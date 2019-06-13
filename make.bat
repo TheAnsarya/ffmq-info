@@ -1,0 +1,3 @@
+asar ffmq.asm
+
+pause
