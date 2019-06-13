@@ -5,13 +5,8 @@
 ; but some names use $FF for space
 ; 
 ; TODO: find out if the code treats the two spaces differently
-
-pushpc
-pushtable
-table "simple.tbl",rtl
-
-org pctosnes($064ba0)
 MonsterNames:
+	print "TEXT: Monster names ($064ba0) -- is at $",pc
 
 	db "Brownie*********"
 	db "Mintmint********"
@@ -94,6 +89,3 @@ MonsterNames:
 	db "Pazuzu**********"
 	db "Zuh*************"
 	db "Dark_King*******"
-
-pulltable
-pullpc

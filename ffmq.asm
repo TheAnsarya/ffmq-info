@@ -16,10 +16,19 @@ MainEntryPoint:
 
 
 
-; data files
-incsrc "location-names.asm"
-incsrc "monster-names.asm"
+; data files at ($063ed0)
 
+pushpc
+pushtable
+table "simple.tbl",rtl
+
+org pctosnes($063ed0)
+
+incsrc "short-text.asm"
+incsrc "data/character-start-stats.asm"
+
+pulltable
+pullpc
 
 
 

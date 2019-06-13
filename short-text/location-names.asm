@@ -1,14 +1,9 @@
 
-; TEXT: Location names
+; TEXT: Location names ($063ed0)
 ; 
 ; TODO: maybe convert to a macro of some kind instead of * for $03?
-
-pushpc
-pushtable
-table "simple.tbl",rtl
-
-org pctosnes($063ed0)
 LocationNames:
+	print "TEXT: Location names ($063ed0)) -- is at $",pc
 
 	db "World***********"
 	db "Focus Tower*****"
@@ -47,6 +42,3 @@ LocationNames:
 	db "Deck************"
 	db "Mac's Ship******"
 	db "Doom Castle*****"
-
-pulltable
-pullpc
