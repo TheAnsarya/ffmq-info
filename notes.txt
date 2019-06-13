@@ -1,0 +1,59 @@
+
+ROM:
+$0b1800 ~ish  -- End credits text
+
+
+$01d636 - start of a bank of text string pointers
+
+$01a37c-$01a411 - lookup table for letters (tiles?)
+9a ff 9b ff 9c ff 9d ff 9e ff 9f ff a0 ff a1 ff a2 ff a3 ff a4 ff a5 ff a6 02 a7 ff a8 ff a9 ff aa ff ab ff ac ff ad ff ae ff af ff b0 ff b1 ff b2 ff b3 02 b4 ff b5 ff b6 ff b7 ff b8 ff b9 ff ba ff bb ff bc ff bd ff be ff bf ff c0 02 c1 ff c2 ff c3 ff c4 ff c5 ff c6 ff c7 ff c8 ff c9 ff ca ff cb ff cc ff cd 02 d2 ff d0 ff d1 ff d7 ff d6 ff da ff d8 ff d9 ff db ff dc ff dd ff ce ff cf 02 90 ff 91 ff 92 ff 93 ff 94 ff 95 ff 96 ff 97 ff 98 ff 99 00
+A B C D E F G H I J K L M N O P Q R S T U V W X Y Z a b c d e f g h i j k l m n o p q r s t u v w x y z. , ' :  - ... / & > % ! ? 0 1 2 3 4 5 6 7 8 9<**>
+
+ram $9e0e - start of jump/routine table (used by "BRANCH: Text -  ($00:9dd2)")
+
+
+$1acde = "Your name: "  text tring from nameing screen
+
+
+
+Text:
+"Strange trees are growing in the
+Level Forest...
+rom $1d90d - $1D924
+ram $3d90d - $3d924
+AC C7 C5 4F BA 40 C7 C5 B8 60 FF B4 C5 40 BA C5 58 48 7B 41 1F 03 53 00
+
+00 is end of string
+03xx is load map name xx ? or maybe jump?
+
+@ 009b61 loads value at 000020 is $000d
+set $00004f to $000d
+$03 -> $000019
+X = value at $000020 << 1  so $00d0 -> $001a -- index of string in bank = $d0, double to get offset of address in bank
+lda $03d636,x   so v@ ($03d636+$001a = $03d650) -> A   $d90d    lower 16bit address of string data
+$17 is $03d90d		-- address of first byte of string
+load value from addr, a == $c7ac
+set high byte to $00, a == $00ac
+compare to v@ $0004 ($0007)
+not equal so don't branch
+copy v@ $009b9d to $000017  ($03a831)
+@ $009d75
+check bit 3 on v@ $0000db
+bit = 0, so branch
+@ $009da2
+get value at $00d0 ($0040)
+check if bits 4 or 7 are set, mask = $0090, aren't
+so branch
+@ $009d9f call routine @ $009bdb
+
+
+
+
+
+
+
+
+WRAM
+$7f: $1000-$1007 - 8 bytes - Player Name, example "ABCDEFGH" -> "9A 9B 9C 9D 9E 9F A0 A1"
+
+
