@@ -56,4 +56,4 @@ so branch
 WRAM
 $7f: $1000-$1007 - 8 bytes - Player Name, example "ABCDEFGH" -> "9A 9B 9C 9D 9E 9F A0 A1"
 
-
+$0e9c-$0e9d - 2 bytes - menu background color (chosen by player in the menu)

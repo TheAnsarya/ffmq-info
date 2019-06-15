@@ -1,0 +1,103 @@
+00b532 lda $63
+
+
+
+00c02a lda $1016,x
+
+
+
+02889e lda #$ff
+0288a0 ora $03,s
+0288a2 sta $03,s
+0288a4 ldx $16
+0288a6 stx $4204
+0288a9 lda #$14
+0288ab jsl $009726
+0288af rep #$30
+0288b1 lda $4214
+0288b4 cmp #$0064
+0288b7 bcc $88bc
+0288bc pha
+0288bd lda #$0000
+0288c0 lda $048b
+0288c3 and #$00ff
+0288c6 asl a
+0288c7 tax
+0288c8 pla
+0288c9 sta $04d1,x
+0288cc sep #$20
+0288ce rep #$10
+
+
+
+0288dd jmp $8522
+
+
+
+028c47 sec
+028c48 sbc #$22
+028c4a inx
+028c4b bra $8c63
+
+
+
+0b9015 lda #$00
+0b9017 sta $7ec360,x
+0b901b lda #$0e
+0b901d xba
+0b901e lda $7ec320,x
+0b9022 clc
+0b9023 adc #$09
+0b9025 jsl $0b92d6
+0b9029 jsr $9304
+0b902c lda $0c00,y
+0b902f sec
+0b9030 sbc #$04
+0b9032 sta $0c10,y
+0b9035 adc #$14
+0b9037 sta $0c14,y
+0b903a lda $0c01,y
+0b903d sta $0c15,y
+0b9040 sbc #$08
+0b9042 sta $0c11,y
+0b9045 rts
+0b9046 lda $7ec260,x
+0b904a asl a
+0b904b asl a
+0b904c tay
+0b904d lda $7ec360,x
+0b9051 lsr a
+0b9052 lsr a
+0b9053 lsr a
+0b9054 lsr a
+0b9055 and #$03
+0b9057 pea $905f
+0b905a jsl $0097be
+0b905e rts
+0b9067 lda #$b9
+0b9069 sta $0c12,y
+0b906c lda #$d2
+0b906e sta $0c16,y
+0b9071 rts
+0b9072 lda #$b9
+0b9074 sta $0c12,y
+0b9077 lda #$b9
+0b9079 sta $0c16,y
+0b907c rts
+0b907d lda #$ba
+0b907f sta $0c12,y
+0b9082 lda #$b9
+0b9084 sta $0c16,y
+0b9087 rts
+0b9088 lda #$d2
+0b908a sta $0c12,y
+0b908d lda #$ba
+0b908f sta $0c16,y
+0b9092 rts
+
+
+
+
+
+
+

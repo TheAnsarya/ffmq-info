@@ -2,6 +2,10 @@ lorom
 arch 65816
 
 
+; Macros!
+insrc "macros.asm"
+
+
 org $008000
 ; game entry point (everything starts here)
 MainEntryPoint:
@@ -12,6 +16,14 @@ MainEntryPoint:
 
 
 
+
+; graphics code, like load town tiles and colors
+
+pushpc
+
+incsrc "load-graphics-routines.asm"
+
+pullpc
 
 
 

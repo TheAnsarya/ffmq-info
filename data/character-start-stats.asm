@@ -3,10 +3,13 @@
 ; 
 ; TODO: map out whole structure
 ; 
-; 
-; 
-; 
-; 
+; character {
+;		name: 16 bytes
+;			only uses up to first 8 bytes
+;			all unused bytes = $03
+;		level: byte
+;		experience: long
+;		
 ; 
 ; 
 ; 
