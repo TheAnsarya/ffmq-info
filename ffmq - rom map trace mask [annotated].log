@@ -2855,6 +2855,9 @@
 009770 jsl $009754		; call routine "Text - TRB value at direct page with mask from $0097fb[] ($00:9754)"
 009774 pld
 009775 rtl				; exit routine
+
+
+
 009776 phd
 009777 pea $0ea8
 00977a pld
@@ -18783,6 +18786,7 @@
 01c835 plx
 01c836 inx
 01c837 bra $c81c
+
 01c839 lda #$00
 01c83b xba
 01c83c lda $0e91

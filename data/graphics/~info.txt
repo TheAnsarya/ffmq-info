@@ -1,0 +1,13 @@
+tiles.dat:
+---------------------
+each $18 bytes is one tile
+in ram: $10 bytes, then $8 bytes each byte followed by $00 (AABBCC... becomes AA00BB00CC00...)
+$22 banks of $100 tiles ($300 bytes)
+$6600 bytes total
+
+
+
+
+
+
+
