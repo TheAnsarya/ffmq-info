@@ -1,0 +1,10 @@
+
+
+
+
+
+!MENU_COLOR = $0e9c
+!MENU_COLOR_LOW = $0e9c
+!MENU_COLOR_HIGH = $0e9d
+
+

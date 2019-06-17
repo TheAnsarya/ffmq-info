@@ -11,6 +11,18 @@ macro setAto16bit()
 	rep #$20
 endmacro
 
+; set XY => 8bit
+; example: %setXYto8bit()
+macro setXYto8bit()
+	sep #$10
+endmacro
+
+; set XY => 16bit
+; example: %setXYto16bit()
+macro setXYto16bit()
+	rep #$10
+endmacro
+
 ; set A,X,Y => 8bit
 ; example: %setAXYto8bit()
 macro setAXYto8bit()

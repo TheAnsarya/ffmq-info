@@ -5,7 +5,8 @@ arch 65816
 ; TODO: why is $aa $f4 $55 $0b being written to $7fdc?
 
 
-
+;Define Variables
+incsrc "ram-variables.asm"
 
 ; Macros!
 incsrc "macros.asm"
@@ -80,6 +81,19 @@ pullpc
 
 
 
+pushpc
+org pctosnes($03b013)
+
+; DATA:  ($07B013)
+; Data07af3b has 16 bit offset pointers to this data
+; TODO: what is all this
+; TODO: is size correct?
+Data07b013:
+	incbin "data\graphics\data07b013.bin"
+
+; pc should equal $07DBFC
+
+pullpc
 
 
 ; data files at ($063ed0)
