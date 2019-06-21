@@ -905,13 +905,13 @@ org $01f985
 
 ; ROUTINE:  ($01f99f)
 ; parameters:
-;		X => offset into jump table $01f9fb[]
+;		X => offset into jump table $01f9fb[] and $01fa03[]
 ;		Y => 
 ;		
 _Entry:
 01f99f jsr $fd50
-01f9a2 sty $1a31
-01f9a5 sty $1a2d
+01f9a2 sty !ram_1a31
+01f9a5 sty !ram_1a2d
 
 	ldy #$0000
 	sty $1a2f			; clear @var_1a2f
@@ -922,7 +922,7 @@ _Entry:
 	asl a
 	asl a
 	and #$80
-	sta $1a33			; @var-1a33 => (bit 3 of @var_19b4 = 1) ? $80 : $00
+	sta !ram_1a33			; !ram_1a33 => (bit 3 of @var_19b4 = 1) ? $80 : $00
 
 	lda $1a52
 	sta $1a34			; @var_1a34 => @var_1a52
@@ -934,20 +934,20 @@ _Entry:
 01f9c5 lda $1a4c
 01f9c8 dec
 01f9c9 bne $f9fa
-01f9cb lda $1a2d
+01f9cb lda !ram_1a2d
 01f9ce clc
 01f9cf adc $1a56
-01f9d2 sta $1a31
+01f9d2 sta !ram_1a31
 01f9d5 lda $1a2e
 01f9d8 clc
 01f9d9 adc $1a57
 01f9dc sta $1a32
-01f9df ldy $1a31
+01f9df ldy !ram_1a31
 01f9e2 jsr $fd50
-01f9e5 sty $1a31
+01f9e5 sty !ram_1a31
 01f9e8 ldy $1a4a
 01f9eb sty $1a2f
-01f9ee stz $1a33
+01f9ee stz !ram_1a33
 01f9f1 lda $1a53
 01f9f4 sta $1a34
 01f9f7 jsr ($fa03,x)
@@ -969,29 +969,29 @@ org $01fa0b
 ;		in jump table Jumpf9fb[]
 ; parameters:
 ;		@var_1924 => 
-;		@var_1a31 => 
-;		@var_1a33 => 
+;		!ram_1a31 => 
+;		!ram_1a33 => 
 ; A => 8bit, XY => 16bit
 ; TODO: name this routine!!!
 
 	ldy #$0000			; loop counter
 	.Loop {
 		phy					; save Y
-		ldy $1a31			; Y => @var_1a31
-		lda $1a33			; A => @var_1a33
+		ldy !ram_1a31		; Y => !ram_1a31
+		lda !ram_1a33		; A => !ram_1a33
 		jsr $fc8e			; get values for $1a3d[0..7]
 		ply					; restore Y
 
 		; copy $1a3d[0..3] to $0800[Y] and $1a3d[4..7] to $0880[Y]
 		%setAto16bit()
-		lda $1a3d
-		sta !ram_0800,y
-		lda $1a3f
-		sta !ram_0800+2,y
-		lda $1a41
-		sta !ram_0800+80,y
-		lda $1a43
-		sta !ram_0800+82,y
+		lda !ram_1a3d
+		sta !tilemap_wram_source_start,y
+		lda !ram_1a3d+2
+		sta !tilemap_wram_source_start+2,y
+		lda !ram_1a3d+4
+		sta !tilemap_wram_source_start+80,y
+		lda !ram_1a3d+6
+		sta !tilemap_wram_source_start+82,y
 		%setAto8bit()
 
 		; counter += 4
@@ -1000,21 +1000,21 @@ org $01fa0b
 		iny
 		iny
 
-		; increment @var_1a31 then subtract @var_1924 if that would be positive
-		lda $1a31			; A => @var_1a31
+		; increment !ram_1a31 then subtract @var_1924 if that would be positive
+		lda !ram_1a31			; A => !ram_1a31
 		inc					; A += 1
 		cmp $1924			; if @var_1924 > A then skip ahead
 		bcc .Skip
 		sec
 		sbc $1924			; A => A - @var_1924
 		.Skip
-		sta $1a31			; @var_1a31 => A
+		sta !ram_1a31			; !ram_1a31 => A
 
 		cpy #$0044			; loop until counter = $44
 		bne .Loop
 	}
 
-	lda #$80			; $80 means increment destination address by 1 word (2 bytes) on write
+	lda #$80			; $80 means increment destination address by 1 word (2 bytes) on write of high byte
 	sta !tilemap_vram_control
 	%setAto16bit()
 	lda !ram_19bd
@@ -1022,7 +1022,7 @@ org $01fa0b
 	and #$000f
 	inc
 	asl a
-	asl a								; A => ((bits 0-3 of !ram_19bd) + 1) * 2
+	asl a								; A => ((inversed bits 0-3 of !ram_19bd) + 1) * 4
 	sta !tilemap_dma_transfer_sizes
 	sta !tilemap_dma_transfer_sizes+2
 	lda #$0044
@@ -1030,12 +1030,12 @@ org $01fa0b
 	sbc !tilemap_dma_transfer_sizes
 	sta !tilemap_dma_transfer_sizes+4
 	sta !tilemap_dma_transfer_sizes+6
-	lda #!ram_0800
+	lda #!tilemap_wram_source_start
 	sta !tilemap_wram_source_addresses
 	clc
 	adc !tilemap_dma_transfer_sizes
 	sta !tilemap_wram_source_addresses+4
-	lda #!ram_0800+80
+	lda #!tilemap_wram_source_start+80
 	sta !tilemap_wram_source_addresses+2
 	clc
 	adc !tilemap_dma_transfer_sizes+2
@@ -1059,12 +1059,290 @@ org $01fa0b
 ; pc should equal $01faae
 
 pullpc
+pushpc
+org $01faae
+
+; ROUTINE:  ($01faae)
+;		in jump table Jumpf9fb[]
+; parameters:
+;		
+; A => 8bit, XY => 16bit
+; TODO: name this routine!!!
+
+01faae ldy #$0000
+01fab1 phy
+01fab2 ldy $1a31
+01fab5 lda $1a33
+01fab8 jsr $fc8e
+01fabb ply
+01fabc rep #$20			; set A => 16bit
+01fabe lda $1a3d
+01fac1 sta $0800,y
+01fac4 lda $1a3f
+01fac7 sta $0880,y
+01faca lda $1a41
+01facd sta $0802,y
+01fad0 lda $1a43
+01fad3 sta $0882,y
+01fad6 sep #$20			; set A => 8bit
+01fad8 iny
+01fad9 iny
+01fada iny
+01fadb iny
+01fadc lda $1a32
+01fadf inc
+01fae0 cmp $1925
+01fae3 bcc $fae9
+01fae5 sec
+01fae6 sbc $1925
+01fae9 sta $1a32
+01faec cpy #$0040
+01faef bne $fab1
+01faf1 lda #$81
+01faf3 sta $19fa
+01faf6 rep #$20			; set A => 16bit
+01faf8 lda $19bf
+01fafb eor #$ffff
+01fafe and #$000f
+01fb01 inc
+01fb02 asl a
+01fb03 asl a
+01fb04 sta $1a0b
+01fb07 sta $1a0d
+01fb0a lda #$0040
+01fb0d sec
+01fb0e sbc $1a0b
+01fb11 sta $1a0f
+01fb14 sta $1a11
+01fb17 lda #$0800
+01fb1a sta $1a03
+01fb1d clc
+01fb1e adc $1a0b
+01fb21 sta $1a07
+01fb24 lda #$0880
+01fb27 sta $1a05
+01fb2a clc
+01fb2b adc $1a0d
+01fb2e sta $1a09
+01fb31 jsr $fd24
+01fb34 sta $19fb
+01fb37 inc
+01fb38 sta $19fd
+01fb3b dec
+01fb3c and #$441e
+01fb3f sta $19ff
+01fb42 inc
+01fb43 sta $1a01
+01fb46 sep #$20			; set A => 8bit
+01fb48 rts				; exit routine
 
 
 
 
 
 
+
+
+
+
+
+
+
+pushpc
+org $01fb49
+
+; ROUTINE:  ($01fb49)
+;		in jump table Jumpfa03[]
+; parameters:
+;		
+; A => 8bit, XY => 16bit
+; TODO: name this routine!!!
+
+	ldy #$0000			; loop counter
+	.Loop {
+		phy					; save Y
+		ldy !ram_1a31		; Y => !ram_1a31
+		lda !ram_1a33		; A => !ram_1a33
+		jsr $fc8e			; get values for $1a3d[0..7]
+		ply					; restore Y
+
+		; copy $1a3d[0..3] to $0900[Y] and $1a3d[4..7] to $0980[Y]
+		%setAto16bit()
+		lda !ram_1a3d
+		sta !tilemap_wram_source_start_2,y
+		lda !ram_1a3d+2
+		sta !tilemap_wram_source_start_2+2,y
+		lda !ram_1a3d+4
+		sta !tilemap_wram_source_start_2+80,y
+		lda !ram_1a3d+6
+		sta !tilemap_wram_source_start_2+82,y
+		%setAto8bit()
+
+		; counter += 4
+		iny
+		iny
+		iny
+		iny
+
+
+		lda !ram_1a31		; A => !ram_1a31
+		inc					; A += 1
+		cmp $1924			; if @var_1924 > A then skip ahead
+		bcc .Skip
+
+; MISSING
+
+		.Skip
+		sta !ram_1a31			; !ram_1a31 => A
+		cpy #$0044			; loop until counter = $44
+		bne .Loop
+	}
+
+
+	lda #$80			; $80 means increment destination address by 1 word (2 bytes) on write of high byte
+	sta !tilemap_vram_control_2
+	%setAto16bit()
+	lda !ram_19bd
+	eor #$ffff
+	and #$000f
+	inc
+	asl a
+	asl a								; A => ((inversed bits 0-3 of !ram_19bd) + 1) * 4
+	sta !tilemap_dma_transfer_sizes_2
+	sta !tilemap_dma_transfer_sizes_2+2
+	lda #$0044
+	sec
+	sbc !tilemap_dma_transfer_sizes_2
+	sta !tilemap_dma_transfer_sizes_2+4
+	sta !tilemap_dma_transfer_sizes_2+6
+	lda #!tilemap_wram_source_start_2
+	sta !tilemap_wram_source_addresses_2
+	clc
+	adc !tilemap_dma_transfer_sizes_2
+	!tilemap_wram_source_addresses_2+4
+	lda #!tilemap_wram_source_start_2+80
+	sta !tilemap_wram_source_addresses_2+2
+	clc
+	adc !tilemap_dma_transfer_sizes_2+2
+	sta !tilemap_wram_source_addresses_2+6
+
+	jsr CalculateTilemapVramDestinationAddress
+
+	ora #$0800
+	sta !tilemap_vram_destination_addresses_2
+	clc
+	adc #$0020
+	sta !tilemap_vram_destination_addresses_2+2
+	eor #$0400
+	and #$4fc0
+	sta !tilemap_vram_destination_addresses_2+4
+	clc
+	adc #$0020
+	sta !tilemap_vram_destination_addresses_2+6
+	%setAto8bit()
+	rts				; exit routine
+
+; pc should equal $01fbef
+
+pullpc
+pushpc
+org $01fb49
+
+; ROUTINE:  ($01fbef)
+;		in jump table Jumpfa03[]
+; parameters:
+;		!ram_1a31
+;		!ram_1a32
+;		!ram_1a33
+;		!ram_1925
+; A => 8bit, XY => 16bit
+; TODO: name this routine!!!
+
+	ldy #$0000			; loop counter
+	.Loop {
+		phy					; save Y
+		ldy !ram_1a31		; Y => !ram_1a31
+		lda !ram_1a33		; A => !ram_1a33
+		jsr $fc8e			; get values for $1a3d[0..7]
+		ply					; restore Y
+
+		; copy $1a3d[0..3] to $0900[Y] and $1a3d[4..7] to $0980[Y]
+		%setAto16bit()
+		lda !ram_1a3d
+		sta !tilemap_wram_source_start_2,y
+		lda !ram_1a3d+2
+		sta !tilemap_wram_source_start_2+2,y
+		lda !ram_1a3d+4
+		sta !tilemap_wram_source_start_2+80,y
+		lda !ram_1a3d+6
+		sta !tilemap_wram_source_start_2+82,y
+		%setAto8bit()
+
+		; counter += 4
+		iny
+		iny
+		iny
+		iny
+
+		; increment !ram_1a32 then subtract !ram_1925 if that would be positive
+		lda !ram_1a32		; A => !ram_1a32
+		inc					; A += 1
+		cmp !ram_1925			; if !ram_1925 > A then skip ahead
+		bcc .Skip
+		sec
+		sbc !ram_1925			; A => A - !ram_1925
+		.Skip
+		sta !ram_1a32			; !ram_1a32 => A
+
+		cpy #$0040			; loop until counter = $40
+		bne .Loop
+	}
+
+	lda #$81			; $81 means increment destination address by $20 words ($40 bytes) on write of high byte
+	sta !tilemap_vram_control_2
+	%setAto16bit()
+	lda !ram_19bf
+	eor #$ffff
+	and #$000f
+	inc
+	asl a
+	asl a								; A => ((inversed bits 0-3 of !ram_19bf) + 1) * 4
+	sta !tilemap_dma_transfer_sizes_2
+	sta !tilemap_dma_transfer_sizes_2+2
+	lda #$0040
+	sec
+	sbc !tilemap_dma_transfer_sizes_2
+	sta !tilemap_dma_transfer_sizes_2+4
+	sta !tilemap_dma_transfer_sizes_2+6
+	lda #!tilemap_wram_source_start_2
+	sta !tilemap_wram_source_addresses_2
+	clc
+	adc !tilemap_dma_transfer_sizes_2
+	sta !tilemap_wram_source_addresses_2+4
+	lda #!tilemap_wram_source_start_2+80
+	sta !tilemap_wram_source_addresses_2+2
+	clc
+	adc !tilemap_dma_transfer_sizes_2+2
+	sta !tilemap_wram_source_addresses_2+6
+
+	jsr CalculateTilemapVramDestinationAddress
+
+	ora #$0800
+	sta !tilemap_vram_destination_addresses_2
+	inc
+	sta !tilemap_vram_destination_addresses_2+2
+	dec
+	and #$4c1e					; TODO: what does this mask do
+	clc
+	sta !tilemap_vram_destination_addresses_2+4
+	inc
+	sta !tilemap_vram_destination_addresses_2+6
+	%setAto8bit()
+	rts					; exit routine
+
+; pc should equal $01fc8e
+
+pullpc
 pushpc
 org $01fc8e
 
@@ -1655,6 +1933,19 @@ Jumpf9fb:
 	db $AE,$FA			; 
 
 ; pc should equal $01fa03
+
+pullpc
+pushpc
+org pctosnes($00fa03)
+; DATA: Jump table for .... ($01fa03)
+Jumpfa03:
+
+	db $49,$FB			; 
+	db $EF,$FB			; 
+	db $49,$FB			; 
+	db $EF,$FB			; 
+
+; pc should equal $01fa0b
 
 pullpc
 

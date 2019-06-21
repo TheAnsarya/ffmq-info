@@ -1,7 +1,13 @@
 
-!ram_0800 = $0800
+!tilemap_wram_source_start = $0800
+!tilemap_wram_source_start_2 = $0900
 
-!ram_19bd = $19bd		; $19bd-$19be => 2 bytes, botttom 4 bits of $19bd are a dma transfer size variable
+
+!ram_1924 = $1924
+!ram_1925 = $1925
+
+
+!ram_19bd = $19bd		; $19bd-$19be => 2 bytes, botttom 4 bits of $19bd inversed are a dma transfer size variable (
 !ram_19bf = $19bf		; $19bf
 
 !tilemap_vram_control = $19fa							; $19fa => 1 byte, VMAIN flags ---- known values $80, $81
@@ -13,6 +19,12 @@
 !tilemap_vram_destination_addresses_2 = $1a14			; $1a14-$1a1b => 8 bytes, 2-byte pairs, 4 of them, each is destination address in VRAM
 !tilemap_wram_source_addresses_2 = $1a1c				; $1a1c-$1a23 => 8 bytes, 2-byte pairs, 4 of them, each is source address offset
 !tilemap_dma_transfer_sizes_2 = $1a24					; $1a24-$1a2b => 8 bytes, 2-byte pairs, 4 of them, each is DMA transfer size in bytes
+
+!ram_1a2d = $1a2d
+
+!ram_1a31 = $1a31
+!ram_1a32 = $1a32
+!ram_1a33 = $1a33
 
 !ram_1a3d = $1a3d
 
