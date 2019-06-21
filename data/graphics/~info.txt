@@ -6,6 +6,29 @@ $22 banks of $100 tiles ($300 bytes)
 $6600 bytes total
 
 
+038030-title-screen-maybe.bin:
+viewable in 2bpp, 2 dimensional, 32 blocks wide in TileMolester
+loaded from routine $008ec4
+
+
+
+048000-tiles.bin
+$100 tiles, $18 bytes
+when written each becomes $10-$8-$ff pattern (first $10 bytes, then last $8 bytes each alternated with $ff (AABBCC... becomes AAffBBffCCff...))
+$1800 bytes total size
+
+
+
+
+03800-colors-$20-bytes.bin
+ROUTINE: LoadTilesAndColors ($008ec4)
+
+
+
+
+
+
+
 
 
 

@@ -5,6 +5,135 @@
 
 
 
+
+
+pushpc
+org $008c3d
+
+; ROUTINE:  ($008c3d)
+
+	php				; save processor status to stack
+	%setAXYto8bit()
+	ldx !ram_1031
+008c43 cpx #$ff
+008c45 beq $8c81
+
+008c47 lda #$02
+008c49 and $00d8
+008c4c beq $8c83
+
+008c4e lda $049800,x
+008c52 adc #$0a
+008c54 xba
+008c55 txa
+008c56 and #$38
+008c58 asl a
+008c59 pha
+008c5a txa
+008c5b and #$07
+008c5d ora $01,s
+008c5f plx
+008c60 asl a
+	%setAXYto16bit()
+008c63 sta $7f075a
+008c67 inc
+008c68 sta $7f075c
+008c6c adc #$000f
+008c6f sta $7f079a
+008c73 inc
+008c74 sta $7f079c
+008c78 sep #$20			; set A => 8bit
+008c7a ldx #$17da
+008c7d lda #$7f
+008c7f bra $8c9c
+
+
+008c83 lda $049800,x
+008c87 asl a
+008c88 asl a
+008c89 sta $00f4
+008c8c rep #$10			; set X,Y => 16bit
+008c8e lda !ram_1031
+008c91 jsr $8d8a
+008c94 stx $00f2
+008c97 ldx #$2d1a
+008c9a lda #$7e
+008c9c pha
+008c9d lda #$04
+008c9f and $00da
+008ca2 beq $8cc5
+
+008ca4 lda $0014
+008ca7 dec
+008ca8 beq $8cc5
+
+008caa lda #$10
+008cac and $00da
+008caf bne $8cbb
+
+008cbb plb
+008cbc lda $0001,x
+008cbf and #$e3
+008cc1 ora #$9c
+008cc3 bra $8ccd
+
+008cc5 plb
+008cc6 lda $0001,x
+008cc9 and #$e3
+008ccb ora #$88
+008ccd xba
+008cce lda !ram_1031_long
+008cd2 cmp #$29
+008cd4 bcc $8d11
+
+008cd6 cmp #$2c
+008cd8 beq $8d11
+
+008cda lda $0001,x
+008cdd and #$63
+008cdf ora #$08
+008ce1 sta $0001,x
+008ce4 sta $0003,x
+008ce7 lda $001030
+008ceb ldy #$ffff
+008cee sec
+008cef iny
+008cf0 sbc #$0a
+008cf2 bcs $8cef
+
+008cf4 adc #$8a
+008cf6 sta $0002,x
+008cf9 cpy #$0000
+008cfc beq $8d06
+
+008cfe tya
+008cff adc #$7f
+008d01 sta $0000,x
+008d04 bra $8d20
+
+008d11 xba
+008d12 sta $0001,x
+008d15 sta $0003,x
+008d18 lda #$45
+008d1a sta $0000,x
+008d1d sta $0002,x
+008d20 phk
+008d21 plb
+008d22 lda #$80
+008d24 tsb $00d4
+008d27 plp
+008d28 rts				; exit routine
+
+; pc should equal $008d29
+
+pullpc
+
+
+
+
+
+
+
 pushpc
 org $008ddf
 
@@ -88,16 +217,19 @@ pullpc
 pushpc
 org $008ec4
 
-; ROUTINE:         (00:8ec4)
+; ROUTINE: LoadTilesAndColors ($008ec4)
+;		loads tiles from $078030 ($038030 in file)
+;			viewable in 2bpp, 2 dimensional, 32 blocks wide in TileMolester
+;			the 8bit address translation causes this output
 ; TODO: what are we actually loading? overworld? city? title?
+;		text and menu outline and stuff and part of title screen
 ; TODO: finish code/comment cleanup
 ; TODO: Better label name
-				; setup
 LoadTilesAndColors:
 	php					; save processor status to stack
 	phd					; save direct page to stack
 	%setAXYto16bit()
-	lda #$2100			; 
+	lda #$2100
 	tcd					; set direct page => $2100, so direct mode writes are to the registers
 	%setAto8bit()
 
@@ -106,27 +238,29 @@ LoadTilesAndColors:
 	ldx #$1801			; $01 means write 2 bytes each time
 						; $18 means destination is $2118 VRAM register  
 	stx $4350			; write dma control and destination registers
-						; setup source => $07:8030
-	ldx #$8030				; 
+
+	; setup source => $07:8030
+	ldx #$8030
 	stx $4352				; set source address offset => $8030
-	lda #$07				; 
+	lda #$07
 	sta $4354				; set source address bank => $07
-	ldx #$1000			; 
+
+	ldx #$1000
 	stx $4355			; set DMA transfer size to $1000 bytes
-	ldx #$3000			; 
+	ldx #$3000
 	stx $16				; set vram destination address => $3000
-	lda #$84			; $84 means 													; TODO: 
+	lda #$84			; $84 means increment address on write high byte, translation = 8bit, increment address by 1 word
 	sta $15				; set video port control [VMAIN]
-	lda #$20			; bitmask for DMA channel 5
+	lda #$20
 	sta $420b			; start DMA transfer on channel 5
 
-	; load $100 tiles from $04:8000 ($18 bytes each) to vram address $2000 ($20 bytes each)
+	; load $100 tiles from $048000 (in file: $020000) ($18 bytes each) to vram address $2000 ($20 bytes each)
 	lda #$80			; $80 means increment destination address by 1 word (2 bytes) on write
 	sta $15				; set video port control [VMAIN]
 	%setAXYto16bit()
-	lda #$ff00			; 
+	lda #$ff00
 	sta $00f0			; set high byte for second half of tile => $ff
-	ldx #$2000			; 
+	ldx #$2000
 	stx $16				; set vram destination address => $2000
 						; setup source => $04:8000
 	%setDatabank(04)
@@ -259,7 +393,7 @@ org $0183be
 ;		copy two sections from WRAM to VRAM through DMA (channel 0)
 ;		each section can have 4 copys
 ; parameters:
-;		@var_1a4c => if $01 then don't call second copy routine
+;		@var_1a4c => if $01 then call second copy routine    TODO: verify
 ;		ram $19fa - $1a12 => parameters for first copy
 ;		ram $1a13 - $1a2b => parameters for second copy
 CopyTilemapFromWRAMToVRAM:
@@ -285,32 +419,32 @@ org $0183cb
 ; ROUTINE: Copy Tilemap from WRAM to VRAM ($0183cb)
 ;		copy from WRAM to VRAM through DMA (channel 0) up to 4 times options at $19fa
 ; parameters:
-;		$19fa => 1 byte, VMAIN flags
-;		$19fb-$1a02 => 8 bytes, 2-byte pairs, 4 of them, each is destination address in VRAM
-;		$1a03-$1a0a => 8 bytes, 2-byte pairs, 4 of them, each is source address offset
-;		$1a0b-$1a12 => 8 bytes, 2-byte pairs, 4 of them, each is DMA transfer size in bytes
+;		$19fa => 1 byte, VMAIN flags, !tilemap_vram_control
+;		$19fb-$1a02 => 8 bytes, 2-byte pairs, 4 of them, each is destination address in VRAM, !tilemap_vram_destination_addresses
+;		$1a03-$1a0a => 8 bytes, 2-byte pairs, 4 of them, each is source address offset, !tilemap_wram_source_addresses
+;		$1a0b-$1a12 => 8 bytes, 2-byte pairs, 4 of them, each is DMA transfer size in bytes, !tilemap_dma_transfer_sizes
 ; A => 8bit, XY => 16bit
 CopyTilemapFromWRAMToVRAM_1:
 	ldx #$0000			; loop counter
 	; setup and run dma transfer up to 4 times {
 	.Loop {
-		ldy $1a0b,x			; Y => DMA transfer size, @var_1a0b[X]
+		ldy !tilemap_dma_transfer_sizes,x
 		beq .Exit			; exit when y = $0000 (no bytes to transfer)
-		sty $4305			; DMA transfer size => @var_1a0b[X]
+		sty $4305			; DMA transfer size => !tilemap_dma_transfer_sizes[X]
 		ldy #$1801			; $18 means destination is VRAM register $2118, $01 means write 2 bytes each time
 		sty $4300			; write dma control and destination registers
 
 		; setup source address
-		ldy $1a03,x
-		sty $4302			; source offset => @var_1a03[X]
+		ldy !tilemap_wram_source_addresses,x
+		sty $4302			; source offset => !tilemap_wram_source_addresses[X]
 		lda #$00
 		sta $4304			; source bank => $00
 
 		; destination setup
-		ldy $19fb,x
-		sty $2116			; VRAM destination address => @var_19fb[X]
-		lda $19fa
-		sta $2115			; VMAIN control => @var_19fa
+		ldy !tilemap_vram_destination_addresses,x
+		sty $2116			; VRAM destination address => !tilemap_vram_destination_addresses[X]
+		lda !tilemap_vram_control
+		sta $2115			; VMAIN control
 		lda #$01
 		sta $420b			; start dma transfer on channel 0
 
@@ -333,32 +467,32 @@ org $018400
 ; ROUTINE:  ($018400)
 ;		copy from WRAM to VRAM through DMA (channel 0) up to 4 times, options at $1a13
 ; parameters:
-;		$1a13 => 1 byte, VMAIN flags
-;		$1a14-$1a1b => 8 bytes, 2-byte pairs, 4 of them, each is destination address in VRAM
-;		$1a1c-$1a23 => 8 bytes, 2-byte pairs, 4 of them, each is source address offset
-;		$1a24-$1a2b => 8 bytes, 2-byte pairs, 4 of them, each is DMA transfer size in bytes
+;		$1a13 => 1 byte, VMAIN flags, !tilemap_vram_control_2
+;		$1a14-$1a1b => 8 bytes, 2-byte pairs, 4 of them, each is destination address in VRAM, !tilemap_vram_destination_addresses_2
+;		$1a1c-$1a23 => 8 bytes, 2-byte pairs, 4 of them, each is source address offset, !tilemap_wram_source_addresses_2
+;		$1a24-$1a2b => 8 bytes, 2-byte pairs, 4 of them, each is DMA transfer size in bytes, !tilemap_dma_transfer_sizes_2
 ; A => 8bit, XY => 16bit
 CopyTilemapFromWRAMToVRAM_2:
 	ldx #$0000		; setup X as a counter starting at $0000
 ; start of loop - setup and run dma transfer up to 4 times {
 	.Loop {
-		ldy $1a24,x			; Y => DMA transfer size, @var_1a24[X]
+		ldy !tilemap_dma_transfer_sizes_2,x
 		beq .Exit			; exit when y = $0000 (no bytes to transfer)
-		sty $4305			; DMA transfer size => @var_1a24[X]
+		sty $4305			; DMA transfer size => !tilemap_dma_transfer_sizes_2[X]
 		ldy #$1801			; $18 means destination is VRAM register $2118, $01 means write 2 bytes each time
 		sty $4300			; write dma control and destination registers
 
 		; setup source address
-		ldy $1a1c,x
-		sty $4302			; source offset => @var_1a1c[X]
+		ldy !tilemap_wram_source_addresses_2,x
+		sty $4302			; source offset => !tilemap_wram_source_addresses_2[X]
 		lda #$00
 		sta $4304			; source bank => $00
 
 		; destination setup
-		ldy $1a14,x
-		sty $2116			; VRAM destination address => @var_1a14[X]
-		lda $1a13
-		sta $2115			; VMAIN control => @var_1a13
+		ldy !tilemap_vram_destination_addresses_2,x
+		sty $2116			; VRAM destination address => !tilemap_vram_destination_addresses_2[X]
+		lda !tilemap_vram_control_2
+		sta $2115			; VMAIN control
 		lda #$01
 		sta $420b			; start dma transfer on channel 0
 
@@ -655,6 +789,67 @@ pullpc
 
 
 
+
+
+
+pushpc
+org $01f849
+
+; ROUTINE:  ($01f849)
+; parameters:
+;		ram $19f7 =>
+; TODO: name this routine!!!
+
+	%setAto8bit()
+01f84b inc $19f7
+01f84e jsr $82cf
+01f851 ldx $1900
+01f854 stx $1904
+01f857 ldx $1902
+01f85a stx $1906
+01f85d lda #$07
+01f85f sta $1a4c
+01f862 jsr $f8a5
+	ldx #$0000			; loop counter
+	.Loop {
+		phx					; save counter
+		%setAto16bit()
+01f86b lda $f891,x
+01f86e sta $1a14
+01f871 clc
+01f872 adc #$0400
+01f875 sta $1a16
+		%setAto8bit()
+01f87a jsr $f8da
+
+		plx					; restore counter
+		inx
+		inx					; counter += 2
+		cpx #$0014			; loop until counter = $14
+		bne .Loop
+	}
+
+01f885 stz $1a4c
+01f888 lda #$15
+01f88a sta $1a4e
+01f88d stz $1a4f
+01f890 rts				; exit routine
+
+; pc should equal $01f891
+
+pullpc
+
+
+
+
+
+
+
+
+
+
+
+
 pushpc
 org $01f977
 
@@ -777,6 +972,7 @@ org $01fa0b
 ;		@var_1a31 => 
 ;		@var_1a33 => 
 ; A => 8bit, XY => 16bit
+; TODO: name this routine!!!
 
 	ldy #$0000			; loop counter
 	.Loop {
@@ -786,16 +982,16 @@ org $01fa0b
 		jsr $fc8e			; get values for $1a3d[0..7]
 		ply					; restore Y
 
-		; copy $1a3d[0..3] to $0800 and $1a3d[4..7] to $0880
+		; copy $1a3d[0..3] to $0800[Y] and $1a3d[4..7] to $0880[Y]
 		%setAto16bit()
 		lda $1a3d
-		sta $0800,y
+		sta !ram_0800,y
 		lda $1a3f
-		sta $0802,y
+		sta !ram_0800+2,y
 		lda $1a41
-		sta $0880,y
+		sta !ram_0800+80,y
 		lda $1a43
-		sta $0882,y
+		sta !ram_0800+82,y
 		%setAto8bit()
 
 		; counter += 4
@@ -818,43 +1014,45 @@ org $01fa0b
 		bne .Loop
 	}
 
-01fa4e lda #$80
-01fa50 sta $19fa
+	lda #$80			; $80 means increment destination address by 1 word (2 bytes) on write
+	sta !tilemap_vram_control
 	%setAto16bit()
-01fa55 lda $19bd
-01fa58 eor #$ffff
-01fa5b and #$000f
-01fa5e inc
-01fa5f asl a
-01fa60 asl a
-01fa61 sta $1a0b
-01fa64 sta $1a0d
-01fa67 lda #$0044
-01fa6a sec
-01fa6b sbc $1a0b
-01fa6e sta $1a0f
-01fa71 sta $1a11
-01fa74 lda #$0800
-01fa77 sta $1a03
-01fa7a clc
-01fa7b adc $1a0b
-01fa7e sta $1a07
-01fa81 lda #$0880
-01fa84 sta $1a05
-01fa87 clc
-01fa88 adc $1a0d
-01fa8b sta $1a09
-01fa8e jsr $fd24
-01fa91 sta $19fb
-01fa94 clc
-01fa95 adc #$0020
-01fa98 sta $19fd
-01fa9b eor #$0400
-01fa9e and #$47c0
-01faa1 sta $19ff
-01faa4 clc
-01faa5 adc #$0020
-01faa8 sta $1a01
+	lda !ram_19bd
+	eor #$ffff
+	and #$000f
+	inc
+	asl a
+	asl a								; A => ((bits 0-3 of !ram_19bd) + 1) * 2
+	sta !tilemap_dma_transfer_sizes
+	sta !tilemap_dma_transfer_sizes+2
+	lda #$0044
+	sec
+	sbc !tilemap_dma_transfer_sizes
+	sta !tilemap_dma_transfer_sizes+4
+	sta !tilemap_dma_transfer_sizes+6
+	lda #!ram_0800
+	sta !tilemap_wram_source_addresses
+	clc
+	adc !tilemap_dma_transfer_sizes
+	sta !tilemap_wram_source_addresses+4
+	lda #!ram_0800+80
+	sta !tilemap_wram_source_addresses+2
+	clc
+	adc !tilemap_dma_transfer_sizes+2
+	sta !tilemap_wram_source_addresses+6
+
+	jsr CalculateTilemapVramDestinationAddress
+
+	sta !tilemap_vram_destination_addresses
+	clc
+	adc #$0020
+	sta !tilemap_vram_destination_addresses+2
+	eor #$0400
+	and #$47c0
+	sta !tilemap_vram_destination_addresses+4
+	clc
+	adc #$0020
+	sta !tilemap_vram_destination_addresses+6
 	%setAto8bit()
 	rts					; exit routine
 
@@ -947,7 +1145,7 @@ org $01fc8e
 		phx					; save X
 		tax					; X => @var_1a35[Y]
 
-		; move bit 1 to bit 6 and clear other bits
+		; move bit 1 to bit 6 and clear other bits TODO: WRONG
 		lsr $1a3c			; A => A / 2
 		ror a
 		ror a				; rotate right 2
@@ -984,10 +1182,52 @@ org $01fc8e
 
 pullpc
 
+pushpc
+org $01fd24
+; ROUTINE: Calculate tilemap vram destination address ($01fd24)
+;		A => !ram_19bf * $40 + ($4000 or $4400 based on bit 4 of !ram_19bd)
+; parameters:
+;		!ram_19bf => this * $40 is the base address
+;		!ram_19bd => bit 4 determines which offset to use
+; returns:
+;		A => vram destination address
+CalculateTilemapVramDestinationAddress:
+	%setAto8bit()
+	ldx #$0000			; X => $00
+	lda !ram_19bf
+	sta $4202			; WRMPYA => !ram_19bf
+	lda #$40
+	sta $4203			; WRMPYB => $40
 
+	lda !ram_19bd		; A => !ram_19bd
+	bit #$10
+	beq .Skip			; if bit 4 = 0, then don't add 2
+	inx
+	inx					; X += 2
+	.Skip
 
+	asl a				; A => A * 2
+	%setAto16bit()
+	and #$001e			; bits 1-4
+	clc
+	adc CalculateTilemapVramDestinationAddress_Offset,x			; A += $fd4c[X], $fd4c is directly after this routine TODO: make sure label results in correct instructions
+	clc
+	adc $4216			; A += !ram_19bf * $40
+	rts					; exit routine
 
+; pc should equal $01fd4c
+pullpc
+pushpc
+org pctosnes($00fd4c)
 
+; DATA: word is offset used above ($01fd4c)
+;		bit 4 of !ram_19bd determines which offset to use
+CalculateTilemapVramDestinationAddress_Offset:
+db $00,$40,$00,$44
+
+; pc should equal $01fd50
+
+pullpc
 
 pushpc
 org $01fd50
@@ -1210,10 +1450,10 @@ org $01ffc1
 
 	; 
 	ldx #$000f
-	stx $19bf			; @var_19bf => $000f
+	stx !ram_19bf			; !ram_19bf => $000f
 
 	ldx #$0000			; loop counter
-	stx $19bd			; clear @var_19bd
+	stx !ram_19bd			; clear !ram_19bd
 
 	.Loop {
 		phx					; save counter
@@ -1222,14 +1462,14 @@ org $01ffc1
 		inc $192e			; increment @var_192e
 
 		plx					; restore counter
-		stx $19bf			; @var_19bf => counter
+		stx !ram_19bf			; !ram_19bf => counter
 		inx					; increment counter
 		cpx #$000d			; loop until counter = $d
 		bne .Loop
 	}
 
 	ldx #$0000
-	stx $19bf			; clear @var_19bf
+	stx !ram_19bf			; clear !ram_19bf
 
 	rts					; exit routine
 
