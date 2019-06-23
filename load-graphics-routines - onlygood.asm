@@ -1,284 +1,16 @@
 
 
 
-;-------------------------------------------------------------------------
-;						BANK $00
-;-------------------------------------------------------------------------
 
 
 
 
 
 
-
-
-
-;-------------------------------------------------------------------------
-pushpc
-org $008504
-
-
-; ROUTINE: Copy 8 Colors from $d8e4 ($008504)
-;		copies $8 colors ($10 bytes)
-;		data starts at $d8e4
-; parameters:
-;		A => starting color index
-;		X => source address offset
-; directpage should be $4300
-; dma control $4350 should be set
-; dma destination $4351 should be set
-; dma databank $4354 should be set
-Copy8ColorsFromD8E4:
-	sta $2121			; starting color index => A
-	ldy #$0010
-	sty $55				; dma transfer size => $10
-	%setAXYto16bit()
-	txa
-	and #$00ff
-	clc
-	adc #$d8e4
-	sta $52				; source address => X.low + $d8e4
-	%setAto8bit()
-	lda #$20
-	sta $420b			; start dma on channel 5
-	rts					; exit routine
-
-
-; pc should equal $008520
-pullpc
-;-------------------------------------------------------------------------
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-;-------------------------------------------------------------------------
-pushpc
-org $008c1b
-
-
-; ROUTINE: DecompressAddress ($008c1b)
-;		expands the address stored in A.low
-; parameters:
-;		A => compressed address
-; returns:
-;		X => ((bits 3-5 of A) * 2) + (bits 0-2 of A)
-;			so values can be: $00 to $77 (with bit 3 always 0)
-;		A => decompressed address
-;			(((X * 2) + X) * 16) + $8000 (bottom 4 bits always 0)
-;			so values can be: $8000 to $9650
-; TODO: maybe rename when other address expanders are found or we figure out what this is for
-DecompressAddress:
-	php					; save processor status
-	%setAXYto16bit()
-
-	and #$00ff			; discard high byte
-	pha					; save A
-	and #$0038			; bits 3-5
-	asl a				; A => A * 2
-	tax					; X => A
-	pla					; restore A
-
-	; using stack as a variable
-	; X is (bits 3-5 of A) * 2
-	and #$0007			; bits 0-2
-	phx					; stack => X
-	adc $01,s			; A += stack, is ((bits 3-5) * 2) + (bits 0-2)
-	sta $01,s			; stack => A
-	asl a				; A => A * 2
-	adc $01,s			; A += stack
-	asl a
-	asl a
-	asl a
-	asl a				; A => A * 16
-	adc #$8000			; A += $8000
-	plx					; X => stack
-
-	plp					; restore processor status
-	rts					; exit routine
-
-
-; pc should equal $008c3d
-pullpc
-;-------------------------------------------------------------------------
-pushpc
-org $008c3d
-
-
-; ROUTINE:  ($008c3d)
-Routine008c3d:
-	php				; save processor status to stack
-	%setAXYto8bit()
-	ldx !ram_1031
-008c43 cpx #$ff
-008c45 beq $8c81
-
-008c47 lda #$02
-008c49 and $00d8
-008c4c beq $8c83
-
-008c4e lda $049800,x
-008c52 adc #$0a
-008c54 xba
-008c55 txa
-008c56 and #$38
-008c58 asl a
-008c59 pha
-008c5a txa
-008c5b and #$07
-008c5d ora $01,s
-008c5f plx
-008c60 asl a
-	%setAXYto16bit()
-008c63 sta $7f075a
-008c67 inc
-008c68 sta $7f075c
-008c6c adc #$000f
-008c6f sta $7f079a
-008c73 inc
-008c74 sta $7f079c
-008c78 sep #$20			; set A => 8bit
-008c7a ldx #$17da
-008c7d lda #$7f
-008c7f bra $8c9c
-
-
-008c83 lda $049800,x
-008c87 asl a
-008c88 asl a
-008c89 sta !color_data_source_offset
-008c8c rep #$10			; set X,Y => 16bit
-008c8e lda !ram_1031
-008c91 jsr DecompressAddressUnlessFF
-008c94 stx $00f2
-008c97 ldx #$2d1a
-008c9a lda #$7e
-008c9c pha
-008c9d lda #$04
-008c9f and $00da
-008ca2 beq $8cc5
-
-008ca4 lda $0014
-008ca7 dec
-008ca8 beq $8cc5
-
-008caa lda #$10
-008cac and $00da
-008caf bne $8cbb
-
-008cbb plb
-008cbc lda $0001,x
-008cbf and #$e3
-008cc1 ora #$9c
-008cc3 bra $8ccd
-
-008cc5 plb
-008cc6 lda $0001,x
-008cc9 and #$e3
-008ccb ora #$88
-008ccd xba
-008cce lda !ram_1031_long
-008cd2 cmp #$29
-008cd4 bcc $8d11
-
-008cd6 cmp #$2c
-008cd8 beq $8d11
-
-008cda lda $0001,x
-008cdd and #$63
-008cdf ora #$08
-008ce1 sta $0001,x
-008ce4 sta $0003,x
-008ce7 lda $001030
-008ceb ldy #$ffff
-008cee sec
-008cef iny
-008cf0 sbc #$0a
-008cf2 bcs $8cef
-
-008cf4 adc #$8a
-008cf6 sta $0002,x
-008cf9 cpy #$0000
-008cfc beq $8d06
-
-008cfe tya
-008cff adc #$7f
-008d01 sta $0000,x
-008d04 bra $8d20
-
-008d11 xba
-008d12 sta $0001,x
-008d15 sta $0003,x
-008d18 lda #$45
-008d1a sta $0000,x
-008d1d sta $0002,x
-008d20 phk
-008d21 plb
-008d22 lda #$80
-008d24 tsb $00d4
-008d27 plp
-008d28 rts				; exit routine
-
-
-; pc should equal $008d29
-pullpc
-;-------------------------------------------------------------------------
-
-
-
-
-
-
-;-------------------------------------------------------------------------
-pushpc
-org $008d8a
-
-
-; ROUTINE:  ($008d8a)
-; parameters:
-;		A => compressed address
-;			if $ff then return $ffff
-; returns:
-;		X => decompressed address
-;			$ffff when A is $ff
-DecompressAddressUnlessFF:
-	cmp #$ff
-	beq .IsFF
-
-	.NotFF
-		jsr DecompressAddress
-		tax
-		rts				; exit routine
-	.IsFF
-		ldx #$ffff
-		rts				; exit routine
-
-
-; pc should equal $008d97
-pullpc
-;-------------------------------------------------------------------------
-
-
-
-
-
-
-;-------------------------------------------------------------------------
 pushpc
 org $008ddf
 
-
-; ROUTINE: Copy tiles to VRAM ($008ddf)
+; ROUTINE: Copy tiles to VRAM (00:8ddf)
 ;		loops Y times, writing one tile to VRAM each time
 ;			copies $10 bytes to vram, then copies $8 bytes as the low byte using the same high byte loaded from $00f0-$00f1
 ;			so if data for last $8 bytes is = $AA $BB $CC... and $00f0 = $5500, then the second part would write as $55AA $55BB $55CC...
@@ -336,10 +68,9 @@ CopyTilesToVRAM:
 	plp				; restore processor status from stack
 	rtl				; exit routine
 
-
 ; pc should equal $008e54
+
 pullpc
-;-------------------------------------------------------------------------
 
 
 
@@ -352,10 +83,12 @@ pullpc
 
 
 
-;-------------------------------------------------------------------------
+
+
+
+
 pushpc
 org $008ec4
-
 
 ; ROUTINE: LoadTilesAndColors ($008ec4)
 ;		loads tiles from $078030 ($038030 in file)
@@ -430,8 +163,8 @@ LoadTilesAndColors:
 
 	; Load the menu background color into indexes $0d and $1e
 	; ram $0e9c-$0e9d - 2 bytes - menu background color (chosen by player in the menu)
-	ldx !menu_color
-	ldy !menu_color_high
+	ldx !MENU_COLOR_LOW
+	ldy !MENU_COLOR_HIGH
 	lda #$0d
 	sta $21
 	stx $22
@@ -475,13 +208,25 @@ LoadTilesAndColors:
 	plp				; restore processor status from stack
 	rts				; exit routine
 
-
 ; pc should equal $008fb4
+
 pullpc
-;-------------------------------------------------------------------------
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 pushpc
 org $008fb4
-
 
 ; ROUTINE: Copy $4 colors to CGRAM ($008fb4)
 ; parameters:
@@ -505,199 +250,17 @@ Copy4ColorsToCGRAM:
 	
 	rts					; exit routine
 
-
 ; pc should equal $008fdf
+
 pullpc
-;-------------------------------------------------------------------------
 
 
 
 
 
 
-
-;-------------------------------------------------------------------------
-pushpc
-org $0099bd
-
-
-; ROUTINE: Fill with A ($0099bd)
-;		fills $40 bytes with A starting at Y 
-;		16bit so $20 words
-; parameters:
-;		A => fill value
-;		Y => destination
-; AXY => 16bit
-Fill32WordsWithA:
-	!counter = $3e
-	while !counter >= $00
-		sta $00!counter,y
-		
-		!counter #= !counter-2
-	endif
-
-	rts					; exit routine
-
-
-; pc should equal $009a1e
-pullpc
-;-------------------------------------------------------------------------
-
-
-
-
-
-
-;-------------------------------------------------------------------------
-;						BANK $01
-;-------------------------------------------------------------------------
-
-
-
-
-;-------------------------------------------------------------------------
-pushpc
-org $018336
-
-
-; ROUTINE:  ($018336)
-Routine018336:
-	php					; save processor status
-	phb					; save databank
-	phk
-	plb					; databank => program bank
-	%setAto8bit()
-	%setXYto16bit()
-
-	lda !ram_19a5
-	bmi .Exit
-
-018343 jsr $8e06
-018346 jsr $9739
-
-018349 lda #$00
-01834b xba					; clear A.high
-01834c lda !ram_1a46
-01834f asl a
-018350 tax
-018351 jsr ($835a,x)
-018354 stz !ram_1a46
-
-	.Exit
-	plb					; restore databank
-	plp					; restore processor status
-	rtl					; exit routine
-
-
-; pc should equal $018360
-pullpc
-;-------------------------------------------------------------------------
-
-
-
-
-
-
-
-
-
-
-
-
-;-------------------------------------------------------------------------
-pushpc
-org $01836c
-
-
-; ROUTINE: LoadFromDataColors839e ($01836c)
-;		DataColors839e => $20 bytes in $4 byte chunks
-;			byte 0 => color index
-;			bytes 1-2 => source address
-;			byte 3 => dma transfer size
-; A => 8bit, XY => 16bit
-LoadFromDataColors839e:
-	ldx #$0000			; clear X
-	txa
-	xba					; clear A.high
-	.Loop {
-		lda $839e,x
-		sta $2121			; color index => $839e[X]
-		ldy #$2200			; dma control => $00, auto increment, write twice
-		sty $4300			; dma destination => $22, CGRAM
-		ldy $839f,x
-		sty $4302			; source offset => $839f[X]
-		lda #$7f
-		sta $4304			; source bank => $7f
-		lda $83a1,x
-		tay
-		sty $4305			; dma transfer size => $83a1[X]
-		lda #$01
-		sta $420b			; start dma transfer on channel 0
-
-		inx
-		inx
-		inx
-		inx					; counter += 4
-		cpx #$0020			; loop until counter = $20
-		bne .Loop
-	}
-
-	rts					; exit routine
-
-
-; pc should equal $01839e
-pullpc
-;-------------------------------------------------------------------------
-pushpc
-org $01839e
-
-
-; DATA: DataColors839e ($01839e)
-;		$01839e-$0183bd ($20 bytes)
-;		$20 bytes in $4 byte chunks
-;			byte 0 => color index
-;			bytes 1-2 => source address
-;			byte 3 => dma transfer size
-DataColors839e:
-		db $80			; color index
-		dw $C488		; source address
-		db $10			; size
-
-		db $90			; color index
-		dw $C4A8		; source address
-		db $10			; size
-
-		db $A0			; color index
-		dw $C4C8		; source address
-		db $10			; size
-
-		db $B0			; color index
-		dw $C4E8		; source address
-		db $20			; size
-
-		db $C0			; color index
-		dw $C508		; source address
-		db $10			; size
-
-		db $D0			; color index
-		dw $C528		; source address
-		db $10			; size
-
-		db $E0			; color index
-		dw $C548		; source address
-		db $10			; size
-
-		db $F0			; color index
-		dw $C568		; source address
-		db $10			; size
-
-
-; pc should equal $0183be
-pullpc
-;-------------------------------------------------------------------------
 pushpc
 org $0183be
-
 
 ; ROUTINE: Copy Tilemap from WRAM to VRAM ($0183be)
 ;		copy two sections from WRAM to VRAM through DMA (channel 0)
@@ -709,8 +272,8 @@ org $0183be
 CopyTilemapFromWRAMToVRAM:
 	jsr CopyTilemapFromWRAMToVRAM_1
 
-	; skip second copy if !ram_1a4c !+= $01
-	lda !ram_1a4c
+	; skip second copy if @var_1a4c = $01
+	lda $1a4c			; load @var_1a4c
 	dec
 	bne .Exit
 
@@ -719,12 +282,12 @@ CopyTilemapFromWRAMToVRAM:
 	.Exit
 		rts					; exit routine
 
-
 ; pc should equal $0183cb
-pullpc;-------------------------------------------------------------------------
+
+pullpc
+
 pushpc
 org $0183cb
-
 
 ; ROUTINE: Copy Tilemap from WRAM to VRAM ($0183cb)
 ;		copy from WRAM to VRAM through DMA (channel 0) up to 4 times options at $19fa
@@ -767,12 +330,12 @@ CopyTilemapFromWRAMToVRAM_1:
 	.Exit
 		rts				; exit routine
 
-
 ; pc should equal $018400
-pullpc;-------------------------------------------------------------------------
+
+pullpc
+
 pushpc
 org $018400
-
 
 ; ROUTINE:  ($018400)
 ;		copy from WRAM to VRAM through DMA (channel 0) up to 4 times, options at $1a13
@@ -783,7 +346,7 @@ org $018400
 ;		$1a24-$1a2b => 8 bytes, 2-byte pairs, 4 of them, each is DMA transfer size in bytes, !tilemap_dma_transfer_sizes_2
 ; A => 8bit, XY => 16bit
 CopyTilemapFromWRAMToVRAM_2:
-	ldx #$0000			; setup X as a counter starting at $0000
+	ldx #$0000		; setup X as a counter starting at $0000
 ; start of loop - setup and run dma transfer up to 4 times {
 	.Loop {
 		ldy !tilemap_dma_transfer_sizes_2,x
@@ -813,323 +376,11 @@ CopyTilemapFromWRAMToVRAM_2:
 	}
 
 	.Exit
-		rts					; exit routine
-
-
-; pc should equal $018435
-pullpc;-------------------------------------------------------------------------
-pushpc
-org $018435
-
-
-; ROUTINE: Copy Wram 7FD274 To Vram ($018435)
-;		Copy $2000 bytes from WRAM $7fd274 to VRAM $0000 through DMA (channel 0)
-; A => 8bit, XY => 16bit
-CopyWram7FD274ToVram:
-	ldx #$0000
-	stx $2116			; destination address => $0000
-	lda #$80
-	sta $2115			; vram control => $80, auto increment by 1 word on write high
-	ldx #$1801			; dma control => $01, write 2 bytes each time
-	stx $4300			; dma destination => $18, VRAM
-	ldx #$d274
-	stx $4302			; source offset => $d274
-	lda #$7f
-	sta $4304			; source bank => $7f
-	ldx #$2000
-	stx $4305			; dma transfer size => $2000
-	lda #$01
-	sta $420b			; start DMA transfer on channel 0
-	rts					; exit routine
-
-
-; pc should equal $01845d
-pullpc;-------------------------------------------------------------------------
-pushpc
-org $01845d
-
-
-; ROUTINE: Copy 64 colors from c588 ($01845d)
-;		Copy $40 colors ($80 bytes) from WRAM $7fc588[X] to CGRAM
-; parameters:
-;		X => source offset
-; A => 8bit, XY => 16bit
-Copy64ColorsFrom7FC588:
-	ldx #$c588			; X => $c588, source offset start
-	lda #$00			; loop counter => $00, also color index
-	.Loop {
-		pha					; save counter
-		sta $2121			; color index => A
-		ldy #$2200			; dma control => $00, auto increment, write twice
-		sty $4300			; dma destination => $22, CGRAM
-		stx $4302			; source offset => X
-		lda #$7f
-		sta $4304			; source bank => $7f
-		ldy #$0010
-		sty $4305			; dma transfer size => $10
-		lda #$01
-		sta $420b			; start dma transfer on channel 0
-
-		; X += $10
-		%setAto16bit()
-		txa
-		clc
-		adc #$0010
-		tax
-		%setAto8bit()
-
-		pla					; restore counter
-		clc
-		adc #$10			; counter += $10
-		cmp #$80			; loop until counter = $80
-		bne .Loop
-	}
-	rts					; exit routine
-
-
-; pc should equal $018492
-pullpc;-------------------------------------------------------------------------
-pushpc
-org $018492
-
-
-; ROUTINE: Copy wram 7f0000 to vram ($018492)
-;		Copy $2e00 bytes from WRAM $7f0000 to VRAM $6900 through DMA (channel 0)
-; A => 8bit, XY => 16bit
-CopyWram7F0000ToVram:
-	ldx #$6900
-	stx $2116			; destination address => $6900
-	lda #$80
-	sta $2115			; vram control => $80, auto increment by 1 word on write high
-	ldx #$1801			; dma control => $01, write 2 bytes each time
-	stx $4300			; dma destination => $18, VRAM
-	stz $4302			; source offset => $0000
-	ldx #$7f00			; 
-	stx $4303			; source bank => $7f
-	ldx #$2e00
-	stx $4305			; dma transfer size => $2e00
-	lda #$01
-	sta $420b			; start dma transfer on channel 0
-	rts					; exit routine
-
-
-; pc should equal $0184b8
-pullpc
-;-------------------------------------------------------------------------
-pushpc
-org $0184b8
-
-
-; ROUTINE:  ($0184b8)
-;		copy $0c00 bytes from WRAM $7f4000 to VRAM $6100 through DMA (channel 0)
-; A => 8bit, XY => 16bit
-CopyWram7F4000ToVram:
-	ldx #$6100
-	stx $2116			; destination address => $6100
-	lda #$80
-	sta $2115			; vram control => $80, auto increment by 1 word on write high
-	ldx #$1801			; dma control => $01, write 2 bytes each time
-	stx $4300			; dma destination => $18, VRAM
-	ldx #$4000
-	stx $4302			; source offset => $4000
-	lda #$7f
-	sta $4304			; source bank => $7F
-	ldx #$0c00
-	stx $4305			; dma transfer size => $0c00
-	lda #$01
-	sta $420b			; start dma transfer on channel 0
-	rts					; exit routine
-
-
-; pc should equal $0184e0
-pullpc
-;-------------------------------------------------------------------------
-
-
-
-
-
-
-
-
-
-
-
-;-------------------------------------------------------------------------
-pushpc
-org $01914c
-
-
-; ROUTINE:  ($01914c)
-Routine01914c:
-01914c jsr $8b75		; jump to the "Clear bits in 2 byte value at $008e using mask of $4030" routine
-	jsl Routine0b8149
-019153 jsr $c839
-019156 jsr $af55
-019159 jsl $0b87b9
-01915d jsl $0b836a
-	jsr CopyTileDataToWRAM
-019164 jsl $0b83b8
-019168 jsl $0b83f2
-01916c jsr $81db
-01916f jsr $fe0b
-019172 jsl $0b84fb
-019176 ldy $0e89
-019179 jsr $fd50
-01917c sty $0e89
-01917f jsl $0b8223
-019183 jsl $0b8560
-019187 jsr $c750
-01918a ldx #$0000		; clear X
-01918d stx $1908
-019190 stx $190a
-019193 ldx #$0008
-019196 stx $1900
-019199 ldx #$00f8
-01919c stx $1902
-01919f php				; save processor status to stack
-0191a0 jsr $9fae
-0191a3 plp
-0191a4 jsr $a226
-0191a7 ldx #$ffff
-0191aa stx $195f
-0191ad jsr $a403
-0191b0 jsr $e76a
-0191b3 jsr $ab5c
-0191b6 jsr $ab5c
-0191b9 jsr $ab5c
-0191bc jsr $c8a8
-0191bf jsl $0b82aa
-0191c3 lda $1cc2
-0191c6 beq $91d8
-
-
-;MISSING
-
-
-0191d8 jsr $94cc
-0191db jsr $e61c
-0191de jsr $a08a
-
-0191e1 jsl $0c8000
-0191e5 lda $0110
-0191e8 bpl $91e1
-
-0191ea lda $0111
-0191ed pha
-0191ee stz $0111
-0191f1 stz $420c
-0191f4 jsl $0b841d
-0191f8 jsr CopyWram7FD274ToVram
-0191fb jsr Copy64ColorsFrom7FC588
-0191fe jsr CopyWram7F0000ToVram
-019201 jsr CopyWram7F4000ToVram
-019204 jsr LoadFromDataColors839e
-019207 jsr $fe6b
-01920a jsr $8672
-01920d jsr $84e0
-019210 lda $1916
-019213 and #$1f
-019215 sta $19ee
-019218 sta $19f5
-01921b lda #$26
-01921d sta $19ef
-019220 jsl $01b24b
-019224 lda $19f6
-019227 beq $9233
-019229 ldx #$2502
-01922c stx $19ee
-01922f jsl $01b24b
-019233 pla
-019234 sta $0111
-019237 stz !ram_1a46
-01923a stz $19ac
-01923d lda $0e91
-019240 cmp #$05
-019242 beq .Exit
-
-019244 lda #$02
-019246 sta $1a45
-
-019249 jsl $0c8000
-01924d lda $1a45
-019250 bne $9249
-
-019252 ldx #$0000
-019255 stx $0015
-019258 stz !ram_19a5
-01925b jsr $8b82
-01925e lda $0e91
-019261 beq .Exit
-
-019263 jsl $009aec
-
-	.Exit
-	rts				; exit routine
-
-
-; pc should equal $019268
-pullpc
-;-------------------------------------------------------------------------
-
-
-
-
-
-
-;-------------------------------------------------------------------------
-pushpc
-org $01c839
-
-
-Routine01c839:
-01c839 lda #$00
-01c83b xba
-01c83c lda $0e91
-01c83f tax
-01c840 lda $06be77,x
-	bmi .Exit
-01c846 asl a
-01c847 tax
-01c848 php				; save processor status to stack
-01c849 rep #$30			; set A,X,Y => 16bit
-01c84b lda $06bee3,x
-01c84f tax
-01c850 plp
-	.Loop {
-01c851 lda $06bf15,x
-01c855 cmp #$ff
-01c857 beq $c882
-01c859 jsl $009776
-01c85d beq $c87d
-01c85f lda $06bf16,x
-01c863 sta $19ee
-01c866 lda $06bf17,x
-01c86a sta $19ef
-01c86d cmp #$24
-01c86f beq $c883
-01c871 cmp #$28
-01c873 beq $c88b
-01c875 ldy $19ee
-01c878 cpy #$2500
-01c87b beq $c8a2
-01c87d inx
-01c87e inx
-01c87f inx
-		bra .Loop
-	}
-
-	.Exit
 		rts				; exit routine
 
-; pc should equal $01c883
-
-
-; TODO: there is more to this routine, get additional code
-
+; pc should equal $018435
 
 pullpc
-;-------------------------------------------------------------------------
 
 
 
@@ -1141,10 +392,16 @@ pullpc
 
 
 
-;-------------------------------------------------------------------------
+
+
+
+
+
+
+
+
 pushpc
 org $01e90c
-
 
 ; ROUTINE: Copy one tile to WRAM ($01:e90c)
 ;		$18 bytes from source => $20 bytes destination
@@ -1184,10 +441,9 @@ CopyOneTileToWRAM:
 	pld				; restore directpage
 	rts				; exit routine
 
-
 ; pc should equal $01e92f
+
 pullpc
-;-------------------------------------------------------------------------
 
 
 
@@ -1196,10 +452,8 @@ pullpc
 
 
 
-;-------------------------------------------------------------------------
 pushpc
 org $01e946
-
 
 ; ROUTINE: Clear $20 bytes of WRAM ($01:e946)
 ; 
@@ -1226,69 +480,9 @@ Clear32bytesOfWRAM:
 	pld					; restore directpage
 	rts					; exit routine
 
-
 ; pc should equal $01e95d
+
 pullpc
-;-------------------------------------------------------------------------
-
-
-
-
-
-
-
-
-
-;-------------------------------------------------------------------------
-pushpc
-org $01f849
-
-
-; ROUTINE:  ($01f849)
-; parameters:
-;		ram $19f7 =>
-; TODO: name this routine!!!
-
-Routine01f849:
-	%setAto8bit()
-01f84b inc $19f7
-01f84e jsr $82cf
-01f851 ldx $1900
-01f854 stx $1904
-01f857 ldx $1902
-01f85a stx $1906
-01f85d lda #$07
-01f85f sta $1a4c
-01f862 jsr $f8a5
-	ldx #$0000			; loop counter
-	.Loop {
-		phx					; save counter
-		%setAto16bit()
-01f86b lda $f891,x
-01f86e sta $1a14
-01f871 clc
-01f872 adc #$0400
-01f875 sta $1a16
-		%setAto8bit()
-01f87a jsr $f8da
-
-		plx					; restore counter
-		inx
-		inx					; counter += 2
-		cpx #$0014			; loop until counter = $14
-		bne .Loop
-	}
-
-01f885 stz $1a4c
-01f888 lda #$15
-01f88a sta $1a4e
-01f88d stz $1a4f
-01f890 rts				; exit routine
-
-
-; pc should equal $01f891
-pullpc
-;-------------------------------------------------------------------------
 
 
 
@@ -1301,16 +495,22 @@ pullpc
 
 
 
-;-------------------------------------------------------------------------
+
+
+
+
+
+
 pushpc
 org $01f977
-
 
 ; ROUTINE:  ($01f977)
 ; parameters:
 ;		@var_192d
 ; XY => 16bit
+
 Routine01f977:
+
 	php					; save processor status
 	%setAto8bit()
 	ldx #$0000			; clear X
@@ -1319,13 +519,12 @@ Routine01f977:
 	plp					; restore processor status
 	rts				; exit routine
 
-
 ; pc should equal $01f985
+
 pullpc
-;-------------------------------------------------------------------------
+
 pushpc
 org $01f985
-
 
 ; ROUTINE:  ($01f985)
 ;		
@@ -1338,7 +537,7 @@ org $01f985
 ; TODO: name this routine!!!!!!
 Routine01f985:
 
-	; get offset into JumpTableTilemapCopySetup[]
+	; get offset into jump table $01f9fb[]
 	lda $19d7			; load @var_19d7
 	asl a
 	%setAto16bit()
@@ -1357,115 +556,28 @@ Routine01f985:
 
 	; continue into the following routine
 
-; ROUTINE:  ($01f99f)
-; parameters:
-;		X => offset into JumpTableTilemapCopySetup[] and JumpTableTilemapCopySetup_2[]
-;		Y => 
-;		
-
-Routine01f985_Entry:
-01f99f jsr $fd50
-01f9a2 sty !ram_1a31
-01f9a5 sty !ram_1a2d
-
-	ldy #$0000
-	sty $1a2f			; clear @var_1a2f
-
-	lda !ram_19b4
-	asl a
-	asl a
-	asl a
-	asl a
-	and #$80
-	sta !ram_1a33			; !ram_1a33 => (bit 3 of @var_19b4 = 1) ? $80 : $00
-
-	lda $1a52
-	sta !ram_1a34			; !ram_1a34 => @var_1a52
-
-	phx					; save X
-	jsr (JumpTableTilemapCopySetup,x)
-	plx					; restore X
-
-01f9c5 lda $1a4c
-01f9c8 dec
-01f9c9 bne $f9fa
-01f9cb lda !ram_1a2d
-01f9ce clc
-01f9cf adc $1a56
-01f9d2 sta !ram_1a31
-01f9d5 lda $1a2e
-01f9d8 clc
-01f9d9 adc $1a57
-01f9dc sta $1a32
-01f9df ldy !ram_1a31
-
-01f9e2 jsr $fd50
-
-01f9e5 sty !ram_1a31
-01f9e8 ldy $1a4a
-01f9eb sty $1a2f
-01f9ee stz !ram_1a33
-01f9f1 lda $1a53
-01f9f4 sta !ram_1a34
-	jsr (JumpTableTilemapCopySetup_2,x)
-	rts					; exit routine
 
 
-; pc should equal $01f9fb
+; pc should equal $01f9fa
+
 pullpc
-;-------------------------------------------------------------------------
-pushpc
-org $01f9fb		; pctosnes($00f9fb)
 
 
-; DATA: Jump table for setting up tilemap data for writing one line ($01f9fb)
-JumpTableTilemapCopySetup:
-	dw TilemapCopySetup
-	dw TilemapCopySetupVertical
-	dw TilemapCopySetup
-	dw TilemapCopySetupVertical
-;	db $0B,$FA
-;	db $AE,$FA
-;	db $0B,$FA
-;	db $AE,$FA
 
 
-; pc should equal $01fa03
-pullpc
-;-------------------------------------------------------------------------
-pushpc
-org $01fa03 ; pctosnes($00fa03)
 
-
-; DATA: Jump table for setting up tilemap data for writing one line ($01fa03)
-JumpTableTilemapCopySetup_2:
-	dw TilemapCopySetup_2
-	dw TilemapCopySetupVertical_2
-	dw TilemapCopySetup_2
-	dw TilemapCopySetupVertical_2
-;	db $49,$FB
-;	db $EF,$FB
-;	db $49,$FB
-;	db $EF,$FB
-
-
-; pc should equal $01fa0b
-pullpc
-;-------------------------------------------------------------------------
 pushpc
 org $01fa0b
-
-
 ; ROUTINE:  ($01fa0b)
-;		in JumpTableTilemapCopySetup[]
-;		source order: $8000,02,80,82
+;		in jump table Jumpf9fb[]
 ; parameters:
-;		!ram_1924 => 
+;		@var_1924 => 
 ;		!ram_1a31 => 
 ;		!ram_1a33 => 
 ; A => 8bit, XY => 16bit
 ; TODO: name this routine!!!
-TilemapCopySetup:
+Routine01fa0b:
+
 	ldy #$0000			; loop counter
 	.Loop {
 		phy					; save Y
@@ -1492,7 +604,7 @@ TilemapCopySetup:
 		iny
 		iny
 
-		; increment !ram_1a31 then subtract !ram_1924 if that would be positive
+		; increment !ram_1a31 then subtract @var_1924 if that would be positive
 		lda !ram_1a31			; A => !ram_1a31
 		inc					; A += 1
 		cmp !ram_1924			; if !ram_1924 > A then skip ahead
@@ -1533,7 +645,7 @@ TilemapCopySetup:
 	adc !tilemap_dma_transfer_sizes+2
 	sta !tilemap_wram_source_addresses+6
 
-	jsr CalculateTilemapVramDestination
+	jsr CalculateTilemapVramDestinationAddress
 
 	sta !tilemap_vram_destination_addresses
 	clc
@@ -1550,116 +662,22 @@ TilemapCopySetup:
 
 ; pc should equal $01faae
 
-
 pullpc
-;-------------------------------------------------------------------------
-pushpc
-org $01faae
 
 
-; ROUTINE:  ($01faae)
-;		in JumpTableTilemapCopySetup[]
-;		source order: $8000,80,02,82
-; parameters:
-;		
-; A => 8bit, XY => 16bit
-; TODO: name this routine!!!
-TilemapCopySetupVertical:
-	ldy #$0000			; loop counter
-	.Loop {
-		phy					; save Y
-		ldy !ram_1a31		; Y => !ram_1a31
-		lda !ram_1a33		; A => !ram_1a33
-		jsr $fc8e			; get values for $1a3d[0..7]
-		ply					; restore Y
-
-		%setAto16bit()
-		lda !ram_1a3d
-		sta !tilemap_wram_source_start,y
-		lda !ram_1a3d+2
-		sta !tilemap_wram_source_start+$80,y
-		lda !ram_1a3d+4
-		sta !tilemap_wram_source_start+2,y
-		lda !ram_1a3d+6
-		sta !tilemap_wram_source_start+$82,y
-		%setAto8bit()
-
-		; counter += 4
-		iny
-		iny
-		iny
-		iny
-
-		; increment !ram_1a32 then subtract !ram_1925 if that would be positive
-		lda !ram_1a32		; A => !ram_1a32
-		inc					; A += 1
-		cmp !ram_1925			; if !ram_1925 > A then skip ahead
-		bcc .Skip
-		sec
-		sbc !ram_1925			; A => A - !ram_1925
-		.Skip
-		sta !ram_1a32			; !ram_1a32 => A
-
-		cpy #$0040			; loop until counter = $40
-		bne .Loop
-	}
-
-	lda #$81			; $81 means increment destination address by $20 words ($40 bytes) on write of high byte
-	sta !tilemap_vram_control
-	%setAto16bit()
-	lda $19bf
-	eor #$ffff
-	and #$000f
-	inc
-	asl a
-	asl a								; A => ((inversed bits 0-3 of !ram_19bf) + 1) * 4
-	sta !tilemap_dma_transfer_sizes
-	sta !tilemap_dma_transfer_sizes+2
-	lda #$0040
-	sec
-	sbc !tilemap_dma_transfer_sizes
-	sta !tilemap_dma_transfer_sizes+4
-	sta !tilemap_dma_transfer_sizes+6
-	lda #!tilemap_wram_source_start
-	sta !tilemap_wram_source_addresses
-	clc
-	adc !tilemap_dma_transfer_sizes
-	sta !tilemap_wram_source_addresses+4
-	lda #!tilemap_wram_source_start+$80
-	sta !tilemap_wram_source_addresses+2
-	clc
-	adc !tilemap_dma_transfer_sizes+2
-	sta !tilemap_wram_source_addresses+6
-
-	jsr CalculateTilemapVramDestination
-
-	sta !tilemap_vram_destination_addresses
-	inc
-	sta !tilemap_vram_destination_addresses+2
-	dec
-	and #$441e					; TODO: what does this mask do
-	sta !tilemap_vram_destination_addresses+4
-	inc
-	sta !tilemap_vram_destination_addresses+6
-	%setAto8bit()
-	rts					; exit routine
 
 
-; pc should equal $01fb49
-pullpc
-;-------------------------------------------------------------------------
 pushpc
 org $01fb49
 
-
 ; ROUTINE:  ($01fb49)
-;		in JumpTableTilemapCopySetup_2[]
-;		source order: $9000,02,80,82
+;		in jump table Jumpfa03[]
 ; parameters:
 ;		
 ; A => 8bit, XY => 16bit
 ; TODO: name this routine!!!
-TilemapCopySetup_2:
+
+Routine01fb49:
 	ldy #$0000			; loop counter
 	.Loop {
 		phy					; save Y
@@ -1686,17 +704,19 @@ TilemapCopySetup_2:
 		iny
 		iny
 
+
 		lda !ram_1a31		; A => !ram_1a31
 		inc					; A += 1
-		cmp !ram_1924			; if !ram_1924 > A then skip ahead
+		cmp $1924			; if @var_1924 > A then skip ahead
 		bcc .Skip
 		sec
-		sbc !ram_1924			; A => A - !ram_1924
+		sbc !ram_1924		; A => A - !ram_1924
 		.Skip
-		sta !ram_1a31			; !ram_1a31 => A
+		sta !ram_1a31		; !ram_1a31 => A
 		cpy #$0044			; loop until counter = $44
 		bne .Loop
 	}
+
 
 	lda #$80			; $80 means increment destination address by 1 word (2 bytes) on write of high byte
 	sta !tilemap_vram_control_2
@@ -1725,7 +745,7 @@ TilemapCopySetup_2:
 	adc !tilemap_dma_transfer_sizes_2+2
 	sta !tilemap_wram_source_addresses_2+6
 
-	jsr CalculateTilemapVramDestination
+	jsr CalculateTilemapVramDestinationAddress
 
 	ora #$0800
 	sta !tilemap_vram_destination_addresses_2
@@ -1741,17 +761,14 @@ TilemapCopySetup_2:
 	%setAto8bit()
 	rts				; exit routine
 
-
 ; pc should equal $01fbef
+
 pullpc
-;-------------------------------------------------------------------------
 pushpc
 org $01fbef
 
-
 ; ROUTINE:  ($01fbef)
-;		in JumpTableTilemapCopySetup_2[]
-;		source order: $9000,80,02,82
+;		in jump table Jumpfa03[]
 ; parameters:
 ;		!ram_1a31
 ;		!ram_1a32
@@ -1759,7 +776,8 @@ org $01fbef
 ;		!ram_1925
 ; A => 8bit, XY => 16bit
 ; TODO: name this routine!!!
-TilemapCopySetupVertical_2:
+
+Routine01fbef:
 	ldy #$0000			; loop counter
 	.Loop {
 		phy					; save Y
@@ -1827,7 +845,7 @@ TilemapCopySetupVertical_2:
 	adc !tilemap_dma_transfer_sizes_2+2
 	sta !tilemap_wram_source_addresses_2+6
 
-	jsr CalculateTilemapVramDestination
+	jsr CalculateTilemapVramDestinationAddress
 
 	ora #$0800
 	sta !tilemap_vram_destination_addresses_2
@@ -1842,21 +860,19 @@ TilemapCopySetupVertical_2:
 	%setAto8bit()
 	rts					; exit routine
 
-
 ; pc should equal $01fc8e
+
 pullpc
-;-------------------------------------------------------------------------
 pushpc
 org $01fc8e
-
 
 ; ROUTINE:  ($01fc8e)
 ; parameters:
 ;		A => 
 ;		Y => 
-;		!ram_1924 => 
+;		@var_1924 => 
 ;		@var_1a2f => 
-;		!ram_1a34 => 
+;		@var_1a34 => 
 ;		$7f8000[] => 
 ;		$7fcef4[] => 
 ;		$7ff274[] => 
@@ -1864,17 +880,18 @@ org $01fc8e
 ;		ram $1a3d[] => 8 bytes
 ; A => 8bit, XY => 16bit
 ; TODO: name this routine!!!!!!!!!!
+
 Routine01fc8e:
 	sta $1a3a			; @var_1a3a => A
 
-	; multiply Y.high * !ram_1924
+	; multiply Y.high * @var_1924
 	%setAto16bit()
 	tya					; A => Y
 	%setAto8bit()
 	xba					; A => Y.high
 	sta $4202			; WRMPYA => A
-	lda !ram_1924
-	sta $4203			; WRMPYB => !ram_1924
+	lda $1924
+	sta $4203			; WRMPYB => @var_1924
 
 	xba					; A => Y.low
 	%setAto16bit()
@@ -1946,7 +963,7 @@ Routine01fc8e:
 		xba					; swap in saved byte
 		plx					; restore X
 
-		ora !ram_1a34		; OR in !ram_1a34
+		ora $1a34			; OR in @var_1a34
 		ora $1a3b			; OR in @var_1a3b
 		sta $1a3e,x			; @var_1a3d[][X+1] => A
 
@@ -1960,14 +977,12 @@ Routine01fc8e:
 	%setXYto16bit()
 	rts					; exit routine
 
-
 ; pc should equal $01fd24
+
 pullpc
-;-------------------------------------------------------------------------
+
 pushpc
 org $01fd24
-
-
 ; ROUTINE: Calculate tilemap vram destination address ($01fd24)
 ;		A => !ram_19bf * $40 + ($4000 or $4400 based on bit 4 of !ram_19bd)
 ; parameters:
@@ -1975,7 +990,7 @@ org $01fd24
 ;		!ram_19bd => bit 4 determines which offset to use
 ; returns:
 ;		A => vram destination address
-CalculateTilemapVramDestination:
+CalculateTilemapVramDestinationAddress:
 	%setAto8bit()
 	ldx #$0000			; X => $00
 	lda !ram_19bf
@@ -1994,43 +1009,40 @@ CalculateTilemapVramDestination:
 	%setAto16bit()
 	and #$001e			; bits 1-4
 	clc
-	adc.w DataCalculateTilemapVramDestination_Offset,x			; A += $fd4c[X], $fd4c is directly after this routine TODO: make sure label results in correct instructions
+	adc.w CalculateTilemapVramDestinationAddress_Offset,x			; A += $fd4c[X], $fd4c is directly after this routine TODO: make sure label results in correct instructions
 	clc
 	adc $4216			; A += !ram_19bf * $40
 	rts					; exit routine
 
-
 ; pc should equal $01fd4c
-pullpc;-------------------------------------------------------------------------
+pullpc
 pushpc
 org pctosnes($00fd4c)
 
-
 ; DATA: word is offset used above ($01fd4c)
 ;		bit 4 of !ram_19bd determines which offset to use
-DataCalculateTilemapVramDestination_Offset:
-	db $00,$40,$00,$44
-
+CalculateTilemapVramDestinationAddress_Offset:
+db $00,$40,$00,$44
 
 ; pc should equal $01fd50
+
 pullpc
-;-------------------------------------------------------------------------
+
 pushpc
 org $01fd50
 
-
 ; ROUTINE:  ($01fd50)
 ;		Y.high => (Y.high < 0) ? (Y.high + @var_1925) : (Y.high - @var_1925)
-;		Y.low => (Y.low < 0) ? (Y.low + !ram_1924) : (Y.low - !ram_1924)
+;		Y.low => (Y.low < 0) ? (Y.low + @var_1924) : (Y.low - @var_1924)
 ; parameters:
 ;		Y => 
-;		!ram_1924 => 
 ;		@var_1925 => 
+;		@var_1924 => 
 ; returns:
 ;		Y => 
 ; TODO: Name this routine!!!!!!!!!
-Routine01fd50:
 
+Routine01fd50:
 	%setAto16bit()
 	tya					; A => Y
 	%setAto8bit()
@@ -2041,14 +1053,14 @@ Routine01fd50:
 
 	.NegativeHigh
 		clc
-		adc !ram_1925			; A => A + !ram_1925
+		adc $1925			; A => A + @var_1925
 		bra .SetLow
 
 	.PositiveHigh
-		cmp !ram_1925
+		cmp $1925
 		bcc .SetLow
 		sec
-		sbc !ram_1925			; A => A - !ram_1925
+		sbc $1925			; A => A - @var_1925
 
 	.SetLow
 		xba					; get Y.low
@@ -2056,26 +1068,25 @@ Routine01fd50:
 
 	.NegativeLow
 		clc
-		adc !ram_1924			; A => A + !ram_1924
+		adc $1924			; A => A + @var_1924
 		bra .End
 
 	.PositiveLow
-		cmp !ram_1924
+		cmp $1924
 		bcc .End
 		sec
-		sbc !ram_1924			; A => A - !ram_1924
+		sbc $1924			; A => A - @var_1924
 
 	.End
 		tay				; Y => A
 		rts				; exit routine
 
-
 ; pc should equal $01fd7b
+
 pullpc
-;-------------------------------------------------------------------------
+
 pushpc
 org $01fd7b
-
 
 ; ROUTINE: Copy tile data to WRAM ($01fd7b)
 ;		Copies two sets of tiles into WRAM
@@ -2201,9 +1212,9 @@ CopyTileDataToWRAM:
 	plb					; restore program bank
 	rts					; exit routine
 
-
 ; pc should equal $01fe0b
-pullpc;-------------------------------------------------------------------------
+
+pullpc
 
 
 
@@ -2212,11 +1223,8 @@ pullpc;-------------------------------------------------------------------------
 
 
 
-
-;-------------------------------------------------------------------------
 pushpc
 org $01ffc1
-
 
 ; ROUTINE:  ($01ffc1)
 ;		
@@ -2227,6 +1235,8 @@ org $01ffc1
 ; TODO: Name this routine!!!!!!!!!
 
 Routine01ffc1:
+
+
 	;
 	lda $0e89			; load @var_0e89
 	sec
@@ -2248,7 +1258,7 @@ Routine01ffc1:
 
 	.Loop {
 		phx					; save counter
-01ffe0 jsr $f977
+		jsr $f977
 		jsr CopyTilemapFromWRAMToVRAM
 		inc $192e			; increment @var_192e
 
@@ -2264,96 +1274,9 @@ Routine01ffc1:
 
 	rts					; exit routine
 
-
 ; pc should equal $01fffa
-pullpc
-;-------------------------------------------------------------------------
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-;-------------------------------------------------------------------------
-;						BANK $07
-;-------------------------------------------------------------------------
-
-
-
-
-;-------------------------------------------------------------------------
-pushpc
-org $07af3b		; pctosnes($03af3b)
-
-
-; DATA:  ($07af3b)
-;		table of 16bit offset pointers into $07b013[]
-; TODO: what is this?
-; TODO: does it actually consist of all $200 bytes?
-; TODO: another table starts at $07b013, so cut off data there?
-Data07af3b:
-	db $00,$00,$00,$00,$09,$00,$09,$00,$09,$00,$09,$00,$12,$00,$68,$00
-	db $0B,$01,$29,$01,$7F,$01,$C7,$01,$D7,$01,$34,$02,$B4,$02,$3B,$03
-	db $83,$03,$B6,$03,$0C,$04,$2A,$04,$AA,$04,$4D,$05,$D4,$05,$46,$06
-	db $5D,$06,$90,$06,$CA,$06,$EF,$06,$37,$07,$D3,$07,$61,$08,$B7,$08
-	db $1B,$09,$47,$09,$C7,$09,$63,$0A,$06,$0B,$A9,$0B,$4C,$0C,$E1,$0C
-	db $3E,$0D,$3E,$0D,$63,$0D,$A4,$0D,$BB,$0D,$E7,$0D,$05,$0E,$38,$0E
-	db $79,$0E,$9E,$0E,$25,$0F,$BA,$0F,$5D,$10,$AC,$10,$D1,$10,$4A,$11
-	db $CA,$11,$12,$12,$A7,$12,$4A,$13,$D8,$13,$6D,$14,$02,$15,$97,$15
-	db $D8,$15,$43,$16,$5A,$16,$86,$16,$29,$17,$CC,$17,$6F,$18,$B0,$18
-	db $53,$19,$BE,$19,$61,$1A,$B0,$1A,$1B,$1B,$2B,$1B,$49,$1B,$59,$1B
-	db $FC,$1B,$9F,$1C,$42,$1D,$C9,$1D,$5E,$1E,$F3,$1E,$96,$1F,$32,$20
-	db $C7,$20,$5C,$21,$FF,$21,$1D,$22,$3B,$22,$59,$22,$77,$22,$95,$22
-	db $B3,$22,$D8,$22,$82,$23,$1E,$24,$C1,$24,$25,$25,$2E,$25,$C3,$25
-	db $51,$26,$ED,$26,$F6,$26,$84,$27
-
-
-; pc should equal $07b013
-pullpc
-;-------------------------------------------------------------------------
-
-
-
-
-
-
-
-
-;-------------------------------------------------------------------------
-pushpc
-org $07f7c3		; pctosnes($03f7c3)
-
-; DATA:  ($07f7c3)
-Data07f7c3:
-	db $35,$7E,$0E,$23,$08,$1F,$16,$1F,$22,$19,$29,$13,$2E,$15,$37,$0F
-	db $33,$0D,$2D,$09,$24,$10,$1F,$10,$1A,$17,$1A,$13,$1A,$0E,$0F,$0C
-	db $09,$0C,$10,$08,$1F,$0A,$2E,$29,$33,$28,$19,$2A,$0E,$28,$12,$26
-	db $0E,$1E,$0E,$1A,$1C,$21,$1F,$1D,$24,$13,$30,$11,$37,$0B,$28,$18
-	db $2D,$0E,$2D,$06,$34,$18,$1F,$15,$1F,$1B,$1C,$1B,$15,$0C,$09,$08
-	db $0F,$10,$18,$08,$19,$05,$1D,$1E,$1F,$1F,$26,$1F,$28,$27,$28,$29
-	db $35,$23,$3B,$28,$3C,$24,$35,$1E,$31,$1E,$1C,$27,$21,$2A,$31,$1C
-	db $1C,$28,$2A,$25
-
-; pc should equal $07f837
-
-; end of bank, fill
-padbyte $ff
-pad $07ffff
-
-; TODO: did last byte fill?
-;pad $088000
 
 pullpc
-;-------------------------------------------------------------------------
 
 
 
@@ -2362,20 +1285,10 @@ pullpc
 
 
 
-
-;-------------------------------------------------------------------------
-;						BANK $0b
-;-------------------------------------------------------------------------
-
-
-
-
-
-;-------------------------------------------------------------------------
 pushpc
 org $0b8149
 
-; ROUTINE:  ($0b8149)
+; ROUTINE:  ($0b:8149)
 ;
 ; A is 8bit, XY is 16bit
 ; TODO: rename!!!!!!!!
@@ -2383,7 +1296,7 @@ Routine0b8149:
 	; setup variables
 	stz $19f6			; @var_19f6 => $00
 	lda #$80
-	sta !ram_19a5			; @var_19a5 => $80
+	sta $19a5			; @var_19a5 => $80
 	lda #$01
 	sta $1a45			; @var_1a45 => $01
 	ldx $19f1			; load @var_19f1
@@ -2393,7 +1306,7 @@ Routine0b8149:
 	bne .IsZero			; if @var_19f0 is $0000
 
 	lda #$f2
-	jsl TRBWithBitMaskTo0ea8		; set @var_0ec6 => 
+	jsl TRBWithMaskFromTable97fbTo0ea8		; set @var_0ec6 => 
 
 	stz $1a5b			; @var_1a5b => $00
 
@@ -2407,7 +1320,7 @@ Routine0b8149:
 	sta $0e89			; @var_0e89 => 
 	%setAto8bit()
 	lda #$f3
-	jsl ANDBitMaskAnd0ea8ToA
+	jsl ANDFromTable97fbAnd0ea8ToA
 	bne .IsZero 
 	lda #$02
 	sta $0e8b			; @var_0e89 => $02
@@ -2509,43 +1422,63 @@ Routine0b8149:
 
 	rtl					; exit routine
 
-
 ; pc should equal $0b8223
+
 pullpc
-;-------------------------------------------------------------------------
 
 
 
 
 
 
-;-------------------------------------------------------------------------
+
 pushpc
 org $0b8892		; pctosnes($058892)
-
 
 ; DATA:  ($0b8892)
 Data0b8892:
 
-; TODO: get the data
 
 
 ; pc should equal $
+
 pullpc
-;-------------------------------------------------------------------------
+
+
+
+pushpc
+org $01f9fb		; pctosnes($00f9fb)
+
+; DATA: Jump table for .... ($01f9fb)
+Jumpf9fb:
+	db $0B,$FA			; 
+	db $AE,$FA			; 
+	db $0B,$FA			; 
+	db $AE,$FA			; 
+
+; pc should equal $01fa03
+
+pullpc
+pushpc
+org $01fa03 ; pctosnes($00fa03)
+; DATA: Jump table for .... ($01fa03)
+Jumpfa03:
+
+	db $49,$FB			; 
+	db $EF,$FB			; 
+	db $49,$FB			; 
+	db $EF,$FB			; 
+
+; pc should equal $01fa0b
+
+pullpc
 
 
 
 
 
-
-
-
-
-;-------------------------------------------------------------------------
 pushpc
 org $0b8cd9		; pctosnes($058CD9)
-
 
 ; DATA:  ($0b8cd9)
 ;		accessed in $a byte chunks
@@ -2599,10 +1532,74 @@ DataTilesets:
 	db $5E,$07,$08,$09,$0A,$0B,$0C,$0D,$04,$1D
 	db $51,$0E,$00,$01,$02,$09,$06,$07,$11,$13
 
+; pc should equal $0B8E91
 
-; pc should equal $0b8e91
 pullpc
-;-------------------------------------------------------------------------
 
 
+
+
+
+
+
+
+pushpc
+org $07af3b		; pctosnes($03af3b)
+
+; DATA:  ($07af3b)
+;		table of 16bit offset pointers into $07b013[]
+; TODO: what is this?
+; TODO: does it actually consist of all $200 bytes?
+; TODO: another table starts at $07b013, so cut off data there?
+Data07af3b:
+	db $00,$00,$00,$00,$09,$00,$09,$00,$09,$00,$09,$00,$12,$00,$68,$00
+	db $0B,$01,$29,$01,$7F,$01,$C7,$01,$D7,$01,$34,$02,$B4,$02,$3B,$03
+	db $83,$03,$B6,$03,$0C,$04,$2A,$04,$AA,$04,$4D,$05,$D4,$05,$46,$06
+	db $5D,$06,$90,$06,$CA,$06,$EF,$06,$37,$07,$D3,$07,$61,$08,$B7,$08
+	db $1B,$09,$47,$09,$C7,$09,$63,$0A,$06,$0B,$A9,$0B,$4C,$0C,$E1,$0C
+	db $3E,$0D,$3E,$0D,$63,$0D,$A4,$0D,$BB,$0D,$E7,$0D,$05,$0E,$38,$0E
+	db $79,$0E,$9E,$0E,$25,$0F,$BA,$0F,$5D,$10,$AC,$10,$D1,$10,$4A,$11
+	db $CA,$11,$12,$12,$A7,$12,$4A,$13,$D8,$13,$6D,$14,$02,$15,$97,$15
+	db $D8,$15,$43,$16,$5A,$16,$86,$16,$29,$17,$CC,$17,$6F,$18,$B0,$18
+	db $53,$19,$BE,$19,$61,$1A,$B0,$1A,$1B,$1B,$2B,$1B,$49,$1B,$59,$1B
+	db $FC,$1B,$9F,$1C,$42,$1D,$C9,$1D,$5E,$1E,$F3,$1E,$96,$1F,$32,$20
+	db $C7,$20,$5C,$21,$FF,$21,$1D,$22,$3B,$22,$59,$22,$77,$22,$95,$22
+	db $B3,$22,$D8,$22,$82,$23,$1E,$24,$C1,$24,$25,$25,$2E,$25,$C3,$25
+	db $51,$26,$ED,$26,$F6,$26,$84,$27
+
+; pc should equal $07B013
+
+pullpc
+
+
+
+
+
+
+
+
+pushpc
+org $07F7C3		; pctosnes($03f7c3)
+
+; DATA:  ($07F7C3)
+Data07f7c3:
+	db $35,$7E,$0E,$23,$08,$1F,$16,$1F,$22,$19,$29,$13,$2E,$15,$37,$0F
+	db $33,$0D,$2D,$09,$24,$10,$1F,$10,$1A,$17,$1A,$13,$1A,$0E,$0F,$0C
+	db $09,$0C,$10,$08,$1F,$0A,$2E,$29,$33,$28,$19,$2A,$0E,$28,$12,$26
+	db $0E,$1E,$0E,$1A,$1C,$21,$1F,$1D,$24,$13,$30,$11,$37,$0B,$28,$18
+	db $2D,$0E,$2D,$06,$34,$18,$1F,$15,$1F,$1B,$1C,$1B,$15,$0C,$09,$08
+	db $0F,$10,$18,$08,$19,$05,$1D,$1E,$1F,$1F,$26,$1F,$28,$27,$28,$29
+	db $35,$23,$3B,$28,$3C,$24,$35,$1E,$31,$1E,$1C,$27,$21,$2A,$31,$1C
+	db $1C,$28,$2A,$25
+
+; pc should equal $07F837
+
+; end of bank, fill
+padbyte $FF
+pad $07FFFF
+
+; TODO: did last byte fill?
+;pad $088000
+
+pullpc
 

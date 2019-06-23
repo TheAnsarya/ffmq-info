@@ -1,9 +1,15 @@
 
+
+
+
+
+;-------------------------------------------------------------------------
 pushpc
 org $009754
 
-; ROUTINE: Text - TRB value at direct page with mask from $0097fb[] ($00:9754)
-;		fetch mask from ram $97fb[]
+
+; ROUTINE: Text - TRB value at direct page with mask from DataBitMask[] ($009754)
+;		fetch mask from ram DataBitMask[]
 ;		clears bits on $00:directpage using mask
 ; parameters:
 ;		A => low byte: aaaaabbb
@@ -16,20 +22,22 @@ org $009754
 ;		ram $00:directpage => 
 ; notes:
 ;		always PHD before calling and PLD after
-TRBWithMaskFromTable97fb:
-	jsr IncreaseDPAndFetchFromTable97fb
+TRBWithBitMask:
+	jsr IncreaseDPAndFetchBitMask
 	trb $00				; use A as mask to clear bits on value at $00:directpage
 	rtl					; exit routine
 
-; pc should equal $00975a
 
-pullpc
+; pc should equal $00975a
+pullpc;-------------------------------------------------------------------------
+
 pushpc
 org $00975a
 
-; ROUTINE: AND value at directpage with value from $0097fb[] into A ($00:975a)
+
+; ROUTINE: AND value at directpage with value from DataBitMask[] into A ($00975a)
 ;		increments direct page by top 5 bits of A
-;		fetch value from rom $97fb[] AND v@ $00:D
+;		fetch value from rom DataBitMask[] AND v@ $00:D
 ; parameters:
 ;		A => low byte: aaaaabbb
 ;			aaaaa - increment direct page by
@@ -40,15 +48,14 @@ org $00975a
 ;		A => 
 ; notes:
 ;		always PHD before calling and PLD after
-ANDFromTable97fbToA:
-	jsr IncreaseDPAndFetchFromTable97fb
+ANDBitMaskToA:
+	jsr IncreaseDPAndFetchBitMask
 	and $00			; A => A AND value at $00:directpage
 	rtl				; exit routine
 
+
 ; pc should equal $009760
-
-pullpc
-
+pullpc;-------------------------------------------------------------------------
 
 
 
@@ -56,11 +63,14 @@ pullpc
 
 
 
+
+;-------------------------------------------------------------------------
 pushpc
 org $00976b
 
-; ROUTINE: TRB With Mask From Table $97fb[] To $0ea8[] ($00:976b)
-;		fetch mask from rom $97fb[]
+
+; ROUTINE: TRB With Mask From Table DataBitMask[] To $0ea8[] ($00976b)
+;		fetch mask from rom DataBitMask[]
 ;		clears bits on $0ea8[] using mask
 ; parameters:
 ;		A => low byte: aaaaabbb
@@ -68,25 +78,26 @@ org $00976b
 ;			bbb - this value is XOR'ed to flip the bits
 ;				invert = index to table 
 ;				invert * 2 = address offset
-TRBWithMaskFromTable97fbTo0ea8:
+TRBWithBitMaskTo0ea8:
 	phd					; save directpage
 
 	%setDirectpage($0ea8)
-	jsl TRBWithMaskFromTable97fb
+	jsl TRBWithBitMask
 
 	pld					; restore directpage
 	rtl					; exit routine
 
+
 ; pc should equal $009776
-
 pullpc
+;-------------------------------------------------------------------------
 pushpc
-
 org $009776
 
-; ROUTINE: AND value at $0ea8[] with value from $0097fb[] into A ($00:9776)
+
+; ROUTINE: AND value at $0ea8[] with value from DataBitMask[] into A ($009776)
 ;		increments direct page by top 5 bits of A
-;		fetch value from rom $97fb[] AND ram $0ea8[]
+;		fetch value from rom DataBitMask[] AND ram $0ea8[]
 ; parameters:
 ;		A => low byte: aaaaabbb
 ;			aaaaa - increment direct page by
@@ -97,18 +108,19 @@ org $009776
 ;		A => 
 ; notes:
 ;		always PHD before calling and PLD after
-ANDFromTable97fbAnd0ea8ToA:
+ANDBitMaskAnd0ea8ToA:
 	phd					; save directpage
 	%setDirectpage($0ea8)
-	jsl ANDFromTable97fbToA
+	jsl ANDBitMaskToA
 	pld					; restore directpage
 	inc
 	dec
 	rtl					; exit routine
 
+
 ; pc should equal $009783
-
 pullpc
+;-------------------------------------------------------------------------
 
 
 
@@ -117,12 +129,14 @@ pullpc
 
 
 
+;-------------------------------------------------------------------------
 pushpc
 org $0097da
 
-; ROUTINE: Increase direct page, fetch from $0097fb[] ($00:97da)
+
+; ROUTINE: Increase direct page, fetch from DataBitMask[] ($0097da)
 ;		increments direct page by top 5 bits of A
-;		fetch value from rom $97fb[]
+;		fetch value from rom DataBitMask[]
 ; parameters:
 ;		A => low byte: aaaaabbb
 ;			aaaaa - increment direct page by
@@ -131,9 +145,9 @@ org $0097da
 ;				invert * 2 = address offset
 ;		directpage => 
 ; returns:
-;		A => value from $97fb[]
+;		A => value from DataBitMask[]
 ;		directpage => 
-IncreaseDPAndFetchFromTable97fb:
+IncreaseDPAndFetchBitMask:
 	php					; save processor status
 	%setAXYto16bit()
 
@@ -150,7 +164,7 @@ IncreaseDPAndFetchFromTable97fb:
 	tcd					; set dp
 	pla					; throw away temp value (old dp)
 
-	; get index into $97fb[]
+	; get index into DataBitMask[]
 	pla					; restore A
 	and #$0007			; only keep bottom 3 bits
 	eor #$0007			; invert bottom 3 bits
@@ -161,33 +175,27 @@ IncreaseDPAndFetchFromTable97fb:
 	asl a				; offset => index * 2
 	tax					; copy A to X
 
-	lda Data0097fb,x		; fetch value
+	lda.l DataBitMask,x
 
 	plx					; restore X
 	rts					; exit routine
 
+
 ; pc should equal $0097fb
-
 pullpc
-
-
-
-
-
-
-
-
+;-------------------------------------------------------------------------
 pushpc
-org pctosnes($0017FB)
+org $0097fb		;pctosnes ($0017fb)
+
 
 ; DATA:  ($0097fb)
-Data0097fb:
+DataBitMask:
 	db $01,$00,$02,$00,$04,$00,$08,$00,$10,$00,$20,$00,$40,$00,$80,$00
 
+
 ; pc should equal $00980b
-
-
 pullpc
+;-------------------------------------------------------------------------
 
 
 

@@ -432,6 +432,12 @@
 008414 beq $841a
 008416 jsr $8520
 008419 rtl				; exit routine
+00841a phk
+00841b plb
+00841c sta $2116
+00841f ldx #$f0c6
+008422 ldy #$0004
+008425 jmp $8ddf
 008428 lda #$80
 00842a and $00d4
 00842d beq $8476
@@ -1570,6 +1576,14 @@
 008d8e jsr $8c1b
 008d91 tax
 008d92 rts				; exit routine
+008d97 lda $1031
+008d9a pha
+008d9b lda #$0003
+008d9e jsr $8da8
+008da1 pla
+008da2 sta $1031
+008da5 sty $9e
+008da7 rts
 
 
 
@@ -2091,6 +2105,10 @@
 009186 ldy #$3719
 009189 cmp #$0026
 00918c bcc $9199
+00918e ldy #$3729
+009191 cmp #$0029
+009194 bcc $9199
+009196 ldy #$3739
 009199 ldx #$3669
 00919c lda #$000f
 00919f mvn $7e,$7e
@@ -2699,6 +2717,7 @@
 0096d3 adc $9e
 0096d5 sta $9e
 0096d7 bcc $96db
+0096d9 inc $a0
 0096db dex
 0096dc bne $96c9
 0096de ply
@@ -3752,6 +3771,12 @@
 00a156 ldx #$aef8
 00a159 stx $17
 00a15b rts				; exit routine
+00a15c sep #$20
+00a15e lda #$03
+00a160 sta $19
+00a162 ldx #$8457
+00a165 stx $17
+00a167 rts
 
 
 
@@ -3890,6 +3915,8 @@
 00a269 plb
 00a26a plp
 00a26b bne $a273
+00a26d lda #$0080
+00a270 trb $10a0
 00a273 rts				; exit routine
 
 
@@ -3921,6 +3948,36 @@
 00a2a6 dec
 00a2a7 bne $a2a2
 00a2a9 rts				; exit routine
+00a2b4 pei ($9e)
+00a2b6 sep #$20
+00a2b8 ldx #$0000
+00a2bb lda $a2dd,x
+00a2be cmp #$ff
+00a2c0 beq $a2d4
+00a2c2 cmp $01,s
+00a2c4 beq $a2cb
+00a2c6 inx
+00a2c7 inx
+00a2c8 inx
+00a2c9 bra $a2bb
+00a2cb rep #$30
+00a2cd lda $a2de,x
+00a2d0 sta $9e
+00a2d2 plx
+00a2d3 rts
+00a2e7 lda [$17]
+00a2e9 inc $17
+00a2eb and #$00ff
+00a2ee dec
+00a2ef cmp $9e
+00a2f1 bcc $a2ff
+00a2f3 lda $9e
+00a2f5 asl a
+00a2f6 adc $17
+00a2f8 sta $17
+00a2fa lda [$17]
+00a2fc sta $17
+00a2fe rts
 
 
 
@@ -4076,6 +4133,8 @@
 00a42b jsr $b1d6
 00a42e bne $a437
 00a430 bra $a43c
+00a432 jsr $b1d6
+00a435 bne $a43c
 00a437 inc $17
 00a439 inc $17
 00a43b rts				; exit routine
@@ -4085,14 +4144,22 @@
 00a43c lda [$17]
 00a43e sta $17
 00a440 rts				; exit routine
+00a451 jsr $b1e8
+00a454 bcs $a46d
 
 
 
 00a458 jsr $b1e8
 00a45b bcc $a472
+00a46d inc $17
+00a46f inc $17
+00a471 rts
 00a472 lda [$17]
 00a474 sta $17
 00a476 rts				; exit routine
+00a480 jsr $b204
+00a483 bcc $a4a3
+00a485 bra $a4a8
 
 
 
@@ -4129,12 +4196,19 @@
 00a4de lda [$17]
 00a4e0 sta $17
 00a4e2 rts				; exit routine
+00a4e3 jsr $b22f
+00a4e6 bcc $a50f
+00a4e8 beq $a50f
+00a4ea bra $a514
 
 
 
 00a4ec jsr $b22f
 00a4ef bcc $a50f
 00a4f1 bra $a514
+00a50f inc $17
+00a511 inc $17
+00a513 rts
 00a514 lda [$17]
 00a516 sta $17
 00a518 rts				; exit routine
@@ -4238,6 +4312,14 @@
 00a5d3 tax
 00a5d4 lda $19
 00a5d6 jmp $a71c
+00a708 lda [$17]
+00a70a inc $17
+00a70c inc $17
+00a70e tax
+00a70f lda [$17]
+00a711 inc $17
+00a713 and #$00ff
+00a716 bra $a71c
 00a718 ldx $9e
 00a71a lda $a0
 00a71c sep #$20
@@ -5637,6 +5719,8 @@
 00b1f9 lda $a0
 00b1fb cmp $62
 00b1fd bne $b203
+00b1ff lda $9e
+00b201 cmp $64
 00b203 rts				; exit routine
 
 
@@ -6071,6 +6155,12 @@
 00b5ba bcc $b5df
 00b5bc cmp #$7b
 00b5be bcs $b5df
+00b5c9 clc
+00b5ca lda $22
+00b5cc adc #$08
+00b5ce sta $22
+00b5d0 lda #$04
+00b5d2 sta $24
 00b5d4 lda #$04
 00b5d6 tsb $00d0
 00b5d9 bra $b5df
@@ -6124,6 +6214,12 @@
 00b63f bcc $b657
 00b641 cmp #$d1
 00b643 bcc $b667
+00b657 cmp #$08
+00b659 bcs $b65f
+00b65f lda $24
+00b661 and #$fe
+00b663 ora #$02
+00b665 sta $24
 00b667 lda $24
 00b669 and #$08
 00b66b bne $b674
@@ -6180,6 +6276,82 @@
 00b6cd tsb $00d4
 00b6d0 jsl $0c8000
 00b6d4 rts				; exit routine
+00b6d5 lda #$0001
+00b6d8 sta $62
+00b6da sep #$30
+00b6dc lda #$20
+00b6de bra $b6c9
+00b6e0 pei ($17)
+00b6e2 pei ($18)
+00b6e4 jmp $b78d
+00b6e7 sec
+00b6e8 lda $0e84
+00b6eb sbc $0164
+00b6ee sta $0e84
+00b6f1 sep #$20
+00b6f3 lda $0e86
+00b6f6 sbc $0166
+00b6f9 sta $0e86
+00b6fc lda $015f
+00b6ff cmp #$dd
+00b701 beq $b716
+00b703 jsl $00da6a
+00b707 clc
+00b708 adc $0162
+00b70b sta $0e9f,x
+00b70e lda $015f
+00b711 sta $0e9e,x
+00b714 bra $b727
+00b716 clc
+00b717 lda $1030
+00b71a adc $0162
+00b71d sta $1030
+00b720 bra $b727
+00b722 sep #$20
+00b724 stz $0162
+00b727 plx
+00b728 stx $18
+00b72a plx
+00b72b stx $17
+00b72d rts
+00b72e rep #$30
+00b730 jsl $0096a0
+00b734 lda $07
+00b736 sta $15
+00b738 bit #$8000
+00b73b bne $b722
+00b73d bit #$0080
+00b740 bne $b6e7
+00b742 bit #$0800
+00b745 bne $b7b5
+00b747 bit #$0400
+00b74a bne $b797
+00b74c bit #$0100
+00b74f bne $b770
+00b751 bit #$0200
+00b754 beq $b72e
+00b756 sep #$20
+00b758 dec $0162
+00b75b bpl $b78d
+00b75d lda $95
+00b75f and #$02
+00b761 beq $b76b
+00b76b inc $0162
+00b76e bra $b72e
+00b770 sep #$20
+00b772 inc $0162
+00b775 lda $0163
+00b778 cmp $0162
+00b77b bcs $b78d
+00b77d lda $95
+00b77f and #$01
+00b781 beq $b788
+00b788 dec $0162
+00b78b bra $b72e
+00b78d rep #$30
+00b78f ldx #$b7dd
+00b792 jsr $9bc4
+00b795 bra $b72e
 00b82a rep #$30
 00b82c phb
 00b82d pha
@@ -6900,6 +7072,11 @@
 00becd stz $02
 00becf lda $7e3664
 00bed3 beq $bee9
+00bed5 bmi $bee0
+00bed7 lda $1090
+00beda bmi $bee9
+00bedc inc $01
+00bede bra $bee9
 00bee9 lda $04e0
 00beec and #$10
 00beee beq $bef4
@@ -6997,6 +7174,7 @@
 00bfbb beq $bf77
 00bfbd cmp #$0011
 00bfc0 bcc $c00f
+00bfc2 beq $bff8
 00bfe0 sep #$20			; set A => 8bit
 00bfe2 lda $04df
 00bfe5 sta $0505
@@ -7006,9 +7184,20 @@
 00bff0 jsr $9bc4
 00bff3 bra $bf97
 00bff5 jmp $bf7a
+00bff8 jsr $c032
+00bffb bcc $c002
+00bffd bne $bff5
+00bfff lda #$0080
+00c002 dec $0e9f,x
+00c005 tax
+00c006 sep #$20
+00c008 stz $1021,x
+00c00b rep #$30
+00c00d bra $bfe0
 00c00f jsr $c032
 00c012 bcc $c019
 00c014 bne $bff5
+00c016 lda #$0080
 00c019 dec $0e9f,x
 00c01c tax
 00c01d lda $1016,x
@@ -7096,6 +7285,8 @@
 00c113 txa
 00c114 cmp #$0000
 00c117 beq $c11f
+00c119 lda $1096
+00c11c sta $1094
 00c11f sep #$20			; set A => 8bit
 00c121 ldx #$0000		; clear X
 00c124 lda $01
@@ -7108,6 +7299,17 @@
 00c136 ldx #$c055
 00c139 jsr $9bc4
 00c13c jmp $c0ad
+00c13f jsr $c1d1
+00c142 beq $c158
+00c144 sep #$20
+00c146 cmp #$01
+00c148 beq $c14d
+00c14a stz $1021
+00c14d cmp #$00
+00c14f beq $c154
+00c151 stz $10a1
+00c154 rep #$30
+00c156 bra $c11f
 00c15b jsr $c1d1
 00c15e beq $c158
 00c160 pha
@@ -7721,6 +7923,15 @@
 
 00c749 and #$0080
 00c74c beq $c75e
+00c74e sep #$20
+00c750 tya
+00c751 sta $0000,x
+00c754 txy
+00c755 iny
+00c756 iny
+00c757 lda #$15
+00c759 mvn $7f,$7f
+00c75c rep #$30
 00c75e rts				; exit routine
 
 
@@ -9065,6 +9276,12 @@
 00d39b lda $16
 00d39d and #$80
 00d39f beq $d355
+00d3a1 lda $1021
+00d3a4 and #$f8
+00d3a6 bne $d355
+00d3a8 lda $1050
+00d3ab cmp #$30
+00d3ad bne $d370
 00d3b7 lda #$30
 00d3b9 trb $1020
 00d3bc trb $10a0
@@ -9403,6 +9620,8 @@
 00d6b0 lda $15
 00d6b2 bit #$80
 00d6b4 bne $d6bb
+00d6b6 jsr $d011
+00d6b9 bra $d69c
 00d6bb jsr $d644
 00d6be ldx #$0000		; clear X
 00d6c1 stx $8e
@@ -9509,6 +9728,7 @@
 00d7ae lda $04e0
 00d7b1 bit #$02
 00d7b3 bne $d7fe
+00d7b5 bra $d7be
 00d7be lda $04e0
 00d7c1 bit #$80
 00d7c3 bne $d7d6
@@ -9568,6 +9788,7 @@
 00d851 lda #$02
 00d853 and $04e0
 00d856 beq $d875
+00d858 lda #$00
 00d85a sta $02
 00d85c jsr $da23
 00d85f bra $d869
@@ -9680,6 +9901,8 @@
 00d942 lda $1221
 00d945 and #$c0
 00d947 beq $d94e
+00d949 lda $0a35
+00d94c bra $d91b
 00d94e txa
 00d94f sta $01
 00d951 rts				; exit routine
@@ -9756,6 +9979,8 @@
 00d9eb lda $11a1
 00d9ee and #$c0
 00d9f0 beq $d9de
+00d9f2 lda $0a31
+00d9f5 bra $d9b8
 00d9f7 ldx #$0000
 00d9fa lda $1110
 00d9fd inc
@@ -9781,6 +10006,10 @@
 00da29 cmp #$03
 00da2b beq $da5a
 00da5a rts				; exit routine
+00da61 lda $9e
+00da63 jsl $00da6a
+00da67 sta $9e
+00da69 rts
 
 
 
@@ -9809,6 +10038,12 @@
 00da93 bra $daa8
 00da95 lda $0e9f,x
 00da98 bra $daa8
+00da9a bne $daa3
+00da9c lda $1030
+00da9f ldx #$92
+00daa1 bra $daa8
+00daa3 lda $10b0
+00daa6 ldx #$12
 00daa8 plp
 00daa9 rtl				; exit routine
 
@@ -9843,6 +10078,15 @@
 00dade bcc $dafc
 00dae0 cmp #$dd
 00dae2 bcc $db06
+00dae4 beq $daf1
+00dae6 lda $10b0
+00dae9 jsr $db0a
+00daec sta $10b0
+00daef bra $db06
+00daf1 lda $1030
+00daf4 jsr $db0a
+00daf7 sta $1030
+00dafa bra $db06
 00dafc jsl $00da6a
 00db00 jsr $db0a
 00db03 sta $0e9f,x
@@ -9853,9 +10097,19 @@
 
 00db0a cmp #$63
 00db0c bcc $db19
+00db0e stz $0166
+00db11 lda #$80
+00db13 trb $0165
+00db16 lda #$63
+00db18 rts
 00db19 adc $0166
 00db1c cmp #$64
 00db1e bcc $db2c
+00db20 sbc #$63
+00db22 eor #$ff
+00db24 adc $0166
+00db27 sta $0166
+00db2a lda #$63
 00db2c rts				; exit routine
 
 
@@ -9864,6 +10118,9 @@
 00db2f jsl $00da6a
 00db33 cmp #$0063
 00db36 bcc $db3e
+00db38 lda #$00ff
+00db3b sta $9e
+00db3d rts
 00db3e lda $9e
 00db40 php				; save processor status to stack
 00db41 rep #$30			; set A,X,Y => 16bit
@@ -9878,6 +10135,19 @@
 00db51 bcc $db93
 00db53 cmp #$2f
 00db55 bcc $dba1
+00db57 cmp #$dd
+00db59 bcc $dbc3
+00db5b bne $db69
+00db5d lda $1030
+00db60 cmp #$63
+00db62 bcs $dbdb
+00db64 inc $1030
+00db67 bra $dbdb
+00db69 lda $10b0
+00db6c cmp #$63
+00db6e bcs $dbdb
+00db70 inc $10b0
+00db73 bra $dbdb
 00db75 tay
 00db76 jsl $00da6a
 00db7a cmp #$63
@@ -9916,11 +10186,34 @@
 00dbbc lda #$04
 00dbbe tsb $00d4
 00dbc1 bra $dbdb
+00dbc3 pha
+00dbc4 sbc #$2e
+00dbc6 phd
+00dbc7 pea $1035
+00dbca pld
+00dbcb jsl $00974e
+00dbcf pld
+00dbd0 pla
+00dbd1 ldy #$00
+00dbd3 jsr $9111
+00dbd6 lda #$04
+00dbd8 tsb $00d4
 00dbdb rep #$30			; set A,X,Y => 16bit
 00dbdd ply
 00dbde plx
 00dbdf plp
 00dbe0 rts				; exit routine
+00dbe1 pha
+00dbe2 lda #$02
+00dbe4 trb $10b2
+00dbe7 lda #$04
+00dbe9 tsb $10b3
+00dbec lda #$2d
+00dbee sta $10b1
+00dbf1 ldy #$50
+00dbf3 jsr $9111
+00dbf6 pla
+00dbf7 bra $dba6
 
 
 
@@ -10017,6 +10310,12 @@
 00dc81 plb
 00dc82 clc
 00dc83 jmp ($00cc)
+00dd04 lda $0022,x
+00dd07 eor #$00ff
+00dd0a sta $2022,x
+00dd0d lda $0020,x
+00dd10 eor #$00ff
+00dd13 sta $2020,x
 00dd16 lda $001e,x
 00dd19 eor #$00ff
 00dd1c sta $201e,x
@@ -11549,6 +11848,21 @@
 00f04a and #$eeee
 00f04d sta $0032,x
 00f050 rts				; exit routine
+00f051 clc
+00f052 lda $00c2
+00f055 adc #$0020
+00f058 ldx #$0018
+00f05b pea $007f
+00f05e plb
+00f05f tay
+00f060 lda #$0000
+00f063 jsr $9a05
+00f066 tya
+00f067 adc #$0034
+00f06a dex
+00f06b bne $f05f
+00f06d plb
+00f06e rts
 
 
 
@@ -12158,6 +12472,8 @@
 01851b lda #$01			; bitmask for DMA channel 0
 01851d sta $420b		; start DMA transfer on channel 0
 018520 rts				; exit routine
+018521 jsr $836c
+018524 jmp $845d
 018527 php
 018528 phb
 018529 phk
@@ -12784,6 +13100,9 @@
 018bc3 lda $1a7f,x
 018bc6 bit #$20
 018bc8 beq $8bb9
+018bca lda $192b
+018bcd inc
+018bce bra $8bbc
 018bd0 jsr $8bd4
 018bd3 rtl				; exit routine
 
@@ -12848,6 +13167,8 @@
 018c4a bra $8c55
 018c4c cmp $1925
 018c4f bcc $8c58
+018c51 sec
+018c52 sbc $1925
 018c55 sta $192e
 018c58 plp
 018c59 rts				; exit routine
@@ -12931,6 +13252,8 @@
 018cf4 sty $1997
 018cf7 lda $0e8d
 018cfa beq $8d00
+018cfc lda #$06
+018cfe bra $8d08
 018d00 lda $19cb
 018d03 and #$70
 018d05 lsr a
@@ -13370,6 +13693,9 @@
 019139 sta $0500
 01913c lda $19f6
 01913f beq $9149
+019141 sta $050b
+019144 lda #$f5
+019146 sta $050a
 019149 plx
 01914a plp
 01914b rts				; exit routine
@@ -13444,6 +13770,9 @@
 019220 jsl $01b24b
 019224 lda $19f6
 019227 beq $9233
+019229 ldx #$2502
+01922c stx $19ee
+01922f jsl $01b24b
 019233 pla
 019234 sta $0111
 019237 stz $1a46
@@ -13601,6 +13930,74 @@
 0193b9 inc $19f8
 0193bc jsr $8b82
 0193bf rts				; exit routine
+0193c6 phb
+0193c7 jsr $9057
+0193ca ldx $19bd
+0193cd stx $19c1
+0193d0 ldx $19bf
+0193d3 stx $19c3
+0193d6 jsr $907a
+0193d9 jsr $f985
+0193dc lda #$02
+0193de sta $1a46
+0193e1 ldy #$000a
+0193e4 sty $1991
+0193e7 lda #$0f
+0193e9 sta $1926
+0193ec jsr $946b
+0193ef jsr $82d8
+0193f2 rep #$30
+0193f4 ldy $1991
+0193f7 cpy #$0000
+0193fa bmi $944c
+0193fc sep #$20
+0193fe ldx $19c1
+019401 stx $19bd
+019404 ldx $19c3
+019407 stx $19bf
+01940a ldx $0e89
+01940d phx
+01940e stx $192d
+019411 tyx
+019412 lda $192e
+019415 sec
+019416 sbc #$05
+019418 clc
+019419 adc $0194e1,x
+01941d sta $192e
+019420 lda $0194e1,x
+019424 pha
+019425 lda $192d
+019428 sec
+019429 sbc #$08
+01942b sta $192d
+01942e lda #$00
+019430 xba
+019431 pla
+019432 rep #$30
+019434 clc
+019435 adc $19bf
+019438 and #$000f
+01943b sta $19bf
+01943e jsr $f977
+019441 plx
+019442 stx $0e89
+019445 ldy $1991
+019448 dey
+019449 sty $1991
+01944c sep #$20
+01944e rep #$10
+019450 lda #$02
+019452 sta $1a46
+019455 lda $1926
+019458 sec
+019459 sbc $1928
+01945c sta $1926
+01945f bmi $9464
+019461 jmp $93ec
+019464 jsr $90bc
+019467 plb
+019468 jmp $93bc
 
 
 
@@ -13666,6 +14063,27 @@
 019502 stz $19b0
 019505 plp
 019506 rts				; exit routine
+019507 jsr $9511
+01950a plp
+01950b rts
+019511 sep #$20
+019513 rep #$10
+019515 php
+019516 lda #$00
+019518 sta $194b
+01951b stz $1951
+01951e xba
+01951f lda $0e8b
+019522 asl a
+019523 tax
+019524 rep #$30
+019526 lda $00f3f1,x
+01952a sta $194f
+01952d lda $00f5e7,x
+019531 sta $194d
+019534 jsr $95d7
+019537 plp
+019538 rts
 
 
 
@@ -13889,6 +14307,9 @@
 01971d lda $19c9
 019720 and $192b
 019723 beq $972b
+019725 lda #$40
+019727 ora $01,x
+019729 sta $01,x
 01972b iny
 01972c cpy #$0004
 01972f beq $9735
@@ -14326,6 +14747,10 @@
 019b35 lda $1935
 019b38 cmp #$06
 019b3a bne $9b48
+019b3c jsr $9b65
+019b3f jsr $e4fe
+019b42 jsr $9b7e
+019b45 jsr $e4fe
 019b48 jsr $9b65
 019b4b jsr $e4fe
 019b4e jsr $9b7e
@@ -14377,6 +14802,8 @@
 019ba9 lda $1935
 019bac cmp #$06
 019bae bne $9bb4
+019bb0 lda #$32
+019bb2 bra $9bba
 019bb4 lda #$2f
 019bb6 bra $9bba
 019bb8 lda #$05
@@ -14408,6 +14835,9 @@
 019bf8 sta $1926
 019bfb lda $1935
 019bfe beq $9c5d
+019c00 asl a
+019c01 asl a
+019c02 sta $193f
 019c05 jsr $9ccc
 019c08 inc $1940
 019c0b ldx $1933
@@ -16334,6 +16764,7 @@
 01ac2e sta $197f
 01ac31 cmp #$03
 01ac33 bne $ac38
+01ac35 inc $197f
 01ac38 pla
 01ac39 lsr a
 01ac3a lsr a
@@ -16861,6 +17292,19 @@
 01b02b sbc #$10
 01b02d sta $198a
 01b030 jmp $b050
+01b033 tyx
+01b034 lda $1a54
+01b037 sta $198a
+01b03a sec
+01b03b sbc #$10
+01b03d sta $1989
+01b040 jmp $b050
+01b043 tyx
+01b044 lda $1a54
+01b047 sec
+01b048 sbc #$10
+01b04a sta $1989
+01b04d sta $198a
 01b050 pha
 01b051 lda $02,x
 01b053 and #$cf
@@ -16924,6 +17368,40 @@
 
 01b0c5 sec
 01b0c6 rts				; exit routine
+01b0c7 lda #$08
+01b0c9 sta $1935
+01b0cc stz $193b
+01b0cf lda $1935
+01b0d2 jsr $90dc
+01b0d5 cmp #$ff
+01b0d7 beq $b117
+01b0d9 jsr $b077
+01b0dc bcs $b10a
+01b0de lda $193b
+01b0e1 jsr $b1ea
+01b0e4 bcs $b0fc
+01b0e6 ldx $1935
+01b0e9 phx
+01b0ea ldx $193b
+01b0ed phx
+01b0ee lda $193b
+01b0f1 jsr $b171
+01b0f4 plx
+01b0f5 stx $193b
+01b0f8 plx
+01b0f9 stx $1935
+01b0fc inc $193b
+01b0ff lda $1935
+01b102 clc
+01b103 adc #$07
+01b105 sta $1935
+01b108 bra $b0cf
+01b10a lda $193b
+01b10d jsr $b1ea
+01b110 bcc $b0fc
+01b112 jsr $b1b5
+01b115 bra $b0fc
+01b117 rts
 
 
 
@@ -17066,6 +17544,9 @@
 01b20d sep #$20			; set A => 8bit
 01b20f pla
 01b210 bra $b1fa
+01b212 pld
+01b213 clc
+01b214 rts
 01b215 lda $01
 01b217 pld
 01b218 sec
@@ -17301,6 +17782,51 @@
 01b428 jsr $a9ed
 01b42b jsr $c6a0
 01b42e rts				; exit routine
+01b457 ldx #$bdeb
+01b45a sep #$20
+01b45c rep #$10
+01b45e phb
+01b45f pea $0006
+01b462 plb
+01b463 pla
+01b464 xba
+01b465 lda $0000,x
+01b468 cmp #$ff
+01b46a beq $b4ad
+01b46c cmp $0e91
+01b46f beq $b477
+01b471 inx
+01b472 inx
+01b473 inx
+01b474 inx
+01b475 bra $b465
+01b477 lda $0001,x
+01b47a sta $19f0
+01b47d lda $0002,x
+01b480 sta $19f2
+01b483 lda $0003,x
+01b486 and #$3f
+01b488 sta $19f1
+01b48b lda $0003,x
+01b48e rol a
+01b48f rol a
+01b490 rol a
+01b491 and #$03
+01b493 sta $0e8b
+01b496 plb
+01b497 lda #$2b
+01b499 jsr $baac
+01b49c jsr $c240
+01b49f jsr $c240
+01b4a2 jsr $cab7
+01b4a5 jsr $82cf
+01b4a8 lda #$01
+01b4aa jsr $82f1
+01b4ad rts
+01b4b3 ldx #$be2f
+01b4b6 bra $b45a
+01b4bd ldx #$be53
+01b4c0 bra $b45a
 
 
 
@@ -17355,6 +17881,74 @@
 01b54b asl a
 01b54c tax
 01b54d jmp ($b550,x)
+01b574 phb
+01b575 sep #$20
+01b577 rep #$10
+01b579 jsr $a5a9
+01b57c lda #$7f
+01b57e sta $1937
+01b581 ldx #$3000
+01b584 stx $1938
+01b587 ldx #$7800
+01b58a stx $1935
+01b58d ldx #$1000
+01b590 stx $193a
+01b593 rep #$30
+01b595 stz $192b
+01b598 lda #$0010
+01b59b sta $192d
+01b59e php
+01b59f sep #$20
+01b5a1 rep #$10
+01b5a3 pea $7f00
+01b5a6 plb
+01b5a7 plb
+01b5a8 plp
+01b5a9 lda #$3000
+01b5ac clc
+01b5ad adc $00192b
+01b5b1 tax
+01b5b2 lda #$1e00
+01b5b5 clc
+01b5b6 adc $00192b
+01b5ba tay
+01b5bb lda $00192b
+01b5bf clc
+01b5c0 adc #$0003
+01b5c3 and #$000f
+01b5c6 sta $00192b
+01b5ca lda #$0800
+01b5cd sta $00192f
+01b5d1 lda $0000,y
+01b5d4 sta $0000,x
+01b5d7 iny
+01b5d8 iny
+01b5d9 inx
+01b5da inx
+01b5db lda $00192f
+01b5df dec
+01b5e0 sta $00192f
+01b5e4 bne $b5d1
+01b5e6 php
+01b5e7 sep #$20
+01b5e9 rep #$10
+01b5eb jsr $8df2
+01b5ee lda #$04
+01b5f0 sta $001a46
+01b5f4 plp
+01b5f5 lda $00192d
+01b5f9 dec
+01b5fa sta $00192d
+01b5fe bne $b5a9
+01b600 plb
+01b601 rts
+01b602 jsr $cfa6
+01b605 jsr $d0ba
+01b608 rts
+01b609 sep #$20
+01b60b rep #$10
+01b60d jsr $b0c7
+01b610 rts
 01b66a sep #$20			; set A => 8bit
 01b66c rep #$10			; set X,Y => 16bit
 01b66e lda $19ee
@@ -17444,6 +18038,8 @@
 01b71e and #$01ff
 01b721 sta $1a87,x
 01b724 rts				; exit routine
+01b737 jsr $d0ba
+01b73a rts
 
 
 
@@ -17530,6 +18126,82 @@
 01b7b3 tax
 01b7b4 jsr ($b7b8,x)
 01b7b7 rts				; exit routine
+01b816 sep #$20
+01b818 rep #$10
+01b81a lda #$03
+01b81c sta $19f6
+01b81f sta $050b
+01b822 lda #$f5
+01b824 sta $050a
+01b827 rts
+01b828 phb
+01b829 ldx #$02f0
+01b82c ldy #$c508
+01b82f pea $7f00
+01b832 plb
+01b833 plb
+01b834 lda #$0008
+01b837 pha
+01b838 lda $07d824,x
+01b83c sta $0000,y
+01b83f inx
+01b840 inx
+01b841 iny
+01b842 iny
+01b843 pla
+01b844 dec
+01b845 bne $b837
+01b847 plb
+01b848 rts
+01b849 ldx #$0005
+01b84c stx $192b
+01b84f jsr $b828
+01b852 jsr $b8b3
+01b855 lda #$0004
+01b858 jsr $d6c3
+01b85b ldy #$0008
+01b85e ldx #$0000
+01b861 lda #$ffff
+01b864 sta $7fc508,x
+01b868 inx
+01b869 inx
+01b86a dey
+01b86b bne $b864
+01b86d jsr $b8b3
+01b870 lda #$0004
+01b873 jsr $d6c3
+01b876 dec $192b
+01b879 bne $b84f
+01b87b ldx #$001f
+01b87e stx $1935
+01b881 ldx #$0000
+01b884 ldy #$0008
+01b887 lda $7fc508,x
+01b88b sta $192b
+01b88e lda $07db14,x
+01b892 sta $192d
+01b895 jsr $d23b
+01b898 lda $192f
+01b89b sta $7fc508,x
+01b89f inx
+01b8a0 inx
+01b8a1 dey
+01b8a2 bne $b887
+01b8a4 jsr $b8b3
+01b8a7 lda #$0004
+01b8aa jsr $d6bc
+01b8ad dec $1935
+01b8b0 bne $b881
+01b8b2 rts
+01b8b3 php
+01b8b4 sep #$20
+01b8b6 rep #$10
+01b8b8 jsr $8df2
+01b8bb lda #$01
+01b8bd sta $1a46
+01b8c0 jsr $8df2
+01b8c3 plp
+01b8c4 rts
 
 
 
@@ -17544,6 +18216,56 @@
 01b8d6 jsr $d6bc
 01b8d9 plp				; restore processor status from stack
 01b8da rts				; exit routine
+01b8e4 sep #$20
+01b8e6 rep #$10
+01b8e8 jsr $d2de
+01b8eb jsr $d35c
+01b8ee jsr $d3a5
+01b8f1 ldx #$463c
+01b8f4 stx $19ee
+01b8f7 jsr $beb1
+01b8fa ldx #$463d
+01b8fd stx $19ee
+01b900 jsr $beb1
+01b903 jsr $d3cc
+01b906 lda #$0c
+01b908 jsr $d49a
+01b90b rts
+01b90c sep #$20
+01b90e rep #$10
+01b910 jsr $d2de
+01b913 jsr $d35c
+01b916 jsr $d3c1
+01b919 ldx #$4636
+01b91c stx $19ee
+01b91f jsr $beb1
+01b922 ldx #$4637
+01b925 stx $19ee
+01b928 jsr $beb1
+01b92b jsr $d3cc
+01b92e lda #$06
+01b930 jsr $d49a
+01b933 rts
+01b984 ldx #$0400
+01b987 stx $1935
+01b98a lda #$0005
+01b98d sta $1937
+01b990 jmp $cce7
+01b993 ldx #$0501
+01b996 stx $1935
+01b999 lda #$0005
+01b99c sta $1937
+01b99f jmp $cce7
+01b9a2 ldx #$0602
+01b9a5 stx $1935
+01b9a8 lda #$0003
+01b9ab sta $1937
+01b9ae jmp $cce7
+01b9b1 ldx #$0703
+01b9b4 stx $1935
+01b9b7 lda #$0005
+01b9ba sta $1937
+01b9bd jmp $cce7
 
 
 
@@ -17726,6 +18448,55 @@
 01badf jsr $b73b
 01bae2 jsr $c6a0
 01bae5 rts				; exit routine
+01baf9 sep #$20
+01bafb rep #$10
+01bafd lda $19ee
+01bb00 jsr $b1ea
+01bb03 bcc $bb52
+01bb05 sta $192d
+01bb08 lda $1a80,x
+01bb0b and #$cf
+01bb0d ora #$10
+01bb0f sta $1a80,x
+01bb12 lda $1a82,x
+01bb15 rep #$30
+01bb17 and #$00ff
+01bb1a asl a
+01bb1b phx
+01bb1c tax
+01bb1d lda $00fdcf,x
+01bb21 clc
+01bb22 adc #$0008
+01bb25 tay
+01bb26 plx
+01bb27 jsr $ae89
+01bb2a lda $192d
+01bb2d and #$00ff
+01bb30 asl a
+01bb31 asl a
+01bb32 phx
+01bb33 tax
+01bb34 lda $01a639,x
+01bb38 tay
+01bb39 plx
+01bb3a lda $1a73,x
+01bb3d sta $0c02,y
+01bb40 lda $1a75,x
+01bb43 sta $0c06,y
+01bb46 lda $1a77,x
+01bb49 sta $0c0a,y
+01bb4c lda $1a79,x
+01bb4f sta $0c0e,y
+01bb52 rts
+01bb53 sep #$20
+01bb55 rep #$10
+01bb57 lda $1916
+01bb5a and #$e0
+01bb5c sta $1916
+01bb5f lda $19ee
+01bb62 and #$1f
+01bb64 sta $1916
+01bb67 rts
 
 
 
@@ -17891,6 +18662,36 @@
 01bcd4 sta $0c0e,y
 01bcd7 jsr $82d8
 01bcda rts
+01bd1c php
+01bd1d sep #$20
+01bd1f rep #$10
+01bd21 jsr $cf9d
+01bd24 bcc $bd61
+01bd26 sta $19e7
+01bd29 plp
+01bd2a lda $1a80,x
+01bd2d pha
+01bd2e lda $19ee
+01bd31 and #$0010
+01bd34 lsr a
+01bd35 lsr a
+01bd36 lsr a
+01bd37 lsr a
+01bd38 clc
+01bd39 adc #$003c
+01bd3c jsr $cace
+01bd3f jsr $82cf
+01bd42 lda #$002d
+01bd45 jsr $d6a8
+01bd48 lda $19ee
+01bd4b and #$000f
+01bd4e ora #$4400
+01bd51 sta $19ee
+01bd54 pla
+01bd55 and #$0030
+01bd58 ora $19ee
+01bd5b sta $19ee
+01bd5e jmp $bc1a
 01bd9d lda $19ee
 01bda0 and #$00f0
 01bda3 lsr a
@@ -17902,6 +18703,67 @@
 01bdcb bcc $bdd0
 01bdcd jsr $c49e
 01bdd0 rts				; exit routine
+01bdd1 jsr $c456
+01bdd4 bcc $bdd9
+01bdd6 jsr $c4d1
+01bdd9 rts
+01bdf3 sep #$20
+01bdf5 rep #$10
+01bdf7 jsr $cf9d
+01bdfa bcc $be27
+01bdfc sta $192b
+01bdff stx $192d
+01be02 lda $1a80,x
+01be05 and #$30
+01be07 lsr a
+01be08 lsr a
+01be09 lsr a
+01be0a lsr a
+01be0b sta $192c
+01be0e ldy #$0004
+01be11 phy
+01be12 lda $192c
+01be15 inc
+01be16 and #$03
+01be18 sta $192c
+01be1b jsr $8ae4
+01be1e lda #$04
+01be20 jsr $d6bc
+01be23 ply
+01be24 dey
+01be25 bne $be11
+01be27 rts
+01be28 sep #$20
+01be2a rep #$10
+01be2c jsr $cf9d
+01be2f bcc $be66
+01be31 sta $192b
+01be34 stx $192d
+01be37 rep #$30
+01be39 phx
+01be3a ldy #$000c
+01be3d phy
+01be3e dec $1a87,x
+01be41 dec $1a87,x
+01be44 jsr $82cf
+01be47 ply
+01be48 dey
+01be49 bne $be3d
+01be4b php
+01be4c sep #$20
+01be4e rep #$10
+01be50 jsr $be02
+01be53 plp
+01be54 plx
+01be55 ldy #$000c
+01be58 phy
+01be59 inc $1a87,x
+01be5c inc $1a87,x
+01be5f jsr $82cf
+01be62 ply
+01be63 dey
+01be64 bne $be58
+01be66 rts
 
 
 
@@ -17947,6 +18809,16 @@
 01bee4 jsr $cf5d
 01bee7 jsr $b1ad
 01beea rts				; exit routine
+01beeb php
+01beec sep #$20
+01beee rep #$10
+01bef0 jsr $cf9d
+01bef3 bcc $beff
+01bef5 sta $19e7
+01bef8 plp
+01bef9 lda #$003e
+01befc jsr $cace
+01beff rts
 
 
 
@@ -17986,6 +18858,54 @@
 01bfa0 pla
 01bfa1 sta $1a72,x
 01bfa4 rts				; exit routine
+01bfa5 sep #$20
+01bfa7 rep #$10
+01bfa9 jsr $cf9d
+01bfac bcc $c001
+01bfae lda $1a72,x
+01bfb1 pha
+01bfb2 lda $1a82,x
+01bfb5 pha
+01bfb6 lda #$3e
+01bfb8 sta $1a82,x
+01bfbb lda $19ef
+01bfbe inc
+01bfbf and #$03
+01bfc1 sta $192b
+01bfc4 ora #$90
+01bfc6 sta $1a72,x
+01bfc9 jsr $cc81
+01bfcc lda #$00
+01bfce xba
+01bfcf lda $19ee
+01bfd2 lsr a
+01bfd3 lsr a
+01bfd4 lsr a
+01bfd5 lsr a
+01bfd6 tay
+01bfd7 phy
+01bfd8 phx
+01bfd9 php
+01bfda jsr $caec
+01bfdd jsr $82cf
+01bfe0 plp
+01bfe1 plx
+01bfe2 lda $1a72,x
+01bfe5 bne $bfd8
+01bfe7 ply
+01bfe8 dey
+01bfe9 beq $bff9
+01bfeb phy
+01bfec lda $192b
+01bfef ora #$90
+01bff1 sta $1a72,x
+01bff4 jsr $cc81
+01bff7 bra $bfd8
+01bff9 pla
+01bffa sta $1a82,x
+01bffd pla
+01bffe sta $1a72,x
+01c001 rts
 
 
 
@@ -18047,6 +18967,9 @@
 01c094 and #$07
 01c096 cmp $192b
 01c099 beq $c0a9
+01c09b lda $19cf
+01c09e and #$08
+01c0a0 beq $c0a9
 01c0a9 lda $19cb
 01c0ac jsr $885f
 01c0af plp
@@ -18095,6 +19018,13 @@
 01c112 jsr $d6a8
 01c115 jsr $c44f
 01c118 rts				; exit routine
+01c119 sep #$20
+01c11b rep #$10
+01c11d lda #$10
+01c11f sta $1993
+01c122 lda #$1c
+01c124 jsr $8caf
+01c127 rts
 
 
 
@@ -18264,6 +19194,17 @@
 01c325 sta $19b4
 01c328 jsr $c44f
 01c32b rts				; exit routine
+01c32c sep #$20
+01c32e rep #$10
+01c330 jsr $c487
+01c333 stz $192b
+01c336 lda $19ee
+01c339 cmp #$b0
+01c33b beq $c342
+01c33d lda #$03
+01c33f sta $192b
+01c342 jsr $c4f5
+01c345 rts
 
 
 
@@ -18280,6 +19221,20 @@
 01c35d lda #$01
 01c35f sta $1928
 01c362 jmp $c04d
+01c365 sep #$20
+01c367 rep #$10
+01c369 lda #$10
+01c36b sta $1993
+01c36e lda $19ef
+01c371 inc
+01c372 and #$03
+01c374 sta $0e8b
+01c377 sta $19d7
+01c37a lda #$03
+01c37c sta $1929
+01c37f lda #$02
+01c381 sta $1928
+01c384 jmp $c04d
 01c388 sep #$20			; set A => 8bit
 01c38a rep #$10			; set X,Y => 16bit
 01c38c lda #$00
@@ -18411,6 +19366,36 @@
 01c4ed sta $0c57
 01c4f0 sta $0c5f
 01c4f3 bra $c4c0
+01c4f5 lda #$48
+01c4f7 sta $0c52
+01c4fa sta $0c56
+01c4fd inc
+01c4fe sta $0c5a
+01c501 sta $0c5e
+01c504 lda #$0c
+01c506 ora $1a54
+01c509 sta $0c53
+01c50c sta $0c5b
+01c50f ora #$40
+01c511 sta $0c57
+01c514 sta $0c5f
+01c517 jsr $c541
+01c51a stz $0e05
+01c51d lda #$14
+01c51f jsr $d6a8
+01c522 lda #$4a
+01c524 sta $0c52
+01c527 sta $0c56
+01c52a inc
+01c52b sta $0c5a
+01c52e sta $0c5e
+01c531 lda #$10
+01c533 sta $050a
+01c536 lda #$2d
+01c538 jsr $d6a8
+01c53b lda #$55
+01c53d sta $0e05
+01c540 rts
 01c541 lda #$00
 01c543 xba
 01c544 lda $192b
@@ -18730,6 +19715,19 @@
 01c7bf lda $06b8cd,x
 01c7c3 cmp $0e91
 01c7c6 bne $c7e4
+01c7c8 lda $06b8d0,x
+01c7cc sta $19ee
+01c7cf lda #$22
+01c7d1 sta $19ef
+01c7d4 ldx $192b
+01c7d7 phx
+01c7d8 phy
+01c7d9 php
+01c7da jsl $01b24b
+01c7de plp
+01c7df ply
+01c7e0 plx
+01c7e1 stx $192b
 01c7e4 dec $192b
 01c7e7 dey
 01c7e8 bne $c7a1
@@ -18974,6 +19972,17 @@
 01cab2 sta $0e05
 01cab5 plp
 01cab6 rts				; exit routine
+01cab7 php
+01cab8 sep #$20
+01caba rep #$10
+01cabc lda $0e91
+01cabf beq $cacc
+01cac1 lda #$55
+01cac3 sta $0e04
+01cac6 sta $0e0c
+01cac9 jsr $82cf
+01cacc plp
+01cacd rts
 
 
 
@@ -19118,6 +20127,8 @@
 01cbcf lda $10,x
 01cbd1 cmp #$3e
 01cbd3 bne $cbda
+01cbd5 lda $1979
+01cbd8 bra $cbe2
 01cbda lda $1980
 01cbdd asl a
 01cbde clc
@@ -19236,6 +20247,202 @@
 01ccbe pld
 01ccbf plp
 01ccc0 rts				; exit routine
+01ccc1 lda #$80
+01ccc3 sta $2115
+01ccc6 lda #$00
+01ccc8 xba
+01ccc9 lda $192b
+01cccc rep #$30
+01ccce clc
+01cccf adc $192d
+01ccd2 tax
+01ccd3 stx $2116
+01ccd6 ldy $192f
+01ccd9 stz $2118
+01ccdc clc
+01ccdd adc #$0010
+01cce0 sta $2116
+01cce3 dey
+01cce4 bne $ccd9
+01cce6 rts
+01cce7 lda $19cb
+01ccea and #$fff8
+01cced ora #$0001
+01ccf0 sta $19cb
+01ccf3 sep #$20
+01ccf5 rep #$10
+01ccf7 lda $19b4
+01ccfa and #$f8
+01ccfc ora #$01
+01ccfe sta $19b4
+01cd01 lda #$01
+01cd03 sta $1928
+01cd06 lda #$02
+01cd08 sta $19d7
+01cd0b jsr $cec9
+01cd0e jsr $935c
+01cd11 lda $1935
+01cd14 jsr $b1ea
+01cd17 sta $1939
+01cd1a stx $193b
+01cd1d lda $1a72,x
+01cd20 sta $193a
+01cd23 lda #$04
+01cd25 sta $1a72,x
+01cd28 lda $1a7d,x
+01cd2b dec
+01cd2c sta $192d
+01cd2f lda $1a7e,x
+01cd32 sta $192e
+01cd35 jsr $880b
+01cd38 stx $193d
+01cd3b jsr $9057
+01cd3e lda $19bd
+01cd41 clc
+01cd42 adc #$07
+01cd44 and #$1f
+01cd46 sta $19bd
+01cd49 lda $19bf
+01cd4c clc
+01cd4d adc #$05
+01cd4f and #$0f
+01cd51 sta $19bf
+01cd54 jsr $88cc
+01cd57 ldx $192b
+01cd5a stx $193f
+01cd5d lda $1936
+01cd60 jsr $b1ea
+01cd63 sta $1941
+01cd66 stx $1943
+01cd69 lda $1a72,x
+01cd6c sta $1942
+01cd6f lda #$b0
+01cd71 sta $1945
+01cd74 sta $1a72,x
+01cd77 lda $1a80,x
+01cd7a sta $1946
+01cd7d and #$3f
+01cd7f ora #$80
+01cd81 sta $1a80,x
+01cd84 stz $192b
+01cd87 jsr $cc81
+01cd8a lda #$02
+01cd8c sta $1928
+01cd8f jsr $cec9
+01cd92 stz $1947
+01cd95 stz $1948
+01cd98 lda $1937
+01cd9b sta $1949
+01cd9e lda #$02
+01cda0 sta $192a
+01cda3 lda #$80
+01cda5 sta $1929
+01cda8 lda #$37
+01cdaa jsr $baac
+01cdad jsr $935c
+01cdb0 dec $1949
+01cdb3 beq $cdc9
+01cdb5 ldx $1943
+01cdb8 lda $1945
+01cdbb sta $1a72,x
+01cdbe stz $192b
+01cdc1 jsr $cc81
+01cdc4 jsr $cec9
+01cdc7 bra $cdad
+01cdc9 ldx $193b
+01cdcc lda $193a
+01cdcf sta $1a72,x
+01cdd2 lda $1a7e,x
+01cdd5 clc
+01cdd6 adc $1937
+01cdd9 sta $1a7e,x
+01cddc lda #$38
+01cdde jsr $baac
+01cde1 ldx $193b
+01cde4 lda $1939
+01cde7 sta $19e7
+01cdea lda #$17
+01cdec jsr $cace
+01cdef stz $192a
+01cdf2 stz $1929
+01cdf5 lda #$01
+01cdf7 sta $1928
+01cdfa jsr $cec9
+01cdfd jsr $935c
+01ce00 lda $19b4
+01ce03 and #$f8
+01ce05 sta $19b4
+01ce08 ldx $193b
+01ce0b lda $1939
+01ce0e sta $19e7
+01ce11 lda #$19
+01ce13 jsr $cace
+01ce16 ldx $193b
+01ce19 lda #$b0
+01ce1b sta $194a
+01ce1e sta $1a72,x
+01ce21 lda $1a80,x
+01ce24 sta $194b
+01ce27 and #$3f
+01ce29 ora #$80
+01ce2b sta $1a80,x
+01ce2e stz $192b
+01ce31 jsr $cc81
+01ce34 ldx $1943
+01ce37 lda #$b2
+01ce39 sta $1945
+01ce3c sta $1a72,x
+01ce3f lda #$02
+01ce41 sta $192b
+01ce44 jsr $cc81
+01ce47 lda $1937
+01ce4a sta $1949
+01ce4d jsr $ce9e
+01ce50 ldx $193b
+01ce53 lda $1a72,x
+01ce56 bne $ce4d
+01ce58 dec $1949
+01ce5b beq $ce7f
+01ce5d ldx $193b
+01ce60 lda $194a
+01ce63 sta $1a72,x
+01ce66 stz $192b
+01ce69 jsr $cc81
+01ce6c ldx $1943
+01ce6f lda $1945
+01ce72 sta $1a72,x
+01ce75 lda #$02
+01ce77 sta $192b
+01ce7a jsr $cc81
+01ce7d bra $ce4d
+01ce7f ldx $193b
+01ce82 lda $193a
+01ce85 sta $1a72,x
+01ce88 lda $194b
+01ce8b sta $1a80,x
+01ce8e ldx $1943
+01ce91 lda $1942
+01ce94 sta $1a72,x
+01ce97 lda $1946
+01ce9a sta $1a80,x
+01ce9d rts
+01ce9e sep #$20
+01cea0 rep #$10
+01cea2 inc $1947
+01cea5 lda $1947
+01cea8 cmp #$02
+01ceaa bne $cebf
+01ceac lda #$00
+01ceae sta $1947
+01ceb1 xba
+01ceb2 lda $1948
+01ceb5 and #$01
+01ceb7 asl a
+01ceb8 tax
+01ceb9 jsr ($cec5,x)
+01cebc inc $1948
+01cebf jsr $caec
+01cec2 jmp $82d8
 
 
 
@@ -19253,6 +20460,54 @@
 01cedf adc $0e8a
 01cee2 sta $19f2
 01cee5 rts				; exit routine
+01cee6 lda #$00
+01cee8 xba
+01cee9 ldx $193d
+01ceec lda $7f8000,x
+01cef0 inc
+01cef1 sta $7f8000,x
+01cef5 bra $cf06
+01cef7 lda #$00
+01cef9 xba
+01cefa ldx $193d
+01cefd lda $7f8000,x
+01cf01 dec
+01cf02 sta $7f8000,x
+01cf06 tax
+01cf07 lda $7fd0f4,x
+01cf0b sta $19c9
+01cf0e txa
+01cf0f rep #$30
+01cf11 asl a
+01cf12 asl a
+01cf13 tax
+01cf14 lda $7fcef4,x
+01cf18 sta $19c5
+01cf1b lda $7fcef6,x
+01cf1f sta $19c7
+01cf22 sep #$20
+01cf24 rep #$10
+01cf26 jsr $96d2
+01cf29 ldx $193f
+01cf2c stx $195f
+01cf2f rts
+01cf30 lda #$80
+01cf32 sta $2115
+01cf35 ldx $1935
+01cf38 stx $2116
+01cf3b lda #$01
+01cf3d sta $4300
+01cf40 lda #$18
+01cf42 sta $4301
+01cf45 lda $1937
+01cf48 sta $4304
+01cf4b ldx $1938
+01cf4e stx $4302
+01cf51 ldx $193a
+01cf54 stx $4305
+01cf57 lda #$01
+01cf59 sta $420b
+01cf5c rts
 
 
 
@@ -19293,6 +20548,159 @@
 01cfa0 and #$0f
 01cfa2 jsr $b1ea
 01cfa5 rts				; exit routine
+01cfa6 php
+01cfa7 sep #$20
+01cfa9 rep #$10
+01cfab ldx #$0001
+01cfae lda $0e91
+01cfb1 cmp #$16
+01cfb3 beq $cfcf
+01cfb5 cmp #$2a
+01cfb7 beq $cfcf
+01cfcf txa
+01cfd0 jsr $b1ea
+01cfd3 lda $1a85,x
+01cfd6 jsr $d040
+01cfd9 lda $1a87,x
+01cfdc jsr $d050
+01cfdf lda $0c51
+01cfe2 clc
+01cfe3 adc #$10
+01cfe5 jsr $d050
+01cfe8 stz $0e05
+01cfeb jsr $d0a4
+01cfee lda $0c50
+01cff1 clc
+01cff2 adc #$10
+01cff4 jsr $d040
+01cff7 lda $0c51
+01cffa sec
+01cffb sbc #$10
+01cffd jsr $d050
+01d000 jsr $d0a4
+01d003 lda $0c51
+01d006 clc
+01d007 adc #$10
+01d009 jsr $d050
+01d00c jsr $d0a4
+01d00f lda $0c50
+01d012 sec
+01d013 sbc #$10
+01d015 jsr $d040
+01d018 lda $0c51
+01d01b sec
+01d01c sbc #$10
+01d01e jsr $d050
+01d021 jsr $d0a4
+01d024 lda $0c50
+01d027 clc
+01d028 adc #$08
+01d02a jsr $d040
+01d02d lda $0c51
+01d030 clc
+01d031 adc #$08
+01d033 jsr $d050
+01d036 jsr $d0a4
+01d039 lda #$55
+01d03b sta $0e05
+01d03e plp
+01d03f rts
+01d040 sta $0c50
+01d043 sta $0c58
+01d046 clc
+01d047 adc #$08
+01d049 sta $0c54
+01d04c sta $0c5c
+01d04f rts
+01d050 sta $0c51
+01d053 sta $0c55
+01d056 clc
+01d057 adc #$08
+01d059 sta $0c59
+01d05c sta $0c5d
+01d05f rts
+01d060 php
+01d061 rep #$30
+01d063 lda #$0140
+01d066 bra $d06e
+01d068 php
+01d069 rep #$30
+01d06b lda #$0144
+01d06e sta $0c52
+01d071 inc
+01d072 sta $0c56
+01d075 inc
+01d076 sta $0c5a
+01d079 inc
+01d07a sta $0c5e
+01d07d sep #$20
+01d07f rep #$10
+01d081 lda #$0c
+01d083 ora $1a54
+01d086 tay
+01d087 ora $0c53
+01d08a sta $0c53
+01d08d tya
+01d08e ora $0c57
+01d091 sta $0c57
+01d094 tya
+01d095 ora $0c5b
+01d098 sta $0c5b
+01d09b tya
+01d09c ora $0c5f
+01d09f sta $0c5f
+01d0a2 plp
+01d0a3 rts
+01d0a4 lda #$08
+01d0a6 jsr $baac
+01d0a9 jsr $d068
+01d0ac lda #$06
+01d0ae jsr $d6a8
+01d0b1 jsr $d060
+01d0b4 lda #$06
+01d0b6 jsr $d6a8
+01d0b9 rts
+01d0ba php
+01d0bb ldy #$0010
+01d0be stz $192b
+01d0c1 ldx #$6b00
+01d0c4 stx $192d
+01d0c7 sty $192f
+01d0ca stz $1931
+01d0cd ldx $1900
+01d0d0 stx $1933
+01d0d3 sep #$20
+01d0d5 rep #$10
+01d0d7 lda $0e91
+01d0da cmp #$6b
+01d0dc bne $d0e4
+01d0e4 jsr $8df2
+01d0e7 php
+01d0e8 rep #$30
+01d0ea lda $1900
+01d0ed clc
+01d0ee adc $1931
+01d0f1 sta $1900
+01d0f4 lda $1931
+01d0f7 eor #$ffff
+01d0fa inc
+01d0fb sta $1931
+01d0fe plp
+01d0ff lda #$03
+01d101 sta $1a46
+01d104 jsr $8df2
+01d107 lda $192b
+01d10a clc
+01d10b adc #$03
+01d10d and #$0f
+01d10f sta $192b
+01d112 dey
+01d113 bne $d0e7
+01d115 rep #$30
+01d117 lda $1933
+01d11a sta $1900
+01d11d plp
+01d11e rts
 
 
 
@@ -19322,6 +20730,513 @@
 01d152 ora #$80
 01d154 sta $1a80,x
 01d157 rts				; exit routine
+01d158 php
+01d159 rep #$30
+01d15b lda $192b
+01d15e sta $192f
+01d161 cmp #$7fff
+01d164 beq $d16f
+01d166 jsr $d1e0
+01d169 jsr $d1f3
+01d16c jsr $d20c
+01d16f plp
+01d170 rts
+01d1e0 lda $192b
+01d1e3 and #$001f
+01d1e6 cmp #$001f
+01d1e9 beq $d1ef
+01d1eb inc
+01d1ec and #$001f
+01d1ef sta $192f
+01d1f2 rts
+01d1f3 lda $192b
+01d1f6 and #$03e0
+01d1f9 cmp #$03e0
+01d1fc beq $d205
+01d1fe clc
+01d1ff adc #$0020
+01d202 and #$03e0
+01d205 ora $192f
+01d208 sta $192f
+01d20b rts
+01d20c lda $192b
+01d20f and #$7c00
+01d212 cmp #$7c00
+01d215 beq $d21e
+01d217 clc
+01d218 adc #$0400
+01d21b and #$7c00
+01d21e ora $192f
+01d221 sta $192f
+01d224 rts
+01d225 php
+01d226 rep #$30
+01d228 lda $192b
+01d22b sta $192f
+01d22e beq $d239
+01d230 jsr $d2ab
+01d233 jsr $d2b8
+01d236 jsr $d2cb
+01d239 plp
+01d23a rts
+01d23b php
+01d23c rep #$30
+01d23e lda $192b
+01d241 sta $192f
+01d244 cmp $192d
+01d247 beq $d2a9
+01d249 lda $192d
+01d24c and #$001f
+01d24f sta $1931
+01d252 lda $192b
+01d255 and #$001f
+01d258 cmp $1931
+01d25b beq $d25f
+01d25d bcs $d264
+01d25f sta $192f
+01d262 bra $d267
+01d264 jsr $d2ab
+01d267 lda $192d
+01d26a and #$03e0
+01d26d sta $1931
+01d270 lda $192b
+01d273 and #$03e0
+01d276 cmp $1931
+01d279 beq $d27d
+01d27b bcs $d285
+01d27d ora $192f
+01d280 sta $192f
+01d283 bra $d288
+01d285 jsr $d2b8
+01d288 lda $192d
+01d28b and #$7c00
+01d28e sta $1931
+01d291 lda $192b
+01d294 and #$7c00
+01d297 cmp $1931
+01d29a beq $d29e
+01d29c bcs $d2a6
+01d29e ora $192f
+01d2a1 sta $192f
+01d2a4 bra $d2a9
+01d2a6 jsr $d2cb
+01d2a9 plp
+01d2aa rts
+01d2ab lda $192b
+01d2ae and #$001f
+01d2b1 beq $d2b4
+01d2b3 dec
+01d2b4 sta $192f
+01d2b7 rts
+01d2b8 lda $192b
+01d2bb and #$03e0
+01d2be beq $d2c4
+01d2c0 sec
+01d2c1 sbc #$0020
+01d2c4 ora $192f
+01d2c7 sta $192f
+01d2ca rts
+01d2cb lda $192b
+01d2ce and #$7c00
+01d2d1 beq $d2d7
+01d2d3 sec
+01d2d4 sbc #$0400
+01d2d7 ora $192f
+01d2da sta $192f
+01d2dd rts
+01d2de php
+01d2df rep #$30
+01d2e1 phb
+01d2e2 pea $7f00
+01d2e5 plb
+01d2e6 plb
+01d2e7 ldx #$0000
+01d2ea ldy #$0000
+01d2ed lda #$0040
+01d2f0 pha
+01d2f1 lda $c588,x
+01d2f4 sta $c608,y
+01d2f7 inx
+01d2f8 inx
+01d2f9 iny
+01d2fa iny
+01d2fb pla
+01d2fc dec
+01d2fd bne $d2f0
+01d2ff plb
+01d300 sep #$20
+01d302 rep #$10
+01d304 lda #$f1
+01d306 sta $050a
+01d309 lda #$0a
+01d30b sta $1935
+01d30e php
+01d30f rep #$30
+01d311 ldy #$0040
+01d314 ldx #$0000
+01d317 lda $7fc588,x
+01d31b sta $192b
+01d31e jsr $d225
+01d321 lda $192f
+01d324 sta $7fc588,x
+01d328 inx
+01d329 inx
+01d32a dey
+01d32b bne $d317
+01d32d plp
+01d32e lda #$05
+01d330 sta $1a46
+01d333 jsr $8df2
+01d336 lda #$10
+01d338 jsr $d6a8
+01d33b dec $1935
+01d33e bne $d30e
+01d340 jsr $d345
+01d343 plp
+01d344 rts
+01d345 phb
+01d346 lda #$00
+01d348 sta $7f2000
+01d34c ldx #$2000
+01d34f ldy #$2001
+01d352 lda #$02
+01d354 xba
+01d355 lda #$00
+01d357 mvn $7f,$7f
+01d35a plb
+01d35b rts
+01d35c ldx #$6a40
+01d35f stx $192b
+01d362 stx $19e8
+01d365 lda #$7f
+01d367 sta $192d
+01d36a ldx #$0000
+01d36d stx $192e
+01d370 ldx #$0100
+01d373 stx $1930
+01d376 jsr $8df2
+01d379 lda #$07
+01d37b sta $1a46
+01d37e jsr $8df2
+01d381 jsr $d385
+01d384 rts
+01d385 ldx $192b
+01d388 stx $1935
+01d38b lda $192d
+01d38e sta $1937
+01d391 ldx #$2000
+01d394 stx $1938
+01d397 ldx $1930
+01d39a stx $193a
+01d39d lda #$04
+01d39f sta $1a46
+01d3a2 jmp $8df2
+01d3a5 ldx #$7700
+01d3a8 stx $192b
+01d3ab stx $19ea
+01d3ae lda #$7f
+01d3b0 sta $192d
+01d3b3 ldx #$0100
+01d3b6 stx $192e
+01d3b9 ldx #$0080
+01d3bc stx $1930
+01d3bf bra $d376
+01d3c1 ldx #$6a00
+01d3c4 stx $192b
+01d3c7 stx $19ea
+01d3ca bra $d3ae
+01d3cc ldx #$0f08
+01d3cf stx $0501
+01d3d2 lda #$1a
+01d3d4 sta $0500
+01d3d7 lda #$14
+01d3d9 jsr $d6bc
+01d3dc ldx #$0000
+01d3df stx $1933
+01d3e2 ldx #$0010
+01d3e5 stx $1943
+01d3e8 lda #$7f
+01d3ea sta $1937
+01d3ed ldx #$0000
+01d3f0 stx $192b
+01d3f3 ldx #$2000
+01d3f6 stx $192d
+01d3f9 ldx #$0008
+01d3fc jsr $d461
+01d3ff ldx $19e8
+01d402 stx $1935
+01d405 ldx $192d
+01d408 stx $1938
+01d40b ldx #$0100
+01d40e stx $193a
+01d411 jsr $8df2
+01d414 lda #$04
+01d416 sta $1a46
+01d419 jsr $82cf
+01d41c ldx #$0100
+01d41f stx $192b
+01d422 ldx #$2100
+01d425 stx $192d
+01d428 ldx #$0004
+01d42b jsr $d461
+01d42e jsr $8df2
+01d431 ldx $19ea
+01d434 stx $1935
+01d437 ldx $192d
+01d43a stx $1938
+01d43d ldx #$0080
+01d440 stx $193a
+01d443 lda #$04
+01d445 sta $1a46
+01d448 jsr $82cf
+01d44b lda $1933
+01d44e clc
+01d44f adc #$12
+01d451 and #$1e
+01d453 sta $1933
+01d456 lda #$10
+01d458 jsr $d6a8
+01d45b dec $1943
+01d45e bne $d3ed
+01d460 rts
+01d461 php
+01d462 phb
+01d463 rep #$30
+01d465 phx
+01d466 pea $7f00
+01d469 plb
+01d46a plb
+01d46b lda $00192b
+01d46f clc
+01d470 adc $001933
+01d474 tax
+01d475 lda $00192d
+01d479 clc
+01d47a adc $001933
+01d47e tay
+01d47f pla
+01d480 pha
+01d481 lda $0000,x
+01d484 sta $0000,y
+01d487 txa
+01d488 clc
+01d489 adc #$0020
+01d48c tax
+01d48d tya
+01d48e clc
+01d48f adc #$0020
+01d492 tay
+01d493 pla
+01d494 dec
+01d495 bne $d480
+01d497 plb
+01d498 plp
+01d499 rts
+01d49a php
+01d49b jsr $b1ea
+01d49e stx $192b
+01d4a1 sta $192d
+01d4a4 rep #$30
+01d4a6 ldy #$000c
+01d4a9 phy
+01d4aa lda $1a87,x
+01d4ad dec
+01d4ae and #$03ff
+01d4b1 sta $1a87,x
+01d4b4 lda #$0008
+01d4b7 jsr $d6bc
+01d4ba ply
+01d4bb dey
+01d4bc bne $d4a9
+01d4be ldx $192b
+01d4c1 phx
+01d4c2 lda #$0012
+01d4c5 sta $192b
+01d4c8 jsr $d602
+01d4cb lda #$0014
+01d4ce jsr $d6bc
+01d4d1 ldy #$0008
+01d4d4 lda #$0004
+01d4d7 sta $192b
+01d4da jsr $d602
+01d4dd lda #$0004
+01d4e0 jsr $d6bc
+01d4e3 dey
+01d4e4 bne $d4d4
+01d4e6 plx
+01d4e7 stx $192b
+01d4ea php
+01d4eb sep #$20
+01d4ed rep #$10
+01d4ef lda #$03
+01d4f1 sta $1a72,x
+01d4f4 plp
+01d4f5 rep #$30
+01d4f7 ldy #$000c
+01d4fa phy
+01d4fb lda $1a87,x
+01d4fe inc
+01d4ff and #$03ff
+01d502 sta $1a87,x
+01d505 lda #$0008
+01d508 jsr $d6c3
+01d50b ply
+01d50c dey
+01d50d bne $d4fa
+01d50f sep #$20
+01d511 rep #$10
+01d513 lda #$10
+01d515 sta $1935
+01d518 php
+01d519 rep #$30
+01d51b ldy #$0040
+01d51e ldx #$0000
+01d521 lda $7fc588,x
+01d525 sta $192b
+01d528 jsr $d158
+01d52b lda $192f
+01d52e sta $7fc588,x
+01d532 inx
+01d533 inx
+01d534 dey
+01d535 bne $d521
+01d537 plp
+01d538 lda #$05
+01d53a sta $1a46
+01d53d jsr $8df2
+01d540 lda #$10
+01d542 jsr $d6c3
+01d545 dec $1935
+01d548 bne $d518
+01d54a lda #$70
+01d54c sta $050b
+01d54f lda #$81
+01d551 sta $050a
+01d554 lda #$0a
+01d556 sta $192b
+01d559 jsr $d602
+01d55c jsr $8df2
+01d55f lda #$0e
+01d561 sta $1935
+01d564 php
+01d565 rep #$30
+01d567 ldy #$0040
+01d56a ldx #$0000
+01d56d lda $7fc588,x
+01d571 sta $192b
+01d574 lda $7fc608,x
+01d578 sta $192d
+01d57b jsr $d23b
+01d57e lda $192f
+01d581 sta $7fc588,x
+01d585 inx
+01d586 inx
+01d587 dey
+01d588 bne $d56d
+01d58a plp
+01d58b jsr $8df2
+01d58e lda #$05
+01d590 sta $1a46
+01d593 lda #$10
+01d595 jsr $d6c3
+01d598 dec $1935
+01d59b bne $d564
+01d59d lda #$28
+01d59f jsr $d6c3
+01d5a2 ldx #$0f08
+01d5a5 stx $0501
+01d5a8 lda $1916
+01d5ab and #$1f
+01d5ad sta $0500
+01d5b0 plp
+01d5b1 rts
+01d5b2 lda #$80
+01d5b4 sta $2115
+01d5b7 ldx $192b
+01d5ba stx $2116
+01d5bd lda $213a
+01d5c0 lda #$81
+01d5c2 sta $4300
+01d5c5 lda #$39
+01d5c7 sta $4301
+01d5ca lda $192d
+01d5cd sta $4304
+01d5d0 ldx $192e
+01d5d3 stx $4302
+01d5d6 ldx $1930
+01d5d9 stx $4305
+01d5dc lda #$01
+01d5de sta $420b
+01d5e1 rts
+01d602 phx
+01d603 phy
+01d604 php
+01d605 phb
+01d606 sep #$20
+01d608 rep #$10
+01d60a lda $1a51
+01d60d sta $192c
+01d610 stz $1a51
+01d613 lda $192b
+01d616 beq $d680
+01d618 rep #$30
+01d61a lda #$6f7b
+01d61d ldx #$5000
+01d620 ldy #$0100
+01d623 sta $7f0000,x
+01d627 inx
+01d628 inx
+01d629 dey
+01d62a bne $d623
+01d62c ldx #$c588
+01d62f ldy #$4000
+01d632 lda #$007f
+01d635 mvn $7f,$7f
+01d638 ldx #$c488
+01d63b ldy #$6000
+01d63e lda #$00ff
+01d641 mvn $7f,$7f
+01d644 ldx #$5000
+01d647 ldy #$c588
+01d64a lda #$007f
+01d64d mvn $7f,$7f
+01d650 ldx #$5000
+01d653 ldy #$c488
+01d656 lda #$00ff
+01d659 mvn $7f,$7f
+01d65c plb
+01d65d sep #$20
+01d65f rep #$10
+01d661 jsr $8df2
+01d664 lda #$06
+01d666 sta $1a46
+01d669 jsr $8df2
+01d66c lda $192b
+01d66f bmi $d6a4
+01d671 jsr $82d8
+01d674 dec $192b
+01d677 bne $d671
+01d679 phb
+01d67a lda $192c
+01d67d sta $1a51
+01d680 rep #$30
+01d682 ldx #$4000
+01d685 ldy #$c588
+01d688 lda #$007f
+01d68b mvn $7f,$7f
+01d68e ldx #$6000
+01d691 ldy #$c488
+01d694 lda #$00ff
+01d697 mvn $7f,$7f
+01d69a plb
+01d69b sep #$20
+01d69d rep #$10
+01d69f lda #$06
+01d6a1 sta $1a46
+01d6a4 plp
+01d6a5 ply
+01d6a6 plx
+01d6a7 rts
 
 
 
@@ -19345,6 +21260,10 @@
 01d6bd php				; save processor status to stack
 01d6be ldx #$0002
 01d6c1 bra $d6ad
+01d6c3 phx
+01d6c4 php
+01d6c5 ldx #$0004
+01d6c8 bra $d6ad
 
 
 
@@ -19491,6 +21410,221 @@
 01d825 stz $192c
 01d828 jsr $8ae4
 01d82b rts				; exit routine
+01d82c sep #$20
+01d82e rep #$10
+01d830 jsr $8b75
+01d833 jsr $df71
+01d836 stz $1926
+01d839 jsr $e28a
+01d83c lda #$00
+01d83e jsr $b1ea
+01d841 stx $19ea
+01d844 sta $19e7
+01d847 lda #$3e
+01d849 ldx $19ea
+01d84c jsr $cace
+01d84f ldx $19ea
+01d852 lda $1a85,x
+01d855 clc
+01d856 adc $e282
+01d859 sta $1935
+01d85c lda $1a87,x
+01d85f clc
+01d860 adc $e283
+01d863 sta $1936
+01d866 php
+01d867 rep #$30
+01d869 lda $1935
+01d86c sta $0cd0
+01d86f clc
+01d870 adc #$0008
+01d873 sta $0cd4
+01d876 clc
+01d877 adc #$0800
+01d87a sta $0cdc
+01d87d lda $1935
+01d880 clc
+01d881 adc #$0800
+01d884 sta $0cd8
+01d887 plp
+01d888 jsr $e2cd
+01d88b stz $0e0d
+01d88e jsr $82cf
+01d891 jsr $e2f6
+01d894 jsr $e371
+01d897 jsr $e391
+01d89a jsr $e3a9
+01d89d ldx #$0d01
+01d8a0 stx $19ee
+01d8a3 jsr $c71e
+01d8a6 ldx #$2216
+01d8a9 stx $19ee
+01d8ac jsl $01b24b
+01d8b0 jsr $c6a0
+01d8b3 rts
+01d8b4 sep #$20
+01d8b6 rep #$10
+01d8b8 jsr $8b75
+01d8bb jsr $df64
+01d8be ldx #$0000
+01d8c1 lda $0e91
+01d8c4 cmp #$16
+01d8c6 beq $d8cb
+01d8cb txa
+01d8cc jsr $b1ea
+01d8cf stx $19ea
+01d8d2 sta $19e7
+01d8d5 lda #$37
+01d8d7 ldx $19ea
+01d8da jsr $cace
+01d8dd ldx #$ff06
+01d8e0 stx $1935
+01d8e3 lda #$01
+01d8e5 sta $1939
+01d8e8 jsr $98b2
+01d8eb ldx $19ea
+01d8ee lda $1a85,x
+01d8f1 sta $1937
+01d8f4 lda $1a87,x
+01d8f7 sta $1938
+01d8fa jsr $998b
+01d8fd jsr $9b2d
+01d900 jsr ($98a6,x)
+01d903 lda #$f2
+01d905 sta $050a
+01d908 lda $19e7
+01d90b sta $192b
+01d90e lda #$01
+01d910 sta $192c
+01d913 jsr $8ae4
+01d916 jsr $8b82
+01d919 rts
+01d91a sep #$20
+01d91c rep #$10
+01d91e lda #$06
+01d920 jsr $b1ea
+01d923 stx $1935
+01d926 sta $1937
+01d929 lda #$07
+01d92b jsr $b1ea
+01d92e stx $1939
+01d931 sta $193b
+01d934 lda #$08
+01d936 jsr $b1ea
+01d939 stx $193d
+01d93c sta $193f
+01d93f lda #$09
+01d941 jsr $b1ea
+01d944 stx $1941
+01d947 sta $1943
+01d94a jsr $d96c
+01d94d jsr $d98e
+01d950 ldy #$000a
+01d953 phy
+01d954 jsr $caec
+01d957 jsr $82cf
+01d95a ldx $1935
+01d95d lda $1a72,x
+01d960 bne $d954
+01d962 ply
+01d963 dey
+01d964 beq $d96b
+01d966 jsr $d96c
+01d969 bra $d953
+01d96b rts
+01d96c lda #$02
+01d96e sta $192b
+01d971 ldx $1935
+01d974 jsr $d986
+01d977 ldx $1939
+01d97a jsr $d986
+01d97d ldx $193d
+01d980 jsr $d986
+01d983 ldx $1941
+01d986 lda #$92
+01d988 sta $1a72,x
+01d98b jmp $cc81
+01d98e lda #$0b
+01d990 jsr $baac
+01d993 rts
+01d9a4 sep #$20
+01d9a6 rep #$10
+01d9a8 lda #$01
+01d9aa sta $19e2
+01d9ad stz $19e4
+01d9b0 jsr $df71
+01d9b3 jsr $8b75
+01d9b6 lda $19e4
+01d9b9 jsr $b1ea
+01d9bc stx $19ea
+01d9bf sta $19e7
+01d9c2 lda #$04
+01d9c4 sta $193f
+01d9c7 lda #$02
+01d9c9 sta $1926
+01d9cc ldx $19ea
+01d9cf lda $1a85,x
+01d9d2 sta $1935
+01d9d5 lda $1a87,x
+01d9d8 sta $1936
+01d9db jsr $e28a
+01d9de jsr $e2cd
+01d9e1 lda $19e2
+01d9e4 clc
+01d9e5 adc #$36
+01d9e7 ldx $19ea
+01d9ea jsr $cace
+01d9ed jsl $0b8121
+01d9f1 lda #$00
+01d9f3 xba
+01d9f4 lda $19e2
+01d9f7 asl a
+01d9f8 tax
+01d9f9 jsr ($e583,x)
+01d9fc jsr $e371
+01d9ff jsr $e391
+01da02 jsr $e3a9
+01da05 lda #$44
+01da07 xba
+01da08 lda $19e2
+01da0b asl a
+01da0c asl a
+01da0d asl a
+01da0e asl a
+01da0f ora $19e4
+01da12 tax
+01da13 stx $19ee
+01da16 jsl $01b24b
+01da1a jsr $df33
+01da1d jsr $8b82
+01da20 rts
+01df33 lda #$00
+01df35 xba
+01df36 lda $1031
+01df39 sec
+01df3a sbc #$20
+01df3c tax
+01df3d lda $df45,x
+01df40 asl a
+01df41 tax
+01df42 jmp ($df51,x)
+01df64 lda #$7f
+01df66 sta $1937
+01df69 ldx #$c908
+01df6c stx $1938
+01df6f bra $df7c
+01df71 lda #$7f
+01df73 sta $1937
+01df76 ldx #$ca48
+01df79 stx $1938
+01df7c ldx #$6700
+01df7f stx $1935
+01df82 ldx #$0380
+01df85 stx $193a
+01df88 lda #$04
+01df8a sta $1a46
+01df8d jsr $8df2
+01df90 rts
 
 
 
@@ -19729,6 +21863,12 @@
 01e15d lda $1926
 01e160 cmp #$01
 01e162 beq $e175
+01e164 ldy $19e8
+01e167 lda $1a72,y
+01e16a sta $19ec
+01e16d lda #$04
+01e16f sta $1a72,y
+01e172 jsr $e19a
 01e175 lda $1926
 01e178 pha
 01e179 jsr $935c
@@ -19740,6 +21880,9 @@
 01e189 lda $1926
 01e18c cmp #$01
 01e18e beq $e199
+01e190 ldx $19e8
+01e193 lda $19ec
+01e196 sta $1a72,x
 01e199 rts				; exit routine
 
 
@@ -19781,6 +21924,13 @@
 01e1e2 xba
 01e1e3 cmp $0f29,x
 01e1e6 beq $e1f3
+01e1e8 xba
+01e1e9 inx
+01e1ea inx
+01e1eb inx
+01e1ec inx
+01e1ed dey
+01e1ee bne $e1dd
 01e1f3 ply
 01e1f4 rts				; exit routine
 
@@ -19791,6 +21941,8 @@
 01e1f9 bne $e1fe
 01e1fb pla
 01e1fc bra $e1f3
+01e1fe pla
+01e1ff bra $e1e9
 01e201 lda $1030
 01e204 bne $e20f
 01e20f jsr $8b75		; jump to the "Clear bits in 2 byte value at $008e using mask of $4030" routine
@@ -19981,6 +22133,7 @@
 01e398 ldx #$0006
 01e39b lda $1926
 01e39e beq $e3a3
+01e3a0 ldx #$0008
 01e3a3 txa
 01e3a4 sta $0505
 01e3a7 plx
@@ -20005,6 +22158,50 @@
 01e3c6 sta $0e07
 01e3c9 jsr $e48d
 01e3cc rts				; exit routine
+01e3cd jsr $e403
+01e3d0 jsr $e512
+01e3d3 lda #$55
+01e3d5 sta $0e0d
+01e3d8 sta $0e07
+01e3db jsr $e471
+01e3de jsr $e512
+01e3e1 jsr $e48d
+01e3e4 rts
+01e3e5 jsr $e403
+01e3e8 jsr $e512
+01e3eb lda #$55
+01e3ed sta $0e0d
+01e3f0 sta $0e07
+01e3f3 jsr $e43a
+01e3f6 jsr $e512
+01e3f9 jsr $e471
+01e3fc jsr $e512
+01e3ff jsr $e48d
+01e402 rts
+01e403 stz $0e06
+01e406 lda #$0c
+01e408 ora $1a54
+01e40b xba
+01e40c lda #$70
+01e40e php
+01e40f rep #$30
+01e411 sta $0c62
+01e414 inc
+01e415 sta $0c66
+01e418 inc
+01e419 sta $0c6a
+01e41c inc
+01e41d sta $0c6e
+01e420 lda $0cd0
+01e423 sta $0c60
+01e426 lda $0cd4
+01e429 sta $0c64
+01e42c lda $0cd8
+01e42f sta $0c68
+01e432 lda $0cdc
+01e435 sta $0c6c
+01e438 plp
+01e439 rts
 
 
 
@@ -20032,6 +22229,21 @@
 01e46c sta $0c6c
 01e46f plp
 01e470 rts				; exit routine
+01e471 lda #$0c
+01e473 ora $1a54
+01e476 xba
+01e477 lda #$78
+01e479 php
+01e47a rep #$30
+01e47c sta $0c62
+01e47f inc
+01e480 sta $0c66
+01e483 inc
+01e484 sta $0c6a
+01e487 inc
+01e488 sta $0c6e
+01e48b plp
+01e48c rts
 
 
 
@@ -20115,6 +22327,95 @@
 
 01e519 jsr $e512
 01e51c jmp $e4f8
+01e51f lda $1030
+01e522 bne $e52c
+01e52c jsr $8b75
+01e52f dec $1030
+01e532 jsl $009b02
+01e536 lda $1926
+01e539 sta $193f
+01e53c lda #$02
+01e53e sta $1926
+01e541 ldx $199d
+01e544 stx $1935
+01e547 jsr $e28a
+01e54a jsr $e2cd
+01e54d lda $0e8b
+01e550 clc
+01e551 adc #$0c
+01e553 jsr $8caf
+01e556 jsl $0b8121
+01e55a lda #$00
+01e55c xba
+01e55d lda $0e8b
+01e560 asl a
+01e561 tax
+01e562 jsr ($e583,x)
+01e565 jsr $e371
+01e568 jsr $e391
+01e56b jsr $e3a9
+01e56e lda #$10
+01e570 sta $1993
+01e573 jsr $c44f
+01e576 lda $19b0
+01e579 beq $e57f
+01e57b jsl $01b24b
+01e57f jsr $8b82
+01e582 rts
+01e58b ldx #$fc00
+01e58e stx $193b
+01e591 stz $0e0d
+01e594 lda $193f
+01e597 asl a
+01e598 asl a
+01e599 sta $193d
+01e59c lda #$55
+01e59e sta $0e07
+01e5a1 jsr $e5e5
+01e5a4 ldx $1939
+01e5a7 jsr $e338
+01e5aa stx $1939
+01e5ad bra $e5b2
+01e5af jsr $e5e5
+01e5b2 jsr $82d8
+01e5b5 lda $0e07
+01e5b8 eor #$04
+01e5ba sta $0e07
+01e5bd lda $193d
+01e5c0 dec
+01e5c1 sta $193d
+01e5c4 bit #$01
+01e5c6 bne $e5a1
+01e5c8 cmp #$00
+01e5ca bne $e5af
+01e5cc rts
+01e5d5 ldx #$0004
+01e5d8 stx $193b
+01e5db bra $e591
+01e5e5 lda $193b
+01e5e8 clc
+01e5e9 adc $1935
+01e5ec sta $1935
+01e5ef lda $193c
+01e5f2 clc
+01e5f3 adc $1936
+01e5f6 sta $1936
+01e5f9 php
+01e5fa rep #$30
+01e5fc lda $1935
+01e5ff sta $0cd0
+01e602 clc
+01e603 adc #$0008
+01e606 sta $0cd4
+01e609 clc
+01e60a adc #$0800
+01e60d sta $0cdc
+01e610 lda $1935
+01e613 clc
+01e614 adc #$0800
+01e617 sta $0cd8
+01e61a plp
+01e61b rts
 01e61c ldx $0e89
 01e61f stx $1cae
 01e622 ldx #$ffe8
@@ -20176,6 +22477,7 @@
 01e687 sta $0a
 01e689 sta $06
 01e68b bpl $e68f
+01e68d stz $06
 01e68f clc
 01e690 adc #$13
 01e692 sta $07
@@ -20639,6 +22941,8 @@
 01ea0a beq $ea16
 01ea0c bit #$08
 01ea0e beq $ea3d
+01ea10 and #$07
+01ea12 bne $ea30
 01ea16 lda $1929
 01ea19 bne $ea22
 01ea1b lda $1993
@@ -20654,6 +22958,11 @@
 
 01ea2d lda #$00
 01ea2f rts				; exit routine
+01ea30 inc $194c
+01ea33 lda #$83
+01ea35 sta $1929
+01ea38 ldx #$0006
+01ea3b bra $ea4a
 
 
 
@@ -20688,6 +22997,19 @@
 01ea85 beq $eaaa
 01ea87 lda $194c
 01ea8a bne $eaaa
+01ea8c bra $ea30
+01ea8e tax
+01ea8f sep #$10
+01ea91 rep #$10
+01ea93 lda $f3ff,x
+01ea96 cmp $19d7
+01ea99 beq $eaa3
+01ea9b lda $19f9
+01ea9e beq $eaaa
+01eaa0 jmp $ea45
+01eaa3 lda $f406,x
+01eaa6 asl a
+01eaa7 sta $1928
 01eaaa lda #$01
 01eaac sta $19f9
 01eaaf jsr $f211
@@ -20721,6 +23043,7 @@
 01eaf1 lda $19cf
 01eaf4 and #$08
 01eaf6 beq $eb38
+01eaf8 dey
 01eaf9 tya
 01eafa sta $0e8d
 01eafd ldx $19cf
@@ -20742,12 +23065,19 @@
 01eb28 bmi $eb2d
 01eb2a lda #$02
 01eb2c rts				; exit routine
+01eb2d lda #$08
+01eb2f eor $19b4
+01eb32 sta $19b4
+01eb35 lda #$03
+01eb37 rts
 
 
 
 01eb38 lda $194b
 01eb3b bit #$08
 01eb3d beq $eb42
+01eb3f lda #$00
+01eb41 rts
 01eb42 lda #$04
 01eb44 rts				; exit routine
 
@@ -20798,6 +23128,7 @@
 01ebb5 jsr $f297
 01ebb8 jsr $f325
 01ebbb bcc $ebc0
+01ebbd inc $1926
 01ebc0 lda $19d5
 01ebc3 sta $19d3
 01ebc6 ldx $19cf
@@ -20828,6 +23159,8 @@
 01ebfb lda $1031
 01ebfe cmp #$26
 01ec00 bcc $ec06
+01ec02 cmp #$29
+01ec04 bcc $ec0b
 01ec06 txa
 01ec07 cmp #$06
 01ec09 bne $ec55
@@ -20874,6 +23207,7 @@
 01ec4f cmp #$30
 01ec51 beq $ec54
 01ec53 rts				; exit routine
+01ec54 plx
 
 
 
@@ -20918,6 +23252,9 @@
 
 01eca5 lda $194b
 01eca8 beq $ecb1
+01ecaa bit #$08
+01ecac bne $ecb1
+01ecae jmp $ea3d
 01ecb1 lda #$00
 01ecb3 rts				; exit routine
 
@@ -20927,6 +23264,7 @@
 01ecb7 lda $194b
 01ecba cmp #$0b
 01ecbc bne $ecc1
+01ecbe jmp $ea30
 01ecc1 stz $1a60
 01ecc4 lda #$f0
 01ecc6 trb $1a61
@@ -21046,6 +23384,11 @@
 01edfe beq $ee3e
 01ee00 cmp #$07
 01ee02 beq $ee10
+01ee04 lda $19b4
+01ee07 and #$07
+01ee09 beq $ee10
+01ee0b cmp $192b
+01ee0e bne $ee3e
 01ee10 lda $19d0
 01ee13 bpl $ee1f
 01ee1f bit #$08
@@ -21061,6 +23404,57 @@
 01ee38 sta $1993
 01ee3b lda #$0e
 01ee3d rts				; exit routine
+01ee41 jsr $ec3c
+01ee44 ldx $19f1
+01ee47 stx $193b
+01ee4a ldx $19cf
+01ee4d stx $193d
+01ee50 lda $19d5
+01ee53 sta $193f
+01ee56 lda $19b4
+01ee59 and #$07
+01ee5b sta $1943
+01ee5e stz $1926
+01ee61 lda $1926
+01ee64 asl a
+01ee65 asl a
+01ee66 tax
+01ee67 inc $1926
+01ee6a sep #$10
+01ee6c rep #$30
+01ee6e lda $193d
+01ee71 sta $192d,x
+01ee74 lda $193b
+01ee77 sta $192b,x
+01ee7a sep #$20
+01ee7c ldy $193b
+01ee7f jsr $f2ca
+01ee82 bcc $ee8d
+01ee8d lda $19d3
+01ee90 eor $193f
+01ee93 bmi $eed9
+01ee95 lda $193d
+01ee98 and #$07
+01ee9a beq $eedc
+01ee9c cmp #$07
+01ee9e bne $eeae
+01eea0 lda $193e
+01eea3 bmi $eed9
+01eea5 bit #$08
+01eea7 beq $eed9
+01eea9 ldy $193b
+01eeac bra $ef06
+01ef06 and #$30
+01ef08 beq $ef15
+01ef0a inc $19b0
+01ef0d lda #$0d
+01ef0f sta $19ef
+01ef12 sty $19f1
+01ef15 stz $1929
+01ef18 lda #$10
+01ef1a sta $1993
+01ef1d lda #$0f
+01ef1f rts
 
 
 
@@ -21121,6 +23515,14 @@
 01efd9 and #$18
 01efdb cmp #$18
 01efdd bne $eff5
+01efdf lda $1a80,x
+01efe2 and #$07
+01efe4 sta $193d
+01efe7 lda $19d1
+01efea and #$f8
+01efec ora $193d
+01efef sta $19d1
+01eff2 stz $1940
 01eff5 lda $19d3
 01eff8 eor $19d5
 01effb bmi $f01b
@@ -21155,6 +23557,8 @@
 01f040 beq $f046
 01f042 cmp #$85
 01f044 bne $f04b
+01f046 lda #$07
+01f048 sta $193d
 01f04b ldx #$0000		; clear X
 01f04e txy
 01f04f lda $193c
@@ -21324,6 +23728,10 @@
 01f1d4 beq $f1e1
 01f1d6 jsl $009776
 01f1da beq $f1e1
+01f1dc tya
+01f1dd clc
+01f1de adc #$08
+01f1e0 tay
 01f1e1 sty $0a9c
 01f1e4 inc $19b0
 01f1e7 rep #$10			; set X,Y => 16bit
@@ -21390,10 +23798,14 @@
 01f24d bra $f258
 01f24f cmp $1925
 01f252 bcc $f258
+01f254 sec
+01f255 sbc $1925
 01f258 xba
 01f259 bpl $f261
 01f261 cmp $1924
 01f264 bcc $f26a
+01f266 sec
+01f267 sbc $1924
 01f26a tay
 01f26b xba
 01f26c sta $4202
@@ -21521,6 +23933,14 @@
 01f357 pld
 01f358 clc
 01f359 rts				; exit routine
+01f35a lda $1f,x
+01f35c sta $19e6
+01f35f stx $19e8
+01f362 xba
+01f363 sta $19ec
+01f366 pld
+01f367 sec
+01f368 rts
 
 
 
@@ -21562,6 +23982,7 @@
 01f3b1 bpl $f39d
 01f3b3 plb
 01f3b4 rts				; exit routine
+01f3b5 rts
 
 
 
@@ -21600,6 +24021,18 @@
 01f4a0 bcc $f4ca
 01f4a2 cmp #$2b
 01f4a4 bcs $f4ca
+01f4a6 lda #$03
+01f4a8 jsl $009776
+01f4ac bne $f4ca
+01f4ae lda #$02
+01f4b0 sta $0e8b
+01f4b3 jsr $94cc
+01f4b6 ldx #$270b
+01f4b9 stx $19ee
+01f4bc jsl $01b24b
+01f4c0 ldx #$2000
+01f4c3 stx $19ee
+01f4c6 jsl $01b24b
 01f4ca bra $f467
 01f502 rts				; exit routine
 
@@ -21648,6 +24081,76 @@
 01f58b ldx $19cf
 01f58e stx $19cb
 01f591 jmp $935c
+01f685 sep #$20
+01f687 lda #$80
+01f689 tsb $19b4
+01f68c lda $0e91
+01f68f pha
+01f690 ldx $0e89
+01f693 phx
+01f694 stz $19f0
+01f697 jsr $914c
+01f69a jsr $8b75
+01f69d jsr $f6b4
+01f6a0 lda #$80
+01f6a2 trb $19b4
+01f6a5 plx
+01f6a6 stx $19f1
+01f6a9 pla
+01f6aa sta $19f0
+01f6ad jsr $914c
+01f6b0 jsr $8b75
+01f6b3 rts
+01f6b4 lda #$36
+01f6b6 jsl $00976b
+01f6ba ldy #$0038
+01f6bd ldx #$0000
+01f6c0 inc $0d01
+01f6c3 inc $0d05
+01f6c6 inc $0d09
+01f6c9 inc $0d0d
+01f6cc inc $0d01
+01f6cf inc $0d05
+01f6d2 inc $0d09
+01f6d5 inc $0d0d
+01f6d8 lda $f705,x
+01f6db sta $0d02
+01f6de sta $0d0a
+01f6e1 lda $f706,x
+01f6e4 sta $0d06
+01f6e7 sta $0d0e
+01f6ea phy
+01f6eb jsr $d98e
+01f6ee lda #$02
+01f6f0 jsr $f7a4
+01f6f3 ply
+01f6f4 tya
+01f6f5 rep #$20
+01f6f7 and #$0001
+01f6fa asl a
+01f6fb tax
+01f6fc sep #$20
+01f6fe dey
+01f6ff bne $f6c0
+01f701 jsr $f7c3
+01f704 rts
+01f7a4 pha
+01f7a5 rep #$20
+01f7a7 lda $1902
+01f7aa pha
+01f7ab clc
+01f7ac adc #$0002
+01f7af sta $1902
+01f7b2 jsr $82cf
+01f7b5 pla
+01f7b6 sta $1902
+01f7b9 sep #$20
+01f7bb jsr $82cf
+01f7be pla
+01f7bf dec
+01f7c0 bne $f7a4
+01f7c2 rts
+01f7c3 ldy #$0030
 01f7c6 jsr $82cf
 01f7c9 dey
 01f7ca bne $f7c6
@@ -21982,6 +24485,8 @@
 01fb7a inc
 01fb7b cmp $1924
 01fb7e bcc $fb84
+01fb80 sec
+01fb81 sbc $1924
 
 01fb84 sta $1a31
 01fb87 cpy #$0044
@@ -23002,6 +25507,19 @@
 0283cb beq $83ce
 0283ce and #$38
 0283d0 beq $83ec
+0283d2 jsr $88e0
+0283d5 jsl $009b02
+0283d9 phd
+0283da jsr $8f22
+0283dd lda $21
+0283df pld
+0283e0 sta $11
+0283e2 bit #$30
+0283e4 beq $83e7
+0283e6 rts
+0283e7 and #$08
+0283e9 bne $83ec
+0283eb rts
 0283ec phd				; save direct page to stack
 0283ed jsr $8f22
 0283f0 lda $21
@@ -23101,6 +25619,8 @@
 0284d2 lda $10a1
 0284d5 and #$c0
 0284d7 beq $8509
+0284d9 stz $8e
+0284db bra $8509
 0284dd lda #$02
 0284df sta $8d
 0284e1 jsr $8532
@@ -23180,6 +25700,7 @@
 028562 xba
 028563 and #$c0
 028565 beq $8568
+028567 rts
 028568 lda $8b
 02856a cmp #$02
 02856c bcc $8590
@@ -23608,6 +26129,7 @@
 0288b1 lda $4214
 0288b4 cmp #$0064
 0288b7 bcc $88bc
+0288b9 lda #$0063
 0288bc pha
 0288bd lda #$0000
 0288c0 lda $048b
@@ -23627,6 +26149,45 @@
 0288da bne $88dd
 0288dc rts				; exit routine
 0288dd jmp $8522
+0288e0 sep #$20
+0288e2 rep #$10
+0288e4 phd
+0288e5 jsr $8f22
+0288e8 lda $21
+0288ea and #$20
+0288ec beq $8902
+0288ee lda #$65
+0288f0 sta $00a8
+0288f3 jsl $009783
+0288f7 lda $00a9
+0288fa cmp #$14
+0288fc bcs $8902
+0288fe lda #$20
+028900 trb $21
+028902 lda $21
+028904 and #$10
+028906 beq $891c
+028908 lda #$65
+02890a sta $00a8
+02890d jsl $009783
+028911 lda $00a9
+028914 cmp #$1e
+028916 bcs $891c
+028918 lda #$10
+02891a trb $21
+02891c lda $21
+02891e and #$08
+028920 beq $8936
+028922 lda #$65
+028924 sta $00a8
+028927 jsl $009783
+02892b lda $00a9
+02892e cmp #$28
+028930 bcs $8936
+028932 lda #$08
+028934 trb $21
+028936 pld
+028937 rts
 
 
 
@@ -23737,6 +26298,22 @@
 028a15 jsr $8835
 028a18 jsr $8a43
 028a1b bra $8a41
+028a1d bit #$4000
+028a20 beq $8a30
+028a22 and #$00ff
+028a25 sta $009e
+028a28 ldx #$d5d4
+028a2b jsr $8835
+028a2e bra $8a41
+028a30 and #$3fff
+028a33 pha
+028a34 asl a
+028a35 clc
+028a36 adc $01,s
+028a38 sta $a2
+028a3a pla
+028a3b ldx #$d5c9
+028a3e jsr $8835
 028a41 plp
 028a42 rts				; exit routine
 
@@ -24411,6 +26988,8 @@
 02903e lda $3a
 029040 cmp #$46
 029042 bne $9048
+029044 lda #$01
+029046 sta $e3
 029048 jsr $9797
 02904b phd				; save direct page to stack
 02904c jsr $8f22
@@ -24557,6 +27136,12 @@
 029291 lda $3a
 029293 cmp #$11
 029295 beq $930d
+029297 lda $11
+029299 and #$08
+02929b bne $92a3
+02929d jsr $9964
+0292a0 inc
+0292a1 beq $931d
 02930d jsr $97b8
 029310 lda #$24
 029312 sta $e2
@@ -24564,6 +27149,11 @@
 029316 sta $df
 029318 jsr $a0cd
 02931b bra $9329
+02931d lda $90
+02931f cmp $8f
+029321 bne $9329
+029323 jsr $97be
+029326 jsr $a0cd
 029329 phd				; save direct page to stack
 02932a jsr $8f2f
 02932d lda $21
@@ -24645,6 +27235,26 @@
 0293f8 cmp #$8a
 0293fa beq $93fd
 0293fc rts				; exit routine
+0293fd rep #$30
+0293ff lda $1116
+029402 sec
+029403 sbc $1114
+029406 cmp $d081
+029409 bcc $940e
+02940b lda $d081
+02940e eor #$ffff
+029411 inc
+029412 bne $9417
+029417 tay
+029418 sep #$20
+02941a rep #$10
+02941c lda #$00
+02941e xba
+02941f lda $8b
+029421 asl a
+029422 tax
+029423 sty $d1,x
+029425 rts
 
 
 
@@ -24656,6 +27266,10 @@
 029475 lda $de
 029477 cmp #$15
 029479 beq $9487
+02947b jsr $999d
+02947e jsr $9b20
+029481 jsr $9727
+029484 jsr $99c6
 029487 phd				; save direct page to stack
 029488 jsr $8f2f
 02948b lda $2e
@@ -24665,7 +27279,79 @@
 029495 lda $de
 029497 cmp #$15
 029499 beq $94bb
+02949b lsr $b7
+02949d lda #$65
+02949f sta $00a8
+0294a2 jsl $009783
+0294a6 lda $00a9
+0294a9 sta $b9
+0294ab jsl $009783
+0294af lda $00a9
+0294b2 sta $b8
+0294b4 lda $b7
+0294b6 cmp $b8
+0294b8 bcs $94bb
+0294ba rts
 0294bb jmp $9cb6
+0294be jsr $9797
+0294c1 jsr $997e
+0294c4 lda $ba
+0294c6 bne $94cb
+0294c8 jmp $9785
+0294cb dec
+0294cc bne $94d3
+0294ce jsr $97ac
+0294d1 bra $94d6
+0294d3 jsr $97b2
+0294d6 jsr $999d
+0294d9 lda $de
+0294db cmp #$17
+0294dd bcc $94e4
+0294df jsr $9b20
+0294e2 bra $94e7
+0294e4 jsr $9b14
+0294e7 rep #$20
+0294e9 sep #$10
+0294eb ldx $ba
+0294ed lda $77
+0294ef dex
+0294f0 beq $94f7
+0294f2 clc
+0294f3 adc $77
+0294f5 bra $94ef
+0294f7 sta $77
+0294f9 lda $de
+0294fb and #$00ff
+0294fe cmp #$0016
+029501 beq $9508
+029503 lda $77
+029505 lsr a
+029506 sta $77
+029508 sep #$20
+02950a rep #$10
+02950c jsr $9bd9
+02950f jmp $99c6
+029512 lda $90
+029514 cmp $8f
+029516 bne $951b
+029518 jsr $9797
+02951b jsr $97d9
+02951e jsr $999d
+029521 jsr $9b20
+029524 ldx #$0000
+029527 stx $79
+029529 jsr $9bd9
+02952c ldx $79
+02952e beq $9561
+029561 jsr $99c6
+029564 phd
+029565 jsr $8f2f
+029568 lda $10
+02956a pld
+02956b cmp $00
+02956d beq $9572
+02956f bcc $9572
+029571 rts
 0295c7 php				; save processor status to stack
 0295c8 rep #$30			; set A,X,Y => 16bit
 0295ca lda $14
@@ -24690,6 +27376,96 @@
 0295e8 sep #$20			; set A => 8bit
 0295ea rep #$10			; set X,Y => 16bit
 0295ec rts				; exit routine
+0295ed lda $90
+0295ef cmp $8f
+0295f1 bne $95f6
+0295f3 jsr $9797
+0295f6 jsr $999d
+0295f9 phd
+0295fa jsr $8f22
+0295fd rep #$30
+0295ff lda $14
+029601 sta $0479
+029604 lda $16
+029606 pld
+029607 sta $77
+029609 lda $dd
+02960b and #$00ff
+02960e clc
+02960f adc $77
+029611 sta $77
+029613 sep #$20
+029615 rep #$10
+029617 jsr $99c6
+02961a lda #$00
+02961c xba
+02961d lda $8b
+02961f asl a
+029620 tax
+029621 ldy $79
+029623 sty $d1,x
+029625 rts
+029626 lda #$02
+029628 sta $be
+02962a lda $1121
+02962d and #$80
+02962f bne $964c
+02964c jsr $97d9
+02964f lda $b7
+029651 cmp $b8
+029653 bcs $9658
+029658 lda $8b
+02965a pha
+02965b lda $be
+02965d sta $8b
+02965f phd
+029660 jsr $8f22
+029663 phd
+029664 ply
+029665 pld
+029666 pla
+029667 sta $8b
+029669 phd
+02966a jsr $8f22
+02966d phd
+02966e plx
+02966f pld
+029670 phy
+029671 rep #$30
+029673 lda #$007f
+029676 phb
+029677 mvn $00,$00
+02967a plb
+02967b plx
+02967c sep #$20
+02967e rep #$10
+029680 stz $0050,x
+029683 inc $b3
+029685 lda #$00
+029687 xba
+029688 lda $8b
+02968a dec
+02968b dec
+02968c tax
+02968d lda $0a02,x
+029690 pha
+029691 lda $0a0a,x
+029694 pha
+029695 lda $0a07,x
+029698 pha
+029699 lda $be
+02969b dec
+02969c dec
+02969d tax
+02969e pla
+02969f sta $0a07,x
+0296a2 pla
+0296a3 sta $0a0a,x
+0296a6 pla
+0296a7 sta $0a02,x
+0296aa jsl $02d149
+0296ae ldx #$d462
+0296b1 jmp $8835
 
 
 
@@ -24724,6 +27500,8 @@
 029759 bne $975e
 02975b lda #$02
 02975d rts				; exit routine
+02975e lda #$01
+029760 rts
 
 
 
@@ -24748,6 +27526,10 @@
 0297a3 jsr $a217
 0297a6 jsr $a217
 0297a9 jmp $a0cd
+0297ac ldx #$d48c
+0297af jmp $8835
+0297b2 ldx #$d494
+0297b5 jmp $8835
 0297b8 ldx #$d367
 0297bb jmp $8835
 0297be ldx #$d346
@@ -24845,6 +27627,14 @@
 029878 sta $b7
 02987a lda #$00
 02987c bra $9895
+02987e lda $28
+029880 sta $b7
+029882 lda #$00
+029884 bra $9895
+029886 lda #$5a
+029888 sta $b7
+02988a lda #$00
+02988c bra $9895
 029895 sta $bb
 029897 lda $b7
 029899 cmp #$64
@@ -24854,6 +27644,7 @@
 0298a1 lda $11
 0298a3 and #$02
 0298a5 beq $98a9
+0298a7 lsr $b7
 0298a9 lda $8b
 0298ab cmp #$02
 0298ad bcc $98ec
@@ -24940,6 +27731,23 @@
 
 02997b lda #$ff
 02997d rts				; exit routine
+02997e lda $e5
+029980 and #$03
+029982 inc
+029983 cmp #$04
+029985 bne $9989
+029987 inc
+029988 inc
+029989 sta $a0
+02998b stz $ba
+02998d jsr $97d9
+029990 lda $b7
+029992 cmp $b8
+029994 bcc $9998
+029996 inc $ba
+029998 dec $a0
+02999a bne $998d
+02999c rts
 
 
 
@@ -25151,9 +27959,26 @@
 029af3 lda $3b
 029af5 cmp #$44
 029af7 bcc $9b10
+029af9 rep #$30
+029afb pla
+029afc sta $0098
+029aff stz $009a
+029b02 lda #$000a
+029b05 sta $009c
+029b08 jsl $0096e4
+029b0c lda $009e
+029b0f rts
 029b10 rep #$30			; set A,X,Y => 16bit
 029b12 pla
 029b13 rts				; exit routine
+029b14 jsr $9a36
+029b17 rep #$30
+029b19 lsr $77
+029b1b sep #$20
+029b1d rep #$10
+029b1f rts
+029b20 jsr $9ac6
+029b23 bra $9b17
 
 
 
@@ -25175,6 +28000,17 @@
 029b43 cmp #$50
 029b45 beq $9b48
 029b47 rts				; exit routine
+029b48 rep #$30
+029b4a asl $77
+029b4c sep #$20
+029b4e rep #$10
+029b50 ldx #$d340
+029b53 jsr $883d
+029b56 ldx #$d3ab
+029b59 jsr $883d
+029b5c ldx #$d3cc
+029b5f jsr $883d
+029b62 bra $9bb0
 
 
 
@@ -25269,6 +28105,12 @@
 029c3d ldx #$d3bf
 029c40 jsr $883d
 029c43 bra $9c81
+029c45 lda $db
+029c47 and #$20
+029c49 beq $9c53
+029c4b ldx #$d3c3
+029c4e jsr $883d
+029c51 bra $9c81
 029c81 jsr $9bb0
 029c84 jmp $9efc
 029c87 jsr $9964
@@ -25294,6 +28136,10 @@
 029cd2 bne $9cd9
 029cd4 jsr $9de4
 029cd7 bra $9ce5
+029cd9 jsr $9bcd
+029cdc ldx #$d3f1
+029cdf jsr $883d
+029ce2 jsr $9bb0
 029ce5 lda $dc
 029ce7 and #$02
 029ce9 beq $9d07
@@ -25304,6 +28150,10 @@
 029cf4 lda #$02
 029cf6 jsr $9de4
 029cf9 bra $9d07
+029cfb jsr $9bcd
+029cfe ldx #$d3f8
+029d01 jsr $883d
+029d04 jsr $9bb0
 029d07 lda $dc
 029d09 and #$04
 029d0b beq $9d29
@@ -25338,6 +28188,10 @@
 029d5a lda #$10
 029d5c jsr $9de4
 029d5f bra $9d6d
+029d61 jsr $9bcd
+029d64 ldx #$d40c
+029d67 jsr $883d
+029d6a jsr $9bb0
 029d6d lda $dc
 029d6f and #$20
 029d71 beq $9d8f
@@ -25530,6 +28384,7 @@
 029ebe sec
 029ebf sbc $4216
 029ec2 bcs $9ec6
+029ec4 lda #$00
 029ec6 sta $26,x
 029ec8 clc
 029ec9 adc $2a,x
@@ -25576,6 +28431,7 @@
 029f32 lda $b7
 029f34 cmp $b8
 029f36 bcs $9f39
+029f38 rts
 029f39 lda $4f
 029f3b and #$08
 029f3d beq $9f9c
@@ -25633,6 +28489,10 @@
 029fa6 rol a
 029fa7 bcc $9fa4
 029fa9 jmp ($9fac,x)
+029fb4 ldx #$d4e1
+029fb7 jsr $8835
+029fba lda #$40
+029fbc bra $9fda
 029fc8 ldx #$d4ed
 029fcb jsr $8835
 029fce lda #$20
@@ -25865,6 +28725,23 @@
 02a2d6 ora $c4
 02a2d8 and #$0010
 02a2db beq $a304
+02a2dd lda $c6
+02a2df and $c4
+02a2e1 and #$0010
+02a2e4 beq $a2f5
+02a2e6 lda $10a5
+02a2e9 cmp #$0032
+02a2ec bcc $a2f5
+02a2ee lda #$0080
+02a2f1 sta $ce
+02a2f3 bra $a301
+02a2f5 lda $c6
+02a2f7 cmp $c4
+02a2f9 bcc $a301
+02a2fb sep #$20
+02a2fd rep #$10
+02a2ff inc $ce
+02a301 jmp $a596
 02a304 lda $c6
 02a306 ora $c4
 02a308 and #$0027
@@ -25914,12 +28791,37 @@
 02a3a3 ora $cc
 02a3a5 and #$0060
 02a3a8 beq $a3b0
+02a3aa jsr $a3d0
+02a3ad jmp $a514
 02a3b0 lda $c8
 02a3b2 ora $ca
 02a3b4 ora $cc
 02a3b6 and #$0010
 02a3b9 beq $a3be
 02a3bb jmp $a596
+02a3be lda $c8
+02a3c0 ora $ca
+02a3c2 ora $cc
+02a3c4 and #$0027
+02a3c7 bne $a3ca
+02a3ca jsr $a3d0
+02a3cd jmp $a514
+02a3d0 lda #$0002
+02a3d3 sta $ce
+02a3d5 lda #$0003
+02a3d8 sta $a0
+02a3da lda $c8
+02a3dc sta $a2
+02a3de cmp $ca
+02a3e0 bcs $a3ea
+02a3ea inc $a0
+02a3ec lda $a2
+02a3ee cmp $cc
+02a3f0 bcc $a3f3
+02a3f2 rts
+02a3f3 lda $a0
+02a3f5 sta $ce
+02a3f7 rts
 02a3f8 ldx $92
 02a3fa rep #$30			; set A,X,Y => 16bit
 02a3fc lda #$0000
@@ -26035,6 +28937,11 @@
 02a4d2 lda $21
 02a4d4 and #$08
 02a4d6 beq $a4e6
+02a4d8 lda #$05
+02a4da sta $00a8
+02a4dd jsl $009783
+02a4e1 lda $00a9
+02a4e4 bra $a4e9
 02a4e6 lda $04a0
 02a4e9 sta $51
 02a4eb pld
@@ -26047,6 +28954,22 @@
 02a518 lda $8b
 02a51a cmp #$01
 02a51c beq $a53c
+02a51e phd
+02a51f jsr $8f22
+02a522 lda $5e
+02a524 pld
+02a525 cmp #$4a
+02a527 bne $a57b
+02a529 phd
+02a52a jsr $8f22
+02a52d lda #$10
+02a52f sta $50
+02a531 lda #$4a
+02a533 sta $52
+02a535 lda $04ce
+02a538 sta $51
+02a53a pld
+02a53b rts
 02a53c lda #$11
 02a53e jsl $00da6a
 02a542 inc
@@ -26060,6 +28983,11 @@
 02a552 sta $10d1
 02a555 sta $39
 02a557 rts				; exit routine
+02a57b lda $8b
+02a57d cmp #$02
+02a57f bcs $a591
+02a591 lda #$10
+02a593 jmp $a624
 
 
 
@@ -26082,6 +29010,30 @@
 02a5b5 sta $52
 02a5b7 pld
 02a5b8 jmp $a483
+02a5bb phd
+02a5bc jsr $8f22
+02a5bf lda $18
+02a5c1 xba
+02a5c2 lda $38
+02a5c4 pld
+02a5c5 and #$40
+02a5c7 beq $a5ea
+02a5c9 xba
+02a5ca beq $a5ea
+02a5cc lda #$20
+02a5ce sta $10d0
+02a5d1 lda #$15
+02a5d3 sta $10d2
+02a5d6 lda $ce
+02a5d8 and #$80
+02a5da bne $a5e2
+02a5dc lda $ce
+02a5de sta $10d1
+02a5e1 rts
+02a5e2 lda $ce
+02a5e4 sta $10d1
+02a5e7 sta $39
+02a5e9 rts
 02a60c lda $8b
 02a60e cmp #$02
 02a610 bcs $a622
@@ -26105,6 +29057,59 @@
 02a646 pld
 02a647 and #$08
 02a649 beq $a6b3
+02a64b phd
+02a64c jsr $8f22
+02a64f lda $38
+02a651 and #$0f
+02a653 ora $39
+02a655 sta $04a0
+02a658 pld
+02a659 lda $a0
+02a65b beq $a66b
+02a65d lda #$02
+02a65f sta $00a8
+02a662 jsl $009783
+02a666 lda $00a9
+02a669 bne $a66e
+02a66b jmp $a86d
+02a66e phd
+02a66f jsr $8f22
+02a672 lda $38
+02a674 xba
+02a675 lda $39
+02a677 rep #$30
+02a679 ldx #$ffff
+02a67c pld
+02a67d asl a
+02a67e asl a
+02a67f asl a
+02a680 asl a
+02a681 sep #$20
+02a683 rep #$10
+02a685 sta $a8
+02a687 xba
+02a688 sta $a7
+02a68a lda #$08
+02a68c sta $00a8
+02a68f jsl $009783
+02a693 lda $00a9
+02a696 sta $a9
+02a698 lda $a9
+02a69a pha
+02a69b inc
+02a69c and #$07
+02a69e sta $a9
+02a6a0 pla
+02a6a1 tax
+02a6a2 phd
+02a6a3 pea $04a7
+02a6a6 pld
+02a6a7 jsl $00975a
+02a6ab pld
+02a6ac inc
+02a6ad dec
+02a6ae beq $a698
+02a6b0 jmp $a8b2
 02a6b3 lda #$02
 02a6b5 sta $a4
 02a6b7 ldx #$0403
@@ -26188,6 +29193,8 @@
 02a756 cmp #$2e
 02a758 beq $a75c
 02a75a bra $a761
+02a75c lda $10b0
+02a75f beq $a776
 02a761 stz $10d0
 02a764 lda $e0
 02a766 and #$02
@@ -26218,6 +29225,9 @@
 02a78b and #$50
 02a78d cmp #$50
 02a78f bne $a796
+02a791 pla
+02a792 lda #$1c
+02a794 bra $a7c1
 02a796 pla
 02a797 ldx #$0005
 02a79a and #$f8
@@ -26248,11 +29258,16 @@
 02a7c3 sta $10d2
 02a7c6 cmp #$1c
 02a7c8 bne $a7d1
+02a7ca lda $109a
+02a7cd beq $a84a
+02a7cf bra $a7e1
 02a7d1 cmp #$15
 02a7d3 bne $a7dc
 02a7d5 lda $1098
 02a7d8 beq $a84a
 02a7da bra $a7e1
+02a7dc lda $1099
+02a7df beq $a84a
 02a7e1 lda #$20
 02a7e3 sta $38
 02a7e5 sta $10d0
@@ -26267,6 +29282,8 @@
 02a7ff beq $a806
 02a801 jsr $a76a
 02a804 bra $a80b
+02a806 lda $8d
+02a808 sta $10d1
 02a80b phd				; save direct page to stack
 02a80c jsr $8f2f
 02a80f lda $2e
@@ -26328,13 +29345,21 @@
 02a8c4 pld
 02a8c5 cmp #$1c
 02a8c7 bcc $a8d2
+02a8c9 rep #$30
+02a8cb txa
+02a8cc sep #$20
+02a8ce rep #$10
+02a8d0 xba
+02a8d1 tax
 02a8d2 txa
 02a8d3 inc
 02a8d4 dec
 02a8d5 bne $a8da
+02a8d7 jmp $a86d
 02a8da jsr $a93c
 02a8dd lda $8b
 02a8df bne $a8e2
+02a8e1 rts
 02a8e2 phd				; save direct page to stack
 02a8e3 jsr $8f22
 02a8e6 lda $51
@@ -26422,6 +29447,13 @@
 02a973 lda $21
 02a975 and #$08
 02a977 beq $a98b
+02a979 lda #$02
+02a97b sta $00a8
+02a97e jsl $009783
+02a982 lda $00a9
+02a985 beq $a98b
+02a987 lda #$80
+02a989 sta $51
 02a98b pld
 02a98c rts				; exit routine
 
@@ -26433,6 +29465,7 @@
 02a993 lda $3b
 02a995 cmp #$4a
 02a997 bcc $a99c
+02a999 jmp $aa46
 02a99c lda $11
 02a99e and #$08
 02a9a0 beq $a9be
@@ -26444,6 +29477,9 @@
 02a9c9 lda $44,x
 02a9cb and #$80
 02a9cd beq $a9d4
+02a9cf lda $58,x
+02a9d1 inc
+02a9d2 bra $a9fb
 02a9d4 dex
 02a9d5 bpl $a9c9
 02a9d7 pld
@@ -26497,6 +29533,318 @@
 02aa42 sta $51
 02aa44 pld
 02aa45 rts				; exit routine
+02aa46 sep #$20
+02aa48 rep #$10
+02aa4a sec
+02aa4b sbc #$4a
+02aa4d sta $a2
+02aa4f lda $b5
+02aa51 cmp #$02
+02aa53 bcs $aa77
+02aa55 lda #$00
+02aa57 xba
+02aa58 lda $a2
+02aa5a asl a
+02aa5b asl a
+02aa5c asl a
+02aa5d tax
+02aa5e phd
+02aa5f jsr $8f22
+02aa62 ldy $d0be,x
+02aa65 sty $44
+02aa67 ldy $d0c0,x
+02aa6a sty $46
+02aa6c ldy $d0c2,x
+02aa6f sty $48
+02aa71 ldy $d0c4,x
+02aa74 sty $4a
+02aa76 pld
+02aa77 lda #$00
+02aa79 xba
+02aa7a lda $a2
+02aa7c asl a
+02aa7d tax
+02aa7e jmp ($acb2,x)
+02aa81 lda $0417
+02aa84 and #$03
+02aa86 cmp #$03
+02aa88 bne $aa93
+02aa8a phd
+02aa8b jsr $8f22
+02aa8e lda #$c4
+02aa90 sta $58
+02aa92 pld
+02aa93 jmp $a99c
+02aa96 ldx $1114
+02aa99 cpx $d07f
+02aa9c bcs $aabf
+02aa9e lda #$65
+02aaa0 sta $00a8
+02aaa3 jsl $009783
+02aaa7 lda $00a9
+02aaaa cmp $d083
+02aaad bcs $aabf
+02aaaf lda #$10
+02aab1 sta $1150
+02aab4 lda #$8a
+02aab6 sta $1152
+02aab9 lda #$80
+02aabb sta $1151
+02aabe rts
+02aabf jmp $a99c
+02acc1 sep #$20
+02acc3 rep #$10
+02acc5 lda #$00
+02acc7 xba
+02acc8 lda $7ec360,x
+02accc pea $acd4
+02accf jsl $0097be
+02acd3 rts
+02acd8 lda #$fe
+02acda sta $7ec340,x
+02acde lda #$01
+02ace0 sta $000af0
+02ace4 lda #$d5
+02ace6 jsl $02fe0f
+02acea lda #$80
+02acec sta $7ec4a0,x
+02acf0 lda #$40
+02acf2 sta $7ec4c0,x
+02acf6 lda #$02
+02acf8 sta $7ec300,x
+02acfc lda $7ec240,x
+02ad00 and #$bf
+02ad02 sta $7ec240,x
+02ad06 lda #$00
+02ad08 sta $7ec4e0,x
+02ad0c lda #$01
+02ad0e sta $7ec360,x
+02ad12 lda $7ec240,x
+02ad16 ora #$40
+02ad18 sta $7ec240,x
+02ad1c lda $7ec4c0,x
+02ad20 inc
+02ad21 sta $7ec4c0,x
+02ad25 cmp #$4b
+02ad27 bcc $ad35
+02ad29 lda $7ec300,x
+02ad2d and #$fc
+02ad2f ora #$03
+02ad31 sta $7ec300,x
+02ad35 lda #$00
+02ad37 xba
+02ad38 lda $7ec4e0,x
+02ad3c tay
+02ad3d inc
+02ad3e and #$3f
+02ad40 beq $ad63
+02ad42 sta $7ec4e0,x
+02ad46 lda $048d
+02ad49 beq $ad57
+02ad4b lda #$80
+02ad4d clc
+02ad4e adc $ade0,y
+02ad51 sta $7ec4a0,x
+02ad55 bra $ad8a
+02ad57 lda #$80
+02ad59 sec
+02ad5a sbc $ade0,y
+02ad5d sta $7ec4a0,x
+02ad61 bra $ad8a
+02ad63 lda #$06
+02ad65 sta $0505
+02ad68 stz $0af0
+02ad6b jsr $fe83
+02ad6e lda #$01
+02ad70 sta $7ec340,x
+02ad74 lda #$67
+02ad76 sta $7ec2a0,x
+02ad7a lda $048d
+02ad7d beq $ad83
+02ad7f lda #$78
+02ad81 bra $ad85
+02ad83 lda #$48
+02ad85 sta $7ec280,x
+02ad89 rts
+02ad8a lda #$00
+02ad8c xba
+02ad8d lda $7ec440,x
+02ad91 tay
+02ad92 lda $ae20,y
+02ad95 sta $7ec2e0,x
+02ad99 lda $7ec300,x
+02ad9d and #$f3
+02ad9f ora $ae24,y
+02ada2 sta $7ec300,x
+02ada6 lda $ae28,y
+02ada9 clc
+02adaa adc $7ec4a0,x
+02adae sta $7ec280,x
+02adb2 lda $ae2c,y
+02adb5 clc
+02adb6 adc $7ec4c0,x
+02adba sta $7ec2a0,x
+02adbe lda $7ec460,x
+02adc2 inc
+02adc3 and #$03
+02adc5 sta $7ec460,x
+02adc9 beq $adcc
+02adcb rts
+02adcc lda $7ec440,x
+02add0 inc
+02add1 and #$03
+02add3 sta $7ec440,x
+02add7 beq $adda
+02add9 rts
+02adda lda #$0a
+02addc sta $0505
+02addf rts
+02ae30 sep #$20
+02ae32 rep #$10
+02ae34 lda #$00
+02ae36 xba
+02ae37 lda $7ec360,x
+02ae3b pea $ae43
+02ae3e jsl $0097be
+02ae42 rts
+02ae4d lda #$fe
+02ae4f sta $7ec340,x
+02ae53 lda $7ec240,x
+02ae57 and #$bf
+02ae59 sta $7ec240,x
+02ae5d lda #$02
+02ae5f sta $000af0
+02ae63 lda #$d7
+02ae65 jsl $02fe0f
+02ae69 lda $0417
+02ae6c and #$03
+02ae6e cmp #$03
+02ae70 bne $ae76
+02ae76 lda #$60
+02ae78 sta $7ec280,x
+02ae7c lda #$2c
+02ae7e sta $7ec2a0,x
+02ae82 lda #$03
+02ae84 sta $7ec300,x
+02ae88 lda #$06
+02ae8a sta $7ec480,x
+02ae8e lda #$01
+02ae90 sta $7ec360,x
+02ae94 lda $7ec240,x
+02ae98 ora #$40
+02ae9a sta $7ec240,x
+02ae9e rts
+02ae9f lda $7ec480,x
+02aea3 dec
+02aea4 sta $7ec480,x
+02aea8 beq $aeab
+02aeaa rts
+02aeab lda #$06
+02aead sta $7ec480,x
+02aeb1 lda $7ec2e0,x
+02aeb5 cmp #$04
+02aeb7 beq $aebf
+02aeb9 inc
+02aeba sta $7ec2e0,x
+02aebe rts
+02aebf lda #$02
+02aec1 sta $7ec360,x
+02aec5 lda #$19
+02aec7 sta $0505
+02aeca rts
+02aecb lda $7ec2a0,x
+02aecf inc
+02aed0 inc
+02aed1 inc
+02aed2 inc
+02aed3 cmp #$80
+02aed5 bcc $aedf
+02aed7 lda #$03
+02aed9 sta $7ec360,x
+02aedd lda #$80
+02aedf sta $7ec2a0,x
+02aee3 lda $048d
+02aee6 bne $aee9
+02aee8 rts
+02aee9 lda $7ec280,x
+02aeed inc
+02aeee inc
+02aeef sta $7ec280,x
+02aef3 rts
+02aef4 lda $7ec380,x
+02aef8 sta $04a7
+02aefb lda $7ec320,x
+02aeff sta $04a5
+02af02 lda $7ec240,x
+02af06 and #$bf
+02af08 sta $7ec240,x
+02af0c lda #$14
+02af0e sta $7ec340,x
+02af12 lda #$00
+02af14 sta $7ec380,x
+02af18 lda #$08
+02af1a sta $04a4
+02af1d jsl $02fe38
+02af21 lda $04a7
+02af24 sta $7ec380,x
+02af28 lda $048d
+02af2b beq $af31
+02af2d lda #$94
+02af2f bra $af33
+02af31 lda #$64
+02af33 sta $7ec280,x
+02af37 lda #$88
+02af39 sta $7ec2a0,x
+02af3d lda #$03
+02af3f sta $7ec300,x
+02af43 lda $04a5
+02af46 sta $7ec320,x
+02af4a lda #$04
+02af4c sta $7ec360,x
+02af50 lda $7ec240,x
+02af54 ora #$40
+02af56 sta $7ec240,x
+02af5a lda #$10
+02af5c sta $7ec580,x
+02af60 lda #$03
+02af62 sta $00a8
+02af65 jsl $009783
+02af69 lda $00a9
+02af6c clc
+02af6d adc #$02
+02af6f eor #$ff
+02af71 inc
+02af72 sta $7ec5a0,x
+02af76 lda #$07
+02af78 sta $00a8
+02af7b jsl $009783
+02af7f lda #$03
+02af81 sbc $00a9
+02af84 sta $7ec5c0,x
+02af88 dec $04a4
+02af8b bne $af1d
+02af8d rts
+02af8e lda $7ec580,x
+02af92 dec
+02af93 sta $7ec580,x
+02af97 beq $afb4
+02af99 lda $7ec280,x
+02af9d clc
+02af9e adc $7ec5c0,x
+02afa2 sta $7ec280,x
+02afa6 lda $7ec2a0,x
+02afaa clc
+02afab adc $7ec5a0,x
+02afaf sta $7ec2a0,x
+02afb3 rts
+02afb4 stz $0af0
+02afb7 jsr $fe83
+02afba lda #$00
+02afbc sta $7ec240,x
+02afc0 sta $7ec280,x
+02afc4 sta $7ec2a0,x
+02afc8 sta $7ec300,x
+02afcc rts
 
 
 
@@ -26560,6 +29908,13 @@
 02d171 lda $13
 02d173 cmp $04b3
 02d176 bpl $d18f
+02d178 lda #$ff
+02d17a sta $0d
+02d17c sta $0e
+02d17e sta $0f
+02d180 lda $00
+02d182 cmp #$01
+02d184 bne $d1f5
 02d18f jsr $d358
 02d192 rep #$30			; set A,X,Y => 16bit
 02d194 ldx #$3800
@@ -27822,6 +31177,33 @@
 
 
 02df7f rts				; exit routine
+02df80 rts
+02df81 php
+02df82 rep #$30
+02df84 lda #$0000
+02df87 sta $7ec660
+02df8b ldx #$c660
+02df8e ldy #$c661
+02df91 lda #$01bc
+02df94 phb
+02df95 mvn $7e,$7e
+02df98 plb
+02df99 ldx #$dfc6
+02df9c ldy #$c640
+02df9f lda #$0006
+02dfa2 phb
+02dfa3 mvn $02,$7e
+02dfa6 plb
+02dfa7 ldx #$dfbe
+02dfaa ldy #$4320
+02dfad lda #$0007
+02dfb0 mvn $02,$02
+02dfb3 sep #$20
+02dfb5 rep #$10
+02dfb7 lda #$04
+02dfb9 tsb $0111
+02dfbc plp
+02dfbd rts
 
 
 
@@ -29227,6 +32609,9 @@
 02ec03 jsl $00971e
 02ec07 lda $cc
 02ec09 beq $ec12
+02ec0b rep #$20
+02ec0d lda #$efc1
+02ec10 bra $ec17
 02ec12 rep #$20			; set A => 16bit
 02ec14 lda #$bfc1
 02ec17 clc
@@ -30261,6 +33646,7 @@
 02f4fc beq $f504
 02f4fe cmp #$01
 02f500 beq $f52c
+02f502 bra $f51d
 02f504 clc
 02f505 adc $7ec2c0,x
 02f509 sta $0c02,y
@@ -30268,6 +33654,13 @@
 02f50d ply
 02f50e pla
 02f50f rts				; exit routine
+02f51d lda $7ec2e0,x
+02f521 asl a
+02f522 asl a
+02f523 ora $7ec2e0,x
+02f527 and #$33
+02f529 asl a
+02f52a bra $f504
 
 
 
@@ -30375,6 +33768,41 @@
 
 
 02f5e1 rts				; exit routine
+02f5e3 php
+02f5e4 lda $0aef
+02f5e7 clc
+02f5e8 adc $f5e2
+02f5eb pha
+02f5ec and #$0f
+02f5ee sta $0aef
+02f5f1 pla
+02f5f2 and #$f0
+02f5f4 beq $f624
+02f5f6 ldx #$00
+02f5f8 txy
+02f5f9 cpx #$52
+02f5fb bpl $f615
+02f5fd txa
+02f5fe cmp $f626,y
+02f601 bmi $f605
+02f603 iny
+02f604 iny
+02f605 lda $7ec660,x
+02f609 clc
+02f60a adc $f627,y
+02f60d sta $7ec660,x
+02f611 inx
+02f612 inx
+02f613 bra $f5f9
+02f615 rep #$10
+02f617 lda $f1
+02f619 sta $7ec660,x
+02f61d inx
+02f61e inx
+02f61f cpx #$01ae
+02f622 bne $f619
+02f624 plp
+02f625 rts
 
 
 
@@ -30976,6 +34404,13 @@
 02fb4b sta $0a,x
 02fb4d sta $0e,x
 02fb4f rts				; exit routine
+02fb50 lda $7ec420,x
+02fb54 xba
+02fb55 lda $7ec320,x
+02fb59 clc
+02fb5a adc #$08
+02fb5c jsl $0b92d6
+02fb60 rts
 
 
 
@@ -31029,6 +34464,26 @@
 02fe0c plp
 02fe0d pld
 02fe0e rtl				; exit routine
+02fe0f phd
+02fe10 pea $0a00
+02fe13 pld
+02fe14 php
+02fe15 sep #$30
+02fe17 sta $ca
+02fe19 stz $cc
+02fe1b cmp #$c8
+02fe1d bmi $fe21
+02fe1f inc $cc
+02fe21 lda $7ec2c0,x
+02fe25 sta $cb
+02fe27 lda #$00
+02fe29 sta $7ec2e0,x
+02fe2d jsr $eb55
+02fe30 lda #$03
+02fe32 sta $0ae4
+02fe35 plp
+02fe36 pld
+02fe37 rtl
 
 
 
@@ -31265,6 +34720,50 @@
 07914f dey
 079150 bne $9133
 079152 rts				; exit routine
+079153 sep #$20
+079155 rep #$10
+079157 ldx $04
+079159 ldy #$0020
+07915c lda $7fcdc8,x
+079160 beq $916f
+079162 cmp #$ff
+079164 beq $916f
+079166 stz $00
+079168 asl a
+079169 adc $00
+07916b sta $7fcdc8,x
+07916f inx
+079170 dey
+079171 bne $915c
+079173 rts
+079174 rep #$30
+079176 ldx $04
+079178 ldy #$0002
+07917b lda $7fcdc8,x
+07917f sta $00
+079181 lda $7fcdca,x
+079185 sta $7fcdc8,x
+079189 lda $7fcdcc,x
+07918d sta $7fcdca,x
+079191 lda $7fcdce,x
+079195 sta $7fcdcc,x
+079199 lda $7fcdd0,x
+07919d sta $7fcdce,x
+0791a1 lda $7fcdd2,x
+0791a5 sta $7fcdd0,x
+0791a9 lda $7fcdd4,x
+0791ad sta $7fcdd2,x
+0791b1 lda $7fcdd6,x
+0791b5 sta $7fcdd4,x
+0791b9 lda $00
+0791bb sta $7fcdd6,x
+0791bf txa
+0791c0 clc
+0791c1 adc #$0010
+0791c4 tax
+0791c5 dey
+0791c6 bne $917b
+0791c8 rts
 
 
 
@@ -31319,6 +34818,16 @@
 0b8006 beq $8023
 0b8008 dec
 0b8009 beq $802f
+0b800b lda #$4a
+0b800d sta $0507
+0b8010 lda #$1b
+0b8012 sta $0506
+0b8015 bra $8039
+0b8017 lda #$a1
+0b8019 sta $0507
+0b801c lda #$1f
+0b801e sta $0506
+0b8021 bra $8039
 0b8023 lda #$b6
 0b8025 sta $0507
 0b8028 lda #$1b
@@ -31385,6 +34894,31 @@
 0b80a3 plb
 0b80a4 plp
 0b80a5 rtl				; exit routine
+0b80a6 php
+0b80a7 phb
+0b80a8 phx
+0b80a9 phy
+0b80aa sep #$20
+0b80ac rep #$10
+0b80ae jsr $80d9
+0b80b1 ldx $192b
+0b80b4 cpx #$ffff
+0b80b7 beq $80a1
+0b80b9 lda $1a80,x
+0b80bc and #$cf
+0b80be sta $1a80,x
+0b80c1 lda $1a82,x
+0b80c4 rep #$30
+0b80c6 and #$00ff
+0b80c9 asl a
+0b80ca phx
+0b80cb tax
+0b80cc clc
+0b80cd lda $00fdcf,x
+0b80d1 tay
+0b80d2 plx
+0b80d3 jsl $01ae85
+0b80d7 bra $8077
 
 
 
@@ -31394,6 +34928,53 @@
 0b80e1 sta $192b
 0b80e4 jsl $018bd0
 0b80e8 rts				; exit routine
+0b80e9 phx
+0b80ea phy
+0b80eb pha
+0b80ec php
+0b80ed phd
+0b80ee pea $1a72
+0b80f1 pld
+0b80f2 sep #$20
+0b80f4 rep #$10
+0b80f6 ldx #$0000
+0b80f9 ldy #$0016
+0b80fc lda $00,x
+0b80fe cmp #$ff
+0b8100 beq $8114
+0b8102 lda $19,x
+0b8104 cmp $1502
+0b8107 bne $8114
+0b8109 ldy $0b,x
+0b810b sty $1500
+0b810e pld
+0b810f plp
+0b8110 pla
+0b8111 ply
+0b8112 plx
+0b8113 rtl
+0b8114 php
+0b8115 rep #$30
+0b8117 txa
+0b8118 clc
+0b8119 adc #$001a
+0b811c tax
+0b811d plp
+0b811e dey
+0b811f bne $80fc
+0b8121 lda #$00
+0b8123 xba
+0b8124 lda $0e8b
+0b8127 tax
+0b8128 lda $0b8140,x
+0b812c sta $0507
+0b812f lda $193f
+0b8132 tax
+0b8133 lda $0b8144,x
+0b8137 sta $0506
+0b813a lda #$07
+0b813c sta $0505
+0b813f rtl
 
 
 
@@ -31562,6 +35143,8 @@
 0b82d3 lda $19cb
 0b82d6 and #$08
 0b82d8 beq $82e3
+0b82da lda $0e8d
+0b82dd beq $82e3
 0b82e3 lda $19cb
 0b82e6 and #$07
 0b82e8 xba
@@ -31730,6 +35313,9 @@
 0b8440 and #$70
 0b8442 cmp #$70
 0b8444 bne $844a
+0b8446 tya
+0b8447 ora #$10
+0b8449 tay
 0b844a tya
 0b844b sta $2131
 0b844e rtl				; exit routine
@@ -32082,6 +35668,7 @@
 0b8f39 jsr $9304
 0b8f3c cpx #$00
 0b8f3e beq $8f44
+0b8f40 jsl $0b935f
 0b8f44 lda #$80
 0b8f46 sta $0ae5
 0b8f49 rts				; exit routine
@@ -32089,6 +35676,19 @@
 
 
 0b8f4a rts				; exit routine
+0b8ffa jsr $9304
+0b8ffd lda $7ec480,x
+0b9001 sec
+0b9002 sbc #$0c
+0b9004 sta $0c02,y
+0b9007 inc
+0b9008 sta $0c06,y
+0b900b inc
+0b900c sta $0c0a,y
+0b900f inc
+0b9010 sta $0c0e,y
+0b9013 rts
+0b9014 rts
 0b9015 lda #$00
 0b9017 sta $7ec360,x
 0b901b lda #$0e
@@ -32339,6 +35939,71 @@
 0b91fa lda #$b4
 0b91fc sta $0c16,y
 0b91ff rts				; exit routine
+0b9200 jsr $9304
+0b9203 lda #$04
+0b9205 xba
+0b9206 lda $7ec320,x
+0b920a clc
+0b920b adc #$09
+0b920d jsl $0b92d6
+0b9211 lda #$04
+0b9213 sta $7ec400,x
+0b9217 lda #$b7
+0b9219 sta $0c12,y
+0b921c sta $0c1a,y
+0b921f inc
+0b9220 sta $0c16,y
+0b9223 sta $0c1e,y
+0b9226 lda $0c00,y
+0b9229 sec
+0b922a sbc #$08
+0b922c sta $0c10,y
+0b922f sta $0c14,y
+0b9232 clc
+0b9233 adc #$17
+0b9235 sta $0c18,y
+0b9238 sta $0c1c,y
+0b923b lda $0c01,y
+0b923e sta $0c11,y
+0b9241 sta $0c19,y
+0b9244 clc
+0b9245 adc #$08
+0b9247 sta $0c15,y
+0b924a sta $0c1d,y
+0b924d lda $0c1b,y
+0b9250 ora #$40
+0b9252 sta $0c1b,y
+0b9255 sta $0c1f,y
+0b9258 rts
+0b9259 lda $7ec260,x
+0b925d asl a
+0b925e asl a
+0b925f tay
+0b9260 lda $7ec360,x
+0b9264 and #$01
+0b9266 beq $927f
+0b9268 lda $0c10,y
+0b926b inc
+0b926c inc
+0b926d sta $0c10,y
+0b9270 sta $0c14,y
+0b9273 lda $0c18,y
+0b9276 dec
+0b9277 dec
+0b9278 sta $0c18,y
+0b927b sta $0c1c,y
+0b927e rts
+0b927f lda $0c10,y
+0b9282 dec
+0b9283 dec
+0b9284 sta $0c10,y
+0b9287 sta $0c14,y
+0b928a lda $0c18,y
+0b928d inc
+0b928e inc
+0b928f sta $0c18,y
+0b9292 sta $0c1c,y
+0b9295 rts
 
 
 

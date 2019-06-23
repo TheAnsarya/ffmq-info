@@ -62,7 +62,7 @@ pullpc
 
 pushpc
 
-incsrc "load-graphics-routines.asm"
+incsrc "load-graphics-routines - onlygood.asm"
 
 pullpc
 
@@ -90,6 +90,7 @@ DataTiles048000:
 ; pc should equal $05F280
 
 pullpc
+
 
 
 pushpc

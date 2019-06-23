@@ -1,4 +1,19 @@
 
+
+
+TODO: look at file location $048000 (snes = $098000)
+
+
+
+
+
+
+
+
+
+
+
+
 ROM:
 $0b1800 ~ish  -- End credits text
 
