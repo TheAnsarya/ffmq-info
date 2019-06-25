@@ -26,10 +26,12 @@ MainEntryPoint:
 
 
 
+;--------------------------------------------------------------------
 pushpc
 org $008247
 
-; ROUTINE: Basic init ($00:8247)
+
+; ROUTINE: Basic init ($008247)
 ;		Screen off, no interupts, AXY => 8bit
 ; TODO: maybe relabel?
 BasicInit:
@@ -40,8 +42,8 @@ BasicInit:
 	rts					; exit routine
 
 ; pc should equal $008252
-
 pullpc
+;--------------------------------------------------------------------
 
 
 

@@ -3,8 +3,8 @@
 
 TODO: look at file location $048000 (snes = $098000)
 
-
-
+regex for all lines not containing string:
+^((?!%setAto16bit\(\)).)*$
 
 
 

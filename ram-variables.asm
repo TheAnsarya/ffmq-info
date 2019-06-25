@@ -3,9 +3,16 @@
 !general_address = $0017
 
 
+!loop_counter_62 = $62
+!loop_counter_64 = $64
+
+
+!flags_d8 = $00d8
+
 !color_data_source_offset = $00f4
 !color_data_source_offset_2 = $00f7
 
+!ram_0111 = $0111
 
 !tilemap_wram_source_start = $0800
 !tilemap_wram_source_start_2 = $0900
@@ -19,6 +26,8 @@
 !ram_1924 = $1924
 !ram_1925 = $1925
 
+
+!ram_195f = $195f
 
 !ram_19a5 = $19a5
 

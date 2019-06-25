@@ -1,0 +1,116 @@
+
+
+
+; ROUTINE: Expand second half with zeros ($0c92eb)
+;		for bytes $7f0000-$7f0eb9 (size = $3c0)
+;		for $20 byte chunks, skip first $10
+;		then expand next $8 with zeros between bytes
+;		so:			----------------abcdefgh--------
+;		becomes:	----------------a0b0c0d0e0f0g0h0
+; AXY => 16bit
+ExpandSecondHalfWithZeros:
+0c92eb clc
+0c92ec lda #$001e
+0c92ef sta !loop_counter_62		; loop counter => $1e
+0c92f1 lda #$0000				; A => $0000
+	.Loop {
+0c92f4 adc #$0018			; A += $18
+0c92f7 tax					; X => A
+0c92f8 adc #$0008			; A += $8
+0c92fb tay					; Y => A
+0c92fc pha					; save A
+
+0c92fd lda #$0008
+0c9300 sta !loop_counter_64		; loop counter #2 => $8
+		.Loop2 {
+0c9302 dex						; X -= 1
+0c9303 dey
+0c9304 dey						; Y => Y - 2
+0c9305 lda $0000,x
+0c9308 and #$00ff
+0c930b sta $0000,y				; word at Y => $00(lower byte at X)
+0c930e dec !loop_counter_64		; decrement counter #2
+0c9310 bne .Loop2
+		}
+
+0c9312 pla						; restore A
+0c9313 dec !loop_counter_62		; decrement counter
+0c9315 bne .Loop
+	}
+
+0c9317 rts					; ROUTINE: ExpandSecondHalfWithZeros
+
+
+; start
+; 0                       X       Y
+; abcdefghijklmnopqrstuvwxyz123456-		; counter = $8
+; dex
+; 0                      X        Y
+; abcdefghijklmnopqrstuvwxyz123456-
+; dey : dey
+; 0                      X      Y  
+; abcdefghijklmnopqrstuvwxyz123456-
+; lda : and : sta
+; 0                      X      Y  
+; abcdefghijklmnopqrstuvwxyz1234x0-
+; dex : dey : dey : lda : and : sta		; counter = $7
+; 0                     X     Y    
+; abcdefghijklmnopqrstuvwxyz12w0x0-
+; dex : dey : dey : lda : and : sta		; counter = $6
+; 0                    X    Y      
+; abcdefghijklmnopqrstuvwxyzv0w0x0-
+; dex : dey : dey : lda : and : sta		; counter = $5
+; 0                   X   Y        
+; abcdefghijklmnopqrstuvwxu0v0w0x0-
+; dex : dey : dey : lda : and : sta		; counter = $4
+; 0                  X  Y          
+; abcdefghijklmnopqrstuvt0u0v0w0x0-
+; dex : dey : dey : lda : and : sta		; counter = $3
+; 0                 X Y            
+; abcdefghijklmnopqrsts0t0u0v0w0x0-
+; dex : dey : dey : lda : and : sta		; counter = $2
+; 0                XY              
+; abcdefghijklmnopqrr0s0t0u0v0w0x0-
+; dex : dey : dey : lda : and : sta		; counter = $1
+; 0               B                
+; abcdefghijklmnopq0r0s0t0u0v0w0x0-
+; end
+
+
+;-----------------------------------------------------------------------
+
+; using expanded instead:
+pushpc
+org $0099bd
+
+
+; ROUTINE: Fill with A ($0099bd)
+;		fills $20 or $40 bytes with A starting at Y
+;		if 16bit, $20 words
+;		if 8bit, $20 bytes
+; parameters:
+;		A => fill value
+;		Y => destination
+; A can be 8bit or 16bit
+FillA32Times:
+	!counter = $3e
+	while !counter > $20
+		sta $00!counter,y
+
+		!counter #= !counter-2
+	endif
+
+	.Fill_17
+	while !counter >= $00
+		sta $00!counter,y
+
+		!counter #= !counter-2
+	endif
+
+	rts					; exit routine
+
+
+; pc should equal $009a1e
+pullpc
+
+;-----------------------------------------------------------------------

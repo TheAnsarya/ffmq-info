@@ -34,9 +34,9 @@
 ; START OF BANK $00
 
 ; game entry point (everything starts here)
-008000 clc
-008001 xce					; set native mode
-008002 jsr BasicInit		; screen off, no interupts, AXY => 8bit
+008000 clc				; 
+008001 xce				; set native mode
+008002 jsr $8247		; call routine "Screen off, no interupts, AXY => 8bit ($00:8247)"
 008005 jsl $0d8000
 008009 lda #$00
 00800b sta $7e3667
@@ -45,7 +45,7 @@
 008014 bra $8023
 
 ; restart titlescreen & demo sequnce
-008016 jsr BasicInit		; screen off, no interupts, AXY => 8bit
+008016 jsr $8247		; call routine "Screen off, no interupts, AXY => 8bit ($00:8247)"
 008019 lda #$f0
 00801b sta $000600
 00801f jsl $0d8004
@@ -59,7 +59,7 @@
 008032 bne $806e
 008034 jsl $0c8080
 008038 bra $804d
-00803a jsr BasicInit		; screen off, no interupts, AXY => 8bit
+00803a jsr $8247		; call routine "Screen off, no interupts, AXY => 8bit ($00:8247)"
 00803d lda #$f0
 00803f sta $000600
 008043 jsl $0d8004
@@ -104,7 +104,7 @@
 0080b0 lda #$80
 0080b2 trb $00de
 0080b5 lda #$e0
-0080b7 trb !ram_0111
+0080b7 trb $0111
 0080ba jsl $0c8000
 0080be lda #$e0
 0080c0 sta $2132
@@ -254,9 +254,16 @@
 
 
 
-008247-008251			; ROUTINE: BasicInit
 
 
+
+
+; ROUTINE: Screen off, no interupts, AXY => 8bit ($00:8247)
+008247 %setAXYto8bit()			; set A,X,Y => 8bit
+008249 stz $4200		; disable interupts and joypad
+00824c lda #$80			; 
+00824e sta $2100		; turn screen off, set brightness to $0
+008251 rts				; exit routine
 
 
 
@@ -297,7 +304,7 @@
 0082c3 lda #$0007
 0082c6 mvn $00,$00
 0082c9 lda #$0010
-0082cc tsb !ram_0111
+0082cc tsb $0111
 0082cf lda #$0000
 0082d2 jsr $ca83
 0082d5 lda #$0001
@@ -349,13 +356,13 @@
 008352 and $00dd
 008355 bne $8385
 008357 lda #$80
-008359 and !flags_d8
+008359 and $00d8
 00835c beq $8366
 
 
 
 00835e lda #$80
-008360 trb !flags_d8
+008360 trb $00d8
 008363 jmp $85b7
 008366 lda #$c0
 008368 and $00d2
@@ -450,7 +457,7 @@
 008436 sta $2115			; vram writes will be in order, increment 1 word
 
 008439 lda #$02
-00843b and !flags_d8
+00843b and $00d8
 00843e beq .ExitLoop
 
 008440 ldx #$1801
@@ -897,7 +904,7 @@
 0087e5 stz $15
 0087e7 ldx #$5e1b
 0087ea lda #$02
-0087ec and !flags_d8
+0087ec and $00d8
 0087ef beq $87f4
 0087f1 ldx #$4b7b
 0087f4 stx $16
@@ -913,7 +920,7 @@
 00880d lda $8962,x
 008810 sta $18
 008812 lda #$02
-008814 and !flags_d8
+008814 and $00d8
 008817 beq $883a
 008819 lda $8960,x
 00881c sta $7e26f6
@@ -935,53 +942,53 @@
 00884e ldx #$31c5
 008851 ldy #$3015
 008854 clc
-008855 jsr CopyByWords_x20
+008855 jsr $9891
 008858 txa
 008859 adc #$0040
 00885c tax
 00885d tya
 00885e adc #$0040
 008861 tay
-008862 jsr CopyByWords_x20
+008862 jsr $9891
 008865 txa
 008866 adc #$0040
 008869 tax
 00886a tya
 00886b adc #$0040
 00886e tay
-00886f jsr CopyByWords_x20
+00886f jsr $9891
 008872 txa
 008873 adc #$0040
 008876 tax
 008877 tya
 008878 adc #$0040
 00887b tay
-00887c jsr CopyByWords_x20
+00887c jsr $9891
 00887f txa
 008880 adc #$0040
 008883 tax
 008884 tya
 008885 adc #$0040
 008888 tay
-008889 jsr CopyByWords_x20
+008889 jsr $9891
 00888c txa
 00888d adc #$0040
 008890 tax
 008891 tya
 008892 adc #$0040
 008895 tay
-008896 jsr CopyByWords_x20
+008896 jsr $9891
 008899 txa
 00889a adc #$0040
 00889d tax
 00889e tya
 00889f adc #$0040
 0088a2 tay
-0088a3 jsr CopyByWords_x10
+0088a3 jsr $98f1
 0088a6 plb
 0088a7 %setAto8bit()
 0088a9 lda #$04
-0088ab and !flags_d8
+0088ab and $00d8
 0088ae beq $88ca
 0088b0 lda #$80
 0088b2 and $00e0
@@ -990,10 +997,10 @@
 0088b9 and $00e0
 0088bc beq $88c5
 0088be lda #$c8
-0088c0 tsb !ram_0111
+0088c0 tsb $0111
 0088c3 bra $88ca
 0088c5 lda #$c8
-0088c7 trb !ram_0111
+0088c7 trb $0111
 0088ca lda #$80
 0088cc and $00da
 0088cf beq $890c
@@ -1045,7 +1052,7 @@
 008946 lda #$0169
 008949 sta $7e3015
 00894d %setAto8bit()
-00894f lda !ram_0111
+00894f lda $0111
 008952 sta $420c
 008955 rtl
 008956 sta $2121
@@ -1411,7 +1418,7 @@
 008d29 php				; save processor status to stack
 008d2a %setAXYto8bit()			; set A,X,Y => 8bit
 008d2c lda #$02
-008d2e and !flags_d8
+008d2e and $00d8
 008d31 beq $8d6c
 008d33 ldx $10b1
 008d36 cpx #$ff
@@ -2342,9 +2349,9 @@
 0096a1 %setAto8bit()
 0096a3 pha
 0096a4 lda #$20
-0096a6 trb !flags_d8
+0096a6 trb $00d8
 0096a9 lda #$20
-0096ab and !flags_d8
+0096ab and $00d8
 0096ae beq $96a9
 0096b0 pla
 0096b1 plp
@@ -2563,7 +2570,7 @@
 00985e sbc #$003f
 009861 bcc $9874
 009863 pha
-009864 jsr CopyByWords_x20
+009864 jsr $9891
 009867 txa
 009868 adc #$003f
 00986b tax
@@ -2582,6 +2589,8 @@
 009884 pha
 009885 rts				; exit routine
 
+
+
 009886 clc
 009887 txa
 009888 adc $01,s
@@ -2591,19 +2600,111 @@
 00988e tay
 00988f pla
 009890 rts				; exit routine
+009891 lda $003e,x
+009894 sta $003e,y
+009897 lda $003c,x
+00989a sta $003c,y
+00989d lda $003a,x
+0098a0 sta $003a,y
+0098a3 lda $0038,x
+0098a6 sta $0038,y
+0098a9 lda $0036,x
+0098ac sta $0036,y
+0098af lda $0034,x
+0098b2 sta $0034,y
+0098b5 lda $0032,x
+0098b8 sta $0032,y
+0098bb lda $0030,x
+0098be sta $0030,y
+0098c1 lda $002e,x
+0098c4 sta $002e,y
+0098c7 lda $002c,x
+0098ca sta $002c,y
+0098cd lda $002a,x
+0098d0 sta $002a,y
+0098d3 lda $0028,x
+0098d6 sta $0028,y
+0098d9 lda $0026,x
+0098dc sta $0026,y
+0098df lda $0024,x
+0098e2 sta $0024,y
+0098e5 lda $0022,x
+0098e8 sta $0022,y
+0098eb lda $0020,x
+0098ee sta $0020,y
+0098f1 lda $001e,x
+0098f4 sta $001e,y
+0098f7 lda $001c,x
+0098fa sta $001c,y
+0098fd lda $001a,x
+009900 sta $001a,y
+009903 lda $0018,x
+009906 sta $0018,y
+009909 lda $0016,x
+00990c sta $0016,y
+00990f lda $0014,x
+009912 sta $0014,y
+009915 lda $0012,x
+009918 sta $0012,y
+00991b lda $0010,x
+00991e sta $0010,y
+009921 lda $000e,x
+009924 sta $000e,y
+009927 lda $000c,x
+00992a sta $000c,y
+00992d lda $000a,x
+009930 sta $000a,y
+009933 lda $0008,x
+009936 sta $0008,y
+009939 lda $0006,x
+00993c sta $0006,y
+00993f lda $0004,x
+009942 sta $0004,y
+009945 lda $0002,x
+009948 sta $0002,y
+00994b lda $0000,x
+00994e sta $0000,y
+009951 rts
 
 
 
-009891-009951			; ROUTINE: CopyByWords
+009994 jsr $9998
+009997 rtl				; exit routine
+
+
+009998 phx
+009999 cmp #$0040
+00999c bcc $99b8
+
+00999e pha
+00999f lsr a
+0099a0 lsr a
+0099a1 lsr a
+0099a2 lsr a
+0099a3 lsr a
+0099a4 lsr a
+0099a5 tax
+0099a6 clc
+0099a7 lda $03,s
+
+0099a9 jsr FillA32Times
+
+0099ac tya
+0099ad adc #$0040
+0099b0 tay
+0099b1 dex
+0099b2 bne $99a7
+0099b4 pla
+0099b5 and #$003f
+
+0099b8 tax
+0099b9 pla
+0099ba jmp ($9a1e,x)
 
 
 
-009994-009997			; ROUTINE: FillSectionWithA_LongJump
-009998-0099ba			; ROUTINE: FillSectionWithA
-0099bd-009a1d			; ROUTINE: FillWithA
-009a1e-009a5f			; JUMP: JumpTableFillWithA
 
-
+0099bd-009a1d			; ROUTINE: FillA32Times
 
 
 
@@ -2626,9 +2727,6 @@
 009a7c plb
 009a7d plp
 009a7e rtl				; exit routine
-
-
-
 009aec php
 009aed phd
 009aee pea $0000
@@ -2637,6 +2735,9 @@
 009af4 phx
 009af5 ldx #$9aff
 009af8 jsr $9bc4
+
+
+
 009afb plx
 009afc pld
 009afd plp
@@ -2809,12 +2910,12 @@
 
 
 009bd8 lda #$0004
-009bdb and !flags_d8
+009bdb and $00d8
 009bde beq .Exit
 009be0 lda #$0004
-009be3 trb !flags_d8
+009be3 trb $00d8
 009be6 lda #$00c8
-009be9 trb !ram_0111
+009be9 trb $0111
 	.Exit
 009bec rts				; exit routine
 
@@ -2927,7 +3028,7 @@
 009cdf sta $7f5010
 009ce3 sta $7f501d
 009ce7 lda #$04
-009ce9 tsb !flags_d8
+009ce9 tsb $00d8
 009cec %setAXYto16bit()
 009cee rts				; exit routine
 
@@ -2991,7 +3092,7 @@
 009d61 pha
 009d62 plb
 009d63 lda $02,s
-009d65 jsr FillSectionWithA
+009d65 jsr $9998
 009d68 plb
 009d69 pla
 009d6a rts
@@ -3104,10 +3205,10 @@
 009de7 tay
 009de8 lda $03ba86,x
 009dec and #$00ff
-009def sta !loop_counter_64
+009def sta $64
 009df1 txa
 009df2 sec
-009df3 adc !loop_counter_64
+009df3 adc $64
 009df5 tax
 009df6 dey
 009df7 bne $9de8
@@ -3326,7 +3427,7 @@
 00a1e4 lda [$17]
 00a1e6 inc $17
 00a1e8 and #$00ff
-00a1eb jmp FillSectionWithA
+00a1eb jmp $9998
 00a1ee jsl $0c8000
 00a1f2 rts				; exit routine
 
@@ -3534,7 +3635,7 @@
 
 
 00a38b lda #$0080
-00a38e tsb !flags_d8
+00a38e tsb $00d8
 00a391 jsl $0c8000
 00a395 lda #$0008
 00a398 trb $00d4
@@ -3907,22 +4008,22 @@
 00a7f2 lda [$17]
 00a7f4 inc $17
 00a7f6 and #$00ff
-00a7f9 sta !loop_counter_64
-00a7fb stx !loop_counter_62
+00a7f9 sta $64
+00a7fb stx $62
 00a7fd %setAto16bit()
 00a7ff %setXYto8bit()
 00a801 pei ($17)
 00a803 ldx $19
 00a805 phx
 00a806 pei ($3d)
-00a808 lda !loop_counter_64
+00a808 lda $64
 00a80a and #$00ff
 00a80d clc
-00a80e adc !loop_counter_62
+00a80e adc $62
 00a810 sta $3d
 00a812 ldx $65
 00a814 stx $19
-00a816 lda !loop_counter_62
+00a816 lda $62
 00a818 sta $17
 00a81a lda #$0008
 00a81d and $00db
@@ -4056,7 +4157,7 @@
 00a907 and #$00ff
 00a90a dec
 00a90b jmp $0030
-00a90e stz !loop_counter_62
+00a90e stz $62
 00a910 lda [$17]
 00a912 inc $17
 00a914 inc $17
@@ -4072,7 +4173,7 @@
 00a927 lda [$17]
 00a929 inc $17
 00a92b and #$00ff
-00a92e ora !loop_counter_62
+00a92e ora $62
 00a930 sta $31
 00a932 lda [$17]
 00a934 inc $17
@@ -4328,7 +4429,7 @@
 00aaf3 jmp $a8d1
 00ab07 lda $2b
 00ab09 and #$00ff
-00ab0c sta !loop_counter_62
+00ab0c sta $62
 00ab0e lda $2a
 00ab10 and #$00ff
 00ab13 asl a
@@ -4344,7 +4445,7 @@
 00ab20 jsr $ab9f
 00ab23 lda #$4000
 00ab26 ora $1d
-00ab28 sta !loop_counter_64
+00ab28 sta $64
 00ab2a jsr $b4a7
 00ab2d sec
 00ab2e lda $1a
@@ -4355,7 +4456,7 @@
 00ab3a beq $ab44
 00ab3c jsr $a8d1
 00ab3f lda #$8000
-00ab42 tsb !loop_counter_64
+00ab42 tsb $64
 00ab44 %setAto8bit()
 00ab46 lda $22
 00ab48 lsr a
@@ -4364,7 +4465,7 @@
 00ab4b cmp $28
 00ab4d bcs $ab52
 00ab52 sbc $28
-00ab54 sta !loop_counter_62
+00ab54 sta $62
 00ab56 lda $22
 00ab58 cmp #$78
 00ab5a bcc $ab64
@@ -4372,27 +4473,27 @@
 00ab5e lda $24
 00ab60 bit #$01
 00ab62 beq $ab6a
-00ab64 inc !loop_counter_62
+00ab64 inc $62
 00ab66 lda #$40
 00ab68 trb $65
-00ab6a lda !loop_counter_62
+00ab6a lda $62
 00ab6c inc
 00ab6d cmp $2a
 00ab6f bcc $ab77
 00ab77 %setAXYto16bit()
-00ab79 lda !loop_counter_62
+00ab79 lda $62
 00ab7b and #$00ff
 00ab7e asl a
 00ab7f tay
 00ab80 lda #$00fd
-00ab83 eor !loop_counter_64
+00ab83 eor $64
 00ab85 sta ($1a),y
 00ab87 rts				; exit routine
 00ab88 lda #$00fc
 00ab8b jsr $ad2d
 00ab8e lda #$00ff
 00ab91 jsr $ad44
-00ab94 inc !loop_counter_62
+00ab94 inc $62
 00ab96 lda #$80fc
 00ab99 jsr $ad85
 00ab9c jmp $aca6
@@ -4406,7 +4507,7 @@
 00abaa dec
 00abab dec
 00abac jsr $abfc
-00abaf inc !loop_counter_62
+00abaf inc $62
 00abb1 lda #$80fc
 00abb4 jsr $ad85
 00abb7 jmp $aca6
@@ -4427,7 +4528,7 @@
 00abd1 jsr $ad2d
 00abd4 lda #$00ff
 00abd7 jsr $ad44
-00abda inc !loop_counter_62
+00abda inc $62
 00abdc lda #$8045
 00abdf jsr $ad85
 00abe2 jmp $acd3
@@ -4435,16 +4536,16 @@
 00abe8 jsr $ad2d
 00abeb lda #$00ff
 00abee jsr $ad44
-00abf1 inc !loop_counter_62
+00abf1 inc $62
 00abf3 lda #$8075
 00abf6 jsr $ad85
 00abf9 jmp $ad00
-00abfc sta !loop_counter_62
+00abfc sta $62
 00abfe txa
 00abff asl a
 00ac00 eor #$ffff
 00ac03 adc #$ac97
-00ac06 sta !loop_counter_64
+00ac06 sta $64
 00ac08 txa
 00ac09 lsr a
 00ac0a pha
@@ -4507,7 +4608,7 @@
 00ac97 adc #$0040
 00ac9a tay
 00ac9b lda $01,s
-00ac9d dec !loop_counter_62
+00ac9d dec $62
 00ac9f beq $aca4
 00aca1 jmp $ac0b
 00aca4 pla
@@ -4586,7 +4687,7 @@
 00ad39 asl a
 00ad3a tax
 00ad3b lda #$0001
-00ad3e sta !loop_counter_62
+00ad3e sta $62
 00ad40 pla
 00ad41 jmp $ad85
 00ad44 pha
@@ -4594,7 +4695,7 @@
 00ad47 and #$00ff
 00ad4a dec
 00ad4b dec
-00ad4c sta !loop_counter_62
+00ad4c sta $62
 00ad4e pla
 00ad4f jmp $ad85
 00ad52 lda $2a
@@ -4606,15 +4707,15 @@
 00ad5c and #$00ff
 00ad5f dec
 00ad60 dec
-00ad61 sta !loop_counter_62
+00ad61 sta $62
 00ad63 rts
 00ad64 eor $1d
-00ad66 sta !loop_counter_64
+00ad66 sta $64
 00ad68 lda $1a
 00ad6a adc #$0040
 00ad6d sta $1a
-00ad6f ldx !loop_counter_62
-00ad71 lda !loop_counter_64
+00ad6f ldx $62
+00ad71 lda $64
 00ad73 sta ($1a)
 00ad75 eor #$4000
 00ad78 sta ($1a),y
@@ -4625,13 +4726,13 @@
 00ad82 bne $ad71
 00ad84 rts
 00ad85 eor $1d
-00ad87 sta !loop_counter_64
+00ad87 sta $64
 00ad89 jsr ($9a1e,x)
 00ad8c tya
 00ad8d adc #$0040
 00ad90 tay
-00ad91 lda !loop_counter_64
-00ad93 dec !loop_counter_62
+00ad91 lda $64
+00ad93 dec $62
 00ad95 bne $ad89
 00ad97 rts
 
@@ -4640,7 +4741,7 @@
 00ad98 lda [$17]
 00ad9a inc $17
 00ad9c and #$00ff
-00ad9f sta !loop_counter_62
+00ad9f sta $62
 00ada1 ldy #$31c5
 00ada4 lda #$01f0
 00ada7 pea $007e
@@ -4653,7 +4754,7 @@
 00adb4 tay
 00adb5 txa
 00adb6 adc #$fff8
-00adb9 dec !loop_counter_62
+00adb9 dec $62
 00adbb bne $adac
 00adbd plb
 00adbe rts				; exit routine
@@ -4662,40 +4763,40 @@
 
 00adbf lda $2c
 00adc1 and #$00ff
-00adc4 sta !loop_counter_64
+00adc4 sta $64
 00adc6 asl a
 00adc7 adc #$31b5
 00adca tay
 00adcb lda #$01f9
-00adce sbc !loop_counter_64
+00adce sbc $64
 00add0 pea $007e
 00add3 plb
-00add4 sta !loop_counter_64
+00add4 sta $64
 00add6 and #$0007
 00add9 asl a
 00adda tax
-00addb lda !loop_counter_64
+00addb lda $64
 00addd and #$fff8
 00ade0 adc #$0008
 00ade3 jsr ($9a1e,x)
 00ade6 sbc #$0007
 00ade9 tax
-00adea lda !loop_counter_64
+00adea lda $64
 00adec and #$0007
-00adef sta !loop_counter_64
-00adf1 sty !loop_counter_62
+00adef sta $64
+00adf1 sty $62
 00adf3 asl a
-00adf4 adc !loop_counter_62
+00adf4 adc $62
 00adf6 tay
 00adf7 sec
 00adf8 lda $2d
-00adfa sbc !loop_counter_64
+00adfa sbc $64
 00adfc and #$00ff
 00adff pha
 00ae00 lsr a
 00ae01 lsr a
 00ae02 lsr a
-00ae03 sta !loop_counter_62
+00ae03 sta $62
 00ae05 txa
 00ae06 sec
 00ae07 tax
@@ -4705,14 +4806,14 @@
 00ae0f tay
 00ae10 txa
 00ae11 adc #$fff8
-00ae14 dec !loop_counter_62
+00ae14 dec $62
 00ae16 bne $ae07
-00ae18 sta !loop_counter_64
+00ae18 sta $64
 00ae1a pla
 00ae1b and #$0007
 00ae1e asl a
 00ae1f tax
-00ae20 lda !loop_counter_64
+00ae20 lda $64
 00ae22 jsr ($9a1e,x)
 00ae25 plb
 00ae26 rts				; exit routine
@@ -4735,7 +4836,7 @@
 00ae42 sta $01,s
 00ae44 lda $2b
 00ae46 and #$00ff
-00ae49 sta !loop_counter_62
+00ae49 sta $62
 00ae4b lda [$17]
 00ae4d and #$00ff
 00ae50 beq $ae6a
@@ -4762,7 +4863,7 @@
 00ae74 adc $01,s
 00ae76 sta $01,s
 00ae78 inc $17
-00ae7a dec !loop_counter_62
+00ae7a dec $62
 00ae7c bne $ae4b
 00ae7e pla
 00ae7f plb
@@ -5163,12 +5264,12 @@
 00b1c3 lda [$17]
 00b1c5 inc $17
 00b1c7 and #$00ff
-00b1ca sta !loop_counter_64
+00b1ca sta $64
 00b1cc sec
 00b1cd lda $a0
 00b1cf bne $b1d5
 00b1d1 lda $9e
-00b1d3 cmp !loop_counter_64
+00b1d3 cmp $64
 00b1d5 rts
 
 
@@ -5176,12 +5277,12 @@
 00b1d6 lda [$17]
 00b1d8 inc $17
 00b1da inc $17
-00b1dc sta !loop_counter_64
+00b1dc sta $64
 00b1de sec
 00b1df lda $a0
 00b1e1 bne $b1e7
 00b1e3 lda $9e
-00b1e5 cmp !loop_counter_64
+00b1e5 cmp $64
 00b1e7 rts				; exit routine
 
 
@@ -5189,16 +5290,16 @@
 00b1e8 lda [$17]
 00b1ea inc $17
 00b1ec inc $17
-00b1ee sta !loop_counter_64
+00b1ee sta $64
 00b1f0 lda [$17]
 00b1f2 inc $17
 00b1f4 and #$00ff
-00b1f7 sta !loop_counter_62
+00b1f7 sta $62
 00b1f9 lda $a0
-00b1fb cmp !loop_counter_62
+00b1fb cmp $62
 00b1fd bne $b203
 00b1ff lda $9e
-00b201 cmp !loop_counter_64
+00b201 cmp $64
 00b203 rts				; exit routine
 
 
@@ -5209,12 +5310,12 @@
 00b20a tax
 00b20b lda $0000,x
 00b20e and #$00ff
-00b211 sta !loop_counter_64
+00b211 sta $64
 00b213 sec
 00b214 lda $a0
 00b216 bne $b21c
 00b218 lda $9e
-00b21a cmp !loop_counter_64
+00b21a cmp $64
 00b21c rts				; exit routine
 
 
@@ -5238,9 +5339,9 @@
 00b235 tax
 00b236 lda $0002,x
 00b239 and #$00ff
-00b23c sta !loop_counter_64
+00b23c sta $64
 00b23e lda $a0
-00b240 cmp !loop_counter_64
+00b240 cmp $64
 00b242 bne $b249
 00b244 lda $9e
 00b246 cmp $0000,x
@@ -5494,10 +5595,10 @@
 00b478 txa
 00b479 and #$38
 00b47b asl a
-00b47c sta !loop_counter_64
+00b47c sta $64
 00b47e txa
 00b47f and #$07
-00b481 adc !loop_counter_64
+00b481 adc $64
 00b483 asl a
 00b484 %setAto16bit()
 00b486 %setXYto8bit()			; set X,Y => 8bit
@@ -5545,7 +5646,7 @@
 00b4ef lda [$17]
 00b4f1 inc $17
 00b4f3 and #$00ff
-00b4f6 sta !loop_counter_64
+00b4f6 sta $64
 00b4f8 lda $63
 00b4fa and #$ff00
 00b4fd lsr a
@@ -5553,14 +5654,14 @@
 00b4ff adc #$1100
 00b502 sta $9e
 00b504 ldy #$0010
-00b507 stz !loop_counter_62
+00b507 stz $62
 00b509 %setAto8bit()
 00b50b stz $a0
 00b50d lda $1100,x
 00b510 inx
 00b511 cmp #$80
 00b513 bcc $b51c
-00b515 inc !loop_counter_62
+00b515 inc $62
 00b517 dey
 00b518 bne $b50d
 00b51c dey
@@ -5572,15 +5673,15 @@
 00b527 inc $63
 00b529 dey
 00b52a bne $b51f
-00b52c lda !loop_counter_62
+00b52c lda $62
 00b52e cmp $63
 00b530 bcs $b534
 00b532 lda $63
-00b534 sta !loop_counter_62
+00b534 sta $62
 00b536 sec
 00b537 lda $2a
 00b539 sbc #$02
-00b53b sbc !loop_counter_62
+00b53b sbc $62
 00b53d lsr a
 00b53e clc
 00b53f adc $25
@@ -5667,7 +5768,7 @@
 00b60f lda #$0e
 00b611 adc $2d
 00b613 sta $2d
-00b615 sta !loop_counter_64
+00b615 sta $64
 00b617 adc #$05
 00b619 cmp $23
 00b61b bcs $b630
@@ -5703,12 +5804,12 @@
 00b66b bne $b674
 00b66d sec
 00b66e lda $23
-00b670 sbc !loop_counter_64
+00b670 sbc $64
 00b672 bra $b679
 00b674 clc
 00b675 lda $23
 00b677 adc #$10
-00b679 sta !loop_counter_62
+00b679 sta $62
 00b67b lda $00c8
 00b67e cmp #$00
 00b680 bne $b68e
@@ -5721,15 +5822,15 @@
 00b690 and $00e0
 00b693 beq $b6b1
 00b695 lda $0181
-00b698 cmp !loop_counter_62
+00b698 cmp $62
 00b69a bcc $b6a4
-00b69c sbc !loop_counter_62
-00b69e cmp !loop_counter_64
+00b69c sbc $62
+00b69e cmp $64
 00b6a0 bcs $b6b1
 00b6a2 bra $b6ab
-00b6a4 adc !loop_counter_64
+00b6a4 adc $64
 00b6a6 dec
-00b6a7 cmp !loop_counter_62
+00b6a7 cmp $62
 00b6a9 bcc $b6b1
 00b6ab lda $24
 00b6ad eor #$0c
@@ -5743,19 +5844,19 @@
 00b6b5 cmp #$00de
 00b6b8 beq $b6d5
 00b6ba jsr DecompressAddress
-00b6bd sta !loop_counter_62
+00b6bd sta $62
 00b6bf %setAXYto8bit()			; set A,X,Y => 8bit
 00b6c1 ldx $9e
 00b6c3 lda $049800,x
 00b6c7 asl a
 00b6c8 asl a
-00b6c9 sta !loop_counter_64
+00b6c9 sta $64
 00b6cb lda #$02
 00b6cd tsb $00d4
 00b6d0 jsl $0c8000
 00b6d4 rts				; exit routine
 00b6d5 lda #$0001
-00b6d8 sta !loop_counter_62
+00b6d8 sta $62
 00b6da %setAXYto8bit()
 00b6dc lda #$20
 00b6de bra $b6c9
@@ -5816,7 +5917,7 @@
 00b761 beq $b76b
 00b76b inc $0162
 00b76e bra $b72e
-00b770 %setAto8bit()
+00b770 %setAto16bit()
 00b772 inc $0162
 00b775 lda $0163
 00b778 cmp $0162
@@ -5834,7 +5935,7 @@
 00b82c phb
 00b82d pha
 00b82e phx
-00b82f %setAto8bit()
+00b82f %setAto16bit()
 00b831 phk
 00b832 plb
 00b833 stz $4200
@@ -5872,7 +5973,7 @@
 00b878 phd
 00b879 phy
 00b87a jsr $8b69
-00b87d %setAto8bit()
+00b87d %setAto16bit()
 00b87f lda #$07
 00b881 sta $4209
 00b884 ldx #$b898
@@ -5880,7 +5981,7 @@
 00b88a lda $0112
 00b88d sta $4200
 00b890 lda #$40
-00b892 tsb !flags_d8
+00b892 tsb $00d8
 00b895 ply
 00b896 pld
 00b897 rti
@@ -5888,7 +5989,7 @@
 00b89a phb
 00b89b pha
 00b89c phx
-00b89d %setAto8bit()
+00b89d %setAto16bit()
 00b89f phk
 00b8a0 plb
 00b8a1 stz $4200
@@ -5926,7 +6027,7 @@
 00b8e6 jsr $8ba0
 00b8e9 phy
 00b8ea jsr $8b88
-00b8ed %setAto8bit()
+00b8ed %setAto16bit()
 00b8ef lda #$d8
 00b8f1 sta $4209
 00b8f4 ldx #$b82a
@@ -5934,7 +6035,7 @@
 00b8fa lda $0112
 00b8fd sta $4200
 00b900 lda #$20
-00b902 tsb !flags_d8
+00b902 tsb $00d8
 00b905 ply
 00b906 pld
 00b907 rti
@@ -6078,7 +6179,7 @@
 00ba25 ldx #$bae7
 00ba28 jsr $9bc4
 00ba2b lda #$10
-00ba2d trb !ram_0111
+00ba2d trb $0111
 00ba30 jsl $0c8000
 00ba34 stz $2112
 00ba37 stz $2112
@@ -6093,7 +6194,7 @@
 00ba4e cmp #$d0
 00ba50 bne $ba41
 00ba52 lda #$10
-00ba54 tsb !ram_0111
+00ba54 tsb $0111
 00ba57 %setAXYto16bit()
 00ba59 stz $00cc
 00ba5c lda #$060d
@@ -6141,7 +6242,7 @@
 00bac5 beq $ba6d
 00bac7 dey
 00bac8 sty $00cc
-00bacb %setAto8bit()
+00bacb %setAto16bit()
 00bacd lda #$03
 00bacf bra $bab4
 00bad1 lda $00cc
@@ -6341,7 +6442,7 @@
 00bc9c php				; save processor status to stack
 00bc9d %setAXYto8bit()			; set A,X,Y => 8bit
 00bc9f lda #$01
-00bca1 tsb !flags_d8
+00bca1 tsb $00d8
 00bca4 plp
 00bca5 php				; save processor status to stack
 00bca6 phb				; save databank to stack
@@ -6355,7 +6456,7 @@
 00bcb7 jsl $00c7d8
 00bcbb jsr $baf0
 00bcbe lda #$0001
-00bcc1 and !flags_d8
+00bcc1 and $00d8
 00bcc4 bne $bccb
 00bcc6 jsr $c7fe
 00bcc9 bra $bcce
@@ -6454,7 +6555,7 @@
 00bdb9 phk
 00bdba plb
 00bdbb lda #$0001
-00bdbe and !flags_d8
+00bdbe and $00d8
 00bdc1 bne $be1a
 00bdc3 lda #$fff0
 00bdc6 sta $8e
@@ -6487,7 +6588,7 @@
 00be15 jsr $9bc4
 00be18 bra $bdcd
 00be1a lda #$0001
-00be1d trb !flags_d8
+00be1d trb $00d8
 00be20 lda #$0080
 00be23 tsb $00de
 00be26 pei ($01)
@@ -6516,9 +6617,9 @@
 00be52 lda $02
 00be54 and #$00ff
 00be57 asl a
-00be58 sta !loop_counter_64
+00be58 sta $64
 00be5a asl a
-00be5b adc !loop_counter_64
+00be5b adc $64
 00be5d tax
 00be5e stz $01
 00be60 stz $05
@@ -6668,7 +6769,7 @@
 00bfff lda #$0080
 00c002 dec $0e9f,x
 00c005 tax
-00c006 %setAto8bit()
+00c006 %setAto16bit()
 00c008 stz $1021,x
 00c00b %setAXYto16bit()
 00c00d bra $bfe0
@@ -6779,7 +6880,7 @@
 00c13c jmp $c0ad
 00c13f jsr $c1d1
 00c142 beq $c158
-00c144 %setAto8bit()
+00c144 %setAto16bit()
 00c146 cmp #$01
 00c148 beq $c14d
 00c14a stz $1021
@@ -6793,9 +6894,9 @@
 00c160 pha
 00c161 lda $1025,x
 00c164 and #$00ff
-00c167 sta !loop_counter_64
+00c167 sta $64
 00c169 asl a
-00c16a adc !loop_counter_64
+00c16a adc $64
 00c16c lsr a
 00c16d clc
 00c16e adc #$0032
@@ -7052,7 +7153,7 @@
 00c3b8 bit #$0c00
 00c3bb beq $c372
 00c3bd lda #$0000
-00c3c0 %setAto8bit()
+00c3c0 %setAto16bit()
 00c3c2 lda #$ec
 00c3c4 sta $7f56da
 00c3c8 sta $7f56dc
@@ -7194,7 +7295,7 @@
 00c52e mvn $00,$00
 00c531 %setAto8bit()
 00c533 lda #$c0
-00c535 tsb !ram_0111
+00c535 tsb $0111
 00c538 %setAXYto16bit()
 00c53a rts				; exit routine
 
@@ -7391,7 +7492,7 @@
 
 00c749 and #$0080
 00c74c beq $c75e
-00c74e %setAto8bit()
+00c74e %setAto16bit()
 00c750 tya
 00c751 sta $0000,x
 00c754 txy
@@ -7437,7 +7538,7 @@
 
 00c7ad %setAto8bit()
 00c7af lda #$c0
-00c7b1 trb !ram_0111
+00c7b1 trb $0111
 00c7b4 rts				; exit routine
 
 
@@ -7793,11 +7894,11 @@
 00cac5 pla
 00cac6 jsr $c9f3
 00cac9 lda #$0000
-00cacc sta !loop_counter_64
+00cacc sta $64
 00cace lda #$fff0
 00cad1 sta $8e
 00cad3 jmp $981b
-00cad6 lda !loop_counter_64
+00cad6 lda $64
 00cad8 rts				; exit routine
 
 
@@ -7873,7 +7974,7 @@
 00cbc1 lda #$0080
 00cbc4 tsb $00da
 00cbc7 lda #$0020
-00cbca tsb !ram_0111
+00cbca tsb $0111
 00cbcd lda $02
 00cbcf and #$00ff
 00cbd2 inc
@@ -7923,7 +8024,7 @@
 00cc6b lda #$08
 00cc6d trb $00d4
 00cc70 lda #$20
-00cc72 trb !ram_0111
+00cc72 trb $0111
 00cc75 lda #$80
 00cc77 trb $00da
 00cc7a rts				; exit routine
@@ -7949,7 +8050,7 @@
 00cc9e lda #$0080
 00cca1 tsb $00da
 00cca4 lda #$0020
-00cca7 tsb !ram_0111
+00cca7 tsb $0111
 00ccaa %setAto8bit()
 00ccac lda #$08
 00ccae tsb $00d4
@@ -7995,7 +8096,7 @@
 00cd1f lda #$08
 00cd21 trb $00d4
 00cd24 lda #$20
-00cd26 trb !ram_0111
+00cd26 trb $0111
 00cd29 lda #$80
 00cd2b trb $00da
 00cd2e rts				; exit routine
@@ -8301,9 +8402,9 @@
 00cf8f dec
 00cf90 and #$0003
 00cf93 asl a
-00cf94 sta !loop_counter_64
+00cf94 sta $64
 00cf96 asl a
-00cf97 adc !loop_counter_64
+00cf97 adc $64
 00cf99 adc #$cfa5
 00cf9c tay
 00cf9d pla
@@ -8466,7 +8567,7 @@
 00d130 inc $1094
 00d133 jsl $00c7d8
 00d137 lda #$008f
-00d13a trb !ram_0111
+00d13a trb $0111
 00d13d lda #$0010
 00d140 tsb $00d6
 00d143 jsl $0c8000
@@ -8595,7 +8696,7 @@
 00d25e lda #$0004
 00d261 mvn $00,$00
 00d264 lda #$0040
-00d267 tsb !ram_0111
+00d267 tsb $0111
 00d26a rts				; exit routine
 
 
@@ -8615,7 +8716,7 @@
 00d29f lda !menu_color_high
 00d2a2 sta $2122
 00d2a5 lda #$40
-00d2a7 trb !ram_0111
+00d2a7 trb $0111
 00d2aa stz $210e
 00d2ad stz $210e
 00d2b0 rts				; exit routine
@@ -8624,8 +8725,8 @@
 
 00d2b1 %setAXYto8bit()			; set A,X,Y => 8bit
 00d2b3 lda #$40
-00d2b5 trb !ram_0111
-00d2b8 lda !ram_0111
+00d2b5 trb $0111
+00d2b8 lda $0111
 00d2bb sta $420c
 00d2be rts				; exit routine
 
@@ -9189,7 +9290,7 @@
 00d79f and #$0007
 00d7a2 ora #$0200
 00d7a5 tax
-00d7a6 %setAto8bit()
+00d7a6 %setAto16bit()
 00d7a8 bra $d801
 00d7aa bit #$01
 00d7ac beq $d7b7
@@ -9571,7 +9672,7 @@
 00db16 lda #$63
 00db18 rts
 00db19 adc $0166
-00db1c cmp #!loop_counter_64
+00db1c cmp #$64
 00db1e bcc $db2c
 00db20 sbc #$63
 00db22 eor #$ff
@@ -9856,7 +9957,7 @@
 00de04 sta $5c
 00de06 sta $58
 00de08 stz $5a
-00de0a cmp !loop_counter_62
+00de0a cmp $62
 00de0c beq $de11
 00de0e jsr $df48
 00de11 pld
@@ -10018,7 +10119,7 @@
 00df67 lda $4216
 00df6a pea $007f
 00df6d plb
-00df6e jsr FillSectionWithA
+00df6e jsr $9998
 00df71 plb
 00df72 clc
 00df73 lda $5c
@@ -10028,7 +10129,7 @@
 00df7c lda $4216
 00df7f pea $007f
 00df82 plb
-00df83 jsr FillSectionWithA
+00df83 jsr $9998
 00df86 plb
 00df87 clc
 00df88 lda $4216
@@ -10209,7 +10310,7 @@
 00e0ab lda #$005e
 00e0ae tcd
 00e0af jsr $ddfa
-00e0b2 lda !loop_counter_62
+00e0b2 lda $62
 00e0b4 cmp $58
 00e0b6 bne $e127
 00e0b8 jsl $0c8000
@@ -10234,8 +10335,8 @@
 00e0eb tsb $00d0
 00e0ee sec
 00e0ef lda $66
-00e0f1 sbc !loop_counter_64
-00e0f3 tsb !loop_counter_62
+00e0f1 sbc $64
+00e0f3 tsb $62
 00e0f5 lda #$0010
 00e0f8 and $00da
 00e0fb bne $e11e
@@ -10790,7 +10891,7 @@
 00eb7b lsr a
 00eb7c lsr a
 00eb7d adc $4216
-00eb80 sta !loop_counter_62
+00eb80 sta $62
 00eb82 rts				; exit routine
 
 
@@ -10818,7 +10919,7 @@
 00eb98 lda #$0750
 00eb9b pea $007f
 00eb9e plb
-00eb9f jsr FillSectionWithA
+00eb9f jsr $9998
 00eba2 plb
 00eba3 rts				; exit routine
 
@@ -10833,7 +10934,7 @@
 00ebaa lda #$0750
 00ebad pea $007f
 00ebb0 plb
-00ebb1 jsr FillSectionWithA
+00ebb1 jsr $9998
 00ebb4 plb
 00ebb5 rts				; exit routine
 
@@ -11373,10 +11474,11 @@
 
 
 
+; END OF BANK 00
 
-;--------------------------------------------------------------------
-;						BANK $01
-;--------------------------------------------------------------------
+
+
+; START OF BANK 01
 
 
 
@@ -11665,7 +11767,7 @@
 
 
 
-01831f %setAto8bit()
+01831f %setAto16bit()
 018321 %setXYto16bit()
 018323 phb
 018324 lda !ram_19a5
@@ -11739,7 +11841,7 @@
 01852a plb
 01852b %setAXYto16bit()
 01852d inc $19a6
-018530 %setAto8bit()
+018530 %setAto16bit()
 018532 stz $19f7
 018535 lda !ram_19a5
 018538 inc
@@ -11860,17 +11962,17 @@
 018631 lda $080f
 018634 adc #$0018
 018637 sta $080f
-01863a %setAto8bit()
+01863a %setAto16bit()
 01863c ldx #$2601
 01863f stx $4310
 018642 ldx #$0800
 018645 stx $4312
 018648 stz $4314
 01864b lda #$02
-01864d tsb !ram_0111
+01864d tsb $0111
 018650 rts
 018651 lda #$02
-018653 trb !ram_0111
+018653 trb $0111
 018656 stz $2123
 018659 stz $2124
 01865c stz $2125
@@ -11890,7 +11992,7 @@
 01867c adc $08
 01867e and #$01ff
 018681 sta $00
-018683 %setAto8bit()
+018683 %setAto16bit()
 018685 sta $210d
 018688 xba
 018689 sta $210d
@@ -11900,7 +12002,7 @@
 018691 adc $0a
 018693 and #$00ff
 018696 sta $02
-018698 %setAto8bit()
+018698 %setAto16bit()
 01869a sta $210e
 01869d xba
 01869e sta $210e
@@ -12133,7 +12235,7 @@
 018905 sta $192b
 018908 plp
 018909 rts				; exit routine
-018a2c %setAto8bit()
+018a2c %setAto16bit()
 018a2e %setXYto16bit()
 018a30 phk
 018a31 plb
@@ -12319,7 +12421,7 @@
 018b80 plp				; restore process status from stack
 018b81 rts				; exit routine
 018b82 php
-018b83 %setAto8bit()
+018b83 %setAto16bit()
 018b85 %setAXYto16bit()
 018b87 lda #$4030
 018b8a tsb $008e
@@ -12632,7 +12734,7 @@
 018dfd rts				; exit routine
 
 
-018e06 %setAto8bit()
+018e06 %setAto16bit()
 018e08 %setXYto16bit()
 018e0a lda !ram_19a5
 018e0d beq $8e12
@@ -12686,7 +12788,7 @@
 018e7e inc $cef0
 018e81 inc $cef2
 018e84 plb
-018e85 %setAto8bit()
+018e85 %setAto16bit()
 018e87 %setXYto16bit()
 018e89 lda #$00
 018e8b xba
@@ -13037,9 +13139,9 @@
 019316 jsl $0c8000
 01931a lda $0110
 01931d bpl $9316
-01931f lda !ram_0111
+01931f lda $0111
 019322 pha
-019323 stz !ram_0111
+019323 stz $0111
 019326 stz $420c
 019329 jsl $0b841d
 01932d jsr CopyWram7FD274ToVram
@@ -13051,7 +13153,7 @@
 01933f jsr $fe6b
 019342 jsr $8672
 019345 pla
-019346 sta !ram_0111
+019346 sta $0111
 019349 jsl $00bd2a
 01934d jsr $912a
 019350 inc $19f7
@@ -13124,7 +13226,7 @@
 0193f4 ldy $1991
 0193f7 cpy #$0000
 0193fa bmi $944c
-0193fc %setAto8bit()
+0193fc %setAto16bit()
 0193fe ldx $19c1
 019401 stx !ram_19bd
 019404 ldx $19c3
@@ -13159,7 +13261,7 @@
 019445 ldy $1991
 019448 dey
 019449 sty $1991
-01944c %setAto8bit()
+01944c %setAto16bit()
 01944e %setXYto16bit()
 019450 lda #$02
 019452 sta !ram_1a46
@@ -13240,7 +13342,7 @@
 019507 jsr $9511
 01950a plp
 01950b rts
-019511 %setAto8bit()
+019511 %setAto16bit()
 019513 %setXYto16bit()
 019515 php
 019516 lda #$00
@@ -14813,7 +14915,7 @@
 01a2a5 phb
 01a2a6 php
 01a2a7 phd
-01a2a8 %setAto8bit()
+01a2a8 %setAto16bit()
 01a2aa %setXYto16bit()
 01a2ac lda $19df
 01a2af cmp #$ff
@@ -14894,7 +14996,7 @@
 01a34a phb
 01a34b php
 01a34c phd
-01a34d %setAto8bit()
+01a34d %setAto16bit()
 01a34f %setXYto16bit()
 01a351 lda $19e1
 01a354 cmp #$ff
@@ -16953,7 +17055,7 @@
 01b42b jsr $c6a0
 01b42e rts				; exit routine
 01b457 ldx #$bdeb
-01b45a %setAto8bit()
+01b45a %setAto16bit()
 01b45c %setXYto16bit()
 01b45e phb
 01b45f pea $0006
@@ -17052,7 +17154,7 @@
 01b54c tax
 01b54d jmp ($b550,x)
 01b574 phb
-01b575 %setAto8bit()
+01b575 %setAto16bit()
 01b577 %setXYto16bit()
 01b579 jsr $a5a9
 01b57c lda #$7f
@@ -17068,7 +17170,7 @@
 01b598 lda #$0010
 01b59b sta $192d
 01b59e php
-01b59f %setAto8bit()
+01b59f %setAto16bit()
 01b5a1 %setXYto16bit()
 01b5a3 pea $7f00
 01b5a6 plb
@@ -17100,7 +17202,7 @@
 01b5e0 sta $00192f
 01b5e4 bne $b5d1
 01b5e6 php
-01b5e7 %setAto8bit()
+01b5e7 %setAto16bit()
 01b5e9 %setXYto16bit()
 01b5eb jsr $8df2
 01b5ee lda #$04
@@ -17115,7 +17217,7 @@
 01b602 jsr $cfa6
 01b605 jsr $d0ba
 01b608 rts
-01b609 %setAto8bit()
+01b609 %setAto16bit()
 01b60b %setXYto16bit()
 01b60d jsr $b0c7
 01b610 rts
@@ -17296,7 +17398,7 @@
 01b7b3 tax
 01b7b4 jsr ($b7b8,x)
 01b7b7 rts				; exit routine
-01b816 %setAto8bit()
+01b816 %setAto16bit()
 01b818 %setXYto16bit()
 01b81a lda #$03
 01b81c sta $19f6
@@ -17364,7 +17466,7 @@
 01b8b0 bne $b881
 01b8b2 rts
 01b8b3 php
-01b8b4 %setAto8bit()
+01b8b4 %setAto16bit()
 01b8b6 %setXYto16bit()
 01b8b8 jsr $8df2
 01b8bb lda #$01
@@ -17386,7 +17488,7 @@
 01b8d6 jsr $d6bc
 01b8d9 plp				; restore processor status from stack
 01b8da rts				; exit routine
-01b8e4 %setAto8bit()
+01b8e4 %setAto16bit()
 01b8e6 %setXYto16bit()
 01b8e8 jsr $d2de
 01b8eb jsr $d35c
@@ -17401,7 +17503,7 @@
 01b906 lda #$0c
 01b908 jsr $d49a
 01b90b rts
-01b90c %setAto8bit()
+01b90c %setAto16bit()
 01b90e %setXYto16bit()
 01b910 jsr $d2de
 01b913 jsr $d35c
@@ -17618,7 +17720,7 @@
 01badf jsr $b73b
 01bae2 jsr $c6a0
 01bae5 rts				; exit routine
-01baf9 %setAto8bit()
+01baf9 %setAto16bit()
 01bafb %setXYto16bit()
 01bafd lda $19ee
 01bb00 jsr $b1ea
@@ -17658,7 +17760,7 @@
 01bb4c lda $1a79,x
 01bb4f sta $0c0e,y
 01bb52 rts
-01bb53 %setAto8bit()
+01bb53 %setAto16bit()
 01bb55 %setXYto16bit()
 01bb57 lda $1916
 01bb5a and #$e0
@@ -17776,7 +17878,7 @@
 01bc62 sta $19ee
 01bc65 bra $bc1a
 01bc68 php
-01bc69 %setAto8bit()
+01bc69 %setAto16bit()
 01bc6b %setXYto16bit()
 01bc6d jsr $cf9d
 01bc70 bcc $bcda
@@ -17833,7 +17935,7 @@
 01bcd7 jsr $82d8
 01bcda rts
 01bd1c php
-01bd1d %setAto8bit()
+01bd1d %setAto16bit()
 01bd1f %setXYto16bit()
 01bd21 jsr $cf9d
 01bd24 bcc $bd61
@@ -17877,7 +17979,7 @@
 01bdd4 bcc $bdd9
 01bdd6 jsr $c4d1
 01bdd9 rts
-01bdf3 %setAto8bit()
+01bdf3 %setAto16bit()
 01bdf5 %setXYto16bit()
 01bdf7 jsr $cf9d
 01bdfa bcc $be27
@@ -17903,7 +18005,7 @@
 01be24 dey
 01be25 bne $be11
 01be27 rts
-01be28 %setAto8bit()
+01be28 %setAto16bit()
 01be2a %setXYto16bit()
 01be2c jsr $cf9d
 01be2f bcc $be66
@@ -17920,7 +18022,7 @@
 01be48 dey
 01be49 bne $be3d
 01be4b php
-01be4c %setAto8bit()
+01be4c %setAto16bit()
 01be4e %setXYto16bit()
 01be50 jsr $be02
 01be53 plp
@@ -17980,7 +18082,7 @@
 01bee7 jsr $b1ad
 01beea rts				; exit routine
 01beeb php
-01beec %setAto8bit()
+01beec %setAto16bit()
 01beee %setXYto16bit()
 01bef0 jsr $cf9d
 01bef3 bcc $beff
@@ -18028,7 +18130,7 @@
 01bfa0 pla
 01bfa1 sta $1a72,x
 01bfa4 rts				; exit routine
-01bfa5 %setAto8bit()
+01bfa5 %setAto16bit()
 01bfa7 %setXYto16bit()
 01bfa9 jsr $cf9d
 01bfac bcc $c001
@@ -18188,7 +18290,7 @@
 01c112 jsr $d6a8
 01c115 jsr $c44f
 01c118 rts				; exit routine
-01c119 %setAto8bit()
+01c119 %setAto16bit()
 01c11b %setXYto16bit()
 01c11d lda #$10
 01c11f sta $1993
@@ -18364,7 +18466,7 @@
 01c325 sta !ram_19b4
 01c328 jsr $c44f
 01c32b rts				; exit routine
-01c32c %setAto8bit()
+01c32c %setAto16bit()
 01c32e %setXYto16bit()
 01c330 jsr $c487
 01c333 stz $192b
@@ -18391,7 +18493,7 @@
 01c35d lda #$01
 01c35f sta $1928
 01c362 jmp $c04d
-01c365 %setAto8bit()
+01c365 %setAto16bit()
 01c367 %setXYto16bit()
 01c369 lda #$10
 01c36b sta $1993
@@ -19109,7 +19211,7 @@
 01cab5 plp
 01cab6 rts				; exit routine
 01cab7 php
-01cab8 %setAto8bit()
+01cab8 %setAto16bit()
 01caba %setXYto16bit()
 01cabc lda $0e91
 01cabf beq $cacc
@@ -19405,7 +19507,7 @@
 01ccea and #$fff8
 01cced ora #$0001
 01ccf0 sta $19cb
-01ccf3 %setAto8bit()
+01ccf3 %setAto16bit()
 01ccf5 %setXYto16bit()
 01ccf7 lda !ram_19b4
 01ccfa and #$f8
@@ -19562,7 +19664,7 @@
 01ce97 lda $1946
 01ce9a sta $1a80,x
 01ce9d rts
-01ce9e %setAto8bit()
+01ce9e %setAto16bit()
 01cea0 %setXYto16bit()
 01cea2 inc $1947
 01cea5 lda $1947
@@ -19621,7 +19723,7 @@
 01cf18 sta $19c5
 01cf1b lda $7fcef6,x
 01cf1f sta $19c7
-01cf22 %setAto8bit()
+01cf22 %setAto16bit()
 01cf24 %setXYto16bit()
 01cf26 jsr $96d2
 01cf29 ldx $193f
@@ -19685,7 +19787,7 @@
 01cfa2 jsr $b1ea
 01cfa5 rts				; exit routine
 01cfa6 php
-01cfa7 %setAto8bit()
+01cfa7 %setAto16bit()
 01cfa9 %setXYto16bit()
 01cfab ldx #$0001
 01cfae lda $0e91
@@ -19769,7 +19871,7 @@
 01d076 sta $0c5a
 01d079 inc
 01d07a sta $0c5e
-01d07d %setAto8bit()
+01d07d %setAto16bit()
 01d07f %setXYto16bit()
 01d081 lda #$0c
 01d083 ora $1a54
@@ -19805,7 +19907,7 @@
 01d0ca stz $1931
 01d0cd ldx $1900
 01d0d0 stx $1933
-01d0d3 %setAto8bit()
+01d0d3 %setAto16bit()
 01d0d5 %setXYto16bit()
 01d0d7 lda $0e91
 01d0da cmp #$6b
@@ -20000,7 +20102,7 @@
 01d2fc dec
 01d2fd bne $d2f0
 01d2ff plb
-01d300 %setAto8bit()
+01d300 %setAto16bit()
 01d302 %setXYto16bit()
 01d304 lda #$f1
 01d306 sta $050a
@@ -20202,7 +20304,7 @@
 01d4e6 plx
 01d4e7 stx $192b
 01d4ea php
-01d4eb %setAto8bit()
+01d4eb %setAto16bit()
 01d4ed %setXYto16bit()
 01d4ef lda #$03
 01d4f1 sta $1a72,x
@@ -20219,7 +20321,7 @@
 01d50b ply
 01d50c dey
 01d50d bne $d4fa
-01d50f %setAto8bit()
+01d50f %setAto16bit()
 01d511 %setXYto16bit()
 01d513 lda #$10
 01d515 sta $1935
@@ -20308,7 +20410,7 @@
 01d603 phy
 01d604 php
 01d605 phb
-01d606 %setAto8bit()
+01d606 %setAto16bit()
 01d608 %setXYto16bit()
 01d60a lda $1a51
 01d60d sta $192c
@@ -20341,7 +20443,7 @@
 01d656 lda #$00ff
 01d659 mvn $7f,$7f
 01d65c plb
-01d65d %setAto8bit()
+01d65d %setAto16bit()
 01d65f %setXYto16bit()
 01d661 jsr $8df2
 01d664 lda #$06
@@ -20365,7 +20467,7 @@
 01d694 lda #$00ff
 01d697 mvn $7f,$7f
 01d69a plb
-01d69b %setAto8bit()
+01d69b %setAto16bit()
 01d69d %setXYto16bit()
 01d69f lda #$06
 01d6a1 sta !ram_1a46
@@ -20413,7 +20515,7 @@
 01d6d9 lda #$03
 01d6db sta $19e2
 01d6de bra $d6e7
-01d6e0 %setAto8bit()
+01d6e0 %setAto16bit()
 01d6e2 %setXYto16bit()
 01d6e4 stz $19e2
 01d6e7 lda $19e2
@@ -20546,7 +20648,7 @@
 01d825 stz $192c
 01d828 jsr $8ae4
 01d82b rts				; exit routine
-01d82c %setAto8bit()
+01d82c %setAto16bit()
 01d82e %setXYto16bit()
 01d830 jsr $8b75
 01d833 jsr $df71
@@ -20598,7 +20700,7 @@
 01d8ac jsl $01b24b
 01d8b0 jsr $c6a0
 01d8b3 rts
-01d8b4 %setAto8bit()
+01d8b4 %setAto16bit()
 01d8b6 %setXYto16bit()
 01d8b8 jsr $8b75
 01d8bb jsr $df64
@@ -20635,7 +20737,7 @@
 01d913 jsr $8ae4
 01d916 jsr $8b82
 01d919 rts
-01d91a %setAto8bit()
+01d91a %setAto16bit()
 01d91c %setXYto16bit()
 01d91e lda #$06
 01d920 jsr $b1ea
@@ -20683,7 +20785,7 @@
 01d98e lda #$0b
 01d990 jsr $baac
 01d993 rts
-01d9a4 %setAto8bit()
+01d9a4 %setAto16bit()
 01d9a6 %setXYto16bit()
 01d9a8 lda #$01
 01d9aa sta $19e2
@@ -22519,7 +22621,7 @@
 01ee71 sta $192d,x
 01ee74 lda $193b
 01ee77 sta $192b,x
-01ee7a %setAto8bit()
+01ee7a %setAto16bit()
 01ee7c ldy $193b
 01ee7f jsr $f2ca
 01ee82 bcc $ee8d
@@ -23174,7 +23276,7 @@
 01f58b ldx $19cf
 01f58e stx $19cb
 01f591 jmp $935c
-01f685 %setAto8bit()
+01f685 %setAto16bit()
 01f687 lda #$80
 01f689 tsb !ram_19b4
 01f68c lda $0e91
@@ -23222,7 +23324,7 @@
 01f6f7 and #$0001
 01f6fa asl a
 01f6fb tax
-01f6fc %setAto8bit()
+01f6fc %setAto16bit()
 01f6fe dey
 01f6ff bne $f6c0
 01f701 jsr $f7c3
@@ -23237,7 +23339,7 @@
 01f7b2 jsr $82cf
 01f7b5 pla
 01f7b6 sta $1902
-01f7b9 %setAto8bit()
+01f7b9 %setAto16bit()
 01f7bb jsr $82cf
 01f7be pla
 01f7bf dec
@@ -23685,7 +23787,7 @@
 028157 ldx #$d530
 02815a jsr $8835
 02815d bra $8163
-02815f %setAto8bit()
+02815f %setAto16bit()
 028161 %setXYto16bit()
 028163 jsl $02d132
 028167 lda #$01
@@ -23753,7 +23855,7 @@
 0281d5 sta $4202
 0281d8 lda #$0a
 0281da sta $4203
-0281dd lda #!loop_counter_64
+0281dd lda #$64
 0281df sec
 0281e0 sbc $4216
 0281e3 sta $a2
@@ -23786,7 +23888,7 @@
 028214 lda #$01
 028216 sta $76
 028218 rts				; exit routine
-028219 %setAto8bit()
+028219 %setAto16bit()
 02821b %setXYto16bit()
 02821d lda $af
 02821f and #$40
@@ -23847,7 +23949,7 @@
 02829d sta $a2
 02829f lda $a2
 0282a1 sta $4204
-0282a4 %setAto8bit()
+0282a4 %setAto16bit()
 0282a6 %setXYto16bit()
 0282a8 txa
 0282a9 jsl $009726
@@ -24450,7 +24552,7 @@
 02874c beq $873d
 02874e sta $94
 028750 rts
-028751 %setAto8bit()
+028751 %setAto16bit()
 028753 %setXYto16bit()
 028755 phd
 028756 stz $8b
@@ -24484,7 +24586,7 @@
 02879b jsl $0096e4
 02879f lda $009e
 0287a2 sta $14
-0287a4 %setAto8bit()
+0287a4 %setAto16bit()
 0287a6 %setXYto16bit()
 0287a8 lda $10
 0287aa sta $04a2
@@ -24544,7 +24646,7 @@
 02881d sta $29
 02881f adc $2d
 028821 sta $25
-028823 %setAto8bit()
+028823 %setAto16bit()
 028825 %setXYto16bit()
 028827 lda $10
 028829 lsr a
@@ -24636,7 +24738,7 @@
 0288c7 tax
 0288c8 pla
 0288c9 sta $04d1,x
-0288cc %setAto8bit()
+0288cc %setAto16bit()
 0288ce %setXYto16bit()
 0288d0 pld
 0288d1 inc $89
@@ -24647,7 +24749,7 @@
 0288da bne $88dd
 0288dc rts				; exit routine
 0288dd jmp $8522
-0288e0 %setAto8bit()
+0288e0 %setAto16bit()
 0288e2 %setXYto16bit()
 0288e4 phd
 0288e5 jsr $8f22
@@ -24836,7 +24938,7 @@
 028a5f %setAto8bit()
 028a61 %setXYto16bit()
 028a63 rts				; exit routine
-028a64 %setAto8bit()
+028a64 %setAto16bit()
 028a66 %setXYto16bit()
 028a68 jmp $8751
 
@@ -25631,7 +25733,7 @@
 029282 sbc $14
 029284 pld
 029285 sta $77
-029287 %setAto8bit()
+029287 %setAto16bit()
 029289 %setXYto16bit()
 02928b jsr $95de
 02928e jmp $9c87
@@ -25748,7 +25850,7 @@
 029411 inc
 029412 bne $9417
 029417 tay
-029418 %setAto8bit()
+029418 %setAto16bit()
 02941a %setXYto16bit()
 02941c lda #$00
 02941e xba
@@ -25829,7 +25931,7 @@
 029503 lda $77
 029505 lsr a
 029506 sta $77
-029508 %setAto8bit()
+029508 %setAto16bit()
 02950a %setXYto16bit()
 02950c jsr $9bd9
 02950f jmp $99c6
@@ -25896,7 +25998,7 @@
 02960e clc
 02960f adc $77
 029611 sta $77
-029613 %setAto8bit()
+029613 %setAto16bit()
 029615 %setXYto16bit()
 029617 jsr $99c6
 02961a lda #$00
@@ -25939,7 +26041,7 @@
 029677 mvn $00,$00
 02967a plb
 02967b plx
-02967c %setAto8bit()
+02967c %setAto16bit()
 02967e %setXYto16bit()
 029680 stz $0050,x
 029683 inc $b3
@@ -26139,7 +26241,7 @@
 02988c bra $9895
 029895 sta $bb
 029897 lda $b7
-029899 cmp #!loop_counter_64
+029899 cmp #$64
 02989b bcc $98a1
 02989d lda #$63
 02989f sta $b7
@@ -26171,7 +26273,7 @@
 0298d0 bcc $98e0
 0298d2 phd				; save direct page to stack
 0298d3 jsr $8f2f
-0298d6 lda #!loop_counter_64
+0298d6 lda #$64
 0298d8 sec
 0298d9 sbc $3f
 0298db pld
@@ -26179,7 +26281,7 @@
 0298de bra $98ec
 0298e0 phd				; save direct page to stack
 0298e1 jsr $8f2f
-0298e4 lda #!loop_counter_64
+0298e4 lda #$64
 0298e6 sec
 0298e7 sbc $41
 0298e9 pld
@@ -26476,7 +26578,7 @@
 029b14 jsr $9a36
 029b17 %setAXYto16bit()
 029b19 lsr $77
-029b1b %setAto8bit()
+029b1b %setAto16bit()
 029b1d %setXYto16bit()
 029b1f rts
 029b20 jsr $9ac6
@@ -26504,7 +26606,7 @@
 029b47 rts				; exit routine
 029b48 %setAXYto16bit()
 029b4a asl $77
-029b4c %setAto8bit()
+029b4c %setAto16bit()
 029b4e %setXYto16bit()
 029b50 ldx #$d340
 029b53 jsr $883d
@@ -27240,7 +27342,7 @@
 02a2f5 lda $c6
 02a2f7 cmp $c4
 02a2f9 bcc $a301
-02a2fb %setAto8bit()
+02a2fb %setAto16bit()
 02a2fd %setXYto16bit()
 02a2ff inc $ce
 02a301 jmp $a596
@@ -27586,7 +27688,7 @@
 02a67e asl a
 02a67f asl a
 02a680 asl a
-02a681 %setAto8bit()
+02a681 %setAto16bit()
 02a683 %setXYto16bit()
 02a685 sta $a8
 02a687 xba
@@ -27849,7 +27951,7 @@
 02a8c7 bcc $a8d2
 02a8c9 %setAXYto16bit()
 02a8cb txa
-02a8cc %setAto8bit()
+02a8cc %setAto16bit()
 02a8ce %setXYto16bit()
 02a8d0 xba
 02a8d1 tax
@@ -28035,7 +28137,7 @@
 02aa42 sta $51
 02aa44 pld
 02aa45 rts				; exit routine
-02aa46 %setAto8bit()
+02aa46 %setAto16bit()
 02aa48 %setXYto16bit()
 02aa4a sec
 02aa4b sbc #$4a
@@ -28094,7 +28196,7 @@
 02aabb sta $1151
 02aabe rts
 02aabf jmp $a99c
-02acc1 %setAto8bit()
+02acc1 %setAto16bit()
 02acc3 %setXYto16bit()
 02acc5 lda #$00
 02acc7 xba
@@ -28201,7 +28303,7 @@
 02adda lda #$0a
 02addc sta $0505
 02addf rts
-02ae30 %setAto8bit()
+02ae30 %setAto16bit()
 02ae32 %setXYto16bit()
 02ae34 lda #$00
 02ae36 xba
@@ -28293,7 +28395,7 @@
 02af2b beq $af31
 02af2d lda #$94
 02af2f bra $af33
-02af31 lda #!loop_counter_64
+02af31 lda #$64
 02af33 sta $7ec280,x
 02af37 lda #$88
 02af39 sta $7ec2a0,x
@@ -28607,7 +28709,7 @@
 02d440 plx
 02d441 %setAto8bit()
 02d443 %setXYto16bit()
-02d445 lda #!loop_counter_64
+02d445 lda #$64
 02d447 pha
 02d448 lda #$00
 02d44a jsr $d489
@@ -29453,7 +29555,7 @@
 02db71 lda #$04
 02db73 mvn $02,$00
 02db76 lda #$80
-02db78 tsb !ram_0111
+02db78 tsb $0111
 02db7b phk
 02db7c plb
 02db7d stz $ea
@@ -29700,10 +29802,10 @@
 02dfaa ldy #$4320
 02dfad lda #$0007
 02dfb0 mvn $02,$02
-02dfb3 %setAto8bit()
+02dfb3 %setAto16bit()
 02dfb5 %setXYto16bit()
 02dfb7 lda #$04
-02dfb9 tsb !ram_0111
+02dfb9 tsb $0111
 02dfbc plp
 02dfbd rts
 
@@ -30301,7 +30403,7 @@
 02e664 sta $0aa1
 02e667 lda #$02
 02e669 jsl $0c8000
-02e66d tsb !ram_0111
+02e66d tsb $0111
 02e670 %setAto8bit()
 02e672 lda $0aaf
 02e675 bit #$80
@@ -30347,7 +30449,7 @@
 02e6d0 trb $0110
 02e6d3 bra $e670
 02e6d5 lda #$02
-02e6d7 trb !ram_0111
+02e6d7 trb $0111
 02e6da stz $2123
 02e6dd stz $2124
 02e6e0 stz $2125
@@ -33040,14 +33142,14 @@
 
 
 
-;--------------------------------------------------------------------
+;-----------------------------------------------------------------------
 ;						BANK $07
-;--------------------------------------------------------------------
+;-----------------------------------------------------------------------
 
 
 079030 phd
 079031 php
-079032 %setAto8bit()
+079032 %setAto16bit()
 079034 %setXYto16bit()
 079036 lda $19ab
 079039 cmp #$ff
@@ -33199,7 +33301,7 @@
 07914f dey
 079150 bne $9133
 079152 rts				; exit routine
-079153 %setAto8bit()
+079153 %setAto16bit()
 079155 %setXYto16bit()
 079157 ldx $04
 079159 ldy #$0020
@@ -33285,9 +33387,9 @@
 
 
 
-;--------------------------------------------------------------------
+;-----------------------------------------------------------------------
 ;						BANK $0b
-;--------------------------------------------------------------------
+;-----------------------------------------------------------------------
 
 
 
@@ -33391,7 +33493,7 @@
 0b80a7 phb
 0b80a8 phx
 0b80a9 phy
-0b80aa %setAto8bit()
+0b80aa %setAto16bit()
 0b80ac %setXYto16bit()
 0b80ae jsr $80d9
 0b80b1 ldx $192b
@@ -33428,7 +33530,7 @@
 0b80ed phd
 0b80ee pea $1a72
 0b80f1 pld
-0b80f2 %setAto8bit()
+0b80f2 %setAto16bit()
 0b80f4 %setXYto16bit()
 0b80f6 ldx #$0000
 0b80f9 ldy #$0016
@@ -34566,12 +34668,36 @@
 
 
 
-;--------------------------------------------------------------------
+;-----------------------------------------------------------------------
 ;						BANK $0c
-;--------------------------------------------------------------------
+;-----------------------------------------------------------------------
 
 
-0c8000-0c8012			; ROUTINE: IdleUntilInterruptD8
+
+
+
+
+
+
+
+
+; ROUTINE: Idle until interrupt $d8 ($)
+;		loops until bit 6 of $00d8 is clear
+IdleUntilInterruptD8
+0c8000 php					; save processor status
+0c8001 %setAto8bit()
+0c8003 pha					; save A
+0c8004 lda #$40
+0c8006 trb $00d8				; clear bit 6 of $00d8
+	.Loop {
+0c8009 lda #$40
+0c800b and $00d8				; loop until bit 6 of $00d8 is clear
+0c800e beq .Loop
+	}
+
+0c8010 pla					; restore A
+0c8011 plp					; restore processor status
+0c8012 rtl					; exit routine
 
 
 
@@ -34585,13 +34711,13 @@
 0c8019 %setAXYto16bit()
 0c801b phx
 0c801c and #$00ff
-0c801f sta !loop_counter_64
+0c801f sta $64
 0c8021 asl a
 0c8022 asl a
-0c8023 adc !loop_counter_64
+0c8023 adc $64
 0c8025 tax
 0c8026 %setAto8bit()
-0c8028 lda !loop_counter_64
+0c8028 lda $64
 0c802a sta $00ef
 0c802d lda $07ee84,x
 0c8031 sta $015f
@@ -34637,14 +34763,14 @@
 0c808b lda #$2100
 0c808e tcd
 0c808f %setAto8bit()
-0c8091 stz !ram_0111
+0c8091 stz $0111
 0c8094 stz $00d2
 0c8097 stz $00d4
 0c809a lda #$08
 0c809c tsb $00d2
 0c809f lda #$40
 0c80a1 tsb $00d6
-0c80a4 lda #!loop_counter_62
+0c80a4 lda #$62
 0c80a6 sta $01
 0c80a8 lda #$07
 0c80aa sta $05
@@ -34665,7 +34791,7 @@
 0c80d0 jsl $0c8000
 0c80d4 lda #$01
 0c80d6 sta $05
-0c80d8 lda #!loop_counter_62
+0c80d8 lda #$62
 0c80da sta $07
 0c80dc lda #$69
 0c80de sta $08
@@ -35305,82 +35431,64 @@
 
 
 
-0c87e9 stz !ram_0111
-0c87ec rts					; exit routine
+0c87e9 stz $0111
+0c87ec rts				; exit routine
 
 
 
-; ROUTINE:  ($0c87ed)
 0c87ed %setAXYto16bit()
-0c87ef pea $0c7f			; used for databanks
-
-	; fill $7f001e-$7f0192 with $4000 ($c0 words, $180 bytes)
-0c87f2 plb					; databank => $7f
-0c87f3 ldx #$4000			; fill value => $4000
-0c87f6 ldy #$001e			; fill destination => $001e
-0c87f9 lda #$00c0			; fill size => $c0 words
-0c87fc jsl FillSectionWithA_LongJump
-
-0c8800 plb					; databank => $0c
+0c87ef pea $0c7f
+0c87f2 plb
+0c87f3 ldx #$4000
+0c87f6 ldy #$001e
+0c87f9 lda #$00c0
+0c87fc jsl $009994
+0c8800 plb
 0c8801 %setAto8bit()
 0c8803 stz $4204
 0c8806 ldx #$00ce
 0c8809 ldy #$0082
-
-	.Loop {
 0c880c tya
 0c880d asl a
 0c880e sta $4205
 0c8811 lda #$20
 0c8813 jsl $009726
-
 0c8817 %setAXYto16bit()
 0c8819 lda $4214
 0c881c sta $7f0010,x
 0c8820 %setAto8bit()
-
 0c8822 iny
 0c8823 inx
 0c8824 inx
 0c8825 cpy #$00e8
-0c8828 bne .Loop
-	}
-
-	; copy $0c886b-$0c8874 to $7f0000-$7f0009 ($a bytes)
+0c8828 bne $880c
 0c882a %setAXYto16bit()
-0c882c ldx #$886b			; TODO: can this be "ldx.w DataHMDATable0c886b" ??
+0c882c ldx #$886b
 0c882f ldy #$0000
-0c8832 lda #$0009			; TODO: is this a programming error? last 3 bytes are code
+0c8832 lda #$0009
 0c8835 mvn $0c,$7f
 0c8838 phk
-0c8839 plb					; databank => program bank ($0c)
+0c8839 plb
 0c883a %setAto8bit()
-
 0c883c lda #$42
-0c883e sta $4310			; hdma control #1 => indirect mode, write twice
-0c8841 sta $4320			; hdma control #2 => indirect mode, write twice
+0c883e sta $4310
+0c8841 sta $4320
 0c8844 lda #$1b
-0c8846 sta $4311			; hdma destination register #1 => $1b
+0c8846 sta $4311
 0c8849 lda #$1e
-0c884b sta $4321			; hdma destination register #2 => $1e
-0c884e ldx #$0000
-0c8851 stx $4312			; hdma table source offset #1 => $0000
-0c8854 stx $4322			; hdma table source offset #2 => $0000
+0c884b sta $4321
+0c884e ldx #$0000		; clear X
+0c8851 stx $4312
+0c8854 stx $4322
 0c8857 lda #$7f
-0c8859 sta $4314			; source bank #1 => $7f
-0c885c sta $4324			; source bank #2 => $7f
-0c885f sta $4317			; indirect souce bank #1 => $7f
-0c8862 sta $4327			; indirect souce bank #2 => $7f
+0c8859 sta $4314			; source bank => 
+0c885c sta $4324			; source bank => 
+0c885f sta $4317
+0c8862 sta $4327
 0c8865 lda #$06
-0c8867 sta !ram_0111		; !ram_0111 => $06
-0c886a rts					; exit routine
+0c8867 sta $0111
+0c886a rts				; exit routine
 
-
-; DATA: HMDA table 0c886b ($0c886b)
-;		$0c886b-$0c8874
-; TODO: is this a programming error? last 3 bytes are code
-DataHMDATable0c886b:
-FF 10 00 D1 0E 01 00 A9 F7 A2
 
 
 0c8872 lda #$f7
@@ -35499,7 +35607,7 @@ FF 10 00 D1 0E 01 00 A9 F7 A2
 
 
 
-0c8948-0c896e			; ROUTINE: ClearOAM
+0c8948-0c896e			; ClearOAM
 
 
 
@@ -36056,17 +36164,17 @@ FF 10 00 D1 0E 01 00 A9 F7 A2
 0c8fb6 lda #$08
 0c8fb8 pha
 0c8fb9 ldy $0010,x
-0c8fbc sty !loop_counter_64
+0c8fbc sty $64
 0c8fbe ldy $0000,x
-0c8fc1 sty !loop_counter_62
+0c8fc1 sty $62
 0c8fc3 ldy #$0008
 0c8fc6 asl $65
 0c8fc8 rol a
-0c8fc9 asl !loop_counter_64
+0c8fc9 asl $64
 0c8fcb rol a
 0c8fcc asl $63
 0c8fce rol a
-0c8fcf asl !loop_counter_62
+0c8fcf asl $62
 0c8fd1 rol a
 0c8fd2 and #$0f
 0c8fd4 sta $002119
@@ -36102,11 +36210,11 @@ FF 10 00 D1 0E 01 00 A9 F7 A2
 0c8ffb asl a
 0c8ffc asl a
 0c8ffd asl a
-0c8ffe sta !loop_counter_64
+0c8ffe sta $64
 0c9000 pla
 0c9001 and #$001f
 0c9004 asl a
-0c9005 ora !loop_counter_64
+0c9005 ora $64
 0c9007 ldy #$0008
 0c900a tax
 0c900b lda $078031,x
@@ -36185,17 +36293,17 @@ FF 10 00 D1 0E 01 00 A9 F7 A2
 0c909b lda #$08
 0c909d pha
 0c909e ldy $0010,x
-0c90a1 sty !loop_counter_64
+0c90a1 sty $64
 0c90a3 ldy $0000,x
-0c90a6 sty !loop_counter_62
+0c90a6 sty $62
 0c90a8 ldy #$0008
 0c90ab asl $65
 0c90ad rol a
-0c90ae asl !loop_counter_64
+0c90ae asl $64
 0c90b0 rol a
 0c90b1 asl $63
 0c90b3 rol a
-0c90b4 asl !loop_counter_62
+0c90b4 asl $62
 0c90b6 rol a
 0c90b7 and #$0f
 0c90b9 beq $90bd
@@ -36266,48 +36374,38 @@ FF 10 00 D1 0E 01 00 A9 F7 A2
 
 
 
-; ROUTINE:  ($0c9142)
-Routine0c9142:
-0c9142 php					; save processor status
-0c9143 phd					; save direct page
-
+0c9142 php				; save processor status to stack
+0c9143 phd				; save direct page to stack
 0c9144 %setAXYto16bit()
 0c9146 lda #$0000
-0c9149 tcd					; direct page => $0000
-
-0c914a jsr CopyABunch0c9318
-0c914d jsr ExpandSecondHalfWithZeros
+0c9149 tcd
+0c914a jsr $9318
+0c914d jsr $92eb
 0c9150 jsr $9161
-
 0c9153 lda #$0010
-0c9156 sta $7f2f9c			; $7f2f9c => $0010	; TODO: what is this?
-0c915a sta $7f2dd2			; $7f2dd2 => $0010	; TODO: what is this?
-
-0c915e pld				; restore direct page
-0c915f plp				; restore processor status
+0c9156 sta $7f2f9c
+0c915a sta $7f2dd2
+0c915e pld
+0c915f plp
 0c9160 rts				; exit routine
 
 
 
-
-; ROUTINE:  ($0c9161)
-; AXY => 16bit
-Routine0c9161:
 0c9161 ldx #$0000		; clear X
 0c9164 ldy #$2000
 0c9167 lda #$2000
-0c916a jsl FillSectionWithA_LongJump
+0c916a jsl $009994
 0c916e jsr $91af
 0c9171 jsr $9197
-0c9174 jsr ReverseWordArrays
+0c9174 jsr $9247
 0c9177 jsr $91b7
 0c917a jsr $919f
-0c917d jsr ReverseBitsAndShiftLeftSection
+0c917d jsr $929e
 0c9180 jsr $91bf
-0c9183 jsr ReverseWordArrays
+0c9183 jsr $9247
 0c9186 jsr $91c7
 0c9189 jsr $91a7
-0c918c jsr ReverseWordArrays
+0c918c jsr $9247
 0c918f ldy #$24c0
 0c9192 ldx #$9400
 0c9195 bra $91cd
@@ -36356,9 +36454,9 @@ Routine0c9161:
 0c91f2 asl a
 0c91f3 asl a
 0c91f4 asl a
-0c91f5 sta !loop_counter_64
+0c91f5 sta $64
 0c91f7 tya
-0c91f8 adc !loop_counter_64
+0c91f8 adc $64
 0c91fa tay
 0c91fb inx
 0c91fc bra $91cd
@@ -36368,24 +36466,23 @@ Routine0c9161:
 
 0c91ff %setAto8bit()
 0c9201 lda #$08
-0c9203 sta !loop_counter_62
+0c9203 sta $62
 0c9205 pea $7f00
 0c9208 plb
-0c9209 plb					; databank => $7f
-
+0c9209 plb
 0c920a lda $0000,x
 0c920d ora $0001,x
 0c9210 ora $0010,x
 0c9213 eor #$ff
-0c9215 sta !loop_counter_64
+0c9215 sta $64
 0c9217 and $0000,y
 0c921a ora $0000,x
 0c921d sta $0000,y
-0c9220 lda !loop_counter_64
+0c9220 lda $64
 0c9222 and $0001,y
 0c9225 ora $0001,x
 0c9228 sta $0001,y
-0c922b lda !loop_counter_64
+0c922b lda $64
 0c922d and $0010,y
 0c9230 ora $0010,x
 0c9233 sta $0010,y
@@ -36393,7 +36490,7 @@ Routine0c9161:
 0c9237 inx
 0c9238 iny
 0c9239 iny
-0c923a dec !loop_counter_62
+0c923a dec $62
 0c923c bne $920a
 0c923e %setAXYto16bit()
 0c9240 clc
@@ -36404,12 +36501,143 @@ Routine0c9161:
 
 
 
-0c9247-0c925f			; ROUTINE: ReverseWordArrays
-0c9260-0c929d			; ROUTINE: ReverseWordArray
-0c929e-0c92c1			; ROUTINE: ReverseBitsAndShiftLeftSection
-0c92c2-0c92ea			; ROUTINE: ReverseBitsAndShiftLeft
-0c92eb-0c9317			; ROUTINE: ExpandSecondHalfWithZeros
-0c9318-0c9345			; ROUTINE: CopyABunch0c9318
+0c9247 pea $7f00
+0c924a plb
+0c924b plb
+0c924c clc
+0c924d lda #$001e
+0c9250 sta $62
+0c9252 ldx #$0000		; clear X
+0c9255 jsr $9260
+0c9258 jsr $9260
+0c925b dec $62
+0c925d bne $9255
+0c925f rts				; exit routine
+
+
+
+0c9260 lda $0000,x
+0c9263 tay
+0c9264 lda $000e,x
+0c9267 sta $0000,x
+0c926a tya
+0c926b sta $000e,x
+0c926e lda $0002,x
+0c9271 tay
+0c9272 lda $000c,x
+0c9275 sta $0002,x
+0c9278 tya
+0c9279 sta $000c,x
+0c927c lda $0004,x
+0c927f tay
+0c9280 lda $000a,x
+0c9283 sta $0004,x
+0c9286 tya
+0c9287 sta $000a,x
+0c928a lda $0006,x
+0c928d tay
+0c928e lda $0008,x
+0c9291 sta $0006,x
+0c9294 tya
+0c9295 sta $0008,x
+0c9298 txa
+0c9299 adc #$0010
+0c929c tax
+0c929d rts				; exit routine
+
+
+
+0c929e pea $7f00
+0c92a1 plb
+0c92a2 plb
+0c92a3 ldy #$001e
+0c92a6 ldx #$0000		; clear X
+0c92a9 phy
+0c92aa ldy #$0010
+0c92ad jsr $92c2
+0c92b0 dey
+0c92b1 bne $92ad
+0c92b3 ldy #$0008
+0c92b6 jsr $92c2
+0c92b9 inx
+0c92ba dey
+0c92bb bne $92b6
+0c92bd ply
+0c92be dey
+0c92bf bne $92a9
+0c92c1 rts				; exit routine
+
+
+
+0c92c2 %setAto8bit()
+0c92c4 lda $0000,x
+0c92c7 lsr a
+0c92c8 lsr a
+0c92c9 rol $0000,x
+0c92cc lsr a
+0c92cd rol $0000,x
+0c92d0 lsr a
+0c92d1 rol $0000,x
+0c92d4 lsr a
+0c92d5 rol $0000,x
+0c92d8 lsr a
+0c92d9 rol $0000,x
+0c92dc lsr a
+0c92dd rol $0000,x
+0c92e0 lsr a
+0c92e1 rol $0000,x
+0c92e4 asl $0000,x
+0c92e7 inx
+0c92e8 %setAXYto16bit()
+0c92ea rts				; exit routine
+
+
+
+0c92eb clc
+0c92ec lda #$001e
+0c92ef sta $62
+0c92f1 lda #$0000
+0c92f4 adc #$0018
+0c92f7 tax
+0c92f8 adc #$0008
+0c92fb tay
+0c92fc pha
+0c92fd lda #$0008
+0c9300 sta $64
+0c9302 dex
+0c9303 dey
+0c9304 dey
+0c9305 lda $0000,x
+0c9308 and #$00ff
+0c930b sta $0000,y
+0c930e dec $64
+0c9310 bne $9302
+0c9312 pla
+0c9313 dec $62
+0c9315 bne $92f4
+0c9317 rts				; exit routine
+
+
+
+0c9318 clc
+0c9319 ldx #$e220
+0c931c ldy #$0000
+0c931f lda #$0004
+0c9322 jsr $9334
+0c9325 ldx #$e490
+0c9328 lda #$0006
+0c932b jsr $9334
+0c932e ldx #$fcc0
+0c9331 lda #$0014
+0c9334 sta $62
+0c9336 lda #!general_address
+0c9339 mvn $04,$7f
+0c933c tya
+0c933d adc #$0008
+0c9340 tay
+0c9341 dec $62
+0c9343 bne $9336
+0c9345 rts				; exit routine
 
 
 
@@ -36417,9 +36645,11 @@ Routine0c9161:
 
 
 
-;--------------------------------------------------------------------
-;						BANK $0d
-;--------------------------------------------------------------------
+; END OF BANK 0c
+
+
+
+; START OF BANK 0d
 
 
 0d8000 jmp $802c
