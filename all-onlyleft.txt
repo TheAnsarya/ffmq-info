@@ -88,8 +88,8 @@
 008080 cli
 008081 lda #$0f
 008083 sta $00aa
-008086 jsl $0c8000
-00808a jsl $0c8000
+008086 jsl IdleUntilInterruptD8
+00808a jsl IdleUntilInterruptD8
 00808e lda $7e3665
 008092 bne $80a8
 008094 lda $700000
@@ -105,7 +105,7 @@
 0080b2 trb $00de
 0080b5 lda #$e0
 0080b7 trb !ram_0111
-0080ba jsl $0c8000
+0080ba jsl IdleUntilInterruptD8
 0080be lda #$e0
 0080c0 sta $2132
 0080c3 ldx #$0000		; clear X
@@ -115,7 +115,7 @@
 0080cf stz $2110
 0080d2 stz $2110
 0080d5 jsr $bd30
-0080d8 jsl $0c8000
+0080d8 jsl IdleUntilInterruptD8
 0080dc jsr $9014
 0080df lda #$00
 0080e1 jsr $91d4
@@ -146,7 +146,7 @@
 008121 sta $7e31b5
 008125 jsr $bd64
 008128 %setAto8bit()
-00812a jsl $0c8000
+00812a jsl IdleUntilInterruptD8
 00812e ldx #$0000
 008131 stx $2102
 008134 ldx #$0400
@@ -2653,7 +2653,7 @@
 009b0a phx
 009b0b pea $0000
 009b0e pld
-009b0f jsl $0c8000
+009b0f jsl IdleUntilInterruptD8
 009b13 jsl $0096a0
 009b17 pei ($1d)
 009b19 lda $27
@@ -3327,7 +3327,7 @@
 00a1e6 inc $17
 00a1e8 and #$00ff
 00a1eb jmp FillSectionWithA
-00a1ee jsl $0c8000
+00a1ee jsl IdleUntilInterruptD8
 00a1f2 rts				; exit routine
 
 
@@ -3535,7 +3535,7 @@
 
 00a38b lda #$0080
 00a38e tsb !flags_d8
-00a391 jsl $0c8000
+00a391 jsl IdleUntilInterruptD8
 00a395 lda #$0008
 00a398 trb $00d4
 00a39b rts				; exit routine
@@ -3548,7 +3548,7 @@
 
 00a3a5 lda #$00ff
 00a3a8 jmp $9dc9
-00a3ab jsl $0c8000
+00a3ab jsl IdleUntilInterruptD8
 00a3af lda #$0020
 00a3b2 and $00d0
 00a3b5 bne $a3c6
@@ -5752,7 +5752,7 @@
 00b6c9 sta !loop_counter_64
 00b6cb lda #$02
 00b6cd tsb $00d4
-00b6d0 jsl $0c8000
+00b6d0 jsl IdleUntilInterruptD8
 00b6d4 rts				; exit routine
 00b6d5 lda #$0001
 00b6d8 sta !loop_counter_62
@@ -6002,7 +6002,7 @@
 00b955 pea $5555
 00b958 lda #$0080
 00b95b tsb $00d6
-00b95e jsl $0c8000
+00b95e jsl IdleUntilInterruptD8
 00b962 jsr $baf0
 00b965 stz $01
 00b967 %setAto8bit()
@@ -6067,7 +6067,7 @@
 00b9ff sta $7f56d8,x
 00ba03 lda #$08
 00ba05 tsb $00d4
-00ba08 jsl $0c8000
+00ba08 jsl IdleUntilInterruptD8
 00ba0c lda #$08
 00ba0e trb $00d4
 00ba11 jmp $b9a0
@@ -6079,13 +6079,13 @@
 00ba28 jsr $9bc4
 00ba2b lda #$10
 00ba2d trb !ram_0111
-00ba30 jsl $0c8000
+00ba30 jsl IdleUntilInterruptD8
 00ba34 stz $2112
 00ba37 stz $2112
 00ba3a lda #$17
 00ba3c sta $212c
 00ba3f lda #$00
-00ba41 jsl $0c8000
+00ba41 jsl IdleUntilInterruptD8
 00ba45 sta $2112
 00ba48 stz $2112
 00ba4b clc
@@ -6382,7 +6382,7 @@
 00bd03 jsr $bd64
 00bd06 ldx #$c909
 00bd09 jsr $9bc4
-00bd0c jsl $0c8000
+00bd0c jsl IdleUntilInterruptD8
 00bd10 lda #$0040
 00bd13 sta $01f0
 00bd16 lda #$0004
@@ -6408,7 +6408,7 @@
 00bd39 pld
 00bd3a ldx #$bd61
 00bd3d jsr $9bc4
-00bd40 jsl $0c8000
+00bd40 jsl IdleUntilInterruptD8
 00bd44 jsr LoadTilesAndColors
 00bd47 jsr Routine008c3d
 00bd4a jsr $8d29
@@ -7069,7 +7069,7 @@
 00c3e1 sta $7f56da,x
 00c3e5 lda #$08
 00c3e7 tsb $00d4
-00c3ea jsl $0c8000
+00c3ea jsl IdleUntilInterruptD8
 00c3ee lda #$08
 00c3f0 trb $00d4
 00c3f3 %setAXYto16bit()
@@ -7453,7 +7453,7 @@
 00c7c8 cmp $0110
 00c7cb beq $c7d6
 00c7cd inc $0110
-00c7d0 jsl $0c8000
+00c7d0 jsl IdleUntilInterruptD8
 00c7d4 bra $c7c8
 00c7d6 plp
 00c7d7 rtl				; exit routine
@@ -7468,7 +7468,7 @@
 00c7e3 beq $c7ef
 00c7e5 dec
 00c7e6 sta $0110
-00c7e9 jsl $0c8000
+00c7e9 jsl IdleUntilInterruptD8
 00c7ed bra $c7e1
 00c7ef lda #$80
 00c7f1 tsb $00d6
@@ -7571,7 +7571,7 @@
 00c8ef inx
 00c8f0 inx
 00c8f1 lda #$000c
-00c8f4 jsl $0c8000
+00c8f4 jsl IdleUntilInterruptD8
 00c8f8 pha
 00c8f9 phx
 00c8fa jsr $9bc4
@@ -7844,11 +7844,11 @@
 00cb6e jsr $cd42
 00cb71 jsr $cd80
 00cb74 jsr $cc8e
-00cb77 jsl $0c8000
+00cb77 jsl IdleUntilInterruptD8
 00cb7b lda #$e0
 00cb7d sta $7f56da
 00cb81 sta $7f56de
-00cb85 jsl $0c8000
+00cb85 jsl IdleUntilInterruptD8
 00cb89 lda #$80
 00cb8b trb $00db
 00cb8e lda #$08
@@ -7857,7 +7857,7 @@
 00cb96 jsr $cd42
 00cb99 jsr $cd80
 00cb9c jsr $cd62
-00cb9f jsl $0c8000
+00cb9f jsl IdleUntilInterruptD8
 00cba3 lda #$e0
 00cba5 sta $2132
 00cba8 ldx #$0000		; clear X
@@ -7892,7 +7892,7 @@
 00cc15 lda #$e0
 00cc17 sta $7f56d8
 00cc1b sta $7f56d8,x
-00cc1f jsl $0c8000
+00cc1f jsl IdleUntilInterruptD8
 00cc23 lda #$08
 00cc25 trb $00d4
 00cc28 rts				; exit routine
@@ -7902,7 +7902,7 @@
 00cc29 lda #$08
 00cc2b tsb $00d4
 00cc2e ldx #$0007
-00cc31 jsl $0c8000
+00cc31 jsl IdleUntilInterruptD8
 00cc35 lda $7f56d8
 00cc39 jsr $cc7b
 00cc3c sta $7f56d8
@@ -7957,7 +7957,7 @@
 00ccb3 ldy $17
 00ccb5 jsr $9d75
 00ccb8 sty $17
-00ccba jsl $0c8000
+00ccba jsl IdleUntilInterruptD8
 00ccbe sta $7f56da
 00ccc2 sta $7f56de
 00ccc6 dec
@@ -7974,7 +7974,7 @@
 00ccdd lda #$08
 00ccdf tsb $00d4
 00cce2 ldx #$0007
-00cce5 jsl $0c8000
+00cce5 jsl IdleUntilInterruptD8
 00cce9 lda $7f56d8
 00cced jsr $cd2f
 00ccf0 sta $7f56d8
@@ -8012,7 +8012,7 @@
 
 
 00cd42 ldx #$0007
-00cd45 jsl $0c8000
+00cd45 jsl IdleUntilInterruptD8
 00cd49 lda $00cd5a,x
 00cd4d sta $2132
 00cd50 ldy $17
@@ -8025,7 +8025,7 @@
 
 
 00cd62 ldx #$0005
-00cd65 jsl $0c8000
+00cd65 jsl IdleUntilInterruptD8
 00cd69 lda $00cd7a,x
 00cd6d sta $2132
 00cd70 ldy $17
@@ -8340,7 +8340,7 @@
 00cff3 and #$001f
 00cff6 tsb $0162
 00cff9 %setAto8bit()
-00cffb jsl $0c8000
+00cffb jsl IdleUntilInterruptD8
 00cfff lda #$31
 00d001 sta $2121
 00d004 lda $0162
@@ -8394,7 +8394,7 @@
 00d051 bne $d06b
 00d053 lda #$08
 00d055 tsb $00da
-00d058 jsl $0c8000
+00d058 jsl IdleUntilInterruptD8
 00d05c jsl $0096a0
 00d060 pei ($17)
 00d062 ldx #$d097
@@ -8469,7 +8469,7 @@
 00d13a trb !ram_0111
 00d13d lda #$0010
 00d140 tsb $00d6
-00d143 jsl $0c8000
+00d143 jsl IdleUntilInterruptD8
 00d147 jsl $0096a0
 00d14b lda #$0010
 00d14e trb $00da
@@ -8487,7 +8487,7 @@
 00d164 beq $d0fa
 00d166 lda #$0010
 00d169 trb $00da
-00d16c jsl $0c8000
+00d16c jsl IdleUntilInterruptD8
 00d170 %setAXYto8bit()
 00d172 stz $2130
 00d175 lda #$b7
@@ -8495,10 +8495,10 @@
 00d17a lda #$c0
 00d17c sta $2132
 00d17f ldy #$0f
-00d181 jsl $0c8000
-00d185 jsl $0c8000
-00d189 jsl $0c8000
-00d18d jsl $0c8000
+00d181 jsl IdleUntilInterruptD8
+00d185 jsl IdleUntilInterruptD8
+00d189 jsl IdleUntilInterruptD8
+00d18d jsl IdleUntilInterruptD8
 00d191 inc
 00d192 dey
 00d193 sta $2132
@@ -8530,7 +8530,7 @@
 00d1ce %setXYto16bit()
 00d1d0 ldx !general_address
 00d1d3 phx
-00d1d4 jsl $0c8000
+00d1d4 jsl IdleUntilInterruptD8
 00d1d8 lda #$80
 00d1da sta $15
 00d1dc ldx #$2ff0
@@ -8560,7 +8560,7 @@
 00d20e pld
 00d20f plb
 00d210 plp
-00d211 jsl $0c8000
+00d211 jsl IdleUntilInterruptD8
 00d215 lda #$80
 00d217 sta $15
 00d219 %setAXYto16bit()
@@ -8581,11 +8581,11 @@
 
 
 00d23a %setAXYto8bit()			; set A,X,Y => 8bit
-00d23c jsl $0c8000
-00d240 jsl $0c8000
+00d23c jsl IdleUntilInterruptD8
+00d240 jsl IdleUntilInterruptD8
 00d244 lda #$10
 00d246 tsb $00d2
-00d249 jsl $0c8000
+00d249 jsl IdleUntilInterruptD8
 00d24d %setAXYto16bit()
 00d24f ldx #$d26b
 00d252 ldy #$5007
@@ -8601,7 +8601,7 @@
 
 
 00d27d %setAXYto8bit()			; set A,X,Y => 8bit
-00d27f jsl $0c8000
+00d27f jsl IdleUntilInterruptD8
 00d283 lda #$0d
 00d285 sta $2121
 00d288 lda !menu_color
@@ -10212,7 +10212,7 @@
 00e0b2 lda !loop_counter_62
 00e0b4 cmp $58
 00e0b6 bne $e127
-00e0b8 jsl $0c8000
+00e0b8 jsl IdleUntilInterruptD8
 00e0bc jsr $9cef
 00e0bf lda $00e0
 00e0c2 and #$00c0
@@ -10617,7 +10617,7 @@
 00e745 plb
 00e746 stx $0f
 00e748 jsr $e5cd
-00e74b jsl $0c8000
+00e74b jsl IdleUntilInterruptD8
 00e74f dec $07
 00e751 bne $e71c
 00e753 rts				; exit routine
@@ -11364,7 +11364,7 @@
 00f0aa sta $01f4
 00f0ad lda #$0040
 00f0b0 tsb $00dd
-00f0b3 jsl $0c8000
+00f0b3 jsl IdleUntilInterruptD8
 00f0b7 rts				; exit routine
 
 
@@ -13034,7 +13034,7 @@
 01930d jsr $a08a
 019310 jsr $94cc
 019313 jsr $c8a8
-019316 jsl $0c8000
+019316 jsl IdleUntilInterruptD8
 01931a lda $0110
 01931d bpl $9316
 01931f lda !ram_0111
@@ -27153,7 +27153,7 @@
 02a22b asl a
 02a22c tax
 02a22d ldy #$0012
-02a230 jsl $0c8000
+02a230 jsl IdleUntilInterruptD8
 02a234 lda $a25e,x
 02a237 sta $2121
 02a23a lda $a264,y
@@ -29320,10 +29320,10 @@
 02da32 beq $da49
 02da34 inx
 02da35 sta $32
-02da37 jsl $0c8000
-02da3b jsl $0c8000
-02da3f jsl $0c8000
-02da43 jsl $0c8000
+02da37 jsl IdleUntilInterruptD8
+02da3b jsl IdleUntilInterruptD8
+02da3f jsl IdleUntilInterruptD8
+02da43 jsl IdleUntilInterruptD8
 02da47 bra $da2f
 02da49 lda #$1f
 02da4b sta $2c
@@ -29334,11 +29334,11 @@
 02da57 beq $da72
 02da59 inx
 02da5a sta $32
-02da5c jsl $0c8000
-02da60 jsl $0c8000
-02da64 jsl $0c8000
-02da68 jsl $0c8000
-02da6c jsl $0c8000
+02da5c jsl IdleUntilInterruptD8
+02da60 jsl IdleUntilInterruptD8
+02da64 jsl IdleUntilInterruptD8
+02da68 jsl IdleUntilInterruptD8
+02da6c jsl IdleUntilInterruptD8
 02da70 bra $da54
 02da72 stz $0a84
 02da75 stz $30
@@ -30267,7 +30267,7 @@
 
 
 02e60f php				; save processor status to stack
-02e610 jsl $0c8000
+02e610 jsl IdleUntilInterruptD8
 02e614 lda #$ff
 02e616 sta $2127
 02e619 sta $2129
@@ -30300,7 +30300,7 @@
 02e662 lda #$80
 02e664 sta $0aa1
 02e667 lda #$02
-02e669 jsl $0c8000
+02e669 jsl IdleUntilInterruptD8
 02e66d tsb !ram_0111
 02e670 %setAto8bit()
 02e672 lda $0aaf
@@ -30341,7 +30341,7 @@
 02e6bf lda $0ab0
 02e6c2 adc $e5a0
 02e6c5 sta $0ab0
-02e6c8 jsl $0c8000
+02e6c8 jsl IdleUntilInterruptD8
 02e6cc %setAto8bit()
 02e6ce lda #$80
 02e6d0 trb $0110
@@ -34662,7 +34662,7 @@
 0c80c6 jsl $00c7b5
 0c80ca jsr $8bad
 0c80cd jsr $896f
-0c80d0 jsl $0c8000
+0c80d0 jsl IdleUntilInterruptD8
 0c80d4 lda #$01
 0c80d6 sta $05
 0c80d8 lda #!loop_counter_62
@@ -34692,7 +34692,7 @@
 0c810b stx $0058
 0c810e lda #$40
 0c8110 tsb $00e2
-0c8113 jsl $0c8000
+0c8113 jsl IdleUntilInterruptD8
 0c8117 lda #$07
 0c8119 sta $05
 0c811b jsr $87ed
@@ -34702,7 +34702,7 @@
 0c8127 jsr $87e9
 0c812a lda #$40
 0c812c trb $00d6
-0c812f jsl $0c8000
+0c812f jsl IdleUntilInterruptD8
 0c8133 lda #$01
 0c8135 sta $05
 0c8137 stz $0e
@@ -34736,7 +34736,7 @@
 0c817b sta $0ccc
 0c817e %setAto8bit()
 0c8180 lda #$80
-0c8182 jsl $0c8000
+0c8182 jsl IdleUntilInterruptD8
 0c8186 sta $15
 0c8188 lda #$08
 0c818a ldx #$6225
@@ -34793,7 +34793,7 @@
 0c81e2 stx $0058
 0c81e5 lda #$40
 0c81e7 tsb $00e2
-0c81ea jsl $0c8000
+0c81ea jsl IdleUntilInterruptD8
 0c81ee rts				; exit routine
 
 
@@ -35383,12 +35383,16 @@ DataHMDATable0c886b:
 FF 10 00 D1 0E 01 00 A9 F7 A2
 
 
+
+; ROUTINE:  ($0c8872)
+; A => 8bit
 0c8872 lda #$f7
-0c8874 ldx #$0000		; clear X
+0c8874 ldx #$0000			; clear X
+
 0c8877 phk
-0c8878 plb
-0c8879 pha
-0c887a jsl $0c8000
+0c8878 plb					; databank => program bank, $0c
+0c8879 pha					; push $f7 to stack
+0c887a jsl IdleUntilInterruptD8
 0c887e sta $0e
 0c8880 stz $0e
 0c8882 lda $88b0,x
@@ -35422,7 +35426,7 @@ FF 10 00 D1 0E 01 00 A9 F7 A2
 0c88bf plb
 0c88c0 clc
 0c88c1 lda #$84
-0c88c3 jsl $0c8000
+0c88c3 jsl IdleUntilInterruptD8
 0c88c7 stz $15
 0c88c9 sta $1f
 0c88cb stz $1f
@@ -35473,7 +35477,7 @@ FF 10 00 D1 0E 01 00 A9 F7 A2
 0c891c stx $0058
 0c891f lda #$40
 0c8921 tsb $00e2
-0c8924 jsl $0c8000
+0c8924 jsl IdleUntilInterruptD8
 0c8928 rts				; exit routine
 
 
@@ -35524,7 +35528,7 @@ FF 10 00 D1 0E 01 00 A9 F7 A2
 0c897d lda $0000,y
 0c8980 beq $899b
 0c8982 phy
-0c8983 jsl $0c8000
+0c8983 jsl IdleUntilInterruptD8
 0c8987 jsr $8a78
 0c898a ply
 0c898b tya
@@ -35538,7 +35542,7 @@ FF 10 00 D1 0E 01 00 A9 F7 A2
 0c8998 iny
 0c8999 bra $897d
 0c899b lda #$1e
-0c899d jsl $0c8000
+0c899d jsl IdleUntilInterruptD8
 0c89a1 pha
 0c89a2 jsr $8a76
 0c89a5 pla
@@ -35570,11 +35574,11 @@ FF 10 00 D1 0E 01 00 A9 F7 A2
 0c89e0 sty $0062
 0c89e3 inc $0062
 0c89e6 bra $89af
-0c89e8 jsl $0c8000
+0c89e8 jsl IdleUntilInterruptD8
 0c89ec jsr $8a76
 0c89ef cpx #$8b66
 0c89f2 bne $89e8
-0c89f4 jsl $0c8000
+0c89f4 jsl IdleUntilInterruptD8
 0c89f8 jsr $8a76
 0c89fb cpx #$8b66
 0c89fe bne $89f4
@@ -35599,7 +35603,7 @@ FF 10 00 D1 0E 01 00 A9 F7 A2
 0c8a23 dey
 0c8a24 bne $8a1c
 0c8a26 jsr $8910
-0c8a29 jsl $0c8000
+0c8a29 jsl IdleUntilInterruptD8
 0c8a2d plx
 0c8a2e ply
 0c8a2f lda $01,s
@@ -35635,7 +35639,7 @@ FF 10 00 D1 0E 01 00 A9 F7 A2
 0c8a6a sty $0058
 0c8a6d lda #$40
 0c8a6f tsb $00e2
-0c8a72 jsl $0c8000
+0c8a72 jsl IdleUntilInterruptD8
 0c8a76 lda #$30
 0c8a78 sta $4202
 0c8a7b sta $0064
@@ -35650,7 +35654,7 @@ FF 10 00 D1 0E 01 00 A9 F7 A2
 0c8a8e cpx #$8b96
 0c8a91 bne $8a96
 0c8a93 ldx #$8b66
-0c8a96 jsl $0c8000
+0c8a96 jsl IdleUntilInterruptD8
 0c8a9a lda $0062
 0c8a9d sta $1b
 0c8a9f lda $0063
@@ -35807,7 +35811,7 @@ FF 10 00 D1 0E 01 00 A9 F7 A2
 0c8c10 bne $8c01
 0c8c12 plb
 0c8c13 clc
-0c8c14 jsl $0c8000
+0c8c14 jsl IdleUntilInterruptD8
 0c8c18 stz $15
 0c8c1a lda #$8c
 0c8c1c sta $1f
@@ -36156,7 +36160,7 @@ FF 10 00 D1 0E 01 00 A9 F7 A2
 0c9066 stx $0058
 0c9069 lda #$40
 0c906b tsb $00e2
-0c906e jsl $0c8000
+0c906e jsl IdleUntilInterruptD8
 0c9072 pld
 0c9073 plp
 0c9074 rts				; exit routine
@@ -36237,19 +36241,22 @@ FF 10 00 D1 0E 01 00 A9 F7 A2
 
 
 
-0c90f9 stz $2115
+; ROUTINE:  ($0c90f9)
+Routine0c90f9:
+0c90f9 stz $2115			; vram control => $00, auto increment by 1 word on write low
 0c90fc ldx #$6000
-0c90ff stx $2116
-0c9102 ldx #$1808
+0c90ff stx $2116			; destination address => $6000
+0c9102 ldx #$1808			; $18 is vram, $08 is fixed address, write twice
 0c9105 stx $4300
 0c9108 ldx #$9140
-0c910b stx $4302			; source offset => 
+0c910b stx $4302			; source offset => $9140
 0c910e lda #$0c
-0c9110 sta $4304			; source bank => 
+0c9110 sta $4304			; source bank => $0c
 0c9113 ldx #$1000
 0c9116 stx $4305
 0c9119 lda #$01
 0c911b sta $420b
+
 0c911e lda #$80
 0c9120 sta $2115
 0c9123 ldx #$6000
@@ -36262,7 +36269,7 @@ FF 10 00 D1 0E 01 00 A9 F7 A2
 0c9137 stx $4305
 0c913a lda #$01
 0c913c sta $420b
-0c913f rts				; exit routine
+0c913f rts					; exit routine
 
 
 
@@ -36283,9 +36290,9 @@ Routine0c9142:
 0c9156 sta $7f2f9c			; $7f2f9c => $0010	; TODO: what is this?
 0c915a sta $7f2dd2			; $7f2dd2 => $0010	; TODO: what is this?
 
-0c915e pld				; restore direct page
-0c915f plp				; restore processor status
-0c9160 rts				; exit routine
+0c915e pld					; restore direct page
+0c915f plp					; restore processor status
+0c9160 rts					; exit routine
 
 
 
@@ -36293,9 +36300,9 @@ Routine0c9142:
 ; ROUTINE:  ($0c9161)
 ; AXY => 16bit
 Routine0c9161:
-0c9161 ldx #$0000		; clear X
-0c9164 ldy #$2000
-0c9167 lda #$2000
+0c9161 ldx #$0000			; fill value => $0000
+0c9164 ldy #$2000			; fill destination => $2000
+0c9167 lda #$2000			; fill size => $2000 words
 0c916a jsl FillSectionWithA_LongJump
 0c916e jsr $91af
 0c9171 jsr $9197
@@ -36310,44 +36317,55 @@ Routine0c9161:
 0c918c jsr ReverseWordArrays
 0c918f ldy #$24c0
 0c9192 ldx #$9400
-0c9195 bra $91cd
+0c9195 bra .Skip0c91cd
 0c9197 ldy #$2080
 0c919a ldx #$93ca
-0c919d bra $91cd
+0c919d bra .Skip0c91cd
 0c919f ldy #$2480
 0c91a2 ldx #$93eb
-0c91a5 bra $91cd
+0c91a5 bra .Skip0c91cd
 0c91a7 ldy #$20c0
 0c91aa ldx #$9410
-0c91ad bra $91cd
+0c91ad bra .Skip0c91cd
+
+
 0c91af ldy #$2000
 0c91b2 ldx #$9346
-0c91b5 bra $91cd
+0c91b5 bra .Skip0c91cd
+
+
 0c91b7 ldy #$2b80
 0c91ba ldx #$9392
-0c91bd bra $91cd
+0c91bd bra .Skip0c91cd
 0c91bf ldy #$2ba0
 0c91c2 ldx #$9392
-0c91c5 bra $91cd
+0c91c5 bra .Skip0c91cd
 0c91c7 ldy #$2040
 0c91ca ldx #$9396
+
+	.Skip0c91cd {
 0c91cd phk
-0c91ce plb
+0c91ce plb					; databank => program bank, $0c
 0c91cf lda $0000,x
 0c91d2 and #$00ff
 0c91d5 cmp #$0080
-0c91d8 bcs $91e8
+0c91d8 bcs .LeaveLoop		; loop until $0000[X].low >= $80
 0c91da asl a
 0c91db asl a
 0c91dc asl a
 0c91dd asl a
-0c91de asl a
-0c91df phx
-0c91e0 tax
+0c91de asl a				; A => A / $20, top 3 bits of A.low
+0c91df phx					; save X
+0c91e0 tax					; X => A
+
 0c91e1 jsr $91ff
-0c91e4 plx
-0c91e5 inx
-0c91e6 bra $91cd
+
+0c91e4 plx					; restore X
+0c91e5 inx					; increment X
+0c91e6 bra .Skip0c91cd
+	}
+
+	.LeaveLoop
 0c91e8 cmp #$00ff
 0c91eb beq $91fe
 0c91ed and #$007f
@@ -36361,46 +36379,61 @@ Routine0c9161:
 0c91f8 adc !loop_counter_64
 0c91fa tay
 0c91fb inx
-0c91fc bra $91cd
-0c91fe rts				; exit routine
+0c91fc bra .Skip0c91cd
+0c91fe rts					; exit routine
 
 
 
+
+; ROUTINE:  ($0c91ff)
+; parameters:
+;		X => offset
+;		Y => 
+Routine0c91ff:
 0c91ff %setAto8bit()
 0c9201 lda #$08
-0c9203 sta !loop_counter_62
+0c9203 sta !loop_counter_62		; !loop_counter_62 => $08
 0c9205 pea $7f00
 0c9208 plb
 0c9209 plb					; databank => $7f
 
+	.Loop {
 0c920a lda $0000,x
 0c920d ora $0001,x
 0c9210 ora $0010,x
 0c9213 eor #$ff
 0c9215 sta !loop_counter_64
+
 0c9217 and $0000,y
 0c921a ora $0000,x
 0c921d sta $0000,y
+
 0c9220 lda !loop_counter_64
 0c9222 and $0001,y
 0c9225 ora $0001,x
 0c9228 sta $0001,y
+
 0c922b lda !loop_counter_64
 0c922d and $0010,y
 0c9230 ora $0010,x
 0c9233 sta $0010,y
+
 0c9236 inx
-0c9237 inx
+0c9237 inx					; X += 2
 0c9238 iny
-0c9239 iny
+0c9239 iny					; Y += 2
 0c923a dec !loop_counter_62
-0c923c bne $920a
+0c923c bne .Loop
+	}
+
 0c923e %setAXYto16bit()
 0c9240 clc
 0c9241 tya
 0c9242 adc #$0010
-0c9245 tay
-0c9246 rts				; exit routine
+0c9245 tay					; Y += $10
+0c9246 rts					; exit routine
+
+
 
 
 
@@ -36545,47 +36578,53 @@ Routine0c9161:
 0d813f sta $fa
 0d8141 lda #$0d
 0d8143 sta $fb
-0d8145 bra $8178
+0d8145 bra $.Exit
 
 
 
-
-0d8147 phb				; save databank to stack
-0d8148 phd				; save direct page to stack
-0d8149 php				; save processor status to stack
+0d8147 phb					; save databank
+0d8148 phd					; save direct page
+0d8149 php					; save processor status
 0d814a %setAto16bit()
 0d814c %setXYto16bit()
-0d814e pha
-0d814f phx
-0d8150 phy
+0d814e pha					; save A
+0d814f phx					; save X
+0d8150 phy					; save Y
 0d8151 %setAto8bit()
+
 0d8153 lda #$00
 0d8155 pha
-0d8156 plb
+0d8156 plb					; databank => $00
 0d8157 ldx #$0600
 0d815a phx
-0d815b pld
+0d815b pld					; direct page => $0600
 0d815c %setAto8bit()
-0d815e lda $00
-0d8160 stz $00
-0d8162 beq $8178
-0d8164 bmi $8172
+0d815e lda $00				; A => ram @ $000600
+0d8160 stz $00				; ram @ $000600 => $00
+0d8162 beq .Exit			; if A is $00, exit
+0d8164 bmi $8172			; if A < 0 
 0d8166 cmp #$01
 0d8168 beq $8183
 0d816a cmp #$03
 0d816c beq $8183
 0d816e cmp #$70
 0d8170 bcs $8175
+
 0d8172 jmp $85ba
+
+; MISSING: $8175-$8177
+
+
+	.Exit
 0d8178 %setAto16bit()
 0d817a %setXYto16bit()
-0d817c ply
-0d817d plx
-0d817e pla
-0d817f plp
-0d8180 pld
-0d8181 plb
-0d8182 rtl				; exit routine
+0d817c ply					; restore Y
+0d817d plx					; restore X
+0d817e pla					; restore A
+0d817f plp					; restore processor status
+0d8180 pld					; restore direct page
+0d8181 plb					; restore databank
+0d8182 rtl					; exit routine
 
 
 

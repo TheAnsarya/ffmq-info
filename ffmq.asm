@@ -75,7 +75,7 @@ org pctosnes($028C80)
 
 ; DATA: Background tiles ($058C80)
 DataTiles:
-	incbin "data\graphics\tiles.dat"
+	incbin "data\graphics\tiles.bin"
 
 ; pc should equal $05F280
 

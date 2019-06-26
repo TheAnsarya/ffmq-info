@@ -1,0 +1,4 @@
+
+asar "testing.asm"
+
+pause

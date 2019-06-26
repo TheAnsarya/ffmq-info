@@ -1,1 +1,5 @@
-data/graphics/tiles - Copy.bin
+data/graphics/*.bin
+data/graphics/*.bak
+pull-assets-from-rom/bin
+pull-assets-from-rom/obj
+.vs/
