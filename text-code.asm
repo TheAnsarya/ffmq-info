@@ -1,6 +1,24 @@
 
 
 
+;--------------------------------------------------------------------
+pushpc
+org $008252
+
+
+; DATA: DataFillValues8252 ($008252)
+;		$008252-?
+;		in file: $000252-?
+DataFillValues8252:
+	db $00
+
+
+; pc should equal ????????
+pullpc
+;--------------------------------------------------------------------
+
+
+
 
 
 ;--------------------------------------------------------------------
@@ -326,10 +344,11 @@ org $009998
 ; ROUTINE: FillSectionWithA ($009998)
 ;		fills a section of memory with A
 ; parameters:
-;		A => not exactly the number of words to fill with A
-;			upper $A bits => fill size, number of $20 word chunks to fill
-;			lower $6 bits => offset into JumpTableFillWithA[]
-;				this is the remainder except $04 only fills $03 and $12 only fills $11
+;		A => not exactly the number of bytes to fill with A
+;			upper $A bits => fill size, number of $40 byte chunks to fill
+;			bits 0-5 => offset into JumpTableFillWithA[]
+;				this is the remainder except $08 only fills $06 and $24 only fills $22
+;			bit 0 must be 0
 ;		X => fill value
 ;		Y => fill destination
 ; AXY => 16bit
@@ -377,13 +396,11 @@ org $0099bd
 
 
 ; ROUTINE: Fill with A ($0099bd)
-;		fills $20 or $40 bytes with A starting at Y
-;		if 16bit, $20 words
-;		if 8bit, $20 bytes
+;		fills $40 bytes with A starting at Y
 ; parameters:
 ;		A => fill value
 ;		Y => destination
-; A can be 8bit or 16bit
+; A => 16bit
 FillWithA:
 	.x20					; $99bd
 		sta $003e,y
@@ -506,8 +523,66 @@ pullpc
 
 
 
+;--------------------------------------------------------------------
+;						BANK $04
+;--------------------------------------------------------------------
 
 
+
+
+;--------------------------------------------------------------------
+pushpc
+org $04e220
+
+
+; DATA: Title screen crystals - compressed graphics part 01 ($04e220)
+;		$04e220-$04e27f ($60 bytes)
+;		in file: $026220-$02627f
+DataTitleScreenCrystals01:
+	incbin "data\graphics\title-screen-crystals-01.bin"
+
+
+; pc should equal $04e280
+pullpc
+;--------------------------------------------------------------------
+
+
+
+
+;--------------------------------------------------------------------
+pushpc
+org $04e490
+
+
+; DATA: Title screen crystals - compressed graphics part 02 ($04e490)
+;		$04e490-$‭04e51f ($60 bytes)
+;		in file: $026490-$0‭2651f
+DataTitleScreenCrystals02:
+	incbin "data\graphics\title-screen-crystals-02.bin"
+
+
+; pc should equal $‭04e520
+pullpc
+;--------------------------------------------------------------------
+
+
+
+
+;--------------------------------------------------------------------
+pushpc
+org $04fcc0
+
+
+; DATA: Title screen crystals - compressed graphics part 01 ($04fcc0)
+;		$04fcc0-$0‭4fe9f‬ ($60 bytes)
+;		in file: $027cc0-$0‭27e9f
+DataTitleScreenCrystals03:
+	incbin "data\graphics\title-screen-crystals-03.bin"
+
+
+; pc should equal $0‭4fe9a0
+pullpc
+;--------------------------------------------------------------------
 
 
 
@@ -553,7 +628,382 @@ pullpc
 
 
 
+;--------------------------------------------------------------------
+pushpc
+org $0c8f14
 
+
+; DATA: DataDMAControlCodes0c8f14 ($0c8f14)
+;		$0c8f14-$0c8f97 ($84 bytes)
+;		in file: $061f14-$061f97
+; layout:
+;		dma transfer size => byte[0] * 20
+;		dma source offset => byte[1] * 20 += $aa4c
+;		increase vram destination address by => byte[2] * 10
+; end when byte[2] is $00
+DataDMAControlCodes0c8f14:
+	db $01,$00,$02
+	db $01,$01,$02
+	db $01,$02,$02
+	db $01,$03,$02
+	db $01,$04,$02
+	db $01,$05,$02
+	db $01,$06,$02
+	db $01,$07,$02
+	db $01,$08,$02
+	db $01,$09,$02
+	db $01,$0A,$02
+	db $01,$0B,$02
+	db $01,$0C,$02
+	db $01,$09,$02
+	db $01,$0D,$02
+	db $01,$0E,$0E
+	db $03,$3B,$04
+	db $0B,$0F,$0B
+	db $05,$3E,$05
+	db $0A,$1A,$0B
+	db $02,$47,$03
+	db $02,$49,$02
+	db $04,$24,$05
+	db $05,$28,$06
+	db $03,$4F,$04
+	db $01,$52,$01
+	db $02,$2D,$03
+	db $01,$2F,$02
+	db $06,$30,$06
+	db $05,$57,$05
+	db $01,$36,$04
+	db $02,$37,$05
+	db $02,$39,$03
+	db $04,$60,$14
+	db $04,$43,$04
+	db $04,$13,$0C
+	db $04,$4B,$04
+	db $04,$1E,$0C
+	db $04,$53,$05
+	db $03,$28,$0B
+	db $04,$5C,$05
+	db $03,$30,$0B
+	db $01,$64,$04
+	db $02,$37,$00
+
+
+; pc should equal $0c8f98
+pullpc
+;--------------------------------------------------------------------
+
+
+
+
+
+
+
+;--------------------------------------------------------------------
+pushpc
+org $0c90d7
+
+
+; ROUTINE: Clear VRAM low bytes with $00 ($0c90d7)
+;		fills vram $0000-$3fff ($4000 bytes)
+;			even addresses get value $00
+;			odd addresses are not touched
+; directpage => $4300
+; A => 8bit, XY => 16bit
+ClearVRAMLowBytes:
+	stz $2115			; vram control => $00, auto increment by 1 word on write low
+	ldx #$0000
+	stx $2116			; destination address => $0000
+	ldx #$1808			; $18 is vram low, $08 is fixed address, write twice
+	stx $00
+
+	; source address => $008252, DataFillValues8252 ($00)
+	ldx #$8252
+	stx $02				; source offset => $8252
+	lda #$00
+	sta $04				; source bank => $00
+
+	ldx #$2000
+	stx $05				; transfer size => $2000
+	lda #$01
+	sta $420b			; start dma transfer on channel 0
+
+	rtl					; exit routine
+
+
+; pc should equal $0c90f9
+pullpc
+;--------------------------------------------------------------------
+pushpc
+org $0c90f9
+
+
+; ROUTINE: Fill OAM2 with $01ff ($0c90f9)
+;		fills vram $c000-$dfff ($2000 bytes)
+;			with value $01ff ($ff $01) repeated
+;		appears to be first half of OAM2 tile memory
+FillOAM2With_01ff:
+	; fill in the $ff values
+	stz $2115			; vram control => $00, auto increment by 1 word on write low
+	ldx #$6000
+	stx $2116			; destination address => $6000
+	ldx #$1808			; $18 is vram low, $08 is fixed address, write twice
+	stx $4300
+
+	; source address => $0c9140, DataFillValues9140 ($ff)
+	ldx #$9140			
+	stx $4302			; source offset => $9140
+	lda #$0c
+	sta $4304			; source bank => $0c
+
+	ldx #$1000
+	stx $4305			; transfer size => $1000
+	lda #$01
+	sta $420b			; start dma transfer on channel 0
+
+	; fill in the $01 values
+	lda #$80
+	sta $2115			; vram control => $80, auto increment by 1 word on write high
+	ldx #$6000
+	stx $2116			; destination address => $6000
+	lda #$19
+	sta $4301			; $19 is vram high
+
+	; source address => $0c9141, DataFillValues9140+1 ($01)
+	ldx #$9141
+	stx $4302			; source offset => $9141
+
+	ldx #$1000
+	stx $4305			; transfer size => $1000
+	lda #$01
+	sta $420b			; start dma transfer on channel 0
+
+	rts					; exit routine
+
+
+; pc should equal $0c9140
+pullpc
+;--------------------------------------------------------------------
+pushpc
+org $0c9140
+
+
+; DATA: DataFillValues9140 ($0c9140)
+;		$0c9140-$0c9141 ($c bytes)
+;		in file: $061140-$061141
+DataFillValues9140:
+	db $ff,$01
+
+
+; pc should equal $0c9142
+pullpc
+;--------------------------------------------------------------------
+pushpc
+org $0c9142
+
+
+; ROUTINE: Copy and decompress title screen crystals graphics ($0c9142)
+CopyAndDecompressCrystals:
+	php					; save processor status
+	phd					; save direct page
+
+	%setAXYto16bit()
+	lda #$0000
+	tcd					; direct page => $0000
+
+	jsr CopyTitleScreenCrystalsCompressed
+	jsr ExpandSecondHalfWithZeros
+	jsr DecompressCrystals
+
+	lda #$0010
+	sta $7f2f9c			; $7f2f9c => $0010	; TODO: what is this?
+	sta $7f2dd2			; $7f2dd2 => $0010	; TODO: what is this?
+
+	pld					; restore direct page
+	plp					; restore processor status
+	rts					; exit routine
+
+
+; pc should equal $0c9161
+pullpc
+;--------------------------------------------------------------------
+pushpc
+org $0c9161
+
+
+; ROUTINE: Decompress title screen crystals ($0c9161)
+;		decompresses title screen crystals graphics
+;		destination of decompressed data => $7f2000-$7f3fff 
+; AXY => 16bit
+DecompressCrystals:
+	; Clear ram $7f2000-$7f3fff 
+	ldx #$0000			; fill value => $0000
+	ldy #$2000			; fill destination => $2000
+	lda #$2000			; fill size => $2000 bytes
+	jsl FillSectionWithA_LongJump
+
+	jsr .Section91af
+	jsr .Section9197
+	jsr ReverseWordArrays
+	jsr .Section91b7
+	jsr .Section919f
+	jsr ReverseBitsAndShiftLeftSection
+	jsr .Section91bf
+	jsr ReverseWordArrays
+	jsr .Section91c7
+	jsr .Section91a7
+	jsr ReverseWordArrays
+
+	ldy #$24c0
+	ldx #$9400			; DataDecompressCrystalsControl06
+	bra .MainLoop
+
+	.Section9197
+	ldy #$2080
+	ldx #$93ca			; DataDecompressCrystalsControl04
+	bra .MainLoop
+
+	.Section919f
+	ldy #$2480
+	ldx #$93eb			; DataDecompressCrystalsControl05
+	bra .MainLoop
+
+	.Section91a7
+	ldy #$20c0
+	ldx #$9410			; DataDecompressCrystalsControl07
+	bra .MainLoop
+
+	.Section91af
+	ldy #$2000
+	ldx #$9346			; DataDecompressCrystalsControl01
+	bra .MainLoop
+
+	.Section91b7
+	ldy #$2b80
+	ldx #$9392			; DataDecompressCrystalsControl02
+	bra .MainLoop
+
+	.Section91bf
+	ldy #$2ba0
+	ldx #$9392			; DataDecompressCrystalsControl02
+	bra .MainLoop
+
+	.Section91c7
+	ldy #$2040
+	ldx #$9396			; DataDecompressCrystalsControl03
+
+	.MainLoop {
+		phk
+		plb					; databank => program bank, $0c
+		lda $0000,x
+		and #$00ff			; A => control code ($0000[X].low)
+		cmp #$0080
+		bcs .SkipAhead			; if high bit set then .SkipAhead else .Decompress
+
+		.Decompress {
+			asl a
+			asl a
+			asl a
+			asl a
+			asl a				; A => A * $20
+			phx					; save control code offset
+			tax					; X => A
+
+			jsr DecompressCrystalsChunk
+
+			plx					; restore control code offset
+			inx					; increment control code offset
+			bra .MainLoop
+		}
+
+		.SkipAhead {
+			cmp #$00ff
+			beq .Exit			; exit when control code = $FF
+
+			and #$007f			; clear high bit
+			; skip A * $20 bytes of destination
+			asl a
+			asl a
+			asl a
+			asl a
+			asl a				; A => A * $20
+			sta !temp_64
+			tya
+			adc !temp_64
+			tay					; Y => Y + A
+
+			inx					; increment control code offset
+			bra .MainLoop
+		}
+	}
+
+	.Exit
+	rts					; exit routine
+
+
+; pc should equal $0c91ff
+pullpc
+;--------------------------------------------------------------------
+pushpc
+org $0c91ff
+
+
+; ROUTINE: Decompress chunk ($0c91ff)
+;		
+; parameters:
+;		X => source data offset
+;			bits 0-4 are 0, so processed in $20 byte chunks
+;			for bytes $10-$1f, odd addresses are not used (eg $11 $13 $15...)
+;		Y => transformed data offset
+;			for bytes $10-$1f, odd addresses are not set (eg $11 $13 $15...)
+; AXY => 16bit
+DecompressCrystalsChunk:
+	%setAto8bit()
+	lda #$08
+	sta !loop_counter_62		; !loop_counter_62 => $08
+	pea $7f00
+	plb
+	plb					; databank => $7f
+
+	.Loop {
+		lda $0000,x
+		ora $0001,x
+		ora $0010,x
+		eor #$ff
+		sta !temp_64		; tmp => (source[x] | source[x+1] | source[x+$10]) xor $FF
+
+		and $0000,y
+		ora $0000,x
+		sta $0000,y			; dest[y] => (tmp & dest[y]) | source[x]
+
+		lda !temp_64
+		and $0001,y
+		ora $0001,x
+		sta $0001,y			; dest[y+1] => (tmp & dest[y+1]) | source[x+1]
+
+		lda !temp_64
+		and $0010,y
+		ora $0010,x
+		sta $0010,y			; dest[y+$10] => (tmp & dest[y+$10]) | source[x+$10]
+
+		inx
+		inx					; X += 2
+		iny
+		iny					; Y += 2
+		dec !loop_counter_62
+		bne .Loop
+	}
+
+	%setAXYto16bit()
+	clc
+	tya
+	adc #$0010
+	tay					; Y += $10
+	rts					; exit routine
+
+
+
+; pc should equal $0c9247
+pullpc
 ;--------------------------------------------------------------------
 pushpc
 org $0c9247
@@ -767,30 +1217,30 @@ pushpc
 org $0c9318
 
 
-; ROUTINE: CopyABunch0c9318 ($0c9318)
+; ROUTINE: CopyTitleScreenCrystalsCompressed ($0c9318)
 ;		sources =>
-;			$04e220-$04e27f, in file $026220-$02627f, $60 bytes
-;			$04e490-$‭04e51f, in file $026490-$0‭2651f, $90 bytes
-;			$04fcc0-$0‭4fe9f‬, in file $027cc0-$0‭27e9f, $1E0 bytes
+;			$04e220-$04e27f - DataTitleScreenCrystals01 ($60 bytes)
+;			$04e490-$‭04e51f - DataTitleScreenCrystals02 ($90 bytes)
+;			$04fcc0-$0‭4fe9f - DataTitleScreenCrystals03 ($1E0 bytes)
 ;		destination => $7f0000-$7f0eb9
 ;			size => $3c0, chunk size => $20, number of chunks => $1e
 ;		copies $18 bytes then skips $8 bytes each chunk
 ; AXY => 16bit
 ; direct page => $0000
 ; TODO: rename routine!!
-CopyABunch0c9318:
+CopyTitleScreenCrystalsCompressed:
 	clc
 	ldx #$e220			; source offset => $e220 (in file => $026220)
 	ldy #$0000			; destination offset => $0000
 	lda #$0004			; times to loop => $4 ($60 bytes)
-	jsr CopyABunch0c9318_Entry
+	jsr CopyTitleScreenCrystalsCompressed_Entry
 	ldx #$e490			; source offset => $e490 (in file => $026490)
 	lda #$0006			; times to loop => $6 ($90 bytes)
-	jsr CopyABunch0c9318_Entry
+	jsr CopyTitleScreenCrystalsCompressed_Entry
 	ldx #$fcc0			; source offset => $fcc0 (in file => $027cc0)
 	lda #$0014			; times to loop => $14 ($1E0 bytes)
 
-CopyABunch0c9318_Entry:
+CopyTitleScreenCrystalsCompressed_Entry:
 	; source offset => X, increases $18 each loop
 	; destination offset => Y, increases $20 each loop
 	sta !loop_counter_62
@@ -810,8 +1260,114 @@ CopyABunch0c9318_Entry:
 ; pc should equal $0c9346
 pullpc
 ;--------------------------------------------------------------------
+pushpc
+org $0c9346
 
 
+; DATA: DataDecompressCrystalsControl01 ($0c9346)
+;		$0c9346-$0c9391 ($4c bytes)
+;		in file: $061346-$061391
+DataDecompressCrystalsControl01:
+	db $00,$01,$82,$00,$01,$82,$00,$01,$82,$00,$01,$82,$02,$03,$82,$02
+	db $03,$82,$02,$03,$82,$02,$03,$82,$04,$05,$82,$04,$05,$82,$04,$05
+	db $82,$04,$05,$82,$06,$07,$82,$06,$07,$82,$06,$07,$82,$06,$07,$82
+	db $00,$01,$82,$00,$01,$86,$08,$81,$09,$81,$02,$03,$82,$02,$03,$8A
+	db $04,$05,$82,$04,$05,$8A,$06,$07,$82,$06,$07,$FF
+
+
+; pc should equal $0c9392
+pullpc
+;--------------------------------------------------------------------
+pushpc
+org $0c9392
+
+
+; DATA: DataDecompressCrystalsControl02 ($0c9392)
+;		$0c9392-$0c9395 ($4 bytes)
+;		in file: $061392-$061395
+DataDecompressCrystalsControl02:
+	db $08,$81,$09,$FF
+
+
+; pc should equal $0c9396
+pullpc
+;--------------------------------------------------------------------
+pushpc
+org $0c9396
+
+
+; DATA: DataDecompressCrystalsControl03 ($0c9396)
+;		$0c9396-$0c93c9 ($34 bytes)
+;		in file: $061396-$0613c9
+DataDecompressCrystalsControl03:
+	db $00,$83,$00,$83,$00,$83,$00,$83,$02,$83,$02,$83,$02,$83,$02,$83
+	db $04,$83,$04,$83,$04,$83,$04,$83,$06,$83,$06,$83,$06,$83,$06,$83
+	db $00,$83,$00,$86,$08,$81,$09,$82,$02,$83,$02,$8B,$04,$83,$04,$8B
+	db $06,$83,$06,$FF
+
+
+; pc should equal $0c93ca
+pullpc
+;--------------------------------------------------------------------
+pushpc
+org $0c93ca
+
+
+; DATA: DataDecompressCrystalsControl04 ($0c93ca)
+;		$0c93ca-$0c93ea ($21 bytes)
+;		in file: $0613ca-$0613ea
+DataDecompressCrystalsControl04:
+	db $0A,$0B,$83,$0F,$82,$13,$14,$86,$0C,$0D,$82,$10,$11,$82,$15,$16
+	db $87,$0E,$83,$12,$83,$17,$92,$18,$19,$82,$1D,$8B,$1A,$1B,$8F,$1C
+	db $FF
+
+
+; pc should equal $0c93eb
+pullpc
+;--------------------------------------------------------------------
+pushpc
+org $0c93eb
+
+
+; DATA: DataDecompressCrystalsControl05 ($0c93eb)
+;		$0c93eb-$0c93ff ($15 bytes)
+;		in file: $0613eb-$0613ff
+DataDecompressCrystalsControl05:
+	db $0C,$83,$10,$83,$15,$87,$0A,$0B,$83,$0F,$82,$13,$14,$A2,$1A,$8F
+	db $18,$19,$82,$1D,$FF
+
+
+; pc should equal $0c9400
+pullpc
+;--------------------------------------------------------------------
+pushpc
+org $0c9400
+
+
+; DATA: DataDecompressCrystalsControl06 ($0c9400)
+;		$0c9400-$0c940f ($10 bytes)
+;		in file: $061400-$06140f
+DataDecompressCrystalsControl06:
+	db $0C,$83,$10,$83,$15,$87,$0A,$87,$13,$A3,$1A,$8F,$18,$83,$1D,$FF
+
+
+; pc should equal $0c9410
+pullpc
+;--------------------------------------------------------------------
+pushpc
+org $0c9410
+
+
+; DATA: DataDecompressCrystalsControl07 ($0c9410)
+;		$0c9410-$0c941f ($10 bytes)
+;		in file: $061410-$06141f
+DataDecompressCrystalsControl07:
+	db $0A,$87,$13,$87,$0C,$83,$10,$83,$15,$A3,$18,$83,$1D,$8B,$1A,$FF
+
+
+; pc should equal $0c9410
+pullpc
+;--------------------------------------------------------------------
 
 
 

@@ -33038,6 +33038,21 @@
 
 
 
+;--------------------------------------------------------------------
+;						BANK $04
+;--------------------------------------------------------------------
+
+
+
+
+04e220-04e27f			; DATA: DataTitleScreenCrystals01
+
+04e490-‭04e51f			; DATA: DataTitleScreenCrystals02
+
+04fcc0-0‭4fe9f‬			; DATA: DataTitleScreenCrystals03
+
+
+
 
 
 ;--------------------------------------------------------------------
@@ -34689,7 +34704,7 @@
 0c8103 lda #$0c
 0c8105 sta $005a
 0c8108 ldx #$90d7
-0c810b stx $0058
+0c810b stx $0058		; $0c90d7, ClearVRAMLowBytes
 0c810e lda #$40
 0c8110 tsb $00e2
 0c8113 jsl IdleUntilInterruptD8
@@ -35314,11 +35329,11 @@
 0c87ed %setAXYto16bit()
 0c87ef pea $0c7f			; used for databanks
 
-	; fill $7f001e-$7f0192 with $4000 ($c0 words, $180 bytes)
+	; fill $7f001e-$7f00dd with $4000 ($c0 bytes)
 0c87f2 plb					; databank => $7f
 0c87f3 ldx #$4000			; fill value => $4000
 0c87f6 ldy #$001e			; fill destination => $001e
-0c87f9 lda #$00c0			; fill size => $c0 words
+0c87f9 lda #$00c0			; fill size => $c0 bytes
 0c87fc jsl FillSectionWithA_LongJump
 
 0c8800 plb					; databank => $0c
@@ -35853,13 +35868,17 @@ FF 10 00 D1 0E 01 00 A9 F7 A2
 
 
 
-0c8d7b php				; save processor status to stack
-0c8d7c phd				; save direct page to stack
+; ROUTINE:  ($)
+0c8d7b php					; save processor status
+0c8d7c phd					; save direct page
+
 0c8d7d %setAXYto16bit()
 0c8d7f lda #$4300
-0c8d82 tcd				; set direct page to $4300
-0c8d83 stz $2116		; 
+0c8d82 tcd					; direct page => $4300
+
+0c8d83 stz $2116			; destination address => $0000
 0c8d86 %setAto8bit()
+
 0c8d88 lda #$80
 0c8d8a sta $2115
 0c8d8d lda #$00
@@ -35891,63 +35910,83 @@ FF 10 00 D1 0E 01 00 A9 F7 A2
 0c8dc4 stx $05
 0c8dc6 lda #$01
 0c8dc8 sta $420b
-0c8dcb jsr $90f9
-0c8dce jsr $9142
+
+0c8dcb jsr FillOAM2With_01ff
+
+0c8dce jsr CopyAndDecompressCrystals
+
+	; copy decompressed crystals data to vram
 0c8dd1 ldx #$1801
-0c8dd4 stx $00
+0c8dd4 stx $00				; $18 is vram, $01 is increment write two bytes
 0c8dd6 ldx #$4000
-0c8dd9 stx $2116
+0c8dd9 stx $2116			; vram destination address => $8000
 0c8ddc ldx #$2000
-0c8ddf stx $02
+0c8ddf stx $02				; source offset => $2000
 0c8de1 lda #$7f
-0c8de3 sta $04
+0c8de3 sta $04				; source bank => $7f
 0c8de5 ldx #$1000
-0c8de8 stx $05
+0c8de8 stx $05				; dma transfer size => $1000
 0c8dea lda #$01
-0c8dec sta $420b
+0c8dec sta $420b			; start dma transfer on channel 0
+
+	; 
 0c8def lda #$0c
-0c8df1 sta $04
-0c8df3 ldy #$5100
-0c8df6 ldx #$8f14
+0c8df1 sta $04				; source bank => $0c
+0c8df3 ldy #$5100			; destination start => $5100
+0c8df6 ldx #$8f14			; control codes address => $8f14
+
+	.Loop {
 0c8df9 %setAXYto16bit()
-0c8dfb sty $2116
+0c8dfb sty $2116			; vram destination address => Y
+
+	; dma transfer size => codes[x] * $20
 0c8dfe lda $0000,x
-0c8e01 and #$00ff
+0c8e01 and #$00ff			; A => codes[x]
 0c8e04 asl a
 0c8e05 asl a
 0c8e06 asl a
 0c8e07 asl a
-0c8e08 asl a
-0c8e09 sta $05
+0c8e08 asl a				; A => A * $20
+0c8e09 sta $05				; dma transfer size => A
+
+	; dma source offset => (codes[x+1] * $20) + $aa4c
 0c8e0b lda $0001,x
-0c8e0e and #$00ff
+0c8e0e and #$00ff			; A => codes[x+1]
 0c8e11 asl a
 0c8e12 asl a
 0c8e13 asl a
 0c8e14 asl a
-0c8e15 asl a
-0c8e16 adc #$aa4c
-0c8e19 sta $02
+0c8e15 asl a				; A => A * $20
+0c8e16 adc #$aa4c			; A += $aa4c
+0c8e19 sta $02				; dma source offset => A
+
+	; next vram destination address += codes[x+2] * $10
 0c8e1b lda $0002,x
-0c8e1e and #$00ff
+0c8e1e and #$00ff			; A => codes[x+2]
 0c8e21 asl a
 0c8e22 asl a
 0c8e23 asl a
-0c8e24 asl a
+0c8e24 asl a				; A => A * $10
 0c8e25 phy
 0c8e26 adc $01,s
-0c8e28 tay
-0c8e29 pla
+0c8e28 tay					; Y => Y + A
+0c8e29 pla					; throw away temp value
+
 0c8e2a %setAto8bit()
 0c8e2c lda #$01
-0c8e2e sta $420b
-0c8e31 lda $0002,x
-0c8e34 php				; save processor status to stack
+0c8e2e sta $420b			; start dma transfer on channel 0
+
+0c8e31 lda $0002,x			; check loop exit condition
+
+0c8e34 php					; save processor status
 0c8e35 inx
 0c8e36 inx
-0c8e37 inx
-0c8e38 plp
-0c8e39 bne $8df9
+0c8e37 inx					; control codes address += 3
+0c8e38 plp					; restore processor status
+
+0c8e39 bne .Loop			; if codes[x+2] = 0, exit the loop
+	}
+
 0c8e3b %setAXYto16bit()
 0c8e3d lda #$0000
 0c8e40 tcd
@@ -35958,6 +35997,7 @@ FF 10 00 D1 0E 01 00 A9 F7 A2
 0c8e4d ldx #$0000		; clear X
 0c8e50 lda #$0400
 0c8e53 pha
+
 0c8e54 sta $002116
 0c8e58 lda $0c8f14,x
 0c8e5c and #$00ff
@@ -35970,15 +36010,18 @@ FF 10 00 D1 0E 01 00 A9 F7 A2
 0c8e6a adc #$0000
 0c8e6d phx
 0c8e6e tax
+
 0c8e6f phy
 0c8e70 jsr Copy4ColorsToCGRAM
 0c8e73 ply
 0c8e74 dey
 0c8e75 bne $8e6f
+
 0c8e77 plx
 0c8e78 lda $0c8f15,x
 0c8e7c and #$ff00
 0c8e7f beq $8e8c
+
 0c8e81 inx
 0c8e82 inx
 0c8e83 inx
@@ -35987,6 +36030,7 @@ FF 10 00 D1 0E 01 00 A9 F7 A2
 0c8e86 adc $01,s
 0c8e88 sta $01,s
 0c8e8a bra $8e54
+
 0c8e8c pla
 0c8e8d phk
 0c8e8e plb
@@ -35996,9 +36040,11 @@ FF 10 00 D1 0E 01 00 A9 F7 A2
 0c8e97 stx $2116
 0c8e9a ldx #$0040
 0c8e9d lda #$10
+
 0c8e9f sta $2119
 0c8ea2 dex
 0c8ea3 bne $8e9f
+
 0c8ea5 pld
 0c8ea6 plp
 0c8ea7 rts				; exit routine
@@ -36224,229 +36270,36 @@ FF 10 00 D1 0E 01 00 A9 F7 A2
 
 
 
-0c90d7 stz $2115
-0c90da ldx #$0000		; clear X
-0c90dd stx $2116
-0c90e0 ldx #$1808
-0c90e3 stx $00
-0c90e5 ldx #$8252
-0c90e8 stx $02
-0c90ea lda #$00
-0c90ec sta $04
-0c90ee ldx #$2000
-0c90f1 stx $05
-0c90f3 lda #$01
-0c90f5 sta $420b
-0c90f8 rtl				; exit routine
 
-
-
-; ROUTINE:  ($0c90f9)
-Routine0c90f9:
-0c90f9 stz $2115			; vram control => $00, auto increment by 1 word on write low
-0c90fc ldx #$6000
-0c90ff stx $2116			; destination address => $6000
-0c9102 ldx #$1808			; $18 is vram, $08 is fixed address, write twice
-0c9105 stx $4300
-0c9108 ldx #$9140
-0c910b stx $4302			; source offset => $9140
-0c910e lda #$0c
-0c9110 sta $4304			; source bank => $0c
-0c9113 ldx #$1000
-0c9116 stx $4305
-0c9119 lda #$01
-0c911b sta $420b
-
-0c911e lda #$80
-0c9120 sta $2115
-0c9123 ldx #$6000
-0c9126 stx $2116
-0c9129 lda #$19
-0c912b sta $4301
-0c912e ldx #$9141
-0c9131 stx $4302			; source offset => 
-0c9134 ldx #$1000
-0c9137 stx $4305
-0c913a lda #$01
-0c913c sta $420b
-0c913f rts					; exit routine
-
-
-
-; ROUTINE:  ($0c9142)
-Routine0c9142:
-0c9142 php					; save processor status
-0c9143 phd					; save direct page
-
-0c9144 %setAXYto16bit()
-0c9146 lda #$0000
-0c9149 tcd					; direct page => $0000
-
-0c914a jsr CopyABunch0c9318
-0c914d jsr ExpandSecondHalfWithZeros
-0c9150 jsr $9161
-
-0c9153 lda #$0010
-0c9156 sta $7f2f9c			; $7f2f9c => $0010	; TODO: what is this?
-0c915a sta $7f2dd2			; $7f2dd2 => $0010	; TODO: what is this?
-
-0c915e pld					; restore direct page
-0c915f plp					; restore processor status
-0c9160 rts					; exit routine
-
-
-
-
-; ROUTINE:  ($0c9161)
-; AXY => 16bit
-Routine0c9161:
-0c9161 ldx #$0000			; fill value => $0000
-0c9164 ldy #$2000			; fill destination => $2000
-0c9167 lda #$2000			; fill size => $2000 words
-0c916a jsl FillSectionWithA_LongJump
-0c916e jsr $91af
-0c9171 jsr $9197
-0c9174 jsr ReverseWordArrays
-0c9177 jsr $91b7
-0c917a jsr $919f
-0c917d jsr ReverseBitsAndShiftLeftSection
-0c9180 jsr $91bf
-0c9183 jsr ReverseWordArrays
-0c9186 jsr $91c7
-0c9189 jsr $91a7
-0c918c jsr ReverseWordArrays
-0c918f ldy #$24c0
-0c9192 ldx #$9400
-0c9195 bra .Skip0c91cd
-0c9197 ldy #$2080
-0c919a ldx #$93ca
-0c919d bra .Skip0c91cd
-0c919f ldy #$2480
-0c91a2 ldx #$93eb
-0c91a5 bra .Skip0c91cd
-0c91a7 ldy #$20c0
-0c91aa ldx #$9410
-0c91ad bra .Skip0c91cd
-
-
-0c91af ldy #$2000
-0c91b2 ldx #$9346
-0c91b5 bra .Skip0c91cd
-
-
-0c91b7 ldy #$2b80
-0c91ba ldx #$9392
-0c91bd bra .Skip0c91cd
-0c91bf ldy #$2ba0
-0c91c2 ldx #$9392
-0c91c5 bra .Skip0c91cd
-0c91c7 ldy #$2040
-0c91ca ldx #$9396
-
-	.Skip0c91cd {
-0c91cd phk
-0c91ce plb					; databank => program bank, $0c
-0c91cf lda $0000,x
-0c91d2 and #$00ff
-0c91d5 cmp #$0080
-0c91d8 bcs .LeaveLoop		; loop until $0000[X].low >= $80
-0c91da asl a
-0c91db asl a
-0c91dc asl a
-0c91dd asl a
-0c91de asl a				; A => A / $20, top 3 bits of A.low
-0c91df phx					; save X
-0c91e0 tax					; X => A
-
-0c91e1 jsr $91ff
-
-0c91e4 plx					; restore X
-0c91e5 inx					; increment X
-0c91e6 bra .Skip0c91cd
-	}
-
-	.LeaveLoop
-0c91e8 cmp #$00ff
-0c91eb beq $91fe
-0c91ed and #$007f
-0c91f0 asl a
-0c91f1 asl a
-0c91f2 asl a
-0c91f3 asl a
-0c91f4 asl a
-0c91f5 sta !loop_counter_64
-0c91f7 tya
-0c91f8 adc !loop_counter_64
-0c91fa tay
-0c91fb inx
-0c91fc bra .Skip0c91cd
-0c91fe rts					; exit routine
-
-
-
-
-; ROUTINE:  ($0c91ff)
-; parameters:
-;		X => offset
-;		Y => 
-Routine0c91ff:
-0c91ff %setAto8bit()
-0c9201 lda #$08
-0c9203 sta !loop_counter_62		; !loop_counter_62 => $08
-0c9205 pea $7f00
-0c9208 plb
-0c9209 plb					; databank => $7f
-
-	.Loop {
-0c920a lda $0000,x
-0c920d ora $0001,x
-0c9210 ora $0010,x
-0c9213 eor #$ff
-0c9215 sta !loop_counter_64
-
-0c9217 and $0000,y
-0c921a ora $0000,x
-0c921d sta $0000,y
-
-0c9220 lda !loop_counter_64
-0c9222 and $0001,y
-0c9225 ora $0001,x
-0c9228 sta $0001,y
-
-0c922b lda !loop_counter_64
-0c922d and $0010,y
-0c9230 ora $0010,x
-0c9233 sta $0010,y
-
-0c9236 inx
-0c9237 inx					; X += 2
-0c9238 iny
-0c9239 iny					; Y += 2
-0c923a dec !loop_counter_62
-0c923c bne .Loop
-	}
-
-0c923e %setAXYto16bit()
-0c9240 clc
-0c9241 tya
-0c9242 adc #$0010
-0c9245 tay					; Y += $10
-0c9246 rts					; exit routine
-
-
-
-
-
+0c90d7-0c90f8			; ROUTINE: ClearVRAMLowBytes
+0c90f9-0c913f			; ROUTINE: FillOAM2With_01ff
+0c9140-0c9141			; DATA: DataFillValues9140
+0c9142-0c9160			; ROUTINE: CopyAndDecompressCrystals
+0c9161-0c91fe			; ROUTINE: DecompressCrystals
+0c91ff-0c9246			; ROUTINE: DecompressCrystalsChunk
 0c9247-0c925f			; ROUTINE: ReverseWordArrays
 0c9260-0c929d			; ROUTINE: ReverseWordArray
 0c929e-0c92c1			; ROUTINE: ReverseBitsAndShiftLeftSection
 0c92c2-0c92ea			; ROUTINE: ReverseBitsAndShiftLeft
 0c92eb-0c9317			; ROUTINE: ExpandSecondHalfWithZeros
-0c9318-0c9345			; ROUTINE: CopyABunch0c9318
+0c9318-0c9345			; ROUTINE: CopyTitleScreenCrystalsCompressed
+0c9346-0c9391			; DATA: DataDecompressCrystalsControl01
+0c9392-0c9395			; DATA: DataDecompressCrystalsControl02
+0c9396-0c93c9			; DATA: DataDecompressCrystalsControl03
+0c93ca-0c93ea			; DATA: DataDecompressCrystalsControl04
+0c93eb-0c93ff			; DATA: DataDecompressCrystalsControl05
+0c9400-0c940f			; DATA: DataDecompressCrystalsControl06
+0c9410-0c941f			; DATA: DataDecompressCrystalsControl07
 
 
 
-; MISSING: $0c9346-$0cffff  ($6CB9 bytes)
+
+; MISSING: $0c9420-$0cffff  ($---- bytes)
+
+
+
+
+
 
 
 

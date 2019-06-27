@@ -15,8 +15,14 @@ namespace pull_assets_from_rom {
 			new Asset(@"data\graphics\048000-tiles.bin", 0x020000, 0x1800),
 			new Asset(@"data\graphics\tiles.bin", 0x028C80, 0x6600),
 			new Asset(@"data\graphics\038030-title-screen-maybe.bin", 0x038030, 0x1000),
-			new Asset(@"data\graphics\data07b013.bin", 0x03B013, 0x2BE9)
-		};
+			new Asset(@"data\graphics\data07b013.bin", 0x03B013, 0x2BE9),
+
+			
+			new Asset(@"data\graphics\title-screen-crystals-01.bin", 0x026220, 0x60),	// $04e220-$04e27f, in file $026220-$02627f
+			new Asset(@"data\graphics\title-screen-crystals-02.bin", 0x026490, 0x90),	// $04e490-$‭04e51f, in file $026490-$0‭2651f
+			new Asset(@"data\graphics\title-screen-crystals-03.bin", 0x027cc0, 0x1e0)	// $04fcc0-$0‭4fe9f‬, in file $027cc0-$0‭27e9f
+
+	};
 
 
 		static void Main(string[] args) {

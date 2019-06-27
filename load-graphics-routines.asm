@@ -383,7 +383,7 @@ LoadTilesAndColors:
 	ldx #$1000
 	stx $4355			; dma transfer size => $1000
 	ldx #$3000
-	stx $16				; vram destination address => $3000
+	stx $16				; vram destination address => $6000
 	lda #$84			; $84 means increment address on write high byte, translation = 8bit, increment address by 1 word
 	sta $15				; set video port control [VMAIN]
 	lda #$20
@@ -600,8 +600,6 @@ Routine018336:
 ; pc should equal $018360
 pullpc
 ;--------------------------------------------------------------------
-
-
 
 
 

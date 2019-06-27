@@ -4,6 +4,8 @@
 ;--------------------------------------------------------------------
 
 008247-008251			; ROUTINE: BasicInit
+008251-??????			; DATA: DataFillValues8252
+
 
 008504-00851f			; ROUTINE: Copy8ColorsFromD8E4
 
@@ -100,6 +102,27 @@
 
 
 
+
+
+;--------------------------------------------------------------------
+;						BANK $04
+;--------------------------------------------------------------------
+
+
+
+
+04e220-04e27f			; DATA: DataTitleScreenCrystals01
+
+04e490-‭04e51f			; DATA: DataTitleScreenCrystals02
+
+04fcc0-0‭4fe9f‬			; DATA: DataTitleScreenCrystals03
+
+
+
+
+
+
+
 ;--------------------------------------------------------------------
 ;						BANK $07
 ;--------------------------------------------------------------------
@@ -132,14 +155,32 @@
 0c8948-0c896e			; ROUTINE: ClearOAM
 
 
+
+0c90d7-0c90f8			; ROUTINE: ClearVRAMLowBytes
+0c90f9-0c913f			; ROUTINE: FillOAM2With_01ff
+0c9140-0c9141			; DATA: DataFillValues9140
+0c9142-0c9160			; ROUTINE: CopyAndDecompressCrystals
+0c9161-0c91fe			; ROUTINE: DecompressCrystals
+0c91ff-0c9246			; ROUTINE: DecompressCrystalsChunk
 0c9247-0c925f			; ROUTINE: ReverseWordArrays
 0c9260-0c929d			; ROUTINE: ReverseWordArray
 0c929e-0c92c1			; ROUTINE: ReverseBitsAndShiftLeftSection
 0c92c2-0c92ea			; ROUTINE: ReverseBitsAndShiftLeft
 0c92eb-0c9317			; ROUTINE: ExpandSecondHalfWithZeros
-0c9318-0c9345			; ROUTINE: CopyABunch0c9318
+0c9318-0c9345			; ROUTINE: CopyTitleScreenCrystalsCompressed
+0c9346-0c9391			; DATA: DataDecompressCrystalsControl01
+0c9392-0c9395			; DATA: DataDecompressCrystalsControl02
+0c9396-0c93c9			; DATA: DataDecompressCrystalsControl03
+0c93ca-0c93ea			; DATA: DataDecompressCrystalsControl04
+0c93eb-0c93ff			; DATA: DataDecompressCrystalsControl05
+0c9400-0c940f			; DATA: DataDecompressCrystalsControl06
+0c9410-0c941f			; DATA: DataDecompressCrystalsControl07
 
-; MISSING: $0c9346-$0cffff  ($6CB9 bytes)
+
+
+; MISSING: $0c9420-$0cffff  ($---- bytes)
+
+
 
 ;--------------------------------------------------------------------
 ;						BANK $0d
