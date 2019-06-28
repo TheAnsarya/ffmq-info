@@ -633,15 +633,16 @@ pushpc
 org $0c8f14
 
 
-; DATA: DataDMAControlCodes0c8f14 ($0c8f14)
+; DATA: DataTitleScreenWordsControlCodes ($0c8f14)
 ;		$0c8f14-$0c8f97 ($84 bytes)
 ;		in file: $061f14-$061f97
+;		describes graphics stored at $0caa4c ($ca0 bytes)
 ; layout:
 ;		dma transfer size => byte[0] * 20
 ;		dma source offset => byte[1] * 20 += $aa4c
 ;		increase vram destination address by => byte[2] * 10
 ; end when byte[2] is $00
-DataDMAControlCodes0c8f14:
+DataTitleScreenWordsControlCodes:
 	db $01,$00,$02
 	db $01,$01,$02
 	db $01,$02,$02
@@ -1366,6 +1367,31 @@ DataDecompressCrystalsControl07:
 
 
 ; pc should equal $0c9410
+pullpc
+;--------------------------------------------------------------------
+
+
+
+
+
+
+;--------------------------------------------------------------------
+pushpc
+org $0caa4c
+
+
+; DATA: Title screen word graphics ($0caa4c)
+;		$0caa4c-$0‭cb6ec ($ca0 bytes)		TODO: this much is copied first, which is right? should the be separate?
+;		in file: $062a4c-$0636ec
+;
+;		$0caa4c-$0‭cb7ab ($d60 bytes)
+;		in file: $062a4c-$0637ab
+DataTitleScreenWordGraphics:
+	incbin "data\graphics\title-screen-words.bin"
+
+
+; TODO: this was the value, which is right?  pc should equal $0‭cb6ed
+; pc should equal $0‭cb7ac
 pullpc
 ;--------------------------------------------------------------------
 

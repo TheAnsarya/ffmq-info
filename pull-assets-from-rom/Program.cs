@@ -11,6 +11,20 @@ namespace pull_assets_from_rom {
 		static string romfilename = @"c:\working\Final Fantasy - Mystic Quest (U) (V1.0) [!].smc";
 		static string outputfolder = @"c:\working\ffmq-assets\";
 
+		private static byte[] _rom = null;
+		public static byte[] ROM {
+			get {
+				if (_rom == null) {
+					_rom = new byte[0x80000];
+					using (var romstream = File.OpenRead(romfilename)) {
+						romstream.Read(_rom, 0, 0x80000);
+					}
+				}
+
+				return _rom;
+			}
+		}
+
 		static List<Asset> Definition = new List<Asset>() {
 			new Asset(@"data\graphics\048000-tiles.bin", 0x020000, 0x1800),
 			new Asset(@"data\graphics\tiles.bin", 0x028C80, 0x6600),
@@ -20,7 +34,9 @@ namespace pull_assets_from_rom {
 			
 			new Asset(@"data\graphics\title-screen-crystals-01.bin", 0x026220, 0x60),	// $04e220-$04e27f, in file $026220-$02627f
 			new Asset(@"data\graphics\title-screen-crystals-02.bin", 0x026490, 0x90),	// $04e490-$‭04e51f, in file $026490-$0‭2651f
-			new Asset(@"data\graphics\title-screen-crystals-03.bin", 0x027cc0, 0x1e0)	// $04fcc0-$0‭4fe9f‬, in file $027cc0-$0‭27e9f
+			new Asset(@"data\graphics\title-screen-crystals-03.bin", 0x027cc0, 0x1e0),	// $04fcc0-$0‭4fe9f‬, in file $027cc0-$0‭27e9f
+			
+			new Asset(@"data\graphics\title-screen-words.bin", 0x062a4c, 0xca0)			// $0caa4c-$0‭cb6ec, in file $062a4c-$0636ec
 
 	};
 
@@ -29,13 +45,8 @@ namespace pull_assets_from_rom {
 			PullAssets();
 		}
 		static void PullAssets() {
-			var rom = new byte[0x80000];
-			using (var romstream = File.OpenRead(romfilename)) {
-				romstream.Read(rom, 0, 0x80000);
-			}
-
 			foreach (var def in Definition) {
-				var section = new MemoryStream(rom, def.Address, def.Size);
+				var section = new MemoryStream(ROM, def.Address, def.Size);
 
 				string path = Path.Combine(outputfolder, def.Path);
 				string dir = Path.GetDirectoryName(path);

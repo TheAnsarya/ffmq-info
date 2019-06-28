@@ -2,10 +2,13 @@
 
 !general_address = $0017
 
-
+; temp variables and loop counters
 !loop_counter_62 = $62
+!temp_62 = $62
+!temp_63 = $63
 !loop_counter_64 = $64
 !temp_64 = $64
+!temp_65 = $65
 
 !flags_d8 = $00d8
 

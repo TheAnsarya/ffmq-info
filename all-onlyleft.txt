@@ -35929,11 +35929,13 @@ FF 10 00 D1 0E 01 00 A9 F7 A2
 0c8dea lda #$01
 0c8dec sta $420b			; start dma transfer on channel 0
 
-	; 
+	; copy title screen words graphics to vram
+	; they are uncompressed in the rom except for a simple "copy this much from here and then skip ahead to here"
+	; control codes: DataTitleScreenWordsControlCodes
 0c8def lda #$0c
 0c8df1 sta $04				; source bank => $0c
 0c8df3 ldy #$5100			; destination start => $5100
-0c8df6 ldx #$8f14			; control codes address => $8f14
+0c8df6 ldx #$8f14			; control codes address => $8f14, DataTitleScreenWordsControlCodes
 
 	.Loop {
 0c8df9 %setAXYto16bit()
@@ -35957,7 +35959,7 @@ FF 10 00 D1 0E 01 00 A9 F7 A2
 0c8e13 asl a
 0c8e14 asl a
 0c8e15 asl a				; A => A * $20
-0c8e16 adc #$aa4c			; A += $aa4c
+0c8e16 adc #$aa4c			; A += $aa4c, DataTitleScreenWordGraphics
 0c8e19 sta $02				; dma source offset => A
 
 	; next vram destination address += codes[x+2] * $10
@@ -35989,35 +35991,44 @@ FF 10 00 D1 0E 01 00 A9 F7 A2
 
 0c8e3b %setAXYto16bit()
 0c8e3d lda #$0000
-0c8e40 tcd
-0c8e41 ldx #$aa4c
+0c8e40 tcd					; direct page => $0000
+
+	; copy title screen word graphics to wram
+	; TODO: why is this being copied again?
+0c8e41 ldx #$aa4c			; DataTitleScreenWordGraphics
 0c8e44 ldy #$0000
 0c8e47 lda #$0d5f
 0c8e4a mvn $0c,$7f
-0c8e4d ldx #$0000		; clear X
-0c8e50 lda #$0400
-0c8e53 pha
 
-0c8e54 sta $002116
+
+0c8e4d ldx #$0000			; source offset => $0000
+0c8e50 lda #$0400			; vram destination offset => $0400
+0c8e53 pha					; save destination offset
+
+0c8e54 sta $002116			; vram destination offset => A
+	; control codes address => DataTitleScreenWordsControlCodes
 0c8e58 lda $0c8f14,x
 0c8e5c and #$00ff
-0c8e5f tay
+0c8e5f tay					; Y => codes[x].low
+
 0c8e60 lda $0c8f14,x
-0c8e64 and #$ff00
+0c8e64 and #$ff00			; A => codes[x].high
 0c8e67 lsr a
 0c8e68 lsr a
-0c8e69 lsr a
-0c8e6a adc #$0000
-0c8e6d phx
-0c8e6e tax
+0c8e69 lsr a				; A => A / 8
+0c8e6a adc #$0000			; A += carry flag
+0c8e6d phx					; save source offset
+0c8e6e tax					; X => A
 
-0c8e6f phy
-0c8e70 jsr Copy4ColorsToCGRAM
-0c8e73 ply
-0c8e74 dey
-0c8e75 bne $8e6f
+	.Loop2 {
+0c8e6f phy					; save counter
+0c8e70 jsr $8fb4
+0c8e73 ply					; restore counter
+0c8e74 dey					; decrement counter
+0c8e75 bne .Loop2
+	}
 
-0c8e77 plx
+0c8e77 plx					; restore source offset
 0c8e78 lda $0c8f15,x
 0c8e7c and #$ff00
 0c8e7f beq $8e8c
@@ -36030,6 +36041,7 @@ FF 10 00 D1 0E 01 00 A9 F7 A2
 0c8e86 adc $01,s
 0c8e88 sta $01,s
 0c8e8a bra $8e54
+
 
 0c8e8c pla
 0c8e8d phk
@@ -36101,71 +36113,108 @@ FF 10 00 D1 0E 01 00 A9 F7 A2
 
 
 
+; ROUTINE:  ($0c8fb4)
+;		some kind of decompression for title graphics
+;		expand $20 bytes into $40 bytes written to vram
+;		1 bit each from 4 bytes form the lower nibble of the new byte
+; parameters:
+;		X => source offset
+; XY => 16bit
 
 0c8fb4 %setAto8bit()
-0c8fb6 lda #$08
-0c8fb8 pha
+0c8fb6 lda #$08				; counter => $8
+
+	.Loop {
+0c8fb8 pha					; save counter
+		; chunk => source[x].w, source[x+$10].w
 0c8fb9 ldy $0010,x
-0c8fbc sty !loop_counter_64
+0c8fbc sty !temp_64
 0c8fbe ldy $0000,x
-0c8fc1 sty !loop_counter_62
-0c8fc3 ldy #$0008
-0c8fc6 asl $65
+0c8fc1 sty !temp_62
+
+	; transform the 4 bytes to 8 bytes by a bit from each
+0c8fc3 ldy #$0008			; counter #2 => $8
+		.Loop2 {
+			; push the high bits of each of the 4 bytes into A low nibble
+0c8fc6 asl !temp_65
 0c8fc8 rol a
-0c8fc9 asl !loop_counter_64
+0c8fc9 asl !temp_64
 0c8fcb rol a
-0c8fcc asl $63
+0c8fcc asl !temp_63
 0c8fce rol a
-0c8fcf asl !loop_counter_62
+0c8fcf asl !temp_62
 0c8fd1 rol a
-0c8fd2 and #$0f
-0c8fd4 sta $002119
-0c8fd8 dey
-0c8fd9 bne $8fc6
+0c8fd2 and #$0f				; clear out old 4 bits (high nibble)
+0c8fd4 sta $002119			; write to vram high bte
+
+0c8fd8 dey					; decrement counter #2
+0c8fd9 bne .Loop2
+		}
+
 0c8fdb inx
-0c8fdc inx
-0c8fdd pla
-0c8fde dec
-0c8fdf bne $8fb8
+0c8fdc inx					; source offset += 2
+0c8fdd pla					; restore counter
+0c8fde dec					; decrement counter
+0c8fdf bne .Loop
+	}
+
 0c8fe1 %setAXYto16bit()
 0c8fe3 txa
 0c8fe4 adc #$0010
-0c8fe7 tax
-0c8fe8 rts				; exit routine
+0c8fe7 tax					; X += $0010
+0c8fe8 rts					; exit routine
 
 
 
+
+; ROUTINE:  ($0c8fe9)
+; parameters:
+;		X => source offset
+;		Y => loop counter
+
+	.Loop {
 0c8fe9 lda $0000,x
 0c8fec jsr $8ff4
-0c8fef inx
-0c8ff0 dey
-0c8ff1 bne $8fe9
-0c8ff3 rts				; exit routine
+0c8fef inx					; increment offset
+0c8ff0 dey					; decrement counter
+0c8ff1 bne .Loop
+	}
+0c8ff3 rts					; exit routine
 
 
 
-0c8ff4 phy
-0c8ff5 phx
-0c8ff6 pha
-0c8ff7 and #$00e0
+; ROUTINE:  ($0c8ff4)
+; parameters:
+;		A => 
+
+0c8ff4 phy					; save Y
+0c8ff5 phx					; save X
+0c8ff6 pha					; save A
+0c8ff7 and #$00e0			; bits 1-3
 0c8ffa asl a
 0c8ffb asl a
 0c8ffc asl a
 0c8ffd asl a
-0c8ffe sta !loop_counter_64
+0c8ffe sta !temp_64
 0c9000 pla
 0c9001 and #$001f
 0c9004 asl a
-0c9005 ora !loop_counter_64
-0c9007 ldy #$0008
+0c9005 ora !temp_64
+
+0c9007 ldy #$0008			; counter => $8
+	.Loop {
 0c900a tax
+		; $078031 is $038031 in file
 0c900b lda $078031,x
 0c900f and #$00ff
 0c9012 sta $2118
 0c9015 txa
 0c9016 adc #$0040
-0c9019 dey
-0c901a bne $900a
+
+0c9019 dey					; decrement counter
+0c901a bne .Loop
+	}
+
 0c901c stz $2118
 0c901f stz $2118
 0c9022 stz $2118
@@ -36173,10 +36222,11 @@ FF 10 00 D1 0E 01 00 A9 F7 A2
 0c9028 stz $2118
 0c902b stz $2118
 0c902e stz $2118
-0c9031 stz $2118
-0c9034 plx
-0c9035 ply
-0c9036 rts				; exit routine
+0c9031 stz $2118			; clear next $10 bytes of vram
+
+0c9034 plx					; restore X
+0c9035 ply					; restore Y
+0c9036 rts					; exit routine
 
 
 
@@ -36209,25 +36259,29 @@ FF 10 00 D1 0E 01 00 A9 F7 A2
 0c906e jsl IdleUntilInterruptD8
 0c9072 pld
 0c9073 plp
-0c9074 rts				; exit routine
+0c9074 rts					; exit routine
 
 
+
+;		called from interrupt???
+;		copy $2000 bytes from $7f4000 into high bytes of $2000 words in vram $0880-487f
+;		so destination is every other byte (odd/high addresses) over $4000 byte area
 
 0c9075 lda #$80
-0c9077 sta $2115
+0c9077 sta $2115			; vram control => $80, auto increment by 1 word on write high
 0c907a ldx #$0440
-0c907d stx $2116
-0c9080 ldx #$1900
+0c907d stx $2116			; vram destination => $0880
+0c9080 ldx #$1900			; control => $00 (write twice), destination => $19 (vram high)
 0c9083 stx $00
 0c9085 ldx #$4000
-0c9088 stx $02
+0c9088 stx $02				; source offset => $4000
 0c908a lda #$7f
-0c908c sta $04
+0c908c sta $04				; source bank => $7f
 0c908e ldx #$2000
-0c9091 stx $05
+0c9091 stx $05				; dma transfer size => $2000
 0c9093 lda #$01
-0c9095 sta $420b
-0c9098 rtl				; exit routine
+0c9095 sta $420b			; start dma transfer on channel 0
+0c9098 rtl					; exit routine
 
 
 

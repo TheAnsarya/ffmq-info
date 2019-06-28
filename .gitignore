@@ -3,3 +3,5 @@ data/graphics/*.bak
 pull-assets-from-rom/bin
 pull-assets-from-rom/obj
 .vs/
+*.smc
+*.sfc

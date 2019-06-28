@@ -177,6 +177,7 @@
 0c9410-0c941f			; DATA: DataDecompressCrystalsControl07
 
 
+0caa4c-0‭cb6ec			; DATA: DataTitleScreenWordGraphics
 
 ; MISSING: $0c9420-$0cffff  ($---- bytes)
 

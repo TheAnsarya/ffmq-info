@@ -482,10 +482,8 @@ org $008fb4
 ; parameters:
 ;		A => the starting color index
 ;		X => source address offset
-; called with:
-;		all known calls use databank => $07 but don't have to
-; AXY are 8bit
-; D is $2100 so the writes are to registers
+; direct page => $2100, so the writes are to registers
+; AXY => 8bit
 Copy4ColorsToCGRAM:
 	sta $21				; set CGRAM address $2121
 	
