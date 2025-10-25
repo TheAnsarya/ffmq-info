@@ -29,7 +29,7 @@ ASM_SOURCES = $(wildcard $(ASM_DIR)/*.s)
 MAIN_ASM = $(ASM_DIR)/main.s
 
 # Build Targets
-.PHONY: all clean rom extract-assets build-tools docs test test-setup test-launch test-debug
+.PHONY: all clean rom extract-assets build-tools docs test test-rom test-setup test-launch test-debug
 
 # Default target
 all: rom
@@ -69,8 +69,15 @@ docs:
 
 # Test the ROM
 test: $(OUTPUT_ROM)
-	@echo "Testing ROM with MesenS..."
+	@echo "Testing ROM with automated tests..."
+	$(PYTHON) $(TOOLS_DIR)/rom_tester.py "$(OUTPUT_ROM)"
+	@echo "Launching ROM in MesenS..."
 	$(PYTHON) $(TOOLS_DIR)/mesen_integration.py launch "$(OUTPUT_ROM)"
+
+# Run ROM validation tests only
+test-rom: $(OUTPUT_ROM)
+	@echo "Running ROM validation tests..."
+	$(PYTHON) $(TOOLS_DIR)/rom_tester.py "$(OUTPUT_ROM)"
 
 # Setup testing environment
 test-setup:
@@ -122,7 +129,8 @@ help:
 	@echo "  extract-assets - Extract graphics, text, and music from original ROM"
 	@echo "  build-tools   - Build development tools"
 	@echo "  docs          - Generate documentation"
-	@echo "  test          - Test ROM in MesenS emulator"
+	@echo "  test          - Run ROM tests and launch in MesenS emulator"
+	@echo "  test-rom      - Run ROM validation tests only"
 	@echo "  test-setup    - Setup testing environment with MesenS"
 	@echo "  test-launch   - Launch ROM in MesenS emulator"
 	@echo "  test-debug    - Launch ROM with debugging enabled"
