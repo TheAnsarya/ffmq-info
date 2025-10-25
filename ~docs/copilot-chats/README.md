@@ -2,6 +2,32 @@
 
 This folder contains saved conversations with GitHub Copilot to track the development progress and decisions made during the FFMQ SNES development project.
 
+## Auto-Update System 🤖
+
+**Chat logs are now automatically updated!** The system tracks:
+- ✅ **Every git commit** - Automatically logged via git hook
+- ✅ **Significant changes** - Manual logging with helper script
+- ✅ **Questions & answers** - Track decisions and research
+- ✅ **Daily sessions** - Organized by date for easy reference
+
+### Quick Start
+
+**No setup needed for commits** - They're logged automatically!
+
+**For manual updates:**
+```powershell
+# Log a change
+.\log.ps1 -Type change -Message "Fixed tile extraction bug"
+
+# Log a question
+.\log.ps1 -Type question -Message "How does 4BPP work?"
+
+# View today's summary
+.\log.ps1 -Type summary
+```
+
+See the [detailed README](AUTO-UPDATE-README.md) for complete documentation.
+
 ## Purpose
 
 These chat logs serve as:
