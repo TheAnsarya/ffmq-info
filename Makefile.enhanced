@@ -74,6 +74,9 @@ PALETTES_DIR = $(ASSETS_DIR)/palettes
 DOCS_DIR = docs
 MAPS_DIR = $(DOCS_DIR)/maps
 
+# Reports
+REPORTS_DIR = reports
+
 #==============================================================================
 # Source Files
 #==============================================================================
@@ -111,6 +114,9 @@ INJECT_TEXT = $(INJECT_TOOLS)/inject_text.py
 INJECT_ITEMS = $(INJECT_TOOLS)/inject_items.py
 INJECT_GFX = $(INJECT_TOOLS)/inject_graphics.py
 
+# Verification and comparison
+ROM_COMPARE = $(TOOLS_DIR)/rom_compare.py
+
 #==============================================================================
 # Build Targets
 #==============================================================================
@@ -119,7 +125,7 @@ INJECT_GFX = $(INJECT_TOOLS)/inject_graphics.py
 .PHONY: extract extract-all extract-graphics extract-text extract-enemies extract-items extract-palettes
 .PHONY: convert convert-graphics convert-all
 .PHONY: build build-rom build-clean inject inject-all
-.PHONY: test verify diff compare
+.PHONY: test verify diff compare compare-detailed report
 .PHONY: docs install-deps
 
 # Default target
@@ -308,21 +314,62 @@ inject-items:
 # Testing and Verification
 #------------------------------------------------------------------------------
 
-# Compare built ROM with original
-verify: $(OUTPUT_ROM) $(CLEAN_ROM)
+# Quick binary comparison (basic check)
+verify: $(OUTPUT_ROM)
 	@echo ============================================================
-	@echo Verifying ROM build
+	@echo Quick Verification: Binary Comparison
 	@echo ============================================================
-	@echo Comparing: $(OUTPUT_ROM)
-	@echo With: $(CLEAN_ROM)
+	@echo Comparing built ROM with original...
+	@echo Original: $(BASE_ROM)
+	@echo Built:    $(OUTPUT_ROM)
 	@echo.
-	-$(CMP) "$(OUTPUT_ROM)" "$(CLEAN_ROM)"
+	-$(CMP) "$(OUTPUT_ROM)" "$(BASE_ROM)"
 	@echo.
-	@echo Verification complete.
+	@echo For detailed analysis, use: make compare-detailed
 	@echo.
 
-# Show differences between ROMs
-diff: verify
+# Detailed comparison with reports
+compare: compare-detailed
+
+compare-detailed: $(OUTPUT_ROM) | $(REPORTS_DIR)
+	@echo ============================================================
+	@echo Detailed ROM Comparison Analysis
+	@echo ============================================================
+	@echo.
+	@echo Comparing:
+	@echo   Original: $(BASE_ROM)
+	@echo   Built:    $(OUTPUT_ROM)
+	@echo.
+	$(PYTHON) $(ROM_COMPARE) "$(BASE_ROM)" "$(OUTPUT_ROM)" --report-dir "$(REPORTS_DIR)"
+	@echo.
+	@echo ============================================================
+	@echo Reports generated in $(REPORTS_DIR)/
+	@echo   - comparison.txt  (human-readable)
+	@echo   - comparison.json (machine-readable)
+	@echo   - comparison.html (visual report)
+	@echo ============================================================
+	@echo.
+	@echo Open $(REPORTS_DIR)/comparison.html in browser for visual analysis
+	@echo.
+
+# Generate comprehensive rebuild report
+report: compare-detailed
+	@echo ============================================================
+	@echo Generating Comprehensive Rebuild Report
+	@echo ============================================================
+	@echo.
+	@echo This report shows progress toward byte-perfect rebuild
+	@echo.
+	@echo Reports available:
+	@echo   $(REPORTS_DIR)/comparison.txt
+	@echo   $(REPORTS_DIR)/comparison.json  
+	@echo   $(REPORTS_DIR)/comparison.html
+	@echo.
+	@type "$(REPORTS_DIR)\comparison.txt"
+	@echo.
+
+# Show differences (alias for compare)
+diff: compare-detailed
 
 # Test ROM in emulator
 test: $(OUTPUT_ROM)
@@ -357,7 +404,7 @@ docs:
 #------------------------------------------------------------------------------
 
 # Create directory structure
-$(BUILD_DIR) $(EXTRACTED_DIR) $(CONVERTED_DIR) $(GRAPHICS_DIR) $(TEXT_DIR) $(DATA_ASSETS) $(PALETTES_DIR) $(MAPS_DIR):
+$(BUILD_DIR) $(EXTRACTED_DIR) $(CONVERTED_DIR) $(GRAPHICS_DIR) $(TEXT_DIR) $(DATA_ASSETS) $(PALETTES_DIR) $(MAPS_DIR) $(REPORTS_DIR):
 	@if not exist "$@" mkdir "$@"
 
 # Install Python dependencies
@@ -385,6 +432,7 @@ setup: install-deps
 	@if not exist "$(DATA_ASSETS)" mkdir "$(DATA_ASSETS)"
 	@if not exist "$(PALETTES_DIR)" mkdir "$(PALETTES_DIR)"
 	@if not exist "$(MAPS_DIR)" mkdir "$(MAPS_DIR)"
+	@if not exist "$(REPORTS_DIR)" mkdir "$(REPORTS_DIR)"
 	@echo.
 	@echo Environment setup complete!
 	@echo.
@@ -439,8 +487,11 @@ help:
 	@echo.
 	@echo TESTING TARGETS:
 	@echo   test              - Test ROM in emulator
-	@echo   verify            - Compare built ROM with original
-	@echo   diff              - Show differences between ROMs
+	@echo   verify            - Quick binary comparison with original
+	@echo   compare           - Detailed ROM comparison with reports
+	@echo   compare-detailed  - Generate comprehensive comparison reports
+	@echo   report            - Show detailed rebuild progress report
+	@echo   diff              - Show differences (alias for compare)
 	@echo.
 	@echo UTILITY TARGETS:
 	@echo   docs              - Generate documentation
@@ -457,7 +508,15 @@ help:
 	@echo   4. make convert-graphics   - Convert PNG to SNES format
 	@echo   5. make build-rom          - Build modified ROM
 	@echo   6. make inject-all         - Inject modifications
-	@echo   7. make test               - Test in emulator
+	@echo   7. make compare-detailed   - Check progress toward byte-perfect
+	@echo   8. make test               - Test in emulator
+	@echo.
+	@echo BYTE-PERFECT REBUILD WORKFLOW:
+	@echo   1. make extract-all        - Extract everything from original
+	@echo   2. make build-rom          - Build from extracted sources
+	@echo   3. make compare-detailed   - See what differs
+	@echo   4. [Work on differences]
+	@echo   5. Repeat until 100%% match
 	@echo.
 	@echo EXAMPLES:
 	@echo   make extract-graphics
