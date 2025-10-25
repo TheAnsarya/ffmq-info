@@ -43,6 +43,27 @@ did you update the chatlog and update the documentation or did those updates not
 
 Add as much code as you can from the historical code folder and the reference websites (`https://github.com/TheAnsarya/GameInfo/tree/main/Final%20Fantasy%20Mystic%20Quest%20(SNES)`) and then use the `diztinguish` file `historical\diztinguish-disassembly\diztinguish\FFMQ-disassembly.diz` to generate missing source code and data for the project.
 
+I see no code differences, did you update the files? and add the new ones?
+no, I know the files are all there, but you just said you made a ton changes by reading and processing the diztinguish files but there wasn't any codefile changes, so figure out the code and save it all.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+find and implement the better more modern build stack for `snes`, is `asa`r old or underpowered? make the best `SNES` development and build environment, make sure the `run` and `test` environments are still good and the best for modern practices. Do a better build stack! 
 
 
 
