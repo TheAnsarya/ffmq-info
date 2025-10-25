@@ -1,8 +1,27 @@
 # 📝 Chat Log Quick Reference Card
 
-**Keep this visible while coding!**
+**🤖 AUTOMATIC TRACKING AVAILABLE!**
 
-## When to Log
+## Easiest Way: Fully Automatic
+
+```powershell
+# Start once, forget about it!
+.\start-tracking.ps1
+
+# Everything is logged automatically in the background
+# No manual logging needed!
+```
+
+**Status commands:**
+```powershell
+.\track.ps1 status  # Check if running
+.\track.ps1 stop    # Stop tracking
+.\track.ps1 start   # Start tracking
+```
+
+---
+
+## Manual Logging (If You Prefer)
 
 ### Always
 - ✅ Before switching tasks
