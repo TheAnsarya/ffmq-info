@@ -11,10 +11,19 @@ save all of the past and future copilot chats to a folder so I know what's happe
 +++++++++++++++++++
 directives:
 for all:
-use my editorconfig for formatting, use crlf, use tabs (4) not spaces for all documents, use UTF-8, (IMPORTANT) and always use the most modern code and practices, leave blank line between the stages, comment everything including the code inside methods, add links in the comments to explanitory articles, always format and clean up, make sure file structure matches namespaces, always comment and document, fix issues and test everything, always format the code using editorconfig and other formatting directives (never spaces, always tabs), if a file grows too large move pieces into their own logical components or classes separating concerns, update the chat log files, create a git commit including description, for this session and all sessions
+use my editorconfig for formatting, use crlf, use tabs (4) not spaces for all documents, use UTF-8, (IMPORTANT) and always use the most modern code and practices, leave blank line between the stages, comment everything including the code inside methods, add links in the comments to explanitory articles, always format and clean up, make sure file structure matches namespaces, always comment and document, fix issues and test everything, always format the code using editorconfig and other formatting directives (never spaces, always tabs), if a file grows too large move pieces into their own logical components or classes separating concerns, update the chat log files, create a git commit including description, use lowercase hexadecimal, for this session and all sessions
 for SNES ASM:
 use lowercase hexadecimal
 +++++++++++++++++++
+
+
+
+
+
+
+
+
+
 
 
 

@@ -336,3 +336,22 @@ python tools/mesen_integration.py launch build/ffmq-modified.sfc
 - **Chat Logs:** Updated with each session
 - **Documentation:** Maintained alongside code
 - **History:** Preserved in version control
+
+## Git Commits Made
+
+### Commit 1: Apply comprehensive coding standards and development directives
+**Hash:** 14efa46  
+**Files Modified:** 3
+- `.editorconfig` - Enhanced with comprehensive file type coverage
+- `~docs/copilot-chats/2025-01-24-project-reorganization.md` - Updated with directives
+- `~docs/prompts 2025-10-24.txt` - Added directive documentation
+
+**Description:**
+Established comprehensive coding standards for the FFMQ SNES development project including:
+- EditorConfig rules for all file types (Python, Assembly, PowerShell, etc.)
+- CRLF line endings for Windows compatibility
+- Tab indentation (4-space width) enforced across all files
+- UTF-8 encoding standardized
+- SNES Assembly specific standards (lowercase hex, comprehensive comments)
+- Code quality requirements (modern practices, testing, documentation)
+- Git workflow standards (descriptive commits, chat log maintenance)
