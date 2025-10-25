@@ -1,0 +1,82 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "📝 Log Changes",
+			"type": "shell",
+			"command": "pwsh",
+			"args": [
+				"-File",
+				"${workspaceFolder}/update.ps1"
+			],
+			"presentation": {
+				"reveal": "always",
+				"panel": "new",
+				"focus": true,
+				"clear": true
+			},
+			"problemMatcher": [],
+			"group": "none"
+		},
+		{
+			"label": "📊 View Chat Log Summary",
+			"type": "shell",
+			"command": "python",
+			"args": [
+				"tools/update_chat_log.py",
+				"--summary"
+			],
+			"presentation": {
+				"reveal": "always",
+				"panel": "shared",
+				"focus": false
+			},
+			"problemMatcher": []
+		},
+		{
+			"label": "🔄 Quick Log Change",
+			"type": "shell",
+			"command": "pwsh",
+			"args": [
+				"-Command",
+				"$desc = Read-Host 'Describe your change'; if ($desc) { python tools/update_chat_log.py --change \"$desc\" }"
+			],
+			"presentation": {
+				"reveal": "always",
+				"panel": "shared",
+				"focus": true
+			},
+			"problemMatcher": []
+		},
+		{
+			"label": "❓ Quick Log Question",
+			"type": "shell",
+			"command": "pwsh",
+			"args": [
+				"-Command",
+				"$q = Read-Host 'Your question'; if ($q) { python tools/update_chat_log.py --question \"$q\" }"
+			],
+			"presentation": {
+				"reveal": "always",
+				"panel": "shared",
+				"focus": true
+			},
+			"problemMatcher": []
+		},
+		{
+			"label": "💭 Quick Log Note",
+			"type": "shell",
+			"command": "pwsh",
+			"args": [
+				"-Command",
+				"$note = Read-Host 'Your note'; if ($note) { python tools/update_chat_log.py --note \"$note\" }"
+			],
+			"presentation": {
+				"reveal": "always",
+				"panel": "shared",
+				"focus": true
+			},
+			"problemMatcher": []
+		}
+	]
+}

@@ -214,6 +214,33 @@ This log tracks all development work, questions, and decisions made during this 
 		
 		print(f"✓ Added question entry to {self.current_log.name}")
 	
+	def add_note_entry(self, note: str):
+		"""
+		Add a note or decision to the chat log.
+		
+		Notes are for tracking thoughts, decisions, or observations
+		that don't fit cleanly into commit/change/question categories.
+		
+		Args:
+			note: Note text to record
+		"""
+		self.initialize_session_log()
+		
+		timestamp = datetime.now().strftime("%H:%M:%S")
+		
+		entry = f"""
+### [{timestamp}] Note
+
+**Note:** {note}
+
+"""
+		
+		# Append to log file
+		with open(self.current_log, 'a', encoding='utf-8') as f:
+			f.write(entry)
+		
+		print(f"✓ Added note to {self.current_log.name}")
+	
 	def update_main_log(self):
 		"""
 		Update the main project reorganization log with today's session.
@@ -297,6 +324,11 @@ def main():
 		help="Log a question that was asked"
 	)
 	group.add_argument(
+		"--note",
+		type=str,
+		help="Log a note, thought, or decision"
+	)
+	group.add_argument(
 		"--summary",
 		action="store_true",
 		help="Display summary of today's session"
@@ -338,6 +370,10 @@ def main():
 		
 	elif args.question:
 		updater.add_question_entry(args.question, args.answer)
+		updater.update_main_log()
+		
+	elif args.note:
+		updater.add_note_entry(args.note)
 		updater.update_main_log()
 		
 	elif args.summary:

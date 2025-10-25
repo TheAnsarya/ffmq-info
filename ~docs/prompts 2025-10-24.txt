@@ -17,9 +17,10 @@ use lowercase hexadecimal
 +++++++++++++++++++
 
 make sure the chat-log and documentation and history is updated everytime there is a git commit or a large source update or just a decent change or question.
-
+make sure the chat-log and documentation and history is updated all the time. Especially when everytime there is a git commit or a large source update or just a decent change or question. But always update the vhat history no matter if it is committed.
 
 Add as much code as you can from the historical code and then use the `diztinguish` file `historical\diztinguish-disassembly\diztinguish\FFMQ-disassembly.diz` to generate missing source code and data for the project
+
 
 
 
