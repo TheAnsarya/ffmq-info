@@ -16,7 +16,7 @@ param(
 )
 
 # Get project root
-$ProjectRoot = Split-Path -Parent $PSScriptRoot
+$ProjectRoot = $PSScriptRoot
 
 # Path to updater script
 $UpdaterScript = Join-Path $ProjectRoot "tools\update_chat_log.py"
