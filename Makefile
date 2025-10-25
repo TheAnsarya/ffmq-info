@@ -29,7 +29,9 @@ ASM_SOURCES = $(wildcard $(ASM_DIR)/*.s)
 MAIN_ASM = $(ASM_DIR)/main.s
 
 # Build Targets
-.PHONY: all clean rom extract-assets build-tools docs test test-rom test-setup test-launch test-debug
+.PHONY: all clean rom extract-assets extract-graphics extract-text extract-music \
+        convert-graphics install-deps build-tools docs test test-rom test-setup \
+        test-launch test-debug
 
 # Default target
 all: rom
@@ -48,12 +50,62 @@ $(BUILD_DIR):
 	mkdir -p $(BUILD_DIR)
 
 # Extract assets from original ROM
-extract-assets: $(BASE_ROM) | $(ASSETS_DIR)
-	@echo "Extracting assets from original ROM..."
-	$(PYTHON) $(TOOLS_DIR)/extract_graphics.py "$(BASE_ROM)" "$(ASSETS_DIR)/graphics/"
+extract-assets: extract-graphics extract-text extract-music
+	@echo "All assets extracted successfully!"
+
+# Extract graphics only
+extract-graphics: $(BASE_ROM) | $(ASSETS_DIR)
+	@echo "Extracting graphics from ROM..."
+	$(PYTHON) $(TOOLS_DIR)/extract_graphics_v2.py "$(BASE_ROM)" "$(ASSETS_DIR)/graphics/" --docs
+	@echo "Graphics extraction complete"
+
+# Extract text only
+extract-text: $(BASE_ROM) | $(ASSETS_DIR)
+	@echo "Extracting text from ROM..."
 	$(PYTHON) $(TOOLS_DIR)/extract_text.py "$(BASE_ROM)" "$(ASSETS_DIR)/text/"
+	@echo "Text extraction complete"
+
+# Extract music only
+extract-music: $(BASE_ROM) | $(ASSETS_DIR)
+	@echo "Extracting music from ROM..."
 	$(PYTHON) $(TOOLS_DIR)/extract_music.py "$(BASE_ROM)" "$(ASSETS_DIR)/music/"
-	@echo "Asset extraction complete"
+	@echo "Music extraction complete"
+
+# Convert graphics between formats
+convert-graphics:
+	@echo "Graphics Conversion Utility"
+	@echo "Usage: make convert-graphics-to-png INPUT=file.bin OUTPUT=file.png"
+	@echo "   or: make convert-graphics-to-snes INPUT=file.png OUTPUT=file.bin"
+
+# Helper target: Convert SNES to PNG
+convert-graphics-to-png:
+	@if [ -z "$(INPUT)" ] || [ -z "$(OUTPUT)" ]; then \
+		echo "Error: INPUT and OUTPUT required"; \
+		echo "Example: make convert-graphics-to-png INPUT=tiles.bin OUTPUT=tiles.png BPP=4"; \
+		exit 1; \
+	fi
+	$(PYTHON) $(TOOLS_DIR)/convert_graphics.py to-png "$(INPUT)" "$(OUTPUT)" \
+		$(if $(PALETTE),--palette $(PALETTE)) \
+		$(if $(BPP),--bpp $(BPP)) \
+		$(if $(TILES_PER_ROW),--tiles-per-row $(TILES_PER_ROW)) \
+		$(if $(INDEXED),--indexed)
+
+# Helper target: Convert PNG to SNES
+convert-graphics-to-snes:
+	@if [ -z "$(INPUT)" ] || [ -z "$(OUTPUT)" ]; then \
+		echo "Error: INPUT and OUTPUT required"; \
+		echo "Example: make convert-graphics-to-snes INPUT=tiles.png OUTPUT=tiles.bin BPP=4"; \
+		exit 1; \
+	fi
+	$(PYTHON) $(TOOLS_DIR)/convert_graphics.py to-snes "$(INPUT)" "$(OUTPUT)" \
+		$(if $(PALETTE),--palette $(PALETTE)) \
+		$(if $(BPP),--bpp $(BPP))
+
+# Install Python dependencies
+install-deps:
+	@echo "Installing Python dependencies..."
+	$(PYTHON) -m pip install -r requirements.txt
+	@echo "Dependencies installed!"
 
 # Build development tools
 build-tools:
@@ -124,23 +176,32 @@ help:
 	@echo "==========================================="
 	@echo ""
 	@echo "Available targets:"
-	@echo "  all           - Build everything (default)"
-	@echo "  rom           - Build the modified ROM"
-	@echo "  extract-assets - Extract graphics, text, and music from original ROM"
-	@echo "  build-tools   - Build development tools"
-	@echo "  docs          - Generate documentation"
-	@echo "  test          - Run ROM tests and launch in MesenS emulator"
-	@echo "  test-rom      - Run ROM validation tests only"
-	@echo "  test-setup    - Setup testing environment with MesenS"
-	@echo "  test-launch   - Launch ROM in MesenS emulator"
-	@echo "  test-debug    - Launch ROM with debugging enabled"
-	@echo "  setup-env     - Check development environment"
-	@echo "  install-tools - Show installation instructions for tools"
-	@echo "  clean         - Clean build artifacts"
-	@echo "  help          - Show this help"
+	@echo "  all                    - Build everything (default)"
+	@echo "  rom                    - Build the modified ROM"
+	@echo "  extract-assets         - Extract all assets (graphics, text, music)"
+	@echo "  extract-graphics       - Extract graphics only with PNG output"
+	@echo "  extract-text           - Extract text only"
+	@echo "  extract-music          - Extract music only"
+	@echo "  convert-graphics       - Show graphics conversion help"
+	@echo "  install-deps           - Install Python dependencies (Pillow, etc.)"
+	@echo "  build-tools            - Build development tools"
+	@echo "  docs                   - Generate documentation"
+	@echo "  test                   - Run ROM tests and launch in MesenS emulator"
+	@echo "  test-rom               - Run ROM validation tests only"
+	@echo "  test-setup             - Setup testing environment with MesenS"
+	@echo "  test-launch            - Launch ROM in MesenS emulator"
+	@echo "  test-debug             - Launch ROM with debugging enabled"
+	@echo "  setup-env              - Check development environment"
+	@echo "  install-tools          - Show installation instructions for tools"
+	@echo "  clean                  - Clean build artifacts"
+	@echo "  help                   - Show this help"
+	@echo ""
+	@echo "Graphics Conversion Examples:"
+	@echo "  make convert-graphics-to-png INPUT=tiles.bin OUTPUT=tiles.png BPP=4"
+	@echo "  make convert-graphics-to-snes INPUT=tiles.png OUTPUT=tiles.bin BPP=4"
 	@echo ""
 	@echo "Requirements:"
 	@echo "  - ca65/cc65 assembler suite"
 	@echo "  - asar assembler"
-	@echo "  - Python 3.x"
+	@echo "  - Python 3.x + Pillow (for graphics tools)"
 	@echo "  - MesenS emulator (for testing)"

@@ -32,16 +32,21 @@ make sure the chat-log and documentation and history is updated everytime there 
 make sure the chat-log and documentation and history is updated all the time. Especially when everytime there is a git commit or a large source update or just a decent change or question. But always update the vhat history no matter if it is committed.
 log all that shit automatically
 
-
-
-
-
-
-
-
-
+----------------------------------------------
+.\track.ps1 status  # Check if tracker is running
+.\track.ps1 stop    # Stop tracking
+.\track.ps1 start   # Start tracking
+----------------------------------------------
 
 Now I'm ready to move on to Graphics Tools development - the next major component for creating a full SNES development environment for Final Fantasy Mystic Quest!
+
+
+
+
+
+
+
+
 
 Add as much code as you can from the historical code folder and the reference websites (`https://github.com/TheAnsarya/GameInfo/tree/main/Final%20Fantasy%20Mystic%20Quest%20(SNES)`) and then use the `diztinguish` file `historical\diztinguish-disassembly\diztinguish\FFMQ-disassembly.diz` to generate missing source code and data for the project.
 
