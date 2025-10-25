@@ -41,6 +41,31 @@ log all that shit automatically
 Now I'm ready to move on to Graphics Tools development - the next major component for creating a full SNES development environment for Final Fantasy Mystic Quest!
 did you update the chatlog and update the documentation or did those updates not work? update the copilot chat logs!
 
+Add as much code as you can from the historical code folder and the reference websites (`https://github.com/TheAnsarya/GameInfo/tree/main/Final%20Fantasy%20Mystic%20Quest%20(SNES)`) and then use the `diztinguish` file `historical\diztinguish-disassembly\diztinguish\FFMQ-disassembly.diz` to generate missing source code and data for the project.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -49,7 +74,7 @@ did you update the chatlog and update the documentation or did those updates not
 Discord channels about SNES development include invites of: `https://discord.gg/AAS9WXdj` and `https://discord.gg/Jv7J3SNA`
 
 
-Add as much code as you can from the historical code folder and the reference websites (`https://github.com/TheAnsarya/GameInfo/tree/main/Final%20Fantasy%20Mystic%20Quest%20(SNES)`) and then use the `diztinguish` file `historical\diztinguish-disassembly\diztinguish\FFMQ-disassembly.diz` to generate missing source code and data for the project.
+
 
 
 
