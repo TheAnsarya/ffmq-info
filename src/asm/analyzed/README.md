@@ -249,6 +249,70 @@ Additional areas needing analysis:
 - [ ] Collision detection
 - [ ] World map system
 
+---
+
+### 6. nmi_handler.asm (230 lines)
+
+**Purpose:** Document the NMI (VBlank) interrupt handler - the heartbeat of the graphics system.
+
+**Analysis:**
+- **NMI Vector:** $00FFE6 → Points to $011B
+- **IRQ Vector:** $00FFEE → Points to $0117
+
+- **VBlank Synchronization System:**
+  - NMI fires ~60 times/second at start of VBlank
+  - Sets flag at $00D8.6 to signal VBlank occurred
+  - WaitForVBlank ($0C8000) clears flag and waits for NMI to set it
+  - This ensures ALL graphics updates happen during safe VBlank period!
+
+- **DMA Transfer Patterns:**
+  - Main VRAM transfer: Channel 5, mode $1801
+  - Source: Bank $7F + offset from $01F6-$01F8
+  - Size: From $01F4-$01F5
+  - Dest VRAM: Address in $01F8-$01F9
+  - VMAINC = $84 (word increment)
+  - Trigger: Write $20 to MDMAEN ($420B)
+
+- **OAM (Sprite) Updates:**
+  - Main OAM: 512 bytes from $0C00 → $2102
+  - Extended OAM: 32 bytes from $0E00 → $2102+$100
+  - Size controlled by $01F0-$01F3
+  - Mode $0400 (byte to fixed address)
+
+- **Update Flags (checked by NMI):**
+  - $00D2.7: VRAM tilemap update
+  - $00D2.6: Full background refresh
+  - $00D2.5: Palette transfer
+  - $00DD.6: Major DMA operation pending
+  - $00D4.1: Tilemap reload
+  - $00E2.6: Execute callback at [$0058]
+
+- **Typical NMI Flow:**
+  1. Save registers
+  2. Check and execute callback if $00E2.6 set
+  3. Process tilemap transfer if $00D4.1 set
+  4. Execute major DMA if $00DD.6 set
+  5. Update VRAM if $00D2.7 set
+  6. Transfer palettes if $00D2.5 set
+  7. Refresh background if $00D2.6 set
+  8. **Set VBlank flag** at $00D8.6
+  9. Return from interrupt
+
+**Key Discoveries:**
+- **CRITICAL:** VBlank flag at $00D8.6 is the fundamental sync point for entire graphics system
+- Main game loop pattern: Update logic → Prepare data → WaitForVBlank → NMI transfers data
+- All screen updates synchronized through flag system (main code sets, NMI checks/clears)
+- DMA transfers happen ONLY during VBlank for glitch-free rendering
+- Callback system at $0058-$005A for custom NMI operations
+
+**Confidence:** MEDIUM-HIGH
+- VBlank flag system: VERIFIED
+- DMA patterns: VERIFIED  
+- Flag system: VERIFIED
+- Complete NMI flow: INFERRED (actual handler code at $011B needs manual trace)
+
+---
+
 ## Cross-Reference Tables
 
 ### Major Routines by Bank
@@ -293,8 +357,8 @@ Additional areas needing analysis:
 *Analysis is ongoing. This documentation improves as we learn more about the game's code.*
 
 **Last Updated**: 2025-10-24  
-**Files Analyzed**: 6 (boot, DMA, battle, menu, RAM map, README)  
-**Functions Documented**: 20+  
-**Data Structures**: 6+  
-**Lines of Analysis**: 1,900+  
+**Files Analyzed**: 7 (boot, DMA, battle, menu, RAM map, NMI handler, README)  
+**Functions Documented**: 25+  
+**Data Structures**: 8+  
+**Lines of Analysis**: 2,130+  
 **Confidence**: Medium-High to High
