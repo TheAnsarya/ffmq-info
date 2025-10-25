@@ -1,5 +1,8 @@
 # Final Fantasy Mystic Quest - SNES Disassembly & ROM Hack Project
 
+> **📝 Important:** This project uses continuous chat logging. Run `.\update.ps1` regularly to log your work!  
+> See [LOGGING-QUICK-REF.md](LOGGING-QUICK-REF.md) for quick commands.
+
 A comprehensive disassembly and development environment for Final Fantasy Mystic Quest (SNES) using modern tools and practices.
 
 ## Project Overview
