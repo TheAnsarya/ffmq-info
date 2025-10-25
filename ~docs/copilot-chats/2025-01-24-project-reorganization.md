@@ -355,3 +355,22 @@ Established comprehensive coding standards for the FFMQ SNES development project
 - SNES Assembly specific standards (lowercase hex, comprehensive comments)
 - Code quality requirements (modern practices, testing, documentation)
 - Git workflow standards (descriptive commits, chat log maintenance)
+
+### Commit 2: Add comprehensive coding standards documentation
+**Hash:** a912a0f  
+**Files Modified:** 3
+- `docs/coding-standards.md` - Complete development guidelines (new file)
+- `~docs/copilot-chats/2025-01-24-project-reorganization.md` - Added commit tracking
+- `~docs/prompts 2025-10-24.txt` - Updated with directive status
+
+**Description:**
+Created comprehensive coding standards documentation covering:
+- Code formatting standards with file-specific examples (Assembly, Python, PowerShell, Makefile)
+- SNES Assembly standards (lowercase hex, commenting, organization)
+- Code quality standards (modern practices, separation of concerns, documentation, testing)
+- Git standards (commit messages, frequency, chat log maintenance)
+- File organization (namespace alignment, directory structure)
+- Extensive code examples and references to SNES documentation
+- Practical guidelines for all development aspects
+
+This establishes the single source of truth for all coding standards in the project.
