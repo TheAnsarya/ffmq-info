@@ -313,6 +313,68 @@ Additional areas needing analysis:
 
 ---
 
+### 7. input_handler.asm (380 lines)
+
+**Purpose:** Document the input/controller handling system with auto-repeat and state management.
+
+**Analysis:**
+- **Hardware Reading:**
+  - Reads SNES_CNTRL1L ($4218) each frame
+  - 16-bit button state in standard SNES format
+  - Buttons: B/Y/Select/Start/Up/Down/Left/Right/A/X/L/R
+
+- **State Management Variables:**
+  - `$0092`: Current frame button state (raw hardware)
+  - `$0094`: New button presses (edge detection: 0→1 transitions)
+  - `$0096`: Previous frame state (for comparison)
+  - `$0090`: Injected input (for demo mode/scripted sequences)
+  - `$0007`: Processed input output (after auto-repeat)
+  - `$0009`: Auto-repeat timer (frames)
+
+- **Auto-Repeat System:**
+  - Initial press: Immediate response, set timer to 25 frames
+  - Hold for 25 frames: First auto-repeat, reset timer to 5 frames
+  - Subsequent repeats: Every 5 frames while held
+  - Pattern: `Press → 25 frame delay → Repeat every 5 frames`
+  - This creates comfortable menu scrolling UX!
+
+- **Input Processing Modes:**
+  - Normal mode: Standard gameplay input
+  - Menu mode ($00D2.3): Special handler at CODE_0092F0
+  - Dialog mode ($00DB.2): Text advance handling
+  - Disabled ($00D6.6): Input completely ignored
+
+- **Input Injection:**
+  - $0090 can be set by code to simulate button presses
+  - OR'd with hardware input
+  - Used for: Demo mode, scripted events, auto-battle
+  - Cleared each frame after processing
+
+- **Edge Detection Algorithm:**
+  ```
+  New_Presses = Current_State AND NOT Previous_State
+  This detects 0→1 button transitions
+  Example: If A was not pressed last frame but is now
+          → New_Press.A = 1 (trigger action)
+  ```
+
+**Key Discoveries:**
+- **Auto-repeat timing** creates the "feel" of menu navigation
+  - 25 frame initial delay prevents accidental scrolling
+  - 5 frame repeat rate feels responsive but controlled
+- **Layered architecture**: Hardware → State → Auto-repeat → Context processing
+- **Input injection** enables demo mode and scripted sequences
+- **Context-aware** processing changes behavior based on game state
+- Button constants: B=$8000, Y=$4000, Start=$1000, A=$0080, etc.
+
+**Confidence:** HIGH
+- Hardware registers: VERIFIED
+- State variables: VERIFIED  
+- Auto-repeat logic: VERIFIED
+- All timings measured from code
+
+---
+
 ## Cross-Reference Tables
 
 ### Major Routines by Bank
@@ -340,8 +402,16 @@ Additional areas needing analysis:
 | $00AA | 1 | ScreenBrightness | Screen brightness (0-15) |
 | $00D2 | 1 | DMARequestFlags1 | DMA request flags |
 | $00D4 | 1 | DMARequestFlags2 | Additional DMA flags |
+| $00D6 | 1 | SystemFlags | System control flags |
+| $00D8 | 1 | VBlankFlag | VBlank & timing flags |
 | $00DA | 2 | HardwareFlags | Hardware configuration |
 | $00DE | 1 | GeneralFlags1 | General purpose flags |
+| $0090 | 2 | InjectedInput | Injected button state |
+| $0092 | 2 | CurrentButtons | Current frame buttons |
+| $0094 | 2 | NewPresses | New button presses (edge) |
+| $0096 | 2 | PreviousButtons | Previous frame buttons |
+| $0007 | 1 | ProcessedInput | Auto-repeat output |
+| $0009 | 1 | AutoRepeatTimer | Frames until repeat |
 | $0111 | 1 | GeneralFlags2 | General purpose flags |
 | $0112 | 1 | SavedNMIFlags | Saved interrupt enable |
 
@@ -357,8 +427,8 @@ Additional areas needing analysis:
 *Analysis is ongoing. This documentation improves as we learn more about the game's code.*
 
 **Last Updated**: 2025-10-24  
-**Files Analyzed**: 7 (boot, DMA, battle, menu, RAM map, NMI handler, README)  
-**Functions Documented**: 25+  
-**Data Structures**: 8+  
-**Lines of Analysis**: 2,130+  
+**Files Analyzed**: 8 (boot, DMA, battle, menu, RAM, NMI, input, README)  
+**Functions Documented**: 30+  
+**Data Structures**: 10+  
+**Lines of Analysis**: 2,510+  
 **Confidence**: Medium-High to High
