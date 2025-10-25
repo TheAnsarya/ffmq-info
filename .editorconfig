@@ -1,8 +1,97 @@
+# EditorConfig is awesome: https://EditorConfig.org
+# Top-most EditorConfig file for FFMQ SNES Development
 root = true
 
+# All files - default settings
 [*]
+charset = utf-8
+end_of_line = crlf
+insert_final_newline = true
+trim_trailing_whitespace = true
 indent_style = tab
 indent_size = 4
-charset = utf-8
+
+# Markdown files - preserve trailing whitespace for line breaks
+[*.md]
+indent_style = tab
+indent_size = 4
 trim_trailing_whitespace = false
+
+# YAML files (CI/CD configurations)
+[*.{yml,yaml}]
+indent_style = tab
+indent_size = 4
+
+# JSON files (package configs, debug configs)
+[*.json]
+indent_style = tab
+indent_size = 4
+
+# Python files (development tools)
+[*.py]
+indent_style = tab
+indent_size = 4
+max_line_length = 120
+
+# Assembly files (SNES source code)
+[*.{asm,s,inc}]
+indent_style = tab
+indent_size = 4
+
+# C/C++ files (potential future tools)
+[*.{c,cpp,h,hpp}]
+indent_style = tab
+indent_size = 4
+
+# C# files (asset extraction tools)
+[*.cs]
+indent_style = tab
+indent_size = 4
+
+# Makefile (must use tabs)
+[Makefile]
+indent_style = tab
+indent_size = 4
+
+# Batch files (Windows scripts)
+[*.bat]
+indent_style = tab
+indent_size = 4
+end_of_line = crlf
+
+# PowerShell files (Windows scripts)
+[*.ps1]
+indent_style = tab
+indent_size = 4
+end_of_line = crlf
+
+# Lua files (MesenS test scripts)
+[*.lua]
+indent_style = tab
+indent_size = 4
+
+# Shell scripts (Unix/Linux compatibility)
+[*.sh]
+indent_style = tab
+indent_size = 4
+end_of_line = lf
+
+# Text files (documentation, notes)
+[*.txt]
+indent_style = tab
+indent_size = 4
+
+# Table files (SNES character encoding)
+[*.tbl]
+indent_style = tab
+indent_size = 4
+
+# Config files
+[*.{cfg,conf,ini}]
+indent_style = tab
+indent_size = 4
+
+# Log files (preserve as-is)
+[*.log]
 insert_final_newline = false
+trim_trailing_whitespace = false

@@ -1,7 +1,20 @@
 update git's `user.name` to `Andy Hubbard` and `git.email` to `me@ansarya.com`
 create a new branch for the changes named `ai-code-trial` and then analyze the code `SNES` assembly code and documentation, and reorganize the project by copying all the old code files into a historical folder structure and then reorganizing the code for creating an SNES build path using the most modern snes build tools and practices, `/~roms/` contains all the FFMQ roms and use `/~roms/Final Fantasy - Mystic Quest (U) (V1.1).sfc` as the original base ROM. Setup an SNES development project for the complete disassembly and commenting and documentation of `Final Fantasy Mystic Quest` (FFMQ) with a full toolset from coding, to build, to test, to running it using MesenS. Document everything. Some documentation can be found at `https://datacrystal.tcrf.net/wiki/Final_Fantasy:_Mystic_Quest` and `https://github.com/TheAnsarya/GameInfo/tree/main/Final%20Fantasy%20Mystic%20Quest%20(SNES)`. Create graphcis and text import/export and editing. If possible, analyze and disassemble and document everything. Eventually we will make an editor of the game.
 continue
+
+&&&&&&&
+Now I'm ready to move on to Graphics Tools development - the next major component for creating a full SNES development environment for Final Fantasy Mystic Quest!
+&&&&&&&
+
 save all of the past and future copilot chats to a folder so I know what's happening
+
++++++++++++++++++++
+directives:
+for all:
+use my editorconfig for formatting, use crlf, use tabs (4) not spaces for all documents, use UTF-8, (IMPORTANT) and always use the most modern code and practices, leave blank line between the stages, comment everything including the code inside methods, add links in the comments to explanitory articles, always format and clean up, make sure file structure matches namespaces, always comment and document, fix issues and test everything, always format the code using editorconfig and other formatting directives (never spaces, always tabs), if a file grows too large move pieces into their own logical components or classes separating concerns, update the chat log files, create a git commit including description, for this session and all sessions
+for SNES ASM:
+use lowercase hexadecimal
++++++++++++++++++++
 
 
 

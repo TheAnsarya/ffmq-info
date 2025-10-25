@@ -299,7 +299,40 @@ python tools/mesen_integration.py launch build/ffmq-modified.sfc
 
 ---
 
-**Session Status:** Active - Graphics tools in progress  
+**Session Status:** Active - Applying coding standards and preparing for commit  
 **Overall Progress:** 70% complete (7/10 major tasks finished)  
 **Quality:** Excellent - comprehensive, well-documented, tested  
 **Next Session:** Continue with graphics tools, then text tools, then documentation
+
+## Development Directives Applied
+
+### Code Formatting Standards
+- **EditorConfig:** Comprehensive configuration for all file types
+- **Line Endings:** CRLF for Windows compatibility
+- **Indentation:** Tabs (4 spaces width) for all files
+- **Encoding:** UTF-8 for all text files
+- **Final Newline:** Required for all files
+- **Whitespace:** Trailing whitespace trimmed (except markdown)
+
+### SNES Assembly Standards
+- **Hexadecimal:** Lowercase (0xff not 0xFF)
+- **Comments:** Comprehensive inline and block comments
+- **Documentation:** Links to explanatory articles
+- **Structure:** Logical separation of concerns
+- **Organization:** File structure matches namespaces
+
+### Code Quality Standards
+- **Modern Practices:** Latest tools and techniques
+- **Blank Lines:** Separation between code stages
+- **Method Comments:** Every method and function documented
+- **External Links:** Reference articles in comments
+- **Testing:** All code tested before commit
+- **Formatting:** Automatic formatting applied
+- **File Size:** Large files split into logical components
+- **Namespaces:** File structure matches organization
+
+### Git Standards
+- **Commits:** Descriptive messages with context
+- **Chat Logs:** Updated with each session
+- **Documentation:** Maintained alongside code
+- **History:** Preserved in version control
