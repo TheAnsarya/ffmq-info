@@ -46,11 +46,13 @@ Add as much code as you can from the historical code folder and the reference we
 I see no code differences, did you update the files? and add the new ones?
 no, I know the files are all there, but you just said you made a ton changes by reading and processing the diztinguish files but there wasn't any codefile changes, so figure out the code and save it all.
 `save the copilot chat history` and then continue with the `actual reverse engineering work`
+----save to git after you update the documents
+continue with the `actual reverse engineering work`
+the documentation has been updated, but make sure all the `asm` files are completely filled and processed and updated and make the disassembly and re-assembly a seemless process
 
-save to git after you update the documents
-
-
-
+=========== this is nonsense:
+The work continues to reveal how this game was carefully engineered, with each system building on the others in a clean, layered architecture.
+=================
 
 
 
