@@ -1,1 +1,6 @@
+update git's `user.name` to `Andy Hubbard` and `git.email` to `me@ansarya.com`
 create a new branch for the changes named `ai-code-trial` and then analyze the code `SNES` assembly code and documentation, and reorganize the project by copying all the old code files into a historical folder structure and then reorganizing the code for creating an SNES build path using the most modern snes build tools and practices, `/~roms/` contains all the FFMQ roms and use `/~roms/Final Fantasy - Mystic Quest (U) (V1.1).sfc` as the original base ROM. Setup an SNES development project for the complete disassembly and commenting and documentation of `Final Fantasy Mystic Quest` (FFMQ) with a full toolset from coding, to build, to test, to running it using MesenS. Document everything. Some documentation can be found at `https://datacrystal.tcrf.net/wiki/Final_Fantasy:_Mystic_Quest` and `https://github.com/TheAnsarya/GameInfo/tree/main/Final%20Fantasy%20Mystic%20Quest%20(SNES)`. Create graphcis and text import/export and editing. If possible, analyze and disassemble and document everything. Eventually we will make an editor of the game.
+
+
+
+
