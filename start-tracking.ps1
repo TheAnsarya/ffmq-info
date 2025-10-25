@@ -1,7 +1,7 @@
 # FFMQ Auto-Tracker Launcher
 # Starts tracking in background when you start working on the project
 
-$ProjectRoot = Split-Path -Parent $PSScriptRoot
+$ProjectRoot = $PSScriptRoot
 
 Write-Host ""
 Write-Host "╔═══════════════════════════════════════════════════╗" -ForegroundColor Cyan

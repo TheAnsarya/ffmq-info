@@ -10,7 +10,7 @@ param(
 	[int]$Interval = 30
 )
 
-$ProjectRoot = Split-Path -Parent $PSScriptRoot
+$ProjectRoot = $PSScriptRoot
 $TrackerScript = Join-Path $ProjectRoot "tools\auto_tracker.py"
 
 # Check if Python is available
