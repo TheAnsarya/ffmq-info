@@ -14,9 +14,10 @@ While the Diztinguish disassembly in `src/asm/banks/` provides complete code cov
 
 ## Files
 
-### `boot_sequence.asm`
+### `boot_sequence.asm` (150+ lines)
 **Original Code**: bank_00.asm $008000-$0080FF  
-**Analysis**: Complete boot and initialization sequence
+**Analysis**: Complete boot and initialization sequence  
+**Status**: ✅ Complete
 
 **Key Discoveries**:
 - Three entry points: BootEntry ($008000), AlternateEntry ($008016), WarmBootEntry ($00803A)
@@ -35,9 +36,10 @@ While the Diztinguish disassembly in `src/asm/banks/` provides complete code cov
 - `ContinueBootSequence` - Main boot flow
 - `MainGameLoop` - Enter main game
 
-### `dma_graphics.asm`
+### `dma_graphics.asm` (220+ lines)
 **Original Code**: bank_00.asm $008247-$008500+  
-**Analysis**: DMA transfer routines for graphics and VRAM
+**Analysis**: DMA transfer routines for graphics and VRAM  
+**Status**: ✅ Complete
 
 **Key Discoveries**:
 - Three DMA patterns: VRAM fill, tile transfer, palette transfer
@@ -61,9 +63,10 @@ While the Diztinguish disassembly in `src/asm/banks/` provides complete code cov
 - $01EB-$01F8 - DMA parameter storage
 - $0048, $0062, $0064 - Transfer configuration
 
-### `battle_system.asm`
+### `battle_system.asm` (280+ lines)
 **Original Code**: bank_09.asm $098000-$098600+  
-**Analysis**: Battle system data structures
+**Analysis**: Battle system data structures  
+**Status**: ✅ Complete
 
 **Key Discoveries**:
 - Enemy palette table: 16 bytes per enemy (8 colors RGB555)
@@ -82,6 +85,73 @@ While the Diztinguish disassembly in `src/asm/banks/` provides complete code cov
 **Color Format**:
 - RGB555: 0BBBBBGGGGGRRRRR (15-bit)
 - Common values: $0000 (black), $7FFF (white), $001F (red)
+
+### `menu_system.asm` (350+ lines) ✨ NEW
+**Original Code**: bank_0C.asm $0C8000-$0C8200+  
+**Analysis**: Menu system, UI, and VBlank control  
+**Status**: ✅ Complete
+
+**Key Discoveries**:
+- VBlank wait routine (`WaitForVBlank` at $0C8000) - most called routine!
+- Equipment display system with stat conversion
+- Menu initialization sequence (MenuSystemInit)
+- PPU mode switching (Mode 1 ↔ Mode 7)
+- Display layer configuration (BG1, BG2, OBJ)
+- Callback system for deferred rendering ($0058-$005A)
+- Direct page manipulation for fast PPU access
+
+**Functions Documented**:
+- `WaitForVBlank` - VBlank synchronization (critical!)
+- `DisplayEquipmentInfo` - Equipment window display
+- `ConvertStatBonus` - Stat display value conversion
+- `MenuSystemInit` - Complete menu system setup
+- `LoadMenuContent` - Menu rendering and updates
+
+**RAM Variables Mapped**:
+- $00D8 bit 6 - VBlank occurred flag (THE synchronization flag)
+- $00D2/$00D4/$00D6 - DMA and display flags
+- $00E2 - Callback pending flags
+- $00AA - Screen brightness
+- $7E3665 - Menu initialized flag
+
+**Display Modes**:
+- Mode 1: Standard gameplay (BG1+BG2+OBJ, 4-color)
+- Mode 7: Menu/status (rotation/scaling effects)
+
+### `ram_map.asm` (280+ lines) ✨ NEW
+**Original Code**: Analysis across all banks  
+**Analysis**: Complete RAM variable mapping  
+**Status**: ✅ Complete
+
+**Key Discoveries**:
+- Comprehensive memory layout ($0000-$7FFFFF)
+- Critical flag byte documentation ($00D2-$00DF)
+- VBlank flag at $00D8 bit 6 (set by NMI, cleared by wait)
+- DMA parameter storage ($01EB-$01F8)
+- Save data structure (3 slots × ~900 bytes in SRAM)
+- Boot flags ($7E3665, $7E3667, $7E3668)
+- Flag byte usage patterns (TSB/TRB/AND)
+
+**Memory Regions Mapped**:
+- Zero Page ($0000-$00FF) - Fast access variables
+- Page 1 ($0100-$01FF) - System parameters
+- Low RAM ($0200-$1FFF) - Game data
+- Work RAM $7E ($7E0000-$7E7FFF) - Main game state
+- Work RAM $7F ($7F0000-$7FFFFF) - Buffers
+- SRAM ($700000-$7FFFFF) - Save data
+
+**Critical Variables Identified**:
+- $00D8 - VBlank sync (most important!)
+- $00D2 - DMA flags
+- $00D4 - Transfer flags
+- $01F4-$01F8 - DMA parameters
+- $7E3665 - Save/init flag
+- $700000/$70038C/$700718 - Save slots
+
+**Confidence Levels**:
+- ✅ High: VBlank flag, DMA flags, boot flags, save slots
+- ⚠️ Medium: Equipment stats, menu parameters
+- ❓ Low: Character block layout details
 
 ## Usage
 
@@ -165,16 +235,19 @@ If you discover new information:
 
 Additional areas needing analysis:
 
-- [ ] Menu system (bank_0C, bank_0D)
-- [ ] Text rendering engine (already partially in `text_engine.asm`)
-- [ ] Graphics loading (already partially in `graphics_engine.asm`)
+- [ ] Text rendering engine (update existing `text_engine.asm`)
+- [ ] Graphics loading (update existing `graphics_engine.asm`)
 - [ ] Sound/music system
 - [ ] Map/field system
 - [ ] Event/script system
-- [ ] Item/equipment system
+- [ ] Item/equipment system (partially done - equipment display)
 - [ ] Magic/spell system
 - [ ] AI routines
-- [ ] Save/load system
+- [ ] Save/load system (partially done - SRAM structure)
+- [ ] Input handling
+- [ ] Sprite/OAM management
+- [ ] Collision detection
+- [ ] World map system
 
 ## Cross-Reference Tables
 
@@ -220,7 +293,8 @@ Additional areas needing analysis:
 *Analysis is ongoing. This documentation improves as we learn more about the game's code.*
 
 **Last Updated**: 2025-10-24  
-**Files Analyzed**: 3  
-**Functions Documented**: 15+  
-**Data Structures**: 4+  
-**Confidence**: Medium-High
+**Files Analyzed**: 6 (boot, DMA, battle, menu, RAM map, README)  
+**Functions Documented**: 20+  
+**Data Structures**: 6+  
+**Lines of Analysis**: 1,900+  
+**Confidence**: Medium-High to High
