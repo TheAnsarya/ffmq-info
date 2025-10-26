@@ -1,0 +1,286 @@
+# Final Fantasy Mystic Quest - Modern Build System
+# Features: Fast builds, watch mode, auto-testing, emulator integration
+# Date: 2025-10-25
+
+#==============================================================================
+# Configuration
+#==============================================================================
+
+PROJECT = ffmq
+VERSION = 1.1-enhanced
+
+# ROMs
+BASE_ROM = ~roms/Final Fantasy - Mystic Quest (U) (V1.1).sfc
+CLEAN_ROM = build/ffmq-clean.sfc
+OUTPUT_ROM = build/ffmq-modified.sfc
+DEBUG_ROM = build/ffmq-debug.sfc
+
+# Source
+MAIN_ASM = src/asm/ffmq_complete.asm
+ASM_FILES = $(shell find src/asm -name '*.asm' 2>/dev/null || dir /s /b src\asm\*.asm)
+
+# Tools
+ASAR = asar
+PYTHON = python
+EMULATOR = mesen-s.exe
+EMULATOR_ALT = bsnes.exe
+
+# Directories
+BUILD_DIR = build
+ASSETS_DIR = assets
+REPORTS_DIR = reports
+TOOLS_DIR = tools
+
+# Build flags
+ASAR_FLAGS = --verbose --werror
+ASAR_DEBUG_FLAGS = $(ASAR_FLAGS) --symbols=wla
+
+#==============================================================================
+# Colors and Output (PowerShell compatible)
+#==============================================================================
+
+ECHO = @echo
+RM = del /Q /F
+RMDIR = rmdir /S /Q
+MKDIR = mkdir
+CP = copy /Y
+RESOLVE = powershell -Command "Resolve-Path"
+
+#==============================================================================
+# Main Targets
+#==============================================================================
+
+.PHONY: all clean build rebuild test debug watch dev emulator help
+
+# Default target
+all: build test
+
+# Display help
+help:
+	$(ECHO) ============================================================
+	$(ECHO) FFMQ Modern Build System
+	$(ECHO) ============================================================
+	$(ECHO).
+	$(ECHO) Build Targets:
+	$(ECHO)   make build      - Fast build (asar)
+	$(ECHO)   make rebuild    - Clean + build
+	$(ECHO)   make debug      - Build with debug symbols
+	$(ECHO)   make clean      - Remove build artifacts
+	$(ECHO).
+	$(ECHO) Development:
+	$(ECHO)   make dev        - Development mode (watch + test + emulator)
+	$(ECHO)   make watch      - Watch mode (rebuild on change)
+	$(ECHO)   make emulator   - Launch emulator with built ROM
+	$(ECHO).
+	$(ECHO) Testing:
+	$(ECHO)   make test       - Run all tests
+	$(ECHO)   make verify     - Quick byte comparison
+	$(ECHO)   make compare    - Detailed ROM comparison
+	$(ECHO).
+	$(ECHO) Assets:
+	$(ECHO)   make extract    - Extract all assets from ROM
+	$(ECHO)   make graphics   - Convert graphics (PNG to SNES)
+	$(ECHO)   make text       - Rebuild text tables
+	$(ECHO).
+	$(ECHO) CI/CD:
+	$(ECHO)   make ci         - Run CI pipeline (build + test + verify)
+	$(ECHO)   make baseline   - Establish byte-perfect baseline
+	$(ECHO).
+
+#==============================================================================
+# Build Targets
+#==============================================================================
+
+# Fast build with asar
+build: $(OUTPUT_ROM)
+	$(ECHO) ✓ Build complete: $(OUTPUT_ROM)
+
+$(OUTPUT_ROM): $(MAIN_ASM) | $(BUILD_DIR)
+	$(ECHO) ========================================
+	$(ECHO) Building ROM with asar...
+	$(ECHO) ========================================
+	$(ECHO).
+	@powershell -Command "$$rom = Resolve-Path '$(BASE_ROM)'; Copy-Item \"$$rom\" '$(OUTPUT_ROM)'"
+	$(ASAR) $(ASAR_FLAGS) $(MAIN_ASM) $(OUTPUT_ROM)
+	$(ECHO).
+	$(ECHO) ✓ ROM built successfully!
+	$(ECHO) Size: 
+	@powershell -Command "(Get-Item '$(OUTPUT_ROM)').Length"
+	$(ECHO).
+
+# Debug build with symbols
+debug: $(DEBUG_ROM)
+	$(ECHO) ✓ Debug build complete with symbols
+
+$(DEBUG_ROM): $(MAIN_ASM) | $(BUILD_DIR)
+	$(ECHO) Building DEBUG ROM with symbols...
+	@powershell -Command "$$rom = Resolve-Path '$(BASE_ROM)'; Copy-Item \"$$rom\" '$(DEBUG_ROM)'"
+	$(ASAR) $(ASAR_DEBUG_FLAGS) $(MAIN_ASM) $(DEBUG_ROM)
+	$(ECHO) ✓ Debug symbols: build/debug_symbols.sym
+
+# Clean build
+rebuild: clean build
+
+# Create build directory
+$(BUILD_DIR):
+	-$(MKDIR) $(BUILD_DIR) 2>nul
+
+#==============================================================================
+# Development Workflow
+#==============================================================================
+
+# Development mode: watch + auto-rebuild + emulator
+dev:
+	$(ECHO) ========================================
+	$(ECHO) Starting Development Mode
+	$(ECHO) ========================================
+	$(ECHO) - Watching: src/asm/**/*.asm
+	$(ECHO) - Auto-rebuild on changes
+	$(ECHO) - Emulator: $(EMULATOR)
+	$(ECHO) - Press Ctrl+C to exit
+	$(ECHO).
+	@powershell -ExecutionPolicy Bypass -File tools/dev-watch.ps1
+
+# Watch mode: rebuild on file changes
+watch:
+	$(ECHO) Starting watch mode...
+	@powershell -ExecutionPolicy Bypass -File tools/watch-build.ps1
+
+# Launch emulator with built ROM
+emulator: build
+	$(ECHO) Launching emulator...
+	-@start $(EMULATOR) $(OUTPUT_ROM) 2>nul || start $(EMULATOR_ALT) $(OUTPUT_ROM) 2>nul
+	$(ECHO) ✓ Emulator started
+
+#==============================================================================
+# Testing and Verification
+#==============================================================================
+
+# Run all tests
+test: build
+	$(ECHO) ========================================
+	$(ECHO) Running Test Suite
+	$(ECHO) ========================================
+	$(PYTHON) $(TOOLS_DIR)/run_tests.py
+	$(ECHO) ✓ All tests passed
+
+# Quick verification (binary comparison)
+verify: build
+	$(ECHO) Running quick verification...
+	@powershell -Command "$$rom = Resolve-Path '$(BASE_ROM)'; fc /b \"$$rom\" '$(OUTPUT_ROM)'"
+
+# Detailed comparison with reports
+compare: build
+	$(ECHO) ========================================
+	$(ECHO) Running Detailed ROM Comparison
+	$(ECHO) ========================================
+	@powershell -Command "$$rom = Resolve-Path '$(BASE_ROM)'; $(PYTHON) $(TOOLS_DIR)/rom_compare.py \"$$rom\" '$(OUTPUT_ROM)' --report-dir $(REPORTS_DIR)/latest"
+	$(ECHO).
+	$(ECHO) ✓ Report: $(REPORTS_DIR)/latest/comparison.html
+	@start $(REPORTS_DIR)\latest\comparison.html
+
+# Establish baseline for byte-perfect rebuild
+baseline: build
+	$(ECHO) Establishing baseline comparison...
+	@powershell -Command "$$rom = Resolve-Path '$(BASE_ROM)'; $(PYTHON) $(TOOLS_DIR)/rom_compare.py \"$$rom\" '$(OUTPUT_ROM)' --report-dir $(REPORTS_DIR)/baseline"
+	@start $(REPORTS_DIR)\baseline\comparison.html
+
+#==============================================================================
+# Asset Pipeline
+#==============================================================================
+
+# Extract all assets from base ROM
+extract:
+	$(ECHO) ========================================
+	$(ECHO) Extracting Assets from Base ROM
+	$(ECHO) ========================================
+	@powershell -Command "$$rom = Resolve-Path '$(BASE_ROM)'; $(PYTHON) $(TOOLS_DIR)/extract_all_assets.py \"$$rom\" $(ASSETS_DIR)"
+	$(ECHO) ✓ Assets extracted to $(ASSETS_DIR)/
+
+# Convert graphics (PNG to SNES format)
+graphics:
+	$(ECHO) Converting graphics...
+	$(PYTHON) $(TOOLS_DIR)/convert_graphics.py $(ASSETS_DIR)/graphics $(BUILD_DIR)/graphics
+	$(ECHO) ✓ Graphics converted
+
+# Rebuild text tables
+text:
+	$(ECHO) Rebuilding text tables...
+	$(PYTHON) $(TOOLS_DIR)/build_text.py $(ASSETS_DIR)/text $(BUILD_DIR)/text
+	$(ECHO) ✓ Text rebuilt
+
+#==============================================================================
+# CI/CD Pipeline
+#==============================================================================
+
+# CI pipeline (GitHub Actions compatible)
+ci: clean build test verify
+	$(ECHO) ========================================
+	$(ECHO) CI Pipeline Complete
+	$(ECHO) ========================================
+	$(ECHO) ✓ Build: PASS
+	$(ECHO) ✓ Tests: PASS
+	$(ECHO) ✓ Verify: PASS
+
+# Generate reports for CI
+ci-reports: compare
+	$(ECHO) Generating CI reports...
+	@powershell -Command "$(PYTHON) $(TOOLS_DIR)/track_extraction.py > $(REPORTS_DIR)/extraction_status.txt"
+
+#==============================================================================
+# Utilities
+#==============================================================================
+
+# Clean build artifacts
+clean:
+	$(ECHO) Cleaning build artifacts...
+	-$(RM) $(BUILD_DIR)\*.sfc 2>nul
+	-$(RM) $(BUILD_DIR)\*.sym 2>nul
+	-$(RM) $(BUILD_DIR)\*.log 2>nul
+	$(ECHO) ✓ Clean complete
+
+# Show build status and progress
+status:
+	$(ECHO) ========================================
+	$(ECHO) FFMQ Build Status
+	$(ECHO) ========================================
+	$(PYTHON) $(TOOLS_DIR)/track_extraction.py
+	$(ECHO).
+	$(ECHO) Recent builds:
+	-@dir /B /O-D $(BUILD_DIR)\*.sfc 2>nul
+
+# Check dependencies
+check-deps:
+	$(ECHO) Checking dependencies...
+	$(ECHO) - asar: 
+	@$(ASAR) --version
+	$(ECHO) - Python:
+	@$(PYTHON) --version
+	$(ECHO) - Emulator:
+	-@where $(EMULATOR) 2>nul || echo Not found (optional)
+	$(ECHO) ✓ Dependencies OK
+
+#==============================================================================
+# Advanced Targets
+#==============================================================================
+
+# Profile build performance
+profile:
+	$(ECHO) Profiling build...
+	@powershell -Command "Measure-Command { make build }"
+
+# Generate documentation
+docs:
+	$(ECHO) Generating documentation...
+	$(PYTHON) $(TOOLS_DIR)/generate_docs.py
+
+# Package for distribution
+package: build test
+	$(ECHO) Creating distribution package...
+	-$(MKDIR) dist 2>nul
+	$(CP) $(OUTPUT_ROM) dist\
+	$(CP) README.md dist\
+	$(CP) LICENSE dist\
+	$(ECHO) ✓ Package: dist/
+
+.DEFAULT_GOAL := help

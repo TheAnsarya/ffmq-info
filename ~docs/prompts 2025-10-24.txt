@@ -70,19 +70,17 @@ Research the correct dialog text address?
 ^^^^
 
 ******* search bing copilot: is there an Managed Service Provider (msp) for the SNES (super Nintendo) architecture to help when programming an SNES game ROM?
-
-
-
-
-
-
-
-
-
-
-
-
 But asar is installed! can you not find it? are you sure you're trying to compile the entry code file? While making sure the compile chain works, if asar isn't the solution find and implement the better more modern build stack for `snes`, is `asar` old or underpowered? make the best `SNES` development and build environment, make sure the `run` and `test` environments are still good and the best for modern practices. Do a better build stack! 
+
+
+
+
+
+
+
+
+
+
 
 
 
