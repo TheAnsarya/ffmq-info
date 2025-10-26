@@ -4354,20 +4354,40 @@ CODE_008D8A:
 ;-------------------------------------------------------------------------------
 
 UNREACH_008D93:
-	.db $A2,$FF,$FF,$60         ; LDX #$FFFF, RTS
-	; Process controller input
-	LDA.B $07                        ; Get joypad state
-	AND.B $8E                        ; Mask with enabled buttons
-	BEQ Frame_Update_Done            ; If no buttons pressed, done
-	
-	; Execute input handler
-	JSL.L CODE_009730                ; Get input handler function
-	SEP #$30                         ; 8-bit A, X, Y
-	ASL A                            ; Multiply by 2 (word pointer)
-	TAX                              ; Transfer to X
-	JSR.W (CODE_008A35,X)            ; Call input handler via table
+	LDX.W #$FFFF                ; X = invalid address marker
+	RTS                         ; Return
 
-Frame_Update_Done:
+;===============================================================================
+; VRAM Write Helper Routines
+;===============================================================================
+; This section contains low-level VRAM manipulation routines used by the
+; DMA system and graphics update code. These helpers provide direct VRAM
+; writes for tile data and perform critical setup for graphics transfers.
+;===============================================================================
+
+CODE_008D97:
+	; ===========================================================================
+	; Direct VRAM Write: 8 Tiles From WRAM
+	; ===========================================================================
+	; Writes 8 consecutive tiles (128 bytes) directly to VRAM from WRAM
+	; Used for quick tilemap updates without DMA overhead
+	;
+	; TECHNICAL NOTES:
+	; - Uses Direct Page = $2100 for PPU register access
+	; - Writes in pairs (high byte from $00F0, low byte from WRAM)
+	; - Each tile is 16 bytes (8×8 pixels, 4bpp)
+	; - Loop processes 8 tiles = 128 bytes total
+	;
+	; Parameters:
+	;   Direct Page = $2100 (PPU registers)
+	;   X = WRAM source address ($07xxxx range)
+	;   $00F0 = High byte pattern (usually $00)
+	;   VRAM address already set via !SNES_VMADDL/H
+	;
+	; Register Usage:
+	;   A = Data byte being written
+	;   X = Source pointer (increments by $10 per tile)
+	;   Y = Tile counter (8 tiles)
 	REP #$30                         ; 16-bit A, X, Y
 	JSR.W CODE_009342                ; Update sprites
 	JSR.W CODE_009264                ; Update animations
