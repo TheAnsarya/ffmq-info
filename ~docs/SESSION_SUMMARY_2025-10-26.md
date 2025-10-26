@@ -66,6 +66,32 @@ This session had TWO phases:
 - Indirect jump mechanism (JML [$0058]) for dynamic handlers
 - **This is the heart of the SNES display update system**
 
+**Commit 26 (99d2ec4):** Session summary update
+- Updated documentation with Phase 2 progress
+- Documented commits 23-25 methodology
+- Added statistics and remaining work estimates
+
+**Commit 27 (01c0f78):** DMA suite import (~600 lines) 
+- CODE_0083E8-CODE_0085B6: Complete VBLANK graphics transfer system
+- Tilemap DMA transfer with palette upload
+- Large VRAM transfer handler with battle graphics support
+- Palette transfer helper (CGRAM DMA, 16 bytes per call)
+- Tilemap transfer helper (two-pass interleaved format)
+- OAM sprite transfer (512-byte main + 32-byte high table)
+- Battle graphics VRAM updates with state flag checks
+- Comprehensive documentation of DMA channels and parameters
+
+**Commit 28 (67ffd92):** Special graphics transfers (~330 lines)
+- CODE_00863D-CODE_008965: Menu and character display system
+- Battle mode graphics transfer with palette loading
+- Field mode character status display updates
+- Single character update system ($00DE bit 6 flag)
+- Full 3-character party display refresh
+- Character graphics helper (2-part DMA transfer)
+- Palette transfer helpers with CGRAM addressing
+- Character data structure format documented (graphics + palette pointers)
+- VRAM addressing for character displays ($6100-$6380)
+
 **Code Sections Fully Documented:**
 - ✅ CODE_008000-CODE_00806E: Boot sequence (3 entry points)
 - ✅ CODE_0080B0-CODE_0080DC: Display init and main game jump
@@ -75,21 +101,23 @@ This session had TWO phases:
 - ✅ CODE_008230-CODE_008251: Final setup and hardware init
 - ✅ CODE_00825C-CODE_008333: VBLANK initialization
 - ✅ CODE_008337-CODE_0083E7: **NMI/VBLANK handler (CRITICAL)**
+- ✅ CODE_0083E8-CODE_0085B6: **DMA suite (tilemap, palette, OAM, VRAM)**
+- ✅ CODE_00863D-CODE_008965: **Special graphics transfers (menu, characters)**
 
 **Statistics:**
-- **~1,100 lines** of heavily commented code imported
-- **3 major commits** (23, 24, 25)
-- **8 complete code sections** fully documented
-- **All critical boot and interrupt handling** complete
-- Methodology proving highly effective
+- **~2,030 lines** of heavily commented code imported (~14.5% of Bank $00)
+- **5 major commits** (23, 24, 25, 27, 28) plus 1 summary update
+- **10 complete code sections** fully documented
+- **All critical boot, interrupt, and graphics transfer systems** complete
+- Methodology proving highly effective with consistent quality
 
 **Remaining Bank $00 Sections:**
-- ⚠️ CODE_0083E8+: Tilemap DMA and additional VBLANK operations (~300 lines)
-- ❌ CODE_008500+: Controller input and menu systems (~2,000 lines)
-- ❌ CODE_009000+: Main game loop and state machine (~3,000 lines)  
+- ⚠️ CODE_008966+: Main game loop and frame update (~500 lines) - IN PROGRESS
+- ❌ CODE_008A00+: Controller input and menu systems (~2,000 lines)
+- ❌ CODE_009000+: State machine and game logic (~3,000 lines)  
 - ❌ CODE_00A000+: Battle system and transitions (~2,500 lines)
 - ❌ CODE_00C000+: Graphics and sprite routines (~2,000 lines)
-- ❌ Remaining: ~11,000 lines total remaining in Bank $00
+- ❌ Remaining: ~11,700 lines total remaining in Bank $00
 
 ### Systematic Import Methodology Established:
 
