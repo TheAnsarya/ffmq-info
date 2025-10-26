@@ -6882,8 +6882,516 @@ CODE_009BA4:
 	PLP                         ; Restore processor status
 	RTL                         ; Return long
 
+; ===========================================================================
+; Graphics Data Processing Engine
+; ===========================================================================
+
+; ---------------------------------------------------------------------------
+; CODE_009BC4: Process Graphics Data
+; ---------------------------------------------------------------------------
+; Purpose: Core graphics data processor - copies parameters and processes
+; Input: X = data pointer in Bank $00
+; ===========================================================================
+
+CODE_009BC4:
+	PHP                         ; Save processor status
+	REP #$30                    ; 16-bit A/X/Y
+	PHY                         ; Save Y
+	PHA                         ; Save A
+	LDY.W #$0017                ; Y = Direct Page $0017
+	LDA.W #$0002                ; Count = 2 bytes + 1
+	MVN $00,$00                 ; Copy 3 bytes from [X] to [$17]
+	                            ; This copies graphics pointer and bank
+	PLA                         ; Restore A
+	PLY                         ; Restore Y
+	PLP                         ; Restore processor status
+	JMP.W CODE_009D75           ; Jump to main graphics processor
+
+; ---------------------------------------------------------------------------
+; Clear Graphics Flag Bit 2
+; ---------------------------------------------------------------------------
+
+CODE_009BD8:
+	LDA.W #$0004                ; Bit 2 mask
+	AND.W $00D8                 ; Test if set
+	BEQ CODE_009BEC             ; Skip if not set
+	LDA.W #$0004                ; Bit 2 mask
+	TRB.W $00D8                 ; Clear bit 2
+	LDA.W #$00C8                ; Bits 6-7 + bit 3 mask
+	TRB.W $0111                 ; Clear those bits in $0111
+
+CODE_009BEC:
+	RTS                         ; Return
+
+; ---------------------------------------------------------------------------
+; Initialize Color Palette Processing
+; ---------------------------------------------------------------------------
+; Purpose: Setup DMA for color palette operations
+; ===========================================================================
+
+CODE_009BED:
+	LDX.W #$9C87                ; Source data pointer
+	LDY.W #$5007                ; Dest = $7F5007
+	LDA.W #$0022                ; Transfer $22 bytes + 1 = 35 bytes
+	MVN $7F,$00                 ; Copy data to buffer
+	
+	; Initialize color values
+	LDA.L $000E9C               ; Load base color
+	STA.W $5011                 ; Store at offset $11
+	STA.W $5014                 ; Store at offset $14
+	STA.W $501A                 ; Store at offset $1A
+	JSR.W CODE_009C52           ; Adjust color brightness
+	STA.W $5017                 ; Store adjusted color
+	
+	LDA.L DATA8_07800C          ; Load another base color
+	STA.W $501E                 ; Store at offset $1E
+	STA.W $5021                 ; Store at offset $21
+	STA.W $5027                 ; Store at offset $27
+	JSR.W CODE_009C52           ; Adjust color brightness
+	STA.W $5024                 ; Store adjusted color
+	
+	; Setup DMA channels 3, 6, 7 for palette transfer
+	PHK                         ; Push program bank
+	PLB                         ; Pull to data bank
+	SEP #$20                    ; 8-bit A
+	
+	LDA.B #$7F                  ; Bank $7F
+	STA.W SNES_DMA3ADDRH        ; DMA3 source bank
+	STA.W SNES_DMA6ADDRH        ; DMA6 source bank
+	STA.W SNES_DMA7ADDRH        ; DMA7 source bank
+	
+	LDX.W #$2100                ; SNES register base
+	STX.W SNES_DMA3PARAM        ; DMA3 parameter
+	LDX.W #$2202                ; Different register
+	STX.W SNES_DMA6PARAM        ; DMA6 parameter
+	STX.W SNES_DMA7PARAM        ; DMA7 parameter
+	
+	LDX.W #$5007                ; Source address
+	STX.W SNES_DMA3ADDRL        ; DMA3 source low
+	LDX.W #$5010                ; Source address
+	STX.W SNES_DMA6ADDRL        ; DMA6 source low
+	LDX.W #$501D                ; Source address
+	STX.W SNES_DMA7ADDRL        ; DMA7 source low
+	
+	REP #$30                    ; 16-bit A/X/Y
+	RTS                         ; Return
+
+; ---------------------------------------------------------------------------
+; CODE_009C52: Adjust Color Brightness
+; ---------------------------------------------------------------------------
+; Purpose: Reduce color intensity (darken for shadowing/fade)
+; Input: Color on stack (SNES BGR555 format)
+; Output: A = adjusted color
+; Algorithm: Subtract $30 from red, $18 from green, $0C from blue (clamp to 0)
+; ===========================================================================
+
+CODE_009C52:
+	PHA                         ; Save color
+	SEC                         ; Set carry for subtraction
+	AND.W #$7C00                ; Mask red component (bits 10-14)
+	SBC.W #$3000                ; Subtract $30 from red
+	BCS CODE_009C60             ; Branch if no underflow
+	LDA.W #$0000                ; Clamp to 0
+	SEC                         ; Set carry
+
+CODE_009C60:
+	PHA                         ; Save adjusted red
+	LDA.B $03,S                 ; Get original color
+	AND.W #$03E0                ; Mask green component (bits 5-9)
+	SBC.W #$0180                ; Subtract $18 from green
+	BCS CODE_009C6F             ; Branch if no underflow
+	LDA.W #$0000                ; Clamp to 0
+	SEC                         ; Set carry
+
+CODE_009C6F:
+	ORA.B $01,S                 ; Combine with adjusted red
+	STA.B $01,S                 ; Store combined result
+	LDA.B $03,S                 ; Get original color again
+	AND.W #$001F                ; Mask blue component (bits 0-4)
+	SBC.W #$000C                ; Subtract $0C from blue
+	BCS CODE_009C80             ; Branch if no underflow
+	LDA.W #$0000                ; Clamp to 0
+
+CODE_009C80:
+	ORA.B $01,S                 ; Combine with red+green
+	STA.B $03,S                 ; Store final result
+	PLA                         ; Remove temporary value
+	PLA                         ; Get final adjusted color
+	RTS                         ; Return
+
+; ---------------------------------------------------------------------------
+; Color Palette Data
+; ---------------------------------------------------------------------------
+
+DATA8_009C87:
+	.dw $0D00, $0D01, $0D01, $0D01  ; Color entries
+	.dw $0000, $5140, $5101, $5140
+	.dw $1FB4, $5101, $5140, $0000
+	.dw $7FFF, $7F01, $7FFF, $4E73
+	.dw $7F01, $7FFF, $0001
+
+; ---------------------------------------------------------------------------
+; Setup Character Palette Display
+; ---------------------------------------------------------------------------
+
+CODE_009CAA:
+	SEP #$20                    ; 8-bit A
+	LDX.W #$01AD                ; Default offset
+	LDA.B #$20                  ; Test bit 5
+	AND.W $00E0                 ; Check flag
+	BNE CODE_009CB9             ; Use default if set
+	LDX.W #$016F                ; Alternate offset
+
+CODE_009CB9:
+	; Copy character palette data to display buffer
+	LDA.W $0013,X               ; Load palette entry
+	STA.L $7F500B               ; Store to buffer +$0B
+	STA.L $7F5016               ; Store to buffer +$16
+	STA.L $7F5023               ; Store to buffer +$23
+	
+	LDA.W $0012,X               ; Load size/count
+	DEC A                       ; Decrement
+	LSR A                       ; Divide by 2
+	STA.L $7F5009               ; Store to buffer +$09
+	STA.L $7F5013               ; Store to buffer +$13
+	STA.L $7F5020               ; Store to buffer +$20
+	
+	ADC.B #$00                  ; Add carry
+	STA.L $7F5007               ; Store to buffer +$07
+	STA.L $7F5010               ; Store to buffer +$10
+	STA.L $7F501D               ; Store to buffer +$1D
+	
+	LDA.B #$04                  ; Bit 2 mask
+	TSB.W $00D8                 ; Set bit 2 in flags
+	REP #$30                    ; 16-bit A/X/Y
+	RTS                         ; Return
+
+CODE_009CEF:
+	RTS                         ; Empty stub
+
+; ---------------------------------------------------------------------------
+; Push Graphics Parameters to Stack
+; ---------------------------------------------------------------------------
+
+CODE_009CF0:
+	PHP                         ; Save processor status
+	REP #$30                    ; 16-bit A/X/Y
+	PHB                         ; Save data bank
+	PHA                         ; Save A
+	PHD                         ; Save direct page
+	PHX                         ; Save X
+	PHY                         ; Save Y
+	
+	LDX.W #$0017                ; Source = DP $0017
+	LDA.L $7E3367               ; Load stack pointer
+	TAY                         ; Y = destination
+	LDA.W #$0025                ; Transfer 38 bytes
+	MVN $7E,$00                 ; Copy DP $0017-$003E to stack
+	
+	LDX.W #$00D0                ; Source = DP $00D0
+	LDA.W #$0000                ; Transfer 1 byte
+	MVN $7E,$00                 ; Copy DP $00D0 to stack
+	
+	TYA                         ; A = new stack pointer
+	CMP.W #$35D9                ; Check if stack overflow
+	BCC CODE_009D18             ; Branch if OK
+	JMP.W CODE_009D1F           ; Handle overflow (infinite loop)
+
+CODE_009D18:
+	STA.L $7E3367               ; Update stack pointer
+	JMP.W CODE_00981B           ; Clean stack and return
+
+CODE_009D1F:
+	BRA CODE_009D1F             ; Infinite loop (stack overflow)
+
+; ---------------------------------------------------------------------------
+; Pop Graphics Parameters from Stack
+; ---------------------------------------------------------------------------
+
+CODE_009D21:
+	PHP                         ; Save processor status
+	REP #$30                    ; 16-bit A/X/Y
+	PHB                         ; Save data bank
+	PHA                         ; Save A
+	PHD                         ; Save direct page
+	PHX                         ; Save X
+	PHY                         ; Save Y
+	
+	LDA.L $7E3367               ; Load stack pointer
+	SEC                         ; Set carry
+	SBC.W #$0027                ; Subtract 39 bytes
+	STA.L $7E3367               ; Update stack pointer
+	TAX                         ; X = source
+	
+	LDY.W #$0017                ; Dest = DP $0017
+	LDA.W #$0025                ; Transfer 38 bytes
+	MVN $00,$7E                 ; Copy stack to DP $0017-$003E
+	
+	LDY.W #$00D0                ; Dest = DP $00D0
+	LDA.W #$0000                ; Transfer 1 byte
+	MVN $00,$7E                 ; Copy stack to DP $00D0
+	
+	JMP.W CODE_00981B           ; Clean stack and return
+
+; ---------------------------------------------------------------------------
+; Fill Memory via Helper
+; ---------------------------------------------------------------------------
+
+CODE_009D4B:
+	PHY                         ; Save Y
+	STX.B $1A                   ; Store X to $1A
+	TXY                         ; Y = X
+	TAX                         ; X = A
+	JSR.W CODE_00B49E           ; Call helper
+	CLC                         ; Clear carry
+	TYA                         ; A = Y
+	ADC.B $01,S                 ; Add saved Y
+	STA.B $1A                   ; Store to $1A
+	JSR.W CODE_00B4A7           ; Call helper
+	LDA.B $1C                   ; Load $1C
+	AND.W #$00FF                ; Mask to byte
+	PHA                         ; Push to stack
+	PLB                         ; Pull to data bank
+	LDA.B $02,S                 ; Load parameter
+	JSR.W CODE_009998           ; Call fill dispatcher
+	PLB                         ; Restore data bank
+	PLA                         ; Clean stack
+	RTS                         ; Return
+
+; ---------------------------------------------------------------------------
+; CODE_009D6B: Process Graphics with DP Setup
+; ---------------------------------------------------------------------------
+
+CODE_009D6B:
+	PHD                         ; Save direct page
+	PEA.W $0000                 ; Push $0000
+	PLD                         ; Direct Page = $0000
+	JSR.W CODE_009D75           ; Process graphics
+	PLD                         ; Restore direct page
+	RTL                         ; Return long
+
+; ---------------------------------------------------------------------------
+; CODE_009D75: Main Graphics Data Processor
+; ---------------------------------------------------------------------------
+; Purpose: Core loop for processing graphics command stream
+; Algorithm: Read bytes from [$17], dispatch to handlers via jump table
+; Commands $00-$2F: Jump table entries
+; Commands $30+: Indexed data lookup
+; Commands $80+: Direct tile data (XOR with $1D for effects)
+; ===========================================================================
+
+CODE_009D75:
+	PHP                         ; Save processor status
+	REP #$30                    ; 16-bit A/X/Y
+	PHB                         ; Save data bank
+	PHA                         ; Save A
+	PHD                         ; Save direct page
+	PHX                         ; Save X
+	PHY                         ; Save Y
+	PHK                         ; Push program bank
+	PLB                         ; Pull to data bank
+	
+	; Check if special processing mode
+	LDA.W #$0008                ; Bit 3 mask
+	AND.W $00DB                 ; Test flag
+	BEQ CODE_009DA2             ; Normal processing
+	
+	; Special mode with synchronization
+	LDA.W #$0010                ; Bit 4 mask
+	AND.W $00D0                 ; Test flag
+	BNE CODE_009D9A             ; Use alternate sync
+
+CODE_009D8F:
+	JSR.W CODE_009DBD           ; Read and process command
+	LDA.B $17                   ; Get current pointer
+	CMP.B $3D                   ; Compare to sync pointer
+	BNE CODE_009D8F             ; Loop until synchronized
+	BRA CODE_009DBA             ; Done
+
+CODE_009D9A:
+	JSR.W CODE_00E055           ; Alternate sync handler
+	BRA CODE_009DBA             ; Done
+
+CODE_009D9F:
+	JSR.W CODE_009DBD           ; Read and process command
+
+CODE_009DA2:
+	; Normal processing loop
+	LDA.W $00D0                 ; Load flags
+	BIT.W #$0090                ; Test bits 4 and 7
+	BEQ CODE_009D9F             ; Continue if neither set
+	
+	BIT.W #$0080                ; Test bit 7
+	BNE CODE_009DB4             ; Exit if set
+	JSR.W CODE_00E055           ; Process special event
+	BRA CODE_009DA2             ; Continue loop
+
+CODE_009DB4:
+	LDA.W #$0080                ; Bit 7 mask
+	TRB.W $00D0                 ; Clear exit flag
+
+CODE_009DBA:
+	JMP.W CODE_00981B           ; Clean stack and return
+
+; ---------------------------------------------------------------------------
+; CODE_009DBD: Read and Dispatch Graphics Command
+; ---------------------------------------------------------------------------
+
+CODE_009DBD:
+	LDA.B [$17]                 ; Read command byte
+	INC.B $17                   ; Advance pointer
+	AND.W #$00FF                ; Mask to byte
+	CMP.W #$0080                ; Is it direct tile data?
+	BCC CODE_009DD2             ; No, dispatch to handler
+	
+CODE_009DC9:
+	; Direct tile write (values $80-$FF)
+	EOR.B $1D                   ; XOR with effect mask
+	
+CODE_009DCB:
+	STA.B [$1A]                 ; Write to VRAM buffer
+	INC.B $1A                   ; Advance pointer
+	INC.B $1A                   ; (16-bit increment)
+	RTS                         ; Return
+
+CODE_009DD2:
+	; Command dispatch (values $00-$7F)
+	CMP.W #$0030                ; Is it indexed data?
+	BCS CODE_009DDF             ; Yes, handle indexed
+	
+	; Jump table dispatch ($00-$2F)
+	ASL A                       ; Multiply by 2 (word index)
+	TAX                         ; X = table offset
+	JSR.W (DATA8_009E0E,X)      ; Call handler via table
+	REP #$30                    ; 16-bit A/X/Y
+	RTS                         ; Return
+
+CODE_009DDF:
+	; Indexed data lookup ($30+)
+	LDX.W #$0000                ; X = 0 (table index)
+	SBC.W #$0030                ; Subtract base (now $00-$4F)
+	BEQ CODE_009DF9             ; If 0, use first entry
+	TAY                         ; Y = index count
+
+CODE_009DE8:
+	; Find entry in variable-length table
+	LDA.L DATA8_03BA35,X        ; Load entry size
+	AND.W #$00FF                ; Mask to byte
+	STA.B $64                   ; Store size
+	TXA                         ; A = current offset
+	SEC                         ; Set carry
+	ADC.B $64                   ; Add size (+ 1 from carry)
+	TAX                         ; X = next entry offset
+	DEY                         ; Decrement index
+	BNE CODE_009DE8             ; Continue until found
+
+CODE_009DF9:
+	; Process found entry
+	TXA                         ; A = table offset
+	CLC                         ; Clear carry
+	ADC.W #$BA36                ; Add base address
+	TAY                         ; Y = data pointer
+	SEP #$20                    ; 8-bit A
+	LDA.B #$03                  ; Bank $03
+	XBA                         ; Swap to high byte
+	LDA.L DATA8_03BA35,X        ; Load entry size
+	TYX                         ; X = data pointer
+	REP #$30                    ; 16-bit A/X/Y
+	JMP.W CODE_00A7F9           ; Process data block
+
+; ---------------------------------------------------------------------------
+; Graphics Command Jump Table
+; ---------------------------------------------------------------------------
+; Commands $00-$2F dispatch here
+; ===========================================================================
+
+DATA8_009E0E:
+	.dw CODE_00A378             ; $00: Command handler
+	.dw CODE_00A8C0             ; $01
+	.dw CODE_00A8BD             ; $02
+	.dw CODE_00A39C             ; $03
+	.dw CODE_00B354             ; $04
+	.dw CODE_00A37F             ; $05
+	.dw CODE_00B4B0             ; $06
+	.dw CODE_00A708             ; $07
+	.dw CODE_00A755             ; $08
+	.dw CODE_00A83F             ; $09
+	.dw CODE_00A519             ; $0A
+	.dw CODE_00A3F5             ; $0B
+	.dw CODE_00A958             ; $0C
+	.dw CODE_00A96C             ; $0D
+	.dw CODE_00A97D             ; $0E
+	.dw CODE_00AFD6             ; $0F
+	.dw CODE_00AF9A             ; $10
+	.dw CODE_00AF6B             ; $11
+	.dw CODE_00AF70             ; $12
+	.dw CODE_00B094             ; $13
+	.dw CODE_00AFFE             ; $14
+	.dw CODE_00A0B7             ; $15
+	.dw CODE_00B2F9             ; $16
+	.dw CODE_00AEDA             ; $17
+	.dw CODE_00AACF             ; $18
+	.dw CODE_00A8D1             ; $19
+	.dw CODE_00A168             ; $1A
+	.dw CODE_00A17E             ; $1B
+	.dw CODE_00A15C             ; $1C
+	.dw CODE_00A13C             ; $1D
+	.dw CODE_00A0FE             ; $1E
+	.dw CODE_00A0C0             ; $1F
+	.dw CODE_00A0DF             ; $20
+	.dw CODE_00B2F4             ; $21
+	.dw CODE_00A150             ; $22
+	.dw CODE_00AEA2             ; $23
+	.dw CODE_00A11D             ; $24
+	.dw CODE_00A07D             ; $25
+	.dw CODE_00A089             ; $26
+	.dw CODE_00A09D             ; $27
+	.dw CODE_00A0A9             ; $28
+	.dw CODE_00AEB5             ; $29
+	.dw CODE_00B379             ; $2A
+	.dw CODE_00AEC7             ; $2B
+	.dw CODE_00B355             ; $2C
+	.dw CODE_00A074             ; $2D
+	.dw CODE_00A563             ; $2E
+	.dw CODE_00A06E             ; $2F
+
+; ---------------------------------------------------------------------------
+; Secondary Jump Table (for specific graphics operations)
+; ---------------------------------------------------------------------------
+
+DATA8_009E6E:
+	.dw CODE_00A342             ; $00
+	.dw CODE_00A3AB             ; $01
+	.dw CODE_00A51E             ; $02
+	.dw CODE_00A52E             ; $03
+	.dw CODE_00A3D5             ; $04
+	.dw CODE_00A3DE             ; $05
+	.dw CODE_00A3E5             ; $06
+	.dw CODE_00A3EC             ; $07
+	.dw $0000                   ; $08: Unused
+	.dw CODE_00A3FC             ; $09
+	.dw $0000                   ; $0A: Unused
+	.dw CODE_00A572             ; $0B
+	.dw CODE_00A581             ; $0C
+	.dw CODE_00A586             ; $0D
+	.dw CODE_00A744             ; $0E
+	.dw $0000, $0000            ; $0F-$10: Unused
+	.dw CODE_00A718             ; $11
+	.dw CODE_00A78E             ; $12
+	.dw CODE_00A79D             ; $13
+	.dw CODE_00A7AC             ; $14
+	.dw CODE_00A7B3             ; $15
+	.dw $0000                   ; $16: Unused
+	.dw CODE_00A86E             ; $17
+	.dw CODE_00A7EB             ; $18
+	.dw CODE_00A7DE             ; $19
+	.dw $0000, $0000, $0000     ; $1A-$1C: Unused
+	.dw CODE_00A874             ; $1D
+	.dw CODE_00A89B             ; $1E
+	.dw $0000                   ; $1F: Unused
+
 ;===============================================================================
-; Progress: ~6,900 lines documented (49% of Bank $00)
+; Progress: ~7,300 lines documented (52% of Bank $00)
 ; Sections completed:
 ; - Boot sequence and hardware init
 ; - DMA and graphics transfers
@@ -6897,6 +7405,7 @@ CODE_009BA4:
 ; - Bit manipulation helpers
 ; - Memory copy and fill operations
 ; - Graphics processing routines
+; - Graphics command dispatcher and jump tables
 ;
-; Remaining: ~7,100 lines (battle system, more graphics, data tables, etc.)
+; Remaining: ~6,700 lines (battle system, command handlers, more data tables)
 ;===============================================================================
