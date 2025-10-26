@@ -7,7 +7,7 @@
 #   .\build.ps1 -Output test.sfc   # Custom output path
 
 param(
-    [string]$Source = "src\asm\ffmq_complete.asm",
+    [string]$Source = "src\asm\ffmq_working.asm",
     [string]$Output = "build\ffmq-rebuilt.sfc",
     [switch]$Symbols,
     [switch]$Verbose,
@@ -45,6 +45,16 @@ if (-not (Test-Path "build")) {
     Write-Info "Creating build directory..."
     New-Item -ItemType Directory -Path "build" | Out-Null
     Write-Success "Build directory created"
+}
+
+# Copy base ROM
+$baseRom = Resolve-Path "~roms\Final Fantasy - Mystic Quest (U) (V1.1).sfc" -ErrorAction SilentlyContinue
+if ($baseRom -and (Test-Path $baseRom)) {
+    Write-Info "Copying base ROM..."
+    Copy-Item $baseRom $Output -Force
+    Write-Success "Base ROM copied"
+} else {
+    Write-Warning "Base ROM not found at ~roms/. Output will be patch-only."
 }
 
 # Check for asar
