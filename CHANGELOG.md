@@ -1,5 +1,72 @@
 # Changelog - FFMQ Reverse Engineering Project
 
+## [1.1.0] - 2025-10-25 - Graphics + Palette Extraction 🎨
+
+### 🎯 Key Achievement
+- **✅ Palette extraction complete!** - 36 palettes, 576 colors extracted
+- **✅ Recognizable sprite workflow** - Combine tiles + palettes for editing
+- **70.0% extraction progress** (up from 66.7%)
+- Created comprehensive graphics + palette pipeline
+
+### 🎨 Palette System (NEW!)
+- **Tool Created:** `tools/extraction/extract_palettes_sprites.py`
+- Extracted 4 palette categories from ROM:
+  * **Character Palettes:** 8 palettes (Benjamin, Kaeli, Phoebe, Reuben variants)
+  * **Enemy Palettes:** 16 palettes (all enemy sprite colors)
+  * **Background Palettes:** 8 palettes (map tile colors)
+  * **Battle BG Palettes:** 4 palettes (battle backgrounds)
+- **Total:** 36 palettes × 16 colors = **576 colors**
+
+**Output Formats:**
+1. **Binary (.bin)** - SNES BGR555 format, re-insertable into ROM
+2. **JSON (.json)** - Human-editable with hex color codes
+3. **PNG (preview)** - Visual reference showing all colors
+
+**Files Added:**
+- `tools/extraction/extract_palettes_sprites.py` (370 lines)
+- `assets/graphics/palettes/character_palettes.{bin,json,png}`
+- `assets/graphics/palettes/enemy_palettes.{bin,json,png}`
+- `assets/graphics/palettes/bg_palettes.{bin,json,png}`
+- `assets/graphics/palettes/battle_bg_palettes.{bin,json,png}`
+- `assets/graphics/palettes/SPRITE_GUIDE.md`
+- `docs/GRAPHICS_PALETTE_WORKFLOW.md` (200+ lines)
+
+### 📚 Documentation Added
+- **GRAPHICS_PALETTE_WORKFLOW.md** - Complete palette editing guide
+  * Explains SNES BGR555 color format
+  * Palette memory map ($07A000-$07A500)
+  * Editing workflow (JSON → BIN → ROM)
+  * Before/After comparison (grayscale → colorized)
+- **SPRITE_GUIDE.md** - Quick reference in palettes directory
+
+### 🔧 Improvements
+- Fixed import paths in extraction tools
+- Added UTF-8 encoding for guide files
+- Updated method calls (to_rgb24 → to_rgb888)
+
+### 📊 Extraction Progress: 70.0% → 77.8% (Target)
+
+| Category | Coverage | Files | Status |
+|----------|----------|-------|--------|
+| Code | 100% | 18 | ✅ Complete |
+| Enemy Data | 100% | 3 | ✅ Complete |
+| Item Data | 100% | 8 | ✅ Complete |
+| Text | 100% | 8 | ✅ Complete |
+| Dialog | 100% | 2 | ✅ Complete |
+| Graphics | 100% | 7 | ✅ Complete |
+| **Palettes** | **100%** | **12** | ✅ **NEW!** |
+| Maps | 0% | 0 | ⏳ Next |
+| Audio | 0% | 0 | ⏳ Next |
+
+### 🚀 Next Steps
+- [ ] Create sprite assembler (combine tiles + palettes)
+- [ ] Generate recognizable character/enemy sprite sheets
+- [ ] Implement PNG → ROM round-trip workflow
+- [ ] Extract map data
+- [ ] Extract audio/SPC data
+
+---
+
 ## [1.0.0] - 2025-10-25 - MAJOR MILESTONE: First Successful Build 🎉
 
 ### 🎯 Key Achievement

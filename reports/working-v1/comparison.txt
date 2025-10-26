@@ -3,7 +3,7 @@ FFMQ ROM Comparison Report
 ================================================================================
 
 Original ROM: C:\Users\me\source\repos\ffmq-info\~roms\Final Fantasy - Mystic Quest (U) (V1.1).sfc
-Built ROM:    build\ffmq-rebuilt.sfc
+Built ROM:    build\ffmq-working.sfc
 
 Overall Statistics:
 --------------------------------------------------------------------------------

@@ -1,23 +1,23 @@
 {
   "original_rom": "C:\\Users\\me\\source\\repos\\ffmq-info\\~roms\\Final Fantasy - Mystic Quest (U) (V1.1).sfc",
-  "built_rom": "build\\ffmq-rebuilt.sfc",
+  "built_rom": "build\\ffmq-minimal.sfc",
   "statistics": {
     "total_bytes": 524288,
-    "matching_bytes": 524267,
-    "differing_bytes": 21,
-    "match_percentage": 99.9959945678711,
+    "matching_bytes": 524271,
+    "differing_bytes": 17,
+    "match_percentage": 99.99675750732422,
     "by_category": {
       "code": {
         "total_bytes": 245760,
-        "matching_bytes": 245760,
-        "differing_bytes": 0,
-        "match_percentage": 100.0
+        "matching_bytes": 245747,
+        "differing_bytes": 13,
+        "match_percentage": 99.99471028645833
       },
       "data": {
         "total_bytes": 114768,
-        "matching_bytes": 114747,
-        "differing_bytes": 21,
-        "match_percentage": 99.98170221664576
+        "matching_bytes": 114764,
+        "differing_bytes": 4,
+        "match_percentage": 99.99651470793253
       },
       "text": {
         "total_bytes": 16384,
@@ -41,13 +41,22 @@
   },
   "difference_blocks": [
     {
-      "start": "$007FC2",
-      "end": "$007FD3",
-      "size": 17,
-      "region": "Engine Data",
-      "category": "data",
-      "original_sample": "204d5953544943205155455354202020",
-      "built_sample": "4d5120456e68616e6365642076312e30"
+      "start": "$000002",
+      "end": "$00000A",
+      "size": 8,
+      "region": "Boot/Reset",
+      "category": "code",
+      "original_sample": "2047822200800da9",
+      "built_sample": "e2309c0042a9808d"
+    },
+    {
+      "start": "$00000B",
+      "end": "$000010",
+      "size": 5,
+      "region": "Boot/Reset",
+      "category": "code",
+      "original_sample": "8f67367e3a",
+      "built_sample": "215c108000"
     },
     {
       "start": "$007FDC",
@@ -56,7 +65,7 @@
       "region": "Engine Data",
       "category": "data",
       "original_sample": "0a70f58f",
-      "built_sample": "3c6fc390"
+      "built_sample": "7c6f8390"
     }
   ],
   "regions": [

@@ -72,8 +72,16 @@ Research the correct dialog text address?
 ******* search bing copilot: is there an Managed Service Provider (msp) for the SNES (super Nintendo) architecture to help when programming an SNES game ROM?
 But asar is installed! can you not find it? are you sure you're trying to compile the entry code file? While making sure the compile chain works, if asar isn't the solution find and implement the better more modern build stack for `snes`, is `asar` old or underpowered? make the best `SNES` development and build environment, make sure the `run` and `test` environments are still good and the best for modern practices. Do a better build stack! 
 
+But __`asar IS installed`__! can you not find it? are you sure you're trying to compile the entry code file? While making sure the compile chain works, if asar isn't the solution find and implement the better more modern build stack for `snes`, is `asar` old or underpowered? make the best `SNES` development and build environment, make sure the `run` and `test` environments are still good and the best for modern practices. Do a better build stack! 
 
+Resume making sure that:  While making sure the compile chain works, if asar isn't the solution find and implement the better more modern build stack for `snes`, is `asar` old or underpowered? make the best `SNES` development and build environment, make sure the `run` and `test` environments are still good and the best for modern practices. Do a better build stack! 
 
+Next: Fix assembly format → Get first build → Establish baseline → Iterate to 100%!
+(1: Use historical assembly files (fastest), 2: Convert Diztinguish format (thorough), 3: Hybrid approach (recommended)) use #3/hybrid
+
+you are supposed to be commenting all the code, updating chat logs and documentation, and checking in changes! Do all that! And then analyze assets so that sprites and tiles are combined with palettes in the build process so we can see recognizable png files for editing and re insertion
+
+the target ROM file, the one that is compiled from code and after all the assets are converted back into the SNES data structures, should not fill in blanks from the original file, but be completly generated from the code and assets pipleline. That is what we are comparing with the original rom. It doesn't make sense to compare to a copy. We are are not at 99%.
 
 
 

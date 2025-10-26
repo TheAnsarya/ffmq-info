@@ -30,7 +30,7 @@
         <h1>🎮 Final Fantasy Mystic Quest - ROM Comparison Report</h1>
         
         <p><strong>Original ROM:</strong> Final Fantasy - Mystic Quest (U) (V1.1).sfc</p>
-        <p><strong>Built ROM:</strong> ffmq-rebuilt.sfc</p>
+        <p><strong>Built ROM:</strong> ffmq-minimal.sfc</p>
         
         <h2>📊 Overall Progress</h2>
         <div class="progress-bar">
@@ -46,11 +46,11 @@
             </div>
             <div class="stat-box">
                 <h3>Matching Bytes</h3>
-                <div class="value">524,267</div>
+                <div class="value">524,271</div>
             </div>
             <div class="stat-box">
                 <h3>Differing Bytes</h3>
-                <div class="value">21</div>
+                <div class="value">17</div>
             </div>
         </div>
         
@@ -81,12 +81,12 @@
             <tr>
                 <td class="category-code">CODE</td>
                 <td>245,760</td>
-                <td>245,760</td>
-                <td>0</td>
-                <td>100.00%</td>
+                <td>245,747</td>
+                <td>13</td>
+                <td>99.99%</td>
                 <td>
                     <div style="background: #ecf0f1; height: 20px; border-radius: 10px; overflow: hidden;">
-                        <div style="background: #2ecc71; width: 100.00%; height: 100%;"></div>
+                        <div style="background: #2ecc71; width: 99.99%; height: 100%;"></div>
                     </div>
                 </td>
             </tr>
@@ -94,12 +94,12 @@
             <tr>
                 <td class="category-data">DATA</td>
                 <td>114,768</td>
-                <td>114,747</td>
-                <td>21</td>
-                <td>99.98%</td>
+                <td>114,764</td>
+                <td>4</td>
+                <td>100.00%</td>
                 <td>
                     <div style="background: #ecf0f1; height: 20px; border-radius: 10px; overflow: hidden;">
-                        <div style="background: #2ecc71; width: 99.98%; height: 100%;"></div>
+                        <div style="background: #2ecc71; width: 100.00%; height: 100%;"></div>
                     </div>
                 </td>
             </tr>
@@ -142,10 +142,17 @@
             </tr>
 
             <tr>
-                <td><code>$007FC2 - $007FD3</code></td>
-                <td>17 bytes</td>
-                <td>Engine Data</td>
-                <td class="category-data">data</td>
+                <td><code>$000002 - $00000A</code></td>
+                <td>8 bytes</td>
+                <td>Boot/Reset</td>
+                <td class="category-code">code</td>
+            </tr>
+
+            <tr>
+                <td><code>$00000B - $000010</code></td>
+                <td>5 bytes</td>
+                <td>Boot/Reset</td>
+                <td class="category-code">code</td>
             </tr>
 
             <tr>

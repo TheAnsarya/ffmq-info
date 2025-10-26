@@ -1,6 +1,6 @@
 {
   "original_rom": "C:\\Users\\me\\source\\repos\\ffmq-info\\~roms\\Final Fantasy - Mystic Quest (U) (V1.1).sfc",
-  "built_rom": "build\\ffmq-rebuilt.sfc",
+  "built_rom": "build\\ffmq-working.sfc",
   "statistics": {
     "total_bytes": 524288,
     "matching_bytes": 524267,
