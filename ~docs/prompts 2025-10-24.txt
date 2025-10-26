@@ -83,6 +83,7 @@ you are supposed to be commenting all the code, updating chat logs and documenta
 
 the target ROM file, the one that is compiled from code and after all the assets are converted back into the SNES data structures, should not fill in blanks from the original file, but be completly generated from the code and assets pipleline. That is what we are comparing with the original rom. It doesn't make sense to compare to a copy. We are are not at 99%. Dissasemble and comment all the code you can! (and format, update chat/history log, commit to git)
 
+awesome! so now do that. disassemble the game and comment and analyze and all that you know you need to do.
 
 
 
