@@ -2,102 +2,293 @@
 ; Final Fantasy Mystic Quest - Bank $00 - Main Game Engine
 ; ==============================================================================
 ; This bank contains the core game engine including:
-; - Boot sequence and initialization
-; - Main game loop
-; - Graphics setup and DMA
+; - Boot sequence and initialization ($008000-$0082FF)
+; - Main game loop and state machine
+; - Graphics setup and DMA transfer management
 ; - Controller input handling
-; - Screen transitions
-; - Save game management
+; - Screen transitions and fade effects
+; - Save game management and SRAM operations
+; - NMI and IRQ handlers
 ;
-; Size: 14,017 lines of disassembly
-; Progress: Converting and commenting systematically
+; Original ROM Size: 32,768 bytes ($8000)
+; Diztinguish Source: 14,018 lines
 ; ==============================================================================
 
 arch 65816
 lorom
 
 ;===============================================================================
-; BOOT SEQUENCE & INITIALIZATION ($008000-$0082FF)
+; BOOT SEQUENCE & INITIALIZATION ($008000-$008113)
 ;===============================================================================
 
 org $008000
 
-Boot_Entry_Point:
+CODE_008000:
 	; ===========================================================================
-	; SNES Power-On Boot Sequence
+	; SNES Power-On Boot Entry Point (RESET Vector Handler)
 	; ===========================================================================
 	; This is the first code executed when the SNES powers on or resets.
-	; The RESET vector at $00FFFC points here.
+	; The RESET vector at $00FFFC points here ($008000).
 	; 
-	; Purpose:
-	;   - Switch CPU from 6502 emulation mode to native 65816 mode
-	;   - Initialize all hardware registers
-	;   - Set up RAM and stack
-	;   - Start game initialization
+	; Boot Process:
+	;   1. Switch from 6502 emulation mode to native 65816 mode
+	;   2. Initialize all hardware registers (display off, sound off, DMA off)
+	;   3. Initialize bank $0D subsystems (sound driver, etc.)
+	;   4. Clear save file flags in RAM
+	;   5. Jump to stack setup and main initialization
 	;
-	; Technical Details:
-	;   The SNES boots in 6502 emulation mode for backward compatibility.
-	;   CLC + XCE switches to native mode, enabling 16-bit registers and
-	;   extended addressing modes.
+	; Technical Notes:
+	;   - SNES always boots in 6502 emulation mode for compatibility
+	;   - CLC+XCE is required to enable native mode features:
+	;     * 16-bit accumulator and index registers
+	;     * Extended addressing modes
+	;     * Full 24-bit address space
+	;     * 16-bit stack pointer
 	;
-	; Registers After:
-	;   CPU in native 65816 mode
-	;   All other registers uninitialized (set by Init_Hardware)
+	; Registers On Entry:
+	;   Emulation mode, all registers undefined
+	;
+	; Registers On Exit:
+	;   Native mode, stack at $001FFF, hardware initialized
 	; ===========================================================================
 	
-	CLC                         ; Clear carry flag (required for mode switch)
-	XCE                         ; Exchange carry with emulation flag
-								; Carry=0 → Emulation flag=0 → Native mode!
+	CLC                         ; Clear carry flag
+	XCE                         ; Exchange Carry with Emulation flag
+								; C=0 → E=0 → Native 65816 mode enabled!
 	
-	JSR.W Init_Hardware         ; Initialize all SNES hardware registers
-	JSL.L Bank0D_Init           ; Initialize subsystems in bank $0D
+	JSR.W CODE_008247           ; Init_Hardware: Disable NMI, force blank, clear registers
+	JSL.L CODE_0D8000           ; Bank $0D initialization (sound driver, APU setup)
 	
 	; ---------------------------------------------------------------------------
-	; Initialize Save Game State Flags
+	; Initialize Save Game State Variables
 	; ---------------------------------------------------------------------------
-	; These flags track whether save data exists and what state it's in
-	; $7E3667 = Save file exists flag
-	; $7E3668 = Save file state/slot number
+	; $7E3667 = Save file exists flag (0=no save, 1=save exists)
+	; $7E3668 = Save file slot/state ($FF=no save, 0-2=slot number)
 	; ---------------------------------------------------------------------------
 	
 	LDA.B #$00                  ; A = 0
 	STA.L $7E3667               ; Clear "save file exists" flag
 	DEC A                       ; A = $FF (-1)
-	STA.L $7E3668               ; Set save state to -1 (no save)
-	BRA Setup_Stack_And_Memory  ; Continue to main initialization
+	STA.L $7E3668               ; Set save slot to $FF (no active save)
+	BRA CODE_008023             ; → Continue to stack setup
 
 ;-------------------------------------------------------------------------------
 
-Boot_Secondary_Entry:
+CODE_008016:
 	; ===========================================================================
-	; Secondary Boot Entry Point  
+	; Secondary Boot Entry Point
 	; ===========================================================================
-	; Alternative entry point, possibly used for:
-	;   - Soft reset
-	;   - Return from diagnostic mode
-	;   - Return from special state
+	; Alternative entry point used for soft reset or special boot modes.
+	; Different from main boot: calls different bank $0D init routine.
 	; ===========================================================================
 	
-	JSR.W Init_Hardware         ; Re-initialize hardware
+	JSR.W CODE_008247           ; Init_Hardware again
 	
 	LDA.B #$F0                  ; A = $F0
-	STA.L $000600               ; Write to low RAM (hardware mirror area)
-								; This might trigger some hardware behavior
+	STA.L $000600               ; Write $F0 to $000600 (low RAM mirror area)
+								; Purpose unclear - may trigger hardware behavior
 	
-	JSL.L Bank0D_Init_Variant   ; Different initialization routine
+	JSL.L CODE_0D8004           ; Bank $0D alternate initialization routine
 
 ;-------------------------------------------------------------------------------
 
-Setup_Stack_And_Memory:
+CODE_00803A:
 	; ===========================================================================
-	; Stack Pointer and Memory Setup
+	; Third Entry Point (Soft Reset with Different Init)
 	; ===========================================================================
-	; Sets up the CPU stack and prepares memory for game execution
+	; Yet another entry point with same hardware init but different
+	; bank $0D initialization. May be used for returning from special modes.
+	; ===========================================================================
+	
+	JSR.W CODE_008247           ; Init_Hardware
+	
+	LDA.B #$F0                  ; A = $F0
+	STA.L $000600               ; Write $F0 to $000600
+	
+	JSL.L CODE_0D8004           ; Bank $0D alternate init
+	
+	REP #$30                    ; Set 16-bit mode: A, X, Y
+	LDX.W #$1FFF                ; X = $1FFF (stack pointer initial value)
+	TXS                         ; Transfer X to Stack: S = $1FFF
+
+;-------------------------------------------------------------------------------
+
+CODE_008023:
+	; ===========================================================================
+	; Stack Setup and Main Initialization Path
+	; ===========================================================================
+	; All boot paths converge here. Sets up stack pointer and continues
+	; to main game initialization.
 	;
-	; Stack Location:
-	;   $001FFF (top of bank $00 RAM, grows downward)
-	;   SNES typically uses $0000-$1FFF as general purpose RAM
+	; Stack Configuration:
+	;   Top of stack: $001FFF
+	;   Stack grows downward (typical 65816 configuration)
+	;   RAM area $0000-$1FFF available for stack/variables
 	; ===========================================================================
+	
+	REP #$30                    ; 16-bit A, X, Y registers
+	LDX.W #$1FFF                ; X = $1FFF (top of RAM bank $00)
+	TXS                         ; S = $1FFF (initialize stack pointer)
+	
+	JSR.W CODE_0081F0           ; Clear_RAM: Zero out all work RAM $0000-$1FFF
+	
+	; ---------------------------------------------------------------------------
+	; Check Boot Mode Flag ($00DA bit 6)
+	; ---------------------------------------------------------------------------
+	; $00DA appears to be a boot mode/configuration flag
+	; Bit 6 ($40) determines which initialization path to take
+	; ---------------------------------------------------------------------------
+	
+	LDA.W #$0040                ; A = $0040 (bit 6 mask)
+	AND.W $00DA                 ; Test bit 6 of $00DA
+	BNE CODE_00806E             ; If bit 6 set → Skip display init, jump ahead
+	
+	JSL.L CODE_0C8080           ; Bank $0C: Full display/PPU initialization
+	BRA CODE_00804D             ; → Continue to DMA setup
+
+;-------------------------------------------------------------------------------
+
+CODE_00804D:
+	; ===========================================================================
+	; DMA Transfer Setup - Copy Data to RAM
+	; ===========================================================================
+	; Configures and executes a DMA transfer from ROM to RAM.
+	; Transfers $0000 bytes from $008252 to... (size is 0??)
+	;
+	; This appears to be setup code that may be partially disabled or
+	; used for specific initialization scenarios.
+	; ===========================================================================
+	
+	JSR.W CODE_0081F0           ; Clear_RAM again (redundant?)
+	
+	SEP #$20                    ; 8-bit accumulator
+	
+	; ---------------------------------------------------------------------------
+	; DMA Channel 0 Configuration
+	; ---------------------------------------------------------------------------
+	; Purpose: Copy initialization data from ROM to RAM
+	; Pattern: Fixed source, incrementing destination (mode $18)
+	; Register: $2109 (not a standard PPU register?)
+	; ---------------------------------------------------------------------------
+	
+	LDX.W #$1809                ; X = $1809
+								; $18 = DMA mode (2 registers, increment write)
+								; $09 = Target register (high byte)
+	STX.W SNES_DMA0PARAM        ; $4300 = DMA0 parameters
+	
+	LDX.W #$8252                ; X = $8252 (source address low/mid)
+	STX.W SNES_DMA0ADDRL        ; $4302-$4303 = Source address $xx8252
+	
+	LDA.B #$00                  ; A = $00
+	STA.W SNES_DMA0ADDRH        ; $4304 = Source bank $00 → $008252
+	
+	LDX.W #$0000                ; X = $0000 (transfer size = 0 bytes!)
+	STX.W SNES_DMA0CNTL         ; $4305-$4306 = Transfer 0 bytes
+								; This DMA won't transfer anything!
+	
+	LDA.B #$01                  ; A = $01 (enable channel 0)
+	STA.W SNES_MDMAEN           ; $420B = Execute DMA channel 0
+								; (Executes but transfers 0 bytes)
+
+;-------------------------------------------------------------------------------
+
+CODE_00806E:
+	; ===========================================================================
+	; Direct Page Setup and NMI Enable
+	; ===========================================================================
+	; Sets up direct page pointer and enables interrupts for main game loop.
+	; ===========================================================================
+	
+	JSL.L $00011F               ; Call routine at $00011F (in bank $00 RAM!)
+								; This is calling CODE in RAM, not ROM
+								; Must have been loaded earlier
+	
+	REP #$30                    ; 16-bit A, X, Y
+	
+	LDA.W #$0000                ; A = $0000
+	TCD                         ; Direct Page = $0000 (D = $0000)
+								; Sets up fast direct page access
+	
+	SEP #$20                    ; 8-bit accumulator
+	
+	LDA.W $0112                 ; A = [$0112] (NMI enable flags)
+	STA.W SNES_NMITIMEN         ; $4200 = Enable NMI/IRQ/Auto-joypad
+								; Copies configuration from RAM variable
+	
+	CLI                         ; Clear Interrupt disable flag
+								; Enable IRQ interrupts (NMI already configured)
+	
+	LDA.B #$0F                  ; A = $0F
+	STA.W $00AA                 ; [$00AA] = $0F (some game state variable)
+	
+	JSL.L CODE_0C8000           ; Bank $0C: Wait for VBLANK
+	JSL.L CODE_0C8000           ; Bank $0C: Wait for VBLANK again
+								; Double wait ensures PPU is stable
+	
+	; ---------------------------------------------------------------------------
+	; Check Boot/Continue Mode
+	; ---------------------------------------------------------------------------
+	; $7E3665 = Continue/load game flag
+	; $700000, $70038C, $700718 = Save file signature bytes?
+	; ---------------------------------------------------------------------------
+	
+	LDA.L $7E3665               ; A = Continue flag
+	BNE CODE_0080A8             ; If set → Load existing game
+	
+	; Check if save data exists in SRAM
+	LDA.L $700000               ; A = SRAM byte 1
+	ORA.L $70038C               ; OR with SRAM byte 2
+	ORA.L $700718               ; OR with SRAM byte 3
+	BEQ CODE_0080AD             ; If all zero → New game (no save data)
+	
+	JSL.L CODE_00B950           ; Has save data → Show continue menu
+	BRA CODE_0080B0             ; → Continue to fade-in
+
+;-------------------------------------------------------------------------------
+
+CODE_0080A8:
+	; ===========================================================================
+	; Load Saved Game
+	; ===========================================================================
+	; Player selected "Continue" - load saved game data from SRAM.
+	; ===========================================================================
+	
+	JSR.W CODE_008166           ; Load_Game_From_SRAM
+	BRA CODE_0080DC             ; → Skip new game setup, jump to main init
+
+;-------------------------------------------------------------------------------
+
+CODE_0080AD:
+	; ===========================================================================
+	; New Game Initialization
+	; ===========================================================================
+	; No save data exists - start a new game.
+	; ===========================================================================
+	
+	JSR.W CODE_008117           ; Initialize_New_Game_State
+
+;-------------------------------------------------------------------------------
+
+CODE_0080B0:
+	; ===========================================================================
+	; Screen Fade-In and Final Setup
+	; ===========================================================================
+	; Common path for both new game and continue.
+	; Prepares display and jumps to main game code.
+	; ===========================================================================
+	
+	LDA.B #$80                  ; A = $80 (bit 7)
+	TRB.W $00DE                 ; Test and Reset bit 7 of $00DE
+								; Clear some state flag
+	
+	LDA.B #$E0                  ; A = $E0 (bits 5-7)
+	TRB.W $0111                 ; Test and Reset bits 5-7 of $0111
+								; Clear multiple state flags
+	
+	JSL.L CODE_0C8000           ; Bank $0C: Wait for VBLANK
+	
+	; ---------------------------------------------------------------------------
+	; Configure Color Math (Fade Effect)
 	
 	REP #$30                    ; 16-bit A, X, Y registers
 	LDX.W #$1FFF                ; X = $1FFF
