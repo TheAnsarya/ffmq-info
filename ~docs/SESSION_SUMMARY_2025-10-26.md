@@ -163,6 +163,28 @@ This session had TWO phases:
 - Build system working - successfully identified duplicate labels
 - **BUILD VERIFICATION ACTIVE**: Can now verify code accuracy against ROM
 
+**Commit 38 (bb920d5):** Session summary update
+
+**Commit 39 (e111ee5):** Fix duplicate code after CODE_008D8A
+- Removed incorrect duplicate input handling code
+- Fixed UNREACH_008D93 to proper assembly
+
+**Commit 40 (0d5512a):** Character validation and DMA helpers (~400 lines)
+- CODE_008D97-CODE_008DA8: Character & party validation
+- Character position validation helper
+- Party member availability check using status bitfield
+- CODE_008DDF-CODE_008E54: DMA transfer helpers
+- Large VRAM write via direct writes (no DMA)
+- 8-tile pattern interleaving system
+
+**Commit 41 (4060e4b):** Graphics initialization & palette loading (~200 lines)
+- CODE_008EC4-CODE_008FB4: Complete field/menu graphics setup
+- DMA Channel 5 bulk VRAM transfer (4096 bytes)
+- Loads tiles to VRAM $3000-$3FFF and $2000-$2FFF
+- Complete CGRAM palette loading system
+- 4 sets of 8-color palettes + 6 sets of 16-color palettes
+- Special color handling from $0E9C-$0E9D
+
 **Code Sections Fully Documented:**
 - ✅ CODE_008000-CODE_00806E: Boot sequence (3 entry points)
 - ✅ CODE_0080B0-CODE_0080DC: Display init and main game jump
@@ -177,22 +199,24 @@ This session had TWO phases:
 - ✅ CODE_008966-CODE_008A9C: **Main game loop & input handlers**
 - ✅ CODE_008A9D-CODE_008C1A: **Button handlers & menu interaction**
 - ✅ CODE_008C1B-CODE_008D93: **Tilemap calculation & VRAM addressing**
+- ✅ CODE_008D97-CODE_008DA8: **Character validation helpers**
+- ✅ CODE_008DDF-CODE_008E54: **DMA transfer helpers**
+- ✅ CODE_008EC4-CODE_008FB4: **Graphics initialization & palette loading**
 
 **Statistics:**
-- **~3,400 lines** of heavily commented code imported (~24.3% of Bank $00)
-- **8 major commits** (23, 24, 25, 27, 28, 30, 32, 34) plus 5 infrastructure updates
-- **13 complete code sections** fully documented
-- **All core systems complete**: Boot, interrupts, graphics, main loop, input, menus, tilemap
+- **~4,000 lines** of heavily commented code imported (~28.5% of Bank $00)
+- **11 major code commits** (23, 24, 25, 27, 28, 30, 32, 34, 40, 41) + infrastructure
+- **16 complete code sections** fully documented
+- **All core systems complete**: Boot, interrupts, graphics, main loop, input, menus, tilemap, palettes
 - **✅ BUILD VERIFICATION WORKING**: asar assembler configured and testing
 - Methodology proving highly effective with consistent quality
 
 **Remaining Bank $00 Sections:**
-- ⚠️ CODE_008D97+: Character validation and helpers (~200 lines) - NEXT
-- ❌ CODE_008DDF+: DMA transfer helper routines (~400 lines)
+- ⚠️ CODE_008FDF+: Miscellaneous helpers and data (~300 lines) - NEXT
 - ❌ CODE_009000+: State machine and game logic (~3,000 lines)  
 - ❌ CODE_00A000+: Battle system and transitions (~2,500 lines)
 - ❌ CODE_00C000+: Graphics and sprite routines (~2,000 lines)
-- ❌ Remaining: ~10,330 lines total remaining in Bank $00
+- ❌ Remaining: ~10,000 lines total remaining in Bank $00
 
 **Build System Status:**
 - ✅ asar assembler installed and working
