@@ -5218,16 +5218,65 @@ Render_Done:
 	PLD                         ; Restore Direct Page
 	PLP                         ; Restore processor status
 	RTS                         ; Return
-	BEQ Time_Events_Done             ; If clear, no status animation
+
+;-------------------------------------------------------------------------------
+
+CODE_0091A9:
+	; ===========================================================================
+	; Set Status Icon Flags in Buffer
+	; ===========================================================================
+	; Decodes status effect flags and writes $05 to appropriate buffer slots
+	; Used by icon rendering to mark which status effects are active
+	;
+	; TECHNICAL NOTES:
+	; - $E4 contains packed flags (bits 0-3 for 4 different statuses)
+	; - Each bit set writes $05 to corresponding buffer position
+	; - Buffer layout: $3669, $366A, $366B, $366C (+X offset)
+	;
+	; Parameters:
+	;   X = Buffer offset
+	;   $E4 (at Direct Page $0400) = Packed status flags
+	;
+	; Flag Mapping:
+	;   Bit 3 → $3669,X
+	;   Bit 2 → $366A,X
+	;   Bit 1 → $366B,X
+	;   Bit 0 → $366C,X
+	; ===========================================================================
 	
-	; Process character status animation
-	LDA.W #$0C00                     ; Direct page = $0C00
-	TCD                              ; Set DP to character data area
+	LDA.B $E4                   ; Get packed status flags
+	TAY                         ; Y = flags (save for later)
+	AND.B #$08                  ; Check bit 3
+	BEQ Skip_Flag1              ; If clear, skip
+	LDA.B #$05                  ; A = $05 (active marker)
+
+Skip_Flag1:
+	STA.W $3669,X               ; Store to buffer slot 1
 	
-	SEP #$30                         ; 8-bit A, X, Y
+	TYA                         ; A = flags
+	AND.B #$04                  ; Check bit 2
+	BEQ Skip_Flag2              ; If clear, skip
+	.db $A9,$05                 ; LDA #$05
+
+Skip_Flag2:
+	STA.W $366A,X               ; Store to buffer slot 2
 	
-	; Decrement animation timer
-	DEC.W $010D                      ; Decrement timer
+	TYA                         ; A = flags
+	AND.B #$02                  ; Check bit 1
+	BEQ Skip_Flag3              ; If clear, skip
+	LDA.B #$05                  ; A = $05
+
+Skip_Flag3:
+	STA.W $366B,X               ; Store to buffer slot 3
+	
+	TYA                         ; A = flags
+	AND.B #$01                  ; Check bit 0
+	BEQ Skip_Flag4              ; If clear, skip
+	LDA.B #$05                  ; A = $05
+
+Skip_Flag4:
+	STA.W $366C,X               ; Store to buffer slot 4
+	RTS                         ; Return
 	BPL Time_Events_Done             ; If still positive, done
 	
 	; Timer expired, reset and check character slots
