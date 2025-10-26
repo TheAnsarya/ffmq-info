@@ -859,18 +859,449 @@ DATA8_008252:
 	db $DB, $80, $FD, $DB, $80, $FD, $DB, $80, $FD
 
 ;===============================================================================
-; VBL
-	; Load Saved Game
+; VBLANK/NMI HANDLER AND DMA MANAGEMENT ($00825C-$008337)
+;===============================================================================
+
+CODE_00825C:
 	; ===========================================================================
-	; Player selected "Continue" - load saved game data from SRAM.
+	; NMI/VBLANK Initialization and Setup
+	; ===========================================================================
+	; Initializes variables and structures used during VBLANK interrupt handling.
+	; Sets up DMA transfer parameters and clears state flags.
+	;
+	; VBLANK Context:
+	;   During active display (non-VBLANK), PPU VRAM/OAM/CGRAM are locked.
+	;   VBLANK period (~4,500 cycles) is the only time for video updates.
+	;   This routine prepares data structures for efficient VBLANK DMA.
 	; ===========================================================================
 	
-	JSR.W CODE_008166           ; Load_Game_From_SRAM
-	BRA CODE_0080DC             ; → Skip new game setup, jump to main init
+	REP #$30                    ; 16-bit A, X, Y
+	
+	LDA.W #$0000                ; A = $0000
+	TCD                         ; Direct Page = $0000
+	
+	; ---------------------------------------------------------------------------
+	; Initialize DMA State Variables ($0500-$050A)
+	; ---------------------------------------------------------------------------
+	; These variables track DMA transfer state and configuration
+	; ---------------------------------------------------------------------------
+	
+	LDX.W #$FF08                ; X = $FF08 (init value)
+	STX.W $0503                 ; [$0503-$0504] = $FF08
+	STX.W $0501                 ; [$0501-$0502] = $FF08
+	
+	LDX.W #$880F                ; X = $880F (init value)
+	STX.W $0508                 ; [$0508-$0509] = $880F
+	STX.W $0506                 ; [$0506-$0507] = $880F
+	
+	LDA.W #$00FF                ; A = $00FF
+	SEP #$20                    ; 8-bit accumulator
+	
+	STA.W $0500                 ; [$0500] = $FF
+	STA.W $0505                 ; [$0505] = $FF
+	
+	LDA.B #$00                  ; A = $00
+	STA.W $050A                 ; [$050A] = $00
+	
+	; ---------------------------------------------------------------------------
+	; Clear Graphics State Flags ($7E3659-$7E3663)
+	; ---------------------------------------------------------------------------
+	
+	STA.L $7E3659               ; [$7E3659] = $00
+	STA.L $7E365E               ; [$7E365E] = $00
+	STA.L $7E3663               ; [$7E3663] = $00
+	
+	REP #$30                    ; 16-bit A, X, Y
+	
+	STA.L $7E365A               ; [$7E365A-$7E365B] = $0000
+	STA.L $7E365C               ; [$7E365C-$7E365D] = $0000
+	STA.L $7E365F               ; [$7E365F-$7E3660] = $0000
+	STA.L $7E3661               ; [$7E3661-$7E3662] = $0000
+	
+	; ---------------------------------------------------------------------------
+	; Load Additional Initialization Data
+	; ---------------------------------------------------------------------------
+	
+	LDX.W #$8334                ; X = $8334 (pointer to init data table)
+	JSR.W CODE_009BC4           ; Load/process data table
+	
+	; ---------------------------------------------------------------------------
+	; Initialize OAM DMA Parameters
+	; ---------------------------------------------------------------------------
+	; $01F0/$01F2 = OAM DMA transfer sizes
+	; ---------------------------------------------------------------------------
+	
+	LDA.W #$0040                ; A = $0040 (64 bytes)
+	STA.W $01F0                 ; [$01F0] = $0040 (first OAM DMA size)
+	
+	LDA.W #$0004                ; A = $0004 (4 bytes)
+	STA.W $01F2                 ; [$01F2] = $0004 (second OAM DMA size)
+	
+	; ---------------------------------------------------------------------------
+	; Copy Data from ROM to RAM (Bank $7E)
+	; ---------------------------------------------------------------------------
+	
+	LDX.W #$B81B                ; X = $B81B (source address low/mid)
+	LDY.W #$3000                ; Y = $3000 (destination address)
+	LDA.W #$0006                ; A = $0006 (copy 7 bytes)
+	MVN $7E,$00                 ; Copy from bank $00 to bank $7E
+								; Source: $00B81B → Dest: $7E3000
+	
+	; ---------------------------------------------------------------------------
+	; Copy DMA Channel Configuration
+	; ---------------------------------------------------------------------------
+	; Copies 8 bytes from $004340 to $004340 (self-copy? or init?)
+	; ---------------------------------------------------------------------------
+	
+	LDY.W #$4340                ; Y = $4340 (DMA channel 4 registers)
+	LDA.W #$0007                ; A = $0007 (copy 8 bytes)
+	MVN $00,$00                 ; Copy within bank $00
+	
+	; ---------------------------------------------------------------------------
+	; Set Configuration Flag
+	; ---------------------------------------------------------------------------
+	
+	LDA.W #$0010                ; A = $0010 (bit 4)
+	TSB.W $0111                 ; Test and Set bit 4 in $0111
+	
+	; ---------------------------------------------------------------------------
+	; Initialize Graphics System (3 calls)
+	; ---------------------------------------------------------------------------
+	
+	LDA.W #$0000                ; A = $0000 (parameter)
+	JSR.W CODE_00CA63           ; Initialize graphics component 0
+	
+	LDA.W #$0001                ; A = $0001 (parameter)
+	JSR.W CODE_00CA63           ; Initialize graphics component 1
+	
+	LDA.W #$0002                ; A = $0002 (parameter)
+	JSR.W CODE_00CA63           ; Initialize graphics component 2
+	
+	; ---------------------------------------------------------------------------
+	; Load Graphics Data from ROM to RAM
+	; ---------------------------------------------------------------------------
+	
+	LDX.W #$D380                ; X = $D380 (source: bank $0C, offset $D380)
+	LDY.W #$0E84                ; Y = $0E84 (destination in bank $00)
+	LDA.W #$017B                ; A = $017B (copy 380 bytes)
+	MVN $00,$0C                 ; Copy from bank $0C to bank $00
+								; Source: $0CD380 → Dest: $000E84
+	
+	LDX.W #$D0B0                ; X = $D0B0 (source: bank $0C, offset $D0B0)
+	LDY.W #$1000                ; Y = $1000 (destination in bank $00)
+	LDA.W #$004F                ; A = $004F (copy 80 bytes)
+	MVN $00,$0C                 ; Copy from bank $0C to bank $00
+								; Source: $0CD0B0 → Dest: $001000
+	
+	; ---------------------------------------------------------------------------
+	; Initialize Character/Party State
+	; ---------------------------------------------------------------------------
+	
+	LDA.W #$00FF                ; A = $00FF
+	STA.W $1090                 ; [$1090] = $00FF (character state?)
+	STA.W $10A1                 ; [$10A1] = $00FF
+	STA.W $10A0                 ; [$10A0] = $00FF (active character?)
+	
+	; ---------------------------------------------------------------------------
+	; Load Configuration from ROM
+	; ---------------------------------------------------------------------------
+	
+	LDA.L DATA8_07800A          ; A = [ROM $07800A]
+	AND.W #$739C                ; A = A & $739C (mask specific bits)
+	STA.W $0E9C                 ; [$0E9C] = masked value
+	
+	; ---------------------------------------------------------------------------
+	; Initialize Additional Systems
+	; ---------------------------------------------------------------------------
+	
+	JSR.W CODE_008EC4           ; Initialize system
+	JSR.W CODE_008C3D           ; Initialize system
+	JSR.W CODE_008D29           ; Initialize system
+	
+	; ---------------------------------------------------------------------------
+	; Set Direct Page to PPU Registers ($2100)
+	; ---------------------------------------------------------------------------
+	; Clever technique: Set D=$2100 so direct page accesses hit PPU registers
+	; This makes `STA.B $15` equivalent to `STA.W $2115` (VMAINC)
+	; Saves bytes and cycles in tight VBLANK code
+	; ---------------------------------------------------------------------------
+	
+	LDA.W #$2100                ; A = $2100 (PPU register base)
+	TCD                         ; D = $2100 (Direct Page → PPU registers)
+	
+	STZ.W $00F0                 ; [$00F0] = $0000 (clear state)
+	
+	; ---------------------------------------------------------------------------
+	; Upload Graphics to VRAM
+	; ---------------------------------------------------------------------------
+	
+	LDX.W #$6080                ; X = $6080 (VRAM address)
+	STX.B SNES_VMADDL-$2100     ; $2116-$2117 = VRAM address $6080
+								; (using direct page offset)
+	
+	PEA.W $0004                 ; Push $0004
+	PLB                         ; B = $04 (Data Bank = $04)
+								; Memory accesses now default to bank $04
+	
+	LDX.W #$99C0                ; X = $99C0 (source address in bank $04)
+	LDY.W #$0004                ; Y = $0004 (DMA parameters)
+	JSL.L CODE_008DDF           ; Execute graphics upload via DMA
+	
+	PLB                         ; Restore Data Bank
+	RTL                         ; Return
+
+;-------------------------------------------------------------------------------
+; INITIALIZATION DATA TABLE
+;-------------------------------------------------------------------------------
+
+DATA8_008334:
+	; Referenced at $0082A2
+	db $FC, $A6, $03
+
+;===============================================================================
+; MAIN NMI/VBLANK HANDLER ($008337-$0083E7)
+;===============================================================================
+
+CODE_008337:
+	; ===========================================================================
+	; NMI (Non-Maskable Interrupt) Handler - VBLANK Routine
+	; ===========================================================================
+	; This is the main VBLANK handler called 60 times per second during vertical
+	; blanking interval. This is the ONLY safe time to update VRAM, OAM, CGRAM.
+	;
+	; VBLANK Timing:
+	;   - Triggered automatically when display reaches end of frame
+	;   - Lasts ~4,500 CPU cycles (~1.3ms at 3.58MHz)
+	;   - Must complete all DMA transfers within this window
+	;   - Missing VBLANK causes visible glitches (tearing, flicker)
+	;
+	; This Handler:
+	;   - Sets Direct Page to $4300 (DMA registers)
+	;   - Checks state flags to determine what needs updating
+	;   - Executes DMA transfers for graphics, sprites, palettes
+	;   - Updates VRAM addresses and scroll positions
+	;   - Returns before VBLANK ends
+	;
+	; State Flags Checked:
+	;   $00E2 bit 6: Special mode handler
+	;   $00D4 bit 1: Tilemap DMA pending
+	;   $00DD bit 6: Graphics upload pending
+	;   $00D8 bit 7: Battle graphics update
+	;   $00D2 bits: Various DMA operation flags
+	; ===========================================================================
+	
+	REP #$30                    ; 16-bit A, X, Y
+	
+	LDA.W #$4300                ; A = $4300 (DMA register base)
+	TCD                         ; D = $4300 (Direct Page → DMA registers)
+								; Now `LDA.B $00` = `LDA.W $4300` etc.
+	
+	SEP #$20                    ; 8-bit accumulator
+	
+	STZ.W $420C                 ; $420C (HDMAEN) = $00
+								; Disable HDMA during processing
+	
+	; ---------------------------------------------------------------------------
+	; Check State Flag $00E2 Bit 6 (Special Handler Mode)
+	; ---------------------------------------------------------------------------
+	
+	LDA.B #$40                  ; A = $40 (bit 6 mask)
+	AND.W $00E2                 ; Test bit 6 of $00E2
+	BNE CODE_00837D             ; If set → Jump to special handler
+	
+	; ---------------------------------------------------------------------------
+	; Check State Flag $00D4 Bit 1 (Tilemap DMA)
+	; ---------------------------------------------------------------------------
+	
+	LDA.B #$02                  ; A = $02 (bit 1 mask)
+	AND.W $00D4                 ; Test bit 1 of $00D4
+	BNE CODE_00837A             ; If set → Tilemap DMA needed
+	
+	; ---------------------------------------------------------------------------
+	; Check State Flag $00DD Bit 6 (Graphics Upload)
+	; ---------------------------------------------------------------------------
+	
+	LDA.B #$40                  ; A = $40 (bit 6 mask)
+	AND.W $00DD                 ; Test bit 6 of $00DD
+	BNE CODE_008385             ; If set → Graphics upload needed
+	
+	; ---------------------------------------------------------------------------
+	; Check State Flag $00D8 Bit 7 (Battle Graphics)
+	; ---------------------------------------------------------------------------
+	
+	LDA.B #$80                  ; A = $80 (bit 7 mask)
+	AND.W $00D8                 ; Test bit 7 of $00D8
+	BEQ CODE_008366             ; If clear → Skip battle graphics
+	
+	LDA.B #$80                  ; A = $80
+	TRB.W $00D8                 ; Test and Reset bit 7 of $00D8
+								; Clear the flag (one-shot operation)
+	
+	JMP.W CODE_0085B7           ; Execute battle graphics update
 
 ;-------------------------------------------------------------------------------
 
-CODE_0080AD:
+CODE_008366:
+	; ===========================================================================
+	; Check Additional DMA Flags
+	; ===========================================================================
+	; Continues checking state flags for other DMA operations.
+	; ===========================================================================
+	
+	LDA.B #$C0                  ; A = $C0 (bits 6-7 mask)
+	AND.W $00D2                 ; Test bits 6-7 of $00D2
+	BNE CODE_0083A8             ; If any set → Execute DMA operations
+	
+	LDA.B #$10                  ; A = $10 (bit 4 mask)
+	AND.W $00D2                 ; Test bit 4 of $00D2
+	BNE CODE_008377             ; If set → Special operation
+	
+	JMP.W CODE_008428           ; → Continue to additional handlers
+
+;-------------------------------------------------------------------------------
+
+CODE_008377:
+	JMP.W CODE_00863D           ; Execute special DMA operation
+
+;-------------------------------------------------------------------------------
+
+CODE_00837A:
+	JMP.W CODE_0083E8           ; Execute tilemap DMA transfer
+
+;-------------------------------------------------------------------------------
+
+CODE_00837D:
+	; ===========================================================================
+	; Special Mode Handler (Indirect Jump)
+	; ===========================================================================
+	; Bit 6 of $00E2 triggers special handler mode.
+	; Jumps through pointer at [$0058] (16-bit address in bank $00).
+	; This allows dynamic handler switching.
+	; ===========================================================================
+	
+	LDA.B #$40                  ; A = $40
+	TRB.W $00E2                 ; Test and Reset bit 6 of $00E2
+								; Clear flag before jumping
+	
+	JML.W [$0058]               ; Jump Long to address stored at [$0058]
+								; Indirect jump through pointer!
+
+;-------------------------------------------------------------------------------
+
+CODE_008385:
+	; ===========================================================================
+	; Graphics Upload via DMA
+	; ===========================================================================
+	; Transfers graphics data from RAM to VRAM during VBLANK.
+	; Uses DMA channel 5 for bulk transfer.
+	;
+	; DMA Configuration:
+	;   Source: RAM address from $01F6 (bank $7F)
+	;   Destination: VRAM address from $01F8
+	;   Size: $01F4 bytes
+	;   Mode: $1801 (incrementing source, fixed dest register pair)
+	; ===========================================================================
+	
+	LDX.W #$1801                ; X = $1801
+								; $18 = DMA mode (2 registers, increment)
+								; $01 = Low byte of destination register
+	STX.B SNES_DMA5PARAM-$4300  ; $4350-$4351 = DMA5 parameters
+	
+	LDX.W $01F6                 ; X = source address (from variable)
+	STX.B SNES_DMA5ADDRL-$4300  ; $4352-$4353 = Source address low/mid
+	
+	LDA.B #$7F                  ; A = $7F
+	STA.B SNES_DMA5ADDRH-$4300  ; $4354 = Source bank $7F
+	
+	LDX.W $01F4                 ; X = transfer size (from variable)
+	STX.B SNES_DMA5CNTL-$4300   ; $4355-$4356 = Transfer size
+	
+	LDX.W $01F8                 ; X = VRAM destination address
+	STX.W SNES_VMADDL           ; $2116-$2117 = VRAM address
+	
+	LDA.B #$84                  ; A = $84
+								; Bit 7 = increment after writing $2119
+								; Bits 0-3 = increment by 128 words
+	STA.W SNES_VMAINC           ; $2115 = VRAM address increment mode
+	
+	LDA.B #$20                  ; A = $20 (bit 5 = DMA channel 5)
+	STA.W SNES_MDMAEN           ; $420B = Execute DMA channel 5
+								; Transfer starts immediately!
+
+;-------------------------------------------------------------------------------
+
+CODE_0083A8:
+	; ===========================================================================
+	; Process DMA Operation Flags ($00D2)
+	; ===========================================================================
+	; Handles various DMA operations based on flags in $00D2.
+	; ===========================================================================
+	
+	LDA.B #$80                  ; A = $80 (bit 7 mask)
+	AND.W $00D2                 ; Test bit 7 of $00D2
+	BEQ CODE_0083D3             ; If clear → Skip this DMA
+	
+	; ---------------------------------------------------------------------------
+	; DMA Transfer with Vertical Increment
+	; ---------------------------------------------------------------------------
+	
+	LDA.B #$80                  ; A = $80 (increment after $2119 write)
+	STA.W SNES_VMAINC           ; $2115 = VRAM increment mode
+	
+	LDX.W #$1801                ; X = $1801 (DMA parameters)
+	STX.B SNES_DMA5PARAM-$4300  ; $4350-$4351 = DMA5 config
+	
+	LDX.W $01ED                 ; X = source address
+	STX.B SNES_DMA5ADDRL-$4300  ; $4352-$4353 = Source address low/mid
+	
+	LDA.W $01EF                 ; A = source bank
+	STA.B SNES_DMA5ADDRH-$4300  ; $4354 = Source bank
+	
+	LDX.W $01EB                 ; X = transfer size
+	STX.B SNES_DMA5CNTL-$4300   ; $4355-$4356 = Size
+	
+	LDX.W $0048                 ; X = VRAM address
+	STX.W SNES_VMADDL           ; $2116-$2117 = VRAM address
+	
+	LDA.B #$20                  ; A = $20 (DMA channel 5)
+	STA.W SNES_MDMAEN           ; $420B = Execute DMA
+
+;-------------------------------------------------------------------------------
+
+CODE_0083D3:
+	; ===========================================================================
+	; Check OAM Update Flag
+	; ===========================================================================
+	; Bit 5 of $00D2 triggers OAM (sprite) data upload.
+	; ===========================================================================
+	
+	LDA.B #$20                  ; A = $20 (bit 5 mask)
+	AND.W $00D2                 ; Test bit 5 of $00D2
+	BEQ CODE_0083DD             ; If clear → Skip OAM update
+	
+	JSR.W CODE_008543           ; Execute OAM DMA transfer
+
+;-------------------------------------------------------------------------------
+
+CODE_0083DD:
+	; ===========================================================================
+	; Cleanup and Return from NMI
+	; ===========================================================================
+	; Clears processed flags and returns from interrupt handler.
+	; ===========================================================================
+	
+	LDA.B #$40                  ; A = $40 (bit 6)
+	TRB.W $00DD                 ; Test and Reset bit 6 of $00DD
+								; Clear graphics upload flag
+	
+	LDA.B #$A0                  ; A = $A0 (bits 5 and 7)
+	TRB.W $00D2                 ; Test and Reset bits 5,7 of $00D2
+								; Clear OAM and VRAM DMA flags
+	
+	RTL                         ; Return from Long call (NMI complete)
+
+;===============================================================================
+; TILEMAP DMA TRANSFER ($0083E8-$00
 	; ===========================================================================
 	; New Game Initialization
 	; ===========================================================================
