@@ -85,6 +85,11 @@ the target ROM file, the one that is compiled from code and after all the assets
 
 awesome! so now do that. disassemble the game and comment and analyze and all that you know you need to do.
 
+continue the disassembly
+
+don't stop, just continue the disassembly in stages attacking multiple banks at once if that scales, otherwise do one bank at a time, saving as you go, and make sure we can continue where we left off next week, but go go go creating an SNES build platform for disassembling games starting with FFMQ (btw, the palettes and pngs look like nonsense (is the conversion process ok? or is there a compression algorithm?)) use `https://github.com/TheAnsarya/logsmall` for ffmq stuff like `https://github.com/TheAnsarya/logsmall/blob/master/logsmall/Compression/SimpleTailWindowCompression.cs` or `https://github.com/TheAnsarya/logsmall/blob/master/logsmall/Compression/ExpandSecondHalfWithZeros.cs`, document everything and comment and create data structures and interfaces (and format, update chat/history log, commit to git)
+
+
 
 
 
