@@ -92,6 +92,13 @@ don't stop, just continue the disassembly in stages attacking multiple banks at 
 continue to make progress and add more banks
 expand all the data markers, so `; [Collision data continues...]` actually shows the data, but in a real data structure and format. Create alive data structures so we have code-usable classes of the format and data files using the format, but mostly after integratng format files into the exctra craft data/convert-back data format files into the build pipeline so fix all the `polaceholder` comments wirh actual code and data, and data into files and formats!
 
+&&&&&&&&&&&&&
+Create Bank $08 text extraction (similar tool)
+Replace placeholders in ALL bank files (Banks $01-$08)
+Complete round-trip verification
+Integrate into main build system (Makefile)
+&&&&&&&&&&&&&&&
+
 
 
 

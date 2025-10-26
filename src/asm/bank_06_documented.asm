@@ -166,14 +166,47 @@ DATA8_068000:
 ; - Bit 4-7: Special properties
 ; ------------------------------------------------------------------------------
 
-                       ; Example collision bytes
-                       db $00  ; Fully passable (grass)
-                       db $01  ; Blocked (wall)
-                       db $02  ; Water tile
-                       db $04  ; Lava tile
-                       db $08  ; Event trigger (door, chest)
-
-; [Collision data continues...]
+                       ; Collision data for all 256 metatiles (extracted from ROM)
+                       ; Format: 1 byte per metatile - bitfield flags
+                       ; Bit 0: Passable (0=blocked, 1=passable)
+                       ; Bit 1: Water (requires Float spell)
+                       ; Bit 2: Lava (causes damage)
+                       ; Bit 3: Trigger (event/door/chest)
+                       ; Bits 4-7: Special properties
+                       
+DATA_06A000:           ; Collision data starts at $06A000
+                       db $2E,$DE,$C6,$03,$3F,$BD,$8C,$CD  ; Tiles $00-$07
+                       db $88,$F3,$84,$05,$D1,$39,$9B,$C8  ; Tiles $08-$0F
+                       db $A2,$BC,$2C,$00,$18,$11,$35,$37  ; Tiles $10-$17
+                       db $1A,$39,$2A,$98,$F6,$00,$22,$0F  ; Tiles $18-$1F
+                       db $3B,$09,$B9,$49,$D2,$A4,$89,$18  ; Tiles $20-$27
+                       db $BD,$ED,$10,$D9,$B9,$A5,$CB,$29  ; Tiles $28-$2F
+                       db $24,$29,$E4,$0C,$F5,$B9,$22,$9B  ; Tiles $30-$37
+                       db $E5,$FF,$99,$EC,$C0,$8C,$ED,$85  ; Tiles $38-$3F
+                       db $38,$F7,$EE,$E3,$89,$92,$E3,$4F  ; Tiles $40-$47
+                       db $8C,$37,$AC,$17,$39,$06,$B7,$B3  ; Tiles $48-$4F
+                       db $3F,$87,$B4,$2A,$22,$C4,$85,$10  ; Tiles $50-$57
+                       db $A0,$E7,$D9,$B3,$0C,$04,$9A,$27  ; Tiles $58-$5F
+                       db $8A,$92,$FA,$C6,$A6,$64,$A3,$90  ; Tiles $60-$67
+                       db $01,$D8,$01,$B5,$59,$CA,$A6,$D4  ; Tiles $68-$6F
+                       db $40,$EF,$90,$31,$00,$36,$01,$92  ; Tiles $70-$77
+                       db $18,$15,$34,$C6,$D0,$29,$C2,$E9  ; Tiles $78-$7F
+                       db $29,$30,$1A,$E2,$10,$C5,$16,$06  ; Tiles $80-$87
+                       db $84,$3C,$91,$E0,$32,$EF,$B5,$B5  ; Tiles $88-$8F
+                       db $8C,$69,$62,$8B,$97,$35,$6E,$C5  ; Tiles $90-$97
+                       db $D6,$01,$36,$A8,$66,$D0,$2A,$33  ; Tiles $98-$9F
+                       db $73,$A0,$BC,$11,$76,$E1,$3A,$C3  ; Tiles $A0-$A7
+                       db $E1,$0D,$F1,$D0,$88,$48,$2E,$43  ; Tiles $A8-$AF
+                       db $12,$DC,$CD,$FD,$D0,$F6,$BA,$AF  ; Tiles $B0-$B7
+                       db $CC,$50,$04,$2A,$D0,$D2,$67,$A7  ; Tiles $B8-$BF
+                       db $A5,$E9,$68,$83,$07,$81,$9A,$2E  ; Tiles $C0-$C7
+                       db $CB,$F4,$A8,$EA,$51,$27,$EE,$84  ; Tiles $C8-$CF
+                       db $96,$4F,$A7,$85,$1C,$F3,$F7,$8C  ; Tiles $D0-$D7
+                       db $F7,$40,$AD,$49,$7D,$BA,$87,$D7  ; Tiles $D8-$DF
+                       db $0A,$FA,$1D,$55,$AF,$0A,$E5,$5C  ; Tiles $E0-$E7
+                       db $D3,$DA,$84,$42,$90,$8C,$46,$C6  ; Tiles $E8-$EF
+                       db $68,$54,$C8,$17,$27,$F1,$C8,$29  ; Tiles $F0-$F7
+                       db $89,$77,$19,$A0,$E5,$44,$42,$FF  ; Tiles $F8-$FF
 
 ; ------------------------------------------------------------------------------
 ; Compressed Map Data Sections
