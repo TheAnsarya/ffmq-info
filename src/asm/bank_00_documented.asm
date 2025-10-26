@@ -4865,19 +4865,359 @@ CODE_008FB4:
 	STA.B !SNES_CGDATA-$2100    ; Write to CGRAM
 	RTS                         ; Return
 
-; ===========================================================================
-; Time-Based Event Processor
-; ===========================================================================
-; Purpose: Process events that occur at specific time intervals
-; Technical Details: Checks status flags for various timed events
-; ===========================================================================
+;===============================================================================
+; Embedded Subroutine Data
+;===============================================================================
+; This section contains embedded machine code data used by various helper
+; routines. These are small inline subroutines stored as raw bytes.
+;===============================================================================
 
-CODE_0089C6:
-	PHD                              ; Preserve direct page
+DATA_008FDF:
+	; ===========================================================================
+	; Embedded Helper Subroutine ($008FDF-$009013)
+	; ===========================================================================
+	; Small helper routine stored as data bytes
+	; Appears to handle coordinate/offset calculations
+	; ===========================================================================
+	.db $08,$0B,$C2,$30,$DA,$48,$3B,$38,$E9,$02,$00,$1B,$5B,$E2,$20,$A5
+	.db $04,$85,$02,$64,$04,$A9,$00,$C2,$30,$A2,$08,$00,$C6,$03,$0A,$06
+	.db $01,$90,$02,$65,$03,$CA,$D0,$F6,$85,$03,$3B,$18,$69,$02,$00,$1B
+	.db $68,$FA,$2B,$28,$6B
+
+;===============================================================================
+; Status Effect Rendering System
+;===============================================================================
+; Major system that handles rendering character status effects and animations
+; Processes status ailments, buffs, and visual indicators for the party
+;===============================================================================
+
+CODE_009014:
+	; ===========================================================================
+	; Initialize Status Effect Display System
+	; ===========================================================================
+	; Clears status effect display buffers and sets up party status rendering
+	; Called when entering field/menu modes
+	;
+	; TECHNICAL NOTES:
+	; - Clears $7E3669-$7E3746 (222 bytes) for status display
+	; - Uses MVN for efficient memory clearing
+	; - Sets Direct Page to $1000 for party data access
+	; - Processes party member status flags from $1032-$1033
+	; - Renders status icons/indicators to tilemap buffers
+	;
+	; Status Display Layout:
+	; - $7E3669: Start of status effect buffer
+	; - Various offsets for different status types
+	; - Supports 6 party member slots with multiple status effects each
+	; ===========================================================================
 	
-	; Check if character status animation active
-	LDA.W #$0080                     ; Check bit 7
-	AND.W $00DE                      ; Test animation flags
+	PHP                         ; Save processor status
+	PHD                         ; Save Direct Page
+	REP #$30                    ; 16-bit mode
+	
+	; Clear status display buffer
+	LDA.W #$0000                ; A = 0
+	STA.L $7E3669               ; Clear first word of buffer
+	LDX.W #$3669                ; X = source (first word)
+	LDY.W #$366B                ; Y = destination (next word)
+	LDA.W #$00DD                ; A = $DD (221 bytes to fill)
+	MVN $7E,$7E                 ; Block fill with zeros
+	
+	; Setup for status processing
+	PHK                         ; Push program bank
+	PLB                         ; Data bank = program bank
+	SEP #$30                    ; 8-bit mode
+	PEA.W $1000                 ; Push $1000
+	PLD                         ; Direct Page = $1000 (party data)
+	
+	; Process party status bits (high nibble of $1032)
+	LDA.B $32                   ; Get party status flags (high)
+	AND.B #$E0                  ; Mask bits 7-5
+	BEQ Skip_Status_Group1      ; If clear, skip first group
+	
+	JSL.L CODE_009730           ; Calculate status icon offset
+	EOR.B #$FF                  ; Invert
+	SEC                         ; Set carry
+	ADC.B #$27                  ; Add offset $27
+	LDY.B #$A0                  ; Y = $A0 (display position)
+	JSR.W CODE_009111           ; Render status icon
+
+Skip_Status_Group1:
+	; Process bits 4-2 of $1032
+	LDA.B $32                   ; Get party status flags
+	AND.B #$1C                  ; Mask bits 4-2
+	BEQ Skip_Status_Group2      ; If clear, skip second group
+	
+	JSL.L CODE_009730           ; Calculate status icon offset
+	EOR.B #$FF                  ; Invert
+	SEC                         ; Set carry
+	ADC.B #$27                  ; Add offset $27
+	LDY.B #$B0                  ; Y = $B0 (display position)
+	JSR.W CODE_009111           ; Render status icon
+
+Skip_Status_Group2:
+	; Process bit 7 of $1033 and bits 1-0 of $1032
+	LDA.B $33                   ; Get extended status flags
+	AND.B #$80                  ; Check bit 7
+	BNE Process_Status_Group3   ; If set, process group 3
+	
+	LDA.B $32                   ; Get party status flags
+	AND.B #$03                  ; Mask bits 1-0
+	BEQ Skip_Status_Group3      ; If clear, skip
+	
+	; Embedded JSL instruction as data
+	.db $22,$30,$97,$00         ; JSL CODE_009730
+	.db $18,$69,$08             ; CLC, ADC #$08
+	.db $80,$04                 ; BRA +4
+
+Process_Status_Group3:
+	JSL.L CODE_009730           ; Calculate status icon offset
+	EOR.B #$FF                  ; Invert
+	SEC                         ; Set carry
+	ADC.B #$2F                  ; Add offset $2F
+	LDY.B #$C0                  ; Y = $C0 (display position)
+	JSR.W CODE_009111           ; Render status icon
+
+Skip_Status_Group3:
+	; Process bits 6-4 of $1033
+	LDA.B $33                   ; Get extended status flags
+	AND.B #$70                  ; Mask bits 6-4
+	BEQ Skip_Status_Group4      ; If clear, skip
+	
+	JSL.L CODE_009730           ; Calculate status icon offset
+	EOR.B #$FF                  ; Invert
+	SEC                         ; Set carry
+	ADC.B #$2F                  ; Add offset $2F
+	LDY.B #$D0                  ; Y = $D0 (display position)
+	JSR.W CODE_009111           ; Render status icon
+
+Skip_Status_Group4:
+	; Process first character slot
+	LDY.B #$00                  ; Y = 0 (slot 0)
+	JSR.W CODE_0090A3           ; Render character status
+	
+	; Switch to second character slot data
+	PEA.W $1080                 ; Push $1080
+	PLD                         ; Direct Page = $1080
+	LDY.B #$50                  ; Y = $50 (display offset)
+	JSR.W CODE_0090A3           ; Render character status
+	
+	PLD                         ; Restore Direct Page
+	PLP                         ; Restore processor status
+	RTS                         ; Return
+
+;-------------------------------------------------------------------------------
+
+CODE_0090A3:
+	; ===========================================================================
+	; Render Single Character Status Effects
+	; ===========================================================================
+	; Renders status effect icons for one character
+	;
+	; Parameters:
+	;   Y = Display position offset
+	;   Direct Page = character data ($1000 or $1080)
+	;   $31 = Character slot number (bit 7 = invalid flag)
+	;   $35-$37 = Character status flags
+	; ===========================================================================
+	
+	LDA.B $31                   ; Get character slot
+	BMI Skip_Character          ; If bit 7 set → invalid/dead character
+	JSR.W CODE_009111           ; Render base character icon
+
+Skip_Character:
+	; Process status flags group 1 (bits 7-5 of $35)
+	LDA.B $35                   ; Get status flags byte 1
+	AND.B #$E0                  ; Mask bits 7-5
+	BEQ Skip_Status1            ; If clear, skip
+	
+	JSL.L CODE_009730           ; Calculate icon offset
+	EOR.B #$FF                  ; Invert
+	SEC                         ; Set carry
+	ADC.B #$36                  ; Add offset $36
+	JSR.W CODE_009111           ; Render status icon
+
+Skip_Status1:
+	; Process status flags group 2 (bits 7-6 of $36 and bits 4-0 of $35)
+	LDA.B $36                   ; Get status flags byte 2
+	AND.B #$C0                  ; Mask bits 7-6
+	BNE Alternative_Status2     ; If set, use alternative handling
+	
+	LDA.B $35                   ; Get status flags byte 1
+	AND.B #$1F                  ; Mask bits 4-0
+	BEQ Skip_Status2            ; If clear, skip
+	
+	JSL.L CODE_009730           ; Calculate icon offset
+	CLC                         ; Clear carry
+	ADC.B #$08                  ; Add offset $08
+	BRA Continue_Status2        ; Continue processing
+
+Alternative_Status2:
+	.db $22,$30,$97,$00         ; JSL CODE_009730
+
+Continue_Status2:
+	EOR.B #$FF                  ; Invert
+	SEC                         ; Set carry
+	ADC.B #$3E                  ; Add offset $3E
+	JSR.W CODE_009111           ; Render status icon
+
+Skip_Status2:
+	; Process status flags group 3 (bits 5-2 of $36)
+	LDA.B $36                   ; Get status flags byte 2
+	AND.B #$3C                  ; Mask bits 5-2
+	BEQ Skip_Status3            ; If clear, skip
+	
+	JSL.L CODE_009730           ; Calculate icon offset
+	EOR.B #$FF                  ; Invert
+	SEC                         ; Set carry
+	ADC.B #$3E                  ; Add offset $3E
+	JSR.W CODE_009111           ; Render status icon
+
+Skip_Status3:
+	; Process status flags group 4 (bit 7 of $37 and bits 1-0 of $36)
+	LDA.B $37                   ; Get status flags byte 3
+	AND.B #$80                  ; Check bit 7
+	BNE Alternative_Status4     ; If set, use alternative
+	
+	LDA.B $36                   ; Get status flags byte 2
+	AND.B #$03                  ; Mask bits 1-0
+	BEQ Skip_Status4            ; If clear, skip
+	
+	JSL.L CODE_009730           ; Calculate icon offset
+	CLC                         ; Clear carry
+	ADC.B #$08                  ; Add offset $08
+	BRA Continue_Status4        ; Continue
+
+Alternative_Status4:
+	.db $22,$30,$97,$00         ; JSL CODE_009730
+
+Continue_Status4:
+	EOR.B #$FF                  ; Invert
+	SEC                         ; Set carry
+	ADC.B #$46                  ; Add offset $46
+	JSR.W CODE_009111           ; Render status icon
+
+Skip_Status4:
+	RTS                         ; Return
+
+;-------------------------------------------------------------------------------
+
+CODE_009111:
+	; ===========================================================================
+	; Render Status Icon to Buffer
+	; ===========================================================================
+	; Writes status icon data to the display buffer in $7E memory
+	; Handles both simple icons and complex multi-part status displays
+	;
+	; TECHNICAL NOTES:
+	; - Uses Direct Page $0400 for temporary calculations
+	; - Calls CODE_028AE0 to process icon type
+	; - Icons $00-$2E: Simple single icons
+	; - Icons $2F-$46: Complex multi-part status displays
+	; - Buffer layout supports 4 different icon "layers" per slot
+	;
+	; Parameters:
+	;   A = Icon/status ID ($00-$46)
+	;   Y = Display position offset
+	;   Data bank = $7E
+	; ===========================================================================
+	
+	PHP                         ; Save processor status
+	PHD                         ; Save Direct Page
+	SEP #$30                    ; 8-bit mode
+	PEA.W $007E                 ; Push bank $7E
+	PLB                         ; Data bank = $7E
+	PHY                         ; Save Y offset
+	PEA.W $0400                 ; Push $0400
+	PLD                         ; Direct Page = $0400
+	
+	STA.B $3A                   ; Save icon ID to $043A
+	JSL.L CODE_028AE0           ; Process icon type
+	
+	LDA.B $3A                   ; Get icon ID
+	CMP.B #$2F                  ; Check if >= $2F
+	BCC Simple_Icon             ; If < $2F → simple icon
+
+Complex_Status:
+	; Complex multi-part status display ($2F-$46)
+	LDX.B #$10                  ; X = $10 (layer 1 offset)
+	CMP.B #$32                  ; Check if >= $32
+	BCC Got_Layer_Offset        ; If < $32 → use layer 1
+	
+	LDX.B #$20                  ; X = $20 (layer 2 offset)
+	CMP.B #$39                  ; Check if >= $39
+	BCC Got_Layer_Offset        ; If < $39 → use layer 2
+	
+	LDX.B #$30                  ; X = $30 (layer 3 offset)
+	CMP.B #$3D                  ; Check if >= $3D
+	BCC Got_Layer_Offset        ; If < $3D → use layer 3
+	
+	LDX.B #$40                  ; X = $40 (layer 4 offset)
+	CLC                         ; Clear carry
+
+Got_Layer_Offset:
+	TXA                         ; A = layer offset
+	ADC.B $01,S                 ; Add Y offset from stack
+	TAX                         ; X = final buffer offset
+	JSR.W CODE_0091A9           ; Write icon data to buffer
+	
+	; Copy calculated values to buffer
+	LDA.B $DB                   ; Get calculated value 1
+	STA.W $3670,X               ; Store to buffer
+	LDA.B $DC                   ; Get calculated value 2
+	STA.W $3671,X               ; Store to buffer
+	LDA.B $E5                   ; Get calculated value 3
+	STA.W $3672,X               ; Store to buffer
+	LDA.B $E6                   ; Get calculated value 4
+	ADC.W $366A,X               ; Add to existing value
+	STA.W $366A,X               ; Store accumulated value
+	LDA.B $E7                   ; Get calculated value 5
+	STA.W $366E,X               ; Store to buffer
+	LDA.B $E8                   ; Get calculated value 6
+	STA.W $366D,X               ; Store to buffer
+	LDA.B $E9                   ; Get calculated value 7
+	STA.W $366F,X               ; Store to buffer
+	BRA Render_Done             ; Done
+
+Simple_Icon:
+	; Simple single icon ($00-$2E)
+	PLX                         ; X = Y offset (from stack)
+	PHX                         ; Save it back
+	JSR.W CODE_0091A9           ; Write icon to buffer
+	
+	CPX.B #$50                  ; Check if offset >= $50
+	BCS Render_Done             ; If so, done
+	
+	; Copy icon template for simple icons
+	REP #$30                    ; 16-bit mode
+	LDA.B $3A                   ; Get icon ID
+	AND.W #$00FF                ; Mask to byte
+	LDY.W #$3709                ; Y = template address for icons $00-$22
+	CMP.W #$0023                ; Check if < $23
+	BCC Copy_Template           ; If so, use first template
+	
+	LDY.W #$3719                ; Y = template for icons $23-$25
+	CMP.W #$0026                ; Check if < $26
+	BCC Copy_Template           ; If so, use second template
+	
+	LDY.W #$3729                ; Y = template for icons $26-$28
+	CMP.W #$0029                ; Check if < $29
+	BCC Copy_Template           ; If so, use third template
+	
+	LDY.W #$3739                ; Y = template for icons $29+
+
+Copy_Template:
+	LDX.W #$3669                ; X = destination buffer
+	LDA.W #$000F                ; A = 15 bytes to copy
+	MVN $7E,$7E                 ; Block copy template
+	SEP #$30                    ; 8-bit mode
+
+Render_Done:
+	PLY                         ; Restore Y offset
+	PLB                         ; Restore data bank
+	PLD                         ; Restore Direct Page
+	PLP                         ; Restore processor status
+	RTS                         ; Return
 	BEQ Time_Events_Done             ; If clear, no status animation
 	
 	; Process character status animation
