@@ -3914,20 +3914,447 @@ CODE_008C13:
 	
 	RTS                         ; Return
 
-Normal_Frame_Update:
-	JSR.W CODE_008BFD                ; Normal frame processing
-	
-	; Check if input processing allowed
-	LDA.W #$0010                     ; Check bit 4
-	AND.W $00DA                      ; Test input flags
-	BNE Process_Input                ; If set, process input
-	
-	; Check alternate input enable flag
-	LDA.W #$0004                     ; Check bit 2
-	AND.W $00E2                      ; Test alternate flags
-	BNE Frame_Update_Done            ; If set, skip input
+;===============================================================================
+; TILEMAP CALCULATION & UPDATE ROUTINES ($008C1B-$008DDE)
+;===============================================================================
 
-Process_Input:
+CODE_008C1B:
+	; ===========================================================================
+	; Calculate VRAM Address from Tilemap Coordinates
+	; ===========================================================================
+	; Converts tile X,Y coordinates to linear VRAM address.
+	; Used for placing tiles in the tilemap during updates.
+	;
+	; Parameters:
+	;   A = Tile coordinate (packed format)
+	;       Bits 0-2: X coordinate (0-7)
+	;       Bits 3-5: Y coordinate (0-7)
+	;
+	; Returns:
+	;   A = VRAM address offset
+	;
+	; SNES Tilemap Format:
+	;   32x32 tiles per screen (1024 tiles)
+	;   Linear addressing: row-major order
+	;   Address = (Y * 64) + (X * 12) + $8000
+	;
+	; Calculation Breakdown:
+	;   1. Extract Y coordinate (bits 3-5) → multiply by 64
+	;   2. Extract X coordinate (bits 0-2) → multiply by 12
+	;   3. Add base address $8000
+	; ===========================================================================
+	
+	PHP                         ; Save processor status
+	REP #$30                    ; 16-bit A, X, Y
+	
+	AND.W #$00FF                ; A = A & $FF (ensure 8-bit value)
+	PHA                         ; Save original coordinate
+	
+	; ---------------------------------------------------------------------------
+	; Extract and Process Y Coordinate (Bits 3-5)
+	; ---------------------------------------------------------------------------
+	
+	AND.W #$0038                ; A = A & $38 (extract bits 3-5: Y coord)
+	ASL A                       ; A = A × 2 (Y × 2)
+	TAX                         ; X = Y × 2 (save for later)
+	
+	; ---------------------------------------------------------------------------
+	; Extract and Process X Coordinate (Bits 0-2)
+	; ---------------------------------------------------------------------------
+	
+	PLA                         ; A = original coordinate
+	AND.W #$0007                ; A = A & $07 (extract bits 0-2: X coord)
+	
+	PHX                         ; Save Y×2 on stack
+	
+	; Calculate X contribution: X × 12
+	ADC.B $01,S                 ; A = X + (Y×2)  [1st add]
+	STA.B $01,S                 ; Save intermediate result
+	
+	ASL A                       ; A = (X + Y×2) × 2
+	ADC.B $01,S                 ; A = result×2 + result = result×3
+	
+	ASL A                       ; A = result × 6
+	ASL A                       ; A = result × 12
+	ASL A                       ; A = result × 24
+	ASL A                       ; A = result × 48
+	
+	; ---------------------------------------------------------------------------
+	; Add Base Address
+	; ---------------------------------------------------------------------------
+	
+	ADC.W #$8000                ; A = A + $8000 (add base VRAM address)
+	
+	PLX                         ; Clean stack (discard saved Y×2)
+	
+	PLP                         ; Restore processor status
+	RTS                         ; Return with VRAM address in A
+
+;-------------------------------------------------------------------------------
+
+CODE_008C3D:
+	; ===========================================================================
+	; Update Character Cursor Tilemap
+	; ===========================================================================
+	; Updates the tilemap tiles for character selection cursor.
+	; Handles both battle mode and field mode displays.
+	;
+	; $1031: Character Y position (row)
+	; $00D8 bit 1: Battle mode flag
+	; ===========================================================================
+	
+	PHP                         ; Save processor status
+	SEP #$30                    ; 8-bit A, X, Y
+	
+	LDX.W $1031                 ; X = character Y position
+	CPX.B #$FF                  ; Check if invalid position
+	BEQ UNREACH_008C81          ; If $FF → Exit (invalid)
+	
+	; ---------------------------------------------------------------------------
+	; Check Battle Mode Flag
+	; ---------------------------------------------------------------------------
+	
+	LDA.B #$02                  ; A = $02 (bit 1 mask)
+	AND.W $00D8                 ; Test bit 1 of $00D8
+	BEQ CODE_008C83             ; If clear → Field mode
+	
+	; ---------------------------------------------------------------------------
+	; Battle Mode Tilemap Update
+	; ---------------------------------------------------------------------------
+	; Uses special tilemap data from bank $04
+	; ---------------------------------------------------------------------------
+	
+	LDA.L DATA8_049800,X        ; A = [$049800+X] (base tile value)
+	ADC.B #$0A                  ; A = A + $0A (offset for battle tiles)
+	XBA                         ; Swap A high/low bytes (save in high byte)
+	
+	; Calculate tile position
+	TXA                         ; A = X (Y position)
+	AND.B #$38                  ; A = A & $38 (extract Y coordinate bits)
+	ASL A                       ; A = A × 2
+	PHA                         ; Save Y offset
+	
+	TXA                         ; A = X again
+	AND.B #$07                  ; A = A & $07 (extract X coordinate)
+	ORA.B $01,S                 ; A = A | Y_offset (combine X and Y)
+	PLX                         ; X = Y offset (cleanup stack)
+	
+	ASL A                       ; A = coordinate × 2 (word address)
+	
+	REP #$30                    ; 16-bit A, X, Y
+	
+	; Store tile values in WRAM buffer $7F075A
+	STA.L $7F075A               ; [$7F075A] = tile 1 coordinate
+	INC A                       ; A = A + 1 (next tile)
+	STA.L $7F075C               ; [$7F075C] = tile 2 coordinate
+	
+	ADC.W #$000F                ; A = A + $0F (skip to next row)
+	STA.L $7F079A               ; [$7F079A] = tile 3 coordinate (row 2)
+	INC A                       ; A = A + 1
+	STA.L $7F079C               ; [$7F079C] = tile 4 coordinate (row 2)
+	
+	SEP #$20                    ; 8-bit accumulator
+	
+	LDX.W #$17DA                ; X = $17DA (WRAM data source)
+	LDA.B #$7F                  ; A = $7F (bank $7F)
+	BRA CODE_008C9C             ; → Continue to transfer
+
+;-------------------------------------------------------------------------------
+
+UNREACH_008C81:
+	.db $28,$60                 ; Unreachable code: PLP, RTS
+
+;-------------------------------------------------------------------------------
+
+CODE_008C83:
+	; ===========================================================================
+	; Field Mode Tilemap Update
+	; ===========================================================================
+	; Normal field/map mode cursor update
+	; ===========================================================================
+	
+	LDA.L DATA8_049800,X        ; A = [$049800+X] (base tile)
+	ASL A                       ; A = A × 2
+	ASL A                       ; A = A × 4 (tile offset)
+	STA.W $00F4                 ; [$00F4] = tile offset
+	
+	REP #$10                    ; 16-bit X, Y
+	
+	LDA.W $1031                 ; A = character Y position
+	JSR.W CODE_008D8A           ; Calculate tilemap address
+	STX.W $00F2                 ; [$00F2] = tilemap address
+	
+	LDX.W #$2D1A                ; X = $2D1A (WRAM source address)
+	LDA.B #$7E                  ; A = $7E (bank $7E)
+
+;-------------------------------------------------------------------------------
+
+CODE_008C9C:
+	; ===========================================================================
+	; Apply Cursor Attributes
+	; ===========================================================================
+	; Modifies tile attributes based on game state flags.
+	;
+	; $00DA bit 2: Disable cursor blink
+	; $0014: Blink timer
+	; Attribute bits:
+	;   Bit 2: Horizontal flip
+	;   Bit 3-4: Palette selection
+	;   Bit 7: Priority
+	; ===========================================================================
+	
+	PHA                         ; Save bank number
+	
+	LDA.B #$04                  ; A = $04 (bit 2 mask)
+	AND.W $00DA                 ; Test bit 2 of $00DA
+	BEQ CODE_008CC5             ; If clear → Normal cursor
+	
+	; Check blink timer
+	LDA.W $0014                 ; A = [$0014] (blink timer)
+	DEC A                       ; A = A - 1
+	BEQ CODE_008CC5             ; If zero → Show cursor
+	
+	; Apply alternate palette during blink
+	LDA.B #$10                  ; A = $10 (bit 4 mask)
+	AND.W $00DA                 ; Test bit 4 of $00DA
+	BNE CODE_008CBB             ; If set → Special blink mode
+	
+	; Normal blink mode (incomplete in disassembly)
+	.db $AB,$BD,$01,$00,$29,$E3,$09,$94,$80,$12
+
+;-------------------------------------------------------------------------------
+
+CODE_008CBB:
+	PLB                         ; B = bank (restore)
+	LDA.W $0001,X               ; A = [X+1] (tile attribute byte)
+	AND.B #$E3                  ; A = A & $E3 (clear palette bits 2,3,4)
+	ORA.B #$9C                  ; A = A | $9C (set new palette + priority)
+	BRA CODE_008CCD             ; → Save and continue
+
+;-------------------------------------------------------------------------------
+
+CODE_008CC5:
+	PLB                         ; B = bank (restore)
+	LDA.W $0001,X               ; A = [X+1] (tile attribute)
+	AND.B #$E3                  ; Clear palette bits
+	ORA.B #$88                  ; Set normal palette
+
+;-------------------------------------------------------------------------------
+
+CODE_008CCD:
+	; ===========================================================================
+	; Handle Number Display
+	; ===========================================================================
+	; For certain Y positions (>=$29), displays 2-digit numbers.
+	; Used for item quantities, HP values, etc.
+	; ===========================================================================
+	
+	XBA                         ; Swap A bytes (save attributes in high byte)
+	
+	LDA.L $001031               ; A = Y position
+	CMP.B #$29                  ; Compare with $29
+	BCC CODE_008D11             ; If Y < $29 → Use simple tile display
+	
+	CMP.B #$2C                  ; Compare with $2C
+	BEQ CODE_008D11             ; If Y = $2C → Use simple tile display
+	
+	; ---------------------------------------------------------------------------
+	; Two-Digit Number Display
+	; ---------------------------------------------------------------------------
+	; Displays a number as two separate digit tiles
+	; $1030 contains the value to display (0-99)
+	; ---------------------------------------------------------------------------
+	
+	LDA.W $0001,X               ; A = tile attribute
+	AND.B #$63                  ; Clear certain attribute bits
+	ORA.B #$08                  ; Set priority bit
+	STA.W $0001,X               ; Save attribute for tile 1
+	STA.W $0003,X               ; Save attribute for tile 2
+	
+	; Calculate tens digit
+	LDA.L $001030               ; A = number value (0-99)
+	LDY.W #$FFFF                ; Y = -1 (digit counter)
+	SEC                         ; Set carry for subtraction
+
+;-------------------------------------------------------------------------------
+
+CODE_008CEF:
+	; Divide by 10 loop
+	INY                         ; Y++ (count tens)
+	SBC.B #$0A                  ; A = A - 10
+	BCS CODE_008CEF             ; If carry still set → Continue subtracting
+	
+	; A now contains ones digit - 10 (needs adjustment)
+	ADC.B #$8A                  ; A = A + $8A (convert to tile number)
+	STA.W $0002,X               ; Store ones digit tile
+	
+	; Check if tens digit is zero
+	CPY.W #$0000                ; Is tens digit zero?
+	BEQ UNREACH_008D06          ; If zero → Show blank tens digit
+	
+	; Display tens digit
+	TYA                         ; A = tens digit value
+	ADC.B #$7F                  ; A = A + $7F (convert to tile number)
+	STA.W $0000,X               ; Store tens digit tile
+	BRA CODE_008D20             ; → Finish update
+
+;-------------------------------------------------------------------------------
+
+UNREACH_008D06:
+	; Show blank tile for tens digit
+	.db $A9,$45,$9D,$00,$00,$EB,$9D,$01,$00,$80,$0F
+	; LDA #$45, STA [$00,X], XBA, STA [$01,X], BRA $0F
+
+;-------------------------------------------------------------------------------
+
+CODE_008D11:
+	; ===========================================================================
+	; Simple Tile Display
+	; ===========================================================================
+	; Displays blank tiles (tile $45) for positions that don't need numbers
+	; ===========================================================================
+	
+	XBA                         ; Swap A bytes (get attributes back)
+	STA.W $0001,X               ; Store attribute for tile 1
+	STA.W $0003,X               ; Store attribute for tile 2
+	
+	LDA.B #$45                  ; A = $45 (blank tile)
+	STA.W $0000,X               ; Store blank in tile 1
+	STA.W $0002,X               ; Store blank in tile 2
+
+;-------------------------------------------------------------------------------
+
+CODE_008D20:
+	; ===========================================================================
+	; Finalize Tilemap Update
+	; ===========================================================================
+	
+	PHK                         ; Push program bank
+	PLB                         ; Pull to data bank (B = $00)
+	
+	LDA.B #$80                  ; A = $80 (bit 7)
+	TSB.W $00D4                 ; Set bit 7 of $00D4 (large VRAM update flag)
+	
+	PLP                         ; Restore processor status
+	RTS                         ; Return
+
+;===============================================================================
+; LAYER UPDATE ROUTINES ($008D29-$008D89)
+;===============================================================================
+
+CODE_008D29:
+	; ===========================================================================
+	; Background Layer 1 Update
+	; ===========================================================================
+	; Updates BG layer 1 tilemap during VBLANK.
+	; Handles both battle and field modes.
+	; ===========================================================================
+	
+	PHP                         ; Save processor status
+	SEP #$30                    ; 8-bit A, X, Y
+	
+	; ---------------------------------------------------------------------------
+	; Check Battle Mode
+	; ---------------------------------------------------------------------------
+	
+	LDA.B #$02                  ; A = $02 (bit 1 mask)
+	AND.W $00D8                 ; Test bit 1 of $00D8
+	BEQ CODE_008D6C             ; If clear → Field mode
+	
+	; ---------------------------------------------------------------------------
+	; Battle Mode Layer Update
+	; ---------------------------------------------------------------------------
+	
+	LDX.W $10B1                 ; X = [$10B1] (cursor position)
+	CPX.B #$FF                  ; Check if invalid
+	BEQ CODE_008D6A             ; If $FF → Exit
+	
+	; Calculate tile data
+	LDA.L DATA8_049800,X        ; A = base tile value
+	ADC.B #$0A                  ; A = A + $0A (battle offset)
+	XBA                         ; Save in high byte
+	
+	TXA                         ; A = position
+	AND.B #$38                  ; Extract Y bits
+	ASL A                       ; Y × 2
+	PHA                         ; Save
+	
+	TXA                         ; A = position again
+	AND.B #$07                  ; Extract X bits
+	ORA.B $01,S                 ; Combine with Y
+	PLX                         ; Cleanup stack
+	
+	ASL A                       ; Word address
+	REP #$30                    ; 16-bit A, X, Y
+	
+	; Store in WRAM buffer
+	STA.L $7F0778               ; Tile 1 position
+	INC A                       ; Next tile
+	STA.L $7F077A               ; Tile 2 position
+	
+	ADC.W #$000F                ; Next row
+	STA.L $7F07B8               ; Tile 3 position
+	INC A                       ; Next tile
+	STA.L $7F07BA               ; Tile 4 position
+	
+	LDA.W #$0080                ; A = $0080 (bit 7)
+	TSB.W $00D4                 ; Set large update flag
+
+CODE_008D6A:
+	PLP                         ; Restore status
+	RTS                         ; Return
+
+;-------------------------------------------------------------------------------
+
+CODE_008D6C:
+	; ===========================================================================
+	; Field Mode Layer Update
+	; ===========================================================================
+	
+	LDX.W $10B1                 ; X = cursor position
+	LDA.L DATA8_049800,X        ; A = base tile
+	ASL A                       ; A × 2
+	ASL A                       ; A × 4
+	STA.W $00F7                 ; Save tile offset
+	
+	REP #$10                    ; 16-bit X, Y
+	
+	LDA.W $10B1                 ; A = cursor position
+	JSR.W CODE_008D8A           ; Calculate tilemap address
+	STX.W $00F5                 ; Save address
+	
+	LDA.B #$80                  ; A = $80
+	TSB.W $00D4                 ; Set update flag
+	
+	PLP                         ; Restore status
+	RTS                         ; Return
+
+;-------------------------------------------------------------------------------
+
+CODE_008D8A:
+	; ===========================================================================
+	; Tilemap Address Calculation Wrapper
+	; ===========================================================================
+	; Calls CODE_008C1B if position is valid
+	;
+	; Parameters:
+	;   A = Position value
+	;
+	; Returns:
+	;   X = Tilemap address (or $FFFF if invalid)
+	; ===========================================================================
+	
+	CMP.B #$FF                  ; Check if invalid position
+	BEQ UNREACH_008D93          ; If $FF → Return $FFFF
+	
+	JSR.W CODE_008C1B           ; Calculate tilemap address
+	TAX                         ; X = calculated address
+	RTS                         ; Return
+
+;-------------------------------------------------------------------------------
+
+UNREACH_008D93:
+	.db $A2,$FF,$FF,$60         ; LDX #$FFFF, RTS
 	; Process controller input
 	LDA.B $07                        ; Get joypad state
 	AND.B $8E                        ; Mask with enabled buttons
