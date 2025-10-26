@@ -17,7 +17,7 @@
 ; - Bank $02: Map palette switching
 ; ==============================================================================
 
-                       ORG $058000
+					   ORG $058000
 
 ; ------------------------------------------------------------------------------
 ; Palette Set 1 - General UI/Interface
@@ -32,25 +32,25 @@
 ; ------------------------------------------------------------------------------
 
 DATA8_058000:
-                       ; UI Palette 1
-                       dw $0000  ; 0: Transparent
-                       dw $1726  ; 1: Light text
-                       dw $325A  ; 2: Medium text
-                       dw $1DD5  ; 3: Dark text
-                       dw $2150  ; 4: Border
-                       dw $256B  ; 5: Highlight
-                       dw $7BBF  ; 6: White/bright
-                       dw $2E66  ; 7: Selection
+					   ; UI Palette 1
+					   dw $0000  ; 0: Transparent
+					   dw $1726  ; 1: Light text
+					   dw $325A  ; 2: Medium text
+					   dw $1DD5  ; 3: Dark text
+					   dw $2150  ; 4: Border
+					   dw $256B  ; 5: Highlight
+					   dw $7BBF  ; 6: White/bright
+					   dw $2E66  ; 7: Selection
 
-                       ; UI Palette 2  
-                       dw $0000  ; 0: Transparent
-                       dw $0BB1  ; 1: Dark green
-                       dw $1726  ; 2: Light green
-                       dw $2E66  ; 3: Menu background
-                       dw $2606  ; 4: Panel
-                       dw $4EB9  ; 5: Panel edge
-                       dw $4615  ; 6: Shadow
-                       dw $2529  ; 7: Button
+					   ; UI Palette 2  
+					   dw $0000  ; 0: Transparent
+					   dw $0BB1  ; 1: Dark green
+					   dw $1726  ; 2: Light green
+					   dw $2E66  ; 3: Menu background
+					   dw $2606  ; 4: Panel
+					   dw $4EB9  ; 5: Panel edge
+					   dw $4615  ; 6: Shadow
+					   dw $2529  ; 7: Button
 
 ; ------------------------------------------------------------------------------
 ; Palette Set 2 - Battle Characters
@@ -59,25 +59,25 @@ DATA8_058000:
 ; Each character has dedicated palette with flesh tones, armor, etc.
 ; ------------------------------------------------------------------------------
 
-                       ; Benjamin palette
-                       dw $0000  ; 0: Transparent
-                       dw $7FFF  ; 1: White (armor highlights)
-                       dw $6318  ; 2: Light gray
-                       dw $5294  ; 3: Medium gray
-                       dw $4631  ; 4: Dark gray
-                       dw $39CE  ; 5: Shadow
-                       dw $2D6B  ; 6: Dark shadow
-                       dw $0000  ; 7: Black
+					   ; Benjamin palette
+					   dw $0000  ; 0: Transparent
+					   dw $7FFF  ; 1: White (armor highlights)
+					   dw $6318  ; 2: Light gray
+					   dw $5294  ; 3: Medium gray
+					   dw $4631  ; 4: Dark gray
+					   dw $39CE  ; 5: Shadow
+					   dw $2D6B  ; 6: Dark shadow
+					   dw $0000  ; 7: Black
 
-                       ; Kaeli palette
-                       dw $0000  ; 0: Transparent
-                       dw $7A4B  ; 1: Light skin
-                       dw $5BBF  ; 2: Medium skin
-                       dw $3E98  ; 3: Dark skin
-                       dw $2A17  ; 4: Shadow
-                       dw $21B4  ; 5: Dark shadow
-                       dw $69C4  ; 6: Hair highlight
-                       dw $5D62  ; 7: Hair
+					   ; Kaeli palette
+					   dw $0000  ; 0: Transparent
+					   dw $7A4B  ; 1: Light skin
+					   dw $5BBF  ; 2: Medium skin
+					   dw $3E98  ; 3: Dark skin
+					   dw $2A17  ; 4: Shadow
+					   dw $21B4  ; 5: Dark shadow
+					   dw $69C4  ; 6: Hair highlight
+					   dw $5D62  ; 7: Hair
 
 ; [Additional character palettes continue...]
 
@@ -88,15 +88,15 @@ DATA8_058000:
 ; Organized by enemy type/zone
 ; ------------------------------------------------------------------------------
 
-                       ; Goblin palette
-                       dw $0000  ; 0: Transparent
-                       dw $7FFF  ; 1: White highlight
-                       dw $7F59  ; 2: Bright
-                       dw $7ED1  ; 3: Light
-                       dw $7A4B  ; 4: Medium
-                       dw $69C4  ; 5: Dark
-                       dw $5D62  ; 6: Shadow
-                       dw $2529  ; 7: Black
+					   ; Goblin palette
+					   dw $0000  ; 0: Transparent
+					   dw $7FFF  ; 1: White highlight
+					   dw $7F59  ; 2: Bright
+					   dw $7ED1  ; 3: Light
+					   dw $7A4B  ; 4: Medium
+					   dw $69C4  ; 5: Dark
+					   dw $5D62  ; 6: Shadow
+					   dw $2529  ; 7: Black
 
 ; ------------------------------------------------------------------------------
 ; Palette Set 4 - Map/Overworld
@@ -105,25 +105,25 @@ DATA8_058000:
 ; Background graphics, terrain, objects
 ; ------------------------------------------------------------------------------
 
-                       ; Grass/Forest palette
-                       dw $0000  ; 0: Transparent
-                       dw $1726  ; 1: Light green
-                       dw $5BBF  ; 2: Medium green
-                       dw $3E98  ; 3: Dark green
-                       dw $2A17  ; 4: Tree shadow
-                       dw $21B4  ; 5: Grass shadow
-                       dw $2A06  ; 6: Path
-                       dw $2108  ; 7: Dark path
+					   ; Grass/Forest palette
+					   dw $0000  ; 0: Transparent
+					   dw $1726  ; 1: Light green
+					   dw $5BBF  ; 2: Medium green
+					   dw $3E98  ; 3: Dark green
+					   dw $2A17  ; 4: Tree shadow
+					   dw $21B4  ; 5: Grass shadow
+					   dw $2A06  ; 6: Path
+					   dw $2108  ; 7: Dark path
 
-                       ; Desert/Sand palette
-                       dw $0000  ; 0: Transparent
-                       dw $1726  ; 1: Light sand
-                       dw $2286  ; 2: Medium sand
-                       dw $66FD  ; 3: Bright sand
-                       dw $4EB9  ; 4: Sand shadow
-                       dw $4615  ; 5: Dark sand
-                       dw $35D3  ; 6: Rock
-                       dw $2108  ; 7: Dark rock
+					   ; Desert/Sand palette
+					   dw $0000  ; 0: Transparent
+					   dw $1726  ; 1: Light sand
+					   dw $2286  ; 2: Medium sand
+					   dw $66FD  ; 3: Bright sand
+					   dw $4EB9  ; 4: Sand shadow
+					   dw $4615  ; 5: Dark sand
+					   dw $35D3  ; 6: Rock
+					   dw $2108  ; 7: Dark rock
 
 ; ------------------------------------------------------------------------------
 ; Palette Set 5 - Magic/Effects
@@ -132,25 +132,25 @@ DATA8_058000:
 ; Designed for palette cycling/animation
 ; ------------------------------------------------------------------------------
 
-                       ; Fire spell palette
-                       dw $0000  ; 0: Transparent
-                       dw $5AFD  ; 1: White (hottest)
-                       dw $425A  ; 2: Yellow
-                       dw $39D5  ; 3: Orange
-                       dw $3150  ; 4: Red
-                       dw $2D6B  ; 5: Dark red
-                       dw $5BBF  ; 6: Flame edge
-                       dw $29D3  ; 7: Shadow
+					   ; Fire spell palette
+					   dw $0000  ; 0: Transparent
+					   dw $5AFD  ; 1: White (hottest)
+					   dw $425A  ; 2: Yellow
+					   dw $39D5  ; 3: Orange
+					   dw $3150  ; 4: Red
+					   dw $2D6B  ; 5: Dark red
+					   dw $5BBF  ; 6: Flame edge
+					   dw $29D3  ; 7: Shadow
 
-                       ; Ice/Water spell palette
-                       dw $0000  ; 0: Transparent
-                       dw $7FFF  ; 1: White (ice highlight)
-                       dw $77BD  ; 2: Light cyan
-                       dw $739C  ; 3: Medium cyan
-                       dw $56B5  ; 4: Blue
-                       dw $4EB9  ; 5: Dark blue
-                       dw $6610  ; 6: Deep blue
-                       dw $4A52  ; 7: Shadow
+					   ; Ice/Water spell palette
+					   dw $0000  ; 0: Transparent
+					   dw $7FFF  ; 1: White (ice highlight)
+					   dw $77BD  ; 2: Light cyan
+					   dw $739C  ; 3: Medium cyan
+					   dw $56B5  ; 4: Blue
+					   dw $4EB9  ; 5: Dark blue
+					   dw $6610  ; 6: Deep blue
+					   dw $4A52  ; 7: Shadow
 
 ; ------------------------------------------------------------------------------
 ; Palette Animation Data
@@ -160,25 +160,25 @@ DATA8_058000:
 ; ------------------------------------------------------------------------------
 
 DATA8_058A80:
-                       ; Palette animation table
-                       dw $7FFF  ; Animation marker
-                       dw $7B7B  ; Frame 1
-                       dw $7717  ; Frame 2
-                       dw $72B3  ; Frame 3
-                       dw $5E0E  ; Frame 4
-                       dw $4969  ; Frame 5
-                       dw $34C4  ; Frame 6
-                       dw $2020  ; Frame 7
+					   ; Palette animation table
+					   dw $7FFF  ; Animation marker
+					   dw $7B7B  ; Frame 1
+					   dw $7717  ; Frame 2
+					   dw $72B3  ; Frame 3
+					   dw $5E0E  ; Frame 4
+					   dw $4969  ; Frame 5
+					   dw $34C4  ; Frame 6
+					   dw $2020  ; Frame 7
 
-                       ; Animation speed/timing data
-                       db $19,$02  ; Speed: 2 frames/tick
-                       db $D8,$01  ; Delay: 1 tick
-                       db $B7,$01  ; Loop point
-                       db $77,$01  ; Frame count
-                       db $56,$01  ; Palette index
-                       db $35,$01  ; Effect type
-                       db $F4,$00  ; Duration
-                       db $D4,$00  ; Flags
+					   ; Animation speed/timing data
+					   db $19,$02  ; Speed: 2 frames/tick
+					   db $D8,$01  ; Delay: 1 tick
+					   db $B7,$01  ; Loop point
+					   db $77,$01  ; Frame count
+					   db $56,$01  ; Palette index
+					   db $35,$01  ; Effect type
+					   db $F4,$00  ; Duration
+					   db $D4,$00  ; Flags
 
 ; ------------------------------------------------------------------------------
 ; Palette Loading Sequences
@@ -187,14 +187,14 @@ DATA8_058A80:
 ; Format: [state_id][palette_count][palette_ids...]
 ; ------------------------------------------------------------------------------
 
-                       db $80,$00  ; State 0: Title screen
-                       db $00,$01  ; Load 1 palette
-                       db $80,$01  ; Palette set 1
-                       db $00,$02  ; State 1: Overworld
-                       db $80,$02  ; Load 2 palettes
-                       db $00,$03  ; Palette sets 2-3
-                       db $80,$03  ; State 2: Battle
-                       db $E0,$03  ; Load 3+ palettes
+					   db $80,$00  ; State 0: Title screen
+					   db $00,$01  ; Load 1 palette
+					   db $80,$01  ; Palette set 1
+					   db $00,$02  ; State 1: Overworld
+					   db $80,$02  ; Load 2 palettes
+					   db $00,$03  ; Palette sets 2-3
+					   db $80,$03  ; State 2: Battle
+					   db $E0,$03  ; Load 3+ palettes
 
 ; [Additional palette data continues...]
 

@@ -24,7 +24,7 @@
 ; - simple.tbl: Character encoding table
 ; ==============================================================================
 
-                       ORG $088000
+					   ORG $088000
 
 ; ------------------------------------------------------------------------------
 ; Text Pointer Table Section 1 - Main Story Dialog
@@ -34,22 +34,22 @@
 ; ------------------------------------------------------------------------------
 
 DATA8_088000:
-                       ; Dialog pointer 0
-                       dw $032D  ; Pointer to string (lo/hi)
-                       db $F1    ; Flags: end marker?
-                       db $00    ; Padding
-                       
-                       ; Dialog pointer 1
-                       dw $0050
-                       db $00
-                       db $55
-                       
-                       ; Dialog pointer 2
-                       dw $0A92  ; Appears to be text at $08892
-                       db $00
-                       db $66
-                       
-                       ; [... continues with hundreds of pointers...]
+					   ; Dialog pointer 0
+					   dw $032D  ; Pointer to string (lo/hi)
+					   db $F1    ; Flags: end marker?
+					   db $00    ; Padding
+					   
+					   ; Dialog pointer 1
+					   dw $0050
+					   db $00
+					   db $55
+					   
+					   ; Dialog pointer 2
+					   dw $0A92  ; Appears to be text at $08892
+					   db $00
+					   db $66
+					   
+					   ; [... continues with hundreds of pointers...]
 
 ; Each pointer entry is variable length (2-6 bytes)
 ; Pattern: word_address + optional_flags + optional_padding
@@ -67,25 +67,25 @@ DATA8_088000:
 ; ($00=H, $26=e, $07=l, ... using simple.tbl mapping)
 
 DATA8_088330:
-                       ; NPC greeting text
-                       db $00,$26,$07,$07,$07  ; "Hello"
-                       db $00,$06,$11           ; ", "
-                       db $2D,$49,$48           ; "tra"
-                       db $38,$2E,$2D,$27       ; "vele"
-                       db $00,$06,$06           ; "r.."
-                       db $F0                   ; END_STRING
-                       
-                       ; Benjamin intro text
-                       db $07,$11,$12           ; "I a"
-                       db $3C,$3B,$49,$38       ; "m Be"
-                       db $00,$26,$26           ; "nja"
-                       db $05,$12               ; "min"
-                       db $49,$2A,$2D,$2D       ; ", th"
-                       db $28,$2C,$29           ; "e K"
-                       db $11,$12,$3D           ; "nig"
-                       db $2D,$08,$2D,$4A       ; "ht o"
-                       db $4B,$4C,$2D,$09       ; "f Ge"
-                       db $F0                   ; END_STRING
+					   ; NPC greeting text
+					   db $00,$26,$07,$07,$07  ; "Hello"
+					   db $00,$06,$11           ; ", "
+					   db $2D,$49,$48           ; "tra"
+					   db $38,$2E,$2D,$27       ; "vele"
+					   db $00,$06,$06           ; "r.."
+					   db $F0                   ; END_STRING
+					   
+					   ; Benjamin intro text
+					   db $07,$11,$12           ; "I a"
+					   db $3C,$3B,$49,$38       ; "m Be"
+					   db $00,$26,$26           ; "nja"
+					   db $05,$12               ; "min"
+					   db $49,$2A,$2D,$2D       ; ", th"
+					   db $28,$2C,$29           ; "e K"
+					   db $11,$12,$3D           ; "nig"
+					   db $2D,$08,$2D,$4A       ; "ht o"
+					   db $4B,$4C,$2D,$09       ; "f Ge"
+					   db $F0                   ; END_STRING
 
 ; [Hundreds of dialog strings continue...]
 
@@ -95,20 +95,20 @@ DATA8_088330:
 ; Attack names, damage text, status messages
 ; ------------------------------------------------------------------------------
 
-                       ; "Enemy attacks!"
-                       db $2A,$2D,$38           ; "Ene"
-                       db $3A,$2E,$2D,$2D       ; "my a"
-                       db $5F,$39               ; "tta"
-                       db $04,$05               ; "cks"
-                       db $58,$5B,$5C,$5A       ; "!"
-                       db $F0                   ; END
-                       
-                       ; "XXX HP restored"
-                       db $3C,$3B,$38,$2E       ; "XXX "
-                       db $5F,$39,$49           ; "HP r"
-                       db $10,$11,$2D           ; "esto"
-                       db $18,$0A,$1E,$2D       ; "red"
-                       db $F0                   ; END
+					   ; "Enemy attacks!"
+					   db $2A,$2D,$38           ; "Ene"
+					   db $3A,$2E,$2D,$2D       ; "my a"
+					   db $5F,$39               ; "tta"
+					   db $04,$05               ; "cks"
+					   db $58,$5B,$5C,$5A       ; "!"
+					   db $F0                   ; END
+					   
+					   ; "XXX HP restored"
+					   db $3C,$3B,$38,$2E       ; "XXX "
+					   db $5F,$39,$49           ; "HP r"
+					   db $10,$11,$2D           ; "esto"
+					   db $18,$0A,$1E,$2D       ; "red"
+					   db $F0                   ; END
 
 ; [Battle text continues...]
 
@@ -118,20 +118,20 @@ DATA8_088330:
 ; Equipment names, item descriptions, status screen labels
 ; ------------------------------------------------------------------------------
 
-                       ; "Sword of Healing"
-                       db $3C,$38,$3A           ; "Swo"
-                       db $3A,$3A,$39,$49       ; "rd o"
-                       db $3D,$12,$11,$21       ; "f He"
-                       db $06,$13,$2D           ; "ali"
-                       db $F0                   ; END
-                       
-                       ; "HP:" label
-                       db $0A,$1A,$1A,$1E       ; "HP:"
-                       db $F0                   ; END
-                       
-                       ; "MP:" label
-                       db $2D,$2D,$4D,$4F       ; "MP:"
-                       db $F0                   ; END
+					   ; "Sword of Healing"
+					   db $3C,$38,$3A           ; "Swo"
+					   db $3A,$3A,$39,$49       ; "rd o"
+					   db $3D,$12,$11,$21       ; "f He"
+					   db $06,$13,$2D           ; "ali"
+					   db $F0                   ; END
+					   
+					   ; "HP:" label
+					   db $0A,$1A,$1A,$1E       ; "HP:"
+					   db $F0                   ; END
+					   
+					   ; "MP:" label
+					   db $2D,$2D,$4D,$4F       ; "MP:"
+					   db $F0                   ; END
 
 ; [Menu text continues...]
 
@@ -142,14 +142,14 @@ DATA8_088330:
 ; Must be decompressed before display
 ; ------------------------------------------------------------------------------
 
-                       ; Example compressed dialog
-                       ; (Would be decompressed by text engine)
-                       db $1F,$0B,$2D           ; Literal bytes
-                       db $3C,$48,$48,$48       ; More literals
-                       db $49,$3D,$12,$12       ; Continue
-                       db $20,$10,$07,$11       ; Literal
-                       db $85,$03               ; LZ reference: copy 5 bytes from offset 3
-                       db $F0                   ; END after decompression
+					   ; Example compressed dialog
+					   ; (Would be decompressed by text engine)
+					   db $1F,$0B,$2D           ; Literal bytes
+					   db $3C,$48,$48,$48       ; More literals
+					   db $49,$3D,$12,$12       ; Continue
+					   db $20,$10,$07,$11       ; Literal
+					   db $85,$03               ; LZ reference: copy 5 bytes from offset 3
+					   db $F0                   ; END after decompression
 
 ; ------------------------------------------------------------------------------
 ; Special Character Codes
