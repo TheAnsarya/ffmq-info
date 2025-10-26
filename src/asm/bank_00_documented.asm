@@ -4663,10 +4663,207 @@ CODE_008E63:
 	PLD                         ; Restore Direct Page
 	PLP                         ; Restore processor status
 	RTL                         ; Return
-	REP #$30                         ; 16-bit A, X, Y
-	JSR.W CODE_009342                ; Update sprites
-	JSR.W CODE_009264                ; Update animations
-	RTL                              ; Return to caller
+
+;===============================================================================
+; Graphics Initialization & Palette Loading
+;===============================================================================
+; Complex graphics setup routine that loads tiles and palettes for menu/field
+; display. Handles DMA transfers and direct palette uploads to CGRAM.
+;===============================================================================
+
+CODE_008EC4:
+	; ===========================================================================
+	; Field/Menu Graphics Initialization
+	; ===========================================================================
+	; Complete graphics setup for field mode and menu displays
+	; Loads character tiles, background tiles, and color palettes
+	;
+	; TECHNICAL NOTES:
+	; - Uses DMA Channel 5 for bulk VRAM transfer ($1000 bytes)
+	; - Loads tiles to VRAM $3000-$3FFF  
+	; - Loads additional tiles to VRAM $2000-$2FFF via CODE_008DDF
+	; - Sets up multiple palette entries in CGRAM
+	; - Direct Page = $2100 throughout for PPU access
+	;
+	; Graphics Loaded:
+	; - Bank $07:$8030: Main tile graphics (4096 bytes via DMA)
+	; - Bank $04:$8000: Additional tiles (256 groups via direct write)
+	; - Bank $07:$8000: Palette data (4 sets of 8 colors)
+	; - Bank $07:$D8E4: Extended palette data (6 groups of 16 colors)
+	;
+	; CGRAM Layout:
+	; - $0D, $1D: Special colors from $0E9C-$0E9D
+	; - $08-$1F: Four 8-color palettes from Bank $07:$8000
+	; - $28-$87: Six 16-color palettes from Bank $07:$D8E4
+	; ===========================================================================
+	
+	PHP                         ; Save processor status
+	PHD                         ; Save Direct Page
+	REP #$30                    ; 16-bit mode
+	LDA.W #$2100                ; A = $2100
+	TCD                         ; Direct Page = $2100 (PPU registers)
+	
+	; Setup DMA Channel 5 for VRAM transfer
+	SEP #$20                    ; 8-bit A
+	LDX.W #$1801                ; X = $1801 (DMA params: word, increment)
+	STX.W !SNES_DMA5PARAM       ; Set DMA5 control
+	LDX.W #$8030                ; X = $8030 (source address low/mid)
+	STX.W !SNES_DMA5ADDRL       ; Set DMA5 source address
+	LDA.B #$07                  ; A = $07 (source bank)
+	STA.W !SNES_DMA5ADDRH       ; Set DMA5 source bank
+	LDX.W #$1000                ; X = $1000 (4096 bytes to transfer)
+	STX.W !SNES_DMA5CNTL        ; Set DMA5 transfer size
+	
+	; Setup VRAM destination
+	LDX.W #$3000                ; X = $3000 (VRAM address)
+	STX.B !SNES_VMADDL-$2100    ; Set VRAM address
+	LDA.B #$84                  ; A = $84 (increment +32 after high byte)
+	STA.B !SNES_VMAINC-$2100    ; Set VRAM increment mode
+	
+	; Execute DMA transfer
+	LDA.B #$20                  ; A = $20 (enable DMA channel 5)
+	STA.W !SNES_MDMAEN          ; Start DMA transfer
+	
+	; Restore normal VRAM increment
+	LDA.B #$80                  ; A = $80 (increment +1)
+	STA.B !SNES_VMAINC-$2100    ; Set VRAM increment mode
+	
+	; Setup for additional tile transfer
+	REP #$30                    ; 16-bit mode
+	LDA.W #$FF00                ; A = $FF00 (pattern for interleaving)
+	STA.W $00F0                 ; Store pattern word
+	LDX.W #$2000                ; X = $2000 (VRAM address)
+	STX.B !SNES_VMADDL-$2100    ; Set VRAM address
+	
+	; Transfer additional tiles from Bank $04
+	PEA.W $0004                 ; Push bank $04
+	PLB                         ; Data bank = $04
+	LDX.W #$8000                ; X = $8000 (source address)
+	LDY.W #$0100                ; Y = $0100 (256 tile groups)
+	JSL.L CODE_008DDF           ; Transfer tiles via direct writes
+	PLB                         ; Restore data bank
+	
+	; Load palette data from Bank $07
+	SEP #$30                    ; 8-bit mode
+	PEA.W $0007                 ; Push bank $07
+	PLB                         ; Data bank = $07
+	
+	; Load 4 sets of 8-color palettes
+	LDA.B #$08                  ; A = $08 (CGRAM address $08)
+	LDX.B #$00                  ; X = $00 (source offset)
+	JSR.W CODE_008FB4           ; Load 8 colors
+	LDA.B #$0C                  ; A = $0C (CGRAM address $0C)
+	LDX.B #$08                  ; X = $08 (source offset)
+	JSR.W CODE_008FB4           ; Load 8 colors
+	LDA.B #$18                  ; A = $18 (CGRAM address $18)
+	LDX.B #$10                  ; X = $10 (source offset)
+	JSR.W CODE_008FB4           ; Load 8 colors
+	LDA.B #$1C                  ; A = $1C (CGRAM address $1C)
+	LDX.B #$18                  ; X = $18 (source offset)
+	JSR.W CODE_008FB4           ; Load 8 colors
+	PLB                         ; Restore data bank
+	
+	; Load special color values
+	LDX.W $0E9C                 ; X = color value (low byte)
+	LDY.W $0E9D                 ; Y = color value (high byte)
+	LDA.B #$0D                  ; A = $0D (CGRAM address)
+	STA.B !SNES_CGADD-$2100     ; Set CGRAM address
+	STX.B !SNES_CGDATA-$2100    ; Write color (low)
+	STY.B !SNES_CGDATA-$2100    ; Write color (high)
+	LDA.B #$1D                  ; A = $1D (CGRAM address)
+	STA.B !SNES_CGADD-$2100     ; Set CGRAM address
+	STX.B !SNES_CGDATA-$2100    ; Write color (low)
+	STY.B !SNES_CGDATA-$2100    ; Write color (high)
+	
+	; Load extended palette data (6 groups of 16 colors)
+	LDY.B #$06                  ; Y = 6 (group count)
+	LDA.B #$00                  ; A = 0 (initial offset)
+	CLC                         ; Clear carry
+	PEA.W $0007                 ; Push bank $07
+	PLB                         ; Data bank = $07
+
+CODE_008F55:
+	TAX                         ; X = offset
+	ADC.B #$28                  ; A += $28 (CGRAM address increment)
+	STA.B !SNES_CGADD-$2100     ; Set CGRAM address
+	
+	; Write 16 colors (32 bytes) from DATA8_07D8E4
+	LDA.W DATA8_07D8E4,X        ; Get color byte
+	STA.B !SNES_CGDATA-$2100    ; Write to CGRAM
+	LDA.W DATA8_07D8E5,X        ; Get color byte
+	STA.B !SNES_CGDATA-$2100    ; Write to CGRAM
+	LDA.W DATA8_07D8E6,X        ; Get color byte
+	STA.B !SNES_CGDATA-$2100    ; Write to CGRAM
+	LDA.W DATA8_07D8E7,X        ; Get color byte
+	STA.B !SNES_CGDATA-$2100    ; Write to CGRAM
+	LDA.W DATA8_07D8E8,X        ; Get color byte
+	STA.B !SNES_CGDATA-$2100    ; Write to CGRAM
+	LDA.W DATA8_07D8E9,X        ; Get color byte
+	STA.B !SNES_CGDATA-$2100    ; Write to CGRAM
+	LDA.W DATA8_07D8EA,X        ; Get color byte
+	STA.B !SNES_CGDATA-$2100    ; Write to CGRAM
+	LDA.W DATA8_07D8EB,X        ; Get color byte
+	STA.B !SNES_CGDATA-$2100    ; Write to CGRAM
+	LDA.W DATA8_07D8EC,X        ; Get color byte
+	STA.B !SNES_CGDATA-$2100    ; Write to CGRAM
+	LDA.W DATA8_07D8ED,X        ; Get color byte
+	STA.B !SNES_CGDATA-$2100    ; Write to CGRAM
+	LDA.W DATA8_07D8EE,X        ; Get color byte
+	STA.B !SNES_CGDATA-$2100    ; Write to CGRAM
+	LDA.W DATA8_07D8EF,X        ; Get color byte
+	STA.B !SNES_CGDATA-$2100    ; Write to CGRAM
+	LDA.W DATA8_07D8F0,X        ; Get color byte
+	STA.B !SNES_CGDATA-$2100    ; Write to CGRAM
+	LDA.W DATA8_07D8F1,X        ; Get color byte
+	STA.B !SNES_CGDATA-$2100    ; Write to CGRAM
+	LDA.W DATA8_07D8F2,X        ; Get color byte
+	STA.B !SNES_CGDATA-$2100    ; Write to CGRAM
+	LDA.W DATA8_07D8F3,X        ; Get color byte
+	STA.B !SNES_CGDATA-$2100    ; Write to CGRAM
+	
+	TXA                         ; A = X (offset)
+	ADC.B #$10                  ; A += $10 (16 bytes per group)
+	DEY                         ; Decrement group counter
+	BNE CODE_008F55             ; Loop if more groups remain
+	
+	PLB                         ; Restore data bank
+	PLD                         ; Restore Direct Page
+	PLP                         ; Restore processor status
+	RTS                         ; Return
+
+;-------------------------------------------------------------------------------
+
+CODE_008FB4:
+	; ===========================================================================
+	; Load 8-Color Palette to CGRAM
+	; ===========================================================================
+	; Loads 8 colors (16 bytes) from Bank $07:$8000 to CGRAM
+	;
+	; Parameters:
+	;   A = CGRAM starting address
+	;   X = Source offset in DATA8_078000
+	;   Data bank = $07
+	;   Direct Page = $2100
+	; ===========================================================================
+	
+	STA.B !SNES_CGADD-$2100     ; Set CGRAM address
+	LDA.W DATA8_078000,X        ; Get color byte 0
+	STA.B !SNES_CGDATA-$2100    ; Write to CGRAM
+	LDA.W DATA8_078001,X        ; Get color byte 1
+	STA.B !SNES_CGDATA-$2100    ; Write to CGRAM
+	LDA.W DATA8_078002,X        ; Get color byte 2
+	STA.B !SNES_CGDATA-$2100    ; Write to CGRAM
+	LDA.W DATA8_078003,X        ; Get color byte 3
+	STA.B !SNES_CGDATA-$2100    ; Write to CGRAM
+	LDA.W DATA8_078004,X        ; Get color byte 4
+	STA.B !SNES_CGDATA-$2100    ; Write to CGRAM
+	LDA.W DATA8_078005,X        ; Get color byte 5
+	STA.B !SNES_CGDATA-$2100    ; Write to CGRAM
+	LDA.W DATA8_078006,X        ; Get color byte 6
+	STA.B !SNES_CGDATA-$2100    ; Write to CGRAM
+	LDA.W DATA8_078007,X        ; Get color byte 7
+	STA.B !SNES_CGDATA-$2100    ; Write to CGRAM
+	RTS                         ; Return
 
 ; ===========================================================================
 ; Time-Based Event Processor
