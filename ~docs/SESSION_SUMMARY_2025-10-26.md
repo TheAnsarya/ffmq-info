@@ -45,20 +45,51 @@ This session had TWO phases:
 - Explained 6502 emulation mode → 65816 native mode transition
 - Technical notes on memory layout, NMI configuration, boot paths
 
-**Code Sections Documented:**
-- ✅ CODE_008000: Main boot entry (RESET vector handler)
-- ✅ CODE_008016: Secondary boot entry (soft reset)
-- ✅ CODE_00803A: Third entry point (alternate init)
-- ✅ CODE_008023: Stack setup convergence point
-- ✅ CODE_00804D: DMA transfer setup
-- ✅ CODE_00806E: Direct page and NMI enable (partial)
+**Commit 24 (c834645):** Bank $00 initialization section (~400 lines)
+- CODE_0080B0-CODE_008252: Screen fade-in, final setup, data tables
+- CODE_008117: New game initialization with OAM DMA configuration
+- CODE_008166: Complete SRAM save/load system with slot management
+- CODE_0081F0: RAM clear routine (clever MVN technique explained)
+- CODE_008230: Final setup before main game jump
+- CODE_008247: Hardware initialization (NMI disable, force blank)
+- Comprehensive documentation of save slot data structures
+- Color math and display register usage fully documented
+
+**Commit 25 (1e8be11):** Bank $00 NMI/VBLANK handler (~350 lines)
+- CODE_00825C: VBLANK initialization and DMA state management
+- CODE_008337: **Main NMI handler** - Critical 60fps interrupt routine
+- Complete state machine for DMA operations during VBLANK
+- Direct Page optimization technique explained (D=$4300 for DMA access)
+- State flag system documented ($00D2, $00D4, $00DD, $00E2, $00D8)
+- DMA channel 5 configuration for graphics/sprites/palettes
+- VBLANK timing constraints and optimization strategies
+- Indirect jump mechanism (JML [$0058]) for dynamic handlers
+- **This is the heart of the SNES display update system**
+
+**Code Sections Fully Documented:**
+- ✅ CODE_008000-CODE_00806E: Boot sequence (3 entry points)
+- ✅ CODE_0080B0-CODE_0080DC: Display init and main game jump
+- ✅ CODE_008117-CODE_008165: New game initialization
+- ✅ CODE_008166-CODE_0081D4: SRAM save/load with slot management
+- ✅ CODE_0081F0-CODE_008227: RAM clear and init tables
+- ✅ CODE_008230-CODE_008251: Final setup and hardware init
+- ✅ CODE_00825C-CODE_008333: VBLANK initialization
+- ✅ CODE_008337-CODE_0083E7: **NMI/VBLANK handler (CRITICAL)**
+
+**Statistics:**
+- **~1,100 lines** of heavily commented code imported
+- **3 major commits** (23, 24, 25)
+- **8 complete code sections** fully documented
+- **All critical boot and interrupt handling** complete
+- Methodology proving highly effective
 
 **Remaining Bank $00 Sections:**
-- ⚠️ CODE_0080B0-CODE_008113: Fade-in, display init, main game jump
-- ❌ CODE_008117-CODE_0081F0: New game init, load game, RAM clear
-- ❌ CODE_0081F0-CODE_008247: Full RAM initialization routine
-- ❌ CODE_008247-CODE_00825C: Hardware init (NMI disable, screen blank)
-- ❌ CODE_00825C-CODE_00FFFF: Main game engine (~13,000 lines remaining)
+- ⚠️ CODE_0083E8+: Tilemap DMA and additional VBLANK operations (~300 lines)
+- ❌ CODE_008500+: Controller input and menu systems (~2,000 lines)
+- ❌ CODE_009000+: Main game loop and state machine (~3,000 lines)  
+- ❌ CODE_00A000+: Battle system and transitions (~2,500 lines)
+- ❌ CODE_00C000+: Graphics and sprite routines (~2,000 lines)
+- ❌ Remaining: ~11,000 lines total remaining in Bank $00
 
 ### Systematic Import Methodology Established:
 
