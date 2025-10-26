@@ -109,6 +109,24 @@ This session had TWO phases:
 - Input handler dispatch table with 12 different modes
 - Cursor movement handlers with bounds checking and wrap-around flags
 
+**Commit 31 (aa58f66):** Session summary update
+- Documented commit 30 progress
+- Updated statistics: ~2,480 lines (17.7% of Bank $00)
+
+**Commit 32 (14cafbb):** Button handlers and input processing (~500 lines)
+- CODE_008A9D-CODE_008C1A: Menu interaction core
+- A button handler: Toggle character status display
+- Character position validation for menu interactions
+- Menu navigation: Up/down character selection with automatic cycling
+- Character validity checking (skips dead/invalid party members)
+- Tilemap update system based on Y position ranges
+- MVN block copy for efficient tilemap transfers
+- Input enable flag system (CODE_008B57)
+- Main controller input handler with state management
+- Special input modes with D-pad filtering
+- Autofire/repeat system: 25-frame initial delay, 5-frame repeat rate
+- Hardware controller reading ($4218 SNES_CNTRL1L)
+
 **Code Sections Fully Documented:**
 - ✅ CODE_008000-CODE_00806E: Boot sequence (3 entry points)
 - ✅ CODE_0080B0-CODE_0080DC: Display init and main game jump
@@ -121,21 +139,21 @@ This session had TWO phases:
 - ✅ CODE_0083E8-CODE_0085B6: **DMA suite (tilemap, palette, OAM, VRAM)**
 - ✅ CODE_00863D-CODE_008965: **Special graphics transfers (menu, characters)**
 - ✅ CODE_008966-CODE_008A9C: **Main game loop & input handlers**
+- ✅ CODE_008A9D-CODE_008C1A: **Button handlers & menu interaction**
 
 **Statistics:**
-- **~2,480 lines** of heavily commented code imported (~17.7% of Bank $00)
-- **6 major commits** (23, 24, 25, 27, 28, 30) plus 2 summary updates
-- **11 complete code sections** fully documented
-- **All critical systems complete**: Boot, interrupts, graphics, main loop, input
+- **~2,980 lines** of heavily commented code imported (~21.3% of Bank $00)
+- **7 major commits** (23, 24, 25, 27, 28, 30, 32) plus 3 summary updates
+- **12 complete code sections** fully documented
+- **All core systems complete**: Boot, interrupts, graphics, main loop, input, menus
 - Methodology proving highly effective with consistent quality
 
 **Remaining Bank $00 Sections:**
-- ⚠️ CODE_008A9D+: Button handlers and menu logic (~500 lines) - NEXT
-- ❌ CODE_008C00+: Tilemap update routines (~1,000 lines)
+- ⚠️ CODE_008C1B+: Tilemap calculation and updates (~800 lines) - NEXT
 - ❌ CODE_009000+: State machine and game logic (~3,000 lines)  
 - ❌ CODE_00A000+: Battle system and transitions (~2,500 lines)
 - ❌ CODE_00C000+: Graphics and sprite routines (~2,000 lines)
-- ❌ Remaining: ~11,250 lines total remaining in Bank $00
+- ❌ Remaining: ~10,750 lines total remaining in Bank $00
 
 ### Systematic Import Methodology Established:
 
