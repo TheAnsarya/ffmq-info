@@ -5524,40 +5524,131 @@ Animation_Done:
 	LDA.B #$20                  ; Bit 5 mask
 	TRB.W $00D9                 ; Clear animation processing flag
 	RTS                         ; Return
-	REP #$10                         ; 16-bit X, Y
-	
-	; Check if text window updates needed
-	LDA.B #$20                       ; Check bit 5
-	AND.W $00D4                      ; Test display flags
-	BEQ Skip_Window_Update           ; If clear, skip window update
-	
-	; Update text window tiles
-	LDA.B #$20                       ; Bit 5
-	TRB.W $00D4                      ; Clear bit in flags
-	
-	; Setup source/dest for MVN block move
-	LDX.W #$54F4                     ; Source address (bank will be set)
-	LDY.W #$54F6                     ; Destination address
-	REP #$30                         ; 16-bit A, X, Y
-	
-	; Check game mode for window type
-	LDA.W #$0080                     ; Check bit 7
-	AND.W $0EC6                      ; Test game mode flags
-	BNE Alternate_Window             ; If set, use alternate window
-	
-	; Standard text window
-	LDA.W #$0024                     ; Tile value $24 (window border?)
-	STA.L $7F54F4                    ; Store to WRAM buffer
-	LDA.W #$000B                     ; Move $000B bytes
-	MVN $7F,$7F                      ; Block move within bank $7F
-	LDA.W #$0026                     ; Tile value $26 (different border)
-	STA.W $5500                      ; Store to WRAM
-	LDA.W #$0009                     ; Move $0009 bytes
-	MVN $7F,$7F                      ; Block move
-	BRA Window_Updated               ; Done
 
-Alternate_Window:
-	; Alternate text window (battle/menu?)
+; ===========================================================================
+; Graphics Mode Setup - Jump to Field Mode Initialization
+; ===========================================================================
+; Purpose: Setup graphics environment and jump to field mode code
+; Technical Details:
+;   - Calls CODE_0092FC to prepare graphics state
+;   - Jumps to CODE_00803A for field mode initialization
+; Side Effects: Modifies $00D6, NMITIMEN register, $00D2, $00DB
+; ===========================================================================
+
+CODE_0092F0:
+	JSR.W CODE_0092FC           ; Setup graphics state
+	JMP.W CODE_00803A           ; Jump to field mode init
+
+; ===========================================================================
+; Graphics Mode Setup - Jump to Battle Mode Initialization
+; ===========================================================================
+; Purpose: Setup graphics environment and jump to battle mode code
+; Technical Details:
+;   - Calls CODE_0092FC to prepare graphics state
+;   - Jumps to CODE_008016 for battle mode initialization
+; Side Effects: Modifies $00D6, NMITIMEN register, $00D2, $00DB
+; ===========================================================================
+
+CODE_0092F6:
+	JSR.W CODE_0092FC           ; Setup graphics state
+	JMP.W CODE_008016           ; Jump to battle mode init
+
+; ===========================================================================
+; Graphics State Setup Routine
+; ===========================================================================
+; Purpose: Configure graphics system for mode transitions
+; Technical Details:
+;   - Sets bit 6 ($40) of $00D6 (graphics busy flag)
+;   - Restores NMI/IRQ configuration from $0112
+;   - Enables interrupts
+;   - Calls sprite processing routine CODE_00C7B8
+;   - Clears bit 3 ($08) of $00D2 (graphics ready flag)
+;   - Clears bit 2 ($04) of $00DB (animation gate)
+; Registers Modified:
+;   - A: Used for bit manipulation
+;   - NMITIMEN ($4200): Set from $0112
+; ===========================================================================
+
+CODE_0092FC:
+	SEP #$30                    ; 8-bit A/X/Y
+	LDA.B #$40                  ; Bit 6 mask
+	TSB.W $00D6                 ; Set graphics busy flag in $00D6
+	LDA.W $0112                 ; Load NMI/IRQ configuration
+	STA.W SNES_NMITIMEN         ; Store to NMITIMEN ($4200)
+	CLI                         ; Enable interrupts
+	JSL.L CODE_00C7B8           ; Call sprite processing routine
+	LDA.B #$08                  ; Bit 3 mask
+	TRB.W $00D2                 ; Clear graphics ready flag
+	LDA.B #$04                  ; Bit 2 mask
+	TRB.W $00DB                 ; Clear animation gate
+	RTS                         ; Return
+
+; ===========================================================================
+; Display Configuration Setup
+; ===========================================================================
+; Purpose: Configure display parameters and enable certain display features
+; Technical Details:
+;   - Called to enable/configure display effects
+;   - Sets $0051 = $0008 (display timer/counter)
+;   - Sets $0055 = $0C (display mode/config)
+;   - Clears bit 1 ($02) of $00DB (display update gate)
+;   - Clears bit 7 ($80) of $00E2 (graphics effect flag)
+;   - Sets bit 2 ($04) of $00DB (animation gate)
+; Side Effects: Enables specific graphics modes, gates certain animations
+; ===========================================================================
+
+CODE_009319:
+	PHP                         ; Save processor status
+	PHB                         ; Save data bank
+	PHK                         ; Push program bank
+	PLB                         ; Data Bank = program bank
+	REP #$30                    ; 16-bit A/X/Y
+	PHA                         ; Save A
+	LDA.W #$0008                ; Value $0008
+	STA.W $0051                 ; Store to display timer
+	SEP #$20                    ; 8-bit A
+	LDA.B #$0C                  ; Value $0C
+	STA.W $0055                 ; Store to display config
+	LDA.B #$02                  ; Bit 1 mask
+	TRB.W $00DB                 ; Clear display update gate
+	LDA.B #$80                  ; Bit 7 mask
+	TRB.W $00E2                 ; Clear graphics effect flag
+	LDA.B #$04                  ; Bit 2 mask
+	TSB.W $00DB                 ; Set animation gate
+	REP #$30                    ; 16-bit A/X/Y
+	PLA                         ; Restore A
+	PLB                         ; Restore data bank
+	PLP                         ; Restore processor status
+	RTL                         ; Return long
+
+; ===========================================================================
+; Display Frame Counter Check
+; ===========================================================================
+; Purpose: Check display timing and process frame-based updates
+; Technical Details:
+;   - Checks if bit 2 ($04) of $00DB is set (animation gate)
+;   - If not set, returns immediately
+;   - Checks lower nibble of $0E97 for timing sync
+;   - Must be $00 to proceed with updates
+;   - If all conditions met, processes display updates
+; Returns: Early if conditions not met
+; Side Effects: May call display update routines
+; ===========================================================================
+
+CODE_009342:
+	LDA.W #$0004                ; Bit 2 mask
+	AND.W $00DB                 ; Check animation gate
+	BEQ Skip_Frame_Check        ; If clear, skip
+	LDA.W $0E97                 ; Load frame counter
+	AND.W #$000F                ; Mask to lower nibble
+	BEQ Process_Frame           ; If $00, process this frame
+
+Skip_Frame_Check:
+	RTS                         ; Return (skip this frame)
+
+Process_Frame:
+	; Frame processing continues...
+	; (Code continues into next section)
 	LDA.W #$0020                     ; Tile value $20
 	STA.L $7F54F4                    ; Store to WRAM buffer
 	LDA.W #$0015                     ; Move $0015 bytes (21 bytes)
