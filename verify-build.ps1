@@ -26,8 +26,10 @@ Write-Host ""
 
 # Check for reference ROM
 $romFullPath = Join-Path $PSScriptRoot $RomPath
+# Escape brackets in path for Test-Path
+$testPath = $romFullPath -replace '\[', '`[' -replace '\]', '`]'
 
-if (-not (Test-Path $romFullPath)) {
+if (-not (Test-Path -LiteralPath $romFullPath)) {
     Write-Host "ERROR: Reference ROM not found at: $romFullPath" -ForegroundColor Red
     Write-Host ""
     Write-Host "Please ensure you have the reference ROM file." -ForegroundColor Yellow
@@ -63,6 +65,9 @@ arch 65816
 
 ; Set origin to bank `$00
 org `$008000
+
+; Include SNES hardware register definitions
+incsrc "../src/asm/snes_registers.asm"
 
 ; Include our documented bank `$00 code
 incsrc "../src/asm/bank_00_documented.asm"
