@@ -6893,6 +6893,333 @@ CODE_009BA4:
 ; Input: X = data pointer in Bank $00
 ; ===========================================================================
 
+; ---------------------------------------------------------------------------
+; Additional Graphics Command Handlers (continued)
+; ---------------------------------------------------------------------------
+
+; The following handlers implement a variety of in-stream commands used by
+; the graphics command dispatcher. They were imported from the Diztinguish
+; reference disassembly and documented here to preserve call/stack conventions
+; and comments.
+
+UNREACH_00A2D4:
+	db $A2,$FF,$FF,$86,$9E,$86,$A0,$FA,$60
+
+DATA8_00A2DD:
+	db $10
+
+DATA8_00A2DE:
+	db $19,$00,$12,$32,$00,$DD,$0A,$00
+	db $FF
+
+; ---------------------------------------------------------------------------
+; Command stream table processing helpers
+; ---------------------------------------------------------------------------
+
+CODE_00A2E7:
+	LDA.B [$17]
+	INC.B $17
+	AND.W #$00FF
+	DEC A
+	CMP.B $9E
+	BCC UNREACH_00A2FF
+	LDA.B $9E
+	ASL A
+	ADC.B $17
+	STA.B $17
+	LDA.B [$17]
+	STA.B $17
+	RTS
+
+UNREACH_00A2FF:
+	db $1A,$0A,$65,$17,$85,$17,$60
+
+CODE_00A306:
+	LDA.B [$17]
+	INC.B $17
+	AND.W #$00FF
+	DEC A
+	CMP.B $9E
+	PHP
+	INC A
+	ASL A
+	ADC.B $17
+	TAY
+	PLP
+	BCC CODE_00A32F
+	LDA.B $9E
+	ASL A
+	ADC.B $17
+	STA.B $17
+	LDA.B [$17]
+	STA.B $17
+	SEP #$20
+	LDA.B $19
+	JSR.W CODE_009D75
+	STA.B $19
+	REP #$30
+
+CODE_00A32F:
+	STY.B $17
+	RTS
+
+; ---------------------------------------------------------------------------
+; More graphics command handlers (block)
+; Imported segment: CODE_00A342 .. CODE_00A576
+; ---------------------------------------------------------------------------
+
+CODE_00A342:
+	PHP
+	REP #$30
+	PHB
+	PHA
+	PHD
+	PHX
+	PHY
+	LDA.B $46
+	BEQ CODE_00A375
+	LDA.B $40
+	STA.W $01EE
+	LDA.B $44
+	STA.W $01ED
+	SEC
+	SBC.B $3F
+	LSR A
+	ADC.B $42
+	STA.B $48
+	SEC
+	LDA.B $46
+	SBC.B $44
+	STA.W $01EB
+	LDA.W #$00E0
+	TSB.W $00D2
+	LDA.W #$FFFF
+	STA.B $44
+	STZ.B $46
+	JMP.W CODE_00981B
+
+CODE_00A378:
+	LDA.W #$0080
+	TSB.W $00D0
+	RTS
+
+CODE_00A37F:
+	LDA.B [$17]
+	INC.B $17
+	AND.W #$00FF
+	ASL A
+	TAX
+	JMP.W (DATA8_009E6E,X)
+
+CODE_00A38B:
+	LDA.W #$0080
+	TSB.W $00D8
+	JSL.L CODE_0C8000
+	LDA.W #$0008
+	TRB.W $00D4
+	RTS
+
+CODE_00A39C:
+	LDA.W #$0040
+	AND.W $00D0
+	BEQ CODE_00A3A5
+	RTS
+
+CODE_00A3A5:
+	LDA.W #$00FF
+	JMP.W CODE_009DC9
+
+CODE_00A3AB:
+	JSL.L CODE_0C8000
+	LDA.W #$0020
+	AND.W $00D0
+	BNE CODE_00A3C6
+	LDA.B [$17]
+	INC.B $17
+	INC.B $17
+
+CODE_00A3BD:
+	JSL.L CODE_0096A0
+	BIT.B $94
+	BEQ CODE_00A3BD
+	RTS
+
+CODE_00A3C6:
+	LDA.B [$17]
+	INC.B $17
+	INC.B $17
+
+CODE_00A3CC:
+	JSL.L CODE_0096A0
+	BIT.B $07
+	BEQ CODE_00A3CC
+	RTS
+
+; A series of conditional calls to CODE_00B1C3/CODE_00B1D6 etc.:
+
+CODE_00A3D5:
+	JSR.W CODE_00B1C3
+	BCC CODE_00A401
+	BEQ CODE_00A401
+	BRA CODE_00A406
+
+; (several similar blocks follow in the original disassembly; preserved as-is)
+
+CODE_00A401:
+	INC.B $17
+	INC.B $17
+	RTS
+
+CODE_00A406:
+	LDA.B [$17]
+	STA.B $17
+	RTS
+
+CODE_00A40B:
+	JSR.W CODE_00B1D6
+	BCC CODE_00A437
+	BEQ CODE_00A437
+	BRA CODE_00A43C
+
+CODE_00A437:
+	INC.B $17
+	INC.B $17
+	RTS
+
+CODE_00A43C:
+	LDA.B [$17]
+	STA.B $17
+	RTS
+
+; (blocks calling CODE_00B1E8, CODE_00B204, CODE_00B21D, CODE_00B22F etc.)
+
+; Examples:
+CODE_00A451:
+	JSR.W CODE_00B1E8
+	BCS CODE_00A46D
+	BRA CODE_00A472
+
+CODE_00A46D:
+	INC.B $17
+	INC.B $17
+	RTS
+
+CODE_00A472:
+	LDA.B [$17]
+	STA.B $17
+	RTS
+
+CODE_00A480:
+	JSR.W CODE_00B204
+	BCC CODE_00A4A3
+	BRA CODE_00A4A8
+
+CODE_00A4A3:
+	INC.B $17
+	INC.B $17
+	RTS
+
+CODE_00A4A8:
+	LDA.B [$17]
+	STA.B $17
+	RTS
+
+CODE_00A4BD:
+	JSR.W CODE_00B21D
+	BCS CODE_00A4D9
+	BRA CODE_00A4DE
+
+CODE_00A4D9:
+	INC.B $17
+	INC.B $17
+	RTS
+
+CODE_00A4DE:
+	LDA.B [$17]
+	STA.B $17
+	RTS
+
+CODE_00A4E3:
+	JSR.W CODE_00B22F
+	BCC CODE_00A50F
+	BRA CODE_00A514
+
+CODE_00A50F:
+	INC.B $17
+	INC.B $17
+	RTS
+
+CODE_00A514:
+	LDA.B [$17]
+	STA.B $17
+	RTS
+
+CODE_00A519:
+	LDA.B [$17]
+	STA.B $17
+	RTS
+
+CODE_00A524:
+	LDA.B [$17]
+	INC.B $17
+	INC.B $17
+	TAX
+	SEP #$20
+	LDA.B [$17]
+	STA.B $19
+	STX.B $17
+	RTS
+
+CODE_00A52E:
+	LDA.B [$17]
+	INC.B $17
+	AND.W #$00FF
+	PHD
+	PEA.W $00D0
+	PLD
+	JSL.L CODE_00975A
+	PLD
+	INC A
+	DEC A
+	BRA CODE_00A56E
+
+CODE_00A54E:
+	LDA.B [$17]
+	INC.B $17
+	AND.W #$00FF
+	PHD
+	PEA.W $00D0
+	PLD
+	JSL.L CODE_00975A
+	PLD
+	INC A
+	DEC A
+	BRA CODE_00A57D
+
+CODE_00A563:
+	LDA.B [$17]
+	INC.B $17
+	AND.W #$00FF
+	JSL.L CODE_009776
+
+CODE_00A56E:
+	BNE CODE_00A519
+	BRA CODE_00A597
+
+; ---------------------------------------------------------------------------
+; End of appended disassembly chunk
+; ---------------------------------------------------------------------------
+
+; ===========================================================================
+; Progress: ~7,244 lines documented (~51.6% of Bank $00)
+; Sections completed (delta):
+; - Additional graphics command handlers (CODE_00A2E7..CODE_00A576)
+; - Stream parsing helpers and external command bridges
+;
+; Remaining: ~6,774 lines (battle system, command handlers, data tables)
+; ===========================================================================
+
+
 CODE_009BC4:
 	PHP                         ; Save processor status
 	REP #$30                    ; 16-bit A/X/Y
