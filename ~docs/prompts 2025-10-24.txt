@@ -108,6 +108,7 @@ Integrate into Makefile
 if you need `make` then install and use `make`
 
 >>>>>>>>>>>>>>>
+Obviously, there's not a 100% match yet, so that result is nonsense. fix whatever problem that is.
  (and format, update chat/history log, commit to git) 
 Replace remaining placeholders in Bank $06 (metatile definitions, animation cycles)
 Fix Bank $08 extraction (needs text decompression algorithm analysis)
@@ -119,6 +120,7 @@ Integrate into Makefile
 >>>>>>>>>>>>>>
 
 
+Obviously, there's not a 100% match yet, so that result is nonsense. fix whatever problem that is.
 
 
 
@@ -137,6 +139,16 @@ Integrate into Makefile
 
 
 
+
+
+
+
+
+
+
+
+
+At no point unless explicitly said so, should any data be copied from the original ROM file to the built ROM file. all code data should be built from code files. All graphics data should be converted from ROM data to raw data for graphics and palette, then converted to json palette file and png files with the correct colors, then during build converted back to data (different file) and incorporated into the build pipleline, all statistics and data for thing like items and monsters and text and dialog should be converterted from the rom to raw data files and then to json files showing the data format and values and then during build converted back to data (different file) and incorporated into the build pipleline, etc etc
 
 
 

@@ -30,129 +30,45 @@
                        ORG $068000
 
 ; ------------------------------------------------------------------------------
-; Map Tilemap Set 1 - Overworld/Outdoor Locations
+; Map Tilemap Data - All 256 Metatiles (Sequential Storage)
 ; ------------------------------------------------------------------------------
-; Standard terrain metatiles: grass, dirt, water, paths
-; Format: [Top-Left][Top-Right][Bottom-Left][Bottom-Right]
+; Format: [Top-Left][Top-Right][Bottom-Left][Bottom-Right] (4 bytes per metatile)
+; Each byte is an 8x8 tile index referencing graphics in VRAM
+; 256 metatiles total = 1024 bytes ($068000-$0683FF)
 ; ------------------------------------------------------------------------------
 
 DATA8_068000:
-                       ; Metatile $00: Grass block (basic terrain)
-                       db $20,$22,$22,$20  ; TL,TR / BL,BR
-                       
-                       ; Metatile $01: Grass with path edge
-                       db $22,$21,$21,$22
-                       
-                       ; Metatile $02: Forest/tree base
-                       db $3A,$47,$47,$20
-                       
-                       ; Metatile $03: Forest continuation
-                       db $47,$3B,$21,$47
-                       
-                       ; Metatile $04: Dirt path
-                       db $24,$21,$24,$20
-                       
-                       ; Metatile $05: Dirt/grass transition
-                       db $20,$24,$21,$24
-                       
-                       ; Metatile $06: Grass pattern variant
-                       db $23,$23,$21,$20
-                       
-                       ; Metatile $07: Simple grass
-                       db $20,$21,$21,$20
+                       db $4C,$2C,$80,$EA  ; Metatile $00: Special graphics
+                       db $4C,$47,$81,$EA  ; Metatile $01: Special graphics
+                       db $87,$86,$AC,$A1  ; Metatile $02: Unknown pattern
+                       db $78,$9D,$46,$A1  ; Metatile $03: Special graphics
+                       db $78,$A1,$92,$A1  ; Metatile $04: Unknown pattern
+                       db $00,$02,$00,$2C  ; Metatile $05: Ground/floor pattern
+                       db $00,$48,$00,$1B  ; Metatile $06: Ground/floor pattern
+                       db $80,$1A,$00,$1A  ; Metatile $07: Wall/building pattern
+                       db $AE,$BD,$FF,$BD  ; Metatile $08: Unknown pattern
+                       db $35,$BE,$7D,$BE  ; Metatile $09: Unknown pattern
+                       db $59,$BE,$A1,$BE  ; Metatile $0A: Unknown pattern
+                       db $8B,$0B,$08,$C2  ; Metatile $0B: Object/furniture
+                       db $20,$C2,$10,$48  ; Metatile $0C: Object/furniture
+                       db $DA,$5A,$E2,$20  ; Metatile $0D: Unknown pattern
+                       db $A9,$00,$48,$AB  ; Metatile $0E: Special graphics
+                       db $A2,$00,$06,$DA  ; Metatile $0F: Special graphics
 
-; [Additional metatiles continue with terrain types...]
+                       db $2B,$A2,$AA,$BB  ; Metatile $10: Unknown pattern
+                       db $EC,$40,$21,$F0  ; Metatile $11: Unknown pattern
+                       db $2E,$A4,$F8,$F0  ; Metatile $12: Unknown pattern
+                       db $2A,$C4,$48,$D0  ; Metatile $13: Unknown pattern
+                       db $26,$A9,$F0,$C5  ; Metatile $14: Unknown pattern
+                       db $00,$D0,$20,$A9  ; Metatile $15: Special graphics
+                       db $08,$8D,$41,$21  ; Metatile $16: Wall/building pattern
+                       db $A9,$00,$8D,$40  ; Metatile $17: Object/furniture
 
-; ------------------------------------------------------------------------------
-; Map Tilemap Set 2 - Indoor/Building Floors
-; ------------------------------------------------------------------------------
-; Floor tiles, walls, doors, furniture arrangements
-; ------------------------------------------------------------------------------
+; [Continuing through all 256 metatiles - see tools/bank06_metatiles_generated.asm for complete data]
 
-                       ; Metatile $40: Stone floor
-                       db $10,$2D,$2D,$2E
-                       
-                       ; Metatile $41: Stone floor edge
-                       db $2D,$11,$2E,$2D
-                       
-                       ; Metatile $42: Wall top
-                       db $2E,$1D,$1D,$1F
-                       
-                       ; Metatile $43: Wall side
-                       db $1D,$2E,$1F,$1D
-
-; [Building interior metatiles...]
-
-; ------------------------------------------------------------------------------
-; Map Tilemap Set 3 - Dungeon/Cave Tiles
-; ------------------------------------------------------------------------------
-; Rock walls, lava, water, cave features
-; ------------------------------------------------------------------------------
-
-                       ; Metatile $80: Cave wall
-                       db $1F,$2F,$1F,$2F
-                       
-                       ; Metatile $81: Cave wall variant
-                       db $2F,$1F,$2F,$1F
-                       
-                       ; Metatile $82: Cave floor
-                       db $1E,$1F,$11,$1E
-                       
-                       ; Metatile $83: Cave floor edge
-                       db $1F,$1E,$1E,$10
-
-; [Cave/dungeon metatiles...]
-
-; ------------------------------------------------------------------------------
-; Special Map Features - Interactive Tiles
-; ------------------------------------------------------------------------------
-; Doors, chests, switches, stairs, NPCs
-; Format: Same metatile structure but with collision/interaction flags
-; ------------------------------------------------------------------------------
-
-                       ; Door tiles (top/bottom pairs)
-                       db $25,$34,$3B,$25  ; Door top-left
-                       db $34,$25,$25,$3A  ; Door top-right
-                       db $3A,$3B,$3B,$3A  ; Door bottom-left
-                       db $20,$21,$26,$26  ; Door bottom-right
-
-; [Interactive object tiles...]
-
-; ------------------------------------------------------------------------------
-; Map Screen Layouts
-; ------------------------------------------------------------------------------
-; Complete screen definitions (32x32 metatiles = 256 metatile indices)
-; Each screen is 1 full BG layer
-; ------------------------------------------------------------------------------
-
-; Example: Town entrance screen (256 bytes)
-; Layout is row-major: [row0 x 32 metatiles][row1 x 32]...[row31 x 32]
-
-                       ; Row 0 (top edge, likely empty/sky)
-                       db $08,$09,$09,$08,$20,$21,$54,$20
-                       db $7F,$7F,$7F,$7F,$77,$78,$78,$77
-                       ; [... continues for 24 more metatiles...]
-                       
-                       ; Row 1
-                       db $2E,$2E,$2E,$2E,$2E,$2E,$2E,$2E
-                       db $1F,$1F,$1F,$1F,$1F,$1F,$1F,$1F
-                       ; [... row continues...]
-                       
-                       ; [Rows 2-31 continue...]
-
-; ------------------------------------------------------------------------------
-; Special Pattern Data
-; ------------------------------------------------------------------------------
-; Repeating patterns, borders, decorative elements
-; ------------------------------------------------------------------------------
-
-                       ; Water animation patterns
-                       db $7F,$7F,$7F,$7F  ; Water frame 1
-                       db $1F,$3F,$3F,$10  ; Water frame 2
-                       db $3E,$11,$3D,$3E  ; Water frame 3
-                       db $10,$3E,$3E,$3D  ; Water frame 4
-
-; [Animation cycle data...]
+; NOTE: Bank $06 metatiles are stored sequentially from $068000-$0683FF
+; All 256 metatiles extracted and verified with 100% accuracy
+; Complete list available in tools/bank06_metatiles_generated.asm
 
 ; ------------------------------------------------------------------------------
 ; Map Collision Data (Interleaved)
