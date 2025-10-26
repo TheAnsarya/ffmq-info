@@ -37,8 +37,8 @@ Visual Layout:
 ```asm
 ; Grass terrain metatile
 db $20,$22,$22,$20
-    ; TL=$20, TR=$22, BL=$22, BR=$20
-    ; Creates a grass pattern
+	; TL=$20, TR=$22, BL=$22, BR=$20
+	; Creates a grass pattern
 ```
 
 ### Special Tile Values
@@ -84,25 +84,25 @@ Collision data uses 1-byte bitfields to define tile properties.
 ### Bitfield Structure
 ```
 Bit Layout: 7  6  5  4  3  2  1  0
-           ┌──┬──┬──┬──┬──┬──┬──┬──┐
-           │??│??│??│??│TR│LV│WA│BK│
-           └──┴──┴──┴──┴──┴──┴──┴──┘
+		   ┌──┬──┬──┬──┬──┬──┬──┬──┐
+		   │??│??│??│??│TR│LV│WA│BK│
+		   └──┴──┴──┴──┴──┴──┴──┴──┘
 
 Bit 0 (BK): Blocked
-  - 0 = Passable (player can walk)
-  - 1 = Blocked (impassable)
+	- 0 = Passable (player can walk)
+	- 1 = Blocked (impassable)
 
 Bit 1 (WA): Water
-  - 0 = Normal terrain
-  - 1 = Water tile (requires Float ability)
+	- 0 = Normal terrain
+	- 1 = Water tile (requires Float ability)
 
 Bit 2 (LV): Lava
-  - 0 = Safe terrain
-  - 1 = Lava tile (damages player)
+	- 0 = Safe terrain
+	- 1 = Lava tile (damages player)
 
 Bit 3 (TR): Trigger
-  - 0 = Normal tile
-  - 1 = Event trigger (door, chest, NPC interaction)
+	- 0 = Normal tile
+	- 1 = Event trigger (door, chest, NPC interaction)
 
 Bits 4-7: Special properties (varies by map)
 ```
@@ -137,13 +137,13 @@ collision = CollisionData.from_bytes(rom[0x06A000:0x06A001], tile_id=0)
 
 # Check properties
 if collision.is_passable:
-    print("Player can walk here")
+	print("Player can walk here")
 if collision.is_water:
-    print("Requires Float ability")
+	print("Requires Float ability")
 if collision.is_lava:
-    print("Damages player")
+	print("Damages player")
 if collision.is_trigger:
-    print("Event trigger")
+	print("Event trigger")
 
 # Generate ASM
 asm_code = collision.to_asm()
@@ -165,8 +165,8 @@ Byte 1: High byte of address
 
 Example:
 db $2D,$03
-    ; Address = $032D (little-endian)
-    ; Points to text string at Bank $08 offset $032D
+	; Address = $032D (little-endian)
+	; Points to text string at Bank $08 offset $032D
 ```
 
 ### Address Calculation
@@ -227,21 +227,21 @@ Structure:
 ```asm
 ; "Hello World!" message
 DATA8_088400:
-    db $48,$65,$6C,$6C,$6F  ; "Hello"
-    db $20                   ; Space
-    db $57,$6F,$72,$6C,$64  ; "World"
-    db $21                   ; "!"
-    db $F0                   ; END control code
-    db $00                   ; Null terminator
+	db $48,$65,$6C,$6C,$6F  ; "Hello"
+	db $20                   ; Space
+	db $57,$6F,$72,$6C,$64  ; "World"
+	db $21                   ; "!"
+	db $F0                   ; END control code
+	db $00                   ; Null terminator
 
 ; Multi-line dialog
 DATA8_088410:
-    db $47,$72,$65,$65,$74,$69,$6E,$67,$73,$21  ; "Greetings!"
-    db $F1                   ; NEWLINE
-    db $57,$65,$6C,$63,$6F,$6D,$65,$21          ; "Welcome!"
-    db $F2                   ; WAIT for input
-    db $F0                   ; END
-    db $00                   ; Null terminator
+	db $47,$72,$65,$65,$74,$69,$6E,$67,$73,$21  ; "Greetings!"
+	db $F1                   ; NEWLINE
+	db $57,$65,$6C,$63,$6F,$6D,$65,$21          ; "Welcome!"
+	db $F2                   ; WAIT for input
+	db $F0                   ; END
+	db $00                   ; Null terminator
 ```
 
 ### Character Encoding
@@ -279,11 +279,11 @@ SNES uses RGB555 format for colors (15-bit color depth).
 Format: 2 bytes (little-endian)
 
 Bit Layout:
-  15 14 13 12 11 10  9  8  7  6  5  4  3  2  1  0
+	15 14 13 12 11 10  9  8  7  6  5  4  3  2  1  0
 ┌──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┐
 │ 0│B4│B3│B2│B1│B0│G4│G3│G2│G1│G0│R4│R3│R2│R1│R0│
 └──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┘
-    └────Blue─────┘ └────Green────┘ └─────Red────┘
+	└────Blue─────┘ └────Green────┘ └─────Red────┘
 
 Bits  0-4:  Red component (0-31)
 Bits  5-9:  Green component (0-31)
@@ -295,28 +295,28 @@ Bit  15:    Unused (always 0)
 ```asm
 ; Pure red (R=31, G=0, B=0)
 db $1F,$00
-    ; Binary: 00000_00000_11111
-    ; RGB555: $001F
+	; Binary: 00000_00000_11111
+	; RGB555: $001F
 
 ; Pure green (R=0, G=31, B=0)
 db $E0,$03
-    ; Binary: 00000_11111_00000
-    ; RGB555: $03E0
+	; Binary: 00000_11111_00000
+	; RGB555: $03E0
 
 ; Pure blue (R=0, G=0, B=31)
 db $00,$7C
-    ; Binary: 11111_00000_00000
-    ; RGB555: $7C00
+	; Binary: 11111_00000_00000
+	; RGB555: $7C00
 
 ; White (R=31, G=31, B=31)
 db $FF,$7F
-    ; Binary: 11111_11111_11111
-    ; RGB555: $7FFF
+	; Binary: 11111_11111_11111
+	; RGB555: $7FFF
 
 ; Black (R=0, G=0, B=0)
 db $00,$00
-    ; Binary: 00000_00000_00000
-    ; RGB555: $0000
+	; Binary: 00000_00000_00000
+	; RGB555: $0000
 ```
 
 ### Converting to 8-bit RGB
@@ -324,7 +324,7 @@ db $00,$00
 RGB888 = (RGB555 * 255) / 31
 
 Example: R=31 (5-bit)
-  R8 = (31 * 255) / 31 = 255
+	R8 = (31 * 255) / 31 = 255
 ```
 
 ### Python Class
@@ -360,10 +360,10 @@ Bitplane 0-1: First 16 bytes (2bpp)
 Bitplane 2-3: Second 16 bytes (2bpp)
 
 Each row (8 pixels):
-  Plane 0: Byte 0 (bits 0-7)
-  Plane 1: Byte 1 (bits 0-7)
-  Plane 2: Byte 16 (bits 0-7)
-  Plane 3: Byte 17 (bits 0-7)
+	Plane 0: Byte 0 (bits 0-7)
+	Plane 1: Byte 1 (bits 0-7)
+	Plane 2: Byte 16 (bits 0-7)
+	Plane 3: Byte 17 (bits 0-7)
 
 Pixel color index = Bit from P3 P2 P1 P0 (4-bit value 0-15)
 ```
@@ -372,25 +372,25 @@ Pixel color index = Bit from P3 P2 P1 P0 (4-bit value 0-15)
 ```asm
 ; 8x8 tile (32 bytes)
 DATA8_070000:
-    ; Bitplanes 0-1 (rows 0-7)
-    db $00,$00  ; Row 0
-    db $18,$18  ; Row 1
-    db $24,$24  ; Row 2
-    db $42,$42  ; Row 3
-    db $42,$42  ; Row 4
-    db $24,$24  ; Row 5
-    db $18,$18  ; Row 6
-    db $00,$00  ; Row 7
-    
-    ; Bitplanes 2-3 (rows 0-7)
-    db $00,$00  ; Row 0
-    db $00,$00  ; Row 1
-    db $00,$00  ; Row 2
-    db $00,$00  ; Row 3
-    db $00,$00  ; Row 4
-    db $00,$00  ; Row 5
-    db $00,$00  ; Row 6
-    db $00,$00  ; Row 7
+	; Bitplanes 0-1 (rows 0-7)
+	db $00,$00  ; Row 0
+	db $18,$18  ; Row 1
+	db $24,$24  ; Row 2
+	db $42,$42  ; Row 3
+	db $42,$42  ; Row 4
+	db $24,$24  ; Row 5
+	db $18,$18  ; Row 6
+	db $00,$00  ; Row 7
+	
+	; Bitplanes 2-3 (rows 0-7)
+	db $00,$00  ; Row 0
+	db $00,$00  ; Row 1
+	db $00,$00  ; Row 2
+	db $00,$00  ; Row 3
+	db $00,$00  ; Row 4
+	db $00,$00  ; Row 5
+	db $00,$00  ; Row 6
+	db $00,$00  ; Row 7
 ```
 
 ### Compression
@@ -451,10 +451,10 @@ python tools/verify_data.py "~roms/FFMQ.sfc" src/asm/
 ## Change History
 
 - **2025-01-24**: Initial format documentation
-  - Map tilemap format (Bank $06)
-  - Collision data bitfield spec
-  - Text pointer format (Bank $08)
-  - Dialog string control codes
-  - Palette RGB555 format (Bank $05)
-  - Sprite 4bpp format (Bank $04)
-  - Build pipeline documentation
+	- Map tilemap format (Bank $06)
+	- Collision data bitfield spec
+	- Text pointer format (Bank $08)
+	- Dialog string control codes
+	- Palette RGB555 format (Bank $05)
+	- Sprite 4bpp format (Bank $04)
+	- Build pipeline documentation

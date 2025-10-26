@@ -82,18 +82,18 @@ ffmq-info/
 
 ### Essential Tools
 - **ca65/cc65**: 65816 assembler and toolchain
-  - Download: https://cc65.github.io/
-  - Used for modern assembly development
+	- Download: https://cc65.github.io/
+	- Used for modern assembly development
 - **asar**: SNES assembler (alternative/compatibility)
-  - Download: https://github.com/RPGHacker/asar
-  - Used for SNES-specific features
+	- Download: https://github.com/RPGHacker/asar
+	- Used for SNES-specific features
 - **Python 3.x**: For development tools and scripts
-  - Download: https://python.org/
+	- Download: https://python.org/
 
 ### Optional Tools
 - **MesenS**: SNES emulator with debugging features
-  - Download: https://github.com/SourMesen/Mesen-S
-  - Used for testing and debugging
+	- Download: https://github.com/SourMesen/Mesen-S
+	- Used for testing and debugging
 - **YY-CHR**: Graphics editor for SNES graphics
 - **Hex Editor**: For manual ROM inspection
 
