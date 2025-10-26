@@ -6025,6 +6025,277 @@ CODE_0097DA:
 	; Returns with A = inverted bit position (for bit mask lookup)
 
 ; ===========================================================================
+; Indirect Jump Via Table
+; ===========================================================================
+; Purpose: Perform indirect jump using jump table indexed by A
+; Input: A (8-bit) = table index, return address on stack points to table
+; Output: Jumps to address from table, modifies return address
+; Technical Details:
+;   - Manipulates stack to redirect return address
+;   - Reads 16-bit pointer from table at (return_address + A*2)
+;   - Replaces return address with table entry
+;   - Uses RTI to jump to new address
+; Stack Layout:
+;   Entry: [return_bank] [return_addr] [saved_registers]
+;   Exit:  [return_bank] [table_addr] [saved_registers]
+; ===========================================================================
+
+CODE_0097BE:
+	PHP                         ; Save processor status
+	PHB                         ; Save data bank
+	REP #$30                    ; 16-bit A/X/Y
+	PHY                         ; Save Y
+	AND.W #$00FF                ; Mask to 8-bit index
+	ASL A                       ; Multiply by 2 (word table)
+	TAY                         ; Y = table offset
+	LDA.B $06,S                 ; Load return bank from stack
+	PHA                         ; Save it
+	PLB                         ; Data Bank = return bank
+	PLB                         ; (needs double pull for 16-bit)
+	LDA.B ($08,S),Y             ; Read table entry at [return_addr + Y]
+	TAY                         ; Y = destination address
+	LDA.B $05,S                 ; Get saved processor status
+	STA.B $08,S                 ; Move to where return address was
+	TYA                         ; A = destination address
+	STA.B $05,S                 ; Store as new return address
+	PLY                         ; Restore Y
+	PLB                         ; Restore data bank
+	RTI                         ; Return to table address (not original caller)
+
+; ===========================================================================
+; Common Stack Cleanup Routine
+; ===========================================================================
+; Purpose: Standard cleanup of saved registers from stack
+; Technical Details:
+;   - Restores registers in reverse order of saving
+;   - REP #$30 ensures 16-bit mode for index registers
+; ===========================================================================
+
+CODE_00981B:
+	REP #$30                    ; 16-bit A/X/Y
+	PLY                         ; Restore Y
+	PLX                         ; Restore X
+	PLD                         ; Restore direct page
+	PLA                         ; Restore A
+	PLB                         ; Restore data bank
+	PLP                         ; Restore processor status
+	RTS                         ; Return
+
+; ===========================================================================
+; Memory Copy/Fill Routines
+; ===========================================================================
+
+; ---------------------------------------------------------------------------
+; Copy 64 Bytes (16 words) Between Memory Blocks
+; ---------------------------------------------------------------------------
+; Purpose: Copy 32 words (64 bytes) from X to Y, both in bank $7E
+; Input: X = source address, Y = destination address
+; Technical Details:
+;   - Copies in reverse order (high to low addresses)
+;   - 32 LDA/STA pairs for 64 bytes total
+;   - All addresses offset from base X/Y by +$00 to +$3E (even offsets)
+; ===========================================================================
+
+CODE_009891:
+	LDA.W $003E,X               ; Copy word at +$3E
+	STA.W $003E,Y               
+	LDA.W $003C,X               ; Copy word at +$3C
+	STA.W $003C,Y               
+	LDA.W $003A,X               ; Copy word at +$3A
+	STA.W $003A,Y               
+	LDA.W $0038,X               ; Copy word at +$38
+	STA.W $0038,Y               
+	LDA.W $0036,X               ; Copy word at +$36
+	STA.W $0036,Y               
+	LDA.W $0034,X               ; Copy word at +$34
+	STA.W $0034,Y               
+	LDA.W $0032,X               ; Copy word at +$32
+	STA.W $0032,Y               
+	LDA.W $0030,X               ; Copy word at +$30
+	STA.W $0030,Y               
+	LDA.W $002E,X               ; Copy word at +$2E
+	STA.W $002E,Y               
+	LDA.W $002C,X               ; Copy word at +$2C
+	STA.W $002C,Y               
+	LDA.W $002A,X               ; Copy word at +$2A
+	STA.W $002A,Y               
+	LDA.W $0028,X               ; Copy word at +$28
+	STA.W $0028,Y               
+	LDA.W $0026,X               ; Copy word at +$26
+	STA.W $0026,Y               
+	LDA.W $0024,X               ; Copy word at +$24
+	STA.W $0024,Y               
+	LDA.W $0022,X               ; Copy word at +$22
+	STA.W $0022,Y               
+	LDA.W $0020,X               ; Copy word at +$20
+	STA.W $0020,Y               
+
+CODE_0098F1:
+	LDA.W $001E,X               ; Copy word at +$1E
+	STA.W $001E,Y               
+	LDA.W $001C,X               ; Copy word at +$1C
+	STA.W $001C,Y               
+	LDA.W $001A,X               ; Copy word at +$1A
+	STA.W $001A,Y               
+	LDA.W $0018,X               ; Copy word at +$18
+	STA.W $0018,Y               
+	LDA.W $0016,X               ; Copy word at +$16
+	STA.W $0016,Y               
+	LDA.W $0014,X               ; Copy word at +$14
+	STA.W $0014,Y               
+	LDA.W $0012,X               ; Copy word at +$12
+	STA.W $0012,Y               
+	LDA.W $0010,X               ; Copy word at +$10
+	STA.W $0010,Y               
+	LDA.W $000E,X               ; Copy word at +$0E
+	STA.W $000E,Y               
+	LDA.W $000C,X               ; Copy word at +$0C
+	STA.W $000C,Y               
+	LDA.W $000A,X               ; Copy word at +$0A
+	STA.W $000A,Y               
+	LDA.W $0008,X               ; Copy word at +$08
+	STA.W $0008,Y               
+	LDA.W $0006,X               ; Copy word at +$06
+	STA.W $0006,Y               
+	LDA.W $0004,X               ; Copy word at +$04
+	STA.W $0004,Y               
+	LDA.W $0002,X               ; Copy word at +$02
+	STA.W $0002,Y               
+	LDA.W $0000,X               ; Copy word at +$00
+	STA.W $0000,Y               
+	RTS                         ; Return
+
+; ---------------------------------------------------------------------------
+; Memory Fill Dispatcher - Long Entry Point
+; ---------------------------------------------------------------------------
+; Purpose: Fill memory with value (long call wrapper)
+; Input: A (16-bit) = fill count, Y = start address, value on stack
+; ===========================================================================
+
+CODE_009994:
+	JSR.W CODE_009998           ; Call fill routine
+	RTL                         ; Return long
+
+; ---------------------------------------------------------------------------
+; Memory Fill Routine
+; ---------------------------------------------------------------------------
+; Purpose: Fill memory region with specified value
+; Input: 
+;   A (16-bit) = number of bytes to fill
+;   Y = starting address in bank $7F
+;   Stack+3 = fill value (16-bit)
+; Technical Details:
+;   - Handles blocks of 64 bytes ($40) at a time
+;   - Uses CODE_0099BD for 64-byte blocks
+;   - Uses jump table (DATA8_009A1E) for partial blocks
+;   - Remainder handled by indexed jump
+; ===========================================================================
+
+CODE_009998:
+	PHX                         ; Save X
+	CMP.W #$0040                ; Check if >= 64 bytes
+	BCC Handle_Remainder        ; If < 64, handle remainder
+	PHA                         ; Save count
+	LSR A                       ; Divide by 2
+	LSR A                       ; Divide by 4
+	LSR A                       ; Divide by 8
+	LSR A                       ; Divide by 16
+	LSR A                       ; Divide by 32
+	LSR A                       ; Divide by 64
+	TAX                         ; X = number of 64-byte blocks
+	CLC                         ; Clear carry
+
+Fill_Block_Loop:
+	LDA.B $03,S                 ; Get fill value from stack
+	JSR.W CODE_0099BD           ; Fill 64 bytes
+	TYA                         ; A = current address
+	ADC.W #$0040                ; Advance by 64 bytes
+	TAY                         ; Y = new address
+	DEX                         ; Decrement block counter
+	BNE Fill_Block_Loop         ; Loop if more blocks
+	PLA                         ; Restore count
+	AND.W #$003F                ; Get remainder (last 0-63 bytes)
+
+Handle_Remainder:
+	TAX                         ; X = remainder count (doubled for jump table)
+	PLA                         ; Restore X from stack
+	JMP.W (DATA8_009A1E,X)      ; Jump to handler for exact count
+
+; ---------------------------------------------------------------------------
+; Fill 64 Bytes With Value
+; ---------------------------------------------------------------------------
+; Purpose: Fill exactly 64 bytes starting at Y with value in A
+; Technical Details:
+;   - Uses unrolled loop (32 stores of 16-bit words)
+;   - All addresses in bank $7F
+; ===========================================================================
+
+CODE_0099BD:
+	STA.W $003E,Y               ; Fill word at +$3E
+	STA.W $003C,Y               ; Fill word at +$3C
+	STA.W $003A,Y               ; Fill word at +$3A
+	STA.W $0038,Y               ; Fill word at +$38
+	STA.W $0036,Y               ; Fill word at +$36
+	STA.W $0034,Y               ; Fill word at +$34
+	STA.W $0032,Y               ; Fill word at +$32
+	STA.W $0030,Y               ; Fill word at +$30
+	STA.W $002E,Y               ; Fill word at +$2E
+	STA.W $002C,Y               ; Fill word at +$2C
+	STA.W $002A,Y               ; Fill word at +$2A
+	STA.W $0028,Y               ; Fill word at +$28
+	STA.W $0026,Y               ; Fill word at +$26
+	STA.W $0024,Y               ; Fill word at +$24
+	STA.W $0022,Y               ; Fill word at +$22
+
+CODE_0099EA:
+	STA.W $0020,Y               ; Fill word at +$20
+	STA.W $001E,Y               ; Fill word at +$1E
+	STA.W $001C,Y               ; Fill word at +$1C
+	STA.W $001A,Y               ; Fill word at +$1A
+	STA.W $0018,Y               ; Fill word at +$18
+	STA.W $0016,Y               ; Fill word at +$16
+	STA.W $0014,Y               ; Fill word at +$14
+	STA.W $0012,Y               ; Fill word at +$12
+
+CODE_009A02:
+	STA.W $0010,Y               ; Fill word at +$10
+
+CODE_009A05:
+	STA.W $000E,Y               ; Fill word at +$0E
+
+CODE_009A08:
+	STA.W $000C,Y               ; Fill word at +$0C
+	STA.W $000A,Y               ; Fill word at +$0A
+	STA.W $0008,Y               ; Fill word at +$08
+
+CODE_009A11:
+	STA.W $0006,Y               ; Fill word at +$06
+	STA.W $0004,Y               ; Fill word at +$04
+	STA.W $0002,Y               ; Fill word at +$02
+	STA.W $0000,Y               ; Fill word at +$00
+	RTS                         ; Return
+
+; ---------------------------------------------------------------------------
+; Fill Jump Table
+; ---------------------------------------------------------------------------
+; Purpose: Jump table for partial block fills (0-63 bytes)
+; Format: Table of addresses for each possible remainder count
+; Technical Details:
+;   - Entry points into CODE_0099BD at various offsets
+;   - Allows exact fill counts without conditional logic
+; ===========================================================================
+
+DATA8_009A1E:
+	dw $9A1D                    ; 0 bytes (just return)
+	dw $9A1A, $9A17, $9A14, $9A11  ; 2, 4, 6, 8 bytes
+	dw $9A0E, $9A0B, $9A08, $9A05, $9A02  ; 10-18 bytes
+	dw $99FF, $99FC, $99F9, $99F6, $99F3  ; 20-28 bytes
+	dw $99F0, $99ED, $99EA, $99E7, $99E4  ; 30-38 bytes
+	dw $99E1, $99DE, $99DB, $99D8, $99D5  ; 40-48 bytes
+	dw $99D2, $99CF, $99CC, $99C9, $99C6  ; 50-58 bytes
+	dw $99C3, $99C0, $99BD               ; 60-64 bytes
+
+; ===========================================================================
 ; Animate Status Icon
 ; ===========================================================================
 ; Purpose: Toggle character status icon animation frame
