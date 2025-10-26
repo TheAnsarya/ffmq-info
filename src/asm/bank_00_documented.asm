@@ -248,6 +248,618 @@ CODE_00806E:
 
 CODE_0080A8:
 	; ===========================================================================
+	; Load Saved Game from SRAM
+	; ===========================================================================
+	; Player selected "Continue" from title screen - load saved game data.
+	; ===========================================================================
+	
+	JSR.W CODE_008166           ; Load_Game_From_SRAM: Restore all game state
+	BRA CODE_0080DC             ; → Skip new game init, jump to main setup
+
+;-------------------------------------------------------------------------------
+
+CODE_0080AD:
+	; ===========================================================================
+	; New Game Initialization
+	; ===========================================================================
+	; No save data exists - initialize a fresh game state.
+	; ===========================================================================
+	
+	JSR.W CODE_008117           ; Initialize_New_Game_State: Set default values
+
+;-------------------------------------------------------------------------------
+
+CODE_0080B0:
+	; ===========================================================================
+	; Screen Fade-In and Final Setup (Common Path)
+	; ===========================================================================
+	; Both new game and continue converge here.
+	; Prepares screen for display and jumps to main game engine.
+	;
+	; Technical Notes:
+	;   - Color math configured for fade effects
+	;   - Background scroll positions reset
+	;   - State flags cleared
+	;   - Final VBLANK sync before jumping to main game
+	; ===========================================================================
+	
+	LDA.B #$80                  ; A = $80 (bit 7)
+	TRB.W $00DE                 ; Test and Reset bit 7 of $00DE
+								; Clear some display state flag
+	
+	LDA.B #$E0                  ; A = $E0 (bits 5-7: %11100000)
+	TRB.W $0111                 ; Test and Reset bits 5-7 of $0111
+								; Clear multiple configuration flags
+	
+	JSL.L CODE_0C8000           ; Bank $0C: Wait for VBLANK
+								; Ensure PPU ready for register writes
+	
+	; ---------------------------------------------------------------------------
+	; Configure Color Math and Window Settings
+	; ---------------------------------------------------------------------------
+	; Sets up color addition/subtraction for fade effects
+	; SNES_COLDATA ($2132): Color math control register
+	; SNES_CGSWSEL ($2130): Color addition select
+	; ---------------------------------------------------------------------------
+	
+	LDA.B #$E0                  ; A = $E0
+								; Bit 7 = 1: Subtract color
+								; Bit 6 = 1: Half color math
+								; Bit 5 = 1: Enable color math
+	STA.W SNES_COLDATA          ; $2132 = Color math configuration
+	
+	LDX.W #$0000                ; X = $0000
+	STX.W SNES_CGSWSEL          ; $2130 = Color/math window settings = 0
+								; Disable all color window masking
+	
+	; ---------------------------------------------------------------------------
+	; Reset Background Scroll Positions
+	; ---------------------------------------------------------------------------
+	; SNES requires writing scroll values TWICE (high byte, then low byte)
+	; Writing $00 twice sets scroll position to 0
+	; ---------------------------------------------------------------------------
+	
+	STZ.W SNES_BG1VOFS          ; $210E = BG1 vertical scroll = 0 (low byte)
+	STZ.W SNES_BG1VOFS          ; $210E = BG1 vertical scroll = 0 (high byte)
+	STZ.W SNES_BG2VOFS          ; $2110 = BG2 vertical scroll = 0 (low byte)
+	STZ.W SNES_BG2VOFS          ; $2110 = BG2 vertical scroll = 0 (high byte)
+	
+	JSR.W CODE_00BD30           ; Additional graphics/fade setup
+	JSL.L CODE_0C8000           ; Bank $0C: Wait for VBLANK again
+								; Ensure all register writes complete
+
+;-------------------------------------------------------------------------------
+
+CODE_0080DC:
+	; ===========================================================================
+	; Final Game Initialization and Main Game Jump
+	; ===========================================================================
+	; Last initialization steps before transferring control to main game engine.
+	;
+	; This section:
+	;   - Initializes game systems (sound, graphics, input)
+	;   - Sets up initial state flags
+	;   - Configures game mode variables
+	;   - Jumps to main game loop in bank $01
+	; ===========================================================================
+	
+	JSR.W CODE_009014           ; Initialize subsystem (graphics related?)
+	
+	; ---------------------------------------------------------------------------
+	; Initialize Two System Components (Unknown Purpose)
+	; ---------------------------------------------------------------------------
+	; Calls same routine twice with different parameters
+	; May be initializing two separate game systems
+	; ---------------------------------------------------------------------------
+	
+	LDA.B #$00                  ; A = $00 (parameter for first init)
+	JSR.W CODE_0091D4           ; Initialize system component 0
+	
+	LDA.B #$01                  ; A = $01 (parameter for second init)
+	JSR.W CODE_0091D4           ; Initialize system component 1
+	
+	; ---------------------------------------------------------------------------
+	; Load Initial Data Table
+	; ---------------------------------------------------------------------------
+	; $81ED points to initialization data (see DATA8_0081ED below)
+	; CODE_009BC4 likely loads/processes this data table
+	; ---------------------------------------------------------------------------
+	
+	LDX.W #$81ED                ; X = $81ED (pointer to init data)
+	JSR.W CODE_009BC4           ; Load/process data table
+	
+	; ---------------------------------------------------------------------------
+	; Configure State Flags
+	; ---------------------------------------------------------------------------
+	; $00D4, $00D6, $00E2 = State/configuration flag bytes
+	; TSB/TRB = Test and Set/Reset Bits instructions
+	; ---------------------------------------------------------------------------
+	
+	LDA.B #$04                  ; A = $04 (bit 2)
+	TSB.W $00D4                 ; Test and Set bit 2 in $00D4
+								; Enable some display/update feature
+	
+	LDA.B #$80                  ; A = $80 (bit 7)
+	TRB.W $00D6                 ; Test and Reset bit 7 in $00D6
+								; Disable some feature
+	
+	STZ.W $0110                 ; [$0110] = $00 (clear game state variable)
+	
+	LDA.B #$01                  ; A = $01 (bit 0)
+	TSB.W $00E2                 ; Test and Set bit 0 in $00E2
+								; Enable some system feature
+	
+	LDA.B #$10                  ; A = $10 (bit 4)
+	TSB.W $00D6                 ; Test and Set bit 4 in $00D6
+								; Enable another feature
+	
+	; ---------------------------------------------------------------------------
+	; Initialize Game Position/State Variable
+	; ---------------------------------------------------------------------------
+	; $008E appears to be a signed 16-bit position or state value
+	; ---------------------------------------------------------------------------
+	
+	LDX.W #$FFF0                ; X = $FFF0 (-16 in signed 16-bit)
+	STX.W $008E                 ; [$008E] = $FFF0 (initial game state)
+	
+	; ---------------------------------------------------------------------------
+	; Final Setup Routines
+	; ---------------------------------------------------------------------------
+	
+	JSL.L CODE_009B2F           ; Final system initialization
+	JSR.W CODE_008230           ; Additional setup (see below)
+	
+	; ---------------------------------------------------------------------------
+	; JUMP TO MAIN GAME LOOP
+	; ---------------------------------------------------------------------------
+	; JML = Jump Long (24-bit address)
+	; Control transfers to bank $01, never returns
+	; This is the END of boot sequence - game starts running!
+	; ---------------------------------------------------------------------------
+	
+	JML.L CODE_018272           ; → JUMP TO MAIN GAME ENGINE (Bank $01)
+								; Boot sequence complete!
+
+;===============================================================================
+; NEW GAME INITIALIZATION ($008117-$008165)
+;===============================================================================
+
+CODE_008117:
+	; ===========================================================================
+	; Initialize New Game State
+	; ===========================================================================
+	; Called when starting a new game (no save data exists).
+	; Sets up default values for character stats, inventory, flags, etc.
+	;
+	; Technical Notes:
+	;   - Configures display layers (TM register)
+	;   - Clears save game variables
+	;   - Sets up OAM (sprite) DMA transfer
+	;   - Initializes various game subsystems
+	; ===========================================================================
+	
+	LDA.B #$14                  ; A = $14 (%00010100)
+								; Bit 4 = Enable BG3
+								; Bit 2 = Enable BG1
+	STA.W SNES_TM               ; $212C = Main screen designation
+								; Display BG1 and BG3 on main screen
+	
+	REP #$30                    ; 16-bit A, X, Y
+	
+	LDA.W #$0000                ; A = $0000
+	STA.L $7E31B5               ; Clear [$7E31B5] (game state variable)
+	
+	JSR.W CODE_00BD64           ; Initialize graphics/display system
+	
+	SEP #$20                    ; 8-bit accumulator
+	
+	JSL.L CODE_0C8000           ; Bank $0C: Wait for VBLANK
+	
+	; ---------------------------------------------------------------------------
+	; Configure OAM (Sprite) DMA Transfer
+	; ---------------------------------------------------------------------------
+	; OAM = Object Attribute Memory (sprite data)
+	; DMA Channel 5 used for sprite transfers during VBLANK
+	;
+	; DMA Configuration:
+	;   Source: $000C00 (RAM - OAM buffer)
+	;   Destination: $2104 (OAMDATA register)
+	;   Size: $0220 bytes (544 bytes = 128 sprites × 4 bytes + 32 bytes hi table)
+	;   Mode: $04 = Write 2 registers once each (OAMDATA + OAMDATAWR)
+	; ---------------------------------------------------------------------------
+	
+	LDX.W #$0000                ; X = $0000
+	STX.W SNES_OAMADDL          ; $2102-$2103 = OAM address = $0000
+								; Start writing at first sprite
+	
+	LDX.W #$0400                ; X = $0400
+								; $04 = DMA mode: 2 registers, write once
+								; $00 = Target register low byte
+	STX.W SNES_DMA5PARAM        ; $4350 = DMA5 parameters
+	
+	LDX.W #$0C00                ; X = $0C00
+	STX.W SNES_DMA5ADDRL        ; $4352-$4353 = Source address $xx0C00
+	
+	LDA.B #$00                  ; A = $00
+	STA.W SNES_DMA5ADDRH        ; $4354 = Source bank = $00 → $000C00
+	
+	LDX.W #$0220                ; X = $0220 (544 bytes)
+	STX.W SNES_DMA5CNTL         ; $4355-$4356 = Transfer size = 544 bytes
+	
+	LDA.B #$20                  ; A = $20 (bit 5 = DMA channel 5)
+	STA.W SNES_MDMAEN           ; $420B = Execute DMA channel 5
+								; Copies OAM data to PPU
+	
+	; ---------------------------------------------------------------------------
+	; Initialize Game State Variables
+	; ---------------------------------------------------------------------------
+	
+	REP #$30                    ; 16-bit A, X, Y
+	
+	LDA.W #$FFFF                ; A = $FFFF
+	STA.W $010E                 ; [$010E] = $FFFF (state marker)
+	
+	JSL.L CODE_00C795           ; Initialize subsystem
+	JSR.W CODE_00BA1A           ; Initialize subsystem
+	JSL.L CODE_00C7B8           ; Initialize subsystem
+	
+	SEP #$20                    ; 8-bit accumulator
+	RTS                         ; Return to caller
+
+;===============================================================================
+; LOAD SAVED GAME ($008166-$0081D4)
+;===============================================================================
+
+CODE_008166:
+	; ===========================================================================
+	; Load Game from SRAM
+	; ===========================================================================
+	; Restores saved game data from SRAM (battery-backed save RAM).
+	;
+	; Process:
+	;   1. Copy save data from SRAM ($700000+) to WRAM
+	;   2. Restore character stats, inventory, progress flags
+	;   3. Load appropriate save slot data
+	;   4. Initialize display with saved state
+	;
+	; SNES SRAM Details:
+	;   - Mapped to $700000-$77FFFF (bank $70-$77)
+	;   - Battery-backed, persists when power off
+	;   - FFMQ uses multiple save slots
+	; ===========================================================================
+	
+	REP #$30                    ; 16-bit A, X, Y
+	
+	; ---------------------------------------------------------------------------
+	; Copy Save Data Block 1: MVN (Block Move Negative)
+	; ---------------------------------------------------------------------------
+	; MVN instruction: Move block of memory
+	; Format: MVN srcbank,dstbank
+	; X = source address, Y = destination address, A = length-1
+	;
+	; This copies $0040 bytes from $0CA9C2 to $001010
+	; ---------------------------------------------------------------------------
+	
+	LDX.W #$A9C2                ; X = $A9C2 (source address low/mid)
+	LDY.W #$1010                ; Y = $1010 (destination address)
+	LDA.W #$003F                ; A = $003F (transfer 64 bytes: $3F+1)
+	MVN $00,$0C                 ; Copy from bank $0C to bank $00
+								; Source: $0CA9C2, Dest: $001010, Size: $40
+	
+	; Note: MVN auto-increments X, Y and decrements A until A = $FFFF
+	; After execution: X = $A9C2+$40, Y = $1010+$40, A = $FFFF
+	
+	; ---------------------------------------------------------------------------
+	; Copy Save Data Block 2
+	; ---------------------------------------------------------------------------
+	; Y already = $1010+$40 = $1050 from previous MVN
+	; Copies $000A bytes from $0C0E9E to $001050
+	; ---------------------------------------------------------------------------
+	
+	LDY.W #$0E9E                ; Y = $0E9E (new source address)
+								; Overwrites Y (dest becomes source for new copy)
+								; Actually this is confusing - need to verify
+	LDA.W #$0009                ; A = $0009 (transfer 10 bytes: $09+1)
+	MVN $00,$0C                 ; Copy from bank $0C to bank $00
+	
+	SEP #$20                    ; 8-bit accumulator
+	
+	; ---------------------------------------------------------------------------
+	; Set Save Slot Marker
+	; ---------------------------------------------------------------------------
+	
+	LDA.B #$02                  ; A = $02
+	STA.W $0FE7                 ; [$0FE7] = $02 (save slot indicator?)
+	
+	; ---------------------------------------------------------------------------
+	; Determine Active Save Slot
+	; ---------------------------------------------------------------------------
+	; $7E3668 contains save slot number (0, 1, or 2)
+	; If >= 2, wraps to slot 0
+	; ---------------------------------------------------------------------------
+	
+	LDA.L $7E3668               ; A = save slot number
+	CMP.B #$02                  ; Compare with 2
+	BCC CODE_00818E             ; If < 2, skip ahead (valid slot 0 or 1)
+	
+	LDA.B #$FF                  ; A = $FF (invalid slot, reset to -1)
+
+CODE_00818E:
+	; ===========================================================================
+	; Load Save Slot Data Table
+	; ===========================================================================
+	; Each save slot has associated data in a table.
+	; Slot number is incremented and used as index into data table.
+	;
+	; Data Table Structure (8 bytes per slot):
+	;   See DATA8_0081D5-0081ED below
+	; ===========================================================================
+	
+	INC A                       ; A = slot number + 1 (1, 2, or 3)
+	STA.L $7E3668               ; Update slot number in RAM
+	
+	REP #$30                    ; 16-bit A, X, Y
+	
+	AND.W #$0003                ; A = A & 3 (ensure 0-3 range)
+	ASL A                       ; A = A × 2
+	ASL A                       ; A = A × 4
+	ASL A                       ; A = A × 8 (8 bytes per slot)
+	TAX                         ; X = slot_index × 8 (table offset)
+	
+	SEP #$20                    ; 8-bit accumulator
+	
+	; ---------------------------------------------------------------------------
+	; Load Data from Slot Table
+	; ---------------------------------------------------------------------------
+	; Uses X as offset into DATA8_0081D5 table
+	; Loads 8 bytes of configuration data for this save slot
+	; ---------------------------------------------------------------------------
+	
+	STZ.B $19                   ; [$19] = $00 (clear direct page variable)
+	
+	LDA.W DATA8_0081D5,X        ; A = table[X+0] (byte 0)
+	STA.W $0E88                 ; Store to $0E88
+	
+	LDY.W DATA8_0081D6,X        ; Y = table[X+1,X+2] (bytes 1-2, 16-bit)
+	STY.W $0E89                 ; Store to $0E89-$0E8A
+	
+	LDA.W DATA8_0081D8,X        ; A = table[X+3] (byte 3)
+	STA.W $0E92                 ; Store to $0E92
+	
+	LDY.W DATA8_0081DB,X        ; Y = table[X+4,X+5] (bytes 4-5, 16-bit)
+	STY.B $53                   ; Store to $53-$54
+	
+	LDY.W DATA8_0081D9,X        ; Y = table[X+6,X+7] (bytes 6-7, 16-bit)
+	TYX                         ; X = Y (transfer loaded value to X)
+	
+	REP #$30                    ; 16-bit A, X, Y
+	
+	; ---------------------------------------------------------------------------
+	; Copy Additional Save Data
+	; ---------------------------------------------------------------------------
+	; Copies $0020 bytes from $0C:X to $000EA8
+	; X was loaded from table above
+	; ---------------------------------------------------------------------------
+	
+	LDY.W #$0EA8                ; Y = $0EA8 (destination)
+	LDA.W #$001F                ; A = $001F (copy 32 bytes)
+	MVN $00,$0C                 ; Copy from bank $0C to bank $00
+	
+	; ---------------------------------------------------------------------------
+	; Final Save Load Setup
+	; ---------------------------------------------------------------------------
+	
+	LDX.W #$0E92                ; X = $0E92
+	STX.B $17                   ; [$17] = $0E92 (store pointer)
+	
+	JSR.W CODE_00A236           ; Process loaded save data
+	
+	SEP #$20                    ; 8-bit accumulator
+	
+	JSL.L CODE_009319           ; Finalize save load
+	
+	RTS                         ; Return
+
+;-------------------------------------------------------------------------------
+; SAVE SLOT DATA TABLE
+;-------------------------------------------------------------------------------
+; Format: 8 bytes per save slot (4 slots: $FF, 0, 1, 2)
+; Structure unclear without further analysis
+;-------------------------------------------------------------------------------
+
+DATA8_0081D5:
+	db $2D                      ; Slot 0, byte 0
+
+DATA8_0081D6:
+	dw $1F26                    ; Slot 0, bytes 1-2 (little-endian)
+
+DATA8_0081D8:
+	db $05                      ; Slot 0, byte 3
+
+DATA8_0081D9:
+	dw $AA0C                    ; Slot 0, bytes 4-5
+
+DATA8_0081DB:
+	dw $A82E                    ; Slot 0, bytes 6-7
+	
+	; Slot 1 data (8 bytes)
+	db $19, $0E, $1A, $02, $0C, $AA, $C1, $A8
+	
+	; Slot 2 data (8 bytes)
+	db $14, $33, $28, $05, $2C, $AA, $6A, $A9
+
+DATA8_0081ED:
+	; Referenced by CODE_0080DC (at $008113)
+	; Initialization data table
+	db $EC, $A6, $03
+
+;===============================================================================
+; RAM INITIALIZATION ($0081F0-$008227)
+;===============================================================================
+
+CODE_0081F0:
+	; ===========================================================================
+	; Clear All Work RAM
+	; ===========================================================================
+	; Zeros out RAM ranges $0000-$05FF and $0800-$1FFF.
+	; Leaves $0600-$07FF untouched (likely reserved for specific purpose).
+	;
+	; Uses MVN (Block Move Negative) instruction for fast memory fill.
+	; Clever technique: Write zero to first byte, then copy that byte forward.
+	;
+	; RAM Layout After Clear:
+	;   $0000-$05FF: Cleared (1,536 bytes)
+	;   $0600-$07FF: Preserved (512 bytes) - hardware mirrors or special use
+	;   $0800-$1FFF: Cleared (6,144 bytes)
+	; ===========================================================================
+	
+	LDA.W #$0000                ; A = $0000
+	TCD                         ; D = $0000 (Direct Page = $0000)
+								; Reset direct page to bank $00 start
+	
+	STZ.B $00                   ; [$0000] = $00 (write zero to first byte)
+	
+	; ---------------------------------------------------------------------------
+	; Clear $0000-$05FF (1,536 bytes)
+	; ---------------------------------------------------------------------------
+	; Technique: Copy the zero byte forward across memory
+	; Source: $0000 (which we just set to $00)
+	; Dest: $0002 (start copying from here)
+	; Length: $05FD+1 = $05FE bytes
+	; Result: $0000-$05FF all become $00
+	; ---------------------------------------------------------------------------
+	
+	LDX.W #$0000                ; X = $0000 (source address)
+	LDY.W #$0002                ; Y = $0002 (dest address - skip $0000,$0001)
+	LDA.W #$05FD                ; A = $05FD (copy 1,534 bytes)
+	MVN $00,$00                 ; Fill $0002-$05FF with zero
+								; (copying from $0000 which is zero)
+	
+	; ---------------------------------------------------------------------------
+	; Clear $0800-$1FFF (6,144 bytes)
+	; ---------------------------------------------------------------------------
+	; Same technique for second RAM region
+	; Skips $0600-$07FF (512 bytes preserved)
+	; ---------------------------------------------------------------------------
+	
+	STZ.W $0800                 ; [$0800] = $00 (write zero to start of region)
+	
+	LDX.W #$0800                ; X = $0800 (source address)
+	LDY.W #$0802                ; Y = $0802 (dest address)
+	LDA.W #$17F8                ; A = $17F8 (copy 6,137 bytes)
+	MVN $00,$00                 ; Fill $0802-$1FFF with zero
+	
+	; ---------------------------------------------------------------------------
+	; Set Boot Signature
+	; ---------------------------------------------------------------------------
+	; $7E3367 = Boot signature/checksum
+	; $3369 might be a magic number verifying proper boot
+	; ---------------------------------------------------------------------------
+	
+	LDA.W #$3369                ; A = $3369 (boot signature)
+	STA.L $7E3367               ; [$7E3367] = $3369
+	
+	; ---------------------------------------------------------------------------
+	; Load Initial Data Table Based on Save Flag
+	; ---------------------------------------------------------------------------
+	; Checks if save file exists, loads different init table accordingly
+	; ---------------------------------------------------------------------------
+	
+	LDX.W #$822A                ; X = $822A (default data table pointer)
+	
+	LDA.L $7E3667               ; A = save file exists flag
+	AND.W #$00FF                ; Mask to 8-bit value
+	BEQ CODE_008227             ; If 0 (no save) → use default table
+	
+	LDX.W #$822D                ; X = $822D (alternate table for existing save)
+
+CODE_008227:
+	JMP.W CODE_009BC4           ; Load/process data table and return
+
+;-------------------------------------------------------------------------------
+; INITIALIZATION DATA TABLES
+;-------------------------------------------------------------------------------
+
+DATA8_00822A:
+	; No save file table
+	db $2D, $A6, $03
+
+DATA8_00822D:
+	; Has save file table
+	db $2B, $A6, $03
+
+;===============================================================================
+; FINAL SETUP ROUTINE ($008230-$008246)
+;===============================================================================
+
+CODE_008230:
+	; ===========================================================================
+	; Final Setup Before Main Game
+	; ===========================================================================
+	; Called just before jumping to main game loop.
+	; Sets up additional game state in bank $7E RAM.
+	; ===========================================================================
+	
+	REP #$30                    ; 16-bit A, X, Y
+	
+	PEA.W $007E                 ; Push $007E to stack
+	PLB                         ; Pull to B (Data Bank = $7E)
+								; All memory accesses now default to bank $7E
+	
+	LDA.W #$0170                ; A = $0170 (parameter 1)
+	LDY.W #$3007                ; Y = $3007 (parameter 2)
+	JSR.W CODE_009A08           ; Initialize with these parameters
+	
+	LDA.W #$0098                ; A = $0098
+	STA.W $31B5                 ; [$7E31B5] = $0098 (game state variable)
+	
+	PLB                         ; Restore B (Data Bank back to $00)
+	RTS                         ; Return
+
+;===============================================================================
+; HARDWARE INITIALIZATION ($008247-$008251)
+;===============================================================================
+
+CODE_008247:
+	; ===========================================================================
+	; Initialize SNES Hardware (Disable Display and Interrupts)
+	; ===========================================================================
+	; Called at boot to put SNES in safe state before initialization.
+	;
+	; Actions:
+	;   1. Disable all interrupts (NMI, IRQ, auto-joypad)
+	;   2. Force screen blank (turn off display)
+	;
+	; This prevents glitches during initialization by ensuring:
+	;   - No interrupts fire during setup
+	;   - No garbage displays on screen
+	;   - PPU is idle and safe to configure
+	; ===========================================================================
+	
+	SEP #$30                    ; 8-bit A, X, Y (and set flags)
+	
+	STZ.W SNES_NMITIMEN         ; $4200 = $00
+								; Disable NMI, IRQ, and auto-joypad read
+	
+	LDA.B #$80                  ; A = $80 (bit 7 = force blank)
+	STA.W SNES_INIDISP          ; $2100 = $80
+								; Force blank: screen output disabled
+								; Brightness = 0
+	
+	RTS                         ; Return
+
+;-------------------------------------------------------------------------------
+; DATA TABLE (Unknown Purpose)
+;-------------------------------------------------------------------------------
+
+DATA8_008252:
+	; Referenced by DMA setup at CODE_00804D
+	; 9 bytes of data
+	db $00
+	db $DB, $80, $FD, $DB, $80, $FD, $DB, $80, $FD
+
+;===============================================================================
+; VBL
 	; Load Saved Game
 	; ===========================================================================
 	; Player selected "Continue" - load saved game data from SRAM.
