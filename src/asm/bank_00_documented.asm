@@ -2359,106 +2359,8 @@ DMA_Init_Data:
 	; More data continues...
 
 ;===============================================================================
-; TODO: Continue converting and documenting rest of bank $00
+; Graphics Update - Field Mode (continued from CODE_008577)
 ;===============================================================================
-; Remaining ~13,600 lines to analyze and comment!
-;
-; ===========================================================================
-; DMA OAM Transfer Routines
-; ===========================================================================
-; Purpose: Transfer sprite (OAM) data from RAM to PPU via DMA
-; Technical Details: Uses DMA channel 5 to upload sprite positions and attributes
-; ===========================================================================
-
-CODE_008543:
-	; Setup DMA Channel 5 for OAM transfer
-	LDX.W #$0400                     ; DMA mode: A→B, fixed source, word-length
-	STX.B SNES_DMA5PARAM-$4300       ; Store to DMA5 control register
-	LDX.W #$0C00                     ; Source address: $000C00 in RAM
-	STX.B SNES_DMA5ADDRL-$4300       ; Set DMA5 source address (low/mid bytes)
-	LDA.B #$00                       ; Bank $00
-	STA.B SNES_DMA5ADDRH-$4300       ; Set DMA5 source bank
-	
-	; Transfer main OAM data (512 bytes)
-	LDX.W $01F0                      ; Get OAM data size from variable
-	STX.B SNES_DMA5CNTL-$4300        ; Set DMA5 transfer size
-	LDX.W #$0000                     ; Start at OAM address $0000
-	STX.W SNES_OAMADDL               ; Set OAM write address
-	LDA.B #$20                       ; Trigger DMA channel 5
-	STA.W SNES_MDMAEN                ; Execute DMA transfer
-	
-	; Transfer high table OAM data (32 bytes)
-	LDX.W #$0E00                     ; Source address: $000E00 in RAM
-	STX.B SNES_DMA5ADDRL-$4300       ; Update DMA5 source address
-	LDX.W $01F2                      ; Get high table size from variable
-	STX.B SNES_DMA5CNTL-$4300        ; Set DMA5 transfer size
-	LDX.W #$0100                     ; High table starts at OAM $0100
-	STX.W SNES_OAMADDL               ; Set OAM write address
-	LDA.B #$20                       ; Trigger DMA channel 5
-	STA.W SNES_MDMAEN                ; Execute DMA transfer
-	RTS
-; Next sections to tackle:
-; - Main game loop
-; - Controller input
-; - Graphics updates
-; - Battle system calls
-; - Menu system
-; - Save/load
-; - Screen transitions
-; ==============================================================================
-
-; ===========================================================================
-; Graphics Transfer - Battle Mode
-; ===========================================================================
-; Purpose: Upload battle graphics to VRAM during battle transitions
-; Technical Details: Transfers character tiles and tilemap data
-; Registers Used: A, X, Y
-; ===========================================================================
-
-CODE_008577:
-	; Setup VRAM address for character data
-	LDX.W #$4400                     ; VRAM address $4400
-	STX.W SNES_VMADDL                ; Set VRAM write address
-	
-	; Configure DMA for 2-byte sequential write (VMDATAL/VMDATAH)
-	LDX.W #$1801                     ; DMA mode: word write, increment source
-	STX.B SNES_DMA5PARAM-$4300       ; Set DMA5 parameters
-	
-	; Transfer character graphics from $7F0480
-	LDX.W #$0480                     ; Source: $7F0480
-	STX.B SNES_DMA5ADDRL-$4300       ; Set source address (low/mid)
-	LDA.B #$7F                       ; Bank $7F (WRAM)
-	STA.B SNES_DMA5ADDRH-$4300       ; Set source bank
-	LDX.W #$0280                     ; Transfer size: $0280 bytes (640 bytes)
-	STX.B SNES_DMA5CNTL-$4300        ; Set transfer size
-	LDA.B #$20                       ; Trigger DMA channel 5
-	STA.W SNES_MDMAEN                ; Execute transfer
-	
-	; Transfer tilemap data to VRAM $5820
-	LDX.W #$5820                     ; VRAM address $5820
-	STX.W SNES_VMADDL                ; Set VRAM write address
-	LDX.W #$2040                     ; Source: $7E2040
-	STX.B SNES_DMA5ADDRL-$4300       ; Set source address
-	LDA.B #$7E                       ; Bank $7E (WRAM)
-	STA.B SNES_DMA5ADDRH-$4300       ; Set source bank
-	LDX.W #$0B00                     ; Transfer size: $0B00 bytes (2816 bytes)
-	STX.B SNES_DMA5CNTL-$4300        ; Set transfer size
-	LDA.B #$20                       ; Trigger DMA channel 5
-	STA.W SNES_MDMAEN                ; Execute transfer
-	
-	; Set flag indicating graphics updated
-	LDA.B #$40                       ; Bit 6 flag
-	TSB.W $00D2                      ; Set bit in status flags
-	JSR.W CODE_008543                ; Transfer OAM data
-	RTL                              ; Return from long call
-
-; ===========================================================================
-; Graphics Update - Field Mode
-; ===========================================================================
-; Purpose: Update field/map graphics during gameplay
-; Technical Details: Conditional updates based on game state flags
-; Side Effects: Updates VRAM, modifies status flags
-; ===========================================================================
 
 CODE_0085B7:
 	; Setup VRAM for vertical increment mode
@@ -6296,77 +6198,42 @@ DATA8_009A1E:
 	dw $99C3, $99C0, $99BD               ; 60-64 bytes
 
 ; ===========================================================================
-; Animate Status Icon
-; ===========================================================================
-; Purpose: Toggle character status icon animation frame
-; Input: X = OAM data offset for character slot
-; Technical Details: Toggles tile numbers to create animation effect
+; Text/Graphics Processing Routines
 ; ===========================================================================
 
-CODE_008A2A:
-	; Toggle tile animation frame
-	LDA.B $02,X                      ; Get current tile number
-	EOR.B #$04                       ; Toggle bit 2 (animation frame)
-	STA.B $02,X                      ; Store back to OAM
-	
-	; Update adjacent sprite tiles
-	INC A                            ; Next tile
-	STA.W $0C06,X                    ; Store to OAM +4
-	INC A                            ; Next tile
-	STA.W $0C0A,X                    ; Store to OAM +8
-	INC A                            ; Next tile
-	STA.W $0C0E,X                    ; Store to OAM +12
-	RTS                              ; Return
-
-; ===========================================================================
-; Input Handler Jump Table
-; ===========================================================================
-; Purpose: Dispatch table for different input contexts
-; Format: Table of 16-bit addresses for input handler functions
+; ---------------------------------------------------------------------------
+; Load Graphics Data
+; ---------------------------------------------------------------------------
+; Purpose: Initialize graphics for specific game mode
+; Input: Direct Page $0000, $17 = graphics pointer, $19 = bank
 ; ===========================================================================
 
-Input_Handler_Table:
-	dw Input_Down                    ; $008A3D: Down button handler
-	dw Input_Up                      ; $008A3F: Up button handler
-	dw Input_Action                  ; $008A41: A/B button handler
-	dw Input_Action                  ; $008A43: (duplicate)
-	dw Input_Left                    ; $008A45: Left button handler
-	dw Input_Right                   ; $008A47: Right button handler
-	dw Input_Right                   ; $008A49: (alternate)
-	dw Input_Left                    ; $008A4B: (alternate)
-	dw Input_Action                  ; $008A4D: (action variant)
-	dw Input_Action                  ; $008A4F: (action variant)
-	dw Input_Switch_Character        ; $008A51: Character switch
-	dw Input_Action                  ; $008A53: (action variant)
+CODE_009A60:
+	PHP                         ; Save processor status
+	PHB                         ; Save data bank
+	PHD                         ; Save direct page
+	REP #$30                    ; 16-bit A/X/Y
+	PHA                         ; Save A
+	LDA.W #$0000                ; Direct Page = $0000
+	TCD                         ; Set DP
+	LDA.W #$F811                ; Graphics pointer
+	STA.B $17                   ; Store pointer
+	SEP #$20                    ; 8-bit A
+	LDA.B #$03                  ; Bank $03
+	STA.B $19                   ; Store bank
+	JSR.W CODE_009D75           ; Process graphics data
+	REP #$30                    ; 16-bit A/X/Y
+	PLA                         ; Restore A
+	PLD                         ; Restore direct page
+	PLB                         ; Restore data bank
+	PLP                         ; Restore processor status
+	RTL                         ; Return long
 
-; ===========================================================================
-; Menu Cursor Movement - Vertical
-; ===========================================================================
+; ---------------------------------------------------------------------------
+; Graphics Processing Entry Points
+; ---------------------------------------------------------------------------
 
-Input_Left:
-	DEC.B $02                        ; Move cursor left
-	BRA Validate_Cursor_Position     ; Check bounds
-
-Input_Right:
-	INC.B $02                        ; Move cursor right
-	BRA Validate_Cursor_Position     ; Check bounds
-
-Input_Up:
-	DEC.B $01                        ; Move cursor up
-	BRA Validate_Cursor_Position     ; Check bounds
-
-Input_Down:
-	INC.B $01                        ; Move cursor down
-	; Fall through to validation
-
-; ===========================================================================
-; Validate Cursor Position
-; ===========================================================================
-; Purpose: Ensure cursor stays within menu bounds, handle wrapping
-; Technical Details: Checks against bounds in $03/$04, handles wrap flags
-; ===========================================================================
-
-Validate_Cursor_Position:
+CODE_009AEC:
 	; Check vertical bounds
 	LDA.B $01                        ; Get cursor Y position
 	BMI Cursor_Above_Top             ; If negative, handle wrap
