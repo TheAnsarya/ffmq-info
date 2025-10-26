@@ -51,13 +51,16 @@ class TextExtractor:
             'address': 0x051000,
             'count': 128,
             'max_length': 20
+        },
+        # Dialog text - pointer-based system
+        # Pointer table at $01d636 (PC address), points to strings in bank $03
+        # See notes.txt: "$01d636 - start of a bank of text string pointers"
+        'dialog': {
+            'pointer_table': 0x00D636,  # PC address of 16-bit pointer table
+            'count': 256,  # Number of dialog strings
+            'bank': 0x03,  # Dialog stored in bank $03 (PC: $018000-$01FFFF)
+            'max_length': 512
         }
-        # NOTE: Dialog requires more research - address TBD
-        # 'dialog': {
-        #     'address': 0x020000,  # TODO: Find correct address
-        #     'count': 1000,
-        #     'max_length': 256
-        # }
     }
     
     # Text control codes
@@ -189,13 +192,62 @@ class TextExtractor:
             
         print(f"  Extracted {len(strings)} strings")
         return strings
+    
+    def extract_pointer_based_text(self, name: str, config: Dict) -> List[Dict]:
+        """Extract text using pointer table (for dialog)"""
+        ptr_table = config['pointer_table']
+        count = config['count']
+        bank = config['bank']
+        max_len = config['max_length']
+        
+        print(f"\nExtracting {name} from pointer table at ${ptr_table:06X}...")
+        
+        strings = []
+        
+        for i in range(count):
+            # Read 16-bit pointer from table
+            ptr_offset = ptr_table + (i * 2)
+            if ptr_offset + 2 > len(self.rom_data):
+                break
+                
+            # Little-endian 16-bit pointer
+            ptr_low = self.rom_data[ptr_offset]
+            ptr_high = self.rom_data[ptr_offset + 1]
+            ptr_addr = (ptr_high << 8) | ptr_low
+            
+            # Convert SNES address to PC address
+            # Bank $03 SNES address to PC: $03xxxx -> $01xxxx (PC)
+            pc_addr = ((bank - 2) * 0x8000) + (ptr_addr & 0x7FFF)
+            
+            # Bounds check
+            if pc_addr >= len(self.rom_data):
+                continue
+                
+            text, length = self.decode_string(pc_addr, max_len)
+            
+            # Skip empty entries
+            if text and text.strip():
+                strings.append({
+                    'id': i,
+                    'text': text,
+                    'address': f"${pc_addr:06X}",
+                    'pointer': f"${ptr_addr:04X}",
+                    'length': length
+                })
+        
+        print(f"  Extracted {len(strings)} dialog strings")
+        return strings
         
     def extract_all(self) -> Dict[str, List[Dict]]:
         """Extract all text tables from ROM"""
         all_text = {}
         
         for table_name, config in self.TEXT_TABLES.items():
-            strings = self.extract_text_table(table_name, config)
+            # Check if this is pointer-based or direct address
+            if 'pointer_table' in config:
+                strings = self.extract_pointer_based_text(table_name, config)
+            else:
+                strings = self.extract_text_table(table_name, config)
             all_text[table_name] = strings
             
         return all_text
@@ -235,7 +287,13 @@ class TextExtractor:
                 
                 if strings:
                     config = self.TEXT_TABLES[table_name]
-                    f.write(f"org ${config['address']:06X}\n\n")
+                    
+                    # Handle pointer-based vs direct address tables
+                    if 'pointer_table' in config:
+                        f.write(f"; Pointer table at ${config['pointer_table']:06X}\n")
+                        f.write(f"; Strings in bank ${config['bank']:02X}\n\n")
+                    else:
+                        f.write(f"org ${config['address']:06X}\n\n")
                     
                     for entry in strings:
                         f.write(f"; {entry['id']:04d}: {entry['text'][:40]}\n")

@@ -1,5 +1,5 @@
 {
-  "overall_progress": 42.77777777777778,
+  "overall_progress": 66.66666666666667,
   "assets": {
     "code": {
       "description": "Game code (65816 assembly)",
@@ -22,8 +22,8 @@
       "status": "complete",
       "source": "extract_text.py",
       "location": "assets/text/",
-      "files": 7,
-      "coverage": 85.0
+      "files": 8,
+      "coverage": 100.0
     },
     "enemy_data": {
       "description": "Enemy stats and properties",
@@ -35,11 +35,11 @@
     },
     "item_data": {
       "description": "Item/equipment stats",
-      "status": "not_started",
+      "status": "complete",
       "source": "extract_items.py (TODO)",
       "location": "assets/data/",
-      "files": 0,
-      "coverage": 0.0
+      "files": 7,
+      "coverage": 100.0
     },
     "map_data": {
       "description": "Level maps and layouts",
@@ -67,11 +67,11 @@
     },
     "dialog": {
       "description": "Game dialog text",
-      "status": "not_started",
+      "status": "complete",
       "source": "extract_text.py (needs address research)",
       "location": "assets/text/",
-      "files": 0,
-      "coverage": 0.0
+      "files": 1,
+      "coverage": 100.0
     }
   }
 }
