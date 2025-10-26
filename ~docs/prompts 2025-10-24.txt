@@ -7,9 +7,6 @@ And you'll see the interactive menu with all your current changes ready to log!
 
 
 
-
-
-
 update git's `user.name` to `Andy Hubbard` and `git.email` to `me@ansarya.com`
 create a new branch for the changes named `ai-code-trial` and then analyze the code `SNES` assembly code and documentation, and reorganize the project by copying all the old code files into a historical folder structure and then reorganizing the code for creating an SNES build path using the most modern snes build tools and practices, `/~roms/` contains all the FFMQ roms and use `/~roms/Final Fantasy - Mystic Quest (U) (V1.1).sfc` as the original base ROM. Setup an SNES development project for the complete disassembly and commenting and documentation of `Final Fantasy Mystic Quest` (FFMQ) with a full toolset from coding, to build, to test, to running it using MesenS. Document everything. Some documentation can be found at `https://datacrystal.tcrf.net/wiki/Final_Fantasy:_Mystic_Quest` and `https://github.com/TheAnsarya/GameInfo/tree/main/Final%20Fantasy%20Mystic%20Quest%20(SNES)`. Create graphcis and text import/export and editing. If possible, analyze and disassemble and document everything. Eventually we will make an editor of the game.
 continue
@@ -23,7 +20,7 @@ save all of the past and future copilot chats to a folder so I know what's happe
 +++++++++++++++++++
 directives:
 for all:
-use my editorconfig for formatting, use crlf, use tabs (4) not spaces for all documents, use UTF-8, (IMPORTANT) and always use the most modern code and practices, leave blank line between the stages, comment everything including the code inside methods, add links in the comments to explanitory articles, always format and clean up, make sure file structure matches namespaces, always comment and document, fix issues and test everything, always format the code using editorconfig and other formatting directives (never spaces, always tabs), if a file grows too large move pieces into their own logical components or classes separating concerns, update the chat log files, create a git commit including description, use lowercase hexadecimal, for this session and all sessions
+use my editorconfig for formatting, use crlf, use tabs (tab-size: 4) not spaces for all documents, use UTF-8, (IMPORTANT) and always use the most modern code and practices, leave blank line between the stages, comment everything including the code inside methods, add links in the comments to explanitory articles, always format and clean up, make sure file structure matches namespaces, always comment and document, fix issues and test everything, always format the code using editorconfig and other formatting directives (never spaces, always tabs), if a file grows too large move pieces into their own logical components or classes separating concerns, update the chat log files, create a git commit including description, use lowercase hexadecimal, for this session and all sessions
 for SNES ASM:
 use lowercase hexadecimal
 +++++++++++++++++++
@@ -122,7 +119,28 @@ Integrate into Makefile
 At no point unless explicitly said so, should any data be copied from the original ROM file to the built ROM file. all code data should be built from code files. All graphics data should be converted from ROM data to raw data for graphics and palette, then converted to json palette file and png files with the correct colors, then during build converted back to data (different file) and incorporated into the build pipleline, all statistics and data for thing like items and monsters and text and dialog should be converterted from the rom to raw data files and then to json files showing the data format and values and then during build converted back to data (different file) and incorporated into the build pipleline, etc etc (and format, update chat/history log, commit to git) 
 And then continue what you were doing before: "Great! Now let me check Banks $0A-$0D to understand their content and create documentation for them as well:"
 
+
+
+
+
+
+
+
+sorry, I messed up the directive. By `use tabs (4) not spaces for all documents` I meant use ONE (1) tab with a tab-size of 4-spaces per level of indentation. Please re-format all the text files using one tab per level.
+
+
+
+
+
+
+
+
+
+
+
 find all the `Next steps` and todos and fill out the code
+
+
 
 
 
@@ -174,19 +192,19 @@ What was accomplished:
 ----------------------
 1. **Data Structure Classes** (ffmq_data_structures.py - 530 lines)
    - Created 5 production-ready classes:
-     * Metatile: 16x16 tile format (4 bytes)
-     * CollisionData: Bitfield parser for collision flags
-     * TextPointer: 16-bit address pointers (for Bank $08)
-     * DialogString: Variable-length text strings
-     * PaletteEntry: RGB555 color format
+	 * Metatile: 16x16 tile format (4 bytes)
+	 * CollisionData: Bitfield parser for collision flags
+	 * TextPointer: 16-bit address pointers (for Bank $08)
+	 * DialogString: Variable-length text strings
+	 * PaletteEntry: RGB555 color format
    - All classes support: from_bytes(), to_bytes(), to_asm(), JSON round-trip
 
 2. **Extraction Tools Built**
    - extract_bank06_data.py (253 lines) ✅ VERIFIED 100%
-     * Extracts 256 metatiles from $068000 (sequential storage)
-     * Extracts 256 collision bytes from $06A000
-     * Output: data/map_tilemaps.json
-     * CRITICAL FIX: Corrected addresses from $068020/$068030 to $068000
+	 * Extracts 256 metatiles from $068000 (sequential storage)
+	 * Extracts 256 collision bytes from $06A000
+	 * Output: data/map_tilemaps.json
+	 * CRITICAL FIX: Corrected addresses from $068020/$068030 to $068000
    - build_asm_from_json.py (150 lines) - Converts JSON → ASM
    - generate_bank06_metatiles.py (71 lines) - Generates complete ASM
    - verify_roundtrip.py (260 lines) ✅ 100% PASS
@@ -196,16 +214,16 @@ What was accomplished:
    - Makefile integration ✅ COMPLETE AND TESTED
    - GNU Make installed (GnuWin32.Make via winget)
    - Targets working:
-     * make extract-bank06
-     * make generate-asm
-     * make verify-bank06
-     * make pipeline (full workflow)
+	 * make extract-bank06
+	 * make generate-asm
+	 * make verify-bank06
+	 * make pipeline (full workflow)
 
 4. **Documentation**
    - docs/data_formats.md (450 lines)
-     * Complete format specifications
-     * Build pipeline workflow
-     * Usage examples
+	 * Complete format specifications
+	 * Build pipeline workflow
+	 * Usage examples
 
 5. **Verification Results** ✅ 100% BYTE-EXACT
    - Metatiles: 1024/1024 bytes verified ✅
