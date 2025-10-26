@@ -51,12 +51,13 @@ class TextExtractor:
             'address': 0x051000,
             'count': 128,
             'max_length': 20
-        },
-        'dialog': {
-            'address': 0x100000,  # Large block - varies by ROM version
-            'count': 1000,  # Approximate
-            'max_length': 256
         }
+        # NOTE: Dialog requires more research - address TBD
+        # 'dialog': {
+        #     'address': 0x020000,  # TODO: Find correct address
+        #     'count': 1000,
+        #     'max_length': 256
+        # }
     }
     
     # Text control codes
