@@ -242,7 +242,7 @@ def main():
         print("Usage: python extract_items.py <rom_file> <output_dir>")
         print()
         print("Example:")
-        print('  python extract_items.py "~roms/FFMQ.sfc" "assets/data/"')
+        print('  python extract_items.py "roms/FFMQ.sfc" "assets/data/"')
         sys.exit(1)
     
     rom_path = sys.argv[1]

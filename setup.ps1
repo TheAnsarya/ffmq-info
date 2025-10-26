@@ -44,7 +44,7 @@ Write-Host ""
 # Setup directories
 Write-Host "Setting up directories..." -ForegroundColor Yellow
 
-$directories = @("~roms", "build", "assets", "assets\graphics", "assets\text", "assets\music")
+$directories = @("roms", "build", "assets", "assets\graphics", "assets\text", "assets\music")
 
 foreach ($dir in $directories) {
     if (-not (Test-Path $dir)) {
@@ -54,9 +54,9 @@ foreach ($dir in $directories) {
 }
 
 # Check ROM directory
-if (-not (Get-ChildItem -Path "~roms" -Filter "*.sfc" -ErrorAction SilentlyContinue)) {
+if (-not (Get-ChildItem -Path "roms" -Filter "*.sfc" -ErrorAction SilentlyContinue)) {
     Write-Host ""
-    Write-Host "ROM files not found in ~roms directory." -ForegroundColor Yellow
+    Write-Host "ROM files not found in roms directory." -ForegroundColor Yellow
     Write-Host "Please copy your Final Fantasy Mystic Quest ROM files to the ~roms directory:" -ForegroundColor White
     Write-Host "  - Final Fantasy - Mystic Quest (U) (V1.1).sfc (recommended)" -ForegroundColor White
     Write-Host "  - Other regional versions (optional)" -ForegroundColor White

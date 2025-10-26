@@ -304,7 +304,7 @@ def main():
         print("Usage: python extract_palettes_sprites.py <rom_file> <output_dir>")
         print()
         print("Example:")
-        print('  python extract_palettes_sprites.py "~roms/FFMQ.sfc" "assets/graphics/"')
+        print('  python extract_palettes_sprites.py "roms/FFMQ.sfc" "assets/graphics/"')
         print()
         print("This will:")
         print("  1. Extract all color palettes from ROM")

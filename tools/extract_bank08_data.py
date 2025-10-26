@@ -9,7 +9,7 @@ Input:  ROM file (ffmq.sfc)
 Output: data/text_data.json with pointers and strings
 
 Usage:
-    python tools/extract_bank08_data.py "~roms/FFMQ.sfc"
+    python tools/extract_bank08_data.py "roms/FFMQ.sfc"
 """
 
 import sys
@@ -160,7 +160,7 @@ def analyze_control_codes(strings: list[DialogString]) -> dict:
 def main():
     if len(sys.argv) < 2:
         print("Usage: python extract_bank08_data.py <rom_file>")
-        print('Example: python extract_bank08_data.py "~roms/FFMQ.sfc"')
+        print('Example: python extract_bank08_data.py "roms/FFMQ.sfc"')
         sys.exit(1)
     
     rom_path = sys.argv[1]

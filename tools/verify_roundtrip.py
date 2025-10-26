@@ -5,7 +5,7 @@ Round-Trip Verification Tool for FFMQ Data Pipeline
 Verifies that ROM → JSON → ASM → Binary produces byte-exact results.
 
 Usage:
-    python tools/verify_roundtrip.py "~roms/FFMQ.sfc"
+    python tools/verify_roundtrip.py "roms/FFMQ.sfc"
 """
 
 import sys
@@ -164,7 +164,7 @@ def print_verification_report(results: list[dict]):
 def main():
     if len(sys.argv) < 2:
         print("Usage: python verify_roundtrip.py <rom_file>")
-        print('Example: python verify_roundtrip.py "~roms/FFMQ.sfc"')
+        print('Example: python verify_roundtrip.py "roms/FFMQ.sfc"')
         sys.exit(1)
     
     rom_path = sys.argv[1]

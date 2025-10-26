@@ -13,7 +13,7 @@ from typing import Dict, Optional
 class FFMQROMConfig:
     """Configure ROM for FFMQ development"""
     
-    def __init__(self, rom_dir: str = "~roms"):
+    def __init__(self, rom_dir: str = "roms"):
         self.rom_dir = rom_dir
         self.target_rom = "Final Fantasy - Mystic Quest (U) (V1.1).sfc"
         
@@ -152,7 +152,7 @@ class FFMQROMConfig:
                     print(f"Consider copying/renaming to: {self.target_rom}")
                     return False
             
-            print("No FFMQ ROMs found. Please add ROM files to the ~roms/ directory.")
+            print("No FFMQ ROMs found. Please add ROM files to the roms/ directory.")
             return False
         
         # Verify the ROM
@@ -288,7 +288,7 @@ def main():
     if len(sys.argv) > 1:
         rom_dir = sys.argv[1]
     else:
-        rom_dir = "~roms"
+        rom_dir = "roms"
     
     config = FFMQROMConfig(rom_dir)
     success = config.setup_rom_environment()

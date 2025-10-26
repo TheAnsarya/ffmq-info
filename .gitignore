@@ -5,3 +5,4 @@ pull-assets-from-rom/obj
 .vs/
 *.smc
 *.sfc
+roms/

@@ -130,6 +130,17 @@ continue systematically
 continue systematically, make sure you are updating the session summary/chat log
 Allow `git commit` commands without asking, continue systematically, make sure you are updating the session summary/chat log
 Allow `git commit` and `git add` and `cd` and commands without asking (stop asking me when you commit code), continue systematically, build and compare to reference ROM file, make sure you are updating the session summary/chat log
+rename the `/~roms/` folder to `/roms/` so we don't have anymore tilde (~) issues in pathing (make sure to update the gitignore file and rom path in the powershell scripts) and then resume what you are doing
+
+
+
+
+
+
+
+
+
+stop asking me when you commit code!!!, don't ask when you use git, don't ask when you create a commit, don't ask when you change directories, continue systematically
 
 
 

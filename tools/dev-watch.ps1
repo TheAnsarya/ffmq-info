@@ -18,7 +18,7 @@ function Write-Error { Write-Host $args -ForegroundColor Red }
 
 # Configuration
 $MainAsm = "src/asm/ffmq_complete.asm"
-$BaseRom = Resolve-Path "~roms/Final Fantasy - Mystic Quest (U) (V1.1).sfc"
+$BaseRom = Resolve-Path "roms/Final Fantasy - Mystic Quest (U) (V1.1).sfc"
 $OutputRom = "build/ffmq-modified.sfc"
 $WatchPath = "src/asm"
 $BuildDir = "build"

@@ -1,6 +1,6 @@
 import json
 
-rom = open('~roms/Final Fantasy - Mystic Quest (U) (V1.1).sfc', 'rb').read()
+rom = open('roms/Final Fantasy - Mystic Quest (U) (V1.1).sfc', 'rb').read()
 data = json.load(open('data/map_tilemaps.json'))
 
 errors = 0
