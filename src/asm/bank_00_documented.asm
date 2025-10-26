@@ -5277,77 +5277,253 @@ Skip_Flag3:
 Skip_Flag4:
 	STA.W $366C,X               ; Store to buffer slot 4
 	RTS                         ; Return
-	BPL Time_Events_Done             ; If still positive, done
+
+; ===========================================================================
+; Character Status Calculation Routine
+; ===========================================================================
+; Purpose: Calculate cumulative character status from multiple stat buffers
+; Input: Bit 0 of $89 determines which character to process (0=first, 1=second)
+; Output: $2A-$2D, $3A-$3F, $2E updated with calculated stats
+; Technical Details:
+;   - Sets up Direct Page to $1000 or $1080 based on character selection
+;   - Processes 7 stats via CODE_009253 (summation across 5 buffers)
+;   - Processes 2 stats via CODE_009245 (OR across 4 buffers)
+;   - Updates base stats ($22-$25) with deltas ($26-$29)
+; Buffers accessed:
+;   - $3669-$3678: Base buffer (16 bytes)
+;   - $3679-$3688: Delta buffer 1
+;   - $3689-$3698: Delta buffer 2
+;   - $3699-$36A8: Delta buffer 3
+;   - $36A9-$36B8: Delta buffer 4
+; ===========================================================================
+
+CODE_0091D4:
+	PHP                         ; Save processor status
+	PHD                         ; Save direct page register
+	SEP #$30                    ; 8-bit A/X/Y
+	PEA.W $007E                 ; Push $7E to stack
+	PLB                         ; Data Bank = $7E
+	CLC                         ; Clear carry
+	PEA.W $1000                 ; Default to character 1 DP ($1000)
+	PLD                         ; Direct Page = $1000
+	LDX.B #$00                  ; X = $00 (buffer offset)
+	BIT.B #$01                  ; Test bit 0 of $89
+	BEQ Setup_Done              ; If 0, use first character's DP
+	PEA.W $1080                 ; Character 2 DP ($1080)
+	PLD                         ; Direct Page = $1080
+	LDX.B #$50                  ; X = $50 (character 2 buffer offset)
+
+Setup_Done:
+	; Calculate cumulative stats using CODE_009253 (ADC across 5 buffers)
+	JSR.W CODE_009253           ; Sum buffer values at X
+	STA.B $2A                   ; Store stat 1
+	JSR.W CODE_009253           ; Sum next buffer values (X++)
+	STA.B $2B                   ; Store stat 2
+	JSR.W CODE_009253           ; Sum next buffer values (X++)
+	STA.B $2C                   ; Store stat 3
+	JSR.W CODE_009253           ; Sum next buffer values (X++)
+	STA.B $2D                   ; Store stat 4
+	JSR.W CODE_009253           ; Sum next buffer values (X++)
+	STA.B $41                   ; Store stat 5
+	JSR.W CODE_009253           ; Sum next buffer values (X++)
+	STA.B $3E                   ; Store stat 6
+	JSR.W CODE_009253           ; Sum next buffer values (X++)
+	STA.B $3F                   ; Store stat 7
 	
-	; Timer expired, reset and check character slots
-	LDA.B #$0C                       ; Reset timer to 12 frames
-	STA.W $010D                      ; Store timer
+	; Calculate bitwise OR stats using CODE_009245 (ORA across 4 buffers)
+	JSR.W CODE_009245           ; OR buffer values at X
+	STA.B $3A                   ; Store flags 1
+	JSR.W CODE_009245           ; OR next buffer values (X++)
+	STA.B $3B                   ; Store flags 2
 	
-	; Check character slot 1 (Reuben/Kaeli)
-	LDA.L $700027                    ; Check character 1 in party
-	BNE Check_Slot_2                 ; If present, skip animation
-	LDX.B #$40                       ; Animation offset for slot 1
-	JSR.W CODE_008A2A                ; Animate status icon
-
-Check_Slot_2:
-	; Check character slot 2 (Phoebe)
-	LDA.L $700077                    ; Check character 2 in party
-	BNE Check_Slot_3                 ; If present, skip animation
-	LDX.B #$50                       ; Animation offset for slot 2
-	JSR.W CODE_008A2A                ; Animate status icon
-
-Check_Slot_3:
-	; Check character slot 3 (Tristam)
-	LDA.L $7003B3                    ; Check character 3 in party
-	BNE Check_Slot_4                 ; If present, skip animation
-	LDX.B #$60                       ; Animation offset for slot 3
-	JSR.W CODE_008A2A                ; Animate status icon
-
-Check_Slot_4:
-	; Check character slot 4 (Enemy/Guest)
-	LDA.L $700403                    ; Check character 4 in party
-	BNE Time_Events_Done             ; If present, skip animation
-	LDX.B #$70                       ; Animation offset for slot 4
-	JSR.W CODE_008A2A                ; Animate status icon
-
-Time_Events_Done:
-	PLD                              ; Restore direct page
-	RTS                              ; Return
-
-; ===========================================================================
-; Character Status Icon Animation
-; ===========================================================================
-; Purpose: Animate status icons for inactive/KO'd characters
-; Input: X = OAM offset for character slot
-; ===========================================================================
-
-CODE_008A2A:
-	; TODO: Document status icon animation logic
-	; Cycles through animation frames for defeated/inactive characters
-	RTS
+	; Process status effect bits (lower nibble only)
+	LDA.B #$0F                  ; Mask for lower nibble
+	TRB.B $2E                   ; Clear lower nibble in $2E
+	JSR.W CODE_009245           ; OR next buffer values (X++)
+	AND.B #$0F                  ; Keep only lower nibble
+	TSB.B $2E                   ; Set bits in $2E
+	
+	; Clear specific status bits and update base stats
+	LDA.B $3B                   ; A = flags 2
+	TRB.B $21                   ; Clear those bits in $21
+	
+	; Update base stats with deltas (with carry from earlier CLC)
+	LDA.B $2A                   ; A = stat 1
+	ADC.B $26                   ; Add delta 1
+	STA.B $22                   ; Store to base stat 1
+	LDA.B $2B                   ; A = stat 2
+	ADC.B $27                   ; Add delta 2
+	STA.B $23                   ; Store to base stat 2
+	LDA.B $2C                   ; A = stat 3
+	ADC.B $28                   ; Add delta 3
+	STA.B $24                   ; Store to base stat 3
+	LDA.B $2D                   ; A = stat 4
+	ADC.B $29                   ; Add delta 4
+	STA.B $25                   ; Store to base stat 4
+	
+	PLB                         ; Restore data bank
+	PLD                         ; Restore direct page
+	PLP                         ; Restore processor status
+	RTS                         ; Return
 
 ; ===========================================================================
-; Input Handler Jump Table
+; Bitwise OR Stat Calculation Helper
+; ===========================================================================
+; Purpose: Calculates bitwise OR of a stat value across 4 buffers
+; Input: X = buffer offset (auto-incremented)
+; Output: A = result of ORing all 4 buffer values
+; Technical Details:
+;   - Used for flag-based stats where any bit set in any buffer should be set
+;   - Buffers: $3679, $3689, $3699, $36A9 (delta buffers 1-4)
+;   - Increments X for next stat
 ; ===========================================================================
 
-CODE_008A35:
-	; TODO: Document input handler addresses
-	; Table of function pointers for different game modes
-	dw Input_Handler_Field
-	dw Input_Handler_Battle
-	dw Input_Handler_Menu
-	; ... more handlers
+CODE_009245:
+	LDA.W $3679,X               ; A = delta buffer 1 value
+	ORA.W $3689,X               ; OR with delta buffer 2
+	ORA.W $3699,X               ; OR with delta buffer 3
+	ORA.W $36A9,X               ; OR with delta buffer 4
+	INX                         ; Increment offset to next stat
+	RTS                         ; Return with result in A
 
 ; ===========================================================================
-; VBlank Main Handler
+; Additive Stat Calculation Helper
 ; ===========================================================================
-; Purpose: Main VBlank routine that processes display updates
-; Technical Details: Called every frame during VBlank period
-; Side Effects: Updates VRAM, OAM, palettes based on flags
+; Purpose: Calculates sum of a stat value across all 5 buffers
+; Input: X = buffer offset (auto-incremented)
+; Output: A = sum of all 5 buffer values (with carry)
+; Technical Details:
+;   - Used for numeric stats that accumulate (HP, MP, Attack, Defense, etc.)
+;   - Buffers: $3669 (base), $3679, $3689, $3699, $36A9 (deltas 1-4)
+;   - Assumes carry flag is in appropriate state for multi-byte addition
+;   - Increments X for next stat
 ; ===========================================================================
 
-VBlank_Main_Handler:
-	SEP #$20                         ; 8-bit A
+CODE_009253:
+	LDA.W $3669,X               ; A = base buffer value
+	ADC.W $3679,X               ; Add delta buffer 1 (with carry)
+	ADC.W $3689,X               ; Add delta buffer 2
+	ADC.W $3699,X               ; Add delta buffer 3
+	ADC.W $36A9,X               ; Add delta buffer 4
+	INX                         ; Increment offset to next stat
+	RTS                         ; Return with result in A
+
+; ===========================================================================
+; Animation Update Handler
+; ===========================================================================
+; Purpose: Conditionally update animations based on timing and game state
+; Technical Details:
+;   - Checks bit 5 ($20) of $00D9 as update gate
+;   - Only processes animations when bit is clear
+;   - Sets bit after processing to prevent multiple updates per frame
+; Side Effects: May modify $00D9, calls CODE_009273
+; ===========================================================================
+
+CODE_009264:
+	SEP #$30                    ; 8-bit A/X/Y
+	LDA.B #$20                  ; Bit 5 mask
+	AND.W $00D9                 ; Check animation update flag
+	BNE Skip_Animation          ; If set, skip this frame
+	JSR.W CODE_009273           ; Process animation updates
+
+Skip_Animation:
+	REP #$30                    ; 16-bit A/X/Y
+	RTS                         ; Return
+
+; ===========================================================================
+; Animation Update System
+; ===========================================================================
+; Purpose: Main animation update routine with queue processing
+; Technical Details:
+;   - Sets bit 5 of $00D9 to indicate animation processing
+;   - Uses Direct Page $0500 for animation control structures
+;   - Processes up to 3 queued animations ($00, $05, $0A slots)
+;   - Checks bit 2 ($04) of $00E2 to gate certain animations
+; Queue Structure (Direct Page $0500):
+;   - $00: Animation type/ID (slot 1)
+;   - $01-$03: Animation parameters (slot 1)
+;   - $05: Animation type/ID (slot 2)
+;   - $06-$08: Animation parameters (slot 2)
+;   - $0A: Animation type/ID (slot 3)
+;   - $0C-$0E: Animation parameters (slot 3)
+; Animation Types:
+;   - $FF = empty slot
+;   - $01 = Type 1 animation (uses $0601 parameter)
+;   - $02 = Type 2 animation (uses $0601 parameter)
+;   - $10-$1F = Range-based type (gated by $00E2 bit 2)
+;   - Other values processed based on range checks
+; ===========================================================================
+
+CODE_009273:
+	REP #$10                    ; 16-bit X/Y
+	LDA.B #$20                  ; Bit 5 mask
+	TSB.W $00D9                 ; Set animation processing flag
+	PEA.W $0500                 ; Push $0500 to stack
+	PLD                         ; Direct Page = $0500 (animation queue)
+	CLI                         ; Enable interrupts
+	
+	; Process animation slot 1 ($00)
+	LDA.B #$04                  ; Bit 2 mask
+	AND.W $00E2                 ; Check animation gate flag
+	BNE Check_Slot2             ; If set, skip slot 1
+	LDA.B $00                   ; A = animation type (slot 1)
+	BMI Check_Slot2             ; If $FF (empty), skip
+	STA.W $0601                 ; Store animation type to $0601
+	LDX.B $01                   ; X = animation parameter (16-bit)
+	STX.W $0602                 ; Store parameter to $0602
+	LDA.B #$01                  ; Animation command = $01
+	STA.W $0600                 ; Store to animation command register
+	JSL.L CODE_0D8004           ; Call animation processor
+	LDA.B #$FF                  ; Mark slot as empty
+	STA.B $00                   ; Store to slot 1 type
+	LDX.B $03                   ; X = saved parameters
+	STX.B $01                   ; Restore to slot 1
+
+Check_Slot2:
+	; Process animation slot 2 ($05)
+	LDA.B $05                   ; A = animation type (slot 2)
+	BMI Check_Slot3             ; If $FF (empty), skip
+	LDA.B $05                   ; A = animation type (reload)
+	STA.W $0601                 ; Store animation type to $0601
+	LDX.B $06                   ; X = animation parameter (16-bit)
+	STX.W $0602                 ; Store parameter to $0602
+	LDA.B #$02                  ; Animation command = $02
+	STA.W $0600                 ; Store to animation command register
+	JSL.L CODE_0D8004           ; Call animation processor
+	LDA.B #$FF                  ; Mark slot as empty
+	STA.B $05                   ; Store to slot 2 type
+	LDX.B $08                   ; X = saved parameters
+	STX.B $06                   ; Restore to slot 2
+
+Check_Slot3:
+	; Process animation slot 3 ($0A)
+	LDA.B $0A                   ; A = animation type (slot 3)
+	BEQ Animation_Done          ; If $00 (empty), done
+	CMP.B #$02                  ; Compare to $02
+	BEQ Execute_Slot3           ; If exactly $02, execute
+	CMP.B #$10                  ; Compare to $10
+	BCC Check_Gate              ; If < $10, check gate
+	CMP.B #$20                  ; Compare to $20
+	BCC Execute_Slot3           ; If $10-$1F, execute
+
+Check_Gate:
+	LDA.B #$04                  ; Bit 2 mask
+	AND.W $00E2                 ; Check animation gate flag
+	BNE Animation_Done          ; If set, skip slot 3
+
+Execute_Slot3:
+	LDX.B $0A                   ; X = animation type (16-bit load)
+	STX.W $0600                 ; Store to animation command
+	LDX.B $0C                   ; X = animation parameter (16-bit)
+	STX.W $0602                 ; Store parameter to $0602
+	JSL.L CODE_0D8004           ; Call animation processor
+	STZ.B $0A                   ; Clear slot 3 type ($00 = empty)
+
+Animation_Done:
+	SEI                         ; Disable interrupts
+	LDA.B #$20                  ; Bit 5 mask
+	TRB.W $00D9                 ; Clear animation processing flag
+	RTS                         ; Return
 	REP #$10                         ; 16-bit X, Y
 	
 	; Check if text window updates needed
