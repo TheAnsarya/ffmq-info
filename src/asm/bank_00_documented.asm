@@ -5649,55 +5649,380 @@ Skip_Frame_Check:
 Process_Frame:
 	; Frame processing continues...
 	; (Code continues into next section)
-	LDA.W #$0020                     ; Tile value $20
-	STA.L $7F54F4                    ; Store to WRAM buffer
-	LDA.W #$0015                     ; Move $0015 bytes (21 bytes)
-	MVN $7F,$7F                      ; Block move
-	
-Window_Updated:
-	SEP #$20                         ; 8-bit A
 
-Skip_Window_Update:
-	PHK                              ; Push program bank
-	PLB                              ; Pull to data bank (set DB = PB)
-	
-	; Apply HDMA channel enable settings
-	LDA.W $0111                      ; Get HDMA channel mask
-	STA.W SNES_HDMAEN                ; Write to HDMA enable register
-	
-	RTL                              ; Return from VBlank handler
-
-;===============================================================================
-; Progress: ~1,200 lines documented (8.6% of Bank $00)
-; Remaining: ~12,800 lines
-;===============================================================================
 ; ===========================================================================
-; Character Status Animation (continued from earlier sections)
+; Math Helper Routines - Multiplication and Division
 ; ===========================================================================
 
-CODE_008A0B:
-	; Check character slot 5
-	LDA.L $70073F                    ; Check character 5 in party data
-	BNE CODE_008A16                  ; If present, skip animation
-	LDX.B #$80                       ; Animation offset for slot 5
-	JSR.W CODE_008A2A                ; Animate status icon
+; ---------------------------------------------------------------------------
+; 16-bit Multiplication Helper
+; ---------------------------------------------------------------------------
+; Purpose: Multiply two 16-bit values using SNES hardware multiplier
+; Input: A = multiplicand (16-bit), Y = multiplier (16-bit)
+; Output: $9E-$A0 = 32-bit product
+; Technical Details:
+;   - Uses Direct Page $0000 for calculations
+;   - Saves A register ($9C → $A4)
+;   - Performs 16 iterations of shift-and-add
+;   - Result in $9E (low word) and $A0 (high word)
+; ===========================================================================
 
-CODE_008A16:
-	; Check character slot 6
-	LDA.L $70078F                    ; Check character 6 in party data
-	BNE CODE_008A21                  ; If present, skip animation
-	LDX.B #$90                       ; Animation offset for slot 6
-	JSR.W CODE_008A2A                ; Animate status icon
+CODE_0096B3:
+	PHP                         ; Save processor status
+	REP #$30                    ; 16-bit A/X/Y
+	PHD                         ; Save direct page
+	PHA                         ; Save A
+	PHX                         ; Save X
+	PHY                         ; Save Y
+	LDA.W #$0000                ; Direct Page = $0000
+	TCD                         ; Set DP to zero page
+	LDA.B $9C                   ; Load multiplicand from stack
+	STA.B $A4                   ; Store to $A4
+	STZ.B $9E                   ; Clear result low word
+	LDX.W #$0010                ; Loop counter = 16 bits
+	LDY.B $98                   ; Y = multiplier from stack
 
-CODE_008A21:
-	; Set update flag and return
-	LDA.B #$20                       ; Bit 5 flag
-	TSB.W $00D2                      ; Set bit in display flags
+Multiply_Loop:
+	ASL.B $9E                   ; Shift result left (low word)
+	ROL.B $A0                   ; Rotate result (high word)
+	ASL.B $A4                   ; Shift multiplicand left
+	BCC Skip_Add                ; If no carry, skip addition
+	TYA                         ; A = multiplier
+	CLC                         ; Clear carry
+	ADC.B $9E                   ; Add to result low word
+	STA.B $9E                   ; Store back
+	BCC Skip_Add                ; If no carry, continue
+	INC.B $A0                   ; Increment high word
 
-CODE_008A26:
-	REP #$30                         ; 16-bit A, X, Y
-	PLD                              ; Restore direct page
-	RTS                              ; Return
+Skip_Add:
+	DEX                         ; Decrement loop counter
+	BNE Multiply_Loop           ; Loop until done
+	PLY                         ; Restore Y
+	PLX                         ; Restore X
+	PLA                         ; Restore A
+	PLD                         ; Restore direct page
+	PLP                         ; Restore processor status
+	RTL                         ; Return long
+
+; ---------------------------------------------------------------------------
+; 32-bit Division Helper
+; ---------------------------------------------------------------------------
+; Purpose: Divide 32-bit value by 16-bit divisor
+; Input: $9E-$A0 = 32-bit dividend, $9C = 16-bit divisor
+; Output: $9E-$A0 = quotient, $A2 = remainder
+; Technical Details:
+;   - Uses Direct Page $0000 for calculations
+;   - Performs 32 iterations of shift-and-subtract
+;   - Handles division by zero (undefined behavior)
+; ===========================================================================
+
+CODE_0096E4:
+	PHP                         ; Save processor status
+	REP #$30                    ; 16-bit A/X/Y
+	PHD                         ; Save direct page
+	PHA                         ; Save A
+	PHX                         ; Save X
+	LDA.W #$0000                ; Direct Page = $0000
+	TCD                         ; Set DP to zero page
+	LDA.B $98                   ; Load dividend low word
+	STA.B $A4                   ; Store to $A4
+	LDA.B $9A                   ; Load dividend high word
+	STA.B $A6                   ; Store to $A6
+	STZ.B $A2                   ; Clear remainder
+	LDX.W #$0020                ; Loop counter = 32 bits
+
+Divide_Loop:
+	ASL.B $9E                   ; Shift quotient left (low)
+	ROL.B $A0                   ; Rotate quotient (mid)
+	ASL.B $A4                   ; Shift dividend left (low)
+	ROL.B $A6                   ; Rotate dividend (mid)
+	ROL.B $A2                   ; Rotate into remainder
+	LDA.B $A2                   ; A = remainder
+	BCS Division_Subtract       ; If carry set, always subtract
+	SEC                         ; Set carry for subtraction
+	SBC.B $9C                   ; Subtract divisor
+	BCS Store_Remainder         ; If no borrow, store result
+	BRA Skip_Division           ; Skip if borrow
+
+Division_Subtract:
+	SBC.B $9C                   ; Subtract divisor (carry already set)
+
+Store_Remainder:
+	STA.B $A2                   ; Store new remainder
+	INC.B $9E                   ; Set bit in quotient
+
+Skip_Division:
+	DEX                         ; Decrement loop counter
+	BNE Divide_Loop             ; Loop until done
+	PLX                         ; Restore X
+	PLA                         ; Restore A
+	PLD                         ; Restore direct page
+	PLP                         ; Restore processor status
+	RTL                         ; Return long
+
+; ---------------------------------------------------------------------------
+; Hardware Multiply Helper
+; ---------------------------------------------------------------------------
+; Purpose: Store value to SNES hardware multiplier B register
+; Input: A (8-bit) = multiplier B value
+; Output: Hardware multiplier ready for result read
+; Technical Details:
+;   - Writes to WRMPYB ($4203)
+;   - Must have previously written to WRMPYA ($4202)
+;   - Result available in RDMPYL/H ($4216-$4217) after 8 cycles
+; ===========================================================================
+
+CODE_00971E:
+	PHP                         ; Save processor status
+	SEP #$20                    ; 8-bit A
+	STA.W SNES_WRMPYB           ; Write to multiplier B register
+	PLP                         ; Restore processor status
+	RTL                         ; Return long
+
+; ---------------------------------------------------------------------------
+; Hardware Divide Helper
+; ---------------------------------------------------------------------------
+; Purpose: Perform hardware division using SNES divider
+; Input: A (16-bit) = dividend, after XBA = divisor (8-bit high byte)
+; Output: Result in RDDIVL/H ($4214-$4215), remainder in RDMPYL/H
+; Technical Details:
+;   - Writes to WRDIVB ($4206)
+;   - XBA twice creates delay for result to be ready
+;   - Division takes 16 cycles to complete
+; ===========================================================================
+
+CODE_009726:
+	PHP                         ; Save processor status
+	SEP #$20                    ; 8-bit A
+	STA.W SNES_WRDIVB           ; Write divisor to hardware
+	XBA                         ; Swap A bytes (delay)
+	XBA                         ; Swap back (delay)
+	PLP                         ; Restore processor status
+	RTL                         ; Return long
+
+; ---------------------------------------------------------------------------
+; Find First Set Bit (Count Leading Zeros)
+; ---------------------------------------------------------------------------
+; Purpose: Find position of first set bit in 16-bit value
+; Input: A (16-bit) = value to test
+; Output: A (16-bit) = bit position (0-15), or $FFFF if no bits set
+; Technical Details:
+;   - Counts from LSB (bit 0) upward
+;   - Returns position of first 1 bit found
+;   - Returns $FFFF if input is $0000
+; ===========================================================================
+
+CODE_009730:
+	PHP                         ; Save processor status
+	REP #$30                    ; 16-bit A/X/Y
+	PHX                         ; Save X
+	LDX.W #$FFFF                ; X = -1 (initial position)
+
+Count_Bits:
+	INX                         ; Increment position
+	LSR A                       ; Shift right, test bit 0
+	BCC Count_Bits              ; If clear, continue
+	TXA                         ; A = bit position
+	PLX                         ; Restore X
+	PLP                         ; Restore processor status
+	RTL                         ; Return long
+
+; ===========================================================================
+; Bit Manipulation Helpers
+; ===========================================================================
+
+; ---------------------------------------------------------------------------
+; Set Bits (TSB - Test and Set Bits)
+; ---------------------------------------------------------------------------
+; Purpose: Set bits in memory using TSB operation
+; Input: A = bit mask, $00+DP = target address
+; Output: Target memory has bits set, Z flag reflects test
+; Technical Details:
+;   - Calls CODE_0097DA to calculate bit position
+;   - Uses TSB instruction at Direct Page $00
+; ===========================================================================
+
+CODE_00974E:
+	JSR.W CODE_0097DA           ; Calculate bit position/mask
+	TSB.B $00                   ; Test and set bits
+	RTL                         ; Return long
+
+; ---------------------------------------------------------------------------
+; Clear Bits (TRB - Test and Reset Bits)
+; ---------------------------------------------------------------------------
+; Purpose: Clear bits in memory using TRB operation
+; Input: A = bit mask, $00+DP = target address
+; Output: Target memory has bits cleared, Z flag reflects test
+; Technical Details:
+;   - Calls CODE_0097DA to calculate bit position
+;   - Uses TRB instruction at Direct Page $00
+; ===========================================================================
+
+CODE_009754:
+	JSR.W CODE_0097DA           ; Calculate bit position/mask
+	TRB.B $00                   ; Test and reset bits
+	RTL                         ; Return long
+
+; ---------------------------------------------------------------------------
+; Test Bits (AND operation)
+; ---------------------------------------------------------------------------
+; Purpose: Test bits in memory without modification
+; Input: A = bit mask, $00+DP = target address
+; Output: A = result of AND operation, Z/N flags set
+; Technical Details:
+;   - Calls CODE_0097DA to calculate bit position
+;   - Uses AND instruction to test bits
+; ===========================================================================
+
+CODE_00975A:
+	JSR.W CODE_0097DA           ; Calculate bit position/mask
+	AND.B $00                   ; Test bits
+	RTL                         ; Return long
+
+; ---------------------------------------------------------------------------
+; Set Bits with DP $0EA8
+; ---------------------------------------------------------------------------
+; Purpose: Set bits in $0EA8+offset using TSB
+; Input: A = bit mask (offset in low byte)
+; Output: Bits set in target location
+; ===========================================================================
+
+CODE_009760:
+	PHD                         ; Save direct page
+	PEA.W $0EA8                 ; Push $0EA8
+	PLD                         ; Direct Page = $0EA8
+	JSL.L CODE_00974E           ; Set bits via TSB
+	PLD                         ; Restore direct page
+	RTL                         ; Return long
+
+; ---------------------------------------------------------------------------
+; Clear Bits with DP $0EA8
+; ---------------------------------------------------------------------------
+; Purpose: Clear bits in $0EA8+offset using TRB
+; Input: A = bit mask (offset in low byte)
+; Output: Bits cleared in target location
+; ===========================================================================
+
+CODE_00976B:
+	PHD                         ; Save direct page
+	PEA.W $0EA8                 ; Push $0EA8
+	PLD                         ; Direct Page = $0EA8
+	JSL.L CODE_009754           ; Clear bits via TRB
+	PLD                         ; Restore direct page
+	RTL                         ; Return long
+
+; ---------------------------------------------------------------------------
+; Test Bits with DP $0EA8
+; ---------------------------------------------------------------------------
+; Purpose: Test bits in $0EA8+offset
+; Input: A = bit mask (offset in low byte)
+; Output: A = result of test, Z/N flags set
+; ===========================================================================
+
+CODE_009776:
+	PHD                         ; Save direct page
+	PEA.W $0EA8                 ; Push $0EA8
+	PLD                         ; Direct Page = $0EA8
+	JSL.L CODE_00975A           ; Test bits via AND
+	PLD                         ; Restore direct page
+	INC A                       ; Set flags based on result
+	DEC A                       ; (INC/DEC preserves value, updates flags)
+	RTL                         ; Return long
+
+; ---------------------------------------------------------------------------
+; Random Number Generator
+; ---------------------------------------------------------------------------
+; Purpose: Generate pseudo-random number using linear congruential generator
+; Output: $A9 (at DP $005E) = random byte, $701FFE updated
+; Technical Details:
+;   - Uses formula: seed = seed * 5 + $3711 + frame_counter
+;   - Seed stored at $701FFE (16-bit)
+;   - Uses $0E96 (frame counter) for additional entropy
+;   - Applies modulo $A8 (stored in $A8 at DP $005E)
+; ===========================================================================
+
+CODE_009783:
+	PHP                         ; Save processor status
+	PHD                         ; Save direct page
+	REP #$30                    ; 16-bit A/X/Y
+	PHA                         ; Save A
+	LDA.W #$005E                ; Direct Page = $005E
+	TCD                         ; Set DP
+	LDA.L $701FFE               ; Load current seed
+	ASL A                       ; Multiply by 2
+	ASL A                       ; Multiply by 4
+	ADC.L $701FFE               ; Add original (now *5)
+	ADC.W #$3711                ; Add constant
+	ADC.W $0E96                 ; Add frame counter
+	STA.L $701FFE               ; Store new seed
+	SEP #$20                    ; 8-bit A
+	XBA                         ; Get high byte
+	STA.B $4B                   ; Store to $A9 (DP $005E + $4B)
+	STA.W SNES_WRDIVL           ; Write to divider (low byte)
+	STZ.W SNES_WRDIVH           ; Clear divider (high byte)
+	LDA.B $4A                   ; Load modulo value from $A8
+	BEQ Random_Done             ; If zero, skip modulo
+	JSL.L CODE_009726           ; Perform division
+	LDA.W SNES_RDMPYL           ; Read remainder (result of modulo)
+	STA.B $4B                   ; Store to $A9
+
+Random_Done:
+	REP #$30                    ; 16-bit A/X/Y
+	PLA                         ; Restore A
+	PLD                         ; Restore direct page
+	PLP                         ; Restore processor status
+	RTL                         ; Return long
+
+; ---------------------------------------------------------------------------
+; Bit Position to Mask Conversion Table
+; ---------------------------------------------------------------------------
+; Purpose: Convert bit position (0-7) to bit mask
+; Input: A (after processing) = bit position * 2 (for word indexing)
+; Output: A = bit mask ($0001, $0002, $0004...$0080, $0100...$8000)
+; ===========================================================================
+
+CODE_0097F2:
+	PHX                         ; Save X
+	ASL A                       ; Multiply by 2 for word table
+	TAX                         ; X = index
+	LDA.L DATA8_0097FB,X        ; Load bit mask from table
+	PLX                         ; Restore X
+	RTS                         ; Return
+
+DATA8_0097FB:
+	dw $0001, $0002, $0004, $0008, $0010, $0020, $0040, $0080
+	dw $0100, $0200, $0400, $0800, $1000, $2000, $4000, $8000
+
+; ---------------------------------------------------------------------------
+; Bit Position Calculator
+; ---------------------------------------------------------------------------
+; Purpose: Calculate Direct Page offset and bit mask from bit position
+; Input: A (8-bit) = absolute bit position (0-255)
+; Output: DP adjusted to byte containing bit, A = bit number (0-7) inverted
+; Technical Details:
+;   - Divides bit position by 8 to get byte offset
+;   - Adds offset to current Direct Page
+;   - Returns bit position within byte (inverted: 7-0)
+; ===========================================================================
+
+CODE_0097DA:
+	PHP                         ; Save processor status
+	REP #$30                    ; 16-bit A/X/Y
+	AND.W #$00FF                ; Mask to 8-bit value
+	PHA                         ; Save bit position
+	LSR A                       ; Divide by 2
+	LSR A                       ; Divide by 4
+	LSR A                       ; Divide by 8 (byte offset)
+	PHD                         ; Save current DP
+	CLC                         ; Clear carry
+	ADC.B $01,S                 ; Add to saved DP
+	TCD                         ; Set new DP
+	PLA                         ; Discard saved DP
+	PLA                         ; Restore bit position
+	AND.W #$0007                ; Mask to bit number (0-7)
+	EOR.W #$0007                ; Invert bit position
+	PLP                         ; Restore processor status
+	; Returns with A = inverted bit position (for bit mask lookup)
 
 ; ===========================================================================
 ; Animate Status Icon
