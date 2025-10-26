@@ -1,0 +1,5409 @@
+{
+  "bank": "$06",
+  "description": "Map tilemap and collision data",
+  "metatile_format": "16x16 pixels (4x 8x8 tiles): [TL, TR, BL, BR]",
+  "metatile_sets": {
+    "set_1_overworld": {
+      "start_address": "$068000",
+      "count": 128,
+      "metatiles": [
+        {
+          "id": 0,
+          "tiles": {
+            "top_left": 76,
+            "top_right": 44,
+            "bottom_left": 128,
+            "bottom_right": 234
+          },
+          "description": "Special graphics"
+        },
+        {
+          "id": 1,
+          "tiles": {
+            "top_left": 76,
+            "top_right": 71,
+            "bottom_left": 129,
+            "bottom_right": 234
+          },
+          "description": "Special graphics"
+        },
+        {
+          "id": 2,
+          "tiles": {
+            "top_left": 135,
+            "top_right": 134,
+            "bottom_left": 172,
+            "bottom_right": 161
+          },
+          "description": "Unknown pattern"
+        },
+        {
+          "id": 3,
+          "tiles": {
+            "top_left": 120,
+            "top_right": 157,
+            "bottom_left": 70,
+            "bottom_right": 161
+          },
+          "description": "Special graphics"
+        },
+        {
+          "id": 4,
+          "tiles": {
+            "top_left": 120,
+            "top_right": 161,
+            "bottom_left": 146,
+            "bottom_right": 161
+          },
+          "description": "Unknown pattern"
+        },
+        {
+          "id": 5,
+          "tiles": {
+            "top_left": 0,
+            "top_right": 2,
+            "bottom_left": 0,
+            "bottom_right": 44
+          },
+          "description": "Ground/floor pattern"
+        },
+        {
+          "id": 6,
+          "tiles": {
+            "top_left": 0,
+            "top_right": 72,
+            "bottom_left": 0,
+            "bottom_right": 27
+          },
+          "description": "Ground/floor pattern"
+        },
+        {
+          "id": 7,
+          "tiles": {
+            "top_left": 128,
+            "top_right": 26,
+            "bottom_left": 0,
+            "bottom_right": 26
+          },
+          "description": "Wall/building pattern"
+        },
+        {
+          "id": 8,
+          "tiles": {
+            "top_left": 174,
+            "top_right": 189,
+            "bottom_left": 255,
+            "bottom_right": 189
+          },
+          "description": "Unknown pattern"
+        },
+        {
+          "id": 9,
+          "tiles": {
+            "top_left": 53,
+            "top_right": 190,
+            "bottom_left": 125,
+            "bottom_right": 190
+          },
+          "description": "Unknown pattern"
+        },
+        {
+          "id": 10,
+          "tiles": {
+            "top_left": 89,
+            "top_right": 190,
+            "bottom_left": 161,
+            "bottom_right": 190
+          },
+          "description": "Unknown pattern"
+        },
+        {
+          "id": 11,
+          "tiles": {
+            "top_left": 139,
+            "top_right": 11,
+            "bottom_left": 8,
+            "bottom_right": 194
+          },
+          "description": "Object/furniture"
+        },
+        {
+          "id": 12,
+          "tiles": {
+            "top_left": 32,
+            "top_right": 194,
+            "bottom_left": 16,
+            "bottom_right": 72
+          },
+          "description": "Object/furniture"
+        },
+        {
+          "id": 13,
+          "tiles": {
+            "top_left": 218,
+            "top_right": 90,
+            "bottom_left": 226,
+            "bottom_right": 32
+          },
+          "description": "Unknown pattern"
+        },
+        {
+          "id": 14,
+          "tiles": {
+            "top_left": 169,
+            "top_right": 0,
+            "bottom_left": 72,
+            "bottom_right": 171
+          },
+          "description": "Special graphics"
+        },
+        {
+          "id": 15,
+          "tiles": {
+            "top_left": 162,
+            "top_right": 0,
+            "bottom_left": 6,
+            "bottom_right": 218
+          },
+          "description": "Special graphics"
+        },
+        {
+          "id": 16,
+          "tiles": {
+            "top_left": 43,
+            "top_right": 162,
+            "bottom_left": 170,
+            "bottom_right": 187
+          },
+          "description": "Unknown pattern"
+        },
+        {
+          "id": 17,
+          "tiles": {
+            "top_left": 236,
+            "top_right": 64,
+            "bottom_left": 33,
+            "bottom_right": 240
+          },
+          "description": "Unknown pattern"
+        },
+        {
+          "id": 18,
+          "tiles": {
+            "top_left": 46,
+            "top_right": 164,
+            "bottom_left": 248,
+            "bottom_right": 240
+          },
+          "description": "Unknown pattern"
+        },
+        {
+          "id": 19,
+          "tiles": {
+            "top_left": 42,
+            "top_right": 196,
+            "bottom_left": 72,
+            "bottom_right": 208
+          },
+          "description": "Unknown pattern"
+        },
+        {
+          "id": 20,
+          "tiles": {
+            "top_left": 38,
+            "top_right": 169,
+            "bottom_left": 240,
+            "bottom_right": 197
+          },
+          "description": "Unknown pattern"
+        },
+        {
+          "id": 21,
+          "tiles": {
+            "top_left": 0,
+            "top_right": 208,
+            "bottom_left": 32,
+            "bottom_right": 169
+          },
+          "description": "Special graphics"
+        },
+        {
+          "id": 22,
+          "tiles": {
+            "top_left": 8,
+            "top_right": 141,
+            "bottom_left": 65,
+            "bottom_right": 33
+          },
+          "description": "Wall/building pattern"
+        },
+        {
+          "id": 23,
+          "tiles": {
+            "top_left": 169,
+            "top_right": 0,
+            "bottom_left": 141,
+            "bottom_right": 64
+          },
+          "description": "Object/furniture"
+        },
+        {
+          "id": 24,
+          "tiles": {
+            "top_left": 33,
+            "top_right": 162,
+            "bottom_left": 248,
+            "bottom_right": 0
+          },
+          "description": "Special graphics"
+        },
+        {
+          "id": 25,
+          "tiles": {
+            "top_left": 157,
+            "top_right": 255,
+            "bottom_left": 5,
+            "bottom_right": 202
+          },
+          "description": "Unknown pattern"
+        },
+        {
+          "id": 26,
+          "tiles": {
+            "top_left": 208,
+            "top_right": 250,
+            "bottom_left": 132,
+            "bottom_right": 72
+          },
+          "description": "Unknown pattern"
+        },
+        {
+          "id": 27,
+          "tiles": {
+            "top_left": 169,
+            "top_right": 255,
+            "bottom_left": 133,
+            "bottom_right": 5
+          },
+          "description": "Unknown pattern"
+        },
+        {
+          "id": 28,
+          "tiles": {
+            "top_left": 169,
+            "top_right": 240,
+            "bottom_left": 133,
+            "bottom_right": 0
+          },
+          "description": "Unknown pattern"
+        },
+        {
+          "id": 29,
+          "tiles": {
+            "top_left": 76,
+            "top_right": 92,
+            "bottom_left": 129,
+            "bottom_right": 236
+          },
+          "description": "Unknown pattern"
+        },
+        {
+          "id": 30,
+          "tiles": {
+            "top_left": 64,
+            "top_right": 33,
+            "bottom_left": 208,
+            "bottom_right": 251
+          },
+          "description": "Unknown pattern"
+        },
+        {
+          "id": 31,
+          "tiles": {
+            "top_left": 162,
+            "top_right": 0,
+            "bottom_left": 0,
+            "bottom_right": 175
+          },
+          "description": "Object/furniture"
+        },
+        {
+          "id": 32,
+          "tiles": {
+            "top_left": 20,
+            "top_right": 128,
+            "bottom_left": 13,
+            "bottom_right": 141
+          },
+          "description": "Object/furniture"
+        },
+        {
+          "id": 33,
+          "tiles": {
+            "top_left": 66,
+            "top_right": 33,
+            "bottom_left": 175,
+            "bottom_right": 21
+          },
+          "description": "Object/furniture"
+        },
+        {
+          "id": 34,
+          "tiles": {
+            "top_left": 128,
+            "top_right": 13,
+            "bottom_left": 141,
+            "bottom_right": 67
+          },
+          "description": "Object/furniture"
+        },
+        {
+          "id": 35,
+          "tiles": {
+            "top_left": 33,
+            "top_right": 169,
+            "bottom_left": 1,
+            "bottom_right": 141
+          },
+          "description": "Object/furniture"
+        },
+        {
+          "id": 36,
+          "tiles": {
+            "top_left": 65,
+            "top_right": 33,
+            "bottom_left": 169,
+            "bottom_right": 204
+          },
+          "description": "Special graphics"
+        },
+        {
+          "id": 37,
+          "tiles": {
+            "top_left": 141,
+            "top_right": 64,
+            "bottom_left": 33,
+            "bottom_right": 205
+          },
+          "description": "Special graphics"
+        },
+        {
+          "id": 38,
+          "tiles": {
+            "top_left": 64,
+            "top_right": 33,
+            "bottom_left": 208,
+            "bottom_right": 251
+          },
+          "description": "Unknown pattern"
+        },
+        {
+          "id": 39,
+          "tiles": {
+            "top_left": 169,
+            "top_right": 0,
+            "bottom_left": 235,
+            "bottom_right": 191
+          },
+          "description": "Unknown pattern"
+        },
+        {
+          "id": 40,
+          "tiles": {
+            "top_left": 8,
+            "top_right": 128,
+            "bottom_left": 13,
+            "bottom_right": 133
+          },
+          "description": "Object/furniture"
+        },
+        {
+          "id": 41,
+          "tiles": {
+            "top_left": 20,
+            "top_right": 191,
+            "bottom_left": 9,
+            "bottom_right": 128
+          },
+          "description": "Object/furniture"
+        },
+        {
+          "id": 42,
+          "tiles": {
+            "top_left": 13,
+            "top_right": 133,
+            "bottom_left": 21,
+            "bottom_right": 169
+          },
+          "description": "Object/furniture"
+        },
+        {
+          "id": 43,
+          "tiles": {
+            "top_left": 13,
+            "top_right": 133,
+            "bottom_left": 22,
+            "bottom_right": 160
+          },
+          "description": "Object/furniture"
+        },
+        {
+          "id": 44,
+          "tiles": {
+            "top_left": 0,
+            "top_right": 0,
+            "bottom_left": 183,
+            "bottom_right": 20
+          },
+          "description": "Wall/building pattern"
+        },
+        {
+          "id": 45,
+          "tiles": {
+            "top_left": 24,
+            "top_right": 105,
+            "bottom_left": 2,
+            "bottom_right": 133
+          },
+          "description": "Object/furniture"
+        },
+        {
+          "id": 46,
+          "tiles": {
+            "top_left": 16,
+            "top_right": 200,
+            "bottom_left": 183,
+            "bottom_right": 20
+          },
+          "description": "Special graphics"
+        },
+        {
+          "id": 47,
+          "tiles": {
+            "top_left": 105,
+            "top_right": 0,
+            "bottom_left": 133,
+            "bottom_right": 17
+          },
+          "description": "Wall/building pattern"
+        },
+        {
+          "id": 48,
+          "tiles": {
+            "top_left": 200,
+            "top_right": 183,
+            "bottom_left": 20,
+            "bottom_right": 141
+          },
+          "description": "Unknown pattern"
+        },
+        {
+          "id": 49,
+          "tiles": {
+            "top_left": 65,
+            "top_right": 33,
+            "bottom_left": 235,
+            "bottom_right": 141
+          },
+          "description": "Special graphics"
+        },
+        {
+          "id": 50,
+          "tiles": {
+            "top_left": 64,
+            "top_right": 33,
+            "bottom_left": 205,
+            "bottom_right": 64
+          },
+          "description": "Object/furniture"
+        },
+        {
+          "id": 51,
+          "tiles": {
+            "top_left": 33,
+            "top_right": 208,
+            "bottom_left": 251,
+            "bottom_right": 26
+          },
+          "description": "Unknown pattern"
+        },
+        {
+          "id": 52,
+          "tiles": {
+            "top_left": 235,
+            "top_right": 200,
+            "bottom_left": 196,
+            "bottom_right": 16
+          },
+          "description": "Unknown pattern"
+        },
+        {
+          "id": 53,
+          "tiles": {
+            "top_left": 208,
+            "top_right": 235,
+            "bottom_left": 235,
+            "bottom_right": 26
+          },
+          "description": "Unknown pattern"
+        },
+        {
+          "id": 54,
+          "tiles": {
+            "top_left": 26,
+            "top_right": 26,
+            "bottom_left": 208,
+            "bottom_right": 1
+          },
+          "description": "Object/furniture"
+        },
+        {
+          "id": 55,
+          "tiles": {
+            "top_left": 26,
+            "top_right": 232,
+            "bottom_left": 232,
+            "bottom_right": 224
+          },
+          "description": "Unknown pattern"
+        },
+        {
+          "id": 56,
+          "tiles": {
+            "top_left": 12,
+            "top_right": 0,
+            "bottom_left": 240,
+            "bottom_right": 29
+          },
+          "description": "Object/furniture"
+        },
+        {
+          "id": 57,
+          "tiles": {
+            "top_left": 235,
+            "top_right": 191,
+            "bottom_left": 20,
+            "bottom_right": 128
+          },
+          "description": "Unknown pattern"
+        },
+        {
+          "id": 58,
+          "tiles": {
+            "top_left": 13,
+            "top_right": 141,
+            "bottom_left": 66,
+            "bottom_right": 33
+          },
+          "description": "Wall/building pattern"
+        },
+        {
+          "id": 59,
+          "tiles": {
+            "top_left": 191,
+            "top_right": 21,
+            "bottom_left": 128,
+            "bottom_right": 13
+          },
+          "description": "Object/furniture"
+        },
+        {
+          "id": 60,
+          "tiles": {
+            "top_left": 141,
+            "top_right": 67,
+            "bottom_left": 33,
+            "bottom_right": 235
+          },
+          "description": "Special graphics"
+        },
+        {
+          "id": 61,
+          "tiles": {
+            "top_left": 141,
+            "top_right": 65,
+            "bottom_left": 33,
+            "bottom_right": 141
+          },
+          "description": "Object/furniture"
+        },
+        {
+          "id": 62,
+          "tiles": {
+            "top_left": 64,
+            "top_right": 33,
+            "bottom_left": 205,
+            "bottom_right": 64
+          },
+          "description": "Object/furniture"
+        },
+        {
+          "id": 63,
+          "tiles": {
+            "top_left": 33,
+            "top_right": 208,
+            "bottom_left": 251,
+            "bottom_right": 128
+          },
+          "description": "Unknown pattern"
+        },
+        {
+          "id": 64,
+          "tiles": {
+            "top_left": 155,
+            "top_right": 160,
+            "bottom_left": 0,
+            "bottom_right": 2
+          },
+          "description": "Object/furniture"
+        },
+        {
+          "id": 65,
+          "tiles": {
+            "top_left": 140,
+            "top_right": 66,
+            "bottom_left": 33,
+            "bottom_right": 235
+          },
+          "description": "Special graphics"
+        },
+        {
+          "id": 66,
+          "tiles": {
+            "top_left": 169,
+            "top_right": 0,
+            "bottom_left": 141,
+            "bottom_right": 65
+          },
+          "description": "Object/furniture"
+        },
+        {
+          "id": 67,
+          "tiles": {
+            "top_left": 33,
+            "top_right": 235,
+            "bottom_left": 141,
+            "bottom_right": 64
+          },
+          "description": "Special graphics"
+        },
+        {
+          "id": 68,
+          "tiles": {
+            "top_left": 33,
+            "top_right": 205,
+            "bottom_left": 64,
+            "bottom_right": 33
+          },
+          "description": "Object/furniture"
+        },
+        {
+          "id": 69,
+          "tiles": {
+            "top_left": 208,
+            "top_right": 251,
+            "bottom_left": 235,
+            "bottom_right": 141
+          },
+          "description": "Unknown pattern"
+        },
+        {
+          "id": 70,
+          "tiles": {
+            "top_left": 64,
+            "top_right": 33,
+            "bottom_left": 162,
+            "bottom_right": 0
+          },
+          "description": "Object/furniture"
+        },
+        {
+          "id": 71,
+          "tiles": {
+            "top_left": 1,
+            "top_right": 157,
+            "bottom_left": 255,
+            "bottom_right": 5
+          },
+          "description": "Special graphics"
+        },
+        {
+          "id": 72,
+          "tiles": {
+            "top_left": 202,
+            "top_right": 208,
+            "bottom_left": 250,
+            "bottom_right": 169
+          },
+          "description": "Unknown pattern"
+        },
+        {
+          "id": 73,
+          "tiles": {
+            "top_left": 255,
+            "top_right": 133,
+            "bottom_left": 5,
+            "bottom_right": 194
+          },
+          "description": "Unknown pattern"
+        },
+        {
+          "id": 74,
+          "tiles": {
+            "top_left": 32,
+            "top_right": 175,
+            "bottom_left": 120,
+            "bottom_right": 157
+          },
+          "description": "Special graphics"
+        },
+        {
+          "id": 75,
+          "tiles": {
+            "top_left": 13,
+            "top_right": 24,
+            "bottom_left": 105,
+            "bottom_right": 0
+          },
+          "description": "Wall/building pattern"
+        },
+        {
+          "id": 76,
+          "tiles": {
+            "top_left": 72,
+            "top_right": 133,
+            "bottom_left": 248,
+            "bottom_right": 133
+          },
+          "description": "Unknown pattern"
+        },
+        {
+          "id": 77,
+          "tiles": {
+            "top_left": 72,
+            "top_right": 162,
+            "bottom_left": 0,
+            "bottom_right": 8
+          },
+          "description": "Wall/building pattern"
+        },
+        {
+          "id": 78,
+          "tiles": {
+            "top_left": 202,
+            "top_right": 208,
+            "bottom_left": 253,
+            "bottom_right": 226
+          },
+          "description": "Unknown pattern"
+        },
+        {
+          "id": 79,
+          "tiles": {
+            "top_left": 32,
+            "top_right": 169,
+            "bottom_left": 128,
+            "bottom_right": 133
+          },
+          "description": "Special graphics"
+        },
+        {
+          "id": 80,
+          "tiles": {
+            "top_left": 250,
+            "top_right": 169,
+            "bottom_left": 13,
+            "bottom_right": 133
+          },
+          "description": "Unknown pattern"
+        },
+        {
+          "id": 81,
+          "tiles": {
+            "top_left": 251,
+            "top_right": 128,
+            "bottom_left": 49,
+            "bottom_right": 139
+          },
+          "description": "Unknown pattern"
+        },
+        {
+          "id": 82,
+          "tiles": {
+            "top_left": 11,
+            "top_right": 8,
+            "bottom_left": 194,
+            "bottom_right": 32
+          },
+          "description": "Wall/building pattern"
+        },
+        {
+          "id": 83,
+          "tiles": {
+            "top_left": 194,
+            "top_right": 16,
+            "bottom_left": 72,
+            "bottom_right": 218
+          },
+          "description": "Special graphics"
+        },
+        {
+          "id": 84,
+          "tiles": {
+            "top_left": 90,
+            "top_right": 226,
+            "bottom_left": 32,
+            "bottom_right": 169
+          },
+          "description": "Unknown pattern"
+        },
+        {
+          "id": 85,
+          "tiles": {
+            "top_left": 0,
+            "top_right": 72,
+            "bottom_left": 171,
+            "bottom_right": 162
+          },
+          "description": "Special graphics"
+        },
+        {
+          "id": 86,
+          "tiles": {
+            "top_left": 0,
+            "top_right": 6,
+            "bottom_left": 218,
+            "bottom_right": 43
+          },
+          "description": "Object/furniture"
+        },
+        {
+          "id": 87,
+          "tiles": {
+            "top_left": 226,
+            "top_right": 32,
+            "bottom_left": 165,
+            "bottom_right": 0
+          },
+          "description": "Special graphics"
+        },
+        {
+          "id": 88,
+          "tiles": {
+            "top_left": 100,
+            "top_right": 0,
+            "bottom_left": 240,
+            "bottom_right": 20
+          },
+          "description": "Object/furniture"
+        },
+        {
+          "id": 89,
+          "tiles": {
+            "top_left": 48,
+            "top_right": 12,
+            "bottom_left": 201,
+            "bottom_right": 1
+          },
+          "description": "Object/furniture"
+        },
+        {
+          "id": 90,
+          "tiles": {
+            "top_left": 240,
+            "top_right": 25,
+            "bottom_left": 201,
+            "bottom_right": 3
+          },
+          "description": "Special graphics"
+        },
+        {
+          "id": 91,
+          "tiles": {
+            "top_left": 240,
+            "top_right": 21,
+            "bottom_left": 201,
+            "bottom_right": 112
+          },
+          "description": "Unknown pattern"
+        },
+        {
+          "id": 92,
+          "tiles": {
+            "top_left": 176,
+            "top_right": 3,
+            "bottom_left": 76,
+            "bottom_right": 186
+          },
+          "description": "Special graphics"
+        },
+        {
+          "id": 93,
+          "tiles": {
+            "top_left": 133,
+            "top_right": 76,
+            "bottom_left": 14,
+            "bottom_right": 134
+          },
+          "description": "Object/furniture"
+        },
+        {
+          "id": 94,
+          "tiles": {
+            "top_left": 194,
+            "top_right": 32,
+            "bottom_left": 194,
+            "bottom_right": 16
+          },
+          "description": "Special graphics"
+        },
+        {
+          "id": 95,
+          "tiles": {
+            "top_left": 122,
+            "top_right": 250,
+            "bottom_left": 104,
+            "bottom_right": 40
+          },
+          "description": "Unknown pattern"
+        },
+        {
+          "id": 96,
+          "tiles": {
+            "top_left": 43,
+            "top_right": 171,
+            "bottom_left": 107,
+            "bottom_right": 226
+          },
+          "description": "Unknown pattern"
+        },
+        {
+          "id": 97,
+          "tiles": {
+            "top_left": 32,
+            "top_right": 235,
+            "bottom_left": 165,
+            "bottom_right": 1
+          },
+          "description": "Special graphics"
+        },
+        {
+          "id": 98,
+          "tiles": {
+            "top_left": 197,
+            "top_right": 5,
+            "bottom_left": 208,
+            "bottom_right": 97
+          },
+          "description": "Special graphics"
+        },
+        {
+          "id": 99,
+          "tiles": {
+            "top_left": 166,
+            "top_right": 2,
+            "bottom_left": 134,
+            "bottom_right": 6
+          },
+          "description": "Object/furniture"
+        },
+        {
+          "id": 100,
+          "tiles": {
+            "top_left": 138,
+            "top_right": 41,
+            "bottom_left": 15,
+            "bottom_right": 141
+          },
+          "description": "Object/furniture"
+        },
+        {
+          "id": 101,
+          "tiles": {
+            "top_left": 65,
+            "top_right": 33,
+            "bottom_left": 169,
+            "bottom_right": 132
+          },
+          "description": "Special graphics"
+        },
+        {
+          "id": 102,
+          "tiles": {
+            "top_left": 205,
+            "top_right": 64,
+            "bottom_left": 33,
+            "bottom_right": 240
+          },
+          "description": "Unknown pattern"
+        },
+        {
+          "id": 103,
+          "tiles": {
+            "top_left": 251,
+            "top_right": 141,
+            "bottom_left": 64,
+            "bottom_right": 33
+          },
+          "description": "Special graphics"
+        },
+        {
+          "id": 104,
+          "tiles": {
+            "top_left": 205,
+            "top_right": 64,
+            "bottom_left": 33,
+            "bottom_right": 208
+          },
+          "description": "Special graphics"
+        },
+        {
+          "id": 105,
+          "tiles": {
+            "top_left": 251,
+            "top_right": 169,
+            "bottom_left": 0,
+            "bottom_right": 141
+          },
+          "description": "Unknown pattern"
+        },
+        {
+          "id": 106,
+          "tiles": {
+            "top_left": 64,
+            "top_right": 33,
+            "bottom_left": 235,
+            "bottom_right": 165
+          },
+          "description": "Special graphics"
+        },
+        {
+          "id": 107,
+          "tiles": {
+            "top_left": 3,
+            "top_right": 74,
+            "bottom_left": 74,
+            "bottom_right": 74
+          },
+          "description": "Wall/building pattern"
+        },
+        {
+          "id": 108,
+          "tiles": {
+            "top_left": 74,
+            "top_right": 141,
+            "bottom_left": 65,
+            "bottom_right": 33
+          },
+          "description": "Object/furniture"
+        },
+        {
+          "id": 109,
+          "tiles": {
+            "top_left": 169,
+            "top_right": 129,
+            "bottom_left": 205,
+            "bottom_right": 64
+          },
+          "description": "Unknown pattern"
+        },
+        {
+          "id": 110,
+          "tiles": {
+            "top_left": 33,
+            "top_right": 240,
+            "bottom_left": 251,
+            "bottom_right": 141
+          },
+          "description": "Unknown pattern"
+        },
+        {
+          "id": 111,
+          "tiles": {
+            "top_left": 64,
+            "top_right": 33,
+            "bottom_left": 205,
+            "bottom_right": 64
+          },
+          "description": "Object/furniture"
+        },
+        {
+          "id": 112,
+          "tiles": {
+            "top_left": 33,
+            "top_right": 208,
+            "bottom_left": 251,
+            "bottom_right": 235
+          },
+          "description": "Unknown pattern"
+        },
+        {
+          "id": 113,
+          "tiles": {
+            "top_left": 141,
+            "top_right": 64,
+            "bottom_left": 33,
+            "bottom_right": 235
+          },
+          "description": "Special graphics"
+        },
+        {
+          "id": 114,
+          "tiles": {
+            "top_left": 165,
+            "top_right": 2,
+            "bottom_left": 41,
+            "bottom_right": 240
+          },
+          "description": "Special graphics"
+        },
+        {
+          "id": 115,
+          "tiles": {
+            "top_left": 133,
+            "top_right": 2,
+            "bottom_left": 165,
+            "bottom_right": 3
+          },
+          "description": "Object/furniture"
+        },
+        {
+          "id": 116,
+          "tiles": {
+            "top_left": 41,
+            "top_right": 15,
+            "bottom_left": 5,
+            "bottom_right": 2
+          },
+          "description": "Ground/floor pattern"
+        },
+        {
+          "id": 117,
+          "tiles": {
+            "top_left": 141,
+            "top_right": 65,
+            "bottom_left": 33,
+            "bottom_right": 169
+          },
+          "description": "Special graphics"
+        },
+        {
+          "id": 118,
+          "tiles": {
+            "top_left": 129,
+            "top_right": 205,
+            "bottom_left": 64,
+            "bottom_right": 33
+          },
+          "description": "Special graphics"
+        },
+        {
+          "id": 119,
+          "tiles": {
+            "top_left": 240,
+            "top_right": 251,
+            "bottom_left": 141,
+            "bottom_right": 64
+          },
+          "description": "Unknown pattern"
+        },
+        {
+          "id": 120,
+          "tiles": {
+            "top_left": 33,
+            "top_right": 205,
+            "bottom_left": 64,
+            "bottom_right": 33
+          },
+          "description": "Object/furniture"
+        },
+        {
+          "id": 121,
+          "tiles": {
+            "top_left": 208,
+            "top_right": 251,
+            "bottom_left": 235,
+            "bottom_right": 141
+          },
+          "description": "Unknown pattern"
+        },
+        {
+          "id": 122,
+          "tiles": {
+            "top_left": 64,
+            "top_right": 33,
+            "bottom_left": 76,
+            "bottom_right": 120
+          },
+          "description": "Object/furniture"
+        },
+        {
+          "id": 123,
+          "tiles": {
+            "top_left": 129,
+            "top_right": 32,
+            "bottom_left": 37,
+            "bottom_right": 134
+          },
+          "description": "Object/furniture"
+        },
+        {
+          "id": 124,
+          "tiles": {
+            "top_left": 165,
+            "top_right": 5,
+            "bottom_left": 48,
+            "bottom_right": 6
+          },
+          "description": "Wall/building pattern"
+        },
+        {
+          "id": 125,
+          "tiles": {
+            "top_left": 133,
+            "top_right": 9,
+            "bottom_left": 166,
+            "bottom_right": 6
+          },
+          "description": "Object/furniture"
+        },
+        {
+          "id": 126,
+          "tiles": {
+            "top_left": 134,
+            "top_right": 10,
+            "bottom_left": 165,
+            "bottom_right": 1
+          },
+          "description": "Object/furniture"
+        },
+        {
+          "id": 127,
+          "tiles": {
+            "top_left": 141,
+            "top_right": 65,
+            "bottom_left": 33,
+            "bottom_right": 133
+          },
+          "description": "Object/furniture"
+        }
+      ]
+    },
+    "set_2_indoor": {
+      "start_address": "$068020",
+      "count": 64,
+      "metatiles": [
+        {
+          "id": 128,
+          "tiles": {
+            "top_left": 174,
+            "top_right": 189,
+            "bottom_left": 255,
+            "bottom_right": 189
+          },
+          "description": "Unknown pattern"
+        },
+        {
+          "id": 129,
+          "tiles": {
+            "top_left": 53,
+            "top_right": 190,
+            "bottom_left": 125,
+            "bottom_right": 190
+          },
+          "description": "Unknown pattern"
+        },
+        {
+          "id": 130,
+          "tiles": {
+            "top_left": 89,
+            "top_right": 190,
+            "bottom_left": 161,
+            "bottom_right": 190
+          },
+          "description": "Unknown pattern"
+        },
+        {
+          "id": 131,
+          "tiles": {
+            "top_left": 139,
+            "top_right": 11,
+            "bottom_left": 8,
+            "bottom_right": 194
+          },
+          "description": "Object/furniture"
+        },
+        {
+          "id": 132,
+          "tiles": {
+            "top_left": 32,
+            "top_right": 194,
+            "bottom_left": 16,
+            "bottom_right": 72
+          },
+          "description": "Object/furniture"
+        },
+        {
+          "id": 133,
+          "tiles": {
+            "top_left": 218,
+            "top_right": 90,
+            "bottom_left": 226,
+            "bottom_right": 32
+          },
+          "description": "Unknown pattern"
+        },
+        {
+          "id": 134,
+          "tiles": {
+            "top_left": 169,
+            "top_right": 0,
+            "bottom_left": 72,
+            "bottom_right": 171
+          },
+          "description": "Special graphics"
+        },
+        {
+          "id": 135,
+          "tiles": {
+            "top_left": 162,
+            "top_right": 0,
+            "bottom_left": 6,
+            "bottom_right": 218
+          },
+          "description": "Special graphics"
+        },
+        {
+          "id": 136,
+          "tiles": {
+            "top_left": 43,
+            "top_right": 162,
+            "bottom_left": 170,
+            "bottom_right": 187
+          },
+          "description": "Unknown pattern"
+        },
+        {
+          "id": 137,
+          "tiles": {
+            "top_left": 236,
+            "top_right": 64,
+            "bottom_left": 33,
+            "bottom_right": 240
+          },
+          "description": "Unknown pattern"
+        },
+        {
+          "id": 138,
+          "tiles": {
+            "top_left": 46,
+            "top_right": 164,
+            "bottom_left": 248,
+            "bottom_right": 240
+          },
+          "description": "Unknown pattern"
+        },
+        {
+          "id": 139,
+          "tiles": {
+            "top_left": 42,
+            "top_right": 196,
+            "bottom_left": 72,
+            "bottom_right": 208
+          },
+          "description": "Unknown pattern"
+        },
+        {
+          "id": 140,
+          "tiles": {
+            "top_left": 38,
+            "top_right": 169,
+            "bottom_left": 240,
+            "bottom_right": 197
+          },
+          "description": "Unknown pattern"
+        },
+        {
+          "id": 141,
+          "tiles": {
+            "top_left": 0,
+            "top_right": 208,
+            "bottom_left": 32,
+            "bottom_right": 169
+          },
+          "description": "Special graphics"
+        },
+        {
+          "id": 142,
+          "tiles": {
+            "top_left": 8,
+            "top_right": 141,
+            "bottom_left": 65,
+            "bottom_right": 33
+          },
+          "description": "Wall/building pattern"
+        },
+        {
+          "id": 143,
+          "tiles": {
+            "top_left": 169,
+            "top_right": 0,
+            "bottom_left": 141,
+            "bottom_right": 64
+          },
+          "description": "Object/furniture"
+        },
+        {
+          "id": 144,
+          "tiles": {
+            "top_left": 33,
+            "top_right": 162,
+            "bottom_left": 248,
+            "bottom_right": 0
+          },
+          "description": "Special graphics"
+        },
+        {
+          "id": 145,
+          "tiles": {
+            "top_left": 157,
+            "top_right": 255,
+            "bottom_left": 5,
+            "bottom_right": 202
+          },
+          "description": "Unknown pattern"
+        },
+        {
+          "id": 146,
+          "tiles": {
+            "top_left": 208,
+            "top_right": 250,
+            "bottom_left": 132,
+            "bottom_right": 72
+          },
+          "description": "Unknown pattern"
+        },
+        {
+          "id": 147,
+          "tiles": {
+            "top_left": 169,
+            "top_right": 255,
+            "bottom_left": 133,
+            "bottom_right": 5
+          },
+          "description": "Unknown pattern"
+        },
+        {
+          "id": 148,
+          "tiles": {
+            "top_left": 169,
+            "top_right": 240,
+            "bottom_left": 133,
+            "bottom_right": 0
+          },
+          "description": "Unknown pattern"
+        },
+        {
+          "id": 149,
+          "tiles": {
+            "top_left": 76,
+            "top_right": 92,
+            "bottom_left": 129,
+            "bottom_right": 236
+          },
+          "description": "Unknown pattern"
+        },
+        {
+          "id": 150,
+          "tiles": {
+            "top_left": 64,
+            "top_right": 33,
+            "bottom_left": 208,
+            "bottom_right": 251
+          },
+          "description": "Unknown pattern"
+        },
+        {
+          "id": 151,
+          "tiles": {
+            "top_left": 162,
+            "top_right": 0,
+            "bottom_left": 0,
+            "bottom_right": 175
+          },
+          "description": "Object/furniture"
+        },
+        {
+          "id": 152,
+          "tiles": {
+            "top_left": 20,
+            "top_right": 128,
+            "bottom_left": 13,
+            "bottom_right": 141
+          },
+          "description": "Object/furniture"
+        },
+        {
+          "id": 153,
+          "tiles": {
+            "top_left": 66,
+            "top_right": 33,
+            "bottom_left": 175,
+            "bottom_right": 21
+          },
+          "description": "Object/furniture"
+        },
+        {
+          "id": 154,
+          "tiles": {
+            "top_left": 128,
+            "top_right": 13,
+            "bottom_left": 141,
+            "bottom_right": 67
+          },
+          "description": "Object/furniture"
+        },
+        {
+          "id": 155,
+          "tiles": {
+            "top_left": 33,
+            "top_right": 169,
+            "bottom_left": 1,
+            "bottom_right": 141
+          },
+          "description": "Object/furniture"
+        },
+        {
+          "id": 156,
+          "tiles": {
+            "top_left": 65,
+            "top_right": 33,
+            "bottom_left": 169,
+            "bottom_right": 204
+          },
+          "description": "Special graphics"
+        },
+        {
+          "id": 157,
+          "tiles": {
+            "top_left": 141,
+            "top_right": 64,
+            "bottom_left": 33,
+            "bottom_right": 205
+          },
+          "description": "Special graphics"
+        },
+        {
+          "id": 158,
+          "tiles": {
+            "top_left": 64,
+            "top_right": 33,
+            "bottom_left": 208,
+            "bottom_right": 251
+          },
+          "description": "Unknown pattern"
+        },
+        {
+          "id": 159,
+          "tiles": {
+            "top_left": 169,
+            "top_right": 0,
+            "bottom_left": 235,
+            "bottom_right": 191
+          },
+          "description": "Unknown pattern"
+        },
+        {
+          "id": 160,
+          "tiles": {
+            "top_left": 8,
+            "top_right": 128,
+            "bottom_left": 13,
+            "bottom_right": 133
+          },
+          "description": "Object/furniture"
+        },
+        {
+          "id": 161,
+          "tiles": {
+            "top_left": 20,
+            "top_right": 191,
+            "bottom_left": 9,
+            "bottom_right": 128
+          },
+          "description": "Object/furniture"
+        },
+        {
+          "id": 162,
+          "tiles": {
+            "top_left": 13,
+            "top_right": 133,
+            "bottom_left": 21,
+            "bottom_right": 169
+          },
+          "description": "Object/furniture"
+        },
+        {
+          "id": 163,
+          "tiles": {
+            "top_left": 13,
+            "top_right": 133,
+            "bottom_left": 22,
+            "bottom_right": 160
+          },
+          "description": "Object/furniture"
+        },
+        {
+          "id": 164,
+          "tiles": {
+            "top_left": 0,
+            "top_right": 0,
+            "bottom_left": 183,
+            "bottom_right": 20
+          },
+          "description": "Wall/building pattern"
+        },
+        {
+          "id": 165,
+          "tiles": {
+            "top_left": 24,
+            "top_right": 105,
+            "bottom_left": 2,
+            "bottom_right": 133
+          },
+          "description": "Object/furniture"
+        },
+        {
+          "id": 166,
+          "tiles": {
+            "top_left": 16,
+            "top_right": 200,
+            "bottom_left": 183,
+            "bottom_right": 20
+          },
+          "description": "Special graphics"
+        },
+        {
+          "id": 167,
+          "tiles": {
+            "top_left": 105,
+            "top_right": 0,
+            "bottom_left": 133,
+            "bottom_right": 17
+          },
+          "description": "Wall/building pattern"
+        },
+        {
+          "id": 168,
+          "tiles": {
+            "top_left": 200,
+            "top_right": 183,
+            "bottom_left": 20,
+            "bottom_right": 141
+          },
+          "description": "Unknown pattern"
+        },
+        {
+          "id": 169,
+          "tiles": {
+            "top_left": 65,
+            "top_right": 33,
+            "bottom_left": 235,
+            "bottom_right": 141
+          },
+          "description": "Special graphics"
+        },
+        {
+          "id": 170,
+          "tiles": {
+            "top_left": 64,
+            "top_right": 33,
+            "bottom_left": 205,
+            "bottom_right": 64
+          },
+          "description": "Object/furniture"
+        },
+        {
+          "id": 171,
+          "tiles": {
+            "top_left": 33,
+            "top_right": 208,
+            "bottom_left": 251,
+            "bottom_right": 26
+          },
+          "description": "Unknown pattern"
+        },
+        {
+          "id": 172,
+          "tiles": {
+            "top_left": 235,
+            "top_right": 200,
+            "bottom_left": 196,
+            "bottom_right": 16
+          },
+          "description": "Unknown pattern"
+        },
+        {
+          "id": 173,
+          "tiles": {
+            "top_left": 208,
+            "top_right": 235,
+            "bottom_left": 235,
+            "bottom_right": 26
+          },
+          "description": "Unknown pattern"
+        },
+        {
+          "id": 174,
+          "tiles": {
+            "top_left": 26,
+            "top_right": 26,
+            "bottom_left": 208,
+            "bottom_right": 1
+          },
+          "description": "Object/furniture"
+        },
+        {
+          "id": 175,
+          "tiles": {
+            "top_left": 26,
+            "top_right": 232,
+            "bottom_left": 232,
+            "bottom_right": 224
+          },
+          "description": "Unknown pattern"
+        },
+        {
+          "id": 176,
+          "tiles": {
+            "top_left": 12,
+            "top_right": 0,
+            "bottom_left": 240,
+            "bottom_right": 29
+          },
+          "description": "Object/furniture"
+        },
+        {
+          "id": 177,
+          "tiles": {
+            "top_left": 235,
+            "top_right": 191,
+            "bottom_left": 20,
+            "bottom_right": 128
+          },
+          "description": "Unknown pattern"
+        },
+        {
+          "id": 178,
+          "tiles": {
+            "top_left": 13,
+            "top_right": 141,
+            "bottom_left": 66,
+            "bottom_right": 33
+          },
+          "description": "Wall/building pattern"
+        },
+        {
+          "id": 179,
+          "tiles": {
+            "top_left": 191,
+            "top_right": 21,
+            "bottom_left": 128,
+            "bottom_right": 13
+          },
+          "description": "Object/furniture"
+        },
+        {
+          "id": 180,
+          "tiles": {
+            "top_left": 141,
+            "top_right": 67,
+            "bottom_left": 33,
+            "bottom_right": 235
+          },
+          "description": "Special graphics"
+        },
+        {
+          "id": 181,
+          "tiles": {
+            "top_left": 141,
+            "top_right": 65,
+            "bottom_left": 33,
+            "bottom_right": 141
+          },
+          "description": "Object/furniture"
+        },
+        {
+          "id": 182,
+          "tiles": {
+            "top_left": 64,
+            "top_right": 33,
+            "bottom_left": 205,
+            "bottom_right": 64
+          },
+          "description": "Object/furniture"
+        },
+        {
+          "id": 183,
+          "tiles": {
+            "top_left": 33,
+            "top_right": 208,
+            "bottom_left": 251,
+            "bottom_right": 128
+          },
+          "description": "Unknown pattern"
+        },
+        {
+          "id": 184,
+          "tiles": {
+            "top_left": 155,
+            "top_right": 160,
+            "bottom_left": 0,
+            "bottom_right": 2
+          },
+          "description": "Object/furniture"
+        },
+        {
+          "id": 185,
+          "tiles": {
+            "top_left": 140,
+            "top_right": 66,
+            "bottom_left": 33,
+            "bottom_right": 235
+          },
+          "description": "Special graphics"
+        },
+        {
+          "id": 186,
+          "tiles": {
+            "top_left": 169,
+            "top_right": 0,
+            "bottom_left": 141,
+            "bottom_right": 65
+          },
+          "description": "Object/furniture"
+        },
+        {
+          "id": 187,
+          "tiles": {
+            "top_left": 33,
+            "top_right": 235,
+            "bottom_left": 141,
+            "bottom_right": 64
+          },
+          "description": "Special graphics"
+        },
+        {
+          "id": 188,
+          "tiles": {
+            "top_left": 33,
+            "top_right": 205,
+            "bottom_left": 64,
+            "bottom_right": 33
+          },
+          "description": "Object/furniture"
+        },
+        {
+          "id": 189,
+          "tiles": {
+            "top_left": 208,
+            "top_right": 251,
+            "bottom_left": 235,
+            "bottom_right": 141
+          },
+          "description": "Unknown pattern"
+        },
+        {
+          "id": 190,
+          "tiles": {
+            "top_left": 64,
+            "top_right": 33,
+            "bottom_left": 162,
+            "bottom_right": 0
+          },
+          "description": "Object/furniture"
+        },
+        {
+          "id": 191,
+          "tiles": {
+            "top_left": 1,
+            "top_right": 157,
+            "bottom_left": 255,
+            "bottom_right": 5
+          },
+          "description": "Special graphics"
+        }
+      ]
+    },
+    "set_3_dungeon": {
+      "start_address": "$068030",
+      "count": 64,
+      "metatiles": [
+        {
+          "id": 192,
+          "tiles": {
+            "top_left": 32,
+            "top_right": 194,
+            "bottom_left": 16,
+            "bottom_right": 72
+          },
+          "description": "Object/furniture"
+        },
+        {
+          "id": 193,
+          "tiles": {
+            "top_left": 218,
+            "top_right": 90,
+            "bottom_left": 226,
+            "bottom_right": 32
+          },
+          "description": "Unknown pattern"
+        },
+        {
+          "id": 194,
+          "tiles": {
+            "top_left": 169,
+            "top_right": 0,
+            "bottom_left": 72,
+            "bottom_right": 171
+          },
+          "description": "Special graphics"
+        },
+        {
+          "id": 195,
+          "tiles": {
+            "top_left": 162,
+            "top_right": 0,
+            "bottom_left": 6,
+            "bottom_right": 218
+          },
+          "description": "Special graphics"
+        },
+        {
+          "id": 196,
+          "tiles": {
+            "top_left": 43,
+            "top_right": 162,
+            "bottom_left": 170,
+            "bottom_right": 187
+          },
+          "description": "Unknown pattern"
+        },
+        {
+          "id": 197,
+          "tiles": {
+            "top_left": 236,
+            "top_right": 64,
+            "bottom_left": 33,
+            "bottom_right": 240
+          },
+          "description": "Unknown pattern"
+        },
+        {
+          "id": 198,
+          "tiles": {
+            "top_left": 46,
+            "top_right": 164,
+            "bottom_left": 248,
+            "bottom_right": 240
+          },
+          "description": "Unknown pattern"
+        },
+        {
+          "id": 199,
+          "tiles": {
+            "top_left": 42,
+            "top_right": 196,
+            "bottom_left": 72,
+            "bottom_right": 208
+          },
+          "description": "Unknown pattern"
+        },
+        {
+          "id": 200,
+          "tiles": {
+            "top_left": 38,
+            "top_right": 169,
+            "bottom_left": 240,
+            "bottom_right": 197
+          },
+          "description": "Unknown pattern"
+        },
+        {
+          "id": 201,
+          "tiles": {
+            "top_left": 0,
+            "top_right": 208,
+            "bottom_left": 32,
+            "bottom_right": 169
+          },
+          "description": "Special graphics"
+        },
+        {
+          "id": 202,
+          "tiles": {
+            "top_left": 8,
+            "top_right": 141,
+            "bottom_left": 65,
+            "bottom_right": 33
+          },
+          "description": "Wall/building pattern"
+        },
+        {
+          "id": 203,
+          "tiles": {
+            "top_left": 169,
+            "top_right": 0,
+            "bottom_left": 141,
+            "bottom_right": 64
+          },
+          "description": "Object/furniture"
+        },
+        {
+          "id": 204,
+          "tiles": {
+            "top_left": 33,
+            "top_right": 162,
+            "bottom_left": 248,
+            "bottom_right": 0
+          },
+          "description": "Special graphics"
+        },
+        {
+          "id": 205,
+          "tiles": {
+            "top_left": 157,
+            "top_right": 255,
+            "bottom_left": 5,
+            "bottom_right": 202
+          },
+          "description": "Unknown pattern"
+        },
+        {
+          "id": 206,
+          "tiles": {
+            "top_left": 208,
+            "top_right": 250,
+            "bottom_left": 132,
+            "bottom_right": 72
+          },
+          "description": "Unknown pattern"
+        },
+        {
+          "id": 207,
+          "tiles": {
+            "top_left": 169,
+            "top_right": 255,
+            "bottom_left": 133,
+            "bottom_right": 5
+          },
+          "description": "Unknown pattern"
+        },
+        {
+          "id": 208,
+          "tiles": {
+            "top_left": 169,
+            "top_right": 240,
+            "bottom_left": 133,
+            "bottom_right": 0
+          },
+          "description": "Unknown pattern"
+        },
+        {
+          "id": 209,
+          "tiles": {
+            "top_left": 76,
+            "top_right": 92,
+            "bottom_left": 129,
+            "bottom_right": 236
+          },
+          "description": "Unknown pattern"
+        },
+        {
+          "id": 210,
+          "tiles": {
+            "top_left": 64,
+            "top_right": 33,
+            "bottom_left": 208,
+            "bottom_right": 251
+          },
+          "description": "Unknown pattern"
+        },
+        {
+          "id": 211,
+          "tiles": {
+            "top_left": 162,
+            "top_right": 0,
+            "bottom_left": 0,
+            "bottom_right": 175
+          },
+          "description": "Object/furniture"
+        },
+        {
+          "id": 212,
+          "tiles": {
+            "top_left": 20,
+            "top_right": 128,
+            "bottom_left": 13,
+            "bottom_right": 141
+          },
+          "description": "Object/furniture"
+        },
+        {
+          "id": 213,
+          "tiles": {
+            "top_left": 66,
+            "top_right": 33,
+            "bottom_left": 175,
+            "bottom_right": 21
+          },
+          "description": "Object/furniture"
+        },
+        {
+          "id": 214,
+          "tiles": {
+            "top_left": 128,
+            "top_right": 13,
+            "bottom_left": 141,
+            "bottom_right": 67
+          },
+          "description": "Object/furniture"
+        },
+        {
+          "id": 215,
+          "tiles": {
+            "top_left": 33,
+            "top_right": 169,
+            "bottom_left": 1,
+            "bottom_right": 141
+          },
+          "description": "Object/furniture"
+        },
+        {
+          "id": 216,
+          "tiles": {
+            "top_left": 65,
+            "top_right": 33,
+            "bottom_left": 169,
+            "bottom_right": 204
+          },
+          "description": "Special graphics"
+        },
+        {
+          "id": 217,
+          "tiles": {
+            "top_left": 141,
+            "top_right": 64,
+            "bottom_left": 33,
+            "bottom_right": 205
+          },
+          "description": "Special graphics"
+        },
+        {
+          "id": 218,
+          "tiles": {
+            "top_left": 64,
+            "top_right": 33,
+            "bottom_left": 208,
+            "bottom_right": 251
+          },
+          "description": "Unknown pattern"
+        },
+        {
+          "id": 219,
+          "tiles": {
+            "top_left": 169,
+            "top_right": 0,
+            "bottom_left": 235,
+            "bottom_right": 191
+          },
+          "description": "Unknown pattern"
+        },
+        {
+          "id": 220,
+          "tiles": {
+            "top_left": 8,
+            "top_right": 128,
+            "bottom_left": 13,
+            "bottom_right": 133
+          },
+          "description": "Object/furniture"
+        },
+        {
+          "id": 221,
+          "tiles": {
+            "top_left": 20,
+            "top_right": 191,
+            "bottom_left": 9,
+            "bottom_right": 128
+          },
+          "description": "Object/furniture"
+        },
+        {
+          "id": 222,
+          "tiles": {
+            "top_left": 13,
+            "top_right": 133,
+            "bottom_left": 21,
+            "bottom_right": 169
+          },
+          "description": "Object/furniture"
+        },
+        {
+          "id": 223,
+          "tiles": {
+            "top_left": 13,
+            "top_right": 133,
+            "bottom_left": 22,
+            "bottom_right": 160
+          },
+          "description": "Object/furniture"
+        },
+        {
+          "id": 224,
+          "tiles": {
+            "top_left": 0,
+            "top_right": 0,
+            "bottom_left": 183,
+            "bottom_right": 20
+          },
+          "description": "Wall/building pattern"
+        },
+        {
+          "id": 225,
+          "tiles": {
+            "top_left": 24,
+            "top_right": 105,
+            "bottom_left": 2,
+            "bottom_right": 133
+          },
+          "description": "Object/furniture"
+        },
+        {
+          "id": 226,
+          "tiles": {
+            "top_left": 16,
+            "top_right": 200,
+            "bottom_left": 183,
+            "bottom_right": 20
+          },
+          "description": "Special graphics"
+        },
+        {
+          "id": 227,
+          "tiles": {
+            "top_left": 105,
+            "top_right": 0,
+            "bottom_left": 133,
+            "bottom_right": 17
+          },
+          "description": "Wall/building pattern"
+        },
+        {
+          "id": 228,
+          "tiles": {
+            "top_left": 200,
+            "top_right": 183,
+            "bottom_left": 20,
+            "bottom_right": 141
+          },
+          "description": "Unknown pattern"
+        },
+        {
+          "id": 229,
+          "tiles": {
+            "top_left": 65,
+            "top_right": 33,
+            "bottom_left": 235,
+            "bottom_right": 141
+          },
+          "description": "Special graphics"
+        },
+        {
+          "id": 230,
+          "tiles": {
+            "top_left": 64,
+            "top_right": 33,
+            "bottom_left": 205,
+            "bottom_right": 64
+          },
+          "description": "Object/furniture"
+        },
+        {
+          "id": 231,
+          "tiles": {
+            "top_left": 33,
+            "top_right": 208,
+            "bottom_left": 251,
+            "bottom_right": 26
+          },
+          "description": "Unknown pattern"
+        },
+        {
+          "id": 232,
+          "tiles": {
+            "top_left": 235,
+            "top_right": 200,
+            "bottom_left": 196,
+            "bottom_right": 16
+          },
+          "description": "Unknown pattern"
+        },
+        {
+          "id": 233,
+          "tiles": {
+            "top_left": 208,
+            "top_right": 235,
+            "bottom_left": 235,
+            "bottom_right": 26
+          },
+          "description": "Unknown pattern"
+        },
+        {
+          "id": 234,
+          "tiles": {
+            "top_left": 26,
+            "top_right": 26,
+            "bottom_left": 208,
+            "bottom_right": 1
+          },
+          "description": "Object/furniture"
+        },
+        {
+          "id": 235,
+          "tiles": {
+            "top_left": 26,
+            "top_right": 232,
+            "bottom_left": 232,
+            "bottom_right": 224
+          },
+          "description": "Unknown pattern"
+        },
+        {
+          "id": 236,
+          "tiles": {
+            "top_left": 12,
+            "top_right": 0,
+            "bottom_left": 240,
+            "bottom_right": 29
+          },
+          "description": "Object/furniture"
+        },
+        {
+          "id": 237,
+          "tiles": {
+            "top_left": 235,
+            "top_right": 191,
+            "bottom_left": 20,
+            "bottom_right": 128
+          },
+          "description": "Unknown pattern"
+        },
+        {
+          "id": 238,
+          "tiles": {
+            "top_left": 13,
+            "top_right": 141,
+            "bottom_left": 66,
+            "bottom_right": 33
+          },
+          "description": "Wall/building pattern"
+        },
+        {
+          "id": 239,
+          "tiles": {
+            "top_left": 191,
+            "top_right": 21,
+            "bottom_left": 128,
+            "bottom_right": 13
+          },
+          "description": "Object/furniture"
+        },
+        {
+          "id": 240,
+          "tiles": {
+            "top_left": 141,
+            "top_right": 67,
+            "bottom_left": 33,
+            "bottom_right": 235
+          },
+          "description": "Special graphics"
+        },
+        {
+          "id": 241,
+          "tiles": {
+            "top_left": 141,
+            "top_right": 65,
+            "bottom_left": 33,
+            "bottom_right": 141
+          },
+          "description": "Object/furniture"
+        },
+        {
+          "id": 242,
+          "tiles": {
+            "top_left": 64,
+            "top_right": 33,
+            "bottom_left": 205,
+            "bottom_right": 64
+          },
+          "description": "Object/furniture"
+        },
+        {
+          "id": 243,
+          "tiles": {
+            "top_left": 33,
+            "top_right": 208,
+            "bottom_left": 251,
+            "bottom_right": 128
+          },
+          "description": "Unknown pattern"
+        },
+        {
+          "id": 244,
+          "tiles": {
+            "top_left": 155,
+            "top_right": 160,
+            "bottom_left": 0,
+            "bottom_right": 2
+          },
+          "description": "Object/furniture"
+        },
+        {
+          "id": 245,
+          "tiles": {
+            "top_left": 140,
+            "top_right": 66,
+            "bottom_left": 33,
+            "bottom_right": 235
+          },
+          "description": "Special graphics"
+        },
+        {
+          "id": 246,
+          "tiles": {
+            "top_left": 169,
+            "top_right": 0,
+            "bottom_left": 141,
+            "bottom_right": 65
+          },
+          "description": "Object/furniture"
+        },
+        {
+          "id": 247,
+          "tiles": {
+            "top_left": 33,
+            "top_right": 235,
+            "bottom_left": 141,
+            "bottom_right": 64
+          },
+          "description": "Special graphics"
+        },
+        {
+          "id": 248,
+          "tiles": {
+            "top_left": 33,
+            "top_right": 205,
+            "bottom_left": 64,
+            "bottom_right": 33
+          },
+          "description": "Object/furniture"
+        },
+        {
+          "id": 249,
+          "tiles": {
+            "top_left": 208,
+            "top_right": 251,
+            "bottom_left": 235,
+            "bottom_right": 141
+          },
+          "description": "Unknown pattern"
+        },
+        {
+          "id": 250,
+          "tiles": {
+            "top_left": 64,
+            "top_right": 33,
+            "bottom_left": 162,
+            "bottom_right": 0
+          },
+          "description": "Object/furniture"
+        },
+        {
+          "id": 251,
+          "tiles": {
+            "top_left": 1,
+            "top_right": 157,
+            "bottom_left": 255,
+            "bottom_right": 5
+          },
+          "description": "Special graphics"
+        },
+        {
+          "id": 252,
+          "tiles": {
+            "top_left": 202,
+            "top_right": 208,
+            "bottom_left": 250,
+            "bottom_right": 169
+          },
+          "description": "Unknown pattern"
+        },
+        {
+          "id": 253,
+          "tiles": {
+            "top_left": 255,
+            "top_right": 133,
+            "bottom_left": 5,
+            "bottom_right": 194
+          },
+          "description": "Unknown pattern"
+        },
+        {
+          "id": 254,
+          "tiles": {
+            "top_left": 32,
+            "top_right": 175,
+            "bottom_left": 120,
+            "bottom_right": 157
+          },
+          "description": "Special graphics"
+        },
+        {
+          "id": 255,
+          "tiles": {
+            "top_left": 13,
+            "top_right": 24,
+            "bottom_left": 105,
+            "bottom_right": 0
+          },
+          "description": "Wall/building pattern"
+        }
+      ]
+    }
+  },
+  "collision": {
+    "start_address": "$06A000",
+    "count": 256,
+    "entries": [
+      {
+        "tile_id": 0,
+        "flags": 46,
+        "properties": {
+          "passable": true,
+          "blocked": false,
+          "water": true,
+          "lava": true,
+          "trigger": true
+        }
+      },
+      {
+        "tile_id": 1,
+        "flags": 222,
+        "properties": {
+          "passable": true,
+          "blocked": false,
+          "water": true,
+          "lava": true,
+          "trigger": true
+        }
+      },
+      {
+        "tile_id": 2,
+        "flags": 198,
+        "properties": {
+          "passable": true,
+          "blocked": false,
+          "water": true,
+          "lava": true,
+          "trigger": false
+        }
+      },
+      {
+        "tile_id": 3,
+        "flags": 3,
+        "properties": {
+          "passable": false,
+          "blocked": true,
+          "water": true,
+          "lava": false,
+          "trigger": false
+        }
+      },
+      {
+        "tile_id": 4,
+        "flags": 63,
+        "properties": {
+          "passable": false,
+          "blocked": true,
+          "water": true,
+          "lava": true,
+          "trigger": true
+        }
+      },
+      {
+        "tile_id": 5,
+        "flags": 189,
+        "properties": {
+          "passable": false,
+          "blocked": true,
+          "water": false,
+          "lava": true,
+          "trigger": true
+        }
+      },
+      {
+        "tile_id": 6,
+        "flags": 36,
+        "properties": {
+          "passable": true,
+          "blocked": false,
+          "water": false,
+          "lava": true,
+          "trigger": false
+        }
+      },
+      {
+        "tile_id": 7,
+        "flags": 47,
+        "properties": {
+          "passable": false,
+          "blocked": true,
+          "water": true,
+          "lava": true,
+          "trigger": true
+        }
+      },
+      {
+        "tile_id": 8,
+        "flags": 238,
+        "properties": {
+          "passable": true,
+          "blocked": false,
+          "water": true,
+          "lava": true,
+          "trigger": true
+        }
+      },
+      {
+        "tile_id": 9,
+        "flags": 20,
+        "properties": {
+          "passable": true,
+          "blocked": false,
+          "water": false,
+          "lava": true,
+          "trigger": false
+        }
+      },
+      {
+        "tile_id": 10,
+        "flags": 79,
+        "properties": {
+          "passable": false,
+          "blocked": true,
+          "water": true,
+          "lava": true,
+          "trigger": true
+        }
+      },
+      {
+        "tile_id": 11,
+        "flags": 198,
+        "properties": {
+          "passable": true,
+          "blocked": false,
+          "water": true,
+          "lava": true,
+          "trigger": false
+        }
+      },
+      {
+        "tile_id": 12,
+        "flags": 206,
+        "properties": {
+          "passable": true,
+          "blocked": false,
+          "water": true,
+          "lava": true,
+          "trigger": true
+        }
+      },
+      {
+        "tile_id": 13,
+        "flags": 52,
+        "properties": {
+          "passable": true,
+          "blocked": false,
+          "water": false,
+          "lava": true,
+          "trigger": false
+        }
+      },
+      {
+        "tile_id": 14,
+        "flags": 30,
+        "properties": {
+          "passable": true,
+          "blocked": false,
+          "water": true,
+          "lava": true,
+          "trigger": true
+        }
+      },
+      {
+        "tile_id": 15,
+        "flags": 222,
+        "properties": {
+          "passable": true,
+          "blocked": false,
+          "water": true,
+          "lava": true,
+          "trigger": true
+        }
+      },
+      {
+        "tile_id": 16,
+        "flags": 20,
+        "properties": {
+          "passable": true,
+          "blocked": false,
+          "water": false,
+          "lava": true,
+          "trigger": false
+        }
+      },
+      {
+        "tile_id": 17,
+        "flags": 45,
+        "properties": {
+          "passable": false,
+          "blocked": true,
+          "water": false,
+          "lava": true,
+          "trigger": true
+        }
+      },
+      {
+        "tile_id": 18,
+        "flags": 207,
+        "properties": {
+          "passable": false,
+          "blocked": true,
+          "water": true,
+          "lava": true,
+          "trigger": true
+        }
+      },
+      {
+        "tile_id": 19,
+        "flags": 34,
+        "properties": {
+          "passable": true,
+          "blocked": false,
+          "water": true,
+          "lava": false,
+          "trigger": false
+        }
+      },
+      {
+        "tile_id": 20,
+        "flags": 198,
+        "properties": {
+          "passable": true,
+          "blocked": false,
+          "water": true,
+          "lava": true,
+          "trigger": false
+        }
+      },
+      {
+        "tile_id": 21,
+        "flags": 30,
+        "properties": {
+          "passable": true,
+          "blocked": false,
+          "water": true,
+          "lava": true,
+          "trigger": true
+        }
+      },
+      {
+        "tile_id": 22,
+        "flags": 206,
+        "properties": {
+          "passable": true,
+          "blocked": false,
+          "water": true,
+          "lava": true,
+          "trigger": true
+        }
+      },
+      {
+        "tile_id": 23,
+        "flags": 52,
+        "properties": {
+          "passable": true,
+          "blocked": false,
+          "water": false,
+          "lava": true,
+          "trigger": false
+        }
+      },
+      {
+        "tile_id": 24,
+        "flags": 12,
+        "properties": {
+          "passable": true,
+          "blocked": false,
+          "water": false,
+          "lava": true,
+          "trigger": true
+        }
+      },
+      {
+        "tile_id": 25,
+        "flags": 208,
+        "properties": {
+          "passable": true,
+          "blocked": false,
+          "water": false,
+          "lava": false,
+          "trigger": false
+        }
+      },
+      {
+        "tile_id": 26,
+        "flags": 51,
+        "properties": {
+          "passable": false,
+          "blocked": true,
+          "water": true,
+          "lava": false,
+          "trigger": false
+        }
+      },
+      {
+        "tile_id": 27,
+        "flags": 29,
+        "properties": {
+          "passable": false,
+          "blocked": true,
+          "water": false,
+          "lava": true,
+          "trigger": true
+        }
+      },
+      {
+        "tile_id": 28,
+        "flags": 192,
+        "properties": {
+          "passable": true,
+          "blocked": false,
+          "water": false,
+          "lava": false,
+          "trigger": false
+        }
+      },
+      {
+        "tile_id": 29,
+        "flags": 198,
+        "properties": {
+          "passable": true,
+          "blocked": false,
+          "water": true,
+          "lava": true,
+          "trigger": false
+        }
+      },
+      {
+        "tile_id": 30,
+        "flags": 85,
+        "properties": {
+          "passable": false,
+          "blocked": true,
+          "water": false,
+          "lava": true,
+          "trigger": false
+        }
+      },
+      {
+        "tile_id": 31,
+        "flags": 252,
+        "properties": {
+          "passable": true,
+          "blocked": false,
+          "water": false,
+          "lava": true,
+          "trigger": true
+        }
+      },
+      {
+        "tile_id": 32,
+        "flags": 226,
+        "properties": {
+          "passable": true,
+          "blocked": false,
+          "water": true,
+          "lava": false,
+          "trigger": false
+        }
+      },
+      {
+        "tile_id": 33,
+        "flags": 51,
+        "properties": {
+          "passable": false,
+          "blocked": true,
+          "water": true,
+          "lava": false,
+          "trigger": false
+        }
+      },
+      {
+        "tile_id": 34,
+        "flags": 13,
+        "properties": {
+          "passable": false,
+          "blocked": true,
+          "water": false,
+          "lava": true,
+          "trigger": true
+        }
+      },
+      {
+        "tile_id": 35,
+        "flags": 193,
+        "properties": {
+          "passable": false,
+          "blocked": true,
+          "water": false,
+          "lava": false,
+          "trigger": false
+        }
+      },
+      {
+        "tile_id": 36,
+        "flags": 67,
+        "properties": {
+          "passable": false,
+          "blocked": true,
+          "water": true,
+          "lava": false,
+          "trigger": false
+        }
+      },
+      {
+        "tile_id": 37,
+        "flags": 236,
+        "properties": {
+          "passable": true,
+          "blocked": false,
+          "water": false,
+          "lava": true,
+          "trigger": true
+        }
+      },
+      {
+        "tile_id": 38,
+        "flags": 198,
+        "properties": {
+          "passable": true,
+          "blocked": false,
+          "water": true,
+          "lava": true,
+          "trigger": false
+        }
+      },
+      {
+        "tile_id": 39,
+        "flags": 225,
+        "properties": {
+          "passable": false,
+          "blocked": true,
+          "water": false,
+          "lava": false,
+          "trigger": false
+        }
+      },
+      {
+        "tile_id": 40,
+        "flags": 50,
+        "properties": {
+          "passable": true,
+          "blocked": false,
+          "water": true,
+          "lava": false,
+          "trigger": false
+        }
+      },
+      {
+        "tile_id": 41,
+        "flags": 251,
+        "properties": {
+          "passable": false,
+          "blocked": true,
+          "water": true,
+          "lava": false,
+          "trigger": true
+        }
+      },
+      {
+        "tile_id": 42,
+        "flags": 193,
+        "properties": {
+          "passable": false,
+          "blocked": true,
+          "water": false,
+          "lava": false,
+          "trigger": false
+        }
+      },
+      {
+        "tile_id": 43,
+        "flags": 82,
+        "properties": {
+          "passable": true,
+          "blocked": false,
+          "water": true,
+          "lava": false,
+          "trigger": false
+        }
+      },
+      {
+        "tile_id": 44,
+        "flags": 220,
+        "properties": {
+          "passable": true,
+          "blocked": false,
+          "water": false,
+          "lava": true,
+          "trigger": true
+        }
+      },
+      {
+        "tile_id": 45,
+        "flags": 242,
+        "properties": {
+          "passable": true,
+          "blocked": false,
+          "water": true,
+          "lava": false,
+          "trigger": false
+        }
+      },
+      {
+        "tile_id": 46,
+        "flags": 50,
+        "properties": {
+          "passable": true,
+          "blocked": false,
+          "water": true,
+          "lava": false,
+          "trigger": false
+        }
+      },
+      {
+        "tile_id": 47,
+        "flags": 199,
+        "properties": {
+          "passable": false,
+          "blocked": true,
+          "water": true,
+          "lava": true,
+          "trigger": false
+        }
+      },
+      {
+        "tile_id": 48,
+        "flags": 236,
+        "properties": {
+          "passable": true,
+          "blocked": false,
+          "water": false,
+          "lava": true,
+          "trigger": true
+        }
+      },
+      {
+        "tile_id": 49,
+        "flags": 227,
+        "properties": {
+          "passable": false,
+          "blocked": true,
+          "water": true,
+          "lava": false,
+          "trigger": false
+        }
+      },
+      {
+        "tile_id": 50,
+        "flags": 65,
+        "properties": {
+          "passable": false,
+          "blocked": true,
+          "water": false,
+          "lava": false,
+          "trigger": false
+        }
+      },
+      {
+        "tile_id": 51,
+        "flags": 238,
+        "properties": {
+          "passable": true,
+          "blocked": false,
+          "water": true,
+          "lava": true,
+          "trigger": true
+        }
+      },
+      {
+        "tile_id": 52,
+        "flags": 2,
+        "properties": {
+          "passable": true,
+          "blocked": false,
+          "water": true,
+          "lava": false,
+          "trigger": false
+        }
+      },
+      {
+        "tile_id": 53,
+        "flags": 66,
+        "properties": {
+          "passable": true,
+          "blocked": false,
+          "water": true,
+          "lava": false,
+          "trigger": false
+        }
+      },
+      {
+        "tile_id": 54,
+        "flags": 236,
+        "properties": {
+          "passable": true,
+          "blocked": false,
+          "water": false,
+          "lava": true,
+          "trigger": true
+        }
+      },
+      {
+        "tile_id": 55,
+        "flags": 4,
+        "properties": {
+          "passable": true,
+          "blocked": false,
+          "water": false,
+          "lava": true,
+          "trigger": false
+        }
+      },
+      {
+        "tile_id": 56,
+        "flags": 2,
+        "properties": {
+          "passable": true,
+          "blocked": false,
+          "water": true,
+          "lava": false,
+          "trigger": false
+        }
+      },
+      {
+        "tile_id": 57,
+        "flags": 0,
+        "properties": {
+          "passable": true,
+          "blocked": false,
+          "water": false,
+          "lava": false,
+          "trigger": false
+        }
+      },
+      {
+        "tile_id": 58,
+        "flags": 0,
+        "properties": {
+          "passable": true,
+          "blocked": false,
+          "water": false,
+          "lava": false,
+          "trigger": false
+        }
+      },
+      {
+        "tile_id": 59,
+        "flags": 0,
+        "properties": {
+          "passable": true,
+          "blocked": false,
+          "water": false,
+          "lava": false,
+          "trigger": false
+        }
+      },
+      {
+        "tile_id": 60,
+        "flags": 0,
+        "properties": {
+          "passable": true,
+          "blocked": false,
+          "water": false,
+          "lava": false,
+          "trigger": false
+        }
+      },
+      {
+        "tile_id": 61,
+        "flags": 0,
+        "properties": {
+          "passable": true,
+          "blocked": false,
+          "water": false,
+          "lava": false,
+          "trigger": false
+        }
+      },
+      {
+        "tile_id": 62,
+        "flags": 0,
+        "properties": {
+          "passable": true,
+          "blocked": false,
+          "water": false,
+          "lava": false,
+          "trigger": false
+        }
+      },
+      {
+        "tile_id": 63,
+        "flags": 0,
+        "properties": {
+          "passable": true,
+          "blocked": false,
+          "water": false,
+          "lava": false,
+          "trigger": false
+        }
+      },
+      {
+        "tile_id": 64,
+        "flags": 0,
+        "properties": {
+          "passable": true,
+          "blocked": false,
+          "water": false,
+          "lava": false,
+          "trigger": false
+        }
+      },
+      {
+        "tile_id": 65,
+        "flags": 194,
+        "properties": {
+          "passable": true,
+          "blocked": false,
+          "water": true,
+          "lava": false,
+          "trigger": false
+        }
+      },
+      {
+        "tile_id": 66,
+        "flags": 64,
+        "properties": {
+          "passable": true,
+          "blocked": false,
+          "water": false,
+          "lava": false,
+          "trigger": false
+        }
+      },
+      {
+        "tile_id": 67,
+        "flags": 227,
+        "properties": {
+          "passable": false,
+          "blocked": true,
+          "water": true,
+          "lava": false,
+          "trigger": false
+        }
+      },
+      {
+        "tile_id": 68,
+        "flags": 48,
+        "properties": {
+          "passable": true,
+          "blocked": false,
+          "water": false,
+          "lava": false,
+          "trigger": false
+        }
+      },
+      {
+        "tile_id": 69,
+        "flags": 18,
+        "properties": {
+          "passable": true,
+          "blocked": false,
+          "water": true,
+          "lava": false,
+          "trigger": false
+        }
+      },
+      {
+        "tile_id": 70,
+        "flags": 17,
+        "properties": {
+          "passable": false,
+          "blocked": true,
+          "water": false,
+          "lava": false,
+          "trigger": false
+        }
+      },
+      {
+        "tile_id": 71,
+        "flags": 34,
+        "properties": {
+          "passable": true,
+          "blocked": false,
+          "water": true,
+          "lava": false,
+          "trigger": false
+        }
+      },
+      {
+        "tile_id": 72,
+        "flags": 34,
+        "properties": {
+          "passable": true,
+          "blocked": false,
+          "water": true,
+          "lava": false,
+          "trigger": false
+        }
+      },
+      {
+        "tile_id": 73,
+        "flags": 34,
+        "properties": {
+          "passable": true,
+          "blocked": false,
+          "water": true,
+          "lava": false,
+          "trigger": false
+        }
+      },
+      {
+        "tile_id": 74,
+        "flags": 150,
+        "properties": {
+          "passable": true,
+          "blocked": false,
+          "water": true,
+          "lava": true,
+          "trigger": false
+        }
+      },
+      {
+        "tile_id": 75,
+        "flags": 236,
+        "properties": {
+          "passable": true,
+          "blocked": false,
+          "water": false,
+          "lava": true,
+          "trigger": true
+        }
+      },
+      {
+        "tile_id": 76,
+        "flags": 4,
+        "properties": {
+          "passable": true,
+          "blocked": false,
+          "water": false,
+          "lava": true,
+          "trigger": false
+        }
+      },
+      {
+        "tile_id": 77,
+        "flags": 221,
+        "properties": {
+          "passable": false,
+          "blocked": true,
+          "water": false,
+          "lava": true,
+          "trigger": true
+        }
+      },
+      {
+        "tile_id": 78,
+        "flags": 47,
+        "properties": {
+          "passable": false,
+          "blocked": true,
+          "water": true,
+          "lava": true,
+          "trigger": true
+        }
+      },
+      {
+        "tile_id": 79,
+        "flags": 226,
+        "properties": {
+          "passable": true,
+          "blocked": false,
+          "water": true,
+          "lava": false,
+          "trigger": false
+        }
+      },
+      {
+        "tile_id": 80,
+        "flags": 236,
+        "properties": {
+          "passable": true,
+          "blocked": false,
+          "water": false,
+          "lava": true,
+          "trigger": true
+        }
+      },
+      {
+        "tile_id": 81,
+        "flags": 50,
+        "properties": {
+          "passable": true,
+          "blocked": false,
+          "water": true,
+          "lava": false,
+          "trigger": false
+        }
+      },
+      {
+        "tile_id": 82,
+        "flags": 223,
+        "properties": {
+          "passable": false,
+          "blocked": true,
+          "water": true,
+          "lava": true,
+          "trigger": true
+        }
+      },
+      {
+        "tile_id": 83,
+        "flags": 198,
+        "properties": {
+          "passable": true,
+          "blocked": false,
+          "water": true,
+          "lava": true,
+          "trigger": false
+        }
+      },
+      {
+        "tile_id": 84,
+        "flags": 0,
+        "properties": {
+          "passable": true,
+          "blocked": false,
+          "water": false,
+          "lava": false,
+          "trigger": false
+        }
+      },
+      {
+        "tile_id": 85,
+        "flags": 0,
+        "properties": {
+          "passable": true,
+          "blocked": false,
+          "water": false,
+          "lava": false,
+          "trigger": false
+        }
+      },
+      {
+        "tile_id": 86,
+        "flags": 240,
+        "properties": {
+          "passable": true,
+          "blocked": false,
+          "water": false,
+          "lava": false,
+          "trigger": false
+        }
+      },
+      {
+        "tile_id": 87,
+        "flags": 15,
+        "properties": {
+          "passable": false,
+          "blocked": true,
+          "water": true,
+          "lava": true,
+          "trigger": true
+        }
+      },
+      {
+        "tile_id": 88,
+        "flags": 1,
+        "properties": {
+          "passable": false,
+          "blocked": true,
+          "water": false,
+          "lava": false,
+          "trigger": false
+        }
+      },
+      {
+        "tile_id": 89,
+        "flags": 223,
+        "properties": {
+          "passable": false,
+          "blocked": true,
+          "water": true,
+          "lava": true,
+          "trigger": true
+        }
+      },
+      {
+        "tile_id": 90,
+        "flags": 95,
+        "properties": {
+          "passable": false,
+          "blocked": true,
+          "water": true,
+          "lava": true,
+          "trigger": true
+        }
+      },
+      {
+        "tile_id": 91,
+        "flags": 164,
+        "properties": {
+          "passable": true,
+          "blocked": false,
+          "water": false,
+          "lava": true,
+          "trigger": false
+        }
+      },
+      {
+        "tile_id": 92,
+        "flags": 194,
+        "properties": {
+          "passable": true,
+          "blocked": false,
+          "water": true,
+          "lava": false,
+          "trigger": false
+        }
+      },
+      {
+        "tile_id": 93,
+        "flags": 79,
+        "properties": {
+          "passable": false,
+          "blocked": true,
+          "water": true,
+          "lava": true,
+          "trigger": true
+        }
+      },
+      {
+        "tile_id": 94,
+        "flags": 211,
+        "properties": {
+          "passable": false,
+          "blocked": true,
+          "water": true,
+          "lava": false,
+          "trigger": false
+        }
+      },
+      {
+        "tile_id": 95,
+        "flags": 65,
+        "properties": {
+          "passable": false,
+          "blocked": true,
+          "water": false,
+          "lava": false,
+          "trigger": false
+        }
+      },
+      {
+        "tile_id": 96,
+        "flags": 35,
+        "properties": {
+          "passable": false,
+          "blocked": true,
+          "water": true,
+          "lava": false,
+          "trigger": false
+        }
+      },
+      {
+        "tile_id": 97,
+        "flags": 34,
+        "properties": {
+          "passable": true,
+          "blocked": false,
+          "water": true,
+          "lava": false,
+          "trigger": false
+        }
+      },
+      {
+        "tile_id": 98,
+        "flags": 33,
+        "properties": {
+          "passable": false,
+          "blocked": true,
+          "water": false,
+          "lava": false,
+          "trigger": false
+        }
+      },
+      {
+        "tile_id": 99,
+        "flags": 17,
+        "properties": {
+          "passable": false,
+          "blocked": true,
+          "water": false,
+          "lava": false,
+          "trigger": false
+        }
+      },
+      {
+        "tile_id": 100,
+        "flags": 17,
+        "properties": {
+          "passable": false,
+          "blocked": true,
+          "water": false,
+          "lava": false,
+          "trigger": false
+        }
+      },
+      {
+        "tile_id": 101,
+        "flags": 151,
+        "properties": {
+          "passable": false,
+          "blocked": true,
+          "water": true,
+          "lava": true,
+          "trigger": false
+        }
+      },
+      {
+        "tile_id": 102,
+        "flags": 44,
+        "properties": {
+          "passable": true,
+          "blocked": false,
+          "water": false,
+          "lava": true,
+          "trigger": true
+        }
+      },
+      {
+        "tile_id": 103,
+        "flags": 20,
+        "properties": {
+          "passable": true,
+          "blocked": false,
+          "water": false,
+          "lava": true,
+          "trigger": false
+        }
+      },
+      {
+        "tile_id": 104,
+        "flags": 238,
+        "properties": {
+          "passable": true,
+          "blocked": false,
+          "water": true,
+          "lava": true,
+          "trigger": true
+        }
+      },
+      {
+        "tile_id": 105,
+        "flags": 62,
+        "properties": {
+          "passable": true,
+          "blocked": false,
+          "water": true,
+          "lava": true,
+          "trigger": true
+        }
+      },
+      {
+        "tile_id": 106,
+        "flags": 210,
+        "properties": {
+          "passable": true,
+          "blocked": false,
+          "water": true,
+          "lava": false,
+          "trigger": false
+        }
+      },
+      {
+        "tile_id": 107,
+        "flags": 253,
+        "properties": {
+          "passable": false,
+          "blocked": true,
+          "water": false,
+          "lava": true,
+          "trigger": true
+        }
+      },
+      {
+        "tile_id": 108,
+        "flags": 49,
+        "properties": {
+          "passable": false,
+          "blocked": true,
+          "water": false,
+          "lava": false,
+          "trigger": false
+        }
+      },
+      {
+        "tile_id": 109,
+        "flags": 207,
+        "properties": {
+          "passable": false,
+          "blocked": true,
+          "water": true,
+          "lava": true,
+          "trigger": true
+        }
+      },
+      {
+        "tile_id": 110,
+        "flags": 2,
+        "properties": {
+          "passable": true,
+          "blocked": false,
+          "water": true,
+          "lava": false,
+          "trigger": false
+        }
+      },
+      {
+        "tile_id": 111,
+        "flags": 0,
+        "properties": {
+          "passable": true,
+          "blocked": false,
+          "water": false,
+          "lava": false,
+          "trigger": false
+        }
+      },
+      {
+        "tile_id": 112,
+        "flags": 0,
+        "properties": {
+          "passable": true,
+          "blocked": false,
+          "water": false,
+          "lava": false,
+          "trigger": false
+        }
+      },
+      {
+        "tile_id": 113,
+        "flags": 0,
+        "properties": {
+          "passable": true,
+          "blocked": false,
+          "water": false,
+          "lava": false,
+          "trigger": false
+        }
+      },
+      {
+        "tile_id": 114,
+        "flags": 0,
+        "properties": {
+          "passable": true,
+          "blocked": false,
+          "water": false,
+          "lava": false,
+          "trigger": false
+        }
+      },
+      {
+        "tile_id": 115,
+        "flags": 0,
+        "properties": {
+          "passable": true,
+          "blocked": false,
+          "water": false,
+          "lava": false,
+          "trigger": false
+        }
+      },
+      {
+        "tile_id": 116,
+        "flags": 0,
+        "properties": {
+          "passable": true,
+          "blocked": false,
+          "water": false,
+          "lava": false,
+          "trigger": false
+        }
+      },
+      {
+        "tile_id": 117,
+        "flags": 0,
+        "properties": {
+          "passable": true,
+          "blocked": false,
+          "water": false,
+          "lava": false,
+          "trigger": false
+        }
+      },
+      {
+        "tile_id": 118,
+        "flags": 0,
+        "properties": {
+          "passable": true,
+          "blocked": false,
+          "water": false,
+          "lava": false,
+          "trigger": false
+        }
+      },
+      {
+        "tile_id": 119,
+        "flags": 122,
+        "properties": {
+          "passable": true,
+          "blocked": false,
+          "water": true,
+          "lava": false,
+          "trigger": true
+        }
+      },
+      {
+        "tile_id": 120,
+        "flags": 19,
+        "properties": {
+          "passable": false,
+          "blocked": true,
+          "water": true,
+          "lava": false,
+          "trigger": false
+        }
+      },
+      {
+        "tile_id": 121,
+        "flags": 50,
+        "properties": {
+          "passable": true,
+          "blocked": false,
+          "water": true,
+          "lava": false,
+          "trigger": false
+        }
+      },
+      {
+        "tile_id": 122,
+        "flags": 240,
+        "properties": {
+          "passable": true,
+          "blocked": false,
+          "water": false,
+          "lava": false,
+          "trigger": false
+        }
+      },
+      {
+        "tile_id": 123,
+        "flags": 53,
+        "properties": {
+          "passable": false,
+          "blocked": true,
+          "water": false,
+          "lava": true,
+          "trigger": false
+        }
+      },
+      {
+        "tile_id": 124,
+        "flags": 84,
+        "properties": {
+          "passable": true,
+          "blocked": false,
+          "water": false,
+          "lava": true,
+          "trigger": false
+        }
+      },
+      {
+        "tile_id": 125,
+        "flags": 35,
+        "properties": {
+          "passable": false,
+          "blocked": true,
+          "water": true,
+          "lava": false,
+          "trigger": false
+        }
+      },
+      {
+        "tile_id": 126,
+        "flags": 87,
+        "properties": {
+          "passable": false,
+          "blocked": true,
+          "water": true,
+          "lava": true,
+          "trigger": false
+        }
+      },
+      {
+        "tile_id": 127,
+        "flags": 97,
+        "properties": {
+          "passable": false,
+          "blocked": true,
+          "water": false,
+          "lava": false,
+          "trigger": false
+        }
+      },
+      {
+        "tile_id": 128,
+        "flags": 138,
+        "properties": {
+          "passable": true,
+          "blocked": false,
+          "water": true,
+          "lava": false,
+          "trigger": true
+        }
+      },
+      {
+        "tile_id": 129,
+        "flags": 238,
+        "properties": {
+          "passable": true,
+          "blocked": false,
+          "water": true,
+          "lava": true,
+          "trigger": true
+        }
+      },
+      {
+        "tile_id": 130,
+        "flags": 241,
+        "properties": {
+          "passable": false,
+          "blocked": true,
+          "water": false,
+          "lava": false,
+          "trigger": false
+        }
+      },
+      {
+        "tile_id": 131,
+        "flags": 35,
+        "properties": {
+          "passable": false,
+          "blocked": true,
+          "water": true,
+          "lava": false,
+          "trigger": false
+        }
+      },
+      {
+        "tile_id": 132,
+        "flags": 33,
+        "properties": {
+          "passable": false,
+          "blocked": true,
+          "water": false,
+          "lava": false,
+          "trigger": false
+        }
+      },
+      {
+        "tile_id": 133,
+        "flags": 53,
+        "properties": {
+          "passable": false,
+          "blocked": true,
+          "water": false,
+          "lava": true,
+          "trigger": false
+        }
+      },
+      {
+        "tile_id": 134,
+        "flags": 100,
+        "properties": {
+          "passable": true,
+          "blocked": false,
+          "water": false,
+          "lava": true,
+          "trigger": false
+        }
+      },
+      {
+        "tile_id": 135,
+        "flags": 46,
+        "properties": {
+          "passable": true,
+          "blocked": false,
+          "water": true,
+          "lava": true,
+          "trigger": true
+        }
+      },
+      {
+        "tile_id": 136,
+        "flags": 224,
+        "properties": {
+          "passable": true,
+          "blocked": false,
+          "water": false,
+          "lava": false,
+          "trigger": false
+        }
+      },
+      {
+        "tile_id": 137,
+        "flags": 138,
+        "properties": {
+          "passable": true,
+          "blocked": false,
+          "water": true,
+          "lava": false,
+          "trigger": true
+        }
+      },
+      {
+        "tile_id": 138,
+        "flags": 53,
+        "properties": {
+          "passable": false,
+          "blocked": true,
+          "water": false,
+          "lava": true,
+          "trigger": false
+        }
+      },
+      {
+        "tile_id": 139,
+        "flags": 67,
+        "properties": {
+          "passable": false,
+          "blocked": true,
+          "water": true,
+          "lava": false,
+          "trigger": false
+        }
+      },
+      {
+        "tile_id": 140,
+        "flags": 18,
+        "properties": {
+          "passable": true,
+          "blocked": false,
+          "water": true,
+          "lava": false,
+          "trigger": false
+        }
+      },
+      {
+        "tile_id": 141,
+        "flags": 18,
+        "properties": {
+          "passable": true,
+          "blocked": false,
+          "water": true,
+          "lava": false,
+          "trigger": false
+        }
+      },
+      {
+        "tile_id": 142,
+        "flags": 52,
+        "properties": {
+          "passable": true,
+          "blocked": false,
+          "water": false,
+          "lava": true,
+          "trigger": false
+        }
+      },
+      {
+        "tile_id": 143,
+        "flags": 49,
+        "properties": {
+          "passable": false,
+          "blocked": true,
+          "water": false,
+          "lava": false,
+          "trigger": false
+        }
+      },
+      {
+        "tile_id": 144,
+        "flags": 1,
+        "properties": {
+          "passable": false,
+          "blocked": true,
+          "water": false,
+          "lava": false,
+          "trigger": false
+        }
+      },
+      {
+        "tile_id": 145,
+        "flags": 35,
+        "properties": {
+          "passable": false,
+          "blocked": true,
+          "water": true,
+          "lava": false,
+          "trigger": false
+        }
+      },
+      {
+        "tile_id": 146,
+        "flags": 154,
+        "properties": {
+          "passable": true,
+          "blocked": false,
+          "water": true,
+          "lava": false,
+          "trigger": true
+        }
+      },
+      {
+        "tile_id": 147,
+        "flags": 33,
+        "properties": {
+          "passable": false,
+          "blocked": true,
+          "water": false,
+          "lava": false,
+          "trigger": false
+        }
+      },
+      {
+        "tile_id": 148,
+        "flags": 254,
+        "properties": {
+          "passable": true,
+          "blocked": false,
+          "water": true,
+          "lava": true,
+          "trigger": true
+        }
+      },
+      {
+        "tile_id": 149,
+        "flags": 242,
+        "properties": {
+          "passable": true,
+          "blocked": false,
+          "water": true,
+          "lava": false,
+          "trigger": false
+        }
+      },
+      {
+        "tile_id": 150,
+        "flags": 69,
+        "properties": {
+          "passable": false,
+          "blocked": true,
+          "water": false,
+          "lava": true,
+          "trigger": false
+        }
+      },
+      {
+        "tile_id": 151,
+        "flags": 48,
+        "properties": {
+          "passable": true,
+          "blocked": false,
+          "water": false,
+          "lava": false,
+          "trigger": false
+        }
+      },
+      {
+        "tile_id": 152,
+        "flags": 239,
+        "properties": {
+          "passable": false,
+          "blocked": true,
+          "water": true,
+          "lava": true,
+          "trigger": true
+        }
+      },
+      {
+        "tile_id": 153,
+        "flags": 53,
+        "properties": {
+          "passable": false,
+          "blocked": true,
+          "water": false,
+          "lava": true,
+          "trigger": false
+        }
+      },
+      {
+        "tile_id": 154,
+        "flags": 65,
+        "properties": {
+          "passable": false,
+          "blocked": true,
+          "water": false,
+          "lava": false,
+          "trigger": false
+        }
+      },
+      {
+        "tile_id": 155,
+        "flags": 170,
+        "properties": {
+          "passable": true,
+          "blocked": false,
+          "water": true,
+          "lava": false,
+          "trigger": true
+        }
+      },
+      {
+        "tile_id": 156,
+        "flags": 255,
+        "properties": {
+          "passable": false,
+          "blocked": true,
+          "water": true,
+          "lava": true,
+          "trigger": true
+        }
+      },
+      {
+        "tile_id": 157,
+        "flags": 1,
+        "properties": {
+          "passable": false,
+          "blocked": true,
+          "water": false,
+          "lava": false,
+          "trigger": false
+        }
+      },
+      {
+        "tile_id": 158,
+        "flags": 16,
+        "properties": {
+          "passable": true,
+          "blocked": false,
+          "water": false,
+          "lava": false,
+          "trigger": false
+        }
+      },
+      {
+        "tile_id": 159,
+        "flags": 236,
+        "properties": {
+          "passable": true,
+          "blocked": false,
+          "water": false,
+          "lava": true,
+          "trigger": true
+        }
+      },
+      {
+        "tile_id": 160,
+        "flags": 208,
+        "properties": {
+          "passable": true,
+          "blocked": false,
+          "water": false,
+          "lava": false,
+          "trigger": false
+        }
+      },
+      {
+        "tile_id": 161,
+        "flags": 51,
+        "properties": {
+          "passable": false,
+          "blocked": true,
+          "water": true,
+          "lava": false,
+          "trigger": false
+        }
+      },
+      {
+        "tile_id": 162,
+        "flags": 15,
+        "properties": {
+          "passable": false,
+          "blocked": true,
+          "water": true,
+          "lava": true,
+          "trigger": true
+        }
+      },
+      {
+        "tile_id": 163,
+        "flags": 240,
+        "properties": {
+          "passable": true,
+          "blocked": false,
+          "water": false,
+          "lava": false,
+          "trigger": false
+        }
+      },
+      {
+        "tile_id": 164,
+        "flags": 154,
+        "properties": {
+          "passable": true,
+          "blocked": false,
+          "water": true,
+          "lava": false,
+          "trigger": true
+        }
+      },
+      {
+        "tile_id": 165,
+        "flags": 19,
+        "properties": {
+          "passable": false,
+          "blocked": true,
+          "water": true,
+          "lava": false,
+          "trigger": false
+        }
+      },
+      {
+        "tile_id": 166,
+        "flags": 46,
+        "properties": {
+          "passable": true,
+          "blocked": false,
+          "water": true,
+          "lava": true,
+          "trigger": true
+        }
+      },
+      {
+        "tile_id": 167,
+        "flags": 188,
+        "properties": {
+          "passable": true,
+          "blocked": false,
+          "water": false,
+          "lava": true,
+          "trigger": true
+        }
+      },
+      {
+        "tile_id": 168,
+        "flags": 2,
+        "properties": {
+          "passable": true,
+          "blocked": false,
+          "water": true,
+          "lava": false,
+          "trigger": false
+        }
+      },
+      {
+        "tile_id": 169,
+        "flags": 47,
+        "properties": {
+          "passable": false,
+          "blocked": true,
+          "water": true,
+          "lava": true,
+          "trigger": true
+        }
+      },
+      {
+        "tile_id": 170,
+        "flags": 202,
+        "properties": {
+          "passable": true,
+          "blocked": false,
+          "water": true,
+          "lava": false,
+          "trigger": true
+        }
+      },
+      {
+        "tile_id": 171,
+        "flags": 208,
+        "properties": {
+          "passable": true,
+          "blocked": false,
+          "water": false,
+          "lava": false,
+          "trigger": false
+        }
+      },
+      {
+        "tile_id": 172,
+        "flags": 16,
+        "properties": {
+          "passable": true,
+          "blocked": false,
+          "water": false,
+          "lava": false,
+          "trigger": false
+        }
+      },
+      {
+        "tile_id": 173,
+        "flags": 138,
+        "properties": {
+          "passable": true,
+          "blocked": false,
+          "water": true,
+          "lava": false,
+          "trigger": true
+        }
+      },
+      {
+        "tile_id": 174,
+        "flags": 252,
+        "properties": {
+          "passable": true,
+          "blocked": false,
+          "water": false,
+          "lava": true,
+          "trigger": true
+        }
+      },
+      {
+        "tile_id": 175,
+        "flags": 205,
+        "properties": {
+          "passable": false,
+          "blocked": true,
+          "water": false,
+          "lava": true,
+          "trigger": true
+        }
+      },
+      {
+        "tile_id": 176,
+        "flags": 255,
+        "properties": {
+          "passable": false,
+          "blocked": true,
+          "water": true,
+          "lava": true,
+          "trigger": true
+        }
+      },
+      {
+        "tile_id": 177,
+        "flags": 254,
+        "properties": {
+          "passable": true,
+          "blocked": false,
+          "water": true,
+          "lava": true,
+          "trigger": true
+        }
+      },
+      {
+        "tile_id": 178,
+        "flags": 204,
+        "properties": {
+          "passable": true,
+          "blocked": false,
+          "water": false,
+          "lava": true,
+          "trigger": true
+        }
+      },
+      {
+        "tile_id": 179,
+        "flags": 223,
+        "properties": {
+          "passable": false,
+          "blocked": true,
+          "water": true,
+          "lava": true,
+          "trigger": true
+        }
+      },
+      {
+        "tile_id": 180,
+        "flags": 255,
+        "properties": {
+          "passable": false,
+          "blocked": true,
+          "water": true,
+          "lava": true,
+          "trigger": true
+        }
+      },
+      {
+        "tile_id": 181,
+        "flags": 236,
+        "properties": {
+          "passable": true,
+          "blocked": false,
+          "water": false,
+          "lava": true,
+          "trigger": true
+        }
+      },
+      {
+        "tile_id": 182,
+        "flags": 138,
+        "properties": {
+          "passable": true,
+          "blocked": false,
+          "water": true,
+          "lava": false,
+          "trigger": true
+        }
+      },
+      {
+        "tile_id": 183,
+        "flags": 188,
+        "properties": {
+          "passable": true,
+          "blocked": false,
+          "water": false,
+          "lava": true,
+          "trigger": true
+        }
+      },
+      {
+        "tile_id": 184,
+        "flags": 226,
+        "properties": {
+          "passable": true,
+          "blocked": false,
+          "water": true,
+          "lava": false,
+          "trigger": false
+        }
+      },
+      {
+        "tile_id": 185,
+        "flags": 33,
+        "properties": {
+          "passable": false,
+          "blocked": true,
+          "water": false,
+          "lava": false,
+          "trigger": false
+        }
+      },
+      {
+        "tile_id": 186,
+        "flags": 235,
+        "properties": {
+          "passable": false,
+          "blocked": true,
+          "water": true,
+          "lava": false,
+          "trigger": true
+        }
+      },
+      {
+        "tile_id": 187,
+        "flags": 188,
+        "properties": {
+          "passable": true,
+          "blocked": false,
+          "water": false,
+          "lava": true,
+          "trigger": true
+        }
+      },
+      {
+        "tile_id": 188,
+        "flags": 237,
+        "properties": {
+          "passable": false,
+          "blocked": true,
+          "water": false,
+          "lava": true,
+          "trigger": true
+        }
+      },
+      {
+        "tile_id": 189,
+        "flags": 219,
+        "properties": {
+          "passable": false,
+          "blocked": true,
+          "water": true,
+          "lava": false,
+          "trigger": true
+        }
+      },
+      {
+        "tile_id": 190,
+        "flags": 239,
+        "properties": {
+          "passable": false,
+          "blocked": true,
+          "water": true,
+          "lava": true,
+          "trigger": true
+        }
+      },
+      {
+        "tile_id": 191,
+        "flags": 122,
+        "properties": {
+          "passable": true,
+          "blocked": false,
+          "water": true,
+          "lava": false,
+          "trigger": true
+        }
+      },
+      {
+        "tile_id": 192,
+        "flags": 52,
+        "properties": {
+          "passable": true,
+          "blocked": false,
+          "water": false,
+          "lava": true,
+          "trigger": false
+        }
+      },
+      {
+        "tile_id": 193,
+        "flags": 60,
+        "properties": {
+          "passable": true,
+          "blocked": false,
+          "water": false,
+          "lava": true,
+          "trigger": true
+        }
+      },
+      {
+        "tile_id": 194,
+        "flags": 171,
+        "properties": {
+          "passable": false,
+          "blocked": true,
+          "water": true,
+          "lava": false,
+          "trigger": true
+        }
+      },
+      {
+        "tile_id": 195,
+        "flags": 223,
+        "properties": {
+          "passable": false,
+          "blocked": true,
+          "water": true,
+          "lava": true,
+          "trigger": true
+        }
+      },
+      {
+        "tile_id": 196,
+        "flags": 235,
+        "properties": {
+          "passable": false,
+          "blocked": true,
+          "water": true,
+          "lava": false,
+          "trigger": true
+        }
+      },
+      {
+        "tile_id": 197,
+        "flags": 189,
+        "properties": {
+          "passable": false,
+          "blocked": true,
+          "water": false,
+          "lava": true,
+          "trigger": true
+        }
+      },
+      {
+        "tile_id": 198,
+        "flags": 241,
+        "properties": {
+          "passable": false,
+          "blocked": true,
+          "water": false,
+          "lava": false,
+          "trigger": false
+        }
+      },
+      {
+        "tile_id": 199,
+        "flags": 237,
+        "properties": {
+          "passable": false,
+          "blocked": true,
+          "water": false,
+          "lava": true,
+          "trigger": true
+        }
+      },
+      {
+        "tile_id": 200,
+        "flags": 122,
+        "properties": {
+          "passable": true,
+          "blocked": false,
+          "water": true,
+          "lava": false,
+          "trigger": true
+        }
+      },
+      {
+        "tile_id": 201,
+        "flags": 239,
+        "properties": {
+          "passable": false,
+          "blocked": true,
+          "water": true,
+          "lava": true,
+          "trigger": true
+        }
+      },
+      {
+        "tile_id": 202,
+        "flags": 18,
+        "properties": {
+          "passable": true,
+          "blocked": false,
+          "water": true,
+          "lava": false,
+          "trigger": false
+        }
+      },
+      {
+        "tile_id": 203,
+        "flags": 11,
+        "properties": {
+          "passable": false,
+          "blocked": true,
+          "water": true,
+          "lava": false,
+          "trigger": true
+        }
+      },
+      {
+        "tile_id": 204,
+        "flags": 174,
+        "properties": {
+          "passable": true,
+          "blocked": false,
+          "water": true,
+          "lava": true,
+          "trigger": true
+        }
+      },
+      {
+        "tile_id": 205,
+        "flags": 52,
+        "properties": {
+          "passable": true,
+          "blocked": false,
+          "water": false,
+          "lava": true,
+          "trigger": false
+        }
+      },
+      {
+        "tile_id": 206,
+        "flags": 14,
+        "properties": {
+          "passable": true,
+          "blocked": false,
+          "water": true,
+          "lava": true,
+          "trigger": true
+        }
+      },
+      {
+        "tile_id": 207,
+        "flags": 206,
+        "properties": {
+          "passable": true,
+          "blocked": false,
+          "water": true,
+          "lava": true,
+          "trigger": true
+        }
+      },
+      {
+        "tile_id": 208,
+        "flags": 54,
+        "properties": {
+          "passable": true,
+          "blocked": false,
+          "water": true,
+          "lava": true,
+          "trigger": false
+        }
+      },
+      {
+        "tile_id": 209,
+        "flags": 122,
+        "properties": {
+          "passable": true,
+          "blocked": false,
+          "water": true,
+          "lava": false,
+          "trigger": true
+        }
+      },
+      {
+        "tile_id": 210,
+        "flags": 79,
+        "properties": {
+          "passable": false,
+          "blocked": true,
+          "water": true,
+          "lava": true,
+          "trigger": true
+        }
+      },
+      {
+        "tile_id": 211,
+        "flags": 220,
+        "properties": {
+          "passable": true,
+          "blocked": false,
+          "water": false,
+          "lava": true,
+          "trigger": true
+        }
+      },
+      {
+        "tile_id": 212,
+        "flags": 21,
+        "properties": {
+          "passable": false,
+          "blocked": true,
+          "water": false,
+          "lava": true,
+          "trigger": false
+        }
+      },
+      {
+        "tile_id": 213,
+        "flags": 99,
+        "properties": {
+          "passable": false,
+          "blocked": true,
+          "water": true,
+          "lava": false,
+          "trigger": false
+        }
+      },
+      {
+        "tile_id": 214,
+        "flags": 235,
+        "properties": {
+          "passable": false,
+          "blocked": true,
+          "water": true,
+          "lava": false,
+          "trigger": true
+        }
+      },
+      {
+        "tile_id": 215,
+        "flags": 194,
+        "properties": {
+          "passable": true,
+          "blocked": false,
+          "water": true,
+          "lava": false,
+          "trigger": false
+        }
+      },
+      {
+        "tile_id": 216,
+        "flags": 66,
+        "properties": {
+          "passable": true,
+          "blocked": false,
+          "water": true,
+          "lava": false,
+          "trigger": false
+        }
+      },
+      {
+        "tile_id": 217,
+        "flags": 254,
+        "properties": {
+          "passable": true,
+          "blocked": false,
+          "water": true,
+          "lava": true,
+          "trigger": true
+        }
+      },
+      {
+        "tile_id": 218,
+        "flags": 122,
+        "properties": {
+          "passable": true,
+          "blocked": false,
+          "water": true,
+          "lava": false,
+          "trigger": true
+        }
+      },
+      {
+        "tile_id": 219,
+        "flags": 225,
+        "properties": {
+          "passable": false,
+          "blocked": true,
+          "water": false,
+          "lava": false,
+          "trigger": false
+        }
+      },
+      {
+        "tile_id": 220,
+        "flags": 87,
+        "properties": {
+          "passable": false,
+          "blocked": true,
+          "water": true,
+          "lava": true,
+          "trigger": false
+        }
+      },
+      {
+        "tile_id": 221,
+        "flags": 65,
+        "properties": {
+          "passable": false,
+          "blocked": true,
+          "water": false,
+          "lava": false,
+          "trigger": false
+        }
+      },
+      {
+        "tile_id": 222,
+        "flags": 17,
+        "properties": {
+          "passable": false,
+          "blocked": true,
+          "water": false,
+          "lava": false,
+          "trigger": false
+        }
+      },
+      {
+        "tile_id": 223,
+        "flags": 52,
+        "properties": {
+          "passable": true,
+          "blocked": false,
+          "water": false,
+          "lava": true,
+          "trigger": false
+        }
+      },
+      {
+        "tile_id": 224,
+        "flags": 30,
+        "properties": {
+          "passable": true,
+          "blocked": false,
+          "water": true,
+          "lava": true,
+          "trigger": true
+        }
+      },
+      {
+        "tile_id": 225,
+        "flags": 203,
+        "properties": {
+          "passable": false,
+          "blocked": true,
+          "water": true,
+          "lava": false,
+          "trigger": true
+        }
+      },
+      {
+        "tile_id": 226,
+        "flags": 221,
+        "properties": {
+          "passable": false,
+          "blocked": true,
+          "water": false,
+          "lava": true,
+          "trigger": true
+        }
+      },
+      {
+        "tile_id": 227,
+        "flags": 122,
+        "properties": {
+          "passable": true,
+          "blocked": false,
+          "water": true,
+          "lava": false,
+          "trigger": true
+        }
+      },
+      {
+        "tile_id": 228,
+        "flags": 240,
+        "properties": {
+          "passable": true,
+          "blocked": false,
+          "water": false,
+          "lava": false,
+          "trigger": false
+        }
+      },
+      {
+        "tile_id": 229,
+        "flags": 17,
+        "properties": {
+          "passable": false,
+          "blocked": true,
+          "water": false,
+          "lava": false,
+          "trigger": false
+        }
+      },
+      {
+        "tile_id": 230,
+        "flags": 70,
+        "properties": {
+          "passable": true,
+          "blocked": false,
+          "water": true,
+          "lava": true,
+          "trigger": false
+        }
+      },
+      {
+        "tile_id": 231,
+        "flags": 80,
+        "properties": {
+          "passable": true,
+          "blocked": false,
+          "water": false,
+          "lava": false,
+          "trigger": false
+        }
+      },
+      {
+        "tile_id": 232,
+        "flags": 224,
+        "properties": {
+          "passable": true,
+          "blocked": false,
+          "water": false,
+          "lava": false,
+          "trigger": false
+        }
+      },
+      {
+        "tile_id": 233,
+        "flags": 18,
+        "properties": {
+          "passable": true,
+          "blocked": false,
+          "water": true,
+          "lava": false,
+          "trigger": false
+        }
+      },
+      {
+        "tile_id": 234,
+        "flags": 12,
+        "properties": {
+          "passable": true,
+          "blocked": false,
+          "water": false,
+          "lava": true,
+          "trigger": true
+        }
+      },
+      {
+        "tile_id": 235,
+        "flags": 172,
+        "properties": {
+          "passable": true,
+          "blocked": false,
+          "water": false,
+          "lava": true,
+          "trigger": true
+        }
+      },
+      {
+        "tile_id": 236,
+        "flags": 122,
+        "properties": {
+          "passable": true,
+          "blocked": false,
+          "water": true,
+          "lava": false,
+          "trigger": true
+        }
+      },
+      {
+        "tile_id": 237,
+        "flags": 226,
+        "properties": {
+          "passable": true,
+          "blocked": false,
+          "water": true,
+          "lava": false,
+          "trigger": false
+        }
+      },
+      {
+        "tile_id": 238,
+        "flags": 32,
+        "properties": {
+          "passable": true,
+          "blocked": false,
+          "water": false,
+          "lava": false,
+          "trigger": false
+        }
+      },
+      {
+        "tile_id": 239,
+        "flags": 221,
+        "properties": {
+          "passable": false,
+          "blocked": true,
+          "water": false,
+          "lava": true,
+          "trigger": true
+        }
+      },
+      {
+        "tile_id": 240,
+        "flags": 242,
+        "properties": {
+          "passable": true,
+          "blocked": false,
+          "water": true,
+          "lava": false,
+          "trigger": false
+        }
+      },
+      {
+        "tile_id": 241,
+        "flags": 101,
+        "properties": {
+          "passable": false,
+          "blocked": true,
+          "water": false,
+          "lava": true,
+          "trigger": false
+        }
+      },
+      {
+        "tile_id": 242,
+        "flags": 234,
+        "properties": {
+          "passable": true,
+          "blocked": false,
+          "water": true,
+          "lava": false,
+          "trigger": true
+        }
+      },
+      {
+        "tile_id": 243,
+        "flags": 192,
+        "properties": {
+          "passable": true,
+          "blocked": false,
+          "water": false,
+          "lava": false,
+          "trigger": false
+        }
+      },
+      {
+        "tile_id": 244,
+        "flags": 69,
+        "properties": {
+          "passable": false,
+          "blocked": true,
+          "water": false,
+          "lava": true,
+          "trigger": false
+        }
+      },
+      {
+        "tile_id": 245,
+        "flags": 122,
+        "properties": {
+          "passable": true,
+          "blocked": false,
+          "water": true,
+          "lava": false,
+          "trigger": true
+        }
+      },
+      {
+        "tile_id": 246,
+        "flags": 241,
+        "properties": {
+          "passable": false,
+          "blocked": true,
+          "water": false,
+          "lava": false,
+          "trigger": false
+        }
+      },
+      {
+        "tile_id": 247,
+        "flags": 188,
+        "properties": {
+          "passable": true,
+          "blocked": false,
+          "water": false,
+          "lava": true,
+          "trigger": true
+        }
+      },
+      {
+        "tile_id": 248,
+        "flags": 5,
+        "properties": {
+          "passable": false,
+          "blocked": true,
+          "water": false,
+          "lava": true,
+          "trigger": false
+        }
+      },
+      {
+        "tile_id": 249,
+        "flags": 64,
+        "properties": {
+          "passable": true,
+          "blocked": false,
+          "water": false,
+          "lava": false,
+          "trigger": false
+        }
+      },
+      {
+        "tile_id": 250,
+        "flags": 221,
+        "properties": {
+          "passable": false,
+          "blocked": true,
+          "water": false,
+          "lava": true,
+          "trigger": true
+        }
+      },
+      {
+        "tile_id": 251,
+        "flags": 4,
+        "properties": {
+          "passable": true,
+          "blocked": false,
+          "water": false,
+          "lava": true,
+          "trigger": false
+        }
+      },
+      {
+        "tile_id": 252,
+        "flags": 84,
+        "properties": {
+          "passable": true,
+          "blocked": false,
+          "water": false,
+          "lava": true,
+          "trigger": false
+        }
+      },
+      {
+        "tile_id": 253,
+        "flags": 14,
+        "properties": {
+          "passable": true,
+          "blocked": false,
+          "water": true,
+          "lava": true,
+          "trigger": true
+        }
+      },
+      {
+        "tile_id": 254,
+        "flags": 122,
+        "properties": {
+          "passable": true,
+          "blocked": false,
+          "water": true,
+          "lava": false,
+          "trigger": true
+        }
+      },
+      {
+        "tile_id": 255,
+        "flags": 18,
+        "properties": {
+          "passable": true,
+          "blocked": false,
+          "water": true,
+          "lava": false,
+          "trigger": false
+        }
+      }
+    ]
+  },
+  "total_metatiles": 256,
+  "total_collision_entries": 256
+}

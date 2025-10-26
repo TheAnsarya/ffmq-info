@@ -89,7 +89,8 @@ continue the disassembly
 
 don't stop, just continue the disassembly in stages attacking multiple banks at once if that scales, otherwise do one bank at a time, saving as you go, and make sure we can continue where we left off next week, but go go go creating an SNES build platform for disassembling games starting with FFMQ (btw, the palettes and pngs look like nonsense (is the conversion process ok? or is there a compression algorithm?)) use `https://github.com/TheAnsarya/logsmall` for ffmq stuff like `https://github.com/TheAnsarya/logsmall/blob/master/logsmall/Compression/SimpleTailWindowCompression.cs` or `https://github.com/TheAnsarya/logsmall/blob/master/logsmall/Compression/ExpandSecondHalfWithZeros.cs`, document everything and comment and create data structures and interfaces (and format, update chat/history log, commit to git)
 
-
+continue to make progress and add more banks
+expand all the data markers, so `; [Collision data continues...]` actually shows the data, but in a real data structure and format. Create alive data structures so we have code-usable classes of the format and data files using the format, but mostly after integratng format files into the exctra craft data/convert-back data format files into the build pipeline so fix all the `polaceholder` comments wirh actual code and data, and data into files and formats!
 
 
 
