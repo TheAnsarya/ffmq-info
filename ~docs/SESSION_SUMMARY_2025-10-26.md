@@ -143,6 +143,26 @@ This session had TWO phases:
 - VRAM address formula: (Y×64) + (X×12) + $8000
 - Coordinate packing format (X in bits 0-2, Y in bits 3-5)
 
+**Commit 35 (43328e7):** Session summary update
+- Documented commit 34
+
+**Commit 36 (2714b74):** Rename ~roms to roms folder
+- Renamed ~roms/ to roms/ to eliminate tilde path issues
+- Updated .gitignore to ignore roms/ directory
+- Updated all PowerShell scripts (verify-build.ps1, setup.ps1, dev-watch.ps1)
+- Updated all Python scripts (8 files total)
+- Consistent path handling across entire project
+
+**Commit 37 (c7e56cc):** Build verification system **✅ MAJOR MILESTONE**
+- Created verify-build.ps1 automated build verification script
+- Script uses asar to assemble bank_00_documented.asm
+- Byte-by-byte comparison with reference ROM
+- Created src/asm/snes_registers.asm with complete hardware register map
+- All PPU, CPU, DMA, and controller registers defined
+- Uses asar-compatible !define syntax
+- Build system working - successfully identified duplicate labels
+- **BUILD VERIFICATION ACTIVE**: Can now verify code accuracy against ROM
+
 **Code Sections Fully Documented:**
 - ✅ CODE_008000-CODE_00806E: Boot sequence (3 entry points)
 - ✅ CODE_0080B0-CODE_0080DC: Display init and main game jump
@@ -160,9 +180,10 @@ This session had TWO phases:
 
 **Statistics:**
 - **~3,400 lines** of heavily commented code imported (~24.3% of Bank $00)
-- **8 major commits** (23, 24, 25, 27, 28, 30, 32, 34) plus 4 summary updates
+- **8 major commits** (23, 24, 25, 27, 28, 30, 32, 34) plus 5 infrastructure updates
 - **13 complete code sections** fully documented
 - **All core systems complete**: Boot, interrupts, graphics, main loop, input, menus, tilemap
+- **✅ BUILD VERIFICATION WORKING**: asar assembler configured and testing
 - Methodology proving highly effective with consistent quality
 
 **Remaining Bank $00 Sections:**
@@ -172,6 +193,13 @@ This session had TWO phases:
 - ❌ CODE_00A000+: Battle system and transitions (~2,500 lines)
 - ❌ CODE_00C000+: Graphics and sprite routines (~2,000 lines)
 - ❌ Remaining: ~10,330 lines total remaining in Bank $00
+
+**Build System Status:**
+- ✅ asar assembler installed and working
+- ✅ SNES register definitions complete (all hardware mapped)
+- ✅ Automated verification script functional
+- ⚠️ Duplicate labels identified (need cleanup before full verification)
+- Reference ROM: Final Fantasy - Mystic Quest (U) (V1.0) [!].sfc
 
 ### Systematic Import Methodology Established:
 
