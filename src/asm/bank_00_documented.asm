@@ -6717,8 +6717,173 @@ Perform_DMA_Update:
 	; Execute DMA transfer to update VRAM
 	; (code continues...)
 
+; ===========================================================================
+; Text/Graphics Processing Routines
+; ===========================================================================
+
+; ---------------------------------------------------------------------------
+; Load Graphics Data
+; ---------------------------------------------------------------------------
+; Purpose: Initialize graphics for specific game mode
+; Input: Direct Page $0000, $17 = graphics pointer, $19 = bank
+; ===========================================================================
+
+CODE_009A60:
+	PHP                         ; Save processor status
+	PHB                         ; Save data bank
+	PHD                         ; Save direct page
+	REP #$30                    ; 16-bit A/X/Y
+	PHA                         ; Save A
+	LDA.W #$0000                ; Direct Page = $0000
+	TCD                         ; Set DP
+	LDA.W #$F811                ; Graphics pointer
+	STA.B $17                   ; Store pointer
+	SEP #$20                    ; 8-bit A
+	LDA.B #$03                  ; Bank $03
+	STA.B $19                   ; Store bank
+	JSR.W CODE_009D75           ; Process graphics data
+	REP #$30                    ; 16-bit A/X/Y
+	PLA                         ; Restore A
+	PLD                         ; Restore direct page
+	PLB                         ; Restore data bank
+	PLP                         ; Restore processor status
+	RTL                         ; Return long
+
+; ---------------------------------------------------------------------------
+; Graphics Processing Entry Points
+; ---------------------------------------------------------------------------
+
+CODE_009AEC:
+	PHP                         ; Save processor status
+	PHD                         ; Save direct page
+	PEA.W $0000                 ; Push $0000
+	PLD                         ; Direct Page = $0000
+	REP #$30                    ; 16-bit A/X/Y
+	PHX                         ; Save X
+	LDX.W #$9AFF                ; Data pointer
+	JSR.W CODE_009BC4           ; Process data
+	PLX                         ; Restore X
+	PLD                         ; Restore direct page
+	PLP                         ; Restore processor status
+	RTL                         ; Return long
+
+CODE_009B02:
+	PHP                         ; Save processor status
+	PHD                         ; Save direct page
+	PHB                         ; Save data bank
+	SEP #$20                    ; 8-bit A
+	REP #$10                    ; 16-bit X/Y
+	PHA                         ; Save A
+	PHX                         ; Save X
+	PEA.W $0000                 ; Push $0000
+	PLD                         ; Direct Page = $0000
+	JSL.L CODE_0C8000           ; Call graphics handler
+	JSL.L CODE_0096A0           ; Wait for VBlank
+	PEI.B ($1D)                 ; Push [$1D]
+	LDA.B $27                   ; Load parameter
+	PHA                         ; Save it
+	JSL.L CODE_009B2F           ; Process graphics
+	JSR.W CODE_00A342           ; Call handler
+	PLA                         ; Restore parameter
+	STA.B $27                   ; Store back
+	PLX                         ; Get saved value
+	STX.B $1D                   ; Store to $1D
+	PLX                         ; Restore X
+	PLA                         ; Restore A
+	PLB                         ; Restore data bank
+	PLD                         ; Restore direct page
+	PLP                         ; Restore processor status
+	RTL                         ; Return long
+
+CODE_009B2F:
+	PHP                         ; Save processor status
+	PHD                         ; Save direct page
+	PEA.W $0000                 ; Push $0000
+	PLD                         ; Direct Page = $0000
+	REP #$30                    ; 16-bit A/X/Y
+	PHX                         ; Save X
+	LDX.W #$9B42                ; Data pointer
+	JSR.W CODE_009BC4           ; Process data
+	PLX                         ; Restore X
+	PLD                         ; Restore direct page
+	PLP                         ; Restore processor status
+	RTL                         ; Return long
+
+CODE_009B45:
+	PHP                         ; Save processor status
+	PHD                         ; Save direct page
+	REP #$30                    ; 16-bit A/X/Y
+	LDA.W #$0000                ; Direct Page = $0000
+	TCD                         ; Set DP
+	LDX.W #$9B56                ; Data pointer
+	JSR.W CODE_009BC4           ; Process data
+	PLD                         ; Restore direct page
+	PLP                         ; Restore processor status
+	RTL                         ; Return long
+
+CODE_009B59:
+	PHP                         ; Save processor status
+	PHD                         ; Save direct page
+	REP #$30                    ; 16-bit A/X/Y
+	LDA.W #$0000                ; Direct Page = $0000
+	TCD                         ; Set DP
+	LDA.B $20                   ; Load parameter
+	STA.B $4F                   ; Store to $4F
+	JSR.W CODE_009B8A           ; Setup graphics
+	LDA.B [$17]                 ; Load data
+	AND.W #$00FF                ; Mask to byte
+	CMP.W #$0004                ; Compare to 4
+	BEQ Skip_Special            ; If equal, skip
+	LDX.W #$9B9D                ; Special data pointer
+	JSR.W CODE_009BC4           ; Process data
+
+Skip_Special:
+	JSR.W CODE_009B8A           ; Setup graphics again
+	JSR.W CODE_009D75           ; Process graphics data
+	JSR.W CODE_009BA3           ; Post-process
+	LDX.W #$9BA0                ; Cleanup pointer
+	JSR.W CODE_009BC4           ; Process cleanup
+	PLD                         ; Restore direct page
+	PLP                         ; Restore processor status
+	RTL                         ; Return long
+
+CODE_009B8A:
+	SEP #$20                    ; 8-bit A
+	LDA.B #$03                  ; Bank $03
+	STA.B $19                   ; Store bank
+	REP #$30                    ; 16-bit A/X/Y
+	LDA.B $20                   ; Load parameter
+	ASL A                       ; Multiply by 2
+	TAX                         ; X = index
+	LDA.L UNREACH_03D5E5,X      ; Load pointer from table
+	STA.B $17                   ; Store graphics pointer
+	RTS                         ; Return
+
+CODE_009BA3:
+	RTS                         ; Return (stub)
+
+CODE_009BA4:
+	PHP                         ; Save processor status
+	PHD                         ; Save direct page
+	REP #$30                    ; 16-bit A/X/Y
+	LDA.W #$0000                ; Direct Page = $0000
+	TCD                         ; Set DP
+	SEP #$20                    ; 8-bit A
+	LDA.B #$03                  ; Bank $03
+	STA.B $19                   ; Store bank
+	REP #$30                    ; 16-bit A/X/Y
+	LDA.B $20                   ; Load parameter
+	ASL A                       ; Multiply by 2
+	TAX                         ; X = index
+	LDA.L DATA8_03BB81,X        ; Load pointer from table
+	STA.B $17                   ; Store graphics pointer
+	JSR.W CODE_009D75           ; Process graphics data
+	PLD                         ; Restore direct page
+	PLP                         ; Restore processor status
+	RTL                         ; Return long
+
 ;===============================================================================
-; Progress: ~1,500 lines documented (10.7% of Bank $00)
+; Progress: ~6,900 lines documented (49% of Bank $00)
 ; Sections completed:
 ; - Boot sequence and hardware init
 ; - DMA and graphics transfers
@@ -6727,6 +6892,11 @@ Perform_DMA_Update:
 ; - Input handling and validation
 ; - Character switching
 ; - Tilemap updates
-; 
-; Remaining: ~12,500 lines (battle system, map scrolling, more menus, etc.)
+; - Status effects and animations
+; - Math helpers (multiply, divide, RNG)
+; - Bit manipulation helpers
+; - Memory copy and fill operations
+; - Graphics processing routines
+;
+; Remaining: ~7,100 lines (battle system, more graphics, data tables, etc.)
 ;===============================================================================
