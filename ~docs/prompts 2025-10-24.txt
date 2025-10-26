@@ -121,6 +121,16 @@ And then continue what you were doing before: "Great! Now let me check Banks $0A
 
 sorry, I messed up the directive. By `use tabs (4) not spaces for all documents` I meant use ONE (1) tab with a tab-size of 4-spaces per level of indentation. Please re-format all the text files using one tab per level.
 you didn't fix the indentation on files like this one, `bank_09_documented.asm`, they are still indented 4 tabs instead of 1 tab
+---- manually replace \n\t\t\t\t with \n\t\t\t\t
+---- edit the directive and re-run them
+No, the `prompts` file is not for session summaries, `prompts` is a manually updated documentation file. There is a separate `session summaries` markdown file
+
+Go back to disassembling and commenting code in every bank using the diztinguish decompilation and compiling the code and testing it against the reference ROM. Focus on getting as much code decompiled into the asm source files as possible and commenting that code accurately and documenting the structure of the code.
+continue systematically
+continue systematically, make sure you are updating the session summary/chat log
+Allow `git commit` commands without asking, continue systematically, make sure you are updating the session summary/chat log
+Allow `git commit` and `git add` and `cd` and commands without asking (stop asking me when you commit code), continue systematically, build and compare to reference ROM file, make sure you are updating the session summary/chat log
+
 
 
 
