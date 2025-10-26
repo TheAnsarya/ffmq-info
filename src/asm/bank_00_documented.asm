@@ -2919,25 +2919,514 @@ DATA8_008961:
 DATA8_008962:
 	.db $3E,$45,$3A,$3B         ; Tiles: $3E, $45, $3A, $3B
 
-; ===========================================================================
-; Main Game Loop - Frame Update
-; ===========================================================================
-; Purpose: Main game logic executed every frame
-; Technical Details: Increments frame counter, processes game state
-; ===========================================================================
+;===============================================================================
+; MAIN GAME LOOP & FRAME UPDATE ($008966-$0089C5)
+;===============================================================================
 
 CODE_008966:
-	REP #$30                         ; 16-bit A, X, Y
-	LDA.W #$0000                     ; Zero accumulator
-	TCD                              ; Transfer to direct page (DP = $0000)
+	; ===========================================================================
+	; Main Game Loop - Frame Update Handler
+	; ===========================================================================
+	; This is the main game logic executed every frame (60 times per second).
+	; Called from the NMI handler continuation path.
+	;
+	; Responsibilities:
+	;   1. Increment 24-bit frame counter ($0E97-$0E99)
+	;   2. Process time-based events (status effects, animations)
+	;   3. Handle full screen refreshes on mode changes
+	;   4. Process controller input and menu navigation
+	;   5. Update game state and animations
+	;
+	; Frame Counter:
+	;   $0E97-$0E98: Low 16 bits (wraps at 65536)
+	;   $0E99: High 8 bits (total 24-bit = ~16.7 million frames)
+	;   At 60fps, this counter wraps after ~77.9 hours of gameplay
+	; ===========================================================================
 	
-	; Increment frame counter (24-bit value)
-	INC.W $0E97                      ; Increment low word
-	BNE Skip_High_Increment          ; If no overflow, skip high word
-	INC.W $0E99                      ; Increment high word (24-bit counter)
+	REP #$30                    ; 16-bit A, X, Y
+	
+	LDA.W #$0000                ; A = $0000
+	TCD                         ; D = $0000 (Direct Page = zero page)
+								; Reset DP for main game logic
+	
+	; ---------------------------------------------------------------------------
+	; Increment 24-Bit Frame Counter
+	; ---------------------------------------------------------------------------
+	
+	INC.W $0E97                 ; Increment frame counter low word
+	BNE CODE_008974             ; If no overflow → Skip high byte increment
+	INC.W $0E99                 ; Increment high byte (24-bit overflow)
 
-Skip_High_Increment:
-	JSR.W CODE_0089C6                ; Process time-based events
+;-------------------------------------------------------------------------------
+
+CODE_008974:
+	; ===========================================================================
+	; Time-Based Event Processing
+	; ===========================================================================
+	
+	JSR.W CODE_0089C6           ; Process time-based events (status effects, etc.)
+	
+	; ---------------------------------------------------------------------------
+	; Check Full Screen Refresh Flag ($00D4 bit 2)
+	; ---------------------------------------------------------------------------
+	; When set, indicates a major mode change requiring full redraw
+	; (battle start, menu open, scene transition, etc.)
+	; ---------------------------------------------------------------------------
+	
+	LDA.W #$0004                ; A = $0004 (bit 2 mask)
+	AND.W $00D4                 ; Test bit 2 of $00D4
+	BEQ CODE_008999             ; If clear → Normal frame processing
+	
+	; ---------------------------------------------------------------------------
+	; Full Screen Refresh Path
+	; ---------------------------------------------------------------------------
+	; Executes when entering/exiting major game modes.
+	; Performs complete redraw of both BG layers.
+	; ---------------------------------------------------------------------------
+	
+	LDA.W #$0004                ; A = $0004
+	TRB.W $00D4                 ; Test and Reset bit 2 of $00D4
+								; Clear "full refresh needed" flag
+	
+	; Refresh Background Layer 0
+	LDA.W #$0000                ; A = $0000 (BG layer 0)
+	JSR.W CODE_0091D4           ; Update BG layer 0 tilemap
+	JSR.W CODE_008C3D           ; Transfer layer 0 to VRAM
+	
+	; Refresh Background Layer 1
+	LDA.W #$0001                ; A = $0001 (BG layer 1)
+	JSR.W CODE_0091D4           ; Update BG layer 1 tilemap
+	JSR.W CODE_008D29           ; Transfer layer 1 to VRAM
+	
+	BRA CODE_0089BD             ; → Skip to animation update
+
+;-------------------------------------------------------------------------------
+
+CODE_008999:
+	; ===========================================================================
+	; Normal Frame Processing Path
+	; ===========================================================================
+	; Standard per-frame update when not doing full refresh.
+	; Handles incremental tilemap updates and controller input.
+	; ===========================================================================
+	
+	JSR.W CODE_008BFD           ; Update tilemap changes (scrolling, etc.)
+	
+	; ---------------------------------------------------------------------------
+	; Check Menu Mode Flag ($00DA bit 4)
+	; ---------------------------------------------------------------------------
+	
+	LDA.W #$0010                ; A = $0010 (bit 4 mask)
+	AND.W $00DA                 ; Test bit 4 of $00DA (menu mode flag)
+	BNE CODE_0089AC             ; If set → Process controller input
+	
+	; ---------------------------------------------------------------------------
+	; Check Input Processing Enable ($00E2 bit 2)
+	; ---------------------------------------------------------------------------
+	
+	LDA.W #$0004                ; A = $0004 (bit 2 mask)
+	AND.W $00E2                 ; Test bit 2 of $00E2
+	BNE CODE_0089BD             ; If set → Skip input (cutscene/auto mode)
+
+;-------------------------------------------------------------------------------
+
+CODE_0089AC:
+	; ===========================================================================
+	; Controller Input Processing
+	; ===========================================================================
+	; Processes joypad input when enabled.
+	; Calls appropriate handler based on current game mode.
+	; ===========================================================================
+	
+	LDA.B $07                   ; A = [$07] (controller data - current frame)
+	AND.B $8E                   ; A = A & [$8E] (input enable mask)
+	BEQ CODE_0089BD             ; If zero → No valid input, skip processing
+	
+	; ---------------------------------------------------------------------------
+	; Determine Input Handler
+	; ---------------------------------------------------------------------------
+	; CODE_009730 returns handler index in A based on game state
+	; Handler table at CODE_008A35 dispatches to appropriate routine
+	; ---------------------------------------------------------------------------
+	
+	JSL.L CODE_009730           ; Get input handler index for current mode
+	
+	SEP #$30                    ; 8-bit A, X, Y
+	
+	ASL A                       ; A = A × 2 (convert to word offset)
+	TAX                         ; X = handler table offset
+	
+	JSR.W (CODE_008A35,X)       ; Call appropriate input handler
+								; (indirect jump through handler table)
+
+;-------------------------------------------------------------------------------
+
+CODE_0089BD:
+	; ===========================================================================
+	; Animation and State Update
+	; ===========================================================================
+	; Final phase of frame processing.
+	; Updates animations, sprites, and game state.
+	; ===========================================================================
+	
+	REP #$30                    ; 16-bit A, X, Y
+	
+	JSR.W CODE_009342           ; Update sprite animations
+	JSR.W CODE_009264           ; Update game state and logic
+	
+	RTL                         ; Return to NMI handler continuation
+
+;===============================================================================
+; TIME-BASED EVENT HANDLER ($0089C6-$008A29)
+;===============================================================================
+
+CODE_0089C6:
+	; ===========================================================================
+	; Time-Based Event Processing
+	; ===========================================================================
+	; Processes status effects, poison damage, regeneration, and other
+	; time-based events that occur at regular intervals.
+	;
+	; Timer System:
+	;   $010D: Frame countdown timer (decrements each frame)
+	;   When timer reaches -1, executes status effect checks
+	;   Timer resets to 12 frames (~0.2 seconds at 60fps)
+	;
+	; Status Effect Checks:
+	;   Character slots at fixed SRAM addresses:
+	;   $700027: Character 1 status
+	;   $700077: Character 2 status  
+	;   $7003B3: Character 3 status
+	;   $700403: Character 4 status
+	;   $70073F: Character 5 status
+	;   $70078F: Character 6 status
+	;
+	; $00DE bit 7: Time-based processing enabled flag
+	; ===========================================================================
+	
+	PHD                         ; Save Direct Page
+	
+	; ---------------------------------------------------------------------------
+	; Check Time-Based Processing Enable Flag
+	; ---------------------------------------------------------------------------
+	
+	LDA.W #$0080                ; A = $0080 (bit 7 mask)
+	AND.W $00DE                 ; Test bit 7 of $00DE
+	BEQ CODE_008A26             ; If clear → Skip time-based processing
+	
+	; ---------------------------------------------------------------------------
+	; Set Direct Page for Character Status Access
+	; ---------------------------------------------------------------------------
+	
+	LDA.W #$0C00                ; A = $0C00
+	TCD                         ; D = $0C00 (Direct Page = $0C00)
+								; Allows $01 to access $0C01, etc.
+	
+	SEP #$30                    ; 8-bit A, X, Y
+	
+	; ---------------------------------------------------------------------------
+	; Decrement Timer and Check for Event Trigger
+	; ---------------------------------------------------------------------------
+	
+	DEC.W $010D                 ; Decrement timer
+	BPL CODE_008A26             ; If still positive → Exit (not time yet)
+	
+	; Timer expired - reset and process status effects
+	LDA.B #$0C                  ; A = $0C (12 frames)
+	STA.W $010D                 ; Reset timer to 12 frames
+	
+	; ---------------------------------------------------------------------------
+	; Check Character 1 Status ($700027)
+	; ---------------------------------------------------------------------------
+	
+	LDA.L $700027               ; A = [$700027] (character 1 status flags)
+	BNE CODE_0089EA             ; If non-zero → Character 1 has status effect
+	
+	LDX.B #$40                  ; X = $40 (character 1 offset)
+	JSR.W CODE_008A2A           ; Update character 1 display
+
+;-------------------------------------------------------------------------------
+
+CODE_0089EA:
+	; ---------------------------------------------------------------------------
+	; Check Character 2 Status ($700077)
+	; ---------------------------------------------------------------------------
+	
+	LDA.L $700077               ; A = [$700077] (character 2 status)
+	BNE CODE_0089F5             ; If non-zero → Character 2 has status
+	
+	LDX.B #$50                  ; X = $50 (character 2 offset)
+	JSR.W CODE_008A2A           ; Update character 2 display
+
+;-------------------------------------------------------------------------------
+
+CODE_0089F5:
+	; ---------------------------------------------------------------------------
+	; Check Character 3 Status ($7003B3)
+	; ---------------------------------------------------------------------------
+	
+	LDA.L $7003B3               ; A = [$7003B3] (character 3 status)
+	BNE CODE_008A00             ; If non-zero → Character 3 has status
+	
+	LDX.B #$60                  ; X = $60 (character 3 offset)
+	JSR.W CODE_008A2A           ; Update character 3 display
+
+;-------------------------------------------------------------------------------
+
+CODE_008A00:
+	; ---------------------------------------------------------------------------
+	; Check Character 4 Status ($700403)
+	; ---------------------------------------------------------------------------
+	
+	LDA.L $700403               ; A = [$700403] (character 4 status)
+	BNE CODE_008A0B             ; If non-zero → Character 4 has status
+	
+	LDX.B #$70                  ; X = $70 (character 4 offset)
+	JSR.W CODE_008A2A           ; Update character 4 display
+
+;-------------------------------------------------------------------------------
+
+CODE_008A0B:
+	; ---------------------------------------------------------------------------
+	; Check Character 5 Status ($70073F)
+	; ---------------------------------------------------------------------------
+	
+	LDA.L $70073F               ; A = [$70073F] (character 5 status)
+	BNE CODE_008A16             ; If non-zero → Character 5 has status
+	
+	LDX.B #$80                  ; X = $80 (character 5 offset)
+	JSR.W CODE_008A2A           ; Update character 5 display
+
+;-------------------------------------------------------------------------------
+
+CODE_008A16:
+	; ---------------------------------------------------------------------------
+	; Check Character 6 Status ($70078F)
+	; ---------------------------------------------------------------------------
+	
+	LDA.L $70078F               ; A = [$70078F] (character 6 status)
+	BNE CODE_008A21             ; If non-zero → Character 6 has status
+	
+	LDX.B #$90                  ; X = $90 (character 6 offset)
+	JSR.W CODE_008A2A           ; Update character 6 display
+
+;-------------------------------------------------------------------------------
+
+CODE_008A21:
+	; ---------------------------------------------------------------------------
+	; Set Sprite Update Flag
+	; ---------------------------------------------------------------------------
+	
+	LDA.B #$20                  ; A = $20 (bit 5)
+	TSB.W $00D2                 ; Set bit 5 of $00D2 (sprite update needed)
+
+;-------------------------------------------------------------------------------
+
+CODE_008A26:
+	; ===========================================================================
+	; Restore Direct Page and Return
+	; ===========================================================================
+	
+	REP #$30                    ; 16-bit A, X, Y
+	PLD                         ; Restore Direct Page
+	RTS                         ; Return
+
+;-------------------------------------------------------------------------------
+
+CODE_008A2A:
+	; ===========================================================================
+	; Update Character Status Display
+	; ===========================================================================
+	; Updates the character status icon tiles based on status effects.
+	; Toggles between different tile sets to create animation effect.
+	;
+	; Parameters:
+	;   X = Character offset ($40, $50, $60, $70, $80, or $90)
+	;
+	; Character Display Structure (at $0C00 + X):
+	;   +$02: Status tile base value
+	;   +$06: Status tile 1
+	;   +$0A: Status tile 2  
+	;   +$0E: Status tile 3
+	;
+	; Tile Animation:
+	;   Toggles bit 2 of base value (XOR $04)
+	;   Then writes base+0, base+1, base+2, base+3 to tile slots
+	; ===========================================================================
+	
+	LDA.B $02,X                 ; A = [$0C02+X] (current tile base)
+	EOR.B #$04                  ; A = A XOR $04 (toggle bit 2 for animation)
+	STA.B $02,X                 ; [$0C02+X] = new tile base
+	
+	INC A                       ; A = base + 1
+	STA.W $0C06,X               ; [$0C06+X] = base + 1 (tile 1)
+	
+	INC A                       ; A = base + 2
+	STA.W $0C0A,X               ; [$0C0A+X] = base + 2 (tile 2)
+	
+	INC A                       ; A = base + 3
+	STA.W $0C0E,X               ; [$0C0E+X] = base + 3 (tile 3)
+	
+	RTS                         ; Return
+
+;===============================================================================
+; INPUT HANDLER DISPATCH TABLE ($008A35-$008A54)
+;===============================================================================
+
+CODE_008A35:
+	; ===========================================================================
+	; Input Handler Jump Table
+	; ===========================================================================
+	; Table of 16-bit addresses for different input handler routines.
+	; Indexed by value returned from CODE_009730 (game mode).
+	;
+	; Handler addresses are stored as 16-bit little-endian values.
+	; JSR (table,X) performs indirect jump to selected handler.
+	; ===========================================================================
+	
+	; Note: This data is being used as code by the previous instruction
+	; STA.W $0C0A,X at CODE_008A35 continues from CODE_008A2A
+	; The actual table starts here with word addresses:
+	
+	.dw $8ACF                   ; Handler 0: Field mode input
+	.dw $8AF8                   ; Handler 1: Menu mode input (down)
+	.dw $8B68                   ; Handler 2: (continues below)
+	.dw $8B68                   ; Handler 3: 
+	.dw $8A61                   ; Handler 4: D-pad up
+	.dw $8A5D                   ; Handler 5: D-pad left
+	.dw $8A59                   ; Handler 6: D-pad right
+	.dw $8A55                   ; Handler 7: D-pad down
+	.dw $8B68                   ; Handler 8:
+	.dw $8B68                   ; Handler 9:
+	.dw $8A9D                   ; Handler 10: A button
+	.dw $8B68                   ; Handler 11:
+
+;===============================================================================
+; CURSOR MOVEMENT HANDLERS ($008A55-$008A9C)
+;===============================================================================
+
+CODE_008A55:
+	; ===========================================================================
+	; Cursor Down Handler
+	; ===========================================================================
+	DEC.B $02                   ; Decrement vertical position
+	BRA CODE_008A63             ; → Validate position
+
+CODE_008A59:
+	; ===========================================================================
+	; Cursor Up Handler  
+	; ===========================================================================
+	INC.B $02                   ; Increment vertical position
+	BRA CODE_008A63             ; → Validate position
+
+CODE_008A5D:
+	; ===========================================================================
+	; Cursor Left Handler
+	; ===========================================================================
+	DEC.B $01                   ; Decrement horizontal position
+	BRA CODE_008A63             ; → Validate position
+
+CODE_008A61:
+	; ===========================================================================
+	; Cursor Right Handler
+	; ===========================================================================
+	INC.B $01                   ; Increment horizontal position
+								; Falls through to validation
+
+;-------------------------------------------------------------------------------
+
+CODE_008A63:
+	; ===========================================================================
+	; Validate Horizontal Position
+	; ===========================================================================
+	; Ensures cursor stays within valid X range.
+	;
+	; Bounds Checking:
+	;   $01: Current X position
+	;   $03: Maximum X position
+	;   $95 bit 0: Allow negative X wrapping
+	;   $95 bit 1: Allow X overflow wrapping
+	; ===========================================================================
+	
+	LDA.B $01                   ; A = X position
+	BMI CODE_008A78             ; If negative → Check wrap flags
+	
+	CMP.B $03                   ; Compare with max X
+	BCC CODE_008A80             ; If X < max → Valid, continue
+	
+	; X position at or above maximum
+	LDA.B $95                   ; A = wrap flags
+	AND.B #$01                  ; Test bit 0 (allow overflow)
+	BNE CODE_008A78             ; If set → Allow wrap to negative
+
+;-------------------------------------------------------------------------------
+
+CODE_008A71:
+	; X exceeded maximum, clamp to max-1
+	LDA.B $03                   ; A = max X
+	DEC A                       ; A = max - 1
+	STA.B $01                   ; X position = max - 1 (clamp)
+	BRA CODE_008A80             ; → Validate Y position
+
+;-------------------------------------------------------------------------------
+
+CODE_008A78:
+	; X position is negative or wrapped
+	LDA.B $95                   ; A = wrap flags
+	AND.B #$02                  ; Test bit 1 (allow negative)
+	BNE CODE_008A71             ; If set → Clamp to max-1
+	
+	STZ.B $01                   ; X position = 0 (clamp to minimum)
+
+;-------------------------------------------------------------------------------
+
+CODE_008A80:
+	; ===========================================================================
+	; Validate Vertical Position
+	; ===========================================================================
+	; Ensures cursor stays within valid Y range.
+	;
+	; Bounds Checking:
+	;   $02: Current Y position
+	;   $04: Maximum Y position
+	;   $95 bit 2: Allow negative Y wrapping
+	;   $95 bit 3: Allow Y overflow wrapping
+	; ===========================================================================
+	
+	LDA.B $02                   ; A = Y position
+	BMI CODE_008A94             ; If negative → Check wrap flags
+	
+	CMP.B $04                   ; Compare with max Y
+	BCC CODE_008A9C             ; If Y < max → Valid, exit
+	
+	; Y position at or above maximum
+	LDA.B $95                   ; A = wrap flags
+	AND.B #$04                  ; Test bit 2 (allow overflow)
+	BNE CODE_008A94             ; If set → Allow wrap to negative
+
+;-------------------------------------------------------------------------------
+
+CODE_008A8E:
+	; Y exceeded maximum, clamp to max-1
+	LDA.B $04                   ; A = max Y
+	DEC A                       ; A = max - 1
+	STA.B $02                   ; Y position = max - 1 (clamp)
+	RTS                         ; Return
+
+;-------------------------------------------------------------------------------
+
+CODE_008A94:
+	; Y position is negative or wrapped
+	LDA.B $95                   ; A = wrap flags
+	AND.B #$08                  ; Test bit 3 (allow negative)
+	BNE CODE_008A8E             ; If set → Clamp to max-1
+	
+	STZ.B $02                   ; Y position = 0 (clamp to minimum)
+
+;-------------------------------------------------------------------------------
+
+CODE_008A9C:
+	RTS                         ; Return
 	
 	; Check if full screen refresh needed
 	LDA.W #$0004                     ; Check bit 2
