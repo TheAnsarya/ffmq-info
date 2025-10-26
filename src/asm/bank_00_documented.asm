@@ -7390,8 +7390,499 @@ DATA8_009E6E:
 	.dw CODE_00A89B             ; $1E
 	.dw $0000                   ; $1F: Unused
 
+; ===========================================================================
+; Graphics Command Handlers (Commands $00-$2F)
+; ===========================================================================
+
+; ---------------------------------------------------------------------------
+; Command $2D: Set Graphics Pointer to Fixed Address
+; ---------------------------------------------------------------------------
+
+CODE_00A06E:
+	LDA.W #$0EA6                ; Fixed pointer
+	STA.B $2E                   ; Store to $2E
+	RTS                         ; Return
+
+; ---------------------------------------------------------------------------
+; Command $25: Load Graphics Pointer from Stream
+; ---------------------------------------------------------------------------
+
+CODE_00A074:
+	LDA.B [$17]                 ; Read 16-bit pointer
+	INC.B $17                   ; Advance stream pointer
+	INC.B $17                   ; (2 bytes)
+	STA.B $2E                   ; Store to $2E
+	RTS                         ; Return
+
+; ---------------------------------------------------------------------------
+; Command $26: Set Tile Offset (8-bit)
+; ---------------------------------------------------------------------------
+
+CODE_00A07D:
+	LDA.B [$17]                 ; Read byte parameter
+	INC.B $17                   ; Advance stream pointer
+	AND.W #$00FF                ; Mask to byte
+	SEP #$20                    ; 8-bit A
+	STA.B $1E                   ; Store tile offset
+	RTS                         ; Return
+
+; ---------------------------------------------------------------------------
+; Command $19: Set Graphics Bank and Pointer
+; ---------------------------------------------------------------------------
+
+CODE_00A089:
+	LDA.B [$17]                 ; Read 16-bit pointer
+	INC.B $17                   ; Advance stream pointer
+	INC.B $17                   ; (2 bytes)
+	STA.B $3F                   ; Store pointer
+	LDA.B [$17]                 ; Read bank byte
+	INC.B $17                   ; Advance stream pointer
+	AND.W #$00FF                ; Mask to byte
+	SEP #$20                    ; 8-bit A
+	STA.B $41                   ; Store bank
+	RTS                         ; Return
+
+; ---------------------------------------------------------------------------
+; Command $27: Set Display Mode Byte
+; ---------------------------------------------------------------------------
+
+CODE_00A09D:
+	LDA.B [$17]                 ; Read byte parameter
+	INC.B $17                   ; Advance stream pointer
+	AND.W #$00FF                ; Mask to byte
+	SEP #$20                    ; 8-bit A
+	STA.B $27                   ; Store mode byte
+	RTS                         ; Return
+
+; ---------------------------------------------------------------------------
+; Command $28: Set Effect Mask
+; ---------------------------------------------------------------------------
+
+CODE_00A0A9:
+	LDA.B [$17]                 ; Read byte parameter
+	INC.B $17                   ; Advance stream pointer
+	AND.W #$00FF                ; Mask to byte
+	SEP #$20                    ; 8-bit A
+	REP #$10                    ; 16-bit X/Y
+	STA.B $1D                   ; Store effect mask
+	RTS                         ; Return
+
+; ---------------------------------------------------------------------------
+; Command $15: Set 16-bit Parameter at $25
+; ---------------------------------------------------------------------------
+
+CODE_00A0B7:
+	LDA.B [$17]                 ; Read 16-bit value
+	INC.B $17                   ; Advance stream pointer
+	INC.B $17                   ; (2 bytes)
+	STA.B $25                   ; Store to $25
+	RTS                         ; Return
+
+; ---------------------------------------------------------------------------
+; Command $1F: Indexed String Lookup with Fixed Length
+; ---------------------------------------------------------------------------
+
+CODE_00A0C0:
+	PEI.B ($9E)                 ; Save $9E
+	PEI.B ($A0)                 ; Save $A0
+	LDA.B [$17]                 ; Read string index
+	INC.B $17                   ; Advance stream pointer
+	AND.W #$00FF                ; Mask to byte
+	STA.B $9E                   ; Store index
+	STZ.B $A0                   ; Clear high byte
+	LDA.W #$0003                ; Length = 3 bytes
+	LDX.W #$82BB                ; Table pointer
+	JSR.W CODE_00A71C           ; Process string
+	PLX                         ; Restore $A0
+	STX.B $A0                   ; Store back
+	PLX                         ; Restore $9E
+	STX.B $9E                   ; Store back
+	RTS                         ; Return
+
+; ---------------------------------------------------------------------------
+; Command $20: Indexed String Lookup (Different Table)
+; ---------------------------------------------------------------------------
+
+CODE_00A0DF:
+	PEI.B ($9E)                 ; Save $9E
+	PEI.B ($A0)                 ; Save $A0
+	LDA.B [$17]                 ; Read string index
+	INC.B $17                   ; Advance stream pointer
+	AND.W #$00FF                ; Mask to byte
+	STA.B $9E                   ; Store index
+	STZ.B $A0                   ; Clear high byte
+	LDA.W #$0003                ; Length = 3 bytes
+	LDX.W #$A802                ; Table pointer
+	JSR.W CODE_00A71C           ; Process string
+	PLX                         ; Restore $A0
+	STX.B $A0                   ; Store back
+	PLX                         ; Restore $9E
+	STX.B $9E                   ; Store back
+	RTS                         ; Return
+
+; ---------------------------------------------------------------------------
+; Command $1E: Another Indexed String Handler
+; ---------------------------------------------------------------------------
+
+CODE_00A0FE:
+	PEI.B ($9E)                 ; Save $9E
+	PEI.B ($A0)                 ; Save $A0
+	LDA.B [$17]                 ; Read string index
+	INC.B $17                   ; Advance stream pointer
+	AND.W #$00FF                ; Mask to byte
+	STA.B $9E                   ; Store index
+	STZ.B $A0                   ; Clear high byte
+	LDA.W #$0003                ; Length = 3 bytes
+	LDX.W #$8383                ; Table pointer
+	JSR.W CODE_00A71C           ; Process string
+	PLX                         ; Restore $A0
+	STX.B $A0                   ; Store back
+	PLX                         ; Restore $9E
+	STX.B $9E                   ; Store back
+	RTS                         ; Return
+
+; ---------------------------------------------------------------------------
+; Command $24: Set Display Parameters
+; ---------------------------------------------------------------------------
+
+CODE_00A11D:
+	LDA.B [$17]                 ; Read first word
+	INC.B $17                   ; Advance stream pointer
+	INC.B $17                   ; (2 bytes)
+	STA.B $28                   ; Store to $28
+	LDA.B [$17]                 ; Read second word
+	INC.B $17                   ; Advance stream pointer
+	INC.B $17                   ; (2 bytes)
+	STA.B $2A                   ; Store to $2A
+	RTS                         ; Return
+
+CODE_00A12E:
+	LDA.B [$17]                 ; Read parameter
+	INC.B $17                   ; Advance stream pointer
+	INC.B $17                   ; (2 bytes)
+	SEP #$20                    ; 8-bit A
+	STA.B $2C                   ; Store low byte
+	XBA                         ; Swap bytes
+	STA.B $2D                   ; Store high byte
+	RTS                         ; Return
+
+; ---------------------------------------------------------------------------
+; Command $1D: Indexed Lookup with Table $A7F6
+; ---------------------------------------------------------------------------
+
+CODE_00A13C:
+	LDA.B [$17]                 ; Read index
+	INC.B $17                   ; Advance stream pointer
+	AND.W #$00FF                ; Mask to byte
+	STA.B $9E                   ; Store index
+	STZ.B $A0                   ; Clear high byte
+	LDA.W #$0003                ; Length = 3 bytes
+	LDX.W #$A7F6                ; Table pointer
+	JMP.W CODE_00A71C           ; Process and return
+
+; ---------------------------------------------------------------------------
+; Command $22: Set Graphics Pointer to $AEA7 Bank $03
+; ---------------------------------------------------------------------------
+
+CODE_00A150:
+	SEP #$20                    ; 8-bit A
+	LDA.B #$03                  ; Bank $03
+	STA.B $19                   ; Store bank
+	LDX.W #$AEA7                ; Pointer
+	STX.B $17                   ; Store pointer
+	RTS                         ; Return
+
+; ---------------------------------------------------------------------------
+; Command $1C: Set Graphics Pointer to $8457 Bank $03
+; ---------------------------------------------------------------------------
+
+CODE_00A15C:
+	SEP #$20                    ; 8-bit A
+	LDA.B #$03                  ; Bank $03
+	STA.B $19                   ; Store bank
+	LDX.W #$8457                ; Pointer
+	STX.B $17                   ; Store pointer
+	RTS                         ; Return
+
+; ---------------------------------------------------------------------------
+; Command $1A: Indexed Character Graphics
+; ---------------------------------------------------------------------------
+
+CODE_00A168:
+	LDA.B [$17]                 ; Read character index
+	INC.B $17                   ; Advance stream pointer
+	AND.W #$00FF                ; Mask to byte
+	SEP #$20                    ; 8-bit A
+	STA.B $4F                   ; Store character ID
+	REP #$30                    ; 16-bit A/X/Y
+	LDA.W #$0003                ; Bank $03
+	LDX.W #$A831                ; Table pointer
+	JMP.W CODE_00A71C           ; Process character graphics
+
+; ---------------------------------------------------------------------------
+; Command $1B: Indexed Monster Graphics
+; ---------------------------------------------------------------------------
+
+CODE_00A17E:
+	LDA.B [$17]                 ; Read monster index
+	INC.B $17                   ; Advance stream pointer
+	AND.W #$00FF                ; Mask to byte
+	SEP #$20                    ; 8-bit A
+	STA.B $4F                   ; Store monster ID
+	REP #$30                    ; 16-bit A/X/Y
+	LDA.W #$0003                ; Bank $03
+	LDX.W #$A895                ; Table pointer
+	JMP.W CODE_00A71C           ; Process monster graphics
+
+; ---------------------------------------------------------------------------
+; Clear Address High Byte Handlers
+; ---------------------------------------------------------------------------
+
+CODE_00A194:
+	JSR.W CODE_00A1AB           ; Read pointer
+	STZ.B $9F                   ; Clear $9F
+	STZ.B $A0                   ; Clear $A0
+	RTS                         ; Return
+
+CODE_00A19C:
+	JSR.W CODE_00A1AB           ; Read pointer
+	STZ.B $A0                   ; Clear $A0
+	RTS                         ; Return
+
+CODE_00A1A2:
+	JSR.W CODE_00A1AB           ; Read pointer
+	AND.W #$00FF                ; Mask to byte
+	STA.B $A0                   ; Store to $A0
+	RTS                         ; Return
+
+; ---------------------------------------------------------------------------
+; CODE_00A1AB: Read Indirect Pointer from Stream
+; ---------------------------------------------------------------------------
+; Purpose: Read pointer and bank from [$17], then dereference
+; Algorithm: Read 3 bytes -> use as pointer -> read actual target pointer
+; ===========================================================================
+
+CODE_00A1AB:
+	LDA.B [$17]                 ; Read pointer word
+	INC.B $17                   ; Advance stream
+	INC.B $17                   ; (2 bytes)
+	TAX                         ; X = pointer address
+	LDA.B [$17]                 ; Read bank byte
+	INC.B $17                   ; Advance stream
+	AND.W #$00FF                ; Mask to byte
+	CLC                         ; Clear carry
+	ADC.W $0000,X               ; Add offset from [X]
+	TAY                         ; Y = final offset
+	LDA.W $0002,X               ; Load bank from [X+2]
+	AND.W #$00FF                ; Mask to byte
+	PHA                         ; Push bank
+	PLB                         ; Pull to data bank
+	LDA.W $0000,Y               ; Load target pointer low
+	TAX                         ; X = pointer low
+	LDA.W $0002,Y               ; Load target pointer high
+	PLB                         ; Restore bank
+	STX.B $9E                   ; Store pointer low
+	RTS                         ; Return (A = pointer high)
+
+; ---------------------------------------------------------------------------
+; Memory Fill from Stream Parameters
+; ---------------------------------------------------------------------------
+
+CODE_00A1D1:
+	LDA.B [$17]                 ; Read destination address
+	INC.B $17                   ; Advance stream
+	INC.B $17                   ; (2 bytes)
+	TAY                         ; Y = destination
+	SEP #$20                    ; 8-bit A
+	LDA.B [$17]                 ; Read fill value
+	XBA                         ; Swap to high byte
+	LDA.B [$17]                 ; Read again (16-bit fill)
+	REP #$30                    ; 16-bit A/X/Y
+	INC.B $17                   ; Advance stream
+	TAX                         ; X = fill value
+	LDA.B [$17]                 ; Read count
+	INC.B $17                   ; Advance stream
+	AND.W #$00FF                ; Mask to byte
+	JMP.W CODE_009998           ; Call fill dispatcher
+
+; ---------------------------------------------------------------------------
+; Graphics System Calls
+; ---------------------------------------------------------------------------
+
+CODE_00A1EE:
+	JSL.L CODE_0C8000           ; Call graphics system
+	RTS                         ; Return
+
+CODE_00A1F3:
+	JSL.L CODE_0096A0           ; Wait for VBlank
+	RTS                         ; Return
+
+; ---------------------------------------------------------------------------
+; CODE_00A1F8: Copy Display State
+; ---------------------------------------------------------------------------
+
+CODE_00A1F8:
+	JSR.W CODE_00A220           ; Prepare state
+	SEP #$20                    ; 8-bit A
+	LDX.W $101B                 ; Load source X
+	STX.W $1018                 ; Copy to destination X
+	LDA.W $101D                 ; Load source bank
+	STA.W $101A                 ; Copy to destination bank
+	LDX.W $109B                 ; Load source X (second set)
+	STX.W $1098                 ; Copy to destination X
+	LDA.W $109D                 ; Load source bank (second set)
+	STA.W $109A                 ; Copy to destination bank
+	RTS                         ; Return
+
+; ---------------------------------------------------------------------------
+; Copy State and Clear Flags
+; ---------------------------------------------------------------------------
+
+CODE_00A216:
+	JSR.W CODE_00A1F8           ; Copy display state
+	STZ.W $1021                 ; Clear flag
+	STZ.W $10A1                 ; Clear flag
+	RTS                         ; Return
+
+; ---------------------------------------------------------------------------
+; CODE_00A220: Prepare Display State
+; ---------------------------------------------------------------------------
+
+CODE_00A220:
+	LDX.W $1016                 ; Load source
+	STX.W $1014                 ; Copy to destination
+	LDX.W $1096                 ; Load source (second set)
+	STX.W $1094                 ; Copy to destination
+	LDA.W #$0003                ; Bits 0-1 mask
+	TRB.W $102F                 ; Clear bits
+	TRB.W $10AF                 ; Clear bits
+	RTS                         ; Return
+
+; ---------------------------------------------------------------------------
+; CODE_00A236: Character Data DMA Transfer
+; ---------------------------------------------------------------------------
+; Purpose: Copy character data to VRAM buffer area
+; ===========================================================================
+
+CODE_00A236:
+	LDA.W #$0080                ; Bit 7 mask
+	AND.W $10A0                 ; Test character flag
+	PHP                         ; Save result
+	
+	; Read character slot index
+	LDA.B [$17]                 ; Read slot index
+	INC.B $17                   ; Advance stream
+	AND.W #$00FF                ; Mask to byte
+	SEP #$30                    ; 8-bit A/X/Y
+	STA.W $0E92                 ; Store character slot
+	
+	; Calculate offset: slot * $50
+	STA.W SNES_WRMPYA           ; Multiplicand = slot
+	LDA.B #$50                  ; Multiplier = $50 (80 bytes)
+	JSL.L CODE_00971E           ; Perform multiply
+	REP #$30                    ; 16-bit A/X/Y
+	
+	; Setup DMA transfer
+	CLC                         ; Clear carry
+	LDA.W #$D0B0                ; Base address $0CD0B0
+	ADC.W SNES_RDMPYL           ; Add offset (result)
+	TAX                         ; X = source address
+	LDY.W #$1080                ; Y = destination $7E1080
+	LDA.W #$0050                ; Transfer $50 bytes
+	PEA.W $000C                 ; Push bank $0C
+	PLB                         ; Pull to data bank
+	JSR.W CODE_00985D           ; Perform memory copy
+	PLB                         ; Restore bank
+	
+	PLP                         ; Restore flags
+	BNE CODE_00A273             ; Skip if flag was set
+	LDA.W #$0080                ; Bit 7 mask
+	TRB.W $10A0                 ; Clear character flag
+
+CODE_00A273:
+	RTS                         ; Return
+
+; ---------------------------------------------------------------------------
+; Multiple Command Sequence
+; ---------------------------------------------------------------------------
+
+CODE_00A274:
+	LDA.W #$0003                ; Bank $03
+	LDX.W #$8457                ; Pointer to data
+	JSR.W CODE_00A71C           ; Process data
+	REP #$30                    ; 16-bit A/X/Y
+	
+	LDA.B [$17]                 ; Read parameters
+	INC.B $17                   ; Advance stream
+	INC.B $17                   ; (2 bytes)
+	SEP #$20                    ; 8-bit A
+	STA.W $0513                 ; Store parameter
+	XBA                         ; Swap bytes
+	STA.W $0A9C                 ; Store parameter
+	
+	LDX.B $17                   ; X = current pointer
+	LDA.B $19                   ; A = current bank
+	JSL.L CODE_00D080           ; Call handler
+	STA.B $19                   ; Update bank
+	STX.B $17                   ; Update pointer
+	RTS                         ; Return
+
+; ---------------------------------------------------------------------------
+; VBlank Wait Loop
+; ---------------------------------------------------------------------------
+
+CODE_00A29B:
+	LDA.B [$17]                 ; Read wait count
+	INC.B $17                   ; Advance stream
+	AND.W #$00FF                ; Mask to byte
+
+CODE_00A2A2:
+	JSL.L CODE_0096A0           ; Wait for VBlank
+	DEC A                       ; Decrement counter
+	BNE CODE_00A2A2             ; Loop until 0
+	RTS                         ; Return
+
+; ---------------------------------------------------------------------------
+; Indexed Color Palette Lookup
+; ---------------------------------------------------------------------------
+
+CODE_00A2AA:
+	LDA.B [$17]                 ; Read palette index
+	INC.B $17                   ; Advance stream
+	AND.W #$00FF                ; Mask to byte
+	PHA                         ; Save index
+	BRA CODE_00A2B4 + 2         ; Skip to processing
+
+CODE_00A2B4:
+	PEI.B ($9E)                 ; Save $9E
+	SEP #$20                    ; 8-bit A
+	LDX.W #$0000                ; X = 0 (table index)
+
+CODE_00A2BB:
+	; Search palette table for matching index
+	LDA.W DATA8_00A2DD,X        ; Load table entry
+	CMP.B #$FF                  ; Check for end marker
+	BEQ UNREACH_00A2D4          ; End of table (not found)
+	CMP.B $01,S                 ; Compare with search index
+	BEQ CODE_00A2CB             ; Found match
+	INX                         ; Next entry
+	INX                         ; (skip 2 more bytes)
+	INX                         ; (3 bytes per entry)
+	BRA CODE_00A2BB             ; Continue search
+
+CODE_00A2CB:
+	REP #$30                    ; 16-bit A/X/Y
+	LDA.W DATA8_00A2DE,X        ; Load palette pointer
+	STA.B $9E                   ; Store to $9E
+	PLX                         ; Clean stack
+	RTS                         ; Return
+
+UNREACH_00A2D4:
+	; End of table - index not found
+	; (likely error condition)
+
 ;===============================================================================
-; Progress: ~7,300 lines documented (52% of Bank $00)
+; Progress: ~7,400 lines documented (52.8% of Bank $00)
 ; Sections completed:
 ; - Boot sequence and hardware init
 ; - DMA and graphics transfers
@@ -7406,6 +7897,7 @@ DATA8_009E6E:
 ; - Memory copy and fill operations
 ; - Graphics processing routines
 ; - Graphics command dispatcher and jump tables
+; - Graphics command handlers ($00-$2F)
 ;
-; Remaining: ~6,700 lines (battle system, command handlers, more data tables)
+; Remaining: ~6,600 lines (battle system, more handlers, data tables)
 ;===============================================================================
