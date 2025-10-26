@@ -133,6 +133,8 @@ Allow `git commit` and `git add` and `cd` and commands without asking (stop aski
 rename the `/~roms/` folder to `/roms/` so we don't have anymore tilde (~) issues in pathing (make sure to update the gitignore file and rom path in the powershell scripts) and then resume what you are doing
 stop asking me when you commit code!!!, don't ask when you use git, don't ask when you create a commit, don't ask when you change directories, just in general stop asking me to approve so many actions, continue systematically
 continue systematically across banks 00, 01, 02, and 03
+continue systematically
+auto-accept `git add ..... && git commit`, continue systematically, pushing after each commit, build and compare to reference ROM file, make sure you are updating the session summary/chat log
 
 
 
@@ -145,7 +147,7 @@ continue systematically across banks 00, 01, 02, and 03
 
 
 
-
+continue systematically, pushing after each commit, build and compare to reference ROM file, make sure you are updating the session summary/chat log
 
 
 
@@ -205,6 +207,37 @@ find all the `Next steps` and todos and fill out the code
 update editorconfig so python scripts use tabs (4) (and utf-8, crlf) instead of spaces and then update all python scripts to the correct formatting.
 
 Discord channels about SNES development include invites of: `https://discord.gg/AAS9WXdj` and `https://discord.gg/Jv7J3SNA`
+
+---
+Session update (2025-10-26  -- automated entry)
+
+Summary of recent automated actions:
+- Committed: "Add graphics processing routines (CODE_009A60-CODE_009BA4)" (auto)
+- Committed: "Add graphics data processing engine (CODE_009BC4-CODE_009DDF) and command jump tables" (auto)
+- Committed: "Add graphics command handlers (CODE_00A06E-CODE_00A2D4)" (auto)
+- Committed: "Add additional graphics command handlers (CODE_00A2E7-CODE_00A576)" (auto, pushed to branch ai-code-trial)
+
+Build verification:
+- Action: Ran `verify-build.ps1` to assemble `bank_00_documented.asm` and compare the assembled bank to the reference ROM.
+- Result: Assembly failed. asar reported multiple label redefinition errors in `src/asm/bank_00_documented.asm` (see below). Assembly aborted.
+
+Representative errors from asar output:
+- Label redefined: CODE_008543 (multiple locations)
+- Label redefined: CODE_008577
+- Multiple data/label redefinitions around CODE_008A35_dw and DATA_008FDF_db
+- Over 20 errors were reported; assembly aborted with exit code 1.
+
+Immediate next steps (recommended):
+1) Diagnose duplicate label causes: search `src/asm/bank_00_documented.asm` for repeated labels (CODE_008543, CODE_008577, etc.). The duplicates often come from repeated data blocks or from importing the same region twice.
+2) Run a local grep for `.dw`, `.db`, and `CODE_` labels to locate duplicates and reconcile with the historical disassembly files. Prefer to keep a single canonical label definition per symbol.
+3) Consider splitting large included data tables into separate files and `incsrc`-ing them once, to avoid accidental redefinitions when concatenating chunks.
+4) After fixing duplicates, re-run `pwsh -NoProfile -ExecutionPolicy Bypass -File verify-build.ps1` to re-assemble and compare.
+
+Notes:
+- The automated workflow will continue to auto-commit and push changes. I will update this session log after each commit and after each build attempt.
+- If you want me to halt auto-pushes or change branch targets, say so explicitly. Otherwise I'll continue pushing to `ai-code-trial`.
+
+
 
 
 
