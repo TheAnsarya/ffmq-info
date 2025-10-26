@@ -47,15 +47,24 @@ if (-not (Test-Path "build")) {
     Write-Success "Build directory created"
 }
 
-# Copy base ROM
-$baseRom = Resolve-Path "~roms\Final Fantasy - Mystic Quest (U) (V1.1).sfc" -ErrorAction SilentlyContinue
-if ($baseRom -and (Test-Path $baseRom)) {
-    Write-Info "Copying base ROM..."
-    Copy-Item $baseRom $Output -Force
-    Write-Success "Base ROM copied"
-} else {
-    Write-Warning "Base ROM not found at ~roms/. Output will be patch-only."
-}
+# ==============================================================================
+# REAL BUILD - NO ROM COPYING!
+# ==============================================================================
+# Old behavior: Copy original ROM and patch over it (99.996% fake match)
+# New behavior: Build entire ROM from scratch (HONEST progress tracking)
+# 
+# The output ROM is built ENTIRELY from:
+# - Disassembled assembly code
+# - Extracted graphics binaries
+# - Extracted palette data
+# - Extracted text strings
+# - Extracted game data (enemies, items, maps, etc.)
+#
+# This is the ONLY way to track real disassembly progress!
+# ==============================================================================
+
+Write-Info "Building ROM from scratch (no ROM copying!)"
+Write-Warning "Progress is now HONEST - expect low match % until disassembly complete"
 
 # Check for asar
 Write-Info "Checking for asar assembler..."
