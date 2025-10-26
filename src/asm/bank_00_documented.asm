@@ -4358,36 +4358,311 @@ UNREACH_008D93:
 	RTS                         ; Return
 
 ;===============================================================================
-; VRAM Write Helper Routines
+; Character Validation & Party Helper Routines
 ;===============================================================================
-; This section contains low-level VRAM manipulation routines used by the
-; DMA system and graphics update code. These helpers provide direct VRAM
-; writes for tile data and perform critical setup for graphics transfers.
+; These small helper routines validate character positions and check party
+; member availability. Used by menu systems to skip dead/invalid characters.
 ;===============================================================================
 
 CODE_008D97:
 	; ===========================================================================
-	; Direct VRAM Write: 8 Tiles From WRAM
+	; Character Position Validation Helper
 	; ===========================================================================
-	; Writes 8 consecutive tiles (128 bytes) directly to VRAM from WRAM
-	; Used for quick tilemap updates without DMA overhead
-	;
-	; TECHNICAL NOTES:
-	; - Uses Direct Page = $2100 for PPU register access
-	; - Writes in pairs (high byte from $00F0, low byte from WRAM)
-	; - Each tile is 16 bytes (8×8 pixels, 4bpp)
-	; - Loop processes 8 tiles = 128 bytes total
+	; Validates a character position by checking party member availability
 	;
 	; Parameters:
-	;   Direct Page = $2100 (PPU registers)
-	;   X = WRAM source address ($07xxxx range)
-	;   $00F0 = High byte pattern (usually $00)
-	;   VRAM address already set via !SNES_VMADDL/H
+	;   $1031 = Current character position
+	;
+	; Returns:
+	;   $009E = Validated position (or adjusted)
+	;   $1031 = Updated position after validation
+	; ===========================================================================
+	
+	LDA.W $1031                 ; Get current character position
+	PHA                         ; Save it
+	LDA.W #$0003                ; A = 3 (check 3 party slots)
+	JSR.W CODE_008DA8           ; Validate party member
+	PLA                         ; Restore original position
+	STA.W $1031                 ; Store back to $1031
+	STY.B $9E                   ; Save validated position to $9E
+	RTS                         ; Return
+
+;-------------------------------------------------------------------------------
+
+CODE_008DA8:
+	; ===========================================================================
+	; Party Member Availability Check
+	; ===========================================================================
+	; Checks party member status flags to find next valid character
+	; Scans through bits in $1032-$1033 to skip dead/invalid members
+	;
+	; TECHNICAL NOTES:
+	; - $1032-$1033 contains party status bitfield
+	; - Each character has flags indicating availability
+	; - Function counts valid members and returns position
+	;
+	; Parameters:
+	;   A = Number of slots to check
+	;   $1032-$1033 = Party status flags
+	;
+	; Returns:
+	;   Y = Valid character position (or $FF if none found)
+	;   $1031 = Updated character position
+	; ===========================================================================
+	
+	PHP                         ; Save processor status
+	SEP #$30                    ; 8-bit mode
+	PHA                         ; Save slot count
+	CLC                         ; Clear carry
+	ADC.B $01,S                 ; A = count × 2 (stack peek)
+	ADC.B $01,S                 ; A = count × 3
+	ADC.B #$22                  ; A += $22 (offset calculation)
+	TAY                         ; Y = calculated offset
+	PLA                         ; Restore slot count
+	EOR.B #$FF                  ; Invert bits
+	SEC                         ; Set carry
+	ADC.B #$04                  ; A = 4 - count (bit shift count)
+	TAX                         ; X = shift count
+	
+	LDA.W $1032                 ; Get status flags (high byte)
+	XBA                         ; Swap to low byte
+	LDA.W $1033                 ; Get status flags (low byte)
+	REP #$20                    ; 16-bit A
+	SEP #$10                    ; 8-bit X, Y
+	LSR A                       ; Shift right (first bit)
+
+CODE_008DC7:
+	LSR A                       ; Shift right
+	LSR A                       ; Shift right
+	LSR A                       ; Shift right (shift 3 bits per slot)
+	DEX                         ; Decrement shift counter
+	BNE CODE_008DC7             ; Loop until X = 0
+	
+	LSR A                       ; Check first member bit
+	BCS CODE_008DDA             ; If set → valid member found
+	DEY                         ; Try previous slot
+	LSR A                       ; Check second member bit
+	BCS CODE_008DDA             ; If set → valid member found
+	DEY                         ; Try previous slot
+	LSR A                       ; Check third member bit
+	BCS CODE_008DDA             ; If set → valid member found
+	LDY.B #$FF                  ; No valid members → $FF
+
+CODE_008DDA:
+	STY.W $1031                 ; Store validated position
+	PLP                         ; Restore processor status
+	RTS                         ; Return
+
+;===============================================================================
+; DMA Transfer Helper Routines
+;===============================================================================
+; Low-level DMA and direct VRAM write helpers used throughout the graphics
+; system. These routines handle bulk transfers and direct writes to VRAM.
+;===============================================================================
+
+CODE_008DDF:
+	; ===========================================================================
+	; Large VRAM Write via Direct Writes (No DMA)
+	; ===========================================================================
+	; Writes large blocks of tile data directly to VRAM without using DMA
+	; Used when DMA channels are unavailable or for specific VRAM patterns
+	;
+	; TECHNICAL NOTES:
+	; - Sets Direct Page to $2100 (PPU registers)
+	; - Writes 24 bytes per tile (8 words × 3 bytes each)
+	; - Interleaves data with $00F0 pattern bytes
+	; - VRAM auto-increment must be configured externally
+	;
+	; Parameters:
+	;   Direct Page = $2100
+	;   X = Source address in Bank $04
+	;   Y = Number of tile groups to write
+	;   VRAM address already set
 	;
 	; Register Usage:
-	;   A = Data byte being written
-	;   X = Source pointer (increments by $10 per tile)
-	;   Y = Tile counter (8 tiles)
+	;   A = Data being written
+	;   X = Source pointer (auto-increments)
+	;   Y = Outer loop counter (tile groups)
+	; ===========================================================================
+	
+	PHP                         ; Save processor status
+	PHD                         ; Save Direct Page
+	REP #$30                    ; 16-bit mode
+	LDA.W #$2100                ; A = $2100
+	TCD                         ; Direct Page = $2100 (PPU registers)
+	CLC                         ; Clear carry for additions
+
+CODE_008DE8:
+	PHY                         ; Save Y counter
+	SEP #$20                    ; 8-bit A
+	LDY.W #$0018                ; Y = $18 (24 decimal, inner loop count)
+
+CODE_008DEE:
+	LDA.W $0000,X               ; Get byte from source
+	TAY                         ; Y = data byte
+	STY.B !SNES_VMDATAL-$2100   ; Write to VRAM data (low)
+	LDA.W $0001,X               ; Get next byte
+	TAY                         ; Y = data byte  
+	STY.B !SNES_VMDATAL-$2100   ; Write to VRAM data (low)
+	LDA.W $0002,X               ; Get third byte
+	TAY                         ; Y = data byte
+	STY.B !SNES_VMDATAL-$2100   ; Write to VRAM data (low)
+	LDA.W $0003,X               ; Get fourth byte
+	TAY                         ; Y = data byte
+	STY.B !SNES_VMDATAL-$2100   ; Write to VRAM data (low)
+	LDA.W $0004,X               ; Get fifth byte
+	TAY                         ; Y = data byte
+	STY.B !SNES_VMDATAL-$2100   ; Write to VRAM data (low)
+	LDA.W $0005,X               ; Get sixth byte
+	TAY                         ; Y = data byte
+	STY.B !SNES_VMDATAL-$2100   ; Write to VRAM data (low)
+	LDA.W $0006,X               ; Get seventh byte
+	TAY                         ; Y = data byte
+	STY.B !SNES_VMDATAL-$2100   ; Write to VRAM data (low)
+	LDA.W $0007,X               ; Get eighth byte
+	TAY                         ; Y = data byte
+	STY.B !SNES_VMDATAL-$2100   ; Write to VRAM data (low)
+	
+	LDA.W $0008,X               ; Get ninth byte
+	TAY                         ; Y = data byte
+	STY.B !SNES_VMDATAL-$2100   ; Write to VRAM data (low)
+	LDA.W $0009,X               ; Get tenth byte
+	TAY                         ; Y = data byte
+	STY.B !SNES_VMDATAL-$2100   ; Write to VRAM data (low)
+	LDA.W $000A,X               ; Get 11th byte
+	TAY                         ; Y = data byte
+	STY.B !SNES_VMDATAL-$2100   ; Write to VRAM data (low)
+	LDA.W $000B,X               ; Get 12th byte
+	TAY                         ; Y = data byte
+	STY.B !SNES_VMDATAL-$2100   ; Write to VRAM data (low)
+	LDA.W $000C,X               ; Get 13th byte
+	TAY                         ; Y = data byte
+	STY.B !SNES_VMDATAL-$2100   ; Write to VRAM data (low)
+	LDA.W $000D,X               ; Get 14th byte
+	TAY                         ; Y = data byte
+	STY.B !SNES_VMDATAL-$2100   ; Write to VRAM data (low)
+	LDA.W $000E,X               ; Get 15th byte
+	TAY                         ; Y = data byte
+	STY.B !SNES_VMDATAL-$2100   ; Write to VRAM data (low)
+	LDA.W $000F,X               ; Get 16th byte
+	TAY                         ; Y = data byte
+	STY.B !SNES_VMDATAL-$2100   ; Write to VRAM data (low)
+	
+	LDA.W $0010,X               ; Get 17th byte
+	TAY                         ; Y = data byte
+	STY.B !SNES_VMDATAL-$2100   ; Write to VRAM data (low)
+	LDA.W $0011,X               ; Get 18th byte
+	TAY                         ; Y = data byte
+	STY.B !SNES_VMDATAL-$2100   ; Write to VRAM data (low)
+	LDA.W $0012,X               ; Get 19th byte
+	TAY                         ; Y = data byte
+	STY.B !SNES_VMDATAL-$2100   ; Write to VRAM data (low)
+	LDA.W $0013,X               ; Get 20th byte
+	TAY                         ; Y = data byte
+	STY.B !SNES_VMDATAL-$2100   ; Write to VRAM data (low)
+	LDA.W $0014,X               ; Get 21st byte
+	TAY                         ; Y = data byte
+	STY.B !SNES_VMDATAL-$2100   ; Write to VRAM data (low)
+	LDA.W $0015,X               ; Get 22nd byte
+	TAY                         ; Y = data byte
+	STY.B !SNES_VMDATAL-$2100   ; Write to VRAM data (low)
+	LDA.W $0016,X               ; Get 23rd byte
+	TAY                         ; Y = data byte
+	STY.B !SNES_VMDATAL-$2100   ; Write to VRAM data (low)
+	LDA.W $0017,X               ; Get 24th byte
+	TAY                         ; Y = data byte
+	STY.B !SNES_VMDATAL-$2100   ; Write to VRAM data (low)
+	
+	REP #$30                    ; 16-bit mode
+	TXA                         ; A = X (source pointer)
+	ADC.W #$0018                ; A += $18 (24 bytes)
+	TAX                         ; X = new source address
+	PLY                         ; Restore Y counter
+	DEY                         ; Decrement tile group counter
+	BNE CODE_008DE8             ; Loop if more groups remain
+	
+	PLD                         ; Restore Direct Page
+	PLP                         ; Restore processor status
+	RTL                         ; Return
+
+;-------------------------------------------------------------------------------
+
+CODE_008E54:
+	; ===========================================================================
+	; VRAM Write: 8 Tiles with Pattern Interleaving
+	; ===========================================================================
+	; Writes 8 tiles (16 bytes each) to VRAM with pattern byte interleaving
+	; Pattern byte from $00F0 is written between each data byte
+	;
+	; TECHNICAL NOTES:
+	; - VRAM increment mode $88 (increment by 32 after high byte write)
+	; - Each tile writes: data, pattern, data, pattern... (16 writes total)
+	; - 8 tiles × 16 bytes = 128 bytes written
+	; - Source is in Bank $07 WRAM
+	;
+	; Parameters:
+	;   X = Source address in Bank $07
+	;   Y = Number of tiles (typically 8)
+	;   $00F0 = Pattern byte to interleave
+	;   VRAM address already set
+	; ===========================================================================
+	
+	PHP                         ; Save processor status
+	PHD                         ; Save Direct Page
+	PEA.W $2100                 ; Push $2100
+	PLD                         ; Direct Page = $2100
+	SEP #$20                    ; 8-bit A
+	LDA.B #$88                  ; A = $88 (VRAM increment +32 after high)
+	STA.B !SNES_VMAINC-$2100    ; Set VRAM increment mode
+	REP #$30                    ; 16-bit mode
+	CLC                         ; Clear carry
+
+CODE_008E63:
+	LDA.W $0000,X               ; Get word 0
+	STA.B !SNES_VMDATAL-$2100   ; Write to VRAM
+	LDA.W $00F0                 ; Get pattern word
+	STA.B !SNES_VMDATAL-$2100   ; Write pattern
+	LDA.W $0002,X               ; Get word 1
+	STA.B !SNES_VMDATAL-$2100   ; Write to VRAM
+	LDA.W $00F0                 ; Get pattern word
+	STA.B !SNES_VMDATAL-$2100   ; Write pattern
+	LDA.W $0004,X               ; Get word 2
+	STA.B !SNES_VMDATAL-$2100   ; Write to VRAM
+	LDA.W $00F0                 ; Get pattern word
+	STA.B !SNES_VMDATAL-$2100   ; Write pattern
+	LDA.W $0006,X               ; Get word 3
+	STA.B !SNES_VMDATAL-$2100   ; Write to VRAM
+	LDA.W $00F0                 ; Get pattern word
+	STA.B !SNES_VMDATAL-$2100   ; Write pattern
+	LDA.W $0008,X               ; Get word 4
+	STA.B !SNES_VMDATAL-$2100   ; Write to VRAM
+	LDA.W $00F0                 ; Get pattern word
+	STA.B !SNES_VMDATAL-$2100   ; Write pattern
+	LDA.W $000A,X               ; Get word 5
+	STA.B !SNES_VMDATAL-$2100   ; Write to VRAM
+	LDA.W $00F0                 ; Get pattern word
+	STA.B !SNES_VMDATAL-$2100   ; Write pattern
+	LDA.W $000C,X               ; Get word 6
+	STA.B !SNES_VMDATAL-$2100   ; Write to VRAM
+	LDA.W $00F0                 ; Get pattern word
+	STA.B !SNES_VMDATAL-$2100   ; Write pattern
+	LDA.W $000E,X               ; Get word 7
+	STA.B !SNES_VMDATAL-$2100   ; Write to VRAM
+	LDA.W $00F0                 ; Get pattern word
+	STA.B !SNES_VMDATAL-$2100   ; Write pattern
+	
+	TXA                         ; A = X (source pointer)
+	ADC.W #$0010                ; A += $10 (16 bytes per tile)
+	TAX                         ; X = new source address
+	DEY                         ; Decrement tile counter
+	BNE CODE_008E63             ; Loop if more tiles remain
+	
+	SEP #$20                    ; 8-bit A
+	LDA.B #$80                  ; A = $80 (VRAM increment +1)
+	STA.B !SNES_VMAINC-$2100    ; Restore normal VRAM increment
+	PLD                         ; Restore Direct Page
+	PLP                         ; Restore processor status
+	RTL                         ; Return
 	REP #$30                         ; 16-bit A, X, Y
 	JSR.W CODE_009342                ; Update sprites
 	JSR.W CODE_009264                ; Update animations
