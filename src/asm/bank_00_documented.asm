@@ -1301,23 +1301,504 @@ CODE_0083DD:
 	RTL                         ; Return from Long call (NMI complete)
 
 ;===============================================================================
-; TILEMAP DMA TRANSFER ($0083E8-$00
+; TILEMAP DMA TRANSFER ($0083E8-$008576)
+;===============================================================================
+
+CODE_0083E8:
 	; ===========================================================================
-	; New Game Initialization
+	; Tilemap DMA Transfer to VRAM
 	; ===========================================================================
-	; No save data exists - start a new game.
+	; Transfers tilemap data from ROM to VRAM for background layers.
+	; Used when switching screens or updating large portions of the map.
+	;
+	; Process:
+	;   1. Clear DMA pending flag ($00D4 bit 1)
+	;   2. Configure CGRAM (palette) upload
+	;   3. Transfer tilemap data to VRAM
+	;   4. Handle special cases based on $0062 flag
 	; ===========================================================================
 	
-	JSR.W CODE_008117           ; Initialize_New_Game_State
+	LDA.B #$02                  ; A = $02 (bit 1)
+	TRB.W $00D4                 ; Test and Reset bit 1 of $00D4
+								; Clear "tilemap DMA pending" flag
+	
+	LDA.B #$80                  ; A = $80 (increment after $2119 write)
+	STA.W $2115                 ; $2115 (VMAINC) = $80
+								; VRAM address increments by 1 word after high byte write
+	
+	; ---------------------------------------------------------------------------
+	; Configure Palette (CGRAM) DMA
+	; ---------------------------------------------------------------------------
+	
+	LDX.W #$2200                ; X = $2200
+								; $22 = DMA mode (fixed source, increment dest)
+								; $00 = Target register low byte
+	STX.B SNES_DMA5PARAM-$4300  ; $4350 = DMA5 parameters
+	
+	LDA.B #$07                  ; A = $07
+	STA.B SNES_DMA5ADDRH-$4300  ; $4354 = Source bank $07
+	
+	LDA.B #$A8                  ; A = $A8 (CGADD - palette address register)
+	LDX.W $0064                 ; X = [$0064] (palette index/parameters)
+	JSR.W CODE_008504           ; Execute palette DMA transfer
+	
+	; ---------------------------------------------------------------------------
+	; Prepare for Tilemap Transfer
+	; ---------------------------------------------------------------------------
+	
+	REP #$30                    ; 16-bit A, X, Y
+	
+	LDX.W #$FF00                ; X = $FF00
+	STX.W $00F0                 ; [$00F0] = $FF00 (state marker)
+	
+	; ---------------------------------------------------------------------------
+	; Check Transfer Mode ($0062)
+	; ---------------------------------------------------------------------------
+	; $0062 determines which transfer path to take
+	; If $0062 = 1, use special graphics upload method
+	; Otherwise, use standard tilemap transfer
+	; ---------------------------------------------------------------------------
+	
+	LDX.W $0062                 ; X = [$0062] (transfer mode flag)
+	LDA.W #$6080                ; A = $6080 (default VRAM address)
+	
+	CPX.W #$0001                ; Compare mode with 1
+	BEQ CODE_00841A             ; If mode = 1 → Special graphics upload
+	
+	JSR.W CODE_008520           ; Standard tilemap transfer
+	RTL                         ; Return
 
 ;-------------------------------------------------------------------------------
 
-CODE_0080B0:
+CODE_00841A:
 	; ===========================================================================
-	; Screen Fade-In and Final Setup
+	; Special Graphics Upload (Mode 1)
 	; ===========================================================================
-	; Common path for both new game and continue.
-	; Prepares display and jumps to main game code.
+	; Alternative graphics upload path when $0062 = 1.
+	; Uses different source data and parameters.
+	; ===========================================================================
+	
+	PHK                         ; Push Program Bank (K register)
+	PLB                         ; Pull to Data Bank (B register)
+								; B = $00 (set data bank to current program bank)
+	
+	STA.W SNES_VMADDL           ; $2116-$2117 = VRAM address $6080
+	
+	LDX.W #$F0C1                ; X = $F0C1 (source address in bank $04)
+	LDY.W #$0004                ; Y = $0004 (DMA parameters)
+	JMP.W CODE_008DDF           ; Execute graphics DMA and return
+
+;===============================================================================
+; ADDITIONAL VRAM TRANSFER ROUTINES ($008428-$008576)
+;===============================================================================
+
+CODE_008428:
+	; ===========================================================================
+	; Large VRAM Transfer Handler
+	; ===========================================================================
+	; Handles large-scale VRAM transfers during VBLANK.
+	; Checks state flags and executes appropriate transfer operations.
+	;
+	; State Flags:
+	;   $00D4 bit 7: Large transfer pending
+	;   $00D8 bit 1: Battle graphics mode
+	;   $00DA bit 4: Special transfer mode
+	; ===========================================================================
+	
+	LDA.B #$80                  ; A = $80 (bit 7 mask)
+	AND.W $00D4                 ; Test bit 7 of $00D4
+	BEQ CODE_008476             ; If clear → Skip, jump to handler return
+	
+	LDA.B #$80                  ; A = $80
+	TRB.W $00D4                 ; Test and Reset bit 7 of $00D4
+								; Clear "large transfer pending" flag
+	
+	LDA.B #$80                  ; A = $80 (increment mode)
+	STA.W $2115                 ; $2115 (VMAINC) = $80
+	
+	; ---------------------------------------------------------------------------
+	; Check Battle Graphics Mode ($00D8 bit 1)
+	; ---------------------------------------------------------------------------
+	
+	LDA.B #$02                  ; A = $02 (bit 1 mask)
+	AND.W $00D8                 ; Test bit 1 of $00D8
+	BEQ CODE_008479             ; If clear → Use alternate path
+	
+	; ---------------------------------------------------------------------------
+	; Battle Graphics Transfer
+	; ---------------------------------------------------------------------------
+	; Transfers battle-specific graphics during scene transitions
+	; ---------------------------------------------------------------------------
+	
+	LDX.W #$1801                ; X = $1801 (DMA parameters)
+	STX.B SNES_DMA5PARAM-$4300  ; $4350 = DMA5 config
+	
+	LDX.W #$075A                ; X = $075A (source address offset)
+	STX.B SNES_DMA5ADDRL-$4300  ; $4352-$4353 = Source address low/mid
+	
+	LDA.B #$7F                  ; A = $7F
+	STA.B SNES_DMA5ADDRH-$4300  ; $4354 = Source bank $7F
+								; Full source: $7F075A
+	
+	LDX.W #$0062                ; X = $0062 (98 bytes)
+	STX.B SNES_DMA5CNTL-$4300   ; $4355-$4356 = Transfer size
+	
+	LDX.W #$3BAD                ; X = $3BAD (VRAM destination)
+	STX.W $2116                 ; $2116-$2117 = VRAM address
+	
+	LDA.B #$20                  ; A = $20 (DMA channel 5)
+	STA.W $420B                 ; $420B = Execute DMA
+	
+	; ---------------------------------------------------------------------------
+	; Additional Battle Graphics Data Transfer
+	; ---------------------------------------------------------------------------
+	; Writes specific data directly to VRAM
+	; ---------------------------------------------------------------------------
+	
+	REP #$30                    ; 16-bit A, X, Y
+	
+	LDX.W #$4BED                ; X = $4BED (VRAM address)
+	STX.W $2116                 ; Set VRAM address
+	
+	LDA.L $7F17DA               ; A = [$7F17DA] (16-bit data)
+	STA.W $2118                 ; $2118-$2119 = Write to VRAM data
+	
+	LDA.L $7F17DC               ; A = [$7F17DC] (16-bit data)
+	STA.W $2118                 ; Write second word to VRAM
+	
+	SEP #$20                    ; 8-bit accumulator
+
+;-------------------------------------------------------------------------------
+
+CODE_008476:
+	; ===========================================================================
+	; Return to Main NMI Handler
+	; ===========================================================================
+	JMP.W CODE_0083A8           ; → Jump back to NMI handler continuation
+
+;-------------------------------------------------------------------------------
+
+CODE_008479:
+	; ===========================================================================
+	; Alternate Graphics Transfer Path
+	; ===========================================================================
+	; Used when battle graphics mode is not active.
+	; Handles palette and tilemap transfers for normal gameplay.
+	; ===========================================================================
+	
+	; ---------------------------------------------------------------------------
+	; Configure Palette DMA
+	; ---------------------------------------------------------------------------
+	
+	LDX.W #$2200                ; X = $2200 (DMA parameters)
+	STX.B SNES_DMA5PARAM-$4300  ; $4350 = DMA5 config
+	
+	LDA.B #$07                  ; A = $07
+	STA.B SNES_DMA5ADDRH-$4300  ; $4354 = Source bank $07
+	
+	; ---------------------------------------------------------------------------
+	; Transfer Two Palette Sets
+	; ---------------------------------------------------------------------------
+	
+	LDA.B #$88                  ; A = $88 (palette address)
+	LDX.W $00F4                 ; X = [$00F4] (source offset 1)
+	JSR.W CODE_008504           ; Transfer palette set 1
+	
+	LDA.B #$98                  ; A = $98 (palette address)
+	LDX.W $00F7                 ; X = [$00F7] (source offset 2)
+	JSR.W CODE_008504           ; Transfer palette set 2
+	
+	; ---------------------------------------------------------------------------
+	; Write Direct VRAM Data
+	; ---------------------------------------------------------------------------
+	
+	REP #$30                    ; 16-bit A, X, Y
+	
+	LDX.W #$5E8D                ; X = $5E8D (VRAM address)
+	STX.W $2116                 ; Set VRAM address
+	
+	LDA.L $7E2D1A               ; A = [$7E2D1A] (data from WRAM)
+	STA.W $2118                 ; Write to VRAM
+	
+	LDA.L $7E2D1C               ; A = [$7E2D1C]
+	STA.W $2118                 ; Write second word
+	
+	; ---------------------------------------------------------------------------
+	; Prepare for Tilemap Transfer
+	; ---------------------------------------------------------------------------
+	
+	LDX.W #$FF00                ; X = $FF00
+	STX.W $00F0                 ; [$00F0] = $FF00 (marker)
+	
+	; ---------------------------------------------------------------------------
+	; Transfer Two Tilemap Regions
+	; ---------------------------------------------------------------------------
+	
+	LDX.W $00F2                 ; X = [$00F2] (tilemap 1 source)
+	LDA.W #$6000                ; A = $6000 (VRAM address 1)
+	JSR.W CODE_008520           ; Transfer tilemap region 1
+	
+	LDX.W $00F5                 ; X = [$00F5] (tilemap 2 source)
+	LDA.W #$6040                ; A = $6040 (VRAM address 2)
+	JSR.W CODE_008520           ; Transfer tilemap region 2
+	
+	SEP #$20                    ; 8-bit accumulator
+	
+	; ---------------------------------------------------------------------------
+	; Check Special Transfer Mode
+	; ---------------------------------------------------------------------------
+	
+	LDA.B #$10                  ; A = $10 (bit 4 mask)
+	AND.W $00DA                 ; Test bit 4 of $00DA
+	BNE CODE_0084F8             ; If set → Skip menu graphics transfer
+	
+	; ---------------------------------------------------------------------------
+	; Menu Graphics Transfer
+	; ---------------------------------------------------------------------------
+	; Transfers menu-specific graphics data
+	; ---------------------------------------------------------------------------
+	
+	LDX.W #$1801                ; X = $1801 (DMA parameters)
+	STX.B SNES_DMA5PARAM-$4300  ; $4350 = DMA5 config
+	
+	LDX.W #$0380                ; X = $0380 (896 bytes)
+	STX.B SNES_DMA5CNTL-$4300   ; $4355-$4356 = Transfer size
+	
+	LDA.B #$7F                  ; A = $7F
+	STA.B SNES_DMA5ADDRH-$4300  ; $4354 = Source bank $7F
+	
+	; ---------------------------------------------------------------------------
+	; Select Source Address Based on Menu Position
+	; ---------------------------------------------------------------------------
+	; $1031 contains vertical menu position
+	; Different Y positions use different graphics data
+	; ---------------------------------------------------------------------------
+	
+	LDA.W $1031                 ; A = [$1031] (Y position)
+	
+	LDX.W #$C708                ; X = $C708 (default source 1)
+	CMP.B #$26                  ; Compare Y with $26
+	BCC CODE_0084EB             ; If Y < $26 → Use source 1
+	
+	LDX.W #$C908                ; X = $C908 (source 2)
+	CMP.B #$29                  ; Compare Y with $29
+	BCC CODE_0084EB             ; If Y < $29 → Use source 2
+	
+	LDX.W #$CA48                ; X = $CA48 (source 3)
+								; Y >= $29 → Use source 3
+
+CODE_0084EB:
+	STX.B SNES_DMA5ADDRL-$4300  ; $4352-$4353 = Selected source address
+	
+	LDX.W #$6700                ; X = $6700 (VRAM destination)
+	STX.W SNES_VMADDL           ; $2116-$2117 = VRAM address
+	
+	LDA.B #$20                  ; A = $20 (DMA channel 5)
+	STA.W SNES_MDMAEN           ; $420B = Execute DMA
+
+;-------------------------------------------------------------------------------
+
+CODE_0084F8:
+	; ===========================================================================
+	; Clear Transfer Markers and Return
+	; ===========================================================================
+	
+	LDX.W #$FFFF                ; X = $FFFF
+	STX.W $00F2                 ; [$00F2] = $FFFF (invalidate tilemap 1)
+	STX.W $00F5                 ; [$00F5] = $FFFF (invalidate tilemap 2)
+	
+	JMP.W CODE_0083A8           ; → Return to NMI handler
+
+;===============================================================================
+; PALETTE TRANSFER HELPER ($008504-$00851F)
+;===============================================================================
+
+CODE_008504:
+	; ===========================================================================
+	; Palette Transfer Helper Routine
+	; ===========================================================================
+	; Transfers a single palette set to CGRAM via DMA.
+	;
+	; Parameters:
+	;   A = Palette start address (CGADD value)
+	;   X = Source data offset (8-bit, added to base $07D8E4)
+	;
+	; Process:
+	;   1. Set CGRAM address
+	;   2. Calculate full source address
+	;   3. Execute 16-byte DMA transfer
+	; ===========================================================================
+	
+	STA.W $2121                 ; $2121 (CGADD) = Palette start address
+								; Sets where in CGRAM to write
+	
+	LDY.W #$0010                ; Y = $0010 (16 bytes = 8 colors)
+	STY.B SNES_DMA5CNTL-$4300   ; $4355-$4356 = Transfer 16 bytes
+	
+	REP #$30                    ; 16-bit A, X, Y
+	
+	TXA                         ; A = X (transfer source offset to A)
+	AND.W #$00FF                ; A = A & $00FF (ensure 8-bit value)
+	CLC                         ; Clear carry
+	ADC.W #$D8E4                ; A = A + $D8E4 (add base address)
+								; Final source in bank $07: $07(D8E4+offset)
+	STA.B SNES_DMA5ADDRL-$4300  ; $4352-$4353 = Calculated source address
+	
+	SEP #$20                    ; 8-bit accumulator
+	
+	LDA.B #$20                  ; A = $20 (DMA channel 5)
+	STA.W $420B                 ; $420B = Execute palette DMA
+	
+	RTS                         ; Return
+
+;===============================================================================
+; TILEMAP TRANSFER HELPER ($008520-$008542)
+;===============================================================================
+
+CODE_008520:
+	; ===========================================================================
+	; Tilemap Transfer Helper Routine
+	; ===========================================================================
+	; Transfers tilemap data to VRAM in two passes for proper formatting.
+	;
+	; Parameters:
+	;   A = VRAM destination address
+	;   X = Source address offset (or $FFFF to skip)
+	;
+	; SNES Tilemap Format:
+	;   Each tile = 2 bytes (tile number + attributes)
+	;   Transfers in two passes separated by $0180 bytes
+	;   This likely handles interleaved data format
+	; ===========================================================================
+	
+	CPX.W #$FFFF                ; Check if X = $FFFF
+	BEQ CODE_008542             ; If yes → Skip transfer (no data)
+	
+	STA.W SNES_VMADDL           ; $2116-$2117 = VRAM destination address
+	
+	PEA.W $0004                 ; Push $0004
+	PLB                         ; B = $04 (Data Bank = $04)
+	
+	PHX                         ; Save X (source address)
+	
+	LDY.W #$0002                ; Y = $0002 (DMA parameters)
+	JSL.L CODE_008DDF           ; Execute first tilemap transfer
+	
+	PLA                         ; A = saved X (restore source address)
+	CLC                         ; Clear carry
+	ADC.W #$0180                ; A = source + $0180 (offset to second half)
+	TAX                         ; X = new source address
+	
+	LDY.W #$0002                ; Y = $0002 (DMA parameters)
+	JSL.L CODE_008DDF           ; Execute second tilemap transfer
+								; (VRAM address auto-increments)
+	
+	PLB                         ; Restore Data Bank
+
+CODE_008542:
+	RTS                         ; Return
+
+;===============================================================================
+; OAM (SPRITE) TRANSFER ROUTINE ($008543-$008576)
+;===============================================================================
+
+CODE_008543:
+	; ===========================================================================
+	; OAM (Object Attribute Memory) Transfer
+	; ===========================================================================
+	; Transfers sprite data from RAM to OAM during VBLANK.
+	; OAM contains position, tile, and attribute data for all sprites.
+	;
+	; SNES OAM Structure:
+	;   Main table: 512 bytes (128 sprites × 4 bytes each)
+	;     Byte 0: X position (low 8 bits)
+	;     Byte 1: Y position
+	;     Byte 2: Tile number
+	;     Byte 3: Attributes (palette, priority, flip)
+	;   High table: 32 bytes (128 sprites × 2 bits each)
+	;     Bit 0: X position bit 8 (for X > 255)
+	;     Bit 1: Sprite size toggle
+	;
+	; This routine transfers both tables in two DMA operations.
+	; ===========================================================================
+	
+	; ---------------------------------------------------------------------------
+	; Configure DMA for Main OAM Table
+	; ---------------------------------------------------------------------------
+	
+	LDX.W #$0400                ; X = $0400
+								; $04 = DMA mode (write 2 registers once)
+								; $00 = Target register low byte ($2104 = OAMDATA)
+	STX.B SNES_DMA5PARAM-$4300  ; $4350 = DMA5 config
+	
+	LDX.W #$0C00                ; X = $0C00 (source address)
+	STX.B SNES_DMA5ADDRL-$4300  ; $4352-$4353 = Source in bank $00: $000C00
+	
+	LDA.B #$00                  ; A = $00
+	STA.B SNES_DMA5ADDRH-$4300  ; $4354 = Source bank $00
+	
+	LDX.W $01F0                 ; X = [$01F0] (transfer size - main table)
+	STX.B SNES_DMA5CNTL-$4300   ; $4355-$4356 = Size (typically $0200 = 512 bytes)
+	
+	LDX.W #$0000                ; X = $0000
+	STX.W SNES_OAMADDL          ; $2102-$2103 = OAM address = 0
+								; Start writing at first sprite
+	
+	LDA.B #$20                  ; A = $20 (DMA channel 5)
+	STA.W SNES_MDMAEN           ; $420B = Execute DMA (main table)
+	
+	; ---------------------------------------------------------------------------
+	; Configure DMA for High OAM Table
+	; ---------------------------------------------------------------------------
+	
+	LDX.W #$0E00                ; X = $0E00 (source address for high table)
+	STX.B SNES_DMA5ADDRL-$4300  ; $4352-$4353 = Source: $000E00
+	
+	LDX.W $01F2                 ; X = [$01F2] (transfer size - high table)
+	STX.B SNES_DMA5CNTL-$4300   ; $4355-$4356 = Size (typically $0020 = 32 bytes)
+	
+	LDX.W #$0100                ; X = $0100
+	STX.W SNES_OAMADDL          ; $2102-$2103 = OAM address = $100
+								; This is where high table starts
+	
+	LDA.B #$20                  ; A = $20 (DMA channel 5)
+	STA.W SNES_MDMAEN           ; $420B = Execute DMA (high table)
+	
+	RTS                         ; Return
+
+;===============================================================================
+; BATTLE GRAPHICS UPDATE ($008577-$0085B6)
+;===============================================================================
+
+CODE_008577:
+	; ===========================================================================
+	; Battle Graphics VRAM Transfer
+	; ===========================================================================
+	; Transfers battle-specific graphics to VRAM during scene transitions.
+	; Handles both tile data and tilemap updates.
+	; ===========================================================================
+	
+	; ---------------------------------------------------------------------------
+	; Transfer Battle Tile Graphics
+	; ---------------------------------------------------------------------------
+	
+	LDX.W #$4400                ; X = $4400 (VRAM destination)
+	STX.W SNES_VMADDL           ; $2116-$2117 = VRAM address
+	
+	LDX.W #$1801                ; X = $1801 (DMA parameters)
+	STX.B SNES_DMA5PARAM-$4300  ; $4350 = DMA5 config
+	
+	LDX.W #$0480                ; X = $0480 (source address offset)
+	STX.B SNES_DMA5ADDRL-$4300  ; $4352-$4353 = Source in bank $7F: $7F0480
+	
+	LDA.B #$7F                  ; A = $7F
+	STA.B SNES_DMA5ADDRH-$4300  ; $4354 = Source bank
+	
+	LDX.W #$0280                ; X = $0280 (640 bytes)
+	STX.B SNES_DMA5CNTL-$4300   ; $4355-$4356 = Transfer size
+	
+	LDA.B #$20                  ; A = $20 (DMA channel 5)
+	STA.W SNES_MDMAEN           ; $420B = Execute DMA
 	; ===========================================================================
 	
 	LDA.B #$80                  ; A = $80 (bit 7)
