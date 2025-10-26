@@ -2538,6 +2538,387 @@ CODE_00862D:
 CODE_00863C:
 	RTL                              ; Return
 
+;===============================================================================
+; SPECIAL GRAPHICS TRANSFER ROUTINES ($00863D-$008965)
+;===============================================================================
+
+CODE_00863D:
+	; ===========================================================================
+	; Special VRAM Transfer Handler
+	; ===========================================================================
+	; Handles specialized graphics transfers for menu systems and battle mode.
+	; Manages palette selection, tilemap updates, and context-specific graphics.
+	;
+	; State Flags:
+	;   $00D2 bit 4: Special transfer pending
+	;   $00DA bit 4: Battle mode graphics flag
+	;   $00DE bit 6: Character status update
+	;   $00D6 bit 5: Additional display update flag
+	; ===========================================================================
+	
+	LDA.B #$10                  ; A = $10 (bit 4 mask)
+	TRB.W $00D2                 ; Test and Reset bit 4 of $00D2
+								; Clear "special transfer pending" flag
+	
+	LDA.B #$80                  ; A = $80 (increment mode)
+	STA.W SNES_VMAINC           ; $2115 = Increment after $2119 write
+	
+	; ---------------------------------------------------------------------------
+	; Check Battle Mode Graphics Flag
+	; ---------------------------------------------------------------------------
+	
+	LDA.B #$10                  ; A = $10 (bit 4 mask)
+	AND.W $00DA                 ; Test bit 4 of $00DA
+	BEQ CODE_00869D             ; If clear → Use normal field mode graphics
+	
+	; ---------------------------------------------------------------------------
+	; Battle Mode Graphics Transfer
+	; ---------------------------------------------------------------------------
+	; Transfers menu graphics for battle interface
+	; ---------------------------------------------------------------------------
+	
+	PEA.W $0004                 ; Push $0004
+	PLB                         ; B = $04 (Data Bank = $04)
+	
+	LDX.W #$60C0                ; X = $60C0 (VRAM address)
+	STX.W $2116                 ; Set VRAM address
+	
+	LDX.W #$FF00                ; X = $FF00
+	STX.W $00F0                 ; [$00F0] = $FF00 (state marker)
+	
+	LDX.W #$99C0                ; X = $99C0 (source in bank $04)
+	LDY.W #$0004                ; Y = $0004 (DMA parameters)
+	JSL.L CODE_008DDF           ; Execute tilemap DMA transfer
+	
+	PLB                         ; Restore Data Bank
+	
+	; ---------------------------------------------------------------------------
+	; Transfer Battle Palette Set 1
+	; ---------------------------------------------------------------------------
+	
+	LDA.B #$A8                  ; A = $A8 (palette start address)
+	STA.W SNES_CGADD            ; $2121 = CGRAM address = $A8
+	
+	LDX.W #$2200                ; X = $2200 (DMA parameters)
+	STX.B SNES_DMA5PARAM-$4300  ; $4350 = DMA5 config
+	
+	LDX.W #$D814                ; X = $D814 (source offset)
+	STX.B SNES_DMA5ADDRL-$4300  ; $4352-$4353 = Source: $07D814
+	
+	LDA.B #$07                  ; A = $07
+	STA.B SNES_DMA5ADDRH-$4300  ; $4354 = Source bank $07
+	
+	LDX.W #$0010                ; X = $0010 (16 bytes = 8 colors)
+	STX.B SNES_DMA5CNTL-$4300   ; $4355-$4356 = Transfer size
+	
+	LDA.B #$20                  ; A = $20 (DMA channel 5)
+	STA.W SNES_MDMAEN           ; $420B = Execute palette DMA
+	
+	; ---------------------------------------------------------------------------
+	; Clear Specific Palette Entries
+	; ---------------------------------------------------------------------------
+	; Clears palette entries $0D and $1D to black
+	; Used to reset specific UI colors in battle mode
+	; ---------------------------------------------------------------------------
+	
+	LDA.B #$0D                  ; A = $0D (palette entry 13)
+	STA.W SNES_CGADD            ; Set CGRAM address
+	STZ.W SNES_CGDATA           ; $2122 = $00 (color low byte = black)
+	STZ.W SNES_CGDATA           ; $2122 = $00 (color high byte)
+	
+	LDA.B #$1D                  ; A = $1D (palette entry 29)
+	STA.W SNES_CGADD            ; Set CGRAM address
+	STZ.W SNES_CGDATA           ; $2122 = $00 (black)
+	STZ.W SNES_CGDATA           ; $2122 = $00
+	
+	RTL                         ; Return
+
+;-------------------------------------------------------------------------------
+
+CODE_00869D:
+	; ===========================================================================
+	; Field Mode Graphics Transfer
+	; ===========================================================================
+	; Handles graphics updates for field/map mode interface.
+	; Transfers palettes, tilemaps, and character status displays.
+	; ===========================================================================
+	
+	; ---------------------------------------------------------------------------
+	; Configure Palette DMA
+	; ---------------------------------------------------------------------------
+	
+	LDX.W #$2200                ; X = $2200 (DMA parameters)
+	STX.B SNES_DMA5PARAM-$4300  ; $4350 = DMA5 config
+	
+	LDX.W #$D824                ; X = $D824 (source offset)
+	STX.B SNES_DMA5ADDRL-$4300  ; $4352-$4353 = Source: $07D824
+	
+	LDA.B #$07                  ; A = $07
+	STA.B SNES_DMA5ADDRH-$4300  ; $4354 = Source bank $07
+	
+	LDX.W #$0010                ; X = $0010 (16 bytes)
+	STX.B SNES_DMA5CNTL-$4300   ; $4355-$4356 = Transfer size
+	
+	REP #$30                    ; 16-bit A, X, Y
+	
+	STZ.W $00F0                 ; [$00F0] = $0000 (clear state marker)
+	
+	PEA.W $0004                 ; Push $0004
+	PLB                         ; B = $04 (Data Bank = $04)
+	
+	; ---------------------------------------------------------------------------
+	; Check Character Status Update Flag ($00DE bit 6)
+	; ---------------------------------------------------------------------------
+	; If set, update single character's status display
+	; Otherwise, refresh all three character displays
+	; ---------------------------------------------------------------------------
+	
+	LDA.W #$0040                ; A = $0040 (bit 6 mask)
+	AND.W $00DE                 ; Test bit 6 of $00DE
+	BEQ CODE_0086F3             ; If clear → Update all characters
+	
+	; ---------------------------------------------------------------------------
+	; Single Character Status Update
+	; ---------------------------------------------------------------------------
+	; Updates one character's status display based on $010D and $010E
+	; ---------------------------------------------------------------------------
+	
+	LDA.W #$0040                ; A = $0040
+	TRB.W $00DE                 ; Test and Reset bit 6 of $00DE
+								; Clear "single character update" flag
+	
+	LDA.W $010D                 ; A = [$010D] (character position data)
+	AND.W #$FF00                ; A = A & $FF00 (mask high byte)
+	CLC                         ; Clear carry
+	ADC.W #$6180                ; A = A + $6180 (calculate VRAM address)
+	STA.W $2116                 ; $2116-$2117 = VRAM address
+	
+	LDA.W $010E                 ; A = [$010E] (character index)
+	ASL A                       ; A = A × 2 (convert to word offset)
+	TAX                         ; X = character table offset
+	
+	LDA.W $0107,X               ; A = [$0107 + X] (character data pointer)
+	TAX                         ; X = character data pointer
+	
+	PHA                         ; Save character data pointer
+	JSR.W CODE_008751           ; Transfer character graphics (2-part)
+	PLY                         ; Y = character data pointer (restore)
+	
+	PLB                         ; Restore Data Bank
+	
+	; ---------------------------------------------------------------------------
+	; Transfer Character Palette
+	; ---------------------------------------------------------------------------
+	
+	CLC                         ; Clear carry
+	LDA.W $010E                 ; A = [$010E] (character index)
+	ADC.W #$000D                ; A = A + $000D (palette offset)
+	ASL A                       ; A = A × 2
+	ASL A                       ; A = A × 4
+	ASL A                       ; A = A × 8
+	ASL A                       ; A = A × 16 (multiply by 16)
+	TAX                         ; X = palette CGRAM address
+	
+	JSR.W CODE_00876C           ; Transfer character palette
+	
+	RTL                         ; Return
+
+;-------------------------------------------------------------------------------
+
+CODE_0086F3:
+	; ===========================================================================
+	; Full Character Status Display Update
+	; ===========================================================================
+	; Refreshes all three character status displays.
+	; Transfers character graphics, names, and palettes for the party.
+	; ===========================================================================
+	
+	; ---------------------------------------------------------------------------
+	; Transfer Base Menu Tilemap
+	; ---------------------------------------------------------------------------
+	
+	LDA.W #$6100                ; A = $6100 (VRAM address)
+	STA.W $2116                 ; Set VRAM address
+	
+	LDX.W #$9A20                ; X = $9A20 (source in bank $04)
+	LDY.W #$0004                ; Y = $0004 (DMA parameters)
+	JSL.L CODE_008DDF           ; Transfer tilemap part 1
+	
+	LDX.W #$CD20                ; X = $CD20 (source for second part)
+	LDY.W #$0004                ; Y = $0004 (DMA parameters)
+	JSL.L CODE_008DDF           ; Transfer tilemap part 2
+	
+	; ---------------------------------------------------------------------------
+	; Transfer Character 1 Graphics
+	; ---------------------------------------------------------------------------
+	
+	LDX.W $0107                 ; X = [$0107] (character 1 data pointer)
+	JSR.W CODE_008751           ; Transfer character 1 graphics
+	
+	; ---------------------------------------------------------------------------
+	; Transfer Character 2 Graphics
+	; ---------------------------------------------------------------------------
+	
+	LDA.W #$6280                ; A = $6280 (VRAM address for char 2)
+	STA.W $2116                 ; Set VRAM address
+	
+	LDX.W $0109                 ; X = [$0109] (character 2 data pointer)
+	JSR.W CODE_008751           ; Transfer character 2 graphics
+	
+	; ---------------------------------------------------------------------------
+	; Transfer Character 3 Graphics
+	; ---------------------------------------------------------------------------
+	
+	LDA.W #$6380                ; A = $6380 (VRAM address for char 3)
+	STA.W $2116                 ; Set VRAM address
+	
+	LDX.W $010B                 ; X = [$010B] (character 3 data pointer)
+	JSR.W CODE_008751           ; Transfer character 3 graphics
+	
+	PLB                         ; Restore Data Bank
+	
+	; ---------------------------------------------------------------------------
+	; Transfer Main Menu Palette
+	; ---------------------------------------------------------------------------
+	
+	LDA.W #$D824                ; A = $D824 (source address)
+	LDX.W #$00C0                ; X = $00C0 (CGRAM address = palette $C)
+	JSR.W CODE_00876F           ; Transfer palette
+	
+	; ---------------------------------------------------------------------------
+	; Transfer Character 1 Palette
+	; ---------------------------------------------------------------------------
+	
+	LDY.W $0107                 ; Y = [$0107] (character 1 data pointer)
+	LDX.W #$00D0                ; X = $00D0 (CGRAM address = palette $D)
+	JSR.W CODE_00876C           ; Transfer character palette
+	
+	; ---------------------------------------------------------------------------
+	; Transfer Character 2 Palette
+	; ---------------------------------------------------------------------------
+	
+	LDY.W $0109                 ; Y = [$0109] (character 2 data pointer)
+	LDX.W #$00E0                ; X = $00E0 (CGRAM address = palette $E)
+	JSR.W CODE_00876C           ; Transfer character palette
+	
+	; ---------------------------------------------------------------------------
+	; Transfer Character 3 Palette
+	; ---------------------------------------------------------------------------
+	
+	LDY.W $010B                 ; Y = [$010B] (character 3 data pointer)
+	LDX.W #$00F0                ; X = $00F0 (CGRAM address = palette $F)
+	JSR.W CODE_00876C           ; Transfer character palette
+	
+	RTL                         ; Return
+
+;===============================================================================
+; GRAPHICS HELPER SUBROUTINES ($008751-$008783)
+;===============================================================================
+
+CODE_008751:
+	; ===========================================================================
+	; Transfer Character Graphics (2-Part Transfer)
+	; ===========================================================================
+	; Transfers character graphics in two sequential DMA operations.
+	; Used for character portraits in status displays.
+	;
+	; Parameters:
+	;   X = Pointer to character data structure
+	;   VRAM address already set in $2116
+	;
+	; Character Data Structure:
+	;   +$00: Pointer to graphics part 1 (2 bytes)
+	;   +$02: Pointer to graphics part 2 (2 bytes)
+	; ===========================================================================
+	
+	PHX                         ; Save character data pointer
+	
+	; ---------------------------------------------------------------------------
+	; Transfer Graphics Part 1
+	; ---------------------------------------------------------------------------
+	
+	LDA.L $000000,X             ; A = [X+0] (graphics part 1 pointer)
+	TAX                         ; X = graphics part 1 pointer
+	LDY.W #$0004                ; Y = $0004 (DMA parameters)
+	JSL.L CODE_008DDF           ; Execute DMA transfer
+	
+	; ---------------------------------------------------------------------------
+	; Transfer Graphics Part 2
+	; ---------------------------------------------------------------------------
+	
+	PLX                         ; Restore character data pointer
+	
+	LDA.L $000002,X             ; A = [X+2] (graphics part 2 pointer)
+	TAX                         ; X = graphics part 2 pointer
+	LDY.W #$0004                ; Y = $0004 (DMA parameters)
+	JSL.L CODE_008DDF           ; Execute DMA transfer
+								; (VRAM address auto-increments from part 1)
+	
+	RTS                         ; Return
+
+;-------------------------------------------------------------------------------
+
+CODE_00876C:
+	; ===========================================================================
+	; Transfer Character Palette (Variant Entry Point)
+	; ===========================================================================
+	; Alternative entry point that loads palette source from character data.
+	; Falls through to CODE_00876F.
+	;
+	; Parameters:
+	;   X = CGRAM address (palette index)
+	;   Y = Character data pointer
+	; ===========================================================================
+	
+	LDA.W $0004,Y               ; A = [Y+4] (palette data pointer)
+								; Falls through to CODE_00876F
+
+CODE_00876F:
+	; ===========================================================================
+	; Transfer Palette to CGRAM
+	; ===========================================================================
+	; Executes a 16-byte palette DMA transfer.
+	;
+	; Parameters:
+	;   A = Source address (low/mid bytes, bank $07 assumed)
+	;   X = CGRAM address (palette index)
+	;
+	; SNES Palette Format:
+	;   Each color = 2 bytes (15-bit BGR format)
+	;   16 bytes = 8 colors per transfer
+	; ===========================================================================
+	
+	STA.B SNES_DMA5ADDRL-$4300  ; $4352-$4353 = Source address
+	
+	TXA                         ; A = X (CGRAM address)
+	SEP #$20                    ; 8-bit accumulator
+	
+	STA.W SNES_CGADD            ; $2121 = CGRAM address
+	
+	LDX.W #$0010                ; X = $0010 (16 bytes)
+	STX.B SNES_DMA5CNTL-$4300   ; $4355-$4356 = Transfer size
+	
+	LDA.B #$20                  ; A = $20 (DMA channel 5)
+	STA.W SNES_MDMAEN           ; $420B = Execute palette DMA
+	
+	REP #$30                    ; 16-bit A, X, Y
+	
+	RTS                         ; Return
+
+;===============================================================================
+; ADDITIONAL VBLANK OPERATIONS ($008784-$008965)
+;===============================================================================
+
+; Data table referenced by CODE_008784
+DATA8_008960:
+	.db $3C                     ; Tile $3C
+	
+DATA8_008961:
+	.db $3D                     ; Tile $3D
+	
+DATA8_008962:
+	.db $3E,$45,$3A,$3B         ; Tiles: $3E, $45, $3A, $3B
+
 ; ===========================================================================
 ; Main Game Loop - Frame Update
 ; ===========================================================================
