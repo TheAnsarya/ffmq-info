@@ -98,7 +98,25 @@ Replace placeholders in ALL bank files (Banks $01-$08)
 Complete round-trip verification
 Integrate into main build system (Makefile)
 &&&&&&&&&&&&&&&
+Replace remaining placeholders in Bank $06 (metatile definitions, animation cycles)
+Fix Bank $08 extraction (needs text decompression algorithm analysis)
+Create verify_roundtrip.py for quality assurance
+Replace placeholders in Banks $01-$05, $07-$08
+Integrate into Makefile
+&&&&&&&&&&&&&&&&&
 
+if you need `make` then install and use `make`
+
+>>>>>>>>>>>>>>>
+ (and format, update chat/history log, commit to git) 
+Replace remaining placeholders in Bank $06 (metatile definitions, animation cycles)
+Fix Bank $08 extraction (needs text decompression algorithm analysis)
+Create verify_roundtrip.py for quality assurance
+Replace placeholders in Banks $01-$05, $07-$08
+continue disassembly with lower banks and then banks $09-$0d++++
+Integrate into Makefile
+(and format, update chat/history log, commit to git) 
+>>>>>>>>>>>>>>
 
 
 

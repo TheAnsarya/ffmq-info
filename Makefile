@@ -18,9 +18,9 @@ PYTHON = python
 SRC_DIR = src
 ASM_DIR = $(SRC_DIR)/asm
 INCLUDE_DIR = $(SRC_DIR)/include
-DATA_DIR = $(SRC_DIR)/data
-ASSETS_DIR = assets
+DATA_DIR = data
 TOOLS_DIR = tools
+ASSETS_DIR = assets
 BUILD_DIR = build
 DOCS_DIR = docs
 
@@ -31,7 +31,8 @@ MAIN_ASM = $(ASM_DIR)/main.s
 # Build Targets
 .PHONY: all clean rom extract-assets extract-graphics extract-text extract-music \
         convert-graphics install-deps build-tools docs test test-rom test-setup \
-        test-launch test-debug
+        test-launch test-debug extract-bank06 extract-all verify-bank06 verify-all \
+        generate-asm pipeline
 
 # Default target
 all: rom
@@ -178,6 +179,15 @@ help:
 	@echo "Available targets:"
 	@echo "  all                    - Build everything (default)"
 	@echo "  rom                    - Build the modified ROM"
+	@echo ""
+	@echo "Data Extraction Pipeline:"
+	@echo "  extract-bank06         - Extract Bank $$06 data (metatiles, collision)"
+	@echo "  extract-all            - Extract data from all supported banks"
+	@echo "  verify-bank06          - Verify Bank $$06 round-trip integrity"
+	@echo "  generate-asm           - Generate ASM files from JSON data"
+	@echo "  pipeline               - Full workflow: extract -> generate -> verify"
+	@echo ""
+	@echo "Asset Extraction:"
 	@echo "  extract-assets         - Extract all assets (graphics, text, music)"
 	@echo "  extract-graphics       - Extract graphics only with PNG output"
 	@echo "  extract-text           - Extract text only"
@@ -205,3 +215,42 @@ help:
 	@echo "  - asar assembler"
 	@echo "  - Python 3.x + Pillow (for graphics tools)"
 	@echo "  - MesenS emulator (for testing)"
+
+# ==============================================================================
+# Data Extraction and Build Pipeline
+# ==============================================================================
+
+# Extract Bank $06 data from ROM
+extract-bank06:
+	@echo "Extracting Bank $$06 metatile and collision data..."
+	$(PYTHON) $(TOOLS_DIR)/extract_bank06_data.py "$(BASE_ROM)"
+	@echo "Done! Data saved to $(DATA_DIR)/map_tilemaps.json"
+
+# Extract all banks (Bank $06 currently supported)
+extract-all: extract-bank06
+	@echo "Note: Only Bank $$06 fully supported"
+	@echo "Bank $$08 text extraction needs text compression algorithm"
+
+# Verify Bank $06 round-trip (ROM -> JSON -> Binary)
+verify-bank06:
+	@echo "Verifying Bank $$06 round-trip integrity..."
+	$(PYTHON) $(TOOLS_DIR)/verify_roundtrip.py "$(BASE_ROM)"
+
+# Verify all extracted data
+verify-all: verify-bank06
+	@echo "All verifications complete"
+
+# Generate ASM files from JSON data
+generate-asm:
+	@echo "Generating Bank $$06 metatile ASM..."
+	$(PYTHON) $(TOOLS_DIR)/generate_bank06_metatiles.py > $(TOOLS_DIR)/bank06_metatiles_generated.asm
+	@echo "Generating Bank $$06 data ASM..."
+	$(PYTHON) $(TOOLS_DIR)/build_asm_from_json.py $(DATA_DIR)/map_tilemaps.json $(ASM_DIR)/bank_06_data_generated.asm
+	@echo "Done! Generated ASM in $(ASM_DIR)/"
+
+# Full data pipeline: extract -> generate -> verify
+pipeline: extract-bank06 generate-asm verify-bank06
+	@echo ""
+	@echo "=========================================="
+	@echo "Data pipeline complete!"
+	@echo "=========================================="

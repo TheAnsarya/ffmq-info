@@ -27,9 +27,8 @@ BANK_06_START = 0x068000
 BANK_06_SIZE = 0x008000  # 32KB
 
 # Known data sections in Bank $06
-METATILE_SET_1_ADDR = 0x068000  # Overworld/outdoor metatiles
-METATILE_SET_2_ADDR = 0x068020  # Indoor/building metatiles
-METATILE_SET_3_ADDR = 0x068030  # Dungeon/cave metatiles
+METATILE_DATA_START = 0x068000  # All metatiles stored sequentially
+METATILE_COUNT = 256  # Total metatiles in Bank $06 (256 * 4 bytes = 1024 bytes = $400)
 
 # Collision data appears interleaved with tilemap data
 # Starting around 0x06A000
@@ -160,18 +159,9 @@ def main():
     
     print("\nExtracting Bank $06 data...")
     
-    # Extract metatile sets
-    print("  - Metatile Set 1 (Overworld/outdoor)...")
-    metatiles_set1 = extract_metatiles(rom_data, METATILE_SET_1_ADDR, 128, offset_id=0)
-    
-    print("  - Metatile Set 2 (Indoor/building)...")
-    metatiles_set2 = extract_metatiles(rom_data, METATILE_SET_2_ADDR, 64, offset_id=128)
-    
-    print("  - Metatile Set 3 (Dungeon/cave)...")
-    metatiles_set3 = extract_metatiles(rom_data, METATILE_SET_3_ADDR, 64, offset_id=192)
-    
-    # Combine all metatiles
-    all_metatiles = metatiles_set1 + metatiles_set2 + metatiles_set3
+    # Extract all metatiles sequentially
+    print("  - Metatiles (all 256 tiles)...")
+    all_metatiles = extract_metatiles(rom_data, METATILE_DATA_START, METATILE_COUNT, offset_id=0)
     
     print(f"  Total metatiles extracted: {len(all_metatiles)}")
     
@@ -188,22 +178,10 @@ def main():
         "bank": "$06",
         "description": "Map tilemap and collision data",
         "metatile_format": "16x16 pixels (4x 8x8 tiles): [TL, TR, BL, BR]",
-        "metatile_sets": {
-            "set_1_overworld": {
-                "start_address": f"${METATILE_SET_1_ADDR:06X}",
-                "count": len(metatiles_set1),
-                "metatiles": [m.to_dict() for m in metatiles_set1]
-            },
-            "set_2_indoor": {
-                "start_address": f"${METATILE_SET_2_ADDR:06X}",
-                "count": len(metatiles_set2),
-                "metatiles": [m.to_dict() for m in metatiles_set2]
-            },
-            "set_3_dungeon": {
-                "start_address": f"${METATILE_SET_3_ADDR:06X}",
-                "count": len(metatiles_set3),
-                "metatiles": [m.to_dict() for m in metatiles_set3]
-            }
+        "metatiles": {
+            "start_address": f"${METATILE_DATA_START:06X}",
+            "count": len(all_metatiles),
+            "metatiles": [m.to_dict() for m in all_metatiles]
         },
         "collision": {
             "start_address": f"${collision_start:06X}",
