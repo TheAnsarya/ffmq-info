@@ -127,6 +127,22 @@ This session had TWO phases:
 - Autofire/repeat system: 25-frame initial delay, 5-frame repeat rate
 - Hardware controller reading ($4218 SNES_CNTRL1L)
 
+**Commit 33 (3b2d7eb):** Session summary update
+- Documented commit 32 progress
+- Updated statistics: ~2,980 lines (21.3% of Bank $00)
+
+**Commit 34 (c7216a1):** Tilemap calculation and updates (~420 lines)
+- CODE_008C1B-CODE_008D93: VRAM address system
+- Tilemap coordinate to VRAM address conversion algorithm
+- Character cursor tilemap update system
+- Battle mode vs field mode tilemap handling
+- Two-digit number display for HP/item quantities
+- Cursor blink attribute system with palette switching
+- Background layer update routines with WRAM buffering
+- Tilemap address calculation wrapper
+- VRAM address formula: (Y×64) + (X×12) + $8000
+- Coordinate packing format (X in bits 0-2, Y in bits 3-5)
+
 **Code Sections Fully Documented:**
 - ✅ CODE_008000-CODE_00806E: Boot sequence (3 entry points)
 - ✅ CODE_0080B0-CODE_0080DC: Display init and main game jump
@@ -140,20 +156,22 @@ This session had TWO phases:
 - ✅ CODE_00863D-CODE_008965: **Special graphics transfers (menu, characters)**
 - ✅ CODE_008966-CODE_008A9C: **Main game loop & input handlers**
 - ✅ CODE_008A9D-CODE_008C1A: **Button handlers & menu interaction**
+- ✅ CODE_008C1B-CODE_008D93: **Tilemap calculation & VRAM addressing**
 
 **Statistics:**
-- **~2,980 lines** of heavily commented code imported (~21.3% of Bank $00)
-- **7 major commits** (23, 24, 25, 27, 28, 30, 32) plus 3 summary updates
-- **12 complete code sections** fully documented
-- **All core systems complete**: Boot, interrupts, graphics, main loop, input, menus
+- **~3,400 lines** of heavily commented code imported (~24.3% of Bank $00)
+- **8 major commits** (23, 24, 25, 27, 28, 30, 32, 34) plus 4 summary updates
+- **13 complete code sections** fully documented
+- **All core systems complete**: Boot, interrupts, graphics, main loop, input, menus, tilemap
 - Methodology proving highly effective with consistent quality
 
 **Remaining Bank $00 Sections:**
-- ⚠️ CODE_008C1B+: Tilemap calculation and updates (~800 lines) - NEXT
+- ⚠️ CODE_008D97+: Character validation and helpers (~200 lines) - NEXT
+- ❌ CODE_008DDF+: DMA transfer helper routines (~400 lines)
 - ❌ CODE_009000+: State machine and game logic (~3,000 lines)  
 - ❌ CODE_00A000+: Battle system and transitions (~2,500 lines)
 - ❌ CODE_00C000+: Graphics and sprite routines (~2,000 lines)
-- ❌ Remaining: ~10,750 lines total remaining in Bank $00
+- ❌ Remaining: ~10,330 lines total remaining in Bank $00
 
 ### Systematic Import Methodology Established:
 
