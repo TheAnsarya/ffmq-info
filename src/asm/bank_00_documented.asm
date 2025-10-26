@@ -3427,26 +3427,492 @@ CODE_008A94:
 
 CODE_008A9C:
 	RTS                         ; Return
+
+;===============================================================================
+; BUTTON HANDLER & MENU LOGIC ($008A9D-$008BFC)
+;===============================================================================
+
+CODE_008A9D:
+	; ===========================================================================
+	; A Button Handler - Toggle Character Status
+	; ===========================================================================
+	; Handles A button press to toggle character status display.
+	; Shows/hides detailed character information in battle mode.
+	; ===========================================================================
 	
-	; Check if full screen refresh needed
-	LDA.W #$0004                     ; Check bit 2
-	AND.W $00D4                      ; Test display flags
-	BEQ Normal_Frame_Update          ; If clear, do normal update
+	JSR.W CODE_008B57           ; Check if input allowed
+	BNE CODE_008ABC             ; If blocked → Exit
 	
-	; Full screen refresh (mode change)
-	LDA.W #$0004                     ; Bit 2
-	TRB.W $00D4                      ; Clear bit in flags
+	; Check if in valid screen position
+	LDA.W $1090                 ; A = [$1090] (screen mode/position)
+	BMI CODE_008AB9             ; If negative → Call alternate handler
 	
-	; Redraw layer 1
-	LDA.W #$0000                     ; Layer 1 index
-	JSR.W CODE_0091D4                ; Redraw layer routine
-	JSR.W CODE_008C3D                ; Additional layer 1 processing
+	; Toggle character status display
+	LDA.W $10A0                 ; A = [$10A0] (character display flags)
+	EOR.B #$80                  ; Toggle bit 7
+	STA.W $10A0                 ; Save new flag state
 	
-	; Redraw layer 2
-	LDA.W #$0001                     ; Layer 2 index
-	JSR.W CODE_0091D4                ; Redraw layer routine
-	JSR.W CODE_008D29                ; Additional layer 2 processing
-	BRA Frame_Update_Done            ; Skip normal update
+	LDA.B #$40                  ; A = $40 (bit 6)
+	TSB.W $00D4                 ; Set bit 6 of $00D4 (update needed)
+	
+	JSR.W CODE_00B908           ; Update character display
+	BRA CODE_008ABC             ; → Exit
+
+;-------------------------------------------------------------------------------
+
+CODE_008AB9:
+	JSR.W CODE_00B912           ; Alternate character update routine
+
+CODE_008ABC:
+	RTS                         ; Return
+
+;-------------------------------------------------------------------------------
+
+CODE_008ABD:
+	; ===========================================================================
+	; Check Character Position Validity
+	; ===========================================================================
+	; Validates character screen position for interaction.
+	; Used before processing menu selections.
+	;
+	; Position Check:
+	;   $1032 = $80 and $1033 = $00 → Special case, call B912
+	;   Otherwise → Call B908
+	; ===========================================================================
+	
+	LDA.W $1032                 ; A = [$1032] (X position)
+	CMP.B #$80                  ; Compare with $80
+	BNE CODE_008ACC             ; If not $80 → Jump to B908
+	
+	LDA.W $1033                 ; A = [$1033] (Y position)
+	BNE CODE_008ACC             ; If not $00 → Jump to B908
+	
+	JMP.W CODE_00B912           ; Special position → Call B912
+
+;-------------------------------------------------------------------------------
+
+CODE_008ACC:
+	JMP.W CODE_00B908           ; Normal position → Call B908
+
+;-------------------------------------------------------------------------------
+
+CODE_008ACF:
+	; ===========================================================================
+	; Menu Navigation - Character Selection (Up/Down)
+	; ===========================================================================
+	; Handles up/down navigation through character list in menu.
+	; Cycles through valid characters, skipping invalid/dead entries.
+	; ===========================================================================
+	
+	JSR.W CODE_008B57           ; Check if input allowed
+	BNE CODE_008AF7             ; If blocked → Exit
+	
+	JSR.W CODE_008ABD           ; Validate character position
+	
+	; ---------------------------------------------------------------------------
+	; Calculate Current Character Index
+	; ---------------------------------------------------------------------------
+	
+	LDA.W $1031                 ; A = [$1031] (Y position)
+	SEC                         ; Set carry for subtraction
+	SBC.B #$20                  ; A = Y - $20 (base offset)
+	
+	LDX.B #$FF                  ; X = -1 (character counter)
+
+;-------------------------------------------------------------------------------
+
+CODE_008ADF:
+	; Divide by 3 to get character slot
+	INX                         ; X++
+	SBC.B #$03                  ; A -= 3
+	BCS CODE_008ADF             ; If carry still set → Continue dividing
+	
+	; X now contains character index (0-3)
+	TXA                         ; A = character index
+
+;-------------------------------------------------------------------------------
+
+CODE_008AE5:
+	; ===========================================================================
+	; Cycle to Next Valid Character
+	; ===========================================================================
+	; Increments character index and checks if character is valid.
+	; Loops until valid character found.
+	; ===========================================================================
+	
+	INC A                       ; A = next character index
+	AND.B #$03                  ; A = A & $03 (wrap 0-3)
+	
+	PHA                         ; Save character index
+	JSR.W CODE_008DA8           ; Check if character is valid
+	PLA                         ; Restore character index
+	
+	CPY.B #$FF                  ; Check if character invalid (Y = $FF)
+	BEQ CODE_008AE5             ; If invalid → Try next character
+	
+	; Valid character found
+	JSR.W CODE_008B21           ; Update character display
+	JSR.W CODE_008C3D           ; Refresh graphics
+
+CODE_008AF7:
+	RTS                         ; Return
+
+;-------------------------------------------------------------------------------
+
+CODE_008AF8:
+	; ===========================================================================
+	; Menu Navigation - Character Selection (Down/Reverse)
+	; ===========================================================================
+	; Handles down navigation, cycles backwards through character list.
+	; Same as CODE_008ACF but decrements instead of increments.
+	; ===========================================================================
+	
+	JSR.W CODE_008B57           ; Check if input allowed
+	BNE CODE_008B20             ; If blocked → Exit
+	
+	JSR.W CODE_008ABD           ; Validate character position
+	
+	LDA.W $1031                 ; A = [$1031] (Y position)
+	SEC                         ; Set carry
+	SBC.B #$20                  ; A = Y - $20 (base offset)
+	
+	LDX.B #$FF                  ; X = -1 (counter)
+
+;-------------------------------------------------------------------------------
+
+CODE_008B08:
+	INX                         ; X++
+	SBC.B #$03                  ; A -= 3
+	BCS CODE_008B08             ; If carry → Continue
+	
+	TXA                         ; A = character index
+
+;-------------------------------------------------------------------------------
+
+CODE_008B0E:
+	; Cycle to previous valid character
+	DEC A                       ; A = previous character index
+	AND.B #$03                  ; A = A & $03 (wrap 0-3)
+	
+	PHA                         ; Save index
+	JSR.W CODE_008DA8           ; Check if character valid
+	PLA                         ; Restore index
+	
+	CPY.B #$FF                  ; Check if invalid
+	BEQ CODE_008B0E             ; If invalid → Try previous
+	
+	JSR.W CODE_008B21           ; Update character display
+	JSR.W CODE_008C3D           ; Refresh graphics
+
+CODE_008B20:
+	RTS                         ; Return
+
+;-------------------------------------------------------------------------------
+
+CODE_008B21:
+	; ===========================================================================
+	; Update Character Display Position
+	; ===========================================================================
+	; Updates tilemap pointer based on character Y position.
+	; Different Y ranges use different tilemap sections.
+	;
+	; Y Position Ranges:
+	;   Y < $23: Use tilemap at $3709
+	;   Y < $26: Use tilemap at $3719
+	;   Y < $29: Use tilemap at $3729
+	;   Y >= $29: Use tilemap at $3739
+	; ===========================================================================
+	
+	REP #$30                    ; 16-bit A, X, Y
+	
+	LDX.W #$3709                ; X = $3709 (default tilemap 1)
+	CPY.W #$0023                ; Compare Y with $23
+	BCC CODE_008B3E             ; If Y < $23 → Use tilemap 1
+	
+	LDX.W #$3719                ; X = $3719 (tilemap 2)
+	CPY.W #$0026                ; Compare Y with $26
+	BCC CODE_008B3E             ; If Y < $26 → Use tilemap 2
+	
+	LDX.W #$3729                ; X = $3729 (tilemap 3)
+	CPY.W #$0029                ; Compare Y with $29
+	BCC CODE_008B3E             ; If Y < $29 → Use tilemap 3
+	
+	LDX.W #$3739                ; X = $3739 (tilemap 4, Y >= $29)
+
+;-------------------------------------------------------------------------------
+
+CODE_008B3E:
+	; ===========================================================================
+	; Copy Tilemap Data to Destination
+	; ===========================================================================
+	; Uses MVN to copy 16 bytes of tilemap data.
+	;
+	; MVN Format:
+	;   MVN dest_bank,src_bank
+	;   Copies (A+1) bytes from X to Y
+	;   Auto-increments X and Y, decrements A
+	; ===========================================================================
+	
+	LDY.W #$3669                ; Y = $3669 (destination in bank $7E)
+	LDA.W #$000F                ; A = $000F (15, so copy 16 bytes)
+	MVN $7E,$7E                 ; Copy 16 bytes from X to Y (both in $7E)
+	
+	PHK                         ; Push program bank
+	PLB                         ; Pull to data bank (B = $00)
+	
+	; ---------------------------------------------------------------------------
+	; Refresh Background Layer
+	; ---------------------------------------------------------------------------
+	
+	LDA.W #$0000                ; A = $0000 (BG layer 0)
+	JSR.W CODE_0091D4           ; Update layer 0
+	
+	SEP #$30                    ; 8-bit A, X, Y
+	
+	LDA.B #$80                  ; A = $80 (bit 7)
+	TSB.W $00D9                 ; Set bit 7 of $00D9
+	
+	RTS                         ; Return
+
+;-------------------------------------------------------------------------------
+
+CODE_008B57:
+	; ===========================================================================
+	; Check Input Enable Flags
+	; ===========================================================================
+	; Checks if controller input is currently allowed.
+	; Returns with Z flag indicating result.
+	;
+	; Returns:
+	;   Z flag clear (non-zero): Input blocked
+	;   Z flag set (zero): Input allowed
+	;
+	; $00D6 bit 4: Input block flag
+	; $92: Controller state (masked to disable certain buttons)
+	; ===========================================================================
+	
+	LDA.B #$10                  ; A = $10 (bit 4 mask)
+	AND.W $00D6                 ; Test bit 4 of $00D6
+	BEQ CODE_008B67             ; If clear → Input allowed, exit
+	
+	; Input blocked - mask controller state
+	REP #$30                    ; 16-bit A, X, Y
+	
+	LDA.B $92                   ; A = [$92] (controller state)
+	AND.W #$BFCF                ; A = A & $BFCF (mask bits 4-5, 14)
+								; Disables: bit 4, bit 5, bit 14
+	
+	SEP #$30                    ; 8-bit A, X, Y
+
+CODE_008B67:
+	RTS                         ; Return (Z flag indicates input state)
+
+; Padding/unused byte
+CODE_008B68:
+	RTS                         ; Return
+
+;===============================================================================
+; CONTROLLER INPUT PROCESSING ($008BA0-$008BFC)
+;===============================================================================
+
+CODE_008BA0:
+	; ===========================================================================
+	; Main Controller Input Handler
+	; ===========================================================================
+	; Reads joypad state and processes button presses.
+	; Handles autofire timing and input filtering.
+	;
+	; Controller State Variables:
+	;   $92: Current frame button state
+	;   $94: Newly pressed buttons (triggered this frame)
+	;   $96: Previous frame button state
+	;   $90: Autofire accumulator
+	;   $09: Autofire repeat timer
+	;
+	; $00D6 bit 6: Disable controller reading
+	; $00D2 bit 3: Special input mode
+	; $00DB bit 2: Alternate input filtering
+	; ===========================================================================
+	
+	REP #$30                    ; 16-bit A, X, Y
+	
+	LDA.W #$0000                ; A = $0000
+	TCD                         ; D = $0000 (Direct Page = zero page)
+	
+	; ---------------------------------------------------------------------------
+	; Check Controller Read Enable
+	; ---------------------------------------------------------------------------
+	
+	LDA.W #$0040                ; A = $0040 (bit 6 mask)
+	AND.W $00D6                 ; Test bit 6 of $00D6
+	BNE CODE_008BFC             ; If set → Controller disabled, exit
+	
+	; ---------------------------------------------------------------------------
+	; Save Previous Controller State
+	; ---------------------------------------------------------------------------
+	
+	LDA.B $92                   ; A = current controller state
+	STA.B $96                   ; Save as previous state
+	
+	; ---------------------------------------------------------------------------
+	; Check Special Input Mode ($00D2 bit 3)
+	; ---------------------------------------------------------------------------
+	
+	LDA.W #$0008                ; A = $0008 (bit 3 mask)
+	AND.W $00D2                 ; Test bit 3 of $00D2
+	BNE CODE_008BC7             ; If set → Special input mode
+	
+	; ---------------------------------------------------------------------------
+	; Check Alternate Input Filter ($00DB bit 2)
+	; ---------------------------------------------------------------------------
+	
+	LDA.W #$0004                ; A = $0004 (bit 2 mask)
+	AND.W $00DB                 ; Test bit 2 of $00DB
+	BNE CODE_008BD2             ; If set → Use alternate filtering
+	
+	; ---------------------------------------------------------------------------
+	; Normal Controller Read
+	; ---------------------------------------------------------------------------
+	
+	LDA.W SNES_CNTRL1L          ; A = [$4218] (Controller 1 input)
+								; Reads 16-bit joypad state
+	BRA CODE_008BEA             ; → Process input
+
+;-------------------------------------------------------------------------------
+
+CODE_008BC7:
+	; ===========================================================================
+	; Special Input Mode - Filter D-Pad
+	; ===========================================================================
+	; Reads controller but masks out D-pad directions.
+	; Only allows button presses (A, B, X, Y, L, R, Start, Select).
+	; ===========================================================================
+	
+	LDA.W SNES_CNTRL1L          ; A = controller state
+	AND.W #$FFF0                ; A = A & $FFF0 (clear bits 0-3, D-pad)
+	BEQ CODE_008BEA             ; If zero → No buttons pressed
+	
+	JMP.W CODE_0092F0           ; → Special button handler
+
+;-------------------------------------------------------------------------------
+
+CODE_008BD2:
+	; ===========================================================================
+	; Alternate Input Filter
+	; ===========================================================================
+	; Checks $00D9 bit 1 for additional filtering mode.
+	; ===========================================================================
+	
+	LDA.W #$0002                ; A = $0002 (bit 1 mask)
+	AND.W $00D9                 ; Test bit 1 of $00D9
+	BEQ CODE_008BDF             ; If clear → Normal alternate mode
+	
+	; Special alternate mode (incomplete in disassembly)
+	.db $A9,$80,$00,$04,$90     ; Raw bytes (seems incomplete)
+
+;-------------------------------------------------------------------------------
+
+CODE_008BDF:
+	LDA.W SNES_CNTRL1L          ; A = controller state
+	AND.W #$FFF0                ; Mask D-pad
+	BEQ CODE_008BEA             ; If zero → No buttons
+	
+	JMP.W CODE_0092F6           ; → Alternate button handler
+
+;-------------------------------------------------------------------------------
+
+CODE_008BEA:
+	; ===========================================================================
+	; Process Controller Input
+	; ===========================================================================
+	; Combines current hardware input with software autofire.
+	; Calculates newly pressed buttons.
+	; ===========================================================================
+	
+	ORA.B $90                   ; A = A | [$90] (OR with autofire bits)
+	AND.W #$FFF0                ; Mask to buttons only
+	STA.B $94                   ; [$94] = all pressed buttons this frame
+	
+	TAX                         ; X = pressed buttons (for later)
+	
+	TRB.B $96                   ; Clear pressed buttons from previous state
+								; $96 now = buttons released this frame
+	
+	LDA.B $92                   ; A = previous frame state
+	TRB.B $94                   ; Clear held buttons from new press state
+								; $94 now = newly pressed buttons only
+	
+	STX.B $92                   ; Save current state
+	STZ.B $90                   ; Clear autofire accumulator
+
+CODE_008BFC:
+	RTS                         ; Return
+
+;===============================================================================
+; AUTOFIRE & INPUT TIMING ($008BFD-$008C1A)
+;===============================================================================
+
+CODE_008BFD:
+	; ===========================================================================
+	; Autofire Timer Handler
+	; ===========================================================================
+	; Manages autofire/repeat functionality for held buttons.
+	; When button held, generates periodic "new press" events.
+	;
+	; Timing:
+	;   First repeat: After 25 frames (~0.4 seconds)
+	;   Subsequent repeats: Every 5 frames (~0.08 seconds)
+	;
+	; Variables:
+	;   $07: Output - Effective button presses this frame
+	;   $09: Autofire countdown timer
+	;   $94: Newly pressed buttons
+	;   $92: Currently held buttons
+	; ===========================================================================
+	
+	STZ.B $07                   ; Clear output (no input by default)
+	
+	; ---------------------------------------------------------------------------
+	; Check for New Button Presses
+	; ---------------------------------------------------------------------------
+	
+	LDA.B $94                   ; A = newly pressed buttons
+	BNE CODE_008C13             ; If any new press → Handle immediate input
+	
+	; ---------------------------------------------------------------------------
+	; Handle Held Buttons (Autofire)
+	; ---------------------------------------------------------------------------
+	
+	LDA.B $92                   ; A = currently held buttons
+	BEQ CODE_008C12             ; If nothing held → Exit
+	
+	DEC.B $09                   ; Decrement autofire timer
+	BPL CODE_008C12             ; If timer still positive → Exit (not ready)
+	
+	; Timer expired - trigger autofire event
+	STA.B $07                   ; Output = held buttons (simulate new press)
+	
+	LDA.W #$0005                ; A = $05 (5 frames)
+	STA.B $09                   ; Reset timer to 5 for repeat rate
+
+CODE_008C12:
+	RTS                         ; Return
+
+;-------------------------------------------------------------------------------
+
+CODE_008C13:
+	; ===========================================================================
+	; Handle New Button Press
+	; ===========================================================================
+	; When button first pressed, output immediately and set long timer.
+	; ===========================================================================
+	
+	STA.B $07                   ; Output = new button presses
+	
+	LDA.W #$0019                ; A = $19 (25 frames)
+	STA.B $09                   ; Set timer to 25 (initial delay)
+	
+	RTS                         ; Return
 
 Normal_Frame_Update:
 	JSR.W CODE_008BFD                ; Normal frame processing
