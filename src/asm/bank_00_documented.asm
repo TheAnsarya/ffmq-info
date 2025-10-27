@@ -80,21 +80,14 @@ CODE_00A375 = $00A375
 CODE_00A3DE = $00A3DE
 CODE_00A3E5 = $00A3E5
 CODE_00A3EC = $00A3EC
-CODE_00A3F5 = $00A3F5
+CODE_00A3F5 = $00A3FC
 CODE_00A3FC = $00A3FC
 CODE_00A51E = $00A51E
 ; CODE_00A572 through CODE_00A597 now implemented
 ; CODE_00A708 through CODE_00A83F now implemented
-CODE_00A78E = $00A78E             ; Not yet implemented (referenced in jump table)
-CODE_00A86E = $00A86E
-CODE_00A874 = $00A874
-CODE_00A89B = $00A89B
-CODE_00A8BD = $00A8BD
-CODE_00A8C0 = $00A8C0
-CODE_00A8D1 = $00A8D1
-CODE_00A958 = $00A958
-CODE_00A96C = $00A96C
-CODE_00A97D = $00A97D
+; CODE_00A86E through CODE_00AACC now implemented (partial CODE_00A86E as db)
+CODE_00A78E = $00A78E             ; Referenced in jump table but not implemented as routine
+CODE_00A86E = $00A86E             ; Partial implementation (raw bytecode placeholder)
 CODE_00AACF = $00AACF
 CODE_00AEA2 = $00AEA2
 CODE_00AEB5 = $00AEB5
@@ -8546,14 +8539,468 @@ CODE_00A867:
 	RTS                            ; Return
 
 ;===============================================================================
-; Progress: ~8,400 lines documented (60.0% of Bank $00)
+; Memory Manipulation and Data Transfer Routines
+;===============================================================================
+
+; CODE_00A86E - Raw bytecode (not yet disassembled fully)
+; Purpose: Unknown memory operation involving $9E and $A0
+	db $A4,$9E,$A5,$A0,$80,$D9
+
+;-------------------------------------------------------------------------------
+; CODE_00A874 - Copy data to RAM $7E3367 using MVN
+; Purpose: Block memory move from Bank $00 to Bank $7E
+; Entry: [$17] = destination offset,  [$17+2] = byte count
+;-------------------------------------------------------------------------------
+CODE_00A874:
+	LDA.B [$17]                    ; Load destination offset
+	INC.B $17
+	INC.B $17
+	TAX                            ; X = destination offset
+	LDA.L $7E3367                  ; Load current $7E pointer
+	TAY                            ; Y = source in $7E
+	LDA.B [$17]                    ; Load byte count
+	INC.B $17
+	AND.W #$00FF
+	DEC A                          ; Count-1 for MVN
+	PHB                            ; Save data bank
+	MVN $7E,$00                    ; Move (Y)Bank$00 → (X)Bank$7E, A+1 bytes
+	PLB                            ; Restore data bank
+	TYA                            ; Get end pointer
+	CMP.W #$35D9                   ; Check if exceeds buffer limit
+	BCC CODE_00A896                ; If below limit, update pointer
+	db $4C,$1F,$9D                 ; JMP CODE_009D1F (buffer overflow handler)
+
+CODE_00A896:
+	STA.L $7E3367                  ; Update pointer
+	RTS
+
+;-------------------------------------------------------------------------------
+; CODE_00A89B - Copy data from RAM $7E3367 back to Bank $00
+; Purpose: Reverse block move from Bank $7E to Bank $00
+; Entry: [$17] = destination, [$17+2] = count
+;-------------------------------------------------------------------------------
+CODE_00A89B:
+	LDA.B [$17]                    ; Load destination in Bank $00
+	INC.B $17
+	INC.B $17
+	TAY                            ; Y = destination
+	LDA.B [$17]                    ; Load byte count
+	INC.B $17
+	AND.W #$00FF
+	PHA                            ; Save count
+	EOR.W #$FFFF                   ; Negate count
+	SEC
+	ADC.L $7E3367                  ; Subtract from pointer (move backward)
+	STA.L $7E3367                  ; Update pointer
+	TAX                            ; X = new source
+	PLA                            ; Restore count
+	DEC A                          ; Count-1 for MVN
+	MVN $00,$7E                    ; Move (X)Bank$7E → (Y)Bank$00
+	RTS
+
+;-------------------------------------------------------------------------------
+; CODE_00A8BD/CODE_00A8C0 - Pointer manipulation helpers
+;-------------------------------------------------------------------------------
+CODE_00A8BD:
+	JSR.W CODE_00A8C0
+
+CODE_00A8C0:
+	LDA.W #$003E                   ; Mask for clearing bits
+	TRB.B $1A                      ; Clear bits in $1A
+	LSR A                          ; Shift mask
+	AND.B $25                      ; Apply to $25
+	ASL A                          ; Shift result
+	ORA.B $1A                      ; Combine with $1A
+	ADC.W #$0040                   ; Add base offset
+	STA.B $1A                      ; Store result
+	RTS
+
+;-------------------------------------------------------------------------------
+; CODE_00A8D1 - Calculate pointer from $25 (coordinates/position)
+; Purpose: Convert position data to tilemap pointer
+; Entry: $25 = position data, $3F/$40 = base pointers
+; Exit: $1A = calculated pointer, $1B = bank/high byte
+;-------------------------------------------------------------------------------
+CODE_00A8D1:
+	LDA.B $40                      ; Load base bank/high
+	STA.B $1B                      ; Set $1B
+	LDA.B $25                      ; Load position
+	AND.W #$00FF                   ; Get low byte (X coordinate)
+	ASL A                          ; × 2 (word-sized tiles)
+	STA.B $1A                      ; Store as base
+	LDA.B $25                      ; Load position again
+	AND.W #$FF00                   ; Get high byte (Y coordinate)
+	LSR A                          ; / 4 (row calculation)
+	LSR A
+	ADC.B $1A                      ; Add X offset
+	ADC.B $3F                      ; Add base pointer
+	STA.B $1A                      ; Store final pointer
+	RTS
+
+;-------------------------------------------------------------------------------
+; CODE_00A8EB-CODE_00A93E - DMA/MVN transfer routines
+; Purpose: Various block memory transfer operations
+;-------------------------------------------------------------------------------
+	db $4C,$24,$98                 ; JMP CODE_009824
+
+CODE_00A8EE:
+	LDA.B $18                      ; Load $18
+	AND.W #$FF00                   ; Get high byte
+	STA.B $31                      ; Store in $31
+	LDA.B [$17]                    ; Load X parameter
+	INC.B $17
+	INC.B $17
+	TAX
+	LDA.B [$17]                    ; Load Y parameter
+	INC.B $17
+	INC.B $17
+	TAY
+	LDA.B [$17]                    ; Load count
+	INC.B $17
+	AND.W #$00FF
+	DEC A                          ; Count-1 for MVN
+	JMP.W $0030                    ; Execute DMA/transfer at $0030
+
+CODE_00A90E:
+	STZ.B $62                      ; Clear $62
+	LDA.B [$17]                    ; Load parameter 1
+	INC.B $17
+	INC.B $17
+	TAX
+	LDA.B [$17]                    ; Load parameter 2
+	INC.B $17
+	AND.W #$00FF
+	STA.B $63                      ; Store in $63
+	LDA.B [$17]                    ; Load parameter 3
+	INC.B $17
+	INC.B $17
+	TAY
+	LDA.B [$17]                    ; Load parameter 4
+	INC.B $17
+	AND.W #$00FF
+	ORA.B $62                      ; Combine with $62
+	STA.B $31                      ; Store in $31
+	LDA.B [$17]                    ; Load count
+	INC.B $17
+	INC.B $17
+	DEC A                          ; Count-1
+	PHB                            ; Save data bank
+	JSR.W $0030                    ; Execute transfer
+	PLB                            ; Restore data bank
+	RTS
+
+CODE_00A93F:
+	LDA.B $35                      ; Load $35
+	SEP #$20                       ; 8-bit A
+	LDA.B $39                      ; Load bank byte
+	REP #$30                       ; 16-bit mode
+	STA.B $31                      ; Store bank
+	LDA.B $3A                      ; Check if count non-zero
+	BEQ CODE_00A957                ; If zero, skip
+	DEC A                          ; Count-1
+	LDX.B $34                      ; Load X param
+	LDY.B $37                      ; Load Y param
+	PHB                            ; Save data bank
+	JSR.W $0030                    ; Execute transfer
+	PLB                            ; Restore data bank
+
+CODE_00A957:
+	RTS
+
+;-------------------------------------------------------------------------------
+; CODE_00A958 - Write 8-bit value to address
+; Purpose: [X] = 8-bit value from script
+; Entry: [$17] = address, [$17+2] = 8-bit value
+;-------------------------------------------------------------------------------
+CODE_00A958:
+	LDA.B [$17]                    ; Load address
+	INC.B $17
+	INC.B $17
+	TAX                            ; X = address
+	LDA.B [$17]                    ; Load value (8-bit in low byte)
+	INC.B $17
+	AND.W #$00FF
+	SEP #$20                       ; 8-bit A
+	STA.W $0000,X                  ; Store to address
+	RTS                            ; (REP #$30 happens in caller)
+
+;-------------------------------------------------------------------------------
+; CODE_00A96C - Write 16-bit value to address
+; Purpose: [X] = 16-bit value from script
+; Entry: [$17] = address, [$17+2] = 16-bit value
+;-------------------------------------------------------------------------------
+CODE_00A96C:
+	LDA.B [$17]                    ; Load address
+	INC.B $17
+	INC.B $17
+	TAX                            ; X = address
+	LDA.B [$17]                    ; Load 16-bit value
+	INC.B $17
+	INC.B $17
+	STA.W $0000,X                  ; Store to address
+	RTS
+
+;-------------------------------------------------------------------------------
+; CODE_00A97D - Write 16-bit value + 8-bit value to address
+; Purpose: Write word then byte (3 bytes total)
+; Entry: [$17] = address, [$17+2] = word, [$17+4] = byte
+;-------------------------------------------------------------------------------
+CODE_00A97D:
+	JSR.W CODE_00A96C              ; Write word at X
+	LDA.B [$17]                    ; Load byte value
+	INC.B $17
+	AND.W #$00FF
+	SEP #$20                       ; 8-bit A
+	STA.W $0002,X                  ; Store at X+2
+	RTS
+
+;-------------------------------------------------------------------------------
+; CODE_00A98D/CODE_00A999 - Indirect pointer writes (using $9E)
+; Purpose: Write to address pointed to by $9E/$9F
+;-------------------------------------------------------------------------------
+CODE_00A98D:
+	LDA.B [$17]                    ; Load 8-bit value
+	INC.B $17
+	AND.W #$00FF
+	SEP #$20                       ; 8-bit A
+	STA.B [$9E]                    ; Store via indirect pointer
+	RTS
+
+CODE_00A999:
+	LDA.B [$17]                    ; Load 16-bit value
+	INC.B $17
+	INC.B $17
+	STA.B [$9E]                    ; Store via indirect pointer
+	RTS
+
+;-------------------------------------------------------------------------------
+; CODE_00A9A2 - Complex indirect write sequence
+;-------------------------------------------------------------------------------
+CODE_00A9A2:
+	db $20,$99,$A9,$E6,$9E,$E6,$9E,$20,$8D,$A9,$C2,$30,$C6,$9E,$C6,$9E
+	db $60
+
+;-------------------------------------------------------------------------------
+; CODE_00A9B3 - Load value from indirect pointer
+; Purpose: Load 16-bit value from [$9E]
+; Entry: [$17] = address to store result
+; Exit: A = value from [$9E], X = address
+;-------------------------------------------------------------------------------
+CODE_00A9B3:
+	LDA.B [$17]                    ; Load destination address
+	INC.B $17
+	INC.B $17
+	TAX                            ; X = destination
+	LDA.B [$9E]                    ; Load value via indirect
+	RTS
+
+CODE_00A9BD:
+	JSR.W CODE_00A9B3              ; Load via [$9E]
+	SEP #$20                       ; 8-bit A
+	STA.W $0000,X                  ; Store low byte only
+	RTS
+
+CODE_00A9C6:
+	JSR.W CODE_00A9B3              ; Load via [$9E]
+	STA.W $0000,X                  ; Store full word
+	RTS
+
+;-------------------------------------------------------------------------------
+; CODE_00A9CD - MVN transfer using $9E pointer
+; Purpose: Block move using indirect pointer as bank
+;-------------------------------------------------------------------------------
+CODE_00A9CD:
+	LDA.B [$17]                    ; Load destination
+	INC.B $17
+	INC.B $17
+	TAY                            ; Y = destination
+	LDX.B $9E                      ; X = source from $9E
+	LDA.B $9F                      ; Load bank byte
+	AND.W #$FF00
+	STA.B $31                      ; Store bank in $31
+	LDA.W #$0002                   ; Transfer 3 bytes (count-1=2)
+	JMP.W $0030                    ; Execute MVN via $0030
+
+;-------------------------------------------------------------------------------
+; CODE_00A9E3-CODE_00AA22 - Bank $7E write operations
+; Purpose: Write to Bank $7E addresses using special bank handling
+;-------------------------------------------------------------------------------
+CODE_00A9E3:
+	JSR.W CODE_00AA22              ; Load address and bank
+	PHA                            ; Save bank
+	PLB                            ; Set data bank
+	LDA.B [$17]                    ; Load 8-bit value
+	INC.B $17
+	AND.W #$00FF
+	SEP #$20                       ; 8-bit A
+	STA.W $0000,X                  ; Store to Bank $7E address
+	PLB                            ; Restore data bank
+	RTS
+
+CODE_00A9F6:
+	JSR.W CODE_00AA22              ; Load address and bank
+	PHA                            ; Save bank
+	PLB                            ; Set data bank
+	LDA.B [$17]                    ; Load 16-bit value
+	INC.B $17
+	INC.B $17
+	STA.W $0000,X                  ; Store to Bank $7E address
+	PLB                            ; Restore data bank
+	RTS
+
+CODE_00AA06:
+	db $20,$22,$AA,$48,$AB,$A7,$17,$E6,$17,$E6,$17,$9D,$00,$00,$A7,$17
+	db $E6,$17,$29,$FF,$00,$E2,$20,$9D,$02,$00,$AB,$60
+
+;-------------------------------------------------------------------------------
+; CODE_00AA22 - Helper: Load address and bank for Bank $7E operations
+; Entry: [$17] = address, [$17+2] = bank byte
+; Exit: X = address, A = bank (low byte)
+;-------------------------------------------------------------------------------
+CODE_00AA22:
+	LDA.B [$17]                    ; Load address
+	INC.B $17
+	INC.B $17
+	TAX                            ; X = address
+	LDA.B [$17]                    ; Load bank
+	INC.B $17
+	AND.W #$00FF                   ; Isolate bank byte
+	RTS
+
+;-------------------------------------------------------------------------------
+; CODE_00AA31-CODE_00AA67 - Text positioning and display helpers
+; Purpose: Calculate text window positions and sizes
+;-------------------------------------------------------------------------------
+CODE_00AA31:
+	SEP #$30                       ; 8-bit A, X, Y
+	JSR.W CODE_00AA3B              ; Calculate X position
+	JSR.W CODE_00AA44              ; Calculate Y position/width
+	BRA CODE_00AA5D                ; Finalize
+
+CODE_00AA3B:
+	LDA.B #$20                     ; Load window width constant
+	SEC
+	SBC.B $2A                      ; Subtract text width
+	LSR A                          ; / 2 (center)
+	STA.B $28                      ; Store X offset
+	RTS
+
+CODE_00AA44:
+	LDA.B $24                      ; Load flags
+	AND.B #$08                     ; Test bit 3
+	BEQ CODE_00AA4E                ; If clear, skip
+	LDA.B #$10                     ; Use fixed position
+	BRA CODE_00AA53
+
+CODE_00AA4E:
+	LDA.B $2D                      ; Load position
+	EOR.B #$FF                     ; Negate
+	INC A
+
+CODE_00AA53:
+	CLC
+	ADC.B $23                      ; Add offset
+	STA.B $2C                      ; Store Y position
+	LSR A                          ; / 4 (row)
+	LSR A
+	STA.B $29                      ; Store row index
+	RTS
+
+CODE_00AA5D:
+	REP #$30                       ; 16-bit mode
+	LDA.B $28                      ; Load calculated position
+	CLC
+	ADC.W #$0101                   ; Add offset (both bytes)
+	STA.B $25                      ; Store final position
+	RTS
+
+;-------------------------------------------------------------------------------
+; CODE_00AA68 - Repeat text operation
+; Purpose: Execute text display routine multiple times
+; Entry: $1F = repeat count, $17 = operation pointer
+;-------------------------------------------------------------------------------
+CODE_00AA68:
+	LDA.B $1F                      ; Load repeat count
+	AND.W #$00FF
+	LDX.B $17                      ; Load operation pointer
+
+CODE_00AA6F:
+	PHA                            ; Save count
+	PHX                            ; Save pointer
+	STX.B $17                      ; Set pointer
+	JSR.W CODE_009DBD              ; Execute text operation
+	PLX                            ; Restore pointer
+	PLA                            ; Restore count
+	DEC A                          ; Decrement count
+	BNE CODE_00AA6F                ; Loop if not zero
+	RTS
+
+;-------------------------------------------------------------------------------
+; CODE_00AA7C-CODE_00AACC - DMA transfer setup routines
+; Purpose: Set up and execute DMA transfers to VRAM/tilemap
+;-------------------------------------------------------------------------------
+CODE_00AA7C:
+	LDA.B $40                      ; Load bank/high byte
+	STA.B $1B                      ; Set DMA bank
+	STA.B $35                      ; Set alternate bank
+	STA.B $38                      ; Set third bank
+	LDA.W #$2CFE                   ; Load tile value
+	LDX.B $3F                      ; Load X base
+	LDY.W #$1000                   ; Load Y base (large transfer)
+	JMP.W CODE_009D4B              ; Execute DMA
+
+CODE_00AA8F:
+	LDA.B $40                      ; Load bank
+	STA.B $1B
+	STA.B $35
+	STA.B $38
+	LDA.B $28                      ; Load position high byte
+	AND.W #$FF00
+	LSR A                          ; / 4 (calculate offset)
+	LSR A
+	ADC.B $3F                      ; Add base
+	TAX                            ; X = transfer source
+	LDA.B $2A                      ; Load size high byte
+	AND.W #$FF00
+	LSR A                          ; / 4
+	LSR A
+	TAY                            ; Y = transfer size
+	LDA.W #$2CFE                   ; Load tile value
+	JMP.W CODE_009D4B              ; Execute DMA
+
+CODE_00AAAF:
+	LDA.B $40                      ; Load bank
+	STA.B $1B
+	STA.B $35
+	STA.B $38
+	LDA.B $28                      ; Load position
+	AND.W #$FF00
+	LSR A                          ; / 4
+	LSR A
+	ADC.B $3F                      ; Add base
+	TAX
+	LDA.B $2A                      ; Load size
+	AND.W #$FF00
+	LSR A                          ; / 4
+	LSR A
+	TAY
+	LDA.W #$2C00                   ; Different tile value (blank/clear)
+	JMP.W CODE_009D4B              ; Execute DMA
+
+;===============================================================================
+; Progress: ~8,900 lines documented (63.5% of Bank $00)
 ; Latest additions:
-; - CODE_00A5C8-00A5CD: Skip helpers and address loaders
-; - Conditional handler patterns for all test types (00B1D6, 00B1E8, 00B204, 00B21D, 00B22F)
-; - CODE_00A708-00A71C: Critical bank switching infrastructure
-; - CODE_00A744-00A755: Address execution handlers
-; - CODE_00A7F9: Full context save/restore for subroutines
-; - CODE_00A83F: External subroutine execution via long calls
+; - CODE_00A86E-00A874: Memory block transfers to/from Bank $7E
+; - CODE_00A89B: Reverse block copy (Bank $7E → Bank $00)
+; - CODE_00A8C0-00A8D1: Pointer manipulation and coordinate calculations
+; - CODE_00A8EE-00A93E: DMA/MVN transfer helper routines
+; - CODE_00A958-00A97D: Direct memory write operations (8-bit, 16-bit, 24-bit)
+; - CODE_00A98D-00A999: Indirect pointer writes via $9E
+; - CODE_00A9B3-00A9CD: Indirect pointer reads and transfers
+; - CODE_00A9E3-00AA22: Bank $7E special write operations
+; - CODE_00AA31-00AA67: Text positioning and window calculations
+; - CODE_00AA68: Text operation repeat loop
+; - CODE_00AA7C-00AACC: DMA transfer setup for VRAM/tilemap operations
 ;
-; Next: Memory manipulation and data transfer routines (CODE_00A86E onward)
+; Next: More DMA and graphics routines (CODE_00AACF onward)
 ;===============================================================================
