@@ -58,6 +58,10 @@ SNES_CNTRL1L   = $4218    ; Controller 1 Data Low
 
 ; System Registers
 SNES_NMITIMEN  = $4200    ; NMI/Timer Enable
+SNES_VTIMEL    = $4209    ; V-Timer Low
+SNES_SLHV      = $2137    ; H/V Latch
+SNES_OPVCT     = $213D    ; Vertical Counter (PPU)
+SNES_STAT78    = $213F    ; PPU Status 78
 
 ; Math/Multiplication/Division Registers
 SNES_WRMPYA    = $4202    ; Multiplicand
@@ -91,17 +95,7 @@ CODE_00A51E = $00A51E
 CODE_00A78E = $00A78E             ; Referenced in jump table but not implemented as routine
 CODE_00A86E = $00A86E             ; Partial implementation (raw bytecode placeholder)
 ; All comparison tests now implemented below
-CODE_00B950 = $00B950
 CODE_00BA1A = $00BA1A
-CODE_00BD30 = $00BD30
-CODE_00BD64 = $00BD64
-CODE_00C795 = $00C795
-CODE_00C7B8 = $00C7B8
-CODE_00CA63 = $00CA63
-CODE_00D080 = $00D080
-CODE_00E055 = $00E055
-CODE_00B908 = $00B908
-CODE_00B912 = $00B912
 Some_Graphics_Setup = $00B000
 Some_Init_Routine = $00B100
 Some_Mode_Handler = $00B200
@@ -112,6 +106,18 @@ Some_Function_9319 = $009319
 Some_Function_9A08 = $009A08
 Some_Function_A236 = $00A236
 CODE_009824 = $009824    ; BCD/Hex number formatting routine
+CODE_008B69 = $008B69    ; Screen setup routine 1
+CODE_008B88 = $008B88    ; Screen setup routine 2
+CODE_00BAF0 = $00BAF0    ; Initialization routine
+CODE_00CBEC = $00CBEC    ; Setup routine
+CODE_00DA65 = $00DA65    ; External data routine
+CODE_00BD30 = $00BD30    ; External routine
+CODE_00BD64 = $00BD64    ; External routine
+CODE_00C795 = $00C795    ; External routine
+CODE_00C7B8 = $00C7B8    ; External routine
+CODE_00CA63 = $00CA63    ; External routine
+CODE_00D080 = $00D080    ; External routine
+CODE_00E055 = $00E055    ; External routine
 
 ; Other Banks
 CODE_028AE0 = $028AE0    ; Bank $02 routine
@@ -125,6 +131,7 @@ CODE_0D8000 = $0D8000    ; Bank $0D routine
 CODE_0D8004 = $0D8004    ; Bank $0D routine
 Bank0D_Init_Variant = $0D8000    ; Bank $0D Init
 CODE_018272 = $018272    ; Bank $01 routine
+CODE_018A52 = $018A52    ; Bank $01 sprite initialization
 CODE_01B24C = $01B24C    ; Bank $01 script initialization routine
 Jump_To_Bank01 = $018000 ; Bank $01 jump target
 DATA8_049800 = $049800   ; Bank $04 data
@@ -11190,3 +11197,745 @@ CODE_00B534:
     REP #$30                       ; 16-bit A/X/Y
     JSR.W CODE_00A8D1              ; Call positioning routine
     RTS
+
+;-------------------------------------------------------------------------------
+; CODE_00B548: Set text counter and call text routine
+;
+; Purpose: Set $3A to $10 (16) and call text drawing routine
+; Entry: (parameters set up by caller)
+; Exit: Text drawing initiated
+; Calls: CODE_00A7DE (text drawing routine)
+;-------------------------------------------------------------------------------
+CODE_00B548:
+    LDA.W #$0010                   ; Load 16
+    STA.B $3A                      ; Store in counter
+    JMP.W CODE_00A7DE              ; Jump to text drawing
+
+;-------------------------------------------------------------------------------
+; CODE_00B550: Tilemap buffer manipulation (unclear function)
+;
+; Purpose: Complex tilemap buffer operation
+; Entry: $015F = counter/index
+;        $1A = tilemap pointer
+;        $1F = parameter
+; Exit: Tilemap buffer updated
+;       $015F updated
+; Notes: Uses indexed buffer writes with loop
+;-------------------------------------------------------------------------------
+CODE_00B550:
+    db $C2,$20,$E2,$10,$AD,$5F,$01,$A4,$1F,$87,$1A,$E6,$1A,$E6,$1A,$1A
+    db $88,$D0,$F6,$8D,$5F,$01,$60
+    ; REP #$20; SEP #$10
+    ; LDA $015F; LDY $1F
+    ; STA [$1A]; INC $1A; INC $1A; INC A
+    ; DEY; BNE loop; STA $015F; RTS
+
+;-------------------------------------------------------------------------------
+; CODE_00B567: Character sprite setup and positioning
+;
+; Purpose: Set up character sprite display parameters based on game state
+; Entry: $20 = location/mode ID
+;        $DA/$D9/$D0 = state flags
+;        $C8 = location parameter
+;        $E0 = display flags
+;        $22/$23/$24 = sprite position/mode
+; Exit: $22 = sprite X position (adjusted)
+;       $23 = sprite Y position (adjusted)
+;       $24 = sprite display mode
+;       $D0 bit 2 set/cleared based on location
+; Calls: CODE_018A52 (external sprite init)
+; Notes: Complex location-based sprite positioning
+;        Handles battle vs overworld sprite modes
+;        Adjusts for screen centering and boundaries
+;-------------------------------------------------------------------------------
+CODE_00B567:
+    PHP                            ; Save processor status
+    SEP #$20                       ; 8-bit accumulator
+    REP #$10                       ; 16-bit X/Y
+    LDA.B #$10                     ; Bit 4 mask
+    AND.W $00DA                    ; Test bit 4 of $DA
+    BEQ CODE_00B57E                ; If clear, normal mode
+    LDA.B #$04                     ; Mode 4 (battle mode)
+    STA.B $24                      ; Store sprite mode
+    LDX.W #$5F78                   ; Sprite data pointer
+    STX.B $22                      ; Store in $22
+    PLP                            ; Restore processor status
+    RTS
+
+CODE_00B57E:
+    LDA.B #$04                     ; Bit 2 mask
+    TRB.W $00D0                    ; Clear bit 2 of $D0
+    JSL.L CODE_018A52              ; Call external sprite init
+    LDA.B #$01                     ; Bit 0 mask
+    AND.W $00D9                    ; Test bit 0 of $D9
+    BEQ CODE_00B592                ; If clear, skip
+    LDA.B #$08                     ; Mode 8
+    STA.B $24                      ; Store sprite mode
+
+CODE_00B592:
+    LDA.B $20                      ; Load location/mode ID
+    CMP.B #$0B                     ; Location $0B?
+    BEQ CODE_00B5DB                ; If yes, special handling
+    CMP.B #$A7                     ; Location $A7?
+    BEQ CODE_00B5DB                ; If yes, special handling
+    CMP.B #$4F                     ; Location $4F?
+    BEQ CODE_00B5D4                ; If yes, set bit 2 in $D0
+    CMP.B #$01                     ; Location $01?
+    BEQ CODE_00B5C9                ; If yes, adjust X position
+    CMP.B #$1B                     ; Location $1B?
+    BEQ CODE_00B5C9                ; If yes, adjust X position
+    CMP.B #$30                     ; Location $30?
+    BEQ CODE_00B5C9                ; If yes, adjust X position
+    CMP.B #$31                     ; Location $31?
+    BEQ CODE_00B5C9                ; If yes, adjust X position
+    CMP.B #$4E                     ; Location $4E?
+    BEQ CODE_00B5C9                ; If yes, adjust X position
+    CMP.B #$6B                     ; Location $6B?
+    BEQ UNREACH_00B5C2             ; If yes, adjust Y position
+    CMP.B #$77                     ; < $77?
+    BCC CODE_00B5DF                ; If yes, continue
+    CMP.B #$7B                     ; >= $7B?
+    BCS CODE_00B5DF                ; If yes, continue
+    db $80,$07                     ; BRA CODE_00B5C9 (unconditional)
+
+UNREACH_00B5C2:
+    db $18,$A5,$23,$69,$04,$85,$23 ; CLC; LDA $23; ADC #$04; STA $23
+
+CODE_00B5C9:
+    CLC                            ; Clear carry
+    LDA.B $22                      ; Load X position
+    ADC.B #$08                     ; Add 8
+    STA.B $22                      ; Store X position
+    LDA.B #$04                     ; Mode 4
+    STA.B $24                      ; Store sprite mode
+
+CODE_00B5D4:
+    LDA.B #$04                     ; Bit 2 mask
+    TSB.W $00D0                    ; Set bit 2 of $D0
+    BRA CODE_00B5DF                ; Continue
+
+CODE_00B5DB:
+    LDA.B #$04                     ; Mode 4
+    STA.B $24                      ; Store sprite mode
+
+CODE_00B5DF:
+    INC.B $23                      ; Increment Y position
+    LDA.B $24                      ; Load sprite mode
+    BIT.B #$08                     ; Test bit 3
+    BNE CODE_00B5F3                ; If set, use mode 10
+    BIT.B #$04                     ; Test bit 2
+    BNE CODE_00B5EF                ; If set, use mode 5
+    BIT.B #$02                     ; Test bit 1
+    BNE CODE_00B5F3                ; If set, use mode 10
+
+CODE_00B5EF:
+    LDA.B #$05                     ; Mode 5
+    BRA CODE_00B5F5                ; Store mode
+
+CODE_00B5F3:
+    LDA.B #$0A                     ; Mode 10
+
+CODE_00B5F5:
+    STA.B $24                      ; Store final sprite mode
+    LDA.B $23                      ; Load Y position
+    CMP.B #$08                     ; < $08?
+    BCC UNREACH_00B607             ; If yes, clamp to $08
+    CMP.B #$A9                     ; >= $A9?
+    BCC CODE_00B60B                ; If no, in range
+    db $A9,$A8,$85,$23,$80,$04     ; LDA #$A8; STA $23; BRA CODE_00B60B
+
+UNREACH_00B607:
+    db $A9,$08,$85,$23             ; LDA #$08; STA $23
+
+CODE_00B60B:
+    CLC                            ; Clear carry
+    LDA.B $2D                      ; Load parameter
+    XBA                            ; Swap A/B
+    LDA.B #$0E                     ; Load 14
+    ADC.B $2D                      ; Add to parameter
+    STA.B $2D                      ; Store result
+    STA.B $64                      ; Store in temp
+    ADC.B #$05                     ; Add 5
+    CMP.B $23                      ; Compare with Y position
+    BCS CODE_00B630                ; If >= Y, use mode bits
+    SEC                            ; Set carry
+    LDA.B #$A8                     ; Load $A8
+    SBC.B $2D                      ; Subtract parameter
+    CMP.B $23                      ; Compare with Y
+    BCS CODE_00B638                ; If >= Y, continue
+    LDA.B $24                      ; Load sprite mode
+    AND.B #$F7                     ; Clear bit 3
+    ORA.B #$04                     ; Set bit 2
+    STA.B $24                      ; Store updated mode
+    BRA CODE_00B638                ; Continue
+
+CODE_00B630:
+    LDA.B $24                      ; Load sprite mode
+    AND.B #$FB                     ; Clear bit 2
+    ORA.B #$08                     ; Set bit 3
+    STA.B $24                      ; Store updated mode
+
+CODE_00B638:
+    XBA                            ; Swap A/B
+    STA.B $2D                      ; Store parameter
+    LDA.B $22                      ; Load X position
+    CMP.B #$20                     ; < $20?
+    BCC CODE_00B657                ; If yes, clamp to $08
+    CMP.B #$D1                     ; >= $D1?
+    BCC CODE_00B667                ; If no, in range
+    db $C9,$E9,$90,$04,$A9,$E8,$85,$22,$A5,$24,$29,$FD,$09,$01,$85,$24
+    db $80,$10                     ; LDA #$E8; STA $22; LDA $24; AND #$FD; ORA #$01; STA $24; BRA
+
+CODE_00B657:
+    CMP.B #$08                     ; < $08?
+    BCS CODE_00B65F                ; If no, in range
+    db $A9,$08,$85,$22             ; LDA #$08; STA $22
+
+CODE_00B65F:
+    LDA.B $24                      ; Load sprite mode
+    AND.B #$FE                     ; Clear bit 0
+    ORA.B #$02                     ; Set bit 1
+    STA.B $24                      ; Store updated mode
+
+CODE_00B667:
+    LDA.B $24                      ; Load sprite mode
+    AND.B #$08                     ; Test bit 3
+    BNE CODE_00B674                ; If set, add $10 offset
+    SEC                            ; Set carry
+    LDA.B $23                      ; Load Y position
+    SBC.B $64                      ; Subtract temp
+    BRA CODE_00B679                ; Store offset
+
+CODE_00B674:
+    CLC                            ; Clear carry
+    LDA.B $23                      ; Load Y position
+    ADC.B #$10                     ; Add $10
+
+CODE_00B679:
+    STA.B $62                      ; Store Y offset
+    LDA.W $00C8                    ; Load location parameter
+    CMP.B #$00                     ; Check if 0
+    BNE CODE_00B68E                ; If not, alternate check
+    LDA.B #$40                     ; Bit 6 mask
+    AND.W $00E0                    ; Test bit 6 of $E0
+    BEQ CODE_00B6B1                ; If clear, done
+    LDA.W $01BF                    ; Load character 1 position
+    BRA CODE_00B698                ; Check position
+
+CODE_00B68E:
+    LDA.B #$80                     ; Bit 7 mask
+    AND.W $00E0                    ; Test bit 7 of $E0
+    BEQ CODE_00B6B1                ; If clear, done
+    LDA.W $0181                    ; Load character 2 position
+
+CODE_00B698:
+    CMP.B $62                      ; Compare with Y offset
+    BCC CODE_00B6A4                ; If less, check lower bound
+    SBC.B $62                      ; Subtract Y offset
+    CMP.B $64                      ; Compare with temp
+    BCS CODE_00B6B1                ; If >=, done
+    BRA CODE_00B6AB                ; Toggle mode
+
+CODE_00B6A4:
+    ADC.B $64                      ; Add temp
+    DEC A                          ; Decrement
+    CMP.B $62                      ; Compare with Y offset
+    BCC CODE_00B6B1                ; If less, done
+
+CODE_00B6AB:
+    LDA.B $24                      ; Load sprite mode
+    EOR.B #$0C                     ; Toggle bits 2-3
+    STA.B $24                      ; Store updated mode
+
+CODE_00B6B1:
+    PLP                            ; Restore processor status
+    RTS
+
+;-------------------------------------------------------------------------------
+; CODE_00B6B3: Character sprite display setup
+;
+; Purpose: Set up character sprite display using character index
+; Entry: $9E = character index (or $DE for special case)
+; Exit: $62 = sprite mode
+;       $64 = position offset
+;       Sprite display initiated
+; Calls: CODE_008C1B (character data lookup)
+;        CODE_0C8000 (external sprite display)
+; Notes: Special handling for character $DE
+;-------------------------------------------------------------------------------
+CODE_00B6B3:
+    LDA.B $9E                      ; Load character index
+    CMP.W #$00DE                   ; Check if $DE (special)
+    BEQ CODE_00B6D5                ; If yes, special handling
+    JSR.W CODE_008C1B              ; Look up character data
+    STA.B $62                      ; Store sprite mode
+    SEP #$30                       ; 8-bit A/X/Y
+    LDX.B $9E                      ; X = character index
+    LDA.L DATA8_049800,X           ; Load position offset
+    ASL A                          ; × 2
+    ASL A                          ; × 4
+
+CODE_00B6C9:
+    STA.B $64                      ; Store position offset
+    LDA.B #$02                     ; Bit 1 mask
+    TSB.W $00D4                    ; Set bit 1 of $D4
+    JSL.L CODE_0C8000              ; Call external sprite display
+    RTS
+
+CODE_00B6D5:
+    LDA.W #$0001                   ; Mode 1
+    STA.B $62                      ; Store sprite mode
+    SEP #$30                       ; 8-bit A/X/Y
+    LDA.B #$20                     ; Position $20
+    BRA CODE_00B6C9                ; Display sprite
+
+;-------------------------------------------------------------------------------
+; CODE_00B6E0: Save script pointer and execute script
+;
+; Purpose: Save current script pointer and execute CODE_00B78D
+; Entry: $17/$18 = current script pointer
+; Exit: Script pointer saved on stack
+;       CODE_00B78D executed
+;-------------------------------------------------------------------------------
+CODE_00B6E0:
+    PEI.B ($17)                    ; Save script pointer low
+    PEI.B ($18)                    ; Save script pointer high
+    JMP.W CODE_00B78D              ; Jump to script execution
+
+;-------------------------------------------------------------------------------
+; CODE_00B6E7: Update character gold amount
+;
+; Purpose: Subtract current value from party gold
+; Entry: $0164/$0166 = amount to subtract (24-bit)
+;        $0E84/$0E86 = current party gold
+; Exit: $0E84/$0E86 = updated gold
+;       $17/$18 restored from stack
+; Notes: Part of shop/transaction system
+;-------------------------------------------------------------------------------
+CODE_00B6E7:
+    SEC                            ; Set carry for subtraction
+    LDA.W $0E84                    ; Load gold low word
+    SBC.W $0164                    ; Subtract amount low
+    STA.W $0E84                    ; Store result low
+    SEP #$20                       ; 8-bit accumulator
+    LDA.W $0E86                    ; Load gold high byte
+    SBC.W $0166                    ; Subtract amount high (with borrow)
+    STA.W $0E86                    ; Store result high
+    LDA.W $015F                    ; Load character index
+    CMP.B #$DD                     ; Check if $DD (special)
+    BEQ CODE_00B716                ; If yes, alternate storage
+    JSL.L CODE_00DA65              ; Call external routine
+    CLC                            ; Clear carry
+    ADC.W $0162                    ; Add offset
+    STA.W $0E9F,X                  ; Store at indexed location
+    LDA.W $015F                    ; Load character index
+    STA.W $0E9E,X                  ; Store character ID
+    BRA CODE_00B727                ; Restore and return
+
+CODE_00B716:
+    CLC                            ; Clear carry
+    LDA.W $1030                    ; Load alternate storage
+    ADC.W $0162                    ; Add offset
+    STA.W $1030                    ; Store result
+    BRA CODE_00B727                ; Restore and return
+
+CODE_00B722:
+    SEP #$20                       ; 8-bit accumulator
+    STZ.W $0162                    ; Clear offset
+
+CODE_00B727:
+    PLX                            ; Restore X (script pointer high)
+    STX.B $18                      ; Store in $18
+    PLX                            ; Restore X (script pointer low)
+    STX.B $17                      ; Store in $17
+    RTS
+
+;-------------------------------------------------------------------------------
+; CODE_00B72E: Input handler for menu navigation
+;
+; Purpose: Handle controller input for menu cursor movement
+; Entry: $07 = controller input state
+;        $0162/$0163 = cursor position/limits
+;        $95 = wrapping flags
+; Exit: $0162 = updated cursor position
+;       $17/$18 = script pointer (preserved or updated)
+; Calls: CODE_0096A0 (controller read)
+;        CODE_009BC4 (menu update)
+; Notes: Handles up/down navigation with wrapping
+;        Checks button presses and updates cursor
+;-------------------------------------------------------------------------------
+CODE_00B72E:
+    REP #$30                       ; 16-bit A/X/Y
+    JSL.L CODE_0096A0              ; Read controller input
+    LDA.B $07                      ; Load button state
+    STA.B $15                      ; Store in temp
+    BIT.W #$8000                   ; Test A button (bit 15)
+    BNE CODE_00B722                ; If pressed, clear and return
+    BIT.W #$0080                   ; Test B button (bit 7)
+    BNE CODE_00B6E7                ; If pressed, update gold
+    BIT.W #$0800                   ; Test X button (bit 11)
+    BNE UNREACH_00B7B5             ; If pressed, jump ahead
+    BIT.W #$0400                   ; Test Y button (bit 10)
+    BNE UNREACH_00B797             ; If pressed, move by 10
+    BIT.W #$0100                   ; Test Start (bit 8)
+    BNE CODE_00B770                ; If pressed, increment cursor
+    BIT.W #$0200                   ; Test Select (bit 9)
+    BEQ CODE_00B72E                ; If not pressed, loop
+    SEP #$20                       ; 8-bit accumulator
+    DEC.W $0162                    ; Decrement cursor position
+    BPL CODE_00B78D                ; If >= 0, update menu
+    LDA.B $95                      ; Load wrapping flags
+    AND.B #$02                     ; Test bit 1 (wrap down)
+    BEQ UNREACH_00B76B             ; If no wrap, increment back
+    LDA.W $0163                    ; Load max position
+    STA.W $0162                    ; Wrap to max
+    BRA CODE_00B78D                ; Update menu
+
+UNREACH_00B76B:
+    db $EE,$62,$01,$80,$BE         ; INC $0162; BRA CODE_00B72E
+
+CODE_00B770:
+    SEP #$20                       ; 8-bit accumulator
+    INC.W $0162                    ; Increment cursor position
+    LDA.W $0163                    ; Load max position
+    CMP.W $0162                    ; Compare with current
+    BCS CODE_00B78D                ; If max >= current, update
+    LDA.B $95                      ; Load wrapping flags
+    AND.B #$01                     ; Test bit 0 (wrap up)
+    BEQ CODE_00B788                ; If no wrap, decrement back
+    STZ.W $0162                    ; Wrap to 0
+    BRA CODE_00B78D                ; Update menu
+
+CODE_00B788:
+    DEC.W $0162                    ; Decrement back
+    BRA CODE_00B72E                ; Read input again
+
+CODE_00B78D:
+    REP #$30                       ; 16-bit A/X/Y
+    LDX.W #$B7DD                   ; Menu data pointer
+    JSR.W CODE_009BC4              ; Update menu display
+    BRA CODE_00B72E                ; Read input again
+
+UNREACH_00B797:
+    db $E2,$20,$38,$AD,$62,$01,$F0,$08,$E9,$0A,$B0,$0D,$A9,$00,$80,$09
+    db $A5,$95,$29,$04,$F0,$81,$AD,$63,$01,$8D,$62,$01,$80,$D8
+    ; Cursor movement by 10 (Y button handler)
+
+UNREACH_00B7B5:
+    db $E2,$20,$AD,$62,$01,$CD,$63,$01,$F0,$13,$18,$69,$0A,$8D,$62,$01
+    db $AD,$63,$01,$CD,$62,$01,$B0,$C0,$8D,$62,$01,$80,$BB,$A5,$95,$29
+    db $08,$F0,$BD,$9C,$62,$01,$80,$B0
+    ; Cursor movement by 10 (X button handler)
+
+;-------------------------------------------------------------------------------
+; DATA at $B7DD: Menu configuration data
+;
+; Purpose: Menu display configuration
+; Format: Unknown structure for menu system
+; Used by: CODE_009BC4 (menu update routine)
+;-------------------------------------------------------------------------------
+DATA_00B7DD:
+    db $2B,$8D,$03,$04,$00,$8F,$03,$00,$00,$01,$00,$08,$00,$09,$00,$42
+    db $4B,$5A,$00,$00,$03,$16,$00,$11,$00,$00,$00,$00,$00,$00,$00,$00
+    db $00,$00,$17,$00,$00,$00,$00,$00,$E0,$00,$CC,$20,$0E,$00,$00,$FF
+    db $00,$00,$01,$00,$01,$00,$00,$00,$00,$00,$00,$00,$FF,$FF,$FF,$07
+    db $30,$D9,$05,$31,$00,$42,$12,$00,$30,$7E,$07,$30,$7E
+
+;-------------------------------------------------------------------------------
+; CODE_00B82A: IRQ handler (jitter fix - first variant)
+;
+; Purpose: Interrupt handler for horizontal timing jitter correction
+; Entry: Called by SNES IRQ interrupt
+; Exit: NMI disabled
+;       Interrupt vector updated to CODE_00B86C
+; Uses: SNES_NMITIMEN, SNES_SLHV, SNES_STAT78, SNES_OPVCT
+; Notes: Samples vertical counter until jitter stabilizes
+;        Uses $DA bit 6 for jitter calculation toggle
+;        Enables second-stage IRQ handler
+;-------------------------------------------------------------------------------
+CODE_00B82A:
+    REP #$30                       ; 16-bit A/X/Y
+    PHB                            ; Save data bank
+    PHA                            ; Save accumulator
+    PHX                            ; Save X
+    SEP #$20                       ; 8-bit accumulator
+    PHK                            ; Push program bank
+    PLB                            ; Set data bank = program bank
+    STZ.W SNES_NMITIMEN            ; Disable NMI/IRQ
+
+CODE_00B836:
+    LDA.W SNES_SLHV                ; Sample H/V counter
+    LDA.W SNES_STAT78              ; Read PPU status
+    LDA.W SNES_OPVCT               ; Read vertical counter
+    STA.W $0118                    ; Store V counter
+    LDA.B #$40                     ; Bit 6 mask
+    AND.W $00DA                    ; Test bit 6 of $DA
+    BNE CODE_00B854                ; If set, skip jitter calc
+    LDA.W $0118                    ; Load V counter
+    ASL A                          ; × 2
+    ADC.W $0118                    ; × 3
+    ADC.B #$9A                     ; Add offset
+    PHA                            ; Push result
+    PLP                            ; Pull to processor status (jitter)
+
+CODE_00B854:
+    LSR.W $0118                    ; V counter >> 1
+    BCS CODE_00B836                ; If carry, resample (unstable)
+    LDX.W #$B86C                   ; Second-stage IRQ handler
+    STX.W $0118                    ; Store handler address
+    LDA.B #$11                     ; Enable V-IRQ + NMI
+    STA.W SNES_NMITIMEN            ; Set interrupt mode
+    CLI                            ; Enable interrupts
+    WAI                            ; Wait for interrupt
+    REP #$30                       ; 16-bit A/X/Y
+    PLX                            ; Restore X
+    PLA                            ; Restore accumulator
+    PLB                            ; Restore data bank
+    RTI                            ; Return from interrupt
+
+;-------------------------------------------------------------------------------
+; CODE_00B86C: IRQ handler (second stage - screen on)
+;
+; Purpose: Second-stage IRQ handler - turn screen on and switch to NMI
+; Entry: Called by IRQ after jitter correction
+; Exit: Screen enabled
+;       NMI mode set
+;       $D8 bit 6 set
+;       Interrupt vector updated to CODE_00B82A
+; Calls: CODE_008B69 (screen setup)
+; Notes: Final stage of screen transition
+;-------------------------------------------------------------------------------
+CODE_00B86C:
+    LDA.B #$80                     ; Screen off brightness
+    STA.W SNES_INIDISP             ; Disable screen
+    LDA.B #$01                     ; NMI only mode
+    STA.W SNES_NMITIMEN            ; Set interrupt mode
+    REP #$30                       ; 16-bit A/X/Y
+    PHD                            ; Save direct page
+    PHY                            ; Save Y
+    JSR.W CODE_008B69              ; Screen setup
+    SEP #$20                       ; 8-bit accumulator
+    LDA.B #$07                     ; V-IRQ timer low
+    STA.W SNES_VTIMEL              ; Set V timer
+    LDX.W #$B898                   ; Next IRQ handler
+    STX.W $0118                    ; Store handler address
+    LDA.W $0112                    ; Load interrupt mode
+    STA.W SNES_NMITIMEN            ; Set interrupt mode
+    LDA.B #$40                     ; Bit 6
+    TSB.W $00D8                    ; Set bit 6 of $D8
+    PLY                            ; Restore Y
+    PLD                            ; Restore direct page
+    RTI                            ; Return from interrupt
+
+;-------------------------------------------------------------------------------
+; CODE_00B898: IRQ handler (jitter fix - second variant)
+;
+; Purpose: Alternate IRQ handler for horizontal timing jitter correction
+; Entry: Called by SNES IRQ interrupt
+; Exit: NMI disabled
+;       Interrupt vector updated to CODE_00B8DA
+; Uses: Similar to CODE_00B82A but with different offset ($0F vs $9A)
+; Notes: Second variant of jitter correction algorithm
+;-------------------------------------------------------------------------------
+CODE_00B898:
+    REP #$30                       ; 16-bit A/X/Y
+    PHB                            ; Save data bank
+    PHA                            ; Save accumulator
+    PHX                            ; Save X
+    SEP #$20                       ; 8-bit accumulator
+    PHK                            ; Push program bank
+    PLB                            ; Set data bank = program bank
+    STZ.W SNES_NMITIMEN            ; Disable NMI/IRQ
+
+CODE_00B8A4:
+    LDA.W SNES_SLHV                ; Sample H/V counter
+    LDA.W SNES_STAT78              ; Read PPU status
+    LDA.W SNES_OPVCT               ; Read vertical counter
+    STA.W $0118                    ; Store V counter
+    LDA.B #$40                     ; Bit 6 mask
+    AND.W $00DA                    ; Test bit 6 of $DA
+    BNE CODE_00B8C2                ; If set, skip jitter calc
+    LDA.W $0118                    ; Load V counter
+    ASL A                          ; × 2
+    ADC.W $0118                    ; × 3
+    ADC.B #$0F                     ; Add offset (different from B82A)
+    PHA                            ; Push result
+    PLP                            ; Pull to processor status
+
+CODE_00B8C2:
+    LSR.W $0118                    ; V counter >> 1
+    BCC CODE_00B8A4                ; If no carry, resample (unstable)
+    LDX.W #$B8DA                   ; Second-stage IRQ handler
+    STX.W $0118                    ; Store handler address
+    LDA.B #$11                     ; Enable V-IRQ + NMI
+    STA.W SNES_NMITIMEN            ; Set interrupt mode
+    CLI                            ; Enable interrupts
+    WAI                            ; Wait for interrupt
+    REP #$30                       ; 16-bit A/X/Y
+    PLX                            ; Restore X
+    PLA                            ; Restore accumulator
+    PLB                            ; Restore data bank
+    RTI                            ; Return from interrupt
+
+;-------------------------------------------------------------------------------
+; CODE_00B8DA: IRQ handler (second stage - alternate)
+;
+; Purpose: Alternate second-stage IRQ handler
+; Entry: Called by IRQ after jitter correction (variant 2)
+; Exit: Screen enabled ($0110 brightness)
+;       NMI mode set
+;       $D8 bit 5 set
+;       Interrupt vector updated to CODE_00B82A
+; Calls: CODE_008BA0, CODE_008B88 (screen setup routines)
+; Notes: Uses different screen setup sequence than CODE_00B86C
+;-------------------------------------------------------------------------------
+CODE_00B8DA:
+    LDA.W $0110                    ; Load brightness value
+    STA.W SNES_INIDISP             ; Set screen brightness
+    LDA.B #$01                     ; NMI only mode
+    STA.W SNES_NMITIMEN            ; Set interrupt mode
+    PHD                            ; Save direct page
+    JSR.W CODE_008BA0              ; Screen setup routine 1
+    PHY                            ; Save Y
+    JSR.W CODE_008B88              ; Screen setup routine 2
+    SEP #$20                       ; 8-bit accumulator
+    LDA.B #$D8                     ; V-IRQ timer low
+    STA.W $4209                    ; Set V timer (direct address)
+    LDX.W #$B82A                   ; First-stage IRQ handler
+    STX.W $0118                    ; Store handler address
+    LDA.W $0112                    ; Load interrupt mode
+    STA.W $4200                    ; Set interrupt mode (direct)
+    LDA.B #$20                     ; Bit 5
+    TSB.W $00D8                    ; Set bit 5 of $D8
+    PLY                            ; Restore Y
+    PLD                            ; Restore direct page
+    RTI                            ; Return from interrupt
+
+;-------------------------------------------------------------------------------
+; CODE_00B908: Set sprite mode $2D
+;
+; Purpose: Set sprite display mode to $2D
+; Entry: None
+; Exit: $0505 = $2D
+; Notes: Preserves processor status
+;-------------------------------------------------------------------------------
+CODE_00B908:
+    PHP                            ; Save processor status
+    SEP #$20                       ; 8-bit accumulator
+    LDA.B #$2D                     ; Mode $2D
+    STA.W $0505                    ; Store in sprite mode
+    PLP                            ; Restore processor status
+    RTS
+
+;-------------------------------------------------------------------------------
+; CODE_00B912: Set sprite mode $2C
+;
+; Purpose: Set sprite display mode to $2C
+; Entry: None
+; Exit: $0505 = $2C
+; Notes: Preserves processor status
+;-------------------------------------------------------------------------------
+CODE_00B912:
+    PHP                            ; Save processor status
+    SEP #$20                       ; 8-bit accumulator
+    LDA.B #$2C                     ; Mode $2C
+    STA.W $0505                    ; Store in sprite mode
+    PLP                            ; Restore processor status
+    RTS
+
+;-------------------------------------------------------------------------------
+; CODE_00B91C: Set animation mode $10
+;
+; Purpose: Set animation mode to $10
+; Entry: None
+; Exit: $050A = $10
+; Notes: Preserves processor status
+;-------------------------------------------------------------------------------
+CODE_00B91C:
+    PHP                            ; Save processor status
+    SEP #$20                       ; 8-bit accumulator
+    LDA.B #$10                     ; Mode $10
+    STA.W $050A                    ; Store in animation mode
+    PLP                            ; Restore processor status
+    RTS
+
+;-------------------------------------------------------------------------------
+; CODE_00B926: Set animation mode $11
+;
+; Purpose: Set animation mode to $11
+; Entry: None
+; Exit: $050A = $11
+; Notes: Preserves processor status
+;-------------------------------------------------------------------------------
+CODE_00B926:
+    PHP                            ; Save processor status
+    SEP #$20                       ; 8-bit accumulator
+    LDA.B #$11                     ; Mode $11
+    STA.W $050A                    ; Store in animation mode
+    PLP                            ; Restore processor status
+    RTS
+
+;-------------------------------------------------------------------------------
+; CODE_00B930: Input polling loop with mode toggle
+;
+; Purpose: Poll controller input and toggle sprite mode on button press
+; Entry: $07 = controller input state (from CODE_0096A0)
+;        $01 = current state
+;        $05 = compare state
+; Exit: A = button state
+;       X = $01 value
+;       Flags set based on comparison
+;       $0505 may be updated (mode $2C)
+; Calls: CODE_0096A0 (controller read)
+;        CODE_00B912 (set sprite mode $2C)
+; Notes: Loops until specific button condition met
+;        XORs button state when no buttons pressed
+;-------------------------------------------------------------------------------
+CODE_00B930:
+    JSL.L CODE_0096A0              ; Read controller input
+    BIT.B $07                      ; Test button state
+    BNE CODE_00B949                ; If buttons pressed, check
+    EOR.W #$FFFF                   ; Invert button state
+    BIT.B $07                      ; Test inverted state
+    BEQ CODE_00B944                ; If no change, toggle back
+    PHA                            ; Save state
+    JSR.W CODE_00B912              ; Set sprite mode $2C
+    PLA                            ; Restore state
+
+CODE_00B944:
+    EOR.W #$FFFF                   ; Invert back
+    BRA CODE_00B930                ; Loop
+
+CODE_00B949:
+    LDA.B $07                      ; Load button state
+    LDX.B $01                      ; Load current state
+    CPX.B $05                      ; Compare with compare state
+    RTS
+
+;-------------------------------------------------------------------------------
+; CODE_00B950: Main initialization/game start routine
+;
+; Purpose: Initialize game system and start main game loop
+; Entry: Called at game start or reset
+; Exit: Does not return (infinite game loop)
+; Calls: CODE_0C8000 (bank $0C init)
+;        CODE_00BAF0 (initialization)
+;        CODE_00CBEC (some setup)
+; Notes: Sets up initial game state
+;        Prepares for main game execution
+;-------------------------------------------------------------------------------
+CODE_00B950:
+    PHP                            ; Save processor status
+    PHB                            ; Save data bank
+    PHD                            ; Save direct page
+    REP #$30                       ; 16-bit A/X/Y
+    PEA.W $5555                    ; Push $5555 (init marker?)
+    LDA.W #$0080                   ; Bit 7
+    TSB.W $00D6                    ; Set bit 7 of $D6
+    JSL.L CODE_0C8000              ; Call Bank $0C init
+    JSR.W CODE_00BAF0              ; Initialization routine
+    STZ.B $01                      ; Clear $01
+    SEP #$20                       ; 8-bit accumulator
+    JSR.W CODE_00CBEC              ; Setup routine
+    REP #$30                       ; 16-bit A/X/Y
+    ; (continues...)
