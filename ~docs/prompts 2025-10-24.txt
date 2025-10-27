@@ -141,6 +141,8 @@ fix label issues and other build issues, build and compare to reference ROM file
 begin again and disassemble as much as you can
 continue
 continue disassembling everything and commenting and documenting and commiting and organizing over and over don't stop at a commit, just run for an hour or so
+continue disassembling everything and commenting and documenting and commiting and organizing over and over don't stop at a commit, just run for an hour or so
+
 
 
 

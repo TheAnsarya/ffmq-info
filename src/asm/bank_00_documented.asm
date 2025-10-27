@@ -67,6 +67,9 @@ SNES_WRDIVH    = $4205    ; Dividend High
 SNES_WRDIVB    = $4206    ; Divisor
 SNES_RDMPYL    = $4216    ; Multiplication/Division Result Low
 
+; Constant Pointers
+PTR16_00FFFF   = $FFFF    ; Return marker value for subroutine calls
+
 ;===============================================================================
 ; External Bank Stubs (code in other banks)
 ;===============================================================================
@@ -81,19 +84,8 @@ CODE_00A3F5 = $00A3F5
 CODE_00A3FC = $00A3FC
 CODE_00A51E = $00A51E
 ; CODE_00A572 through CODE_00A597 now implemented
-CODE_00A708 = $00A708
-CODE_00A718 = $00A718
-CODE_00A71C = $00A71C
-CODE_00A744 = $00A744
-CODE_00A755 = $00A755
-CODE_00A78E = $00A78E
-CODE_00A79D = $00A79D
-CODE_00A7AC = $00A7AC
-CODE_00A7B3 = $00A7B3
-CODE_00A7DE = $00A7DE
-CODE_00A7EB = $00A7EB
-CODE_00A7F9 = $00A7F9
-CODE_00A83F = $00A83F
+; CODE_00A708 through CODE_00A83F now implemented
+CODE_00A78E = $00A78E             ; Not yet implemented (referenced in jump table)
 CODE_00A86E = $00A86E
 CODE_00A874 = $00A874
 CODE_00A89B = $00A89B
@@ -7996,7 +7988,572 @@ CODE_00A597:
 	RTS
 
 ;===============================================================================
-; Progress: ~7,500 lines documented (53.5% of Bank $00)
-; Latest additions: Conditional jump handlers CODE_00A572-CODE_00A597
-; Next: More conditional handlers and bank switching routines
+; CODE_00A5C8 - Skip Jump Address Helper
+;===============================================================================
+
+CODE_00A5C8:
+	INC.B $17                      ; Skip jump address
+	INC.B $17                      ; (2 bytes)
+	RTS                            ; Return
+
+;===============================================================================
+; CODE_00A5CD - Load Address and Bank, Execute with Context Switch
+;===============================================================================
+
+CODE_00A5CD:
+	LDA.B [$17]                    ; Load target address
+	INC.B $17                      ; Advance pointer
+	INC.B $17
+	TAX                            ; Store address to X
+	LDA.B $19                      ; Load current bank
+	JMP.W CODE_00A71C              ; Jump to bank switcher
+
+;===============================================================================
+; Duplicate Conditional Handler Patterns (for different test functions)
+; These follow the same pattern as earlier but for CODE_00B1D6, CODE_00B1E8,
+; CODE_00B204, CODE_00B21D, and CODE_00B22F test routines
+;===============================================================================
+
+; Pattern set for CODE_00B1D6 (6 variants)
+	JSR.W CODE_00B1D6              ; Test type 2
+	BCS +
+	BNE +
+	JMP CODE_00A744
++	INC.B $17
+	INC.B $17
+	RTS
+
+	JSR.W CODE_00B1D6
+	BCS +
+	JMP CODE_00A744
++	INC.B $17
+	INC.B $17
+	RTS
+
+	JSR.W CODE_00B1D6
+	BCC +
+	JMP CODE_00A744
++	INC.B $17
+	INC.B $17
+	RTS
+
+	JSR.W CODE_00B1D6
+	BCC +
+	BNE +
+	JMP CODE_00A744
++	INC.B $17
+	INC.B $17
+	RTS
+
+	JSR.W CODE_00B1D6
+	BEQ +
+	JMP CODE_00A744
++	INC.B $17
+	INC.B $17
+	RTS
+
+	JSR.W CODE_00B1D6
+	BEQ +
+	JMP CODE_00A744
++	INC.B $17
+	INC.B $17
+	RTS
+
+	LDA.B [$17]                    ; Load address
+	INC.B $17
+	INC.B $17
+	TAX                            ; Store to X
+	LDA.B $19                      ; Load bank
+	JMP.W CODE_00A71C              ; Bank switch
+
+; Pattern set for CODE_00B1E8 (6 variants)
+	JSR.W CODE_00B1E8
+	BCS +
+	BNE +
+	JMP CODE_00A744
++	INC.B $17
+	INC.B $17
+	RTS
+
+	JSR.W CODE_00B1E8
+	BCS +
+	JMP CODE_00A744
++	INC.B $17
+	INC.B $17
+	RTS
+
+	JSR.W CODE_00B1E8
+	BCC +
+	JMP CODE_00A744
++	INC.B $17
+	INC.B $17
+	RTS
+
+	JSR.W CODE_00B1E8
+	BCC +
+	BNE +
+	JMP CODE_00A744
++	INC.B $17
+	INC.B $17
+	RTS
+
+	JSR.W CODE_00B1E8
+	BEQ +
+	JMP CODE_00A744
++	INC.B $17
+	INC.B $17
+	RTS
+
+	JSR.W CODE_00B1E8
+	BEQ +
+	JMP CODE_00A744
++	INC.B $17
+	INC.B $17
+	RTS
+
+	LDA.B [$17]
+	INC.B $17
+	INC.B $17
+	TAX
+	LDA.B $19
+	JMP.W CODE_00A71C
+
+; Pattern set for CODE_00B204 (6 variants)
+	JSR.W CODE_00B204
+	BCS +
+	BNE +
+	JMP CODE_00A744
++	INC.B $17
+	INC.B $17
+	RTS
+
+	JSR.W CODE_00B204
+	BCS +
+	JMP CODE_00A744
++	INC.B $17
+	INC.B $17
+	RTS
+
+	JSR.W CODE_00B204
+	BCC +
+	JMP CODE_00A744
++	INC.B $17
+	INC.B $17
+	RTS
+
+	JSR.W CODE_00B204
+	BCC +
+	BNE +
+	JMP CODE_00A744
++	INC.B $17
+	INC.B $17
+	RTS
+
+	JSR.W CODE_00B204
+	BEQ +
+	JMP CODE_00A744
++	INC.B $17
+	INC.B $17
+	RTS
+
+	JSR.W CODE_00B204
+	BEQ +
+	JMP CODE_00A744
++	INC.B $17
+	INC.B $17
+	RTS
+
+	LDA.B [$17]
+	INC.B $17
+	INC.B $17
+	TAX
+	LDA.B $19
+	JMP.W CODE_00A71C
+
+; Pattern set for CODE_00B21D (6 variants)
+	JSR.W CODE_00B21D
+	BCS +
+	BNE +
+	JMP CODE_00A744
++	INC.B $17
+	INC.B $17
+	RTS
+
+	JSR.W CODE_00B21D
+	BCS +
+	JMP CODE_00A744
++	INC.B $17
+	INC.B $17
+	RTS
+
+	JSR.W CODE_00B21D
+	BCC +
+	JMP CODE_00A744
++	INC.B $17
+	INC.B $17
+	RTS
+
+	JSR.W CODE_00B21D
+	BCC +
+	BNE +
+	JMP CODE_00A744
++	INC.B $17
+	INC.B $17
+	RTS
+
+	JSR.W CODE_00B21D
+	BEQ +
+	JMP CODE_00A744
++	INC.B $17
+	INC.B $17
+	RTS
+
+	JSR.W CODE_00B21D
+	BEQ +
+	JMP CODE_00A744
++	INC.B $17
+	INC.B $17
+	RTS
+
+	LDA.B [$17]
+	INC.B $17
+	INC.B $17
+	TAX
+	LDA.B $19
+	BRA CODE_00A71C_alt1
+
+; Pattern set for CODE_00B22F (6 variants)
+	JSR.W CODE_00B22F
+	BCS +
+	BNE +
+	JMP CODE_00A744
++	INC.B $17
+	INC.B $17
+	RTS
+
+	JSR.W CODE_00B22F
+	BCS +
+	JMP CODE_00A744
++	INC.B $17
+	INC.B $17
+	RTS
+
+	JSR.W CODE_00B22F
+	BCC +
+	JMP CODE_00A744
++	INC.B $17
+	INC.B $17
+	RTS
+
+	JSR.W CODE_00B22F
+	BCC +
+	BNE +
+	JMP CODE_00A744
++	INC.B $17
+	INC.B $17
+	RTS
+
+	JSR.W CODE_00B22F
+	BEQ +
+	JMP CODE_00A744
++	INC.B $17
+	INC.B $17
+	RTS
+
+	JSR.W CODE_00B22F
+	BEQ +
+	JMP CODE_00A744
++	INC.B $17
+	INC.B $17
+	RTS
+
+	LDA.B [$17]
+	INC.B $17
+	INC.B $17
+	TAX
+	LDA.B $19
+	BRA CODE_00A71C_alt2
+
+;===============================================================================
+; CODE_00A708 - Load Pointer and Bank, Execute Subroutine
+;===============================================================================
+
+CODE_00A708:
+	LDA.B [$17]                    ; Load target pointer
+	INC.B $17
+	INC.B $17
+	TAX                            ; Store pointer to X
+	LDA.B [$17]                    ; Load bank byte
+	INC.B $17
+	AND.W #$00FF                   ; Mask to byte
+	BRA CODE_00A71C                ; Jump to bank switcher
+
+CODE_00A718:
+	LDX.B $9E                      ; Load saved pointer
+	LDA.B $A0                      ; Load saved bank
+
+;===============================================================================
+; CODE_00A71C - Bank Switch with Full Context Save/Restore
+;
+; This is THE critical routine for script execution and inter-bank calls.
+; It saves the current execution context (pointer + bank), switches to a new
+; context, executes code there, then fully restores the original context.
+;
+; Entry: A = new bank byte (in high byte), X = new pointer
+; Uses: Full context save via stack and register swapping
+;===============================================================================
+
+CODE_00A71C:
+CODE_00A71C_alt1:
+CODE_00A71C_alt2:
+	SEP #$20                       ; 8-bit A
+	XBA                            ; Swap A/B (save new bank to B)
+	LDA.B $19                      ; Load current bank
+	LDY.B $17                      ; Load current pointer to Y
+	XBA                            ; Swap back (new bank to A, old to B)
+	STA.B $19                      ; Set new bank
+	STX.B $17                      ; Set new pointer
+	LDA.B #$08                     ; Load flag bit $08
+	AND.W $00DB                    ; Test current flag state
+	PHP                            ; Save flag state
+	LDA.B #$08                     ; Load flag bit $08
+	TRB.W $00DB                    ; Clear flag
+	JSR.W CODE_009D75              ; Execute in new context (external)
+	PLP                            ; Restore flag state
+	BEQ CODE_00A73E                ; If flag was clear, skip restore
+	LDA.B #$08                     ; Load flag bit
+	TSB.W $00DB                    ; Restore flag to set state
+
+CODE_00A73E:
+	XBA                            ; Get old bank from B
+	STA.B $19                      ; Restore bank
+	STY.B $17                      ; Restore pointer
+	RTS                            ; Return
+
+;===============================================================================
+; CODE_00A744 - Load Address, Call Function, Execute Result
+;===============================================================================
+
+CODE_00A744:
+	LDA.B [$17]                    ; Load address
+	INC.B $17
+	INC.B $17
+	JSR.W CODE_009CF0              ; Call function (external)
+	STA.B $17                      ; Store result as pointer
+	JSR.W CODE_009D75              ; Execute at new pointer
+	JMP.W CODE_009D21              ; Jump to cleanup (external)
+
+;===============================================================================
+; CODE_00A755 - Load Pointer and Execute with Bank Switch
+;===============================================================================
+
+CODE_00A755:
+	LDA.B [$17]                    ; Load pointer
+	INC.B $17
+	INC.B $17
+	TAX                            ; Store to X
+	LDA.B $19                      ; Load bank
+	BRA CODE_00A71C                ; Bank switch and execute
+
+;===============================================================================
+; Flag Testing with Conditional Jumps to CODE_00A755 or CODE_00A7C6
+;===============================================================================
+
+	LDA.B [$17]                    ; Load flag index
+	INC.B $17
+	AND.W #$00FF                   ; Mask to byte
+	PHD                            ; Save direct page
+	PEA.W $00D0                    ; Set DP to $D0
+	PLD
+	JSL.L CODE_00975A              ; Test flag (external)
+	PLD                            ; Restore DP
+	INC A                          ; Test result (set Z flag)
+	DEC A
+	BNE CODE_00A755                ; If flag set, take jump
+	BRA CODE_00A7C6                ; If clear, skip
+
+	LDA.B [$17]                    ; Load flag index
+	INC.B $17
+	AND.W #$00FF                   ; Mask to byte
+	PHD                            ; Save direct page
+	PEA.W $00D0                    ; Set DP to $D0
+	PLD
+	JSL.L CODE_00975A              ; Test flag (external)
+	PLD                            ; Restore DP
+	INC A                          ; Test result
+	DEC A
+	BEQ CODE_00A755                ; If flag clear, take jump
+	BRA CODE_00A7C6                ; If set, skip
+
+	LDA.B [$17]                    ; Load item flag
+	INC.B $17
+	AND.W #$00FF                   ; Mask to byte
+	JSL.L CODE_009776              ; Test item (external)
+	BNE CODE_00A755                ; If set, jump
+	BRA CODE_00A7C6                ; If clear, skip
+
+CODE_00A79D:
+	LDA.B [$17]                    ; Load item flag
+	INC.B $17
+	AND.W #$00FF                   ; Mask to byte
+	JSL.L CODE_009776              ; Test item (external)
+	BEQ CODE_00A755                ; If clear, jump
+	BRA CODE_00A7C6                ; If set, skip
+
+CODE_00A7AC:
+	JSR.W CODE_00B1A1              ; Test variable
+	BNE CODE_00A755                ; If not zero, jump
+	BRA CODE_00A7C6                ; If zero, skip
+
+CODE_00A7B3:
+	JSR.W CODE_00B1A1              ; Test variable
+	BEQ CODE_00A755                ; If zero, jump
+	BRA CODE_00A7C6                ; If not zero, skip
+
+	JSR.W CODE_00B1B4              ; Test condition
+	BNE CODE_00A755                ; If not zero, jump
+	BRA CODE_00A7C6                ; If zero, skip
+
+	JSR.W CODE_00B1B4              ; Test condition
+	BEQ CODE_00A755                ; If zero, jump
+
+CODE_00A7C6:
+	INC.B $17                      ; Skip jump address
+	INC.B $17                      ; (2 bytes)
+	RTS                            ; Return
+
+;===============================================================================
+; Subroutine Execution with Parameter Passing
+;===============================================================================
+
+	LDA.B [$17]                    ; Load parameter
+	INC.B $17
+	AND.W #$00FF                   ; Mask to byte
+	SEP #$20                       ; 8-bit A
+	LDX.B $9E                      ; Load saved pointer
+	XBA                            ; Build word (param in high byte)
+	LDA.B $A0                      ; Load saved bank
+	XBA                            ; Swap back
+	REP #$30                       ; 16-bit A/X/Y
+	BRA CODE_00A7F9                ; Execute subroutine
+
+CODE_00A7DE:
+	SEP #$20                       ; 8-bit A
+	LDX.B $9E                      ; Load pointer
+	LDA.B $A0                      ; Load bank
+	XBA                            ; Build word
+	LDA.B $3A                      ; Load parameter from $3A
+	REP #$30                       ; 16-bit A/X/Y
+	BRA CODE_00A7F9                ; Execute
+
+CODE_00A7EB:
+	LDA.B [$17]                    ; Load address
+	INC.B $17
+	INC.B $17
+	TAX                            ; Store address
+	LDA.B [$17]                    ; Load parameter byte
+	INC.B $17
+	AND.W #$00FF                   ; Mask to byte
+
+;===============================================================================
+; CODE_00A7F9 - Execute Subroutine with Full Context Save
+;
+; Saves current execution state, switches to new address/bank with parameter,
+; executes subroutine, then restores all state. Used for calling script
+; subroutines that need to return to caller.
+;
+; Entry: A = parameter (low byte), X = subroutine address
+; Stack usage: Saves $17 (pointer), $19 (bank), $3D (limit)
+;===============================================================================
+
+CODE_00A7F9:
+	STA.B $64                      ; Save parameter
+	STX.B $62                      ; Save subroutine address
+	REP #$20                       ; 16-bit A
+	SEP #$10                       ; 8-bit X/Y
+	PEI.B ($17)                    ; Save current pointer
+	LDX.B $19                      ; Load current bank
+	PHX                            ; Save bank
+	PEI.B ($3D)                    ; Save $3D (limit/end marker)
+	LDA.B $64                      ; Load parameter
+	AND.W #$00FF                   ; Mask to byte
+	CLC                            ; Clear carry
+	ADC.B $62                      ; Add to subroutine address
+	STA.B $3D                      ; Store as new limit/end
+	LDX.B $65                      ; Load bank byte from parameter
+	STX.B $19                      ; Set as current bank
+	LDA.B $62                      ; Load subroutine address
+	STA.B $17                      ; Set as pointer
+	LDA.W #$0008                   ; Load flag $08
+	AND.W $00DB                    ; Test current state
+	PHP                            ; Save flag state
+	LDA.W #$0008                   ; Load flag $08
+	TSB.W $00DB                    ; Set flag
+	JSR.W CODE_009D75              ; Execute subroutine (external)
+	PLP                            ; Restore flag state
+	BNE CODE_00A833                ; If flag was set, keep it
+	LDA.W #$0008                   ; Load flag $08
+	TRB.W $00DB                    ; Clear flag
+
+CODE_00A833:
+	PLA                            ; Restore $3D
+	STA.B $3D
+	PLX                            ; Restore bank
+	STX.B $19
+	PLA                            ; Restore pointer
+	STA.B $17
+	REP #$30                       ; 16-bit A/X/Y
+	RTS                            ; Return
+
+;===============================================================================
+; CODE_00A83F - Execute External Subroutine via Long Call
+;===============================================================================
+
+CODE_00A83F:
+	LDA.B [$17]                    ; Load target address
+	INC.B $17
+	INC.B $17
+	TAY                            ; Store address to Y
+	LDA.B [$17]                    ; Load bank/parameter
+	INC.B $17
+	AND.W #$00FF                   ; Mask to byte
+	PEA.W PTR16_00FFFF             ; Push return marker ($FFFF)
+	SEP #$20                       ; 8-bit A
+	DEY                            ; Adjust address (Y = address - 1)
+	PHK                            ; Push program bank (for RTL)
+	PEA.W CODE_00A85B              ; Push return address
+	PHA                            ; Push bank byte
+	PHY                            ; Push address - 1
+	REP #$30                       ; 16-bit A/X/Y
+	; Stack now set up for RTL to execute target code
+
+CODE_00A85B:
+	RTL                            ; Return from long call
+
+; Clean up after external subroutine
+	SEP #$20                       ; 8-bit A
+	REP #$10                       ; 16-bit X/Y
+	PLX                            ; Pull return marker
+	CPX.W #$FFFF                   ; Check if $FFFF
+	BEQ CODE_00A867                ; If marker found, done
+	PLA                            ; Pull extra byte (clean stack)
+
+CODE_00A867:
+	PEA.W $0000                    ; Reset direct page to $0000
+	PLD
+	PHK                            ; Push program bank
+	PLB                            ; Set data bank = program bank
+	RTS                            ; Return
+
+;===============================================================================
+; Progress: ~8,400 lines documented (60.0% of Bank $00)
+; Latest additions:
+; - CODE_00A5C8-00A5CD: Skip helpers and address loaders
+; - Conditional handler patterns for all test types (00B1D6, 00B1E8, 00B204, 00B21D, 00B22F)
+; - CODE_00A708-00A71C: Critical bank switching infrastructure
+; - CODE_00A744-00A755: Address execution handlers
+; - CODE_00A7F9: Full context save/restore for subroutines
+; - CODE_00A83F: External subroutine execution via long calls
+;
+; Next: Memory manipulation and data transfer routines (CODE_00A86E onward)
 ;===============================================================================
