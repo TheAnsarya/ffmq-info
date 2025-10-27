@@ -120,6 +120,8 @@ CODE_00C7DE = $00C7DE    ; Screen setup routine 1
 CODE_00C7F0 = $00C7F0    ; Screen setup routine 2
 CODE_00C78D = $00C78D    ; External routine
 CODE_00CF3F = $00CF3F    ; Main routine
+CODE_00DAA5 = $00DAA5    ; External routine
+CODE_00C9D3 = $00C9D3    ; Get save slot address
 
 ; Other Banks
 CODE_028AE0 = $028AE0    ; Bank $02 routine
@@ -12667,6 +12669,81 @@ DATA_00BE83:
     db $7A,$BE,$03,$3A,$BE,$03,$66,$BE,$03
 
 ;-------------------------------------------------------------------------------
+; CODE_00BE83: Menu handler with party member selection
+;
+; Purpose: Display menu with party member selection capability
+; Entry: A = menu option parameter
+;        $1090 = companion status flags (negative if no companion)
+; Exit: $14 = selected option or $FF
+;       $7E3664 = selected option stored
+; Calls: CODE_00B91C (update sprite), CODE_009BC4 (show menu)
+; Notes: Handles single-character vs two-character party
+;        Saves/restores menu state on stack
+;-------------------------------------------------------------------------------
+CODE_00BE83:
+    PHP                            ; Save processor status
+    SEP #$20                       ; 8-bit accumulator
+    REP #$10                       ; 16-bit index
+    STA.W $04E0                    ; Store menu parameter
+    LDA.B #$04                     ; Menu active flag
+    TSB.W $00DA                    ; Set bit 2 in flags
+    PEI.B ($8E)                    ; Save position
+    PEI.B ($01)                    ; Save option
+    PEI.B ($03)                    ; Save menu type
+    LDA.B #$FF                     ; No selection
+    STA.B $14                      ; Initialize result
+    STZ.B $8E                      ; Clear position low
+    STZ.B $8F                      ; Clear position high
+    LDX.W #$0102                   ; Two options (two characters)
+    LDA.W $1090                    ; Check companion status
+    BPL CODE_00BEA9                ; Branch if companion present
+    LDX.W #$0101                   ; One option (solo)
+
+CODE_00BEA9:
+    STX.B $03                      ; Set menu configuration
+    STZ.B $01                      ; Clear option
+    STZ.B $02                      ; Clear option high
+    LDA.L $7E3664                  ; Load last selection
+    BEQ CODE_00BEC9                ; Branch if zero
+    BMI UNREACH_00BEC0             ; Branch if negative
+    LDA.W $1090                    ; Check companion status again
+    BMI CODE_00BEC9                ; Branch if no companion
+    INC.B $01                      ; Select second option
+    BRA CODE_00BEC9                ; Continue
+
+UNREACH_00BEC0:
+    db $AD,$E0,$04,$29,$20,$D0,$0D,$80,$07  ; Unreachable data
+
+CODE_00BEC9:
+    LDA.W $04E0                    ; Load parameter
+    AND.B #$10                     ; Check bit 4
+    BEQ UNREACH_00BED4             ; Branch if clear
+
+CODE_00BED0:
+    LDA.B $01                      ; Load current option
+    BRA CODE_00BED6                ; Continue
+
+UNREACH_00BED4:
+    db $A9,$80                     ; Unreachable data
+
+CODE_00BED6:
+    LDX.B $14                      ; Load previous result
+    CMP.B $14                      ; Compare with current
+    STA.B $14                      ; Store new result
+    STA.L $7E3664                  ; Save selection
+    BEQ CODE_00BEEA                ; Branch if unchanged
+    TXA                            ; Get previous
+    CMP.B #$FF                     ; Was cancelled?
+    BEQ CODE_00BEEA                ; Branch if yes
+    JSR.W CODE_00B91C              ; Update sprite
+
+CODE_00BEEA:
+    LDX.W #$BF48                   ; Menu data
+    JSR.W CODE_009BC4              ; Show menu
+    LDX.W #$FFF0                   ; Position offset (-16)
+    STX.B $8E                      ; Set position
+
+;-------------------------------------------------------------------------------
 ; CODE_00BE8C: Menu option selection handler
 ;
 ; Purpose: Handle menu cursor and option selection
@@ -12770,9 +12847,666 @@ CODE_00BF28:
     STX.W $015F                    ; Store input state
     JSR.W CODE_00B91C              ; Set animation mode $10
     BRA CODE_00BF0B                ; Loop
-    JSR.W CODE_00BAF0              ; Initialization routine
-    STZ.B $01                      ; Clear $01
+
+;-------------------------------------------------------------------------------
+; CODE_00BF30: Item use/equip system cleanup and return
+;
+; Purpose: Restore state after item menu operations
+; Entry: Processor status saved on stack
+;        $01, $03, $8E saved on stack
+;        $14 = result code
+; Exit: Restored state, A = result code
+; Calls: CODE_009BC4 (menu update)
+; Notes: Cleanup routine for item management
+;-------------------------------------------------------------------------------
+CODE_00BF30:
+    LDA.B #$04                     ; Bit 2 mask
+    TRB.W $00DA                    ; Clear bit 2 of $DA
+    LDX.W #$BF48                   ; Menu data
+    JSR.W CODE_009BC4              ; Update menu
+    PLX                            ; Restore X
+    STX.B $03                      ; Restore $03
+    PLX                            ; Restore X
+    STX.B $01                      ; Restore $01
+    PLX                            ; Restore X
+    STX.B $8E                      ; Restore $8E
+    LDA.B $14                      ; Load result code
+    PLP                            ; Restore processor status
+    RTS
+
+DATA_00BF48:
+    db $9B,$8F,$03                 ; Menu configuration
+
+;-------------------------------------------------------------------------------
+; Inventory Item Discard System (CODE_00BF4B - CODE_00C012)
+;-------------------------------------------------------------------------------
+CODE_00BF4B:
+    LDA.W #$0504                   ; Menu mode $0504
+    STA.B $03                      ; Store in $03
+    LDX.W #$FFF0                   ; Load $FFF0
+    STX.B $8E                      ; Store in $8E
+    BRA CODE_00BF77                ; Jump to menu display
+
+CODE_00BF57:
+    JSR.W CODE_00B912              ; Set sprite mode $2D
+
+CODE_00BF5A:
+    LDA.W #$CFB0                   ; Button mask
+    JSR.W CODE_00B930              ; Poll input
+    BNE CODE_00BF77                ; If button pressed, process
+    BIT.W #$0080                   ; Test B button
+    BNE CODE_00BF7F                ; If pressed, branch
+    BIT.W #$8000                   ; Test A button
+    BEQ CODE_00BF5A                ; If not pressed, loop
+    JSR.W CODE_00B91C              ; Set animation mode $10
+    STZ.B $8E                      ; Clear $8E
+    LDX.W #$C032                   ; Menu data
+    JMP.W CODE_009BC4              ; Update menu and return
+
+CODE_00BF77:
+    LDX.W #$C02F                   ; Menu data
+    JSR.W CODE_009BC4              ; Update menu
+    BRA CODE_00BF5A                ; Loop
+
+CODE_00BF7F:
+    LDA.B $02                      ; Load selection
+    AND.W #$00FF                   ; Mask to 8 bits
+    BNE CODE_00BF57                ; If not zero, error sound
+    LDA.B $01                      ; Load item slot
+    AND.W #$00FF                   ; Mask to 8 bits
+    ASL A                          ; × 2 (word index)
+    TAX                            ; X = item index
+    LDA.W $0E9E,X                  ; Load item ID
+    AND.W #$00FF                   ; Mask to 8 bits
+    CMP.W #$00FF                   ; Check if empty slot
+    BEQ CODE_00BF57                ; If empty, error
+    CMP.W #$0013                   ; Check if item $13
+    BEQ CODE_00BF57                ; If yes, can't discard
+    CMP.W #$0011                   ; Check if less than $11
+    BCC CODE_00BFEF                ; If yes, handle consumable
+    BEQ CODE_00BFD8                ; If $11, handle armor
+    JSR.W CODE_00C012              ; Confirm discard
+    BCC CODE_00BFAE                ; If confirmed, proceed
+    BNE CODE_00BF5A                ; If cancelled, loop
+    LDA.W #$0080                   ; Load $80 (companion item)
+
+CODE_00BFAE:
+    DEC.W $0E9F,X                  ; Decrement quantity
+    CLC                            ; Clear carry
+    ADC.W #$1018                   ; Add base address
+    TAY                            ; Y = source
+    ADC.W #$0003                   ; Add 3
+    TAX                            ; X = dest
+    LDA.W #$0002                   ; Length = 2
+    MVN $00,$00                    ; Block move (shift items)
+
+CODE_00BFC0:
     SEP #$20                       ; 8-bit accumulator
-    JSR.W CODE_00CBEC              ; Setup routine
+    LDA.W $04DF                    ; Load character ID
+    STA.W $0505                    ; Store in $0505
     REP #$30                       ; 16-bit A/X/Y
-    ; (continues...)
+    JSR.W CODE_00DAA5              ; External routine
+    LDX.W #$C035                   ; Menu data
+    JSR.W CODE_009BC4              ; Update menu
+    BRA CODE_00BF77                ; Loop
+
+UNREACH_00BFD5:
+    db $4C,$5A,$BF                 ; JMP CODE_00BF5A
+
+CODE_00BFD8:
+    JSR.W CODE_00C012              ; Confirm discard
+    BCC CODE_00BFE2                ; If confirmed, proceed
+    BNE UNREACH_00BFD5             ; If cancelled, loop
+    LDA.W #$0080                   ; Load $80
+
+CODE_00BFE2:
+    DEC.W $0E9F,X                  ; Decrement quantity
+    TAX                            ; X = item offset
+    SEP #$20                       ; 8-bit accumulator
+    STZ.W $1021,X                  ; Clear equipped flag
+    REP #$30                       ; 16-bit A/X/Y
+    BRA CODE_00BFC0                ; Update display
+
+CODE_00BFEF:
+    JSR.W CODE_00C012              ; Confirm discard
+    BCC CODE_00BFF9                ; If confirmed, proceed
+    BNE UNREACH_00BFD5             ; If cancelled, loop
+    LDA.W #$0080                   ; Load $80
+
+CODE_00BFF9:
+    DEC.W $0E9F,X                  ; Decrement quantity
+    TAX                            ; X = item offset
+    LDA.W $1016,X                  ; Load max HP
+    LSR A                          ; ÷ 4 (HP recovery amount)
+    LSR A
+    ADC.W $1014,X                  ; Add current HP
+    CMP.W $1016,X                  ; Check if exceeds max
+    BCC CODE_00C00D                ; If not, store
+    LDA.W $1016,X                  ; Use max HP
+
+CODE_00C00D:
+    STA.W $1014,X                  ; Store new HP
+    BRA CODE_00BFC0                ; Update display
+
+;-------------------------------------------------------------------------------
+; CODE_00C012: Confirm item discard dialog
+;
+; Purpose: Show confirmation dialog for discarding items
+; Entry: A = item ID
+; Exit: Carry clear if confirmed (A=1), carry set if cancelled
+; Calls: CODE_028AE0, CODE_00B908, CODE_00BE83
+; Notes: Uses $04E0 for input tracking
+;-------------------------------------------------------------------------------
+CODE_00C012:
+    PHX                            ; Save X
+    SEP #$20                       ; 8-bit accumulator
+    STA.W $043A                    ; Store item ID
+    JSL.L CODE_028AE0              ; External routine
+    JSR.W CODE_00B908              ; Set sprite mode $2D
+    REP #$30                       ; 16-bit A/X/Y
+    LDA.W #$0010                   ; Menu type $10
+    JSR.W CODE_00BE83              ; Show confirmation menu
+    PLX                            ; Restore X
+    AND.W #$00FF                   ; Mask result
+    CMP.W #$0001                   ; Check if confirmed
+    RTS
+
+DATA_00C02F:
+    db $E8,$8F,$03,$DD,$8F,$03,$8A,$8F,$03
+
+;-------------------------------------------------------------------------------
+; Spell Equip/Unequip System (CODE_00C038 - CODE_00C1D8)
+;-------------------------------------------------------------------------------
+CODE_00C038:
+    LDA.W #$0406                   ; Menu mode $0406
+    STA.B $03                      ; Store in $03
+    LDX.W #$FFF0                   ; Load $FFF0
+    STX.B $8E                      ; Store in $8E
+    BRA CODE_00C08D                ; Jump to menu display
+
+UNREACH_00C044:
+    db $20,$12,$B9                 ; JSR CODE_00B912
+
+CODE_00C047:
+    LDA.W #$CFB0                   ; Button mask
+    JSR.W CODE_00B930              ; Poll input
+    BNE CODE_00C08D                ; If button pressed, process
+    BIT.W #$0080                   ; Test B button
+    BNE CODE_00C098                ; If pressed, branch
+    BIT.W #$8000                   ; Test A button
+    BEQ CODE_00C047                ; If not pressed, loop
+    JSR.W CODE_00B91C              ; Set animation mode $10
+    STZ.B $8E                      ; Clear $8E
+    LDX.W #$C1D6                   ; Menu data
+    JMP.W CODE_009BC4              ; Update menu and return
+
+UNREACH_00C064:
+    db $AD,$91,$0E,$29,$7F,$00,$C9,$07,$00,$90,$D5,$20,$B1,$C1,$F0,$D3
+    db $DE,$18,$10,$E2,$20,$A9,$14,$8D,$3A,$04,$22,$E0,$8A,$02,$AD,$DF
+    db $04,$8D,$05,$05,$A9,$14,$4C,$F4,$BC
+
+CODE_00C08D:
+    LDX.W #$C1D3                   ; Menu data
+    JSR.W CODE_009BC4              ; Update menu
+    BRA CODE_00C047                ; Loop
+
+UNREACH_00C095:
+    db $4C,$44,$C0                 ; JMP UNREACH_00C044
+
+CODE_00C098:
+    LDA.B $01                      ; Load character selection
+    AND.W #$00FF                   ; Mask to 8 bits
+    BEQ CODE_00C0B2                ; If character 0, branch
+    CMP.W #$0003                   ; Check if character 3
+    BNE UNREACH_00C044             ; If not, error
+    LDA.W $1090                    ; Load companion data
+    AND.W #$00FF                   ; Mask to 8 bits
+    CMP.W #$00FF                   ; Check if no companion
+    BEQ UNREACH_00C044             ; If none, error
+    LDA.W #$0080                   ; Load $80 (companion offset)
+
+CODE_00C0B2:
+    TAX                            ; X = character offset
+    LDA.W $1021,X                  ; Load status flags
+    AND.W #$00F9                   ; Mask out certain flags
+    BNE UNREACH_00C044             ; If flagged, error
+    LDA.W #$0007                   ; Load 7 (max spell slot -1)
+    SEC                            ; Set carry
+    SBC.B $02                      ; Subtract selection
+    AND.W #$00FF                   ; Mask to 8 bits
+    JSR.W CODE_0097F2              ; Get bit mask
+    AND.W $1038,X                  ; Test spell equipped
+    BEQ UNREACH_00C095             ; If not equipped, error
+    LDA.W $1018,X                  ; Load current MP
+    AND.W #$00FF                   ; Mask to 8 bits
+    BEQ UNREACH_00C095             ; If no MP, error
+    LDA.B $02                      ; Load spell slot
+    AND.W #$00FF                   ; Mask to 8 bits
+    BEQ UNREACH_00C064             ; If slot 0, special case
+    CMP.W #$0002                   ; Check if slot 2
+    BCC CODE_00C13B                ; If slot 1, HP healing
+    BEQ CODE_00C11F                ; If slot 2, cure/status
+    JSR.W CODE_00C1B1              ; Confirm spell use
+    BEQ CODE_00C138                ; If cancelled, loop
+    CMP.W #$0001                   ; Check result
+    BEQ CODE_00C0F4                ; If 1, branch
+    TAX                            ; X = character offset
+    LDA.W $1016                    ; Load max HP
+    STA.W $1014                    ; Restore to full HP
+    TXA                            ; A = character offset
+
+CODE_00C0F4:
+    CMP.W #$0000                   ; Check if character 0
+    BEQ CODE_00C0FF                ; If yes, skip
+    LDA.W $1096                    ; Load companion max HP
+    STA.W $1094                    ; Restore companion HP
+
+CODE_00C0FF:
+    SEP #$20                       ; 8-bit accumulator
+    LDX.W #$0000                   ; Default character offset
+    LDA.B $01                      ; Load character selection
+    BEQ CODE_00C10B                ; If 0, use default
+    LDX.W #$0080                   ; Companion offset
+
+CODE_00C10B:
+    DEC.W $1018,X                  ; Decrement MP
+    LDA.W $04DF                    ; Load character ID
+    STA.W $0505                    ; Store in $0505
+    REP #$30                       ; 16-bit A/X/Y
+    LDX.W #$C035                   ; Menu data
+    JSR.W CODE_009BC4              ; Update menu
+    JMP.W CODE_00C08D              ; Loop
+
+CODE_00C11F:
+    JSR.W CODE_00C1B1              ; Confirm spell use
+    BEQ CODE_00C138                ; If cancelled, loop
+    SEP #$20                       ; 8-bit accumulator
+    CMP.B #$01                     ; Check result
+    BEQ CODE_00C12D                ; If 1, branch
+    STZ.W $1021                    ; Clear status (char 0)
+
+CODE_00C12D:
+    CMP.B #$00                     ; Check if character 0
+    BEQ CODE_00C134                ; If yes, skip
+    STZ.W $10A1                    ; Clear companion status
+
+CODE_00C134:
+    REP #$30                       ; 16-bit A/X/Y
+    BRA CODE_00C0FF                ; Continue
+
+CODE_00C138:
+    JMP.W CODE_00C047              ; Loop
+
+CODE_00C13B:
+    JSR.W CODE_00C1B1              ; Confirm spell use
+    BEQ CODE_00C138                ; If cancelled, loop
+    PHA                            ; Save character offset
+    LDA.W $1025,X                  ; Load spell power
+    AND.W #$00FF                   ; Mask to 8 bits
+    STA.B $64                      ; Store in $64
+    ASL A                          ; × 2
+    ADC.B $64                      ; + original (× 3)
+    LSR A                          ; ÷ 2 (× 1.5)
+    CLC                            ; Clear carry
+    ADC.W #$0032                   ; Add base value (50)
+    STA.B $98                      ; Store recovery amount
+    TAY                            ; Y = recovery
+    LDA.B $01,S                    ; Load character from stack
+    CMP.W #$0001                   ; Check if character 1
+    BEQ CODE_00C16F                ; If yes, skip HP calc
+    LDA.W $1016                    ; Load max HP
+    JSR.W CODE_00C18D              ; Calculate percentage
+    ADC.W $1014                    ; Add current HP
+    CMP.W $1016                    ; Check if exceeds max
+    BCC CODE_00C16C                ; If not, store
+    LDA.W $1016                    ; Use max HP
+
+CODE_00C16C:
+    STA.W $1014                    ; Store new HP
+
+CODE_00C16F:
+    STY.B $98                      ; Restore recovery amount
+    LDA.B $01,S                    ; Load character from stack
+    BEQ CODE_00C189                ; If character 0, skip
+    LDA.W $1096                    ; Load companion max HP
+    JSR.W CODE_00C18D              ; Calculate percentage
+    ADC.W $1094                    ; Add companion current HP
+    CMP.W $1096                    ; Check if exceeds max
+    BCC CODE_00C186                ; If not, store
+    LDA.W $1096                    ; Use max HP
+
+CODE_00C186:
+    STA.W $1094                    ; Store companion HP
+
+CODE_00C189:
+    PLA                            ; Restore character offset
+    JMP.W CODE_00C0FF              ; Continue
+
+;-------------------------------------------------------------------------------
+; CODE_00C18D: Calculate percentage-based HP recovery
+;
+; Purpose: Calculate HP recovery as percentage of max HP
+; Entry: A = max HP value
+;        $98 = base recovery amount
+; Exit: A = calculated recovery amount
+; Uses: $98-$A0 for calculation
+;-------------------------------------------------------------------------------
+CODE_00C18D:
+    STA.B $9C                      ; Store max HP
+    JSL.L CODE_0096B3              ; Multiply routine
+    LDA.B $9E                      ; Load result low
+    STA.B $98                      ; Store in $98
+    LDA.B $A0                      ; Load result high
+    STA.B $9A                      ; Store in $9A
+    LDA.W #$0064                   ; Divisor = 100
+    STA.B $9C                      ; Store divisor
+    JSL.L CODE_0096E4              ; Divide routine
+    LDA.B $03,S                    ; Load character offset from stack
+    CMP.W #$0080                   ; Check if companion
+    BNE CODE_00C1AD                ; If not, skip
+    db $46,$9E                     ; LSR $9E (halve result)
+
+CODE_00C1AD:
+    LDA.B $9E                      ; Load result
+    CLC                            ; Clear carry
+    RTS
+
+;-------------------------------------------------------------------------------
+; CODE_00C1B1: Spell use confirmation
+;
+; Purpose: Confirm spell usage and show dialog
+; Entry: $02 = spell slot
+; Exit: A = character offset (0 or $80), Z flag set if cancelled
+; Calls: CODE_028AE0, CODE_00B908, CODE_00BE83
+;-------------------------------------------------------------------------------
+CODE_00C1B1:
+    PHX                            ; Save X
+    SEP #$20                       ; 8-bit accumulator
+    LDA.B $02                      ; Load spell slot
+    CLC                            ; Clear carry
+    ADC.B #$14                     ; Add $14 (spell offset)
+    STA.W $043A                    ; Store spell ID
+    JSL.L CODE_028AE0              ; External routine
+    JSR.W CODE_00B908              ; Set sprite mode $2D
+    LDA.W $04E0                    ; Load input flags
+    REP #$30                       ; 16-bit A/X/Y
+    JSR.W CODE_00BE83              ; Show confirmation menu
+    PLX                            ; Restore X
+    AND.W #$00FF                   ; Mask result
+    CMP.W #$00FF                   ; Check if cancelled
+    RTS
+
+DATA_00C1D3:
+    db $3A,$90,$03,$DD,$8F,$03
+
+;-------------------------------------------------------------------------------
+; Battle Settings Menu (CODE_00C1D9 - CODE_00C348)
+;-------------------------------------------------------------------------------
+CODE_00C1D9:
+    LDA.W #$0020                   ; Bit 5 mask
+    TSB.W $00D6                    ; Set bit 5 of $D6
+    LDA.W #$0602                   ; Menu mode $0602
+    STA.B $03                      ; Store in $03
+    LDA.W #$BFF0                   ; Load $BFF0
+    STA.B $8E                      ; Store in $8E
+    BRA CODE_00C1EE                ; Jump to input loop
+
+UNREACH_00C1EB:
+    db $20,$12,$B9                 ; JSR CODE_00B912
+
+CODE_00C1EE:
+    REP #$30                       ; 16-bit A/X/Y
+    LDA.W #$CF30                   ; Button mask
+    JSR.W CODE_00B930              ; Poll input
+    BNE CODE_00C218                ; If button pressed, process
+    BIT.W #$4000                   ; Test Y button
+    BNE UNREACH_00C20E             ; If pressed, branch
+    BIT.W #$8000                   ; Test A button
+    BEQ CODE_00C1EE                ; If not pressed, loop
+    JSR.W CODE_00B91C              ; Set animation mode $10
+    STZ.B $8E                      ; Clear $8E
+    LDA.W #$0020                   ; Bit 5 mask
+    TRB.W $00D6                    ; Clear bit 5 of $D6
+    RTS
+
+UNREACH_00C20E:
+    db $E2,$20,$AD,$90,$10,$30,$D6,$4C,$D9,$C2
+
+CODE_00C218:
+    TXA                            ; Transfer button state
+    SEP #$20                       ; 8-bit accumulator
+    LDA.B #$00                     ; Clear high byte
+    XBA                            ; Swap bytes
+    CMP.W $0006                    ; Compare with current setting
+    BNE CODE_00C226                ; If different, update
+    JMP.W CODE_00C2C3              ; Toggle setting
+
+CODE_00C226:
+    PHA                            ; Save setting
+    JSR.W CODE_00B91C              ; Set animation mode $10
+    PLA                            ; Restore setting
+    CMP.B #$01                     ; Check setting type
+    BCC CODE_00C28E                ; If < 1, handle battle speed
+    BEQ CODE_00C26D                ; If = 1, handle battle mode
+    CMP.B #$03                     ; Check if < 3
+    BCC CODE_00C260                ; If yes, handle cursor memory
+    BEQ CODE_00C250                ; If = 3, handle green color
+    CMP.B #$05                     ; Check if < 5
+    BCC CODE_00C242                ; If yes, handle blue color
+    LDA.W $0E9D                    ; Load color data high byte
+    LSR A                          ; Extract red component
+    LSR A
+    BRA CODE_00C253                ; Store result
+
+CODE_00C242:
+    REP #$30                       ; 16-bit A/X/Y
+    LDA.W $0E9C                    ; Load color data
+    LSR A                          ; Extract blue component
+    LSR A
+    SEP #$20                       ; 8-bit accumulator
+    LSR A
+    LSR A
+    LSR A
+    BRA CODE_00C253                ; Store result
+
+CODE_00C250:
+    LDA.W $0E9C                    ; Load color data (green)
+
+CODE_00C253:
+    AND.B #$1F                     ; Mask to 5 bits
+    INC A                          ; Increment
+    LSR A                          ; ÷ 4 (scale down)
+    LSR A
+    LDX.W #$0009                   ; X = 9 (data offset)
+    LDY.W #$0609                   ; Y = menu mode
+    BRA CODE_00C29D                ; Continue
+
+CODE_00C260:
+    LDA.W $0E9B                    ; Load cursor memory setting
+    AND.B #$07                     ; Mask to 3 bits
+    LDX.W #$0006                   ; X = 6
+    LDY.W #$0607                   ; Y = menu mode
+    BRA CODE_00C29D                ; Continue
+
+CODE_00C26D:
+    LDA.W $1090                    ; Load battle mode setting
+    BPL CODE_00C27C                ; If active mode, branch
+    LDA.B $06                      ; Load current selection
+    EOR.B #$02                     ; Toggle bit 1
+    AND.B #$FE                     ; Clear bit 0
+    STA.B $02                      ; Store new selection
+    BRA CODE_00C226                ; Loop
+
+CODE_00C27C:
+    LDA.B #$80                     ; Load $80
+    AND.W $10A0                    ; Test companion flag
+    BEQ CODE_00C285                ; If not set, use 0
+    LDA.B #$FF                     ; Load $FF
+
+CODE_00C285:
+    INC A                          ; Increment (0 or 1)
+    LDX.W #$0003                   ; X = 3
+    LDY.W #$0602                   ; Y = menu mode
+    BRA CODE_00C29D                ; Continue
+
+CODE_00C28E:
+    LDA.B #$80                     ; Load $80
+    AND.W $0EC6                    ; Test battle speed flag
+    BEQ CODE_00C297                ; If not set, use 0
+    db $A9,$01                     ; LDA #$01
+
+CODE_00C297:
+    LDX.W #$0000                   ; X = 0
+    LDY.W #$0602                   ; Y = menu mode
+
+CODE_00C29D:
+    STY.B $03                      ; Store menu mode
+    STA.B $01                      ; Store current value
+    LDA.W DATA8_00C339,X           ; Load color byte 1
+    STA.L $7F56D7                  ; Store to WRAM
+    LDA.W DATA8_00C33A,X           ; Load color byte 2
+    STA.L $7F56D9                  ; Store to WRAM
+    LDA.W DATA8_00C33B,X           ; Load color byte 3
+    STA.L $7F56DB                  ; Store to WRAM
+
+CODE_00C2B6:
+    LDX.B $01                      ; Load current value
+    STX.B $05                      ; Store in $05
+    LDX.W #$C345                   ; Menu data
+    JSR.W CODE_009BC4              ; Update menu
+    JMP.W CODE_00C1EE              ; Loop
+
+CODE_00C2C3:
+    LDA.B $02                      ; Load option index
+    BEQ CODE_00C2E3                ; If 0, toggle battle speed
+    CMP.B #$02                     ; Check if 2
+    BCC CODE_00C2D9                ; If < 2, toggle battle mode
+    BNE CODE_00C2F0                ; If > 2, handle colors
+    LDA.W $0E9B                    ; Load cursor memory
+    AND.B #$F8                     ; Clear low 3 bits
+    ORA.B $01                      ; Set new value
+    STA.W $0E9B                    ; Store cursor memory
+    BRA CODE_00C2EB                ; Update display
+
+CODE_00C2D9:
+    LDA.W $10A0                    ; Load companion flag
+    EOR.B #$80                     ; Toggle bit 7
+    STA.W $10A0                    ; Store back
+    BRA CODE_00C2EB                ; Update display
+
+CODE_00C2E3:
+    LDA.W $0EC6                    ; Load battle speed
+    EOR.B #$80                     ; Toggle bit 7
+    STA.W $0EC6                    ; Store back
+
+CODE_00C2EB:
+    JSR.W CODE_00B908              ; Set sprite mode $2D
+    BRA CODE_00C2B6                ; Update display
+
+CODE_00C2F0:
+    CMP.B #$04                     ; Check if 4
+    BCC CODE_00C325                ; If < 4, handle blue
+    BEQ CODE_00C30A                ; If = 4, handle green
+    LDA.B #$7C                     ; Mask for red component
+    TRB.W $0E9D                    ; Clear red bits
+    LDA.B $01                      ; Load new value
+    ASL A                          ; Shift left 4 times
+    ASL A
+    ASL A
+    ASL A
+    BPL CODE_00C305                ; If positive, use value
+    LDA.B #$7C                     ; Max value
+
+CODE_00C305:
+    TSB.W $0E9D                    ; Set red bits
+    BRA CODE_00C2EB                ; Update display
+
+CODE_00C30A:
+    REP #$30                       ; 16-bit A/X/Y
+    LDA.W #$03E0                   ; Mask for green component
+    TRB.W $0E9C                    ; Clear green bits
+    LDA.B $00                      ; Load new value
+    AND.W #$FF00                   ; Get high byte
+    LSR A                          ; Shift right
+    CMP.W #$0400                   ; Check if exceeds max
+    BNE CODE_00C320                ; If not, use value
+    LDA.W #$03E0                   ; Max value
+
+CODE_00C320:
+    TSB.W $0E9C                    ; Set green bits
+    BRA CODE_00C2EB                ; Update display
+
+CODE_00C325:
+    LDA.B #$1F                     ; Mask for blue component
+    TRB.W $0E9C                    ; Clear blue bits
+    LDA.B $01                      ; Load new value
+    ASL A                          ; Shift left 2 times
+    ASL A
+    CMP.B #$20                     ; Check if exceeds max
+    BNE CODE_00C334                ; If not, use value
+    LDA.B #$1F                     ; Max value
+
+CODE_00C334:
+    TSB.W $0E9C                    ; Set blue bits
+    BRA CODE_00C2EB                ; Update display
+
+DATA_00C339:
+    db $1F                         ; Blue data
+DATA8_00C339:
+    db $1F                         ; Blue data
+DATA8_00C33A:
+    db $20                         ; Green data
+DATA8_00C33B:
+    db $78,$3F,$20,$58,$5F,$20,$38,$7F,$38,$00
+
+DATA_00C345:
+    db $94,$92,$03
+
+;-------------------------------------------------------------------------------
+; Save File Deletion System (CODE_00C348 - CODE_00C3A2)
+;-------------------------------------------------------------------------------
+CODE_00C348:
+    LDA.W #$0301                   ; Menu mode $0301
+    STA.B $03                      ; Store in $03
+    LDX.W #$0C00                   ; Load $0C00
+    STX.B $8E                      ; Store in $8E
+
+CODE_00C352:
+    LDA.W #$8C80                   ; Button mask
+    JSR.W CODE_00B930              ; Poll input
+    BNE CODE_00C39D                ; If button pressed, process
+    BIT.W #$0080                   ; Test B button
+    BNE CODE_00C36A                ; If pressed, cancel
+    BIT.W #$8000                   ; Test A button
+    BEQ CODE_00C352                ; If not pressed, loop
+
+CODE_00C364:
+    JSR.W CODE_00B91C              ; Set animation mode $10
+    STZ.B $8E                      ; Clear $8E
+    RTS
+
+CODE_00C36A:
+    JSR.W CODE_00B908              ; Set sprite mode $2D
+    SEP #$20                       ; 8-bit accumulator
+    LDA.B $02                      ; Load save slot selection
+    INC A                          ; +1 (1-based index)
+    STA.L $701FFD                  ; Store save slot
+    DEC A                          ; Back to 0-based
+    REP #$30                       ; 16-bit A/X/Y
+    AND.W #$00FF                   ; Mask to 8 bits
+    STA.W $010E                    ; Store slot index
+    JSR.W CODE_00C9D3              ; Get save slot address
+    LDA.W #$0040                   ; Bit 6 mask
+    TSB.W $00DE                    ; Set bit 6 of $DE
+    JSR.W CODE_00CF3F              ; Clear save data
+    LDX.W #$C3D8                   ; Menu data
+    JSR.W CODE_009BC4              ; Update menu
+    LDA.B $9E                      ; Load result
+    BIT.W #$8000                   ; Test bit 15
+    BNE CODE_00C364                ; If set, return
+    BIT.W #$0C00                   ; Test bits 10-11
+    BEQ CODE_00C352                ; If clear, loop
+
+CODE_00C39D:
+    LDA.W #$0000                   ; Load 0
+    SEP #$20                       ; 8-bit accumulator
