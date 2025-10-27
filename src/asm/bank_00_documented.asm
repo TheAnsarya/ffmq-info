@@ -18,6 +18,189 @@ arch 65816
 lorom
 
 ;===============================================================================
+; SNES Hardware Register Definitions
+;===============================================================================
+; DMA Registers
+SNES_DMA0PARAM = $4300    ; DMA Channel 0 Parameters
+SNES_DMA0ADDRL = $4302    ; DMA Channel 0 Address Low
+SNES_DMA0ADDRH = $4303    ; DMA Channel 0 Address High
+SNES_DMA0CNTL  = $4305    ; DMA Channel 0 Control Low
+SNES_DMA3PARAM = $4330    ; DMA Channel 3 Parameters
+SNES_DMA3ADDRL = $4332    ; DMA Channel 3 Address Low
+SNES_DMA3ADDRH = $4333    ; DMA Channel 3 Address High
+SNES_DMA5PARAM = $4350    ; DMA Channel 5 Parameters
+SNES_DMA5ADDRL = $4352    ; DMA Channel 5 Address Low
+SNES_DMA5ADDRH = $4353    ; DMA Channel 5 Address High
+SNES_DMA5CNTL  = $4355    ; DMA Channel 5 Control Low
+SNES_DMA6PARAM = $4360    ; DMA Channel 6 Parameters
+SNES_DMA6ADDRL = $4362    ; DMA Channel 6 Address Low
+SNES_DMA6ADDRH = $4363    ; DMA Channel 6 Address High
+SNES_DMA7PARAM = $4370    ; DMA Channel 7 Parameters
+SNES_DMA7ADDRL = $4372    ; DMA Channel 7 Address Low
+SNES_DMA7ADDRH = $4373    ; DMA Channel 7 Address High
+SNES_MDMAEN    = $420B    ; DMA Enable
+
+; PPU Registers
+SNES_INIDISP   = $2100    ; Display Control
+SNES_TM        = $212C    ; Main Screen Designation
+SNES_CGADD     = $2121    ; CG RAM Address
+SNES_CGDATA    = $2122    ; CG RAM Data
+SNES_COLDATA   = $2132    ; Color Data
+SNES_CGSWSEL   = $2130    ; Color/Window Select
+SNES_BG1VOFS   = $210E    ; BG1 Vertical Offset
+SNES_BG2VOFS   = $2110    ; BG2 Vertical Offset
+SNES_VMADDL    = $2116    ; VRAM Address Low
+SNES_VMAINC    = $2115    ; VRAM Address Increment
+SNES_OAMADDL   = $2102    ; OAM Address Low
+
+; Controller Registers
+SNES_CNTRL1L   = $4218    ; Controller 1 Data Low
+
+; System Registers
+SNES_NMITIMEN  = $4200    ; NMI/Timer Enable
+
+; Math/Multiplication/Division Registers
+SNES_WRMPYA    = $4202    ; Multiplicand
+SNES_WRMPYB    = $4203    ; Multiplicand/Multiplier
+SNES_WRDIVL    = $4204    ; Dividend Low
+SNES_WRDIVH    = $4205    ; Dividend High
+SNES_WRDIVB    = $4206    ; Divisor
+SNES_RDMPYL    = $4216    ; Multiplication/Division Result Low
+
+;===============================================================================
+; External Bank Stubs (code in other banks)
+;===============================================================================
+; Bank $00 - Not yet imported
+CODE_0096A0 = $0096A0
+CODE_00985D = $00985D
+CODE_00A375 = $00A375
+CODE_00A3DE = $00A3DE
+CODE_00A3E5 = $00A3E5
+CODE_00A3EC = $00A3EC
+CODE_00A3F5 = $00A3F5
+CODE_00A3FC = $00A3FC
+CODE_00A51E = $00A51E
+CODE_00A572 = $00A572
+CODE_00A57D = $00A57D
+CODE_00A581 = $00A581
+CODE_00A586 = $00A586
+CODE_00A597 = $00A597
+CODE_00A708 = $00A708
+CODE_00A718 = $00A718
+CODE_00A71C = $00A71C
+CODE_00A744 = $00A744
+CODE_00A755 = $00A755
+CODE_00A78E = $00A78E
+CODE_00A79D = $00A79D
+CODE_00A7AC = $00A7AC
+CODE_00A7B3 = $00A7B3
+CODE_00A7DE = $00A7DE
+CODE_00A7EB = $00A7EB
+CODE_00A7F9 = $00A7F9
+CODE_00A83F = $00A83F
+CODE_00A86E = $00A86E
+CODE_00A874 = $00A874
+CODE_00A89B = $00A89B
+CODE_00A8BD = $00A8BD
+CODE_00A8C0 = $00A8C0
+CODE_00A8D1 = $00A8D1
+CODE_00A958 = $00A958
+CODE_00A96C = $00A96C
+CODE_00A97D = $00A97D
+CODE_00AACF = $00AACF
+CODE_00AEA2 = $00AEA2
+CODE_00AEB5 = $00AEB5
+CODE_00AEC7 = $00AEC7
+CODE_00AEDA = $00AEDA
+CODE_00AF6B = $00AF6B
+CODE_00AF70 = $00AF70
+CODE_00AF9A = $00AF9A
+CODE_00AFD6 = $00AFD6
+CODE_00AFFE = $00AFFE
+CODE_00B094 = $00B094
+CODE_00B2F4 = $00B2F4
+CODE_00B2F9 = $00B2F9
+CODE_00B354 = $00B354
+CODE_00B355 = $00B355
+CODE_00B379 = $00B379
+CODE_00B950 = $00B950
+CODE_00BA1A = $00BA1A
+CODE_00B1C3 = $00B1C3
+CODE_00B1D6 = $00B1D6
+CODE_00B1E8 = $00B1E8
+CODE_00B204 = $00B204
+CODE_00B21D = $00B21D
+CODE_00B22F = $00B22F
+CODE_00B49E = $00B49E
+CODE_00B4A7 = $00B4A7
+CODE_00B4B0 = $00B4B0
+CODE_00BD30 = $00BD30
+CODE_00BD64 = $00BD64
+CODE_00C795 = $00C795
+CODE_00C7B8 = $00C7B8
+CODE_00CA63 = $00CA63
+CODE_00D080 = $00D080
+CODE_00E055 = $00E055
+CODE_00B908 = $00B908
+CODE_00B912 = $00B912
+Some_Graphics_Setup = $00B000
+Some_Init_Routine = $00B100
+Some_Mode_Handler = $00B200
+Main_Game_Loop = $00B300
+Execute_Script_Or_Command = $00B400
+Some_Init_Function_2 = $00B500
+Some_Function_9319 = $009319
+Some_Function_9A08 = $009A08
+Some_Function_A236 = $00A236
+
+; Other Banks
+CODE_028AE0 = $028AE0    ; Bank $02 routine
+DATA8_03BA35 = $03BA35   ; Bank $03 data
+DATA8_03BB81 = $03BB81   ; Bank $03 data
+UNREACH_03D5E5 = $03D5E5 ; Bank $03 unreachable code
+CODE_0C8000 = $0C8000    ; Bank $0C routine
+CODE_0C8080 = $0C8080    ; Bank $0C routine
+BankOC_Init = $0C8000    ; Bank $0C Init
+CODE_0D8000 = $0D8000    ; Bank $0D routine
+CODE_0D8004 = $0D8004    ; Bank $0D routine
+Bank0D_Init_Variant = $0D8000    ; Bank $0D Init
+CODE_018272 = $018272    ; Bank $01 routine
+Jump_To_Bank01 = $018000 ; Bank $01 jump target
+DATA8_049800 = $049800   ; Bank $04 data
+Load_Save_Game = $0E8000 ; Bank $0E save game
+Some_System_Call = $0F8000    ; Bank $0F system
+Some_Init_Function_1 = $0F8100    ; Bank $0F init
+Some_Init_Function_3 = $0F8200    ; Bank $0F init
+
+; Bank $07 data
+DATA8_078000 = $078000
+DATA8_078001 = $078001
+DATA8_078002 = $078002
+DATA8_078003 = $078003
+DATA8_078004 = $078004
+DATA8_078005 = $078005
+DATA8_078006 = $078006
+DATA8_078007 = $078007
+DATA8_07800A = $07800A
+DATA8_07800C = $07800C
+DATA8_07D8E4 = $07D8E4
+DATA8_07D8E5 = $07D8E5
+DATA8_07D8E6 = $07D8E6
+DATA8_07D8E7 = $07D8E7
+DATA8_07D8E8 = $07D8E8
+DATA8_07D8E9 = $07D8E9
+DATA8_07D8EA = $07D8EA
+DATA8_07D8EB = $07D8EB
+DATA8_07D8EC = $07D8EC
+DATA8_07D8ED = $07D8ED
+DATA8_07D8EE = $07D8EE
+DATA8_07D8EF = $07D8EF
+DATA8_07D8F0 = $07D8F0
+DATA8_07D8F1 = $07D8F1
+DATA8_07D8F2 = $07D8F2
+DATA8_07D8F3 = $07D8F3
+
+;===============================================================================
 ; BOOT SEQUENCE & INITIALIZATION ($008000-$008113)
 ;===============================================================================
 
@@ -29,7 +212,7 @@ CODE_008000:
 	; ===========================================================================
 	; This is the first code executed when the SNES powers on or resets.
 	; The RESET vector at $00FFFC points here ($008000).
-	; 
+	;
 	; Boot Process:
 	;   1. Switch from 6502 emulation mode to native 65816 mode
 	;   2. Initialize all hardware registers (display off, sound off, DMA off)
@@ -51,21 +234,21 @@ CODE_008000:
 	; Registers On Exit:
 	;   Native mode, stack at $001FFF, hardware initialized
 	; ===========================================================================
-	
+
 	CLC                         ; Clear carry flag
 	XCE                         ; Exchange Carry with Emulation flag
 								; C=0 → E=0 → Native 65816 mode enabled!
-	
+
 	JSR.W CODE_008247           ; Init_Hardware: Disable NMI, force blank, clear registers
 	JSL.L CODE_0D8000           ; Bank $0D initialization (sound driver, APU setup)
-	
+
 	; ---------------------------------------------------------------------------
 	; Initialize Save Game State Variables
 	; ---------------------------------------------------------------------------
 	; $7E3667 = Save file exists flag (0=no save, 1=save exists)
 	; $7E3668 = Save file slot/state ($FF=no save, 0-2=slot number)
 	; ---------------------------------------------------------------------------
-	
+
 	LDA.B #$00                  ; A = 0
 	STA.L $7E3667               ; Clear "save file exists" flag
 	DEC A                       ; A = $FF (-1)
@@ -81,13 +264,13 @@ CODE_008016:
 	; Alternative entry point used for soft reset or special boot modes.
 	; Different from main boot: calls different bank $0D init routine.
 	; ===========================================================================
-	
+
 	JSR.W CODE_008247           ; Init_Hardware again
-	
+
 	LDA.B #$F0                  ; A = $F0
 	STA.L $000600               ; Write $F0 to $000600 (low RAM mirror area)
 								; Purpose unclear - may trigger hardware behavior
-	
+
 	JSL.L CODE_0D8004           ; Bank $0D alternate initialization routine
 
 ;-------------------------------------------------------------------------------
@@ -99,14 +282,14 @@ CODE_00803A:
 	; Yet another entry point with same hardware init but different
 	; bank $0D initialization. May be used for returning from special modes.
 	; ===========================================================================
-	
+
 	JSR.W CODE_008247           ; Init_Hardware
-	
+
 	LDA.B #$F0                  ; A = $F0
 	STA.L $000600               ; Write $F0 to $000600
-	
+
 	JSL.L CODE_0D8004           ; Bank $0D alternate init
-	
+
 	REP #$30                    ; Set 16-bit mode: A, X, Y
 	LDX.W #$1FFF                ; X = $1FFF (stack pointer initial value)
 	TXS                         ; Transfer X to Stack: S = $1FFF
@@ -125,24 +308,24 @@ CODE_008023:
 	;   Stack grows downward (typical 65816 configuration)
 	;   RAM area $0000-$1FFF available for stack/variables
 	; ===========================================================================
-	
+
 	REP #$30                    ; 16-bit A, X, Y registers
 	LDX.W #$1FFF                ; X = $1FFF (top of RAM bank $00)
 	TXS                         ; S = $1FFF (initialize stack pointer)
-	
+
 	JSR.W CODE_0081F0           ; Clear_RAM: Zero out all work RAM $0000-$1FFF
-	
+
 	; ---------------------------------------------------------------------------
 	; Check Boot Mode Flag ($00DA bit 6)
 	; ---------------------------------------------------------------------------
 	; $00DA appears to be a boot mode/configuration flag
 	; Bit 6 ($40) determines which initialization path to take
 	; ---------------------------------------------------------------------------
-	
+
 	LDA.W #$0040                ; A = $0040 (bit 6 mask)
 	AND.W $00DA                 ; Test bit 6 of $00DA
 	BNE CODE_00806E             ; If bit 6 set → Skip display init, jump ahead
-	
+
 	JSL.L CODE_0C8080           ; Bank $0C: Full display/PPU initialization
 	BRA CODE_00804D             ; → Continue to DMA setup
 
@@ -158,11 +341,11 @@ CODE_00804D:
 	; This appears to be setup code that may be partially disabled or
 	; used for specific initialization scenarios.
 	; ===========================================================================
-	
+
 	JSR.W CODE_0081F0           ; Clear_RAM again (redundant?)
-	
+
 	SEP #$20                    ; 8-bit accumulator
-	
+
 	; ---------------------------------------------------------------------------
 	; DMA Channel 0 Configuration
 	; ---------------------------------------------------------------------------
@@ -170,22 +353,22 @@ CODE_00804D:
 	; Pattern: Fixed source, incrementing destination (mode $18)
 	; Register: $2109 (not a standard PPU register?)
 	; ---------------------------------------------------------------------------
-	
+
 	LDX.W #$1809                ; X = $1809
 								; $18 = DMA mode (2 registers, increment write)
 								; $09 = Target register (high byte)
 	STX.W SNES_DMA0PARAM        ; $4300 = DMA0 parameters
-	
+
 	LDX.W #$8252                ; X = $8252 (source address low/mid)
 	STX.W SNES_DMA0ADDRL        ; $4302-$4303 = Source address $xx8252
-	
+
 	LDA.B #$00                  ; A = $00
 	STA.W SNES_DMA0ADDRH        ; $4304 = Source bank $00 → $008252
-	
+
 	LDX.W #$0000                ; X = $0000 (transfer size = 0 bytes!)
 	STX.W SNES_DMA0CNTL         ; $4305-$4306 = Transfer 0 bytes
 								; This DMA won't transfer anything!
-	
+
 	LDA.B #$01                  ; A = $01 (enable channel 0)
 	STA.W SNES_MDMAEN           ; $420B = Execute DMA channel 0
 								; (Executes but transfers 0 bytes)
@@ -198,49 +381,49 @@ CODE_00806E:
 	; ===========================================================================
 	; Sets up direct page pointer and enables interrupts for main game loop.
 	; ===========================================================================
-	
+
 	JSL.L $00011F               ; Call routine at $00011F (in bank $00 RAM!)
 								; This is calling CODE in RAM, not ROM
 								; Must have been loaded earlier
-	
+
 	REP #$30                    ; 16-bit A, X, Y
-	
+
 	LDA.W #$0000                ; A = $0000
 	TCD                         ; Direct Page = $0000 (D = $0000)
 								; Sets up fast direct page access
-	
+
 	SEP #$20                    ; 8-bit accumulator
-	
+
 	LDA.W $0112                 ; A = [$0112] (NMI enable flags)
 	STA.W SNES_NMITIMEN         ; $4200 = Enable NMI/IRQ/Auto-joypad
 								; Copies configuration from RAM variable
-	
+
 	CLI                         ; Clear Interrupt disable flag
 								; Enable IRQ interrupts (NMI already configured)
-	
+
 	LDA.B #$0F                  ; A = $0F
 	STA.W $00AA                 ; [$00AA] = $0F (some game state variable)
-	
+
 	JSL.L CODE_0C8000           ; Bank $0C: Wait for VBLANK
 	JSL.L CODE_0C8000           ; Bank $0C: Wait for VBLANK again
 								; Double wait ensures PPU is stable
-	
+
 	; ---------------------------------------------------------------------------
 	; Check Boot/Continue Mode
 	; ---------------------------------------------------------------------------
 	; $7E3665 = Continue/load game flag
 	; $700000, $70038C, $700718 = Save file signature bytes?
 	; ---------------------------------------------------------------------------
-	
+
 	LDA.L $7E3665               ; A = Continue flag
 	BNE CODE_0080A8             ; If set → Load existing game
-	
+
 	; Check if save data exists in SRAM
 	LDA.L $700000               ; A = SRAM byte 1
 	ORA.L $70038C               ; OR with SRAM byte 2
 	ORA.L $700718               ; OR with SRAM byte 3
 	BEQ CODE_0080AD             ; If all zero → New game (no save data)
-	
+
 	JSL.L CODE_00B950           ; Has save data → Show continue menu
 	BRA CODE_0080B0             ; → Continue to fade-in
 
@@ -252,7 +435,7 @@ CODE_0080A8:
 	; ===========================================================================
 	; Player selected "Continue" from title screen - load saved game data.
 	; ===========================================================================
-	
+
 	JSR.W CODE_008166           ; Load_Game_From_SRAM: Restore all game state
 	BRA CODE_0080DC             ; → Skip new game init, jump to main setup
 
@@ -264,7 +447,7 @@ CODE_0080AD:
 	; ===========================================================================
 	; No save data exists - initialize a fresh game state.
 	; ===========================================================================
-	
+
 	JSR.W CODE_008117           ; Initialize_New_Game_State: Set default values
 
 ;-------------------------------------------------------------------------------
@@ -282,18 +465,18 @@ CODE_0080B0:
 	;   - State flags cleared
 	;   - Final VBLANK sync before jumping to main game
 	; ===========================================================================
-	
+
 	LDA.B #$80                  ; A = $80 (bit 7)
 	TRB.W $00DE                 ; Test and Reset bit 7 of $00DE
 								; Clear some display state flag
-	
+
 	LDA.B #$E0                  ; A = $E0 (bits 5-7: %11100000)
 	TRB.W $0111                 ; Test and Reset bits 5-7 of $0111
 								; Clear multiple configuration flags
-	
+
 	JSL.L CODE_0C8000           ; Bank $0C: Wait for VBLANK
 								; Ensure PPU ready for register writes
-	
+
 	; ---------------------------------------------------------------------------
 	; Configure Color Math and Window Settings
 	; ---------------------------------------------------------------------------
@@ -301,29 +484,29 @@ CODE_0080B0:
 	; SNES_COLDATA ($2132): Color math control register
 	; SNES_CGSWSEL ($2130): Color addition select
 	; ---------------------------------------------------------------------------
-	
+
 	LDA.B #$E0                  ; A = $E0
 								; Bit 7 = 1: Subtract color
 								; Bit 6 = 1: Half color math
 								; Bit 5 = 1: Enable color math
 	STA.W SNES_COLDATA          ; $2132 = Color math configuration
-	
+
 	LDX.W #$0000                ; X = $0000
 	STX.W SNES_CGSWSEL          ; $2130 = Color/math window settings = 0
 								; Disable all color window masking
-	
+
 	; ---------------------------------------------------------------------------
 	; Reset Background Scroll Positions
 	; ---------------------------------------------------------------------------
 	; SNES requires writing scroll values TWICE (high byte, then low byte)
 	; Writing $00 twice sets scroll position to 0
 	; ---------------------------------------------------------------------------
-	
+
 	STZ.W SNES_BG1VOFS          ; $210E = BG1 vertical scroll = 0 (low byte)
 	STZ.W SNES_BG1VOFS          ; $210E = BG1 vertical scroll = 0 (high byte)
 	STZ.W SNES_BG2VOFS          ; $2110 = BG2 vertical scroll = 0 (low byte)
 	STZ.W SNES_BG2VOFS          ; $2110 = BG2 vertical scroll = 0 (high byte)
-	
+
 	JSR.W CODE_00BD30           ; Additional graphics/fade setup
 	JSL.L CODE_0C8000           ; Bank $0C: Wait for VBLANK again
 								; Ensure all register writes complete
@@ -342,73 +525,73 @@ CODE_0080DC:
 	;   - Configures game mode variables
 	;   - Jumps to main game loop in bank $01
 	; ===========================================================================
-	
+
 	JSR.W CODE_009014           ; Initialize subsystem (graphics related?)
-	
+
 	; ---------------------------------------------------------------------------
 	; Initialize Two System Components (Unknown Purpose)
 	; ---------------------------------------------------------------------------
 	; Calls same routine twice with different parameters
 	; May be initializing two separate game systems
 	; ---------------------------------------------------------------------------
-	
+
 	LDA.B #$00                  ; A = $00 (parameter for first init)
 	JSR.W CODE_0091D4           ; Initialize system component 0
-	
+
 	LDA.B #$01                  ; A = $01 (parameter for second init)
 	JSR.W CODE_0091D4           ; Initialize system component 1
-	
+
 	; ---------------------------------------------------------------------------
 	; Load Initial Data Table
 	; ---------------------------------------------------------------------------
 	; $81ED points to initialization data (see DATA8_0081ED below)
 	; CODE_009BC4 likely loads/processes this data table
 	; ---------------------------------------------------------------------------
-	
+
 	LDX.W #$81ED                ; X = $81ED (pointer to init data)
 	JSR.W CODE_009BC4           ; Load/process data table
-	
+
 	; ---------------------------------------------------------------------------
 	; Configure State Flags
 	; ---------------------------------------------------------------------------
 	; $00D4, $00D6, $00E2 = State/configuration flag bytes
 	; TSB/TRB = Test and Set/Reset Bits instructions
 	; ---------------------------------------------------------------------------
-	
+
 	LDA.B #$04                  ; A = $04 (bit 2)
 	TSB.W $00D4                 ; Test and Set bit 2 in $00D4
 								; Enable some display/update feature
-	
+
 	LDA.B #$80                  ; A = $80 (bit 7)
 	TRB.W $00D6                 ; Test and Reset bit 7 in $00D6
 								; Disable some feature
-	
+
 	STZ.W $0110                 ; [$0110] = $00 (clear game state variable)
-	
+
 	LDA.B #$01                  ; A = $01 (bit 0)
 	TSB.W $00E2                 ; Test and Set bit 0 in $00E2
 								; Enable some system feature
-	
+
 	LDA.B #$10                  ; A = $10 (bit 4)
 	TSB.W $00D6                 ; Test and Set bit 4 in $00D6
 								; Enable another feature
-	
+
 	; ---------------------------------------------------------------------------
 	; Initialize Game Position/State Variable
 	; ---------------------------------------------------------------------------
 	; $008E appears to be a signed 16-bit position or state value
 	; ---------------------------------------------------------------------------
-	
+
 	LDX.W #$FFF0                ; X = $FFF0 (-16 in signed 16-bit)
 	STX.W $008E                 ; [$008E] = $FFF0 (initial game state)
-	
+
 	; ---------------------------------------------------------------------------
 	; Final Setup Routines
 	; ---------------------------------------------------------------------------
-	
+
 	JSL.L CODE_009B2F           ; Final system initialization
 	JSR.W CODE_008230           ; Additional setup (see below)
-	
+
 	; ---------------------------------------------------------------------------
 	; JUMP TO MAIN GAME LOOP
 	; ---------------------------------------------------------------------------
@@ -416,7 +599,7 @@ CODE_0080DC:
 	; Control transfers to bank $01, never returns
 	; This is the END of boot sequence - game starts running!
 	; ---------------------------------------------------------------------------
-	
+
 	JML.L CODE_018272           ; → JUMP TO MAIN GAME ENGINE (Bank $01)
 								; Boot sequence complete!
 
@@ -437,24 +620,24 @@ CODE_008117:
 	;   - Sets up OAM (sprite) DMA transfer
 	;   - Initializes various game subsystems
 	; ===========================================================================
-	
+
 	LDA.B #$14                  ; A = $14 (%00010100)
 								; Bit 4 = Enable BG3
 								; Bit 2 = Enable BG1
 	STA.W SNES_TM               ; $212C = Main screen designation
 								; Display BG1 and BG3 on main screen
-	
+
 	REP #$30                    ; 16-bit A, X, Y
-	
+
 	LDA.W #$0000                ; A = $0000
 	STA.L $7E31B5               ; Clear [$7E31B5] (game state variable)
-	
+
 	JSR.W CODE_00BD64           ; Initialize graphics/display system
-	
+
 	SEP #$20                    ; 8-bit accumulator
-	
+
 	JSL.L CODE_0C8000           ; Bank $0C: Wait for VBLANK
-	
+
 	; ---------------------------------------------------------------------------
 	; Configure OAM (Sprite) DMA Transfer
 	; ---------------------------------------------------------------------------
@@ -467,42 +650,42 @@ CODE_008117:
 	;   Size: $0220 bytes (544 bytes = 128 sprites × 4 bytes + 32 bytes hi table)
 	;   Mode: $04 = Write 2 registers once each (OAMDATA + OAMDATAWR)
 	; ---------------------------------------------------------------------------
-	
+
 	LDX.W #$0000                ; X = $0000
 	STX.W SNES_OAMADDL          ; $2102-$2103 = OAM address = $0000
 								; Start writing at first sprite
-	
+
 	LDX.W #$0400                ; X = $0400
 								; $04 = DMA mode: 2 registers, write once
 								; $00 = Target register low byte
 	STX.W SNES_DMA5PARAM        ; $4350 = DMA5 parameters
-	
+
 	LDX.W #$0C00                ; X = $0C00
 	STX.W SNES_DMA5ADDRL        ; $4352-$4353 = Source address $xx0C00
-	
+
 	LDA.B #$00                  ; A = $00
 	STA.W SNES_DMA5ADDRH        ; $4354 = Source bank = $00 → $000C00
-	
+
 	LDX.W #$0220                ; X = $0220 (544 bytes)
 	STX.W SNES_DMA5CNTL         ; $4355-$4356 = Transfer size = 544 bytes
-	
+
 	LDA.B #$20                  ; A = $20 (bit 5 = DMA channel 5)
 	STA.W SNES_MDMAEN           ; $420B = Execute DMA channel 5
 								; Copies OAM data to PPU
-	
+
 	; ---------------------------------------------------------------------------
 	; Initialize Game State Variables
 	; ---------------------------------------------------------------------------
-	
+
 	REP #$30                    ; 16-bit A, X, Y
-	
+
 	LDA.W #$FFFF                ; A = $FFFF
 	STA.W $010E                 ; [$010E] = $FFFF (state marker)
-	
+
 	JSL.L CODE_00C795           ; Initialize subsystem
 	JSR.W CODE_00BA1A           ; Initialize subsystem
 	JSL.L CODE_00C7B8           ; Initialize subsystem
-	
+
 	SEP #$20                    ; 8-bit accumulator
 	RTS                         ; Return to caller
 
@@ -527,9 +710,9 @@ CODE_008166:
 	;   - Battery-backed, persists when power off
 	;   - FFMQ uses multiple save slots
 	; ===========================================================================
-	
+
 	REP #$30                    ; 16-bit A, X, Y
-	
+
 	; ---------------------------------------------------------------------------
 	; Copy Save Data Block 1: MVN (Block Move Negative)
 	; ---------------------------------------------------------------------------
@@ -539,49 +722,49 @@ CODE_008166:
 	;
 	; This copies $0040 bytes from $0CA9C2 to $001010
 	; ---------------------------------------------------------------------------
-	
+
 	LDX.W #$A9C2                ; X = $A9C2 (source address low/mid)
 	LDY.W #$1010                ; Y = $1010 (destination address)
 	LDA.W #$003F                ; A = $003F (transfer 64 bytes: $3F+1)
 	MVN $00,$0C                 ; Copy from bank $0C to bank $00
 								; Source: $0CA9C2, Dest: $001010, Size: $40
-	
+
 	; Note: MVN auto-increments X, Y and decrements A until A = $FFFF
 	; After execution: X = $A9C2+$40, Y = $1010+$40, A = $FFFF
-	
+
 	; ---------------------------------------------------------------------------
 	; Copy Save Data Block 2
 	; ---------------------------------------------------------------------------
 	; Y already = $1010+$40 = $1050 from previous MVN
 	; Copies $000A bytes from $0C0E9E to $001050
 	; ---------------------------------------------------------------------------
-	
+
 	LDY.W #$0E9E                ; Y = $0E9E (new source address)
 								; Overwrites Y (dest becomes source for new copy)
 								; Actually this is confusing - need to verify
 	LDA.W #$0009                ; A = $0009 (transfer 10 bytes: $09+1)
 	MVN $00,$0C                 ; Copy from bank $0C to bank $00
-	
+
 	SEP #$20                    ; 8-bit accumulator
-	
+
 	; ---------------------------------------------------------------------------
 	; Set Save Slot Marker
 	; ---------------------------------------------------------------------------
-	
+
 	LDA.B #$02                  ; A = $02
 	STA.W $0FE7                 ; [$0FE7] = $02 (save slot indicator?)
-	
+
 	; ---------------------------------------------------------------------------
 	; Determine Active Save Slot
 	; ---------------------------------------------------------------------------
 	; $7E3668 contains save slot number (0, 1, or 2)
 	; If >= 2, wraps to slot 0
 	; ---------------------------------------------------------------------------
-	
+
 	LDA.L $7E3668               ; A = save slot number
 	CMP.B #$02                  ; Compare with 2
 	BCC CODE_00818E             ; If < 2, skip ahead (valid slot 0 or 1)
-	
+
 	LDA.B #$FF                  ; A = $FF (invalid slot, reset to -1)
 
 CODE_00818E:
@@ -594,70 +777,70 @@ CODE_00818E:
 	; Data Table Structure (8 bytes per slot):
 	;   See DATA8_0081D5-0081ED below
 	; ===========================================================================
-	
+
 	INC A                       ; A = slot number + 1 (1, 2, or 3)
 	STA.L $7E3668               ; Update slot number in RAM
-	
+
 	REP #$30                    ; 16-bit A, X, Y
-	
+
 	AND.W #$0003                ; A = A & 3 (ensure 0-3 range)
 	ASL A                       ; A = A × 2
 	ASL A                       ; A = A × 4
 	ASL A                       ; A = A × 8 (8 bytes per slot)
 	TAX                         ; X = slot_index × 8 (table offset)
-	
+
 	SEP #$20                    ; 8-bit accumulator
-	
+
 	; ---------------------------------------------------------------------------
 	; Load Data from Slot Table
 	; ---------------------------------------------------------------------------
 	; Uses X as offset into DATA8_0081D5 table
 	; Loads 8 bytes of configuration data for this save slot
 	; ---------------------------------------------------------------------------
-	
+
 	STZ.B $19                   ; [$19] = $00 (clear direct page variable)
-	
+
 	LDA.W DATA8_0081D5,X        ; A = table[X+0] (byte 0)
 	STA.W $0E88                 ; Store to $0E88
-	
+
 	LDY.W DATA8_0081D6,X        ; Y = table[X+1,X+2] (bytes 1-2, 16-bit)
 	STY.W $0E89                 ; Store to $0E89-$0E8A
-	
+
 	LDA.W DATA8_0081D8,X        ; A = table[X+3] (byte 3)
 	STA.W $0E92                 ; Store to $0E92
-	
+
 	LDY.W DATA8_0081DB,X        ; Y = table[X+4,X+5] (bytes 4-5, 16-bit)
 	STY.B $53                   ; Store to $53-$54
-	
+
 	LDY.W DATA8_0081D9,X        ; Y = table[X+6,X+7] (bytes 6-7, 16-bit)
 	TYX                         ; X = Y (transfer loaded value to X)
-	
+
 	REP #$30                    ; 16-bit A, X, Y
-	
+
 	; ---------------------------------------------------------------------------
 	; Copy Additional Save Data
 	; ---------------------------------------------------------------------------
 	; Copies $0020 bytes from $0C:X to $000EA8
 	; X was loaded from table above
 	; ---------------------------------------------------------------------------
-	
+
 	LDY.W #$0EA8                ; Y = $0EA8 (destination)
 	LDA.W #$001F                ; A = $001F (copy 32 bytes)
 	MVN $00,$0C                 ; Copy from bank $0C to bank $00
-	
+
 	; ---------------------------------------------------------------------------
 	; Final Save Load Setup
 	; ---------------------------------------------------------------------------
-	
+
 	LDX.W #$0E92                ; X = $0E92
 	STX.B $17                   ; [$17] = $0E92 (store pointer)
-	
+
 	JSR.W CODE_00A236           ; Process loaded save data
-	
+
 	SEP #$20                    ; 8-bit accumulator
-	
+
 	JSL.L CODE_009319           ; Finalize save load
-	
+
 	RTS                         ; Return
 
 ;-------------------------------------------------------------------------------
@@ -681,10 +864,10 @@ DATA8_0081D9:
 
 DATA8_0081DB:
 	dw $A82E                    ; Slot 0, bytes 6-7
-	
+
 	; Slot 1 data (8 bytes)
 	db $19, $0E, $1A, $02, $0C, $AA, $C1, $A8
-	
+
 	; Slot 2 data (8 bytes)
 	db $14, $33, $28, $05, $2C, $AA, $6A, $A9
 
@@ -712,13 +895,13 @@ CODE_0081F0:
 	;   $0600-$07FF: Preserved (512 bytes) - hardware mirrors or special use
 	;   $0800-$1FFF: Cleared (6,144 bytes)
 	; ===========================================================================
-	
+
 	LDA.W #$0000                ; A = $0000
 	TCD                         ; D = $0000 (Direct Page = $0000)
 								; Reset direct page to bank $00 start
-	
+
 	STZ.B $00                   ; [$0000] = $00 (write zero to first byte)
-	
+
 	; ---------------------------------------------------------------------------
 	; Clear $0000-$05FF (1,536 bytes)
 	; ---------------------------------------------------------------------------
@@ -728,49 +911,49 @@ CODE_0081F0:
 	; Length: $05FD+1 = $05FE bytes
 	; Result: $0000-$05FF all become $00
 	; ---------------------------------------------------------------------------
-	
+
 	LDX.W #$0000                ; X = $0000 (source address)
 	LDY.W #$0002                ; Y = $0002 (dest address - skip $0000,$0001)
 	LDA.W #$05FD                ; A = $05FD (copy 1,534 bytes)
 	MVN $00,$00                 ; Fill $0002-$05FF with zero
 								; (copying from $0000 which is zero)
-	
+
 	; ---------------------------------------------------------------------------
 	; Clear $0800-$1FFF (6,144 bytes)
 	; ---------------------------------------------------------------------------
 	; Same technique for second RAM region
 	; Skips $0600-$07FF (512 bytes preserved)
 	; ---------------------------------------------------------------------------
-	
+
 	STZ.W $0800                 ; [$0800] = $00 (write zero to start of region)
-	
+
 	LDX.W #$0800                ; X = $0800 (source address)
 	LDY.W #$0802                ; Y = $0802 (dest address)
 	LDA.W #$17F8                ; A = $17F8 (copy 6,137 bytes)
 	MVN $00,$00                 ; Fill $0802-$1FFF with zero
-	
+
 	; ---------------------------------------------------------------------------
 	; Set Boot Signature
 	; ---------------------------------------------------------------------------
 	; $7E3367 = Boot signature/checksum
 	; $3369 might be a magic number verifying proper boot
 	; ---------------------------------------------------------------------------
-	
+
 	LDA.W #$3369                ; A = $3369 (boot signature)
 	STA.L $7E3367               ; [$7E3367] = $3369
-	
+
 	; ---------------------------------------------------------------------------
 	; Load Initial Data Table Based on Save Flag
 	; ---------------------------------------------------------------------------
 	; Checks if save file exists, loads different init table accordingly
 	; ---------------------------------------------------------------------------
-	
+
 	LDX.W #$822A                ; X = $822A (default data table pointer)
-	
+
 	LDA.L $7E3667               ; A = save file exists flag
 	AND.W #$00FF                ; Mask to 8-bit value
 	BEQ CODE_008227             ; If 0 (no save) → use default table
-	
+
 	LDX.W #$822D                ; X = $822D (alternate table for existing save)
 
 CODE_008227:
@@ -799,20 +982,20 @@ CODE_008230:
 	; Called just before jumping to main game loop.
 	; Sets up additional game state in bank $7E RAM.
 	; ===========================================================================
-	
+
 	REP #$30                    ; 16-bit A, X, Y
-	
+
 	PEA.W $007E                 ; Push $007E to stack
 	PLB                         ; Pull to B (Data Bank = $7E)
 								; All memory accesses now default to bank $7E
-	
+
 	LDA.W #$0170                ; A = $0170 (parameter 1)
 	LDY.W #$3007                ; Y = $3007 (parameter 2)
 	JSR.W CODE_009A08           ; Initialize with these parameters
-	
+
 	LDA.W #$0098                ; A = $0098
 	STA.W $31B5                 ; [$7E31B5] = $0098 (game state variable)
-	
+
 	PLB                         ; Restore B (Data Bank back to $00)
 	RTS                         ; Return
 
@@ -835,17 +1018,17 @@ CODE_008247:
 	;   - No garbage displays on screen
 	;   - PPU is idle and safe to configure
 	; ===========================================================================
-	
+
 	SEP #$30                    ; 8-bit A, X, Y (and set flags)
-	
+
 	STZ.W SNES_NMITIMEN         ; $4200 = $00
 								; Disable NMI, IRQ, and auto-joypad read
-	
+
 	LDA.B #$80                  ; A = $80 (bit 7 = force blank)
 	STA.W SNES_INIDISP          ; $2100 = $80
 								; Force blank: screen output disabled
 								; Brightness = 0
-	
+
 	RTS                         ; Return
 
 ;-------------------------------------------------------------------------------
@@ -874,150 +1057,150 @@ CODE_00825C:
 	;   VBLANK period (~4,500 cycles) is the only time for video updates.
 	;   This routine prepares data structures for efficient VBLANK DMA.
 	; ===========================================================================
-	
+
 	REP #$30                    ; 16-bit A, X, Y
-	
+
 	LDA.W #$0000                ; A = $0000
 	TCD                         ; Direct Page = $0000
-	
+
 	; ---------------------------------------------------------------------------
 	; Initialize DMA State Variables ($0500-$050A)
 	; ---------------------------------------------------------------------------
 	; These variables track DMA transfer state and configuration
 	; ---------------------------------------------------------------------------
-	
+
 	LDX.W #$FF08                ; X = $FF08 (init value)
 	STX.W $0503                 ; [$0503-$0504] = $FF08
 	STX.W $0501                 ; [$0501-$0502] = $FF08
-	
+
 	LDX.W #$880F                ; X = $880F (init value)
 	STX.W $0508                 ; [$0508-$0509] = $880F
 	STX.W $0506                 ; [$0506-$0507] = $880F
-	
+
 	LDA.W #$00FF                ; A = $00FF
 	SEP #$20                    ; 8-bit accumulator
-	
+
 	STA.W $0500                 ; [$0500] = $FF
 	STA.W $0505                 ; [$0505] = $FF
-	
+
 	LDA.B #$00                  ; A = $00
 	STA.W $050A                 ; [$050A] = $00
-	
+
 	; ---------------------------------------------------------------------------
 	; Clear Graphics State Flags ($7E3659-$7E3663)
 	; ---------------------------------------------------------------------------
-	
+
 	STA.L $7E3659               ; [$7E3659] = $00
 	STA.L $7E365E               ; [$7E365E] = $00
 	STA.L $7E3663               ; [$7E3663] = $00
-	
+
 	REP #$30                    ; 16-bit A, X, Y
-	
+
 	STA.L $7E365A               ; [$7E365A-$7E365B] = $0000
 	STA.L $7E365C               ; [$7E365C-$7E365D] = $0000
 	STA.L $7E365F               ; [$7E365F-$7E3660] = $0000
 	STA.L $7E3661               ; [$7E3661-$7E3662] = $0000
-	
+
 	; ---------------------------------------------------------------------------
 	; Load Additional Initialization Data
 	; ---------------------------------------------------------------------------
-	
+
 	LDX.W #$8334                ; X = $8334 (pointer to init data table)
 	JSR.W CODE_009BC4           ; Load/process data table
-	
+
 	; ---------------------------------------------------------------------------
 	; Initialize OAM DMA Parameters
 	; ---------------------------------------------------------------------------
 	; $01F0/$01F2 = OAM DMA transfer sizes
 	; ---------------------------------------------------------------------------
-	
+
 	LDA.W #$0040                ; A = $0040 (64 bytes)
 	STA.W $01F0                 ; [$01F0] = $0040 (first OAM DMA size)
-	
+
 	LDA.W #$0004                ; A = $0004 (4 bytes)
 	STA.W $01F2                 ; [$01F2] = $0004 (second OAM DMA size)
-	
+
 	; ---------------------------------------------------------------------------
 	; Copy Data from ROM to RAM (Bank $7E)
 	; ---------------------------------------------------------------------------
-	
+
 	LDX.W #$B81B                ; X = $B81B (source address low/mid)
 	LDY.W #$3000                ; Y = $3000 (destination address)
 	LDA.W #$0006                ; A = $0006 (copy 7 bytes)
 	MVN $7E,$00                 ; Copy from bank $00 to bank $7E
 								; Source: $00B81B → Dest: $7E3000
-	
+
 	; ---------------------------------------------------------------------------
 	; Copy DMA Channel Configuration
 	; ---------------------------------------------------------------------------
 	; Copies 8 bytes from $004340 to $004340 (self-copy? or init?)
 	; ---------------------------------------------------------------------------
-	
+
 	LDY.W #$4340                ; Y = $4340 (DMA channel 4 registers)
 	LDA.W #$0007                ; A = $0007 (copy 8 bytes)
 	MVN $00,$00                 ; Copy within bank $00
-	
+
 	; ---------------------------------------------------------------------------
 	; Set Configuration Flag
 	; ---------------------------------------------------------------------------
-	
+
 	LDA.W #$0010                ; A = $0010 (bit 4)
 	TSB.W $0111                 ; Test and Set bit 4 in $0111
-	
+
 	; ---------------------------------------------------------------------------
 	; Initialize Graphics System (3 calls)
 	; ---------------------------------------------------------------------------
-	
+
 	LDA.W #$0000                ; A = $0000 (parameter)
 	JSR.W CODE_00CA63           ; Initialize graphics component 0
-	
+
 	LDA.W #$0001                ; A = $0001 (parameter)
 	JSR.W CODE_00CA63           ; Initialize graphics component 1
-	
+
 	LDA.W #$0002                ; A = $0002 (parameter)
 	JSR.W CODE_00CA63           ; Initialize graphics component 2
-	
+
 	; ---------------------------------------------------------------------------
 	; Load Graphics Data from ROM to RAM
 	; ---------------------------------------------------------------------------
-	
+
 	LDX.W #$D380                ; X = $D380 (source: bank $0C, offset $D380)
 	LDY.W #$0E84                ; Y = $0E84 (destination in bank $00)
 	LDA.W #$017B                ; A = $017B (copy 380 bytes)
 	MVN $00,$0C                 ; Copy from bank $0C to bank $00
 								; Source: $0CD380 → Dest: $000E84
-	
+
 	LDX.W #$D0B0                ; X = $D0B0 (source: bank $0C, offset $D0B0)
 	LDY.W #$1000                ; Y = $1000 (destination in bank $00)
 	LDA.W #$004F                ; A = $004F (copy 80 bytes)
 	MVN $00,$0C                 ; Copy from bank $0C to bank $00
 								; Source: $0CD0B0 → Dest: $001000
-	
+
 	; ---------------------------------------------------------------------------
 	; Initialize Character/Party State
 	; ---------------------------------------------------------------------------
-	
+
 	LDA.W #$00FF                ; A = $00FF
 	STA.W $1090                 ; [$1090] = $00FF (character state?)
 	STA.W $10A1                 ; [$10A1] = $00FF
 	STA.W $10A0                 ; [$10A0] = $00FF (active character?)
-	
+
 	; ---------------------------------------------------------------------------
 	; Load Configuration from ROM
 	; ---------------------------------------------------------------------------
-	
+
 	LDA.L DATA8_07800A          ; A = [ROM $07800A]
 	AND.W #$739C                ; A = A & $739C (mask specific bits)
 	STA.W $0E9C                 ; [$0E9C] = masked value
-	
+
 	; ---------------------------------------------------------------------------
 	; Initialize Additional Systems
 	; ---------------------------------------------------------------------------
-	
+
 	JSR.W CODE_008EC4           ; Initialize system
 	JSR.W CODE_008C3D           ; Initialize system
 	JSR.W CODE_008D29           ; Initialize system
-	
+
 	; ---------------------------------------------------------------------------
 	; Set Direct Page to PPU Registers ($2100)
 	; ---------------------------------------------------------------------------
@@ -1025,28 +1208,28 @@ CODE_00825C:
 	; This makes `STA.B $15` equivalent to `STA.W $2115` (VMAINC)
 	; Saves bytes and cycles in tight VBLANK code
 	; ---------------------------------------------------------------------------
-	
+
 	LDA.W #$2100                ; A = $2100 (PPU register base)
 	TCD                         ; D = $2100 (Direct Page → PPU registers)
-	
+
 	STZ.W $00F0                 ; [$00F0] = $0000 (clear state)
-	
+
 	; ---------------------------------------------------------------------------
 	; Upload Graphics to VRAM
 	; ---------------------------------------------------------------------------
-	
+
 	LDX.W #$6080                ; X = $6080 (VRAM address)
 	STX.B SNES_VMADDL-$2100     ; $2116-$2117 = VRAM address $6080
 								; (using direct page offset)
-	
+
 	PEA.W $0004                 ; Push $0004
 	PLB                         ; B = $04 (Data Bank = $04)
 								; Memory accesses now default to bank $04
-	
+
 	LDX.W #$99C0                ; X = $99C0 (source address in bank $04)
 	LDY.W #$0004                ; Y = $0004 (DMA parameters)
 	JSL.L CODE_008DDF           ; Execute graphics upload via DMA
-	
+
 	PLB                         ; Restore Data Bank
 	RTL                         ; Return
 
@@ -1089,54 +1272,54 @@ CODE_008337:
 	;   $00D8 bit 7: Battle graphics update
 	;   $00D2 bits: Various DMA operation flags
 	; ===========================================================================
-	
+
 	REP #$30                    ; 16-bit A, X, Y
-	
+
 	LDA.W #$4300                ; A = $4300 (DMA register base)
 	TCD                         ; D = $4300 (Direct Page → DMA registers)
 								; Now `LDA.B $00` = `LDA.W $4300` etc.
-	
+
 	SEP #$20                    ; 8-bit accumulator
-	
+
 	STZ.W $420C                 ; $420C (HDMAEN) = $00
 								; Disable HDMA during processing
-	
+
 	; ---------------------------------------------------------------------------
 	; Check State Flag $00E2 Bit 6 (Special Handler Mode)
 	; ---------------------------------------------------------------------------
-	
+
 	LDA.B #$40                  ; A = $40 (bit 6 mask)
 	AND.W $00E2                 ; Test bit 6 of $00E2
 	BNE CODE_00837D             ; If set → Jump to special handler
-	
+
 	; ---------------------------------------------------------------------------
 	; Check State Flag $00D4 Bit 1 (Tilemap DMA)
 	; ---------------------------------------------------------------------------
-	
+
 	LDA.B #$02                  ; A = $02 (bit 1 mask)
 	AND.W $00D4                 ; Test bit 1 of $00D4
 	BNE CODE_00837A             ; If set → Tilemap DMA needed
-	
+
 	; ---------------------------------------------------------------------------
 	; Check State Flag $00DD Bit 6 (Graphics Upload)
 	; ---------------------------------------------------------------------------
-	
+
 	LDA.B #$40                  ; A = $40 (bit 6 mask)
 	AND.W $00DD                 ; Test bit 6 of $00DD
 	BNE CODE_008385             ; If set → Graphics upload needed
-	
+
 	; ---------------------------------------------------------------------------
 	; Check State Flag $00D8 Bit 7 (Battle Graphics)
 	; ---------------------------------------------------------------------------
-	
+
 	LDA.B #$80                  ; A = $80 (bit 7 mask)
 	AND.W $00D8                 ; Test bit 7 of $00D8
 	BEQ CODE_008366             ; If clear → Skip battle graphics
-	
+
 	LDA.B #$80                  ; A = $80
 	TRB.W $00D8                 ; Test and Reset bit 7 of $00D8
 								; Clear the flag (one-shot operation)
-	
+
 	JMP.W CODE_0085B7           ; Execute battle graphics update
 
 ;-------------------------------------------------------------------------------
@@ -1147,15 +1330,15 @@ CODE_008366:
 	; ===========================================================================
 	; Continues checking state flags for other DMA operations.
 	; ===========================================================================
-	
+
 	LDA.B #$C0                  ; A = $C0 (bits 6-7 mask)
 	AND.W $00D2                 ; Test bits 6-7 of $00D2
 	BNE CODE_0083A8             ; If any set → Execute DMA operations
-	
+
 	LDA.B #$10                  ; A = $10 (bit 4 mask)
 	AND.W $00D2                 ; Test bit 4 of $00D2
 	BNE CODE_008377             ; If set → Special operation
-	
+
 	JMP.W CODE_008428           ; → Continue to additional handlers
 
 ;-------------------------------------------------------------------------------
@@ -1178,11 +1361,11 @@ CODE_00837D:
 	; Jumps through pointer at [$0058] (16-bit address in bank $00).
 	; This allows dynamic handler switching.
 	; ===========================================================================
-	
+
 	LDA.B #$40                  ; A = $40
 	TRB.W $00E2                 ; Test and Reset bit 6 of $00E2
 								; Clear flag before jumping
-	
+
 	JML.W [$0058]               ; Jump Long to address stored at [$0058]
 								; Indirect jump through pointer!
 
@@ -1201,29 +1384,29 @@ CODE_008385:
 	;   Size: $01F4 bytes
 	;   Mode: $1801 (incrementing source, fixed dest register pair)
 	; ===========================================================================
-	
+
 	LDX.W #$1801                ; X = $1801
 								; $18 = DMA mode (2 registers, increment)
 								; $01 = Low byte of destination register
 	STX.B SNES_DMA5PARAM-$4300  ; $4350-$4351 = DMA5 parameters
-	
+
 	LDX.W $01F6                 ; X = source address (from variable)
 	STX.B SNES_DMA5ADDRL-$4300  ; $4352-$4353 = Source address low/mid
-	
+
 	LDA.B #$7F                  ; A = $7F
 	STA.B SNES_DMA5ADDRH-$4300  ; $4354 = Source bank $7F
-	
+
 	LDX.W $01F4                 ; X = transfer size (from variable)
 	STX.B SNES_DMA5CNTL-$4300   ; $4355-$4356 = Transfer size
-	
+
 	LDX.W $01F8                 ; X = VRAM destination address
 	STX.W SNES_VMADDL           ; $2116-$2117 = VRAM address
-	
+
 	LDA.B #$84                  ; A = $84
 								; Bit 7 = increment after writing $2119
 								; Bits 0-3 = increment by 128 words
 	STA.W SNES_VMAINC           ; $2115 = VRAM address increment mode
-	
+
 	LDA.B #$20                  ; A = $20 (bit 5 = DMA channel 5)
 	STA.W SNES_MDMAEN           ; $420B = Execute DMA channel 5
 								; Transfer starts immediately!
@@ -1236,33 +1419,33 @@ CODE_0083A8:
 	; ===========================================================================
 	; Handles various DMA operations based on flags in $00D2.
 	; ===========================================================================
-	
+
 	LDA.B #$80                  ; A = $80 (bit 7 mask)
 	AND.W $00D2                 ; Test bit 7 of $00D2
 	BEQ CODE_0083D3             ; If clear → Skip this DMA
-	
+
 	; ---------------------------------------------------------------------------
 	; DMA Transfer with Vertical Increment
 	; ---------------------------------------------------------------------------
-	
+
 	LDA.B #$80                  ; A = $80 (increment after $2119 write)
 	STA.W SNES_VMAINC           ; $2115 = VRAM increment mode
-	
+
 	LDX.W #$1801                ; X = $1801 (DMA parameters)
 	STX.B SNES_DMA5PARAM-$4300  ; $4350-$4351 = DMA5 config
-	
+
 	LDX.W $01ED                 ; X = source address
 	STX.B SNES_DMA5ADDRL-$4300  ; $4352-$4353 = Source address low/mid
-	
+
 	LDA.W $01EF                 ; A = source bank
 	STA.B SNES_DMA5ADDRH-$4300  ; $4354 = Source bank
-	
+
 	LDX.W $01EB                 ; X = transfer size
 	STX.B SNES_DMA5CNTL-$4300   ; $4355-$4356 = Size
-	
+
 	LDX.W $0048                 ; X = VRAM address
 	STX.W SNES_VMADDL           ; $2116-$2117 = VRAM address
-	
+
 	LDA.B #$20                  ; A = $20 (DMA channel 5)
 	STA.W SNES_MDMAEN           ; $420B = Execute DMA
 
@@ -1274,11 +1457,11 @@ CODE_0083D3:
 	; ===========================================================================
 	; Bit 5 of $00D2 triggers OAM (sprite) data upload.
 	; ===========================================================================
-	
+
 	LDA.B #$20                  ; A = $20 (bit 5 mask)
 	AND.W $00D2                 ; Test bit 5 of $00D2
 	BEQ CODE_0083DD             ; If clear → Skip OAM update
-	
+
 	JSR.W CODE_008543           ; Execute OAM DMA transfer
 
 ;-------------------------------------------------------------------------------
@@ -1289,15 +1472,15 @@ CODE_0083DD:
 	; ===========================================================================
 	; Clears processed flags and returns from interrupt handler.
 	; ===========================================================================
-	
+
 	LDA.B #$40                  ; A = $40 (bit 6)
 	TRB.W $00DD                 ; Test and Reset bit 6 of $00DD
 								; Clear graphics upload flag
-	
+
 	LDA.B #$A0                  ; A = $A0 (bits 5 and 7)
 	TRB.W $00D2                 ; Test and Reset bits 5,7 of $00D2
 								; Clear OAM and VRAM DMA flags
-	
+
 	RTL                         ; Return from Long call (NMI complete)
 
 ;===============================================================================
@@ -1317,40 +1500,40 @@ CODE_0083E8:
 	;   3. Transfer tilemap data to VRAM
 	;   4. Handle special cases based on $0062 flag
 	; ===========================================================================
-	
+
 	LDA.B #$02                  ; A = $02 (bit 1)
 	TRB.W $00D4                 ; Test and Reset bit 1 of $00D4
 								; Clear "tilemap DMA pending" flag
-	
+
 	LDA.B #$80                  ; A = $80 (increment after $2119 write)
 	STA.W $2115                 ; $2115 (VMAINC) = $80
 								; VRAM address increments by 1 word after high byte write
-	
+
 	; ---------------------------------------------------------------------------
 	; Configure Palette (CGRAM) DMA
 	; ---------------------------------------------------------------------------
-	
+
 	LDX.W #$2200                ; X = $2200
 								; $22 = DMA mode (fixed source, increment dest)
 								; $00 = Target register low byte
 	STX.B SNES_DMA5PARAM-$4300  ; $4350 = DMA5 parameters
-	
+
 	LDA.B #$07                  ; A = $07
 	STA.B SNES_DMA5ADDRH-$4300  ; $4354 = Source bank $07
-	
+
 	LDA.B #$A8                  ; A = $A8 (CGADD - palette address register)
 	LDX.W $0064                 ; X = [$0064] (palette index/parameters)
 	JSR.W CODE_008504           ; Execute palette DMA transfer
-	
+
 	; ---------------------------------------------------------------------------
 	; Prepare for Tilemap Transfer
 	; ---------------------------------------------------------------------------
-	
+
 	REP #$30                    ; 16-bit A, X, Y
-	
+
 	LDX.W #$FF00                ; X = $FF00
 	STX.W $00F0                 ; [$00F0] = $FF00 (state marker)
-	
+
 	; ---------------------------------------------------------------------------
 	; Check Transfer Mode ($0062)
 	; ---------------------------------------------------------------------------
@@ -1358,13 +1541,13 @@ CODE_0083E8:
 	; If $0062 = 1, use special graphics upload method
 	; Otherwise, use standard tilemap transfer
 	; ---------------------------------------------------------------------------
-	
+
 	LDX.W $0062                 ; X = [$0062] (transfer mode flag)
 	LDA.W #$6080                ; A = $6080 (default VRAM address)
-	
+
 	CPX.W #$0001                ; Compare mode with 1
 	BEQ CODE_00841A             ; If mode = 1 → Special graphics upload
-	
+
 	JSR.W CODE_008520           ; Standard tilemap transfer
 	RTL                         ; Return
 
@@ -1377,13 +1560,13 @@ CODE_00841A:
 	; Alternative graphics upload path when $0062 = 1.
 	; Uses different source data and parameters.
 	; ===========================================================================
-	
+
 	PHK                         ; Push Program Bank (K register)
 	PLB                         ; Pull to Data Bank (B register)
 								; B = $00 (set data bank to current program bank)
-	
+
 	STA.W SNES_VMADDL           ; $2116-$2117 = VRAM address $6080
-	
+
 	LDX.W #$F0C1                ; X = $F0C1 (source address in bank $04)
 	LDY.W #$0004                ; Y = $0004 (DMA parameters)
 	JMP.W CODE_008DDF           ; Execute graphics DMA and return
@@ -1404,68 +1587,68 @@ CODE_008428:
 	;   $00D8 bit 1: Battle graphics mode
 	;   $00DA bit 4: Special transfer mode
 	; ===========================================================================
-	
+
 	LDA.B #$80                  ; A = $80 (bit 7 mask)
 	AND.W $00D4                 ; Test bit 7 of $00D4
 	BEQ CODE_008476             ; If clear → Skip, jump to handler return
-	
+
 	LDA.B #$80                  ; A = $80
 	TRB.W $00D4                 ; Test and Reset bit 7 of $00D4
 								; Clear "large transfer pending" flag
-	
+
 	LDA.B #$80                  ; A = $80 (increment mode)
 	STA.W $2115                 ; $2115 (VMAINC) = $80
-	
+
 	; ---------------------------------------------------------------------------
 	; Check Battle Graphics Mode ($00D8 bit 1)
 	; ---------------------------------------------------------------------------
-	
+
 	LDA.B #$02                  ; A = $02 (bit 1 mask)
 	AND.W $00D8                 ; Test bit 1 of $00D8
 	BEQ CODE_008479             ; If clear → Use alternate path
-	
+
 	; ---------------------------------------------------------------------------
 	; Battle Graphics Transfer
 	; ---------------------------------------------------------------------------
 	; Transfers battle-specific graphics during scene transitions
 	; ---------------------------------------------------------------------------
-	
+
 	LDX.W #$1801                ; X = $1801 (DMA parameters)
 	STX.B SNES_DMA5PARAM-$4300  ; $4350 = DMA5 config
-	
+
 	LDX.W #$075A                ; X = $075A (source address offset)
 	STX.B SNES_DMA5ADDRL-$4300  ; $4352-$4353 = Source address low/mid
-	
+
 	LDA.B #$7F                  ; A = $7F
 	STA.B SNES_DMA5ADDRH-$4300  ; $4354 = Source bank $7F
 								; Full source: $7F075A
-	
+
 	LDX.W #$0062                ; X = $0062 (98 bytes)
 	STX.B SNES_DMA5CNTL-$4300   ; $4355-$4356 = Transfer size
-	
+
 	LDX.W #$3BAD                ; X = $3BAD (VRAM destination)
 	STX.W $2116                 ; $2116-$2117 = VRAM address
-	
+
 	LDA.B #$20                  ; A = $20 (DMA channel 5)
 	STA.W $420B                 ; $420B = Execute DMA
-	
+
 	; ---------------------------------------------------------------------------
 	; Additional Battle Graphics Data Transfer
 	; ---------------------------------------------------------------------------
 	; Writes specific data directly to VRAM
 	; ---------------------------------------------------------------------------
-	
+
 	REP #$30                    ; 16-bit A, X, Y
-	
+
 	LDX.W #$4BED                ; X = $4BED (VRAM address)
 	STX.W $2116                 ; Set VRAM address
-	
+
 	LDA.L $7F17DA               ; A = [$7F17DA] (16-bit data)
 	STA.W $2118                 ; $2118-$2119 = Write to VRAM data
-	
+
 	LDA.L $7F17DC               ; A = [$7F17DC] (16-bit data)
 	STA.W $2118                 ; Write second word to VRAM
-	
+
 	SEP #$20                    ; 8-bit accumulator
 
 ;-------------------------------------------------------------------------------
@@ -1485,114 +1668,114 @@ CODE_008479:
 	; Used when battle graphics mode is not active.
 	; Handles palette and tilemap transfers for normal gameplay.
 	; ===========================================================================
-	
+
 	; ---------------------------------------------------------------------------
 	; Configure Palette DMA
 	; ---------------------------------------------------------------------------
-	
+
 	LDX.W #$2200                ; X = $2200 (DMA parameters)
 	STX.B SNES_DMA5PARAM-$4300  ; $4350 = DMA5 config
-	
+
 	LDA.B #$07                  ; A = $07
 	STA.B SNES_DMA5ADDRH-$4300  ; $4354 = Source bank $07
-	
+
 	; ---------------------------------------------------------------------------
 	; Transfer Two Palette Sets
 	; ---------------------------------------------------------------------------
-	
+
 	LDA.B #$88                  ; A = $88 (palette address)
 	LDX.W $00F4                 ; X = [$00F4] (source offset 1)
 	JSR.W CODE_008504           ; Transfer palette set 1
-	
+
 	LDA.B #$98                  ; A = $98 (palette address)
 	LDX.W $00F7                 ; X = [$00F7] (source offset 2)
 	JSR.W CODE_008504           ; Transfer palette set 2
-	
+
 	; ---------------------------------------------------------------------------
 	; Write Direct VRAM Data
 	; ---------------------------------------------------------------------------
-	
+
 	REP #$30                    ; 16-bit A, X, Y
-	
+
 	LDX.W #$5E8D                ; X = $5E8D (VRAM address)
 	STX.W $2116                 ; Set VRAM address
-	
+
 	LDA.L $7E2D1A               ; A = [$7E2D1A] (data from WRAM)
 	STA.W $2118                 ; Write to VRAM
-	
+
 	LDA.L $7E2D1C               ; A = [$7E2D1C]
 	STA.W $2118                 ; Write second word
-	
+
 	; ---------------------------------------------------------------------------
 	; Prepare for Tilemap Transfer
 	; ---------------------------------------------------------------------------
-	
+
 	LDX.W #$FF00                ; X = $FF00
 	STX.W $00F0                 ; [$00F0] = $FF00 (marker)
-	
+
 	; ---------------------------------------------------------------------------
 	; Transfer Two Tilemap Regions
 	; ---------------------------------------------------------------------------
-	
+
 	LDX.W $00F2                 ; X = [$00F2] (tilemap 1 source)
 	LDA.W #$6000                ; A = $6000 (VRAM address 1)
 	JSR.W CODE_008520           ; Transfer tilemap region 1
-	
+
 	LDX.W $00F5                 ; X = [$00F5] (tilemap 2 source)
 	LDA.W #$6040                ; A = $6040 (VRAM address 2)
 	JSR.W CODE_008520           ; Transfer tilemap region 2
-	
+
 	SEP #$20                    ; 8-bit accumulator
-	
+
 	; ---------------------------------------------------------------------------
 	; Check Special Transfer Mode
 	; ---------------------------------------------------------------------------
-	
+
 	LDA.B #$10                  ; A = $10 (bit 4 mask)
 	AND.W $00DA                 ; Test bit 4 of $00DA
 	BNE CODE_0084F8             ; If set → Skip menu graphics transfer
-	
+
 	; ---------------------------------------------------------------------------
 	; Menu Graphics Transfer
 	; ---------------------------------------------------------------------------
 	; Transfers menu-specific graphics data
 	; ---------------------------------------------------------------------------
-	
+
 	LDX.W #$1801                ; X = $1801 (DMA parameters)
 	STX.B SNES_DMA5PARAM-$4300  ; $4350 = DMA5 config
-	
+
 	LDX.W #$0380                ; X = $0380 (896 bytes)
 	STX.B SNES_DMA5CNTL-$4300   ; $4355-$4356 = Transfer size
-	
+
 	LDA.B #$7F                  ; A = $7F
 	STA.B SNES_DMA5ADDRH-$4300  ; $4354 = Source bank $7F
-	
+
 	; ---------------------------------------------------------------------------
 	; Select Source Address Based on Menu Position
 	; ---------------------------------------------------------------------------
 	; $1031 contains vertical menu position
 	; Different Y positions use different graphics data
 	; ---------------------------------------------------------------------------
-	
+
 	LDA.W $1031                 ; A = [$1031] (Y position)
-	
+
 	LDX.W #$C708                ; X = $C708 (default source 1)
 	CMP.B #$26                  ; Compare Y with $26
 	BCC CODE_0084EB             ; If Y < $26 → Use source 1
-	
+
 	LDX.W #$C908                ; X = $C908 (source 2)
 	CMP.B #$29                  ; Compare Y with $29
 	BCC CODE_0084EB             ; If Y < $29 → Use source 2
-	
+
 	LDX.W #$CA48                ; X = $CA48 (source 3)
 								; Y >= $29 → Use source 3
 
 CODE_0084EB:
 	STX.B SNES_DMA5ADDRL-$4300  ; $4352-$4353 = Selected source address
-	
+
 	LDX.W #$6700                ; X = $6700 (VRAM destination)
 	STX.W SNES_VMADDL           ; $2116-$2117 = VRAM address
-	
+
 	LDA.B #$20                  ; A = $20 (DMA channel 5)
 	STA.W SNES_MDMAEN           ; $420B = Execute DMA
 
@@ -1602,11 +1785,11 @@ CODE_0084F8:
 	; ===========================================================================
 	; Clear Transfer Markers and Return
 	; ===========================================================================
-	
+
 	LDX.W #$FFFF                ; X = $FFFF
 	STX.W $00F2                 ; [$00F2] = $FFFF (invalidate tilemap 1)
 	STX.W $00F5                 ; [$00F5] = $FFFF (invalidate tilemap 2)
-	
+
 	JMP.W CODE_0083A8           ; → Return to NMI handler
 
 ;===============================================================================
@@ -1628,27 +1811,27 @@ CODE_008504:
 	;   2. Calculate full source address
 	;   3. Execute 16-byte DMA transfer
 	; ===========================================================================
-	
+
 	STA.W $2121                 ; $2121 (CGADD) = Palette start address
 								; Sets where in CGRAM to write
-	
+
 	LDY.W #$0010                ; Y = $0010 (16 bytes = 8 colors)
 	STY.B SNES_DMA5CNTL-$4300   ; $4355-$4356 = Transfer 16 bytes
-	
+
 	REP #$30                    ; 16-bit A, X, Y
-	
+
 	TXA                         ; A = X (transfer source offset to A)
 	AND.W #$00FF                ; A = A & $00FF (ensure 8-bit value)
 	CLC                         ; Clear carry
 	ADC.W #$D8E4                ; A = A + $D8E4 (add base address)
 								; Final source in bank $07: $07(D8E4+offset)
 	STA.B SNES_DMA5ADDRL-$4300  ; $4352-$4353 = Calculated source address
-	
+
 	SEP #$20                    ; 8-bit accumulator
-	
+
 	LDA.B #$20                  ; A = $20 (DMA channel 5)
 	STA.W $420B                 ; $420B = Execute palette DMA
-	
+
 	RTS                         ; Return
 
 ;===============================================================================
@@ -1670,29 +1853,29 @@ CODE_008520:
 	;   Transfers in two passes separated by $0180 bytes
 	;   This likely handles interleaved data format
 	; ===========================================================================
-	
+
 	CPX.W #$FFFF                ; Check if X = $FFFF
 	BEQ CODE_008542             ; If yes → Skip transfer (no data)
-	
+
 	STA.W SNES_VMADDL           ; $2116-$2117 = VRAM destination address
-	
+
 	PEA.W $0004                 ; Push $0004
 	PLB                         ; B = $04 (Data Bank = $04)
-	
+
 	PHX                         ; Save X (source address)
-	
+
 	LDY.W #$0002                ; Y = $0002 (DMA parameters)
 	JSL.L CODE_008DDF           ; Execute first tilemap transfer
-	
+
 	PLA                         ; A = saved X (restore source address)
 	CLC                         ; Clear carry
 	ADC.W #$0180                ; A = source + $0180 (offset to second half)
 	TAX                         ; X = new source address
-	
+
 	LDY.W #$0002                ; Y = $0002 (DMA parameters)
 	JSL.L CODE_008DDF           ; Execute second tilemap transfer
 								; (VRAM address auto-increments)
-	
+
 	PLB                         ; Restore Data Bank
 
 CODE_008542:
@@ -1721,49 +1904,49 @@ CODE_008543:
 	;
 	; This routine transfers both tables in two DMA operations.
 	; ===========================================================================
-	
+
 	; ---------------------------------------------------------------------------
 	; Configure DMA for Main OAM Table
 	; ---------------------------------------------------------------------------
-	
+
 	LDX.W #$0400                ; X = $0400
 								; $04 = DMA mode (write 2 registers once)
 								; $00 = Target register low byte ($2104 = OAMDATA)
 	STX.B SNES_DMA5PARAM-$4300  ; $4350 = DMA5 config
-	
+
 	LDX.W #$0C00                ; X = $0C00 (source address)
 	STX.B SNES_DMA5ADDRL-$4300  ; $4352-$4353 = Source in bank $00: $000C00
-	
+
 	LDA.B #$00                  ; A = $00
 	STA.B SNES_DMA5ADDRH-$4300  ; $4354 = Source bank $00
-	
+
 	LDX.W $01F0                 ; X = [$01F0] (transfer size - main table)
 	STX.B SNES_DMA5CNTL-$4300   ; $4355-$4356 = Size (typically $0200 = 512 bytes)
-	
+
 	LDX.W #$0000                ; X = $0000
 	STX.W SNES_OAMADDL          ; $2102-$2103 = OAM address = 0
 								; Start writing at first sprite
-	
+
 	LDA.B #$20                  ; A = $20 (DMA channel 5)
 	STA.W SNES_MDMAEN           ; $420B = Execute DMA (main table)
-	
+
 	; ---------------------------------------------------------------------------
 	; Configure DMA for High OAM Table
 	; ---------------------------------------------------------------------------
-	
+
 	LDX.W #$0E00                ; X = $0E00 (source address for high table)
 	STX.B SNES_DMA5ADDRL-$4300  ; $4352-$4353 = Source: $000E00
-	
+
 	LDX.W $01F2                 ; X = [$01F2] (transfer size - high table)
 	STX.B SNES_DMA5CNTL-$4300   ; $4355-$4356 = Size (typically $0020 = 32 bytes)
-	
+
 	LDX.W #$0100                ; X = $0100
 	STX.W SNES_OAMADDL          ; $2102-$2103 = OAM address = $100
 								; This is where high table starts
-	
+
 	LDA.B #$20                  ; A = $20 (DMA channel 5)
 	STA.W SNES_MDMAEN           ; $420B = Execute DMA (high table)
-	
+
 	RTS                         ; Return
 
 ;===============================================================================
@@ -1777,60 +1960,60 @@ CODE_008577:
 	; Transfers battle-specific graphics to VRAM during scene transitions.
 	; Handles both tile data and tilemap updates.
 	; ===========================================================================
-	
+
 	; ---------------------------------------------------------------------------
 	; Transfer Battle Tile Graphics
 	; ---------------------------------------------------------------------------
-	
+
 	LDX.W #$4400                ; X = $4400 (VRAM destination)
 	STX.W SNES_VMADDL           ; $2116-$2117 = VRAM address
-	
+
 	LDX.W #$1801                ; X = $1801 (DMA parameters)
 	STX.B SNES_DMA5PARAM-$4300  ; $4350 = DMA5 config
-	
+
 	LDX.W #$0480                ; X = $0480 (source address offset)
 	STX.B SNES_DMA5ADDRL-$4300  ; $4352-$4353 = Source in bank $7F: $7F0480
-	
+
 	LDA.B #$7F                  ; A = $7F
 	STA.B SNES_DMA5ADDRH-$4300  ; $4354 = Source bank
-	
+
 	LDX.W #$0280                ; X = $0280 (640 bytes)
 	STX.B SNES_DMA5CNTL-$4300   ; $4355-$4356 = Transfer size
-	
+
 	LDA.B #$20                  ; A = $20 (DMA channel 5)
 	STA.W SNES_MDMAEN           ; $420B = Execute DMA
 	; ===========================================================================
-	
+
 	LDA.B #$80                  ; A = $80 (bit 7)
 	TRB.W $00DE                 ; Test and Reset bit 7 of $00DE
 								; Clear some state flag
-	
+
 	LDA.B #$E0                  ; A = $E0 (bits 5-7)
 	TRB.W $0111                 ; Test and Reset bits 5-7 of $0111
 								; Clear multiple state flags
-	
+
 	JSL.L CODE_0C8000           ; Bank $0C: Wait for VBLANK
-	
+
 	; ---------------------------------------------------------------------------
 	; Configure Color Math (Fade Effect)
-	
+
 	REP #$30                    ; 16-bit A, X, Y registers
 	LDX.W #$1FFF                ; X = $1FFF
 	TXS                         ; Stack pointer = $1FFF (top of RAM)
-	
+
 	JSR.W Init_Graphics_Registers ; Initialize PPU and graphics registers
-	
+
 	; ---------------------------------------------------------------------------
 	; Check for Special Button Combination
 	; ---------------------------------------------------------------------------
 	; Checks if a specific button is held during boot
 	; Might enable debug mode, skip intro, etc.
 	; ---------------------------------------------------------------------------
-	
+
 	LDA.W #$0040                ; A = $0040 (bit 6 = some button?)
 	AND.W $00DA                 ; Mask with controller input
 	BNE Skip_Normal_Init        ; If button held, skip to alternate path
-	
+
 	; Normal initialization path
 	JSL.L BankOC_Init           ; Initialize bank $0C systems
 	BRA Continue_Init           ; Continue setup
@@ -1843,14 +2026,14 @@ Boot_Tertiary_Entry:
 	; ===========================================================================
 	; Yet another entry point - FFMQ has multiple boot paths
 	; ===========================================================================
-	
+
 	JSR.W Init_Hardware         ; Hardware init (again)
-	
+
 	LDA.B #$F0
 	STA.L $000600               ; Hardware mirror write
-	
+
 	JSL.L Bank0D_Init_Variant   ; Subsystem init
-	
+
 	REP #$30                    ; 16-bit mode
 	LDX.W #$1FFF                ; Reset stack pointer
 	TXS
@@ -1869,26 +2052,26 @@ Continue_Init:
 	;   Dest: Hardware registers
 	;   Size: $0000 (means $10000 = 64KB! But table is smaller)
 	; ===========================================================================
-	
+
 	JSR.W Init_Graphics_Registers ; More graphics setup
-	
+
 	SEP #$20                    ; 8-bit A, 16-bit X/Y
-	
+
 	; Configure DMA Channel 0
 	LDX.W #$1809                ; DMA parameters
 								; $18 = DMA control byte
 								; $09 = Target register (probably $2109?)
 	STX.W !SNES_DMA0PARAM       ; $4300-4301: DMA control + target
-	
+
 	LDX.W #$8252                ; Source address = $008252
 	STX.W !SNES_DMA0ADDRL       ; $4302-4303: Source address low/mid
-	
+
 	LDA.B #$00                  ; Source bank = $00
 	STA.W !SNES_DMA0ADDRH       ; $4304: Source address bank
-	
+
 	LDX.W #$0000                ; Size = $0000 (wraps to $10000 = 64KB)
 	STX.W !SNES_DMA0CNTL        ; $4305-4306: Transfer size
-	
+
 	LDA.B #$01                  ; Enable DMA channel 0
 	STA.W !SNES_MDMAEN          ; $420B: Start DMA transfer NOW
 
@@ -1900,15 +2083,15 @@ Skip_Normal_Init:
 	; ===========================================================================
 	; Called after hardware is initialized, regardless of boot path
 	; ===========================================================================
-	
+
 	JSL.L $00011F               ; Call early routine (what is this?)
-	
+
 	REP #$30                    ; 16-bit A, X, Y
 	LDA.W #$0000
 	TCD                         ; Direct page = $0000 (default)
-	
+
 	SEP #$20                    ; 8-bit A
-	
+
 	; ---------------------------------------------------------------------------
 	; Enable Interrupts (NMI/IRQ)
 	; ---------------------------------------------------------------------------
@@ -1916,44 +2099,44 @@ Skip_Normal_Init:
 	; Fires every frame at vertical blanking
 	; Used for graphics updates, timing, etc.
 	; ---------------------------------------------------------------------------
-	
+
 	LDA.W $0112                 ; Load NMI enable flags
 	STA.W !SNES_NMITIMEN        ; $4200: Enable NMI and/or IRQ
 	CLI                         ; Clear interrupt disable flag
 								; Interrupts now active!
-	
+
 	; ---------------------------------------------------------------------------
 	; Set Screen Brightness
 	; ---------------------------------------------------------------------------
-	
+
 	LDA.B #$0F                  ; Full brightness (0-15 scale)
 	STA.W $00AA                 ; Store to brightness variable
-	
+
 	; Call initialization twice (fade in/out? Double buffer?)
 	JSL.L BankOC_Init
 	JSL.L BankOC_Init
-	
+
 	; ---------------------------------------------------------------------------
 	; Check Save Game Status
 	; ---------------------------------------------------------------------------
 	; Determines whether to load a save or start new game
 	; ---------------------------------------------------------------------------
-	
+
 	LDA.L $7E3665               ; Load save state flag
 	BNE Handle_Existing_Save    ; If non-zero, handle existing save
-	
+
 	; ---------------------------------------------------------------------------
 	; Check SRAM for Save Data
 	; ---------------------------------------------------------------------------
 	; SRAM (battery-backed RAM) at $70:0000-$7F:FFFF stores save games
 	; Check specific bytes to see if valid save data exists
 	; ---------------------------------------------------------------------------
-	
+
 	LDA.L $700000               ; SRAM byte 1 (save header?)
 	ORA.L $70038C               ; OR with SRAM byte 2
 	ORA.L $700718               ; OR with SRAM byte 3
 	BEQ Start_New_Game          ; If all zero, no save exists
-	
+
 	; Save data exists - load it
 	JSL.L Load_Save_Game        ; Load game from SRAM
 	BRA Continue_To_Game
@@ -1966,7 +2149,7 @@ Handle_Existing_Save:
 	; ===========================================================================
 	; Called when save state flag indicates save in progress
 	; ===========================================================================
-	
+
 	JSR.W Some_Save_Handler
 	BRA Enter_Main_Loop
 
@@ -1978,7 +2161,7 @@ Start_New_Game:
 	; ===========================================================================
 	; Called when no save data exists - starts a fresh game
 	; ===========================================================================
-	
+
 	JSR.W Init_New_Game
 
 ;-------------------------------------------------------------------------------
@@ -1989,38 +2172,38 @@ Continue_To_Game:
 	; ===========================================================================
 	; Last minute preparations before entering main game loop
 	; ===========================================================================
-	
+
 	LDA.B #$80                  ; Bit 7
 	TRB.W $00DE                 ; Test and reset bit 7 in game flag
-	
+
 	LDA.B #$E0                  ; Bits 5-7
 	TRB.W $0111                 ; Test and reset bits 5-7
-	
+
 	JSL.L BankOC_Init           ; Another initialization call
-	
+
 	; ---------------------------------------------------------------------------
 	; Configure Color Math (SNES Special Effects)
 	; ---------------------------------------------------------------------------
 	; Color math allows adding/subtracting colors for transparency, fades, etc.
 	; ---------------------------------------------------------------------------
-	
+
 	LDA.B #$E0                  ; Color math: subtract mode?
 	STA.W !SNES_COLDATA         ; $2132: Color math configuration
-	
+
 	; Reset windowing and color effects
 	LDX.W #$0000
 	STX.W !SNES_CGSWSEL         ; $2130: Window mask settings
-	
+
 	; ---------------------------------------------------------------------------
 	; Reset Background Scroll Positions
 	; ---------------------------------------------------------------------------
-	
+
 	STZ.W !SNES_BG1VOFS         ; $210E: BG1 vertical scroll = 0
 	STZ.W !SNES_BG1VOFS         ; Write twice (SNES registers need H+L bytes)
-	
+
 	STZ.W !SNES_BG2VOFS         ; $2110: BG2 vertical scroll = 0
 	STZ.W !SNES_BG2VOFS
-	
+
 	JSR.W Some_Graphics_Setup
 	JSL.L BankOC_Init
 
@@ -2033,35 +2216,35 @@ Enter_Main_Loop:
 	; This is where the actual game begins!
 	; From here, execution enters the main game loop
 	; ===========================================================================
-	
+
 	JSR.W Main_Game_Loop
-	
+
 	LDA.B #$00
 	JSR.W Some_Mode_Handler
-	
+
 	LDA.B #$01
 	JSR.W Some_Mode_Handler
-	
+
 	LDX.W #$81ED                ; Pointer to some data
 	JSR.W Execute_Script_Or_Command
-	
+
 	LDA.B #$04
 	TSB.W $00D4                 ; Test and set bit 2 in game flag
-	
+
 	LDA.B #$80
 	TRB.W $00D6                 ; Test and reset bit 7 in flag
-	
+
 	STZ.W $0110                 ; Clear some variable
-	
+
 	LDA.B #$01
 	TSB.W $00E2                 ; Test and set bit 0
-	
+
 	LDA.B #$10
 	TSB.W $00D6                 ; Test and set bit 4
-	
+
 	LDX.W #$FFF0                ; Some value
 	STX.W $008E                 ; Store to variable
-	
+
 	JSL.L Some_System_Call
 	JSR.W Some_Function
 	JML.L Jump_To_Bank01        ; Jump to bank $01 code!
@@ -2080,56 +2263,56 @@ Init_New_Game:
 	; - Inventory
 	; - Flags and variables
 	; ===========================================================================
-	
+
 	LDA.B #$14                  ; Enable BG1, BG3, BG4?
 	STA.W !SNES_TM              ; $212C: Main screen designation
-	
+
 	REP #$30                    ; 16-bit mode
 	LDA.W #$0000
 	STA.L $7E31B5               ; Clear some game variable
-	
+
 	JSR.W Some_Init_Routine
-	
+
 	SEP #$20                    ; 8-bit A
 	JSL.L BankOC_Init
-	
+
 	; ---------------------------------------------------------------------------
 	; DMA Transfer to OAM (Sprite Attribute Memory)
 	; ---------------------------------------------------------------------------
 	; OAM holds sprite positions, tiles, and attributes
 	; ---------------------------------------------------------------------------
-	
+
 	LDX.W #$0000
 	STX.W !SNES_OAMADDL         ; $2102: OAM address = 0
-	
+
 	; Configure DMA Channel 5 for OAM
 	LDX.W #$0400                ; DMA params for OAM
 	STX.W !SNES_DMA5PARAM       ; $4350-4351
-	
+
 	LDX.W #$0C00                ; Source = $000C00
 	STX.W !SNES_DMA5ADDRL       ; $4352-4353
-	
+
 	LDA.B #$00                  ; Source bank = $00
 	STA.W !SNES_DMA5ADDRH       ; $4354
-	
+
 	LDX.W #$0220                ; Transfer size = $0220 = 544 bytes
 	STX.W !SNES_DMA5CNTL        ; $4355-4356
-	
+
 	LDA.B #$20                  ; Enable DMA channel 5 (bit 5)
 	STA.W !SNES_MDMAEN          ; $420B: Start DMA
-	
+
 	; ---------------------------------------------------------------------------
 	; More Initialization
 	; ---------------------------------------------------------------------------
-	
+
 	REP #$30                    ; 16-bit mode
 	LDA.W #$FFFF
 	STA.W $010E                 ; Initialize some variable to -1
-	
+
 	JSL.L Some_Init_Function_1
 	JSR.W Some_Init_Function_2
 	JSL.L Some_Init_Function_3
-	
+
 	SEP #$20                    ; 8-bit A
 	RTS
 
@@ -2141,69 +2324,69 @@ Some_Save_Handler:
 	; ===========================================================================
 	; TODO: Analyze what this actually does
 	; ===========================================================================
-	
+
 	REP #$30                    ; 16-bit mode
-	
+
 	; MVN = Block move negative (copy memory blocks)
 	LDX.W #$A9C2                ; Source
 	LDY.W #$1010                ; Destination
 	LDA.W #$003F                ; Length-1
 	MVN $00,$0C                 ; Copy from bank $00 to bank $0C
-	
+
 	LDY.W #$0E9E                ; Another destination
 	LDA.W #$0009                ; Length-1
 	MVN $00,$0C                 ; Another block copy
-	
+
 	SEP #$20                    ; 8-bit A
-	
+
 	LDA.B #$02
 	STA.W $0FE7                 ; Store some value
-	
+
 	LDA.L $7E3668               ; Load save state
 	CMP.B #$02
 	BCC .less_than_2
 	LDA.B #$FF                  ; Cap at $FF if >= 2
-	
+
 .less_than_2:
 	INC A                       ; Increment save state
 	STA.L $7E3668               ; Store back
-	
+
 	REP #$30                    ; 16-bit mode
 	AND.W #$0003                ; Mask to 0-3
 	ASL A                       ; Multiply by 8
 	ASL A
 	ASL A
 	TAX                         ; X = offset into table
-	
+
 	SEP #$20                    ; 8-bit A
 	STZ.B $19                   ; Clear some variable
-	
+
 	; Load data from table based on save state
 	LDA.W Save_State_Table,X
 	STA.W $0E88
-	
+
 	LDY.W Save_State_Table+1,X
 	STY.W $0E89
-	
+
 	LDA.W Save_State_Table+3,X
 	STA.W $0E92
-	
+
 	LDY.W Save_State_Table+6,X
 	STY.B $53
-	
+
 	LDY.W Save_State_Table+4,X
 	TYX
-	
+
 	REP #$30                    ; 16-bit mode
 	LDY.W #$0EA8
 	LDA.W #$001F
 	MVN $00,$0C                 ; Block copy
-	
+
 	LDX.W #$0E92
 	STX.B $17
-	
+
 	JSR.W Some_Function_A236
-	
+
 	SEP #$20                    ; 8-bit A
 	JSL.L Some_Function_9319
 	RTS
@@ -2218,17 +2401,17 @@ Save_State_Table:
 	db $05
 	dw $AA0C
 	dw $A82E
-	
+
 	db $19, $0E, $1A            ; Entry 1
 	db $02
 	dw $AA0C
 	dw $A8C1
-	
+
 	db $14, $33, $28            ; Entry 2
 	db $05
 	dw $AA2C
 	dw $A96A
-	
+
 	db $EC, $A6, $03            ; Entry 3 (partial data visible)
 
 ;===============================================================================
@@ -2241,55 +2424,55 @@ Init_Graphics_Registers:
 	; ===========================================================================
 	; Sets up initial values for SNES PPU (Picture Processing Unit)
 	; ===========================================================================
-	
+
 	LDA.W #$0000
 	TCD                         ; Direct page = $0000
-	
+
 	STZ.B $00                   ; Clear first byte of RAM
-	
+
 	; ---------------------------------------------------------------------------
 	; Clear RAM ($0000-$05FD = 1,534 bytes)
 	; ---------------------------------------------------------------------------
 	; Uses MVN (block move) to quickly zero memory
 	; ---------------------------------------------------------------------------
-	
+
 	LDX.W #$0000                ; Source = $0000
 	LDY.W #$0002                ; Dest = $0002
 	LDA.W #$05FD                ; Length = $05FD bytes
 	MVN $00,$00                 ; Copy within bank $00
 								; This copies $00 forward, clearing memory!
-	
+
 	; ---------------------------------------------------------------------------
 	; Clear More RAM ($0800-$1FF8 = 6,136 bytes)
 	; ---------------------------------------------------------------------------
-	
+
 	STZ.W $0800                 ; Clear byte at $0800
-	
+
 	LDX.W #$0800                ; Source = $0800
 	LDY.W #$0802                ; Dest = $0802
 	LDA.W #$17F8                ; Length = $17F8 = 6,136 bytes
 	MVN $00,$00                 ; Clear this block too
-	
+
 	; ---------------------------------------------------------------------------
 	; Initialize Magic Number (Save Data Validation?)
 	; ---------------------------------------------------------------------------
-	
+
 	LDA.W #$3369                ; Magic number = $3369
 	STA.L $7E3367               ; Store to WRAM
 								; Probably used to detect valid save data
-	
+
 	; ---------------------------------------------------------------------------
 	; Execute Initialization Script Based on Save State
 	; ---------------------------------------------------------------------------
-	
+
 	LDX.W #$822A                ; Default script pointer
-	
+
 	LDA.L $7E3667               ; Load save exists flag
 	AND.W #$00FF                ; Mask to byte
 	BEQ .no_save
-	
+
 	LDX.W #$822D                ; Different script if save exists
-	
+
 .no_save:
 	JMP.W Execute_Script_Or_Command
 
@@ -2308,20 +2491,20 @@ Some_Function:
 	; ===========================================================================
 	; TODO: Analyze and document this function
 	; ===========================================================================
-	
+
 	REP #$30                    ; 16-bit mode
-	
+
 	; Set data bank to $7E (WRAM)
 	PEA.W $007E
 	PLB
-	
+
 	LDA.W #$0170
 	LDY.W #$3007
 	JSR.W Some_Function_9A08
-	
+
 	LDA.W #$0098
 	STA.W $31B5                 ; Store to WRAM variable
-	
+
 	PLB                         ; Restore data bank
 	RTS
 
@@ -2336,11 +2519,11 @@ Init_Hardware:
 	; - Force blank screen
 	; - Reset registers
 	; ===========================================================================
-	
+
 	SEP #$30                    ; 8-bit A, X, Y
-	
+
 	STZ.W !SNES_NMITIMEN        ; $4200: Disable NMI and IRQ
-	
+
 	LDA.B #$80                  ; Force blank + full brightness
 	STA.W !SNES_INIDISP         ; $2100: Screen display control
 								; Bit 7 = force blank (screen off)
@@ -2366,16 +2549,17 @@ CODE_0085B7:
 	; Setup VRAM for vertical increment mode
 	LDA.B #$80                       ; Increment after writing to $2119
 	STA.W SNES_VMAINC                ; Set VRAM increment mode
-	
+
 	; Check if battle mode graphics needed
 	LDA.B #$10                       ; Check bit 4 of display flags
 	AND.W $00DA                      ; Test against display status
-	BNE CODE_008577                  ; If set, do battle graphics transfer
-	
+	BEQ +                            ; If clear, continue to field graphics
+	JMP CODE_008577                  ; Otherwise do battle graphics transfer
++
 	; Field mode graphics update
 	LDX.W $0042                      ; Get current VRAM address from variable
 	STX.W SNES_VMADDL                ; Set VRAM write address
-	
+
 	; Setup DMA for character tile transfer
 	LDX.W #$1801                     ; DMA mode: word write, increment
 	STX.B SNES_DMA5PARAM-$4300       ; Set DMA5 parameters
@@ -2387,14 +2571,14 @@ CODE_0085B7:
 	STX.B SNES_DMA5CNTL-$4300        ; Set transfer size
 	LDA.B #$20                       ; Trigger DMA channel 5
 	STA.W SNES_MDMAEN                ; Execute transfer
-	
+
 	REP #$30                         ; 16-bit A, X, Y
 	CLC                              ; Clear carry for addition
 	LDA.W $0042                      ; Get VRAM address
 	ADC.W #$1000                     ; Add $1000 for next section
 	STA.W SNES_VMADDL                ; Set new VRAM address
 	SEP #$20                         ; 8-bit A
-	
+
 	; Transfer second section of tiles
 	LDX.W #$1801                     ; DMA mode: word write
 	STX.B SNES_DMA5PARAM-$4300       ; Set DMA5 parameters
@@ -2406,12 +2590,12 @@ CODE_0085B7:
 	STX.B SNES_DMA5CNTL-$4300        ; Set transfer size
 	LDA.B #$20                       ; Trigger DMA channel 5
 	STA.W SNES_MDMAEN                ; Execute transfer
-	
+
 	; Check if tilemap update needed
 	LDA.B #$80                       ; Check bit 7
 	AND.W $00D6                      ; Test display flags
 	BEQ CODE_00862D                  ; If clear, skip tilemap transfer
-	
+
 	; Transfer tilemap data
 	LDX.W #$5820                     ; VRAM address $5820
 	STX.W SNES_VMADDL                ; Set VRAM write address
@@ -2429,14 +2613,14 @@ CODE_0085B7:
 
 CODE_00862D:
 	JSR.W CODE_008543                ; Transfer OAM data
-	
+
 	; Check if additional display update needed
 	LDA.B #$20                       ; Check bit 5
 	AND.W $00D6                      ; Test display flags
 	BEQ CODE_00863C                  ; If clear, exit
 	LDA.B #$78                       ; Set multiple flags (bits 3,4,5,6)
 	TSB.W $00D4                      ; Set bits in status register
-	
+
 CODE_00863C:
 	RTL                              ; Return
 
@@ -2457,82 +2641,82 @@ CODE_00863D:
 	;   $00DE bit 6: Character status update
 	;   $00D6 bit 5: Additional display update flag
 	; ===========================================================================
-	
+
 	LDA.B #$10                  ; A = $10 (bit 4 mask)
 	TRB.W $00D2                 ; Test and Reset bit 4 of $00D2
 								; Clear "special transfer pending" flag
-	
+
 	LDA.B #$80                  ; A = $80 (increment mode)
 	STA.W SNES_VMAINC           ; $2115 = Increment after $2119 write
-	
+
 	; ---------------------------------------------------------------------------
 	; Check Battle Mode Graphics Flag
 	; ---------------------------------------------------------------------------
-	
+
 	LDA.B #$10                  ; A = $10 (bit 4 mask)
 	AND.W $00DA                 ; Test bit 4 of $00DA
 	BEQ CODE_00869D             ; If clear → Use normal field mode graphics
-	
+
 	; ---------------------------------------------------------------------------
 	; Battle Mode Graphics Transfer
 	; ---------------------------------------------------------------------------
 	; Transfers menu graphics for battle interface
 	; ---------------------------------------------------------------------------
-	
+
 	PEA.W $0004                 ; Push $0004
 	PLB                         ; B = $04 (Data Bank = $04)
-	
+
 	LDX.W #$60C0                ; X = $60C0 (VRAM address)
 	STX.W $2116                 ; Set VRAM address
-	
+
 	LDX.W #$FF00                ; X = $FF00
 	STX.W $00F0                 ; [$00F0] = $FF00 (state marker)
-	
+
 	LDX.W #$99C0                ; X = $99C0 (source in bank $04)
 	LDY.W #$0004                ; Y = $0004 (DMA parameters)
 	JSL.L CODE_008DDF           ; Execute tilemap DMA transfer
-	
+
 	PLB                         ; Restore Data Bank
-	
+
 	; ---------------------------------------------------------------------------
 	; Transfer Battle Palette Set 1
 	; ---------------------------------------------------------------------------
-	
+
 	LDA.B #$A8                  ; A = $A8 (palette start address)
 	STA.W SNES_CGADD            ; $2121 = CGRAM address = $A8
-	
+
 	LDX.W #$2200                ; X = $2200 (DMA parameters)
 	STX.B SNES_DMA5PARAM-$4300  ; $4350 = DMA5 config
-	
+
 	LDX.W #$D814                ; X = $D814 (source offset)
 	STX.B SNES_DMA5ADDRL-$4300  ; $4352-$4353 = Source: $07D814
-	
+
 	LDA.B #$07                  ; A = $07
 	STA.B SNES_DMA5ADDRH-$4300  ; $4354 = Source bank $07
-	
+
 	LDX.W #$0010                ; X = $0010 (16 bytes = 8 colors)
 	STX.B SNES_DMA5CNTL-$4300   ; $4355-$4356 = Transfer size
-	
+
 	LDA.B #$20                  ; A = $20 (DMA channel 5)
 	STA.W SNES_MDMAEN           ; $420B = Execute palette DMA
-	
+
 	; ---------------------------------------------------------------------------
 	; Clear Specific Palette Entries
 	; ---------------------------------------------------------------------------
 	; Clears palette entries $0D and $1D to black
 	; Used to reset specific UI colors in battle mode
 	; ---------------------------------------------------------------------------
-	
+
 	LDA.B #$0D                  ; A = $0D (palette entry 13)
 	STA.W SNES_CGADD            ; Set CGRAM address
 	STZ.W SNES_CGDATA           ; $2122 = $00 (color low byte = black)
 	STZ.W SNES_CGDATA           ; $2122 = $00 (color high byte)
-	
+
 	LDA.B #$1D                  ; A = $1D (palette entry 29)
 	STA.W SNES_CGADD            ; Set CGRAM address
 	STZ.W SNES_CGDATA           ; $2122 = $00 (black)
 	STZ.W SNES_CGDATA           ; $2122 = $00
-	
+
 	RTL                         ; Return
 
 ;-------------------------------------------------------------------------------
@@ -2544,74 +2728,74 @@ CODE_00869D:
 	; Handles graphics updates for field/map mode interface.
 	; Transfers palettes, tilemaps, and character status displays.
 	; ===========================================================================
-	
+
 	; ---------------------------------------------------------------------------
 	; Configure Palette DMA
 	; ---------------------------------------------------------------------------
-	
+
 	LDX.W #$2200                ; X = $2200 (DMA parameters)
 	STX.B SNES_DMA5PARAM-$4300  ; $4350 = DMA5 config
-	
+
 	LDX.W #$D824                ; X = $D824 (source offset)
 	STX.B SNES_DMA5ADDRL-$4300  ; $4352-$4353 = Source: $07D824
-	
+
 	LDA.B #$07                  ; A = $07
 	STA.B SNES_DMA5ADDRH-$4300  ; $4354 = Source bank $07
-	
+
 	LDX.W #$0010                ; X = $0010 (16 bytes)
 	STX.B SNES_DMA5CNTL-$4300   ; $4355-$4356 = Transfer size
-	
+
 	REP #$30                    ; 16-bit A, X, Y
-	
+
 	STZ.W $00F0                 ; [$00F0] = $0000 (clear state marker)
-	
+
 	PEA.W $0004                 ; Push $0004
 	PLB                         ; B = $04 (Data Bank = $04)
-	
+
 	; ---------------------------------------------------------------------------
 	; Check Character Status Update Flag ($00DE bit 6)
 	; ---------------------------------------------------------------------------
 	; If set, update single character's status display
 	; Otherwise, refresh all three character displays
 	; ---------------------------------------------------------------------------
-	
+
 	LDA.W #$0040                ; A = $0040 (bit 6 mask)
 	AND.W $00DE                 ; Test bit 6 of $00DE
 	BEQ CODE_0086F3             ; If clear → Update all characters
-	
+
 	; ---------------------------------------------------------------------------
 	; Single Character Status Update
 	; ---------------------------------------------------------------------------
 	; Updates one character's status display based on $010D and $010E
 	; ---------------------------------------------------------------------------
-	
+
 	LDA.W #$0040                ; A = $0040
 	TRB.W $00DE                 ; Test and Reset bit 6 of $00DE
 								; Clear "single character update" flag
-	
+
 	LDA.W $010D                 ; A = [$010D] (character position data)
 	AND.W #$FF00                ; A = A & $FF00 (mask high byte)
 	CLC                         ; Clear carry
 	ADC.W #$6180                ; A = A + $6180 (calculate VRAM address)
 	STA.W $2116                 ; $2116-$2117 = VRAM address
-	
+
 	LDA.W $010E                 ; A = [$010E] (character index)
 	ASL A                       ; A = A × 2 (convert to word offset)
 	TAX                         ; X = character table offset
-	
+
 	LDA.W $0107,X               ; A = [$0107 + X] (character data pointer)
 	TAX                         ; X = character data pointer
-	
+
 	PHA                         ; Save character data pointer
 	JSR.W CODE_008751           ; Transfer character graphics (2-part)
 	PLY                         ; Y = character data pointer (restore)
-	
+
 	PLB                         ; Restore Data Bank
-	
+
 	; ---------------------------------------------------------------------------
 	; Transfer Character Palette
 	; ---------------------------------------------------------------------------
-	
+
 	CLC                         ; Clear carry
 	LDA.W $010E                 ; A = [$010E] (character index)
 	ADC.W #$000D                ; A = A + $000D (palette offset)
@@ -2620,9 +2804,9 @@ CODE_00869D:
 	ASL A                       ; A = A × 8
 	ASL A                       ; A = A × 16 (multiply by 16)
 	TAX                         ; X = palette CGRAM address
-	
+
 	JSR.W CODE_00876C           ; Transfer character palette
-	
+
 	RTL                         ; Return
 
 ;-------------------------------------------------------------------------------
@@ -2634,83 +2818,83 @@ CODE_0086F3:
 	; Refreshes all three character status displays.
 	; Transfers character graphics, names, and palettes for the party.
 	; ===========================================================================
-	
+
 	; ---------------------------------------------------------------------------
 	; Transfer Base Menu Tilemap
 	; ---------------------------------------------------------------------------
-	
+
 	LDA.W #$6100                ; A = $6100 (VRAM address)
 	STA.W $2116                 ; Set VRAM address
-	
+
 	LDX.W #$9A20                ; X = $9A20 (source in bank $04)
 	LDY.W #$0004                ; Y = $0004 (DMA parameters)
 	JSL.L CODE_008DDF           ; Transfer tilemap part 1
-	
+
 	LDX.W #$CD20                ; X = $CD20 (source for second part)
 	LDY.W #$0004                ; Y = $0004 (DMA parameters)
 	JSL.L CODE_008DDF           ; Transfer tilemap part 2
-	
+
 	; ---------------------------------------------------------------------------
 	; Transfer Character 1 Graphics
 	; ---------------------------------------------------------------------------
-	
+
 	LDX.W $0107                 ; X = [$0107] (character 1 data pointer)
 	JSR.W CODE_008751           ; Transfer character 1 graphics
-	
+
 	; ---------------------------------------------------------------------------
 	; Transfer Character 2 Graphics
 	; ---------------------------------------------------------------------------
-	
+
 	LDA.W #$6280                ; A = $6280 (VRAM address for char 2)
 	STA.W $2116                 ; Set VRAM address
-	
+
 	LDX.W $0109                 ; X = [$0109] (character 2 data pointer)
 	JSR.W CODE_008751           ; Transfer character 2 graphics
-	
+
 	; ---------------------------------------------------------------------------
 	; Transfer Character 3 Graphics
 	; ---------------------------------------------------------------------------
-	
+
 	LDA.W #$6380                ; A = $6380 (VRAM address for char 3)
 	STA.W $2116                 ; Set VRAM address
-	
+
 	LDX.W $010B                 ; X = [$010B] (character 3 data pointer)
 	JSR.W CODE_008751           ; Transfer character 3 graphics
-	
+
 	PLB                         ; Restore Data Bank
-	
+
 	; ---------------------------------------------------------------------------
 	; Transfer Main Menu Palette
 	; ---------------------------------------------------------------------------
-	
+
 	LDA.W #$D824                ; A = $D824 (source address)
 	LDX.W #$00C0                ; X = $00C0 (CGRAM address = palette $C)
 	JSR.W CODE_00876F           ; Transfer palette
-	
+
 	; ---------------------------------------------------------------------------
 	; Transfer Character 1 Palette
 	; ---------------------------------------------------------------------------
-	
+
 	LDY.W $0107                 ; Y = [$0107] (character 1 data pointer)
 	LDX.W #$00D0                ; X = $00D0 (CGRAM address = palette $D)
 	JSR.W CODE_00876C           ; Transfer character palette
-	
+
 	; ---------------------------------------------------------------------------
 	; Transfer Character 2 Palette
 	; ---------------------------------------------------------------------------
-	
+
 	LDY.W $0109                 ; Y = [$0109] (character 2 data pointer)
 	LDX.W #$00E0                ; X = $00E0 (CGRAM address = palette $E)
 	JSR.W CODE_00876C           ; Transfer character palette
-	
+
 	; ---------------------------------------------------------------------------
 	; Transfer Character 3 Palette
 	; ---------------------------------------------------------------------------
-	
+
 	LDY.W $010B                 ; Y = [$010B] (character 3 data pointer)
 	LDX.W #$00F0                ; X = $00F0 (CGRAM address = palette $F)
 	JSR.W CODE_00876C           ; Transfer character palette
-	
+
 	RTL                         ; Return
 
 ;===============================================================================
@@ -2732,30 +2916,30 @@ CODE_008751:
 	;   +$00: Pointer to graphics part 1 (2 bytes)
 	;   +$02: Pointer to graphics part 2 (2 bytes)
 	; ===========================================================================
-	
+
 	PHX                         ; Save character data pointer
-	
+
 	; ---------------------------------------------------------------------------
 	; Transfer Graphics Part 1
 	; ---------------------------------------------------------------------------
-	
+
 	LDA.L $000000,X             ; A = [X+0] (graphics part 1 pointer)
 	TAX                         ; X = graphics part 1 pointer
 	LDY.W #$0004                ; Y = $0004 (DMA parameters)
 	JSL.L CODE_008DDF           ; Execute DMA transfer
-	
+
 	; ---------------------------------------------------------------------------
 	; Transfer Graphics Part 2
 	; ---------------------------------------------------------------------------
-	
+
 	PLX                         ; Restore character data pointer
-	
+
 	LDA.L $000002,X             ; A = [X+2] (graphics part 2 pointer)
 	TAX                         ; X = graphics part 2 pointer
 	LDY.W #$0004                ; Y = $0004 (DMA parameters)
 	JSL.L CODE_008DDF           ; Execute DMA transfer
 								; (VRAM address auto-increments from part 1)
-	
+
 	RTS                         ; Return
 
 ;-------------------------------------------------------------------------------
@@ -2771,7 +2955,7 @@ CODE_00876C:
 	;   X = CGRAM address (palette index)
 	;   Y = Character data pointer
 	; ===========================================================================
-	
+
 	LDA.W $0004,Y               ; A = [Y+4] (palette data pointer)
 								; Falls through to CODE_00876F
 
@@ -2789,22 +2973,22 @@ CODE_00876F:
 	;   Each color = 2 bytes (15-bit BGR format)
 	;   16 bytes = 8 colors per transfer
 	; ===========================================================================
-	
+
 	STA.B SNES_DMA5ADDRL-$4300  ; $4352-$4353 = Source address
-	
+
 	TXA                         ; A = X (CGRAM address)
 	SEP #$20                    ; 8-bit accumulator
-	
+
 	STA.W SNES_CGADD            ; $2121 = CGRAM address
-	
+
 	LDX.W #$0010                ; X = $0010 (16 bytes)
 	STX.B SNES_DMA5CNTL-$4300   ; $4355-$4356 = Transfer size
-	
+
 	LDA.B #$20                  ; A = $20 (DMA channel 5)
 	STA.W SNES_MDMAEN           ; $420B = Execute palette DMA
-	
+
 	REP #$30                    ; 16-bit A, X, Y
-	
+
 	RTS                         ; Return
 
 ;===============================================================================
@@ -2813,13 +2997,13 @@ CODE_00876F:
 
 ; Data table referenced by CODE_008784
 DATA8_008960:
-	.db $3C                     ; Tile $3C
-	
+	db $3C                     ; Tile $3C
+
 DATA8_008961:
-	.db $3D                     ; Tile $3D
-	
+	db $3D                     ; Tile $3D
+
 DATA8_008962:
-	.db $3E,$45,$3A,$3B         ; Tiles: $3E, $45, $3A, $3B
+	db $3E,$45,$3A,$3B         ; Tiles: $3E, $45, $3A, $3B
 
 ;===============================================================================
 ; MAIN GAME LOOP & FRAME UPDATE ($008966-$0089C5)
@@ -2844,17 +3028,17 @@ CODE_008966:
 	;   $0E99: High 8 bits (total 24-bit = ~16.7 million frames)
 	;   At 60fps, this counter wraps after ~77.9 hours of gameplay
 	; ===========================================================================
-	
+
 	REP #$30                    ; 16-bit A, X, Y
-	
+
 	LDA.W #$0000                ; A = $0000
 	TCD                         ; D = $0000 (Direct Page = zero page)
 								; Reset DP for main game logic
-	
+
 	; ---------------------------------------------------------------------------
 	; Increment 24-Bit Frame Counter
 	; ---------------------------------------------------------------------------
-	
+
 	INC.W $0E97                 ; Increment frame counter low word
 	BNE CODE_008974             ; If no overflow → Skip high byte increment
 	INC.W $0E99                 ; Increment high byte (24-bit overflow)
@@ -2865,41 +3049,41 @@ CODE_008974:
 	; ===========================================================================
 	; Time-Based Event Processing
 	; ===========================================================================
-	
+
 	JSR.W CODE_0089C6           ; Process time-based events (status effects, etc.)
-	
+
 	; ---------------------------------------------------------------------------
 	; Check Full Screen Refresh Flag ($00D4 bit 2)
 	; ---------------------------------------------------------------------------
 	; When set, indicates a major mode change requiring full redraw
 	; (battle start, menu open, scene transition, etc.)
 	; ---------------------------------------------------------------------------
-	
+
 	LDA.W #$0004                ; A = $0004 (bit 2 mask)
 	AND.W $00D4                 ; Test bit 2 of $00D4
 	BEQ CODE_008999             ; If clear → Normal frame processing
-	
+
 	; ---------------------------------------------------------------------------
 	; Full Screen Refresh Path
 	; ---------------------------------------------------------------------------
 	; Executes when entering/exiting major game modes.
 	; Performs complete redraw of both BG layers.
 	; ---------------------------------------------------------------------------
-	
+
 	LDA.W #$0004                ; A = $0004
 	TRB.W $00D4                 ; Test and Reset bit 2 of $00D4
 								; Clear "full refresh needed" flag
-	
+
 	; Refresh Background Layer 0
 	LDA.W #$0000                ; A = $0000 (BG layer 0)
 	JSR.W CODE_0091D4           ; Update BG layer 0 tilemap
 	JSR.W CODE_008C3D           ; Transfer layer 0 to VRAM
-	
+
 	; Refresh Background Layer 1
 	LDA.W #$0001                ; A = $0001 (BG layer 1)
 	JSR.W CODE_0091D4           ; Update BG layer 1 tilemap
 	JSR.W CODE_008D29           ; Transfer layer 1 to VRAM
-	
+
 	BRA CODE_0089BD             ; → Skip to animation update
 
 ;-------------------------------------------------------------------------------
@@ -2911,21 +3095,21 @@ CODE_008999:
 	; Standard per-frame update when not doing full refresh.
 	; Handles incremental tilemap updates and controller input.
 	; ===========================================================================
-	
+
 	JSR.W CODE_008BFD           ; Update tilemap changes (scrolling, etc.)
-	
+
 	; ---------------------------------------------------------------------------
 	; Check Menu Mode Flag ($00DA bit 4)
 	; ---------------------------------------------------------------------------
-	
+
 	LDA.W #$0010                ; A = $0010 (bit 4 mask)
 	AND.W $00DA                 ; Test bit 4 of $00DA (menu mode flag)
 	BNE CODE_0089AC             ; If set → Process controller input
-	
+
 	; ---------------------------------------------------------------------------
 	; Check Input Processing Enable ($00E2 bit 2)
 	; ---------------------------------------------------------------------------
-	
+
 	LDA.W #$0004                ; A = $0004 (bit 2 mask)
 	AND.W $00E2                 ; Test bit 2 of $00E2
 	BNE CODE_0089BD             ; If set → Skip input (cutscene/auto mode)
@@ -2939,25 +3123,25 @@ CODE_0089AC:
 	; Processes joypad input when enabled.
 	; Calls appropriate handler based on current game mode.
 	; ===========================================================================
-	
+
 	LDA.B $07                   ; A = [$07] (controller data - current frame)
 	AND.B $8E                   ; A = A & [$8E] (input enable mask)
 	BEQ CODE_0089BD             ; If zero → No valid input, skip processing
-	
+
 	; ---------------------------------------------------------------------------
 	; Determine Input Handler
 	; ---------------------------------------------------------------------------
 	; CODE_009730 returns handler index in A based on game state
 	; Handler table at CODE_008A35 dispatches to appropriate routine
 	; ---------------------------------------------------------------------------
-	
+
 	JSL.L CODE_009730           ; Get input handler index for current mode
-	
+
 	SEP #$30                    ; 8-bit A, X, Y
-	
+
 	ASL A                       ; A = A × 2 (convert to word offset)
 	TAX                         ; X = handler table offset
-	
+
 	JSR.W (CODE_008A35,X)       ; Call appropriate input handler
 								; (indirect jump through handler table)
 
@@ -2970,12 +3154,12 @@ CODE_0089BD:
 	; Final phase of frame processing.
 	; Updates animations, sprites, and game state.
 	; ===========================================================================
-	
+
 	REP #$30                    ; 16-bit A, X, Y
-	
+
 	JSR.W CODE_009342           ; Update sprite animations
 	JSR.W CODE_009264           ; Update game state and logic
-	
+
 	RTL                         ; Return to NMI handler continuation
 
 ;===============================================================================
@@ -2997,7 +3181,7 @@ CODE_0089C6:
 	; Status Effect Checks:
 	;   Character slots at fixed SRAM addresses:
 	;   $700027: Character 1 status
-	;   $700077: Character 2 status  
+	;   $700077: Character 2 status
 	;   $7003B3: Character 3 status
 	;   $700403: Character 4 status
 	;   $70073F: Character 5 status
@@ -3005,45 +3189,45 @@ CODE_0089C6:
 	;
 	; $00DE bit 7: Time-based processing enabled flag
 	; ===========================================================================
-	
+
 	PHD                         ; Save Direct Page
-	
+
 	; ---------------------------------------------------------------------------
 	; Check Time-Based Processing Enable Flag
 	; ---------------------------------------------------------------------------
-	
+
 	LDA.W #$0080                ; A = $0080 (bit 7 mask)
 	AND.W $00DE                 ; Test bit 7 of $00DE
 	BEQ CODE_008A26             ; If clear → Skip time-based processing
-	
+
 	; ---------------------------------------------------------------------------
 	; Set Direct Page for Character Status Access
 	; ---------------------------------------------------------------------------
-	
+
 	LDA.W #$0C00                ; A = $0C00
 	TCD                         ; D = $0C00 (Direct Page = $0C00)
 								; Allows $01 to access $0C01, etc.
-	
+
 	SEP #$30                    ; 8-bit A, X, Y
-	
+
 	; ---------------------------------------------------------------------------
 	; Decrement Timer and Check for Event Trigger
 	; ---------------------------------------------------------------------------
-	
+
 	DEC.W $010D                 ; Decrement timer
 	BPL CODE_008A26             ; If still positive → Exit (not time yet)
-	
+
 	; Timer expired - reset and process status effects
 	LDA.B #$0C                  ; A = $0C (12 frames)
 	STA.W $010D                 ; Reset timer to 12 frames
-	
+
 	; ---------------------------------------------------------------------------
 	; Check Character 1 Status ($700027)
 	; ---------------------------------------------------------------------------
-	
+
 	LDA.L $700027               ; A = [$700027] (character 1 status flags)
 	BNE CODE_0089EA             ; If non-zero → Character 1 has status effect
-	
+
 	LDX.B #$40                  ; X = $40 (character 1 offset)
 	JSR.W CODE_008A2A           ; Update character 1 display
 
@@ -3053,10 +3237,10 @@ CODE_0089EA:
 	; ---------------------------------------------------------------------------
 	; Check Character 2 Status ($700077)
 	; ---------------------------------------------------------------------------
-	
+
 	LDA.L $700077               ; A = [$700077] (character 2 status)
 	BNE CODE_0089F5             ; If non-zero → Character 2 has status
-	
+
 	LDX.B #$50                  ; X = $50 (character 2 offset)
 	JSR.W CODE_008A2A           ; Update character 2 display
 
@@ -3066,10 +3250,10 @@ CODE_0089F5:
 	; ---------------------------------------------------------------------------
 	; Check Character 3 Status ($7003B3)
 	; ---------------------------------------------------------------------------
-	
+
 	LDA.L $7003B3               ; A = [$7003B3] (character 3 status)
 	BNE CODE_008A00             ; If non-zero → Character 3 has status
-	
+
 	LDX.B #$60                  ; X = $60 (character 3 offset)
 	JSR.W CODE_008A2A           ; Update character 3 display
 
@@ -3079,10 +3263,10 @@ CODE_008A00:
 	; ---------------------------------------------------------------------------
 	; Check Character 4 Status ($700403)
 	; ---------------------------------------------------------------------------
-	
+
 	LDA.L $700403               ; A = [$700403] (character 4 status)
 	BNE CODE_008A0B             ; If non-zero → Character 4 has status
-	
+
 	LDX.B #$70                  ; X = $70 (character 4 offset)
 	JSR.W CODE_008A2A           ; Update character 4 display
 
@@ -3092,10 +3276,10 @@ CODE_008A0B:
 	; ---------------------------------------------------------------------------
 	; Check Character 5 Status ($70073F)
 	; ---------------------------------------------------------------------------
-	
+
 	LDA.L $70073F               ; A = [$70073F] (character 5 status)
 	BNE CODE_008A16             ; If non-zero → Character 5 has status
-	
+
 	LDX.B #$80                  ; X = $80 (character 5 offset)
 	JSR.W CODE_008A2A           ; Update character 5 display
 
@@ -3105,10 +3289,10 @@ CODE_008A16:
 	; ---------------------------------------------------------------------------
 	; Check Character 6 Status ($70078F)
 	; ---------------------------------------------------------------------------
-	
+
 	LDA.L $70078F               ; A = [$70078F] (character 6 status)
 	BNE CODE_008A21             ; If non-zero → Character 6 has status
-	
+
 	LDX.B #$90                  ; X = $90 (character 6 offset)
 	JSR.W CODE_008A2A           ; Update character 6 display
 
@@ -3118,7 +3302,7 @@ CODE_008A21:
 	; ---------------------------------------------------------------------------
 	; Set Sprite Update Flag
 	; ---------------------------------------------------------------------------
-	
+
 	LDA.B #$20                  ; A = $20 (bit 5)
 	TSB.W $00D2                 ; Set bit 5 of $00D2 (sprite update needed)
 
@@ -3128,7 +3312,7 @@ CODE_008A26:
 	; ===========================================================================
 	; Restore Direct Page and Return
 	; ===========================================================================
-	
+
 	REP #$30                    ; 16-bit A, X, Y
 	PLD                         ; Restore Direct Page
 	RTS                         ; Return
@@ -3148,27 +3332,27 @@ CODE_008A2A:
 	; Character Display Structure (at $0C00 + X):
 	;   +$02: Status tile base value
 	;   +$06: Status tile 1
-	;   +$0A: Status tile 2  
+	;   +$0A: Status tile 2
 	;   +$0E: Status tile 3
 	;
 	; Tile Animation:
 	;   Toggles bit 2 of base value (XOR $04)
 	;   Then writes base+0, base+1, base+2, base+3 to tile slots
 	; ===========================================================================
-	
+
 	LDA.B $02,X                 ; A = [$0C02+X] (current tile base)
 	EOR.B #$04                  ; A = A XOR $04 (toggle bit 2 for animation)
 	STA.B $02,X                 ; [$0C02+X] = new tile base
-	
+
 	INC A                       ; A = base + 1
 	STA.W $0C06,X               ; [$0C06+X] = base + 1 (tile 1)
-	
+
 	INC A                       ; A = base + 2
 	STA.W $0C0A,X               ; [$0C0A+X] = base + 2 (tile 2)
-	
+
 	INC A                       ; A = base + 3
 	STA.W $0C0E,X               ; [$0C0E+X] = base + 3 (tile 3)
-	
+
 	RTS                         ; Return
 
 ;===============================================================================
@@ -3185,23 +3369,15 @@ CODE_008A35:
 	; Handler addresses are stored as 16-bit little-endian values.
 	; JSR (table,X) performs indirect jump to selected handler.
 	; ===========================================================================
-	
+
 	; Note: This data is being used as code by the previous instruction
 	; STA.W $0C0A,X at CODE_008A35 continues from CODE_008A2A
 	; The actual table starts here with word addresses:
-	
-	dw $8ACF                   ; Handler 0: Field mode input
-	.dw $8AF8                   ; Handler 1: Menu mode input (down)
-	.dw $8B68                   ; Handler 2: (continues below)
-	.dw $8B68                   ; Handler 3: 
-	.dw $8A61                   ; Handler 4: D-pad up
-	.dw $8A5D                   ; Handler 5: D-pad left
-	.dw $8A59                   ; Handler 6: D-pad right
-	.dw $8A55                   ; Handler 7: D-pad down
-	.dw $8B68                   ; Handler 8:
-	.dw $8B68                   ; Handler 9:
-	.dw $8A9D                   ; Handler 10: A button
-	.dw $8B68                   ; Handler 11:
+
+	; Handler jump table data (12 entries x 2 bytes = 24 bytes)
+	db $CF,$8A, $F8,$8A, $68,$8B, $68,$8B  ; Handlers 0-3
+	db $61,$8A, $5D,$8A, $59,$8A, $55,$8A  ; Handlers 4-7
+	db $68,$8B, $68,$8B, $9D,$8A, $68,$8B  ; Handlers 8-11
 
 ;===============================================================================
 ; CURSOR MOVEMENT HANDLERS ($008A55-$008A9C)
@@ -3216,7 +3392,7 @@ CODE_008A55:
 
 CODE_008A59:
 	; ===========================================================================
-	; Cursor Up Handler  
+	; Cursor Up Handler
 	; ===========================================================================
 	INC.B $02                   ; Increment vertical position
 	BRA CODE_008A63             ; → Validate position
@@ -3249,13 +3425,13 @@ CODE_008A63:
 	;   $95 bit 0: Allow negative X wrapping
 	;   $95 bit 1: Allow X overflow wrapping
 	; ===========================================================================
-	
+
 	LDA.B $01                   ; A = X position
 	BMI CODE_008A78             ; If negative → Check wrap flags
-	
+
 	CMP.B $03                   ; Compare with max X
 	BCC CODE_008A80             ; If X < max → Valid, continue
-	
+
 	; X position at or above maximum
 	LDA.B $95                   ; A = wrap flags
 	AND.B #$01                  ; Test bit 0 (allow overflow)
@@ -3277,7 +3453,7 @@ CODE_008A78:
 	LDA.B $95                   ; A = wrap flags
 	AND.B #$02                  ; Test bit 1 (allow negative)
 	BNE CODE_008A71             ; If set → Clamp to max-1
-	
+
 	STZ.B $01                   ; X position = 0 (clamp to minimum)
 
 ;-------------------------------------------------------------------------------
@@ -3294,13 +3470,13 @@ CODE_008A80:
 	;   $95 bit 2: Allow negative Y wrapping
 	;   $95 bit 3: Allow Y overflow wrapping
 	; ===========================================================================
-	
+
 	LDA.B $02                   ; A = Y position
 	BMI CODE_008A94             ; If negative → Check wrap flags
-	
+
 	CMP.B $04                   ; Compare with max Y
 	BCC CODE_008A9C             ; If Y < max → Valid, exit
-	
+
 	; Y position at or above maximum
 	LDA.B $95                   ; A = wrap flags
 	AND.B #$04                  ; Test bit 2 (allow overflow)
@@ -3322,7 +3498,7 @@ CODE_008A94:
 	LDA.B $95                   ; A = wrap flags
 	AND.B #$08                  ; Test bit 3 (allow negative)
 	BNE CODE_008A8E             ; If set → Clamp to max-1
-	
+
 	STZ.B $02                   ; Y position = 0 (clamp to minimum)
 
 ;-------------------------------------------------------------------------------
@@ -3341,22 +3517,22 @@ CODE_008A9D:
 	; Handles A button press to toggle character status display.
 	; Shows/hides detailed character information in battle mode.
 	; ===========================================================================
-	
+
 	JSR.W CODE_008B57           ; Check if input allowed
 	BNE CODE_008ABC             ; If blocked → Exit
-	
+
 	; Check if in valid screen position
 	LDA.W $1090                 ; A = [$1090] (screen mode/position)
 	BMI CODE_008AB9             ; If negative → Call alternate handler
-	
+
 	; Toggle character status display
 	LDA.W $10A0                 ; A = [$10A0] (character display flags)
 	EOR.B #$80                  ; Toggle bit 7
 	STA.W $10A0                 ; Save new flag state
-	
+
 	LDA.B #$40                  ; A = $40 (bit 6)
 	TSB.W $00D4                 ; Set bit 6 of $00D4 (update needed)
-	
+
 	JSR.W CODE_00B908           ; Update character display
 	BRA CODE_008ABC             ; → Exit
 
@@ -3381,14 +3557,14 @@ CODE_008ABD:
 	;   $1032 = $80 and $1033 = $00 → Special case, call B912
 	;   Otherwise → Call B908
 	; ===========================================================================
-	
+
 	LDA.W $1032                 ; A = [$1032] (X position)
 	CMP.B #$80                  ; Compare with $80
 	BNE CODE_008ACC             ; If not $80 → Jump to B908
-	
+
 	LDA.W $1033                 ; A = [$1033] (Y position)
 	BNE CODE_008ACC             ; If not $00 → Jump to B908
-	
+
 	JMP.W CODE_00B912           ; Special position → Call B912
 
 ;-------------------------------------------------------------------------------
@@ -3405,20 +3581,20 @@ CODE_008ACF:
 	; Handles up/down navigation through character list in menu.
 	; Cycles through valid characters, skipping invalid/dead entries.
 	; ===========================================================================
-	
+
 	JSR.W CODE_008B57           ; Check if input allowed
 	BNE CODE_008AF7             ; If blocked → Exit
-	
+
 	JSR.W CODE_008ABD           ; Validate character position
-	
+
 	; ---------------------------------------------------------------------------
 	; Calculate Current Character Index
 	; ---------------------------------------------------------------------------
-	
+
 	LDA.W $1031                 ; A = [$1031] (Y position)
 	SEC                         ; Set carry for subtraction
 	SBC.B #$20                  ; A = Y - $20 (base offset)
-	
+
 	LDX.B #$FF                  ; X = -1 (character counter)
 
 ;-------------------------------------------------------------------------------
@@ -3428,7 +3604,7 @@ CODE_008ADF:
 	INX                         ; X++
 	SBC.B #$03                  ; A -= 3
 	BCS CODE_008ADF             ; If carry still set → Continue dividing
-	
+
 	; X now contains character index (0-3)
 	TXA                         ; A = character index
 
@@ -3441,17 +3617,17 @@ CODE_008AE5:
 	; Increments character index and checks if character is valid.
 	; Loops until valid character found.
 	; ===========================================================================
-	
+
 	INC A                       ; A = next character index
 	AND.B #$03                  ; A = A & $03 (wrap 0-3)
-	
+
 	PHA                         ; Save character index
 	JSR.W CODE_008DA8           ; Check if character is valid
 	PLA                         ; Restore character index
-	
+
 	CPY.B #$FF                  ; Check if character invalid (Y = $FF)
 	BEQ CODE_008AE5             ; If invalid → Try next character
-	
+
 	; Valid character found
 	JSR.W CODE_008B21           ; Update character display
 	JSR.W CODE_008C3D           ; Refresh graphics
@@ -3468,16 +3644,16 @@ CODE_008AF8:
 	; Handles down navigation, cycles backwards through character list.
 	; Same as CODE_008ACF but decrements instead of increments.
 	; ===========================================================================
-	
+
 	JSR.W CODE_008B57           ; Check if input allowed
 	BNE CODE_008B20             ; If blocked → Exit
-	
+
 	JSR.W CODE_008ABD           ; Validate character position
-	
+
 	LDA.W $1031                 ; A = [$1031] (Y position)
 	SEC                         ; Set carry
 	SBC.B #$20                  ; A = Y - $20 (base offset)
-	
+
 	LDX.B #$FF                  ; X = -1 (counter)
 
 ;-------------------------------------------------------------------------------
@@ -3486,7 +3662,7 @@ CODE_008B08:
 	INX                         ; X++
 	SBC.B #$03                  ; A -= 3
 	BCS CODE_008B08             ; If carry → Continue
-	
+
 	TXA                         ; A = character index
 
 ;-------------------------------------------------------------------------------
@@ -3495,14 +3671,14 @@ CODE_008B0E:
 	; Cycle to previous valid character
 	DEC A                       ; A = previous character index
 	AND.B #$03                  ; A = A & $03 (wrap 0-3)
-	
+
 	PHA                         ; Save index
 	JSR.W CODE_008DA8           ; Check if character valid
 	PLA                         ; Restore index
-	
+
 	CPY.B #$FF                  ; Check if invalid
 	BEQ CODE_008B0E             ; If invalid → Try previous
-	
+
 	JSR.W CODE_008B21           ; Update character display
 	JSR.W CODE_008C3D           ; Refresh graphics
 
@@ -3524,21 +3700,21 @@ CODE_008B21:
 	;   Y < $29: Use tilemap at $3729
 	;   Y >= $29: Use tilemap at $3739
 	; ===========================================================================
-	
+
 	REP #$30                    ; 16-bit A, X, Y
-	
+
 	LDX.W #$3709                ; X = $3709 (default tilemap 1)
 	CPY.W #$0023                ; Compare Y with $23
 	BCC CODE_008B3E             ; If Y < $23 → Use tilemap 1
-	
+
 	LDX.W #$3719                ; X = $3719 (tilemap 2)
 	CPY.W #$0026                ; Compare Y with $26
 	BCC CODE_008B3E             ; If Y < $26 → Use tilemap 2
-	
+
 	LDX.W #$3729                ; X = $3729 (tilemap 3)
 	CPY.W #$0029                ; Compare Y with $29
 	BCC CODE_008B3E             ; If Y < $29 → Use tilemap 3
-	
+
 	LDX.W #$3739                ; X = $3739 (tilemap 4, Y >= $29)
 
 ;-------------------------------------------------------------------------------
@@ -3554,26 +3730,26 @@ CODE_008B3E:
 	;   Copies (A+1) bytes from X to Y
 	;   Auto-increments X and Y, decrements A
 	; ===========================================================================
-	
+
 	LDY.W #$3669                ; Y = $3669 (destination in bank $7E)
 	LDA.W #$000F                ; A = $000F (15, so copy 16 bytes)
 	MVN $7E,$7E                 ; Copy 16 bytes from X to Y (both in $7E)
-	
+
 	PHK                         ; Push program bank
 	PLB                         ; Pull to data bank (B = $00)
-	
+
 	; ---------------------------------------------------------------------------
 	; Refresh Background Layer
 	; ---------------------------------------------------------------------------
-	
+
 	LDA.W #$0000                ; A = $0000 (BG layer 0)
 	JSR.W CODE_0091D4           ; Update layer 0
-	
+
 	SEP #$30                    ; 8-bit A, X, Y
-	
+
 	LDA.B #$80                  ; A = $80 (bit 7)
 	TSB.W $00D9                 ; Set bit 7 of $00D9
-	
+
 	RTS                         ; Return
 
 ;-------------------------------------------------------------------------------
@@ -3592,18 +3768,18 @@ CODE_008B57:
 	; $00D6 bit 4: Input block flag
 	; $92: Controller state (masked to disable certain buttons)
 	; ===========================================================================
-	
+
 	LDA.B #$10                  ; A = $10 (bit 4 mask)
 	AND.W $00D6                 ; Test bit 4 of $00D6
 	BEQ CODE_008B67             ; If clear → Input allowed, exit
-	
+
 	; Input blocked - mask controller state
 	REP #$30                    ; 16-bit A, X, Y
-	
+
 	LDA.B $92                   ; A = [$92] (controller state)
 	AND.W #$BFCF                ; A = A & $BFCF (mask bits 4-5, 14)
 								; Disables: bit 4, bit 5, bit 14
-	
+
 	SEP #$30                    ; 8-bit A, X, Y
 
 CODE_008B67:
@@ -3635,47 +3811,47 @@ CODE_008BA0:
 	; $00D2 bit 3: Special input mode
 	; $00DB bit 2: Alternate input filtering
 	; ===========================================================================
-	
+
 	REP #$30                    ; 16-bit A, X, Y
-	
+
 	LDA.W #$0000                ; A = $0000
 	TCD                         ; D = $0000 (Direct Page = zero page)
-	
+
 	; ---------------------------------------------------------------------------
 	; Check Controller Read Enable
 	; ---------------------------------------------------------------------------
-	
+
 	LDA.W #$0040                ; A = $0040 (bit 6 mask)
 	AND.W $00D6                 ; Test bit 6 of $00D6
 	BNE CODE_008BFC             ; If set → Controller disabled, exit
-	
+
 	; ---------------------------------------------------------------------------
 	; Save Previous Controller State
 	; ---------------------------------------------------------------------------
-	
+
 	LDA.B $92                   ; A = current controller state
 	STA.B $96                   ; Save as previous state
-	
+
 	; ---------------------------------------------------------------------------
 	; Check Special Input Mode ($00D2 bit 3)
 	; ---------------------------------------------------------------------------
-	
+
 	LDA.W #$0008                ; A = $0008 (bit 3 mask)
 	AND.W $00D2                 ; Test bit 3 of $00D2
 	BNE CODE_008BC7             ; If set → Special input mode
-	
+
 	; ---------------------------------------------------------------------------
 	; Check Alternate Input Filter ($00DB bit 2)
 	; ---------------------------------------------------------------------------
-	
+
 	LDA.W #$0004                ; A = $0004 (bit 2 mask)
 	AND.W $00DB                 ; Test bit 2 of $00DB
 	BNE CODE_008BD2             ; If set → Use alternate filtering
-	
+
 	; ---------------------------------------------------------------------------
 	; Normal Controller Read
 	; ---------------------------------------------------------------------------
-	
+
 	LDA.W SNES_CNTRL1L          ; A = [$4218] (Controller 1 input)
 								; Reads 16-bit joypad state
 	BRA CODE_008BEA             ; → Process input
@@ -3689,11 +3865,11 @@ CODE_008BC7:
 	; Reads controller but masks out D-pad directions.
 	; Only allows button presses (A, B, X, Y, L, R, Start, Select).
 	; ===========================================================================
-	
+
 	LDA.W SNES_CNTRL1L          ; A = controller state
 	AND.W #$FFF0                ; A = A & $FFF0 (clear bits 0-3, D-pad)
 	BEQ CODE_008BEA             ; If zero → No buttons pressed
-	
+
 	JMP.W CODE_0092F0           ; → Special button handler
 
 ;-------------------------------------------------------------------------------
@@ -3704,13 +3880,13 @@ CODE_008BD2:
 	; ===========================================================================
 	; Checks $00D9 bit 1 for additional filtering mode.
 	; ===========================================================================
-	
+
 	LDA.W #$0002                ; A = $0002 (bit 1 mask)
 	AND.W $00D9                 ; Test bit 1 of $00D9
 	BEQ CODE_008BDF             ; If clear → Normal alternate mode
-	
+
 	; Special alternate mode (incomplete in disassembly)
-	.db $A9,$80,$00,$04,$90     ; Raw bytes (seems incomplete)
+	db $A9,$80,$00,$04,$90     ; Raw bytes (seems incomplete)
 
 ;-------------------------------------------------------------------------------
 
@@ -3718,7 +3894,7 @@ CODE_008BDF:
 	LDA.W SNES_CNTRL1L          ; A = controller state
 	AND.W #$FFF0                ; Mask D-pad
 	BEQ CODE_008BEA             ; If zero → No buttons
-	
+
 	JMP.W CODE_0092F6           ; → Alternate button handler
 
 ;-------------------------------------------------------------------------------
@@ -3730,20 +3906,20 @@ CODE_008BEA:
 	; Combines current hardware input with software autofire.
 	; Calculates newly pressed buttons.
 	; ===========================================================================
-	
+
 	ORA.B $90                   ; A = A | [$90] (OR with autofire bits)
 	AND.W #$FFF0                ; Mask to buttons only
 	STA.B $94                   ; [$94] = all pressed buttons this frame
-	
+
 	TAX                         ; X = pressed buttons (for later)
-	
+
 	TRB.B $96                   ; Clear pressed buttons from previous state
 								; $96 now = buttons released this frame
-	
+
 	LDA.B $92                   ; A = previous frame state
 	TRB.B $94                   ; Clear held buttons from new press state
 								; $94 now = newly pressed buttons only
-	
+
 	STX.B $92                   ; Save current state
 	STZ.B $90                   ; Clear autofire accumulator
 
@@ -3771,29 +3947,29 @@ CODE_008BFD:
 	;   $94: Newly pressed buttons
 	;   $92: Currently held buttons
 	; ===========================================================================
-	
+
 	STZ.B $07                   ; Clear output (no input by default)
-	
+
 	; ---------------------------------------------------------------------------
 	; Check for New Button Presses
 	; ---------------------------------------------------------------------------
-	
+
 	LDA.B $94                   ; A = newly pressed buttons
 	BNE CODE_008C13             ; If any new press → Handle immediate input
-	
+
 	; ---------------------------------------------------------------------------
 	; Handle Held Buttons (Autofire)
 	; ---------------------------------------------------------------------------
-	
+
 	LDA.B $92                   ; A = currently held buttons
 	BEQ CODE_008C12             ; If nothing held → Exit
-	
+
 	DEC.B $09                   ; Decrement autofire timer
 	BPL CODE_008C12             ; If timer still positive → Exit (not ready)
-	
+
 	; Timer expired - trigger autofire event
 	STA.B $07                   ; Output = held buttons (simulate new press)
-	
+
 	LDA.W #$0005                ; A = $05 (5 frames)
 	STA.B $09                   ; Reset timer to 5 for repeat rate
 
@@ -3808,12 +3984,12 @@ CODE_008C13:
 	; ===========================================================================
 	; When button first pressed, output immediately and set long timer.
 	; ===========================================================================
-	
+
 	STA.B $07                   ; Output = new button presses
-	
+
 	LDA.W #$0019                ; A = $19 (25 frames)
 	STA.B $09                   ; Set timer to 25 (initial delay)
-	
+
 	RTS                         ; Return
 
 ;===============================================================================
@@ -3845,50 +4021,50 @@ CODE_008C1B:
 	;   2. Extract X coordinate (bits 0-2) → multiply by 12
 	;   3. Add base address $8000
 	; ===========================================================================
-	
+
 	PHP                         ; Save processor status
 	REP #$30                    ; 16-bit A, X, Y
-	
+
 	AND.W #$00FF                ; A = A & $FF (ensure 8-bit value)
 	PHA                         ; Save original coordinate
-	
+
 	; ---------------------------------------------------------------------------
 	; Extract and Process Y Coordinate (Bits 3-5)
 	; ---------------------------------------------------------------------------
-	
+
 	AND.W #$0038                ; A = A & $38 (extract bits 3-5: Y coord)
 	ASL A                       ; A = A × 2 (Y × 2)
 	TAX                         ; X = Y × 2 (save for later)
-	
+
 	; ---------------------------------------------------------------------------
 	; Extract and Process X Coordinate (Bits 0-2)
 	; ---------------------------------------------------------------------------
-	
+
 	PLA                         ; A = original coordinate
 	AND.W #$0007                ; A = A & $07 (extract bits 0-2: X coord)
-	
+
 	PHX                         ; Save Y×2 on stack
-	
+
 	; Calculate X contribution: X × 12
 	ADC.B $01,S                 ; A = X + (Y×2)  [1st add]
 	STA.B $01,S                 ; Save intermediate result
-	
+
 	ASL A                       ; A = (X + Y×2) × 2
 	ADC.B $01,S                 ; A = result×2 + result = result×3
-	
+
 	ASL A                       ; A = result × 6
 	ASL A                       ; A = result × 12
 	ASL A                       ; A = result × 24
 	ASL A                       ; A = result × 48
-	
+
 	; ---------------------------------------------------------------------------
 	; Add Base Address
 	; ---------------------------------------------------------------------------
-	
+
 	ADC.W #$8000                ; A = A + $8000 (add base VRAM address)
-	
+
 	PLX                         ; Clean stack (discard saved Y×2)
-	
+
 	PLP                         ; Restore processor status
 	RTS                         ; Return with VRAM address in A
 
@@ -3904,59 +4080,59 @@ CODE_008C3D:
 	; $1031: Character Y position (row)
 	; $00D8 bit 1: Battle mode flag
 	; ===========================================================================
-	
+
 	PHP                         ; Save processor status
 	SEP #$30                    ; 8-bit A, X, Y
-	
+
 	LDX.W $1031                 ; X = character Y position
 	CPX.B #$FF                  ; Check if invalid position
 	BEQ UNREACH_008C81          ; If $FF → Exit (invalid)
-	
+
 	; ---------------------------------------------------------------------------
 	; Check Battle Mode Flag
 	; ---------------------------------------------------------------------------
-	
+
 	LDA.B #$02                  ; A = $02 (bit 1 mask)
 	AND.W $00D8                 ; Test bit 1 of $00D8
 	BEQ CODE_008C83             ; If clear → Field mode
-	
+
 	; ---------------------------------------------------------------------------
 	; Battle Mode Tilemap Update
 	; ---------------------------------------------------------------------------
 	; Uses special tilemap data from bank $04
 	; ---------------------------------------------------------------------------
-	
+
 	LDA.L DATA8_049800,X        ; A = [$049800+X] (base tile value)
 	ADC.B #$0A                  ; A = A + $0A (offset for battle tiles)
 	XBA                         ; Swap A high/low bytes (save in high byte)
-	
+
 	; Calculate tile position
 	TXA                         ; A = X (Y position)
 	AND.B #$38                  ; A = A & $38 (extract Y coordinate bits)
 	ASL A                       ; A = A × 2
 	PHA                         ; Save Y offset
-	
+
 	TXA                         ; A = X again
 	AND.B #$07                  ; A = A & $07 (extract X coordinate)
 	ORA.B $01,S                 ; A = A | Y_offset (combine X and Y)
 	PLX                         ; X = Y offset (cleanup stack)
-	
+
 	ASL A                       ; A = coordinate × 2 (word address)
-	
+
 	REP #$30                    ; 16-bit A, X, Y
-	
+
 	; Store tile values in WRAM buffer $7F075A
 	STA.L $7F075A               ; [$7F075A] = tile 1 coordinate
 	INC A                       ; A = A + 1 (next tile)
 	STA.L $7F075C               ; [$7F075C] = tile 2 coordinate
-	
+
 	ADC.W #$000F                ; A = A + $0F (skip to next row)
 	STA.L $7F079A               ; [$7F079A] = tile 3 coordinate (row 2)
 	INC A                       ; A = A + 1
 	STA.L $7F079C               ; [$7F079C] = tile 4 coordinate (row 2)
-	
+
 	SEP #$20                    ; 8-bit accumulator
-	
+
 	LDX.W #$17DA                ; X = $17DA (WRAM data source)
 	LDA.B #$7F                  ; A = $7F (bank $7F)
 	BRA CODE_008C9C             ; → Continue to transfer
@@ -3964,7 +4140,7 @@ CODE_008C3D:
 ;-------------------------------------------------------------------------------
 
 UNREACH_008C81:
-	.db $28,$60                 ; Unreachable code: PLP, RTS
+	db $28,$60                 ; Unreachable code: PLP, RTS
 
 ;-------------------------------------------------------------------------------
 
@@ -3974,18 +4150,18 @@ CODE_008C83:
 	; ===========================================================================
 	; Normal field/map mode cursor update
 	; ===========================================================================
-	
+
 	LDA.L DATA8_049800,X        ; A = [$049800+X] (base tile)
 	ASL A                       ; A = A × 2
 	ASL A                       ; A = A × 4 (tile offset)
 	STA.W $00F4                 ; [$00F4] = tile offset
-	
+
 	REP #$10                    ; 16-bit X, Y
-	
+
 	LDA.W $1031                 ; A = character Y position
 	JSR.W CODE_008D8A           ; Calculate tilemap address
 	STX.W $00F2                 ; [$00F2] = tilemap address
-	
+
 	LDX.W #$2D1A                ; X = $2D1A (WRAM source address)
 	LDA.B #$7E                  ; A = $7E (bank $7E)
 
@@ -4004,25 +4180,25 @@ CODE_008C9C:
 	;   Bit 3-4: Palette selection
 	;   Bit 7: Priority
 	; ===========================================================================
-	
+
 	PHA                         ; Save bank number
-	
+
 	LDA.B #$04                  ; A = $04 (bit 2 mask)
 	AND.W $00DA                 ; Test bit 2 of $00DA
 	BEQ CODE_008CC5             ; If clear → Normal cursor
-	
+
 	; Check blink timer
 	LDA.W $0014                 ; A = [$0014] (blink timer)
 	DEC A                       ; A = A - 1
 	BEQ CODE_008CC5             ; If zero → Show cursor
-	
+
 	; Apply alternate palette during blink
 	LDA.B #$10                  ; A = $10 (bit 4 mask)
 	AND.W $00DA                 ; Test bit 4 of $00DA
 	BNE CODE_008CBB             ; If set → Special blink mode
-	
+
 	; Normal blink mode (incomplete in disassembly)
-	.db $AB,$BD,$01,$00,$29,$E3,$09,$94,$80,$12
+	db $AB,$BD,$01,$00,$29,$E3,$09,$94,$80,$12
 
 ;-------------------------------------------------------------------------------
 
@@ -4050,29 +4226,29 @@ CODE_008CCD:
 	; For certain Y positions (>=$29), displays 2-digit numbers.
 	; Used for item quantities, HP values, etc.
 	; ===========================================================================
-	
+
 	XBA                         ; Swap A bytes (save attributes in high byte)
-	
+
 	LDA.L $001031               ; A = Y position
 	CMP.B #$29                  ; Compare with $29
 	BCC CODE_008D11             ; If Y < $29 → Use simple tile display
-	
+
 	CMP.B #$2C                  ; Compare with $2C
 	BEQ CODE_008D11             ; If Y = $2C → Use simple tile display
-	
+
 	; ---------------------------------------------------------------------------
 	; Two-Digit Number Display
 	; ---------------------------------------------------------------------------
 	; Displays a number as two separate digit tiles
 	; $1030 contains the value to display (0-99)
 	; ---------------------------------------------------------------------------
-	
+
 	LDA.W $0001,X               ; A = tile attribute
 	AND.B #$63                  ; Clear certain attribute bits
 	ORA.B #$08                  ; Set priority bit
 	STA.W $0001,X               ; Save attribute for tile 1
 	STA.W $0003,X               ; Save attribute for tile 2
-	
+
 	; Calculate tens digit
 	LDA.L $001030               ; A = number value (0-99)
 	LDY.W #$FFFF                ; Y = -1 (digit counter)
@@ -4085,15 +4261,15 @@ CODE_008CEF:
 	INY                         ; Y++ (count tens)
 	SBC.B #$0A                  ; A = A - 10
 	BCS CODE_008CEF             ; If carry still set → Continue subtracting
-	
+
 	; A now contains ones digit - 10 (needs adjustment)
 	ADC.B #$8A                  ; A = A + $8A (convert to tile number)
 	STA.W $0002,X               ; Store ones digit tile
-	
+
 	; Check if tens digit is zero
 	CPY.W #$0000                ; Is tens digit zero?
 	BEQ UNREACH_008D06          ; If zero → Show blank tens digit
-	
+
 	; Display tens digit
 	TYA                         ; A = tens digit value
 	ADC.B #$7F                  ; A = A + $7F (convert to tile number)
@@ -4104,7 +4280,7 @@ CODE_008CEF:
 
 UNREACH_008D06:
 	; Show blank tile for tens digit
-	.db $A9,$45,$9D,$00,$00,$EB,$9D,$01,$00,$80,$0F
+	db $A9,$45,$9D,$00,$00,$EB,$9D,$01,$00,$80,$0F
 	; LDA #$45, STA [$00,X], XBA, STA [$01,X], BRA $0F
 
 ;-------------------------------------------------------------------------------
@@ -4115,11 +4291,11 @@ CODE_008D11:
 	; ===========================================================================
 	; Displays blank tiles (tile $45) for positions that don't need numbers
 	; ===========================================================================
-	
+
 	XBA                         ; Swap A bytes (get attributes back)
 	STA.W $0001,X               ; Store attribute for tile 1
 	STA.W $0003,X               ; Store attribute for tile 2
-	
+
 	LDA.B #$45                  ; A = $45 (blank tile)
 	STA.W $0000,X               ; Store blank in tile 1
 	STA.W $0002,X               ; Store blank in tile 2
@@ -4130,13 +4306,13 @@ CODE_008D20:
 	; ===========================================================================
 	; Finalize Tilemap Update
 	; ===========================================================================
-	
+
 	PHK                         ; Push program bank
 	PLB                         ; Pull to data bank (B = $00)
-	
+
 	LDA.B #$80                  ; A = $80 (bit 7)
 	TSB.W $00D4                 ; Set bit 7 of $00D4 (large VRAM update flag)
-	
+
 	PLP                         ; Restore processor status
 	RTS                         ; Return
 
@@ -4151,54 +4327,54 @@ CODE_008D29:
 	; Updates BG layer 1 tilemap during VBLANK.
 	; Handles both battle and field modes.
 	; ===========================================================================
-	
+
 	PHP                         ; Save processor status
 	SEP #$30                    ; 8-bit A, X, Y
-	
+
 	; ---------------------------------------------------------------------------
 	; Check Battle Mode
 	; ---------------------------------------------------------------------------
-	
+
 	LDA.B #$02                  ; A = $02 (bit 1 mask)
 	AND.W $00D8                 ; Test bit 1 of $00D8
 	BEQ CODE_008D6C             ; If clear → Field mode
-	
+
 	; ---------------------------------------------------------------------------
 	; Battle Mode Layer Update
 	; ---------------------------------------------------------------------------
-	
+
 	LDX.W $10B1                 ; X = [$10B1] (cursor position)
 	CPX.B #$FF                  ; Check if invalid
 	BEQ CODE_008D6A             ; If $FF → Exit
-	
+
 	; Calculate tile data
 	LDA.L DATA8_049800,X        ; A = base tile value
 	ADC.B #$0A                  ; A = A + $0A (battle offset)
 	XBA                         ; Save in high byte
-	
+
 	TXA                         ; A = position
 	AND.B #$38                  ; Extract Y bits
 	ASL A                       ; Y × 2
 	PHA                         ; Save
-	
+
 	TXA                         ; A = position again
 	AND.B #$07                  ; Extract X bits
 	ORA.B $01,S                 ; Combine with Y
 	PLX                         ; Cleanup stack
-	
+
 	ASL A                       ; Word address
 	REP #$30                    ; 16-bit A, X, Y
-	
+
 	; Store in WRAM buffer
 	STA.L $7F0778               ; Tile 1 position
 	INC A                       ; Next tile
 	STA.L $7F077A               ; Tile 2 position
-	
+
 	ADC.W #$000F                ; Next row
 	STA.L $7F07B8               ; Tile 3 position
 	INC A                       ; Next tile
 	STA.L $7F07BA               ; Tile 4 position
-	
+
 	LDA.W #$0080                ; A = $0080 (bit 7)
 	TSB.W $00D4                 ; Set large update flag
 
@@ -4212,22 +4388,22 @@ CODE_008D6C:
 	; ===========================================================================
 	; Field Mode Layer Update
 	; ===========================================================================
-	
+
 	LDX.W $10B1                 ; X = cursor position
 	LDA.L DATA8_049800,X        ; A = base tile
 	ASL A                       ; A × 2
 	ASL A                       ; A × 4
 	STA.W $00F7                 ; Save tile offset
-	
+
 	REP #$10                    ; 16-bit X, Y
-	
+
 	LDA.W $10B1                 ; A = cursor position
 	JSR.W CODE_008D8A           ; Calculate tilemap address
 	STX.W $00F5                 ; Save address
-	
+
 	LDA.B #$80                  ; A = $80
 	TSB.W $00D4                 ; Set update flag
-	
+
 	PLP                         ; Restore status
 	RTS                         ; Return
 
@@ -4245,10 +4421,10 @@ CODE_008D8A:
 	; Returns:
 	;   X = Tilemap address (or $FFFF if invalid)
 	; ===========================================================================
-	
+
 	CMP.B #$FF                  ; Check if invalid position
 	BEQ UNREACH_008D93          ; If $FF → Return $FFFF
-	
+
 	JSR.W CODE_008C1B           ; Calculate tilemap address
 	TAX                         ; X = calculated address
 	RTS                         ; Return
@@ -4279,7 +4455,7 @@ CODE_008D97:
 	;   $009E = Validated position (or adjusted)
 	;   $1031 = Updated position after validation
 	; ===========================================================================
-	
+
 	LDA.W $1031                 ; Get current character position
 	PHA                         ; Save it
 	LDA.W #$0003                ; A = 3 (check 3 party slots)
@@ -4311,7 +4487,7 @@ CODE_008DA8:
 	;   Y = Valid character position (or $FF if none found)
 	;   $1031 = Updated character position
 	; ===========================================================================
-	
+
 	PHP                         ; Save processor status
 	SEP #$30                    ; 8-bit mode
 	PHA                         ; Save slot count
@@ -4325,7 +4501,7 @@ CODE_008DA8:
 	SEC                         ; Set carry
 	ADC.B #$04                  ; A = 4 - count (bit shift count)
 	TAX                         ; X = shift count
-	
+
 	LDA.W $1032                 ; Get status flags (high byte)
 	XBA                         ; Swap to low byte
 	LDA.W $1033                 ; Get status flags (low byte)
@@ -4339,7 +4515,7 @@ CODE_008DC7:
 	LSR A                       ; Shift right (shift 3 bits per slot)
 	DEX                         ; Decrement shift counter
 	BNE CODE_008DC7             ; Loop until X = 0
-	
+
 	LSR A                       ; Check first member bit
 	BCS CODE_008DDA             ; If set → valid member found
 	DEY                         ; Try previous slot
@@ -4386,7 +4562,7 @@ CODE_008DDF:
 	;   X = Source pointer (auto-increments)
 	;   Y = Outer loop counter (tile groups)
 	; ===========================================================================
-	
+
 	PHP                         ; Save processor status
 	PHD                         ; Save Direct Page
 	REP #$30                    ; 16-bit mode
@@ -4404,7 +4580,7 @@ CODE_008DEE:
 	TAY                         ; Y = data byte
 	STY.B !SNES_VMDATAL-$2100   ; Write to VRAM data (low)
 	LDA.W $0001,X               ; Get next byte
-	TAY                         ; Y = data byte  
+	TAY                         ; Y = data byte
 	STY.B !SNES_VMDATAL-$2100   ; Write to VRAM data (low)
 	LDA.W $0002,X               ; Get third byte
 	TAY                         ; Y = data byte
@@ -4424,7 +4600,7 @@ CODE_008DEE:
 	LDA.W $0007,X               ; Get eighth byte
 	TAY                         ; Y = data byte
 	STY.B !SNES_VMDATAL-$2100   ; Write to VRAM data (low)
-	
+
 	LDA.W $0008,X               ; Get ninth byte
 	TAY                         ; Y = data byte
 	STY.B !SNES_VMDATAL-$2100   ; Write to VRAM data (low)
@@ -4449,7 +4625,7 @@ CODE_008DEE:
 	LDA.W $000F,X               ; Get 16th byte
 	TAY                         ; Y = data byte
 	STY.B !SNES_VMDATAL-$2100   ; Write to VRAM data (low)
-	
+
 	LDA.W $0010,X               ; Get 17th byte
 	TAY                         ; Y = data byte
 	STY.B !SNES_VMDATAL-$2100   ; Write to VRAM data (low)
@@ -4474,15 +4650,16 @@ CODE_008DEE:
 	LDA.W $0017,X               ; Get 24th byte
 	TAY                         ; Y = data byte
 	STY.B !SNES_VMDATAL-$2100   ; Write to VRAM data (low)
-	
+
 	REP #$30                    ; 16-bit mode
 	TXA                         ; A = X (source pointer)
 	ADC.W #$0018                ; A += $18 (24 bytes)
 	TAX                         ; X = new source address
 	PLY                         ; Restore Y counter
 	DEY                         ; Decrement tile group counter
-	BNE CODE_008DE8             ; Loop if more groups remain
-	
+	BEQ +                       ; Exit if done
+	JMP CODE_008DE8             ; Loop if more groups remain
++
 	PLD                         ; Restore Direct Page
 	PLP                         ; Restore processor status
 	RTL                         ; Return
@@ -4508,7 +4685,7 @@ CODE_008E54:
 	;   $00F0 = Pattern byte to interleave
 	;   VRAM address already set
 	; ===========================================================================
-	
+
 	PHP                         ; Save processor status
 	PHD                         ; Save Direct Page
 	PEA.W $2100                 ; Push $2100
@@ -4552,13 +4729,13 @@ CODE_008E63:
 	STA.B !SNES_VMDATAL-$2100   ; Write to VRAM
 	LDA.W $00F0                 ; Get pattern word
 	STA.B !SNES_VMDATAL-$2100   ; Write pattern
-	
+
 	TXA                         ; A = X (source pointer)
 	ADC.W #$0010                ; A += $10 (16 bytes per tile)
 	TAX                         ; X = new source address
 	DEY                         ; Decrement tile counter
 	BNE CODE_008E63             ; Loop if more tiles remain
-	
+
 	SEP #$20                    ; 8-bit A
 	LDA.B #$80                  ; A = $80 (VRAM increment +1)
 	STA.B !SNES_VMAINC-$2100    ; Restore normal VRAM increment
@@ -4582,7 +4759,7 @@ CODE_008EC4:
 	;
 	; TECHNICAL NOTES:
 	; - Uses DMA Channel 5 for bulk VRAM transfer ($1000 bytes)
-	; - Loads tiles to VRAM $3000-$3FFF  
+	; - Loads tiles to VRAM $3000-$3FFF
 	; - Loads additional tiles to VRAM $2000-$2FFF via CODE_008DDF
 	; - Sets up multiple palette entries in CGRAM
 	; - Direct Page = $2100 throughout for PPU access
@@ -4598,13 +4775,13 @@ CODE_008EC4:
 	; - $08-$1F: Four 8-color palettes from Bank $07:$8000
 	; - $28-$87: Six 16-color palettes from Bank $07:$D8E4
 	; ===========================================================================
-	
+
 	PHP                         ; Save processor status
 	PHD                         ; Save Direct Page
 	REP #$30                    ; 16-bit mode
 	LDA.W #$2100                ; A = $2100
 	TCD                         ; Direct Page = $2100 (PPU registers)
-	
+
 	; Setup DMA Channel 5 for VRAM transfer
 	SEP #$20                    ; 8-bit A
 	LDX.W #$1801                ; X = $1801 (DMA params: word, increment)
@@ -4615,28 +4792,28 @@ CODE_008EC4:
 	STA.W !SNES_DMA5ADDRH       ; Set DMA5 source bank
 	LDX.W #$1000                ; X = $1000 (4096 bytes to transfer)
 	STX.W !SNES_DMA5CNTL        ; Set DMA5 transfer size
-	
+
 	; Setup VRAM destination
 	LDX.W #$3000                ; X = $3000 (VRAM address)
 	STX.B !SNES_VMADDL-$2100    ; Set VRAM address
 	LDA.B #$84                  ; A = $84 (increment +32 after high byte)
 	STA.B !SNES_VMAINC-$2100    ; Set VRAM increment mode
-	
+
 	; Execute DMA transfer
 	LDA.B #$20                  ; A = $20 (enable DMA channel 5)
 	STA.W !SNES_MDMAEN          ; Start DMA transfer
-	
+
 	; Restore normal VRAM increment
 	LDA.B #$80                  ; A = $80 (increment +1)
 	STA.B !SNES_VMAINC-$2100    ; Set VRAM increment mode
-	
+
 	; Setup for additional tile transfer
 	REP #$30                    ; 16-bit mode
 	LDA.W #$FF00                ; A = $FF00 (pattern for interleaving)
 	STA.W $00F0                 ; Store pattern word
 	LDX.W #$2000                ; X = $2000 (VRAM address)
 	STX.B !SNES_VMADDL-$2100    ; Set VRAM address
-	
+
 	; Transfer additional tiles from Bank $04
 	PEA.W $0004                 ; Push bank $04
 	PLB                         ; Data bank = $04
@@ -4644,12 +4821,12 @@ CODE_008EC4:
 	LDY.W #$0100                ; Y = $0100 (256 tile groups)
 	JSL.L CODE_008DDF           ; Transfer tiles via direct writes
 	PLB                         ; Restore data bank
-	
+
 	; Load palette data from Bank $07
 	SEP #$30                    ; 8-bit mode
 	PEA.W $0007                 ; Push bank $07
 	PLB                         ; Data bank = $07
-	
+
 	; Load 4 sets of 8-color palettes
 	LDA.B #$08                  ; A = $08 (CGRAM address $08)
 	LDX.B #$00                  ; X = $00 (source offset)
@@ -4664,7 +4841,7 @@ CODE_008EC4:
 	LDX.B #$18                  ; X = $18 (source offset)
 	JSR.W CODE_008FB4           ; Load 8 colors
 	PLB                         ; Restore data bank
-	
+
 	; Load special color values
 	LDX.W $0E9C                 ; X = color value (low byte)
 	LDY.W $0E9D                 ; Y = color value (high byte)
@@ -4676,7 +4853,7 @@ CODE_008EC4:
 	STA.B !SNES_CGADD-$2100     ; Set CGRAM address
 	STX.B !SNES_CGDATA-$2100    ; Write color (low)
 	STY.B !SNES_CGDATA-$2100    ; Write color (high)
-	
+
 	; Load extended palette data (6 groups of 16 colors)
 	LDY.B #$06                  ; Y = 6 (group count)
 	LDA.B #$00                  ; A = 0 (initial offset)
@@ -4688,7 +4865,7 @@ CODE_008F55:
 	TAX                         ; X = offset
 	ADC.B #$28                  ; A += $28 (CGRAM address increment)
 	STA.B !SNES_CGADD-$2100     ; Set CGRAM address
-	
+
 	; Write 16 colors (32 bytes) from DATA8_07D8E4
 	LDA.W DATA8_07D8E4,X        ; Get color byte
 	STA.B !SNES_CGDATA-$2100    ; Write to CGRAM
@@ -4722,12 +4899,12 @@ CODE_008F55:
 	STA.B !SNES_CGDATA-$2100    ; Write to CGRAM
 	LDA.W DATA8_07D8F3,X        ; Get color byte
 	STA.B !SNES_CGDATA-$2100    ; Write to CGRAM
-	
+
 	TXA                         ; A = X (offset)
 	ADC.B #$10                  ; A += $10 (16 bytes per group)
 	DEY                         ; Decrement group counter
 	BNE CODE_008F55             ; Loop if more groups remain
-	
+
 	PLB                         ; Restore data bank
 	PLD                         ; Restore Direct Page
 	PLP                         ; Restore processor status
@@ -4747,7 +4924,7 @@ CODE_008FB4:
 	;   Data bank = $07
 	;   Direct Page = $2100
 	; ===========================================================================
-	
+
 	STA.B !SNES_CGADD-$2100     ; Set CGRAM address
 	LDA.W DATA8_078000,X        ; Get color byte 0
 	STA.B !SNES_CGDATA-$2100    ; Write to CGRAM
@@ -4782,10 +4959,10 @@ DATA_008FDF:
 	; Appears to handle coordinate/offset calculations
 	; ===========================================================================
 DATA_008FDF_bytes:
-	.db $08,$0B,$C2,$30,$DA,$48,$3B,$38,$E9,$02,$00,$1B,$5B,$E2,$20,$A5
-	.db $04,$85,$02,$64,$04,$A9,$00,$C2,$30,$A2,$08,$00,$C6,$03,$0A,$06
-	.db $01,$90,$02,$65,$03,$CA,$D0,$F6,$85,$03,$3B,$18,$69,$02,$00,$1B
-	.db $68,$FA,$2B,$28,$6B
+	db $08,$0B,$C2,$30,$DA,$48,$3B,$38,$E9,$02,$00,$1B,$5B,$E2,$20,$A5
+	db $04,$85,$02,$64,$04,$A9,$00,$C2,$30,$A2,$08,$00,$C6,$03,$0A,$06
+	db $01,$90,$02,$65,$03,$CA,$D0,$F6,$85,$03,$3B,$18,$69,$02,$00,$1B
+	db $68,$FA,$2B,$28,$6B
 
 ;===============================================================================
 ; Status Effect Rendering System
@@ -4813,11 +4990,11 @@ CODE_009014:
 	; - Various offsets for different status types
 	; - Supports 6 party member slots with multiple status effects each
 	; ===========================================================================
-	
+
 	PHP                         ; Save processor status
 	PHD                         ; Save Direct Page
 	REP #$30                    ; 16-bit mode
-	
+
 	; Clear status display buffer
 	LDA.W #$0000                ; A = 0
 	STA.L $7E3669               ; Clear first word of buffer
@@ -4825,19 +5002,19 @@ CODE_009014:
 	LDY.W #$366B                ; Y = destination (next word)
 	LDA.W #$00DD                ; A = $DD (221 bytes to fill)
 	MVN $7E,$7E                 ; Block fill with zeros
-	
+
 	; Setup for status processing
 	PHK                         ; Push program bank
 	PLB                         ; Data bank = program bank
 	SEP #$30                    ; 8-bit mode
 	PEA.W $1000                 ; Push $1000
 	PLD                         ; Direct Page = $1000 (party data)
-	
+
 	; Process party status bits (high nibble of $1032)
 	LDA.B $32                   ; Get party status flags (high)
 	AND.B #$E0                  ; Mask bits 7-5
 	BEQ Skip_Status_Group1      ; If clear, skip first group
-	
+
 	JSL.L CODE_009730           ; Calculate status icon offset
 	EOR.B #$FF                  ; Invert
 	SEC                         ; Set carry
@@ -4850,7 +5027,7 @@ Skip_Status_Group1:
 	LDA.B $32                   ; Get party status flags
 	AND.B #$1C                  ; Mask bits 4-2
 	BEQ Skip_Status_Group2      ; If clear, skip second group
-	
+
 	JSL.L CODE_009730           ; Calculate status icon offset
 	EOR.B #$FF                  ; Invert
 	SEC                         ; Set carry
@@ -4863,16 +5040,16 @@ Skip_Status_Group2:
 	LDA.B $33                   ; Get extended status flags
 	AND.B #$80                  ; Check bit 7
 	BNE Process_Status_Group3   ; If set, process group 3
-	
+
 	LDA.B $32                   ; Get party status flags
 	AND.B #$03                  ; Mask bits 1-0
 	BEQ Skip_Status_Group3      ; If clear, skip
-	
+
 	; Embedded JSL instruction as data
 Skip_Status_Group2_bytes:
-	.db $22,$30,$97,$00         ; JSL CODE_009730
-	.db $18,$69,$08             ; CLC, ADC #$08
-	.db $80,$04                 ; BRA +4
+	db $22,$30,$97,$00         ; JSL CODE_009730
+	db $18,$69,$08             ; CLC, ADC #$08
+	db $80,$04                 ; BRA +4
 
 Process_Status_Group3:
 	JSL.L CODE_009730           ; Calculate status icon offset
@@ -4887,7 +5064,7 @@ Skip_Status_Group3:
 	LDA.B $33                   ; Get extended status flags
 	AND.B #$70                  ; Mask bits 6-4
 	BEQ Skip_Status_Group4      ; If clear, skip
-	
+
 	JSL.L CODE_009730           ; Calculate status icon offset
 	EOR.B #$FF                  ; Invert
 	SEC                         ; Set carry
@@ -4899,13 +5076,13 @@ Skip_Status_Group4:
 	; Process first character slot
 	LDY.B #$00                  ; Y = 0 (slot 0)
 	JSR.W CODE_0090A3           ; Render character status
-	
+
 	; Switch to second character slot data
 	PEA.W $1080                 ; Push $1080
 	PLD                         ; Direct Page = $1080
 	LDY.B #$50                  ; Y = $50 (display offset)
 	JSR.W CODE_0090A3           ; Render character status
-	
+
 	PLD                         ; Restore Direct Page
 	PLP                         ; Restore processor status
 	RTS                         ; Return
@@ -4924,7 +5101,7 @@ CODE_0090A3:
 	;   $31 = Character slot number (bit 7 = invalid flag)
 	;   $35-$37 = Character status flags
 	; ===========================================================================
-	
+
 	LDA.B $31                   ; Get character slot
 	BMI Skip_Character          ; If bit 7 set → invalid/dead character
 	JSR.W CODE_009111           ; Render base character icon
@@ -4934,7 +5111,7 @@ Skip_Character:
 	LDA.B $35                   ; Get status flags byte 1
 	AND.B #$E0                  ; Mask bits 7-5
 	BEQ Skip_Status1            ; If clear, skip
-	
+
 	JSL.L CODE_009730           ; Calculate icon offset
 	EOR.B #$FF                  ; Invert
 	SEC                         ; Set carry
@@ -4946,18 +5123,18 @@ Skip_Status1:
 	LDA.B $36                   ; Get status flags byte 2
 	AND.B #$C0                  ; Mask bits 7-6
 	BNE Alternative_Status2     ; If set, use alternative handling
-	
+
 	LDA.B $35                   ; Get status flags byte 1
 	AND.B #$1F                  ; Mask bits 4-0
 	BEQ Skip_Status2            ; If clear, skip
-	
+
 	JSL.L CODE_009730           ; Calculate icon offset
 	CLC                         ; Clear carry
 	ADC.B #$08                  ; Add offset $08
 	BRA Continue_Status2        ; Continue processing
 
 Alternative_Status2:
-	.db $22,$30,$97,$00         ; JSL CODE_009730
+	db $22,$30,$97,$00         ; JSL CODE_009730
 
 Continue_Status2:
 	EOR.B #$FF                  ; Invert
@@ -4970,7 +5147,7 @@ Skip_Status2:
 	LDA.B $36                   ; Get status flags byte 2
 	AND.B #$3C                  ; Mask bits 5-2
 	BEQ Skip_Status3            ; If clear, skip
-	
+
 	JSL.L CODE_009730           ; Calculate icon offset
 	EOR.B #$FF                  ; Invert
 	SEC                         ; Set carry
@@ -4982,18 +5159,18 @@ Skip_Status3:
 	LDA.B $37                   ; Get status flags byte 3
 	AND.B #$80                  ; Check bit 7
 	BNE Alternative_Status4     ; If set, use alternative
-	
+
 	LDA.B $36                   ; Get status flags byte 2
 	AND.B #$03                  ; Mask bits 1-0
 	BEQ Skip_Status4            ; If clear, skip
-	
+
 	JSL.L CODE_009730           ; Calculate icon offset
 	CLC                         ; Clear carry
 	ADC.B #$08                  ; Add offset $08
 	BRA Continue_Status4        ; Continue
 
 Alternative_Status4:
-	.db $22,$30,$97,$00         ; JSL CODE_009730
+	db $22,$30,$97,$00         ; JSL CODE_009730
 
 Continue_Status4:
 	EOR.B #$FF                  ; Invert
@@ -5025,7 +5202,7 @@ CODE_009111:
 	;   Y = Display position offset
 	;   Data bank = $7E
 	; ===========================================================================
-	
+
 	PHP                         ; Save processor status
 	PHD                         ; Save Direct Page
 	SEP #$30                    ; 8-bit mode
@@ -5034,10 +5211,10 @@ CODE_009111:
 	PHY                         ; Save Y offset
 	PEA.W $0400                 ; Push $0400
 	PLD                         ; Direct Page = $0400
-	
+
 	STA.B $3A                   ; Save icon ID to $043A
 	JSL.L CODE_028AE0           ; Process icon type
-	
+
 	LDA.B $3A                   ; Get icon ID
 	CMP.B #$2F                  ; Check if >= $2F
 	BCC Simple_Icon             ; If < $2F → simple icon
@@ -5047,15 +5224,15 @@ Complex_Status:
 	LDX.B #$10                  ; X = $10 (layer 1 offset)
 	CMP.B #$32                  ; Check if >= $32
 	BCC Got_Layer_Offset        ; If < $32 → use layer 1
-	
+
 	LDX.B #$20                  ; X = $20 (layer 2 offset)
 	CMP.B #$39                  ; Check if >= $39
 	BCC Got_Layer_Offset        ; If < $39 → use layer 2
-	
+
 	LDX.B #$30                  ; X = $30 (layer 3 offset)
 	CMP.B #$3D                  ; Check if >= $3D
 	BCC Got_Layer_Offset        ; If < $3D → use layer 3
-	
+
 	LDX.B #$40                  ; X = $40 (layer 4 offset)
 	CLC                         ; Clear carry
 
@@ -5064,7 +5241,7 @@ Got_Layer_Offset:
 	ADC.B $01,S                 ; Add Y offset from stack
 	TAX                         ; X = final buffer offset
 	JSR.W CODE_0091A9           ; Write icon data to buffer
-	
+
 	; Copy calculated values to buffer
 	LDA.B $DB                   ; Get calculated value 1
 	STA.W $3670,X               ; Store to buffer
@@ -5088,10 +5265,10 @@ Simple_Icon:
 	PLX                         ; X = Y offset (from stack)
 	PHX                         ; Save it back
 	JSR.W CODE_0091A9           ; Write icon to buffer
-	
+
 	CPX.B #$50                  ; Check if offset >= $50
 	BCS Render_Done             ; If so, done
-	
+
 	; Copy icon template for simple icons
 	REP #$30                    ; 16-bit mode
 	LDA.B $3A                   ; Get icon ID
@@ -5099,15 +5276,15 @@ Simple_Icon:
 	LDY.W #$3709                ; Y = template address for icons $00-$22
 	CMP.W #$0023                ; Check if < $23
 	BCC Copy_Template           ; If so, use first template
-	
+
 	LDY.W #$3719                ; Y = template for icons $23-$25
 	CMP.W #$0026                ; Check if < $26
 	BCC Copy_Template           ; If so, use second template
-	
+
 	LDY.W #$3729                ; Y = template for icons $26-$28
 	CMP.W #$0029                ; Check if < $29
 	BCC Copy_Template           ; If so, use third template
-	
+
 	LDY.W #$3739                ; Y = template for icons $29+
 
 Copy_Template:
@@ -5147,7 +5324,7 @@ CODE_0091A9:
 	;   Bit 1 → $366B,X
 	;   Bit 0 → $366C,X
 	; ===========================================================================
-	
+
 	LDA.B $E4                   ; Get packed status flags
 	TAY                         ; Y = flags (save for later)
 	AND.B #$08                  ; Check bit 3
@@ -5156,15 +5333,15 @@ CODE_0091A9:
 
 Skip_Flag1:
 	STA.W $3669,X               ; Store to buffer slot 1
-	
+
 	TYA                         ; A = flags
 	AND.B #$04                  ; Check bit 2
 	BEQ Skip_Flag2              ; If clear, skip
-	.db $A9,$05                 ; LDA #$05
+	db $A9,$05                 ; LDA #$05
 
 Skip_Flag2:
 	STA.W $366A,X               ; Store to buffer slot 2
-	
+
 	TYA                         ; A = flags
 	AND.B #$02                  ; Check bit 1
 	BEQ Skip_Flag3              ; If clear, skip
@@ -5172,7 +5349,7 @@ Skip_Flag2:
 
 Skip_Flag3:
 	STA.W $366B,X               ; Store to buffer slot 3
-	
+
 	TYA                         ; A = flags
 	AND.B #$01                  ; Check bit 0
 	BEQ Skip_Flag4              ; If clear, skip
@@ -5233,24 +5410,24 @@ Setup_Done:
 	STA.B $3E                   ; Store stat 6
 	JSR.W CODE_009253           ; Sum next buffer values (X++)
 	STA.B $3F                   ; Store stat 7
-	
+
 	; Calculate bitwise OR stats using CODE_009245 (ORA across 4 buffers)
 	JSR.W CODE_009245           ; OR buffer values at X
 	STA.B $3A                   ; Store flags 1
 	JSR.W CODE_009245           ; OR next buffer values (X++)
 	STA.B $3B                   ; Store flags 2
-	
+
 	; Process status effect bits (lower nibble only)
 	LDA.B #$0F                  ; Mask for lower nibble
 	TRB.B $2E                   ; Clear lower nibble in $2E
 	JSR.W CODE_009245           ; OR next buffer values (X++)
 	AND.B #$0F                  ; Keep only lower nibble
 	TSB.B $2E                   ; Set bits in $2E
-	
+
 	; Clear specific status bits and update base stats
 	LDA.B $3B                   ; A = flags 2
 	TRB.B $21                   ; Clear those bits in $21
-	
+
 	; Update base stats with deltas (with carry from earlier CLC)
 	LDA.B $2A                   ; A = stat 1
 	ADC.B $26                   ; Add delta 1
@@ -5264,7 +5441,7 @@ Setup_Done:
 	LDA.B $2D                   ; A = stat 4
 	ADC.B $29                   ; Add delta 4
 	STA.B $25                   ; Store to base stat 4
-	
+
 	PLB                         ; Restore data bank
 	PLD                         ; Restore direct page
 	PLP                         ; Restore processor status
@@ -5365,7 +5542,7 @@ CODE_009273:
 	PEA.W $0500                 ; Push $0500 to stack
 	PLD                         ; Direct Page = $0500 (animation queue)
 	CLI                         ; Enable interrupts
-	
+
 	; Process animation slot 1 ($00)
 	LDA.B #$04                  ; Bit 2 mask
 	AND.W $00E2                 ; Check animation gate flag
@@ -6002,71 +6179,71 @@ CODE_00981B:
 
 CODE_009891:
 	LDA.W $003E,X               ; Copy word at +$3E
-	STA.W $003E,Y               
+	STA.W $003E,Y
 	LDA.W $003C,X               ; Copy word at +$3C
-	STA.W $003C,Y               
+	STA.W $003C,Y
 	LDA.W $003A,X               ; Copy word at +$3A
-	STA.W $003A,Y               
+	STA.W $003A,Y
 	LDA.W $0038,X               ; Copy word at +$38
-	STA.W $0038,Y               
+	STA.W $0038,Y
 	LDA.W $0036,X               ; Copy word at +$36
-	STA.W $0036,Y               
+	STA.W $0036,Y
 	LDA.W $0034,X               ; Copy word at +$34
-	STA.W $0034,Y               
+	STA.W $0034,Y
 	LDA.W $0032,X               ; Copy word at +$32
-	STA.W $0032,Y               
+	STA.W $0032,Y
 	LDA.W $0030,X               ; Copy word at +$30
-	STA.W $0030,Y               
+	STA.W $0030,Y
 	LDA.W $002E,X               ; Copy word at +$2E
-	STA.W $002E,Y               
+	STA.W $002E,Y
 	LDA.W $002C,X               ; Copy word at +$2C
-	STA.W $002C,Y               
+	STA.W $002C,Y
 	LDA.W $002A,X               ; Copy word at +$2A
-	STA.W $002A,Y               
+	STA.W $002A,Y
 	LDA.W $0028,X               ; Copy word at +$28
-	STA.W $0028,Y               
+	STA.W $0028,Y
 	LDA.W $0026,X               ; Copy word at +$26
-	STA.W $0026,Y               
+	STA.W $0026,Y
 	LDA.W $0024,X               ; Copy word at +$24
-	STA.W $0024,Y               
+	STA.W $0024,Y
 	LDA.W $0022,X               ; Copy word at +$22
-	STA.W $0022,Y               
+	STA.W $0022,Y
 	LDA.W $0020,X               ; Copy word at +$20
-	STA.W $0020,Y               
+	STA.W $0020,Y
 
 CODE_0098F1:
 	LDA.W $001E,X               ; Copy word at +$1E
-	STA.W $001E,Y               
+	STA.W $001E,Y
 	LDA.W $001C,X               ; Copy word at +$1C
-	STA.W $001C,Y               
+	STA.W $001C,Y
 	LDA.W $001A,X               ; Copy word at +$1A
-	STA.W $001A,Y               
+	STA.W $001A,Y
 	LDA.W $0018,X               ; Copy word at +$18
-	STA.W $0018,Y               
+	STA.W $0018,Y
 	LDA.W $0016,X               ; Copy word at +$16
-	STA.W $0016,Y               
+	STA.W $0016,Y
 	LDA.W $0014,X               ; Copy word at +$14
-	STA.W $0014,Y               
+	STA.W $0014,Y
 	LDA.W $0012,X               ; Copy word at +$12
-	STA.W $0012,Y               
+	STA.W $0012,Y
 	LDA.W $0010,X               ; Copy word at +$10
-	STA.W $0010,Y               
+	STA.W $0010,Y
 	LDA.W $000E,X               ; Copy word at +$0E
-	STA.W $000E,Y               
+	STA.W $000E,Y
 	LDA.W $000C,X               ; Copy word at +$0C
-	STA.W $000C,Y               
+	STA.W $000C,Y
 	LDA.W $000A,X               ; Copy word at +$0A
-	STA.W $000A,Y               
+	STA.W $000A,Y
 	LDA.W $0008,X               ; Copy word at +$08
-	STA.W $0008,Y               
+	STA.W $0008,Y
 	LDA.W $0006,X               ; Copy word at +$06
-	STA.W $0006,Y               
+	STA.W $0006,Y
 	LDA.W $0004,X               ; Copy word at +$04
-	STA.W $0004,Y               
+	STA.W $0004,Y
 	LDA.W $0002,X               ; Copy word at +$02
-	STA.W $0002,Y               
+	STA.W $0002,Y
 	LDA.W $0000,X               ; Copy word at +$00
-	STA.W $0000,Y               
+	STA.W $0000,Y
 	RTS                         ; Return
 
 ; ---------------------------------------------------------------------------
@@ -6084,7 +6261,7 @@ CODE_009994:
 ; Memory Fill Routine
 ; ---------------------------------------------------------------------------
 ; Purpose: Fill memory region with specified value
-; Input: 
+; Input:
 ;   A (16-bit) = number of bytes to fill
 ;   Y = starting address in bank $7F
 ;   Stack+3 = fill value (16-bit)
@@ -6205,7 +6382,7 @@ Update_Done:
 Single_Buffer_Update:
 	; Handle single buffer update
 	; (code continues...)
-	
+
 Perform_DMA_Update:
 	; Execute DMA transfer to update VRAM
 	; (code continues...)
@@ -6470,8 +6647,9 @@ CODE_00A342:
 	PHX
 	PHY
 	LDA.B $46
-	BEQ CODE_00A375
-	LDA.B $40
+	BNE +
+	JMP CODE_00A375
++	LDA.B $40
 	STA.W $01EE
 	LDA.B $44
 	STA.W $01ED
@@ -6687,7 +6865,7 @@ CODE_00A54E:
 	PLD
 	INC A
 	DEC A
-	BRA CODE_00A57D
+	JMP CODE_00A57D
 
 CODE_00A563:
 	LDA.B [$17]
@@ -6697,7 +6875,7 @@ CODE_00A563:
 
 CODE_00A56E:
 	BNE CODE_00A519
-	BRA CODE_00A597
+	JMP CODE_00A597
 
 ; ---------------------------------------------------------------------------
 ; End of appended disassembly chunk
@@ -6754,7 +6932,7 @@ CODE_009BED:
 	LDY.W #$5007                ; Dest = $7F5007
 	LDA.W #$0022                ; Transfer $22 bytes + 1 = 35 bytes
 	MVN $7F,$00                 ; Copy data to buffer
-	
+
 	; Initialize color values
 	LDA.L $000E9C               ; Load base color
 	STA.W $5011                 ; Store at offset $11
@@ -6762,37 +6940,37 @@ CODE_009BED:
 	STA.W $501A                 ; Store at offset $1A
 	JSR.W CODE_009C52           ; Adjust color brightness
 	STA.W $5017                 ; Store adjusted color
-	
+
 	LDA.L DATA8_07800C          ; Load another base color
 	STA.W $501E                 ; Store at offset $1E
 	STA.W $5021                 ; Store at offset $21
 	STA.W $5027                 ; Store at offset $27
 	JSR.W CODE_009C52           ; Adjust color brightness
 	STA.W $5024                 ; Store adjusted color
-	
+
 	; Setup DMA channels 3, 6, 7 for palette transfer
 	PHK                         ; Push program bank
 	PLB                         ; Pull to data bank
 	SEP #$20                    ; 8-bit A
-	
+
 	LDA.B #$7F                  ; Bank $7F
 	STA.W SNES_DMA3ADDRH        ; DMA3 source bank
 	STA.W SNES_DMA6ADDRH        ; DMA6 source bank
 	STA.W SNES_DMA7ADDRH        ; DMA7 source bank
-	
+
 	LDX.W #$2100                ; SNES register base
 	STX.W SNES_DMA3PARAM        ; DMA3 parameter
 	LDX.W #$2202                ; Different register
 	STX.W SNES_DMA6PARAM        ; DMA6 parameter
 	STX.W SNES_DMA7PARAM        ; DMA7 parameter
-	
+
 	LDX.W #$5007                ; Source address
 	STX.W SNES_DMA3ADDRL        ; DMA3 source low
 	LDX.W #$5010                ; Source address
 	STX.W SNES_DMA6ADDRL        ; DMA6 source low
 	LDX.W #$501D                ; Source address
 	STX.W SNES_DMA7ADDRL        ; DMA7 source low
-	
+
 	REP #$30                    ; 16-bit A/X/Y
 	RTS                         ; Return
 
@@ -6846,11 +7024,11 @@ CODE_009C80:
 DATA8_009C87:
 	; Color Palette Data Table
 DATA8_009C87_colors:
-	.dw $0D00, $0D01, $0D01, $0D01  ; Color entries
-	.dw $0000, $5140, $5101, $5140
-	.dw $1FB4, $5101, $5140, $0000
-	.dw $7FFF, $7F01, $7FFF, $4E73
-	.dw $7F01, $7FFF, $0001
+	dw $0D00, $0D01, $0D01, $0D01  ; Color entries
+	dw $0000, $5140, $5101, $5140
+	dw $1FB4, $5101, $5140, $0000
+	dw $7FFF, $7F01, $7FFF, $4E73
+	dw $7F01, $7FFF, $0001
 
 ; ---------------------------------------------------------------------------
 ; Setup Character Palette Display
@@ -6870,19 +7048,19 @@ CODE_009CB9:
 	STA.L $7F500B               ; Store to buffer +$0B
 	STA.L $7F5016               ; Store to buffer +$16
 	STA.L $7F5023               ; Store to buffer +$23
-	
+
 	LDA.W $0012,X               ; Load size/count
 	DEC A                       ; Decrement
 	LSR A                       ; Divide by 2
 	STA.L $7F5009               ; Store to buffer +$09
 	STA.L $7F5013               ; Store to buffer +$13
 	STA.L $7F5020               ; Store to buffer +$20
-	
+
 	ADC.B #$00                  ; Add carry
 	STA.L $7F5007               ; Store to buffer +$07
 	STA.L $7F5010               ; Store to buffer +$10
 	STA.L $7F501D               ; Store to buffer +$1D
-	
+
 	LDA.B #$04                  ; Bit 2 mask
 	TSB.W $00D8                 ; Set bit 2 in flags
 	REP #$30                    ; 16-bit A/X/Y
@@ -6903,17 +7081,17 @@ CODE_009CF0:
 	PHD                         ; Save direct page
 	PHX                         ; Save X
 	PHY                         ; Save Y
-	
+
 	LDX.W #$0017                ; Source = DP $0017
 	LDA.L $7E3367               ; Load stack pointer
 	TAY                         ; Y = destination
 	LDA.W #$0025                ; Transfer 38 bytes
 	MVN $7E,$00                 ; Copy DP $0017-$003E to stack
-	
+
 	LDX.W #$00D0                ; Source = DP $00D0
 	LDA.W #$0000                ; Transfer 1 byte
 	MVN $7E,$00                 ; Copy DP $00D0 to stack
-	
+
 	TYA                         ; A = new stack pointer
 	CMP.W #$35D9                ; Check if stack overflow
 	BCC CODE_009D18             ; Branch if OK
@@ -6938,21 +7116,21 @@ CODE_009D21:
 	PHD                         ; Save direct page
 	PHX                         ; Save X
 	PHY                         ; Save Y
-	
+
 	LDA.L $7E3367               ; Load stack pointer
 	SEC                         ; Set carry
 	SBC.W #$0027                ; Subtract 39 bytes
 	STA.L $7E3367               ; Update stack pointer
 	TAX                         ; X = source
-	
+
 	LDY.W #$0017                ; Dest = DP $0017
 	LDA.W #$0025                ; Transfer 38 bytes
 	MVN $00,$7E                 ; Copy stack to DP $0017-$003E
-	
+
 	LDY.W #$00D0                ; Dest = DP $00D0
 	LDA.W #$0000                ; Transfer 1 byte
 	MVN $00,$7E                 ; Copy stack to DP $00D0
-	
+
 	JMP.W CODE_00981B           ; Clean stack and return
 
 ; ---------------------------------------------------------------------------
@@ -7012,12 +7190,12 @@ CODE_009D75:
 	PHY                         ; Save Y
 	PHK                         ; Push program bank
 	PLB                         ; Pull to data bank
-	
+
 	; Check if special processing mode
 	LDA.W #$0008                ; Bit 3 mask
 	AND.W $00DB                 ; Test flag
 	BEQ CODE_009DA2             ; Normal processing
-	
+
 	; Special mode with synchronization
 	LDA.W #$0010                ; Bit 4 mask
 	AND.W $00D0                 ; Test flag
@@ -7042,7 +7220,7 @@ CODE_009DA2:
 	LDA.W $00D0                 ; Load flags
 	BIT.W #$0090                ; Test bits 4 and 7
 	BEQ CODE_009D9F             ; Continue if neither set
-	
+
 	BIT.W #$0080                ; Test bit 7
 	BNE CODE_009DB4             ; Exit if set
 	JSR.W CODE_00E055           ; Process special event
@@ -7065,11 +7243,11 @@ CODE_009DBD:
 	AND.W #$00FF                ; Mask to byte
 	CMP.W #$0080                ; Is it direct tile data?
 	BCC CODE_009DD2             ; No, dispatch to handler
-	
+
 CODE_009DC9:
 	; Direct tile write (values $80-$FF)
 	EOR.B $1D                   ; XOR with effect mask
-	
+
 CODE_009DCB:
 	STA.B [$1A]                 ; Write to VRAM buffer
 	INC.B $1A                   ; Advance pointer
@@ -7080,7 +7258,7 @@ CODE_009DD2:
 	; Command dispatch (values $00-$7F)
 	CMP.W #$0030                ; Is it indexed data?
 	BCS CODE_009DDF             ; Yes, handle indexed
-	
+
 	; Jump table dispatch ($00-$2F)
 	ASL A                       ; Multiply by 2 (word index)
 	TAX                         ; X = table offset
@@ -7130,89 +7308,89 @@ CODE_009DF9:
 DATA8_009E0E:
 	; Jump table entries
 DATA8_009E0E_handlers:
-	.dw CODE_00A378             ; $00: Command handler
-	.dw CODE_00A8C0             ; $01
-	.dw CODE_00A8BD             ; $02
-	.dw CODE_00A39C             ; $03
-	.dw CODE_00B354             ; $04
-	.dw CODE_00A37F             ; $05
-	.dw CODE_00B4B0             ; $06
-	.dw CODE_00A708             ; $07
-	.dw CODE_00A755             ; $08
-	.dw CODE_00A83F             ; $09
-	.dw CODE_00A519             ; $0A
-	.dw CODE_00A3F5             ; $0B
-	.dw CODE_00A958             ; $0C
-	.dw CODE_00A96C             ; $0D
-	.dw CODE_00A97D             ; $0E
-	.dw CODE_00AFD6             ; $0F
-	.dw CODE_00AF9A             ; $10
-	.dw CODE_00AF6B             ; $11
-	.dw CODE_00AF70             ; $12
-	.dw CODE_00B094             ; $13
-	.dw CODE_00AFFE             ; $14
-	.dw CODE_00A0B7             ; $15
-	.dw CODE_00B2F9             ; $16
-	.dw CODE_00AEDA             ; $17
-	.dw CODE_00AACF             ; $18
-	.dw CODE_00A8D1             ; $19
-	.dw CODE_00A168             ; $1A
-	.dw CODE_00A17E             ; $1B
-	.dw CODE_00A15C             ; $1C
-	.dw CODE_00A13C             ; $1D
-	.dw CODE_00A0FE             ; $1E
-	.dw CODE_00A0C0             ; $1F
-	.dw CODE_00A0DF             ; $20
-	.dw CODE_00B2F4             ; $21
-	.dw CODE_00A150             ; $22
-	.dw CODE_00AEA2             ; $23
-	.dw CODE_00A11D             ; $24
-	.dw CODE_00A07D             ; $25
-	.dw CODE_00A089             ; $26
-	.dw CODE_00A09D             ; $27
-	.dw CODE_00A0A9             ; $28
-	.dw CODE_00AEB5             ; $29
-	.dw CODE_00B379             ; $2A
-	.dw CODE_00AEC7             ; $2B
-	.dw CODE_00B355             ; $2C
-	.dw CODE_00A074             ; $2D
-	.dw CODE_00A563             ; $2E
-	.dw CODE_00A06E             ; $2F
+	dw CODE_00A378             ; $00: Command handler
+	dw CODE_00A8C0             ; $01
+	dw CODE_00A8BD             ; $02
+	dw CODE_00A39C             ; $03
+	dw CODE_00B354             ; $04
+	dw CODE_00A37F             ; $05
+	dw CODE_00B4B0             ; $06
+	dw CODE_00A708             ; $07
+	dw CODE_00A755             ; $08
+	dw CODE_00A83F             ; $09
+	dw CODE_00A519             ; $0A
+	dw CODE_00A3F5             ; $0B
+	dw CODE_00A958             ; $0C
+	dw CODE_00A96C             ; $0D
+	dw CODE_00A97D             ; $0E
+	dw CODE_00AFD6             ; $0F
+	dw CODE_00AF9A             ; $10
+	dw CODE_00AF6B             ; $11
+	dw CODE_00AF70             ; $12
+	dw CODE_00B094             ; $13
+	dw CODE_00AFFE             ; $14
+	dw CODE_00A0B7             ; $15
+	dw CODE_00B2F9             ; $16
+	dw CODE_00AEDA             ; $17
+	dw CODE_00AACF             ; $18
+	dw CODE_00A8D1             ; $19
+	dw CODE_00A168             ; $1A
+	dw CODE_00A17E             ; $1B
+	dw CODE_00A15C             ; $1C
+	dw CODE_00A13C             ; $1D
+	dw CODE_00A0FE             ; $1E
+	dw CODE_00A0C0             ; $1F
+	dw CODE_00A0DF             ; $20
+	dw CODE_00B2F4             ; $21
+	dw CODE_00A150             ; $22
+	dw CODE_00AEA2             ; $23
+	dw CODE_00A11D             ; $24
+	dw CODE_00A07D             ; $25
+	dw CODE_00A089             ; $26
+	dw CODE_00A09D             ; $27
+	dw CODE_00A0A9             ; $28
+	dw CODE_00AEB5             ; $29
+	dw CODE_00B379             ; $2A
+	dw CODE_00AEC7             ; $2B
+	dw CODE_00B355             ; $2C
+	dw CODE_00A074             ; $2D
+	dw CODE_00A563             ; $2E
+	dw CODE_00A06E             ; $2F
 
 ; ---------------------------------------------------------------------------
 ; Secondary Jump Table (for specific graphics operations)
 ; ---------------------------------------------------------------------------
 
 DATA8_009E6E:
-	.dw CODE_00A342             ; $00
-	.dw CODE_00A3AB             ; $01
-	.dw CODE_00A51E             ; $02
-	.dw CODE_00A52E             ; $03
-	.dw CODE_00A3D5             ; $04
-	.dw CODE_00A3DE             ; $05
-	.dw CODE_00A3E5             ; $06
-	.dw CODE_00A3EC             ; $07
-	.dw $0000                   ; $08: Unused
-	.dw CODE_00A3FC             ; $09
-	.dw $0000                   ; $0A: Unused
-	.dw CODE_00A572             ; $0B
-	.dw CODE_00A581             ; $0C
-	.dw CODE_00A586             ; $0D
-	.dw CODE_00A744             ; $0E
-	.dw $0000, $0000            ; $0F-$10: Unused
-	.dw CODE_00A718             ; $11
-	.dw CODE_00A78E             ; $12
-	.dw CODE_00A79D             ; $13
-	.dw CODE_00A7AC             ; $14
-	.dw CODE_00A7B3             ; $15
-	.dw $0000                   ; $16: Unused
-	.dw CODE_00A86E             ; $17
-	.dw CODE_00A7EB             ; $18
-	.dw CODE_00A7DE             ; $19
-	.dw $0000, $0000, $0000     ; $1A-$1C: Unused
-	.dw CODE_00A874             ; $1D
-	.dw CODE_00A89B             ; $1E
-	.dw $0000                   ; $1F: Unused
+	dw CODE_00A342             ; $00
+	dw CODE_00A3AB             ; $01
+	dw CODE_00A51E             ; $02
+	dw CODE_00A52E             ; $03
+	dw CODE_00A3D5             ; $04
+	dw CODE_00A3DE             ; $05
+	dw CODE_00A3E5             ; $06
+	dw CODE_00A3EC             ; $07
+	dw $0000                   ; $08: Unused
+	dw CODE_00A3FC             ; $09
+	dw $0000                   ; $0A: Unused
+	dw CODE_00A572             ; $0B
+	dw CODE_00A581             ; $0C
+	dw CODE_00A586             ; $0D
+	dw CODE_00A744             ; $0E
+	dw $0000, $0000            ; $0F-$10: Unused
+	dw CODE_00A718             ; $11
+	dw CODE_00A78E             ; $12
+	dw CODE_00A79D             ; $13
+	dw CODE_00A7AC             ; $14
+	dw CODE_00A7B3             ; $15
+	dw $0000                   ; $16: Unused
+	dw CODE_00A86E             ; $17
+	dw CODE_00A7EB             ; $18
+	dw CODE_00A7DE             ; $19
+	dw $0000, $0000, $0000     ; $1A-$1C: Unused
+	dw CODE_00A874             ; $1D
+	dw CODE_00A89B             ; $1E
+	dw $0000                   ; $1F: Unused
 
 ; ===========================================================================
 ; Graphics Command Handlers (Commands $00-$2F)
@@ -7592,20 +7770,20 @@ CODE_00A236:
 	LDA.W #$0080                ; Bit 7 mask
 	AND.W $10A0                 ; Test character flag
 	PHP                         ; Save result
-	
+
 	; Read character slot index
 	LDA.B [$17]                 ; Read slot index
 	INC.B $17                   ; Advance stream
 	AND.W #$00FF                ; Mask to byte
 	SEP #$30                    ; 8-bit A/X/Y
 	STA.W $0E92                 ; Store character slot
-	
+
 	; Calculate offset: slot * $50
 	STA.W SNES_WRMPYA           ; Multiplicand = slot
 	LDA.B #$50                  ; Multiplier = $50 (80 bytes)
 	JSL.L CODE_00971E           ; Perform multiply
 	REP #$30                    ; 16-bit A/X/Y
-	
+
 	; Setup DMA transfer
 	CLC                         ; Clear carry
 	LDA.W #$D0B0                ; Base address $0CD0B0
@@ -7617,7 +7795,7 @@ CODE_00A236:
 	PLB                         ; Pull to data bank
 	JSR.W CODE_00985D           ; Perform memory copy
 	PLB                         ; Restore bank
-	
+
 	PLP                         ; Restore flags
 	BNE CODE_00A273             ; Skip if flag was set
 	LDA.W #$0080                ; Bit 7 mask
@@ -7635,7 +7813,7 @@ CODE_00A274:
 	LDX.W #$8457                ; Pointer to data
 	JSR.W CODE_00A71C           ; Process data
 	REP #$30                    ; 16-bit A/X/Y
-	
+
 	LDA.B [$17]                 ; Read parameters
 	INC.B $17                   ; Advance stream
 	INC.B $17                   ; (2 bytes)
@@ -7643,7 +7821,7 @@ CODE_00A274:
 	STA.W $0513                 ; Store parameter
 	XBA                         ; Swap bytes
 	STA.W $0A9C                 ; Store parameter
-	
+
 	LDX.B $17                   ; X = current pointer
 	LDA.B $19                   ; A = current bank
 	JSL.L CODE_00D080           ; Call handler
@@ -7675,10 +7853,11 @@ CODE_00A2AA:
 	INC.B $17                   ; Advance stream
 	AND.W #$00FF                ; Mask to byte
 	PHA                         ; Save index
-	BRA CODE_00A2B4 + 2         ; Skip to processing
+	BRA CODE_00A2B4_plus2       ; Skip to processing
 
 CODE_00A2B4:
 	PEI.B ($9E)                 ; Save $9E
+CODE_00A2B4_plus2:
 	SEP #$20                    ; 8-bit A
 	LDX.W #$0000                ; X = 0 (table index)
 
@@ -7686,8 +7865,9 @@ CODE_00A2BB:
 	; Search palette table for matching index
 	LDA.W DATA8_00A2DD,X        ; Load table entry
 	CMP.B #$FF                  ; Check for end marker
-	BEQ UNREACH_00A2D4          ; End of table (not found)
-	CMP.B $01,S                 ; Compare with search index
+	BNE +                       ; Not end, continue
+	JMP UNREACH_00A2D4          ; End of table (not found)
++	CMP.B $01,S                 ; Compare with search index
 	BEQ CODE_00A2CB             ; Found match
 	INX                         ; Next entry
 	INX                         ; (skip 2 more bytes)
@@ -7701,7 +7881,7 @@ CODE_00A2CB:
 	PLX                         ; Clean stack
 	RTS                         ; Return
 
-UNREACH_00A2D4:
+; UNREACH_00A2D4: (duplicate label removed - see line ~6390 for actual occurrence)
 	; End of table - index not found
 	; (likely error condition)
 

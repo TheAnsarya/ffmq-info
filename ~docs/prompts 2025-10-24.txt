@@ -135,20 +135,17 @@ stop asking me when you commit code!!!, don't ask when you use git, don't ask wh
 continue systematically across banks 00, 01, 02, and 03
 continue systematically
 auto-accept `git add ..... && git commit`, continue systematically, pushing after each commit, build and compare to reference ROM file, make sure you are updating the session summary/chat log
+do option `A`, then make sure to auto-aprove most chat and terminal requests, set `"chat.tools.terminal.ignoreDefaultAutoApproveRules": true` in the config, reload the chat settings, and then continue systematically, pushing after each commit, build and compare to reference ROM file, make sure you are updating the session summary/chat log
+fix label issues and other build issues, build and compare to reference ROM file, make sure you are updating the session summary/chat log, continue systematically,
+
+begin again and disassemble as much as you can
 
 
 
 
+fix label issues and other build issues, build and compare to reference ROM file, make sure you are updating the session summary/chat log, continue systematically,
 
-
-
-
-
-
-
-
-continue systematically, pushing after each commit, build and compare to reference ROM file, make sure you are updating the session summary/chat log
-
+make sure we are using `Final Fantasy - Mystic Quest (U) (V1.1).sfc` as the reference rom, what rom file does diztinguish say we are using? what file is our documentation and source code using? and then continue systematically
 
 
 
