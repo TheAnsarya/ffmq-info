@@ -87,11 +87,9 @@ CODE_00A51E = $00A51E
 ; CODE_00A708 through CODE_00A83F now implemented
 ; CODE_00A86E through CODE_00AACC now implemented (partial CODE_00A86E as db)
 ; CODE_00AACF through CODE_00AFFE now implemented
+; CODE_00B000 through CODE_00B1A1 now implemented
 CODE_00A78E = $00A78E             ; Referenced in jump table but not implemented as routine
 CODE_00A86E = $00A86E             ; Partial implementation (raw bytecode placeholder)
-CODE_00B000 = $00B000
-CODE_00B094 = $00B094
-CODE_00B1A1 = $00B1A1
 CODE_00B1B4 = $00B1B4
 CODE_00B1C3 = $00B1C3
 CODE_00B1D6 = $00B1D6
@@ -127,6 +125,7 @@ Some_Init_Function_2 = $00B500
 Some_Function_9319 = $009319
 Some_Function_9A08 = $009A08
 Some_Function_A236 = $00A236
+CODE_009824 = $009824    ; BCD/Hex number formatting routine
 
 ; Other Banks
 CODE_028AE0 = $028AE0    ; Bank $02 routine
@@ -9891,4 +9890,351 @@ CODE_00AFF1:
 ; CODE_00AFFE - Bitwise AND variants with preset counts
 ;-------------------------------------------------------------------------------
 CODE_00AFFE:
+	LDA.W #$0000                   ; 1 byte count
+	BRA CODE_00AFE9                ; → AND table copy
+
+	LDA.W #$0001                   ; 2 byte count
+	BRA CODE_00AFE9
+
+	db $A9,$02,$00,$80,$DC,$A9,$00,$00,$80,$DC ; More variants
+
+	LDA.W #$0001                   ; 2 byte count
+	BRA CODE_00AFEE                ; → AND direct copy
+
+	db $A9,$02,$00,$80,$D2         ; 3 byte variant
+
+;-------------------------------------------------------------------------------
+; CODE_00B01C/B021 - Bitwise TSB (Test and Set Bits)
+; Purpose: OR values with $9E/$A0 (set bits)
+;-------------------------------------------------------------------------------
+CODE_00B01C:
+	JSR.W CODE_00AF2A              ; Copy table
+	BRA CODE_00B024
+
+CODE_00B021:
+	JSR.W CODE_00AF47              ; Copy direct
+
+CODE_00B024:
+	LDA.B $98                      ; Load value
+	TSB.B $9E                      ; Test and Set Bits in $9E
+	LDA.B $9A
+	TSB.B $A0                      ; Test and Set Bits in $A0
+	RTS
+
+	db $A9,$00,$00,$80,$EA         ; TSB variants with preset counts
+
+	LDA.W #$0001
+	BRA CODE_00B01C
+
+	db $A9,$02,$00,$80,$E0
+
 	LDA.W #$0000
+	BRA CODE_00B021
+
+	db $A9,$01,$00,$80,$DB,$A9,$02,$00,$80,$D6
+
+;-------------------------------------------------------------------------------
+; CODE_00B04B/B050 - Bitwise XOR (Exclusive OR)
+; Purpose: XOR values with $9E/$A0
+;-------------------------------------------------------------------------------
+CODE_00B04B:
+	JSR.W CODE_00AF2A              ; Copy table
+	BRA CODE_00B053
+
+CODE_00B050:
+	JSR.W CODE_00AF47              ; Copy direct
+
+CODE_00B053:
+	LDA.B $9E
+	EOR.B $98                      ; XOR with $98
+	STA.B $9E                      ; Store result
+	LDA.B $A0
+	EOR.B $9A                      ; XOR with $9A
+	STA.B $A0
+	RTS
+
+;-------------------------------------------------------------------------------
+; XOR variants with preset counts
+;-------------------------------------------------------------------------------
+	LDA.W #$0000
+	BRA CODE_00B04B
+
+	db $A9,$01,$00,$80,$E1,$A9,$02,$00,$80,$DC,$A9,$00,$00,$80,$DC
+
+	LDA.W #$0001
+	BRA CODE_00B050
+
+	db $A9,$02,$00,$80,$D2
+
+;-------------------------------------------------------------------------------
+; CODE_00B07E/B083 - Addition (ADD)
+; Purpose: Add values to $9E/$A0
+;-------------------------------------------------------------------------------
+CODE_00B07E:
+	JSR.W CODE_00AF2A              ; Copy table
+	BRA CODE_00B086
+
+CODE_00B083:
+	JSR.W CODE_00AF47              ; Copy direct
+
+CODE_00B086:
+	CLC
+	LDA.B $9E
+	ADC.B $98                      ; Add $98
+	STA.B $9E                      ; Store sum
+	LDA.B $A0
+	ADC.B $9A                      ; Add $9A with carry
+	STA.B $A0
+	RTS
+
+;-------------------------------------------------------------------------------
+; CODE_00B094 - Addition variants with preset counts
+;-------------------------------------------------------------------------------
+CODE_00B094:
+	LDA.W #$0000                   ; 1 byte
+	BRA CODE_00B07E
+
+	LDA.W #$0001                   ; 2 bytes
+	BRA CODE_00B07E
+
+	LDA.W #$0002                   ; 3 bytes
+	BRA CODE_00B07E
+
+	LDA.W #$0000                   ; Direct variants
+	BRA CODE_00B083
+
+	LDA.W #$0001
+	BRA CODE_00B083
+
+	LDA.W #$0002
+	BRA CODE_00B083
+
+;-------------------------------------------------------------------------------
+; CODE_00B0B2/B0B7 - Subtraction (SUB)
+; Purpose: Subtract values from $9E/$A0
+;-------------------------------------------------------------------------------
+CODE_00B0B2:
+	JSR.W CODE_00AF2A              ; Copy table
+	BRA CODE_00B0BA
+
+CODE_00B0B7:
+	JSR.W CODE_00AF47              ; Copy direct
+
+CODE_00B0BA:
+	SEC
+	LDA.B $9E
+	SBC.B $98                      ; Subtract $98
+	STA.B $9E                      ; Store difference
+	LDA.B $A0
+	SBC.B $9A                      ; Subtract $9A with borrow
+	STA.B $A0
+	RTS
+
+;-------------------------------------------------------------------------------
+; Subtraction variants with preset counts
+;-------------------------------------------------------------------------------
+	LDA.W #$0000
+	BRA CODE_00B0B2
+
+	LDA.W #$0001
+	BRA CODE_00B0B2
+
+	LDA.W #$0002
+	BRA CODE_00B0B2
+
+	LDA.W #$0000
+	BRA CODE_00B0B7
+
+	LDA.W #$0001
+	BRA CODE_00B0B7
+
+	LDA.W #$0002
+	BRA CODE_00B0B7
+
+;-------------------------------------------------------------------------------
+; CODE_00B0E6 - Division (16-bit / 8-bit)
+; Purpose: Divide $9E by accumulator
+; Entry: A = divisor (8-bit)
+; Exit: $98 = quotient, $9A = remainder (via CODE_0096B3)
+;-------------------------------------------------------------------------------
+CODE_00B0E6:
+	STA.B $9C                      ; Store divisor
+	LDA.B $9E                      ; Load dividend
+	STA.B $98                      ; Setup for division
+	JSL.L CODE_0096B3              ; Call division routine
+	RTS
+
+	LDA.B [$17]                    ; Variant: divisor from script
+	INC.B $17
+	AND.W #$00FF
+	BRA CODE_00B0E6
+
+	db $A7,$17,$E6,$17,$E6,$17,$80,$E4 ; 16-bit divisor variant
+
+	JSR.W CODE_00B188              ; Variant: divisor from $B188
+	BRA CODE_00B0E6
+
+	JSR.W CODE_00B196              ; Variant: divisor from $B196
+	BRA CODE_00B0E6
+
+;-------------------------------------------------------------------------------
+; CODE_00B10C - Multiplication (16-bit × 8-bit)
+; Purpose: Multiply $9E/$A0 by accumulator
+; Entry: A = multiplier (8-bit)
+; Exit: Result in $98/$9A (via CODE_0096E4)
+;-------------------------------------------------------------------------------
+CODE_00B10C:
+	STA.B $9C                      ; Store multiplier
+	LDA.B $9E                      ; Load multiplicand low
+	STA.B $98
+	LDA.B $A0                      ; Load multiplicand high
+	STA.B $9A
+	JSL.L CODE_0096E4              ; Call multiplication routine
+	RTS
+
+;-------------------------------------------------------------------------------
+; CODE_00B11B - Multiplication variants
+;-------------------------------------------------------------------------------
+CODE_00B11B:
+	LDA.B [$17]                    ; Multiplier from script (8-bit)
+	INC.B $17
+	AND.W #$00FF
+	BRA CODE_00B10C
+
+	LDA.B [$17]                    ; Multiplier from script (16-bit)
+	INC.B $17
+	INC.B $17
+	BRA CODE_00B10C
+
+	db $20,$88,$B1,$80,$DB         ; From CODE_00B188
+
+	JSR.W CODE_00B196              ; From CODE_00B196
+	BRA CODE_00B10C
+
+;-------------------------------------------------------------------------------
+; CODE_00B136 - Get random number result
+; Purpose: Transfer RNG result ($A2) to $9E
+; Exit: $9E = random value, $A0 = 0
+;-------------------------------------------------------------------------------
+CODE_00B136:
+	LDA.B $A2                      ; Load RNG result
+	STA.B $9E                      ; Store in $9E
+	STZ.B $A0                      ; Clear high byte
+	RTS
+
+	JSR.W CODE_00B11B              ; Variant: multiply then get result
+	BRA CODE_00B136
+
+	db $20,$24,$B1,$80,$EF,$20,$2C,$B1,$80,$EA,$20,$31,$B1,$80,$E5
+
+;-------------------------------------------------------------------------------
+; CODE_00B151 - Format decimal number for display
+; Purpose: Convert binary value to BCD for display
+; Entry: $9E/$A0 = value to convert
+; Exit: Formatted value in buffer at $6D
+;-------------------------------------------------------------------------------
+CODE_00B151:
+	PEI.B ($9E)                    ; Save $9E
+	PEI.B ($A0)                    ; Save $A0
+	LDA.W #$0090                   ; BCD format flags
+	STA.B $6D                      ; Store in buffer
+	LDA.W #$000A                   ; Base 10 (decimal)
+	STA.B $9C                      ; Store base
+	LDX.W #$006D                   ; X = buffer pointer
+	CLC
+	JSL.L CODE_009824              ; Call BCD conversion
+	PLA                            ; Restore $A0
+	STA.B $A0
+	PLA                            ; Restore $9E
+	STA.B $9E
+	RTS
+
+;-------------------------------------------------------------------------------
+; CODE_00B16B - Format hexadecimal number for display
+; Purpose: Convert binary value to hex for display
+;-------------------------------------------------------------------------------
+CODE_00B16B:
+	PEI.B ($9E)                    ; Save values
+	PEI.B ($A0)
+	LDA.W #$0010                   ; Base 16 (hexadecimal)
+	STA.B $9C
+	LDX.W #$006D                   ; Buffer pointer
+	SEC                            ; Hex mode flag
+	JSL.L CODE_009824              ; Call hex conversion
+	PLA
+	STA.B $A0
+	PLA
+	STA.B $9E
+	RTS
+
+;-------------------------------------------------------------------------------
+; CODE_00B185 - Helper routines for loading test values
+;-------------------------------------------------------------------------------
+CODE_00B185:
+	LDA.B $3A                      ; Load from $3A
+	RTS
+
+CODE_00B188:
+	LDA.B [$17]                    ; Load 8-bit from script
+	INC.B $17
+	AND.W #$00FF
+	RTS
+
+CODE_00B18F:
+	LDA.B $9E                      ; Load from $9E
+	RTS
+
+CODE_00B192:
+	LDA.B $A2                      ; Load from $A2 (RNG)
+	RTS
+
+CODE_00B196:
+	LDA.B [$17]                    ; Load 16-bit from script
+	INC.B $17
+	INC.B $17
+	RTS
+
+;-------------------------------------------------------------------------------
+; CODE_00B1A1 - Compare 16-bit values (equality test)
+; Purpose: Test if $9E/$A0 == value from script
+; Entry: [$17] = 16-bit value, [$17+2] = 8-bit high byte
+; Exit: Z flag set if equal, C flag indicates comparison result
+;-------------------------------------------------------------------------------
+CODE_00B1A1:
+	LDA.B [$17]                    ; Load comparison value low
+	INC.B $17
+	INC.B $17
+	STA.B $64                      ; Save in $64
+	LDA.B [$17]                    ; Load comparison value high
+	INC.B $17
+	AND.W #$00FF
+	STA.B $62                      ; Save in $62
+	SEC                            ; Set carry for comparison
+	LDA.B $A0                      ; Load high byte
+	SBC.B $62                      ; Subtract comparison high
+	BNE CODE_00B1C2                ; If not equal, done
+	LDA.B $9E                      ; Load low byte
+	SBC.B $64                      ; Subtract comparison low
+	; Z flag = equality result
+	; C flag = greater/equal result
+
+CODE_00B1C2:
+	RTS
+
+;===============================================================================
+; Progress: ~10,200 lines documented (72.8% of Bank $00)
+; Latest additions:
+; - CODE_00AFFE-00B021: Bitwise AND and TSB operations with variants
+; - CODE_00B04B-00B053: Bitwise XOR operations
+; - CODE_00B07E-00B094: 16-bit addition operations
+; - CODE_00B0B2-00B0BA: 16-bit subtraction operations
+; - CODE_00B0E6: Division (16÷8 bit)
+; - CODE_00B10C: Multiplication (16×8 bit)
+; - CODE_00B136: Random number result getter
+; - CODE_00B151: Decimal number formatting (BCD conversion)
+; - CODE_00B16B: Hexadecimal number formatting
+; - CODE_00B185-00B196: Value loading helper routines
+; - CODE_00B1A1: 24-bit comparison test
+;
+; Next: More comparison and test routines (CODE_00B1B4 onward)
+;===============================================================================
