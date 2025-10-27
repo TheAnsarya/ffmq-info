@@ -13510,3 +13510,1183 @@ CODE_00C36A:
 CODE_00C39D:
     LDA.W #$0000                   ; Load 0
     SEP #$20                       ; 8-bit accumulator
+    LDA.B #$EC                     ; Load $EC
+    STA.L $7F56DA                  ; Store to WRAM
+    STA.L $7F56DC                  ; Store to WRAM
+    STA.L $7F56DE                  ; Store to WRAM
+    LDA.B $02                      ; Load option index
+    CMP.B $06                      ; Compare with previous
+    BEQ CODE_00C3BD                ; If same, skip update
+    STA.B $06                      ; Store new selection
+    JSR.W CODE_00B91C              ; Update sprite
+    LDA.B $06                      ; Reload selection
+
+CODE_00C3BD:
+    ASL A                          ; × 2
+    TAX                            ; Transfer to X
+    LDA.B #$E0                     ; Load $E0
+    STA.L $7F56DA,X                ; Store to WRAM indexed
+    LDA.B #$08                     ; Bit 3 mask
+    TSB.W $00D4                    ; Set bit 3
+    JSL.L CODE_0C8000              ; Call external routine
+    LDA.B #$08                     ; Bit 3 mask
+    TRB.W $00D4                    ; Clear bit 3
+    REP #$30                       ; 16-bit A/X/Y
+    JMP.W CODE_00C352              ; Jump back to loop
+
+DATA_00C3D8:
+    db $C3,$95,$03
+
+;-------------------------------------------------------------------------------
+; Menu Scrolling System (CODE_00C3DB - CODE_00C439)
+;-------------------------------------------------------------------------------
+CODE_00C3DB:
+    LDA.W #$0305                   ; Menu mode $0305
+    STA.B $03                      ; Store in $03
+    LDX.W #$FFF0                   ; Position offset (-16)
+    STX.B $8E                      ; Set position
+    BRA CODE_00C439                ; Jump to menu display
+
+CODE_00C3E7:
+    LDA.W #$CF30                   ; Button mask
+    JSR.W CODE_00B930              ; Poll input
+    BIT.W #$0300                   ; Test Y/X buttons
+    BNE CODE_00C407                ; If pressed, process
+    BIT.W #$0C00                   ; Test L/R buttons
+    BNE CODE_00C439                ; If pressed, refresh
+    BIT.W #$8000                   ; Test A button
+    BEQ CODE_00C3E7                ; If not pressed, loop
+    JSR.W CODE_00B91C              ; Update sprite
+    STZ.B $8E                      ; Clear position
+    LDX.W #$C444                   ; Menu data
+    JMP.W CODE_009BC4              ; Show menu
+
+CODE_00C407:
+    SEP #$20                       ; 8-bit accumulator
+    LDA.B $01                      ; Load menu option
+    CMP.B #$04                     ; Check if option 4
+    BEQ CODE_00C423                ; If yes, scroll down
+    LDA.B $04                      ; Load scroll position
+    CMP.B #$03                     ; Check if at top
+    BEQ CODE_00C437                ; If yes, can't scroll up
+    DEC.B $04                      ; Decrement scroll
+    LDA.B $02                      ; Load current index
+    SBC.B #$02                     ; Subtract 2
+    BCS CODE_00C41F                ; If no underflow, continue
+    LDA.B #$00                     ; Clamp to 0
+
+CODE_00C41F:
+    STA.B $02                      ; Store new index
+    BRA CODE_00C437                ; Continue
+
+CODE_00C423:
+    LDA.B $04                      ; Load scroll position
+    CMP.B #$04                     ; Check if at bottom
+    BEQ CODE_00C437                ; If yes, can't scroll down
+    INC.B $04                      ; Increment scroll
+    LDA.B $02                      ; Load current index
+    ADC.B #$02                     ; Add 2
+    CMP.B #$04                     ; Check if >= 4
+    BNE CODE_00C435                ; If not, continue
+    LDA.B #$03                     ; Clamp to 3
+
+CODE_00C435:
+    STA.B $02                      ; Store new index
+
+CODE_00C437:
+    REP #$30                       ; 16-bit A/X/Y
+
+CODE_00C439:
+    LDX.W #$C441                   ; Menu data
+    JSR.W CODE_009BC4              ; Update menu
+    BRA CODE_00C3E7                ; Loop
+
+DATA_00C441:
+    db $8E,$90,$03
+
+DATA_00C444:
+    db $47,$91,$03
+
+;-------------------------------------------------------------------------------
+; Another Menu Scrolling System (CODE_00C447 - CODE_00C494)
+;-------------------------------------------------------------------------------
+CODE_00C447:
+    LDA.W #$0305                   ; Menu mode $0305
+    STA.B $03                      ; Store in $03
+    LDX.W #$FFF0                   ; Position offset (-16)
+    STX.B $8E                      ; Set position
+    BRA CODE_00C494                ; Jump to menu display
+
+CODE_00C453:
+    LDA.W #$CF30                   ; Button mask
+    JSR.W CODE_00B930              ; Poll input
+    BIT.W #$0300                   ; Test Y/X buttons
+    BNE CODE_00C473                ; If pressed, process
+    BIT.W #$0C00                   ; Test L/R buttons
+    BNE CODE_00C494                ; If pressed, refresh
+    BIT.W #$8000                   ; Test A button
+    BEQ CODE_00C453                ; If not pressed, loop
+    JSR.W CODE_00B91C              ; Update sprite
+    STZ.B $8E                      ; Clear position
+    LDX.W #$C49F                   ; Menu data
+    JMP.W CODE_009BC4              ; Show menu
+
+CODE_00C473:
+    SEP #$20                       ; 8-bit accumulator
+    LDA.B $01                      ; Load menu option
+    CMP.B #$04                     ; Check if option 4
+    BEQ CODE_00C488                ; If yes, scroll to bottom
+    LDA.B #$03                     ; Load 3
+    CMP.B $04                      ; Compare with scroll position
+    BEQ CODE_00C492                ; If equal, done
+    STA.B $04                      ; Store 3
+    DEC A                          ; Decrement to 2
+    STA.B $02                      ; Store index
+    BRA CODE_00C492                ; Continue
+
+CODE_00C488:
+    LDA.B #$01                     ; Load 1
+    CMP.B $04                      ; Compare with scroll position
+    BEQ CODE_00C492                ; If equal, done
+    STA.B $04                      ; Store 1
+    STZ.B $02                      ; Clear index
+
+CODE_00C492:
+    REP #$30                       ; 16-bit A/X/Y
+
+CODE_00C494:
+    LDX.W #$C49C                   ; Menu data
+    JSR.W CODE_009BC4              ; Update menu
+    BRA CODE_00C453                ; Loop
+
+DATA_00C49C:
+    db $E3,$91,$03
+
+DATA_00C49F:
+    db $47,$91,$03
+
+;-------------------------------------------------------------------------------
+; Wait Loop with Input Polling (CODE_00C4A2 - CODE_00C4D7)
+;-------------------------------------------------------------------------------
+CODE_00C4A2:
+    LDX.W #$FFF0                   ; Position offset (-16)
+    STX.B $8E                      ; Set position
+
+CODE_00C4A7:
+    JSL.L CODE_0096A0              ; Call external routine
+    LDA.W #$0080                   ; Bit 7 mask
+    AND.W $00D9                    ; Test flag
+    BEQ CODE_00C4C1                ; If clear, continue
+    db $A9,$80,$00,$1C,$D9,$00,$A2,$D8,$C4,$20,$C4,$9B,$80,$E6  ; Data/unreachable
+
+CODE_00C4C1:
+    LDA.B $07                      ; Load input result
+    AND.W #$BFCF                   ; Mask buttons
+    BEQ CODE_00C4A7                ; If no button, loop
+    AND.W #$8000                   ; Test A button
+    BNE CODE_00C4D2                ; If pressed, confirm
+    JSR.W CODE_00B912              ; Update sprite mode
+    BRA CODE_00C4A7                ; Loop
+
+CODE_00C4D2:
+    JSR.W CODE_00B91C              ; Update sprite
+    STZ.B $8E                      ; Clear position
+    RTS
+
+DATA_00C4D8:
+    db $D1,$9C,$03
+;===============================================================================
+; WRAM Buffer Management & Screen Setup (CODE_00C4DB - CODE_00C7DD)
+;===============================================================================
+; This section manages WRAM buffers at $7F5000-$7F5700 for battle menus
+; and handles screen initialization for various game modes
+;===============================================================================
+
+; CODE_00C4DB - already a stub, implementing now
+CODE_00C4DB:
+    JSR.W CODE_00C561              ; Clear WRAM buffer 1 ($7F5000)
+    JSR.W CODE_00C576              ; Clear WRAM buffer 2 ($7F51B7)  
+    JSR.W CODE_00C58B              ; Clear WRAM buffer 3 ($7F536E)
+    JSR.W CODE_00C5A0              ; Clear WRAM buffer 4 ($7F551E)
+    JSR.W CODE_00C604              ; Jump to CODE_00C5B5 (WRAM $7E3000)
+    LDX.W #$C51B                   ; Source data pointer
+    LDY.W #$5000                   ; Dest: WRAM $7F5000
+    LDA.W #$0006                   ; 7 bytes
+    MVN $7F,$00                    ; Block move Bank $00 ? $7F
+    LDY.W #$4360                   ; Dest: DMA channel 6
+    LDA.W #$0007                   ; 8 bytes
+    MVN $00,$00                    ; Block move within Bank $00
+    LDY.W #$5367                   ; Dest: WRAM $7F5367
+    LDA.W #$0006                   ; 7 bytes
+    MVN $7F,$00                    ; Block move Bank $00 ? $7F
+    LDY.W #$4370                   ; Dest: DMA channel 7
+    LDA.W #$0007                   ; 8 bytes
+    MVN $00,$00                    ; Block move within Bank $00
+    SEP #$20                       ; 8-bit accumulator
+    LDA.B #$C0                     ; Bits 6-7
+    TSB.W $0111                    ; Set bits in $0111
+    REP #$30                       ; 16-bit A/X/Y
+    RTS
+
+DATA_00C51B:
+    db $FF,$07,$50,$D9,$05,$51,$00,$42,$0E,$00,$50,$7F,$07,$50,$7F,$FF
+    db $6E,$53,$D9,$6C,$54,$00,$42,$10,$67,$53,$7F,$6E,$53,$7F
+
+; Helper - Unknown purpose  
+CODE_00C539:
+    PEA.W $007F                    ; Push $007F
+    PLB                            ; Pull to data bank
+    LDY.W #$5016                   ; WRAM address
+    JSR.W CODE_00C54B              ; Call fill routine
+    LDY.W #$537D                   ; WRAM address
+    JSR.W CODE_00C54B              ; Call fill routine
+    PLB                            ; Restore data bank
+    RTS
+
+CODE_00C54B:
+    LDX.W #$000D                   ; 13 iterations
+    CLC                            ; Clear carry
+
+CODE_00C54F:
+    SEP #$20                       ; 8-bit accumulator
+    LDA.B #$00                     ; Value 0
+    JSR.W CODE_0099EA              ; Write to WRAM
+    REP #$30                       ; 16-bit A/X/Y
+    TYA                            ; Y to A
+    ADC.W #$0020                   ; Add $20 (32 bytes)
+    TAY                            ; Back to Y
+    DEX                            ; Decrement counter
+    BNE CODE_00C54F                ; Loop if not zero
+    RTS
+
+;-------------------------------------------------------------------------------
+; WRAM Buffer Clear Routines
+;-------------------------------------------------------------------------------
+CODE_00C561:
+    LDA.W #$0000                   ; Clear value
+    STA.L $7F5007                  ; Write to $7F5007
+    LDX.W #$5007                   ; Source
+    LDY.W #$5009                   ; Dest
+    LDA.W #$01AD                   ; 430 bytes
+    MVN $7F,$7F                    ; Fill $7F5007-$7F51B5 with 0
+    BRA CODE_00C5F5                ; Continue
+
+CODE_00C576:
+    LDA.W #$0100                   ; Value $0100
+    STA.L $7F51B7                  ; Write to $7F51B7
+    LDX.W #$51B7                   ; Source
+    LDY.W #$51B9                   ; Dest
+    LDA.W #$01AD                   ; 430 bytes
+    MVN $7F,$7F                    ; Fill $7F51B7-$7F5365 with $0100
+    BRA CODE_00C5F5                ; Continue
+
+CODE_00C58B:
+    LDA.W #$0000                   ; Clear value
+    STA.L $7F536E                  ; Write to $7F536E
+    LDX.W #$536E                   ; Source
+    LDY.W #$5370                   ; Dest
+    LDA.W #$01AD                   ; 430 bytes
+    MVN $7F,$7F                    ; Fill $7F536E-$7F551C with 0
+    BRA CODE_00C5CF                ; Continue
+
+CODE_00C5A0:
+    LDA.W #$0100                   ; Value $0100
+    STA.L $7F551E                  ; Write to $7F551E
+    LDX.W #$551E                   ; Source
+    LDY.W #$5520                   ; Dest
+    LDA.W #$01AD                   ; 430 bytes
+    MVN $7F,$7F                    ; Fill $7F551E-$7F56CC with $0100
+    BRA CODE_00C5CF                ; Continue
+
+CODE_00C5B5:
+    LDA.W #$0000                   ; Clear value
+    STA.L $7E3007                  ; Write to $7E3007
+    LDX.W #$3007                   ; Source
+    LDY.W #$3009                   ; Dest
+    LDA.W #$01AD                   ; 430 bytes
+    MVN $7E,$7E                    ; Fill $7E3007-$7E31B5 with 0
+    LDA.W #$0120                   ; Value $0120
+    STA.W $31B5                    ; Store at $7E31B5
+    RTS
+
+CODE_00C5CF:
+    TYA                            ; Y to A
+    SEC                            ; Set carry
+    SBC.W #$0042                   ; Subtract $42
+    TAY                            ; Back to Y
+    LDX.W #$C5E7                   ; Data pointer
+    LDA.L $000EC6                  ; Load battle speed flag
+    AND.W #$0080                   ; Test bit 7
+    BEQ CODE_00C5E4                ; If clear, use first data
+    db $A2,$F0,$C5                 ; LDX #$C5F0 (alternate data)
+
+CODE_00C5E4:
+    JMP.W CODE_00C75B              ; Jump to sprite setup
+
+DATA_00C5E7:
+    db $0C,$20,$06,$24,$06,$26,$08,$28,$00
+    db $18,$20,$08,$28,$00
+
+CODE_00C5F5:
+    TYA                            ; Y to A
+    SEC                            ; Set carry
+    SBC.W #$0042                   ; Subtract $42
+    TAY                            ; Back to Y
+    LDX.W #$C601                   ; Data pointer
+    JMP.W CODE_00C75B              ; Jump to sprite setup
+
+DATA_00C601:
+    db $20,$28,$00
+
+CODE_00C604:
+    JMP.W CODE_00C5B5              ; Jump to WRAM clear
+
+;-------------------------------------------------------------------------------
+; Screen Setup Routines
+;-------------------------------------------------------------------------------
+CODE_00C607:
+    JSR.W CODE_00C5B5              ; Clear WRAM $7E3000
+    LDA.W #$0060                   ; Value $60
+    LDX.W #$3025                   ; Address $7E3025
+    JSR.W CODE_00C65A              ; Fill 8 words
+    LDX.W #$3035                   ; Address $7E3035
+    BRA CODE_00C62C                ; Continue
+
+CODE_00C618:
+    JSR.W CODE_00C561              ; Clear WRAM buffer 1
+    LDA.W #$0030                   ; Value $30
+    LDX.W #$50F5                   ; Address $7F50F5
+    BRA CODE_00C62C                ; Continue
+
+CODE_00C623:
+    JSR.W CODE_00C576              ; Clear WRAM buffer 2
+    LDA.W #$0030                   ; Value $30
+    LDX.W #$52A5                   ; Address $7F52A5
+
+CODE_00C62C:
+    JSR.W CODE_00C65A              ; Fill 8 words
+    SEC                            ; Set carry
+
+CODE_00C630:
+    STA.W $0010,X                  ; Store at X+$10
+    STA.W $0012,X                  ; Store at X+$12
+    STA.W $0014,X                  ; Store at X+$14
+    STA.W $0016,X                  ; Store at X+$16
+    STA.W $0018,X                  ; Store at X+$18
+    STA.W $001A,X                  ; Store at X+$1A
+    STA.W $001C,X                  ; Store at X+$1C
+    STA.W $001E,X                  ; Store at X+$1E
+    TAY                            ; Transfer to Y
+    REP #$30                       ; 16-bit A/X/Y
+    TXA                            ; X to A
+    ADC.W #$000F                   ; Add 15
+    TAX                            ; Back to X
+    SEP #$20                       ; 8-bit accumulator
+    TYA                            ; Y to A
+    SBC.B #$07                     ; Subtract 7
+    BNE CODE_00C630                ; Loop if not zero
+    REP #$30                       ; 16-bit A/X/Y
+    RTS
+
+CODE_00C65A:
+    SEP #$20                       ; 8-bit accumulator
+    STA.W $0000,X                  ; Store at X+0
+    STA.W $0002,X                  ; Store at X+2
+    STA.W $0004,X                  ; Store at X+4
+    STA.W $0006,X                  ; Store at X+6
+    STA.W $0008,X                  ; Store at X+8
+    STA.W $000A,X                  ; Store at X+10
+    STA.W $000C,X                  ; Store at X+12
+    STA.W $000E,X                  ; Store at X+14
+    RTS
+; ==============================================================================
+; Screen Setup and Sprite Systems - CODE_00C675+
+; ==============================================================================
+
+CODE_00C675:
+    LDY.W #$521D                         ;00C675|A01D52  |      ;
+    PHB                                  ;00C678|8B      |      ;
+    PHY                                  ;00C679|5A      |      ;
+    JSR.W CODE_00C576                    ;00C67A|2076C5  |00C576;
+    PLY                                  ;00C67D|7A      |      ;
+    LDX.W #$C686                         ;00C67E|A286C6  |      ;
+    JSR.W CODE_00C75B                    ;00C681|205BC7  |00C75B;
+    PLB                                  ;00C684|AB      |      ;
+    RTS                                  ;00C685|60      |      ;
+
+DATA_00C686:
+    db $0C,$04,$18,$08,$00               ;00C686|        |      ;
+
+CODE_00C68B:
+    PHB                                  ;00C68B|8B      |      ;
+    JSR.W CODE_00C576                    ;00C68C|2076C5  |00C576;
+    LDX.W #$C6A6                         ;00C68F|A2A6C6  |      ;
+    LDY.W #$522D                         ;00C692|A02D52  |      ;
+    JSR.W CODE_00C75B                    ;00C695|205BC7  |00C75B;
+    JSR.W CODE_00C5A0                    ;00C698|20A0C5  |00C5A0;
+    LDX.W #$C6B3                         ;00C69B|A2B3C6  |      ;
+    LDY.W #$5634                         ;00C69E|A03456  |      ;
+    JSR.W CODE_00C75B                    ;00C6A1|205BC7  |00C75B;
+    PLB                                  ;00C6A4|AB      |      ;
+    RTS                                  ;00C6A5|60      |      ;
+
+DATA_00C6A6:
+    db $0C,$04,$0C,$08,$1C,$0C,$1C,$10,$1C,$14,$10,$18,$00 ;00C6A6|        |      ;
+
+DATA_00C6B3:
+    db $1C,$04,$10,$08,$00               ;00C6B3|        |      ;
+
+CODE_00C6B8:
+    PHB                                  ;00C6B8|8B      |      ;
+    JSR.W CODE_00C576                    ;00C6B9|2076C5  |00C576;
+    LDX.W #$C6D3                         ;00C6BC|A2D3C6  |      ;
+    LDY.W #$528D                         ;00C6BF|A08D52  |      ;
+    JSR.W CODE_00C75B                    ;00C6C2|205BC7  |00C75B;
+    JSR.W CODE_00C5A0                    ;00C6C5|20A0C5  |00C5A0;
+    LDX.W #$C6D6                         ;00C6C8|A2D6C6  |      ;
+    LDY.W #$5574                         ;00C6CB|A07455  |      ;
+    JSR.W CODE_00C75B                    ;00C6CE|205BC7  |00C75B;
+    PLB                                  ;00C6D1|AB      |      ;
+    RTS                                  ;00C6D2|60      |      ;
+
+DATA_00C6D3:
+    db $0C,$04,$00                       ;00C6D3|        |      ;
+
+DATA_00C6D6:
+    db $0C,$04,$14,$08,$0C,$0C,$34,$10,$0C,$14,$0C,$18,$0C ;00C6D6|        |      ;
+    db $1C,$08,$20,$00                   ;00C6E3|        |      ;
+
+CODE_00C6E7:
+    PHB                                  ;00C6E7|8B      |      ;
+    JSR.W CODE_00C576                    ;00C6E8|2076C5  |00C576;
+    LDX.W #$C73F                         ;00C6EB|A23FC7  |      ;
+    LDY.W #$527D                         ;00C6EE|A07D52  |      ;
+    JSR.W CODE_00C75B                    ;00C6F1|205BC7  |00C75B;
+    JSR.W CODE_00C5A0                    ;00C6F4|20A0C5  |00C5A0;
+    LDX.W #$C744                         ;00C6F7|A244C7  |      ;
+    LDY.W #$55B4                         ;00C6FA|A0B455  |      ;
+    JSR.W CODE_00C75B                    ;00C6FD|205BC7  |00C75B;
+    LDX.W #$55B4                         ;00C700|A2B455  |      ;
+    LDY.W #$0000                         ;00C703|A00000  |      ;
+    LDA.L $000101                        ;00C706|AF010100|000101;
+    JSR.W CODE_00C729                    ;00C70A|2029C7  |00C729;
+    LDX.W #$562C                         ;00C70D|A22C56  |      ;
+    LDY.W #$000C                         ;00C710|A00C00  |      ;
+    LDA.L $000102                        ;00C713|AF020100|000102;
+    JSR.W CODE_00C729                    ;00C717|2029C7  |00C729;
+    LDX.W #$56A4                         ;00C71A|A2A456  |      ;
+    LDY.W #$0018                         ;00C71D|A01800  |      ;
+    LDA.L $000103                        ;00C720|AF030100|000103;
+    JSR.W CODE_00C729                    ;00C724|2029C7  |00C729;
+    PLB                                  ;00C727|AB      |      ;
+    RTS                                  ;00C728|60      |      ;
+
+CODE_00C729:
+    AND.W #$0080                         ;00C729|298000  |      ;
+    BEQ CODE_00C73E                      ;00C72C|F010    |00C73E;
+    db $E2,$20,$98,$9D,$00,$00,$9B,$C8,$C8,$A9,$15,$54,$7F,$7F,$C2,$30 ;00C72E|        |      ;
+
+CODE_00C73E:
+    RTS                                  ;00C73E|60      |      ;
+
+DATA_00C73F:
+    db $3C,$04,$38,$08,$00               ;00C73F|        |      ;
+
+DATA_00C744:
+    db $06,$04,$06,$06,$0C,$08,$24,$0C,$06,$10,$06,$12,$0C,$14,$24,$18 ;00C744|        |      ;
+    db $06,$1C,$06,$1E,$08,$20,$00       ;00C754|        |      ;
+; ==============================================================================
+; Sprite Display System and Save/Load Operations - CODE_00C75B+
+; ==============================================================================
+
+CODE_00C75B:
+    PHB                                  ;00C75B|8B      |      ;
+    PHB                                  ;00C75C|8B      |      ;
+    PLA                                  ;00C75D|68      |      ;
+    STA.L $000031                        ;00C75E|8F310000|000031;
+    SEP #$20                             ;00C762|E220    |      ;
+
+CODE_00C764:
+    LDA.L $000000,X                      ;00C764|BF000000|000000;
+    BEQ CODE_00C78A                      ;00C768|F020    |00C78A;
+    XBA                                  ;00C76A|EB      |      ;
+    LDA.L $000001,X                      ;00C76B|BF010000|000001;
+    STA.W $0000,Y                        ;00C76F|990000  |7F0000;
+    LDA.B #$00                           ;00C772|A900    |      ;
+    XBA                                  ;00C774|EB      |      ;
+    DEC A                                ;00C775|3A      |      ;
+    BEQ UNREACH_00C784                   ;00C776|F00C    |00C784;
+    PHX                                  ;00C778|DA      |      ;
+    ASL A                                ;00C779|0A      |      ;
+    DEC A                                ;00C77A|3A      |      ;
+    TYX                                  ;00C77B|BB      |      ;
+    INY                                  ;00C77C|C8      |      ;
+    INY                                  ;00C77D|C8      |      ;
+    JSR.W $0030                          ;00C77E|203000  |000030;
+    PLX                                  ;00C781|FA      |      ;
+    BRA CODE_00C786                      ;00C782|8002    |00C786;
+
+UNREACH_00C784:
+    db $C8,$C8                           ;00C784|        |      ;
+
+CODE_00C786:
+    INX                                  ;00C786|E8      |      ;
+    INX                                  ;00C787|E8      |      ;
+    BRA CODE_00C764                      ;00C788|80DA    |00C764;
+
+CODE_00C78A:
+    REP #$30                             ;00C78A|C230    |      ;
+    RTS                                  ;00C78C|60      |      ;
+
+CODE_00C78D:
+    SEP #$20                             ;00C78D|E220    |      ;
+    LDA.B #$C0                           ;00C78F|A9C0    |      ;
+    TRB.W $0111                          ;00C791|1C1101  |000111;
+    RTS                                  ;00C794|60      |      ;
+
+CODE_00C795:
+    PHP                                  ;00C795|08      |      ;
+    SEP #$20                             ;00C796|E220    |      ;
+    LDA.B #$80                           ;00C798|A980    |      ;
+    TRB.W $00D6                          ;00C79A|1CD600  |0000D6;
+    LDA.W $00AA                          ;00C79D|ADAA00  |0000AA;
+    AND.B #$F0                           ;00C7A0|29F0    |      ;
+    STA.W $0110                          ;00C7A2|8D1001  |000110;
+    LDA.W $00AA                          ;00C7A5|ADAA00  |0000AA;
+
+CODE_00C7A8:
+    CMP.W $0110                          ;00C7A8|CD1001  |000110;
+    BEQ CODE_00C7B6                      ;00C7AB|F009    |00C7B6;
+    INC.W $0110                          ;00C7AD|EE1001  |000110;
+    JSL.L CODE_0C8000                    ;00C7B0|2200800C|0C8000;
+    BRA CODE_00C7A8                      ;00C7B4|80F2    |00C7A8;
+
+CODE_00C7B6:
+    PLP                                  ;00C7B6|28      |      ;
+    RTL                                  ;00C7B7|6B      |      ;
+
+CODE_00C7B8:
+    PHP                                  ;00C7B8|08      |      ;
+    SEP #$20                             ;00C7B9|E220    |      ;
+    LDA.W $0110                          ;00C7BB|AD1001  |010110;
+    STA.W $00AA                          ;00C7BE|8DAA00  |0100AA;
+
+CODE_00C7C1:
+    BIT.B #$0F                           ;00C7C1|890F    |      ;
+    BEQ CODE_00C7CF                      ;00C7C3|F00A    |00C7CF;
+    DEC A                                ;00C7C5|3A      |      ;
+    STA.W $0110                          ;00C7C6|8D1001  |010110;
+    JSL.L CODE_0C8000                    ;00C7C9|2200800C|0C8000;
+    BRA CODE_00C7C1                      ;00C7CD|80F2    |00C7C1;
+
+CODE_00C7CF:
+    LDA.B #$80                           ;00C7CF|A980    |      ;
+    TSB.W $00D6                          ;00C7D1|0CD600  |0100D6;
+    LDA.B #$80                           ;00C7D4|A980    |      ;
+    STA.W $2100                          ;00C7D6|8D0021  |012100;
+    STA.W $0110                          ;00C7D9|8D1001  |010110;
+    PLP                                  ;00C7DC|28      |      ;
+    RTL                                  ;00C7DD|6B      |      ;
+
+CODE_00C7DE:
+    JSR.W CODE_00C618                    ;00C7DE|2018C6  |00C618;
+    JSR.W CODE_00C58B                    ;00C7E1|208BC5  |00C58B;
+    LDX.W #$C8EC                         ;00C7E4|A2ECC8  |      ;
+    JSR.W CODE_009BC4                    ;00C7E7|20C49B  |009BC4;
+    LDX.W #$C8E3                         ;00C7EA|A2E3C8  |      ;
+    JMP.W CODE_009BC4                    ;00C7ED|4CC49B  |009BC4;
+
+CODE_00C7F0:
+    LDA.W $010D                          ;00C7F0|AD0D01  |00010D;
+    BPL CODE_00C7F8                      ;00C7F3|1003    |00C7F8;
+    LDA.W #$0000                         ;00C7F5|A90000  |      ;
+
+CODE_00C7F8:
+    AND.W #$FF00                         ;00C7F8|2900FF  |      ;
+    STA.B $01                            ;00C7FB|8501    |000001;
+    SEP #$20                             ;00C7FD|E220    |      ;
+    LDA.B #$18                           ;00C7FF|A918    |      ;
+    STA.W $00AB                          ;00C801|8DAB00  |0000AB;
+    JSR.W CODE_00CBEC                    ;00C804|20ECCB  |00CBEC;
+    REP #$30                             ;00C807|C230    |      ;
+    LDX.W #$C922                         ;00C809|A222C9  |      ;
+    JSR.W CODE_009BC4                    ;00C80C|20C49B  |009BC4;
+    PHB                                  ;00C80F|8B      |      ;
+    LDX.W #$016F                         ;00C810|A26F01  |      ;
+    LDY.W #$0E04                         ;00C813|A0040E  |      ;
+    LDA.W #$0005                         ;00C816|A90500  |      ;
+    MVN $00,$00                          ;00C819|540000  |      ;
+    LDA.W #$0020                         ;00C81C|A92000  |      ;
+    TSB.W $00D2                          ;00C81F|0CD200  |0000D2;
+    JSR.W CODE_00C607                    ;00C822|2007C6  |00C607;
+    LDX.W #$51C5                         ;00C825|A2C551  |      ;
+    LDY.W #$5015                         ;00C828|A01550  |      ;
+    LDA.W #$019F                         ;00C82B|A99F01  |      ;
+    MVN $7F,$7F                          ;00C82E|547F7F  |      ;
+    LDX.W #$552C                         ;00C831|A22C55  |      ;
+    LDY.W #$537C                         ;00C834|A07C53  |      ;
+    LDA.W #$019F                         ;00C837|A99F01  |      ;
+    MVN $7F,$7F                          ;00C83A|547F7F  |      ;
+    PLB                                  ;00C83D|AB      |      ;
+    LDX.W #$C8E3                         ;00C83E|A2E3C8  |      ;
+    JSR.W CODE_009BC4                    ;00C841|20C49B  |009BC4;
+    LDA.W #$0600                         ;00C844|A90006  |      ;
+    STA.B $01                            ;00C847|8501    |000001;
+    STA.B $05                            ;00C849|8505    |000005;
+    RTS                                  ;00C84B|60      |      ;
+
+; Menu initialization and game state management
+    LDA.W #$0040                         ;00C84C|A94000  |      ;
+    TSB.W $00DB                          ;00C84F|0CDB00  |0000DB;
+    BRA CODE_00C85A                      ;00C852|8006    |00C85A;
+
+    LDA.W #$0001                         ;00C854|A90100  |      ;
+    TSB.W $00DA                          ;00C857|0CDA00  |0000DA;
+
+CODE_00C85A:
+    JSR.W CODE_00C623                    ;00C85A|2023C6  |00C623;
+    JSR.W CODE_00C5A0                    ;00C85D|20A0C5  |00C5A0;
+    LDX.W #$C8EC                         ;00C860|A2ECC8  |      ;
+    BRA CODE_00C89D                      ;00C863|8038    |00C89D;
+
+    LDX.W #$C90A                         ;00C865|A20AC9  |      ;
+    BRA CODE_00C89D                      ;00C868|8033    |00C89D;
+
+    LDX.W #$C910                         ;00C86A|A210C9  |      ;
+    BRA CODE_00C89D                      ;00C86D|802E    |00C89D;
+
+    LDA.W #$0080                         ;00C86F|A98000  |      ;
+    TRB.W $00D9                          ;00C872|1CD900  |0000D9;
+    LDX.W #$C916                         ;00C875|A216C9  |      ;
+    BRA CODE_00C89D                      ;00C878|8023    |00C89D;
+
+    LDA.W #$0080                         ;00C87A|A98000  |      ;
+    TSB.W $00DB                          ;00C87D|0CDB00  |0000DB;
+    LDX.W #$C91C                         ;00C880|A21CC9  |      ;
+    BRA CODE_00C89D                      ;00C883|8018    |00C89D;
+
+    LDA.W $010D                          ;00C885|AD0D01  |00010D;
+    BPL CODE_00C88D                      ;00C888|1003    |00C88D;
+    LDA.W #$0000                         ;00C88A|A90000  |      ;
+
+CODE_00C88D:
+    AND.W #$FF00                         ;00C88D|2900FF  |      ;
+    STA.B $01                            ;00C890|8501    |000001;
+    STA.B $05                            ;00C892|8505    |000005;
+    LDA.W #$0002                         ;00C894|A90200  |      ;
+    TSB.W $00DA                          ;00C897|0CDA00  |0000DA;
+    LDX.W #$C922                         ;00C89A|A222C9  |      ;
+
+CODE_00C89D:
+    PHX                                  ;00C89D|DA      |      ;
+    JSR.W CODE_009BC4                    ;00C89E|20C49B  |009BC4;
+    PLX                                  ;00C8A1|FA      |      ;
+    INX                                  ;00C8A2|E8      |      ;
+    INX                                  ;00C8A3|E8      |      ;
+    INX                                  ;00C8A4|E8      |      ;
+    LDY.W #$0017                         ;00C8A5|A01700  |      ;
+    LDA.W #$0002                         ;00C8A8|A90200  |      ;
+    MVN $00,$00                          ;00C8AB|540000  |      ;
+    JSR.W CODE_00CAB9                    ;00C8AE|20B9CA  |00CAB9;
+    LDX.W #$C8E3                         ;00C8B1|A2E3C8  |      ;
+    JMP.W CODE_009BC4                    ;00C8B4|4CC49B  |009BC4;
+
+; Animation and screen effect handlers
+    LDX.W #$C8F2                         ;00C8B7|A2F2C8  |      ;
+    BRA CODE_00C8C9                      ;00C8BA|800D    |00C8C9;
+
+    LDX.W #$C8F8                         ;00C8BC|A2F8C8  |      ;
+    BRA CODE_00C8C9                      ;00C8BF|8008    |00C8C9;
+
+    LDX.W #$C8FE                         ;00C8C1|A2FEC8  |      ;
+    BRA CODE_00C8C9                      ;00C8C4|8003    |00C8C9;
+
+    LDX.W #$C904                         ;00C8C6|A204C9  |      ;
+
+CODE_00C8C9:
+    PHX                                  ;00C8C9|DA      |      ;
+    JSR.W CODE_009BC4                    ;00C8CA|20C49B  |009BC4;
+    PLX                                  ;00C8CD|FA      |      ;
+    INX                                  ;00C8CE|E8      |      ;
+    INX                                  ;00C8CF|E8      |      ;
+    INX                                  ;00C8D0|E8      |      ;
+    LDA.W #$000C                         ;00C8D1|A90C00  |      ;
+
+CODE_00C8D4:
+    JSL.L CODE_0C8000                    ;00C8D4|2200800C|0C8000;
+    PHA                                  ;00C8D8|48      |      ;
+    PHX                                  ;00C8D9|DA      |      ;
+    JSR.W CODE_009BC4                    ;00C8DA|20C49B  |009BC4;
+    PLX                                  ;00C8DD|FA      |      ;
+    PLA                                  ;00C8DE|68      |      ;
+    DEC A                                ;00C8DF|3A      |      ;
+    BNE CODE_00C8D4                      ;00C8E0|D0F2    |00C8D4;
+    RTS                                  ;00C8E2|60      |      ;
+; ==============================================================================
+; Save System Data Tables and Checksum Validation - Final Systems
+; ==============================================================================
+
+; Save file data table pointers
+DATA_00C8E3:
+    db $A7,$8F,$03,$F2,$AA,$03,$55,$AB,$03,$AA,$92,$03,$14,$93,$03,$19 ;00C8E3|        |      ;
+    db $93,$03,$1F,$93,$03,$28,$93,$03,$33,$93,$03,$3C,$93,$03,$42,$93 ;00C8F3|        |      ;
+    db $03,$4B,$93,$03,$57,$93,$03,$60,$93,$03,$A9,$93,$03,$AE,$93,$03 ;00C903|        |      ;
+    db $F7,$93,$03,$FC,$93,$03,$74,$94,$03,$79,$94,$03,$DD,$94,$03,$E2 ;00C913|        |      ;
+    db $94,$03,$EA,$97,$03                                               ;00C923|        |      ;
+
+; Save slot address calculation
+    LDA.W $015F                          ;00C928|AD5F01  |00015F;
+
+CODE_00C92B:
+    AND.W #$00FF                         ;00C92B|29FF00  |      ;
+    STA.B $98                            ;00C92E|8598    |000098;
+    LDA.W #$038C                         ;00C930|A98C03  |      ;
+    STA.B $9C                            ;00C933|859C    |00009C;
+    JSL.L CODE_0096B3                    ;00C935|22B39600|0096B3;
+    LDA.B $9E                            ;00C939|A59E    |00009E;
+    CLC                                  ;00C93B|18      |      ;
+    ADC.W #$0000                         ;00C93C|690000  |      ;
+    STA.B $0B                            ;00C93F|850B    |00000B;
+    RTS                                  ;00C941|60      |      ;
+
+CODE_00C942:
+    PHP                                  ;00C942|08      |      ;
+    SEP #$20                             ;00C943|E220    |      ;
+    REP #$10                             ;00C945|C210    |      ;
+    PHA                                  ;00C947|48      |      ;
+    LDA.B #$7F                           ;00C948|A97F    |      ;
+    STA.B $61                            ;00C94A|8561    |000061;
+    PLA                                  ;00C94C|68      |      ;
+    PLP                                  ;00C94D|28      |      ;
+    RTS                                  ;00C94E|60      |      ;
+
+CODE_00C94F:
+    PHP                                  ;00C94F|08      |      ;
+    SEP #$20                             ;00C950|E220    |      ;
+    REP #$10                             ;00C952|C210    |      ;
+    PHA                                  ;00C954|48      |      ;
+    LDA.B #$70                           ;00C955|A970    |      ;
+    STA.B $61                            ;00C957|8561    |000061;
+    PLA                                  ;00C959|68      |      ;
+    PLP                                  ;00C95A|28      |      ;
+    RTS                                  ;00C95B|60      |      ;
+
+CODE_00C95C:
+    PHA                                  ;00C95C|48      |      ;
+    PHX                                  ;00C95D|DA      |      ;
+    LDA.W #$4646                         ;00C95E|A94646  |      ;
+    STA.B $0E                            ;00C961|850E    |00000E;
+    LDA.W #$2130                         ;00C963|A93021  |      ;
+    STA.B $10                            ;00C966|8510    |000010;
+    LDX.W #$01C3                         ;00C968|A2C301  |      ;
+    LDA.W #$0000                         ;00C96B|A90000  |      ;
+    CLC                                  ;00C96E|18      |      ;
+
+CODE_00C96F:
+    ADC.B [$5F]                          ;00C96F|675F    |00005F;
+    INC.B $5F                            ;00C971|E65F    |00005F;
+    INC.B $5F                            ;00C973|E65F    |00005F;
+    DEX                                  ;00C975|CA      |      ;
+    BNE CODE_00C96F                      ;00C976|D0F7    |00C96F;
+    STA.B $12                            ;00C978|8512    |000012;
+    PLX                                  ;00C97A|FA      |      ;
+    PLA                                  ;00C97B|68      |      ;
+    RTS                                  ;00C97C|60      |      ;
+
+CODE_00C97D:
+    LDX.W #$0000                         ;00C97D|A20000  |      ;
+
+CODE_00C980:
+    LDA.B $0E,X                          ;00C980|B50E    |00000E;
+    CMP.B [$0B]                          ;00C982|C70B    |00000B;
+    BNE CODE_00C991                      ;00C984|D00B    |00C991;
+    INC.B $0B                            ;00C986|E60B    |00000B;
+    INC.B $0B                            ;00C988|E60B    |00000B;
+    INX                                  ;00C98A|E8      |      ;
+    INX                                  ;00C98B|E8      |      ;
+    CPX.W #$0006                         ;00C98C|E00600  |      ;
+    BNE CODE_00C980                      ;00C98F|D0EF    |00C980;
+
+CODE_00C991:
+    RTS                                  ;00C991|60      |      ;
+
+CODE_00C992:
+    PHB                                  ;00C992|8B      |      ;
+    PHX                                  ;00C993|DA      |      ;
+    PHY                                  ;00C994|5A      |      ;
+    PHA                                  ;00C995|48      |      ;
+    LDX.W #$3000                         ;00C996|A20030  |      ;
+    STX.B $5F                            ;00C999|865F    |00005F;
+    JSR.W CODE_00C942                    ;00C99B|2042C9  |00C942;
+    JSR.W CODE_00C95C                    ;00C99E|205CC9  |00C95C;
+    JSR.W CODE_00C92B                    ;00C9A1|202BC9  |00C92B;
+    LDY.B $0B                            ;00C9A4|A40B    |00000B;
+    LDX.W #$000E                         ;00C9A6|A20E00  |      ;
+    LDA.W #$0005                         ;00C9A9|A90500  |      ;
+    MVN $70,$00                          ;00C9AC|547000  |      ;
+    STY.B $5F                            ;00C9AF|845F    |00005F;
+    LDX.W #$3000                         ;00C9B1|A20030  |      ;
+    LDA.W #$0385                         ;00C9B4|A98503  |      ;
+    MVN $70,$7F                          ;00C9B7|54707F  |      ;
+    LDA.B $12                            ;00C9BA|A512    |000012;
+    JSR.W CODE_00C94F                    ;00C9BC|204FC9  |00C94F;
+    JSR.W CODE_00C95C                    ;00C9BF|205CC9  |00C95C;
+    CMP.B $12                            ;00C9C2|C512    |000012;
+    BNE UNREACH_00C9CB                   ;00C9C4|D005    |00C9CB;
+    JSR.W CODE_00C97D                    ;00C9C6|207DC9  |00C97D;
+    BEQ CODE_00C9CE                      ;00C9C9|F003    |00C9CE;
+
+UNREACH_00C9CB:
+    db $68,$80,$C7                       ;00C9CB|        |      ;
+
+CODE_00C9CE:
+    PLA                                  ;00C9CE|68      |      ;
+    PLY                                  ;00C9CF|7A      |      ;
+    PLX                                  ;00C9D0|FA      |      ;
+    PLB                                  ;00C9D1|AB      |      ;
+    RTS                                  ;00C9D2|60      |      ;
+
+CODE_00C9D3:
+    PHP                                  ;00C9D3|08      |      ;
+    REP #$30                             ;00C9D4|C230    |      ;
+    PHB                                  ;00C9D6|8B      |      ;
+    PHA                                  ;00C9D7|48      |      ;
+    PHD                                  ;00C9D8|0B      |      ;
+    PHX                                  ;00C9D9|DA      |      ;
+    PHY                                  ;00C9DA|5A      |      ;
+    PHA                                  ;00C9DB|48      |      ;
+    STZ.B $8E                            ;00C9DC|648E    |00008E;
+    PHB                                  ;00C9DE|8B      |      ;
+    LDX.W #$1000                         ;00C9DF|A20010  |      ;
+    LDY.W #$3000                         ;00C9E2|A00030  |      ;
+    LDA.W #$004F                         ;00C9E5|A94F00  |      ;
+    MVN $7F,$00                          ;00C9E8|547F00  |      ;
+    LDX.W #$1080                         ;00C9EB|A28010  |      ;
+    LDA.W #$004F                         ;00C9EE|A94F00  |      ;
+    MVN $7F,$00                          ;00C9F1|547F00  |      ;
+    LDX.W #$0E84                         ;00C9F4|A2840E  |      ;
+    LDA.W #$017B                         ;00C9F7|A97B01  |      ;
+    MVN $7F,$00                          ;00C9FA|547F00  |      ;
+    PLB                                  ;00C9FD|AB      |      ;
+    PLA                                  ;00C9FE|68      |      ;
+    LDX.W #$0003                         ;00C9FF|A20300  |      ;
+
+CODE_00CA02:
+    JSR.W CODE_00C992                    ;00CA02|2092C9  |00C992;
+    CLC                                  ;00CA05|18      |      ;
+    ADC.W #$0003                         ;00CA06|690300  |      ;
+    DEX                                  ;00CA09|CA      |      ;
+    BNE CODE_00CA02                      ;00CA0A|D0F6    |00CA02;
+    LDA.W #$FFF0                         ;00CA0C|A9F0FF  |      ;
+    STA.B $8E                            ;00CA0F|858E    |00008E;
+    JMP.W CODE_00981B                    ;00CA11|4C1B98  |00981B;
+
+CODE_00CA14:
+    PHX                                  ;00CA14|DA      |      ;
+    PHY                                  ;00CA15|5A      |      ;
+    PHA                                  ;00CA16|48      |      ;
+
+CODE_00CA17:
+    LDA.B $01,S                          ;00CA17|A301    |000001;
+    JSR.W CODE_00C92B                    ;00CA19|202BC9  |00C92B;
+    CLC                                  ;00CA1C|18      |      ;
+    ADC.W #$0006                         ;00CA1D|690600  |      ;
+    STA.B $5F                            ;00CA20|855F    |00005F;
+    JSR.W CODE_00C94F                    ;00CA22|204FC9  |00C94F;
+    JSR.W CODE_00C95C                    ;00CA25|205CC9  |00C95C;
+    JSR.W CODE_00C97D                    ;00CA28|207DC9  |00C97D;
+    BNE CODE_00CA54                      ;00CA2B|D027    |00CA54;
+    LDA.B $01,S                          ;00CA2D|A301    |000001;
+    JSR.W CODE_00C92B                    ;00CA2F|202BC9  |00C92B;
+    CLC                                  ;00CA32|18      |      ;
+    ADC.W #$0006                         ;00CA33|690600  |      ;
+    TAX                                  ;00CA36|AA      |      ;
+    LDY.W #$3000                         ;00CA37|A00030  |      ;
+    LDA.W #$0385                         ;00CA3A|A98503  |      ;
+    MVN $7F,$70                          ;00CA3D|547F70  |      ;
+    LDA.B $12                            ;00CA40|A512    |000012;
+    LDX.W #$3000                         ;00CA42|A20030  |      ;
+    STX.B $5F                            ;00CA45|865F    |00005F;
+    JSR.W CODE_00C942                    ;00CA47|2042C9  |00C942;
+    JSR.W CODE_00C95C                    ;00CA4A|205CC9  |00C95C;
+    CMP.B $12                            ;00CA4D|C512    |000012;
+    BNE CODE_00CA17                      ;00CA4F|D0C6    |00CA17;
+    CLC                                  ;00CA51|18      |      ;
+    BRA CODE_00CA5F                      ;00CA52|800B    |00CA5F;
+
+CODE_00CA54:
+    LDA.B $01,S                          ;00CA54|A301    |000001;
+    JSR.W CODE_00C92B                    ;00CA56|202BC9  |00C92B;
+    LDA.W #$0000                         ;00CA59|A90000  |      ;
+    STA.B [$0B]                          ;00CA5C|870B    |00000B;
+    SEC                                  ;00CA5E|38      |      ;
+
+CODE_00CA5F:
+    PLA                                  ;00CA5F|68      |      ;
+    PLY                                  ;00CA60|7A      |      ;
+    PLX                                  ;00CA61|FA      |      ;
+    RTS                                  ;00CA62|60      |      ;
+
+CODE_00CA63:
+    PEA.W LOOSE_OP_00CAB5                ;00CA63|F4B5CA  |00CAB5;
+    PHP                                  ;00CA66|08      |      ;
+    REP #$30                             ;00CA67|C230    |      ;
+    PHB                                  ;00CA69|8B      |      ;
+    PHA                                  ;00CA6A|48      |      ;
+    PHD                                  ;00CA6B|0B      |      ;
+    PHX                                  ;00CA6C|DA      |      ;
+    PHY                                  ;00CA6D|5A      |      ;
+    PHA                                  ;00CA6E|48      |      ;
+    STZ.B $8E                            ;00CA6F|648E    |00008E;
+    LDA.B $01,S                          ;00CA71|A301    |000001;
+    LDX.W #$0003                         ;00CA73|A20300  |      ;
+
+CODE_00CA76:
+    JSR.W CODE_00CA14                    ;00CA76|2014CA  |00CA14;
+    BCC CODE_00CA87                      ;00CA79|900C    |00CA87;
+    ADC.W #$0002                         ;00CA7B|690200  |      ;
+    DEX                                  ;00CA7E|CA      |      ;
+    BNE CODE_00CA76                      ;00CA7F|D0F5    |00CA76;
+    PLA                                  ;00CA81|68      |      ;
+    LDA.W #$FFFF                         ;00CA82|A9FFFF  |      ;
+    BRA CODE_00CAAC                      ;00CA85|8025    |00CAAC;
+
+CODE_00CA87:
+    LDX.W #$3000                         ;00CA87|A20030  |      ;
+    LDY.W #$1000                         ;00CA8A|A00010  |      ;
+    LDA.W #$004F                         ;00CA8D|A94F00  |      ;
+    MVN $00,$7F                          ;00CA90|54007F  |      ;
+    LDY.W #$1080                         ;00CA93|A08010  |      ;
+    LDA.W #$004F                         ;00CA96|A94F00  |      ;
+    MVN $00,$7F                          ;00CA99|54007F  |      ;
+    LDY.W #$0E84                         ;00CA9C|A0840E  |      ;
+    LDA.W #$017B                         ;00CA9F|A97B01  |      ;
+    MVN $00,$7F                          ;00CAA2|54007F  |      ;
+    PLA                                  ;00CAA5|68      |      ;
+    JSR.W CODE_00C9D3                    ;00CAA6|20D3C9  |00C9D3;
+    LDA.W #$0000                         ;00CAA9|A90000  |      ;
+
+CODE_00CAAC:
+    STA.B $64                            ;00CAAC|8564    |000064;
+    LDA.W #$FFF0                         ;00CAAE|A9F0FF  |      ;
+    STA.B $8E                            ;00CAB1|858E    |00008E;
+    JMP.W CODE_00981B                    ;00CAB3|4C1B98  |00981B;
+
+LOOSE_OP_00CAB5:
+    LDA.B $64                            ;00CAB6|A564    |000064;
+    RTS                                  ;00CAB8|60      |      ;
+
+CODE_00CAB9:
+    PHP                                  ;00CAB9|08      |      ;
+    REP #$30                             ;00CABA|C230    |      ;
+    PHB                                  ;00CABC|8B      |      ;
+    PHA                                  ;00CABD|48      |      ;
+    PHD                                  ;00CABE|0B      |      ;
+    PHX                                  ;00CABF|DA      |      ;
+    PHY                                  ;00CAC0|5A      |      ;
+    LDA.W #$0000                         ;00CAC1|A90000  |      ;
+    TCD                                  ;00CAC4|5B      |      ;
+    SEP #$20                             ;00CAC5|E220    |      ;
+    LDA.B #$01                           ;00CAC7|A901    |      ;
+    AND.W $00DA                          ;00CAC9|2DDA00  |0000DA;
+    BNE CODE_00CAEC                      ;00CACC|D01E    |00CAEC;
+    LDA.B #$40                           ;00CACE|A940    |      ;
+    AND.W $00DB                          ;00CAD0|2DDB00  |0000DB;
+    BNE CODE_00CB07                      ;00CAD3|D032    |00CB07;
+    LDX.W #$9300                         ;00CAD5|A20093  |      ;
+    STX.W SNES_CGSWSEL                   ;00CAD8|8E3021  |002130;
+    LDA.B #$02                           ;00CADB|A902    |      ;
+    AND.W $00DA                          ;00CADD|2DDA00  |0000DA;
+    BNE CODE_00CB11                      ;00CAE0|D02F    |00CB11;
+    LDA.B #$80                           ;00CAE2|A980    |      ;
+    AND.W $00DB                          ;00CAE4|2DDB00  |0000DB;
+    BNE CODE_00CB4E                      ;00CAE7|D065    |00CB4E;
+    JMP.W CODE_00CB76                    ;00CAE9|4C76CB  |00CB76;
+
+CODE_00CAEC:
+    LDA.B #$01                           ;00CAEC|A901    |      ;
+    TRB.W $00DA                          ;00CAEE|1CDA00  |0000DA;
+    JSR.W CODE_00CC09                    ;00CAF1|2009CC  |00CC09;
+    LDX.W #$5555                         ;00CAF4|A25555  |      ;
+    STX.W $0E04                          ;00CAF7|8E040E  |000E04;
+    STX.W $0E06                          ;00CAFA|8E060E  |000E06;
+    STX.W $0E08                          ;00CAFD|8E080E  |000E08;
+    LDA.B #$80                           ;00CB00|A980    |      ;
+    TRB.W $00DE                          ;00CB02|1CDE00  |0000DE;
+    BRA CODE_00CB79                      ;00CB05|8072    |00CB79;
+
+CODE_00CB07:
+    LDA.B #$40                           ;00CB07|A940    |      ;
+    TRB.W $00DB                          ;00CB09|1CDB00  |0000DB;
+    JSR.W CODE_00CCBD                    ;00CB0C|20BDCC  |00CCBD;
+    BRA CODE_00CB79                      ;00CB0F|8068    |00CB79;
+; ==============================================================================
+; Screen Color Management and Final Systems - CODE_00CB11+
+; ==============================================================================
+
+CODE_00CB11:
+    JSR.W CODE_00CD22                    ;00CB11|2022CD  |00CD22;
+    REP #$30                             ;00CB14|C230    |      ;
+    LDX.W #$016F                         ;00CB16|A26F01  |      ;
+    LDY.W #$0E04                         ;00CB19|A0040E  |      ;
+    LDA.W #$0005                         ;00CB1C|A90500  |      ;
+    MVN $00,$00                          ;00CB1F|540000  |      ;
+    SEP #$20                             ;00CB22|E220    |      ;
+    LDA.B #$80                           ;00CB24|A980    |      ;
+    TSB.W $00DE                          ;00CB26|0CDE00  |0000DE;
+    JSR.W CODE_00CD60                    ;00CB29|2060CD  |00CD60;
+    JSR.W CODE_00CBC6                    ;00CB2C|20C6CB  |00CBC6;
+    JSL.L CODE_0C8000                    ;00CB2F|2200800C|0C8000;
+    LDA.B #$E0                           ;00CB33|A9E0    |      ;
+    STA.L $7F56D8                        ;00CB35|8FD8567F|7F56D8;
+    STA.L $7F56D8,X                      ;00CB39|9FD8567F|7F56D8;
+    JSL.L CODE_0C8000                    ;00CB3D|2200800C|0C8000;
+    LDA.B #$02                           ;00CB41|A902    |      ;
+    TRB.W $00DA                          ;00CB43|1CDA00  |0000DA;
+    LDA.B #$08                           ;00CB46|A908    |      ;
+    TRB.W $00D4                          ;00CB48|1CD400  |0000D4;
+    JMP.W CODE_00981B                    ;00CB4B|4C1B98  |00981B;
+
+CODE_00CB4E:
+    JSR.W CODE_00CD22                    ;00CB4E|2022CD  |00CD22;
+    JSR.W CODE_00CD60                    ;00CB51|2060CD  |00CD60;
+    JSR.W CODE_00CC6E                    ;00CB54|206ECC  |00CC6E;
+    JSL.L CODE_0C8000                    ;00CB57|2200800C|0C8000;
+    LDA.B #$E0                           ;00CB5B|A9E0    |      ;
+    STA.L $7F56DA                        ;00CB5D|8FDA567F|7F56DA;
+    STA.L $7F56DE                        ;00CB61|8FDE567F|7F56DE;
+    JSL.L CODE_0C8000                    ;00CB65|2200800C|0C8000;
+    LDA.B #$80                           ;00CB69|A980    |      ;
+    TRB.W $00DB                          ;00CB6B|1CDB00  |0000DB;
+    LDA.B #$08                           ;00CB6E|A908    |      ;
+    TRB.W $00D4                          ;00CB70|1CD400  |0000D4;
+    JMP.W CODE_00981B                    ;00CB73|4C1B98  |00981B;
+
+CODE_00CB76:
+    JSR.W CODE_00CD22                    ;00CB76|2022CD  |00CD22;
+
+CODE_00CB79:
+    JSR.W CODE_00CD60                    ;00CB79|2060CD  |00CD60;
+    JSR.W CODE_00CD42                    ;00CB7C|2042CD  |00CD42;
+    JSL.L CODE_0C8000                    ;00CB7F|2200800C|0C8000;
+    LDA.B #$E0                           ;00CB83|A9E0    |      ;
+    STA.W SNES_COLDATA                   ;00CB85|8D3221  |002132;
+    LDX.W #$0000                         ;00CB88|A20000  |      ;
+    STX.W SNES_CGSWSEL                   ;00CB8B|8E3021  |002130;
+    JMP.W CODE_00981B                    ;00CB8E|4C1B98  |00981B;
+
+CODE_00CB91:
+    REP #$30                             ;00CB91|C230    |      ;
+    PHB                                  ;00CB93|8B      |      ;
+    LDX.W #$CBBD                         ;00CB94|A2BDCB  |      ;
+    LDY.W #$56D7                         ;00CB97|A0D756  |      ;
+    LDA.W #$0008                         ;00CB9A|A90800  |      ;
+    MVN $7F,$00                          ;00CB9D|547F00  |      ;
+    PLB                                  ;00CBA0|AB      |      ;
+    LDA.W #$0080                         ;00CBA1|A98000  |      ;
+    TSB.W $00DA                          ;00CBA4|0CDA00  |0000DA;
+    LDA.W #$0020                         ;00CBA7|A92000  |      ;
+    TSB.W $0111                          ;00CBAA|0C1101  |000111;
+    LDA.B $02                            ;00CBAD|A502    |000002;
+    AND.W #$00FF                         ;00CBAF|29FF00  |      ;
+    INC A                                ;00CBB2|1A      |      ;
+    ASL A                                ;00CBB3|0A      |      ;
+    TAX                                  ;00CBB4|AA      |      ;
+    SEP #$20                             ;00CBB5|E220    |      ;
+    LDA.B #$08                           ;00CBB7|A908    |      ;
+    TSB.W $00D4                          ;00CBB9|0CD400  |0000D4;
+    RTS                                  ;00CBBC|60      |      ;
+
+DATA_00CBBD:
+    db $27,$EC,$3C,$EC,$3C,$EC,$38,$EC,$00 ;00CBBD|        |      ;
+
+CODE_00CBC6:
+    JSR.W CODE_00CB91                    ;00CBC6|2091CB  |00CB91;
+    LDA.B #$E9                           ;00CBC9|A9E9    |      ;
+
+CODE_00CBCB:
+    LDY.B $17                            ;00CBCB|A417    |000017;
+    JSR.W CODE_009D75                    ;00CBCD|20759D  |009D75;
+    STY.B $17                            ;00CBD0|8417    |000017;
+    JSL.L CODE_0C8000                    ;00CBD2|2200800C|0C8000;
+    STA.L $7F56D8                        ;00CBD6|8FD8567F|7F56D8;
+    STA.L $7F56D8,X                      ;00CBDA|9FD8567F|7F56D8;
+    DEC A                                ;00CBDE|3A      |      ;
+    DEC A                                ;00CBDF|3A      |      ;
+    CMP.B #$E1                           ;00CBE0|C9E1    |      ;
+    BNE CODE_00CBCB                      ;00CBE2|D0E7    |00CBCB;
+    LDY.B $17                            ;00CBE4|A417    |000017;
+    JSR.W CODE_009D75                    ;00CBE6|20759D  |009D75;
+    STY.B $17                            ;00CBE9|8417    |000017;
+    RTS                                  ;00CBEB|60      |      ;
+
+CODE_00CBEC:
+    LDY.W #$9300                         ;00CBEC|A00093  |      ;
+    STY.W SNES_CGSWSEL                   ;00CBEF|8C3021  |002130;
+    JSR.W CODE_00CB91                    ;00CBF2|2091CB  |00CB91;
+    LDA.B #$E0                           ;00CBF5|A9E0    |      ;
+    STA.L $7F56D8                        ;00CBF7|8FD8567F|7F56D8;
+    STA.L $7F56D8,X                      ;00CBFB|9FD8567F|7F56D8;
+    JSL.L CODE_0C8000                    ;00CBFF|2200800C|0C8000;
+    LDA.B #$08                           ;00CC03|A908    |      ;
+    TRB.W $00D4                          ;00CC05|1CD400  |0000D4;
+    RTS                                  ;00CC08|60      |      ;
+
+CODE_00CC09:
+    LDA.B #$08                           ;00CC09|A908    |      ;
+    TSB.W $00D4                          ;00CC0B|0CD400  |0000D4;
+    LDX.W #$0007                         ;00CC0E|A20700  |      ;
+
+CODE_00CC11:
+    JSL.L CODE_0C8000                    ;00CC11|2200800C|0C8000;
+    LDA.L $7F56D8                        ;00CC15|AFD8567F|7F56D8;
+    JSR.W CODE_00CC5B                    ;00CC19|205BCC  |00CC5B;
+    STA.L $7F56D8                        ;00CC1C|8FD8567F|7F56D8;
+    LDA.L $7F56DA                        ;00CC20|AFDA567F|7F56DA;
+    JSR.W CODE_00CC5B                    ;00CC24|205BCC  |00CC5B;
+    STA.L $7F56DA                        ;00CC27|8FDA567F|7F56DA;
+    LDA.L $7F56DC                        ;00CC2B|AFDC567F|7F56DC;
+    JSR.W CODE_00CC5B                    ;00CC2F|205BCC  |00CC5B;
+    STA.L $7F56DC                        ;00CC32|8FDC567F|7F56DC;
+    LDA.L $7F56DE                        ;00CC36|AFDE567F|7F56DE;
+    JSR.W CODE_00CC5B                    ;00CC3A|205BCC  |00CC5B;
+    STA.L $7F56DE                        ;00CC3D|8FDE567F|7F56DE;
+    LDY.B $17                            ;00CC41|A417    |000017;
+    JSR.W CODE_009D75                    ;00CC43|20759D  |009D75;
+    STY.B $17                            ;00CC46|8417    |000017;
+    DEX                                  ;00CC48|CA      |      ;
+    BNE CODE_00CC11                      ;00CC49|D0C6    |00CC11;
+    LDA.B #$08                           ;00CC4B|A908    |      ;
+    TRB.W $00D4                          ;00CC4D|1CD400  |0000D4;
+    LDA.B #$20                           ;00CC50|A920    |      ;
+    TRB.W $0111                          ;00CC52|1C1101  |000111;
+    LDA.B #$80                           ;00CC55|A980    |      ;
+    TRB.W $00DA                          ;00CC57|1CDA00  |0000DA;
+    RTS                                  ;00CC5A|60      |      ;
+
+CODE_00CC5B:
+    CLC                                  ;00CC5B|18      |      ;
+    ADC.L CODE_00CC66,X                  ;00CC5C|7F66CC00|00CC66;
+    CMP.B #$F0                           ;00CC60|C9F0    |      ;
+    BCC CODE_00CC66                      ;00CC62|9002    |00CC66;
+    LDA.B #$EF                           ;00CC64|A9EF    |      ;
+
+CODE_00CC66:
+    RTS                                  ;00CC66|60      |      ;
+
+DATA_00CC67:
+    db $03,$02,$02,$02,$02,$01,$03       ;00CC67|        |      ;
+
+; ==============================================================================
+; BANK $00 COMPLETE - FINAL STUB SECTION
+; ==============================================================================
+
+; Final stub definitions for any remaining external routines
+CODE_00CF3F:
+    = $CF3F
+CODE_00CF62:
+    = $CF62
+
+; ==============================================================================
+; END OF BANK $00 - 100% COMPLETE
+; ==============================================================================
