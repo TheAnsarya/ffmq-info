@@ -80,11 +80,7 @@ CODE_00A3EC = $00A3EC
 CODE_00A3F5 = $00A3F5
 CODE_00A3FC = $00A3FC
 CODE_00A51E = $00A51E
-CODE_00A572 = $00A572
-CODE_00A57D = $00A57D
-CODE_00A581 = $00A581
-CODE_00A586 = $00A586
-CODE_00A597 = $00A597
+; CODE_00A572 through CODE_00A597 now implemented
 CODE_00A708 = $00A708
 CODE_00A718 = $00A718
 CODE_00A71C = $00A71C
@@ -118,6 +114,14 @@ CODE_00AF9A = $00AF9A
 CODE_00AFD6 = $00AFD6
 CODE_00AFFE = $00AFFE
 CODE_00B094 = $00B094
+CODE_00B1A1 = $00B1A1
+CODE_00B1B4 = $00B1B4
+CODE_00B1C3 = $00B1C3
+CODE_00B1D6 = $00B1D6
+CODE_00B1E8 = $00B1E8
+CODE_00B204 = $00B204
+CODE_00B21D = $00B21D
+CODE_00B22F = $00B22F
 CODE_00B2F4 = $00B2F4
 CODE_00B2F9 = $00B2F9
 CODE_00B354 = $00B354
@@ -125,12 +129,6 @@ CODE_00B355 = $00B355
 CODE_00B379 = $00B379
 CODE_00B950 = $00B950
 CODE_00BA1A = $00BA1A
-CODE_00B1C3 = $00B1C3
-CODE_00B1D6 = $00B1D6
-CODE_00B1E8 = $00B1E8
-CODE_00B204 = $00B204
-CODE_00B21D = $00B21D
-CODE_00B22F = $00B22F
 CODE_00B49E = $00B49E
 CODE_00B4A7 = $00B4A7
 CODE_00B4B0 = $00B4B0
@@ -7904,4 +7902,101 @@ CODE_00A2CB:
 ; - Graphics command handlers ($00-$2F)
 ;
 ; Remaining: ~6,600 lines (battle system, more handlers, data tables)
+;===============================================================================
+
+;===============================================================================
+; Conditional Jump Handlers - Item/Flag Testing
+; These handlers test various game flags and conditionally jump based on results
+;===============================================================================
+
+CODE_00A572:
+	LDA.B [$17]                    ; Load item/flag index
+	INC.B $17                      ; Advance pointer
+	AND.W #$00FF                   ; Mask to byte
+	JSL.L CODE_009776              ; Test item flag (external stub)
+
+CODE_00A57D:
+	BNE +                           ; If set, skip
+	JMP CODE_00A519                ; If clear, take jump (far)
++	JMP CODE_00A597                ; If set, skip jump (far)
+
+CODE_00A581:
+	JSR.W CODE_00B1A1              ; Test variable
+	BNE +                           ; If not zero, skip
+	JMP CODE_00A56E                ; Branch based on result (far)
++	RTS
+
+CODE_00A586:
+	JSR.W CODE_00B1A1              ; Test variable (alternate)
+	BEQ CODE_00A57D                ; Branch to alternate handler
+	RTS
+
+	JSR.W CODE_00B1B4              ; Test condition
+	BEQ +                           ; If zero, skip
+	JMP CODE_00A519                ; If not zero, take jump (far)
++	JMP CODE_00A597                ; If zero, skip jump (far)
+
+	JSR.W CODE_00B1B4              ; Test condition (alternate)
+	BNE +                           ; If not zero, skip
+	JMP CODE_00A519                ; If zero, take jump (far)
++	RTS
+
+CODE_00A597:
+	INC.B $17                      ; Skip jump address
+	INC.B $17                      ; (2 bytes)
+	RTS                            ; Return
+
+;===============================================================================
+; More Conditional Branch Handlers
+; (Similar patterns for different test types: CODE_00B1C3, CODE_00B1D6, etc.)
+;===============================================================================
+
+	JSR.W CODE_00B1C3              ; Test condition type 1
+	BCS +                          ; If greater/equal, skip
+	BNE +
+	JMP CODE_00A744                ; Take jump (far)
++	INC.B $17                      ; Skip address
+	INC.B $17
+	RTS
+
+	JSR.W CODE_00B1C3
+	BCS +
+	JMP CODE_00A744
++	INC.B $17
+	INC.B $17
+	RTS
+
+	JSR.W CODE_00B1C3
+	BCC +
+	JMP CODE_00A744
++	INC.B $17
+	INC.B $17
+	RTS
+
+	JSR.W CODE_00B1C3
+	BCC +
+	BNE +
+	JMP CODE_00A744
++	INC.B $17
+	INC.B $17
+	RTS
+
+	JSR.W CODE_00B1C3
+	BEQ +
+	JMP CODE_00A744
++	INC.B $17
+	INC.B $17
+	RTS
+
+	JSR.W CODE_00B1C3
+	BEQ +
+	JMP CODE_00A744
++	INC.B $17
+	INC.B $17
+	RTS
+
+;===============================================================================
+; Progress: ~7,500 lines documented (53.5% of Bank $00)
+; Latest additions: Conditional jump handlers CODE_00A572-CODE_00A597
+; Next: More conditional handlers and bank switching routines
 ;===============================================================================

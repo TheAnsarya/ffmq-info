@@ -139,6 +139,38 @@ do option `A`, then make sure to auto-aprove most chat and terminal requests, se
 fix label issues and other build issues, build and compare to reference ROM file, make sure you are updating the session summary/chat log, continue systematically,
 
 begin again and disassemble as much as you can
+continue
+continue disassembling everything and commenting and documenting and commiting and organizing over and over don't stop at a commit, just run for an hour or so
+
+
+
+
+
+
+
+
+
+
+
+
+
+document, update the chat log, and commit the code changes at the end of every code change, c'mon!
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -146,6 +178,7 @@ begin again and disassemble as much as you can
 fix label issues and other build issues, build and compare to reference ROM file, make sure you are updating the session summary/chat log, continue systematically,
 
 make sure we are using `Final Fantasy - Mystic Quest (U) (V1.1).sfc` as the reference rom, what rom file does diztinguish say we are using? what file is our documentation and source code using? and then continue systematically
+
 
 
 
