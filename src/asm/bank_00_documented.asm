@@ -86,18 +86,10 @@ CODE_00A51E = $00A51E
 ; CODE_00A572 through CODE_00A597 now implemented
 ; CODE_00A708 through CODE_00A83F now implemented
 ; CODE_00A86E through CODE_00AACC now implemented (partial CODE_00A86E as db)
+; CODE_00AACF through CODE_00AFFE now implemented
 CODE_00A78E = $00A78E             ; Referenced in jump table but not implemented as routine
 CODE_00A86E = $00A86E             ; Partial implementation (raw bytecode placeholder)
-CODE_00AACF = $00AACF
-CODE_00AEA2 = $00AEA2
-CODE_00AEB5 = $00AEB5
-CODE_00AEC7 = $00AEC7
-CODE_00AEDA = $00AEDA
-CODE_00AF6B = $00AF6B
-CODE_00AF70 = $00AF70
-CODE_00AF9A = $00AF9A
-CODE_00AFD6 = $00AFD6
-CODE_00AFFE = $00AFFE
+CODE_00B000 = $00B000
 CODE_00B094 = $00B094
 CODE_00B1A1 = $00B1A1
 CODE_00B1B4 = $00B1B4
@@ -9004,3 +8996,899 @@ CODE_00AAAF:
 ;
 ; Next: More DMA and graphics routines (CODE_00AACF onward)
 ;===============================================================================
+
+;-------------------------------------------------------------------------------
+; CODE_00AACF - Indexed sprite/tile drawing dispatcher
+; Purpose: Use sprite type index ($27) to dispatch to specific drawing routine
+; Entry: $27 = sprite type index, $28 = position data
+;-------------------------------------------------------------------------------
+CODE_00AACF:
+	LDA.B $27                      ; Load sprite type index
+	AND.W #$00FF
+	ASL A                          ; × 2 for word table
+	TAX                            ; X = table offset
+	PEI.B ($25)                    ; Save $25 to stack
+	LDA.B $28                      ; Load position
+	STA.B $25                      ; Store as new $25
+	JSR.W CODE_00A8D1              ; Calculate tilemap pointer
+	JSR.W CODE_00B49E              ; Prepare drawing context
+	LDA.B $1C                      ; Load bank byte
+	AND.W #$00FF
+	PHA                            ; Save bank
+	PLB                            ; Set data bank
+	JSR.W (UNREACH_00AAF7,X)       ; Dispatch to sprite routine
+	PLB                            ; Restore data bank
+	JSR.W CODE_00B4A7              ; Cleanup drawing context
+	PLA                            ; Restore $25
+	STA.B $25
+	JMP.W CODE_00A8D1              ; Recalculate pointer and return
+
+	db $60                         ; Extra RTS
+
+;-------------------------------------------------------------------------------
+; UNREACH_00AAF7 - Sprite drawing dispatch table
+;-------------------------------------------------------------------------------
+UNREACH_00AAF7:
+	db $F6,$AA                     ; Unreachable data
+	dw CODE_00AB07                 ; $00
+	dw CODE_00AB20                 ; $01
+	dw CODE_00AB88                 ; $02
+	dw CODE_00ABCE                 ; $03
+	dw CODE_00ABE5                 ; $04
+	dw CODE_00AB9F                 ; $05
+	dw CODE_00ABBA                 ; $06
+
+;-------------------------------------------------------------------------------
+; CODE_00AB07 - Draw filled rectangle (tile $FE)
+; Purpose: Draw solid filled rectangle using tile $FE
+;-------------------------------------------------------------------------------
+CODE_00AB07:
+	LDA.B $2B                      ; Load height
+	AND.W #$00FF
+	STA.B $62                      ; Store row counter
+	LDA.B $2A                      ; Load width
+	AND.W #$00FF
+	ASL A                          ; × 2 for word offset
+	TAX                            ; X = column offset
+	LDY.B $1A                      ; Load tilemap pointer
+	LDA.W #$00FE                   ; Tile $FE (solid fill)
+	JSR.W CODE_00AD85              ; Draw tiles
+	STY.B $1A                      ; Update pointer
+	RTS
+
+;-------------------------------------------------------------------------------
+; CODE_00AB20 - Draw window border with vertical flip
+; Purpose: Draw bordered window with special tile handling
+;-------------------------------------------------------------------------------
+CODE_00AB20:
+	JSR.W CODE_00AB9F              ; Draw top border
+	LDA.W #$4000                   ; Vertical flip bit
+	ORA.B $1D                      ; Combine with tile flags
+	STA.B $64                      ; Store flip flags
+	JSR.W CODE_00B4A7              ; Setup drawing
+	SEC
+	LDA.B $1A                      ; Load pointer
+	SBC.W #$0040                   ; Back up one row
+	STA.B $1A
+	LDA.B $24                      ; Load flags
+	BIT.W #$0008                   ; Test bit 3
+	BEQ CODE_00AB44                ; If clear, skip
+	JSR.W CODE_00A8D1              ; Recalculate pointer
+	LDA.W #$8000                   ; Horizontal flip bit
+	TSB.B $64                      ; Set in flags
+
+CODE_00AB44:
+	SEP #$20                       ; 8-bit A
+	LDA.B $22                      ; Load Y position
+	LSR A                          ; / 8 (tile row)
+	LSR A
+	LSR A
+	CMP.B $28                      ; Compare with window top
+	BCS CODE_00AB52                ; If >= top, use it
+	LDA.B $28                      ; Use window top
+	SEC
+
+CODE_00AB52:
+	SBC.B $28                      ; Calculate row offset
+	STA.B $62                      ; Store row counter
+	LDA.B $22                      ; Load Y again
+	CMP.B #$78                     ; Check if >= 120
+	BCC CODE_00AB64                ; If below, adjust
+	BNE CODE_00AB6A                ; If above, skip
+	LDA.B $24                      ; Check flags
+	BIT.B #$01                     ; Test bit 0
+	BEQ CODE_00AB6A                ; If clear, skip
+
+CODE_00AB64:
+	INC.B $62                      ; Increment row count
+	LDA.B #$40                     ; Clear bit $40
+	TRB.B $65                      ; In $65
+
+CODE_00AB6A:
+	LDA.B $62                      ; Load row counter
+	INC A                          ; +1
+	CMP.B $2A                      ; Compare with width
+	BCC CODE_00AB77                ; If less, use it
+	db $A5,$2A,$E9,$02,$85,$62     ; Load width-2 into $62
+
+CODE_00AB77:
+	REP #$30                       ; 16-bit mode
+	LDA.B $62                      ; Load final count
+	AND.W #$00FF
+	ASL A                          ; × 2 for word offset
+	TAY                            ; Y = offset
+	LDA.W #$00FD                   ; Tile $FD
+	EOR.B $64                      ; Apply flip flags
+	STA.B ($1A),Y                  ; Draw tile
+	RTS
+
+;-------------------------------------------------------------------------------
+; CODE_00AB88 - Draw window frame (tiles $FC, $FF)
+;-------------------------------------------------------------------------------
+CODE_00AB88:
+	LDA.W #$00FC                   ; Top border tile
+	JSR.W CODE_00AD2D              ; Setup top edge
+	LDA.W #$00FF                   ; Fill tile
+	JSR.W CODE_00AD44              ; Setup vertical edges
+	INC.B $62                      ; Adjust counter
+	LDA.W #$80FC                   ; Bottom border (flipped)
+	JSR.W CODE_00AD85              ; Draw
+	JMP.W CODE_00ACA6              ; Draw corners
+
+;-------------------------------------------------------------------------------
+; CODE_00AB9F - Draw window top border
+;-------------------------------------------------------------------------------
+CODE_00AB9F:
+	LDA.W #$00FC                   ; Border tile
+	JSR.W CODE_00AD2D              ; Setup top
+	LDA.B $2B                      ; Load height
+	AND.W #$00FF
+	DEC A                          ; -2 for borders
+	DEC A
+	JSR.W CODE_00ABFC              ; Fill routine
+	INC.B $62                      ; Adjust
+	LDA.W #$80FC                   ; Bottom border
+	JSR.W CODE_00AD85              ; Draw
+	JMP.W CODE_00ACA6              ; Draw corners
+
+;-------------------------------------------------------------------------------
+; CODE_00ABBA - Draw simple filled box
+;-------------------------------------------------------------------------------
+CODE_00ABBA:
+	LDY.B $1A                      ; Load pointer
+	LDA.B $2A                      ; Load width
+	AND.W #$00FF
+	ASL A                          ; × 2
+	TAX                            ; X = offset
+	LDA.B $2B                      ; Load height
+	AND.W #$00FF
+	JSR.W CODE_00ABFC              ; Fill
+	STY.B $1A                      ; Update pointer
+	RTS
+
+;-------------------------------------------------------------------------------
+; CODE_00ABCE - Draw item icon box (tiles $45)
+;-------------------------------------------------------------------------------
+CODE_00ABCE:
+	LDA.W #$0045                   ; Item icon tile
+	JSR.W CODE_00AD2D              ; Setup top
+	LDA.W #$00FF                   ; Fill
+	JSR.W CODE_00AD44              ; Setup edges
+	INC.B $62
+	LDA.W #$8045                   ; Flipped icon
+	JSR.W CODE_00AD85              ; Draw
+	JMP.W CODE_00ACD3              ; Finish
+
+;-------------------------------------------------------------------------------
+; CODE_00ABE5 - Draw spell icon box (tiles $75)
+;-------------------------------------------------------------------------------
+CODE_00ABE5:
+	LDA.W #$0075                   ; Spell icon tile
+	JSR.W CODE_00AD2D              ; Setup top
+	LDA.W #$00FF                   ; Fill
+	JSR.W CODE_00AD44              ; Setup edges
+	INC.B $62
+	LDA.W #$8075                   ; Flipped spell icon
+	JSR.W CODE_00AD85              ; Draw
+	JMP.W CODE_00AD00              ; Finish
+
+;-------------------------------------------------------------------------------
+; CODE_00ABFC - Tile fill routine with indirect jump
+; Purpose: Complex tile filling using computed jump table
+; Entry: A = row count, X = column offset × 2
+;-------------------------------------------------------------------------------
+CODE_00ABFC:
+	STA.B $62                      ; Save row count
+	TXA                            ; Get column offset
+	ASL A                          ; × 2 again
+	EOR.W #$FFFF                   ; Negate
+	ADC.W #$AC97                   ; Add base (computed address)
+	STA.B $64                      ; Store jump target
+	TXA                            ; Column offset
+	LSR A                          ; / 2
+	PHA                            ; Save to stack
+
+CODE_00AC0B:
+	ADC.L $00015F                  ; Add to system counter
+	STA.L $00015F                  ; Update counter
+	JMP.W ($0064)                  ; Jump to computed address
+
+	; Computed jump table entries (tile fill patterns)
+	db $3A,$99,$3E,$00,$3A,$99,$3C,$00,$3A,$99,$3A,$00,$3A,$99,$38,$00
+	db $3A,$99,$36,$00,$3A,$99,$34,$00
+
+	; Unrolled tile write loop (26 tiles worth)
+	DEC A
+	STA.W $0032,Y
+	DEC A
+	STA.W $0030,Y
+	DEC A
+	STA.W $002E,Y
+	DEC A
+	STA.W $002C,Y
+	DEC A
+	STA.W $002A,Y
+	DEC A
+	STA.W $0028,Y
+	DEC A
+	STA.W $0026,Y
+	DEC A
+	STA.W $0024,Y
+	DEC A
+	STA.W $0022,Y
+	DEC A
+	STA.W $0020,Y
+	DEC A
+	STA.W $001E,Y
+	DEC A
+	STA.W $001C,Y
+	DEC A
+	STA.W $001A,Y
+	DEC A
+	STA.W $0018,Y
+	DEC A
+	STA.W $0016,Y
+	DEC A
+	STA.W $0014,Y
+	DEC A
+	STA.W $0012,Y
+	DEC A
+	STA.W $0010,Y
+	DEC A
+	STA.W $000E,Y
+	DEC A
+	STA.W $000C,Y
+	DEC A
+	STA.W $000A,Y
+	DEC A
+	STA.W $0008,Y
+	DEC A
+	STA.W $0006,Y
+	DEC A
+	STA.W $0004,Y
+	DEC A
+	STA.W $0002,Y
+	DEC A
+	STA.W $0000,Y
+	TYA                            ; Get current pointer
+	ADC.W #$0040                   ; Next row (+$40 bytes)
+	TAY                            ; Update Y
+	LDA.B $01,S                    ; Load saved value
+	DEC.B $62                      ; Decrement row counter
+	BEQ CODE_00ACA4                ; If zero, done
+	JMP.W CODE_00AC0B              ; Loop
+
+CODE_00ACA4:
+	PLA                            ; Clean stack
+	RTS
+
+;-------------------------------------------------------------------------------
+; CODE_00ACA6 - Draw window corners (tiles $F7/$F9/$FB)
+;-------------------------------------------------------------------------------
+CODE_00ACA6:
+	JSR.W CODE_00AD52              ; Setup coordinates
+	LDA.B $1D                      ; Load tile flags
+	EOR.W #$00F7                   ; Top-left corner
+	STA.B ($1A)                    ; Draw
+	LDA.B $1D
+	EOR.W #$00F9                   ; Top-right corner
+	STA.B ($1A),Y                  ; Draw
+	LDA.W #$00FB                   ; Side tiles
+	JSR.W CODE_00AD64              ; Draw sides
+	LDA.B $1D
+	EOR.W #$00F8                   ; Bottom-left corner
+	STA.B ($1A)
+	LDA.B $1D
+	EOR.W #$00FA                   ; Bottom-right corner
+	STA.B ($1A),Y
+	LDA.B $1A                      ; Advance pointer
+	ADC.W #$0040
+	STA.B $1A
+	RTS
+
+;-------------------------------------------------------------------------------
+; CODE_00ACD3 - Draw item icon corners (tiles $40-$44)
+;-------------------------------------------------------------------------------
+CODE_00ACD3:
+	JSR.W CODE_00AD52              ; Setup
+	LDA.B $1D
+	EOR.W #$0040                   ; Icon TL
+	STA.B ($1A)
+	LDA.B $1D
+	EOR.W #$0042                   ; Icon TR
+	STA.B ($1A),Y
+	LDA.W #$0044                   ; Icon sides
+	JSR.W CODE_00AD64              ; Draw
+	LDA.B $1D
+	EOR.W #$0041                   ; Icon BL
+	STA.B ($1A)
+	LDA.B $1D
+	EOR.W #$0043                   ; Icon BR
+	STA.B ($1A),Y
+	LDA.B $1A
+	ADC.W #$0040
+	STA.B $1A
+	RTS
+
+;-------------------------------------------------------------------------------
+; CODE_00AD00 - Draw spell icon corners (tiles $70-$74)
+;-------------------------------------------------------------------------------
+CODE_00AD00:
+	JSR.W CODE_00AD52              ; Setup
+	LDA.B $1D
+	EOR.W #$0070                   ; Spell TL
+	STA.B ($1A)
+	LDA.B $1D
+	EOR.W #$0072                   ; Spell TR
+	STA.B ($1A),Y
+	LDA.W #$0074                   ; Spell sides
+	JSR.W CODE_00AD64              ; Draw
+	LDA.B $1D
+	EOR.W #$0071                   ; Spell BL
+	STA.B ($1A)
+	LDA.B $1D
+	EOR.W #$0073                   ; Spell BR
+	STA.B ($1A),Y
+	LDA.B $1A
+	ADC.W #$0040
+	STA.B $1A
+	RTS
+
+;-------------------------------------------------------------------------------
+; CODE_00AD2D - Setup top edge drawing
+; Entry: A = tile value
+;-------------------------------------------------------------------------------
+CODE_00AD2D:
+	PHA                            ; Save tile
+	LDY.B $1A                      ; Load pointer
+	INY                            ; Skip first tile
+	INY
+	LDA.B $2A                      ; Load width
+	AND.W #$00FF
+	DEC A                          ; -2 for corners
+	DEC A
+	ASL A                          ; × 2
+	TAX                            ; X = offset
+	LDA.W #$0001                   ; Single row
+	STA.B $62
+	PLA                            ; Restore tile
+	JMP.W CODE_00AD85              ; Draw
+
+;-------------------------------------------------------------------------------
+; CODE_00AD44 - Setup vertical edge drawing
+; Entry: A = tile value
+;-------------------------------------------------------------------------------
+CODE_00AD44:
+	PHA                            ; Save tile
+	LDA.B $2B                      ; Load height
+	AND.W #$00FF
+	DEC A                          ; -2 for top/bottom
+	DEC A
+	STA.B $62                      ; Row count
+	PLA                            ; Restore tile
+	JMP.W CODE_00AD85              ; Draw
+
+;-------------------------------------------------------------------------------
+; CODE_00AD52 - Calculate corner positions
+; Exit: Y = right edge offset, $62 = adjusted row count
+;-------------------------------------------------------------------------------
+CODE_00AD52:
+	LDA.B $2A                      ; Width
+	AND.W #$00FF
+	DEC A                          ; -1
+	ASL A                          ; × 2
+	TAY                            ; Y = right offset
+	LDA.B $2B                      ; Height
+	AND.W #$00FF
+	DEC A                          ; -2
+	DEC A
+	STA.B $62                      ; Row count
+	RTS
+
+;-------------------------------------------------------------------------------
+; CODE_00AD64 - Draw vertical side tiles
+; Entry: A = tile value (XORed with $1D)
+;-------------------------------------------------------------------------------
+CODE_00AD64:
+	EOR.B $1D                      ; Apply tile flags
+	STA.B $64                      ; Save tile
+	LDA.B $1A                      ; Advance to next row
+	ADC.W #$0040
+	STA.B $1A
+	LDX.B $62                      ; Load row counter
+
+CODE_00AD71:
+	LDA.B $64                      ; Load tile
+	STA.B ($1A)                    ; Draw left edge
+	EOR.W #$4000                   ; Flip horizontally
+	STA.B ($1A),Y                  ; Draw right edge
+	LDA.B $1A                      ; Next row
+	ADC.W #$0040
+	STA.B $1A
+	DEX                            ; Decrement counter
+	BNE CODE_00AD71                ; Loop
+	RTS
+
+;-------------------------------------------------------------------------------
+; CODE_00AD85 - Generic tile drawing routine
+; Entry: A = tile value (XORed with $1D), X = column offset
+;-------------------------------------------------------------------------------
+CODE_00AD85:
+	EOR.B $1D                      ; Apply flags
+	STA.B $64                      ; Save tile
+
+CODE_00AD89:
+	JSR.W (DATA8_009A1E,X)         ; Call indexed routine
+	TYA                            ; Get pointer
+	ADC.W #$0040                   ; Next row
+	TAY
+	LDA.B $64                      ; Restore tile
+	DEC.B $62                      ; Decrement row counter
+	BNE CODE_00AD89                ; Loop
+	RTS
+
+;-------------------------------------------------------------------------------
+; CODE_00AD98 - Clear sprite OAM entries
+; Purpose: Clear OAM sprite data in Bank $7E
+; Entry: [$17] = number of sprites to clear
+;-------------------------------------------------------------------------------
+CODE_00AD98:
+	LDA.B [$17]                    ; Load sprite count
+	INC.B $17
+	AND.W #$00FF
+	STA.B $62                      ; Save count
+	LDY.W #$31C5                   ; OAM base + offset
+	LDA.W #$01F0                   ; Off-screen Y position
+	PEA.W $007E                    ; Push Bank $7E
+	PLB                            ; Set data bank
+	SEC
+
+CODE_00ADAC:
+	TAX                            ; X = Y position
+	JSR.W CODE_009A05              ; Clear sprite entry
+	TYA                            ; Get OAM pointer
+	SBC.W #$FFF0                   ; Move back (-16 bytes)
+	TAY
+	TXA                            ; Restore Y position
+	ADC.W #$FFF8                   ; Adjust (-8)
+	DEC.B $62                      ; Decrement count
+	BNE CODE_00ADAC                ; Loop
+	PLB                            ; Restore bank
+	RTS
+
+;-------------------------------------------------------------------------------
+; CODE_00ADBF - Compressed tile drawing to Bank $7E
+; Purpose: Draw compressed tile data to screen buffer
+; Entry: $2C = Y coordinate, $2D = width, $2B = height
+;-------------------------------------------------------------------------------
+CODE_00ADBF:
+	LDA.B $2C                      ; Load Y coord
+	AND.W #$00FF
+	STA.B $64                      ; Save
+	ASL A                          ; × 2
+	ADC.W #$31B5                   ; Add buffer base
+	TAY                            ; Y = destination
+	LDA.W #$01F9                   ; Calculate offset
+	SBC.B $64
+	PEA.W $007E                    ; Bank $7E
+	PLB
+	STA.B $64                      ; Save offset
+	AND.W #$0007                   ; Get low 3 bits
+	ASL A                          ; × 2
+	TAX                            ; X = table offset
+	LDA.B $64
+	AND.W #$FFF8                   ; Mask to 8-byte boundary
+	ADC.W #$0008                   ; Adjust
+	JSR.W (DATA8_009A1E,X)         ; Call indexed routine
+	SBC.W #$0007                   ; Adjust back
+	TAX
+	LDA.B $64
+	AND.W #$0007                   ; Get bit offset
+	STA.B $64
+	STY.B $62                      ; Save pointer
+	ASL A                          ; × 2
+	ADC.B $62
+	TAY                            ; Y = adjusted pointer
+	SEC
+	LDA.B $2D                      ; Load width
+	SBC.B $64                      ; Subtract offset
+	AND.W #$00FF
+	PHA                            ; Save
+	LSR A                          ; / 8
+	LSR A
+	LSR A
+	STA.B $62                      ; Row counter
+	TXA
+	SEC
+
+CODE_00AE07:
+	TAX
+	JSR.W CODE_009A05              ; Draw routine
+	TYA
+	SBC.W #$FFF0                   ; Adjust pointer
+	TAY
+	TXA
+	ADC.W #$FFF8                   ; Adjust X
+	DEC.B $62
+	BNE CODE_00AE07                ; Loop
+	STA.B $64                      ; Save result
+	PLA                            ; Restore width
+	AND.W #$0007                   ; Get remainder
+	ASL A                          ; × 2
+	TAX
+	LDA.B $64
+	JSR.W (DATA8_009A1E,X)         ; Final draw
+	PLB                            ; Restore bank
+	RTS
+
+;-------------------------------------------------------------------------------
+; CODE_00AE27 - RLE compressed text drawing
+; Purpose: Run-length encoded text decompression to Bank $7E
+; Entry: $2C = Y start, $29 = row count, $2B = column count
+;-------------------------------------------------------------------------------
+CODE_00AE27:
+	PEA.W $007E                    ; Bank $7E
+	PLB
+	LDA.B $2C                      ; Y coordinate
+	AND.W #$00FF
+	PHA                            ; Save
+	DEC A                          ; -1
+	ASL A                          ; × 2
+	ADC.W #$31B7                   ; Buffer base
+	TAX                            ; X = destination
+	LDA.B $29                      ; Row count
+	AND.W #$00FF
+	ASL A                          ; × 8
+	ASL A
+	ASL A
+	SEC
+	SBC.B $01,S                    ; Subtract Y
+	STA.B $01,S                    ; Update stack
+	LDA.B $2B                      ; Column count
+	AND.W #$00FF
+	STA.B $62                      ; Save
+
+CODE_00AE4B:
+	LDA.B [$17]                    ; Load RLE byte
+	AND.W #$00FF
+	BEQ CODE_00AE6A                ; If zero, skip
+	BIT.W #$0080                   ; Test high bit
+	BNE CODE_00AE81                ; If set, special mode
+	PHA                            ; Save count
+	LDA.B $03,S                    ; Load tile value
+	STA.W $0000,X                  ; Store
+	TXY                            ; Y = X
+	INY                            ; Advance
+	INY
+	PLA                            ; Restore count
+	DEC A                          ; -1
+	BEQ CODE_00AE69                ; If 1, done
+	ASL A                          ; × 2
+	DEC A                          ; -1 for MVN
+	MVN $7E,$7E                    ; Block move
+
+CODE_00AE69:
+	TYX                            ; X = end pointer
+
+CODE_00AE6A:
+	LDA.W #$0008                   ; 8 tiles
+	SEC
+	SBC.B [$17]                    ; Subtract used
+	AND.W #$00FF
+	CLC
+	ADC.B $01,S                    ; Add to stack offset
+	STA.B $01,S
+
+CODE_00AE78:
+	INC.B $17                      ; Next RLE byte
+	DEC.B $62                      ; Decrement column counter
+	BNE CODE_00AE4B                ; Loop
+	PLA                            ; Clean stack
+	PLB                            ; Restore bank
+	RTS
+
+CODE_00AE81:
+	AND.W #$007F                   ; Mask off high bit
+	PHA                            ; Save count
+	LDA.W #$0008
+	SEC
+	SBC.B $01,S                    ; Calculate skip
+	CLC
+	ADC.B $03,S                    ; Add to offset
+	STA.B $03,S
+	STA.W $0000,X                  ; Store
+	TXY
+	INY
+	INY
+	PLA
+	DEC A
+	BEQ CODE_00AE9F
+	ASL A
+	DEC A
+	MVN $7E,$7E                    ; Block move
+
+CODE_00AE9F:
+	TYX
+	BRA CODE_00AE78                ; Continue
+
+;-------------------------------------------------------------------------------
+; CODE_00AEA2 - Call graphics function with 8-bit parameter
+;-------------------------------------------------------------------------------
+CODE_00AEA2:
+	LDA.B [$17]                    ; Load parameter
+	INC.B $17
+	AND.W #$00FF
+	JSL.L CODE_009760              ; Long call to graphics routine
+	RTS
+
+	db $A5,$9E,$22,$60,$97,$00,$60 ; Variant with $9E parameter
+
+;-------------------------------------------------------------------------------
+; CODE_00AEB5 - Call graphics function with DP context
+;-------------------------------------------------------------------------------
+CODE_00AEB5:
+	LDA.B [$17]                    ; Load parameter
+	INC.B $17
+	AND.W #$00FF
+	PHD                            ; Save direct page
+	PEA.W $00D0                    ; Set DP to $D0
+	PLD
+	JSL.L CODE_00974E              ; Call graphics routine
+	PLD                            ; Restore DP
+	RTS
+
+;-------------------------------------------------------------------------------
+; CODE_00AEC7 - Call sprite/tile function
+;-------------------------------------------------------------------------------
+CODE_00AEC7:
+	LDA.B [$17]                    ; Load parameter
+	INC.B $17
+	AND.W #$00FF
+	JSL.L CODE_00976B              ; Call sprite routine
+	RTS
+
+	db $A5,$9E,$22,$6B,$97,$00,$60 ; Variant with $9E
+
+;-------------------------------------------------------------------------------
+; CODE_00AEDA - Call graphics function with DP=$D0
+;-------------------------------------------------------------------------------
+CODE_00AEDA:
+	LDA.B [$17]
+	INC.B $17
+	AND.W #$00FF
+	PHD
+	PEA.W $00D0                    ; DP = $D0
+	PLD
+	JSL.L CODE_009754              ; Graphics call
+	PLD
+	RTS
+
+	; More variants with different parameter sources
+	db $A5,$2E,$0B,$48,$A7,$17,$E6,$17,$29,$FF,$00,$2B,$22,$4E,$97,$00
+	db $2B,$60
+
+CODE_00AEFE:
+	LDA.B $2E                      ; From $2E
+	PHD
+	PHA
+	LDA.B $9E                      ; From $9E
+	PLD
+	JSL.L CODE_00974E
+	PLD
+	RTS
+
+	db $A5,$2E,$0B,$48,$A7,$17,$E6,$17,$29,$FF,$00,$2B,$22,$54,$97,$00
+	db $2B,$60
+
+CODE_00AF1D:
+	LDA.B $2E
+	PHD
+	PHA
+	LDA.B $9E
+	PLD
+	JSL.L CODE_009754
+	PLD
+	RTS
+
+;-------------------------------------------------------------------------------
+; CODE_00AF2A - Memory copy with table offset
+; Purpose: Copy data using offset from script
+; Entry: A = byte count
+;-------------------------------------------------------------------------------
+CODE_00AF2A:
+	TAY                            ; Y = count
+	LDA.B [$17]                    ; Load source
+	STA.B $A4
+	INC.B $17
+	INC.B $17
+	LDA.B [$17]                    ; Load dest
+	STA.B $A6
+	DEC.B $17
+	DEC.B $17
+	TYA                            ; Get count
+	SEC
+	ADC.B $17                      ; Advance script pointer
+	STA.B $17
+	LDX.W #$00A4                   ; X = $A4 (source pointer)
+	TYA                            ; A = count
+	BRA CODE_00AF50
+
+;-------------------------------------------------------------------------------
+; CODE_00AF47 - Memory copy direct
+;-------------------------------------------------------------------------------
+CODE_00AF47:
+	TAY                            ; Y = count
+	LDA.B [$17]                    ; Load source
+	INC.B $17
+	INC.B $17
+	TAX                            ; X = source
+	TYA                            ; A = count
+
+CODE_00AF50:
+	STZ.B $98                      ; Clear dest low
+	STZ.B $9A                      ; Clear dest high
+	LDY.W #$0098                   ; Y = $98
+	MVN $00,$00                    ; Block move
+	RTS
+
+;-------------------------------------------------------------------------------
+; CODE_00AF5B - Memory copy to $9E pointer
+;-------------------------------------------------------------------------------
+CODE_00AF5B:
+	TAX                            ; X = count
+	LDA.B [$17]                    ; Load source
+	INC.B $17
+	INC.B $17
+	TAY                            ; Y = source
+	TXA                            ; A = count
+	LDX.W #$009E                   ; X = $9E
+	MVN $00,$00                    ; Block move
+	RTS
+
+;-------------------------------------------------------------------------------
+; CODE_00AF6B/AF70/AF75 - Memory copy variants with preset counts
+;-------------------------------------------------------------------------------
+CODE_00AF6B:
+	LDA.W #$0000                   ; 1 byte
+	BRA CODE_00AF5B
+
+CODE_00AF70:
+	LDA.W #$0001                   ; 2 bytes
+	BRA CODE_00AF5B
+
+CODE_00AF75:
+	LDA.W #$0002                   ; 3 bytes
+	BRA CODE_00AF5B
+
+;-------------------------------------------------------------------------------
+; CODE_00AF7A/AF7F - Copy and store in $9E
+;-------------------------------------------------------------------------------
+CODE_00AF7A:
+	JSR.W CODE_00AF2A              ; Table copy
+	BRA CODE_00AF82
+
+CODE_00AF7F:
+	JSR.W CODE_00AF47              ; Direct copy
+
+CODE_00AF82:
+	LDA.B $98                      ; Load result low
+	STA.B $9E                      ; Store in $9E
+	LDA.B $9A                      ; Load result high
+	STA.B $A0                      ; Store in $A0
+	RTS
+
+;-------------------------------------------------------------------------------
+; CODE_00AF8B/AF90/AF95/AF9A/AF9F - Copy variants with preset counts
+;-------------------------------------------------------------------------------
+CODE_00AF8B:
+	LDA.W #$0000
+	BRA CODE_00AF7A
+
+CODE_00AF90:
+	LDA.W #$0001
+	BRA CODE_00AF7A
+
+CODE_00AF95:
+	LDA.W #$0002
+	BRA CODE_00AF7A
+
+CODE_00AF9A:
+	LDA.W #$0001
+	BRA CODE_00AF7F
+
+CODE_00AF9F:
+	LDA.W #$0002
+	BRA CODE_00AF7F
+
+;-------------------------------------------------------------------------------
+; CODE_00AFA4/AFAC/AFB1 - Load pointer helpers
+;-------------------------------------------------------------------------------
+CODE_00AFA4:
+	JSR.W CODE_00AFBB              ; Load pointer
+	STZ.B $9F                      ; Clear high byte
+	STZ.B $A0
+	RTS
+
+	db $20,$BB,$AF,$64,$A0,$60,$20,$BB,$AF,$29,$FF,$00,$85,$A0,$60
+
+;-------------------------------------------------------------------------------
+; CODE_00AFBB - Load pointer from Bank $XX address
+; Entry: [$17] = address, [$17+2] = bank
+; Exit: Y = word value, A = next word, $9E = first word
+;-------------------------------------------------------------------------------
+CODE_00AFBB:
+	LDA.B [$17]                    ; Load address
+	INC.B $17
+	INC.B $17
+	TAX                            ; X = address
+	LDA.B [$17]                    ; Load bank
+	INC.B $17
+	AND.W #$00FF
+	PHA                            ; Save bank
+	PLB                            ; Set data bank
+	LDA.W $0000,X                  ; Load first word
+	TAY                            ; Y = first word
+	LDA.W $0002,X                  ; Load second word
+	PLB                            ; Restore bank
+	STY.B $9E                      ; Store first word
+	RTS
+
+;-------------------------------------------------------------------------------
+; CODE_00AFD6 - Load byte from address into $9E
+;-------------------------------------------------------------------------------
+CODE_00AFD6:
+	STZ.B $9E                      ; Clear $9E
+	STZ.B $A0                      ; Clear $A0
+	LDA.B [$17]                    ; Load address
+	INC.B $17
+	INC.B $17
+	TAX                            ; X = address
+	SEP #$20                       ; 8-bit A
+	LDA.W $0000,X                  ; Load byte
+	STA.B $9E                      ; Store in $9E
+	RTS                            ; (REP #$30 in caller)
+
+;-------------------------------------------------------------------------------
+; CODE_00AFE9/AFEE - Bitwise AND operations
+;-------------------------------------------------------------------------------
+CODE_00AFE9:
+	JSR.W CODE_00AF2A              ; Copy table
+	BRA CODE_00AFF1
+
+CODE_00AFEE:
+	JSR.W CODE_00AF47              ; Copy direct
+
+CODE_00AFF1:
+	LDA.B $9E                      ; Load $9E
+	AND.B $98                      ; AND with $98
+	STA.B $9E                      ; Store result
+	LDA.B $A0                      ; Load $A0
+	AND.B $9A                      ; AND with $9A
+	STA.B $A0                      ; Store result
+	RTS
+
+;-------------------------------------------------------------------------------
+; CODE_00AFFE - Bitwise AND variants with preset counts
+;-------------------------------------------------------------------------------
+CODE_00AFFE:
+	LDA.W #$0000
