@@ -95,7 +95,6 @@ CODE_00A51E = $00A51E
 CODE_00A78E = $00A78E             ; Referenced in jump table but not implemented as routine
 CODE_00A86E = $00A86E             ; Partial implementation (raw bytecode placeholder)
 ; All comparison tests now implemented below
-CODE_00BA1A = $00BA1A
 Some_Graphics_Setup = $00B000
 Some_Init_Routine = $00B100
 Some_Mode_Handler = $00B200
@@ -108,21 +107,25 @@ Some_Function_A236 = $00A236
 CODE_009824 = $009824    ; BCD/Hex number formatting routine
 CODE_008B69 = $008B69    ; Screen setup routine 1
 CODE_008B88 = $008B88    ; Screen setup routine 2
-CODE_00BAF0 = $00BAF0    ; Initialization routine
 CODE_00CBEC = $00CBEC    ; Setup routine
 CODE_00DA65 = $00DA65    ; External data routine
-CODE_00BD30 = $00BD30    ; External routine
-CODE_00BD64 = $00BD64    ; External routine
 CODE_00C795 = $00C795    ; External routine
 CODE_00C7B8 = $00C7B8    ; External routine
 CODE_00CA63 = $00CA63    ; External routine
 CODE_00D080 = $00D080    ; External routine
 CODE_00E055 = $00E055    ; External routine
+CODE_00C92B = $00C92B    ; Get save slot address
+CODE_00C4DB = $00C4DB    ; External routine
+CODE_00C7DE = $00C7DE    ; Screen setup routine 1
+CODE_00C7F0 = $00C7F0    ; Screen setup routine 2
+CODE_00C78D = $00C78D    ; External routine
+CODE_00CF3F = $00CF3F    ; Main routine
 
 ; Other Banks
 CODE_028AE0 = $028AE0    ; Bank $02 routine
 DATA8_03BA35 = $03BA35   ; Bank $03 data
 DATA8_03BB81 = $03BB81   ; Bank $03 data
+DATA8_03A37C = $03A37C   ; Bank $03 character data
 UNREACH_03D5E5 = $03D5E5 ; Bank $03 unreachable code
 CODE_0C8000 = $0C8000    ; Bank $0C routine
 CODE_0C8080 = $0C8080    ; Bank $0C routine
@@ -151,6 +154,38 @@ DATA8_078006 = $078006
 DATA8_078007 = $078007
 DATA8_07800A = $07800A
 DATA8_07800C = $07800C
+DATA8_07D7F4 = $07D7F4   ; Palette color data base
+DATA8_07D7F5 = $07D7F5
+DATA8_07D7F6 = $07D7F6
+DATA8_07D7F7 = $07D7F7
+DATA8_07D7F8 = $07D7F8
+DATA8_07D7F9 = $07D7F9
+DATA8_07D7FA = $07D7FA
+DATA8_07D7FB = $07D7FB
+DATA8_07D7FC = $07D7FC
+DATA8_07D7FD = $07D7FD
+DATA8_07D7FE = $07D7FE
+DATA8_07D7FF = $07D7FF
+DATA8_07D800 = $07D800
+DATA8_07D801 = $07D801
+DATA8_07D802 = $07D802
+DATA8_07D803 = $07D803
+DATA8_07D814 = $07D814   ; Color data (additional palette)
+DATA8_07D815 = $07D815
+DATA8_07D816 = $07D816
+DATA8_07D817 = $07D817
+DATA8_07D818 = $07D818
+DATA8_07D819 = $07D819
+DATA8_07D81A = $07D81A
+DATA8_07D81B = $07D81B
+DATA8_07D81C = $07D81C
+DATA8_07D81D = $07D81D
+DATA8_07D81E = $07D81E
+DATA8_07D81F = $07D81F
+DATA8_07D820 = $07D820
+DATA8_07D821 = $07D821
+DATA8_07D822 = $07D822
+DATA8_07D823 = $07D823
 DATA8_07D8E4 = $07D8E4
 DATA8_07D8E5 = $07D8E5
 DATA8_07D8E6 = $07D8E6
@@ -167,6 +202,18 @@ DATA8_07D8F0 = $07D8F0
 DATA8_07D8F1 = $07D8F1
 DATA8_07D8F2 = $07D8F2
 DATA8_07D8F3 = $07D8F3
+
+;===============================================================================
+; SNES Hardware Register Definitions (Additional)
+;===============================================================================
+SNES_BG1HOFS   = $210D    ; BG1 Horizontal Offset
+SNES_BG2HOFS   = $210F    ; BG2 Horizontal Offset
+SNES_BG3VOFS   = $2112    ; BG3 Vertical Offset
+SNES_BG1SC     = $2107    ; BG1 Screen Base Address
+SNES_BG2SC     = $2108    ; BG2 Screen Base Address
+
+; Loose operations (code fragments)
+LOOSE_OP_00BCF3 = $00BCF3 ; Continuation address in state machine
 
 ;===============================================================================
 ; BOOT SEQUENCE & INITIALIZATION ($008000-$008113)
@@ -11933,6 +11980,796 @@ CODE_00B950:
     LDA.W #$0080                   ; Bit 7
     TSB.W $00D6                    ; Set bit 7 of $D6
     JSL.L CODE_0C8000              ; Call Bank $0C init
+    JSR.W CODE_00BAF0              ; Initialization routine
+    STZ.B $01                      ; Clear $01
+    SEP #$20                       ; 8-bit accumulator
+    JSR.W CODE_00CBEC              ; Setup routine
+    REP #$30                       ; 16-bit A/X/Y
+    LDX.W #$BA17                   ; Menu data pointer
+    JSR.W CODE_009BC4              ; Update menu
+    TSC                            ; Transfer stack to A
+    STA.W $0105                    ; Save stack pointer
+    LDA.W #$0080                   ; Bit 7
+    TSB.W $00DE                    ; Set bit 7 of $DE
+    PEI.B ($01)                    ; Save $01
+    PEI.B ($03)                    ; Save $03
+    LDA.W #$0401                   ; Load $0401
+    STA.B $03                      ; Store in $03
+    LDA.L $701FFC                  ; Load save data flag
+    AND.W #$0300                   ; Mask bits 8-9
+    STA.B $01                      ; Store in $01
+    STA.B $05                      ; Store in $05
+    PEA.W LOOSE_OP_00BCF3          ; Push continue address
+    LDX.W #$BA14                   ; Menu data
+    JSR.W CODE_009BC4              ; Update menu
+    LDA.W #$0F00                   ; Load $0F00
+    STA.B $8E                      ; Store in brightness?
+
+CODE_00B9A0:
+    REP #$30                       ; 16-bit A/X/Y
+    LDA.W #$0C80                   ; Button mask
+    JSR.W CODE_00B930              ; Poll input
+    BNE UNREACH_00B9E0             ; If button pressed, branch
+    BIT.W #$0080                   ; Test B button
+    BEQ CODE_00B9A0                ; If not pressed, loop
+    SEP #$20                       ; 8-bit accumulator
+    LDA.B $06                      ; Load save slot selection
+    STA.L $701FFD                  ; Store save slot
+    REP #$30                       ; 16-bit A/X/Y
+    AND.W #$00FF                   ; Mask to 8 bits
+    DEC A                          ; Decrement (0-based index)
+    STA.W $010E                    ; Store save slot index
+    BMI UNREACH_00B9D5             ; If negative (new game), branch
+    JSR.W CODE_00C92B              ; Get save slot address
+    TAX                            ; X = save address
+    LDA.L $700000,X                ; Load save data validity flag
+    BEQ UNREACH_00B9DB             ; If empty, branch
+    JSR.W CODE_00B908              ; Set sprite mode $2D
+    LDA.W $010E                    ; Load save slot index
+    JMP.W CODE_00CA63              ; Load game
+
+UNREACH_00B9D5:
+    db $20,$08,$B9,$4C,$1A,$BA     ; JSR CODE_00B908; JMP CODE_00BA1A
+
+UNREACH_00B9DB:
+    db $20,$12,$B9,$80,$C0         ; JSR CODE_00B912; BRA (skip)
+
+UNREACH_00B9E0:
+    db $86,$05,$20,$1C,$B9,$E2,$30,$A9,$EC,$8F,$D8,$56,$7F,$8F,$DA,$56
+    db $7F,$8F,$DC,$56,$7F,$8F,$DE,$56,$7F,$A5,$06,$0A,$AA,$A9,$E0,$9F
+    db $D8,$56,$7F,$A9,$08,$0C,$D4,$00,$22,$00,$80,$0C,$A9,$08,$1C,$D4
+    db $00,$4C,$A0,$B9
+    ; STX $05; JSR CODE_00B91C; SEP #$30; (sprite setup code)
+
+DATA_00BA14:
+    db $38,$AC,$03,$0B,$95,$03     ; Menu configuration data
+
+;-------------------------------------------------------------------------------
+; CODE_00BA1A: Initialize title screen display
+;
+; Purpose: Set up title screen graphics and palette
+; Entry: None
+; Exit: Title screen initialized
+;       $0111 bit 4 cleared/set for BG3 control
+; Calls: CODE_009A11 (graphics init)
+;        CODE_009BC4 (menu update)
+;        CODE_0C8000 (external init)
+; Notes: Sets up BG3 scrolling animation
+;        Loads title screen palette from Bank $07
+;-------------------------------------------------------------------------------
+CODE_00BA1A:
+    LDY.W #$1000                   ; Y = $1000 (destination)
+    LDA.W #$0303                   ; Graphics mode $0303
+    JSR.W CODE_009A11              ; Initialize graphics
+    SEP #$20                       ; 8-bit accumulator
+    LDX.W #$BAE7                   ; Data pointer
+    JSR.W CODE_009BC4              ; Update menu
+    LDA.B #$10                     ; Bit 4 mask
+    TRB.W $0111                    ; Clear bit 4 of $0111
+    JSL.L CODE_0C8000              ; External init call
+    STZ.W SNES_BG3VOFS             ; Clear BG3 V-scroll low
+    STZ.W SNES_BG3VOFS             ; Clear BG3 V-scroll high
+    LDA.B #$17                     ; Enable BG1+BG2+BG3+sprites
+    STA.W SNES_TM                  ; Set main screen designation
+    LDA.B #$00                     ; Start at Y=0
+
+CODE_00BA41:
+    JSL.L CODE_0C8000              ; External call
+    STA.W SNES_BG3VOFS             ; Set BG3 V-scroll low
+    STZ.W SNES_BG3VOFS             ; Clear BG3 V-scroll high
+    CLC                            ; Clear carry
+    ADC.B #$08                     ; Add 8 (scroll speed)
+    CMP.B #$D0                     ; Check if reached $D0
+    BNE CODE_00BA41                ; Loop until done
+    LDA.B #$10                     ; Bit 4 mask
+    TSB.W $0111                    ; Set bit 4 of $0111
+    REP #$30                       ; 16-bit A/X/Y
+    STZ.W $00CC                    ; Clear character count
+    LDA.W #$060D                   ; Load $060D
+    STA.B $03                      ; Store in $03
+    LDA.W #$0000                   ; Load 0
+    STA.B $05                      ; Clear $05
+    STA.B $01                      ; Clear $01
+    STA.W $015F                    ; Clear $015F
+    BRA CODE_00BADF                ; Jump to menu display
+
+UNREACH_00BA6D:
+    db $20,$12,$B9                 ; JSR CODE_00B912
+
+;-------------------------------------------------------------------------------
+; CODE_00BA70: Character name entry input loop
+;
+; Purpose: Handle controller input for character naming
+; Entry: $00CC = current character count (0-8)
+;        $01 = current cursor position
+; Exit: Character name entered
+;       $1000-$1007 = entered name
+; Calls: CODE_00B930 (input polling)
+;        CODE_00B912, CODE_00B926 (sprite modes)
+;        CODE_009BC4 (menu update)
+; Notes: Supports character entry, deletion, confirmation
+;        Max 8 characters per name
+;-------------------------------------------------------------------------------
+CODE_00BA70:
+    REP #$30                       ; 16-bit A/X/Y
+    LDA.W #$9F80                   ; Button mask
+    JSR.W CODE_00B930              ; Poll input
+    BNE CODE_00BAD9                ; If button pressed, process
+    BIT.W #$1000                   ; Test L button
+    BNE CODE_00BAD1                ; If pressed, confirm
+    BIT.W #$8000                   ; Test A button
+    BNE UNREACH_00BAC2             ; If pressed, delete char
+    BIT.W #$0080                   ; Test B button
+    BEQ CODE_00BA70                ; If not pressed, loop
+    LDA.B $01                      ; Load cursor position
+    CMP.W #$050C                   ; Check if at end position
+    BEQ CODE_00BAD1                ; If yes, confirm
+    SEP #$30                       ; 8-bit A/X/Y
+    LDY.W $00CC                    ; Load character count
+    CPY.B #$08                     ; Check if 8 chars entered
+    BEQ UNREACH_00BA6D             ; If full, error sound
+    LDA.B $06                      ; Load selected character (row)
+    STA.W SNES_WRMPYA              ; Set multiplicand
+    LDA.B #$1A                     ; Load 26 (chars per row)
+    JSL.L CODE_00971E              ; Multiply
+    LDA.B $05                      ; Load column
+    ASL A                          ; × 2
+    ADC.W SNES_RDMPYL              ; Add multiplication result
+    TAX                            ; X = character index
+    REP #$10                       ; 16-bit X/Y
+    INC.W $00CC                    ; Increment character count
+    LDA.L DATA8_03A37C,X           ; Load character from table
+    STA.W $1000,Y                  ; Store in name buffer
+    JSR.W CODE_00B926              ; Set animation mode $11
+    LDX.W #$BAED                   ; Menu data
+    JSR.W CODE_009BC4              ; Update menu
+    BRA CODE_00BA70                ; Loop
+
+UNREACH_00BAC2:
+    db $AC,$CC,$00,$F0,$A6,$88,$8C,$CC,$00,$E2,$20,$A9,$03,$80,$E3
+    ; LDY $00CC; BEQ skip; DEY; STY $00CC; SEP #$20; LDA #$03; BRA sound
+
+CODE_00BAD1:
+    LDA.W $00CC                    ; Load character count
+    BEQ UNREACH_00BA6D             ; If empty, error
+    JMP.W CODE_00B908              ; Set sprite mode $2D and return
+
+CODE_00BAD9:
+    STX.W $015F                    ; Store selected option
+    JSR.W CODE_00B91C              ; Set animation mode $10
+
+CODE_00BADF:
+    LDX.W #$BAEA                   ; Menu data
+    JSR.W CODE_009BC4              ; Update menu
+    BRA CODE_00BA70                ; Loop
+
+DATA_00BAE7:
+    db $CA,$AC,$03                 ; Menu configuration
+
+DATA_00BAEA:
+    db $34,$AD,$03,$21,$AD,$03     ; Menu configuration
+
+;-------------------------------------------------------------------------------
+; CODE_00BAF0: System initialization routine
+;
+; Purpose: Initialize SNES hardware and game system
+; Entry: Called at game start
+; Exit: System initialized
+;       Direct page = $2100 (PPU registers)
+;       Graphics loaded, palettes set, sprites configured
+; Calls: Multiple graphics and initialization routines
+; Notes: Comprehensive system setup
+;        Configures PPU, loads graphics, sets up memory
+;-------------------------------------------------------------------------------
+CODE_00BAF0:
+    LDA.W #$2100                   ; PPU register base
+    TCD                            ; Set direct page to $2100
+    STZ.B SNES_CGSWSEL-$2100       ; Clear color/window select
+    LDA.W #$0017                   ; Enable BG1+BG2+BG3+OBJ
+    STA.W $212C                    ; Set main screen designation
+    LDA.W #$5555                   ; Init marker
+    STA.W $0E00                    ; Store marker
+    SEP #$20                       ; 8-bit accumulator
+    LDA.B #$00                     ; Load 0
+    STA.L $7E3664                  ; Clear flag
+    LDA.B #$3B                     ; BG1 tilemap = $3B00
+    STA.B SNES_BG1SC-$2100         ; Set BG1 screen base
+    LDA.B #$4B                     ; BG2 tilemap = $4B00
+    STA.B SNES_BG2SC-$2100         ; Set BG2 screen base
+    LDA.B #$80                     ; VRAM increment after high byte
+    STA.B SNES_VMAINC-$2100        ; Set VRAM increment mode
+    REP #$30                       ; 16-bit A/X/Y
+    STZ.W $00F0                    ; Clear $F0
+    LDX.W #$0000                   ; VRAM address $0000
+    STX.B SNES_VMADDL-$2100        ; Set VRAM address
+    PEA.W $0007                    ; Bank $07
+    PLB                            ; Set data bank to $07
+    LDX.W #$8030                   ; Source address
+    LDY.W #$0100                   ; Length (256 words)
+    JSL.L CODE_008E54              ; DMA transfer to VRAM
+    PLB                            ; Restore data bank
+    LDX.W #$1000                   ; VRAM address $1000
+    STX.B SNES_VMADDL-$2100        ; Set VRAM address
+    PEA.W $0004                    ; Bank $04
+    PLB                            ; Set data bank to $04
+    LDX.W #$9840                   ; Source address
+    LDY.W #$0010                   ; Length (16 words)
+    JSL.L CODE_008DDF              ; DMA transfer
+    PLB                            ; Restore data bank
+    LDX.W #$6080                   ; VRAM address $6080
+    STX.B SNES_VMADDL-$2100        ; Set VRAM address
+    PEA.W $0004                    ; Bank $04
+    PLB                            ; Set data bank
+    LDX.W #$99C0                   ; Source address
+    LDY.W #$0004                   ; Length (4 words)
+    JSL.L CODE_008DDF              ; DMA transfer
+    PLB                            ; Restore data bank
+    SEP #$30                       ; 8-bit A/X/Y
+    PEA.W $0007                    ; Bank $07
+    PLB                            ; Set data bank
+    LDA.B #$20                     ; Palette offset $20
+    LDX.B #$00                     ; Palette index 0
+    JSR.W CODE_008FB4              ; Load palette
+    LDA.B #$30                     ; Palette offset $30
+    LDX.B #$08                     ; Palette index 8
+    JSR.W CODE_008FB4              ; Load palette
+    LDA.B #$60                     ; Palette offset $60
+    LDX.B #$10                     ; Palette index 16
+    JSR.W CODE_008FB4              ; Load palette
+    LDA.B #$70                     ; Palette offset $70
+    LDX.B #$18                     ; Palette index 24
+    JSR.W CODE_008FB4              ; Load palette
+    LDA.B #$40                     ; Palette offset $40
+    LDX.B #$20                     ; Palette index 32
+    JSR.W CODE_008FB4              ; Load palette
+    LDA.B #$50                     ; Palette offset $50
+    LDX.B #$28                     ; Palette index 40
+    JSR.W CODE_008FB4              ; Load palette
+    PLB                            ; Restore data bank
+    LDX.B #$00                     ; Index 0
+    TXA                            ; A = 0
+    PEA.W $0007                    ; Bank $07
+    PLB                            ; Set data bank
+    JSR.W CODE_00BC49              ; Load color data
+    LDX.B #$10                     ; Index 16
+    LDA.B #$10                     ; Offset $10
+    JSR.W CODE_00BC49              ; Load color data
+    PLB                            ; Restore data bank
+    LDA.B #$80                     ; CGRAM address $80
+    STA.B SNES_CGADD-$2100         ; Set CGRAM address
+    PEA.W $0007                    ; Bank $07
+    PLB                            ; Set data bank
+    LDA.W DATA8_07D814             ; Load color data
+    STA.B SNES_CGDATA-$2100        ; Write to CGRAM
+    LDA.W DATA8_07D815             ; Load color data
+    STA.B SNES_CGDATA-$2100        ; Write to CGRAM
+    LDA.W DATA8_07D816             ; Load color data
+    STA.B SNES_CGDATA-$2100        ; Write to CGRAM
+    LDA.W DATA8_07D817             ; Load color data
+    STA.B SNES_CGDATA-$2100        ; Write to CGRAM
+    LDA.W DATA8_07D818             ; Load color data
+    STA.B SNES_CGDATA-$2100        ; Write to CGRAM
+    LDA.W DATA8_07D819             ; Load color data
+    STA.B SNES_CGDATA-$2100        ; Write to CGRAM
+    LDA.W DATA8_07D81A             ; Load color data
+    STA.B SNES_CGDATA-$2100        ; Write to CGRAM
+    LDA.W DATA8_07D81B             ; Load color data
+    STA.B SNES_CGDATA-$2100        ; Write to CGRAM
+    LDA.W DATA8_07D81C             ; Load color data
+    STA.B SNES_CGDATA-$2100        ; Write to CGRAM
+    LDA.W DATA8_07D81D             ; Load color data
+    STA.B SNES_CGDATA-$2100        ; Write to CGRAM
+    LDA.W DATA8_07D81E             ; Load color data
+    STA.B SNES_CGDATA-$2100        ; Write to CGRAM
+    LDA.W DATA8_07D81F             ; Load color data
+    STA.B SNES_CGDATA-$2100        ; Write to CGRAM
+    LDA.W DATA8_07D820             ; Load color data
+    STA.B SNES_CGDATA-$2100        ; Write to CGRAM
+    LDA.W DATA8_07D821             ; Load color data
+    STA.B SNES_CGDATA-$2100        ; Write to CGRAM
+    LDA.W DATA8_07D822             ; Load color data
+    STA.B SNES_CGDATA-$2100        ; Write to CGRAM
+    LDA.W DATA8_07D823             ; Load color data
+    STA.B SNES_CGDATA-$2100        ; Write to CGRAM
+    PLB                            ; Restore data bank
+    LDA.B #$31                     ; CGRAM address $31
+    STA.B SNES_CGADD-$2100         ; Set CGRAM address
+    LDA.W $0E9C                    ; Load color low
+    STA.B SNES_CGDATA-$2100        ; Write to CGRAM
+    LDA.W $0E9D                    ; Load color high
+    STA.B SNES_CGDATA-$2100        ; Write to CGRAM
+    LDA.B #$71                     ; CGRAM address $71
+    STA.B SNES_CGADD-$2100         ; Set CGRAM address
+    LDA.W $0E9C                    ; Load color low
+    STA.B SNES_CGDATA-$2100        ; Write to CGRAM
+    LDA.W $0E9D                    ; Load color high
+    STA.B SNES_CGDATA-$2100        ; Write to CGRAM
+    STZ.B SNES_BG1HOFS-$2100       ; Clear BG1 H-scroll
+    STZ.B SNES_BG1HOFS-$2100       ; (write twice)
+    STZ.B SNES_BG1VOFS-$2100       ; Clear BG1 V-scroll
+    STZ.B SNES_BG1VOFS-$2100       ; (write twice)
+    STZ.B SNES_BG2HOFS-$2100       ; Clear BG2 H-scroll
+    STZ.B SNES_BG2HOFS-$2100       ; (write twice)
+    STZ.B SNES_BG2VOFS-$2100       ; Clear BG2 V-scroll
+    STZ.B SNES_BG2VOFS-$2100       ; (write twice)
+    REP #$30                       ; 16-bit A/X/Y
+    LDA.W #$0000                   ; Direct page = $0000
+    TCD                            ; Restore direct page
+    LDX.W #$C8E6                   ; Data pointer
+    JSR.W CODE_009BC4              ; Update menu
+    JSR.W CODE_00C4DB              ; External routine
+    JSR.W CODE_00BD64              ; Clear memory routine
+    LDA.W #$0200                   ; Load $0200
+    STA.W $01F0                    ; Store in $01F0
+    LDA.W #$0020                   ; Load $0020
+    STA.W $01F2                    ; Store in $01F2
+    LDA.W #$0701                   ; Load $0701
+    STA.B $03                      ; Store in $03
+    STZ.B $05                      ; Clear $05
+    STZ.B $01                      ; Clear $01
+    JMP.W CODE_00CF3F              ; Jump to main routine
+
+;-------------------------------------------------------------------------------
+; CODE_00BC49: Load palette color data
+;
+; Purpose: Load 16 colors from Bank $07 to CGRAM
+; Entry: A = CGRAM start address
+;        X = data offset in Bank $07
+;        Data bank = $07
+; Exit: 16 colors loaded to CGRAM
+; Uses: DATA8_07D7F4 onwards (color data)
+;-------------------------------------------------------------------------------
+CODE_00BC49:
+    STA.B SNES_CGADD-$2100         ; Set CGRAM address
+    LDA.W DATA8_07D7F4,X           ; Load color byte
+    STA.B SNES_CGDATA-$2100        ; Write to CGRAM
+    LDA.W DATA8_07D7F5,X           ; (repeat for 32 bytes = 16 colors)
+    STA.B SNES_CGDATA-$2100
+    LDA.W DATA8_07D7F6,X
+    STA.B SNES_CGDATA-$2100
+    LDA.W DATA8_07D7F7,X
+    STA.B SNES_CGDATA-$2100
+    LDA.W DATA8_07D7F8,X
+    STA.B SNES_CGDATA-$2100
+    LDA.W DATA8_07D7F9,X
+    STA.B SNES_CGDATA-$2100
+    LDA.W DATA8_07D7FA,X
+    STA.B SNES_CGDATA-$2100
+    LDA.W DATA8_07D7FB,X
+    STA.B SNES_CGDATA-$2100
+    LDA.W DATA8_07D7FC,X
+    STA.B SNES_CGDATA-$2100
+    LDA.W DATA8_07D7FD,X
+    STA.B SNES_CGDATA-$2100
+    LDA.W DATA8_07D7FE,X
+    STA.B SNES_CGDATA-$2100
+    LDA.W DATA8_07D7FF,X
+    STA.B SNES_CGDATA-$2100
+    LDA.W DATA8_07D800,X
+    STA.B SNES_CGDATA-$2100
+    LDA.W DATA8_07D801,X
+    STA.B SNES_CGDATA-$2100
+    LDA.W DATA8_07D802,X
+    STA.B SNES_CGDATA-$2100
+    LDA.W DATA8_07D803,X
+    STA.B SNES_CGDATA-$2100
+    RTS
+
+;-------------------------------------------------------------------------------
+; CODE_00BC9C: Set display update flag and execute screen update
+;
+; Purpose: Set bit 0 of $D8 and call screen update routine
+; Entry: None
+; Exit: $D8 bit 0 set
+;       Screen update executed
+;-------------------------------------------------------------------------------
+CODE_00BC9C:
+    PHP                            ; Save processor status
+    SEP #$30                       ; 8-bit A/X/Y
+    LDA.B #$01                     ; Bit 0 mask
+    TSB.W $00D8                    ; Set bit 0 of $D8
+    PLP                            ; Restore processor status
+
+;-------------------------------------------------------------------------------
+; CODE_00BCA5: Screen transition/reset routine
+;
+; Purpose: Reset screen and reinitialize game state
+; Entry: $0E00 = state marker
+; Exit: Screen reinitialized
+;       Game state restored
+; Calls: CODE_00C7B8 (external routine)
+;        CODE_00BAF0 (initialization)
+;        CODE_00C7DE or CODE_00C7F0 (conditional screen setup)
+;        CODE_009BC4 (menu update)
+;        CODE_00C795 (external routine)
+;        CODE_00BDB9 (menu handler)
+;        CODE_00BD64 (clear memory)
+;        CODE_00C4DB (external routine)
+;        CODE_00CF3F (main routine)
+; Notes: Handles screen transitions and state restoration
+;-------------------------------------------------------------------------------
+CODE_00BCA5:
+    PHP                            ; Save processor status
+    PHB                            ; Save data bank
+    PHD                            ; Save direct page
+    REP #$30                       ; 16-bit A/X/Y
+    LDA.W #$0010                   ; Bit 4 mask
+    TRB.W $00D6                    ; Clear bit 4 of $D6
+    LDA.W $0E00                    ; Load state marker
+    PHA                            ; Save on stack
+    STZ.W $008E                    ; Clear $8E
+    JSL.L CODE_00C7B8              ; External routine
+    JSR.W CODE_00BAF0              ; Initialize system
+    LDA.W #$0001                   ; Bit 0 mask
+    AND.W $00D8                    ; Test bit 0 of $D8
+    BNE CODE_00BCCB                ; If set, alternate path
+    JSR.W CODE_00C7DE              ; Screen setup routine 1
+    BRA CODE_00BCCE                ; Continue
+
+CODE_00BCCB:
+    JSR.W CODE_00C7F0              ; Screen setup routine 2
+
+CODE_00BCCE:
+    LDX.W #$BE80                   ; Data pointer
+    JSR.W CODE_009BC4              ; Update menu
+    LDA.W #$0020                   ; Bit 5 mask
+    TSB.W $00D2                    ; Set bit 5 of $D2
+    JSL.L CODE_00C795              ; External routine
+    LDA.W #$00A0                   ; Load $A0
+    STA.W $01F0                    ; Store in $01F0
+    LDA.W #$000A                   ; Load $0A
+    STA.W $01F2                    ; Store in $01F2
+    TSC                            ; Transfer stack to A
+    STA.W $0105                    ; Save stack pointer
+    JSR.W CODE_00BDB9              ; Menu handler
+    LDA.W #$00FF                   ; Load $FF
+    SEP #$30                       ; 8-bit A/X/Y
+    STA.W $0104                    ; Store in $0104
+    REP #$30                       ; 16-bit A/X/Y
+    LDA.W $0105                    ; Load stack pointer
+    TCS                            ; Restore stack
+    JSL.L CODE_00C7B8              ; External routine
+    JSR.W CODE_00BD64              ; Clear memory
+    LDX.W #$C8E9                   ; Data pointer
+    JSR.W CODE_009BC4              ; Update menu
+    JSL.L CODE_0C8000              ; External init
+    LDA.W #$0040                   ; Load $40
+    STA.W $01F0                    ; Store in $01F0
+    LDA.W #$0004                   ; Load $04
+    STA.W $01F2                    ; Store in $01F2
+    PLA                            ; Restore state marker
+    STA.W $0E00                    ; Store back
+    JSR.W CODE_00C78D              ; External routine
+    JSR.W CODE_008230              ; External routine
+    PLD                            ; Restore direct page
+    PLB                            ; Restore data bank
+    PLP                            ; Restore processor status
+    RTL                            ; Return
+
+;-------------------------------------------------------------------------------
+; CODE_00BD2A: Screen update wrapper
+;
+; Purpose: Call screen update and graphics routine
+; Entry: None
+; Exit: Screen updated
+; Calls: CODE_00BD30 (screen update)
+;        CODE_00C795 (graphics routine)
+;-------------------------------------------------------------------------------
+CODE_00BD2A:
+    JSR.W CODE_00BD30              ; Screen update
+    JMP.W CODE_00C795              ; Graphics routine
+
+;-------------------------------------------------------------------------------
+; CODE_00BD30: Screen update and initialization
+;
+; Purpose: Update screen display and reinitialize subsystems
+; Entry: None
+; Exit: Screen updated
+;       Subsystems initialized
+; Calls: Multiple initialization routines
+; Notes: Major screen refresh routine
+;-------------------------------------------------------------------------------
+CODE_00BD30:
+    PHP                            ; Save processor status
+    PHD                            ; Save direct page
+    SEP #$20                       ; 8-bit accumulator
+    REP #$10                       ; 16-bit X/Y
+    PEA.W $0000                    ; Direct page = $0000
+    PLD                            ; Set direct page
+    LDX.W #$BD61                   ; Data pointer
+    JSR.W CODE_009BC4              ; Update menu
+    JSL.L CODE_0C8000              ; External init
+    JSR.W CODE_008EC4              ; External routine
+    JSR.W CODE_008C3D              ; External routine
+    JSR.W CODE_008D29              ; External routine
+    JSL.L CODE_009B2F              ; External routine
+    JSR.W CODE_00A342              ; External routine
+    LDA.B #$10                     ; Bit 4 mask
+    TSB.W $00D6                    ; Set bit 4 of $D6
+    LDX.W #$FFF0                   ; Load $FFF0
+    STX.B $8E                      ; Store in $8E
+    PLD                            ; Restore direct page
+    PLP                            ; Restore processor status
+    RTS
+
+DATA_00BD61:
+    db $F2,$82,$03                 ; Configuration data
+
+;-------------------------------------------------------------------------------
+; CODE_00BD64: Clear memory routine
+;
+; Purpose: Clear memory range $0C20-$0E1F (512 bytes)
+; Entry: None
+; Exit: Memory cleared to $5555 pattern
+;       Tilemap initialized
+; Notes: Uses MVN for fast block fill
+;        Sets up character display tilemap
+;-------------------------------------------------------------------------------
+CODE_00BD64:
+    LDA.W #$5555                   ; Fill pattern
+    STA.W $0C20                    ; Store at start
+    LDX.W #$0C20                   ; Source address
+    LDY.W #$0C22                   ; Destination address
+    LDA.W #$01FD                   ; Length (509 bytes)
+    MVN $00,$00                    ; Block move (fill memory)
+    LDX.W #$BD99                   ; Tilemap data pointer
+    STX.B $5F                      ; Store in $5F
+    LDX.W #$0000                   ; Tilemap index = 0
+    LDY.W #$0020                   ; Counter = 32 tiles
+
+CODE_00BD81:
+    SEP #$20                       ; 8-bit accumulator
+    LDA.B ($5F)                    ; Load tile number
+    STA.W $0C22,X                  ; Store in tilemap
+    LDA.B #$30                     ; Palette 3
+    STA.W $0C23,X                  ; Store attributes
+    REP #$30                       ; 16-bit A/X/Y
+    INC.B $5F                      ; Next tile data
+    INX                            ; Advance tilemap index
+    INX                            ; (4 bytes per entry)
+    INX
+    INX
+    DEY                            ; Decrement counter
+    BNE CODE_00BD81                ; Loop until done
+    RTS
+
+;-------------------------------------------------------------------------------
+; DATA_00BD99: Character display tilemap data
+;
+; Purpose: Tile numbers for character name/stats display
+; Format: 32 tile numbers (1 byte each)
+;-------------------------------------------------------------------------------
+DATA_00BD99:
+    db $08,$0A,$09,$0B,$08,$09,$0A,$0B,$10,$11,$12,$13,$18,$19,$1A,$1B
+    db $10,$11,$12,$13,$28,$29,$2A,$2B,$10,$11,$12,$13,$38,$39,$3A,$3B
+
+;-------------------------------------------------------------------------------
+; CODE_00BDB9: Menu/dialog input handler
+;
+; Purpose: Handle menu input and dialog display
+; Entry: $D8 bit 0 indicates mode
+; Exit: User selection processed
+; Calls: CODE_00B930 (input polling)
+;        CODE_00B912, CODE_00B91C (sprite modes)
+;        CODE_009BC4 (menu update)
+; Notes: Complex menu navigation system
+;-------------------------------------------------------------------------------
+CODE_00BDB9:
+    PHK                            ; Push program bank
+    PLB                            ; Set data bank
+    LDA.W #$0001                   ; Bit 0 mask
+    AND.W $00D8                    ; Test bit 0 of $D8
+    BNE CODE_00BDFD                ; If set, alternate mode
+    LDA.W #$FFF0                   ; Load $FFF0
+    STA.B $8E                      ; Store in $8E
+    BRA CODE_00BDF5                ; Continue
+
+UNREACH_00BDCA:
+    db $20,$12,$B9                 ; JSR CODE_00B912
+
+CODE_00BDCD:
+    LDA.W #$CCB0                   ; Button mask
+    JSR.W CODE_00B930              ; Poll input
+    BNE CODE_00BDF5                ; If button pressed, process
+    BIT.W #$0080                   ; Test B button
+    BNE CODE_00BE2A                ; If pressed, branch
+    BIT.W #$8000                   ; Test A button
+    BEQ CODE_00BDCD                ; If not pressed, loop
+    JSR.W CODE_00B91C              ; Set animation mode $10
+    STZ.B $8E                      ; Clear $8E
+
+CODE_00BDE4:
+    RTS
+
+LOOSE_OP_00BDE5:
+    PLA                            ; Pull return address
+    STA.B $03                      ; Store in $03
+    PLA                            ; Pull high byte
+    STA.B $05                      ; Store in $05
+    PLA                            ; Pull saved value
+    STA.B $01                      ; Store in $01
+    LDA.W #$FFF0                   ; Load $FFF0
+    STA.B $8E                      ; Store in $8E
+
+CODE_00BDF5:
+    STX.W $015F                    ; Store input state
+    JSR.W CODE_00B91C              ; Set animation mode $10
+    BRA CODE_00BE30                ; Continue
+
+CODE_00BDFD:
+    LDA.W #$CCB0                   ; Button mask
+    JSR.W CODE_00B930              ; Poll input
+    BNE CODE_00BE30                ; If button pressed, process
+    LDA.B #$01                     ; Bit 0 mask
+    TRB.W $00D8                    ; Clear bit 0 of $D8
+    BIT.W #$0080                   ; Test B button
+    BNE CODE_00BE21                ; If pressed, cancel
+    BIT.W #$8000                   ; Test A button
+    BEQ CODE_00BDFD                ; If not pressed, loop
+    JSR.W CODE_00B91C              ; Set animation mode $10
+    LDA.W #$FFFF                   ; Load $FFFF
+    STA.B $01                      ; Store in $01
+    STZ.B $8E                      ; Clear $8E
+    RTS
+
+CODE_00BE21:
+    JSR.W CODE_00B912              ; Set sprite mode $2D
+    LDA.W #$00FF                   ; Load $FF
+    STA.B $01                      ; Store in $01
+    RTS
+
+CODE_00BE2A:
+    LDA.B #$01                     ; Bit 0 mask
+    TRB.W $00D8                    ; Clear bit 0 of $D8
+    RTS
+
+CODE_00BE30:
+    LDX.W #$BE80                   ; Data pointer
+    JSR.W CODE_009BC4              ; Update menu
+    BRA CODE_00BDCD                ; Loop
+
+DATA_00BE38:
+    db $02,$04                     ; Configuration data
+
+DATA_00BE3A:
+    db $2B,$BF,$03,$06,$02,$00,$04,$00,$06,$00,$08,$00,$04,$01,$06,$01
+    db $00,$00,$02,$00,$04,$00,$06,$00,$08,$00,$04,$01,$06,$01,$00,$02
+    db $02,$02,$04,$02,$06,$02,$08,$02,$04,$03,$06,$03
+
+DATA_00BE66:
+    db $1C,$BF,$80,$00,$11,$0E,$11,$0E,$30,$70,$80,$00,$2F,$03,$2E,$03
+    db $00,$00,$80,$00
+
+DATA_00BE7A:
+    db $78,$BE,$03,$6B,$BE,$03,$38,$BE,$03
+
+DATA_00BE83:
+    db $7A,$BE,$03,$3A,$BE,$03,$66,$BE,$03
+
+;-------------------------------------------------------------------------------
+; CODE_00BE8C: Menu option selection handler
+;
+; Purpose: Handle menu cursor and option selection
+; Entry: $01 = current menu option
+;        $03 = menu configuration
+; Exit: $01 = selected option or $FF for cancel
+; Calls: CODE_00B930 (input polling)
+;        CODE_00B912, CODE_00B926, CODE_00B91C (sprite/animation modes)
+;        CODE_009BC4 (menu update)
+; Notes: Supports cursor wrapping, confirmation, cancellation
+;-------------------------------------------------------------------------------
+CODE_00BE8C:
+    LDA.W #$CCB0                   ; Button mask
+    JSR.W CODE_00B930              ; Poll input
+    BNE CODE_00BED8                ; If button pressed, process
+    BIT.W #$0080                   ; Test B button
+    BNE CODE_00BEB3                ; If pressed, cancel
+    BIT.W #$8000                   ; Test A button
+    BEQ CODE_00BE8C                ; If not pressed, loop
+    JSR.W CODE_00B91C              ; Set animation mode $10
+    LDA.W #$000F                   ; Mask low 4 bits
+    AND.B $01                      ; Get current selection
+    CMP.W #$000C                   ; Check if option $0C
+    BEQ CODE_00BEB3                ; If yes, treat as cancel
+    LDA.B $01                      ; Load full option
+    STA.W $015F                    ; Store selection
+    LDA.W #$FFFF                   ; Load $FFFF
+    STA.B $01                      ; Store in $01
+    STZ.B $8E                      ; Clear $8E
+    RTS
+
+CODE_00BEB3:
+    JSR.W CODE_00B912              ; Set sprite mode $2D
+    LDA.W #$00FF                   ; Load $FF (cancel code)
+    STA.B $01                      ; Store in $01
+    RTS
+
+UNREACH_00BEBB:
+    db $A9,$01,$00,$1C,$D8,$00,$60 ; LDA #$0001; TRB $00D8; RTS
+
+DATA_00BEC2:
+    db $D8,$00,$03,$C2,$00,$03,$F5,$00,$03
+
+DATA_00BECB:
+    db $F2,$82,$03
+
+LOOSE_OP_00BECE:
+    db $9C,$10,$01,$9C,$12,$01,$60 ; STZ $0110; STZ $0112; RTS
+
+UNREACH_00BED5:
+    db $48,$22,$00,$80,$0C         ; PHA; JSL CODE_0C8000; (more code)
+
+CODE_00BED8:
+    STX.W $015F                    ; Store input state
+    JSR.W CODE_00B91C              ; Set animation mode $10
+    LDX.W #$BE80                   ; Data pointer
+    JSR.W CODE_009BC4              ; Update menu
+    BRA CODE_00BE8C                ; Loop
+
+UNREACH_00BEE5:
+    db $A9,$B0,$CC,$22,$30,$B9,$00,$F0,$F1,$89,$80,$00,$F0,$03,$4C,$CC
+    db $BE,$20,$12,$B9,$A9,$FF,$00,$85,$01,$60
+    ; LDA #$CCB0; JSL CODE_00B930; (menu polling code)
+
+;-------------------------------------------------------------------------------
+; CODE_00BF00: Complex menu update routine
+;
+; Purpose: Update menu display with multiple options
+; Entry: $01 = current option
+;        $03 = menu data pointer
+; Exit: Menu updated
+; Calls: CODE_009BC4 (menu update)
+;        CODE_00B930 (input polling)
+;        CODE_00B926 (animation mode)
+; Notes: Handles multi-option menus with cursor navigation
+;-------------------------------------------------------------------------------
+CODE_00BF00:
+    PHK                            ; Push program bank
+    PLB                            ; Set data bank
+    JSR.W CODE_00B926              ; Set animation mode $11
+    LDX.W #$BECB                   ; Data pointer
+    JSR.W CODE_009BC4              ; Update menu
+
+CODE_00BF0B:
+    LDA.W #$CCB0                   ; Button mask
+    JSR.W CODE_00B930              ; Poll input
+    BNE CODE_00BF28                ; If button pressed, process
+    BIT.W #$0080                   ; Test B button
+    BEQ CODE_00BF0B                ; If not pressed, loop
+    STZ.B $8E                      ; Clear $8E
+    RTS
+
+UNREACH_00BF1B:
+    db $20,$1C,$B9,$A9,$FF,$FF,$85,$01,$9C,$8E,$00,$60
+    ; JSR CODE_00B91C; LDA #$FFFF; STA $01; STZ $8E; RTS
+
+DATA_00BF27:
+    db $00                         ; Padding
+
+CODE_00BF28:
+    STX.W $015F                    ; Store input state
+    JSR.W CODE_00B91C              ; Set animation mode $10
+    BRA CODE_00BF0B                ; Loop
     JSR.W CODE_00BAF0              ; Initialization routine
     STZ.B $01                      ; Clear $01
     SEP #$20                       ; 8-bit accumulator
