@@ -162,7 +162,9 @@ yes continue doing this! do not ignore extracting graphics and data and transfor
 do the aggressive code disassembly, but also extract data and graphics
 you have converted some code into data db commands instead. Do not do that, go back and create actual code, aggressively and continue
 continue with what you are doing and then switch to bank 04 when you are done, make sure you are updating the session summary/chat log, document the code as accurately as possible, and aggressively and greedily continue these import cycles and don't stop until all banks are done, create a git commit and push including description every few cycles
+continue all the code extractiona dn data extracyion, and documentation, and git commit and chat/session logs, kill it!
 
+add `*.asm` files to the `.editorconfig` file with crlf, utf-8, tabs not spaces (display: 4 spaces), have a blank line at the end of the file; many of these asm files have severe indentation (like 30 spaces or whatever), fix them to have the single tab indent, fix everything to use tabs and continue these import cycles and don't stop until all banks are done, create a git commit and push including description every few cycles
 
 
 
