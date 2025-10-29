@@ -26,7 +26,7 @@
                        ; $10 = Choice separator
                        ; $54 = Default selection
                        ; Multiple branches with recursive choice points
-                       
+
                        db $44,$FF,$FF,$1A,$9F,$5B,$4B,$40,$55,$B4,$C5,$B8,$CE,$1B,$00,$79
                        ; $44 = Final choice offset
                        ; $FF,$FF = End-of-choices marker
@@ -217,7 +217,7 @@
 ; Dictionary Entry: Party member join event
                        db $F8
                        ; $F8 = Party join marker (triggers character recruitment)
-                       
+
                        db $2A,$28,$27,$08,$2C,$80,$FB,$FF,$FF,$0D,$5F,$01,$3A,$00,$62,$2B
                        ; $2A = Party event marker
                        ; $28 = Event type (join/leave/swap)
@@ -232,7 +232,7 @@
                        ; $00 = Separator
                        ; $62 = Continue marker
                        ; $2B = Fanfare ID
-                       
+
                        db $AD,$00,$08
                        ; $AD = Dictionary → "joined"
                        ; $00 = Separator
@@ -259,7 +259,7 @@
                        ; $50,$50 = Base damage values
                        ; $51 = Element modifier
                        ; $0B = Critical hit check
-                       
+
                        db $27,$00,$20,$20,$50,$20,$51,$0B,$27,$00,$20,$00,$54,$FF,$FF,$1A
                        ; Continuation of action sequence (multi-hit pattern)
                        ; $27-$51 = Repeated action structure (second hit)
@@ -315,7 +315,7 @@
                        ; $2B,$F3 = Final control code
                        ; $00 = Separator
                        ; $FF = Start of bank padding
-                       
+
                        db $FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF
                        db $FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF
                        db $FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF

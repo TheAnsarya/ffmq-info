@@ -133,35 +133,35 @@ UNREACH_03D5E5:
                        ; Likely leftover from development or cut features
                        ; Analysis: No code paths lead to $03D5E5-$03D67B
                        ; Size: 150+ bytes of orphaned data
-                       
+
                        db $2B,$FC,$0A,$2B,$FE,$B0,$4F,$42
                        ; Jump table pointer offsets
                        ; $2B,$FC = Offset to subroutine at $FCAB (bank-relative)
                        ; $0A = Entry count (10 entries)
                        ; $2B,$FE = Offset to subroutine at $FEAB
-                       
+
                        db $46,$BF,$BC,$65,$56,$FF,$46,$3F
                        ; More pointer offsets (2-byte little-endian)
                        ; $46,$BF = Offset $BF46
                        ; $BC,$65 = Offset $65BC
                        ; $56,$FF = Offset $FF56 (likely invalid/sentinel)
-                       
+
                        db $5F,$B5,$4F,$B7,$CF,$1B,$00,$30
                        ; Additional jump table entries
                        ; $5F,$B5 = Offset $B55F
                        ; $4F,$B7 = Offset $B74F
                        ; $CF,$1B = Offset $1BCF
                        ; $00,$30 = Padding or null entry
-                       
+
                        db $FF,$FF,$FF,$B2,$60,$01,$FF,$FF
                        ; Sentinel values ($FF,$FF,$FF) mark end of table
                        ; $B2,$60,$01 = Possible data parameter (orphaned)
-                       
+
                        db $FF,$A7,$C2,$0D,$5F,$01,$01,$02
                        ; More orphaned data (no execution path)
                        ; $0D,$5F = Possible command byte + parameter
                        ; $01,$01,$02 = Flag values or counters
-                       
+
                        db $08,$AC,$8D,$05,$DB,$02,$0A,$EB
                        ; Embedded command sequence (never executed)
                        ; $08 = Command prefix (would execute subroutine if reachable)
@@ -169,21 +169,21 @@ UNREACH_03D5E5:
                        ; $05,$DB,$02 = Inline data parameters
                        ; $0A = Choice marker (orphaned)
                        ; $EB = Parameter byte
-                       
+
                        db $1E,$EB,$36,$2A,$14,$26,$00,$54
                        ; More orphaned bytecode
                        ; $1E,$EB = Offset or parameter
                        ; $36,$2A = Control code sequence
                        ; $14,$26 = Parameters
                        ; $00,$54 = Null + parameter
-                       
+
                        db $09,$44,$E0,$55,$EA,$45,$B0,$54
                        ; Jump offsets (unreachable)
                        ; $09,$44 = Offset $4409
                        ; $E0,$55 = Offset $55E0
                        ; $EA,$45 = Offset $45EA
                        ; $B0,$54 = Offset $54B0
-                       
+
                        db $06,$FF,$B0,$54,$FF,$FF,$00,$0A
                        ; Final table entries with sentinels
                        ; $06 = Entry count or command
@@ -209,14 +209,14 @@ UNREACH_03D5E5:
                        ; $2C,$22 = Compressed text
                        ; $25 = Text color change
                        ; $00 = End marker
-                       
+
                        db $04,$2C,$23,$25,$00,$04,$2C,$24,$25,$00,$04
                        ; Repeated color change pattern
                        ; $04 = Command prefix
                        ; $2C,$23 = Text fragment
                        ; $25 = Color change
                        ; Pattern repeats 3 times (rainbow text effect)
-                       
+
                        db $2C,$25,$25,$00
                        ; Final color change + terminator
                        ; $2C,$25 = Text fragment
@@ -231,7 +231,7 @@ UNREACH_03D5E5:
                        ; $67 = Dictionary → "to the"
                        ; $91,$90 = Location name indices
                        ; $A0,$A9 = Compressed destination name
-                       
+
                        db $FF,$B9,$5C,$FF,$78,$B6,$C8
                        ; $FF = Extended control code marker
                        ; $B9,$5C = Text fragment
@@ -246,7 +246,7 @@ UNREACH_03D5E5:
                        ; $B9,$B9 = Repeated dictionary entry (compression artifact)
                        ; $B8,$B8 = Character tiles
                        ; $CF = Dictionary → "power"
-                       
+
                        db $2B,$C7,$0A,$E9,$FE,$04,$05
                        ; $2B = Control code (sound effect)
                        ; $C7 = Sound effect ID
@@ -310,7 +310,7 @@ UNREACH_03D5E5:
 ; Dictionary Entry: Complex recursive phrase (3 levels deep)
                        db $01,$A5,$B8,$42,$C8,$45,$3F,$C5,$43,$BA,$BB,$CE
                        ; $01 = State marker
-                       ; $A5 = Dictionary (level 1) → "the" 
+                       ; $A5 = Dictionary (level 1) → "the"
                        ; $B8 = Dictionary (level 1) → "you"
                        ;   → $77 (level 2) + $49 (level 2)
                        ; $42 = Dictionary → "are"
