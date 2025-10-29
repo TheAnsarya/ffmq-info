@@ -166,6 +166,11 @@ continue all the code extractiona dn data extracyion, and documentation, and git
 
 add `*.asm` files to the `.editorconfig` file with crlf, utf-8, tabs not spaces (display: 4 spaces), have a blank line at the end of the file; many of these asm files have severe indentation (like 30 spaces or whatever), fix them to have the single tab indent, fix everything to use tabs and continue these import cycles and don't stop until all banks are done, create a git commit and push including description every few cycles
 
+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+
+where are the COMPREHENSIVE DATA TABLES EXTRACTED? all of the data and graphics and music and just bin-data extract them! where are those saved?
+
+where are the COMPREHENSIVE DATA TABLES EXTRACTED? all of the data and graphics and music and just bin-data extract them! find/use or create a file structure that saves (extracts) all of the data/graphics/etc and reinserts it, but saves 1) `original binary data as a series of files` and 2) `converted "pngs" and "json" files` and other files, like csv, and then 3) a final cpnverted back from png/json/etc into `bin` files (save chat/session logs, git commit)
 
 
 
@@ -179,6 +184,8 @@ add `*.asm` files to the `.editorconfig` file with crlf, utf-8, tabs not spaces 
 
 
 
+
+make sure you are updating the chat log/session log and then aggressively and greedily continue these import cycles and don't stop until all banks are done
 
 
 
