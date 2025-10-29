@@ -147,7 +147,9 @@ make sure you are updating the chat log/session log and then aggressively and gr
 No, the `prompts` file is not for session summaries, `prompts` is a manually updated documentation file. There is a separate `session summaries` markdown file, make sure you are updating the chat log/session log and then aggressively and greedily continue these import cycles and don't stop until all banks are done
 make sure you are updating the chat log/session log and then aggressively and greedily continue these import cycles and don't stop until all banks are done
 make sure you are updating the chat log/session log and then aggressively and greedily continue these import cycles and don't stop until all banks are done
-
+yes
+continue
+keep it going!
 
 
 
