@@ -158,9 +158,10 @@ make sure we are using `Final Fantasy - Mystic Quest (U) (V1.1).smc` as our refe
 build and compare to reference ROM file updating a progress file, make sure you are updating the session summary/chat log, and then aggressively and greedily continue these import cycles and don't stop until all banks are done
 continue, building occassionally
 build and compare to reference ROM file updating a progress file, make sure you are updating the session summary/chat log, document the code as accurately as possible, and aggressively and greedily continue these import cycles and don't stop until all banks are done, create a git commitand push including description every few cycles
-
-
-
+yes continue doing this! do not ignore extracting graphics and data and transforming to-and-from an editable state, but focus on code like 80%
+do the aggressive code disassembly, but also extract data and graphics
+you have converted some code into data db commands instead. Do not do that, go back and create actual code, aggressively and continue
+continue with what you are doing and then switch to bank 04 when you are done, make sure you are updating the session summary/chat log, document the code as accurately as possible, and aggressively and greedily continue these import cycles and don't stop until all banks are done, create a git commit and push including description every few cycles
 
 
 
