@@ -156,6 +156,7 @@ make sure you are updating the chat log/session log and then aggressively and gr
 build and compare to reference ROM file updating a progress file, make sure you are updating the session summary/chat log, and then aggressively and greedily continue these import cycles and don't stop until all banks are done
 make sure we are using `Final Fantasy - Mystic Quest (U) (V1.1).smc` as our reference ROM file just like the `diz and `dizraw` files do
 build and compare to reference ROM file updating a progress file, make sure you are updating the session summary/chat log, and then aggressively and greedily continue these import cycles and don't stop until all banks are done
+continue, building occassionally
 
 
 

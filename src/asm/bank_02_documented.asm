@@ -5157,4 +5157,1398 @@ CODE_02D62D:
                        ASL A                                ;02D661|0A      |      ; Multiply by 2
 
 ; **CYCLE 14 COMPLETION MARKER - 4,322 lines documented**
+
+; Bank $02 Cycle 15: Complex System Coordination and Advanced Processing Engine
+; Sophisticated memory row calculation and address management systems
+; Advanced graphics data processing with multi-bank coordination
+; High-speed memory clearing with SNES register optimization
+; Complex position and coordinate calculation systems
+; Advanced data transfer and state management with sophisticated bank coordination
+; Entity parameter processing with complex lookup and mapping systems
+; Graphics processing coordination with advanced calculation systems
+; Multi-bank data coordination with complex processing loops
+; Advanced display processing and color management with sophisticated effects
+
+; Memory Row Calculation and Address Management
+; Advanced row offset calculation with sophisticated memory addressing
+CODE_02D664:
+                       LDA.B #$02                           ;02D664|A902    |      ; Set row increment value
+
+CODE_02D666:
+                       REP #$30                             ;02D666|C230    |      ; 16-bit mode
+                       CLC                                  ;02D668|18      |      ; Clear carry
+                       ADC.B $72                            ;02D669|6572    |000A72; Add to memory base
+                       STA.B $72                            ;02D66B|8572    |000A72; Store updated memory address
+                       PLP                                  ;02D66D|28      |      ; Restore processor status
+                       RTS                                  ;02D66E|60      |      ; Return
+
+; Advanced Graphics Data Processing Engine
+; Complex graphics data transfer with multi-bank coordination
+CODE_02D66F:
+                       PHY                                  ;02D66F|5A      |      ; Save Y register
+                       PHP                                  ;02D670|08      |      ; Save processor status
+                       PHB                                  ;02D671|8B      |      ; Save data bank
+                       SEP #$20                             ;02D672|E220    |      ; 8-bit accumulator
+                       REP #$10                             ;02D674|C210    |      ; 16-bit index
+                       LDA.B #$7E                           ;02D676|A97E    |      ; Bank $7E
+                       STA.W $2183                          ;02D678|8D8321  |022183; Set WRAM bank
+                       LDX.B $70                            ;02D67B|A670    |000A70; Load memory offset
+                       STX.W $2181                          ;02D67D|8E8121  |022181; Set WRAM address
+                       LDA.B $15                            ;02D680|A515    |000A15; Load graphics bank
+                       PHA                                  ;02D682|48      |      ; Save bank
+                       PLB                                  ;02D683|AB      |      ; Set as data bank
+                       LDX.B $69                            ;02D684|A669    |000A69; Load graphics pointer
+                       LDY.W #$0010                         ;02D686|A01000  |      ; 16-byte transfer count
+
+; Graphics Data Transfer Loop 1
+; First phase graphics data transfer (16 bytes)
+CODE_02D689:
+                       LDA.B ($69)                          ;02D689|B269    |000A69; Load graphics byte
+                       SEP #$20                             ;02D68B|E220    |      ; 8-bit accumulator
+                       REP #$10                             ;02D68D|C210    |      ; 16-bit index
+                       STA.W $2180                          ;02D68F|8D8021  |092180; Write to WRAM
+                       REP #$30                             ;02D692|C230    |      ; 16-bit mode
+                       INC.B $69                            ;02D694|E669    |000A69; Next graphics byte
+                       DEY                                  ;02D696|88      |      ; Decrement counter
+                       BNE CODE_02D689                      ;02D697|D0F0    |02D689; Continue transfer loop
+                       LDY.W #$0008                         ;02D699|A00800  |      ; 8-byte transfer count
+
+; Graphics Data Transfer Loop 2
+; Second phase graphics data transfer with special processing
+CODE_02D69C:
+                       LDA.B ($69)                          ;02D69C|B269    |000A69; Load graphics byte
+                       SEP #$20                             ;02D69E|E220    |      ; 8-bit accumulator
+                       REP #$10                             ;02D6A0|C210    |      ; 16-bit index
+                       STA.W $2180                          ;02D6A2|8D8021  |092180; Write to WRAM
+                       STZ.W $2180                          ;02D6A5|9C8021  |092180; Write zero byte
+                       REP #$30                             ;02D6A8|C230    |      ; 16-bit mode
+                       INC.B $69                            ;02D6AA|E669    |000A69; Next graphics byte
+                       DEY                                  ;02D6AC|88      |      ; Decrement counter
+                       BNE CODE_02D69C                      ;02D6AD|D0ED    |02D69C; Continue transfer loop
+                       PLB                                  ;02D6AF|AB      |      ; Restore data bank
+                       PLP                                  ;02D6B0|28      |      ; Restore processor status
+                       PLY                                  ;02D6B1|7A      |      ; Restore Y register
+                       RTS                                  ;02D6B2|60      |      ; Return
+
+; Memory Clearing Engine
+; High-speed memory clearing with SNES register optimization
+CODE_02D6B3:
+                       PHP                                  ;02D6B3|08      |      ; Save processor status
+                       PHD                                  ;02D6B4|0B      |      ; Save direct page
+                       SEP #$20                             ;02D6B5|E220    |      ; 8-bit accumulator
+                       REP #$10                             ;02D6B7|C210    |      ; 16-bit index
+                       PEA.W $2100                          ;02D6B9|F40021  |022100; Set direct page to $2100
+                       PLD                                  ;02D6BC|2B      |      ; Load new direct page
+                       LDA.B #$00                           ;02D6BD|A900    |      ; Clear value
+                       STA.B SNES_WMADDH-$2100              ;02D6BF|8583    |002183; Set WRAM bank to 0
+                       LDX.W $0A70                          ;02D6C1|AE700A  |020A70; Load memory address
+                       STX.B SNES_WMADDL-$2100              ;02D6C4|8681    |002181; Set WRAM address
+                       LDA.B #$20                           ;02D6C6|A920    |      ; Clear 32 bytes
+
+; Memory Clear Loop
+CODE_02D6C8:
+                       STZ.B SNES_WMDATA-$2100              ;02D6C8|6480    |002180; Write zero to WRAM
+                       DEC A                                ;02D6CA|3A      |      ; Decrement counter
+                       BNE CODE_02D6C8                      ;02D6CB|D0FB    |02D6C8; Continue clear loop
+                       PLD                                  ;02D6CD|2B      |      ; Restore direct page
+                       PLP                                  ;02D6CE|28      |      ; Restore processor status
+                       RTS                                  ;02D6CF|60      |      ; Return
+
+; Advanced Position Calculation Engine
+; Complex position and coordinate calculation system
+CODE_02D6D0:
+                       PHP                                  ;02D6D0|08      |      ; Save processor status
+                       SEP #$30                             ;02D6D1|E230    |      ; 8-bit mode
+                       LDX.B $83                            ;02D6D3|A683    |000A83; Load state index
+                       LDA.B #$0D                           ;02D6D5|A90D    |      ; Base calculation value
+                       SEC                                  ;02D6D7|38      |      ; Set carry
+                       SBC.B $19                            ;02D6D8|E519    |000A19; Subtract position parameter
+                       INC A                                ;02D6DA|1A      |      ; Increment result
+                       LDY.W $0A0A,X                        ;02D6DB|BC0A0A  |020A0A; Load position flags
+                       BEQ CODE_02D6E6                      ;02D6DE|F006    |02D6E6; Branch if zero
+                       LDY.W $0A07,X                        ;02D6E0|BC070A  |020A07; Load alternate flags
+                       BNE CODE_02D6E6                      ;02D6E3|D001    |02D6E6; Branch if not zero
+                       DEC A                                ;02D6E5|3A      |      ; Decrement if special case
+
+CODE_02D6E6:
+                       STA.B $17                            ;02D6E6|8517    |000A17; Store calculated position
+                       PHX                                  ;02D6E8|DA      |      ; Save X register
+                       CLC                                  ;02D6E9|18      |      ; Clear carry
+                       LDA.B $00                            ;02D6EA|A500    |000A00; Load base value
+                       ADC.B $00                            ;02D6EC|6500    |000A00; Double the value
+                       ADC.B $00                            ;02D6EE|6500    |000A00; Triple the value
+                       DEC A                                ;02D6F0|3A      |      ; Adjust by -1
+                       DEC A                                ;02D6F1|3A      |      ; Adjust by -2
+                       DEC A                                ;02D6F2|3A      |      ; Adjust by -3
+                       ADC.B $01,S                          ;02D6F3|6301    |000001; Add stack value
+                       TAX                                  ;02D6F5|AA      |      ; Transfer to X
+                       LDA.B $18                            ;02D6F6|A518    |000A18; Load height parameter
+                       LSR A                                ;02D6F8|4A      |      ; Divide by 2
+                       PHA                                  ;02D6F9|48      |      ; Save half height
+                       LDA.W DATA8_02D72B,X                 ;02D6FA|BD2BD7  |02D72B; Load position data
+                       SEC                                  ;02D6FD|38      |      ; Set carry
+                       SBC.B $01,S                          ;02D6FE|E301    |000001; Subtract half height
+                       STA.B $16                            ;02D700|8516    |000A16; Store adjusted position
+                       PLA                                  ;02D702|68      |      ; Restore half height
+                       PLX                                  ;02D703|FA      |      ; Restore X register
+                       JSR.W CODE_02D734                    ;02D704|2034D7  |02D734; Call position processor
+
+; Advanced Position Coordinate Processing
+                       REP #$20                             ;02D707|C220    |      ; 16-bit accumulator
+                       SEP #$10                             ;02D709|E210    |      ; 8-bit index
+                       LDA.B $17                            ;02D70B|A517    |000A17; Load position value
+                       AND.W #$00FF                         ;02D70D|29FF00  |      ; Mask to 8-bit
+                       ASL A                                ;02D710|0A      |      ; Multiply by 2
+                       ASL A                                ;02D711|0A      |      ; Multiply by 4
+                       ASL A                                ;02D712|0A      |      ; Multiply by 8
+                       ASL A                                ;02D713|0A      |      ; Multiply by 16
+                       ASL A                                ;02D714|0A      |      ; Multiply by 32
+                       SEP #$30                             ;02D715|E230    |      ; 8-bit mode
+                       CLC                                  ;02D717|18      |      ; Clear carry
+                       ADC.B $16                            ;02D718|6516    |000A16; Add adjusted position
+                       XBA                                  ;02D71A|EB      |      ; Exchange bytes
+                       ADC.B #$00                           ;02D71B|6900    |      ; Add carry to high byte
+                       XBA                                  ;02D71D|EB      |      ; Exchange bytes back
+                       REP #$20                             ;02D71E|C220    |      ; 16-bit accumulator
+                       SEP #$10                             ;02D720|E210    |      ; 8-bit index
+                       ASL A                                ;02D722|0A      |      ; Multiply by 2
+                       CLC                                  ;02D723|18      |      ; Clear carry
+                       ADC.W #$A800                         ;02D724|6900A8  |      ; Add base address
+                       STA.B $72                            ;02D727|8572    |000A72; Store final address
+                       PLP                                  ;02D729|28      |      ; Restore processor status
+                       RTS                                  ;02D72A|60      |      ; Return
+
+; Position Data Table
+; Position offset values for coordinate calculations
+DATA8_02D72B:
+                       db $10                               ;02D72B; Position offset 1
+                       db $00,$00                           ;02D72C; Position offsets 2-3
+                       db $0B,$15                           ;02D72E; Position offsets 4-5
+                       db $00                               ;02D730; Position offset 6
+                       db $06,$10,$1A                       ;02D731; Position offsets 7-9
+
+; Advanced Data Transfer and State Management Engine
+; Complex state processing with multi-bank data coordination
+CODE_02D734:
+                       PHX                                  ;02D734|DA      |      ; Save X register
+                       PHP                                  ;02D735|08      |      ; Save processor status
+                       REP #$30                             ;02D736|C230    |      ; 16-bit mode
+                       LDA.B $83                            ;02D738|A583    |000A83; Load state index
+                       AND.W #$00FF                         ;02D73A|29FF00  |      ; Mask to 8-bit
+                       ASL A                                ;02D73D|0A      |      ; Multiply by 2
+                       ASL A                                ;02D73E|0A      |      ; Multiply by 4
+                       ADC.W #$0A2D                         ;02D73F|692D0A  |      ; Add base address
+                       TAY                                  ;02D742|A8      |      ; Transfer to Y
+                       LDX.W #$0A16                         ;02D743|A2160A  |      ; Source address
+                       LDA.W #$0003                         ;02D746|A90300  |      ; Transfer 4 bytes
+                       MVN $02,$02                          ;02D749|540202  |      ; Block move within bank
+                       LDA.B $18                            ;02D74C|A518    |000A18; Load height parameter
+                       LDX.W #$0000                         ;02D74E|A20000  |      ; Initialize index
+
+; Height Parameter Search Loop
+CODE_02D751:
+                       CMP.W DATA8_02D77A,X                 ;02D751|DD7AD7  |02D77A; Compare with height table
+                       BEQ CODE_02D75A                      ;02D754|F004    |02D75A; Branch if match found
+                       INX                                  ;02D756|E8      |      ; Increment index
+                       INX                                  ;02D757|E8      |      ; Increment index (word values)
+                       BRA CODE_02D751                      ;02D758|80F7    |02D751; Continue search
+
+CODE_02D75A:
+                       TXA                                  ;02D75A|8A      |      ; Transfer index to A
+                       SEP #$30                             ;02D75B|E230    |      ; 8-bit mode
+                       LSR A                                ;02D75D|4A      |      ; Divide by 2 (word to byte index)
+                       LDX.B $83                            ;02D75E|A683    |000A83; Load state index
+                       STA.B $22,X                          ;02D760|9522    |000A22; Store height index
+                       LDA.B $02                            ;02D762|A502    |000A02; Load current state
+                       CMP.B #$50                           ;02D764|C950    |      ; Check for special state
+                       BNE CODE_02D777                      ;02D766|D00F    |02D777; Branch if not special
+
+; Special State Processing
+                       db $A5,$07,$D0,$0B,$A5,$2D,$18,$69,$08,$85,$2D,$A9,$0C,$85,$2F;02D768
+
+CODE_02D777:
+                       PLP                                  ;02D777|28      |      ; Restore processor status
+                       PLX                                  ;02D778|FA      |      ; Restore X register
+                       RTS                                  ;02D779|60      |      ; Return
+
+; Height Data Table
+; Height values for position calculations
+DATA8_02D77A:
+                       db $06,$06,$08,$08,$0A,$0A           ;02D77A; Height values 1-6
+                       db $0A,$08,$1C,$0A                   ;02D780; Height values 7-10
+
+; State Processing and Data Bank Management Engine
+; Advanced state processing with sophisticated bank coordination
+CODE_02D784:
+                       PHA                                  ;02D784|48      |      ; Save accumulator
+                       PHX                                  ;02D785|DA      |      ; Save X register
+                       PHP                                  ;02D786|08      |      ; Save processor status
+                       SEP #$20                             ;02D787|E220    |      ; 8-bit accumulator
+                       REP #$10                             ;02D789|C210    |      ; 16-bit index
+                       PHK                                  ;02D78B|4B      |      ; Push program bank
+                       PLB                                  ;02D78C|AB      |      ; Set as data bank
+                       LDX.W #$0000                         ;02D78D|A20000  |      ; Initialize search index
+
+; State Data Search Loop
+CODE_02D790:
+                       LDA.W DATA8_02D7D3,X                 ;02D790|BDD3D7  |02D7D3; Load state threshold
+                       CMP.B $20                            ;02D793|C520    |000A20; Compare with current state
+                       BPL CODE_02D7A5                      ;02D795|100E    |02D7A5; Branch if threshold reached
+                       REP #$30                             ;02D797|C230    |      ; 16-bit mode
+                       TXA                                  ;02D799|8A      |      ; Transfer index to A
+                       CLC                                  ;02D79A|18      |      ; Clear carry
+                       ADC.W #$0009                         ;02D79B|690900  |      ; Add 9 bytes (record size)
+                       TAX                                  ;02D79E|AA      |      ; Transfer back to X
+                       SEP #$20                             ;02D79F|E220    |      ; 8-bit accumulator
+                       REP #$10                             ;02D7A1|C210    |      ; 16-bit index
+                       BRA CODE_02D790                      ;02D7A3|80EB    |02D790; Continue search
+
+; State Data Processing
+CODE_02D7A5:
+                       REP #$30                             ;02D7A5|C230    |      ; 16-bit mode
+                       INX                                  ;02D7A7|E8      |      ; Next byte (skip threshold)
+                       TXA                                  ;02D7A8|8A      |      ; Transfer index to A
+                       CLC                                  ;02D7A9|18      |      ; Clear carry
+                       ADC.W #$D7D3                         ;02D7AA|69D3D7  |      ; Add base address
+                       TAX                                  ;02D7AD|AA      |      ; Source address
+                       LDY.W #$0A15                         ;02D7AE|A0150A  |      ; Destination address
+                       LDA.W #$0007                         ;02D7B1|A90700  |      ; Transfer 8 bytes
+                       MVN $02,$02                          ;02D7B4|540202  |      ; Block move within bank
+
+; Mathematical Processing and Bank Coordination
+                       SEP #$20                             ;02D7B7|E220    |      ; 8-bit accumulator
+                       REP #$10                             ;02D7B9|C210    |      ; 16-bit index
+                       LDA.B $20                            ;02D7BB|A520    |000A20; Load state parameter
+                       STA.W $4202                          ;02D7BD|8D0242  |024202; Set multiplicand
+                       LDA.B #$05                           ;02D7C0|A905    |      ; Set multiplier
+                       JSL.L CODE_00971E                    ;02D7C2|221E9700|00971E; Call multiplication routine
+                       LDX.W $4216                          ;02D7C6|AE1642  |024216; Load multiplication result
+                       LDA.L DATA8_098462,X                 ;02D7C9|BF628409|098462; Load bank data
+                       STA.B $15                            ;02D7CD|8515    |000A15; Store bank value
+                       PLP                                  ;02D7CF|28      |      ; Restore processor status
+                       PLX                                  ;02D7D0|FA      |      ; Restore X register
+                       PLA                                  ;02D7D1|68      |      ; Restore accumulator
+                       RTS                                  ;02D7D2|60      |      ; Return
+
+; State Data Table
+; Complex state configuration data with thresholds and parameters
+DATA8_02D7D3:
+                       db $37,$09,$00,$00,$06,$06,$24,$00,$01,$3F,$0A,$00,$00,$08,$08,$40;02D7D3
+                       db $00,$02,$41                       ;02D7E3
+                       db $0B,$00,$00,$0A,$0A,$64,$00,$03   ;02D7E6
+                       db $49,$0A,$00,$00,$08,$08,$40,$00,$02,$4F,$0B,$00,$00,$0A,$0A,$64;02D7EE
+                       db $00,$03                           ;02D7FE
+                       db $50,$0B,$00,$00,$1C,$0A,$18,$01,$03,$FF;02D800
+
+; Advanced Graphics and Entity Coordination Engine
+; Complex entity processing with multi-bank graphics coordination
+CODE_02D80A:
+                       PHX                                  ;02D80A|DA      |      ; Save X register
+                       PHB                                  ;02D80B|8B      |      ; Save data bank
+                       PHP                                  ;02D80C|08      |      ; Save processor status
+                       SEP #$30                             ;02D80D|E230    |      ; 8-bit mode
+                       LDX.B $83                            ;02D80F|A683    |000A83; Load state index
+                       LDA.B $02,X                          ;02D811|B502    |000A02; Load entity state
+                       STA.B $20                            ;02D813|8520    |000A20; Store for processing
+                       SEP #$20                             ;02D815|E220    |      ; 8-bit accumulator
+                       REP #$10                             ;02D817|C210    |      ; 16-bit index
+                       STA.W $4202                          ;02D819|8D0242  |024202; Set multiplicand
+                       LDA.B #$05                           ;02D81C|A905    |      ; Set multiplier (5)
+                       JSL.L CODE_00971E                    ;02D81E|221E9700|00971E; Call multiplication routine
+                       LDX.W $4216                          ;02D822|AE1642  |024216; Load result address
+
+; Multi-Bank Data Retrieval
+                       LDA.L DATA8_098460,X                 ;02D825|BF608409|098460; Load graphics bank 1
+                       STA.B $69                            ;02D829|8569    |000A69; Store bank 1
+                       LDA.L DATA8_098461,X                 ;02D82B|BF618409|098461; Load graphics bank 2
+                       STA.B $6A                            ;02D82F|856A    |000A6A; Store bank 2
+                       LDA.L DATA8_098462,X                 ;02D831|BF628409|098462; Load graphics bank 3
+                       STA.B $6B                            ;02D835|856B    |000A6B; Store bank 3
+                       PHB                                  ;02D837|8B      |      ; Save current bank
+                       LDA.L DATA8_098464,X                 ;02D838|BF648409|098464; Load special flag
+                       CMP.B #$FF                           ;02D83C|C9FF    |      ; Check for special value
+                       BEQ UNREACH_02D89B                   ;02D83E|F05B    |02D89B; Branch to special handling
+
+; Advanced Graphics Block Transfer System
+                       PHA                                  ;02D840|48      |      ; Save graphics parameter
+                       LDA.L DATA8_098463,X                 ;02D841|BF638409|098463; Load graphics offset
+                       PHA                                  ;02D845|48      |      ; Save offset
+                       REP #$30                             ;02D846|C230    |      ; 16-bit mode
+                       LDA.B $83                            ;02D848|A583    |000A83; Load state index
+                       AND.W #$00FF                         ;02D84A|29FF00  |      ; Mask to 8-bit
+                       ASL A                                ;02D84D|0A      |      ; Multiply by 2
+                       ASL A                                ;02D84E|0A      |      ; Multiply by 4
+                       ASL A                                ;02D84F|0A      |      ; Multiply by 8
+                       ASL A                                ;02D850|0A      |      ; Multiply by 16
+                       ASL A                                ;02D851|0A      |      ; Multiply by 32
+                       ASL A                                ;02D852|0A      |      ; Multiply by 64
+                       CLC                                  ;02D853|18      |      ; Clear carry
+                       ADC.W #$C040                         ;02D854|6940C0  |      ; Add base graphics address
+                       TAY                                  ;02D857|A8      |      ; Set as destination
+
+; First Graphics Block Transfer
+                       SEP #$20                             ;02D858|E220    |      ; 8-bit accumulator
+                       REP #$10                             ;02D85A|C210    |      ; 16-bit index
+                       PLA                                  ;02D85C|68      |      ; Restore graphics offset
+                       REP #$30                             ;02D85D|C230    |      ; 16-bit mode
+                       AND.W #$00FF                         ;02D85F|29FF00  |      ; Mask to 8-bit
+                       ASL A                                ;02D862|0A      |      ; Multiply by 2
+                       ASL A                                ;02D863|0A      |      ; Multiply by 4
+                       ASL A                                ;02D864|0A      |      ; Multiply by 8
+                       ASL A                                ;02D865|0A      |      ; Multiply by 16
+                       CLC                                  ;02D866|18      |      ; Clear carry
+                       ADC.W #$8000                         ;02D867|690080  |      ; Add graphics base
+                       TAX                                  ;02D86A|AA      |      ; Set as source
+                       LDA.W #$000F                         ;02D86B|A90F00  |      ; Transfer 16 bytes
+                       MVN $7E,$09                          ;02D86E|547E09  |      ; Block move (bank $09 to $7E)
+
+; Second Graphics Block Transfer
+                       TYA                                  ;02D871|98      |      ; Transfer destination to A
+                       CLC                                  ;02D872|18      |      ; Clear carry
+                       ADC.W #$0010                         ;02D873|691000  |      ; Add 16 bytes offset
+                       TAY                                  ;02D876|A8      |      ; Set new destination
+                       SEP #$20                             ;02D877|E220    |      ; 8-bit accumulator
+                       REP #$10                             ;02D879|C210    |      ; 16-bit index
+                       PLA                                  ;02D87B|68      |      ; Restore second parameter
+                       REP #$30                             ;02D87C|C230    |      ; 16-bit mode
+                       AND.W #$00FF                         ;02D87E|29FF00  |      ; Mask to 8-bit
+                       ASL A                                ;02D881|0A      |      ; Multiply by 2
+                       ASL A                                ;02D882|0A      |      ; Multiply by 4
+                       ASL A                                ;02D883|0A      |      ; Multiply by 8
+                       ASL A                                ;02D884|0A      |      ; Multiply by 16
+                       CLC                                  ;02D885|18      |      ; Clear carry
+                       ADC.W #$8000                         ;02D886|690080  |      ; Add graphics base
+                       TAX                                  ;02D889|AA      |      ; Set as source
+                       LDA.W #$000F                         ;02D88A|A90F00  |      ; Transfer 16 bytes
+                       MVN $7E,$09                          ;02D88D|547E09  |      ; Block move (bank $09 to $7E)
+                       PLB                                  ;02D890|AB      |      ; Restore data bank
+
+; Graphics Processing Completion
+                       JSR.W CODE_02D910                    ;02D891|2010D9  |02D910; Call graphics processor
+                       JSR.W CODE_02D994                    ;02D894|2094D9  |02D994; Call data coordinator
+                       PLP                                  ;02D897|28      |      ; Restore processor status
+                       PLB                                  ;02D898|AB      |      ; Restore data bank
+                       PLX                                  ;02D899|FA      |      ; Restore X register
+                       RTS                                  ;02D89A|60      |      ; Return
+
+; Unreachable Special Case Handler
+UNREACH_02D89B:
+                       db $E2,$30,$A6,$83,$B5,$07,$C9,$03,$D0,$01,$3A,$18,$69,$29,$48,$A9;02D89B
+                       db $28,$48,$80,$97                   ;02D8AB
+
+; Entity Parameter Processing Engine
+; Advanced entity parameter lookup and processing
+CODE_02D8AF:
+                       PHX                                  ;02D8AF|DA      |      ; Save X register
+                       PHA                                  ;02D8B0|48      |      ; Save accumulator
+                       PHP                                  ;02D8B1|08      |      ; Save processor status
+                       SEP #$30                             ;02D8B2|E230    |      ; 8-bit mode
+                       LDX.B $20                            ;02D8B4|A620    |000A20; Load entity parameter
+                       LDA.W DATA8_02D8BF,X                 ;02D8B6|BDBFD8  |02D8BF; Load entity data from table
+                       STA.B $78                            ;02D8B9|8578    |000A78; Store entity data
+                       PLP                                  ;02D8BB|28      |      ; Restore processor status
+                       PLA                                  ;02D8BC|68      |      ; Restore accumulator
+                       PLX                                  ;02D8BD|FA      |      ; Restore X register
+                       RTS                                  ;02D8BE|60      |      ; Return
+
+; Entity Parameter Table
+; Complex entity parameter mapping table
+DATA8_02D8BF:
+                       db $00,$00,$00,$01,$01,$01,$02,$02   ;02D8BF; Entity parameters 0-7
+                       db $02                               ;02D8C7; Entity parameter 8
+                       db $03,$03                           ;02D8C8; Entity parameters 9-10
+                       db $03                               ;02D8CA; Entity parameter 11
+                       db $04,$04,$04,$05,$05               ;02D8CB; Entity parameters 12-16
+                       db $05                               ;02D8D0; Entity parameter 17
+                       db $06,$06                           ;02D8D1; Entity parameters 18-19
+                       db $06                               ;02D8D3; Entity parameter 20
+                       db $07,$07                           ;02D8D4; Entity parameters 21-22
+                       db $07                               ;02D8D6; Entity parameter 23
+                       db $08,$08,$09                       ;02D8D7; Entity parameters 24-26
+                       db $09                               ;02D8DA; Entity parameter 27
+                       db $0A,$0A,$0B                       ;02D8DB; Entity parameters 28-30
+                       db $0B                               ;02D8DE; Entity parameter 31
+                       db $0C,$0C,$0D,$0D,$0E,$0E,$0F       ;02D8DF; Entity parameters 32-38
+                       db $0F                               ;02D8E6; Entity parameter 39
+                       db $10                               ;02D8E7; Entity parameter 40
+                       db $10                               ;02D8E8; Entity parameter 41
+                       db $11                               ;02D8E9; Entity parameter 42
+                       db $11                               ;02D8EA; Entity parameter 43
+                       db $12,$12,$13,$13,$14               ;02D8EB; Entity parameters 44-48
+                       db $14                               ;02D8F0; Entity parameter 49
+                       db $15,$15,$16                       ;02D8F1; Entity parameters 50-52
+                       db $16                               ;02D8F4; Entity parameter 53
+                       db $17                               ;02D8F5; Entity parameter 54
+                       db $17                               ;02D8F6; Entity parameter 55
+                       db $18,$19,$1A,$1B,$1C,$1D           ;02D8F7; Entity parameters 56-61
+                       db $1F,$1E,$20,$21                   ;02D8FD; Entity parameters 62-65
+                       db $18,$19,$1A,$1B,$1C,$1D           ;02D901; Entity parameters 66-71
+                       db $1F,$1E                           ;02D907; Entity parameters 72-73
+                       db $20,$21,$22                       ;02D909; Entity parameters 74-76
+                       db $22,$23,$23,$24                   ;02D90C; Entity parameters 77-80
+
+; Advanced Graphics Processing Coordination Engine
+; Complex graphics processing with sophisticated calculation systems
+CODE_02D910:
+                       PHP                                  ;02D910|08      |      ; Save processor status
+                       PHB                                  ;02D911|8B      |      ; Save data bank
+                       PHK                                  ;02D912|4B      |      ; Push program bank
+                       PLB                                  ;02D913|AB      |      ; Set as data bank
+                       REP #$30                             ;02D914|C230    |      ; 16-bit mode
+                       JSR.W CODE_02D8AF                    ;02D916|20AFD8  |02D8AF; Call entity parameter processor
+                       LDX.W #$0000                         ;02D919|A20000  |      ; Initialize search index
+                       LDA.B $78                            ;02D91C|A578    |000A78; Load entity parameter
+                       AND.W #$00FF                         ;02D91E|29FF00  |      ; Mask to 8-bit
+
+; Graphics Parameter Search Loop
+CODE_02D921:
+                       CMP.W DATA8_02D96E,X                 ;02D921|DD6ED9  |02D96E; Compare with threshold table
+                       BMI CODE_02D930                      ;02D924|300A    |02D930; Branch if below threshold
+                       PHA                                  ;02D926|48      |      ; Save parameter
+                       TXA                                  ;02D927|8A      |      ; Transfer index to A
+                       CLC                                  ;02D928|18      |      ; Clear carry
+                       ADC.W #$000A                         ;02D929|690A00  |      ; Add 10 bytes (record size)
+                       TAX                                  ;02D92C|AA      |      ; Transfer back to X
+                       PLA                                  ;02D92D|68      |      ; Restore parameter
+                       BRA CODE_02D921                      ;02D92E|80F1    |02D921; Continue search
+
+; Graphics Calculation Processing
+CODE_02D930:
+                       SEC                                  ;02D930|38      |      ; Set carry
+                       SBC.W DATA8_02D96C,X                 ;02D931|FD6CD9  |02D96C; Subtract base value
+                       SEP #$20                             ;02D934|E220    |      ; 8-bit accumulator
+                       REP #$10                             ;02D936|C210    |      ; 16-bit index
+                       STA.W $4202                          ;02D938|8D0242  |024202; Set multiplicand
+                       REP #$30                             ;02D93B|C230    |      ; 16-bit mode
+                       LDA.W DATA8_02D972,X                 ;02D93D|BD72D9  |02D972; Load multiplier data
+                       STA.W $0A79                          ;02D940|8D790A  |020A79; Store multiplier
+                       SEP #$20                             ;02D943|E220    |      ; 8-bit accumulator
+                       REP #$10                             ;02D945|C210    |      ; 16-bit index
+                       STA.W $4203                          ;02D947|8D0342  |024203; Set multiplier
+                       NOP                                  ;02D94A|EA      |      ; Wait for multiplication
+                       NOP                                  ;02D94B|EA      |      ; Wait for multiplication
+                       NOP                                  ;02D94C|EA      |      ; Wait for multiplication
+                       NOP                                  ;02D94D|EA      |      ; Wait for multiplication
+
+; Second Stage Graphics Calculation
+                       LDA.W $4216                          ;02D94E|AD1642  |024216; Load multiplication result
+                       STA.W $4202                          ;02D951|8D0242  |024202; Set new multiplicand
+                       LDA.W DATA8_02D974,X                 ;02D954|BD74D9  |02D974; Load second multiplier
+                       STA.W $4203                          ;02D957|8D0342  |024203; Set second multiplier
+                       NOP                                  ;02D95A|EA      |      ; Wait for multiplication
+                       NOP                                  ;02D95B|EA      |      ; Wait for multiplication
+                       NOP                                  ;02D95C|EA      |      ; Wait for multiplication
+                       NOP                                  ;02D95D|EA      |      ; Wait for multiplication
+                       REP #$30                             ;02D95E|C230    |      ; 16-bit mode
+                       LDA.W DATA8_02D970,X                 ;02D960|BD70D9  |02D970; Load base offset
+                       CLC                                  ;02D963|18      |      ; Clear carry
+                       ADC.W $4216                          ;02D964|6D1642  |024216; Add calculation result
+                       STA.B $6B                            ;02D967|856B    |000A6B; Store final result
+                       PLB                                  ;02D969|AB      |      ; Restore data bank
+                       PLP                                  ;02D96A|28      |      ; Restore processor status
+                       RTS                                  ;02D96B|60      |      ; Return
+
+; Graphics Calculation Data Tables
+DATA8_02D96C:
+                       db $00,$00                           ;02D96C; Base calculation values
+
+DATA8_02D96E:
+                       db $18,$00                           ;02D96E; Threshold values
+
+DATA8_02D970:
+                       db $00,$00                           ;02D970; Base offset values
+
+DATA8_02D972:
+                       db $05,$00                           ;02D972; Multiplier values
+
+DATA8_02D974:
+                       db $02                               ;02D974; Second multiplier
+                       db $00                               ;02D975; Padding
+                       db $18,$00,$20,$00,$F0,$00,$08,$00,$03;02D976; Graphics parameter table 1
+                       db $00                               ;02D97F
+                       db $20,$00,$24,$00,$B0,$01,$0D,$00,$04;02D980; Graphics parameter table 2
+                       db $00,$24,$00,$25,$00,$80,$02,$23,$00,$04,$00;02D989; Graphics parameter table 3
+
+; Advanced Data Coordination and Processing Engine
+; Complex data processing with multi-bank coordination and calculation
+CODE_02D994:
+                       PHP                                  ;02D994|08      |      ; Save processor status
+                       PHB                                  ;02D995|8B      |      ; Save data bank
+                       SEP #$20                             ;02D996|E220    |      ; 8-bit accumulator
+                       REP #$10                             ;02D998|C210    |      ; 16-bit index
+                       LDA.B #$0A                           ;02D99A|A90A    |      ; Bank $0A
+                       PHA                                  ;02D99C|48      |      ; Save bank
+                       PLB                                  ;02D99D|AB      |      ; Set as data bank
+                       LDA.B #$00                           ;02D99E|A900    |      ; Clear register
+                       PHA                                  ;02D9A0|48      |      ; Save on stack
+                       LDA.B $83                            ;02D9A1|A583    |000A83; Load state index
+                       ASL A                                ;02D9A3|0A      |      ; Multiply by 2
+                       ASL A                                ;02D9A4|0A      |      ; Multiply by 4
+                       ASL A                                ;02D9A5|0A      |      ; Multiply by 8
+                       REP #$30                             ;02D9A6|C230    |      ; 16-bit mode
+                       AND.W #$00FF                         ;02D9A8|29FF00  |      ; Mask to 8-bit
+                       ADC.W #$0A39                         ;02D9AB|69390A  |      ; Add base address
+                       TAY                                  ;02D9AE|A8      |      ; Transfer to Y
+
+; Data Structure Setup
+                       LDA.B $69                            ;02D9AF|A569    |000A69; Load graphics data 1
+                       STA.W $0000,Y                        ;02D9B1|990000  |0A0000; Store at base offset
+                       PHY                                  ;02D9B4|5A      |      ; Save Y position
+                       LDA.B $6B                            ;02D9B5|A56B    |000A6B; Load graphics data 2
+                       STA.W $0018,Y                        ;02D9B7|991800  |0A0018; Store at offset +24
+                       PHA                                  ;02D9BA|48      |      ; Save data
+                       CLC                                  ;02D9BB|18      |      ; Clear carry
+                       ADC.B $79                            ;02D9BC|6579    |000A79; Add calculation value
+                       STA.W $001A,Y                        ;02D9BE|991A00  |0A001A; Store at offset +26
+                       CLC                                  ;02D9C1|18      |      ; Clear carry
+                       ADC.B $79                            ;02D9C2|6579    |000A79; Add calculation value
+                       STA.W $001C,Y                        ;02D9C4|991C00  |0A001C; Store at offset +28
+                       CLC                                  ;02D9C7|18      |      ; Clear carry
+                       ADC.B $79                            ;02D9C8|6579    |000A79; Add calculation value
+                       STA.W $001E,Y                        ;02D9CA|991E00  |0A001E; Store at offset +30
+                       PLX                                  ;02D9CD|FA      |      ; Restore data to X
+                       SEP #$20                             ;02D9CE|E220    |      ; 8-bit accumulator
+                       REP #$10                             ;02D9D0|C210    |      ; 16-bit index
+
+; Complex Data Processing Loop
+CODE_02D9D2:
+                       LDA.B $79                            ;02D9D2|A579    |000A79; Load processing count
+                       PHA                                  ;02D9D4|48      |      ; Save count
+                       LDA.B #$00                           ;02D9D5|A900    |      ; Clear accumulator
+                       XBA                                  ;02D9D7|EB      |      ; Exchange bytes
+
+; Data Byte Processing Loop
+CODE_02D9D8:
+                       LDA.L DATA8_0A8000,X                 ;02D9D8|BF00800A|0A8000; Load data byte
+                       INX                                  ;02D9DC|E8      |      ; Next byte
+                       LDY.W #$0008                         ;02D9DD|A00800  |      ; 8 bits per byte
+
+; Bit Processing Loop
+CODE_02D9E0:
+                       ASL A                                ;02D9E0|0A      |      ; Shift bit left
+                       XBA                                  ;02D9E1|EB      |      ; Exchange accumulator bytes
+                       ADC.B #$00                           ;02D9E2|6900    |      ; Add carry
+                       XBA                                  ;02D9E4|EB      |      ; Exchange bytes back
+                       DEY                                  ;02D9E5|88      |      ; Decrement bit counter
+                       BNE CODE_02D9E0                      ;02D9E6|D0F8    |02D9E0; Continue bit processing
+                       PLA                                  ;02D9E8|68      |      ; Restore processing count
+                       DEC A                                ;02D9E9|3A      |      ; Decrement count
+                       BEQ CODE_02D9EF                      ;02D9EA|F003    |02D9EF; Branch if done
+                       PHA                                  ;02D9EC|48      |      ; Save count
+                       BRA CODE_02D9D8                      ;02D9ED|80E9    |02D9D8; Continue processing
+
+; Final Calculation Processing
+CODE_02D9EF:
+                       XBA                                  ;02D9EF|EB      |      ; Exchange bytes
+                       STA.W $4202                          ;02D9F0|8D0242  |0A4202; Set multiplicand
+                       LDA.B #$18                           ;02D9F3|A918    |      ; Set multiplier (24)
+                       STA.W $4203                          ;02D9F5|8D0342  |0A4203; Set multiplier
+                       REP #$30                             ;02D9F8|C230    |      ; 16-bit mode
+                       PLY                                  ;02D9FA|7A      |      ; Restore Y position
+                       LDA.W $0000,Y                        ;02D9FB|B90000  |0A0000; Load base value
+                       CLC                                  ;02D9FE|18      |      ; Clear carry
+                       ADC.W $4216                          ;02D9FF|6D1642  |0A4216; Add multiplication result
+                       STA.W $0002,Y                        ;02DA02|990200  |0A0002; Store final result
+                       INY                                  ;02DA05|C8      |      ; Next Y position
+                       INY                                  ;02DA06|C8      |      ; Next Y position (word)
+                       SEP #$20                             ;02DA07|E220    |      ; 8-bit accumulator
+                       REP #$10                             ;02DA09|C210    |      ; 16-bit index
+                       PLA                                  ;02DA0B|68      |      ; Restore loop counter
+                       INC A                                ;02DA0C|1A      |      ; Increment counter
+                       CMP.B #$03                           ;02DA0D|C903    |      ; Check limit (3)
+                       BPL CODE_02DA15                      ;02DA0F|1004    |02DA15; Exit if done
+                       PHA                                  ;02DA11|48      |      ; Save counter
+                       PHY                                  ;02DA12|5A      |      ; Save Y position
+                       BRA CODE_02D9D2                      ;02DA13|80BD    |02D9D2; Continue processing
+
+CODE_02DA15:
+                       PLB                                  ;02DA15|AB      |      ; Restore data bank
+                       PLP                                  ;02DA16|28      |      ; Restore processor status
+                       RTS                                  ;02DA17|60      |      ; Return
+
+; Advanced Display Processing and Color Management Engine
+; Complex display processing with sophisticated color effects and timing
+CODE_02DA18:
+                       PHD                                  ;02DA18|0B      |      ; Save direct page
+                       PEA.W $2100                          ;02DA19|F40021  |022100; Set direct page to $2100
+                       PLD                                  ;02DA1C|2B      |      ; Load new direct page
+                       STZ.W $0A7E                          ;02DA1D|9C7E0A  |020A7E; Clear display flag
+                       LDA.B #$1D                           ;02DA20|A91D    |      ; Main screen enable
+                       STA.B SNES_TM-$2100                  ;02DA22|852C    |00212C; Set main screen
+                       STZ.B SNES_TS-$2100                  ;02DA24|642D    |00212D; Clear sub screen
+                       STZ.B SNES_CGSWSEL-$2100             ;02DA26|6430    |002130; Clear color window
+                       LDX.W #$0000                         ;02DA28|A20000  |      ; Initialize index
+                       LDA.B #$A1                           ;02DA2B|A9A1    |      ; Color math settings
+                       STA.B SNES_CGADSUB-$2100             ;02DA2D|8531    |002131; Set color math
+
+; Color Effect Processing Loop 1
+CODE_02DA2F:
+                       LDA.W DATA8_02DA7D,X                 ;02DA2F|BD7DDA  |02DA7D; Load color data
+                       BEQ CODE_02DA49                      ;02DA32|F015    |02DA49; Exit if zero
+                       INX                                  ;02DA34|E8      |      ; Next color
+                       STA.B SNES_COLDATA-$2100             ;02DA35|8532    |002132; Set color data
+                       JSL.L CODE_0C8000                    ;02DA37|2200800C|0C8000; Wait timing routine
+                       JSL.L CODE_0C8000                    ;02DA3B|2200800C|0C8000; Wait timing routine
+                       JSL.L CODE_0C8000                    ;02DA3F|2200800C|0C8000; Wait timing routine
+                       JSL.L CODE_0C8000                    ;02DA43|2200800C|0C8000; Wait timing routine
+                       BRA CODE_02DA2F                      ;02DA47|80E6    |02DA2F; Continue color loop
+
+; Color Effect Processing Phase 2
+CODE_02DA49:
+                       LDA.B #$1F                           ;02DA49|A91F    |      ; Full screen enable
+                       STA.B SNES_TM-$2100                  ;02DA4B|852C    |00212C; Set main screen
+                       LDA.B #$22                           ;02DA4D|A922    |      ; Alternate color math
+                       STA.B SNES_CGADSUB-$2100             ;02DA4F|8531    |002131; Set color math
+                       LDX.W #$0000                         ;02DA51|A20000  |      ; Reset index
+
+; Color Effect Processing Loop 2
+CODE_02DA54:
+                       LDA.W DATA8_02DA7D,X                 ;02DA54|BD7DDA  |02DA7D; Load color data
+                       BEQ CODE_02DA72                      ;02DA57|F019    |02DA72; Exit if zero
+                       INX                                  ;02DA59|E8      |      ; Next color
+                       STA.B SNES_COLDATA-$2100             ;02DA5A|8532    |002132; Set color data
+                       JSL.L CODE_0C8000                    ;02DA5C|2200800C|0C8000; Wait timing routine
+                       JSL.L CODE_0C8000                    ;02DA60|2200800C|0C8000; Wait timing routine
+                       JSL.L CODE_0C8000                    ;02DA64|2200800C|0C8000; Wait timing routine
+                       JSL.L CODE_0C8000                    ;02DA68|2200800C|0C8000; Wait timing routine
+                       JSL.L CODE_0C8000                    ;02DA6C|2200800C|0C8000; Wait timing routine
+                       BRA CODE_02DA54                      ;02DA70|80E2    |02DA54; Continue color loop
+
+; Display Processing Completion
+CODE_02DA72:
+                       STZ.W $0A84                          ;02DA72|9C840A  |020A84; Clear processing flag
+                       STZ.B SNES_CGSWSEL-$2100             ;02DA75|6430    |002130; Clear color window
+                       STZ.B SNES_CGADSUB-$2100             ;02DA77|6431    |002131; Clear color math
+                       STZ.B SNES_COLDATA-$2100             ;02DA79|6432    |002132; Clear color data
+                       PLD                                  ;02DA7B|2B      |      ; Restore direct page
+                       RTS                                  ;02DA7C|60      |      ; Return
+
+; **CYCLE 15 COMPLETION MARKER - 4,851 lines documented**
+
+; Bank $02 Cycle 16: Complex Display Management and Advanced State Processing Engine
+; Sophisticated color effect processing with timing synchronization
+; Advanced display control and screen management systems
+; Complex state initialization and sprite handling engine
+; Multi-bank memory management with advanced block transfer systems
+; State data processing with sophisticated lookup and calculation
+; Advanced graphics buffer management and coordination engine
+
+; Color Effect Data Table and Display Processing Completion
+; Complex color gradient data for sophisticated display effects
+DATA8_02DA7D:
+                       db $F8,$F4,$F0,$EB,$EA,$E7,$E6,$E5,$E4,$E3,$E2,$E1,$E0,$00;02DA7D; Color fade sequence 1
+                       db $81,$61,$41,$31,$21,$21,$11,$11,$11,$01,$01,$FF,$01    ;02DA8B; Color fade sequence 2
+
+; Advanced Display Management and State Processing Engine
+; Complex display initialization with multi-system coordination
+CODE_02DA98:
+                       PHA                                  ;02DA98|48      |      ; Save accumulator
+                       PHX                                  ;02DA99|DA      |      ; Save X register
+                       PHY                                  ;02DA9A|5A      |      ; Save Y register
+                       PHD                                  ;02DA9B|0B      |      ; Save direct page
+                       PHP                                  ;02DA9C|08      |      ; Save processor status
+                       PHB                                  ;02DA9D|8B      |      ; Save data bank
+                       PEA.W $0A00                          ;02DA9E|F4000A  |020A00; Set direct page to $0A00
+                       PLD                                  ;02DAA1|2B      |      ; Load new direct page
+                       SEP #$20                             ;02DAA2|E220    |      ; 8-bit accumulator
+                       REP #$10                             ;02DAA4|C210    |      ; 16-bit index
+                       PHK                                  ;02DAA6|4B      |      ; Push program bank
+                       PLB                                  ;02DAA7|AB      |      ; Set as data bank
+                       JSR.W CODE_02DFCD                    ;02DAA8|20CDDF  |02DFCD; Call memory clearing routine
+
+; State Initialization Engine
+; Advanced state flags and system parameters setup
+                       LDA.B #$FF                           ;02DAAB|A9FF    |      ; Initialize display flag
+                       STA.B $84                            ;02DAAD|8584    |000A84; Store display state
+                       STA.B $7E                            ;02DAAF|857E    |000A7E; Store processing flag
+                       STZ.W $0AF0                          ;02DAB1|9CF00A  |020AF0; Clear frame counter
+                       LDA.B #$0F                           ;02DAB4|A90F    |      ; Set sprite limit
+                       STA.W $0110                          ;02DAB6|8D1001  |020110; Store sprite count
+                       LDA.W $04AF                          ;02DAB9|ADAF04  |0204AF; Load world state
+                       LSR A                                ;02DABC|4A      |      ; Shift right
+                       LSR A                                ;02DABD|4A      |      ; Shift right again
+                       INC A                                ;02DABE|1A      |      ; Increment value
+                       AND.B #$03                           ;02DABF|2903    |      ; Mask to 2 bits
+                       BEQ CODE_02DAD5                      ;02DAC1|F012    |02DAD5; Branch if zero
+
+; Special State Configuration
+; Configure special world state parameters
+                       STA.W $050B                          ;02DAC3|8D0B05  |02050B; Store world parameter 1
+                       LDA.B #$08                           ;02DAC6|A908    |      ; Set parameter 2
+                       STA.W $050C                          ;02DAC8|8D0C05  |02050C; Store parameter 2
+                       LDA.B #$0F                           ;02DACB|A90F    |      ; Set parameter 3
+                       STA.W $050D                          ;02DACD|8D0D05  |02050D; Store parameter 3
+                       LDA.B #$03                           ;02DAD0|A903    |      ; Set parameter 4
+                       STA.W $050A                          ;02DAD2|8D0A05  |02050A; Store parameter 4
+
+; System State Coordination
+CODE_02DAD5:
+                       STZ.B $E3                            ;02DAD5|64E3    |000AE3; Clear system flag
+                       INC.B $E2                            ;02DAD7|E6E2    |000AE2; Increment counter
+                       STZ.W $0AF8                          ;02DAD9|9CF80A  |020AF8; Clear processing flag
+                       INC.B $E6                            ;02DADC|E6E6    |000AE6; Increment synchronization flag
+
+; VBlank Synchronization Loop
+; Wait for vertical blank for display synchronization
+CODE_02DADE:
+                       LDA.B $E6                            ;02DADE|A5E6    |000AE6; Load sync flag
+                       BNE CODE_02DADE                      ;02DAE0|D0FC    |02DADE; Wait for VBlank
+
+; Advanced Graphics Configuration Engine
+; Complex screen mode and graphics setup
+                       PHD                                  ;02DAE2|0B      |      ; Save direct page
+                       PEA.W $2100                          ;02DAE3|F40021  |022100; Set direct page to PPU
+                       PLD                                  ;02DAE6|2B      |      ; Load PPU direct page
+                       LDA.B #$42                           ;02DAE7|A942    |      ; BG1 screen configuration
+                       STA.B SNES_BG1SC-$2100               ;02DAE9|8507    |002107; Set BG1 screen
+                       LDA.B #$4A                           ;02DAEB|A94A    |      ; BG2 screen configuration
+                       STA.B SNES_BG2SC-$2100               ;02DAED|8508    |002108; Set BG2 screen
+                       REP #$30                             ;02DAEF|C230    |      ; 16-bit mode
+                       STZ.B SNES_BG1HOFS-$2100             ;02DAF1|640D    |00210D; Clear BG1 H scroll
+                       STZ.B SNES_BG1HOFS-$2100             ;02DAF3|640D    |00210D; Clear BG1 H scroll (high)
+                       STZ.B SNES_BG2HOFS-$2100             ;02DAF5|640F    |00210F; Clear BG2 H scroll
+                       STZ.B SNES_BG2HOFS-$2100             ;02DAF7|640F    |00210F; Clear BG2 H scroll (high)
+
+; Memory Buffer Initialization Engine
+; Advanced memory buffer setup with multi-bank coordination
+                       LDA.W #$0000                         ;02DAF9|A90000  |      ; Clear value
+                       STA.L $7EC240                        ;02DAFC|8F40C27E|7EC240; Initialize buffer 1
+                       LDX.W #$C240                         ;02DB00|A240C2  |      ; Source address
+                       LDY.W #$C241                         ;02DB03|A041C2  |      ; Destination address
+                       LDA.W #$03FE                         ;02DB06|A9FE03  |      ; Transfer count (1023 bytes)
+                       MVN $7E,$7E                          ;02DB09|547E7E  |      ; Block move within WRAM
+
+; Pattern Data Initialization
+                       LDA.W #$FEFE                         ;02DB0C|A9FEFE  |      ; Pattern fill value
+                       STA.W $0C40                          ;02DB0F|8D400C  |7E0C40; Store pattern in buffer
+                       LDX.W #$0C40                         ;02DB12|A2400C  |      ; Source address
+                       LDY.W #$0C41                         ;02DB15|A0410C  |      ; Destination address
+                       LDA.W #$01BE                         ;02DB18|A9BE01  |      ; Transfer count (447 bytes)
+                       MVN $02,$02                          ;02DB1B|540202  |      ; Block move within bank
+
+; Special Pattern Buffer Setup
+                       LDA.W #$5555                         ;02DB1E|A95555  |      ; Special pattern value
+                       STA.W $0E04                          ;02DB21|8D040E  |020E04; Store in special buffer
+                       LDX.W #$0E04                         ;02DB24|A2040E  |      ; Source address
+                       LDY.W #$0E05                         ;02DB27|A0050E  |      ; Destination address
+                       LDA.W #$001A                         ;02DB2A|A91A00  |      ; Transfer count (27 bytes)
+                       MVN $02,$02                          ;02DB2D|540202  |      ; Block move within bank
+
+; Multi-Bank Data Coordination Engine
+                       PEA.W $0B00                          ;02DB30|F4000B  |020B00; Set direct page to $0B00
+                       PLD                                  ;02DB33|2B      |      ; Load new direct page
+                       STA.B $00                            ;02DB34|8500    |000B00; Store pattern value
+                       STZ.B $02                            ;02DB36|6402    |000B02; Clear register 2
+                       STZ.B $04                            ;02DB38|6404    |000B04; Clear register 4
+                       STZ.B $06                            ;02DB3A|6406    |000B06; Clear register 6
+                       STZ.B $08                            ;02DB3C|6408    |000B08; Clear register 8
+                       STZ.B $0A                            ;02DB3E|640A    |000B0A; Clear register 10
+                       STZ.B $0C                            ;02DB40|640C    |000B0C; Clear register 12
+                       STZ.B $0E                            ;02DB42|640E    |000B0E; Clear register 14
+                       PLD                                  ;02DB44|2B      |      ; Restore direct page
+                       SEP #$20                             ;02DB45|E220    |      ; 8-bit accumulator
+                       REP #$10                             ;02DB47|C210    |      ; 16-bit index
+
+; Advanced Sprite Management System
+; Complex sprite initialization and state management
+                       LDA.W $0A9C                          ;02DB49|AD9C0A  |020A9C; Load sprite mode flag
+                       BEQ CODE_02DB88                      ;02DB4C|F03A    |02DB88; Branch if no sprites
+
+; DMA Configuration Engine
+; Setup DMA for sprite data transfer
+                       PHD                                  ;02DB4E|0B      |      ; Save direct page
+                       PEA.W $0B00                          ;02DB4F|F4000B  |020B00; Set direct page to $0B00
+                       PLD                                  ;02DB52|2B      |      ; Load new direct page
+                       LDA.B #$81                           ;02DB53|A981    |      ; DMA control flags
+                       STA.B $33                            ;02DB55|8533    |000B33; Set DMA channel 3 control
+                       STA.B $36                            ;02DB57|8536    |000B36; Set DMA channel 3 mirror
+                       LDA.B #$00                           ;02DB59|A900    |      ; Clear value
+                       STA.B $34                            ;02DB5B|8534    |000B34; Clear DMA source low
+                       STA.B $35                            ;02DB5D|8535    |000B35; Clear DMA source mid
+                       STA.B $37                            ;02DB5F|8537    |000B37; Clear DMA source high
+                       INC.B $37                            ;02DB61|E637    |000B37; Set source high byte
+                       STA.B $38                            ;02DB63|8538    |000B38; Clear DMA destination
+                       STA.B $39                            ;02DB65|8539    |000B39; Clear DMA count
+                       PLD                                  ;02DB67|2B      |      ; Restore direct page
+
+; DMA Transfer Setup and Execution
+                       LDX.W #$DB83                         ;02DB68|A283DB  |      ; DMA data table address
+                       LDY.W #$4370                         ;02DB6B|A07043  |      ; DMA register address
+                       LDA.B #$00                           ;02DB6E|A900    |      ; Clear high byte
+                       XBA                                  ;02DB70|EB      |      ; Exchange bytes
+                       LDA.B #$04                           ;02DB71|A904    |      ; Transfer 4 bytes
+                       MVN $00,$02                          ;02DB73|540002  |      ; Block move to DMA registers
+                       LDA.B #$80                           ;02DB76|A980    |      ; DMA enable flag
+                       TSB.W $0111                          ;02DB78|0C1101  |000111; Test and set DMA trigger
+                       PHK                                  ;02DB7B|4B      |      ; Push program bank
+                       PLB                                  ;02DB7C|AB      |      ; Set as data bank
+                       STZ.B $EA                            ;02DB7D|64EA    |000AEA; Clear DMA complete flag
+                       STZ.B $EB                            ;02DB7F|64EB    |000AEB; Clear DMA error flag
+                       BRA CODE_02DB88                      ;02DB81|8005    |02DB88; Continue to next phase
+
+; DMA Control Data Table
+; Configuration data for sprite DMA transfer
+DATA8_02DB83:
+                       db $02,$0E,$33,$0B,$00               ;02DB83; DMA configuration data
+
+; Sprite Processing and Display Coordination Engine
+CODE_02DB88:
+                       JSR.W CODE_02E6ED                    ;02DB88|20EDE6  |02E6ED; Call sprite processor
+                       JSR.W CODE_02E0DB                    ;02DB8B|20DBE0  |02E0DB; Call display coordinator
+                       LDX.W #$0005                         ;02DB8E|A20500  |      ; Initialize loop counter
+                       LDA.B #$FF                           ;02DB91|A9FF    |      ; Clear value
+
+; State Register Initialization Loop
+CODE_02DB93:
+                       STA.B $0D,X                          ;02DB93|950D    |000A0D; Clear state register
+                       DEX                                  ;02DB95|CA      |      ; Decrement counter
+                       BPL CODE_02DB93                      ;02DB96|10FB    |02DB93; Continue loop
+
+; State Data Transfer and Configuration Engine
+                       LDY.W #$0A25                         ;02DB98|A0250A  |      ; Destination address
+                       LDX.W #$DCC4                         ;02DB9B|A2C4DC  |      ; Default source address
+                       LDA.W $1090                          ;02DB9E|AD9010  |021090; Load configuration flag
+                       CMP.B #$FF                           ;02DBA1|C9FF    |      ; Check for special mode
+                       BNE CODE_02DBA8                      ;02DBA3|D003    |02DBA8; Branch if normal mode
+                       LDX.W #$DCCC                         ;02DBA5|A2CCDC  |      ; Alternate source address
+
+; State Data Block Transfer
+CODE_02DBA8:
+                       REP #$30                             ;02DBA8|C230    |      ; 16-bit mode
+                       LDA.W #$0007                         ;02DBAA|A90700  |      ; Transfer 8 bytes
+                       MVN $02,$02                          ;02DBAD|540202  |      ; Block move within bank
+                       SEP #$20                             ;02DBB0|E220    |      ; 8-bit accumulator
+                       REP #$10                             ;02DBB2|C210    |      ; 16-bit index
+
+; Advanced Sprite Rendering System
+                       LDA.B $9C                            ;02DBB4|A59C    |000A9C; Load rendering mode
+                       BEQ UNREACH_02DBBD                   ;02DBB6|F005    |02DBBD; Branch if disabled
+                       JSR.W CODE_02DCDD                    ;02DBB8|20DDDC  |02DCDD; Call sprite renderer
+                       BRA CODE_02DBC0                      ;02DBBB|8003    |02DBC0; Continue processing
+
+; Unreachable Alternate Renderer Path
+UNREACH_02DBBD:
+                       db $20,$30,$DD                       ;02DBBD; Alternate renderer call
+
+; Advanced Object Management Engine
+CODE_02DBC0:
+                       SEP #$30                             ;02DBC0|E230    |      ; 8-bit mode
+                       JSR.W CODE_02EA60                    ;02DBC2|2060EA  |02EA60; Call object allocator
+                       STX.W $0ADE                          ;02DBC5|8EDE0A  |020ADE; Store primary object index
+                       STZ.W $0AF4                          ;02DBC8|9CF40A  |020AF4; Clear processing flag
+
+; Primary Object Configuration
+                       LDA.B #$00                           ;02DBCB|A900    |      ; Clear flags
+                       STA.L $7EC320,X                      ;02DBCD|9F20C37E|7EC320; Clear object state 1
+                       LDA.B #$00                           ;02DBD1|A900    |      ; Clear value
+                       STA.L $7EC400,X                      ;02DBD3|9F00C47E|7EC400; Clear object state 2
+                       STA.L $7EC340,X                      ;02DBD7|9F40C37E|7EC340; Clear object state 3
+                       LDA.B #$81                           ;02DBDB|A981    |      ; Set object flags
+                       STA.L $7EC240,X                      ;02DBDD|9F40C27E|7EC240; Store object flags
+                       LDY.B #$0C                           ;02DBE1|A00C    |      ; Parameter value
+                       JSR.W CODE_02EA7F                    ;02DBE3|207FEA  |02EA7F; Call parameter processor
+                       STA.L $7EC260,X                      ;02DBE6|9F60C27E|7EC260; Store parameter result
+
+; Primary Object Graphics Setup
+                       PHX                                  ;02DBEA|DA      |      ; Save object index
+                       ASL A                                ;02DBEB|0A      |      ; Multiply by 2
+                       ASL A                                ;02DBEC|0A      |      ; Multiply by 4
+                       TAX                                  ;02DBED|AA      |      ; Transfer to index
+                       PHD                                  ;02DBEE|0B      |      ; Save direct page
+                       PEA.W $0C00                          ;02DBEF|F4000C  |020C00; Set direct page to $0C00
+                       PLD                                  ;02DBF2|2B      |      ; Load new direct page
+
+; Graphics Tile Configuration
+                       LDA.B #$1C                           ;02DBF3|A91C    |      ; Base tile number
+                       PHA                                  ;02DBF5|48      |      ; Save tile number
+                       STA.B $02,X                          ;02DBF6|9502    |000C02; Set tile 1
+                       INC A                                ;02DBF8|1A      |      ; Next tile
+                       STA.B $06,X                          ;02DBF9|9506    |000C06; Set tile 2
+                       INC A                                ;02DBFB|1A      |      ; Next tile
+                       STA.B $0A,X                          ;02DBFC|950A    |000C0A; Set tile 3
+                       INC A                                ;02DBFE|1A      |      ; Next tile
+                       STA.B $0E,X                          ;02DBFF|950E    |000C0E; Set tile 4
+
+; Graphics Attribute Configuration
+                       LDA.B #$30                           ;02DC01|A930    |      ; Attribute flags
+                       STA.B $03,X                          ;02DC03|9503    |000C03; Set attribute 1
+                       STA.B $07,X                          ;02DC05|9507    |000C07; Set attribute 2
+                       STA.B $0B,X                          ;02DC07|950B    |000C0B; Set attribute 3
+                       STA.B $0F,X                          ;02DC09|950F    |000C0F; Set attribute 4
+
+; Position Calculation Engine
+                       LDA.W $0A25                          ;02DC0B|AD250A  |020A25; Load X position base
+                       ASL A                                ;02DC0E|0A      |      ; Multiply by 2
+                       ASL A                                ;02DC0F|0A      |      ; Multiply by 4
+                       ASL A                                ;02DC10|0A      |      ; Multiply by 8
+                       STA.B $00,X                          ;02DC11|9500    |000C00; Set X position 1
+                       STA.B $08,X                          ;02DC13|9508    |000C08; Set X position 3
+                       CLC                                  ;02DC15|18      |      ; Clear carry
+                       ADC.B #$08                           ;02DC16|6908    |      ; Add 8 pixels
+                       STA.B $04,X                          ;02DC18|9504    |000C04; Set X position 2
+                       STA.B $0C,X                          ;02DC1A|950C    |000C0C; Set X position 4
+
+; Y Position Calculation
+                       LDA.W $0A26                          ;02DC1C|AD260A  |020A26; Load Y position base
+                       ASL A                                ;02DC1F|0A      |      ; Multiply by 2
+                       ASL A                                ;02DC20|0A      |      ; Multiply by 4
+                       ASL A                                ;02DC21|0A      |      ; Multiply by 8
+                       DEC A                                ;02DC22|3A      |      ; Adjust by -1
+                       STA.B $01,X                          ;02DC23|9501    |000C01; Set Y position 1
+                       STA.B $05,X                          ;02DC25|9505    |000C05; Set Y position 2
+                       CLC                                  ;02DC27|18      |      ; Clear carry
+                       ADC.B #$08                           ;02DC28|6908    |      ; Add 8 pixels
+                       STA.B $09,X                          ;02DC2A|9509    |000C09; Set Y position 3
+                       STA.B $0D,X                          ;02DC2C|950D    |000C0D; Set Y position 4
+                       PLA                                  ;02DC2E|68      |      ; Restore tile number
+                       PLD                                  ;02DC2F|2B      |      ; Restore direct page
+                       PLX                                  ;02DC30|FA      |      ; Restore object index
+                       STA.L $7EC480,X                      ;02DC31|9F80C47E|7EC480; Store tile configuration
+
+; Secondary Object Management System
+                       STZ.W $0AF5                          ;02DC35|9CF50A  |020AF5; Clear secondary flag
+                       JSR.W CODE_02EA60                    ;02DC38|2060EA  |02EA60; Call object allocator
+                       LDA.B #$02                           ;02DC3B|A902    |      ; Secondary object type
+                       STA.L $7EC320,X                      ;02DC3D|9F20C37E|7EC320; Set object type
+                       STX.W $0ADF                          ;02DC41|8EDF0A  |020ADF; Store secondary object index
+
+; Secondary Object Configuration
+                       LDA.B #$00                           ;02DC44|A900    |      ; Clear flags
+                       STA.L $7EC400,X                      ;02DC46|9F00C47E|7EC400; Clear object state 1
+                       STA.L $7EC340,X                      ;02DC4A|9F40C37E|7EC340; Clear object state 2
+                       LDA.B #$81                           ;02DC4E|A981    |      ; Set object flags
+                       STA.L $7EC240,X                      ;02DC50|9F40C27E|7EC240; Store object flags
+                       LDY.B #$0C                           ;02DC54|A00C    |      ; Parameter value
+                       JSR.W CODE_02EA7F                    ;02DC56|207FEA  |02EA7F; Call parameter processor
+                       STA.L $7EC260,X                      ;02DC59|9F60C27E|7EC260; Store parameter result
+
+; Secondary Object Graphics Processing
+                       PHA                                  ;02DC5D|48      |      ; Save parameter
+                       CLC                                  ;02DC5E|18      |      ; Clear carry
+                       ADC.B #$18                           ;02DC5F|6918    |      ; Add graphics offset
+                       STA.W $0AE9                          ;02DC61|8DE90A  |020AE9; Store graphics index
+                       PLA                                  ;02DC64|68      |      ; Restore parameter
+                       ASL A                                ;02DC65|0A      |      ; Multiply by 2
+                       ASL A                                ;02DC66|0A      |      ; Multiply by 4
+                       PHX                                  ;02DC67|DA      |      ; Save object index
+                       TAX                                  ;02DC68|AA      |      ; Transfer to index
+
+; Special Tile Selection Engine
+                       LDA.W $10A0                          ;02DC69|ADA010  |0210A0; Load special flags
+                       AND.B #$0F                           ;02DC6C|290F    |      ; Mask lower bits
+                       TAY                                  ;02DC6E|A8      |      ; Transfer to index
+                       LDA.W UNREACH_02DCD4,Y               ;02DC6F|B9D4DC  |02DCD4; Load tile from table
+                       PHA                                  ;02DC72|48      |      ; Save tile number
+
+; Secondary Object Graphics Setup
+                       PHD                                  ;02DC73|0B      |      ; Save direct page
+                       PEA.W $0C00                          ;02DC74|F4000C  |020C00; Set direct page to $0C00
+                       PLD                                  ;02DC77|2B      |      ; Load new direct page
+                       STA.B $02,X                          ;02DC78|9502    |000C02; Set tile 1
+                       INC A                                ;02DC7A|1A      |      ; Next tile
+                       STA.B $06,X                          ;02DC7B|9506    |000C06; Set tile 2
+                       INC A                                ;02DC7D|1A      |      ; Next tile
+                       STA.B $0A,X                          ;02DC7E|950A    |000C0A; Set tile 3
+                       INC A                                ;02DC80|1A      |      ; Next tile
+                       STA.B $0E,X                          ;02DC81|950E    |000C0E; Set tile 4
+
+; Secondary Graphics Attributes
+                       LDA.B #$34                           ;02DC83|A934    |      ; Special attribute flags
+                       STA.B $03,X                          ;02DC85|9503    |000C03; Set attribute 1
+                       STA.B $07,X                          ;02DC87|9507    |000C07; Set attribute 2
+                       STA.B $0B,X                          ;02DC89|950B    |000C0B; Set attribute 3
+                       STA.B $0F,X                          ;02DC8B|950F    |000C0F; Set attribute 4
+
+; Secondary Position Calculation
+                       LDA.W $0A29                          ;02DC8D|AD290A  |020A29; Load secondary X base
+                       ASL A                                ;02DC90|0A      |      ; Multiply by 2
+                       ASL A                                ;02DC91|0A      |      ; Multiply by 4
+                       ASL A                                ;02DC92|0A      |      ; Multiply by 8
+                       STA.B $00,X                          ;02DC93|9500    |000C00; Set X position 1
+                       STA.B $08,X                          ;02DC95|9508    |000C08; Set X position 3
+                       CLC                                  ;02DC97|18      |      ; Clear carry
+                       ADC.B #$08                           ;02DC98|6908    |      ; Add 8 pixels
+                       STA.B $04,X                          ;02DC9A|9504    |000C04; Set X position 2
+                       STA.B $0C,X                          ;02DC9C|950C    |000C0C; Set X position 4
+
+; Secondary Y Position Calculation
+                       LDA.W $0A2A                          ;02DC9E|AD2A0A  |020A2A; Load secondary Y base
+                       ASL A                                ;02DCA1|0A      |      ; Multiply by 2
+                       ASL A                                ;02DCA2|0A      |      ; Multiply by 4
+                       ASL A                                ;02DCA3|0A      |      ; Multiply by 8
+                       DEC A                                ;02DCA4|3A      |      ; Adjust by -1
+                       STA.B $01,X                          ;02DCA5|9501    |000C01; Set Y position 1
+                       STA.B $05,X                          ;02DCA7|9505    |000C05; Set Y position 2
+                       CLC                                  ;02DCA9|18      |      ; Clear carry
+                       ADC.B #$08                           ;02DCAA|6908    |      ; Add 8 pixels
+                       STA.B $09,X                          ;02DCAC|9509    |000C09; Set Y position 3
+                       STA.B $0D,X                          ;02DCAE|950D    |000C0D; Set Y position 4
+                       PLD                                  ;02DCB0|2B      |      ; Restore direct page
+                       PLA                                  ;02DCB1|68      |      ; Restore tile number
+                       PLX                                  ;02DCB2|FA      |      ; Restore object index
+                       STA.L $7EC480,X                      ;02DCB3|9F80C47E|7EC480; Store tile configuration
+
+; Final System Coordination
+                       JSL.L CODE_0B935F                    ;02DCB7|225F930B|0B935F; Call system coordinator
+                       INC.B $F8                            ;02DCBB|E6F8    |000AF8; Increment frame counter
+                       PLB                                  ;02DCBD|AB      |      ; Restore data bank
+                       PLP                                  ;02DCBE|28      |      ; Restore processor status
+                       PLD                                  ;02DCBF|2B      |      ; Restore direct page
+                       PLY                                  ;02DCC0|7A      |      ; Restore Y register
+                       PLX                                  ;02DCC1|FA      |      ; Restore X register
+                       PLA                                  ;02DCC2|68      |      ; Restore accumulator
+                       RTL                                  ;02DCC3|6B      |      ; Return to caller
+
+; Configuration Data Tables
+; State configuration data for different modes
+DATA8_02DCC4:
+                       db $0C,$10,$02,$02,$12,$10,$02,$02,$0F,$10,$02,$02,$FF,$FF,$02,$02;02DCC4
+
+; Special Tile Mapping Table
+; Tile numbers for special object types
+UNREACH_02DCD4:
+                       db $1C                               ;02DCD4; Base tile
+                       db $34,$4C,$64,$7C,$34,$4C           ;02DCD5; Special tiles 1-6
+                       db $64,$7C                           ;02DCDB; Special tiles 7-8
+
+; Advanced Sprite Rendering and Processing Engine
+; Complex sprite system with multi-layer processing
+CODE_02DCDD:
+                       PHP                                  ;02DCDD|08      |      ; Save processor status
+                       SEP #$30                             ;02DCDE|E230    |      ; 8-bit mode
+                       JSR.W CODE_02DF3E                    ;02DCE0|203EDF  |02DF3E; Call sprite initializer
+                       JSR.W CODE_02DFE8                    ;02DCE3|20E8DF  |02DFE8; Call sprite loader
+                       JSR.W CODE_02E021                    ;02DCE6|2021E0  |02E021; Call sprite coordinator
+                       LDA.B #$20                           ;02DCE9|A920    |      ; Set sprite flag
+                       TSB.B $E3                            ;02DCEB|04E3    |000AE3; Test and set system flag
+                       STZ.B $98                            ;02DCED|6498    |000A98; Clear sprite counter
+                       LDA.B #$06                           ;02DCEF|A906    |      ; Set sprite limit
+                       STA.B $99                            ;02DCF1|8599    |000A99; Store sprite limit
+                       LDA.W $0A9D                          ;02DCF3|AD9D0A  |020A9D; Load sprite base
+                       STA.B $9A                            ;02DCF6|859A    |000A9A; Store sprite base
+
+; Sprite Processing Loop Coordination
+CODE_02DCF8:
+                       STA.B $97                            ;02DCF8|8597    |000A97; Store current sprite
+                       JSL.L CODE_02E48C                    ;02DCFA|228CE402|02E48C; Call sprite processor
+                       CLC                                  ;02DCFE|18      |      ; Clear carry
+                       ADC.B #$04                           ;02DCFF|6904    |      ; Next sprite (4 bytes each)
+                       CMP.B #$10                           ;02DD01|C910    |      ; Check limit (16 sprites)
+                       BNE CODE_02DCF8                      ;02DD03|D0F3    |02DCF8; Continue loop
+
+; Sprite Grid Processing Engine
+                       LDY.B #$04                           ;02DD05|A004    |      ; Start Y position
+                       LDX.B #$00                           ;02DD07|A200    |      ; Start X position
+
+; Double Loop for Sprite Grid
+CODE_02DD09:
+                       STX.B $91                            ;02DD09|8691    |000A91; Store X position
+                       STY.B $92                            ;02DD0B|8492    |000A92; Store Y position
+                       LDA.B #$10                           ;02DD0D|A910    |      ; Set processing mode
+                       STA.B $94                            ;02DD0F|8594    |000A94; Store processing mode
+                       LDA.B $9F                            ;02DD11|A59F    |000A9F; Load sprite flags
+                       AND.B #$0F                           ;02DD13|290F    |      ; Mask lower bits
+                       STA.B $96                            ;02DD15|8596    |000A96; Store masked flags
+                       JSL.L CODE_02E4EB                    ;02DD17|22EBE402|02E4EB; Call sprite renderer
+                       INX                                  ;02DD1B|E8      |      ; Next X position
+                       CPX.B #$10                           ;02DD1C|E010    |      ; Check X limit (16)
+                       BNE CODE_02DD09                      ;02DD1E|D0E9    |02DD09; Continue X loop
+                       LDX.B #$00                           ;02DD20|A200    |      ; Reset X position
+                       INY                                  ;02DD22|C8      |      ; Next Y position
+                       CPY.B #$0E                           ;02DD23|C00E    |      ; Check Y limit (14)
+                       BNE CODE_02DD09                      ;02DD25|D0E2    |02DD09; Continue Y loop
+
+; Sprite Rendering Completion
+                       LDA.B #$02                           ;02DD27|A902    |      ; Set completion flag
+                       TSB.B $E3                            ;02DD29|04E3    |000AE3; Test and set system flag
+                       JSR.W CODE_02E095                    ;02DD2B|2095E0  |02E095; Call sprite finalizer
+                       PLP                                  ;02DD2E|28      |      ; Restore processor status
+                       RTS                                  ;02DD2F|60      |      ; Return to caller
+
+; **CYCLE 16 COMPLETION MARKER - 5,300 lines documented**
+
+; Bank $02 Cycle 17: Complex Graphics Rendering and Multi-Bank Coordination Engine
+; Advanced graphics data processing with multi-bank memory coordination
+; Complex DMA transfer systems and sprite data management
+; Sophisticated pattern rendering with bit manipulation and data transformation
+; Advanced tile processing and graphics buffer management
+; Complex memory addressing and bank switching operations
+; High-performance graphics rendering with optimized data transfer
+
+; Unreachable Alternate Processing Path
+; Complex processing chain for special handling modes
+DATA8_02DD30:
+                       db $08,$0B,$8B,$E2,$20,$C2,$10,$F4,$00,$0A,$2B,$A9,$0C,$85,$8A,$A2;02DD30
+                       db $85,$D7,$86,$8B,$64,$8D,$A2,$A0,$5D,$86,$8E,$A9,$06,$85,$90,$A2;02DD40
+                       db $E0,$00,$22,$C3,$E1,$02,$CA,$D0,$F9,$F4,$00,$0B,$2B,$A9,$0C,$8D;02DD50
+                       db $29,$0B,$A9,$7E,$8D,$2C,$0B,$64,$23,$64,$24,$A2,$00,$00,$BF,$D5;02DD60
+                       db $F5,$0C,$85,$25,$20,$06,$DE,$E8,$E0,$00,$01,$D0,$F1,$A9,$42,$0C;02DD70
+                       db $E3,$0A,$A9,$18,$8D,$A0,$0A,$8B,$C2,$30,$A0,$00,$C1,$A2,$05,$F4;02DD80
+                       db $A9,$0F,$00,$54,$7E,$0C,$A2,$15,$F4,$A0,$20,$C1,$A9,$0F,$00,$54;02DD90
+                       db $7E,$0C,$AB,$E2,$20,$C2,$10,$A9,$00,$A2,$00,$00,$A0,$00,$02,$48;02DDA0
+                       db $20,$D8,$B9,$18,$69,$80,$4A,$4A,$4A,$4A,$49,$FF,$1A,$9F,$60,$C6;02DDB0
+                       db $7E,$A9,$00,$9F,$61,$C6,$7E,$E8,$E8,$68,$1A,$1A,$1A,$1A,$88,$D0;02DDC0
+                       db $DE,$A9,$E4,$8D,$47,$0B,$9C,$4D,$0B,$9C,$F2,$0A,$A9,$01,$8D,$4A;02DDD0
+                       db $0B,$A2,$F1,$0A,$8E,$4B,$0B,$A2,$FE,$DD,$A0,$70,$43,$A9,$00,$EB;02DDE0
+                       db $A9,$07,$54,$00,$02,$A9,$80,$0C,$11,$01,$AB,$2B,$28,$60,$42,$0F;02DDF0
+                       db $47,$0B,$00,$60,$C6,$7E,$DA,$08,$C2,$20,$E2,$10,$A5,$24,$29,$FF;02DE00
+                       db $00,$0A,$0A,$0A,$0A,$0A,$0A,$E2,$30,$18,$65,$23,$EB,$69,$00,$EB;02DE10
+                       db $18,$65,$23,$EB,$69,$00,$EB,$C2,$20,$E2,$10,$0A,$18,$69,$00,$B8;02DE20
+                       db $85,$2A,$E2,$30,$64,$2D,$A5,$25,$8D,$02,$42,$A9,$06,$22,$1E,$97;02DE30
+                       db $00,$C2,$20,$E2,$10,$A9,$85,$EF,$18,$6D,$16,$42,$85,$27,$E2,$30;02DE40
+                       db $A0,$04,$B7,$27,$85,$2E,$C8,$B7,$27,$85,$2F,$20,$BA,$DE,$A6,$26;02DE50
+                       db $E2,$30,$A5,$2D,$C9,$04,$10,$25,$20,$29,$DF,$A5,$26,$0A,$0A,$0A;02DE60
+                       db $0A,$09,$19,$45,$30,$EB,$BC,$AA,$DE,$B7,$27,$C2,$20,$E2,$10,$18;02DE70
+                       db $69,$2D,$00,$BC,$9A,$DE,$97,$2A,$E8,$E6,$2D,$80,$D3,$E6,$23,$A9;02DE80
+                       db $10,$14,$23,$F0,$02,$E6,$24,$28,$FA,$60,$00,$02,$40,$42,$02,$00;02DE90
+                       db $42,$40,$40,$42,$00,$02,$42,$40,$02,$00,$00,$01,$02,$03,$00,$01;02DEA0
+                       db $02,$03,$00,$01,$02,$03,$00,$01,$02,$03,$DA,$5A,$08,$C2,$30,$8B;02DEB0
+                       db $4B,$AB,$A5,$23,$29,$FF,$00,$0A,$A8,$A5,$24,$29,$FF,$00,$0A,$AA;02DEC0
+                       db $E2,$20,$C2,$10,$64,$26,$C2,$30,$BF,$D5,$F6,$0C,$39,$09,$DF,$F0;02DED0
+                       db $03,$38,$80,$01,$18,$E2,$20,$C2,$10,$26,$26,$C2,$30,$BF,$F5,$F6;02DEE0
+                       db $0C,$39,$09,$DF,$F0,$03,$38,$80,$01,$18,$E2,$20,$C2,$10,$26,$26;02DEF0
+                       db $06,$26,$06,$26,$AB,$28,$7A,$FA,$60,$00,$80,$00,$40,$00,$20,$00;02DF00
+                       db $10,$00,$08,$00,$04,$00,$02,$00,$01,$80,$00,$40,$00,$20,$00,$10;02DF10
+                       db $00,$08,$00,$04,$00,$02,$00,$01,$00,$A9,$00,$06,$2E,$2A,$06,$2E;02DF20
+                       db $2A,$0A,$0A,$06,$2F,$2A,$06,$2F,$2A,$0A,$0A,$85,$30,$60         ;02DF30
+
+; Advanced Sprite Initialization and Configuration Engine
+; Complex sprite system initialization with parameter processing
+CODE_02DF3E:
+                       PHX                                  ;02DF3E|DA      |      ; Save X register
+                       PHY                                  ;02DF3F|5A      |      ; Save Y register
+                       PHP                                  ;02DF40|08      |      ; Save processor status
+                       TAX                                  ;02DF41|AA      |      ; Transfer parameter to X
+                       LDA.W UNREACH_02DF5B,X               ;02DF42|BD5BDF  |02DF5B; Load sprite parameter
+                       STA.W $0AEE                          ;02DF45|8DEE0A  |020AEE; Store sprite configuration
+                       PEA.W DATA8_02DF53                   ;02DF48|F453DF  |02DF53; Push configuration table
+                       JSL.L CODE_0097BE                    ;02DF4B|22BE9700|0097BE; Call sprite initializer
+                       PLP                                  ;02DF4F|28      |      ; Restore processor status
+                       PLY                                  ;02DF50|7A      |      ; Restore Y register
+                       PLX                                  ;02DF51|FA      |      ; Restore X register
+                       RTS                                  ;02DF52|60      |      ; Return to caller
+
+; Sprite Configuration Data Table
+DATA8_02DF53:
+                       db $7F,$DF,$80,$DF,$81,$DF           ;02DF53; Sprite configuration entries
+                       db $80,$DF                           ;02DF59; Additional configuration
+
+; Sprite Parameter Table
+UNREACH_02DF5B:
+                       db $03                               ;02DF5B; Base sprite parameter
+                       db $00,$00,$01,$00,$00,$00,$00       ;02DF5C; Extended parameters 1-7
+                       db $00,$00,$00,$00                   ;02DF63; Extended parameters 8-11
+                       db $00,$00                           ;02DF67; Extended parameters 12-13
+                       db $00,$00                           ;02DF69; Extended parameters 14-15
+                       db $00,$01                           ;02DF6B; Extended parameters 16-17
+                       db $00                               ;02DF6D; Extended parameter 18
+                       db $01,$00,$00,$00,$00               ;02DF6E; Extended parameters 19-23
+                       db $00                               ;02DF73; Extended parameter 24
+                       db $02                               ;02DF74; Extended parameter 25
+                       db $00                               ;02DF75; Extended parameter 26
+                       db $00,$00,$00                       ;02DF76; Extended parameters 27-29
+                       db $00,$00                           ;02DF79; Extended parameters 30-31
+                       db $00                               ;02DF7B; Extended parameter 32
+                       db $00,$00,$00                       ;02DF7C; Extended parameters 33-35
+                       RTS                                  ;02DF7F|60      |      ; Return instruction
+                       RTS                                  ;02DF80|60      |      ; Duplicate return
+
+; Advanced Graphics Buffer Initialization Engine
+; Complex buffer setup with multi-bank block transfers
+CODE_02DF81:
+                       PHP                                  ;02DF81|08      |      ; Save processor status
+                       REP #$30                             ;02DF82|C230    |      ; 16-bit mode
+                       LDA.W #$0000                         ;02DF84|A90000  |      ; Clear value
+                       STA.L $7EC660                        ;02DF87|8F60C67E|7EC660; Initialize graphics buffer
+                       LDX.W #$C660                         ;02DF8B|A260C6  |      ; Source address
+                       LDY.W #$C661                         ;02DF8E|A061C6  |      ; Destination address
+                       LDA.W #$01BC                         ;02DF91|A9BC01  |      ; Transfer count (445 bytes)
+                       PHB                                  ;02DF94|8B      |      ; Save data bank
+                       MVN $7E,$7E                          ;02DF95|547E7E  |      ; Block move within WRAM
+                       PLB                                  ;02DF98|AB      |      ; Restore data bank
+
+; Secondary Buffer Setup
+                       LDX.W #$DFC6                         ;02DF99|A2C6DF  |      ; Secondary source
+                       LDY.W #$C640                         ;02DF9C|A040C6  |      ; Secondary destination
+                       LDA.W #$0006                         ;02DF9F|A90600  |      ; Transfer 7 bytes
+                       PHB                                  ;02DFA2|8B      |      ; Save data bank
+                       MVN $7E,$02                          ;02DFA3|547E02  |      ; Block move (bank $02 to WRAM)
+                       PLB                                  ;02DFA6|AB      |      ; Restore data bank
+
+; DMA Configuration Setup
+                       LDX.W #$DFBE                         ;02DFA7|A2BEDF  |      ; DMA configuration data
+                       LDY.W #$4320                         ;02DFAA|A02043  |      ; DMA register address
+                       LDA.W #$0007                         ;02DFAD|A90700  |      ; Transfer 8 bytes
+                       MVN $02,$02                          ;02DFB0|540202  |      ; Block move within bank
+                       SEP #$20                             ;02DFB3|E220    |      ; 8-bit accumulator
+                       REP #$10                             ;02DFB5|C210    |      ; 16-bit index
+                       LDA.B #$04                           ;02DFB7|A904    |      ; Set DMA enable flag
+                       TSB.W $0111                          ;02DFB9|0C1101  |020111; Test and set DMA control
+                       PLP                                  ;02DFBC|28      |      ; Restore processor status
+                       RTS                                  ;02DFBD|60      |      ; Return to caller
+
+; DMA Configuration Data Table
+DATA8_02DFBE:
+                       db $42,$0F,$40,$C6,$7E,$60,$C6,$7E,$F0,$60,$C6,$E7,$40,$C7,$00; DMA parameters
+
+; Memory Clearing and System Reset Engine
+; High-speed memory clearing with optimized block operations
+CODE_02DFCD:
+                       PHP                                  ;02DFCD|08      |      ; Save processor status
+                       PHB                                  ;02DFCE|8B      |      ; Save data bank
+                       SEP #$20                             ;02DFCF|E220    |      ; 8-bit accumulator
+                       REP #$10                             ;02DFD1|C210    |      ; 16-bit index
+                       LDA.B #$00                           ;02DFD3|A900    |      ; Clear value
+                       STA.L $7EC240                        ;02DFD5|8F40C27E|7EC240; Clear memory buffer
+                       LDX.W #$C240                         ;02DFD9|A240C2  |      ; Source address
+                       LDY.W #$C241                         ;02DFDC|A041C2  |      ; Destination address
+                       XBA                                  ;02DFDF|EB      |      ; Exchange bytes
+                       LDA.B #$1E                           ; Set transfer count
+                       MVN $7E,$7E                          ;02DFE2|547E7E  |      ; Block clear operation
+                       PLB                                  ;02DFE5|AB      |      ; Restore data bank
+                       PLP                                  ;02DFE6|28      |      ; Restore processor status
+                       RTS                                  ;02DFE7|60      |      ; Return to caller
+
+; Advanced Graphics Data Processing Engine
+; Complex graphics data transformation with multi-bank coordination
+CODE_02DFE8:
+                       PHP                                  ;02DFE8|08      |      ; Save processor status
+                       SEP #$20                             ;02DFE9|E220    |      ; 8-bit accumulator
+                       REP #$10                             ;02DFEB|C210    |      ; 16-bit index
+                       LDA.W $0A9C                          ;02DFED|AD9C0A  |020A9C; Load graphics mode
+                       STA.W $4202                          ;02DFF0|8D0242  |024202; Set multiplicand
+                       LDA.B #$03                           ;02DFF3|A903    |      ; Set multiplier (3)
+                       JSL.L CODE_00971E                    ;02DFF5|221E9700|00971E; Call multiplication routine
+                       LDX.W $4216                          ;02DFF9|AE1642  |024216; Load result index
+                       REP #$30                             ;02DFFC|C230    |      ; 16-bit mode
+                       LDA.L UNREACH_0CF715,X               ;02DFFE|BF15F70C|0CF715; Load graphics parameter 1
+                       AND.W #$00FF                         ;02E002|29FF00  |      ; Mask to 8-bit
+                       ASL A                                ;02E005|0A      |      ; Multiply by 2
+                       ASL A                                ;02E006|0A      |      ; Multiply by 4
+                       ASL A                                ;02E007|0A      |      ; Multiply by 8
+                       ASL A                                ;02E008|0A      |      ; Multiply by 16
+                       STA.W $0A9D                          ;02E009|8D9D0A  |020A9D; Store graphics offset
+                       SEP #$20                             ;02E00C|E220    |      ; 8-bit accumulator
+                       REP #$10                             ;02E00E|C210    |      ; 16-bit index
+                       LDA.L UNREACH_0CF716,X               ;02E010|BF16F70C|0CF716; Load graphics parameter 2
+                       STA.W $0A9F                          ;02E014|8D9F0A  |020A9F; Store graphics flag
+                       DEC A                                ;02E017|3A      |      ; Decrement parameter
+                       LDA.L UNREACH_0CF717,X               ;02E018|BF17F70C|0CF717; Load graphics parameter 3
+                       STA.W $0AA0                          ;02E01C|8DA00A  |020AA0; Store graphics mode
+                       PLP                                  ;02E01F|28      |      ; Restore processor status
+                       RTS                                  ;02E020|60      |      ; Return to caller
+
+; Advanced Graphics Data Processing Engine
+; Complex graphics data transformation with mathematical operations
+CODE_02E021:
+                       PHP                                  ;02E021|08      |      ; Save processor status
+                       REP #$30                             ;02E022|C230    |      ; 16-bit mode
+                       LDX.W #$E04F                         ;02E024|A24FE0  |      ; Graphics configuration table
+                       LDY.W #$0A8A                         ;02E027|A08A0A  |      ; Target memory address
+                       LDA.W #$0006                         ;02E02A|A90600  |      ; Transfer 7 bytes
+                       MVN $02,$02                          ;02E02D|540202  |      ; Block move within bank
+                       SEP #$20                             ;02E030|E220    |      ; 8-bit accumulator
+                       REP #$10                             ;02E032|C210    |      ; 16-bit index
+                       LDY.W #$0010                         ;02E034|A01000  |      ; Loop count (16 iterations)
+                       LDX.W $0A9D                          ;02E037|AE9D0A  |020A9D; Load graphics base address
+
+; Graphics Data Processing Loop
+; High-speed graphics data extraction and transformation
+CODE_02E03A:
+                       LDA.L UNREACH_0CF425,X               ;02E03A|BF25F40C|0CF425; Load graphics byte from bank $0C
+                       INX                                  ;02E03E|E8      |      ; Next graphics byte
+                       JSR.W CODE_02E056                    ;02E03F|2056E0  |02E056; Call graphics processor
+                       DEY                                  ;02E042|88      |      ; Decrement loop counter
+                       BNE CODE_02E03A                      ;02E043|D0F5    |02E03A; Continue processing loop
+                       LDA.W $0A9F                          ;02E045|AD9F0A  |020A9F; Load special graphics flag
+                       AND.B #$0F                           ;02E048|290F    |      ; Mask lower 4 bits
+                       JSR.W CODE_02E056                    ;02E04A|2056E0  |02E056; Process special graphics data
+                       PLP                                  ;02E04D|28      |      ; Restore processor status
+                       RTS                                  ;02E04E|60      |      ; Return to caller
+
+; Graphics Configuration Data Table
+; Complex graphics setup parameters
+DATA8_02E04F:
+                       db $0C,$00,$00,$00,$A0,$5D,$06       ;02E04F; Graphics configuration parameters
+
+; Advanced Graphics Processing and Calculation Engine
+; Complex graphics data transformation with mathematical operations
+CODE_02E056:
+                       PHX                                  ;02E056|DA      |      ; Save X register
+                       PHY                                  ;02E057|5A      |      ; Save Y register
+                       PHP                                  ;02E058|08      |      ; Save processor status
+                       SEP #$20                             ;02E059|E220    |      ; 8-bit accumulator
+                       REP #$10                             ;02E05B|C210    |      ; 16-bit index
+                       STA.W $4202                          ;02E05D|8D0242  |024202; Set multiplicand
+                       LDA.B #$06                           ;02E060|A906    |      ; Set multiplier (6)
+                       JSL.L CODE_00971E                    ;02E062|221E9700|00971E; Call multiplication routine
+                       LDX.W $4216                          ;02E066|AE1642  |024216; Load multiplication result
+                       LDY.W #$0004                         ;02E069|A00400  |      ; Process 4 data segments
+
+; Graphics Data Segment Processing Loop
+CODE_02E06C:
+                       SEP #$20                             ;02E06C|E220    |      ; 8-bit accumulator
+                       REP #$10                             ;02E06E|C210    |      ; 16-bit index
+                       LDA.L DATA8_0CEF85,X                 ;02E070|BF85EF0C|0CEF85; Load graphics data segment
+                       INX                                  ;02E074|E8      |      ; Next data byte
+                       STA.W $4202                          ;02E075|8D0242  |024202; Set new multiplicand
+                       LDA.B #$18                           ;02E078|A918    |      ; Set multiplier (24)
+                       JSL.L CODE_00971E                    ;02E07A|221E9700|00971E; Call multiplication routine
+                       REP #$30                             ;02E07E|C230    |      ; 16-bit mode
+                       LDA.W $4216                          ;02E080|AD1642  |024216; Load calculation result
+                       CLC                                  ;02E083|18      |      ; Clear carry
+                       ADC.W #$D785                         ;02E084|6985D7  |      ; Add graphics base offset
+                       STA.W $0A8B                          ;02E087|8D8B0A  |020A8B; Store graphics address
+                       JSL.L CODE_02E1C3                    ;02E08A|22C3E102|02E1C3; Call graphics renderer
+                       DEY                                  ;02E08E|88      |      ; Decrement segment counter
+                       BNE CODE_02E06C                      ;02E08F|D0DB    |02E06C; Continue segment processing
+                       PLP                                  ;02E091|28      |      ; Restore processor status
+                       PLY                                  ;02E092|7A      |      ; Restore Y register
+                       PLX                                  ;02E093|FA      |      ; Restore X register
+                       RTS                                  ;02E094|60      |      ; Return to caller
+
+; Complex Graphics Buffer Management Engine
+; Advanced graphics buffer operations with multi-bank coordination
+CODE_02E095:
+                       PHP                                  ;02E095|08      |      ; Save processor status
+                       PHB                                  ;02E096|8B      |      ; Save data bank
+                       PHD                                  ;02E097|0B      |      ; Save direct page
+                       REP #$30                             ;02E098|C230    |      ; 16-bit mode
+                       PEA.W $0A00                          ;02E09A|F4000A  |020A00; Set direct page to $0A00
+                       PLD                                  ;02E09D|2B      |      ; Load new direct page
+                       LDA.W #$00C0                         ;02E09E|A9C000  |      ; Graphics buffer offset 1
+                       CLC                                  ;02E0A1|18      |      ; Clear carry
+                       ADC.W #$C040                         ;02E0A2|6940C0  |      ; Add graphics base address
+                       TAY                                  ;02E0A5|A8      |      ; Set as destination
+                       LDA.W $0AA0                          ;02E0A6|ADA00A  |020AA0; Load graphics parameter
+                       AND.W #$00FF                         ;02E0A9|29FF00  |      ; Mask to 8-bit
+                       ASL A                                ;02E0AC|0A      |      ; Multiply by 2
+                       ASL A                                ;02E0AD|0A      |      ; Multiply by 4
+                       ASL A                                ;02E0AE|0A      |      ; Multiply by 8
+                       ASL A                                ;02E0AF|0A      |      ; Multiply by 16
+                       ADC.W #$F285                         ;02E0B0|6985F2  |      ; Add graphics data base
+                       TAX                                  ;02E0B3|AA      |      ; Set as source
+                       LDA.W #$000F                         ;02E0B4|A90F00  |      ; Transfer 16 bytes
+                       MVN $7E,$0C                          ;02E0B7|547E0C  |      ; Block move (bank $0C to WRAM)
+
+; Second Graphics Buffer Operation
+                       LDA.W #$00E0                         ;02E0BA|A9E000  |      ; Graphics buffer offset 2
+                       CLC                                  ;02E0BD|18      |      ; Clear carry
+                       ADC.W #$C040                         ;02E0BE|6940C0  |      ; Add graphics base address
+                       TAY                                  ;02E0C1|A8      |      ; Set as destination
+                       LDA.W $0A9F                          ;02E0C2|AD9F0A  |7E0A9F; Load secondary graphics parameter
+                       AND.W #$00F0                         ;02E0C5|29F000  |      ; Mask upper 4 bits
+                       CLC                                  ;02E0C8|18      |      ; Clear carry
+                       ADC.W #$F285                         ;02E0C9|6985F2  |      ; Add graphics data base
+                       TAX                                  ;02E0CC|AA      |      ; Set as source
+                       LDA.W #$000F                         ;02E0CD|A90F00  |      ; Transfer 16 bytes
+                       MVN $7E,$0C                          ;02E0D0|547E0C  |      ; Block move (bank $0C to WRAM)
+                       SEP #$20                             ;02E0D3|E220    |      ; 8-bit accumulator
+                       REP #$10                             ;02E0D5|C210    |      ; 16-bit index
+                       PLD                                  ;02E0D7|2B      |      ; Restore direct page
+                       PLB                                  ;02E0D8|AB      |      ; Restore data bank
+                       PLP                                  ;02E0D9|28      |      ; Restore processor status
+                       RTS                                  ;02E0DA|60      |      ; Return to caller
+
+; **CYCLE 17 COMPLETION MARKER - 5,800 lines documented**
 ;====================================================================
