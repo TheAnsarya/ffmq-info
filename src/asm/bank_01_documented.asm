@@ -7211,3 +7211,1398 @@ dynamic_coordinate_processing_engine:
                        STA.W $0CD8                          ; Set DMA source high
                        PLP                                  ; Restore processor flags
                        RTS                                  ; Return from coordinate processing
+; Advanced Battle Processing and Memory Management Systems for FFMQ Bank $01
+; Cycle 8 Implementation Part 1: Complex Memory Operations and Battle State Processing
+; Source analysis: Lines 12500-13000 with sophisticated memory and battle architecture
+
+; Advanced Graphics Memory Transfer Engine
+; Sophisticated graphics memory transfer system with DMA coordination and battle integration
+; Implements complex memory operations with multi-channel processing and coordinate management
+graphics_memory_transfer_engine:
+                       BCC CODE_01E7C3                      ; Branch if carry clear for alternate processing
+                       JSR.W CODE_01E8CD                    ; Execute advanced memory transfer
+                       BRA CODE_01E78B                      ; Branch to main processing loop
+                       ; Alternate transfer processing
+                       JSR.W CODE_01E899                    ; Execute standard memory transfer
+                       BRA CODE_01E78B                      ; Branch to main processing loop
+                       ; Complex transfer processing
+                       JSR.W CODE_01E90D                    ; Execute complex memory transfer
+                       BRA CODE_01E78B                      ; Branch to main processing loop
+
+; Advanced VRAM Management and Transfer System
+; Complex VRAM management with sophisticated transfer operations and DMA coordination
+; Manages multiple transfer channels with battle graphics integration
+vram_management_transfer_system:
+                       LDA.B #$07                           ; Set bank for VRAM operations
+                       PHA                                  ; Push bank to stack
+                       PLB                                  ; Pull bank from stack
+                       LDY.W #$DDC4                         ; Load VRAM destination address
+                       LDX.W #$1A00                         ; Load VRAM source address
+                       STX.B SNES_WMADDL-$2100              ; Set WRAM address low
+                       LDX.W #$0088                         ; Set transfer count
+vram_transfer_loop_1:
+                       JSR.W CODE_01E90D                    ; Execute transfer operation
+                       DEX                                  ; Decrement counter
+                       BNE vram_transfer_loop_1             ; Continue if not zero
+                       LDX.W #$2C00                         ; Load secondary VRAM address
+                       STX.B SNES_WMADDL-$2100              ; Set WRAM address low
+                       LDX.W #$0008                         ; Set secondary transfer count
+vram_transfer_loop_2:
+                       JSR.W CODE_01E90D                    ; Execute transfer operation
+                       DEX                                  ; Decrement counter
+                       BNE vram_transfer_loop_2             ; Continue if not zero
+                       JSR.W CODE_01E811                    ; Execute final transfer setup
+                       JSR.W CODE_01E7F5                    ; Finalize VRAM operations
+                       RTS                                  ; Return from VRAM management
+
+; Advanced Graphics Data Processing Engine
+; Sophisticated graphics data processing with coordinate transformation and memory management
+; Implements complex data manipulation with multi-stage processing and DMA integration
+graphics_data_processing_engine:
+                       SEP #$20                             ; Set 8-bit accumulator mode
+                       LDA.B #$04                           ; Set graphics bank
+                       PHA                                  ; Push bank to stack
+                       PLB                                  ; Pull bank from stack
+                       STZ.W $2181                          ; Clear WRAM address port
+                       LDX.W #$7F42                         ; Load graphics data address
+                       STX.W $2182                          ; Set WRAM address high
+                       LDY.W #$F720                         ; Load graphics data source
+                       LDX.W #$0010                         ; Set data processing count
+graphics_data_loop:
+                       JSR.W CODE_01E90D                    ; Execute data processing
+                       DEX                                  ; Decrement counter
+                       BNE graphics_data_loop               ; Continue if not zero
+                       RTS                                  ; Return from data processing
+
+; Advanced Palette and Color Management System
+; Complex palette management with color processing and DMA coordination
+; Implements sophisticated color calculations with memory management integration
+palette_color_management_system:
+                       REP #$20                             ; Set 16-bit accumulator mode
+                       LDX.W #$0000                         ; Initialize palette index
+                       LDY.W #$C488                         ; Load palette data source
+palette_processing_loop:
+                       LDA.L DATA8_01E83F,X                 ; Load palette data
+                       AND.W #$00FF                         ; Mask to 8-bit value
+                       ASL A                                ; Shift for addressing
+                       ASL A                                ; Shift again
+                       ASL A                                ; Shift again
+                       ASL A                                ; Shift for final address
+                       ADC.W #$D824                         ; Add base palette address
+                       PHB                                  ; Save current bank
+                       PHX                                  ; Save current index
+                       TAX                                  ; Transfer address to index
+                       LDA.W #$000F                         ; Set transfer length
+                       MVN $7F,$07                          ; Execute block move
+                       PLX                                  ; Restore index
+                       PLB                                  ; Restore bank
+                       TYA                                  ; Transfer Y to accumulator
+                       CLC                                  ; Clear carry for addition
+                       ADC.W #$0010                         ; Add palette entry size
+                       TAY                                  ; Transfer back to Y
+                       INX                                  ; Increment palette index
+                       CPX.W #$0007                         ; Compare with palette count
+                       BNE palette_processing_loop          ; Continue if not complete
+                       RTS                                  ; Return from palette management
+
+; Advanced Color Conversion and Processing Engine
+; Sophisticated color conversion with coordinate processing and DMA integration
+; Manages complex color transformations with memory management coordination
+color_conversion_processing_engine:
+                       PHD                                  ; Save direct page register
+                       PHX                                  ; Save X register
+                       PEA.W $2100                          ; Push hardware register page
+                       PLD                                  ; Pull to direct page
+                       REP #$20                             ; Set 16-bit accumulator mode
+                       TYA                                  ; Transfer Y to accumulator
+                       CLC                                  ; Clear carry for addition
+                       ADC.W #$0018                         ; Add color offset
+                       PHA                                  ; Save result
+                       DEC A                                ; Decrement for processing
+                       PHA                                  ; Save decremented value
+                       SBC.W #$0008                         ; Subtract color component offset
+                       TAY                                  ; Transfer to Y register
+                       LDA.W #$0000                         ; Clear accumulator
+                       SEP #$20                             ; Set 8-bit accumulator mode
+                       LDX.W #$0008                         ; Set color component count
+color_component_loop:
+                       PHX                                  ; Save component counter
+                       LDA.W $0000,Y                        ; Load color component
+                       INY                                  ; Increment source pointer
+                       TAX                                  ; Transfer to index
+                       LDA.L DATA8_02E236,X                 ; Load converted color value
+                       STA.B SNES_WMDATA-$2100              ; Store to hardware register
+                       LDA.W $0000,Y                        ; Load next component
+                       DEY                                  ; Decrement for processing
+                       TAX                                  ; Transfer to index
+                       LDA.L DATA8_02E236,X                 ; Load converted color value
+                       STA.B SNES_WMDATA-$2100              ; Store to hardware register
+                       DEY                                  ; Decrement source pointer
+                       DEY                                  ; Decrement again
+                       PLX                                  ; Restore component counter
+                       DEX                                  ; Decrement counter
+                       BNE color_component_loop             ; Continue if not complete
+                       PLY                                  ; Restore Y register
+                       PLX                                  ; Restore X register
+                       PLD                                  ; Restore direct page
+                       RTS                                  ; Return from color conversion
+
+; Advanced Battle State and Memory Coordination System
+; Complex battle state management with memory coordination and DMA processing
+; Implements sophisticated state control with multi-system integration
+battle_state_memory_coordination_system:
+                       LDX.W $0092                          ; Load battle state parameter
+                       STX.W $1A60                          ; Store to battle state register
+                       LDA.B #$01                           ; Set battle bank
+                       PHA                                  ; Push bank to stack
+                       PLB                                  ; Pull bank from stack
+                       LDA.W $0E91                          ; Load current battle map
+                       BEQ battle_world_map_processing      ; Branch if world map
+                       ; Battle map processing
+                       STZ.W $194B                          ; Clear battle state flag
+                       STZ.W $194C                          ; Clear battle counter
+                       LDA.W $0E8D                          ; Load encounter status
+                       BNE battle_state_processing          ; Branch if encounter active
+                       LDA.W $19CC                          ; Load battle trigger data
+                       BMI battle_state_processing          ; Branch if negative
+                       XBA                                  ; Exchange bytes
+                       LDA.W $19CB                          ; Load battle configuration
+                       ASL A                                ; Shift for processing
+                       XBA                                  ; Exchange bytes back
+                       ROL A                                ; Rotate with carry
+                       AND.B #$0F                           ; Mask to battle type
+                       STA.W $194B                          ; Store battle type
+                       BEQ battle_state_processing          ; Branch if zero
+                       LDA.B #$40                           ; Load battle flag constant
+                       TRB.W $1A60                          ; Test and reset bit
+                       LDA.B #$50                           ; Load additional battle flag
+                       TRB.W $1A61                          ; Test and reset bit
+battle_state_processing:
+                       JSR.W CODE_01F1F3                    ; Execute battle state function
+                       ASL A                                ; Shift for table lookup
+                       TAX                                  ; Transfer to index
+                       JMP.W (DATA8_01F3CB,X)               ; Jump to battle function
+battle_world_map_processing:
+                       LDA.W $1A5B                          ; Load world map flag
+                       BNE world_map_complete               ; Branch if set
+                       LDY.W $0015                          ; Load world state
+                       STY.W $1A60                          ; Store to state register
+world_map_complete:
+                       JSR.W CODE_01F1F3                    ; Execute world map function
+                       ASL A                                ; Shift for table lookup
+                       TAX                                  ; Transfer to index
+                       JMP.W (DATA8_01F3E1,X)               ; Jump to world map function
+
+; Advanced Animation and Graphics State Control
+; Sophisticated animation control with graphics state management and memory coordination
+; Implements complex animation processing with multi-frame coordination and DMA integration
+animation_graphics_state_control:
+                       STZ.W $19AF                          ; Clear animation state
+                       LDA.W $194B                          ; Load battle state
+                       BEQ animation_standard_processing    ; Branch if standard mode
+                       BIT.B #$08                           ; Test animation mode bit
+                       BEQ animation_special_processing     ; Branch if special mode
+                       AND.B #$07                           ; Mask animation type
+                       BNE animation_type_processing        ; Branch if type set
+                       BRA animation_complete               ; Branch to completion
+animation_standard_processing:
+                       LDA.W $1929                          ; Load animation timer
+                       BNE animation_timer_processing       ; Branch if timer active
+                       LDA.W $1993                          ; Load graphics state
+                       CMP.B #$10                           ; Compare with standard value
+                       BEQ animation_complete               ; Branch if complete
+animation_timer_processing:
+                       LDA.B #$10                           ; Set standard graphics value
+                       STA.W $1993                          ; Store graphics state
+                       STZ.W $1929                          ; Clear animation timer
+                       LDA.B #$04                           ; Return animation code
+                       RTS                                  ; Return from animation
+animation_complete:
+                       LDA.B #$00                           ; Return completion code
+                       RTS                                  ; Return from animation
+animation_type_processing:
+                       INC.W $194C                          ; Increment animation counter
+                       LDA.B #$83                           ; Set animation mode
+                       STA.W $1929                          ; Store animation timer
+                       LDX.W #$0006                         ; Set animation parameter
+                       BRA animation_setup                  ; Branch to setup
+animation_special_processing:
+                       LDA.W $194B                          ; Load battle state
+                       TAX                                  ; Transfer to index
+                       SEP #$10                             ; Set 8-bit index mode
+                       REP #$10                             ; Set 16-bit index mode
+                       LDA.B #$80                           ; Set special animation mode
+                       STA.W $1929                          ; Store animation timer
+animation_setup:
+                       STZ.W $19F9                          ; Clear animation flag
+                       LDA.B #$10                           ; Set graphics value
+                       STA.W $1993                          ; Store graphics state
+                       LDA.W DATA8_01F400,X                 ; Load animation data
+                       STA.W $19D7                          ; Store animation parameter
+                       LDA.W UNREACH_01F407,X               ; Load animation mode
+                       STA.W $1928                          ; Store animation mode
+                       JMP.W CODE_01EAB0                    ; Jump to animation processor
+; Advanced Battle Processing and Memory Management Systems for FFMQ Bank $01
+; Cycle 8 Implementation Part 2: Pathfinding Algorithms and Advanced State Management
+; Source analysis: Lines 13000-13500 with sophisticated pathfinding and battle coordination
+
+; Advanced Battle Direction and Movement Processing Engine
+; Sophisticated battle movement system with direction processing and coordinate management
+; Implements complex movement calculations with multi-directional support and state coordination
+battle_direction_movement_processing_engine:
+                       LDA.W $19D3                          ; Load current direction state
+                       STA.W $193B                          ; Store to movement buffer
+                       LDA.W $19D5                          ; Load target direction state
+                       STA.W $19D3                          ; Store as current direction
+                       LDX.W $19CF                          ; Load movement configuration
+                       STX.W $19CB                          ; Store movement state
+                       LDA.W $19D0                          ; Load movement flags
+                       LDY.W $19F1                          ; Load movement index
+                       JSR.W CODE_01F36A                    ; Execute movement processing
+                       LDA.W $193B                          ; Load movement buffer
+                       EOR.W $19D5                          ; XOR with target direction
+                       BMI battle_direction_reverse         ; Branch if direction reversed
+                       LDA.B #$02                           ; Set forward movement code
+                       RTS                                  ; Return from movement processing
+battle_direction_reverse:
+                       LDA.B #$08                           ; Load direction toggle bit
+                       EOR.W $19B4                          ; XOR with battle state
+                       STA.W $19B4                          ; Store updated battle state
+                       LDA.B #$03                           ; Set reverse movement code
+                       RTS                                  ; Return from movement processing
+
+; Advanced Battle State Validation and Control System
+; Complex battle state validation with error checking and state management
+; Implements sophisticated state control with multi-condition validation and coordination
+battle_state_validation_control_system:
+                       LDA.W $194B                          ; Load battle mode state
+                       BIT.B #$08                           ; Test battle mode bit
+                       BEQ battle_state_standard            ; Branch if standard battle
+                       LDA.B #$00                           ; Set inactive state code
+                       RTS                                  ; Return from validation
+battle_state_standard:
+                       LDA.B #$04                           ; Set active battle code
+                       RTS                                  ; Return from validation
+
+; Advanced Character Interaction and Battle Processing
+; Sophisticated character interaction system with battle coordination and state management
+; Manages complex character relationships with multi-character battle integration
+character_interaction_battle_processing:
+                       LDA.W $1A7F,X                        ; Load character interaction flags
+                       BIT.B #$08                           ; Test interaction mode bit
+                       BNE character_interaction_special    ; Branch if special interaction
+                       AND.B #$03                           ; Mask interaction type
+                       CMP.B #$01                           ; Compare with standard type
+                       BNE battle_state_standard            ; Branch if not standard
+                       LDA.B #$07                           ; Set special interaction code
+                       RTS                                  ; Return from interaction
+character_interaction_special:
+                       BIT.B #$10                           ; Test special interaction bit
+                       BEQ character_interaction_advanced   ; Branch if advanced mode
+                       ; Special character configuration processing
+                       LDA.W $1A80,X                        ; Load character configuration
+                       AND.B #$07                           ; Mask configuration bits
+                       STA.W $192B                          ; Store configuration parameter
+                       LDA.W $19CF                          ; Load character state
+                       AND.B #$F8                           ; Clear lower bits
+                       ORA.W $192B                          ; OR with configuration
+                       STA.W $19CF                          ; Store updated character state
+                       JMP.W CODE_01EAD2                    ; Jump to character processor
+character_interaction_advanced:
+                       LDA.B #$20                           ; Set advanced processing mode
+                       STA.W $1993                          ; Store graphics state
+                       LDX.W $19E8                          ; Load character index
+                       STX.W $19EA                          ; Store character backup
+                       LDA.W $19E6                          ; Load character parameter
+                       STA.W $19E7                          ; Store character state
+                       LDA.W $19EC                          ; Load character mode
+                       STA.W $19ED                          ; Store character backup
+                       JSR.W CODE_01F21F                    ; Execute character processing
+                       RTS                                  ; Return from interaction
+
+; Advanced Battle Collision and Movement Validation
+; Complex collision detection with movement validation and coordinate processing
+; Implements sophisticated collision algorithms with multi-layer validation and state management
+battle_collision_movement_validation:
+                       LDA.W $19B4                          ; Load battle movement state
+                       AND.B #$07                           ; Mask movement direction
+                       BEQ battle_state_standard            ; Branch if no movement
+                       EOR.W $19D1                          ; XOR with collision state
+                       AND.B #$07                           ; Mask collision bits
+                       BNE battle_state_standard            ; Branch if collision detected
+                       JSR.W CODE_01F2CB                    ; Execute collision validation
+                       BCS battle_state_standard            ; Branch if collision confirmed
+                       LDA.W $19D6                          ; Load collision data
+                       LSR A                                ; Shift collision flags
+                       LSR A                                ; Shift again
+                       LSR A                                ; Shift again
+                       LSR A                                ; Shift for final position
+                       EOR.W $19B4                          ; XOR with battle state
+                       AND.B #$08                           ; Mask collision type bit
+                       BNE battle_state_standard            ; Branch if collision type mismatch
+                       LDA.B #$01                           ; Set movement validation mode
+                       STA.W $1926                          ; Store validation state
+                       LDY.W $19F1                          ; Load movement index
+                       LDX.W #$0000                         ; Clear collision index
+                       JSR.W CODE_01F298                    ; Execute movement validation
+                       JSR.W CODE_01F326                    ; Execute collision processing
+                       BCC collision_validation_complete    ; Branch if validation complete
+                       INC.W $1926                          ; Increment validation state
+collision_validation_complete:
+                       LDA.W $19D5                          ; Load target movement state
+                       STA.W $19D3                          ; Store as current state
+                       LDX.W $19CF                          ; Load movement configuration
+                       STX.W $19CB                          ; Store movement backup
+                       LDA.W $19D0                          ; Load movement flags
+                       LDY.W $19F1                          ; Load movement index
+                       JSR.W CODE_01F36A                    ; Execute movement coordination
+                       LDA.B #$0C                           ; Set movement completion code
+                       RTS                                  ; Return from collision validation
+
+; Advanced Battle Environment and Location Processing
+; Sophisticated environment processing with location validation and state management
+; Manages complex environment interactions with battle coordination and memory management
+battle_environment_location_processing:
+                       LDA.W $0E8B                          ; Load environment data
+                       STA.W $19D7                          ; Store environment state
+                       JSR.W CODE_01F212                    ; Execute environment processing
+                       JSR.W CODE_01F2CB                    ; Execute location validation
+                       BCC environment_processing_standard  ; Branch if standard processing
+                       LDA.W $1A7F,X                        ; Load location flags
+                       AND.B #$03                           ; Mask location type
+                       ASL A                                ; Shift for table lookup
+                       TAX                                  ; Transfer to index
+                       LDA.W $0094                          ; Load system flags
+                       AND.B #$80                           ; Test system mode bit
+                       BEQ environment_location_check       ; Branch if standard mode
+                       SEP #$10                             ; Set 8-bit index mode
+                       REP #$10                             ; Set 16-bit index mode
+                       JMP.W (DATA8_01F40F,X)               ; Jump to location function
+environment_location_check:
+                       LDA.W $1031                          ; Load location identifier
+                       CMP.B #$26                           ; Compare with location range start
+                       BCC environment_location_alternate   ; Branch if below range
+                       CMP.B #$29                           ; Compare with location range end
+                       BCC environment_processing_standard  ; Branch if in range
+environment_location_alternate:
+                       TXA                                  ; Transfer index to accumulator
+                       CMP.B #$06                           ; Compare with alternate type
+                       BNE environment_location_error       ; Branch if type mismatch
+environment_processing_standard:
+                       LDA.W $1031                          ; Load location identifier
+                       SEC                                  ; Set carry for subtraction
+                       SBC.B #$20                           ; Subtract base location offset
+                       CMP.B #$0C                           ; Compare with location range
+                       BCS environment_location_error       ; Branch if out of range
+                       ASL A                                ; Shift for table lookup
+                       TAX                                  ; Transfer to index
+                       SEP #$10                             ; Set 8-bit index mode
+                       REP #$10                             ; Set 16-bit index mode
+                       JMP.W (DATA8_01F417,X)               ; Jump to location processor
+environment_location_error:
+                       LDA.B #$BF                           ; Load error flag
+                       TRB.W $1A60                          ; Test and reset error bit
+                       JMP.W CODE_01E9EA                    ; Jump to error handler
+
+; Advanced Battle Trigger and Event Processing System
+; Complex battle trigger system with event processing and state coordination
+; Implements sophisticated trigger algorithms with multi-event support and memory management
+battle_trigger_event_processing_system:
+                       JSR.W CODE_01EC3D                    ; Execute trigger validation
+                       LDA.W $19D0                          ; Load trigger state
+                       BPL trigger_processing_standard      ; Branch if standard trigger
+                       BIT.B #$20                           ; Test trigger type bit
+                       BEQ trigger_processing_standard      ; Branch if standard type
+                       AND.B #$1F                           ; Mask trigger identifier
+                       STA.W $19EE                          ; Store trigger parameter
+                       LDA.B #$0F                           ; Set trigger mode
+                       STA.W $19EF                          ; Store trigger configuration
+                       INC.W $19B0                          ; Increment trigger counter
+trigger_processing_standard:
+                       STZ.W $1929                          ; Clear trigger timer
+                       LDA.B #$10                           ; Set standard trigger value
+                       STA.W $1993                          ; Store trigger state
+                       LDA.B #$0A                           ; Set trigger return code
+                       RTS                                  ; Return from trigger processing
+
+; Advanced Battle State Machine and Flow Control
+; Sophisticated state machine with flow control and multi-state coordination
+; Manages complex battle flow with state transitions and coordination systems
+battle_state_machine_flow_control:
+                       LDA.W $194B                          ; Load battle state machine state
+                       BEQ battle_flow_standard             ; Branch if standard flow
+                       BIT.B #$08                           ; Test state machine mode bit
+                       BNE battle_flow_standard             ; Branch if standard mode
+                       JMP.W CODE_01EA3E                    ; Jump to advanced flow processor
+battle_flow_standard:
+                       LDA.B #$00                           ; Set standard flow code
+                       RTS                                  ; Return from state machine
+
+; Advanced Battle Animation and Graphics State Control
+; Complex animation control with graphics state management and coordination
+; Implements sophisticated animation processing with multi-frame coordination and memory management
+battle_animation_graphics_state_control:
+                       INC.W $19AF                          ; Increment animation counter
+battle_animation_processing:
+                       LDA.W $194B                          ; Load animation state
+                       CMP.B #$0B                           ; Compare with animation mode
+                       BNE battle_animation_state_setup     ; Branch if not animation mode
+                       JMP.W CODE_01EA31                    ; Jump to animation processor
+battle_animation_state_setup:
+                       STZ.W $1A60                          ; Clear animation state register
+                       LDA.B #$F0                           ; Load animation mask
+                       TRB.W $1A61                          ; Test and reset animation bits
+                       JSR.W CODE_01F1F3                    ; Execute animation function
+                       ASL A                                ; Shift for table lookup
+                       TAX                                  ; Transfer to index
+                       INC.W $194C                          ; Increment animation frame counter
+                       JMP.W (DATA8_01F3F7,X)               ; Jump to animation state function
+
+; Advanced Multi-Path Battle Processing Engine
+; Sophisticated multi-path processing with pathfinding and coordinate management
+; Implements complex pathfinding algorithms with multi-destination support and state coordination
+multi_path_battle_processing_engine:
+                       LDA.W $19AF                          ; Load pathfinding state
+                       BNE battle_animation_graphics_state_control ; Branch if active pathfinding
+                       INC.W $19AF                          ; Increment pathfinding counter
+                       LDA.W $0E8D                          ; Load pathfinding mode
+                       BNE battle_animation_processing      ; Branch if pathfinding active
+                       LDA.W $19CB                          ; Load pathfinding configuration
+                       AND.B #$70                           ; Mask pathfinding type
+                       CMP.B #$30                           ; Compare with pathfinding mode
+                       BEQ battle_animation_processing      ; Branch if pathfinding mode
+                       LDA.W $194B                          ; Load battle pathfinding state
+                       BEQ pathfinding_standard_setup       ; Branch if standard pathfinding
+                       BIT.B #$08                           ; Test pathfinding mode bit
+                       BNE pathfinding_standard_setup       ; Branch if standard mode
+pathfinding_standard_setup:
+                       STZ.W $1929                          ; Clear pathfinding timer
+                       LDA.B #$10                           ; Set standard pathfinding value
+                       STA.W $1993                          ; Store pathfinding state
+                       LDY.W #$FF01                         ; Load pathfinding configuration
+                       STY.W $1926                          ; Store pathfinding parameters
+                       LDA.W $19B4                          ; Load battle pathfinding data
+                       AND.B #$07                           ; Mask pathfinding direction
+                       STA.W $1933                          ; Store pathfinding direction
+                       LDX.W $0E89                          ; Load pathfinding coordinates
+                       STX.W $193B                          ; Store pathfinding X coordinate
+                       LDX.W $19CB                          ; Load pathfinding state
+                       STX.W $193D                          ; Store pathfinding Y coordinate
+                       LDA.W $19D3                          ; Load pathfinding direction state
+                       STA.W $193F                          ; Store pathfinding direction backup
+                       LDX.W $19F1                          ; Load pathfinding index
+                       STX.W $1943                          ; Store pathfinding index backup
+                       LDX.W $19CF                          ; Load pathfinding configuration
+                       STX.W $1945                          ; Store pathfinding configuration backup
+                       LDA.W $19D5                          ; Load pathfinding target state
+                       STA.W $1947                          ; Store pathfinding target backup
+                       ; Pathfinding processing complete
+                       RTS                                  ; Return from pathfinding processing
+; =============================================================================
+; FFMQ Bank $01 - Cycle 9 Part 1: Advanced Graphics Processing and Coordinate Management
+; Lines 13500-14000: Battle graphics engine with coordinate transformation systems
+; =============================================================================
+
+; -----------------------------------------------------------------------------
+; Advanced Battle Coordinate Processing Engine
+; Complex coordinate masking, comparison, and transformation operations
+; Handles battle entity positioning with advanced bit manipulation
+; -----------------------------------------------------------------------------
+UNREACH_01EF3B:
+    ; Advanced coordinate masking operations with complex bit patterns
+    ; Uses specialized data block for coordinate transformation
+    db $9C,$AF,$19,$A9,$E0,$1C,$61,$1A,$4C,$EA,$E9  ; Coordinate transformation data
+
+; Advanced Battle Entity State Management System
+; Sophisticated state initialization with multi-register coordination
+CODE_01EF46:
+    LDA.B #$01                     ; Initialize primary state register
+    STA.W $19F9                    ; Set battle entity primary state
+    STA.W $1928                    ; Set battle coordination flag
+    LDA.B #$10                     ; Set advanced positioning mode
+    STA.W $1993                    ; Store positioning control
+    STZ.W $1929                    ; Clear secondary state register
+    LDA.W $0E8B                    ; Load battle environment context
+    STA.W $19D7                    ; Store environment reference
+    JSR.W CODE_01F212              ; Execute coordinate preprocessing
+    JSR.W CODE_01F21F              ; Execute coordinate finalization
+    
+; Advanced Coordinate Bit Analysis Engine
+; Sophisticated bit field extraction and analysis for battle positioning
+Advanced_Coordinate_Analysis:
+    LDA.W $19B4                    ; Load primary coordinate register
+    AND.B #$07                     ; Extract lower coordinate bits
+    STA.W $193B                    ; Store X-axis coordinate component
+    LDA.W $19CF                    ; Load secondary coordinate register
+    AND.B #$07                     ; Extract coordinate fragment
+    STA.W $193C                    ; Store Y-axis coordinate component
+    LDA.W $19D1                    ; Load tertiary coordinate register
+    AND.B #$07                     ; Extract Z-axis coordinate fragment
+    STA.W $193D                    ; Store depth coordinate component
+
+; Multi-Dimensional Battle Entity Processing System
+; Advanced entity tracking with coordinate validation and error checking
+Multi_Entity_Coordinate_Processing:
+    LDX.W #$0000                   ; Initialize entity index
+    STX.W $193F                    ; Clear entity processing flags
+    LDY.W $19F1                    ; Load primary entity reference
+    JSR.W CODE_01F2CB              ; Execute entity coordinate validation
+    BCC Entity_Processing_Complete ; Branch if validation successful
+    
+; Advanced Entity Attribute Processing
+; Complex attribute analysis with specialized bit manipulation
+Entity_Attribute_Analysis:
+    LDA.W $1A7F,X                  ; Load entity attribute data
+    AND.B #$03                     ; Extract attribute type bits
+    DEC A                          ; Decrement for zero-based indexing
+    BNE Continue_Attribute_Processing
+    db $A9,$07,$60                 ; Advanced attribute completion code
+
+Continue_Attribute_Processing:
+    INC.W $193F                    ; Increment processing counter
+    LDA.W $1A7F,X                  ; Reload entity attributes
+    BIT.B #$08                     ; Test advanced attribute flag
+    BEQ Entity_Processing_Complete ; Branch if basic attributes only
+    
+; Advanced Multi-Bit Attribute Processing Engine
+; Sophisticated attribute manipulation with complex data flow
+Advanced_Attribute_Engine:
+    db $89,$10,$F0,$18,$BD,$80,$1A,$29,$07,$8D,$3C,$19,$AD,$CF,$19,$29
+    db $F8,$0D,$3C,$19,$8D,$CF,$19,$9C,$3F,$19,$80,$13,$AC,$F1,$19,$A2
+    db $00,$00,$20,$98,$F2,$20,$26,$F3,$90,$05,$A9,$07,$8D,$3C,$19
+
+Entity_Processing_Complete:
+    ; Advanced secondary entity coordinate processing
+    LDY.W $19F3                    ; Load secondary entity reference
+    JSR.W CODE_01F2CB              ; Execute coordinate validation
+    BCC Secondary_Processing_Complete
+
+; Secondary Entity Advanced Processing
+; Complex secondary entity management with state coordination
+Secondary_Entity_Processing:
+    INC.W $1940                    ; Increment secondary processing counter
+    LDA.W $1A7F,X                  ; Load secondary entity attributes
+    AND.B #$18                     ; Extract secondary attribute flags
+    CMP.B #$18                     ; Check for advanced secondary mode
+    BNE Secondary_Processing_Complete
+
+; Advanced Secondary Attribute Coordination
+; Sophisticated attribute synchronization between primary and secondary entities
+Secondary_Attribute_Coordination:
+    LDA.W $1A80,X                  ; Load secondary attribute extension
+    AND.B #$07                     ; Extract coordination bits
+    STA.W $193D                    ; Store coordinated attribute
+    LDA.W $19D1                    ; Load primary coordination register
+    AND.B #$F8                     ; Preserve upper coordination bits
+    ORA.W $193D                    ; Merge with secondary attributes
+    STA.W $19D1                    ; Store unified coordination state
+    STZ.W $1940                    ; Clear secondary processing counter
+
+Secondary_Processing_Complete:
+    ; Advanced battle state differential analysis
+    LDA.W $19D3                    ; Load primary battle state
+    EOR.W $19D5                    ; Compare with secondary state
+    BMI Advanced_State_Mismatch    ; Branch if state conflict detected
+
+; Advanced Battle State Validation Engine
+; Complex state validation with multiple validation layers
+Battle_State_Validation:
+    LDA.W $19CF                    ; Load coordinate state
+    AND.B #$70                     ; Extract state classification bits
+    CMP.B #$30                     ; Check for advanced state mode
+    BEQ Advanced_State_Mismatch    ; Branch if advanced mode conflict
+    CMP.B #$20                     ; Check for intermediate state mode
+    BEQ Advanced_State_Mismatch    ; Branch if intermediate conflict
+    
+; State-Specific Attribute Validation
+    LDA.W $19D0                    ; Load state-specific attributes
+    BMI Negative_State_Processing  ; Branch for negative state handling
+    BIT.B #$04                     ; Test state-specific flag
+    BNE Advanced_State_Mismatch    ; Branch if flag conflict
+
+Negative_State_Processing:
+    CMP.B #$84                     ; Check for specific negative state A
+    BEQ Advanced_State_Mismatch    ; Branch if state A conflict
+    CMP.B #$85                     ; Check for specific negative state B
+    BNE Continue_State_Validation  ; Continue if no state B conflict
+
+Advanced_State_Mismatch:
+    db $A9,$07,$8D,$3C,$19         ; Set advanced error state
+
+Continue_State_Validation:
+    ; Parallel state validation for tertiary battle state
+    LDA.W $19D3                    ; Reload primary battle state
+    EOR.W $19D6                    ; Compare with tertiary state
+    BMI Tertiary_State_Error       ; Branch if tertiary conflict
+
+; Tertiary Battle State Processing Engine
+; Advanced tertiary state management with complex validation
+Tertiary_State_Processing:
+    LDA.W $19D1                    ; Load tertiary coordinate state
+    AND.B #$70                     ; Extract tertiary classification
+    CMP.B #$30                     ; Check tertiary advanced mode
+    BEQ Tertiary_State_Error       ; Branch if advanced tertiary conflict
+    CMP.B #$20                     ; Check tertiary intermediate mode
+    BEQ Tertiary_State_Error       ; Branch if intermediate tertiary conflict
+
+; Tertiary-Specific Attribute Validation
+    LDA.W $19D2                    ; Load tertiary-specific attributes
+    BMI Tertiary_Negative_Processing ; Branch for negative tertiary state
+    BIT.B #$04                     ; Test tertiary-specific flag
+    BNE Tertiary_State_Error       ; Branch if tertiary flag conflict
+
+Tertiary_Negative_Processing:
+    CMP.B #$84                     ; Check for tertiary negative state A
+    BEQ Tertiary_State_Error       ; Branch if tertiary state A conflict
+    CMP.B #$85                     ; Check for tertiary negative state B
+    BNE Multi_State_Coordination   ; Continue if no tertiary state B conflict
+
+Tertiary_State_Error:
+    LDA.B #$07                     ; Set tertiary error code
+    STA.W $193D                    ; Store tertiary error state
+
+; Advanced Multi-State Coordination Engine
+; Sophisticated coordination between multiple battle states
+Multi_State_Coordination:
+    LDX.W #$0000                   ; Initialize coordination index
+    TXY                            ; Transfer to Y register
+    LDA.W $193C                    ; Load secondary coordination state
+    BEQ Primary_Coordination_Mode  ; Branch if primary mode only
+    CMP.B #$07                     ; Check for advanced coordination mode
+    BCS Complex_Coordination_Error ; Branch if coordination overflow
+
+; Primary-Secondary Coordination Analysis
+Primary_Secondary_Coordination:
+    LDA.W $193B                    ; Load primary coordination reference
+    BEQ Primary_Coordination_Mode  ; Branch if primary mode active
+    CMP.W $193C                    ; Compare primary with secondary
+    BEQ Primary_Coordination_Mode  ; Branch if coordination match
+    BCC Complex_Coordination_Error ; Branch if coordination underflow
+    
+; Advanced Coordination State Machine
+    LDA.W $1940                    ; Load coordination state machine
+    BNE Complex_Coordination_Error ; Branch if state machine conflict
+    DEY                            ; Decrement coordination counter
+    LDA.W $193D                    ; Load tertiary coordination
+    BEQ Coordination_Complete      ; Branch if tertiary coordination complete
+    CMP.W $193B                    ; Compare tertiary with primary
+    BEQ Coordination_Complete      ; Branch if coordination synchronized
+    INY                            ; Increment coordination counter
+    BRA Complex_Coordination_Error ; Branch to error handling
+
+Primary_Coordination_Mode:
+    ; Advanced primary-only coordination processing
+    LDA.W $1940                    ; Load primary coordination state
+    BNE Secondary_Coordination_Fallback ; Branch if secondary fallback needed
+    LDA.W $193D                    ; Load primary coordination reference
+    BEQ Coordination_Complete      ; Branch if coordination complete
+    CMP.B #$07                     ; Check for coordination overflow
+    BCS Secondary_Coordination_Fallback ; Branch if overflow detected
+    
+; Primary Coordination Validation
+    LDA.W $193B                    ; Load primary validation reference
+    BEQ Tertiary_Coordination_Check ; Branch if tertiary check needed
+    CMP.W $193D                    ; Compare primary with reference
+    BEQ Coordination_Complete      ; Branch if validation successful
+
+Secondary_Coordination_Fallback:
+    ; Handle coordination fallback scenarios
+    LDA.W $193F                    ; Load fallback state
+    BNE Complex_Coordination_Error ; Branch if fallback conflict
+    BRA Coordination_Success       ; Branch to success handler
+
+Tertiary_Coordination_Check:
+    ; Advanced tertiary coordination validation
+    LDA.W $193C                    ; Load tertiary coordination state
+    BEQ Coordination_Complete      ; Branch if tertiary complete
+    CMP.W $193D                    ; Compare with coordination reference
+    BNE Secondary_Coordination_Fallback ; Branch if tertiary mismatch
+
+Coordination_Complete:
+    INX                            ; Increment completion counter
+
+Coordination_Success:
+    INX                            ; Increment success counter
+
+Complex_Coordination_Error:
+    ; Store coordination results and prepare for battle processing
+    TYA                            ; Transfer coordination state
+    STA.W $1927                    ; Store coordination result
+    TXA                            ; Transfer success state
+    STA.W $1926                    ; Store success result
+    BEQ Battle_Processing_Complete ; Branch if no further processing needed
+
+; Advanced Battle Processing Decision Engine
+; Complex decision tree for battle action processing
+Battle_Processing_Decision:
+    DEC A                          ; Decrement for decision analysis
+    BNE Secondary_Battle_Processing ; Branch if secondary processing needed
+    LDY.W $19F1                    ; Load primary battle context
+    LDA.W $19D0                    ; Load primary battle state
+    BRA Execute_Battle_Processing  ; Branch to execution
+
+Secondary_Battle_Processing:
+    LDY.W $19F3                    ; Load secondary battle context
+    LDA.W $19D2                    ; Load secondary battle state
+
+Execute_Battle_Processing:
+    JSR.W CODE_01F36A              ; Execute advanced battle processing
+
+Battle_Processing_Complete:
+    ; Final battle validation and preparation for next cycle
+    LDY.W $0E89                    ; Load environment context
+    JSR.W CODE_01F326              ; Execute environment validation
+    BCS Battle_Validation_Error    ; Branch if validation failed
+
+; Multi-Level Battle Validation System
+Advanced_Battle_Validation:
+    LDA.W $1926                    ; Load battle validation state
+    BEQ Battle_State_Success       ; Branch if validation successful
+    LDY.W $19F1                    ; Load primary validation context
+    DEC A                          ; Decrement for validation analysis
+    BEQ Primary_Validation_Mode    ; Branch if primary validation
+    LDY.W $19F3                    ; Load secondary validation context
+
+Primary_Validation_Mode:
+    ; Advanced validation processing with environment coordination
+    LDA.B #$00                     ; Clear validation register
+    XBA                            ; Exchange accumulator bytes
+    LDA.W $0E8B                    ; Load environment validation context
+    ASL A                          ; Shift for validation indexing
+    TAX                            ; Transfer to index register
+    PHX                            ; Preserve validation index
+    JSR.W CODE_01F326              ; Execute validation processing
+    PLX                            ; Restore validation index
+    BCS Battle_Validation_Error    ; Branch if validation failed
+    
+; Final validation confirmation
+    LDY.W $19F1                    ; Load final validation context
+    JSR.W CODE_01F326              ; Execute final validation
+    BCS Battle_Validation_Error    ; Branch if final validation failed
+
+Battle_State_Success:
+    LDA.B #$03                     ; Set success state
+    TSB.W $19B4                    ; Set success flags
+
+Battle_Validation_Error:
+    LDA.B #$06                     ; Set error state
+    RTS                            ; Return with error status
+
+; Advanced Environment Validation System
+; Sophisticated environment processing with multi-layer validation
+Environment_Validation_System:
+    LDY.W $0E89                    ; Load environment context
+    JSR.W CODE_01F326              ; Execute environment validation
+    BCS Environment_Validation_Error ; Branch if environment validation failed
+
+Environment_Success:
+    LDA.B #$05                     ; Set environment success state
+    RTS                            ; Return with success status
+
+; Advanced Battle Mode Processing
+; Complex battle mode management with state coordination
+Advanced_Battle_Mode_Processing:
+    LDA.B #$60                     ; Set advanced battle mode
+    TRB.W $1A61                    ; Clear advanced mode flags
+    JMP.W CODE_01E9EA              ; Jump to battle mode handler
+
+; Battle Mode Validation and State Management
+Battle_Mode_Validation:
+    LDY.W $0E89                    ; Load battle mode context
+    JSR.W CODE_01F326              ; Execute mode validation
+    BCS Environment_Validation_Error ; Branch if mode validation failed
+
+Battle_Mode_Success:
+    LDA.B #$10                     ; Set battle mode success
+    RTS                            ; Return with success status
+
+; Advanced Battle Attribute Validation
+; Complex attribute validation with error handling
+Battle_Attribute_Validation:
+    LDA.W $1A5B                    ; Load battle attribute state
+    BEQ Environment_Success        ; Branch if attributes valid
+
+Environment_Validation_Error:
+    db $A9,$00,$60                 ; Return with validation error
+
+; Secondary Battle Attribute Processing
+Secondary_Battle_Attributes:
+    LDA.W $1A5B                    ; Load secondary attribute state
+    BEQ Battle_Mode_Success        ; Branch if secondary attributes valid
+    db $A9,$00,$60                 ; Return with secondary error
+
+; Advanced Battle Initialization System
+; Sophisticated battle setup with multi-component initialization
+Advanced_Battle_Initialization:
+    LDA.W $1A5B                    ; Load initialization state
+    BNE Battle_Initialization_Complete ; Branch if already initialized
+    INC.W $19B0                    ; Increment initialization counter
+    LDX.W #$7000                   ; Set advanced initialization mode
+    STX.W $19EE                    ; Store initialization reference
+
+Battle_Initialization_Complete:
+    LDA.B #$00                     ; Clear initialization state
+    RTS                            ; Return initialization complete
+
+; Advanced Graphics Data Loading System
+; Complex graphics data management with advanced indexing
+Advanced_Graphics_Loading:
+    LDA.W $1A5B                    ; Load graphics loading state
+    BNE Graphics_Loading_Error     ; Branch if loading conflict
+    LDA.W DATA8_01F42D,X           ; Load graphics data reference
+    TAY                            ; Transfer to index register
+    LDA.W $0E88                    ; Load graphics context
+    DEC A                          ; Decrement for zero-based indexing
+    AND.B #$7F                     ; Mask for valid graphics range
+    ASL A                          ; Shift for double-byte indexing
+    TAX                            ; Transfer to graphics index
+    REP #$20                       ; Set 16-bit accumulator mode
+    LDA.L DATA8_07F011,X           ; Load graphics data pointer
+    TAX                            ; Transfer to graphics pointer
+    SEP #$20                       ; Set 8-bit accumulator mode
+    INY                            ; Increment graphics counter
+
+; Advanced Graphics Data Processing Loop
+Graphics_Data_Processing_Loop:
+    LDA.L $070000,X                ; Load graphics data byte
+    BPL Graphics_Data_Validation   ; Branch if positive data
+    INX                            ; Increment data pointer
+    BRA Graphics_Data_Processing_Loop ; Continue processing
+
+Graphics_Data_Validation:
+    DEY                            ; Decrement validation counter
+    BNE Graphics_Data_Processing_Continue ; Continue if more data
+    STA.W $1A5A                    ; Store validated graphics data
+    INX                            ; Increment to next data
+    STX.W $1A5D                    ; Store graphics data pointer
+    INC.W $19B0                    ; Increment graphics loading counter
+    LDX.W #$7001                   ; Set graphics completion mode
+    STX.W $19EE                    ; Store completion reference
+    LDA.B #$00                     ; Clear graphics loading state
+    RTS                            ; Return graphics loading complete
+
+Graphics_Data_Processing_Continue:
+    INX                            ; Increment graphics data pointer
+    BRA Graphics_Data_Processing_Loop ; Continue graphics processing
+
+Graphics_Loading_Error:
+    ; Handle graphics loading error scenarios
+    db $A9,$02,$8D,$28,$19,$BD,$2D,$F4,$8D,$D7,$19,$20,$B7,$F3,$B0,$ED
+    db $20,$12,$F2,$AD,$D5,$19,$8D,$D3,$19,$AE,$CF,$19,$8E,$CB,$19,$A9
+    db $02,$60,$EE,$B0,$19,$A2,$02,$70,$8E,$EE,$19,$A9,$00,$60
+
+; Advanced Special Graphics Mode Processing
+; Sophisticated special graphics handling with context validation
+Special_Graphics_Processing:
+    LDA.W $1A5B                    ; Load special graphics state
+    BEQ Special_Graphics_Active    ; Branch if special mode active
+    db $A9,$00,$60                 ; Return with special mode inactive
+
+Special_Graphics_Active:
+    ; Process special graphics with advanced context management
+    LDA.B #$00                     ; Clear special graphics register
+    XBA                            ; Exchange accumulator bytes
+    LDA.W $0E88                    ; Load special graphics context
+    DEC A                          ; Decrement for processing
+    CMP.B #$14                     ; Check for special graphics range
+    BCC Special_Graphics_Continue  ; Branch if in special range
+    
+; Advanced Special Graphics Initialization
+    INC.W $19B0                    ; Increment special graphics counter
+    REP #$20                       ; Set 16-bit mode
+    ASL A                          ; Shift for special indexing
+    TAX                            ; Transfer to special index
+    LDA.L DATA8_07EFA1,X           ; Load special graphics reference
+    STA.W $19EE                    ; Store special reference
+    SEP #$20                       ; Set 8-bit mode
+    LDA.B #$00                     ; Clear special state
+    RTS                            ; Return special processing complete
+
+Special_Graphics_Continue:
+    ; Continue special graphics processing with advanced algorithms
+    STA.W $0513                    ; Store special processing state
+    TAX                            ; Transfer to special index
+    LDA.L DATA8_01F437,X           ; Load special graphics data
+    SEP #$10                       ; Set 8-bit index mode
+    PHA                            ; Preserve special data
+    LSR A                          ; Shift for special analysis
+    LSR A                          ; Continue shift
+    LSR A                          ; Final shift
+    TAY                            ; Transfer to special counter
+    PLA                            ; Restore special data
+    AND.B #$07                     ; Mask for special bits
+    BEQ Special_Graphics_Direct    ; Branch if direct mode
+    
+; Advanced Special Graphics Bit Processing
+    JSL.L CODE_009776              ; Execute special bit processing
+    BEQ Special_Graphics_Direct    ; Branch if processing complete
+    TYA                            ; Transfer special counter
+    CLC                            ; Clear carry for addition
+    ADC.B #$08                     ; Add special offset
+    TAY                            ; Transfer back to counter
+
+Special_Graphics_Direct:
+    STY.W $0A9C                    ; Store special graphics result
+    INC.W $19B0                    ; Increment special completion counter
+    REP #$10                       ; Set 16-bit index mode
+    LDX.W #$7003                   ; Set special completion mode
+    STX.W $19EE                    ; Store completion mode
+    LDA.B #$00                     ; Clear special processing state
+    RTS                            ; Return special processing complete
+; =============================================================================
+; FFMQ Bank $01 - Cycle 9 Part 2: Advanced Battle Processing and Coordinate Systems
+; Lines 14000-14500: Complex coordinate transformation and battle management
+; =============================================================================
+
+; Advanced Battle State Analysis Engine
+; Sophisticated bit pattern analysis for battle state determination
+CODE_01F1F3:
+    LDA.B #$00                     ; Clear analysis register
+    XBA                            ; Exchange for double-byte processing
+    LDA.W $1A60                    ; Load primary battle state register
+    AND.B #$C0                     ; Extract high-order state bits
+    BEQ Standard_Battle_Analysis   ; Branch if standard battle mode
+    LDX.W #$000A                   ; Set advanced analysis mode
+    BRA Execute_Battle_Analysis    ; Branch to execution
+
+Standard_Battle_Analysis:
+    LDA.W $1A61                    ; Load secondary battle state
+    AND.B #$BF                     ; Clear specific battle flag
+    LDX.W #$0008                   ; Set standard analysis mode
+
+Execute_Battle_Analysis:
+    ASL A                          ; Shift for bit analysis
+    BCS Battle_Bit_Found           ; Branch if analysis bit found
+    DEX                            ; Decrement analysis counter
+    BNE Execute_Battle_Analysis    ; Continue analysis if counter non-zero
+
+Battle_Bit_Found:
+    TXA                            ; Transfer analysis result
+    RTS                            ; Return analysis complete
+
+; Advanced Coordinate Processing and Validation System
+; Multi-layered coordinate processing with validation and error handling
+CODE_01F212:
+    JSR.W CODE_01F22F              ; Execute primary coordinate processing
+    STA.W $19D5                    ; Store primary coordinate result
+    STX.W $19CF                    ; Store coordinate transformation index
+    STY.W $19F1                    ; Store coordinate validation reference
+    RTS                            ; Return coordinate processing complete
+
+; Secondary Coordinate Processing Engine
+; Advanced secondary coordinate management with state synchronization
+CODE_01F21F:
+    LDY.W $19F1                    ; Load primary coordinate reference
+    JSR.W CODE_01F232              ; Execute secondary coordinate processing
+    STA.W $19D6                    ; Store secondary coordinate result
+    STX.W $19D1                    ; Store secondary transformation index
+    STY.W $19F3                    ; Store secondary validation reference
+    RTS                            ; Return secondary processing complete
+
+; Primary Coordinate Transformation Engine
+; Sophisticated coordinate transformation with environment context
+CODE_01F22F:
+    LDY.W $0E89                    ; Load environment coordinate context
+
+; Advanced Coordinate Calculation Engine
+; Complex mathematical coordinate processing with multiple validation layers
+CODE_01F232:
+    LDA.B #$00                     ; Clear coordinate calculation register
+    XBA                            ; Exchange for calculation preparation
+    LDA.W $19D7                    ; Load coordinate base reference
+    ASL A                          ; Shift for double-byte indexing
+    TAX                            ; Transfer to coordinate index
+    REP #$20                       ; Set 16-bit accumulator mode
+    TYA                            ; Transfer environment context
+    SEP #$20                       ; Set 8-bit accumulator mode
+    CLC                            ; Clear carry for coordinate addition
+    ADC.W DATA8_0190D5,X           ; Add X-coordinate offset
+    XBA                            ; Exchange bytes for Y processing
+    CLC                            ; Clear carry for Y-coordinate addition
+    ADC.W DATA8_0190D6,X           ; Add Y-coordinate offset
+    BPL Positive_Y_Coordinate      ; Branch if Y-coordinate positive
+    CLC                            ; Clear carry for boundary handling
+    ADC.W $1925                    ; Add Y-boundary correction
+    BRA Process_X_Coordinate       ; Branch to X-coordinate processing
+
+Positive_Y_Coordinate:
+    CMP.W $1925                    ; Compare with Y-boundary
+    BCC Process_X_Coordinate       ; Branch if within Y-boundary
+    SEC                            ; Set carry for boundary correction
+    SBC.W $1925                    ; Subtract Y-boundary
+
+Process_X_Coordinate:
+    XBA                            ; Exchange for X-coordinate processing
+    BPL Positive_X_Coordinate      ; Branch if X-coordinate positive
+    CLC                            ; Clear carry for X-boundary handling
+    ADC.W $1924                    ; Add X-boundary correction
+    BRA Finalize_Coordinate_Processing
+
+Positive_X_Coordinate:
+    CMP.W $1924                    ; Compare with X-boundary
+    BCC Finalize_Coordinate_Processing ; Branch if within X-boundary
+    SEC                            ; Set carry for X-boundary correction
+    SBC.W $1924                    ; Subtract X-boundary
+
+Finalize_Coordinate_Processing:
+    TAY                            ; Transfer Y-coordinate result
+    XBA                            ; Exchange for X-coordinate access
+    STA.W $4202                    ; Store X-coordinate for multiplication
+    LDA.W $1924                    ; Load X-boundary for multiplication
+    STA.W $4203                    ; Store multiplier
+    XBA                            ; Exchange for coordinate finalization
+    REP #$20                       ; Set 16-bit mode for final calculation
+    AND.W #$003F                   ; Mask coordinate for final range
+    CLC                            ; Clear carry for final addition
+    ADC.W $4216                    ; Add multiplication result
+    TAX                            ; Transfer final coordinate index
+    SEP #$20                       ; Set 8-bit mode
+    LDA.L $7F8000,X                ; Load coordinate map data
+    PHA                            ; Preserve coordinate data
+    REP #$20                       ; Set 16-bit mode for address calculation
+    AND.W #$007F                   ; Mask for coordinate address range
+    ASL A                          ; Shift for address calculation
+    TAX                            ; Transfer to address index
+    LDA.L $7FD174,X                ; Load coordinate address
+    SEP #$20                       ; Set 8-bit mode
+    TAX                            ; Transfer coordinate address
+    PLA                            ; Restore coordinate data
+    RTS                            ; Return coordinate processing complete
+
+; Alternative Coordinate Processing Engine
+; Specialized coordinate processing for specific battle scenarios
+CODE_01F298:
+    REP #$20                       ; Set 16-bit mode for alternative processing
+    TYA                            ; Transfer Y-coordinate context
+    SEP #$20                       ; Set 8-bit mode
+    CLC                            ; Clear carry for alternative calculation
+    ADC.W DATA8_0190D5,X           ; Add alternative X-offset
+    XBA                            ; Exchange for alternative Y-processing
+    CLC                            ; Clear carry for alternative Y-calculation
+    ADC.W DATA8_0190D6,X           ; Add alternative Y-offset
+    BPL Alternative_Positive_Y     ; Branch if alternative Y positive
+    db $18,$6D,$25,$19,$80,$09     ; Alternative Y-boundary correction
+
+Alternative_Positive_Y:
+    CMP.W $1925                    ; Compare with alternative Y-boundary
+    BCC Alternative_Process_X      ; Branch if within alternative Y-boundary
+    db $38,$ED,$25,$19             ; Alternative Y-boundary subtraction
+
+Alternative_Process_X:
+    XBA                            ; Exchange for alternative X-processing
+    BPL Alternative_Positive_X     ; Branch if alternative X positive
+    db $18,$6D,$24,$19,$80,$09     ; Alternative X-boundary correction
+
+Alternative_Positive_X:
+    CMP.W $1924                    ; Compare with alternative X-boundary
+    BCC Alternative_Coordinate_Complete ; Branch if within X-boundary
+    db $38,$ED,$24,$19             ; Alternative X-boundary subtraction
+
+Alternative_Coordinate_Complete:
+    TAY                            ; Transfer alternative coordinate result
+    RTS                            ; Return alternative processing complete
+
+; Advanced Entity Detection and Validation System
+; Sophisticated entity detection with multi-layer validation
+CODE_01F2CB:
+    PHD                            ; Preserve direct page register
+    PEA.W $1A62                    ; Push entity data page address
+    PLD                            ; Load entity data page
+    STY.B $00                      ; Store entity reference
+    LDA.W $19B4                    ; Load entity validation register
+    AND.B #$07                     ; Extract entity validation bits
+    STA.B $02                      ; Store validation reference
+    LDX.W #$0000                   ; Initialize entity search index
+    TXA                            ; Clear accumulator for entity search
+
+; Entity Search and Validation Loop
+; Advanced entity scanning with comprehensive validation
+Entity_Search_Loop:
+    XBA                            ; Exchange for entity processing
+    LDA.B $10,X                    ; Load entity status data
+    BMI Entity_Search_Continue     ; Branch if entity inactive
+    LDY.B $1B,X                    ; Load entity position reference
+    CPY.B $00                      ; Compare with search reference
+    BNE Entity_Search_Continue     ; Branch if position mismatch
+    LDA.B $1D,X                    ; Load entity attribute flags
+    BIT.B #$04                     ; Test entity availability flag
+    BNE Entity_Search_Continue     ; Branch if entity unavailable
+    LDA.B $02                      ; Load validation reference
+    BEQ Entity_Found               ; Branch if validation complete
+    LDA.B $1E,X                    ; Load entity validation data
+    AND.B #$07                     ; Extract validation bits
+    BEQ Entity_Found               ; Branch if validation passed
+    CMP.B #$07                     ; Check for validation overflow
+    BEQ Entity_Found               ; Branch if overflow validation
+    CMP.B $02                      ; Compare with validation reference
+    BEQ Entity_Found               ; Branch if validation match
+
+Entity_Search_Continue:
+    LDA.B #$1A                     ; Set entity search increment
+    STA.W $211B                    ; Store search multiplier low
+    STZ.W $211B                    ; Clear search multiplier high
+    XBA                            ; Exchange for index processing
+    INC A                          ; Increment entity index
+    STA.W $211C                    ; Store entity index multiplier
+    LDX.W $2134                    ; Load multiplication result
+    CMP.B #$16                     ; Check for entity search limit
+    BNE Entity_Search_Loop         ; Continue search if limit not reached
+    PLD                            ; Restore direct page register
+    CLC                            ; Clear carry for search failure
+    RTS                            ; Return search failure
+
+Entity_Found:
+    LDA.B $1F,X                    ; Load found entity data
+    STA.W $19E6                    ; Store entity data reference
+    STX.W $19E8                    ; Store entity index
+    XBA                            ; Exchange for entity confirmation
+    STA.W $19EC                    ; Store entity confirmation
+    PLD                            ; Restore direct page register
+    SEC                            ; Set carry for search success
+    RTS                            ; Return search success
+
+; Specialized Entity Detection System
+; Alternative entity detection for specific battle scenarios
+CODE_01F326:
+    PHD                            ; Preserve direct page register
+    PEA.W $1A62                    ; Push specialized entity page address
+    PLD                            ; Load specialized entity page
+    STY.B $00                      ; Store specialized entity reference
+    LDX.W #$0000                   ; Initialize specialized search index
+    TXA                            ; Clear accumulator for specialized search
+
+; Specialized Entity Search Loop
+; Advanced specialized entity scanning with targeted validation
+Specialized_Entity_Search_Loop:
+    XBA                            ; Exchange for specialized processing
+    LDA.B $10,X                    ; Load specialized entity status
+    BMI Specialized_Search_Continue ; Branch if specialized entity inactive
+    LDY.B $1B,X                    ; Load specialized position reference
+    CPY.B $00                      ; Compare with specialized reference
+    BNE Specialized_Search_Continue ; Branch if specialized position mismatch
+    LDA.B $1D,X                    ; Load specialized attribute flags
+    AND.B #$18                     ; Extract specialized attribute bits
+    CMP.B #$18                     ; Check for specialized mode
+    BEQ Specialized_Entity_Found   ; Branch if specialized entity found
+
+Specialized_Search_Continue:
+    LDA.B #$1A                     ; Set specialized search increment
+    STA.W $211B                    ; Store specialized multiplier low
+    STZ.W $211B                    ; Clear specialized multiplier high
+    XBA                            ; Exchange for specialized index processing
+    INC A                          ; Increment specialized entity index
+    STA.W $211C                    ; Store specialized index multiplier
+    LDX.W $2134                    ; Load specialized multiplication result
+    CMP.B #$16                     ; Check for specialized search limit
+    BNE Specialized_Entity_Search_Loop ; Continue specialized search
+    PLD                            ; Restore direct page register
+    CLC                            ; Clear carry for specialized search failure
+    RTS                            ; Return specialized search failure
+
+Specialized_Entity_Found:
+    LDA.B $1F,X                    ; Load specialized entity data
+    STA.W $19E6                    ; Store specialized entity reference
+    STX.W $19E8                    ; Store specialized entity index
+    XBA                            ; Exchange for specialized confirmation
+    STA.W $19EC                    ; Store specialized confirmation
+    PLD                            ; Restore direct page register
+    SEC                            ; Set carry for specialized success
+    RTS                            ; Return specialized search success
+
+; Advanced Battle Action Processing Engine
+; Sophisticated battle action management with state coordination
+CODE_01F36A:
+    BIT.B #$80                     ; Test advanced battle action flag
+    BEQ Battle_Action_Complete     ; Branch if standard action mode
+    BIT.B #$60                     ; Test battle action type flags
+    BNE Battle_Action_Complete     ; Branch if action type conflict
+    INC.W $19B0                    ; Increment battle action counter
+    STZ.W $19EE                    ; Clear battle action reference
+    AND.B #$1F                     ; Extract battle action code
+    STA.W $19EF                    ; Store battle action code
+    CMP.B #$03                     ; Check for special action code
+    BEQ Battle_Action_Complete     ; Branch if special action
+    CMP.B #$16                     ; Check for action code range
+    BCS Battle_Action_Error        ; Branch if action code out of range
+    STY.W $192B                    ; Store battle action context
+
+; Advanced Battle Action Lookup System
+; Sophisticated action lookup with bank switching and context management
+Advanced_Battle_Action_Lookup:
+    PHB                            ; Preserve data bank register
+    LDA.B #$05                     ; Set battle action data bank
+    PHA                            ; Push bank for switching
+    PLB                            ; Load battle action bank
+    LDA.W $0E91                    ; Load battle action environment
+    ASL A                          ; Shift for action indexing
+    REP #$20                       ; Set 16-bit mode for action lookup
+    AND.W #$00FF                   ; Mask for action index range
+    TAX                            ; Transfer to action index
+    LDA.L UNREACH_05F920,X         ; Load action lookup table entry
+    TAX                            ; Transfer action table address
+    SEP #$20                       ; Set 8-bit mode
+
+; Battle Action Lookup Processing Loop
+Battle_Action_Lookup_Loop:
+    LDY.W DATA8_05F9F8,X           ; Load action lookup data
+    CPY.W $192B                    ; Compare with action context
+    BNE Battle_Action_Lookup_Continue ; Branch if lookup mismatch
+    LDA.W UNREACH_05F9FA,X         ; Load action lookup result
+    STA.W $19EE                    ; Store action lookup result
+    BRA Battle_Action_Lookup_Complete ; Branch to completion
+
+Battle_Action_Lookup_Continue:
+    INX                            ; Increment lookup index
+    INX                            ; Increment for double-byte data
+    INX                            ; Increment for triple-byte entries
+    TYA                            ; Transfer lookup data
+    BPL Battle_Action_Lookup_Loop  ; Continue lookup if positive
+
+Battle_Action_Lookup_Complete:
+    PLB                            ; Restore data bank register
+
+Battle_Action_Complete:
+    RTS                            ; Return battle action processing complete
+
+Battle_Action_Error:
+    RTS                            ; Return battle action error
+
+; Advanced Environment Context Validation
+; Sophisticated environment validation with context matching
+Advanced_Environment_Validation:
+    db $AD,$89,$0E,$DD,$49,$F4,$F0,$0A,$AD,$8A,$0E,$DD,$4A,$F4,$F0,$02
+    db $18,$60,$38,$60             ; Environment validation algorithm
+
+; Battle Data Tables and References
+; Complex data structures for battle processing
+DATA8_01F3CB:
+    db $05,$EA,$62,$EA,$62,$EA,$62,$EA,$62,$EA,$F6,$F0,$01,$F1
+    db $05,$EA
+    db $24,$EF,$09,$F1,$D9,$EB
+
+DATA8_01F3E1:
+    db $24,$F1,$35,$F1,$35,$F1,$35,$F1,$35,$F1,$14,$F1
+    db $91,$F1,$05,$EA
+    db $9D,$F1,$1C,$F1,$9D,$F1
+
+DATA8_01F3F7:
+    db $A6,$EC,$65,$EA,$65,$EA,$65,$EA,$65
+
+DATA8_01F400:
+    db $EA,$00,$02,$03,$01
+    db $00
+    db $02
+
+UNREACH_01F407:
+    db $02
+    db $01,$01,$01,$01
+    db $02
+    db $02
+    db $04
+
+; Advanced Graphics and Animation Data Tables
+DATA8_01F40F:
+    db $1F,$EC,$29,$EC,$33,$EC,$0C,$EC
+
+DATA8_01F417:
+    db $5E,$EC,$5E,$EC
+    db $5E,$EC
+    db $82,$EC,$82,$EC,$82,$EC,$B5,$EC,$B5,$EC,$D5,$EC,$DA,$ED,$DA,$ED
+
+DATA8_01F42D:
+    db $42,$EE,$01
+    db $20
+    db $03
+    db $60
+    db $02
+    db $40
+    db $00
+    db $00
+
+DATA8_01F437:
+    db $A1,$CA,$CA,$AA,$B2,$B2,$AA,$AA,$BA,$AA,$C2,$08,$08,$08,$08,$08
+    db $08,$08
+    db $D4,$D4,$3C,$FF,$08,$FF,$FF,$2A,$FF,$05
+
+DATA8_01F453:
+    db $20,$10
+
+; Advanced Sound and Music Processing System
+; Sophisticated audio management with battle coordination
+Advanced_Sound_Processing:
+    LDA.B #$0F                     ; Set advanced sound mode
+    STA.W $0506                    ; Store sound control register
+    LDA.B #$88                     ; Set sound effect parameters
+    STA.W $0507                    ; Store sound effect control
+    LDA.B #$27                     ; Set audio coordination mode
+    STA.W $0505                    ; Store audio coordination
+    JSL.L CODE_00D080              ; Execute sound processing system
+
+; Advanced Battle Sequence Processing
+; Complex battle sequence management with multi-state coordination
+CODE_01F468:
+    LDA.B #$02                     ; Set battle sequence mode
+    STA.W $0E8B                    ; Store battle sequence context
+    JSR.W CODE_0194CD              ; Execute sequence initialization
+    JSR.W CODE_018B83              ; Execute sequence coordination
+    LDA.W $0E88                    ; Load sequence environment
+    JSL.L CODE_0C8013              ; Execute sequence processing
+    RTS                            ; Return sequence processing complete
+
+; Advanced Battle Enhancement System
+; Sophisticated battle enhancement with progression tracking
+Advanced_Battle_Enhancement:
+    INC.W $19F7                    ; Increment battle enhancement counter
+    JSR.W CODE_0182D0              ; Execute enhancement coordination
+    LDA.B #$10                     ; Set enhancement mode
+    STA.W $1993                    ; Store enhancement control
+    STZ.W $1929                    ; Clear enhancement state
+    LDA.B #$01                     ; Set enhancement active flag
+    STA.W $1928                    ; Store enhancement flag
+    JSR.W CODE_01F52F              ; Execute enhancement processing
+    LDA.W $1A5A                    ; Load enhancement result
+    STA.W $0E88                    ; Store enhancement context
+    CMP.B #$0C                     ; Check enhancement threshold
+    BCC Enhancement_Processing_Complete ; Branch if threshold not met
+    CMP.B #$12                     ; Check enhancement upper limit
+    BCC Enhancement_Special_Processing ; Branch for special enhancement
+    CMP.B #$26                     ; Check enhancement extended range
+    BCC Enhancement_Processing_Complete ; Branch if in extended range
+    CMP.B #$2B                     ; Check enhancement maximum
+    BCS Enhancement_Processing_Complete ; Branch if at maximum
+
+Enhancement_Special_Processing:
+    LDA.B #$03                     ; Set special enhancement mode
+    JSL.L CODE_009776              ; Execute special enhancement
+    BNE Enhancement_Processing_Complete ; Branch if special complete
+    LDA.B #$02                     ; Set special completion mode
+    STA.W $0E8B                    ; Store special completion context
+    JSR.W CODE_0194CD              ; Execute completion processing
+    LDX.W #$270B                   ; Set special enhancement reference
+    STX.W $19EE                    ; Store enhancement reference
+    JSL.L CODE_01B24C              ; Execute enhancement finalization
+    LDX.W #$2000                   ; Set enhancement completion mode
+    STX.W $19EE                    ; Store completion mode
+    JSL.L CODE_01B24C              ; Execute final enhancement processing
+
+Enhancement_Processing_Complete:
+    BRA CODE_01F468                ; Branch to battle sequence processing
+
+; Advanced Battle State Toggle System
+; Sophisticated state toggle with validation and error handling
+Advanced_Battle_State_Toggle:
+    db $A9,$FF,$4D,$5B,$1A,$8D,$5B,$1A,$D0,$11,$20,$04,$F5,$20,$F9,$F4
+    db $A9,$80,$1C,$B4,$19,$20,$F6,$F4,$4C,$68,$F4,$20,$F9,$F4,$AE,$89
+    db $0E,$8E,$F3,$19,$A9,$80,$0C,$B4,$19,$4C,$CD,$94,$20,$D9,$82,$AD
+    db $93,$00,$89,$20,$D0,$F6
+
+; Advanced Battle Completion System
+CODE_01F503:
+    RTS                            ; Return battle completion
+
+; Advanced Battle Direction Processing
+; Complex direction processing with multi-axis validation
+Advanced_Battle_Direction_Processing:
+    db $A9,$08,$8D,$28,$19,$AD,$89,$0E,$CD,$F3,$19,$F0,$0B,$A9,$03,$B0
+    db $02,$A9,$01,$20,$5A,$F5,$80,$ED,$AD,$8A,$0E,$CD,$F4,$19,$F0,$DF
+    db $A9,$00,$B0,$02,$A9,$02,$20,$5A,$F5,$80,$ED
