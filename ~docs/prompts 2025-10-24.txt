@@ -153,6 +153,9 @@ keep it going!
 make sure you are updating the chat/sessions logs, and keep the progress going!
 there are two session log updates that got added to the end of the `prompts` text file, that file is manually updated not a log file. PLease move those two updates to the session log `.md` files where they belong
 make sure you are updating the chat log/session log and then aggressively and greedily continue these import cycles and don't stop until all banks are done
+build and compare to reference ROM file updating a progress file, make sure you are updating the session summary/chat log, and then aggressively and greedily continue these import cycles and don't stop until all banks are done
+make sure we are using `Final Fantasy - Mystic Quest (U) (V1.1).smc` as our reference ROM file just like the `diz and `dizraw` files do
+
 
 
 

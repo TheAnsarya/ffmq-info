@@ -2,7 +2,7 @@
 # Assembles bank_00_documented.asm and compares with reference ROM
 
 param(
-    [string]$RomPath = "roms\Final Fantasy - Mystic Quest (U) (V1.0) [!].sfc"
+    [string]$RomPath = "roms\Final Fantasy - Mystic Quest (U) (V1.1).sfc"
 )
 
 Write-Host "FFMQ Build Verification System" -ForegroundColor Cyan
@@ -84,19 +84,19 @@ Write-Host "  Command: asar $wrapperFile $outputFile" -ForegroundColor Gray
 
 try {
     & asar $wrapperFile $outputFile 2>&1 | Out-String | Write-Host
-    
+
     if ($LASTEXITCODE -ne 0) {
         Write-Host ""
         Write-Host "ERROR: Assembly failed with exit code $LASTEXITCODE" -ForegroundColor Red
         exit 1
     }
-    
+
     if (-not (Test-Path $outputFile)) {
         Write-Host ""
         Write-Host "ERROR: Output file was not created" -ForegroundColor Red
         exit 1
     }
-    
+
     Write-Host ""
     Write-Host "  Success!" -ForegroundColor Green
 } catch {
@@ -149,7 +149,7 @@ for ($i = 0; $i -lt $bytesToCompare -and $i -lt $assembled.Length; $i++) {
         Write-Host "WARNING: Reference ROM too small" -ForegroundColor Yellow
         break
     }
-    
+
     if ($assembled[$i] -ne $reference[$refOffset]) {
         $differences++
         if ($firstDiffOffset -eq -1) {
@@ -172,7 +172,7 @@ if ($differences -eq 0) {
     Write-Host "First difference at offset: 0x$($firstDiffOffset.ToString('X4'))" -ForegroundColor Red
     Write-Host "  ROM address: `$00$((0x8000 + $firstDiffOffset).ToString('X4'))" -ForegroundColor Red
     Write-Host ""
-    
+
     # Show first few differences
     Write-Host "First differences:" -ForegroundColor Yellow
     $diffCount = 0
@@ -184,7 +184,7 @@ if ($differences -eq 0) {
             $diffCount++
         }
     }
-    
+
     if ($differences -gt 10) {
         Write-Host "  ... and $($differences - 10) more difference(s)" -ForegroundColor Red
     }
