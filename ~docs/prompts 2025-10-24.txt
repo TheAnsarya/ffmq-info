@@ -155,6 +155,31 @@ there are two session log updates that got added to the end of the `prompts` tex
 make sure you are updating the chat log/session log and then aggressively and greedily continue these import cycles and don't stop until all banks are done
 build and compare to reference ROM file updating a progress file, make sure you are updating the session summary/chat log, and then aggressively and greedily continue these import cycles and don't stop until all banks are done
 make sure we are using `Final Fantasy - Mystic Quest (U) (V1.1).smc` as our reference ROM file just like the `diz and `dizraw` files do
+build and compare to reference ROM file updating a progress file, make sure you are updating the session summary/chat log, and then aggressively and greedily continue these import cycles and don't stop until all banks are done
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -171,35 +196,9 @@ document, update the chat log, and commit the code changes at the end of every c
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 fix label issues and other build issues, build and compare to reference ROM file, make sure you are updating the session summary/chat log, continue systematically,
 
 make sure we are using `Final Fantasy - Mystic Quest (U) (V1.1).sfc` as the reference rom, what rom file does diztinguish say we are using? what file is our documentation and source code using? and then continue systematically
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -212,52 +211,11 @@ find all the `Next steps` and todos and fill out the code
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 update editorconfig so python scripts use tabs (4) (and utf-8, crlf) instead of spaces and then update all python scripts to the correct formatting.
 
 Discord channels about SNES development include invites of: `https://discord.gg/AAS9WXdj` and `https://discord.gg/Jv7J3SNA`
 
 ---
-
-
-
-
-
-
-
 
 
 
