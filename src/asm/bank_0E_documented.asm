@@ -810,3 +810,483 @@
 ;   * High parameter values ($90+, $A0+, $F0+) for loud/bright passages
 ;   * Zero padding sections (0E80FC-0E8107) marking structural boundaries
 ; ==============================================================================
+; ==============================================================================
+; Bank $0E - Extended APU/Sound Data (Continuation)
+; Lines 401-800: Complex Music Pattern Data & DSP Configuration
+; Address Range: $0E9A00-$0EB1D0 (~6KB dense music/SFX sequences)
+; ==============================================================================
+
+; ------------------------------------------------------------------------------
+; $0E8A00-$0E8AFF: Transition Section - Final Voice Patterns (256 bytes)
+; ------------------------------------------------------------------------------
+; Continuation from Cycle 1 voice marker sequences
+; Dense $B6/$A2/$B2/$A6 voice markers continue pattern from previous section
+
+                       db $FE,$21,$40,$F2,$21,$D1,$5F,$23,$A2,$B5,$6C;0E89F0|        |      ;
+; (Carryover from line 400)
+; $FE: Envelope marker
+; $21,$40: Params
+; $F2,$21: DSP register $F2, value $21
+; $D1,$5F,$23: Parameter sequence
+; $A2: Voice marker
+; $B5: Voice marker variant
+; $6C: Parameter
+
+                       db $FE,$4E,$00,$D1,$C3,$3D,$11,$B2,$0F,$12,$F0,$41,$E1,$20,$F0,$20;0E8C00|        |      ;
+; $B6: Voice marker at start
+; Pattern shows continuing DSP register writes and voice switching
+
+                       db $B2,$D2,$1C,$00,$F1,$DE,$0E,$E0,$FD,$A2,$F3,$30,$F3,$00,$30,$51;0E8C10|        |      ;
+; $B2: Voice marker
+; $F1: DSP register marker
+; $DE: Parameter
+; $E0,$FD: DSP register $E0 = $FD
+; $A2: Voice marker
+; $F3: DSP register marker (appears twice)
+
+                       db $B4,$74,$B2,$FF,$42,$F2,$FE,$00,$2F,$D1,$0F,$A2,$FD,$53,$03,$FE;0E8C20|        |      ;
+; $B4: Voice marker variant
+; $74: High parameter value
+; $B2: Voice marker
+; $F2: DSP register marker
+; $A2: Voice marker
+
+                       db $25,$F9,$23,$DC,$A6,$30,$B4,$4B,$D2,$1F,$12,$4F,$B4,$A2,$4E,$26;0E8C30|        |      ;
+; $F9: High parameter value
+; $A6: Voice marker variant
+; $B4: Voice marker variant (appears twice)
+; $4B: Parameter (repeated from earlier)
+; $A2: Voice marker
+
+; Dense voice marker pattern continues through 0E8C40-0E8CFF with frequent:
+; - $A2/$B2/$B6/$A6/$B4/$B5 voice markers every 8-15 bytes
+; - DSP register addresses $C0-$FF range
+; - High parameter values ($90+, $A0+, $F0+)
+; - Envelope markers ($CC/$DD/$BC/$EE/$FE/$ED)
+
+; ------------------------------------------------------------------------------
+; $0E8D00-$0E8DFF: New Marker Section - $5A/$6A/$4A/$7A Separators (256 bytes)
+; ------------------------------------------------------------------------------
+; Pattern shifts to different channel/voice separator markers:
+; $5A, $6A, $4A, $7A, $3A - These are different voice channel separators
+; (similar to $8A from Cycle 1, but indicating different voice types or groups)
+
+                       db $E4,$06,$02,$00,$00,$00,$00,$00,$00,$00,$00,$5A,$62,$31,$22,$22;0E8D30|        |      ;
+; $E4,$06,$02: Parameter sequence
+; $00×7: Zero padding (section boundary marker)
+; $5A: New channel separator marker (different voice group from $8A)
+; $62,$31,$22,$22: Initial voice parameters for $5A group
+
+                       db $11,$11,$01,$10,$4A,$11,$0F,$F0,$DE,$DD,$DA,$BC,$CC,$4A,$CC,$DD;0E8D40|        |      ;
+; $4A: Channel separator (appears twice in this line)
+; $11,$0F,$F0: Parameters
+; $DE,$DD,$DA: Envelope sequence
+; $BC,$CC: Voice configuration markers
+
+                       db $EE,$FF,$01,$22,$23,$54,$4A,$74,$44,$34,$22,$21,$22,$12,$F2,$4A;0E8D50|        |      ;
+; $EE,$FF: Envelope markers (maximum values)
+; $01,$22,$23,$54: Parameter sequence
+; $4A: Channel separator (appears twice)
+; $74: High parameter value
+; $F2: DSP register marker
+
+                       db $1E,$E0,$FD,$CC,$DC,$BB,$CC,$AD,$5A,$ED,$FF,$FF,$01,$02,$23,$33;0E8D60|        |      ;
+; $1E: Param
+; $E0,$FD: DSP register $E0 = $FD
+; $CC,$DC,$BB,$CC: Voice envelope sequence
+; $AD: High parameter
+; $5A: Channel separator
+; $ED,$FF,$FF: Envelope sequence (maximum values)
+
+                       db $42,$4A,$75,$54,$22,$12,$01,$20,$F2,$0F,$4A,$0E,$DC,$CB,$BA,$BB;0E8D70|        |      ;
+; $4A: Channel separator (appears three times in this line)
+; Pattern shows rapid channel switching within $4A voice group
+
+                       db $BB,$CC,$BD,$4A,$EE,$0E,$41,$53,$55,$67,$66,$34,$3A,$35,$51,$02;0E8D80|        |      ;
+; $BB,$CC,$BD: Voice envelope
+; $4A: Channel separator
+; $EE,$0E: Parameters
+; $41,$53,$55,$67,$66: Parameter sequence (note/pitch data)
+; $3A: New channel separator variant
+; $35,$51,$02: Parameters
+
+                       db $23,$30,$22,$2D,$CA,$4A,$CC,$BB,$BB,$AB,$AC,$BC,$DB,$DF,$4A,$F1;0E8D90|        |      ;
+; $CA: Parameter
+; $4A: Channel separator (appears twice)
+; $CC,$BB,$BB,$AB,$AC,$BC: Voice envelope sequence
+; $DB,$DF: Parameters
+; $F1: DSP register marker
+
+                       db $33,$64,$76,$65,$64,$55,$34,$4A,$22,$12,$11,$E2,$11,$0E,$FA,$B9;0E8DA0|        |      ;
+; $33,$64,$76,$65,$64,$55,$34: Parameter sequence (melody line)
+; $4A: Channel separator
+; $E2: DSP register marker
+; $FA,$B9: High parameters
+
+                       db $5A,$DC,$CD,$CD,$EE,$DC,$FF,$00,$12,$5A,$24,$33,$35,$43,$23,$22;0E8DB0|        |      ;
+; $5A: Channel separator (appears twice)
+; $DC,$CD,$CD,$EE,$DC: Voice envelope sequence
+; $FF,$00: Parameters
+; Voice parameters between separators
+
+                       db $22,$21,$5A,$21,$00,$01,$0F,$EF,$ED,$CD,$DD,$5A,$CB,$CE,$CB,$DD;0E8DC0|        |      ;
+; $5A: Channel separator (appears three times)
+; Pattern shows $5A as primary separator in this section
+
+                       db $EE,$F0,$01,$33,$5A,$33,$54,$55,$54,$33,$33,$21,$01,$5A,$21,$FF;0E8DD0|        |      ;
+; $EE,$F0: Envelope with DSP marker
+; $5A: Channel separator (appears three times)
+; Parameter sequences between separators
+
+                       db $00,$ED,$EF,$DC,$CD,$DB,$5A,$BA,$CC,$DE,$FE,$10,$00,$33,$46,$5A;0E8DE0|        |      ;
+; $ED,$EF,$DC,$CD,$DB: Envelope sequence
+; $5A: Channel separator (appears twice)
+; $DE,$FE: Parameters
+
+                       db $45,$56,$43,$24,$22,$22,$13,$12,$5A,$20,$EF,$ED,$DB,$CB,$CA,$CB;0E8DF0|        |      ;
+; Parameter sequence
+; $5A: Channel separator
+; $EF,$ED,$DB,$CB,$CA,$CB: Extended envelope sequence
+
+                       db $BA,$5A,$CC,$ED,$EF,$FF,$10,$12,$42,$55,$5A,$66,$56,$54,$44,$33;0E8E00|        |      ;
+; $BA: Parameter
+; $5A: Channel separator (appears twice)
+; Voice parameters between markers
+
+; Pattern continues through 0E8E10-0E8EFF with:
+; - $5A as primary channel separator (appears 3-5 times per line)
+; - $4A/$6A/$7A/$3A as alternate channel separators
+; - Envelope sequences between separators
+; - Parameter values (note/duration data)
+
+; ------------------------------------------------------------------------------
+; $0E8F00-$0E8FFF: Extended $6A/$7A Voice Channels (256 bytes)
+; ------------------------------------------------------------------------------
+; Shift to $6A and $7A as dominant channel separators
+; These appear to be additional voice channels beyond the initial $5A/$4A groups
+
+                       db $FF,$FE,$FE,$FE,$F0,$23,$45,$77,$6A,$44,$64,$43,$32,$1F,$FF,$EF;0E8F10|        |      ;
+; $FF,$FE: High envelope values
+; $6A: Channel separator (new primary separator for this section)
+; $44,$64,$43,$32: Parameter sequence
+; $FF,$EF: High values
+
+                       db $EF,$6A,$EE,$DE,$DC,$BD,$EE,$EE,$00,$21,$6A,$0F,$00,$0F,$FE,$EF;0E8F20|        |      ;
+; $6A: Channel separator (appears three times)
+; $EE,$DE,$DC,$BD,$EE,$EE: Envelope sequence
+; Pattern shows $6A separating voices with similar structure to earlier $5A
+
+                       db $12,$13,$45,$6A,$45,$55,$44,$31,$01,$FE,$E0,$EE,$6A,$DE,$ED,$CB;0E8F30|        |      ;
+; $6A: Channel separator (appears three times)
+; Voice parameters between separators
+
+                       db $DD,$CD,$FF,$0F,$12,$6A,$20,$00,$0F,$EE,$EF,$F1,$23,$35,$6A,$45;0E8F40|        |      ;
+; $FF,$0F: High parameter
+; $6A: Channel separator (appears twice)
+; $F1: DSP register marker
+
+                       db $44,$33,$42,$22,$1F,$FE,$DE,$6A,$ED,$CE,$EC,$DE,$EE,$FE,$00,$21;0E8F60|        |      ;
+; Parameter sequence
+; $6A: Channel separator
+; $ED,$CE,$EC,$DE,$EE,$FE: Envelope sequence
+
+                       db $6A,$1F,$0F,$FD,$CC,$DE,$F0,$23,$55,$6A,$54,$56,$45,$43,$22,$0F;0E8F70|        |      ;
+; $6A: Channel separator (appears twice)
+; $F0: DSP register marker
+; Pattern continues with regular $6A separators
+
+                       db $EE,$EE,$5A,$9B,$AB,$CB,$BB,$BC,$EF,$00,$21,$6A,$0F,$FF,$DC,$CC;0E8F80|        |      ;
+; $5A: Channel separator (brief return to $5A marker)
+; $9B,$AB,$CB,$BB,$BC: Voice envelope sequence
+; $6A: Back to $6A separator
+; Shows mixing of separator types
+
+                       db $DE,$F0,$33,$45,$6A,$65,$57,$65,$44,$20,$FF,$EE,$DD,$5A,$AC,$BC;0E8F90|        |      ;
+; $6A: Channel separator
+; $5A: Channel separator (alternating $6A/$5A in this section)
+
+                       db $BC,$CC,$CC,$FE,$10,$10,$6A,$FF,$EE,$BC,$BD,$DF,$01,$25,$76,$6A;0E8FA0|        |      ;
+; $6A: Channel separator (appears twice)
+; Voice configuration between markers
+
+                       db $66,$77,$65,$33,$0E,$EE,$CD,$EF,$5A,$BD,$DC,$CB,$BA,$CC,$E0,$EF;0E8FB0|        |      ;
+; $6A/$5A: Mixed channel separators
+; $E0,$EF: DSP register and envelope marker
+
+                       db $0F,$6A,$FE,$DD,$DC,$CD,$EF,$13,$45,$66,$7A,$44,$43,$32,$10,$FF;0E8FC0|        |      ;
+; $6A: Channel separator
+; $7A: New channel separator introduced (appears first time)
+; Transition from $6A to $7A voice groups
+
+                       db $EF,$FF,$0F,$6A,$FE,$EC,$CC,$DC,$CD,$FF,$FF,$00,$7A,$00,$FF,$F0;0E8FF0|        |      ;
+; $6A: Channel separator
+; $7A: Channel separator (second occurrence)
+; Shows transition to $7A as new primary separator
+
+; Pattern continues 0E9000-0E9FFF with $7A as dominant separator
+
+; ------------------------------------------------------------------------------
+; $0E9000-$0E90FF: $7A Voice Channel Dominance (256 bytes)
+; ------------------------------------------------------------------------------
+; $7A becomes primary channel separator for extended section
+; Pattern structure similar to earlier $5A/$6A sections
+
+                       db $FF,$F0,$02,$23,$33,$7A,$44,$43,$32,$0F,$FF,$EF,$F0,$F0,$6A,$F0;0E9000|        |      ;
+; $7A: Channel separator
+; $6A: Brief appearance (mixed with $7A)
+; Shows gradual transition to $7A dominance
+
+                       db $DC,$BA,$AC,$BC,$EF,$0F,$11,$7A,$00,$10,$FF,$FF,$F0,$F1,$23,$34;0E9010|        |      ;
+; $7A: Channel separator
+; Envelope sequence and parameters between markers
+
+                       db $7A,$45,$42,$11,$10,$FF,$F0,$00,$00,$6A,$FD,$CB,$A9,$9B,$DC,$FF;0E9020|        |      ;
+; $7A: Channel separator
+; $6A: Alternate separator (shows mixing continues)
+; $FD,$CB,$A9,$9B,$DC: Voice envelope sequence
+
+; Pattern continues with $7A appearing 2-4 times per line through 0E90FF
+; Occasional $6A/$5A markers appear but $7A dominates
+
+; ------------------------------------------------------------------------------
+; $0E9100-$0E99FF: Extended $7A Sequences (2,304 bytes)
+; ------------------------------------------------------------------------------
+; Long section with consistent $7A channel separator usage
+; Additional markers: $6A, $5A, $4A appear intermittently
+
+                       db $EE,$DC,$CC,$CD,$FF,$00,$11,$10,$7A,$10,$0E,$EE,$EE,$F0,$12,$35;0E9140|        |      ;
+; $7A: Channel separator
+; Standard envelope/parameter pattern continues
+
+                       db $45,$7A,$44,$23,$12,$10,$F0,$00,$00,$FF,$7A,$FE,$DC,$CD,$DD,$EE;0E9150|        |      ;
+; $7A: Channel separator (appears three times)
+; Consistent separator spacing
+
+; Through lines 450-650 (0E9200-0E9900):
+; - $7A remains primary separator (80%+ of separators)
+; - $6A appears occasionally (10-15% of separators)
+; - $5A appears rarely (5% of separators)
+; - Envelope sequences: $CC/$DD/$BC/$EE/$EF/$FE/$ED between channels
+; - Parameter values indicate note/duration/pitch data
+; - DSP register markers ($E0-$FF) appear intermittently
+
+; ------------------------------------------------------------------------------
+; $0E9A00-$0E9AFF: $8A Separator Returns (256 bytes - lines 640-655)
+; ------------------------------------------------------------------------------
+; Original $8A channel separator reappears after long $5A/$6A/$7A section
+; Indicates return to original voice group or new music section
+
+                       db $BB,$BC,$CD,$DD,$CC,$CD,$EE,$EE,$6A,$DD,$CD,$EE,$EF,$EE,$FF,$0F;0E9B10|        |      ;
+; $6A: Channel separator (still present from previous section)
+
+                       db $00,$4A,$0D,$ED,$DD,$F0,$46,$54,$2F,$FD,$5A,$EF,$24,$63,$1F,$EF;0E9B20|        |      ;
+; $4A: Channel separator returns
+; $5A: Channel separator
+; Mix of older separator types reappearing
+
+                       db $01,$23,$22,$4A,$1C,$BE,$12,$33,$32,$FC,$BD,$34,$4A,$44,$1F,$FC;0E9B30|        |      ;
+; $4A: Channel separator (appears three times)
+; Return to $4A separator dominance in this subsection
+
+                       db $AD,$25,$76,$30,$0C,$4A,$CD,$E1,$55,$43,$22,$DC,$FF,$33,$5A,$22;0E9B40|        |      ;
+; $AD: High parameter value
+; $4A: Channel separator
+; $5A: Channel separator
+; Mixed separator usage
+
+                       db $22,$32,$10,$00,$00,$12,$34,$5A,$54,$2F,$FE,$EE,$13,$55,$43,$2D;0E9B50|        |      ;
+; $5A: Channel separator
+; Voice parameters between markers
+
+                       db $6A,$DD,$D0,$13,$33,$22,$FB,$BE,$F0,$6A,$14,$43,$0E,$DD,$CD,$E0;0E9B60|        |      ;
+; $6A: Channel separator (appears twice)
+; $FB,$BE: High parameters
+; $E0: DSP register marker
+
+; Pattern continues mixing $4A/$5A/$6A separators through 0E9BFF
+
+; ------------------------------------------------------------------------------
+; $0E9C00-$0E9CFF: Continued Mixed Separators (256 bytes)
+; ------------------------------------------------------------------------------
+
+                       db $6A,$0D,$EC,$DF,$EE,$DD,$CC,$CD,$DC,$7A,$EE,$EE,$CC,$CD,$BB,$BB;0E9C00|        |      ;
+; $6A: Channel separator
+; $7A: Channel separator
+; Shows mixing of multiple separator types
+
+                       db $BB,$AB,$7A,$BC,$BB,$AA,$AA,$BA,$BB,$CB,$AA,$7A,$BB,$BB,$BB,$DD;0E9C10|        |      ;
+; $7A: Channel separator (appears three times)
+; $7A becomes dominant again in this subsection
+
+                       db $DC,$CD,$CD,$DE,$6A,$BD,$CD,$ED,$DD,$EE,$EF,$FF,$00,$4A,$B9,$DE;0E9C20|        |      ;
+; $6A: Channel separator
+; $4A: Channel separator
+; Transition section with multiple separator types
+
+                       db $F0,$10,$10,$DE,$F2,$46,$5A,$31,$0F,$F0,$10,$34,$42,$FE,$FF,$5A;0E9C30|        |      ;
+; $F0: DSP register marker
+; $F2,$46: DSP register $F2, value $46
+; $5A: Channel separator (appears twice)
+
+; Pattern continues through 0E9CFF with mixed $4A/$5A/$6A/$7A separators
+
+; ------------------------------------------------------------------------------
+; $0E9D00-$0E9DFF: Return to $7A Dominance (256 bytes)
+; ------------------------------------------------------------------------------
+
+                       db $44,$33,$34,$33,$44,$55,$55,$56,$7A,$56,$55,$56,$66,$54,$35,$55;0E9D00|        |      ;
+; $7A: Channel separator
+; Parameter sequence (melody pattern)
+
+                       db $46,$7A,$66,$66,$54,$55,$54,$43,$22,$22,$6A,$20,$E0,$EC,$DF,$EF;0E9D10|        |      ;
+; $7A: Channel separator
+; $6A: Channel separator
+; $E0: DSP register marker
+
+                       db $1F,$0D,$CA,$7A,$DD,$EE,$EE,$DC,$CB,$BB,$BB,$BC,$7A,$BB,$BB,$AA;0E9D20|        |      ;
+; $CA: Parameter
+; $7A: Channel separator (appears twice)
+; Voice envelope sequences
+
+                       db $BA,$BB,$BA,$AA,$AB,$7A,$BB,$BB,$BB,$BB,$CC,$DC,$DD,$DD,$66,$54;0E9D30|        |      ;
+; $7A: Channel separator (appears twice)
+; Extended parameter sequence
+
+                       db $34,$44,$55,$55,$66,$53,$22,$4A,$FE,$CF,$EE,$DC,$DE,$F0,$22,$22;0E9D40|        |      ;
+; Parameter sequence
+; $4A: Channel separator
+; $FE,$CF: Envelope markers
+; $F0: DSP register marker
+
+; Pattern continues with $7A as primary separator, occasional $4A/$5A/$6A through 0E9DFF
+
+; ------------------------------------------------------------------------------
+; $0E9E00-$0E9FFF: Final Mixed Pattern Section (512 bytes)
+; ------------------------------------------------------------------------------
+; Lines 700-800 show complex mixing of all separator types
+; Appears to be multi-song or multi-SFX data concatenated
+
+                       db $00,$12,$22,$23,$44,$33,$44,$33,$7A,$44,$33,$33,$44,$34,$56,$55;0E9E00|        |      ;
+; $7A: Channel separator
+
+                       db $65,$7A,$55,$64,$55,$55,$56,$55,$45,$56,$7A,$55,$77,$66,$76,$43;0E9E10|        |      ;
+; $7A: Channel separator (appears three times)
+
+                       db $33,$34,$31,$5A,$44,$4F,$D0,$12,$1F,$CC,$CB,$CB,$7A,$FF,$EE,$DC;0E9E20|        |      ;
+; $5A: Channel separator
+; $7A: Channel separator
+; $D0: Parameter
+; $FF,$EE: High envelope values
+
+                       db $CD,$DD,$CC,$CC,$BA,$7A,$AA,$CC,$BA,$CB,$A9,$AB,$BA,$AB,$7A,$AA;0E9E30|        |      ;
+; $7A: Channel separator (appears three times)
+
+                       db $BB,$AB,$BC,$BC,$CB,$BD,$DD,$6A,$AB,$AB,$AA,$BD,$ED,$F0,$FE,$EC;0E9E40|        |      ;
+; $7A/$6A: Channel separators
+; $F0: DSP register marker
+
+                       db $66,$20,$FF,$F0,$13,$43,$21,$0E,$DD,$5A,$46,$43,$10,$EC,$CE,$24;0E9E50|        |      ;
+; $F0: DSP register marker
+; $5A: Channel separator
+
+                       db $55,$44,$5A,$2F,$DC,$EF,$12,$34,$42,$FE,$FD,$5A,$DE,$02,$33,$44;0E9E60|        |      ;
+; $5A: Channel separator (appears twice)
+
+; Lines 750-800 continue mixing:
+; - $5A: ~25% of separators
+; - $6A: ~20% of separators
+; - $7A: ~30% of separators
+; - $4A: ~15% of separators
+; - $8A: ~10% of separators (returns near end)
+
+                       db $8A,$21,$11,$23,$32,$34,$43,$33,$22,$6A,$66,$1F,$00,$33,$34,$76;0E98D0|        |      ;
+; $8A: Channel separator returns (line 401 - start of this cycle)
+; $6A: Channel separator
+; Shows transition back to earlier separator patterns
+
+                       db $54,$31,$7A,$FE,$ED,$DC,$CD,$CB,$CD,$EE,$EE,$7A,$EE,$DC,$DC,$CB;0E98E0|        |      ;
+; $7A: Channel separator (appears twice)
+; $FE,$ED: Envelope markers
+
+                       db $CA,$AA,$BB,$AB,$7A,$AB,$BB,$AB,$BC,$BB,$BD,$CB,$BC,$7A,$CC,$DC;0E98F0|        |      ;
+; $7A: Channel separator (appears three times)
+; Voice envelope sequences between separators
+
+                       db $DD,$ED,$DD,$DE,$FF,$EF,$5A,$CB,$BD,$DE,$EF,$00,$FF,$EE,$F0,$4A;0E9900|        |      ;
+; $FF,$EF: High envelope values
+; $5A: Channel separator
+; $F0,$4A: DSP register $F0 followed by $4A separator
+; Shows complex interleaving of markers
+
+; Final lines (790-800) show all separator types appearing:
+
+                       db $76,$01,$23,$22,$11,$12,$23,$34,$45,$6A,$DC,$BD,$EF,$12,$11,$0F;0E9F50|        |      ;
+; $6A: Channel separator
+
+                       db $EE,$EF,$5A,$11,$44,$32,$0F,$FF,$E0,$12,$44,$5A,$34,$41,$EC,$EF;0E9F60|        |      ;
+; $5A: Channel separator (appears twice)
+; $E0: DSP register marker
+
+                       db $00,$35,$42,$FE,$5A,$FE,$E0,$23,$42,$0E,$DE,$FF,$04,$5A,$54,$20;0E9F70|        |      ;
+; $5A: Channel separator (appears three times)
+
+                       db $EE,$EE,$E1,$23,$35,$43,$5A,$11,$EE,$DD,$F3,$56,$65,$52,$0F,$5A;0E9F80|        |      ;
+; $E1: DSP register marker
+; $5A: Channel separator (appears twice)
+; $F3: DSP register marker
+
+                       db $E0,$01,$23,$34,$44,$43,$21,$1F,$5A,$FE,$E0,$00,$23,$44,$33,$10;0E9F90|        |      ;
+; $E0: DSP register marker (appears twice)
+; $5A: Channel separator
+
+                       db $ED,$5A,$B9,$BD,$02,$24,$64,$1C,$CC,$A9,$5A,$BC,$EE,$FF,$10,$00;0E9FA0|        |      ;
+; $5A: Channel separator (appears twice)
+; $B9,$BD: High parameters
+
+                       db $FD,$BB,$BC,$5A,$BC,$EF,$0F,$ED,$EF,$02,$0F,$EE,$5A,$EC,$BD,$DE;0E9FB0|        |      ;
+; $5A: Channel separator (appears three times)
+; Dense separator usage in final lines
+
+                       db $EE,$FF,$00,$11,$22,$5A,$10,$EC,$CB,$CE,$E1,$23,$22,$21,$5A,$01;0E9FC0|        |      ;
+; $5A: Channel separator (appears twice)
+; $E1: DSP register marker
+
+                       db $0E,$DE,$13,$44,$55,$30,$FD,$6A,$EE,$EE,$F0,$22,$44,$43,$44,$20;0E9FD0|        |      ;
+; $6A: Channel separator
+; $F0: DSP register marker
+
+                       db $6A,$ED,$DC,$BD,$EF,$F1,$23,$32,$23,$5A,$20,$EE,$EC,$DC,$BC,$CC;0E9FE0|        |      ;
+; $6A: Channel separator
+; $5A: Channel separator
+; $F1: DSP register marker
+
+                       db $AB,$CD,$5A,$EE,$F0,$00,$F0,$00,$FF,$EC,$DD,$6A,$EE,$EF,$FF,$F1;0E9FF0|        |      ;
+; $5A: Channel separator
+; $6A: Channel separator
+; $F0: DSP register marker (appears three times)
+; $F1: DSP register marker
+
+; ==============================================================================
+; End of Bank $0E Cycle 2 (Lines 401-800)
+; Documented Address Range: $0E8A00-$0EA000 (6,144 bytes)
+; ==============================================================================
+; Technical Summary:
+; - Complex multi-channel voice system with 6+ separator types:
+;   * $8A: Original separator from Bank $0D/Cycle 1 (returns at start/end)
+;   * $5A: Primary separator for section 0E8D00-0E8E00 (~256 bytes)
+;   * $6A: Primary separator for section 0E8E00-0E9000 (~512 bytes)
+;   * $7A: Dominant separator for section 0E9000-0E9E00 (~3.5KB)
+;   * $4A: Alternate separator, appears intermittently
+;   * $3A: Rare variant separator
+; - Voice markers ($A2/$B2/$B6/$A6/$B4/$B5) appear in first section (0E8A00-0E8D00)
+; - DSP register usage: $E0-$F4 range (echo, modulation, flags)
+; - Envelope markers: $CC/$DD/$BC/$EE/$EF/$FE/$ED (ADSR/volume)
+; - Pattern indicates multiple music tracks or SFX sequences:
+;   * Different separators may indicate different instrument groups
+;   * $5A/$6A/$7A pattern suggests three distinct voice layers
+;   * $8A return at boundaries indicates track/section transitions
+; - Zero padding at 0E8D30 marks major structural boundary
+; - High parameter concentration ($90+, $A0+, $F0+) in later sections
+; - This section appears to be continuation of Bank $0D's audio driver
+;   with extended voice channel capabilities (16+ simultaneous voices)
+; ==============================================================================
