@@ -2188,3 +2188,736 @@ CODE_0B8F01:  ; Animation disabled path
 ; - Additional enemy AI routines
 ; - More graphics management
 ; =============================================================================
+; =============================================================================
+; Bank $0B - Cycle 4 Documentation (Lines 1200-1600)
+; =============================================================================
+; Coverage: Battle Animation State Machine, Sprite Animation Handlers
+; Type: Executable 65816 assembly code
+; Focus: Frame-based animation, OAM updates, sprite positioning
+; =============================================================================
+
+; Continuation of CODE_0B8E91 from Cycle 3...
+
+CODE_0B8EC3:  ; Animation comparison/update path
+	CMP.B $F4					; Compare animation frame with cached value (DP)
+	BEQ CODE_0B8ED2				; Skip update if unchanged
+
+	; Animation frame changed - trigger update
+	STA.B $F4					; Store new cached frame value
+	PEA.W DATA8_0B8F15			; Push animation table pointer (changed state)
+	JSL.L CODE_0097BE			; Call animation dispatcher (Bank $00)
+	BRA CODE_0B8ED9				; Jump to next section
+
+CODE_0B8ED2:  ; Animation frame unchanged path
+	PEA.W DATA8_0B8F03			; Push animation table pointer (same state)
+	JSL.L CODE_0097BE			; Call animation dispatcher
+	; Fall through to CODE_0B8ED9
+
+CODE_0B8ED9:  ; Secondary animation counter update
+	LDX.W $0ADF					; Load secondary animation index
+	LDA.L $7EC360,X				; Load frame counter from WRAM
+	INC A						; Increment frame
+	STA.L $7EC360,X				; Store updated frame
+
+	LDA.W $10A1					; Load battle mode flags
+	JSR.W CODE_0B8F27			; Call bit scan routine (find first set bit)
+	CMP.B $F5					; Compare with cached value (DP)
+	BEQ CODE_0B8EFA				; Skip if unchanged
+
+	; Secondary animation changed
+	STA.B $F5					; Store new cached value
+	PEA.W DATA8_0B8F15			; Push changed-state table
+	JSL.L CODE_0097BE			; Call dispatcher
+	BRA CODE_0B8F01				; Exit
+
+CODE_0B8EFA:  ; Secondary animation unchanged
+	PEA.W DATA8_0B8F03			; Push same-state table
+	JSL.L CODE_0097BE			; Call dispatcher
+	; Fall through to exit
+
+CODE_0B8F01:
+	PLB							; Restore data bank
+	RTL							; Return to caller
+
+; -----------------------------------------------------------------------------
+; Animation State Jump Tables
+; -----------------------------------------------------------------------------
+; Two tables: One for unchanged frames (DATA8_0B8F03), one for changed (DATA8_0B8F15)
+; Format: 16-bit pointers to animation handler routines
+
+DATA8_0B8F03:  ; Same-state animation handlers
+	db $4A,$8F					; Handler 0: $0B8F4A
+	db $9C,$8F					; Handler 1: $0B8F9C
+	db $14,$90					; Handler 2: $0B9014
+	db $46,$90					; Handler 3: $0B9046
+	db $F9,$90					; Handler 4: $0B90F9
+	db $B6,$91					; Handler 5: $0B91B6
+	db $59,$92					; Handler 6: $0B9259
+	db $B0,$92					; Handler 7: $0B92B0 (continues beyond this section)
+	db $D5,$92					; Handler 8: $0B92D5
+
+DATA8_0B8F15:  ; Changed-state animation handlers
+	db $33,$8F					; Handler 0: $0B8F33
+	db $4B,$8F					; Handler 1: $0B8F4B
+	db $FA,$8F					; Handler 2: $0B8FFA
+	db $15,$90					; Handler 3: $0B9015
+	db $93,$90					; Handler 4: $0B9093
+	db $62,$91					; Handler 5: $0B9162
+	db $00,$92					; Handler 6: $0B9200
+	db $96,$92					; Handler 7: $0B9296
+	db $B1,$92					; Handler 8: $0B92B1
+
+; -----------------------------------------------------------------------------
+; CODE_0B8F27: Bit Scan Forward
+; -----------------------------------------------------------------------------
+; Purpose: Find position of first set bit in byte (1-8, or 0 if none)
+; Input: A = byte to scan
+; Output: Y = bit position (1-8), or 0 if no bits set
+; Method: Shift left until carry set, count shifts
+;
+; Example: A=$08 (00001000) → Y=4 (bit 3 is first set, counting from right)
+
+CODE_0B8F27:
+	PHY							; Save Y register
+	LDY.B #$08					; Y = 8 (max bits to scan)
+
+CODE_0B8F2A:  ; Scan loop
+	ASL A						; Shift left, bit 7 → carry
+	BCS CODE_0B8F30				; Exit if carry set (found bit)
+	DEY							; Decrement bit counter
+	BNE CODE_0B8F2A				; Loop if more bits to check
+
+CODE_0B8F30:
+	TYA							; Transfer bit position to A
+	PLY							; Restore Y register
+	RTS							; Return (A = bit position)
+
+; -----------------------------------------------------------------------------
+; Animation Handler 0 (Changed State): Sprite Initialization
+; -----------------------------------------------------------------------------
+; Purpose: Initialize new sprite animation state
+; Sets: $7EC400,X = 0 (sprite type/state)
+; Calls: CODE_0B9304 (sprite positioning), CODE_0B935F (sprite setup)
+
+; Entry at $0B8F33
+	LDA.B #$00					; Sprite state = 0 (inactive/default)
+	STA.L $7EC400,X				; Store to WRAM sprite state
+	JSR.W CODE_0B9304			; Calculate sprite OAM positions
+	CPX.B #$00					; Check if sprite index = 0
+	BEQ CODE_0B8F44				; Skip setup if index 0
+	JSL.L CODE_0B935F			; Call extended sprite setup
+
+CODE_0B8F44:
+	LDA.B #$80					; Set flag $80
+	STA.W $0AE5					; Store to battle state flags
+	RTS							; Return
+
+; -----------------------------------------------------------------------------
+; Animation Handler 0 (Same State): No-op
+; -----------------------------------------------------------------------------
+; Entry at $0B8F4A - Returns immediately when animation unchanged
+	RTS							; Return (do nothing)
+
+; -----------------------------------------------------------------------------
+; Animation Handler 1 (Changed State): Complex Sprite Animation
+; -----------------------------------------------------------------------------
+; Purpose: Multi-sprite animation with position adjustments
+; Manages: 8 sprite slots with coordinated movement
+; Uses: Direct page for fast register access
+
+; Entry at $0B8F4B
+	db $DA,$5A,$0B,$F4,$00,$0C,$2B	; PHX / PHY / PHP / PEA $0C00 / PLD
+	; Relocate direct page to $0C00 (OAM buffer area)
+
+	LDA.B #$00					; Clear A
+	STA.L $7EC360,X				; Reset animation frame counter
+	XBA							; Clear B
+	LDA.L $7EC320,X				; Load sprite base index
+	CLC							; Clear carry
+	ADC.B #$09					; Add offset 9
+	JSL.L CODE_0B92D6			; Call position calculator
+	JSR.W CODE_0B9304			; Calculate OAM positions
+
+	; Complex sprite positioning code (uses DP for OAM direct access)
+	; Updates sprites at offsets $00-$1F with calculated positions
+	; Format unclear from raw bytes - likely position table lookups
+
+	db $BB,$A9,$A6,$95			; Restore stack, load values
+	db $12,$95,$1A,$1A,$95,$16,$1A,$95,$1E	; Store to sprite positions
+
+	; Adjust sprite Y positions (vertical offsets)
+	db $B5,$01,$38,$E9,$0D,$95,$11	; Load sprite 1, subtract $0D
+	db $95,$15,$95,$19			; Store to positions $15, $19
+	db $18,$69,$08,$95,$1D		; Add $08, store to $1D
+
+	; Adjust sprite X positions (horizontal offsets)
+	db $B5,$00,$95,$10,$69,$08,$95	; Load sprite 0, add $08
+	db $14,$95,$1C,$69,$08,$95,$18	; Store to multiple positions
+
+	; Set sprite flip flags
+	db $B5,$1B,$09,$40,$95,$1B	; Load sprite $1B, OR with $40 (flip)
+	db $2B,$7A,$FA,$60			; Restore DP/Y/X, return
+
+; -----------------------------------------------------------------------------
+; Animation Handler 1 (Same State): Sprite Flip Animation
+; -----------------------------------------------------------------------------
+; Purpose: Animate sprite by toggling horizontal flip based on OAM data
+; Uses: OAM buffer $0C02 to determine flip direction
+
+; Entry at $0B8F9C
+	db $DA,$0B,$F4,$00,$0C,$2B	; Save X, relocate DP to $0C00
+
+	LDA.L $7EC360,X				; Load animation frame counter
+	CLC							; Clear carry
+	ADC.B #$04					; Add 4 to frame
+	ASL A						; Multiply by 2
+	ASL A						; Multiply by 2 again (×4 total)
+	TAY							; Transfer to Y (OAM index)
+
+	LDA.W $0C02,Y				; Load OAM sprite data byte
+	PHA							; Save it
+
+	LDA.L $7EC360,X				; Load frame counter again
+	BEQ CODE_0B8FBB				; Branch if frame 0
+	CMP.B #$40					; Check if frame = $40
+	BEQ CODE_0B8FD5				; Branch if frame $40
+	CMP.B #$80					; Check if frame = $80
+	BEQ CODE_0B8FC5				; Branch if frame $80
+	CMP.B #$C0					; Check if frame = $C0
+	BEQ CODE_0B8FD5				; Branch if frame $C0
+
+	PLA							; Restore saved byte
+	db $2B,$FA,$60				; Restore DP/X, return
+
+CODE_0B8FBB:  ; Frame 0: Move sprite left
+	PLA							; Restore OAM data
+	db $BB,$38,$E9,$03			; Restore stack, subtract 3 from position
+	db $95,$02,$95,$0A,$1A,$95,$06	; Store to X positions
+
+	; Clear flip bits
+	db $B5,$07,$29,$3F,$95,$07	; Load attr, AND $3F (clear flip)
+	db $B5,$0F,$29,$3F,$95,$0F	; Repeat for second sprite
+	db $80,$E3					; Branch back (BRA -29)
+
+CODE_0B8FC5:  ; Frame $80: Move sprite right
+	PLA							; Restore OAM data
+	db $BB,$18,$69,$03			; Restore stack, add 3 to position
+	db $95,$02,$95,$0A,$1A,$95,$06	; Store to X positions
+
+	; Set flip bits
+	db $B5,$07,$09,$40,$95,$07	; Load attr, OR $40 (set flip)
+	db $B5,$0F,$29,$3F,$95,$0F	; Clear flip on second sprite
+	db $80,$C9					; Branch back (BRA -55)
+
+CODE_0B8FD5:  ; Frame $40/$C0: Alternate flip
+	; Similar to above but different flip pattern
+	db $68,$BB,$18,$69,$03		; Pop, restore, add 3
+	db $95,$02,$95,$0A,$1A,$95,$06
+	db $B5,$07,$09,$40,$95,$07	; Set flip
+	db $B5,$0F,$29,$3F,$95,$0F
+	; Fall through to return
+
+; -----------------------------------------------------------------------------
+; Animation Handler 2 (Changed State): Vertical Sprite Setup
+; -----------------------------------------------------------------------------
+; Purpose: Initialize 4-sprite vertical formation
+; Positions sprites in vertical line with sequential tile IDs
+
+CODE_0B8FFA:
+	JSR.W CODE_0B9304			; Calculate OAM positions
+	LDA.L $7EC480,X				; Load sprite base tile ID
+	SEC							; Set carry
+	SBC.B #$0C					; Subtract 12 (start 12 tiles back)
+	STA.W $0C02,Y				; Store to sprite 0 tile
+	INC A						; Next tile
+	STA.W $0C06,Y				; Store to sprite 1 tile
+	INC A						; Next tile
+	STA.W $0C0A,Y				; Store to sprite 2 tile
+	INC A						; Next tile
+	STA.W $0C0E,Y				; Store to sprite 3 tile
+	RTS							; Return
+
+; Handler 2 (Same State) at $0B9014:
+	RTS							; No-op when unchanged
+
+; -----------------------------------------------------------------------------
+; Animation Handler 3 (Changed State): Expanding Animation
+; -----------------------------------------------------------------------------
+; Purpose: Sprite expansion animation starting from center
+; Creates "growing" effect by adjusting sprite positions outward
+
+CODE_0B9015:
+	LDA.B #$00					; Clear animation counter
+	STA.L $7EC360,X				; Store to WRAM
+	LDA.B #$0E					; A high byte = $0E
+	XBA							; Swap to high byte
+	LDA.L $7EC320,X				; Load sprite base index
+	CLC							; Clear carry
+	ADC.B #$09					; Add offset 9
+	JSL.L CODE_0B92D6			; Call position calculator
+	JSR.W CODE_0B9304			; Calculate OAM positions
+
+	; Setup expanding sprite positions
+	LDA.W $0C00,Y				; Load sprite 0 X position
+	SEC							; Set carry
+	SBC.B #$04					; Subtract 4 (move left)
+	STA.W $0C10,Y				; Store to sprite 1 X
+	ADC.B #$14					; Add 20 (move right from center)
+	STA.W $0C14,Y				; Store to sprite 2 X
+
+	LDA.W $0C01,Y				; Load sprite 0 Y position
+	STA.W $0C15,Y				; Store to sprite 2 Y (same height)
+	SBC.B #$08					; Subtract 8 (move up)
+	STA.W $0C11,Y				; Store to sprite 1 Y
+	RTS							; Return
+
+; -----------------------------------------------------------------------------
+; Animation Handler 3 (Same State): Spinning Animation
+; -----------------------------------------------------------------------------
+; Purpose: 4-frame rotation animation for sprite
+; Cycles through 4 tile patterns based on frame counter
+
+CODE_0B9046:
+	LDA.L $7EC260,X				; Load sprite slot index
+	ASL A						; Multiply by 4
+	ASL A
+	TAY							; Transfer to Y (OAM offset)
+
+	LDA.L $7EC360,X				; Load animation frame counter
+	LSR A						; Shift right 4 times (divide by 16)
+	LSR A
+	LSR A
+	LSR A
+	AND.B #$03					; Mask to 0-3 (4 frames)
+	PEA.W DATA8_0B905F			; Push animation table pointer
+	JSL.L CODE_0097BE			; Call dispatcher
+	RTS							; Return
+
+DATA8_0B905F:  ; Rotation frame handlers
+	db $67,$90					; Frame 0 handler: $0B9067
+	db $72,$90					; Frame 1 handler: $0B9072
+	db $7D,$90					; Frame 2 handler: $0B907D
+	db $88,$90					; Frame 3 handler: $0B9088
+
+; Frame handlers set sprite tile IDs for rotation effect:
+; Frame 0: Tiles $B9, $D2
+CODE_0B9067:
+	LDA.B #$B9					; Tile ID $B9
+	STA.W $0C12,Y				; Store to sprite slot
+	LDA.B #$D2					; Tile ID $D2
+	STA.W $0C16,Y				; Store to next sprite
+	RTS
+
+; Frame 1: Tiles $B9, $B9 (same tile both)
+CODE_0B9072:
+	LDA.B #$B9
+	STA.W $0C12,Y
+	LDA.B #$B9
+	STA.W $0C16,Y
+	RTS
+
+; Frame 2: Tiles $BA, $B9
+CODE_0B907D:
+	LDA.B #$BA
+	STA.W $0C12,Y
+	LDA.B #$B9
+	STA.W $0C16,Y
+	RTS
+
+; Frame 3: Tiles $D2, $BA
+CODE_0B9088:
+	LDA.B #$D2
+	STA.W $0C12,Y
+	LDA.B #$BA
+	STA.W $0C16,Y
+	RTS
+
+; -----------------------------------------------------------------------------
+; Animation Handler 4 (Changed State): Large Multi-Sprite Setup
+; -----------------------------------------------------------------------------
+; Purpose: Initialize 8-sprite formation (2×4 grid)
+; Complex positioning with vertical/horizontal offsets
+
+CODE_0B9093:
+	PHX							; Save X
+	PHY							; Save Y
+	PHP							; Save processor status
+	LDA.B #$00					; Clear A
+	XBA							; Clear B
+	LDA.L $7EC320,X				; Load sprite base index
+	CLC							; Clear carry
+	ADC.B #$09					; Add offset
+	JSL.L CODE_0B92D6			; Calculate positions
+	JSR.W CODE_0B9304			; Setup OAM
+
+	; Position calculations for 8-sprite grid
+	LDA.W $0C00,Y				; Load base X position
+	SBC.B #$0D					; Subtract 13 (left edge)
+	STA.W $0C10,Y				; Store sprite 1 X
+	STA.W $0C14,Y				; Store sprite 2 X (same column)
+	CLC							; Clear carry
+	ADC.B #$08					; Add 8 (next column)
+	STA.W $0C18,Y				; Store sprite 3 X
+	ADC.B #$0C					; Add 12 (third column)
+	STA.W $0C1C,Y				; Store sprite 4 X
+	STA.W $0C20,Y				; Store sprite 5 X (same column)
+	ADC.B #$09					; Add 9 (fourth column)
+	STA.W $0C24,Y				; Store sprite 6 X
+	ADC.B #$08					; Add 8 (fifth column)
+	STA.W $0C28,Y				; Store sprite 7 X
+	STA.W $0C2C,Y				; Store sprite 8 X (same column)
+
+	; Y position calculations (2 rows)
+	LDA.W $0C01,Y				; Load base Y position
+	SBC.B #$0D					; Subtract 13 (top row)
+	STA.W $0C11,Y				; Store row 1 sprites
+	STA.W $0C1D,Y
+	STA.W $0C29,Y
+	CLC							; Clear carry
+	ADC.B #$08					; Add 8 (bottom row)
+	STA.W $0C15,Y				; Store row 2 sprites
+	STA.W $0C19,Y
+	STA.W $0C21,Y
+	STA.W $0C25,Y
+	STA.W $0C2D,Y
+
+	; Set flip flag on specific sprite
+	LDA.W $0C13,Y				; Load sprite attribute
+	ORA.B #$40					; Set horizontal flip bit
+	STA.W $0C27,Y				; Store to sprite 6 attribute
+
+	PLP							; Restore processor status
+	PLY							; Restore Y
+	PLX							; Restore X
+	RTS							; Return
+
+; -----------------------------------------------------------------------------
+; Animation Handler 4 (Same State): 4-Frame Tile Animation
+; -----------------------------------------------------------------------------
+; Purpose: Cycle through 4 tile patterns for multi-sprite effect
+
+CODE_0B90F9:
+	LDA.L $7EC260,X				; Load sprite slot
+	ASL A						; Multiply by 4
+	ASL A
+	TAY							; Transfer to Y
+
+	LDA.L $7EC360,X				; Load frame counter
+	LSR A						; Divide by 32 (shift right 5)
+	LSR A
+	LSR A
+	LSR A
+	LSR A
+	AND.B #$03					; Mask to 0-3 (4 frames)
+	PEA.W DATA8_0B9113			; Push tile pattern table
+	JSL.L CODE_0097BE			; Call dispatcher
+	RTS
+
+DATA8_0B9113:  ; 4-frame tile pattern handlers
+	db $1B,$91					; Frame 0: $0B911B
+	db $29,$91					; Frame 1: $0B9129
+	db $3E,$91					; Frame 2: $0B913E
+	db $56,$91					; Frame 3: $0B9156
+
+; Frame 0: Tiles $AB, $AC, $AD (sequential)
+CODE_0B911B:
+	LDA.B #$AB
+	STA.W $0C12,Y
+	INC A
+	STA.W $0C16,Y
+	INC A
+	STA.W $0C1A,Y
+	RTS
+
+; Frame 1: Mixed pattern $D2, $D2, $D2, $AE, $AF
+CODE_0B9129:
+	LDA.B #$D2
+	STA.W $0C12,Y
+	STA.W $0C16,Y
+	STA.W $0C1A,Y
+	LDA.B #$AE
+	STA.W $0C1E,Y
+	INC A
+	STA.W $0C22,Y
+	RTS
+
+; Frame 2: Pattern $D2, $D2, $AD, $B0, $B1
+CODE_0B913E:
+	LDA.B #$D2
+	STA.W $0C1E,Y
+	STA.W $0C22,Y
+	LDA.B #$AD
+	STA.W $0C26,Y
+	INC A
+	INC A
+	INC A
+	STA.W $0C2A,Y
+	INC A
+	STA.W $0C2E,Y
+	RTS
+
+; Frame 3: All $D2 tiles (blank/transition)
+CODE_0B9156:
+	LDA.B #$D2
+	STA.W $0C26,Y
+	STA.W $0C2A,Y
+	STA.W $0C2E,Y
+	RTS
+
+; -----------------------------------------------------------------------------
+; Animation Handler 5 (Changed State): Enemy Attack Animation
+; -----------------------------------------------------------------------------
+; Purpose: Setup attack animation with sprite positioning
+
+CODE_0B9162:
+	PHX							; Save X
+	PHY							; Save Y
+	LDA.B #$00					; Clear A
+	LDA.L $7EC360,X				; Load frame counter
+	LDA.B #$04					; A high = $04
+	XBA							; Swap
+	LDA.L $7EC320,X				; Load sprite base
+	CLC							; Clear carry
+	ADC.B #$09					; Add offset
+	JSL.L CODE_0B92D6			; Calculate positions
+	JSR.W CODE_0B9304			; Setup OAM
+
+	LDA.B #$04					; Sprite count = 4
+	STA.L $7EC400,X				; Store sprite state
+
+	; Position attack sprites (moving forward)
+	LDA.L $7EC480,X				; Load base tile
+	CLC							; Clear carry
+	ADC.B #$08					; Add 8 (forward offset)
+	STA.W $0C02,Y				; Store sprite 0
+	INC A						; Next tile
+	STA.W $0C06,Y				; Store sprite 1
+	INC A
+	STA.W $0C0A,Y				; Store sprite 2
+	INC A
+	STA.W $0C0E,Y				; Store sprite 3
+
+	; Vertical positioning
+	LDA.W $0C01,Y				; Load base Y
+	SEC							; Set carry
+	SBC.B #$08					; Subtract 8 (move up)
+	STA.W $0C11,Y				; Store sprites 1,2
+	SBC.B #$04					; Subtract 4 more
+	STA.W $0C15,Y				; Store sprite 3
+
+	; Horizontal positioning
+	LDA.W $0C00,Y				; Load base X
+	CLC							; Clear carry
+	ADC.B #$08					; Add 8
+	STA.W $0C10,Y				; Store sprite 1 X
+	ADC.B #$08					; Add 8
+	STA.W $0C14,Y				; Store sprite 2 X
+
+	PLY							; Restore Y
+	PLX							; Restore X
+	RTS
+
+; -----------------------------------------------------------------------------
+; Animation Handler 5 (Same State): Attack Motion Animation
+; -----------------------------------------------------------------------------
+; Purpose: 4-frame attack motion (thrust/retreat cycle)
+
+CODE_0B91B6:
+	LDA.L $7EC260,X				; Load sprite slot
+	ASL A						; Multiply by 4
+	ASL A
+	TAY
+
+	LDA.L $7EC360,X				; Load frame counter
+	LSR A						; Divide by 32
+	LSR A
+	LSR A
+	LSR A
+	LSR A
+	AND.B #$03					; Mask to 4 frames
+	PEA.W DATA8_0B91D0			; Push motion table
+	JSL.L CODE_0097BE			; Dispatch
+	RTS
+
+DATA8_0B91D0:  ; Attack motion frames
+	db $D8,$91					; Frame 0: Neutral
+	db $E1,$91					; Frame 1: Forward
+	db $EC,$91					; Frame 2: Max forward
+	db $F5,$91					; Frame 3: Retreat
+
+; Motion frames set tile patterns for thrust animation
+CODE_0B91D8:  ; Frame 0: Both $D2 (neutral)
+	LDA.B #$D2
+	STA.W $0C12,Y
+	STA.W $0C16,Y
+	RTS
+
+CODE_0B91E1:  ; Frame 1: $B4, $D2 (forward start)
+	LDA.B #$B4
+	STA.W $0C12,Y
+	LDA.B #$D2
+	STA.W $0C16,Y
+	RTS
+
+CODE_0B91EC:  ; Frame 2: Both $B4 (max forward)
+	LDA.B #$B4
+	STA.W $0C12,Y
+	STA.W $0C16,Y
+	RTS
+
+CODE_0B91F5:  ; Frame 3: $D2, $B4 (retreat)
+	LDA.B #$D2
+	STA.W $0C12,Y
+	LDA.B #$B4
+	STA.W $0C16,Y
+	RTS
+
+; -----------------------------------------------------------------------------
+; Animation Handler 6 (Changed State): Wing Flap Animation Setup
+; -----------------------------------------------------------------------------
+; Purpose: Initialize 4-sprite wing animation
+
+CODE_0B9200:
+	JSR.W CODE_0B9304			; Calculate OAM positions
+	LDA.B #$04					; A high = $04
+	XBA							; Swap
+	LDA.L $7EC320,X				; Load sprite base
+	CLC
+	ADC.B #$09					; Add offset
+	JSL.L CODE_0B92D6			; Calculate
+
+	LDA.B #$04					; Sprite count = 4
+	STA.L $7EC400,X				; Store state
+
+	; Setup wing tiles ($B7, $B8)
+	LDA.B #$B7					; Wing tile 1
+	STA.W $0C12,Y				; Left wing top
+	STA.W $0C1A,Y				; Left wing bottom
+	INC A						; $B8
+	STA.W $0C16,Y				; Right wing top
+	STA.W $0C1E,Y				; Right wing bottom
+
+	; Position wings horizontally
+	LDA.W $0C00,Y				; Load base X
+	SEC
+	SBC.B #$08					; Move left
+	STA.W $0C10,Y				; Left wing X
+	STA.W $0C14,Y
+	CLC
+	ADC.B #$17					; Move right 23 pixels
+	STA.W $0C18,Y				; Right wing X
+	STA.W $0C1C,Y
+
+	; Position wings vertically
+	LDA.W $0C01,Y				; Load base Y
+	STA.W $0C11,Y				; Top row Y
+	STA.W $0C19,Y
+	CLC
+	ADC.B #$08					; Bottom row
+	STA.W $0C15,Y
+	STA.W $0C1D,Y
+
+	; Set flip on right wing
+	LDA.W $0C1B,Y				; Load right wing attr
+	ORA.B #$40					; Set horizontal flip
+	STA.W $0C1B,Y
+	STA.W $0C1F,Y
+	RTS
+
+; -----------------------------------------------------------------------------
+; Animation Handler 6 (Same State): Wing Oscillation
+; -----------------------------------------------------------------------------
+; Purpose: Animate wing positions with sinusoidal motion
+
+CODE_0B9259:
+	LDA.L $7EC260,X				; Load sprite slot
+	ASL A
+	ASL A
+	TAY
+
+	LDA.L $7EC360,X				; Load frame counter
+	AND.B #$01					; Check if odd/even frame
+	BEQ CODE_0B927F				; Branch if even
+
+	; Odd frames: Wings move inward
+	LDA.W $0C10,Y				; Load left wing X
+	INC A						; Move right 2 pixels
+	INC A
+	STA.W $0C10,Y
+	STA.W $0C14,Y
+
+	LDA.W $0C18,Y				; Load right wing X
+	DEC A						; Move left 2 pixels
+	DEC A
+	STA.W $0C18,Y
+	STA.W $0C1C,Y
+	RTS
+
+CODE_0B927F:  ; Even frames: Wings move outward
+	LDA.W $0C10,Y				; Load left wing X
+	; [Continues beyond this section...]
+
+; =============================================================================
+; Bank $0B Cycle 4 Summary
+; =============================================================================
+; Lines documented: ~650 lines
+; Source coverage: Lines 1200-1600 (400 source lines)
+; Documentation ratio: ~162% (extensive animation handler documentation)
+;
+; Key Systems Documented:
+; 1. Battle animation state machine (dual-table dispatch system)
+; 2. 9 animation handlers (0-8) with changed/same-state variants
+; 3. Frame-based sprite animations (rotation, expansion, attack, wing flap)
+; 4. OAM manipulation for multi-sprite formations (1-8 sprites)
+; 5. Bit scan forward algorithm (find first set bit)
+;
+; Animation Handlers:
+; - Handler 0: Sprite initialization / no-op
+; - Handler 1: Multi-sprite complex animation / flip animation
+; - Handler 2: Vertical 4-sprite formation / no-op
+; - Handler 3: Expanding animation / spinning rotation (4 frames)
+; - Handler 4: Large 8-sprite grid / 4-frame tile cycling
+; - Handler 5: Attack animation setup / thrust motion (4 frames)
+; - Handler 6: Wing flap setup / oscillation motion
+; - Handlers 7-8: (Continue beyond this section)
+;
+; Technical Patterns:
+; - Dual dispatch tables for state changes vs. continuations
+; - Frame counter at $7EC360,X (WRAM animation timing)
+; - Sprite states at $7EC400,X (WRAM sprite type/behavior)
+; - OAM buffer direct manipulation ($0C00-$0C2F range)
+; - Direct page relocation for fast OAM access
+; - Jump table dispatch via CODE_0097BE
+; - Bit masking for frame cycling (AND #$03 = 4 frames)
+; - Position calculations with carry arithmetic
+; - Horizontal flip via ORA #$40 on attributes
+;
+; Animation Frame Rates:
+; - Fast (LSR ×4): 16 frames/cycle
+; - Medium (LSR ×5): 32 frames/cycle
+; - Slow (AND #$01): 2 frames/cycle (oscillation)
+;
+; Sprite Formation Patterns:
+; - Vertical line: 4 sprites stacked
+; - Horizontal pairs: 2×2 grid
+; - Large grid: 2×4 array (8 sprites)
+; - Wings: Mirrored pair with flip
+; - Attack: Forward-moving sequence
+;
+; Cross-References:
+; - CODE_0097BE: Animation dispatcher (Bank $00)
+; - CODE_0B92D6: Position calculator (documented ahead)
+; - CODE_0B9304: OAM position setup (documented ahead)
+; - CODE_0B935F: Extended sprite setup (documented ahead)
+; - $7EC260: Sprite slot index (WRAM)
+; - $7EC320: Sprite base index (WRAM)
+; - $7EC360: Animation frame counter (WRAM)
+; - $7EC400: Sprite state flags (WRAM)
+; - $7EC480: Sprite base tile ID (WRAM)
+;
+; Next Cycle: Lines 1600-2000
+; - Complete animation handlers 6-8
+; - Position calculator CODE_0B92D6
+; - OAM setup CODE_0B9304
+; - Additional sprite management
+; =============================================================================
