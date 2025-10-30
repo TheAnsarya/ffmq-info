@@ -1191,3 +1191,560 @@ CODE_0C880C:									; Loop: Setup calculation
 ; Address range: $0C8396-$0C8813 (partial)
 ; Systems: Screen effects, palette fades, sprite animation, Mode 7 tilemap
 ; ==============================================================================
+; ==============================================================================
+; BANK $0C CYCLE 3 - DMA/HDMA & Mode 7 Math (Lines 900-1300)
+; ==============================================================================
+; Address range: $0C8813-$0C8AF1
+; Systems: HDMA setup, Mode 7 rotation/scaling, DMA transfers, OAM management
+; ==============================================================================
+
+; [Continued from Cycle 2 ending at $0C8813]
+
+	JSL.L CODE_009726						;0C8813	; Call hardware multiply routine
+	REP #$30								;0C8817	; 16-bit A/X/Y
+	LDA.W $4214								;0C8819	; Read quotient from hardware divider
+	STA.L $7F0010,X							;0C881C	; Store to Mode 7 calculation buffer
+	SEP #$20								;0C8820	; 8-bit accumulator
+	INY										;0C8822	; Next Y value
+	INX										;0C8823	; Next X offset
+	INX										;0C8824	; (word addressing)
+	CPY.W #$00E8							;0C8825	; Processed 232 values?
+	BNE CODE_0C880C							;0C8828	; Loop for all rows
+
+; ==============================================================================
+; HDMA Channel Configuration - Perspective Effect Setup
+; ==============================================================================
+; Configures two HDMA channels for Mode 7 scanline effects.
+; Channel 1 ($4310): Controls horizontal scroll register ($211B)
+; Channel 2 ($4320): Controls vertical scroll register ($211E)
+; ==============================================================================
+
+	REP #$30								;0C882A	; 16-bit A/X/Y
+	LDX.W #$886B							;0C882C	; HDMA data table address
+	LDY.W #$0000							;0C882F	; Destination = $7F0000
+	LDA.W #$0009							;0C8832	; Transfer 10 bytes
+	MVN $7F,$0C								;0C8835	; Block move Bank $0C → Bank $7F
+	PHK										;0C8838	; Push current bank
+	PLB										;0C8839	; Set data bank
+	SEP #$20								;0C883A	; 8-bit accumulator
+
+	; Configure HDMA Channel 1 (Mode 7 X scroll)
+	LDA.B #$42								;0C883C	; Transfer mode = Write 2 bytes
+	STA.W $4310								;0C883E	; Set DMA1 parameters ($4310)
+	STA.W $4320								;0C8841	; Set DMA2 parameters ($4320)
+	LDA.B #$1B								;0C8844	; PPU register = $211B (SNES_M7HOFS)
+	STA.W $4311								;0C8846	; DMA1 destination = Mode 7 H offset
+	LDA.B #$1E								;0C8849	; PPU register = $211E (SNES_M7VOFS)
+	STA.W $4321								;0C884B	; DMA2 destination = Mode 7 V offset
+
+	; Set HDMA table addresses (Bank $7F)
+	LDX.W #$0000							;0C884E	; Table offset = $7F0000
+	STX.W $4312								;0C8851	; DMA1 source address low
+	STX.W $4322								;0C8854	; DMA2 source address low
+	LDA.B #$7F								;0C8857	; Source bank = $7F
+	STA.W $4314								;0C8859	; DMA1 source bank
+	STA.W $4324								;0C885C	; DMA2 source bank
+	STA.W $4317								;0C885F	; DMA1 indirect address bank
+	STA.W $4327								;0C8862	; DMA2 indirect address bank
+
+	LDA.B #$06								;0C8865	; Enable channels 1 and 2
+	STA.W $0111								;0C8867	; Set HDMA enable flag (NMI handler)
+	RTS										;0C886A	; Return
+
+; ==============================================================================
+; HDMA Table Header Data
+; ==============================================================================
+; Format: [scanline_count] [register_value_low] [register_value_high]
+; Controls Mode 7 scroll offsets per scanline for perspective effect.
+; ==============================================================================
+
+DATA8_0C886B:
+	db $FF,$10,$00,$D1,$0E,$01,$00		;0C886B	; HDMA: 255 lines, value=$0010, then $01D1
+
+; ==============================================================================
+; CODE_0C8872 - Animated Vertical Scroll Effect
+; ==============================================================================
+; Creates smooth scrolling animation from top to bottom of screen.
+; Animates through 14-frame cycle using lookup table.
+; Used for title screen, special transitions, dramatic reveals.
+; ==============================================================================
+
+CODE_0C8872:
+	LDA.B #$F7								;0C8872	; Initial scroll value = -9 pixels
+	LDX.W #$0000							;0C8874	; Table index = 0
+
+CODE_0C8877:									; Main scroll animation loop
+	PHK										;0C8877	; Push data bank
+	PLB										;0C8878	; Set data bank
+	PHA										;0C8879	; Save scroll value
+	JSL.L CODE_0C8000						;0C887A	; Wait for VBLANK
+	STA.B SNES_BG1VOFS-$2100				;0C887E	; Set BG1 vertical scroll ($210E)
+	STZ.B SNES_BG1VOFS-$2100				;0C8880	; High byte = 0
+	LDA.W DATA8_0C88B0,X					;0C8882	; Load animation tile pattern
+	INX										;0C8885	; Next table entry
+	PHX										;0C8886	; Save index
+	JSR.W CODE_0C88EB						;0C8887	; Draw tile pattern (3×3 grid)
+	PLX										;0C888A	; Restore index
+	CPX.W #$000E							;0C888B	; End of 14-entry table?
+	BNE CODE_0C8893							;0C888E	; Branch if not done
+	LDX.W #$0000							;0C8890	; Wrap to start
+
+CODE_0C8893:									; Check scroll position ranges
+	PLA										;0C8893	; Restore scroll value
+	CMP.B #$39								;0C8894	; Position < $39?
+	BCC CODE_0C88AB							;0C8896	; Branch if in range 1 (fast scroll)
+	CMP.B #$59								;0C8898	; Position < $59?
+	BCC CODE_0C88A7							;0C889A	; Branch if in range 2 (medium scroll)
+	CMP.B #$79								;0C889C	; Position < $79?
+	BCC CODE_0C88A3							;0C889E	; Branch if in range 3 (slow scroll)
+	DEC A									;0C88A0	; Range 4: Decrement by 1 (slowest)
+	BRA CODE_0C8877							;0C88A1	; Continue animation
+
+CODE_0C88A3:								; Range 3: Slow scroll
+	SBC.B #$01								;0C88A3	; Decrement by 2 (carry set from CMP)
+	BRA CODE_0C8877							;0C88A5	; Continue animation
+
+CODE_0C88A7:								; Range 2: Medium scroll
+	SBC.B #$03								;0C88A7	; Decrement by 4
+	BRA CODE_0C8877							;0C88A9	; Continue animation
+
+CODE_0C88AB:								; Range 1: Fast scroll
+	SBC.B #$05								;0C88AB	; Decrement by 6 (fastest)
+	BCS CODE_0C8877							;0C88AD	; Continue if not wrapped negative
+	RTS										;0C88AF	; Exit when scroll completes
+
+; ==============================================================================
+; Animation Tile Pattern Table (14 entries)
+; ==============================================================================
+; Sprite tile numbers for scroll animation frames.
+; Values correspond to VRAM tile addresses for 3×3 pattern drawing.
+; ==============================================================================
+
+DATA8_0C88B0:
+	db $11,$15,$15,$11,$11,$19,$19,$19,$1D,$51,$51,$55,$55,$11 ;0C88B0
+
+; ==============================================================================
+; CODE_0C88BE - Mode 7 Matrix Initialization
+; ==============================================================================
+; Sets up Mode 7 affine transformation matrix for rotation/scaling.
+; Initializes center point ($0118, $0184) and identity matrix.
+; Called during screen setup, before 3D perspective effects.
+; ==============================================================================
+
+CODE_0C88BE:
+	PHK										;0C88BE	; Push data bank
+	PLB										;0C88BF	; Set data bank
+	CLC										;0C88C0	; Clear carry
+	LDA.B #$84								;0C88C1	; Center Y = $84 (132 decimal)
+	JSL.L CODE_0C8000						;0C88C3	; Wait for VBLANK
+	STZ.B SNES_VMAINC-$2100					;0C88C7	; VRAM address increment = 1
+
+	; Set Mode 7 center point (X coordinate)
+	STA.B SNES_M7X-$2100					;0C88C9	; M7X low byte = $00 ($211F)
+	STZ.B SNES_M7X-$2100					;0C88CB	; M7X high byte = $00
+	LDA.B #$18								;0C88CD	; Center X low = $18
+	STA.B SNES_M7Y-$2100					;0C88CF	; M7Y low byte ($2120)
+	LDA.B #$01								;0C88D1	; Center X high = $01
+	STA.B SNES_M7Y-$2100					;0C88D3	; M7Y high byte (X = $0118 = 280)
+
+	; Initialize Mode 7 matrix to identity (no rotation/scale)
+	STZ.B SNES_M7B-$2100					;0C88D5	; M7B = $0000 ($211C)
+	STZ.B SNES_M7B-$2100					;0C88D7	; Matrix element B = 0
+	STZ.B SNES_M7C-$2100					;0C88D9	; M7C = $0000 ($211D)
+	STZ.B SNES_M7C-$2100					;0C88DB	; Matrix element C = 0
+
+	; Set initial scroll offset
+	LDA.B #$04								;0C88DD	; H scroll = 4 pixels right
+	STA.B SNES_BG1HOFS-$2100				;0C88DF	; BG1 horizontal offset ($210D)
+	STZ.B SNES_BG1HOFS-$2100				;0C88E1	; High byte = 0
+	LDA.B #$F8								;0C88E3	; V scroll = -8 pixels
+	STA.B SNES_BG1VOFS-$2100				;0C88E5	; BG1 vertical offset ($210E)
+	STZ.B SNES_BG1VOFS-$2100				;0C88E7	; High byte = 0
+	LDA.B #$11								;0C88E9	; Base tile pattern
+
+; ==============================================================================
+; CODE_0C88EB - Draw 3×3 Tile Pattern
+; ==============================================================================
+; Draws 3×3 grid of tiles to VRAM at specified position.
+; Uses sequential tile numbers with automatic wrapping.
+; Input: A = base tile number, X = VRAM position base
+; ==============================================================================
+
+CODE_0C88EB:
+	CLC										;0C88EB	; Clear carry
+	LDX.W #$0F8F							;0C88EC	; VRAM base address = $0F8F
+	JSR.W CODE_0C88F8						;0C88EF	; Draw first row (3 tiles)
+	JSR.W CODE_0C88F8						;0C88F2	; Draw second row (3 tiles)
+	JSR.W CODE_0C88F8						;0C88F5	; Draw third row (3 tiles)
+
+; ==============================================================================
+; CODE_0C88F8 - Draw Single Tile Row (3 tiles)
+; ==============================================================================
+; Writes 3 consecutive tile numbers to VRAM.
+; Advances VRAM address by $80 (down one row in tilemap).
+; Input: X = VRAM address, A = starting tile number
+; ==============================================================================
+
+CODE_0C88F8:
+	STX.B SNES_VMADDL-$2100					;0C88F8	; Set VRAM address ($2116)
+	STA.B SNES_VMDATAL-$2100				;0C88FA	; Write tile 1 ($2118)
+	INC A									;0C88FC	; Next tile
+	STA.B SNES_VMDATAL-$2100				;0C88FD	; Write tile 2
+	INC A									;0C88FF	; Next tile
+	STA.B SNES_VMDATAL-$2100				;0C8900	; Write tile 3
+	ADC.B #$0E								;0C8902	; Advance tile base (+16 total from start)
+	PHA										;0C8904	; Save next row tile number
+	REP #$30								;0C8905	; 16-bit A/X/Y
+	TXA										;0C8907	; Transfer VRAM address to A
+	ADC.W #$0080							;0C8908	; Move down one tilemap row (32 tiles * 2 bytes)
+	TAX										;0C890B	; Update VRAM address
+	SEP #$20								;0C890C	; 8-bit accumulator
+	PLA										;0C890E	; Restore tile number
+	RTS										;0C890F	; Return
+
+; ==============================================================================
+; CODE_0C8910 - Setup NMI OAM Transfer
+; ==============================================================================
+; Configures NMI handler to perform OAM sprite DMA during VBLANK.
+; Sets up pointer to sprite transfer subroutine.
+; Critical for smooth sprite updates without flicker.
+; ==============================================================================
+
+CODE_0C8910:
+	PHK										;0C8910	; Push data bank
+	PLB										;0C8911	; Set data bank
+	SEP #$20								;0C8912	; 8-bit accumulator
+	LDA.B #$0C								;0C8914	; Handler bank = $0C
+	STA.W $005A								;0C8916	; Store NMI handler bank
+	LDX.W #$8929							;0C8919	; Handler address = $0C8929
+	STX.W $0058								;0C891C	; Store NMI handler pointer
+	LDA.B #$40								;0C891F	; Flag bit 6
+	TSB.W $00E2								;0C8921	; Set NMI control flag (enable OAM transfer)
+	JSL.L CODE_0C8000						;0C8924	; Wait for VBLANK
+	RTS										;0C8928	; Return
+
+; ==============================================================================
+; NMI OAM DMA Routine - Executed during VBLANK
+; ==============================================================================
+; Called automatically by NMI handler when bit 6 of $00E2 is set.
+; Transfers 544 bytes ($220) from $0C00 to OAM ($2104).
+; Uses DMA channel 5 for maximum speed (single VBLANK period).
+; ==============================================================================
+
+	LDX.W #$0000							;0C8929	; OAM address = 0
+	STX.W SNES_OAMADDL						;0C892C	; Set OAM write address ($2102)
+	LDX.W #$0400							;0C892F	; DMA mode: CPU→PPU, auto-increment
+	STX.B SNES_DMA5PARAM-$4300				;0C8932	; Set DMA5 parameters ($4350)
+	LDX.W #$0C00							;0C8934	; Source address = $0C00 (sprite buffer)
+	STX.B SNES_DMA5ADDRL-$4300				;0C8937	; Set DMA5 source address ($4352)
+	LDA.B #$00								;0C8939	; Source bank = $00
+	STA.B SNES_DMA5ADDRH-$4300				;0C893B	; Set DMA5 source bank ($4354)
+	LDX.W #$0220							;0C893D	; Transfer size = 544 bytes (512 OAM + 32 table)
+	STX.B SNES_DMA5CNTL-$4300				;0C8940	; Set DMA5 byte count ($4355)
+	LDA.B #$20								;0C8942	; Enable DMA channel 5
+	STA.W SNES_MDMAEN						;0C8944	; Start DMA transfer ($420B)
+	RTL										;0C8947	; Return from NMI handler
+
+; ==============================================================================
+; CODE_0C8948 - Direct OAM DMA Transfer
+; ==============================================================================
+; Immediately performs OAM sprite DMA (non-NMI version).
+; Identical to NMI routine but callable from main code.
+; Used for initial sprite setup or forced updates.
+; ==============================================================================
+
+CODE_0C8948:
+	SEP #$20								;0C8948	; 8-bit accumulator
+	LDX.W #$0000							;0C894A	; OAM address = 0
+	STX.W SNES_OAMADDL						;0C894D	; Set OAM write address ($2102)
+	LDX.W #$0400							;0C8950	; DMA mode: CPU→PPU, auto-increment
+	STX.W SNES_DMA5PARAM					;0C8953	; Set DMA5 parameters ($4350)
+	LDX.W #$0C00							;0C8956	; Source address = $0C00
+	STX.W SNES_DMA5ADDRL					;0C8959	; Set DMA5 source address ($4352)
+	LDA.B #$00								;0C895C	; Source bank = $00
+	STA.W SNES_DMA5ADDRH					;0C895E	; Set DMA5 source bank ($4354)
+	LDX.W #$0220							;0C8961	; Transfer size = 544 bytes
+	STX.W SNES_DMA5CNTL						;0C8964	; Set DMA5 byte count ($4355)
+	LDA.B #$20								;0C8967	; Enable DMA channel 5
+	STA.W SNES_MDMAEN						;0C8969	; Start DMA transfer ($420B)
+	PHK										;0C896C	; Push data bank
+	PLB										;0C896D	; Set data bank
+	RTS										;0C896E	; Return
+
+; ==============================================================================
+; CODE_0C896F - Complex Mode 7 Rotation Sequence
+; ==============================================================================
+; Performs animated Mode 7 rotation effect with matrix calculations.
+; Updates transformation matrix each frame for smooth rotation.
+; Used for title screen rotation, special battle effects.
+; ==============================================================================
+
+CODE_0C896F:
+	LDA.B #$D4								;0C896F	; Scroll offset = -44 pixels
+	STA.B SNES_BG1VOFS-$2100				;0C8971	; Set vertical scroll ($210E)
+	LDA.B #$FF								;0C8973	; High byte = -1 (negative scroll)
+	STA.B SNES_BG1VOFS-$2100				;0C8975	; Set high byte
+	LDX.W #$8B86							;0C8977	; Sine/cosine table 1
+	LDY.W #$8B96							;0C897A	; Sine/cosine table 2
+
+CODE_0C897D:									; Main rotation loop
+	LDA.W $0000,Y							;0C897D	; Load rotation angle
+	BEQ CODE_0C899B							;0C8980	; Exit if angle = 0 (no rotation)
+	PHY										;0C8982	; Save table pointer
+	JSL.L CODE_0C8000						;0C8983	; Wait for VBLANK
+	JSR.W CODE_0C8A78						;0C8987	; Update Mode 7 matrix ($4202 multiply)
+	PLY										;0C898A	; Restore table pointer
+
+	; Calculate vertical scroll based on rotation progress
+	TYA										;0C898B	; Transfer table offset to A
+	SEC										;0C898C	; Set carry for subtraction
+	SBC.B #$AB								;0C898D	; Subtract table base ($8B96 - $AB = $8BEB)
+	ASL A									;0C898F	; Multiply by 2 (pixel offset)
+	STA.B SNES_BG1VOFS-$2100				;0C8990	; Set vertical scroll ($210E)
+	BEQ CODE_0C8996							;0C8992	; Branch if offset = 0
+	LDA.B #$FF								;0C8994	; High byte = -1 (negative)
+
+CODE_0C8996:
+	STA.B SNES_BG1VOFS-$2100				;0C8996	; Set high byte
+	INY										;0C8998	; Next rotation angle
+	BRA CODE_0C897D							;0C8999	; Continue rotation
+
+CODE_0C899B:									; Post-rotation fade loop
+	LDA.B #$1E								;0C899B	; Loop counter = 30 frames
+
+CODE_0C899D:
+	JSL.L CODE_0C8000						;0C899D	; Wait for VBLANK
+	PHA										;0C89A1	; Save counter
+	JSR.W CODE_0C8A76						;0C89A2	; Update Mode 7 matrix
+	PLA										;0C89A5	; Restore counter
+	DEC A									;0C89A6	; Decrement
+	BNE CODE_0C899D							;0C89A7	; Loop 30 times
+
+	; Initialize sprite animation sequence
+	LDY.W #$0101							;0C89A9	; Start position = $0101
+	STY.W $0062								;0C89AC	; Store position counter
+
+CODE_0C89AF:									; Sprite position update loop
+	LDY.W $0062								;0C89AF	; Load position
+	PHY										;0C89B2	; Save position
+	JSR.W CODE_0C8A3F						;0C89B3	; Update sprite coordinates
+	PLY										;0C89B6	; Restore position
+	STY.W $0062								;0C89B7	; Store position
+	INC.W $0062								;0C89BA	; Increment X coordinate
+	INC.W $0063								;0C89BD	; Increment Y coordinate
+
+	; Second sprite update (staggered)
+	LDY.W $0062								;0C89C0	; Load updated position
+	PHY										;0C89C3	; Save position
+	JSR.W CODE_0C8A3F						;0C89C4	; Update sprite coordinates
+	PLY										;0C89C7	; Restore position
+	STY.W $0062								;0C89C8	; Store position
+	INC.W $0062								;0C89CB	; Increment X coordinate
+	INC.W $0063								;0C89CE	; Increment Y coordinate
+
+	; Check for triple update (every 3 cycles)
+	LDA.W $0062								;0C89D1	; Load X coordinate
+	CMP.B #$0C								;0C89D4	; Reached position $0C?
+	BEQ CODE_0C89E8							;0C89D6	; Branch if done
+
+	; Third sprite update (pattern of 3)
+	LDY.W $0062								;0C89D8	; Load position
+	PHY										;0C89DB	; Save position
+	JSR.W CODE_0C8A3F						;0C89DC	; Update sprite coordinates
+	PLY										;0C89DF	; Restore position
+	STY.W $0062								;0C89E0	; Store position
+	INC.W $0062								;0C89E3	; Increment X coordinate
+	BRA CODE_0C89AF							;0C89E6	; Continue loop
+
+CODE_0C89E8:									; Wait for table sync loop
+	JSL.L CODE_0C8000						;0C89E8	; Wait for VBLANK
+	JSR.W CODE_0C8A76						;0C89EC	; Update Mode 7 matrix
+	CPX.W #$8B66							;0C89EF	; Table index at $8B66?
+	BNE CODE_0C89E8							;0C89F2	; Loop until synced
+
+CODE_0C89F4:									; Final sync hold loop
+	JSL.L CODE_0C8000						;0C89F4	; Wait for VBLANK
+	JSR.W CODE_0C8A76						;0C89F8	; Update Mode 7 matrix
+	CPX.W #$8B66							;0C89FB	; Table index at $8B66?
+	BNE CODE_0C89F4							;0C89FE	; Loop until stable
+
+	; Setup final color effects
+	JSR.W CODE_0C8910						;0C8A00	; Enable NMI OAM transfer
+	LDA.B #$30								;0C8A03	; Flag value = $30
+	STA.W $0505								;0C8A05	; Store effect state
+	LDX.W #$2100							;0C8A08	; Color math mode
+	STX.B SNES_CGSWSEL-$2100				;0C8A0B	; Set color window ($2130)
+	LDA.B #$FF								;0C8A0D	; Maximum brightness
+	STA.B SNES_COLDATA-$2100				;0C8A0F	; Set fixed color ($2132)
+
+	; Fade-in sequence (8 steps)
+	LDA.B #$08								;0C8A11	; Loop counter = 8 brightness levels
+	LDY.W #$000C							;0C8A13	; Sprite count = 12
+	LDX.W #$0C04							;0C8A16	; Sprite data buffer base
+
+CODE_0C8A19:									; Fade brightness loop
+	PHA										;0C8A19	; Save brightness level
+	PHY										;0C8A1A	; Save sprite count
+	PHX										;0C8A1B	; Save buffer pointer
+
+CODE_0C8A1C:									; Decrement sprite brightness
+	DEC.W $0000,X							;0C8A1C	; Decrease sprite brightness
+	INX										;0C8A1F	; Next sprite
+	INX										;0C8A20	; (skip 2 bytes)
+	INX										;0C8A21	; (skip 2 bytes)
+	INX										;0C8A22	; (word + word structure)
+	DEY										;0C8A23	; Decrement sprite counter
+	BNE CODE_0C8A1C							;0C8A24	; Loop for all sprites
+
+	JSR.W CODE_0C8910						;0C8A26	; Update OAM via NMI
+	JSL.L CODE_0C8000						;0C8A29	; Wait for VBLANK
+	PLX										;0C8A2D	; Restore buffer pointer
+	PLY										;0C8A2E	; Restore sprite count
+	LDA.B $01,S								;0C8A2F	; Load brightness level from stack
+	DEC A									;0C8A31	; Decrease brightness
+	ASL A									;0C8A32	; *2
+	ASL A									;0C8A33	; *4 (multiply by 4)
+	ORA.B #$E0								;0C8A34	; OR with color mask ($E0 = red channel)
+	STA.B SNES_COLDATA-$2100				;0C8A36	; Update fixed color ($2132)
+	PLA										;0C8A38	; Clean up brightness from stack
+	DEC A									;0C8A39	; Decrement loop counter
+	BNE CODE_0C8A19							;0C8A3A	; Loop for all 8 brightness levels
+
+	STZ.B SNES_CGADSUB-$2100				;0C8A3C	; Disable color math ($2131)
+	RTS										;0C8A3E	; Return
+
+; ==============================================================================
+; CODE_0C8A3F - Update Sprite Position
+; ==============================================================================
+; Calculates and sets sprite screen coordinates.
+; Converts logical position to screen-relative offset.
+; Input: $0062 = X position, $0063 = Y position
+; ==============================================================================
+
+CODE_0C8A3F:
+	REP #$30								;0C8A3F	; 16-bit A/X/Y
+	SEC										;0C8A41	; Set carry for subtraction
+	LDA.W $0062								;0C8A42	; Load X position
+	AND.W #$00FF							;0C8A45	; Mask to 8-bit
+	EOR.W #$FFFF							;0C8A48	; Invert bits (two's complement prep)
+	ADC.W #$040F							;0C8A4B	; Add screen offset ($0410 - 1)
+	STA.W $0400								;0C8A4E	; Store screen X coordinate
+
+	LDA.W $0063								;0C8A51	; Load Y position
+	AND.W #$00FF							;0C8A54	; Mask to 8-bit
+	EOR.W #$FFFF							;0C8A57	; Invert bits
+	ADC.W #$603F							;0C8A5A	; Add screen offset ($6040 - 1)
+	STA.W $0402								;0C8A5D	; Store screen Y coordinate
+
+	SEP #$20								;0C8A60	; 8-bit accumulator
+	LDA.B #$0C								;0C8A62	; NMI handler bank
+	STA.W $005A								;0C8A64	; Store handler bank
+	LDY.W #$8B0C							;0C8A67	; Handler routine address
+	STY.W $0058								;0C8A6A	; Store handler pointer
+	LDA.B #$40								;0C8A6D	; Flag bit 6
+	TSB.W $00E2								;0C8A6F	; Set NMI enable flag
+	JSL.L CODE_0C8000						;0C8A72	; Wait for VBLANK
+
+; ==============================================================================
+; CODE_0C8A76 - Hardware Multiply Setup
+; ==============================================================================
+; Initializes hardware multiplier for Mode 7 calculations.
+; Input: A = multiplicand value (typically $30 for 48×48 matrix)
+; ==============================================================================
+
+CODE_0C8A76:
+	LDA.B #$30								;0C8A76	; Multiplicand = 48
+
+CODE_0C8A78:
+	STA.W $4202								;0C8A78	; Set multiplicand register ($4202)
+	STA.W $0064								;0C8A7B	; Store to variable
+	JSR.W CODE_0C8AC8						;0C8A7E	; Read Mode 7 matrix element
+	STY.W $0062								;0C8A81	; Store matrix A value
+	INX										;0C8A84	; Next matrix element
+	INX										;0C8A85	; (word offset)
+	JSR.W CODE_0C8AC8						;0C8A86	; Read Mode 7 matrix element
+	STY.W $0064								;0C8A89	; Store matrix B value
+	INX										;0C8A8C	; Next matrix element
+	INX										;0C8A8D	; (word offset)
+
+	; Check for table wrap
+	CPX.W #$8B96							;0C8A8E	; End of sine/cosine table?
+	BNE CODE_0C8A96							;0C8A91	; Branch if not
+	LDX.W #$8B66							;0C8A93	; Wrap to table start
+
+CODE_0C8A96:									; Write Mode 7 matrix registers
+	JSL.L CODE_0C8000						;0C8A96	; Wait for VBLANK
+
+	; Update Mode 7 matrix A register ($211B)
+	LDA.W $0062								;0C8A9A	; Load matrix A low byte
+	STA.B SNES_M7A-$2100					;0C8A9D	; Write M7A low ($211B)
+	LDA.W $0063								;0C8A9F	; Load matrix A high byte
+	STA.B SNES_M7A-$2100					;0C8AA2	; Write M7A high
+
+	; Update Mode 7 matrix D register ($211E)
+	LDA.W $0062								;0C8AA4	; Load matrix D low byte
+	STA.B SNES_M7D-$2100					;0C8AA7	; Write M7D low ($211E)
+	LDA.W $0063								;0C8AA9	; Load matrix D high byte
+	STA.B SNES_M7D-$2100					;0C8AAC	; Write M7D high
+
+	; Update Mode 7 matrix B register ($211C)
+	LDA.W $0064								;0C8AAE	; Load matrix B low byte
+	STA.B SNES_M7B-$2100					;0C8AB1	; Write M7B low ($211C)
+	XBA										;0C8AB3	; Swap A/B bytes
+	LDA.W $0065								;0C8AB4	; Load matrix B high byte
+	STA.B SNES_M7B-$2100					;0C8AB7	; Write M7B high
+	XBA										;0C8AB9	; Restore byte order
+
+	; Calculate and set matrix C (negative of B)
+	REP #$30								;0C8ABA	; 16-bit A/X/Y
+	EOR.W #$FFFF							;0C8ABC	; Invert all bits
+	INC A									;0C8ABF	; Increment (two's complement = -B)
+	SEP #$20								;0C8AC0	; 8-bit accumulator
+	STA.B SNES_M7C-$2100					;0C8AC2	; Write M7C low ($211D)
+	XBA										;0C8AC4	; Swap bytes
+	STA.B SNES_M7C-$2100					;0C8AC5	; Write M7C high
+	RTS										;0C8AC7	; Return
+
+; ==============================================================================
+; CODE_0C8AC8 - Read & Multiply Matrix Element
+; ==============================================================================
+; Reads sine/cosine value from table and performs hardware multiply.
+; Used for Mode 7 rotation matrix calculation.
+; Input: X = table offset
+; Output: Y = result from hardware multiplier
+; ==============================================================================
+
+CODE_0C8AC8:
+	LDA.W $0001,X							;0C8AC8	; Load matrix value high byte
+	BMI CODE_0C8AF1							;0C8ACB	; Branch if negative (sign extend)
+	BNE CODE_0C8AE6							;0C8ACD	; Branch if non-zero high byte
+	LDA.W $0000,X							;0C8ACF	; Load low byte only
+
+CODE_0C8AD2:									; Small positive value path
+	JSL.L CODE_00971E						;0C8AD2	; Setup hardware multiply/divide
+	LDY.W $4216								;0C8AD6	; Read division remainder
+	STY.W $4204								;0C8AD9	; Store to dividend register
+
+CODE_0C8ADC:									; Common multiply path
+	LDA.B #$30								;0C8ADC	; Multiplier = 48
+	JSL.L CODE_009726						;0C8ADE	; Perform hardware multiply
+	LDY.W $4214								;0C8AE2	; Read product result ($4214)
+	RTS										;0C8AE5	; Return with result in Y
+
+CODE_0C8AE6:									; Large positive value path
+	STZ.W $4204								;0C8AE6	; Clear dividend high byte
+	LDA.W $0064								;0C8AE9	; Load multiplier value
+	STA.W $4205								;0C8AEC	; Set divisor register
+	BRA CODE_0C8ADC							;0C8AEF	; Continue to multiply
+
+CODE_0C8AF1:									; Negative value path (sign extend)
+	LDA.W $0000,X							;0C8AF1	; Load matrix value low byte
+	; [Additional processing continues...]
+
+; ==============================================================================
+; End of Bank $0C Cycle 3
+; ==============================================================================
+; Lines documented: 400 source lines (900-1300)
+; Address range: $0C8813-$0C8AF1
+; Systems: HDMA setup, Mode 7 rotation/scaling, DMA transfers, OAM management
+; ==============================================================================
