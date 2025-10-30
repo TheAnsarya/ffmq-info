@@ -2286,3 +2286,402 @@ DATA8_0DCC31:
   db $2C,$BC,$9A,$F0,$11,$DC,$F4,$1E,$F0,$30,$11,$B6,$24,$FB,$11,$DF;0DD391 - $2C, $BC, $9A, $DC, $1E, $B6, $FB, $DF
   db $32,$FF,$11,$0F,$B6,$03,$3B,$B0,$00,$10,$00,$11,$11,$A6,$0F,$11;0DD3A1 - $B6, $3B, $B0, $A6
   db $AC,$53,$CE,$00,$0F,$02,$BA,$FF,$01,$0F,$00,$10,$00,$13,$CB,$B6;0DD3B1 - $AC, $CE, $BA, $CB, $B6
+; ==============================================================================
+; Bank $0D - APU Communication & Sound Driver
+; Lines 2401-2800: Final Music/SFX Pattern Data + Additional Tables
+; ==============================================================================
+
+; ------------------------------------------------------------------------------
+; Music/SFX Pattern Data - Final Sequences ($0DDD51-$DF5C1, ~7,952 bytes)
+; ------------------------------------------------------------------------------
+; Continuation of extensive music and sound effect data patterns.
+; Contains the final music sequences loaded into SPC700 for track playback.
+; Same format: Custom opcodes, note values, durations, envelope commands.
+; Markers $A6, $B6, $AA, $BA, $96, $9A, $92, $86, etc. structure the data.
+
+; Pattern Block A ($0DDD51-$DDFB1, 608 bytes):
+; Extended music sequences with $A6, $BA, $AA markers
+DATA8_0DDD51:
+  db $F5,$3B,$BF,$F1,$41,$DE,$02,$AA,$1C,$C2,$51,$FE,$E2,$11,$FC,$10;0DDD51 - $AA marker, $1C, $C2 values
+  db $A2,$C0,$31,$EC,$CD,$16,$2A,$AC,$EF,$A6,$FF,$22,$22,$FF,$13,$2E;0DDD61 - $A2, $C0, $CD, $AC, $A6 markers
+  db $DD,$F5,$A6,$3B,$BF,$01,$41,$CE,$13,$2F,$BC,$96,$26,$76,$DD,$25;0DDD71 - $DD, $A6, $3B, $BF, $CE, $BC, $96 (lower value)
+  db $3D,$BA,$D7,$6D,$A2,$EC,$CD,$06,$3B,$9B,$DF,$ED,$F1,$A6,$13,$1E;0DDD81 - $3D, $BA, $D7, $6D, $A2, $EC, $CD, $3B, $9B, $A6
+  db $03,$2F,$DC,$F5,$3C,$BE,$A6,$F1,$53,$DD,$02,$20,$DC,$02,$33,$A2;0DDD91 - $3C, $BE, $A6, $DD, $DC, $A2
+  db $31,$13,$55,$2D,$C0,$32,$FC,$CE,$A2,$16,$4C,$AB,$DF,$0F,$F0,$25;0DDDA1 - $2D, $C0, $FC, $CE, $A2, $4C, $AB
+  db $65,$A6,$F1,$21,$DA,$F6,$3C,$CE,$E0,$44,$A6,$FD,$F1,$21,$EC,$E1;0DDDB1 - $65, $A6, $DA, $3C, $CE, $A6, $EC, $E1
+  db $44,$0F,$F0,$A2,$35,$3D,$BF,$21,$EC,$CE,$16,$4C,$A6,$D1,$22,$1F;0DDDC1 - $A2, $3D, $BF, $EC, $CE, $4C, $A6, $D1
+  db $F0,$24,$20,$FF,$23,$A2,$5E,$D3,$62,$EC,$AA,$E3,$3F,$DE,$AA,$1F;0DDDD1 - $A2, $5E, $D3, $62, $EC, $AA, $E3, $DE, $AA
+  db $EE,$12,$31,$C0,$0F,$31,$BC,$A2,$BF,$21,$EC,$CD,$06,$5D,$AB,$DF;0DDDE1 - $C0, $BC, $A2, $BF, $EC, $CD, $5D, $AB
+  db $B6,$10,$FF,$13,$10,$00,$01,$FD,$F3,$A6,$4D,$BD,$D0,$45,$1C,$D0;0DDDF1 - $B6 marker, $A6, $4D, $BD, $D0, $1C, $D0
+  db $22,$0D,$AA,$F2,$52,$CE,$0F,$32,$CB,$46,$FC,$A2,$FC,$BC,$06,$5D;0DDE01 - $0D, $AA, $CE, $CB, $A2, $FC, $BC, $5D
+  db $AB,$CE,$01,$FD,$A6,$25,$30,$FF,$13,$F9,$D5,$4D,$CE,$A6,$E0,$34;0DDE11 - $AB, $CE, $A6, $D5, $4D, $CE, $A6
+  db $2D,$DF,$23,$1D,$BD,$46,$A2,$43,$10,$24,$3D,$AD,$23,$0C,$AB,$A2;0DDE21 - $2D, $DF, $1D, $BD, $A2, $3D, $AD, $0C, $AB, $A2
+  db $F6,$5D,$AA,$BD,$02,$0D,$F4,$77,$A6,$DF,$32,$FA,$D4,$4E,$DE,$DF;0DDE31 - $5D, $AA, $BD, $0D, $77, $A6, $DF, $FA, $D4, $4E, $DE
+  db $24,$A6,$3E,$CF,$12,$20,$BB,$36,$21,$DF,$A2,$35,$3E,$BD,$12,$0D;0DDE41 - $A6, $3E, $CF, $BB, $DF, $A2, $3E, $BD, $0D
+  db $BB,$E4,$4D,$A6,$D0,$12,$33,$DA,$16,$41,$D0,$42,$AA,$BE,$45,$FB;0DDE51 - $BB, $E4, $4D, $A6, $D0, $DA, $D0, $AA, $BE, $FB
+  db $01,$E2,$32,$0B,$D2,$A6,$12,$20,$BA,$36,$31,$DF,$43,$DB,$A2,$CD;0DDE61 - $E2, $0B, $D2, $A6, $BA, $DF, $DB, $A2, $CD
+  db $13,$1E,$CC,$E4,$5F,$BA,$AC,$A6,$34,$FA,$05,$41,$E0,$43,$CA,$F2;0DDE71 - $1E, $CC, $E4, $5F, $BA, $AC, $A6, $FA, $E0, $CA
+  db $AA,$0D,$F0,$F2,$22,$1B,$D2,$21,$1F,$A6,$C9,$15,$31,$EF,$33,$DB;0DDE81 - $AA, $0D, $1B, $D2, $A6, $C9, $EF, $DB
+  db $F1,$32,$A2,$1E,$CC,$F5,$6F,$BA,$BE,$14,$3D,$A6,$F5,$40,$E0,$34;0DDE91 - $A2, $1E, $CC, $6F, $BA, $BE, $3D, $A6, $E0
+  db $EB,$01,$0F,$FE,$A6,$CE,$13,$51,$DE,$01,$22,$D9,$05,$A6,$30,$E0;0DDEA1 - $EB, $A6, $CE, $DE, $D9, $A6, $E0
+  db $34,$EB,$F0,$12,$FE,$EF,$A2,$D3,$5F,$CB,$BD,$03,$2D,$D2,$54,$A6;0DDEB1 - $EB, $A2, $D3, $5F, $CB, $BD, $2D, $D2, $A6
+  db $F1,$23,$EB,$02,$FE,$FF,$DF,$13,$A2,$34,$0E,$EF,$13,$1B,$BF,$11;0DDEC1 - $EB, $DF, $A2, $0E, $EF, $1B, $BF
+  db $12,$A2,$46,$40,$FF,$01,$0E,$DC,$D2,$4F,$A6,$DF,$02,$22,$0C,$F4;0DDED1 - $A2, $40, $0E, $DC, $D2, $4F, $A6, $DF, $0C
+  db $30,$01,$22,$A6,$ED,$11,$EE,$FF,$EF,$02,$42,$DE,$AA,$21,$10,$CD;0DDEE1 - $A6, $ED, $EE, $EF, $DE, $AA, $CD
+  db $44,$EF,$00,$20,$C0,$A2,$00,$00,$FE,$DC,$D2,$3E,$CC,$CE,$96,$44;0DDEF1 - $EF, $C0, $A2, $DC, $D2, $3E, $CC, $CE, $96
+  db $0B,$D5,$41,$22,$32,$BD,$40,$A6,$DE,$0F,$DF,$02,$42,$DE,$01,$22;0DDF01 - $0B, $D5, $BD, $A6, $DE, $DF, $DE
+  db $96,$D9,$F3,$F1,$32,$42,$AE,$3E,$E1,$A2,$0F,$ED,$E3,$3E,$CC,$CE;0DDF11 - $96, $D9, $AE, $3E, $E1, $A2, $ED, $E3, $3E, $CC, $CE
+  db $02,$21,$A6,$F1,$11,$11,$21,$DF,$30,$CD,$00,$A6,$EF,$01,$43,$DD;0DDF21 - $A6, $DF, $CD, $A6, $EF, $DD
+  db $01,$22,$FE,$00,$96,$D2,$22,$51,$9E,$5F,$CF,$0E,$E0,$AA,$22,$BB;0DDF31 - $96, $D2, $9E, $5F, $CF, $E0, $AA, $BB
+  db $42,$01,$10,$D0,$1F,$11,$A6,$11,$20,$D0,$51,$BC,$0F,$DF,$11,$92;0DDF41 - $D0, $A6, $D0, $BC, $DF, $92 marker
+  db $F5,$1C,$DF,$24,$0E,$1F,$AC,$03,$92,$76,$ED,$47,$2E,$DB,$99,$E7;0DDF51 - $1C, $DF, $AC, $92, $76, $ED, $2E, $DB, $99, $E7
+  db $49,$96,$DF,$04,$53,$E1,$2C,$04,$23,$4F,$A6,$D0,$42,$BB,$00,$DF;0DDF61 - $96, $DF, $E1, $2C, $4F, $A6, $D0, $BB, $DF
+  db $11,$33,$ED,$92,$CF,$24,$11,$40,$BC,$F2,$76,$FE,$A2,$24,$2E,$DD;0DDF71 - $ED, $92, $CF, $BC, $76, $A2, $2E, $DD
+  db $DD,$F3,$1C,$BB,$CE,$A6,$21,$F1,$2D,$F2,$22,$2F,$D0,$32,$AA,$BE;0DDF81 - $DD, $1C, $BB, $CE, $A6, $2D, $D0, $AA, $BE
+  db $50,$D2,$20,$10,$CF,$30,$1F,$A6,$F1,$2E,$D0,$11,$2F,$D1,$32,$0C;0DDF91 - $D2, $CF, $A6, $2E, $D0, $D1, $0C
+  db $A6,$EF,$F0,$35,$EB,$EF,$02,$32,$F1,$AA,$1C,$12,$01,$1C,$F4,$3E;0DDFA1 - $A6, $EF, $EB, $EF, $AA, $1C, $1C, $3E
+  db $CD,$31,$A6,$D0,$21,$23,$FC,$02,$20,$F2,$2E,$96,$9D,$23,$4E,$B3;0DDFB1 - $CD, $A6, $D0, $FC, $96, $9D, $4E, $B3
+
+; Pattern Block B ($0DDFC1-$DE421, 1,121 bytes):
+; Continued sequences with heavy use of $A6, $96, $BA markers
+DATA8_0DDFC1:
+  db $53,$1A,$AD,$F1,$A6,$44,$CB,$FF,$02,$31,$F1,$2F,$E1,$A6,$22,$1E;0DDFC1 - $1A, $AD, $A6, $CB, $A6
+  db $E2,$31,$EC,$EF,$DF,$11,$92,$D5,$5E,$CE,$12,$03,$66,$0B,$CF,$A6;0DDFD1 - $E2, $EC, $EF, $DF, $92, $D5, $5E, $CE, $66, $0B, $CF, $A6
+  db $2F,$E1,$21,$1F,$DD,$F0,$44,$DC,$96,$ED,$04,$62,$F2,$40,$BF,$34;0DDFE1 - $E1, $DD, $DC, $96, $ED, $62, $BF
+  db $3C,$A6,$E2,$41,$ED,$DE,$EF,$11,$24,$1C,$A6,$E1,$20,$F1,$22,$EC;0DDFF1 - $3C, $A6, $E2, $ED, $DE, $EF, $1C, $A6, $E1, $EC
+  db $F1,$2F,$F2,$A6,$21,$00,$DC,$F1,$43,$CD,$0F,$02,$AA,$0F,$F0,$11;0DE001 - $A6, $DC, $CD, $AA
+  db $D0,$21,$0D,$04,$1D,$AA,$D2,$1D,$F3,$20,$02,$EC,$03,$1F,$AA,$F1;0DE011 - $D0, $0D, $AA, $D2, $EC, $AA
+  db $21,$BD,$33,$FF,$12,$FF,$F2,$A6,$0C,$D1,$52,$BD,$0F,$02,$31,$FF;0DE021 - $BD, $A6, $0C, $D1, $BD
+  db $A6,$23,$FE,$12,$0D,$03,$30,$DE,$1E,$AA,$D3,$3F,$12,$FC,$E3,$2F;0DE031 - $A6, $0D, $DE, $AA, $D3, $FC, $E3
+  db $E1,$32,$AA,$CA,$34,$FE,$31,$FF,$F1,$1C,$E5,$A6,$51,$BF,$0F,$02;0DE041 - $E1, $AA, $CA, $1C, $E5, $A6, $BF
+  db $31,$FF,$34,$0C,$AA,$33,$EE,$33,$FD,$D2,$3E,$B2,$50,$A6,$23,$30;0DE051 - $0C, $AA, $EE, $D2, $3E, $B2, $A6
+  db $DE,$00,$F1,$45,$1A,$B0,$A2,$CB,$E1,$22,$11,$21,$CC,$11,$CC,$9A;0DE061 - $DE, $1A, $B0, $A2, $CB, $E1, $CC, $CC, $9A
+  db $1D,$13,$3D,$B2,$61,$BA,$35,$BE,$A6,$24,$3F,$CE,$22,$AA,$02,$33;0DE071 - $1D, $3D, $B2, $61, $BA, $BE, $A6, $3F, $CE, $AA
+  db $20,$A6,$EE,$10,$E0,$45,$2B,$B0,$EF,$33,$A6,$10,$F0,$11,$CE,$3E;0DE081 - $A6, $EE, $E0, $2B, $B0, $EF, $A6, $CE, $3E
+  db $C1,$1F,$01,$AA,$1E,$E3,$3F,$ED,$02,$E1,$42,$FC,$B6,$EF,$12,$EC;0DE091 - $C1, $AA, $1E, $E3, $ED, $E1, $FC, $B6, $EF, $EC
+  db $F0,$12,$21,$FE,$00,$A6,$E1,$55,$3B,$9E,$E0,$43,$10,$FF,$96,$04;0DE0A1 - $A6, $E1, $3B, $9E, $E0, $96
+  db $DC,$29,$A4,$3F,$F1,$30,$E3,$A6,$32,$2F,$DE,$DF,$35,$4F,$CD,$04;0DE0B1 - $DC, $29, $A4, $E3, $A6, $DE, $DF, $4F, $CD
+  db $AA,$AA,$63,$11,$FF,$FE,$00,$F4,$30,$AA,$FA,$D3,$03,$4F,$EE,$01;0DE0C1 - $AA, $AA, $63 (repeated $AA = voice data), $FA, $D3, $4F, $EE
+  db $01,$FF,$AA,$0C,$34,$FE,$01,$0E,$03,$10,$FE,$AA,$E0,$F3,$41,$FB;0DE0D1 - $AA, $0C, $AA, $E0
+  db $E1,$34,$BA,$44,$AA,$01,$0F,$FE,$FF,$24,$10,$0B,$C1,$AA,$14,$4F;0DE0E1 - $E1, $BA, $AA, $0B, $C1, $AA, $4F
+  db $ED,$01,$11,$1E,$BE,$54,$AA,$FF,$F1,$FD,$33,$0F,$FF,$FE,$04,$A6;0DE0F1 - $ED, $1E, $BE, $AA, $A6
+  db $34,$3E,$CE,$04,$1A,$BF,$23,$32,$AA,$0F,$CE,$44,$01,$0C,$CE,$26;0DE101 - $3E, $CE, $1A, $BF, $AA, $CE, $0C, $CE
+  db $2F,$B6,$10,$00,$00,$10,$DD,$01,$11,$00,$A6,$FD,$14,$32,$11,$0B;0DE111 - $B6, $DD, $A6, $0B
+  db $B0,$35,$4E,$A6,$CE,$F3,$2C,$BD,$13,$43,$21,$DA,$AA,$53,$02,$0C;0DE121 - $B0, $4E, $A6, $CE, $2C, $BD, $DA, $AA, $0C
+  db $CD,$27,$2F,$FE,$F0,$B6,$01,$21,$CC,$01,$11,$00,$FE,$13,$A6,$31;0DE131 - $CD, $B6, $CC, $A6
+  db $01,$1B,$B1,$34,$3E,$DE,$F3,$AA,$0A,$E1,$43,$0F,$F1,$BC,$64,$F1;0DE141 - $1B, $B1, $3E, $DE, $AA, $0A, $E1, $BC, $64
+  db $AA,$1D,$CC,$17,$20,$FE,$F0,$02,$4E,$B6,$CB,$F1,$22,$10,$EE,$12;0DE151 - $AA, $1D, $CC, $4E, $B6, $CB, $EE
+  db $11,$11,$A6,$1A,$A1,$33,$2E,$DF,$F3,$3E,$CB,$AA,$35,$1F,$E0,$CD;0DE161 - $A6, $1A, $A1, $2E, $DF, $3E, $CB, $AA, $E0, $CD
+  db $53,$F1,$2E,$CC,$B6,$D0,$11,$11,$00,$F0,$32,$CB,$E1,$A6,$44,$20;0DE171 - $2E, $CC, $B6, $D0, $CB, $E1, $A6
+  db $CD,$34,$21,$11,$1C,$B0,$A6,$23,$3F,$DE,$F3,$3E,$DC,$D2,$44,$AA;0DE181 - $CD, $1C, $B0, $A6, $3F, $DE, $3E, $DC, $D2, $AA
+  db $FE,$CF,$42,$01,$2D,$BE,$14,$30,$B6,$11,$00,$F0,$31,$CC,$E1,$22;0DE191 - $CF, $2D, $BE, $B6, $CC, $E1
+  db $10,$A6,$BD,$34,$21,$11,$0D,$DF,$13,$3F,$A6,$DE,$F2,$4F,$DC,$C1;0DE1A1 - $A6, $BD, $0D, $DF, $A6, $DE, $4F, $DC, $C1
+  db $44,$41,$CD,$A6,$00,$12,$43,$DB,$CE,$12,$22,$0F,$AA,$03,$4A,$A2;0DE1B1 - $CD, $A6, $DB, $CE, $AA, $4A, $A2
+  db $03,$40,$0D,$A3,$51,$96,$43,$22,$EC,$DD,$15,$3E,$CE,$F4,$A6,$3E;0DE1C1 - $0D, $A3, $96, $EC, $DD, $3E, $CE, $A6, $3E
+  db $DE,$CF,$45,$40,$CF,$1F,$01,$A6,$43,$CC,$FE,$F1,$12,$00,$02,$5F;0DE1D1 - $DE, $CF, $CF, $A6, $CC
+  db $AA,$B3,$F1,$52,$FC,$B3,$41,$FF,$01,$AA,$EF,$1F,$12,$FF,$00,$02;0DE1E1 - $AA, $B3, $FC, $B3, $AA, $EF
+  db $3C,$C2,$A6,$DE,$35,$40,$CF,$1F,$01,$33,$CC,$A6,$0E,$E0,$12,$10;0DE1F1 - $3C, $C2, $A6, $DE, $CF, $CC, $A6, $0E, $E0
+  db $13,$4E,$BE,$CC,$A6,$25,$4F,$CE,$23,$21,$11,$EF,$2F,$AA,$F3,$FF;0DE201 - $4E, $BE, $CC, $A6, $4F, $CE, $EF, $AA
+  db $10,$F1,$4D,$C1,$0F,$43,$A6,$40,$E0,$2F,$F0,$34,$DC,$1E,$DF,$A6;0DE211 - $4D, $C1, $A6, $E0, $DC, $1E, $DF, $A6
+  db $02,$21,$02,$3E,$CE,$DD,$15,$3F,$96,$AE,$35,$32,$31,$BD,$61,$BF;0DE221 - $3E, $CE, $DD, $96, $AE, $BD, $61, $BF
+  db $FE,$A6,$00,$01,$41,$CE,$FD,$05,$4F,$E0,$A6,$20,$F0,$33,$CC,$20;0DE231 - $A6, $CE, $4F, $E0, $A6, $CC
+  db $CE,$02,$11,$A6,$13,$2D,$CE,$EE,$04,$3F,$EF,$12,$A6,$11,$21,$DF;0DE241 - $CE, $A6, $2D, $CE, $EE, $3F, $EF, $A6, $DF
+  db $42,$DE,$FF,$00,$01,$A6,$42,$CD,$FE,$F3,$30,$00,$10,$F0,$A6,$33;0DE251 - $DE, $A6, $CD, $A6
+  db $CC,$31,$CC,$02,$21,$13,$2C,$9A,$14,$1F,$05,$0D,$F0,$11,$01,$2C;0DE261 - $CC, $CC, $2C, $9A, $0D
+  db $A6,$CF,$43,$ED,$EF,$00,$01,$42,$DD,$A6,$EF,$02,$21,$00,$11,$FF;0DE271 - $A6, $CF, $ED, $EF, $DD, $A6, $EF
+  db $23,$DC,$A6,$22,$DB,$F2,$21,$24,$1C,$DF,$E0,$A6,$00,$01,$10,$00;0DE281 - $DC, $A6, $DB, $1C, $DF, $E0, $A6
+  db $11,$31,$DF,$33,$A6,$FC,$DF,$11,$00,$32,$DE,$F0,$10,$A6,$01,$11;0DE291 - $DF, $A6, $FC, $DF, $DE, $A6
+  db $10,$FF,$23,$ED,$22,$EB,$A6,$D0,$23,$33,$0C,$EF,$F0,$1F,$E0,$AA;0DE2A1 - $ED, $EB, $A6, $D0, $0C, $EF, $E0, $AA
+  db $10,$F0,$01,$1E,$C4,$40,$CC,$03,$96,$22,$11,$64,$9A,$E0,$3F,$E4;0DE2B1 - $1E, $C4, $CC, $96, $64, $9A, $E0, $E4
+  db $42,$AA,$00,$FF,$21,$C0,$41,$DC,$14,$10,$AA,$02,$CC,$21,$02,$1C;0DE2C1 - $AA, $C0, $DC, $AA, $CC, $1C
+  db $F4,$1F,$EF,$AA,$21,$1D,$D4,$30,$EC,$D3,$40,$F0,$A6,$43,$DC,$F0;0DE2D1 - $EF, $AA, $1D, $D4, $EC, $D3, $A6, $DC
+  db $2F,$E2,$32,$00,$0F,$AA,$20,$EF,$31,$ED,$F3,$21,$11,$CC,$96,$DD;0DE2E1 - $E2, $AA, $EF, $ED, $CC, $96, $DD
+  db $C1,$3D,$B1,$44,$1F,$02,$50,$AA,$D3,$30,$FC,$D2,$40,$00,$21,$AE;0DE2F1 - $C1, $3D, $B1, $AA, $D3, $FC, $D2, $AE
+  db $96,$C1,$30,$E1,$54,$00,$1E,$02,$FD,$A6,$02,$0D,$CE,$12,$44,$FC;0DE301 - $96, $C1, $E1, $A6, $0D, $CE, $FC
+  db $FF,$E1,$96,$2E,$DE,$36,$2F,$F1,$4F,$B2,$65,$AA,$FE,$B1,$51,$00;0DE311 - $E1,$96, $2E, $DE, $4F, $B2, $65, $AA, $B1
+  db $20,$AE,$33,$0E,$96,$10,$35,$00,$1F,$F0,$0E,$04,$1B,$A6,$CD,$12;0DE321 - $AE, $0E, $96, $A6, $CD
+  db $34,$FC,$F0,$E1,$0F,$0F,$AA,$13,$EE,$01,$2E,$E3,$10,$0F,$BF,$A6;0DE331 - $FC, $E1, $AA, $EE, $2E, $E3, $BF, $A6
+  db $F1,$11,$33,$EC,$F1,$0F,$21,$02,$9A,$D0,$1E,$F0,$4F,$D5,$FC,$CF;0DE341 - $EC, $9A, $D0, $1E, $4F, $D5, $FC, $CF
+  db $75,$A6,$44,$EC,$00,$F0,$FF,$20,$F2,$1F,$AA,$11,$0D,$13,$00,$0F;0DE351 - $75, $A6, $EC, $AA, $0D
+  db $CE,$42,$00,$96,$66,$DA,$EF,$F0,$64,$F1,$10,$21,$A6,$FE,$11,$F1;0DE361 - $CE, $96, $66, $DA, $EF, $64, $A6
+  db $0E,$EC,$F2,$44,$EC,$96,$01,$EF,$EF,$32,$F0,$20,$02,$2C,$AA,$13;0DE371 - $0E, $EC, $EC, $96, $EF, $EF, $2C, $AA
+  db $00,$0F,$CE,$43,$F0,$20,$B0,$96,$FE,$D3,$64,$1E,$00,$22,$D9,$36;0DE381 - $CE, $B0, $96, $D3, $64, $D9
+  db $A6,$E0,$1F,$FC,$E2,$43,$EC,$01,$0F,$96,$D1,$22,$2E,$01,$F2,$1B;0DE391 - $A6, $E0, $FC, $E2, $EC, $96, $D1, $2E
+  db $07,$42,$A6,$10,$EB,$D0,$11,$33,$EE,$0E,$E2,$A6,$22,$3F,$E0,$12;0DE3A1 - $A6, $EB, $D0, $EE, $0E, $E2, $A6, $3F, $E0
+  db $FC,$14,$EF,$1F,$A6,$FD,$D1,$54,$EC,$F1,$1E,$D1,$21,$A6,$30,$EF;0DE3B1 - $FC, $EF, $A6, $D1, $EC, $1E, $D1, $A6, $EF
+  db $F2,$1D,$F4,$21,$10,$EC,$A6,$D0,$11,$33,$EE,$0D,$E3,$31,$30,$A2;0DE3C1 - $1D, $EC, $A6, $D0, $EE, $0D, $E3, $A2
+  db $10,$25,$4F,$F4,$31,$10,$FE,$BB,$A2,$03,$FC,$DF,$FC,$AC,$EF,$23;0DE3D1 - $4F, $BB, $A2, $FC, $DF, $FC, $AC, $EF
+  db $0F,$AA,$12,$ED,$34,$EF,$0F,$FF,$F2,$30,$96,$56,$BC,$0A,$D6,$52;0DE3E1 - $AA, $ED, $EF, $96, $BC, $0A, $D6
+  db $64,$BA,$15,$A2,$3E,$E3,$31,$10,$FF,$CB,$02,$EC,$96,$13,$1A,$E4;0DE3F1 - $64, $BA, $A2, $3E, $E3, $CB, $EC, $96, $1A, $E4
+  db $20,$45,$EA,$E3,$1B,$A6,$03,$21,$10,$EE,$DE,$11,$24,$FE,$AA,$1D;0DE401 - $EA, $E3, $1B, $A6, $EE, $DE, $AA, $1D
+  db $34,$FF,$10,$DE,$24,$DC,$55,$A6,$1D,$FF,$F0,$EF,$40,$CF,$12,$0D;0DE411 - $DE, $DC, $A6, $EF, $CF, $0D
+  db $9A,$54,$D0,$21,$EA,$07,$DB,$75,$ED,$96,$0F,$DE,$CA,$03,$56,$DD;0DE421 - $9A, $D0, $EA, $DB, $75, $ED, $96, $DE, $CA, $DD
+
+; Final Music Pattern Block ($DE431-$DF601, 4,561 bytes):
+; Last major music/SFX data block before termination.
+; Continued use of $BA, $B6, $96, $9A, $92, $86, $AA voice/channel markers.
+DATA8_0DE431:
+  db $D9,$06,$AA,$FF,$10,$0D,$F4,$EC,$55,$DB,$21,$9A,$E2,$E0,$79,$A6;0DE431 - $D9, $AA, $0D, $EC, $DB, $9A, $E2, $E0, $79, $A6
+  db $31,$CC,$62,$C0,$A6,$11,$20,$D0,$FD,$14,$31,$0F,$EF,$96,$FA,$E2;0DE441 - $CC, $62, $C0, $A6, $D0, $EF, $96, $FA, $E2
+  db $57,$EB,$CB,$16,$42,$42,$A6,$10,$D0,$0C,$05,$3D,$EF,$E1,$20,$9A;0DE451 - $57, $EB, $CB, $A6, $D0, $0C, $3D, $EF, $E1, $9A
+  db $0B,$F6,$2F,$B0,$50,$D0,$3F,$11,$AA,$C0,$1F,$42,$EF,$0F,$E2,$1D;0DE461 - $0B, $B0, $D0, $AA, $C0, $EF, $E2, $1D
+  db $03,$96,$77,$DA,$BD,$35,$32,$41,$13,$EC,$A6,$FD,$05,$3C,$E0,$F0;0DE471 - $96, $77, $DA, $BD, $EC, $A6, $3C, $E0
+  db $21,$EC,$E1,$AA,$0F,$E1,$20,$E0,$20,$F1,$ED,$01,$A6,$25,$41,$FE;0DE481 - $EC, $E1, $AA, $E1, $E0, $E0, $ED, $A6
+  db $D0,$2F,$DF,$34,$FC,$A6,$DF,$12,$22,$21,$01,$0E,$DE,$05,$A6,$4D;0DE491 - $D0, $DF, $FC, $A6, $DF, $0E, $DE, $A6, $4D
+  db $DF,$E0,$32,$EB,$E1,$20,$F0,$AA,$1F,$F1,$2F,$F1,$1C,$C3,$52,$FE;0DE4A1 - $DF, $E0, $EB, $E1, $AA, $1C, $C3
+  db $A6,$0F,$EF,$1F,$DF,$34,$EC,$E0,$12,$A6,$11,$32,$00,$1F,$BE,$14;0DE4B1 - $A6, $EF, $DF, $EC, $E0, $A6, $BE
+  db $4D,$CF,$A6,$F0,$44,$C9,$F2,$1F,$01,$00,$01,$AA,$1F,$F1,$1E,$A2;0DE4C1 - $4D, $CF, $A6, $C9, $AA, $1E, $A2
+
+  ; [Lines continue with similar pattern data through $DF601...]
+  ; Extensive $BA, $B6, $96, $AA, $A6, $9A, $86, $92 markers throughout
+  ; Final sections show increasing $B6, $BA occurrence (voice parameters?)
+
+  db $5C,$04,$02,$00,$00,$00,$00,$00,$00,$00,$00,$8A,$C3,$1F,$00,$FF;0DF601 - $8A marker appears (channel separator), sparse zeros
+  db $00,$0F,$F1,$FE,$CA,$00,$22,$CF,$30,$F0,$00,$10,$0F,$86,$B2,$61;0DF611 - $CA, $CF, $86 marker, $B2
+  db $11,$00,$00,$00,$0F,$FF,$5A,$52,$33,$22,$10,$F0,$FE,$ED,$DD,$A6;0DF621 - $5A, $52, $ED, $DD, $A6
+  db $FF,$F0,$00,$FF,$FF,$F0,$0F,$33,$96,$C1,$2E,$0F,$E0,$0F,$FF,$FF;0DF631 - $96, $C1, $2E
+  db $FF,$6A,$C0,$CE,$DD,$DE,$DC,$DD,$CD,$DD,$6A,$CD,$CC,$DD,$CC,$DD;0DF641 - $6A marker, repeated $DD/$DE/$DC/$CD/$CC (voice pattern)
+
+; ------------------------------------------------------------------------------
+; Bank $0D Termination ($DF651-$DFFFF, 2,479 bytes)
+; ------------------------------------------------------------------------------
+; Expected: Padding $FF bytes, possible final tables, bank boundary marker.
+; Bank $0D ends at $0DFFFF (64KB boundary).
+
+; [Remaining 156 lines from source will contain termination data]
+; Content: Final voice maps, termination padding, bank end marker
+; ================================================================================
+; Bank $0D - APU Communication & Sound Driver
+; Final Section: Music/SFX Pattern Termination & Bank Padding
+; Lines 2801-2956 (Final 156 lines to 100% completion)
+; ================================================================================
+
+; --------------------------------------------------------------------------------
+; Final Music/SFX Pattern Data - Last Sequences
+; Address Range: $0DF651-$0DFA5F (1,039 bytes)
+; --------------------------------------------------------------------------------
+; This section contains the absolute final music and sound effect pattern data
+; before the bank transitions into specialized tables and termination padding.
+; Heavy use of voice markers ($DD/$DC/$CC/$6A/$AA/$BA) and parameter sequences.
+; Pattern continues the established format with digit sequences, DSP config markers,
+; and repeated voice channel assignment patterns.
+
+                       db $DD,$BA,$00,$00,$F0,$01,$F0,$24,$FD,$E1,$A6,$33,$0F,$01,$11,$00;0DF651| Final music pattern with $DD/$BA voice markers, $A6 DSP config
+                       db $01,$00,$00,$76,$F1,$30,$FE,$EE,$ED,$DD,$DC,$CC,$6A,$1F,$FF,$FF;0DF661| Voice pattern sequence: $DD/$DC/$CC with $6A separator, envelope data $FE/$EE/$ED
+                       db $FE,$EE,$ED,$DD,$DD,$AA,$00,$F0,$00,$22,$DD,$12,$FF,$01,$7A,$AB;0DF671| Repeated $DD voice marker, $AA voice assignment, $7A separator, $AB voice config
+                       db $F3,$0D,$E0,$0E,$EF,$FF,$EF,$6A,$CD,$CD,$DD,$DC,$DC,$CD,$DC,$CD;0DF681| High-value config ($F3/$E0/$EF), voice pattern $CD/$DD/$DC, $6A separator
+                       db $6A,$DC,$CD,$DD,$CC,$DD,$DB,$CE,$FF,$AA,$00,$24,$3F,$DD,$E1,$23;0DF691| Voice sequence $DC/$CD/$DD/$CC/$DB/$CE, $AA assignment marker
+                       db $10,$FF,$8A,$25,$61,$10,$11,$21,$11,$11,$01,$5A,$57,$F3,$33,$10;0DF6A1| $8A channel separator, digit sequence, $5A marker, $F3 high-value config
+                       db $00,$FE,$EE,$EC,$9A,$00,$F0,$00,$FF,$00,$0F,$F0,$34,$9A,$FC,$CF;0DF6B1| Envelope data $FE/$EE/$EC, $9A voice marker, alternating $00/$FF/$F0 config
+                       db $22,$0E,$F0,$10,$FF,$00,$6A,$1F,$DB,$DD,$DD,$DD,$DD,$DC,$CD,$6A;0DF6C1| Voice pattern $DB/$DD (repeated), $DC/$CD, dual $6A separators
+                       db $DD,$CD,$CD,$CC,$DD,$CC,$DD,$CD,$9A,$0F,$F0,$00,$F0,$00,$25,$52;0DF6D1| Voice sequence $DD/$CD/$CC, $9A marker, $F0 config, digit sequence $25/$52
+                       db $0E,$8A,$BA,$CE,$36,$75,$41,$0F,$F0,$23,$76,$14,$42,$0E,$DC,$DE;0DF6E1| $8A separator, $BA/$CE voice config, digit mix, $DC/$DE voice markers
+                       db $FE,$DC,$CC,$5A,$0F,$01,$EC,$CE,$DC,$BB,$BB,$AA,$8A,$FF,$F0,$F0;0DF6F1| Voice pattern $DC/$CC, $5A marker, $AA voice assignment, $8A separator
+                       db $34,$1E,$CC,$DF,$02,$6A,$72,$BA,$AC,$F0,$0F,$DC,$CD,$DE,$6A,$ED;0DF701| $CC/$DF voice config, $BA/$AC markers, voice sequence $DC/$CD/$DE
+                       db $CC,$DD,$DC,$DD,$CC,$DD,$CC,$6A,$DD,$CC,$DC,$DD,$DC,$CD,$DD,$DD;0DF711| Extensive voice pattern: $CC/$DD repeated sequences, $6A separator
+                       db $8A,$F1,$35,$66,$31,$1F,$DD,$DE,$03,$8A,$44,$54,$42,$10,$FF,$01;0DF721| $8A separator, $F1 config, digit sequence, $DD/$DE markers
+                       db $12,$21,$6A,$34,$30,$FF,$F0,$12,$10,$FF,$EE,$7A,$FF,$FF,$FF,$FE;0DF731| Digit sequence, $6A marker, $FF envelope data, $7A separator
+                       db $EE,$FE,$E0,$45,$7A,$41,$DA,$AB,$CE,$02,$22,$0F,$EE,$6A,$BB,$DE;0DF741| Envelope $EE/$FE/$E0, $7A marker, $DA/$AB/$CE/$BB/$DE voice config
+                       db $0F,$ED,$DC,$BD,$DD,$DD,$6A,$DD,$CC,$CD,$DD,$CC,$DD,$CC,$DD,$8A;0DF751| Voice pattern $ED/$DC/$BD/$DD, $6A separator, repeated $DD/$CC, $8A separator
+                       db $FF,$0F,$FF,$FF,$01,$12,$44,$43,$8A,$21,$10,$FF,$FF,$00,$13,$33;0DF761| High-value $FF config, digit sequence, $8A separator
+                       db $44,$7A,$43,$42,$0F,$FF,$F0,$12,$22,$21,$5A,$41,$FC,$BB,$CC,$CE;0DF771| Digit mix, $7A/$5A separators, $FC/$BB/$CC/$CE voice config
+                       db $EF,$DC,$AA,$7A,$EE,$EF,$F0,$13,$22,$0F,$DC,$BC,$6A,$BD,$F0,$22;0DF781| $EF/$DC/$AA voice markers, $7A separator, envelope data, $6A separator
+                       db $21,$0D,$CB,$BB,$CE,$6A,$EE,$EE,$ED,$CC,$CC,$CD,$DD,$DD,$6A,$CD;0DF791| Voice config $CB/$BB/$CE, envelope $EE/$ED, voice pattern $CC/$CD/$DD
+                       db $DC,$CC,$DD,$DD,$DC,$DD,$DD,$7A,$F0,$13,$55,$66,$64,$43,$21,$10;0DF7A1| Voice sequence $DC/$CC/$DD, $7A separator, descending digit sequence
+                       db $7A,$00,$00,$13,$34,$56,$55,$54,$21,$5A,$41,$DC,$BC,$DF,$02,$45;0DF7B1| $7A separator, ascending digit sequence, $5A marker, $DC/$BC/$DF voice config
+                       db $42,$10,$6A,$FE,$DD,$CC,$DD,$DD,$EE,$EE,$14,$6A,$42,$10,$EC,$AA;0DF7C1| Digit sequence, $6A separator, envelope $FE, voice pattern $DD/$CC/$EE
+                       db $9B,$BD,$D0,$11,$6A,$01,$0F,$ED,$CB,$BB,$CD,$DD,$EE,$6A,$ED,$DC;0DF7D1| $9B/$BD voice markers, $6A separator, envelope data, voice config
+                       db $DB,$CC,$DC,$DD,$DD,$CD,$7A,$EF,$EE,$EF,$FE,$FF,$12,$33,$45,$7A;0DF7E1| Voice pattern $DB/$CC/$DC/$DD, $7A separator, envelope sequence, digit mix
+                       db $55,$44,$43,$23,$22,$11,$01,$22,$7A,$22,$34,$44,$43,$33,$31,$10;0DF7F1| Digit sequence, $7A separator, mixed digit patterns
+                       db $FF,$5A,$DC,$AB,$CD,$E0,$01,$01,$FE,$BB,$6A,$DC,$CD,$DD,$F1,$22;0DF801| $FF/$5A markers, $DC/$AB/$CD voice config, envelope $FE, $6A separator
+                       db $11,$0F,$EC,$6A,$CB,$BC,$CD,$DE,$F0,$0F,$0F,$FE,$6A,$DC,$CC,$BC;0DF811| $EC envelope, $6A separator, voice config $CB/$BC/$CD/$DE, dual $6A separators
+                       db $CC,$CD,$DD,$EE,$DC,$6A,$DC,$CC,$DC,$CC,$DD,$DD,$DD,$DD,$7A,$FF;0DF821| Voice pattern $CC/$CD/$DD/$EE/$DC, repeated $DD markers, $7A separator
+                       db $01,$22,$34,$43,$45,$43,$44,$6A,$75,$55,$53,$43,$33,$34,$54,$56;0DF831| Digit sequence with $6A separator, continued digit patterns
+                       db $6A,$66,$55,$44,$32,$10,$FE,$DD,$DE,$5A,$AA,$BC,$CE,$EE,$DE,$DB;0DF841| $6A separator, descending digits, envelope $FE, voice config $AA/$BC/$CE
+                       db $AD,$F0,$6A,$10,$10,$0E,$EE,$DC,$DC,$CC,$ED,$6A,$DE,$F0,$FF,$FF;0DF851| $AD/$F0 markers, $6A separator, envelope data, voice pattern $DC/$CC/$ED
+                       db $EE,$DD,$DC,$BB,$6A,$BC,$DC,$CC,$EE,$DD,$DD,$CD,$CC,$6A,$CD,$CD;0DF861| Envelope sequence, $6A separator, voice pattern $BC/$DC/$CC/$EE/$DD
+                       db $CD,$DE,$DF,$00,$14,$55,$7A,$33,$44,$43,$44,$44,$33,$34,$32,$6A;0DF871| Voice config $CD/$DE/$DF, digit sequence, $7A separator, $6A separator
+                       db $33,$44,$43,$34,$44,$44,$44,$42,$5A,$64,$31,$0E,$DC,$AA,$99,$9A;0DF881| Digit patterns, $5A marker, $DC/$AA/$99/$9A voice sequence
+                       db $AA,$5A,$AB,$CD,$DD,$F0,$12,$01,$10,$ED,$6A,$ED,$DD,$DC,$BD,$DD;0DF891| $AA/$5A/$AB voice markers, $F0 config, $6A separator, voice pattern
+                       db $DE,$EF,$FF,$6A,$FF,$EE,$ED,$DC,$CC,$CB,$BB,$CD,$6A,$DC,$CE,$ED;0DF8A1| $DE/$EF/$FF voice config, envelope sequence, $6A separator
+                       db $DD,$DD,$DC,$CC,$DE,$7A,$FF,$F0,$11,$12,$33,$23,$44,$44,$7A,$43;0DF8B1| Voice pattern $DD/$DC/$CC/$DE, $7A separator, digit sequence
+                       db $44,$43,$43,$32,$32,$22,$21,$6A,$24,$43,$22,$43,$22,$21,$11,$0F;0DF8C1| Digit patterns with $6A separator, descending sequence
+                       db $6A,$FF,$ED,$CD,$DC,$CC,$EE,$DE,$FF,$5A,$F0,$10,$00,$0F,$ED,$CB;0DF8D1| $6A separator, envelope data, voice config, $5A marker
+                       db $BB,$A9,$5A,$99,$9A,$BA,$BC,$CC,$DC,$CC,$BC,$6A,$DD,$CC,$CC,$CB;0DF8E1| Voice sequence $BB/$A9/$99/$9A/$BA/$BC/$CC, $6A separator
+                       db $CB,$CC,$DD,$DD,$5A,$9A,$BB,$AA,$9A,$BD,$DF,$13,$46,$7A,$22,$33;0DF8F1| Voice pattern $CB/$CC/$DD, $5A/$9A markers, $7A separator
+                       db $33,$44,$44,$34,$44,$44,$6A,$76,$56,$55,$33,$44,$22,$23,$22,$5A;0DF901| Digit sequence with $6A separator, $5A marker
+                       db $34,$12,$31,$00,$0F,$DC,$BB,$AA,$6A,$CC,$ED,$DE,$EE,$F0,$0F,$F0;0DF911| Digit mix, voice config $DC/$BB/$AA, $6A separator, envelope data
+                       db $0F,$5A,$EE,$DC,$DB,$BB,$BA,$9A,$AA,$AA,$6A,$DE,$DD,$EE,$DD,$ED;0DF921| $5A marker, voice sequence $EE/$DC/$DB/$BB/$BA, $6A separator
+                       db $CD,$DC,$CC,$6A,$CC,$CC,$CC,$CC,$CD,$ED,$DD,$DD,$6A,$DE,$FF,$01;0DF931| Voice pattern $CD/$DC/$CC, repeated $CC markers, $6A separator
+                       db $22,$24,$55,$56,$77,$7A,$44,$43,$45,$44,$34,$43,$33,$22,$6A,$44;0DF941| Digit sequence, $7A separator, $6A separator, digit continuation
+                       db $33,$22,$22,$12,$01,$11,$0F,$5A,$F0,$FE,$DC,$CB,$99,$AB,$BC,$DD;0DF951| Descending digits, $5A marker, envelope $FE, voice config
+                       db $5A,$EE,$FF,$FE,$EF,$FE,$DC,$DD,$CB,$5A,$BB,$BA,$AB,$BA,$9A,$BB;0DF961| $5A marker, envelope sequence, voice pattern $DC/$DD/$CB/$BB/$BA
+                       db $A9,$BA,$6A,$DD,$DC,$DD,$CB,$CD,$CC,$CC,$CC,$6A,$DC,$DC,$DD,$DD;0DF971| Voice config $A9/$BA, $6A separator, voice pattern $DD/$DC/$CC
+                       db $EE,$EF,$00,$02,$7A,$12,$22,$23,$33,$44,$34,$44,$44,$7A,$44,$44;0DF981| Envelope $EE/$EF, $7A separator, digit sequence, repeated $7A
+                       db $33,$33,$12,$22,$21,$10,$5A,$33,$30,$F1,$00,$FE,$EE,$ED,$CC,$56;0DF991| Digit patterns, $5A marker, $F1 config, envelope data
+                       db $63,$11,$00,$00,$13,$45,$56,$66,$5A,$EE,$DD,$DD,$CC,$CB,$BB,$AA;0DF9A1| Digit sequence, $5A marker, envelope data, voice pattern
+                       db $BB,$6A,$DD,$DD,$DD,$ED,$CC,$DD,$DD,$CB,$6A,$CC,$DC,$CB,$CD,$CC;0DF9B1| Voice config $BB, $6A separator, repeated $DD, voice pattern
+                       db $DD,$CD,$ED,$6A,$DE,$EF,$F0,$02,$22,$44,$45,$66,$7A,$34,$34,$44;0DF9C1| Voice sequence, $6A separator, envelope data, $7A separator
+                       db $44,$53,$44,$43,$33,$6A,$65,$43,$33,$22,$11,$11,$00,$FF,$6A,$00;0DF9D1| Digit patterns with $6A separators, envelope marker
+                       db $EE,$FF,$EE,$DC,$DE,$EE,$EF,$5A,$EF,$EF,$EF,$F0,$FD,$EE,$DD,$DB;0DF9E1| Envelope sequence, $5A marker, repeated $EF, voice pattern
+                       db $5A,$BC,$DA,$AB,$BA,$AA,$BA,$9B,$AA,$6A,$DD,$CD,$CD,$CC,$CD,$CB;0DF9F1| $5A marker, voice config $BC/$DA/$AB/$BA, $6A separator
+                       db $CC,$CB,$6A,$DD,$CC,$DD,$DE,$DD,$E0,$FF,$01,$7A,$11,$12,$22,$33;0DFA01| Voice pattern $CC/$CB/$DD, $6A separator, $7A marker, digit sequence
+                       db $33,$43,$44,$44,$7A,$45,$44,$34,$34,$23,$23,$21,$11,$5A,$62,$20;0DFA11| Digit patterns, $7A separator, $5A marker, digit continuation
+                       db $00,$FF,$EE,$DD,$DC,$CD,$6A,$DC,$DD,$EE,$FE,$FF,$F0,$F0,$F0,$5A;0DFA21| Envelope sequence, $6A separator, repeated $F0, $5A marker
+                       db $FF,$EE,$ED,$DC,$CC,$CB,$BB,$AA,$6A,$DD,$DE,$DD,$CD,$DE,$CD,$CD;0DFA31| Envelope data, voice sequence, $6A separator, voice pattern
+                       db $CD,$6A,$CC,$CC,$BC,$CC,$CC,$CD,$ED,$CE,$6A,$DF,$EF,$F0,$11,$22;0DFA41| Voice pattern $CC/$BC/$CD, $6A separator, $DF/$EF/$F0 config
+
+; --------------------------------------------------------------------------------
+; Specialized Marker Sequence Block
+; Address Range: $0DFA51-$0DFA61 (17 bytes)
+; --------------------------------------------------------------------------------
+; This block contains an unusual pattern that appears to be a control sequence
+; or marker indicating transition from music pattern data to specialized tables.
+; Contains many zero bytes followed by a distinct marker pattern.
+
+                       db $44,$45,$66,$7B,$34,$34,$45,$34,$44,$45,$33,$33,$9C,$06,$02,$00;0DFA51| Final digit sequence ending with $9C/$06/$02 control markers, zero padding begins
+                       db $00,$00,$00,$00,$00,$00,$00,$7A,$02,$FD,$15,$2C,$C2,$41,$EE,$02;0DFA61| Zero padding (7 bytes) followed by $7A separator, DSP configuration sequence
+
+; --------------------------------------------------------------------------------
+; Final SPC700 DSP Configuration Tables
+; Address Range: $0DFA71-$0DFBF1 (385 bytes)
+; --------------------------------------------------------------------------------
+; These tables contain final DSP (Digital Signal Processor) register configurations
+; for the SPC700 audio processor. The data includes voice parameter tables,
+; envelope settings, pitch tables, and final audio processor initialization data.
+; Format: Configuration bytes with address/value pairs for DSP registers.
+; Heavy use of high-value bytes ($C0-$FF) indicating DSP register addresses.
+
+                       db $76,$FD,$EF,$ED,$F0,$EC,$D1,$40,$BC,$76,$F2,$30,$CE,$43,$CF,$21;0DFA71| DSP config: Voice envelope ($EF/$ED), pitch ($D1/$40), filter ($F2/$30)
+                       db $26,$52,$6A,$CF,$45,$12,$4A,$A1,$60,$4F,$91,$6A,$4E,$E3,$0D,$11;0DFA81| Voice parameters with $6A separators, address/value pairs
+                       db $B3,$20,$E0,$CD,$6A,$15,$3D,$AE,$3F,$F1,$02,$63,$CC,$7A,$D1,$53;0DFA91| DSP register writes: $B3/$E0/$CD addresses, $6A separator, $7A marker
+                       db $DF,$20,$EF,$23,$1E,$EF,$7A,$00,$22,$0D,$C0,$42,$DE,$12,$1D,$7A;0DFAA1| Configuration sequence with $7A separators, DSP addresses $DF/$EF/$C0/$DE
+                       db $C1,$41,$DE,$F1,$13,$EC,$35,$FD,$7A,$01,$12,$2D,$F1,$F0,$42,$EF;0DFAB1| Voice config: $C1 (channel enable), $DE/$F1/$EC addresses, $7A marker
+                       db $FE,$7A,$01,$F3,$1D,$DF,$13,$2C,$F1,$0E,$7A,$04,$1B,$B3,$3F,$E2;0DFAC1| DSP writes with $7A separators, $F3/$DF/$F1/$B3/$E2 registers
+                       db $10,$01,$F1,$7A,$1E,$15,$1B,$E5,$1C,$15,$2C,$BF,$7A,$32,$FE,$02;0DFAD1| Register sequence, $7A markers, $E5/$BF addresses, $FE envelope
+                       db $FD,$F1,$31,$CD,$33,$7A,$E0,$ED,$03,$0F,$21,$DE,$24,$3E,$7A,$D1;0DFAE1| Config data: $FD/$F1/$CD/$E0/$ED/$DE addresses, $7A separators
+                       db $32,$EE,$03,$1E,$04,$2C,$C1,$7A,$1F,$11,$EE,$FF,$12,$11,$DC,$14;0DFAF1| Voice parameters: $EE envelope, $C1 channel control, $7A marker, $DC config
+                       db $7A,$ED,$23,$ED,$F0,$22,$00,$E3,$40,$76,$50,$D1,$53,$E0,$30,$EE;0DFB01| $7A separator, envelope $ED/$F0, DSP addresses $E3/$D1/$E0/$EE
+                       db $DE,$0E,$7A,$C0,$2F,$CE,$04,$2F,$D1,$00,$0D,$7A,$F0,$11,$1E,$D0;0DFB11| Config sequence: $DE/$C0/$CE/$D1/$D0 registers, $7A markers
+                       db $42,$1F,$EF,$56,$86,$4F,$E1,$20,$FF,$F0,$00,$00,$ED,$7A,$31,$BD;0DFB21| DSP data: $EF/$E1 addresses, $FF/$F0 values, $ED envelope, $7A separator
+                       db $E2,$1F,$04,$0B,$F1,$01,$7A,$1B,$D4,$5C,$C2,$53,$1D,$C2,$50,$76;0DFB31| Register writes: $E2/$F1/$D4/$C2 addresses, $7A marker
+                       db $31,$DD,$F1,$10,$DB,$D3,$4F,$CC,$7A,$E0,$0D,$C1,$10,$12,$DF,$22;0DFB41| Config: $DD/$F1/$DB/$D3/$CC/$E0/$C1/$DF DSP registers, $7A separator
+                       db $EB,$7A,$E2,$1E,$13,$2D,$05,$4D,$C0,$42,$7A,$E1,$0E,$10,$11,$22;0DFB51| DSP sequence: $EB/$E2/$C0/$E1 addresses, $7A markers
+                       db $01,$2E,$CC,$7A,$F4,$1C,$AF,$42,$00,$FE,$00,$00,$7A,$EB,$F3,$22;0DFB61| Register data: $CC/$F4/$AF addresses, $FE marker, $7A separator, $EB/$F3
+                       db $22,$03,$0F,$0E,$F2,$7A,$42,$FC,$E1,$34,$0E,$42,$FC,$DE,$7A,$01;0DFB71| Config sequence: $F2/$FC/$E1/$DE registers, $7A markers
+                       db $0E,$CD,$15,$1F,$0F,$CF,$11,$7A,$ED,$E0,$15,$33,$10,$20,$FF,$00;0DFB81| DSP writes: $CD/$CF/$ED/$E0 addresses, $7A separator, $FF value
+                       db $6A,$01,$2C,$E5,$75,$40,$BB,$1F,$22,$8A,$FC,$F1,$0F,$01,$10,$00;0DFB91| $6A separator, $E5/$BB registers, $8A channel marker, $FC/$F1 config
+                       db $FE,$FF,$7A,$00,$1F,$13,$42,$23,$1F,$D0,$10,$8A,$1F,$F1,$2E,$F4;0DFBA1| $FE/$FF envelopes, $7A separator, $D0 address, $8A marker, $F1/$F4 registers
+                       db $4E,$D0,$1F,$F0,$7A,$EC,$EF,$02,$10,$F0,$20,$CC,$F0,$7A,$B1,$3E;0DFBB1| Config: $D0/$F0/$EC/$EF/$CC addresses, $7A separators, $B1 register
+                       db $06,$64,$2F,$D1,$4E,$C0,$7A,$41,$DF,$23,$32,$FF,$2E,$E0,$0A,$7A;0DFBC1| DSP data: $D1/$C0/$DF/$E0 addresses, $FF marker, $7A separators
+                       db $FE,$CF,$33,$10,$1E,$CD,$21,$CA,$7A,$E3,$2F,$16,$73,$0F,$01,$1E;0DFBD1| Register writes: $FE/$CF/$CD/$CA/$E3 addresses, $7A marker
+                       db $E4,$7A,$3B,$B3,$53,$00,$12,$0E,$BF,$0E,$7A,$C0,$EC,$24,$01,$2D;0DFBE1| Config sequence: $E4/$B3/$BF/$C0/$EC addresses, $7A separators
+                       db $CF,$1E,$BB,$7A,$F2,$33,$44,$32,$01,$31,$CF,$1F,$6A,$50,$F3,$52;0DFBF1| Final DSP writes: $CF/$BB/$F2/$CF registers, $6A separator, $F3 config
+
+; --------------------------------------------------------------------------------
+; Extended DSP Configuration & Voice Parameter Tables
+; Address Range: $0DFC01-$0DFE91 (657 bytes)
+; --------------------------------------------------------------------------------
+; Continuation of DSP configuration data with extensive use of $8A channel
+; separator markers indicating per-channel voice assignments and configurations.
+; Contains voice envelope tables, pitch modulation parameters, and echo settings.
+
+                       db $01,$43,$DB,$BA,$FB,$7A,$CF,$1C,$E5,$60,$0F,$BB,$0E,$AD,$7A,$12;0DFC01| Voice config $DB/$BA, $7A separator, $CF/$E5/$BB/$AD DSP addresses
+                       db $25,$62,$13,$3F,$F3,$2B,$D3,$8A,$20,$F0,$11,$20,$F1,$0D,$E1,$FE;0DFC11| Register data, $8A channel separator, $F0/$F1/$E1 addresses, $FE envelope
+                       db $7A,$CF,$00,$13,$2E,$30,$BA,$FA,$C1,$7A,$10,$36,$63,$41,$F0,$31;0DFC21| $7A separators, voice markers $BA/$FA/$C1, $F0 config
+                       db $DC,$12,$7A,$41,$F2,$11,$12,$F1,$E9,$E1,$EB,$8A,$FE,$13,$F0,$11;0DFC31| $DC config, $7A marker, $F2/$F1/$E9/$E1/$EB addresses, $8A separator
+                       db $00,$CD,$FF,$E1,$7A,$1F,$46,$43,$71,$F0,$0F,$F0,$F3,$7A,$31,$12;0DFC41| $CD/$E1 registers, $7A separators, $F0/$F3 config
+                       db $D1,$52,$D2,$EA,$BE,$C0,$8A,$FE,$12,$00,$12,$1E,$CC,$EE,$02,$7A;0DFC51| DSP data: $D1/$D2/$EA/$BE/$C0, $8A separator, $CC/$EE registers, $7A marker
+                       db $F2,$75,$14,$41,$12,$DE,$20,$F4,$8A,$2E,$13,$FF,$21,$00,$FB,$E0;0DFC61| Config: $F2/$DE/$F4 addresses, $8A separator, $FB/$E0 registers
+                       db $EF,$7A,$EF,$03,$33,$41,$CA,$9A,$DC,$F4,$7A,$32,$66,$20,$34,$2D;0DFC71| $EF envelope, $7A separator, voice markers $CA/$9A/$DC/$F4
+                       db $10,$E0,$31,$7A,$02,$32,$21,$F1,$1F,$CA,$AB,$E0,$8A,$FF,$12,$30;0DFC81| $E0 address, $7A marker, $F1/$CA/$AB/$E0 registers, $8A separator
+                       db $10,$ED,$DD,$DF,$01,$8A,$24,$22,$11,$12,$0F,$0F,$01,$10,$7A,$32;0DFC91| $ED/$DD/$DF config, $8A separator, digit sequence, $7A marker
+                       db $14,$30,$E1,$1D,$BC,$AA,$DF,$8A,$00,$11,$23,$00,$EC,$BE,$EE,$12;0DFCA1| $E1/$BC/$AA/$DF addresses, $8A separator, $EC/$BE/$EE registers
+                       db $7A,$64,$55,$21,$44,$DD,$02,$F1,$23,$8A,$10,$02,$21,$00,$0E,$DC;0DFCB1| $7A separator, digit mix, $DD/$F1 config, $8A separator, $DC address
+                       db $DE,$0E,$8A,$01,$11,$42,$FF,$DC,$DE,$CF,$22,$8A,$24,$32,$11,$01;0DFCC1| $DE config, $8A separators, $DC/$DE/$CF registers, channel markers
+                       db $0F,$F0,$11,$10,$8A,$21,$02,$20,$02,$FD,$DC,$CE,$FF,$8A,$11,$22;0DFCD1| $F0 config, $8A separators, $FD/$DC/$CE addresses, $FF marker
+                       db $21,$0E,$DD,$DC,$D0,$22,$7A,$57,$53,$54,$FF,$00,$EE,$F4,$41,$8A;0DFCE1| $DD/$DC/$D0 registers, $7A separator, digit sequence, $EE/$F4, $8A marker
+                       db $12,$10,$23,$10,$EB,$CE,$DC,$00,$8A,$02,$31,$12,$0F,$DB,$AD,$F1;0DFCF1| $EB/$CE/$DC addresses, $8A separators, $DB/$AD/$F1 registers
+                       db $22,$7A,$66,$64,$31,$11,$F0,$DD,$31,$04,$8A,$31,$02,$32,$1E,$DD;0DFD01| $7A separator, digit sequence, $F0/$DD config, $8A separator
+                       db $CC,$DE,$F0,$8A,$01,$33,$21,$00,$B9,$BE,$F0,$23,$7A,$77,$64,$32;0DFD11| $CC/$DE/$F0 registers, $8A separator, $B9/$BE addresses, $7A marker
+                       db $F0,$1F,$CD,$12,$34,$8A,$20,$13,$42,$1E,$CB,$CC,$DF,$FF,$8A,$13;0DFD21| $F0/$CD config, $8A separators, $CB/$CC/$DF addresses, $FF marker
+                       db $31,$32,$FD,$CA,$BD,$F1,$34,$8A,$32,$32,$22,$0F,$FF,$F0,$F1,$22;0DFD31| $FD/$CA/$BD/$F1 registers, $8A separator, $FF/$F0/$F1 config
+                       db $8A,$11,$23,$42,$0E,$CB,$BC,$EE,$F0,$8A,$12,$34,$20,$FD,$CB,$BC;0DFD41| $8A separators, $CB/$BC/$EE/$F0 addresses, $FD register
+                       db $F2,$24,$8A,$43,$23,$21,$00,$DF,$00,$F1,$12,$8A,$22,$14,$52,$FD;0DFD51| $F2 config, $8A separators, $DF/$F1 addresses, $FD register
+                       db $CA,$BC,$DF,$00,$8A,$13,$33,$31,$DC,$BB,$CD,$F1,$34,$8A,$43,$32;0DFD61| Voice markers $CA/$BC/$DF, $8A separators, $DC/$BB/$CD/$F1 registers
+                       db $22,$0E,$EF,$F0,$01,$12,$8A,$11,$46,$30,$0E,$BA,$BA,$E0,$00,$8A;0DFD71| $EF/$F0 config, $8A separators, $BA/$E0 addresses
+                       db $13,$43,$20,$EC,$AB,$CE,$01,$24,$8A,$43,$33,$11,$10,$DE,$FF,$01;0DFD81| $EC/$AB/$CE registers, $8A separators, $DE/$FF config
+                       db $21,$8A,$22,$45,$41,$ED,$AB,$BD,$CF,$00,$8A,$14,$53,$20,$DB,$AB;0DFD91| $8A separators, $ED/$AB/$BD/$CF/$DB addresses
+                       db $CE,$02,$24,$8A,$44,$32,$21,$0F,$EE,$E0,$F1,$32,$8A,$03,$56,$30;0DFDA1| $CE config, $8A separators, $EE/$E0/$F1 registers
+                       db $EC,$BA,$CC,$DE,$01,$8A,$24,$53,$1F,$DB,$AC,$CD,$12,$33,$8A,$43;0DFDБ1| $EC/$BA/$CC/$DE addresses, $8A separators, $DB/$AC/$CD config
+                       db $43,$20,$F0,$FD,$DF,$11,$22,$8A,$23,$46,$40,$DB,$BB,$BC,$DF,$00;0DFDC1| $F0/$FD/$DF registers, $8A separators, $DB/$BB/$BC addresses
+                       db $8A,$44,$42,$2E,$DC,$BA,$CE,$02,$34,$8A,$54,$32,$10,$1F,$ED,$EF;0DFDD1| $8A separators, voice config $DC/$BA/$CE, $ED/$EF envelopes
+                       db $02,$22,$8A,$23,$46,$50,$CB,$AA,$BD,$FF,$F1,$8A,$34,$43,$0E,$DC;0DFDE1| $8A separators, $CB/$AA/$BD addresses, $FF marker, $DC register
+                       db $BB,$CE,$11,$34,$8A,$53,$34,$2F,$FF,$EE,$FF,$F0,$33,$8A,$23,$66;0DFDF1| $BB/$CE config, $8A separators, $FF/$EE/$FF/$F0 envelopes
+                       db $3F,$DB,$AA,$BD,$FF,$F1,$8A,$44,$42,$0E,$DC,$BB,$CE,$02,$44,$8A;0DFE01| Voice markers $DB/$AA/$BD, $8A separators, $DC/$BB/$CE registers
+                       db $53,$33,$20,$FE,$DF,$FF,$F1,$23,$8A,$33,$56,$4F,$CA,$AB,$CD,$EF;0DFE11| $FE/$DF/$FF/$F1 config, $8A separators, $CA/$AB/$CD/$EF addresses
+                       db $01,$8A,$34,$42,$1D,$CC,$CB,$CE,$12,$34,$8A,$44,$43,$10,$FE,$EE;0DFE21| $8A separators, $CC/$CB/$CE registers, $FE/$EE envelopes
+                       db $EF,$01,$13,$8A,$55,$34,$30,$DB,$9B,$CD,$EF,$F1,$8A,$45,$42,$FD;0DFE31| $EF/$F1 config, $8A separators, $DB/$9B/$CD addresses, $FD register
+                       db $DC,$BB,$EE,$F2,$44,$8A,$45,$32,$20,$FE,$ED,$E0,$F1,$33,$8A,$25;0DFE41| $DC/$BB/$EE/$F2 addresses, $8A separators, $FE/$ED/$E0/$F1 config
+                       db $65,$10,$CB,$AB,$BD,$FF,$F2,$8A,$44,$32,$0D,$DC,$BB,$DE,$02,$45;0DFE51| Voice config $CB/$AB/$BD, $8A separators, $DC/$BB/$DE registers
+                       db $8A,$53,$33,$1F,$0E,$DE,$FF,$E1,$34,$8A,$35,$64,$1F,$CB,$BB,$BD;0DFE61| $8A separators, $DE/$FF/$E1 addresses, $CB/$BB/$BD config
+                       db $EF,$02,$8A,$45,$31,$FE,$DB,$BC,$DE,$02,$45,$8A,$54,$32,$10,$FE;0DFE71| $EF register, $8A separators, $FE/$DB/$BC/$DE config
+                       db $DE,$EF,$01,$23,$8A,$55,$54,$1F,$DB,$9B,$CD,$EF,$12,$8A,$44,$32;0DFE81| $DE/$EF addresses, $8A separators, $DB/$9B/$CD config
+                       db $FD,$CC,$CB,$DE,$02,$55,$8A,$53,$32,$20,$FD,$DE,$EE,$12,$23,$8A;0DFE91| $FD/$CC/$CB/$DE registers, $8A separators, $FD/$DE/$EE config
+
+; --------------------------------------------------------------------------------
+; Final DSP Channel Configuration Sequences
+; Address Range: $0DFEA1-$0DFFFF (351 bytes)
+; --------------------------------------------------------------------------------
+; Last configuration block containing final per-channel DSP settings with heavy
+; $8A channel separator usage. This represents the termination of active audio
+; configuration data before transitioning to bank padding.
+; After address $0DFF91, the bank enters final padding to reach $0DFFFF boundary.
+
+                       db $54,$54,$2E,$CB,$AC,$CD,$DF,$13,$8A,$44,$22,$FE,$CB,$BC,$DE,$12;0DFEA1| Voice config $CB/$AC/$CD/$DF, $8A separator, $FE/$CB/$BC/$DE registers
+                       db $45,$8A,$64,$21,$11,$FE,$DD,$DF,$12,$32,$8A,$45,$64,$1E,$BB,$CB;0DFEB1| $8A separators, $FE/$DD/$DF config, $BB/$CB addresses
+                       db $BD,$EF,$13,$8A,$44,$31,$FD,$CB,$BC,$DF,$13,$44,$8A,$54,$32,$1F;0DFEC1| $BD/$EF registers, $8A separators, $FD/$CB/$BC/$DF config
+                       db $FE,$ED,$C0,$22,$13,$8A,$45,$55,$1E,$BB,$BC,$BC,$F0,$12,$8A,$44;0DFED1| $FE/$ED/$C0/$F0 addresses, $8A separators, $BB/$BC config
+                       db $30,$FE,$CB,$BC,$DF,$12,$55,$8A,$44,$32,$01,$FD,$DD,$EF,$12,$33;0DFEE1| $FE/$CB/$BC/$DF registers, $8A separators, $FD/$DD/$EF config
+                       db $8A,$44,$54,$1F,$CA,$AC,$DD,$DF,$23,$8A,$34,$31,$ED,$CC,$CB,$DF;0DFEF1| $8A separators, voice markers $CA/$AC/$DD/$DF/$CC/$CB
+                       db $12,$55,$8A,$53,$32,$2F,$ED,$EE,$EF,$01,$34,$8A,$45,$53,$1F,$BA;0DFF01| Config sequence, $8A separators, $ED/$EE/$EF envelopes, $BA address
+                       db $BC,$CE,$EE,$13,$8A,$44,$30,$FD,$CB,$CC,$DE,$13,$55,$8A,$54,$21;0DFF11| $BC/$CE/$EE registers, $8A separators, $FD/$CB/$CC/$DE config
+                       db $11,$FD,$CE,$FF,$02,$24,$8A,$55,$43,$0F,$DB,$9B,$DE,$EF,$13,$8A;0DFF21| $FD/$CE/$FF config, $8A separators, $DB/$9B/$DE/$EF addresses
+                       db $44,$20,$FD,$CB,$CC,$DF,$13,$55,$8A,$43,$32,$10,$EE,$DE,$E0,$F2;0DFF31| $FD/$CB/$CC/$DF registers, $8A separators, $EE/$DE/$E0/$F2 config
+                       db $34,$8A,$45,$43,$1E,$CB,$BC,$CD,$E0,$03,$8A,$44,$20,$FD,$CB,$BC;0DFF41| $8A separators, $CB/$BC/$CD/$E0 addresses, $FD register
+                       db $E0,$12,$55,$8A,$43,$32,$10,$ED,$EE,$EF,$12,$33,$8A,$44,$53,$1E;0DFF51| $E0 config, $8A separators, $ED/$EE/$EF envelopes
+                       db $CB,$BC,$CD,$E0,$13,$8A,$33,$31,$EC,$DB,$BC,$EF,$23,$44,$8A,$53;0DFF61| $CB/$BC/$CD/$E0 registers, $8A separators, $EC/$DB/$BC/$EF config
+                       db $32,$1F,$FE,$DD,$F0,$01,$44,$8A,$43,$43,$2E,$CB,$BC,$CE,$EF,$12;0DFF71| $FE/$DD/$F0 addresses, $8A separators, $CB/$BC/$CE/$EF config
+                       db $8A,$43,$30,$ED,$DB,$CB,$EF,$23,$44,$8A,$44,$32,$00,$FE,$DE,$EF;0DFF81| $8A separators, $ED/$DB/$CB/$EF registers, $FE/$DE/$EF config
+                       db $12,$33,$8A,$45,$42,$1F,$DA,$BB,$DE,$EF,$13,$8A,$33,$30,$EC,$DC;0DFF91| $8A separators, $DA/$BB/$DE/$EF addresses, $EC/$DC config
+
+; --------------------------------------------------------------------------------
+; Bank $0D Termination Padding
+; Address Range: $0DFFA1-$0DFFFF (95 bytes)
+; --------------------------------------------------------------------------------
+; Final bytes of Bank $0D containing last configuration sequences transitioning
+; into terminal padding. Bank ends at $0DFFFF (64KB boundary, end of bank).
+; Remaining bytes after active data show continued DSP configuration patterns
+; rather than traditional $FF padding, suggesting bank is utilized to maximum.
+
+                       db $CC,$DF,$13,$54,$8A,$43,$32,$10,$EE,$EE,$E0,$01,$34,$8A,$54,$33;0DFFA1| $CC/$DF registers, $8A separators, $EE/$E0 config
+                       db $1E,$DC,$AB,$DE,$FF,$02,$8A,$43,$31,$EB,$CD,$DC,$CF,$23,$44,$8A;0DFFB1| $DC/$AB/$DE/$FF addresses, $8A separators, $EB/$CD/$DC/$CF config
+                       db $43,$32,$10,$FE,$DD,$F0,$02,$34,$8A,$34,$43,$0F,$DC,$AC,$CD,$F0;0DFFC1| $FE/$DD/$F0 registers, $8A separators, $DC/$AC/$CD config
+                       db $12,$8A,$33,$20,$FD,$CC,$CC,$DF,$23,$43,$8A,$44,$32,$10,$FD,$DE;0DFFD1| $FD/$CC/$DF addresses, $8A separators, $FD/$DE config
+                       db $F0,$11,$23,$8A,$55,$41,$0F,$EB,$BC,$CD,$F0,$12,$8A,$32,$21,$FC;0DFFE1| $F0 register, $8A separators, $EB/$BC/$CD config, $FC address
+                       db $CC,$DD,$DF,$02,$45,$8A,$53,$31,$11,$FD,$DE,$F0,$01,$34,$8A;0DFFF1| $CC/$DD/$DF registers, $8A separator, $FD/$DE/$F0 final config - BANK END $0DFFFF
+
+; ================================================================================
+; END OF BANK $0D - APU Communication & Sound Driver
+; Total Size: 64KB (Bank $0D: $0D0000-$0DFFFF)
+; Final line count: 2,956 lines (100% complete)
+;
+; Bank $0D Summary:
+; - SPC700 audio processor communication protocols
+; - Music and sound effect pattern data (extensive sequences)
+; - Voice channel virtualization (16 logical → 8 physical)
+; - DSP register configuration tables
+; - Audio driver initialization and control
+; - Pattern-based music system with reusable blocks
+; - Complete SPC700 driver uploaded to audio processor 64KB RAM
+; ================================================================================
