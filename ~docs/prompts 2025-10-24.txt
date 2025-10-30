@@ -215,7 +215,8 @@ stop asking if you can or should continue and just continue. I authorize going c
 continue aggressively
 yes
 response is too large, break up the query
-
+no, break up the effort into smaller chunks for this one so we don't hit the response limit
+go
 
 
 

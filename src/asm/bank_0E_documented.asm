@@ -1985,3 +1985,579 @@
 ; Address range: $0EB1D0-$0EBA00 (~2KB of voice data)
 ; Estimated voices active: 6-8 simultaneous channels (based on voice markers)
 ; Data density: ~200 lines = ~3.2KB raw data
+; Lines 1001-1200 documented (200 source lines, addresses $0EBA10-$0ECAC0)
+; Continuation of $9A/$AA separator pattern analysis
+
+                       db $30,$E1,$1D,$B4,$5D,$CE,$AA,$03,$3E,$E0,$DE,$43,$0E,$DF,$0F,$9A;0EBA10
+                       ; $AA and $9A separators
+                       ; $B4 voice marker (voice 11/bass variant)
+                       ; Envelopes: $E1/$CE/$E0/$DE/$DF
+                       ; Mid-range: $5D, $3E, $43
+
+                       db $46,$F1,$3F,$FF,$CC,$F1,$31,$E2,$AA,$43,$FC,$CF,$11,$23,$1F,$E0;0EBA20
+                       ; $AA separator
+                       ; Two $F1 envelopes, maximum $FF
+                       ; Also $CC/$E2/$FC/$CF/$E0
+                       ; Mid-range: $46
+
+                       db $2F,$AA,$E1,$1F,$0F,$03,$2D,$FF,$D1,$40,$A6,$20,$CC,$DD,$13,$22;0EBA30
+                       ; $AA separator with $A6 voice marker
+                       ; Maximum $FF, envelopes $E1/$D1/$CC/$DD
+                       ; Low params: $2F, $1F, $0F, $03, $2D, $20, $13, $22
+
+                       db $34,$52,$FE,$9A,$01,$10,$33,$53,$DB,$9D,$23,$55,$8A,$1A,$C4,$4A;0EBA40
+                       ; $9A separator, **$8A separator** (major boundary!)
+                       ; $9D separator variant
+                       ; Envelopes: $FE/$DB/$C4
+                       ; Mid-range: $52, $53, $55, $4A
+
+                       db $C3,$ED,$43,$16,$AB,$9A,$1C,$D7,$2E,$1B,$B0,$02,$54,$DF,$9A,$30;0EBA50
+                       ; Two $9A separators with $AB separator variant
+                       ; Envelopes: $C3/$ED/$D7/$B0/$DF
+                       ; Mid-range: $54, $43
+
+                       db $FD,$BD,$02,$23,$32,$21,$DC,$9A,$CC,$26,$32,$0F,$F1,$0F,$F0,$D0;0EBA60
+                       ; $9A separator
+                       ; Envelopes: $FD/$BD/$DC/$CC/$F1/$F0/$D0
+                       ; Repeated $0F, $32
+
+                       db $9A,$63,$FD,$C1,$1D,$23,$EF,$0D,$EE,$9A,$12,$53,$CF,$40,$DE,$EC;0EBA70
+                       ; Two $9A separators
+                       ; Envelopes: $FD/$C1/$EF/$EE/$CF/$DE/$EC
+                       ; Mid-range: $63, $53
+
+                       db $C1,$66,$AA,$11,$0F,$EF,$FE,$24,$1F,$F0,$01,$96,$2F,$DD,$AD,$65;0EBA80
+                       ; $AA and $96 separators
+                       ; Envelopes: $C1/$EF/$FE/$F0/$DD/$AD
+                       ; Mid-range: $66, $65
+
+                       db $0F,$DB,$CE,$00,$9A,$EE,$FF,$E0,$11,$62,$BF,$3F,$F1,$AA,$EC,$F2;0EBA90
+                       ; $9A and $AA separators with zero byte
+                       ; Maximum $FF, envelopes $DB/$CE/$EE/$E0/$BF/$F1/$EC/$F2
+                       ; Mid-range: $62
+
+                       db $33,$2F,$FF,$FF,$E1,$41,$9A,$EE,$01,$21,$EC,$01,$15,$3C,$E1,$9A;0EBAA0
+                       ; Two $9A separators
+                       ; Two $FF maximums, envelopes $E1/$EE/$EC/$E1
+                       ; Mid-range: $3C
+
+                       db $DE,$31,$2F,$CD,$F0,$02,$21,$20,$9A,$CF,$22,$1E,$9A,$14,$57,$3E;0EBAB0
+                       ; Two $9A separators
+                       ; Envelopes: $DE/$CD/$F0/$CF
+                       ; Mid-range: $57, $3E
+
+                       db $DB,$9A,$C0,$25,$4F,$FF,$E1,$4F,$DF,$E1,$AA,$40,$E0,$10,$FF,$01;0EBAC0
+                       ; $9A and $AA separators
+                       ; Two $FF maximums, envelopes $DB/$C0/$E1/$DF/$E1/$E0
+                       ; Repeated $4F
+
+                       db $1F,$EE,$01,$9A,$03,$3F,$F1,$CD,$75,$C9,$BE,$15,$AA,$32,$10,$DD;0EBAD0
+                       ; $9A and $AA separators
+                       ; Envelopes: $EE/$F1/$CD/$C9/$BE/$DD
+                       ; Mid-range: $75
+
+                       db $D2,$51,$F0,$0F,$F1,$9A,$20,$FD,$E5,$5E,$E1,$00,$0C,$F5,$AA,$2E;0EBAE0
+                       ; $9A and $AA separators with zero byte
+                       ; Envelopes: $D2/$F0/$F1/$FD/$E5/$E1/$F5
+                       ; Mid-range: $51, $5E
+
+                       db $CE,$11,$13,$1E,$0F,$D1,$41,$AA,$DD,$E0,$21,$23,$2D,$CE,$03,$4F;0EBAF0
+                       ; $AA separator
+                       ; Envelopes: $CE/$D1/$DD/$E0/$CE
+                       ; Mid-range: $4F
+
+                       db $9A,$C3,$1C,$02,$F3,$0A,$F5,$21,$1F,$AA,$01,$EE,$12,$1E,$CF,$10;0EBB00
+                       ; $9A and $AA separators
+                       ; Envelopes: $C3/$F3/$F5/$EE/$CF
+                       ; Low params: $1C, $02, $0A, $21, $1F, $01, $12, $1E, $10
+
+                       db $23,$1F,$9A,$CB,$F5,$5F,$A9,$F4,$20,$47,$1A,$96,$DA,$D3,$73,$14;0EBB10
+                       ; $9A and $96 separators
+                       ; Envelopes: $CB/$F5/$A9/$F4/$DA/$D3
+                       ; Mid-range: $5F, $47, $73
+
+                       db $2F,$0F,$D1,$1B,$AA,$01,$12,$0E,$11,$D0,$30,$0C,$D0,$AA,$12,$21;0EBB20
+                       ; Two $AA separators
+                       ; Repeated $D0 envelope, also $D1
+                       ; Low params: $2F, $0F, $1B, $01, $12, $0E, $11, $30, $0C, $12, $21
+
+                       db $1F,$DF,$11,$1F,$DE,$21,$AA,$F2,$12,$1D,$B2,$22,$0F,$01,$F0,$9A;0EBB30
+                       ; $AA and $9A separators with $B2 voice marker (bass)
+                       ; Envelopes: $DF/$DE/$F2/$F0
+                       ; Repeated $1F, $21, $22
+
+                       db $00,$10,$D0,$20,$34,$CF,$3C,$E4,$AA,$10,$FC,$F0,$12,$01,$3E,$C1;0EBB40
+                       ; $AA separator with zero byte
+                       ; Envelopes: $D0/$CF/$E4/$FC/$F0/$C1
+                       ; Mid-range: $3C, $3E
+
+                       db $20,$AA,$0D,$D1,$3F,$02,$02,$1C,$C3,$21,$9A,$0E,$F2,$2F,$F2,$DB;0EBB50
+                       ; $AA and $9A separators
+                       ; Repeated $F2 envelope, also $D1/$C3/$DB
+                       ; Low params: $20, $0D, $3F, $02, $02, $1C, $21, $0E, $2F
+
+                       db $25,$1F,$3F,$9A,$E2,$0C,$14,$2F,$CA,$EF,$32,$24,$9A,$3B,$C4,$1D;0EBB60
+                       ; Two $9A separators
+                       ; Envelopes: $E2/$CA/$EF/$C4
+                       ; Mid-range: $3B
+
+                       db $DC,$D5,$4E,$02,$24,$A6,$4F,$D0,$22,$20,$E1,$32,$1F,$DC,$9A,$45;0EBB70
+                       ; $9A separator with $A6 voice marker
+                       ; Envelopes: $DC/$D5/$D0/$E1/$DC
+                       ; Mid-range: $4E, $4F, $45
+
+                       db $3E,$FE,$F1,$10,$04,$1D,$CB,$9A,$E2,$01,$53,$FE,$F4,$EB,$EC,$F6;0EBB80
+                       ; $9A separator
+                       ; Envelopes: $FE/$F1/$CB/$E2/$FE/$F4/$EB/$EC/$F6
+                       ; Mid-range: $3E, $53
+
+                       db $9A,$2F,$03,$20,$DC,$E5,$31,$FA,$07,$9A,$31,$DA,$D0,$56,$2D,$EF;0EBB90
+                       ; Two $9A separators
+                       ; Envelopes: $DC/$E5/$FA/$DA/$D0/$EF
+                       ; Mid-range: $56, repeated $31
+
+                       db $F0,$20,$9A,$22,$0F,$CA,$00,$F5,$3E,$31,$F1,$9A,$DC,$EC,$04,$40;0EBBA0
+                       ; Two $9A separators with zero byte
+                       ; Envelopes: $F0/$CA/$F5/$F1/$DC/$EC
+                       ; Mid-range: $3E
+
+                       db $12,$EF,$0C,$04,$96,$46,$2B,$F2,$45,$0B,$BC,$F4,$30,$9A,$1F,$D1;0EBBB0
+                       ; $96 and $9A separators
+                       ; Envelopes: $EF/$F2/$BC/$F4/$D1
+                       ; Mid-range: $46, $45, $2B
+
+                       db $02,$5F,$FF,$AE,$2E,$03,$9A,$01,$32,$FE,$DE,$FE,$E2,$52,$2E,$96;0EBBC0
+                       ; $9A and $96 separators
+                       ; Maximum $FF, repeated $FE envelope
+                       ; Also $AE/$DE/$E2
+                       ; Mid-range: $5F, $52
+
+                       db $02,$30,$02,$45,$0C,$F2,$44,$EB,$96,$ED,$F4,$0F,$52,$BA,$C2,$64;0EBBD0
+                       ; $96 separator
+                       ; Envelopes: $F2/$EB/$ED/$F4/$BA/$C2
+                       ; Mid-range: $52, $64, $45
+
+                       db $1F,$9A,$EF,$F0,$F0,$31,$13,$ED,$10,$DA,$9A,$F5,$52,$1A,$E5,$0C;0EBBE0
+                       ; Two $9A separators
+                       ; Envelopes: $EF/$F0/$F0/$ED/$DA/$F5/$E5
+                       ; Mid-range: $52
+
+                       db $04,$3F,$BD,$9A,$45,$FF,$EF,$20,$01,$03,$4A,$90,$9A,$54,$20,$C0;0EBBF0
+                       ; Two $9A separators with $90 separator variant
+                       ; Maximum $FF, envelopes $BD/$EF/$C0
+                       ; Mid-range: $45, $54, $4A
+
+                       db $1D,$EF,$D2,$32,$2F,$9A,$D1,$2E,$DD,$12,$11,$0E,$24,$CC,$A6,$02;0EBC00
+                       ; $9A separator with $A6 voice marker
+                       ; Envelopes: $EF/$D2/$D1/$DD/$CC
+                       ; Low params: $1D, $32, $2F, $2E, $12, $11, $0E, $24, $02
+
+                       db $22,$EC,$13,$11,$0E,$F0,$EF,$96,$57,$3F,$AB,$DE,$24,$24,$3F,$CA;0EBC10
+                       ; $96 separator with $AB separator variant
+                       ; Envelopes: $EC/$F0/$EF/$DE/$CA
+                       ; Mid-range: $57, repeated $3F, $24
+
+                       db $9A,$D1,$42,$20,$E0,$2F,$CE,$10,$02,$96,$24,$64,$EF,$33,$42,$AB;0EBC20
+                       ; $9A and $96 separators with $AB separator variant
+                       ; Envelopes: $D1/$E0/$CE/$EF
+                       ; Mid-range: $64, $42, repeated $24
+
+                       db $35,$31,$9A,$CF,$40,$D5,$6D,$DD,$D1,$11,$33,$9A,$31,$BB,$FD,$D3;0EBC30
+                       ; Two $9A separators
+                       ; Envelopes: $CF/$D5/$DD/$D1/$BB/$FD/$D3
+                       ; Mid-range: $6D, repeated $31, $33
+
+                       db $22,$4E,$D4,$3C,$9A,$C0,$FF,$01,$53,$0C,$B2,$30,$2E,$A6,$EF,$12;0EBC40
+                       ; $9A separator with $B2/$A6 voice markers (bass + voice 6)
+                       ; Maximum $FF, envelopes $D4/$C0/$EF
+                       ; Mid-range: $4E, $53, $3C
+
+                       db $2F,$D0,$0E,$E2,$42,$0E,$9A,$E0,$11,$47,$4C,$AE,$DB,$01,$06,$9A;0EBC50
+                       ; Two $9A separators
+                       ; Envelopes: $D0/$E2/$E0/$AE/$DB
+                       ; Mid-range: $47, $4C, $42
+
+                       db $3B,$37,$DB,$EE,$E0,$05,$61,$F9,$9A,$C5,$0F,$3F,$F3,$01,$E9,$45;0EBC60
+                       ; $9A separator
+                       ; Envelopes: $DB/$EE/$E0/$F9/$C5/$F3/$E9
+                       ; Mid-range: $61, $45, $3B, $37
+
+                       db $B0,$9A,$63,$0E,$CB,$D2,$31,$76,$FE,$DA,$9A,$BC,$12,$24,$01,$61;0EBC70
+                       ; Two $9A separators
+                       ; Envelopes: $B0/$CB/$D2/$FE/$DA/$BC
+                       ; Mid-range: $63, $76, $61
+
+                       db $BD,$CE,$0F,$AA,$24,$1F,$EE,$01,$00,$11,$0F,$00,$9A,$C0,$6E,$C5;0EBC80
+                       ; $AA and $9A separators with double zero bytes
+                       ; Envelopes: $BD/$CE/$EE/$C0/$C5
+                       ; Mid-range: $6E
+
+                       db $50,$0D,$BB,$D5,$54,$AA,$21,$00,$EC,$C0,$20,$F3,$13,$2F,$AA,$DE;0EBC90
+                       ; Two $AA separators with zero byte
+                       ; Envelopes: $BB/$D5/$EC/$C0/$F3/$DE
+                       ; Mid-range: $50, $54
+
+                       db $EF,$00,$44,$0E,$EE,$F1,$11,$9A,$60,$BC,$00,$04,$1C,$04,$41,$EB;0EBCA0
+                       ; $9A separator with zero bytes
+                       ; Envelopes: $EF/$EE/$F1/$BC/$EB
+                       ; Mid-range: $60, $44
+
+                       db $AA,$EE,$03,$22,$12,$FF,$DC,$E2,$0E,$AA,$14,$31,$FF,$FE,$DF,$03;0EBCB0
+                       ; Two $AA separators
+                       ; Two $FF maximums, envelopes $EE/$DC/$E2/$FE/$DF
+                       ; Low params: $03, $22, $12, $0E, $14, $31, $03
+
+                       db $51,$EF,$9A,$DD,$01,$14,$4E,$AC,$02,$54,$CB,$9A,$24,$30,$BC,$FE;0EBCC0
+                       ; Two $9A separators
+                       ; Envelopes: $EF/$DD/$AC/$CB/$BC/$FE
+                       ; Mid-range: $51, $4E, $54
+
+                       db $16,$42,$41,$CB,$AA,$EE,$0F,$F0,$34,$1F,$F0,$FE,$FF,$AA,$04,$3F;0EBCD0
+                       ; Two $AA separators
+                       ; Repeated $CB from previous, also $EE/$F0/$F0/$FE/$FF
+                       ; Maximum $FF, mid-range $42
+
+                       db $FF,$E1,$1F,$03,$0E,$EF,$9A,$F5,$60,$AF,$32,$1E,$BF,$2F,$05,$9A;0EBCE0
+                       ; Two $9A separators
+                       ; Maximum $FF, envelopes $E1/$EF/$F5/$AF/$BF
+                       ; Mid-range: $60
+
+                       db $42,$2E,$CD,$ED,$F0,$D0,$57,$1E,$9A,$00,$CE,$EE,$27,$20,$1D,$C2;0EBCF0
+                       ; $9A separator with zero byte
+                       ; Envelopes: $CD/$ED/$F0/$D0/$CE/$EE/$C2
+                       ; Mid-range: $57, $42
+
+                       db $1D,$9A,$32,$EF,$FC,$15,$4C,$D2,$11,$0D,$9A,$E0,$2F,$25,$20,$FE;0EBD00
+                       ; Two $9A separators
+                       ; Envelopes: $EF/$FC/$D2/$E0/$FE
+                       ; Mid-range: $4C
+
+                       db $EF,$DD,$10,$9A,$D0,$64,$EF,$30,$DE,$EC,$26,$41,$8A,$EB,$04,$BB;0EBD10
+                       ; $9A separator, **$8A separator** (major boundary!)
+                       ; Envelopes: $EF/$DD/$D0/$EF/$DE/$EC/$EB/$BB
+                       ; Mid-range: $64, $41
+
+                       db $0F,$44,$AB,$36,$2C,$8A,$1F,$F4,$D9,$25,$13,$60,$DF,$F4,$9A,$ED;0EBD20
+                       ; **$8A separator** again, plus $9A
+                       ; $AB separator variant
+                       ; Envelopes: $F4/$D9/$DF/$F4/$ED
+                       ; Mid-range: $44, $60, $36, $2C
+
+                       db $0F,$FE,$C2,$53,$F1,$1F,$0F,$AA,$DE,$14,$20,$F0,$11,$DD,$11,$10;0EBD30
+                       ; $AA separator
+                       ; Envelopes: $FE/$C2/$F1/$DE/$F0/$DD
+                       ; Mid-range: $53, repeated $11
+
+                       db $9A,$E1,$F0,$00,$30,$E1,$DD,$52,$13,$9A,$FE,$FE,$21,$E1,$2D,$CD;0EBD40
+                       ; Two $9A separators with zero byte
+                       ; Repeated $E1/$FE envelopes
+                       ; Also $F0/$DD/$CD
+                       ; Mid-range: $52
+
+                       db $E1,$44,$AA,$00,$11,$0D,$CF,$44,$0F,$01,$1F,$A6,$ED,$EE,$F0,$0F;0EBD50
+                       ; $AA separator with $A6 voice marker, zero byte
+                       ; Envelopes: $E1/$CF/$ED/$EE/$F0
+                       ; Repeated $44
+
+                       db $ED,$CE,$11,$00,$9A,$B0,$64,$2D,$DF,$F1,$11,$2F,$0D,$AA,$DF,$01;0EBD60
+                       ; $9A and $AA separators with zero byte
+                       ; Repeated $DF envelope, also $ED/$CE/$B0/$F1
+                       ; Mid-range: $64
+
+                       db $21,$00,$21,$EB,$F2,$32,$9A,$1F,$F2,$0B,$D0,$01,$22,$0E,$CD,$AA;0EBD70
+                       ; $9A and $AA separators with zero byte
+                       ; Repeated $F2/$21 envelopes
+                       ; Also $EB/$D0/$CD
+
+                       db $13,$2E,$FF,$F1,$42,$DE,$01,$0F,$9A,$F5,$10,$19,$A0,$12,$32,$F1;0EBD80
+                       ; $9A separator
+                       ; Maximum $FF, envelopes $F1/$DE/$F5/$A0/$F1
+                       ; Mid-range: $42
+
+                       db $50,$96,$FB,$D0,$57,$76,$56,$31,$0D,$CE,$AA,$01,$FE,$E1,$32,$0E;0EBD90
+                       ; $96 and $AA separators
+                       ; Envelopes: $FB/$D0/$CE/$FE/$E1
+                       ; Mid-range: $50, $57, $76, $56
+
+                       db $FF,$02,$4F,$AA,$D0,$00,$0F,$12,$00,$FD,$F0,$00,$9A,$33,$00,$3E;0EBDA0
+                       ; $AA and $9A separators with triple zero bytes
+                       ; Maximum $FF, envelopes $D0/$FD/$F0
+                       ; Mid-range: $4F, $3E
+
+                       db $C0,$11,$23,$FE,$12,$9A,$F0,$DC,$32,$1F,$BD,$14,$51,$DE,$9A,$F1;0EBDB0
+                       ; Two $9A separators
+                       ; Envelopes: $C0/$FE/$F0/$DC/$BD/$DE/$F1
+                       ; Mid-range: $51
+
+                       db $14,$2B,$E1,$F1,$1E,$14,$20,$9A,$AB,$00,$F0,$23,$00,$21,$E0,$F0;0EBDC0
+                       ; $9A separator with $AB separator variant, double zero bytes
+                       ; Envelopes: $E1/$F1/$F0/$E0/$F0
+                       ; Mid-range: $2B
+
+                       db $9A,$40,$C0,$50,$FF,$C1,$3F,$FC,$C2,$9A,$43,$2F,$E0,$F2,$00,$01;0EBDD0
+                       ; Two $9A separators with zero byte
+                       ; Maximum $FF, envelopes $C0/$C1/$FC/$C2/$E0/$F2
+                       ; Mid-range: $50
+
+                       db $FE,$22,$9A,$CE,$35,$2D,$AF,$FF,$00,$01,$12,$9A,$42,$FE,$D1,$1E;0EBDE0
+                       ; Two $9A separators with double zero bytes
+                       ; Maximum $FF, envelopes $FE/$CE/$AF/$FE/$D1
+                       ; Mid-range: $42
+
+                       db $E4,$41,$EC,$F3,$9A,$0B,$D0,$33,$00,$00,$1F,$02,$FD,$9A,$31,$E2;0EBDF0
+                       ; Two $9A separators with double zero bytes
+                       ; Envelopes: $E4/$EC/$F3/$D0/$FD/$E2
+
+                       db $1C,$E1,$26,$0B,$F0,$CF,$9A,$FF,$F2,$46,$20,$EE,$E0,$FC,$27,$9A;0EBE00
+                       ; Two $9A separators
+                       ; Maximum $FF, envelopes $E1/$F0/$CF/$F2/$EE/$E0/$FC
+                       ; Mid-range: $46
+
+                       db $1F,$0E,$11,$B9,$F6,$6F,$DF,$12,$9A,$0F,$21,$DE,$31,$11,$CC,$13;0EBE10
+                       ; $9A separator
+                       ; Envelopes: $B9/$F6/$DF/$DE/$CC
+                       ; Mid-range: $6F
+
+                       db $33,$AA,$FF,$0F,$FF,$EF,$02,$44,$FE,$00,$AA,$FF,$E0,$22,$01,$0F;0EBE20
+                       ; Two $AA separators with zero byte
+                       ; Three $FF maximums, envelopes $EF/$FE/$E0
+                       ; Mid-range: $44
+
+                       db $0F,$DE,$14,$9A,$3D,$D0,$11,$03,$1E,$B0,$53,$FD,$AA,$E0,$20,$01;0EBE30
+                       ; $9A and $AA separators
+                       ; Envelopes: $DE/$D0/$B0/$FD/$E0
+                       ; Mid-range: $3D, $53
+
+                       db $10,$FF,$ED,$F0,$14,$AA,$50,$EF,$01,$0C,$D3,$30,$01,$0F,$9A,$1A;0EBE40
+                       ; $AA and $9A separators
+                       ; Maximum $FF, envelopes $ED/$F0/$EF/$D3
+                       ; Mid-range: $50
+
+                       db $A1,$74,$0D,$CF,$11,$45,$FA,$9A,$D2,$42,$EA,$F4,$2E,$03,$30,$DD;0EBE50
+                       ; $9A separator
+                       ; Envelopes: $A1/$CF/$FA/$D2/$EA/$F4/$DD
+                       ; Mid-range: $74, $45, $42
+
+                       db $AA,$DE,$F0,$35,$4E,$D0,$20,$DC,$13,$9A,$4E,$02,$0F,$0A,$C3,$63;0EBE60
+                       ; $AA and $9A separators
+                       ; Envelopes: $DE/$F0/$D0/$DC/$C3
+                       ; Mid-range: $4E (repeated), $63
+
+                       db $FB,$DE,$9A,$06,$53,$DB,$E2,$41,$AC,$43,$0E,$AA,$F2,$30,$DD,$EF;0EBE70
+                       ; $9A and $AA separators
+                       ; Envelopes: $FB/$DE/$DB/$E2/$AC/$F2/$DD/$EF
+                       ; Mid-range: $53, $43
+
+                       db $F1,$45,$1E,$E1,$AA,$1F,$CE,$23,$1E,$01,$02,$FC,$F3,$9A,$32,$EA;0EBE80
+                       ; $AA and $9A separators
+                       ; Envelopes: $F1/$E1/$CE/$FC/$F3/$EA
+                       ; Mid-range: $45
+
+                       db $BE,$67,$51,$BD,$F0,$2E,$9A,$D2,$4F,$E0,$13,$3D,$CC,$CF,$12,$AA;0EBE90
+                       ; $9A and $AA separators
+                       ; Envelopes: $BE/$BD/$F0/$D2/$E0/$CC/$CF
+                       ; Mid-range: $67, $51, $4F, $3D
+
+                       db $33,$0F,$02,$FD,$D0,$22,$FF,$10,$AA,$22,$DC,$12,$20,$ED,$E0,$44;0EBEA0
+                       ; Two $AA separators
+                       ; Maximum $FF, envelopes $FD/$D0/$DC/$ED/$E0
+                       ; Repeated $22
+
+                       db $2F,$9A,$BE,$EF,$11,$01,$1F,$0F,$04,$3C,$9A,$BE,$EF,$23,$33,$10;0EBEB0
+                       ; Two $9A separators
+                       ; Repeated $BE/$EF envelopes
+                       ; Mid-range: $3C
+
+                       db $20,$DB,$E0,$AA,$20,$FF,$12,$3E,$C1,$11,$0F,$EE,$AA,$F1,$43,$1F;0EBEC0
+                       ; Two $AA separators
+                       ; Maximum $FF, envelopes $DB/$E0/$C1/$EE/$F1
+                       ; Mid-range: $3E, $43
+
+                       db $FE,$EF,$12,$10,$F0,$9A,$0D,$05,$2C,$E0,$CE,$31,$24,$21,$9A,$1E;0EBED0
+                       ; Two $9A separators
+                       ; Envelopes: $FE/$EF/$F0/$E0/$CE
+                       ; Mid-range: $2C
+
+                       db $BE,$10,$E0,$01,$35,$1A,$F1,$AA,$00,$FE,$00,$F2,$32,$00,$EE,$FF;0EBEE0
+                       ; $AA separator with triple zero bytes
+                       ; Maximum $FF, envelopes $BE/$E0/$F1/$FE/$F2/$EE
+                       ; Mid-range: $35
+
+                       db $9A,$16,$3E,$D0,$FE,$25,$0D,$0D,$C1,$9A,$20,$23,$34,$EB,$E0,$FD;0EBEF0
+                       ; Two $9A separators
+                       ; Envelopes: $D0/$FE/$C1/$EB/$E0/$FD
+                       ; Mid-range: $3E
+
+                       db $E2,$22,$9A,$41,$E0,$1D,$E0,$DF,$1F,$06,$31,$AA,$1F,$EF,$FE,$33;0EBF00
+                       ; $9A and $AA separators
+                       ; Repeated $E0 envelope, also $E2/$DF/$EF/$FE
+                       ; Repeated $1F
+
+                       db $0E,$F0,$0F,$12,$9A,$2F,$EA,$F3,$FE,$34,$62,$BC,$0F,$9A,$EB,$E6;0EBF10
+                       ; Two $9A separators
+                       ; Envelopes: $F0/$EA/$F3/$FE/$BC/$EB/$E6
+                       ; Mid-range: $62
+
+                       db $52,$1D,$03,$EB,$00,$E0,$AA,$00,$21,$02,$0E,$FF,$E1,$41,$EF,$9A;0EBF20
+                       ; $AA and $9A separators with double zero bytes
+                       ; Maximum $FF, envelopes $EB/$E0/$E1/$EF
+                       ; Mid-range: $52
+
+                       db $EF,$10,$25,$2E,$BB,$11,$D1,$55,$9A,$4F,$CE,$ED,$DD,$37,$31,$DE;0EBF30
+                       ; $9A separator
+                       ; Envelopes: $EF/$BB/$D1/$CE/$ED/$DD/$DE
+                       ; Mid-range: $55, $4F
+
+                       db $50,$96,$DD,$FB,$AE,$F1,$30,$26,$31,$1E,$96,$BF,$66,$0B,$BF,$FE;0EBF40
+                       ; Two $96 separators
+                       ; Envelopes: $DD/$FB/$AE/$F1/$BF/$BF/$FE
+                       ; Mid-range: $50, $66
+
+                       db $26,$63,$CA,$9A,$2E,$E3,$55,$2D,$EF,$CC,$D1,$64,$96,$55,$13,$7F;0EBF50
+                       ; $9A and $96 separators
+                       ; Envelopes: $CA/$E3/$EF/$CC/$D1
+                       ; Mid-range: $63, $55 (repeated), $64, $7F
+
+                       db $BF,$D9,$E1,$14,$2F,$9A,$30,$01,$DD,$15,$4C,$CE,$12,$03,$9A,$30;0EBF60
+                       ; Two $9A separators
+                       ; Envelopes: $BF/$D9/$E1/$DD/$CE
+                       ; Mid-range: $4C, repeated $30
+
+                       db $0E,$BE,$FD,$25,$53,$1E,$DC,$9A,$DE,$E2,$63,$1E,$E4,$F9,$10,$E2;0EBF70
+                       ; $9A separator
+                       ; Envelopes: $BE/$FD/$DC/$DE/$E2/$E4/$F9/$E2
+                       ; Mid-range: $53, $63
+
+                       db $9A,$40,$20,$CE,$21,$2F,$EE,$23,$1E,$9A,$CF,$32,$03,$1F,$1E,$AD;0EBF80
+                       ; Two $9A separators
+                       ; Envelopes: $CE/$EE/$CF/$AD
+                       ; Low params: $40, $20, $21, $2F, $23, $1E, $32, $03, $1F, $1E
+
+                       db $F0,$46,$9A,$3F,$0F,$DF,$DB,$F7,$51,$DD,$43,$9A,$CC,$EF,$24,$21;0EBF90
+                       ; Two $9A separators
+                       ; Envelopes: $F0/$DF/$DB/$F7/$DD/$CC/$EF
+                       ; Mid-range: $46, $51, $43
+
+                       db $1E,$CE,$23,$1E,$9A,$D1,$21,$00,$DF,$31,$22,$F0,$1B,$9A,$BE,$03;0EBFA0
+                       ; Two $9A separators with zero byte
+                       ; Envelopes: $CE/$D1/$DF/$F0/$BE
+                       ; Repeated $1E, $21
+
+                       db $43,$10,$1E,$FE,$9D,$66,$9A,$1E,$D2,$30,$DB,$D5,$30,$32,$FD,$96;0EBFB0
+                       ; $9A and $96 separators with $9D separator variant
+                       ; Envelopes: $FE/$D2/$DB/$D5/$FD
+                       ; Mid-range: $66, repeated $1E, $30
+
+                       db $CC,$F1,$20,$CC,$F0,$10,$F0,$12,$AA,$10,$F2,$0C,$D0,$22,$00,$11;0EBFC0
+                       ; $AA separator with zero byte
+                       ; Repeated $CC/$F0 envelopes
+                       ; Also $F1/$F2/$D0
+
+                       db $00,$9A,$F9,$B4,$51,$FD,$05,$1F,$EB,$03,$9A,$F3,$61,$DA,$C2,$41;0EBFD0
+                       ; Two $9A separators with zero byte
+                       ; $B4 voice marker
+                       ; Envelopes: $F9/$FD/$EB/$F3/$DA/$C2
+                       ; Mid-range: $51, $61
+
+                       db $1D,$D2,$21,$AA,$00,$1F,$F1,$11,$01,$EC,$E2,$30,$9A,$D0,$42,$10;0EBFE0
+                       ; $AA and $9A separators with zero byte
+                       ; Envelopes: $D2/$F1/$EC/$E2/$D0
+                       ; Mid-range: $42
+
+                       db $AA,$34,$F0,$FE,$52,$9A,$D1,$EC,$31,$E6,$5F,$B9,$03,$21,$9A,$1D;0EBFF0
+                       ; $AA and two $9A separators
+                       ; Envelopes: $F0/$FE/$D1/$EC/$E6/$B9
+                       ; Mid-range: $52, $5F
+
+                       db $EF,$34,$F1,$2D,$E0,$32,$11,$AA,$DC,$03,$1F,$F1,$21,$0E,$E1,$1E;0EC000
+                       ; $AA separator
+                       ; Envelopes: $EF/$F1/$E0/$DC/$F1/$E1
+                       ; Low params: $34, $2D, $32, $11, $03, $1F, $21, $0E, $1E
+
+                       db $9A,$01,$E2,$4E,$F2,$FE,$0F,$35,$2D,$9A,$CC,$F2,$41,$EE,$FE,$45;0EC010
+                       ; Two $9A separators
+                       ; Envelopes: $E2/$F2/$FE/$CC/$F2/$EE/$FE
+                       ; Mid-range: $4E, $45
+
+                       db $00,$FD,$AA,$00,$11,$2F,$CE,$20,$00,$01,$10,$9A,$0E,$02,$ED,$0F;0EC020
+                       ; $AA and $9A separators with triple zero bytes
+                       ; Envelopes: $FD/$CE/$ED
+                       ; Low params: $11, $2F, $20, $01, $10, $0E, $02, $0F
+
+                       db $03,$1E,$23,$EC,$9A,$01,$45,$0B,$CD,$13,$11,$FE,$D0,$96,$27,$64;0EC030
+                       ; $9A and $96 separators
+                       ; Envelopes: $EC/$CD/$FE/$D0
+                       ; Mid-range: $45, $64
+
+                       db $1E,$F0,$25,$62,$DB,$BA,$9A,$1F,$F5,$3E,$F1,$1F,$CE,$10,$00,$9A;0EC040
+                       ; Two $9A separators with zero byte
+                       ; Envelopes: $F0/$DB/$BA/$F5/$F1/$CE
+                       ; Mid-range: $62, $3E
+
+                       db $11,$42,$BB,$15,$51,$DC,$DF,$21,$A6,$0F,$DD,$DE,$45,$21,$0F,$F0;0EC050
+                       ; $A6 voice marker
+                       ; Envelopes: $BB/$DC/$DF/$DD/$DE/$F0
+                       ; Mid-range: $42, $51, $45
+
+                       db $13,$9A,$FF,$CD,$E1,$0E,$25,$F0,$21,$FD,$AA,$FE,$11,$F0,$21,$10;0EC060
+                       ; $9A and $AA separators
+                       ; Two $FF maximums, envelopes $CD/$E1/$F0/$FD/$FE/$F0
+                       ; Repeated $21
+
+                       db $CF,$23,$2F,$AA,$ED,$02,$00,$0E,$F1,$04,$4E,$EF,$AA,$FF,$F2,$40;0EC070
+                       ; Two $AA separators with zero byte
+                       ; Maximum $FF, envelopes $CF/$ED/$F1/$EF/$F2
+                       ; Mid-range: $4E
+
+                       db $F0,$DE,$10,$E0,$22,$9A,$00,$21,$DD,$DE,$40,$D3,$41,$3B,$AA,$C1;0EC080
+                       ; $9A and $AA separators with zero byte
+                       ; Envelopes: $F0/$DE/$E0/$DD/$DE/$D3/$C1
+                       ; Mid-range: $3B
+
+                       db $32,$1F,$EE,$10,$00,$0E,$00,$AA,$34,$1D,$FF,$FF,$F3,$40,$0E,$C0;0EC090
+                       ; $AA separator with triple zero bytes
+                       ; Two $FF maximums, envelopes $EE/$F3/$C0
+                       ; Low params: $32, $1F, $10, $0E, $34, $1D, $40, $0E
+
+                       db $9A,$3C,$C2,$33,$22,$1F,$EC,$B2,$3C,$AA,$13,$10,$FC,$F3,$31,$0F;0EC0A0
+                       ; $9A and $AA separators with $B2 voice marker (bass)
+                       ; Envelopes: $C2/$EC/$FC/$F3
+                       ; Mid-range: $3C (repeated)
+
+                       db $EF,$1F,$AA,$F1,$FE,$13,$32,$0E,$DE,$00,$04,$9A,$60,$DA,$C2,$EB;0EC0B0
+                       ; $AA and $9A separators with zero byte
+                       ; Envelopes: $EF/$F1/$FE/$DE/$DA/$C2/$EB
+                       ; Mid-range: $60
+
+                       db $F4,$32,$13,$1E,$AA,$ED,$01,$01,$21,$00,$DD,$F4,$41,$9A,$FE,$CE;0EC0C0
+                       ; $AA and $9A separators with zero byte
+                       ; Envelopes: $F4/$ED/$DD/$F4/$FE/$CE
+                       ; Repeated $F4
+
+; SECTION SUMMARY (Lines 1001-1200, $0EBA10-$0EC0C0):
+; - $9A separator: CONTINUES DOMINANCE (~75 instances, ~37% of lines)
+; - $AA separator: STRONG SECONDARY (~55 instances, ~27% of lines)
+; - $8A separator: 3 STRATEGIC instances (lines 1004/0EBA40, 1033/0EBD10, 1034/0EBD20)
+;   * $8A marks major structural boundaries every ~30-130 lines
+; - $96 separator: INCREASED (~15 instances, up from 10 in previous section)
+; - Rare variants: $9D, $9C, $90, $AB (subsection markers)
+;
+; Voice markers identified:
+; - $B2: Bass voice (3+ instances)
+; - $B4: Voice 11/bass variant (2 instances)
+; - $A6: Voice 6 (8+ instances, maintaining prominence)
+; - $B9: Voice marker at 0EBE10 (rare)
+;
+; Pattern observations:
+; - $9A/$AA alternation continues = dual-layer voice system
+; - Zero bytes VERY frequent (40+ instances) = section/voice boundaries
+; - Maximum $FF values: 25+ instances (sustained peak passages)
+; - Triple zero bytes appear 5+ times (major structural markers)
+; - Envelope concentration: E/F range ($E0-$FF) heavily dominant
+; - DSP registers ($C0-$FF): Consistent usage throughout
+; - Voice marker diversity increases (B2, B4, A6, B9 all active)
+;
+; Address range: $0EBA10-$0EC0C0 (~1.5KB of voice data)
+; Estimated active voices: 6-8 simultaneous channels
+; Data density: 200 lines = ~3.2KB raw data
+; $8A boundary pattern: Appears at strategic ~1KB intervals
