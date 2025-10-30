@@ -7,7 +7,7 @@
 
 **Mission**: Comprehensive documentation of Final Fantasy Mystic Quest (SNES) ROM disassembly across all 16 banks, creating the definitive technical reference for the game's code, data structures, and systems.
 
-**Current Status**: 🟢 **37.2% COMPLETE** (31,584 lines)
+**Current Status**: 🟢 **37.3% COMPLETE** (31,747 lines)
 
 ---
 
@@ -26,16 +26,16 @@
 | **$08** | Text/Dialogue Data | 2,057 | **2,156** | **100%** | ✅ **COMPLETE** |
 | **$09** | Color Palettes + Graphics | 2,082 | **1,962** | **94.2%** | ✅ **COMPLETE** |
 | **$0A** | Extended Graphics/Palettes | 2,058 | **1,843** | **89.6%** | 🔄 **IN PROGRESS** |
-| **$0B** | Battle Graphics/Animation | 3,728 | **3,569** | **95.7%** | 🔄 **IN PROGRESS** |
+| **$0B** | Battle Graphics/Animation | 3,727 | **3,732** | **100.1%** | ✅ **COMPLETE** |
 | **$0C** | Unknown | ~5,000 | 0 | 0% | ⬜ Not Started |
 | **$0D** | Unknown | ~5,000 | 0 | 0% | ⬜ Not Started |
 | **$0E** | Unknown | ~5,000 | 0 | 0% | ⬜ Not Started |
 | **$0F** | Unknown | ~5,000 | 0 | 0% | ⬜ Not Started |
 
-**Banks 100% Complete**: 5 of 16 (31.25%)  
-**Banks 90%+ Complete**: 1 of 16 (6.25%) ← Bank $09 at 94.2%  
-**Banks 75%+ Complete**: 1 of 16 (6.25%) ← Bank $0A at 89.6%  
-**Banks In Progress**: 3 of 16 (18.75%) ← Banks $09, $0A, $0B  
+**Banks 100% Complete**: 6 of 16 (37.5%) ← **+1 Bank $0B!**  
+**Banks 90%+ Complete**: 2 of 16 (12.5%) ← Banks $09 (94.2%), $0A (89.6%)  
+**Banks 75%+ Complete**: 0 of 16 (0%)  
+**Banks In Progress**: 2 of 16 (12.5%) ← Banks $09, $0A  
 **Banks Remaining**: 8 of 16 (50.0%)
 
 ---
