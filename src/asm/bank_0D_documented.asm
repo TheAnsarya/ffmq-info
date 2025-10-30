@@ -1439,3 +1439,319 @@ CODE_0D80F3:
                        BNE CODE_0D84E6                      ;0D84E1|D003    |0D84E6; If has patterns
                        db $4C,$AD,$85                       ;0D84E3|        |0D85AD; Jump to exit
 
+; ****************************************************************************
+; Bank $0D - APU Communication & Sound Driver
+; Cycle 4: Audio Data Tables & Music Pattern Data (Lines 1201-1600)
+; ****************************************************************************
+
+; ===========================================================================
+; MUSIC/SFX PATTERN DATA - Large Binary Data Blocks
+; ===========================================================================
+; These data blocks contain raw audio pattern data uploaded to SPC700 RAM.
+; Format: Binary instrument samples, note sequences, timing data, etc.
+; Used by the music/SFX playback routines documented in Cycles 1-3.
+
+                       db $C4,$36,$EB,$C5,$E4,$C4,$D4,$8D,$D0,$0A,$DB,$86,$D4,$85,$D4,$8A;0D9476| Pattern data block |
+                       db $D4,$89,$2F,$35,$DD,$80,$B4,$86,$F0,$EC,$4D,$0D,$B0,$03,$48,$FF;0D9486|        |
+                       db $BC,$F8,$C4,$8D,$00,$9E,$C4,$39,$E8,$00,$9E,$C4,$38,$BA,$38,$D0;0D9496|        |
+                       db $02,$AB,$38,$8E,$B0,$08,$58,$FF,$38,$58,$FF,$39,$3A,$38,$BA,$38;0D94A6|        |
+                       db $CE,$D4,$89,$DB,$8A,$E8,$00,$D4,$85,$AB,$C3,$69,$36,$C3,$F0,$04;0D94B6|        |
+                       db $3D,$3D,$2F,$AE,$8F,$FF,$D8,$6F,$AB,$C3,$E4,$C4,$28,$0F,$F0,$71;0D94C6|        |
+                       db $38,$F0,$C4,$9F,$C4,$C5,$CD,$00,$E4,$C3,$13,$C3,$03,$BC,$2F,$0D;0D94D6|        |
+                       db $33,$C3,$05,$BC,$CD,$02,$2F,$05,$AB,$C3,$60,$88,$03,$C4,$36,$EB;0D94E6|        |
+                       db $C5,$E4,$C4,$D4,$99,$D0,$0A,$DB,$92,$D4,$91,$D4,$96,$D4,$95,$2F;0D94F6| More pattern data |
+                       db $35,$DD,$80,$B4,$92,$F0,$EC,$4D,$0D,$B0,$03,$48,$FF,$BC,$F8,$C4;0D9506|        |
+                       db $8D,$00,$9E,$C4,$39,$E8,$00,$9E,$C4,$38,$BA,$38,$D0,$02,$AB,$38;0D9516|        |
+                       db $8E,$B0,$08,$58,$FF,$38,$58,$FF,$39,$3A,$38,$BA,$38,$CE,$D4,$95;0D9526|        |
+                       db $DB,$96,$E8,$00,$D4,$91,$AB,$C3,$69,$36,$C3,$F0,$04,$3D,$3D,$2F;0D9536|        |
+                       db $AE,$8F,$FF,$D8,$6F,$E4,$C4,$28,$07,$F0,$08,$8D,$12,$CF,$73,$C4;0D9546|        |
+                       db $02,$48,$FF,$48,$80,$C4,$C5,$38,$F0,$C4,$CD,$00,$E4,$C3,$13,$C3;0D9556|        |
+                       db $03,$BC,$2F,$0D,$23,$C3,$05,$BC,$CD,$02,$2F,$05,$AB,$C3,$60,$88;0D9566|        |
+                       db $03,$C4,$36,$EB,$C5,$E4,$C4,$D4,$A5,$D0,$0A,$DB,$9E,$D4,$9D,$D4;0D9576| Pattern sequences |
+                       db $A2,$D4,$A1,$2F,$35,$DD,$80,$B4,$9E,$F0,$EC,$4D,$0D,$B0,$03,$48;0D9586|        |
+                       db $FF,$BC,$F8,$C4,$8D,$00,$9E,$C4,$39,$E8,$00,$9E,$C4,$38,$BA,$38;0D9596|        |
+                       db $D0,$02,$AB,$38,$8E,$B0,$08,$58,$FF,$38,$58,$FF,$39,$3A,$38,$BA;0D95A6|        |
+                       db $38,$CE,$D4,$A1,$DB,$A2,$E8,$00,$D4,$9D,$AB,$C3,$69,$36,$C3,$F0;0D95B6|        |
+                       db $04,$3D,$3D,$2F,$AE,$6F,$AB,$C3,$E4,$C4,$28,$07,$F0,$08,$8D,$12;0D95C6|        |
+                       db $CF,$73,$C4,$02,$48,$FF,$48,$80,$C4,$C5,$38,$F0,$C4,$CD,$00,$E4;0D95D6|        |
+                       db $C3,$13,$C3,$03,$BC,$2F,$0D,$23,$C3,$05,$BC,$CD,$02,$2F,$05,$AB;0D95E6|        |
+                       db $C3,$60,$88,$03,$C4,$36,$EB,$C5,$E4,$C4,$D4,$B1,$D0,$0A,$DB,$AA;0D95F6| Complex patterns |
+                       db $D4,$A9,$D4,$AE,$D4,$AD,$2F,$35,$DD,$80,$B4,$AA,$F0,$EC,$4D,$0D;0D9606|        |
+                       db $B0,$03,$48,$FF,$BC,$F8,$C4,$8D,$00,$9E,$C4,$39,$E8,$00,$9E,$C4;0D9616|        |
+                       db $38,$BA,$38,$D0,$02,$AB,$38,$8E,$B0,$08,$58,$FF,$38,$58,$FF,$39;0D9626|        |
+                       db $3A,$38,$BA,$38,$CE,$D4,$AD,$DB,$AE,$E8,$00,$D4,$A9,$AB,$C3,$69;0D9636|        |
+                       db $36,$C3,$F0,$04,$3D,$3D,$2F,$AE,$6F,$13,$C3,$04,$12,$C0,$2F,$02;0D9646|        |
+                       db $02,$C0,$8F,$FF,$D8,$6F,$23,$C3,$29,$E4,$BC,$04,$BD,$48,$FF,$0E;0D9656|        |
+                       db $BF,$00,$4E,$BE,$00,$4E,$C7,$00,$4E,$C9,$00,$4E,$C8,$00,$E8,$00;0D9666|        |
+                       db $C4,$BB,$C4,$DA,$C4,$CB,$C4,$CF,$C4,$CD,$9C,$C4,$ED,$C4,$EE,$03;0D9676|        |
+
+; ===========================================================================
+; SPC700 DRIVER CODE SECTION - Embedded Audio Processor Routines
+; ===========================================================================
+; These routines run ON THE SPC700 (not the 65816 CPU!)
+; Uploaded to SPC700 RAM during initialization (see CODE_0D8000).
+; Contains: Note processing, envelope control, DSP register management, etc.
+
+                       db $C3,$1D,$E4,$BC,$0E,$BF,$00,$4E,$BE,$00,$C4,$04,$CD,$1E,$8F,$80;0D9686| SPC700 driver code |
+                       db $C1,$0B,$04,$90,$03,$3F,$1C,$0A,$1D,$1D,$4B,$C1,$B3,$C1,$F2,$6F;0D9696| - Note processing |
+                       db $FA,$C4,$C2,$8F,$FF,$D8,$6F,$FA,$BB,$D3,$6F,$AA,$C3,$00,$CA,$C0;0D96A6| - Envelope control |
+                       db $60,$6F,$03,$C3,$3A,$8D,$05,$CB,$F2,$E4,$F3,$28,$7F,$C4,$F3,$DD;0D96B6| - DSP interaction |
+                       db $60,$88,$10,$FD,$10,$F1,$CD,$00,$8D,$00,$CB,$F2,$D8,$F3,$FC,$CB;0D96C6|        |
+                       db $F2,$D8,$F3,$DD,$60,$88,$0F,$FD,$10,$F0,$BA,$BB,$F0,$06,$DA,$DA;0D96D6|        |
+                       db $BA,$00,$DA,$BB,$C4,$BE,$8D,$10,$D6,$DB,$00,$FE,$FB,$2F,$1E,$8D;0D96E6|        |
+                       db $05,$CB,$F2,$E4,$F3,$08,$80,$C4,$F3,$DD,$60,$88,$10,$FD,$10,$F1;0D96F6|        |
+                       db $BA,$DA,$F0,$09,$8F,$FF,$D8,$DA,$BB,$BA,$00,$DA,$DA,$6F,$E4,$F5;0D9706|        |
+                       db $C4,$06,$28,$07,$C4,$F5,$D0,$04,$D8,$F4,$2F,$1B,$1C,$2D,$BA,$F6;0D9716|        |
+                       db $DA,$2E,$EE,$F6,$BB,$17,$2D,$F6,$BA,$17,$2D,$8D,$00,$F8,$F4,$D8;0D9726|        |
+                       db $F4,$3E,$F4,$F0,$FC,$F8,$F4,$6F,$E4,$F5,$D7,$2E,$3A,$2E,$E4,$F6;0D9736|        |
+                       db $D7,$2E,$3A,$2E,$E4,$F7,$D7,$2E,$3A,$2E,$D8,$F4,$3E,$F4,$F0,$FC;0D9746|        |
+                       db $F8,$F4,$D0,$E4,$2F,$B8,$E4,$F6,$D7,$2E,$3A,$2E,$E4,$F7,$D7,$2E;0D9756|        |
+                       db $3A,$2E,$D8,$F4,$3E,$F4,$F0,$FC,$F8,$F4,$D0,$EA,$2F,$A0,$E4,$F7;0D9766|        |
+                       db $D7,$2E,$3A,$2E,$D8,$F4,$3E,$F4,$F0,$FC,$F8,$F4,$D0,$F0,$2F,$8E;0D9776|        |
+                       db $D8,$F4,$3E,$F4,$F0,$FC,$F8,$F4,$D0,$F6,$5F,$8B,$12,$BA,$F6,$DA;0D9786|        |
+                       db $30,$D8,$F4,$3E,$F4,$F0,$FC,$F8,$F4,$BA,$F6,$DA,$36,$D8,$F4,$8D;0D9796|        |
+                       db $00,$F7,$2E,$D7,$30,$FC,$D0,$04,$AB,$2F,$AB,$31,$1A,$36,$D0,$F1;0D97A6|        |
+                       db $3E,$F4,$F0,$FC,$F8,$F4,$F0,$0E,$BA,$F6,$DA,$2E,$D8,$F4,$3E,$F4;0D97B6|        |
+                       db $F0,$FC,$F8,$F4,$2F,$C7,$5F,$8B,$12,$EA,$C3,$20,$AA,$C3,$20,$CA;0D97C6|        |
+                       db $C0,$20,$B0,$04,$E8,$24,$2F,$02,$E8,$01,$8F,$00,$F1,$C4,$FA,$8F;0D97D6|        |
+                       db $01,$F1,$6F,$E8,$FF,$8D,$FE,$5A,$C3,$D0,$0C,$E8,$FD,$8D,$FC,$5A;0D97E6|        |
+                       db $C5,$D0,$04,$E2,$C0,$2F,$02,$F2,$C0,$6F,$E8,$00,$8D,$D2,$DA,$2E;0D97F6|        |
+                       db $E8,$00,$FD,$D7,$2E,$FC,$D0,$FB,$AB,$2F,$78,$FA,$2F,$D0,$F4,$6F;0D9806|        |
+
+; ===========================================================================
+; DSP REGISTER VOICE MAPPING TABLE
+; ===========================================================================
+; Maps SPC700 DSP registers to voice control parameters.
+; Each entry: [voice_register_offset, control_value]
+; Used to initialize/control the 8 hardware voices on SPC700 DSP.
+
+                       db $FA,$EE,$ED,$E4,$82,$C5,$60,$FD,$E4,$B9,$C5,$61,$FD,$E4,$BB,$C5;0D9816| DSP voice 0 regs |
+                       db $62,$FD,$E4,$CB,$C5,$63,$FD,$E4,$CD,$C5,$64,$FD,$E4,$CF,$C5,$65;0D9826| DSP voice 1 regs |
+                       db $FD,$E4,$D1,$C5,$66,$FD,$E4,$D3,$C5,$67,$FD,$E4,$D4,$C5,$68,$FD;0D9836| DSP voice 2 regs |
+                       db $E4,$D6,$C5,$69,$FD,$E4,$D7,$C5,$6A,$FD,$BA,$08,$C5,$6B,$FD,$CC;0D9846| DSP voice 3 regs |
+                       db $6C,$FD,$BA,$7E,$C5,$6D,$FD,$CC,$6E,$FD,$BA,$80,$C5,$6F,$FD,$CC;0D9856| DSP voice 4 regs |
+                       db $70,$FD,$BA,$83,$C5,$71,$FD,$CC,$72,$FD,$BA,$B5,$C5,$73,$FD,$CC;0D9866| DSP voice 5 regs |
+                       db $74,$FD,$BA,$B7,$C5,$75,$FD,$CC,$76,$FD,$CD,$0E,$F4,$3E,$D5,$77;0D9876| DSP voice 6 regs |
+                       db $FD,$F4,$3F,$D5,$78,$FD,$F4,$5E,$D5,$87,$FD,$F4,$5F,$D5,$88,$FD;0D9886| DSP voice 7 regs |
+
+; ===========================================================================
+; INSTRUMENT/SAMPLE POINTER TABLE
+; ===========================================================================
+; 16-bit pointers to instrument sample data in SPC700 RAM.
+; Format: [addr_low, addr_high] pairs for each instrument.
+; Used by voice initialization to set sample source addresses.
+
+                       db $F5,$00,$01,$D5,$97,$FD,$F5,$01,$01,$D5,$98,$FD,$F5,$20,$01,$D5;0D9896| Instrument 0-3 |
+                       db $A7,$FD,$F5,$21,$01,$D5,$A8,$FD,$F5,$40,$01,$D5,$B7,$FD,$F5,$41;0D98A6| Instrument 4-7 |
+                       db $01,$D5,$B8,$FD,$F5,$60,$01,$D5,$C7,$FD,$F5,$61,$01,$D5,$C8,$FD;0D98B6| Instrument 8-11 |
+                       db $F5,$80,$FA,$D5,$D7,$FD,$F5,$81,$FA,$D5,$D8,$FD,$F5,$A0,$FA,$D5;0D98C6| Instrument 12-15 |
+                       db $E7,$FD,$F5,$A1,$FA,$D5,$E8,$FD,$F5,$C0,$FA,$D5,$F7,$FD,$1D,$1D;0D98D6| Instrument 16-18 |
+                       db $10,$9A,$CD,$0E,$F5,$C1,$FA,$D5,$F8,$FD,$F5,$E0,$FA,$D5,$07,$FE;0D98E6| Instrument 19-21 |
+                       db $F5,$E1,$FA,$D5,$08,$FE,$F5,$00,$FB,$D5,$17,$FE,$F5,$40,$FB,$D5;0D98F6| Instrument 22-25 |
+                       db $27,$FE,$F5,$41,$FB,$D5,$28,$FE,$F5,$60,$FB,$D5,$37,$FE,$F5,$61;0D9906| Instrument 26-29 |
+                       db $FB,$D5,$38,$FE,$F5,$C0,$FB,$D5,$47,$FE,$F5,$C1,$FB,$D5,$48,$FE;0D9916| Instrument 30-33 |
+                       db $F5,$01,$FB,$D5,$18,$FE,$F5,$00,$FC,$D5,$57,$FE,$F5,$01,$FC,$D5;0D9926| Instrument 34-37 |
+                       db $58,$FE,$1D,$1D,$10,$AE,$CD,$3F,$F5,$E0,$FC,$D5,$57,$FF,$1D,$C8;0D9936| Instrument 38-39 |
+
+; ===========================================================================
+; ENVELOPE/ADSR CONFIGURATION DATA
+; ===========================================================================
+; ADSR (Attack, Decay, Sustain, Release) envelope parameters for each voice.
+; Format: Configuration bytes for SPC700 DSP ADSR registers.
+; Controls volume envelope shape during note playback.
+
+                       db $20,$B0,$F5,$F5,$E0,$FC,$D5,$57,$FF,$F5,$A0,$FC,$D5,$37,$FF,$1D;0D9946| ADSR config 0-1 |
+                       db $C8,$10,$B0,$EF,$F5,$E0,$FC,$D5,$57,$FF,$F5,$A0,$FC,$D5,$37,$FF;0D9956| ADSR config 2-3 |
+                       db $F4,$0E,$D5,$67,$FE,$F5,$00,$FA,$D5,$77,$FE,$F5,$20,$FA,$D5,$87;0D9966| ADSR config 4-7 |
+                       db $FE,$F5,$40,$FA,$D5,$97,$FE,$F5,$60,$FA,$D5,$A7,$FE,$F5,$20,$FB;0D9976| ADSR config 8-11 |
+                       db $D5,$B7,$FE,$F5,$80,$FB,$D5,$C7,$FE,$F5,$A0,$FB,$D5,$D7,$FE,$F5;0D9986| ADSR config 12-15 |
+                       db $E0,$FB,$D5,$E7,$FE,$F5,$20,$FC,$D5,$F7,$FE,$F5,$40,$FC,$D5,$07;0D9996| ADSR config 16-19 |
+                       db $FF,$F5,$60,$FC,$D5,$17,$FF,$F5,$80,$FC,$D5,$27,$FF,$1D,$10,$A4;0D99A6| ADSR config 20-23 |
+                       db $6F,$8F,$FF,$ED,$E5,$60,$FD,$C4,$82,$E5,$61,$FD,$C4,$B9,$E5,$62;0D99B6| ADSR config 24+ |
+
+; ===========================================================================
+; VOICE PARAMETER ALTERNATE TABLE
+; ===========================================================================
+; Alternate voice configuration (different ADSR/volume settings).
+; Used for layered sounds or special effects.
+
+                       db $FD,$C4,$BB,$E5,$63,$FD,$C4,$CB,$C4,$C7,$E5,$64,$FD,$C4,$CD,$C4;0D99C6| Alt voice 0-3 |
+                       db $C8,$E5,$65,$FD,$C4,$CF,$C4,$C9,$E5,$66,$FD,$C4,$D1,$E5,$67,$FD;0D99D6| Alt voice 4-7 |
+                       db $C4,$D3,$E5,$68,$FD,$C4,$D4,$C4,$CA,$E5,$6A,$FD,$C4,$D7,$E5,$69;0D99E6| Alt voice 8-11 |
+                       db $FD,$3F,$78,$07,$E5,$6B,$FD,$EC,$6C,$FD,$DA,$08,$E5,$6D,$FD,$EC;0D99F6| Alt voice 12-15 |
+                       db $6E,$FD,$DA,$7E,$E5,$6F,$FD,$EC,$70,$FD,$DA,$80,$E5,$71,$FD,$EC;0D9A06| Alt voice 16-19 |
+                       db $72,$FD,$DA,$83,$E5,$73,$FD,$EC,$74,$FD,$DA,$B5,$E5,$75,$FD,$EC;0D9A16| Alt voice 20-23 |
+                       db $76,$FD,$DA,$B7,$CD,$0E,$F5,$77,$FD,$D4,$3E,$F5,$78,$FD,$D4,$3F;0D9A26| Alt voice 24-27 |
+
+; ===========================================================================
+; EXTENDED INSTRUMENT POINTER TABLE (Continued)
+; ===========================================================================
+; Continuation of instrument sample pointers for higher instrument IDs.
+
+                       db $F5,$87,$FD,$D4,$5E,$F5,$88,$FD,$D4,$5F,$F5,$97,$FD,$D5,$00,$01;0D9A36| Instruments 28-31 |
+                       db $F5,$98,$FD,$D5,$01,$01,$F5,$A7,$FD,$D5,$20,$01,$F5,$A8,$FD,$D5;0D9A46| Instruments 32-35 |
+                       db $21,$01,$F5,$B7,$FD,$D5,$40,$01,$F5,$B8,$FD,$D5,$41,$01,$F5,$C7;0D9A56| Instruments 36-39 |
+                       db $FD,$D5,$60,$01,$F5,$C8,$FD,$D5,$61,$01,$F5,$D7,$FD,$D5,$80,$FA;0D9A66| Instruments 40-43 |
+                       db $F5,$D8,$FD,$D5,$81,$FA,$F5,$E7,$FD,$D5,$A0,$FA,$F5,$E8,$FD,$D5;0D9A76| Instruments 44-47 |
+                       db $A1,$FA,$F5,$F7,$FD,$D5,$C0,$FA,$1D,$1D,$10,$9A,$CD,$0E,$F5,$F8;0D9A86| Instruments 48-50 |
+
+; ===========================================================================
+; EXTENDED ADSR CONFIGURATION (Continued)
+; ===========================================================================
+; More ADSR envelope parameters for additional instruments/voices.
+
+                       db $FD,$D5,$C1,$FA,$F5,$07,$FE,$D5,$E0,$FA,$F5,$08,$FE,$D5,$E1,$FA;0D9A96| ADSR extended 0-3 |
+                       db $F5,$17,$FE,$D5,$00,$FB,$F5,$27,$FE,$D5,$40,$FB,$F5,$28,$FE,$D5;0D9AA6| ADSR extended 4-7 |
+                       db $41,$FB,$F5,$37,$FE,$D5,$60,$FB,$F5,$38,$FE,$D5,$61,$FB,$F5,$47;0D9AB6| ADSR extended 8-11 |
+                       db $FE,$D5,$C0,$FB,$F5,$48,$FE,$D5,$C1,$FB,$F5,$18,$FE,$D5,$01,$FB;0D9AC6| ADSR extended 12-15 |
+                       db $F5,$57,$FE,$D5,$00,$FC,$F5,$58,$FE,$D5,$01,$FC,$1D,$1D,$10,$AE;0D9AD6| ADSR extended 16-18 |
+
+; ===========================================================================
+; SPECIAL EFFECT ENVELOPE DATA
+; ===========================================================================
+; Specialized envelope configurations for sound effects.
+
+                       db $CD,$3F,$F5,$57,$FF,$D5,$E0,$FC,$1D,$C8,$20,$B0,$F5,$F5,$57,$FF;0D9AE6| SFX envelope 0-1 |
+                       db $D5,$E0,$FC,$F5,$37,$FF,$D5,$A0,$FC,$1D,$C8,$10,$B0,$EF,$F5,$57;0D9AF6| SFX envelope 2-3 |
+                       db $FF,$D5,$E0,$FC,$F5,$37,$FF,$D5,$A0,$FC,$F5,$67,$FE,$D4,$0E,$F5;0D9B06| SFX envelope 4-6 |
+                       db $77,$FE,$D5,$00,$FA,$F5,$87,$FE,$D5,$20,$FA,$F5,$97,$FE,$D5,$40;0D9B16| SFX envelope 7-10 |
+                       db $FA,$F5,$A7,$FE,$D5,$60,$FA,$F5,$B7,$FE,$D5,$20,$FB,$F5,$C7,$FE;0D9B26| SFX envelope 11-14 |
+                       db $D5,$80,$FB,$F5,$D7,$FE,$D5,$A0,$FB,$F5,$E7,$FE,$D5,$E0,$FB,$F5;0D9B36| SFX envelope 15-18 |
+                       db $F7,$FE,$D5,$20,$FC,$F5,$07,$FF,$D5,$40,$FC,$F5,$17,$FF,$D5,$60;0D9B46| SFX envelope 19-22 |
+                       db $FC,$F5,$27,$FF,$D5,$80,$FC,$1D,$10,$A4,$6F,$E8,$36,$C4,$3B,$E8;0D9B56| SFX envelope 23-24 |
+
+; ===========================================================================
+; CODE_0D9B5C - Audio Command Processing Routine
+; ===========================================================================
+; Processes audio commands from CPU to SPC700.
+; Handles command parsing, parameter extraction, DSP control.
+
+CODE_0D9B5C:           db $DC,$8F,$00,$05,$43,$C0,$05,$8F,$09,$C1,$2F,$08,$8F,$49,$C1,$60;0D9B5C| Command processor |
+                       db $88,$08,$E2,$05,$C4,$3C,$60,$88,$08,$C4,$04,$F8,$3C,$EB,$C1,$CB;0D9B6C| - Parse command byte |
+                       db $F2,$EB,$F3,$6D,$BF,$CF,$DD,$28,$70,$C4,$3A,$EE,$BF,$CF,$DD,$D8;0D9B7C| - Extract parameters |
+                       db $3C,$F8,$3B,$9F,$28,$07,$04,$3A,$04,$05,$AF,$D8,$3B,$60,$98,$10;0D9B8C| - Dispatch to handler |
+                       db $C1,$69,$04,$3C,$D0,$D5,$BA,$36,$DA,$F4,$BA,$38,$DA,$F6,$58,$04;0D9B9C|        |
+                       db $C0,$6F,$E4,$8D,$F0,$0F,$8B,$8D,$BA,$89,$7A,$85,$7E,$86,$DA,$85;0D9BAC|        |
+
+; ===========================================================================
+; VOICE CHANNEL CONTROL ROUTINES
+; ===========================================================================
+; Control individual SPC700 DSP voices (pitch, volume, ADSR, etc.)
+
+                       db $F0,$03,$09,$BB,$D8,$E4,$8F,$F0,$0F,$8B,$8F,$BA,$8B,$7A,$87,$7E;0D9BBC| Voice 0 control |
+                       db $88,$DA,$87,$F0,$03,$09,$BC,$D8,$E4,$99,$F0,$0F,$8B,$99,$BA,$95;0D9BCC| Voice 1 control |
+                       db $7A,$91,$7E,$92,$DA,$91,$F0,$03,$09,$BB,$D8,$E4,$9B,$F0,$0F,$8B;0D9BDC| Voice 2 control |
+                       db $9B,$BA,$97,$7A,$93,$7E,$94,$DA,$93,$F0,$03,$09,$BC,$D8,$E4,$A5;0D9BEC| Voice 3 control |
+                       db $F0,$08,$8B,$A5,$BA,$A1,$7A,$9D,$DA,$9D,$E4,$A7,$F0,$08,$8B,$A7;0D9BFC| Voice 4-5 control |
+                       db $BA,$A3,$7A,$9F,$DA,$9F,$E4,$B1,$F0,$0F,$8B,$B1,$BA,$AD,$7A,$A9;0D9C0C| Voice 6 control |
+                       db $7E,$AA,$DA,$A9,$F0,$03,$09,$BB,$D9,$E4,$B3,$F0,$0F,$8B,$B3,$BA;0D9C1C| Voice 7 control |
+                       db $AF,$7A,$AB,$7E,$AC,$DA,$AB,$F0,$03,$09,$BC,$D9,$6F,$FD,$12,$EB;0D9C2C|        |
+
+; ===========================================================================
+; TRACK/PATTERN POINTER TABLES
+; ===========================================================================
+; Lookup tables for music track and SFX pattern data.
+; Format: 24-bit pointers [bank, addr_low, addr_high] for each track.
+
+DATA8_0D9C3C:          db $12,$D3,$12,$B5,$12,$FD,$12,$FD,$12,$FD,$12,$0A,$13,$85,$06,$91;0D9C3C| Track pointers 0-7 |
+                       db $06,$13,$07,$1F,$07,$5B,$07,$9A,$07,$AC,$07,$B0,$07,$C2,$07,$C6;0D9C4C| Track pointers 8-15 |
+                       db $07,$17,$08,$9B,$08,$5A,$08,$87,$08,$AB,$08,$C4,$08,$31,$08,$4A;0D9C5C| Track pointers 16-23 |
+                       db $08,$2D,$08,$23,$08,$29,$08,$6A,$07,$66,$07,$16,$0A,$D4,$08,$FE;0D9C6C| Track pointers 24-31 |
+                       db $08,$2E,$09,$41,$09,$53,$09,$63,$09,$AC,$09,$D5,$09,$1A,$0A,$3D;0D9C7C| Track pointers 32-39 |
+                       db $06,$4A,$06,$CD,$06,$DA,$06,$6E,$07,$82,$06,$87,$09,$75,$09,$FB;0D9C8C| Track pointers 40-47 |
+                       db $09,$1A,$0A,$1A,$0A,$1A,$0A,$1A,$0A,$01,$02,$01,$02,$02,$03,$00;0D9C9C| Track pointers 48-55 |
+
+; ===========================================================================
+; TRACK TYPE/FLAGS TABLE
+; ===========================================================================
+; Flags indicating track type (music/SFX), loop points, priority, etc.
+; One byte per track entry.
+
+                       db $03,$00,$02,$00,$01,$00,$00,$00,$00,$00,$00,$01,$00,$00,$01,$01;0D9CAC| Track flags 0-15 |
+                       db $01,$01,$01,$01,$01,$01,$00,$01,$00,$00,$01,$02,$01,$02,$02,$01;0D9CBC| Track flags 16-31 |
+                       db $03,$02,$02,$00,$00,$00,$00,$79,$08,$FA,$08,$83,$09,$14,$0A,$AD;0D9CCC| Track flags 32-39 |
+                       db $0A,$50,$0B,$FC,$0B,$B2,$0C,$74,$0D,$41,$0E,$1A,$0F,$00,$10,$F3;0D9CDC| More pointers |
+                       db $10,$7F,$00,$00,$00,$00,$00,$00,$00,$0C,$21,$2B,$2B,$13,$FE,$F3;0D9CEC|        |
+
+; ===========================================================================
+; AUDIO DRIVER CONFIGURATION DATA
+; ===========================================================================
+; Driver initialization parameters, timing values, buffer sizes, etc.
+
+DATA8_0D9CFC:          db $F9,$58,$BF,$DB,$F0,$FE,$07,$0C,$0C,$34,$33,$00,$D9,$E5,$01,$FC;0D9CFC| Config: Timing/buffers |
+                       db $EB,$C0,$90,$60,$40,$48,$30,$20,$24,$18,$10,$0C,$08,$06,$04,$03;0D9D0C| Config: Rate table |
+                       db $BD,$18,$CC,$18,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00;0D9D1C| Config: Reserved |
+                       db $00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00;0D9D2C| Padding/alignment |
+                       db $D2,$D2,$EA,$02,$E4,$05,$0D,$E5,$0D,$D2,$28,$0D,$E5,$0D,$F2,$D2;0D9D3C| Command templates |
+                       db $FA,$EA,$07,$E4,$05,$0D,$E5,$0D,$E6,$0D,$D2,$32,$0D,$E5,$0D,$E6;0D9D4C|        |
+                       db $0D,$F2,$4C,$5C,$2D,$3D,$4D,$2C,$3C,$6C,$BE,$BF,$C9,$C8,$C7,$B6;0D9D5C| Note mapping |
+                       db $B6,$CA                           ;0D9D6C|        |
+
+; ===========================================================================
+; DATA8_0D9D78 - SPC700 MUSIC TRACK DATA
+; ===========================================================================
+; Embedded music sequence data for multiple tracks.
+; Format: Proprietary music notation (notes, durations, commands, loops, etc.)
+; Processed by SPC700 sequencer uploaded during initialization.
+
+DATA8_0D9D78:          db $CC,$03,$02,$00,$00,$00,$00,$00,$00,$00,$00,$AA,$21,$F0,$31,$EE;0D9D78| Track data block 0 |
+                       db $1E,$CE,$41,$F0,$86,$E5,$0D,$23,$00,$10,$23,$FD,$47,$96,$FD,$35;0D9D88|        |
+                       db $FD,$35,$FD,$35,$0F,$34,$9A,$E0,$21,$11,$00,$33,$F1,$42,$BD,$AA;0D9D98|        |
+                       db $1F,$BE,$42,$E0,$32,$EF,$00,$F0,$96,$0F,$02,$0F,$23,$FE,$34,$ED;0D9DA8|        |
+                       db $35,$96,$FE,$35,$0F,$34,$21,$33,$34,$44,$AA,$11,$01,$20,$EE,$1F;0D9DB8|        |
+                       db $CE,$32,$F0,$87,$D4,$FD,$33,$FF,$11,$22,$FE,$46,$02,$00,$00,$00;0D9DC8|        |
+                       db $00,$00,$00,$00,$00,$A6,$60,$AF,$50,$BF,$30,$DF,$00,$11,$BA,$F0;0D9DD8| Track data block 1 |
+                       db $1F,$E2,$4F,$D3,$4C,$B2,$3D,$A2,$20,$56,$32,$32,$0F,$EE,$00,$CB;0D9DE8|        |
+                       db $A6,$40,$AF,$61,$AF,$50,$AF,$40,$C0,$BA,$1F,$F0,$00,$10,$F0,$1E;0D9DF8|        |
+                       db $E3,$4F,$BA,$D3,$3D,$B1,$3E,$E3,$3E,$E2,$1F,$A6,$EF,$F0,$20,$CF;0D9E08|        |
+                       db $40,$AF,$61,$AF,$A6,$60,$9E,$51,$CF,$30,$EF,$0F,$11,$BB,$F0,$1F;0D9E18|        |
+                       db $E2,$30,$E3,$2C,$C2,$3D,$02,$00,$00,$00,$00,$00,$00,$00,$00,$B6;0D9E28| Track data block 2 |
+                       db $FF,$FF,$F0,$12,$AC,$21,$0F,$FE,$9A,$CF,$10,$11,$11,$10,$FE,$DB;0D9E38|        |
+                       db $DC,$B6,$64,$EF,$01,$12,$33,$32,$10,$00,$B6,$FE,$EF,$01,$12,$AC;0D9E48|        |
+                       db $11,$10,$ED,$9B,$01,$F0,$10,$21,$10,$FD,$DC,$EB,$02,$00,$00,$00;0D9E58|        |
+                       db $00,$00,$00,$00,$00,$A6,$DE,$20,$ED,$BF,$3F,$E0,$13,$33,$AA,$FE;0D9E68| Track data block 3 |
+                       db $36,$BD,$21,$11,$00,$F0,$00,$AA,$01,$4C,$E1,$04,$0E,$EE,$F0,$00;0D9E78|        |
+                       db $A6,$DF,$12,$11,$00,$64,$F0,$01,$16,$AA,$39,$F0,$00,$11,$23,$EB;0D9E88|        |
+                       db $52,$EF,$B2,$42,$0E,$CC,$DE,$F0,$21,$DE,$11,$9A,$E1,$13,$FF,$FF;0D9E98|        |
+                       db $EE,$00,$22,$41,$A6,$DE,$20,$ED,$BF,$3F,$E0,$13,$33,$AB,$FE,$36;0D9EA8|        |
+                       db $BD,$21,$11,$00,$F0,$00,$02,$00,$00,$00,$00,$00,$00,$00,$00,$CA;0D9EB8| Track data block 4 |
+                       db $00,$01,$01,$CC,$51,$00,$00,$0F,$8A,$04,$59,$EF,$0F,$FE,$00,$0F;0D9EC8|        |
+                       db $00,$7A,$01,$13,$12,$22,$34,$34,$54,$45,$CA,$00,$01,$01,$CC,$51;0D9ED8|        |
+                       db $00,$00,$0F,$8B,$04,$59,$FF,$FE,$0F,$F0,$0F,$00,$02,$00,$00,$00;0D9EE8|        |
+                       db $00,$00,$00,$00,$00,$8A,$C0,$C2,$00,$0F,$01,$11,$0F,$3E,$BA,$1D;0D9EF8| Track data block 5 |
+                       db $A4,$4F,$00,$00,$00,$F0,$10,$8A,$DF,$40,$12,$12,$22,$23,$31,$40;0D9F08|        |
+                       db $B6,$20,$AD,$00,$09,$AF,$FF,$00,$00,$7A,$AC,$CF,$EE,$EF,$E0,$F0;0D9F18|        |
+                       db $01,$12,$BA,$00,$01,$00,$01,$00,$01,$CD,$51,$BA,$01,$00,$00,$00;0D9F28|        |
+                       db $1D,$A5,$3F,$00,$7A,$EC,$E1,$F0,$00,$00,$13,$1E,$5C,$BB,$1D,$B4;0D9F38|        |
+                       db $3F,$00,$00,$00,$00,$00,$02,$00,$00,$00,$00,$00,$00,$00,$00,$BA;0D9F48| Track data block 6 |
+                       db $ED,$41,$00,$00,$00,$00,$00,$01,$86,$1E,$CF,$0F,$01,$EF,$F1,$1E;0D9F58|        |
+                       db $0F,$CA,$00,$00,$00,$00,$0E,$E3,$15,$ED,$BA,$ED,$41,$F0,$11,$FF;0D9F68|        |
+                       db $01,$00,$01,$87,$0D,$CF,$00,$11,$DF,$F1,$0E,$10,$02,$00,$00,$00;0D9F78|        |
+                       db $00,$00,$00,$00,$00,$C6,$FF,$14,$2E,$12,$D1,$3E,$C0,$11,$C6,$31;0D9F88| Track data block 7 |
+                       db $DF,$2D,$E2,$ED,$12,$11,$FC,$B6,$D5,$DB,$50,$B4,$60,$EE,$BE,$61;0D9F98|        |
+                       db $C6,$E3,$2E,$23,$FE,$FF,$14,$2E,$12,$B6,$B1,$5D,$A0,$22,$52,$AE;0D9FA8|        |
+                       db $4A,$C5,$C6,$EC,$02,$11,$0D,$E2,$FE,$2F,$D2,$B6,$71,$FE,$AE,$61;0D9FB8|        |
+                       db $B6,$4C,$46,$EC,$C6,$FF,$14,$2E,$12,$E1,$3E,$D0,$11,$C7,$31,$DF;0D9FC8|        |
+                       db $2D,$E2,$ED,$12,$11,$FC,$02,$00,$00,$00,$00,$00,$00,$00,$00,$C6;0D9FD8| Track data block 8 |
+                       db $E1,$22,$FC,$D2,$41,$DC,$E1,$33,$C6,$FC,$E3,$41,$EE,$02,$32,$EC;0D9FE8|        |
+                       db $F4,$C6,$40,$DD,$F2,$41,$CB,$04,$2E,$DE,$C6,$03,$3F,$BD,$24,$2F;0D9FF8|        |
+                       db $EE,$14,$4F,$C6,$CE,$34,$1E,$DE,$14,$2D,$CF,$22,$C6,$1E,$CE,$34;0DA008|        |
+                       db $0C,$D0,$33,$1D,$C0,$C6,$55,$FC,$E2,$33,$0D,$C1,$43,$EC,$C6,$E1;0DA018|        |
+                       db $32,$FB,$C1,$52,$DC,$F2,$32,$C7,$EC,$E3,$41,$EE,$02,$42,$EC,$04;0DA028|        |
+                       db $02,$00,$00,$00,$00,$00,$00,$00,$00,$C2,$40,$E3,$30,$12,$11,$22;0DA038| Track data block 9 |
+                       db $22,$22,$96,$EC,$04,$DD,$2F,$E2,$EC,$32,$DF,$C6,$00,$00,$F0,$0F;0DA048|        |
+                       db $01,$DF,$5F,$A4,$C2,$4F,$D3,$41,$23,$22,$21,$11,$11,$97,$2C,$14;0DA058|        |
+                       db $EE,$3E,$D2,$FD,$31,$CF,$02,$00,$00,$00,$00,$00,$00,$00,$00,$7A;0DA068| Track data block 10 |
+                       db $13,$32,$F0,$35,$54,$23,$57,$61,$8A,$EE,$F1,$23,$21,$35,$64,$2E;0DA078|        |
+                       db $E0,$8A,$35,$43,$12,$12,$34,$31,$01,$23,$9A,$21,$FE,$F2,$45,$30;0DA088|        |
+                       db $EF,$35,$41,$AA,$FF,$01,$10,$EC,$D0,$33,$0F,$F0,$9A,$13,$2E,$BC;0DA098|        |
+                       db $02,$2F,$CA,$D0,$10,$8A,$FC,$CD,$FF,$FE,$CC,$DF,$FF,$EC,$8A,$BC;0DA0A8|        |
+                       db $E2,$21,$EB,$BC,$ED,$DB,$EF,$7A,$34,$3C,$AB,$DF,$EB,$BD,$F1,$ED;0DA0B8|        |
+                       db $7A,$EF,$12,$0B,$AE,$34,$0E,$CE,$36,$7A,$4F,$DC,$15,$63,$EB,$C2;0DA0C8|        |
+                       db $42,$FE,$7A,$E1,$57,$41,$11,$34,$1E,$CB,$DD,$7A,$F0,$11,$46,$50;0DA0D8|        |
+                       db $E0,$12,$0C,$AC,$7A,$E2,$20,$DD,$F2,$65,$EA,$C0,$45,$7A,$F1,$BC;0DA0E8|        |
+                       db $05,$40,$DD,$04,$54,$0E,$7A,$12,$32,$00,$35,$44,$23,$57,$62,$8B;0DA0F8|        |
+                       db $FD,$E1,$33,$21,$25,$65,$2E,$E0,$02,$00,$00,$00,$00,$00,$00,$00;0DA108|        |
+                       db $00,$7A,$43,$42,$33,$1F,$0F,$EE,$BC,$CB,$7A,$AC,$CC,$CD,$FF,$1F;0DA118| Track data block 11 |
+                       db $01,$31,$21,$7A,$12,$11,$01,$02,$F1,$12,$33,$24,$7A,$33,$43,$33;0DA128|        |
+                       db $1F,$1F,$DD,$CC,$CB,$7B,$BB,$BD,$DD,$EF,$00,$11,$12,$22,$30,$00;0DA138|        |
