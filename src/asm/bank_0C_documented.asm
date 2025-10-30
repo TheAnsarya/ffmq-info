@@ -2247,3 +2247,621 @@ CODE_0C8E9F:								; Fill loop
 ; Address range: $0C8AF1-$0C8F98
 ; Systems: VRAM fill, palette DMA, title screen setup, tilemap initialization
 ; ==============================================================================
+; ==============================================================================
+; Bank $0C Cycle 5: Graphics Decompression & Tile Processing (Lines 1700-2100)
+; ==============================================================================
+; Address Range: $0C8F9E - $0C924D
+; Systems: 4bpp graphics decompression, tile compositing, VRAM buffer management
+; ==============================================================================
+
+                       ; DMA Transfer Parameters Setup (continued from previous)
+                       STX.B SNES_DMA0PARAM-$4300           ;0C8F9E|8600    |004300; DMA0 params (direct page $43xx addressing)
+                       LDX.W #$B6EC                         ;0C8FA0|A2ECB6  |      ; Source address $0CB6EC
+                       STX.B SNES_DMA0ADDRL-$4300           ;0C8FA3|8602    |004302; DMA0 source low word
+                       LDA.B #$0C                           ;0C8FA5|A90C    |      ; Bank $0C
+                       STA.B SNES_DMA0ADDRH-$4300           ;0C8FA7|8504    |004304; DMA0 source bank byte
+                       LDX.W #$0022                         ;0C8FA9|A22200  |      ; Transfer size: 34 bytes
+                       STX.B SNES_DMA0CNTL-$4300            ;0C8FAC|8605    |004305; DMA0 byte count
+                       LDA.B #$01                           ;0C8FAE|A901    |      ; Channel 0 enable
+                       STA.W SNES_MDMAEN                    ;0C8FB0|8D0B42  |00420B; Trigger DMA transfer ($420B)
+                       RTS                                  ;0C8FB3|60      |      ; Return
+
+; ==============================================================================
+; CODE_0C8FB4: 4bpp Planar to Linear Graphics Decompression
+; ==============================================================================
+; Purpose: Convert SNES 4bpp planar graphics format to linear format for processing
+; Input: X = pointer to source tile data (32 bytes per 8x8 tile in planar format)
+; Output: Decompressed tile data written directly to VRAM via $2119 (VMDATAH)
+; Format: SNES 4bpp = 4 bitplanes (BP0, BP1, BP2, BP3), 2 bytes per row per plane
+; Algorithm: Interleave 4 bitplanes by shifting and combining bits
+; Used by: Graphics loading routines during initialization/transitions
+; ------------------------------------------------------------------------------
+          CODE_0C8FB4:
+                       SEP #$20                             ;0C8FB4|E220    |      ; 8-bit accumulator
+                       LDA.B #$08                           ;0C8FB6|A908    |      ; 8 rows per tile (8x8 pixels)
+
+          CODE_0C8FB8:
+                       ; Process one row of the tile (8 pixels)
+                       PHA                                  ;0C8FB8|48      |      ; Save row counter
+
+                       ; Load bitplane data for this row:
+                       ; $0000,X = BP0 (low 2 bytes)
+                       ; $0010,X = BP2 (high 2 bytes)
+                       ; Each pair represents one row across the tile
+                       LDY.W $0010,X                        ;0C8FB9|BC1000  |7F0010; Load bitplane 2+3 word
+                       STY.B $64                            ;0C8FBC|8464    |000064; Store in DP $64-$65
+                       LDY.W $0000,X                        ;0C8FBE|BC0000  |7F0000; Load bitplane 0+1 word
+                       STY.B $62                            ;0C8FC1|8462    |000062; Store in DP $62-$63
+                       LDY.W #$0008                         ;0C8FC3|A00800  |      ; 8 pixels per row
+
+          CODE_0C8FC6:
+                       ; Deinterleave 4 bitplanes into 4-bit pixel value
+                       ; Each pixel needs bits from all 4 planes
+                       ; Shift order: BP3, BP2, BP1, BP0 (MSB to LSB)
+                       ASL.B $65                            ;0C8FC6|0665    |000065; Shift BP3 (high byte of $64-$65)
+                       ROL A                                ;0C8FC8|2A      |      ; Rotate bit into accumulator (bit 0)
+                       ASL.B $64                            ;0C8FC9|0664    |000064; Shift BP2 (low byte of $64-$65)
+                       ROL A                                ;0C8FCB|2A      |      ; Rotate bit into accumulator (bit 1)
+                       ASL.B $63                            ;0C8FCC|0663    |000063; Shift BP1 (high byte of $62-$63)
+                       ROL A                                ;0C8FCE|2A      |      ; Rotate bit into accumulator (bit 2)
+                       ASL.B $62                            ;0C8FCF|0662    |000062; Shift BP0 (low byte of $62-$63)
+                       ROL A                                ;0C8FD1|2A      |      ; Rotate bit into accumulator (bit 3)
+                       AND.B #$0F                           ;0C8FD2|290F    |      ; Mask to 4 bits (palette index 0-15)
+                       STA.L SNES_VMDATAH                   ;0C8FD4|8F192100|002119; Write to VRAM high byte ($2119)
+                       DEY                                  ;0C8FD8|88      |      ; Decrement pixel counter
+                       BNE CODE_0C8FC6                      ;0C8FD9|D0EB    |0C8FC6; Loop for all 8 pixels
+
+                       ; Move to next row
+                       INX                                  ;0C8FDB|E8      |      ; X += 2 (next row in planar format)
+                       INX                                  ;0C8FDC|E8      |      ; (2 bytes per row per plane pair)
+                       PLA                                  ;0C8FDD|68      |      ; Restore row counter
+                       DEC A                                ;0C8FDE|3A      |      ; Decrement row count
+                       BNE CODE_0C8FB8                      ;0C8FDF|D0D7    |0C8FB8; Loop for all 8 rows
+
+                       ; Tile complete, X now points +$10 from start
+                       REP #$30                             ;0C8FE1|C230    |      ; 16-bit mode
+                       TXA                                  ;0C8FE3|8A      |      ; Get current position
+                       ADC.W #$0010                         ;0C8FE4|691000  |      ; Skip to next tile (+16 bytes for BP2/BP3)
+                       TAX                                  ;0C8FE7|AA      |      ; Update X pointer
+                       RTS                                  ;0C8FE8|60      |      ; Return
+
+; ==============================================================================
+; CODE_0C8FE9: RGB555 Color to Tile Pattern Converter (Batch)
+; ==============================================================================
+; Purpose: Convert multiple RGB555 color values to tile patterns via lookup
+; Input: X = pointer to RGB555 color data, Y = count
+; Output: Tile patterns written to VRAM via CODE_0C8FF4
+; Used by: Color-based tile generation (e.g., solid color tiles, gradients)
+; ------------------------------------------------------------------------------
+          CODE_0C8FE9:
+                       LDA.W $0000,X                        ;0C8FE9|BD0000  |0C0000; Load RGB555 color word
+                       JSR.W CODE_0C8FF4                    ;0C8FEC|20F48F  |0C8FF4; Convert to tile pattern
+                       INX                                  ;0C8FEF|E8      |      ; Move to next color
+                       DEY                                  ;0C8FF0|88      |      ; Decrement count
+                       BNE CODE_0C8FE9                      ;0C8FF1|D0F6    |0C8FE9; Loop until all colors processed
+                       RTS                                  ;0C8FF3|60      |      ; Return
+
+; ==============================================================================
+; CODE_0C8FF4: RGB555 Color to Tile Pattern Converter (Single)
+; ==============================================================================
+; Purpose: Convert single RGB555 color to 8x8 tile pattern using lookup table
+; Input: A = RGB555 color word (%0BBBBBGGGGGRRRRR, 15-bit color)
+; Output: 8x8 tile (64 pixels) written to VRAM at current address
+; Algorithm:
+;   1. Extract green component (bits 5-9, middle 5 bits)
+;   2. Extract red component (bits 0-4, low 5 bits)
+;   3. Combine: (Green << 4) | Red to form 9-bit index (0-511)
+;   4. Use index to lookup tile pattern from Bank $07:8031
+;   5. Write 8 rows of tile data + 8 zeros (4bpp format padding)
+; Lookup Table: DATA8_078031 contains pre-generated tile patterns
+; VRAM Format: Each tile row writes to $2118 (VMDATAL), auto-increment
+; ------------------------------------------------------------------------------
+          CODE_0C8FF4:
+                       PHY                                  ;0C8FF4|5A      |      ; Preserve registers
+                       PHX                                  ;0C8FF5|DA      |      ;
+                       PHA                                  ;0C8FF6|48      |      ; Save color value
+
+                       ; Extract GREEN component (bits 5-9)
+                       AND.W #$00E0                         ;0C8FF7|29E000  |      ; Mask bits 5-7 (%11100000)
+                       ASL A                                ;0C8FFA|0A      |      ; Shift left 4 times to move
+                       ASL A                                ;0C8FFB|0A      |      ; green from bits 5-9 to
+                       ASL A                                ;0C8FFC|0A      |      ; bits 9-13 (creates space
+                       ASL A                                ;0C8FFD|0A      |      ; for red component)
+                       STA.B $64                            ;0C8FFE|8564    |000064; Save shifted green
+
+                       ; Extract RED component (bits 0-4)
+                       PLA                                  ;0C9000|68      |      ; Restore original color
+                       AND.W #$001F                         ;0C9001|291F00  |      ; Mask bits 0-4 (%00011111)
+                       ASL A                                ;0C9004|0A      |      ; Shift left 1 (multiply by 2)
+                       ORA.B $64                            ;0C9005|0564    |000064; Combine: (Green << 4) | (Red << 1)
+
+                       ; Result: A = lookup index (0-511)
+                       ; Index = (Green[4:0] << 4) | (Red[4:0])
+                       ; This maps 32x32=1024 possible RG combinations to 512 patterns
+
+                       LDY.W #$0008                         ;0C9007|A00800  |      ; 8 rows per tile
+
+          CODE_0C900A:
+                       ; Lookup tile pattern for each row
+                       TAX                                  ;0C900A|AA      |      ; Use color index as X
+                       LDA.L DATA8_078031,X                 ;0C900B|BF318007|078031; Load pattern byte from Bank $07
+                       AND.W #$00FF                         ;0C900F|29FF00  |      ; Mask to byte
+                       STA.W $2118                          ;0C9012|8D1821  |0C2118; Write to VRAM low byte ($2118)
+                       TXA                                  ;0C9015|8A      |      ; Restore index
+                       ADC.W #$0040                         ;0C9016|694000  |      ; +$40 for next row in table
+                       DEY                                  ;0C9019|88      |      ; Decrement row counter
+                       BNE CODE_0C900A                      ;0C901A|D0EE    |0C900A; Loop for 8 rows
+
+                       ; Write 8 zero bytes (padding for 4bpp high bitplanes)
+                       STZ.W $2118                          ;0C901C|9C1821  |0C2118; Zero byte 1
+                       STZ.W $2118                          ;0C901F|9C1821  |0C2118; Zero byte 2
+                       STZ.W $2118                          ;0C9022|9C1821  |0C2118; Zero byte 3
+                       STZ.W $2118                          ;0C9025|9C1821  |0C2118; Zero byte 4
+                       STZ.W $2118                          ;0C9028|9C1821  |0C2118; Zero byte 5
+                       STZ.W $2118                          ;0C902B|9C1821  |0C2118; Zero byte 6
+                       STZ.W $2118                          ;0C902E|9C1821  |0C2118; Zero byte 7
+                       STZ.W $2118                          ;0C9031|9C1821  |0C2118; Zero byte 8
+
+                       PLX                                  ;0C9034|FA      |      ; Restore registers
+                       PLY                                  ;0C9035|7A      |      ;
+                       RTS                                  ;0C9036|60      |      ; Return
+
+; ==============================================================================
+; CODE_0C9037: Complex Graphics Buffer Initialization
+; ==============================================================================
+; Purpose: Initialize large graphics buffer in Bank $7F with processed tile data
+; Input: None (uses hardcoded buffer addresses)
+; Output: $7F:4000-$7FFF filled with 128 copies of processed tile patterns
+; Buffer: $7F4000 (16KB graphics work area)
+; Process: Decompresses/processes tiles from $7F0000, copies 128 times
+; Used by: Major graphics transitions, screen initialization
+; Technique: Uses MVN block move for efficiency after processing
+; ------------------------------------------------------------------------------
+          CODE_0C9037:
+                       PHP                                  ;0C9037|08      |      ; Save processor status
+                       PHD                                  ;0C9038|0B      |      ; Save direct page
+                       REP #$30                             ;0C9039|C230    |      ; 16-bit mode
+                       LDA.W #$0000                         ;0C903B|A90000  |      ; Reset direct page
+                       TCD                                  ;0C903E|5B      |      ; Set DP = $0000
+
+                       ; Setup buffer pointers
+                       LDX.W #$4000                         ;0C903F|A20040  |      ; Destination: $7F:4000
+                       STX.B $5F                            ;0C9042|865F    |00005F; Store dest offset
+                       LDX.W #$7F40                         ;0C9044|A2407F  |      ; Dest bank + high byte
+                       STX.B $60                            ;0C9047|8660    |000060; Store at $60-$61
+
+                       ; Setup source pointer (X register for processing loop)
+                       LDX.W #$2000                         ;0C9049|A20020  |      ; Source: $7F:2000
+                       LDA.W #$0080                         ;0C904C|A98000  |      ; 128 iterations (128 tiles)
+
+                       ; Set data bank to $7F for processing
+                       PEA.W $007F                          ;0C904F|F47F00  |0C007F; Push $7F00
+                       PLB                                  ;0C9052|AB      |      ; Pull into DB ($7F)
+
+          CODE_0C9053:
+                       ; Process 128 tiles
+                       PHA                                  ;0C9053|48      |      ; Save iteration counter
+                       JSR.W CODE_0C9099                    ;0C9054|209990  |0C9099; Process one tile (decompression)
+                       PLA                                  ;0C9057|68      |      ; Restore counter
+                       DEC A                                ;0C9058|3A      |      ; Decrement
+                       BNE CODE_0C9053                      ;0C9059|D0F8    |0C9053; Loop for all 128 tiles
+
+                       ; Setup DMA transfer for processed buffer
+                       PLB                                  ;0C905B|AB      |      ; Restore data bank
+                       SEP #$20                             ;0C905C|E220    |      ; 8-bit accumulator
+                       LDA.B #$0C                           ;0C905E|A90C    |      ; Bank $0C for subroutine
+                       STA.W $005A                          ;0C9060|8D5A00  |00005A; Store at $005A (bank byte)
+                       LDX.W #$9075                         ;0C9063|A27590  |      ; Address $0C:9075 (DMA routine)
+                       STX.W $0058                          ;0C9066|8E5800  |000058; Store at $0058-$0059 (address)
+
+                       ; Register completion handler
+                       LDA.B #$40                           ;0C9069|A940    |      ; Bit 6 flag
+                       TSB.W $00E2                          ;0C906B|0CE200  |0000E2; Test and Set bit at $E2
+                       JSL.L CODE_0C8000                    ;0C906E|2200800C|0C8000; Call graphics handler
+
+                       PLD                                  ;0C9072|2B      |      ; Restore direct page
+                       PLP                                  ;0C9073|28      |      ; Restore processor status
+                       RTS                                  ;0C9074|60      |      ; Return
+
+; ==============================================================================
+; DMA Transfer Routine (Embedded at $0C:9075)
+; ==============================================================================
+; Purpose: Transfer processed graphics buffer to VRAM
+; Source: $7F:4000 (8KB processed tile data)
+; Dest: VRAM $0440 (BG tileset area)
+; Size: $2000 bytes (8192 bytes = 256 tiles)
+; ------------------------------------------------------------------------------
+                       ; VRAM Setup
+                       LDA.B #$80                           ;0C9075|A980    |      ; VRAM increment = 1 (word mode)
+                       STA.W SNES_VMAINC                    ;0C9077|8D1521  |002115; Set increment mode ($2115)
+                       LDX.W #$0440                         ;0C907A|A24004  |      ; VRAM address $0440
+                       STX.W SNES_VMADDL                    ;0C907D|8E1621  |002116; Set VRAM address ($2116-$2117)
+
+                       ; DMA Channel 0 Configuration
+                       LDX.W #$1900                         ;0C9080|A20019  |      ; DMA params: $19 = word, $00 = A→B
+                       STX.B SNES_DMA0PARAM-$4300           ;0C9083|8600    |004300; $4300-$4301 (params + dest)
+                       LDX.W #$4000                         ;0C9085|A20040  |      ; Source: $7F:4000
+                       STX.B SNES_DMA0ADDRL-$4300           ;0C9088|8602    |004302; $4302-$4303 (source low word)
+                       LDA.B #$7F                           ;0C908A|A97F    |      ; Source bank $7F
+                       STA.B SNES_DMA0ADDRH-$4300           ;0C908C|8504    |004304; $4304 (source bank)
+                       LDX.W #$2000                         ;0C908E|A20020  |      ; Transfer $2000 bytes (8KB)
+                       STX.B SNES_DMA0CNTL-$4300            ;0C9091|8605    |004305; $4305-$4306 (byte count)
+                       LDA.B #$01                           ;0C9093|A901    |      ; Channel 0 enable
+                       STA.W SNES_MDMAEN                    ;0C9095|8D0B42  |00420B; Trigger DMA ($420B)
+                       RTL                                  ;0C9098|6B      |      ; Return (long)
+
+; ==============================================================================
+; CODE_0C9099: Tile Processing Routine (4bpp Decompression to Buffer)
+; ==============================================================================
+; Purpose: Process planar tile data to linear format with transparency support
+; Input: X = source pointer ($7F:2000+offset), $5F-$60 = dest pointer
+; Output: Processed tile written to buffer, X advanced, $5F incremented
+; Format: Converts 4bpp planar to linear with transparency flag (bit 4)
+; Algorithm: Same as CODE_0C8FB4 but writes to buffer instead of VRAM
+; Difference: Sets bit 4 ($10) if pixel is non-zero (transparency marker)
+; ------------------------------------------------------------------------------
+          CODE_0C9099:
+                       SEP #$20                             ;0C9099|E220    |      ; 8-bit accumulator
+                       LDA.B #$08                           ;0C909B|A908    |      ; 8 rows per tile
+
+          CODE_0C909D:
+                       PHA                                  ;0C909D|48      |      ; Save row counter
+                       LDY.W $0010,X                        ;0C909E|BC1000  |7F0010; Load BP2+BP3 word
+                       STY.B $64                            ;0C90A1|8464    |000064; Store at $64-$65
+                       LDY.W $0000,X                        ;0C90A3|BC0000  |7F0000; Load BP0+BP1 word
+                       STY.B $62                            ;0C90A6|8462    |000062; Store at $62-$63
+                       LDY.W #$0008                         ;0C90A8|A00800  |      ; 8 pixels per row
+
+          CODE_0C90AB:
+                       ; Deinterleave bitplanes (same as CODE_0C8FC6)
+                       ASL.B $65                            ;0C90AB|0665    |000065; Shift BP3
+                       ROL A                                ;0C90AD|2A      |      ; Rotate into A
+                       ASL.B $64                            ;0C90AE|0664    |000064; Shift BP2
+                       ROL A                                ;0C90B0|2A      |      ; Rotate into A
+                       ASL.B $63                            ;0C90B1|0663    |000063; Shift BP1
+                       ROL A                                ;0C90B3|2A      |      ; Rotate into A
+                       ASL.B $62                            ;0C90B4|0662    |000062; Shift BP0
+                       ROL A                                ;0C90B6|2A      |      ; Rotate into A
+                       AND.B #$0F                           ;0C90B7|290F    |      ; Mask to 4 bits (color 0-15)
+
+                       ; Transparency handling
+                       BEQ CODE_0C90BD                      ;0C90B9|F002    |0C90BD; If zero, skip (transparent)
+                       ORA.B #$10                           ;0C90BB|0910    |      ; Set bit 4 (non-transparent marker)
+
+          CODE_0C90BD:
+                       ; Write to buffer
+                       STA.B [$5F]                          ;0C90BD|875F    |00005F; Write to [$5F] (buffer pointer)
+                       REP #$30                             ;0C90BF|C230    |      ; 16-bit mode
+                       INC.B $5F                            ;0C90C1|E65F    |00005F; Increment buffer pointer
+                       SEP #$20                             ;0C90C3|E220    |      ; 8-bit mode
+                       DEY                                  ;0C90C5|88      |      ; Decrement pixel counter
+                       BNE CODE_0C90AB                      ;0C90C6|D0E3    |0C90AB; Loop for 8 pixels
+
+                       ; Next row
+                       INX                                  ;0C90C8|E8      |      ; X += 2
+                       INX                                  ;0C90C9|E8      |      ;
+                       PLA                                  ;0C90CA|68      |      ; Restore row counter
+                       DEC A                                ;0C90CB|3A      |      ; Decrement
+                       BNE CODE_0C909D                      ;0C90CC|D0CF    |0C909D; Loop for 8 rows
+
+                       ; Tile complete, advance source pointer
+                       REP #$30                             ;0C90CE|C230    |      ; 16-bit mode
+                       CLC                                  ;0C90D0|18      |      ; Clear carry
+                       TXA                                  ;0C90D1|8A      |      ; Get current X
+                       ADC.W #$0010                         ;0C90D2|691000  |      ; Skip $10 bytes (BP2/BP3 data)
+                       TAX                                  ;0C90D5|AA      |      ; Update X
+                       RTS                                  ;0C90D6|60      |      ; Return
+
+; ==============================================================================
+; DMA Routine: Transfer Tilemap Data to VRAM
+; ==============================================================================
+; Purpose: Transfer tilemap/tileset from Bank $00 to VRAM base address
+; Source: $00:8252 (ROM tilemap data)
+; Dest: VRAM $0000 (base tilemap/charset area)
+; Size: $2000 bytes (8KB)
+; Mode: Word transfer, no increment during transfer
+; ------------------------------------------------------------------------------
+                       STZ.W SNES_VMAINC                    ;0C90D7|9C1521  |002115; VRAM increment = 0 (no increment)
+                       LDX.W #$0000                         ;0C90DA|A20000  |      ; VRAM address $0000
+                       STX.W SNES_VMADDL                    ;0C90DD|8E1621  |002116; Set VRAM address
+
+                       ; DMA Channel 0 Setup
+                       LDX.W #$1808                         ;0C90E0|A20818  |      ; $18 = word mode, $08 = dest reg
+                       STX.B SNES_DMA0PARAM-$4300           ;0C90E3|8600    |004300; DMA0 params
+                       LDX.W #$8252                         ;0C90E5|A25282  |      ; Source: $00:8252
+                       STX.B SNES_DMA0ADDRL-$4300           ;0C90E8|8602    |004302; Source low word
+                       LDA.B #$00                           ;0C90EA|A900    |      ; Bank $00
+                       STA.B SNES_DMA0ADDRH-$4300           ;0C90EC|8504    |004304; Source bank
+                       LDX.W #$2000                         ;0C90EE|A20020  |      ; $2000 bytes (8KB)
+                       STX.B SNES_DMA0CNTL-$4300            ;0C90F1|8605    |004305; Byte count
+                       LDA.B #$01                           ;0C90F3|A901    |      ; Channel 0 enable
+                       STA.W SNES_MDMAEN                    ;0C90F5|8D0B42  |00420B; Trigger DMA
+                       RTL                                  ;0C90F8|6B      |      ; Return long
+
+; ==============================================================================
+; CODE_0C90F9: Battle Graphics Upload (Split Transfer)
+; ==============================================================================
+; Purpose: Upload battle graphics in two phases (low/high bitplanes separate)
+; Source: $0C:9140-$A140 (battle graphics data, 4KB)
+; Dest: VRAM $6000 (battle graphics tileset area)
+; Technique: Two DMA passes - first low bitplanes, then high bitplanes
+; Used by: Battle scene initialization, enemy sprite loading
+; ------------------------------------------------------------------------------
+          CODE_0C90F9:
+                       ; Phase 1: Upload low bitplanes (word mode, no increment)
+                       STZ.W $2115                          ;0C90F9|9C1521  |0C2115; VRAM increment = 0
+                       LDX.W #$6000                         ;0C90FC|A20060  |      ; VRAM address $6000
+                       STX.W $2116                          ;0C90FF|8E1621  |0C2116; Set VRAM address
+                       LDX.W #$1808                         ;0C9102|A20818  |      ; DMA mode: word, dest $2118-$2119
+                       STX.W $4300                          ;0C9105|8E0043  |0C4300; DMA0 params
+                       LDX.W #$9140                         ;0C9108|A24091  |      ; Source: $0C:9140 (low bitplanes)
+                       STX.W $4302                          ;0C910B|8E0243  |0C4302; Source address
+                       LDA.B #$0C                           ;0C910E|A90C    |      ; Bank $0C
+                       STA.W $4304                          ;0C9110|8D0443  |0C4304; Source bank
+                       LDX.W #$1000                         ;0C9113|A20010  |      ; $1000 bytes (4KB)
+                       STX.W $4305                          ;0C9116|8E0543  |0C4305; Byte count
+                       LDA.B #$01                           ;0C9119|A901    |      ; Channel 0 enable
+                       STA.W $420B                          ;0C911B|8D0B42  |0C420B; Trigger DMA
+
+                       ; Phase 2: Upload high bitplanes (word mode, increment +1)
+                       LDA.B #$80                           ;0C911E|A980    |      ; VRAM increment = 1 (word)
+                       STA.W $2115                          ;0C9120|8D1521  |0C2115; Set increment mode
+                       LDX.W #$6000                         ;0C9123|A20060  |      ; VRAM address $6000 (same base)
+                       STX.W $2116                          ;0C9126|8E1621  |0C2116; Set VRAM address
+                       LDA.B #$19                           ;0C9129|A919    |      ; DMA mode: $19 = word, auto-inc
+                       STA.W $4301                          ;0C912B|8D0143  |0C4301; DMA0 dest register
+                       LDX.W #$9141                         ;0C912E|A24191  |      ; Source: $0C:9141 (+1 for high BP)
+                       STX.W $4302                          ;0C9131|8E0243  |0C4302; Source address
+                       LDX.W #$1000                         ;0C9134|A20010  |      ; $1000 bytes (4KB)
+                       STX.W $4305                          ;0C9137|8E0543  |0C4305; Byte count
+                       LDA.B #$01                           ;0C913A|A901    |      ; Channel 0 enable
+                       STA.W $420B                          ;0C913C|8D0B42  |0C420B; Trigger DMA
+                       RTS                                  ;0C913F|60      |      ; Return
+
+; ==============================================================================
+; DATA: Battle Graphics Header/Marker
+; ==============================================================================
+                       db $FF,$01                           ;0C9140|        |      ; Graphics data marker ($FF = compressed, $01 = type)
+
+; ==============================================================================
+; CODE_0C9142: Complex Sprite/Graphics Initialization System
+; ==============================================================================
+; Purpose: Initialize complete sprite/graphics system for battle/overworld
+; Systems: Tile decompression, compositing, VRAM upload, buffer management
+; Output: Multiple VRAM regions populated, flags set
+; Used by: Scene transitions, battle start, major state changes
+; ------------------------------------------------------------------------------
+          CODE_0C9142:
+                       PHP                                  ;0C9142|08      |      ; Save processor status
+                       PHD                                  ;0C9143|0B      |      ; Save direct page
+                       REP #$30                             ;0C9144|C230    |      ; 16-bit mode
+                       LDA.W #$0000                         ;0C9146|A90000  |      ; Reset DP
+                       TCD                                  ;0C9149|5B      |      ; DP = $0000
+
+                       ; Execute initialization sequence
+                       JSR.W CODE_0C9318                    ;0C914A|201893  |0C9318; Initialize graphics buffers
+                       JSR.W CODE_0C92EB                    ;0C914D|20EB92  |0C92EB; Setup palette system
+                       JSR.W CODE_0C9161                    ;0C9150|206191  |0C9161; Load sprite graphics
+
+                       ; Set completion flags
+                       LDA.W #$0010                         ;0C9153|A91000  |      ; Flag value $10
+                       STA.L $7F2F9C                        ;0C9156|8F9C2F7F|7F2F9C; Mark completion at $7F2F9C
+                       STA.L $7F2DD2                        ;0C915A|8FD22D7F|7F2DD2; Mark completion at $7F2DD2
+
+                       PLD                                  ;0C915E|2B      |      ; Restore direct page
+                       PLP                                  ;0C915F|28      |      ; Restore status
+                       RTS                                  ;0C9160|60      |      ; Return
+
+; ==============================================================================
+; CODE_0C9161: Sprite Graphics Loading & Compositing System
+; ==============================================================================
+; Purpose: Load and composite multiple sprite layers into VRAM
+; Technique: Clear buffer, composite 8 sprite layers, upload to VRAM
+; Buffer: $7F:2000 (8KB work area)
+; VRAM Dest: Various addresses for different sprite layers
+; Used by: Battle sprite setup, character graphics initialization
+; ------------------------------------------------------------------------------
+          CODE_0C9161:
+                       ; Clear graphics buffer ($7F:2000-$3FFF, 8KB)
+                       LDX.W #$0000                         ;0C9161|A20000  |      ; Source = $0000 (zeros)
+                       LDY.W #$2000                         ;0C9164|A00020  |      ; Dest = $2000
+                       LDA.W #$2000                         ;0C9167|A90020  |      ; Size = $2000 (8KB)
+                       JSL.L CODE_009994                    ;0C916A|22949900|009994; Clear memory routine
+
+                       ; Composite sprite layers (8 layers)
+                       JSR.W CODE_0C91AF                    ;0C916E|20AF91  |0C91AF; Layer 1: Base sprites
+                       JSR.W CODE_0C9197                    ;0C9171|209791  |0C9197; Layer 2: Overlay 1
+                       JSR.W CODE_0C9247                    ;0C9174|204792  |0C9247; Spacing/padding
+                       JSR.W CODE_0C91B7                    ;0C9177|20B791  |0C91B7; Layer 3: Accessories
+                       JSR.W CODE_0C919F                    ;0C917A|209F91  |0C919F; Layer 4: Overlay 2
+                       JSR.W CODE_0C929E                    ;0C917D|209E92  |0C929E; Unknown processing
+                       JSR.W CODE_0C91BF                    ;0C9180|20BF91  |0C91BF; Layer 5: Effects
+                       JSR.W CODE_0C9247                    ;0C9183|204792  |0C9247; Spacing/padding
+                       JSR.W CODE_0C91C7                    ;0C9186|20C791  |0C91C7; Layer 6: Highlights
+                       JSR.W CODE_0C91A7                    ;0C9189|20A791  |0C91A7; Layer 7: Shadows
+                       JSR.W CODE_0C9247                    ;0C918C|204792  |0C9247; Spacing/padding
+
+                       ; Final upload
+                       LDY.W #$24C0                         ;0C918F|A0C024  |      ; VRAM address $24C0
+                       LDX.W #$9400                         ;0C9192|A20094  |      ; Source data pointer
+                       BRA CODE_0C91CD                      ;0C9195|8036    |0C91CD; Jump to upload routine
+
+; ==============================================================================
+; Sprite Layer Loading Routines (Setup VRAM address + source pointer)
+; ==============================================================================
+; Each routine sets Y=VRAM destination, X=source data pointer
+; Then branches to CODE_0C91CD for actual processing
+; ------------------------------------------------------------------------------
+
+          CODE_0C9197:
+                       ; Layer 2: VRAM $2080, source $0C:93CA
+                       LDY.W #$2080                         ;0C9197|A08020  |      ; VRAM dest
+                       LDX.W #$93CA                         ;0C919A|A2CA93  |      ; Source pointer
+                       BRA CODE_0C91CD                      ;0C919D|802E    |0C91CD; Process
+
+          CODE_0C919F:
+                       ; Layer 4: VRAM $2480, source $0C:93EB
+                       LDY.W #$2480                         ;0C919F|A08024  |      ; VRAM dest
+                       LDX.W #$93EB                         ;0C91A2|A2EB93  |      ; Source pointer
+                       BRA CODE_0C91CD                      ;0C91A5|8026    |0C91CD; Process
+
+          CODE_0C91A7:
+                       ; Layer 7: VRAM $20C0, source $0C:9410
+                       LDY.W #$20C0                         ;0C91A7|A0C020  |      ; VRAM dest
+                       LDX.W #$9410                         ;0C91AA|A21094  |      ; Source pointer
+                       BRA CODE_0C91CD                      ;0C91AD|801E    |0C91CD; Process
+
+          CODE_0C91AF:
+                       ; Layer 1: VRAM $2000, source $0C:9346
+                       LDY.W #$2000                         ;0C91AF|A00020  |      ; VRAM dest
+                       LDX.W #$9346                         ;0C91B2|A24693  |      ; Source pointer
+                       BRA CODE_0C91CD                      ;0C91B5|8016    |0C91CD; Process
+
+          CODE_0C91B7:
+                       ; Layer 3: VRAM $2B80, source $0C:9392
+                       LDY.W #$2B80                         ;0C91B7|A0802B  |      ; VRAM dest
+                       LDX.W #$9392                         ;0C91BA|A29293  |      ; Source pointer
+                       BRA CODE_0C91CD                      ;0C91BD|800E    |0C91CD; Process
+
+          CODE_0C91BF:
+                       ; Layer 5: VRAM $2BA0, source $0C:9392
+                       LDY.W #$2BA0                         ;0C91BF|A0A02B  |      ; VRAM dest
+                       LDX.W #$9392                         ;0C91C2|A29293  |      ; Source pointer
+                       BRA CODE_0C91CD                      ;0C91C5|8006    |0C91CD; Process
+
+          CODE_0C91C7:
+                       ; Layer 6: VRAM $2040, source $0C:9396
+                       LDY.W #$2040                         ;0C91C7|A04020  |      ; VRAM dest
+                       LDX.W #$9396                         ;0C91CA|A29693  |      ; Source pointer
+
+; ==============================================================================
+; CODE_0C91CD: Sprite Data Processing Loop (Bytecode Interpreter)
+; ==============================================================================
+; Purpose: Process sprite command bytecode to composite graphics
+; Input: X = command pointer, Y = VRAM base address
+; Format: Command bytes:
+;   $00-$7F: Tile index (process 32 bytes at offset = index * 32)
+;   $80-$FE: Relative offset (+/- adjust Y by (value & $7F) * 32)
+;   $FF: End marker
+; Algorithm: Interpret commands, composite tiles from $7F:0000 to buffer
+; ------------------------------------------------------------------------------
+          CODE_0C91CD:
+                       PHK                                  ;0C91CD|4B      |      ; Push program bank ($0C)
+                       PLB                                  ;0C91CE|AB      |      ; Pull to data bank
+
+          ; Process command stream
+                       LDA.W $0000,X                        ;0C91CF|BD0000  |0C0000; Load command byte
+                       AND.W #$00FF                         ;0C91D2|29FF00  |      ; Mask to byte
+                       CMP.W #$0080                         ;0C91D5|C98000  |      ; Check if < $80
+                       BCS CODE_0C91E8                      ;0C91D8|B00E    |0C91E8; Branch if >= $80 (offset cmd)
+
+                       ; Tile index command ($00-$7F)
+                       ASL A                                ;0C91DA|0A      |      ; Multiply by 32:
+                       ASL A                                ;0C91DB|0A      |      ; Shift left 5 times
+                       ASL A                                ;0C91DC|0A      |      ; (index * 2^5 = index * 32)
+                       ASL A                                ;0C91DD|0A      |      ;
+                       ASL A                                ;0C91DE|0A      |      ; A = tile offset in bytes
+                       PHX                                  ;0C91DF|DA      |      ; Save command pointer
+                       TAX                                  ;0C91E0|AA      |      ; X = tile data offset
+                       JSR.W CODE_0C91FF                    ;0C91E1|20FF91  |0C91FF; Composite tile
+                       PLX                                  ;0C91E4|FA      |      ; Restore command pointer
+                       INX                                  ;0C91E5|E8      |      ; Next command
+                       BRA CODE_0C91CD                      ;0C91E6|80E5    |0C91CD; Loop
+
+          CODE_0C91E8:
+                       ; Check for end marker
+                       CMP.W #$00FF                         ;0C91E8|C9FF00  |      ; End of commands?
+                       BEQ CODE_0C91FE                      ;0C91EB|F011    |0C91FE; Yes, exit
+
+                       ; Offset command ($80-$FE)
+                       AND.W #$007F                         ;0C91ED|297F00  |      ; Mask offset value (0-127)
+                       ASL A                                ;0C91F0|0A      |      ; Multiply by 32:
+                       ASL A                                ;0C91F1|0A      |      ; (offset * 32 = VRAM rows)
+                       ASL A                                ;0C91F2|0A      |      ;
+                       ASL A                                ;0C91F3|0A      |      ;
+                       ASL A                                ;0C91F4|0A      |      ;
+                       STA.B $64                            ;0C91F5|8564    |000064; Save offset
+                       TYA                                  ;0C91F7|98      |      ; Get current VRAM address
+                       ADC.B $64                            ;0C91F8|6564    |000064; Add offset
+                       TAY                                  ;0C91FA|A8      |      ; Update Y
+                       INX                                  ;0C91FB|E8      |      ; Next command
+                       BRA CODE_0C91CD                      ;0C91FC|80CF    |0C91CD; Loop
+
+          CODE_0C91FE:
+                       RTS                                  ;0C91FE|60      |      ; End of command stream
+
+; ==============================================================================
+; CODE_0C91FF: Tile Compositing with Transparency (8x8 tile, 3-plane)
+; ==============================================================================
+; Purpose: Composite source tile onto destination with transparency masking
+; Input: X = source offset ($7F:0000+X), Y = dest offset ($7F:2000+Y)
+; Algorithm: For each row, mask transparent pixels, OR opaque pixels
+; Format: 3 bytes per row (BP0, BP1, BP2), 8 rows = 24 bytes per tile
+; Technique: (dest & ~(BP0|BP1|BP2)) | src = composite with transparency
+; ------------------------------------------------------------------------------
+          CODE_0C91FF:
+                       SEP #$20                             ;0C91FF|E220    |      ; 8-bit accumulator
+                       LDA.B #$08                           ;0C9201|A908    |      ; 8 rows per tile
+                       STA.B $62                            ;0C9203|8562    |000062; Save row counter
+
+                       ; Set data bank to $7F
+                       PEA.W $7F00                          ;0C9205|F4007F  |0C7F00; Push $7F00
+                       PLB                                  ;0C9208|AB      |      ; Pull to DB (high byte)
+                       PLB                                  ;0C9209|AB      |      ; Pull to DB (low byte) = $7F
+
+          CODE_0C920A:
+                       ; Load source tile row (3 bytes: BP0, BP1, BP2)
+                       ; Calculate transparency mask: OR all 3 bitplanes
+                       LDA.W $0000,X                        ;0C920A|BD0000  |7F0000; Load BP0
+                       ORA.W $0001,X                        ;0C920D|1D0100  |7F0001; OR BP1
+                       ORA.W $0010,X                        ;0C9210|1D1000  |7F0010; OR BP2
+                       EOR.B #$FF                           ;0C9213|49FF    |      ; Invert = transparency mask
+                       STA.B $64                            ;0C9215|8564    |000064; Save mask
+
+                       ; Composite BP0: (dest & mask) | src
+                       AND.W $0000,Y                        ;0C9217|390000  |7F0000; Mask dest BP0
+                       ORA.W $0000,X                        ;0C921A|1D0000  |7F0000; OR source BP0
+                       STA.W $0000,Y                        ;0C921D|990000  |7F0000; Write result
+
+                       ; Composite BP1: (dest & mask) | src
+                       LDA.B $64                            ;0C9220|A564    |000064; Load mask
+                       AND.W $0001,Y                        ;0C9222|390100  |7F0001; Mask dest BP1
+                       ORA.W $0001,X                        ;0C9225|1D0100  |7F0001; OR source BP1
+                       STA.W $0001,Y                        ;0C9228|990100  |7F0001; Write result
+
+                       ; Composite BP2: (dest & mask) | src
+                       LDA.B $64                            ;0C922B|A564    |000064; Load mask
+                       AND.W $0010,Y                        ;0C922D|391000  |7F0010; Mask dest BP2
+                       ORA.W $0010,X                        ;0C9230|1D1000  |7F0010; OR source BP2
+                       STA.W $0010,Y                        ;0C9233|991000  |7F0010; Write result
+
+                       ; Next row (stride +2 for X, +2 for Y within 8x8)
+                       INX                                  ;0C9236|E8      |      ; X += 2
+                       INX                                  ;0C9237|E8      |      ;
+                       INY                                  ;0C9238|C8      |      ; Y += 2
+                       INY                                  ;0C9239|C8      |      ;
+                       DEC.B $62                            ;0C923A|C662    |000062; Decrement row counter
+                       BNE CODE_0C920A                      ;0C923C|D0CC    |0C920A; Loop for 8 rows
+
+                       ; Tile complete, advance to next tile
+                       REP #$30                             ;0C923E|C230    |      ; 16-bit mode
+                       CLC                                  ;0C9240|18      |      ; Clear carry
+                       TYA                                  ;0C9241|98      |      ; Get Y position
+                       ADC.W #$0010                         ;0C9242|691000  |      ; +$10 (skip to next tile row)
+                       TAY                                  ;0C9245|A8      |      ; Update Y
+                       RTS                                  ;0C9246|60      |      ; Return
+
+; ==============================================================================
+; CODE_0C9247: Buffer Spacing/Padding Routine
+; ==============================================================================
+; Purpose: Add spacing between sprite layers in buffer
+; Input: None (uses Bank $7F data bank)
+; Output: Y advanced by $1E * something (spacing calculation)
+; Used by: Sprite layer compositing to maintain proper offsets
+; ------------------------------------------------------------------------------
+          CODE_0C9247:
+                       PEA.W $7F00                          ;0C9247|F4007F  |0C7F00; Set data bank = $7F
+                       PLB                                  ;0C924A|AB      |      ;
+                       PLB                                  ;0C924B|AB      |      ;
+                       CLC                                  ;0C924C|18      |      ; Clear carry
+                       LDA.W #$001E                         ;0C924D|A91E00  |      ; Spacing value $1E (30)
