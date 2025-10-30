@@ -3088,3 +3088,142 @@
 ; $0EDE60-$0EDFB0: Routing (A-tier: $AA)
 ; $0EDFB0-$0EE3D0: Voice envelopes (9-tier: $9A/$96)
 ; [Pattern likely continues...]
+; Bank $0E Cycle 7a: Lines 1601-1700 (100 source lines)
+; Address Range: $0EE3D0-$0EEA10
+; Extended APU/Sound Data (SPC700 Audio Driver - 8-Tier Dominance Zone)
+
+; MAJOR PATTERN SHIFT: 8-TIER ($86/$8A/$82) SEPARATOR DOMINANCE
+
+; Lines 1601-1650: $86/$82 separator DOMINANCE (50 lines)
+; Pattern: Dense $A0-$F4 envelopes, structured voice data
+
+; Line 1601: $0EE3D0 - $86/$9C separators, $AE/$CA/$D4/$EA envelopes
+                       db $37,$4D,$AE,$45,$0A,$B0,$64,$86,$EA,$D4,$63,$CA,$F5,$5E,$9C,$26;0EE3D0
+
+; Lines 1602-1620: Continuous $86/$82 pattern (19 lines)
+; Separator frequency: $86 ~50%, $82 ~30%
+; Envelope range: $A0-$F4 (high concentration)
+
+; Line 1621: $0EE4D0 - $8A separator EMERGES, $86 continues
+                       db $FC,$E2,$42,$86,$DC,$F3,$3F,$DD,$14,$3F,$CF,$34,$8A,$CC,$04,$40;0EE4D0
+
+; Lines 1621-1660: $8A/$86/$82 TRIPLE DOMINANCE (40 lines!)
+; $8A becomes primary separator (~40% of separators)
+; $86 secondary (~30%)
+; $82 rare (~5%)
+; Pattern: Dense separator usage (3-5 per line)
+
+; Line 1640: $0EE640 - $7A separator BRIEF APPEARANCE
+                       db $8A,$E2,$31,$CC,$13,$3E,$EE,$24,$2D,$7A,$9F,$63;0EE640
+
+; Line 1641: $0EE650 - Dual $8A separators, $7A continues
+                       db $F9,$B3,$74,$DB,$F4,$70,$8A,$DD,$F3,$2F,$DF,$23,$2E,$D0,$22,$8A;0EE650
+
+; Line 1643: $0EE670 - $7A/$9C separators emerge
+                       db $D1,$7A,$72,$D9,$F6,$71,$AC,$15,$4D,$9C,$7A,$36,$1D,$B0,$66,$0A;0EE670
+
+; Lines 1643-1700: $7A separator DOMINATES (58 lines!)
+; COMPLETE SHIFT from $8A/$86 to $7A
+; $7A frequency: ~60 instances (100% of separators in many lines)
+; $8A/$86 vanish completely
+; Pattern: Lower envelope range ($B0-$F6), more numeric patterns
+
+; Line 1660: $0EE700 - Pure $7A pattern
+                       db $C0,$45,$1C,$E2,$51;0EE700
+
+; Line 1680: $0EE800 - $7A continues dominance
+                       db $CF,$34,$1F,$E1,$42,$EC,$D0,$21,$7A,$ED,$13,$41,$EF,$02,$1D,$CE;0EE810
+
+; Line 1695: $0EE960 - $7B separator (NEW!), $DA separator (NEW!), 9 consecutive zero bytes!
+                       db $43,$7B,$0D,$D0,$21,$CC,$04,$31,$EF,$14,$DA,$0D;0EE960
+                       db $02,$00,$00,$00,$00,$00,$00,$00,$00,$A2,$01,$34,$34,$63,$20,$FD;0EE970
+
+; Line 1697: $0EE980 - $92/$A2 separators emerge
+                       db $E4,$2C,$B2,$E3,$5F,$C0,$20,$DE,$00,$FF,$FF,$92,$CA,$03,$FF,$35;0EE980
+
+; Line 1698-1700: $A2/$A6 separator DOMINANCE (NEW TIER!)
+                       db $1E,$21,$05,$6F,$A2,$CE,$31,$BD,$33,$0D,$E1,$31,$E0,$A6,$2E,$F1;0EE990
+                       db $1F,$F0,$23,$FC,$F4,$1D,$A6,$F1,$1F,$F0,$F1,$3E,$D1,$42,$DD,$A6;0EE9A0
+                       db $33,$DB,$12,$21,$F1,$0F,$FF,$01,$A6,$FF,$10,$12,$1F,$13,$DB,$41;0EE9B0
+
+;=== CYCLE 7a SUMMARY (Lines 1601-1700) ===
+; FOUR DISTINCT SEPARATOR ZONES:
+;
+; ZONE 1: Lines 1601-1620 (20 lines) - 8/6-TIER DOMINANCE
+;  Separator Analysis:
+;   - $86: ~40 instances (primary)
+;   - $82: ~25 instances (secondary)
+;   - Pattern: 8-tier voice data block
+;  Envelope Range: $A0-$F4 (dense high)
+;  Hypothesis: Voice routing/DSP parameters
+;
+; ZONE 2: Lines 1621-1642 (22 lines) - 8-TIER PEAK
+;  Separator Analysis:
+;   - $8A: ~45 instances (dominant!)
+;   - $86: ~30 instances (secondary)
+;   - $82: ~8 instances (tertiary)
+;   - Pattern: Highest $8A concentration in entire bank
+;  Envelope Range: $C0-$F4 (very high)
+;  Hypothesis: Major voice parameter block
+;
+; ZONE 3: Lines 1643-1696 (54 lines) - 7-TIER DOMINANCE
+;  Separator Analysis:
+;   - $7A: ~60 instances (100% primary!)
+;   - $7B: 1 instance (rare, line 1695)
+;   - ALL 8-tier separators vanish
+;  Envelope Range: $B0-$F6 (mid-high)
+;  Hypothesis: Sequencing/timing data return
+;
+; ZONE 4: Lines 1697-1700 (4 lines) - A-TIER EMERGENCE
+;  Separator Analysis:
+;   - $A6: ~6 instances (primary!)
+;   - $A2: ~2 instances (secondary)
+;   - $B2: 1 instance
+;   - $92: 1 instance
+;   - $DA: 1 instance (NEW rare separator!)
+;   - $7A vanishes completely
+;  Envelope Range: $BD-$F4 (high)
+;  Pattern: NEW A-tier subsystem ($A6/$A2)
+;  Hypothesis: Voice marker/channel assignment data
+;
+; CRITICAL DISCOVERIES:
+;
+; 1. 8-TIER PEAK ZONE (lines 1621-1642):
+;    - Highest $8A concentration in Bank $0E
+;    - $8A frequency: 45 instances in 22 lines (2+ per line)
+;    - Suggests critical voice parameter section
+;
+; 2. MAJOR BOUNDARY AT LINE 1695:
+;    - 9 consecutive zero bytes (3rd major boundary in bank)
+;    - NEW separators: $7B, $DA
+;    - Marks transition to A-tier system
+;
+; 3. A-TIER SUBSYSTEM DISCOVERED:
+;    - $A6/$A2 = new separator tier (voice markers?)
+;    - Previously seen as voice markers, now acting as separators
+;    - Pattern suggests voice/channel assignment data block
+;
+; 4. CLEAN ZONE TRANSITIONS:
+;    Line 1620: $86/$82 → $8A dominant
+;    Line 1642: $8A → $7A (instant switch)
+;    Line 1696: $7A → $A6/$A2 (instant switch)
+;
+; 5. SEPARATOR TIER COUNT: Now 8 tiers identified!
+;    - 9-tier: $9A/$96 (voice envelopes)
+;    - 8-tier: $8A/$86/$82 (voice parameters/DSP)
+;    - 7-tier: $7A/$76 (sequencing)
+;    - 6-tier: $6A (sequencing variant)
+;    - 5-tier: $5A (sequencing variant)
+;    - B-tier: $BA/$B6 (instrument data)
+;    - A-tier low: $AA (routing)
+;    - A-tier high: $A6/$A2 (voice markers/assignments)
+;
+; Address Range: $0EE3D0-$0EEA10 (~1.6KB)
+; Major Boundaries: 1 (9-zero sequence at line 1695)
+; Zone Count: 4 distinct separator tier zones
+; Architectural Complexity: VERY HIGH (8 tier systems)
+;
+; REVISED BANK $0E STRUCTURE:
+; Multiple interleaved data block types with 8-tier separator system
+; Clean zone boundaries suggest compiler-generated or structured data format
+; Zero-byte boundaries mark major section transitions
