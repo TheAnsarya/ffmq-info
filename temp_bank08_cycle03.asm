@@ -2,7 +2,7 @@
 ; Bank $08 - Text and Dialogue Data - CYCLE 3
 ; ==============================================================================
 ; Lines 800-1200 of source (binary tile data + extended dialogue strings)
-; 
+;
 ; This cycle documents the transition from compressed text strings into
 ; binary tile mapping data and graphical text rendering tables. Bank $08
 ; contains both TEXT DATA (strings) and TILE DATA (visual representation).
@@ -19,7 +19,7 @@
 
 ; Address $08B1A2-$08B1B1 (16 bytes):
 ; Raw: $00,$F2,$83,$12,$00,$F1,$DB,$40,$00,$13,$19,$10,$BA,$70,$00,$13
-; 
+;
 ; Transition sequence showing mixed text and formatting:
 ; $00 = NULL/padding
 ; $F2 = CLEAR_WINDOW control code
@@ -35,13 +35,13 @@
 
 ; Address $08B322-$08B381 (96 bytes):
 ; BINARY TILE MAPPING TABLE DISCOVERED!
-; 
+;
 ; Raw data shows repeating patterns of low bytes ($00-$7F) with occasional
 ; high bytes, characteristic of tile index tables:
 ; $00,$00,$01,$2F,$01,$01,$02,$3F,$02,$01,$2D,$1E,$1E,$02,$0A,$1C
-; 
+;
 ; This is NOT text data - it's TILE INDICES for graphics rendering!
-; 
+;
 ; Structure:
 ; - Each byte = tile index in graphics ROM
 ; - Sequential values ($01,$02,$03) = adjacent tiles in tileset
@@ -58,7 +58,7 @@
 
 ; Address $08B3F2-$08B4F5 (260 bytes):
 ; MASSIVE TILE MAPPING BLOCK
-; 
+;
 ; Repeated patterns observed:
 ; - $01,$02,$03 = Sequential tile runs (horizontal/vertical lines)
 ; - $10,$10,$10,$10 = Repeated tiles (solid fill, pattern backgrounds)
@@ -67,7 +67,7 @@
 ;
 ; Example sequence:
 ; $01,$02,$14,$02,$12,$10,$10,$02,$02,$11,$10,$10,$02,$02
-; 
+;
 ; Interpretation: This could represent a dialogue box border:
 ; Row 1: Top-left corner ($01), top edge ($02 repeated), top-right ($14)
 ; Row 2: Left edge ($12), interior space ($10 repeated), right edge
@@ -81,9 +81,9 @@
 
 ; Address $08B496-$08B4A5 (16 bytes):
 ; Raw: $4D,$03,$51,$00,$51,$00,$60,$0F,$F0,$00,$F0,$00,$C0,$00,$60,$3F
-; 
+;
 ; MIXED DATA BLOCK - Transition between tile data and text pointers!
-; 
+;
 ; $4D,$03 = 16-bit POINTER ($034D → address $0884D)
 ; $51,$00 = Another pointer ($0051 → address $08051)
 ; $51,$00 = Repeated pointer (same string referenced twice?)
@@ -106,7 +106,7 @@
 ; BACK TO TEXT DATA - More compressed dialogue strings
 ;
 ; Sample: $01,$02,$02,$02,$11,$10,$10,$10,$12,$04,$14,$08,$10,$10,$14,$0C
-; 
+;
 ; This section returns to character encoding, but with unusual patterns:
 ; - Very low byte values ($01-$14) dominate
 ; - Suggests punctuation, numbers, or control character section
@@ -114,7 +114,7 @@
 ;
 ; Example interpretation (hypothetical):
 ; $01 = "0" (numeric zero tile)
-; $02 = "1" 
+; $02 = "1"
 ; $11 = " " (space)
 ; $10 = "/" (slash for ratios like "HP: 250/300")
 ; $04 = ":" (colon for labels)
@@ -127,9 +127,9 @@
 
 ; Address $08B936-$08B965 (48 bytes):
 ; Raw: $D1,$00,$F0,$1F,$F0,$1F,$B0,$00,$F1,$1F,$C0,$1E,$F1,$1F,$F0,$1E
-; 
+;
 ; CONTROL CODE HEAVY SEQUENCE
-; 
+;
 ; Pattern analysis:
 ; $D1,$00 = Parameter pair (possibly address or command ID)
 ; $F0,$1F = END + parameter (string termination with flags?)
@@ -151,7 +151,7 @@
 
 ; Address $08C046-$08C055 (16 bytes):
 ; Raw: $36,$35,$13,$35,$45,$35,$35,$C7,$01,$F1,$00,$F0,$00,$F0,$00,$F0
-; 
+;
 ; End of data block with padding:
 ; $36,$35,$13... = Final character sequence
 ; $C7,$01 = HIGH BYTE + parameter (final dictionary reference)
@@ -165,9 +165,9 @@
 
 ; Address $08C056-$08C0A5 (80 bytes):
 ; POINTER TABLE RESUMES!
-; 
+;
 ; Raw: $00,$F0,$00,$E0,$00,$11,$00,$20,$04,$A0,$03,$B1,$1F,$B4,$03,$D0
-; 
+;
 ; Pattern indicates 16-bit pointer pairs with control flags:
 ; $00,$F0 = Pointer to $F000 (likely null/empty string)
 ; $00,$E0 = Pointer to $E000
@@ -188,12 +188,12 @@
 
 ; Address $08C216-$08C2A5 (144 bytes):
 ; TILE PATTERN DATA - Graphics arrangement for text boxes
-; 
+;
 ; Raw: $0F,$6C,$6C,$6E,$6E,$47,$6E,$4B,$48,$5E,$76,$7A,$38,$3A,$3A,$3A
-; 
+;
 ; Tile indices in $38-$7A range = MID-RANGE TILES
 ; These are not ASCII or low control codes - they're graphics tile IDs!
-; 
+;
 ; Pattern structure:
 ; $6C repeated = Horizontal border tile (top/bottom edges)
 ; $6E repeated = Corner or junction tile
@@ -212,7 +212,7 @@
 ;
 ; DUAL-PURPOSE BANK STRUCTURE:
 ; Bank $08 is NOT just text - it's TEXT + GRAPHICS DATA combined!
-; 
+;
 ; Section 1 ($088000-$08B300): COMPRESSED TEXT STRINGS
 ; - NPC dialogue, battle messages, menu labels
 ; - Character encoding via simple.tbl
