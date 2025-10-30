@@ -217,6 +217,8 @@ yes
 response is too large, break up the query
 no, break up the effort into smaller chunks for this one so we don't hit the response limit
 go
+resume (with log and commits and documentation) the aggressive disassembly (with documentation!) of the ROM file using the temp file approach from earlier to reduce the time between cycles and banks; and whatever extraction tools of data and graphics and sound and etc
+why am I getting the error "Sorry, the response hit the length limit. Please rephrase your prompt." ? Please fix this issue or tell me what to do or break your response into smaller chunks or do something!
 
 
 
