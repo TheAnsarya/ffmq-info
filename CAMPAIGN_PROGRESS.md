@@ -5,16 +5,16 @@
 
 ## 📊 Advanced Metrics Dashboard
 
-### 🎯 Campaign Total: 36,986 lines (43.5%) ← **🔥 Cycle 2: 38.7% Bank $0D**
+### 🎯 Campaign Total: 37,282 lines (43.9%) ← **🔥 Bank $0D: 48.7%!**
 
 ### Code Disassembly Progress
 | Metric | Progress | Target | Status |
 |--------|----------|--------|--------|
 | **Total Source Lines** | 85,000 (est.) | 85,000 | 🔍 Baseline |
-| **Lines Documented** | **36,986** | 85,000 | ✅ 43.5% |
+| **Lines Documented** | **37,282** | 85,000 | ✅ 43.9% |
 | **Banks Complete** | **9 of 16** | 16 | ✅ 56.25% |
-| **Bank $0D In Progress** | **1,145 / 2,956** | 2,956 | 🔄 38.7% |
-| **Next Milestone** | 42,500 (50%) | 85,000 (100%) | 🎯 +5,514 lines |
+| **Bank $0D In Progress** | **1,441 / 2,956** | 2,956 | 🔄 48.7% |
+| **Next Milestone** | 42,500 (50%) | 85,000 (100%) | 🎯 +5,218 lines |
 
 ### Asset Extraction Progress
 | Asset Type | Extracted | Total | % Complete | Status |
@@ -99,7 +99,7 @@ This epic session delivered:
 | **$0A** | Extended Graphics/Palettes | 2,058 | **2,058** | **100%** | ✅ **COMPLETE** |
 | **$0B** | Battle Graphics/Animation | 3,727 | **3,732** | **100.1%** | ✅ **COMPLETE** |
 | **$0C** | Display/PPU Management | 4,226 | **4,249** | **100.5%** | ✅ **COMPLETE** |
-| **$0D** | APU Communication/Sound | 2,956 | **1,145** | **38.7%** | 🔄 **IN PROGRESS** |
+| **$0D** | APU Communication/Sound | 2,956 | **1,441** | **48.7%** | 🔄 **IN PROGRESS** |
 | **$0E** | Unknown | ~5,000 | 0 | 0% | ⬜ Not Started |
 | **$0F** | Unknown | ~5,000 | 0 | 0% | ⬜ Not Started |
 
