@@ -224,6 +224,15 @@ make sure you are updating the chat/sessions logs, create git commits, focus on 
 
 
 
++++++++++++++++++++
+directives:
+for all:
+use my editorconfig for formatting, use crlf, use tabs (tab-size: 4) not spaces for all documents, use UTF-8, (IMPORTANT) and always use the most modern code and practices, leave blank line between the stages, comment everything including the code inside methods, add links in the comments to explanitory articles, always format and clean up, make sure file structure matches namespaces, always comment and document, fix issues and test everything, always format the code using editorconfig and other formatting directives (never spaces, always tabs), if a file grows too large move pieces into their own logical components or classes separating concerns, continuously update the chat log files, create a git commit including description, use lowercase hexadecimal, for this session and all sessions
+for SNES ASM:
+use lowercase hexadecimal
++++++++++++++++++++
+Set up or improve build processes
+make sure you are updating the chat/sessions logs, create git commits with descriptions, focus on aggressive disassembly of the remaining banks of code (and use the temp file action process to speed things up)
 
 
 
