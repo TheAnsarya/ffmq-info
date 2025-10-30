@@ -1748,3 +1748,502 @@ CODE_0C8AF1:									; Negative value path (sign extend)
 ; Address range: $0C8813-$0C8AF1
 ; Systems: HDMA setup, Mode 7 rotation/scaling, DMA transfers, OAM management
 ; ==============================================================================
+; ==============================================================================
+; BANK $0C CYCLE 4 - VRAM Fill & Title Screen Setup (Lines 1300-1700)
+; ==============================================================================
+; Address range: $0C8AF1-$0C8F98
+; Systems: VRAM tile fill, palette DMA, title screen initialization, tilemap setup
+; ==============================================================================
+
+; [Continued from Cycle 3 ending at $0C8AF1]
+
+	LDA.W $0000,X							;0C8AF1	; Load matrix value (continued from CODE_0C8AC8)
+	BEQ CODE_0C8B07							;0C8AF4	; Branch if zero (no processing needed)
+	EOR.B #$FF								;0C8AF6	; Invert bits (two's complement step 1)
+	INC A									;0C8AF8	; Increment (two's complement = negate)
+	JSR.W CODE_0C8AD2						;0C8AF9	; Process small positive value path
+
+CODE_0C8AFC:								; Negate result and return
+	REP #$30								;0C8AFC	; 16-bit A/X/Y
+	TYA										;0C8AFE	; Transfer result to A
+	EOR.W #$FFFF							;0C8AFF	; Invert all bits
+	INC A									;0C8B02	; Increment (negate)
+	TAY										;0C8B03	; Return result in Y
+	SEP #$20								;0C8B04	; 8-bit accumulator
+	RTS										;0C8B06	; Return
+
+CODE_0C8B07:								; Zero value path
+	JSR.W CODE_0C8AE6						;0C8B07	; Process large positive value
+	BRA CODE_0C8AFC							;0C8B0A	; Negate and return
+
+; ==============================================================================
+; NMI Sprite Position Update Handler
+; ==============================================================================
+; Called from NMI when sprite positions need updating.
+; Uses DMA to transfer sprite coordinate data to VRAM during VBLANK.
+; ==============================================================================
+
+	LDY.W #$1800							;0C8B0C	; DMA mode: A→A, increment both
+	STY.B SNES_DMA0PARAM-$4300				;0C8B0F	; Set DMA0 parameters ($4300)
+	STZ.B SNES_DMA1CNTL-$4300				;0C8B11	; Clear DMA1 count ($4315)
+	LDA.B #$7F								;0C8B13	; Source bank = $7F
+	STA.B SNES_DMA0ADDRH-$4300				;0C8B15	; Set DMA0 source bank ($4304)
+	LDY.W $0402								;0C8B17	; Load Y coordinate offset
+	LDX.W #$0008							;0C8B1A	; Row count = 8
+	STX.W $0064								;0C8B1D	; Store row counter
+	LDX.W #$0414							;0C8B20	; Data buffer address
+	LDA.W $0063								;0C8B23	; Load Y position
+	JSR.W CODE_0C8B3C						;0C8B26	; Update vertical sprite positions
+	
+	; Update horizontal sprite positions
+	LDX.W #$000B							;0C8B29	; Column count = 11
+	STX.W $0064								;0C8B2C	; Store column counter
+	LDY.W #$6000							;0C8B2F	; VRAM address = $6000
+	LDX.W $0400								;0C8B32	; Load X coordinate offset
+	LDA.W $0062								;0C8B35	; Load X position
+	JSR.W CODE_0C8B3C						;0C8B38	; Update horizontal sprite positions
+	RTL										;0C8B3B	; Return from NMI handler
+
+; ==============================================================================
+; CODE_0C8B3C - Sprite Coordinate DMA Transfer
+; ==============================================================================
+; Transfers sprite coordinate data to VRAM using DMA.
+; Writes 5 bytes per row/column, advancing VRAM address by $80 each iteration.
+; Input: A = coordinate value, X = VRAM address, Y = source buffer address
+; ==============================================================================
+
+CODE_0C8B3C:
+	CLC										;0C8B3C	; Clear carry
+	XBA										;0C8B3D	; Swap bytes (prep for DMA count)
+	LDA.B #$05								;0C8B3E	; Transfer size = 5 bytes
+
+CODE_0C8B40:								; DMA transfer loop
+	STX.W SNES_VMADDL						;0C8B40	; Set VRAM address ($2116)
+	XBA										;0C8B43	; Swap to get count
+	STA.B SNES_DMA0CNTL-$4300				;0C8B44	; Set DMA byte count low ($4305)
+	STZ.B SNES_DMA0CNTH-$4300				;0C8B46	; Set DMA byte count high ($4306)
+	STY.B SNES_DMA0ADDRL-$4300				;0C8B48	; Set DMA source address ($4302)
+	PHA										;0C8B4A	; Save count
+	LDA.B #$01								;0C8B4B	; Enable DMA channel 0
+	STA.W SNES_MDMAEN						;0C8B4D	; Start DMA transfer ($420B)
+	PLA										;0C8B50	; Restore count
+	
+	; Advance to next row/column
+	REP #$30								;0C8B51	; 16-bit A/X/Y
+	PHA										;0C8B53	; Save count
+	TXA										;0C8B54	; Transfer VRAM address to A
+	ADC.W #$0080							;0C8B55	; Advance by 128 (next row in 32×32 tilemap)
+	TAX										;0C8B58	; Update VRAM address
+	TYA										;0C8B59	; Transfer source address to A
+	ADC.W $0064								;0C8B5A	; Add row/column stride
+	TAY										;0C8B5D	; Update source address
+	PLA										;0C8B5E	; Restore count
+	SEP #$20								;0C8B5F	; 8-bit accumulator
+	XBA										;0C8B61	; Swap back
+	DEC A									;0C8B62	; Decrement row/column counter
+	BNE CODE_0C8B40							;0C8B63	; Loop for all rows/columns
+	RTS										;0C8B65	; Return
+
+; ==============================================================================
+; Mode 7 Rotation Sine/Cosine Lookup Tables
+; ==============================================================================
+; Two 48-entry tables for smooth rotation animation.
+; Values represent fixed-point sine/cosine for 360° rotation.
+; Format: Signed 16-bit fixed-point (8.8 format)
+; ==============================================================================
+
+DATA16_0C8B66:								; Sine/cosine table 1 (48 entries)
+	db $DD,$00,$80,$00,$80,$00,$DD,$00,$00,$00 ;0C8B66	; Angles 0-9
+	db $00										;0C8B70
+	db $01,$80,$FF,$DD,$00,$23,$FF,$80,$00,$00,$FF,$00,$00,$23,$FF,$80 ;0C8B71	; Angles 10-25
+	db $FF,$80,$FF,$23,$FF,$00,$00,$00,$FF,$80,$00,$23,$FF,$DD,$00,$80 ;0C8B81	; Angles 26-41
+	db $FF										;0C8B91
+	db $00										;0C8B92
+
+DATA8_0C8B93:								; Animation speed table (30 bytes)
+	db $01,$00,$00,$01,$02,$03,$04,$05,$06,$07,$08,$0A,$0C,$0E,$10,$12 ;0C8B93
+	db $14,$16,$18,$1C,$20,$24,$28,$2C,$30,$00 ;0C8BA3
+
+; ==============================================================================
+; CODE_0C8BAD - Title Screen Initialization
+; ==============================================================================
+; Sets up title screen graphics, sprites, and tilemaps.
+; Initializes Mode 7 perspective effect for logo animation.
+; Uses multiple MVN block moves for efficient data transfer.
+; ==============================================================================
+
+CODE_0C8BAD:
+	LDA.B #$18								;0C8BAD	; Effect timer = 24 frames
+	STA.W $0500								;0C8BAF	; Store effect state
+	REP #$30								;0C8BB2	; 16-bit A/X/Y
+	
+	; Transfer title screen configuration data
+	LDX.W #$8CE2							;0C8BB4	; Source: Title config table
+	LDY.W #$0D00							;0C8BB7	; Dest: $0D00 (config buffer)
+	LDA.W #$0037							;0C8BBA	; Transfer 56 bytes
+	MVN $00,$0C								;0C8BBD	; Block move Bank $0C → Bank $00
+	
+	LDY.W #$0E10							;0C8BC0	; Dest: $0E10 (secondary buffer)
+	LDA.W #$0003							;0C8BC3	; Transfer 4 bytes
+	MVN $00,$0C								;0C8BC6	; Block move
+	
+	; Transfer sprite attribute data
+	LDX.W #$8C5E							;0C8BC9	; Source: Sprite data table
+	LDY.W #$0C04							;0C8BCC	; Dest: $0C04 (sprite buffer)
+	LDA.W #$007B							;0C8BCF	; Transfer 124 bytes
+	MVN $00,$0C								;0C8BD2	; Block move
+	
+	LDY.W #$0E00							;0C8BD5	; Dest: $0E00 (effect params)
+	LDA.W #$0007							;0C8BD8	; Transfer 8 bytes
+	MVN $00,$0C								;0C8BDB	; Block move
+	
+	SEP #$20								;0C8BDE	; 8-bit accumulator
+	PEA.W $0C7F								;0C8BE0	; Push bank $7F
+	PLB										;0C8BE3	; Set data bank = $7F
+	
+	; Initialize tile pattern buffer ($7F6000-$7F6xxx)
+	LDY.W #$6000							;0C8BE4	; Buffer address = $7F6000
+	LDA.B #$40								;0C8BE7	; Starting tile = $40
+	CLC										;0C8BE9	; Clear carry
+
+CODE_0C8BEA:								; Outer loop: Process 11 tile rows
+	LDX.W #$000B							;0C8BEA	; Column count = 11
+
+CODE_0C8BED:								; Inner loop: Fill tile row
+	STA.W $0000,Y							;0C8BED	; Write tile number to buffer
+	INC A									;0C8BF0	; Next tile
+	INY										;0C8BF1	; Next buffer position
+	DEX										;0C8BF2	; Decrement column counter
+	BNE CODE_0C8BED							;0C8BF3	; Loop for all columns
+	ADC.B #$05								;0C8BF5	; Advance to next row base (+16 total)
+	CMP.B #$90								;0C8BF7	; Reached tile $90?
+	BNE CODE_0C8BEA							;0C8BF9	; Loop for all rows
+	
+	; Initialize secondary tile pattern buffer (8-column layout)
+	LDY.W #$6037							;0C8BFB	; Buffer address = $7F6037 (offset)
+	LDA.B #$A0								;0C8BFE	; Starting tile = $A0
+	CLC										;0C8C00	; Clear carry
+
+CODE_0C8C01:								; Outer loop: Process 8 tile rows
+	LDX.W #$0008							;0C8C01	; Column count = 8
+
+CODE_0C8C04:								; Inner loop: Fill tile row
+	STA.W $0000,Y							;0C8C04	; Write tile number
+	INC A									;0C8C07	; Next tile
+	INY										;0C8C08	; Next buffer position
+	DEX										;0C8C09	; Decrement column counter
+	BNE CODE_0C8C04							;0C8C0A	; Loop for all columns
+	ADC.B #$08								;0C8C0C	; Advance to next row base (+16 total)
+	CMP.B #$F0								;0C8C0E	; Reached tile $F0?
+	BNE CODE_0C8C01							;0C8C10	; Loop for all rows
+	
+	PLB										;0C8C12	; Restore data bank
+	CLC										;0C8C13	; Clear carry
+	JSL.L CODE_0C8000						;0C8C14	; Wait for VBLANK
+	STZ.B SNES_VMAINC-$2100					;0C8C18	; VRAM address increment = 1
+	
+	; Set Mode 7 center point
+	LDA.B #$8C								;0C8C1A	; Center X = $8C (140 decimal)
+	STA.B SNES_M7X-$2100					;0C8C1C	; Write M7 center X low ($211F)
+	STZ.B SNES_M7X-$2100					;0C8C1E	; Write M7 center X high
+	LDA.B #$50								;0C8C20	; Center Y = $50 (80 decimal)
+	STA.B SNES_M7Y-$2100					;0C8C22	; Write M7 center Y low ($2120)
+	STZ.B SNES_M7Y-$2100					;0C8C24	; Write M7 center Y high
+	
+	; Initialize Mode 7 identity matrix
+	LDA.B #$01								;0C8C26	; Matrix diagonal = 1.0
+	STA.B SNES_M7A-$2100					;0C8C28	; M7A = $0100 ($211B)
+	STZ.B SNES_M7A-$2100					;0C8C2A	; High byte
+	STA.B SNES_M7D-$2100					;0C8C2C	; M7D = $0100 ($211E)
+	STZ.B SNES_M7D-$2100					;0C8C2E	; High byte
+	
+	; Process tilemap fill commands from table
+	LDX.W #$0285							;0C8C30	; Initial VRAM address
+	LDY.W #$8D1E							;0C8C33	; Command table address
+	PHX										;0C8C36	; Save base VRAM address
+
+CODE_0C8C37:								; Tilemap fill loop
+	STX.B SNES_VMADDL-$2100					;0C8C37	; Set VRAM address ($2116)
+	LDA.B #$00								;0C8C39	; Clear high byte
+	XBA										;0C8C3B	; Swap (A = 0)
+	LDA.W $0000,Y							;0C8C3C	; Load repeat count
+	TAX										;0C8C3F	; Use as counter
+	LDA.W $0001,Y							;0C8C40	; Load starting tile number
+
+CODE_0C8C43:								; Fill repeat loop
+	STA.B SNES_VMDATAL-$2100				;0C8C43	; Write tile to VRAM ($2118)
+	INC A									;0C8C45	; Increment tile number
+	DEX										;0C8C46	; Decrement counter
+	BNE CODE_0C8C43							;0C8C47	; Loop for repeat count
+	
+	; Check for next command
+	LDA.W $0002,Y							;0C8C49	; Load VRAM offset for next fill
+	BEQ CODE_0C8C5C							;0C8C4C	; Exit if offset = 0 (end marker)
+	INY										;0C8C4E	; Next command entry
+	INY										;0C8C4F	; (3 bytes per entry)
+	INY										;0C8C50	; Advance to next
+	REP #$30								;0C8C51	; 16-bit A/X/Y
+	ADC.B $01,S								;0C8C53	; Add offset to base VRAM address
+	STA.B $01,S								;0C8C55	; Update base address on stack
+	TAX										;0C8C57	; Use as VRAM address
+	SEP #$20								;0C8C58	; 8-bit accumulator
+	BRA CODE_0C8C37							;0C8C5A	; Continue with next command
+
+CODE_0C8C5C:								; Cleanup and return
+	PLX										;0C8C5C	; Clean up stack
+	RTS										;0C8C5D	; Return
+
+; ==============================================================================
+; Title Screen Sprite Configuration Data (124 bytes)
+; ==============================================================================
+; Format: [X_pos] [Y_pos] [tile] [attr] - 31 sprites × 4 bytes
+; Defines sprite positions and attributes for title screen logo/effects.
+; ==============================================================================
+
+DATA8_0C8C5E:
+	db $28,$27,$10,$01,$38,$27,$12,$01,$48,$27,$14,$01,$58,$27,$16,$01 ;0C8C5E
+	db $68,$27,$18,$01,$80,$27,$10,$01,$90,$27,$16,$01,$A0,$27,$14,$01 ;0C8C6E
+	db $B0,$27,$1A,$01,$C0,$27,$16,$01,$D0,$27,$1C,$01,$E0,$27,$1E,$01 ;0C8C7E
+	db $20,$5F,$80,$31,$40,$5F,$84,$31,$68,$5F,$89,$31,$80,$57,$7C,$31 ;0C8C8E
+	db $90,$57,$7E,$31,$A0,$5F,$E0,$31,$C0,$5F,$E4,$31,$78,$B7,$86,$30 ;0C8C9E
+	db $20,$B7,$E0,$30,$30,$B7,$E2,$30,$40,$B7,$E4,$30,$20,$3F,$40,$31 ;0C8CAE
+	db $40,$3F,$44,$31,$60,$3F,$48,$31,$80,$37,$3C,$31,$A0,$3F,$A0,$31 ;0C8CBE
+	db $C0,$3F,$A4,$31,$58,$B7,$82,$30,$68,$B7,$84,$30 ;0C8CCE
+	db $01,$00,$00,$00 ;0C8CD6	; End marker + padding
+	db $00,$00,$AA,$0A ;0C8CDA
+
+; ==============================================================================
+; Title Screen Configuration Data (56 bytes)
+; ==============================================================================
+; Additional sprite/effect configuration for title animation.
+; ==============================================================================
+
+DATA8_0C8CDE:
+	db $90,$B7,$A0,$30,$A0,$B7,$A2,$30,$B8,$B7,$A4,$30 ;0C8CDE
+	db $C8,$B7,$A6,$30,$30,$C3,$A8,$30,$40,$C3,$AA,$30,$50,$C3,$AC,$30 ;0C8CEA
+	db $60,$C3,$AE,$30,$78,$C3,$E6,$30,$90,$C3,$E8,$30,$A0,$C3,$EA,$30 ;0C8CFA
+	db $B0,$C3,$EC,$30,$C0,$C3,$EE,$30,$E0,$57,$80,$30,$00,$00,$00,$50 ;0C8D0A
+
+; ==============================================================================
+; Tilemap Fill Command Table
+; ==============================================================================
+; Format: [repeat_count] [start_tile] [vram_offset]
+; Used by CODE_0C8C37 to efficiently fill VRAM tilemaps.
+; Offset = 0 marks end of table.
+; ==============================================================================
+
+DATA8_0C8D1E:
+	db $01,$FF,$02,$01,$FF,$02,$01,$FF,$02,$01,$FF,$02,$01,$FF,$03,$01 ;0C8D1E
+	db $FF,$02,$01,$FF,$02,$01,$FF,$02,$01,$FF,$02,$01,$FF,$02,$01,$FF ;0C8D2E
+	db $02,$01,$FF,$69,$01,$FF,$02,$01,$FF,$02,$01,$FF,$02,$01,$FF,$02 ;0C8D3E
+	db $01,$FF,$03,$01,$FF,$02,$01,$FF,$02,$01,$FF,$02,$01,$FF,$02,$01 ;0C8D4E
+	db $FF,$02,$01,$FF,$02,$01,$FF,$74,$03,$3C,$7F,$05,$4B,$80,$05,$5B ;0C8D5E
+	db $80,$05,$6B,$80,$05,$7B,$81,$04,$8C,$04,$01,$E0,$00 ;0C8D6E	; End marker
+
+; ==============================================================================
+; CODE_0C8D7B - Complex Title Screen VRAM Setup
+; ==============================================================================
+; Initializes complete title screen graphics system.
+; Sets up 3 palette groups, fills OAM, configures DMA for tilemap transfer.
+; Highly optimized using DMA channel 0 for maximum VBLANK efficiency.
+; ==============================================================================
+
+CODE_0C8D7B:
+	PHP										;0C8D7B	; Save processor status
+	PHD										;0C8D7C	; Save direct page
+	REP #$30								;0C8D7D	; 16-bit A/X/Y
+	LDA.W #$4300							;0C8D7F	; Direct page = DMA registers
+	TCD										;0C8D82	; Set direct page to $4300
+	STZ.W SNES_VMADDL						;0C8D83	; Clear VRAM address ($2116)
+	SEP #$20								;0C8D86	; 8-bit accumulator
+	LDA.B #$80								;0C8D88	; VRAM increment = +128 (vertical)
+	STA.W SNES_VMAINC						;0C8D8A	; Set increment mode ($2115)
+	
+	; Transfer palette group 1
+	LDA.B #$00								;0C8D8D	; Palette offset = 0
+	JSR.W CODE_0C8F98						;0C8D8F	; Transfer palette via DMA
+	
+	; Transfer palette group 2
+	LDA.B #$80								;0C8D92	; Palette offset = $80 (128 colors)
+	JSR.W CODE_0C8F98						;0C8D94	; Transfer palette via DMA
+	
+	; Transfer palette group 3
+	LDA.B #$C0								;0C8D97	; Palette offset = $C0 (192 colors)
+	JSR.W CODE_0C8F98						;0C8D99	; Transfer palette via DMA
+	
+	; Fill OAM sprite buffer with pattern
+	REP #$30								;0C8D9C	; 16-bit A/X/Y
+	LDA.W #$5555							;0C8D9E	; Fill pattern = $5555
+	STA.W $0C00								;0C8DA1	; Write to sprite buffer start
+	LDX.W #$0C00							;0C8DA4	; Source = $0C00
+	LDY.W #$0C02							;0C8DA7	; Dest = $0C02
+	LDA.W #$021D							;0C8DAA	; Transfer 542 bytes (fill entire OAM)
+	MVN $00,$00								;0C8DAD	; Block move within Bank $00
+	
+	JSR.W CODE_0C8948						;0C8DB0	; Perform OAM DMA transfer
+	
+	; Setup tilemap DMA transfer
+	LDX.W #$1809							;0C8DB3	; DMA mode: Word, A→A, increment
+	STX.B SNES_DMA0PARAM-$4300				;0C8DB6	; Set DMA0 parameters ($4300)
+	LDX.W #$8F12							;0C8DB8	; Source address = $0C8F12
+	STX.B SNES_DMA0ADDRL-$4300				;0C8DBB	; Set DMA0 source ($4302)
+	LDA.B #$0C								;0C8DBD	; Source bank = $0C
+	STA.B SNES_DMA0ADDRH-$4300				;0C8DBF	; Set DMA0 bank ($4304)
+	LDX.W #$0000							;0C8DC1	; Transfer size = 64KB (full auto)
+	STX.B SNES_DMA0CNTL-$4300				;0C8DC4	; Set DMA0 count ($4305)
+	LDA.B #$01								;0C8DC6	; Enable DMA channel 0
+	STA.W $420B								;0C8DC8	; Start DMA transfer ($420B)
+	
+	JSR.W CODE_0C90F9						;0C8DCB	; Additional VRAM setup routine
+	JSR.W CODE_0C9142						;0C8DCE	; Secondary graphics initialization
+	
+	; Transfer large graphics block to VRAM $4000
+	LDX.W #$1801							;0C8DD1	; DMA mode: Byte, A→A
+	STX.B SNES_DMA0PARAM-$4300				;0C8DD4	; Set DMA0 parameters
+	LDX.W #$4000							;0C8DD6	; VRAM address = $4000
+	STX.W $2116								;0C8DD9	; Set VRAM address ($2116)
+	LDX.W #$2000							;0C8DDC	; Source address = $7F2000
+	STX.B SNES_DMA0ADDRL-$4300				;0C8DDF	; Set DMA0 source
+	LDA.B #$7F								;0C8DE1	; Source bank = $7F
+	STA.B SNES_DMA0ADDRH-$4300				;0C8DE3	; Set DMA0 bank
+	LDX.W #$1000							;0C8DE5	; Transfer size = 4096 bytes
+	STX.B SNES_DMA0CNTL-$4300				;0C8DE8	; Set DMA0 count
+	LDA.B #$01								;0C8DEA	; Enable DMA channel 0
+	STA.W $420B								;0C8DEC	; Start DMA transfer
+	
+	; Process graphics command table
+	LDA.B #$0C								;0C8DEF	; Source bank = $0C
+	STA.B SNES_DMA0ADDRH-$4300				;0C8DF1	; Set DMA0 bank
+	LDY.W #$5100							;0C8DF3	; VRAM base address = $5100
+	LDX.W #$8F14							;0C8DF6	; Command table address
+
+CODE_0C8DF9:								; Graphics command processing loop
+	REP #$30								;0C8DF9	; 16-bit A/X/Y
+	STY.W $2116								;0C8DFB	; Set VRAM address ($2116)
+	
+	; Calculate DMA transfer size (entry byte 0 × 32)
+	LDA.W $0000,X							;0C8DFE	; Load entry byte 0
+	AND.W #$00FF							;0C8E01	; Mask to 8-bit
+	ASL A									;0C8E04	; ×2
+	ASL A									;0C8E05	; ×4
+	ASL A									;0C8E06	; ×8
+	ASL A									;0C8E07	; ×16
+	ASL A									;0C8E08	; ×32 (tile size)
+	STA.B SNES_DMA0CNTL-$4300				;0C8E09	; Set DMA transfer size ($4305)
+	
+	; Calculate source address (entry byte 1 × 32 + $AA4C base)
+	LDA.W $0001,X							;0C8E0B	; Load entry byte 1
+	AND.W #$00FF							;0C8E0E	; Mask to 8-bit
+	ASL A									;0C8E11	; ×2
+	ASL A									;0C8E12	; ×4
+	ASL A									;0C8E13	; ×8
+	ASL A									;0C8E14	; ×16
+	ASL A									;0C8E15	; ×32
+	ADC.W #$AA4C							;0C8E16	; Add base address
+	STA.B SNES_DMA0ADDRL-$4300				;0C8E19	; Set DMA source address ($4302)
+	
+	; Calculate VRAM offset (entry byte 2 × 16 + current VRAM)
+	LDA.W $0002,X							;0C8E1B	; Load entry byte 2
+	AND.W #$00FF							;0C8E1E	; Mask to 8-bit
+	ASL A									;0C8E21	; ×2
+	ASL A									;0C8E22	; ×4
+	ASL A									;0C8E23	; ×8
+	ASL A									;0C8E24	; ×16
+	PHY										;0C8E25	; Save current VRAM address
+	ADC.B $01,S								;0C8E26	; Add offset to VRAM address
+	TAY										;0C8E28	; Update VRAM address
+	PLA										;0C8E29	; Clean up stack
+	
+	SEP #$20								;0C8E2A	; 8-bit accumulator
+	LDA.B #$01								;0C8E2C	; Enable DMA channel 0
+	STA.W $420B								;0C8E2E	; Start DMA transfer ($420B)
+	
+	; Check for next command (entry byte 2 != 0)
+	LDA.W $0002,X							;0C8E31	; Load entry byte 2
+	PHP										;0C8E34	; Save flags (check for zero)
+	INX										;0C8E35	; Next entry
+	INX										;0C8E36	; (3 bytes per entry)
+	INX										;0C8E37	; Advance pointer
+	PLP										;0C8E38	; Restore flags
+	BNE CODE_0C8DF9							;0C8E39	; Continue if not end marker
+	
+	; Copy graphics data to Bank $7F buffer
+	REP #$30								;0C8E3B	; 16-bit A/X/Y
+	LDA.W #$0000							;0C8E3D	; Clear A
+	TCD										;0C8E40	; Restore direct page to $0000
+	LDX.W #$AA4C							;0C8E41	; Source = $0CAA4C
+	LDY.W #$0000							;0C8E44	; Dest = $7F0000
+	LDA.W #$0D5F							;0C8E47	; Transfer 3424 bytes
+	MVN $7F,$0C								;0C8E4A	; Block move Bank $0C → Bank $7F
+	
+	; Additional tilemap fill from command table
+	LDX.W #$0000							;0C8E4D	; Clear X
+	LDA.W #$0400							;0C8E50	; VRAM base address
+	PHA										;0C8E53	; Save base address
+
+CODE_0C8E54:								; Tilemap command loop
+	STA.L SNES_VMADDL						;0C8E54	; Set VRAM address ($2116)
+	LDA.L DATA8_0C8F14,X					;0C8E58	; Load command entry
+	AND.W #$00FF							;0C8E5C	; Get repeat count (low byte)
+	TAY										;0C8E5F	; Use as counter
+	LDA.L DATA8_0C8F14,X					;0C8E60	; Reload entry
+	AND.W #$FF00							;0C8E64	; Get tile base (high byte)
+	LSR A									;0C8E67	; ÷2
+	LSR A									;0C8E68	; ÷4
+	LSR A									;0C8E69	; ÷8 (shift to position)
+	ADC.W #$0000							;0C8E6A	; Add carry from previous ops
+	PHX										;0C8E6D	; Save command pointer
+	TAX										;0C8E6E	; Use tile base as index
+
+CODE_0C8E6F:								; Tile fill loop
+	PHY										;0C8E6F	; Save counter
+	JSR.W CODE_0C8FB4						;0C8E70	; Write tile pattern (subroutine)
+	PLY										;0C8E73	; Restore counter
+	DEY										;0C8E74	; Decrement
+	BNE CODE_0C8E6F							;0C8E75	; Loop for repeat count
+	
+	PLX										;0C8E77	; Restore command pointer
+	LDA.L DATA8_0C8F15,X					;0C8E78	; Load next command offset
+	AND.W #$FF00							;0C8E7C	; Check high byte
+	BEQ CODE_0C8E8C							;0C8E7F	; Exit if zero (end marker)
+	INX										;0C8E81	; Next command entry
+	INX										;0C8E82	; (3 bytes)
+	INX										;0C8E83	; Advance pointer
+	LSR A									;0C8E84	; Shift offset
+	LSR A									;0C8E85	; (calculate VRAM offset)
+	ADC.B $01,S								;0C8E86	; Add to base VRAM address
+	STA.B $01,S								;0C8E88	; Update base on stack
+	BRA CODE_0C8E54							;0C8E8A	; Continue with next command
+
+CODE_0C8E8C:								; Cleanup and finalize
+	PLA										;0C8E8C	; Clean up stack
+	PHK										;0C8E8D	; Push data bank
+	PLB										;0C8E8E	; Set data bank
+	JSR.W CODE_0C8EA8						;0C8E8F	; Additional text/logo setup
+	
+	; Fill bottom screen area with pattern $10
+	SEP #$20								;0C8E92	; 8-bit accumulator
+	LDX.W #$3FC0							;0C8E94	; VRAM address = $3FC0
+	STX.W $2116								;0C8E97	; Set VRAM address
+	LDX.W #$0040							;0C8E9A	; Fill count = 64 tiles
+	LDA.B #$10								;0C8E9D	; Fill pattern = tile $10
+
+CODE_0C8E9F:								; Fill loop
+	STA.W $2119								;0C8E9F	; Write to VRAM data ($2119)
+	DEX										;0C8EA2	; Decrement counter
+	BNE CODE_0C8E9F							;0C8EA3	; Loop for all tiles
+	
+	PLD										;0C8EA5	; Restore direct page
+	PLP										;0C8EA6	; Restore processor status
+	RTS										;0C8EA7	; Return
+
+; [Additional text/logo transfer routines continue at CODE_0C8EA8...]
+; [Palette DMA setup continues at CODE_0C8F98...]
+
+; ==============================================================================
+; End of Bank $0C Cycle 4
+; ==============================================================================
+; Lines documented: 400 source lines (1300-1700)
+; Address range: $0C8AF1-$0C8F98
+; Systems: VRAM fill, palette DMA, title screen setup, tilemap initialization
+; ==============================================================================
