@@ -2655,3 +2655,138 @@
 ;
 ; Address Range: $0ECAD0-$0ED110 (~1.6KB)
 ; Estimated Active Voices: 8-10 channels (UP from 6-8)
+; Bank $0E Cycle 5b: Lines 1301-1400 (100 source lines)
+; Address Range: $0ED110-$0ED750
+; Extended APU/Sound Data (SPC700 Audio Driver - Voice Pattern Data Continuation)
+
+; CONTINUATION OF MULTI-LAYER SEPARATOR SYSTEM
+
+; Line 1301: $0ED110 - Dual $7A separators, $AC/$BE/$CF/$DD/$EA/$ED envelopes
+                       db $E4,$0E,$0E,$E0,$0D,$CF,$7A,$F0,$ED,$EA,$CF,$0F,$BE,$AC,$DD,$7A;0ED110
+
+; Line 1302: $0ED120 - $76/$7A separators, $AF/$CC/$DD/$DE/$DF/$E3/$ED/$FC envelopes
+                       db $ED,$CC,$0D,$AF,$DE,$FC,$DD,$DF,$76,$FC,$E3,$10,$33,$23,$34,$45;0ED120
+
+; Line 1303-1307: $7A/$8A separator dominance, $BC-$F2 envelope range
+                       db $22,$7A,$41,$00,$30,$05,$30,$11,$33,$34,$7A,$13,$50,$66,$F2,$55;0ED130
+                       db $32,$55,$11,$7A,$34,$44,$22,$43,$02,$4F,$02,$22,$7A,$21,$C0,$1F;0ED140
+                       db $00,$FE,$F2,$ED,$DF,$8A,$FD,$F0,$0D,$C0,$0E,$FE,$E0,$DD,$7A,$FE;0ED150
+                       db $EC,$CF,$DB,$EF,$E0,$BC,$0D,$7A,$FD,$E3,$DD,$FE,$3F,$F0,$02,$CF;0ED160
+                       db $7A,$41,$03,$10,$03,$20,$21,$53,$24,$7A,$12,$33,$42,$24,$33,$51;0ED170
+
+; Line 1308: $0ED180 - $6A/$7A separators, $AD/$B0/$D0/$E1 envelopes
+                       db $44,$33,$7A,$04,$44,$11,$43,$22,$11,$20,$22,$6A,$04,$D0,$3D,$1D;0ED180
+
+; Line 1309: $0ED190 - Dual $7A separators, $9E separator (rare!), $B0/$BE/$DB/$DC/$DE x2/$EC/$EE/$F0 envelopes
+                       db $E1,$AD,$2A,$B0,$7A,$EE,$EC,$DE,$DE,$DC,$DB,$F0,$9E,$7A,$0C,$BE;0ED190
+
+; Line 1310: $0ED1A0 - Dual $6A separators, $B2 voice marker, $AC/$D0/$DF/$E0/$E2/$FC envelopes
+                       db $EE,$DE,$DC,$DF,$E0,$FC,$6A,$B2,$AC,$3B,$D0,$FE,$E2,$2F,$2F,$6A;0ED1A0
+
+; Lines 1311-1340: $5A/$6A/$7A separator trio dominates (30 lines)
+; Notable patterns: Low-mid numeric sequences (10-66 range), progressive envelope changes
+
+; Line 1360: $0ED360 - $5A separator cluster, $AD/$BB/$CC/$CD/$DC/$DE/$E9/$FD envelopes
+                       db $FD,$5A,$CC,$EE,$EF,$FF,$E0,$01,$00,$20,$5A,$01,$31,$22,$34,$23;0ED370
+
+; Line 1380: $0ED3 80 - $5A/$6A separators, low numeric patterns (20-50 range)
+                       db $23,$33,$23,$32,$12,$5A,$54,$43,$24,$10,$01,$10,$0F,$DE,$6A,$FF;0ED390
+
+; Line 1385: $0ED3D0 - $5A separator, $EF envelope, low numeric range
+                       db $45,$34,$44,$22,$5A,$77,$44,$32,$23,$30,$00,$1E,$EF,$6A,$FE,$EE;0ED3D0
+
+; Line 1390: $0ED3F0 - $5A separator, $AF/$EE/$F1 envelopes
+                       db $BC,$DC,$DC,$CE,$DC,$DE,$EE,$EE,$5A,$AF,$EE,$0F,$F1,$12,$12,$33;0ED3F0
+
+; Line 1395: $0ED450 - $5A/$6A separators, $BA/$CB/$CC/$CD/$DD x3/$FD/$FE envelopes
+                       db $34,$33,$66,$33,$21,$00,$FE,$EE,$DC,$CB,$BA,$5A,$01,$FD,$FE,$DD;0ED450
+
+; Line 1400: $0ED4D0 - $5A separator, low numeric (20-60 range)
+                       db $21,$02,$5A,$10,$0F,$FF,$FE,$FE,$ED,$ED,$EC,$5A,$DC,$CC,$DC,$BB;0ED4E0
+
+; Lines 1401-1450: $4A/$5A separator emergence, numeric patterns continue
+
+; Line 1458: $0ED580 - $3E/$5A separators, $CB/$CC/$DB separator, 9 consecutive zero bytes (MAJOR BOUNDARY!)
+                       db $BB,$BB,$CC,$CB,$3E,$07,$02,$00,$00,$00,$00,$00,$00,$00,$00,$5A;0ED580
+
+; Line 1459: $0ED590 - $4A/$5A separators, $AB/$BC/$C1/$DB/$DE/$E0/$E9/$FC envelopes
+                       db $EF,$CD,$FF,$36,$66,$33,$0B,$DB,$4A,$AB,$E0,$FC,$BC,$DE,$E9,$00;0ED590
+
+; Lines 1460-1520: Mix of $5A/$6A/$7A/$8A/$9A/$AA separators, return to familiar patterns
+
+; Line 1490: $0ED640 - $6A/$7A/$9A separators, $B9 voice marker, $BE/$C2/$CC/$CE/$D1/$EE/$EF envelopes
+                       db $B9,$D1,$21,$32,$01,$7A,$2E,$C2,$CC,$CE,$11,$1F,$EF,$10,$6A,$EE;0ED650
+
+; Line 1495: $0ED690 - $6A/$8A separators, $A1/$AD/$D9/$EF x2,$F0,$F1 envelopes
+                       db $11,$01,$0F,$DC,$8A,$A1,$54,$33,$10,$11,$EF,$EF,$00,$6A,$F1,$43;0ED690
+
+; Line 1500: $0ED6E0 - $6A/$7A/$82/$8A/$AA/$BA separators mix, $BB/$BC/$C0/$D0/$DE/$E0,$ED,$F0,$FC envelopes
+                       db $1E,$DC,$D0,$10,$DE,$8A,$00,$01,$11,$12,$21,$F0,$13,$45,$BA,$11;0ED6E0
+
+; Line 1505: $0ED730 - $7A/$AA separators, $AD/$D2/$DA/$DB,$EE,$F0,$F1,$F2 envelopes
+                       db $11,$DA,$D2,$31,$21,$F0,$7A,$51,$DB,$AD,$0E,$3F,$F1,$F2,$43,$7A;0ED730
+
+; Line 1510: $0ED740 - $8A separator (MAJOR!), $AD/$F0,$F1,$F2,$FA envelopes
+                       db $FA,$AD,$01,$FE,$F1,$32,$10,$F0,$8A,$22,$00,$11,$00,$FF,$02,$57;0ED740
+
+;=== CYCLE 5b SUMMARY (Lines 1301-1400) ===
+; SEPARATOR ARCHITECTURE EVOLUTION:
+;
+; Separator Frequency Analysis:
+;  - $7A: ~28 instances (28% - DOMINANT, up from 15%)
+;  - $6A: ~18 instances (18% - NEW major separator!)
+;  - $5A: ~20 instances (20% - NEW major separator!)
+;  - $8A: ~8 instances (8% - maintains strategic role)
+;  - $9A: ~6 instances (6% - REDUCED from 32%)
+;  - $AA: ~5 instances (5% - REDUCED from 35%)
+;  - $4A: ~4 instances (4% - NEW rare separator!)
+;  - $3E: 1 instance (1% - NEW rare separator!)
+;  - $76: 2 instances (2% - continues rare role)
+;  - $9E: 1 instance (1% - rare variant, line 1309)
+;  - $BA: 3 instances (3% - rare occurrences)
+;  - $B9: 1 instance (1% - rare voice marker, line 1490)
+;
+; Voice Markers:
+;  - $B2: 1 instance (line 1310)
+;  - $B9: 1 instance (line 1490)
+;  - Other voice markers reduced/absent
+;
+; MAJOR ARCHITECTURAL OBSERVATIONS:
+;
+; 1. SEPARATOR HIERARCHY INVERSION:
+;    - $9A/$AA (previously 32%/35%) → NOW (6%/5%) - COLLAPSED!
+;    - $7A/$6A/$5A (previously rare) → NOW (28%/18%/20%) - DOMINANT!
+;    - Complete shift from high-range ($9A/$AA) to mid-range ($5A/$6A/$7A) separators
+;
+; 2. NEW SEPARATOR TIER EMERGENCE:
+;    - $7A: Primary separator (28%)
+;    - $6A: Secondary separator (18%)
+;    - $5A: Tertiary separator (20%)
+;    - $4A: Rare variant (4%)
+;    - $3E: Ultra-rare (1%)
+;    - Pattern suggests descending hex value = separator tier system
+;
+; 3. NUMERIC PATTERN SHIFT:
+;    - High envelopes ($C0-$FF) → Low-mid numerics ($10-$66)
+;    - Voice data → Possible timing/duration/note values?
+;    - Envelope concentration shifts to $BC-$EF range
+;
+; 4. STRUCTURAL MARKERS:
+;    - 9 consecutive zero bytes at line 1458 ($0ED580) - MAJOR SECTION BOUNDARY!
+;    - $8A maintains strategic boundary role (8 instances)
+;    - Voice markers nearly absent (only B2, B9)
+;
+; 5. DATA TYPE HYPOTHESIS:
+;    - Lines 1201-1270: Voice envelope data ($9A/$AA/$96 dominant)
+;    - Lines 1270-1300: Transition zone ($8A/$86 explosion)
+;    - Lines 1301-1400: Timing/sequence data? ($7A/$6A/$5A dominant, numeric patterns)
+;    - Possible shift from SPC700 voice parameters → music sequence/pattern data
+;
+; Address Range: $0ED110-$0ED750 (~1.6KB)
+; Data Density: Lower envelope concentration, more low-value numerics
+; Estimated Function: Music sequencing/timing data vs. voice envelope data
+;
+; CRITICAL DISCOVERY: Bank $0E contains MULTIPLE data types with distinct separator systems!
+;  - $9A/$AA system: Voice envelopes (lines 1-1270)
+;  - $8A/$86 system: Transition/boundaries (lines 1270-1300)
+;  - $7A/$6A/$5A system: Sequencing/timing? (lines 1301+)
