@@ -100,7 +100,7 @@ endmacro
 ; pullpc
 
 ; --- Enemy Data ---
-; pushpc  
+; pushpc
 ; org $04F800  ; Enemy data location (approximate - needs verification)
 ; ; Replace with extracted enemy stats (allows balance modifications)
 ; incsrc "../../assets/data/enemies.asm"
@@ -135,12 +135,16 @@ endmacro
 ; Build Metadata
 ; ==============================================================================
 
-; Track our build version in unused ROM space
-; This helps identify modified ROMs vs original
-pushpc
-org $00FFC0     ; ROM header area (internal name location)
-db "FFMQ Enhanced v1.0", $00  ; Null-terminated string
-pullpc
+; NOTE: For 100% ROM match, the SNES header must match the original exactly.
+; The header at $00FFC0 contains the internal ROM name "FF MYSTIC QUEST     "
+; If you want to create a modified version, uncomment the lines below:
+;
+; pushpc
+; org $00FFC0     ; ROM header area (internal name location)
+; db "FFMQ Enhanced v1.0", $00  ; Null-terminated string (21 bytes)
+; pullpc
+;
+; For now, we preserve the original header to achieve 100% ROM match.
 
 ; ==============================================================================
 ; End of Patch
