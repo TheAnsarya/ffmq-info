@@ -2010,3 +2010,279 @@ UNREACH_0DBEA1:        db $00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$0
                        db $FE,$F0,$22,$1D,$AD,$21,$1F,$9A,$CD,$02,$0F,$FF,$FF,$00,$EC,$F2;0DC421|        |
                        db $8A,$30,$DC,$02,$11,$DC,$F0,$F1,$31,$8A,$F1,$33,$0F,$13,$41,$DF;0DC431|        |
                        db $44,$23,$86,$54,$53,$46,$52,$FE,$F1,$FA,$B1,$7A,$2C,$F3,$3E,$C5;0DC441| End final data |
+; ==============================================================================
+; Bank $0D - APU Communication & Sound Driver
+; Lines 2001-2400: Extended Music Pattern Data (Continued)
+; ==============================================================================
+
+; ------------------------------------------------------------------------------
+; Music Pattern Data - Extended Sequences (Continued from Cycle 5)
+; ------------------------------------------------------------------------------
+; More proprietary music sequence data uploaded to SPC700 RAM for playback.
+; Format: Opcode bytes + operands for note events, timing, envelopes, control.
+; Processed by the SPC700 sequencer running in dedicated audio processor RAM.
+
+; Music Data Block Continuation ($0DC451-$0DC820, 976 bytes):
+; Contains note sequences, duration values, envelope commands, loop markers,
+; tempo changes, and pattern control opcodes for various game music tracks.
+; Each byte sequence encodes musical events using custom SPC700 driver format.
+DATA8_0DC451:
+  db $6D,$B0,$75,$FB,$8A,$DF,$10,$F1,$0E,$F3,$30,$DD,$02,$8A,$0F,$FD;0DC451 - Note patterns with $8A (possible voice/channel marker)
+  db $04,$20,$DC,$C1,$41,$BB,$8A,$DF,$FF,$10,$BD,$11,$E9,$BF,$12,$8A;0DC461 - $8A appears frequently (likely channel/command separator)
+  db $1C,$C0,$30,$FF,$ED,$E0,$21,$FF,$8A,$24,$3D,$E4,$52,$0D,$03,$32;0DC471 - $FF (max value), $ED (likely envelope end)
+  db $43,$8A,$00,$23,$53,$DE,$44,$1E,$04,$30,$86,$F0,$1F,$DE,$FF,$ED;0DC481 - $F0 values (high envelope/volume)
+  db $D0,$22,$10,$7A,$DC,$13,$2D,$B0,$64,$1E,$BE,$34,$8A,$FD,$D0,$24;0DC491 - $7A appears (possible note/duration marker)
+  db $2E,$AC,$33,$FD,$DC,$8A,$CF,$11,$CC,$01,$0E,$B9,$D2,$2E,$8A,$CE;0DC4A1 - $AC, $CF, $CC (pattern data values)
+  db $F0,$11,$FE,$CC,$12,$EC,$04,$8A,$31,$DF,$34,$10,$FF,$12,$14,$3F;0DC4B1 - $EC (envelope command?)
+  db $8A,$F3,$53,$0E,$24,$1E,$03,$11,$22,$7A,$32,$EF,$55,$0C,$F3,$63;0DC4C1 - $F3 (high envelope), $EF values
+  db $20,$EC,$7A,$F4,$2E,$EE,$E4,$72,$DD,$02,$31,$8A,$EC,$F3,$51,$EC;0DC4D1 - $F4, $EE (envelope levels)
+  db $F0,$10,$1D,$BD,$8A,$00,$FD,$DF,$22,$E9,$BF,$00,$FE,$8A,$DF,$F1;0DC4E1 - $BD, $BF (pattern markers)
+  db $20,$CD,$F0,$0D,$D1,$31,$8A,$0F,$02,$31,$01,$0E,$F4,$51,$E0,$8A;0DC4F1 - $CD, $D1 (data values)
+  db $44,$00,$32,$10,$10,$10,$03,$41,$7A,$EF,$35,$3E,$F0,$11,$66,$0D;0DC501 - Repeated $10 (timing/duration?)
+  db $DF,$7A,$34,$FC,$C1,$54,$20,$EE,$36,$39,$8A,$C0,$33,$11,$ED,$F2;0DC511 - $FC (max-3), $C0, $C1 values
+  db $20,$ED,$DF,$8A,$1F,$BD,$13,$1E,$BC,$EF,$00,$EC,$8A,$E0,$12,$0C;0DC521 - $BC (pattern data)
+  db $E1,$0D,$DD,$12,$1F,$8A,$01,$00,$23,$2E,$D1,$41,$F0,$23,$7A,$41;0DC531 - $E1, $DD values
+  db $06,$50,$02,$1F,$F1,$65,$2D,$7A,$13,$23,$1D,$D0,$24,$43,$EA,$05;0DC541 - $EA (envelope attack?)
+  db $8A,$0F,$FD,$F2,$32,$FC,$04,$3E,$EE,$8A,$F0,$33,$1D,$EF,$12,$2D;0DC551 - Envelope and timing data
+  db $CF,$10,$8A,$EB,$D1,$20,$0E,$CD,$E0,$1F,$CC,$7A,$F4,$4E,$CE,$2F;0DC561 - $EB, $CE values
+  db $BA,$D0,$00,$22,$8A,$0E,$14,$30,$E0,$22,$0F,$12,$21,$7A,$33,$53;0DC571 - $BA (pattern marker)
+  db $23,$31,$DE,$44,$33,$10,$7A,$13,$33,$FD,$D0,$56,$2E,$D0,$21,$7A;0DC581 - $DE values
+  db $1E,$AD,$35,$2C,$D2,$43,$1E,$AC,$7A,$15,$43,$DA,$F3,$41,$CA,$02;0DC591 - $AD, $DA, $CA markers
+  db $EA,$8A,$DD,$01,$10,$FD,$CF,$01,$EC,$D0,$7A,$20,$FE,$13,$FB,$BE;0DC5A1 - $FB (high value), $BE
+  db $ED,$24,$0C,$8A,$F3,$32,$00,$01,$20,$01,$21,$12,$7A,$42,$24,$53;0DC5B1 - Pattern continues
+  db $1F,$E2,$44,$11,$11,$7A,$24,$40,$DB,$05,$42,$1D,$E1,$41,$7A,$CA;0DC5C1 - $E2, $DB values
+  db $E3,$30,$DD,$04,$51,$DB,$B0,$7A,$33,$3D,$AF,$43,$EC,$E0,$1D,$BA;0DC5D1 - $E3, $AF, $B0 data
+  db $8A,$DD,$02,$2E,$CD,$F0,$0D,$CD,$01,$7A,$EC,$F3,$0F,$FD,$AB,$F2;0DC5E1 - $AB marker
+  db $2E,$C0,$7A,$55,$20,$13,$31,$01,$21,$24,$43,$7A,$22,$57,$51,$EF;0DC5F1 - $C0 value
+  db $13,$43,$21,$02,$7A,$64,$0E,$E0,$24,$40,$C1,$43,$FD,$7A,$CF,$13;0DC601 - Sequential patterns
+  db $0E,$CF,$45,$30,$B9,$E4,$8A,$31,$ED,$02,$1F,$FF,$00,$0F,$DC,$8A;0DC611 - $B9, $E4 values
+  db $DF,$22,$FC,$DF,$1F,$CD,$0F,$EE,$8A,$F0,$01,$10,$DD,$E0,$10,$EE;0DC621 - Envelope data
+  db $02,$7A,$41,$13,$30,$23,$10,$12,$34,$32,$7A,$25,$66,$21,$F1,$14;0DC631 - Note sequences
+  db $52,$F1,$45,$7A,$33,$0D,$E4,$52,$FF,$14,$31,$DD,$7A,$E2,$30,$DC;0DC641 - $E4, $E2 markers
+  db $E3,$65,$1A,$9E,$54,$8A,$0E,$F0,$11,$FF,$F0,$01,$0D,$BC,$7A,$D4;0DC651 - $9E (lower value)
+  db $3D,$9D,$FF,$CB,$CD,$BC,$DE,$8A,$FF,$01,$1E,$DD,$01,$FD,$E1,$01;0DC661 - $9D, $CB values
+  db $7A,$13,$11,$12,$32,$0E,$13,$42,$12,$7A,$45,$55,$20,$E2,$43,$21;0DC671 - Pattern data
+  db $F1,$67,$7A,$3F,$DF,$34,$2F,$F2,$44,$1E,$DE,$8A,$11,$1F,$EE,$13;0DC681 - Timing sequences
+  db $31,$ED,$F1,$20,$8A,$0F,$00,$10,$FF,$01,$11,$EB,$CF,$7A,$20,$DC;0DC691 - $EB marker
+  db $FF,$DD,$DD,$CC,$DC,$CC,$7A,$D1,$42,$DA,$CF,$0E,$DC,$EF,$21,$7A;0DC6A1 - Repeated $DD, $CC
+  db $22,$00,$35,$1F,$F3,$21,$13,$21,$8A,$24,$21,$10,$02,$21,$F0,$13;0DC6B1 - Sequential values
+  db $22,$7A,$00,$F3,$32,$EF,$15,$42,$FE,$E1,$7A,$33,$FA,$B1,$67,$2D;0DC6C1 - $FA, $B1 markers
+  db $CF,$22,$00,$8A,$00,$01,$1F,$EF,$22,$2E,$CD,$F0,$8A,$FF,$FF,$FF;0DC6D1 - $FF repeated (max/fill)
+  db $0F,$ED,$E0,$FD,$CF,$6A,$35,$1E,$A9,$CD,$DA,$BA,$AE,$35,$7A,$00;0DC6E1 - $6A, $A9, $AE (lower values)
+  db $14,$21,$01,$10,$22,$00,$33,$7A,$55,$42,$00,$33,$2F,$E1,$56,$3F;0DC6F1 - Pattern continues
+  db $7A,$F1,$33,$1E,$E0,$34,$41,$CC,$15,$7A,$3E,$AB,$04,$52,$0D,$E0;0DC701 - $AB value
+  db $21,$0E,$7A,$F1,$32,$EB,$E3,$62,$DC,$DC,$CE,$8A,$FF,$F0,$0F,$EE;0DC711 - $EB, $CE markers
+  db $FF,$FF,$DC,$E0,$7A,$21,$0E,$EE,$EE,$FE,$CB,$01,$1F,$7A,$12,$22;0DC721 - Repeated $EE, $FE
+  db $21,$11,$21,$00,$12,$25,$7A,$55,$20,$14,$42,$EE,$14,$54,$1F,$7A;0DC731 - Sequential pattern
+  db $13,$31,$FE,$F2,$55,$1C,$D1,$53,$7A,$FB,$CE,$24,$21,$0F,$F0,$20;0DC741 - $FB, $CE values
+  db $EE,$7A,$34,$2C,$BF,$44,$2F,$EE,$DD,$DE,$7A,$CD,$02,$FC,$BF,$0F;0DC751 - $BF marker
+  db $DA,$9C,$F0,$6A,$F0,$1F,$BB,$0E,$B9,$BC,$EF,$10,$7A,$13,$31,$02;0DC761 - $9C, $BB, $B9 values
+  db $32,$11,$00,$02,$46,$7A,$52,$02,$55,$2E,$D0,$46,$30,$02,$7A,$33;0DC771 - Pattern data
+  db $20,$CD,$26,$50,$DD,$14,$40,$7A,$BB,$E1,$22,$2F,$E0,$21,$DC,$14;0DC781 - $BB marker
+  db $7A,$30,$DC,$E1,$32,$10,$EC,$EF,$BB,$7A,$D0,$0F,$DC,$EF,$FE,$BA;0DC791 - $BA value
+  db $BC,$E0,$6A,$1E,$DE,$FD,$CC,$BA,$BD,$EC,$F3,$7A,$22,$12,$11,$24;0DC7A1 - $BC, $BA, $BD markers
+  db $20,$EF,$15,$63,$7A,$12,$35,$53,$FE,$03,$43,$11,$13,$7A,$44,$0C;0DC7B1 - Pattern sequences
+  db $E1,$45,$2D,$E1,$43,$0E,$7A,$DD,$F1,$21,$F0,$22,$0C,$C0,$44,$7A;0DC7C1 - $E1 values
+  db $1E,$DD,$F2,$32,$0E,$F0,$EB,$AD,$7A,$00,$FD,$CE,$00,$ED,$B9,$BE;0DC7D1 - $AD, $CE, $B9, $BE
+  db $0E,$6A,$DF,$00,$FC,$CC,$BD,$BB,$CE,$12,$7A,$22,$21,$02,$54,$0E;0DC7E1 - $BD, $BB, $CE markers
+  db $D1,$55,$32,$7A,$13,$66,$30,$F0,$23,$42,$00,$45,$7A,$41,$ED,$05;0DC7F1 - $D1 value
+  db $51,$DF,$13,$33,$0C,$7A,$C0,$21,$EE,$14,$3F,$DD,$F2,$32,$7A,$F0;0DC801 - Pattern continues
+  db $DE,$F1,$33,$0D,$F0,$EC,$AC,$7B,$01,$FC,$CF,$0F,$ED,$BA,$BD,$F0;0DC811 - $AC, $BA, $BD values
+  
+; Music Data Block ($0DC821-$0DD3B1, 2960 bytes):
+; Extensive pattern data with repeated byte sequences suggesting voice patterns.
+; Pattern: Many sequences contain repeating nibbles (AA, BB, AB, etc) indicating
+; possible voice channel routing or sample selection data for SPC700 hardware.
+DATA8_0DC821:
+  db $0B,$04,$00,$00,$00,$00,$00,$00,$00,$00,$00,$88,$61,$FF,$00,$11;0DC821 - $88 marker, zeros (padding/init?)
+  db $12,$20,$05,$2C,$88,$C3,$53,$23,$1F,$EE,$55,$D1,$7D,$B8,$F2,$1E;0DC831 - $88, $B8 markers
+  db $F3,$2D,$D2,$50,$BE,$56,$C4,$1D,$D1,$42,$FD,$DF,$34,$1E,$EF,$B8;0DC841 - $BE, $C4, $B8 values
+  db $12,$22,$FC,$D0,$10,$03,$42,$ED,$B8,$DF,$11,$0E,$02,$14,$3D,$CE;0DC851 - $CE value
+  db $EE,$B8,$13,$11,$31,$CE,$0E,$D2,$22,$2F,$A4,$E9,$BF,$DA,$D0,$20;0DC861 - $A4, $E9, $BF, $DA
+  db $FE,$ED,$DC,$98,$01,$0F,$EE,$EC,$E0,$FF,$EE,$EF,$84,$BA,$9A,$AA;0DC871 - $98, $84 (lower values), $9A, $AA
+  db $AA,$AB,$AA,$AA,$AB,$78,$99,$AB,$AB,$9A,$AA,$BB,$AA,$AA,$78,$BB;0DC881 - $78 marker, repeated $AA/$AB/$BB (voice data?)
+  db $AA,$AC,$EE,$B9,$AB,$CC,$DB,$78,$AF,$1C,$AB,$ED,$F1,$2E,$CD,$BA;0DC891 - $AC, $B9, $CC, $DB, $78, $AF, $BA
+  db $78,$D4,$32,$0E,$BF,$65,$FC,$D1,$66,$88,$0E,$02,$44,$1D,$E2,$55;0DC8A1 - $D4, $BF markers
+  db $30,$F0,$A8,$11,$11,$11,$00,$0F,$12,$41,$FF,$88,$35,$53,$33,$33;0DC8B1 - $A8 marker, repeated $11/$33
+  db $43,$33,$42,$34,$88,$43,$22,$44,$33,$33,$33,$34,$32,$88,$33,$43;0DC8C1 - $88 repeated, sequential numbers pattern
+  db $32,$43,$32,$34,$32,$34,$78,$46,$66,$56,$66,$56,$65,$56,$56,$78;0DC8D1 - $78 marker, repeated digit patterns (4,5,6)
+  db $65,$56,$55,$65,$55,$56,$54,$65,$78,$55,$54,$65,$45,$54,$55,$54;0DC8E1 - Digit 5 variations, $78
+  db $45,$78,$41,$25,$44,$43,$23,$23,$22,$33,$58,$72,$35,$66,$42,$E0;0DC8F1 - $58, $72 markers, digit patterns
+  db $35,$1D,$DD,$78,$EF,$00,$00,$EC,$BD,$F1,$FE,$DE,$88,$EE,$DE,$F0;0DC901 - $78, $88 markers
+  db $FF,$EC,$CE,$F0,$FD,$88,$BD,$DE,$FF,$DE,$DE,$CB,$E0,$DD,$78,$BB;0DC911 - $CE, $CB, $BB markers
+  db $AA,$AB,$BA,$BB,$AB,$BA,$AB,$78,$BB,$AB,$BA,$AC,$BA,$AB,$CB,$AA;0DC921 - $78 marker, $AA/$AB/$BA/$BB/$AC/$CB patterns
+  db $78,$BB,$CB,$AA,$BB,$CB,$BB,$AB,$CB,$78,$AB,$CB,$CA,$CB,$BB,$CB;0DC931 - $CA, $CB, $BB alternations
+  db $BB,$CC,$78,$BB,$CB,$BC,$CB,$CC,$BC,$CC,$BB,$78,$CD,$CC,$BC,$CD;0DC941 - $CC, $BC, $CD patterns
+  db $BC,$CD,$CC,$CD,$78,$CB,$DD,$CC,$DD,$CC,$DD,$CC,$ED,$74,$BA,$AA;0DC951 - $CB, $DD, $CC, $ED, $74, $BA, $AA
+  db $BB,$BA,$BC,$E0,$32,$EA,$78,$DF,$11,$0E,$DD,$EE,$0F,$EE,$01,$68;0DC961 - $EA, $78, $68 markers
+  db $2F,$DF,$10,$DC,$E3,$64,$ED,$13,$78,$21,$10,$22,$0F,$04,$53,$0F;0DC971 - $E3, $64, $78
+  db $F2,$78,$45,$32,$23,$11,$13,$35,$43,$22,$88,$11,$22,$32,$20,$01;0DC981 - $78, $88, digit sequences
+  db $24,$32,$11,$78,$24,$64,$54,$21,$46,$65,$44,$33,$78,$44,$35,$65;0DC991 - Digit patterns with $78
+  db $55,$32,$36,$54,$35,$78,$67,$42,$14,$57,$75,$32,$33,$54,$78,$66;0DC9A1 - Sequential number data
+  db $54,$34,$44,$45,$43,$44,$54,$78,$54,$44,$53,$23,$56,$54,$23,$33;0DC9B1 - $78 separated digit blocks
+  db $78,$55,$44,$43,$22,$45,$54,$22,$35,$78,$43,$32,$33,$33,$54,$31;0DC9C1 - Number sequences
+  db $22,$33,$78,$53,$32,$22,$22,$34,$32,$22,$22,$78,$12,$44,$21,$02;0DC9D1 - Repeated digit pairs
+  db $33,$22,$11,$12,$68,$34,$46,$53,$00,$24,$45,$42,$11,$68,$11,$23;0DC9E1 - $68 marker
+  db $45,$31,$01,$22,$10,$02,$68,$43,$10,$00,$13,$32,$0E,$F0,$11,$48;0DC9F1 - $68, $48 markers
+  db $76,$72,$BA,$03,$20,$F0,$22,$ED,$58,$F1,$0E,$FF,$DC,$F2,$10,$FE;0DCA01 - $76, $72, $BA, $58
+  db $AA,$58,$D1,$11,$FC,$AB,$DE,$EF,$0F,$DB,$68,$DD,$DD,$F2,$2F,$BB;0DCA11 - $AA, $58, $AB, $68, $BB
+  db $DF,$FD,$DF,$68,$20,$CA,$BD,$EF,$00,$ED,$ED,$AB,$68,$DF,$FE,$DD;0DCA21 - $CA, $BD, $AB, $68
+  db $ED,$DD,$EC,$BC,$FE,$68,$DD,$DB,$BD,$EE,$DD,$BC,$DE,$BA,$68,$CE;0DCA31 - $BC, $68, $DB, $BD, $BC, $DE, $BA, $68, $CE
+  db $EC,$CB,$DE,$DA,$AB,$CD,$DD,$68,$DC,$CB,$AA,$CD,$EC,$BA,$CC,$CB;0DCA41 - $EC, $CB, $DE, $DA, $AB, $CD, $68, $DC, $AA, $BA, $CC
+  db $68,$BD,$DB,$9A,$CD,$CB,$BC,$CD,$AA,$68,$AB,$CC,$CC,$CA,$BB,$BA;0DCA51 - $68, $BD, $DB, $9A, $CD, $CB, $BC, $AA, $CC, $CA, $BB, $BA
+  db $BC,$CB,$68,$CD,$BA,$AB,$BB,$CC,$CB,$BC,$BB,$68,$AB,$CB,$CD,$CB;0DCA61 - $BC, $CB, $68, $CD, $BA, $AB, $BB, $CC, $CB, $BC, $68
+  db $CB,$AB,$DC,$CC,$68,$BC,$CC,$BC,$CD,$CC,$CC,$CC,$CD,$68,$CD,$CD;0DCA71 - $CB, $AB, $DC, $CC, $68, $BC, $CC, $CD
+  db $CC,$CD,$DD,$CD,$DD,$CD,$58,$AA,$9A,$BA,$9A,$BB,$AA,$BB,$AA,$58;0DCA81 - $CD, $DD, $58, $AA, $9A, $BA, $9A, $BB
+  db $BB,$BB,$BC,$BB,$BB,$BC,$CB,$CC,$58,$BC,$DD,$CA,$AD,$EF,$DC,$BD;0DCA91 - $BB, $BC, $CB, $CC, $58, $BC, $DD, $CA, $AD, $EF, $DC, $BD
+  db $CD,$58,$DE,$DD,$CE,$FE,$DC,$E0,$0C,$BD,$48,$F1,$0D,$BB,$AB,$F2;0DCAA1 - $CD, $58, $DE, $DD, $CE, $FE, $DC, $48, $BB, $AB
+  db $20,$CA,$AE,$48,$23,$0D,$EF,$11,$0E,$DF,$01,$34,$48,$2E,$F1,$0F;0DCAB1 - $CA, $AE, $48
+  db $34,$22,$30,$F1,$55,$48,$31,$01,$25,$54,$45,$41,$00,$27,$58,$54;0DCAC1 - $48, $58
+  db $10,$12,$33,$22,$23,$33,$23,$58,$21,$13,$54,$33,$22,$22,$34,$54;0DCAD1 - $58, digit patterns
+  db $58,$21,$34,$43,$31,$36,$52,$13,$44,$58,$44,$33,$34,$44,$32,$24;0DCAE1 - $58 separated
+  db $55,$44,$58,$32,$24,$54,$44,$33,$44,$34,$44,$58,$43,$33,$44,$65;0DCAF1 - Digit sequences
+  db $21,$25,$65,$22,$58,$45,$54,$21,$34,$66,$41,$23,$45,$58,$52,$23;0DCB01 - $58 markers
+  db $54,$42,$33,$44,$43,$33,$58,$22,$45,$43,$23,$34,$33,$23,$33,$58;0DCB11 - Number data
+  db $33,$43,$32,$22,$23,$45,$31,$23,$54,$43,$35,$55,$44,$44,$33,$45;0DCB21 - Sequential patterns
+  db $55,$48,$32,$35,$65,$44,$44,$23,$46,$54,$48,$22,$33,$44,$43,$43;0DCB31 - $48 markers
+  db $32,$33,$32,$48,$24,$53,$11,$32,$32,$32,$22,$43,$38,$00,$47,$54;0DCB41 - $48, $38
+  db $33,$22,$34,$53,$23,$38,$42,$11,$12,$56,$30,$F1,$21,$01,$34,$04;0DCB51 - $38 marker
+  db $53,$10,$FE,$E0,$11,$0F,$DD,$28,$13,$32,$10,$FD,$E0,$20,$FF,$0F;0DCB61 - $28 marker
+  db $28,$0F,$0F,$EC,$C0,$21,$EB,$BE,$0F,$38,$EE,$F0,$0E,$DD,$F0,$0F;0DCB71 - $28, $38, $EB, $BE
+  db $DD,$D0,$38,$0F,$CE,$EE,$EE,$FF,$FE,$ED,$DE,$28,$BD,$EE,$CB,$AA;0DCB81 - $38, $28, $CE, $BD, $CB, $AA
+  db $BC,$ED,$DC,$B9,$38,$DF,$ED,$DF,$FE,$CD,$EF,$ED,$DF,$28,$DB,$9C;0DCB91 - $BC, $B9, $38, $DF, $CD, $EF, $28, $DB, $9C
+  db $EC,$AB,$BC,$CD,$DC,$A9,$28,$BD,$FD,$BA,$BD,$DC,$BB,$CD,$DB,$28;0DCBA1 - $EC, $AB, $BC, $CD, $DC, $A9, $28, $BD, $BA, $BB, $DB
+  db $CE,$DB,$BB,$CD,$ED,$CB,$CE,$DC,$28,$CD,$EC,$BD,$ED,$DD,$DC,$DC;0DCBB1 - $CE, $DB, $BB, $CD, $ED, $CB, $CE, $DC, $28, $CD, $EC, $BD, $DD
+  db $EE,$18,$CA,$BA,$AB,$AA,$CE,$C9,$AC,$ED,$18,$AA,$CC,$DC,$BC,$CE;0DCBC1 - $EE, $18, $CA, $BA, $AB, $AA, $CE, $C9, $AC, $ED, $18, $CC, $DC, $BC
+  db $DC,$CB,$BC,$18,$F0,$FA,$BC,$EE,$DE,$00,$EA,$AD,$18,$01,$0E,$FE;0DCBD1 - $DC, $CB, $BC, $18, $FA, $BC, $EA, $AD
+  db $CC,$E0,$00,$EE,$F0,$04,$00,$FB,$BE,$02,$00,$22,$0E,$00,$04,$EE;0DCBE1 - $FB, $BE
+  db $04,$42,$00,$00,$11,$20,$10,$04,$12,$43,$20,$00,$01,$13,$53,$20;0DCBF1 - Sparse digit data
+  db $04,$00,$03,$43,$10,$00,$12,$21,$10,$04,$11,$11,$20,$01,$11,$10;0DCC01 - Sequential with $04 separators
+  db $01,$11,$04,$10,$00,$11,$10,$00,$00,$00,$00,$04,$00,$00,$00,$00;0DCC11 - Mostly zeros, $04
+  db $00,$00,$01,$00,$01,$42,$11,$11,$11,$11,$00,$00,$00,$D8,$1B,$02;0DCC21 - $D8, $1B (lower values)
+
+; Music Data Block with Pattern Markers ($0DCC31-$0DD3B1, 1408 bytes):
+; Contains extensive sequences with $C2, $B2, $A6, $BA, $AA markers.
+; Pattern suggests voice/channel assignment data or DSP register configurations.
+; Frequent $96, $9A markers (lower values) may indicate specific voice mappings.
+DATA8_0DCC31:
+  db $00,$00,$00,$03,$4F,$DE,$EF,$00,$A6,$E0,$20,$00,$00,$15,$3A,$A0;0DCC31 - $4F, $DE, $EF, $A6, $3A, $A0
+  db $01,$C2,$00,$00,$13,$1D,$DF,$00,$00,$11,$86,$BB,$9E,$22,$00,$1F;0DCC41 - $C2 marker, $86, $BB, $9E
+  db $DF,$36,$21,$B6,$01,$41,$AB,$31,$F1,$FF,$11,$10,$B2,$00,$00,$14;0DCC51 - $B6, $AB, $B2 markers
+  db $4F,$DD,$DF,$11,$10,$C2,$36,$0B,$DF,$01,$11,$11,$10,$FF,$CA,$10;0DCC61 - $C2, $CA
+  db $FF,$01,$00,$00,$00,$00,$04,$C2,$4E,$EF,$F0,$FF,$01,$11,$11,$11;0DCC71 - $C2, $4E
+  db $11,$B2,$22,$54,$DB,$CD,$F0,$00,$F1,$54,$B6,$BB,$24,$10,$00,$00;0DCC81 - $B2, $DB, $B6, $BB
+  db $F0,$00,$00,$A6,$01,$0E,$E0,$11,$22,$0E,$66,$4E,$C2,$ED,$FF,$FF;0DCC91 - $A6, $66, $4E, $C2
+  db $F0,$11,$11,$11,$12,$B2,$4E,$CC,$CD,$FF,$FE,$03,$F0,$2C,$A6,$15;0DCCA1 - $B2, $4E, $CC, $CD, $2C, $A6
+  db $13,$10,$00,$F0,$0E,$F2,$31,$C2,$0F,$F0,$00,$11,$12,$02,$3D,$DF;0DCCB1 - $C2, $3D
+  db $B6,$02,$20,$FF,$F1,$10,$E3,$3B,$D0,$B2,$CD,$FF,$FE,$03,$DF,$3C;0DCCC1 - $B6, $3B, $D0, $B2, $CD, $3C
+  db $BE,$F0,$AA,$0F,$E0,$13,$0A,$D5,$50,$EE,$F0,$C6,$00,$10,$11,$C2;0DCCD1 - $BE, $AA, $0A, $D5, $C6, $C2
+  db $6A,$C1,$01,$20,$B2,$00,$01,$22,$12,$75,$CB,$CD,$FF,$C2,$FF,$01;0DCCE1 - $6A, $C1, $B2, $75, $CB, $CD, $C2
+  db $EC,$02,$ED,$EF,$00,$00,$A6,$10,$32,$FC,$D1,$31,$11,$0E,$EF,$C2;0DCCF1 - $EC, $A6, $FC, $D1, $C2
+  db $02,$10,$20,$11,$DE,$00,$00,$00,$C6,$00,$02,$3E,$C0,$01,$10,$FF;0DCD01 - $C6, $3E, $C0
+  db $F2,$B2,$0A,$C0,$15,$5C,$9C,$EE,$F0,$00,$B2,$01,$1F,$EF,$01,$33;0DCD11 - $B2, $0A, $C0, $5C, $9C
+  db $10,$04,$4F,$B6,$63,$9E,$41,$9F,$31,$11,$00,$F4,$C6,$4D,$C0,$00;0DCD21 - $4F, $B6, $63, $9E, $9F, $C6, $4D, $C0
+  db $10,$00,$01,$FD,$11,$B6,$01,$03,$DA,$12,$22,$0F,$01,$21,$C6,$FF;0DCD31 - $B6, $DA, $C6
+  db $01,$10,$00,$01,$ED,$43,$CE,$C6,$02,$0D,$01,$11,$00,$01,$30,$CF;0DCD41 - $CE, $C6, $CF
+  db $B6,$F1,$40,$FF,$02,$BA,$44,$01,$F4,$B2,$4B,$AC,$DE,$FF,$EE,$F2;0DCD51 - $B6, $BA, $B2, $4B, $AC, $DE
+  db $31,$FF,$C6,$11,$10,$01,$ED,$34,$EE,$00,$2E,$B6,$B1,$21,$1F,$F0;0DCD61 - $C6, $B6, $B1
+  db $65,$AC,$FE,$22,$C6,$00,$11,$DC,$12,$10,$F0,$22,$CD,$A6,$46,$22;0DCD71 - $65, $AC, $C6, $DC, $CD, $A6
+  db $10,$11,$33,$EC,$F1,$22,$B2,$46,$1A,$C4,$71,$DD,$C1,$7F,$9D,$B6;0DCD81 - $B2, $1A, $C4, $71, $DD, $C1, $7F, $9D, $B6
+  db $31,$0F,$37,$CA,$1F,$F2,$10,$13,$C2,$0C,$DF,$01,$0F,$FF,$12,$ED;0DCD91 - $37, $CA, $C2, $0C
+  db $F0,$C6,$0F,$F0,$11,$10,$FF,$01,$22,$EC,$CA,$51,$1C,$E3,$00,$12;0DCDA1 - $C6, $EC, $CA, $1C, $E3
+  db $DC,$41,$0F,$C6,$F2,$2D,$01,$FF,$00,$22,$DD,$11,$C6,$00,$00,$00;0DCDБ1 - $DC, $C6, $DD, $C6
+  db $01,$2C,$D1,$21,$0F,$B6,$01,$22,$0E,$F0,$45,$BB,$10,$53,$C2,$0F;0DCDC1 - $2C, $D1, $B6, $BB, $C2
+  db $FF,$01,$31,$DE,$F0,$02,$41,$B6,$B3,$2F,$00,$33,$BC,$10,$01,$0F;0DCDD1 - $DE, $B6, $B3, $BC
+  db $C2,$FF,$00,$23,$EC,$EF,$FF,$FF,$F0,$B6,$30,$EF,$44,$BE,$30,$24;0DCDE1 - $C2, $EC, $EF, $B6, $BE
+  db $BB,$1F,$B2,$E0,$16,$4B,$AD,$E2,$71,$CF,$12,$A2,$3F,$35,$AB,$21;0DCDF1 - $BB, $B2, $4B, $AD, $E2, $CF, $A2, $AB
+  db $FD,$BB,$CC,$CE,$C6,$01,$2D,$C1,$21,$0F,$01,$10,$FF,$C6,$21,$E1;0DCE01 - $BB, $CC, $CE, $C6, $2D, $C1, $C6
+  db $2F,$02,$FC,$00,$01,$10,$C2,$23,$FD,$F1,$42,$F0,$00,$11,$20,$B2;0DCE11 - $C2, $B2
+  db $AD,$11,$1F,$EE,$EE,$EE,$EF,$F2,$C2,$1D,$CD,$EF,$FF,$01,$11,$20;0DCE21 - $AD, $C2, $1D, $CD, $EF
+  db $E0,$C6,$20,$12,$EC,$01,$01,$00,$01,$1E,$C2,$CE,$33,$FF,$01,$22;0DCE31 - $C6, $C2, $CE
+  db $2F,$DF,$12,$C6,$0E,$EF,$01,$10,$00,$0F,$11,$DF,$B6,$32,$10,$F2;0DCE41 - $DF, $C6, $B6
+  db $21,$1A,$D4,$32,$13,$C2,$2D,$DE,$EF,$00,$00,$02,$0C,$03,$B2,$0F;0DCE51 - $1A, $D4, $C2, $2D, $DE, $EF, $0C, $B2
+  db $FE,$16,$6E,$BE,$F1,$32,$FD,$C2,$EE,$F0,$0F,$F0,$01,$1D,$CE,$FF;0DCE61 - $6E, $BE, $C2, $1D, $CE
+  db $CA,$00,$11,$EC,$42,$F0,$02,$DB,$43,$B2,$FF,$01,$11,$01,$5F,$C4;0DCE71 - $CA, $EC, $DB, $B2, $5F, $C4
+  db $1D,$ED,$B2,$07,$6D,$CE,$E0,$23,$1E,$CC,$DE,$C2,$FF,$FF,$FF,$12;0DCE81 - $1D, $ED, $B2, $6D, $CE, $1E, $CC, $DE, $C2
+  db $ED,$F0,$00,$14,$C6,$FC,$02,$11,$02,$1C,$D0,$01,$10,$B2,$00,$11;0DCE91 - $C6, $FC, $1C, $D0, $B2
+  db $14,$32,$1C,$DD,$F5,$3D,$A6,$13,$21,$02,$1D,$BD,$12,$0E,$F1,$B6;0DCEA1 - $1C, $DD, $3D, $A6, $1D, $BD, $B6
+  db $11,$F1,$2A,$E3,$20,$23,$DC,$11,$C6,$11,$01,$3E,$CF,$01,$10,$00;0DCEB1 - $2A, $E3, $DC, $C6, $3E, $CF
+  db $00,$C6,$0F,$22,$CD,$11,$22,$EF,$1F,$00,$9A,$13,$1C,$9D,$65,$FC;0DCEC1 - $C6, $CD, $EF, $9A, $1C, $9D, $65, $FC
+  db $E4,$2F,$0A,$B6,$23,$AC,$32,$41,$A0,$3F,$02,$03,$CA,$1C,$E3,$01;0DCED1 - $E4, $0A, $B6, $AC, $A0, $CA, $1C, $E3
+  db $1F,$F0,$10,$0F,$15,$C2,$5D,$CE,$01,$EF,$11,$11,$00,$12,$B2,$30;0DCEE1 - $C2, $5D, $CE, $B2
+  db $EE,$EE,$DD,$EF,$F0,$F1,$3C,$B6,$D4,$5E,$A2,$41,$F0,$03,$6D,$90;0DCEF1 - $DD, $EF, $3C, $B6, $D4, $5E, $A2, $6D, $90
+  db $C2,$FF,$01,$11,$11,$00,$04,$60,$CE,$B2,$0F,$CF,$23,$20,$FF,$01;0DCF01 - $C2, $60, $CE, $B2, $CF
+  db $10,$FE,$B2,$EE,$DC,$DE,$EE,$FF,$22,$BC,$1E,$B6,$D3,$32,$FE,$03;0DCF11 - $B2, $DC, $DE, $BC, $B6, $D3
+  db $6D,$A1,$0E,$01,$B6,$10,$00,$00,$16,$2B,$9E,$2E,$04,$AA,$DF,$BC;0DCF21 - $6D, $A1, $B6, $2B, $9E, $AA, $BC
+  db $24,$10,$0F,$EE,$03,$00,$A6,$01,$11,$00,$06,$D9,$19,$07,$45,$B6;0DCF31 - $A6, $D9, $19, $45, $B6
+  db $0E,$E3,$7D,$B0,$0F,$10,$00,$00,$B6,$00,$16,$1A,$1E,$BD,$34,$22;0DCF41 - $E3, $7D, $B0, $B6, $1A, $1E, $BD
+  db $0E,$AA,$F4,$30,$0E,$0E,$E2,$20,$F0,$11,$C6,$00,$00,$21,$CD,$12;0DCF51 - $AA, $E2, $C6, $CD
+  db $11,$00,$F1,$B6,$6D,$B1,$00,$00,$01,$00,$F0,$16,$C6,$1C,$12,$BD;0DCF61 - $B6, $6D, $B1, $C6, $1C, $BD
+  db $32,$11,$0F,$FF,$01,$9A,$19,$CE,$D2,$42,$F0,$01,$1C,$0D,$C6,$23;0DCF71 - $9A, $19, $CE, $D2, $1C, $0D, $C6
+  db $CC,$21,$01,$10,$F1,$2E,$E1,$C6,$00,$00,$00,$00,$00,$13,$1C,$02;0DCF81 - $CC, $2E, $E1, $C6, $1C
+  db $C6,$CD,$22,$10,$00,$0F,$F0,$11,$00,$B6,$FE,$E0,$10,$00,$10,$00;0DCF91 - $C6, $CD, $B6
+  db $23,$CA,$B6,$13,$21,$11,$F2,$3B,$D2,$00,$1F,$B6,$F0,$10,$00,$16;0DCFA1 - $CA, $B6, $3B, $D2, $B6
+  db $29,$00,$CD,$03,$A6,$51,$12,$0E,$DF,$12,$20,$DD,$DF,$A6,$01,$11;0DCFB1 - $29, $CD, $A6, $DF, $DD, $A6
+  db $00,$12,$3B,$E0,$A2,$51,$B6,$01,$03,$3A,$C2,$21,$0F,$F0,$00,$B6;0DCFC1 - $3B, $E0, $A2, $B6, $3A, $C2, $B6
+  db $00,$16,$0B,$1C,$E4,$DE,$21,$12,$96,$5D,$AA,$03,$63,$CA,$AB,$02;0DCFD1 - $1C, $E4, $DE, $96, $5D, $AA, $63, $CA, $AB
+  db $21,$B6,$00,$02,$1B,$F6,$EC,$12,$11,$14,$B6,$39,$B1,$12,$20,$FF;0DCFE1 - $B6, $1B, $F6, $EC, $B6, $39, $B1
+  db $00,$0F,$16,$B2,$62,$2C,$A1,$2D,$DF,$01,$22,$1F,$AA,$23,$2F,$DF;0DCFF1 - $B2, $62, $2C, $A1, $2D, $DF, $AA
+  db $FF,$22,$1F,$F0,$14,$C6,$0E,$02,$1E,$F0,$01,$12,$1D,$E0,$B6,$13;0DD001 - $C6, $1E, $1D, $E0, $B6
+  db $20,$FF,$F0,$10,$15,$FD,$EB,$B6,$F5,$4D,$C1,$11,$21,$0E,$EF,$11;0DD011 - $FD, $EB, $B6, $4D, $C1
+  db $B6,$10,$FE,$F0,$10,$F0,$23,$DC,$13,$C6,$2F,$D0,$11,$13,$1C,$E0;0DD021 - $B6, $DC, $C6, $1C, $E0
+  db $01,$10,$B6,$F0,$00,$0F,$15,$0D,$DD,$13,$40,$B2,$DB,$DF,$12,$32;0DD031 - $B6, $0D, $DD, $B2, $DB, $DF
+  db $0E,$F0,$00,$0F,$B2,$ED,$DE,$EE,$02,$EC,$EF,$23,$EC,$B6,$22,$26;0DD041 - $B2, $ED, $DE, $EC, $EF, $B6
+  db $19,$D0,$02,$21,$0F,$FF,$B6,$00,$25,$0B,$BF,$22,$22,$DB,$12,$9A;0DD051 - $19, $D0, $B6, $0B, $BF, $DB, $9A
+  db $0D,$EC,$B1,$63,$D1,$ED,$1F,$12,$BA,$00,$2D,$C5,$3E,$F1,$EC,$42;0DD061 - $0D, $EC, $B1, $63, $D1, $BA, $2D, $C5, $3E, $EC
+  db $04,$B6,$2A,$D0,$02,$21,$00,$0F,$F0,$25,$B2,$7F,$BD,$F1,$11,$1D;0DD071 - $B6, $2A, $D0, $B2, $7F, $BD, $1D
+  db $BE,$13,$32,$A2,$1E,$EF,$FF,$00,$FE,$CB,$BD,$1C,$B6,$D2,$21,$00;0DD081 - $BE, $A2, $1E, $EF, $CB, $BD, $1C, $B6, $D2
+  db $2D,$C1,$36,$2A,$E0,$B2,$EF,$12,$33,$21,$0F,$06,$6C,$9C,$B2,$E1;0DD091 - $2D, $C1, $2A, $E0, $B2, $EF, $6C, $9C, $B2
+  db $21,$20,$BC,$F1,$22,$10,$00,$B6,$00,$00,$00,$FF,$F2,$1C,$E2,$22;0DD0A1 - $BC, $B6, $1C, $E2
+  db $B6,$1F,$10,$BF,$26,$4B,$D0,$F0,$21,$C6,$00,$00,$00,$03,$0B,$F2;0DD0B1 - $B6, $BF, $4B, $D0, $C6, $0B
+  db $01,$0F,$A6,$04,$AC,$45,$31,$FE,$FF,$EF,$12,$B6,$0F,$FF,$02,$FC;0DD0C1 - $A6, $AC, $EF, $B6, $FC
+  db $13,$11,$0F,$02,$B6,$ED,$15,$3B,$E1,$F0,$11,$12,$0F,$B2,$10,$06;0DD0D1 - $B6, $ED, $3B, $E1, $B2
+  db $6C,$AD,$E0,$10,$F1,$1D,$A6,$F5,$42,$0F,$FE,$D0,$11,$10,$FE,$B6;0DD0E1 - $6C, $AD, $E0, $A6, $D0, $B6
+  db $01,$DD,$22,$11,$0F,$F2,$2D,$E5,$B6,$3B,$E1,$01,$10,$01,$10,$FF;0DD0F1 - $DD, $2D, $E5, $B6, $3B, $E1
+  db $04,$B2,$4D,$BD,$E0,$10,$F0,$2F,$CE,$01,$AA,$0F,$FF,$E2,$21,$0E;0DD101 - $B2, $4D, $BD, $E0, $CE, $AA, $E2
+  db $F0,$2E,$96,$B6,$21,$11,$0F,$01,$3F,$C4,$3B,$E1,$BA,$F1,$0F,$01;0DD111 - $96, $B6, $3F, $C4, $3B, $E1, $BA
+  db $00,$F0,$11,$EC,$24,$A2,$DF,$10,$FF,$45,$CB,$03,$44,$42,$B6,$FF;0DD121 - $EC, $A2, $DF, $CB, $B6
+  db $00,$11,$00,$0D,$C1,$21,$10,$B2,$FE,$F0,$23,$F1,$4F,$DE,$F1,$21;0DD131 - $0D, $C1, $B2, $4F, $DE
+  db $A2,$13,$45,$56,$73,$31,$AB,$DE,$0F,$A2,$FF,$26,$0A,$D1,$34,$43;0DD141 - $A2, $73, $AB, $DE, $A2, $0A, $D1
+  db $0E,$DE,$B6,$11,$00,$0C,$D1,$21,$10,$FF,$11,$A2,$26,$33,$6D,$BE;0DD151 - $DE, $B6, $0C, $D1, $A2, $6D, $BE
+  db $F2,$54,$12,$46,$B2,$34,$40,$23,$ED,$EE,$FF,$FF,$03,$A2,$6D,$BF;0DD161 - $B2, $ED, $A2, $6D, $BF
+  db $24,$42,$0F,$EE,$F0,$13,$BA,$EC,$33,$00,$F0,$F0,$10,$F2,$0E,$BA;0DD171 - $BA, $EC
+  db $1C,$14,$00,$0F,$F0,$11,$00,$DE,$B2,$14,$FD,$DD,$EF,$FF,$F0,$20;0DD181 - $1C, $DE, $B2, $FD, $DD, $EF
+  db $DE,$BA,$10,$FF,$00,$F0,$11,$10,$CE,$41,$BA,$00,$E0,$10,$00,$01;0DD191 - $DE, $BA, $CE, $BA, $E0
+  db $10,$BD,$53,$B6,$12,$20,$FF,$01,$21,$DD,$43,$BD,$A2,$A9,$BF,$00;0DD1A1 - $BD, $B6, $DD, $BD, $A2, $A9, $BF
+  db $12,$65,$DB,$E1,$33,$B6,$00,$FF,$01,$21,$CD,$10,$01,$0F,$B2,$DE;0DD1B1 - $65, $DB, $E1, $B6, $CD, $B2, $DE
+  db $01,$11,$25,$5E,$BD,$F1,$33,$B6,$FF,$01,$21,$CE,$44,$BC,$0F,$02;0DD1C1 - $5E, $BD, $B6, $CE, $BC
+  db $A6,$20,$11,$33,$BA,$13,$10,$10,$FE,$B2,$F0,$22,$DC,$EF,$FF,$FE;0DD1D1 - $A6, $BA, $B2, $DC, $EF
+  db $DD,$F1,$B2,$22,$25,$70,$BC,$DF,$23,$21,$01,$B6,$30,$CF,$44,$CA;0DD1E1 - $DD, $B2, $70, $BC, $DF, $B6, $CF, $CA
+  db $00,$02,$10,$01,$A2,$36,$5D,$BF,$12,$44,$2F,$DF,$42,$B6,$C0,$20;0DD1F1 - $A2, $5D, $BF, $DF, $B6, $C0
+  db $FF,$0F,$01,$11,$00,$04,$B6,$49,$91,$23,$31,$FF,$F1,$2E,$D1,$B6;0DD201 - $B6, $49, $91, $2E, $D1, $B6
+  db $34,$DA,$FF,$02,$10,$01,$11,$1D,$A6,$B2,$11,$42,$EE,$D1,$3C,$C2;0DD211 - $DA, $1D, $A6, $B2, $D1, $3C, $C2
+  db $20,$C2,$FE,$EE,$EE,$F0,$00,$01,$42,$EE,$B6,$21,$32,$0F,$F0,$1E;0DD221 - $C2, $B6
+  db $F1,$24,$DA,$B6,$FF,$03,$20,$00,$00,$20,$DF,$00,$A6,$43,$FD,$E1;0DD231 - $DA, $B6, $DF, $A6, $E1
+  db $1B,$F3,$10,$EE,$FF,$CA,$00,$10,$F0,$01,$2D,$C3,$20,$10,$BA,$DE;0DD241 - $1B, $CA, $2D, $C3, $BA, $DE
+  db $02,$0D,$32,$02,$AC,$51,$02,$A6,$21,$00,$01,$43,$AA,$F1,$44,$0E;0DD251 - $0D, $AC, $A6, $AA
+  db $A6,$F1,$DA,$14,$10,$EE,$EE,$01,$23,$C2,$00,$01,$32,$ED,$EF,$01;0DD261 - $A6, $DA, $C2, $ED, $EF
+  db $11,$11,$B6,$EE,$22,$24,$D9,$EF,$02,$21,$00,$AA,$10,$13,$A9,$55;0DD271 - $B6, $D9, $EF, $AA, $A9
+  db $30,$CD,$21,$A1,$A6,$44,$1F,$EE,$EF,$11,$12,$10,$F3,$B6,$51,$AB;0DD281 - $CD, $A1, $A6, $B6, $AB
+  db $F2,$43,$1F,$00,$DE,$22,$B6,$23,$DA,$EF,$12,$10,$00,$01,$12,$B6;0DD291 - $DE, $B6, $DA, $EF, $B6
+  db $0C,$D1,$22,$1F,$00,$CE,$22,$10,$B6,$FF,$FF,$00,$11,$10,$01,$51;0DD2A1 - $0C, $D1, $CE, $B6
+  db $BB,$BA,$33,$20,$FE,$0F,$D3,$4F,$01,$BD,$BA,$41,$02,$FF,$01,$0F;0DD2B1 - $BB, $BA, $D3, $4F, $BD, $BA
+  db $11,$0B,$E5,$BA,$20,$0F,$FE,$E4,$3E,$0F,$F0,$00,$B6,$00,$01,$11;0DD2C1 - $0B, $E5, $BA, $E4, $3E, $B6
+  db $00,$42,$CC,$D0,$33,$BA,$0E,$0D,$E4,$3F,$11,$BC,$41,$11,$AA,$EF;0DD2D1 - $CC, $D0, $BA, $0D, $E4, $3F, $BC, $AA, $EF
+  db $02,$FF,$13,$09,$97,$71,$0D,$B6,$0D,$C0,$21,$10,$FF,$FF,$00,$11;0DD2E1 - $97, $71, $0D, $B6, $0D, $C0
+  db $B6,$00,$11,$42,$CE,$DE,$23,$32,$0C,$BA,$04,$20,$01,$CC,$31,$11;0DD2F1 - $B6, $CE, $DE, $0C, $BA, $CC
+  db $0F,$00,$B6,$10,$12,$2F,$CD,$12,$22,$0C,$C1,$9A,$4C,$ED,$D0,$E2;0DD301 - $B6, $CD, $0C, $C1, $9A, $4C, $ED, $D0, $E2
+  db $40,$F1,$F0,$2E,$B6,$43,$CE,$ED,$13,$33,$0C,$D1,$11,$BA,$12,$CA;0DD311 - $B6, $CE, $ED, $0C, $D1, $BA, $CA
+  db $33,$11,$EF,$11,$0F,$02,$B2,$44,$1D,$DF,$14,$4F,$CD,$EF,$00,$B6;0DD321 - $EF, $B2, $1D, $DF, $4F, $CD, $EF, $B6
+  db $FF,$F0,$00,$00,$00,$11,$33,$CE,$B6,$0D,$03,$33,$0B,$E1,$11,$13;0DD331 - $CE, $B6, $0D, $0B, $E1
+  db $1A,$BA,$23,$11,$FF,$01,$10,$F0,$F0,$1C,$B2,$CE,$14,$3D,$BD,$EF;0DD341 - $1A, $BA, $1C, $B2, $CE, $3D, $BD, $EF
+  db $01,$0F,$EE,$B6,$00,$00,$00,$11,$33,$CD,$2E,$E2,$B6,$33,$0C,$F1;0DD351 - $B6, $CD, $2E, $E2, $B6, $0C
+  db $01,$14,$1A,$C0,$01,$B6,$0F,$01,$11,$12,$0F,$0D,$D2,$33,$A2,$6C;0DD361 - $1A, $C0, $B6, $0D, $D2, $A2, $6C
+  db $9C,$EF,$01,$0D,$AA,$BC,$CC,$B6,$00,$12,$23,$EC,$1F,$D1,$33,$0D;0DD371 - $9C, $EF, $0D, $AA, $BC, $CC, $B6, $EC, $D1, $0D
+  db $B6,$01,$00,$03,$2B,$C0,$00,$0F,$01,$A2,$F2,$46,$53,$53,$BA,$05;0DD381 - $B6, $2B, $C0, $A2, $BA
+  db $2C,$BC,$9A,$F0,$11,$DC,$F4,$1E,$F0,$30,$11,$B6,$24,$FB,$11,$DF;0DD391 - $2C, $BC, $9A, $DC, $1E, $B6, $FB, $DF
+  db $32,$FF,$11,$0F,$B6,$03,$3B,$B0,$00,$10,$00,$11,$11,$A6,$0F,$11;0DD3A1 - $B6, $3B, $B0, $A6
+  db $AC,$53,$CE,$00,$0F,$02,$BA,$FF,$01,$0F,$00,$10,$00,$13,$CB,$B6;0DD3B1 - $AC, $CE, $BA, $CB, $B6
