@@ -188,3 +188,511 @@ CODE_0C8080:
 ; - Map all Mode 7 calculations
 ; - Document palette management
 ; ==============================================================================
+; ==============================================================================
+; BANK $0C CYCLE 1 - Screen Initialization & Graphics Management (Lines 100-500)
+; ==============================================================================
+; Continuation from address $0C80B2
+; Major systems: Screen mode setup, VRAM initialization, palette DMA, window effects
+; ==============================================================================
+
+; [Continued from documented section ending at $0C80B2]
+
+	STA.B SNES_TM-$2100						;0C80B2	; Set main screen layers ($212C) = $11 (BG1+Obj)
+	JSR.W CODE_0C8D7B						;0C80B4	; Call graphics setup routine
+	LDA.W $0112								;0C80B7	; Load NMI enable flags
+	STA.W $4200								;0C80BA	; Set NMI/IRQ/Auto-Joypad ($4200)
+	CLI										;0C80BD	; Enable interrupts
+	LDA.B #$0F								;0C80BE	; Brightness = 15 (full)
+	STA.W $00AA								;0C80C0	; Store brightness value
+	STZ.W $0110								;0C80C3	; Clear screen state flag
+	JSL.L CODE_00C795						;0C80C6	; Call main game loop handler
+	JSR.W CODE_0C8BAD						;0C80CA	; Graphics state update
+	JSR.W CODE_0C896F						;0C80CD	; Background layer setup
+	JSL.L CODE_0C8000						;0C80D0	; Wait for VBLANK
+	LDA.B #$01								;0C80D4	; BG mode 1
+	STA.B SNES_BGMODE-$2100					;0C80D6	; Set background mode ($2105)
+	LDA.B #$62								;0C80D8	; BG1 tilemap config
+	STA.B SNES_BG1SC-$2100					;0C80DA	; BG1 screen config ($2107)
+	LDA.B #$69								;0C80DC	; BG2 tilemap config
+	STA.B SNES_BG2SC-$2100					;0C80DE	; BG2 screen config ($2108)
+	LDA.B #$44								;0C80E0	; Character address config
+	STA.B SNES_BG12NBA-$2100				;0C80E2	; BG1/BG2 char address ($210B)
+	LDA.B #$13								;0C80E4	; Layer enable mask
+	STA.B SNES_TM-$2100						;0C80E6	; Set main screen layers ($212C)
+	JSR.W CODE_0C9037						;0C80E8	; Additional graphics setup
+	JSR.W CODE_0C8103						;0C80EB	; Call main screen init
+	REP #$30								;0C80EE	; 16-bit A/X/Y
+	LDA.W #$0001							;0C80F0	; Screen initialized flag
+	STA.L $7E3665							;0C80F3	; Set screen ready flag (WRAM)
+	JSL.L CODE_00C7B8						;0C80F7	; Game state handler
+	SEI										;0C80FB	; Disable interrupts
+	LDA.W #$0008							;0C80FC	; VBLANK processing flag
+	TRB.W $00D2								;0C80FF	; Reset VBLANK flag
+	RTL										;0C8102	; Return
+
+; ==============================================================================
+; CODE_0C8103 - Main Screen Initialization Routine
+; ==============================================================================
+; Sets up Mode 7 screen, loads palettes, initializes display registers.
+; Called during screen transitions and battle entry.
+; ==============================================================================
+
+CODE_0C8103:
+	LDA.B #$0C								;0C8103	; Bank $0C
+	STA.W $005A								;0C8105	; Set data bank
+	LDX.W #$90D7							;0C8108	; Address of palette DMA code
+	STX.W $0058								;0C810B	; Set DMA routine pointer
+	LDA.B #$40								;0C810E	; VBLANK DMA flag
+	TSB.W $00E2								;0C8110	; Set DMA pending flag
+	JSL.L CODE_0C8000						;0C8113	; Wait for VBLANK
+	LDA.B #$07								;0C8117	; Background mode 7
+	STA.B SNES_BGMODE-$2100					;0C8119	; Set BG mode ($2105)
+	JSR.W CODE_0C87ED						;0C811B	; Mode 7 matrix setup
+	JSR.W CODE_0C81DA						;0C811E	; Palette load setup
+	JSR.W CODE_0C88BE						;0C8121	; Additional graphics init
+	JSR.W CODE_0C8872						;0C8124	; Background scrolling setup
+	JSR.W CODE_0C87E9						;0C8127	; Finalize graphics state
+	LDA.B #$40								;0C812A	; VBLANK flag
+	TRB.W $00D6								;0C812C	; Clear VBLANK pending
+	JSL.L CODE_0C8000						;0C812F	; Wait for VBLANK
+	LDA.B #$01								;0C8133	; BG mode 1
+	STA.B SNES_BGMODE-$2100					;0C8135	; Set BG mode ($2105)
+	STZ.B SNES_BG1VOFS-$2100				;0C8137	; BG1 V-scroll = 0 ($210E)
+	STZ.B SNES_BG1VOFS-$2100				;0C8139	; Write high byte
+	JSR.W CODE_0C8767						;0C813B	; Graphics state finalize
+	JSR.W CODE_0C8241						;0C813E	; Sprite/OAM setup
+	RTS										;0C8141	; Return
+
+; ==============================================================================
+; CODE_0C8142 - Window Effect Configuration
+; ==============================================================================
+; Sets up color window registers for screen effects (fades, transitions).
+; Configures SNES window masking system.
+; ==============================================================================
+
+CODE_0C8142:
+	LDX.W #$4156							;0C8142	; Window config value 1
+	STX.W $0E08								;0C8145	; Store window settings
+	LDX.W #$5555							;0C8148	; Window config value 2
+	STX.W $0E0A								;0C814B	; Additional window data
+	LDX.W #$5500							;0C814E	; Window config value 3
+	STX.W $0E0C								;0C8151	; Final window settings
+	JMP.W CODE_0C8910						;0C8154	; Jump to window apply routine
+
+; ==============================================================================
+; CODE_0C8157 - VRAM Address Calculation Routine
+; ==============================================================================
+; Calculates VRAM addresses for tile placement.
+; Adds offset $0804 to base addresses for proper tile positioning.
+; ==============================================================================
+
+CODE_0C8157:
+	CLC										;0C8157	; Clear carry
+	REP #$30								;0C8158	; 16-bit A/X/Y
+	LDA.W $0C84								;0C815A	; Load VRAM base address 1
+	ADC.W #$0804							;0C815D	; Add tile offset
+	STA.W $0CC0								;0C8160	; Store calculated address
+	LDA.W $0C88								;0C8163	; Load VRAM base address 2
+	ADC.W #$0804							;0C8166	; Add tile offset
+	STA.W $0CC4								;0C8169	; Store calculated address
+	LDA.W $0C8C								;0C816C	; Load VRAM base address 3
+	ADC.W #$0804							;0C816F	; Add tile offset
+	STA.W $0CC8								;0C8172	; Store calculated address
+	LDA.W $0C90								;0C8175	; Load VRAM base address 4
+	ADC.W #$0C90							;0C8178	; Add tile offset
+	STA.W $0CCC								;0C817B	; Store calculated address
+	SEP #$20								;0C817E	; 8-bit accumulator
+	LDA.B #$80								;0C8180	; VRAM increment mode (increment on $2119 write)
+	JSL.L CODE_0C8000						;0C8182	; Wait for VBLANK
+	STA.B SNES_VMAINC-$2100					;0C8186	; Set VRAM increment ($2115)
+	LDA.B #$08								;0C8188	; Tile pattern value
+	LDX.W #$6225							;0C818A	; VRAM address $6225
+	JSR.W CODE_0C81A5						;0C818D	; Call VRAM fill routine
+	LDA.B #$0C								;0C8190	; Tile pattern value
+	LDX.W #$622A							;0C8192	; VRAM address $622A
+	JSR.W CODE_0C81A5						;0C8195	; Call VRAM fill routine
+	LDA.B #$14								;0C8198	; Tile pattern value
+	LDX.W #$6234							;0C819A	; VRAM address $6234
+	JSR.W CODE_0C81A5						;0C819D	; Call VRAM fill routine
+	LDA.B #$10								;0C81A0	; Tile pattern value
+	LDX.W #$6239							;0C81A2	; VRAM address $6239
+
+; ==============================================================================
+; CODE_0C81A5 - VRAM Pattern Fill Routine
+; ==============================================================================
+; Fills VRAM with sequential tile numbers for background patterns.
+; Creates animated tile sequences (water, fire, etc.).
+; Input: A = pattern start value, X = VRAM address
+; ==============================================================================
+
+CODE_0C81A5:
+	XBA										;0C81A5	; Swap A/B registers
+	LDA.B #$00								;0C81A6	; Clear low byte
+	REP #$30								;0C81A8	; 16-bit A/X/Y
+
+CODE_0C81AA:									; Loop: Fill VRAM pattern
+	STX.B SNES_VMADDL-$2100					;0C81AA	; Set VRAM address ($2116)
+	STA.B SNES_VMDATAL-$2100				;0C81AC	; Write tile number ($2118)
+	INC A									;0C81AE	; Next tile
+	STA.B SNES_VMDATAL-$2100				;0C81AF	; Write tile number
+	INC A									;0C81B1	; Next tile
+	STA.B SNES_VMDATAL-$2100				;0C81B2	; Write tile number
+	TAY										;0C81B4	; Save tile counter to Y
+	TXA										;0C81B5	; Load VRAM address
+	ADC.W #$0020							;0C81B6	; Move to next row (+32 tiles)
+	TAX										;0C81B9	; Update VRAM address
+	TYA										;0C81BA	; Restore tile counter
+	ADC.W #$000E							;0C81BB	; Advance tile pattern
+	BIT.W #$0040							;0C81BE	; Test completion bit
+	BEQ CODE_0C81AA							;0C81C1	; Loop if not done
+	SEP #$20								;0C81C3	; 8-bit accumulator
+	RTS										;0C81C5	; Return
+
+; ==============================================================================
+; CODE_0C81C6 - Color Math Disable Routine
+; ==============================================================================
+; Disables color addition/subtraction effects.
+; Resets window and color math registers.
+; ==============================================================================
+
+CODE_0C81C6:
+	STZ.B SNES_CGSWSEL-$2100				;0C81C6	; Clear color window select ($2130)
+	STZ.B SNES_CGADSUB-$2100				;0C81C8	; Clear color math ($2131)
+	RTS										;0C81CA	; Return
+
+; ==============================================================================
+; CODE_0C81CB - Color Addition Effect Setup
+; ==============================================================================
+; Enables color addition for screen brightness/darkness effects.
+; Used for battle transitions, lightning, darkness, etc.
+; ==============================================================================
+
+CODE_0C81CB:
+	LDX.W #$7002							;0C81CB	; Color window config
+	STX.B SNES_CGSWSEL-$2100				;0C81CE	; Set color window ($2130-$2131)
+	LDA.B #$E0								;0C81D0	; Fixed color data (brightness)
+	STA.B SNES_COLDATA-$2100				;0C81D2	; Set fixed color value ($2132)
+	LDX.W #$0110							;0C81D4	; Layer enable mask
+	STX.B SNES_TM-$2100						;0C81D7	; Set main/sub screen layers ($212C-$212D)
+	RTS										;0C81D9	; Return
+
+; ==============================================================================
+; CODE_0C81DA - Palette DMA Setup Routine
+; ==============================================================================
+; Prepares palette data for DMA transfer during VBLANK.
+; Sets up indirect DMA from Bank $0C address $81EF.
+; ==============================================================================
+
+CODE_0C81DA:
+	LDA.B #$0C								;0C81DA	; Bank $0C
+	STA.W $005A								;0C81DC	; Set DMA source bank
+	LDX.W #$81EF							;0C81DF	; Palette DMA routine address
+	STX.W $0058								;0C81E2	; Set DMA routine pointer
+	LDA.B #$40								;0C81E5	; VBLANK DMA flag
+	TSB.W $00E2								;0C81E7	; Set DMA pending flag
+	JSL.L CODE_0C8000						;0C81EA	; Wait for VBLANK
+	RTS										;0C81EE	; Return
+
+; ==============================================================================
+; Palette DMA Transfer Code (Embedded at $0C81EF)
+; ==============================================================================
+; Direct palette load routine executed during VBLANK.
+; Transfers 16-byte palette chunks from Bank $07 to CGRAM.
+; ==============================================================================
+
+; [Palette DMA routine starts here]
+	LDX.W #$2200							;0C81EF	; DMA params: A→B, increment
+	STX.B SNES_DMA0PARAM-$4300				;0C81F2	; DMA0 params ($4300)
+	LDA.B #$07								;0C81F4	; Source bank = Bank $07 (palette data)
+	STA.B SNES_DMA0ADDRH-$4300				;0C81F6	; DMA0 source bank ($4304)
+	LDA.B #$10								;0C81F8	; Starting palette index = $10
+	LDY.W #$D974							;0C81FA	; Source address $07:D974
+	JSR.W CODE_0C8224						;0C81FD	; DMA 16 bytes to CGRAM
+	LDY.W #$D934							;0C8200	; Source address $07:D934
+	JSR.W CODE_0C8224						;0C8203	; DMA 16 bytes
+	JSR.W CODE_0C8224						;0C8206	; DMA 16 bytes (auto-increment)
+	JSR.W CODE_0C8224						;0C8209	; DMA 16 bytes
+	JSR.W CODE_0C8224						;0C820C	; DMA 16 bytes
+	LDA.B #$B0								;0C820F	; Palette index = $B0
+	JSR.W CODE_0C8224						;0C8211	; DMA 16 bytes
+	LDY.W #$D934							;0C8214	; Reset source to $07:D934
+	JSR.W CODE_0C8224						;0C8217	; DMA 16 bytes
+	JSR.W CODE_0C8224						;0C821A	; DMA 16 bytes
+	JSR.W CODE_0C8224						;0C821D	; DMA 16 bytes
+	JSR.W CODE_0C8224						;0C8220	; DMA 16 bytes
+	RTL										;0C8223	; Return from palette DMA
+
+; ==============================================================================
+; CODE_0C8224 - Single Palette DMA Transfer (16 bytes)
+; ==============================================================================
+; Transfers 16 bytes of palette data to CGRAM via DMA.
+; Input: A = CGRAM address, Y = source address (Bank $07)
+; Output: A += $10, Y += $10 (auto-incremented for next call)
+; ==============================================================================
+
+CODE_0C8224:
+	PHA										;0C8224	; Save CGRAM address
+	STA.W SNES_CGADD						;0C8225	; Set CGRAM address ($2121)
+	STY.B SNES_DMA0ADDRL-$4300				;0C8228	; DMA0 source address ($4302)
+	LDX.W #$0010							;0C822A	; Transfer size = 16 bytes
+	STX.B SNES_DMA0CNTL-$4300				;0C822D	; DMA0 byte count ($4305)
+	LDA.B #$01								;0C822F	; Enable DMA channel 0
+	STA.W SNES_MDMAEN						;0C8231	; Start DMA ($420B)
+	REP #$30								;0C8234	; 16-bit A/X/Y
+	TYA										;0C8236	; Load source address
+	ADC.W #$0010							;0C8237	; Advance +16 bytes
+	TAY										;0C823A	; Update source address
+	SEP #$20								;0C823B	; 8-bit accumulator
+	PLA										;0C823D	; Restore CGRAM address
+	ADC.B #$10								;0C823E	; Advance +16 colors
+	RTS										;0C8240	; Return
+
+; ==============================================================================
+; CODE_0C8241 - OAM/Sprite Initialization Routine
+; ==============================================================================
+; Copies sprite configuration data to OAM buffer.
+; Uses MVN (block move) for fast 9-byte transfer.
+; ==============================================================================
+
+CODE_0C8241:
+	REP #$30								;0C8241	; 16-bit A/X/Y
+	LDX.W #$8667							;0C8243	; Source address $0C:8667
+	LDY.W #$0202							;0C8246	; Destination address $00:0202
+	LDA.W #$0009							;0C8249	; Transfer 10 bytes (9+1 for MVN)
+	MVN $0C,$0C								;0C824C	; Block move within bank $0C
+	SEP #$20								;0C824F	; 8-bit accumulator
+	STZ.W $0160								;0C8251	; Clear sprite state flag
+	STZ.W $0201								;0C8254	; Clear OAM control byte
+	LDX.W #$8671							;0C8257	; Effect script address
+
+; ==============================================================================
+; CODE_0C825A - Visual Effect Script Interpreter
+; ==============================================================================
+; Interprets bytecode commands for screen effects (fades, flashes, transitions).
+; Commands: 00=wait, 01=fade step, 02=color cycle, 03=palette load, etc.
+; ==============================================================================
+
+CODE_0C825A:
+	LDA.W $0000,X							;0C825A	; Load effect command byte
+	INX										;0C825D	; Advance script pointer
+	CMP.B #$01								;0C825E	; Command < 01?
+	BCC CODE_0C8297							;0C8260	; Branch to wait routine
+	BEQ CODE_0C8292							;0C8262	; Command = 01: Single frame delay
+	CMP.B #$03								;0C8264	; Command < 03?
+	BCC CODE_0C8288							;0C8266	; Branch to color cycle
+	BEQ CODE_0C82A0							;0C8268	; Command = 03: Palette operation
+	CMP.B #$05								;0C826A	; Command = 05?
+	BEQ CODE_0C82A3							;0C826C	; Branch to special effect
+	BCS CODE_0C82A6							;0C826E	; Command >= 06: Complex operations
+	LDY.W #$0004							;0C8270	; Loop count = 4
+
+; Color flash effect loop (command 04)
+CODE_0C8273:
+	PHY										;0C8273	; Save loop counter
+	LDA.B #$3F								;0C8274	; Fixed color = white ($3F)
+	STA.B SNES_COLDATA-$2100				;0C8276	; Set color addition ($2132)
+	JSR.W CODE_0C85DB						;0C8278	; Wait one frame
+	LDA.B #$E0								;0C827B	; Fixed color = dark ($E0)
+	STA.B SNES_COLDATA-$2100				;0C827D	; Set color subtraction
+	JSR.W CODE_0C85DB						;0C827F	; Wait one frame
+	PLY										;0C8282	; Restore loop counter
+	DEY										;0C8283	; Decrement
+	BNE CODE_0C8273							;0C8284	; Loop 4 times (4 flashes)
+	BRA CODE_0C825A							;0C8286	; Continue script
+
+; Color cycle effect (command 02)
+CODE_0C8288:
+	LDA.B #$3B								;0C8288	; Cycle duration = 59 frames
+
+CODE_0C828A:
+	PHA										;0C828A	; Save counter
+	JSR.W CODE_0C85DB						;0C828B	; Wait one frame
+	PLA										;0C828E	; Restore counter
+	DEC A									;0C828F	; Decrement
+	BNE CODE_0C828A							;0C8290	; Loop until counter = 0
+
+; Single frame delay (command 01)
+CODE_0C8292:
+	JSR.W CODE_0C85DB						;0C8292	; Wait one frame
+	BRA CODE_0C825A							;0C8295	; Continue script
+
+; Wait until condition met (command 00)
+CODE_0C8297:
+	JSR.W CODE_0C85DB						;0C8297	; Wait one frame
+	LDA.W $0C82								;0C829A	; Load condition flag
+	BNE CODE_0C8297							;0C829D	; Loop until flag clears
+	RTS										;0C829F	; Return from effect script
+
+; Palette load command (command 03)
+CODE_0C82A0:
+	JMP.W CODE_0C8460						;0C82A0	; Jump to palette loader
+
+; Special effect command (command 05)
+CODE_0C82A3:
+	JMP.W CODE_0C8421						;0C82A3	; Jump to special effect handler
+
+; ==============================================================================
+; Complex Command Handler (Commands $06-$FF)
+; ==============================================================================
+; Decodes complex commands with parameters.
+; Format: [CMD:5bits][PARAM:3bits] for advanced visual effects.
+; ==============================================================================
+
+CODE_0C82A6:
+	PHA										;0C82A6	; Save command byte
+	AND.B #$07								;0C82A7	; Extract parameter (bits 0-2)
+	STA.W $015F								;0C82A9	; Store parameter
+	PLA										;0C82AC	; Restore command byte
+	AND.B #$F8								;0C82AD	; Extract command (bits 3-7)
+	CMP.B #$40								;0C82AF	; Command < $40?
+	BCC CODE_0C8302							;0C82B1	; Branch to low-range handler
+	CMP.B #$80								;0C82B3	; Command < $80?
+	BCC CODE_0C82F7							;0C82B5	; Branch to mid-range handler
+	CMP.B #$C0								;0C82B7	; Command < $C0?
+	BCC CODE_0C82CF							;0C82B9	; Branch to high-range handler
+	SBC.B #$40								;0C82BB	; Normalize command ($C0+ → $80+)
+	STA.W $0161								;0C82BD	; Store normalized command
+	REP #$30								;0C82C0	; 16-bit A/X/Y
+	LDA.W $015F								;0C82C2	; Load parameter
+	ASL A									;0C82C5	; *2
+	ASL A									;0C82C6	; *4 (table offset)
+	ADC.W #$0CBC							;0C82C7	; Add table base address
+	JSR.W CODE_0C83CB						;0C82CA	; Execute table entry
+	BRA CODE_0C825A							;0C82CD	; Continue script
+
+; High-range command handler ($80-$BF)
+CODE_0C82CF:
+	STA.W $0161								;0C82CF	; Store command
+	REP #$30								;0C82D2	; 16-bit A/X/Y
+	LDA.W $015F								;0C82D4	; Load parameter
+	ASL A									;0C82D7	; *2
+	ASL A									;0C82D8	; *4
+	PHA										;0C82D9	; Save offset
+	ADC.W #$0C80							;0C82DA	; Add table base 1
+	JSR.W CODE_0C83CB						;0C82DD	; Execute table entry 1
+	REP #$30								;0C82E0	; 16-bit A/X/Y
+	PLA										;0C82E2	; Restore offset
+	ASL A									;0C82E3	; *2 again (*8 total)
+	ADC.W #$0C94							;0C82E4	; Add table base 2
+	JSR.W CODE_0C83CB						;0C82E7	; Execute table entry 2
+	REP #$30								;0C82EA	; 16-bit A/X/Y
+	TYA										;0C82EC	; Load Y (result from previous call)
+	CLC										;0C82ED	; Clear carry
+	ADC.W #$0004							;0C82EE	; Add 4
+	JSR.W CODE_0C83CB						;0C82F1	; Execute table entry 3
+	JMP.W CODE_0C825A						;0C82F4	; Continue script
+
+; Mid-range command handler ($40-$7F)
+CODE_0C82F7:
+	SBC.B #$30								;0C82F7	; Normalize command ($40+ → $10+)
+	LSR A									;0C82F9	; /2
+	LSR A									;0C82FA	; /4
+	LSR A									;0C82FB	; /8
+	STA.W $0200								;0C82FC	; Store effect type
+	JMP.W CODE_0C825A						;0C82FF	; Continue script
+
+; Low-range command handler ($08-$3F)
+CODE_0C8302:
+	CMP.B #$08								;0C8302	; Command = $08?
+	BNE CODE_0C837D							;0C8304	; Branch if not $08
+	LDA.W $015F								;0C8306	; Load parameter
+	BNE CODE_0C831E							;0C8309	; Branch if parameter != 0
+	REP #$30								;0C830B	; 16-bit A/X/Y
+	LDA.W #$3C03							;0C830D	; Bit mask
+	TRB.W $0E08								;0C8310	; Clear bits in window config
+	LDA.W #$0002							;0C8313	; New value
+	TSB.W $0E08								;0C8316	; Set bits in window config
+	SEP #$20								;0C8319	; 8-bit accumulator
+	JMP.W CODE_0C825A						;0C831B	; Continue script
+
+; Parameter-based table lookup
+CODE_0C831E:
+	REP #$30								;0C831E	; 16-bit A/X/Y
+	LDA.W $015F								;0C8320	; Load parameter
+	ASL A									;0C8323	; *2
+	ASL A									;0C8324	; *4
+	PHA										;0C8325	; Save offset
+	ADC.W #$0C80							;0C8326	; Add table base 1
+	TAY										;0C8329	; Use as index
+	LDA.W $0C80								;0C832A	; Load value from table
+	STA.W $0000,Y							;0C832D	; Store to destination
+	PLA										;0C8330	; Restore offset
+	ASL A									;0C8331	; *2 (*8 total)
+	ADC.W #$0C94							;0C8332	; Add table base 2
+	TAY										;0C8335	; Use as index
+	LDA.W $0C94								;0C8336	; Load first value
+	STA.W $0000,Y							;0C8339	; Store to destination
+	LDA.W $0C98								;0C833C	; Load second value
+	STA.W $0004,Y							;0C833F	; Store to destination+4
+	LDY.W $015F								;0C8342	; Load parameter
+	LDA.W #$0003							;0C8345	; Bit shift value = 3
+
+; Bit shift loop
+CODE_0C8348:
+	ASL A									;0C8348	; Shift left *2
+	ASL A									;0C8349	; Shift left *2 (total *4)
+	DEY										;0C834A	; Decrement parameter
+	BNE CODE_0C8348							;0C834B	; Loop until parameter = 0
+	PHA										;0C834D	; Save shifted value
+	TRB.W $0E08								;0C834E	; Clear bits in window config
+	AND.W #$AAAA							;0C8351	; Mask pattern ($AAAA)
+	TSB.W $0E08								;0C8354	; Set masked bits
+	PLA										;0C8357	; Restore shifted value
+	LDY.W $015F								;0C8358	; Reload parameter
+	LSR A									;0C835B	; Shift right /2
+	LSR A									;0C835C	; Shift right /2 (total /4)
+
+; Second bit shift loop
+CODE_0C835D:
+	ASL A									;0C835D	; Shift left *2
+	ASL A									;0C835E	; Shift left *2 (total *4)
+	DEY										;0C835F	; Decrement parameter
+	BNE CODE_0C835D							;0C8360	; Loop until parameter = 0
+	LSR A									;0C8362	; Shift right /2
+	LSR A									;0C8363	; Shift right /2 (total /4)
+	PHA										;0C8364	; Save value
+	LSR A									;0C8365	; Shift right /2
+	LSR A									;0C8366	; Shift right /2
+	ORA.B $01,S								;0C8367	; OR with stack value
+	TRB.W $0E0A								;0C8369	; Clear bits in second window config
+	CMP.W #$0003							;0C836C	; Compare to 3
+	BNE CODE_0C8377							;0C836F	; Branch if not equal
+	LDA.W #$C000							;0C8371	; Top bits mask
+	TRB.W $0E08								;0C8374	; Clear top bits in first window config
+
+CODE_0C8377:
+	PLA										;0C8377	; Clean up stack
+	SEP #$20								;0C8378	; 8-bit accumulator
+	JMP.W CODE_0C825A						;0C837A	; Continue script
+
+; ==============================================================================
+; Complex Screen Effect Setup (Command $08+)
+; ==============================================================================
+; Initializes multi-stage screen effects combining VRAM updates,
+; palette fades, and color window operations.
+; ==============================================================================
+
+CODE_0C837D:
+	PHX										;0C837D	; Save script pointer
+	JSR.W CODE_0C8157						;0C837E	; Calculate VRAM addresses
+	JSR.W CODE_0C8142						;0C8381	; Setup window effects
+	JSR.W CODE_0C83B1						;0C8384	; Execute effect stage 1
+	JSR.W CODE_0C83B1						;0C8387	; Execute effect stage 2
+	JSR.W CODE_0C83B1						;0C838A	; Execute effect stage 3
+	LDA.B #$10								;0C838D	; Loop counter = 16 frames
+
+CODE_0C838F:
+	PHA										;0C838F	; Save counter
+	JSR.W CODE_0C81CB						;0C8390	; Enable color addition
+	JSR.W CODE_0C85DB						;0C8393	; Wait one frame
+	JSR.W CODE_0C85DB						;0C8396	; Wait one frame
+
+; [Additional effect code continues...]
+
+; ==============================================================================
+; End of Bank $0C Cycle 1
+; ==============================================================================
+; Lines documented: 400 source lines (100-500)
+; Address range: $0C80B2-$0C8399 (partial)
+; Major systems: Screen init, VRAM management, palette DMA, effect scripts
+; ==============================================================================
