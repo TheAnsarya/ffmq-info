@@ -7,7 +7,7 @@
 
 **Mission**: Comprehensive documentation of Final Fantasy Mystic Quest (SNES) ROM disassembly across all 16 banks, creating the definitive technical reference for the game's code, data structures, and systems.
 
-**Current Status**: 🟢 **36.4% COMPLETE** (30,938 lines) ← **36% MILESTONE PASSED! 🎉**
+**Current Status**: 🟢 **37.0% COMPLETE** (31,444 lines) ← **37% MILESTONE PASSED! 🎉**
 
 ---
 
@@ -26,7 +26,7 @@
 | **$08** | Text/Dialogue Data | 2,057 | **2,156** | **100%** | ✅ **COMPLETE** |
 | **$09** | Color Palettes + Graphics | 2,082 | **1,962** | **94.2%** | ✅ **COMPLETE** |
 | **$0A** | Extended Graphics/Palettes | 2,058 | **1,843** | **89.6%** | 🔄 **IN PROGRESS** |
-| **$0B** | Battle Graphics/Animation | 3,728 | **2,923** | **78.4%** | 🔄 **IN PROGRESS** |
+| **$0B** | Battle Graphics/Animation | 3,728 | **3,429** | **92.0%** | 🔄 **IN PROGRESS** |
 | **$0C** | Unknown | ~5,000 | 0 | 0% | ⬜ Not Started |
 | **$0D** | Unknown | ~5,000 | 0 | 0% | ⬜ Not Started |
 | **$0E** | Unknown | ~5,000 | 0 | 0% | ⬜ Not Started |

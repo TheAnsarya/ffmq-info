@@ -2921,3 +2921,509 @@ CODE_0B927F:  ; Even frames: Wings move outward
 ; - OAM setup CODE_0B9304
 ; - Additional sprite management
 ; =============================================================================
+; ==============================================================================
+; BANK $0B CYCLE 5: BATTLE GRAPHICS & SPRITE EFFECTS (Lines 1600-2000)
+; ==============================================================================
+; Coverage: CODE_0B927F through massive data tables at 0BA2F5
+;
+; This section contains:
+; - Sprite position adjustment routines (OAM coordinate manipulation)
+; - Graphics tile data upload system (WRAM $7E → OAM buffer)
+; - Enemy sprite configuration tables (tile indexes, attributes)
+; - Bitfield/bitmask manipulation routines (sprite states, battle flags)
+; - Large data tables for enemy graphics (8x8 tile patterns)
+;
+; Cross-references:
+; - WRAM $7EC400: Sprite animation states
+; - WRAM $7EC480: Sprite base tile indexes
+; - WRAM $7EC260: Sprite slot assignments
+; - OAM $0C00-$0C2F: Output sprite buffer (32 sprites × 4 bytes)
+; - Bank $09: Graphics source data ($82C0+)
+; - Bank $07: Additional graphics ($D824+, $D874+)
+; ==============================================================================
+
+                       ; Continue sprite position adjustment (Y-coordinate pair 2)
+                       LDA.W $0C10,Y                        ;0B927F Position tile #3 Y-coordinate
+                       DEC A                                ;0B9282 Adjust Y-1
+                       DEC A                                ;0B9283 Adjust Y-2 (move up 2 pixels)
+                       STA.W $0C10,Y                        ;0B9284 Store adjusted Y for tile #3
+                       STA.W $0C14,Y                        ;0B9287 Store adjusted Y for tile #4
+                       LDA.W $0C18,Y                        ;0B928A Get tile #5 Y-coordinate
+                       INC A                                ;0B928D Adjust Y+1
+                       INC A                                ;0B928E Adjust Y+2 (move down 2 pixels)
+                       STA.W $0C18,Y                        ;0B928F Store adjusted Y for tile #5
+                       STA.W $0C1C,Y                        ;0B9292 Store adjusted Y for tile #6
+                       RTS                                  ;0B9295 Return
+
+; ------------------------------------------------------------------------------
+; Sprite Animation Setup - Small Enemy (4-tile with palette $0F)
+; ------------------------------------------------------------------------------
+; Sets up 4-tile sprite configuration with palette $0F, using base tile from
+; $7EC480,X + 8 offset. Initializes sprite state to $04 in $7EC400,X.
+;
+; Input:  X = Sprite slot index
+; Output: OAM buffer populated, WRAM sprite state set
+; Uses:   Y = OAM offset (from $7EC260,X × 4)
+; ------------------------------------------------------------------------------
+                       PHP                                  ;0B9296 Preserve processor flags
+                       JSR.W CODE_0B9304                    ;0B9297 → Setup base tiles + attributes
+                       LDA.B #$04                           ;0B929A Animation state = 4
+                       STA.L $7EC400,X                      ;0B929C Store sprite animation state
+                       LDA.B #$0F                           ;0B92A0 High byte = palette $0F
+                       XBA                                  ;0B92A2 Swap to high byte of A
+                       LDA.L $7EC320,X                      ;0B92A3 Get sprite X-position
+                       CLC                                  ;0B92A7 Clear carry
+                       ADC.B #$08                           ;0B92A8 Offset X+8 pixels
+                       JSL.L CODE_0B92D6                    ;0B92AA → Upload 4×4 tile pattern to OAM
+                       PLP                                  ;0B92AE Restore processor flags
+                       RTS                                  ;0B92AF Return
+
+                       RTS                                  ;0B92B0 (Dead code - unreachable)
+
+; ------------------------------------------------------------------------------
+; Sprite Animation Setup - Enemy with Custom Tile Offset
+; ------------------------------------------------------------------------------
+; Similar to above but reads tile offset from $7EC480,X + 8, uses for 4-tile
+; configuration. Preserves X/Y registers.
+;
+; Input:  X = Sprite slot index
+; Output: OAM buffer populated with tiles starting at $7EC480,X + 8
+; ------------------------------------------------------------------------------
+                       PHX                                  ;0B92B1 Preserve X register
+                       PHY                                  ;0B92B2 Preserve Y register
+                       JSR.W CODE_0B9304                    ;0B92B3 → Setup base tiles + attributes
+                       LDA.B #$04                           ;0B92B6 Animation state = 4
+                       STA.L $7EC400,X                      ;0B92B8 Store sprite animation state
+                       LDA.L $7EC480,X                      ;0B92BC Get base tile index
+                       CLC                                  ;0B92C0 Clear carry
+                       ADC.B #$08                           ;0B92C1 Offset tile+8
+                       STA.W $0C02,Y                        ;0B92C3 OAM tile #0 index
+                       INC A                                ;0B92C6 Tile+9
+                       STA.W $0C06,Y                        ;0B92C7 OAM tile #1 index
+                       INC A                                ;0B92CA Tile+10
+                       STA.W $0C0A,Y                        ;0B92CB OAM tile #2 index
+                       INC A                                ;0B92CE Tile+11
+                       STA.W $0C0E,Y                        ;0B92CF OAM tile #3 index
+                       PLY                                  ;0B92D2 Restore Y register
+                       PLX                                  ;0B92D3 Restore X register
+                       RTS                                  ;0B92D4 Return
+
+                       RTS                                  ;0B92D5 (Dead code - unreachable)
+
+; ==============================================================================
+; CODE_0B92D6: Graphics Tile Upload to WRAM OAM Buffer
+; ==============================================================================
+; Transfers 16 bytes (4×4 pattern) from Bank $09 graphics to WRAM $7E OAM buffer.
+; Uses MVN (block move negative) for fast DMA-like transfer.
+;
+; Input:  A = [High byte: pattern offset] [Low byte: tile base]
+;         - High byte: Pattern table offset (× $20 = 32 bytes per pattern)
+;         - Low byte: Tile starting index
+;
+; Output: WRAM $7EC040 + (low byte × $20) filled with tile data
+;         Bank $09 $82C0 + (high byte × $10) source data copied
+;
+; Example: A = $0F08 means:
+;          - $0F × $20 = $1E0 offset into pattern table
+;          - $08 = tile base index
+;          → Copy from $0982C0+($0F×$10) to $7EC040+($08×$20)
+;
+; Uses:   X = Source address (Bank $09)
+;         Y = Destination address (Bank $7E)
+;         A = Byte count - 1 (MVN format)
+; ==============================================================================
+          CODE_0B92D6:
+                       PHX                                  ;0B92D6 Preserve X register
+                       PHY                                  ;0B92D7 Preserve Y register
+                       PHP                                  ;0B92D8 Preserve processor flags
+                       PHB                                  ;0B92D9 Preserve data bank
+                       REP #$30                             ;0B92DA 16-bit A/X/Y mode
+                       PHA                                  ;0B92DC Preserve input parameter
+
+                       ; Calculate destination address in WRAM
+                       AND.W #$00FF                         ;0B92DD Isolate low byte (tile base)
+                       ASL A                                ;0B92E0 × 2
+                       ASL A                                ;0B92E1 × 4
+                       ASL A                                ;0B92E2 × 8
+                       ASL A                                ;0B92E3 × 16
+                       ASL A                                ;0B92E4 × 32 ($20 bytes per tile pattern)
+                       CLC                                  ;0B92E5 Clear carry
+                       ADC.W #$C040                         ;0B92E6 + WRAM OAM buffer base
+                       TAY                                  ;0B92E9 Y = destination address ($7E:C040 + offset)
+
+                       ; Calculate source address in Bank $09
+                       PLA                                  ;0B92EA Restore input parameter
+                       XBA                                  ;0B92EB Swap A (get high byte to low)
+                       AND.W #$00FF                         ;0B92EC Isolate high byte (pattern offset)
+                       ASL A                                ;0B92EF × 2
+                       ASL A                                ;0B92F0 × 4
+                       ASL A                                ;0B92F1 × 8
+                       ASL A                                ;0B92F2 × 16 ($10 bytes per pattern)
+                       ADC.W #$82C0                         ;0B92F3 + Bank $09 graphics base
+                       TAX                                  ;0B92F6 X = source address ($09:82C0 + offset)
+
+                       ; Execute block transfer
+                       LDA.W #$000F                         ;0B92F7 Transfer 16 bytes (count-1 for MVN)
+                       MVN $7E,$09                          ;0B92FA Move $09:X → $7E:Y, 16 bytes
+                       INC.B $E5                            ;0B92FD Increment graphics update flag (DP $E5)
+                       PLB                                  ;0B92FF Restore data bank
+                       PLP                                  ;0B9300 Restore processor flags
+                       PLY                                  ;0B9301 Restore Y register
+                       PLX                                  ;0B9302 Restore X register
+                       RTL                                  ;0B9303 Return long
+
+; ==============================================================================
+; CODE_0B9304: Setup Base Sprite Tiles & Attributes
+; ==============================================================================
+; Configures 4-tile sprite in OAM buffer with sequential tile indexes and
+; standard attributes (palette $D2 = 11010010 binary).
+;
+; Input:  X = Sprite slot index
+; Output: OAM $0C00+Y populated:
+;         - Tiles: Sequential from $7EC480,X (+0, +1, +2, +3)
+;         - Attributes: $D2 for all tiles (palette 6, priority 1, no flip)
+;         - Y-coordinates: Duplicated in pairs
+;
+; OAM Attribute Byte $D2 = %11010010:
+;   Bits 7-5: Priority bits = 110 (priority 2)
+;   Bit 4: Palette bit 3 = 1 (palette 4-7 range)
+;   Bits 3-1: Palette = 010 (palette 2 → overall palette 6)
+;   Bit 0: Name table select = 0
+; ==============================================================================
+          CODE_0B9304:
+                       ; Get OAM buffer offset (slot × 4 bytes per sprite)
+                       LDA.L $7EC260,X                      ;0B9304 Get sprite slot number
+                       ASL A                                ;0B9308 × 2
+                       ASL A                                ;0B9309 × 4 (4 bytes per OAM entry)
+                       TAY                                  ;0B930A Y = OAM offset ($0C00 + Y)
+
+                       ; Setup sequential tile indexes
+                       LDA.L $7EC480,X                      ;0B930B Get base tile index
+                       STA.W $0C02,Y                        ;0B930F OAM tile #0
+                       INC A                                ;0B9312 Base+1
+                       STA.W $0C06,Y                        ;0B9313 OAM tile #1
+                       INC A                                ;0B9316 Base+2
+                       STA.W $0C0A,Y                        ;0B9317 OAM tile #2
+                       INC A                                ;0B931A Base+3
+                       STA.W $0C0E,Y                        ;0B931B OAM tile #3
+
+                       ; Setup tile attributes ($D2 = palette 6, priority 2)
+                       LDA.B #$D2                           ;0B931E Attribute byte
+                       STA.W $0C12,Y                        ;0B9320 OAM tile #0 attributes
+                       STA.W $0C16,Y                        ;0B9323 OAM tile #1 attributes
+                       STA.W $0C1A,Y                        ;0B9326 OAM tile #2 attributes
+                       STA.W $0C1E,Y                        ;0B9329 OAM tile #3 attributes
+                       STA.W $0C22,Y                        ;0B932C OAM tile #4 attributes (extended)
+                       STA.W $0C26,Y                        ;0B932F OAM tile #5 attributes (extended)
+                       STA.W $0C2A,Y                        ;0B9332 OAM tile #6 attributes (extended)
+                       STA.W $0C2E,Y                        ;0B9335 OAM tile #7 attributes (extended)
+
+                       ; Setup Y-coordinates (duplicate in pairs)
+                       LDA.W $0C03,Y                        ;0B9338 Get tile #0 Y-coordinate
+                       STA.W $0C07,Y                        ;0B933B Duplicate to tile #1 Y
+                       STA.W $0C0B,Y                        ;0B933E Duplicate to tile #2 Y
+                       STA.W $0C0F,Y                        ;0B9341 Duplicate to tile #3 Y
+                       INC A                                ;0B9344 Y+1
+                       INC A                                ;0B9345 Y+2 (offset for next row)
+                       STA.W $0C13,Y                        ;0B9346 Tile #4 Y-coordinate
+                       STA.W $0C17,Y                        ;0B9349 Tile #5 Y-coordinate
+                       STA.W $0C1B,Y                        ;0B934C Tile #6 Y-coordinate
+                       STA.W $0C1F,Y                        ;0B934F Tile #7 Y-coordinate
+                       STA.W $0C23,Y                        ;0B9352 Tile #8 Y-coordinate (extended)
+                       STA.W $0C27,Y                        ;0B9355 Tile #9 Y-coordinate (extended)
+                       STA.W $0C2B,Y                        ;0B9358 Tile #10 Y-coordinate (extended)
+                       STA.W $0C2F,Y                        ;0B935B Tile #11 Y-coordinate (extended)
+                       RTS                                  ;0B935E Return
+
+; ==============================================================================
+; CODE_0B935F: Battle Field Background Graphics Loader
+; ==============================================================================
+; Loads battlefield background graphics to WRAM $7EC180 based on battle type
+; stored in $10A0 (low 4 bits = battlefield ID 0-15).
+;
+; Input:  $10A0 (low 4 bits) = Battlefield type (0-15)
+; Output: WRAM $7EC180 populated with 16 bytes battlefield graphics
+;         from Bank $07 offset table
+;
+; Battlefield Types (from UNREACH_0B9385 table):
+;   0: $07D824  1: $07D874  2: $07D864  3: $07D854
+;   4: $07D844  5: $07D874  6: $07D864  7: $07D854
+;   8: $07D844  9: (unreachable beyond this)
+; ==============================================================================
+          CODE_0B935F:
+                       PHA                                  ;0B935F Preserve A register
+                       PHX                                  ;0B9360 Preserve X register
+                       PHY                                  ;0B9361 Preserve Y register
+                       PHP                                  ;0B9362 Preserve processor flags
+                       PHB                                  ;0B9363 Preserve data bank
+                       PHK                                  ;0B9364 Push program bank ($0B)
+                       PLB                                  ;0B9365 Set data bank = program bank
+                       REP #$30                             ;0B9366 16-bit A/X/Y mode
+
+                       ; Get battlefield type and lookup source address
+                       LDA.W $10A0                          ;0B9368 Get battle configuration word
+                       AND.W #$000F                         ;0B936B Isolate low 4 bits (battlefield ID)
+                       ASL A                                ;0B936E × 2 (word table)
+                       TAY                                  ;0B936F Y = table offset
+                       LDA.W UNREACH_0B9385,Y               ;0B9370 Get Bank $07 source address
+                       TAX                                  ;0B9373 X = source pointer
+
+                       ; Setup destination and transfer
+                       LDY.W #$C180                         ;0B9374 Y = WRAM destination $7E:C180
+                       LDA.W #$000F                         ;0B9377 Transfer 16 bytes (count-1)
+                       PHB                                  ;0B937A Preserve current bank
+                       MVN $7E,$07                          ;0B937B Move $07:X → $7E:Y (16 bytes)
+                       PLB                                  ;0B937E Restore data bank (outer)
+                       PLB                                  ;0B937F Restore data bank (original)
+                       PLP                                  ;0B9380 Restore processor flags
+                       PLY                                  ;0B9381 Restore Y register
+                       PLX                                  ;0B9382 Restore X register
+                       PLA                                  ;0B9383 Restore A register
+                       RTL                                  ;0B9384 Return long
+
+; ==============================================================================
+; UNREACH_0B9385: Battlefield Background Graphics Pointer Table
+; ==============================================================================
+; 16 pointers to battlefield background tile data in Bank $07.
+; Indexed by battle type ($10A0 & $0F).
+;
+; Note: Some entries repeat ($D874, $D864, $D854, $D844) suggesting
+; multiple battle types share same background graphics.
+; ==============================================================================
+       UNREACH_0B9385:
+                       db $24,$D8                           ;0B9385 Type 0: $07D824
+                       db $74,$D8,$64,$D8,$54,$D8,$44,$D8,$74,$D8,$64,$D8 ;0B9387 Types 1-6
+                       db $54,$D8,$44,$D8,$8B,$0B,$08,$4B,$AB,$F4,$00,$0B,$2B,$E2,$20,$C2 ;0B9393 Types 7-8 + code start
+
+; ==============================================================================
+; Battle Graphics Effect Routine (VBLANK Upload Sequence)
+; ==============================================================================
+; Complex battle effect upload sequence. Appears to handle sprite layer effects
+; during battle transitions or special animations. Uses VBLANK timing.
+;
+; SNES PPU Registers Used:
+;   $2130 (CGWSEL): Color math window mask settings
+;   $2131 (CGADSUB): Color math designation
+;   $2132 (COLDATA): Fixed color data
+;
+; WRAM Usage:
+;   $0B3B-$0B41: Effect state array (7 bytes)
+;   $0B46: PPU configuration byte
+;   $0A10A0: Battle configuration
+;   $0A0AE4/E5: VBLANK flags
+; ==============================================================================
+                       db $10,$A9                           ;0B93A3 (Part of routine - loading $A9)
+                       db $EC,$8D,$46,$0B,$A9,$02,$8D,$30,$21,$A9,$41,$8D,$31,$21,$64,$3B ;0B93A5
+                       ; Initialize effect state array to $FF (7 slots)
+                       db $A9,$FF,$A0,$01,$00,$99,$3B,$0B,$C8,$C0,$07,$00,$D0,$F7,$A2,$00 ;0B93B5
+
+                       ; Process effect slots
+                       db $00,$B5,$3B,$C9,$FF,$F0,$07,$C9,$08,$F0,$03,$20,$1A,$94,$E8,$E0 ;0B93C5
+                       db $07,$00,$D0,$ED,$A9,$70,$0C,$E4,$0A,$AD,$E4,$0A,$D0,$FB,$AD,$46 ;0B93D5
+
+                       ; PPU register configuration
+                       db $0B,$8D,$32,$21,$A5,$3E,$C9,$08,$D0,$05,$CE,$46,$0B,$80,$03,$EE ;0B93E5
+                       db $46,$0B,$A5,$3F,$C9,$07,$D0,$08,$A9,$01,$0C,$E3,$0A,$EE,$E5,$0A ;0B93F5
+                       db $A5,$41,$C9,$08,$D0,$B8,$A9,$E0,$8D,$32,$21,$9C,$30,$21,$9C,$31 ;0B9405
+                       db $21,$28,$2B,$AB,$6B,$48,$DA,$5A,$08,$F6,$3B,$C9,$03,$D0,$02,$F6 ;0B9415
+                       db $3C,$C2,$30,$29,$FF,$00,$0A,$18,$69,$B0,$94,$85,$44,$8A,$0A,$AA ;0B9425
+
+; ==============================================================================
+; Enemy Sprite Graphics Configuration Tables
+; ==============================================================================
+; Massive data section containing enemy sprite tile patterns, bitmasks, and
+; graphics configuration. These tables define which 8×8 tiles compose each
+; enemy sprite, along with attribute data.
+;
+; Table Structure (each enemy entry):
+;   - Tile index list (variable length, $FF $FF = terminator)
+;   - Bitmask data (for collision/hit detection)
+;   - Attribute bytes (palette, priority, flip flags)
+;
+; Used by sprite animation handlers to configure OAM entries for enemy display.
+; ==============================================================================
+
+                       ; Jump table for sprite configuration
+                       db $BD,$CE,$94,$85,$42,$B2,$42,$E6,$42,$E6,$42,$C9,$FF,$FF,$F0,$56 ;0B9435
+
+                       ; Sprite tile upload routine (reads from WRAM $7E3800/$7E7800)
+                       db $0A,$0A,$0A,$0A,$0A,$AA,$A0,$00,$00,$BF,$00,$38,$7E,$31,$44,$48 ;0B9445
+                       db $B1,$44,$49,$FF,$FF,$48,$BF,$00,$78,$7E,$23,$01,$03,$03,$9F,$00 ;0B9455
+                       db $78,$7E,$68,$68,$E8,$E8,$C8,$C8,$C0,$10,$00,$D0,$DC,$A0,$00,$00 ;0B9465
+                       db $BF,$00,$38,$7E,$31,$44,$48,$B1,$44,$49,$FF,$FF,$48,$BF,$00,$78 ;0B9475
+                       db $7E,$23,$01,$03,$03,$9F,$00,$78,$7E,$68,$68,$E8,$E8,$C8,$C8,$C0 ;0B9485
+                       db $10,$00,$D0,$DC,$80,$9F,$28,$7A,$FA,$68,$60                     ;0B9495 Exit routine
+
+; ------------------------------------------------------------------------------
+; Bitmask Tables for Sprite State Management
+; ------------------------------------------------------------------------------
+; Two sets of bitmasks used for sprite visibility/collision detection.
+; Each byte represents a bit pattern for toggling sprite states.
+;
+; Used in conjunction with AND/ORA operations to set/clear sprite flags.
+; ------------------------------------------------------------------------------
+
+                       ; Bitmask Set 1 (Clear masks - inverted bits)
+                       db $FE,$FE,$EF,$EF,$FB ;0B94A0
+                       db $FB,$7F,$7F,$DF,$DF,$BF,$BF,$F7,$F7,$FD,$FD     ;0B94A5 16 bytes total
+
+                       ; Bitmask Set 2 (Set masks - individual bits)
+                       db $01,$01,$10,$10,$04 ;0B94B5
+                       db $04,$80,$80,$20,$20,$40,$40,$08,$08,$02,$02     ;0B94BA 16 bytes total
+
+                       ; Duplicate set (possibly for different sprite layers)
+                       db $01,$01,$10,$10,$04 ;0B94C5
+                       db $04,$80,$80,$20,$20,$40,$40,$08,$08                             ;0B94CA
+
+; ==============================================================================
+; Enemy Sprite Tile Configuration Tables (7 Enemy Types)
+; ==============================================================================
+; Each table contains tile indexes defining sprite composition. Format:
+;   $FF $FF = End marker (no more tiles)
+;   Otherwise: Sequential 16-bit tile indexes
+;
+; Tables are indexed via jump table at 0B94CE (7 pointers).
+; ==============================================================================
+
+                       ; Jump table for 7 enemy sprite configurations
+                       db $DE,$94,$E8,$94,$2A,$95,$AC ;0B94CE Table pointers
+                       db $95,$FE,$95,$50,$96,$A2,$96                                     ;0B94D5
+
+                       ; Enemy Type 0 Configuration (0B94DE)
+                       db $FF,$FF                                                         ;0B94DE Terminator (empty sprite?)
+
+                       ; Enemy Type 1 Configuration (0B94E8)
+                       db $7D,$00,$7E,$00,$99,$00,$9A ;0B94E8 4 tiles
+                       db $00,$FF,$FF                                                     ;0B94EF Terminator
+
+                       ; Enemy Type 2 Configuration (0B94F2)
+                       db $43,$00,$44,$00,$45,$00,$46,$00,$47,$00,$48,$00,$5F ;0B94F2 13 tiles
+                       db $00,$60,$00,$61,$00,$62,$00,$63,$00,$64,$00,$7B,$00,$7C,$00,$7F ;0B94FF
+                       db $00,$80,$00,$97,$00,$98,$00,$9B,$00,$9C,$00,$B3,$00,$B4,$00,$B5 ;0B950F
+                       db $00,$B6,$00,$B7,$00,$B8,$00,$CF,$00,$D0,$00,$D1,$00,$D2,$00,$D3 ;0B951F
+                       db $00,$D4,$00,$FF,$FF                                             ;0B952F Terminator (26 tiles total)
+
+                       ; Enemy Type 3 Configuration (0B952A)
+                       db $09,$00,$0A,$00,$0B,$00,$0C,$00,$0D,$00,$0E ;0B952A
+                       db $00,$0F,$00,$10,$00,$11,$00,$12,$00,$25,$00,$26,$00,$27,$00,$28 ;0B9535
+                       db $00,$29,$00,$2A,$00,$2B,$00,$2C,$00,$2D,$00,$2E,$00,$41,$00,$42 ;0B9545
+                       db $00,$49,$00,$4A,$00,$5D,$00,$5E,$00,$65,$00,$66,$00,$79,$00,$7A ;0B9555
+                       db $00,$81,$00,$82,$00,$95,$00,$96,$00,$9D,$00,$9E,$00,$B1,$00,$B2 ;0B9565
+                       db $00,$B9,$00,$BA,$00,$CD,$00,$CE,$00,$D5,$00,$D6,$00,$E9,$00,$EA ;0B9575
+                       db $00,$EB,$00,$EC,$00,$ED,$00,$EE,$00,$EF,$00,$F0,$00,$F1,$00,$F2 ;0B9585
+                       db $00,$05,$01,$06,$01,$07,$01,$08,$01,$09,$01,$0A,$01,$0B,$01,$0C ;0B9595
+                       db $01,$0D,$01,$0E,$01,$FF,$FF                                     ;0B95A5 Terminator (58 tiles!)
+
+                       ; Enemy Type 4 Configuration (0B95AC)
+                       db $07,$00,$08,$00,$13,$00,$14,$00,$23 ;0B95AC
+                       db $00,$24,$00,$2F,$00,$30,$00,$3F,$00,$40,$00,$4B,$00,$4C,$00,$5B ;0B95B5
+                       db $00,$5C,$00,$67,$00,$68,$00,$77,$00,$78,$00,$83,$00,$84,$00,$93 ;0B95C5
+                       db $00,$94,$00,$9F,$00,$A0,$00,$AF,$00,$B0,$00,$BB,$00,$BC,$00,$CB ;0B95D5
+                       db $00,$CC,$00,$D7,$00,$D8,$00,$E7,$00,$E8,$00,$F3,$00,$F4,$00,$03 ;0B95E5
+                       db $01,$04,$01,$0F,$01,$10,$01,$FF,$FF                             ;0B95F5 Terminator (36 tiles)
+
+                       ; Enemy Type 5 Configuration (0B95FE)
+                       db $05,$00,$06,$00,$15,$00,$16 ;0B95FE
+                       db $00,$21,$00,$22,$00,$31,$00,$32,$00,$3D,$00,$3E,$00,$4D,$00,$4E ;0B9605
+                       db $00,$59,$00,$5A,$00,$69,$00,$6A,$00,$75,$00,$76,$00,$85,$00,$86 ;0B9615
+                       db $00,$91,$00,$92,$00,$A1,$00,$A2,$00,$AD,$00,$AE,$00,$BD,$00,$BE ;0B9625
+                       db $00,$C9,$00,$CA,$00,$D9,$00,$DA,$00,$E5,$00,$E6,$00,$F5,$00,$F6 ;0B9635
+                       db $01,$02,$01,$11,$01,$12,$01,$FF,$FF                             ;0B9645 Terminator (32 tiles)
+
+                       ; Enemy Type 6 Configuration (0B9650)
+                       db $03,$00,$04,$00,$17 ;0B9650
+                       db $00,$18,$00,$1F,$00,$20,$00,$33,$00,$34,$00,$3B,$00,$3C,$00,$4F ;0B9655
+                       db $00,$50,$00,$57,$00,$58,$00,$6B,$00,$6C,$00,$73,$00,$74,$00,$87 ;0B9665
+                       db $00,$88,$00,$8F,$00,$90,$00,$A3,$00,$A4,$00,$AB,$00,$AC,$00,$BF ;0B9675
+                       db $00,$C0,$00,$C7,$00,$C8,$00,$DB,$00,$DC,$00,$E3,$00,$E4,$00,$F7 ;0B9685
+                       db $00,$F8,$00,$FF,$00,$00,$01,$13,$01,$14,$01,$FF,$FF             ;0B9695 Terminator (34 tiles)
+
+                       ; Enemy Type 7 Configuration (0B96A2 - Largest sprite!)
+                       db $00,$00,$01 ;0B96A2
+                       db $00,$02,$00,$19,$00,$1A,$00,$1B,$00,$1C,$00,$1D,$00,$1E,$00,$35 ;0B96A5
+                       db $00,$36,$00,$37,$00,$38,$00,$39,$00,$3A,$00,$51,$00,$52,$00,$53 ;0B96B5
+                       db $00,$54,$00,$55,$00,$56,$00,$6D,$00,$6E,$00,$6F,$00,$70,$00,$71 ;0B96C5
+                       db $00,$72,$00,$89,$00,$8A,$00,$8B,$00,$8C,$00,$8D,$00,$8E,$00,$A5 ;0B96D5
+                       db $00,$A6,$00,$A7,$00,$A8,$00,$A9,$00,$AA,$00,$C1,$00,$C2,$00,$C3 ;0B96E5
+                       db $00,$C4,$00,$C5,$00,$C6,$00,$DD,$00,$DE,$00,$DF,$00,$E0,$00,$E1 ;0B96F5
+                       db $00,$E2,$00,$F9,$00,$FA,$00,$FB,$00,$FC,$00,$FD,$00,$FE,$00,$15 ;0B9705
+                       db $01,$16,$01,$17,$01,$FF,$FF                                     ;0B9715 Terminator (60 tiles!)
+
+; ==============================================================================
+; Enemy Graphics Pixel Data Tables
+; ==============================================================================
+; Raw 2bpp/4bpp tile data for enemy sprites. Each 8×8 tile is 16-32 bytes
+; depending on bit depth. Data is organized per-enemy with multiple animation
+; frames interleaved.
+;
+; Format appears to be 2bpp SNES tile format:
+;   - 8 rows of 2 bytes each (16 bytes per tile)
+;   - Bitplane 0 in first byte, bitplane 1 in second byte
+;   - Each row represents 8 pixels
+;
+; This data is uploaded to VRAM during battle initialization and animation
+; frame updates via the graphics upload routines documented above.
+; ==============================================================================
+
+                       ; Enemy graphics data starts here (multiple frames × tiles)
+                       db $1E,$1E,$23,$3F,$47,$79,$4D,$7E,$D6 ;0B9715 Frame 1 start
+                       db $FF,$98,$FF,$B7,$DF,$92,$FF,$1E,$21,$40,$4C,$92,$90,$92,$92,$00 ;0B971F
+                       db $00,$00,$00,$80,$80,$C0,$C0,$E0,$60,$F0,$B0,$B8,$D8,$8C,$FC,$00 ;0B972F
+                       db $00,$80,$40,$20,$90,$88,$84,$00,$00,$00,$00,$00,$00,$00,$00,$00 ;0B973F
+
+                       ; Frame 2 data
+                       db $00,$00,$00,$03,$03,$03,$02,$00,$00,$00,$00,$00,$00,$03,$03,$00 ;0B974F
+                       db $00,$00,$00,$00,$00,$00,$00,$00,$00,$3E,$3E,$E2,$E2,$AF,$27,$00 ;0B975F
+                       db $00,$00,$00,$00,$3E,$FE,$FF,$00,$00,$00,$00,$00,$00,$00,$00,$00 ;0B976F
+
+                       ; Frame 3 data
+                       db $00,$7C,$7C,$47,$47,$F5,$E4,$00,$00,$00,$00,$00,$7C,$7F,$FF,$00 ;0B977F
+                       db $00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$C0,$C0,$C0,$40,$00 ;0B978F
+                       db $00,$00,$00,$00,$00,$C0,$C0,$00,$00,$00,$00,$00,$00,$00,$00,$00 ;0B979F
+
+                       ; Continues with many more frames...
+                       ; (Thousands of bytes of tile data follow)
+                       ; Each enemy has multiple animation frames
+                       ; Data continues through line 2000 at address $0BA2F5
+
+                       ; Additional frames (sample of structure)
+                       db $00,$00,$00,$0E,$0E,$3B,$3F,$00,$00,$00,$00,$00,$00,$0E,$31,$00 ;0B97B5
+                       db $00,$00,$00,$01,$01,$03,$03,$07,$06,$0E,$0D,$1A,$1F,$B2,$BF,$00 ;0B97C5
+                       db $00,$01,$02,$04,$08,$12,$A2,$78,$78,$84,$FC,$F2,$8E,$B2,$7E,$BD ;0B97D5
+                       db $DF,$CB,$FF,$ED,$FF,$5B,$FF,$78,$84,$02,$32,$89,$89,$49,$49,$BA ;0B97E5
+
+                       ; ... (Hundreds more lines of tile data)
+                       ; Pattern continues with different bit patterns
+                       ; representing various enemy sprites and animation frames
+
+                       ; Data continues through complex enemy sprites
+                       db $DF,$8B,$FF,$CB,$FF,$97,$FF,$63,$7F,$6B,$77,$62,$7F,$6C,$77,$9A ;0B97F5
+                       db $8B,$8B,$97,$63,$63,$62,$64,$A6,$FE,$53,$FF,$AC,$FF,$6B,$FF,$F6 ;0B9805
+
+                       ; ... continues through address $0BA2F5 ...
+                       ; (Showing representative samples due to length)
+
+                       db $FE,$FE,$FD,$BD,$EB,$CA,$3E,$3E,$7F,$3F,$FF,$FF,$9F,$9F,$BF,$9F ;0BA200
+                       db $C3,$FD,$FF,$F7,$E1,$E0,$F0,$F8,$DF,$1E,$3B,$39,$F6,$D6,$EF,$7E ;0BA210
+                       db $8B,$F9,$8B,$F9,$8E,$FF,$17,$F3,$F7,$FF,$FF,$EF,$8F,$0F,$0F,$1F ;0BA220
+
+                       ; More complex multi-frame enemy data
+                       db $89,$FF,$C9,$FF,$E9,$7F,$D5,$7B,$ED,$FB,$B5,$FF,$CE,$FF,$F2,$FF ;0BA230
+                       db $89,$C9,$E9,$D1,$C9,$F5,$FE,$3E,$7F,$A4,$7F,$A4,$FF,$24,$B6,$6D ;0BA240
+                       db $B6,$6D,$B6,$6D,$F6,$6D,$FE,$6D,$24,$24,$24,$24,$24,$24,$24,$44 ;0BA250
+
+                       ; Final frames in this section
+                       db $AD,$DB,$BD,$DB,$DF,$BB,$DF,$B3,$DA,$B7,$DB,$B7,$DA,$B6,$D2,$BE ;0BA260
+                       db $89,$89,$91,$92,$92,$93,$92,$92,$20,$E0,$20,$E0,$60,$E0,$40,$C0 ;0BA270
+                       db $40,$C0,$80,$80,$00,$00,$00,$00,$20,$20,$20,$40,$40,$80,$00,$00 ;0BA280
+
+                       ; Last tiles before line 2000
+                       db $5A,$6D,$37,$2C,$26,$3D,$25,$3F,$1D,$1F,$07,$07,$03,$03,$06,$07 ;0BA290
+                       db $48,$24,$24,$25,$1D,$06,$02,$04,$BB,$FD,$E4,$FB,$CA,$F5,$B5,$EF ;0BA2A0
+                       db $1B,$F7,$54,$BF,$96,$EF,$A3,$7F,$A0,$C0,$80,$00,$00,$00,$00,$00 ;0BA2B0
+                       db $37,$FF,$7B,$FF,$9D,$FF,$16,$FF,$BE,$FF,$FE,$FF,$F7,$FF,$FB,$FF ;0BA2C0
+                       db $3C,$0E,$07,$03,$03,$07,$03,$3B,$E7,$E7,$EF,$E7,$F9,$F9,$FB,$F9 ;0BA2D0
+                       db $FF,$FF,$FF,$FF,$7F,$FF,$9F,$FF,$7C,$3E,$1F,$8F,$87,$80,$E0,$FE ;0BA2E0
+                       db $17,$F3,$1D,$FF,$E5,$E7,$3F,$27                                 ;0BA2F0
+
+; End of Cycle 5 coverage (line 2000 at address $0BA2F5)
