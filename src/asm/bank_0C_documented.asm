@@ -696,3 +696,498 @@ CODE_0C838F:
 ; Address range: $0C80B2-$0C8399 (partial)
 ; Major systems: Screen init, VRAM management, palette DMA, effect scripts
 ; ==============================================================================
+; ==============================================================================
+; BANK $0C CYCLE 2 - Graphics Effects & Screen Transitions (Lines 500-900)
+; ==============================================================================
+; Address range: $0C8396-$0C8813
+; Systems: Screen effects, window animations, visual transitions, Mode 7 setup
+; ==============================================================================
+
+; [Continued from Cycle 1 ending at $0C8399]
+
+	JSR.W CODE_0C85DB						;0C8396	; Wait one frame (VBLANK sync)
+	LDA.B #$11								;0C8399	; Layer enable mask
+	STA.B SNES_TM-$2100						;0C839B	; Set main screen layers ($212C)
+	JSR.W CODE_0C81C6						;0C839D	; Disable color math
+	JSR.W CODE_0C85DB						;0C83A0	; Wait one frame
+	JSR.W CODE_0C85DB						;0C83A3	; Wait one frame
+	PLA										;0C83A6	; Restore loop counter
+	DEC A									;0C83A7	; Decrement
+	BNE CODE_0C838F							;0C83A8	; Loop if not done (16 frames total)
+	JSR.W CODE_0C81CB						;0C83AA	; Re-enable color addition
+	PLX										;0C83AD	; Restore script pointer
+	JMP.W CODE_0C825A						;0C83AE	; Continue effect script
+
+; ==============================================================================
+; CODE_0C83B1 - Flash Effect Subroutine
+; ==============================================================================
+; Creates white flash effect (bright → normal → bright sequence).
+; Used for lightning, magic spells, critical hits.
+; ==============================================================================
+
+CODE_0C83B1:
+	JSR.W CODE_0C81CB						;0C83B1	; Enable color addition
+	LDA.B #$11								;0C83B4	; Layer enable mask
+	STA.B SNES_TM-$2100						;0C83B6	; Set layers ($212C)
+	LDA.B #$3F								;0C83B8	; Fixed color = white ($3F)
+	STA.B SNES_COLDATA-$2100				;0C83BA	; Set color addition ($2132)
+	JSR.W CODE_0C85DB						;0C83BC	; Wait one frame (flash)
+	JSR.W CODE_0C81C6						;0C83BF	; Disable color math
+	JSR.W CODE_0C85DB						;0C83C2	; Wait one frame
+	JSR.W CODE_0C85DB						;0C83C5	; Wait one frame
+	JMP.W CODE_0C85DB						;0C83C8	; Wait one frame and return
+
+; ==============================================================================
+; CODE_0C83CB - Table-Based Effect Executor
+; ==============================================================================
+; Executes visual effects from data tables.
+; Modifies screen position/color values based on command and parameter.
+; Input: A = table offset, $0161 = command type, $0200 = adjustment value
+; ==============================================================================
+
+CODE_0C83CB:
+	PHX										;0C83CB	; Save X register
+	TAX										;0C83CC	; Use A as table index
+	SEP #$20								;0C83CD	; 8-bit accumulator
+	LDY.W $0161								;0C83CF	; Load command type
+	CPY.W #$00B8							;0C83D2	; Command = $B8 (specific effect)?
+	BEQ CODE_0C83DD							;0C83D5	; Branch if match
+	CPY.W #$0089							;0C83D7	; Command >= $89?
+	BCS UNREACH_0C83E8						;0C83DA	; Branch if high range
+	SEC										;0C83DC	; Set carry for subtraction
+
+CODE_0C83DD:
+	LDA.W $0001,X							;0C83DD	; Load table value
+	SBC.W $0200								;0C83E0	; Subtract adjustment
+	STA.W $0001,X							;0C83E3	; Store result
+	BRA CODE_0C83FB							;0C83E6	; Continue
+
+UNREACH_0C83E8:
+	db $C0,$98,$00,$90,$0E,$C0,$A9,$00,$B0,$09,$BD,$01,$00,$6D,$00,$02 ; Additional effect logic
+	db $9D,$01,$00
+
+CODE_0C83FB:
+	CPY.W #$0088							;0C83FB	; Command < $88?
+	BCC CODE_0C8410							;0C83FE	; Branch if low range
+	db $C0,$99,$00,$B0,$0B,$BD,$00,$00,$6D,$00,$02,$9D,$00,$00,$80,$0E ; Effect processing
+
+CODE_0C8410:
+	CPY.W #$00A8							;0C8410	; Command < $A8?
+	BCC CODE_0C841E							;0C8413	; Branch if not A8+
+	db $BD,$00,$00,$ED,$00,$02,$9D,$00,$00 ; Additional effect
+
+CODE_0C841E:
+	TXY										;0C841E	; Transfer result to Y
+	PLX										;0C841F	; Restore X
+	RTS										;0C8420	; Return
+
+; ==============================================================================
+; CODE_0C8421 - Screen Scroll Effect
+; ==============================================================================
+; Animated scrolling effect for screen transitions.
+; Scrolls window positions over 32 frames, then holds for 60 frames.
+; ==============================================================================
+
+CODE_0C8421:
+	LDA.B #$20								;0C8421	; Loop counter = 32 frames
+
+CODE_0C8423:
+	PHA										;0C8423	; Save counter
+	SEC										;0C8424	; Set carry for subtraction
+	LDA.W $0CC1								;0C8425	; Load window position 1
+	SBC.B #$04								;0C8428	; Scroll -4 pixels
+	STA.W $0CC1								;0C842A	; Update position 1
+	STA.W $0CC5								;0C842D	; Update position 2
+	STA.W $0CC9								;0C8430	; Update position 3
+	STA.W $0CCD								;0C8433	; Update position 4
+	LDA.W $0CCC								;0C8436	; Load position 5
+	SBC.B #$04								;0C8439	; Scroll -4 pixels
+	STA.W $0CCC								;0C843B	; Update position 5
+	LDA.W $0CC0								;0C843E	; Load position 6
+	ADC.B #$03								;0C8441	; Scroll +3 pixels
+	STA.W $0CC0								;0C8443	; Update position 6
+	JSR.W CODE_0C85DB						;0C8446	; Wait one frame
+	PLA										;0C8449	; Restore counter
+	DEC A									;0C844A	; Decrement
+	BNE CODE_0C8423							;0C844B	; Loop 32 times
+	LDA.B #$3C								;0C844D	; Hold duration = 60 frames
+
+CODE_0C844F:
+	PHA										;0C844F	; Save counter
+	JSR.W CODE_0C85DB						;0C8450	; Wait one frame
+	PLA										;0C8453	; Restore counter
+	DEC A									;0C8454	; Decrement
+	BNE CODE_0C844F							;0C8455	; Loop 60 times
+	STZ.W $0E0D								;0C8457	; Clear window state 1
+	STZ.W $0E0E								;0C845A	; Clear window state 2
+	JMP.W CODE_0C825A						;0C845D	; Continue script
+
+; ==============================================================================
+; CODE_0C8460 - Complex Palette Fade Sequence
+; ==============================================================================
+; Multi-stage palette fading effect using indirect function calls.
+; Cycles through color transformations with precise timing.
+; ==============================================================================
+
+CODE_0C8460:
+	PHX										;0C8460	; Save script pointer
+	LDY.W #$8575							;0C8461	; Function pointer 1
+	STY.W $0212								;0C8464	; Store function address
+	LDX.W #$0000							;0C8467	; Clear X (parameter)
+	LDY.W #$84CB							;0C846A	; Fade table address
+	JSR.W CODE_0C849E						;0C846D	; Execute fade stage 1
+	LDY.W #$84CB							;0C8470	; Fade table address
+	JSR.W CODE_0C849E						;0C8473	; Execute fade stage 2
+	LDY.W #$8520							;0C8476	; Different fade table
+	JSR.W CODE_0C849E						;0C8479	; Execute fade stage 3
+	LDY.W #$84CC							;0C847C	; Fade table address
+	JSR.W CODE_0C849E						;0C847F	; Execute fade stage 4
+	LDY.W #$84F6							;0C8482	; Fade table address
+	JSR.W CODE_0C849E						;0C8485	; Execute fade stage 5
+	STZ.W $0214								;0C8488	; Clear fade state
+	LDY.W #$854A							;0C848B	; Function pointer 2
+	STY.W $0212								;0C848E	; Update function address
+	LDY.W #$84CB							;0C8491	; Final fade table
+	JSR.W CODE_0C849E						;0C8494	; Execute final stage
+	JSR.W CODE_0C85DB						;0C8497	; Wait one frame
+	PLX										;0C849A	; Restore script pointer
+	JMP.W CODE_0C825A						;0C849B	; Continue script
+
+; ==============================================================================
+; CODE_0C849E - Fade Stage Executor
+; ==============================================================================
+; Executes one stage of palette fade using function table.
+; Input: Y = fade curve table address
+; Uses indirect JSR through $0210 and $0212 function pointers.
+; ==============================================================================
+
+CODE_0C849E:
+	STY.W $0210								;0C849E	; Store table address
+	LDY.W #$85B3							;0C84A1	; Fade curve start
+
+CODE_0C84A4:									; Loop through fade curve
+	JSR.W ($0210,X)							;0C84A4	; Call effect function (indirect)
+	SEC										;0C84A7	; Set carry
+	LDA.W $0C81								;0C84A8	; Load base color value
+	SBC.W $0000,Y							;0C84AB	; Subtract curve value
+	JSR.W ($0212,X)							;0C84AE	; Call adjustment function (indirect)
+	INY										;0C84B1	; Next curve entry
+	CPY.W #$85DB							;0C84B2	; End of curve?
+	BNE CODE_0C84A4							;0C84B5	; Loop if not done
+	DEY										;0C84B7	; Back up one entry
+
+CODE_0C84B8:									; Reverse fade loop
+	DEY										;0C84B8	; Previous curve entry
+	JSR.W ($0210,X)							;0C84B9	; Call effect function
+	CLC										;0C84BC	; Clear carry
+	LDA.W $0C81								;0C84BD	; Load base color
+	ADC.W $0000,Y							;0C84C0	; Add curve value
+	JSR.W ($0212,X)							;0C84C3	; Call adjustment function
+	CPY.W #$85B2							;0C84C6	; Back at start?
+	BNE CODE_0C84B8							;0C84C9	; Loop if not done
+	RTS										;0C84CB	; Return
+
+; [Fade function - adjusts window positions alternately]
+	TYA										;0C84CC	; Transfer Y to A
+	BIT.B #$01								;0C84CD	; Test bit 0 (odd/even)
+	BEQ CODE_0C84F5							;0C84CF	; Skip if even frame
+	DEC.W $0C88								;0C84D1	; Adjust position 1
+	DEC.W $0CA4								;0C84D4	; Adjust position 2
+	DEC.W $0CA8								;0C84D7	; Adjust position 3
+	INC.W $0C90								;0C84DA	; Adjust position 4
+	INC.W $0CB4								;0C84DD	; Adjust position 5
+	INC.W $0CB8								;0C84E0	; Adjust position 6
+	INC.W $0C84								;0C84E3	; Adjust position 7
+	INC.W $0C9C								;0C84E6	; Adjust position 8
+	INC.W $0CA0								;0C84E9	; Adjust position 9
+	DEC.W $0C8C								;0C84EC	; Adjust position 10
+	DEC.W $0CAC								;0C84EF	; Adjust position 11
+	DEC.W $0CB0								;0C84F2	; Adjust position 12
+
+CODE_0C84F5:
+	RTS										;0C84F5	; Return
+
+; [Fade function 2 - reverse direction adjustments]
+	TYA										;0C84F6	; Transfer Y to A
+	BIT.B #$01								;0C84F7	; Test bit 0
+	BEQ CODE_0C851F							;0C84F9	; Skip if even
+	INC.W $0C88								;0C84FB	; Adjust opposite direction
+	INC.W $0CA4								;0C84FE	; Adjust position
+	INC.W $0CA8								;0C8501	; Adjust position
+	DEC.W $0C90								;0C8504	; Adjust position
+	DEC.W $0CB4								;0C8507	; Adjust position
+	DEC.W $0CB8								;0C850A	; Adjust position
+	DEC.W $0C84								;0C850D	; Adjust position
+	DEC.W $0C9C								;0C8510	; Adjust position
+	DEC.W $0CA0								;0C8513	; Adjust position
+	INC.W $0C8C								;0C8516	; Adjust position
+	INC.W $0CAC								;0C8519	; Adjust position
+	INC.W $0CB0								;0C851C	; Adjust position
+
+CODE_0C851F:
+	RTS										;0C851F	; Return
+
+; [Fade function 3 - partial position adjustments]
+	TYA										;0C8520	; Transfer Y
+	BIT.B #$01								;0C8521	; Test bit 0
+	BEQ CODE_0C8537							;0C8523	; Skip if even
+	DEC.W $0C88								;0C8525	; Adjust subset of positions
+	DEC.W $0CA4								;0C8528	; Adjust position
+	DEC.W $0CA8								;0C852B	; Adjust position
+	INC.W $0C90								;0C852E	; Adjust position
+	INC.W $0CB4								;0C8531	; Adjust position
+	INC.W $0CB8								;0C8534	; Adjust position
+
+CODE_0C8537:
+	DEC.W $0C84								;0C8537	; Adjust remaining positions
+	DEC.W $0C9C								;0C853A	; Adjust position
+	DEC.W $0CA0								;0C853D	; Adjust position
+	INC.W $0C8C								;0C8540	; Adjust position
+	INC.W $0CAC								;0C8543	; Adjust position
+	INC.W $0CB0								;0C8546	; Adjust position
+	RTS										;0C8549	; Return
+
+; [Fade function 4 - complex bidirectional fade]
+	LDA.W $0C81								;0C854A	; Load base value
+	PHA										;0C854D	; Save to stack
+	LDA.W $0214								;0C854E	; Load fade direction flag
+	BCS CODE_0C8559							;0C8551	; Branch if carry set
+	SEC										;0C8553	; Set carry
+	SBC.W $0000,Y							;0C8554	; Subtract curve value
+	BRA CODE_0C855D							;0C8557	; Continue
+
+CODE_0C8559:
+	CLC										;0C8559	; Clear carry
+	ADC.W $0000,Y							;0C855A	; Add curve value
+
+CODE_0C855D:
+	STA.W $0214								;0C855D	; Store new fade value
+	LSR A									;0C8560	; Divide by 2
+	PHA										;0C8561	; Save to stack
+	LDA.B $02,S								;0C8562	; Load original value
+	SEC										;0C8564	; Set carry
+	SBC.B $01,S								;0C8565	; Subtract half-fade value
+	JSR.W CODE_0C8575						;0C8567	; Apply to screen
+	PLA										;0C856A	; Clean up stack
+	PLA										;0C856B	; Clean up stack
+	PHY										;0C856C	; Save Y
+	LDY.W #$0000							;0C856D	; Clear Y
+	JSR.W CODE_0C8575						;0C8570	; Apply secondary effect
+	PLY										;0C8573	; Restore Y
+	RTS										;0C8574	; Return
+
+; ==============================================================================
+; CODE_0C8575 - Screen Color Value Updater
+; ==============================================================================
+; Updates multiple screen color/position registers with same value.
+; Spreads value across 5 primary + 5 secondary position registers.
+; Input: A = value to write
+; ==============================================================================
+
+CODE_0C8575:
+	SEC										;0C8575	; Set carry
+	STA.W $0C81								;0C8576	; Store to register 1
+	STA.W $0C85								;0C8579	; Store to register 2
+	STA.W $0C89								;0C857C	; Store to register 3
+	STA.W $0C8D								;0C857F	; Store to register 4
+	STA.W $0C91								;0C8582	; Store to register 5
+	SBC.B #$10								;0C8585	; Subtract offset
+	STA.W $0C95								;0C8587	; Store to secondary register 1
+	STA.W $0C9D								;0C858A	; Store to secondary register 2
+	STA.W $0CA5								;0C858D	; Store to secondary register 3
+	STA.W $0CAD								;0C8590	; Store to secondary register 4
+	STA.W $0CB5								;0C8593	; Store to secondary register 5
+	ADC.B #$2F								;0C8596	; Add different offset
+	STA.W $0C99								;0C8598	; Store to tertiary register 1
+	STA.W $0CA1								;0C859B	; Store to tertiary register 2
+	STA.W $0CA9								;0C859E	; Store to tertiary register 3
+	STA.W $0CB1								;0C85A1	; Store to tertiary register 4
+	STA.W $0CB9								;0C85A4	; Store to tertiary register 5
+	TYA										;0C85A7	; Transfer Y to A
+	BIT.B #$01								;0C85A8	; Test bit 0
+	BEQ CODE_0C85B1							;0C85AA	; Skip if even
+	PHY										;0C85AC	; Save Y
+	JSR.W CODE_0C85DB						;0C85AD	; Wait one frame
+	PLY										;0C85B0	; Restore Y
+
+CODE_0C85B1:
+	RTS										;0C85B1	; Return
+
+; Fade curve data table (40 bytes)
+	db $00,$04,$02,$01,$02,$01,$01,$01,$01,$00,$01,$01,$00,$01,$00,$01 ; Smooth fade curve
+	db $01,$00,$01,$00,$01,$00,$00,$01,$00,$00,$01,$00,$00,$00,$01,$00 ; values (0-4 range)
+	db $00,$00,$00,$01,$00,$00,$00,$00,$00 ; End of curve
+
+; ==============================================================================
+; CODE_0C85DB - Frame Wait & Sprite Animation Update
+; ==============================================================================
+; Primary VBLANK synchronization + sprite animation handler.
+; Called hundreds of times per second - performance critical!
+; Updates animated sprite tiles every 4 frames.
+; ==============================================================================
+
+CODE_0C85DB:
+	PHK										;0C85DB	; Push data bank
+	PLB										;0C85DC	; Set data bank = current bank
+	PHX										;0C85DD	; Save X register
+	LDA.W $0E97								;0C85DE	; Load animation timer
+	AND.B #$04								;0C85E1	; Test bit 2 (every 4 frames)
+	LSR A									;0C85E3	; Shift to bit 1
+	ADC.B #$4C								;0C85E4	; Base tile number = $4C or $4E
+	STA.W $0CC2								;0C85E6	; Update sprite tile 1
+	STA.W $0CCA								;0C85E9	; Update sprite tile 2
+	EOR.B #$02								;0C85EC	; Toggle between tiles ($4C↔$4E)
+	STA.W $0CC6								;0C85EE	; Update sprite tile 3
+	STA.W $0CCE								;0C85F1	; Update sprite tile 4
+	REP #$30								;0C85F4	; 16-bit A/X/Y
+	LDA.W #$0005							;0C85F6	; Loop counter = 5 sprites
+	STA.W $020C								;0C85F9	; Store counter
+	STZ.W $020E								;0C85FC	; Clear sprite index
+
+CODE_0C85FF:									; Loop: Update each sprite
+	LDA.W $020E								;0C85FF	; Load sprite index
+	ASL A									;0C8602	; *2 (word offset)
+	ADC.W #$0C80							;0C8603	; Add base address
+	TAY										;0C8606	; Use as pointer
+	LDX.W $020E								;0C8607	; Load sprite index
+	LDA.W $0202,X							;0C860A	; Load animation frame
+	INC A									;0C860D	; Next frame
+	CMP.W #$000E							;0C860E	; Frame >= 14?
+	BNE CODE_0C8616							;0C8611	; Branch if not
+	LDA.W #$0000							;0C8613	; Wrap to frame 0
+
+CODE_0C8616:
+	STA.W $0202,X							;0C8616	; Store new frame number
+	TAX										;0C8619	; Use frame as index
+	SEP #$20								;0C861A	; 8-bit accumulator
+	LDA.W DATA8_0C8659,X					;0C861C	; Load tile number from table
+	STA.W $0002,Y							;0C861F	; Update sprite tile
+	CMP.B #$44								;0C8622	; Tile = $44?
+	PHP										;0C8624	; Save comparison result
+	REP #$30								;0C8625	; 16-bit A/X/Y
+	LDA.W $020E								;0C8627	; Load sprite index
+	ASL A									;0C862A	; *2
+	ASL A									;0C862B	; *4 (dword offset)
+	ADC.W #$0C94							;0C862C	; Add base address
+	TAY										;0C862F	; Use as pointer
+	PLP										;0C8630	; Restore comparison
+	BEQ CODE_0C863D							;0C8631	; Branch if tile was $44
+	LDA.B #$48								;0C8633	; Tile pattern = $48
+	STA.W $0002,Y							;0C8635	; Update pattern 1
+	STA.W $0006,Y							;0C8638	; Update pattern 2
+	BRA CODE_0C8647							;0C863B	; Continue
+
+CODE_0C863D:
+	LDA.B #$6C								;0C863D	; Tile pattern = $6C
+	STA.W $0002,Y							;0C863F	; Update pattern 1
+	LDA.B #$6E								;0C8642	; Tile pattern = $6E
+	STA.W $0006,Y							;0C8644	; Update pattern 2
+
+CODE_0C8647:
+	REP #$30								;0C8647	; 16-bit A/X/Y
+	INC.W $020E								;0C8649	; Next sprite
+	INC.W $020E								;0C864C	; Increment by 2 (word addressing)
+	DEC.W $020C								;0C864F	; Decrement counter
+	BNE CODE_0C85FF							;0C8652	; Loop for all 5 sprites
+	JSR.W CODE_0C8910						;0C8654	; Update PPU registers
+	PLX										;0C8657	; Restore X
+	RTS										;0C8658	; Return
+
+; ==============================================================================
+; Animation Frame Table (14 frames of sprite tile numbers)
+; ==============================================================================
+
+DATA8_0C8659:
+	db $00,$04,$04,$00,$00,$08,$08,$08,$0C,$40,$40,$44,$44,$00,$00,$00 ; Sprite animation sequence
+
+; [Additional sprite configuration data continues...]
+	db $06,$00,$02,$00,$08,$00,$04,$00,$02,$08,$01,$68,$80,$01,$80,$01
+	db $80,$01,$80,$01,$80,$01,$80,$01,$80,$01,$80,$01,$80,$01,$80,$01
+	db $80,$01,$80,$01,$09,$0A,$0B,$0C,$03,$02,$02,$02,$10,$40,$02,$02
+	db $C1,$C3,$01,$01,$C1,$C3,$01,$01,$C1,$C3,$01,$01,$C1,$C3,$01,$01
+	db $C1,$C3,$01,$01,$C1,$C3,$01,$01,$C1,$C3,$01,$01,$C1,$C3,$01,$01
+	db $C1,$C3,$01,$01,$C1,$C3,$01,$01,$C1,$C3,$01,$01,$C1,$C3,$01,$01
+	db $C1,$C3,$01,$01,$C1,$C3,$01,$01,$C1,$C3,$01,$01,$C1,$C3,$01,$01
+	db $C1,$C3,$01,$01,$C1,$C3,$01,$01,$C1,$C3,$01,$01,$C1,$C3,$01,$01
+	db $C1,$C3,$01,$01,$C1,$C3,$01,$01,$C1,$C3,$01,$01,$C1,$C3,$01,$01
+	db $C1,$C3,$01,$01,$C1,$C3,$01,$01,$C1,$C3,$01,$01,$C1,$C3,$01,$01
+	db $C2,$C4,$01,$01,$C2,$C4,$01,$01,$C2,$C4,$01,$01,$C2,$C4,$01,$01
+	db $C2,$C4,$01,$01,$C2,$C4,$01,$01,$C2,$C4,$01,$01,$C2,$C4,$01,$01
+	db $C2,$C4,$01,$01,$C2,$C4,$01,$01,$C2,$C4,$01,$01,$C2,$C4,$01,$01
+	db $C2,$C4,$01,$01,$C2,$C4,$01,$01,$C2,$C4,$01,$01,$C2,$C4,$01,$01
+	db $C2,$C4,$01,$01,$C2,$C4,$01,$01,$C2,$C4,$01,$01,$C2,$C4,$01,$01
+	db $C2,$C4,$01,$01,$C2,$C4,$01,$01,$C2,$C4,$01,$01,$C2,$C4,$01,$01
+	db $02,$04,$01,$01,$05,$02,$02,$02,$02,$02,$02,$02,$02,$00
+
+; ==============================================================================
+; CODE_0C8767 - Sprite OAM Data Copy
+; ==============================================================================
+; Block copies sprite configuration to OAM buffer.
+; 112 bytes ($70) transferred via MVN instruction.
+; ==============================================================================
+
+CODE_0C8767:
+	REP #$30								;0C8767	; 16-bit A/X/Y
+	LDX.W #$8779							;0C8769	; Source address
+	LDY.W #$0C80							;0C876C	; Destination address (OAM buffer)
+	LDA.W #$006F							;0C876F	; Transfer size = 112 bytes
+	MVN $00,$0C								;0C8772	; Block move (Bank $0C → Bank $00)
+	JSR.W CODE_0C8910						;0C8775	; Update PPU registers
+	RTS										;0C8778	; Return
+
+; OAM sprite configuration data (112 bytes)
+	db $74,$CF,$00,$36,$74,$CF,$00,$38,$74,$CF,$00,$3A,$74,$CF,$00,$3C
+	db $74,$CF,$00,$3E,$7C,$BF,$00,$36,$7C,$EF,$00,$36,$7C,$BF,$00,$38
+	db $7C,$EF,$00,$38,$7C,$BF,$00,$3A,$7C,$EF,$00,$3A,$7C,$BF,$00,$3C
+	db $7C,$EF,$00,$3C,$7C,$BF,$00,$3E,$7C,$EF,$00,$3E,$78,$8F,$4C,$06
+	db $78,$8F,$4C,$08,$78,$8F,$4C,$0A,$78,$8F,$4C,$0C,$78,$8F,$4C,$0E
+	db $40,$6F,$C0,$00,$50,$6F,$C2,$00,$60,$6F,$C4,$00,$70,$6F,$C6,$00
+	db $80,$6F,$C8,$00,$90,$6F,$CA,$00,$A0,$6F,$CC,$00,$B0,$6F,$CE,$00
+
+; ==============================================================================
+; CODE_0C87E9 - Clear NMI Flag
+; ==============================================================================
+; Disables NMI interrupts by clearing flag.
+; Called before major PPU updates.
+; ==============================================================================
+
+CODE_0C87E9:
+	STZ.W $0111								;0C87E9	; Clear NMI enable flag
+	RTS										;0C87EC	; Return
+
+; ==============================================================================
+; CODE_0C87ED - Mode 7 Tilemap Setup
+; ==============================================================================
+; Initializes Mode 7 tilemap with block fill.
+; Fills 30 rows ($1E) × 128 columns with pattern $C0.
+; ==============================================================================
+
+CODE_0C87ED:
+	REP #$30								;0C87ED	; 16-bit A/X/Y
+	PEA.W $0C7F								;0C87EF	; Push bank $0C
+	PLB										;0C87F2	; Pull to data bank register
+	LDX.W #$4000							;0C87F3	; VRAM start address
+	LDY.W #$001E							;0C87F6	; Row count = 30
+	LDA.W #$00C0							;0C87F9	; Fill pattern = $C0
+	JSL.L CODE_009994						;0C87FC	; Call tilemap fill routine
+	PLB										;0C8800	; Restore data bank
+	SEP #$20								;0C8801	; 8-bit accumulator
+	STZ.W $4204								;0C8803	; Clear multiply/divide register
+	LDX.W #$00CE							;0C8806	; Table offset = $CE
+	LDY.W #$0082							;0C8809	; Y parameter = $82
+
+CODE_0C880C:									; Loop: Setup calculation
+	TYA										;0C880C	; Transfer Y to A
+	ASL A									;0C880D	; *2
+	STA.W $4205								;0C880E	; Store to multiply register
+	LDA.B #$20								;0C8811	; Value = $20
+	JSL.L CODE_009726						;0C8813	; Call calculation routine
+	; [Additional Mode 7 setup continues...]
+
+; ==============================================================================
+; End of Bank $0C Cycle 2
+; ==============================================================================
+; Lines documented: 400 source lines (500-900)
+; Address range: $0C8396-$0C8813 (partial)
+; Systems: Screen effects, palette fades, sprite animation, Mode 7 tilemap
+; ==============================================================================
