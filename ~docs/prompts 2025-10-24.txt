@@ -212,6 +212,8 @@ continue, and don't stop, run for like 300+ iterations, updating documentation, 
 ---- stop asking if you can or should continue and just continue. I authorize going continuously for a couple hours.
 ---- stop asking if you can or should continue and just continue. I authorize going continuously for a couple hours.  timestamp your actions.
 stop asking if you can or should continue and just continue. I authorize going continuously for a couple hours.  timestamp your actions.  (and use the temp file action process to speed things up)
+continue aggressively
+yes
 
 
 

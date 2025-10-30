@@ -1,0 +1,812 @@
+; ==============================================================================
+; Bank $0E - Extended APU/Sound Data (Continuation of Bank $0D)
+; ==============================================================================
+; Bank $0E Size: 2,051 source lines (estimated ~32KB of $0E8000-$0EFFFF range)
+; Content: Appears to be extension of Bank $0D's SPC700 audio processor data
+; Format: Continuation of DSP configuration, music patterns, voice data
+; ==============================================================================
+
+; ==============================================================================
+; Bank $0E - Extended APU/Sound Data (Continuation of Bank $0D)
+; Lines 1-400: Voice Configuration Sequences & DSP Register Data
+; Address Range: $0E8000-$0E8FC0 (~4KB audio pattern data)
+; ==============================================================================
+
+; ------------------------------------------------------------------------------
+; $0E8000-$0E80FF: Initial Voice Channel Sequences (256 bytes)
+; ------------------------------------------------------------------------------
+; Pattern structure identical to Bank $0D continuation:
+; - $8A markers: Channel/voice separators (splits audio into tracks)
+; - $CC/$DD/$BC/$DC/$EE/$EF: Envelope sequences (ADSR/volume control)
+; - $Fx/$Ex: DSP register addresses ($F0-$FF range)
+; - Digit sequences: Note/duration/pitch parameters
+;
+; Channel separator $8A appears at:
+; - 0E8003, 0E8010, 0E8020, 0E8030, 0E8040, 0E8050, 0E8060, 0E8070
+; - 0E8080, 0E8090, 0E80A0, 0E80B0, 0E80C0, 0E80D0, 0E80E0
+; Pattern indicates multi-track music/SFX data (16+ channels in first 256 bytes)
+
+                                                            ;      |        |      ;
+                       ORG $0E8000                          ;      |        |      ;
+                                                            ;      |        |      ;
+                       db $44,$43,$0E,$CC,$CC,$CD,$F0,$12,$8A,$32,$21,$FC,$CC,$DC,$EF,$11;0E8000|        |      ;
+; $44,$43,$0E: Initial parameters (note values or timing)
+; $CC,$CC,$CD: Voice envelope markers (voice configuration)
+; $F0,$12: DSP register $F0 (FLG - DSP flags/control), value $12
+; $8A: Channel separator (voice 0 complete, start voice 1)
+; $32,$21,$FC: Voice 1 parameters
+; $CC,$DC,$EF,$11: Voice 1 envelope sequence
+
+                       db $45,$8A,$53,$22,$11,$FE,$DD,$E0,$11,$43,$8A,$44,$42,$0F,$DB,$BC;0E8010|        |      ;
+; $45: Parameter continuation
+; $8A: Channel separator (voice 1→2)
+; $53,$22,$11: Voice 2 initial params
+; $FE: Voice envelope marker
+; $DD: Voice configuration
+; $E0,$11: DSP register $E0 (likely EDL - echo delay), value $11
+; $43: Param
+; $8A: Channel separator (voice 2→3)
+; $44,$42,$0F: Voice 3 params
+; $DB,$BC: Voice 3 envelope
+
+                       db $DE,$EF,$13,$8A,$32,$20,$FD,$CB,$DD,$EF,$11,$45,$8A,$52,$32,$1F;0E8020|        |      ;
+; $DE,$EF,$13: Envelope sequence for voice 3
+; $8A: Channel separator (voice 3→4)
+; $32,$20,$FD: Voice 4 params
+; $CB,$DD,$EF,$11: Voice 4 envelope
+; $45: Param
+; $8A: Channel separator (voice 4→5)
+; $52,$32,$1F: Voice 5 params
+
+                       db $0E,$EE,$EF,$02,$44,$8A,$33,$43,$0E,$DC,$BC,$DE,$EF,$13,$8A,$32;0E8030|        |      ;
+; $0E: Param
+; $EE,$EF,$02: Envelope sequence
+; $44: Param
+; $8A: Channel separator (voice 5→6)
+; $33,$43,$0E: Voice 6 params
+; $DC,$BC,$DE,$EF,$13: Voice 6 extended envelope
+; $8A: Channel separator (voice 6→7)
+
+                       db $10,$FD,$DD,$CB,$E0,$11,$44,$8A,$53,$32,$10,$FE,$EE,$EF,$02,$35;0E8040|        |      ;
+; Voice 7 data: $10,$FD,$DD,$CB
+; $E0,$11: DSP register $E0 = $11
+; $44: Param
+; $8A: Channel separator (voice 7→8)
+; Voice 8 data: $53,$32,$10,$FE,$EE,$EF,$02,$35
+
+                       db $8A,$43,$23,$1F,$CC,$BC,$DE,$EF,$12,$8A,$33,$20,$ED,$DC,$CD,$EF;0E8050|        |      ;
+; $8A: Channel separator at start (voice 8→9)
+; Voice 9 data: $43,$23,$1F,$CC,$BC,$DE,$EF,$12
+; $8A: Channel separator (voice 9→10)
+; Voice 10 data: $33,$20,$ED,$DC,$CD,$EF
+
+                       db $02,$45,$8A,$43,$32,$10,$FE,$EE,$EF,$12,$34,$8A,$43,$32,$1F,$CB;0E8060|        |      ;
+; $02,$45: Voice 10 params
+; $8A: Channel separator (voice 10→11)
+; Voice 11 data: $43,$32,$10,$FE,$EE,$EF,$12,$34
+; $8A: Channel separator (voice 11→12)
+; Voice 12 start: $43,$32,$1F,$CB
+
+                       db $CD,$CE,$E0,$12,$8A,$23,$20,$ED,$DD,$CC,$EF,$03,$44,$8A,$43,$32;0E8070|        |      ;
+; Voice 12 envelope: $CD,$CE
+; $E0,$12: DSP register $E0 = $12 (echo delay adjustment)
+; $8A: Channel separator (voice 12→13)
+; Voice 13: $23,$20,$ED,$DD,$CC,$EF,$03,$44
+; $8A: Channel separator (voice 13→14)
+; Voice 14 start: $43,$32
+
+                       db $10,$FF,$EE,$DF,$13,$33,$8A,$44,$22,$1F,$CC,$CC,$CE,$F0,$02,$8A;0E8080|        |      ;
+; Voice 14: $10,$FF,$EE,$DF,$13,$33
+; $8A: Channel separator (voice 14→15)
+; Voice 15: $44,$22,$1F,$CC,$CC,$CE
+; $F0,$02: DSP register $F0 (FLG) = $02 (reset/noise/mute flags)
+; $8A: Channel separator (voice 15→16)
+
+                       db $32,$11,$FD,$CD,$CD,$DF,$13,$34,$8A,$43,$32,$10,$0E,$EE,$EF,$12;0E8090|        |      ;
+; Voice 16: $32,$11,$FD,$CD,$CD,$DF,$13,$34
+; $8A: Channel separator (voice 16→17)
+; Voice 17: $43,$32,$10,$0E,$EE,$EF,$12
+
+                       db $24,$8A,$44,$22,$1F,$DC,$BB,$DE,$F0,$01,$8A,$34,$10,$FD,$CC,$DD;0E80A0|        |      ;
+; Voice 17 continues: $24
+; $8A: Channel separator (voice 17→18)
+; Voice 18: $44,$22,$1F,$DC,$BB,$DE
+; $F0,$01: DSP register $F0 = $01
+; $8A: Channel separator (voice 18→19)
+; Voice 19: $34,$10,$FD,$CC,$DD
+
+                       db $EE,$12,$44,$8A,$43,$32,$10,$0F,$DE,$EF,$03,$43,$8A,$33,$32,$1F;0E80B0|        |      ;
+                       db $DC,$BC,$CF,$EF,$13,$8A,$22,$11,$FD,$CC,$DD,$EF,$02,$44,$8A,$43;0E80C0|        |      ;
+                       db $32,$10,$0F,$ED,$EF,$12,$43,$8A,$33,$32,$10,$DB,$BC,$DE,$EF,$13;0E80D0|        |      ;
+                       db $8A,$22,$20,$EE,$EB,$CD,$EF,$12,$34,$8A,$34,$42,$00,$0F,$EE,$DF;0E80E0|        |      ;
+                       db $13,$33,$8B,$33,$33,$1F,$CC,$BC,$DE,$EF,$22,$33,$0C,$02,$00,$00;0E80F0|        |      ;
+; $8B at 0E80F2: Variant channel separator (indicates different voice type or mode)
+; $0C,$02,$00,$00: Control sequence or padding before next section
+
+; ------------------------------------------------------------------------------
+; $0E8100-$0E81FF: Dense Voice Marker Sequences (256 bytes)
+; ------------------------------------------------------------------------------
+; Zero padding appears at 0E80FC-0E8107 (12 bytes of $00)
+; Marks transition from initial channel setup to voice configuration tables
+; New marker set: $B2, $B1, $B3, $A2 (voice assignment markers, same as Bank $0D)
+
+                       db $00,$00,$00,$00,$00,$00,$B2,$0F,$00,$B1,$30,$1F,$23,$F0,$2F,$C2;0E8100|        |      ;
+; Zero padding: $00×6 (section separator)
+; $B2: Voice marker (bass/rhythm voice, same as Bank $0D usage)
+; $0F,$00: Parameters
+; $B1: Voice marker (melody voice 1)
+; $30,$1F,$23: Parameters
+; $F0,$2F: DSP register $F0 = $2F
+; $C2: Parameter
+
+                       db $00,$00,$00,$F3,$3C,$E1,$00,$0F,$B2,$FF,$0E,$D3,$0B,$3F,$F1,$D3;0E8110|        |      ;
+; $00×3: Padding
+; $F3,$3C: Parameters
+; $E1,$00,$0F: DSP register $E1 (possibly EON - echo on), values
+; $B2: Voice marker return
+; $FF,$0E,$D3,$0B,$3F: Parameter sequence
+; $F1,$D3: DSP register $F1, value $D3
+
+                       db $10,$B2,$00,$42,$0F,$64,$D1,$32,$01,$EE,$B2,$30,$0E,$03,$B3,$FD;0E8120|        |      ;
+; $10: Param
+; $B2: Voice marker
+; $00,$42,$0F,$64: Parameters
+; $D1,$32,$01: Parameter sequence
+; $EE: Envelope marker
+; $B2: Voice marker return
+; $30,$0E,$03: Params
+; $B3: Voice marker (third voice type)
+; $FD: Envelope marker
+
+                       db $2C,$02,$0E,$A2,$D1,$FD,$1C,$11,$93,$0A,$33,$1E,$B2,$F2,$00,$01;0E8130|        |      ;
+; $2C,$02,$0E: Params
+; $A2: Voice marker (fourth voice type - saw this in Bank $0D)
+; $D1,$FD,$1C,$11: Parameter sequence
+; $93: Parameter (high value - possibly note pitch or velocity)
+; $0A,$33,$1E: Params
+; $B2: Voice marker return
+; $F2,$00,$01: DSP register $F2, values
+
+                       db $0F,$0F,$11,$2E,$24,$A2,$E0,$07,$E0,$F4,$2E,$FB,$6B,$E0,$B2,$E1;0E8140|        |      ;
+; $0F,$0F,$11,$2E,$24: Parameter sequence
+; $A2: Voice marker
+; $E0,$07: DSP register $E0 = $07
+; $E0,$F4: DSP register $E0 = $F4 (rapid change - tremolo/vibrato effect?)
+; $2E,$FB,$6B: Params
+; $E0: DSP register marker
+; $B2: Voice marker
+; $E1: DSP register marker
+
+                       db $1D,$10,$D1,$0D,$E2,$FC,$12,$B2,$00,$03,$1C,$F3,$01,$3E,$22,$F2;0E8150|        |      ;
+; $1D,$10: Params
+; $D1,$0D: Parameter
+; $E2,$FC,$12: DSP register $E2, values
+; $B2: Voice marker
+; $00,$03,$1C: Params
+; $F3,$01,$3E,$22: Parameter sequence
+; $F2: DSP register marker
+
+                       db $A2,$10,$C1,$2D,$05,$1B,$3A,$24,$96,$B2,$EC,$3D,$01,$D0,$00,$0D;0E8160|        |      ;
+; $A2: Voice marker
+; $10,$C1,$2D,$05,$1B,$3A,$24: Parameter sequence
+; $96: High value parameter
+; $B2: Voice marker
+; $EC,$3D,$01: Params
+; $D0,$00,$0D: Parameter sequence
+
+                       db $12,$F2,$A2,$FF,$33,$2A,$53,$E4,$F2,$FF,$4C,$B2,$F4,$0E,$F4,$0B;0E8170|        |      ;
+; $12: Param
+; $F2: DSP register marker
+; $A2: Voice marker
+; $FF,$33,$2A,$53: Parameter sequence
+; $E4,$F2,$FF,$4C: Parameters (multiple $FF - maximum values)
+; $B2: Voice marker
+; $F4,$0E,$F4,$0B: DSP register $F4 repeated (pitch modulation?)
+
+                       db $31,$EF,$D0,$21,$A2,$DE,$4F,$A2,$5E,$C0,$ED,$1D,$FF,$B2,$C2,$2D;0E8180|        |      ;
+; $31: Param
+; $EF,$D0,$21: Parameter sequence
+; $A2: Voice marker
+; $DE,$4F: Params
+; $A2: Voice marker repeated (voice switch)
+; $5E: Param
+; $C0,$ED,$1D,$FF: Parameters
+; $B2: Voice marker
+; $C2,$2D: Params
+
+                       db $20,$E2,$D3,$3E,$2E,$35,$B2,$C0,$F1,$3D,$31,$D4,$10,$2F,$10,$B2;0E8190|        |      ;
+; Dense parameter/marker mixing continues
+; Pattern: Voice markers ($A2/$B2/$B3) interspersed with:
+; - DSP register addresses ($C0-$F4 range)
+; - Parameters (digit sequences, envelope markers)
+; - Control values ($FF, $00, high/low bounds)
+
+                       db $21,$D1,$10,$FF,$01,$EF,$3C,$11,$92,$FC,$B2,$D6,$A2,$DF,$60,$3E;0E81A0|        |      ;
+                       db $24,$A2,$FF,$41,$EF,$BF,$1E,$D1,$5C,$F5,$B2,$DF,$FF,$1F,$D1,$2E;0E81B0|        |      ;
+                       db $1E,$7E,$B2,$B2,$F3,$B1,$4D,$04,$31,$00,$1F,$10,$B2,$12,$EE,$22;0E81C0|        |      ;
+; $B2,$B2: Double voice marker (emphasis or channel lock)
+; $F3,$B1: Parameters with $B1 marker
+; Pattern shows complex voice interleaving
+
+                       db $E1,$0F,$3F,$12,$C2,$B2,$0F,$1C,$1F,$D3,$D1,$5C,$0C,$03,$A2,$B2;0E81D0|        |      ;
+; $A2,$B2: Voice marker sequence (voice handoff A2→B2)
+
+                       db $30,$24,$D0,$2D,$01,$0F,$BF,$B2,$10,$42,$E0,$3F,$C3,$21,$0E,$32;0E81E0|        |      ;
+                       db $B2,$BF,$2F,$1F,$2E,$E4,$EF,$02,$1F,$A2,$D1,$4D,$FC,$FE,$00,$B1;0E81F0|        |      ;
+; $A2: Voice marker
+; $D1,$4D,$FC,$FE,$00: Parameter sequence ending in zero
+; $B1: Voice marker
+
+; ------------------------------------------------------------------------------
+; $0E8200-$0E82FF: Extended Voice Configuration (256 bytes)
+; ------------------------------------------------------------------------------
+; Continues dense marker pattern from previous section
+; Increasing frequency of $A2/$B2/$B3 markers indicates complex multi-voice music
+
+                       db $E2,$2E,$A2,$DC,$1D,$34,$E7,$E0,$5C,$13,$21,$A2,$13,$31,$EF,$50;0E8200|        |      ;
+                       db $02,$30,$05,$D2,$B2,$31,$0E,$FF,$00,$F1,$F0,$6C,$D2,$B2,$F1,$1D;0E8210|        |      ;
+; $F1,$F0,$6C: Parameters
+; $D2: Parameter
+; $B2: Voice marker
+; $F1,$1D: Parameters
+
+                       db $E1,$DF,$1E,$F2,$EC,$30,$B2,$01,$C1,$23,$1D,$20,$13,$01,$F2,$B2;0E8220|        |      ;
+                       db $10,$2E,$13,$EF,$02,$0E,$0D,$13,$B2,$D0,$CF,$1F,$0C,$03,$1F,$30;0E8230|        |      ;
+                       db $EE,$B2,$03,$E1,$2C,$14,$F0,$20,$E3,$2E,$B2,$12,$C0,$4E,$2F,$0F;0E8240|        |      ;
+                       db $F1,$01,$E0,$A2,$B3,$13,$1F,$2F,$1D,$10,$30,$0F,$A2,$C2,$EE,$11;0E8250|        |      ;
+; $A2,$B3: Voice marker transition (A2→B3 voice handoff)
+
+                       db $50,$C2,$D5,$3E,$0F,$A2,$E9,$43,$FC,$51,$EE,$00,$B3,$C5,$A2,$1F;0E8260|        |      ;
+; $B3,$C5,$A2: Voice marker sequence (B3→A2 transition with $C5 param)
+
+                       db $3A,$C3,$50,$AE,$4E,$20,$B3,$B2,$30,$F0,$0F,$F4,$20,$E0,$21,$FE;0E8270|        |      ;
+; $B3,$B2: Voice transition marker
+; $30,$F0,$0F,$F4,$20: Parameter sequence
+; $E0,$21: DSP register $E0 = $21
+; $FE: Envelope marker
+
+                       db $A2,$4D,$1F,$D1,$DD,$03,$11,$E9,$35,$A2,$CF,$03,$1A,$C2,$2E,$00;0E8280|        |      ;
+                       db $C1,$7D,$C2,$00,$F0,$F1,$1E,$2F,$D4,$0F,$3F,$B2,$F1,$01,$DE,$22;0E8290|        |      ;
+                       db $40,$01,$C3,$1D,$B2,$00,$00,$EE,$6F,$D0,$1F,$0F,$00,$B2,$B4,$2B;0E82A0|        |      ;
+; $B2,$B4: New voice marker combination (B2→B4 transition)
+
+                       db $10,$00,$C5,$2D,$F2,$3C,$A2,$12,$E2,$E0,$0E,$1D,$76,$CF,$D0,$B2;0E82B0|        |      ;
+                       db $C1,$1F,$11,$3F,$0F,$2D,$F4,$D3,$B2,$FC,$40,$16,$EF,$1E,$D1,$3E;0E82C0|        |      ;
+                       db $E1,$B2,$1F,$0E,$00,$C0,$0E,$EF,$00,$11,$B2,$FD,$E2,$21,$E0,$5E;0E82D0|        |      ;
+                       db $F3,$1D,$11,$B2,$03,$0F,$02,$F2,$5D,$D2,$2E,$F1,$B2,$3F,$D5,$0D;0E82E0|        |      ;
+                       db $C0,$3D,$13,$11,$01,$B2,$FF,$01,$F0,$0D,$2B,$F6,$F1,$00,$B2,$1F;0E82F0|        |      ;
+
+; ------------------------------------------------------------------------------
+; $0E8300-$0E83FF: Continued Voice Pattern Data (256 bytes)
+; ------------------------------------------------------------------------------
+
+                       db $F2,$22,$31,$00,$2E,$0E,$E3,$B2,$CF,$00,$11,$1F,$6E,$A5,$DD,$4E;0E8300|        |      ;
+; $A5: New voice marker variant (or parameter)
+; $DD: Envelope marker
+
+                       db $B2,$01,$F2,$EF,$30,$FF,$3F,$D3,$E2,$B2,$20,$00,$4B,$E5,$C3,$5B;0E8310|        |      ;
+                       db $1F,$13,$B2,$C0,$0F,$2F,$20,$C2,$2E,$E0,$00,$B2,$F1,$4C,$14,$9F;0E8320|        |      ;
+                       db $2F,$1E,$F3,$10,$B2,$F1,$30,$12,$D0,$4F,$FE,$41,$D1,$A2,$1D,$01;0E8330|        |      ;
+                       db $93,$CD,$3D,$D0,$14,$FF,$B2,$3F,$00,$04,$0C,$22,$D0,$03,$FC,$B2;0E8340|        |      ;
+                       db $60,$F2,$F2,$BE,$0D,$2D,$0F,$E2,$B2,$04,$BC,$5F,$D0,$30,$02,$2F;0E8350|        |      ;
+                       db $F1,$B2,$D0,$10,$3E,$F4,$1F,$F3,$DD,$5F,$B2,$E0,$E0,$12,$1F,$FE;0E8360|        |      ;
+                       db $04,$0E,$03,$B2,$FC,$40,$E0,$14,$DF,$30,$F1,$43,$B2,$DE,$42,$D1;0E8370|        |      ;
+                       db $51,$DF,$3F,$CD,$FF,$B2,$F0,$1D,$C0,$11,$AF,$19,$E1,$0E,$A2,$E4;0E8380|        |      ;
+                       db $00,$D3,$2F,$00,$54,$12,$30,$B2,$13,$4C,$05,$E0,$12,$4E,$E5,$1E;0E8390|        |      ;
+                       db $B2,$20,$00,$03,$DD,$21,$FF,$2F,$CE,$B2,$02,$FE,$F0,$DE,$2F,$FC;0E83A0|        |      ;
+                       db $00,$FF,$A2,$04,$D7,$32,$7C,$26,$F0,$66,$22,$A2,$37,$7E,$E7,$DB;0E83B0|        |      ;
+; $A2: Voice marker
+; $04,$D7,$32,$7C,$26: Parameter sequence
+; $F0,$66,$22: DSP register $F0 = $66, param $22
+; $A2: Voice marker return
+; $37,$7E: Params (high values - loud/bright voice)
+; $E7,$DB: Parameters
+
+                       db $5B,$D0,$F3,$AF,$B2,$0E,$F0,$40,$E3,$20,$E1,$2C,$E0,$B2,$C2,$0E;0E83C0|        |      ;
+                       db $5C,$C6,$0C,$0F,$01,$E0,$B2,$3E,$E3,$1F,$1F,$EF,$24,$E0,$31,$B2;0E83D0|        |      ;
+                       db $00,$2F,$02,$E3,$0A,$40,$F5,$DF,$B2,$0D,$20,$02,$11,$C2,$2E,$2C;0E83E0|        |      ;
+                       db $F2,$B2,$DF,$FF,$0D,$DE,$FF,$CF,$F0,$2F,$B2,$20,$03,$E0,$41,$F2;0E83F0|        |      ;
+
+; ------------------------------------------------------------------------------
+; $0E8400-$0E84FF: Voice Configuration Tables Continue (256 bytes)
+; ------------------------------------------------------------------------------
+
+                       db $22,$3F,$11,$B2,$F3,$0D,$F4,$1E,$22,$0D,$0E,$10,$B2,$B3,$DE,$2E;0E8400|        |      ;
+; $B2,$B3: Voice marker transition
+
+                       db $10,$FF,$FD,$FF,$C0,$A2,$1E,$3F,$A1,$3C,$F1,$E2,$20,$22,$A2,$03;0E8410|        |      ;
+; $A1: Possible new voice marker (or parameter $A1)
+; $3C: Parameter
+; $F1,$E2,$20,$22: Parameter sequence
+; $A2: Voice marker
+
+                       db $44,$25,$4E,$22,$30,$14,$F2,$B2,$F2,$1D,$00,$0F,$1B,$E2,$EF,$02;0E8420|        |      ;
+                       db $A2,$CD,$5F,$D1,$6F,$B1,$2F,$AF,$72,$B2,$B1,$4E,$FF,$E1,$2D,$00;0E8430|        |      ;
+; $B1: Voice marker (melody voice)
+; $2F,$AF,$72: Parameters (high value $AF)
+; $B2,$B1: Voice transition marker
+
+                       db $D2,$11,$B2,$0F,$00,$2D,$01,$C2,$20,$11,$20,$B2,$FF,$35,$FF,$11;0E8440|        |      ;
+                       db $30,$F1,$F0,$FE,$B2,$2C,$05,$D0,$40,$EE,$FF,$12,$ED,$B2,$30,$C0;0E8450|        |      ;
+                       db $0F,$FC,$14,$C1,$4E,$00,$B2,$10,$E2,$41,$03,$40,$12,$12,$F2,$B2;0E8460|        |      ;
+                       db $40,$EF,$33,$EF,$1F,$DC,$FF,$01,$B2,$AE,$3D,$01,$D1,$30,$0E,$2F;0E8470|        |      ;
+; $AE: High parameter value
+
+                       db $D4,$A2,$41,$12,$E0,$5F,$FE,$52,$E0,$35,$A2,$F0,$E0,$F1,$39,$1F;0E8480|        |      ;
+; $A2: Voice marker
+; $41,$12: Params
+; $E0,$5F: DSP register $E0 = $5F
+; $FE: Envelope marker
+; $52: Param
+; $E0,$35: DSP $E0 = $35
+; $A2: Voice marker
+; $F0,$E0,$F1,$39,$1F: DSP register sequence ($F0, $E0, $F1)
+
+                       db $B1,$E4,$AC,$B2,$2D,$20,$C0,$01,$2F,$21,$C3,$10,$A2,$43,$1C,$42;0E8490|        |      ;
+; $B1: Voice marker
+; $E4,$AC: Parameters (high value $AC)
+; $B2: Voice marker
+; ... followed by $A2 voice marker
+
+                       db $43,$C2,$4E,$22,$E0,$A2,$D1,$5D,$9F,$DE,$1B,$13,$BC,$0F,$A2,$E0;0E84A0|        |      ;
+; $9F: High parameter value
+; $A2: Voice marker appears twice in sequence
+
+                       db $DA,$65,$B0,$13,$02,$5F,$E3,$A2,$42,$43,$51,$F4,$3E,$00,$E4,$1A;0E84B0|        |      ;
+; $DA,$65,$B0: Parameters (high values)
+; $A2: Voice marker
+; $F4,$3E,$00: Parameters
+; $E4,$1A: DSP register $E4, value $1A
+
+                       db $B2,$F0,$E2,$0F,$0B,$E1,$EE,$1F,$CF,$B2,$1E,$E2,$0F,$1F,$15,$FF;0E84C0|        |      ;
+                       db $40,$33,$A2,$E2,$00,$40,$02,$01,$2F,$0F,$D6,$B2,$EF,$3D,$10,$E0;0E84D0|        |      ;
+                       db $F0,$EC,$D1,$0F,$B2,$10,$E2,$1C,$05,$FF,$3F,$01,$F3,$B2,$FE,$51;0E84E0|        |      ;
+                       db $E1,$0F,$00,$02,$EF,$21,$A6,$DD,$3F,$2F,$0B,$15,$E5,$CF,$2F,$B2;0E84F0|        |      ;
+; $A6: New voice marker variant (or high parameter)
+
+; ------------------------------------------------------------------------------
+; $0E8500-$0E85FF: Dense Parameter Sequences (256 bytes)
+; ------------------------------------------------------------------------------
+
+                       db $0E,$21,$C3,$3D,$0E,$F4,$EF,$31,$B2,$0E,$F2,$1C,$F0,$E1,$11,$DD;0E8500|        |      ;
+                       db $3F,$B2,$D0,$0F,$DD,$31,$02,$F2,$DF,$4E,$A2,$26,$F1,$10,$23,$FF;0E8510|        |      ;
+                       db $40,$DD,$FE,$B2,$02,$F0,$1F,$FE,$F0,$FF,$03,$CD,$B2,$4F,$0C,$02;0E8520|        |      ;
+                       db $D0,$F1,$1E,$21,$DF,$A2,$1F,$A2,$72,$10,$61,$C2,$32,$F2,$A2,$40;0E8530|        |      ;
+; $A2,$1F,$A2: Double voice marker with param between (voice ping-pong)
+; $72: High parameter
+; $61: Parameter
+; $A2: Voice marker return
+
+                       db $10,$E1,$10,$EB,$A0,$2B,$C2,$A2,$0C,$DC,$02,$AF,$60,$C0,$63,$E4;0E8540|        |      ;
+; $EB,$A0: High parameters
+; $A2: Voice marker
+; $AF,$60: High parameters
+; $C0,$63: Parameters
+; $E4: DSP register marker
+
+                       db $B2,$2F,$FF,$24,$0E,$3E,$D3,$E0,$DD,$B2,$3D,$11,$C1,$FF,$3F,$F0;0E8550|        |      ;
+                       db $F1,$10,$A2,$DD,$20,$1F,$D0,$BF,$01,$0F,$19,$A2,$34,$F4,$FD,$42;0E8560|        |      ;
+; $BF: High parameter
+
+                       db $0F,$04,$E2,$31,$B2,$0D,$12,$0F,$F1,$1F,$F1,$EF,$4E,$A2,$B7,$FE;0E8570|        |      ;
+; $B7: Voice marker variant (or high parameter)
+
+                       db $4E,$25,$D0,$6F,$F4,$22,$A2,$0E,$4F,$C3,$E0,$FE,$2D,$FE,$C1,$A2;0E8580|        |      ;
+                       db $CE,$5C,$B1,$03,$00,$1A,$F4,$DD,$A2,$ED,$31,$E7,$4A,$F5,$62,$34;0E8590|        |      ;
+; $B1: Voice marker
+; $A2: Voice marker
+; $E7,$4A,$F5,$62: Parameter sequence (high values)
+
+                       db $E4,$A2,$53,$30,$F2,$1B,$41,$F3,$C4,$6B,$B2,$F1,$CC,$FF,$FD,$ED;0E85A0|        |      ;
+; $C4,$6B: High parameters
+; $B2: Voice marker
+; $CC,$FF,$FD: Parameter sequence (multiple high values)
+
+                       db $13,$C0,$1B,$A2,$02,$E3,$EC,$06,$20,$3C,$52,$F4,$B2,$F2,$FF,$40;0E85B0|        |      ;
+                       db $F1,$00,$02,$3E,$F1,$A2,$12,$D3,$1C,$21,$FC,$05,$9F,$40,$B2,$ED;0E85C0|        |      ;
+                       db $0F,$FE,$12,$FF,$14,$0C,$04,$A2,$4E,$37,$DB,$75,$ED,$D4,$1C,$30;0E85D0|        |      ;
+; $DB,$75: High parameters
+; $D4: Parameter
+
+                       db $B2,$E1,$11,$1D,$E0,$F1,$2C,$04,$FE,$A2,$22,$CD,$01,$3E,$F6,$DA;0E85E0|        |      ;
+; $F6,$DA: High parameters (max values)
+
+                       db $33,$50,$B2,$F2,$DE,$4F,$E4,$FF,$3E,$10,$D1,$B2,$00,$2F,$F0,$11;0E85F0|        |      ;
+
+; ------------------------------------------------------------------------------
+; $0E8600-$0E86FF: Extended Voice Tables (256 bytes)
+; ------------------------------------------------------------------------------
+
+                       db $F3,$EC,$01,$0E,$B2,$11,$1E,$04,$DF,$4E,$F1,$D2,$0D,$B2,$1F,$21;0E8600|        |      ;
+                       db $C0,$FE,$11,$01,$F0,$0D,$A2,$ED,$BD,$D1,$BD,$2E,$10,$C5,$2D,$A2;0E8610|        |      ;
+; $BD: High parameter (repeated twice)
+; $C5: Parameter
+; $A2: Voice marker
+
+                       db $21,$23,$F0,$30,$44,$C1,$54,$F1,$B2,$3F,$D2,$1C,$12,$C0,$F0,$1E;0E8620|        |      ;
+                       db $0E,$B2,$01,$D1,$0B,$02,$F0,$0F,$00,$EF,$B2,$3F,$D1,$31,$E0,$1E;0E8630|        |      ;
+                       db $14,$20,$D1,$BA,$F9,$41,$00,$E1,$1F,$00,$00,$10,$A2,$DE,$EE,$3F;0E8640|        |      ;
+; $BA,$F9: High parameters
+; $A2: Voice marker
+; $DE,$EE,$3F: Parameter sequence
+
+                       db $D1,$CE,$30,$31,$14,$A2,$F4,$2C,$62,$D1,$01,$2C,$E4,$01,$B2,$0F;0E8650|        |      ;
+; $CE: Parameter
+; $A2: Voice marker
+; $F4,$2C,$62: Parameters
+; $E4: DSP register marker
+; $B2: Voice marker
+
+                       db $11,$EE,$20,$C1,$2F,$0F,$20,$B2,$D0,$10,$E1,$20,$01,$2C,$04,$02;0E8660|        |      ;
+                       db $A2,$0C,$41,$C2,$4D,$E7,$5D,$F4,$0F,$B2,$11,$3F,$E0,$B1,$4E,$21;0E8670|        |      ;
+; $E7,$5D: Parameters
+; $F4,$0F: DSP register $F4 = $0F
+; $B1: Voice marker
+
+                       db $D0,$10,$A2,$DE,$EF,$3E,$14,$DE,$25,$3D,$3F,$B2,$F3,$12,$FD,$22;0E8680|        |      ;
+                       db $20,$D1,$3E,$04,$A2,$2D,$D4,$1D,$1D,$B1,$31,$EC,$14,$A2,$CD,$50;0E8690|        |      ;
+; $B1: Voice marker
+; $EC: Parameter
+; $A2: Voice marker
+; $CD: Parameter
+
+                       db $F1,$2D,$17,$F0,$0C,$FF,$B2,$E1,$FE,$3F,$00,$D4,$10,$4E,$FF,$A2;0E86A0|        |      ;
+                       db $F6,$C0,$4D,$EE,$0F,$90,$41,$0F,$A2,$FF,$12,$02,$3C,$D1,$32,$F3;0E86B0|        |      ;
+; $F6,$C0: High parameters
+; $90: High parameter
+; $A2: Voice marker (appears twice)
+
+                       db $10,$A2,$33,$F3,$6F,$14,$00,$0C,$FD,$B0,$A2,$CE,$DB,$21,$0D,$00;0E86C0|        |      ;
+; $DB: High parameter
+; $B0: Voice marker variant (or parameter)
+; $A2: Voice marker
+
+                       db $D1,$16,$FD,$B2,$42,$11,$F2,$2F,$12,$00,$00,$FF,$A2,$00,$19,$C7;0E86D0|        |      ;
+; $C7: Parameter
+; $A2: Voice marker
+
+                       db $4F,$D2,$DF,$5B,$CE,$B2,$FE,$F2,$EE,$20,$10,$EF,$FD,$F5,$B2,$DB;0E86E0|        |      ;
+; $DF,$5B,$CE: Parameters
+; $F5: Parameter
+; $DB: High parameter
+
+                       db $20,$24,$09,$15,$04,$42,$0E,$B2,$52,$D3,$1E,$00,$0F,$D0,$3E,$F1;0E86F0|        |      ;
+
+; ------------------------------------------------------------------------------
+; $0E8700-$0E87FF: Complex Voice Interleaving (256 bytes)
+; ------------------------------------------------------------------------------
+
+                       db $B2,$CF,$10,$3E,$F2,$EF,$F1,$1E,$F1,$A2,$32,$C3,$7D,$37,$EF,$2E;0E8700|        |      ;
+; $CF: Parameter
+; $A2: Voice marker
+; $7D,$37: High parameters
+
+                       db $03,$00,$A2,$1E,$00,$C0,$ED,$43,$E1,$20,$D0,$A2,$1F,$1D,$DD,$E3;0E8710|        |      ;
+                       db $02,$1B,$E3,$3D,$B2,$DF,$30,$D2,$2E,$03,$FE,$02,$1D,$B2,$13,$1F;0E8720|        |      ;
+                       db $D4,$4C,$C2,$0D,$10,$00,$A2,$F2,$F1,$20,$1F,$11,$C1,$4E,$43,$B2;0E8730|        |      ;
+                       db $F1,$12,$EF,$3F,$C1,$1F,$0C,$01,$A2,$BE,$F0,$00,$B1,$4C,$E2,$1F;0E8740|        |      ;
+; $BE: High parameter
+; $A2: Voice marker
+; $B1: Voice marker
+
+                       db $F2,$A2,$2D,$06,$FC,$55,$EC,$F7,$2C,$04,$A2,$5A,$D3,$44,$E4,$1D;0E8750|        |      ;
+; $EC,$F7: High parameters
+; $A2: Voice marker (appears twice)
+; $5A: Marker (channel separator from early pattern)
+
+                       db $40,$2E,$D3,$A6,$CE,$F2,$0F,$E1,$6B,$B5,$01,$0B,$A2,$32,$B2,$BD;0E8760|        |      ;
+; $A6: Voice marker variant
+; $6B,$B5: Parameters
+; $A2: Voice marker
+; $B2: Voice marker
+; $BD: High parameter
+
+                       db $4E,$11,$E1,$2D,$44,$A2,$A1,$37,$3D,$62,$06,$01,$3F,$2D,$A2,$36;0E8770|        |      ;
+; $A2,$A1: Voice marker sequence
+; $62: Parameter
+; $A2: Voice marker return
+
+                       db $C0,$D1,$6E,$D0,$2C,$D6,$CA,$A2,$2F,$1D,$A2,$FB,$E2,$39,$D7,$0D;0E8780|        |      ;
+; $6E: Parameter
+; $D6,$CA: Parameters
+; $A2: Voice marker (appears twice)
+; $FB: High parameter
+; $D7: Parameter
+
+                       db $A2,$07,$3E,$FF,$30,$C4,$6D,$E1,$0F,$A2,$F3,$24,$2E,$10,$13,$FD;0E8790|        |      ;
+; $C4,$6D: Parameters
+; $A2: Voice marker (appears twice)
+
+                       db $10,$D7,$B2,$1D,$22,$21,$F1,$1F,$03,$10,$2E,$A2,$D7,$2C,$E1,$EF;0E87A0|        |      ;
+; $D7: Parameter (repeated from 0E878D)
+; $B2: Voice marker
+; $A2: Voice marker
+; $D7: Parameter (third occurrence)
+
+                       db $31,$FC,$0F,$C4,$A2,$1C,$B0,$7D,$B2,$FF,$2F,$14,$A0,$B2,$2F,$12;0E87B0|        |      ;
+; $C4: Parameter
+; $A2: Voice marker
+; $B0: Voice marker variant
+; $7D: High parameter
+; $B2: Voice marker (appears three times)
+; $A0: Voice marker variant
+
+                       db $2F,$D1,$40,$F0,$23,$E0,$A2,$6D,$D0,$0F,$D0,$1D,$01,$F0,$D0,$A2;0E87C0|        |      ;
+; $6D: Parameter
+; $D0: Parameter (repeated multiple times)
+; $A2: Voice marker (appears twice)
+
+                       db $ED,$DC,$2A,$D3,$0D,$B5,$DC,$3E,$B2,$20,$02,$EF,$21,$EF,$54,$E0;0E87D0|        |      ;
+; $B5: Voice marker variant
+; $DC: Parameter (repeated)
+; $B2: Voice marker
+
+                       db $53,$B2,$01,$10,$00,$10,$D1,$0A,$02,$FF,$B2,$D0,$0D,$DE,$1E,$C2;0E87E0|        |      ;
+                       db $00,$2D,$01,$A2,$B3,$0D,$F1,$32,$E1,$4A,$F2,$F4,$B2,$E0,$4F,$E1;0E87F0|        |      ;
+; $A2,$B3: Voice marker sequence
+; $4A: Parameter
+; $F2,$F4: DSP registers
+; $B2: Voice marker
+
+; ------------------------------------------------------------------------------
+; $0E8800-$0E88FF: Advanced Voice Configuration (256 bytes)
+; ------------------------------------------------------------------------------
+
+                       db $10,$01,$2F,$D1,$1D,$A2,$34,$91,$4D,$CD,$D1,$50,$CE,$C2,$A2,$3B;0E8800|        |      ;
+; $91: High parameter
+; $CD: Parameter
+; $CE: Parameter
+; $A2: Voice marker (appears twice)
+; $3B: Parameter
+
+                       db $F1,$EF,$F3,$3E,$23,$F0,$FF,$A2,$DF,$2D,$21,$E0,$BF,$EF,$2E,$EF;0E8810|        |      ;
+; $BF: High parameter
+; $A2: Voice marker
+
+                       db $A2,$21,$11,$20,$B0,$42,$0E,$46,$01,$B2,$11,$F0,$4E,$E2,$00,$22;0E8820|        |      ;
+; $A2: Voice marker at start
+; $B0: Voice marker variant
+; $B2: Voice marker
+
+                       db $1F,$E0,$A2,$0E,$A5,$EC,$6E,$FF,$1E,$F4,$BD,$A2,$31,$11,$2E,$10;0E8830|        |      ;
+; $A2: Voice marker
+; $A5: Voice marker variant
+; $EC,$6E: Parameters
+; $BD: High parameter
+; $A2: Voice marker return
+
+                       db $C5,$CE,$3F,$40,$A2,$01,$11,$F0,$4D,$23,$F6,$34,$20,$A2,$E3,$1A;0E8840|        |      ;
+; $C5,$CE: Parameters
+; $A2: Voice marker (appears twice)
+; $F6: High parameter
+
+                       db $31,$C0,$FF,$3C,$AD,$EE,$A2,$E3,$EA,$21,$F3,$C0,$5D,$0F,$13,$B2;0E8850|        |      ;
+; $AD,$EE: High parameters
+; $A2: Voice marker
+; $EA: High parameter
+; $B2: Voice marker
+
+                       db $F2,$F0,$2E,$2F,$B2,$1E,$1F,$F3,$A2,$FB,$1F,$D0,$01,$1B,$E3,$10;0E8860|        |      ;
+; $B2: Voice marker (appears twice)
+; $A2: Voice marker
+; $FB: High parameter
+
+                       db $00,$A6,$11,$C2,$1E,$0F,$1F,$2F,$B2,$22,$A2,$20,$EF,$33,$35,$12;0E8870|        |      ;
+; $A6: Voice marker variant
+; $B2: Voice marker
+; $A2: Voice marker
+
+                       db $20,$4F,$00,$B2,$02,$D1,$2C,$02,$00,$B0,$4B,$E4,$A2,$40,$A0,$5D;0E8880|        |      ;
+; $B2: Voice marker
+; $B0: Voice marker variant
+; $4B: Parameter
+; $E4: DSP register marker
+; $A2: Voice marker
+; $A0: Voice marker variant
+
+                       db $B4,$4B,$E3,$1E,$12,$A2,$13,$F0,$1B,$33,$C1,$1D,$10,$BD,$A2,$43;0E8890|        |      ;
+; $B4: Voice marker variant
+; $4B: Parameter (repeated)
+; $E3: DSP register marker
+; $A2: Voice marker (appears twice)
+; $BD: High parameter
+
+                       db $CC,$04,$FE,$2D,$20,$F3,$FE,$A2,$E3,$23,$0C,$11,$FF,$1E,$36,$E2;0E88A0|        |      ;
+; $CC: Parameter
+; $A2: Voice marker
+; $E2: DSP register marker
+
+                       db $A2,$2E,$45,$DE,$5E,$C4,$2D,$E3,$4C,$A2,$91,$0B,$F1,$3C,$D5,$DD;0E88B0|        |      ;
+; $A2: Voice marker (appears twice)
+; $C4: Parameter
+; $E3: DSP register marker
+; $91: High parameter
+; $D5,$DD: Parameters
+
+                       db $0F,$0F,$B2,$00,$00,$FF,$21,$FF,$04,$0F,$41,$A2,$E2,$02,$2A,$D5;0E88C0|        |      ;
+; $B2: Voice marker
+; $A2: Voice marker
+; $E2: DSP register marker
+; $D5: Parameter
+
+                       db $3E,$21,$F2,$DF,$A2,$FD,$1F,$FC,$C2,$EC,$CB,$21,$AE,$A6,$31,$01;0E88D0|        |      ;
+; $DF: Parameter
+; $A2: Voice marker
+; $EC,$CB: Parameters
+; $AE,$A6: High parameters
+
+                       db $1E,$F1,$6D,$A6,$2D,$E6,$A2,$6C,$EF,$24,$DD,$2D,$E6,$CE,$4A,$A2;0E88E0|        |      ;
+; $6D: Parameter
+; $A6: Voice marker variant (appears twice)
+; $E6: DSP register marker (appears twice)
+; $6C: Parameter
+; $CE: Parameter
+; $4A: Parameter
+; $A2: Voice marker
+
+                       db $06,$AA,$4F,$B2,$30,$00,$02,$0E,$B2,$20,$C0,$1E,$00,$E0,$0F,$01;0E88F0|        |      ;
+; $AA: Marker (voice assignment from early patterns)
+; $B2: Voice marker (appears twice)
+; $C0: Parameter
+; $E0,$0F: DSP register $E0 = $0F
+
+; ------------------------------------------------------------------------------
+; $0E8900-$0E89FF: Extended Pattern Data (256 bytes)
+; ------------------------------------------------------------------------------
+
+                       db $02,$B2,$20,$21,$01,$E0,$DF,$4D,$DF,$01,$B2,$EF,$30,$D1,$2D,$C4;0E8900|        |      ;
+; $B2: Voice marker (appears twice)
+; $E0: DSP register marker
+; $DF: Parameter (repeated)
+; $C4: Parameter
+
+                       db $4D,$02,$00,$B2,$02,$4F,$F2,$10,$F1,$11,$00,$FD,$A6,$4F,$10,$F0;0E8910|        |      ;
+; $B2: Voice marker
+; $F2: DSP register marker
+; $F1: DSP register marker
+; $A6: Voice marker variant
+; $F0: DSP register marker
+
+                       db $F3,$B1,$22,$FF,$2D,$A6,$4D,$22,$DF,$17,$CA,$30,$1E,$36,$B2,$C0;0E8920|        |      ;
+; $F3: DSP register marker
+; $B1: Voice marker
+; $A6: Voice marker variant
+; $DF: Parameter
+; $CA: Parameter
+; $B2: Voice marker
+; $C0: Parameter
+
+                       db $2D,$31,$11,$10,$32,$F1,$12,$B2,$11,$1E,$0F,$E1,$E1,$FC,$2E,$E0;0E8930|        |      ;
+; $F1: DSP register marker
+; $B2: Voice marker
+; $E1: DSP register marker (repeated)
+; $E0: DSP register marker
+
+                       db $A2,$A0,$CC,$3E,$10,$D5,$DB,$5F,$D4,$B2,$11,$E1,$5C,$F2,$E1,$0F;0E8940|        |      ;
+; $A2: Voice marker
+; $A0: Voice marker variant
+; $CC: Parameter
+; $D5,$DB,$5F,$D4: Parameter sequence
+; $B2: Voice marker
+; $E1: DSP register marker
+; $F2: DSP register marker
+; $E1: DSP register marker
+
+                       db $12,$0F,$A2,$CD,$53,$DF,$F0,$11,$0C,$E3,$3D,$A2,$CF,$E0,$32,$DE;0E8950|        |      ;
+; $A2: Voice marker (appears twice)
+; $CD: Parameter
+; $DF: Parameter
+; $F0: DSP register marker
+; $E3: DSP register marker
+; $CF: Parameter
+; $E0: DSP register marker
+; $DE: Parameter
+
+                       db $2B,$E2,$34,$1F,$A2,$F3,$E0,$3E,$15,$1F,$11,$3D,$03,$A2,$A2,$2C;0E8960|        |      ;
+; $E2: DSP register marker
+; $A2: Voice marker (appears three times - double marker)
+; $F3: DSP register marker
+; $E0: DSP register marker
+
+                       db $00,$FC,$A1,$7C,$C0,$04,$A2,$E2,$11,$DF,$5E,$33,$E4,$4C,$E1,$A2;0E8970|        |      ;
+; $A1: Voice marker variant
+; $7C: High parameter
+; $C0: Parameter
+; $A2: Voice marker (appears twice)
+; $E2: DSP register marker
+; $DF: Parameter
+; $E4: DSP register marker
+; $E1: DSP register marker
+
+                       db $60,$A6,$3C,$01,$ED,$03,$F9,$BF,$A2,$09,$A3,$CD,$3F,$0E,$B3,$FE;0E8980|        |      ;
+; $A6: Voice marker variant
+; $F9,$BF: High parameters
+; $A2: Voice marker
+; $A3: Voice marker variant (new)
+; $CD: Parameter
+; $B3: Voice marker
+; $FE: Envelope marker
+
+                       db $73,$A6,$93,$40,$3D,$C6,$0A,$52,$CE,$35,$B2,$2F,$E0,$30,$E1,$1F;0E8990|        |      ;
+; $73: High parameter
+; $A6: Voice marker variant
+; $93: High parameter
+; $C6: Parameter
+; $CE: Parameter
+; $B2: Voice marker
+; $E0: DSP register marker
+; $E1: DSP register marker
+
+                       db $E1,$0B,$F2,$B2,$EF,$FF,$EC,$F1,$EF,$2E,$E1,$FE,$B6,$22,$DF,$32;0E89A0|        |      ;
+; $E1: DSP register marker
+; $F2: DSP register marker
+; $B2: Voice marker
+; $EC: Parameter
+; $F1: DSP register marker
+; $E1: DSP register marker
+; $B6: Voice marker variant (new)
+; $DF: Parameter
+
+                       db $DF,$3F,$F0,$23,$CE,$A2,$32,$20,$53,$A3,$2D,$1D,$01,$CC,$A2,$F3;0E89B0|        |      ;
+; $DF: Parameter
+; $F0: DSP register marker
+; $CE: Parameter
+; $A2: Voice marker
+; $A3: Voice marker variant
+; $CC: Parameter
+; $A2: Voice marker
+; $F3: DSP register marker
+
+                       db $1C,$E7,$5D,$0F,$D0,$40,$D2,$B2,$EF,$3B,$E5,$ED,$01,$2E,$E3,$1F;0E89C0|        |      ;
+; $E7: DSP register marker
+; $D0,$40,$D2: Parameter sequence
+; $B2: Voice marker
+; $E5: DSP register marker
+; $ED: Parameter
+; $E3: DSP register marker
+
+                       db $A2,$12,$FC,$17,$3D,$23,$A1,$50,$2D,$A2,$17,$E0,$0D,$41,$E3,$1C;0E89D0|        |      ;
+; $A2: Voice marker (appears twice)
+; $A1: Voice marker variant
+; $E0: DSP register marker
+; $E3: DSP register marker
+
+                       db $D2,$31,$A2,$32,$12,$11,$E2,$1A,$03,$FC,$C1,$A2,$DA,$2B,$A0,$DF;0E89E0|        |      ;
+; $D2: Parameter
+; $A2: Voice marker (appears twice)
+; $E2: DSP register marker
+; $DA: High parameter
+; $A0: Voice marker variant
+; $DF: Parameter
+
+                       db $F0,$4F,$D0,$E6,$B2,$FE,$21,$40,$F2,$21,$D1,$5F,$23,$A2,$B5,$6C;0E89F0|        |      ;
+; $F0: DSP register marker
+; $D0: Parameter
+; $E6: DSP register marker
+; $B2: Voice marker
+; $F2: DSP register marker
+; $D1: Parameter
+; $A2: Voice marker
+; $B5: Voice marker variant
+; $6C: Parameter
+
+; ==============================================================================
+; End of Bank $0E Cycle 1 (Lines 1-400)
+; Documented Address Range: $0E8000-$0E8A00 (2,560 bytes)
+; ==============================================================================
+; Technical Summary:
+; - Continuation of Bank $0D's SPC700 audio driver data
+; - 16+ voice channels in first 256 bytes (high complexity music)
+; - Voice markers: $B2 (bass/rhythm), $B1 (melody 1), $B3 (third voice),
+;                  $A2 (fourth voice), $A6 (variant), $B6 (variant),
+;                  $A3 (new variant), $A1 (variant), $B0/$B4/$B5 (variants)
+; - Channel separators: $8A (primary), $8B (variant at 0E80F2)
+; - DSP registers used: $F0 (FLG), $E0 (EDL), $E1 (EON?), $E2, $E3, $E4, $E5,
+;                       $E6, $E7, $F1, $F2, $F3, $F4, $C0-$Cx range
+; - Envelope markers: $CC/$DD/$DC/$BC/$EE/$EF/$FE/$ED (ADSR control)
+; - Pattern indicates complex multi-voice music tracks with:
+;   * Rapid voice switching (voice markers every 8-20 bytes)
+;   * Frequent DSP register updates (echo, modulation, effects)
+;   * High parameter values ($90+, $A0+, $F0+) for loud/bright passages
+;   * Zero padding sections (0E80FC-0E8107) marking structural boundaries
+; ==============================================================================
