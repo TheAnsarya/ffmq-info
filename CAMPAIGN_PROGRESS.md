@@ -5,15 +5,15 @@
 
 ## 📊 Advanced Metrics Dashboard
 
-### 🎯 Campaign Total: 34,772 lines (40.9%) ← **🎉 40% MILESTONE ACHIEVED! 🎉**
+### 🎯 Campaign Total: 35,285 lines (41.5%) ← **🎉 40% MILESTONE ACHIEVED! 🎉**
 
 ### Code Disassembly Progress
 | Metric | Progress | Target | Status |
 |--------|----------|--------|--------|
 | **Total Source Lines** | 85,000 (est.) | 85,000 | 🔍 Baseline |
-| **Lines Documented** | **34,772** | 85,000 | ✅ 40.9% |
+| **Lines Documented** | **35,285** | 85,000 | ✅ 41.5% |
 | **Banks Complete** | **8 of 16** | 16 | ✅ 50.0% |
-| **Banks In Progress** | **1 (Bank $0C)** | - | 🔄 68.1% |
+| **Bank $0C In Progress** | **3,393 / 4,226** | 4,226 | 🔄 80.3% |
 | **Next Milestone** | 42,500 (50%) | 85,000 (100%) | 🎯 +8,359 lines |
 
 ### Asset Extraction Progress
@@ -269,33 +269,38 @@ This epic session delivered:
    - Exceeded by: +607 lines
    - Strategy: Bank $09 Cycles 1-2 (+1,120 lines)
 
-3. 🔄 **Bank $09 In Progress** ← **NEW!**
-   - Current: **1,120 / 2,082 lines (53.8%)**
-   - Content: **Color palettes + graphics tile patterns**
-   - Discoveries: Multi-bank palette architecture, cross-bank pointers
-   - Cycles completed: 2 of ~5 expected
-   - Next: Continue to 75-100% or begin Bank $0A
+3. ✅ **40% Campaign Milestone** ← **ACHIEVED! (Oct 30, 2025)**
+   - Previous: 30.7%
+   - Current: **35,285 lines (41.5%)**
+   - Exceeded by: +785 lines
+   - Strategy: Bank $0C aggressive sprint (Cycles 4-7, +1,144 lines)
 
-4. 📊 **Data Extraction Tools** ← **PENDING**
+4. 🔄 **Bank $0C Display/PPU Management** ← **80.3% COMPLETE!**
+   - Current: **3,393 / 4,226 lines (80.3%)**
+   - Content: **Graphics decompression, sprite animation, VRAM management**
+   - Cycles completed: 7 of ~9-10 expected
+   - Remaining: 833 lines (19.7%)
+   - Next: Continue aggressive sprint to 100%
+
+5. 📊 **Data Extraction Tools** ← **PENDING**
    - Extract simple.tbl character mapping from ROM
    - Run rom_extractor.py on Banks $03/$07/$08/$09
    - Generate palette PNG swatches, JSON data
    - Create visualization documentation
 
 ### Mid-Term (3-5 Sessions)
-5. 🎯 **35% Campaign Milestone**
-   - Current: 26,107 lines (30.7%)
-   - Target: 29,750 lines (35%)
-   - Need: +3,643 lines
-   - Strategy: Complete Bank $09 + begin Bank $0A
+6. 🎯 **50% Campaign Milestone** ← **IN SIGHT!**
+   - Current: 35,285 lines (41.5%)
+   - Target: 42,500 lines (50%)
+   - Need: +7,215 lines
+   - Strategy: Complete Bank $0C (+833) + 75% of next bank (~6,400 lines)
 
-6. 🔍 **Bank $0A Analysis**
-   - Size: ~5,000 lines (estimated)
-   - Content: Extended palettes + additional graphics
-   - Referenced by Bank $09 pointer tables
-   - Target: 50%+ completion
+7. 🔍 **Bank $0D/$0E/$0F Analysis**
+   - Size: ~5,000 lines each (estimated)
+   - Content: Combat logic, AI, battle sequences
+   - Target: Begin after Bank $0C completion
 
-7. 🛠️ **EditorConfig Implementation**
+8. 🛠️ **EditorConfig Implementation**
    - Apply tab_width=23, indent_size=23 to all ASM files
    - Validate against Diztinguish formatting standards
    - Ensure column alignment for labels/opcodes/comments

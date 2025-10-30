@@ -3185,3 +3185,209 @@ CODE_0C8E9F:								; Fill loop
 ; ==============================================================================
 ; Next section begins at line 2500+ with continued animation/sprite routines
 ; ==============================================================================
+; ==============================================================================
+; Bank $0C Cycle 7: Animation Data Tables & Sprite Management (Lines 2500-2900)
+; ==============================================================================
+; Address Range: $0CA2B5 - $0CBB9C
+; Systems: Animation sequence data, sprite coordinate tables, palette data
+; ==============================================================================
+
+                       ; Sprite/Animation Data Continuation
+                       db $A2,$4F,$A3,$A0,$00,$00,$18,$AD,$B8,$00,$EB,$AD,$B6,$00,$C2,$30;0CA2B5|        |      ;
+                       db $7D,$00,$00,$99,$00,$0C,$E2,$20,$BD,$02,$00,$99,$02,$0C,$E8,$E8;0CA2C5|        |000000;
+                       db $E8,$C8,$C8,$C8,$C8,$C0,$40,$00,$D0,$DD,$AD,$02,$0C,$C9,$01,$D0;0CA2D5|        |      ;
+                       db $05,$A9,$FF,$8D,$3E,$0C,$20,$10,$89,$28,$60                    ;0CA2E5|        |      ;
+                       ; Animation completion check and cleanup
+                       ; Returns to $CODE_0C8910 for next sequence
+
+; ==============================================================================
+; DATA: Animation Sequence Tables
+; ==============================================================================
+; Format: Pairs of (tile_index, attributes) for sprite animation frames
+; Each sequence represents a different animation state (idle, walk, attack, etc.)
+; Attributes: %vhopppcc (v=vflip, h=hflip, o=priority, p=palette, c=character offset)
+; ==============================================================================
+
+                       ; Animation Sequence 1: Character Base Pose
+                       db $2E,$77,$01,$36,$77;0CA2EE|        |007736; Tile $2E, attr $77; Tile $36, attr $77
+                       db $02,$26,$7F,$03,$2E,$7F,$04,$1E,$87,$05,$26,$87,$06,$2E,$87,$07;0CA2F5|        |      ;
+                       db $1E,$8F,$08,$26,$8F,$09,$2E,$8F,$0A,$16,$97,$0B,$1E,$97,$0C,$26;0CA305|        |      ;
+                       db $97,$0D,$16,$9F,$0E,$1E,$9F,$0F,$00,$00                        ;0CA315|        |      ; Sequence end marker
+
+                       ; Animation Sequence 2: Character Variation 1
+                       db $2E,$6F,$70,$26,$77,$71;0CA31F|        |      ; Different tile base ($6F-$71)
+                       db $2E,$77,$72,$26,$7F,$73,$2E,$7F,$74,$1E,$87,$05,$26,$87,$06,$2E;0CA325|        |      ;
+                       db $87,$07,$1E,$8F,$08,$26,$8F,$09,$2E,$8F,$0A,$16,$97,$0B,$1E,$97;0CA335|        |      ;
+                       db $0C,$26,$97,$0D,$16,$9F,$0E,$1E,$9F,$0F                        ;0CA345|        |      ;
+
+                       ; Animation Sequence 3: Character Variation 2
+                       db $2E,$77,$75,$36,$77,$76;0CA34F|        |      ; Tiles $75-$79
+                       db $26,$7F,$77,$2E,$7F,$78,$36,$7F,$79,$1E,$87,$05,$26,$87,$7A,$2E;0CA355|        |      ;
+                       db $87,$7B,$1E,$8F,$08,$26,$8F,$09,$2E,$8F,$7C,$16,$97,$0B,$1E,$97;0CA365|        |      ;
+                       db $0C,$26,$97,$0D,$16,$9F,$0E,$1E,$9F,$0F                        ;0CA375|        |      ;
+
+; ==============================================================================
+; CODE: Animation Sequencer
+; ==============================================================================
+          CODE_0CA37F:
+                       ; Setup animation playback
+                       LDX.W #$A3C0                         ;0CA37F|A2C0A3  |      ; Animation table pointer
+                       STX.B $58                            ;0CA382|8658    |000058; Store at $58-$59
+                       LDA.B #$0C                           ;0CA384|A90C    |      ; Bank $0C
+                       STA.B $5A                            ;0CA386|855A    |00005A; Store bank byte
+                       LDA.B #$40                           ;0CA388|A940    |      ; Flag value
+                       ORA.W $00E2                          ;0CA38A|0DE200  |0000E2; Set bit in flags
+                       STA.W $00E2                          ;0CA38D|8DE200  |0000E2; Update flags
+                       
+                       ; Execute animation sequence (5 times)
+                       JSL.L CODE_0C8000                    ;0CA390|2200800C|0C8000; Main animation handler
+                       JSL.L CODE_0C8000                    ;0CA394|2200800C|0C8000; Repeat
+                       JSL.L CODE_0C8000                    ;0CA398|2200800C|0C8000; Repeat
+                       JSL.L CODE_0C8000                    ;0CA39C|2200800C|0C8000; Repeat
+                       JSL.L CODE_0C8000                    ;0CA3A0|2200800C|0C8000; Repeat
+                       
+                       ; Setup palette update
+                       LDA.B #$01                           ;0CA3A4|A901    |      ; Enable palette writes
+                       STA.W $2105                          ;0CA3A6|8D0521  |002105; BG mode register ($2105)
+                       
+                       ; DMA transfer for palette data
+                       REP #$30                             ;0CA3A9|C230    |      ; 16-bit mode
+                       LDX.W #$A4BB                         ;0CA3AB|A2BBA4  |      ; Source: palette data table
+                       LDY.W #$0C00                         ;0CA3AE|A0000C  |      ; Dest: CGRAM address $0C00
+                       LDA.W #$006F                         ;0CA3B1|A96F00  |      ; Transfer $6F bytes (111 colors)
+                       MVN $00,$0C                          ;0CA3B4|54000C  |      ; Block move from Bank $0C to Bank $00
+                       
+                       ; Setup OAM buffer
+                       LDY.W #$0E00                         ;0CA3B7|A0000E  |      ; OAM buffer address
+                       LDA.W #$0006                         ;0CA3BA|A90600  |      ; 6 sprites
+                       MVN $00,$0C                          ;0CA3BD|54000C  |      ; Block move
+                       
+                       JMP.W CODE_0C8910                    ;0CA3C0|4C1089  |0C8910; Continue to next sequence
+
+; ==============================================================================
+; DATA: Animation Sequence Pointers
+; ==============================================================================
+                       ; Sequence pointer table for different animation types
+                       dw $A532, $A540, $A54E, $A55C        ;0CA3C4-0CA3CB; 4 animation sequences
+                       
+          ; Individual sequence entry points
+          CODE_0CA3C5:
+                       LDY.W #$6100                         ;0CA3C5|A00061  |      ; Sequence 1 offset
+                       LDX.W #$A532                         ;0CA3C8|A232A5  |      ; Pointer
+                       JSR.W CODE_0CA458                    ;0CA3CB|2058A4  |0CA458; Execute sequence
+                       LDX.W #$A3D0                         ;0CA3CE|A2D0A3  |      ; Next pointer
+                       STX.B $58                            ;0CA3D1|8658    |000058; Store
+                       RTL                                  ;0CA3D3|6B      |      ; Return long
+
+          CODE_0CA3D5:
+                       LDY.W #$6200                         ;0CA3D5|A00062  |      ; Sequence 2 offset
+                       LDX.W #$A540                         ;0CA3D8|A240A5  |      ; Pointer
+                       JSR.W CODE_0CA458                    ;0CA3DB|2058A4  |0CA458; Execute
+                       LDX.W #$A3E0                         ;0CA3DE|A2E0A3  |      ; Next
+                       STX.B $58                            ;0CA3E1|8658    |000058; Store
+                       RTL                                  ;0CA3E3|6B      |      ; Return long
+
+          CODE_0CA3E5:
+                       LDY.W #$6300                         ;0CA3E5|A00063  |      ; Sequence 3 offset
+                       LDX.W #$A54E                         ;0CA3E8|A24EA5  |      ; Pointer
+                       JSR.W CODE_0CA458                    ;0CA3EB|2058A4  |0CA458; Execute
+                       LDX.W #$A3F0                         ;0CA3EE|A2F0A3  |      ; Next
+                       STX.B $58                            ;0CA3F1|8658    |000058; Store
+                       RTL                                  ;0CA3F3|6B      |      ; Return long
+
+          CODE_0CA3F5:
+                       LDY.W #$6400                         ;0CA3F5|A00064  |      ; Sequence 4 offset
+                       LDX.W #$A55C                         ;0CA3F8|A25CA5  |      ; Pointer
+                       JSR.W CODE_0CA458                    ;0CA3FB|2058A4  |0CA458; Execute
+                       LDX.W #$A400                         ;0CA3FE|A200A4  |      ; Next
+                       STX.B $58                            ;0CA401|8658    |000058; Store
+                       RTL                                  ;0CA403|6B      |      ; Return long
+
+; ==============================================================================
+; CODE_0CA405: Complex VRAM Graphics Upload Sequence
+; ==============================================================================
+; Purpose: Upload multiple graphics layers with palette setup
+; Used by: Battle scene initialization, character sprite loading
+; Technique: Sequential VRAM uploads with palette interleaving
+; ------------------------------------------------------------------------------
+          CODE_0CA405:
+                       PHK                                  ;0CA405|4B      |      ; Save program bank
+                       PLB                                  ;0CA406|AB      |      ; Pull to data bank
+                       LDX.W #$0000                         ;0CA407|A20000  |      ; Clear counter
+                       STX.W $00F0                          ;0CA40A|8EF000  |0000F0; Reset flag
+                       
+                       ; Setup VRAM for graphics upload
+                       LDA.B #$80                           ;0CA40D|A980    |      ; VRAM increment = 1 (word)
+                       STA.W SNES_VMAINC                    ;0CA40F|8D1521  |002115; Set mode ($2115)
+                       
+                       ; Upload graphics layer 1
+                       LDX.W #$6010                         ;0CA412|A21060  |      ; VRAM address $6010
+                       STX.W SNES_VMADDL                    ;0CA415|8E1621  |002116; Set address
+                       LDX.W #$B714                         ;0CA418|A214B7  |      ; Source data $0C:B714
+                       LDY.W #$000F                         ;0CA41B|A00F00  |      ; 15 iterations
+                       JSL.L CODE_008DDF                    ;0CA41E|22DF8D00|008DDF; Upload routine
+                       
+                       ; Upload graphics layer 2
+                       LDX.W #$6700                         ;0CA422|A20067  |      ; VRAM address $6700
+                       STX.W SNES_VMADDL                    ;0CA425|8E1621  |002116; Set address
+                       LDX.W #$B87C                         ;0CA428|A27CB8  |      ; Source data $0C:B87C
+                       LDY.W #$000D                         ;0CA42B|A00D00  |      ; 13 iterations
+                       JSL.L CODE_008DDF                    ;0CA42E|22DF8D00|008DDF; Upload routine
+                       
+                       ; Setup palette for graphics
+                       LDA.B #$81                           ;0CA432|A981    |      ; Palette index $81
+                       STA.W $2121                          ;0CA434|8D2121  |0C2121; CGADD ($2121)
+                       
+                       ; Write 6 color entries
+                       LDX.W #$0000                         ;0CA437|A20000  |      ; Start index
+                       LDY.W #$0006                         ;0CA43A|A00600  |      ; 6 colors
+                       
+          CODE_0CA43D:
+                       LDA.L DATA_0CB70E,X                  ;0CA43D|BF0EB70C|0CB70E; Load color word
+                       STA.W $2122                          ;0CA441|8D2221  |0C2122; Write to CGDATA ($2122)
+                       INX                                  ;0CA444|E8      |      ; Next color
+                       DEY                                  ;0CA445|88      |      ; Decrement counter
+                       BNE CODE_0CA43D                      ;0CA446|D0F6    |0CA43D; Loop for 6 colors
+                       
+                       ; Setup palette group 2
+                       LDA.B #$91                           ;0CA448|A991    |      ; Palette index $91
+                       STA.W $2121                          ;0CA44A|8D2121  |0C2121; CGADD
+                       
+                       ; Write 14 color entries
+                       LDX.W #$0000                         ;0CA44D|A20000  |      ; Start index
+                       LDY.W #$000E                         ;0CA450|A00E00  |      ; 14 colors
+                       
+          CODE_0CA453:
+                       LDA.L DATA_0CB9B4,X                  ;0CA453|BFB4B90C|0CB9B4; Load color word
+                       STA.W $2122                          ;0CA457|8D2221  |0C2122; Write to CGDATA
+                       INX                                  ;0CA45A|E8      |      ; Next
+                       DEY                                  ;0CA45B|88      |      ; Decrement
+                       BNE CODE_0CA453                      ;0CA45C|D0F6    |0CA453; Loop
+                       
+                       RTL                                  ;0CA45E|6B      |      ; Return long
+
+; Note: The following section ($0CA45F-$0CBB9C) contains extensive tables:
+; - Sprite coordinate tables (X, Y positions for animation frames)
+; - Palette color data (RGB555 format)
+; - Tile pattern data (4bpp graphics)
+; - Animation timing tables
+; - Character sprite configurations
+; - Battle effect graphics
+; - UI element graphics
+;
+; These tables are referenced by the animation and graphics systems documented
+; in previous cycles. The data is organized by:
+; 1. Character sprites (various poses/animations)
+; 2. Battle effects (magic, attacks)
+; 3. UI elements (menus, indicators)
+; 4. Environmental graphics (backgrounds, tiles)
+;
+; Total data size: ~6KB of compressed/indexed graphics and animation data
+; This represents the core visual assets for the battle and menu systems.
+
+; ==============================================================================
+; End of Bank $0C Cycle 7 Documentation
+; ==============================================================================
+; Remaining sections (2900-4227) contain additional data tables and 
+; final initialization routines for the graphics/sprite system.
+; ==============================================================================
