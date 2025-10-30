@@ -172,6 +172,48 @@ where are the COMPREHENSIVE DATA TABLES EXTRACTED? all of the data and graphics 
 
 where are the COMPREHENSIVE DATA TABLES EXTRACTED? all of the data and graphics and music and just bin-data extract them! find/use or create a file structure that saves (extracts) all of the data/graphics/etc and reinserts it, but saves 1) `original binary data as a series of files` and 2) `converted "pngs" and "json" files` and other files, like csv, and then 3) a final cpnverted back from png/json/etc into `bin` files (save chat/session logs, git commit)
 
+add `*.asm` files to the `.editorconfig` file with rules for crlf, utf-8, tabs not spaces (display: 4 spaces), have a blank line at the end of the file; many of these asm files have severe indentation (like 10 spaces or whatever), fix them to have the single tab indent, fix everything to use tabs and continue these import cycles and don't stop until all banks are done, create a git commit and push including description every few cycles
+continue
+continue
+continue
+make sure you're updating the chat/session logs (`md` files) and creating git commits with descriptions at the end of the effort cycle, and continue aggressively creating the disassembly and tools and documentation
+make sure you're updating the chat/session logs (`md` files) and creating git commits with descriptions at the end of the effort cycle, and continue aggressively creating the disassembly and tools and documentation
+
+**********************************
+🎯 Next Steps
+You can now choose:
+
+Option A: Continue Bank $09 to 100% (need +962 more lines, ~2-3 cycles)
+Option B: Begin Bank $0A exploration (extended palettes referenced by $09)
+Option C: Extract palette visualization tools (PNG swatches, JSON export)
+What would you like to tackle next?
+***********************************
+
+option C, then option B, then option A, then continue (make sure you're updating the chat/session logs and commiting the code, and documenting the code and assets relentlessly)
+
+Create git commit first (document all changes before continuing), Continue with Option A now (complete Bank $09 Cycles 3-5)and  resume (with log and commits and documentation) the aggressive disassembly (with documentation!) of the ROM file using the temp file approach from earlier to reduce the time between cycles and banks
+
+continue with our agreed-upon side shit, and continue agressive decompilation
+
+this `bank_0a` file is documenting a different `Final Fantasy` game, what the hell, get rid of this other game's data and purge it''s influence on this dissassembly
+
+resume (with log and commits and documentation) the aggressive disassembly (with documentation!) of the ROM file using the temp file approach from earlier to reduce the time between cycles and banks; and whatever extraction tools of data and graphics and sound and etc
+
+fix it, use appropriate sources, and continue
+fix it, use appropriate sources, and continue
+
+
+
+
+
+
+
+
+
+
+
+
+create documentation that describes the entire hero or enemy or map data structures or tiles or music and how to update them easily through the transitory files like - the extraction tools extract the hero graphics and animations and palettes to json and png (using the right palettes) files that cna be edited - then the build tools convert those png/json/pal files back into the data structures for the insertion build process.
 
 
 
