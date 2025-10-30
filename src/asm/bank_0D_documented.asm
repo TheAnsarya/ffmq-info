@@ -838,3 +838,308 @@ CODE_0D80F3:
 ; ------------------------------------------------------------------------------
                        JSR.W CODE_0D85FA                    ;0D8246|20FA85  |0D85FA; Transfer data routine
 
+; ------------------------------------------------------------------------------
+; Continue: Track Data Transfer (from CODE_0D8249)
+; ------------------------------------------------------------------------------
+                       LDY.B $14                            ;0D8249|A414    |000614; Get pointer offset
+                       STZ.B $14                            ;0D824B|6414    |000614; Clear pointer low
+                       STZ.B $15                            ;0D824D|6415    |000615; Clear pointer mid
+                       LDA.B [$14],Y                        ;0D824F|B714    |000614; Read size low from data
+                       XBA                                  ;0D8251|EB      |      ; Swap to B accumulator
+                       INY                                  ;0D8252|C8      |      ; Next byte
+                       BNE CODE_0D825A                      ;0D8253|D005    |0D825A; If no page wrap
+                       db $E6,$16,$A0,$00,$80               ;0D8255|        |000016; Increment bank, reset Y
+
+          CODE_0D825A:
+                       LDA.B [$14],Y                        ;0D825A|B714    |000614; Read size high
+                       PHA                                  ;0D825C|48      |      ; Push size high
+                       INY                                  ;0D825D|C8      |      ; Next byte
+                       BNE CODE_0D8265                      ;0D825E|D005    |0D8265; If no page wrap
+                       db $E6,$16,$A0,$00,$80               ;0D8260|        |000016; Increment bank, reset Y
+
+          CODE_0D8265:
+                       XBA                                  ;0D8265|EB      |      ; Get size low from B
+                       PHA                                  ;0D8266|48      |      ; Push size low
+                       PLX                                  ;0D8267|FA      |      ; Pull both size bytes to X
+                       LDA.B #$05                           ;0D8268|A905    |      ; Handshake start value $05
+                       XBA                                  ;0D826A|EB      |      ; Save to B accumulator
+
+; ==============================================================================
+; CODE_0D826B: Data Block Transfer Loop
+; ==============================================================================
+; Transfers data blocks (3 bytes at a time) with handshake protocol
+; Each iteration sends: [byte1 to APUIO2, byte2 to APUIO3, handshake to APUIO0]
+; X register counts down from data size
+; ==============================================================================
+          CODE_0D826B:
+                       LDA.B [$14],Y                        ;0D826B|B714    |000614; Read data byte 1
+                       STA.W SNES_APUIO2                    ;0D826D|8D4221  |002142; Send to APUIO2
+                       INY                                  ;0D8270|C8      |      ; Next byte
+                       BNE CODE_0D8278                      ;0D8271|D005    |0D8278; If no page wrap
+                       db $E6,$16,$A0,$00,$80               ;0D8273|        |000016; Increment bank, reset Y
+
+          CODE_0D8278:
+                       LDA.B [$14],Y                        ;0D8278|B714    |000614; Read data byte 2
+                       STA.W SNES_APUIO3                    ;0D827A|8D4321  |002143; Send to APUIO3
+                       INY                                  ;0D827D|C8      |      ; Next byte
+                       BNE CODE_0D8285                      ;0D827E|D005    |0D8285; If no page wrap
+                       db $E6,$16,$A0,$00,$80               ;0D8280|        |000016; Increment bank, reset Y
+
+          CODE_0D8285:
+                       XBA                                  ;0D8285|EB      |      ; Get handshake from B
+                       STA.W SNES_APUIO0                    ;0D8286|8D4021  |002140; Send to trigger transfer
+
+          CODE_0D8289:
+                       CMP.W SNES_APUIO0                    ;0D8289|CD4021  |002140; Wait for SPC700 echo
+                       BNE CODE_0D8289                      ;0D828C|D0FB    |0D8289; Loop until confirmed
+                       INC A                                ;0D828E|1A      |      ; Increment handshake
+                       BNE CODE_0D8292                      ;0D828F|D001    |0D8292; If not $00
+                       INC A                                ;0D8291|1A      |      ; Skip $00 (use $01 instead)
+
+          CODE_0D8292:
+                       XBA                                  ;0D8292|EB      |      ; Save handshake to B
+                       DEX                                  ;0D8293|CA      |      ; Decrement byte counter
+                       DEX                                  ;0D8294|CA      |      ; (2 bytes per iteration)
+                       BPL CODE_0D826B                      ;0D8295|10D4    |0D826B; Loop if more data
+
+; ==============================================================================
+; Post-Transfer Initialization
+; ==============================================================================
+; After track data transfer complete, set up playback parameters
+; Initializes channel buffers and prepares for audio playback
+; ==============================================================================
+
+; ------------------------------------------------------------------------------
+; Set up multiplication for later calculations
+; ------------------------------------------------------------------------------
+                       LDA.B #$20                           ;0D8297|A920    |      ; Multiply by $20
+                       STA.W SNES_WRMPYB                    ;0D8299|8D0342  |004203; Set multiplier
+                       REP #$20                             ;0D829C|C220    |      ; 16-bit accumulator
+
+; ------------------------------------------------------------------------------
+; Clear channel buffers ($0688-$06A7 and $06C8-$06E7)
+; These store active channel states for music playback
+; ------------------------------------------------------------------------------
+                       LDX.W #$0000                         ;0D829E|A20000  |      ; Start at offset 0
+          CODE_0D82A1:
+                       STZ.B $88,X                          ;0D82A1|7488    |000688; Clear buffer 1 entry
+                       STZ.B $C8,X                          ;0D82A3|74C8    |0006C8; Clear buffer 2 entry
+                       INX                                  ;0D82A5|E8      |      ; Next entry
+                       INX                                  ;0D82A6|E8      |      ; (2 bytes per entry)
+                       CPX.W #$0020                         ;0D82A7|E02000  |      ; 16 entries total (32 bytes)
+                       BNE CODE_0D82A1                      ;0D82AA|D0F5    |0D82A1; Loop until all cleared
+
+; ------------------------------------------------------------------------------
+; Calculate pattern table base address
+; Uses hardware multiply result (track# × $20) as offset
+; ------------------------------------------------------------------------------
+                       LDA.W SNES_RDMPYL                    ;0D82AC|AD1642  |004216; Get multiply result
+                       TAX                                  ;0D82AF|AA      |      ; X = pattern table offset
+                       CLC                                  ;0D82B0|18      |      ; Clear carry
+                       ADC.W #$0020                         ;0D82B1|692000  |      ; Add $20 (next entry)
+                       STA.B $12                            ;0D82B4|8512    |000612; Store end offset
+
+; ------------------------------------------------------------------------------
+; Set up buffer pointers
+; $14 = $06A8 (pattern data buffer)
+; $16 = $06C8 (secondary buffer)
+; ------------------------------------------------------------------------------
+                       LDA.W #$06A8                         ;0D82B6|A9A806  |      ; Buffer 1 address
+                       STA.B $14                            ;0D82B9|8514    |000614; Store to DP
+                       LDA.W #$06C8                         ;0D82BB|A9C806  |      ; Buffer 2 address
+                       STA.B $16                            ;0D82BE|8516    |000616; Store to DP
+
+; ==============================================================================
+; CODE_0D82C0: Pattern Table Processing Loop
+; ==============================================================================
+; Processes pattern data from table, distributing to buffers
+; Handles pattern assignment to audio channels
+; ==============================================================================
+          CODE_0D82C0:
+                       LDA.L UNREACH_0DBEA1,X               ;0D82C0|BFA1BE0D|0DBEA1; Load pattern table entry
+                       STA.B ($14)                          ;0D82C4|9214    |000614; Store to buffer 1
+                       INC.B $14                            ;0D82C6|E614    |000614; Advance pointer
+                       INC.B $14                            ;0D82C8|E614    |000614; (2 bytes per entry)
+                       LDY.W #$0000                         ;0D82CA|A00000  |      ; Y = search offset
+
+; ------------------------------------------------------------------------------
+; Search for matching pattern in channel buffer
+; ------------------------------------------------------------------------------
+          CODE_0D82CD:
+                       CMP.W $0628,Y                        ;0D82CD|D92806  |000628; Compare with channel entry
+                       BEQ CODE_0D82E1                      ;0D82D0|F00F    |0D82E1; If match found
+                       INY                                  ;0D82D2|C8      |      ; Next channel
+                       INY                                  ;0D82D3|C8      |      ; (2 bytes per channel)
+                       CPY.W #$0020                         ;0D82D4|C02000  |      ; 16 channels total
+                       BNE CODE_0D82CD                      ;0D82D7|D0F4    |0D82CD; Loop until all checked
+
+; ------------------------------------------------------------------------------
+; No match found - store to buffer 2
+; ------------------------------------------------------------------------------
+                       STA.B ($16)                          ;0D82D9|9216    |000616; Store to buffer 2
+                       INC.B $16                            ;0D82DB|E616    |000616; Advance pointer
+                       INC.B $16                            ;0D82DD|E616    |000616; (2 bytes per entry)
+                       BRA CODE_0D82E4                      ;0D82DF|8003    |0D82E4; Continue
+
+; ------------------------------------------------------------------------------
+; Match found - update channel buffer
+; ------------------------------------------------------------------------------
+          CODE_0D82E1:
+                       STA.W $0688,Y                        ;0D82E1|998806  |000688; Store to channel buffer
+
+          CODE_0D82E4:
+                       INX                                  ;0D82E4|E8      |      ; Next table entry
+                       INX                                  ;0D82E5|E8      |      ; (2 bytes per entry)
+                       CPX.B $12                            ;0D82E6|E412    |000612; Check if at end
+                       BNE CODE_0D82C0                      ;0D82E8|D0D6    |0D82C0; Loop if more entries
+
+; ------------------------------------------------------------------------------
+; Check if buffer 2 has any entries
+; If empty, skip advanced processing
+; ------------------------------------------------------------------------------
+                       LDA.B $C8                            ;0D82EA|A5C8    |0006C8; Check buffer 2 first entry
+                       BNE CODE_0D82F1                      ;0D82EC|D003    |0D82F1; If not empty, continue
+                       JMP.W CODE_0D84DD                    ;0D82EE|4CDD84  |0D84DD; If empty, skip to end
+
+; ==============================================================================
+; CODE_0D82F1: Sound Effect Processing
+; ==============================================================================
+; Processes sound effects from buffer 2
+; Calculates sizes and prepares data for upload to SPC700
+; ==============================================================================
+          CODE_0D82F1:
+                       STZ.B $17                            ;0D82F1|6417    |000617; Clear size accumulator low
+                       SEP #$20                             ;0D82F3|E220    |      ; 8-bit accumulator
+                       LDA.B #$03                           ;0D82F5|A903    |      ; Multiply by 3
+                       STA.W SNES_WRMPYA                    ;0D82F7|8D0242  |004202; Set multiplicand
+                       LDX.W #$0000                         ;0D82FA|A20000  |      ; Start at first entry
+
+; ------------------------------------------------------------------------------
+; Loop through buffer 2 entries, accumulate sizes
+; ------------------------------------------------------------------------------
+          CODE_0D82FD:
+                       LDA.B $C8,X                          ;0D82FD|B5C8    |0006C8; Load buffer 2 entry
+                       BEQ CODE_0D8340                      ;0D82FF|F03F    |0D8340; If zero, end of list
+                       DEC A                                ;0D8301|3A      |      ; Convert to 0-based index
+                       STA.W SNES_WRMPYB                    ;0D8302|8D0342  |004203; Multiply (entry × 3)
+                       NOP                                  ;0D8305|EA      |      ; Wait for multiply (8 cycles)
+                       NOP                                  ;0D8306|EA      |      ;
+                       PHX                                  ;0D8307|DA      |      ; Save buffer index
+
+; ------------------------------------------------------------------------------
+; Look up sound effect data pointer using multiply result
+; ------------------------------------------------------------------------------
+                       LDX.W SNES_RDMPYL                    ;0D8308|AE1642  |004216; Get multiply result (index × 3)
+                       LDA.L DATA8_0DBDFF,X                 ;0D830B|BFFFBD0D|0DBDFF; Load data pointer low
+                       STA.B $14                            ;0D830F|8514    |000614; Store to DP
+                       LDA.L DATA8_0DBE00,X                 ;0D8311|BF00BE0D|0DBE00; Load data pointer mid
+                       STA.B $15                            ;0D8315|8515    |000615; Store to DP
+                       LDA.L DATA8_0DBE01,X                 ;0D8317|BF01BE0D|0DBE01; Load data pointer bank
+                       STA.B $16                            ;0D831B|8516    |000616; Store to DP
+
+; ------------------------------------------------------------------------------
+; Transfer SFX data to SPC700
+; ------------------------------------------------------------------------------
+                       JSR.W CODE_0D85FA                    ;0D831D|20FA85  |0D85FA; Call transfer routine
+
+; ------------------------------------------------------------------------------
+; Read SFX size from data (first 2 bytes)
+; ------------------------------------------------------------------------------
+                       LDY.B $14                            ;0D8320|A414    |000614; Get final pointer offset
+                       STZ.B $14                            ;0D8322|6414    |000614; Clear pointer low
+                       STZ.B $15                            ;0D8324|6415    |000615; Clear pointer mid
+                       LDA.B [$14],Y                        ;0D8326|B714    |000614; Read size low byte
+                       CLC                                  ;0D8328|18      |      ; Clear carry
+                       ADC.B $17                            ;0D8329|6517    |000617; Add to accumulator
+                       STA.B $17                            ;0D832B|8517    |000617; Store total size low
+                       INY                                  ;0D832D|C8      |      ; Next byte
+                       BNE CODE_0D8335                      ;0D832E|D005    |0D8335; If no page wrap
+                       db $E6,$16,$A0,$00,$80               ;0D8330|        |000016; Increment bank, reset Y
+
+          CODE_0D8335:
+                       LDA.B [$14],Y                        ;0D8335|B714    |000614; Read size high byte
+                       ADC.B $18                            ;0D8337|6518    |000618; Add to accumulator high
+                       STA.B $18                            ;0D8339|8518    |000618; Store total size high
+                       PLX                                  ;0D833B|FA      |      ; Restore buffer index
+                       INX                                  ;0D833C|E8      |      ; Next entry
+                       INX                                  ;0D833D|E8      |      ; (2 bytes per entry)
+                       BRA CODE_0D82FD                      ;0D833E|80BD    |0D82FD; Loop for next SFX
+
+; ==============================================================================
+; CODE_0D8340: Channel Allocation and Memory Management
+; ==============================================================================
+; Finds free channels and allocates memory for new patterns
+; Manages SPC700 RAM space for audio data
+; ==============================================================================
+          CODE_0D8340:
+                       LDX.W #$0000                         ;0D8340|A20000  |      ; Start at channel 0
+                       REP #$20                             ;0D8343|C220    |      ; 16-bit accumulator
+
+; ------------------------------------------------------------------------------
+; Find first free channel slot
+; ------------------------------------------------------------------------------
+          CODE_0D8345:
+                       LDA.B $28,X                          ;0D8345|B528    |000628; Check channel status
+                       BEQ CODE_0D834D                      ;0D8347|F004    |0D834D; If free, found slot
+                       INX                                  ;0D8349|E8      |      ; Next channel
+                       INX                                  ;0D834A|E8      |      ; (2 bytes per channel)
+                       BRA CODE_0D8345                      ;0D834B|80F8    |0D8345; Keep searching
+
+; ------------------------------------------------------------------------------
+; Check if new data fits in available SPC700 RAM
+; SPC700 has limited RAM ($0000-$FFFF), must not overflow
+; ------------------------------------------------------------------------------
+          CODE_0D834D:
+                       LDA.B $48,X                          ;0D834D|B548    |000648; Get current RAM position
+                       CLC                                  ;0D834F|18      |      ; Clear carry
+                       ADC.B $17                            ;0D8350|6517    |000617; Add new data size
+                       BCS CODE_0D835C                      ;0D8352|B008    |0D835C; If overflow, reallocate
+                       CMP.W #$D200                         ;0D8354|C900D2  |      ; Compare with RAM limit
+                       BCS CODE_0D835C                      ;0D8357|B003    |0D835C; If >= $D200, reallocate
+                       JMP.W CODE_0D840E                    ;0D8359|4C0E84  |0D840E; Data fits, proceed
+
+; ==============================================================================
+; CODE_0D835C: Memory Reallocation
+; ==============================================================================
+; SPC700 RAM is full - need to free old patterns and reorganize
+; Finds patterns to evict and compacts memory
+; ==============================================================================
+          CODE_0D835C:
+                       LDX.W #$001E                         ;0D835C|A21E00  |      ; Start from last channel
+          CODE_0D835F:
+                       LDA.B $86,X                          ;0D835F|B586    |000686; Check channel active
+                       BNE CODE_0D8367                      ;0D8361|D004    |0D8367; If active, found last used
+                       DEX                                  ;0D8363|CA      |      ; Previous channel
+                       DEX                                  ;0D8364|CA      |      ; (2 bytes per channel)
+                       BNE CODE_0D835F                      ;0D8365|D0F8    |0D835F; Loop until found
+
+          CODE_0D8367:
+                       STX.B $24                            ;0D8367|8624    |000624; Store last used channel
+                       LDX.W #$0000                         ;0D8369|A20000  |      ; Start from first channel
+
+; ------------------------------------------------------------------------------
+; Find first free slot in pattern buffer
+; ------------------------------------------------------------------------------
+          CODE_0D836C:
+                       LDA.B $88,X                          ;0D836C|B588    |000688; Check pattern buffer
+                       BEQ CODE_0D8377                      ;0D836E|F007    |0D8377; If free, found slot
+                       INX                                  ;0D8370|E8      |      ; Next slot
+                       INX                                  ;0D8371|E8      |      ; (2 bytes per slot)
+                       CPX.W #$0020                         ;0D8372|E02000  |      ; 16 slots total
+                       BNE CODE_0D836C                      ;0D8375|D0F5    |0D836C; Loop
+
+          CODE_0D8377:
+                       CPX.B $24                            ;0D8377|E424    |000624; Compare with last used
+                       BNE CODE_0D8387                      ;0D8379|D00C    |0D8387; If different, proceed
+
+; ------------------------------------------------------------------------------
+; All channels full - clear from this point
+; ------------------------------------------------------------------------------
+          CODE_0D837B:
+                       STZ.B $28,X                          ;0D837B|7428    |000628; Clear channel status
+                       INX                                  ;0D837D|E8      |      ; Next channel
+                       INX                                  ;0D837E|E8      |      ; (2 bytes per channel)
+                       CPX.W #$0020                         ;0D837F|E02000  |      ; All channels
+                       BNE CODE_0D837B                      ;0D8382|D0F7    |0D837B; Loop
+                       JMP.W CODE_0D840E                    ;0D8384|4C0E84  |0D840E; Continue processing
+
