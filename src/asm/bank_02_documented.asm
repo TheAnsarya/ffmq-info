@@ -1724,109 +1724,109 @@ validation_complete:
 ;CODE_029399: Multi-stage entity initialization with graphics coordination
 ;Advanced system initialization that coordinates entity processing with graphics subsystems
 ;Handles complex multi-bank coordination and state management
-CODE_029399:
-    JSR.W CODE_0297B8       ; Initialize base graphics processing system
-    LDA.B #$23              ; Set graphics processing mode
-    STA.B $E2               ; Store graphics mode configuration
-    LDA.B #$14              ; Set entity processing parameter
-    STA.B $DF               ; Store entity processing mode
-    BRA CODE_0293AF         ; Jump to main processing loop
+Entity_InitWithGraphics:
+    JSR.W Entity_InitBaseGraphics    ; Initialize base graphics processing system
+    LDA.B #$23                       ; Set graphics processing mode
+    STA.B $E2                        ; Store graphics mode configuration
+    LDA.B #$14                       ; Set entity processing parameter
+    STA.B $DF                        ; Store entity processing mode
+    BRA Entity_ProcessMainLoop       ; Jump to main processing loop
 
 ;Advanced entity validation with cross-system checks
 ;Implements sophisticated validation logic for entity consistency
-CODE_0293A6:
-    LDA.B $90               ; Load current entity index
-    CMP.B $8F               ; Compare with maximum entity count
-    BNE CODE_0293B2         ; Branch if within valid range
-    JSR.W CODE_0297BE       ; Execute entity boundary validation
+Entity_ValidateBoundary:
+    LDA.B $90                        ; Load current entity index
+    CMP.B $8F                        ; Compare with maximum entity count
+    BNE Entity_DispatchMode          ; Branch if within valid range
+    JSR.W Entity_ValidateBoundaryAlt ; Execute entity boundary validation
 
 ;Main entity processing coordinator with state management
 ;Central processing hub that coordinates all entity operations
-CODE_0293AF:
-    JSR.W CODE_02A0E1       ; Execute advanced entity processing
+Entity_ProcessMainLoop:
+    JSR.W CODE_02A0E1                ; Execute advanced entity processing
 
 ;Entity mode dispatcher with specialized handlers
 ;Routes entities to appropriate processing based on mode flags
-CODE_0293B2:
-    LDA.B $38               ; Load entity mode identifier
-    CMP.B #$30              ; Check for special mode $30
-    BNE CODE_0293BB         ; Branch to alternate processing
-    JMP.W CODE_029E79       ; Jump to specialized mode $30 handler
+Entity_DispatchMode:
+    LDA.B $38                        ; Load entity mode identifier
+    CMP.B #$30                       ; Check for special mode $30
+    BNE Entity_ProcessStandard       ; Branch to alternate processing
+    JMP.W CODE_029E79                ; Jump to specialized mode $30 handler
 
 ;Default entity processing route
-CODE_0293BB:
-    JMP.W CODE_029E1A       ; Jump to standard entity processing
+Entity_ProcessStandard:
+    JMP.W CODE_029E1A                ; Jump to standard entity processing
 
 ;Entity synchronization with graphics system validation
 ;Ensures entity state remains synchronized with graphics processing
-    LDA.B $90               ; Load entity synchronization index
-    CMP.B $8F               ; Validate entity boundary
-    BNE CODE_0293C7         ; Continue if valid
-    JSR.W CODE_029797       ; Execute entity synchronization
+    LDA.B $90                        ; Load entity synchronization index
+    CMP.B $8F                        ; Validate entity boundary
+    BNE Entity_ProcessByMode         ; Continue if valid
+    JSR.W Entity_Synchronize         ; Execute entity synchronization
 
 ;Advanced entity processing with mode-specific handlers
 ;Implements sophisticated entity processing with multiple specialized paths
-CODE_0293C7:
-    JSR.W CODE_0297D9       ; Initialize entity processing environment
-    JSR.W CODE_02999D       ; Execute entity state validation
-    LDA.B $DE               ; Load entity processing mode
-    CMP.B #$0F              ; Check for mode $0F (standard processing)
-    BEQ CODE_0293E0         ; Branch to standard handler
-    CMP.B #$10              ; Check for mode $10 (enhanced processing)
-    BEQ UNREACH_0293E5      ; Branch to enhanced handler
-    CMP.B #$11              ; Check for mode $11 (advanced processing)
-    BEQ CODE_0293EA         ; Branch to advanced handler
-    JSR.W CODE_029ADA       ; Execute default entity processing
-    BRA CODE_0293ED         ; Continue to finalization
+Entity_ProcessByMode:
+    JSR.W CODE_0297D9                ; Initialize entity processing environment
+    JSR.W CODE_02999D                ; Execute entity state validation
+    LDA.B $DE                        ; Load entity processing mode
+    CMP.B #$0F                       ; Check for mode $0F (standard processing)
+    BEQ Entity_ProcessMode0F         ; Branch to standard handler
+    CMP.B #$10                       ; Check for mode $10 (enhanced processing)
+    BEQ UNREACH_0293E5               ; Branch to enhanced handler
+    CMP.B #$11                       ; Check for mode $11 (advanced processing)
+    BEQ Entity_ProcessMode11         ; Branch to advanced handler
+    JSR.W Entity_ProcessDefault      ; Execute default entity processing
+    BRA Entity_ProcessFinalize       ; Continue to finalization
 
 ;Standard entity processing mode ($0F)
 ;Handles standard entity operations with optimized processing
-CODE_0293E0:
-    JSR.W CODE_029AAE       ; Execute standard entity processing
-    BRA CODE_0293ED         ; Continue to finalization
+Entity_ProcessMode0F:
+    JSR.W Entity_ProcessStandardMode ; Execute standard entity processing
+    BRA Entity_ProcessFinalize       ; Continue to finalization
 
 ;Enhanced entity processing mode ($10) - unreachable in normal execution
 UNREACH_0293E5:
-    db $20,$DA,$9A,$80,$03  ; Enhanced processing routine (unreachable)
+    db $20,$DA,$9A,$80,$03           ; Enhanced processing routine (unreachable)
 
 ;Advanced entity processing mode ($11)
 ;Implements complex entity processing with extended capabilities
-CODE_0293EA:
-    JSR.W CODE_029ADA       ; Execute advanced entity processing
+Entity_ProcessMode11:
+    JSR.W Entity_ProcessDefault      ; Execute advanced entity processing
 
 ;Entity processing finalization with system updates
 ;Completes entity processing and updates all dependent systems
-CODE_0293ED:
-    JSR.W CODE_029BED       ; Finalize entity state
-    JSR.W CODE_029727       ; Update entity calculations
-    JSR.W CODE_0299DA       ; Synchronize entity data
-    LDA.B $3A               ; Check for special entity condition
-    CMP.B #$8A              ; Test for condition $8A
-    BEQ CODE_0293FD         ; Branch to special processing
-    RTS                     ; Return if no special processing needed
+Entity_ProcessFinalize:
+    JSR.W CODE_029BED                ; Finalize entity state
+    JSR.W Entity_UpdateCalculations  ; Update entity calculations
+    JSR.W CODE_0299DA                ; Synchronize entity data
+    LDA.B $3A                        ; Check for special entity condition
+    CMP.B #$8A                       ; Test for condition $8A
+    BEQ Entity_ProcessMathAdvanced   ; Branch to special processing
+    RTS                              ; Return if no special processing needed
 
 ;Advanced mathematical processing with 16-bit calculations
 ;Implements complex mathematical operations for entity positioning
-CODE_0293FD:
-    REP #$30                ; Set 16-bit accumulator and index registers
-    LDA.W $1116             ; Load position coordinate high
-    SEC                     ; Set carry for subtraction
-    SBC.W $1114             ; Subtract position coordinate low
-    CMP.W DATA8_02D081      ; Compare with maximum distance
-    BCC CODE_02940E         ; Branch if within limits
-    LDA.W DATA8_02D081      ; Load maximum distance limit
+Entity_ProcessMathAdvanced:
+    REP #$30                         ; Set 16-bit accumulator and index registers
+    LDA.W $1116                      ; Load position coordinate high
+    SEC                              ; Set carry for subtraction
+    SBC.W $1114                      ; Subtract position coordinate low
+    CMP.W DATA8_02D081               ; Compare with maximum distance
+    BCC Entity_CalcDistance          ; Branch if within limits
+    LDA.W DATA8_02D081               ; Load maximum distance limit
 
 ;Distance calculation with boundary validation
 ;Ensures calculated distances remain within valid ranges
-CODE_02940E:
-    EOR.W #$FFFF            ; Two's complement preparation
-    INC A                   ; Complete two's complement
-    BNE CODE_029417         ; Branch if result is valid
-    db $A9,$FE,$7F          ; Load maximum negative value
+Entity_CalcDistance:
+    EOR.W #$FFFF                     ; Two's complement preparation
+    INC A                            ; Complete two's complement
+    BNE Entity_StorePosition         ; Branch if result is valid
+    db $A9,$FE,$7F                   ; Load maximum negative value
 
 ;Entity positioning with indexed storage
 ;Stores calculated positioning data in indexed entity arrays
-CODE_029417:
+Entity_StorePosition:
     TAY                     ; Transfer result to Y register
     SEP #$20                ; Return to 8-bit accumulator
     REP #$10                ; Keep 16-bit index registers
@@ -1840,14 +1840,14 @@ CODE_029417:
 
 ;Entity movement validation with boundary checking
 ;Validates entity movement and ensures proper boundary handling
-    LDA.B $90               ; Load movement validation index
-    CMP.B $8F               ; Compare with boundary limit
-    BNE CODE_02942F         ; Continue if within bounds
-    JSR.W CODE_029797       ; Execute boundary validation
+    LDA.B $90                        ; Load movement validation index
+    CMP.B $8F                        ; Compare with boundary limit
+    BNE Entity_ProcessMovement       ; Continue if within bounds
+    JSR.W Entity_Synchronize         ; Execute boundary validation
 
 ;Movement processing with health-based logic
 ;Implements movement processing that considers entity health status
-CODE_02942F:
+Entity_ProcessMovement:
     JSR.W CODE_0297D9       ; Initialize movement processing
     LDA.B $B7               ; Load current health value
     CMP.B $B8               ; Compare with maximum health
@@ -2261,7 +2261,7 @@ CODE_02971B:
 
 ;Mathematical division with hardware acceleration
 ;Implements division using hardware division registers for speed
-CODE_029727:
+Entity_UpdateCalculations:
     LDX.B $77               ; Load dividend low
     STX.W $4204             ; Store in hardware division register
     LDX.B $78               ; Load dividend high
@@ -2336,29 +2336,29 @@ CODE_029785:
 
 ;Advanced system coordination with multiple subsystem calls
 ;Coordinates multiple subsystems for complex operations
-CODE_029797:
-    LDX.W #$D3D7            ; Load subsystem 1 address
-    JSR.W CODE_028835       ; Execute subsystem 1
-    LDX.W #$D3EC            ; Load subsystem 2 address
-    JSR.W CODE_028835       ; Execute subsystem 2
-    JSR.W CODE_02A22B       ; Execute coordination function 1
-    JSR.W CODE_02A22B       ; Execute coordination function 2
-    JMP.W CODE_02A0E1       ; Jump to coordination finalization
+Entity_Synchronize:
+    LDX.W #$D3D7                     ; Load subsystem 1 address
+    JSR.W CODE_028835                ; Execute subsystem 1
+    LDX.W #$D3EC                     ; Load subsystem 2 address
+    JSR.W CODE_028835                ; Execute subsystem 2
+    JSR.W CODE_02A22B                ; Execute coordination function 1
+    JSR.W CODE_02A22B                ; Execute coordination function 2
+    JMP.W CODE_02A0E1                ; Jump to coordination finalization
 
 ;Specialized system handlers for different processing modes
 CODE_0297AC:
-    LDX.W #$D43B            ; Load specialized handler 1 address
-    JMP.W CODE_028835       ; Jump to specialized handler 1
+    LDX.W #$D43B                     ; Load specialized handler 1 address
+    JMP.W CODE_028835                ; Jump to specialized handler 1
 
 CODE_0297B2:
-    LDX.W #$D443            ; Load specialized handler 2 address
-    JMP.W CODE_028835       ; Jump to specialized handler 2
+    LDX.W #$D443                     ; Load specialized handler 2 address
+    JMP.W CODE_028835                ; Jump to specialized handler 2
 
-CODE_0297B8:
-    LDX.W #$D316            ; Load base system handler address
-    JMP.W CODE_028835       ; Jump to base system handler
+Entity_InitBaseGraphics:
+    LDX.W #$D316                     ; Load base system handler address
+    JMP.W CODE_028835                ; Jump to base system handler
 
-CODE_0297BE:
+Entity_ValidateBoundaryAlt:
     LDX.W #$D2F5            ; Load validation handler address
     JMP.W CODE_028835       ; Jump to validation handler
 
@@ -2401,50 +2401,50 @@ CODE_0297D3:
 ;Extended coordinate processing with validation
 ;Processes coordinate data with extended validation and transformations
 CODE_029AA5:
-    JSR.W CODE_029A8B       ; Execute base coordinate processing
-    REP #$30                ; Set 16-bit accumulator and index registers
-    LDA.B $77               ; Load calculated coordinate value
-    BRA CODE_029A9A         ; Branch to coordinate finalization
+    JSR.W CODE_029A8B                ; Execute base coordinate processing
+    REP #$30                         ; Set 16-bit accumulator and index registers
+    LDA.B $77                        ; Load calculated coordinate value
+    BRA CODE_029A9A                  ; Branch to coordinate finalization
 
 ;Advanced entity positioning with coordinate transformation
 ;Implements sophisticated entity positioning with coordinate system management
-CODE_029AAE:
-    LDA.B #$00              ; Clear accumulator high byte
-    XBA                     ; Exchange accumulator bytes
-    LDA.B $12               ; Load X coordinate base
-    CLC                     ; Clear carry for addition
-    ADC.B $DD               ; Add coordinate offset
-    XBA                     ; Exchange bytes for calculation
-    ROL A                   ; Rotate left for extended precision
-    XBA                     ; Exchange back to normal format
-    REP #$30                ; Set 16-bit accumulator and index registers
-    STA.B $77               ; Store base calculation result
-    JSR.W CODE_029AD2       ; Execute coordinate system validation
-    LSR A                   ; Divide by 2
-    LSR A                   ; Divide by 4
-    LSR A                   ; Divide by 8
-    LSR A                   ; Divide by 16 (total division by 16)
-    JSR.W CODE_029B02       ; Execute coordinate processing
-    CLC                     ; Clear carry for addition
-    ADC.B $77               ; Add to base calculation
-    ASL A                   ; Multiply by 2 for final scaling
-    STA.B $77               ; Store final coordinate result
-    SEP #$20                ; Return to 8-bit accumulator
-    REP #$10                ; Keep 16-bit index registers
-    RTS                     ; Return from entity positioning
+Entity_ProcessStandardMode:
+    LDA.B #$00                       ; Clear accumulator high byte
+    XBA                              ; Exchange accumulator bytes
+    LDA.B $12                        ; Load X coordinate base
+    CLC                              ; Clear carry for addition
+    ADC.B $DD                        ; Add coordinate offset
+    XBA                              ; Exchange bytes for calculation
+    ROL A                            ; Rotate left for extended precision
+    XBA                              ; Exchange back to normal format
+    REP #$30                         ; Set 16-bit accumulator and index registers
+    STA.B $77                        ; Store base calculation result
+    JSR.W Entity_ValidateCoordSystem ; Execute coordinate system validation
+    LSR A                            ; Divide by 2
+    LSR A                            ; Divide by 4
+    LSR A                            ; Divide by 8
+    LSR A                            ; Divide by 16 (total division by 16)
+    JSR.W Entity_ProcessCoordinates  ; Execute coordinate processing
+    CLC                              ; Clear carry for addition
+    ADC.B $77                        ; Add to base calculation
+    ASL A                            ; Multiply by 2 for final scaling
+    STA.B $77                        ; Store final coordinate result
+    SEP #$20                         ; Return to 8-bit accumulator
+    REP #$10                         ; Keep 16-bit index registers
+    RTS                              ; Return from entity positioning
 
 ;Coordinate system validation with context switching
 ;Validates coordinate systems with proper context management
-CODE_029AD2:
-    PHD                     ; Push direct page register
-    JSR.W CODE_028F22       ; Switch to coordinate validation context
-    LDA.B $16               ; Load Y coordinate boundary
-    PLD                     ; Restore direct page register
-    RTS                     ; Return validated coordinate
+Entity_ValidateCoordSystem:
+    PHD                              ; Push direct page register
+    JSR.W CODE_028F22                ; Switch to coordinate validation context
+    LDA.B $16                        ; Load Y coordinate boundary
+    PLD                              ; Restore direct page register
+    RTS                              ; Return validated coordinate
 
 ;Enhanced entity processing with advanced coordinate handling
 ;Implements enhanced entity processing with sophisticated coordinate management
-CODE_029ADA:
+Entity_ProcessDefault:
     LDA.B #$00              ; Clear accumulator high byte
     XBA                     ; Exchange accumulator bytes
     LDA.B $12               ; Load entity X coordinate
@@ -2473,7 +2473,7 @@ CODE_029ADA:
 
 ;Complex calculation processing with conditional branching
 ;Implements complex calculations with conditional processing based on game state
-CODE_029B02:
+Entity_ProcessCoordinates:
     PHA                     ; Push calculation value to stack
     SEP #$20                ; Set 8-bit accumulator
     REP #$10                ; Keep 16-bit index registers
