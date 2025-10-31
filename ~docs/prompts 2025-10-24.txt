@@ -246,7 +246,7 @@ make a git commit with description and push it
 Next Steps for "Continue the Disassembly":
 ***Consolidate Temp Files (128 files across banks) - Merge cycles into main documented files
 Improve Function Labels - Replace generic CODE_ labels with descriptive names
-Extract Graphics Data - Parse palette and sprite data from banks $04-$0A
+***Extract Graphics Data - Parse palette and sprite data from banks $04-$0A
 ***Extract Audio Data - Document music/SFX from bank $0F
 Complete Master Build - Finish ffmq_master.asm for full source rebuild
 Would you like me to start consolidating the temp files, or focus on improving the function documentation in the code banks?
@@ -255,15 +255,17 @@ Would you like me to start consolidating the temp files, or focus on improving t
 Consolidate Temp Files (128 files across banks) - Merge cycles into main documented files
 Extract Audio Data - Document music/SFX from bank $0F
 Extract Graphics Data - Parse palette and sprite data from banks $04-$0A
-
-
-
-
+Improve Function Labels - Replace generic CODE_ labels with descriptive names
+Improve Function Labels - Replace generic CODE_ labels with descriptive names
+Improve Function Labels - Replace generic CODE_ labels with descriptive names, do more at one time
+Improve Function Labels - Replace generic CODE_ labels with descriptive names, continue doing more at one time
+That might have been too much, go back to a managable size
 
 
 
 
 create documentation that describes the entire hero or enemy or map data structures or tiles or music and how to update them easily through the transitory files like - the extraction tools extract the hero graphics and animations and palettes to json and png (using the right palettes) files that cna be edited - then the build tools convert those png/json/pal files back into the data structures for the insertion build process.
+
 
 
 

@@ -5766,7 +5766,7 @@ Process_Frame:
 ;   - Result in $9E (low word) and $A0 (high word)
 ; ===========================================================================
 
-CODE_0096B3:
+Math_Multiply16x16:
 	PHP                         ; Save processor status
 	REP #$30                    ; 16-bit A/X/Y
 	PHD                         ; Save direct page
@@ -5815,7 +5815,7 @@ Skip_Add:
 ;   - Handles division by zero (undefined behavior)
 ; ===========================================================================
 
-CODE_0096E4:
+Math_Divide32by16:
 	PHP                         ; Save processor status
 	REP #$30                    ; 16-bit A/X/Y
 	PHD                         ; Save direct page
@@ -5871,7 +5871,7 @@ Skip_Division:
 ;   - Result available in RDMPYL/H ($4216-$4217) after 8 cycles
 ; ===========================================================================
 
-CODE_00971E:
+Hardware_WriteMultiplierB:
 	PHP                         ; Save processor status
 	SEP #$20                    ; 8-bit A
 	STA.W SNES_WRMPYB           ; Write to multiplier B register
@@ -5890,7 +5890,7 @@ CODE_00971E:
 ;   - Division takes 16 cycles to complete
 ; ===========================================================================
 
-CODE_009726:
+Hardware_Divide:
 	PHP                         ; Save processor status
 	SEP #$20                    ; 8-bit A
 	STA.W SNES_WRDIVB           ; Write divisor to hardware
@@ -5911,7 +5911,7 @@ CODE_009726:
 ;   - Returns $FFFF if input is $0000
 ; ===========================================================================
 
-CODE_009730:
+Bit_FindFirstSet:
 	PHP                         ; Save processor status
 	REP #$30                    ; 16-bit A/X/Y
 	PHX                         ; Save X
@@ -5941,8 +5941,8 @@ Count_Bits:
 ;   - Uses TSB instruction at Direct Page $00
 ; ===========================================================================
 
-CODE_00974E:
-	JSR.W CODE_0097DA           ; Calculate bit position/mask
+Bit_SetBits:
+	JSR.W Bit_CalcPosition           ; Calculate bit position/mask
 	TSB.B $00                   ; Test and set bits
 	RTL                         ; Return long
 
@@ -5957,8 +5957,8 @@ CODE_00974E:
 ;   - Uses TRB instruction at Direct Page $00
 ; ===========================================================================
 
-CODE_009754:
-	JSR.W CODE_0097DA           ; Calculate bit position/mask
+Bit_ClearBits:
+	JSR.W Bit_CalcPosition           ; Calculate bit position/mask
 	TRB.B $00                   ; Test and reset bits
 	RTL                         ; Return long
 
@@ -5973,8 +5973,8 @@ CODE_009754:
 ;   - Uses AND instruction to test bits
 ; ===========================================================================
 
-CODE_00975A:
-	JSR.W CODE_0097DA           ; Calculate bit position/mask
+Bit_TestBits:
+	JSR.W Bit_CalcPosition           ; Calculate bit position/mask
 	AND.B $00                   ; Test bits
 	RTL                         ; Return long
 
@@ -5986,11 +5986,11 @@ CODE_00975A:
 ; Output: Bits set in target location
 ; ===========================================================================
 
-CODE_009760:
+Bit_SetBits_0EA8:
 	PHD                         ; Save direct page
 	PEA.W $0EA8                 ; Push $0EA8
 	PLD                         ; Direct Page = $0EA8
-	JSL.L CODE_00974E           ; Set bits via TSB
+	JSL.L Bit_SetBits           ; Set bits via TSB
 	PLD                         ; Restore direct page
 	RTL                         ; Return long
 
@@ -6002,11 +6002,11 @@ CODE_009760:
 ; Output: Bits cleared in target location
 ; ===========================================================================
 
-CODE_00976B:
+Bit_ClearBits_0EA8:
 	PHD                         ; Save direct page
 	PEA.W $0EA8                 ; Push $0EA8
 	PLD                         ; Direct Page = $0EA8
-	JSL.L CODE_009754           ; Clear bits via TRB
+	JSL.L Bit_ClearBits           ; Clear bits via TRB
 	PLD                         ; Restore direct page
 	RTL                         ; Return long
 
@@ -6018,11 +6018,11 @@ CODE_00976B:
 ; Output: A = result of test, Z/N flags set
 ; ===========================================================================
 
-CODE_009776:
+Bit_TestBits_0EA8:
 	PHD                         ; Save direct page
 	PEA.W $0EA8                 ; Push $0EA8
 	PLD                         ; Direct Page = $0EA8
-	JSL.L CODE_00975A           ; Test bits via AND
+	JSL.L Bit_TestBits           ; Test bits via AND
 	PLD                         ; Restore direct page
 	INC A                       ; Set flags based on result
 	DEC A                       ; (INC/DEC preserves value, updates flags)
@@ -6040,7 +6040,7 @@ CODE_009776:
 ;   - Applies modulo $A8 (stored in $A8 at DP $005E)
 ; ===========================================================================
 
-CODE_009783:
+Random_Generate:
 	PHP                         ; Save processor status
 	PHD                         ; Save direct page
 	REP #$30                    ; 16-bit A/X/Y
@@ -6061,7 +6061,7 @@ CODE_009783:
 	STZ.W SNES_WRDIVH           ; Clear divider (high byte)
 	LDA.B $4A                   ; Load modulo value from $A8
 	BEQ Random_Done             ; If zero, skip modulo
-	JSL.L CODE_009726           ; Perform division
+	JSL.L Hardware_Divide           ; Perform division
 	LDA.W SNES_RDMPYL           ; Read remainder (result of modulo)
 	STA.B $4B                   ; Store to $A9
 
@@ -6080,7 +6080,7 @@ Random_Done:
 ; Output: A = bit mask ($0001, $0002, $0004...$0080, $0100...$8000)
 ; ===========================================================================
 
-CODE_0097F2:
+Bit_PositionToMask:
 	PHX                         ; Save X
 	ASL A                       ; Multiply by 2 for word table
 	TAX                         ; X = index
@@ -6271,7 +6271,7 @@ CODE_0098F1:
 ; Input: A (16-bit) = fill count, Y = start address, value on stack
 ; ===========================================================================
 
-CODE_009994:
+Memory_FillLong:
 	JSR.W CODE_009998           ; Call fill routine
 	RTL                         ; Return long
 
@@ -6290,7 +6290,7 @@ CODE_009994:
 ;   - Remainder handled by indexed jump
 ; ===========================================================================
 
-CODE_009998:
+Memory_Fill:
 	PHX                         ; Save X
 	CMP.W #$0040                ; Check if >= 64 bytes
 	BCC Handle_Remainder        ; If < 64, handle remainder
@@ -6306,7 +6306,7 @@ CODE_009998:
 
 Fill_Block_Loop:
 	LDA.B $03,S                 ; Get fill value from stack
-	JSR.W CODE_0099BD           ; Fill 64 bytes
+	JSR.W Memory_Fill64           ; Fill 64 bytes
 	TYA                         ; A = current address
 	ADC.W #$0040                ; Advance by 64 bytes
 	TAY                         ; Y = new address
@@ -6329,7 +6329,7 @@ Handle_Remainder:
 ;   - All addresses in bank $7F
 ; ===========================================================================
 
-CODE_0099BD:
+Memory_Fill64:
 	STA.W $003E,Y               ; Fill word at +$3E
 	STA.W $003C,Y               ; Fill word at +$3C
 	STA.W $003A,Y               ; Fill word at +$3A
@@ -6346,7 +6346,7 @@ CODE_0099BD:
 	STA.W $0024,Y               ; Fill word at +$24
 	STA.W $0022,Y               ; Fill word at +$22
 
-CODE_0099EA:
+Memory_Fill32:
 	STA.W $0020,Y               ; Fill word at +$20
 	STA.W $001E,Y               ; Fill word at +$1E
 	STA.W $001C,Y               ; Fill word at +$1C
@@ -6356,7 +6356,7 @@ CODE_0099EA:
 	STA.W $0014,Y               ; Fill word at +$14
 	STA.W $0012,Y               ; Fill word at +$12
 
-CODE_009A02:
+Memory_Fill16:
 	STA.W $0010,Y               ; Fill word at +$10
 
 CODE_009A05:
@@ -6416,7 +6416,7 @@ Perform_DMA_Update:
 ; Input: Direct Page $0000, $17 = graphics pointer, $19 = bank
 ; ===========================================================================
 
-CODE_009A60:
+Graphics_LoadData:
 	PHP                         ; Save processor status
 	PHB                         ; Save data bank
 	PHD                         ; Save direct page
@@ -6483,7 +6483,7 @@ CODE_009B02:
 	PLP                         ; Restore processor status
 	RTL                         ; Return long
 
-CODE_009B2F:
+Graphics_Setup1:
 	PHP                         ; Save processor status
 	PHD                         ; Save direct page
 	PEA.W $0000                 ; Push $0000
@@ -6491,25 +6491,25 @@ CODE_009B2F:
 	REP #$30                    ; 16-bit A/X/Y
 	PHX                         ; Save X
 	LDX.W #$9B42                ; Data pointer
-	JSR.W CODE_009BC4           ; Process data
+	JSR.W Graphics_ProcessData           ; Process data
 	PLX                         ; Restore X
 	PLD                         ; Restore direct page
 	PLP                         ; Restore processor status
 	RTL                         ; Return long
 
-CODE_009B45:
+Graphics_Setup2:
 	PHP                         ; Save processor status
 	PHD                         ; Save direct page
 	REP #$30                    ; 16-bit A/X/Y
 	LDA.W #$0000                ; Direct Page = $0000
 	TCD                         ; Set DP
 	LDX.W #$9B56                ; Data pointer
-	JSR.W CODE_009BC4           ; Process data
+	JSR.W Graphics_ProcessData           ; Process data
 	PLD                         ; Restore direct page
 	PLP                         ; Restore processor status
 	RTL                         ; Return long
 
-CODE_009B59:
+Graphics_Setup3:
 	PHP                         ; Save processor status
 	PHD                         ; Save direct page
 	REP #$30                    ; 16-bit A/X/Y
@@ -6517,25 +6517,25 @@ CODE_009B59:
 	TCD                         ; Set DP
 	LDA.B $20                   ; Load parameter
 	STA.B $4F                   ; Store to $4F
-	JSR.W CODE_009B8A           ; Setup graphics
+	JSR.W Graphics_SetupPointer           ; Setup graphics
 	LDA.B [$17]                 ; Load data
 	AND.W #$00FF                ; Mask to byte
 	CMP.W #$0004                ; Compare to 4
 	BEQ Skip_Special            ; If equal, skip
 	LDX.W #$9B9D                ; Special data pointer
-	JSR.W CODE_009BC4           ; Process data
+	JSR.W Graphics_ProcessData           ; Process data
 
 Skip_Special:
-	JSR.W CODE_009B8A           ; Setup graphics again
+	JSR.W Graphics_SetupPointer           ; Setup graphics again
 	JSR.W CODE_009D75           ; Process graphics data
-	JSR.W CODE_009BA3           ; Post-process
+	JSR.W Graphics_PostProcess           ; Post-process
 	LDX.W #$9BA0                ; Cleanup pointer
-	JSR.W CODE_009BC4           ; Process cleanup
+	JSR.W Graphics_ProcessData           ; Process cleanup
 	PLD                         ; Restore direct page
 	PLP                         ; Restore processor status
 	RTL                         ; Return long
 
-CODE_009B8A:
+Graphics_SetupPointer:
 	SEP #$20                    ; 8-bit A
 	LDA.B #$03                  ; Bank $03
 	STA.B $19                   ; Store bank
@@ -6547,10 +6547,10 @@ CODE_009B8A:
 	STA.B $17                   ; Store graphics pointer
 	RTS                         ; Return
 
-CODE_009BA3:
+Graphics_PostProcess:
 	RTS                         ; Return (stub)
 
-CODE_009BA4:
+Graphics_Setup4:
 	PHP                         ; Save processor status
 	PHD                         ; Save direct page
 	REP #$30                    ; 16-bit A/X/Y
@@ -6604,7 +6604,7 @@ DATA8_00A2DE:
 ; Command stream table processing helpers
 ; ---------------------------------------------------------------------------
 
-CODE_00A2E7:
+Graphics_CommandDispatch:
 	LDA.B [$17]
 	INC.B $17
 	AND.W #$00FF
@@ -6909,7 +6909,7 @@ CODE_00A56E:
 ; ===========================================================================
 
 
-CODE_009BC4:
+Graphics_ProcessData:
 	PHP                         ; Save processor status
 	REP #$30                    ; 16-bit A/X/Y
 	PHY                         ; Save Y
@@ -6927,7 +6927,7 @@ CODE_009BC4:
 ; Clear Graphics Flag Bit 2
 ; ---------------------------------------------------------------------------
 
-CODE_009BD8:
+Graphics_ClearFlag:
 	LDA.W #$0004                ; Bit 2 mask
 	AND.W $00D8                 ; Test if set
 	BEQ CODE_009BEC             ; Skip if not set
@@ -6945,7 +6945,7 @@ CODE_009BEC:
 ; Purpose: Setup DMA for color palette operations
 ; ===========================================================================
 
-CODE_009BED:
+Palette_InitColorProcessing:
 	LDX.W #$9C87                ; Source data pointer
 	LDY.W #$5007                ; Dest = $7F5007
 	LDA.W #$0022                ; Transfer $22 bytes + 1 = 35 bytes
