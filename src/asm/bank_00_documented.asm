@@ -1430,7 +1430,7 @@ NMI_GraphicsUpload:
 
 ;-------------------------------------------------------------------------------
 
-CODE_0083A8:
+NMI_ProcessDMAFlags:
 	; ===========================================================================
 	; Process DMA Operation Flags ($00D2)
 	; ===========================================================================
@@ -1439,7 +1439,7 @@ CODE_0083A8:
 
 	LDA.B #$80                  ; A = $80 (bit 7 mask)
 	AND.W $00D2                 ; Test bit 7 of $00D2
-	BEQ CODE_0083D3             ; If clear → Skip this DMA
+	BEQ NMI_CheckOAMFlag        ; If clear → Skip this DMA
 
 	; ---------------------------------------------------------------------------
 	; DMA Transfer with Vertical Increment
@@ -1468,7 +1468,7 @@ CODE_0083A8:
 
 ;-------------------------------------------------------------------------------
 
-CODE_0083D3:
+NMI_CheckOAMFlag:
 	; ===========================================================================
 	; Check OAM Update Flag
 	; ===========================================================================
@@ -1477,13 +1477,13 @@ CODE_0083D3:
 
 	LDA.B #$20                  ; A = $20 (bit 5 mask)
 	AND.W $00D2                 ; Test bit 5 of $00D2
-	BEQ CODE_0083DD             ; If clear → Skip OAM update
+	BEQ NMI_Cleanup             ; If clear → Skip OAM update
 
-	JSR.W CODE_008543           ; Execute OAM DMA transfer
+	JSR.W DMA_UpdateOAM         ; Execute OAM DMA transfer
 
 ;-------------------------------------------------------------------------------
 
-CODE_0083DD:
+NMI_Cleanup:
 	; ===========================================================================
 	; Cleanup and Return from NMI
 	; ===========================================================================
@@ -1504,7 +1504,7 @@ CODE_0083DD:
 ; TILEMAP DMA TRANSFER ($0083E8-$008576)
 ;===============================================================================
 
-CODE_0083E8:
+DMA_TransferTilemap:
 	; ===========================================================================
 	; Tilemap DMA Transfer to VRAM
 	; ===========================================================================
@@ -1540,7 +1540,7 @@ CODE_0083E8:
 
 	LDA.B #$A8                  ; A = $A8 (CGADD - palette address register)
 	LDX.W $0064                 ; X = [$0064] (palette index/parameters)
-	JSR.W CODE_008504           ; Execute palette DMA transfer
+	JSR.W DMA_TransferPalette   ; Execute palette DMA transfer
 
 	; ---------------------------------------------------------------------------
 	; Prepare for Tilemap Transfer
@@ -1563,14 +1563,14 @@ CODE_0083E8:
 	LDA.W #$6080                ; A = $6080 (default VRAM address)
 
 	CPX.W #$0001                ; Compare mode with 1
-	BEQ CODE_00841A             ; If mode = 1 → Special graphics upload
+	BEQ DMA_SpecialGraphics     ; If mode = 1 → Special graphics upload
 
-	JSR.W CODE_008520           ; Standard tilemap transfer
+	JSR.W DMA_StandardTilemap   ; Standard tilemap transfer
 	RTL                         ; Return
 
 ;-------------------------------------------------------------------------------
 
-CODE_00841A:
+DMA_SpecialGraphics:
 	; ===========================================================================
 	; Special Graphics Upload (Mode 1)
 	; ===========================================================================
@@ -1592,7 +1592,7 @@ CODE_00841A:
 ; ADDITIONAL VRAM TRANSFER ROUTINES ($008428-$008576)
 ;===============================================================================
 
-CODE_008428:
+NMI_LargeTransfer:
 	; ===========================================================================
 	; Large VRAM Transfer Handler
 	; ===========================================================================
@@ -1607,7 +1607,7 @@ CODE_008428:
 
 	LDA.B #$80                  ; A = $80 (bit 7 mask)
 	AND.W $00D4                 ; Test bit 7 of $00D4
-	BEQ CODE_008476             ; If clear → Skip, jump to handler return
+	BEQ NMI_ReturnToHandler     ; If clear → Skip, jump to handler return
 
 	LDA.B #$80                  ; A = $80
 	TRB.W $00D4                 ; Test and Reset bit 7 of $00D4
@@ -1622,7 +1622,7 @@ CODE_008428:
 
 	LDA.B #$02                  ; A = $02 (bit 1 mask)
 	AND.W $00D8                 ; Test bit 1 of $00D8
-	BEQ CODE_008479             ; If clear → Use alternate path
+	BEQ NMI_AlternateTransfer   ; If clear → Use alternate path
 
 	; ---------------------------------------------------------------------------
 	; Battle Graphics Transfer
@@ -1670,15 +1670,15 @@ CODE_008428:
 
 ;-------------------------------------------------------------------------------
 
-CODE_008476:
+NMI_ReturnToHandler:
 	; ===========================================================================
 	; Return to Main NMI Handler
 	; ===========================================================================
-	JMP.W CODE_0083A8           ; → Jump back to NMI handler continuation
+	JMP.W NMI_ProcessDMAFlags   ; → Jump back to NMI handler continuation
 
 ;-------------------------------------------------------------------------------
 
-CODE_008479:
+NMI_AlternateTransfer:
 	; ===========================================================================
 	; Alternate Graphics Transfer Path
 	; ===========================================================================
@@ -1807,13 +1807,13 @@ CODE_0084F8:
 	STX.W $00F2                 ; [$00F2] = $FFFF (invalidate tilemap 1)
 	STX.W $00F5                 ; [$00F5] = $FFFF (invalidate tilemap 2)
 
-	JMP.W CODE_0083A8           ; → Return to NMI handler
+	JMP.W NMI_ProcessDMAFlags   ; → Return to NMI handler
 
 ;===============================================================================
 ; PALETTE TRANSFER HELPER ($008504-$00851F)
 ;===============================================================================
 
-CODE_008504:
+DMA_TransferPalette:
 	; ===========================================================================
 	; Palette Transfer Helper Routine
 	; ===========================================================================
@@ -1855,7 +1855,7 @@ CODE_008504:
 ; TILEMAP TRANSFER HELPER ($008520-$008542)
 ;===============================================================================
 
-CODE_008520:
+DMA_StandardTilemap:
 	; ===========================================================================
 	; Tilemap Transfer Helper Routine
 	; ===========================================================================
@@ -1872,7 +1872,7 @@ CODE_008520:
 	; ===========================================================================
 
 	CPX.W #$FFFF                ; Check if X = $FFFF
-	BEQ CODE_008542             ; If yes → Skip transfer (no data)
+	BEQ DMA_StandardTilemap_Skip ; If yes → Skip transfer (no data)
 
 	STA.W SNES_VMADDL           ; $2116-$2117 = VRAM destination address
 
@@ -1895,14 +1895,14 @@ CODE_008520:
 
 	PLB                         ; Restore Data Bank
 
-CODE_008542:
+DMA_StandardTilemap_Skip:
 	RTS                         ; Return
 
 ;===============================================================================
 ; OAM (SPRITE) TRANSFER ROUTINE ($008543-$008576)
 ;===============================================================================
 
-CODE_008543:
+DMA_UpdateOAM:
 	; ===========================================================================
 	; OAM (Object Attribute Memory) Transfer
 	; ===========================================================================
@@ -1970,7 +1970,7 @@ CODE_008543:
 ; BATTLE GRAPHICS UPDATE ($008577-$0085B6)
 ;===============================================================================
 
-CODE_008577:
+DMA_BattleGraphics:
 	; ===========================================================================
 	; Battle Graphics VRAM Transfer
 	; ===========================================================================
