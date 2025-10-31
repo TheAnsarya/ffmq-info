@@ -11765,16 +11765,16 @@ CODE_00B86C:
     RTI                            ; Return from interrupt
 
 ;-------------------------------------------------------------------------------
-; CODE_00B898: IRQ handler (jitter fix - second variant)
+; IRQ_JitterFix2: IRQ handler (jitter fix - second variant)
 ;
 ; Purpose: Alternate IRQ handler for horizontal timing jitter correction
 ; Entry: Called by SNES IRQ interrupt
 ; Exit: NMI disabled
-;       Interrupt vector updated to CODE_00B8DA
+;       Interrupt vector updated to IRQ_ScreenOn2
 ; Uses: Similar to CODE_00B82A but with different offset ($0F vs $9A)
 ; Notes: Second variant of jitter correction algorithm
 ;-------------------------------------------------------------------------------
-CODE_00B898:
+IRQ_JitterFix2:
     REP #$30                       ; 16-bit A/X/Y
     PHB                            ; Save data bank
     PHA                            ; Save accumulator
@@ -11784,14 +11784,14 @@ CODE_00B898:
     PLB                            ; Set data bank = program bank
     STZ.W SNES_NMITIMEN            ; Disable NMI/IRQ
 
-CODE_00B8A4:
+IRQ_JitterFix2_Loop:
     LDA.W SNES_SLHV                ; Sample H/V counter
     LDA.W SNES_STAT78              ; Read PPU status
     LDA.W SNES_OPVCT               ; Read vertical counter
     STA.W $0118                    ; Store V counter
     LDA.B #$40                     ; Bit 6 mask
     AND.W $00DA                    ; Test bit 6 of $DA
-    BNE CODE_00B8C2                ; If set, skip jitter calc
+    BNE IRQ_JitterFix2_Skip        ; If set, skip jitter calc
     LDA.W $0118                    ; Load V counter
     ASL A                          ; × 2
     ADC.W $0118                    ; × 3
@@ -11799,9 +11799,9 @@ CODE_00B8A4:
     PHA                            ; Push result
     PLP                            ; Pull to processor status
 
-CODE_00B8C2:
+IRQ_JitterFix2_Skip:
     LSR.W $0118                    ; V counter >> 1
-    BCC CODE_00B8A4                ; If no carry, resample (unstable)
+    BCC IRQ_JitterFix2_Loop        ; If no carry, resample (unstable)
     LDX.W #$B8DA                   ; Second-stage IRQ handler
     STX.W $0118                    ; Store handler address
     LDA.B #$11                     ; Enable V-IRQ + NMI
@@ -11815,7 +11815,7 @@ CODE_00B8C2:
     RTI                            ; Return from interrupt
 
 ;-------------------------------------------------------------------------------
-; CODE_00B8DA: IRQ handler (second stage - alternate)
+; IRQ_ScreenOn2: IRQ handler (second stage - alternate)
 ;
 ; Purpose: Alternate second-stage IRQ handler
 ; Entry: Called by IRQ after jitter correction (variant 2)
@@ -11826,7 +11826,7 @@ CODE_00B8C2:
 ; Calls: CODE_008BA0, CODE_008B88 (screen setup routines)
 ; Notes: Uses different screen setup sequence than CODE_00B86C
 ;-------------------------------------------------------------------------------
-CODE_00B8DA:
+IRQ_ScreenOn2:
     LDA.W $0110                    ; Load brightness value
     STA.W SNES_INIDISP             ; Set screen brightness
     LDA.B #$01                     ; NMI only mode
@@ -11849,14 +11849,14 @@ CODE_00B8DA:
     RTI                            ; Return from interrupt
 
 ;-------------------------------------------------------------------------------
-; CODE_00B908: Set sprite mode $2D
+; Sprite_SetMode2D: Set sprite mode $2D
 ;
 ; Purpose: Set sprite display mode to $2D
 ; Entry: None
 ; Exit: $0505 = $2D
 ; Notes: Preserves processor status
 ;-------------------------------------------------------------------------------
-CODE_00B908:
+Sprite_SetMode2D:
     PHP                            ; Save processor status
     SEP #$20                       ; 8-bit accumulator
     LDA.B #$2D                     ; Mode $2D
@@ -11865,14 +11865,14 @@ CODE_00B908:
     RTS
 
 ;-------------------------------------------------------------------------------
-; CODE_00B912: Set sprite mode $2C
+; Sprite_SetMode2C: Set sprite mode $2C
 ;
 ; Purpose: Set sprite display mode to $2C
 ; Entry: None
 ; Exit: $0505 = $2C
 ; Notes: Preserves processor status
 ;-------------------------------------------------------------------------------
-CODE_00B912:
+Sprite_SetMode2C:
     PHP                            ; Save processor status
     SEP #$20                       ; 8-bit accumulator
     LDA.B #$2C                     ; Mode $2C
@@ -11881,14 +11881,14 @@ CODE_00B912:
     RTS
 
 ;-------------------------------------------------------------------------------
-; CODE_00B91C: Set animation mode $10
+; Anim_SetMode10: Set animation mode $10
 ;
 ; Purpose: Set animation mode to $10
 ; Entry: None
 ; Exit: $050A = $10
 ; Notes: Preserves processor status
 ;-------------------------------------------------------------------------------
-CODE_00B91C:
+Anim_SetMode10:
     PHP                            ; Save processor status
     SEP #$20                       ; 8-bit accumulator
     LDA.B #$10                     ; Mode $10
@@ -11897,14 +11897,14 @@ CODE_00B91C:
     RTS
 
 ;-------------------------------------------------------------------------------
-; CODE_00B926: Set animation mode $11
+; Anim_SetMode11: Set animation mode $11
 ;
 ; Purpose: Set animation mode to $11
 ; Entry: None
 ; Exit: $050A = $11
 ; Notes: Preserves processor status
 ;-------------------------------------------------------------------------------
-CODE_00B926:
+Anim_SetMode11:
     PHP                            ; Save processor status
     SEP #$20                       ; 8-bit accumulator
     LDA.B #$11                     ; Mode $11
@@ -11913,7 +11913,7 @@ CODE_00B926:
     RTS
 
 ;-------------------------------------------------------------------------------
-; CODE_00B930: Input polling loop with mode toggle
+; Input_PollWithToggle: Input polling loop with mode toggle
 ;
 ; Purpose: Poll controller input and toggle sprite mode on button press
 ; Entry: $07 = controller input state (from CODE_0096A0)
@@ -11924,44 +11924,44 @@ CODE_00B926:
 ;       Flags set based on comparison
 ;       $0505 may be updated (mode $2C)
 ; Calls: CODE_0096A0 (controller read)
-;        CODE_00B912 (set sprite mode $2C)
+;        Sprite_SetMode2C (set sprite mode $2C)
 ; Notes: Loops until specific button condition met
 ;        XORs button state when no buttons pressed
 ;-------------------------------------------------------------------------------
-CODE_00B930:
+Input_PollWithToggle:
     JSL.L CODE_0096A0              ; Read controller input
     BIT.B $07                      ; Test button state
-    BNE CODE_00B949                ; If buttons pressed, check
+    BNE Input_PollWithToggle_Check ; If buttons pressed, check
     EOR.W #$FFFF                   ; Invert button state
     BIT.B $07                      ; Test inverted state
-    BEQ CODE_00B944                ; If no change, toggle back
+    BEQ Input_PollWithToggle_ToggleBack ; If no change, toggle back
     PHA                            ; Save state
-    JSR.W CODE_00B912              ; Set sprite mode $2C
+    JSR.W Sprite_SetMode2C         ; Set sprite mode $2C
     PLA                            ; Restore state
 
-CODE_00B944:
+Input_PollWithToggle_ToggleBack:
     EOR.W #$FFFF                   ; Invert back
-    BRA CODE_00B930                ; Loop
+    BRA Input_PollWithToggle       ; Loop
 
-CODE_00B949:
+Input_PollWithToggle_Check:
     LDA.B $07                      ; Load button state
     LDX.B $01                      ; Load current state
     CPX.B $05                      ; Compare with compare state
     RTS
 
 ;-------------------------------------------------------------------------------
-; CODE_00B950: Main initialization/game start routine
+; Game_Initialize: Main initialization/game start routine
 ;
 ; Purpose: Initialize game system and start main game loop
 ; Entry: Called at game start or reset
 ; Exit: Does not return (infinite game loop)
 ; Calls: CODE_0C8000 (bank $0C init)
-;        CODE_00BAF0 (initialization)
+;        System_Init (initialization)
 ;        CODE_00CBEC (some setup)
 ; Notes: Sets up initial game state
 ;        Prepares for main game execution
 ;-------------------------------------------------------------------------------
-CODE_00B950:
+Game_Initialize:
     PHP                            ; Save processor status
     PHB                            ; Save data bank
     PHD                            ; Save direct page
@@ -11970,7 +11970,7 @@ CODE_00B950:
     LDA.W #$0080                   ; Bit 7
     TSB.W $00D6                    ; Set bit 7 of $D6
     JSL.L CODE_0C8000              ; Call Bank $0C init
-    JSR.W CODE_00BAF0              ; Initialization routine
+    JSR.W System_Init              ; Initialization routine
     STZ.B $01                      ; Clear $01
     SEP #$20                       ; 8-bit accumulator
     JSR.W CODE_00CBEC              ; Setup routine
@@ -11995,13 +11995,13 @@ CODE_00B950:
     LDA.W #$0F00                   ; Load $0F00
     STA.B $8E                      ; Store in brightness?
 
-CODE_00B9A0:
+Game_Initialize_Loop:
     REP #$30                       ; 16-bit A/X/Y
     LDA.W #$0C80                   ; Button mask
-    JSR.W CODE_00B930              ; Poll input
+    JSR.W Input_PollWithToggle     ; Poll input
     BNE UNREACH_00B9E0             ; If button pressed, branch
     BIT.W #$0080                   ; Test B button
-    BEQ CODE_00B9A0                ; If not pressed, loop
+    BEQ Game_Initialize_Loop       ; If not pressed, loop
     SEP #$20                       ; 8-bit accumulator
     LDA.B $06                      ; Load save slot selection
     STA.L $701FFD                  ; Store save slot
@@ -12014,28 +12014,28 @@ CODE_00B9A0:
     TAX                            ; X = save address
     LDA.L $700000,X                ; Load save data validity flag
     BEQ UNREACH_00B9DB             ; If empty, branch
-    JSR.W CODE_00B908              ; Set sprite mode $2D
+    JSR.W Sprite_SetMode2D         ; Set sprite mode $2D
     LDA.W $010E                    ; Load save slot index
     JMP.W CODE_00CA63              ; Load game
 
 UNREACH_00B9D5:
-    db $20,$08,$B9,$4C,$1A,$BA     ; JSR CODE_00B908; JMP CODE_00BA1A
+    db $20,$08,$B9,$4C,$1A,$BA     ; JSR Sprite_SetMode2D; JMP TitleScreen_Init
 
 UNREACH_00B9DB:
-    db $20,$12,$B9,$80,$C0         ; JSR CODE_00B912; BRA (skip)
+    db $20,$12,$B9,$80,$C0         ; JSR Sprite_SetMode2C; BRA (skip)
 
 UNREACH_00B9E0:
     db $86,$05,$20,$1C,$B9,$E2,$30,$A9,$EC,$8F,$D8,$56,$7F,$8F,$DA,$56
     db $7F,$8F,$DC,$56,$7F,$8F,$DE,$56,$7F,$A5,$06,$0A,$AA,$A9,$E0,$9F
     db $D8,$56,$7F,$A9,$08,$0C,$D4,$00,$22,$00,$80,$0C,$A9,$08,$1C,$D4
     db $00,$4C,$A0,$B9
-    ; STX $05; JSR CODE_00B91C; SEP #$30; (sprite setup code)
+    ; STX $05; JSR Anim_SetMode10; SEP #$30; (sprite setup code)
 
 DATA_00BA14:
     db $38,$AC,$03,$0B,$95,$03     ; Menu configuration data
 
 ;-------------------------------------------------------------------------------
-; CODE_00BA1A: Initialize title screen display
+; TitleScreen_Init: Initialize title screen display
 ;
 ; Purpose: Set up title screen graphics and palette
 ; Entry: None
@@ -12047,7 +12047,7 @@ DATA_00BA14:
 ; Notes: Sets up BG3 scrolling animation
 ;        Loads title screen palette from Bank $07
 ;-------------------------------------------------------------------------------
-CODE_00BA1A:
+TitleScreen_Init:
     LDY.W #$1000                   ; Y = $1000 (destination)
     LDA.W #$0303                   ; Graphics mode $0303
     JSR.W CODE_009A11              ; Initialize graphics
@@ -12063,14 +12063,14 @@ CODE_00BA1A:
     STA.W SNES_TM                  ; Set main screen designation
     LDA.B #$00                     ; Start at Y=0
 
-CODE_00BA41:
+TitleScreen_Init_ScrollLoop:
     JSL.L CODE_0C8000              ; External call
     STA.W SNES_BG3VOFS             ; Set BG3 V-scroll low
     STZ.W SNES_BG3VOFS             ; Clear BG3 V-scroll high
     CLC                            ; Clear carry
     ADC.B #$08                     ; Add 8 (scroll speed)
     CMP.B #$D0                     ; Check if reached $D0
-    BNE CODE_00BA41                ; Loop until done
+    BNE TitleScreen_Init_ScrollLoop ; Loop until done
     LDA.B #$10                     ; Bit 4 mask
     TSB.W $0111                    ; Set bit 4 of $0111
     REP #$30                       ; 16-bit A/X/Y
@@ -12081,39 +12081,39 @@ CODE_00BA41:
     STA.B $05                      ; Clear $05
     STA.B $01                      ; Clear $01
     STA.W $015F                    ; Clear $015F
-    BRA CODE_00BADF                ; Jump to menu display
+    BRA CharName_UpdateDisplay     ; Jump to menu display
 
 UNREACH_00BA6D:
-    db $20,$12,$B9                 ; JSR CODE_00B912
+    db $20,$12,$B9                 ; JSR Sprite_SetMode2C
 
 ;-------------------------------------------------------------------------------
-; CODE_00BA70: Character name entry input loop
+; CharName_InputLoop: Character name entry input loop
 ;
 ; Purpose: Handle controller input for character naming
 ; Entry: $00CC = current character count (0-8)
 ;        $01 = current cursor position
 ; Exit: Character name entered
 ;       $1000-$1007 = entered name
-; Calls: CODE_00B930 (input polling)
-;        CODE_00B912, CODE_00B926 (sprite modes)
+; Calls: Input_PollWithToggle (input polling)
+;        Sprite_SetMode2C, Anim_SetMode11 (sprite modes)
 ;        CODE_009BC4 (menu update)
 ; Notes: Supports character entry, deletion, confirmation
 ;        Max 8 characters per name
 ;-------------------------------------------------------------------------------
-CODE_00BA70:
+CharName_InputLoop:
     REP #$30                       ; 16-bit A/X/Y
     LDA.W #$9F80                   ; Button mask
-    JSR.W CODE_00B930              ; Poll input
-    BNE CODE_00BAD9                ; If button pressed, process
+    JSR.W Input_PollWithToggle     ; Poll input
+    BNE CharName_InputLoop_Process ; If button pressed, process
     BIT.W #$1000                   ; Test L button
-    BNE CODE_00BAD1                ; If pressed, confirm
+    BNE CharName_InputLoop_Confirm ; If pressed, confirm
     BIT.W #$8000                   ; Test A button
     BNE UNREACH_00BAC2             ; If pressed, delete char
     BIT.W #$0080                   ; Test B button
-    BEQ CODE_00BA70                ; If not pressed, loop
+    BEQ CharName_InputLoop         ; If not pressed, loop
     LDA.B $01                      ; Load cursor position
     CMP.W #$050C                   ; Check if at end position
-    BEQ CODE_00BAD1                ; If yes, confirm
+    BEQ CharName_InputLoop_Confirm ; If yes, confirm
     SEP #$30                       ; 8-bit A/X/Y
     LDY.W $00CC                    ; Load character count
     CPY.B #$08                     ; Check if 8 chars entered
@@ -12130,28 +12130,28 @@ CODE_00BA70:
     INC.W $00CC                    ; Increment character count
     LDA.L DATA8_03A37C,X           ; Load character from table
     STA.W $1000,Y                  ; Store in name buffer
-    JSR.W CODE_00B926              ; Set animation mode $11
+    JSR.W Anim_SetMode11           ; Set animation mode $11
     LDX.W #$BAED                   ; Menu data
     JSR.W CODE_009BC4              ; Update menu
-    BRA CODE_00BA70                ; Loop
+    BRA CharName_InputLoop         ; Loop
 
 UNREACH_00BAC2:
     db $AC,$CC,$00,$F0,$A6,$88,$8C,$CC,$00,$E2,$20,$A9,$03,$80,$E3
     ; LDY $00CC; BEQ skip; DEY; STY $00CC; SEP #$20; LDA #$03; BRA sound
 
-CODE_00BAD1:
+CharName_InputLoop_Confirm:
     LDA.W $00CC                    ; Load character count
     BEQ UNREACH_00BA6D             ; If empty, error
-    JMP.W CODE_00B908              ; Set sprite mode $2D and return
+    JMP.W Sprite_SetMode2D         ; Set sprite mode $2D and return
 
-CODE_00BAD9:
+CharName_InputLoop_Process:
     STX.W $015F                    ; Store selected option
-    JSR.W CODE_00B91C              ; Set animation mode $10
+    JSR.W Anim_SetMode10           ; Set animation mode $10
 
-CODE_00BADF:
+CharName_UpdateDisplay:
     LDX.W #$BAEA                   ; Menu data
     JSR.W CODE_009BC4              ; Update menu
-    BRA CODE_00BA70                ; Loop
+    BRA CharName_InputLoop         ; Loop
 
 DATA_00BAE7:
     db $CA,$AC,$03                 ; Menu configuration
@@ -12160,7 +12160,7 @@ DATA_00BAEA:
     db $34,$AD,$03,$21,$AD,$03     ; Menu configuration
 
 ;-------------------------------------------------------------------------------
-; CODE_00BAF0: System initialization routine
+; System_Init: System initialization routine
 ;
 ; Purpose: Initialize SNES hardware and game system
 ; Entry: Called at game start
@@ -12171,7 +12171,7 @@ DATA_00BAEA:
 ; Notes: Comprehensive system setup
 ;        Configures PPU, loads graphics, sets up memory
 ;-------------------------------------------------------------------------------
-CODE_00BAF0:
+System_Init:
     LDA.W #$2100                   ; PPU register base
     TCD                            ; Set direct page to $2100
     STZ.B SNES_CGSWSEL-$2100       ; Clear color/window select
@@ -12320,7 +12320,7 @@ CODE_00BAF0:
     JMP.W CODE_00CF3F              ; Jump to main routine
 
 ;-------------------------------------------------------------------------------
-; CODE_00BC49: Load palette color data
+; Palette_LoadColors: Load palette color data
 ;
 ; Purpose: Load 16 colors from Bank $07 to CGRAM
 ; Entry: A = CGRAM start address
@@ -12329,7 +12329,7 @@ CODE_00BAF0:
 ; Exit: 16 colors loaded to CGRAM
 ; Uses: DATA8_07D7F4 onwards (color data)
 ;-------------------------------------------------------------------------------
-CODE_00BC49:
+Palette_LoadColors:
     STA.B SNES_CGADD-$2100         ; Set CGRAM address
     LDA.W DATA8_07D7F4,X           ; Load color byte
     STA.B SNES_CGDATA-$2100        ; Write to CGRAM
@@ -12366,14 +12366,14 @@ CODE_00BC49:
     RTS
 
 ;-------------------------------------------------------------------------------
-; CODE_00BC9C: Set display update flag and execute screen update
+; Screen_SetUpdateFlag: Set display update flag and execute screen update
 ;
 ; Purpose: Set bit 0 of $D8 and call screen update routine
 ; Entry: None
 ; Exit: $D8 bit 0 set
 ;       Screen update executed
 ;-------------------------------------------------------------------------------
-CODE_00BC9C:
+Screen_SetUpdateFlag:
     PHP                            ; Save processor status
     SEP #$30                       ; 8-bit A/X/Y
     LDA.B #$01                     ; Bit 0 mask
@@ -12381,24 +12381,24 @@ CODE_00BC9C:
     PLP                            ; Restore processor status
 
 ;-------------------------------------------------------------------------------
-; CODE_00BCA5: Screen transition/reset routine
+; Screen_TransitionReset: Screen transition/reset routine
 ;
 ; Purpose: Reset screen and reinitialize game state
 ; Entry: $0E00 = state marker
 ; Exit: Screen reinitialized
 ;       Game state restored
 ; Calls: CODE_00C7B8 (external routine)
-;        CODE_00BAF0 (initialization)
+;        System_Init (initialization)
 ;        CODE_00C7DE or CODE_00C7F0 (conditional screen setup)
 ;        CODE_009BC4 (menu update)
 ;        CODE_00C795 (external routine)
-;        CODE_00BDB9 (menu handler)
-;        CODE_00BD64 (clear memory)
+;        Menu_Handler (menu handler)
+;        Memory_ClearBlock (clear memory)
 ;        CODE_00C4DB (external routine)
 ;        CODE_00CF3F (main routine)
 ; Notes: Handles screen transitions and state restoration
 ;-------------------------------------------------------------------------------
-CODE_00BCA5:
+Screen_TransitionReset:
     PHP                            ; Save processor status
     PHB                            ; Save data bank
     PHD                            ; Save direct page
@@ -12409,17 +12409,17 @@ CODE_00BCA5:
     PHA                            ; Save on stack
     STZ.W $008E                    ; Clear $8E
     JSL.L CODE_00C7B8              ; External routine
-    JSR.W CODE_00BAF0              ; Initialize system
+    JSR.W System_Init              ; Initialize system
     LDA.W #$0001                   ; Bit 0 mask
     AND.W $00D8                    ; Test bit 0 of $D8
-    BNE CODE_00BCCB                ; If set, alternate path
+    BNE Screen_TransitionReset_Alt ; If set, alternate path
     JSR.W CODE_00C7DE              ; Screen setup routine 1
-    BRA CODE_00BCCE                ; Continue
+    BRA Screen_TransitionReset_Continue ; Continue
 
-CODE_00BCCB:
+Screen_TransitionReset_Alt:
     JSR.W CODE_00C7F0              ; Screen setup routine 2
 
-CODE_00BCCE:
+Screen_TransitionReset_Continue:
     LDX.W #$BE80                   ; Data pointer
     JSR.W CODE_009BC4              ; Update menu
     LDA.W #$0020                   ; Bit 5 mask
@@ -12431,7 +12431,7 @@ CODE_00BCCE:
     STA.W $01F2                    ; Store in $01F2
     TSC                            ; Transfer stack to A
     STA.W $0105                    ; Save stack pointer
-    JSR.W CODE_00BDB9              ; Menu handler
+    JSR.W Menu_Handler             ; Menu handler
     LDA.W #$00FF                   ; Load $FF
     SEP #$30                       ; 8-bit A/X/Y
     STA.W $0104                    ; Store in $0104
@@ -12439,7 +12439,7 @@ CODE_00BCCE:
     LDA.W $0105                    ; Load stack pointer
     TCS                            ; Restore stack
     JSL.L CODE_00C7B8              ; External routine
-    JSR.W CODE_00BD64              ; Clear memory
+    JSR.W Memory_ClearBlock        ; Clear memory
     LDX.W #$C8E9                   ; Data pointer
     JSR.W CODE_009BC4              ; Update menu
     JSL.L CODE_0C8000              ; External init
@@ -12457,20 +12457,20 @@ CODE_00BCCE:
     RTL                            ; Return
 
 ;-------------------------------------------------------------------------------
-; CODE_00BD2A: Screen update wrapper
+; Screen_UpdateAndGraphics: Screen update wrapper
 ;
 ; Purpose: Call screen update and graphics routine
 ; Entry: None
 ; Exit: Screen updated
-; Calls: CODE_00BD30 (screen update)
+; Calls: Screen_UpdateFull (screen update)
 ;        CODE_00C795 (graphics routine)
 ;-------------------------------------------------------------------------------
-CODE_00BD2A:
-    JSR.W CODE_00BD30              ; Screen update
+Screen_UpdateAndGraphics:
+    JSR.W Screen_UpdateFull        ; Screen update
     JMP.W CODE_00C795              ; Graphics routine
 
 ;-------------------------------------------------------------------------------
-; CODE_00BD30: Screen update and initialization
+; Screen_UpdateFull: Screen update and initialization
 ;
 ; Purpose: Update screen display and reinitialize subsystems
 ; Entry: None
@@ -12479,7 +12479,7 @@ CODE_00BD2A:
 ; Calls: Multiple initialization routines
 ; Notes: Major screen refresh routine
 ;-------------------------------------------------------------------------------
-CODE_00BD30:
+Screen_UpdateFull:
     PHP                            ; Save processor status
     PHD                            ; Save direct page
     SEP #$20                       ; 8-bit accumulator
@@ -12506,7 +12506,7 @@ DATA_00BD61:
     db $F2,$82,$03                 ; Configuration data
 
 ;-------------------------------------------------------------------------------
-; CODE_00BD64: Clear memory routine
+; Memory_ClearBlock: Clear memory routine
 ;
 ; Purpose: Clear memory range $0C20-$0E1F (512 bytes)
 ; Entry: None
@@ -12515,7 +12515,7 @@ DATA_00BD61:
 ; Notes: Uses MVN for fast block fill
 ;        Sets up character display tilemap
 ;-------------------------------------------------------------------------------
-CODE_00BD64:
+Memory_ClearBlock:
     LDA.W #$5555                   ; Fill pattern
     STA.W $0C20                    ; Store at start
     LDX.W #$0C20                   ; Source address
@@ -12527,7 +12527,7 @@ CODE_00BD64:
     LDX.W #$0000                   ; Tilemap index = 0
     LDY.W #$0020                   ; Counter = 32 tiles
 
-CODE_00BD81:
+Memory_ClearBlock_Loop:
     SEP #$20                       ; 8-bit accumulator
     LDA.B ($5F)                    ; Load tile number
     STA.W $0C22,X                  ; Store in tilemap
@@ -12540,7 +12540,7 @@ CODE_00BD81:
     INX
     INX
     DEY                            ; Decrement counter
-    BNE CODE_00BD81                ; Loop until done
+    BNE Memory_ClearBlock_Loop     ; Loop until done
     RTS
 
 ;-------------------------------------------------------------------------------
@@ -12554,41 +12554,41 @@ DATA_00BD99:
     db $10,$11,$12,$13,$28,$29,$2A,$2B,$10,$11,$12,$13,$38,$39,$3A,$3B
 
 ;-------------------------------------------------------------------------------
-; CODE_00BDB9: Menu/dialog input handler
+; Menu_Handler: Menu/dialog input handler
 ;
 ; Purpose: Handle menu input and dialog display
 ; Entry: $D8 bit 0 indicates mode
 ; Exit: User selection processed
-; Calls: CODE_00B930 (input polling)
-;        CODE_00B912, CODE_00B91C (sprite modes)
+; Calls: Input_PollWithToggle (input polling)
+;        Sprite_SetMode2C, Anim_SetMode10 (sprite modes)
 ;        CODE_009BC4 (menu update)
 ; Notes: Complex menu navigation system
 ;-------------------------------------------------------------------------------
-CODE_00BDB9:
+Menu_Handler:
     PHK                            ; Push program bank
     PLB                            ; Set data bank
     LDA.W #$0001                   ; Bit 0 mask
     AND.W $00D8                    ; Test bit 0 of $D8
-    BNE CODE_00BDFD                ; If set, alternate mode
+    BNE Menu_Handler_AltMode       ; If set, alternate mode
     LDA.W #$FFF0                   ; Load $FFF0
     STA.B $8E                      ; Store in $8E
-    BRA CODE_00BDF5                ; Continue
+    BRA Menu_Handler_Process       ; Continue
 
 UNREACH_00BDCA:
-    db $20,$12,$B9                 ; JSR CODE_00B912
+    db $20,$12,$B9                 ; JSR Sprite_SetMode2C
 
-CODE_00BDCD:
+Menu_Handler_Loop:
     LDA.W #$CCB0                   ; Button mask
-    JSR.W CODE_00B930              ; Poll input
-    BNE CODE_00BDF5                ; If button pressed, process
+    JSR.W Input_PollWithToggle     ; Poll input
+    BNE Menu_Handler_Process       ; If button pressed, process
     BIT.W #$0080                   ; Test B button
-    BNE CODE_00BE2A                ; If pressed, branch
+    BNE Menu_Handler_Cancel        ; If pressed, branch
     BIT.W #$8000                   ; Test A button
-    BEQ CODE_00BDCD                ; If not pressed, loop
-    JSR.W CODE_00B91C              ; Set animation mode $10
+    BEQ Menu_Handler_Loop          ; If not pressed, loop
+    JSR.W Anim_SetMode10           ; Set animation mode $10
     STZ.B $8E                      ; Clear $8E
 
-CODE_00BDE4:
+Menu_Handler_Done:
     RTS
 
 LOOSE_OP_00BDE5:
@@ -12601,42 +12601,42 @@ LOOSE_OP_00BDE5:
     LDA.W #$FFF0                   ; Load $FFF0
     STA.B $8E                      ; Store in $8E
 
-CODE_00BDF5:
+Menu_Handler_Process:
     STX.W $015F                    ; Store input state
-    JSR.W CODE_00B91C              ; Set animation mode $10
-    BRA CODE_00BE30                ; Continue
+    JSR.W Anim_SetMode10           ; Set animation mode $10
+    BRA Menu_Handler_Update        ; Continue
 
-CODE_00BDFD:
+Menu_Handler_AltMode:
     LDA.W #$CCB0                   ; Button mask
-    JSR.W CODE_00B930              ; Poll input
-    BNE CODE_00BE30                ; If button pressed, process
+    JSR.W Input_PollWithToggle     ; Poll input
+    BNE Menu_Handler_Update        ; If button pressed, process
     LDA.B #$01                     ; Bit 0 mask
     TRB.W $00D8                    ; Clear bit 0 of $D8
     BIT.W #$0080                   ; Test B button
-    BNE CODE_00BE21                ; If pressed, cancel
+    BNE Menu_Handler_AltCancel     ; If pressed, cancel
     BIT.W #$8000                   ; Test A button
-    BEQ CODE_00BDFD                ; If not pressed, loop
-    JSR.W CODE_00B91C              ; Set animation mode $10
+    BEQ Menu_Handler_AltMode       ; If not pressed, loop
+    JSR.W Anim_SetMode10           ; Set animation mode $10
     LDA.W #$FFFF                   ; Load $FFFF
     STA.B $01                      ; Store in $01
     STZ.B $8E                      ; Clear $8E
     RTS
 
-CODE_00BE21:
-    JSR.W CODE_00B912              ; Set sprite mode $2D
+Menu_Handler_AltCancel:
+    JSR.W Sprite_SetMode2C         ; Set sprite mode $2D
     LDA.W #$00FF                   ; Load $FF
     STA.B $01                      ; Store in $01
     RTS
 
-CODE_00BE2A:
+Menu_Handler_Cancel:
     LDA.B #$01                     ; Bit 0 mask
     TRB.W $00D8                    ; Clear bit 0 of $D8
     RTS
 
-CODE_00BE30:
+Menu_Handler_Update:
     LDX.W #$BE80                   ; Data pointer
     JSR.W CODE_009BC4              ; Update menu
-    BRA CODE_00BDCD                ; Loop
+    BRA Menu_Handler_Loop          ; Loop
 
 DATA_00BE38:
     db $02,$04                     ; Configuration data
@@ -12657,18 +12657,18 @@ DATA_00BE83:
     db $7A,$BE,$03,$3A,$BE,$03,$66,$BE,$03
 
 ;-------------------------------------------------------------------------------
-; CODE_00BE83: Menu handler with party member selection
+; Menu_PartySelection: Menu handler with party member selection
 ;
 ; Purpose: Display menu with party member selection capability
 ; Entry: A = menu option parameter
 ;        $1090 = companion status flags (negative if no companion)
 ; Exit: $14 = selected option or $FF
 ;       $7E3664 = selected option stored
-; Calls: CODE_00B91C (update sprite), CODE_009BC4 (show menu)
+; Calls: Anim_SetMode10 (update sprite), CODE_009BC4 (show menu)
 ; Notes: Handles single-character vs two-character party
 ;        Saves/restores menu state on stack
 ;-------------------------------------------------------------------------------
-CODE_00BE83:
+Menu_PartySelection:
     PHP                            ; Save processor status
     SEP #$20                       ; 8-bit accumulator
     REP #$10                       ; 16-bit index
@@ -12684,69 +12684,69 @@ CODE_00BE83:
     STZ.B $8F                      ; Clear position high
     LDX.W #$0102                   ; Two options (two characters)
     LDA.W $1090                    ; Check companion status
-    BPL CODE_00BEA9                ; Branch if companion present
+    BPL Menu_PartySelection_Init   ; Branch if companion present
     LDX.W #$0101                   ; One option (solo)
 
-CODE_00BEA9:
+Menu_PartySelection_Init:
     STX.B $03                      ; Set menu configuration
     STZ.B $01                      ; Clear option
     STZ.B $02                      ; Clear option high
     LDA.L $7E3664                  ; Load last selection
-    BEQ CODE_00BEC9                ; Branch if zero
+    BEQ Menu_PartySelection_Start  ; Branch if zero
     BMI UNREACH_00BEC0             ; Branch if negative
     LDA.W $1090                    ; Check companion status again
-    BMI CODE_00BEC9                ; Branch if no companion
+    BMI Menu_PartySelection_Start  ; Branch if no companion
     INC.B $01                      ; Select second option
-    BRA CODE_00BEC9                ; Continue
+    BRA Menu_PartySelection_Start  ; Continue
 
 UNREACH_00BEC0:
     db $AD,$E0,$04,$29,$20,$D0,$0D,$80,$07  ; Unreachable data
 
-CODE_00BEC9:
+Menu_PartySelection_Start:
     LDA.W $04E0                    ; Load parameter
     AND.B #$10                     ; Check bit 4
     BEQ UNREACH_00BED4             ; Branch if clear
 
-CODE_00BED0:
+Menu_PartySelection_GetOption:
     LDA.B $01                      ; Load current option
-    BRA CODE_00BED6                ; Continue
+    BRA Menu_PartySelection_Update ; Continue
 
 UNREACH_00BED4:
     db $A9,$80                     ; Unreachable data
 
-CODE_00BED6:
+Menu_PartySelection_Update:
     LDX.B $14                      ; Load previous result
     CMP.B $14                      ; Compare with current
     STA.B $14                      ; Store new result
     STA.L $7E3664                  ; Save selection
-    BEQ CODE_00BEEA                ; Branch if unchanged
+    BEQ Menu_PartySelection_Show   ; Branch if unchanged
     TXA                            ; Get previous
     CMP.B #$FF                     ; Was cancelled?
-    BEQ CODE_00BEEA                ; Branch if yes
-    JSR.W CODE_00B91C              ; Update sprite
+    BEQ Menu_PartySelection_Show   ; Branch if yes
+    JSR.W Anim_SetMode10           ; Update sprite
 
-CODE_00BEEA:
+Menu_PartySelection_Show:
     LDX.W #$BF48                   ; Menu data
     JSR.W CODE_009BC4              ; Show menu
     LDX.W #$FFF0                   ; Position offset (-16)
     STX.B $8E                      ; Set position
 
 ;-------------------------------------------------------------------------------
-; CODE_00BE8C: Menu option selection handler
+; Menu_OptionSelection: Menu option selection handler
 ;
 ; Purpose: Handle menu cursor and option selection
 ; Entry: $01 = current menu option
 ;        $03 = menu configuration
 ; Exit: $01 = selected option or $FF for cancel
-; Calls: CODE_00B930 (input polling)
-;        CODE_00B912, CODE_00B926, CODE_00B91C (sprite/animation modes)
+; Calls: Input_PollWithToggle (input polling)
+;        Sprite_SetMode2C, Anim_SetMode11, Anim_SetMode10 (sprite/animation modes)
 ;        CODE_009BC4 (menu update)
 ; Notes: Supports cursor wrapping, confirmation, cancellation
 ;-------------------------------------------------------------------------------
-CODE_00BE8C:
+Menu_OptionSelection:
     LDA.W #$CCB0                   ; Button mask
-    JSR.W CODE_00B930              ; Poll input
-    BNE CODE_00BED8                ; If button pressed, process
+    JSR.W Input_PollWithToggle     ; Poll input
+    BNE Menu_OptionSelection_ProcessInput ; If button pressed, process
     BIT.W #$0080                   ; Test B button
     BNE CODE_00BEB3                ; If pressed, cancel
     BIT.W #$8000                   ; Test A button
