@@ -240,10 +240,19 @@ leave actual data as db statements, just make sure all actual code is disassembl
 make sure you're using the files in `C:\Users\me\source\repos\ffmq-info\historical\diztinguish-disassembly\diztinguish` as reference, make sure you are updating the session summary/chat log, document the code as accurately as possible, create git commits with descriptions, focus on aggressively and greedily disassembly of the remaining banks of code (and use the temp file action process to speed things up), build and compare to reference ROM file updating a progress file, 
 continue the disassembly
 continue the disassembly
+make a git commit with description and push it
 
+*******************************************
+Next Steps for "Continue the Disassembly":
+Consolidate Temp Files (128 files across banks) - Merge cycles into main documented files
+Improve Function Labels - Replace generic CODE_ labels with descriptive names
+Extract Graphics Data - Parse palette and sprite data from banks $04-$0A
+Extract Audio Data - Document music/SFX from bank $0F
+Complete Master Build - Finish ffmq_master.asm for full source rebuild
+Would you like me to start consolidating the temp files, or focus on improving the function documentation in the code banks?
+********************************************
 
-
-
+Consolidate Temp Files (128 files across banks) - Merge cycles into main documented files
 
 
 

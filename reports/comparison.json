@@ -1,11 +1,11 @@
 {
-  "original_rom": "C:\\Users\\me\\source\\repos\\ffmq-info\\roms\\Final Fantasy - Mystic Quest (U) (V1.1).sfc",
-  "built_rom": "C:\\Users\\me\\source\\repos\\ffmq-info\\build\\ffmq-rebuilt.sfc",
+  "original_rom": "roms\\Final Fantasy - Mystic Quest (U) (V1.1).sfc",
+  "built_rom": "build\\ffmq-rebuilt.sfc",
   "statistics": {
     "total_bytes": 524288,
-    "matching_bytes": 524267,
-    "differing_bytes": 21,
-    "match_percentage": 99.9959945678711,
+    "matching_bytes": 524288,
+    "differing_bytes": 0,
+    "match_percentage": 100.0,
     "by_category": {
       "code": {
         "total_bytes": 245760,
@@ -15,9 +15,9 @@
       },
       "data": {
         "total_bytes": 114768,
-        "matching_bytes": 114747,
-        "differing_bytes": 21,
-        "match_percentage": 99.98170221664576
+        "matching_bytes": 114768,
+        "differing_bytes": 0,
+        "match_percentage": 100.0
       },
       "text": {
         "total_bytes": 16384,
@@ -39,26 +39,7 @@
       }
     }
   },
-  "difference_blocks": [
-    {
-      "start": "$007FC2",
-      "end": "$007FD3",
-      "size": 17,
-      "region": "Engine Data",
-      "category": "data",
-      "original_sample": "204d5953544943205155455354202020",
-      "built_sample": "4d5120456e68616e6365642076312e30"
-    },
-    {
-      "start": "$007FDC",
-      "end": "$007FE0",
-      "size": 4,
-      "region": "Engine Data",
-      "category": "data",
-      "original_sample": "0a70f58f",
-      "built_sample": "3c6fc390"
-    }
-  ],
+  "difference_blocks": [],
   "regions": [
     {
       "name": "Boot/Reset",
