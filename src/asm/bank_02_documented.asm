@@ -2643,28 +2643,28 @@ Input_EnhancedValidate:
 ;Complex input state management with conditional processing
 ;Manages complex input states with multiple conditional processing paths
 Input_ComplexState:
-    JSR.W CODE_029E12       ; Execute input state validation
+    JSR.W System_ValidateEnhanced ; Execute input state validation
     AND.B $DB               ; Mask with input validation flags
-    BNE CODE_029BF7         ; Branch to complex processing if input present
-    JMP.W CODE_029C98       ; Jump to standard processing
+    BNE Input_ComplexProcess ; Branch to complex processing if input present
+    JMP.W Input_StandardComplete ; Jump to standard processing
 
 ;Complex input processing with specialized handlers
 ;Processes complex input patterns with specialized handler systems
-CODE_029BF7:
+Input_ComplexProcess:
     LDA.B $DB               ; Load input validation flags
     AND.B #$08              ; Test for input flag $08
-    BEQ CODE_029C0D         ; Branch to alternate processing if not set
+    BEQ Input_AltPattern    ; Branch to alternate processing if not set
     ; Complex input processing sequence with multiple system calls
     db $20,$E1,$9B,$A2,$81,$D3,$20,$3D,$88,$A6,$77,$86,$79,$4C,$95,$9C
 
 ;Alternate input processing with pattern validation
 ;Processes alternate input patterns with comprehensive validation
-CODE_029C0D:
+Input_AltPattern:
     LDA.B $DB               ; Load input validation flags
     AND.B #$50              ; Test for input pattern $50
     CMP.B #$50              ; Validate complete pattern
-    BNE CODE_029C32         ; Branch to standard processing if pattern incomplete
-    JSR.W CODE_029E12       ; Execute input validation
+    BNE Input_Reduction     ; Branch to standard processing if pattern incomplete
+    JSR.W System_ValidateEnhanced ; Execute input validation
     AND.B #$50              ; Test validated input pattern
     CMP.B #$50              ; Verify pattern consistency
     BEQ UNREACH_029C1F      ; Branch to unreachable processing if consistent
@@ -2677,36 +2677,36 @@ UNREACH_029C1F:
 
 ;Standard input processing with reduction and flag management
 ;Processes standard input with mathematical reduction and flag management
-CODE_029C32:
-    JSR.W CODE_029BE1       ; Execute enhanced input validation
+Input_Reduction:
+    JSR.W Input_EnhancedValidate ; Execute enhanced input validation
     REP #$30                ; Set 16-bit accumulator and index registers
     LSR.B $77               ; Reduce calculation by half
     SEP #$20                ; Return to 8-bit accumulator
     REP #$10                ; Keep 16-bit index registers
     LDA.B $DB               ; Load input validation flags
     AND.B #$80              ; Test for input flag $80
-    BEQ CODE_029C4B         ; Branch to alternate handler if not set
+    BEQ Input_Flag40        ; Branch to alternate handler if not set
     LDX.W #$D36A            ; Load handler for flag $80
     JSR.W CODE_02883D       ; Execute flag $80 handler
-    BRA CODE_029C95         ; Branch to processing completion
+    BRA Input_ProcessDone   ; Branch to processing completion
 
 ;Input flag $40 processing
-CODE_029C4B:
+Input_Flag40:
     LDA.B $DB               ; Load input validation flags
     AND.B #$40              ; Test for input flag $40
-    BEQ CODE_029C59         ; Branch to next flag test if not set
+    BEQ Input_Flag20        ; Branch to next flag test if not set
     LDX.W #$D36E            ; Load handler for flag $40
     JSR.W CODE_02883D       ; Execute flag $40 handler
-    BRA CODE_029C95         ; Branch to processing completion
+    BRA Input_ProcessDone   ; Branch to processing completion
 
 ;Input flag $20 processing
-CODE_029C59:
+Input_Flag20:
     LDA.B $DB               ; Load input validation flags
     AND.B #$20              ; Test for input flag $20
     BEQ UNREACH_029C67      ; Branch to unreachable processing if not set
     LDX.W #$D372            ; Load handler for flag $20
     JSR.W CODE_02883D       ; Execute flag $20 handler
-    BRA CODE_029C95         ; Branch to processing completion
+    BRA Input_ProcessDone   ; Branch to processing completion
 
 ;Unreachable input flag processing
 UNREACH_029C67:
@@ -2716,26 +2716,26 @@ UNREACH_029C67:
 
 ;Input processing completion with system finalization
 ;Completes input processing and finalizes all input-related systems
-CODE_029C95:
-    JSR.W CODE_029BC4       ; Execute input processing finalization
+Input_ProcessDone:
+    JSR.W Input_Finalize    ; Execute input processing finalization
 
 ;Main input processing completion handler
-CODE_029C98:
+Input_StandardComplete:
     JMP.W CODE_029F10       ; Jump to main completion handler
 
 ;Advanced system validation with conditional processing
 ;Validates system state with conditional processing paths
-CODE_029C9B:
+System_ValidateState:
     JSR.W CODE_029964       ; Execute system validation check
     INC A                   ; Increment validation result
-    BEQ CODE_029CB6         ; Branch to special processing if result is zero
+    BEQ System_SpecialState ; Branch to special processing if result is zero
     ; Complex system validation sequence
     db $0B,$20,$2F,$8F,$A5,$3D,$2B,$29,$80,$D0,$12,$0B,$20,$2F,$8F,$A6
     db $14,$2B,$86,$77,$60
 
 ;Special system state processing
 ;Handles special system states with context switching
-CODE_029CB6:
+System_SpecialState:
     PHD                     ; Push direct page register
     JSR.W CODE_028F2F       ; Switch to system processing context
     STZ.B $21               ; Clear system state flag
@@ -2747,147 +2747,147 @@ CODE_029CB6:
 
 ;Main system coordination with validation loops
 ;Coordinates main system operations with validation loops and error checking
-CODE_029CCA:
+System_Coordinate:
     LDA.B $11               ; Load system validation flag
     AND.B #$08              ; Test for validation bit $08
-    BNE CODE_029CD9         ; Branch to standard processing if bit set
+    BNE System_ProcessFlags ; Branch to standard processing if bit set
     JSR.W CODE_029964       ; Execute system validation
     INC A                   ; Increment validation result
-    BNE CODE_029CD9         ; Branch to standard processing if result non-zero
+    BNE System_ProcessFlags ; Branch to standard processing if result non-zero
     db $4C,$F5,$9D          ; Jump to error recovery processing
 
 ;System state management with conditional flag processing
 ;Manages system state with conditional flag processing and validation
-CODE_029CD9:
+System_ProcessFlags:
     LDA.B $DC               ; Load system control flags
     AND.B #$01              ; Test for control flag $01
-    BEQ CODE_029CF9         ; Branch to next flag test if not set
-    JSR.W CODE_029E0A       ; Execute flag validation
+    BEQ System_Flag02       ; Branch to next flag test if not set
+    JSR.W System_ValidateContext ; Execute flag validation
     AND.B #$01              ; Test validated flag
     AND.B $DC               ; Mask with control flags
-    BNE CODE_029CED         ; Branch to flag processing if valid
+    BNE System_Flag01_Process ; Branch to flag processing if valid
     db $20,$F8,$9D,$80,$0C ; Execute flag-specific processing
 
 ;System flag $01 processing with handler coordination
-CODE_029CED:
-    JSR.W CODE_029BE1       ; Execute enhanced system validation
+System_Flag01_Process:
+    JSR.W Input_EnhancedValidate ; Execute enhanced system validation
     LDX.W #$D3A0            ; Load flag $01 handler address
     JSR.W CODE_02883D       ; Execute flag $01 handler
-    JSR.W CODE_029BC4       ; Execute processing finalization
+    JSR.W Input_Finalize    ; Execute processing finalization
 
 ;System flag $02 processing with validation and error handling
-CODE_029CF9:
+System_Flag02:
     LDA.B $DC               ; Load system control flags
     AND.B #$02              ; Test for control flag $02
-    BEQ CODE_029D1B         ; Branch to next flag test if not set
-    JSR.W CODE_029E0A       ; Execute flag validation
+    BEQ System_Flag04       ; Branch to next flag test if not set
+    JSR.W System_ValidateContext ; Execute flag validation
     AND.B #$02              ; Test validated flag
     AND.B $DC               ; Mask with control flags
-    BNE CODE_029D0F         ; Branch to flag processing if valid
+    BNE System_Flag02_Process ; Branch to flag processing if valid
     LDA.B #$02              ; Load flag identifier
-    JSR.W CODE_029DF8       ; Execute flag-specific error handling
-    BRA CODE_029D1B         ; Branch to next flag processing
+    JSR.W System_FlagError  ; Execute flag-specific error handling
+    BRA System_Flag04       ; Branch to next flag processing
 
 ;System flag $02 handler processing
-CODE_029D0F:
-    JSR.W CODE_029BE1       ; Execute enhanced system validation
+System_Flag02_Process:
+    JSR.W Input_EnhancedValidate ; Execute enhanced system validation
     LDX.W #$D3A7            ; Load flag $02 handler address
     JSR.W CODE_02883D       ; Execute flag $02 handler
-    JSR.W CODE_029BC4       ; Execute processing finalization
+    JSR.W Input_Finalize    ; Execute processing finalization
 
 ;System flag $04 processing with validation and error handling
-CODE_029D1B:
+System_Flag04:
     LDA.B $DC               ; Load system control flags
     AND.B #$04              ; Test for control flag $04
-    BEQ CODE_029D3D         ; Branch to next flag test if not set
-    JSR.W CODE_029E0A       ; Execute flag validation
+    BEQ System_Flag08       ; Branch to next flag test if not set
+    JSR.W System_ValidateContext ; Execute flag validation
     AND.B #$04              ; Test validated flag
     AND.B $DC               ; Mask with control flags
-    BNE CODE_029D31         ; Branch to flag processing if valid
+    BNE System_Flag04_Process ; Branch to flag processing if valid
     LDA.B #$04              ; Load flag identifier
-    JSR.W CODE_029DF8       ; Execute flag-specific error handling
-    BRA CODE_029D3D         ; Branch to next flag processing
+    JSR.W System_FlagError  ; Execute flag-specific error handling
+    BRA System_Flag08       ; Branch to next flag processing
 
 ;System flag $04 handler processing
-CODE_029D31:
-    JSR.W CODE_029BE1       ; Execute enhanced system validation
+System_Flag04_Process:
+    JSR.W Input_EnhancedValidate ; Execute enhanced system validation
     LDX.W #$D3AC            ; Load flag $04 handler address
     JSR.W CODE_02883D       ; Execute flag $04 handler
-    JSR.W CODE_029BC4       ; Execute processing finalization
+    JSR.W Input_Finalize    ; Execute processing finalization
 
 ;System flag $08 processing with validation and error handling
-CODE_029D3D:
+System_Flag08:
     LDA.B $DC               ; Load system control flags
     AND.B #$08              ; Test for control flag $08
-    BEQ CODE_029D5F         ; Branch to next flag test if not set
-    JSR.W CODE_029E0A       ; Execute flag validation
+    BEQ System_Flag10       ; Branch to next flag test if not set
+    JSR.W System_ValidateContext ; Execute flag validation
     AND.B #$08              ; Test validated flag
     AND.B $DC               ; Mask with control flags
-    BNE CODE_029D53         ; Branch to flag processing if valid
+    BNE System_Flag08_Process ; Branch to flag processing if valid
     LDA.B #$08              ; Load flag identifier
-    JSR.W CODE_029DF8       ; Execute flag-specific error handling
-    BRA CODE_029D5F         ; Branch to next flag processing
+    JSR.W System_FlagError  ; Execute flag-specific error handling
+    BRA System_Flag10       ; Branch to next flag processing
 
 ;System flag $08 handler processing
-CODE_029D53:
-    JSR.W CODE_029BE1       ; Execute enhanced system validation
+System_Flag08_Process:
+    JSR.W Input_EnhancedValidate ; Execute enhanced system validation
     LDX.W #$D3C1            ; Load flag $08 handler address
     JSR.W CODE_02883D       ; Execute flag $08 handler
-    JSR.W CODE_029BC4       ; Execute processing finalization
+    JSR.W Input_Finalize    ; Execute processing finalization
 
 ;System flag $10 processing with validation and error handling
-CODE_029D5F:
+System_Flag10:
     LDA.B $DC               ; Load system control flags
     AND.B #$10              ; Test for control flag $10
-    BEQ CODE_029D81         ; Branch to next flag test if not set
-    JSR.W CODE_029E0A       ; Execute flag validation
+    BEQ System_Flag20       ; Branch to next flag test if not set
+    JSR.W System_ValidateContext ; Execute flag validation
     AND.B #$10              ; Test validated flag
     AND.B $DC               ; Mask with control flags
-    BNE CODE_029D75         ; Branch to flag processing if valid
+    BNE System_Flag10_Process ; Branch to flag processing if valid
     LDA.B #$10              ; Load flag identifier
-    JSR.W CODE_029DF8       ; Execute flag-specific error handling
-    BRA CODE_029D81         ; Branch to next flag processing
+    JSR.W System_FlagError  ; Execute flag-specific error handling
+    BRA System_Flag20       ; Branch to next flag processing
 
 ;System flag $10 handler processing
-CODE_029D75:
-    JSR.W CODE_029BE1       ; Execute enhanced system validation
+System_Flag10_Process:
+    JSR.W Input_EnhancedValidate ; Execute enhanced system validation
     LDX.W #$D3BB            ; Load flag $10 handler address
     JSR.W CODE_02883D       ; Execute flag $10 handler
-    JSR.W CODE_029BC4       ; Execute processing finalization
+    JSR.W Input_Finalize    ; Execute processing finalization
 
 ;System flag $20 processing with validation and error handling
-CODE_029D81:
+System_Flag20:
     LDA.B $DC               ; Load system control flags
     AND.B #$20              ; Test for control flag $20
-    BEQ CODE_029DA3         ; Branch to next flag test if not set
-    JSR.W CODE_029E0A       ; Execute flag validation
+    BEQ System_Flag40       ; Branch to next flag test if not set
+    JSR.W System_ValidateContext ; Execute flag validation
     AND.B #$20              ; Test validated flag
     AND.B $DC               ; Mask with control flags
-    BNE CODE_029D97         ; Branch to flag processing if valid
+    BNE System_Flag20_Process ; Branch to flag processing if valid
     LDA.B #$20              ; Load flag identifier
-    JSR.W CODE_029DF8       ; Execute flag-specific error handling
-    BRA CODE_029DA3         ; Branch to next flag processing
+    JSR.W System_FlagError  ; Execute flag-specific error handling
+    BRA System_Flag40       ; Branch to next flag processing
 
 ;System flag $20 handler processing
-CODE_029D97:
-    JSR.W CODE_029BE1       ; Execute enhanced system validation
+System_Flag20_Process:
+    JSR.W Input_EnhancedValidate ; Execute enhanced system validation
     LDX.W #$D3B2            ; Load flag $20 handler address
     JSR.W CODE_02883D       ; Execute flag $20 handler
-    JSR.W CODE_029BC4       ; Execute processing finalization
+    JSR.W Input_Finalize    ; Execute processing finalization
 
 ;System flag $40 processing with complex validation and error handling
-CODE_029DA3:
+System_Flag40:
     LDA.B $DC               ; Load system control flags
     AND.B #$40              ; Test for control flag $40
-    BNE CODE_029DAA         ; Branch to flag processing if set
+    BNE System_Flag40_Validate ; Branch to flag processing if set
     RTS                     ; Return if flag not set
 
 ;Complex system flag $40 processing with multi-path validation
-CODE_029DAA:
-    JSR.W CODE_029E0A       ; Execute flag validation
+System_Flag40_Validate:
+    JSR.W System_ValidateContext ; Execute flag validation
     AND.B #$40              ; Test validated flag
     AND.B $DC               ; Mask with control flags
-    BNE CODE_029DE9         ; Branch to flag processing if valid
+    BNE System_Flag40_Process ; Branch to flag processing if valid
     LDA.B $8D               ; Load system index
     CMP.B #$02              ; Check for minimum system index
     BCS UNREACH_029DC8      ; Branch to unreachable processing if sufficient
@@ -2907,16 +2907,16 @@ UNREACH_029DC8:
     db $60
 
 ;System flag $40 handler with complex processing
-CODE_029DE9:
-    JSR.W CODE_029BE1       ; Execute enhanced system validation
+System_Flag40_Process:
+    JSR.W Input_EnhancedValidate ; Execute enhanced system validation
     LDX.W #$D398            ; Load flag $40 handler address
     JSR.W CODE_02883D       ; Execute flag $40 handler
-    JSR.W CODE_029BC4       ; Execute processing finalization
-    JMP.W CODE_029E00       ; Jump to system completion
+    JSR.W Input_Finalize    ; Execute processing finalization
+    JMP.W System_Complete   ; Jump to system completion
 
 ;System flag error handling with context switching
 ;Handles system flag errors with proper context switching
-CODE_029DF8:
+System_FlagError:
     PHD                     ; Push direct page register
     JSR.W CODE_028F2F       ; Switch to error handling context
     TSB.B $21               ; Set error flag in system register
@@ -2925,7 +2925,7 @@ CODE_029DF8:
 
 ;System completion with flag clearing
 ;Completes system processing and clears system flags
-CODE_029E00:
+System_Complete:
     LDA.B $DC               ; Load system control flags
     PHD                     ; Push direct page register
     JSR.W CODE_028F2F       ; Switch to completion context
@@ -2935,7 +2935,7 @@ CODE_029E00:
 
 ;System validation with context switching
 ;Validates system state with proper context switching
-CODE_029E0A:
+System_ValidateContext:
     PHD                     ; Push direct page register
     JSR.W CODE_028F2F       ; Switch to validation context
     LDA.B $3D               ; Load validation state
@@ -2944,7 +2944,7 @@ CODE_029E0A:
 
 ;Enhanced system validation with extended context
 ;Validates enhanced system state with extended context management
-CODE_029E12:
+System_ValidateEnhanced:
     PHD                     ; Push direct page register
     JSR.W CODE_028F2F       ; Switch to enhanced validation context
     LDA.B $3C               ; Load enhanced validation state
@@ -2999,40 +2999,40 @@ DATA8_02A279:
 ; Game State Processing and Input Handler
 ; Primary game loop controller management system
 ;----------------------------------------------------------------------------
-CODE_02A28C:
+Controller_GameLoop:
                        PEA.W $0400                          ;02A28C|F40004  |020400; Set direct page to $0400
                        PLD                                  ;02A28F|2B      |      ;
                        SEP #$20                             ;02A290|E220    |      ; 8-bit accumulator
                        REP #$10                             ;02A292|C210    |      ; 16-bit index
                        LDA.B $17                            ;02A294|A517    |000417; Check system interrupt flag
                        AND.B #$80                           ;02A296|2980    |      ; Test high bit for pause state
-                       BEQ CODE_02A29B                      ;02A298|F001    |02A29B; Continue if not paused
+                       BEQ Controller_InputProcess ; Continue if not paused
                        RTS                                  ;02A29A|60      |      ; Exit if paused
                                                             ;      |        |      ;
                                                             ;      |        |      ;
 
 ; Primary Input State Machine Processor
-CODE_02A29B:
+Controller_InputProcess:
                        STZ.B $D0                            ;02A29B|64D0    |0004D0; Clear status flag
                        LDA.B $8B                            ;02A29D|A58B    |00048B; Check game state mode
                        CMP.B #$01                           ;02A29F|C901    |      ; Test for mode 1 (menu/interface)
-                       BEQ CODE_02A2A6                      ;02A2A1|F003    |02A2A6; Branch to menu handler
-                       JMP.W CODE_02A373                    ;02A2A3|4C73A3  |02A373; Jump to game mode handler
+                       BEQ Controller_MenuMode             ; Branch to menu handler
+                       JMP.W Controller_GameMode           ; Jump to game mode handler
                                                             ;      |        |      ;
                                                             ;      |        |      ;
 
 ; Menu Interface Controller Processing
-CODE_02A2A6:
+Controller_MenuMode:
                        LDX.W #$04C4                         ;02A2A6|A2C404  |      ; Load controller data pointer
                        STX.B $92                            ;02A2A9|8692    |000492; Store data pointer
                        STZ.B $8B                            ;02A2AB|648B    |00048B; Reset game state
                        LDA.B #$01                           ;02A2AD|A901    |      ; Set controller count
                        STA.B $8C                            ;02A2AF|858C    |00048C; Store controller count
-                       JSR.W CODE_02A40C                    ;02A2B1|200CA4  |02A40C; Process controller input
+                       JSR.W Controller_ReadAll            ; Process controller input
                        REP #$30                             ;02A2B4|C230    |      ; 16-bit mode
                        LDA.B $C4                            ;02A2B6|A5C4    |0004C4; Read controller 1 state
                        ORA.B $C6                            ;02A2B8|05C6    |0004C6; Combine with controller 2
-                       BNE CODE_02A2C6                      ;02A2BA|D00A    |02A2C6; Branch if input detected
+                       BNE Controller_MenuInputDetected    ; Branch if input detected
                        SEP #$20                             ;02A2BC|E220    |      ; 8-bit accumulator
                        REP #$10                             ;02A2BE|C210    |      ; 16-bit index
                        LDA.B $D0                            ;02A2C0|A5D0    |0004D0; Check idle counter
@@ -3043,7 +3043,7 @@ CODE_02A2A6:
                                                             ;      |        |      ;
 
 ; Input Detected Processing Branch
-CODE_02A2C6:
+Controller_MenuInputDetected:
                        SEP #$20                             ;02A2C6|E220    |      ; 8-bit accumulator
                        REP #$10                             ;02A2C8|C210    |      ; 16-bit index
                        LDA.B #$FF                           ;02A2CA|A9FF    |      ; Set active input flag
@@ -3054,68 +3054,68 @@ CODE_02A2C6:
                        REP #$30                             ;02A2D4|C230    |      ; 16-bit mode
                        LDA.B $C4                            ;02A2D6|A5C4    |0004C4; Read controller 1
                        BIT.W #$0100                         ;02A2D8|890001  |      ; Test for special button
-                       BEQ CODE_02A2E0                      ;02A2DB|F003    |02A2E0; Branch if normal input
-                       JMP.W CODE_02A501                    ;02A2DD|4C01A5  |02A501; Handle special button
+                       BEQ Controller_CheckDirection       ; Branch if normal input
+                       JMP.W Controller_SpecialButton      ; Handle special button
                                                             ;      |        |      ;
                                                             ;      |        |      ;
 
 ; Standard Input Direction Processing
-CODE_02A2E0:
+Controller_CheckDirection:
                        AND.W #$00E0                         ;02A2E0|29E000  |      ; Mask direction bits
-                       BEQ CODE_02A2E8                      ;02A2E3|F003    |02A2E8; Branch if no direction
-                       JMP.W CODE_02A528                    ;02A2E5|4C28A5  |02A528; Process directional input
+                       BEQ Controller_ButtonCheck          ; Branch if no direction
+                       JMP.W Controller_DirectionHandler   ; Process directional input
                                                             ;      |        |      ;
                                                             ;      |        |      ;
 
 ; Button Press Analysis System
-CODE_02A2E8:
+Controller_ButtonCheck:
                        LDA.B $C6                            ;02A2E8|A5C6    |0004C6; Read controller 2
                        ORA.B $C4                            ;02A2EA|05C4    |0004C4; Combine with controller 1
                        AND.W #$0010                         ;02A2EC|291000  |      ; Test for action button
-                       BEQ CODE_02A318                      ;02A2EF|F027    |02A318; Branch if no action button
+                       BEQ Controller_AltButtonCheck       ; Branch if no action button
                        LDA.B $C6                            ;02A2F1|A5C6    |0004C6; Read controller 2 again
                        AND.B $C4                            ;02A2F3|25C4    |0004C4; Check simultaneous press
                        AND.W #$0010                         ;02A2F5|291000  |      ; Verify action button
-                       BEQ CODE_02A309                      ;02A2F8|F00F    |02A309; Branch if not simultaneous
+                       BEQ Controller_CheckPrecedence      ; Branch if not simultaneous
                        LDA.W $10A5                          ;02A2FA|ADA510  |0210A5; Check timing parameter
                        CMP.W #$0032                         ;02A2FD|C93200  |      ; Compare to threshold
-                       BCC CODE_02A309                      ;02A300|9007    |02A309; Branch if below threshold
+                       BCC Controller_CheckPrecedence      ; Branch if below threshold
                        LDA.W #$0080                         ;02A302|A98000  |      ; Set rapid-fire mode
                        STA.B $CE                            ;02A305|85CE    |0004CE; Store rapid-fire flag
-                       BRA CODE_02A315                      ;02A307|800C    |02A315; Continue processing
+                       BRA Controller_ActionProcess        ; Continue processing
                                                             ;      |        |      ;
                                                             ;      |        |      ;
 
 ; Controller Precedence Logic
-CODE_02A309:
+Controller_CheckPrecedence:
                        LDA.B $C6                            ;02A309|A5C6    |0004C6; Read controller 2
                        CMP.B $C4                            ;02A30B|C5C4    |0004C4; Compare to controller 1
-                       BCC CODE_02A315                      ;02A30D|9006    |02A315; Branch if C2 < C1
+                       BCC Controller_ActionProcess        ; Branch if C2 < C1
                        SEP #$20                             ;02A30F|E220    |      ; 8-bit accumulator
                        REP #$10                             ;02A311|C210    |      ; 16-bit index
                        INC.B $CE                            ;02A313|E6CE    |0004CE; Increment controller flag
                                                             ;      |        |      ;
 
-CODE_02A315:
-                       JMP.W CODE_02A5AA                    ;02A315|4CAAA5  |02A5AA; Jump to action handler
+Controller_ActionProcess:
+                       JMP.W Controller_ActionHandler      ; Jump to action handler
                                                             ;      |        |      ;
                                                             ;      |        |      ;
 
 ; Alternative Button Processing Path
-CODE_02A318:
+Controller_AltButtonCheck:
                        LDA.B $C6                            ;02A318|A5C6    |0004C6; Read controller 2
                        ORA.B $C4                            ;02A31A|05C4    |0004C4; Combine with controller 1
                        AND.W #$0027                         ;02A31C|292700  |      ; Test for secondary buttons
                        LDA.B $C6                            ;02A31F|A5C6    |0004C6; Read controller 2 again
                        CMP.B $C4                            ;02A321|C5C4    |0004C4; Compare controllers
-                       BCC CODE_02A32B                      ;02A323|9006    |02A32B; Branch if C2 < C1
+                       BCC Controller_ProcessSecondary     ; Branch if C2 < C1
                        SEP #$20                             ;02A325|E220    |      ; 8-bit accumulator
                        REP #$10                             ;02A327|C210    |      ; 16-bit index
                        INC.B $CE                            ;02A329|E6CE    |0004CE; Increment controller flag
                                                             ;      |        |      ;
 
-CODE_02A32B:
-                       JMP.W CODE_02A528                    ;02A32B|4C28A5  |02A528; Jump to input handler
+Controller_ProcessSecondary:
+                       JMP.W Controller_DirectionHandler   ; Jump to input handler
                                                             ;      |        |      ;
                                                             ;      |        |      ;
 
@@ -3133,19 +3133,19 @@ UNREACH_02A32E:
 ; Game Mode Input Processing System
 ; Handles in-game controller input and character movement
 ;----------------------------------------------------------------------------
-CODE_02A373:
+Controller_GameMode:
                        LDA.B #$65                           ;02A373|A965    |      ; Load sound effect ID
                        STA.W $00A8                          ;02A375|8DA800  |0200A8; Store sound parameter
                        JSL.L CODE_009783                    ;02A378|22839700|009783; Call sound processing
                        LDA.W $00A9                          ;02A37C|ADA900  |0200A9; Read sound result
                        CMP.B #$32                           ;02A37F|C932    |      ; Compare to threshold
-                       BCC CODE_02A384                      ;02A381|9001    |02A384; Continue if below threshold
+                       BCC Controller_MultiSetup           ; Continue if below threshold
                        RTS                                  ;02A383|60      |      ; Exit if sound busy
                                                             ;      |        |      ;
                                                             ;      |        |      ;
 
 ; Multi-Controller Input Processing Setup
-CODE_02A384:
+Controller_MultiSetup:
                        LDA.B $8B                            ;02A384|A58B    |00048B; Save current game state
                        PHA                                  ;02A386|48      |      ; Push to stack
                        LDX.W #$04C8                         ;02A387|A2C804  |      ; Load controller buffer pointer
@@ -3154,18 +3154,18 @@ CODE_02A384:
                        STA.B $8B                            ;02A38E|858B    |00048B; Update game state
                        LDA.B #$04                           ;02A390|A904    |      ; Set 4-controller mode
                        STA.B $8C                            ;02A392|858C    |00048C; Store controller count
-                       JSR.W CODE_02A40C                    ;02A394|200CA4  |02A40C; Process all controllers
+                       JSR.W Controller_ReadAll            ; Process all controllers
                        PLA                                  ;02A397|68      |      ; Restore game state
                        STA.B $8B                            ;02A398|858B    |00048B; Restore state
                                                             ;      |        |      ;
 
 ; Multi-Controller Input Validation Loop
-CODE_02A39A:
+Controller_MultiValidate:
                        REP #$30                             ;02A39A|C230    |      ; 16-bit mode
                        LDA.B $C8                            ;02A39C|A5C8    |0004C8; Read controller 3
                        ORA.B $CA                            ;02A39E|05CA    |0004CA; Combine with controller 4
                        ORA.B $CC                            ;02A3A0|05CC    |0004CC; Combine with additional input
-                       BNE CODE_02A3A9                      ;02A3A2|D005    |02A3A9; Branch if input detected
+                       BNE Controller_MultiDetected        ; Branch if input detected
                        SEP #$20                             ;02A3A4|E220    |      ; 8-bit accumulator
                        REP #$10                             ;02A3A6|C210    |      ; 16-bit index
                        RTS                                  ;02A3A8|60      |      ; Return if no input
@@ -3173,7 +3173,7 @@ CODE_02A39A:
                                                             ;      |        |      ;
 
 ; Extended Controller Input Processing
-CODE_02A3A9:
+Controller_MultiDetected:
                        SEP #$20                             ;02A3A9|E220    |      ; 8-bit accumulator
                        REP #$10                             ;02A3AB|C210    |      ; 16-bit index
                        LDA.B #$FF                           ;02A3AD|A9FF    |      ; Set active input flag
@@ -3183,36 +3183,36 @@ CODE_02A3A9:
                        ORA.B $CA                            ;02A3B5|05CA    |0004CA; Combine with controller 4
                        ORA.B $CC                            ;02A3B7|05CC    |0004CC; Combine with additional
                        AND.W #$0060                         ;02A3B9|296000  |      ; Test shoulder buttons
-                       BEQ CODE_02A3C4                      ;02A3BC|F006    |02A3C4; Branch if no shoulders
-                       JSR.W CODE_02A3E4                    ;02A3BE|20E4A3  |02A3E4; Process shoulder input
-                       JMP.W CODE_02A528                    ;02A3C1|4C28A5  |02A528; Jump to input handler
+                       BEQ Controller_MultiStandard        ; Branch if no shoulders
+                       JSR.W Controller_ShoulderHandler    ; Process shoulder input
+                       JMP.W Controller_DirectionHandler   ; Jump to input handler
                                                             ;      |        |      ;
                                                             ;      |        |      ;
 
 ; Standard Button Processing for Extended Controllers
-CODE_02A3C4:
+Controller_MultiStandard:
                        LDA.B $C8                            ;02A3C4|A5C8    |0004C8; Read controller 3
                        ORA.B $CA                            ;02A3C6|05CA    |0004CA; Combine with controller 4
                        ORA.B $CC                            ;02A3C8|05CC    |0004CC; Combine additional
                        AND.W #$0010                         ;02A3CA|291000  |      ; Test action button
-                       BEQ CODE_02A3D2                      ;02A3CD|F003    |02A3D2; Branch if no action
-                       JMP.W CODE_02A5AA                    ;02A3CF|4CAAA5  |02A5AA; Jump to action handler
+                       BEQ Controller_MultiAlt             ; Branch if no action
+                       JMP.W Controller_ActionHandler      ; Jump to action handler
                                                             ;      |        |      ;
                                                             ;      |        |      ;
 
 ; Alternative Input Processing Path
-CODE_02A3D2:
+Controller_MultiAlt:
                        LDA.B $C8                            ;02A3D2|A5C8    |0004C8; Read controller 3
                        ORA.B $CA                            ;02A3D4|05CA    |0004CA; Combine with controller 4
                        ORA.B $CC                            ;02A3D6|05CC    |0004CC; Combine additional
                        AND.W #$0027                         ;02A3D8|292700  |      ; Test secondary buttons
-                       BNE CODE_02A3DE                      ;02A3DB|D001    |02A3DE; Branch if buttons pressed
+                       BNE Controller_MultiButton          ; Branch if buttons pressed
                        db $60                               ;02A3DD|        |      ; RTS instruction
                                                             ;      |        |      ;
 
-CODE_02A3DE:
-                       JSR.W CODE_02A3E4                    ;02A3DE|20E4A3  |02A3E4; Process button input
-                       JMP.W CODE_02A528                    ;02A3E1|4C28A5  |02A528; Jump to input handler
+Controller_MultiButton:
+                       JSR.W Controller_ShoulderHandler    ; Process button input
+                       JMP.W Controller_DirectionHandler   ; Jump to input handler
                                                             ;      |        |      ;
                                                             ;      |        |      ;
 
@@ -3220,7 +3220,7 @@ CODE_02A3DE:
 ; Extended Controller Priority Resolution System
 ; Determines which controller has input precedence
 ;----------------------------------------------------------------------------
-CODE_02A3E4:
+Controller_ShoulderHandler:
                        LDA.W #$0002                         ;02A3E4|A90200  |      ; Set initial priority value
                        STA.B $CE                            ;02A3E7|85CE    |0004CE; Store priority
                        LDA.W #$0003                         ;02A3E9|A90300  |      ; Set comparison base
@@ -3255,12 +3255,12 @@ CODE_02A407:
 ; Universal Controller Input Reader System
 ; Reads and processes input from multiple controllers
 ;----------------------------------------------------------------------------
-CODE_02A40C:
+Controller_ReadAll:
                        LDX.B $92                            ;02A40C|A692    |000492; Load controller buffer pointer
                                                             ;      |        |      ;
 
 ; Controller Reading Main Loop
-CODE_02A40E:
+Controller_ReadLoop:
                        REP #$30                             ;02A40E|C230    |      ; 16-bit mode
                        LDA.W #$0000                         ;02A410|A90000  |      ; Clear accumulator
                        STA.W $0000,X                        ;02A413|9D0000  |020000; Clear buffer entry
@@ -3298,29 +3298,29 @@ CODE_02A43C:
                                                             ;      |        |      ;
 
 ; Controller Data Processing
-CODE_02A441:
+Controller_ProcessData:
                        REP #$30                             ;02A441|C230    |      ; 16-bit mode
                        LDA.W $0000,X                        ;02A443|BD0000  |020000; Load controller data
-                       JSR.W CODE_02A46B                    ;02A446|206BA4  |02A46B; Process button mapping
+                       JSR.W Controller_ButtonMapping      ; Process button mapping
                        STA.W $0000,X                        ;02A449|9D0000  |020000; Store processed data
                        SEP #$20                             ;02A44C|E220    |      ; 8-bit accumulator
                        REP #$10                             ;02A44E|C210    |      ; 16-bit index
                        LDA.W $048B                          ;02A450|AD8B04  |02048B; Check game mode
                        CMP.B #$02                           ;02A453|C902    |      ; Compare to mode 2
-                       BCC CODE_02A45F                      ;02A455|9008    |02A45F; Branch if less than
+                       BCC Controller_NextController       ; Branch if less than
                        LDA.B #$FE                           ;02A457|A9FE    |      ; Clear bit 0 mask
                        AND.W $0001,X                        ;02A459|3D0100  |020001; Apply to controller data
                        STA.W $0001,X                        ;02A45C|9D0100  |020001; Store result
                                                             ;      |        |      ;
 
-CODE_02A45F:
+Controller_NextController:
                        INX                                  ;02A45F|E8      |      ; Advance to next controller
                        INX                                  ;02A460|E8      |      ; (2 bytes per entry)
                        PLD                                  ;02A461|2B      |      ; Restore direct page
                        INC.B $8B                            ;02A462|E68B    |00048B; Increment controller index
                        LDA.B $8C                            ;02A464|A58C    |00048C; Load controller count
                        CMP.B $8B                            ;02A466|C58B    |00048B; Compare to current index
-                       BCS CODE_02A40E                      ;02A468|B0A4    |02A40E; Loop if more controllers
+                       BCS Controller_ReadLoop             ; Loop if more controllers
                        RTS                                  ;02A46A|60      |      ; Return when done
                                                             ;      |        |      ;
                                                             ;      |        |      ;
@@ -3329,7 +3329,7 @@ CODE_02A45F:
 ; Button Mapping and Bit Manipulation System
 ; Converts raw controller input to game-specific format
 ;----------------------------------------------------------------------------
-CODE_02A46B:
+Controller_ButtonMapping:
                        PHA                                  ;02A46B|48      |      ; Save input
                        PHA                                  ;02A46C|48      |      ; Save again for processing
                        AND.W #$000A                         ;02A46D|290A00  |      ; Mask specific bits
@@ -3367,7 +3367,7 @@ CODE_02A46B:
 ; Advanced Controller Response Time Analysis
 ; Measures controller response and determines optimal settings
 ;----------------------------------------------------------------------------
-CODE_02A497:
+Controller_ResponseTime:
                        REP #$30                             ;02A497|C230    |      ; 16-bit mode
                        LDA.W #$0002                         ;02A499|A90200  |      ; Initialize measurement
                        STA.B $A0                            ;02A49C|85A0    |0004A0; Store initial value
@@ -3376,7 +3376,7 @@ CODE_02A497:
                                                             ;      |        |      ;
 
 ; Response Time Measurement Loop
-CODE_02A4A1:
+Controller_ResponseLoop:
                        JSR.W CODE_028F2F                    ;02A4A1|202F8F  |028F2F; Read controller state
                        LDA.B $21                            ;02A4A4|A521    |001221; Check button state
                        AND.W #$0080                         ;02A4A6|298000  |      ; Test specific button

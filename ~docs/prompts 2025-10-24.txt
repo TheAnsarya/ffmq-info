@@ -269,6 +269,17 @@ continue adding labels
 continue adding labels, more labels per batch, use temp files if you need to to increase the amount
 continue adding labels, more labels per batch, use temp files if you need to to increase the amount and make sure the chat/session logs are being updated
 continue adding labels, more labels per batch, use temp files if you need to to increase the amount and make sure the chat/session logs are being updated
+yes please!
+yes please!
+you have not been updating the session/chat logs `md` files, update them with all the past goings-on, then continue labeling
+see how many `CODE_*` style labels are left in the whole project and create a progress table based on that by bank for what is left to do, then continue labeling
+make sure to document the continuously updated label progress table in the regular documentation and the session log, and then continue labeling
+make sure to document the continuously updated label progress table in the regular documentation and the session log, and then continue labeling foucusing on bank 0d, then bank 02
+make sure to document the continuously updated label progress table in the regular documentation and the session log, and then continue labeling foucusing on bank 0d, then bank 02
+
+
+
+
 
 
 
