@@ -6470,8 +6470,8 @@ CODE_009B02:
 	PEI.B ($1D)                 ; Push [$1D]
 	LDA.B $27                   ; Load parameter
 	PHA                         ; Save it
-	JSL.L CODE_009B2F           ; Process graphics
-	JSR.W CODE_00A342           ; Call handler
+	JSL.L Graphics_Setup1           ; Process graphics
+	JSR.W Graphics_InitDisplay           ; Call handler
 	PLA                         ; Restore parameter
 	STA.B $27                   ; Store back
 	PLX                         ; Get saved value
@@ -6622,7 +6622,7 @@ Graphics_CommandDispatch:
 UNREACH_00A2FF:
 	db $1A,$0A,$65,$17,$85,$17,$60
 
-CODE_00A306:
+Graphics_ConditionalDispatch:
 	LDA.B [$17]
 	INC.B $17
 	AND.W #$00FF
@@ -6634,7 +6634,7 @@ CODE_00A306:
 	ADC.B $17
 	TAY
 	PLP
-	BCC CODE_00A32F
+	BCC Graphics_ConditionalDispatch_Continue
 	LDA.B $9E
 	ASL A
 	ADC.B $17
@@ -6647,7 +6647,7 @@ CODE_00A306:
 	STA.B $19
 	REP #$30
 
-CODE_00A32F:
+Graphics_ConditionalDispatch_Continue:
 	STY.B $17
 	RTS
 
@@ -6656,7 +6656,7 @@ CODE_00A32F:
 ; Imported segment: CODE_00A342 .. CODE_00A576
 ; ---------------------------------------------------------------------------
 
-CODE_00A342:
+Graphics_InitDisplay:
 	PHP
 	REP #$30
 	PHB
@@ -6666,7 +6666,7 @@ CODE_00A342:
 	PHY
 	LDA.B $46
 	BNE +
-	JMP CODE_00A375
+	JMP Graphics_InitDisplay_End
 +	LDA.B $40
 	STA.W $01EE
 	LDA.B $44
@@ -6685,14 +6685,14 @@ CODE_00A342:
 	LDA.W #$FFFF
 	STA.B $44
 	STZ.B $46
-	JMP.W CODE_00981B
+	JMP.W Bit_SetBits_00E2
 
-CODE_00A378:
+Graphics_InitDisplay_End:
 	LDA.W #$0080
 	TSB.W $00D0
 	RTS
 
-CODE_00A37F:
+Graphics_DispatchTable:
 	LDA.B [$17]
 	INC.B $17
 	AND.W #$00FF
@@ -6700,7 +6700,7 @@ CODE_00A37F:
 	TAX
 	JMP.W (DATA8_009E6E,X)
 
-CODE_00A38B:
+Graphics_CallSystem:
 	LDA.W #$0080
 	TSB.W $00D8
 	JSL.L CODE_0C8000
@@ -6708,63 +6708,63 @@ CODE_00A38B:
 	TRB.W $00D4
 	RTS
 
-CODE_00A39C:
+Graphics_CheckDisplayReady:
 	LDA.W #$0040
 	AND.W $00D0
-	BEQ CODE_00A3A5
+	BEQ Graphics_FadeOut
 	RTS
 
-CODE_00A3A5:
+Graphics_FadeOut:
 	LDA.W #$00FF
 	JMP.W CODE_009DC9
 
-CODE_00A3AB:
+Graphics_WaitForEvent:
 	JSL.L CODE_0C8000
 	LDA.W #$0020
 	AND.W $00D0
-	BNE CODE_00A3C6
+	BNE Graphics_WaitForEvent_Alt
 	LDA.B [$17]
 	INC.B $17
 	INC.B $17
 
-CODE_00A3BD:
+Graphics_WaitForEvent_Loop:
 	JSL.L CODE_0096A0
 	BIT.B $94
-	BEQ CODE_00A3BD
+	BEQ Graphics_WaitForEvent_Loop
 	RTS
 
-CODE_00A3C6:
+Graphics_WaitForEvent_Alt:
 	LDA.B [$17]
 	INC.B $17
 	INC.B $17
 
-CODE_00A3CC:
+Graphics_WaitForEvent_AltLoop:
 	JSL.L CODE_0096A0
 	BIT.B $07
-	BEQ CODE_00A3CC
+	BEQ Graphics_WaitForEvent_AltLoop
 	RTS
 
 ; A series of conditional calls to CODE_00B1C3/CODE_00B1D6 etc.:
 
-CODE_00A3D5:
+Condition_CheckPartyMember:
 	JSR.W CODE_00B1C3
-	BCC CODE_00A401
-	BEQ CODE_00A401
-	BRA CODE_00A406
+	BCC Condition_Skip
+	BEQ Condition_Skip
+	BRA Condition_Jump
 
 ; (several similar blocks follow in the original disassembly; preserved as-is)
 
-CODE_00A401:
+Condition_Skip:
 	INC.B $17
 	INC.B $17
 	RTS
 
-CODE_00A406:
+Condition_Jump:
 	LDA.B [$17]
 	STA.B $17
 	RTS
 
-CODE_00A40B:
+Condition_CheckEventFlag:
 	JSR.W CODE_00B1D6
 	BCC CODE_00A437
 	BEQ CODE_00A437
@@ -6783,22 +6783,14 @@ CODE_00A43C:
 ; (blocks calling CODE_00B1E8, CODE_00B204, CODE_00B21D, CODE_00B22F etc.)
 
 ; Examples:
-CODE_00A451:
+Condition_CheckBattleFlag:
 	JSR.W CODE_00B1E8
-	BCS CODE_00A46D
-	BRA CODE_00A472
+	BCS Condition_Skip
+	BRA Condition_Jump
 
-CODE_00A46D:
-	INC.B $17
-	INC.B $17
-	RTS
+; CODE_00A46D and CODE_00A472 removed - reuse Condition_Skip/Jump labels
 
-CODE_00A472:
-	LDA.B [$17]
-	STA.B $17
-	RTS
-
-CODE_00A480:
+Condition_CheckItem:
 	JSR.W CODE_00B204
 	BCC CODE_00A4A3
 	BRA CODE_00A4A8
@@ -6813,22 +6805,14 @@ CODE_00A4A8:
 	STA.B $17
 	RTS
 
-CODE_00A4BD:
+Condition_CheckCompanion:
 	JSR.W CODE_00B21D
-	BCS CODE_00A4D9
-	BRA CODE_00A4DE
+	BCS Condition_Skip
+	BRA Condition_Jump
 
-CODE_00A4D9:
-	INC.B $17
-	INC.B $17
-	RTS
+; CODE_00A4D9 and CODE_00A4DE removed - reuse Condition_Skip/Jump labels
 
-CODE_00A4DE:
-	LDA.B [$17]
-	STA.B $17
-	RTS
-
-CODE_00A4E3:
+Condition_CheckWeapon:
 	JSR.W CODE_00B22F
 	BCC CODE_00A50F
 	BRA CODE_00A514
@@ -6843,12 +6827,12 @@ CODE_00A514:
 	STA.B $17
 	RTS
 
-CODE_00A519:
+Graphics_SetPointer:
 	LDA.B [$17]
 	STA.B $17
 	RTS
 
-CODE_00A524:
+Graphics_SetBank:
 	LDA.B [$17]
 	INC.B $17
 	INC.B $17
@@ -6859,20 +6843,20 @@ CODE_00A524:
 	STX.B $17
 	RTS
 
-CODE_00A52E:
+Condition_TestBitD0:
 	LDA.B [$17]
 	INC.B $17
 	AND.W #$00FF
 	PHD
 	PEA.W $00D0
 	PLD
-	JSL.L CODE_00975A
+	JSL.L Bit_TestBits
 	PLD
 	INC A
 	DEC A
-	BRA CODE_00A56E
+	BRA Condition_BranchOnZero
 
-CODE_00A54E:
+Condition_TestBitD0_Alt:
 	LDA.B [$17]
 	INC.B $17
 	AND.W #$00FF
@@ -6885,14 +6869,14 @@ CODE_00A54E:
 	DEC A
 	JMP CODE_00A57D
 
-CODE_00A563:
+Condition_TestBitEA8:
 	LDA.B [$17]
 	INC.B $17
 	AND.W #$00FF
-	JSL.L CODE_009776
+	JSL.L Bit_TestBits_0EA8
 
-CODE_00A56E:
-	BNE CODE_00A519
+Condition_BranchOnZero:
+	BNE Graphics_SetPointer
 	JMP CODE_00A597
 
 ; ---------------------------------------------------------------------------
@@ -7418,7 +7402,7 @@ DATA8_009E6E:
 ; Command $2D: Set Graphics Pointer to Fixed Address
 ; ---------------------------------------------------------------------------
 
-CODE_00A06E:
+Cmd_SetPointerEA6:
 	LDA.W #$0EA6                ; Fixed pointer
 	STA.B $2E                   ; Store to $2E
 	RTS                         ; Return
@@ -7427,7 +7411,7 @@ CODE_00A06E:
 ; Command $25: Load Graphics Pointer from Stream
 ; ---------------------------------------------------------------------------
 
-CODE_00A074:
+Cmd_LoadPointer:
 	LDA.B [$17]                 ; Read 16-bit pointer
 	INC.B $17                   ; Advance stream pointer
 	INC.B $17                   ; (2 bytes)
@@ -7438,7 +7422,7 @@ CODE_00A074:
 ; Command $26: Set Tile Offset (8-bit)
 ; ---------------------------------------------------------------------------
 
-CODE_00A07D:
+Cmd_SetTileOffset:
 	LDA.B [$17]                 ; Read byte parameter
 	INC.B $17                   ; Advance stream pointer
 	AND.W #$00FF                ; Mask to byte
@@ -7450,7 +7434,7 @@ CODE_00A07D:
 ; Command $19: Set Graphics Bank and Pointer
 ; ---------------------------------------------------------------------------
 
-CODE_00A089:
+Cmd_SetBankAndPointer:
 	LDA.B [$17]                 ; Read 16-bit pointer
 	INC.B $17                   ; Advance stream pointer
 	INC.B $17                   ; (2 bytes)
@@ -7466,7 +7450,7 @@ CODE_00A089:
 ; Command $27: Set Display Mode Byte
 ; ---------------------------------------------------------------------------
 
-CODE_00A09D:
+Cmd_SetDisplayMode:
 	LDA.B [$17]                 ; Read byte parameter
 	INC.B $17                   ; Advance stream pointer
 	AND.W #$00FF                ; Mask to byte
@@ -7478,7 +7462,7 @@ CODE_00A09D:
 ; Command $28: Set Effect Mask
 ; ---------------------------------------------------------------------------
 
-CODE_00A0A9:
+Cmd_SetEffectMask:
 	LDA.B [$17]                 ; Read byte parameter
 	INC.B $17                   ; Advance stream pointer
 	AND.W #$00FF                ; Mask to byte
@@ -7491,7 +7475,7 @@ CODE_00A0A9:
 ; Command $15: Set 16-bit Parameter at $25
 ; ---------------------------------------------------------------------------
 
-CODE_00A0B7:
+Cmd_SetParameter25:
 	LDA.B [$17]                 ; Read 16-bit value
 	INC.B $17                   ; Advance stream pointer
 	INC.B $17                   ; (2 bytes)
@@ -7502,7 +7486,7 @@ CODE_00A0B7:
 ; Command $1F: Indexed String Lookup with Fixed Length
 ; ---------------------------------------------------------------------------
 
-CODE_00A0C0:
+Cmd_StringLookup82BB:
 	PEI.B ($9E)                 ; Save $9E
 	PEI.B ($A0)                 ; Save $A0
 	LDA.B [$17]                 ; Read string index
@@ -7523,7 +7507,7 @@ CODE_00A0C0:
 ; Command $20: Indexed String Lookup (Different Table)
 ; ---------------------------------------------------------------------------
 
-CODE_00A0DF:
+Cmd_StringLookupA802:
 	PEI.B ($9E)                 ; Save $9E
 	PEI.B ($A0)                 ; Save $A0
 	LDA.B [$17]                 ; Read string index
@@ -7544,7 +7528,7 @@ CODE_00A0DF:
 ; Command $1E: Another Indexed String Handler
 ; ---------------------------------------------------------------------------
 
-CODE_00A0FE:
+Cmd_StringLookup8383:
 	PEI.B ($9E)                 ; Save $9E
 	PEI.B ($A0)                 ; Save $A0
 	LDA.B [$17]                 ; Read string index
@@ -7565,7 +7549,7 @@ CODE_00A0FE:
 ; Command $24: Set Display Parameters
 ; ---------------------------------------------------------------------------
 
-CODE_00A11D:
+Cmd_SetDisplayParams:
 	LDA.B [$17]                 ; Read first word
 	INC.B $17                   ; Advance stream pointer
 	INC.B $17                   ; (2 bytes)
@@ -7576,7 +7560,7 @@ CODE_00A11D:
 	STA.B $2A                   ; Store to $2A
 	RTS                         ; Return
 
-CODE_00A12E:
+Cmd_SetParams2C2D:
 	LDA.B [$17]                 ; Read parameter
 	INC.B $17                   ; Advance stream pointer
 	INC.B $17                   ; (2 bytes)
@@ -7590,7 +7574,7 @@ CODE_00A12E:
 ; Command $1D: Indexed Lookup with Table $A7F6
 ; ---------------------------------------------------------------------------
 
-CODE_00A13C:
+Cmd_LookupA7F6:
 	LDA.B [$17]                 ; Read index
 	INC.B $17                   ; Advance stream pointer
 	AND.W #$00FF                ; Mask to byte
@@ -7604,7 +7588,7 @@ CODE_00A13C:
 ; Command $22: Set Graphics Pointer to $AEA7 Bank $03
 ; ---------------------------------------------------------------------------
 
-CODE_00A150:
+Cmd_SetPointerAEA7:
 	SEP #$20                    ; 8-bit A
 	LDA.B #$03                  ; Bank $03
 	STA.B $19                   ; Store bank
@@ -7616,7 +7600,7 @@ CODE_00A150:
 ; Command $1C: Set Graphics Pointer to $8457 Bank $03
 ; ---------------------------------------------------------------------------
 
-CODE_00A15C:
+Cmd_SetPointer8457:
 	SEP #$20                    ; 8-bit A
 	LDA.B #$03                  ; Bank $03
 	STA.B $19                   ; Store bank
@@ -7628,7 +7612,7 @@ CODE_00A15C:
 ; Command $1A: Indexed Character Graphics
 ; ---------------------------------------------------------------------------
 
-CODE_00A168:
+Cmd_CharacterGraphics:
 	LDA.B [$17]                 ; Read character index
 	INC.B $17                   ; Advance stream pointer
 	AND.W #$00FF                ; Mask to byte
@@ -7643,7 +7627,7 @@ CODE_00A168:
 ; Command $1B: Indexed Monster Graphics
 ; ---------------------------------------------------------------------------
 
-CODE_00A17E:
+Cmd_MonsterGraphics:
 	LDA.B [$17]                 ; Read monster index
 	INC.B $17                   ; Advance stream pointer
 	AND.W #$00FF                ; Mask to byte
@@ -7658,31 +7642,31 @@ CODE_00A17E:
 ; Clear Address High Byte Handlers
 ; ---------------------------------------------------------------------------
 
-CODE_00A194:
-	JSR.W CODE_00A1AB           ; Read pointer
+Cmd_ClearHighBytes:
+	JSR.W Cmd_ReadIndirect           ; Read pointer
 	STZ.B $9F                   ; Clear $9F
 	STZ.B $A0                   ; Clear $A0
 	RTS                         ; Return
 
-CODE_00A19C:
-	JSR.W CODE_00A1AB           ; Read pointer
+Cmd_ClearA0:
+	JSR.W Cmd_ReadIndirect           ; Read pointer
 	STZ.B $A0                   ; Clear $A0
 	RTS                         ; Return
 
-CODE_00A1A2:
-	JSR.W CODE_00A1AB           ; Read pointer
+Cmd_SetA0Byte:
+	JSR.W Cmd_ReadIndirect           ; Read pointer
 	AND.W #$00FF                ; Mask to byte
 	STA.B $A0                   ; Store to $A0
 	RTS                         ; Return
 
 ; ---------------------------------------------------------------------------
-; CODE_00A1AB: Read Indirect Pointer from Stream
+; Cmd_ReadIndirect: Read Indirect Pointer from Stream
 ; ---------------------------------------------------------------------------
 ; Purpose: Read pointer and bank from [$17], then dereference
 ; Algorithm: Read 3 bytes -> use as pointer -> read actual target pointer
 ; ===========================================================================
 
-CODE_00A1AB:
+Cmd_ReadIndirect:
 	LDA.B [$17]                 ; Read pointer word
 	INC.B $17                   ; Advance stream
 	INC.B $17                   ; (2 bytes)
@@ -7708,7 +7692,7 @@ CODE_00A1AB:
 ; Memory Fill from Stream Parameters
 ; ---------------------------------------------------------------------------
 
-CODE_00A1D1:
+Cmd_MemoryFill:
 	LDA.B [$17]                 ; Read destination address
 	INC.B $17                   ; Advance stream
 	INC.B $17                   ; (2 bytes)
@@ -7729,19 +7713,19 @@ CODE_00A1D1:
 ; Graphics System Calls
 ; ---------------------------------------------------------------------------
 
-CODE_00A1EE:
+Cmd_CallGraphicsSys:
 	JSL.L CODE_0C8000           ; Call graphics system
 	RTS                         ; Return
 
-CODE_00A1F3:
+Cmd_WaitVBlank:
 	JSL.L CODE_0096A0           ; Wait for VBlank
 	RTS                         ; Return
 
 ; ---------------------------------------------------------------------------
-; CODE_00A1F8: Copy Display State
+; Cmd_CopyDisplayState: Copy Display State
 ; ---------------------------------------------------------------------------
 
-CODE_00A1F8:
+Cmd_CopyDisplayState:
 	JSR.W CODE_00A220           ; Prepare state
 	SEP #$20                    ; 8-bit A
 	LDX.W $101B                 ; Load source X
@@ -7758,17 +7742,17 @@ CODE_00A1F8:
 ; Copy State and Clear Flags
 ; ---------------------------------------------------------------------------
 
-CODE_00A216:
-	JSR.W CODE_00A1F8           ; Copy display state
+Cmd_CopyAndClearFlags:
+	JSR.W Cmd_CopyDisplayState           ; Copy display state
 	STZ.W $1021                 ; Clear flag
 	STZ.W $10A1                 ; Clear flag
 	RTS                         ; Return
 
 ; ---------------------------------------------------------------------------
-; CODE_00A220: Prepare Display State
+; Cmd_PrepareDisplayState: Prepare Display State
 ; ---------------------------------------------------------------------------
 
-CODE_00A220:
+Cmd_PrepareDisplayState:
 	LDX.W $1016                 ; Load source
 	STX.W $1014                 ; Copy to destination
 	LDX.W $1096                 ; Load source (second set)
@@ -7779,12 +7763,12 @@ CODE_00A220:
 	RTS                         ; Return
 
 ; ---------------------------------------------------------------------------
-; CODE_00A236: Character Data DMA Transfer
+; Cmd_CharacterDMATransfer: Character Data DMA Transfer
 ; ---------------------------------------------------------------------------
 ; Purpose: Copy character data to VRAM buffer area
 ; ===========================================================================
 
-CODE_00A236:
+Cmd_CharacterDMATransfer:
 	LDA.W #$0080                ; Bit 7 mask
 	AND.W $10A0                 ; Test character flag
 	PHP                         ; Save result
