@@ -6272,7 +6272,7 @@ Memory_Copy32Bytes:
 ; ===========================================================================
 
 Memory_FillLong:
-	JSR.W CODE_009998           ; Call fill routine
+	JSR.W Memory_FillDispatch   ; Call fill routine
 	RTL                         ; Return long
 
 ; ---------------------------------------------------------------------------
@@ -6285,12 +6285,12 @@ Memory_FillLong:
 ;   Stack+3 = fill value (16-bit)
 ; Technical Details:
 ;   - Handles blocks of 64 bytes ($40) at a time
-;   - Uses CODE_0099BD for 64-byte blocks
+;   - Uses Memory_Fill64 for 64-byte blocks
 ;   - Uses jump table (DATA8_009A1E) for partial blocks
 ;   - Remainder handled by indexed jump
 ; ===========================================================================
 
-Memory_Fill:
+Memory_FillDispatch:
 	PHX                         ; Save X
 	CMP.W #$0040                ; Check if >= 64 bytes
 	BCC Handle_Remainder        ; If < 64, handle remainder
@@ -6768,16 +6768,16 @@ Condition_Jump:
 
 Condition_CheckEventFlag:
 	JSR.W CODE_00B1D6
-	BCC CODE_00A437
-	BEQ CODE_00A437
-	BRA CODE_00A43C
+	BCC Condition_SkipJumpAddr
+	BEQ Condition_SkipJumpAddr
+	BRA Condition_SetPointer
 
-CODE_00A437:
+Condition_SkipJumpAddr:
 	INC.B $17
 	INC.B $17
 	RTS
 
-CODE_00A43C:
+Condition_SetPointer:
 	LDA.B [$17]
 	STA.B $17
 	RTS
@@ -6794,15 +6794,15 @@ Condition_CheckBattleFlag:
 
 Condition_CheckItem:
 	JSR.W CODE_00B204
-	BCC CODE_00A4A3
-	BRA CODE_00A4A8
+	BCC Condition_SkipJumpAddr2
+	BRA Condition_SetPointer2
 
-CODE_00A4A3:
+Condition_SkipJumpAddr2:
 	INC.B $17
 	INC.B $17
 	RTS
 
-CODE_00A4A8:
+Condition_SetPointer2:
 	LDA.B [$17]
 	STA.B $17
 	RTS
@@ -6816,15 +6816,15 @@ Condition_CheckCompanion:
 
 Condition_CheckWeapon:
 	JSR.W CODE_00B22F
-	BCC CODE_00A50F
-	BRA CODE_00A514
+	BCC Condition_SkipJumpAddr3
+	BRA Condition_SetPointer3
 
-CODE_00A50F:
+Condition_SkipJumpAddr3:
 	INC.B $17
 	INC.B $17
 	RTS
 
-CODE_00A514:
+Condition_SetPointer3:
 	LDA.B [$17]
 	STA.B $17
 	RTS
@@ -6916,13 +6916,13 @@ Graphics_ProcessData:
 Graphics_ClearFlag:
 	LDA.W #$0004                ; Bit 2 mask
 	AND.W $00D8                 ; Test if set
-	BEQ CODE_009BEC             ; Skip if not set
+	BEQ Graphics_ClearFlagDone  ; Skip if not set
 	LDA.W #$0004                ; Bit 2 mask
 	TRB.W $00D8                 ; Clear bit 2
 	LDA.W #$00C8                ; Bits 6-7 + bit 3 mask
 	TRB.W $0111                 ; Clear those bits in $0111
 
-CODE_009BEC:
+Graphics_ClearFlagDone:
 	RTS                         ; Return
 
 ; ---------------------------------------------------------------------------
@@ -6942,14 +6942,14 @@ Palette_InitColorProcessing:
 	STA.W $5011                 ; Store at offset $11
 	STA.W $5014                 ; Store at offset $14
 	STA.W $501A                 ; Store at offset $1A
-	JSR.W CODE_009C52           ; Adjust color brightness
+	JSR.W Color_AdjustBrightness ; Adjust color brightness
 	STA.W $5017                 ; Store adjusted color
 
 	LDA.L DATA8_07800C          ; Load another base color
 	STA.W $501E                 ; Store at offset $1E
 	STA.W $5021                 ; Store at offset $21
 	STA.W $5027                 ; Store at offset $27
-	JSR.W CODE_009C52           ; Adjust color brightness
+	JSR.W Color_AdjustBrightness ; Adjust color brightness
 	STA.W $5024                 ; Store adjusted color
 
 	; Setup DMA channels 3, 6, 7 for palette transfer
@@ -6979,7 +6979,7 @@ Palette_InitColorProcessing:
 	RTS                         ; Return
 
 ; ---------------------------------------------------------------------------
-; CODE_009C52: Adjust Color Brightness
+; Color_AdjustBrightness: Adjust Color Brightness
 ; ---------------------------------------------------------------------------
 ; Purpose: Reduce color intensity (darken for shadowing/fade)
 ; Input: Color on stack (SNES BGR555 format)
@@ -6987,16 +6987,16 @@ Palette_InitColorProcessing:
 ; Algorithm: Subtract $30 from red, $18 from green, $0C from blue (clamp to 0)
 ; ===========================================================================
 
-CODE_009C52:
+Color_AdjustBrightness:
 	PHA                         ; Save color
 	SEC                         ; Set carry for subtraction
 	AND.W #$7C00                ; Mask red component (bits 10-14)
 	SBC.W #$3000                ; Subtract $30 from red
-	BCS CODE_009C60             ; Branch if no underflow
+	BCS Color_AdjustRed         ; Branch if no underflow
 	LDA.W #$0000                ; Clamp to 0
 	SEC                         ; Set carry
 
-CODE_009C60:
+Color_AdjustRed:
 	PHA                         ; Save adjusted red
 	LDA.B $03,S                 ; Get original color
 	AND.W #$03E0                ; Mask green component (bits 5-9)
@@ -7248,11 +7248,14 @@ Graphics_ReadDispatchCmd:
 	CMP.W #$0080                ; Is it direct tile data?
 	BCC CODE_009DD2             ; No, dispatch to handler
 
-CODE_009DC9:
+; ---------------------------------------------------------------------------
+; CODE_009DC9 - Direct Tile Write
+; ---------------------------------------------------------------------------
+Graphics_WriteTileDirect:
 	; Direct tile write (values $80-$FF)
 	EOR.B $1D                   ; XOR with effect mask
 
-CODE_009DCB:
+Graphics_WriteTileEntry:
 	STA.B [$1A]                 ; Write to VRAM buffer
 	INC.B $1A                   ; Advance pointer
 	INC.B $1A                   ; (16-bit increment)
@@ -7261,7 +7264,7 @@ CODE_009DCB:
 Graphics_DispatchCommand:
 	; Command dispatch (values $00-$7F)
 	CMP.W #$0030                ; Is it indexed data?
-	BCS Graphics_IndexedDataLookup             ; Yes, handle indexed
+	BCS Graphics_IndexedDataLookup ; Yes, handle indexed
 
 	; Jump table dispatch ($00-$2F)
 	ASL A                       ; Multiply by 2 (word index)
@@ -7287,7 +7290,7 @@ Graphics_IndexedDataSearch:
 	ADC.B $64                   ; Add size (+ 1 from carry)
 	TAX                         ; X = next entry offset
 	DEY                         ; Decrement index
-	BNE Graphics_IndexedDataSearch             ; Continue until found
+	BNE Graphics_IndexedDataSearch ; Continue until found
 
 Graphics_IndexedDataFound:
 	; Process found entry
@@ -8395,41 +8398,41 @@ Graphics_LoadExec:
 	INC A                          ; Test result
 	DEC A
 	BEQ CODE_00A755                ; If flag clear, take jump
-	BRA CODE_00A7C6                ; If set, skip
+	BRA Condition_SkipJumpTarget  ; If set, skip
 
 	LDA.B [$17]                    ; Load item flag
 	INC.B $17
 	AND.W #$00FF                   ; Mask to byte
 	JSL.L CODE_009776              ; Test item (external)
 	BNE CODE_00A755                ; If set, jump
-	BRA CODE_00A7C6                ; If clear, skip
+	BRA Condition_SkipJumpTarget  ; If clear, skip
 
-CODE_00A79D:
+Condition_TestItemNotZero:
 	LDA.B [$17]                    ; Load item flag
 	INC.B $17
 	AND.W #$00FF                   ; Mask to byte
 	JSL.L CODE_009776              ; Test item (external)
 	BEQ CODE_00A755                ; If clear, jump
-	BRA CODE_00A7C6                ; If set, skip
+	BRA Condition_SkipJumpTarget  ; If set, skip
 
-CODE_00A7AC:
+Condition_TestVarNotZero:
 	JSR.W CODE_00B1A1              ; Test variable
 	BNE CODE_00A755                ; If not zero, jump
-	BRA CODE_00A7C6                ; If zero, skip
+	BRA Condition_SkipJumpTarget  ; If zero, skip
 
-CODE_00A7B3:
+Condition_TestVarZero:
 	JSR.W CODE_00B1A1              ; Test variable
 	BEQ CODE_00A755                ; If zero, jump
-	BRA CODE_00A7C6                ; If not zero, skip
+	BRA Condition_SkipJumpTarget  ; If not zero, skip
 
 	JSR.W CODE_00B1B4              ; Test condition
 	BNE CODE_00A755                ; If not zero, jump
-	BRA CODE_00A7C6                ; If zero, skip
+	BRA Condition_SkipJumpTarget  ; If zero, skip
 
 	JSR.W CODE_00B1B4              ; Test condition
 	BEQ CODE_00A755                ; If zero, jump
 
-CODE_00A7C6:
+Condition_SkipJumpTarget:
 	INC.B $17                      ; Skip jump address
 	INC.B $17                      ; (2 bytes)
 	RTS                            ; Return
