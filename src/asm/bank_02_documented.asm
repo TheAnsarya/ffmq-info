@@ -3380,59 +3380,59 @@ Controller_ResponseLoop:
                        JSR.W CODE_028F2F                    ;02A4A1|202F8F  |028F2F; Read controller state
                        LDA.B $21                            ;02A4A4|A521    |001221; Check button state
                        AND.W #$0080                         ;02A4A6|298000  |      ; Test specific button
-                       BEQ CODE_02A4B3                      ;02A4A9|F008    |02A4B3; Exit loop if released
+                       BEQ Controller_ResponseEnd          ; Exit loop if released
                        INC.W $04A0                          ;02A4AB|EEA004  |0204A0; Increment measurement
                        INC.W $048D                          ;02A4AE|EE8D04  |02048D; Increment counter
-                       BRA CODE_02A4A1                      ;02A4B1|80EE    |02A4A1; Continue measuring
+                       BRA Controller_ResponseLoop         ; Continue measuring
                                                             ;      |        |      ;
                                                             ;      |        |      ;
 
-CODE_02A4B3:
+Controller_ResponseEnd:
                        LDA.B $14                            ;02A4B3|A514    |001214; Read timing value
                        STA.W $04A2                          ;02A4B5|8DA204  |0204A2; Store timing reference
                                                             ;      |        |      ;
 
 ; Timing Optimization Loop
-CODE_02A4B8:
+Controller_TimingOptimize:
                        INC.W $048D                          ;02A4B8|EE8D04  |02048D; Increment counter
                        LDA.W #$0005                         ;02A4BB|A90500  |      ; Set loop limit
                        CMP.W $048D                          ;02A4BE|CD8D04  |02048D; Compare to counter
-                       BEQ CODE_02A4DF                      ;02A4C1|F01C    |02A4DF; Exit if limit reached
+                       BEQ Controller_TimingResult         ; Exit if limit reached
                        JSR.W CODE_028F2F                    ;02A4C3|202F8F  |028F2F; Read controller again
                        LDA.B $21                            ;02A4C6|A521    |001221; Check button state
                        AND.W #$0080                         ;02A4C8|298000  |      ; Test button
-                       BNE CODE_02A4B8                      ;02A4CB|D0EB    |02A4B8; Continue if pressed
+                       BNE Controller_TimingOptimize       ; Continue if pressed
                        LDA.B $14                            ;02A4CD|A514    |001214; Read current timing
                        CMP.W $04A2                          ;02A4CF|CDA204  |0204A2; Compare to reference
-                       BCS CODE_02A4B8                      ;02A4D2|B0E4    |02A4B8; Continue if not improved
+                       BCS Controller_TimingOptimize       ; Continue if not improved
                        STA.W $04A2                          ;02A4D4|8DA204  |0204A2; Store new best time
                        LDA.W $048D                          ;02A4D7|AD8D04  |02048D; Load counter
                        STA.W $04A0                          ;02A4DA|8DA004  |0204A0; Store optimal value
-                       BRA CODE_02A4B8                      ;02A4DD|80D9    |02A4B8; Continue optimization
+                       BRA Controller_TimingOptimize       ; Continue optimization
                                                             ;      |        |      ;
                                                             ;      |        |      ;
 
 ; Timing Result Processing
-CODE_02A4DF:
+Controller_TimingResult:
                        SEP #$20                             ;02A4DF|E220    |      ; 8-bit accumulator
                        REP #$10                             ;02A4E1|C210    |      ; 16-bit index
                        JSR.W CODE_028F22                    ;02A4E3|20228F  |028F22; Read final controller state
                        LDA.B $21                            ;02A4E6|A521    |001221; Check button state
                        AND.B #$08                           ;02A4E8|2908    |      ; Test specific bit
-                       BEQ CODE_02A4FA                      ;02A4EA|F00E    |02A4FA; Branch if not set
+                       BEQ Controller_TimingStore          ; Branch if not set
                        LDA.B #$05                           ;02A4EC|A905    |      ; Set sound effect ID
                        STA.W $00A8                          ;02A4EE|8DA800  |0200A8; Store sound parameter
                        JSL.L CODE_009783                    ;02A4F1|22839700|009783; Call sound system
                        LDA.W $00A9                          ;02A4F5|ADA900  |0200A9; Get sound result
-                       BRA CODE_02A4FD                      ;02A4F8|8003    |02A4FD; Continue
+                       BRA Controller_TimingFinalize       ; Continue
                                                             ;      |        |      ;
                                                             ;      |        |      ;
 
-CODE_02A4FA:
+Controller_TimingStore:
                        LDA.W $04A0                          ;02A4FA|ADA004  |0204A0; Load optimal value
                                                             ;      |        |      ;
 
-CODE_02A4FD:
+Controller_TimingFinalize:
                        STA.B $51                            ;02A4FD|8551    |001251; Store final result
                        PLD                                  ;02A4FF|2B      |      ; Restore direct page
                        RTS                                  ;02A500|60      |      ; Return
@@ -3453,7 +3453,7 @@ CODE_02A4FD:
 ; Advanced Controller State Processing and Menu Navigation
 ; Sophisticated button state analysis with controller validation
 ;----------------------------------------------------------------------------
-CODE_02A5CF:
+Menu_AdvancedState:
                        PHD                                  ;02A5CF|0B      |      ; Push direct page
                        JSR.W CODE_028F22                    ;02A5D0|20228F  |028F22; Read controller state
                        LDA.B $18                            ;02A5D3|A518    |001098; Read system state
@@ -3461,16 +3461,16 @@ CODE_02A5CF:
                        LDA.B $38                            ;02A5D6|A538    |0010B8; Read controller config
                        PLD                                  ;02A5D8|2B      |      ; Restore direct page
                        AND.B #$40                           ;02A5D9|2940    |      ; Test special button bit
-                       BEQ CODE_02A5FE                      ;02A5DB|F021    |02A5FE; Branch if not pressed
+                       BEQ Menu_AltPath                    ; Branch if not pressed
                        XBA                                  ;02A5DD|EB      |      ; Swap back
-                       BEQ CODE_02A5FE                      ;02A5DE|F01E    |02A5FE; Branch if zero
+                       BEQ Menu_AltPath                    ; Branch if zero
                        LDA.B #$20                           ;02A5E0|A920    |      ; Set command ID
                        STA.W $10D0                          ;02A5E2|8DD010  |0210D0; Store command
                        LDA.B #$15                           ;02A5E5|A915    |      ; Set command type
                        STA.W $10D2                          ;02A5E7|8DD210  |0210D2; Store command type
                        LDA.B $CE                            ;02A5EA|A5CE    |0004CE; Read controller state
                        AND.B #$80                           ;02A5EC|2980    |      ; Test high bit
-                       BNE CODE_02A5F6                      ;02A5EE|D006    |02A5F6; Branch if set
+                       BNE Menu_ExtendedState              ; Branch if set
                        LDA.B $CE                            ;02A5F0|A5CE    |0004CE; Reload state
                        STA.W $10D1                          ;02A5F2|8DD110  |0210D1; Store parameter
                        RTS                                  ;02A5F5|60      |      ; Return
@@ -3478,7 +3478,7 @@ CODE_02A5CF:
                                                             ;      |        |      ;
 
 ; Extended Controller State Handler
-CODE_02A5F6:
+Menu_ExtendedState:
                        LDA.B $CE                            ;02A5F6|A5CE    |0004CE; Read controller state
                        STA.W $10D1                          ;02A5F8|8DD110  |0210D1; Store parameter
                        STA.B $39                            ;02A5FB|8539    |000439; Store in system register
@@ -3487,12 +3487,12 @@ CODE_02A5F6:
                                                             ;      |        |      ;
 
 ; Alternative Input Processing Path
-CODE_02A5FE:
+Menu_AltPath:
                        LDA.B #$10                           ;02A5FE|A910    |      ; Set test value
                        JSL.L CODE_00DA65                    ;02A600|2265DA00|00DA65; Call system validation
                        INC A                                ;02A604|1A      |      ; Increment for test
                        DEC A                                ;02A605|3A      |      ; Decrement back
-                       BEQ CODE_02A620                      ;02A606|F018    |02A620; Branch if zero
+                       BEQ Menu_StateResolution            ; Branch if zero
                        LDA.B #$30                           ;02A608|A930    |      ; Set alternate command
                        STA.W $10D0                          ;02A60A|8DD010  |0210D0; Store command
                        LDA.B #$10                           ;02A60D|A910    |      ; Set alternate type
@@ -3511,27 +3511,27 @@ CODE_02A61A:
                                                             ;      |        |      ;
 
 ; Complex Input State Resolution
-CODE_02A620:
+Menu_StateResolution:
                        LDA.B $8B                            ;02A620|A58B    |00048B; Read game state
                        CMP.B #$02                           ;02A622|C902    |      ; Compare to mode 2
-                       BCS CODE_02A636                      ;02A624|B010    |02A636; Branch if greater/equal
+                       BCS Menu_ButtonMask                 ; Branch if greater/equal
                        db $A9,$00,$EB,$A5,$CE,$0A,$AA,$A9,$EF,$35,$C4,$95,$C4,$4C,$B4,$A2;02A626|        |      ;
                                                             ;      |        |      ;
 
 ; Advanced Button Mask Processing
-CODE_02A636:
+Menu_ButtonMask:
                        LDA.B #$EF                           ;02A636|A9EF    |      ; Set button mask
                                                             ;      |        |      ;
 
 ; Universal Button Masking System
-CODE_02A638:
+Menu_ApplyMask:
                        AND.B $C8                            ;02A638|25C8    |0004C8; Apply mask to controller 3
                        STA.B $C8                            ;02A63A|85C8    |0004C8; Store masked result
                        AND.B $CA                            ;02A63C|25CA    |0004CA; Apply to controller 4
                        STA.B $CA                            ;02A63E|85CA    |0004CA; Store result
                        AND.B $CC                            ;02A640|25CC    |0004CC; Apply to additional input
                        STA.B $CC                            ;02A642|85CC    |0004CC; Store result
-                       JMP.W CODE_02A39A                    ;02A644|4C9AA3  |02A39A; Jump to input handler
+                       JMP.W Controller_MultiValidate      ; Jump to input handler
                                                             ;      |        |      ;
                                                             ;      |        |      ;
 
@@ -3539,24 +3539,24 @@ CODE_02A638:
 ; Comprehensive Menu System Processing
 ; Advanced menu navigation with sound integration
 ;----------------------------------------------------------------------------
-CODE_02A647:
+Menu_MainHandler:
                        SEP #$20                             ;02A647|E220    |      ; 8-bit accumulator
                        REP #$10                             ;02A649|C210    |      ; 16-bit index
                        LDA.B $8B                            ;02A64B|A58B    |00048B; Read game state
                        CMP.B #$02                           ;02A64D|C902    |      ; Test for menu mode
-                       BCC CODE_02A654                      ;02A64F|9003    |02A654; Branch if less than
+                       BCC Menu_StandardPath               ; Branch if less than
                        JMP.W CODE_02A9A1                    ;02A651|4CA1A9  |02A9A1; Jump to advanced handler
                                                             ;      |        |      ;
                                                             ;      |        |      ;
 
 ; Standard Menu Processing Path
-CODE_02A654:
+Menu_StandardPath:
                        PHD                                  ;02A654|0B      |      ; Push direct page
                        JSR.W CODE_028F22                    ;02A655|20228F  |028F22; Read controller state
                        LDA.B $21                            ;02A658|A521    |001021; Read button state
                        PLD                                  ;02A65A|2B      |      ; Restore direct page
                        AND.B #$08                           ;02A65B|2908    |      ; Test select button
-                       BEQ CODE_02A6C7                      ;02A65D|F068    |02A6C7; Branch if not pressed
+                       BEQ Menu_NoSelect                   ; Branch if not pressed
                        PHD                                  ;02A65F|0B      |      ; Push direct page
                        JSR.W CODE_028F22                    ;02A660|20228F  |028F22; Read full controller state
                        LDA.B $38                            ;02A663|A538    |001038; Read state flags
@@ -3565,15 +3565,15 @@ CODE_02A654:
                        STA.W $04A0                          ;02A669|8DA004  |0204A0; Store combined state
                        PLD                                  ;02A66C|2B      |      ; Restore direct page
                        LDA.B $A0                            ;02A66D|A5A0    |0004A0; Read state
-                       BEQ CODE_02A67F                      ;02A66F|F00E    |02A67F; Branch if zero
+                       BEQ Menu_SelectNoState              ; Branch if zero
                        LDA.B #$02                           ;02A671|A902    |      ; Set sound effect ID
                        STA.W $00A8                          ;02A673|8DA800  |0200A8; Store sound parameter
                        JSL.L CODE_009783                    ;02A676|22839700|009783; Call sound system
                        LDA.W $00A9                          ;02A67A|ADA900  |0200A9; Read sound result
-                       BNE CODE_02A682                      ;02A67D|D003    |02A682; Branch if sound active
+                       BNE Menu_SoundActive                ; Branch if sound active
                                                             ;      |        |      ;
 
-CODE_02A67F:
+Menu_SelectNoState:
                        JMP.W CODE_02A881                    ;02A67F|4C81A8  |02A881; Jump to standard handler
                                                             ;      |        |      ;
                                                             ;      |        |      ;
@@ -3582,7 +3582,7 @@ CODE_02A67F:
 ; Advanced Sound Integration and System State Management
 ; Complex audio-visual coordination system
 ;----------------------------------------------------------------------------
-CODE_02A682:
+Menu_SoundActive:
                        PHD                                  ;02A682|0B      |      ; Push direct page
                        JSR.W CODE_028F22                    ;02A683|20228F  |028F22; Read system state
                        LDA.B $38                            ;02A686|A538    |001038; Read state byte 1
@@ -3906,28 +3906,28 @@ CODE_02A99F:
 ; Advanced Game State Processing System
 ; Complex state machine with interrupt handling
 ;----------------------------------------------------------------------------
-CODE_02A9A1:
+Game_StateHandler:
                        LDA.B $17                            ;02A9A1|A517    |000417; Read interrupt flag
                        AND.B #$80                           ;02A9A3|2980    |      ; Test interrupt bit
-                       BEQ CODE_02A9B0                      ;02A9A5|F009    |02A9B0; Branch if no interrupt
+                       BEQ Game_StandardProcessing         ; Branch if no interrupt
                        LDA.B $3B                            ;02A9A7|A53B    |00043B; Read state parameter
                        CMP.B #$4A                           ;02A9A9|C94A    |      ; Compare to threshold
-                       BCC CODE_02A9B0                      ;02A9AB|9003    |02A9B0; Branch if below
-                       JMP.W CODE_02AA5A                    ;02A9AD|4C5AAA  |02AA5A; Jump to special handler
+                       BCC Game_StandardProcessing         ; Branch if below
+                       JMP.W Math_ProcessingSystem         ; Jump to special handler
                                                             ;      |        |      ;
                                                             ;      |        |      ;
 
 ; Standard Game State Processing
-CODE_02A9B0:
+Game_StandardProcessing:
                        LDA.B $11                            ;02A9B0|A511    |000411; Read system flag
                        AND.B #$08                           ;02A9B2|2908    |      ; Test system bit
-                       BEQ CODE_02A9D2                      ;02A9B4|F01C    |02A9D2; Branch to normal processing
+                       BEQ Game_NormalBranch               ; Branch to normal processing
                        PHD                                  ;02A9B6|0B      |      ; Push direct page
                        JSR.W CODE_028F22                    ;02A9B7|20228F  |028F22; Read system state
                                                             ;      |        |      ;
 
 ; Sound System Coordination Loop
-CODE_02A9BA:
+Sound_WaitLoop:
                        LDA.B #$06                           ;02A9BA|A906    |      ; Set sound channel ID
                        STA.W $00A8                          ;02A9BC|8DA800  |0200A8; Store sound parameter
                        JSL.L CODE_009783                    ;02A9BF|22839700|009783; Call sound system
@@ -3937,39 +3937,39 @@ CODE_02A9BA:
                        TAX                                  ;02A9C9|AA      |      ; Transfer to index
                        LDA.B $58,X                          ;02A9CA|B558    |0011D8; Read sound state array
                        INC A                                ;02A9CC|1A      |      ; Test for active sound
-                       BEQ CODE_02A9BA                      ;02A9CD|F0EB    |02A9BA; Loop if sound busy
-                       JMP.W CODE_02AA0F                    ;02A9CF|4C0FAA  |02AA0F; Jump to completion
+                       BEQ Sound_WaitLoop                  ; Loop if sound busy
+                       JMP.W Game_Priority_Handler         ; Jump to completion
                                                             ;      |        |      ;
                                                             ;      |        |      ;
 
 ; Normal System Processing Branch
-CODE_02A9D2:
+Game_NormalBranch:
                        LDA.B $B5                            ;02A9D2|A5B5    |0004B5; Read system mode
-                       BNE CODE_02A9EC                      ;02A9D4|D016    |02A9EC; Branch if mode set
+                       BNE Sound_PriorityProcess           ; Branch if mode set
                        LDX.W #$0007                         ;02A9D6|A20700  |      ; Set loop counter
                        PHD                                  ;02A9D9|0B      |      ; Push direct page
                        JSR.W CODE_028F22                    ;02A9DA|20228F  |028F22; Read system state
                                                             ;      |        |      ;
 
 ; System State Validation Loop
-CODE_02A9DD:
+Game_StateValidateLoop:
                        LDA.B $44,X                          ;02A9DD|B544    |001244; Read state array
                        AND.B #$80                           ;02A9DF|2980    |      ; Test high bit
-                       BEQ CODE_02A9E8                      ;02A9E1|F005    |02A9E8; Skip if not set
+                       BEQ Game_StateNext                  ; Skip if not set
                        LDA.B $58,X                          ;02A9E3|B558    |0011D8; Read corresponding value
                        INC A                                ;02A9E5|1A      |      ; Test value
-                       BRA CODE_02AA0F                      ;02A9E6|8027    |02AA0F; Branch to handler
+                       BRA Game_Priority_Handler           ; Branch to handler
                                                             ;      |        |      ;
                                                             ;      |        |      ;
 
-CODE_02A9E8:
+Game_StateNext:
                        DEX                                  ;02A9E8|CA      |      ; Decrement index
-                       BPL CODE_02A9DD                      ;02A9E9|10F2    |02A9DD; Continue loop
+                       BPL Game_StateValidateLoop          ; Continue loop
                        PLD                                  ;02A9EB|2B      |      ; Restore direct page
                                                             ;      |        |      ;
 
 ; Sound System Priority Processing
-CODE_02A9EC:
+Sound_PriorityProcess:
                        LDA.B #$65                           ;02A9EC|A965    |      ; Set sound effect ID
                        STA.W $00A8                          ;02A9EE|8DA800  |0200A8; Store sound parameter
                        JSL.L CODE_009783                    ;02A9F1|22839700|009783; Call sound system
@@ -3981,18 +3981,18 @@ CODE_02A9EC:
                                                             ;      |        |      ;
 
 ; Priority Comparison Loop
-CODE_02AA01:
+Sound_PriorityLoop:
                        LDA.B $44,X                          ;02AA01|B544    |001244; Read state value
-                       BEQ CODE_02AA1F                      ;02AA03|F01A    |02AA1F; Skip if zero
+                       BEQ Sound_PriorityAdjust            ; Skip if zero
                        CMP.W $04A0                          ;02AA05|CDA004  |0204A0; Compare to stored result
-                       BCC CODE_02AA1F                      ;02AA08|9015    |02AA1F; Skip if less
+                       BCC Sound_PriorityAdjust            ; Skip if less
                        LDA.B $58,X                          ;02AA0A|B558    |001258; Read corresponding value
                        INC A                                ;02AA0C|1A      |      ; Test value
-                       BEQ CODE_02AA1F                      ;02AA0D|F010    |02AA1F; Skip if zero
+                       BEQ Sound_PriorityAdjust            ; Skip if zero
                                                             ;      |        |      ;
 
 ; Priority Processing Handler
-CODE_02AA0F:
+Game_Priority_Handler:
                        DEC A                                ;02AA0F|3A      |      ; Decrement value
                        STA.B $52                            ;02AA10|8552    |001252; Store result
                        STA.W $043A                          ;02AA12|8D3A04  |02043A; Store in system memory
@@ -4000,52 +4000,52 @@ CODE_02AA0F:
                        STA.B $50                            ;02AA17|8550    |001250; Store command type
                        STA.W $0438                          ;02AA19|8D3804  |020438; Store in system memory
                        PLD                                  ;02AA1C|2B      |      ; Restore direct page
-                       BRA CODE_02AA2E                      ;02AA1D|800F    |02AA2E; Branch to processing
+                       BRA Game_CommandProcess             ; Branch to processing
                                                             ;      |        |      ;
                                                             ;      |        |      ;
 
 ; Priority Adjustment Loop
-CODE_02AA1F:
+Sound_PriorityAdjust:
                        LDA.W $04A0                          ;02AA1F|ADA004  |0204A0; Read stored value
                        SEC                                  ;02AA22|38      |      ; Set carry
                        SBC.B $44,X                          ;02AA23|F544    |001244; Subtract state value
                        STA.W $04A0                          ;02AA25|8DA004  |0204A0; Store result
                        DEX                                  ;02AA28|CA      |      ; Decrement index
-                       BPL CODE_02AA01                      ;02AA29|10D6    |02AA01; Continue loop
+                       BPL Sound_PriorityLoop              ; Continue loop
                        PLD                                  ;02AA2B|2B      |      ; Restore direct page
-                       BRA CODE_02A9EC                      ;02AA2C|80BE    |02A9EC; Return to sound processing
+                       BRA Sound_PriorityProcess           ; Return to sound processing
                                                             ;      |        |      ;
                                                             ;      |        |      ;
 
 ; Final Command Processing
-CODE_02AA2E:
+Game_CommandProcess:
                        JSR.W CODE_028B0F                    ;02AA2E|200F8B  |028B0F; Process command
                        LDA.B $E0                            ;02AA31|A5E0    |0004E0; Read error state
                        AND.B #$03                           ;02AA33|2903    |      ; Mask error bits
                        CMP.B #$02                           ;02AA35|C902    |      ; Test for critical error
-                       BEQ CODE_02AA4B                      ;02AA37|F012    |02AA4B; Branch to error handler
+                       BEQ Game_ErrorState                 ; Branch to error handler
                        CMP.B #$01                           ;02AA39|C901    |      ; Test for warning
-                       BEQ CODE_02AA43                      ;02AA3B|F006    |02AA43; Branch to warning handler
+                       BEQ Game_WarningState               ; Branch to warning handler
                        db $A5,$A0,$29,$02,$F0,$08           ;02AA3D|        |0000A0; Complex condition check
                                                             ;      |        |      ;
 
 ; Warning State Processing
-CODE_02AA43:
+Game_WarningState:
                        LDA.B $A0                            ;02AA43|A5A0    |0004A0; Read stored value
                        AND.B #$01                           ;02AA45|2901    |      ; Mask low bit
                        STA.B $39                            ;02AA47|8539    |000439; Store result
-                       BRA CODE_02AA4F                      ;02AA49|8004    |02AA4F; Continue processing
+                       BRA Game_FinalUpdate                ; Continue processing
                                                             ;      |        |      ;
                                                             ;      |        |      ;
 
 ; Error State Processing
-CODE_02AA4B:
+Game_ErrorState:
                        LDA.B #$80                           ;02AA4B|A980    |      ; Set error flag
                        STA.B $39                            ;02AA4D|8539    |000439; Store error flag
                                                             ;      |        |      ;
 
 ; Final State Update
-CODE_02AA4F:
+Game_FinalUpdate:
                        PHD                                  ;02AA4F|0B      |      ; Push direct page
                        JSR.W CODE_028F22                    ;02AA50|20228F  |028F22; Read system state
                        LDA.W $0439                          ;02AA53|AD3904  |020439; Read final state
@@ -4070,26 +4070,26 @@ CODE_02AA4F:
 ; Complex Mathematical Processing System
 ; Advanced bit manipulation and coordinate calculations
 ;----------------------------------------------------------------------------
-CODE_02AA5A:
+Math_ProcessingSystem:
                        LDA.B $ED                            ;02AA5A|A5ED    |0004ED; Read mathematical parameter
                        AND.B #$03                           ;02AA5C|2903    |      ; Mask to 2 bits
                        STA.L $7EC460,X                      ;02AA5E|9F60C47E|7EC460; Store in extended memory
-                       BEQ CODE_02AA65                      ;02AA62|F001    |02AA65; Branch if zero
+                       BEQ Math_ZeroValue                  ; Branch if zero
                        RTS                                  ;02AA64|60      |      ; Return with value
                                                             ;      |        |      ;
 
 ; Zero Value Processing Branch
-CODE_02AA65:
+Math_ZeroValue:
                        LDA.L $7EC440,X                      ;02AA65|BF40C47E|7EC440; Read coordinate data
                        INC A                                ;02AA69|1A      |      ; Increment value
                        AND.B #$03                           ;02AA6A|2903    |      ; Mask to 2 bits
                        STA.L $7EC440,X                      ;02AA6C|9F40C47E|7EC440; Store back to memory
-                       BEQ CODE_02AA73                      ;02AA70|F001    |02AA73; Branch if zero result
+                       BEQ Math_FinalResult                ; Branch if zero result
                        RTS                                  ;02AA72|60      |      ; Return with value
                                                             ;      |        |      ;
 
 ; Final Mathematical Result Processing
-CODE_02AA73:
+Math_FinalResult:
                        LDA.B #$0A                           ;02AA73|A90A    |      ; Set result value
                        STA.W $0505                          ;02AA75|8D0505  |020505; Store in system register
                        RTS                                  ;02AA78|60      |      ; Return
@@ -4149,7 +4149,7 @@ CODE_02AADA:
 ; Graphics Command Processing System
 ; Sophisticated graphics command interpretation
 ;----------------------------------------------------------------------------
-CODE_02AAE4:
+Graphics_CommandInterpreter:
                        LDA.B #$FE                           ;02AAE4|A9FE    |      ; Set graphics mode
                        STA.L $7EC340,X                      ;02AAE6|9F40C37E|7EC340; Store graphics mode
                        LDA.L $7EC240,X                      ;02AAEA|BF40C27E|7EC240; Read current graphics state
@@ -4164,14 +4164,14 @@ CODE_02AAE4:
                        LDA.W $0417                          ;02AB01|AD1704  |020417; Read graphics status
                        AND.B #$03                           ;02AB04|2903    |      ; Mask status bits
                        CMP.B #$03                           ;02AB06|C903    |      ; Compare to complete state
-                       BNE CODE_02AB0E                      ;02AB08|D004    |02AB0E; Branch if not complete
+                       BNE Graphics_AlternateCode           ;02AB08|D004    |02AB0E; Branch if not complete
                        LDA.B #$67                           ;02AB0A|A967    |      ; Set completion code
-                       BRA CODE_02AB10                      ;02AB0C|8002    |02AB10; Continue processing
+                       BRA Graphics_StoreResult             ;02AB0C|8002    |02AB10; Continue processing
 
-CODE_02AB0E:
+Graphics_AlternateCode:
                        LDA.B #$60                           ;02AB0E|A960    |      ; Set alternate code
 
-CODE_02AB10:
+Graphics_StoreResult:
                        STA.L $7EC280,X                      ;02AB10|9F80C27E|7EC280; Store result code
                        LDA.B #$2C                           ;02AB14|A92C    |      ; Set graphics parameter
                        STA.L $7EC2A0,X                      ;02AB16|9FA0C27E|7EC2A0; Store graphics parameter
@@ -4190,28 +4190,28 @@ CODE_02AB10:
 ; Graphics Channel Management System
 ; Advanced channel coordination with error handling
 ;----------------------------------------------------------------------------
-CODE_02AB37:
+Graphics_ChannelManager:
                        LDA.L $7EC480,X                      ;02AB37|BF80C47E|7EC480; Read graphics channel
                        DEC A                                ;02AB3B|3A      |      ; Decrement channel
                        STA.L $7EC480,X                      ;02AB3C|9F80C47E|7EC480; Store decremented channel
-                       BEQ CODE_02AB43                      ;02AB40|F001    |02AB43; Branch if channel zero
+                       BEQ Graphics_ChannelReset            ;02AB40|F001    |02AB43; Branch if channel zero
                        RTS                                  ;02AB42|60      |      ; Return if channel active
 
-CODE_02AB43:
+Graphics_ChannelReset:
                        LDA.B #$06                           ;02AB43|A906    |      ; Reset channel count
                        STA.L $7EC480,X                      ;02AB45|9F80C47E|7EC480; Store channel count
                        LDA.L $7EC2E0,X                      ;02AB49|BFE0C27E|7EC2E0; Read channel state
                        CMP.B #$04                           ;02AB4D|C904    |      ; Compare to limit
-                       BEQ CODE_02AB55                      ;02AB4F|F004    |02AB55; Branch if at limit
+                       BEQ Graphics_ChannelLimitReached     ;02AB4F|F004    |02AB55; Branch if at limit
                        INC A                                ;02AB51|1A      |      ; Increment state
                        STA.L $7EC2E0,X                      ;02AB52|9FE0C27E|7EC2E0; Store incremented state
                        RTS                                  ;02AB56|60      |      ; Return
 
 ; Channel Limit Reached Processing
-CODE_02AB55:
+Graphics_ChannelLimitReached:
                        RTS                                  ;02AB55|60      |      ; Return (removed duplicate line)
 
-CODE_02AB57:
+Graphics_SetChannelMode:
                        LDA.B #$02                           ;02AB57|A902    |      ; Set channel mode
                        STA.L $7EC360,X                      ;02AB59|9F60C37E|7EC360; Store channel mode
                        LDA.B #$19                           ;02AB5D|A919    |      ; Set channel parameter
@@ -4222,29 +4222,29 @@ CODE_02AB57:
 ; Advanced Channel State Processing
 ; Complex state management with multiple validation points
 ;----------------------------------------------------------------------------
-CODE_02AB63:
+Graphics_ChannelStateProcessor:
                        LDA.L $7EC2A0,X                      ;02AB63|BFA0C27E|7EC2A0; Read channel configuration
                        ASL A                                ;02AB67|0A      |      ; Shift left for indexing
                        ASL A                                ;02AB68|0A      |      ; Double shift for word access
                        ASL A                                ;02AB69|0A      |      ; Triple shift for complex index
                        ASL A                                ;02AB6A|0A      |      ; Quadruple shift for table access
                        CMP.B #$80                           ;02AB6B|C980    |      ; Compare to threshold
-                       BCC CODE_02AB79                      ;02AB6D|9008    |02AB79; Branch if below threshold
+                       BCC Graphics_BelowThreshold          ;02AB6D|9008    |02AB79; Branch if below threshold
                        LDA.B #$03                           ;02AB6F|A903    |      ; Set overflow state
                        STA.L $7EC360,X                      ;02AB71|9F60C37E|7EC360; Store overflow state
                        LDA.B #$80                           ;02AB75|A980    |      ; Set maximum value
-                       BRA CODE_02AB7B                      ;02AB77|8002    |02AB7B; Continue processing
+                       BRA Graphics_StoreProcessed          ;02AB77|8002    |02AB7B; Continue processing
 
-CODE_02AB79:
+Graphics_BelowThreshold:
                        LDA.L $7EC2A0,X                      ;02AB79|BFA0C27E|7EC2A0; Read channel configuration again
 
-CODE_02AB7B:
+Graphics_StoreProcessed:
                        STA.L $7EC2A0,X                      ;02AB7B|9FA0C27E|7EC2A0; Store processed value
                        LDA.W $048D                          ;02AB7F|AD8D04  |02048D; Read system state
-                       BNE CODE_02AB86                      ;02AB82|D001    |02AB86; Branch if state set
+                       BNE Graphics_ProcessShift            ;02AB82|D001    |02AB86; Branch if state set
                        RTS                                  ;02AB84|60      |      ; Return if no state
 
-CODE_02AB86:
+Graphics_ProcessShift:
                        LDA.L $7EC280,X                      ;02AB86|BF80C27E|7EC280; Read channel data
                        ASL A                                ;02AB8A|0A      |      ; Shift for processing
                        ASL A                                ;02AB8B|0A      |      ; Double shift
@@ -4255,7 +4255,7 @@ CODE_02AB86:
 ; Graphics Memory Coordination System
 ; Advanced memory management with buffer coordination
 ;----------------------------------------------------------------------------
-CODE_02AB91:
+Graphics_MemoryCoordinator:
                        LDA.L $7EC380,X                      ;02AB91|BF80C37E|7EC380; Read graphics buffer
                        STA.W $04A7                          ;02AB95|8DA704  |0204A7; Store in working register
                        LDA.L $7EC320,X                      ;02AB98|BF20C37E|7EC320; Read graphics control
@@ -4273,14 +4273,14 @@ CODE_02AB91:
                        LDA.W $04A7                          ;02ABBD|ADA704  |0204A7; Read working register
                        STA.L $7EC380,X                      ;02ABC0|9F80C37E|7EC380; Store in graphics buffer
                        LDA.W $048D                          ;02ABC4|AD8D04  |02048D; Read system state
-                       BEQ CODE_02ABD2                      ;02ABC7|F004    |02ABD2; Branch if state clear
+                       BEQ Graphics_InactiveState           ;02ABC7|F004    |02ABD2; Branch if state clear
                        LDA.B #$94                           ;02ABC9|A994    |      ; Set active state value
-                       BRA CODE_02ABD4                      ;02ABCB|8002    |02ABD4; Continue processing
+                       BRA Graphics_StoreStateValue         ;02ABCB|8002    |02ABD4; Continue processing
 
-CODE_02ABD2:
+Graphics_InactiveState:
                        LDA.B #$64                           ;02ABD2|A964    |      ; Set inactive state value
 
-CODE_02ABD4:
+Graphics_StoreStateValue:
                        STA.L $7EC280,X                      ;02ABD4|9F80C27E|7EC280; Store state value
                        LDA.B #$88                           ;02ABD8|A988    |      ; Set buffer control
                        STA.L $7EC2A0,X                      ;02ABDA|9FA0C27E|7EC2A0; Store buffer control
@@ -4316,11 +4316,11 @@ CODE_02ABD4:
                        SBC.W $00A9                          ;02AC22|EDA900  |0200A9; Subtract sound result
                        STA.L $7EC5C0,X                      ;02AC25|9FC0C57E|7EC5C0; Store processed sound
                        DEC.W $04A4                          ;02AC29|CEA404  |0204A4; Decrement buffer counter
-                       BNE CODE_02AC2F                      ;02AC2C|D001    |02AC2F; Continue if not zero
+                       BNE Graphics_ContinueLoop            ;02AC2C|D001    |02AC2F; Continue if not zero
                        RTS                                  ;02AC2E|60      |      ; Return when complete
 
-CODE_02AC2F:
-                       JMP.W CODE_02AB39                    ;02AC2F|4C39AB  |02AB39; Jump to continue processing
+Graphics_ContinueLoop:
+                       JMP.W Graphics_ChannelManager+$02    ;02AC2F|4C39AB  |02AB39; Jump to continue processing
 
 ; ===========================================================================
 ; End of Bank $02 Cycle 12: Mathematical Processing and Data Validation Systems
@@ -4337,24 +4337,24 @@ CODE_02AC2F:
 ; Graphics Pattern and Palette Management System
 ; Complex color pattern processing and graphics coordinate management
 ;----------------------------------------------------------------------------
-CODE_02AC32:
+Graphics_PatternManager:
                        LDA.L $7EC460,X                      ;02AC32|BF60C47E|7EC460; Read graphics pattern index
                        AND.B #$03                           ;02AC36|2903    |      ; Mask to valid pattern range
                        STA.L $7EC460,X                      ;02AC38|9F60C47E|7EC460; Store pattern index
-                       BEQ CODE_02AC3F                      ;02AC3C|F001    |02AC3F; Branch if pattern zero
+                       BEQ Graphics_PatternZero             ;02AC3C|F001    |02AC3F; Branch if pattern zero
                        RTS                                  ;02AC3E|60      |      ; Return with pattern set
 
 ; Pattern Zero Processing Branch
-CODE_02AC3F:
+Graphics_PatternZero:
                        LDA.L $7EC440,X                      ;02AC3F|BF40C47E|7EC440; Read graphics base address
                        INC A                                ;02AC43|1A      |      ; Increment base
                        AND.B #$03                           ;02AC44|2903    |      ; Mask to valid range
                        STA.L $7EC440,X                      ;02AC46|9F40C47E|7EC440; Store incremented base
-                       BEQ CODE_02AC4D                      ;02AC4A|F001    |02AC4D; Branch if base zero
+                       BEQ Graphics_SystemReset             ;02AC4A|F001    |02AC4D; Branch if base zero
                        RTS                                  ;02AC4C|60      |      ; Return with base set
 
 ; Graphics System Reset Trigger
-CODE_02AC4D:
+Graphics_SystemReset:
                        LDA.B #$0A                           ;02AC4D|A90A    |      ; Set system reset command
                        STA.W $0505                          ;02AC4F|8D0505  |020505; Store reset command
                        RTS                                  ;02AC52|60      |      ; Return
@@ -4396,19 +4396,19 @@ DATA8_02AC9F:
 ; Advanced Graphics Processing Engine
 ; Complex graphics state management with sophisticated coordination
 ;----------------------------------------------------------------------------
-CODE_02ACA3:
+Graphics_ProcessingEngine:
                        REP #$20                             ;02ACA3|C220    |      ; 16-bit accumulator mode
                        REP #$10                             ;02ACA5|C210    |      ; 16-bit index mode
                        LDA.W #$0000                         ;02ACA7|A90000  |      ; Clear accumulator
                        XBA                                  ;02ACAA|EB      |      ; Swap bytes for processing
                        LDA.L $7EC360,X                      ;02ACAB|BF60C37E|7EC360; Read graphics parameter
                        TAY                                  ;02ACAF|A8      |      ; Transfer to Y for indexing
-                       LDA.W CODE_02ACB7,Y                  ;02ACB0|B9B7AC  |02ACB7; Read jump table entry
+                       LDA.W Graphics_StateJumpTable,Y      ;02ACB0|B9B7AC  |02ACB7; Read jump table entry
                        JSL.L CODE_009783                    ;02ACB3|22839700|009783; Call graphics engine
                        RTS                                  ;02ACB7|60      |      ; Return
 
 ; Graphics State Jump Table
-CODE_02ACB7:
+Graphics_StateJumpTable:
                        dw CODE_02AE61                       ;02ACB7|        |02AE61; Graphics state 0 handler
                        dw CODE_02AEB3                       ;02ACB9|        |02AEB3; Graphics state 1 handler
                        dw CODE_02AEDF                       ;02ACBB|        |02AEDF; Graphics state 2 handler
@@ -4419,7 +4419,7 @@ CODE_02ACB7:
 ; Graphics Command Initialization System
 ; Advanced graphics setup with comprehensive state management
 ;----------------------------------------------------------------------------
-CODE_02ACC1:
+Graphics_CommandInit:
                        LDA.B #$FE                           ;02ACC1|A9FE    |      ; Set graphics initialization mode
                        STA.L $7EC340,X                      ;02ACC3|9F40C37E|7EC340; Store graphics mode
                        LDA.L $7EC240,X                      ;02ACC7|BF40C27E|7EC240; Read current graphics state
@@ -4434,14 +4434,14 @@ CODE_02ACC1:
                        LDA.W $0417                          ;02ACDE|AD1704  |020417; Read command status
                        AND.B #$03                           ;02ACE1|2903    |      ; Mask status bits
                        CMP.B #$03                           ;02ACE3|C903    |      ; Check for completion
-                       BNE CODE_02ACEB                      ;02ACE5|D004    |02ACEB; Branch if not complete
+                       BNE Graphics_CommandAltCode          ;02ACE5|D004    |02ACEB; Branch if not complete
                        LDA.B #$67                           ;02ACE7|A967    |      ; Set completion code
-                       BRA CODE_02ACED                      ;02ACE9|8002    |02ACED; Continue processing
+                       BRA Graphics_CommandStoreCode        ;02ACE9|8002    |02ACED; Continue processing
 
-CODE_02ACEB:
+Graphics_CommandAltCode:
                        LDA.B #$60                           ;02ACEB|A960    |      ; Set alternate code
 
-CODE_02ACED:
+Graphics_CommandStoreCode:
                        STA.L $7EC280,X                      ;02ACED|9F80C27E|7EC280; Store result code
                        LDA.B #$2C                           ;02ACF1|A92C    |      ; Set graphics parameter
                        STA.L $7EC2A0,X                      ;02ACF3|9FA0C27E|7EC2A0; Store graphics parameter
@@ -4460,28 +4460,28 @@ CODE_02ACED:
 ; Color and Palette Processing System
 ; Complex color calculations and palette management
 ;----------------------------------------------------------------------------
-CODE_02AD14:
+Color_ChannelProcessor:
                        LDA.L $7EC480,X                      ;02AD14|BF80C47E|7EC480; Read color channel
                        DEC A                                ;02AD18|3A      |      ; Decrement channel
                        STA.L $7EC480,X                      ;02AD19|9F80C47E|7EC480; Store decremented channel
-                       BEQ CODE_02AD20                      ;02AD1D|F001    |02AD20; Branch if channel zero
+                       BEQ Color_ChannelReset               ;02AD1D|F001    |02AD20; Branch if channel zero
                        RTS                                  ;02AD1F|60      |      ; Return if channel active
 
 ; Color Channel Reset Processing
-CODE_02AD20:
+Color_ChannelReset:
                        LDA.B #$06                           ;02AD20|A906    |      ; Reset channel count
                        STA.L $7EC480,X                      ;02AD22|9F80C47E|7EC480; Store channel count
                        LDA.L $7EC2E0,X                      ;02AD26|BFE0C27E|7EC2E0; Read color state
                        CMP.B #$04                           ;02AD2A|C904    |      ; Compare to maximum
-                       BEQ CODE_02AD32                      ;02AD2C|F004    |02AD32; Branch if at maximum
+                       BEQ Color_StateMaxReached            ;02AD2C|F004    |02AD32; Branch if at maximum
                        INC A                                ;02AD2E|1A      |      ; Increment state
                        STA.L $7EC2E0,X                      ;02AD2F|9FE0C27E|7EC2E0; Store incremented state
 
-CODE_02AD32:
+Color_StateMaxReached:
                        RTS                                  ;02AD32|60      |      ; Return
 
 ; Advanced Color Mode Processing
-CODE_02AD33:
+Color_ModeProcessor:
                        LDA.B #$02                           ;02AD33|A902    |      ; Set color mode
                        STA.L $7EC360,X                      ;02AD35|9F60C37E|7EC360; Store color mode
                        LDA.B #$19                           ;02AD39|A919    |      ; Set color parameter
@@ -4492,30 +4492,30 @@ CODE_02AD33:
 ; Advanced Graphics Data Processing
 ; Complex data manipulation and transformation systems
 ;----------------------------------------------------------------------------
-CODE_02AD3F:
+Graphics_DataProcessor:
                        LDA.L $7EC2A0,X                      ;02AD3F|BFA0C27E|7EC2A0; Read graphics data
                        ASL A                                ;02AD43|0A      |      ; Shift left for indexing
                        ASL A                                ;02AD44|0A      |      ; Double shift
                        ASL A                                ;02AD45|0A      |      ; Triple shift
                        ASL A                                ;02AD46|0A      |      ; Quadruple shift for table access
                        CMP.B #$80                           ;02AD47|C980    |      ; Compare to threshold
-                       BCC CODE_02AD55                      ;02AD49|9008    |02AD55; Branch if below threshold
+                       BCC Graphics_DataBelowThreshold      ;02AD49|9008    |02AD55; Branch if below threshold
                        LDA.B #$03                           ;02AD4B|A903    |      ; Set overflow state
                        STA.L $7EC360,X                      ;02AD4D|9F60C37E|7EC360; Store overflow state
                        LDA.B #$80                           ;02AD51|A980    |      ; Set maximum value
-                       BRA CODE_02AD57                      ;02AD53|8002    |02AD57; Continue processing
+                       BRA Graphics_DataStoreValue          ;02AD53|8002    |02AD57; Continue processing
 
-CODE_02AD55:
+Graphics_DataBelowThreshold:
                        LDA.L $7EC2A0,X                      ;02AD55|BFA0C27E|7EC2A0; Read graphics data again
 
-CODE_02AD57:
+Graphics_DataStoreValue:
                        STA.L $7EC2A0,X                      ;02AD57|9FA0C27E|7EC2A0; Store processed value
                        LDA.W $048D                          ;02AD5B|AD8D04  |02048D; Read system state
-                       BNE CODE_02AD62                      ;02AD5E|D001    |02AD62; Branch if state set
+                       BNE Graphics_DataShift               ;02AD5E|D001    |02AD62; Branch if state set
                        RTS                                  ;02AD60|60      |      ; Return if no state
 
 ; Graphics Data Shift Processing
-CODE_02AD62:
+Graphics_DataShift:
                        LDA.L $7EC280,X                      ;02AD62|BF80C27E|7EC280; Read graphics channel data
                        ASL A                                ;02AD66|0A      |      ; Shift for processing
                        ASL A                                ;02AD67|0A      |      ; Double shift
@@ -4526,7 +4526,7 @@ CODE_02AD62:
 ; System Memory and Buffer Coordination
 ; Advanced memory management with comprehensive buffer control
 ;----------------------------------------------------------------------------
-CODE_02AD6D:
+Buffer_MemoryCoordinator:
                        LDA.L $7EC380,X                      ;02AD6D|BF80C37E|7EC380; Read buffer address
                        STA.W $04A7                          ;02AD71|8DA704  |0204A7; Store in working register
                        LDA.L $7EC320,X                      ;02AD74|BF20C37E|7EC320; Read buffer control
@@ -4544,14 +4544,14 @@ CODE_02AD6D:
                        LDA.W $04A7                          ;02AD99|ADA704  |0204A7; Read working register
                        STA.L $7EC380,X                      ;02AD9C|9F80C37E|7EC380; Store in buffer address
                        LDA.W $048D                          ;02ADA0|AD8D04  |02048D; Read system state
-                       BEQ CODE_02ADAE                      ;02ADA3|F004    |02ADAE; Branch if state clear
+                       BEQ Buffer_InactiveState             ;02ADA3|F004    |02ADAE; Branch if state clear
                        LDA.B #$94                           ;02ADA5|A994    |      ; Set active state value
-                       BRA CODE_02ADB0                      ;02ADA7|8002    |02ADB0; Continue processing
+                       BRA Buffer_StoreState                ;02ADA7|8002    |02ADB0; Continue processing
 
-CODE_02ADAE:
+Buffer_InactiveState:
                        LDA.B #$64                           ;02ADAE|A964    |      ; Set inactive state value
 
-CODE_02ADB0:
+Buffer_StoreState:
                        STA.L $7EC280,X                      ;02ADB0|9F80C27E|7EC280; Store state value
                        LDA.B #$88                           ;02ADB4|A988    |      ; Set buffer control
                        STA.L $7EC2A0,X                      ;02ADB6|9FA0C27E|7EC2A0; Store buffer control
@@ -4583,9 +4583,9 @@ CODE_02ADB0:
 ; Stack and Memory Context Management
 ; Advanced memory handling and stack operations
 ; REP/SEP instruction processing for 16/8-bit mode control
-CODE_02D220:
+Stack_ContextManager:
                        LDA.B $7E                            ;02D220|A57E    |000A7E;
-                       BEQ CODE_02D25C                      ;02D222|F038    |02D25C;
+                       BEQ Stack_StateManagement            ;02D222|F038    |02D25C;
                        SEP #$30                             ;02D224|E230    |      ; Set 8-bit mode for A,X,Y
                        LDA.B $02                            ;02D226|A502    |000A02;
                        CMP.B #$50                           ;02D228|C950    |      ;
@@ -4595,7 +4595,7 @@ CODE_02D220:
 
 ; Entity Processing Loop
 ; Complex loop for entity initialization and processing
-CODE_02D230:
+Entity_ProcessingLoop:
                        JSR.W CODE_02EA60                    ;02D230|2060EA  |02EA60; Call entity processing
                        LDA.B #$1C                           ;02D233|A91C    |      ;
                        STA.L $7EC380,X                      ;02D235|9F80C37E|7EC380; Store entity data
@@ -4607,7 +4607,7 @@ CODE_02D230:
                        STA.L $7EC240,X                      ;02D243|9F40C27E|7EC240; Store entity flags
                        INY                                  ;02D247|C8      |      ; Increment counter
                        CPY.B #$03                           ;02D248|C003    |      ; Check entity limit
-                       BNE CODE_02D230                      ;02D24A|D0E4    |02D230; Continue if not done
+                       BNE Entity_ProcessingLoop            ;02D24A|D0E4    |02D230; Continue if not done
 
 ; Sound System Integration
 ; Complex sound processing with multiple parameters
@@ -4621,12 +4621,12 @@ CODE_02D230:
 
 ; System State Management
 ; Stack restoration and function return processing
-CODE_02D25C:
+Stack_StateManagement:
                        INC.B $E6                            ;02D25C|E6E6    |000AE6; Increment state counter
 
-CODE_02D25E:
+Stack_WaitLoop:
                        LDA.B $E6                            ;02D25E|A5E6    |000AE6; Load state
-                       BNE CODE_02D25E                      ;02D260|D0FC    |02D25E; Wait for state change
+                       BNE Stack_WaitLoop                   ;02D260|D0FC    |02D25E; Wait for state change
                        PLP                                  ;02D262|28      |      ; Restore processor status
                        PLD                                  ;02D263|2B      |      ; Restore direct page
                        PLB                                  ;02D264|AB      |      ; Restore data bank
@@ -4656,7 +4656,7 @@ UNREACH_02D269:
 
 ; Memory Initialization Engine
 ; High-performance memory clearing and setup operations
-CODE_02D358:
+Memory_InitEngine:
                        PHP                                  ;02D358|08      |      ; Save processor status
                        PHB                                  ;02D359|8B      |      ; Save data bank
                        REP #$30                             ;02D35A|C230    |      ; 16-bit mode
@@ -4686,7 +4686,7 @@ CODE_02D358:
 
 ; Game State Processing Engine
 ; Complex game state management and validation
-CODE_02D389:
+GameState_ProcessingEngine:
                        PHP                                  ;02D389|08      |      ; Save processor status
                        SEP #$30                             ;02D38A|E230    |      ; 8-bit mode
                        STZ.B $83                            ;02D38C|6483    |000A83; Clear state index
@@ -4695,19 +4695,19 @@ CODE_02D389:
                        STZ.B $1F                            ;02D392|641F    |000A1F; Clear state flags
                        STZ.B $7B                            ;02D394|647B    |000A7B; Clear counter
                        LDA.B $01                            ;02D396|A501    |000A01; Load flag
-                       BEQ CODE_02D39C                      ;02D398|F002    |02D39C; Branch if zero
+                       BEQ GameState_ProcessLoop            ;02D398|F002    |02D39C; Branch if zero
                        INC.B $EA                            ;02D39A|E6EA    |000AEA; Increment state
 
 ; State Processing Loop
 ; Advanced state comparison and management
-CODE_02D39C:
+GameState_ProcessLoop:
                        LDX.B $83                            ;02D39C|A683    |000A83; Load index
                        LDA.B $02,X                          ;02D39E|B502    |000A02; Load current state
                        STA.B $20                            ;02D3A0|8520    |000A20; Store for processing
                        CMP.B $0D,X                          ;02D3A2|D50D    |000A0D; Compare with target
-                       BEQ CODE_02D3BA                      ;02D3A4|F014    |02D3BA; Branch if equal
+                       BEQ GameState_Validation             ;02D3A4|F014    |02D3BA; Branch if equal
                        CMP.B #$FF                           ;02D3A6|C9FF    |      ; Check for special value
-                       BNE CODE_02D3C2                      ;02D3A8|D018    |02D3C2; Branch if not special
+                       BNE GameState_ErrorFlag              ;02D3A8|D018    |02D3C2; Branch if not special
 
 ; Special State Processing
 ; Handle special state transitions and updates
@@ -4721,28 +4721,28 @@ CODE_02D39C:
 
 ; State Validation Processing
 ; Compare and validate state transitions
-CODE_02D3BA:
+GameState_Validation:
                        LDA.B $10,X                          ;02D3BA|B510    |000A10; Load reference state
                        CMP.B $07,X                          ;02D3BC|D507    |000A07; Compare with current
-                       BEQ CODE_02D3C7                      ;02D3BE|F007    |02D3C7; Branch if equal
-                       BMI CODE_02D3C4                      ;02D3C0|3002    |02D3C4; Branch if negative
+                       BEQ GameState_Transition             ;02D3BE|F007    |02D3C7; Branch if equal
+                       BMI GameState_ErrorIncrement         ;02D3C0|3002    |02D3C4; Branch if negative
 
-CODE_02D3C2:
+GameState_ErrorFlag:
                        LDA.B #$FF                           ;02D3C2|A9FF    |      ; Set error flag
 
-CODE_02D3C4:
+GameState_ErrorIncrement:
                        INC.B $7B                            ;02D3C4|E67B    |000A7B; Increment error counter
 
-CODE_02D3C6:
+GameState_IncrementState:
                        INC A                                ;02D3C6|1A      |      ; Increment accumulator
 
 ; State Transition Management
 ; Handle state transitions and validation loops
-CODE_02D3C7:
+GameState_Transition:
                        STA.B $21                            ;02D3C7|8521    |000A21; Store processing state
                        JSR.W CODE_02D4F7                    ;02D3C9|20F7D4  |02D4F7; Call state processor
                        CMP.B $07,X                          ;02D3CC|D507    |000A07; Compare result
-                       BNE CODE_02D3C6                      ;02D3CE|D0F6    |02D3C6; Loop if not equal
+                       BNE GameState_IncrementState         ;02D3CE|D0F6    |02D3C6; Loop if not equal
                        LDA.B $02,X                          ;02D3D0|B502    |000A02; Load current state
                        STA.B $0D,X                          ;02D3D2|950D    |000A0D; Store as target
                        LDA.B $07,X                          ;02D3D4|B507    |000A07; Load state data
