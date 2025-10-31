@@ -10509,7 +10509,7 @@ Math_Negate:
     RTS
 
 ;-------------------------------------------------------------------------------
-; CODE_00B29B: Toggle bits in array (bitfield manipulation)
+; Bitfield_ToggleBits: Toggle bits in array (bitfield manipulation)
 ;
 ; Purpose: Toggle specific bits in a bitfield array based on script parameters
 ; Entry: [$17] = bit operation parameter (bit index and mode)
@@ -10520,7 +10520,7 @@ Math_Negate:
 ; Notes: Complex bitfield operation with XOR toggle
 ;        Uses character stats or similar bitfield array
 ;-------------------------------------------------------------------------------
-CODE_00B29B:
+Bitfield_ToggleBits:
     db $A2,$1A,$00,$A0,$5F,$00,$A9,$02,$00,$54,$00,$00,$A7,$17,$E6,$17
     db $29,$FF,$00,$48,$4A,$A8,$68,$3A,$0A,$65,$5F,$AA,$E2,$20,$A5,$61
     db $8B,$48,$AB,$C2,$30,$A7,$5F,$49,$00,$40,$48,$BD,$00,$00,$49,$00
@@ -12748,14 +12748,14 @@ Menu_OptionSelection:
     JSR.W Input_PollWithToggle     ; Poll input
     BNE Menu_OptionSelection_ProcessInput ; If button pressed, process
     BIT.W #$0080                   ; Test B button
-    BNE CODE_00BEB3                ; If pressed, cancel
+    BNE Menu_OptionSelection_Cancel ; If pressed, cancel
     BIT.W #$8000                   ; Test A button
-    BEQ CODE_00BE8C                ; If not pressed, loop
-    JSR.W CODE_00B91C              ; Set animation mode $10
+    BEQ Menu_OptionSelection       ; If not pressed, loop
+    JSR.W Anim_SetMode10           ; Set animation mode $10
     LDA.W #$000F                   ; Mask low 4 bits
     AND.B $01                      ; Get current selection
     CMP.W #$000C                   ; Check if option $0C
-    BEQ CODE_00BEB3                ; If yes, treat as cancel
+    BEQ Menu_OptionSelection_Cancel ; If yes, treat as cancel
     LDA.B $01                      ; Load full option
     STA.W $015F                    ; Store selection
     LDA.W #$FFFF                   ; Load $FFFF
@@ -12763,8 +12763,8 @@ Menu_OptionSelection:
     STZ.B $8E                      ; Clear $8E
     RTS
 
-CODE_00BEB3:
-    JSR.W CODE_00B912              ; Set sprite mode $2D
+Menu_OptionSelection_Cancel:
+    JSR.W Sprite_SetMode2C         ; Set sprite mode $2C
     LDA.W #$00FF                   ; Load $FF (cancel code)
     STA.B $01                      ; Store in $01
     RTS
@@ -12784,12 +12784,12 @@ LOOSE_OP_00BECE:
 UNREACH_00BED5:
     db $48,$22,$00,$80,$0C         ; PHA; JSL CODE_0C8000; (more code)
 
-CODE_00BED8:
+Menu_OptionSelection_UpdateDisplay:
     STX.W $015F                    ; Store input state
-    JSR.W CODE_00B91C              ; Set animation mode $10
+    JSR.W Anim_SetMode10           ; Set animation mode $10
     LDX.W #$BE80                   ; Data pointer
     JSR.W CODE_009BC4              ; Update menu
-    BRA CODE_00BE8C                ; Loop
+    BRA Menu_OptionSelection       ; Loop
 
 UNREACH_00BEE5:
     db $A9,$B0,$CC,$22,$30,$B9,$00,$F0,$F1,$89,$80,$00,$F0,$03,$4C,$CC
@@ -13077,26 +13077,26 @@ Menu_Spell_ValidateSlot:
     JSR.W CODE_00C1B1              ; Confirm spell use
     BEQ CODE_00C138                ; If cancelled, loop
     CMP.W #$0001                   ; Check result
-    BEQ CODE_00C0F4                ; If 1, branch
+    BEQ Menu_Spell_DecrementMP_Char0 ; If 1, branch
     TAX                            ; X = character offset
     LDA.W $1016                    ; Load max HP
     STA.W $1014                    ; Restore to full HP
     TXA                            ; A = character offset
 
-CODE_00C0F4:
+Menu_Spell_DecrementMP_Char0:
     CMP.W #$0000                   ; Check if character 0
-    BEQ CODE_00C0FF                ; If yes, skip
+    BEQ Menu_Spell_DecrementMP_Main ; If yes, skip
     LDA.W $1096                    ; Load companion max HP
     STA.W $1094                    ; Restore companion HP
 
-CODE_00C0FF:
+Menu_Spell_DecrementMP_Main:
     SEP #$20                       ; 8-bit accumulator
     LDX.W #$0000                   ; Default character offset
     LDA.B $01                      ; Load character selection
-    BEQ CODE_00C10B                ; If 0, use default
+    BEQ Menu_Spell_DecrementMP_Do  ; If 0, use default
     LDX.W #$0080                   ; Companion offset
 
-CODE_00C10B:
+Menu_Spell_DecrementMP_Do:
     DEC.W $1018,X                  ; Decrement MP
     LDA.W $04DF                    ; Load character ID
     STA.W $0505                    ; Store in $0505
@@ -13228,30 +13228,30 @@ DATA_00C1D3:
     db $3A,$90,$03,$DD,$8F,$03
 
 ;-------------------------------------------------------------------------------
-; Battle Settings Menu (CODE_00C1D9 - CODE_00C348)
+; Battle Settings Menu (Menu_BattleSettings - CODE_00C348)
 ;-------------------------------------------------------------------------------
-CODE_00C1D9:
+Menu_BattleSettings:
     LDA.W #$0020                   ; Bit 5 mask
     TSB.W $00D6                    ; Set bit 5 of $D6
     LDA.W #$0602                   ; Menu mode $0602
     STA.B $03                      ; Store in $03
     LDA.W #$BFF0                   ; Load $BFF0
     STA.B $8E                      ; Store in $8E
-    BRA CODE_00C1EE                ; Jump to input loop
+    BRA Menu_BattleSettings_InputLoop ; Jump to input loop
 
 UNREACH_00C1EB:
-    db $20,$12,$B9                 ; JSR CODE_00B912
+    db $20,$12,$B9                 ; JSR Sprite_SetMode2C
 
-CODE_00C1EE:
+Menu_BattleSettings_InputLoop:
     REP #$30                       ; 16-bit A/X/Y
     LDA.W #$CF30                   ; Button mask
-    JSR.W CODE_00B930              ; Poll input
-    BNE CODE_00C218                ; If button pressed, process
+    JSR.W Input_PollWithToggle     ; Poll input
+    BNE Menu_BattleSettings_Process ; If button pressed, process
     BIT.W #$4000                   ; Test Y button
     BNE UNREACH_00C20E             ; If pressed, branch
     BIT.W #$8000                   ; Test A button
-    BEQ CODE_00C1EE                ; If not pressed, loop
-    JSR.W CODE_00B91C              ; Set animation mode $10
+    BEQ Menu_BattleSettings_InputLoop ; If not pressed, loop
+    JSR.W Anim_SetMode10           ; Set animation mode $10
     STZ.B $8E                      ; Clear $8E
     LDA.W #$0020                   ; Bit 5 mask
     TRB.W $00D6                    ; Clear bit 5 of $D6
@@ -13260,33 +13260,33 @@ CODE_00C1EE:
 UNREACH_00C20E:
     db $E2,$20,$AD,$90,$10,$30,$D6,$4C,$D9,$C2
 
-CODE_00C218:
+Menu_BattleSettings_Process:
     TXA                            ; Transfer button state
     SEP #$20                       ; 8-bit accumulator
     LDA.B #$00                     ; Clear high byte
     XBA                            ; Swap bytes
     CMP.W $0006                    ; Compare with current setting
-    BNE CODE_00C226                ; If different, update
-    JMP.W CODE_00C2C3              ; Toggle setting
+    BNE Menu_BattleSettings_UpdateSetting ; If different, update
+    JMP.W Menu_BattleSettings_ToggleSetting ; Toggle setting
 
-CODE_00C226:
+Menu_BattleSettings_UpdateSetting:
     PHA                            ; Save setting
-    JSR.W CODE_00B91C              ; Set animation mode $10
+    JSR.W Anim_SetMode10           ; Set animation mode $10
     PLA                            ; Restore setting
     CMP.B #$01                     ; Check setting type
-    BCC CODE_00C28E                ; If < 1, handle battle speed
-    BEQ CODE_00C26D                ; If = 1, handle battle mode
+    BCC Menu_BattleSettings_Speed  ; If < 1, handle battle speed
+    BEQ Menu_BattleSettings_Mode   ; If = 1, handle battle mode
     CMP.B #$03                     ; Check if < 3
-    BCC CODE_00C260                ; If yes, handle cursor memory
-    BEQ CODE_00C250                ; If = 3, handle green color
+    BCC Menu_BattleSettings_Cursor ; If yes, handle cursor memory
+    BEQ Menu_BattleSettings_Green  ; If = 3, handle green color
     CMP.B #$05                     ; Check if < 5
-    BCC CODE_00C242                ; If yes, handle blue color
+    BCC Menu_BattleSettings_Blue   ; If yes, handle blue color
     LDA.W $0E9D                    ; Load color data high byte
     LSR A                          ; Extract red component
     LSR A
-    BRA CODE_00C253                ; Store result
+    BRA Menu_BattleSettings_StoreColor ; Store result
 
-CODE_00C242:
+Menu_BattleSettings_Blue:
     REP #$30                       ; 16-bit A/X/Y
     LDA.W $0E9C                    ; Load color data
     LSR A                          ; Extract blue component
@@ -13295,59 +13295,59 @@ CODE_00C242:
     LSR A
     LSR A
     LSR A
-    BRA CODE_00C253                ; Store result
+    BRA Menu_BattleSettings_StoreColor ; Store result
 
-CODE_00C250:
+Menu_BattleSettings_Green:
     LDA.W $0E9C                    ; Load color data (green)
 
-CODE_00C253:
+Menu_BattleSettings_StoreColor:
     AND.B #$1F                     ; Mask to 5 bits
     INC A                          ; Increment
     LSR A                          ; ÷ 4 (scale down)
     LSR A
     LDX.W #$0009                   ; X = 9 (data offset)
     LDY.W #$0609                   ; Y = menu mode
-    BRA CODE_00C29D                ; Continue
+    BRA Menu_BattleSettings_UpdateDisplay ; Continue
 
-CODE_00C260:
+Menu_BattleSettings_Cursor:
     LDA.W $0E9B                    ; Load cursor memory setting
     AND.B #$07                     ; Mask to 3 bits
     LDX.W #$0006                   ; X = 6
     LDY.W #$0607                   ; Y = menu mode
-    BRA CODE_00C29D                ; Continue
+    BRA Menu_BattleSettings_UpdateDisplay ; Continue
 
-CODE_00C26D:
+Menu_BattleSettings_Mode:
     LDA.W $1090                    ; Load battle mode setting
-    BPL CODE_00C27C                ; If active mode, branch
+    BPL Menu_BattleSettings_Mode_Active ; If active mode, branch
     LDA.B $06                      ; Load current selection
     EOR.B #$02                     ; Toggle bit 1
     AND.B #$FE                     ; Clear bit 0
     STA.B $02                      ; Store new selection
-    BRA CODE_00C226                ; Loop
+    BRA Menu_BattleSettings_UpdateSetting ; Loop
 
-CODE_00C27C:
+Menu_BattleSettings_Mode_Active:
     LDA.B #$80                     ; Load $80
     AND.W $10A0                    ; Test companion flag
-    BEQ CODE_00C285                ; If not set, use 0
+    BEQ Menu_BattleSettings_Mode_Store ; If not set, use 0
     LDA.B #$FF                     ; Load $FF
 
-CODE_00C285:
+Menu_BattleSettings_Mode_Store:
     INC A                          ; Increment (0 or 1)
     LDX.W #$0003                   ; X = 3
     LDY.W #$0602                   ; Y = menu mode
-    BRA CODE_00C29D                ; Continue
+    BRA Menu_BattleSettings_UpdateDisplay ; Continue
 
-CODE_00C28E:
+Menu_BattleSettings_Speed:
     LDA.B #$80                     ; Load $80
     AND.W $0EC6                    ; Test battle speed flag
-    BEQ CODE_00C297                ; If not set, use 0
+    BEQ Menu_BattleSettings_Speed_Store ; If not set, use 0
     db $A9,$01                     ; LDA #$01
 
-CODE_00C297:
+Menu_BattleSettings_Speed_Store:
     LDX.W #$0000                   ; X = 0
     LDY.W #$0602                   ; Y = menu mode
 
-CODE_00C29D:
+Menu_BattleSettings_UpdateDisplay:
     STY.B $03                      ; Store menu mode
     STA.B $01                      ; Store current value
     LDA.W DATA8_00C339,X           ; Load color byte 1
@@ -13357,44 +13357,44 @@ CODE_00C29D:
     LDA.W DATA8_00C33B,X           ; Load color byte 3
     STA.L $7F56DB                  ; Store to WRAM
 
-CODE_00C2B6:
+Menu_BattleSettings_Refresh:
     LDX.B $01                      ; Load current value
     STX.B $05                      ; Store in $05
     LDX.W #$C345                   ; Menu data
     JSR.W CODE_009BC4              ; Update menu
-    JMP.W CODE_00C1EE              ; Loop
+    JMP.W Menu_BattleSettings_InputLoop ; Loop
 
-CODE_00C2C3:
+Menu_BattleSettings_ToggleSetting:
     LDA.B $02                      ; Load option index
-    BEQ CODE_00C2E3                ; If 0, toggle battle speed
+    BEQ Menu_BattleSettings_ToggleSpeed ; If 0, toggle battle speed
     CMP.B #$02                     ; Check if 2
-    BCC CODE_00C2D9                ; If < 2, toggle battle mode
-    BNE CODE_00C2F0                ; If > 2, handle colors
+    BCC Menu_BattleSettings_ToggleMode ; If < 2, toggle battle mode
+    BNE Menu_BattleSettings_SetColor ; If > 2, handle colors
     LDA.W $0E9B                    ; Load cursor memory
     AND.B #$F8                     ; Clear low 3 bits
     ORA.B $01                      ; Set new value
     STA.W $0E9B                    ; Store cursor memory
-    BRA CODE_00C2EB                ; Update display
+    BRA Menu_BattleSettings_Commit ; Update display
 
-CODE_00C2D9:
+Menu_BattleSettings_ToggleMode:
     LDA.W $10A0                    ; Load companion flag
     EOR.B #$80                     ; Toggle bit 7
     STA.W $10A0                    ; Store back
-    BRA CODE_00C2EB                ; Update display
+    BRA Menu_BattleSettings_Commit ; Update display
 
-CODE_00C2E3:
+Menu_BattleSettings_ToggleSpeed:
     LDA.W $0EC6                    ; Load battle speed
     EOR.B #$80                     ; Toggle bit 7
     STA.W $0EC6                    ; Store back
 
-CODE_00C2EB:
-    JSR.W CODE_00B908              ; Set sprite mode $2D
-    BRA CODE_00C2B6                ; Update display
+Menu_BattleSettings_Commit:
+    JSR.W Sprite_SetMode2D         ; Set sprite mode $2D
+    BRA Menu_BattleSettings_Refresh ; Update display
 
-CODE_00C2F0:
+Menu_BattleSettings_SetColor:
     CMP.B #$04                     ; Check if 4
-    BCC CODE_00C325                ; If < 4, handle blue
-    BEQ CODE_00C30A                ; If = 4, handle green
+    BCC Menu_BattleSettings_SetBlue ; If < 4, handle blue
+    BEQ Menu_BattleSettings_SetGreen ; If = 4, handle green
     LDA.B #$7C                     ; Mask for red component
     TRB.W $0E9D                    ; Clear red bits
     LDA.B $01                      ; Load new value
@@ -13402,14 +13402,14 @@ CODE_00C2F0:
     ASL A
     ASL A
     ASL A
-    BPL CODE_00C305                ; If positive, use value
+    BPL Menu_BattleSettings_SetRed_Store ; If positive, use value
     LDA.B #$7C                     ; Max value
 
-CODE_00C305:
+Menu_BattleSettings_SetRed_Store:
     TSB.W $0E9D                    ; Set red bits
-    BRA CODE_00C2EB                ; Update display
+    BRA Menu_BattleSettings_Commit ; Update display
 
-CODE_00C30A:
+Menu_BattleSettings_SetGreen:
     REP #$30                       ; 16-bit A/X/Y
     LDA.W #$03E0                   ; Mask for green component
     TRB.W $0E9C                    ; Clear green bits
@@ -13417,26 +13417,26 @@ CODE_00C30A:
     AND.W #$FF00                   ; Get high byte
     LSR A                          ; Shift right
     CMP.W #$0400                   ; Check if exceeds max
-    BNE CODE_00C320                ; If not, use value
+    BNE Menu_BattleSettings_SetGreen_Store ; If not, use value
     LDA.W #$03E0                   ; Max value
 
-CODE_00C320:
+Menu_BattleSettings_SetGreen_Store:
     TSB.W $0E9C                    ; Set green bits
-    BRA CODE_00C2EB                ; Update display
+    BRA Menu_BattleSettings_Commit ; Update display
 
-CODE_00C325:
+Menu_BattleSettings_SetBlue:
     LDA.B #$1F                     ; Mask for blue component
     TRB.W $0E9C                    ; Clear blue bits
     LDA.B $01                      ; Load new value
     ASL A                          ; Shift left 2 times
     ASL A
     CMP.B #$20                     ; Check if exceeds max
-    BNE CODE_00C334                ; If not, use value
+    BNE Menu_BattleSettings_SetBlue_Store ; If not, use value
     LDA.B #$1F                     ; Max value
 
-CODE_00C334:
+Menu_BattleSettings_SetBlue_Store:
     TSB.W $0E9C                    ; Set blue bits
-    BRA CODE_00C2EB                ; Update display
+    BRA Menu_BattleSettings_Commit ; Update display
 
 DATA_00C339:
     db $1F                         ; Blue data
