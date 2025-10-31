@@ -7112,7 +7112,7 @@ Graphics_StackOverflow:
 ; Pop Graphics Parameters from Stack
 ; ---------------------------------------------------------------------------
 
-CODE_009D21:
+Graphics_PopParams:
 	PHP                         ; Save processor status
 	REP #$30                    ; 16-bit A/X/Y
 	PHB                         ; Save data bank
@@ -9060,19 +9060,19 @@ Sprite_DrawDispatch:
 ;-------------------------------------------------------------------------------
 UNREACH_00AAF7:
 	db $F6,$AA                     ; Unreachable data
-	dw CODE_00AB07                 ; $00
-	dw CODE_00AB20                 ; $01
-	dw CODE_00AB88                 ; $02
-	dw CODE_00ABCE                 ; $03
-	dw CODE_00ABE5                 ; $04
-	dw CODE_00AB9F                 ; $05
-	dw CODE_00ABBA                 ; $06
+	dw Sprite_DrawFilled           ; $00
+	dw Sprite_DrawWindowBorder     ; $01
+	dw Window_DrawFrame            ; $02
+	dw Window_DrawItemIcon         ; $03
+	dw Window_DrawSpellIcon        ; $04
+	dw Window_DrawTopBorder        ; $05
+	dw Window_DrawFilledBox        ; $06
 
 ;-------------------------------------------------------------------------------
-; CODE_00AB07 - Draw filled rectangle (tile $FE)
+; Sprite_DrawFilled - Draw filled rectangle (tile $FE)
 ; Purpose: Draw solid filled rectangle using tile $FE
 ;-------------------------------------------------------------------------------
-CODE_00AB07:
+Sprite_DrawFilled:
 	LDA.B $2B                      ; Load height
 	AND.W #$00FF
 	STA.B $62                      ; Store row counter
@@ -9082,16 +9082,16 @@ CODE_00AB07:
 	TAX                            ; X = column offset
 	LDY.B $1A                      ; Load tilemap pointer
 	LDA.W #$00FE                   ; Tile $FE (solid fill)
-	JSR.W CODE_00AD85              ; Draw tiles
+	JSR.W Window_DrawTiles         ; Draw tiles
 	STY.B $1A                      ; Update pointer
 	RTS
 
 ;-------------------------------------------------------------------------------
-; CODE_00AB20 - Draw window border with vertical flip
+; Sprite_DrawWindowBorder - Draw window border with vertical flip
 ; Purpose: Draw bordered window with special tile handling
 ;-------------------------------------------------------------------------------
-CODE_00AB20:
-	JSR.W CODE_00AB9F              ; Draw top border
+Sprite_DrawWindowBorder:
+	JSR.W Window_DrawTopBorder     ; Draw top border
 	LDA.W #$4000                   ; Vertical flip bit
 	ORA.B $1D                      ; Combine with tile flags
 	STA.B $64                      ; Store flip flags
@@ -9502,16 +9502,16 @@ Sprite_ClearLoop:
 	TXA                            ; Restore Y position
 	ADC.W #$FFF8                   ; Adjust (-8)
 	DEC.B $62                      ; Decrement count
-	BNE CODE_00ADAC                ; Loop
+	BNE Sprite_ClearLoop           ; Loop
 	PLB                            ; Restore bank
 	RTS
 
 ;-------------------------------------------------------------------------------
-; CODE_00ADBF - Compressed tile drawing to Bank $7E
+; Sprite_DrawCompressed - Compressed tile drawing to Bank $7E
 ; Purpose: Draw compressed tile data to screen buffer
 ; Entry: $2C = Y coordinate, $2D = width, $2B = height
 ;-------------------------------------------------------------------------------
-CODE_00ADBF:
+Sprite_DrawCompressed:
 	LDA.B $2C                      ; Load Y coord
 	AND.W #$00FF
 	STA.B $64                      ; Save
@@ -9551,16 +9551,16 @@ CODE_00ADBF:
 	TXA
 	SEC
 
-CODE_00AE07:
+Sprite_CompressedLoop:
 	TAX
-	JSR.W CODE_009A05              ; Draw routine
+	JSR.W Memory_Fill14Bytes       ; Draw routine
 	TYA
 	SBC.W #$FFF0                   ; Adjust pointer
 	TAY
 	TXA
 	ADC.W #$FFF8                   ; Adjust X
 	DEC.B $62
-	BNE CODE_00AE07                ; Loop
+	BNE Sprite_CompressedLoop      ; Loop
 	STA.B $64                      ; Save result
 	PLA                            ; Restore width
 	AND.W #$0007                   ; Get remainder
@@ -9572,11 +9572,11 @@ CODE_00AE07:
 	RTS
 
 ;-------------------------------------------------------------------------------
-; CODE_00AE27 - RLE compressed text drawing
+; Text_DrawRLE - RLE compressed text drawing
 ; Purpose: Run-length encoded text decompression to Bank $7E
 ; Entry: $2C = Y start, $29 = row count, $2B = column count
 ;-------------------------------------------------------------------------------
-CODE_00AE27:
+Text_DrawRLE:
 	PEA.W $007E                    ; Bank $7E
 	PLB
 	LDA.B $2C                      ; Y coordinate
@@ -9598,12 +9598,12 @@ CODE_00AE27:
 	AND.W #$00FF
 	STA.B $62                      ; Save
 
-CODE_00AE4B:
+Text_DrawRLE_Loop:
 	LDA.B [$17]                    ; Load RLE byte
 	AND.W #$00FF
-	BEQ CODE_00AE6A                ; If zero, skip
+	BEQ Text_DrawRLE_Skip          ; If zero, skip
 	BIT.W #$0080                   ; Test high bit
-	BNE CODE_00AE81                ; If set, special mode
+	BNE Text_DrawRLE_Special       ; If set, special mode
 	PHA                            ; Save count
 	LDA.B $03,S                    ; Load tile value
 	STA.W $0000,X                  ; Store
@@ -9612,15 +9612,15 @@ CODE_00AE4B:
 	INY
 	PLA                            ; Restore count
 	DEC A                          ; -1
-	BEQ CODE_00AE69                ; If 1, done
+	BEQ Text_DrawRLE_Done          ; If 1, done
 	ASL A                          ; × 2
 	DEC A                          ; -1 for MVN
 	MVN $7E,$7E                    ; Block move
 
-CODE_00AE69:
+Text_DrawRLE_Done:
 	TYX                            ; X = end pointer
 
-CODE_00AE6A:
+Text_DrawRLE_Skip:
 	LDA.W #$0008                   ; 8 tiles
 	SEC
 	SBC.B [$17]                    ; Subtract used
@@ -9629,15 +9629,15 @@ CODE_00AE6A:
 	ADC.B $01,S                    ; Add to stack offset
 	STA.B $01,S
 
-CODE_00AE78:
+Text_DrawRLE_Next:
 	INC.B $17                      ; Next RLE byte
 	DEC.B $62                      ; Decrement column counter
-	BNE CODE_00AE4B                ; Loop
+	BNE Text_DrawRLE_Loop          ; Loop
 	PLA                            ; Clean stack
 	PLB                            ; Restore bank
 	RTS
 
-CODE_00AE81:
+Text_DrawRLE_Special:
 	AND.W #$007F                   ; Mask off high bit
 	PHA                            ; Save count
 	LDA.W #$0008
@@ -9657,14 +9657,14 @@ CODE_00AE81:
 	DEC A
 	MVN $7E,$7E                    ; Block move
 
-CODE_00AE9F:
+Text_DrawRLE_SpecialDone:
 	TYX
-	BRA CODE_00AE78                ; Continue
+	BRA Text_DrawRLE_Next          ; Continue
 
 ;-------------------------------------------------------------------------------
-; CODE_00AEA2 - Call graphics function with 8-bit parameter
+; Cmd_CallGraphics8Bit - Call graphics function with 8-bit parameter
 ;-------------------------------------------------------------------------------
-CODE_00AEA2:
+Cmd_CallGraphics8Bit:
 	LDA.B [$17]                    ; Load parameter
 	INC.B $17
 	AND.W #$00FF
@@ -9674,9 +9674,9 @@ CODE_00AEA2:
 	db $A5,$9E,$22,$60,$97,$00,$60 ; Variant with $9E parameter
 
 ;-------------------------------------------------------------------------------
-; CODE_00AEB5 - Call graphics function with DP context
+; Cmd_CallGraphicsWithDP - Call graphics function with DP context
 ;-------------------------------------------------------------------------------
-CODE_00AEB5:
+Cmd_CallGraphicsWithDP:
 	LDA.B [$17]                    ; Load parameter
 	INC.B $17
 	AND.W #$00FF
@@ -9688,9 +9688,9 @@ CODE_00AEB5:
 	RTS
 
 ;-------------------------------------------------------------------------------
-; CODE_00AEC7 - Call sprite/tile function
+; Cmd_CallSprite - Call sprite/tile function
 ;-------------------------------------------------------------------------------
-CODE_00AEC7:
+Cmd_CallSprite:
 	LDA.B [$17]                    ; Load parameter
 	INC.B $17
 	AND.W #$00FF
@@ -9700,9 +9700,9 @@ CODE_00AEC7:
 	db $A5,$9E,$22,$6B,$97,$00,$60 ; Variant with $9E
 
 ;-------------------------------------------------------------------------------
-; CODE_00AEDA - Call graphics function with DP=$D0
+; Cmd_CallGraphicsAlt - Call graphics function with DP=$D0
 ;-------------------------------------------------------------------------------
-CODE_00AEDA:
+Cmd_CallGraphicsAlt:
 	LDA.B [$17]
 	INC.B $17
 	AND.W #$00FF
@@ -9717,7 +9717,7 @@ CODE_00AEDA:
 	db $A5,$2E,$0B,$48,$A7,$17,$E6,$17,$29,$FF,$00,$2B,$22,$4E,$97,$00
 	db $2B,$60
 
-CODE_00AEFE:
+Cmd_CallFromOffset:
 	LDA.B $2E                      ; From $2E
 	PHD
 	PHA
@@ -9730,7 +9730,7 @@ CODE_00AEFE:
 	db $A5,$2E,$0B,$48,$A7,$17,$E6,$17,$29,$FF,$00,$2B,$22,$54,$97,$00
 	db $2B,$60
 
-CODE_00AF1D:
+Cmd_CallFromOffset2:
 	LDA.B $2E
 	PHD
 	PHA
@@ -9741,11 +9741,11 @@ CODE_00AF1D:
 	RTS
 
 ;-------------------------------------------------------------------------------
-; CODE_00AF2A - Memory copy with table offset
+; Memory_CopyWithTable - Memory copy with table offset
 ; Purpose: Copy data using offset from script
 ; Entry: A = byte count
 ;-------------------------------------------------------------------------------
-CODE_00AF2A:
+Memory_CopyWithTable:
 	TAY                            ; Y = count
 	LDA.B [$17]                    ; Load source
 	STA.B $A4
@@ -9761,12 +9761,12 @@ CODE_00AF2A:
 	STA.B $17
 	LDX.W #$00A4                   ; X = $A4 (source pointer)
 	TYA                            ; A = count
-	BRA CODE_00AF50
+	BRA Memory_CopyTo98
 
 ;-------------------------------------------------------------------------------
-; CODE_00AF47 - Memory copy direct
+; Memory_CopyDirect - Memory copy direct
 ;-------------------------------------------------------------------------------
-CODE_00AF47:
+Memory_CopyDirect:
 	TAY                            ; Y = count
 	LDA.B [$17]                    ; Load source
 	INC.B $17
@@ -9774,7 +9774,7 @@ CODE_00AF47:
 	TAX                            ; X = source
 	TYA                            ; A = count
 
-CODE_00AF50:
+Memory_CopyTo98:
 	STZ.B $98                      ; Clear dest low
 	STZ.B $9A                      ; Clear dest high
 	LDY.W #$0098                   ; Y = $98
@@ -9782,9 +9782,9 @@ CODE_00AF50:
 	RTS
 
 ;-------------------------------------------------------------------------------
-; CODE_00AF5B - Memory copy to $9E pointer
+; Memory_CopyTo9E - Memory copy to $9E pointer
 ;-------------------------------------------------------------------------------
-CODE_00AF5B:
+Memory_CopyTo9E:
 	TAX                            ; X = count
 	LDA.B [$17]                    ; Load source
 	INC.B $17
@@ -9796,31 +9796,31 @@ CODE_00AF5B:
 	RTS
 
 ;-------------------------------------------------------------------------------
-; CODE_00AF6B/AF70/AF75 - Memory copy variants with preset counts
+; Memory_Copy1Byte/2Bytes/3Bytes - Memory copy variants with preset counts
 ;-------------------------------------------------------------------------------
-CODE_00AF6B:
+Memory_Copy1Byte:
 	LDA.W #$0000                   ; 1 byte
-	BRA CODE_00AF5B
+	BRA Memory_CopyTo9E
 
-CODE_00AF70:
+Memory_Copy2Bytes:
 	LDA.W #$0001                   ; 2 bytes
-	BRA CODE_00AF5B
+	BRA Memory_CopyTo9E
 
-CODE_00AF75:
+Memory_Copy3Bytes:
 	LDA.W #$0002                   ; 3 bytes
-	BRA CODE_00AF5B
+	BRA Memory_CopyTo9E
 
 ;-------------------------------------------------------------------------------
-; CODE_00AF7A/AF7F - Copy and store in $9E
+; Memory_CopyTableTo9E/DirectTo9E - Copy and store in $9E
 ;-------------------------------------------------------------------------------
-CODE_00AF7A:
-	JSR.W CODE_00AF2A              ; Table copy
-	BRA CODE_00AF82
+Memory_CopyTableTo9E:
+	JSR.W Memory_CopyWithTable     ; Table copy
+	BRA Memory_StoreTo9E
 
-CODE_00AF7F:
-	JSR.W CODE_00AF47              ; Direct copy
+Memory_CopyDirectTo9E:
+	JSR.W Memory_CopyDirect        ; Direct copy
 
-CODE_00AF82:
+Memory_StoreTo9E:
 	LDA.B $98                      ; Load result low
 	STA.B $9E                      ; Store in $9E
 	LDA.B $9A                      ; Load result high
@@ -9828,33 +9828,33 @@ CODE_00AF82:
 	RTS
 
 ;-------------------------------------------------------------------------------
-; CODE_00AF8B/AF90/AF95/AF9A/AF9F - Copy variants with preset counts
+; Memory_CopyTable1/2/3 - Copy variants with preset counts (table mode)
 ;-------------------------------------------------------------------------------
-CODE_00AF8B:
+Memory_CopyTable1Byte:
 	LDA.W #$0000
-	BRA CODE_00AF7A
+	BRA Memory_CopyTableTo9E
 
-CODE_00AF90:
+Memory_CopyTable2Bytes:
 	LDA.W #$0001
-	BRA CODE_00AF7A
+	BRA Memory_CopyTableTo9E
 
-CODE_00AF95:
+Memory_CopyTable3Bytes:
 	LDA.W #$0002
-	BRA CODE_00AF7A
+	BRA Memory_CopyTableTo9E
 
-CODE_00AF9A:
+Memory_CopyDirect2Bytes:
 	LDA.W #$0001
-	BRA CODE_00AF7F
+	BRA Memory_CopyDirectTo9E
 
-CODE_00AF9F:
+Memory_CopyDirect3Bytes:
 	LDA.W #$0002
-	BRA CODE_00AF7F
+	BRA Memory_CopyDirectTo9E
 
 ;-------------------------------------------------------------------------------
-; CODE_00AFA4/AFAC/AFB1 - Load pointer helpers
+; Pointer_Load16BitClear - Load pointer helpers
 ;-------------------------------------------------------------------------------
-CODE_00AFA4:
-	JSR.W CODE_00AFBB              ; Load pointer
+Pointer_Load16BitClear:
+	JSR.W Pointer_LoadFromBank     ; Load pointer
 	STZ.B $9F                      ; Clear high byte
 	STZ.B $A0
 	RTS
@@ -9862,11 +9862,11 @@ CODE_00AFA4:
 	db $20,$BB,$AF,$64,$A0,$60,$20,$BB,$AF,$29,$FF,$00,$85,$A0,$60
 
 ;-------------------------------------------------------------------------------
-; CODE_00AFBB - Load pointer from Bank $XX address
+; Pointer_LoadFromBank - Load pointer from Bank $XX address
 ; Entry: [$17] = address, [$17+2] = bank
 ; Exit: Y = word value, A = next word, $9E = first word
 ;-------------------------------------------------------------------------------
-CODE_00AFBB:
+Pointer_LoadFromBank:
 	LDA.B [$17]                    ; Load address
 	INC.B $17
 	INC.B $17
@@ -9884,9 +9884,9 @@ CODE_00AFBB:
 	RTS
 
 ;-------------------------------------------------------------------------------
-; CODE_00AFD6 - Load byte from address into $9E
+; Pointer_LoadByte - Load byte from address into $9E
 ;-------------------------------------------------------------------------------
-CODE_00AFD6:
+Pointer_LoadByte:
 	STZ.B $9E                      ; Clear $9E
 	STZ.B $A0                      ; Clear $A0
 	LDA.B [$17]                    ; Load address
@@ -9899,16 +9899,16 @@ CODE_00AFD6:
 	RTS                            ; (REP #$30 in caller)
 
 ;-------------------------------------------------------------------------------
-; CODE_00AFE9/AFEE - Bitwise AND operations
+; Bitwise_ANDTable/ANDDirect - Bitwise AND operations
 ;-------------------------------------------------------------------------------
-CODE_00AFE9:
-	JSR.W CODE_00AF2A              ; Copy table
-	BRA CODE_00AFF1
+Bitwise_ANDTable:
+	JSR.W Memory_CopyWithTable     ; Copy table
+	BRA Bitwise_ANDApply
 
-CODE_00AFEE:
-	JSR.W CODE_00AF47              ; Copy direct
+Bitwise_ANDDirect:
+	JSR.W Memory_CopyDirect        ; Copy direct
 
-CODE_00AFF1:
+Bitwise_ANDApply:
 	LDA.B $9E                      ; Load $9E
 	AND.B $98                      ; AND with $98
 	STA.B $9E                      ; Store result
@@ -9918,34 +9918,34 @@ CODE_00AFF1:
 	RTS
 
 ;-------------------------------------------------------------------------------
-; CODE_00AFFE - Bitwise AND variants with preset counts
+; Bitwise_AND1Byte - Bitwise AND variants with preset counts
 ;-------------------------------------------------------------------------------
-CODE_00AFFE:
+Bitwise_AND1Byte:
 	LDA.W #$0000                   ; 1 byte count
-	BRA CODE_00AFE9                ; → AND table copy
+	BRA Bitwise_ANDTable           ; → AND table copy
 
 	LDA.W #$0001                   ; 2 byte count
-	BRA CODE_00AFE9
+	BRA Bitwise_ANDTable
 
 	db $A9,$02,$00,$80,$DC,$A9,$00,$00,$80,$DC ; More variants
 
 	LDA.W #$0001                   ; 2 byte count
-	BRA CODE_00AFEE                ; → AND direct copy
+	BRA Bitwise_ANDDirect          ; → AND direct copy
 
 	db $A9,$02,$00,$80,$D2         ; 3 byte variant
 
 ;-------------------------------------------------------------------------------
-; CODE_00B01C/B021 - Bitwise TSB (Test and Set Bits)
+; Bitwise_TSBTable/TSBDirect - Bitwise TSB (Test and Set Bits)
 ; Purpose: OR values with $9E/$A0 (set bits)
 ;-------------------------------------------------------------------------------
-CODE_00B01C:
-	JSR.W CODE_00AF2A              ; Copy table
-	BRA CODE_00B024
+Bitwise_TSBTable:
+	JSR.W Memory_CopyWithTable     ; Copy table
+	BRA Bitwise_TSBApply
 
-CODE_00B021:
-	JSR.W CODE_00AF47              ; Copy direct
+Bitwise_TSBDirect:
+	JSR.W Memory_CopyDirect        ; Copy direct
 
-CODE_00B024:
+Bitwise_TSBApply:
 	LDA.B $98                      ; Load value
 	TSB.B $9E                      ; Test and Set Bits in $9E
 	LDA.B $9A
@@ -9955,27 +9955,27 @@ CODE_00B024:
 	db $A9,$00,$00,$80,$EA         ; TSB variants with preset counts
 
 	LDA.W #$0001
-	BRA CODE_00B01C
+	BRA Bitwise_TSBTable
 
 	db $A9,$02,$00,$80,$E0
 
 	LDA.W #$0000
-	BRA CODE_00B021
+	BRA Bitwise_TSBDirect
 
 	db $A9,$01,$00,$80,$DB,$A9,$02,$00,$80,$D6
 
 ;-------------------------------------------------------------------------------
-; CODE_00B04B/B050 - Bitwise XOR (Exclusive OR)
+; Bitwise_XORTable/XORDirect - Bitwise XOR (Exclusive OR)
 ; Purpose: XOR values with $9E/$A0
 ;-------------------------------------------------------------------------------
-CODE_00B04B:
-	JSR.W CODE_00AF2A              ; Copy table
-	BRA CODE_00B053
+Bitwise_XORTable:
+	JSR.W Memory_CopyWithTable     ; Copy table
+	BRA Bitwise_XORApply
 
-CODE_00B050:
-	JSR.W CODE_00AF47              ; Copy direct
+Bitwise_XORDirect:
+	JSR.W Memory_CopyDirect        ; Copy direct
 
-CODE_00B053:
+Bitwise_XORApply:
 	LDA.B $9E
 	EOR.B $98                      ; XOR with $98
 	STA.B $9E                      ; Store result
@@ -9988,27 +9988,27 @@ CODE_00B053:
 ; XOR variants with preset counts
 ;-------------------------------------------------------------------------------
 	LDA.W #$0000
-	BRA CODE_00B04B
+	BRA Bitwise_XORTable
 
 	db $A9,$01,$00,$80,$E1,$A9,$02,$00,$80,$DC,$A9,$00,$00,$80,$DC
 
 	LDA.W #$0001
-	BRA CODE_00B050
+	BRA Bitwise_XORDirect
 
 	db $A9,$02,$00,$80,$D2
 
 ;-------------------------------------------------------------------------------
-; CODE_00B07E/B083 - Addition (ADD)
+; Math_AddTable/AddDirect - Addition (ADD)
 ; Purpose: Add values to $9E/$A0
 ;-------------------------------------------------------------------------------
-CODE_00B07E:
-	JSR.W CODE_00AF2A              ; Copy table
-	BRA CODE_00B086
+Math_AddTable:
+	JSR.W Memory_CopyWithTable     ; Copy table
+	BRA Math_AddApply
 
-CODE_00B083:
-	JSR.W CODE_00AF47              ; Copy direct
+Math_AddDirect:
+	JSR.W Memory_CopyDirect        ; Copy direct
 
-CODE_00B086:
+Math_AddApply:
 	CLC
 	LDA.B $9E
 	ADC.B $98                      ; Add $98
@@ -10019,39 +10019,39 @@ CODE_00B086:
 	RTS
 
 ;-------------------------------------------------------------------------------
-; CODE_00B094 - Addition variants with preset counts
+; Math_Add1/2/3Byte - Addition variants with preset counts
 ;-------------------------------------------------------------------------------
-CODE_00B094:
+Math_Add1Byte:
 	LDA.W #$0000                   ; 1 byte
-	BRA CODE_00B07E
+	BRA Math_AddTable
 
 	LDA.W #$0001                   ; 2 bytes
-	BRA CODE_00B07E
+	BRA Math_AddTable
 
 	LDA.W #$0002                   ; 3 bytes
-	BRA CODE_00B07E
+	BRA Math_AddTable
 
 	LDA.W #$0000                   ; Direct variants
-	BRA CODE_00B083
+	BRA Math_AddDirect
 
 	LDA.W #$0001
-	BRA CODE_00B083
+	BRA Math_AddDirect
 
 	LDA.W #$0002
-	BRA CODE_00B083
+	BRA Math_AddDirect
 
 ;-------------------------------------------------------------------------------
-; CODE_00B0B2/B0B7 - Subtraction (SUB)
+; Math_SubTable/SubDirect - Subtraction (SUB)
 ; Purpose: Subtract values from $9E/$A0
 ;-------------------------------------------------------------------------------
-CODE_00B0B2:
-	JSR.W CODE_00AF2A              ; Copy table
-	BRA CODE_00B0BA
+Math_SubTable:
+	JSR.W Memory_CopyWithTable     ; Copy table
+	BRA Math_SubApply
 
-CODE_00B0B7:
-	JSR.W CODE_00AF47              ; Copy direct
+Math_SubDirect:
+	JSR.W Memory_CopyDirect        ; Copy direct
 
-CODE_00B0BA:
+Math_SubApply:
 	SEC
 	LDA.B $9E
 	SBC.B $98                      ; Subtract $98
@@ -10065,30 +10065,30 @@ CODE_00B0BA:
 ; Subtraction variants with preset counts
 ;-------------------------------------------------------------------------------
 	LDA.W #$0000
-	BRA CODE_00B0B2
+	BRA Math_SubTable
 
 	LDA.W #$0001
-	BRA CODE_00B0B2
+	BRA Math_SubTable
 
 	LDA.W #$0002
-	BRA CODE_00B0B2
+	BRA Math_SubTable
 
 	LDA.W #$0000
-	BRA CODE_00B0B7
+	BRA Math_SubDirect
 
 	LDA.W #$0001
-	BRA CODE_00B0B7
+	BRA Math_SubDirect
 
 	LDA.W #$0002
-	BRA CODE_00B0B7
+	BRA Math_SubDirect
 
 ;-------------------------------------------------------------------------------
-; CODE_00B0E6 - Division (16-bit / 8-bit)
+; Math_Divide - Division (16-bit / 8-bit)
 ; Purpose: Divide $9E by accumulator
 ; Entry: A = divisor (8-bit)
 ; Exit: $98 = quotient, $9A = remainder (via CODE_0096B3)
 ;-------------------------------------------------------------------------------
-CODE_00B0E6:
+Math_Divide:
 	STA.B $9C                      ; Store divisor
 	LDA.B $9E                      ; Load dividend
 	STA.B $98                      ; Setup for division
