@@ -3149,7 +3149,7 @@ GameLoop_ProcessInput:
 	; Determine Input Handler
 	; ---------------------------------------------------------------------------
 	; CODE_009730 returns handler index in A based on game state
-	; Handler table at CODE_008A35 dispatches to appropriate routine
+	; Handler table at Input_HandlerTable dispatches to appropriate routine
 	; ---------------------------------------------------------------------------
 
 	JSL.L CODE_009730           ; Get input handler index for current mode
@@ -3159,7 +3159,7 @@ GameLoop_ProcessInput:
 	ASL A                       ; A = A × 2 (convert to word offset)
 	TAX                         ; X = handler table offset
 
-	JSR.W (CODE_008A35,X)       ; Call appropriate input handler
+	JSR.W (Input_HandlerTable,X) ; Call appropriate input handler
 								; (indirect jump through handler table)
 
 ;-------------------------------------------------------------------------------
@@ -3246,7 +3246,7 @@ GameLoop_TimeBasedEvents:
 	BNE GameLoop_CheckChar2     ; If non-zero → Character 1 has status effect
 
 	LDX.B #$40                  ; X = $40 (character 1 offset)
-	JSR.W CODE_008A2A           ; Update character 1 display
+	JSR.W Update_CharacterStatusDisplay ; Update character 1 display
 
 ;-------------------------------------------------------------------------------
 
@@ -3259,7 +3259,7 @@ GameLoop_CheckChar2:
 	BNE GameLoop_CheckChar3     ; If non-zero → Character 2 has status
 
 	LDX.B #$50                  ; X = $50 (character 2 offset)
-	JSR.W CODE_008A2A           ; Update character 2 display
+	JSR.W Update_CharacterStatusDisplay ; Update character 2 display
 
 ;-------------------------------------------------------------------------------
 
@@ -3272,50 +3272,50 @@ GameLoop_CheckChar3:
 	BNE GameLoop_TimeBasedEvents_Exit ; If non-zero → Character 3 has status
 
 	LDX.B #$60                  ; X = $60 (character 3 offset)
-	JSR.W CODE_008A2A           ; Update character 3 display
+	JSR.W Update_CharacterStatusDisplay ; Update character 3 display
 
 ;-------------------------------------------------------------------------------
 
-CODE_008A00:
+GameLoop_CheckChar4:
 	; ---------------------------------------------------------------------------
 	; Check Character 4 Status ($700403)
 	; ---------------------------------------------------------------------------
 
 	LDA.L $700403               ; A = [$700403] (character 4 status)
-	BNE CODE_008A0B             ; If non-zero → Character 4 has status
+	BNE GameLoop_CheckChar5     ; If non-zero → Character 4 has status
 
 	LDX.B #$70                  ; X = $70 (character 4 offset)
-	JSR.W CODE_008A2A           ; Update character 4 display
+	JSR.W Update_CharacterStatusDisplay ; Update character 4 display
 
 ;-------------------------------------------------------------------------------
 
-CODE_008A0B:
+GameLoop_CheckChar5:
 	; ---------------------------------------------------------------------------
 	; Check Character 5 Status ($70073F)
 	; ---------------------------------------------------------------------------
 
 	LDA.L $70073F               ; A = [$70073F] (character 5 status)
-	BNE CODE_008A16             ; If non-zero → Character 5 has status
+	BNE GameLoop_CheckChar6     ; If non-zero → Character 5 has status
 
 	LDX.B #$80                  ; X = $80 (character 5 offset)
-	JSR.W CODE_008A2A           ; Update character 5 display
+	JSR.W Update_CharacterStatusDisplay ; Update character 5 display
 
 ;-------------------------------------------------------------------------------
 
-CODE_008A16:
+GameLoop_CheckChar6:
 	; ---------------------------------------------------------------------------
 	; Check Character 6 Status ($70078F)
 	; ---------------------------------------------------------------------------
 
 	LDA.L $70078F               ; A = [$70078F] (character 6 status)
-	BNE CODE_008A21             ; If non-zero → Character 6 has status
+	BNE GameLoop_SetSpriteFlag  ; If non-zero → Character 6 has status
 
 	LDX.B #$90                  ; X = $90 (character 6 offset)
-	JSR.W CODE_008A2A           ; Update character 6 display
+	JSR.W Update_CharacterStatusDisplay ; Update character 6 display
 
 ;-------------------------------------------------------------------------------
 
-CODE_008A21:
+GameLoop_SetSpriteFlag:
 	; ---------------------------------------------------------------------------
 	; Set Sprite Update Flag
 	; ---------------------------------------------------------------------------
@@ -3325,7 +3325,7 @@ CODE_008A21:
 
 ;-------------------------------------------------------------------------------
 
-CODE_008A26:
+GameLoop_TimeBasedEvents_Exit:
 	; ===========================================================================
 	; Restore Direct Page and Return
 	; ===========================================================================
@@ -3336,7 +3336,7 @@ CODE_008A26:
 
 ;-------------------------------------------------------------------------------
 
-CODE_008A2A:
+Update_CharacterStatusDisplay:
 	; ===========================================================================
 	; Update Character Status Display
 	; ===========================================================================
@@ -3376,7 +3376,7 @@ CODE_008A2A:
 ; INPUT HANDLER DISPATCH TABLE ($008A35-$008A54)
 ;===============================================================================
 
-CODE_008A35:
+Input_HandlerTable:
 	; ===========================================================================
 	; Input Handler Jump Table
 	; ===========================================================================
@@ -3388,7 +3388,7 @@ CODE_008A35:
 	; ===========================================================================
 
 	; Note: This data is being used as code by the previous instruction
-	; STA.W $0C0A,X at CODE_008A35 continues from CODE_008A2A
+	; STA.W $0C0A,X at Input_HandlerTable continues from Update_CharacterStatusDisplay
 	; The actual table starts here with word addresses:
 
 	; Handler jump table data (12 entries x 2 bytes = 24 bytes)
@@ -3400,28 +3400,28 @@ CODE_008A35:
 ; CURSOR MOVEMENT HANDLERS ($008A55-$008A9C)
 ;===============================================================================
 
-CODE_008A55:
+Input_CursorDown:
 	; ===========================================================================
 	; Cursor Down Handler
 	; ===========================================================================
 	DEC.B $02                   ; Decrement vertical position
-	BRA CODE_008A63             ; → Validate position
+	BRA Input_ValidateCursor    ; → Validate position
 
-CODE_008A59:
+Input_CursorUp:
 	; ===========================================================================
 	; Cursor Up Handler
 	; ===========================================================================
 	INC.B $02                   ; Increment vertical position
-	BRA CODE_008A63             ; → Validate position
+	BRA Input_ValidateCursor    ; → Validate position
 
-CODE_008A5D:
+Input_CursorLeft:
 	; ===========================================================================
 	; Cursor Left Handler
 	; ===========================================================================
 	DEC.B $01                   ; Decrement horizontal position
-	BRA CODE_008A63             ; → Validate position
+	BRA Input_ValidateCursor    ; → Validate position
 
-CODE_008A61:
+Input_CursorRight:
 	; ===========================================================================
 	; Cursor Right Handler
 	; ===========================================================================
@@ -3430,7 +3430,7 @@ CODE_008A61:
 
 ;-------------------------------------------------------------------------------
 
-CODE_008A63:
+Input_ValidateCursor:
 	; ===========================================================================
 	; Validate Horizontal Position
 	; ===========================================================================
@@ -3444,38 +3444,38 @@ CODE_008A63:
 	; ===========================================================================
 
 	LDA.B $01                   ; A = X position
-	BMI CODE_008A78             ; If negative → Check wrap flags
+	BMI Input_CheckXWrap        ; If negative → Check wrap flags
 
 	CMP.B $03                   ; Compare with max X
-	BCC CODE_008A80             ; If X < max → Valid, continue
+	BCC Input_ValidateY         ; If X < max → Valid, continue
 
 	; X position at or above maximum
 	LDA.B $95                   ; A = wrap flags
 	AND.B #$01                  ; Test bit 0 (allow overflow)
-	BNE CODE_008A78             ; If set → Allow wrap to negative
+	BNE Input_CheckXWrap        ; If set → Allow wrap to negative
 
 ;-------------------------------------------------------------------------------
 
-CODE_008A71:
+Input_ClampX:
 	; X exceeded maximum, clamp to max-1
 	LDA.B $03                   ; A = max X
 	DEC A                       ; A = max - 1
 	STA.B $01                   ; X position = max - 1 (clamp)
-	BRA CODE_008A80             ; → Validate Y position
+	BRA Input_ValidateY         ; → Validate Y position
 
 ;-------------------------------------------------------------------------------
 
-CODE_008A78:
+Input_CheckXWrap:
 	; X position is negative or wrapped
 	LDA.B $95                   ; A = wrap flags
 	AND.B #$02                  ; Test bit 1 (allow negative)
-	BNE CODE_008A71             ; If set → Clamp to max-1
+	BNE Input_ClampX            ; If set → Clamp to max-1
 
 	STZ.B $01                   ; X position = 0 (clamp to minimum)
 
 ;-------------------------------------------------------------------------------
 
-CODE_008A80:
+Input_ValidateY:
 	; ===========================================================================
 	; Validate Vertical Position
 	; ===========================================================================
@@ -3489,19 +3489,19 @@ CODE_008A80:
 	; ===========================================================================
 
 	LDA.B $02                   ; A = Y position
-	BMI CODE_008A94             ; If negative → Check wrap flags
+	BMI Input_CheckYWrap        ; If negative → Check wrap flags
 
 	CMP.B $04                   ; Compare with max Y
-	BCC CODE_008A9C             ; If Y < max → Valid, exit
+	BCC Input_ValidateDone      ; If Y < max → Valid, exit
 
 	; Y position at or above maximum
 	LDA.B $95                   ; A = wrap flags
 	AND.B #$04                  ; Test bit 2 (allow overflow)
-	BNE CODE_008A94             ; If set → Allow wrap to negative
+	BNE Input_CheckYWrap        ; If set → Allow wrap to negative
 
 ;-------------------------------------------------------------------------------
 
-CODE_008A8E:
+Input_ClampY:
 	; Y exceeded maximum, clamp to max-1
 	LDA.B $04                   ; A = max Y
 	DEC A                       ; A = max - 1
@@ -3510,24 +3510,24 @@ CODE_008A8E:
 
 ;-------------------------------------------------------------------------------
 
-CODE_008A94:
+Input_CheckYWrap:
 	; Y position is negative or wrapped
 	LDA.B $95                   ; A = wrap flags
 	AND.B #$08                  ; Test bit 3 (allow negative)
-	BNE CODE_008A8E             ; If set → Clamp to max-1
+	BNE Input_ClampY            ; If set → Clamp to max-1
 
 	STZ.B $02                   ; Y position = 0 (clamp to minimum)
 
 ;-------------------------------------------------------------------------------
 
-CODE_008A9C:
+Input_ValidateDone:
 	RTS                         ; Return
 
 ;===============================================================================
 ; BUTTON HANDLER & MENU LOGIC ($008A9D-$008BFC)
 ;===============================================================================
 
-CODE_008A9D:
+Input_ButtonA_ToggleStatus:
 	; ===========================================================================
 	; A Button Handler - Toggle Character Status
 	; ===========================================================================
@@ -3535,12 +3535,12 @@ CODE_008A9D:
 	; Shows/hides detailed character information in battle mode.
 	; ===========================================================================
 
-	JSR.W CODE_008B57           ; Check if input allowed
-	BNE CODE_008ABC             ; If blocked → Exit
+	JSR.W Input_CheckAllowed    ; Check if input allowed
+	BNE Input_ButtonA_Exit      ; If blocked → Exit
 
 	; Check if in valid screen position
 	LDA.W $1090                 ; A = [$1090] (screen mode/position)
-	BMI CODE_008AB9             ; If negative → Call alternate handler
+	BMI Input_ButtonA_Alternate ; If negative → Call alternate handler
 
 	; Toggle character status display
 	LDA.W $10A0                 ; A = [$10A0] (character display flags)
@@ -3551,19 +3551,19 @@ CODE_008A9D:
 	TSB.W $00D4                 ; Set bit 6 of $00D4 (update needed)
 
 	JSR.W CODE_00B908           ; Update character display
-	BRA CODE_008ABC             ; → Exit
+	BRA Input_ButtonA_Exit      ; → Exit
 
 ;-------------------------------------------------------------------------------
 
-CODE_008AB9:
+Input_ButtonA_Alternate:
 	JSR.W CODE_00B912           ; Alternate character update routine
 
-CODE_008ABC:
+Input_ButtonA_Exit:
 	RTS                         ; Return
 
 ;-------------------------------------------------------------------------------
 
-CODE_008ABD:
+Menu_CheckCharPosition:
 	; ===========================================================================
 	; Check Character Position Validity
 	; ===========================================================================
@@ -3577,21 +3577,21 @@ CODE_008ABD:
 
 	LDA.W $1032                 ; A = [$1032] (X position)
 	CMP.B #$80                  ; Compare with $80
-	BNE CODE_008ACC             ; If not $80 → Jump to B908
+	BNE Menu_CheckCharPosition_Normal ; If not $80 → Jump to B908
 
 	LDA.W $1033                 ; A = [$1033] (Y position)
-	BNE CODE_008ACC             ; If not $00 → Jump to B908
+	BNE Menu_CheckCharPosition_Normal ; If not $00 → Jump to B908
 
 	JMP.W CODE_00B912           ; Special position → Call B912
 
 ;-------------------------------------------------------------------------------
 
-CODE_008ACC:
+Menu_CheckCharPosition_Normal:
 	JMP.W CODE_00B908           ; Normal position → Call B908
 
 ;-------------------------------------------------------------------------------
 
-CODE_008ACF:
+Menu_NavCharUp:
 	; ===========================================================================
 	; Menu Navigation - Character Selection (Up/Down)
 	; ===========================================================================
@@ -3599,10 +3599,10 @@ CODE_008ACF:
 	; Cycles through valid characters, skipping invalid/dead entries.
 	; ===========================================================================
 
-	JSR.W CODE_008B57           ; Check if input allowed
-	BNE CODE_008AF7             ; If blocked → Exit
+	JSR.W Input_CheckAllowed    ; Check if input allowed
+	BNE Menu_NavCharUp_Exit     ; If blocked → Exit
 
-	JSR.W CODE_008ABD           ; Validate character position
+	JSR.W Menu_CheckCharPosition ; Validate character position
 
 	; ---------------------------------------------------------------------------
 	; Calculate Current Character Index
@@ -3616,18 +3616,18 @@ CODE_008ACF:
 
 ;-------------------------------------------------------------------------------
 
-CODE_008ADF:
+Menu_NavCharUp_CalcIndex:
 	; Divide by 3 to get character slot
 	INX                         ; X++
 	SBC.B #$03                  ; A -= 3
-	BCS CODE_008ADF             ; If carry still set → Continue dividing
+	BCS Menu_NavCharUp_CalcIndex ; If carry still set → Continue dividing
 
 	; X now contains character index (0-3)
 	TXA                         ; A = character index
 
 ;-------------------------------------------------------------------------------
 
-CODE_008AE5:
+Menu_NavCharUp_FindNext:
 	; ===========================================================================
 	; Cycle to Next Valid Character
 	; ===========================================================================
@@ -3643,29 +3643,29 @@ CODE_008AE5:
 	PLA                         ; Restore character index
 
 	CPY.B #$FF                  ; Check if character invalid (Y = $FF)
-	BEQ CODE_008AE5             ; If invalid → Try next character
+	BEQ Menu_NavCharUp_FindNext ; If invalid → Try next character
 
 	; Valid character found
 	JSR.W CODE_008B21           ; Update character display
 	JSR.W CODE_008C3D           ; Refresh graphics
 
-CODE_008AF7:
+Menu_NavCharUp_Exit:
 	RTS                         ; Return
 
 ;-------------------------------------------------------------------------------
 
-CODE_008AF8:
+Menu_NavCharDown:
 	; ===========================================================================
 	; Menu Navigation - Character Selection (Down/Reverse)
 	; ===========================================================================
 	; Handles down navigation, cycles backwards through character list.
-	; Same as CODE_008ACF but decrements instead of increments.
+	; Same as Menu_NavCharUp but decrements instead of increments.
 	; ===========================================================================
 
-	JSR.W CODE_008B57           ; Check if input allowed
-	BNE CODE_008B20             ; If blocked → Exit
+	JSR.W Input_CheckAllowed    ; Check if input allowed
+	BNE Menu_NavCharDown_Exit   ; If blocked → Exit
 
-	JSR.W CODE_008ABD           ; Validate character position
+	JSR.W Menu_CheckCharPosition ; Validate character position
 
 	LDA.W $1031                 ; A = [$1031] (Y position)
 	SEC                         ; Set carry
@@ -3675,16 +3675,16 @@ CODE_008AF8:
 
 ;-------------------------------------------------------------------------------
 
-CODE_008B08:
+Menu_NavCharDown_CalcIndex:
 	INX                         ; X++
 	SBC.B #$03                  ; A -= 3
-	BCS CODE_008B08             ; If carry → Continue
+	BCS Menu_NavCharDown_CalcIndex ; If carry → Continue
 
 	TXA                         ; A = character index
 
 ;-------------------------------------------------------------------------------
 
-CODE_008B0E:
+Menu_NavCharDown_FindPrev:
 	; Cycle to previous valid character
 	DEC A                       ; A = previous character index
 	AND.B #$03                  ; A = A & $03 (wrap 0-3)
@@ -3694,12 +3694,12 @@ CODE_008B0E:
 	PLA                         ; Restore index
 
 	CPY.B #$FF                  ; Check if invalid
-	BEQ CODE_008B0E             ; If invalid → Try previous
+	BEQ Menu_NavCharDown_FindPrev ; If invalid → Try previous
 
 	JSR.W CODE_008B21           ; Update character display
 	JSR.W CODE_008C3D           ; Refresh graphics
 
-CODE_008B20:
+Menu_NavCharDown_Exit:
 	RTS                         ; Return
 
 ;-------------------------------------------------------------------------------
@@ -3771,7 +3771,7 @@ CODE_008B3E:
 
 ;-------------------------------------------------------------------------------
 
-CODE_008B57:
+Input_CheckAllowed:
 	; ===========================================================================
 	; Check Input Enable Flags
 	; ===========================================================================
@@ -3788,7 +3788,7 @@ CODE_008B57:
 
 	LDA.B #$10                  ; A = $10 (bit 4 mask)
 	AND.W $00D6                 ; Test bit 4 of $00D6
-	BEQ CODE_008B67             ; If clear → Input allowed, exit
+	BEQ Input_CheckAllowed_Exit ; If clear → Input allowed, exit
 
 	; Input blocked - mask controller state
 	REP #$30                    ; 16-bit A, X, Y
@@ -3799,11 +3799,11 @@ CODE_008B57:
 
 	SEP #$30                    ; 8-bit A, X, Y
 
-CODE_008B67:
+Input_CheckAllowed_Exit:
 	RTS                         ; Return (Z flag indicates input state)
 
 ; Padding/unused byte
-CODE_008B68:
+Unused_008B68:
 	RTS                         ; Return
 
 ;===============================================================================
