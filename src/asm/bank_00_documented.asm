@@ -12964,15 +12964,15 @@ CODE_00BFF9:
     LSR A
     ADC.W $1014,X                  ; Add current HP
     CMP.W $1016,X                  ; Check if exceeds max
-    BCC CODE_00C00D                ; If not, store
+    BCC Menu_Item_StoreHP          ; If not, store
     LDA.W $1016,X                  ; Use max HP
 
-CODE_00C00D:
+Menu_Item_StoreHP:
     STA.W $1014,X                  ; Store new HP
     BRA CODE_00BFC0                ; Update display
 
 ;-------------------------------------------------------------------------------
-; CODE_00C012: Confirm item discard dialog
+; Menu_Item_ConfirmDiscard: Confirm item discard dialog
 ;
 ; Purpose: Show confirmation dialog for discarding items
 ; Entry: A = item ID
@@ -12980,7 +12980,7 @@ CODE_00C00D:
 ; Calls: CODE_028AE0, CODE_00B908, CODE_00BE83
 ; Notes: Uses $04E0 for input tracking
 ;-------------------------------------------------------------------------------
-CODE_00C012:
+Menu_Item_ConfirmDiscard:
     PHX                            ; Save X
     SEP #$20                       ; 8-bit accumulator
     STA.W $043A                    ; Store item ID
@@ -12998,26 +12998,26 @@ DATA_00C02F:
     db $E8,$8F,$03,$DD,$8F,$03,$8A,$8F,$03
 
 ;-------------------------------------------------------------------------------
-; Spell Equip/Unequip System (CODE_00C038 - CODE_00C1D8)
+; Spell Equip/Unequip System (Menu_Spell_Equip - CODE_00C1D8)
 ;-------------------------------------------------------------------------------
-CODE_00C038:
+Menu_Spell_Equip:
     LDA.W #$0406                   ; Menu mode $0406
     STA.B $03                      ; Store in $03
     LDX.W #$FFF0                   ; Load $FFF0
     STX.B $8E                      ; Store in $8E
-    BRA CODE_00C08D                ; Jump to menu display
+    BRA Menu_Spell_DisplayMenu     ; Jump to menu display
 
 UNREACH_00C044:
     db $20,$12,$B9                 ; JSR CODE_00B912
 
-CODE_00C047:
+Menu_Spell_ProcessInput:
     LDA.W #$CFB0                   ; Button mask
     JSR.W CODE_00B930              ; Poll input
-    BNE CODE_00C08D                ; If button pressed, process
+    BNE Menu_Spell_DisplayMenu     ; If button pressed, process
     BIT.W #$0080                   ; Test B button
-    BNE CODE_00C098                ; If pressed, branch
+    BNE Menu_Spell_Cancel          ; If pressed, branch
     BIT.W #$8000                   ; Test A button
-    BEQ CODE_00C047                ; If not pressed, loop
+    BEQ Menu_Spell_ProcessInput    ; If not pressed, loop
     JSR.W CODE_00B91C              ; Set animation mode $10
     STZ.B $8E                      ; Clear $8E
     LDX.W #$C1D6                   ; Menu data
@@ -13028,18 +13028,18 @@ UNREACH_00C064:
     db $DE,$18,$10,$E2,$20,$A9,$14,$8D,$3A,$04,$22,$E0,$8A,$02,$AD,$DF
     db $04,$8D,$05,$05,$A9,$14,$4C,$F4,$BC
 
-CODE_00C08D:
+Menu_Spell_DisplayMenu:
     LDX.W #$C1D3                   ; Menu data
     JSR.W CODE_009BC4              ; Update menu
-    BRA CODE_00C047                ; Loop
+    BRA Menu_Spell_ProcessInput    ; Loop
 
 UNREACH_00C095:
     db $4C,$44,$C0                 ; JMP UNREACH_00C044
 
-CODE_00C098:
+Menu_Spell_Cancel:
     LDA.B $01                      ; Load character selection
     AND.W #$00FF                   ; Mask to 8 bits
-    BEQ CODE_00C0B2                ; If character 0, branch
+    BEQ Menu_Spell_ValidateSlot    ; If character 0, branch
     CMP.W #$0003                   ; Check if character 3
     BNE UNREACH_00C044             ; If not, error
     LDA.W $1090                    ; Load companion data
@@ -13048,7 +13048,7 @@ CODE_00C098:
     BEQ UNREACH_00C044             ; If none, error
     LDA.W #$0080                   ; Load $80 (companion offset)
 
-CODE_00C0B2:
+Menu_Spell_ValidateSlot:
     TAX                            ; X = character offset
     LDA.W $1021,X                  ; Load status flags
     AND.W #$00F9                   ; Mask out certain flags
@@ -13098,29 +13098,29 @@ CODE_00C10B:
     REP #$30                       ; 16-bit A/X/Y
     LDX.W #$C035                   ; Menu data
     JSR.W CODE_009BC4              ; Update menu
-    JMP.W CODE_00C08D              ; Loop
+    JMP.W Menu_Spell_DisplayMenu   ; Loop
 
-CODE_00C11F:
-    JSR.W CODE_00C1B1              ; Confirm spell use
-    BEQ CODE_00C138                ; If cancelled, loop
+Menu_Spell_UseCure:
+    JSR.W Menu_Spell_ConfirmUse    ; Confirm spell use
+    BEQ Menu_Spell_ReturnToInput   ; If cancelled, loop
     SEP #$20                       ; 8-bit accumulator
     CMP.B #$01                     ; Check result
-    BEQ CODE_00C12D                ; If 1, branch
+    BEQ Menu_Spell_CureCompanion   ; If 1, branch
     STZ.W $1021                    ; Clear status (char 0)
 
-CODE_00C12D:
+Menu_Spell_CureCompanion:
     CMP.B #$00                     ; Check if character 0
-    BEQ CODE_00C134                ; If yes, skip
+    BEQ Menu_Spell_FinishCure      ; If yes, skip
     STZ.W $10A1                    ; Clear companion status
 
-CODE_00C134:
+Menu_Spell_FinishCure:
     REP #$30                       ; 16-bit A/X/Y
-    BRA CODE_00C0FF                ; Continue
+    BRA Menu_Spell_DecrementMP     ; Continue
 
-CODE_00C138:
-    JMP.W CODE_00C047              ; Loop
+Menu_Spell_ReturnToInput:
+    JMP.W Menu_Spell_ProcessInput  ; Loop
 
-CODE_00C13B:
+Menu_Spell_UseHeal:
     JSR.W CODE_00C1B1              ; Confirm spell use
     BEQ CODE_00C138                ; If cancelled, loop
     PHA                            ; Save character offset
@@ -13138,35 +13138,35 @@ CODE_00C13B:
     CMP.W #$0001                   ; Check if character 1
     BEQ CODE_00C16F                ; If yes, skip HP calc
     LDA.W $1016                    ; Load max HP
-    JSR.W CODE_00C18D              ; Calculate percentage
+    JSR.W Menu_Spell_CalcPercent   ; Calculate percentage
     ADC.W $1014                    ; Add current HP
     CMP.W $1016                    ; Check if exceeds max
-    BCC CODE_00C16C                ; If not, store
+    BCC Menu_Spell_StoreHP_Main    ; If not, store
     LDA.W $1016                    ; Use max HP
 
-CODE_00C16C:
+Menu_Spell_StoreHP_Main:
     STA.W $1014                    ; Store new HP
 
-CODE_00C16F:
+Menu_Spell_HealCompanion:
     STY.B $98                      ; Restore recovery amount
     LDA.B $01,S                    ; Load character from stack
-    BEQ CODE_00C189                ; If character 0, skip
+    BEQ Menu_Spell_HealComplete    ; If character 0, skip
     LDA.W $1096                    ; Load companion max HP
-    JSR.W CODE_00C18D              ; Calculate percentage
+    JSR.W Menu_Spell_CalcPercent   ; Calculate percentage
     ADC.W $1094                    ; Add companion current HP
     CMP.W $1096                    ; Check if exceeds max
-    BCC CODE_00C186                ; If not, store
+    BCC Menu_Spell_StoreHP_Comp    ; If not, store
     LDA.W $1096                    ; Use max HP
 
-CODE_00C186:
+Menu_Spell_StoreHP_Comp:
     STA.W $1094                    ; Store companion HP
 
-CODE_00C189:
+Menu_Spell_HealComplete:
     PLA                            ; Restore character offset
-    JMP.W CODE_00C0FF              ; Continue
+    JMP.W Menu_Spell_DecrementMP   ; Continue
 
 ;-------------------------------------------------------------------------------
-; CODE_00C18D: Calculate percentage-based HP recovery
+; Menu_Spell_CalcPercent: Calculate percentage-based HP recovery
 ;
 ; Purpose: Calculate HP recovery as percentage of max HP
 ; Entry: A = max HP value
@@ -13174,7 +13174,7 @@ CODE_00C189:
 ; Exit: A = calculated recovery amount
 ; Uses: $98-$A0 for calculation
 ;-------------------------------------------------------------------------------
-CODE_00C18D:
+Menu_Spell_CalcPercent:
     STA.B $9C                      ; Store max HP
     JSL.L CODE_0096B3              ; Multiply routine
     LDA.B $9E                      ; Load result low
@@ -13186,23 +13186,23 @@ CODE_00C18D:
     JSL.L CODE_0096E4              ; Divide routine
     LDA.B $03,S                    ; Load character offset from stack
     CMP.W #$0080                   ; Check if companion
-    BNE CODE_00C1AD                ; If not, skip
+    BNE Menu_Spell_ReturnPercent   ; If not, skip
     db $46,$9E                     ; LSR $9E (halve result)
 
-CODE_00C1AD:
+Menu_Spell_ReturnPercent:
     LDA.B $9E                      ; Load result
     CLC                            ; Clear carry
     RTS
 
 ;-------------------------------------------------------------------------------
-; CODE_00C1B1: Spell use confirmation
+; Menu_Spell_ConfirmUse: Spell use confirmation
 ;
 ; Purpose: Confirm spell usage and show dialog
 ; Entry: $02 = spell slot
 ; Exit: A = character offset (0 or $80), Z flag set if cancelled
 ; Calls: CODE_028AE0, CODE_00B908, CODE_00BE83
 ;-------------------------------------------------------------------------------
-CODE_00C1B1:
+Menu_Spell_ConfirmUse:
     PHX                            ; Save X
     SEP #$20                       ; 8-bit accumulator
     LDA.B $02                      ; Load spell slot
