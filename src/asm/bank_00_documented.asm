@@ -6359,10 +6359,10 @@ Memory_Fill32:
 Memory_Fill16:
 	STA.W $0010,Y               ; Fill word at +$10
 
-CODE_009A05:
+Memory_Fill14Bytes:
 	STA.W $000E,Y               ; Fill word at +$0E
 
-CODE_009A08:
+Memory_Fill12Bytes:
 	STA.W $000C,Y               ; Fill word at +$0C
 	STA.W $000A,Y               ; Fill word at +$0A
 	STA.W $0008,Y               ; Fill word at +$08
@@ -7845,23 +7845,23 @@ Cmd_WaitVBlankCount:
 Cmd_WaitVBlankLoop:
 	JSL.L CODE_0096A0           ; Wait for VBlank
 	DEC A                       ; Decrement counter
-	BNE CODE_00A2A2             ; Loop until 0
+	BNE Cmd_WaitVBlankLoop      ; Loop until 0
 	RTS                         ; Return
 
 ; ---------------------------------------------------------------------------
 ; Indexed Color Palette Lookup
 ; ---------------------------------------------------------------------------
 
-CODE_00A2AA:
+Palette_IndexedLookup:
 	LDA.B [$17]                 ; Read palette index
 	INC.B $17                   ; Advance stream
 	AND.W #$00FF                ; Mask to byte
 	PHA                         ; Save index
-	BRA CODE_00A2B4_plus2       ; Skip to processing
+	BRA Palette_SearchTable_Entry ; Skip to processing
 
-CODE_00A2B4:
+Palette_SearchTable:
 	PEI.B ($9E)                 ; Save $9E
-CODE_00A2B4_plus2:
+Palette_SearchTable_Entry:
 	SEP #$20                    ; 8-bit A
 	LDX.W #$0000                ; X = 0 (table index)
 
@@ -9099,46 +9099,46 @@ CODE_00AB20:
 	STA.B $1A
 	LDA.B $24                      ; Load flags
 	BIT.W #$0008                   ; Test bit 3
-	BEQ CODE_00AB44                ; If clear, skip
+	BEQ Window_CalcBounds          ; If clear, skip
 	JSR.W CODE_00A8D1              ; Recalculate pointer
 	LDA.W #$8000                   ; Horizontal flip bit
 	TSB.B $64                      ; Set in flags
 
-CODE_00AB44:
+Window_CalcBounds:
 	SEP #$20                       ; 8-bit A
 	LDA.B $22                      ; Load Y position
 	LSR A                          ; / 8 (tile row)
 	LSR A
 	LSR A
 	CMP.B $28                      ; Compare with window top
-	BCS CODE_00AB52                ; If >= top, use it
+	BCS Window_CalcRowOffset       ; If >= top, use it
 	LDA.B $28                      ; Use window top
 	SEC
 
-CODE_00AB52:
+Window_CalcRowOffset:
 	SBC.B $28                      ; Calculate row offset
 	STA.B $62                      ; Store row counter
 	LDA.B $22                      ; Load Y again
 	CMP.B #$78                     ; Check if >= 120
-	BCC CODE_00AB64                ; If below, adjust
-	BNE CODE_00AB6A                ; If above, skip
+	BCC Window_AdjustHeight        ; If below, adjust
+	BNE Window_FinalizeHeight      ; If above, skip
 	LDA.B $24                      ; Check flags
 	BIT.B #$01                     ; Test bit 0
-	BEQ CODE_00AB6A                ; If clear, skip
+	BEQ Window_FinalizeHeight      ; If clear, skip
 
-CODE_00AB64:
+Window_AdjustHeight:
 	INC.B $62                      ; Increment row count
 	LDA.B #$40                     ; Clear bit $40
 	TRB.B $65                      ; In $65
 
-CODE_00AB6A:
+Window_FinalizeHeight:
 	LDA.B $62                      ; Load row counter
 	INC A                          ; +1
 	CMP.B $2A                      ; Compare with width
-	BCC CODE_00AB77                ; If less, use it
+	BCC Window_DrawBorder          ; If less, use it
 	db $A5,$2A,$E9,$02,$85,$62     ; Load width-2 into $62
 
-CODE_00AB77:
+Window_DrawBorder:
 	REP #$30                       ; 16-bit mode
 	LDA.B $62                      ; Load final count
 	AND.W #$00FF
@@ -9150,38 +9150,38 @@ CODE_00AB77:
 	RTS
 
 ;-------------------------------------------------------------------------------
-; CODE_00AB88 - Draw window frame (tiles $FC, $FF)
+; Window_DrawFrame - Draw window frame (tiles $FC, $FF)
 ;-------------------------------------------------------------------------------
-CODE_00AB88:
+Window_DrawFrame:
 	LDA.W #$00FC                   ; Top border tile
-	JSR.W CODE_00AD2D              ; Setup top edge
+	JSR.W Window_SetupTopEdge      ; Setup top edge
 	LDA.W #$00FF                   ; Fill tile
-	JSR.W CODE_00AD44              ; Setup vertical edges
+	JSR.W Window_SetupVerticalEdge ; Setup vertical edges
 	INC.B $62                      ; Adjust counter
 	LDA.W #$80FC                   ; Bottom border (flipped)
-	JSR.W CODE_00AD85              ; Draw
-	JMP.W CODE_00ACA6              ; Draw corners
+	JSR.W Window_DrawTiles         ; Draw
+	JMP.W Window_DrawFrameCorners  ; Draw corners
 
 ;-------------------------------------------------------------------------------
-; CODE_00AB9F - Draw window top border
+; Window_DrawTopBorder - Draw window top border
 ;-------------------------------------------------------------------------------
-CODE_00AB9F:
+Window_DrawTopBorder:
 	LDA.W #$00FC                   ; Border tile
-	JSR.W CODE_00AD2D              ; Setup top
+	JSR.W Window_SetupTopEdge      ; Setup top
 	LDA.B $2B                      ; Load height
 	AND.W #$00FF
 	DEC A                          ; -2 for borders
 	DEC A
-	JSR.W CODE_00ABFC              ; Fill routine
+	JSR.W Window_FillRows          ; Fill routine
 	INC.B $62                      ; Adjust
 	LDA.W #$80FC                   ; Bottom border
-	JSR.W CODE_00AD85              ; Draw
-	JMP.W CODE_00ACA6              ; Draw corners
+	JSR.W Window_DrawTiles         ; Draw
+	JMP.W Window_DrawFrameCorners  ; Draw corners
 
 ;-------------------------------------------------------------------------------
-; CODE_00ABBA - Draw simple filled box
+; Window_DrawFilledBox - Draw simple filled box
 ;-------------------------------------------------------------------------------
-CODE_00ABBA:
+Window_DrawFilledBox:
 	LDY.B $1A                      ; Load pointer
 	LDA.B $2A                      ; Load width
 	AND.W #$00FF
@@ -9189,42 +9189,42 @@ CODE_00ABBA:
 	TAX                            ; X = offset
 	LDA.B $2B                      ; Load height
 	AND.W #$00FF
-	JSR.W CODE_00ABFC              ; Fill
+	JSR.W Window_FillRows          ; Fill
 	STY.B $1A                      ; Update pointer
 	RTS
 
 ;-------------------------------------------------------------------------------
-; CODE_00ABCE - Draw item icon box (tiles $45)
+; Window_DrawItemIcon - Draw item icon box (tiles $45)
 ;-------------------------------------------------------------------------------
-CODE_00ABCE:
+Window_DrawItemIcon:
 	LDA.W #$0045                   ; Item icon tile
-	JSR.W CODE_00AD2D              ; Setup top
+	JSR.W Window_SetupTopEdge      ; Setup top
 	LDA.W #$00FF                   ; Fill
-	JSR.W CODE_00AD44              ; Setup edges
+	JSR.W Window_SetupVerticalEdge ; Setup edges
 	INC.B $62
 	LDA.W #$8045                   ; Flipped icon
-	JSR.W CODE_00AD85              ; Draw
-	JMP.W CODE_00ACD3              ; Finish
+	JSR.W Window_DrawTiles         ; Draw
+	JMP.W Window_DrawItemCorners   ; Finish
 
 ;-------------------------------------------------------------------------------
-; CODE_00ABE5 - Draw spell icon box (tiles $75)
+; Window_DrawSpellIcon - Draw spell icon box (tiles $75)
 ;-------------------------------------------------------------------------------
-CODE_00ABE5:
+Window_DrawSpellIcon:
 	LDA.W #$0075                   ; Spell icon tile
-	JSR.W CODE_00AD2D              ; Setup top
+	JSR.W Window_SetupTopEdge      ; Setup top
 	LDA.W #$00FF                   ; Fill
-	JSR.W CODE_00AD44              ; Setup edges
+	JSR.W Window_SetupVerticalEdge ; Setup edges
 	INC.B $62
 	LDA.W #$8075                   ; Flipped spell icon
-	JSR.W CODE_00AD85              ; Draw
-	JMP.W CODE_00AD00              ; Finish
+	JSR.W Window_DrawTiles         ; Draw
+	JMP.W Window_DrawSpellCorners  ; Finish
 
 ;-------------------------------------------------------------------------------
-; CODE_00ABFC - Tile fill routine with indirect jump
+; Window_FillRows - Tile fill routine with indirect jump
 ; Purpose: Complex tile filling using computed jump table
 ; Entry: A = row count, X = column offset × 2
 ;-------------------------------------------------------------------------------
-CODE_00ABFC:
+Window_FillRows:
 	STA.B $62                      ; Save row count
 	TXA                            ; Get column offset
 	ASL A                          ; × 2 again
@@ -9235,7 +9235,7 @@ CODE_00ABFC:
 	LSR A                          ; / 2
 	PHA                            ; Save to stack
 
-CODE_00AC0B:
+Window_FillLoop:
 	ADC.L $00015F                  ; Add to system counter
 	STA.L $00015F                  ; Update counter
 	JMP.W ($0064)                  ; Jump to computed address
@@ -9302,18 +9302,18 @@ CODE_00AC0B:
 	TAY                            ; Update Y
 	LDA.B $01,S                    ; Load saved value
 	DEC.B $62                      ; Decrement row counter
-	BEQ CODE_00ACA4                ; If zero, done
-	JMP.W CODE_00AC0B              ; Loop
+	BEQ Window_FillDone            ; If zero, done
+	JMP.W Window_FillLoop          ; Loop
 
-CODE_00ACA4:
+Window_FillDone:
 	PLA                            ; Clean stack
 	RTS
 
 ;-------------------------------------------------------------------------------
-; CODE_00ACA6 - Draw window corners (tiles $F7/$F9/$FB)
+; Window_DrawFrameCorners - Draw window corners (tiles $F7/$F9/$FB)
 ;-------------------------------------------------------------------------------
-CODE_00ACA6:
-	JSR.W CODE_00AD52              ; Setup coordinates
+Window_DrawFrameCorners:
+	JSR.W Window_CalcCornerPos     ; Setup coordinates
 	LDA.B $1D                      ; Load tile flags
 	EOR.W #$00F7                   ; Top-left corner
 	STA.B ($1A)                    ; Draw
@@ -9321,7 +9321,7 @@ CODE_00ACA6:
 	EOR.W #$00F9                   ; Top-right corner
 	STA.B ($1A),Y                  ; Draw
 	LDA.W #$00FB                   ; Side tiles
-	JSR.W CODE_00AD64              ; Draw sides
+	JSR.W Window_DrawSideTiles     ; Draw sides
 	LDA.B $1D
 	EOR.W #$00F8                   ; Bottom-left corner
 	STA.B ($1A)
@@ -9334,10 +9334,10 @@ CODE_00ACA6:
 	RTS
 
 ;-------------------------------------------------------------------------------
-; CODE_00ACD3 - Draw item icon corners (tiles $40-$44)
+; Window_DrawItemCorners - Draw item icon corners (tiles $40-$44)
 ;-------------------------------------------------------------------------------
-CODE_00ACD3:
-	JSR.W CODE_00AD52              ; Setup
+Window_DrawItemCorners:
+	JSR.W Window_CalcCornerPos     ; Setup
 	LDA.B $1D
 	EOR.W #$0040                   ; Icon TL
 	STA.B ($1A)
@@ -9345,7 +9345,7 @@ CODE_00ACD3:
 	EOR.W #$0042                   ; Icon TR
 	STA.B ($1A),Y
 	LDA.W #$0044                   ; Icon sides
-	JSR.W CODE_00AD64              ; Draw
+	JSR.W Window_DrawSideTiles     ; Draw
 	LDA.B $1D
 	EOR.W #$0041                   ; Icon BL
 	STA.B ($1A)
@@ -9358,10 +9358,10 @@ CODE_00ACD3:
 	RTS
 
 ;-------------------------------------------------------------------------------
-; CODE_00AD00 - Draw spell icon corners (tiles $70-$74)
+; Window_DrawSpellCorners - Draw spell icon corners (tiles $70-$74)
 ;-------------------------------------------------------------------------------
-CODE_00AD00:
-	JSR.W CODE_00AD52              ; Setup
+Window_DrawSpellCorners:
+	JSR.W Window_CalcCornerPos     ; Setup
 	LDA.B $1D
 	EOR.W #$0070                   ; Spell TL
 	STA.B ($1A)
@@ -9369,7 +9369,7 @@ CODE_00AD00:
 	EOR.W #$0072                   ; Spell TR
 	STA.B ($1A),Y
 	LDA.W #$0074                   ; Spell sides
-	JSR.W CODE_00AD64              ; Draw
+	JSR.W Window_DrawSideTiles     ; Draw
 	LDA.B $1D
 	EOR.W #$0071                   ; Spell BL
 	STA.B ($1A)
@@ -9382,10 +9382,10 @@ CODE_00AD00:
 	RTS
 
 ;-------------------------------------------------------------------------------
-; CODE_00AD2D - Setup top edge drawing
+; Window_SetupTopEdge - Setup top edge drawing
 ; Entry: A = tile value
 ;-------------------------------------------------------------------------------
-CODE_00AD2D:
+Window_SetupTopEdge:
 	PHA                            ; Save tile
 	LDY.B $1A                      ; Load pointer
 	INY                            ; Skip first tile
@@ -9399,13 +9399,13 @@ CODE_00AD2D:
 	LDA.W #$0001                   ; Single row
 	STA.B $62
 	PLA                            ; Restore tile
-	JMP.W CODE_00AD85              ; Draw
+	JMP.W Window_DrawTiles         ; Draw
 
 ;-------------------------------------------------------------------------------
-; CODE_00AD44 - Setup vertical edge drawing
+; Window_SetupVerticalEdge - Setup vertical edge drawing
 ; Entry: A = tile value
 ;-------------------------------------------------------------------------------
-CODE_00AD44:
+Window_SetupVerticalEdge:
 	PHA                            ; Save tile
 	LDA.B $2B                      ; Load height
 	AND.W #$00FF
@@ -9413,13 +9413,13 @@ CODE_00AD44:
 	DEC A
 	STA.B $62                      ; Row count
 	PLA                            ; Restore tile
-	JMP.W CODE_00AD85              ; Draw
+	JMP.W Window_DrawTiles         ; Draw
 
 ;-------------------------------------------------------------------------------
-; CODE_00AD52 - Calculate corner positions
+; Window_CalcCornerPos - Calculate corner positions
 ; Exit: Y = right edge offset, $62 = adjusted row count
 ;-------------------------------------------------------------------------------
-CODE_00AD52:
+Window_CalcCornerPos:
 	LDA.B $2A                      ; Width
 	AND.W #$00FF
 	DEC A                          ; -1
@@ -9433,10 +9433,10 @@ CODE_00AD52:
 	RTS
 
 ;-------------------------------------------------------------------------------
-; CODE_00AD64 - Draw vertical side tiles
+; Window_DrawSideTiles - Draw vertical side tiles
 ; Entry: A = tile value (XORed with $1D)
 ;-------------------------------------------------------------------------------
-CODE_00AD64:
+Window_DrawSideTiles:
 	EOR.B $1D                      ; Apply tile flags
 	STA.B $64                      ; Save tile
 	LDA.B $1A                      ; Advance to next row
@@ -9444,7 +9444,7 @@ CODE_00AD64:
 	STA.B $1A
 	LDX.B $62                      ; Load row counter
 
-CODE_00AD71:
+Window_DrawSideLoop:
 	LDA.B $64                      ; Load tile
 	STA.B ($1A)                    ; Draw left edge
 	EOR.W #$4000                   ; Flip horizontally
@@ -9453,33 +9453,33 @@ CODE_00AD71:
 	ADC.W #$0040
 	STA.B $1A
 	DEX                            ; Decrement counter
-	BNE CODE_00AD71                ; Loop
+	BNE Window_DrawSideLoop        ; Loop
 	RTS
 
 ;-------------------------------------------------------------------------------
-; CODE_00AD85 - Generic tile drawing routine
+; Window_DrawTiles - Generic tile drawing routine
 ; Entry: A = tile value (XORed with $1D), X = column offset
 ;-------------------------------------------------------------------------------
-CODE_00AD85:
+Window_DrawTiles:
 	EOR.B $1D                      ; Apply flags
 	STA.B $64                      ; Save tile
 
-CODE_00AD89:
+Window_DrawTileLoop:
 	JSR.W (DATA8_009A1E,X)         ; Call indexed routine
 	TYA                            ; Get pointer
 	ADC.W #$0040                   ; Next row
 	TAY
 	LDA.B $64                      ; Restore tile
 	DEC.B $62                      ; Decrement row counter
-	BNE CODE_00AD89                ; Loop
+	BNE Window_DrawTileLoop        ; Loop
 	RTS
 
 ;-------------------------------------------------------------------------------
-; CODE_00AD98 - Clear sprite OAM entries
+; Sprite_ClearOAM - Clear sprite OAM entries
 ; Purpose: Clear OAM sprite data in Bank $7E
 ; Entry: [$17] = number of sprites to clear
 ;-------------------------------------------------------------------------------
-CODE_00AD98:
+Sprite_ClearOAM:
 	LDA.B [$17]                    ; Load sprite count
 	INC.B $17
 	AND.W #$00FF
@@ -9490,7 +9490,7 @@ CODE_00AD98:
 	PLB                            ; Set data bank
 	SEC
 
-CODE_00ADAC:
+Sprite_ClearLoop:
 	TAX                            ; X = Y position
 	JSR.W CODE_009A05              ; Clear sprite entry
 	TYA                            ; Get OAM pointer
