@@ -223,7 +223,7 @@ LOOSE_OP_00BCF3 = $00BCF3 ; Continuation address in state machine
 
 org $008000
 
-CODE_008000:
+RESET_Handler:
 	; ===========================================================================
 	; SNES Power-On Boot Entry Point (RESET Vector Handler)
 	; ===========================================================================
@@ -256,7 +256,7 @@ CODE_008000:
 	XCE                         ; Exchange Carry with Emulation flag
 								; C=0 → E=0 → Native 65816 mode enabled!
 
-	JSR.W CODE_008247           ; Init_Hardware: Disable NMI, force blank, clear registers
+	JSR.W Init_Hardware         ; Init_Hardware: Disable NMI, force blank, clear registers
 	JSL.L CODE_0D8000           ; Bank $0D initialization (sound driver, APU setup)
 
 	; ---------------------------------------------------------------------------
@@ -270,11 +270,11 @@ CODE_008000:
 	STA.L $7E3667               ; Clear "save file exists" flag
 	DEC A                       ; A = $FF (-1)
 	STA.L $7E3668               ; Set save slot to $FF (no active save)
-	BRA CODE_008023             ; → Continue to stack setup
+	BRA Boot_SetupStack         ; → Continue to stack setup
 
 ;-------------------------------------------------------------------------------
 
-CODE_008016:
+Boot_Secondary:
 	; ===========================================================================
 	; Secondary Boot Entry Point
 	; ===========================================================================
@@ -282,7 +282,7 @@ CODE_008016:
 	; Different from main boot: calls different bank $0D init routine.
 	; ===========================================================================
 
-	JSR.W CODE_008247           ; Init_Hardware again
+	JSR.W Init_Hardware         ; Init_Hardware again
 
 	LDA.B #$F0                  ; A = $F0
 	STA.L $000600               ; Write $F0 to $000600 (low RAM mirror area)
@@ -292,7 +292,7 @@ CODE_008016:
 
 ;-------------------------------------------------------------------------------
 
-CODE_00803A:
+Boot_Alternate:
 	; ===========================================================================
 	; Third Entry Point (Soft Reset with Different Init)
 	; ===========================================================================
@@ -300,7 +300,7 @@ CODE_00803A:
 	; bank $0D initialization. May be used for returning from special modes.
 	; ===========================================================================
 
-	JSR.W CODE_008247           ; Init_Hardware
+	JSR.W Init_Hardware         ; Init_Hardware
 
 	LDA.B #$F0                  ; A = $F0
 	STA.L $000600               ; Write $F0 to $000600
@@ -313,7 +313,7 @@ CODE_00803A:
 
 ;-------------------------------------------------------------------------------
 
-CODE_008023:
+Boot_SetupStack:
 	; ===========================================================================
 	; Stack Setup and Main Initialization Path
 	; ===========================================================================
@@ -330,7 +330,7 @@ CODE_008023:
 	LDX.W #$1FFF                ; X = $1FFF (top of RAM bank $00)
 	TXS                         ; S = $1FFF (initialize stack pointer)
 
-	JSR.W CODE_0081F0           ; Clear_RAM: Zero out all work RAM $0000-$1FFF
+	JSR.W Clear_WorkRAM         ; Clear_RAM: Zero out all work RAM $0000-$1FFF
 
 	; ---------------------------------------------------------------------------
 	; Check Boot Mode Flag ($00DA bit 6)
@@ -341,14 +341,14 @@ CODE_008023:
 
 	LDA.W #$0040                ; A = $0040 (bit 6 mask)
 	AND.W $00DA                 ; Test bit 6 of $00DA
-	BNE CODE_00806E             ; If bit 6 set → Skip display init, jump ahead
+	BNE Boot_EnableNMI          ; If bit 6 set → Skip display init, jump ahead
 
 	JSL.L CODE_0C8080           ; Bank $0C: Full display/PPU initialization
-	BRA CODE_00804D             ; → Continue to DMA setup
+	BRA Boot_SetupDMA           ; → Continue to DMA setup
 
 ;-------------------------------------------------------------------------------
 
-CODE_00804D:
+Boot_SetupDMA:
 	; ===========================================================================
 	; DMA Transfer Setup - Copy Data to RAM
 	; ===========================================================================
@@ -392,7 +392,7 @@ CODE_00804D:
 
 ;-------------------------------------------------------------------------------
 
-CODE_00806E:
+Boot_EnableNMI:
 	; ===========================================================================
 	; Direct Page Setup and NMI Enable
 	; ===========================================================================
@@ -433,43 +433,43 @@ CODE_00806E:
 	; ---------------------------------------------------------------------------
 
 	LDA.L $7E3665               ; A = Continue flag
-	BNE CODE_0080A8             ; If set → Load existing game
+	BNE Load_SavedGame          ; If set → Load existing game
 
 	; Check if save data exists in SRAM
 	LDA.L $700000               ; A = SRAM byte 1
 	ORA.L $70038C               ; OR with SRAM byte 2
 	ORA.L $700718               ; OR with SRAM byte 3
-	BEQ CODE_0080AD             ; If all zero → New game (no save data)
+	BEQ Init_NewGame            ; If all zero → New game (no save data)
 
 	JSL.L CODE_00B950           ; Has save data → Show continue menu
-	BRA CODE_0080B0             ; → Continue to fade-in
+	BRA Boot_FadeIn             ; → Continue to fade-in
 
 ;-------------------------------------------------------------------------------
 
-CODE_0080A8:
+Load_SavedGame:
 	; ===========================================================================
 	; Load Saved Game from SRAM
 	; ===========================================================================
 	; Player selected "Continue" from title screen - load saved game data.
 	; ===========================================================================
 
-	JSR.W CODE_008166           ; Load_Game_From_SRAM: Restore all game state
-	BRA CODE_0080DC             ; → Skip new game init, jump to main setup
+	JSR.W Load_GameFromSRAM     ; Load_Game_From_SRAM: Restore all game state
+	BRA Boot_PostInit           ; → Skip new game init, jump to main setup
 
 ;-------------------------------------------------------------------------------
 
-CODE_0080AD:
+Init_NewGame:
 	; ===========================================================================
 	; New Game Initialization
 	; ===========================================================================
 	; No save data exists - initialize a fresh game state.
 	; ===========================================================================
 
-	JSR.W CODE_008117           ; Initialize_New_Game_State: Set default values
+	JSR.W Init_NewGameState     ; Initialize_New_Game_State: Set default values
 
 ;-------------------------------------------------------------------------------
 
-CODE_0080B0:
+Boot_FadeIn:
 	; ===========================================================================
 	; Screen Fade-In and Final Setup (Common Path)
 	; ===========================================================================
@@ -624,7 +624,7 @@ CODE_0080DC:
 ; NEW GAME INITIALIZATION ($008117-$008165)
 ;===============================================================================
 
-CODE_008117:
+Init_NewGameState:
 	; ===========================================================================
 	; Initialize New Game State
 	; ===========================================================================
@@ -710,7 +710,7 @@ CODE_008117:
 ; LOAD SAVED GAME ($008166-$0081D4)
 ;===============================================================================
 
-CODE_008166:
+Load_GameFromSRAM:
 	; ===========================================================================
 	; Load Game from SRAM
 	; ===========================================================================
@@ -897,7 +897,7 @@ DATA8_0081ED:
 ; RAM INITIALIZATION ($0081F0-$008227)
 ;===============================================================================
 
-CODE_0081F0:
+Clear_WorkRAM:
 	; ===========================================================================
 	; Clear All Work RAM
 	; ===========================================================================
@@ -969,11 +969,11 @@ CODE_0081F0:
 
 	LDA.L $7E3667               ; A = save file exists flag
 	AND.W #$00FF                ; Mask to 8-bit value
-	BEQ CODE_008227             ; If 0 (no save) → use default table
+	BEQ Load_InitDataTable      ; If 0 (no save) → use default table
 
 	LDX.W #$822D                ; X = $822D (alternate table for existing save)
 
-CODE_008227:
+Load_InitDataTable:
 	JMP.W CODE_009BC4           ; Load/process data table and return
 
 ;-------------------------------------------------------------------------------
@@ -992,7 +992,7 @@ DATA8_00822D:
 ; FINAL SETUP ROUTINE ($008230-$008246)
 ;===============================================================================
 
-CODE_008230:
+Boot_PostInit:
 	; ===========================================================================
 	; Final Setup Before Main Game
 	; ===========================================================================
@@ -1020,7 +1020,7 @@ CODE_008230:
 ; HARDWARE INITIALIZATION ($008247-$008251)
 ;===============================================================================
 
-CODE_008247:
+Init_Hardware:
 	; ===========================================================================
 	; Initialize SNES Hardware (Disable Display and Interrupts)
 	; ===========================================================================
@@ -1062,7 +1062,7 @@ DATA8_008252:
 ; VBLANK/NMI HANDLER AND DMA MANAGEMENT ($00825C-$008337)
 ;===============================================================================
 
-CODE_00825C:
+Init_VBlankDMA:
 	; ===========================================================================
 	; NMI/VBLANK Initialization and Setup
 	; ===========================================================================
@@ -1262,7 +1262,7 @@ DATA8_008334:
 ; MAIN NMI/VBLANK HANDLER ($008337-$0083E7)
 ;===============================================================================
 
-CODE_008337:
+NMI_Handler:
 	; ===========================================================================
 	; NMI (Non-Maskable Interrupt) Handler - VBLANK Routine
 	; ===========================================================================
@@ -1307,7 +1307,7 @@ CODE_008337:
 
 	LDA.B #$40                  ; A = $40 (bit 6 mask)
 	AND.W $00E2                 ; Test bit 6 of $00E2
-	BNE CODE_00837D             ; If set → Jump to special handler
+	BNE NMI_SpecialHandler      ; If set → Jump to special handler
 
 	; ---------------------------------------------------------------------------
 	; Check State Flag $00D4 Bit 1 (Tilemap DMA)
@@ -1315,7 +1315,7 @@ CODE_008337:
 
 	LDA.B #$02                  ; A = $02 (bit 1 mask)
 	AND.W $00D4                 ; Test bit 1 of $00D4
-	BNE CODE_00837A             ; If set → Tilemap DMA needed
+	BNE NMI_TilemapDMA          ; If set → Tilemap DMA needed
 
 	; ---------------------------------------------------------------------------
 	; Check State Flag $00DD Bit 6 (Graphics Upload)
@@ -1323,7 +1323,7 @@ CODE_008337:
 
 	LDA.B #$40                  ; A = $40 (bit 6 mask)
 	AND.W $00DD                 ; Test bit 6 of $00DD
-	BNE CODE_008385             ; If set → Graphics upload needed
+	BNE NMI_GraphicsUpload      ; If set → Graphics upload needed
 
 	; ---------------------------------------------------------------------------
 	; Check State Flag $00D8 Bit 7 (Battle Graphics)
@@ -1331,7 +1331,7 @@ CODE_008337:
 
 	LDA.B #$80                  ; A = $80 (bit 7 mask)
 	AND.W $00D8                 ; Test bit 7 of $00D8
-	BEQ CODE_008366             ; If clear → Skip battle graphics
+	BEQ NMI_CheckMoreFlags      ; If clear → Skip battle graphics
 
 	LDA.B #$80                  ; A = $80
 	TRB.W $00D8                 ; Test and Reset bit 7 of $00D8
@@ -1341,7 +1341,7 @@ CODE_008337:
 
 ;-------------------------------------------------------------------------------
 
-CODE_008366:
+NMI_CheckMoreFlags:
 	; ===========================================================================
 	; Check Additional DMA Flags
 	; ===========================================================================
@@ -1354,23 +1354,23 @@ CODE_008366:
 
 	LDA.B #$10                  ; A = $10 (bit 4 mask)
 	AND.W $00D2                 ; Test bit 4 of $00D2
-	BNE CODE_008377             ; If set → Special operation
+	BNE NMI_SpecialDMA          ; If set → Special operation
 
 	JMP.W CODE_008428           ; → Continue to additional handlers
 
 ;-------------------------------------------------------------------------------
 
-CODE_008377:
+NMI_SpecialDMA:
 	JMP.W CODE_00863D           ; Execute special DMA operation
 
 ;-------------------------------------------------------------------------------
 
-CODE_00837A:
+NMI_TilemapDMA:
 	JMP.W CODE_0083E8           ; Execute tilemap DMA transfer
 
 ;-------------------------------------------------------------------------------
 
-CODE_00837D:
+NMI_SpecialHandler:
 	; ===========================================================================
 	; Special Mode Handler (Indirect Jump)
 	; ===========================================================================
@@ -1388,7 +1388,7 @@ CODE_00837D:
 
 ;-------------------------------------------------------------------------------
 
-CODE_008385:
+NMI_GraphicsUpload:
 	; ===========================================================================
 	; Graphics Upload via DMA
 	; ===========================================================================
@@ -13705,7 +13705,7 @@ DATA_00C4D8:
 ; CODE_00C4DB - already a stub, implementing now
 CODE_00C4DB:
     JSR.W CODE_00C561              ; Clear WRAM buffer 1 ($7F5000)
-    JSR.W CODE_00C576              ; Clear WRAM buffer 2 ($7F51B7)  
+    JSR.W CODE_00C576              ; Clear WRAM buffer 2 ($7F51B7)
     JSR.W CODE_00C58B              ; Clear WRAM buffer 3 ($7F536E)
     JSR.W CODE_00C5A0              ; Clear WRAM buffer 4 ($7F551E)
     JSR.W CODE_00C604              ; Jump to CODE_00C5B5 (WRAM $7E3000)
@@ -13732,7 +13732,7 @@ DATA_00C51B:
     db $FF,$07,$50,$D9,$05,$51,$00,$42,$0E,$00,$50,$7F,$07,$50,$7F,$FF
     db $6E,$53,$D9,$6C,$54,$00,$42,$10,$67,$53,$7F,$6E,$53,$7F
 
-; Helper - Unknown purpose  
+; Helper - Unknown purpose
 CODE_00C539:
     PEA.W $007F                    ; Push $007F
     PLB                            ; Pull to data bank
