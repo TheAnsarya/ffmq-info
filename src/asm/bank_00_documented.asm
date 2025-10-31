@@ -13451,29 +13451,29 @@ DATA_00C345:
     db $94,$92,$03
 
 ;-------------------------------------------------------------------------------
-; Save File Deletion System (CODE_00C348 - CODE_00C3A2)
+; Save File Deletion System (Menu_SaveDelete - Menu_SaveDelete_UpdateCursor)
 ;-------------------------------------------------------------------------------
-CODE_00C348:
+Menu_SaveDelete:
     LDA.W #$0301                   ; Menu mode $0301
     STA.B $03                      ; Store in $03
     LDX.W #$0C00                   ; Load $0C00
     STX.B $8E                      ; Store in $8E
 
-CODE_00C352:
+Menu_SaveDelete_InputLoop:
     LDA.W #$8C80                   ; Button mask
     JSR.W CODE_00B930              ; Poll input
-    BNE CODE_00C39D                ; If button pressed, process
+    BNE Menu_SaveDelete_UpdateCursor ; If button pressed, process
     BIT.W #$0080                   ; Test B button
-    BNE CODE_00C36A                ; If pressed, cancel
+    BNE Menu_SaveDelete_Confirm    ; If pressed, cancel
     BIT.W #$8000                   ; Test A button
-    BEQ CODE_00C352                ; If not pressed, loop
+    BEQ Menu_SaveDelete_InputLoop  ; If not pressed, loop
 
-CODE_00C364:
+Menu_SaveDelete_Exit:
     JSR.W CODE_00B91C              ; Set animation mode $10
     STZ.B $8E                      ; Clear $8E
     RTS
 
-CODE_00C36A:
+Menu_SaveDelete_Confirm:
     JSR.W CODE_00B908              ; Set sprite mode $2D
     SEP #$20                       ; 8-bit accumulator
     LDA.B $02                      ; Load save slot selection
@@ -13491,11 +13491,11 @@ CODE_00C36A:
     JSR.W CODE_009BC4              ; Update menu
     LDA.B $9E                      ; Load result
     BIT.W #$8000                   ; Test bit 15
-    BNE CODE_00C364                ; If set, return
+    BNE Menu_SaveDelete_Exit       ; If set, return
     BIT.W #$0C00                   ; Test bits 10-11
-    BEQ CODE_00C352                ; If clear, loop
+    BEQ Menu_SaveDelete_InputLoop  ; If clear, loop
 
-CODE_00C39D:
+Menu_SaveDelete_UpdateCursor:
     LDA.W #$0000                   ; Load 0
     SEP #$20                       ; 8-bit accumulator
     LDA.B #$EC                     ; Load $EC
@@ -13504,12 +13504,12 @@ CODE_00C39D:
     STA.L $7F56DE                  ; Store to WRAM
     LDA.B $02                      ; Load option index
     CMP.B $06                      ; Compare with previous
-    BEQ CODE_00C3BD                ; If same, skip update
+    BEQ Menu_SaveDelete_UpdateDisplay ; If same, skip update
     STA.B $06                      ; Store new selection
     JSR.W CODE_00B91C              ; Update sprite
     LDA.B $06                      ; Reload selection
 
-CODE_00C3BD:
+Menu_SaveDelete_UpdateDisplay:
     ASL A                          ; × 2
     TAX                            ; Transfer to X
     LDA.B #$E0                     ; Load $E0
@@ -13520,74 +13520,74 @@ CODE_00C3BD:
     LDA.B #$08                     ; Bit 3 mask
     TRB.W $00D4                    ; Clear bit 3
     REP #$30                       ; 16-bit A/X/Y
-    JMP.W CODE_00C352              ; Jump back to loop
+    JMP.W Menu_SaveDelete_InputLoop ; Jump back to loop
 
 DATA_00C3D8:
     db $C3,$95,$03
 
 ;-------------------------------------------------------------------------------
-; Menu Scrolling System (CODE_00C3DB - CODE_00C439)
+; Menu Scrolling System (Menu_Scroll - Menu_Scroll_Down)
 ;-------------------------------------------------------------------------------
-CODE_00C3DB:
+Menu_Scroll:
     LDA.W #$0305                   ; Menu mode $0305
     STA.B $03                      ; Store in $03
     LDX.W #$FFF0                   ; Position offset (-16)
     STX.B $8E                      ; Set position
-    BRA CODE_00C439                ; Jump to menu display
+    BRA Menu_Scroll_Display        ; Jump to menu display
 
-CODE_00C3E7:
+Menu_Scroll_InputLoop:
     LDA.W #$CF30                   ; Button mask
     JSR.W CODE_00B930              ; Poll input
     BIT.W #$0300                   ; Test Y/X buttons
-    BNE CODE_00C407                ; If pressed, process
+    BNE Menu_Scroll_Process        ; If pressed, process
     BIT.W #$0C00                   ; Test L/R buttons
-    BNE CODE_00C439                ; If pressed, refresh
+    BNE Menu_Scroll_Display        ; If pressed, refresh
     BIT.W #$8000                   ; Test A button
-    BEQ CODE_00C3E7                ; If not pressed, loop
+    BEQ Menu_Scroll_InputLoop      ; If not pressed, loop
     JSR.W CODE_00B91C              ; Update sprite
     STZ.B $8E                      ; Clear position
     LDX.W #$C444                   ; Menu data
     JMP.W CODE_009BC4              ; Show menu
 
-CODE_00C407:
+Menu_Scroll_Process:
     SEP #$20                       ; 8-bit accumulator
     LDA.B $01                      ; Load menu option
     CMP.B #$04                     ; Check if option 4
-    BEQ CODE_00C423                ; If yes, scroll down
+    BEQ Menu_Scroll_Down           ; If yes, scroll down
     LDA.B $04                      ; Load scroll position
     CMP.B #$03                     ; Check if at top
-    BEQ CODE_00C437                ; If yes, can't scroll up
+    BEQ Menu_Scroll_Update         ; If yes, can't scroll up
     DEC.B $04                      ; Decrement scroll
     LDA.B $02                      ; Load current index
     SBC.B #$02                     ; Subtract 2
-    BCS CODE_00C41F                ; If no underflow, continue
+    BCS Menu_Scroll_StoreIndex     ; If no underflow, continue
     LDA.B #$00                     ; Clamp to 0
 
-CODE_00C41F:
+Menu_Scroll_StoreIndex:
     STA.B $02                      ; Store new index
-    BRA CODE_00C437                ; Continue
+    BRA Menu_Scroll_Update         ; Continue
 
-CODE_00C423:
+Menu_Scroll_Down:
     LDA.B $04                      ; Load scroll position
     CMP.B #$04                     ; Check if at bottom
-    BEQ CODE_00C437                ; If yes, can't scroll down
+    BEQ Menu_Scroll_Update         ; If yes, can't scroll down
     INC.B $04                      ; Increment scroll
     LDA.B $02                      ; Load current index
     ADC.B #$02                     ; Add 2
     CMP.B #$04                     ; Check if >= 4
-    BNE CODE_00C435                ; If not, continue
+    BNE Menu_Scroll_StoreClamp     ; If not, continue
     LDA.B #$03                     ; Clamp to 3
 
-CODE_00C435:
+Menu_Scroll_StoreClamp:
     STA.B $02                      ; Store new index
 
-CODE_00C437:
+Menu_Scroll_Update:
     REP #$30                       ; 16-bit A/X/Y
 
-CODE_00C439:
+Menu_Scroll_Display:
     LDX.W #$C441                   ; Menu data
     JSR.W CODE_009BC4              ; Update menu
-    BRA CODE_00C3E7                ; Loop
+    BRA Menu_Scroll_InputLoop      ; Loop
 
 DATA_00C441:
     db $8E,$90,$03
@@ -13596,56 +13596,56 @@ DATA_00C444:
     db $47,$91,$03
 
 ;-------------------------------------------------------------------------------
-; Another Menu Scrolling System (CODE_00C447 - CODE_00C494)
+; Another Menu Scrolling System (Menu_Scroll2 - Menu_Scroll2_Bottom)
 ;-------------------------------------------------------------------------------
-CODE_00C447:
+Menu_Scroll2:
     LDA.W #$0305                   ; Menu mode $0305
     STA.B $03                      ; Store in $03
     LDX.W #$FFF0                   ; Position offset (-16)
     STX.B $8E                      ; Set position
-    BRA CODE_00C494                ; Jump to menu display
+    BRA Menu_Scroll2_Display       ; Jump to menu display
 
-CODE_00C453:
+Menu_Scroll2_InputLoop:
     LDA.W #$CF30                   ; Button mask
     JSR.W CODE_00B930              ; Poll input
     BIT.W #$0300                   ; Test Y/X buttons
-    BNE CODE_00C473                ; If pressed, process
+    BNE Menu_Scroll2_Process       ; If pressed, process
     BIT.W #$0C00                   ; Test L/R buttons
-    BNE CODE_00C494                ; If pressed, refresh
+    BNE Menu_Scroll2_Display       ; If pressed, refresh
     BIT.W #$8000                   ; Test A button
-    BEQ CODE_00C453                ; If not pressed, loop
+    BEQ Menu_Scroll2_InputLoop     ; If not pressed, loop
     JSR.W CODE_00B91C              ; Update sprite
     STZ.B $8E                      ; Clear position
     LDX.W #$C49F                   ; Menu data
     JMP.W CODE_009BC4              ; Show menu
 
-CODE_00C473:
+Menu_Scroll2_Process:
     SEP #$20                       ; 8-bit accumulator
     LDA.B $01                      ; Load menu option
     CMP.B #$04                     ; Check if option 4
-    BEQ CODE_00C488                ; If yes, scroll to bottom
+    BEQ Menu_Scroll2_Bottom        ; If yes, scroll to bottom
     LDA.B #$03                     ; Load 3
     CMP.B $04                      ; Compare with scroll position
-    BEQ CODE_00C492                ; If equal, done
+    BEQ Menu_Scroll2_Update        ; If equal, done
     STA.B $04                      ; Store 3
     DEC A                          ; Decrement to 2
     STA.B $02                      ; Store index
-    BRA CODE_00C492                ; Continue
+    BRA Menu_Scroll2_Update        ; Continue
 
-CODE_00C488:
+Menu_Scroll2_Bottom:
     LDA.B #$01                     ; Load 1
     CMP.B $04                      ; Compare with scroll position
-    BEQ CODE_00C492                ; If equal, done
+    BEQ Menu_Scroll2_Update        ; If equal, done
     STA.B $04                      ; Store 1
     STZ.B $02                      ; Clear index
 
-CODE_00C492:
+Menu_Scroll2_Update:
     REP #$30                       ; 16-bit A/X/Y
 
-CODE_00C494:
+Menu_Scroll2_Display:
     LDX.W #$C49C                   ; Menu data
     JSR.W CODE_009BC4              ; Update menu
-    BRA CODE_00C453                ; Loop
+    BRA Menu_Scroll2_InputLoop     ; Loop
 
 DATA_00C49C:
     db $E3,$91,$03
@@ -13654,29 +13654,29 @@ DATA_00C49F:
     db $47,$91,$03
 
 ;-------------------------------------------------------------------------------
-; Wait Loop with Input Polling (CODE_00C4A2 - CODE_00C4D7)
+; Wait Loop with Input Polling (Menu_WaitInput - Menu_WaitInput_Confirm)
 ;-------------------------------------------------------------------------------
-CODE_00C4A2:
+Menu_WaitInput:
     LDX.W #$FFF0                   ; Position offset (-16)
     STX.B $8E                      ; Set position
 
-CODE_00C4A7:
+Menu_WaitInput_Loop:
     JSL.L CODE_0096A0              ; Call external routine
     LDA.W #$0080                   ; Bit 7 mask
     AND.W $00D9                    ; Test flag
-    BEQ CODE_00C4C1                ; If clear, continue
+    BEQ Menu_WaitInput_Poll        ; If clear, continue
     db $A9,$80,$00,$1C,$D9,$00,$A2,$D8,$C4,$20,$C4,$9B,$80,$E6  ; Data/unreachable
 
-CODE_00C4C1:
+Menu_WaitInput_Poll:
     LDA.B $07                      ; Load input result
     AND.W #$BFCF                   ; Mask buttons
-    BEQ CODE_00C4A7                ; If no button, loop
+    BEQ Menu_WaitInput_Loop        ; If no button, loop
     AND.W #$8000                   ; Test A button
-    BNE CODE_00C4D2                ; If pressed, confirm
+    BNE Menu_WaitInput_Confirm     ; If pressed, confirm
     JSR.W CODE_00B912              ; Update sprite mode
-    BRA CODE_00C4A7                ; Loop
+    BRA Menu_WaitInput_Loop        ; Loop
 
-CODE_00C4D2:
+Menu_WaitInput_Confirm:
     JSR.W CODE_00B91C              ; Update sprite
     STZ.B $8E                      ; Clear position
     RTS
@@ -13691,12 +13691,12 @@ DATA_00C4D8:
 ;===============================================================================
 
 ; CODE_00C4DB - already a stub, implementing now
-CODE_00C4DB:
-    JSR.W CODE_00C561              ; Clear WRAM buffer 1 ($7F5000)
-    JSR.W CODE_00C576              ; Clear WRAM buffer 2 ($7F51B7)
-    JSR.W CODE_00C58B              ; Clear WRAM buffer 3 ($7F536E)
-    JSR.W CODE_00C5A0              ; Clear WRAM buffer 4 ($7F551E)
-    JSR.W CODE_00C604              ; Jump to CODE_00C5B5 (WRAM $7E3000)
+WRAM_BattleMenu_Init:
+    JSR.W WRAM_ClearBuffer1        ; Clear WRAM buffer 1 ($7F5000)
+    JSR.W WRAM_ClearBuffer2        ; Clear WRAM buffer 2 ($7F51B7)
+    JSR.W WRAM_ClearBuffer3        ; Clear WRAM buffer 3 ($7F536E)
+    JSR.W WRAM_ClearBuffer4        ; Clear WRAM buffer 4 ($7F551E)
+    JSR.W WRAM_FillData            ; Jump to CODE_00C5B5 (WRAM $7E3000)
     LDX.W #$C51B                   ; Source data pointer
     LDY.W #$5000                   ; Dest: WRAM $7F5000
     LDA.W #$0006                   ; 7 bytes
@@ -13721,21 +13721,21 @@ DATA_00C51B:
     db $6E,$53,$D9,$6C,$54,$00,$42,$10,$67,$53,$7F,$6E,$53,$7F
 
 ; Helper - Unknown purpose
-CODE_00C539:
+WRAM_BattleMenu_Update:
     PEA.W $007F                    ; Push $007F
     PLB                            ; Pull to data bank
     LDY.W #$5016                   ; WRAM address
-    JSR.W CODE_00C54B              ; Call fill routine
+    JSR.W WRAM_BattleMenu_FillSection ; Call fill routine
     LDY.W #$537D                   ; WRAM address
-    JSR.W CODE_00C54B              ; Call fill routine
+    JSR.W WRAM_BattleMenu_FillSection ; Call fill routine
     PLB                            ; Restore data bank
     RTS
 
-CODE_00C54B:
+WRAM_BattleMenu_FillSection:
     LDX.W #$000D                   ; 13 iterations
     CLC                            ; Clear carry
 
-CODE_00C54F:
+WRAM_BattleMenu_FillLoop:
     SEP #$20                       ; 8-bit accumulator
     LDA.B #$00                     ; Value 0
     JSR.W CODE_0099EA              ; Write to WRAM
@@ -13744,49 +13744,49 @@ CODE_00C54F:
     ADC.W #$0020                   ; Add $20 (32 bytes)
     TAY                            ; Back to Y
     DEX                            ; Decrement counter
-    BNE CODE_00C54F                ; Loop if not zero
+    BNE WRAM_BattleMenu_FillLoop   ; Loop if not zero
     RTS
 
 ;-------------------------------------------------------------------------------
 ; WRAM Buffer Clear Routines
 ;-------------------------------------------------------------------------------
-CODE_00C561:
+WRAM_ClearBuffer1:
     LDA.W #$0000                   ; Clear value
     STA.L $7F5007                  ; Write to $7F5007
     LDX.W #$5007                   ; Source
     LDY.W #$5009                   ; Dest
     LDA.W #$01AD                   ; 430 bytes
     MVN $7F,$7F                    ; Fill $7F5007-$7F51B5 with 0
-    BRA CODE_00C5F5                ; Continue
+    BRA WRAM_SetupBattleSprites1   ; Continue
 
-CODE_00C576:
+WRAM_ClearBuffer2:
     LDA.W #$0100                   ; Value $0100
     STA.L $7F51B7                  ; Write to $7F51B7
     LDX.W #$51B7                   ; Source
     LDY.W #$51B9                   ; Dest
     LDA.W #$01AD                   ; 430 bytes
     MVN $7F,$7F                    ; Fill $7F51B7-$7F5365 with $0100
-    BRA CODE_00C5F5                ; Continue
+    BRA WRAM_SetupBattleSprites1   ; Continue
 
-CODE_00C58B:
+WRAM_ClearBuffer3:
     LDA.W #$0000                   ; Clear value
     STA.L $7F536E                  ; Write to $7F536E
     LDX.W #$536E                   ; Source
     LDY.W #$5370                   ; Dest
     LDA.W #$01AD                   ; 430 bytes
     MVN $7F,$7F                    ; Fill $7F536E-$7F551C with 0
-    BRA CODE_00C5CF                ; Continue
+    BRA WRAM_SetupBattleSprites2   ; Continue
 
-CODE_00C5A0:
+WRAM_ClearBuffer4:
     LDA.W #$0100                   ; Value $0100
     STA.L $7F551E                  ; Write to $7F551E
     LDX.W #$551E                   ; Source
     LDY.W #$5520                   ; Dest
     LDA.W #$01AD                   ; 430 bytes
     MVN $7F,$7F                    ; Fill $7F551E-$7F56CC with $0100
-    BRA CODE_00C5CF                ; Continue
+    BRA WRAM_SetupBattleSprites2   ; Continue
 
-CODE_00C5B5:
+WRAM_FillData:
     LDA.W #$0000                   ; Clear value
     STA.L $7E3007                  ; Write to $7E3007
     LDX.W #$3007                   ; Source
@@ -13797,7 +13797,7 @@ CODE_00C5B5:
     STA.W $31B5                    ; Store at $7E31B5
     RTS
 
-CODE_00C5CF:
+WRAM_SetupBattleSprites2:
     TYA                            ; Y to A
     SEC                            ; Set carry
     SBC.W #$0042                   ; Subtract $42
@@ -13805,57 +13805,57 @@ CODE_00C5CF:
     LDX.W #$C5E7                   ; Data pointer
     LDA.L $000EC6                  ; Load battle speed flag
     AND.W #$0080                   ; Test bit 7
-    BEQ CODE_00C5E4                ; If clear, use first data
+    BEQ WRAM_SetupBattleSprites2_Continue ; If clear, use first data
     db $A2,$F0,$C5                 ; LDX #$C5F0 (alternate data)
 
-CODE_00C5E4:
-    JMP.W CODE_00C75B              ; Jump to sprite setup
+WRAM_SetupBattleSprites2_Continue:
+    JMP.W WRAM_SetupSprites        ; Jump to sprite setup
 
 DATA_00C5E7:
     db $0C,$20,$06,$24,$06,$26,$08,$28,$00
     db $18,$20,$08,$28,$00
 
-CODE_00C5F5:
+WRAM_SetupBattleSprites1:
     TYA                            ; Y to A
     SEC                            ; Set carry
     SBC.W #$0042                   ; Subtract $42
     TAY                            ; Back to Y
     LDX.W #$C601                   ; Data pointer
-    JMP.W CODE_00C75B              ; Jump to sprite setup
+    JMP.W WRAM_SetupSprites        ; Jump to sprite setup
 
 DATA_00C601:
     db $20,$28,$00
 
-CODE_00C604:
-    JMP.W CODE_00C5B5              ; Jump to WRAM clear
+WRAM_FillData_Jump:
+    JMP.W WRAM_FillData            ; Jump to WRAM clear
 
 ;-------------------------------------------------------------------------------
 ; Screen Setup Routines
 ;-------------------------------------------------------------------------------
-CODE_00C607:
-    JSR.W CODE_00C5B5              ; Clear WRAM $7E3000
+Screen_Setup1:
+    JSR.W WRAM_FillData            ; Clear WRAM $7E3000
     LDA.W #$0060                   ; Value $60
     LDX.W #$3025                   ; Address $7E3025
-    JSR.W CODE_00C65A              ; Fill 8 words
+    JSR.W Screen_FillWords         ; Fill 8 words
     LDX.W #$3035                   ; Address $7E3035
-    BRA CODE_00C62C                ; Continue
+    BRA Screen_FillWords_Alt       ; Continue
 
-CODE_00C618:
-    JSR.W CODE_00C561              ; Clear WRAM buffer 1
+Screen_Setup2:
+    JSR.W WRAM_ClearBuffer1        ; Clear WRAM buffer 1
     LDA.W #$0030                   ; Value $30
     LDX.W #$50F5                   ; Address $7F50F5
-    BRA CODE_00C62C                ; Continue
+    BRA Screen_FillWords_Alt       ; Continue
 
-CODE_00C623:
-    JSR.W CODE_00C576              ; Clear WRAM buffer 2
+Screen_Setup3:
+    JSR.W WRAM_ClearBuffer2        ; Clear WRAM buffer 2
     LDA.W #$0030                   ; Value $30
     LDX.W #$52A5                   ; Address $7F52A5
 
-CODE_00C62C:
-    JSR.W CODE_00C65A              ; Fill 8 words
+Screen_FillWords_Alt:
+    JSR.W Screen_FillWords         ; Fill 8 words
     SEC                            ; Set carry
 
-CODE_00C630:
+Screen_FillWords_Loop:
     STA.W $0010,X                  ; Store at X+$10
     STA.W $0012,X                  ; Store at X+$12
     STA.W $0014,X                  ; Store at X+$14
@@ -13872,11 +13872,11 @@ CODE_00C630:
     SEP #$20                       ; 8-bit accumulator
     TYA                            ; Y to A
     SBC.B #$07                     ; Subtract 7
-    BNE CODE_00C630                ; Loop if not zero
+    BNE Screen_FillWords_Loop      ; Loop if not zero
     REP #$30                       ; 16-bit A/X/Y
     RTS
 
-CODE_00C65A:
+Screen_FillWords:
     SEP #$20                       ; 8-bit accumulator
     STA.W $0000,X                  ; Store at X+0
     STA.W $0002,X                  ; Store at X+2
@@ -13888,33 +13888,33 @@ CODE_00C65A:
     STA.W $000E,X                  ; Store at X+14
     RTS
 ; ==============================================================================
-; Screen Setup and Sprite Systems - CODE_00C675+
+; Screen Setup and Sprite Systems - Battle_SetupSprites+
 ; ==============================================================================
 
-CODE_00C675:
+Battle_SetupSprites1:
     LDY.W #$521D                         ;00C675|A01D52  |      ;
     PHB                                  ;00C678|8B      |      ;
     PHY                                  ;00C679|5A      |      ;
-    JSR.W CODE_00C576                    ;00C67A|2076C5  |00C576;
+    JSR.W WRAM_ClearBuffer2              ;00C67A|2076C5  |00C576;
     PLY                                  ;00C67D|7A      |      ;
     LDX.W #$C686                         ;00C67E|A286C6  |      ;
-    JSR.W CODE_00C75B                    ;00C681|205BC7  |00C75B;
+    JSR.W WRAM_SetupSprites              ;00C681|205BC7  |00C75B;
     PLB                                  ;00C684|AB      |      ;
     RTS                                  ;00C685|60      |      ;
 
 DATA_00C686:
     db $0C,$04,$18,$08,$00               ;00C686|        |      ;
 
-CODE_00C68B:
+Battle_SetupSprites2:
     PHB                                  ;00C68B|8B      |      ;
-    JSR.W CODE_00C576                    ;00C68C|2076C5  |00C576;
+    JSR.W WRAM_ClearBuffer2              ;00C68C|2076C5  |00C576;
     LDX.W #$C6A6                         ;00C68F|A2A6C6  |      ;
     LDY.W #$522D                         ;00C692|A02D52  |      ;
-    JSR.W CODE_00C75B                    ;00C695|205BC7  |00C75B;
-    JSR.W CODE_00C5A0                    ;00C698|20A0C5  |00C5A0;
+    JSR.W WRAM_SetupSprites              ;00C695|205BC7  |00C75B;
+    JSR.W WRAM_ClearBuffer4              ;00C698|20A0C5  |00C5A0;
     LDX.W #$C6B3                         ;00C69B|A2B3C6  |      ;
     LDY.W #$5634                         ;00C69E|A03456  |      ;
-    JSR.W CODE_00C75B                    ;00C6A1|205BC7  |00C75B;
+    JSR.W WRAM_SetupSprites              ;00C6A1|205BC7  |00C75B;
     PLB                                  ;00C6A4|AB      |      ;
     RTS                                  ;00C6A5|60      |      ;
 
@@ -13924,16 +13924,16 @@ DATA_00C6A6:
 DATA_00C6B3:
     db $1C,$04,$10,$08,$00               ;00C6B3|        |      ;
 
-CODE_00C6B8:
+Battle_SetupSprites3:
     PHB                                  ;00C6B8|8B      |      ;
-    JSR.W CODE_00C576                    ;00C6B9|2076C5  |00C576;
+    JSR.W WRAM_ClearBuffer2              ;00C6B9|2076C5  |00C576;
     LDX.W #$C6D3                         ;00C6BC|A2D3C6  |      ;
     LDY.W #$528D                         ;00C6BF|A08D52  |      ;
-    JSR.W CODE_00C75B                    ;00C6C2|205BC7  |00C75B;
-    JSR.W CODE_00C5A0                    ;00C6C5|20A0C5  |00C5A0;
+    JSR.W WRAM_SetupSprites              ;00C6C2|205BC7  |00C75B;
+    JSR.W WRAM_ClearBuffer4              ;00C6C5|20A0C5  |00C5A0;
     LDX.W #$C6D6                         ;00C6C8|A2D6C6  |      ;
     LDY.W #$5574                         ;00C6CB|A07455  |      ;
-    JSR.W CODE_00C75B                    ;00C6CE|205BC7  |00C75B;
+    JSR.W WRAM_SetupSprites              ;00C6CE|205BC7  |00C75B;
     PLB                                  ;00C6D1|AB      |      ;
     RTS                                  ;00C6D2|60      |      ;
 
@@ -13944,9 +13944,9 @@ DATA_00C6D6:
     db $0C,$04,$14,$08,$0C,$0C,$34,$10,$0C,$14,$0C,$18,$0C ;00C6D6|        |      ;
     db $1C,$08,$20,$00                   ;00C6E3|        |      ;
 
-CODE_00C6E7:
+Battle_SetupSprites4:
     PHB                                  ;00C6E7|8B      |      ;
-    JSR.W CODE_00C576                    ;00C6E8|2076C5  |00C576;
+    JSR.W WRAM_ClearBuffer2              ;00C6E8|2076C5  |00C576;
     LDX.W #$C73F                         ;00C6EB|A23FC7  |      ;
     LDY.W #$527D                         ;00C6EE|A07D52  |      ;
     JSR.W CODE_00C75B                    ;00C6F1|205BC7  |00C75B;
@@ -13984,19 +13984,19 @@ DATA_00C744:
     db $06,$04,$06,$06,$0C,$08,$24,$0C,$06,$10,$06,$12,$0C,$14,$24,$18 ;00C744|        |      ;
     db $06,$1C,$06,$1E,$08,$20,$00       ;00C754|        |      ;
 ; ==============================================================================
-; Sprite Display System and Save/Load Operations - CODE_00C75B+
+; Sprite Display System and Save/Load Operations - WRAM_SetupSprites+
 ; ==============================================================================
 
-CODE_00C75B:
+WRAM_SetupSprites:
     PHB                                  ;00C75B|8B      |      ;
     PHB                                  ;00C75C|8B      |      ;
     PLA                                  ;00C75D|68      |      ;
     STA.L $000031                        ;00C75E|8F310000|000031;
     SEP #$20                             ;00C762|E220    |      ;
 
-CODE_00C764:
+WRAM_SetupSprites_Loop:
     LDA.L $000000,X                      ;00C764|BF000000|000000;
-    BEQ CODE_00C78A                      ;00C768|F020    |00C78A;
+    BEQ WRAM_SetupSprites_Done           ;00C768|F020    |00C78A;
     XBA                                  ;00C76A|EB      |      ;
     LDA.L $000001,X                      ;00C76B|BF010000|000001;
     STA.W $0000,Y                        ;00C76F|990000  |7F0000;
@@ -14012,27 +14012,27 @@ CODE_00C764:
     INY                                  ;00C77D|C8      |      ;
     JSR.W $0030                          ;00C77E|203000  |000030;
     PLX                                  ;00C781|FA      |      ;
-    BRA CODE_00C786                      ;00C782|8002    |00C786;
+    BRA WRAM_SetupSprites_Continue       ;00C782|8002    |00C786;
 
 UNREACH_00C784:
     db $C8,$C8                           ;00C784|        |      ;
 
-CODE_00C786:
+WRAM_SetupSprites_Continue:
     INX                                  ;00C786|E8      |      ;
     INX                                  ;00C787|E8      |      ;
-    BRA CODE_00C764                      ;00C788|80DA    |00C764;
+    BRA WRAM_SetupSprites_Loop           ;00C788|80DA    |00C764;
 
-CODE_00C78A:
+WRAM_SetupSprites_Done:
     REP #$30                             ;00C78A|C230    |      ;
     RTS                                  ;00C78C|60      |      ;
 
-CODE_00C78D:
+Screen_DisableDMA:
     SEP #$20                             ;00C78D|E220    |      ;
     LDA.B #$C0                           ;00C78F|A9C0    |      ;
     TRB.W $0111                          ;00C791|1C1101  |000111;
     RTS                                  ;00C794|60      |      ;
 
-CODE_00C795:
+Screen_WaitForUpdate:
     PHP                                  ;00C795|08      |      ;
     SEP #$20                             ;00C796|E220    |      ;
     LDA.B #$80                           ;00C798|A980    |      ;
@@ -14042,32 +14042,32 @@ CODE_00C795:
     STA.W $0110                          ;00C7A2|8D1001  |000110;
     LDA.W $00AA                          ;00C7A5|ADAA00  |0000AA;
 
-CODE_00C7A8:
+Screen_WaitForUpdate_Loop:
     CMP.W $0110                          ;00C7A8|CD1001  |000110;
-    BEQ CODE_00C7B6                      ;00C7AB|F009    |00C7B6;
+    BEQ Screen_WaitForUpdate_Done        ;00C7AB|F009    |00C7B6;
     INC.W $0110                          ;00C7AD|EE1001  |000110;
     JSL.L CODE_0C8000                    ;00C7B0|2200800C|0C8000;
-    BRA CODE_00C7A8                      ;00C7B4|80F2    |00C7A8;
+    BRA Screen_WaitForUpdate_Loop        ;00C7B4|80F2    |00C7A8;
 
-CODE_00C7B6:
+Screen_WaitForUpdate_Done:
     PLP                                  ;00C7B6|28      |      ;
     RTL                                  ;00C7B7|6B      |      ;
 
-CODE_00C7B8:
+Screen_FadeOut:
     PHP                                  ;00C7B8|08      |      ;
     SEP #$20                             ;00C7B9|E220    |      ;
     LDA.W $0110                          ;00C7BB|AD1001  |010110;
     STA.W $00AA                          ;00C7BE|8DAA00  |0100AA;
 
-CODE_00C7C1:
+Screen_FadeOut_Loop:
     BIT.B #$0F                           ;00C7C1|890F    |      ;
-    BEQ CODE_00C7CF                      ;00C7C3|F00A    |00C7CF;
+    BEQ Screen_FadeOut_Done              ;00C7C3|F00A    |00C7CF;
     DEC A                                ;00C7C5|3A      |      ;
     STA.W $0110                          ;00C7C6|8D1001  |010110;
     JSL.L CODE_0C8000                    ;00C7C9|2200800C|0C8000;
-    BRA CODE_00C7C1                      ;00C7CD|80F2    |00C7C1;
+    BRA Screen_FadeOut_Loop              ;00C7CD|80F2    |00C7C1;
 
-CODE_00C7CF:
+Screen_FadeOut_Done:
     LDA.B #$80                           ;00C7CF|A980    |      ;
     TSB.W $00D6                          ;00C7D1|0CD600  |0100D6;
     LDA.B #$80                           ;00C7D4|A980    |      ;
@@ -14076,20 +14076,20 @@ CODE_00C7CF:
     PLP                                  ;00C7DC|28      |      ;
     RTL                                  ;00C7DD|6B      |      ;
 
-CODE_00C7DE:
-    JSR.W CODE_00C618                    ;00C7DE|2018C6  |00C618;
-    JSR.W CODE_00C58B                    ;00C7E1|208BC5  |00C58B;
+Menu_Init_Battle:
+    JSR.W Screen_Setup2                  ;00C7DE|2018C6  |00C618;
+    JSR.W WRAM_ClearBuffer3              ;00C7E1|208BC5  |00C58B;
     LDX.W #$C8EC                         ;00C7E4|A2ECC8  |      ;
     JSR.W CODE_009BC4                    ;00C7E7|20C49B  |009BC4;
     LDX.W #$C8E3                         ;00C7EA|A2E3C8  |      ;
     JMP.W CODE_009BC4                    ;00C7ED|4CC49B  |009BC4;
 
-CODE_00C7F0:
+Menu_Init_Status:
     LDA.W $010D                          ;00C7F0|AD0D01  |00010D;
-    BPL CODE_00C7F8                      ;00C7F3|1003    |00C7F8;
+    BPL Menu_Init_Status_Continue        ;00C7F3|1003    |00C7F8;
     LDA.W #$0000                         ;00C7F5|A90000  |      ;
 
-CODE_00C7F8:
+Menu_Init_Status_Continue:
     AND.W #$FF00                         ;00C7F8|2900FF  |      ;
     STA.B $01                            ;00C7FB|8501    |000001;
     SEP #$20                             ;00C7FD|E220    |      ;
@@ -14106,7 +14106,7 @@ CODE_00C7F8:
     MVN $00,$00                          ;00C819|540000  |      ;
     LDA.W #$0020                         ;00C81C|A92000  |      ;
     TSB.W $00D2                          ;00C81F|0CD200  |0000D2;
-    JSR.W CODE_00C607                    ;00C822|2007C6  |00C607;
+    JSR.W Screen_Setup1                  ;00C822|2007C6  |00C607;
     LDX.W #$51C5                         ;00C825|A2C551  |      ;
     LDY.W #$5015                         ;00C828|A01550  |      ;
     LDA.W #$019F                         ;00C82B|A99F01  |      ;
@@ -14124,40 +14124,47 @@ CODE_00C7F8:
     RTS                                  ;00C84B|60      |      ;
 
 ; Menu initialization and game state management
+Menu_Init_SetBit6:
     LDA.W #$0040                         ;00C84C|A94000  |      ;
     TSB.W $00DB                          ;00C84F|0CDB00  |0000DB;
-    BRA CODE_00C85A                      ;00C852|8006    |00C85A;
+    BRA Menu_Init_Common                 ;00C852|8006    |00C85A;
 
+Menu_Init_SetBit0:
     LDA.W #$0001                         ;00C854|A90100  |      ;
     TSB.W $00DA                          ;00C857|0CDA00  |0000DA;
 
-CODE_00C85A:
-    JSR.W CODE_00C623                    ;00C85A|2023C6  |00C623;
-    JSR.W CODE_00C5A0                    ;00C85D|20A0C5  |00C5A0;
+Menu_Init_Common:
+    JSR.W Screen_Setup3                  ;00C85A|2023C6  |00C623;
+    JSR.W WRAM_ClearBuffer4              ;00C85D|20A0C5  |00C5A0;
     LDX.W #$C8EC                         ;00C860|A2ECC8  |      ;
-    BRA CODE_00C89D                      ;00C863|8038    |00C89D;
+    BRA Menu_Init_UpdateMenu             ;00C863|8038    |00C89D;
 
+Menu_Init_Alt1:
     LDX.W #$C90A                         ;00C865|A20AC9  |      ;
-    BRA CODE_00C89D                      ;00C868|8033    |00C89D;
+    BRA Menu_Init_UpdateMenu             ;00C868|8033    |00C89D;
 
+Menu_Init_Alt2:
     LDX.W #$C910                         ;00C86A|A210C9  |      ;
-    BRA CODE_00C89D                      ;00C86D|802E    |00C89D;
+    BRA Menu_Init_UpdateMenu             ;00C86D|802E    |00C89D;
 
+Menu_Init_ClearBit7:
     LDA.W #$0080                         ;00C86F|A98000  |      ;
     TRB.W $00D9                          ;00C872|1CD900  |0000D9;
     LDX.W #$C916                         ;00C875|A216C9  |      ;
-    BRA CODE_00C89D                      ;00C878|8023    |00C89D;
+    BRA Menu_Init_UpdateMenu             ;00C878|8023    |00C89D;
 
+Menu_Init_SetBit7:
     LDA.W #$0080                         ;00C87A|A98000  |      ;
     TSB.W $00DB                          ;00C87D|0CDB00  |0000DB;
     LDX.W #$C91C                         ;00C880|A21CC9  |      ;
-    BRA CODE_00C89D                      ;00C883|8018    |00C89D;
+    BRA Menu_Init_UpdateMenu             ;00C883|8018    |00C89D;
 
+Menu_Init_LoadCharacter:
     LDA.W $010D                          ;00C885|AD0D01  |00010D;
-    BPL CODE_00C88D                      ;00C888|1003    |00C88D;
+    BPL Menu_Init_LoadCharacter_Continue ;00C888|1003    |00C88D;
     LDA.W #$0000                         ;00C88A|A90000  |      ;
 
-CODE_00C88D:
+Menu_Init_LoadCharacter_Continue:
     AND.W #$FF00                         ;00C88D|2900FF  |      ;
     STA.B $01                            ;00C890|8501    |000001;
     STA.B $05                            ;00C892|8505    |000005;
@@ -14165,7 +14172,7 @@ CODE_00C88D:
     TSB.W $00DA                          ;00C897|0CDA00  |0000DA;
     LDX.W #$C922                         ;00C89A|A222C9  |      ;
 
-CODE_00C89D:
+Menu_Init_UpdateMenu:
     PHX                                  ;00C89D|DA      |      ;
     JSR.W CODE_009BC4                    ;00C89E|20C49B  |009BC4;
     PLX                                  ;00C8A1|FA      |      ;
@@ -14180,18 +14187,22 @@ CODE_00C89D:
     JMP.W CODE_009BC4                    ;00C8B4|4CC49B  |009BC4;
 
 ; Animation and screen effect handlers
+Screen_Effect1:
     LDX.W #$C8F2                         ;00C8B7|A2F2C8  |      ;
-    BRA CODE_00C8C9                      ;00C8BA|800D    |00C8C9;
+    BRA Screen_EffectCommon              ;00C8BA|800D    |00C8C9;
 
+Screen_Effect2:
     LDX.W #$C8F8                         ;00C8BC|A2F8C8  |      ;
-    BRA CODE_00C8C9                      ;00C8BF|8008    |00C8C9;
+    BRA Screen_EffectCommon              ;00C8BF|8008    |00C8C9;
 
+Screen_Effect3:
     LDX.W #$C8FE                         ;00C8C1|A2FEC8  |      ;
-    BRA CODE_00C8C9                      ;00C8C4|8003    |00C8C9;
+    BRA Screen_EffectCommon              ;00C8C4|8003    |00C8C9;
 
+Screen_Effect4:
     LDX.W #$C904                         ;00C8C6|A204C9  |      ;
 
-CODE_00C8C9:
+Screen_EffectCommon:
     PHX                                  ;00C8C9|DA      |      ;
     JSR.W CODE_009BC4                    ;00C8CA|20C49B  |009BC4;
     PLX                                  ;00C8CD|FA      |      ;
@@ -14200,7 +14211,7 @@ CODE_00C8C9:
     INX                                  ;00C8D0|E8      |      ;
     LDA.W #$000C                         ;00C8D1|A90C00  |      ;
 
-CODE_00C8D4:
+Screen_EffectLoop:
     JSL.L CODE_0C8000                    ;00C8D4|2200800C|0C8000;
     PHA                                  ;00C8D8|48      |      ;
     PHX                                  ;00C8D9|DA      |      ;
@@ -14208,7 +14219,7 @@ CODE_00C8D4:
     PLX                                  ;00C8DD|FA      |      ;
     PLA                                  ;00C8DE|68      |      ;
     DEC A                                ;00C8DF|3A      |      ;
-    BNE CODE_00C8D4                      ;00C8E0|D0F2    |00C8D4;
+    BNE Screen_EffectLoop                ;00C8E0|D0F2    |00C8D4;
     RTS                                  ;00C8E2|60      |      ;
 ; ==============================================================================
 ; Save System Data Tables and Checksum Validation - Final Systems
@@ -14223,9 +14234,10 @@ DATA_00C8E3:
     db $94,$03,$EA,$97,$03                                               ;00C923|        |      ;
 
 ; Save slot address calculation
+Save_GetSlotAddress:
     LDA.W $015F                          ;00C928|AD5F01  |00015F;
 
-CODE_00C92B:
+Save_GetSlotAddress_Main:
     AND.W #$00FF                         ;00C92B|29FF00  |      ;
     STA.B $98                            ;00C92E|8598    |000098;
     LDA.W #$038C                         ;00C930|A98C03  |      ;
@@ -14237,7 +14249,7 @@ CODE_00C92B:
     STA.B $0B                            ;00C93F|850B    |00000B;
     RTS                                  ;00C941|60      |      ;
 
-CODE_00C942:
+Save_ReadByte:
     PHP                                  ;00C942|08      |      ;
     SEP #$20                             ;00C943|E220    |      ;
     REP #$10                             ;00C945|C210    |      ;
