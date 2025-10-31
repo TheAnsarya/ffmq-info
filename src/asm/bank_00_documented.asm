@@ -7097,13 +7097,13 @@ CODE_009CF0:
 	TYA                         ; A = new stack pointer
 	CMP.W #$35D9                ; Check if stack overflow
 	BCC CODE_009D18             ; Branch if OK
-	JMP.W CODE_009D1F           ; Handle overflow (infinite loop)
+	JMP.W Graphics_StackOverflow           ; Handle overflow (infinite loop)
 
-CODE_009D18:
+Graphics_UpdateStackPtr:
 	STA.L $7E3367               ; Update stack pointer
-	JMP.W CODE_00981B           ; Clean stack and return
+	JMP.W Bit_SetBits_00E2           ; Clean stack and return
 
-CODE_009D1F:
+Graphics_StackOverflow:
 	BRA CODE_009D1F             ; Infinite loop (stack overflow)
 
 ; ---------------------------------------------------------------------------
@@ -7133,13 +7133,13 @@ CODE_009D21:
 	LDA.W #$0000                ; Transfer 1 byte
 	MVN $00,$7E                 ; Copy stack to DP $00D0
 
-	JMP.W CODE_00981B           ; Clean stack and return
+	JMP.W Bit_SetBits_00E2           ; Clean stack and return
 
 ; ---------------------------------------------------------------------------
 ; Fill Memory via Helper
 ; ---------------------------------------------------------------------------
 
-CODE_009D4B:
+Graphics_MemoryFillHelper:
 	PHY                         ; Save Y
 	STX.B $1A                   ; Store X to $1A
 	TXY                         ; Y = X
@@ -7161,19 +7161,19 @@ CODE_009D4B:
 	RTS                         ; Return
 
 ; ---------------------------------------------------------------------------
-; CODE_009D6B: Process Graphics with DP Setup
+; Graphics_ProcessWithDP: Process Graphics with DP Setup
 ; ---------------------------------------------------------------------------
 
-CODE_009D6B:
+Graphics_ProcessWithDP:
 	PHD                         ; Save direct page
 	PEA.W $0000                 ; Push $0000
 	PLD                         ; Direct Page = $0000
-	JSR.W CODE_009D75           ; Process graphics
+	JSR.W Graphics_ProcessStream           ; Process graphics
 	PLD                         ; Restore direct page
 	RTL                         ; Return long
 
 ; ---------------------------------------------------------------------------
-; CODE_009D75: Main Graphics Data Processor
+; Graphics_ProcessStream: Main Graphics Data Processor
 ; ---------------------------------------------------------------------------
 ; Purpose: Core loop for processing graphics command stream
 ; Algorithm: Read bytes from [$17], dispatch to handlers via jump table
@@ -7182,7 +7182,7 @@ CODE_009D6B:
 ; Commands $80+: Direct tile data (XOR with $1D for effects)
 ; ===========================================================================
 
-CODE_009D75:
+Graphics_ProcessStream:
 	PHP                         ; Save processor status
 	REP #$30                    ; 16-bit A/X/Y
 	PHB                         ; Save data bank
@@ -7196,14 +7196,14 @@ CODE_009D75:
 	; Check if special processing mode
 	LDA.W #$0008                ; Bit 3 mask
 	AND.W $00DB                 ; Test flag
-	BEQ CODE_009DA2             ; Normal processing
+	BEQ Graphics_ProcessStream_Normal             ; Normal processing
 
 	; Special mode with synchronization
 	LDA.W #$0010                ; Bit 4 mask
 	AND.W $00D0                 ; Test flag
-	BNE CODE_009D9A             ; Use alternate sync
+	BNE Graphics_ProcessStream_AltSync             ; Use alternate sync
 
-CODE_009D8F:
+Graphics_ProcessStream_SyncLoop:
 	JSR.W CODE_009DBD           ; Read and process command
 	LDA.B $17                   ; Get current pointer
 	CMP.B $3D                   ; Compare to sync pointer
@@ -7217,29 +7217,29 @@ CODE_009D9A:
 CODE_009D9F:
 	JSR.W CODE_009DBD           ; Read and process command
 
-CODE_009DA2:
+Graphics_ProcessStream_Normal:
 	; Normal processing loop
 	LDA.W $00D0                 ; Load flags
 	BIT.W #$0090                ; Test bits 4 and 7
-	BEQ CODE_009D9F             ; Continue if neither set
+	BEQ Graphics_ProcessStream_Loop             ; Continue if neither set
 
 	BIT.W #$0080                ; Test bit 7
-	BNE CODE_009DB4             ; Exit if set
+	BNE Graphics_ProcessStream_Exit             ; Exit if set
 	JSR.W CODE_00E055           ; Process special event
-	BRA CODE_009DA2             ; Continue loop
+	BRA Graphics_ProcessStream_Normal             ; Continue loop
 
-CODE_009DB4:
+Graphics_ProcessStream_Exit:
 	LDA.W #$0080                ; Bit 7 mask
 	TRB.W $00D0                 ; Clear exit flag
 
-CODE_009DBA:
-	JMP.W CODE_00981B           ; Clean stack and return
+Graphics_ProcessStream_Done:
+	JMP.W Bit_SetBits_00E2           ; Clean stack and return
 
 ; ---------------------------------------------------------------------------
-; CODE_009DBD: Read and Dispatch Graphics Command
+; Graphics_ReadDispatchCmd: Read and Dispatch Graphics Command
 ; ---------------------------------------------------------------------------
 
-CODE_009DBD:
+Graphics_ReadDispatchCmd:
 	LDA.B [$17]                 ; Read command byte
 	INC.B $17                   ; Advance pointer
 	AND.W #$00FF                ; Mask to byte
@@ -7256,10 +7256,10 @@ CODE_009DCB:
 	INC.B $1A                   ; (16-bit increment)
 	RTS                         ; Return
 
-CODE_009DD2:
+Graphics_DispatchCommand:
 	; Command dispatch (values $00-$7F)
 	CMP.W #$0030                ; Is it indexed data?
-	BCS CODE_009DDF             ; Yes, handle indexed
+	BCS Graphics_IndexedDataLookup             ; Yes, handle indexed
 
 	; Jump table dispatch ($00-$2F)
 	ASL A                       ; Multiply by 2 (word index)
@@ -7268,14 +7268,14 @@ CODE_009DD2:
 	REP #$30                    ; 16-bit A/X/Y
 	RTS                         ; Return
 
-CODE_009DDF:
+Graphics_IndexedDataLookup:
 	; Indexed data lookup ($30+)
 	LDX.W #$0000                ; X = 0 (table index)
 	SBC.W #$0030                ; Subtract base (now $00-$4F)
-	BEQ CODE_009DF9             ; If 0, use first entry
+	BEQ Graphics_IndexedDataFound             ; If 0, use first entry
 	TAY                         ; Y = index count
 
-CODE_009DE8:
+Graphics_IndexedDataSearch:
 	; Find entry in variable-length table
 	LDA.L DATA8_03BA35,X        ; Load entry size
 	AND.W #$00FF                ; Mask to byte
@@ -7803,14 +7803,14 @@ Cmd_CharacterDMATransfer:
 	LDA.W #$0080                ; Bit 7 mask
 	TRB.W $10A0                 ; Clear character flag
 
-CODE_00A273:
+Cmd_CharDMATransfer_Done:
 	RTS                         ; Return
 
 ; ---------------------------------------------------------------------------
 ; Multiple Command Sequence
 ; ---------------------------------------------------------------------------
 
-CODE_00A274:
+Cmd_MultiCommandSeq:
 	LDA.W #$0003                ; Bank $03
 	LDX.W #$8457                ; Pointer to data
 	JSR.W CODE_00A71C           ; Process data
@@ -7835,12 +7835,12 @@ CODE_00A274:
 ; VBlank Wait Loop
 ; ---------------------------------------------------------------------------
 
-CODE_00A29B:
+Cmd_WaitVBlankCount:
 	LDA.B [$17]                 ; Read wait count
 	INC.B $17                   ; Advance stream
 	AND.W #$00FF                ; Mask to byte
 
-CODE_00A2A2:
+Cmd_WaitVBlankLoop:
 	JSL.L CODE_0096A0           ; Wait for VBlank
 	DEC A                       ; Decrement counter
 	BNE CODE_00A2A2             ; Loop until 0
@@ -7863,20 +7863,20 @@ CODE_00A2B4_plus2:
 	SEP #$20                    ; 8-bit A
 	LDX.W #$0000                ; X = 0 (table index)
 
-CODE_00A2BB:
+Cmd_PaletteLookup_Search:
 	; Search palette table for matching index
 	LDA.W DATA8_00A2DD,X        ; Load table entry
 	CMP.B #$FF                  ; Check for end marker
 	BNE +                       ; Not end, continue
 	JMP UNREACH_00A2D4          ; End of table (not found)
 +	CMP.B $01,S                 ; Compare with search index
-	BEQ CODE_00A2CB             ; Found match
+	BEQ Cmd_PaletteLookup_Found             ; Found match
 	INX                         ; Next entry
 	INX                         ; (skip 2 more bytes)
 	INX                         ; (3 bytes per entry)
-	BRA CODE_00A2BB             ; Continue search
+	BRA Cmd_PaletteLookup_Search             ; Continue search
 
-CODE_00A2CB:
+Cmd_PaletteLookup_Found:
 	REP #$30                    ; 16-bit A/X/Y
 	LDA.W DATA8_00A2DE,X        ; Load palette pointer
 	STA.B $9E                   ; Store to $9E
@@ -7913,39 +7913,39 @@ CODE_00A2CB:
 ; These handlers test various game flags and conditionally jump based on results
 ;===============================================================================
 
-CODE_00A572:
+Cmd_TestItemJump:
 	LDA.B [$17]                    ; Load item/flag index
 	INC.B $17                      ; Advance pointer
 	AND.W #$00FF                   ; Mask to byte
-	JSL.L CODE_009776              ; Test item flag (external stub)
+	JSL.L Bit_TestBits_0EA8              ; Test item flag (external stub)
 
-CODE_00A57D:
+Cmd_TestItemJump_Check:
 	BNE +                           ; If set, skip
-	JMP CODE_00A519                ; If clear, take jump (far)
-+	JMP CODE_00A597                ; If set, skip jump (far)
+	JMP Graphics_SetPointer                ; If clear, take jump (far)
++	JMP Cmd_SkipJumpAddress                ; If set, skip jump (far)
 
-CODE_00A581:
+Cmd_TestVariable1:
 	JSR.W CODE_00B1A1              ; Test variable
 	BNE +                           ; If not zero, skip
-	JMP CODE_00A56E                ; Branch based on result (far)
+	JMP Condition_BranchOnZero                ; Branch based on result (far)
 +	RTS
 
-CODE_00A586:
+Cmd_TestVariable2:
 	JSR.W CODE_00B1A1              ; Test variable (alternate)
-	BEQ CODE_00A57D                ; Branch to alternate handler
+	BEQ Cmd_TestItemJump_Check                ; Branch to alternate handler
 	RTS
 
 	JSR.W CODE_00B1B4              ; Test condition
 	BEQ +                           ; If zero, skip
-	JMP CODE_00A519                ; If not zero, take jump (far)
-+	JMP CODE_00A597                ; If zero, skip jump (far)
+	JMP Graphics_SetPointer                ; If not zero, take jump (far)
++	JMP Cmd_SkipJumpAddress                ; If zero, skip jump (far)
 
 	JSR.W CODE_00B1B4              ; Test condition (alternate)
 	BNE +                           ; If not zero, skip
-	JMP CODE_00A519                ; If zero, take jump (far)
+	JMP Graphics_SetPointer                ; If zero, take jump (far)
 +	RTS
 
-CODE_00A597:
+Cmd_SkipJumpAddress:
 	INC.B $17                      ; Skip jump address
 	INC.B $17                      ; (2 bytes)
 	RTS                            ; Return
@@ -8003,16 +8003,16 @@ CODE_00A597:
 ; CODE_00A5C8 - Skip Jump Address Helper
 ;===============================================================================
 
-CODE_00A5C8:
+Cmd_SkipTwoBytes:
 	INC.B $17                      ; Skip jump address
 	INC.B $17                      ; (2 bytes)
 	RTS                            ; Return
 
 ;===============================================================================
-; CODE_00A5CD - Load Address and Bank, Execute with Context Switch
+; Cmd_LoadExecWithSwitch - Load Address and Bank, Execute with Context Switch
 ;===============================================================================
 
-CODE_00A5CD:
+Cmd_LoadExecWithSwitch:
 	LDA.B [$17]                    ; Load target address
 	INC.B $17                      ; Advance pointer
 	INC.B $17
@@ -8076,13 +8076,13 @@ CODE_00A5CD:
 	INC.B $17
 	TAX                            ; Store to X
 	LDA.B $19                      ; Load bank
-	JMP.W CODE_00A71C              ; Bank switch
+	JMP.W Graphics_BankSwitch              ; Bank switch
 
 ; Pattern set for CODE_00B1E8 (6 variants)
 	JSR.W CODE_00B1E8
 	BCS +
 	BNE +
-	JMP CODE_00A744
+	JMP Graphics_LoadAddrExecute
 +	INC.B $17
 	INC.B $17
 	RTS
@@ -8287,10 +8287,10 @@ CODE_00A5CD:
 	BRA CODE_00A71C_alt2
 
 ;===============================================================================
-; CODE_00A708 - Load Pointer and Bank, Execute Subroutine
+; Graphics_LoadAndExec - Load Pointer and Bank, Execute Subroutine
 ;===============================================================================
 
-CODE_00A708:
+Graphics_LoadAndExec:
 	LDA.B [$17]                    ; Load target pointer
 	INC.B $17
 	INC.B $17
@@ -8298,14 +8298,14 @@ CODE_00A708:
 	LDA.B [$17]                    ; Load bank byte
 	INC.B $17
 	AND.W #$00FF                   ; Mask to byte
-	BRA CODE_00A71C                ; Jump to bank switcher
+	BRA Graphics_BankSwitch                ; Jump to bank switcher
 
-CODE_00A718:
+Graphics_LoadSavedContext:
 	LDX.B $9E                      ; Load saved pointer
 	LDA.B $A0                      ; Load saved bank
 
 ;===============================================================================
-; CODE_00A71C - Bank Switch with Full Context Save/Restore
+; Graphics_BankSwitch - Bank Switch with Full Context Save/Restore
 ;
 ; This is THE critical routine for script execution and inter-bank calls.
 ; It saves the current execution context (pointer + bank), switches to a new
@@ -8315,9 +8315,7 @@ CODE_00A718:
 ; Uses: Full context save via stack and register swapping
 ;===============================================================================
 
-CODE_00A71C:
-CODE_00A71C_alt1:
-CODE_00A71C_alt2:
+Graphics_BankSwitch:
 	SEP #$20                       ; 8-bit A
 	XBA                            ; Swap A/B (save new bank to B)
 	LDA.B $19                      ; Load current bank
@@ -8346,20 +8344,20 @@ CODE_00A73E:
 ; CODE_00A744 - Load Address, Call Function, Execute Result
 ;===============================================================================
 
-CODE_00A744:
+Graphics_LoadAddrExecute:
 	LDA.B [$17]                    ; Load address
 	INC.B $17
 	INC.B $17
-	JSR.W CODE_009CF0              ; Call function (external)
+	JSR.W Graphics_CallFunc              ; Call function (external)
 	STA.B $17                      ; Store result as pointer
-	JSR.W CODE_009D75              ; Execute at new pointer
-	JMP.W CODE_009D21              ; Jump to cleanup (external)
+	JSR.W Graphics_ProcessStream              ; Execute at new pointer
+	JMP.W Graphics_PopParams              ; Jump to cleanup (external)
 
 ;===============================================================================
-; CODE_00A755 - Load Pointer and Execute with Bank Switch
+; Graphics_LoadExec - Load Pointer and Execute with Bank Switch
 ;===============================================================================
 
-CODE_00A755:
+Graphics_LoadExec:
 	LDA.B [$17]                    ; Load pointer
 	INC.B $17
 	INC.B $17
