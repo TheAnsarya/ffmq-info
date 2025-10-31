@@ -261,11 +261,12 @@ Improve Function Labels - Replace generic CODE_ labels with descriptive names, d
 Improve Function Labels - Replace generic CODE_ labels with descriptive names, continue doing more at one time
 That might have been too much, go back to a managable size
 continue adding labels!
-
-
-
-
-
+continue adding labels!
+continue adding labels!
+continue adding labels!
+continue adding labels, don't just limit it to bank 00.
+continue adding labels
+continue adding labels, more labels per batch, use temp files if you need to to increase the amount
 
 
 
