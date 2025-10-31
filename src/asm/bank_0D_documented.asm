@@ -14,7 +14,7 @@
 ; - Audio command interface
 ;
 ; Key Routines:
-; - CODE_0D802C: Main SPC700 initialization
+; - SPC_InitMain: Main SPC700 initialization
 ; - CODE_0D8004: Sound data transfer routine
 ; - DATA8_0D8008: Sound driver data pointers
 ;
@@ -35,12 +35,12 @@
 ; Entry Points
 ; ==============================================================================
 
-CODE_0D8000:
-	JMP.W CODE_0D802C						;0D8000	; Jump to SPC700 init
+SPC_Initialize:
+	JMP.W SPC_InitMain						;0D8000	; Jump to SPC700 init
 	db $EA									;0D8003	; NOP padding
 
-CODE_0D8004:
-	JMP.W CODE_0D8147						;0D8004	; Jump to sound transfer
+SPC_TransferData:
+	JMP.W SPC_TransferMain					;0D8004	; Jump to sound transfer
 	db $EA									;0D8007	; NOP padding
 
 ; ==============================================================================
@@ -79,7 +79,7 @@ DATA8_0D8015:
 ; Reference: https://wiki.superfamicom.org/spc700-reference
 ; ==============================================================================
 
-CODE_0D802C:
+SPC_InitMain:
 	PHB										;0D802C	; Save data bank
 	PHD										;0D802D	; Save direct page
 	PHP										;0D802E	; Save processor status
@@ -97,24 +97,24 @@ CODE_0D802C:
 	PLD										;0D8040	; Pull to direct page
 	LDX.W #$BBAA							;0D8041	; SPC700 ready signature
 	CPX.W SNES_APUIO0						;0D8044	; Check APU port 0/1
-	BEQ CODE_0D8077							;0D8047	; Branch if ready
+	BEQ SPC_WaitReady							;0D8047	; Branch if ready
 	LDY.B $F8								;0D8049	; Check communication flag
-	BEQ CODE_0D8077							;0D804B	; Branch if not communicating
+	BEQ SPC_WaitReady							;0D804B	; Branch if not communicating
 	CPY.B $48								;0D804D	; Compare with previous state
-	BNE CODE_0D8077							;0D804F	; Branch if changed
+	BNE SPC_WaitReady							;0D804F	; Branch if changed
 	LDA.B #$F0								;0D8051	; Reset command
 	CMP.B $00								;0D8053	; Check current command
-	BNE CODE_0D8077							;0D8055	; Branch if different
-	
+	BNE SPC_WaitReady							;0D8055	; Branch if different
+
 	; Send reset sequence to SPC700
 	db $A9,$08,$8D,$41,$21,$A9,$00,$8D,$40,$21,$A2,$F8,$00,$9D,$FF,$05	;0D8057
 	db $CA,$D0,$FA,$84,$48,$A9,$FF,$85,$05,$A9,$F0,$85,$00,$4C,$5C,$81	;0D8067
 
-CODE_0D8077:
+SPC_WaitReady:
 	; Wait for SPC700 to be ready
 	CPX.W SNES_APUIO0						;0D8077	; Check for ready signature
-	BNE CODE_0D8077							;0D807A	; Loop until ready
-	
+	BNE SPC_WaitReady							;0D807A	; Loop until ready
+
 	; Begin sound driver upload
 	LDX.W #$0000							;0D807C	; Start at offset 0
 	LDA.L DATA8_0D8014						;0D807F	; Load target address low
@@ -126,10 +126,10 @@ CODE_0D8077:
 	LDA.B #$CC								;0D8092	; Handshake value
 	STA.W SNES_APUIO0						;0D8094	; Send to APU port 0
 
-CODE_0D8097:
+SPC_WaitAck:
 	; Wait for SPC700 acknowledgment
 	CMP.W SNES_APUIO0						;0D8097	; Check port 0
-	BNE CODE_0D8097							;0D809A	; Loop until acknowledged
+	BNE SPC_WaitAck							;0D809A	; Loop until acknowledged
 
 ; ==============================================================================
 ; Sound Driver Data Transfer Loop
@@ -138,7 +138,7 @@ CODE_0D8097:
 ; Each byte is sent with handshake verification.
 ; ==============================================================================
 
-CODE_0D809C:
+SPC_TransferBlock:
 	LDA.B #$00								;0D809C	; Clear high byte
 	XBA										;0D809E	; Swap A/B
 	LDA.L DATA8_0D8008,X					;0D809F	; Load driver data byte
@@ -158,27 +158,27 @@ CODE_0D809C:
 	STA.B $11								;0D80BE	; Store total size high
 	INY										;0D80C0	; Increment offset
 
-CODE_0D80C1:
+SPC_TransferLoop:
 	; Transfer data bytes with handshake
 	LDA.B [$14],Y							;0D80C1	; Load data byte
 	STA.W SNES_APUIO1						;0D80C3	; Send to APU port 1
 	XBA										;0D80C6	; Swap to counter byte
 	STA.W SNES_APUIO0						;0D80C7	; Send to APU port 0
 
-CODE_0D80CA:
+SPC_WaitTransfer:
 	; Wait for acknowledgment
 	CMP.W SNES_APUIO0						;0D80CA	; Check port 0
-	BNE CODE_0D80CA							;0D80CD	; Loop until acknowledged
+	BNE SPC_WaitTransfer							;0D80CD	; Loop until acknowledged
 	INY										;0D80CF	; Next byte
 	XBA										;0D80D0	; Swap back
 	INC A									;0D80D1	; Increment counter
 	XBA										;0D80D2	; Swap to counter
 	CPY.B $10								;0D80D3	; Check if done
-	BNE CODE_0D80C1							;0D80D5	; Loop if more data
+	BNE SPC_TransferLoop							;0D80D5	; Loop if more data
 	INX										;0D80D7	; Next data block
 	CPX.W #$000B							;0D80D8	; Check if all blocks done
-	BNE CODE_0D809C							;0D80DB	; Loop if more blocks
-	
+	BNE SPC_TransferBlock							;0D80DB	; Loop if more blocks
+
 	; Sound driver upload complete
 	LDA.B #$00								;0D80DD	; Zero value
 	STA.W SNES_APUIO1						;0D80DF	; Clear port 1
@@ -189,12 +189,12 @@ CODE_0D80CA:
 	LDA.B #$00								;0D80F0	; Start execution command
 	XBA										;0D80F2	; Swap
 
-CODE_0D80F3:
+SPC_StartDriver:
 	; Final handshake to start driver
 	STA.W SNES_APUIO0						;0D80F3	; Send to port 0
 	CMP.W SNES_APUIO0						;0D80F6	; Wait for ack
-	BNE CODE_0D80F3							;0D80F9	; Loop until acknowledged
-	
+	BNE SPC_StartDriver							;0D80F9	; Loop until acknowledged
+
 	PLY										;0D80FB	; Restore Y
 	PLX										;0D80FC	; Restore X
 	PLA										;0D80FD	; Restore A
@@ -260,7 +260,7 @@ CODE_0D80F3:
 ; Uses IPL (Initial Program Loader) handshake protocol with SPC700
 ; ------------------------------------------------------------------------------
           CODE_0D8000:
-                       JMP.W CODE_0D802C                    ;0D8000|4C2C80  |0D802C; Jump to APU upload routine
+                       JMP.W SPC_InitMain                    ;0D8000|4C2C80  |0D802C; Jump to APU upload routine
                        db $EA                               ;0D8003|        |      ; NOP padding
 
 ; ------------------------------------------------------------------------------
@@ -309,7 +309,7 @@ CODE_0D80F3:
                        db $AE,$BD,$FF,$BD,$35,$BE,$7D,$BE,$59,$BE,$A1,$BE;0D8020|        |00FFBD; Continue module table
 
 ; ==============================================================================
-; CODE_0D802C: Main APU Upload Routine
+; SPC_InitMain: Main APU Upload Routine
 ; ==============================================================================
 ; Uploads SPC700 sound driver to audio processor memory
 ; Protocol: Uses IPL (Initial Program Loader) handshake with SPC700
@@ -327,7 +327,7 @@ CODE_0D80F3:
 ;   4. Use handshake protocol to sync with SPC700
 ;   5. Start execution at $0200 in SPC700 RAM
 ; ------------------------------------------------------------------------------
-          CODE_0D802C:
+          SPC_InitMain:
                        PHB                                  ;0D802C|8B      |      ; Push data bank
                        PHD                                  ;0D802D|0B      |      ; Push direct page
                        PHP                                  ;0D802E|08      |      ; Push processor status
@@ -355,19 +355,19 @@ CODE_0D80F3:
 ; ------------------------------------------------------------------------------
                        LDX.W #$BBAA                         ;0D8041|A2AABB  |      ; IPL ready signature
                        CPX.W SNES_APUIO0                    ;0D8044|EC4021  |002140; Check APUIO0/1 for $AABB
-                       BEQ CODE_0D8077                      ;0D8047|F02E    |0D8077; If IPL ready, start upload
+                       BEQ SPC_WaitReady                      ;0D8047|F02E    |0D8077; If IPL ready, start upload
 
 ; ------------------------------------------------------------------------------
 ; Check if sound driver already loaded (warm start detection)
 ; Verifies checksum values in work RAM to detect existing driver
 ; ------------------------------------------------------------------------------
                        LDY.B $F8                            ;0D8049|A4F8    |0006F8; Load checksum value 1
-                       BEQ CODE_0D8077                      ;0D804B|F02A    |0D8077; If zero, proceed normally
+                       BEQ SPC_WaitReady                      ;0D804B|F02A    |0D8077; If zero, proceed normally
                        CPY.B $48                            ;0D804D|C448    |000648; Compare with checksum value 2
-                       BNE CODE_0D8077                      ;0D804F|D026    |0D8077; If mismatch, upload driver
+                       BNE SPC_WaitReady                      ;0D804F|D026    |0D8077; If mismatch, upload driver
                        LDA.B #$F0                           ;0D8051|A9F0    |      ; Check flag byte
                        CMP.B $00                            ;0D8053|C500    |000600; Compare against work RAM
-                       BNE CODE_0D8077                      ;0D8055|D020    |0D8077; If not $F0, upload driver
+                       BNE SPC_WaitReady                      ;0D8055|D020    |0D8077; If not $F0, upload driver
 
 ; ------------------------------------------------------------------------------
 ; Warm start path: Sound driver already loaded, just reinitialize
@@ -378,7 +378,7 @@ CODE_0D80F3:
                        db $CA,$D0,$FA,$84,$48,$A9,$FF,$85,$05,$A9,$F0,$85,$00,$4C,$5C,$81;0D8067|        |      ; Continue reset
 
 ; ------------------------------------------------------------------------------
-; CODE_0D8077: Begin IPL Upload Protocol
+; SPC_WaitReady: Begin IPL Upload Protocol
 ; ------------------------------------------------------------------------------
 ; Standard SPC700 IPL handshake sequence
 ; Protocol steps:
@@ -389,9 +389,9 @@ CODE_0D80F3:
 ;   5. Wait for SPC700 to echo handshake
 ;   6. Transfer data bytes with incrementing handshake
 ; ------------------------------------------------------------------------------
-          CODE_0D8077:
+          SPC_WaitReady:
                        CPX.W SNES_APUIO0                    ;0D8077|EC4021  |002140; Wait for SPC700 ready
-                       BNE CODE_0D8077                      ;0D807A|D0FB    |0D8077; Loop until $BBAA confirmed
+                       BNE SPC_WaitReady                      ;0D807A|D0FB    |0D8077; Loop until $BBAA confirmed
 
 ; ------------------------------------------------------------------------------
 ; Initialize upload parameters
@@ -410,18 +410,18 @@ CODE_0D80F3:
 ; Wait for SPC700 to acknowledge handshake
 ; SPC700 IPL will echo handshake byte back to APUIO0 when ready
 ; ------------------------------------------------------------------------------
-          CODE_0D8097:
+          SPC_WaitAck:
                        CMP.W SNES_APUIO0                    ;0D8097|CD4021  |002140; Wait for echo
-                       BNE CODE_0D8097                      ;0D809A|D0FB    |0D8097; Loop until handshake confirmed
+                       BNE SPC_WaitAck                      ;0D809A|D0FB    |0D8097; Loop until handshake confirmed
 
 ; ==============================================================================
-; CODE_0D809C: Module Data Transfer Loop
+; SPC_TransferBlock: Module Data Transfer Loop
 ; ==============================================================================
 ; Transfers each driver module byte-by-byte to SPC700
 ; Uses indirect addressing to read module data from ROM
 ; Handshake increments each transfer to sync CPU/SPC700
 ; ==============================================================================
-          CODE_0D809C:
+          SPC_TransferBlock:
                        LDA.B #$00                           ;0D809C|A900    |      ; Clear high byte
                        XBA                                  ;0D809E|EB      |      ; Swap to B accumulator
 
@@ -452,12 +452,12 @@ CODE_0D80F3:
                        INY                                  ;0D80C0|C8      |      ; Y = 2 (start of actual data)
 
 ; ------------------------------------------------------------------------------
-; CODE_0D80C1: Byte Transfer Loop
+; SPC_TransferLoop: Byte Transfer Loop
 ; ------------------------------------------------------------------------------
 ; Transfers module data byte-by-byte with handshake protocol
 ; Each byte requires handshake increment to confirm transfer
 ; ------------------------------------------------------------------------------
-          CODE_0D80C1:
+          SPC_TransferLoop:
                        LDA.B [$14],Y                        ;0D80C1|B714    |000614; Read data byte from module
                        STA.W SNES_APUIO1                    ;0D80C3|8D4121  |002141; Send to APUIO1 (data port)
                        XBA                                  ;0D80C6|EB      |      ; Get handshake byte from B
@@ -466,9 +466,9 @@ CODE_0D80F3:
 ; ------------------------------------------------------------------------------
 ; Wait for SPC700 to echo handshake (confirms byte received)
 ; ------------------------------------------------------------------------------
-          CODE_0D80CA:
+          SPC_WaitTransfer:
                        CMP.W SNES_APUIO0                    ;0D80CA|CD4021  |002140; Wait for echo
-                       BNE CODE_0D80CA                      ;0D80CD|D0FB    |0D80CA; Loop until confirmed
+                       BNE SPC_WaitTransfer                      ;0D80CD|D0FB    |0D80CA; Loop until confirmed
 
 ; ------------------------------------------------------------------------------
 ; Increment handshake and continue
@@ -477,7 +477,7 @@ CODE_0D80F3:
                        XBA                                  ;0D80D0|EB      |      ; Save to B accumulator
                        INY                                  ;0D80D1|C8      |      ; Next byte in module
                        CPY.B $10                            ;0D80D2|C410    |000610; Compare with total size
-                       BNE CODE_0D80C1                      ;0D80D4|D0EB    |0D80C1; Loop if more bytes
+                       BNE SPC_TransferLoop                      ;0D80D4|D0EB    |0D80C1; Loop if more bytes
 
 ; ------------------------------------------------------------------------------
 ; Module transfer complete, prepare for next module
@@ -513,7 +513,7 @@ CODE_0D80F3:
           CODE_0D80FA:
                        CMP.W SNES_APUIO0                    ;0D80FA|CD4021  |002140; Wait for echo
                        BNE CODE_0D80FA                      ;0D80FD|D0FB    |0D80FA; Loop until confirmed
-                       BRA CODE_0D809C                      ;0D80FF|809B    |0D809C; Transfer next module
+                       BRA SPC_TransferBlock                      ;0D80FF|809B    |0D809C; Transfer next module
 
 ; ==============================================================================
 ; CODE_0D8101: Start SPC700 Driver Execution
@@ -2088,7 +2088,7 @@ DATA8_0DC451:
   db $D1,$55,$32,$7A,$13,$66,$30,$F0,$23,$42,$00,$45,$7A,$41,$ED,$05;0DC7F1 - $D1 value
   db $51,$DF,$13,$33,$0C,$7A,$C0,$21,$EE,$14,$3F,$DD,$F2,$32,$7A,$F0;0DC801 - Pattern continues
   db $DE,$F1,$33,$0D,$F0,$EC,$AC,$7B,$01,$FC,$CF,$0F,$ED,$BA,$BD,$F0;0DC811 - $AC, $BA, $BD values
-  
+
 ; Music Data Block ($0DC821-$0DD3B1, 2960 bytes):
 ; Extensive pattern data with repeated byte sequences suggesting voice patterns.
 ; Pattern: Many sequences contain repeating nibbles (AA, BB, AB, etc) indicating
@@ -2872,59 +2872,59 @@ DATA8_0DE431:
 ; END OF BANK $0D - APU Communication & Sound Driver
 ; Total Bank Size: 64KB (Bank $0D: $0D0000-$0DFFFF)
 ; Final Completion: 100% (2,956/2,956 lines documented)
-; 
+;
 ; Bank $0D Complete Summary:
 ; ==========================
-; 
+;
 ; 1. **SPC700 Audio Processor Communication**:
 ;    - Complete upload protocol for 64KB SPC700 RAM
 ;    - Audio driver code transferred to isolated audio coprocessor
 ;    - Bidirectional communication via dedicated I/O ports
-; 
+;
 ; 2. **Music and Sound Effect Pattern Data**:
 ;    - Extensive proprietary music sequence format
 ;    - Pattern-based system with reusable blocks
 ;    - Note events, timing, envelopes, control opcodes
 ;    - Compressed format for efficient storage
-; 
+;
 ; 3. **Voice Channel Virtualization**:
 ;    - 16 logical audio channels → 8 physical DSP voices
 ;    - Dynamic voice allocation algorithm
 ;    - Priority system for music vs sound effects
 ;    - Voice stealing when all 8 channels in use
-; 
+;
 ; 4. **DSP Register Configuration Tables**:
 ;    - Voice parameters (ADSR envelopes, pitch, pan, volume)
 ;    - Echo buffer settings (reverb effects)
 ;    - Pitch modulation tables
 ;    - Filter coefficients (low-pass, band-pass)
 ;    - Noise generator parameters
-; 
+;
 ; 5. **Audio Driver Architecture**:
 ;    - Pattern markers: $8A (channel separator), $6A/$5A/$7A (voice separators)
 ;    - Voice assignment: $AA/$BA/$9A/$96/$A6/$B6/$B2 (voice channel routing)
 ;    - DSP addresses: $C0-$FF range (SPC700 DSP register map)
 ;    - Pattern data: Digit sequences (0-9), control bytes, timing values
-; 
+;
 ; 6. **Space Utilization**:
 ;    - Bank fully utilized: ~99.85% data, minimal padding
 ;    - No traditional $FF padding blocks
 ;    - DSP configuration continues to $0DFFFF (bank boundary)
 ;    - Demonstrates complex audio system requiring maximum allocation
-; 
+;
 ; 7. **Cross-Bank References**:
 ;    - Bank $07: Graphics/Sound initialization routines
 ;    - Bank $00: Core SPC700 upload protocol
 ;    - Bank $01/$02: Sound effect triggers from gameplay
 ;    - Bank $03: Music/SFX calls from script engine
-; 
+;
 ; **Technical Achievement**:
 ; Bank $0D represents one of the most sophisticated audio systems on the SNES
 ; platform, utilizing the SPC700's full capabilities with pattern-based music,
 ; voice virtualization, extensive DSP configuration, and efficient space usage.
 ; The complete 64KB bank is dedicated to audio subsystem data, demonstrating
 ; the importance of audio quality in Final Fantasy Mystic Quest.
-; 
+;
 ; ================================================================================
 ; Final 28 source lines of Bank $0D already documented in Cycle 8 temp file
 ; (integrated at lines 2801-2956 of temp_bank0D_cycle08.asm).
