@@ -8078,8 +8078,8 @@ Cmd_LoadExecWithSwitch:
 	LDA.B $19                      ; Load bank
 	JMP.W Graphics_BankSwitch              ; Bank switch
 
-; Pattern set for CODE_00B1E8 (6 variants)
-	JSR.W CODE_00B1E8
+; Pattern set for Test_Compare24Full (6 variants)
+	JSR.W Test_Compare24Full
 	BCS +
 	BNE +
 	JMP Graphics_LoadAddrExecute
@@ -10200,33 +10200,33 @@ CODE_00B185:
 	LDA.B $3A                      ; Load from $3A
 	RTS
 
-CODE_00B188:
+Test_LoadValue8:
 	LDA.B [$17]                    ; Load 8-bit from script
 	INC.B $17
 	AND.W #$00FF
 	RTS
 
-CODE_00B18F:
+Test_LoadValue9E:
 	LDA.B $9E                      ; Load from $9E
 	RTS
 
-CODE_00B192:
+Test_LoadValueRNG:
 	LDA.B $A2                      ; Load from $A2 (RNG)
 	RTS
 
-CODE_00B196:
+Test_LoadValue16:
 	LDA.B [$17]                    ; Load 16-bit from script
 	INC.B $17
 	INC.B $17
 	RTS
 
 ;-------------------------------------------------------------------------------
-; CODE_00B1A1 - Compare 16-bit values (equality test)
+; Test_CompareValue24: Compare 16-bit values (equality test)
 ; Purpose: Test if $9E/$A0 == value from script
 ; Entry: [$17] = 16-bit value, [$17+2] = 8-bit high byte
 ; Exit: Z flag set if equal, C flag indicates comparison result
 ;-------------------------------------------------------------------------------
-CODE_00B1A1:
+Test_CompareValue24:
 	LDA.B [$17]                    ; Load comparison value low
 	INC.B $17
 	INC.B $17
@@ -10262,31 +10262,31 @@ CODE_00B1C2:
 ; - CODE_00B185-00B196: Value loading helper routines
 ; - CODE_00B1A1: 24-bit comparison test
 ;
-; Next: More comparison and test routines (CODE_00B1B4 onward)
+; Next: More comparison and test routines (Test_CompareDP onward)
 ;===============================================================================
 
 ;-------------------------------------------------------------------------------
-; CODE_00B1B4: Comparison test via external routine (from $2E context)
+; Test_CompareDP: Comparison test via external routine (from $2E context)
 ;
 ; Purpose: Set up direct page context and call external comparison routine
 ; Entry: $2E = direct page base to use
 ;        $9E = value to test
 ; Exit: Flags set by external comparison
-; Uses: CODE_00975A (external comparison routine)
+; Uses: Bit_TestBits (external comparison routine)
 ;-------------------------------------------------------------------------------
-CODE_00B1B4:
+Test_CompareDP:
     LDA.B $2E                      ; Load context pointer
     PHD                            ; Save current direct page
     TCD                            ; Set $2E as new DP base
     LDA.W $009E                    ; Load value from $9E in new context
-    JSL.L CODE_00975A              ; Call external comparison
+    JSL.L Bit_TestBits              ; Call external comparison
     PLD                            ; Restore direct page
     INC A                          ; Set flags
     DEC A                          ; (Z flag = equality)
     RTS
 
 ;-------------------------------------------------------------------------------
-; CODE_00B1C3: 8-bit comparison test
+; Test_Compare8: 8-bit comparison test
 ;
 ; Purpose: Compare $9E/$A0 with 8-bit value from script (16-bit safe check)
 ; Entry: [$17] = 8-bit comparison value
@@ -10295,21 +10295,21 @@ CODE_00B1B4:
 ;       $17 incremented by 1
 ; Notes: Returns immediately if $A0 != 0 (value > 255)
 ;-------------------------------------------------------------------------------
-CODE_00B1C3:
+Test_Compare8:
     LDA.B [$17]                    ; Load 8-bit comparison value
     INC.B $17                      ; Advance script pointer
     AND.W #$00FF                   ; Mask to 8 bits
     STA.B $64                      ; Store comparison value
     SEC                            ; Set carry for comparison
     LDA.B $A0                      ; Check high byte
-    BNE CODE_00B1D5                ; If non-zero, value > 255, return
+    BNE Test_Compare8_Done                ; If non-zero, value > 255, return
     LDA.B $9E                      ; Compare low byte
     CMP.B $64                      ; Set C and Z flags
-CODE_00B1D5:
+Test_Compare8_Done:
     RTS
 
 ;-------------------------------------------------------------------------------
-; CODE_00B1D6: 16-bit comparison test
+; Test_Compare16: 16-bit comparison test
 ;
 ; Purpose: Compare $9E/$A0 with 16-bit value from script (24-bit safe check)
 ; Entry: [$17] = 16-bit comparison value
@@ -10318,21 +10318,21 @@ CODE_00B1D5:
 ;       $17 incremented by 2
 ; Notes: Returns immediately if $A0 != 0 (value > 65535)
 ;-------------------------------------------------------------------------------
-CODE_00B1D6:
+Test_Compare16:
     LDA.B [$17]                    ; Load 16-bit comparison value
     INC.B $17                      ; Advance script pointer
     INC.B $17                      ; (2 bytes)
     STA.B $64                      ; Store comparison value
     SEC                            ; Set carry for comparison
     LDA.B $A0                      ; Check high byte
-    BNE CODE_00B1E7                ; If non-zero, value > $FFFF, return
+    BNE Test_Compare16_Done                ; If non-zero, value > $FFFF, return
     LDA.B $9E                      ; Compare low word
     CMP.B $64                      ; Set C and Z flags
-CODE_00B1E7:
+Test_Compare16_Done:
     RTS
 
 ;-------------------------------------------------------------------------------
-; CODE_00B1E8: 24-bit comparison test (full)
+; Test_Compare24Full: 24-bit comparison test (full)
 ;
 ; Purpose: Compare $9E/$A0 with 24-bit value from script
 ; Entry: [$17] = 16-bit low word
@@ -10342,7 +10342,7 @@ CODE_00B1E7:
 ;       $17 incremented by 3
 ; Notes: Full 24-bit comparison (high byte then low word)
 ;-------------------------------------------------------------------------------
-CODE_00B1E8:
+Test_Compare24Full:
     LDA.B [$17]                    ; Load low word
     INC.B $17
     INC.B $17
