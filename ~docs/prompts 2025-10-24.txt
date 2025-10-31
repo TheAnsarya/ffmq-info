@@ -238,6 +238,8 @@ continue, making sure that code is disassembled and NOT just copied into `db` co
 ---- STOP
 leave actual data as db statements, just make sure all actual code is disassembled.
 make sure you're using the files in `C:\Users\me\source\repos\ffmq-info\historical\diztinguish-disassembly\diztinguish` as reference, make sure you are updating the session summary/chat log, document the code as accurately as possible, create git commits with descriptions, focus on aggressively and greedily disassembly of the remaining banks of code (and use the temp file action process to speed things up), build and compare to reference ROM file updating a progress file, 
+continue the disassembly
+continue the disassembly
 
 
 
