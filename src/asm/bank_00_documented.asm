@@ -553,10 +553,10 @@ Boot_FinalInit:
 	; ---------------------------------------------------------------------------
 
 	LDA.B #$00                  ; A = $00 (parameter for first init)
-	JSR.W CODE_0091D4           ; Initialize system component 0
+	JSR.W Char_CalcStats           ; Initialize system component 0
 
 	LDA.B #$01                  ; A = $01 (parameter for second init)
-	JSR.W CODE_0091D4           ; Initialize system component 1
+	JSR.W Char_CalcStats           ; Initialize system component 1
 
 	; ---------------------------------------------------------------------------
 	; Load Initial Data Table
@@ -856,7 +856,7 @@ Load_SaveSlotData:
 
 	SEP #$20                    ; 8-bit accumulator
 
-	JSL.L CODE_009319           ; Finalize save load
+	JSL.L Display_EnableEffects           ; Finalize save load
 
 	RTS                         ; Return
 
@@ -3093,13 +3093,13 @@ GameLoop_ProcessEvents:
 
 	; Refresh Background Layer 0
 	LDA.W #$0000                ; A = $0000 (BG layer 0)
-	JSR.W CODE_0091D4           ; Update BG layer 0 tilemap
-	JSR.W CODE_008C3D           ; Transfer layer 0 to VRAM
+	JSR.W Char_CalcStats           ; Update BG layer 0 tilemap
+	JSR.W Tilemap_RefreshLayer0           ; Transfer layer 0 to VRAM
 
 	; Refresh Background Layer 1
 	LDA.W #$0001                ; A = $0001 (BG layer 1)
-	JSR.W CODE_0091D4           ; Update BG layer 1 tilemap
-	JSR.W CODE_008D29           ; Transfer layer 1 to VRAM
+	JSR.W Char_CalcStats           ; Update BG layer 1 tilemap
+	JSR.W Tilemap_RefreshLayer1           ; Transfer layer 1 to VRAM
 
 	BRA GameLoop_UpdateState    ; → Skip to animation update
 
@@ -3760,7 +3760,7 @@ Menu_CopyTilemapData:
 	; ---------------------------------------------------------------------------
 
 	LDA.W #$0000                ; A = $0000 (BG layer 0)
-	JSR.W CODE_0091D4           ; Update layer 0
+	JSR.W Char_CalcStats           ; Update layer 0
 
 	SEP #$30                    ; 8-bit A, X, Y
 
@@ -4273,11 +4273,11 @@ Tilemap_ApplyAttributes:
 
 ;-------------------------------------------------------------------------------
 
-CODE_008CEF:
+Display_DecimalDigit_Loop:
 	; Divide by 10 loop
 	INY                         ; Y++ (count tens)
 	SBC.B #$0A                  ; A = A - 10
-	BCS CODE_008CEF             ; If carry still set → Continue subtracting
+	BCS Display_DecimalDigit_Loop             ; If carry still set → Continue subtracting
 
 	; A now contains ones digit - 10 (needs adjustment)
 	ADC.B #$8A                  ; A = A + $8A (convert to tile number)
@@ -4291,7 +4291,7 @@ CODE_008CEF:
 	TYA                         ; A = tens digit value
 	ADC.B #$7F                  ; A = A + $7F (convert to tile number)
 	STA.W $0000,X               ; Store tens digit tile
-	BRA CODE_008D20             ; → Finish update
+	BRA Tilemap_FinalizeUpdate             ; → Finish update
 
 ;-------------------------------------------------------------------------------
 
@@ -4302,7 +4302,7 @@ UNREACH_008D06:
 
 ;-------------------------------------------------------------------------------
 
-CODE_008D11:
+Display_BlankTiles:
 	; ===========================================================================
 	; Simple Tile Display
 	; ===========================================================================
@@ -4319,7 +4319,7 @@ CODE_008D11:
 
 ;-------------------------------------------------------------------------------
 
-CODE_008D20:
+Tilemap_FinalizeUpdate:
 	; ===========================================================================
 	; Finalize Tilemap Update
 	; ===========================================================================
@@ -4362,7 +4362,7 @@ Tilemap_RefreshLayer1:
 
 	LDX.W $10B1                 ; X = [$10B1] (cursor position)
 	CPX.B #$FF                  ; Check if invalid
-	BEQ CODE_008D6A             ; If $FF → Exit
+	BEQ Tilemap_RefreshLayer1_Exit             ; If $FF → Exit
 
 	; Calculate tile data
 	LDA.L DATA8_049800,X        ; A = base tile value
@@ -4395,13 +4395,13 @@ Tilemap_RefreshLayer1:
 	LDA.W #$0080                ; A = $0080 (bit 7)
 	TSB.W $00D4                 ; Set large update flag
 
-CODE_008D6A:
+Tilemap_RefreshLayer1_Exit:
 	PLP                         ; Restore status
 	RTS                         ; Return
 
 ;-------------------------------------------------------------------------------
 
-CODE_008D6C:
+Tilemap_RefreshLayer1_Field:
 	; ===========================================================================
 	; Field Mode Layer Update
 	; ===========================================================================
@@ -4415,7 +4415,7 @@ CODE_008D6C:
 	REP #$10                    ; 16-bit X, Y
 
 	LDA.W $10B1                 ; A = cursor position
-	JSR.W CODE_008D8A           ; Calculate tilemap address
+	JSR.W Tilemap_CalcRowAddress           ; Calculate tilemap address
 	STX.W $00F5                 ; Save address
 
 	LDA.B #$80                  ; A = $80
@@ -4426,7 +4426,8 @@ CODE_008D6C:
 
 ;-------------------------------------------------------------------------------
 
-CODE_008D8A:
+; Already renamed: Tilemap_CalcRowAddress
+Tilemap_CalcRowAddress:
 	; ===========================================================================
 	; Tilemap Address Calculation Wrapper
 	; ===========================================================================
@@ -4476,7 +4477,7 @@ CODE_008D97:
 	LDA.W $1031                 ; Get current character position
 	PHA                         ; Save it
 	LDA.W #$0003                ; A = 3 (check 3 party slots)
-	JSR.W CODE_008DA8           ; Validate party member
+	JSR.W Party_CheckAvailability           ; Validate party member
 	PLA                         ; Restore original position
 	STA.W $1031                 ; Store back to $1031
 	STY.B $9E                   ; Save validated position to $9E
@@ -4484,7 +4485,7 @@ CODE_008D97:
 
 ;-------------------------------------------------------------------------------
 
-CODE_008DA8:
+Party_CheckAvailability:
 	; ===========================================================================
 	; Party Member Availability Check
 	; ===========================================================================
@@ -4526,24 +4527,24 @@ CODE_008DA8:
 	SEP #$10                    ; 8-bit X, Y
 	LSR A                       ; Shift right (first bit)
 
-CODE_008DC7:
+Party_CheckAvailability_ShiftLoop:
 	LSR A                       ; Shift right
 	LSR A                       ; Shift right
 	LSR A                       ; Shift right (shift 3 bits per slot)
 	DEX                         ; Decrement shift counter
-	BNE CODE_008DC7             ; Loop until X = 0
+	BNE Party_CheckAvailability_ShiftLoop             ; Loop until X = 0
 
 	LSR A                       ; Check first member bit
-	BCS CODE_008DDA             ; If set → valid member found
+	BCS Party_CheckAvailability_Found             ; If set → valid member found
 	DEY                         ; Try previous slot
 	LSR A                       ; Check second member bit
-	BCS CODE_008DDA             ; If set → valid member found
+	BCS Party_CheckAvailability_Found             ; If set → valid member found
 	DEY                         ; Try previous slot
 	LSR A                       ; Check third member bit
-	BCS CODE_008DDA             ; If set → valid member found
+	BCS Party_CheckAvailability_Found             ; If set → valid member found
 	LDY.B #$FF                  ; No valid members → $FF
 
-CODE_008DDA:
+Party_CheckAvailability_Found:
 	STY.W $1031                 ; Store validated position
 	PLP                         ; Restore processor status
 	RTS                         ; Return
@@ -4587,12 +4588,12 @@ CODE_008DDF:
 	TCD                         ; Direct Page = $2100 (PPU registers)
 	CLC                         ; Clear carry for additions
 
-CODE_008DE8:
+VRAM_DirectWriteLarge_OuterLoop:
 	PHY                         ; Save Y counter
 	SEP #$20                    ; 8-bit A
 	LDY.W #$0018                ; Y = $18 (24 decimal, inner loop count)
 
-CODE_008DEE:
+VRAM_DirectWriteLarge_InnerLoop:
 	LDA.W $0000,X               ; Get byte from source
 	TAY                         ; Y = data byte
 	STY.B !SNES_VMDATAL-$2100   ; Write to VRAM data (low)
@@ -4683,7 +4684,7 @@ CODE_008DEE:
 
 ;-------------------------------------------------------------------------------
 
-CODE_008E54:
+VRAM_Write8TilesPattern:
 	; ===========================================================================
 	; VRAM Write: 8 Tiles with Pattern Interleaving
 	; ===========================================================================
@@ -4713,7 +4714,7 @@ CODE_008E54:
 	REP #$30                    ; 16-bit mode
 	CLC                         ; Clear carry
 
-CODE_008E63:
+VRAM_Write8TilesPattern_Loop:
 	LDA.W $0000,X               ; Get word 0
 	STA.B !SNES_VMDATAL-$2100   ; Write to VRAM
 	LDA.W $00F0                 ; Get pattern word
@@ -4751,7 +4752,7 @@ CODE_008E63:
 	ADC.W #$0010                ; A += $10 (16 bytes per tile)
 	TAX                         ; X = new source address
 	DEY                         ; Decrement tile counter
-	BNE CODE_008E63             ; Loop if more tiles remain
+	BNE VRAM_Write8TilesPattern_Loop             ; Loop if more tiles remain
 
 	SEP #$20                    ; 8-bit A
 	LDA.B #$80                  ; A = $80 (VRAM increment +1)
@@ -4836,7 +4837,7 @@ CODE_008EC4:
 	PLB                         ; Data bank = $04
 	LDX.W #$8000                ; X = $8000 (source address)
 	LDY.W #$0100                ; Y = $0100 (256 tile groups)
-	JSL.L CODE_008DDF           ; Transfer tiles via direct writes
+	JSL.L VRAM_DirectWriteLarge           ; Transfer tiles via direct writes
 	PLB                         ; Restore data bank
 
 	; Load palette data from Bank $07
@@ -4847,16 +4848,16 @@ CODE_008EC4:
 	; Load 4 sets of 8-color palettes
 	LDA.B #$08                  ; A = $08 (CGRAM address $08)
 	LDX.B #$00                  ; X = $00 (source offset)
-	JSR.W CODE_008FB4           ; Load 8 colors
+	JSR.W Palette_Load8Colors           ; Load 8 colors
 	LDA.B #$0C                  ; A = $0C (CGRAM address $0C)
 	LDX.B #$08                  ; X = $08 (source offset)
-	JSR.W CODE_008FB4           ; Load 8 colors
+	JSR.W Palette_Load8Colors           ; Load 8 colors
 	LDA.B #$18                  ; A = $18 (CGRAM address $18)
 	LDX.B #$10                  ; X = $10 (source offset)
-	JSR.W CODE_008FB4           ; Load 8 colors
+	JSR.W Palette_Load8Colors           ; Load 8 colors
 	LDA.B #$1C                  ; A = $1C (CGRAM address $1C)
 	LDX.B #$18                  ; X = $18 (source offset)
-	JSR.W CODE_008FB4           ; Load 8 colors
+	JSR.W Palette_Load8Colors           ; Load 8 colors
 	PLB                         ; Restore data bank
 
 	; Load special color values
@@ -4920,7 +4921,7 @@ CODE_008F55:
 	TXA                         ; A = X (offset)
 	ADC.B #$10                  ; A += $10 (16 bytes per group)
 	DEY                         ; Decrement group counter
-	BNE CODE_008F55             ; Loop if more groups remain
+	BNE Graphics_InitFieldMenu_PaletteLoop             ; Loop if more groups remain
 
 	PLB                         ; Restore data bank
 	PLD                         ; Restore Direct Page
@@ -4929,7 +4930,7 @@ CODE_008F55:
 
 ;-------------------------------------------------------------------------------
 
-CODE_008FB4:
+Palette_Load8Colors:
 	; ===========================================================================
 	; Load 8-Color Palette to CGRAM
 	; ===========================================================================
@@ -5037,7 +5038,7 @@ CODE_009014:
 	SEC                         ; Set carry
 	ADC.B #$27                  ; Add offset $27
 	LDY.B #$A0                  ; Y = $A0 (display position)
-	JSR.W CODE_009111           ; Render status icon
+	JSR.W Status_RenderIcon           ; Render status icon
 
 Skip_Status_Group1:
 	; Process bits 4-2 of $1032
@@ -5050,7 +5051,7 @@ Skip_Status_Group1:
 	SEC                         ; Set carry
 	ADC.B #$27                  ; Add offset $27
 	LDY.B #$B0                  ; Y = $B0 (display position)
-	JSR.W CODE_009111           ; Render status icon
+	JSR.W Status_RenderIcon           ; Render status icon
 
 Skip_Status_Group2:
 	; Process bit 7 of $1033 and bits 1-0 of $1032
@@ -5074,7 +5075,7 @@ Process_Status_Group3:
 	SEC                         ; Set carry
 	ADC.B #$2F                  ; Add offset $2F
 	LDY.B #$C0                  ; Y = $C0 (display position)
-	JSR.W CODE_009111           ; Render status icon
+	JSR.W Status_RenderIcon           ; Render status icon
 
 Skip_Status_Group3:
 	; Process bits 6-4 of $1033
@@ -5087,18 +5088,18 @@ Skip_Status_Group3:
 	SEC                         ; Set carry
 	ADC.B #$2F                  ; Add offset $2F
 	LDY.B #$D0                  ; Y = $D0 (display position)
-	JSR.W CODE_009111           ; Render status icon
+	JSR.W Status_RenderIcon           ; Render status icon
 
 Skip_Status_Group4:
 	; Process first character slot
 	LDY.B #$00                  ; Y = 0 (slot 0)
-	JSR.W CODE_0090A3           ; Render character status
+	JSR.W Status_RenderCharacter           ; Render character status
 
 	; Switch to second character slot data
 	PEA.W $1080                 ; Push $1080
 	PLD                         ; Direct Page = $1080
 	LDY.B #$50                  ; Y = $50 (display offset)
-	JSR.W CODE_0090A3           ; Render character status
+	JSR.W Status_RenderCharacter           ; Render character status
 
 	PLD                         ; Restore Direct Page
 	PLP                         ; Restore processor status
@@ -5106,7 +5107,7 @@ Skip_Status_Group4:
 
 ;-------------------------------------------------------------------------------
 
-CODE_0090A3:
+Status_RenderCharacter:
 	; ===========================================================================
 	; Render Single Character Status Effects
 	; ===========================================================================
@@ -5193,14 +5194,14 @@ Continue_Status4:
 	EOR.B #$FF                  ; Invert
 	SEC                         ; Set carry
 	ADC.B #$46                  ; Add offset $46
-	JSR.W CODE_009111           ; Render status icon
+	JSR.W Status_RenderIcon           ; Render status icon
 
 Skip_Status4:
 	RTS                         ; Return
 
 ;-------------------------------------------------------------------------------
 
-CODE_009111:
+Status_RenderIcon:
 	; ===========================================================================
 	; Render Status Icon to Buffer
 	; ===========================================================================
@@ -5257,7 +5258,7 @@ Got_Layer_Offset:
 	TXA                         ; A = layer offset
 	ADC.B $01,S                 ; Add Y offset from stack
 	TAX                         ; X = final buffer offset
-	JSR.W CODE_0091A9           ; Write icon data to buffer
+	JSR.W Status_SetIconFlags           ; Write icon data to buffer
 
 	; Copy calculated values to buffer
 	LDA.B $DB                   ; Get calculated value 1
@@ -5281,7 +5282,7 @@ Simple_Icon:
 	; Simple single icon ($00-$2E)
 	PLX                         ; X = Y offset (from stack)
 	PHX                         ; Save it back
-	JSR.W CODE_0091A9           ; Write icon to buffer
+	JSR.W Status_SetIconFlags           ; Write icon to buffer
 
 	CPX.B #$50                  ; Check if offset >= $50
 	BCS Render_Done             ; If so, done
@@ -5319,7 +5320,7 @@ Render_Done:
 
 ;-------------------------------------------------------------------------------
 
-CODE_0091A9:
+Status_SetIconFlags:
 	; ===========================================================================
 	; Set Status Icon Flags in Buffer
 	; ===========================================================================
@@ -5395,7 +5396,7 @@ Skip_Flag4:
 ;   - $36A9-$36B8: Delta buffer 4
 ; ===========================================================================
 
-CODE_0091D4:
+Char_CalcStats:
 	PHP                         ; Save processor status
 	PHD                         ; Save direct page register
 	SEP #$30                    ; 8-bit A/X/Y
@@ -5476,7 +5477,7 @@ Setup_Done:
 ;   - Increments X for next stat
 ; ===========================================================================
 
-CODE_009245:
+Stat_CalcOR:
 	LDA.W $3679,X               ; A = delta buffer 1 value
 	ORA.W $3689,X               ; OR with delta buffer 2
 	ORA.W $3699,X               ; OR with delta buffer 3
@@ -5497,7 +5498,7 @@ CODE_009245:
 ;   - Increments X for next stat
 ; ===========================================================================
 
-CODE_009253:
+Stat_CalcSum:
 	LDA.W $3669,X               ; A = base buffer value
 	ADC.W $3679,X               ; Add delta buffer 1 (with carry)
 	ADC.W $3689,X               ; Add delta buffer 2
@@ -5517,12 +5518,12 @@ CODE_009253:
 ; Side Effects: May modify $00D9, calls CODE_009273
 ; ===========================================================================
 
-CODE_009264:
+Animation_CheckUpdate:
 	SEP #$30                    ; 8-bit A/X/Y
 	LDA.B #$20                  ; Bit 5 mask
 	AND.W $00D9                 ; Check animation update flag
 	BNE Skip_Animation          ; If set, skip this frame
-	JSR.W CODE_009273           ; Process animation updates
+	JSR.W Animation_UpdateSystem           ; Process animation updates
 
 Skip_Animation:
 	REP #$30                    ; 16-bit A/X/Y
@@ -5552,7 +5553,7 @@ Skip_Animation:
 ;   - Other values processed based on range checks
 ; ===========================================================================
 
-CODE_009273:
+Animation_UpdateSystem:
 	REP #$10                    ; 16-bit X/Y
 	LDA.B #$20                  ; Bit 5 mask
 	TSB.W $00D9                 ; Set animation processing flag
@@ -5633,7 +5634,7 @@ Animation_Done:
 ; Side Effects: Modifies $00D6, NMITIMEN register, $00D2, $00DB
 ; ===========================================================================
 
-CODE_0092F0:
+Graphics_SetupFieldMode:
 	JSR.W CODE_0092FC           ; Setup graphics state
 	JMP.W CODE_00803A           ; Jump to field mode init
 
@@ -5667,7 +5668,7 @@ CODE_0092F6:
 ;   - NMITIMEN ($4200): Set from $0112
 ; ===========================================================================
 
-CODE_0092FC:
+Graphics_PrepareTransition:
 	SEP #$30                    ; 8-bit A/X/Y
 	LDA.B #$40                  ; Bit 6 mask
 	TSB.W $00D6                 ; Set graphics busy flag in $00D6
@@ -5695,7 +5696,7 @@ CODE_0092FC:
 ; Side Effects: Enables specific graphics modes, gates certain animations
 ; ===========================================================================
 
-CODE_009319:
+Display_EnableEffects:
 	PHP                         ; Save processor status
 	PHB                         ; Save data bank
 	PHK                         ; Push program bank
@@ -5733,7 +5734,7 @@ CODE_009319:
 ; Side Effects: May call display update routines
 ; ===========================================================================
 
-CODE_009342:
+Display_CheckFrameUpdate:
 	LDA.W #$0004                ; Bit 2 mask
 	AND.W $00DB                 ; Check animation gate
 	BEQ Skip_Frame_Check        ; If clear, skip
