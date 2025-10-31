@@ -10102,19 +10102,19 @@ Math_Divide:
 
 	db $A7,$17,$E6,$17,$E6,$17,$80,$E4 ; 16-bit divisor variant
 
-	JSR.W CODE_00B188              ; Variant: divisor from $B188
-	BRA CODE_00B0E6
+	JSR.W Test_LoadValue9E         ; Variant: divisor from $9E
+	BRA Math_Divide
 
-	JSR.W CODE_00B196              ; Variant: divisor from $B196
-	BRA CODE_00B0E6
+	JSR.W Test_LoadValueRNG        ; Variant: divisor from RNG
+	BRA Math_Divide
 
 ;-------------------------------------------------------------------------------
-; CODE_00B10C - Multiplication (16-bit × 8-bit)
+; Math_Multiply8: Multiplication (16-bit × 8-bit)
 ; Purpose: Multiply $9E/$A0 by accumulator
 ; Entry: A = multiplier (8-bit)
 ; Exit: Result in $98/$9A (via CODE_0096E4)
 ;-------------------------------------------------------------------------------
-CODE_00B10C:
+Math_Multiply8:
 	STA.B $9C                      ; Store multiplier
 	LDA.B $9E                      ; Load multiplicand low
 	STA.B $98
@@ -10124,47 +10124,47 @@ CODE_00B10C:
 	RTS
 
 ;-------------------------------------------------------------------------------
-; CODE_00B11B - Multiplication variants
+; Math_Multiply8_Script: Multiplication variants
 ;-------------------------------------------------------------------------------
-CODE_00B11B:
+Math_Multiply8_Script:
 	LDA.B [$17]                    ; Multiplier from script (8-bit)
 	INC.B $17
 	AND.W #$00FF
-	BRA CODE_00B10C
+	BRA Math_Multiply8
 
 	LDA.B [$17]                    ; Multiplier from script (16-bit)
 	INC.B $17
 	INC.B $17
-	BRA CODE_00B10C
+	BRA Math_Multiply8
 
-	db $20,$88,$B1,$80,$DB         ; From CODE_00B188
+	db $20,$88,$B1,$80,$DB         ; From Test_LoadValue8
 
-	JSR.W CODE_00B196              ; From CODE_00B196
-	BRA CODE_00B10C
+	JSR.W Test_LoadValue16         ; From Test_LoadValue16
+	BRA Math_Multiply8
 
 ;-------------------------------------------------------------------------------
-; CODE_00B136 - Get random number result
+; Math_GetRNGResult: Get random number result
 ; Purpose: Transfer RNG result ($A2) to $9E
 ; Exit: $9E = random value, $A0 = 0
 ;-------------------------------------------------------------------------------
-CODE_00B136:
+Math_GetRNGResult:
 	LDA.B $A2                      ; Load RNG result
 	STA.B $9E                      ; Store in $9E
 	STZ.B $A0                      ; Clear high byte
 	RTS
 
-	JSR.W CODE_00B11B              ; Variant: multiply then get result
-	BRA CODE_00B136
+	JSR.W Math_Multiply8_Script    ; Variant: multiply then get result
+	BRA Math_GetRNGResult
 
 	db $20,$24,$B1,$80,$EF,$20,$2C,$B1,$80,$EA,$20,$31,$B1,$80,$E5
 
 ;-------------------------------------------------------------------------------
-; CODE_00B151 - Format decimal number for display
+; Math_FormatDecimal: Format decimal number for display
 ; Purpose: Convert binary value to BCD for display
 ; Entry: $9E/$A0 = value to convert
 ; Exit: Formatted value in buffer at $6D
 ;-------------------------------------------------------------------------------
-CODE_00B151:
+Math_FormatDecimal:
 	PEI.B ($9E)                    ; Save $9E
 	PEI.B ($A0)                    ; Save $A0
 	LDA.W #$0090                   ; BCD format flags
@@ -10181,10 +10181,10 @@ CODE_00B151:
 	RTS
 
 ;-------------------------------------------------------------------------------
-; CODE_00B16B - Format hexadecimal number for display
+; Math_FormatHex: Format hexadecimal number for display
 ; Purpose: Convert binary value to hex for display
 ;-------------------------------------------------------------------------------
-CODE_00B16B:
+Math_FormatHex:
 	PEI.B ($9E)                    ; Save values
 	PEI.B ($A0)
 	LDA.W #$0010                   ; Base 16 (hexadecimal)
@@ -10201,7 +10201,7 @@ CODE_00B16B:
 ;-------------------------------------------------------------------------------
 ; CODE_00B185 - Helper routines for loading test values
 ;-------------------------------------------------------------------------------
-CODE_00B185:
+System_LoadFrom3A:
 	LDA.B $3A                      ; Load from $3A
 	RTS
 
@@ -10659,7 +10659,7 @@ Math_ShiftLeft_Loop:
     RTS
 
 ;-------------------------------------------------------------------------------
-; CODE_00B32A: Right shift by N bits (from indirect address)
+; Math_ShiftRightIndirect: Right shift by N bits (from indirect address)
 ;
 ; Purpose: Right shift $9E/$A0 by count from memory pointer
 ; Entry: [$17] = pointer to shift count (16-bit address)
@@ -10667,14 +10667,14 @@ Math_ShiftLeft_Loop:
 ; Exit: $9E/$A0 = value >> [pointer]
 ;       $17 incremented by 2
 ;-------------------------------------------------------------------------------
-CODE_00B32A:
+Math_ShiftRightIndirect:
     db $A7,$17,$E6,$17,$E6,$17,$AA,$BD,$00,$00,$29,$FF,$00,$46,$A0,$66
     db $9E,$3A,$D0,$F9,$60
     ; LDA [$17]; INC $17; INC $17; TAX; LDA $0000,X; AND #$00FF
     ; LSR $A0; ROR $9E; DEC A; BNE loop; RTS
 
 ;-------------------------------------------------------------------------------
-; CODE_00B33F: Left shift by N bits (from indirect address)
+; Math_ShiftLeftIndirect: Left shift by N bits (from indirect address)
 ;
 ; Purpose: Left shift $9E/$A0 by count from memory pointer
 ; Entry: [$17] = pointer to shift count (16-bit address)
@@ -10682,7 +10682,7 @@ CODE_00B32A:
 ; Exit: $9E/$A0 = value << [pointer]
 ;       $17 incremented by 2
 ;-------------------------------------------------------------------------------
-CODE_00B33F:
+Math_ShiftLeftIndirect:
     db $A7,$17,$E6,$17,$E6,$17,$AA,$BD,$00,$00,$29,$FF,$00,$06,$9E,$26
     db $A0,$3A,$D0,$F9,$60
     ; LDA [$17]; INC $17; INC $17; TAX; LDA $0000,X; AND #$00FF
@@ -10893,7 +10893,7 @@ Cmd_DecrementIndirect8:
     RTS
 
 ;-------------------------------------------------------------------------------
-; CODE_00B3E5: Bitwise OR from indirect addresses
+; Bitwise_ORIndirect16: Bitwise OR from indirect addresses
 ;
 ; Purpose: OR value from first pointer with value from second pointer, store at first
 ; Entry: [$17] = destination pointer (16-bit address)
@@ -10901,7 +10901,7 @@ Cmd_DecrementIndirect8:
 ; Exit: [dest] = [dest] OR [source]
 ;       $17 incremented by 4
 ;-------------------------------------------------------------------------------
-CODE_00B3E5:
+Bitwise_ORIndirect16:
     db $A7,$17,$E6,$17,$E6,$17,$AA,$A7,$17,$E6,$17,$E6,$17,$3D,$00,$00
     db $9D,$00,$00,$60
     ; LDA [$17]; INC $17; INC $17; TAX
@@ -10932,7 +10932,7 @@ Bitwise_ANDIndirect8:
     RTS
 
 ;-------------------------------------------------------------------------------
-; CODE_00B410: Bitwise OR from indirect addresses (16-bit)
+; Bitwise_ANDIndirect16: Bitwise OR from indirect addresses (16-bit)
 ;
 ; Purpose: OR word from second pointer with word at first pointer
 ; Entry: [$17] = destination pointer (16-bit address)
@@ -10940,7 +10940,7 @@ Bitwise_ANDIndirect8:
 ; Exit: [dest] = [dest] OR [source] (16-bit operation)
 ;       $17 incremented by 4
 ;-------------------------------------------------------------------------------
-CODE_00B410:
+Bitwise_ANDIndirect16:
     db $A7,$17,$E6,$17,$E6,$17,$AA,$A7,$17,$E6,$17,$E6,$17,$1D,$00,$00
     db $9D,$00,$00,$60
     ; LDA [$17]; INC $17; INC $17; TAX
@@ -10970,7 +10970,7 @@ Bitwise_ORIndirect8:
     RTS
 
 ;-------------------------------------------------------------------------------
-; CODE_00B43B: Bitwise XOR from indirect addresses (16-bit)
+; Bitwise_XORIndirect16: Bitwise XOR from indirect addresses (16-bit)
 ;
 ; Purpose: XOR word from second pointer with word at first pointer
 ; Entry: [$17] = destination pointer
@@ -10978,7 +10978,7 @@ Bitwise_ORIndirect8:
 ; Exit: [dest] = [dest] XOR [source] (16-bit operation)
 ;       $17 incremented by 4
 ;-------------------------------------------------------------------------------
-CODE_00B43B:
+Bitwise_XORIndirect16:
     db $A7,$17,$E6,$17,$E6,$17,$AA,$A7,$17,$E6,$17,$E6,$17,$5D,$00,$00
     db $9D,$00,$00,$60
     ; LDA [$17]; INC $17; INC $17; TAX
@@ -11099,7 +11099,7 @@ Tilemap_UpdateMax_Done:
 ; Exit: Jumps to CODE_00A8C0 if bit 5 set, CODE_009DC9 otherwise
 ; Notes: Bit 5 of $DA appears to be a mode or state flag
 ;-------------------------------------------------------------------------------
-CODE_00B4B0:
+System_CheckModeJump:
     LDA.W #$0020                   ; Bit 5 mask
     AND.W $00DA                    ; Test bit 5 of $DA
     BEQ UNREACH_00B4BB             ; If clear, jump to alternate
@@ -11249,7 +11249,7 @@ Text_SetCounter16:
     JMP.W CODE_00A7DE              ; Jump to text drawing
 
 ;-------------------------------------------------------------------------------
-; CODE_00B550: Tilemap buffer manipulation (unclear function)
+; Tilemap_WriteDynamic: Tilemap buffer manipulation (unclear function)
 ;
 ; Purpose: Complex tilemap buffer operation
 ; Entry: $015F = counter/index
@@ -11259,7 +11259,7 @@ Text_SetCounter16:
 ;       $015F updated
 ; Notes: Uses indexed buffer writes with loop
 ;-------------------------------------------------------------------------------
-CODE_00B550:
+Tilemap_WriteDynamic:
     db $C2,$20,$E2,$10,$AD,$5F,$01,$A4,$1F,$87,$1A,$E6,$1A,$E6,$1A,$1A
     db $88,$D0,$F6,$8D,$5F,$01,$60
     ; REP #$20; SEP #$10
@@ -11268,7 +11268,7 @@ CODE_00B550:
     ; DEY; BNE loop; STA $015F; RTS
 
 ;-------------------------------------------------------------------------------
-; CODE_00B567: Character sprite setup and positioning
+; Sprite_SetupCharacter: Character sprite setup and positioning
 ;
 ; Purpose: Set up character sprite display parameters based on game state
 ; Entry: $20 = location/mode ID
@@ -11285,13 +11285,13 @@ CODE_00B550:
 ;        Handles battle vs overworld sprite modes
 ;        Adjusts for screen centering and boundaries
 ;-------------------------------------------------------------------------------
-CODE_00B567:
+Sprite_SetupCharacter:
     PHP                            ; Save processor status
     SEP #$20                       ; 8-bit accumulator
     REP #$10                       ; 16-bit X/Y
     LDA.B #$10                     ; Bit 4 mask
     AND.W $00DA                    ; Test bit 4 of $DA
-    BEQ CODE_00B57E                ; If clear, normal mode
+    BEQ Sprite_SetupCharacter_Normal ; If clear, normal mode
     LDA.B #$04                     ; Mode 4 (battle mode)
     STA.B $24                      ; Store sprite mode
     LDX.W #$5F78                   ; Sprite data pointer
@@ -11299,46 +11299,46 @@ CODE_00B567:
     PLP                            ; Restore processor status
     RTS
 
-CODE_00B57E:
+Sprite_SetupCharacter_Normal:
     LDA.B #$04                     ; Bit 2 mask
     TRB.W $00D0                    ; Clear bit 2 of $D0
     JSL.L CODE_018A52              ; Call external sprite init
     LDA.B #$01                     ; Bit 0 mask
     AND.W $00D9                    ; Test bit 0 of $D9
-    BEQ CODE_00B592                ; If clear, skip
+    BEQ Sprite_SetupCharacter_CheckLocation ; If clear, skip
     LDA.B #$08                     ; Mode 8
     STA.B $24                      ; Store sprite mode
 
-CODE_00B592:
+Sprite_SetupCharacter_CheckLocation:
     LDA.B $20                      ; Load location/mode ID
     CMP.B #$0B                     ; Location $0B?
-    BEQ CODE_00B5DB                ; If yes, special handling
+    BEQ Sprite_SetupCharacter_Special ; If yes, special handling
     CMP.B #$A7                     ; Location $A7?
-    BEQ CODE_00B5DB                ; If yes, special handling
+    BEQ Sprite_SetupCharacter_Special ; If yes, special handling
     CMP.B #$4F                     ; Location $4F?
-    BEQ CODE_00B5D4                ; If yes, set bit 2 in $D0
+    BEQ Sprite_SetupCharacter_SetBit2 ; If yes, set bit 2 in $D0
     CMP.B #$01                     ; Location $01?
-    BEQ CODE_00B5C9                ; If yes, adjust X position
+    BEQ Sprite_SetupCharacter_AdjustX ; If yes, adjust X position
     CMP.B #$1B                     ; Location $1B?
-    BEQ CODE_00B5C9                ; If yes, adjust X position
+    BEQ Sprite_SetupCharacter_AdjustX ; If yes, adjust X position
     CMP.B #$30                     ; Location $30?
-    BEQ CODE_00B5C9                ; If yes, adjust X position
+    BEQ Sprite_SetupCharacter_AdjustX ; If yes, adjust X position
     CMP.B #$31                     ; Location $31?
-    BEQ CODE_00B5C9                ; If yes, adjust X position
+    BEQ Sprite_SetupCharacter_AdjustX ; If yes, adjust X position
     CMP.B #$4E                     ; Location $4E?
-    BEQ CODE_00B5C9                ; If yes, adjust X position
+    BEQ Sprite_SetupCharacter_AdjustX ; If yes, adjust X position
     CMP.B #$6B                     ; Location $6B?
     BEQ UNREACH_00B5C2             ; If yes, adjust Y position
     CMP.B #$77                     ; < $77?
-    BCC CODE_00B5DF                ; If yes, continue
+    BCC Sprite_SetupCharacter_Continue ; If yes, continue
     CMP.B #$7B                     ; >= $7B?
-    BCS CODE_00B5DF                ; If yes, continue
-    db $80,$07                     ; BRA CODE_00B5C9 (unconditional)
+    BCS Sprite_SetupCharacter_Continue ; If yes, continue
+    db $80,$07                     ; BRA Sprite_SetupCharacter_AdjustX (unconditional)
 
 UNREACH_00B5C2:
     db $18,$A5,$23,$69,$04,$85,$23 ; CLC; LDA $23; ADC #$04; STA $23
 
-CODE_00B5C9:
+Sprite_SetupCharacter_AdjustX:
     CLC                            ; Clear carry
     LDA.B $22                      ; Load X position
     ADC.B #$08                     ; Add 8
@@ -11346,45 +11346,45 @@ CODE_00B5C9:
     LDA.B #$04                     ; Mode 4
     STA.B $24                      ; Store sprite mode
 
-CODE_00B5D4:
+Sprite_SetupCharacter_SetBit2:
     LDA.B #$04                     ; Bit 2 mask
     TSB.W $00D0                    ; Set bit 2 of $D0
-    BRA CODE_00B5DF                ; Continue
+    BRA Sprite_SetupCharacter_Continue ; Continue
 
-CODE_00B5DB:
+Sprite_SetupCharacter_Special:
     LDA.B #$04                     ; Mode 4
     STA.B $24                      ; Store sprite mode
 
-CODE_00B5DF:
+Sprite_SetupCharacter_Continue:
     INC.B $23                      ; Increment Y position
     LDA.B $24                      ; Load sprite mode
     BIT.B #$08                     ; Test bit 3
-    BNE CODE_00B5F3                ; If set, use mode 10
+    BNE Sprite_SetupCharacter_Mode10 ; If set, use mode 10
     BIT.B #$04                     ; Test bit 2
-    BNE CODE_00B5EF                ; If set, use mode 5
+    BNE Sprite_SetupCharacter_Mode5 ; If set, use mode 5
     BIT.B #$02                     ; Test bit 1
-    BNE CODE_00B5F3                ; If set, use mode 10
+    BNE Sprite_SetupCharacter_Mode10 ; If set, use mode 10
 
-CODE_00B5EF:
+Sprite_SetupCharacter_Mode5:
     LDA.B #$05                     ; Mode 5
-    BRA CODE_00B5F5                ; Store mode
+    BRA Sprite_SetupCharacter_StoreMode ; Store mode
 
-CODE_00B5F3:
+Sprite_SetupCharacter_Mode10:
     LDA.B #$0A                     ; Mode 10
 
-CODE_00B5F5:
+Sprite_SetupCharacter_StoreMode:
     STA.B $24                      ; Store final sprite mode
     LDA.B $23                      ; Load Y position
     CMP.B #$08                     ; < $08?
     BCC UNREACH_00B607             ; If yes, clamp to $08
     CMP.B #$A9                     ; >= $A9?
-    BCC CODE_00B60B                ; If no, in range
-    db $A9,$A8,$85,$23,$80,$04     ; LDA #$A8; STA $23; BRA CODE_00B60B
+    BCC Sprite_SetupCharacter_CheckX ; If no, in range
+    db $A9,$A8,$85,$23,$80,$04     ; LDA #$A8; STA $23; BRA Sprite_SetupCharacter_CheckX
 
 UNREACH_00B607:
     db $A9,$08,$85,$23             ; LDA #$08; STA $23
 
-CODE_00B60B:
+Sprite_SetupCharacter_CheckX:
     CLC                            ; Clear carry
     LDA.B $2D                      ; Load parameter
     XBA                            ; Swap A/B
@@ -11394,97 +11394,97 @@ CODE_00B60B:
     STA.B $64                      ; Store in temp
     ADC.B #$05                     ; Add 5
     CMP.B $23                      ; Compare with Y position
-    BCS CODE_00B630                ; If >= Y, use mode bits
+    BCS Sprite_SetupCharacter_SetBit3 ; If >= Y, use mode bits
     SEC                            ; Set carry
     LDA.B #$A8                     ; Load $A8
     SBC.B $2D                      ; Subtract parameter
     CMP.B $23                      ; Compare with Y
-    BCS CODE_00B638                ; If >= Y, continue
+    BCS Sprite_SetupCharacter_CheckXBounds ; If >= Y, continue
     LDA.B $24                      ; Load sprite mode
     AND.B #$F7                     ; Clear bit 3
     ORA.B #$04                     ; Set bit 2
     STA.B $24                      ; Store updated mode
-    BRA CODE_00B638                ; Continue
+    BRA Sprite_SetupCharacter_CheckXBounds ; Continue
 
-CODE_00B630:
+Sprite_SetupCharacter_SetBit3:
     LDA.B $24                      ; Load sprite mode
     AND.B #$FB                     ; Clear bit 2
     ORA.B #$08                     ; Set bit 3
     STA.B $24                      ; Store updated mode
 
-CODE_00B638:
+Sprite_SetupCharacter_CheckXBounds:
     XBA                            ; Swap A/B
     STA.B $2D                      ; Store parameter
     LDA.B $22                      ; Load X position
     CMP.B #$20                     ; < $20?
-    BCC CODE_00B657                ; If yes, clamp to $08
+    BCC Sprite_SetupCharacter_XLow ; If yes, clamp to $08
     CMP.B #$D1                     ; >= $D1?
-    BCC CODE_00B667                ; If no, in range
+    BCC Sprite_SetupCharacter_CalcYOffset ; If no, in range
     db $C9,$E9,$90,$04,$A9,$E8,$85,$22,$A5,$24,$29,$FD,$09,$01,$85,$24
     db $80,$10                     ; LDA #$E8; STA $22; LDA $24; AND #$FD; ORA #$01; STA $24; BRA
 
-CODE_00B657:
+Sprite_SetupCharacter_XLow:
     CMP.B #$08                     ; < $08?
-    BCS CODE_00B65F                ; If no, in range
+    BCS Sprite_SetupCharacter_XLow_SetBit1 ; If no, in range
     db $A9,$08,$85,$22             ; LDA #$08; STA $22
 
-CODE_00B65F:
+Sprite_SetupCharacter_XLow_SetBit1:
     LDA.B $24                      ; Load sprite mode
     AND.B #$FE                     ; Clear bit 0
     ORA.B #$02                     ; Set bit 1
     STA.B $24                      ; Store updated mode
 
-CODE_00B667:
+Sprite_SetupCharacter_CalcYOffset:
     LDA.B $24                      ; Load sprite mode
     AND.B #$08                     ; Test bit 3
-    BNE CODE_00B674                ; If set, add $10 offset
+    BNE Sprite_SetupCharacter_AddYOffset ; If set, add $10 offset
     SEC                            ; Set carry
     LDA.B $23                      ; Load Y position
     SBC.B $64                      ; Subtract temp
-    BRA CODE_00B679                ; Store offset
+    BRA Sprite_SetupCharacter_StoreYOffset ; Store offset
 
-CODE_00B674:
+Sprite_SetupCharacter_AddYOffset:
     CLC                            ; Clear carry
     LDA.B $23                      ; Load Y position
     ADC.B #$10                     ; Add $10
 
-CODE_00B679:
+Sprite_SetupCharacter_StoreYOffset:
     STA.B $62                      ; Store Y offset
     LDA.W $00C8                    ; Load location parameter
     CMP.B #$00                     ; Check if 0
-    BNE CODE_00B68E                ; If not, alternate check
+    BNE Sprite_SetupCharacter_CheckAlt ; If not, alternate check
     LDA.B #$40                     ; Bit 6 mask
     AND.W $00E0                    ; Test bit 6 of $E0
-    BEQ CODE_00B6B1                ; If clear, done
+    BEQ Sprite_SetupCharacter_Done ; If clear, done
     LDA.W $01BF                    ; Load character 1 position
-    BRA CODE_00B698                ; Check position
+    BRA Sprite_SetupCharacter_CheckPos ; Check position
 
-CODE_00B68E:
+Sprite_SetupCharacter_CheckAlt:
     LDA.B #$80                     ; Bit 7 mask
     AND.W $00E0                    ; Test bit 7 of $E0
-    BEQ CODE_00B6B1                ; If clear, done
+    BEQ Sprite_SetupCharacter_Done ; If clear, done
     LDA.W $0181                    ; Load character 2 position
 
-CODE_00B698:
+Sprite_SetupCharacter_CheckPos:
     CMP.B $62                      ; Compare with Y offset
-    BCC CODE_00B6A4                ; If less, check lower bound
+    BCC Sprite_SetupCharacter_CheckLower ; If less, check lower bound
     SBC.B $62                      ; Subtract Y offset
     CMP.B $64                      ; Compare with temp
-    BCS CODE_00B6B1                ; If >=, done
-    BRA CODE_00B6AB                ; Toggle mode
+    BCS Sprite_SetupCharacter_Done ; If >=, done
+    BRA Sprite_SetupCharacter_ToggleMode ; Toggle mode
 
-CODE_00B6A4:
+Sprite_SetupCharacter_CheckLower:
     ADC.B $64                      ; Add temp
     DEC A                          ; Decrement
     CMP.B $62                      ; Compare with Y offset
-    BCC CODE_00B6B1                ; If less, done
+    BCC Sprite_SetupCharacter_Done ; If less, done
 
-CODE_00B6AB:
+Sprite_SetupCharacter_ToggleMode:
     LDA.B $24                      ; Load sprite mode
     EOR.B #$0C                     ; Toggle bits 2-3
     STA.B $24                      ; Store updated mode
 
-CODE_00B6B1:
+Sprite_SetupCharacter_Done:
     PLP                            ; Restore processor status
     RTS
 
@@ -11690,7 +11690,7 @@ DATA_00B7DD:
 ;        Uses $DA bit 6 for jitter calculation toggle
 ;        Enables second-stage IRQ handler
 ;-------------------------------------------------------------------------------
-CODE_00B82A:
+IRQ_JitterFix:
     REP #$30                       ; 16-bit A/X/Y
     PHB                            ; Save data bank
     PHA                            ; Save accumulator
@@ -11700,14 +11700,14 @@ CODE_00B82A:
     PLB                            ; Set data bank = program bank
     STZ.W SNES_NMITIMEN            ; Disable NMI/IRQ
 
-CODE_00B836:
+IRQ_JitterFix_Loop:
     LDA.W SNES_SLHV                ; Sample H/V counter
     LDA.W SNES_STAT78              ; Read PPU status
     LDA.W SNES_OPVCT               ; Read vertical counter
     STA.W $0118                    ; Store V counter
     LDA.B #$40                     ; Bit 6 mask
     AND.W $00DA                    ; Test bit 6 of $DA
-    BNE CODE_00B854                ; If set, skip jitter calc
+    BNE IRQ_JitterFix_Skip         ; If set, skip jitter calc
     LDA.W $0118                    ; Load V counter
     ASL A                          ; × 2
     ADC.W $0118                    ; × 3
@@ -11715,9 +11715,9 @@ CODE_00B836:
     PHA                            ; Push result
     PLP                            ; Pull to processor status (jitter)
 
-CODE_00B854:
+IRQ_JitterFix_Skip:
     LSR.W $0118                    ; V counter >> 1
-    BCS CODE_00B836                ; If carry, resample (unstable)
+    BCS IRQ_JitterFix_Loop         ; If carry, resample (unstable)
     LDX.W #$B86C                   ; Second-stage IRQ handler
     STX.W $0118                    ; Store handler address
     LDA.B #$11                     ; Enable V-IRQ + NMI
@@ -11731,18 +11731,18 @@ CODE_00B854:
     RTI                            ; Return from interrupt
 
 ;-------------------------------------------------------------------------------
-; CODE_00B86C: IRQ handler (second stage - screen on)
+; IRQ_ScreenOn: IRQ handler (second stage - screen on)
 ;
 ; Purpose: Second-stage IRQ handler - turn screen on and switch to NMI
 ; Entry: Called by IRQ after jitter correction
 ; Exit: Screen enabled
 ;       NMI mode set
 ;       $D8 bit 6 set
-;       Interrupt vector updated to CODE_00B82A
+;       Interrupt vector updated to IRQ_JitterFix2
 ; Calls: CODE_008B69 (screen setup)
 ; Notes: Final stage of screen transition
 ;-------------------------------------------------------------------------------
-CODE_00B86C:
+IRQ_ScreenOn:
     LDA.B #$80                     ; Screen off brightness
     STA.W SNES_INIDISP             ; Disable screen
     LDA.B #$01                     ; NMI only mode
@@ -11754,7 +11754,7 @@ CODE_00B86C:
     SEP #$20                       ; 8-bit accumulator
     LDA.B #$07                     ; V-IRQ timer low
     STA.W SNES_VTIMEL              ; Set V timer
-    LDX.W #$B898                   ; Next IRQ handler
+    LDX.W #$B898                   ; Next IRQ handler (IRQ_JitterFix2)
     STX.W $0118                    ; Store handler address
     LDA.W $0112                    ; Load interrupt mode
     STA.W SNES_NMITIMEN            ; Set interrupt mode
@@ -12797,47 +12797,47 @@ UNREACH_00BEE5:
     ; LDA #$CCB0; JSL CODE_00B930; (menu polling code)
 
 ;-------------------------------------------------------------------------------
-; CODE_00BF00: Complex menu update routine
+; Menu_MultiOption: Complex menu update routine
 ;
 ; Purpose: Update menu display with multiple options
 ; Entry: $01 = current option
 ;        $03 = menu data pointer
 ; Exit: Menu updated
 ; Calls: CODE_009BC4 (menu update)
-;        CODE_00B930 (input polling)
-;        CODE_00B926 (animation mode)
+;        Input_PollWithToggle (input polling)
+;        Anim_SetMode11 (animation mode)
 ; Notes: Handles multi-option menus with cursor navigation
 ;-------------------------------------------------------------------------------
-CODE_00BF00:
+Menu_MultiOption:
     PHK                            ; Push program bank
     PLB                            ; Set data bank
-    JSR.W CODE_00B926              ; Set animation mode $11
+    JSR.W Anim_SetMode11           ; Set animation mode $11
     LDX.W #$BECB                   ; Data pointer
     JSR.W CODE_009BC4              ; Update menu
 
-CODE_00BF0B:
+Menu_MultiOption_Loop:
     LDA.W #$CCB0                   ; Button mask
-    JSR.W CODE_00B930              ; Poll input
-    BNE CODE_00BF28                ; If button pressed, process
+    JSR.W Input_PollWithToggle     ; Poll input
+    BNE Menu_MultiOption_Process   ; If button pressed, process
     BIT.W #$0080                   ; Test B button
-    BEQ CODE_00BF0B                ; If not pressed, loop
+    BEQ Menu_MultiOption_Loop      ; If not pressed, loop
     STZ.B $8E                      ; Clear $8E
     RTS
 
 UNREACH_00BF1B:
     db $20,$1C,$B9,$A9,$FF,$FF,$85,$01,$9C,$8E,$00,$60
-    ; JSR CODE_00B91C; LDA #$FFFF; STA $01; STZ $8E; RTS
+    ; JSR Anim_SetMode10; LDA #$FFFF; STA $01; STZ $8E; RTS
 
 DATA_00BF27:
     db $00                         ; Padding
 
-CODE_00BF28:
+Menu_MultiOption_Process:
     STX.W $015F                    ; Store input state
-    JSR.W CODE_00B91C              ; Set animation mode $10
-    BRA CODE_00BF0B                ; Loop
+    JSR.W Anim_SetMode10           ; Set animation mode $10
+    BRA Menu_MultiOption_Loop      ; Loop
 
 ;-------------------------------------------------------------------------------
-; CODE_00BF30: Item use/equip system cleanup and return
+; Menu_Item_CleanupReturn: Item use/equip system cleanup and return
 ;
 ; Purpose: Restore state after item menu operations
 ; Entry: Processor status saved on stack
@@ -12847,7 +12847,7 @@ CODE_00BF28:
 ; Calls: CODE_009BC4 (menu update)
 ; Notes: Cleanup routine for item management
 ;-------------------------------------------------------------------------------
-CODE_00BF30:
+Menu_Item_CleanupReturn:
     LDA.B #$04                     ; Bit 2 mask
     TRB.W $00DA                    ; Clear bit 2 of $DA
     LDX.W #$BF48                   ; Menu data
@@ -12866,40 +12866,40 @@ DATA_00BF48:
     db $9B,$8F,$03                 ; Menu configuration
 
 ;-------------------------------------------------------------------------------
-; Inventory Item Discard System (CODE_00BF4B - CODE_00C012)
+; Inventory Item Discard System (Menu_Item_Discard - CODE_00C012)
 ;-------------------------------------------------------------------------------
-CODE_00BF4B:
+Menu_Item_Discard:
     LDA.W #$0504                   ; Menu mode $0504
     STA.B $03                      ; Store in $03
     LDX.W #$FFF0                   ; Load $FFF0
     STX.B $8E                      ; Store in $8E
-    BRA CODE_00BF77                ; Jump to menu display
+    BRA Menu_Item_Discard_Display  ; Jump to menu display
 
-CODE_00BF57:
-    JSR.W CODE_00B912              ; Set sprite mode $2D
+Menu_Item_Discard_Error:
+    JSR.W Sprite_SetMode2C         ; Set sprite mode $2C
 
-CODE_00BF5A:
+Menu_Item_Discard_Input:
     LDA.W #$CFB0                   ; Button mask
-    JSR.W CODE_00B930              ; Poll input
-    BNE CODE_00BF77                ; If button pressed, process
+    JSR.W Input_PollWithToggle     ; Poll input
+    BNE Menu_Item_Discard_Display  ; If button pressed, process
     BIT.W #$0080                   ; Test B button
-    BNE CODE_00BF7F                ; If pressed, branch
+    BNE Menu_Item_Discard_Validate ; If pressed, branch
     BIT.W #$8000                   ; Test A button
-    BEQ CODE_00BF5A                ; If not pressed, loop
-    JSR.W CODE_00B91C              ; Set animation mode $10
+    BEQ Menu_Item_Discard_Input    ; If not pressed, loop
+    JSR.W Anim_SetMode10           ; Set animation mode $10
     STZ.B $8E                      ; Clear $8E
     LDX.W #$C032                   ; Menu data
     JMP.W CODE_009BC4              ; Update menu and return
 
-CODE_00BF77:
+Menu_Item_Discard_Display:
     LDX.W #$C02F                   ; Menu data
     JSR.W CODE_009BC4              ; Update menu
-    BRA CODE_00BF5A                ; Loop
+    BRA Menu_Item_Discard_Input    ; Loop
 
-CODE_00BF7F:
+Menu_Item_Discard_Validate:
     LDA.B $02                      ; Load selection
     AND.W #$00FF                   ; Mask to 8 bits
-    BNE CODE_00BF57                ; If not zero, error sound
+    BNE Menu_Item_Discard_Error    ; If not zero, error sound
     LDA.B $01                      ; Load item slot
     AND.W #$00FF                   ; Mask to 8 bits
     ASL A                          ; × 2 (word index)
@@ -12907,18 +12907,18 @@ CODE_00BF7F:
     LDA.W $0E9E,X                  ; Load item ID
     AND.W #$00FF                   ; Mask to 8 bits
     CMP.W #$00FF                   ; Check if empty slot
-    BEQ CODE_00BF57                ; If empty, error
+    BEQ Menu_Item_Discard_Error    ; If empty, error
     CMP.W #$0013                   ; Check if item $13
-    BEQ CODE_00BF57                ; If yes, can't discard
+    BEQ Menu_Item_Discard_Error    ; If yes, can't discard
     CMP.W #$0011                   ; Check if less than $11
-    BCC CODE_00BFEF                ; If yes, handle consumable
-    BEQ CODE_00BFD8                ; If $11, handle armor
-    JSR.W CODE_00C012              ; Confirm discard
-    BCC CODE_00BFAE                ; If confirmed, proceed
-    BNE CODE_00BF5A                ; If cancelled, loop
+    BCC Menu_Item_Discard_Consumable ; If yes, handle consumable
+    BEQ Menu_Item_Discard_Armor    ; If $11, handle armor
+    JSR.W Menu_Item_ConfirmDiscard ; Confirm discard
+    BCC Menu_Item_Discard_Execute  ; If confirmed, proceed
+    BNE Menu_Item_Discard_Input    ; If cancelled, loop
     LDA.W #$0080                   ; Load $80 (companion item)
 
-CODE_00BFAE:
+Menu_Item_Discard_Execute:
     DEC.W $0E9F,X                  ; Decrement quantity
     CLC                            ; Clear carry
     ADC.W #$1018                   ; Add base address
@@ -12928,7 +12928,7 @@ CODE_00BFAE:
     LDA.W #$0002                   ; Length = 2
     MVN $00,$00                    ; Block move (shift items)
 
-CODE_00BFC0:
+Menu_Item_Discard_UpdateDisplay:
     SEP #$20                       ; 8-bit accumulator
     LDA.W $04DF                    ; Load character ID
     STA.W $0505                    ; Store in $0505
@@ -12936,32 +12936,32 @@ CODE_00BFC0:
     JSR.W CODE_00DAA5              ; External routine
     LDX.W #$C035                   ; Menu data
     JSR.W CODE_009BC4              ; Update menu
-    BRA CODE_00BF77                ; Loop
+    BRA Menu_Item_Discard_Display  ; Loop
 
 UNREACH_00BFD5:
-    db $4C,$5A,$BF                 ; JMP CODE_00BF5A
+    db $4C,$5A,$BF                 ; JMP Menu_Item_Discard_Input
 
-CODE_00BFD8:
-    JSR.W CODE_00C012              ; Confirm discard
-    BCC CODE_00BFE2                ; If confirmed, proceed
+Menu_Item_Discard_Armor:
+    JSR.W Menu_Item_ConfirmDiscard ; Confirm discard
+    BCC Menu_Item_Discard_Armor_Execute ; If confirmed, proceed
     BNE UNREACH_00BFD5             ; If cancelled, loop
     LDA.W #$0080                   ; Load $80
 
-CODE_00BFE2:
+Menu_Item_Discard_Armor_Execute:
     DEC.W $0E9F,X                  ; Decrement quantity
     TAX                            ; X = item offset
     SEP #$20                       ; 8-bit accumulator
     STZ.W $1021,X                  ; Clear equipped flag
     REP #$30                       ; 16-bit A/X/Y
-    BRA CODE_00BFC0                ; Update display
+    BRA Menu_Item_Discard_UpdateDisplay ; Update display
 
-CODE_00BFEF:
-    JSR.W CODE_00C012              ; Confirm discard
-    BCC CODE_00BFF9                ; If confirmed, proceed
+Menu_Item_Discard_Consumable:
+    JSR.W Menu_Item_ConfirmDiscard ; Confirm discard
+    BCC Menu_Item_Discard_Consumable_Execute ; If confirmed, proceed
     BNE UNREACH_00BFD5             ; If cancelled, loop
     LDA.W #$0080                   ; Load $80
 
-CODE_00BFF9:
+Menu_Item_Discard_Consumable_Execute:
     DEC.W $0E9F,X                  ; Decrement quantity
     TAX                            ; X = item offset
     LDA.W $1016,X                  ; Load max HP
@@ -12974,7 +12974,7 @@ CODE_00BFF9:
 
 Menu_Item_StoreHP:
     STA.W $1014,X                  ; Store new HP
-    BRA CODE_00BFC0                ; Update display
+    BRA Menu_Item_Discard_UpdateDisplay ; Update display
 
 ;-------------------------------------------------------------------------------
 ; Menu_Item_ConfirmDiscard: Confirm item discard dialog
@@ -13013,17 +13013,17 @@ Menu_Spell_Equip:
     BRA Menu_Spell_DisplayMenu     ; Jump to menu display
 
 UNREACH_00C044:
-    db $20,$12,$B9                 ; JSR CODE_00B912
+    db $20,$12,$B9                 ; JSR Sprite_SetMode2C
 
 Menu_Spell_ProcessInput:
     LDA.W #$CFB0                   ; Button mask
-    JSR.W CODE_00B930              ; Poll input
+    JSR.W Input_PollWithToggle     ; Poll input
     BNE Menu_Spell_DisplayMenu     ; If button pressed, process
     BIT.W #$0080                   ; Test B button
     BNE Menu_Spell_Cancel          ; If pressed, branch
     BIT.W #$8000                   ; Test A button
     BEQ Menu_Spell_ProcessInput    ; If not pressed, loop
-    JSR.W CODE_00B91C              ; Set animation mode $10
+    JSR.W Anim_SetMode10           ; Set animation mode $10
     STZ.B $8E                      ; Clear $8E
     LDX.W #$C1D6                   ; Menu data
     JMP.W CODE_009BC4              ; Update menu and return
