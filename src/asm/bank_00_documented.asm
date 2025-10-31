@@ -4460,7 +4460,7 @@ UNREACH_008D93:
 ; member availability. Used by menu systems to skip dead/invalid characters.
 ;===============================================================================
 
-CODE_008D97:
+Party_ValidateCharPos:
 	; ===========================================================================
 	; Character Position Validation Helper
 	; ===========================================================================
@@ -4556,7 +4556,7 @@ Party_CheckAvailability_Found:
 ; system. These routines handle bulk transfers and direct writes to VRAM.
 ;===============================================================================
 
-CODE_008DDF:
+VRAM_DirectWriteLarge:
 	; ===========================================================================
 	; Large VRAM Write via Direct Writes (No DMA)
 	; ===========================================================================
@@ -4768,7 +4768,7 @@ VRAM_Write8TilesPattern_Loop:
 ; display. Handles DMA transfers and direct palette uploads to CGRAM.
 ;===============================================================================
 
-CODE_008EC4:
+Graphics_InitFieldMenuMode:
 	; ===========================================================================
 	; Field/Menu Graphics Initialization
 	; ===========================================================================
@@ -4989,7 +4989,7 @@ DATA_008FDF_bytes:
 ; Processes status ailments, buffs, and visual indicators for the party
 ;===============================================================================
 
-CODE_009014:
+Status_InitDisplay:
 	; ===========================================================================
 	; Initialize Status Effect Display System
 	; ===========================================================================
@@ -5158,7 +5158,7 @@ Continue_Status2:
 	EOR.B #$FF                  ; Invert
 	SEC                         ; Set carry
 	ADC.B #$3E                  ; Add offset $3E
-	JSR.W CODE_009111           ; Render status icon
+	JSR.W Status_RenderIcon     ; Render status icon
 
 Skip_Status2:
 	; Process status flags group 3 (bits 5-2 of $36)
@@ -5170,7 +5170,7 @@ Skip_Status2:
 	EOR.B #$FF                  ; Invert
 	SEC                         ; Set carry
 	ADC.B #$3E                  ; Add offset $3E
-	JSR.W CODE_009111           ; Render status icon
+	JSR.W Status_RenderIcon     ; Render status icon
 
 Skip_Status3:
 	; Process status flags group 4 (bit 7 of $37 and bits 1-0 of $36)
@@ -6441,7 +6441,7 @@ Graphics_LoadData:
 ; Graphics Processing Entry Points
 ; ---------------------------------------------------------------------------
 
-CODE_009AEC:
+Graphics_ProcessMenuData:
 	PHP                         ; Save processor status
 	PHD                         ; Save direct page
 	PEA.W $0000                 ; Push $0000
@@ -6455,7 +6455,7 @@ CODE_009AEC:
 	PLP                         ; Restore processor status
 	RTL                         ; Return long
 
-CODE_009B02:
+Graphics_InitDisplay:
 	PHP                         ; Save processor status
 	PHD                         ; Save direct page
 	PHB                         ; Save data bank
@@ -6999,20 +6999,20 @@ CODE_009C60:
 	LDA.B $03,S                 ; Get original color
 	AND.W #$03E0                ; Mask green component (bits 5-9)
 	SBC.W #$0180                ; Subtract $18 from green
-	BCS CODE_009C6F             ; Branch if no underflow
+	BCS Color_GreenOK           ; Branch if no underflow
 	LDA.W #$0000                ; Clamp to 0
 	SEC                         ; Set carry
 
-CODE_009C6F:
+Color_GreenOK:
 	ORA.B $01,S                 ; Combine with adjusted red
 	STA.B $01,S                 ; Store combined result
 	LDA.B $03,S                 ; Get original color again
 	AND.W #$001F                ; Mask blue component (bits 0-4)
 	SBC.W #$000C                ; Subtract $0C from blue
-	BCS CODE_009C80             ; Branch if no underflow
+	BCS Color_BlueOK            ; Branch if no underflow
 	LDA.W #$0000                ; Clamp to 0
 
-CODE_009C80:
+Color_BlueOK:
 	ORA.B $01,S                 ; Combine with red+green
 	STA.B $03,S                 ; Store final result
 	PLA                         ; Remove temporary value
@@ -7036,15 +7036,15 @@ DATA8_009C87_colors:
 ; Setup Character Palette Display
 ; ---------------------------------------------------------------------------
 
-CODE_009CAA:
+Palette_SetupCharDisplay:
 	SEP #$20                    ; 8-bit A
 	LDX.W #$01AD                ; Default offset
 	LDA.B #$20                  ; Test bit 5
 	AND.W $00E0                 ; Check flag
-	BNE CODE_009CB9             ; Use default if set
+	BNE Palette_UseDefault      ; Use default if set
 	LDX.W #$016F                ; Alternate offset
 
-CODE_009CB9:
+Palette_UseDefault:
 	; Copy character palette data to display buffer
 	LDA.W $0013,X               ; Load palette entry
 	STA.L $7F500B               ; Store to buffer +$0B
@@ -7068,14 +7068,14 @@ CODE_009CB9:
 	REP #$30                    ; 16-bit A/X/Y
 	RTS                         ; Return
 
-CODE_009CEF:
+Graphics_EmptyStub:
 	RTS                         ; Empty stub
 
 ; ---------------------------------------------------------------------------
 ; Push Graphics Parameters to Stack
 ; ---------------------------------------------------------------------------
 
-CODE_009CF0:
+Graphics_PushParams:
 	PHP                         ; Save processor status
 	REP #$30                    ; 16-bit A/X/Y
 	PHB                         ; Save data bank
@@ -7204,18 +7204,18 @@ Graphics_ProcessStream:
 	BNE Graphics_ProcessStream_AltSync             ; Use alternate sync
 
 Graphics_ProcessStream_SyncLoop:
-	JSR.W CODE_009DBD           ; Read and process command
+	JSR.W Graphics_ReadDispatchCmd           ; Read and process command
 	LDA.B $17                   ; Get current pointer
 	CMP.B $3D                   ; Compare to sync pointer
-	BNE CODE_009D8F             ; Loop until synchronized
-	BRA CODE_009DBA             ; Done
+	BNE Graphics_ContinueSync   ; Loop until synchronized
+	BRA Graphics_ProcessStream_Cleanup             ; Done
 
-CODE_009D9A:
+Graphics_ProcessStream_AltSync:
 	JSR.W CODE_00E055           ; Alternate sync handler
-	BRA CODE_009DBA             ; Done
+	BRA Graphics_ProcessStream_Cleanup             ; Done
 
-CODE_009D9F:
-	JSR.W CODE_009DBD           ; Read and process command
+Graphics_ContinueSync:
+	JSR.W Graphics_ReadDispatchCmd           ; Read and process command
 
 Graphics_ProcessStream_Normal:
 	; Normal processing loop
@@ -7285,9 +7285,9 @@ Graphics_IndexedDataSearch:
 	ADC.B $64                   ; Add size (+ 1 from carry)
 	TAX                         ; X = next entry offset
 	DEY                         ; Decrement index
-	BNE CODE_009DE8             ; Continue until found
+	BNE Graphics_IndexedDataSearch             ; Continue until found
 
-CODE_009DF9:
+Graphics_IndexedDataFound:
 	; Process found entry
 	TXA                         ; A = table offset
 	CLC                         ; Clear carry
