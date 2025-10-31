@@ -3697,14 +3697,14 @@ Menu_NavCharDown_FindPrev:
 	BEQ Menu_NavCharDown_FindPrev ; If invalid → Try previous
 
 	JSR.W CODE_008B21           ; Update character display
-	JSR.W CODE_008C3D           ; Refresh graphics
+	JSR.W Tilemap_RefreshLayer0 ; Refresh graphics
 
 Menu_NavCharDown_Exit:
 	RTS                         ; Return
 
 ;-------------------------------------------------------------------------------
 
-CODE_008B21:
+Menu_UpdateCharDisplayPos:
 	; ===========================================================================
 	; Update Character Display Position
 	; ===========================================================================
@@ -3726,17 +3726,17 @@ CODE_008B21:
 
 	LDX.W #$3719                ; X = $3719 (tilemap 2)
 	CPY.W #$0026                ; Compare Y with $26
-	BCC CODE_008B3E             ; If Y < $26 → Use tilemap 2
+	BCC Menu_CopyTilemapData    ; If Y < $26 → Use tilemap 2
 
 	LDX.W #$3729                ; X = $3729 (tilemap 3)
 	CPY.W #$0029                ; Compare Y with $29
-	BCC CODE_008B3E             ; If Y < $29 → Use tilemap 3
+	BCC Menu_CopyTilemapData    ; If Y < $29 → Use tilemap 3
 
 	LDX.W #$3739                ; X = $3739 (tilemap 4, Y >= $29)
 
 ;-------------------------------------------------------------------------------
 
-CODE_008B3E:
+Menu_CopyTilemapData:
 	; ===========================================================================
 	; Copy Tilemap Data to Destination
 	; ===========================================================================
@@ -3810,7 +3810,7 @@ Unused_008B68:
 ; CONTROLLER INPUT PROCESSING ($008BA0-$008BFC)
 ;===============================================================================
 
-CODE_008BA0:
+Input_ReadController:
 	; ===========================================================================
 	; Main Controller Input Handler
 	; ===========================================================================
@@ -3840,7 +3840,7 @@ CODE_008BA0:
 
 	LDA.W #$0040                ; A = $0040 (bit 6 mask)
 	AND.W $00D6                 ; Test bit 6 of $00D6
-	BNE CODE_008BFC             ; If set → Controller disabled, exit
+	BNE Input_ReadController_Exit ; If set → Controller disabled, exit
 
 	; ---------------------------------------------------------------------------
 	; Save Previous Controller State
@@ -3855,7 +3855,7 @@ CODE_008BA0:
 
 	LDA.W #$0008                ; A = $0008 (bit 3 mask)
 	AND.W $00D2                 ; Test bit 3 of $00D2
-	BNE CODE_008BC7             ; If set → Special input mode
+	BNE Input_SpecialMode       ; If set → Special input mode
 
 	; ---------------------------------------------------------------------------
 	; Check Alternate Input Filter ($00DB bit 2)
@@ -3863,7 +3863,7 @@ CODE_008BA0:
 
 	LDA.W #$0004                ; A = $0004 (bit 2 mask)
 	AND.W $00DB                 ; Test bit 2 of $00DB
-	BNE CODE_008BD2             ; If set → Use alternate filtering
+	BNE Input_AlternateFilter   ; If set → Use alternate filtering
 
 	; ---------------------------------------------------------------------------
 	; Normal Controller Read
@@ -3871,11 +3871,11 @@ CODE_008BA0:
 
 	LDA.W SNES_CNTRL1L          ; A = [$4218] (Controller 1 input)
 								; Reads 16-bit joypad state
-	BRA CODE_008BEA             ; → Process input
+	BRA Input_ProcessButtons    ; → Process input
 
 ;-------------------------------------------------------------------------------
 
-CODE_008BC7:
+Input_SpecialMode:
 	; ===========================================================================
 	; Special Input Mode - Filter D-Pad
 	; ===========================================================================
@@ -3885,13 +3885,13 @@ CODE_008BC7:
 
 	LDA.W SNES_CNTRL1L          ; A = controller state
 	AND.W #$FFF0                ; A = A & $FFF0 (clear bits 0-3, D-pad)
-	BEQ CODE_008BEA             ; If zero → No buttons pressed
+	BEQ Input_ProcessButtons    ; If zero → No buttons pressed
 
 	JMP.W CODE_0092F0           ; → Special button handler
 
 ;-------------------------------------------------------------------------------
 
-CODE_008BD2:
+Input_AlternateFilter:
 	; ===========================================================================
 	; Alternate Input Filter
 	; ===========================================================================
@@ -3900,23 +3900,23 @@ CODE_008BD2:
 
 	LDA.W #$0002                ; A = $0002 (bit 1 mask)
 	AND.W $00D9                 ; Test bit 1 of $00D9
-	BEQ CODE_008BDF             ; If clear → Normal alternate mode
+	BEQ Input_AlternateNormal   ; If clear → Normal alternate mode
 
 	; Special alternate mode (incomplete in disassembly)
 	db $A9,$80,$00,$04,$90     ; Raw bytes (seems incomplete)
 
 ;-------------------------------------------------------------------------------
 
-CODE_008BDF:
+Input_AlternateNormal:
 	LDA.W SNES_CNTRL1L          ; A = controller state
 	AND.W #$FFF0                ; Mask D-pad
-	BEQ CODE_008BEA             ; If zero → No buttons
+	BEQ Input_ProcessButtons    ; If zero → No buttons
 
 	JMP.W CODE_0092F6           ; → Alternate button handler
 
 ;-------------------------------------------------------------------------------
 
-CODE_008BEA:
+Input_ProcessButtons:
 	; ===========================================================================
 	; Process Controller Input
 	; ===========================================================================
@@ -3940,14 +3940,14 @@ CODE_008BEA:
 	STX.B $92                   ; Save current state
 	STZ.B $90                   ; Clear autofire accumulator
 
-CODE_008BFC:
+Input_ReadController_Exit:
 	RTS                         ; Return
 
 ;===============================================================================
 ; AUTOFIRE & INPUT TIMING ($008BFD-$008C1A)
 ;===============================================================================
 
-CODE_008BFD:
+Input_HandleAutofire:
 	; ===========================================================================
 	; Autofire Timer Handler
 	; ===========================================================================
@@ -3972,17 +3972,17 @@ CODE_008BFD:
 	; ---------------------------------------------------------------------------
 
 	LDA.B $94                   ; A = newly pressed buttons
-	BNE CODE_008C13             ; If any new press → Handle immediate input
+	BNE Input_NewButtonPress    ; If any new press → Handle immediate input
 
 	; ---------------------------------------------------------------------------
 	; Handle Held Buttons (Autofire)
 	; ---------------------------------------------------------------------------
 
 	LDA.B $92                   ; A = currently held buttons
-	BEQ CODE_008C12             ; If nothing held → Exit
+	BEQ Input_HandleAutofire_Exit ; If nothing held → Exit
 
 	DEC.B $09                   ; Decrement autofire timer
-	BPL CODE_008C12             ; If timer still positive → Exit (not ready)
+	BPL Input_HandleAutofire_Exit ; If timer still positive → Exit (not ready)
 
 	; Timer expired - trigger autofire event
 	STA.B $07                   ; Output = held buttons (simulate new press)
@@ -3990,12 +3990,12 @@ CODE_008BFD:
 	LDA.W #$0005                ; A = $05 (5 frames)
 	STA.B $09                   ; Reset timer to 5 for repeat rate
 
-CODE_008C12:
+Input_HandleAutofire_Exit:
 	RTS                         ; Return
 
 ;-------------------------------------------------------------------------------
 
-CODE_008C13:
+Input_NewButtonPress:
 	; ===========================================================================
 	; Handle New Button Press
 	; ===========================================================================
@@ -4013,7 +4013,7 @@ CODE_008C13:
 ; TILEMAP CALCULATION & UPDATE ROUTINES ($008C1B-$008DDE)
 ;===============================================================================
 
-CODE_008C1B:
+Tilemap_CalcVRAMAddress:
 	; ===========================================================================
 	; Calculate VRAM Address from Tilemap Coordinates
 	; ===========================================================================
@@ -4087,7 +4087,7 @@ CODE_008C1B:
 
 ;-------------------------------------------------------------------------------
 
-CODE_008C3D:
+Tilemap_RefreshLayer0:
 	; ===========================================================================
 	; Update Character Cursor Tilemap
 	; ===========================================================================
@@ -4111,7 +4111,7 @@ CODE_008C3D:
 
 	LDA.B #$02                  ; A = $02 (bit 1 mask)
 	AND.W $00D8                 ; Test bit 1 of $00D8
-	BEQ CODE_008C83             ; If clear → Field mode
+	BEQ Tilemap_RefreshLayer0_Field ; If clear → Field mode
 
 	; ---------------------------------------------------------------------------
 	; Battle Mode Tilemap Update
@@ -4152,7 +4152,7 @@ CODE_008C3D:
 
 	LDX.W #$17DA                ; X = $17DA (WRAM data source)
 	LDA.B #$7F                  ; A = $7F (bank $7F)
-	BRA CODE_008C9C             ; → Continue to transfer
+	BRA Tilemap_TransferData    ; → Continue to transfer
 
 ;-------------------------------------------------------------------------------
 
@@ -4161,7 +4161,7 @@ UNREACH_008C81:
 
 ;-------------------------------------------------------------------------------
 
-CODE_008C83:
+Tilemap_RefreshLayer0_Field:
 	; ===========================================================================
 	; Field Mode Tilemap Update
 	; ===========================================================================
@@ -4176,7 +4176,7 @@ CODE_008C83:
 	REP #$10                    ; 16-bit X, Y
 
 	LDA.W $1031                 ; A = character Y position
-	JSR.W CODE_008D8A           ; Calculate tilemap address
+	JSR.W Tilemap_CalcRowAddress ; Calculate tilemap address
 	STX.W $00F2                 ; [$00F2] = tilemap address
 
 	LDX.W #$2D1A                ; X = $2D1A (WRAM source address)
@@ -4184,7 +4184,7 @@ CODE_008C83:
 
 ;-------------------------------------------------------------------------------
 
-CODE_008C9C:
+Tilemap_TransferData:
 	; ===========================================================================
 	; Apply Cursor Attributes
 	; ===========================================================================
@@ -4202,33 +4202,33 @@ CODE_008C9C:
 
 	LDA.B #$04                  ; A = $04 (bit 2 mask)
 	AND.W $00DA                 ; Test bit 2 of $00DA
-	BEQ CODE_008CC5             ; If clear → Normal cursor
+	BEQ Tilemap_SetupDMA        ; If clear → Normal cursor
 
 	; Check blink timer
 	LDA.W $0014                 ; A = [$0014] (blink timer)
 	DEC A                       ; A = A - 1
-	BEQ CODE_008CC5             ; If zero → Show cursor
+	BEQ Tilemap_SetupDMA        ; If zero → Show cursor
 
 	; Apply alternate palette during blink
 	LDA.B #$10                  ; A = $10 (bit 4 mask)
 	AND.W $00DA                 ; Test bit 4 of $00DA
-	BNE CODE_008CBB             ; If set → Special blink mode
+	BNE Tilemap_BlinkSpecial    ; If set → Special blink mode
 
 	; Normal blink mode (incomplete in disassembly)
 	db $AB,$BD,$01,$00,$29,$E3,$09,$94,$80,$12
 
 ;-------------------------------------------------------------------------------
 
-CODE_008CBB:
+Tilemap_BlinkSpecial:
 	PLB                         ; B = bank (restore)
 	LDA.W $0001,X               ; A = [X+1] (tile attribute byte)
 	AND.B #$E3                  ; A = A & $E3 (clear palette bits 2,3,4)
 	ORA.B #$9C                  ; A = A | $9C (set new palette + priority)
-	BRA CODE_008CCD             ; → Save and continue
+	BRA Tilemap_ApplyAttributes ; → Save and continue
 
 ;-------------------------------------------------------------------------------
 
-CODE_008CC5:
+Tilemap_SetupDMA:
 	PLB                         ; B = bank (restore)
 	LDA.W $0001,X               ; A = [X+1] (tile attribute)
 	AND.B #$E3                  ; Clear palette bits
@@ -4236,7 +4236,7 @@ CODE_008CC5:
 
 ;-------------------------------------------------------------------------------
 
-CODE_008CCD:
+Tilemap_ApplyAttributes:
 	; ===========================================================================
 	; Handle Number Display
 	; ===========================================================================
@@ -4337,7 +4337,7 @@ CODE_008D20:
 ; LAYER UPDATE ROUTINES ($008D29-$008D89)
 ;===============================================================================
 
-CODE_008D29:
+Tilemap_RefreshLayer1:
 	; ===========================================================================
 	; Background Layer 1 Update
 	; ===========================================================================
