@@ -1,21 +1,99 @@
 ; ==============================================================================
 ; BANK $04 - Graphics/Sprite Data
 ; ==============================================================================
-; Bank Size: 1,875 lines (2,073 total in source)
+; SNES Address Range: $048000-$04FFFF (32 KB)
+; Memory Map: LoROM Bank $04 ($020000-$027FFF in PC file offset)
 ; Primary Content: Sprite graphics tiles, battle animations, enemy graphics
-; Format: Primarily raw data bytes (db statements)
+; Format: Mix of compressed and uncompressed graphics data (raw db statements)
 ;
-; This bank contains compressed and uncompressed graphics data for:
-; - Enemy sprites and battle animations
-; - Character battle sprites
-; - Effect animations (magic, attacks, etc.)
-; - UI graphics tiles
+; CONTENTS OVERVIEW:
+; ==================
+; This bank contains graphics data for battle scenes and sprite animations:
+; - Enemy sprites and battle animations (monsters, bosses)
+; - Character battle sprites (Benjamin, Kaeli, Phoebe, Reuben)
+; - Effect animations (magic spells, attacks, explosions, etc.)
+; - UI graphics tiles (battle menus, status displays)
+; - Sprite metadata and animation frame sequences
 ;
-; Many graphics are compressed using FFMQ's custom compression:
-; - ExpandSecondHalfWithZeros (3bpp→4bpp expansion)
-; - SimpleTailWindowCompression (LZ-style compression)
+; SNES GRAPHICS FORMAT REFERENCE:
+; ===============================
+; Tile Format: 8x8 pixels, 2BPP or 4BPP planar format
 ;
-; See: tools/ffmq_compression.py for decompression routines
+; 2BPP Format (4 colors):
+;   - 16 bytes per 8x8 tile
+;   - 2 bitplanes interleaved by row
+;   - Bytes 0-1: Row 0 (plane0, plane1)
+;   - Bytes 2-3: Row 1 (plane0, plane1)
+;   - ... (8 rows total)
+;   - Each pixel = 2 bits = palette index 0-3
+;
+; 4BPP Format (16 colors):
+;   - 32 bytes per 8x8 tile
+;   - 4 bitplanes: planes 0-1 interleaved, then planes 2-3 interleaved
+;   - Bytes 0-15:  Rows 0-7 planes 0-1 (2 bytes per row)
+;   - Bytes 16-31: Rows 0-7 planes 2-3 (2 bytes per row)
+;   - Each pixel = 4 bits = palette index 0-15
+;   - Bit extraction per pixel (x=0-7, MSB first):
+;       bit0 = (plane0[row] >> (7-x)) & 1
+;       bit1 = (plane1[row] >> (7-x)) & 1
+;       bit2 = (plane2[row] >> (7-x)) & 1
+;       bit3 = (plane3[row] >> (7-x)) & 1
+;
+; COMPRESSION METHODS:
+; ===================
+; FFMQ uses custom compression for some graphics data:
+;
+; 1. ExpandSecondHalfWithZeros (3bpp→4bpp):
+;    - Stores only 3 bitplanes (24 bytes per tile)
+;    - 4th bitplane filled with zeros during decompression
+;    - Used for graphics that only need 8 colors (palette indices 0-7)
+;
+; 2. SimpleTailWindowCompression (LZ-style):
+;    - RLE + LZ77 hybrid compression
+;    - Control bytes specify copy/literal operations
+;    - Lookback window for repeated patterns
+;    - See tools/ffmq_compression.py for decompression algorithm
+;
+; SPRITE ORGANIZATION:
+; ===================
+; Sprites are composed of multiple 8x8 tiles arranged in patterns:
+; - Small sprites: 2x2 tiles (16x16 pixels)
+; - Medium sprites: 4x4 tiles (32x32 pixels)
+; - Large sprites: 8x8 tiles (64x64 pixels) or larger
+; - Metasprites: Multiple tile groups with positioning data
+;
+; OAM (Object Attribute Memory) data defines sprite placement:
+; - X/Y position (screen coordinates)
+; - Tile index (which 8x8 tile to use from VRAM)
+; - Palette number (0-7, selects 16-color sub-palette)
+; - Priority (sprite layering vs backgrounds)
+; - H/V flip flags (mirror sprites)
+; - Size (8x8, 16x16, 32x32, 64x64)
+;
+; PALETTE REFERENCES:
+; ==================
+; Graphics in this bank use palettes from Bank $05 (bank_05_documented.asm)
+; - Each sprite references a 16-color palette (palette 0-7)
+; - Palette index 0 is always transparent
+; - Color format: SNES RGB555 (15-bit: 0bbbbbgggggrrrrr)
+;
+; CROSS-REFERENCES:
+; ================
+; - Bank $00: Graphics DMA routines, VRAM upload code
+; - Bank $01: Battle sprite loading, animation controllers
+; - Bank $02: Sprite rendering engine, OAM management
+; - Bank $05: Palette data (bank_05_documented.asm)
+; - Bank $09: Additional sprite graphics and metadata
+; - tools/ffmq_compression.py: Decompression routines
+; - tools/extract_graphics.py: Graphics extraction tool
+; - tools/snes_graphics.py: SNES format library (2BPP/4BPP decoders)
+;
+; TECHNICAL REFERENCES:
+; ====================
+; - SNES Development Wiki: https://snes.nesdev.org/wiki/Graphics
+; - Tile Format: https://snes.nesdev.org/wiki/Tile_format
+; - OAM Format: https://snes.nesdev.org/wiki/OAM
+; - PPU Registers: https://snes.nesdev.org/wiki/PPU_registers
 ; ==============================================================================
 
 					   ORG $048000
@@ -142,7 +220,7 @@ DATA8_049800:
 ; ------------------------------------------------------------------------------
 ; Some graphics in this bank are compressed
 ; Compression format: ExpandSecondHalfWithZeros or SimpleTailWindowCompression
-; 
+;
 ; Decompression happens in Bank $01 battle initialization
 ; See: CODE_01822F in bank_01_documented.asm
 ; See: tools/ffmq_compression.py for algorithms
@@ -165,7 +243,7 @@ DATA8_049800:
 ; END OF BANK $04 DOCUMENTATION (Partial)
 ; ==============================================================================
 ; Lines documented: ~500 of 1,875 (26.7%)
-; Remaining work: 
+; Remaining work:
 ; - Document remaining tile data sections
 ; - Identify all compressed data regions
 ; - Map sprite IDs to tile offsets

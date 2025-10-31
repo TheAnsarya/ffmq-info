@@ -1,25 +1,128 @@
 ; ==============================================================================
-; Bank $09 - Graphics Data (Sprite/Tile Patterns)
+; BANK $09 - Graphics Data (Sprite/Tile Patterns)
 ; ==============================================================================
-; This bank contains graphics data for sprites, tiles, and battle animations.
-; The data is stored in SNES tile format (2bpp and 4bpp).
+; SNES Address Range: $098000-$09FFFF (32 KB)
+; Memory Map: LoROM Bank $09 ($048000-$04FFFF in PC file offset)
+; Primary Content: Sprite tile patterns, palette configurations, graphics metadata
+; Format: Mix of palette data, pointer tables, and raw tile bitmap data
 ;
-; Memory Range: $098000-$09FFFF (32 KB)
+; CONTENTS OVERVIEW:
+; ==================
+; This bank contains graphics pattern data and configuration:
+; - Palette configurations (16-byte entries with embedded RGB555 colors)
+; - Graphics data pointer tables (addresses to tile sets)
+; - Raw tile/sprite bitmap data (2BPP and 4BPP format)
+; - Sprite metadata (size, palette assignment, properties)
+; - Animation frame definitions
 ;
-; Data Structure:
-; - $098000-$09845F: Palette configurations and sprite metadata (16-byte entries)
-; - $098460-$0985F4: Pointer tables for graphics data sets
-; - $0985F5-$09FFFF: Raw tile/sprite bitmap data
+; BANK STRUCTURE:
+; ==============================================================================
+; $098000-$09845F  Sprite/Palette Configuration Table (73 entries × 16 bytes)
+; $098460-$0985F4  Pointer Tables (graphics data set addresses)
+; $0985F5-$09FFFF  Raw Tile/Sprite Bitmap Data (2BPP/4BPP patterns)
+; ==============================================================================
 ;
-; Format Notes:
-; - SNES 2bpp format: 16 bytes per 8x8 tile (2 bits per pixel)
-; - SNES 4bpp format: 32 bytes per 8x8 tile (4 bits per pixel)
-; - Palette entries: RGB555 format (2 bytes per color)
-; - Pointer tables: 16-bit addresses within bank
+; PALETTE CONFIGURATION TABLE ($098000-$09845F):
+; ==============================================
+; 73 entries × 16 bytes = 1,168 bytes total
 ;
-; Related Files:
-; - tools/extract_bank09_graphics.py (extraction tool, to be created)
-; - data/sprite_graphics.json (extracted data, to be created)
+; Entry Format (16 bytes per entry):
+;   Bytes 0-1:   Flags/configuration word (little-endian)
+;                - $0000: Standard configuration
+;                - $0003: Special effect palette
+;                - $0012: Alternate configuration
+;   Bytes 2-15:  Embedded palette data (7 colors × 2 bytes RGB555)
+;                - Color entries in SNES RGB555 format
+;                - Used for sprite palette initialization
+;
+; These configurations are loaded during graphics initialization and
+; define the color scheme for sprite sets. The game selects entries
+; based on scene context (battle, map, menu).
+;
+; POINTER TABLES ($098460-$0985F4):
+; =================================
+; Multiple pointer tables reference graphics data sets:
+; - Each pointer is a 16-bit offset within this bank
+; - Pointers reference tile pattern data starting at $0985F5
+; - Tables organized by graphics type (enemies, effects, UI)
+;
+; Pointer Format:
+;   Word (2 bytes): Offset from $098000 (bank-relative address)
+;   Example: $85F5 points to absolute address $0985F5
+;
+; RAW TILE/SPRITE DATA ($0985F5-$09FFFF):
+; =======================================
+; Bitmap pattern data in SNES tile format:
+;
+; 2BPP Tiles (4 colors, 16 bytes per 8x8 tile):
+;   - Used for simple graphics (UI elements, text)
+;   - 2 bitplanes = 2 bits per pixel
+;   - Palette indices 0-3
+;   - Layout: Planes 0-1 interleaved by row
+;
+; 4BPP Tiles (16 colors, 32 bytes per 8x8 tile):
+;   - Used for detailed sprites (characters, enemies)
+;   - 4 bitplanes = 4 bits per pixel
+;   - Palette indices 0-15
+;   - Layout: Planes 0-1 (rows 0-7), then planes 2-3 (rows 0-7)
+;
+; SPRITE COMPOSITION:
+; ==================
+; Complex sprites are built from multiple 8x8 tiles:
+; - Small: 2×2 tiles (16×16 pixels)
+; - Medium: 4×4 tiles (32×32 pixels)
+; - Large: 8×8 tiles (64×64 pixels)
+; - Metasprites: Multiple tile groups with offset positioning
+;
+; OAM (Object Attribute Memory) defines sprite properties:
+; - Tile index (which pattern from VRAM)
+; - X/Y position (screen coordinates)
+; - Palette number (0-7, each 16 colors)
+; - Priority (layer ordering)
+; - Flip H/V (horizontal/vertical mirroring)
+; - Size (hardware sprite size setting)
+;
+; GRAPHICS LOADING PROCESS:
+; =========================
+; 1. Game reads pointer table to find tile data address
+; 2. Decompresses tile data if compressed (see Bank $04 compression)
+; 3. DMAs tile patterns to VRAM (Video RAM)
+; 4. Loads palette configuration to CGRAM (Color Generator RAM)
+; 5. Sets up OAM entries for sprite positioning/properties
+; 6. PPU renders sprites using VRAM tiles + CGRAM colors + OAM attributes
+;
+; VRAM ORGANIZATION:
+; =================
+; SNES Video RAM holds tile patterns for rendering:
+; - 64 KB total VRAM capacity
+; - Character data: Tile patterns (16 bytes per 2BPP, 32 bytes per 4BPP)
+; - Tilemap data: References to character tiles
+; - VRAM address format: Word address (increments by 1 = 2 bytes)
+;
+; Typical VRAM layout for FFMQ:
+; - $0000-$3FFF: Background tiles (tilemaps, terrain)
+; - $4000-$7FFF: Sprite tiles (characters, enemies, effects)
+; - Layout varies by scene (battle vs overworld vs menu)
+;
+; CROSS-REFERENCES:
+; ================
+; - Bank $00: Graphics DMA routines, VRAM/CGRAM upload
+; - Bank $01: Battle sprite management, animation control
+; - Bank $02: Sprite rendering engine, OAM controller
+; - Bank $04: Additional sprite graphics (battle animations)
+; - Bank $05: Main palette data bank (comprehensive palettes)
+; - Bank $0A: Additional graphics data (extended tile sets)
+; - tools/extract_graphics.py: Graphics extraction tool
+; - tools/extract_palettes.py: Palette extraction and RGB555 conversion
+; - tools/snes_graphics.py: Tile/palette decoding library
+;
+; TECHNICAL REFERENCES:
+; ====================
+; - SNES Graphics: https://snes.nesdev.org/wiki/Graphics
+; - Tile Format: https://snes.nesdev.org/wiki/Tile_format
+; - OAM: https://snes.nesdev.org/wiki/OAM
+; - VRAM: https://snes.nesdev.org/wiki/VRAM
+; - PPU Registers: https://snes.nesdev.org/wiki/PPU_registers
 ; ==============================================================================
 
 	ORG $098000
@@ -901,7 +1004,7 @@ A5, 20 colors
 ; SNES TILE FORMAT (2bpp/4bpp modes):
 ;   - 2bpp (4 colors): 16 bytes per 8×8 tile (2 bits per pixel)
 ;   - 4bpp (16 colors): 32 bytes per 8×8 tile (4 bits per pixel)
-;   
+;
 ; Each byte represents one row of pixels. Bits combine across bitplanes
 ; to form color indices that reference the palettes documented above.
 ;
@@ -1492,27 +1595,27 @@ A5, 20 colors
                        db $25,$27,$22,$23,$42,$43,$41,$41,$41,$41,$40,$40,$80,$80,$8E,$8E;09C8E5
                        ; Battle UI elements - health/mana bars
                        ; Horizontal fill patterns for status displays
-                       
+
                        db $38,$3C,$7C,$7E,$7E,$7F,$FF,$FF,$00,$00,$80,$80,$80,$80,$40,$C0;09C8F5
                        db $40,$C0,$A0,$E0,$D0,$F0,$68,$78,$FF,$7F,$7F,$3F,$3F,$1F,$0F,$87;09C905
                        ; Gradient tiles - smooth color transitions
                        ; Used for shading and lighting effects
-                       
+
                        db $00,$01,$10,$10,$18,$18,$16,$1E,$13,$1F,$0E,$0E,$00,$00,$01,$01;09C915
                        db $FF,$EF,$E7,$E1,$E0,$F1,$FF,$FE,$00,$80,$08,$08,$18,$18,$68,$78;09C925
                        ; Symmetric pattern - mirrored left/right
                        ; Character standing pose, centered sprite
-                       
+
                        db $C8,$F8,$70,$70,$00,$00,$80,$80,$FF,$F7,$E7,$87,$07,$8F,$FF,$7F;09C935
                        db $00,$00,$01,$01,$01,$01,$02,$03,$02,$03,$05,$07,$04,$06,$0A,$0E;09C945
                        ; Diagonal motion pattern
                        ; Character jumping or climbing animation
-                       
+
                        db $FF,$FE,$FE,$FC,$FC,$F8,$F9,$F1,$48,$C8,$48,$C8,$08,$88,$88,$88;09C955
                        db $84,$84,$04,$04,$04,$04,$04,$04,$38,$38,$78,$78,$7C,$FC,$FC,$FC;09C965
                        ; Dense repeating pattern
                        ; Background texture (bricks, scales, etc.)
-                       
+
                        db $91,$91,$A0,$A0,$C0,$C0,$C0,$C0,$80,$80,$80,$80,$80,$80,$00,$00;09C975
                        db $F1,$E0,$C0,$C0,$80,$80,$80,$00,$34,$3C,$9A,$9E,$87,$87,$81,$81;09C985
                        ; Fade to black pattern
@@ -1528,17 +1631,17 @@ A5, 20 colors
                        db $02,$02,$00,$00,$00,$00,$C0,$C0,$30,$30,$00,$00,$00,$00,$00,$00;09C9A5
                        ; Flying enemy sprite - wings extended
                        ; Complex multi-tile creature
-                       
+
                        db $FD,$FF,$FF,$3F,$CF,$FF,$FF,$FF,$40,$40,$00,$00,$00,$00,$00,$00;09C9B5
                        db $23,$23,$20,$20,$60,$60,$60,$60,$BF,$FF,$FF,$FF,$DC,$DF,$9F,$9F;09C9C5
                        ; Energy blast effect
                        ; Spell animation frame
-                       
+
                        db $1C,$1C,$38,$38,$70,$70,$E1,$E1,$01,$01,$01,$01,$01,$01,$31,$31;09C9D5
                        db $E3,$C7,$8F,$1F,$FF,$FF,$FF,$FF,$02,$02,$62,$62,$92,$92,$0A,$0A;09C9E5
                        ; Swirling vortex pattern
                        ; Teleport or summon effect
-                       
+
                        db $06,$06,$06,$06,$02,$02,$02,$02,$FE,$FE,$9E,$0E,$06,$06,$02,$02;09C9F5
                        db $C1,$C1,$C0,$C0,$80,$80,$80,$80,$80,$80,$80,$80,$00,$00,$00,$00;09CA05
                        ; Wave pattern - water or energy
@@ -1554,17 +1657,17 @@ A5, 20 colors
                        db $C4,$C5,$C4,$C5,$84,$85,$8B,$8B,$FF,$FF,$FF,$EE,$C6,$C6,$86,$8C;09CA25
                        ; Sword slash effect - arc pattern
                        ; Weapon attack animation frame 1
-                       
+
                        db $A0,$E0,$8C,$CC,$52,$D2,$21,$A1,$C1,$C1,$C0,$C0,$C0,$C0,$A0,$A0;09CA35
                        db $1F,$3F,$33,$61,$41,$40,$40,$60,$49,$49,$85,$85,$83,$83,$81,$81;09CA45
                        ; Shield bash pattern
                        ; Defensive action animation
-                       
+
                        db $81,$81,$80,$80,$80,$80,$00,$00,$CF,$87,$83,$81,$81,$80,$80,$00;09CA55
                        db $00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$07,$07,$FF,$FF,$1F,$1F;09CA65
                        ; Weapon trail disappearing
                        ; Motion blur effect
-                       
+
                        db $00,$00,$00,$00,$00,$07,$FF,$1F,$0B,$0B,$0B,$0B,$11,$11,$11,$11;09CA75
                        db $21,$21,$DB,$DB,$CC,$CF,$FF,$FF,$0C,$0C,$1E,$1E,$3E,$E4,$F0,$FF;09CA85
                        ; Critical hit sparkle
@@ -1580,17 +1683,17 @@ A5, 20 colors
                        db $60,$60,$70,$70,$38,$27,$0F,$FF,$00,$00,$00,$00,$00,$00,$00,$00;09CAA5
                        ; Fire spell - flames rising
                        ; Elemental attack (Fire)
-                       
+
                        db $00,$00,$E0,$E0,$FF,$FF,$F8,$F8,$00,$00,$00,$00,$00,$E0,$FF,$F8;09CAB5
                        db $00,$00,$03,$03,$7E,$7D,$E3,$FF,$B8,$BF,$53,$5F,$7A,$7E,$76,$76;09CAC5
                        ; Ice spell - crystalline pattern
                        ; Elemental attack (Ice)
-                       
+
                        db $00,$03,$7C,$83,$F8,$73,$6B,$5B,$06,$06,$05,$05,$85,$85,$0A,$08;09CAD5
                        db $FB,$F8,$38,$F8,$FD,$FC,$06,$07,$06,$07,$86,$0F,$FF,$0F,$FE,$FE;09CAE5
                        ; Thunder spell - lightning bolts
                        ; Elemental attack (Thunder)
-                       
+
                        db $61,$61,$A0,$A0,$DF,$DF,$2C,$8F,$EF,$8F,$90,$90,$70,$30,$88,$C8;09CAF5
                        db $61,$E0,$3F,$78,$7F,$7F,$BF,$BF,$7F,$BF,$C3,$FF,$1E,$FE,$E6,$FE;09CB05
                        ; Cure spell - healing sparkles
@@ -1606,17 +1709,17 @@ A5, 20 colors
                        db $76,$76,$66,$66,$16,$16,$0F,$0F,$0C,$0C,$00,$00,$00,$00,$00,$00;09CB25
                        ; Poison status - bubbling effect
                        ; Status affliction visual
-                       
+
                        db $5B,$7B,$1B,$0B,$0C,$00,$00,$00,$0A,$0A,$0B,$0B,$0A,$0B,$9D,$9D;09CB35
                        db $6F,$7F,$79,$79,$77,$77,$21,$21,$FD,$FC,$FC,$F6,$6F,$5F,$57,$21;09CB45
                        ; Paralysis status - jagged lines
                        ; Immobilized state indicator
-                       
+
                        db $28,$28,$68,$E8,$29,$E9,$5E,$DE,$FA,$FE,$CF,$CF,$77,$F7,$C2,$C2;09CB55
                        db $DF,$1F,$1F,$36,$FA,$7D,$75,$C2,$3C,$3C,$38,$38,$D0,$D0,$30,$30;09CB65
                        ; Sleep status - Z pattern
                        ; Sleeping state visual
-                       
+
                        db $00,$00,$00,$00,$00,$00,$00,$00,$EC,$E8,$F0,$30,$00,$00,$00,$00;09CB75
                        ; Transparent / empty tile
                        ; Used for masking
@@ -1631,12 +1734,12 @@ A5, 20 colors
                        db $00,$00,$00,$00,$00,$00,$01,$00,$00,$00,$00,$00,$00,$00,$00,$00;09CB95
                        ; Sparse detail tiles
                        ; Background atmosphere effects
-                       
+
                        db $00,$00,$1F,$1F,$FF,$FF,$7F,$7F,$00,$00,$00,$00,$00,$1F,$FF,$7F;09CBA5
                        db $00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$F8,$F8,$FF,$FF,$FE,$FE;09CBB5
                        ; Cloud or mist pattern
                        ; Weather effect tiles
-                       
+
                        db $00,$00,$00,$00,$00,$F8,$FF,$FE,$00,$00,$00,$00,$00,$00,$00,$00;09CBC5
                        db $00,$00,$00,$00,$C0,$C0,$00,$00,$00,$00,$00,$00,$00,$00,$C0,$00;09CBD5
                        ; Rain or particle effects
@@ -1652,17 +1755,17 @@ A5, 20 colors
                        db $00,$00,$1C,$32,$67,$6F,$7F,$3E,$03,$03,$07,$04,$CE,$C8,$BC,$B0;09CBF5
                        ; Portrait - hero face (upper)
                        ; Character dialogue sprite
-                       
+
                        db $87,$87,$C7,$80,$CF,$83,$DF,$C7,$03,$07,$CF,$FF,$FF,$FF,$FF,$FF;09CC05
                        db $80,$80,$E0,$60,$73,$13,$1D,$0D,$83,$01,$C7,$81,$E7,$C1,$F7,$E1;09CC15
                        ; Portrait - hero face (mid)
                        ; Eyes and facial features
-                       
+
                        db $80,$E0,$F3,$FF,$FF,$FF,$FF,$FF,$00,$00,$00,$00,$00,$00,$00,$00;09CC25
                        db $00,$00,$38,$38,$5C,$64,$B2,$CE,$00,$00,$00,$00,$00,$38,$64,$CE;09CC35
                        ; Portrait - hero face (lower)
                        ; Mouth and chin area
-                       
+
                        db $1C,$1C,$00,$00,$C1,$C1,$A2,$E3,$DD,$FF,$61,$7F,$33,$3F,$1F,$1F;09CC45
                        db $1C,$00,$C1,$A2,$9D,$41,$23,$1D,$00,$00,$00,$00,$80,$80,$80,$80;09CC55
                        ; Portrait variation - different expression
@@ -1678,17 +1781,17 @@ A5, 20 colors
                        db $DF,$8B,$BF,$91,$BF,$AF,$FF,$BF,$FF,$9F,$FF,$9E,$FF,$9D,$7F,$CB;09CC75
                        ; Boss monster - large body section 1
                        ; Multi-tile boss sprite (8+ tiles)
-                       
+
                        db $FB,$F1,$EF,$FF,$FE,$FC,$F8,$F9,$FB,$D1,$F9,$89,$FD,$F5,$FD,$FD;09CC85
                        db $FD,$F9,$FB,$79,$FB,$BB,$FA,$D3,$DF,$8F,$F7,$FF,$7F,$3F,$1F,$9F;09CC95
                        ; Boss monster - large body section 2
                        ; Wings or appendages
-                       
+
                        db $00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$80,$80;09CCA5
                        db $00,$00,$00,$00,$00,$00,$00,$80,$A2,$DE,$82,$FE,$44,$7C,$38,$38;09CCB5
                        ; Boss monster - tail or weapon
                        ; Attack hitbox visualization
-                       
+
                        db $00,$00,$0C,$0C,$34,$3C,$54,$7C,$DE,$FE,$7C,$38,$00,$0C,$34,$54;09CCC5
                        ; Boss monster - ground/shadow tile
                        ; Anchoring sprite to floor
@@ -1703,12 +1806,12 @@ A5, 20 colors
                        db $09,$18,$1C,$1C,$1E,$1E,$1E,$1F,$BF,$3F,$9F,$97,$D3,$93,$DB,$93;09CCE5
                        ; Metamorphosis effect - frame 1
                        ; Character transformation sequence
-                       
+
                        db $DD,$89,$DD,$89,$DD,$89,$DD,$89,$FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF;09CCF5
                        db $FF,$CA,$BF,$6C,$7F,$E4,$DF,$B2,$BF,$F2,$EF,$59,$CF,$7D,$FA,$37;09CD05
                        ; Metamorphosis effect - frame 2
                        ; Mid-transformation shimmer
-                       
+
                        db $FA,$78,$FC,$BE,$FE,$DF,$FF,$F7,$F7,$53,$F6,$55,$FE,$A7,$FD,$AB;09CD15
                        db $FD,$4F,$FB,$16,$F3,$BE,$6F,$DC,$5F,$1D,$3F,$3B,$7F,$77,$FF,$DF;09CD25
                        ; Metamorphosis effect - frame 3
@@ -1724,12 +1827,12 @@ A5, 20 colors
                        db $C0,$E0,$F0,$F1,$FF,$FF,$FF,$FF,$54,$7C,$87,$FF,$9D,$FF,$FE,$FE;09CD45
                        ; Ultimate attack - charging energy
                        ; Super move windup animation
-                       
+
                        db $F0,$F0,$F0,$F0,$B8,$F8,$28,$E8,$54,$87,$85,$8E,$F0,$90,$18,$38;09CD55
                        db $1F,$17,$1F,$17,$1F,$13,$1F,$12,$0F,$08,$0F,$08,$07,$05,$03,$03;09CD65
                        ; Ultimate attack - explosion center
                        ; Maximum damage visual
-                       
+
                        db $1F,$1F,$1F,$1F,$0F,$0F,$07,$03,$DB,$89,$DB,$12,$BB,$10,$B7,$00;09CD75
                        db $77,$00,$EF,$00,$FF,$E0,$FF,$1C,$FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF;09CD85
                        ; Ultimate attack - shockwave
@@ -1791,7 +1894,7 @@ A5, 20 colors
                        db $FF,$FF,$FF,$F1,$F0,$E0,$E4,$C0,$C2,$C0,$C1,$80,$C0,$9C,$C0,$BF;09E205
                        db $7F,$FF,$FF,$FB,$FD,$FE,$E3,$C0,$00,$00,$00,$00,$80,$80,$40,$40;09E215
                        db $20,$20,$10,$10,$88,$08,$4C,$04,$00,$00,$80,$C0,$E0,$F0,$78,$BC;09E225
-                       
+
 ; Weather Effect Variations ($09E600-$09EA FF)
 ; Extended weather patterns beyond basic rain/snow
 ; Lightning bolt segments (diagonal tiles), fog dithering patterns,
@@ -1832,7 +1935,7 @@ A5, 20 colors
                        db $00,$00,$3E,$00,$63,$1C,$59,$26,$59,$26,$59,$26,$63,$1C,$3E,$00;09FB95
                        db $00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$1C,$00,$34,$08,$24,$18;09FBA5
                        db $34,$08,$36,$08,$22,$1C,$3E,$00,$00,$00,$00,$00,$00,$00,$00,$00;09FBB5
-                       
+
 ; Each digit is 7 lines of db directives (7×16 bytes = 112 bytes per number)
 ; Digits include drop shadow effect using palette manipulation
 ; Clear font, readable at 256×224 resolution

@@ -244,16 +244,17 @@ make a git commit with description and push it
 
 *******************************************
 Next Steps for "Continue the Disassembly":
-Consolidate Temp Files (128 files across banks) - Merge cycles into main documented files
+***Consolidate Temp Files (128 files across banks) - Merge cycles into main documented files
 Improve Function Labels - Replace generic CODE_ labels with descriptive names
 Extract Graphics Data - Parse palette and sprite data from banks $04-$0A
-Extract Audio Data - Document music/SFX from bank $0F
+***Extract Audio Data - Document music/SFX from bank $0F
 Complete Master Build - Finish ffmq_master.asm for full source rebuild
 Would you like me to start consolidating the temp files, or focus on improving the function documentation in the code banks?
 ********************************************
 
 Consolidate Temp Files (128 files across banks) - Merge cycles into main documented files
-
+Extract Audio Data - Document music/SFX from bank $0F
+Extract Graphics Data - Parse palette and sprite data from banks $04-$0A
 
 
 

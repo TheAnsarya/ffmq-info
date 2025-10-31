@@ -1,20 +1,116 @@
 ; ==============================================================================
 ; BANK $05 - Palette Data
 ; ==============================================================================
-; Bank Size: 1,696 lines (2,259 total in source)
-; Primary Content: Color palette data for all graphics
-; Format: SNES 15-bit RGB color values (2 bytes per color)
+; SNES Address Range: $058000-$05FFFF (32 KB)
+; Memory Map: LoROM Bank $05 ($028000-$02FFFF in PC file offset)
+; Primary Content: Color palette data for all graphics (sprites, backgrounds, UI)
+; Format: SNES RGB555 format (2 bytes per color, little-endian)
 ;
-; SNES Color Format: 0bbbbbgggggrrrrr (15-bit BGR)
-; - Bits 0-4:   Red intensity (0-31)
-; - Bits 5-9:   Green intensity (0-31)
-; - Bits 10-14: Blue intensity (0-31)
-; - Bit 15:     Unused (always 0)
+; CONTENTS OVERVIEW:
+; ==================
+; This bank contains all color palettes used by the game's graphics:
+; - UI/Interface palettes (menus, dialogs, status screens)
+; - Battle character palettes (Benjamin, Kaeli, Phoebe, Reuben)
+; - Enemy/monster palettes (organized by zone/enemy type)
+; - Background/tilemap palettes (world map, dungeons, towns)
+; - Effect palettes (magic spells, animations)
+; - Weapon/equipment palettes (swords, armor, accessories)
 ;
-; Cross-References:
-; - Bank $00: Palette DMA routines
+; SNES RGB555 COLOR FORMAT:
+; =========================
+; Each color is stored as a 16-bit little-endian word (2 bytes):
+;   Byte 0 (LOW):  gggrrrrr (bits 0-7)
+;   Byte 1 (HIGH): 0bbbbbgg (bits 8-15)
+;
+; Bit Layout: 0bbbbbgg gggrrrrr (15-bit BGR format)
+;   Bits 0-4:   Red channel (0-31, 5 bits)
+;   Bits 5-9:   Green channel (0-31, 5 bits)
+;   Bits 10-14: Blue channel (0-31, 5 bits)
+;   Bit 15:     Unused (always 0)
+;
+; Example: $7FFF = White
+;   Binary: 0111111111111111
+;   Red:   11111 (31) = Maximum red
+;   Green: 11111 (31) = Maximum green
+;   Blue:  11111 (31) = Maximum blue
+;   RGB888: (248, 248, 248) ≈ white
+;
+; Example: $0000 = Black/Transparent
+;   Binary: 0000000000000000
+;   Red:   00000 (0) = No red
+;   Green: 00000 (0) = No green
+;   Blue:  00000 (0) = No blue
+;   RGB888: (0, 0, 0) = black
+;
+; RGB555 TO RGB888 CONVERSION:
+; ============================
+; Convert 5-bit channel (0-31) to 8-bit (0-255):
+;   RGB888 = (RGB555 << 3) | (RGB555 >> 2)
+;
+; This formula:
+;   1. Shifts left 3 bits to expand 5-bit to 8-bit range (0-248)
+;   2. ORs with right-shifted 2 bits to fill lower bits (0-7)
+;   3. Result: smooth gradient with no gaps
+;
+; Examples:
+;   $00 (0)  → $00 (0)     Black
+;   $0F (15) → $7B (123)   Mid-tone
+;   $1F (31) → $F8 (248)   Maximum (near 255)
+;
+; PALETTE ORGANIZATION:
+; ====================
+; SNES supports 256 colors total in CGRAM (Color Generator RAM):
+; - 16 palettes × 16 colors each = 256 colors
+; - Palette 0: Colors $00-$0F (Background layer colors)
+; - Palette 1: Colors $10-$1F (Sprite colors, set 1)
+; - Palette 2: Colors $20-$2F (Sprite colors, set 2)
+; - ... (up to Palette 15)
+;
+; Each 16-color palette (sub-palette):
+; - Color 0: Always transparent for sprites
+; - Colors 1-15: Visible colors
+; - Total size: 16 colors × 2 bytes = 32 bytes
+;
+; PALETTE LOADING:
+; ===============
+; Palettes are uploaded to SNES CGRAM (Color Generator RAM):
+; 1. Game prepares palette data in RAM
+; 2. Sets CGRAM address via PPU register $2121
+; 3. Writes color data to register $2122 (CGDATA)
+; 4. Each write increments CGRAM address automatically
+; 5. PPU uses CGRAM colors for rendering
+;
+; CGRAM Structure:
+; - 512 bytes total (256 colors × 2 bytes)
+; - Address range: $000-$1FF in CGRAM
+; - Direct addressing: Write address to $2121, data to $2122
+;
+; PALETTE EFFECTS:
+; ===============
+; FFMQ uses several palette manipulation techniques:
+; - Palette cycling: Rotating colors for water/lava animations
+; - Palette fading: Transitioning between palettes for effects
+; - Flash effects: Rapid palette changes for damage/healing
+; - Day/night: Switching palettes to darken/lighten scenes
+; - Battle transitions: Palette interpolation during scene changes
+;
+; CROSS-REFERENCES:
+; ================
+; - Bank $00: Palette DMA routines, CGRAM upload code
 ; - Bank $01: Battle palette loading (CODE_0184E1)
-; - Bank $02: Map palette switching
+; - Bank $02: Map palette switching, palette cycling routines
+; - Bank $04: Sprite graphics (uses these palettes)
+; - Bank $06: Tilemap data (references palette assignments)
+; - Bank $09: Additional palette configurations
+; - tools/extract_palettes.py: Palette extraction tool (RGB555→RGB888)
+; - tools/snes_graphics.py: SNESColor and SNESPalette classes
+;
+; TECHNICAL REFERENCES:
+; ====================
+; - SNES Palette Format: https://snes.nesdev.org/wiki/Palette
+; - CGRAM Structure: https://snes.nesdev.org/wiki/CGRAM
+; - PPU Registers $2121/$2122: https://snes.nesdev.org/wiki/PPU_registers#CGRAM
+; - Color Math: https://snes.nesdev.org/wiki/Color_math
 ; ==============================================================================
 
 					   ORG $058000
@@ -42,7 +138,7 @@ DATA8_058000:
 					   dw $7BBF  ; 6: White/bright
 					   dw $2E66  ; 7: Selection
 
-					   ; UI Palette 2  
+					   ; UI Palette 2
 					   dw $0000  ; 0: Transparent
 					   dw $0BB1  ; 1: Dark green
 					   dw $1726  ; 2: Light green
