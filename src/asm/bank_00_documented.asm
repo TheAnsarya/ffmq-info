@@ -4879,7 +4879,7 @@ Graphics_InitFieldMenuMode:
 	PEA.W $0007                 ; Push bank $07
 	PLB                         ; Data bank = $07
 
-CODE_008F55:
+Palette_Load16Colors:
 	TAX                         ; X = offset
 	ADC.B #$28                  ; A += $28 (CGRAM address increment)
 	STA.B !SNES_CGADD-$2100     ; Set CGRAM address
@@ -5648,8 +5648,8 @@ Graphics_SetupFieldMode:
 ; Side Effects: Modifies $00D6, NMITIMEN register, $00D2, $00DB
 ; ===========================================================================
 
-CODE_0092F6:
-	JSR.W CODE_0092FC           ; Setup graphics state
+Graphics_SetupBattleMode:
+	JSR.W Graphics_PrepareTransition           ; Setup graphics state
 	JMP.W CODE_008016           ; Jump to battle mode init
 
 ; ===========================================================================
@@ -6104,7 +6104,7 @@ DATA8_0097FB:
 ;   - Returns bit position within byte (inverted: 7-0)
 ; ===========================================================================
 
-CODE_0097DA:
+Bit_CalcPosition:
 	PHP                         ; Save processor status
 	REP #$30                    ; 16-bit A/X/Y
 	AND.W #$00FF                ; Mask to 8-bit value
@@ -6139,7 +6139,7 @@ CODE_0097DA:
 ;   Exit:  [return_bank] [table_addr] [saved_registers]
 ; ===========================================================================
 
-CODE_0097BE:
+Jump_IndirectViaTable:
 	PHP                         ; Save processor status
 	PHB                         ; Save data bank
 	REP #$30                    ; 16-bit A/X/Y
@@ -6170,7 +6170,7 @@ CODE_0097BE:
 ;   - REP #$30 ensures 16-bit mode for index registers
 ; ===========================================================================
 
-CODE_00981B:
+Stack_RestoreAll:
 	REP #$30                    ; 16-bit A/X/Y
 	PLY                         ; Restore Y
 	PLX                         ; Restore X
@@ -6195,7 +6195,7 @@ CODE_00981B:
 ;   - All addresses offset from base X/Y by +$00 to +$3E (even offsets)
 ; ===========================================================================
 
-CODE_009891:
+Memory_Copy64Bytes:
 	LDA.W $003E,X               ; Copy word at +$3E
 	STA.W $003E,Y
 	LDA.W $003C,X               ; Copy word at +$3C
@@ -6229,7 +6229,7 @@ CODE_009891:
 	LDA.W $0020,X               ; Copy word at +$20
 	STA.W $0020,Y
 
-CODE_0098F1:
+Memory_Copy32Bytes:
 	LDA.W $001E,X               ; Copy word at +$1E
 	STA.W $001E,Y
 	LDA.W $001C,X               ; Copy word at +$1C
@@ -6367,10 +6367,12 @@ CODE_009A08:
 	STA.W $000A,Y               ; Fill word at +$0A
 	STA.W $0008,Y               ; Fill word at +$08
 
-CODE_009A11:
+Memory_Fill6Words:
 	STA.W $0006,Y               ; Fill word at +$06
 	STA.W $0004,Y               ; Fill word at +$04
 	STA.W $0002,Y               ; Fill word at +$02
+
+Memory_Fill2Words:
 	STA.W $0000,Y               ; Fill word at +$00
 	RTS                         ; Return
 
