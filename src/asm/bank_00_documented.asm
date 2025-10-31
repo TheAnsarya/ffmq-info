@@ -530,7 +530,7 @@ Boot_FadeIn:
 
 ;-------------------------------------------------------------------------------
 
-CODE_0080DC:
+Boot_FinalInit:
 	; ===========================================================================
 	; Final Game Initialization and Main Game Jump
 	; ===========================================================================
@@ -784,7 +784,7 @@ Load_GameFromSRAM:
 
 	LDA.B #$FF                  ; A = $FF (invalid slot, reset to -1)
 
-CODE_00818E:
+Load_SaveSlotData:
 	; ===========================================================================
 	; Load Save Slot Data Table
 	; ===========================================================================
@@ -1787,7 +1787,7 @@ NMI_AlternateTransfer:
 	LDX.W #$CA48                ; X = $CA48 (source 3)
 								; Y >= $29 → Use source 3
 
-CODE_0084EB:
+DMA_ExecuteTilemapTransfer:
 	STX.B SNES_DMA5ADDRL-$4300  ; $4352-$4353 = Selected source address
 
 	LDX.W #$6700                ; X = $6700 (VRAM destination)
@@ -1798,7 +1798,7 @@ CODE_0084EB:
 
 ;-------------------------------------------------------------------------------
 
-CODE_0084F8:
+NMI_ClearTransferMarkers:
 	; ===========================================================================
 	; Clear Transfer Markers and Return
 	; ===========================================================================
@@ -2562,7 +2562,7 @@ DMA_Init_Data:
 ; Graphics Update - Field Mode (continued from CODE_008577)
 ;===============================================================================
 
-CODE_0085B7:
+DMA_FieldGraphicsUpdate:
 	; Setup VRAM for vertical increment mode
 	LDA.B #$80                       ; Increment after writing to $2119
 	STA.W SNES_VMAINC                ; Set VRAM increment mode
@@ -2611,7 +2611,7 @@ CODE_0085B7:
 	; Check if tilemap update needed
 	LDA.B #$80                       ; Check bit 7
 	AND.W $00D6                      ; Test display flags
-	BEQ CODE_00862D                  ; If clear, skip tilemap transfer
+	BEQ DMA_FieldGraphicsUpdate_OAM  ; If clear, skip tilemap transfer
 
 	; Transfer tilemap data
 	LDX.W #$5820                     ; VRAM address $5820
@@ -2628,24 +2628,24 @@ CODE_0085B7:
 	STA.W SNES_MDMAEN                ; Execute transfer
 	RTL                              ; Return
 
-CODE_00862D:
-	JSR.W CODE_008543                ; Transfer OAM data
+DMA_FieldGraphicsUpdate_OAM:
+	JSR.W DMA_UpdateOAM              ; Transfer OAM data
 
 	; Check if additional display update needed
 	LDA.B #$20                       ; Check bit 5
 	AND.W $00D6                      ; Test display flags
-	BEQ CODE_00863C                  ; If clear, exit
+	BEQ DMA_FieldGraphicsUpdate_Exit ; If clear, exit
 	LDA.B #$78                       ; Set multiple flags (bits 3,4,5,6)
 	TSB.W $00D4                      ; Set bits in status register
 
-CODE_00863C:
+DMA_FieldGraphicsUpdate_Exit:
 	RTL                              ; Return
 
 ;===============================================================================
 ; SPECIAL GRAPHICS TRANSFER ROUTINES ($00863D-$008965)
 ;===============================================================================
 
-CODE_00863D:
+DMA_SpecialVRAMHandler:
 	; ===========================================================================
 	; Special VRAM Transfer Handler
 	; ===========================================================================
@@ -2672,7 +2672,7 @@ CODE_00863D:
 
 	LDA.B #$10                  ; A = $10 (bit 4 mask)
 	AND.W $00DA                 ; Test bit 4 of $00DA
-	BEQ CODE_00869D             ; If clear → Use normal field mode graphics
+	BEQ DMA_FieldModeTransfer   ; If clear → Use normal field mode graphics
 
 	; ---------------------------------------------------------------------------
 	; Battle Mode Graphics Transfer
@@ -2738,7 +2738,7 @@ CODE_00863D:
 
 ;-------------------------------------------------------------------------------
 
-CODE_00869D:
+DMA_FieldModeTransfer:
 	; ===========================================================================
 	; Field Mode Graphics Transfer
 	; ===========================================================================
@@ -2778,7 +2778,7 @@ CODE_00869D:
 
 	LDA.W #$0040                ; A = $0040 (bit 6 mask)
 	AND.W $00DE                 ; Test bit 6 of $00DE
-	BEQ CODE_0086F3             ; If clear → Update all characters
+	BEQ DMA_UpdateAllCharacters ; If clear → Update all characters
 
 	; ---------------------------------------------------------------------------
 	; Single Character Status Update
@@ -2804,7 +2804,7 @@ CODE_00869D:
 	TAX                         ; X = character data pointer
 
 	PHA                         ; Save character data pointer
-	JSR.W CODE_008751           ; Transfer character graphics (2-part)
+	JSR.W DMA_CharacterGraphics ; Transfer character graphics (2-part)
 	PLY                         ; Y = character data pointer (restore)
 
 	PLB                         ; Restore Data Bank
@@ -2822,13 +2822,13 @@ CODE_00869D:
 	ASL A                       ; A = A × 16 (multiply by 16)
 	TAX                         ; X = palette CGRAM address
 
-	JSR.W CODE_00876C           ; Transfer character palette
+	JSR.W DMA_CharacterPalette  ; Transfer character palette
 
 	RTL                         ; Return
 
 ;-------------------------------------------------------------------------------
 
-CODE_0086F3:
+DMA_UpdateAllCharacters:
 	; ===========================================================================
 	; Full Character Status Display Update
 	; ===========================================================================
@@ -2856,7 +2856,7 @@ CODE_0086F3:
 	; ---------------------------------------------------------------------------
 
 	LDX.W $0107                 ; X = [$0107] (character 1 data pointer)
-	JSR.W CODE_008751           ; Transfer character 1 graphics
+	JSR.W DMA_CharacterGraphics ; Transfer character 1 graphics
 
 	; ---------------------------------------------------------------------------
 	; Transfer Character 2 Graphics
@@ -2866,7 +2866,7 @@ CODE_0086F3:
 	STA.W $2116                 ; Set VRAM address
 
 	LDX.W $0109                 ; X = [$0109] (character 2 data pointer)
-	JSR.W CODE_008751           ; Transfer character 2 graphics
+	JSR.W DMA_CharacterGraphics ; Transfer character 2 graphics
 
 	; ---------------------------------------------------------------------------
 	; Transfer Character 3 Graphics
@@ -2876,7 +2876,7 @@ CODE_0086F3:
 	STA.W $2116                 ; Set VRAM address
 
 	LDX.W $010B                 ; X = [$010B] (character 3 data pointer)
-	JSR.W CODE_008751           ; Transfer character 3 graphics
+	JSR.W DMA_CharacterGraphics ; Transfer character 3 graphics
 
 	PLB                         ; Restore Data Bank
 
@@ -2886,7 +2886,7 @@ CODE_0086F3:
 
 	LDA.W #$D824                ; A = $D824 (source address)
 	LDX.W #$00C0                ; X = $00C0 (CGRAM address = palette $C)
-	JSR.W CODE_00876F           ; Transfer palette
+	JSR.W DMA_PaletteToCGRAM    ; Transfer palette
 
 	; ---------------------------------------------------------------------------
 	; Transfer Character 1 Palette
@@ -2894,7 +2894,7 @@ CODE_0086F3:
 
 	LDY.W $0107                 ; Y = [$0107] (character 1 data pointer)
 	LDX.W #$00D0                ; X = $00D0 (CGRAM address = palette $D)
-	JSR.W CODE_00876C           ; Transfer character palette
+	JSR.W DMA_CharacterPalette  ; Transfer character palette
 
 	; ---------------------------------------------------------------------------
 	; Transfer Character 2 Palette
@@ -2918,7 +2918,7 @@ CODE_0086F3:
 ; GRAPHICS HELPER SUBROUTINES ($008751-$008783)
 ;===============================================================================
 
-CODE_008751:
+DMA_CharacterGraphics:
 	; ===========================================================================
 	; Transfer Character Graphics (2-Part Transfer)
 	; ===========================================================================
@@ -2961,12 +2961,12 @@ CODE_008751:
 
 ;-------------------------------------------------------------------------------
 
-CODE_00876C:
+DMA_CharacterPalette:
 	; ===========================================================================
 	; Transfer Character Palette (Variant Entry Point)
 	; ===========================================================================
 	; Alternative entry point that loads palette source from character data.
-	; Falls through to CODE_00876F.
+	; Falls through to DMA_PaletteToCGRAM.
 	;
 	; Parameters:
 	;   X = CGRAM address (palette index)
@@ -2974,9 +2974,9 @@ CODE_00876C:
 	; ===========================================================================
 
 	LDA.W $0004,Y               ; A = [Y+4] (palette data pointer)
-								; Falls through to CODE_00876F
+								; Falls through to DMA_PaletteToCGRAM
 
-CODE_00876F:
+DMA_PaletteToCGRAM:
 	; ===========================================================================
 	; Transfer Palette to CGRAM
 	; ===========================================================================
@@ -3026,7 +3026,7 @@ DATA8_008962:
 ; MAIN GAME LOOP & FRAME UPDATE ($008966-$0089C5)
 ;===============================================================================
 
-CODE_008966:
+GameLoop_FrameUpdate:
 	; ===========================================================================
 	; Main Game Loop - Frame Update Handler
 	; ===========================================================================
@@ -3057,17 +3057,17 @@ CODE_008966:
 	; ---------------------------------------------------------------------------
 
 	INC.W $0E97                 ; Increment frame counter low word
-	BNE CODE_008974             ; If no overflow → Skip high byte increment
+	BNE GameLoop_ProcessEvents  ; If no overflow → Skip high byte increment
 	INC.W $0E99                 ; Increment high byte (24-bit overflow)
 
 ;-------------------------------------------------------------------------------
 
-CODE_008974:
+GameLoop_ProcessEvents:
 	; ===========================================================================
 	; Time-Based Event Processing
 	; ===========================================================================
 
-	JSR.W CODE_0089C6           ; Process time-based events (status effects, etc.)
+	JSR.W GameLoop_TimeBasedEvents ; Process time-based events (status effects, etc.)
 
 	; ---------------------------------------------------------------------------
 	; Check Full Screen Refresh Flag ($00D4 bit 2)
@@ -3078,7 +3078,7 @@ CODE_008974:
 
 	LDA.W #$0004                ; A = $0004 (bit 2 mask)
 	AND.W $00D4                 ; Test bit 2 of $00D4
-	BEQ CODE_008999             ; If clear → Normal frame processing
+	BEQ GameLoop_NormalUpdate   ; If clear → Normal frame processing
 
 	; ---------------------------------------------------------------------------
 	; Full Screen Refresh Path
@@ -3101,11 +3101,11 @@ CODE_008974:
 	JSR.W CODE_0091D4           ; Update BG layer 1 tilemap
 	JSR.W CODE_008D29           ; Transfer layer 1 to VRAM
 
-	BRA CODE_0089BD             ; → Skip to animation update
+	BRA GameLoop_UpdateState    ; → Skip to animation update
 
 ;-------------------------------------------------------------------------------
 
-CODE_008999:
+GameLoop_NormalUpdate:
 	; ===========================================================================
 	; Normal Frame Processing Path
 	; ===========================================================================
@@ -3121,7 +3121,7 @@ CODE_008999:
 
 	LDA.W #$0010                ; A = $0010 (bit 4 mask)
 	AND.W $00DA                 ; Test bit 4 of $00DA (menu mode flag)
-	BNE CODE_0089AC             ; If set → Process controller input
+	BNE GameLoop_ProcessInput   ; If set → Process controller input
 
 	; ---------------------------------------------------------------------------
 	; Check Input Processing Enable ($00E2 bit 2)
@@ -3129,11 +3129,11 @@ CODE_008999:
 
 	LDA.W #$0004                ; A = $0004 (bit 2 mask)
 	AND.W $00E2                 ; Test bit 2 of $00E2
-	BNE CODE_0089BD             ; If set → Skip input (cutscene/auto mode)
+	BNE GameLoop_UpdateState    ; If set → Skip input (cutscene/auto mode)
 
 ;-------------------------------------------------------------------------------
 
-CODE_0089AC:
+GameLoop_ProcessInput:
 	; ===========================================================================
 	; Controller Input Processing
 	; ===========================================================================
@@ -3143,7 +3143,7 @@ CODE_0089AC:
 
 	LDA.B $07                   ; A = [$07] (controller data - current frame)
 	AND.B $8E                   ; A = A & [$8E] (input enable mask)
-	BEQ CODE_0089BD             ; If zero → No valid input, skip processing
+	BEQ GameLoop_UpdateState    ; If zero → No valid input, skip processing
 
 	; ---------------------------------------------------------------------------
 	; Determine Input Handler
@@ -3164,7 +3164,7 @@ CODE_0089AC:
 
 ;-------------------------------------------------------------------------------
 
-CODE_0089BD:
+GameLoop_UpdateState:
 	; ===========================================================================
 	; Animation and State Update
 	; ===========================================================================
@@ -3183,7 +3183,7 @@ CODE_0089BD:
 ; TIME-BASED EVENT HANDLER ($0089C6-$008A29)
 ;===============================================================================
 
-CODE_0089C6:
+GameLoop_TimeBasedEvents:
 	; ===========================================================================
 	; Time-Based Event Processing
 	; ===========================================================================
@@ -3215,7 +3215,7 @@ CODE_0089C6:
 
 	LDA.W #$0080                ; A = $0080 (bit 7 mask)
 	AND.W $00DE                 ; Test bit 7 of $00DE
-	BEQ CODE_008A26             ; If clear → Skip time-based processing
+	BEQ GameLoop_TimeBasedEvents_Exit ; If clear → Skip time-based processing
 
 	; ---------------------------------------------------------------------------
 	; Set Direct Page for Character Status Access
@@ -3232,7 +3232,7 @@ CODE_0089C6:
 	; ---------------------------------------------------------------------------
 
 	DEC.W $010D                 ; Decrement timer
-	BPL CODE_008A26             ; If still positive → Exit (not time yet)
+	BPL GameLoop_TimeBasedEvents_Exit ; If still positive → Exit (not time yet)
 
 	; Timer expired - reset and process status effects
 	LDA.B #$0C                  ; A = $0C (12 frames)
@@ -3243,33 +3243,33 @@ CODE_0089C6:
 	; ---------------------------------------------------------------------------
 
 	LDA.L $700027               ; A = [$700027] (character 1 status flags)
-	BNE CODE_0089EA             ; If non-zero → Character 1 has status effect
+	BNE GameLoop_CheckChar2     ; If non-zero → Character 1 has status effect
 
 	LDX.B #$40                  ; X = $40 (character 1 offset)
 	JSR.W CODE_008A2A           ; Update character 1 display
 
 ;-------------------------------------------------------------------------------
 
-CODE_0089EA:
+GameLoop_CheckChar2:
 	; ---------------------------------------------------------------------------
 	; Check Character 2 Status ($700077)
 	; ---------------------------------------------------------------------------
 
 	LDA.L $700077               ; A = [$700077] (character 2 status)
-	BNE CODE_0089F5             ; If non-zero → Character 2 has status
+	BNE GameLoop_CheckChar3     ; If non-zero → Character 2 has status
 
 	LDX.B #$50                  ; X = $50 (character 2 offset)
 	JSR.W CODE_008A2A           ; Update character 2 display
 
 ;-------------------------------------------------------------------------------
 
-CODE_0089F5:
+GameLoop_CheckChar3:
 	; ---------------------------------------------------------------------------
 	; Check Character 3 Status ($7003B3)
 	; ---------------------------------------------------------------------------
 
 	LDA.L $7003B3               ; A = [$7003B3] (character 3 status)
-	BNE CODE_008A00             ; If non-zero → Character 3 has status
+	BNE GameLoop_TimeBasedEvents_Exit ; If non-zero → Character 3 has status
 
 	LDX.B #$60                  ; X = $60 (character 3 offset)
 	JSR.W CODE_008A2A           ; Update character 3 display
