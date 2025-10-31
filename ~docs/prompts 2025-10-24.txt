@@ -287,6 +287,16 @@ continue adding labels, more labels per batch, use temp files if you need to to 
 
 
 
+
+
+
+
+
+
+
+
+
+
 create documentation that describes the entire hero or enemy or map data structures or tiles or music and how to update them easily through the transitory files like - the extraction tools extract the hero graphics and animations and palettes to json and png (using the right palettes) files that cna be edited - then the build tools convert those png/json/pal files back into the data structures for the insertion build process.
 
 

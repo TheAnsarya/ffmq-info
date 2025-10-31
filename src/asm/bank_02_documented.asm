@@ -4752,7 +4752,7 @@ GameState_Transition:
                        INC.B $83                            ;02D3D8|E683    |000A83; Increment index
                        LDA.B $83                            ;02D3DA|A583    |000A83; Load index
                        CMP.B $00                            ;02D3DC|C500    |000A00; Compare with limit
-                       BNE CODE_02D39C                      ;02D3DE|D0BC    |02D39C; Continue loop if not done
+                       BNE GameState_ProcessLoop            ;02D3DE|D0BC    |02D39C; Continue loop if not done
                        LDA.W $04B3                          ;02D3E0|ADB304  |0204B3; Load final state
                        STA.B $13                            ;02D3E3|8513    |000A13; Store final state
                        PLP                                  ;02D3E5|28      |      ; Restore processor status
@@ -4768,7 +4768,7 @@ DATA8_02D3ED:
 
 ; Advanced Graphics Processing Engine
 ; Complex graphics and entity processing system
-CODE_02D3FD:
+Graphics_EntityProcessor:
                        PHX                                  ;02D3FD|DA      |      ; Save X register
                        PHY                                  ;02D3FE|5A      |      ; Save Y register
                        PHP                                  ;02D3FF|08      |      ; Save processor status
@@ -4780,16 +4780,16 @@ CODE_02D3FD:
                        LDA.B $1D                            ;02D404|A51D    |000A1D; Load graphics flag 1
                        ORA.B $1E                            ;02D406|051E    |000A1E; OR with flag 2
                        ORA.B $1F                            ;02D408|051F    |000A1F; OR with flag 3
-                       BEQ CODE_02D485                      ;02D40A|F079    |02D485; Exit if no flags set
+                       BEQ Graphics_ProcessExit             ;02D40A|F079    |02D485; Exit if no flags set
 
 ; Special Graphics Mode Processing
                        LDA.B $0D                            ;02D40C|A50D    |000A0D; Load graphics mode
                        CMP.B #$50                           ;02D40E|C950    |      ; Check for special mode
-                       BNE CODE_02D422                      ;02D410|D010    |02D422; Branch if not special
+                       BNE Graphics_StandardMode            ;02D410|D010    |02D422; Branch if not special
                        db $A9,$40,$8D,$05,$05,$A9,$01,$85,$1E,$85,$1F,$20,$B3,$D4,$80,$05;02D412
 
 ; Standard Graphics Processing Mode
-CODE_02D422:
+Graphics_StandardMode:
                        LDA.B #$3F                           ;02D422|A93F    |      ; Graphics parameter
                        STA.W $0505                          ;02D424|8D0505  |020505; Store parameter
                        LDA.B #$7E                           ;02D427|A97E    |      ; Bank $7E
@@ -4798,12 +4798,12 @@ CODE_02D422:
 
 ; Graphics Processing Loop
 ; Main graphics processing loop with nested X loop
-CODE_02D42E:
+Graphics_MainLoop:
                        LDX.W #$0000                         ;02D42E|A20000  |      ; Initialize X
 
-CODE_02D431:
+Graphics_XLoop:
                        LDA.B $1D,X                          ;02D431|B51D    |000A1D; Load graphics flag
-                       BEQ CODE_02D470                      ;02D433|F03B    |02D470; Skip if no processing
+                       BEQ Graphics_LoopControl             ;02D433|F03B    |02D470; Skip if no processing
                        REP #$30                             ;02D435|C230    |      ; 16-bit mode
                        PHX                                  ;02D437|DA      |      ; Save X
                        TXA                                  ;02D438|8A      |      ; Transfer X to A
@@ -4817,17 +4817,17 @@ CODE_02D431:
                        LDA.B #$64                           ;02D445|A964    |      ; Row count (100 rows)
 
 ; Graphics Row Processing Loop
-CODE_02D447:
+Graphics_RowLoop:
                        PHA                                  ;02D447|48      |      ; Save row counter
                        LDA.B #$00                           ;02D448|A900    |      ; Initialize column
 
 ; Graphics Column Processing Loop
-CODE_02D44A:
-                       JSR.W CODE_02D489                    ;02D44A|2089D4  |02D489; Process graphics pixel
+Graphics_ColumnLoop:
+                       JSR.W Graphics_PixelProcessor        ;02D44A|2089D4  |02D489; Process graphics pixel
                        INC A                                ;02D44D|1A      |      ; Next column
                        INC A                                ;02D44E|1A      |      ; Skip alternate columns
                        CMP.B #$10                           ;02D44F|C910    |      ; Check column limit (16)
-                       BNE CODE_02D44A                      ;02D451|D0F7    |02D44A; Continue column loop
+                       BNE Graphics_ColumnLoop              ;02D451|D0F7    |02D44A; Continue column loop
 
 ; Graphics Row Advancement
                        REP #$30                             ;02D453|C230    |      ; 16-bit mode
@@ -4839,34 +4839,34 @@ CODE_02D44A:
                        REP #$10                             ;02D45F|C210    |      ; 16-bit index
                        PLA                                  ;02D461|68      |      ; Restore row counter
                        DEC A                                ;02D462|3A      |      ; Decrement row counter
-                       BNE CODE_02D447                      ;02D463|D0E2    |02D447; Continue row loop
+                       BNE Graphics_RowLoop                 ;02D463|D0E2    |02D447; Continue row loop
 
 ; Graphics Completion Check
                        CPY.W #$000C                         ;02D465|C00C00  |      ; Check Y limit (12)
-                       BNE CODE_02D470                      ;02D468|D006    |02D470; Skip if not at limit
+                       BNE Graphics_LoopControl             ;02D468|D006    |02D470; Skip if not at limit
                        LDA.B #$FF                           ;02D46A|A9FF    |      ; Set completion flag
                        STA.B $02,X                          ;02D46C|9502    |000A02; Store in state
                        STA.B $0D,X                          ;02D46E|950D    |000A0D; Store in target
 
 ; Graphics Loop Control
-CODE_02D470:
+Graphics_LoopControl:
                        INX                                  ;02D470|E8      |      ; Next X index
                        CPX.W #$0003                         ;02D471|E00300  |      ; Check X limit (3)
-                       BNE CODE_02D431                      ;02D474|D0BB    |02D431; Continue X loop
+                       BNE Graphics_XLoop                   ;02D474|D0BB    |02D431; Continue X loop
                        LDA.B #$1C                           ;02D476|A91C    |      ; VBlank flag
                        TSB.B $E3                            ;02D478|04E3    |000AE3; Set VBlank bit
 
 ; VBlank Synchronization
-CODE_02D47A:
+Graphics_VBlankWait:
                        LDA.B $E3                            ;02D47A|A5E3    |000AE3; Check VBlank
-                       BNE CODE_02D47A                      ;02D47C|D0FC    |02D47A; Wait for VBlank clear
+                       BNE Graphics_VBlankWait              ;02D47C|D0FC    |02D47A; Wait for VBlank clear
                        INY                                  ;02D47E|C8      |      ; Increment Y
                        INY                                  ;02D47F|C8      |      ; Increment Y again
                        CPY.W #$0010                         ;02D480|C01000  |      ; Check Y limit (16)
-                       BNE CODE_02D42E                      ;02D483|D0A9    |02D42E; Continue main loop
+                       BNE Graphics_MainLoop                ;02D483|D0A9    |02D42E; Continue main loop
 
 ; Graphics Processing Exit
-CODE_02D485:
+Graphics_ProcessExit:
                        PLP                                  ;02D485|28      |      ; Restore processor status
                        PLY                                  ;02D486|7A      |      ; Restore Y register
                        PLX                                  ;02D487|FA      |      ; Restore X register
@@ -4874,7 +4874,7 @@ CODE_02D485:
 
 ; Graphics Pixel Processing Engine
 ; Advanced pixel manipulation and bit mask operations
-CODE_02D489:
+Graphics_PixelProcessor:
                        PHX                                  ;02D489|DA      |      ; Save X register
                        PHY                                  ;02D48A|5A      |      ; Save Y register
                        PHA                                  ;02D48B|48      |      ; Save accumulator
@@ -4914,7 +4914,7 @@ CODE_02D489:
 
 ; State Processing and Validation Engine
 ; Complex state management with bank switching
-CODE_02D4F7:
+State_ValidationEngine:
                        PHK                                  ;02D4F7|4B      |      ; Push program bank
                        PLB                                  ;02D4F8|AB      |      ; Pull to data bank
                        PHA                                  ;02D4F9|48      |      ; Save accumulator
@@ -4924,14 +4924,14 @@ CODE_02D4F7:
                        REP #$10                             ;02D4FE|C210    |      ; 16-bit index
                        LDA.B $20                            ;02D500|A520    |000A20; Load state parameter
                        CMP.B #$FF                           ;02D502|C9FF    |      ; Check for invalid state
-                       BNE CODE_02D50A                      ;02D504|D004    |02D50A; Branch if valid
+                       BNE State_ProcessPipeline            ;02D504|D004    |02D50A; Branch if valid
                        PLP                                  ;02D506|28      |      ; Restore status
                        PLX                                  ;02D507|FA      |      ; Restore X
                        PLA                                  ;02D508|68      |      ; Restore accumulator
                        RTS                                  ;02D509|60      |      ; Return
 
 ; Complex State Processing Pipeline
-CODE_02D50A:
+State_ProcessPipeline:
                        JSR.W CODE_02D784                    ;02D50A|2084D7  |02D784; Call state processor
                        JSR.W CODE_02D5BB                    ;02D50D|20BBD5  |02D5BB; Call graphics setup
                        REP #$30                             ;02D510|C230    |      ; 16-bit mode
@@ -4971,50 +4971,50 @@ CODE_02D50A:
                        STY.B $6B                            ;02D549|846B    |000A6B; Store pointer 2
 
 ; Graphics Rendering Loop Entry
-CODE_02D54B:
-                       JSR.W CODE_02D597                    ;02D54B|2097D5  |02D597; Setup graphics data
+Graphics_RenderLoop:
+                       JSR.W Graphics_DataLoader            ;02D54B|2097D5  |02D597; Setup graphics data
                        SEP #$20                             ;02D54E|E220    |      ; 8-bit accumulator
                        REP #$10                             ;02D550|C210    |      ; 16-bit index
                        LDA.B #$08                           ;02D552|A908    |      ; 8 pixels per byte
                        STA.B $7F                            ;02D554|857F    |000A7F; Store pixel count
 
 ; Graphics Pixel Processing Loop
-CODE_02D556:
+Graphics_PixelLoop:
                        ASL.B $6D                            ;02D556|066D    |000A6D; Shift graphics data 1
-                       BCC CODE_02D561                      ;02D558|9007    |02D561; Branch if bit clear
-                       JSR.W CODE_02D66F                    ;02D55A|206FD6  |02D66F; Process set pixel
+                       BCC Graphics_CheckAlt                ;02D558|9007    |02D561; Branch if bit clear
+                       JSR.W Graphics_SetPixel              ;02D55A|206FD6  |02D66F; Process set pixel
                        ASL.B $6F                            ;02D55D|066F    |000A6F; Shift graphics data 2
-                       BRA CODE_02D568                      ;02D55F|8007    |02D568; Continue
+                       BRA Graphics_AdvanceMemory           ;02D55F|8007    |02D568; Continue
 
-CODE_02D561:
+Graphics_CheckAlt:
                        ASL.B $6F                            ;02D561|066F    |000A6F; Shift graphics data 2
-                       BCC CODE_02D568                      ;02D563|9003    |02D568; Branch if bit clear
-                       JSR.W CODE_02D6B3                    ;02D565|20B3D6  |02D6B3; Process alternate pixel
+                       BCC Graphics_AdvanceMemory           ;02D563|9003    |02D568; Branch if bit clear
+                       JSR.W Graphics_AltPixel              ;02D565|20B3D6  |02D6B3; Process alternate pixel
 
 ; Graphics Memory Advancement
-CODE_02D568:
+Graphics_AdvanceMemory:
                        REP #$30                             ;02D568|C230    |      ; 16-bit mode
                        CLC                                  ;02D56A|18      |      ; Clear carry
                        LDA.B $70                            ;02D56B|A570    |000A70; Load memory offset
                        ADC.W #$0020                         ;02D56D|692000  |      ; Add row size (32 bytes)
                        STA.B $70                            ;02D570|8570    |000A70; Store new offset
-                       JSR.W CODE_02D62D                    ;02D572|202DD6  |02D62D; Process memory update
+                       JSR.W Memory_TileUpdate              ;02D572|202DD6  |02D62D; Process memory update
                        DEC.B $81                            ;02D575|C681    |000A81; Decrement width counter
-                       BEQ CODE_02D58B                      ;02D577|F012    |02D58B; Exit if done
+                       BEQ Graphics_ProcessDone             ;02D577|F012    |02D58B; Exit if done
                        SEP #$20                             ;02D579|E220    |      ; 8-bit accumulator
                        REP #$10                             ;02D57B|C210    |      ; 16-bit index
                        DEC.B $7F                            ;02D57D|C67F    |000A7F; Decrement pixel counter
-                       BNE CODE_02D556                      ;02D57F|D0D5    |02D556; Continue pixel loop
+                       BNE Graphics_PixelLoop               ;02D57F|D0D5    |02D556; Continue pixel loop
 
 ; Graphics Row Advancement
                        REP #$30                             ;02D581|C230    |      ; 16-bit mode
                        INC.B $6B                            ;02D583|E66B    |000A6B; Next graphics row
                        SEP #$20                             ;02D585|E220    |      ; 8-bit accumulator
                        REP #$10                             ;02D587|C210    |      ; 16-bit index
-                       BRA CODE_02D54B                      ;02D589|80C0    |02D54B; Continue graphics loop
+                       BRA Graphics_RenderLoop              ;02D589|80C0    |02D54B; Continue graphics loop
 
 ; Graphics Processing Exit
-CODE_02D58B:
+Graphics_ProcessDone:
                        PLP                                  ;02D58B|28      |      ; Restore processor status
                        PLX                                  ;02D58C|FA      |      ; Restore X register
                        PLA                                  ;02D58D|68      |      ; Restore accumulator
@@ -5027,7 +5027,7 @@ DATA8_02D58F:
 
 ; Graphics Data Loading Engine
 ; Complex graphics data retrieval and bit manipulation
-CODE_02D597:
+Graphics_DataLoader:
                        PHP                                  ;02D597|08      |      ; Save processor status
                        SEP #$20                             ;02D598|E220    |      ; 8-bit accumulator
                        REP #$10                             ;02D59A|C210    |      ; 16-bit index
@@ -5051,7 +5051,7 @@ CODE_02D597:
 
 ; Advanced Graphics Setup Engine
 ; Complex graphics memory configuration and tile processing
-CODE_02D5BB:
+Graphics_SetupEngine:
                        PHP                                  ;02D5BB|08      |      ; Save processor status
                        PHB                                  ;02D5BC|8B      |      ; Save data bank
                        SEP #$20                             ;02D5BD|E220    |      ; 8-bit accumulator
@@ -5078,7 +5078,7 @@ CODE_02D5BB:
                        REP #$30                             ;02D5E5|C230    |      ; 16-bit mode
 
 ; Graphics Tile Writing Loop
-CODE_02D5E7:
+Graphics_TileWriteLoop:
                        STY.W $2181                          ;02D5E7|8C8121  |022181; Set WRAM address
                        INY                                  ;02D5EA|C8      |      ; Increment address
                        LDA.B $74                            ;02D5EB|A574    |000A74; Load tile data
@@ -5092,9 +5092,9 @@ CODE_02D5E7:
                        INY                                  ;02D5FD|C8      |      ; Increment address
                        STA.W $2180                          ;02D5FE|8D8021  |022180; Write tile high byte
                        DEX                                  ;02D601|CA      |      ; Decrement width
-                       BEQ CODE_02D624                      ;02D602|F020    |02D624; Exit if done
+                       BEQ Graphics_SetupDone               ;02D602|F020    |02D624; Exit if done
                        DEC.B $7F                            ;02D604|C67F    |000A7F; Decrement height
-                       BNE CODE_02D61E                      ;02D606|D016    |02D61E; Continue if not row end
+                       BNE Graphics_NextTile                ;02D606|D016    |02D61E; Continue if not row end
 
 ; Graphics Row Advancement
                        REP #$30                             ;02D608|C230    |      ; 16-bit mode
@@ -5109,13 +5109,13 @@ CODE_02D5E7:
                        LDA.B $18                            ;02D61A|A518    |000A18; Load height
                        STA.B $7F                            ;02D61C|857F    |000A7F; Reset height
 
-CODE_02D61E:
+Graphics_NextTile:
                        REP #$30                             ;02D61E|C230    |      ; 16-bit mode
                        INC.B $74                            ;02D620|E674    |000A74; Next tile
-                       BRA CODE_02D5E7                      ;02D622|80C3    |02D5E7; Continue tile loop
+                       BRA Graphics_TileWriteLoop           ;02D622|80C3    |02D5E7; Continue tile loop
 
 ; Graphics Setup Exit
-CODE_02D624:
+Graphics_SetupDone:
                        PLB                                  ;02D624|AB      |      ; Restore data bank
                        PLP                                  ;02D625|28      |      ; Restore processor status
                        RTS                                  ;02D626|60      |      ; Return
@@ -5126,7 +5126,7 @@ DATA8_02D627:
 
 ; Advanced Memory and Tile Processing Engine
 ; Complex memory updates with sophisticated tile management
-CODE_02D62D:
+Memory_TileUpdate:
                        PHP                                  ;02D62D|08      |      ; Save processor status
                        SEP #$20                             ;02D62E|E220    |      ; 8-bit accumulator
                        REP #$10                             ;02D630|C210    |      ; 16-bit index
@@ -5148,7 +5148,7 @@ CODE_02D62D:
                        LDA.B #$00                           ;02D651|A900    |      ; Clear register
                        XBA                                  ;02D653|EB      |      ; Exchange bytes
                        DEC.B $80                            ;02D654|C680    |000A80; Decrement counter
-                       BNE CODE_02D664                      ;02D656|D00C    |02D664; Branch if not zero
+                       BNE Memory_RowIncrement              ;02D656|D00C    |02D664; Branch if not zero
                        LDA.B $18                            ;02D658|A518    |000A18; Load height
                        STA.B $80                            ;02D65A|8580    |000A80; Reset counter
                        LDA.B #$21                           ;02D65C|A921    |      ; Row size (33)
@@ -5171,10 +5171,10 @@ CODE_02D62D:
 
 ; Memory Row Calculation and Address Management
 ; Advanced row offset calculation with sophisticated memory addressing
-CODE_02D664:
+Memory_RowIncrement:
                        LDA.B #$02                           ;02D664|A902    |      ; Set row increment value
 
-CODE_02D666:
+Memory_AddressUpdate:
                        REP #$30                             ;02D666|C230    |      ; 16-bit mode
                        CLC                                  ;02D668|18      |      ; Clear carry
                        ADC.B $72                            ;02D669|6572    |000A72; Add to memory base
@@ -5184,7 +5184,7 @@ CODE_02D666:
 
 ; Advanced Graphics Data Processing Engine
 ; Complex graphics data transfer with multi-bank coordination
-CODE_02D66F:
+Graphics_SetPixel:
                        PHY                                  ;02D66F|5A      |      ; Save Y register
                        PHP                                  ;02D670|08      |      ; Save processor status
                        PHB                                  ;02D671|8B      |      ; Save data bank
@@ -5202,7 +5202,7 @@ CODE_02D66F:
 
 ; Graphics Data Transfer Loop 1
 ; First phase graphics data transfer (16 bytes)
-CODE_02D689:
+Graphics_TransferLoop1:
                        LDA.B ($69)                          ;02D689|B269    |000A69; Load graphics byte
                        SEP #$20                             ;02D68B|E220    |      ; 8-bit accumulator
                        REP #$10                             ;02D68D|C210    |      ; 16-bit index
@@ -5210,12 +5210,12 @@ CODE_02D689:
                        REP #$30                             ;02D692|C230    |      ; 16-bit mode
                        INC.B $69                            ;02D694|E669    |000A69; Next graphics byte
                        DEY                                  ;02D696|88      |      ; Decrement counter
-                       BNE CODE_02D689                      ;02D697|D0F0    |02D689; Continue transfer loop
+                       BNE Graphics_TransferLoop1           ;02D697|D0F0    |02D689; Continue transfer loop
                        LDY.W #$0008                         ;02D699|A00800  |      ; 8-byte transfer count
 
 ; Graphics Data Transfer Loop 2
 ; Second phase graphics data transfer with special processing
-CODE_02D69C:
+Graphics_TransferLoop2:
                        LDA.B ($69)                          ;02D69C|B269    |000A69; Load graphics byte
                        SEP #$20                             ;02D69E|E220    |      ; 8-bit accumulator
                        REP #$10                             ;02D6A0|C210    |      ; 16-bit index
@@ -5224,7 +5224,7 @@ CODE_02D69C:
                        REP #$30                             ;02D6A8|C230    |      ; 16-bit mode
                        INC.B $69                            ;02D6AA|E669    |000A69; Next graphics byte
                        DEY                                  ;02D6AC|88      |      ; Decrement counter
-                       BNE CODE_02D69C                      ;02D6AD|D0ED    |02D69C; Continue transfer loop
+                       BNE Graphics_TransferLoop2           ;02D6AD|D0ED    |02D69C; Continue transfer loop
                        PLB                                  ;02D6AF|AB      |      ; Restore data bank
                        PLP                                  ;02D6B0|28      |      ; Restore processor status
                        PLY                                  ;02D6B1|7A      |      ; Restore Y register
@@ -5232,7 +5232,7 @@ CODE_02D69C:
 
 ; Memory Clearing Engine
 ; High-speed memory clearing with SNES register optimization
-CODE_02D6B3:
+Graphics_AltPixel:
                        PHP                                  ;02D6B3|08      |      ; Save processor status
                        PHD                                  ;02D6B4|0B      |      ; Save direct page
                        SEP #$20                             ;02D6B5|E220    |      ; 8-bit accumulator
@@ -5246,17 +5246,17 @@ CODE_02D6B3:
                        LDA.B #$20                           ;02D6C6|A920    |      ; Clear 32 bytes
 
 ; Memory Clear Loop
-CODE_02D6C8:
+Memory_ClearLoop:
                        STZ.B SNES_WMDATA-$2100              ;02D6C8|6480    |002180; Write zero to WRAM
                        DEC A                                ;02D6CA|3A      |      ; Decrement counter
-                       BNE CODE_02D6C8                      ;02D6CB|D0FB    |02D6C8; Continue clear loop
+                       BNE Memory_ClearLoop                 ;02D6CB|D0FB    |02D6C8; Continue clear loop
                        PLD                                  ;02D6CD|2B      |      ; Restore direct page
                        PLP                                  ;02D6CE|28      |      ; Restore processor status
                        RTS                                  ;02D6CF|60      |      ; Return
 
 ; Advanced Position Calculation Engine
 ; Complex position and coordinate calculation system
-CODE_02D6D0:
+Coord_CalculationEngine:
                        PHP                                  ;02D6D0|08      |      ; Save processor status
                        SEP #$30                             ;02D6D1|E230    |      ; 8-bit mode
                        LDX.B $83                            ;02D6D3|A683    |000A83; Load state index
@@ -5265,12 +5265,12 @@ CODE_02D6D0:
                        SBC.B $19                            ;02D6D8|E519    |000A19; Subtract position parameter
                        INC A                                ;02D6DA|1A      |      ; Increment result
                        LDY.W $0A0A,X                        ;02D6DB|BC0A0A  |020A0A; Load position flags
-                       BEQ CODE_02D6E6                      ;02D6DE|F006    |02D6E6; Branch if zero
+                       BEQ Coord_StorePosition              ;02D6DE|F006    |02D6E6; Branch if zero
                        LDY.W $0A07,X                        ;02D6E0|BC070A  |020A07; Load alternate flags
-                       BNE CODE_02D6E6                      ;02D6E3|D001    |02D6E6; Branch if not zero
+                       BNE Coord_StorePosition              ;02D6E3|D001    |02D6E6; Branch if not zero
                        DEC A                                ;02D6E5|3A      |      ; Decrement if special case
 
-CODE_02D6E6:
+Coord_StorePosition:
                        STA.B $17                            ;02D6E6|8517    |000A17; Store calculated position
                        PHX                                  ;02D6E8|DA      |      ; Save X register
                        CLC                                  ;02D6E9|18      |      ; Clear carry
@@ -5291,7 +5291,7 @@ CODE_02D6E6:
                        STA.B $16                            ;02D700|8516    |000A16; Store adjusted position
                        PLA                                  ;02D702|68      |      ; Restore half height
                        PLX                                  ;02D703|FA      |      ; Restore X register
-                       JSR.W CODE_02D734                    ;02D704|2034D7  |02D734; Call position processor
+                       JSR.W Coord_PositionProcessor        ;02D704|2034D7  |02D734; Call position processor
 
 ; Advanced Position Coordinate Processing
                        REP #$20                             ;02D707|C220    |      ; 16-bit accumulator
@@ -5329,7 +5329,7 @@ DATA8_02D72B:
 
 ; Advanced Data Transfer and State Management Engine
 ; Complex state processing with multi-bank data coordination
-CODE_02D734:
+Coord_PositionProcessor:
                        PHX                                  ;02D734|DA      |      ; Save X register
                        PHP                                  ;02D735|08      |      ; Save processor status
                        REP #$30                             ;02D736|C230    |      ; 16-bit mode
@@ -5346,14 +5346,14 @@ CODE_02D734:
                        LDX.W #$0000                         ;02D74E|A20000  |      ; Initialize index
 
 ; Height Parameter Search Loop
-CODE_02D751:
+Coord_HeightSearch:
                        CMP.W DATA8_02D77A,X                 ;02D751|DD7AD7  |02D77A; Compare with height table
-                       BEQ CODE_02D75A                      ;02D754|F004    |02D75A; Branch if match found
+                       BEQ Coord_HeightFound                ;02D754|F004    |02D75A; Branch if match found
                        INX                                  ;02D756|E8      |      ; Increment index
                        INX                                  ;02D757|E8      |      ; Increment index (word values)
-                       BRA CODE_02D751                      ;02D758|80F7    |02D751; Continue search
+                       BRA Coord_HeightSearch               ;02D758|80F7    |02D751; Continue search
 
-CODE_02D75A:
+Coord_HeightFound:
                        TXA                                  ;02D75A|8A      |      ; Transfer index to A
                        SEP #$30                             ;02D75B|E230    |      ; 8-bit mode
                        LSR A                                ;02D75D|4A      |      ; Divide by 2 (word to byte index)
@@ -5361,12 +5361,12 @@ CODE_02D75A:
                        STA.B $22,X                          ;02D760|9522    |000A22; Store height index
                        LDA.B $02                            ;02D762|A502    |000A02; Load current state
                        CMP.B #$50                           ;02D764|C950    |      ; Check for special state
-                       BNE CODE_02D777                      ;02D766|D00F    |02D777; Branch if not special
+                       BNE Coord_ProcessorExit              ;02D766|D00F    |02D777; Branch if not special
 
 ; Special State Processing
                        db $A5,$07,$D0,$0B,$A5,$2D,$18,$69,$08,$85,$2D,$A9,$0C,$85,$2F;02D768
 
-CODE_02D777:
+Coord_ProcessorExit:
                        PLP                                  ;02D777|28      |      ; Restore processor status
                        PLX                                  ;02D778|FA      |      ; Restore X register
                        RTS                                  ;02D779|60      |      ; Return
@@ -5379,7 +5379,7 @@ DATA8_02D77A:
 
 ; State Processing and Data Bank Management Engine
 ; Advanced state processing with sophisticated bank coordination
-CODE_02D784:
+State_BankManager:
                        PHA                                  ;02D784|48      |      ; Save accumulator
                        PHX                                  ;02D785|DA      |      ; Save X register
                        PHP                                  ;02D786|08      |      ; Save processor status
@@ -5390,10 +5390,10 @@ CODE_02D784:
                        LDX.W #$0000                         ;02D78D|A20000  |      ; Initialize search index
 
 ; State Data Search Loop
-CODE_02D790:
+State_SearchLoop:
                        LDA.W DATA8_02D7D3,X                 ;02D790|BDD3D7  |02D7D3; Load state threshold
                        CMP.B $20                            ;02D793|C520    |000A20; Compare with current state
-                       BPL CODE_02D7A5                      ;02D795|100E    |02D7A5; Branch if threshold reached
+                       BPL State_DataProcess                ;02D795|100E    |02D7A5; Branch if threshold reached
                        REP #$30                             ;02D797|C230    |      ; 16-bit mode
                        TXA                                  ;02D799|8A      |      ; Transfer index to A
                        CLC                                  ;02D79A|18      |      ; Clear carry
@@ -5401,10 +5401,10 @@ CODE_02D790:
                        TAX                                  ;02D79E|AA      |      ; Transfer back to X
                        SEP #$20                             ;02D79F|E220    |      ; 8-bit accumulator
                        REP #$10                             ;02D7A1|C210    |      ; 16-bit index
-                       BRA CODE_02D790                      ;02D7A3|80EB    |02D790; Continue search
+                       BRA State_SearchLoop                 ;02D7A3|80EB    |02D790; Continue search
 
 ; State Data Processing
-CODE_02D7A5:
+State_DataProcess:
                        REP #$30                             ;02D7A5|C230    |      ; 16-bit mode
                        INX                                  ;02D7A7|E8      |      ; Next byte (skip threshold)
                        TXA                                  ;02D7A8|8A      |      ; Transfer index to A
@@ -5442,7 +5442,7 @@ DATA8_02D7D3:
 
 ; Advanced Graphics and Entity Coordination Engine
 ; Complex entity processing with multi-bank graphics coordination
-CODE_02D80A:
+Entity_GraphicsCoordinator:
                        PHX                                  ;02D80A|DA      |      ; Save X register
                        PHB                                  ;02D80B|8B      |      ; Save data bank
                        PHP                                  ;02D80C|08      |      ; Save processor status
@@ -5524,8 +5524,8 @@ CODE_02D80A:
                        PLB                                  ;02D890|AB      |      ; Restore data bank
 
 ; Graphics Processing Completion
-                       JSR.W CODE_02D910                    ;02D891|2010D9  |02D910; Call graphics processor
-                       JSR.W CODE_02D994                    ;02D894|2094D9  |02D994; Call data coordinator
+                       JSR.W Graphics_DataProcessor         ;02D891|2010D9  |02D910; Call graphics processor
+                       JSR.W Data_Coordinator               ;02D894|2094D9  |02D994; Call data coordinator
                        PLP                                  ;02D897|28      |      ; Restore processor status
                        PLB                                  ;02D898|AB      |      ; Restore data bank
                        PLX                                  ;02D899|FA      |      ; Restore X register
@@ -5538,7 +5538,7 @@ UNREACH_02D89B:
 
 ; Entity Parameter Processing Engine
 ; Advanced entity parameter lookup and processing
-CODE_02D8AF:
+Entity_ParameterProcessor:
                        PHX                                  ;02D8AF|DA      |      ; Save X register
                        PHA                                  ;02D8B0|48      |      ; Save accumulator
                        PHP                                  ;02D8B1|08      |      ; Save processor status
@@ -5589,31 +5589,31 @@ DATA8_02D8BF:
 
 ; Advanced Graphics Processing Coordination Engine
 ; Complex graphics processing with sophisticated calculation systems
-CODE_02D910:
+Graphics_DataProcessor:
                        PHP                                  ;02D910|08      |      ; Save processor status
                        PHB                                  ;02D911|8B      |      ; Save data bank
                        PHK                                  ;02D912|4B      |      ; Push program bank
                        PLB                                  ;02D913|AB      |      ; Set as data bank
                        REP #$30                             ;02D914|C230    |      ; 16-bit mode
-                       JSR.W CODE_02D8AF                    ;02D916|20AFD8  |02D8AF; Call entity parameter processor
+                       JSR.W Entity_ParameterProcessor      ;02D916|20AFD8  |02D8AF; Call entity parameter processor
                        LDX.W #$0000                         ;02D919|A20000  |      ; Initialize search index
                        LDA.B $78                            ;02D91C|A578    |000A78; Load entity parameter
                        AND.W #$00FF                         ;02D91E|29FF00  |      ; Mask to 8-bit
 
 ; Graphics Parameter Search Loop
-CODE_02D921:
+Graphics_ParameterSearch:
                        CMP.W DATA8_02D96E,X                 ;02D921|DD6ED9  |02D96E; Compare with threshold table
-                       BMI CODE_02D930                      ;02D924|300A    |02D930; Branch if below threshold
+                       BMI Graphics_CalcProcess             ;02D924|300A    |02D930; Branch if below threshold
                        PHA                                  ;02D926|48      |      ; Save parameter
                        TXA                                  ;02D927|8A      |      ; Transfer index to A
                        CLC                                  ;02D928|18      |      ; Clear carry
                        ADC.W #$000A                         ;02D929|690A00  |      ; Add 10 bytes (record size)
                        TAX                                  ;02D92C|AA      |      ; Transfer back to X
                        PLA                                  ;02D92D|68      |      ; Restore parameter
-                       BRA CODE_02D921                      ;02D92E|80F1    |02D921; Continue search
+                       BRA Graphics_ParameterSearch         ;02D92E|80F1    |02D921; Continue search
 
 ; Graphics Calculation Processing
-CODE_02D930:
+Graphics_CalcProcess:
                        SEC                                  ;02D930|38      |      ; Set carry
                        SBC.W DATA8_02D96C,X                 ;02D931|FD6CD9  |02D96C; Subtract base value
                        SEP #$20                             ;02D934|E220    |      ; 8-bit accumulator
@@ -5671,7 +5671,7 @@ DATA8_02D974:
 
 ; Advanced Data Coordination and Processing Engine
 ; Complex data processing with multi-bank coordination and calculation
-CODE_02D994:
+Data_Coordinator:
                        PHP                                  ;02D994|08      |      ; Save processor status
                        PHB                                  ;02D995|8B      |      ; Save data bank
                        SEP #$20                             ;02D996|E220    |      ; 8-bit accumulator
@@ -5711,34 +5711,34 @@ CODE_02D994:
                        REP #$10                             ;02D9D0|C210    |      ; 16-bit index
 
 ; Complex Data Processing Loop
-CODE_02D9D2:
+Data_ProcessLoop:
                        LDA.B $79                            ;02D9D2|A579    |000A79; Load processing count
                        PHA                                  ;02D9D4|48      |      ; Save count
                        LDA.B #$00                           ;02D9D5|A900    |      ; Clear accumulator
                        XBA                                  ;02D9D7|EB      |      ; Exchange bytes
 
 ; Data Byte Processing Loop
-CODE_02D9D8:
+Data_ByteLoop:
                        LDA.L DATA8_0A8000,X                 ;02D9D8|BF00800A|0A8000; Load data byte
                        INX                                  ;02D9DC|E8      |      ; Next byte
                        LDY.W #$0008                         ;02D9DD|A00800  |      ; 8 bits per byte
 
 ; Bit Processing Loop
-CODE_02D9E0:
+Data_BitLoop:
                        ASL A                                ;02D9E0|0A      |      ; Shift bit left
                        XBA                                  ;02D9E1|EB      |      ; Exchange accumulator bytes
                        ADC.B #$00                           ;02D9E2|6900    |      ; Add carry
                        XBA                                  ;02D9E4|EB      |      ; Exchange bytes back
                        DEY                                  ;02D9E5|88      |      ; Decrement bit counter
-                       BNE CODE_02D9E0                      ;02D9E6|D0F8    |02D9E0; Continue bit processing
+                       BNE Data_BitLoop                     ;02D9E6|D0F8    |02D9E0; Continue bit processing
                        PLA                                  ;02D9E8|68      |      ; Restore processing count
                        DEC A                                ;02D9E9|3A      |      ; Decrement count
-                       BEQ CODE_02D9EF                      ;02D9EA|F003    |02D9EF; Branch if done
+                       BEQ Data_FinalCalc                   ;02D9EA|F003    |02D9EF; Branch if done
                        PHA                                  ;02D9EC|48      |      ; Save count
-                       BRA CODE_02D9D8                      ;02D9ED|80E9    |02D9D8; Continue processing
+                       BRA Data_ByteLoop                    ;02D9ED|80E9    |02D9D8; Continue processing
 
 ; Final Calculation Processing
-CODE_02D9EF:
+Data_FinalCalc:
                        XBA                                  ;02D9EF|EB      |      ; Exchange bytes
                        STA.W $4202                          ;02D9F0|8D0242  |0A4202; Set multiplicand
                        LDA.B #$18                           ;02D9F3|A918    |      ; Set multiplier (24)
@@ -5756,19 +5756,19 @@ CODE_02D9EF:
                        PLA                                  ;02DA0B|68      |      ; Restore loop counter
                        INC A                                ;02DA0C|1A      |      ; Increment counter
                        CMP.B #$03                           ;02DA0D|C903    |      ; Check limit (3)
-                       BPL CODE_02DA15                      ;02DA0F|1004    |02DA15; Exit if done
+                       BPL Data_CoordExit                   ;02DA0F|1004    |02DA15; Exit if done
                        PHA                                  ;02DA11|48      |      ; Save counter
                        PHY                                  ;02DA12|5A      |      ; Save Y position
-                       BRA CODE_02D9D2                      ;02DA13|80BD    |02D9D2; Continue processing
+                       BRA Data_ProcessLoop                 ;02DA13|80BD    |02D9D2; Continue processing
 
-CODE_02DA15:
+Data_CoordExit:
                        PLB                                  ;02DA15|AB      |      ; Restore data bank
                        PLP                                  ;02DA16|28      |      ; Restore processor status
                        RTS                                  ;02DA17|60      |      ; Return
 
 ; Advanced Display Processing and Color Management Engine
 ; Complex display processing with sophisticated color effects and timing
-CODE_02DA18:
+Display_ColorManager:
                        PHD                                  ;02DA18|0B      |      ; Save direct page
                        PEA.W $2100                          ;02DA19|F40021  |022100; Set direct page to $2100
                        PLD                                  ;02DA1C|2B      |      ; Load new direct page
@@ -5782,19 +5782,19 @@ CODE_02DA18:
                        STA.B SNES_CGADSUB-$2100             ;02DA2D|8531    |002131; Set color math
 
 ; Color Effect Processing Loop 1
-CODE_02DA2F:
+Display_ColorLoop1:
                        LDA.W DATA8_02DA7D,X                 ;02DA2F|BD7DDA  |02DA7D; Load color data
-                       BEQ CODE_02DA49                      ;02DA32|F015    |02DA49; Exit if zero
+                       BEQ Display_ColorPhase2              ;02DA32|F015    |02DA49; Exit if zero
                        INX                                  ;02DA34|E8      |      ; Next color
                        STA.B SNES_COLDATA-$2100             ;02DA35|8532    |002132; Set color data
                        JSL.L CODE_0C8000                    ;02DA37|2200800C|0C8000; Wait timing routine
                        JSL.L CODE_0C8000                    ;02DA3B|2200800C|0C8000; Wait timing routine
                        JSL.L CODE_0C8000                    ;02DA3F|2200800C|0C8000; Wait timing routine
                        JSL.L CODE_0C8000                    ;02DA43|2200800C|0C8000; Wait timing routine
-                       BRA CODE_02DA2F                      ;02DA47|80E6    |02DA2F; Continue color loop
+                       BRA Display_ColorLoop1               ;02DA47|80E6    |02DA2F; Continue color loop
 
 ; Color Effect Processing Phase 2
-CODE_02DA49:
+Display_ColorPhase2:
                        LDA.B #$1F                           ;02DA49|A91F    |      ; Full screen enable
                        STA.B SNES_TM-$2100                  ;02DA4B|852C    |00212C; Set main screen
                        LDA.B #$22                           ;02DA4D|A922    |      ; Alternate color math
@@ -5802,9 +5802,9 @@ CODE_02DA49:
                        LDX.W #$0000                         ;02DA51|A20000  |      ; Reset index
 
 ; Color Effect Processing Loop 2
-CODE_02DA54:
+Display_ColorLoop2:
                        LDA.W DATA8_02DA7D,X                 ;02DA54|BD7DDA  |02DA7D; Load color data
-                       BEQ CODE_02DA72                      ;02DA57|F019    |02DA72; Exit if zero
+                       BEQ Display_ProcessDone              ;02DA57|F019    |02DA72; Exit if zero
                        INX                                  ;02DA59|E8      |      ; Next color
                        STA.B SNES_COLDATA-$2100             ;02DA5A|8532    |002132; Set color data
                        JSL.L CODE_0C8000                    ;02DA5C|2200800C|0C8000; Wait timing routine
@@ -5812,10 +5812,10 @@ CODE_02DA54:
                        JSL.L CODE_0C8000                    ;02DA64|2200800C|0C8000; Wait timing routine
                        JSL.L CODE_0C8000                    ;02DA68|2200800C|0C8000; Wait timing routine
                        JSL.L CODE_0C8000                    ;02DA6C|2200800C|0C8000; Wait timing routine
-                       BRA CODE_02DA54                      ;02DA70|80E2    |02DA54; Continue color loop
+                       BRA Display_ColorLoop2               ;02DA70|80E2    |02DA54; Continue color loop
 
 ; Display Processing Completion
-CODE_02DA72:
+Display_ProcessDone:
                        STZ.W $0A84                          ;02DA72|9C840A  |020A84; Clear processing flag
                        STZ.B SNES_CGSWSEL-$2100             ;02DA75|6430    |002130; Clear color window
                        STZ.B SNES_CGADSUB-$2100             ;02DA77|6431    |002131; Clear color math
@@ -5841,7 +5841,7 @@ DATA8_02DA7D:
 
 ; Advanced Display Management and State Processing Engine
 ; Complex display initialization with multi-system coordination
-CODE_02DA98:
+Display_StateInit:
                        PHA                                  ;02DA98|48      |      ; Save accumulator
                        PHX                                  ;02DA99|DA      |      ; Save X register
                        PHY                                  ;02DA9A|5A      |      ; Save Y register
@@ -5869,7 +5869,7 @@ CODE_02DA98:
                        LSR A                                ;02DABD|4A      |      ; Shift right again
                        INC A                                ;02DABE|1A      |      ; Increment value
                        AND.B #$03                           ;02DABF|2903    |      ; Mask to 2 bits
-                       BEQ CODE_02DAD5                      ;02DAC1|F012    |02DAD5; Branch if zero
+                       BEQ Display_SystemCoord              ;02DAC1|F012    |02DAD5; Branch if zero
 
 ; Special State Configuration
 ; Configure special world state parameters
@@ -5882,7 +5882,7 @@ CODE_02DA98:
                        STA.W $050A                          ;02DAD2|8D0A05  |02050A; Store parameter 4
 
 ; System State Coordination
-CODE_02DAD5:
+Display_SystemCoord:
                        STZ.B $E3                            ;02DAD5|64E3    |000AE3; Clear system flag
                        INC.B $E2                            ;02DAD7|E6E2    |000AE2; Increment counter
                        STZ.W $0AF8                          ;02DAD9|9CF80A  |020AF8; Clear processing flag
@@ -5890,9 +5890,9 @@ CODE_02DAD5:
 
 ; VBlank Synchronization Loop
 ; Wait for vertical blank for display synchronization
-CODE_02DADE:
+Display_VBlankWait:
                        LDA.B $E6                            ;02DADE|A5E6    |000AE6; Load sync flag
-                       BNE CODE_02DADE                      ;02DAE0|D0FC    |02DADE; Wait for VBlank
+                       BNE Display_VBlankWait               ;02DAE0|D0FC    |02DADE; Wait for VBlank
 
 ; Advanced Graphics Configuration Engine
 ; Complex screen mode and graphics setup
@@ -5984,7 +5984,7 @@ CODE_02DADE:
                        PLB                                  ;02DB7C|AB      |      ; Set as data bank
                        STZ.B $EA                            ;02DB7D|64EA    |000AEA; Clear DMA complete flag
                        STZ.B $EB                            ;02DB7F|64EB    |000AEB; Clear DMA error flag
-                       BRA CODE_02DB88                      ;02DB81|8005    |02DB88; Continue to next phase
+                       BRA Sprite_ProcessCoord              ;02DB81|8005    |02DB88; Continue to next phase
 
 ; DMA Control Data Table
 ; Configuration data for sprite DMA transfer
@@ -5992,14 +5992,14 @@ DATA8_02DB83:
                        db $02,$0E,$33,$0B,$00               ;02DB83; DMA configuration data
 
 ; Sprite Processing and Display Coordination Engine
-CODE_02DB88:
+Sprite_ProcessCoord:
                        JSR.W CODE_02E6ED                    ;02DB88|20EDE6  |02E6ED; Call sprite processor
                        JSR.W CODE_02E0DB                    ;02DB8B|20DBE0  |02E0DB; Call display coordinator
                        LDX.W #$0005                         ;02DB8E|A20500  |      ; Initialize loop counter
                        LDA.B #$FF                           ;02DB91|A9FF    |      ; Clear value
 
 ; State Register Initialization Loop
-CODE_02DB93:
+State_RegClearLoop:
                        STA.B $0D,X                          ;02DB93|950D    |000A0D; Clear state register
                        DEX                                  ;02DB95|CA      |      ; Decrement counter
                        BPL CODE_02DB93                      ;02DB96|10FB    |02DB93; Continue loop
@@ -6009,11 +6009,11 @@ CODE_02DB93:
                        LDX.W #$DCC4                         ;02DB9B|A2C4DC  |      ; Default source address
                        LDA.W $1090                          ;02DB9E|AD9010  |021090; Load configuration flag
                        CMP.B #$FF                           ;02DBA1|C9FF    |      ; Check for special mode
-                       BNE CODE_02DBA8                      ;02DBA3|D003    |02DBA8; Branch if normal mode
+                       BNE State_BlockTransfer              ;02DBA3|D003    |02DBA8; Branch if normal mode
                        LDX.W #$DCCC                         ;02DBA5|A2CCDC  |      ; Alternate source address
 
 ; State Data Block Transfer
-CODE_02DBA8:
+State_BlockTransfer:
                        REP #$30                             ;02DBA8|C230    |      ; 16-bit mode
                        LDA.W #$0007                         ;02DBAA|A90700  |      ; Transfer 8 bytes
                        MVN $02,$02                          ;02DBAD|540202  |      ; Block move within bank
@@ -6213,7 +6213,7 @@ UNREACH_02DCD4:
 
 ; Advanced Sprite Rendering and Processing Engine
 ; Complex sprite system with multi-layer processing
-CODE_02DCDD:
+Sprite_RenderEngine:
                        PHP                                  ;02DCDD|08      |      ; Save processor status
                        SEP #$30                             ;02DCDE|E230    |      ; 8-bit mode
                        JSR.W CODE_02DF3E                    ;02DCE0|203EDF  |02DF3E; Call sprite initializer
@@ -6228,7 +6228,7 @@ CODE_02DCDD:
                        STA.B $9A                            ;02DCF6|859A    |000A9A; Store sprite base
 
 ; Sprite Processing Loop Coordination
-CODE_02DCF8:
+Sprite_ProcessLoop:
                        STA.B $97                            ;02DCF8|8597    |000A97; Store current sprite
                        JSL.L CODE_02E48C                    ;02DCFA|228CE402|02E48C; Call sprite processor
                        CLC                                  ;02DCFE|18      |      ; Clear carry
@@ -6241,7 +6241,7 @@ CODE_02DCF8:
                        LDX.B #$00                           ;02DD07|A200    |      ; Start X position
 
 ; Double Loop for Sprite Grid
-CODE_02DD09:
+Sprite_GridLoop:
                        STX.B $91                            ;02DD09|8691    |000A91; Store X position
                        STY.B $92                            ;02DD0B|8492    |000A92; Store Y position
                        LDA.B #$10                           ;02DD0D|A910    |      ; Set processing mode
@@ -6314,7 +6314,7 @@ DATA8_02DD30:
 
 ; Advanced Sprite Initialization and Configuration Engine
 ; Complex sprite system initialization with parameter processing
-CODE_02DF3E:
+Sprite_InitEngine:
                        PHX                                  ;02DF3E|DA      |      ; Save X register
                        PHY                                  ;02DF3F|5A      |      ; Save Y register
                        PHP                                  ;02DF40|08      |      ; Save processor status
@@ -6393,7 +6393,7 @@ DATA8_02DFBE:
 
 ; Memory Clearing and System Reset Engine
 ; High-speed memory clearing with optimized block operations
-CODE_02DFCD:
+Memory_ClearEngine:
                        PHP                                  ;02DFCD|08      |      ; Save processor status
                        PHB                                  ;02DFCE|8B      |      ; Save data bank
                        SEP #$20                             ;02DFCF|E220    |      ; 8-bit accumulator
@@ -6440,7 +6440,7 @@ CODE_02DFE8:
 
 ; Advanced Graphics Data Processing Engine
 ; Complex graphics data transformation with mathematical operations
-CODE_02E021:
+Graphics_DataProcessor:
                        PHP                                  ;02E021|08      |      ; Save processor status
                        REP #$30                             ;02E022|C230    |      ; 16-bit mode
                        LDX.W #$E04F                         ;02E024|A24FE0  |      ; Graphics configuration table
@@ -6454,12 +6454,12 @@ CODE_02E021:
 
 ; Graphics Data Processing Loop
 ; High-speed graphics data extraction and transformation
-CODE_02E03A:
+Graphics_DataLoop:
                        LDA.L UNREACH_0CF425,X               ;02E03A|BF25F40C|0CF425; Load graphics byte from bank $0C
                        INX                                  ;02E03E|E8      |      ; Next graphics byte
                        JSR.W CODE_02E056                    ;02E03F|2056E0  |02E056; Call graphics processor
                        DEY                                  ;02E042|88      |      ; Decrement loop counter
-                       BNE CODE_02E03A                      ;02E043|D0F5    |02E03A; Continue processing loop
+                       BNE Graphics_DataLoop                ;02E043|D0F5    |02E03A; Continue processing loop
                        LDA.W $0A9F                          ;02E045|AD9F0A  |020A9F; Load special graphics flag
                        AND.B #$0F                           ;02E048|290F    |      ; Mask lower 4 bits
                        JSR.W CODE_02E056                    ;02E04A|2056E0  |02E056; Process special graphics data
@@ -6473,7 +6473,7 @@ DATA8_02E04F:
 
 ; Advanced Graphics Processing and Calculation Engine
 ; Complex graphics data transformation with mathematical operations
-CODE_02E056:
+Graphics_CalcEngine:
                        PHX                                  ;02E056|DA      |      ; Save X register
                        PHY                                  ;02E057|5A      |      ; Save Y register
                        PHP                                  ;02E058|08      |      ; Save processor status
@@ -6486,7 +6486,7 @@ CODE_02E056:
                        LDY.W #$0004                         ;02E069|A00400  |      ; Process 4 data segments
 
 ; Graphics Data Segment Processing Loop
-CODE_02E06C:
+Graphics_SegmentLoop:
                        SEP #$20                             ;02E06C|E220    |      ; 8-bit accumulator
                        REP #$10                             ;02E06E|C210    |      ; 16-bit index
                        LDA.L DATA8_0CEF85,X                 ;02E070|BF85EF0C|0CEF85; Load graphics data segment
@@ -6501,7 +6501,7 @@ CODE_02E06C:
                        STA.W $0A8B                          ;02E087|8D8B0A  |020A8B; Store graphics address
                        JSL.L CODE_02E1C3                    ;02E08A|22C3E102|02E1C3; Call graphics renderer
                        DEY                                  ;02E08E|88      |      ; Decrement segment counter
-                       BNE CODE_02E06C                      ;02E08F|D0DB    |02E06C; Continue segment processing
+                       BNE Graphics_SegmentLoop             ;02E08F|D0DB    |02E06C; Continue segment processing
                        PLP                                  ;02E091|28      |      ; Restore processor status
                        PLY                                  ;02E092|7A      |      ; Restore Y register
                        PLX                                  ;02E093|FA      |      ; Restore X register
