@@ -1851,12 +1851,12 @@ Entity_ProcessMovement:
     JSR.W CODE_0297D9       ; Initialize movement processing
     LDA.B $B7               ; Load current health value
     CMP.B $B8               ; Compare with maximum health
-    BCS CODE_02943B         ; Branch if health is adequate
-    JMP.W CODE_029785       ; Jump to low health processing
+    BCS Entity_HealthCheck  ; Branch if health is adequate
+    JMP.W System_ErrorMax   ; Jump to low health processing
 
 ;Health-based entity processing with randomized values
 ;Processes entity behavior based on health status with random elements
-CODE_02943B:
+Entity_HealthCheck:
     JSR.W CODE_02999D       ; Validate entity state
     JSR.W CODE_029B34       ; Execute health-based processing
     JSR.W CODE_0299DA       ; Update entity data
@@ -1878,16 +1878,16 @@ CODE_02943B:
 ;Implements complex battle logic with movement system integration
     LDA.B $90               ; Load battle coordination index
     CMP.B $8F               ; Validate battle boundary
-    BNE CODE_029472         ; Continue if valid
+    BNE Battle_StateHandler ; Continue if valid
     JSR.W CODE_029797       ; Execute battle synchronization
 
 ;Battle state processing with mode-specific logic
 ;Handles battle processing with specialized modes and state management
-CODE_029472:
+Battle_StateHandler:
     JSR.W CODE_0297D9       ; Initialize battle processing environment
     LDA.B $DE               ; Load battle processing mode
     CMP.B #$15              ; Check for battle mode $15
-    BEQ CODE_029487         ; Branch to mode $15 handler
+    BEQ Battle_Mode15_Input ; Branch to mode $15 handler
     JSR.W CODE_02999D       ; Execute standard battle validation
     JSR.W CODE_029B34       ; Process battle state
     JSR.W CODE_029727       ; Update battle calculations
@@ -1895,21 +1895,21 @@ CODE_029472:
 
 ;Input processing with battle state integration
 ;Processes user input while maintaining battle state consistency
-CODE_029487:
+Battle_Mode15_Input:
     PHD                     ; Push direct page register
     JSR.W CODE_028F2F       ; Switch to input processing context
     LDA.B $2E               ; Load input state flags
     PLD                     ; Pull direct page register
     AND.B #$04              ; Test for specific input flag
-    BEQ CODE_029495         ; Branch if flag not set
+    BEQ Battle_RandomCalc   ; Branch if flag not set
     db $4C,$7F,$97          ; Jump to input-specific processing
 
 ;Battle processing continuation with random element calculation
 ;Continues battle processing with randomized damage and effect calculations
-CODE_029495:
+Battle_RandomCalc:
     LDA.B $DE               ; Reload battle processing mode
     CMP.B #$15              ; Recheck for mode $15
-    BEQ CODE_0294BB         ; Branch to mode $15 completion
+    BEQ Battle_Complete     ; Branch to mode $15 completion
     LSR.B $B7               ; Prepare health for calculation
     LDA.B #$65              ; Set calculation seed
     STA.W $00A8             ; Store in random number generator
@@ -1921,12 +1921,12 @@ CODE_029495:
     STA.B $B8               ; Store second modifier
     LDA.B $B7               ; Reload health value
     CMP.B $B8               ; Compare with calculation modifier
-    BCS CODE_0294BB         ; Branch if health is sufficient
+    BCS Battle_Complete     ; Branch if health is sufficient
     RTS                     ; Return if health is insufficient
 
 ;Battle completion processing
 ;Finalizes battle processing and updates all battle-related systems
-CODE_0294BB:
+Battle_Complete:
     JMP.W CODE_029CCA       ; Jump to battle completion handler
 
 ;Entity type validation with specialized processing
@@ -1934,33 +1934,33 @@ CODE_0294BB:
     JSR.W CODE_029797       ; Execute entity type validation
     JSR.W CODE_02997E       ; Process entity type data
     LDA.B $BA               ; Load entity type identifier
-    BNE CODE_0294CB         ; Branch if entity type is valid
-    JMP.W CODE_029785       ; Jump to invalid entity handler
+    BNE Entity_TypeSwitch   ; Branch if entity type is valid
+    JMP.W System_ErrorMax   ; Jump to invalid entity handler
 
 ;Entity type-specific processing with branching logic
 ;Processes entities based on their specific type with specialized handlers
-CODE_0294CB:
+Entity_TypeSwitch:
     DEC A                   ; Decrement entity type for zero-based indexing
-    BNE CODE_0294D3         ; Branch if not type 1
-    JSR.W CODE_0297AC       ; Execute type 1 processing
-    BRA CODE_0294D6         ; Continue to finalization
+    BNE Entity_Type2Plus    ; Branch if not type 1
+    JSR.W Entity_Handler1   ; Execute type 1 processing
+    BRA Entity_LevelProcess ; Continue to finalization
 
 ;Type 2+ entity processing
-CODE_0294D3:
-    JSR.W CODE_0297B2       ; Execute type 2+ processing
+Entity_Type2Plus:
+    JSR.W Entity_Handler2   ; Execute type 2+ processing
 
 ;Entity processing finalization with level-based adjustments
 ;Completes entity processing with adjustments based on entity level
-CODE_0294D6:
+Entity_LevelProcess:
     JSR.W CODE_02999D       ; Validate final entity state
     LDA.B $DE               ; Load entity level identifier
     CMP.B #$17              ; Check for high level ($17+)
-    BCC CODE_0294E4         ; Branch to standard level processing
+    BCC Entity_StdLevel     ; Branch to standard level processing
     JSR.W CODE_029B34       ; Execute high level processing
-    BRA CODE_0294E7         ; Continue to calculation phase
+    BRA Math_MultiplyLoop   ; Continue to calculation phase
 
 ;Standard level entity processing
-CODE_0294E4:
+Entity_StdLevel:
     JSR.W CODE_029B28       ; Execute standard level processing
 
 ;Advanced mathematical processing with iterative multiplication
@@ -2003,12 +2003,12 @@ CODE_029508:
 ;Manages memory allocation and initializes data structures
     LDA.B $90               ; Load memory management index
     CMP.B $8F               ; Validate memory boundary
-    BNE CODE_02951B         ; Continue if within bounds
+    BNE Memory_InitProcess  ; Continue if within bounds
     JSR.W CODE_029797       ; Execute memory validation
 
 ;Memory processing with data structure initialization
 ;Processes memory allocation and initializes complex data structures
-CODE_02951B:
+Memory_InitProcess:
     JSR.W CODE_0297D9       ; Initialize memory processing environment
     JSR.W CODE_02999D       ; Validate memory state
     JSR.W CODE_029B34       ; Process memory allocation
@@ -2016,7 +2016,7 @@ CODE_02951B:
     STX.B $79               ; Store zero initialization value
     JSR.W CODE_029BED       ; Finalize memory state
     LDX.B $79               ; Reload initialization counter
-    BEQ CODE_029561         ; Branch if no initialization needed
+    BEQ Memory_Complete     ; Branch if no initialization needed
     ; Continue with complex initialization sequence
     db $20,$DA,$99,$A9,$00,$EB,$A5,$8B,$0A,$AA,$A4,$77,$94,$D1,$20,$8C
     db $95,$0B,$20,$2F,$8F,$20,$C7,$95,$2B,$20,$DE,$95,$A6,$77,$D0,$05
@@ -2025,7 +2025,7 @@ CODE_02951B:
 
 ;Memory processing completion with boundary validation
 ;Completes memory processing and validates all boundaries
-CODE_029561:
+Memory_Complete:
     JSR.W CODE_0299DA       ; Update memory system
     PHD                     ; Push direct page for context switch
     JSR.W CODE_028F2F       ; Switch to system validation context
@@ -2048,27 +2048,27 @@ UNREACH_029572:
 
 ;Advanced bounds checking with 16-bit arithmetic
 ;Implements sophisticated boundary validation using 16-bit calculations
-CODE_0295C7:
+Coord_BoundsCheck:
     PHP                     ; Push processor status
     REP #$30                ; Set 16-bit accumulator and index registers
     LDA.B $14               ; Load position coordinate
     CLC                     ; Clear carry for addition
     ADC.W $0477             ; Add movement offset
     CMP.B $16               ; Compare with boundary limit
-    BCC CODE_0295DC         ; Branch if within bounds
+    BCC Coord_BoundsOK      ; Branch if within bounds
     LDA.B $16               ; Load boundary limit
     SEC                     ; Set carry for subtraction
     SBC.B $14               ; Calculate maximum movement
     STA.W $0477             ; Store corrected movement
 
 ;Bounds checking completion
-CODE_0295DC:
+Coord_BoundsOK:
     PLP                     ; Pull processor status
     RTS                     ; Return from bounds checking
 
 ;Mathematical negation with 16-bit precision
 ;Implements two's complement negation for 16-bit values
-CODE_0295DE:
+Math_Negate16Bit:
     REP #$30                ; Set 16-bit accumulator and index registers
     LDA.B $77               ; Load value to negate
     EOR.W #$FFFF            ; One's complement (flip all bits)
@@ -2082,12 +2082,12 @@ CODE_0295DE:
 ;Implements advanced positioning with coordinate system transformations
     LDA.B $90               ; Load positioning index
     CMP.B $8F               ; Validate positioning boundary
-    BNE CODE_0295F6         ; Continue if within bounds
+    BNE Coord_Transform     ; Continue if within bounds
     JSR.W CODE_029797       ; Execute positioning validation
 
 ;Coordinate transformation with multi-system integration
 ;Transforms coordinates between different coordinate systems
-CODE_0295F6:
+Coord_Transform:
     JSR.W CODE_02999D       ; Validate coordinate state
     PHD                     ; Push direct page for context switch
     JSR.W CODE_028F22       ; Switch to coordinate processing context
@@ -2120,35 +2120,35 @@ CODE_0295F6:
     STA.B $BE               ; Store controller count
     LDA.W $1121             ; Load controller 1 state
     AND.B #$80              ; Test for controller 1 connection
-    BNE CODE_02964C         ; Branch if controller 1 connected
+    BNE Controller_Process  ; Branch if controller 1 connected
     INC.B $BE               ; Increment to controller 2
     LDA.W $11A1             ; Load controller 2 state
     AND.B #$80              ; Test for controller 2 connection
-    BNE CODE_02964C         ; Branch if controller 2 connected
+    BNE Controller_Process  ; Branch if controller 2 connected
     LDA.B $B4               ; Load controller validation flag
     CMP.B #$02              ; Check for validation mode
-    BEQ CODE_029649         ; Branch to validation handler
+    BEQ Controller_Fallback ; Branch to validation handler
     INC.B $BE               ; Increment to controller 3
     LDA.W $1221             ; Load controller 3 state
     AND.B #$80              ; Test for controller 3 connection
-    BNE CODE_02964C         ; Branch if controller 3 connected
+    BNE Controller_Process  ; Branch if controller 3 connected
 
 ;Controller fallback processing
-CODE_029649:
+Controller_Fallback:
     JMP.W CODE_028FA8       ; Jump to controller fallback handler
 
 ;Advanced controller processing with health validation
 ;Processes controller input while validating entity health status
-CODE_02964C:
+Controller_Process:
     JSR.W CODE_0297D9       ; Initialize controller processing
     LDA.B $B7               ; Load current health
     CMP.B $B8               ; Compare with maximum health
-    BCS CODE_029658         ; Continue if health is adequate
+    BCS Controller_DataSwap ; Continue if health is adequate
     JMP.W CODE_028FA8       ; Jump to low health handler
 
 ;Controller data management with context preservation
 ;Manages controller data while preserving execution context
-CODE_029658:
+Controller_DataSwap:
     LDA.B $8B               ; Load current controller index
     PHA                     ; Push to preserve current index
     LDA.B $BE               ; Load target controller index
@@ -2211,7 +2211,7 @@ CODE_029658:
     JSR.W CODE_028F2F       ; Switch to graphics context
     LDA.B $21               ; Load graphics state flags
     AND.B #$C0              ; Test for graphics ready flags
-    BNE CODE_0296D2         ; Branch if graphics not ready
+    BNE Graphics_InitDone   ; Branch if graphics not ready
     LDA.B $1B               ; Load X coordinate source
     STA.B $18               ; Store X coordinate destination
     LDA.B $1C               ; Load Y coordinate source
@@ -2220,7 +2220,7 @@ CODE_029658:
     STA.B $1A               ; Store Z coordinate destination
 
 ;Graphics initialization completion
-CODE_0296D2:
+Graphics_InitDone:
     PLD                     ; Restore direct page
     RTS                     ; Return from graphics initialization
 
@@ -2228,12 +2228,12 @@ CODE_0296D2:
 ;Implements complex graphics processing with coordinate transformations
     LDA.B $90               ; Load graphics processing index
     CMP.B $8F               ; Validate graphics boundary
-    BNE CODE_0296DD         ; Continue if within bounds
+    BNE Graphics_CoordScale ; Continue if within bounds
     JSR.W CODE_029797       ; Execute graphics validation
 
 ;Coordinate scaling with 16-bit precision
 ;Scales coordinates using 16-bit arithmetic for precision
-CODE_0296DD:
+Graphics_CoordScale:
     REP #$30                ; Set 16-bit accumulator and index registers
     LDA.B $DD               ; Load scaling factor
     AND.W #$00FF            ; Mask to 8-bit value
@@ -2245,7 +2245,7 @@ CODE_0296DD:
     REP #$10                ; Keep 16-bit index registers
     LDA.B $3A               ; Load graphics mode
     CMP.B #$D0              ; Check for mode $D0
-    BNE CODE_02971B         ; Branch if not mode $D0
+    BNE Graphics_ProcessComplete ; Branch if not mode $D0
     ; Complex coordinate transformation for mode $D0
     db $C2,$30,$AD,$16,$11,$38,$ED,$14,$11,$CD,$BA,$D0,$90,$03,$AD,$BA
     db $D0,$49,$FF,$FF,$1A,$D0,$03,$A9,$FE,$7F,$A8,$E2,$20,$C2,$10,$A9
@@ -2253,7 +2253,7 @@ CODE_0296DD:
 
 ;Graphics processing completion with system finalization
 ;Completes graphics processing and finalizes all graphics systems
-CODE_02971B:
+Graphics_ProcessComplete:
     JSR.W CODE_02999D       ; Validate graphics state
     JSR.W CODE_0299DA       ; Update graphics data
     JSR.W CODE_029BED       ; Finalize graphics state
@@ -2268,22 +2268,22 @@ Entity_UpdateCalculations:
     STX.W $4205             ; Store in hardware division register high
     LDA.B $39               ; Load division mode
     CMP.B #$80              ; Check for mode $80
-    BEQ CODE_02973C         ; Branch to mode $80 handler
+    BEQ Math_DivMode80      ; Branch to mode $80 handler
     CMP.B #$81              ; Check for mode $81
-    BEQ CODE_029741         ; Branch to mode $81 handler
+    BEQ Math_DivMode81      ; Branch to mode $81 handler
     RTS                     ; Return if no division needed
 
 ;Division mode $80 processing
-CODE_02973C:
-    JSR.W CODE_02974D       ; Execute mode $80 division
-    BRA CODE_029743         ; Continue to result processing
+Math_DivMode80:
+    JSR.W Math_DivGetParam  ; Execute mode $80 division
+    BRA Math_DivExecute     ; Continue to result processing
 
 ;Division mode $81 processing
-CODE_029741:
+Math_DivMode81:
     LDA.B $B3               ; Load division parameter
 
 ;Division result processing
-CODE_029743:
+Math_DivExecute:
     JSL.L CODE_009726       ; Execute hardware division
     LDX.W $4214             ; Load division result
     STX.B $77               ; Store division result
@@ -2291,18 +2291,18 @@ CODE_029743:
 
 ;Division parameter calculation
 ;Calculates division parameters based on system state
-CODE_02974D:
+Math_DivGetParam:
     LDA.W $1021             ; Load system state 1
     AND.B #$C0              ; Test state flags
-    BNE CODE_02975E         ; Branch if flags set
+    BNE Math_DivParam1      ; Branch if flags set
     LDA.W $10A1             ; Load system state 2
     AND.B #$C0              ; Test state flags
-    BNE CODE_02975E         ; Branch if flags set
+    BNE Math_DivParam1      ; Branch if flags set
     LDA.B #$02              ; Load default parameter
     RTS                     ; Return default parameter
 
 ;Alternative division parameter
-CODE_02975E:
+Math_DivParam1:
     LDA.B #$01              ; Load alternative parameter
     RTS                     ; Return alternative parameter
 
@@ -2326,7 +2326,7 @@ CODE_02975E:
 
 ;Error handling with maximum value assignment
 ;Sets error condition with maximum value to indicate system failure
-CODE_029785:
+System_ErrorMax:
     LDX.W #$7FFF            ; Load maximum value (32767)
     STX.B $77               ; Store as error indicator
     RTS                     ; Return from error handler
@@ -2346,11 +2346,11 @@ Entity_Synchronize:
     JMP.W CODE_02A0E1                ; Jump to coordination finalization
 
 ;Specialized system handlers for different processing modes
-CODE_0297AC:
+Entity_Handler1:
     LDX.W #$D43B                     ; Load specialized handler 1 address
     JMP.W CODE_028835                ; Jump to specialized handler 1
 
-CODE_0297B2:
+Entity_Handler2:
     LDX.W #$D443                     ; Load specialized handler 2 address
     JMP.W CODE_028835                ; Jump to specialized handler 2
 
@@ -2365,11 +2365,11 @@ Entity_ValidateBoundaryAlt:
 ;Additional specialized handlers
     db $A2,$BE,$D4,$20,$3D,$88,$4C,$CA,$9B
 
-CODE_0297CD:
+Entity_Handler3:
     LDX.W #$D478            ; Load handler 3 address
     JMP.W CODE_028835       ; Jump to handler 3
 
-CODE_0297D3:
+Entity_Handler4:
     LDX.W #$D484            ; Load handler 4 address
     JMP.W CODE_028835       ; Jump to handler 4
 
@@ -2400,7 +2400,7 @@ CODE_0297D3:
 
 ;Extended coordinate processing with validation
 ;Processes coordinate data with extended validation and transformations
-CODE_029AA5:
+Coord_Extended:
     JSR.W CODE_029A8B                ; Execute base coordinate processing
     REP #$30                         ; Set 16-bit accumulator and index registers
     LDA.B $77                        ; Load calculated coordinate value
@@ -2491,19 +2491,19 @@ Entity_ProcessCoordinates:
     RTS                     ; Return calculated result
 
 ;Simple calculation processing for basic game states
-CODE_029B24:
+Entity_CalcSimple:
     REP #$30                ; Set 16-bit accumulator and index registers
     PLA                     ; Pull calculation value from stack
     RTS                     ; Return original value unchanged
 
 ;Standard entity calculation with halving operation
 ;Implements standard entity calculations with value reduction
-CODE_029B28:
+Entity_CalcStandard:
     JSR.W CODE_029A4A       ; Execute base entity calculation
 
 ;Mathematical reduction with 16-bit precision
 ;Reduces calculated values using 16-bit arithmetic for precision
-CODE_029B2B:
+Math_Halve16Bit:
     REP #$30                ; Set 16-bit accumulator and index registers
     LSR.B $77               ; Divide calculation result by 2
     SEP #$20                ; Return to 8-bit accumulator
@@ -2512,40 +2512,40 @@ CODE_029B2B:
 
 ;Enhanced entity calculation with reduction
 ;Combines enhanced entity processing with mathematical reduction
-CODE_029B34:
+Entity_CalcEnhanced:
     JSR.W CODE_029ADA       ; Execute enhanced entity processing
-    BRA CODE_029B2B         ; Branch to mathematical reduction
+    BRA Math_Halve16Bit     ; Branch to mathematical reduction
 
 ;Multi-controller input validation with state management
 ;Validates multi-controller input and manages controller states
-CODE_029B39:
+Input_ValidateMulti:
     LDA.B $8D               ; Load controller validation index
     CMP.B #$02              ; Check for minimum controller count
-    BCS CODE_029B40         ; Continue if sufficient controllers
+    BCS Input_ProcessContext ; Continue if sufficient controllers
     db $60                  ; Return if insufficient controllers
 
 ;Controller input processing with context switching
 ;Processes controller input with proper context management
-CODE_029B40:
+Input_ProcessContext:
     PHD                     ; Push direct page register
     JSR.W CODE_028F2F       ; Switch to input processing context
     LDA.B $56               ; Load controller input state
     PLD                     ; Restore direct page register
     STA.B $74               ; Store input state for processing
     AND.B $DB               ; Mask with input validation flags
-    BEQ CODE_029BB0         ; Branch to special processing if no input
+    BEQ Input_Special       ; Branch to special processing if no input
     LDA.B $DB               ; Load input validation flags
     CMP.B #$50              ; Check for specific input combination
-    BNE CODE_029B78         ; Branch to standard processing
+    BNE Input_StandardProcess ; Branch to standard processing
     LDA.B $74               ; Load stored input state
     AND.B #$50              ; Test for specific input pattern
     CMP.B #$50              ; Validate complete input pattern
-    BEQ CODE_029B5C         ; Branch to enhanced processing
+    BEQ Input_Enhanced      ; Branch to enhanced processing
     RTS                     ; Return if input pattern invalid
 
 ;Enhanced input processing with system calls
 ;Processes enhanced input patterns with multiple system calls
-CODE_029B5C:
+Input_Enhanced:
     REP #$30                ; Set 16-bit accumulator and index registers
     ASL.B $77               ; Multiply calculation by 2 for enhanced processing
     SEP #$20                ; Return to 8-bit accumulator
@@ -2560,7 +2560,7 @@ CODE_029B5C:
 
 ;Standard input processing with iterative handler calls
 ;Processes standard input with multiple iterative system handler calls
-CODE_029B78:
+Input_StandardProcess:
     LDX.W #$D2EF            ; Load system handler 1 address
     JSR.W CODE_02883D       ; Execute system handler 1
     LDX.W #$D35A            ; Load system handler 2 address
@@ -2575,14 +2575,14 @@ CODE_029B78:
 
 ;Input bit scanning loop with handler dispatch
 ;Scans input bits and dispatches to appropriate handlers
-CODE_029B93:
+Input_ScanLoop:
     INY                     ; Increment bit scanner by 1
     INY                     ; Increment bit scanner by 1 (total +2)
     ROL A                   ; Rotate left to test next bit
-    BCC CODE_029B93         ; Continue scanning if bit not set
+    BCC Input_ScanLoop      ; Continue scanning if bit not set
     LDX.W DATA8_029BA0,Y    ; Load handler address from table
     JSR.W CODE_02883D       ; Execute selected handler
-    BRA CODE_029BC4         ; Branch to processing finalization
+    BRA Input_Finalize      ; Branch to processing finalization
 
 ;Input handler dispatch table
 ;Table of handler addresses for different input combinations
@@ -2593,7 +2593,7 @@ DATA8_029BA0:
 
 ;Special input processing for specific conditions
 ;Handles special input conditions with validation
-CODE_029BB0:
+Input_Special:
     LDA.B $DB               ; Load input validation flags
     CMP.B #$08              ; Check for special condition $08
     BEQ UNREACH_029BB7      ; Branch to unreachable special processing
@@ -2605,26 +2605,26 @@ UNREACH_029BB7:
 
 ;Input processing finalization with controller validation
 ;Finalizes input processing and validates controller state
-CODE_029BC4:
+Input_Finalize:
     LDX.W #$D353            ; Load input finalization handler address
     JSR.W CODE_02883D       ; Execute input finalization handler
     LDA.B #$00              ; Clear accumulator high byte
     XBA                     ; Exchange accumulator bytes
     LDA.B $8D               ; Load controller index
     CMP.B #$04              ; Check for controller 4
-    BNE CODE_029BD4         ; Continue if not controller 4
+    BNE Controller_IndexCheck ; Continue if not controller 4
     RTS                     ; Return if controller 4 (no further processing)
 
 ;Controller state management with index validation
 ;Manages controller state with proper index validation
-CODE_029BD4:
+Controller_IndexCheck:
     CMP.B #$02              ; Check for minimum controller index
-    BCS CODE_029BD9         ; Continue if sufficient
+    BCS Controller_StoreData ; Continue if sufficient
     RTS                     ; Return if insufficient controller index
 
 ;Controller data storage with indexed access
 ;Stores controller data using indexed memory access
-CODE_029BD9:
+Controller_StoreData:
     DEC A                   ; Decrement for zero-based indexing
     DEC A                   ; Decrement for array indexing adjustment
     TAX                     ; Transfer to X register for indexing
@@ -2634,7 +2634,7 @@ CODE_029BD9:
 
 ;Enhanced input validation with system coordination
 ;Validates input with coordination across multiple systems
-CODE_029BE1:
+Input_EnhancedValidate:
     LDX.W #$D2EF            ; Load validation system address
     JSR.W CODE_02883D       ; Execute validation system
     LDX.W #$D361            ; Load coordination system address
@@ -2642,7 +2642,7 @@ CODE_029BE1:
 
 ;Complex input state management with conditional processing
 ;Manages complex input states with multiple conditional processing paths
-CODE_029BED:
+Input_ComplexState:
     JSR.W CODE_029E12       ; Execute input state validation
     AND.B $DB               ; Mask with input validation flags
     BNE CODE_029BF7         ; Branch to complex processing if input present
