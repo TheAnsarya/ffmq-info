@@ -267,7 +267,8 @@ continue adding labels!
 continue adding labels, don't just limit it to bank 00.
 continue adding labels
 continue adding labels, more labels per batch, use temp files if you need to to increase the amount
-
+continue adding labels, more labels per batch, use temp files if you need to to increase the amount and make sure the chat/session logs are being updated
+continue adding labels, more labels per batch, use temp files if you need to to increase the amount and make sure the chat/session logs are being updated
 
 
 

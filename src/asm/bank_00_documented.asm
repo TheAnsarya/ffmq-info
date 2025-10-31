@@ -10249,7 +10249,7 @@ Test_CompareValue24:
 	; Z flag = equality result
 	; C flag = greater/equal result
 
-CODE_00B1C2:
+Test_CompareDone:
 	RTS
 
 ;===============================================================================
@@ -10307,7 +10307,7 @@ Test_Compare8:
     STA.B $64                      ; Store comparison value
     SEC                            ; Set carry for comparison
     LDA.B $A0                      ; Check high byte
-    BNE Test_Compare8_Done                ; If non-zero, value > 255, return
+    BNE Test_Compare8_Done         ; If non-zero, value > 255, return
     LDA.B $9E                      ; Compare low byte
     CMP.B $64                      ; Set C and Z flags
 Test_Compare8_Done:
@@ -10330,7 +10330,7 @@ Test_Compare16:
     STA.B $64                      ; Store comparison value
     SEC                            ; Set carry for comparison
     LDA.B $A0                      ; Check high byte
-    BNE Test_Compare16_Done                ; If non-zero, value > $FFFF, return
+    BNE Test_Compare16_Done        ; If non-zero, value > $FFFF, return
     LDA.B $9E                      ; Compare low word
     CMP.B $64                      ; Set C and Z flags
 Test_Compare16_Done:
@@ -10358,14 +10358,14 @@ Test_Compare24Full:
     STA.B $62                      ; Store high byte
     LDA.B $A0                      ; Compare high bytes first
     CMP.B $62
-    BNE CODE_00B203                ; If not equal, done (C/Z set)
+    BNE Test_Compare24Done         ; If not equal, done (C/Z set)
     LDA.B $9E                      ; Compare low words
     CMP.B $64
-CODE_00B203:
+Test_Compare24Done:
     RTS
 
 ;-------------------------------------------------------------------------------
-; CODE_00B204: Comparison with indirect 8-bit value
+; Test_CompareIndirect8 - Comparison with indirect 8-bit value
 ;
 ; Purpose: Compare $9E/$A0 with 8-bit value from memory (address from script)
 ; Entry: [$17] = pointer to 8-bit value
@@ -10373,7 +10373,7 @@ CODE_00B203:
 ; Exit: Carry and Zero flags set based on comparison
 ;       $17 incremented by 2
 ;-------------------------------------------------------------------------------
-CODE_00B204:
+Test_CompareIndirect8:
     LDA.B [$17]                    ; Load pointer
     INC.B $17
     INC.B $17
@@ -10383,14 +10383,14 @@ CODE_00B204:
     STA.B $64                      ; Store comparison value
     SEC                            ; Set carry
     LDA.B $A0                      ; Check high byte
-    BNE CODE_00B21C                ; If non-zero, return
+    BNE Test_CompareIndirect8Done  ; If non-zero, return
     LDA.B $9E                      ; Compare low byte
     CMP.B $64
-CODE_00B21C:
+Test_CompareIndirect8Done:
     RTS
 
 ;-------------------------------------------------------------------------------
-; CODE_00B21D: Comparison with indirect 16-bit value
+; Test_CompareIndirect16 - Comparison with indirect 16-bit value
 ;
 ; Purpose: Compare $9E/$A0 with 16-bit value from memory (address from script)
 ; Entry: [$17] = pointer to 16-bit value
@@ -10398,21 +10398,21 @@ CODE_00B21C:
 ; Exit: Carry and Zero flags set based on comparison
 ;       $17 incremented by 2
 ;-------------------------------------------------------------------------------
-CODE_00B21D:
+Test_CompareIndirect16:
     LDA.B [$17]                    ; Load pointer
     INC.B $17
     INC.B $17
     TAX                            ; Use as index
     SEC                            ; Set carry
     LDA.B $A0                      ; Check high byte
-    BNE CODE_00B22E                ; If non-zero, return
+    BNE Test_CompareIndirect16Done ; If non-zero, return
     LDA.B $9E                      ; Compare with value at pointer
     CMP.W $0000,X
-CODE_00B22E:
+Test_CompareIndirect16Done:
     RTS
 
 ;-------------------------------------------------------------------------------
-; CODE_00B22F: Comparison with indirect 24-bit value
+; Test_CompareIndirect24 - Comparison with indirect 24-bit value
 ;
 ; Purpose: Compare $9E/$A0 with 24-bit value from memory (address from script)
 ; Entry: [$17] = pointer to 24-bit value (word at X, byte at X+2)
@@ -10420,7 +10420,7 @@ CODE_00B22E:
 ; Exit: Carry and Zero flags set based on comparison
 ;       $17 incremented by 2
 ;-------------------------------------------------------------------------------
-CODE_00B22F:
+Test_CompareIndirect24:
     LDA.B [$17]                    ; Load pointer
     INC.B $17
     INC.B $17
@@ -10430,14 +10430,14 @@ CODE_00B22F:
     STA.B $64                      ; Store high byte
     LDA.B $A0                      ; Compare high bytes
     CMP.B $64
-    BNE CODE_00B249                ; If not equal, done
+    BNE Test_CompareIndirect24Done ; If not equal, done
     LDA.B $9E                      ; Compare low words
     CMP.W $0000,X                  ; With value at pointer
-CODE_00B249:
+Test_CompareIndirect24Done:
     RTS
 
 ;-------------------------------------------------------------------------------
-; CODE_00B24A/B253: Count characters with high bit set (string analysis)
+; String_CountHighBit - Count characters with high bit set (string analysis)
 ;
 ; Purpose: Count characters in a string where bit 7 is set (value >= $80)
 ; Entry: Multiple entry points:
@@ -10450,47 +10450,47 @@ CODE_00B249:
 ; Uses: Bank switching, indexed byte scanning
 ; Notes: Useful for text encoding analysis (control codes, special chars)
 ;-------------------------------------------------------------------------------
-CODE_00B24A:
+String_CountHighBit:
     LDA.B [$17]                    ; Load string length
     INC.B $17                      ; Advance script pointer
     AND.W #$00FF                   ; Mask to 8 bits
-    BRA CODE_00B258                ; Jump to counter
+    BRA String_CountHighBit_Setup  ; Jump to counter
 
     ; Entry point: length from $3A
     db $A5,$3A,$29,$FF,$00         ; LDA $3A; AND #$00FF (alternate entry)
 
-CODE_00B258:
+String_CountHighBit_Setup:
     TAY                            ; Y = string length (counter)
     LDA.B $A0                      ; Get bank
     AND.W #$00FF                   ; Mask to 8 bits
     PHA                            ; Push bank
     PLB                            ; Set data bank
     LDX.B $9E                      ; X = string address
-    BRA CODE_00B274                ; Jump to scan loop
+    BRA String_CountHighBit_Init   ; Jump to scan loop
 
     ; Another entry point (different parameters)
     db $8B,$A7,$17,$E6,$17,$E6,$17,$AA,$A7,$17,$E6,$17,$29,$FF,$00,$A8 ; Alternate parameter loading
 
-CODE_00B274:
+String_CountHighBit_Init:
     STZ.B $9E                      ; Clear result counter
     STZ.B $A0                      ; Clear high byte
 
-CODE_00B278:
+String_CountHighBit_Loop:
     LDA.W $0000,X                  ; Load character from string
     AND.W #$00FF                   ; Mask to 8 bits
     CMP.W #$0080                   ; Check if >= $80 (high bit set)
-    BCC CODE_00B285                ; If < $80, skip increment
+    BCC String_CountHighBit_Next   ; If < $80, skip increment
     INC.B $9E                      ; Count this character
 
-CODE_00B285:
+String_CountHighBit_Next:
     INX                            ; Next character
     DEY                            ; Decrement counter
-    BNE CODE_00B278                ; Loop until done
+    BNE String_CountHighBit_Loop   ; Loop until done
     PLB                            ; Restore bank
     RTS
 
 ;-------------------------------------------------------------------------------
-; CODE_00B28B: Negate value (two's complement)
+; Math_Negate - Negate value (two's complement)
 ;
 ; Purpose: Negate $9E/$A0 (convert to negative)
 ; Entry: $9E/$A0 = value
@@ -10498,7 +10498,7 @@ CODE_00B285:
 ; Notes: Two's complement: invert all bits and add 1
 ;        Equivalent to: result = 0 - value
 ;-------------------------------------------------------------------------------
-CODE_00B28B:
+Math_Negate:
     LDA.W #$0000                   ; Load 0
     SEC                            ; Set carry for subtraction
     SBC.B $9E                      ; 0 - low word
@@ -10529,14 +10529,14 @@ CODE_00B29B:
     ; TODO: Disassemble this complex bit manipulation routine
 
 ;-------------------------------------------------------------------------------
-; CODE_00B2DD: Decrement tilemap pointer by one row
+; Tilemap_DecrementRow: Decrement tilemap pointer by one row
 ;
 ; Purpose: Move tilemap pointer up one row (subtract $40 = 64 bytes)
 ; Entry: $1A = tilemap pointer
 ; Exit: $1A -= $40
 ; Notes: SNES tilemap rows are $40 bytes apart (32 tiles × 2 bytes/tile)
 ;-------------------------------------------------------------------------------
-CODE_00B2DD:
+Tilemap_DecrementRow:
     LDA.B $1A                      ; Load tilemap pointer
     SEC                            ; Set carry for subtraction
     SBC.W #$0040                   ; Subtract one row ($40 bytes)
@@ -10544,14 +10544,14 @@ CODE_00B2DD:
     RTS
 
 ;-------------------------------------------------------------------------------
-; CODE_00B2E6: Increment tilemap pointer by one row
+; Tilemap_IncrementRow: Increment tilemap pointer by one row
 ;
 ; Purpose: Move tilemap pointer down one row (add $40 = 64 bytes)
 ; Entry: $1A = tilemap pointer
 ; Exit: $1A += $40
 ; Notes: SNES tilemap rows are $40 bytes apart
 ;-------------------------------------------------------------------------------
-CODE_00B2E6:
+Tilemap_IncrementRow:
     LDA.B $1A                      ; Load tilemap pointer
     CLC                            ; Clear carry for addition
     ADC.W #$0040                   ; Add one row ($40 bytes)
@@ -10559,33 +10559,33 @@ CODE_00B2E6:
     RTS
 
 ;-------------------------------------------------------------------------------
-; CODE_00B2EF: Decrement tilemap pointer by one tile
+; Tilemap_DecrementTile: Decrement tilemap pointer by one tile
 ;
 ; Purpose: Move tilemap pointer left one tile (subtract 2 bytes)
 ; Entry: $1A = tilemap pointer
 ; Exit: $1A -= 2
 ; Notes: Each tilemap entry is 2 bytes (tile number + attributes)
 ;-------------------------------------------------------------------------------
-CODE_00B2EF:
+Tilemap_DecrementTile:
     DEC.B $1A                      ; Decrement low byte
     DEC.B $1A                      ; Decrement again (2 bytes)
     RTS
 
 ;-------------------------------------------------------------------------------
-; CODE_00B2F4: Increment tilemap pointer by one tile
+; Tilemap_IncrementTile: Increment tilemap pointer by one tile
 ;
 ; Purpose: Move tilemap pointer right one tile (add 2 bytes)
 ; Entry: $1A = tilemap pointer
 ; Exit: $1A += 2
 ; Notes: Each tilemap entry is 2 bytes
 ;-------------------------------------------------------------------------------
-CODE_00B2F4:
+Tilemap_IncrementTile:
     INC.B $1A                      ; Increment low byte
     INC.B $1A                      ; Increment again (2 bytes)
     RTS
 
 ;-------------------------------------------------------------------------------
-; CODE_00B2F9: Jump to external routine with 16-bit parameter
+; Cmd_CallExternal16: Jump to external routine with 16-bit parameter
 ;
 ; Purpose: Load 16-bit parameter from script and call external function
 ; Entry: [$17] = 16-bit parameter
@@ -10593,14 +10593,14 @@ CODE_00B2F4:
 ;       Returns from external function
 ; Calls: CODE_009DCB (external routine)
 ;-------------------------------------------------------------------------------
-CODE_00B2F9:
+Cmd_CallExternal16:
     LDA.B [$17]                    ; Load 16-bit parameter
     INC.B $17                      ; Advance script pointer
     INC.B $17                      ; (2 bytes)
     JMP.W CODE_009DCB              ; Jump to external routine
 
 ;-------------------------------------------------------------------------------
-; CODE_00B302: Jump to external routine with 8-bit parameter
+; Cmd_CallExternal8: Jump to external routine with 8-bit parameter
 ;
 ; Purpose: Load 8-bit parameter from script and call external function
 ; Entry: [$17] = 8-bit parameter
@@ -10608,14 +10608,14 @@ CODE_00B2F9:
 ;       Returns from external function
 ; Calls: CODE_009DC9 (external routine)
 ;-------------------------------------------------------------------------------
-CODE_00B302:
+Cmd_CallExternal8:
     LDA.B [$17]                    ; Load 8-bit parameter
     INC.B $17                      ; Advance script pointer
     AND.W #$00FF                   ; Mask to 8 bits
     JMP.W CODE_009DC9              ; Jump to external routine
 
 ;-------------------------------------------------------------------------------
-; CODE_00B30C: Right shift $9E/$A0 by N bits
+; Math_ShiftRight: Right shift $9E/$A0 by N bits
 ;
 ; Purpose: Logical right shift of 16-bit value
 ; Entry: [$17] = shift count (1-15)
@@ -10624,20 +10624,20 @@ CODE_00B302:
 ;       $17 incremented by 1
 ; Notes: Each iteration: LSR high byte, ROR low byte (preserves shifted bits)
 ;-------------------------------------------------------------------------------
-CODE_00B30C:
+Math_ShiftRight:
     LDA.B [$17]                    ; Load shift count
     INC.B $17                      ; Advance script pointer
     AND.W #$00FF                   ; Mask to 8 bits
 
-CODE_00B313:
+Math_ShiftRight_Loop:
     LSR.B $A0                      ; Shift high byte right
     ROR.B $9E                      ; Rotate low byte right (carry in)
     DEC A                          ; Decrement shift count
-    BNE CODE_00B313                ; Loop until done
+    BNE Math_ShiftRight_Loop       ; Loop until done
     RTS
 
 ;-------------------------------------------------------------------------------
-; CODE_00B31B: Left shift $9E/$A0 by N bits
+; Math_ShiftLeft: Left shift $9E/$A0 by N bits
 ;
 ; Purpose: Logical left shift of 16-bit value
 ; Entry: [$17] = shift count (1-15)
@@ -10646,16 +10646,16 @@ CODE_00B313:
 ;       $17 incremented by 1
 ; Notes: Each iteration: ASL low byte, ROL high byte (preserves shifted bits)
 ;-------------------------------------------------------------------------------
-CODE_00B31B:
+Math_ShiftLeft:
     LDA.B [$17]                    ; Load shift count
     INC.B $17                      ; Advance script pointer
     AND.W #$00FF                   ; Mask to 8 bits
 
-CODE_00B322:
+Math_ShiftLeft_Loop:
     ASL.B $9E                      ; Shift low byte left
     ROL.B $A0                      ; Rotate high byte left (carry in)
     DEC A                          ; Decrement shift count
-    BNE CODE_00B322                ; Loop until done
+    BNE Math_ShiftLeft_Loop        ; Loop until done
     RTS
 
 ;-------------------------------------------------------------------------------
@@ -10689,39 +10689,39 @@ CODE_00B33F:
     ; ASL $9E; ROL $A0; DEC A; BNE loop; RTS
 
 ;-------------------------------------------------------------------------------
-; CODE_00B354: No operation (placeholder)
+; Script_NoOp: No operation (placeholder)
 ;
 ; Purpose: Empty function (immediate return)
 ; Notes: May be unused or placeholder for future functionality
 ;-------------------------------------------------------------------------------
-CODE_00B354:
+Script_NoOp:
     RTS
 
 ;-------------------------------------------------------------------------------
-; CODE_00B355: Execute script or function call
+; Script_Execute: Execute script or function call
 ;
 ; Purpose: Execute script function or register external script
 ; Entry: [$17] = function/script address
 ; Exit: $17 incremented by 2
 ;       Script executed or registered
-; Calls: CODE_00B35B (script execution handler)
+; Calls: Script_Execute_Handler (script execution handler)
 ;       CODE_00A71C (external script registration)
 ;       CODE_01B24C (script initialization)
 ; Notes: Handles both internal scripts (>= $8000) and external scripts (< $8000)
 ;-------------------------------------------------------------------------------
-CODE_00B355:
+Script_Execute:
     LDA.B [$17]                    ; Load script address
     INC.B $17                      ; Advance script pointer
     INC.B $17                      ; (2 bytes)
 
-CODE_00B35B:
+Script_Execute_Handler:
     CMP.W #$8000                   ; Check if >= $8000 (internal script)
-    BCC CODE_00B367                ; If < $8000, external script
+    BCC Script_Execute_External    ; If < $8000, external script
     TAX                            ; X = script address
     LDA.W #$0003                   ; Script mode 3
     JMP.W CODE_00A71C              ; Register and execute script
 
-CODE_00B367:
+Script_Execute_External:
     PEI.B ($17)                    ; Save current script pointer
     PEI.B ($18)                    ; (both bytes)
     STA.W $19EE                    ; Store script address
@@ -10733,7 +10733,7 @@ CODE_00B367:
     RTS
 
 ;-------------------------------------------------------------------------------
-; CODE_00B379: Execute script list (loop until $FFFF terminator)
+; Script_ExecuteList: Execute script list (loop until $FFFF terminator)
 ;
 ; Purpose: Execute multiple scripts in sequence until terminator
 ; Entry: [$17] = pointer to script address list
@@ -10742,35 +10742,35 @@ CODE_00B367:
 ;       $17 advanced past terminator
 ; Notes: Processes scripts one by one, stops at $FFFF marker
 ;-------------------------------------------------------------------------------
-CODE_00B379:
+Script_ExecuteList:
     LDA.B [$17]                    ; Load script address
     INC.B $17                      ; Advance pointer
     INC.B $17                      ; (2 bytes)
     CMP.W #$FFFF                   ; Check for terminator
-    BEQ CODE_00B38B                ; If $FFFF, done
-    JSR.W CODE_00B35B              ; Execute this script
+    BEQ Script_ExecuteList_Done    ; If $FFFF, done
+    JSR.W Script_Execute_Handler   ; Execute this script
     REP #$30                       ; Ensure 16-bit mode
-    BRA CODE_00B379                ; Loop to next script
+    BRA Script_ExecuteList         ; Loop to next script
 
-CODE_00B38B:
+Script_ExecuteList_Done:
     RTS
 
 ;-------------------------------------------------------------------------------
-; CODE_00B38C: Random number transformation
+; Math_RandomTransform: Random number transformation
 ;
 ; Purpose: Apply random number transformation to $9E
 ; Entry: $9E = input value
 ; Exit: $9E = transformed value
 ; Calls: CODE_009730 (external RNG transformation)
 ;-------------------------------------------------------------------------------
-CODE_00B38C:
+Math_RandomTransform:
     LDA.B $9E                      ; Load value
     JSL.L CODE_009730              ; Apply RNG transformation
     STA.B $9E                      ; Store result
     RTS
 
 ;-------------------------------------------------------------------------------
-; CODE_00B395: Count leading zeros (bit scan)
+; Math_CountLeadingZeros: Count leading zeros (bit scan)
 ;
 ; Purpose: Count number of leading zero bits in $9E
 ; Entry: $9E = value to scan
@@ -10778,42 +10778,42 @@ CODE_00B38C:
 ; Notes: Scans from bit 15 down to bit 0, stops at first 1 bit
 ;        Used for bit significance detection
 ;-------------------------------------------------------------------------------
-CODE_00B395:
+Math_CountLeadingZeros:
     LDA.B $9E                      ; Load value
     LDX.W #$0010                   ; Start with 16 (max leading zeros)
 
-CODE_00B39A:
+Math_CountLeadingZeros_Loop:
     DEX                            ; Decrement counter
     ASL A                          ; Shift left (bit 15 → Carry)
-    BCC CODE_00B39A                ; If carry clear (bit was 0), continue
+    BCC Math_CountLeadingZeros_Loop ; If carry clear (bit was 0), continue
     STX.B $9E                      ; Store leading zero count
     RTS
 
 ;-------------------------------------------------------------------------------
-; CODE_00B3A1: Increment $9E/$A0 (24-bit safe)
+; Math_Increment24: Increment $9E/$A0 (24-bit safe)
 ;
 ; Purpose: Increment 16-bit value with carry to high byte
 ; Entry: $9E/$A0 = value
 ; Exit: $9E/$A0 = value + 1
 ; Notes: Handles carry from $9E to $A0
 ;-------------------------------------------------------------------------------
-CODE_00B3A1:
+Math_Increment24:
     INC.B $9E                      ; Increment low word
-    BNE CODE_00B3A7                ; If not zero, done
+    BNE Math_Increment24_Done      ; If not zero, done
     db $E6,$A0                     ; INC $A0 (high byte)
 
-CODE_00B3A7:
+Math_Increment24_Done:
     RTS
 
 ;-------------------------------------------------------------------------------
-; CODE_00B3A8: Increment 16-bit value at pointer (from script)
+; Cmd_IncrementIndirect16: Increment 16-bit value at pointer (from script)
 ;
 ; Purpose: Increment word at memory address from script
 ; Entry: [$17] = pointer to 16-bit value
 ; Exit: Word at pointer incremented
 ;       $17 incremented by 2
 ;-------------------------------------------------------------------------------
-CODE_00B3A8:
+Cmd_IncrementIndirect16:
     LDA.B [$17]                    ; Load pointer
     INC.B $17                      ; Advance script pointer
     INC.B $17                      ; (2 bytes)
@@ -10822,7 +10822,7 @@ CODE_00B3A8:
     RTS
 
 ;-------------------------------------------------------------------------------
-; CODE_00B3B3: Increment 8-bit value at pointer (from script)
+; Cmd_IncrementIndirect8: Increment 8-bit value at pointer (from script)
 ;
 ; Purpose: Increment byte at memory address from script
 ; Entry: [$17] = pointer to 8-bit value
@@ -10830,7 +10830,7 @@ CODE_00B3A8:
 ;       $17 incremented by 2
 ; Notes: Switches to 8-bit accumulator mode
 ;-------------------------------------------------------------------------------
-CODE_00B3B3:
+Cmd_IncrementIndirect8:
     LDA.B [$17]                    ; Load pointer
     INC.B $17                      ; Advance script pointer
     INC.B $17                      ; (2 bytes)
@@ -10840,33 +10840,33 @@ CODE_00B3B3:
     RTS
 
 ;-------------------------------------------------------------------------------
-; CODE_00B3C0: Decrement $9E/$A0 (24-bit safe)
+; Math_Decrement24: Decrement $9E/$A0 (24-bit safe)
 ;
 ; Purpose: Decrement 16-bit value with borrow from high byte
 ; Entry: $9E/$A0 = value
 ; Exit: $9E/$A0 = value - 1
 ; Notes: Handles borrow from $A0 to $9E
 ;-------------------------------------------------------------------------------
-CODE_00B3C0:
+Math_Decrement24:
     LDA.B $9E                      ; Load low word
     SEC                            ; Set carry for subtraction
     SBC.W #$0001                   ; Subtract 1
     STA.B $9E                      ; Store result
-    BCS CODE_00B3CC                ; If carry set, no borrow needed
+    BCS Math_Decrement24_Done      ; If carry set, no borrow needed
     DEC.B $A0                      ; Borrow from high byte
 
-CODE_00B3CC:
+Math_Decrement24_Done:
     RTS
 
 ;-------------------------------------------------------------------------------
-; CODE_00B3CD: Decrement 16-bit value at pointer (from script)
+; Cmd_DecrementIndirect16: Decrement 16-bit value at pointer (from script)
 ;
 ; Purpose: Decrement word at memory address from script
 ; Entry: [$17] = pointer to 16-bit value
 ; Exit: Word at pointer decremented
 ;       $17 incremented by 2
 ;-------------------------------------------------------------------------------
-CODE_00B3CD:
+Cmd_DecrementIndirect16:
     LDA.B [$17]                    ; Load pointer
     INC.B $17                      ; Advance script pointer
     INC.B $17                      ; (2 bytes)
@@ -10875,7 +10875,7 @@ CODE_00B3CD:
     RTS
 
 ;-------------------------------------------------------------------------------
-; CODE_00B3D8: Decrement 8-bit value at pointer (from script)
+; Cmd_DecrementIndirect8: Decrement 8-bit value at pointer (from script)
 ;
 ; Purpose: Decrement byte at memory address from script
 ; Entry: [$17] = pointer to 8-bit value
@@ -10883,7 +10883,7 @@ CODE_00B3CD:
 ;       $17 incremented by 2
 ; Notes: Switches to 8-bit accumulator mode
 ;-------------------------------------------------------------------------------
-CODE_00B3D8:
+Cmd_DecrementIndirect8:
     LDA.B [$17]                    ; Load pointer
     INC.B $17                      ; Advance script pointer
     INC.B $17                      ; (2 bytes)
@@ -10909,7 +10909,7 @@ CODE_00B3E5:
     ; ORA $0000,X; STA $0000,X; RTS
 
 ;-------------------------------------------------------------------------------
-; CODE_00B3F9: Bitwise AND from indirect addresses (8-bit)
+; Bitwise_ANDIndirect8: Bitwise AND from indirect addresses (8-bit)
 ;
 ; Purpose: AND byte from second pointer with byte at first pointer, store at first
 ; Entry: [$17] = destination pointer (16-bit address)
@@ -10918,7 +10918,7 @@ CODE_00B3E5:
 ;       $17 incremented by 3
 ; Notes: Uses 8-bit accumulator mode
 ;-------------------------------------------------------------------------------
-CODE_00B3F9:
+Bitwise_ANDIndirect8:
     LDA.B [$17]                    ; Load destination pointer
     INC.B $17
     INC.B $17
@@ -10948,7 +10948,7 @@ CODE_00B410:
     ; ORA $0000,X; STA $0000,X; RTS
 
 ;-------------------------------------------------------------------------------
-; CODE_00B424: Bitwise OR with 8-bit immediate (to indirect)
+; Bitwise_ORIndirect8: Bitwise OR with 8-bit immediate (to indirect)
 ;
 ; Purpose: OR byte at pointer with 8-bit value from script
 ; Entry: [$17] = destination pointer
@@ -10956,7 +10956,7 @@ CODE_00B410:
 ; Exit: [dest] = [dest] OR mask (8-bit operation)
 ;       $17 incremented by 3
 ;-------------------------------------------------------------------------------
-CODE_00B424:
+Bitwise_ORIndirect8:
     LDA.B [$17]                    ; Load destination pointer
     INC.B $17
     INC.B $17
@@ -10986,7 +10986,7 @@ CODE_00B43B:
     ; EOR $0000,X; STA $0000,X; RTS
 
 ;-------------------------------------------------------------------------------
-; CODE_00B44F: Bitwise XOR with 8-bit immediate (to indirect)
+; Bitwise_XORIndirect8: Bitwise XOR with 8-bit immediate (to indirect)
 ;
 ; Purpose: XOR byte at pointer with 8-bit value from script
 ; Entry: [$17] = destination pointer
@@ -10994,7 +10994,7 @@ CODE_00B43B:
 ; Exit: [dest] = [dest] XOR mask (8-bit operation)
 ;       $17 incremented by 3
 ;-------------------------------------------------------------------------------
-CODE_00B44F:
+Bitwise_XORIndirect8:
     LDA.B [$17]                    ; Load destination pointer
     INC.B $17
     INC.B $17
@@ -11008,7 +11008,7 @@ CODE_00B44F:
     RTS
 
 ;-------------------------------------------------------------------------------
-; CODE_00B466/B46B: Calculate tile address for character sprite
+; Sprite_CalcTileAddress: Calculate tile address for character sprite
 ;
 ; Purpose: Calculate tilemap tile address for character sprite positioning
 ; Entry: $5E = character/entity index
@@ -11019,14 +11019,14 @@ CODE_00B44F:
 ;        00B46B: Offset $0A (10)
 ;        Uses character position data from $049800 table
 ;-------------------------------------------------------------------------------
-CODE_00B466:
+Sprite_CalcTileAddress:
     LDA.W #$002A                   ; Offset 42
-    BRA CODE_00B46E                ; Jump to calculator
+    BRA Sprite_CalcTileAddress_Do  ; Jump to calculator
 
-CODE_00B46B:
+Sprite_CalcTileAddress_Alt:
     LDA.W #$000A                   ; Offset 10
 
-CODE_00B46E:
+Sprite_CalcTileAddress_Do:
     SEP #$30                       ; 8-bit A/X/Y
     CLC                            ; Clear carry
     LDX.B $5E                      ; Load character index
@@ -11056,7 +11056,7 @@ CODE_00B46E:
     RTS
 
 ;-------------------------------------------------------------------------------
-; CODE_00B49E: Update minimum tilemap pointer
+; Tilemap_UpdateMin: Update minimum tilemap pointer
 ;
 ; Purpose: Track minimum tilemap pointer in $44
 ; Entry: $1A = current tilemap pointer
@@ -11064,17 +11064,17 @@ CODE_00B46E:
 ; Exit: $44 = min($44, $1A)
 ; Notes: Used for dirty rectangle optimization
 ;-------------------------------------------------------------------------------
-CODE_00B49E:
+Tilemap_UpdateMin:
     LDA.B $1A                      ; Load current pointer
     CMP.B $44                      ; Compare with current min
-    BCS CODE_00B4A6                ; If >= min, skip
+    BCS Tilemap_UpdateMin_Done     ; If >= min, skip
     STA.B $44                      ; Update minimum
 
-CODE_00B4A6:
+Tilemap_UpdateMin_Done:
     RTS
 
 ;-------------------------------------------------------------------------------
-; CODE_00B4A7: Update maximum tilemap pointer
+; Tilemap_UpdateMax: Update maximum tilemap pointer
 ;
 ; Purpose: Track maximum tilemap pointer in $46
 ; Entry: $1A = current tilemap pointer
@@ -11082,13 +11082,13 @@ CODE_00B4A6:
 ; Exit: $46 = max($46, $1A)
 ; Notes: Used for dirty rectangle optimization (max extent)
 ;-------------------------------------------------------------------------------
-CODE_00B4A7:
+Tilemap_UpdateMax:
     LDA.B $1A                      ; Load current pointer
     CMP.B $46                      ; Compare with current max
-    BCC CODE_00B4AF                ; If < max, skip
+    BCC Tilemap_UpdateMax_Done     ; If < max, skip
     STA.B $46                      ; Update maximum
 
-CODE_00B4AF:
+Tilemap_UpdateMax_Done:
     RTS
 
 ;-------------------------------------------------------------------------------
@@ -11109,7 +11109,7 @@ UNREACH_00B4BB:
     db $A9,$FF,$00,$4C,$C9,$9D     ; LDA #$00FF; JMP CODE_009DC9
 
 ;-------------------------------------------------------------------------------
-; CODE_00B4C1: Clear text mode bits and set new mode
+; Text_ClearModeSetNew: Clear text mode bits and set new mode
 ;
 ; Purpose: Clear bits 10-12 of $1D and set new text mode from script
 ; Entry: [$17] = 8-bit text mode value
@@ -11119,7 +11119,7 @@ UNREACH_00B4BB:
 ;       $17 incremented by 1
 ; Notes: Text rendering mode control
 ;-------------------------------------------------------------------------------
-CODE_00B4C1:
+Text_ClearModeSetNew:
     LDA.W #$1C00                   ; Bits 10-12 mask
     TRB.B $1D                      ; Clear bits in $1D
     LDA.B [$17]                    ; Load new mode value
@@ -11129,7 +11129,7 @@ CODE_00B4C1:
     RTS
 
 ;-------------------------------------------------------------------------------
-; CODE_00B4D0: RNG seed setup and call
+; Math_RNGSeed: RNG seed setup and call
 ;
 ; Purpose: Set up RNG seed from script and generate random number
 ; Entry: [$17] = 8-bit seed/parameter
@@ -11138,7 +11138,7 @@ CODE_00B4C1:
 ;       $17 incremented by 1
 ; Calls: CODE_009783 (RNG routine)
 ;-------------------------------------------------------------------------------
-CODE_00B4D0:
+Math_RNGSeed:
     STZ.B $9E                      ; Clear $9E
     STZ.B $A0                      ; Clear $A0
     LDA.B [$17]                    ; Load seed parameter
@@ -11152,18 +11152,18 @@ CODE_00B4D0:
     RTS
 
 ;-------------------------------------------------------------------------------
-; CODE_00B4EA: Jump to external with $9E parameter
+; Cmd_CallExternal9E: Jump to external with $9E parameter
 ;
 ; Purpose: Call external routine with $9E as parameter
 ; Entry: $9E = parameter value
 ; Calls: CODE_009DCB (external routine)
 ;-------------------------------------------------------------------------------
-CODE_00B4EA:
+Cmd_CallExternal9E:
     LDA.B $9E                      ; Load parameter
     JMP.W CODE_009DCB              ; Jump to external routine
 
 ;-------------------------------------------------------------------------------
-; CODE_00B4EF: Center text based on character count
+; Text_CalcCentering: Center text based on character count
 ;
 ; Purpose: Calculate text centering offset based on character metrics
 ; Entry: [$17] = character count parameter
@@ -11176,7 +11176,7 @@ CODE_00B4EA:
 ;        Counts characters until first < $80 or second >= $80 found
 ;        Calculates centering based on character distribution
 ;-------------------------------------------------------------------------------
-CODE_00B4EF:
+Text_CalcCentering:
     LDA.B [$17]                    ; Load character count param
     INC.B $17                      ; Advance script pointer
     AND.W #$00FF                   ; Mask to 8 bits
@@ -11192,36 +11192,36 @@ CODE_00B4EF:
     SEP #$20                       ; 8-bit accumulator
     STZ.B $A0                      ; Clear high byte
 
-CODE_00B50D:
+Text_CalcCentering_Loop1:
     LDA.W $1100,X                  ; Load character from buffer
     INX                            ; Next character
     CMP.B #$80                     ; Check if >= $80
-    BCC CODE_00B51C                ; If < $80, found end of first section
+    BCC Text_CalcCentering_Loop2   ; If < $80, found end of first section
     INC.B $62                      ; Count this character (>= $80)
     DEY                            ; Decrement remaining
-    BNE CODE_00B50D                ; Loop until done
+    BNE Text_CalcCentering_Loop1   ; Loop until done
     db $80,$10                     ; BRA (skip next section)
 
-CODE_00B51C:
+Text_CalcCentering_Loop2:
     DEY                            ; Decrement remaining
-    BEQ CODE_00B52C                ; If done, exit
+    BEQ Text_CalcCentering_Calc    ; If done, exit
 
-CODE_00B51F:
+Text_CalcCentering_Loop2_Inner:
     LDA.W $1100,X                  ; Load character
     INX                            ; Next character
     CMP.B #$80                     ; Check if >= $80
-    BCC CODE_00B52C                ; If < $80, still in second section
+    BCC Text_CalcCentering_Calc    ; If < $80, still in second section
     INC.B $63                      ; Count this character (>= $80)
     DEY                            ; Decrement remaining
-    BNE CODE_00B51F                ; Loop
+    BNE Text_CalcCentering_Loop2_Inner ; Loop
 
-CODE_00B52C:
+Text_CalcCentering_Calc:
     LDA.B $62                      ; Load first count
     CMP.B $63                      ; Compare with second count
-    BCS CODE_00B534                ; If first >= second, use first
+    BCS Text_CalcCentering_UseFirst ; If first >= second, use first
     LDA.B $63                      ; Use second count
 
-CODE_00B534:
+Text_CalcCentering_UseFirst:
     STA.B $62                      ; Store max count
     SEC                            ; Set carry for subtraction
     LDA.B $2A                      ; Load total width
@@ -11236,14 +11236,14 @@ CODE_00B534:
     RTS
 
 ;-------------------------------------------------------------------------------
-; CODE_00B548: Set text counter and call text routine
+; Text_SetCounter16: Set text counter and call text routine
 ;
 ; Purpose: Set $3A to $10 (16) and call text drawing routine
 ; Entry: (parameters set up by caller)
 ; Exit: Text drawing initiated
 ; Calls: CODE_00A7DE (text drawing routine)
 ;-------------------------------------------------------------------------------
-CODE_00B548:
+Text_SetCounter16:
     LDA.W #$0010                   ; Load 16
     STA.B $3A                      ; Store in counter
     JMP.W CODE_00A7DE              ; Jump to text drawing
@@ -11489,7 +11489,7 @@ CODE_00B6B1:
     RTS
 
 ;-------------------------------------------------------------------------------
-; CODE_00B6B3: Character sprite display setup
+; Sprite_DisplayCharacter: Character sprite display setup
 ;
 ; Purpose: Set up character sprite display using character index
 ; Entry: $9E = character index (or $DE for special case)
@@ -11500,10 +11500,10 @@ CODE_00B6B1:
 ;        CODE_0C8000 (external sprite display)
 ; Notes: Special handling for character $DE
 ;-------------------------------------------------------------------------------
-CODE_00B6B3:
+Sprite_DisplayCharacter:
     LDA.B $9E                      ; Load character index
     CMP.W #$00DE                   ; Check if $DE (special)
-    BEQ CODE_00B6D5                ; If yes, special handling
+    BEQ Sprite_DisplayCharacter_Special ; If yes, special handling
     JSR.W CODE_008C1B              ; Look up character data
     STA.B $62                      ; Store sprite mode
     SEP #$30                       ; 8-bit A/X/Y
@@ -11512,35 +11512,35 @@ CODE_00B6B3:
     ASL A                          ; × 2
     ASL A                          ; × 4
 
-CODE_00B6C9:
+Sprite_DisplayCharacter_Do:
     STA.B $64                      ; Store position offset
     LDA.B #$02                     ; Bit 1 mask
     TSB.W $00D4                    ; Set bit 1 of $D4
     JSL.L CODE_0C8000              ; Call external sprite display
     RTS
 
-CODE_00B6D5:
+Sprite_DisplayCharacter_Special:
     LDA.W #$0001                   ; Mode 1
     STA.B $62                      ; Store sprite mode
     SEP #$30                       ; 8-bit A/X/Y
     LDA.B #$20                     ; Position $20
-    BRA CODE_00B6C9                ; Display sprite
+    BRA Sprite_DisplayCharacter_Do ; Display sprite
 
 ;-------------------------------------------------------------------------------
-; CODE_00B6E0: Save script pointer and execute script
+; Script_SavePointerExecute: Save script pointer and execute script
 ;
 ; Purpose: Save current script pointer and execute CODE_00B78D
 ; Entry: $17/$18 = current script pointer
 ; Exit: Script pointer saved on stack
 ;       CODE_00B78D executed
 ;-------------------------------------------------------------------------------
-CODE_00B6E0:
+Script_SavePointerExecute:
     PEI.B ($17)                    ; Save script pointer low
     PEI.B ($18)                    ; Save script pointer high
     JMP.W CODE_00B78D              ; Jump to script execution
 
 ;-------------------------------------------------------------------------------
-; CODE_00B6E7: Update character gold amount
+; Shop_SubtractGold: Update character gold amount
 ;
 ; Purpose: Subtract current value from party gold
 ; Entry: $0164/$0166 = amount to subtract (24-bit)
@@ -11549,7 +11549,7 @@ CODE_00B6E0:
 ;       $17/$18 restored from stack
 ; Notes: Part of shop/transaction system
 ;-------------------------------------------------------------------------------
-CODE_00B6E7:
+Shop_SubtractGold:
     SEC                            ; Set carry for subtraction
     LDA.W $0E84                    ; Load gold low word
     SBC.W $0164                    ; Subtract amount low
@@ -11560,27 +11560,27 @@ CODE_00B6E7:
     STA.W $0E86                    ; Store result high
     LDA.W $015F                    ; Load character index
     CMP.B #$DD                     ; Check if $DD (special)
-    BEQ CODE_00B716                ; If yes, alternate storage
+    BEQ Shop_SubtractGold_Alternate ; If yes, alternate storage
     JSL.L CODE_00DA65              ; Call external routine
     CLC                            ; Clear carry
     ADC.W $0162                    ; Add offset
     STA.W $0E9F,X                  ; Store at indexed location
     LDA.W $015F                    ; Load character index
     STA.W $0E9E,X                  ; Store character ID
-    BRA CODE_00B727                ; Restore and return
+    BRA Shop_SubtractGold_Done     ; Restore and return
 
-CODE_00B716:
+Shop_SubtractGold_Alternate:
     CLC                            ; Clear carry
     LDA.W $1030                    ; Load alternate storage
     ADC.W $0162                    ; Add offset
     STA.W $1030                    ; Store result
-    BRA CODE_00B727                ; Restore and return
+    BRA Shop_SubtractGold_Done     ; Restore and return
 
-CODE_00B722:
+Menu_ClearCursor:
     SEP #$20                       ; 8-bit accumulator
     STZ.W $0162                    ; Clear offset
 
-CODE_00B727:
+Shop_SubtractGold_Done:
     PLX                            ; Restore X (script pointer high)
     STX.B $18                      ; Store in $18
     PLX                            ; Restore X (script pointer low)
@@ -11588,7 +11588,7 @@ CODE_00B727:
     RTS
 
 ;-------------------------------------------------------------------------------
-; CODE_00B72E: Input handler for menu navigation
+; Menu_InputHandler: Input handler for menu navigation
 ;
 ; Purpose: Handle controller input for menu cursor movement
 ; Entry: $07 = controller input state
@@ -11601,57 +11601,57 @@ CODE_00B727:
 ; Notes: Handles up/down navigation with wrapping
 ;        Checks button presses and updates cursor
 ;-------------------------------------------------------------------------------
-CODE_00B72E:
+Menu_InputHandler:
     REP #$30                       ; 16-bit A/X/Y
     JSL.L CODE_0096A0              ; Read controller input
     LDA.B $07                      ; Load button state
     STA.B $15                      ; Store in temp
     BIT.W #$8000                   ; Test A button (bit 15)
-    BNE CODE_00B722                ; If pressed, clear and return
+    BNE Menu_ClearCursor           ; If pressed, clear and return
     BIT.W #$0080                   ; Test B button (bit 7)
-    BNE CODE_00B6E7                ; If pressed, update gold
+    BNE Shop_SubtractGold          ; If pressed, update gold
     BIT.W #$0800                   ; Test X button (bit 11)
     BNE UNREACH_00B7B5             ; If pressed, jump ahead
     BIT.W #$0400                   ; Test Y button (bit 10)
     BNE UNREACH_00B797             ; If pressed, move by 10
     BIT.W #$0100                   ; Test Start (bit 8)
-    BNE CODE_00B770                ; If pressed, increment cursor
+    BNE Menu_InputHandler_Down     ; If pressed, increment cursor
     BIT.W #$0200                   ; Test Select (bit 9)
-    BEQ CODE_00B72E                ; If not pressed, loop
+    BEQ Menu_InputHandler          ; If not pressed, loop
     SEP #$20                       ; 8-bit accumulator
     DEC.W $0162                    ; Decrement cursor position
-    BPL CODE_00B78D                ; If >= 0, update menu
+    BPL Menu_UpdateDisplay         ; If >= 0, update menu
     LDA.B $95                      ; Load wrapping flags
     AND.B #$02                     ; Test bit 1 (wrap down)
     BEQ UNREACH_00B76B             ; If no wrap, increment back
     LDA.W $0163                    ; Load max position
     STA.W $0162                    ; Wrap to max
-    BRA CODE_00B78D                ; Update menu
+    BRA Menu_UpdateDisplay         ; Update menu
 
 UNREACH_00B76B:
-    db $EE,$62,$01,$80,$BE         ; INC $0162; BRA CODE_00B72E
+    db $EE,$62,$01,$80,$BE         ; INC $0162; BRA Menu_InputHandler
 
-CODE_00B770:
+Menu_InputHandler_Down:
     SEP #$20                       ; 8-bit accumulator
     INC.W $0162                    ; Increment cursor position
     LDA.W $0163                    ; Load max position
     CMP.W $0162                    ; Compare with current
-    BCS CODE_00B78D                ; If max >= current, update
+    BCS Menu_UpdateDisplay         ; If max >= current, update
     LDA.B $95                      ; Load wrapping flags
     AND.B #$01                     ; Test bit 0 (wrap up)
-    BEQ CODE_00B788                ; If no wrap, decrement back
+    BEQ Menu_InputHandler_NoWrapUp ; If no wrap, decrement back
     STZ.W $0162                    ; Wrap to 0
-    BRA CODE_00B78D                ; Update menu
+    BRA Menu_UpdateDisplay         ; Update menu
 
-CODE_00B788:
+Menu_InputHandler_NoWrapUp:
     DEC.W $0162                    ; Decrement back
-    BRA CODE_00B72E                ; Read input again
+    BRA Menu_InputHandler          ; Read input again
 
-CODE_00B78D:
+Menu_UpdateDisplay:
     REP #$30                       ; 16-bit A/X/Y
     LDX.W #$B7DD                   ; Menu data pointer
     JSR.W CODE_009BC4              ; Update menu display
-    BRA CODE_00B72E                ; Read input again
+    BRA Menu_InputHandler          ; Read input again
 
 UNREACH_00B797:
     db $E2,$20,$38,$AD,$62,$01,$F0,$08,$E9,$0A,$B0,$0D,$A9,$00,$80,$09
