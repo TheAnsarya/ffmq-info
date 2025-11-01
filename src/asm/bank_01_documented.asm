@@ -4107,7 +4107,7 @@ CODE_01AEF4:
                        INC.W $19F7                        ;01AF20|EEF719  |0119F7;
                        BRA CODE_01AEF4                     ;01AF23|80CF    |01AEF4;
 
-CODE_01AF25:
+.Complete:
                        RTS                                 ;01AF25|60      |      ;
 
 ; ==============================================================================
@@ -4115,21 +4115,21 @@ CODE_01AF25:
 ; Advanced input processing for battle commands and navigation
 ; ==============================================================================
 
-CODE_01AF26:
+BattleInput_ProcessCommands:
                        SEP #$20                           ;01AF26|E220    |      ;
                        REP #$10                           ;01AF28|C210    |      ;
                        JSR.W CODE_01D120                   ;01AF2A|2020D1  |01D120;
-                       BCC CODE_01AF46                     ;01AF2D|9017    |01AF46;
+                       BCC .Exit                          ;01AF2D|9017    |01AF46;
                        LDA.B #$01                         ;01AF2F|A901    |      ;
                        STA.W $192B                        ;01AF31|8D2B19  |01192B;
                        LDY.W #$0003                       ;01AF34|A00300  |      ;
-                       JSR.W CODE_01AEB3                   ;01AF37|20B3AE  |01AEB3;
+                       JSR.W BattleAnim_HandleSequence    ;01AF37|20B3AE  |01AEB3;
                        STZ.W $192B                        ;01AF3A|9C2B19  |01192B;
                        LDY.W #$0002                       ;01AF3D|A00200  |      ;
-                       JSR.W CODE_01AEB3                   ;01AF40|20B3AE  |01AEB3;
-                       JSR.W CODE_01AEA0                   ;01AF43|20A0AE  |01AEA0;
+                       JSR.W BattleAnim_HandleSequence    ;01AF40|20B3AE  |01AEB3;
+                       JSR.W BattleState_Synchronize      ;01AF43|20A0AE  |01AEA0;
 
-CODE_01AF46:
+.Exit:
                        RTS                                 ;01AF46|60      |      ;
 
 ; ==============================================================================
@@ -4137,7 +4137,7 @@ CODE_01AF46:
 ; Integrates sound effects with battle events and animations
 ; ==============================================================================
 
-CODE_01AF47:
+BattleSound_IntegrateEffects:
                        LDA.W #$0F08                       ;01AF47|A9080F  |      ;
                        STA.W $0501                        ;01AF4A|8D0105  |010501;
                        PHP                                 ;01AF4D|08      |      ;
@@ -4154,11 +4154,11 @@ CODE_01AF47:
 ; Complex audio management for battle scenes and effects
 ; ==============================================================================
 
-CODE_01AF5C:
+BattleAudio_ManageChannels:
                        LDA.W $19EE                        ;01AF5C|ADEE19  |0119EE;
                        AND.W #$00FF                       ;01AF5F|29FF00  |      ;
 
-CODE_01AF62:
+.ProcessChannel:
                        PHX                                 ;01AF62|DA      |      ;
                        PHP                                 ;01AF63|08      |      ;
                        SEP #$20                           ;01AF64|E220    |      ;
@@ -4177,7 +4177,7 @@ CODE_01AF62:
 
                        db $E2,$20,$C2,$10,$AD,$EE,$19,$8D,$15,$19,$60 ; 01AF74
 
-CODE_01AF7F:
+BattleState_RegisterControl:
                        PHP                                 ;01AF7F|08      |      ;
                        SEP #$20                           ;01AF80|E220    |      ;
                        REP #$10                           ;01AF82|C210    |      ;
@@ -4191,7 +4191,7 @@ CODE_01AF7F:
 ; Handles special battle events like critical hits and status effects
 ; ==============================================================================
 
-CODE_01AF8C:
+BattleEvent_HandleSpecial:
                        SEP #$20                           ;01AF8C|E220    |      ;
                        REP #$10                           ;01AF8E|C210    |      ;
                        LDA.B #$22                         ;01AF90|A922    |      ;
@@ -4213,7 +4213,7 @@ CODE_01AF8C:
 ; Comprehensive character validation with battle setup
 ; ==============================================================================
 
-CODE_01AFAF:
+BattleChar_ValidateAndSetup:
                        SEP #$20                           ;01AFAF|E220    |      ;
                        REP #$10                           ;01AFB1|C210    |      ;
                        LDA.W $19EE                        ;01AFB3|ADEE19  |0119EE;
