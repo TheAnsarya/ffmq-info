@@ -291,14 +291,19 @@ continue adding labels, as many as you can, focusing on banks $01 and $0c
 (update session/chat logs, git commit) update the label progress table and then continue adding labels, as many as you can, add more than last time, focusing on banks $01 and $0c
 continue adding labels, as many as you can
 continue adding those last 137 labels, or as many as you can
+finish up all the labels left to be named if possible
+(update session/chat logs, git commit) then make a detailed todo list for the following items: finish up labeling code; format all of the asm code, using CRLF, utf-8, and especially tabs instead of spaces (size: 4 spaces per tab on display); determine labels for memory address and variables; finish disassembling code by bank and function and system; create a robust system of extracting graphics and transforming into bin/png/json/etc, and data into bin/json/csv/etc, and then transforming it back for the build step; (i want to see the `png` graphics extract files with their actual colors, maybe multiple versions of a `view` class of images, idk) build from code and transformed assets; document everything including data structures; 
+
+&&&&&
+2. [ ] Create GitHub Issues for each major task (if using GitHub)
+3. [ ] Set up project board (Kanban) to track progress
+&&&&&
 
 
 
 
 
 
-
-make a detailed todo list for the following items: finish up labeling code; determine labels for memory address and variables; finish disassembling code by bank and function and system; create a robust system of extracting graphics and transforming into bin/png/json/etc, and data into bin/json/csv/etc, and then transforming it back for the build step; (i want to see the `png` graphics extract files with their actual colors, maybe multiple versions of a `view` class of images, idk) build from code and transformed assets; document everything including data structures; format all of the asm code, using CRLF, utf-8, and especially tabs instead of spaces (size: 4 spaces per tab on display); 
 
 
 
