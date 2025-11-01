@@ -147,6 +147,38 @@ mesen build/ffmq-rebuilt.sfc
 
 ## Development Workflow
 
+### Code Formatting Standards
+
+**All assembly code follows standardized formatting for consistency:**
+
+- **Line Endings**: CRLF (Windows standard)
+- **Encoding**: UTF-8 with BOM
+- **Indentation**: Tabs (4-space equivalent)
+- **Column Alignment**: Labels (0), Opcodes (23), Operands (47), Comments (57)
+
+#### Format ASM Files
+
+```powershell
+# Preview formatting changes (dry-run)
+.\tools\format_asm.ps1 -Path src\asm\bank_00_documented.asm -DryRun
+
+# Apply formatting
+.\tools\format_asm.ps1 -Path src\asm\bank_00_documented.asm
+
+# Format multiple files
+Get-ChildItem src\asm\bank_*.asm | ForEach-Object {
+    .\tools\format_asm.ps1 -Path $_.FullName
+}
+```
+
+#### VS Code Tasks
+
+Use built-in tasks for quick formatting:
+- **Ctrl+Shift+P** → "✨ Format ASM File" (applies formatting)
+- **Ctrl+Shift+P** → "🔍 Verify ASM Formatting" (preview only)
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for complete formatting guidelines.
+
 ### Modifying Code
 1. Edit assembly files in `src/asm/`
 2. Update constants in `src/include/ffmq_constants.inc`

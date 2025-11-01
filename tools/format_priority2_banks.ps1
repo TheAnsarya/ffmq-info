@@ -1,15 +1,16 @@
 <#
 .SYNOPSIS
-    Format Priority 3 bank section files with individual git commits.
+    Format Priority 2 bank files with individual git commits.
 
 .DESCRIPTION
-    Automates formatting of 4 Priority 3 bank section files:
-    - bank_00_section2.asm (353 lines)
-    - bank_00_section3.asm (463 lines)
-    - bank_00_section4.asm (508 lines)
-    - bank_00_section5.asm (530 lines)
-    
-    For each section:
+    Automates formatting of 5 Priority 2 documented bank files:
+    - bank_03_documented.asm (2,672 lines)
+    - bank_07_documented.asm (2,647 lines)
+    - bank_08_documented.asm (2,156 lines)
+    - bank_09_documented.asm (2,186 lines)
+    - bank_0A_documented.asm (2,078 lines)
+
+    For each bank:
     1. Verify file exists
     2. Preview changes (dry-run)
     3. Create backup
@@ -25,12 +26,12 @@
     Format files but don't create git commits.
 
 .EXAMPLE
-    .\tools\format_priority3_sections.ps1 -DryRun
+    .\tools\format_priority2_banks.ps1 -DryRun
     Preview formatting changes without applying them.
 
 .EXAMPLE
-    .\tools\format_priority3_sections.ps1
-    Format all Priority 3 sections and create individual commits.
+    .\tools\format_priority2_banks.ps1
+    Format all Priority 2 banks and create individual commits.
 #>
 
 [CmdletBinding()]
@@ -45,33 +46,38 @@ $ScriptRoot = Split-Path -Parent $PSScriptRoot
 $FormatScript = Join-Path $ScriptRoot "tools\format_asm.ps1"
 $SrcDir = Join-Path $ScriptRoot "src\asm"
 
-# Section configuration
-$Sections = @(
+# Bank configuration
+$Banks = @(
     @{
-        File = "bank_00_section2.asm"
-        Description = "Bank 00 Section 2 - Core Engine Part 2"
-        Number = "2"
+        File = "bank_03_documented.asm"
+        Description = "Bank 03 - Battle System"
+        Number = "03"
     }
     @{
-        File = "bank_00_section3.asm"
-        Description = "Bank 00 Section 3 - Core Engine Part 3"
-        Number = "3"
+        File = "bank_07_documented.asm"
+        Description = "Bank 07 - Field System"
+        Number = "07"
     }
     @{
-        File = "bank_00_section4.asm"
-        Description = "Bank 00 Section 4 - Core Engine Part 4"
-        Number = "4"
+        File = "bank_08_documented.asm"
+        Description = "Bank 08 - Map & Graphics"
+        Number = "08"
     }
     @{
-        File = "bank_00_section5.asm"
-        Description = "Bank 00 Section 5 - Core Engine Part 5"
-        Number = "5"
+        File = "bank_09_documented.asm"
+        Description = "Bank 09 - Battle Graphics"
+        Number = "09"
+    }
+    @{
+        File = "bank_0A_documented.asm"
+        Description = "Bank 0A - Text & Dialog"
+        Number = "0A"
     }
 )
 
 # Statistics
 $Stats = @{
-    TotalSections = $Sections.Count
+    TotalBanks = $Banks.Count
     Successful = 0
     Failed = 0
     StartTime = Get-Date
@@ -112,110 +118,110 @@ function Get-FileStats {
     return @{ Exists = $false }
 }
 
-function Format-Section {
+function Format-Bank {
     param(
-        [hashtable]$Section,
+        [hashtable]$Bank,
         [int]$Number,
         [int]$Total
     )
-    
-    $sectionDesc = $Section.Description
-    $sectionFile = $Section.File
-    $sectionPath = Join-Path $SrcDir $sectionFile
-    $backupPath = "$sectionPath.pre_format_backup"
-    
-    Write-Header "Processing Section $Number/$Total - $sectionDesc"
-    
+
+    $bankDesc = $Bank.Description
+    $bankFile = $Bank.File
+    $bankPath = Join-Path $SrcDir $bankFile
+    $backupPath = "$bankPath.pre_format_backup"
+
+    Write-Header "Processing Bank $Number/$Total - $bankDesc"
+
     # Step 1: Verify file exists
-    Write-Host "[1/6] Verify file exists: $sectionFile"
-    $stats = Get-FileStats -Path $sectionPath
+    Write-Host "[1/6] Verify file exists: $bankFile"
+    $stats = Get-FileStats -Path $bankPath
     if (-not $stats.Exists) {
-        Write-Step "File not found: $sectionPath" -Status error
+        Write-Step "File not found: $bankPath" -Status error
         return $false
     }
     Write-Step "File found" -Status success
     Write-Step "Size: $($stats.Size) bytes ($($stats.Lines) lines)"
-    
+
     # Step 2: Preview formatting changes
     Write-Host ""
     Write-Host "[2/6] Preview formatting changes (dry-run)"
-    Write-Step "Executing: .\tools\format_asm.ps1 -Path $sectionPath -DryRun"
+    Write-Step "Executing: .\tools\format_asm.ps1 -Path $bankPath -DryRun"
     Write-Host ""
-    
-    & $FormatScript -Path $sectionPath -DryRun | Out-String | Write-Host
-    
+
+    & $FormatScript -Path $bankPath -DryRun | Out-String | Write-Host
+
     if ($DryRun) {
         Write-Step "DRY-RUN MODE: Stopping here"
         return $true
     }
-    
+
     # Step 3: Create backup
     Write-Host ""
     Write-Host "[3/6] Create backup"
     try {
-        Copy-Item $sectionPath $backupPath -Force
+        Copy-Item $bankPath $backupPath -Force
         Write-Step "Backup created: $backupPath" -Status success
     }
     catch {
         Write-Step "Failed to create backup: $_" -Status error
         return $false
     }
-    
+
     # Step 4: Apply formatting
     Write-Host ""
     Write-Host "[4/6] Apply formatting"
-    Write-Step "Executing: .\tools\format_asm.ps1 -Path $sectionPath"
+    Write-Step "Executing: .\tools\format_asm.ps1 -Path $bankPath"
     Write-Host ""
-    
+
     try {
-        & $FormatScript -Path $sectionPath | Out-String | Write-Host
+        & $FormatScript -Path $bankPath | Out-String | Write-Host
         Write-Step "Formatting applied" -Status success
     }
     catch {
         Write-Step "Formatting failed: $_" -Status error
         # Restore from backup
-        Copy-Item $backupPath $sectionPath -Force
+        Copy-Item $backupPath $bankPath -Force
         Write-Step "Restored from backup" -Status warning
         return $false
     }
-    
+
     # Step 5: Verify formatted file
     Write-Host ""
     Write-Host "[5/6] Verify formatted file"
-    $newStats = Get-FileStats -Path $sectionPath
+    $newStats = Get-FileStats -Path $bankPath
     if (-not $newStats.Exists) {
         Write-Step "Formatted file not found!" -Status error
-        Copy-Item $backupPath $sectionPath -Force
+        Copy-Item $backupPath $bankPath -Force
         return $false
     }
-    
+
     Write-Step "Formatted file exists" -Status success
     Write-Step "Original: $($stats.Size) bytes ($($stats.Lines) lines)"
     Write-Step "Formatted: $($newStats.Size) bytes ($($newStats.Lines) lines)"
-    
+
     $sizeDiff = $newStats.Size - $stats.Size
     $sizePercent = if ($stats.Size -gt 0) { ($sizeDiff / $stats.Size * 100).ToString("F2") } else { "0" }
     $lineDiff = $newStats.Lines - $stats.Lines
-    
+
     Write-Step "Size change: $sizeDiff bytes ($sizePercent%)"
     Write-Step "Line change: $lineDiff lines"
-    
+
     # Verify line count hasn't changed (formatting shouldn't add/remove lines)
     if ($lineDiff -ne 0) {
         Write-Step "WARNING: Line count changed! This shouldn't happen with formatting." -Status warning
     }
-    
+
     # Step 6: Create git commit
     if (-not $NoCommit) {
         Write-Host ""
         Write-Host "[6/6] Create git commit"
-        Write-Step "Staging: $sectionPath"
-        
+        Write-Step "Staging: $bankPath"
+
         try {
-            git add $sectionPath 2>&1 | Out-Null
-            
+            git add $bankPath 2>&1 | Out-Null
+
             $commitMsg = @"
-Format $sectionFile - ASM code formatting
+Format $bankFile - ASM code formatting
 
 - Applied CRLF line endings
 - Applied UTF-8 with BOM encoding
@@ -227,9 +233,9 @@ Stats:
 - Formatted: $($newStats.Size) bytes ($($newStats.Lines) lines)
 - Change: $sizeDiff bytes ($sizePercent%)
 
-Part of Issue #17 - Priority 3 Sections
+Part of Issue #17 - Priority 2 Banks
 "@
-            
+
             Write-Step "Committing changes..."
             git commit -m $commitMsg 2>&1 | Out-Null
             Write-Step "Git commit created" -Status success
@@ -242,19 +248,19 @@ Part of Issue #17 - Priority 3 Sections
     else {
         Write-Step "Skipping git commit (NoCommit flag set)"
     }
-    
+
     # Clean up backup on success
     if (Test-Path $backupPath) {
         Remove-Item $backupPath -Force
     }
-    
-    Write-Step "Section processing complete" -Status success
+
+    Write-Step "Bank processing complete" -Status success
     return $true
 }
 
 # Main execution
 Clear-Host
-Write-Header "ASM Priority 3 Sections Formatting"
+Write-Header "ASM Priority 2 Banks Formatting"
 
 # Display configuration
 $mode = if ($DryRun) { "DRY-RUN (preview only)" } else { "PRODUCTION (will modify files)" }
@@ -271,28 +277,28 @@ if (-not (Test-Path $FormatScript)) {
     exit 1
 }
 
-# Display sections to process
-Write-Host "Sections to process: $($Sections.Count)"
-foreach ($section in $Sections) {
-    $path = Join-Path $SrcDir $section.File
-    Write-Host "  - $path ($($section.Description))"
+# Display banks to process
+Write-Host "Banks to process: $($Banks.Count)"
+foreach ($bank in $Banks) {
+    $path = Join-Path $SrcDir $bank.File
+    Write-Host "  - $path ($($bank.Description))"
 }
 Write-Host ""
 
-# Process each section
-for ($i = 0; $i -lt $Sections.Count; $i++) {
-    $section = $Sections[$i]
+# Process each bank
+for ($i = 0; $i -lt $Banks.Count; $i++) {
+    $bank = $Banks[$i]
     $number = $i + 1
-    
-    $success = Format-Section -Section $section -Number $number -Total $Sections.Count
-    
+
+    $success = Format-Bank -Bank $bank -Number $number -Total $Banks.Count
+
     if ($success) {
         $Stats.Successful++
     }
     else {
         $Stats.Failed++
     }
-    
+
     Write-Host ""
 }
 
@@ -300,7 +306,7 @@ for ($i = 0; $i -lt $Sections.Count; $i++) {
 Write-Header "Summary"
 
 Write-Host "Results:"
-Write-Host "  Total Sections: $($Stats.TotalSections)"
+Write-Host "  Total Banks: $($Stats.TotalBanks)"
 if ($Stats.Successful -gt 0) {
     Write-Step "Successful: $($Stats.Successful)" -Status success
 }
@@ -319,10 +325,10 @@ if ($DryRun) {
 }
 elseif ($Stats.Failed -gt 0) {
     Write-Host ""
-    Write-Step "Some sections failed - check errors above" -Status warning
+    Write-Step "Some banks failed - check errors above" -Status warning
     exit 1
 }
 else {
     Write-Host ""
-    Write-Step "All sections formatted successfully!" -Status success
+    Write-Step "All banks formatted successfully!" -Status success
 }
