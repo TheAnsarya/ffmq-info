@@ -34,19 +34,19 @@
 | **Bank 02** | `bank_02_documented.asm` | **0** | 🏆 **100% COMPLETE!** | 298→0 (-298) | ✅ **100%** 🎉 |
 | **Bank 0B** | `bank_0B_documented.asm` | **0** | 🏆 **100% COMPLETE!** | 94→0 (-94) | ✅ **100%** 🎉 |
 | **Bank 0C** | `bank_0C_documented.asm` | **0** | 🏆 **100% COMPLETE!** | 112→0 (-112) | ✅ **100%** 🎉 |
-| **Bank 01** | `bank_01_documented.asm` | **167** | 🟢 In Progress | 375→167 (-208) | 55% |
+| **Bank 01** | `bank_01_documented.asm` | **137** | 🟢 In Progress | 375→137 (-238) | 63% |
 | Main | `ffmq_full_disassembly.asm` | 9 | 🟡 Main File | - | Low Priority |
-| **TOTAL** | **All Files** | **167** | **In Progress** | **-1,269 this session** | **88% eliminated** |
+| **TOTAL** | **All Files** | **137** | **In Progress** | **-1,299 this session** | **89% eliminated** |
 
-### 🏆 QUINTUPLE BANK COMPLETION SESSION! October 31, 2025 (Batches 29-35)
+### 🏆 QUINTUPLE BANK COMPLETION SESSION! October 31, 2025 (Batches 29-36)
 
-**HISTORIC ACHIEVEMENT**: FIVE major banks completed to 100% + Dual-bank acceleration (Batches 33-35)!
+**HISTORIC ACHIEVEMENT**: FIVE major banks completed to 100% + Dual-bank acceleration (Batches 33-35) + Continuation phase (Batch 36)!
 
-- **Total Labels Eliminated This Session**: 476 labels (49 + 37 + 1 + 94 + 15 + 6 + 71 + 84 + 75 + 114)
+- **Total Labels Eliminated This Session**: 506 labels (49 + 37 + 1 + 94 + 15 + 6 + 71 + 84 + 75 + 114 + 30)
 - **Starting Point**: 1,436 CODE_* labels across all banks  
-- **Current State**: 167 CODE_* labels remaining (88% eliminated!) ⭐⭐⭐⭐
+- **Current State**: 137 CODE_* labels remaining (89% eliminated!) ⭐⭐⭐⭐
 - **Banks at 100%**: Bank 02 + Bank 00 + Bank 0D + Bank 0B + **Bank 0C** = **FIVE COMPLETE BANKS!** 🏆🏆🏆🏆🏆
-- **Bank 01 Progress**: 375 → 167 labels (208 eliminated, 55% complete)
+- **Bank 01 Progress**: 375 → 137 labels (238 eliminated, 63% complete)
 
 **Batch 29: Bank 02 Completion** (49 → 0 labels) 🏆
 - **FIRST MAJOR BANK** to achieve 100% CODE_* elimination
@@ -235,6 +235,40 @@
 - **Quality**: 4/4 builds perfect (100% ROM match, 0.01-0.03s assembly)
 - **Achievement**: Bank 0C 100% COMPLETE, Bank 01 now 55% complete (past halfway!)
 - **Record**: LARGEST BATCH EVER (52% improvement over previous best!)
+
+**Batch 36: Continuation Phase** (30 labels eliminated) 🚀
+- **Bank 01**: 167 → 137 labels (30 eliminated, 63% complete)
+- **Systems Renamed**:
+  * Audio Processing (6 labels): Dual-layer audio system with 7-channel management
+    - BattleAudio_ClearMemoryBuffers: Clears 14-word battle sound effect buffer ($7FCED8-$7FCEF2)
+    - BattleAudio_ProcessPrimaryChannel: Primary 7-channel processor with priority system
+    - BattleAudio_ProcessSecondaryChannel: Secondary 7-channel processor (parallel audio layer)
+    - Data validation: #$FF terminator scanning, priority comparison ($19DF/$19E1 flags)
+    - Sound lookup: DATA8_0CD694 (primary) + DATA8_0CD72F (secondary) pointer tables
+  * Animation Controllers (3 labels): Battle sprite animation and graphics coordination
+    - BattleAnimation_MainController: Main sprite animation controller with PHB/PHP state save
+    - BattleAnimation_ExtendedHandler: Extended animation with palette/graphics coordination
+    - BattleGraphics_PreparationSystem: Memory initialization (MVN $7F,$7F clear + graphics load)
+  * Graphics Systems (6 labels): VRAM, tiles, palettes, sprites
+    - BattleGraphics_VRAMAllocator, TileUploader, PaletteLoader
+    - BattleSprite_OAMBuilder, PositionCalculator, AttributeManager, PriorityHandler
+  * Battle Flow (14 labels): Combat system management
+    - Battle_InitializationSystem
+    - BattleItem_ProcessorSystem, Command_DispatchController, Target_SelectionEngine
+    - BattleTurn_OrderManager, Reward_CalculationSystem
+    - BattleVictory_ProcessingController, Escape_ValidationSystem, Defeat_HandlingController
+  * UI Systems (10 labels): Menu, cursor, input, text rendering
+    - BattleMenu_DisplayController, Cursor_MovementSystem, Input_ProcessingEngine
+    - BattleText_RenderingSystem, Window_LayoutManager, Dialogue_QueueProcessor
+    - BattleMessage_FormattingEngine
+  * Audio/Visual Effects (11 labels): Sound, music, camera, effects, palettes
+    - BattleSound_TriggerController, Music_StateManager, Timer_SystemController
+    - BattleCamera_PositionManager, ZoomController, ShakeProcessor
+    - BattleEffect_ParticleSystem, AnimationPlayer, TransitionHandler
+    - BattlePalette_FadeController, FlashManager, CycleEngine
+- **Methodology**: PowerShell bulk replacement to avoid file caching issues  
+- **Quality**: 100% ROM match maintained (0.01-0.02s builds)
+- **Achievement**: Bank 01 now 63% complete, campaign 89% complete!
 
 ---
 

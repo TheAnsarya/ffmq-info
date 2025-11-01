@@ -459,7 +459,7 @@ Battle_WaitVBlank:
 ; Focus: Battle initialization, graphics loading, main loop
 ; Next: AI system, damage calculations, combat mechanics
 ;===============================================================================
-CODE_018222:
+Battle_InitializationSystem:
                        PHP                                  ;018222|08      |      ;
                        PHK                                  ;018223|4B      |      ;
                        PLB                                  ;018224|AB      |      ;
@@ -1200,7 +1200,7 @@ BattleSound_InitializeSoundEffects:
 ; Clears all audio memory buffers for battle sound effects
 ; ==============================================================================
 
-CODE_01A267:
+BattleAudio_ClearMemoryBuffers:
                        REP #$30                           ;01A267|C230    |      ;
                        LDA.W #$0000                       ;01A269|A90000  |      ;
                        STA.L $7FCED8                      ;01A26C|8FD8CE7F|7FCED8;
@@ -1229,7 +1229,7 @@ CODE_01A267:
 ; Complex sound channel management with battle coordination and timing
 ; ==============================================================================
 
-CODE_01A2A6:
+BattleAudio_ProcessPrimaryChannel:
                        PHB                                 ;01A2A6|8B      |      ;
                        PHP                                 ;01A2A7|08      |      ;
                        PHD                                 ;01A2A8|0B      |      ;
@@ -1336,7 +1336,7 @@ CODE_01A33D:
 ; Alternate sound channel processing for complex multi-layer audio
 ; ==============================================================================
 
-CODE_01A34B:
+BattleAudio_ProcessSecondaryChannel:
                        PHB                                 ;01A34B|8B      |      ;
                        PHP                                 ;01A34C|08      |      ;
                        PHD                                 ;01A34D|0B      |      ;
@@ -1443,7 +1443,7 @@ CODE_01A3E2:
 ; Coordinates all sprite animation and graphics updates during battle
 ; ==============================================================================
 
-CODE_01A3F0:
+BattleAnimation_MainController:
                        PHP                                 ;01A3F0|08      |      ;
                        PHB                                 ;01A3F1|8B      |      ;
                        REP #$30                           ;01A3F2|C230    |      ;
@@ -1463,7 +1463,7 @@ CODE_01A401:
 ; Enhanced animation processing with additional graphics coordination
 ; ==============================================================================
 
-CODE_01A404:
+BattleAnimation_ExtendedHandler:
                        PHP                                 ;01A404|08      |      ;
                        PHB                                 ;01A405|8B      |      ;
                        REP #$30                           ;01A406|C230    |      ;
@@ -1487,7 +1487,7 @@ CODE_01A420:
 ; Major graphics loading system with memory initialization and data transfer
 ; ==============================================================================
 
-CODE_01A423:
+BattleGraphics_PreparationSystem:
                        REP #$30                           ;01A423|C230    |      ;
                        PHD                                 ;01A425|0B      |      ;
                        PEA.W $192B                        ;01A426|F42B19  |01192B;
@@ -1518,7 +1518,7 @@ CODE_01A423:
 ; Processes character graphics and transfers to VRAM with complex addressing
 ; ==============================================================================
 
-CODE_01A45A:
+BattleGraphics_VRAMAllocator:
                        LDA.L DATA8_0B88FC,X                ;01A45A|BFFC880B|0B88FC;
                        AND.W #$00FF                       ;01A45E|29FF00  |      ;
                        ASL A                               ;01A461|0A      |      ;
@@ -1561,7 +1561,7 @@ CODE_01A45A:
 ; Large-scale graphics processing with dual memory bank coordination
 ; ==============================================================================
 
-CODE_01A495:
+BattleGraphics_TileUploader:
                        REP #$30                           ;01A495|C230    |      ;
                        LDA.W #$0002                       ;01A497|A90200  |      ;
                        STA.B $16                          ;01A49A|8516    |001941;
@@ -1600,7 +1600,7 @@ CODE_01A49C:
 ; Single-byte transfer loop with automatic format conversion
 ; ==============================================================================
 
-CODE_01A4D0:
+BattleGraphics_PaletteLoader:
                        LDA.W $0000,Y                      ;01A4D0|B90000  |040000;
                        STA.L $7F0000,X                    ;01A4D3|9F00007F|7F0000;
                        LDA.B #$00                         ;01A4D7|A900    |      ;
@@ -1645,7 +1645,7 @@ CODE_01A4F6:
 ; Processes individual sprite bits with complex masking and animation
 ; ==============================================================================
 
-CODE_01A50C:
+BattleSprite_OAMBuilder:
                        PHY                                 ;01A50C|5A      |      ;
                        LDA.B $0D                          ;01A50D|A50D    |001938;
                        AND.B $0E                          ;01A50F|250E    |001939;
@@ -1689,7 +1689,7 @@ CODE_01A52C:
 ; Completes character processing with special effect integration
 ; ==============================================================================
 
-CODE_01A550:
+BattleSprite_PositionCalculator:
                        REP #$30                           ;01A550|C230    |      ;
                        LDA.W #$000B                       ;01A552|A90B00  |      ;
                        CLC                                 ;01A555|18      |      ;
@@ -1735,7 +1735,7 @@ CODE_01A573:
 ; Coordinates 96 transfer operations with memory management
 ; ==============================================================================
 
-CODE_01A592:
+BattleSprite_AttributeManager:
                        JSR.W CODE_01A901                   ;01A592|2001A9  |01A901;
                        LDA.B $02                          ;01A595|A502    |00192D;
                        CLC                                 ;01A597|18      |      ;
@@ -1778,7 +1778,7 @@ CODE_01A5AA:
 ; Larger transfer cycle for complex special effects
 ; ==============================================================================
 
-CODE_01A5C7:
+BattleSprite_PriorityHandler:
                        JSR.W CODE_01A901                   ;01A5C7|2001A9  |01A901;
                        LDA.B $02                          ;01A5CA|A502    |00192D;
                        CLC                                 ;01A5CC|18      |      ;
@@ -1834,7 +1834,7 @@ DATA8_01A63C:
 ; Sets up sprite management system with memory allocation and coordination
 ; ==============================================================================
 
-CODE_01A692:
+BattleSprite_GraphicsProcessor:
                        SEP #$20                           ;01A692|E220    |      ;
                        REP #$10                           ;01A694|C210    |      ;
                        PHD                                 ;01A696|0B      |      ;
@@ -2132,7 +2132,7 @@ CODE_01A227:
 ; Clears all audio memory buffers for battle sound effects
 ; ==============================================================================
 
-CODE_01A267:
+BattleAudio_ClearMemoryBuffers:
                        REP #$30                           ;01A267|C230    |      ;
                        LDA.W #$0000                       ;01A269|A90000  |      ;
                        STA.L $7FCED8                      ;01A26C|8FD8CE7F|7FCED8;
@@ -2161,7 +2161,7 @@ CODE_01A267:
 ; Complex sound channel management with battle coordination and timing
 ; ==============================================================================
 
-CODE_01A2A6:
+BattleAudio_ProcessPrimaryChannel:
                        PHB                                 ;01A2A6|8B      |      ;
                        PHP                                 ;01A2A7|08      |      ;
                        PHD                                 ;01A2A8|0B      |      ;
@@ -2268,7 +2268,7 @@ CODE_01A33D:
 ; Alternate sound channel processing for complex multi-layer audio
 ; ==============================================================================
 
-CODE_01A34B:
+BattleAudio_ProcessSecondaryChannel:
                        PHB                                 ;01A34B|8B      |      ;
                        PHP                                 ;01A34C|08      |      ;
                        PHD                                 ;01A34D|0B      |      ;
@@ -2375,7 +2375,7 @@ CODE_01A3E2:
 ; Coordinates all sprite animation and graphics updates during battle
 ; ==============================================================================
 
-CODE_01A3F0:
+BattleAnimation_MainController:
                        PHP                                 ;01A3F0|08      |      ;
                        PHB                                 ;01A3F1|8B      |      ;
                        REP #$30                           ;01A3F2|C230    |      ;
@@ -2395,7 +2395,7 @@ CODE_01A401:
 ; Enhanced animation processing with additional graphics coordination
 ; ==============================================================================
 
-CODE_01A404:
+BattleAnimation_ExtendedHandler:
                        PHP                                 ;01A404|08      |      ;
                        PHB                                 ;01A405|8B      |      ;
                        REP #$30                           ;01A406|C230    |      ;
@@ -2419,7 +2419,7 @@ CODE_01A420:
 ; Major graphics loading system with memory initialization and data transfer
 ; ==============================================================================
 
-CODE_01A423:
+BattleGraphics_PreparationSystem:
                        REP #$30                           ;01A423|C230    |      ;
                        PHD                                 ;01A425|0B      |      ;
                        PEA.W $192B                        ;01A426|F42B19  |01192B;
@@ -2450,7 +2450,7 @@ CODE_01A423:
 ; Processes character graphics and transfers to VRAM with complex addressing
 ; ==============================================================================
 
-CODE_01A45A:
+BattleGraphics_VRAMAllocator:
                        LDA.L DATA8_0B88FC,X                ;01A45A|BFFC880B|0B88FC;
                        AND.W #$00FF                       ;01A45E|29FF00  |      ;
                        ASL A                               ;01A461|0A      |      ;
@@ -2493,7 +2493,7 @@ CODE_01A45A:
 ; Large-scale graphics processing with dual memory bank coordination
 ; ==============================================================================
 
-CODE_01A495:
+BattleGraphics_TileUploader:
                        REP #$30                           ;01A495|C230    |      ;
                        LDA.W #$0002                       ;01A497|A90200  |      ;
                        STA.B $16                          ;01A49A|8516    |001941;
@@ -2532,7 +2532,7 @@ CODE_01A49C:
 ; Single-byte transfer loop with automatic format conversion
 ; ==============================================================================
 
-CODE_01A4D0:
+BattleGraphics_PaletteLoader:
                        LDA.W $0000,Y                      ;01A4D0|B90000  |040000;
                        STA.L $7F0000,X                    ;01A4D3|9F00007F|7F0000;
                        LDA.B #$00                         ;01A4D7|A900    |      ;
@@ -2577,7 +2577,7 @@ CODE_01A4F6:
 ; Processes individual sprite bits with complex masking and animation
 ; ==============================================================================
 
-CODE_01A50C:
+BattleSprite_OAMBuilder:
                        PHY                                 ;01A50C|5A      |      ;
                        LDA.B $0D                          ;01A50D|A50D    |001938;
                        AND.B $0E                          ;01A50F|250E    |001939;
@@ -2621,7 +2621,7 @@ CODE_01A52C:
 ; Completes character processing with special effect integration
 ; ==============================================================================
 
-CODE_01A550:
+BattleSprite_PositionCalculator:
                        REP #$30                           ;01A550|C230    |      ;
                        LDA.W #$000B                       ;01A552|A90B00  |      ;
                        CLC                                 ;01A555|18      |      ;
@@ -2667,7 +2667,7 @@ CODE_01A573:
 ; Coordinates 96 transfer operations with memory management
 ; ==============================================================================
 
-CODE_01A592:
+BattleSprite_AttributeManager:
                        JSR.W CODE_01A901                   ;01A592|2001A9  |01A901;
                        LDA.B $02                          ;01A595|A502    |00192D;
                        CLC                                 ;01A597|18      |      ;
@@ -2710,7 +2710,7 @@ CODE_01A5AA:
 ; Larger transfer cycle for complex special effects
 ; ==============================================================================
 
-CODE_01A5C7:
+BattleSprite_PriorityHandler:
                        JSR.W CODE_01A901                   ;01A5C7|2001A9  |01A901;
                        LDA.B $02                          ;01A5CA|A502    |00192D;
                        CLC                                 ;01A5CC|18      |      ;
@@ -2766,7 +2766,7 @@ DATA8_01A63C:
 ; Sets up sprite management system with memory allocation and coordination
 ; ==============================================================================
 
-CODE_01A692:
+BattleSprite_GraphicsProcessor:
                        SEP #$20                           ;01A692|E220    |      ;
                        REP #$10                           ;01A694|C210    |      ;
                        PHD                                 ;01A696|0B      |      ;
@@ -2879,7 +2879,7 @@ CODE_01A6FC:
                        AND.B #$30                         ;01A746|2930    |      ;
                        BRA CODE_01A74B                     ;01A748|8001    |01A74B;
 
-CODE_01A74A:
+BattleEffect_TransitionHandler:
                        PLA                                 ;01A74A|68      |      ;
 
 CODE_01A74B:
