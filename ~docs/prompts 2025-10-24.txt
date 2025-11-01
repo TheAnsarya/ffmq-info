@@ -1,5 +1,432 @@
+
+=======================
+.\update.ps1
+And you'll see the interactive menu with all your current changes ready to log!
+=======================
+
+
+
+
 update git's `user.name` to `Andy Hubbard` and `git.email` to `me@ansarya.com`
-create a new branch for the changes named `ai-code-trial` and then analyze the code `SNES` assembly code and documentation, and reorganize the project by copying all the old code files into a historical folder structure and then reorganizing the code for creating an SNES build path using the most modern snes build tools and practices, `/~roms/` contains all the FFMQ roms and use `/~roms/Final Fantasy - Mystic Quest (U) (V1.1).sfc` as the original base ROM. Setup an SNES development project for the complete disassembly and commenting and documentation of `Final Fantasy Mystic Quest` (FFMQ) with a full toolset from coding, to build, to test, to running it using MesenS. Document everything. Some documentation can be found at `https://datacrystal.tcrf.net/wiki/Final_Fantasy:_Mystic_Quest` and `https://github.com/TheAnsarya/GameInfo/tree/main/Final%20Fantasy%20Mystic%20Quest%20(SNES)`. Create graphcis and text import/export and editing. If possible, analyze and disassemble and document everything. Eventually we will make an editor of the game.
+create a new branch for the changes named `ai-code-trial` and then analyze the code `SNES` assembly code and documentation, and reorganize the project by copying all the old code files into a historical folder structure and then reorganizing the code for creating an SNES build path using the most modern snes build tools and practices, `/roms/` contains all the FFMQ roms and use `/roms/Final Fantasy - Mystic Quest (U) (V1.1).sfc` as the original base ROM. Setup an SNES development project for the complete disassembly and commenting and documentation of `Final Fantasy Mystic Quest` (FFMQ) with a full toolset from coding, to build, to test, to running it using MesenS. Document everything. Some documentation can be found at `https://datacrystal.tcrf.net/wiki/Final_Fantasy:_Mystic_Quest` and `https://github.com/TheAnsarya/GameInfo/tree/main/Final%20Fantasy%20Mystic%20Quest%20(SNES)`. Create graphcis and text import/export and editing. If possible, analyze and disassemble and document everything. Eventually we will make an editor of the game.
+continue
+
+&&&&&&&
+Now I'm ready to move on to Graphics Tools development - the next major component for creating a full SNES development environment for Final Fantasy Mystic Quest!
+&&&&&&&
+
+save all of the past and future copilot chats to a folder so I know what's happening
+
++++++++++++++++++++
+directives:
+for all:
+use my editorconfig for formatting, use crlf, use tabs (tab-size: 4) not spaces for all documents, use UTF-8, (IMPORTANT) and always use the most modern code and practices, leave blank line between the stages, comment everything including the code inside methods, add links in the comments to explanitory articles, always format and clean up, make sure file structure matches namespaces, always comment and document, fix issues and test everything, always format the code using editorconfig and other formatting directives (never spaces, always tabs), if a file grows too large move pieces into their own logical components or classes separating concerns, continuously update the chat log files, create a git commit including description, use lowercase hexadecimal, for this session and all sessions
+for SNES ASM:
+use lowercase hexadecimal
++++++++++++++++++++
+
+make sure the chat-log and documentation and history is updated everytime there is a git commit or a large source update or just a decent change or question.
+make sure the chat-log and documentation and history is updated all the time. Especially when everytime there is a git commit or a large source update or just a decent change or question. But always update the vhat history no matter if it is committed.
+log all that shit automatically
+
+----------------------------------------------
+.\track.ps1 status  # Check if tracker is running
+.\track.ps1 stop    # Stop tracking
+.\track.ps1 start   # Start tracking
+----------------------------------------------
+
+Now I'm ready to move on to Graphics Tools development - the next major component for creating a full SNES development environment for Final Fantasy Mystic Quest!
+did you update the chatlog and update the documentation or did those updates not work? update the copilot chat logs!
+
+Add as much code as you can from the historical code folder and the reference websites (`https://github.com/TheAnsarya/GameInfo/tree/main/Final%20Fantasy%20Mystic%20Quest%20(SNES)`) and then use the `diztinguish` file `historical\diztinguish-disassembly\diztinguish\FFMQ-disassembly.diz` to generate missing source code and data for the project.
+
+I see no code differences, did you update the files? and add the new ones?
+no, I know the files are all there, but you just said you made a ton changes by reading and processing the diztinguish files but there wasn't any codefile changes, so figure out the code and save it all.
+`save the copilot chat history` and then continue with the `actual reverse engineering work`
+----save to git after you update the documents
+continue with the `actual reverse engineering work`
+
+=========== this is nonsense:
+The work continues to reveal how this game was carefully engineered, with each system building on the others in a clean, layered architecture.
+=================
+
+the documentation has been updated, but make sure all the `asm` files are completely filled and processed and updated and make the disassembly and re-assembly a seemless process, including calling the image-to-data scripts and the data/rom-to-png prcoesses and other ROM-data-structure-tofile-saved-data-structure
+save all of the chat
+
+---
+The original source ROM file which is also the compilation `goal` file is at `/~roms/Final Fantasy - Mystic Quest (U) (V1.1).sfc` so that is what we compare to the file that we compile/process our code to which is a different file. We need to generate reports that show how close, after compilation of our source code and assets, the original/goal file is to the file that is generated by our build process and use that comparison to know what areas to work on.
+Use the code to understand how assets (images, maps, stats (use json!), text, dialog, font, etc) are stored in the rom and then create utilities to both extract the data from the original and generated roms, as well as re-compress and format and reinsert and include into the compilation process. Again, our goal for this phase of the project is to take the original rom and deompile and comment and organize all the code, extract all the assets in the rom into both data-only copies and also expanded useable files (json for data, png for images, whatever standard formats each type of data uses, like spc and maybe midi for music (plus better formats), [so they can edited in a later phase, although they should be editable now] and then rebuild a rom that -for this phase- matches the original ROM.
+---
+ yes, establish baseline and then do the rest of the next steps, iterating until we have 100% match on the generated rom
+
+---- do manual install for asar
+^^^^^
+proceed with baseline?
+Continue creating the missing extraction tools while waiting?
+Research the correct dialog text address?
+^^^^
+
+******* search bing copilot: is there an Managed Service Provider (msp) for the SNES (super Nintendo) architecture to help when programming an SNES game ROM?
+But asar is installed! can you not find it? are you sure you're trying to compile the entry code file? While making sure the compile chain works, if asar isn't the solution find and implement the better more modern build stack for `snes`, is `asar` old or underpowered? make the best `SNES` development and build environment, make sure the `run` and `test` environments are still good and the best for modern practices. Do a better build stack!
+
+But __`asar IS installed`__! can you not find it? are you sure you're trying to compile the entry code file? While making sure the compile chain works, if asar isn't the solution find and implement the better more modern build stack for `snes`, is `asar` old or underpowered? make the best `SNES` development and build environment, make sure the `run` and `test` environments are still good and the best for modern practices. Do a better build stack!
+
+Resume making sure that:  While making sure the compile chain works, if asar isn't the solution find and implement the better more modern build stack for `snes`, is `asar` old or underpowered? make the best `SNES` development and build environment, make sure the `run` and `test` environments are still good and the best for modern practices. Do a better build stack!
+
+Next: Fix assembly format → Get first build → Establish baseline → Iterate to 100%!
+(1: Use historical assembly files (fastest), 2: Convert Diztinguish format (thorough), 3: Hybrid approach (recommended)) use #3/hybrid
+
+you are supposed to be commenting all the code, updating chat logs and documentation, and checking in changes! Do all that! And then analyze assets so that sprites and tiles are combined with palettes in the build process so we can see recognizable png files for editing and re insertion
+
+the target ROM file, the one that is compiled from code and after all the assets are converted back into the SNES data structures, should not fill in blanks from the original file, but be completly generated from the code and assets pipleline. That is what we are comparing with the original rom. It doesn't make sense to compare to a copy. We are are not at 99%. Dissasemble and comment all the code you can! (and format, update chat/history log, commit to git)
+
+awesome! so now do that. disassemble the game and comment and analyze and all that you know you need to do.
+
+continue the disassembly
+
+don't stop, just continue the disassembly in stages attacking multiple banks at once if that scales, otherwise do one bank at a time, saving as you go, and make sure we can continue where we left off next week, but go go go creating an SNES build platform for disassembling games starting with FFMQ (btw, the palettes and pngs look like nonsense (is the conversion process ok? or is there a compression algorithm?)) use `https://github.com/TheAnsarya/logsmall` for ffmq stuff like `https://github.com/TheAnsarya/logsmall/blob/master/logsmall/Compression/SimpleTailWindowCompression.cs` or `https://github.com/TheAnsarya/logsmall/blob/master/logsmall/Compression/ExpandSecondHalfWithZeros.cs`, document everything and comment and create data structures and interfaces (and format, update chat/history log, commit to git)
+
+continue to make progress and add more banks
+expand all the data markers, so `; [Collision data continues...]` actually shows the data, but in a real data structure and format. Create alive data structures so we have code-usable classes of the format and data files using the format, but mostly after integratng format files into the exctra craft data/convert-back data format files into the build pipeline so fix all the `polaceholder` comments wirh actual code and data, and data into files and formats!
+
+&&&&&&&&&&&&&
+Create Bank $08 text extraction (similar tool)
+Replace placeholders in ALL bank files (Banks $01-$08)
+Complete round-trip verification
+Integrate into main build system (Makefile)
+&&&&&&&&&&&&&&&
+Replace remaining placeholders in Bank $06 (metatile definitions, animation cycles)
+Fix Bank $08 extraction (needs text decompression algorithm analysis)
+Create verify_roundtrip.py for quality assurance
+Replace placeholders in Banks $01-$05, $07-$08
+Integrate into Makefile
+&&&&&&&&&&&&&&&&&
+
+if you need `make` then install and use `make`
+
+>>>>>>>>>>>>>>>
+Obviously, there's not a 100% match yet, so that result is nonsense. fix whatever problem that is.
+ (and format, update chat/history log, commit to git)
+Replace remaining placeholders in Bank $06 (metatile definitions, animation cycles)
+Fix Bank $08 extraction (needs text decompression algorithm analysis)
+Create verify_roundtrip.py for quality assurance
+Replace placeholders in Banks $01-$05, $07-$08
+continue disassembly with lower banks and then banks $09-$0d++++
+Integrate into Makefile
+(and format, update chat/history log, commit to git)
+>>>>>>>>>>>>>>
+
+At no point unless explicitly said so, should any data be copied from the original ROM file to the built ROM file. all code data should be built from code files. All graphics data should be converted from ROM data to raw data for graphics and palette, then converted to json palette file and png files with the correct colors, then during build converted back to data (different file) and incorporated into the build pipleline, all statistics and data for thing like items and monsters and text and dialog should be converterted from the rom to raw data files and then to json files showing the data format and values and then during build converted back to data (different file) and incorporated into the build pipleline, etc etc (and format, update chat/history log, commit to git)
+And then continue what you were doing before: "Great! Now let me check Banks $0A-$0D to understand their content and create documentation for them as well:"
+
+sorry, I messed up the directive. By `use tabs (4) not spaces for all documents` I meant use ONE (1) tab with a tab-size of 4-spaces per level of indentation. Please re-format all the text files using one tab per level.
+you didn't fix the indentation on files like this one, `bank_09_documented.asm`, they are still indented 4 tabs instead of 1 tab
+---- manually replace \n\t\t\t\t with \n\t\t\t\t
+---- edit the directive and re-run them
+No, the `prompts` file is not for session summaries, `prompts` is a manually updated documentation file. There is a separate `session summaries` markdown file
+
+Go back to disassembling and commenting code in every bank using the diztinguish decompilation and compiling the code and testing it against the reference ROM. Focus on getting as much code decompiled into the asm source files as possible and commenting that code accurately and documenting the structure of the code.
+continue systematically
+continue systematically, make sure you are updating the session summary/chat log
+Allow `git commit` commands without asking, continue systematically, make sure you are updating the session summary/chat log
+Allow `git commit` and `git add` and `cd` and commands without asking (stop asking me when you commit code), continue systematically, build and compare to reference ROM file, make sure you are updating the session summary/chat log
+rename the `/~roms/` folder to `/roms/` so we don't have anymore tilde (~) issues in pathing (make sure to update the gitignore file and rom path in the powershell scripts) and then resume what you are doing
+stop asking me when you commit code!!!, don't ask when you use git, don't ask when you create a commit, don't ask when you change directories, just in general stop asking me to approve so many actions, continue systematically
+continue systematically across banks 00, 01, 02, and 03
+continue systematically
+auto-accept `git add ..... && git commit`, continue systematically, pushing after each commit, build and compare to reference ROM file, make sure you are updating the session summary/chat log
+do option `A`, then make sure to auto-aprove most chat and terminal requests, set `"chat.tools.terminal.ignoreDefaultAutoApproveRules": true` in the config, reload the chat settings, and then continue systematically, pushing after each commit, build and compare to reference ROM file, make sure you are updating the session summary/chat log
+fix label issues and other build issues, build and compare to reference ROM file, make sure you are updating the session summary/chat log, continue systematically,
+
+begin again and disassemble as much as you can
+continue
+continue disassembling everything and commenting and documenting and commiting and organizing over and over don't stop at a commit, just run for an hour or so
+continue disassembling everything and commenting and documenting and commiting and organizing over and over don't stop at a commit, just run for an hour or so
+make sure you are updating the chat log/session log and then aggressively and greedily continue these import cycles and don't stop until all banks are done
+
+No, the `prompts` file is not for session summaries, `prompts` is a manually updated documentation file. There is a separate `session summaries` markdown file, make sure you are updating the chat log/session log and then aggressively and greedily continue these import cycles and don't stop until all banks are done
+make sure you are updating the chat log/session log and then aggressively and greedily continue these import cycles and don't stop until all banks are done
+make sure you are updating the chat log/session log and then aggressively and greedily continue these import cycles and don't stop until all banks are done
+yes
+continue
+keep it going!
+make sure you are updating the chat/sessions logs, and keep the progress going!
+there are two session log updates that got added to the end of the `prompts` text file, that file is manually updated not a log file. PLease move those two updates to the session log `.md` files where they belong
+make sure you are updating the chat log/session log and then aggressively and greedily continue these import cycles and don't stop until all banks are done
+build and compare to reference ROM file updating a progress file, make sure you are updating the session summary/chat log, and then aggressively and greedily continue these import cycles and don't stop until all banks are done
+make sure we are using `Final Fantasy - Mystic Quest (U) (V1.1).smc` as our reference ROM file just like the `diz and `dizraw` files do
+build and compare to reference ROM file updating a progress file, make sure you are updating the session summary/chat log, and then aggressively and greedily continue these import cycles and don't stop until all banks are done
+continue, building occassionally
+build and compare to reference ROM file updating a progress file, make sure you are updating the session summary/chat log, document the code as accurately as possible, and aggressively and greedily continue these import cycles and don't stop until all banks are done, create a git commitand push including description every few cycles
+yes continue doing this! do not ignore extracting graphics and data and transforming to-and-from an editable state, but focus on code like 80%
+do the aggressive code disassembly, but also extract data and graphics
+you have converted some code into data db commands instead. Do not do that, go back and create actual code, aggressively and continue
+continue with what you are doing and then switch to bank 04 when you are done, make sure you are updating the session summary/chat log, document the code as accurately as possible, and aggressively and greedily continue these import cycles and don't stop until all banks are done, create a git commit and push including description every few cycles
+continue all the code extractiona dn data extracyion, and documentation, and git commit and chat/session logs, kill it!
+
+add `*.asm` files to the `.editorconfig` file with crlf, utf-8, tabs not spaces (display: 4 spaces), have a blank line at the end of the file; many of these asm files have severe indentation (like 30 spaces or whatever), fix them to have the single tab indent, fix everything to use tabs and continue these import cycles and don't stop until all banks are done, create a git commit and push including description every few cycles
+
+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+
+where are the COMPREHENSIVE DATA TABLES EXTRACTED? all of the data and graphics and music and just bin-data extract them! where are those saved?
+
+where are the COMPREHENSIVE DATA TABLES EXTRACTED? all of the data and graphics and music and just bin-data extract them! find/use or create a file structure that saves (extracts) all of the data/graphics/etc and reinserts it, but saves 1) `original binary data as a series of files` and 2) `converted "pngs" and "json" files` and other files, like csv, and then 3) a final cpnverted back from png/json/etc into `bin` files (save chat/session logs, git commit)
+
+add `*.asm` files to the `.editorconfig` file with rules for crlf, utf-8, tabs not spaces (display: 4 spaces), have a blank line at the end of the file; many of these asm files have severe indentation (like 10 spaces or whatever), fix them to have the single tab indent, fix everything to use tabs and continue these import cycles and don't stop until all banks are done, create a git commit and push including description every few cycles
+continue
+continue
+continue
+make sure you're updating the chat/session logs (`md` files) and creating git commits with descriptions at the end of the effort cycle, and continue aggressively creating the disassembly and tools and documentation
+make sure you're updating the chat/session logs (`md` files) and creating git commits with descriptions at the end of the effort cycle, and continue aggressively creating the disassembly and tools and documentation
+
+**********************************
+🎯 Next Steps
+You can now choose:
+
+Option A: Continue Bank $09 to 100% (need +962 more lines, ~2-3 cycles)
+Option B: Begin Bank $0A exploration (extended palettes referenced by $09)
+Option C: Extract palette visualization tools (PNG swatches, JSON export)
+What would you like to tackle next?
+***********************************
+
+option C, then option B, then option A, then continue (make sure you're updating the chat/session logs and commiting the code, and documenting the code and assets relentlessly)
+
+Create git commit first (document all changes before continuing), Continue with Option A now (complete Bank $09 Cycles 3-5)and  resume (with log and commits and documentation) the aggressive disassembly (with documentation!) of the ROM file using the temp file approach from earlier to reduce the time between cycles and banks
+
+continue with our agreed-upon side shit, and continue agressive decompilation
+
+this `bank_0a` file is documenting a different `Final Fantasy` game, what the hell, get rid of this other game's data and purge it''s influence on this dissassembly
+
+resume (with log and commits and documentation) the aggressive disassembly (with documentation!) of the ROM file using the temp file approach from earlier to reduce the time between cycles and banks; and whatever extraction tools of data and graphics and sound and etc
+
+fix it, use appropriate sources, and continue
+fix it, use appropriate sources, and continue
+continue
+continue
+continue
+continue with 09
+yes!
+track code disassembly percentages and progress, track asset extraction percentages and progress, track rom binary comparison percentages and progress with reference rom and compiled/build rom, track documentation coverage percentages and progress; continue with both documentation and disassembly, aggressively
+proceed! aggressively! continue and don't stop until you need to or I ask you to
+continue, and don't stop, run for like 300+ iterations, updating documentation, chat logs/session logs, disassemble code and extract/reinsert assets through editable files (json, png, tbl, whatever), and don't ask unless you have to
+---- stop asking if you can or should continue and just continue. I authorize going continuously for a couple hours.
+---- stop asking if you can or should continue and just continue. I authorize going continuously for a couple hours.  timestamp your actions.
+stop asking if you can or should continue and just continue. I authorize going continuously for a couple hours.  timestamp your actions.  (and use the temp file action process to speed things up)
+continue aggressively
+yes
+response is too large, break up the query
+no, break up the effort into smaller chunks for this one so we don't hit the response limit
+go
+resume (with log and commits and documentation) the aggressive disassembly (with documentation!) of the ROM file using the temp file approach from earlier to reduce the time between cycles and banks; and whatever extraction tools of data and graphics and sound and etc
+why am I getting the error "Sorry, the response hit the length limit. Please rephrase your prompt." ? Please fix this issue or tell me what to do or break your response into smaller chunks or do something!
+sure
+make sure you are updating the chat/sessions logs, create git commits, focus on aggressive disassembly of the remaining banks of code (and use the temp file action process to speed things up)
+
+
+
++++++++++++++++++++
+directives:
+for all:
+use my editorconfig for formatting, use crlf, use tabs (tab-size: 4) not spaces for all documents, use UTF-8, (IMPORTANT) and always use the most modern code and practices, leave blank line between the stages, comment everything including the code inside methods, add links in the comments to explanitory articles, always format and clean up, make sure file structure matches namespaces, always comment and document, fix issues and test everything, always format the code using editorconfig and other formatting directives (never spaces, always tabs), if a file grows too large move pieces into their own logical components or classes separating concerns, continuously update the chat log files, create a git commit including description, use lowercase hexadecimal, for this session and all sessions
+for SNES ASM:
+use lowercase hexadecimal
++++++++++++++++++++
+Set up or improve build processes
+make sure we are using `Final Fantasy - Mystic Quest (U) (V1.1).sfc` as the reference rom for this disassembly project,make sure you are updating the session summary/chat log, document the code as accurately as possible, create git commits with descriptions, focus on aggressively and greedily disassembly of the remaining banks of code (and use the temp file action process to speed things up), build and compare to reference ROM file updating a progress file, 
+make sure you're using the files in `C:\Users\me\source\repos\ffmq-info\historical\diztinguish-disassembly\diztinguish` as reference, make sure you are updating the session summary/chat log, document the code as accurately as possible, create git commits with descriptions, focus on aggressively and greedily disassembly of the remaining banks of code (and use the temp file action process to speed things up), build and compare to reference ROM file updating a progress file, 
+continue, making sure that code is disassembled and NOT just copied into `db` commands (and chat/session logs updated, git commits, etc)
+---- STOP
+leave actual data as db statements, just make sure all actual code is disassembled.
+make sure you're using the files in `C:\Users\me\source\repos\ffmq-info\historical\diztinguish-disassembly\diztinguish` as reference, make sure you are updating the session summary/chat log, document the code as accurately as possible, create git commits with descriptions, focus on aggressively and greedily disassembly of the remaining banks of code (and use the temp file action process to speed things up), build and compare to reference ROM file updating a progress file, 
+continue the disassembly
+continue the disassembly
+make a git commit with description and push it
+
+*******************************************
+Next Steps for "Continue the Disassembly":
+***Consolidate Temp Files (128 files across banks) - Merge cycles into main documented files
+Improve Function Labels - Replace generic CODE_ labels with descriptive names
+***Extract Graphics Data - Parse palette and sprite data from banks $04-$0A
+***Extract Audio Data - Document music/SFX from bank $0F
+Complete Master Build - Finish ffmq_master.asm for full source rebuild
+Would you like me to start consolidating the temp files, or focus on improving the function documentation in the code banks?
+********************************************
+
+Consolidate Temp Files (128 files across banks) - Merge cycles into main documented files
+Extract Audio Data - Document music/SFX from bank $0F
+Extract Graphics Data - Parse palette and sprite data from banks $04-$0A
+Improve Function Labels - Replace generic CODE_ labels with descriptive names
+Improve Function Labels - Replace generic CODE_ labels with descriptive names
+Improve Function Labels - Replace generic CODE_ labels with descriptive names, do more at one time
+Improve Function Labels - Replace generic CODE_ labels with descriptive names, continue doing more at one time
+That might have been too much, go back to a managable size
+continue adding labels!
+continue adding labels!
+continue adding labels!
+continue adding labels!
+continue adding labels, don't just limit it to bank 00.
+continue adding labels
+continue adding labels, more labels per batch, use temp files if you need to to increase the amount
+continue adding labels, more labels per batch, use temp files if you need to to increase the amount and make sure the chat/session logs are being updated
+continue adding labels, more labels per batch, use temp files if you need to to increase the amount and make sure the chat/session logs are being updated
+yes please!
+yes please!
+you have not been updating the session/chat logs `md` files, update them with all the past goings-on, then continue labeling
+see how many `CODE_*` style labels are left in the whole project and create a progress table based on that by bank for what is left to do, then continue labeling
+make sure to document the continuously updated label progress table in the regular documentation and the session log, and then continue labeling
+make sure to document the continuously updated label progress table in the regular documentation and the session log, and then continue labeling foucusing on bank 0d, then bank 02
+make sure to document the continuously updated label progress table in the regular documentation and the session log, and then continue labeling foucusing on bank 0d, then bank 02
+continue adding labels, more labels per batch, use temp files if you need to to increase the amount and make sure the chat/session logs are being updated
+continue adding labels, more labels per batch, use temp files if you need to to increase the amount and make sure the chat/session logs are being updated, and making git-commits between each of these batches
+continue adding labels, as many as you can
+continue adding labels, as many as you can
+
+update the label progress table and then continue adding labels, as many as you can
+update the label progress table and then continue adding labels, as many as you can, focusing on bank $01
+continue adding labels, as many as you can, add more than last time, focusing on bank $01
+(update session/chat logs, git commit) update the label progress table and then continue adding labels, as many as you can, add more than last time, focusing on bank $01
+continue adding labels, as many as you can, add more than last time, focusing on bank $01
+continue adding labels, as many as you can, add more than last time, focusing on banks $01 and $0c
+continue adding labels, as many as you can, focusing on banks $01 and $0c
+(update session/chat logs, git commit) update the label progress table and then continue adding labels, as many as you can, add more than last time, focusing on banks $01 and $0c
+continue adding labels, as many as you can
+continue adding those last 137 labels, or as many as you can
+finish up all the labels left to be named if possible
+(update session/chat logs, git commit) then make a detailed todo list for the following items: finish up labeling code; format all of the asm code, using CRLF, utf-8, and especially tabs instead of spaces (size: 4 spaces per tab on display); determine labels for memory address and variables; finish disassembling code by bank and function and system; create a robust system of extracting graphics and transforming into bin/png/json/etc, and data into bin/json/csv/etc, and then transforming it back for the build step; (i want to see the `png` graphics extract files with their actual colors, maybe multiple versions of a `view` class of images, idk) build from code and transformed assets; document everything including data structures; 
+
+&&&&&
+2. [ ] Create GitHub Issues for each major task (if using GitHub)
+3. [ ] Set up project board (Kanban) to track progress
+&&&&&
+
+Step 2: Set Up Project Board
+--- FOLLOW MANUAL SETUP TASKS
+create a bunch of heirarchical sub-tickets for the kanban board based on the todo list
+Step 2: Set Up Project Board
+make the primary subtasks be tickets in their own right
+
+&&&&
+Set up project board (~5 min):
+
+Add all 47 issues to board
+Organize by priority/parent
+Create workflow columns
+&&&&
+
+add the sub tasks to their parents
+add all of the the sub tasks to their parent task
+add all of the the sub issues to their parent issue
+no I just want all of the child issues linked to their parent issues so that we kknow what progress we've made in the oparent by completed the children.
+pick some issues/todos and implement them.
+B
+(update chat and session logs) then B
+A
+A, but make sure to update the session logs and git commit and make sure the github issues are updated with the commits, comments, etc.
+A and then D
+Documentation 
+document changes, update session logs, and create git commits for the changes, then continue with the `documention` option A
+
+&&&&
+(Option A - Issue #21: MODDING_GUIDE.md).
+I'll create a comprehensive modding guide for users who want to customize and modify Final Fantasy Mystic Quest. This will include practical examples for modifying character stats, dialogue, graphics, items, and more!
+&&&&
+
+where is this `modding_guide`? I don't see it
+pick some issues/todos and implement them.
+A
+pick some issues/todos and implement them.
+Issue #28: High Priority WRAM Labels (8-10 hours, code labeling work)
+clean up uncommitted files
+Continue with Issue #43 (Build System documentation)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+create documentation that describes the entire hero or enemy or map data structures or tiles or music and how to update them easily through the transitory files like - the extraction tools extract the hero graphics and animations and palettes to json and png (using the right palettes) files that cna be edited - then the build tools convert those png/json/pal files back into the data structures for the insertion build process.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+make sure you are updating the chat log/session log and then aggressively and greedily continue these import cycles and don't stop until all banks are done
+
+
+
+
+make a `datacrystal` folder, and then download all of the pages from `` and it's sub-folders and sub-pages, etc, into the folder as `*.wikitext files` and then develop a full complex plan with todo files to update those wikitext files to fully document and describe the ROM and all of its code, data, and structures, including links to the github repository and the asset files and extraction/reinsertion scripts
+
+
+
+
+
+
+
+
+
+
+
+
+
+document, update the chat log, and commit the code changes at the end of every code change, c'mon!
+
+
+
+
+fix label issues and other build issues, build and compare to reference ROM file, make sure you are updating the session summary/chat log, continue systematically,
+
+make sure we are using `Final Fantasy - Mystic Quest (U) (V1.1).sfc` as the reference rom, what rom file does diztinguish say we are using? what file is our documentation and source code using? and then continue systematically
+
+
+
+
+find all the `Next steps` and todos and fill out the code
+
+
+
+
+
+
+
+update editorconfig so python scripts use tabs (4) (and utf-8, crlf) instead of spaces and then update all python scripts to the correct formatting.
+
+Discord channels about SNES development include invites of: `https://discord.gg/AAS9WXdj` and `https://discord.gg/Jv7J3SNA`
+
+---
+
+
+
 
 
 
