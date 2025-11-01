@@ -167,7 +167,7 @@ mesen build/ffmq-rebuilt.sfc
 
 # Format multiple files
 Get-ChildItem src\asm\bank_*.asm | ForEach-Object {
-    .\tools\format_asm.ps1 -Path $_.FullName
+	.\tools\format_asm.ps1 -Path $_.FullName
 }
 ```
 

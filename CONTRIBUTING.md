@@ -146,7 +146,7 @@ You can use VS Code tasks to format files:
 ```powershell
 # Format all bank files
 Get-ChildItem src\asm\bank_*.asm | ForEach-Object {
-    .\tools\format_asm.ps1 -Path $_.FullName
+	.\tools\format_asm.ps1 -Path $_.FullName
 }
 ```
 

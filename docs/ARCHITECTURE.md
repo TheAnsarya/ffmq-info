@@ -1,4 +1,4 @@
-﻿# Final Fantasy Mystic Quest - System Architecture
+# Final Fantasy Mystic Quest - System Architecture
 
 ## Document Overview
 
@@ -220,11 +220,11 @@ CPU ←──────────→ WRAM ($7e/$7f)
  ├──→ ROM Banks ($00-$0f:8000-FFFF via LoROM mapping)
  ├──→ SRAM ($70/$71 for save data)
  └──→ Hardware Registers ($21xx-$43xx)
-      ↓
-      ├──→ VRAM (via $2115-$2119) ← DMA Channels
-      ├──→ CGRAM (via $2121-$2122)
-      ├──→ OAM (via $2102-$2104)
-      └──→ SPC700 Audio (via $2140-$2143)
+	  ↓
+	  ├──→ VRAM (via $2115-$2119) ← DMA Channels
+	  ├──→ CGRAM (via $2121-$2122)
+	  ├──→ OAM (via $2102-$2104)
+	  └──→ SPC700 Audio (via $2140-$2143)
 ```
 
 ---
@@ -376,13 +376,13 @@ FFMQ uses NTSC timing primarily.
 ┌─────────────────────────────────────────┐
 │         START OF FRAME                  │
 └─────────────────────────────────────────┘
-              ↓
+			  ↓
 ┌─────────────────────────────────────────┐
 │  [1] Wait for VBlank (NMI)              │
 │      - CPU halts (WAI instruction)      │
 │      - Hardware triggers NMI interrupt  │
 └─────────────────────────────────────────┘
-              ↓
+			  ↓
 ┌─────────────────────────────────────────┐
 │  [2] VBlank Handler (NMI Routine)       │
 │      - DMA graphics to VRAM             │
@@ -392,12 +392,12 @@ FFMQ uses NTSC timing primarily.
 │      - Read joypad input                │
 │      - Increment frame counter          │
 └─────────────────────────────────────────┘
-              ↓
+			  ↓
 ┌─────────────────────────────────────────┐
 │  [3] Return from NMI                    │
 │      - CPU resumes main loop            │
 └─────────────────────────────────────────┘
-              ↓
+			  ↓
 ┌─────────────────────────────────────────┐
 │  [4] Update Game State (Active Render)  │
 │      - Process controller input         │
@@ -412,7 +412,7 @@ FFMQ uses NTSC timing primarily.
 │      - Build OAM buffer in WRAM         │
 │      - Prepare VRAM updates             │
 └─────────────────────────────────────────┘
-              ↓
+			  ↓
 ┌─────────────────────────────────────────┐
 │  [5] Prepare Next Frame Assets          │
 │      - Queue graphics for DMA           │
@@ -420,7 +420,7 @@ FFMQ uses NTSC timing primarily.
 │      - Update palette buffers           │
 │      - Calculate music/SFX commands     │
 └─────────────────────────────────────────┘
-              ↓
+			  ↓
 ┌─────────────────────────────────────────┐
 │  [6] Loop Back                          │
 │      - Jump back to [1] (Wait for VBlank)
@@ -601,34 +601,34 @@ Main CPU reads $2140 to confirm
 │              Main Game Loop (Bank $00)          │
 │         (Orchestrates all subsystems)           │
 └────────────────────────────────────────────────┘
-      ↓              ↓              ↓
+	  ↓              ↓              ↓
 ┌──────────┐   ┌──────────┐   ┌──────────┐
 │ Graphics │   │   Text   │   │  Audio   │
 │  Engine  │←──│  Engine  │   │  Engine  │
 │ (Banks   │   │ (Bank 0C)│   │ (SPC700) │
 │ 00-02,04)│   └──────────┘   └──────────┘
 └──────────┘        ↑              ↑
-      ↑             │              │
-      │     ┌───────┴──────────────┴──────┐
-      │     │                              │
+	  ↑             │              │
+	  │     ┌───────┴──────────────┴──────┐
+	  │     │                              │
 ┌─────┴─────┴──────┐   ┌──────────────────┴──────┐
 │  Field/Map System │   │    Battle System        │
 │  (Banks 03,06,0A) │   │    (Bank 09)            │
 └───────────────────┘   └─────────────────────────┘
-      ↑                           ↑
-      │                           │
-      └───────────┬───────────────┘
-                  │
-         ┌────────┴────────┐
-         │  Menu System    │
-         │  (Banks 0C-0D)  │
-         └─────────────────┘
-                  ↑
-                  │
-         ┌────────┴────────┐
-         │  Save/Load      │
-         │  (SRAM $70-$71) │
-         └─────────────────┘
+	  ↑                           ↑
+	  │                           │
+	  └───────────┬───────────────┘
+				  │
+		 ┌────────┴────────┐
+		 │  Menu System    │
+		 │  (Banks 0C-0D)  │
+		 └─────────────────┘
+				  ↑
+				  │
+		 ┌────────┴────────┐
+		 │  Save/Load      │
+		 │  (SRAM $70-$71) │
+		 └─────────────────┘
 ```
 
 **Key Dependencies:**
@@ -651,14 +651,14 @@ Main CPU reads $2140 to confirm
 ╠═══════════════════════════════════════════════════════════════════╣
 ║  CPU: 65816 (16-bit) │ PPU │ SPC700 Audio │ DMA │ Joypad │ SRAM   ║
 ╚═══════════════════════════════════════════════════════════════════╝
-                              ↓ ↑
+							  ↓ ↑
 ╔═══════════════════════════════════════════════════════════════════╗
 ║                      Memory Subsystem                              ║
 ╠═══════════════════════════════════════════════════════════════════╣
 ║ ROM (16 Banks × 32KB) │ WRAM (128KB) │ VRAM (64KB) │ CGRAM (512B) ║
 ║ SRAM (64KB Battery)   │ OAM (544B)    │ APU Ports                  ║
 ╚═══════════════════════════════════════════════════════════════════╝
-                              ↓ ↑
+							  ↓ ↑
 ┌───────────────────────────────────────────────────────────────────┐
 │                     Core Engine (Banks $00-$02)                    │
 ├───────────────────────────────────────────────────────────────────┤
@@ -669,7 +669,7 @@ Main CPU reads $2140 to confirm
 │  • Mode State Machine                                              │
 │  • Interrupt Handlers (NMI/IRQ)                                    │
 └───────────────────────────────────────────────────────────────────┘
-         ↓                    ↓                    ↓
+		 ↓                    ↓                    ↓
 ┌──────────────────┐  ┌──────────────────┐  ┌──────────────────┐
 │ Graphics Engine  │  │   Text Engine    │  │  Audio Engine    │
 │  (Banks 00-02)   │  │   (Bank $0c)     │  │  (SPC700 CPU)    │
@@ -680,14 +680,14 @@ Main CPU reads $2140 to confirm
 │ • Palette Load   │  │ • Font Drawing   │  │ • Channel Mixing │
 │ • BG Scroll      │  │ • Text Compress  │  └──────────────────┘
 └──────────────────┘  └──────────────────┘
-         ↑                    ↑                    ↑
-         │                    │                    │
+		 ↑                    ↑                    ↑
+		 │                    │                    │
 ┌────────┴────────────────────┴────────────────────┴───────────────┐
 │                    Game Mode Dispatcher                            │
 ├───────────────────────────────────────────────────────────────────┤
 │  Mode Switch: Title → Field → Battle → Menu → Event               │
 └───────────────────────────────────────────────────────────────────┘
-    ↓            ↓            ↓            ↓            ↓
+	↓            ↓            ↓            ↓            ↓
 ┌────────┐  ┌────────┐  ┌────────┐  ┌────────┐  ┌────────┐
 │ Title  │  │ Field  │  │ Battle │  │  Menu  │  │ Event  │
 │ Screen │  │ System │  │ System │  │ System │  │ System │
@@ -701,18 +701,18 @@ Main CPU reads $2140 to confirm
 │• Save  │  │• NPC   │  │• Damage│  │• Status│  │• Trig  │
 │  Select│  │• Collid│  │• Anim  │  │• Save  │  │• Dialog│
 └────────┘  └────────┘  └────────┘  └────────┘  └────────┘
-                │            │            │
-                └────────────┴────────────┘
-                             ↓
-                    ┌─────────────────┐
-                    │ Data Layer      │
-                    ├─────────────────┤
-                    │ • Maps (Bank 6) │
-                    │ • Tiles (4/5)   │
-                    │ • Text (Bank 8) │
-                    │ • Palettes (7)  │
-                    │ • SRAM (Save)   │
-                    └─────────────────┘
+				│            │            │
+				└────────────┴────────────┘
+							 ↓
+					┌─────────────────┐
+					│ Data Layer      │
+					├─────────────────┤
+					│ • Maps (Bank 6) │
+					│ • Tiles (4/5)   │
+					│ • Text (Bank 8) │
+					│ • Palettes (7)  │
+					│ • SRAM (Save)   │
+					└─────────────────┘
 ```
 
 ### Data Flow Diagram
@@ -722,26 +722,26 @@ Main CPU reads $2140 to confirm
 │ Player      │
 │ Controller  │
 └──────┬──────┘
-       ↓
+	   ↓
 ┌──────────────────────────────────┐
 │  Joypad Auto-Read ($4218-$421b)  │
 │  (During VBlank)                 │
 └──────────────┬───────────────────┘
-               ↓
+			   ↓
 ┌──────────────────────────────────┐
 │  Input Processing                │
 │  (Main Loop, Active Render)      │
 └──────────────┬───────────────────┘
-               ↓
-       ┌───────┴────────┐
-       ↓                ↓
+			   ↓
+	   ┌───────┴────────┐
+	   ↓                ↓
 ┌─────────────┐  ┌─────────────┐
 │ Field Input │  │ Battle Input│
 │ Processing  │  │ Processing  │
 └──────┬──────┘  └──────┬──────┘
-       │                │
-       └────────┬───────┘
-                ↓
+	   │                │
+	   └────────┬───────┘
+				↓
 ┌──────────────────────────────────┐
 │  Update Game State (WRAM)        │
 │  • Character position            │
@@ -749,18 +749,18 @@ Main CPU reads $2140 to confirm
 │  • Map state                     │
 │  • Flags/progression             │
 └──────────────┬───────────────────┘
-               ↓
+			   ↓
 ┌──────────────────────────────────┐
 │  Build Graphics Buffers (WRAM)   │
 │  • OAM buffer ($0c00+)           │
 │  • VRAM update queue             │
 │  • Palette update queue          │
 └──────────────┬───────────────────┘
-               ↓
+			   ↓
 ┌──────────────────────────────────┐
 │  Wait for VBlank (WAI)           │
 └──────────────┬───────────────────┘
-               ↓
+			   ↓
 ┌──────────────────────────────────┐
 │  NMI Handler (VBlank Interrupt)  │
 │  ┌────────────────────────────┐  │
@@ -771,7 +771,7 @@ Main CPU reads $2140 to confirm
 │  │ 5. Send audio commands     │  │
 │  └────────────────────────────┘  │
 └──────────────┬───────────────────┘
-               ↓
+			   ↓
 ┌──────────────────────────────────┐
 │  PPU Renders Frame (Hardware)    │
 │  • Reads VRAM for tiles          │
@@ -779,8 +779,8 @@ Main CPU reads $2140 to confirm
 │  • Reads CGRAM for colors        │
 │  • Outputs to TV (60 Hz)         │
 └──────────────────────────────────┘
-               ↓
-         Loop back to top
+			   ↓
+		 Loop back to top
 ```
 
 ---

@@ -1,61 +1,61 @@
-﻿#!/usr/bin/env pwsh
+#!/usr/bin/env pwsh
 <#
 .SYNOPSIS
-    Creates hierarchical sub-issues (task lists) for GitHub issues based on TODO.md
+	Creates hierarchical sub-issues (task lists) for GitHub issues based on TODO.md
 
 .DESCRIPTION
-    This script creates detailed sub-tasks for each main GitHub issue by adding
-    task list comments to each issue based on the hierarchical breakdown in TODO.md
+	This script creates detailed sub-tasks for each main GitHub issue by adding
+	task list comments to each issue based on the hierarchical breakdown in TODO.md
 
 .PARAMETER DryRun
-    If specified, shows what would be created without making changes
+	If specified, shows what would be created without making changes
 
 .EXAMPLE
-    .\create_github_sub_issues.ps1
-    Creates all sub-task comments
+	.\create_github_sub_issues.ps1
+	Creates all sub-task comments
 
 .EXAMPLE
-    .\create_github_sub_issues.ps1 -DryRun
-    Shows what would be created without making changes
+	.\create_github_sub_issues.ps1 -DryRun
+	Shows what would be created without making changes
 #>
 
 param(
-    [switch]$dryRun
+	[switch]$dryRun
 )
 
 $errorActionPreference = "Stop"
 
 # Check if gh CLI is installed and authenticated
 function Test-GitHubCLI {
-    try {
-        $null = gh --version 2>$null
-        $authStatus = gh auth status 2>&1
-        if ($LASTEXITCODE -ne 0) {
-            Write-Error "GitHub CLI not authenticated. Run: gh auth login"
-            exit 1
-        }
-        Write-Host "✓ GitHub CLI authenticated" -ForegroundColor Green
-        return $true
-    }
-    catch {
-        Write-Error "GitHub CLI not found. Install from: https://cli.github.com"
-        exit 1
-    }
+	try {
+		$null = gh --version 2>$null
+		$authStatus = gh auth status 2>&1
+		if ($LASTEXITCODE -ne 0) {
+			Write-Error "GitHub CLI not authenticated. Run: gh auth login"
+			exit 1
+		}
+		Write-Host "✓ GitHub CLI authenticated" -ForegroundColor Green
+		return $true
+	}
+	catch {
+		Write-Error "GitHub CLI not found. Install from: https://cli.github.com"
+		exit 1
+	}
 }
 
 # Get the repository name
 function Get-RepoName {
-    try {
-        $remote = git remote get-url origin
-        if ($remote -match "github\.com[:/](.+)/(.+?)(\.git)?$") {
-            return "$($matches[1])/$($matches[2])"
-        }
-        throw "Could not parse repository name from git remote"
-    }
-    catch {
-        Write-Error "Could not determine repository name: $_"
-        exit 1
-    }
+	try {
+		$remote = git remote get-url origin
+		if ($remote -match "github\.com[:/](.+)/(.+?)(\.git)?$") {
+			return "$($matches[1])/$($matches[2])"
+		}
+		throw "Could not parse repository name from git remote"
+	}
+	catch {
+		Write-Error "Could not determine repository name: $_"
+		exit 1
+	}
 }
 
 Write-Host "🔧 GitHub Sub-Issue Creator for FFMQ Disassembly Project" -ForegroundColor Cyan
@@ -67,12 +67,12 @@ $repo = Get-RepoName
 Write-Host "✓ Repository: $repo`n" -ForegroundColor Green
 
 if ($dryRun) {
-    Write-Host "🔍 DRY RUN MODE - No changes will be made`n" -ForegroundColor Yellow
+	Write-Host "🔍 DRY RUN MODE - No changes will be made`n" -ForegroundColor Yellow
 }
 
 # Define sub-tasks for each main issue using here-strings to avoid quoting issues
 $subTasks = @{
-    "1" = @"
+	"1" = @"
 ## Sub-Tasks Checklist
 
 ### Prerequisites
@@ -130,7 +130,7 @@ $subTasks = @{
 **Total: 36 sub-tasks** | See [TODO.md](TODO.md) for detailed context and estimates (16-24 hours)
 "@
 
-    "2" = @"
+	"2" = @"
 ## Sub-Tasks Checklist
 
 ### Documentation Audit & Planning
@@ -185,7 +185,7 @@ $subTasks = @{
 **Total: 37 sub-tasks** | See [TODO.md](TODO.md) for detailed context and estimates (8-12 hours)
 "@
 
-    "3" = @"
+	"3" = @"
 ## Sub-Tasks Checklist
 
 ### Address Inventory & Analysis
@@ -261,7 +261,7 @@ $subTasks = @{
 **Total: 54 sub-tasks** | See [TODO.md](TODO.md) for detailed context and estimates (40-60 hours)
 "@
 
-    "4" = @"
+	"4" = @"
 ## Sub-Tasks Checklist
 
 ### Core Graphics Extraction Tools
@@ -348,7 +348,7 @@ $subTasks = @{
 **Total: 62 sub-tasks** | See [TODO.md](TODO.md) for detailed context and estimates (60-80 hours)
 "@
 
-    "5" = @"
+	"5" = @"
 ## Sub-Tasks Checklist
 
 ### Core Data Extraction Tools
@@ -429,7 +429,7 @@ $subTasks = @{
 **Total: 50 sub-tasks** | See [TODO.md](TODO.md) for detailed context and estimates (40-60 hours)
 "@
 
-    "6" = @"
+	"6" = @"
 ## Sub-Tasks Checklist
 
 ### Initial Analysis
@@ -463,7 +463,7 @@ $subTasks = @{
 **Total: 18 sub-tasks** | See [TODO.md](TODO.md) for detailed context and estimates (20-30 hours)
 "@
 
-    "7" = @"
+	"7" = @"
 ## Sub-Tasks Checklist
 
 ### Initial Analysis
@@ -495,7 +495,7 @@ $subTasks = @{
 **Total: 16 sub-tasks** | See [TODO.md](TODO.md) for detailed context and estimates (20-30 hours)
 "@
 
-    "8" = @"
+	"8" = @"
 ## Sub-Tasks Checklist
 
 ### Initial Analysis
@@ -527,7 +527,7 @@ $subTasks = @{
 **Total: 16 sub-tasks** | See [TODO.md](TODO.md) for detailed context and estimates (20-30 hours)
 "@
 
-    "9" = @"
+	"9" = @"
 ## Sub-Tasks Checklist
 
 ### Initial Exploration
@@ -565,7 +565,7 @@ $subTasks = @{
 **Total: 20 sub-tasks** | See [TODO.md](TODO.md) for detailed context and estimates (30-40 hours)
 "@
 
-    "10" = @"
+	"10" = @"
 ## Sub-Tasks Checklist
 
 ### Initial Exploration
@@ -603,7 +603,7 @@ $subTasks = @{
 **Total: 20 sub-tasks** | See [TODO.md](TODO.md) for detailed context and estimates (30-40 hours)
 "@
 
-    "11" = @"
+	"11" = @"
 ## Sub-Tasks Checklist
 
 ### Graphics Import Tool
@@ -663,7 +663,7 @@ $subTasks = @{
 **Total: 41 sub-tasks** | See [TODO.md](TODO.md) for detailed context and estimates (40-50 hours)
 "@
 
-    "12" = @"
+	"12" = @"
 ## Sub-Tasks Checklist
 
 ### System Architecture Documentation
@@ -739,37 +739,37 @@ $errorCount = 0
 $totalTasks = 0
 
 foreach ($issueNum in $subTasks.Keys | Sort-Object { [int]$_ }) {
-    $issueCount++
-    $body = $subTasks[$issueNum]
+	$issueCount++
+	$body = $subTasks[$issueNum]
 
-    # Count tasks in this issue
-    $taskMatches = ([regex]::Matches($body, "- \[ \]")).Count
-    $totalTasks += $taskMatches
+	# Count tasks in this issue
+	$taskMatches = ([regex]::Matches($body, "- \[ \]")).Count
+	$totalTasks += $taskMatches
 
-    Write-Host "[$issueCount] Issue #$issueNum - $taskMatches sub-tasks" -ForegroundColor Yellow
+	Write-Host "[$issueCount] Issue #$issueNum - $taskMatches sub-tasks" -ForegroundColor Yellow
 
-    if ($dryRun) {
-        Write-Host "  [DRY RUN] Would add comment to issue #$issueNum" -ForegroundColor Cyan
-        Write-Host "  Preview (first 200 chars):" -ForegroundColor Gray
-        Write-Host "  $($body.Substring(0, [Math]::Min(200, $body.Length)))..." -ForegroundColor DarkGray
-        Write-Host ""
-    }
-    else {
-        try {
-            # Add comment with task list to the issue
-            $tempFile = [System.IO.Path]::GetTempFileName()
-            Set-Content -Path $tempFile -Value $body -NoNewline
-            gh issue comment $issueNum --repo $repo --body-file $tempFile
-            Remove-Item $tempFile
+	if ($dryRun) {
+		Write-Host "  [DRY RUN] Would add comment to issue #$issueNum" -ForegroundColor Cyan
+		Write-Host "  Preview (first 200 chars):" -ForegroundColor Gray
+		Write-Host "  $($body.Substring(0, [Math]::Min(200, $body.Length)))..." -ForegroundColor DarkGray
+		Write-Host ""
+	}
+	else {
+		try {
+			# Add comment with task list to the issue
+			$tempFile = [System.IO.Path]::GetTempFileName()
+			Set-Content -Path $tempFile -Value $body -NoNewline
+			gh issue comment $issueNum --repo $repo --body-file $tempFile
+			Remove-Item $tempFile
 
-            Write-Host "  ✓ Added sub-task checklist comment" -ForegroundColor Green
-            Start-Sleep -Milliseconds 500  # Rate limiting
-        }
-        catch {
-            Write-Host "  ✗ Error: $_" -ForegroundColor Red
-            $errorCount++
-        }
-    }
+			Write-Host "  ✓ Added sub-task checklist comment" -ForegroundColor Green
+			Start-Sleep -Milliseconds 500  # Rate limiting
+		}
+		catch {
+			Write-Host "  ✗ Error: $_" -ForegroundColor Red
+			$errorCount++
+		}
+	}
 }
 
 Write-Host "`n" + ("="*70) + "`n" -ForegroundColor Cyan
@@ -777,23 +777,23 @@ Write-Host "✨ Sub-Task Creation Summary" -ForegroundColor Green
 Write-Host ("="*70) + "`n" -ForegroundColor Cyan
 
 if ($dryRun) {
-    Write-Host "🔍 DRY RUN Complete!" -ForegroundColor Yellow
-    Write-Host "Would have updated $issueCount issues with $totalTasks total sub-tasks`n" -ForegroundColor Yellow
-    Write-Host "Run without -DryRun to create actual comments" -ForegroundColor Yellow
+	Write-Host "🔍 DRY RUN Complete!" -ForegroundColor Yellow
+	Write-Host "Would have updated $issueCount issues with $totalTasks total sub-tasks`n" -ForegroundColor Yellow
+	Write-Host "Run without -DryRun to create actual comments" -ForegroundColor Yellow
 }
 else {
-    Write-Host "✓ Updated $issueCount issues" -ForegroundColor Green
-    Write-Host "✓ Added $totalTasks total sub-tasks across all issues" -ForegroundColor Green
+	Write-Host "✓ Updated $issueCount issues" -ForegroundColor Green
+	Write-Host "✓ Added $totalTasks total sub-tasks across all issues" -ForegroundColor Green
 
-    if ($errorCount -gt 0) {
-        Write-Host "⚠ $errorCount errors encountered" -ForegroundColor Yellow
-    }
+	if ($errorCount -gt 0) {
+		Write-Host "⚠ $errorCount errors encountered" -ForegroundColor Yellow
+	}
 
-    Write-Host "`n🎯 Next Steps:" -ForegroundColor Cyan
-    Write-Host "  1. View issues at: https://github.com/$repo/issues" -ForegroundColor White
-    Write-Host "  2. Check off sub-tasks as you complete them" -ForegroundColor White
-    Write-Host "  3. Close issues when all sub-tasks are done" -ForegroundColor White
-    Write-Host "  4. Use project board to track overall progress`n" -ForegroundColor White
+	Write-Host "`n🎯 Next Steps:" -ForegroundColor Cyan
+	Write-Host "  1. View issues at: https://github.com/$repo/issues" -ForegroundColor White
+	Write-Host "  2. Check off sub-tasks as you complete them" -ForegroundColor White
+	Write-Host "  3. Close issues when all sub-tasks are done" -ForegroundColor White
+	Write-Host "  4. Use project board to track overall progress`n" -ForegroundColor White
 }
 
 Write-Host "Done! 🎉" -ForegroundColor Green

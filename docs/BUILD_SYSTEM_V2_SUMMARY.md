@@ -1,4 +1,4 @@
-﻿# Build System v2.0 - Implementation Summary
+# Build System v2.0 - Implementation Summary
 
 **Date**: October 30, 2025
 **Author**: Build System Team
@@ -174,35 +174,35 @@ make all        # Complete pipeline
 ### Build System Architecture
 ```
 Configuration (JSON)
-    ↓
+	↓
 Build-System.ps1
-    ├── Tool Validation
-    ├── Directory Setup
-    ├── Assembly (asar)
-    ├── Validation
-    └── Comparison
-        ↓
-    Build Artifacts
-        ├── ROM file
-        ├── Symbol file
-        ├── Build log
-        └── Comparison report
+	├── Tool Validation
+	├── Directory Setup
+	├── Assembly (asar)
+	├── Validation
+	└── Comparison
+		↓
+	Build Artifacts
+		├── ROM file
+		├── Symbol file
+		├── Build log
+		└── Comparison report
 ```
 
 ### Watch Mode Flow
 ```
 FileSystemWatcher
-    ↓
+	↓
 File Change Detected
-    ↓
+	↓
 Debounce Check (500ms)
-    ↓
+	↓
 Invoke-Build
-    ↓
+	↓
 Build-System.ps1 -Target build
-    ↓
+	↓
 Success/Fail Statistics
-    ↓
+	↓
 Optional Auto-Launch
 ```
 

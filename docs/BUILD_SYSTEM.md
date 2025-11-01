@@ -1,4 +1,4 @@
-﻿# Final Fantasy Mystic Quest - Complete Build System Integration Guide
+# Final Fantasy Mystic Quest - Complete Build System Integration Guide
 
 ## Overview
 
@@ -127,9 +127,9 @@ ffmq-info/
 │       └── inject_graphics.py
 │
 └── docs/                      # Documentation
-    ├── BUILD_SYSTEM.md        # This file
-    ├── rom_map.html           # ROM memory map
-    └── maps/                  # Extracted map data
+	├── BUILD_SYSTEM.md        # This file
+	├── rom_map.html           # ROM memory map
+	└── maps/                  # Extracted map data
 ```
 
 ---
@@ -344,30 +344,30 @@ make extract-enemies
 ```json
 {
   "enemies": [
-    {
-      "id": 0,
-      "name": "Behemoth",
-      "stats": {
-        "hp": 1500,
-        "attack": 80,
-        "defense": 60,
-        "magic": 40,
-        "magic_defense": 30,
-        "speed": 25,
-        "accuracy": 200,
-        "evade": 10
-      },
-      "resistances": {
-        "elements": {"fire": "resist", "ice": "weak"},
-        "status": ["poison", "sleep"]
-      },
-      "rewards": {
-        "exp": 250,
-        "gold": 150,
-        "drop_item": 42,
-        "drop_rate": 25
-      }
-    }
+	{
+	  "id": 0,
+	  "name": "Behemoth",
+	  "stats": {
+		"hp": 1500,
+		"attack": 80,
+		"defense": 60,
+		"magic": 40,
+		"magic_defense": 30,
+		"speed": 25,
+		"accuracy": 200,
+		"evade": 10
+	  },
+	  "resistances": {
+		"elements": {"fire": "resist", "ice": "weak"},
+		"status": ["poison", "sleep"]
+	  },
+	  "rewards": {
+		"exp": 250,
+		"gold": 150,
+		"drop_item": 42,
+		"drop_rate": 25
+	  }
+	}
   ]
 }
 ```
@@ -528,17 +528,17 @@ To add analyzed labels to bank files:
 
 ; OLD (generic label)
 CODE_008123:
-    lda $00d8
-    bit #$40
-    beq CODE_008123
-    ; ... more code
+	lda $00d8
+	bit #$40
+	beq CODE_008123
+	; ... more code
 
 ; NEW (with analyzed label)
 WaitForVBlank:              ; From nmi_handler.asm analysis
-    lda VBLANK_FLAGS        ; $00d8 - VBlank sync flags
-    bit #$40                ; Check bit 6 (VBlank occurred)
-    beq WaitForVBlank       ; Loop until VBlank
-    ; ... more code
+	lda VBLANK_FLAGS        ; $00d8 - VBlank sync flags
+	bit #$40                ; Check bit 6 (VBlank occurred)
+	beq WaitForVBlank       ; Loop until VBlank
+	; ... more code
 ```
 
 ### Build Process

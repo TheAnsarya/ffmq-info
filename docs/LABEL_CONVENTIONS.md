@@ -1,4 +1,4 @@
-﻿# FFMQ Label Naming Conventions
+# FFMQ Label Naming Conventions
 
 **Version:** 1.0  
 **Last Updated:** November 1, 2025  
@@ -294,14 +294,14 @@ VEC_IRQ:
 
 ```assembly
 PTR_TBL_Dialogs:        ; Table of dialog pointers
-    .dw PTR_Dialog_00
-    .dw PTR_Dialog_01
-    .dw PTR_Dialog_02
+	.dw PTR_Dialog_00
+	.dw PTR_Dialog_01
+	.dw PTR_Dialog_02
 
 PTR_TBL_Sprites:        ; Table of sprite pointers
-    .dw PTR_Sprite_Benjamin
-    .dw PTR_Sprite_Kaeli
-    .dw PTR_Sprite_Phoebe
+	.dw PTR_Sprite_Benjamin
+	.dw PTR_Sprite_Kaeli
+	.dw PTR_Sprite_Phoebe
 ```
 
 ---
@@ -354,10 +354,10 @@ TILEMAP_BattleLayout:
 ```assembly
 ; Animation sequences
 GFX_Benjamin_Walk:
-    GFX_Benjamin_Walk_Frame1:
-    GFX_Benjamin_Walk_Frame2:
-    GFX_Benjamin_Walk_Frame3:
-    GFX_Benjamin_Walk_Frame4:
+	GFX_Benjamin_Walk_Frame1:
+	GFX_Benjamin_Walk_Frame2:
+	GFX_Benjamin_Walk_Frame3:
+	GFX_Benjamin_Walk_Frame4:
 
 ; State-based graphics
 GFX_Benjamin_Stand:
@@ -610,32 +610,32 @@ When encountering existing labels that don't follow conventions:
 
 ; Weapon Statistics Table
 DATA_07_WeaponStats:
-    ; Format: [Attack, Hit%, Critical%, Special Effect]
-    .db 10, 90, 5, 0        ; Steel Sword
-    .db 15, 92, 8, 0        ; Knight Sword
-    .db 25, 95, 10, 1       ; Excalibur (Holy element)
-    ; ... more weapons
+	; Format: [Attack, Hit%, Critical%, Special Effect]
+	.db 10, 90, 5, 0        ; Steel Sword
+	.db 15, 92, 8, 0        ; Knight Sword
+	.db 25, 95, 10, 1       ; Excalibur (Holy element)
+	; ... more weapons
 
 ; Armor Statistics Table
 DATA_07_ArmorStats:
-    ; Format: [Defense, Magic Defense, Evasion%, Special]
-    .db 5, 3, 5, 0          ; Bronze Armor
-    .db 10, 5, 8, 0         ; Steel Armor
-    .db 20, 15, 12, 1       ; Aegis Shield (Fire resist)
-    ; ... more armor
+	; Format: [Defense, Magic Defense, Evasion%, Special]
+	.db 5, 3, 5, 0          ; Bronze Armor
+	.db 10, 5, 8, 0         ; Steel Armor
+	.db 20, 15, 12, 1       ; Aegis Shield (Fire resist)
+	; ... more armor
 
 ; Item Price Table
 TBL_07_ItemPrices:
-    .dw 100                 ; Cure Potion
-    .dw 500                 ; Elixir
-    .dw 1000                ; Phoenix Down
-    ; ... more prices
+	.dw 100                 ; Cure Potion
+	.dw 500                 ; Elixir
+	.dw 1000                ; Phoenix Down
+	; ... more prices
 
 ; Item Name Pointers
 PTR_TBL_ItemNames:
-    .dw STR_Item_CurePotion
-    .dw STR_Item_Elixir
-    .dw STR_Item_PhoenixDown
+	.dw STR_Item_CurePotion
+	.dw STR_Item_Elixir
+	.dw STR_Item_PhoenixDown
 ```
 
 ### Complete Graphics Block
@@ -648,31 +648,31 @@ PTR_TBL_ItemNames:
 ; Benjamin Standing Sprites (all directions)
 GFX_Benjamin_Stand:
 GFX_Benjamin_Stand_Up:
-    incbin "assets/graphics/benjamin_stand_up.2bpp"
+	incbin "assets/graphics/benjamin_stand_up.2bpp"
 GFX_Benjamin_Stand_Down:
-    incbin "assets/graphics/benjamin_stand_down.2bpp"
+	incbin "assets/graphics/benjamin_stand_down.2bpp"
 GFX_Benjamin_Stand_Left:
-    incbin "assets/graphics/benjamin_stand_left.2bpp"
+	incbin "assets/graphics/benjamin_stand_left.2bpp"
 GFX_Benjamin_Stand_Right:
-    incbin "assets/graphics/benjamin_stand_right.2bpp"
+	incbin "assets/graphics/benjamin_stand_right.2bpp"
 
 ; Benjamin Walking Animation (4 frames per direction)
 GFX_Benjamin_Walk:
 GFX_Benjamin_Walk_Up:
-    GFX_Benjamin_Walk_Up_F1:
-        incbin "assets/graphics/benjamin_walk_up_1.2bpp"
-    GFX_Benjamin_Walk_Up_F2:
-        incbin "assets/graphics/benjamin_walk_up_2.2bpp"
-    GFX_Benjamin_Walk_Up_F3:
-        incbin "assets/graphics/benjamin_walk_up_3.2bpp"
-    GFX_Benjamin_Walk_Up_F4:
-        incbin "assets/graphics/benjamin_walk_up_4.2bpp"
+	GFX_Benjamin_Walk_Up_F1:
+		incbin "assets/graphics/benjamin_walk_up_1.2bpp"
+	GFX_Benjamin_Walk_Up_F2:
+		incbin "assets/graphics/benjamin_walk_up_2.2bpp"
+	GFX_Benjamin_Walk_Up_F3:
+		incbin "assets/graphics/benjamin_walk_up_3.2bpp"
+	GFX_Benjamin_Walk_Up_F4:
+		incbin "assets/graphics/benjamin_walk_up_4.2bpp"
 
 ; Palettes for Benjamin
 PAL_Benjamin_Overworld:
-    incbin "assets/palettes/benjamin_overworld.pal"
+	incbin "assets/palettes/benjamin_overworld.pal"
 PAL_Benjamin_Battle:
-    incbin "assets/palettes/benjamin_battle.pal"
+	incbin "assets/palettes/benjamin_battle.pal"
 ```
 
 ---

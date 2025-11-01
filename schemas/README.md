@@ -20,20 +20,20 @@ Each schema is a JSON file that defines:
   "count": 4,
   "struct_size": 9,
   "fields": [
-    {
-      "name": "character_id",
-      "type": "uint8",
-      "description": "Character identifier",
-      "enum": {
-        "0": "Benjamin",
-        "1": "Kaeli"
-      }
-    },
-    {
-      "name": "max_hp",
-      "type": "uint16",
-      "description": "Maximum HP"
-    }
+	{
+	  "name": "character_id",
+	  "type": "uint8",
+	  "description": "Character identifier",
+	  "enum": {
+		"0": "Benjamin",
+		"1": "Kaeli"
+	  }
+	},
+	{
+	  "name": "max_hp",
+	  "type": "uint16",
+	  "description": "Maximum HP"
+	}
   ]
 }
 ```

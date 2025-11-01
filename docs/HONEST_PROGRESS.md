@@ -1,4 +1,4 @@
-﻿# HONEST PROGRESS ASSESSMENT
+# HONEST PROGRESS ASSESSMENT
 **Date:** 2025-10-25  
 **Reality Check:** We were NOT at 99.996%  
 **Actual Progress:** ~5% (see breakdown below)
@@ -175,13 +175,13 @@ HONEST_PROGRESS.md:
 ```
 ; Diztinguish (current):
 CODE_008000:
-    CLC                     ;008000|18      |      ;
-    XCE                     ;008001|FB      |      ;
+	CLC                     ;008000|18      |      ;
+	XCE                     ;008001|FB      |      ;
 
 ; asar (target):
 Boot_Sequence:
-    CLC                     ; Switch to native mode
-    XCE
+	CLC                     ; Switch to native mode
+	XCE
 ```
 
 **2. Add comments to EVERY routine**
@@ -206,34 +206,34 @@ $7e3667 → save_file_state_flag_1
 ```assembly
 org $028c80
 Graphics_Main_Tiles:
-    incbin "data/graphics/tiles.bin"
+	incbin "data/graphics/tiles.bin"
 ```
 
 **5. Integrate palettes**
 ```assembly
 org $07a000
 Palette_Characters:
-    incbin "assets/graphics/palettes/character_palettes.bin"
+	incbin "assets/graphics/palettes/character_palettes.bin"
 ```
 
 **6. Integrate text**
 ```assembly
 org $0XXXXX
 Text_Item_Names:
-    db "Cure", $00
-    db "Heal", $00
-    ; ... etc
+	db "Cure", $00
+	db "Heal", $00
+	; ... etc
 ```
 
 **7. Integrate game data**
 ```assembly
 org $0XXXXX
 Enemy_Stats:
-    ; Behemoth
-    dw 500      ; HP
-    db 50       ; Attack
-    db 30       ; Defense
-    ; ... etc
+	; Behemoth
+	dw 500      ; HP
+	db 50       ; Attack
+	db 30       ; Defense
+	; ... etc
 ```
 
 ### Long Tasks (Stage 3 → 4)

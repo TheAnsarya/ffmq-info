@@ -1,1087 +1,1087 @@
 {
   "weapons": [
-    {
-      "attack": 255,
-      "accuracy": 124,
-      "element": 131,
-      "special": 255,
-      "character_equip": 56,
-      "price": 53247,
-      "sell_price": 65535,
-      "flags": 255,
-      "unused": [
-        255,
-        255,
-        199,
-        0,
-        12,
-        160
-      ],
-      "id": 0
-    },
-    {
-      "attack": 241,
-      "accuracy": 185,
-      "element": 198,
-      "special": 67,
-      "character_equip": 252,
-      "price": 61455,
-      "sell_price": 65510,
-      "flags": 12,
-      "unused": [
-        243,
-        146,
-        127,
-        255,
-        255,
-        255
-      ],
-      "id": 1
-    },
-    {
-      "attack": 255,
-      "accuracy": 255,
-      "element": 255,
-      "special": 255,
-      "character_equip": 255,
-      "price": 65365,
-      "sell_price": 65280,
-      "flags": 0,
-      "unused": [
-        255,
-        11,
-        251,
-        4,
-        77,
-        140
-      ],
-      "id": 2
-    },
-    {
-      "attack": 131,
-      "accuracy": 131,
-      "element": 255,
-      "special": 61,
-      "character_equip": 255,
-      "price": 65535,
-      "sell_price": 1109,
-      "flags": 178,
-      "unused": [
-        112,
-        0,
-        0,
-        85,
-        255,
-        0
-      ],
-      "id": 3
-    },
-    {
-      "attack": 255,
-      "accuracy": 0,
-      "element": 255,
-      "special": 24,
-      "character_equip": 251,
-      "price": 40838,
-      "sell_price": 65146,
-      "flags": 129,
-      "unused": [
-        255,
-        254,
-        31,
-        255,
-        255,
-        85
-      ],
-      "id": 4
-    },
-    {
-      "attack": 4,
-      "accuracy": 96,
-      "element": 1,
-      "special": 0,
-      "character_equip": 0,
-      "price": 65456,
-      "sell_price": 51197,
-      "flags": 32,
-      "unused": [
-        255,
-        88,
-        255,
-        170,
-        255,
-        165
-      ],
-      "id": 5
-    },
-    {
-      "attack": 255,
-      "accuracy": 20,
-      "element": 255,
-      "special": 64,
-      "character_equip": 191,
-      "price": 512,
-      "sell_price": 34059,
-      "flags": 213,
-      "unused": [
-        223,
-        255,
-        255,
-        96,
-        255,
-        3
-      ],
-      "id": 6
-    },
-    {
-      "attack": 255,
-      "accuracy": 102,
-      "element": 255,
-      "special": 73,
-      "character_equip": 255,
-      "price": 65301,
-      "sell_price": 65428,
-      "flags": 112,
-      "unused": [
-        223,
-        34,
-        223,
-        16,
-        88,
-        25
-      ],
-      "id": 7
-    },
-    {
-      "attack": 182,
-      "accuracy": 250,
-      "element": 255,
-      "special": 255,
-      "character_equip": 255,
-      "price": 2815,
-      "sell_price": 49471,
-      "flags": 199,
-      "unused": [
-        56,
-        248,
-        71,
-        254,
-        161,
-        255
-      ],
-      "id": 8
-    },
-    {
-      "attack": 212,
-      "accuracy": 255,
-      "element": 250,
-      "special": 255,
-      "character_equip": 255,
-      "price": 65269,
-      "sell_price": 49151,
-      "flags": 95,
-      "unused": [
-        43,
-        5,
-        0,
-        255,
-        191,
-        255
-      ],
-      "id": 9
-    },
-    {
-      "attack": 85,
-      "accuracy": 255,
-      "element": 10,
-      "special": 47,
-      "character_equip": 208,
-      "price": 21930,
-      "sell_price": 43095,
-      "flags": 234,
-      "unused": [
-        21,
-        245,
-        138,
-        64,
-        170,
-        245
-      ],
-      "id": 10
-    },
-    {
-      "attack": 255,
-      "accuracy": 255,
-      "element": 255,
-      "special": 255,
-      "character_equip": 127,
-      "price": 47871,
-      "sell_price": 22015,
-      "flags": 255,
-      "unused": [
-        0,
-        255,
-        0,
-        0,
-        255,
-        254
-      ],
-      "id": 11
-    },
-    {
-      "attack": 1,
-      "accuracy": 255,
-      "element": 42,
-      "special": 127,
-      "character_equip": 128,
-      "price": 43589,
-      "sell_price": 65535,
-      "flags": 255,
-      "unused": [
-        255,
-        213,
-        255,
-        255,
-        160,
-        254
-      ],
-      "id": 12
-    },
-    {
-      "attack": 65,
-      "accuracy": 249,
-      "element": 6,
-      "special": 199,
-      "character_equip": 57,
-      "price": 51775,
-      "sell_price": 34175,
-      "flags": 159,
-      "unused": [
-        96,
-        227,
-        28,
-        95,
-        191,
-        255
-      ],
-      "id": 13
-    },
-    {
-      "attack": 254,
-      "accuracy": 245,
-      "element": 250,
-      "special": 255,
-      "character_equip": 255,
-      "price": 64255,
-      "sell_price": 21759,
-      "flags": 255,
-      "unused": [
-        0,
-        250,
-        5,
-        175,
-        80,
-        255
-      ],
-      "id": 14
-    }
+	{
+	  "attack": 255,
+	  "accuracy": 124,
+	  "element": 131,
+	  "special": 255,
+	  "character_equip": 56,
+	  "price": 53247,
+	  "sell_price": 65535,
+	  "flags": 255,
+	  "unused": [
+		255,
+		255,
+		199,
+		0,
+		12,
+		160
+	  ],
+	  "id": 0
+	},
+	{
+	  "attack": 241,
+	  "accuracy": 185,
+	  "element": 198,
+	  "special": 67,
+	  "character_equip": 252,
+	  "price": 61455,
+	  "sell_price": 65510,
+	  "flags": 12,
+	  "unused": [
+		243,
+		146,
+		127,
+		255,
+		255,
+		255
+	  ],
+	  "id": 1
+	},
+	{
+	  "attack": 255,
+	  "accuracy": 255,
+	  "element": 255,
+	  "special": 255,
+	  "character_equip": 255,
+	  "price": 65365,
+	  "sell_price": 65280,
+	  "flags": 0,
+	  "unused": [
+		255,
+		11,
+		251,
+		4,
+		77,
+		140
+	  ],
+	  "id": 2
+	},
+	{
+	  "attack": 131,
+	  "accuracy": 131,
+	  "element": 255,
+	  "special": 61,
+	  "character_equip": 255,
+	  "price": 65535,
+	  "sell_price": 1109,
+	  "flags": 178,
+	  "unused": [
+		112,
+		0,
+		0,
+		85,
+		255,
+		0
+	  ],
+	  "id": 3
+	},
+	{
+	  "attack": 255,
+	  "accuracy": 0,
+	  "element": 255,
+	  "special": 24,
+	  "character_equip": 251,
+	  "price": 40838,
+	  "sell_price": 65146,
+	  "flags": 129,
+	  "unused": [
+		255,
+		254,
+		31,
+		255,
+		255,
+		85
+	  ],
+	  "id": 4
+	},
+	{
+	  "attack": 4,
+	  "accuracy": 96,
+	  "element": 1,
+	  "special": 0,
+	  "character_equip": 0,
+	  "price": 65456,
+	  "sell_price": 51197,
+	  "flags": 32,
+	  "unused": [
+		255,
+		88,
+		255,
+		170,
+		255,
+		165
+	  ],
+	  "id": 5
+	},
+	{
+	  "attack": 255,
+	  "accuracy": 20,
+	  "element": 255,
+	  "special": 64,
+	  "character_equip": 191,
+	  "price": 512,
+	  "sell_price": 34059,
+	  "flags": 213,
+	  "unused": [
+		223,
+		255,
+		255,
+		96,
+		255,
+		3
+	  ],
+	  "id": 6
+	},
+	{
+	  "attack": 255,
+	  "accuracy": 102,
+	  "element": 255,
+	  "special": 73,
+	  "character_equip": 255,
+	  "price": 65301,
+	  "sell_price": 65428,
+	  "flags": 112,
+	  "unused": [
+		223,
+		34,
+		223,
+		16,
+		88,
+		25
+	  ],
+	  "id": 7
+	},
+	{
+	  "attack": 182,
+	  "accuracy": 250,
+	  "element": 255,
+	  "special": 255,
+	  "character_equip": 255,
+	  "price": 2815,
+	  "sell_price": 49471,
+	  "flags": 199,
+	  "unused": [
+		56,
+		248,
+		71,
+		254,
+		161,
+		255
+	  ],
+	  "id": 8
+	},
+	{
+	  "attack": 212,
+	  "accuracy": 255,
+	  "element": 250,
+	  "special": 255,
+	  "character_equip": 255,
+	  "price": 65269,
+	  "sell_price": 49151,
+	  "flags": 95,
+	  "unused": [
+		43,
+		5,
+		0,
+		255,
+		191,
+		255
+	  ],
+	  "id": 9
+	},
+	{
+	  "attack": 85,
+	  "accuracy": 255,
+	  "element": 10,
+	  "special": 47,
+	  "character_equip": 208,
+	  "price": 21930,
+	  "sell_price": 43095,
+	  "flags": 234,
+	  "unused": [
+		21,
+		245,
+		138,
+		64,
+		170,
+		245
+	  ],
+	  "id": 10
+	},
+	{
+	  "attack": 255,
+	  "accuracy": 255,
+	  "element": 255,
+	  "special": 255,
+	  "character_equip": 127,
+	  "price": 47871,
+	  "sell_price": 22015,
+	  "flags": 255,
+	  "unused": [
+		0,
+		255,
+		0,
+		0,
+		255,
+		254
+	  ],
+	  "id": 11
+	},
+	{
+	  "attack": 1,
+	  "accuracy": 255,
+	  "element": 42,
+	  "special": 127,
+	  "character_equip": 128,
+	  "price": 43589,
+	  "sell_price": 65535,
+	  "flags": 255,
+	  "unused": [
+		255,
+		213,
+		255,
+		255,
+		160,
+		254
+	  ],
+	  "id": 12
+	},
+	{
+	  "attack": 65,
+	  "accuracy": 249,
+	  "element": 6,
+	  "special": 199,
+	  "character_equip": 57,
+	  "price": 51775,
+	  "sell_price": 34175,
+	  "flags": 159,
+	  "unused": [
+		96,
+		227,
+		28,
+		95,
+		191,
+		255
+	  ],
+	  "id": 13
+	},
+	{
+	  "attack": 254,
+	  "accuracy": 245,
+	  "element": 250,
+	  "special": 255,
+	  "character_equip": 255,
+	  "price": 64255,
+	  "sell_price": 21759,
+	  "flags": 255,
+	  "unused": [
+		0,
+		250,
+		5,
+		175,
+		80,
+		255
+	  ],
+	  "id": 14
+	}
   ],
   "armor": [
-    {
-      "defense": 3,
-      "evade": 243,
-      "element_resist": 12,
-      "status_resist": 15,
-      "character_equip": 241,
-      "price": 11007,
-      "sell_price": 24575,
-      "flags": 255,
-      "unused": [
-        191,
-        255,
-        85,
-        95,
-        255,
-        255
-      ],
-      "id": 0
-    },
-    {
-      "defense": 254,
-      "evade": 213,
-      "element_resist": 160,
-      "status_resist": 64,
-      "character_equip": 170,
-      "price": 16575,
-      "sell_price": 4335,
-      "flags": 243,
-      "unused": [
-        76,
-        252,
-        171,
-        255,
-        250,
-        255
-      ],
-      "id": 1
-    },
-    {
-      "defense": 84,
-      "evade": 255,
-      "element_resist": 0,
-      "status_resist": 254,
-      "character_equip": 1,
-      "price": 65535,
-      "sell_price": 22463,
-      "flags": 5,
-      "unused": [
-        171,
-        255,
-        255,
-        255,
-        170,
-        255
-      ],
-      "id": 2
-    },
-    {
-      "defense": 21,
-      "evade": 255,
-      "element_resist": 0,
-      "status_resist": 63,
-      "character_equip": 192,
-      "price": 16320,
-      "sell_price": 2295,
-      "flags": 201,
-      "unused": [
-        54,
-        28,
-        227,
-        85,
-        234,
-        255
-      ],
-      "id": 3
-    },
-    {
-      "defense": 255,
-      "evade": 255,
-      "element_resist": 255,
-      "status_resist": 255,
-      "character_equip": 255,
-      "price": 62220,
-      "sell_price": 32385,
-      "flags": 42,
-      "unused": [
-        213,
-        255,
-        0,
-        255,
-        0,
-        0
-      ],
-      "id": 4
-    },
-    {
-      "defense": 255,
-      "evade": 231,
-      "element_resist": 31,
-      "status_resist": 63,
-      "character_equip": 192,
-      "price": 65535,
-      "sell_price": 65535,
-      "flags": 255,
-      "unused": [
-        255,
-        255,
-        255,
-        0,
-        255,
-        84
-      ],
-      "id": 5
-    },
-    {
-      "defense": 171,
-      "evade": 255,
-      "element_resist": 0,
-      "status_resist": 255,
-      "character_equip": 0,
-      "price": 8160,
-      "sell_price": 62475,
-      "flags": 63,
-      "unused": [
-        192,
-        0,
-        255,
-        255,
-        255,
-        255
-      ],
-      "id": 6
-    }
+	{
+	  "defense": 3,
+	  "evade": 243,
+	  "element_resist": 12,
+	  "status_resist": 15,
+	  "character_equip": 241,
+	  "price": 11007,
+	  "sell_price": 24575,
+	  "flags": 255,
+	  "unused": [
+		191,
+		255,
+		85,
+		95,
+		255,
+		255
+	  ],
+	  "id": 0
+	},
+	{
+	  "defense": 254,
+	  "evade": 213,
+	  "element_resist": 160,
+	  "status_resist": 64,
+	  "character_equip": 170,
+	  "price": 16575,
+	  "sell_price": 4335,
+	  "flags": 243,
+	  "unused": [
+		76,
+		252,
+		171,
+		255,
+		250,
+		255
+	  ],
+	  "id": 1
+	},
+	{
+	  "defense": 84,
+	  "evade": 255,
+	  "element_resist": 0,
+	  "status_resist": 254,
+	  "character_equip": 1,
+	  "price": 65535,
+	  "sell_price": 22463,
+	  "flags": 5,
+	  "unused": [
+		171,
+		255,
+		255,
+		255,
+		170,
+		255
+	  ],
+	  "id": 2
+	},
+	{
+	  "defense": 21,
+	  "evade": 255,
+	  "element_resist": 0,
+	  "status_resist": 63,
+	  "character_equip": 192,
+	  "price": 16320,
+	  "sell_price": 2295,
+	  "flags": 201,
+	  "unused": [
+		54,
+		28,
+		227,
+		85,
+		234,
+		255
+	  ],
+	  "id": 3
+	},
+	{
+	  "defense": 255,
+	  "evade": 255,
+	  "element_resist": 255,
+	  "status_resist": 255,
+	  "character_equip": 255,
+	  "price": 62220,
+	  "sell_price": 32385,
+	  "flags": 42,
+	  "unused": [
+		213,
+		255,
+		0,
+		255,
+		0,
+		0
+	  ],
+	  "id": 4
+	},
+	{
+	  "defense": 255,
+	  "evade": 231,
+	  "element_resist": 31,
+	  "status_resist": 63,
+	  "character_equip": 192,
+	  "price": 65535,
+	  "sell_price": 65535,
+	  "flags": 255,
+	  "unused": [
+		255,
+		255,
+		255,
+		0,
+		255,
+		84
+	  ],
+	  "id": 5
+	},
+	{
+	  "defense": 171,
+	  "evade": 255,
+	  "element_resist": 0,
+	  "status_resist": 255,
+	  "character_equip": 0,
+	  "price": 8160,
+	  "sell_price": 62475,
+	  "flags": 63,
+	  "unused": [
+		192,
+		0,
+		255,
+		255,
+		255,
+		255
+	  ],
+	  "id": 6
+	}
   ],
   "helmets": [
-    {
-      "defense": 127,
-      "evade": 16,
-      "element_resist": 255,
-      "status_resist": 136,
-      "character_equip": 255,
-      "price": 65535,
-      "sell_price": 65535,
-      "flags": 255,
-      "unused": [
-        255,
-        255,
-        255,
-        102,
-        249,
-        17
-      ],
-      "id": 0
-    },
-    {
-      "defense": 255,
-      "evade": 128,
-      "element_resist": 255,
-      "status_resist": 4,
-      "character_equip": 255,
-      "price": 65520,
-      "sell_price": 55080,
-      "flags": 255,
-      "unused": [
-        255,
-        12,
-        254,
-        255,
-        255,
-        255
-      ],
-      "id": 1
-    },
-    {
-      "defense": 255,
-      "evade": 255,
-      "element_resist": 255,
-      "status_resist": 255,
-      "character_equip": 255,
-      "price": 65280,
-      "sell_price": 43605,
-      "flags": 235,
-      "unused": [
-        20,
-        31,
-        224,
-        225,
-        31,
-        195
-      ],
-      "id": 2
-    },
-    {
-      "defense": 60,
-      "evade": 63,
-      "element_resist": 192,
-      "status_resist": 0,
-      "character_equip": 255,
-      "price": 65535,
-      "sell_price": 65535,
-      "flags": 255,
-      "unused": [
-        255,
-        255,
-        255,
-        5,
-        250,
-        74
-      ],
-      "id": 3
-    },
-    {
-      "defense": 181,
-      "evade": 245,
-      "element_resist": 10,
-      "status_resist": 143,
-      "character_equip": 112,
-      "price": 65504,
-      "sell_price": 255,
-      "flags": 231,
-      "unused": [
-        24,
-        126,
-        255,
-        255,
-        255,
-        255
-      ],
-      "id": 4
-    },
-    {
-      "defense": 255,
-      "evade": 255,
-      "element_resist": 255,
-      "status_resist": 255,
-      "character_equip": 255,
-      "price": 64763,
-      "sell_price": 40800,
-      "flags": 17,
-      "unused": [
-        255,
-        198,
-        249,
-        22,
-        255,
-        128
-      ],
-      "id": 5
-    },
-    {
-      "defense": 255,
-      "evade": 1,
-      "element_resist": 255,
-      "status_resist": 0,
-      "character_equip": 0,
-      "price": 65535,
-      "sell_price": 65535,
-      "flags": 255,
-      "unused": [
-        255,
-        255,
-        255,
-        146,
-        127,
-        12
-      ],
-      "id": 6
-    }
+	{
+	  "defense": 127,
+	  "evade": 16,
+	  "element_resist": 255,
+	  "status_resist": 136,
+	  "character_equip": 255,
+	  "price": 65535,
+	  "sell_price": 65535,
+	  "flags": 255,
+	  "unused": [
+		255,
+		255,
+		255,
+		102,
+		249,
+		17
+	  ],
+	  "id": 0
+	},
+	{
+	  "defense": 255,
+	  "evade": 128,
+	  "element_resist": 255,
+	  "status_resist": 4,
+	  "character_equip": 255,
+	  "price": 65520,
+	  "sell_price": 55080,
+	  "flags": 255,
+	  "unused": [
+		255,
+		12,
+		254,
+		255,
+		255,
+		255
+	  ],
+	  "id": 1
+	},
+	{
+	  "defense": 255,
+	  "evade": 255,
+	  "element_resist": 255,
+	  "status_resist": 255,
+	  "character_equip": 255,
+	  "price": 65280,
+	  "sell_price": 43605,
+	  "flags": 235,
+	  "unused": [
+		20,
+		31,
+		224,
+		225,
+		31,
+		195
+	  ],
+	  "id": 2
+	},
+	{
+	  "defense": 60,
+	  "evade": 63,
+	  "element_resist": 192,
+	  "status_resist": 0,
+	  "character_equip": 255,
+	  "price": 65535,
+	  "sell_price": 65535,
+	  "flags": 255,
+	  "unused": [
+		255,
+		255,
+		255,
+		5,
+		250,
+		74
+	  ],
+	  "id": 3
+	},
+	{
+	  "defense": 181,
+	  "evade": 245,
+	  "element_resist": 10,
+	  "status_resist": 143,
+	  "character_equip": 112,
+	  "price": 65504,
+	  "sell_price": 255,
+	  "flags": 231,
+	  "unused": [
+		24,
+		126,
+		255,
+		255,
+		255,
+		255
+	  ],
+	  "id": 4
+	},
+	{
+	  "defense": 255,
+	  "evade": 255,
+	  "element_resist": 255,
+	  "status_resist": 255,
+	  "character_equip": 255,
+	  "price": 64763,
+	  "sell_price": 40800,
+	  "flags": 17,
+	  "unused": [
+		255,
+		198,
+		249,
+		22,
+		255,
+		128
+	  ],
+	  "id": 5
+	},
+	{
+	  "defense": 255,
+	  "evade": 1,
+	  "element_resist": 255,
+	  "status_resist": 0,
+	  "character_equip": 0,
+	  "price": 65535,
+	  "sell_price": 65535,
+	  "flags": 255,
+	  "unused": [
+		255,
+		255,
+		255,
+		146,
+		127,
+		12
+	  ],
+	  "id": 6
+	}
   ],
   "shields": [
-    {
-      "defense": 255,
-      "evade": 255,
-      "element_resist": 255,
-      "status_resist": 255,
-      "character_equip": 255,
-      "price": 65433,
-      "sell_price": 57254,
-      "flags": 185,
-      "unused": [
-        223,
-        191,
-        192,
-        191,
-        192,
-        191
-      ],
-      "id": 0
-    },
-    {
-      "defense": 213,
-      "evade": 128,
-      "element_resist": 255,
-      "status_resist": 159,
-      "character_equip": 240,
-      "price": 32896,
-      "sell_price": 32896,
-      "flags": 255,
-      "unused": [
-        234,
-        192,
-        207,
-        221,
-        255,
-        100
-      ],
-      "id": 1
-    },
-    {
-      "defense": 255,
-      "evade": 199,
-      "element_resist": 255,
-      "status_resist": 227,
-      "character_equip": 30,
-      "price": 510,
-      "sell_price": 22014,
-      "flags": 6,
-      "unused": [
-        255,
-        254,
-        55,
-        0,
-        0,
-        0
-      ],
-      "id": 2
-    },
-    {
-      "defense": 1,
-      "evade": 255,
-      "element_resist": 171,
-      "status_resist": 1,
-      "character_equip": 201,
-      "price": 58143,
-      "sell_price": 62527,
-      "flags": 63,
-      "unused": [
-        225,
-        63,
-        238,
-        127,
-        224,
-        104
-      ],
-      "id": 3
-    },
-    {
-      "defense": 215,
-      "evade": 64,
-      "element_resist": 255,
-      "status_resist": 255,
-      "character_equip": 255,
-      "price": 52188,
-      "sell_price": 53726,
-      "flags": 223,
-      "unused": [
-        255,
-        255,
-        255,
-        254,
-        75,
-        254
-      ],
-      "id": 4
-    },
-    {
-      "defense": 161,
-      "evade": 254,
-      "element_resist": 93,
-      "status_resist": 254,
-      "character_equip": 161,
-      "price": 35839,
-      "sell_price": 11731,
-      "flags": 1,
-      "unused": [
-        255,
-        255,
-        255,
-        181,
-        95,
-        163
-      ],
-      "id": 5
-    },
-    {
-      "defense": 95,
-      "evade": 117,
-      "element_resist": 255,
-      "status_resist": 255,
-      "character_equip": 255,
-      "price": 65407,
-      "sell_price": 65346,
-      "flags": 95,
-      "unused": [
-        255,
-        139,
-        117,
-        255,
-        0,
-        255
-      ],
-      "id": 6
-    }
+	{
+	  "defense": 255,
+	  "evade": 255,
+	  "element_resist": 255,
+	  "status_resist": 255,
+	  "character_equip": 255,
+	  "price": 65433,
+	  "sell_price": 57254,
+	  "flags": 185,
+	  "unused": [
+		223,
+		191,
+		192,
+		191,
+		192,
+		191
+	  ],
+	  "id": 0
+	},
+	{
+	  "defense": 213,
+	  "evade": 128,
+	  "element_resist": 255,
+	  "status_resist": 159,
+	  "character_equip": 240,
+	  "price": 32896,
+	  "sell_price": 32896,
+	  "flags": 255,
+	  "unused": [
+		234,
+		192,
+		207,
+		221,
+		255,
+		100
+	  ],
+	  "id": 1
+	},
+	{
+	  "defense": 255,
+	  "evade": 199,
+	  "element_resist": 255,
+	  "status_resist": 227,
+	  "character_equip": 30,
+	  "price": 510,
+	  "sell_price": 22014,
+	  "flags": 6,
+	  "unused": [
+		255,
+		254,
+		55,
+		0,
+		0,
+		0
+	  ],
+	  "id": 2
+	},
+	{
+	  "defense": 1,
+	  "evade": 255,
+	  "element_resist": 171,
+	  "status_resist": 1,
+	  "character_equip": 201,
+	  "price": 58143,
+	  "sell_price": 62527,
+	  "flags": 63,
+	  "unused": [
+		225,
+		63,
+		238,
+		127,
+		224,
+		104
+	  ],
+	  "id": 3
+	},
+	{
+	  "defense": 215,
+	  "evade": 64,
+	  "element_resist": 255,
+	  "status_resist": 255,
+	  "character_equip": 255,
+	  "price": 52188,
+	  "sell_price": 53726,
+	  "flags": 223,
+	  "unused": [
+		255,
+		255,
+		255,
+		254,
+		75,
+		254
+	  ],
+	  "id": 4
+	},
+	{
+	  "defense": 161,
+	  "evade": 254,
+	  "element_resist": 93,
+	  "status_resist": 254,
+	  "character_equip": 161,
+	  "price": 35839,
+	  "sell_price": 11731,
+	  "flags": 1,
+	  "unused": [
+		255,
+		255,
+		255,
+		181,
+		95,
+		163
+	  ],
+	  "id": 5
+	},
+	{
+	  "defense": 95,
+	  "evade": 117,
+	  "element_resist": 255,
+	  "status_resist": 255,
+	  "character_equip": 255,
+	  "price": 65407,
+	  "sell_price": 65346,
+	  "flags": 95,
+	  "unused": [
+		255,
+		139,
+		117,
+		255,
+		0,
+		255
+	  ],
+	  "id": 6
+	}
   ],
   "accessories": [
-    {
-      "effect_type": 127,
-      "effect_value": 223,
-      "status_grant": 127,
-      "status_immune": 161,
-      "character_equip": 94,
-      "price": 41727,
-      "sell_price": 44287,
-      "flags": 139,
-      "unused": [
-        244,
-        255,
-        255,
-        128,
-        128,
-        128
-      ],
-      "id": 0
-    },
-    {
-      "effect_type": 128,
-      "effect_value": 221,
-      "status_grant": 211,
-      "status_immune": 255,
-      "character_equip": 255,
-      "price": 65280,
-      "sell_price": 65280,
-      "flags": 255,
-      "unused": [
-        180,
-        255,
-        72,
-        255,
-        36,
-        103
-      ],
-      "id": 1
-    },
-    {
-      "effect_type": 152,
-      "effect_value": 16,
-      "status_grant": 239,
-      "status_immune": 255,
-      "character_equip": 255,
-      "price": 255,
-      "sell_price": 46923,
-      "flags": 219,
-      "unused": [
-        255,
-        255,
-        255,
-        4,
-        255,
-        119
-      ],
-      "id": 2
-    },
-    {
-      "effect_type": 237,
-      "effect_value": 245,
-      "status_grant": 30,
-      "status_immune": 247,
-      "character_equip": 204,
-      "price": 28405,
-      "sell_price": 28054,
-      "flags": 4,
-      "unused": [
-        255,
-        255,
-        255,
-        255,
-        30,
-        239
-      ],
-      "id": 3
-    },
-    {
-      "effect_type": 63,
-      "effect_value": 159,
-      "status_grant": 255,
-      "status_immune": 255,
-      "character_equip": 255,
-      "price": 65288,
-      "sell_price": 56303,
-      "flags": 239,
-      "unused": [
-        89,
-        235,
-        159,
-        239,
-        89,
-        235
-      ],
-      "id": 4
-    },
-    {
-      "effect_type": 28,
-      "effect_value": 44,
-      "status_grant": 219,
-      "status_immune": 255,
-      "character_equip": 255,
-      "price": 15615,
-      "sell_price": 31934,
-      "flags": 190,
-      "unused": [
-        255,
-        255,
-        255,
-        0,
-        255,
-        0
-      ],
-      "id": 5
-    },
-    {
-      "effect_type": 255,
-      "effect_value": 255,
-      "status_grant": 15,
-      "status_immune": 255,
-      "character_equip": 192,
-      "price": 15615,
-      "sell_price": 26265,
-      "flags": 100,
-      "unused": [
-        155,
-        255,
-        255,
-        255,
-        0,
-        240
-      ],
-      "id": 6
-    },
-    {
-      "effect_type": 63,
-      "effect_value": 195,
-      "status_grant": 255,
-      "status_immune": 255,
-      "character_equip": 255,
-      "price": 0,
-      "sell_price": 0,
-      "flags": 50,
-      "unused": [
-        32,
-        125,
-        142,
-        60,
-        255,
-        253
-      ],
-      "id": 7
-    },
-    {
-      "effect_type": 246,
-      "effect_value": 252,
-      "status_grant": 231,
-      "status_immune": 126,
-      "character_equip": 205,
-      "price": 65535,
-      "sell_price": 62431,
-      "flags": 195,
-      "unused": [
-        11,
-        27,
-        179,
-        0,
-        0,
-        0
-      ],
-      "id": 8
-    },
-    {
-      "effect_type": 0,
-      "effect_value": 16,
-      "status_grant": 24,
-      "status_immune": 120,
-      "character_equip": 118,
-      "price": 37756,
-      "sell_price": 63243,
-      "flags": 221,
-      "unused": [
-        59,
-        60,
-        251,
-        255,
-        255,
-        239
-      ],
-      "id": 9
-    },
-    {
-      "effect_type": 143,
-      "effect_value": 239,
-      "status_grant": 252,
-      "status_immune": 230,
-      "character_equip": 199,
-      "price": 16375,
-      "sell_price": 24511,
-      "flags": 183,
-      "unused": [
-        78,
-        155,
-        103,
-        153,
-        119,
-        206
-      ],
-      "id": 10
-    }
+	{
+	  "effect_type": 127,
+	  "effect_value": 223,
+	  "status_grant": 127,
+	  "status_immune": 161,
+	  "character_equip": 94,
+	  "price": 41727,
+	  "sell_price": 44287,
+	  "flags": 139,
+	  "unused": [
+		244,
+		255,
+		255,
+		128,
+		128,
+		128
+	  ],
+	  "id": 0
+	},
+	{
+	  "effect_type": 128,
+	  "effect_value": 221,
+	  "status_grant": 211,
+	  "status_immune": 255,
+	  "character_equip": 255,
+	  "price": 65280,
+	  "sell_price": 65280,
+	  "flags": 255,
+	  "unused": [
+		180,
+		255,
+		72,
+		255,
+		36,
+		103
+	  ],
+	  "id": 1
+	},
+	{
+	  "effect_type": 152,
+	  "effect_value": 16,
+	  "status_grant": 239,
+	  "status_immune": 255,
+	  "character_equip": 255,
+	  "price": 255,
+	  "sell_price": 46923,
+	  "flags": 219,
+	  "unused": [
+		255,
+		255,
+		255,
+		4,
+		255,
+		119
+	  ],
+	  "id": 2
+	},
+	{
+	  "effect_type": 237,
+	  "effect_value": 245,
+	  "status_grant": 30,
+	  "status_immune": 247,
+	  "character_equip": 204,
+	  "price": 28405,
+	  "sell_price": 28054,
+	  "flags": 4,
+	  "unused": [
+		255,
+		255,
+		255,
+		255,
+		30,
+		239
+	  ],
+	  "id": 3
+	},
+	{
+	  "effect_type": 63,
+	  "effect_value": 159,
+	  "status_grant": 255,
+	  "status_immune": 255,
+	  "character_equip": 255,
+	  "price": 65288,
+	  "sell_price": 56303,
+	  "flags": 239,
+	  "unused": [
+		89,
+		235,
+		159,
+		239,
+		89,
+		235
+	  ],
+	  "id": 4
+	},
+	{
+	  "effect_type": 28,
+	  "effect_value": 44,
+	  "status_grant": 219,
+	  "status_immune": 255,
+	  "character_equip": 255,
+	  "price": 15615,
+	  "sell_price": 31934,
+	  "flags": 190,
+	  "unused": [
+		255,
+		255,
+		255,
+		0,
+		255,
+		0
+	  ],
+	  "id": 5
+	},
+	{
+	  "effect_type": 255,
+	  "effect_value": 255,
+	  "status_grant": 15,
+	  "status_immune": 255,
+	  "character_equip": 192,
+	  "price": 15615,
+	  "sell_price": 26265,
+	  "flags": 100,
+	  "unused": [
+		155,
+		255,
+		255,
+		255,
+		0,
+		240
+	  ],
+	  "id": 6
+	},
+	{
+	  "effect_type": 63,
+	  "effect_value": 195,
+	  "status_grant": 255,
+	  "status_immune": 255,
+	  "character_equip": 255,
+	  "price": 0,
+	  "sell_price": 0,
+	  "flags": 50,
+	  "unused": [
+		32,
+		125,
+		142,
+		60,
+		255,
+		253
+	  ],
+	  "id": 7
+	},
+	{
+	  "effect_type": 246,
+	  "effect_value": 252,
+	  "status_grant": 231,
+	  "status_immune": 126,
+	  "character_equip": 205,
+	  "price": 65535,
+	  "sell_price": 62431,
+	  "flags": 195,
+	  "unused": [
+		11,
+		27,
+		179,
+		0,
+		0,
+		0
+	  ],
+	  "id": 8
+	},
+	{
+	  "effect_type": 0,
+	  "effect_value": 16,
+	  "status_grant": 24,
+	  "status_immune": 120,
+	  "character_equip": 118,
+	  "price": 37756,
+	  "sell_price": 63243,
+	  "flags": 221,
+	  "unused": [
+		59,
+		60,
+		251,
+		255,
+		255,
+		239
+	  ],
+	  "id": 9
+	},
+	{
+	  "effect_type": 143,
+	  "effect_value": 239,
+	  "status_grant": 252,
+	  "status_immune": 230,
+	  "character_equip": 199,
+	  "price": 16375,
+	  "sell_price": 24511,
+	  "flags": 183,
+	  "unused": [
+		78,
+		155,
+		103,
+		153,
+		119,
+		206
+	  ],
+	  "id": 10
+	}
   ],
   "consumables": [
-    {
-      "effect": 49,
-      "power": 227,
-      "target": 195,
-      "price": 36807,
-      "sell_price": 23295,
-      "flags": 127,
-      "id": 0
-    },
-    {
-      "effect": 180,
-      "power": 255,
-      "target": 24,
-      "price": 34170,
-      "sell_price": 9180,
-      "flags": 136,
-      "id": 1
-    },
-    {
-      "effect": 119,
-      "power": 6,
-      "target": 249,
-      "price": 24735,
-      "sell_price": 52133,
-      "flags": 231,
-      "id": 2
-    },
-    {
-      "effect": 255,
-      "power": 255,
-      "target": 112,
-      "price": 0,
-      "sell_price": 36863,
-      "flags": 239,
-      "id": 3
-    },
-    {
-      "effect": 16,
-      "power": 87,
-      "target": 168,
-      "price": 20655,
-      "sell_price": 53055,
-      "flags": 255,
-      "id": 4
-    },
-    {
-      "effect": 63,
-      "power": 112,
-      "target": 143,
-      "price": 63495,
-      "sell_price": 65392,
-      "flags": 255,
-      "id": 5
-    },
-    {
-      "effect": 255,
-      "power": 240,
-      "target": 64,
-      "price": 0,
-      "sell_price": 8447,
-      "flags": 255,
-      "id": 6
-    },
-    {
-      "effect": 5,
-      "power": 255,
-      "target": 56,
-      "price": 62205,
-      "sell_price": 49151,
-      "flags": 255,
-      "id": 7
-    },
-    {
-      "effect": 127,
-      "power": 255,
-      "target": 191,
-      "price": 32767,
-      "sell_price": 64223,
-      "flags": 199,
-      "id": 8
-    },
-    {
-      "effect": 15,
-      "power": 64,
-      "target": 128,
-      "price": 32832,
-      "sell_price": 47359,
-      "flags": 253,
-      "id": 9
-    },
-    {
-      "effect": 98,
-      "power": 234,
-      "target": 21,
-      "price": 47685,
-      "sell_price": 49663,
-      "flags": 255,
-      "id": 10
-    },
-    {
-      "effect": 247,
-      "power": 255,
-      "target": 252,
-      "price": 32511,
-      "sell_price": 40775,
-      "flags": 255,
-      "id": 11
-    },
-    {
-      "effect": 255,
-      "power": 62,
-      "target": 8,
-      "price": 33027,
-      "sell_price": 49215,
-      "flags": 231,
-      "id": 12
-    },
-    {
-      "effect": 31,
-      "power": 0,
-      "target": 255,
-      "price": 3839,
-      "sell_price": 511,
-      "flags": 42,
-      "id": 13
-    },
-    {
-      "effect": 213,
-      "power": 129,
-      "target": 126,
-      "price": 49980,
-      "sell_price": 65535,
-      "flags": 255,
-      "id": 14
-    },
-    {
-      "effect": 241,
-      "power": 254,
-      "target": 255,
-      "price": 65535,
-      "sell_price": 65280,
-      "flags": 63,
-      "id": 15
-    },
-    {
-      "effect": 206,
-      "power": 11,
-      "target": 244,
-      "price": 8160,
-      "sell_price": 35583,
-      "flags": 255,
-      "id": 16
-    },
-    {
-      "effect": 1,
-      "power": 87,
-      "target": 168,
-      "price": 1535,
-      "sell_price": 61951,
-      "flags": 255,
-      "id": 17
-    },
-    {
-      "effect": 255,
-      "power": 117,
-      "target": 254,
-      "price": 64255,
-      "sell_price": 0,
-      "flags": 0,
-      "id": 18
-    },
-    {
-      "effect": 0,
-      "power": 1,
-      "target": 1,
-      "price": 30567,
-      "sell_price": 57059,
-      "flags": 200,
-      "id": 19
-    }
+	{
+	  "effect": 49,
+	  "power": 227,
+	  "target": 195,
+	  "price": 36807,
+	  "sell_price": 23295,
+	  "flags": 127,
+	  "id": 0
+	},
+	{
+	  "effect": 180,
+	  "power": 255,
+	  "target": 24,
+	  "price": 34170,
+	  "sell_price": 9180,
+	  "flags": 136,
+	  "id": 1
+	},
+	{
+	  "effect": 119,
+	  "power": 6,
+	  "target": 249,
+	  "price": 24735,
+	  "sell_price": 52133,
+	  "flags": 231,
+	  "id": 2
+	},
+	{
+	  "effect": 255,
+	  "power": 255,
+	  "target": 112,
+	  "price": 0,
+	  "sell_price": 36863,
+	  "flags": 239,
+	  "id": 3
+	},
+	{
+	  "effect": 16,
+	  "power": 87,
+	  "target": 168,
+	  "price": 20655,
+	  "sell_price": 53055,
+	  "flags": 255,
+	  "id": 4
+	},
+	{
+	  "effect": 63,
+	  "power": 112,
+	  "target": 143,
+	  "price": 63495,
+	  "sell_price": 65392,
+	  "flags": 255,
+	  "id": 5
+	},
+	{
+	  "effect": 255,
+	  "power": 240,
+	  "target": 64,
+	  "price": 0,
+	  "sell_price": 8447,
+	  "flags": 255,
+	  "id": 6
+	},
+	{
+	  "effect": 5,
+	  "power": 255,
+	  "target": 56,
+	  "price": 62205,
+	  "sell_price": 49151,
+	  "flags": 255,
+	  "id": 7
+	},
+	{
+	  "effect": 127,
+	  "power": 255,
+	  "target": 191,
+	  "price": 32767,
+	  "sell_price": 64223,
+	  "flags": 199,
+	  "id": 8
+	},
+	{
+	  "effect": 15,
+	  "power": 64,
+	  "target": 128,
+	  "price": 32832,
+	  "sell_price": 47359,
+	  "flags": 253,
+	  "id": 9
+	},
+	{
+	  "effect": 98,
+	  "power": 234,
+	  "target": 21,
+	  "price": 47685,
+	  "sell_price": 49663,
+	  "flags": 255,
+	  "id": 10
+	},
+	{
+	  "effect": 247,
+	  "power": 255,
+	  "target": 252,
+	  "price": 32511,
+	  "sell_price": 40775,
+	  "flags": 255,
+	  "id": 11
+	},
+	{
+	  "effect": 255,
+	  "power": 62,
+	  "target": 8,
+	  "price": 33027,
+	  "sell_price": 49215,
+	  "flags": 231,
+	  "id": 12
+	},
+	{
+	  "effect": 31,
+	  "power": 0,
+	  "target": 255,
+	  "price": 3839,
+	  "sell_price": 511,
+	  "flags": 42,
+	  "id": 13
+	},
+	{
+	  "effect": 213,
+	  "power": 129,
+	  "target": 126,
+	  "price": 49980,
+	  "sell_price": 65535,
+	  "flags": 255,
+	  "id": 14
+	},
+	{
+	  "effect": 241,
+	  "power": 254,
+	  "target": 255,
+	  "price": 65535,
+	  "sell_price": 65280,
+	  "flags": 63,
+	  "id": 15
+	},
+	{
+	  "effect": 206,
+	  "power": 11,
+	  "target": 244,
+	  "price": 8160,
+	  "sell_price": 35583,
+	  "flags": 255,
+	  "id": 16
+	},
+	{
+	  "effect": 1,
+	  "power": 87,
+	  "target": 168,
+	  "price": 1535,
+	  "sell_price": 61951,
+	  "flags": 255,
+	  "id": 17
+	},
+	{
+	  "effect": 255,
+	  "power": 117,
+	  "target": 254,
+	  "price": 64255,
+	  "sell_price": 0,
+	  "flags": 0,
+	  "id": 18
+	},
+	{
+	  "effect": 0,
+	  "power": 1,
+	  "target": 1,
+	  "price": 30567,
+	  "sell_price": 57059,
+	  "flags": 200,
+	  "id": 19
+	}
   ]
 }

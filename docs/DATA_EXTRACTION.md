@@ -1,4 +1,4 @@
-﻿# Data Extraction Process
+# Data Extraction Process
 
 Documentation for extracting game data from Final Fantasy: Mystic Quest ROM.
 
@@ -29,8 +29,8 @@ The data extraction process converts binary ROM data into structured JSON format
 
 ```
 ROM Binary → Extract Tool → JSON Data → Validate → Commit
-                              ↓
-                         Update Docs
+							  ↓
+						 Update Docs
 ```
 
 ## Prerequisites
@@ -85,13 +85,13 @@ Required packages:
 1. **Create JSON Schema** in `data/schemas/`:
    ```json
    {
-     "$schema": "http://json-schema.org/draft-07/schema#",
-     "type": "object",
-     "required": ["version", "data"],
-     "properties": {
-       "version": { "type": "string" },
-       "data": { "type": "array", "items": {...} }
-     }
+	 "$schema": "http://json-schema.org/draft-07/schema#",
+	 "type": "object",
+	 "required": ["version", "data"],
+	 "properties": {
+	   "version": { "type": "string" },
+	   "data": { "type": "array", "items": {...} }
+	 }
    }
    ```
 
@@ -452,18 +452,18 @@ import jsonschema
 
 # Load schema
 with open('data/schemas/enemy_schema.json') as f:
-    schema = json.load(f)
+	schema = json.load(f)
 
 # Load data
 with open('data/enemies/enemies.json') as f:
-    data = json.load(f)
+	data = json.load(f)
 
 # Validate
 try:
-    jsonschema.validate(instance=data, schema=schema)
-    print("✓ Validation passed")
+	jsonschema.validate(instance=data, schema=schema)
+	print("✓ Validation passed")
 except jsonschema.ValidationError as e:
-    print(f"✗ Validation failed: {e.message}")
+	print(f"✗ Validation failed: {e.message}")
 ```
 
 ### ROM Verification
@@ -493,9 +493,9 @@ Custom validation checks:
 ```python
 # Example: Validate stat ranges
 for character in data['characters']:
-    assert 1 <= character['starting_level'] <= 41
-    assert 0 <= character['base_stats']['hp'] <= 9999
-    assert 0 <= character['base_stats']['speed'] <= 255
+	assert 1 <= character['starting_level'] <= 41
+	assert 0 <= character['base_stats']['hp'] <= 9999
+	assert 0 <= character['base_stats']['speed'] <= 255
 ```
 
 ## Best Practices

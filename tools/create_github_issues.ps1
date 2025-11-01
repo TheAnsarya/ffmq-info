@@ -1,9 +1,9 @@
-﻿# GitHub Issues Creation Script for FFMQ Disassembly Project
+# GitHub Issues Creation Script for FFMQ Disassembly Project
 # Prerequisites: Install GitHub CLI (gh) and authenticate: gh auth login
 
 param(
-    [switch]$dryRun = $false,
-    [switch]$createProject = $true
+	[switch]$dryRun = $false,
+	[switch]$createProject = $true
 )
 
 $repo = "TheAnsarya/ffmq-info"
@@ -14,25 +14,25 @@ Write-Host "================================" -ForegroundColor Cyan
 Write-Host ""
 
 if ($dryRun) {
-    Write-Host "⚠️  DRY RUN MODE - No issues will be created" -ForegroundColor Yellow
-    Write-Host ""
+	Write-Host "⚠️  DRY RUN MODE - No issues will be created" -ForegroundColor Yellow
+	Write-Host ""
 }
 
 # Check if gh CLI is installed
 try {
-    $ghVersion = gh --version
-    Write-Host "✓ GitHub CLI found: $($ghVersion[0])" -ForegroundColor Green
+	$ghVersion = gh --version
+	Write-Host "✓ GitHub CLI found: $($ghVersion[0])" -ForegroundColor Green
 } catch {
-    Write-Host "✗ GitHub CLI not found. Please install: https://cli.github.com/" -ForegroundColor Red
-    exit 1
+	Write-Host "✗ GitHub CLI not found. Please install: https://cli.github.com/" -ForegroundColor Red
+	exit 1
 }
 
 # Define all issues based on TODO.md
 $issues = @(
-    # IMMEDIATE PRIORITY (1-2 weeks)
-    @{
-        title = "🏷️ Finish Code Labeling - Bank 00 Section Files (68 labels)"
-        body = @"
+	# IMMEDIATE PRIORITY (1-2 weeks)
+	@{
+		title = "🏷️ Finish Code Labeling - Bank 00 Section Files (68 labels)"
+		body = @"
 ## Goal
 Eliminate the final 68 CODE_* labels to achieve **100% campaign completion**! 🏆
 
@@ -65,13 +65,13 @@ Eliminate the final 68 CODE_* labels to achieve **100% campaign completion**! �
 - See ``TODO.md`` section 1
 - See ``CAMPAIGN_PROGRESS.md`` for current stats
 "@
-        labels = @("priority: high", "type: code-labeling", "milestone: 100%")
-        milestone = "100% Code Labels"
-    },
+		labels = @("priority: high", "type: code-labeling", "milestone: 100%")
+		milestone = "100% Code Labels"
+	},
 
-    @{
-        title = "🎨 ASM Code Formatting Standardization"
-        body = @"
+	@{
+		title = "🎨 ASM Code Formatting Standardization"
+		body = @"
 ## Goal
 Apply consistent formatting to all ASM files: CRLF, UTF-8, tabs (4 spaces display)
 
@@ -115,12 +115,12 @@ Apply consistent formatting to all ASM files: CRLF, UTF-8, tabs (4 spaces displa
 ## References
 - See ``TODO.md`` section 2
 "@
-        labels = @("priority: high", "type: formatting", "requires: testing")
-    },
+		labels = @("priority: high", "type: formatting", "requires: testing")
+	},
 
-    @{
-        title = "📚 Create Basic Documentation (Architecture, Build, Modding Guides)"
-        body = @"
+	@{
+		title = "📚 Create Basic Documentation (Architecture, Build, Modding Guides)"
+		body = @"
 ## Goal
 Write essential documentation to enable contributors and modders
 
@@ -156,13 +156,13 @@ Write essential documentation to enable contributors and modders
 ## References
 - See ``TODO.md`` section 7
 "@
-        labels = @("priority: high", "type: documentation")
-    },
+		labels = @("priority: high", "type: documentation")
+	},
 
-    # SHORT-TERM PRIORITY (1-2 months)
-    @{
-        title = "🏷️ Memory Address & Variable Label System"
-        body = @"
+	# SHORT-TERM PRIORITY (1-2 months)
+	@{
+		title = "🏷️ Memory Address & Variable Label System"
+		body = @"
 ## Goal
 Replace all raw memory addresses (``$xxxx``) with meaningful labels
 
@@ -195,12 +195,12 @@ Requires deep understanding of game logic for meaningful names
 ## References
 - See ``TODO.md`` section 3
 "@
-        labels = @("priority: medium", "type: code-labeling", "effort: large")
-    },
+		labels = @("priority: medium", "type: code-labeling", "effort: large")
+	},
 
-    @{
-        title = "🖼️ Graphics Extraction Pipeline (PNG + JSON + Palettes)"
-        body = @"
+	@{
+		title = "🖼️ Graphics Extraction Pipeline (PNG + JSON + Palettes)"
+		body = @"
 ## Goal
 Create robust extraction system for all ROM graphics assets
 
@@ -235,12 +235,12 @@ Create robust extraction system for all ROM graphics assets
 ## References
 - See ``TODO.md`` section 5
 "@
-        labels = @("priority: medium", "type: graphics", "type: extraction", "effort: large")
-    },
+		labels = @("priority: medium", "type: graphics", "type: extraction", "effort: large")
+	},
 
-    @{
-        title = "📦 Data Extraction Pipeline (JSON/CSV for all game data)"
-        body = @"
+	@{
+		title = "📦 Data Extraction Pipeline (JSON/CSV for all game data)"
+		body = @"
 ## Goal
 Extract all game data into modern formats (JSON, CSV)
 
@@ -272,13 +272,13 @@ Extract all game data into modern formats (JSON, CSV)
 ## References
 - See ``TODO.md`` section 5
 "@
-        labels = @("priority: medium", "type: data", "type: extraction", "effort: large")
-    },
+		labels = @("priority: medium", "type: data", "type: extraction", "effort: large")
+	},
 
-    # MID-TERM PRIORITY (3-6 months)
-    @{
-        title = "🔍 Complete Code Disassembly - Bank $04"
-        body = @"
+	# MID-TERM PRIORITY (3-6 months)
+	@{
+		title = "🔍 Complete Code Disassembly - Bank $04"
+		body = @"
 ## Goal
 Disassemble and document Bank $04 (Data Bank, ~4,000 lines estimated)
 
@@ -299,12 +299,12 @@ Disassemble and document Bank $04 (Data Bank, ~4,000 lines estimated)
 ## References
 - See ``TODO.md`` section 4
 "@
-        labels = @("priority: low", "type: disassembly", "bank: 04")
-    },
+		labels = @("priority: low", "type: disassembly", "bank: 04")
+	},
 
-    @{
-        title = "🔍 Complete Code Disassembly - Bank $05"
-        body = @"
+	@{
+		title = "🔍 Complete Code Disassembly - Bank $05"
+		body = @"
 ## Goal
 Disassemble and document Bank $05 (Data Bank, ~4,000 lines estimated)
 
@@ -325,12 +325,12 @@ Disassemble and document Bank $05 (Data Bank, ~4,000 lines estimated)
 ## References
 - See ``TODO.md`` section 4
 "@
-        labels = @("priority: low", "type: disassembly", "bank: 05")
-    },
+		labels = @("priority: low", "type: disassembly", "bank: 05")
+	},
 
-    @{
-        title = "🔍 Complete Code Disassembly - Bank $06"
-        body = @"
+	@{
+		title = "🔍 Complete Code Disassembly - Bank $06"
+		body = @"
 ## Goal
 Disassemble and document Bank $06 (Data Bank, ~4,000 lines estimated)
 
@@ -351,12 +351,12 @@ Disassemble and document Bank $06 (Data Bank, ~4,000 lines estimated)
 ## References
 - See ``TODO.md`` section 4
 "@
-        labels = @("priority: low", "type: disassembly", "bank: 06")
-    },
+		labels = @("priority: low", "type: disassembly", "bank: 06")
+	},
 
-    @{
-        title = "🔍 Complete Code Disassembly - Bank $0e"
-        body = @"
+	@{
+		title = "🔍 Complete Code Disassembly - Bank $0e"
+		body = @"
 ## Goal
 Disassemble and document Bank $0e (Unknown, ~5,000 lines estimated)
 
@@ -377,12 +377,12 @@ Disassemble and document Bank $0e (Unknown, ~5,000 lines estimated)
 ## References
 - See ``TODO.md`` section 4
 "@
-        labels = @("priority: low", "type: disassembly", "bank: 0E")
-    },
+		labels = @("priority: low", "type: disassembly", "bank: 0E")
+	},
 
-    @{
-        title = "🔍 Complete Code Disassembly - Bank $0f"
-        body = @"
+	@{
+		title = "🔍 Complete Code Disassembly - Bank $0f"
+		body = @"
 ## Goal
 Disassemble and document Bank $0f (Unknown, ~5,000 lines estimated)
 
@@ -403,12 +403,12 @@ Disassemble and document Bank $0f (Unknown, ~5,000 lines estimated)
 ## References
 - See ``TODO.md`` section 4
 "@
-        labels = @("priority: low", "type: disassembly", "bank: 0F")
-    },
+		labels = @("priority: low", "type: disassembly", "bank: 0F")
+	},
 
-    @{
-        title = "🔄 Asset Build System (Import Graphics/Data → ROM)"
-        body = @"
+	@{
+		title = "🔄 Asset Build System (Import Graphics/Data → ROM)"
+		body = @"
 ## Goal
 Create reverse transformation pipeline: modified assets → ROM format
 
@@ -434,12 +434,12 @@ This proves extraction/import are perfect inverses!
 ## References
 - See ``TODO.md`` section 6
 "@
-        labels = @("priority: medium", "type: build-system", "type: tools", "effort: large")
-    },
+		labels = @("priority: medium", "type: build-system", "type: tools", "effort: large")
+	},
 
-    @{
-        title = "📚 Comprehensive System Documentation"
-        body = @"
+	@{
+		title = "📚 Comprehensive System Documentation"
+		body = @"
 ## Goal
 Document all major systems with architecture guides and diagrams
 
@@ -468,55 +468,55 @@ Document all major systems with architecture guides and diagrams
 ## References
 - See ``TODO.md`` section 7
 "@
-        labels = @("priority: low", "type: documentation", "effort: large")
-    }
+		labels = @("priority: low", "type: documentation", "effort: large")
+	}
 )
 
 # Create milestone if it doesn't exist
 if (-not $dryRun) {
-    Write-Host "Creating milestone: 100% Code Labels..." -ForegroundColor Cyan
-    try {
-        gh api repos/$repo/milestones -f title="100% Code Labels" -f description="Complete elimination of all CODE_* generic labels" -f state="open" 2>$null
-        Write-Host "✓ Milestone created" -ForegroundColor Green
-    } catch {
-        Write-Host "⚠️  Milestone may already exist or couldn't be created" -ForegroundColor Yellow
-    }
+	Write-Host "Creating milestone: 100% Code Labels..." -ForegroundColor Cyan
+	try {
+		gh api repos/$repo/milestones -f title="100% Code Labels" -f description="Complete elimination of all CODE_* generic labels" -f state="open" 2>$null
+		Write-Host "✓ Milestone created" -ForegroundColor Green
+	} catch {
+		Write-Host "⚠️  Milestone may already exist or couldn't be created" -ForegroundColor Yellow
+	}
 }
 
 # Create labels if they don't exist
 $labelsToCreate = @(
-    @{name="priority: high"; color="d73a4a"; description="High priority task"},
-    @{name="priority: medium"; color="fbca04"; description="Medium priority task"},
-    @{name="priority: low"; color="0e8a16"; description="Low priority task"},
-    @{name="type: code-labeling"; color="1d76db"; description="Code label replacement"},
-    @{name="type: formatting"; color="5319e7"; description="Code formatting"},
-    @{name="type: documentation"; color="0075ca"; description="Documentation"},
-    @{name="type: graphics"; color="c2e0c6"; description="Graphics extraction/import"},
-    @{name="type: data"; color="c5def5"; description="Data extraction/import"},
-    @{name="type: extraction"; color="bfdadc"; description="Asset extraction"},
-    @{name="type: disassembly"; color="e99695"; description="Code disassembly"},
-    @{name="type: build-system"; color="f9d0c4"; description="Build system"},
-    @{name="type: tools"; color="fef2c0"; description="Development tools"},
-    @{name="effort: large"; color="d876e3"; description="Large time investment"},
-    @{name="requires: testing"; color="ff6347"; description="Requires extensive testing"},
-    @{name="milestone: 100%"; color="gold"; description="100% completion milestone"},
-    @{name="bank: 04"; color="ededed"; description="Bank 04"},
-    @{name="bank: 05"; color="ededed"; description="Bank 05"},
-    @{name="bank: 06"; color="ededed"; description="Bank 06"},
-    @{name="bank: 0E"; color="ededed"; description="Bank 0E"},
-    @{name="bank: 0F"; color="ededed"; description="Bank 0F"}
+	@{name="priority: high"; color="d73a4a"; description="High priority task"},
+	@{name="priority: medium"; color="fbca04"; description="Medium priority task"},
+	@{name="priority: low"; color="0e8a16"; description="Low priority task"},
+	@{name="type: code-labeling"; color="1d76db"; description="Code label replacement"},
+	@{name="type: formatting"; color="5319e7"; description="Code formatting"},
+	@{name="type: documentation"; color="0075ca"; description="Documentation"},
+	@{name="type: graphics"; color="c2e0c6"; description="Graphics extraction/import"},
+	@{name="type: data"; color="c5def5"; description="Data extraction/import"},
+	@{name="type: extraction"; color="bfdadc"; description="Asset extraction"},
+	@{name="type: disassembly"; color="e99695"; description="Code disassembly"},
+	@{name="type: build-system"; color="f9d0c4"; description="Build system"},
+	@{name="type: tools"; color="fef2c0"; description="Development tools"},
+	@{name="effort: large"; color="d876e3"; description="Large time investment"},
+	@{name="requires: testing"; color="ff6347"; description="Requires extensive testing"},
+	@{name="milestone: 100%"; color="gold"; description="100% completion milestone"},
+	@{name="bank: 04"; color="ededed"; description="Bank 04"},
+	@{name="bank: 05"; color="ededed"; description="Bank 05"},
+	@{name="bank: 06"; color="ededed"; description="Bank 06"},
+	@{name="bank: 0E"; color="ededed"; description="Bank 0E"},
+	@{name="bank: 0F"; color="ededed"; description="Bank 0F"}
 )
 
 if (-not $dryRun) {
-    Write-Host "`nCreating labels..." -ForegroundColor Cyan
-    foreach ($label in $labelsToCreate) {
-        try {
-            gh api repos/$repo/labels -f name="$($label.name)" -f color="$($label.color)" -f description="$($label.description)" 2>$null
-            Write-Host "  ✓ Created: $($label.name)" -ForegroundColor Green
-        } catch {
-            Write-Host "  ⚠️  Label exists or couldn't be created: $($label.name)" -ForegroundColor Yellow
-        }
-    }
+	Write-Host "`nCreating labels..." -ForegroundColor Cyan
+	foreach ($label in $labelsToCreate) {
+		try {
+			gh api repos/$repo/labels -f name="$($label.name)" -f color="$($label.color)" -f description="$($label.description)" 2>$null
+			Write-Host "  ✓ Created: $($label.name)" -ForegroundColor Green
+		} catch {
+			Write-Host "  ⚠️  Label exists or couldn't be created: $($label.name)" -ForegroundColor Yellow
+		}
+	}
 }
 
 # Create issues
@@ -524,45 +524,45 @@ Write-Host "`nCreating issues..." -ForegroundColor Cyan
 $createdIssues = @()
 
 foreach ($issue in $issues) {
-    Write-Host "`n📋 $($issue.title)" -ForegroundColor Yellow
+	Write-Host "`n📋 $($issue.title)" -ForegroundColor Yellow
 
-    if ($dryRun) {
-        Write-Host "  [DRY RUN] Would create issue with:" -ForegroundColor Gray
-        Write-Host "    Labels: $($issue.labels -join ', ')" -ForegroundColor Gray
-        if ($issue.milestone) {
-            Write-Host "    Milestone: $($issue.milestone)" -ForegroundColor Gray
-        }
-        $createdIssues += @{title=$issue.title; number="[DRY RUN]"}
-    } else {
-        try {
-            # Build gh issue create command
-            $cmd = "gh issue create --repo $repo --title `"$($issue.title)`" --body `"$($issue.body)`""
+	if ($dryRun) {
+		Write-Host "  [DRY RUN] Would create issue with:" -ForegroundColor Gray
+		Write-Host "    Labels: $($issue.labels -join ', ')" -ForegroundColor Gray
+		if ($issue.milestone) {
+			Write-Host "    Milestone: $($issue.milestone)" -ForegroundColor Gray
+		}
+		$createdIssues += @{title=$issue.title; number="[DRY RUN]"}
+	} else {
+		try {
+			# Build gh issue create command
+			$cmd = "gh issue create --repo $repo --title `"$($issue.title)`" --body `"$($issue.body)`""
 
-            # Add labels
-            if ($issue.labels) {
-                foreach ($label in $issue.labels) {
-                    $cmd += " --label `"$label`""
-                }
-            }
+			# Add labels
+			if ($issue.labels) {
+				foreach ($label in $issue.labels) {
+					$cmd += " --label `"$label`""
+				}
+			}
 
-            # Add milestone if specified
-            if ($issue.milestone) {
-                $cmd += " --milestone `"$($issue.milestone)`""
-            }
+			# Add milestone if specified
+			if ($issue.milestone) {
+				$cmd += " --milestone `"$($issue.milestone)`""
+			}
 
-            # Execute command
-            $result = Invoke-Expression $cmd
+			# Execute command
+			$result = Invoke-Expression $cmd
 
-            # Extract issue number from result (format: https://github.com/owner/repo/issues/123)
-            if ($result -match '/issues/(\d+)$') {
-                $issueNumber = $Matches[1]
-                Write-Host "  ✓ Created issue #$issueNumber" -ForegroundColor Green
-                $createdIssues += @{title=$issue.title; number=$issueNumber; url=$result}
-            }
-        } catch {
-            Write-Host "  ✗ Failed to create issue: $_" -ForegroundColor Red
-        }
-    }
+			# Extract issue number from result (format: https://github.com/owner/repo/issues/123)
+			if ($result -match '/issues/(\d+)$') {
+				$issueNumber = $Matches[1]
+				Write-Host "  ✓ Created issue #$issueNumber" -ForegroundColor Green
+				$createdIssues += @{title=$issue.title; number=$issueNumber; url=$result}
+			}
+		} catch {
+			Write-Host "  ✗ Failed to create issue: $_" -ForegroundColor Red
+		}
+	}
 }
 
 # Summary
@@ -573,31 +573,31 @@ Write-Host "Total issues: $($issues.Count)" -ForegroundColor White
 Write-Host "Created: $($createdIssues.Count)" -ForegroundColor Green
 
 if ($createdIssues.Count -gt 0) {
-    Write-Host "`nCreated Issues:" -ForegroundColor Cyan
-    foreach ($issue in $createdIssues) {
-        if ($issue.url) {
-            Write-Host "  #$($issue.number): $($issue.title)" -ForegroundColor White
-            Write-Host "    $($issue.url)" -ForegroundColor Gray
-        } else {
-            Write-Host "  $($issue.number): $($issue.title)" -ForegroundColor Gray
-        }
-    }
+	Write-Host "`nCreated Issues:" -ForegroundColor Cyan
+	foreach ($issue in $createdIssues) {
+		if ($issue.url) {
+			Write-Host "  #$($issue.number): $($issue.title)" -ForegroundColor White
+			Write-Host "    $($issue.url)" -ForegroundColor Gray
+		} else {
+			Write-Host "  $($issue.number): $($issue.title)" -ForegroundColor Gray
+		}
+	}
 }
 
 if ($createProject -and -not $dryRun) {
-    Write-Host "`n================================" -ForegroundColor Cyan
-    Write-Host "PROJECT BOARD SETUP" -ForegroundColor Cyan
-    Write-Host "================================" -ForegroundColor Cyan
-    Write-Host ""
-    Write-Host "To create a project board manually:" -ForegroundColor Yellow
-    Write-Host "1. Go to: https://github.com/$repo/projects" -ForegroundColor White
-    Write-Host "2. Click 'New project' → 'Board'" -ForegroundColor White
-    Write-Host "3. Name it: 'FFMQ Disassembly Progress'" -ForegroundColor White
-    Write-Host "4. Add columns: Backlog, Todo, In Progress, Review, Done" -ForegroundColor White
-    Write-Host "5. Add all created issues to the board" -ForegroundColor White
-    Write-Host ""
-    Write-Host "Or use GitHub CLI (beta):" -ForegroundColor Yellow
-    Write-Host "  gh project create --owner TheAnsarya --title 'FFMQ Disassembly Progress'" -ForegroundColor Gray
+	Write-Host "`n================================" -ForegroundColor Cyan
+	Write-Host "PROJECT BOARD SETUP" -ForegroundColor Cyan
+	Write-Host "================================" -ForegroundColor Cyan
+	Write-Host ""
+	Write-Host "To create a project board manually:" -ForegroundColor Yellow
+	Write-Host "1. Go to: https://github.com/$repo/projects" -ForegroundColor White
+	Write-Host "2. Click 'New project' → 'Board'" -ForegroundColor White
+	Write-Host "3. Name it: 'FFMQ Disassembly Progress'" -ForegroundColor White
+	Write-Host "4. Add columns: Backlog, Todo, In Progress, Review, Done" -ForegroundColor White
+	Write-Host "5. Add all created issues to the board" -ForegroundColor White
+	Write-Host ""
+	Write-Host "Or use GitHub CLI (beta):" -ForegroundColor Yellow
+	Write-Host "  gh project create --owner TheAnsarya --title 'FFMQ Disassembly Progress'" -ForegroundColor Gray
 }
 
 Write-Host "`n✅ Done!" -ForegroundColor Green

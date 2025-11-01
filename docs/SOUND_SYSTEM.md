@@ -1,4 +1,4 @@
-﻿# Sound System Architecture
+# Sound System Architecture
 
 Complete documentation of the Final Fantasy Mystic Quest sound and music system.
 
@@ -35,8 +35,8 @@ FFMQ uses the SNES SPC700 audio processor for all sound and music:
 │ - Play SFX         │
 │ - Send commands    │
 └─────────┬──────────┘
-          │ (SPC communication ports)
-          v
+		  │ (SPC communication ports)
+		  v
 ┌────────────────────┐
 │  SPC700 Processor  │
 ├────────────────────┤
@@ -44,8 +44,8 @@ FFMQ uses the SNES SPC700 audio processor for all sound and music:
 │ - Mix 8 channels   │
 │ - Process effects  │
 └─────────┬──────────┘
-          │
-          v
+		  │
+		  v
 ┌────────────────────┐
 │  DSP (Audio Chip)  │
 ├────────────────────┤
@@ -54,9 +54,9 @@ FFMQ uses the SNES SPC700 audio processor for all sound and music:
 │ - Echo/reverb      │
 │ - Final mix        │
 └────────────────────┘
-          │
-          v
-      🔊 Stereo Output
+		  │
+		  v
+	  🔊 Stereo Output
 ```
 
 ## SPC700 Architecture
@@ -118,8 +118,8 @@ Music File Structure:
 │ - Channel count     │
 │ - Loop point        │
 └─────────────────────┘
-          │
-          v
+		  │
+		  v
 ┌─────────────────────┐
 │ Channel Data (×8)   │
 ├─────────────────────┤
@@ -132,8 +132,8 @@ Music File Structure:
 │ Channel 6: (unused) │
 │ Channel 7: (unused) │
 └─────────────────────┘
-          │
-          v
+		  │
+		  v
 ┌─────────────────────┐
 │ Pattern Data        │
 ├─────────────────────┤
@@ -238,23 +238,23 @@ Higher priority can interrupt lower priority
 ;   A = Sound effect ID
 ; ==============================================================================
 PlaySoundEffect:
-    ; Check if already playing higher priority SFX
-    cmp CurrentSFXPriority
-    bcc .ignore             ; Lower priority? Ignore
-    
-    ; Store new SFX
-    sta $2140               ; Send to SPC700 port 0
-    lda #$01                ; SFX command
-    sta $2141               ; Send command
-    
-    ; Wait for acknowledgment
+	; Check if already playing higher priority SFX
+	cmp CurrentSFXPriority
+	bcc .ignore             ; Lower priority? Ignore
+	
+	; Store new SFX
+	sta $2140               ; Send to SPC700 port 0
+	lda #$01                ; SFX command
+	sta $2141               ; Send command
+	
+	; Wait for acknowledgment
 .wait:
-    lda $2140
-    cmp #$aa                ; Check ACK byte
-    bne .wait
-    
+	lda $2140
+	cmp #$aa                ; Check ACK byte
+	bne .wait
+	
 .ignore:
-    rts
+	rts
 ```
 
 ### Common Sound Effects
@@ -291,45 +291,45 @@ $42     Game Over           Party defeated
 ; InitializeAudio - Setup SPC700 and load driver
 ; ==============================================================================
 InitializeAudio:
-    ; Wait for SPC700 ready
-    lda #$aa
+	; Wait for SPC700 ready
+	lda #$aa
 .waitReady:
-    cmp $2140
-    bne .waitReady
-    
-    ; Send driver code size
-    lda #<DriverSize
-    sta $2142
-    lda #>DriverSize
-    sta $2143
-    
-    ; Send driver load command
-    lda #$cc
-    sta $2141
-    lda #$01                ; Upload command
-    sta $2140
-    
-    ; Transfer driver code
-    ldx #$0000
+	cmp $2140
+	bne .waitReady
+	
+	; Send driver code size
+	lda #<DriverSize
+	sta $2142
+	lda #>DriverSize
+	sta $2143
+	
+	; Send driver load command
+	lda #$cc
+	sta $2141
+	lda #$01                ; Upload command
+	sta $2140
+	
+	; Transfer driver code
+	ldx #$0000
 .uploadLoop:
-    lda AudioDriver,x
-    sta $2141               ; Send byte
-    lda #$00
-    sta $2140               ; Trigger transfer
-    
+	lda AudioDriver,x
+	sta $2141               ; Send byte
+	lda #$00
+	sta $2140               ; Trigger transfer
+	
 .waitAck:
-    lda $2140
-    bne .waitAck            ; Wait for SPC ack
-    
-    inx
-    cpx #DriverSize
-    bcc .uploadLoop
-    
-    ; Start driver
-    lda #$00
-    sta $2140               ; Send start command
-    
-    rts
+	lda $2140
+	bne .waitAck            ; Wait for SPC ack
+	
+	inx
+	cpx #DriverSize
+	bcc .uploadLoop
+	
+	; Start driver
+	lda #$00
+	sta $2140               ; Send start command
+	
+	rts
 ```
 
 ### Driver Main Loop
@@ -391,7 +391,7 @@ SPC700 Driver Loop (runs at ~60 Hz):
 6. Begin playback
    │
    └─ Process sequence data
-       ↓
+	   ↓
 7. Loop at loop point
 ```
 
@@ -403,43 +403,43 @@ SPC700 Driver Loop (runs at ~60 Hz):
 ; UpdateMusicSequencer - Process music sequence
 ; ==============================================================================
 UpdateMusicSequencer:
-    ; Update tempo timer
-    lda TempoTimer
-    clc
-    adc CurrentTempo
-    sta TempoTimer
-    bcc .done               ; Not time for next event
-    
-    ; Process each channel
-    ldx #$00
+	; Update tempo timer
+	lda TempoTimer
+	clc
+	adc CurrentTempo
+	sta TempoTimer
+	bcc .done               ; Not time for next event
+	
+	; Process each channel
+	ldx #$00
 .channelLoop:
-    lda ChannelActive,x
-    beq .nextChannel        ; Skip if inactive
-    
-    ; Get next event
-    ldy ChannelPointer,x
-    lda (MusicData),y
-    
-    ; Check event type
-    cmp #$80
-    bcc .noteOn
-    
-    cmp #$82
-    beq .loopPoint
-    
-    ; ... (handle other commands)
-    
+	lda ChannelActive,x
+	beq .nextChannel        ; Skip if inactive
+	
+	; Get next event
+	ldy ChannelPointer,x
+	lda (MusicData),y
+	
+	; Check event type
+	cmp #$80
+	bcc .noteOn
+	
+	cmp #$82
+	beq .loopPoint
+	
+	; ... (handle other commands)
+	
 .noteOn:
-    ; Play note on channel
-    jsr PlayNoteOnChannel
-    
+	; Play note on channel
+	jsr PlayNoteOnChannel
+	
 .nextChannel:
-    inx
-    cpx #$06                ; Music uses channels 0-5
-    bcc .channelLoop
-    
+	inx
+	cpx #$06                ; Music uses channels 0-5
+	bcc .channelLoop
+	
 .done:
-    rts
+	rts
 ```
 
 ## Sound Channels
@@ -466,15 +466,15 @@ Channel Registers (per voice):
 ADSR (Attack-Decay-Sustain-Release):
 
    Volume
-     |
+	 |
  127 |    /\
-     |   /  \___________
-     |  /               \
-     | /                 \
+	 |   /  \___________
+	 |  /               \
+	 | /                 \
    0 |/                   \__
-     +----+----+----+----+-----> Time
-       A   D   S    R
-       
+	 +----+----+----+----+-----> Time
+	   A   D   S    R
+	   
 A = Attack:  How fast note reaches peak (0-15)
 D = Decay:   How fast it falls to sustain (0-7)
 S = Sustain: Volume level to hold (0-7)
@@ -502,43 +502,43 @@ ADSR2 byte: sss rrrrr
 ;   Y = Pitch (note)
 ; ==============================================================================
 PlaySampleOnChannel:
-    ; Calculate DSP register offset
-    asl a                   ; × 16 (channel spacing)
-    asl a
-    asl a
-    asl a
-    sta $00                 ; Save offset
-    
-    ; Set sample source
-    lda $00
-    ora #$04                ; +$x4 (source register)
-    sta DspAddress
-    stx DspData             ; Sample number
-    
-    ; Set pitch
-    lda PitchTable,y        ; Get pitch value
-    sta $10
-    lda PitchTable+1,y
-    sta $11
-    
-    lda $00
-    ora #$02                ; +$x2 (pitch low)
-    sta DspAddress
-    lda $10
-    sta DspData
-    
-    lda $00
-    ora #$03                ; +$x3 (pitch high)
-    sta DspAddress
-    lda $11
-    sta DspData
-    
-    ; Key on
-    lda ChannelMask,x       ; Get channel bit
-    sta DspAddress          ; Register $4c (key on)
-    sta DspData
-    
-    rts
+	; Calculate DSP register offset
+	asl a                   ; × 16 (channel spacing)
+	asl a
+	asl a
+	asl a
+	sta $00                 ; Save offset
+	
+	; Set sample source
+	lda $00
+	ora #$04                ; +$x4 (source register)
+	sta DspAddress
+	stx DspData             ; Sample number
+	
+	; Set pitch
+	lda PitchTable,y        ; Get pitch value
+	sta $10
+	lda PitchTable+1,y
+	sta $11
+	
+	lda $00
+	ora #$02                ; +$x2 (pitch low)
+	sta DspAddress
+	lda $10
+	sta DspData
+	
+	lda $00
+	ora #$03                ; +$x3 (pitch high)
+	sta DspAddress
+	lda $11
+	sta DspData
+	
+	; Key on
+	lda ChannelMask,x       ; Get channel bit
+	sta DspAddress          ; Register $4c (key on)
+	sta DspData
+	
+	rts
 ```
 
 ## Instrument System
@@ -571,13 +571,13 @@ SNES uses BRR (Bit Rate Reduction) compressed samples:
 ```
 BRR Block (9 bytes):
   Byte 0: Header
-    Bits 0-1: Loop flags
-      00 = Continue
-      01 = Loop end
-      10 = Loop start
-      11 = Loop both
-    Bits 2-3: Filter type (0-3)
-    Bits 4-7: Shift amount (0-12)
+	Bits 0-1: Loop flags
+	  00 = Continue
+	  01 = Loop end
+	  10 = Loop start
+	  11 = Loop both
+	Bits 2-3: Filter type (0-3)
+	Bits 4-7: Shift amount (0-12)
   
   Bytes 1-8: 16 4-bit samples (compressed)
   
@@ -642,51 +642,51 @@ Music IDs:
 ;   A = Music ID
 ; ==============================================================================
 LoadMusic:
-    ; Get music pointer
-    asl a                   ; × 2 (word table)
-    tax
-    lda MusicPointerTable,x
-    sta $00
-    lda MusicPointerTable+1,x
-    sta $01
-    
-    ; Get music size
-    ldy #$00
-    lda ($00),y             ; Size low
-    sta $10
-    iny
-    lda ($00),y             ; Size high
-    sta $11
-    
-    ; Send load command to SPC700
-    lda #$02                ; Load music command
-    sta $2140
-    lda $10                 ; Size low
-    sta $2141
-    lda $11                 ; Size high
-    sta $2142
-    
-    ; Transfer music data
-    ldy #$02                ; Skip size header
+	; Get music pointer
+	asl a                   ; × 2 (word table)
+	tax
+	lda MusicPointerTable,x
+	sta $00
+	lda MusicPointerTable+1,x
+	sta $01
+	
+	; Get music size
+	ldy #$00
+	lda ($00),y             ; Size low
+	sta $10
+	iny
+	lda ($00),y             ; Size high
+	sta $11
+	
+	; Send load command to SPC700
+	lda #$02                ; Load music command
+	sta $2140
+	lda $10                 ; Size low
+	sta $2141
+	lda $11                 ; Size high
+	sta $2142
+	
+	; Transfer music data
+	ldy #$02                ; Skip size header
 .transferLoop:
-    lda ($00),y
-    sta $2141               ; Send byte
-    
-    ; Wait for SPC acknowledgment
+	lda ($00),y
+	sta $2141               ; Send byte
+	
+	; Wait for SPC acknowledgment
 .waitAck:
-    lda $2140
-    cmp #$aa
-    bne .waitAck
-    
-    iny
-    cpy $11
-    bcc .transferLoop
-    
-    ; Start playback
-    lda #$03                ; Play command
-    sta $2140
-    
-    rts
+	lda $2140
+	cmp #$aa
+	bne .waitAck
+	
+	iny
+	cpy $11
+	bcc .transferLoop
+	
+	; Start playback
+	lda #$03                ; Play command
+	sta $2140
+	
+	rts
 ```
 
 ## Code Locations
@@ -697,19 +697,19 @@ LoadMusic:
 
 ```asm
 InitializeAudio:            ; Setup audio system
-    ; Located at $01:C000
-    
+	; Located at $01:C000
+	
 LoadMusic:                  ; Load music to SPC700
-    ; Located at $01:C123
-    
+	; Located at $01:C123
+	
 PlaySoundEffect:            ; Trigger SFX
-    ; Located at $01:C234
-    
+	; Located at $01:C234
+	
 StopMusic:                  ; Halt music playback
-    ; Located at $01:C345
-    
+	; Located at $01:C345
+	
 SetMusicVolume:             ; Adjust music volume
-    ; Located at $01:C456
+	; Located at $01:C456
 ```
 
 ### SPC700 Driver
@@ -718,19 +718,19 @@ SetMusicVolume:             ; Adjust music volume
 
 ```asm
 DriverMain:                 ; Main driver loop
-    ; SPC RAM at $0300
-    
+	; SPC RAM at $0300
+	
 ProcessCommand:             ; Handle CPU commands
-    ; SPC RAM at $0350
-    
+	; SPC RAM at $0350
+	
 UpdateSequencer:            ; Music sequencer
-    ; SPC RAM at $0400
-    
+	; SPC RAM at $0400
+	
 MixChannels:                ; Mix 8 channels
-    ; SPC RAM at $0500
-    
+	; SPC RAM at $0500
+	
 ProcessEcho:                ; Echo/reverb effect
-    ; SPC RAM at $0600
+	; SPC RAM at $0600
 ```
 
 ### Music Data
@@ -741,14 +741,14 @@ ProcessEcho:                ; Echo/reverb effect
 
 ```asm
 MusicPointerTable:          ; Music pointer table
-    ; Located at $08:0000
-    
+	; Located at $08:0000
+	
 MusicData_Title:            ; Title screen music
-    ; Located at $08:2000
-    
+	; Located at $08:2000
+	
 MusicData_WorldMap:         ; World map theme
-    ; Located at $08:2800
-    
+	; Located at $08:2800
+	
 ; ... (all music tracks)
 ```
 
@@ -799,17 +799,17 @@ Sample optimization:
 ```asm
 ; Mute specific channel
 DebugMuteChannel:
-    lda #$07                ; Channel 7
-    sta $2140
-    lda #$ff                ; Mute command
-    sta $2141
-    rts
+	lda #$07                ; Channel 7
+	sta $2140
+	lda #$ff                ; Mute command
+	sta $2141
+	rts
 
 ; Force music ID
 DebugPlayMusic:
-    lda #$04                ; Battle theme
-    jsr LoadMusic
-    rts
+	lda #$04                ; Battle theme
+	jsr LoadMusic
+	rts
 ```
 
 ## See Also

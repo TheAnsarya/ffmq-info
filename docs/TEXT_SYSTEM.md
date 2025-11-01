@@ -1,4 +1,4 @@
-﻿# Text System Architecture
+# Text System Architecture
 
 Complete documentation of the Final Fantasy Mystic Quest text rendering and dialogue system.
 
@@ -31,8 +31,8 @@ The FFMQ text system handles all in-game text display including:
 ┌─────────────────┐
 │ Text Data (ROM) │ ← Compressed text strings
 └────────┬────────┘
-         │
-         v
+		 │
+		 v
 ┌─────────────────┐
 │ Text Engine     │ ← Decodes and renders
 ├─────────────────┤
@@ -41,8 +41,8 @@ The FFMQ text system handles all in-game text display including:
 │ - Handle control│
 │ - Word wrap     │
 └────────┬────────┘
-         │
-         v
+		 │
+		 v
 ┌─────────────────┐
 │  BG3 Layer      │ ← 2bpp text layer
 └─────────────────┘
@@ -97,29 +97,29 @@ Savings: ~30% compression
 
 ```python
 def encode_text(text: str) -> bytes:
-    """Encode text string to FFMQ format."""
-    result = bytearray()
-    i = 0
-    
-    while i < len(text):
-        # Check for two-character DTE match
-        if i + 1 < len(text):
-            pair = text[i:i+2].lower()
-            if pair in DTE_TABLE:
-                result.append(DTE_TABLE[pair])
-                i += 2
-                continue
-        
-        # Single character encoding
-        char = text[i]
-        if char in CHAR_TABLE:
-            result.append(CHAR_TABLE[char])
-        else:
-            result.append(0x0D)  # Unknown → space
-        i += 1
-    
-    result.append(0x00)  # End marker
-    return bytes(result)
+	"""Encode text string to FFMQ format."""
+	result = bytearray()
+	i = 0
+	
+	while i < len(text):
+		# Check for two-character DTE match
+		if i + 1 < len(text):
+			pair = text[i:i+2].lower()
+			if pair in DTE_TABLE:
+				result.append(DTE_TABLE[pair])
+				i += 2
+				continue
+		
+		# Single character encoding
+		char = text[i]
+		if char in CHAR_TABLE:
+			result.append(CHAR_TABLE[char])
+		else:
+			result.append(0x0D)  # Unknown → space
+		i += 1
+	
+	result.append(0x00)  # End marker
+	return bytes(result)
 ```
 
 ## Text Rendering
@@ -165,48 +165,48 @@ def encode_text(text: str) -> bytes:
 ;   X = Updated position (incremented)
 ; ==============================================================================
 DrawCharacter:
-    cmp #$00            ; Check for end marker
-    beq .end_text
-    
-    cmp #$01            ; Check for newline
-    beq .newline
-    
-    cmp #$02            ; Check for wait
-    beq .wait_input
-    
-    ; Convert character code to tile number
-    jsr GetCharacterTile
-    
-    ; Write to BG3 tilemap in VRAM
-    sta TextBuffer,x    ; Store in buffer
-    inx                 ; Increment position
-    
-    ; Check for line end
-    cpx #$20            ; 32 characters per line
-    bcc .done
-    
+	cmp #$00            ; Check for end marker
+	beq .end_text
+	
+	cmp #$01            ; Check for newline
+	beq .newline
+	
+	cmp #$02            ; Check for wait
+	beq .wait_input
+	
+	; Convert character code to tile number
+	jsr GetCharacterTile
+	
+	; Write to BG3 tilemap in VRAM
+	sta TextBuffer,x    ; Store in buffer
+	inx                 ; Increment position
+	
+	; Check for line end
+	cpx #$20            ; 32 characters per line
+	bcc .done
+	
 .newline:
-    ; Move to next line
-    txa
-    and #$e0            ; Keep line start
-    clc
-    adc #$20            ; Add 32 (next line)
-    tax
-    
+	; Move to next line
+	txa
+	and #$e0            ; Keep line start
+	clc
+	adc #$20            ; Add 32 (next line)
+	tax
+	
 .done:
-    rts
-    
+	rts
+	
 .wait_input:
-    ; Set wait flag
-    lda #$01
-    sta TextWaitFlag
-    rts
-    
+	; Set wait flag
+	lda #$01
+	sta TextWaitFlag
+	rts
+	
 .end_text:
-    ; Mark text complete
-    lda #$ff
-    sta TextCompleteFlag
-    rts
+	; Mark text complete
+	lda #$ff
+	sta TextCompleteFlag
+	rts
 ```
 
 ### Tilemap Layout (BG3)
@@ -275,28 +275,28 @@ Resume Game
 
 ```
 Page 1: "Welcome to the"
-        "village, traveler!"
-        [WAIT]
-        
+		"village, traveler!"
+		[WAIT]
+		
 Page 2: "The Dark King has"
-        "taken our crystal."
-        [END]
+		"taken our crystal."
+		[END]
 ```
 
 **Control flow**:
 ```asm
 DialogueScript_OldMan:
-    .dw Text_OldMan_Page1
-    .dw Text_OldMan_Page2
-    .dw $0000               ; End of dialogue
-    
+	.dw Text_OldMan_Page1
+	.dw Text_OldMan_Page2
+	.dw $0000               ; End of dialogue
+	
 Text_OldMan_Page1:
-    .db "Welcome to the", $01
-    .db "village, traveler!", $02  ; $02 = WAIT
-    
+	.db "Welcome to the", $01
+	.db "village, traveler!", $02  ; $02 = WAIT
+	
 Text_OldMan_Page2:
-    .db "The Dark King has", $01
-    .db "taken our crystal.", $00  ; $00 = END
+	.db "The Dark King has", $01
+	.db "taken our crystal.", $00  ; $00 = END
 ```
 
 ## Text Windows
@@ -328,10 +328,10 @@ FFMQ uses several window styles:
    └──────────────────────────┘
 
 4. Choice Window (Centered)
-       ┌──────────┐
-       │ ► Yes    │
-       │   No     │
-       └──────────┘
+	   ┌──────────┐
+	   │ ► Yes    │
+	   │   No     │
+	   └──────────┘
 ```
 
 ### Window Rendering
@@ -362,38 +362,38 @@ Tile Map:
 ;   $03 = Height (tiles)
 ; ==============================================================================
 DrawWindow:
-    ; Calculate VRAM position
-    lda $01             ; Y position
-    asl a               ; × 32 (row size)
-    asl a
-    asl a
-    asl a
-    asl a
-    clc
-    adc $00             ; + X position
-    tax                 ; X = tilemap offset
-    
-    ; Draw top edge
-    lda #$e0            ; Top-left corner
-    sta TextBuffer,x
-    inx
-    
-    ldy $02             ; Width
-    dey                 ; Minus 2 (corners)
-    dey
+	; Calculate VRAM position
+	lda $01             ; Y position
+	asl a               ; × 32 (row size)
+	asl a
+	asl a
+	asl a
+	asl a
+	clc
+	adc $00             ; + X position
+	tax                 ; X = tilemap offset
+	
+	; Draw top edge
+	lda #$e0            ; Top-left corner
+	sta TextBuffer,x
+	inx
+	
+	ldy $02             ; Width
+	dey                 ; Minus 2 (corners)
+	dey
 .topEdge:
-    lda #$e1            ; Top edge
-    sta TextBuffer,x
-    inx
-    dey
-    bne .topEdge
-    
-    lda #$e2            ; Top-right corner
-    sta TextBuffer,x
-    
-    ; ... (continue for sides and bottom)
-    
-    rts
+	lda #$e1            ; Top edge
+	sta TextBuffer,x
+	inx
+	dey
+	bne .topEdge
+	
+	lda #$e2            ; Top-right corner
+	sta TextBuffer,x
+	
+	; ... (continue for sides and bottom)
+	
+	rts
 ```
 
 ## Font System
@@ -418,22 +418,22 @@ Character Set:
 ; LoadFont - Load font tiles to VRAM
 ; ==============================================================================
 LoadFont:
-    ; Set VRAM destination (BG3 character area)
-    lda #<$4000         ; VRAM address for BG3 tiles
-    sta $2116
-    lda #>$4000
-    sta $2117
-    
-    ; DMA font data from ROM
-    ldx #<FontData
-    ldy #>FontData
-    lda #^FontData
-    jsr LoadGraphicsToVRAM
-    
-    rts
+	; Set VRAM destination (BG3 character area)
+	lda #<$4000         ; VRAM address for BG3 tiles
+	sta $2116
+	lda #>$4000
+	sta $2117
+	
+	; DMA font data from ROM
+	ldx #<FontData
+	ldy #>FontData
+	lda #^FontData
+	jsr LoadGraphicsToVRAM
+	
+	rts
 
 FontData:
-    .incbin "assets/data/font_2bpp.bin"
+	.incbin "assets/data/font_2bpp.bin"
 ```
 
 **Font Palette** (BG3 uses palette 7):
@@ -459,17 +459,17 @@ Text organized in pointer tables:
 ```asm
 ; Main dialogue pointer table
 DialoguePointers:
-    .dw Dialogue_000    ; NPC 0
-    .dw Dialogue_001    ; NPC 1
-    .dw Dialogue_002    ; NPC 2
-    ; ... (hundreds of entries)
-    
+	.dw Dialogue_000    ; NPC 0
+	.dw Dialogue_001    ; NPC 1
+	.dw Dialogue_002    ; NPC 2
+	; ... (hundreds of entries)
+	
 ; System message pointers
 SystemMessages:
-    .dw Msg_ItemReceived
-    .dw Msg_LevelUp
-    .dw Msg_GameOver
-    ; ... (system messages)
+	.dw Msg_ItemReceived
+	.dw Msg_LevelUp
+	.dw Msg_GameOver
+	; ... (system messages)
 ```
 
 ### Text Sections
@@ -574,46 +574,46 @@ Example:
 ;   $12-$13 = Destination pointer (buffer)
 ; ==============================================================================
 DecompressText:
-    ldy #$00            ; Source index
-    ldx #$00            ; Destination index
-    
+	ldy #$00            ; Source index
+	ldx #$00            ; Destination index
+	
 .loop:
-    lda ($10),y         ; Read compressed byte
-    beq .done           ; $00 = end
-    
-    bmi .dictionary     ; Bit 7 set = dictionary
-    
-    ; Literal byte
-    sta ($12),x         ; Write to buffer
-    inx
-    iny
-    bra .loop
-    
+	lda ($10),y         ; Read compressed byte
+	beq .done           ; $00 = end
+	
+	bmi .dictionary     ; Bit 7 set = dictionary
+	
+	; Literal byte
+	sta ($12),x         ; Write to buffer
+	inx
+	iny
+	bra .loop
+	
 .dictionary:
-    and #$7f            ; Get dictionary index
-    asl a               ; × 2 (word pointers)
-    tax
-    
-    ; Load dictionary entry
-    lda DictionaryPointers,x
-    sta $14
-    lda DictionaryPointers+1,x
-    sta $15
-    
-    ; Copy dictionary string
-    phx
-    phy
-    jsr CopyDictionaryEntry
-    ply
-    plx
-    
-    iny
-    bra .loop
-    
+	and #$7f            ; Get dictionary index
+	asl a               ; × 2 (word pointers)
+	tax
+	
+	; Load dictionary entry
+	lda DictionaryPointers,x
+	sta $14
+	lda DictionaryPointers+1,x
+	sta $15
+	
+	; Copy dictionary string
+	phx
+	phy
+	jsr CopyDictionaryEntry
+	ply
+	plx
+	
+	iny
+	bra .loop
+	
 .done:
-    lda #$00            ; Null terminate
-    sta ($12),x
-    rts
+	lda #$00            ; Null terminate
+	sta ($12),x
+	rts
 ```
 
 ## Code Locations
@@ -625,16 +625,16 @@ DecompressText:
 ```asm
 ; Main text rendering
 RenderText:                 ; Main text rendering loop
-    ; Located at $0d:8000
-    
+	; Located at $0d:8000
+	
 DrawCharacter:              ; Draw single character
-    ; Located at $0d:8123
-    
+	; Located at $0d:8123
+	
 ProcessControlCode:         ; Handle control codes
-    ; Located at $0d:8234
-    
+	; Located at $0d:8234
+	
 WordWrap:                   ; Auto word wrapping
-    ; Located at $0d:8345
+	; Located at $0d:8345
 ```
 
 ### Dialogue System
@@ -643,16 +643,16 @@ WordWrap:                   ; Auto word wrapping
 
 ```asm
 ShowDialogue:               ; Display dialogue window
-    ; Located at $0d:9000
-    
+	; Located at $0d:9000
+	
 LoadPortrait:               ; Load character portrait
-    ; Located at $0d:9123
-    
+	; Located at $0d:9123
+	
 WaitForInput:               ; Wait for button press
-    ; Located at $0d:9234
-    
+	; Located at $0d:9234
+	
 CloseDialogue:              ; Close text window
-    ; Located at $0d:9345
+	; Located at $0d:9345
 ```
 
 ### Text Utilities
@@ -661,16 +661,16 @@ CloseDialogue:              ; Close text window
 
 ```asm
 DecompressText:             ; Decompress text data
-    ; Located at $0d:A000
-    
+	; Located at $0d:A000
+	
 GetTextPointer:             ; Look up text by ID
-    ; Located at $0d:A123
-    
+	; Located at $0d:A123
+	
 DrawWindow:                 ; Draw bordered window
-    ; Located at $0d:A234
-    
+	; Located at $0d:A234
+	
 LoadFont:                   ; Load font to VRAM
-    ; Located at $0d:A345
+	; Located at $0d:A345
 ```
 
 ## Performance Considerations
@@ -707,15 +707,15 @@ Decompression Buffer: 512 bytes
 ```asm
 ; Test text rendering
 DebugShowText:
-    ldx #<TestText
-    ldy #>TestText
-    lda #^TestText
-    jsr ShowDialogue
-    rts
-    
+	ldx #<TestText
+	ldy #>TestText
+	lda #^TestText
+	jsr ShowDialogue
+	rts
+	
 TestText:
-    .db "Debug test", $01
-    .db "message!", $00
+	.db "Debug test", $01
+	.db "message!", $00
 ```
 
 ## See Also

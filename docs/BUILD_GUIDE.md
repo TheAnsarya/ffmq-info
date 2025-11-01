@@ -499,14 +499,14 @@ Use built-in tasks (Ctrl+Shift+P → "Run Task"):
 **Configure** (`.vscode/tasks.json`):
 ```json
 {
-    "label": "Build ROM",
-    "type": "shell",
-    "command": "pwsh",
-    "args": ["-File", "${workspaceFolder}/build.ps1"],
-    "group": {
-        "kind": "build",
-        "isDefault": true
-    }
+	"label": "Build ROM",
+	"type": "shell",
+	"command": "pwsh",
+	"args": ["-File", "${workspaceFolder}/build.ps1"],
+	"group": {
+		"kind": "build",
+		"isDefault": true
+	}
 }
 ```
 
@@ -518,11 +518,11 @@ Set up automated build tests:
 # test-build.ps1
 .\build.ps1 -Clean
 if ($LASTEXITCODE -eq 0) {
-    Write-Host "✅ Build successful"
-    .\tools\verify-build.ps1
+	Write-Host "✅ Build successful"
+	.\tools\verify-build.ps1
 } else {
-    Write-Host "❌ Build failed"
-    exit 1
+	Write-Host "❌ Build failed"
+	exit 1
 }
 ```
 
@@ -535,22 +535,22 @@ name: Build ROM
 on: [push, pull_request]
 jobs:
   build:
-    runs-on: windows-latest
-    steps:
-      - uses: actions/checkout@v3
-      - name: Download asar
-        run: |
-          Invoke-WebRequest -Uri "https://github.com/RPGHacker/asar/releases/download/v1.81/asar181.zip" -OutFile "asar.zip"
-          Expand-Archive -Path "asar.zip" -DestinationPath "."
-      - name: Build ROM
-        run: .\build.ps1 -Clean
-      - name: Verify Build
-        run: .\tools\verify-build.ps1
-      - name: Upload ROM
-        uses: actions/upload-artifact@v3
-        with:
-          name: ffmq-rebuilt-rom
-          path: build/ffmq-rebuilt.sfc
+	runs-on: windows-latest
+	steps:
+	  - uses: actions/checkout@v3
+	  - name: Download asar
+		run: |
+		  Invoke-WebRequest -Uri "https://github.com/RPGHacker/asar/releases/download/v1.81/asar181.zip" -OutFile "asar.zip"
+		  Expand-Archive -Path "asar.zip" -DestinationPath "."
+	  - name: Build ROM
+		run: .\build.ps1 -Clean
+	  - name: Verify Build
+		run: .\tools\verify-build.ps1
+	  - name: Upload ROM
+		uses: actions/upload-artifact@v3
+		with:
+		  name: ffmq-rebuilt-rom
+		  path: build/ffmq-rebuilt.sfc
 ```
 
 ### Build Performance

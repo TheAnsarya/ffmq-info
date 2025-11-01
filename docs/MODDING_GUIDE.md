@@ -1,4 +1,4 @@
-﻿# Modding Guide - Final Fantasy Mystic Quest
+# Modding Guide - Final Fantasy Mystic Quest
 
 A comprehensive guide to modifying and customizing Final Fantasy Mystic Quest using the disassembly project.
 
@@ -102,9 +102,9 @@ The disassembly is organized by ROM banks:
 ```asm
 ; Example: Behemoth
 EnemyStats_Behemoth:
-    .dw $0190   ; HP: 400 → Change to $0320 (800)
-    .db $32     ; Attack
-    .db $28     ; Defense
+	.dw $0190   ; HP: 400 → Change to $0320 (800)
+	.db $32     ; Attack
+	.db $28     ; Defense
 ```
 
 ### Infinite MP Cheat
@@ -114,22 +114,22 @@ EnemyStats_Behemoth:
 **Find** MP consumption code:
 ```asm
 ConsumeMP:
-    lda CurrentMP
-    sec
-    sbc SpellCost    ; Subtract MP cost
-    sta CurrentMP
-    rts
+	lda CurrentMP
+	sec
+	sbc SpellCost    ; Subtract MP cost
+	sta CurrentMP
+	rts
 ```
 
 **Change to**:
 ```asm
 ConsumeMP:
-    ; Just return without subtracting!
-    nop
-    nop
-    nop
-    nop
-    rts
+	; Just return without subtracting!
+	nop
+	nop
+	nop
+	nop
+	rts
 ```
 
 ## Character Stats
@@ -140,15 +140,15 @@ Character stats are stored as structured data:
 
 ```asm
 CharacterData:
-    .db Level       ; Current level (1-41)
-    .db HP_Max      ; Maximum HP
-    .db MP_Max      ; Maximum MP  
-    .db Attack      ; Attack power
-    .db Defense     ; Defense power
-    .db Speed       ; Speed/Agility
-    .db Magic       ; Magic power
-    .db Accuracy    ; Hit rate
-    .db Evasion     ; Dodge rate
+	.db Level       ; Current level (1-41)
+	.db HP_Max      ; Maximum HP
+	.db MP_Max      ; Maximum MP  
+	.db Attack      ; Attack power
+	.db Defense     ; Defense power
+	.db Speed       ; Speed/Agility
+	.db Magic       ; Magic power
+	.db Accuracy    ; Hit rate
+	.db Evasion     ; Dodge rate
 ```
 
 ### Modifying Starting Stats
@@ -160,27 +160,27 @@ CharacterData:
 ```asm
 ; Original Benjamin stats
 BenjaminStartStats:
-    .db $01     ; Level 1
-    .db $14     ; HP: 20
-    .db $0a     ; MP: 10
-    .db $08     ; Attack: 8
-    .db $08     ; Defense: 8
-    .db $08     ; Speed: 8
-    .db $08     ; Magic: 8
-    .db $64     ; Accuracy: 100
-    .db $32     ; Evasion: 50
+	.db $01     ; Level 1
+	.db $14     ; HP: 20
+	.db $0a     ; MP: 10
+	.db $08     ; Attack: 8
+	.db $08     ; Defense: 8
+	.db $08     ; Speed: 8
+	.db $08     ; Magic: 8
+	.db $64     ; Accuracy: 100
+	.db $32     ; Evasion: 50
 
 ; Modified - TANK BUILD
 BenjaminStartStats:
-    .db $01     ; Level 1
-    .db $32     ; HP: 50 (2.5x increase!)
-    .db $05     ; MP: 5 (reduced)
-    .db $0c     ; Attack: 12 (increased)
-    .db $14     ; Defense: 20 (BIG increase!)
-    .db $05     ; Speed: 5 (reduced)
-    .db $04     ; Magic: 4 (reduced)
-    .db $64     ; Accuracy: 100
-    .db $1e     ; Evasion: 30 (reduced)
+	.db $01     ; Level 1
+	.db $32     ; HP: 50 (2.5x increase!)
+	.db $05     ; MP: 5 (reduced)
+	.db $0c     ; Attack: 12 (increased)
+	.db $14     ; Defense: 20 (BIG increase!)
+	.db $05     ; Speed: 5 (reduced)
+	.db $04     ; Magic: 4 (reduced)
+	.db $64     ; Accuracy: 100
+	.db $1e     ; Evasion: 30 (reduced)
 ```
 
 ### Level-Up Growth Rates
@@ -190,13 +190,13 @@ BenjaminStartStats:
 ```asm
 ; HP growth per level
 BenjaminHPGrowth:
-    .db $05     ; +5 HP per level (default)
-    ; Change to $0a for +10 HP per level
+	.db $05     ; +5 HP per level (default)
+	; Change to $0a for +10 HP per level
 
 ; Attack growth per level  
 BenjaminAttackGrowth:
-    .db $02     ; +2 Attack per level
-    ; Change to $04 for faster growth
+	.db $02     ; +2 Attack per level
+	; Change to $04 for faster growth
 ```
 
 ### Example: Create a Magic-Focused Build
@@ -204,15 +204,15 @@ BenjaminAttackGrowth:
 ```asm
 ; Make Kaeli a powerful mage
 KaeliStartStats:
-    .db $05     ; Start at level 5
-    .db $28     ; HP: 40
-    .db $32     ; MP: 50 (HIGH!)
-    .db $06     ; Attack: 6 (low)
-    .db $08     ; Defense: 8
-    .db $0c     ; Speed: 12 (good)
-    .db $14     ; Magic: 20 (VERY HIGH!)
-    .db $5a     ; Accuracy: 90
-    .db $46     ; Evasion: 70
+	.db $05     ; Start at level 5
+	.db $28     ; HP: 40
+	.db $32     ; MP: 50 (HIGH!)
+	.db $06     ; Attack: 6 (low)
+	.db $08     ; Defense: 8
+	.db $0c     ; Speed: 12 (good)
+	.db $14     ; Magic: 20 (VERY HIGH!)
+	.db $5a     ; Accuracy: 90
+	.db $46     ; Evasion: 70
 ```
 
 ## Dialogue and Text
@@ -237,15 +237,15 @@ FFMQ uses a custom text encoding with control codes:
 **Find** in `bank_0D_documented.asm`:
 ```asm
 OldManText:
-    .db "Go and defeat", $01
-    .db "the Flamerus Rex!", $00
+	.db "Go and defeat", $01
+	.db "the Flamerus Rex!", $00
 ```
 
 **Change to**:
 ```asm
 OldManText:
-    .db "The Flamerus Rex", $01
-    .db "is super tough!", $00
+	.db "The Flamerus Rex", $01
+	.db "is super tough!", $00
 ```
 
 **Important**: Keep text length similar to avoid overflow!
@@ -255,10 +255,10 @@ OldManText:
 ```asm
 ; New custom NPC dialogue
 MyCustomNPC:
-    .db "Welcome, brave", $01
-    .db "adventurer!", $02     ; Wait for button
-    .db "I have a quest", $01
-    .db "for you...", $00      ; End
+	.db "Welcome, brave", $01
+	.db "adventurer!", $02     ; Wait for button
+	.db "I have a quest", $01
+	.db "for you...", $00      ; End
 ```
 
 ### Character Name in Dialogue
@@ -266,8 +266,8 @@ MyCustomNPC:
 ```asm
 ; Use $fe for player name
 NPCGreeting:
-    .db "Hello, ", $fe, "!", $01
-    .db "How are you?", $00
+	.db "Hello, ", $fe, "!", $01
+	.db "How are you?", $00
 ```
 
 ### Common Pitfalls
@@ -321,9 +321,9 @@ python tools/extract_graphics_v2.py ~roms/FFMQ.sfc --extract-character benjamin
 
 # Convert back to SNES format
 python tools/convert_graphics.py to-snes \
-    assets/graphics/characters/benjamin_edited.png \
-    assets/graphics/characters/benjamin.bin \
-    --format 4bpp
+	assets/graphics/characters/benjamin_edited.png \
+	assets/graphics/characters/benjamin.bin \
+	--format 4bpp
 ```
 
 ### Palette Modification
@@ -333,11 +333,11 @@ python tools/convert_graphics.py to-snes \
 ```asm
 ; Example: Benjamin's palette
 BenjaminPalette:
-    .dw $0000   ; Color 0: Transparent
-    .dw $7fff   ; Color 1: White
-    .dw $001f   ; Color 2: Red
-    .dw $03e0   ; Color 3: Green
-    ; ... more colors
+	.dw $0000   ; Color 0: Transparent
+	.dw $7fff   ; Color 1: White
+	.dw $001f   ; Color 2: Red
+	.dw $03e0   ; Color 3: Green
+	; ... more colors
 ```
 
 **Color Format**: SNES 15-bit BGR (5 bits each)
@@ -349,10 +349,10 @@ BenjaminPalette:
 
 ```asm
 BenjaminPalette:
-    .dw $0000   ; Transparent
-    .dw $7fff   ; White  
-    .dw $7c00   ; Blue (was red!)
-    .dw $5400   ; Dark blue (was green!)
+	.dw $0000   ; Transparent
+	.dw $7fff   ; White  
+	.dw $7c00   ; Blue (was red!)
+	.dw $5400   ; Dark blue (was green!)
 ```
 
 ## Items and Equipment
@@ -361,12 +361,12 @@ BenjaminPalette:
 
 ```asm
 ItemData:
-    .db ItemID      ; Unique identifier
-    .db Type        ; Weapon/Armor/Consumable
-    .db AttackBonus ; Attack power bonus
-    .db DefenseBonus; Defense bonus
-    .db SpecialEffect; Special properties
-    .dw Price       ; Cost in GP
+	.db ItemID      ; Unique identifier
+	.db Type        ; Weapon/Armor/Consumable
+	.db AttackBonus ; Attack power bonus
+	.db DefenseBonus; Defense bonus
+	.db SpecialEffect; Special properties
+	.dw Price       ; Cost in GP
 ```
 
 ### Creating a New Weapon
@@ -376,16 +376,16 @@ ItemData:
 ```asm
 ; Super Excalibur - Overpowered sword!
 Item_SuperExcalibur:
-    .db $ff     ; Item ID (use unused ID)
-    .db $01     ; Type: Weapon
-    .db $63     ; Attack: +99
-    .db $00     ; Defense: +0
-    .db $01     ; Special: Critical hit rate up
-    .dw $9999   ; Price: 9999 GP
+	.db $ff     ; Item ID (use unused ID)
+	.db $01     ; Type: Weapon
+	.db $63     ; Attack: +99
+	.db $00     ; Defense: +0
+	.db $01     ; Special: Critical hit rate up
+	.dw $9999   ; Price: 9999 GP
 
 ; Add item name to text table
 ItemName_SuperExcalibur:
-    .db "Super Excalibur", $00
+	.db "Super Excalibur", $00
 ```
 
 ### Modifying Existing Items
@@ -395,15 +395,15 @@ ItemName_SuperExcalibur:
 ```asm
 ; Original Cure Potion
 Item_CurePotion:
-    .db $01     ; Item ID
-    .db $03     ; Type: Consumable
-    .db $1e     ; Restore 30 HP
+	.db $01     ; Item ID
+	.db $03     ; Type: Consumable
+	.db $1e     ; Restore 30 HP
 
 ; Modified - FULL HEAL
 Item_CurePotion:
-    .db $01     ; Item ID
-    .db $03     ; Type: Consumable
-    .db $ff     ; Restore 255 HP (full heal!)
+	.db $01     ; Item ID
+	.db $03     ; Type: Consumable
+	.db $ff     ; Restore 255 HP (full heal!)
 ```
 
 ### Equipment Effects
@@ -411,12 +411,12 @@ Item_CurePotion:
 ```asm
 ; Armor with special effects
 Item_DragonArmor:
-    .db $20     ; Item ID
-    .db $02     ; Type: Armor
-    .db $00     ; Attack: +0
-    .db $32     ; Defense: +50
-    .db $04     ; Special: Fire resistance
-    .dw $5000   ; Price: 5000 GP
+	.db $20     ; Item ID
+	.db $02     ; Type: Armor
+	.db $00     ; Attack: +0
+	.db $32     ; Defense: +50
+	.db $04     ; Special: Fire resistance
+	.dw $5000   ; Price: 5000 GP
 ```
 
 **Special Effect Codes**:
@@ -432,12 +432,12 @@ Item_DragonArmor:
 
 ```asm
 SpellData:
-    .db SpellID     ; Unique identifier
-    .db MPCost      ; MP required
-    .db Power       ; Base power/damage
-    .db Element     ; Element type
-    .db Target      ; Single/All/Self
-    .db Animation   ; Visual effect ID
+	.db SpellID     ; Unique identifier
+	.db MPCost      ; MP required
+	.db Power       ; Base power/damage
+	.db Element     ; Element type
+	.db Target      ; Single/All/Self
+	.db Animation   ; Visual effect ID
 ```
 
 ### Modifying Spell Power
@@ -447,15 +447,15 @@ SpellData:
 ```asm
 ; Original Cure
 Spell_Cure:
-    .db $01     ; Spell ID: Cure
-    .db $04     ; MP cost: 4
-    .db $1e     ; Power: 30 HP
+	.db $01     ; Spell ID: Cure
+	.db $04     ; MP cost: 4
+	.db $1e     ; Power: 30 HP
 
 ; Modified - MEGA CURE
 Spell_Cure:
-    .db $01     ; Spell ID: Cure
-    .db $04     ; MP cost: 4 (same)
-    .db $63     ; Power: 99 HP (3x stronger!)
+	.db $01     ; Spell ID: Cure
+	.db $04     ; MP cost: 4 (same)
+	.db $63     ; Power: 99 HP (3x stronger!)
 ```
 
 ### Creating a New Spell
@@ -463,27 +463,27 @@ Spell_Cure:
 ```asm
 ; Meteor - Ultimate attack spell
 Spell_Meteor:
-    .db $ff     ; Spell ID (unused)
-    .db $63     ; MP cost: 99
-    .db $ff     ; Power: 255 (MAXIMUM!)
-    .db $00     ; Element: Non-elemental
-    .db $01     ; Target: All enemies
-    .db $0f     ; Animation: Meteor animation
+	.db $ff     ; Spell ID (unused)
+	.db $63     ; MP cost: 99
+	.db $ff     ; Power: 255 (MAXIMUM!)
+	.db $00     ; Element: Non-elemental
+	.db $01     ; Target: All enemies
+	.db $0f     ; Animation: Meteor animation
 
 ; Add spell name
 SpellName_Meteor:
-    .db "Meteor", $00
+	.db "Meteor", $00
 ```
 
 ### Element Types
 
 ```asm
 Elements:
-    $00 = Non-elemental
-    $01 = Fire
-    $02 = Ice
-    $04 = Lightning
-    $08 = Earth
+	$00 = Non-elemental
+	$01 = Fire
+	$02 = Ice
+	$04 = Lightning
+	$08 = Earth
 ```
 
 ## Maps and Levels
@@ -504,17 +504,17 @@ Maps consist of:
 ```asm
 ; Forest area encounters
 ForestEncounters:
-    .db $05     ; 5% encounter rate
-    .db $01     ; Enemy group 1
-    .db $02     ; Enemy group 2
-    .db $03     ; Enemy group 3
+	.db $05     ; 5% encounter rate
+	.db $01     ; Enemy group 1
+	.db $02     ; Enemy group 2
+	.db $03     ; Enemy group 3
 
 ; Make encounters more frequent
 ForestEncounters:
-    .db $0f     ; 15% encounter rate (3x more!)
-    .db $01     ; Enemy group 1
-    .db $02     ; Enemy group 2
-    .db $03     ; Enemy group 3
+	.db $0f     ; 15% encounter rate (3x more!)
+	.db $01     ; Enemy group 1
+	.db $02     ; Enemy group 2
+	.db $03     ; Enemy group 3
 ```
 
 ### Modifying Enemy Groups
@@ -522,18 +522,18 @@ ForestEncounters:
 ```asm
 ; Original: 2 Goblins
 EnemyGroup_01:
-    .db $02     ; Number of enemies
-    .db $01     ; Enemy type: Goblin
-    .db $01     ; Enemy type: Goblin
+	.db $02     ; Number of enemies
+	.db $01     ; Enemy type: Goblin
+	.db $01     ; Enemy type: Goblin
 
 ; Modified: 5 Goblins!
 EnemyGroup_01:
-    .db $05     ; Number of enemies
-    .db $01     ; Goblin
-    .db $01     ; Goblin
-    .db $01     ; Goblin
-    .db $01     ; Goblin
-    .db $01     ; Goblin
+	.db $05     ; Number of enemies
+	.db $01     ; Goblin
+	.db $01     ; Goblin
+	.db $01     ; Goblin
+	.db $01     ; Goblin
+	.db $01     ; Goblin
 ```
 
 ### Boss Modifications
@@ -541,9 +541,9 @@ EnemyGroup_01:
 ```asm
 ; Make boss fights harder
 Boss_DarkKing:
-    .dw $03e8   ; HP: 1000 → Change to $07d0 (2000)
-    .db $64     ; Attack: 100 → Change to $c8 (200)
-    .db $32     ; Defense: 50 → Change to $64 (100)
+	.dw $03e8   ; HP: 1000 → Change to $07d0 (2000)
+	.db $64     ; Attack: 100 → Change to $c8 (200)
+	.db $32     ; Defense: 50 → Change to $64 (100)
 ```
 
 ## Common Pitfalls
@@ -553,14 +553,14 @@ Boss_DarkKing:
 ❌ **Wrong**:
 ```asm
 NPCText:
-    .db "This is way too much text that will overflow the buffer and corrupt other data!", $00
+	.db "This is way too much text that will overflow the buffer and corrupt other data!", $00
 ```
 
 ✅ **Right**:
 ```asm
 NPCText:
-    .db "Keep text", $01
-    .db "concise!", $00
+	.db "Keep text", $01
+	.db "concise!", $00
 ```
 
 ### 2. Invalid Values
@@ -582,15 +582,15 @@ NPCText:
 ```asm
 ; Don't modify this unless you know what it does!
 SomeFunction:
-    lda $00
-    sta $7e0000    ; Critical!
+	lda $00
+	sta $7e0000    ; Critical!
 ```
 
 ✅ **Right**: Modify data tables instead
 ```asm
 ; Safer to modify data
 CharacterStats:
-    .db $14     ; Safe to change!
+	.db $14     ; Safe to change!
 ```
 
 ### 4. Forgetting to Rebuild
@@ -618,19 +618,19 @@ mesen build/ffmq-rebuilt.sfc
 ```asm
 ; Double all enemy stats
 EnemyStats_Goblin:
-    .dw $0028   ; HP: 40 → $0050 (80)
-    .db $10     ; Attack: 16 → $20 (32)
-    .db $08     ; Defense: 8 → $10 (16)
+	.dw $0028   ; HP: 40 → $0050 (80)
+	.db $10     ; Attack: 16 → $20 (32)
+	.db $08     ; Defense: 8 → $10 (16)
 
 ; Reduce cure effectiveness
 Spell_Cure:
-    .db $01     ; ID
-    .db $08     ; MP cost: 8 (doubled!)
-    .db $0f     ; Power: 15 (halved!)
+	.db $01     ; ID
+	.db $08     ; MP cost: 8 (doubled!)
+	.db $0f     ; Power: 15 (halved!)
 
 ; Reduce starting GP
 StartingGP:
-    .dw $0032   ; 50 GP (was 100)
+	.dw $0032   ; 50 GP (was 100)
 ```
 
 ### Example 2: "Easy Mode"
@@ -638,19 +638,19 @@ StartingGP:
 ```asm
 ; Triple starting stats
 BenjaminStartStats:
-    .db $01     ; Level 1
-    .db $3c     ; HP: 60 (was 20)
-    .db $1e     ; MP: 30 (was 10)
-    .db $18     ; Attack: 24 (was 8)
-    .db $18     ; Defense: 24 (was 8)
+	.db $01     ; Level 1
+	.db $3c     ; HP: 60 (was 20)
+	.db $1e     ; MP: 30 (was 10)
+	.db $18     ; Attack: 24 (was 8)
+	.db $18     ; Defense: 24 (was 8)
 
 ; Cheap items
 Item_CurePotion:
-    .dw $0001   ; Price: 1 GP (was 10)
+	.dw $0001   ; Price: 1 GP (was 10)
 
 ; No random encounters
 ForestEncounters:
-    .db $00     ; 0% encounter rate
+	.db $00     ; 0% encounter rate
 ```
 
 ### Example 3: "Randomizer"
@@ -658,14 +658,14 @@ ForestEncounters:
 ```asm
 ; Randomize enemy stats (manually for now)
 EnemyStats_Goblin:
-    .dw $0064   ; HP: Random (100)
-    .db $32     ; Attack: Random (50)
-    .db $1e     ; Defense: Random (30)
+	.dw $0064   ; HP: Random (100)
+	.db $32     ; Attack: Random (50)
+	.db $1e     ; Defense: Random (30)
 
 EnemyStats_Dragon:
-    .dw $0014   ; HP: Random (20) - weak!
-    .db $08     ; Attack: Random (8)
-    .db $05     ; Defense: Random (5)
+	.dw $0014   ; HP: Random (20) - weak!
+	.db $08     ; Attack: Random (8)
+	.db $05     ; Defense: Random (5)
 ```
 
 ### Example 4: "Color Randomizer"
@@ -673,16 +673,16 @@ EnemyStats_Dragon:
 ```asm
 ; Randomize character palettes
 BenjaminPalette:
-    .dw $0000   ; Transparent
-    .dw $7c1f   ; Purple (was white)
-    .dw $03e0   ; Green (was red)
-    .dw $7c00   ; Blue (was blue)
+	.dw $0000   ; Transparent
+	.dw $7c1f   ; Purple (was white)
+	.dw $03e0   ; Green (was red)
+	.dw $7c00   ; Blue (was blue)
 
 KaeliPalette:
-    .dw $0000   ; Transparent
-    .dw $001f   ; Red (was purple)
-    .dw $7fe0   ; Yellow (was green)
-    .dw $7fff   ; White (was teal)
+	.dw $0000   ; Transparent
+	.dw $001f   ; Red (was purple)
+	.dw $7fe0   ; Yellow (was green)
+	.dw $7fff   ; White (was teal)
 ```
 
 ## Tips and Best Practices
@@ -757,8 +757,8 @@ Create scripts to apply mods automatically:
 ```python
 # apply_mod.py
 def double_enemy_hp(asm_file):
-    # Read file, find enemy stats, multiply HP
-    pass
+	# Read file, find enemy stats, multiply HP
+	pass
 ```
 
 ### ROM Hacking Tools

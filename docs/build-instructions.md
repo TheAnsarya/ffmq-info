@@ -1,4 +1,4 @@
-﻿# FFMQ Build Instructions
+# FFMQ Build Instructions
 
 ## Overview
 
@@ -213,9 +213,9 @@ db $ff
 ```powershell
 # Build FFMQ ROM
 param(
-    [string]$Output = "build\ffmq-rebuilt.sfc",
-    [switch]$Symbols,
-    [switch]$Verbose
+	[string]$Output = "build\ffmq-rebuilt.sfc",
+	[switch]$Symbols,
+	[switch]$Verbose
 )
 
 $asarArgs = @()
@@ -226,11 +226,11 @@ $asarArgs += "src\asm\ffmq_complete.asm", $Output
 & asar @asarArgs
 
 if ($LASTEXITCODE -eq 0) {
-    Write-Host "✅ Build successful: $Output" -ForegroundColor Green
-    $size = (Get-Item $Output).Length
-    Write-Host "   Size: $size bytes (expected: 1048576)" -ForegroundColor Cyan
+	Write-Host "✅ Build successful: $Output" -ForegroundColor Green
+	$size = (Get-Item $Output).Length
+	Write-Host "   Size: $size bytes (expected: 1048576)" -ForegroundColor Cyan
 } else {
-    Write-Host "❌ Build failed!" -ForegroundColor Red
+	Write-Host "❌ Build failed!" -ForegroundColor Red
 }
 ```
 

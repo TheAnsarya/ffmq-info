@@ -30,8 +30,8 @@ $originalRom = "~roms\Final Fantasy - Mystic Quest (U) (V1.1).sfc"
 **setup_rom.py:**
 ```python
 "Final Fantasy - Mystic Quest (U) (V1.1)": {
-    "filename": "Final Fantasy - Mystic Quest (U) (V1.1).sfc",
-    "notes": "Primary development target",
+	"filename": "Final Fantasy - Mystic Quest (U) (V1.1).sfc",
+	"notes": "Primary development target",
 }
 ```
 

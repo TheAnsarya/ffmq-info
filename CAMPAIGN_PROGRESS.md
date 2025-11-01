@@ -1,4 +1,4 @@
-﻿# FFMQ Disassembly Campaign - Progress Summary
+# FFMQ Disassembly Campaign - Progress Summary
 **Last Updated**: October 31, 2025
 
 ---
@@ -84,41 +84,41 @@
 - **Progress**: 12% complete (45/375 labels)
 - **Systems Documented**:
   * Battle Main Loop (3 labels): Turn execution, completion wait, VBlank sync
-    - Battle_MainTurnLoop: Main turn counter and AI processing
-    - Battle_WaitTurnComplete: Turn phase management
-    - Battle_WaitVBlank: Frame synchronization
+	- Battle_MainTurnLoop: Main turn counter and AI processing
+	- Battle_WaitTurnComplete: Turn phase management
+	- Battle_WaitVBlank: Frame synchronization
   * Sprite Positioning System (11 labels): Screen clipping with boundary detection
-    - BattleSprite_CalculatePositionWithClipping: Core position calculation
-    - BattleSprite_SetupMultiSpriteOAM: 4-sprite character display
-    - BattleSprite_HideOffScreen: Off-screen sprite handling
-    - BattleSprite_SetupRightEdgeClip: Right edge partial visibility
-    - BattleSprite_SetupLeftEdgeClip: Left edge partial visibility
-    - BattleSprite_SetupFullVisible: Full visibility with wraparound
+	- BattleSprite_CalculatePositionWithClipping: Core position calculation
+	- BattleSprite_SetupMultiSpriteOAM: 4-sprite character display
+	- BattleSprite_HideOffScreen: Off-screen sprite handling
+	- BattleSprite_SetupRightEdgeClip: Right edge partial visibility
+	- BattleSprite_SetupLeftEdgeClip: Left edge partial visibility
+	- BattleSprite_SetupFullVisible: Full visibility with wraparound
   * Sound System (1 label): Audio initialization
-    - BattleSound_InitializeSoundEffects: Channel management setup
+	- BattleSound_InitializeSoundEffects: Channel management setup
   * Graphics Loading System (6 labels): Character sprite loading with bank coordination
-    - BattleGraphics_LoadCharacterSprite: Main loader with compressed format support
-    - Plus 5 local labels for compression, transfer, byte loops
+	- BattleGraphics_LoadCharacterSprite: Main loader with compressed format support
+	- Plus 5 local labels for compression, transfer, byte loops
   * Character Validation & Data Management (24 labels): Multi-layer validation and data loading
-    - BattleChar_VerifyData: Data verification system
-    - BattleSprite_ValidateDataBlock: Sprite data block validation
-    - BattleChar_ClearGraphicsData: Graphics validation engine (26-byte structure clear)
-    - BattleChar_InitializeState: Character state initialization (4-byte load)
-    - BattleChar_SetupAnimationData: Animation parameter configuration (5-byte setup)
-    - BattleChar_InitializeDefaults: Default parameter setup ($ff fill pattern)
-    - BattleSprite_TransformCoordinates: Coordinate transformation for positioning
-    - BattleChar_LoadExtendedStats: Extended stat loading (16-byte structure)
-    - BattleSystem_CoordinateDataLoad: Data loading coordinator with mode handling
-    - BattleMenu_ClearStructure: Menu structure clearing (26-byte zero-init)
-    - BattleTable_Initialize: Table initialization
-    - BattleChar_Validate: Character data validation
-    - BattleChar_LoadData: Character data loading engine with bank switching
-    - BattleChar_TransformIndex: Index transformation for table access
-    - BattleChar_DispatchOperation: Character operation dispatcher
-    - Battle_SetupSpecialOperation: Special operation setup
-    - BattleGraphics_LoadSceneData: Scene graphics loading (8-block transfer)
-    - BattleScene_Setup: Battle scene setup and management
-    - Plus 6 local labels for loops and branches
+	- BattleChar_VerifyData: Data verification system
+	- BattleSprite_ValidateDataBlock: Sprite data block validation
+	- BattleChar_ClearGraphicsData: Graphics validation engine (26-byte structure clear)
+	- BattleChar_InitializeState: Character state initialization (4-byte load)
+	- BattleChar_SetupAnimationData: Animation parameter configuration (5-byte setup)
+	- BattleChar_InitializeDefaults: Default parameter setup ($ff fill pattern)
+	- BattleSprite_TransformCoordinates: Coordinate transformation for positioning
+	- BattleChar_LoadExtendedStats: Extended stat loading (16-byte structure)
+	- BattleSystem_CoordinateDataLoad: Data loading coordinator with mode handling
+	- BattleMenu_ClearStructure: Menu structure clearing (26-byte zero-init)
+	- BattleTable_Initialize: Table initialization
+	- BattleChar_Validate: Character data validation
+	- BattleChar_LoadData: Character data loading engine with bank switching
+	- BattleChar_TransformIndex: Index transformation for table access
+	- BattleChar_DispatchOperation: Character operation dispatcher
+	- Battle_SetupSpecialOperation: Special operation setup
+	- BattleGraphics_LoadSceneData: Scene graphics loading (8-block transfer)
+	- BattleScene_Setup: Battle scene setup and management
+	- Plus 6 local labels for loops and branches
 - **ROM Verification**: 100% match maintained (SHA256: F71817F55FEBD32FD1DCE617A326A77B6B062DD0D4058ECD289F64AF1B7A1D05)
 - **Build Time**: 0.01 seconds (asar assembler)
 - **Challenge**: File has extensive duplicate sections (lines ~900-2700); working in unique areas (lines 3000+)
@@ -142,8 +142,8 @@
   * Color system: Display_ColorMathDisable, ColorAdditionSetup (brightness/darkness effects)
   * Palette system: Display_PaletteLoadSetup, PaletteDMATransfer (16-byte DMA chunks)
   * Effect interpreter: Display_EffectScriptInterpreter (9-command bytecode system)
-    - Commands: 00=wait, 01=single frame, 02=color cycle, 03=palette load, 04=flash, 05=special
-    - Commands 06-FF: Complex parameter-based effects with table lookups
+	- Commands: 00=wait, 01=single frame, 02=color cycle, 03=palette load, 04=flash, 05=special
+	- Commands 06-FF: Complex parameter-based effects with table lookups
   * Screen effects: Display_ComplexScreenEffect (multi-stage VRAM+palette+window)
   * Visual effects: Display_FlashEffect (white flash for lightning/magic/criticals)
   * Scroll effects: Display_ScreenScrollEffect (32-frame scroll + 60-frame hold)
@@ -196,41 +196,41 @@
 - **ACHIEVEMENT**: 114 labels eliminated (52% MORE than Batch 34's 75 labels!)
 - **Bank 0C: 100% COMPLETE** 🏆 (42 → 0 labels, **FIFTH BANK FINISHED!**)
   * Graphics Command System: Display_GraphicsCommandProcessor with DMA transfer loop
-    - Command processor: 3-byte entry parsing (tile count, source, VRAM offset)
-    - DMA automation: Calculates transfer size (×32), source address (+$aa4c), VRAM offset (×16)
-    - Block move: 3424-byte graphics transfer ($0caa4c → $7f0000, MVN instruction)
+	- Command processor: 3-byte entry parsing (tile count, source, VRAM offset)
+	- DMA automation: Calculates transfer size (×32), source address (+$aa4c), VRAM offset (×16)
+	- Block move: 3424-byte graphics transfer ($0caa4c → $7f0000, MVN instruction)
   * Tilemap Command System: Display_TilemapCommandProcessor with table-driven fills
-    - 4 local labels: .TileFillLoop, .Exit, .BottomFillLoop
-    - Command table parsing: Repeat count (low byte), tile base (high byte)
-    - Dual loop system: Per-tile fill + multi-command processing
-    - Bottom screen fill: 64-tile pattern $10 at VRAM $3fc0
+	- 4 local labels: .TileFillLoop, .Exit, .BottomFillLoop
+	- Command table parsing: Repeat count (low byte), tile base (high byte)
+	- Dual loop system: Per-tile fill + multi-command processing
+	- Bottom screen fill: 64-tile pattern $10 at VRAM $3fc0
   * Effect Command Handler: Display_EffectCommandHighRange ($80-$bf)
-    - Triple table dispatch: 3 sequential JSR calls with offset calculation (×4, ×8)
-    - Parameter-based lookup: Entry byte 1 used for all 3 table accesses
+	- Triple table dispatch: 3 sequential JSR calls with offset calculation (×4, ×8)
+	- Parameter-based lookup: Entry byte 1 used for all 3 table accesses
   * Final 2 labels: Effect command high-range + brightness decrement loop label
 - **Bank 01**: 260 → 167 labels (93 eliminated, 55% complete) 🚀
   * Color Processing System (11 main + 12 locals = 23 labels):
-    - BattleColor_RedComponent, GreenComponent, BlueComponent (+ .MaxValue locals)
-    - BattleColor_FadeController, InterpolationEngine (9-local complex interpolation)
-    - BattleColor_FadeRedComponent, FadeGreenComponent, FadeBlueComponent (+ .MinValue locals)
-    - BattlePalette_BufferManager, AnimationLoop (+ .CopyLoop, .ProcessLoop)
+	- BattleColor_RedComponent, GreenComponent, BlueComponent (+ .MaxValue locals)
+	- BattleColor_FadeController, InterpolationEngine (9-local complex interpolation)
+	- BattleColor_FadeRedComponent, FadeGreenComponent, FadeBlueComponent (+ .MinValue locals)
+	- BattlePalette_BufferManager, AnimationLoop (+ .CopyLoop, .ProcessLoop)
   * Graphics DMA System (8 main + 2 locals = 10 labels):
-    - BattleMemory_ClearBuffer
-    - BattleGraphics_DMATransferSystem, ProcessCoordinator, BufferManager, BufferManager2, StreamingSystem
-    - BattleGraphics_MultiLayerLoop, CopyEngine (+ .UpdateLoop, .SetupTransfer, .CopyLoop)
+	- BattleMemory_ClearBuffer
+	- BattleGraphics_DMATransferSystem, ProcessCoordinator, BufferManager, BufferManager2, StreamingSystem
+	- BattleGraphics_MultiLayerLoop, CopyEngine (+ .UpdateLoop, .SetupTransfer, .CopyLoop)
   * Animation/Palette System (5 main + 14 locals = 19 labels):
-    - BattleChar_AnimationProcessor (+ .AnimationLoop, .InnerLoop, .ReverseLoop)
-    - BattlePalette_AnimationController (+ .ColorLoop)
-    - BattleColor_BlendingProcessor (+ .BlendLoop)
+	- BattleChar_AnimationProcessor (+ .AnimationLoop, .InnerLoop, .ReverseLoop)
+	- BattlePalette_AnimationController (+ .ColorLoop)
+	- BattleColor_BlendingProcessor (+ .BlendLoop)
   * Buffer Streaming: BattleGraphics_BufferStreamingCoordinator with VRAM coordination
   * Data Processing: BattleGraphics_DataProcessor (complex memory management)
   * Timing Control: BattleTiming_WaitLoop (3 modes: standard/mode2/mode4)
-    - Mode dispatch table, configurable timing loops
+	- Mode dispatch table, configurable timing loops
   * Character Processing: BattleChar_ProcessorMode3, ProcessorMode0 (battle coordination)
-    - Graphics initialization, animation frames, palette switching
-    - Dual positioning modes (mode 0: increment X, mode 3: decrement Y)
+	- Graphics initialization, animation frames, palette switching
+	- Dual positioning modes (mode 0: increment X, mode 3: decrement Y)
   * Animation State: BattleAnim_StateController (3 timing states: $37/$36/$39)
-    - State-based frame selection, animation loop processing
+	- State-based frame selection, animation loop processing
 - **Total**: 114 labels (28+ main + many local labels in Bank 0C, 24+ main + 28+ locals in Bank 01)
 - **Quality**: 4/4 builds perfect (100% ROM match, 0.01-0.03s assembly)
 - **Achievement**: Bank 0C 100% COMPLETE, Bank 01 now 55% complete (past halfway!)
@@ -240,32 +240,32 @@
 - **Bank 01**: 167 → 137 labels (30 eliminated, 63% complete)
 - **Systems Renamed**:
   * Audio Processing (6 labels): Dual-layer audio system with 7-channel management
-    - BattleAudio_ClearMemoryBuffers: Clears 14-word battle sound effect buffer ($7fced8-$7fcef2)
-    - BattleAudio_ProcessPrimaryChannel: Primary 7-channel processor with priority system
-    - BattleAudio_ProcessSecondaryChannel: Secondary 7-channel processor (parallel audio layer)
-    - Data validation: #$ff terminator scanning, priority comparison ($19df/$19e1 flags)
-    - Sound lookup: DATA8_0CD694 (primary) + DATA8_0CD72F (secondary) pointer tables
+	- BattleAudio_ClearMemoryBuffers: Clears 14-word battle sound effect buffer ($7fced8-$7fcef2)
+	- BattleAudio_ProcessPrimaryChannel: Primary 7-channel processor with priority system
+	- BattleAudio_ProcessSecondaryChannel: Secondary 7-channel processor (parallel audio layer)
+	- Data validation: #$ff terminator scanning, priority comparison ($19df/$19e1 flags)
+	- Sound lookup: DATA8_0CD694 (primary) + DATA8_0CD72F (secondary) pointer tables
   * Animation Controllers (3 labels): Battle sprite animation and graphics coordination
-    - BattleAnimation_MainController: Main sprite animation controller with PHB/PHP state save
-    - BattleAnimation_ExtendedHandler: Extended animation with palette/graphics coordination
-    - BattleGraphics_PreparationSystem: Memory initialization (MVN $7f,$7f clear + graphics load)
+	- BattleAnimation_MainController: Main sprite animation controller with PHB/PHP state save
+	- BattleAnimation_ExtendedHandler: Extended animation with palette/graphics coordination
+	- BattleGraphics_PreparationSystem: Memory initialization (MVN $7f,$7f clear + graphics load)
   * Graphics Systems (6 labels): VRAM, tiles, palettes, sprites
-    - BattleGraphics_VRAMAllocator, TileUploader, PaletteLoader
-    - BattleSprite_OAMBuilder, PositionCalculator, AttributeManager, PriorityHandler
+	- BattleGraphics_VRAMAllocator, TileUploader, PaletteLoader
+	- BattleSprite_OAMBuilder, PositionCalculator, AttributeManager, PriorityHandler
   * Battle Flow (14 labels): Combat system management
-    - Battle_InitializationSystem
-    - BattleItem_ProcessorSystem, Command_DispatchController, Target_SelectionEngine
-    - BattleTurn_OrderManager, Reward_CalculationSystem
-    - BattleVictory_ProcessingController, Escape_ValidationSystem, Defeat_HandlingController
+	- Battle_InitializationSystem
+	- BattleItem_ProcessorSystem, Command_DispatchController, Target_SelectionEngine
+	- BattleTurn_OrderManager, Reward_CalculationSystem
+	- BattleVictory_ProcessingController, Escape_ValidationSystem, Defeat_HandlingController
   * UI Systems (10 labels): Menu, cursor, input, text rendering
-    - BattleMenu_DisplayController, Cursor_MovementSystem, Input_ProcessingEngine
-    - BattleText_RenderingSystem, Window_LayoutManager, Dialogue_QueueProcessor
-    - BattleMessage_FormattingEngine
+	- BattleMenu_DisplayController, Cursor_MovementSystem, Input_ProcessingEngine
+	- BattleText_RenderingSystem, Window_LayoutManager, Dialogue_QueueProcessor
+	- BattleMessage_FormattingEngine
   * Audio/Visual Effects (11 labels): Sound, music, camera, effects, palettes
-    - BattleSound_TriggerController, Music_StateManager, Timer_SystemController
-    - BattleCamera_PositionManager, ZoomController, ShakeProcessor
-    - BattleEffect_ParticleSystem, AnimationPlayer, TransitionHandler
-    - BattlePalette_FadeController, FlashManager, CycleEngine
+	- BattleSound_TriggerController, Music_StateManager, Timer_SystemController
+	- BattleCamera_PositionManager, ZoomController, ShakeProcessor
+	- BattleEffect_ParticleSystem, AnimationPlayer, TransitionHandler
+	- BattlePalette_FadeController, FlashManager, CycleEngine
 - **Methodology**: PowerShell bulk replacement to avoid file caching issues  
 - **Quality**: 100% ROM match maintained (0.01-0.02s builds)
 - **Achievement**: Bank 01 now 63% complete, campaign 89% complete!
@@ -277,35 +277,35 @@
 - Labels: 103 CODE_01 labels → 0 remaining
 - Systems Renamed (103 total labels):
   * **Part 1 - Main Functions** (31 labels):
-    - Battle Effects (5): LightningProcessor, ExplosionHandler, StatusIconManager, ParticleGenerator, TrailRenderer
-    - HUD Systems (5): UpdateHealthBar, UpdateManaBar, UpdateStatusDisplay, DrawCharacterName, RefreshAllBars
-    - Formation (6): InitializePositions, CalculateSpacing, ApplyLayout, ValidatePositions, AdjustOverlap, FinalizeSetup
-    - AI Systems (9): EvaluateTargets, SelectSkill, CalculateThreat, DetermineAction, ExecuteStrategy, UpdatePriority, CheckConditions, ProcessDecision, FinalizeChoice
-    - Magic Systems (6): CastSpell, CalculatePower, ApplyElemental, AnimationTrigger, MPConsumption, SuccessCheck
+	- Battle Effects (5): LightningProcessor, ExplosionHandler, StatusIconManager, ParticleGenerator, TrailRenderer
+	- HUD Systems (5): UpdateHealthBar, UpdateManaBar, UpdateStatusDisplay, DrawCharacterName, RefreshAllBars
+	- Formation (6): InitializePositions, CalculateSpacing, ApplyLayout, ValidatePositions, AdjustOverlap, FinalizeSetup
+	- AI Systems (9): EvaluateTargets, SelectSkill, CalculateThreat, DetermineAction, ExecuteStrategy, UpdatePriority, CheckConditions, ProcessDecision, FinalizeChoice
+	- Magic Systems (6): CastSpell, CalculatePower, ApplyElemental, AnimationTrigger, MPConsumption, SuccessCheck
   * **Part 2 - Audio/Animation Locals** (14 labels):
-    - Primary channel processing (6): Exit, ProcessLoop, ChannelIndexValid, NextChannel, AdvanceChannel, FindTerminator
-    - Secondary channel processing (6): Exit, ProcessLoop, ChannelIndexValid, NextChannel, AdvanceChannel, FindTerminator
-    - Animation controllers (2): Exit_MainController, Exit_ExtendedHandler
+	- Primary channel processing (6): Exit, ProcessLoop, ChannelIndexValid, NextChannel, AdvanceChannel, FindTerminator
+	- Secondary channel processing (6): Exit, ProcessLoop, ChannelIndexValid, NextChannel, AdvanceChannel, FindTerminator
+	- Animation controllers (2): Exit_MainController, Exit_ExtendedHandler
   * **Part 3 - Magic System Locals** (20 labels):
-    - CastSpell loops (4): MagicLoop, ValidTarget, ProcessEffect, Exit
-    - CalculatePower (1): PowerLoop
-    - ApplyElemental (3): ElementalCheck, WeaknessMultiplier, ResistanceReduction
-    - AnimationTrigger (4): AnimLoop, QueueFrame, NextFrame, Exit
-    - MPConsumption (3): MPLoop, InsufficientMP, DeductMP
-    - SuccessCheck (5): SuccessLoop, FailedCheck, Exit, RandomFactor, ApplyModifier
+	- CastSpell loops (4): MagicLoop, ValidTarget, ProcessEffect, Exit
+	- CalculatePower (1): PowerLoop
+	- ApplyElemental (3): ElementalCheck, WeaknessMultiplier, ResistanceReduction
+	- AnimationTrigger (4): AnimLoop, QueueFrame, NextFrame, Exit
+	- MPConsumption (3): MPLoop, InsufficientMP, DeductMP
+	- SuccessCheck (5): SuccessLoop, FailedCheck, Exit, RandomFactor, ApplyModifier
   * **Part 4 - Battle UI/System Locals** (23 labels):
-    - Reward/Victory: CalculationLoop, SequenceComplete
-    - Defeat (5): FadeStart, MemoryCleanup, AudioStop, ScreenClear, Exit
-    - Escape (2): SuccessCheck, FailureHandling
-    - Menu (2): InputLoop, SelectionConfirm
-    - Cursor (2): UpdatePosition, AnimationFrame
-    - Text (2): PrintLoop, NextCharacter
-    - Window (3): DrawBorder, FillBackground, SetAttributes
-    - Dialogue (2): WaitForInput, AdvanceText
-    - Message (3): QueueSystem, DisplayNext, ClearBuffer
+	- Reward/Victory: CalculationLoop, SequenceComplete
+	- Defeat (5): FadeStart, MemoryCleanup, AudioStop, ScreenClear, Exit
+	- Escape (2): SuccessCheck, FailureHandling
+	- Menu (2): InputLoop, SelectionConfirm
+	- Cursor (2): UpdatePosition, AnimationFrame
+	- Text (2): PrintLoop, NextCharacter
+	- Window (3): DrawBorder, FillBackground, SetAttributes
+	- Dialogue (2): WaitForInput, AdvanceText
+	- Message (3): QueueSystem, DisplayNext, ClearBuffer
   * **Part 5 - Final Graphics** (15 labels):
-    - Final graphics coordination: BattleGraphics_FinalCoordination
-    - (Plus 14 from Part 4 overlap - total verified 103)
+	- Final graphics coordination: BattleGraphics_FinalCoordination
+	- (Plus 14 from Part 4 overlap - total verified 103)
 - **Build Quality**: 5/5 perfect builds (100% ROM match, 0.01-0.02s assembly)
 - **Session Achievement**: 643 total labels eliminated (Batches 29-38)
 - Status: ✅ 100% COMPLETE
@@ -314,15 +314,15 @@
 - **Bank 01**: 137 → 103 labels (34 eliminated, 72% complete)
 - **Systems Renamed**:
   * Character Data/Graphics Systems (23 labels):
-    - BattleChar_DataLoadCoordinator, MemorySetup, ValidationLoop, StateInitializer
-    - BattleChar_GraphicsLoader, AnimationSetup, BufferManager, CoordinateProcessor
-    - BattleChar_SpriteController, PositionEngine, DisplayManager, AttributeController
-    - Complete character data loading pipeline with validation and graphics coordination
+	- BattleChar_DataLoadCoordinator, MemorySetup, ValidationLoop, StateInitializer
+	- BattleChar_GraphicsLoader, AnimationSetup, BufferManager, CoordinateProcessor
+	- BattleChar_SpriteController, PositionEngine, DisplayManager, AttributeController
+	- Complete character data loading pipeline with validation and graphics coordination
   * Graphics/Background/Sprite Systems (11 labels):
-    - BattleGraphics_LayerProcessor, TilemapBuilder, ScrollManager, EffectRenderer
-    - BattleBackground_UpdateEngine, TileProcessor, PatternLoader, ColorManager
-    - BattleSprite_TransformEngine, ScaleProcessor, RotationHandler
-    - Multi-layer graphics processing with background/sprite transformation
+	- BattleGraphics_LayerProcessor, TilemapBuilder, ScrollManager, EffectRenderer
+	- BattleBackground_UpdateEngine, TileProcessor, PatternLoader, ColorManager
+	- BattleSprite_TransformEngine, ScaleProcessor, RotationHandler
+	- Multi-layer graphics processing with background/sprite transformation
 - **Methodology**: PowerShell bulk replacement (5 batches, 23+23+23+23+23=115 attempted, 34 actual main functions)
 - **Quality**: 100% ROM match on all 5 builds (0.01s assembly)
 - **Achievement**: Bank 01 now 72% complete, campaign 93% complete!

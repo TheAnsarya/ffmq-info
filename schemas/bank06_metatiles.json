@@ -7,25 +7,25 @@
   "struct_name": "Metatile",
   "struct_size": 4,
   "fields": [
-    {
-      "name": "top_left",
-      "type": "uint8",
-      "description": "Top-left 8x8 tile index"
-    },
-    {
-      "name": "top_right",
-      "type": "uint8",
-      "description": "Top-right 8x8 tile index"
-    },
-    {
-      "name": "bottom_left",
-      "type": "uint8",
-      "description": "Bottom-left 8x8 tile index"
-    },
-    {
-      "name": "bottom_right",
-      "type": "uint8",
-      "description": "Bottom-right 8x8 tile index"
-    }
+	{
+	  "name": "top_left",
+	  "type": "uint8",
+	  "description": "Top-left 8x8 tile index"
+	},
+	{
+	  "name": "top_right",
+	  "type": "uint8",
+	  "description": "Top-right 8x8 tile index"
+	},
+	{
+	  "name": "bottom_left",
+	  "type": "uint8",
+	  "description": "Bottom-left 8x8 tile index"
+	},
+	{
+	  "name": "bottom_right",
+	  "type": "uint8",
+	  "description": "Bottom-right 8x8 tile index"
+	}
   ]
 }

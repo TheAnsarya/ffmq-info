@@ -153,8 +153,8 @@ ffmq-info/
 │   └── build-instructions.md
 ├── build.ps1
 └── ~docs/
-    └── copilot-chats/
-        └── 2025-10-24-session.md  # Updated logs
+	└── copilot-chats/
+		└── 2025-10-24-session.md  # Updated logs
 ```
 
 ## Key Achievements

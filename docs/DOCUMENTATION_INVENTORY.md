@@ -173,10 +173,10 @@ docs/
    - Architecture diagrams
 
 10. **Community Documentation** - Missing
-    - FAQ
-    - Common issues
-    - Tips & tricks
-    - External resources
+	- FAQ
+	- Common issues
+	- Tips & tricks
+	- External resources
 
 ## Outdated Documentation
 
@@ -245,9 +245,9 @@ docs/
 │   ├── AUTOMATIC-TRACKING.md
 │   └── progress/ (subdirectory)
 └── community/
-    ├── FAQ.md (NEW)
-    ├── TROUBLESHOOTING.md (NEW)
-    └── RESOURCES.md (NEW)
+	├── FAQ.md (NEW)
+	├── TROUBLESHOOTING.md (NEW)
+	└── RESOURCES.md (NEW)
 ```
 
 ## Prioritized Action Plan

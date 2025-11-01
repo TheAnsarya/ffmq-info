@@ -1,4 +1,4 @@
-﻿# Battle System Architecture
+# Battle System Architecture
 
 Complete documentation of the Final Fantasy Mystic Quest battle system mechanics and implementation.
 
@@ -37,8 +37,8 @@ FFMQ uses an Active Time Battle (ATB) system with unique mechanics:
 │ - Initialize ATB gauges │
 │ - Play battle music     │
 └───────────┬─────────────┘
-            │
-            v
+			│
+			v
 ┌─────────────────────────┐
 │    Main Battle Loop     │
 ├─────────────────────────┤
@@ -48,8 +48,8 @@ FFMQ uses an Active Time Battle (ATB) system with unique mechanics:
 │ - Execute actions       │
 │ - Check win/lose        │
 └───────────┬─────────────┘
-            │
-            v
+			│
+			v
 ┌─────────────────────────┐
 │    Battle Resolution    │
 ├─────────────────────────┤
@@ -165,40 +165,40 @@ Speed Multipliers:
 ; UpdateATBGauges - Update all ATB gauges
 ; ==============================================================================
 UpdateATBGauges:
-    ; Update party member gauges
-    ldx #$00                ; Start with Benjamin
+	; Update party member gauges
+	ldx #$00                ; Start with Benjamin
 .partyLoop:
-    lda PartyStatus,x       ; Check if alive
-    bmi .nextParty          ; Skip if KO'd
-    
-    lda PartyATB,x          ; Get current ATB
-    clc
-    adc PartySpeed,x        ; Add speed stat
-    sta PartyATB,x          ; Save new ATB
-    
-    cmp #$ff                ; Check if full
-    bcc .nextParty
-    
-    ; ATB full - enable action
-    lda #$ff
-    sta PartyATB,x
-    lda #$01
-    sta PartyActionReady,x
-    
+	lda PartyStatus,x       ; Check if alive
+	bmi .nextParty          ; Skip if KO'd
+	
+	lda PartyATB,x          ; Get current ATB
+	clc
+	adc PartySpeed,x        ; Add speed stat
+	sta PartyATB,x          ; Save new ATB
+	
+	cmp #$ff                ; Check if full
+	bcc .nextParty
+	
+	; ATB full - enable action
+	lda #$ff
+	sta PartyATB,x
+	lda #$01
+	sta PartyActionReady,x
+	
 .nextParty:
-    inx
-    cpx #$03                ; 3 party members
-    bcc .partyLoop
-    
-    ; Update enemy gauges (similar logic)
-    ldx #$00
+	inx
+	cpx #$03                ; 3 party members
+	bcc .partyLoop
+	
+	; Update enemy gauges (similar logic)
+	ldx #$00
 .enemyLoop:
-    ; ... similar code for enemies ...
-    inx
-    cpx #$08                ; Up to 8 enemies
-    bcc .enemyLoop
-    
-    rts
+	; ... similar code for enemies ...
+	inx
+	cpx #$08                ; Up to 8 enemies
+	bcc .enemyLoop
+	
+	rts
 ```
 
 ### Action Execution
@@ -273,61 +273,61 @@ Healing = Base (no variance or modifiers)
 ;   $02-$03 = Damage value
 ; ==============================================================================
 CalculatePhysicalDamage:
-    ; Get attacker's attack stat
-    ldx $00
-    lda CharacterAttack,x
-    sta $10
-    
-    ; Get target's defense stat
-    ldx $01
-    lda EnemyDefense,x
-    sta $11
-    
-    ; Base damage = (Attack - Defense) × 2
-    lda $10
-    sec
-    sbc $11                 ; Attack - Defense
-    bmi .minDamage          ; Negative? Set minimum
-    
-    asl a                   ; × 2
-    sta $12                 ; Save base damage
-    
-    ; Random variance (88-100%)
-    jsr Random              ; A = random 0-255
-    and #$1f                ; Limit to 0-31
-    clc
-    adc #224                ; Add 224 = range 224-255
-    sta $13
-    
-    ; Multiply: Damage = Base × Variance / 256
-    lda $12
-    jsr Multiply8x8         ; A × $13 → $14-$15
-    lda $15                 ; High byte = result
-    sta $02
-    
-    ; Check for critical hit (5% chance)
-    jsr Random
-    cmp #$0d                ; 13/256 ≈ 5%
-    bcs .noCritical
-    
-    ; Critical! Double damage
-    lda $02
-    asl a
-    sta $02
-    
+	; Get attacker's attack stat
+	ldx $00
+	lda CharacterAttack,x
+	sta $10
+	
+	; Get target's defense stat
+	ldx $01
+	lda EnemyDefense,x
+	sta $11
+	
+	; Base damage = (Attack - Defense) × 2
+	lda $10
+	sec
+	sbc $11                 ; Attack - Defense
+	bmi .minDamage          ; Negative? Set minimum
+	
+	asl a                   ; × 2
+	sta $12                 ; Save base damage
+	
+	; Random variance (88-100%)
+	jsr Random              ; A = random 0-255
+	and #$1f                ; Limit to 0-31
+	clc
+	adc #224                ; Add 224 = range 224-255
+	sta $13
+	
+	; Multiply: Damage = Base × Variance / 256
+	lda $12
+	jsr Multiply8x8         ; A × $13 → $14-$15
+	lda $15                 ; High byte = result
+	sta $02
+	
+	; Check for critical hit (5% chance)
+	jsr Random
+	cmp #$0d                ; 13/256 ≈ 5%
+	bcs .noCritical
+	
+	; Critical! Double damage
+	lda $02
+	asl a
+	sta $02
+	
 .noCritical:
-    ; Apply elemental modifiers
-    jsr ApplyElementalModifier
-    
-    ; Ensure minimum damage
-    lda $02
-    bne .done
+	; Apply elemental modifiers
+	jsr ApplyElementalModifier
+	
+	; Ensure minimum damage
+	lda $02
+	bne .done
 .minDamage:
-    lda #$01
-    sta $02
-    
+	lda #$01
+	sta $02
+	
 .done:
-    rts
+	rts
 ```
 
 ### Damage Display
@@ -371,45 +371,45 @@ Shell       Magic defense +50%              5 turns
 ; ProcessStatusEffects - Apply status effects each turn
 ; ==============================================================================
 ProcessStatusEffects:
-    ldx #$00                ; Character index
+	ldx #$00                ; Character index
 .loop:
-    lda CharacterStatus,x
-    beq .next               ; No status? Skip
-    
-    ; Check poison
-    bit #$01
-    beq .checkRegen
-    jsr ApplyPoison         ; Damage HP
-    
+	lda CharacterStatus,x
+	beq .next               ; No status? Skip
+	
+	; Check poison
+	bit #$01
+	beq .checkRegen
+	jsr ApplyPoison         ; Damage HP
+	
 .checkRegen:
-    bit #$02
-    beq .checkDoom
-    jsr ApplyRegen          ; Restore HP
-    
+	bit #$02
+	beq .checkDoom
+	jsr ApplyRegen          ; Restore HP
+	
 .checkDoom:
-    bit #$80
-    beq .decrementDuration
-    dec DoomCounter,x       ; Countdown
-    bne .decrementDuration
-    jsr KnockOut            ; Timer = 0 → KO
-    
+	bit #$80
+	beq .decrementDuration
+	dec DoomCounter,x       ; Countdown
+	bne .decrementDuration
+	jsr KnockOut            ; Timer = 0 → KO
+	
 .decrementDuration:
-    ; Decrement status effect timers
-    lda StatusDuration,x
-    beq .next
-    dec StatusDuration,x
-    bne .next
-    
-    ; Duration = 0, remove status
-    lda #$00
-    sta CharacterStatus,x
-    
+	; Decrement status effect timers
+	lda StatusDuration,x
+	beq .next
+	dec StatusDuration,x
+	bne .next
+	
+	; Duration = 0, remove status
+	lda #$00
+	sta CharacterStatus,x
+	
 .next:
-    inx
-    cpx #$03                ; 3 party members
-    bcc .loop
-    
-    rts
+	inx
+	cpx #$03                ; 3 party members
+	bcc .loop
+	
+	rts
 ```
 
 ### Status Resistance
@@ -489,60 +489,60 @@ Execute Action
 ;   $01 = Target index
 ; ==============================================================================
 EnemyAI:
-    ; Get enemy AI pattern
-    lda EnemyAIPattern,x
-    asl a                   ; × 2 (word table)
-    tax
-    lda AIPatternTable,x
-    sta $10
-    lda AIPatternTable+1,x
-    sta $11
-    
-    ; Jump to pattern handler
-    jmp ($10)
-    
+	; Get enemy AI pattern
+	lda EnemyAIPattern,x
+	asl a                   ; × 2 (word table)
+	tax
+	lda AIPatternTable,x
+	sta $10
+	lda AIPatternTable+1,x
+	sta $11
+	
+	; Jump to pattern handler
+	jmp ($10)
+	
 ; Simple AI - Random attack
 AIPattern_Simple:
-    ; 80% attack, 20% defend
-    jsr Random
-    cmp #$33                ; 51/256 ≈ 20%
-    bcs .attack
-    
-    lda #$02                ; Defend command
-    sta $00
-    rts
-    
+	; 80% attack, 20% defend
+	jsr Random
+	cmp #$33                ; 51/256 ≈ 20%
+	bcs .attack
+	
+	lda #$02                ; Defend command
+	sta $00
+	rts
+	
 .attack:
-    lda #$00                ; Attack command
-    sta $00
-    jsr SelectRandomTarget
-    sta $01
-    rts
-    
+	lda #$00                ; Attack command
+	sta $00
+	jsr SelectRandomTarget
+	sta $01
+	rts
+	
 ; Magic User AI
 AIPattern_MagicUser:
-    ; Check MP
-    lda EnemyMP,x
-    beq AIPattern_Simple    ; No MP? Use simple
-    
-    ; 70% magic, 30% attack
-    jsr Random
-    cmp #$4d                ; 77/256 ≈ 30%
-    bcs .magic
-    
-    lda #$00                ; Attack
-    sta $00
-    jsr SelectRandomTarget
-    sta $01
-    rts
-    
+	; Check MP
+	lda EnemyMP,x
+	beq AIPattern_Simple    ; No MP? Use simple
+	
+	; 70% magic, 30% attack
+	jsr Random
+	cmp #$4d                ; 77/256 ≈ 30%
+	bcs .magic
+	
+	lda #$00                ; Attack
+	sta $00
+	jsr SelectRandomTarget
+	sta $01
+	rts
+	
 .magic:
-    ; Select spell based on situation
-    jsr SelectBestSpell
-    sta $00
-    jsr SelectSpellTarget
-    sta $01
-    rts
+	; Select spell based on situation
+	jsr SelectBestSpell
+	sta $00
+	jsr SelectSpellTarget
+	sta $01
+	rts
 ```
 
 ### Boss AI
@@ -590,40 +590,40 @@ Slot 3: Item    - Use consumable item
 ;   $01 = Target index
 ; ==============================================================================
 ExecuteAttack:
-    ; Play attack animation
-    jsr PlayAttackAnimation
-    
-    ; Calculate damage
-    jsr CalculatePhysicalDamage
-    
-    ; Check for miss
-    jsr CheckHitRate
-    bcc .miss
-    
-    ; Apply damage
-    ldx $01                 ; Target index
-    lda EnemyHP,x
-    sec
-    sbc $02                 ; Subtract damage
-    bcs .notKO
-    lda #$00                ; HP can't go negative
+	; Play attack animation
+	jsr PlayAttackAnimation
+	
+	; Calculate damage
+	jsr CalculatePhysicalDamage
+	
+	; Check for miss
+	jsr CheckHitRate
+	bcc .miss
+	
+	; Apply damage
+	ldx $01                 ; Target index
+	lda EnemyHP,x
+	sec
+	sbc $02                 ; Subtract damage
+	bcs .notKO
+	lda #$00                ; HP can't go negative
 .notKO:
-    sta EnemyHP,x
-    
-    ; Display damage number
-    jsr DisplayDamage
-    
-    ; Check if target KO'd
-    lda EnemyHP,x
-    bne .done
-    jsr EnemyDefeated
-    
+	sta EnemyHP,x
+	
+	; Display damage number
+	jsr DisplayDamage
+	
+	; Check if target KO'd
+	lda EnemyHP,x
+	bne .done
+	jsr EnemyDefeated
+	
 .done:
-    rts
-    
+	rts
+	
 .miss:
-    jsr DisplayMiss
-    rts
+	jsr DisplayMiss
+	rts
 ```
 
 ### Magic Command
@@ -711,39 +711,39 @@ Maximum Level: 41
 ;   X = Character index
 ; ==============================================================================
 LevelUpCharacter:
-    ; Increment level
-    inc CharacterLevel,x
-    
-    ; HP increase
-    lda HPGrowthTable,x     ; Get HP growth rate
-    clc
-    adc CharacterMaxHP,x
-    sta CharacterMaxHP,x
-    sta CharacterCurrentHP,x ; Heal to full
-    
-    ; MP increase
-    lda MPGrowthTable,x
-    clc
-    adc CharacterMaxMP,x
-    sta CharacterMaxMP,x
-    sta CharacterCurrentMP,x ; Restore to full
-    
-    ; Attack increase
-    lda AttackGrowthTable,x
-    clc
-    adc CharacterAttack,x
-    sta CharacterAttack,x
-    
-    ; Defense increase
-    lda DefenseGrowthTable,x
-    clc
-    adc CharacterDefense,x
-    sta CharacterDefense,x
-    
-    ; Display level-up message
-    jsr ShowLevelUpMessage
-    
-    rts
+	; Increment level
+	inc CharacterLevel,x
+	
+	; HP increase
+	lda HPGrowthTable,x     ; Get HP growth rate
+	clc
+	adc CharacterMaxHP,x
+	sta CharacterMaxHP,x
+	sta CharacterCurrentHP,x ; Heal to full
+	
+	; MP increase
+	lda MPGrowthTable,x
+	clc
+	adc CharacterMaxMP,x
+	sta CharacterMaxMP,x
+	sta CharacterCurrentMP,x ; Restore to full
+	
+	; Attack increase
+	lda AttackGrowthTable,x
+	clc
+	adc CharacterAttack,x
+	sta CharacterAttack,x
+	
+	; Defense increase
+	lda DefenseGrowthTable,x
+	clc
+	adc CharacterDefense,x
+	sta CharacterDefense,x
+	
+	; Display level-up message
+	jsr ShowLevelUpMessage
+	
+	rts
 ```
 
 ### Stat Growth Tables
@@ -803,17 +803,17 @@ Maximum GP: 9999
 ```
 Drop System:
   Each enemy has 2 drop slots:
-    - Common drop (25% chance)
-    - Rare drop (5% chance)
+	- Common drop (25% chance)
+	- Rare drop (5% chance)
   
 Drop Rate Modifiers:
   - Thief accessory equipped: +10% to all drops
   - Lucky status: +5% to rare drops
   
 Drop Table Example:
-    Enemy: Goblin
-      Common: Cure Potion (25%)
-      Rare: Antidote (5%)
+	Enemy: Goblin
+	  Common: Cure Potion (25%)
+	  Rare: Antidote (5%)
 ```
 
 ### Victory Rewards Code
@@ -823,49 +823,49 @@ Drop Table Example:
 ; AwardBattleRewards - Give EXP, GP, and items
 ; ==============================================================================
 AwardBattleRewards:
-    ; Calculate total EXP
-    jsr CalculateTotalEXP
-    sta $10                 ; Save EXP
-    
-    ; Award EXP to each party member
-    ldx #$00
+	; Calculate total EXP
+	jsr CalculateTotalEXP
+	sta $10                 ; Save EXP
+	
+	; Award EXP to each party member
+	ldx #$00
 .expLoop:
-    lda PartyStatus,x
-    bmi .nextEXP            ; Skip if KO'd
-    
-    lda $10                 ; Get EXP
-    clc
-    adc CharacterEXP,x
-    sta CharacterEXP,x
-    bcc .checkLevelUp
-    
-    ; EXP overflow (carry set)
-    inc CharacterEXP+1,x
-    
+	lda PartyStatus,x
+	bmi .nextEXP            ; Skip if KO'd
+	
+	lda $10                 ; Get EXP
+	clc
+	adc CharacterEXP,x
+	sta CharacterEXP,x
+	bcc .checkLevelUp
+	
+	; EXP overflow (carry set)
+	inc CharacterEXP+1,x
+	
 .checkLevelUp:
-    jsr CheckForLevelUp
-    
+	jsr CheckForLevelUp
+	
 .nextEXP:
-    inx
-    cpx #$03
-    bcc .expLoop
-    
-    ; Award GP
-    jsr CalculateTotalGP
-    clc
-    adc PartyGP
-    sta PartyGP
-    bcc .itemDrops
-    inc PartyGP+1
-    
+	inx
+	cpx #$03
+	bcc .expLoop
+	
+	; Award GP
+	jsr CalculateTotalGP
+	clc
+	adc PartyGP
+	sta PartyGP
+	bcc .itemDrops
+	inc PartyGP+1
+	
 .itemDrops:
-    ; Check for item drops
-    jsr RollForItemDrops
-    
-    ; Display results
-    jsr ShowRewardsScreen
-    
-    rts
+	; Check for item drops
+	jsr RollForItemDrops
+	
+	; Display results
+	jsr ShowRewardsScreen
+	
+	rts
 ```
 
 ## Code Locations
@@ -876,16 +876,16 @@ AwardBattleRewards:
 
 ```asm
 InitializeBattle:           ; Setup battle state
-    ; Located at $0b:8000
-    
+	; Located at $0b:8000
+	
 LoadEnemyData:              ; Load enemy stats
-    ; Located at $0b:8123
-    
+	; Located at $0b:8123
+	
 LoadBattleBackground:       ; Load battle scene
-    ; Located at $0b:8234
-    
+	; Located at $0b:8234
+	
 InitializeATB:              ; Reset ATB gauges
-    ; Located at $0b:8345
+	; Located at $0b:8345
 ```
 
 ### Battle Loop
@@ -894,16 +894,16 @@ InitializeATB:              ; Reset ATB gauges
 
 ```asm
 BattleMainLoop:             ; Main battle update
-    ; Located at $0b:9000
-    
+	; Located at $0b:9000
+	
 UpdateATBGauges:            ; Fill ATB gauges
-    ; Located at $0b:9123
-    
+	; Located at $0b:9123
+	
 ProcessTurns:               ; Handle ready turns
-    ; Located at $0b:9234
-    
+	; Located at $0b:9234
+	
 CheckBattleEnd:             ; Check win/lose
-    ; Located at $0b:9345
+	; Located at $0b:9345
 ```
 
 ### Damage Calculation
@@ -912,16 +912,16 @@ CheckBattleEnd:             ; Check win/lose
 
 ```asm
 CalculatePhysicalDamage:    ; Physical damage formula
-    ; Located at $0b:A000
-    
+	; Located at $0b:A000
+	
 CalculateMagicDamage:       ; Magic damage formula
-    ; Located at $0b:A123
-    
+	; Located at $0b:A123
+	
 ApplyElementalModifier:     ; Apply element bonuses
-    ; Located at $0b:A234
-    
+	; Located at $0b:A234
+	
 CheckCriticalHit:           ; Roll for critical
-    ; Located at $0b:A345
+	; Located at $0b:A345
 ```
 
 ### AI System
@@ -930,16 +930,16 @@ CheckCriticalHit:           ; Roll for critical
 
 ```asm
 EnemyAI:                    ; Main AI decision
-    ; Located at $0b:B000
-    
+	; Located at $0b:B000
+	
 AIPattern_Simple:           ; Simple attack AI
-    ; Located at $0b:B123
-    
+	; Located at $0b:B123
+	
 AIPattern_MagicUser:        ; Magic-focused AI
-    ; Located at $0b:B234
-    
+	; Located at $0b:B234
+	
 AIPattern_Boss:             ; Complex boss AI
-    ; Located at $0b:B345
+	; Located at $0b:B345
 ```
 
 ### Status Effects
@@ -948,16 +948,16 @@ AIPattern_Boss:             ; Complex boss AI
 
 ```asm
 ProcessStatusEffects:       ; Apply status each turn
-    ; Located at $0b:C000
-    
+	; Located at $0b:C000
+	
 ApplyPoison:                ; Poison damage
-    ; Located at $0b:C123
-    
+	; Located at $0b:C123
+	
 ApplyRegen:                 ; Regen healing
-    ; Located at $0b:C234
-    
+	; Located at $0b:C234
+	
 CheckStatusResistance:      ; Check immunity
-    ; Located at $0b:C345
+	; Located at $0b:C345
 ```
 
 ## Performance Considerations
@@ -1004,17 +1004,17 @@ Total: ~900 bytes
 ```asm
 ; Set enemy HP to 1 (instant kill)
 DebugKillEnemy:
-    lda #$01
-    sta EnemyHP,x
-    rts
+	lda #$01
+	sta EnemyHP,x
+	rts
 
 ; Fill party ATB instantly
 DebugReadyParty:
-    lda #$ff
-    sta PartyATB+0
-    sta PartyATB+1
-    sta PartyATB+2
-    rts
+	lda #$ff
+	sta PartyATB+0
+	sta PartyATB+1
+	sta PartyATB+2
+	rts
 ```
 
 ## See Also

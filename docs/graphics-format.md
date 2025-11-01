@@ -1,4 +1,4 @@
-﻿# SNES Graphics Format Reference
+# SNES Graphics Format Reference
 
 Comprehensive guide to SNES graphics formats used in Final Fantasy Mystic Quest
 
@@ -131,7 +131,7 @@ SNES uses RGB555 format: 15-bit color (5 bits per channel).
 
 ```
 Bit:  15 14 13 12 11 10 09 08 07 06 05 04 03 02 01 00
-      0  B  B  B  B  B  G  G  G  G  G  R  R  R  R  R
+	  0  B  B  B  B  B  G  G  G  G  G  R  R  R  R  R
 ```
 
 ### Conversion to RGB888
@@ -174,7 +174,7 @@ Tilemaps define how tiles are arranged on screen.
 
 ```
 Bit:  15 14 13 12 11 10 09 08 07 06 05 04 03 02 01 00
-      v  h  o  p  p  p  c  c  c  c  c  c  c  c  c  c
+	  v  h  o  p  p  p  c  c  c  c  c  c  c  c  c  c
 ```
 
 **Fields:**
@@ -284,9 +284,9 @@ python tools/convert_graphics.py to-snes input.png tiles.bin \
 3. **Convert back to SNES:**
    ```bash
    python tools/convert_graphics.py to-snes \
-       assets/graphics/sprite_tiles_edited.png \
-       assets/graphics/sprite_tiles_new.bin \
-       --bpp 4
+	   assets/graphics/sprite_tiles_edited.png \
+	   assets/graphics/sprite_tiles_new.bin \
+	   --bpp 4
    ```
 
 4. **Test in emulator:**
@@ -306,8 +306,8 @@ python tools/convert_graphics.py to-snes input.png tiles.bin \
 2. **Convert to SNES:**
    ```bash
    python tools/convert_graphics.py to-snes \
-       mytiles.png custom_tiles.bin \
-       --bpp 4 --palette custom_palette.bin
+	   mytiles.png custom_tiles.bin \
+	   --bpp 4 --palette custom_palette.bin
    ```
 
 3. **Reference in assembly:**

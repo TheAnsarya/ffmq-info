@@ -200,20 +200,20 @@ Scan and catalog all raw memory addresses used in the codebase.
    - Add "Child Issues" section to each parent
    - Link to all granular child issues
    - Example for Parent #1:
-     ```markdown
-     ## Child Issues
-     - #13: Prerequisites and Setup
-     - #14: Develop format_asm.ps1 Script
-     - #15: Testing and Validation
-     - #16: Format Priority 1 Banks (6 files)
-     - #17: Format Priority 2-3 Banks and Integration
-     ```
+	 ```markdown
+	 ## Child Issues
+	 - #13: Prerequisites and Setup
+	 - #14: Develop format_asm.ps1 Script
+	 - #15: Testing and Validation
+	 - #16: Format Priority 1 Banks (6 files)
+	 - #17: Format Priority 2-3 Banks and Integration
+	 ```
 
 4. **Start Working on First Issues**
    - Recommended starting points:
-     - #13: ASM Formatting: Prerequisites and Setup
-     - #18: Documentation: Planning and Templates
-     - #23: Memory Labels: Address Inventory and Analysis
+	 - #13: ASM Formatting: Prerequisites and Setup
+	 - #18: Documentation: Planning and Templates
+	 - #23: Memory Labels: Address Inventory and Analysis
 
 ## Files Created/Modified
 

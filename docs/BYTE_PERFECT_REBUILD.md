@@ -1,4 +1,4 @@
-﻿# Byte-Perfect ROM Rebuild Guide
+# Byte-Perfect ROM Rebuild Guide
 
 ## Goal
 
@@ -65,11 +65,11 @@ assets/
 │   ├── palette_001.json
 │   └── ...
 └── audio/              # Music and sound
-    ├── music/
-    │   ├── track_001.spc
-    │   ├── track_001.mid
-    │   └── ...
-    └── sfx/
+	├── music/
+	│   ├── track_001.spc
+	│   ├── track_001.mid
+	│   └── ...
+	└── sfx/
 ```
 
 ### Phase 2: Build from Sources
@@ -159,31 +159,31 @@ Machine-readable data for automation:
   "original_rom": "~roms/Final Fantasy - Mystic Quest (U) (V1.1).sfc",
   "built_rom": "build/ffmq-modified.sfc",
   "statistics": {
-    "total_bytes": 524288,
-    "matching_bytes": 498532,
-    "differing_bytes": 25756,
-    "match_percentage": 95.09,
-    "by_category": {
-      "code": {
-        "total_bytes": 98304,
-        "matching_bytes": 95234,
-        "differing_bytes": 3070,
-        "match_percentage": 96.88
-      },
-      ...
-    }
+	"total_bytes": 524288,
+	"matching_bytes": 498532,
+	"differing_bytes": 25756,
+	"match_percentage": 95.09,
+	"by_category": {
+	  "code": {
+		"total_bytes": 98304,
+		"matching_bytes": 95234,
+		"differing_bytes": 3070,
+		"match_percentage": 96.88
+	  },
+	  ...
+	}
   },
   "difference_blocks": [
-    {
-      "start": "$030120",
-      "end": "$030240",
-      "size": 288,
-      "region": "Enemy Stats",
-      "category": "data",
-      "original_sample": "1f4e2a3c...",
-      "built_sample": "1f4e0000..."
-    },
-    ...
+	{
+	  "start": "$030120",
+	  "end": "$030240",
+	  "size": 288,
+	  "region": "Enemy Stats",
+	  "category": "data",
+	  "original_sample": "1f4e2a3c...",
+	  "built_sample": "1f4e0000..."
+	},
+	...
   ]
 }
 ```

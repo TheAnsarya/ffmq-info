@@ -1,4 +1,4 @@
-﻿# Graphics + Palette Extraction Summary
+# Graphics + Palette Extraction Summary
 **Date:** 2025-10-25  
 **Commit:** 5d41935  
 **Status:** ✅ **SUCCESS** - Recognizable sprite workflow implemented!
@@ -45,14 +45,14 @@ character_palettes.bin  (256 bytes)
   "palette_count": 8,
   "colors_per_palette": 16,
   "palettes": [
-    {
-      "index": 0,
-      "colors": [
-        {"index": 0, "r": 2, "g": 15, "b": 17, "hex": "#107B8C"},
-        {"index": 1, "r": 10, "g": 23, "b": 10, "hex": "#52BD52"},
-        ...
-      ]
-    }
+	{
+	  "index": 0,
+	  "colors": [
+		{"index": 0, "r": 2, "g": 15, "b": 17, "hex": "#107B8C"},
+		{"index": 1, "r": 10, "g": 23, "b": 10, "hex": "#52BD52"},
+		...
+	  ]
+	}
   ]
 }
 ```
@@ -92,7 +92,7 @@ c:\Users\me\source\repos\ffmq-info\
 │   └── GRAPHICS_PALETTE_WORKFLOW.md   ← Complete guide (200+ lines)
 │
 └── tools\extraction\
-    └── extract_palettes_sprites.py    ← The extraction tool
+	└── extract_palettes_sprites.py    ← The extraction tool
 ```
 
 ## How to View Your Results
@@ -135,7 +135,7 @@ Then run `build_palettes.py` (future tool) to convert back to BIN and rebuild RO
 **BGR555 (15-bit color in 16-bit word):**
 ```
 Bit:  15  14-10   9-5    4-0
-      X   BBBBB  GGGGG  RRRRR
+	  X   BBBBB  GGGGG  RRRRR
 ```
 
 - R, G, B: 0-31 (5 bits each)

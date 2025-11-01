@@ -1,4 +1,4 @@
-﻿# Graphics System Architecture
+# Graphics System Architecture
 
 Complete documentation of the Final Fantasy Mystic Quest graphics rendering system.
 
@@ -31,8 +31,8 @@ The FFMQ graphics system manages all visual rendering through the SNES Picture P
 ┌──────────────────┐
 │  Game Logic      │
 └────────┬─────────┘
-         │
-         v
+		 │
+		 v
 ┌──────────────────┐
 │ Graphics Engine  │ ← Controls what to display
 ├──────────────────┤
@@ -41,8 +41,8 @@ The FFMQ graphics system manages all visual rendering through the SNES Picture P
 │ - Set Scroll Pos │
 │ - Manage Sprites │
 └────────┬─────────┘
-         │
-         v
+		 │
+		 v
 ┌──────────────────┐
 │  PPU Hardware    │ ← Renders to screen
 ├──────────────────┤
@@ -260,32 +260,32 @@ Palettes loaded via DMA during VBlank:
 ```asm
 ; Example from bank_01.asm
 LoadPalette:
-    lda #$00        ; CGRAM address low
-    sta $2121       ; Set CGRAM address
-    
-    ; DMA from ROM to CGRAM
-    lda #$00        ; DMA mode: 1 register write twice
-    sta $4300       ; DMA control
-    lda #$22        ; Destination: $2122 (CGRAM data)
-    sta $4301
-    
-    ; Source address (ROM)
-    lda #<PaletteData
-    sta $4302       ; Source address low
-    lda #>PaletteData  
-    sta $4303       ; Source address high
-    lda #^PaletteData
-    sta $4304       ; Source bank
-    
-    ; Transfer size
-    lda #$00
-    sta $4305       ; 512 bytes (256 words)
-    lda #$02
-    sta $4306
-    
-    lda #$01        ; Trigger DMA on channel 0
-    sta $420b
-    rts
+	lda #$00        ; CGRAM address low
+	sta $2121       ; Set CGRAM address
+	
+	; DMA from ROM to CGRAM
+	lda #$00        ; DMA mode: 1 register write twice
+	sta $4300       ; DMA control
+	lda #$22        ; Destination: $2122 (CGRAM data)
+	sta $4301
+	
+	; Source address (ROM)
+	lda #<PaletteData
+	sta $4302       ; Source address low
+	lda #>PaletteData  
+	sta $4303       ; Source address high
+	lda #^PaletteData
+	sta $4304       ; Source bank
+	
+	; Transfer size
+	lda #$00
+	sta $4305       ; 512 bytes (256 words)
+	lda #$02
+	sta $4306
+	
+	lda #$01        ; Trigger DMA on channel 0
+	sta $420b
+	rts
 ```
 
 ### Palette Effects
@@ -358,37 +358,37 @@ Resume Rendering
 ;   $02-$03 = Transfer size
 ; ==============================================================================
 LoadGraphicsToVRAM:
-    ; Set VRAM address
-    lda $00
-    sta $2116       ; VRAM address low
-    lda $01
-    sta $2117       ; VRAM address high
-    
-    ; Configure DMA
-    lda #$01        ; DMA mode: 2 registers write once
-    sta $4300       ; $2118-$2119 (VRAM data ports)
-    
-    lda #$18        ; Destination: $2118
-    sta $4301
-    
-    ; Source address
-    stx $4302       ; Source address low/high
-    sta $4304       ; Source bank
-    
-    ; Transfer size
-    lda $02
-    sta $4305       ; Size low
-    lda $03
-    sta $4306       ; Size high
-    
-    ; Wait for VBlank
-    jsr WaitVBlank
-    
-    ; Execute DMA
-    lda #$01
-    sta $420b       ; Trigger DMA channel 0
-    
-    rts
+	; Set VRAM address
+	lda $00
+	sta $2116       ; VRAM address low
+	lda $01
+	sta $2117       ; VRAM address high
+	
+	; Configure DMA
+	lda #$01        ; DMA mode: 2 registers write once
+	sta $4300       ; $2118-$2119 (VRAM data ports)
+	
+	lda #$18        ; Destination: $2118
+	sta $4301
+	
+	; Source address
+	stx $4302       ; Source address low/high
+	sta $4304       ; Source bank
+	
+	; Transfer size
+	lda $02
+	sta $4305       ; Size low
+	lda $03
+	sta $4306       ; Size high
+	
+	; Wait for VBlank
+	jsr WaitVBlank
+	
+	; Execute DMA
+	lda #$01
+	sta $420b       ; Trigger DMA channel 0
+	
+	rts
 ```
 
 ### Compression
@@ -398,8 +398,8 @@ Some graphics use simple RLE compression:
 ```
 Format:
   Byte 0: Command
-    If bit 7 = 0: Copy next N bytes literally
-    If bit 7 = 1: Repeat next byte N times
+	If bit 7 = 0: Copy next N bytes literally
+	If bit 7 = 1: Repeat next byte N times
   
 Example:
   $05 $12 $34 $56 $78 $90  →  Copy 5 bytes: 12 34 56 78 90
@@ -439,14 +439,14 @@ Example:
 2. VBlank End
    │
    └─ PPU renders scanlines automatically
-      ├─ Scanline 0-224: Active display
-      │  └─ For each scanline:
-      │     ├─ Render BG layers
-      │     ├─ Render sprites
-      │     ├─ Apply color math
-      │     └─ Apply HDMA effects
-      │
-      └─ Scanline 225-261: VBlank period
+	  ├─ Scanline 0-224: Active display
+	  │  └─ For each scanline:
+	  │     ├─ Render BG layers
+	  │     ├─ Render sprites
+	  │     ├─ Apply color math
+	  │     └─ Apply HDMA effects
+	  │
+	  └─ Scanline 225-261: VBlank period
 
 3. Repeat next frame (60 Hz)
 ```
@@ -472,20 +472,20 @@ VBlank duration: ~1.1 ms
 ```asm
 ; Main graphics update routines
 VBlankHandler:          ; NMI interrupt handler
-    jsr UpdateOAM       ; Update sprite positions
-    jsr UpdateScroll    ; Update background scroll
-    jsr UpdatePalette   ; Apply palette effects
-    jsr RunHDMA         ; Setup scanline effects
-    rti
+	jsr UpdateOAM       ; Update sprite positions
+	jsr UpdateScroll    ; Update background scroll
+	jsr UpdatePalette   ; Apply palette effects
+	jsr RunHDMA         ; Setup scanline effects
+	rti
 
 UpdateOAM:              ; Copy sprite buffer → OAM
-    ; Located at $01:8234
-    
+	; Located at $01:8234
+	
 UpdateScroll:           ; Update BG scroll registers
-    ; Located at $01:8156
-    
+	; Located at $01:8156
+	
 UpdatePalette:          ; Palette fading/effects
-    ; Located at $01:82A5
+	; Located at $01:82A5
 ```
 
 ### Graphics Loading
@@ -494,16 +494,16 @@ UpdatePalette:          ; Palette fading/effects
 
 ```asm
 LoadGraphicsToVRAM:     ; DMA graphics to VRAM
-    ; Located at $02:9122
-    
+	; Located at $02:9122
+	
 LoadPaletteData:        ; Load palette via DMA
-    ; Located at $02:9234
-    
+	; Located at $02:9234
+	
 DecompressGraphics:     ; Decompress RLE graphics
-    ; Located at $02:9456
-    
+	; Located at $02:9456
+	
 LoadSpriteGraphics:     ; Load sprite tiles
-    ; Located at $02:9678
+	; Located at $02:9678
 ```
 
 ### Sprite Management
@@ -512,16 +512,16 @@ LoadSpriteGraphics:     ; Load sprite tiles
 
 ```asm
 AllocateSprite:         ; Find free sprite slot
-    ; Located at $02:A123
-    
+	; Located at $02:A123
+	
 FreeSprite:             ; Free sprite slot
-    ; Located at $02:A145
-    
+	; Located at $02:A145
+	
 UpdateSpriteAnimation:  ; Animate sprite frames
-    ; Located at $02:A234
-    
+	; Located at $02:A234
+	
 SetSpritePosition:      ; Update sprite X/Y
-    ; Located at $02:A267
+	; Located at $02:A267
 ```
 
 ### Background System
@@ -530,16 +530,16 @@ SetSpritePosition:      ; Update sprite X/Y
 
 ```asm
 InitBackground:         ; Setup BG layers
-    ; Located at $01:7234
-    
+	; Located at $01:7234
+	
 UpdateBG1Scroll:        ; Scroll BG1
-    ; Located at $01:7456
-    
+	; Located at $01:7456
+	
 UpdateTilemap:          ; Modify tilemap data
-    ; Located at $01:7678
-    
+	; Located at $01:7678
+	
 LoadBackgroundGfx:      ; Load BG graphics bank
-    ; Located at $01:7890
+	; Located at $01:7890
 ```
 
 ## Hardware Registers
@@ -636,21 +636,21 @@ Solution: Ensure VBlank code completes in time
 ```asm
 ; Visual debug: Flash color
 DebugFlashRed:
-    lda #$1f        ; Pure red (SNES BGR format)
-    sta $2122       ; Write to color 0
-    rts
+	lda #$1f        ; Pure red (SNES BGR format)
+	sta $2122       ; Write to color 0
+	rts
 
 ; Sprite debug: Draw marker at position
 DebugDrawMarker:
-    lda #$00        ; X position
-    sta OAMBuffer+0
-    lda #$00        ; Y position  
-    sta OAMBuffer+1
-    lda #$01        ; Tile (use visible pattern)
-    sta OAMBuffer+2
-    lda #$30        ; Attributes (priority 3, palette 0)
-    sta OAMBuffer+3
-    rts
+	lda #$00        ; X position
+	sta OAMBuffer+0
+	lda #$00        ; Y position  
+	sta OAMBuffer+1
+	lda #$01        ; Tile (use visible pattern)
+	sta OAMBuffer+2
+	lda #$30        ; Attributes (priority 3, palette 0)
+	sta OAMBuffer+3
+	rts
 ```
 
 ## See Also

@@ -1,4 +1,4 @@
-﻿# FFMQ Testing Environment
+# FFMQ Testing Environment
 
 This document describes the testing environment for the Final Fantasy Mystic Quest SNES disassembly project.
 
@@ -187,8 +187,8 @@ python tools/mesen_integration.py setup
 Edit `tools/mesen_integration.py` to add custom MesenS installation paths:
 ```python
 self.mesen_paths = [
-    "path/to/your/mesen-s.exe",
-    # ... existing paths
+	"path/to/your/mesen-s.exe",
+	# ... existing paths
 ]
 ```
 

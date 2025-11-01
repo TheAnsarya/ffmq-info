@@ -1,4 +1,4 @@
-﻿# FFMQ Graphics + Palette Workflow
+# FFMQ Graphics + Palette Workflow
 **Status:** ✅ **WORKING** - Recognizable sprites with correct colors!  
 **Date:** 2025-10-25
 
@@ -38,17 +38,17 @@ character_palettes.bin  (256 bytes = 8 palettes × 16 colors × 2 bytes)
   "palette_count": 8,
   "colors_per_palette": 16,
   "palettes": [
-    {
-      "index": 0,
-      "colors": [
-        {
-          "index": 0,
-          "r": 2, "g": 15, "b": 17,
-          "hex": "#107B8C"
-        },
-        ...
-      ]
-    }
+	{
+	  "index": 0,
+	  "colors": [
+		{
+		  "index": 0,
+		  "r": 2, "g": 15, "b": 17,
+		  "hex": "#107B8C"
+		},
+		...
+	  ]
+	}
   ]
 }
 ```
@@ -137,12 +137,12 @@ SNES uses **15-bit color** stored in 16-bit words:
 
 ```
 Bit:  15  14-10   9-5    4-0
-      X   BBBBB  GGGGG  RRRRR
-      ^   ^^^^^  ^^^^^  ^^^^^
-      |     |      |      └─ Red   (0-31)
-      |     |      └──────── Green (0-31)
-      |     └─────────────── Blue  (0-31)
-      └───────────────────── Unused
+	  X   BBBBB  GGGGG  RRRRR
+	  ^   ^^^^^  ^^^^^  ^^^^^
+	  |     |      |      └─ Red   (0-31)
+	  |     |      └──────── Green (0-31)
+	  |     └─────────────── Blue  (0-31)
+	  └───────────────────── Unused
 ```
 
 **Conversion to RGB888:**

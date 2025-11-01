@@ -2,205 +2,205 @@
   "original_rom": "roms\\Final Fantasy - Mystic Quest (U) (V1.1).sfc",
   "built_rom": "build\\ffmq-rebuilt.sfc",
   "statistics": {
-    "total_bytes": 524288,
-    "matching_bytes": 524288,
-    "differing_bytes": 0,
-    "match_percentage": 100.0,
-    "by_category": {
-      "code": {
-        "total_bytes": 245760,
-        "matching_bytes": 245760,
-        "differing_bytes": 0,
-        "match_percentage": 100.0
-      },
-      "data": {
-        "total_bytes": 114768,
-        "matching_bytes": 114768,
-        "differing_bytes": 0,
-        "match_percentage": 100.0
-      },
-      "text": {
-        "total_bytes": 16384,
-        "matching_bytes": 16384,
-        "differing_bytes": 0,
-        "match_percentage": 100.0
-      },
-      "graphics": {
-        "total_bytes": 98304,
-        "matching_bytes": 98304,
-        "differing_bytes": 0,
-        "match_percentage": 100.0
-      },
-      "audio": {
-        "total_bytes": 49152,
-        "matching_bytes": 49152,
-        "differing_bytes": 0,
-        "match_percentage": 100.0
-      }
-    }
+	"total_bytes": 524288,
+	"matching_bytes": 524288,
+	"differing_bytes": 0,
+	"match_percentage": 100.0,
+	"by_category": {
+	  "code": {
+		"total_bytes": 245760,
+		"matching_bytes": 245760,
+		"differing_bytes": 0,
+		"match_percentage": 100.0
+	  },
+	  "data": {
+		"total_bytes": 114768,
+		"matching_bytes": 114768,
+		"differing_bytes": 0,
+		"match_percentage": 100.0
+	  },
+	  "text": {
+		"total_bytes": 16384,
+		"matching_bytes": 16384,
+		"differing_bytes": 0,
+		"match_percentage": 100.0
+	  },
+	  "graphics": {
+		"total_bytes": 98304,
+		"matching_bytes": 98304,
+		"differing_bytes": 0,
+		"match_percentage": 100.0
+	  },
+	  "audio": {
+		"total_bytes": 49152,
+		"matching_bytes": 49152,
+		"differing_bytes": 0,
+		"match_percentage": 100.0
+	  }
+	}
   },
   "difference_blocks": [],
   "regions": [
-    {
-      "name": "Boot/Reset",
-      "start": 0,
-      "end": 512,
-      "category": "code",
-      "description": "Boot vectors and initialization"
-    },
-    {
-      "name": "Main Engine",
-      "start": 512,
-      "end": 16384,
-      "category": "code",
-      "description": "Main game loop, input, graphics DMA"
-    },
-    {
-      "name": "Engine Data",
-      "start": 16384,
-      "end": 32768,
-      "category": "data",
-      "description": "Engine data tables"
-    },
-    {
-      "name": "Field System",
-      "start": 32768,
-      "end": 65536,
-      "category": "code",
-      "description": "Field/map system, events"
-    },
-    {
-      "name": "Battle System",
-      "start": 65536,
-      "end": 98304,
-      "category": "code",
-      "description": "Battle engine, enemy AI"
-    },
-    {
-      "name": "Menu System",
-      "start": 98304,
-      "end": 131072,
-      "category": "code",
-      "description": "Menu rendering, equipment"
-    },
-    {
-      "name": "Text Engine",
-      "start": 131072,
-      "end": 147456,
-      "category": "code",
-      "description": "Text rendering engine"
-    },
-    {
-      "name": "Dialog Data",
-      "start": 147456,
-      "end": 163840,
-      "category": "text",
-      "description": "Dialog strings and tables"
-    },
-    {
-      "name": "Magic System",
-      "start": 163840,
-      "end": 180224,
-      "category": "code",
-      "description": "Spell effects, magic engine"
-    },
-    {
-      "name": "Item System",
-      "start": 180224,
-      "end": 196608,
-      "category": "code",
-      "description": "Item handling, inventory"
-    },
-    {
-      "name": "Enemy Stats",
-      "start": 196608,
-      "end": 204800,
-      "category": "data",
-      "description": "Enemy stats, resistances, rewards"
-    },
-    {
-      "name": "Battle Data",
-      "start": 204800,
-      "end": 229376,
-      "category": "data",
-      "description": "Battle backgrounds, formations"
-    },
-    {
-      "name": "Character Graphics",
-      "start": 229376,
-      "end": 262144,
-      "category": "graphics",
-      "description": "Hero and NPC sprites"
-    },
-    {
-      "name": "Enemy Graphics",
-      "start": 262144,
-      "end": 294912,
-      "category": "graphics",
-      "description": "Enemy and boss sprites"
-    },
-    {
-      "name": "Tile Graphics",
-      "start": 294912,
-      "end": 327680,
-      "category": "graphics",
-      "description": "Map tiles, backgrounds"
-    },
-    {
-      "name": "Sound Engine",
-      "start": 327680,
-      "end": 344064,
-      "category": "code",
-      "description": "SPC700 sound driver"
-    },
-    {
-      "name": "Music Data",
-      "start": 344064,
-      "end": 360448,
-      "category": "audio",
-      "description": "Music sequences (SPC)"
-    },
-    {
-      "name": "Sound Effects",
-      "start": 360448,
-      "end": 393216,
-      "category": "audio",
-      "description": "Sound effect samples"
-    },
-    {
-      "name": "VBlank Handler",
-      "start": 393216,
-      "end": 409600,
-      "category": "code",
-      "description": "NMI/IRQ handlers, screen updates"
-    },
-    {
-      "name": "Save System",
-      "start": 409600,
-      "end": 425984,
-      "category": "code",
-      "description": "Save/load, SRAM handling"
-    },
-    {
-      "name": "Additional Code",
-      "start": 425984,
-      "end": 458752,
-      "category": "code",
-      "description": "Misc game logic"
-    },
-    {
-      "name": "Additional Data",
-      "start": 458752,
-      "end": 524288,
-      "category": "data",
-      "description": "Misc data tables"
-    },
-    {
-      "name": "ROM Header",
-      "start": 32688,
-      "end": 32768,
-      "category": "data",
-      "description": "SNES ROM header and vectors"
-    }
+	{
+	  "name": "Boot/Reset",
+	  "start": 0,
+	  "end": 512,
+	  "category": "code",
+	  "description": "Boot vectors and initialization"
+	},
+	{
+	  "name": "Main Engine",
+	  "start": 512,
+	  "end": 16384,
+	  "category": "code",
+	  "description": "Main game loop, input, graphics DMA"
+	},
+	{
+	  "name": "Engine Data",
+	  "start": 16384,
+	  "end": 32768,
+	  "category": "data",
+	  "description": "Engine data tables"
+	},
+	{
+	  "name": "Field System",
+	  "start": 32768,
+	  "end": 65536,
+	  "category": "code",
+	  "description": "Field/map system, events"
+	},
+	{
+	  "name": "Battle System",
+	  "start": 65536,
+	  "end": 98304,
+	  "category": "code",
+	  "description": "Battle engine, enemy AI"
+	},
+	{
+	  "name": "Menu System",
+	  "start": 98304,
+	  "end": 131072,
+	  "category": "code",
+	  "description": "Menu rendering, equipment"
+	},
+	{
+	  "name": "Text Engine",
+	  "start": 131072,
+	  "end": 147456,
+	  "category": "code",
+	  "description": "Text rendering engine"
+	},
+	{
+	  "name": "Dialog Data",
+	  "start": 147456,
+	  "end": 163840,
+	  "category": "text",
+	  "description": "Dialog strings and tables"
+	},
+	{
+	  "name": "Magic System",
+	  "start": 163840,
+	  "end": 180224,
+	  "category": "code",
+	  "description": "Spell effects, magic engine"
+	},
+	{
+	  "name": "Item System",
+	  "start": 180224,
+	  "end": 196608,
+	  "category": "code",
+	  "description": "Item handling, inventory"
+	},
+	{
+	  "name": "Enemy Stats",
+	  "start": 196608,
+	  "end": 204800,
+	  "category": "data",
+	  "description": "Enemy stats, resistances, rewards"
+	},
+	{
+	  "name": "Battle Data",
+	  "start": 204800,
+	  "end": 229376,
+	  "category": "data",
+	  "description": "Battle backgrounds, formations"
+	},
+	{
+	  "name": "Character Graphics",
+	  "start": 229376,
+	  "end": 262144,
+	  "category": "graphics",
+	  "description": "Hero and NPC sprites"
+	},
+	{
+	  "name": "Enemy Graphics",
+	  "start": 262144,
+	  "end": 294912,
+	  "category": "graphics",
+	  "description": "Enemy and boss sprites"
+	},
+	{
+	  "name": "Tile Graphics",
+	  "start": 294912,
+	  "end": 327680,
+	  "category": "graphics",
+	  "description": "Map tiles, backgrounds"
+	},
+	{
+	  "name": "Sound Engine",
+	  "start": 327680,
+	  "end": 344064,
+	  "category": "code",
+	  "description": "SPC700 sound driver"
+	},
+	{
+	  "name": "Music Data",
+	  "start": 344064,
+	  "end": 360448,
+	  "category": "audio",
+	  "description": "Music sequences (SPC)"
+	},
+	{
+	  "name": "Sound Effects",
+	  "start": 360448,
+	  "end": 393216,
+	  "category": "audio",
+	  "description": "Sound effect samples"
+	},
+	{
+	  "name": "VBlank Handler",
+	  "start": 393216,
+	  "end": 409600,
+	  "category": "code",
+	  "description": "NMI/IRQ handlers, screen updates"
+	},
+	{
+	  "name": "Save System",
+	  "start": 409600,
+	  "end": 425984,
+	  "category": "code",
+	  "description": "Save/load, SRAM handling"
+	},
+	{
+	  "name": "Additional Code",
+	  "start": 425984,
+	  "end": 458752,
+	  "category": "code",
+	  "description": "Misc game logic"
+	},
+	{
+	  "name": "Additional Data",
+	  "start": 458752,
+	  "end": 524288,
+	  "category": "data",
+	  "description": "Misc data tables"
+	},
+	{
+	  "name": "ROM Header",
+	  "start": 32688,
+	  "end": 32768,
+	  "category": "data",
+	  "description": "SNES ROM header and vectors"
+	}
   ]
 }

@@ -1,238 +1,238 @@
 {
   "metadata": {
-    "project": "FFMQ Disassembly",
-    "version": "1.0",
-    "description": "Example label mappings for apply_labels.ps1",
-    "created": "2025-11-01"
+	"project": "FFMQ Disassembly",
+	"version": "1.0",
+	"description": "Example label mappings for apply_labels.ps1",
+	"created": "2025-11-01"
   },
   "mappings": [
-    {
-      "address": "$40",
-      "label": "player_x_pos_lo",
-      "type": "RAM",
-      "comment": "Player X position (low byte)"
-    },
-    {
-      "address": "$41",
-      "label": "player_x_pos_hi",
-      "type": "RAM",
-      "comment": "Player X position (high byte)"
-    },
-    {
-      "address": "$42",
-      "label": "player_y_pos_lo",
-      "type": "RAM",
-      "comment": "Player Y position (low byte)"
-    },
-    {
-      "address": "$43",
-      "label": "player_y_pos_hi",
-      "type": "RAM",
-      "comment": "Player Y position (high byte)"
-    },
-    {
-      "address": "$44",
-      "label": "player_direction",
-      "type": "RAM",
-      "comment": "Facing direction (0=up, 1=down, 2=left, 3=right)"
-    },
-    {
-      "address": "$45",
-      "label": "player_speed",
-      "type": "RAM",
-      "comment": "Movement speed"
-    },
-    {
-      "address": "$46",
-      "label": "player_state",
-      "type": "RAM",
-      "comment": "Current player state"
-    },
-    {
-      "address": "$47",
-      "label": "player_animation",
-      "type": "RAM",
-      "comment": "Animation frame counter"
-    },
-    {
-      "address": "$48",
-      "label": "map_id",
-      "type": "RAM",
-      "comment": "Current map ID"
-    },
-    {
-      "address": "$49",
-      "label": "map_x_pos",
-      "type": "RAM",
-      "comment": "Map X coordinate (tile)"
-    },
-    {
-      "address": "$4A",
-      "label": "map_y_pos",
-      "type": "RAM",
-      "comment": "Map Y coordinate (tile)"
-    },
-    {
-      "address": "$4B",
-      "label": "collision_flags",
-      "type": "RAM",
-      "comment": "Collision check results"
-    },
-    {
-      "address": "$60",
-      "label": "joy1_current",
-      "type": "RAM",
-      "comment": "Joypad 1 current frame state"
-    },
-    {
-      "address": "$61",
-      "label": "joy1_previous",
-      "type": "RAM",
-      "comment": "Joypad 1 previous frame state"
-    },
-    {
-      "address": "$62",
-      "label": "joy1_pressed",
-      "type": "RAM",
-      "comment": "Joypad 1 newly pressed buttons"
-    },
-    {
-      "address": "$63",
-      "label": "joy1_held",
-      "type": "RAM",
-      "comment": "Joypad 1 held buttons"
-    },
-    {
-      "address": "$64",
-      "label": "joy2_current",
-      "type": "RAM",
-      "comment": "Joypad 2 current frame state"
-    },
-    {
-      "address": "$65",
-      "label": "joy2_previous",
-      "type": "RAM",
-      "comment": "Joypad 2 previous frame state"
-    },
-    {
-      "address": "$66",
-      "label": "joy2_pressed",
-      "type": "RAM",
-      "comment": "Joypad 2 newly pressed buttons"
-    },
-    {
-      "address": "$67",
-      "label": "joy2_held",
-      "type": "RAM",
-      "comment": "Joypad 2 held buttons"
-    },
-    {
-      "address": "$70",
-      "label": "game_mode",
-      "type": "RAM",
-      "comment": "Current game mode"
-    },
-    {
-      "address": "$71",
-      "label": "frame_counter",
-      "type": "RAM",
-      "comment": "Frame counter"
-    },
-    {
-      "address": "$72",
-      "label": "rng_seed_lo",
-      "type": "RAM",
-      "comment": "RNG seed (low byte)"
-    },
-    {
-      "address": "$73",
-      "label": "rng_seed_hi",
-      "type": "RAM",
-      "comment": "RNG seed (high byte)"
-    },
-    {
-      "address": "$74",
-      "label": "game_state",
-      "type": "RAM",
-      "comment": "Game state flags"
-    },
-    {
-      "address": "$75",
-      "label": "menu_selection",
-      "type": "RAM",
-      "comment": "Current menu selection"
-    },
-    {
-      "address": "$76",
-      "label": "menu_index",
-      "type": "RAM",
-      "comment": "Menu index/cursor position"
-    },
-    {
-      "address": "$90",
-      "label": "battle_state",
-      "type": "RAM",
-      "comment": "Current battle state"
-    },
-    {
-      "address": "$91",
-      "label": "battle_phase",
-      "type": "RAM",
-      "comment": "Battle phase"
-    },
-    {
-      "address": "$92",
-      "label": "active_character",
-      "type": "RAM",
-      "comment": "Active character index"
-    },
-    {
-      "address": "$93",
-      "label": "target_index",
-      "type": "RAM",
-      "comment": "Target enemy/character index"
-    },
-    {
-      "address": "$94",
-      "label": "command_index",
-      "type": "RAM",
-      "comment": "Selected command index"
-    },
-    {
-      "address": "$95",
-      "label": "atb_char1",
-      "type": "RAM",
-      "comment": "Character 1 ATB gauge"
-    },
-    {
-      "address": "$96",
-      "label": "atb_char2",
-      "type": "RAM",
-      "comment": "Character 2 ATB gauge"
-    },
-    {
-      "address": "$97",
-      "label": "atb_enemy1",
-      "type": "RAM",
-      "comment": "Enemy 1 ATB gauge"
-    },
-    {
-      "address": "$98",
-      "label": "atb_enemy2",
-      "type": "RAM",
-      "comment": "Enemy 2 ATB gauge"
-    },
-    {
-      "address": "$7E0040",
-      "label": "player_x_pos",
-      "type": "RAM",
-      "comment": "Player X position (word)"
-    },
-    {
-      "address": "$7E0042",
-      "label": "player_y_pos",
-      "type": "RAM",
-      "comment": "Player Y position (word)"
-    }
+	{
+	  "address": "$40",
+	  "label": "player_x_pos_lo",
+	  "type": "RAM",
+	  "comment": "Player X position (low byte)"
+	},
+	{
+	  "address": "$41",
+	  "label": "player_x_pos_hi",
+	  "type": "RAM",
+	  "comment": "Player X position (high byte)"
+	},
+	{
+	  "address": "$42",
+	  "label": "player_y_pos_lo",
+	  "type": "RAM",
+	  "comment": "Player Y position (low byte)"
+	},
+	{
+	  "address": "$43",
+	  "label": "player_y_pos_hi",
+	  "type": "RAM",
+	  "comment": "Player Y position (high byte)"
+	},
+	{
+	  "address": "$44",
+	  "label": "player_direction",
+	  "type": "RAM",
+	  "comment": "Facing direction (0=up, 1=down, 2=left, 3=right)"
+	},
+	{
+	  "address": "$45",
+	  "label": "player_speed",
+	  "type": "RAM",
+	  "comment": "Movement speed"
+	},
+	{
+	  "address": "$46",
+	  "label": "player_state",
+	  "type": "RAM",
+	  "comment": "Current player state"
+	},
+	{
+	  "address": "$47",
+	  "label": "player_animation",
+	  "type": "RAM",
+	  "comment": "Animation frame counter"
+	},
+	{
+	  "address": "$48",
+	  "label": "map_id",
+	  "type": "RAM",
+	  "comment": "Current map ID"
+	},
+	{
+	  "address": "$49",
+	  "label": "map_x_pos",
+	  "type": "RAM",
+	  "comment": "Map X coordinate (tile)"
+	},
+	{
+	  "address": "$4A",
+	  "label": "map_y_pos",
+	  "type": "RAM",
+	  "comment": "Map Y coordinate (tile)"
+	},
+	{
+	  "address": "$4B",
+	  "label": "collision_flags",
+	  "type": "RAM",
+	  "comment": "Collision check results"
+	},
+	{
+	  "address": "$60",
+	  "label": "joy1_current",
+	  "type": "RAM",
+	  "comment": "Joypad 1 current frame state"
+	},
+	{
+	  "address": "$61",
+	  "label": "joy1_previous",
+	  "type": "RAM",
+	  "comment": "Joypad 1 previous frame state"
+	},
+	{
+	  "address": "$62",
+	  "label": "joy1_pressed",
+	  "type": "RAM",
+	  "comment": "Joypad 1 newly pressed buttons"
+	},
+	{
+	  "address": "$63",
+	  "label": "joy1_held",
+	  "type": "RAM",
+	  "comment": "Joypad 1 held buttons"
+	},
+	{
+	  "address": "$64",
+	  "label": "joy2_current",
+	  "type": "RAM",
+	  "comment": "Joypad 2 current frame state"
+	},
+	{
+	  "address": "$65",
+	  "label": "joy2_previous",
+	  "type": "RAM",
+	  "comment": "Joypad 2 previous frame state"
+	},
+	{
+	  "address": "$66",
+	  "label": "joy2_pressed",
+	  "type": "RAM",
+	  "comment": "Joypad 2 newly pressed buttons"
+	},
+	{
+	  "address": "$67",
+	  "label": "joy2_held",
+	  "type": "RAM",
+	  "comment": "Joypad 2 held buttons"
+	},
+	{
+	  "address": "$70",
+	  "label": "game_mode",
+	  "type": "RAM",
+	  "comment": "Current game mode"
+	},
+	{
+	  "address": "$71",
+	  "label": "frame_counter",
+	  "type": "RAM",
+	  "comment": "Frame counter"
+	},
+	{
+	  "address": "$72",
+	  "label": "rng_seed_lo",
+	  "type": "RAM",
+	  "comment": "RNG seed (low byte)"
+	},
+	{
+	  "address": "$73",
+	  "label": "rng_seed_hi",
+	  "type": "RAM",
+	  "comment": "RNG seed (high byte)"
+	},
+	{
+	  "address": "$74",
+	  "label": "game_state",
+	  "type": "RAM",
+	  "comment": "Game state flags"
+	},
+	{
+	  "address": "$75",
+	  "label": "menu_selection",
+	  "type": "RAM",
+	  "comment": "Current menu selection"
+	},
+	{
+	  "address": "$76",
+	  "label": "menu_index",
+	  "type": "RAM",
+	  "comment": "Menu index/cursor position"
+	},
+	{
+	  "address": "$90",
+	  "label": "battle_state",
+	  "type": "RAM",
+	  "comment": "Current battle state"
+	},
+	{
+	  "address": "$91",
+	  "label": "battle_phase",
+	  "type": "RAM",
+	  "comment": "Battle phase"
+	},
+	{
+	  "address": "$92",
+	  "label": "active_character",
+	  "type": "RAM",
+	  "comment": "Active character index"
+	},
+	{
+	  "address": "$93",
+	  "label": "target_index",
+	  "type": "RAM",
+	  "comment": "Target enemy/character index"
+	},
+	{
+	  "address": "$94",
+	  "label": "command_index",
+	  "type": "RAM",
+	  "comment": "Selected command index"
+	},
+	{
+	  "address": "$95",
+	  "label": "atb_char1",
+	  "type": "RAM",
+	  "comment": "Character 1 ATB gauge"
+	},
+	{
+	  "address": "$96",
+	  "label": "atb_char2",
+	  "type": "RAM",
+	  "comment": "Character 2 ATB gauge"
+	},
+	{
+	  "address": "$97",
+	  "label": "atb_enemy1",
+	  "type": "RAM",
+	  "comment": "Enemy 1 ATB gauge"
+	},
+	{
+	  "address": "$98",
+	  "label": "atb_enemy2",
+	  "type": "RAM",
+	  "comment": "Enemy 2 ATB gauge"
+	},
+	{
+	  "address": "$7E0040",
+	  "label": "player_x_pos",
+	  "type": "RAM",
+	  "comment": "Player X position (word)"
+	},
+	{
+	  "address": "$7E0042",
+	  "label": "player_y_pos",
+	  "type": "RAM",
+	  "comment": "Player Y position (word)"
+	}
   ]
 }

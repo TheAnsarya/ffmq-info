@@ -1,4 +1,4 @@
-﻿# FFMQ Data Directory
+# FFMQ Data Directory
 
 This directory contains extracted and organized game data from Final Fantasy: Mystic Quest, structured for analysis, modding, and documentation purposes.
 
@@ -59,7 +59,7 @@ data/
 │   ├── sfx.json             # Sound effect metadata
 │   └── instruments.json     # Instrument definitions
 └── extracted/               # Raw extracted data (temporary)
-    └── .gitkeep
+	└── .gitkeep
 ```
 
 ## Data File Types
@@ -125,27 +125,27 @@ JSON Schema files validate data structure and enforce consistency:
   "name": "Benjamin",
   "starting_level": 1,
   "base_stats": {
-    "hp": 100,
-    "max_hp": 100,
-    "white_magic": 10,
-    "black_magic": 0,
-    "wizard_magic": 0,
-    "speed": 10,
-    "strength": 12,
-    "defense": 10
+	"hp": 100,
+	"max_hp": 100,
+	"white_magic": 10,
+	"black_magic": 0,
+	"wizard_magic": 0,
+	"speed": 10,
+	"strength": 12,
+	"defense": 10
   },
   "stat_growth": {
-    "hp_per_level": 15,
-    "white_magic_per_level": 2,
-    "speed_per_level": 1,
-    "strength_per_level": 2,
-    "defense_per_level": 1
+	"hp_per_level": 15,
+	"white_magic_per_level": 2,
+	"speed_per_level": 1,
+	"strength_per_level": 2,
+	"defense_per_level": 1
   },
   "equipment_slots": ["weapon", "armor", "accessory"],
   "starting_equipment": {
-    "weapon": "steel_sword",
-    "armor": null,
-    "accessory": null
+	"weapon": "steel_sword",
+	"armor": null,
+	"accessory": null
   }
 }
 ```
@@ -157,22 +157,22 @@ JSON Schema files validate data structure and enforce consistency:
   "id": 0,
   "name": "Behemoth",
   "stats": {
-    "hp": 280,
-    "speed": 12,
-    "attack": 25,
-    "defense": 15,
-    "magic_defense": 10
+	"hp": 280,
+	"speed": 12,
+	"attack": 25,
+	"defense": 15,
+	"magic_defense": 10
   },
   "ai_pattern": "aggressive_melee",
   "attacks": ["bite", "charge"],
   "weaknesses": ["thunder"],
   "resistances": ["earth"],
   "drops": {
-    "exp": 50,
-    "gp": 40,
-    "items": [
-      {"id": "cure_potion", "rate": 0.25}
-    ]
+	"exp": 50,
+	"gp": 40,
+	"items": [
+	  {"id": "cure_potion", "rate": 0.25}
+	]
   }
 }
 ```
@@ -185,19 +185,19 @@ JSON Schema files validate data structure and enforce consistency:
   "name": "Foresta",
   "type": "town",
   "dimensions": {
-    "width": 32,
-    "height": 32
+	"width": 32,
+	"height": 32
   },
   "tileset_id": 1,
   "music_track": 3,
   "layers": {
-    "bg1": "collision and main graphics",
-    "bg2": "background decoration",
-    "bg3": "text layer"
+	"bg1": "collision and main graphics",
+	"bg2": "background decoration",
+	"bg3": "text layer"
   },
   "metatiles": {
-    "count": 256,
-    "format": "16x16 pixels (4x 8x8 tiles)"
+	"count": 256,
+	"format": "16x16 pixels (4x 8x8 tiles)"
   },
   "collision_data": "1 byte per tile",
   "events": [],
@@ -217,9 +217,9 @@ JSON Schema files validate data structure and enforce consistency:
   "speaker": "Old Man",
   "text": "Welcome to Foresta!{NEWLINE}The Crystal is in danger!",
   "control_codes": {
-    "NEWLINE": "$01",
-    "WAIT": "$02",
-    "END": "$00"
+	"NEWLINE": "$01",
+	"WAIT": "$02",
+	"END": "$00"
   },
   "compressed": true,
   "encoding": "DTE"
@@ -252,7 +252,7 @@ import json
 
 # Load enemy data
 with open('data/enemies/enemies.json', 'r') as f:
-    enemies = json.load(f)
+	enemies = json.load(f)
 
 # Access specific enemy
 behemoth = enemies['enemies'][0]
@@ -269,9 +269,9 @@ import jsonschema
 
 # Load schema and data
 with open('data/schemas/enemy_schema.json', 'r') as f:
-    schema = json.load(f)
+	schema = json.load(f)
 with open('data/enemies/enemies.json', 'r') as f:
-    data = json.load(f)
+	data = json.load(f)
 
 # Validate
 jsonschema.validate(instance=data, schema=schema)

@@ -1,4 +1,4 @@
-﻿# FFMQ Build System v2.0 - Quick Start Guide# FFMQ Build System - Quick Reference
+# FFMQ Build System v2.0 - Quick Start Guide# FFMQ Build System - Quick Reference
 
 
 
@@ -232,11 +232,11 @@ make -f Makefile.enhanced verify
 
 ```    ├── enemies.json    # Edit with text editor
 
-    ├── enemies.csv     # Edit with Excel/LibreOffice
+	├── enemies.csv     # Edit with Excel/LibreOffice
 
 #### Using Make    ├── items.json
 
-    └── palettes/
+	└── palettes/
 
 ```bash```
 
@@ -276,13 +276,13 @@ src/asm/
 
 .\tools\Build-System.ps1 -Target extract└── analyzed/           # Documentation (your reverse engineering work)
 
-    ├── nmi_handler.asm
+	├── nmi_handler.asm
 
 # Or using Make    ├── input_handler.asm
 
 make extract    ├── battle_system.asm
 
-    └── ...
+	└── ...
 
 # Extract specific assets```
 

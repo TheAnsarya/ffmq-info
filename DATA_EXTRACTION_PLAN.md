@@ -1,4 +1,4 @@
-﻿# FFMQ Data Extraction Pipeline
+# FFMQ Data Extraction Pipeline
 # Complete asset extraction, conversion, and re-insertion system
 
 ## Directory Structure
@@ -59,9 +59,9 @@ ffmq-info/
 │   ├── animation_converter.py     # Animation <-> JSON/CSV converter
 │   └── table_converter.py         # Table <-> CSV/JSON converter
 └── logs/                           # Extraction logs
-    ├── extraction_log.txt         # Extraction session logs
-    ├── conversion_log.txt         # Conversion session logs
-    └── validation_log.txt         # Validation/comparison logs
+	├── extraction_log.txt         # Extraction session logs
+	├── conversion_log.txt         # Conversion session logs
+	└── validation_log.txt         # Validation/comparison logs
 ```
 
 ## Extraction Workflow
@@ -111,7 +111,7 @@ ROM $048000+        → data/graphics/1_original_bin/main_tiles.bin
 **Conversion**:
 ```
 main_tiles.bin → 2_converted_png/tiles_sheet.png (4bpp planar → indexed PNG)
-               → 3_converted_json/tiles_metadata.json (tile dimensions, count)
+			   → 3_converted_json/tiles_metadata.json (tile dimensions, count)
 ```
 
 ### Palette Data (Multiple Banks)
@@ -128,7 +128,7 @@ Bank $07 $cdc8 refs   → data/palettes/1_original_bin/active_palettes.bin
 **Conversion**:
 ```
 bgr555_palettes.bin → 2_converted_json/palettes.json (BGR555 → RGB JSON)
-                    → 3_converted_png/palette_swatches.png (visual reference)
+					→ 3_converted_png/palette_swatches.png (visual reference)
 ```
 
 ### Sprite Data (Bank $07)
@@ -147,9 +147,9 @@ Bank $07 $aa60-$aaad → data/sprites/1_original_bin/item_sprites.bin
 **Conversion**:
 ```
 character_sprites.bin → 2_converted_png/characters/ (individual PNGs)
-                      → 3_converted_json/characters.json (coords, palettes)
+					  → 3_converted_json/characters.json (coords, palettes)
 enemy_sprites.bin     → 2_converted_png/enemies/ (individual PNGs)
-                      → 3_converted_json/enemies.json (animation data)
+					  → 3_converted_json/enemies.json (animation data)
 ```
 
 ### Animation Data (Bank $07)
@@ -167,7 +167,7 @@ Bank $07 $af3b-$b012 → data/animation/1_original_bin/animation_pointers.bin
 **Conversion**:
 ```
 animation_sequences.bin → 2_converted_json/animations.json (frame sequences)
-                        → 3_converted_csv/animation_timing.csv (timing data)
+						→ 3_converted_csv/animation_timing.csv (timing data)
 ```
 
 ### Map Data (Bank $03 + others)
@@ -176,8 +176,8 @@ animation_sequences.bin → 2_converted_json/animations.json (frame sequences)
 **Complete Extraction**:
 ```
 Bank $03 map data → data/maps/1_original_bin/map_data.bin
-                  → 2_converted_tmx/ (Tiled-compatible TMX files)
-                  → 3_converted_json/maps.json (enhanced metadata)
+				  → 2_converted_tmx/ (Tiled-compatible TMX files)
+				  → 3_converted_json/maps.json (enhanced metadata)
 ```
 
 ### Text Data (Multiple Banks)
@@ -186,8 +186,8 @@ Bank $03 map data → data/maps/1_original_bin/map_data.bin
 **Complete Extraction**:
 ```
 All text banks → data/text/1_original_bin/compressed_text.bin
-               → 2_converted_txt/dialog_strings.txt (decompressed)
-               → 3_converted_json/text_metadata.json (pointers, encoding)
+			   → 2_converted_txt/dialog_strings.txt (decompressed)
+			   → 3_converted_json/text_metadata.json (pointers, encoding)
 ```
 
 ### Music Data (Separate SPC region)
@@ -196,8 +196,8 @@ All text banks → data/text/1_original_bin/compressed_text.bin
 **Extraction**:
 ```
 SPC700 region → data/music/1_original_bin/spc_sequences.bin
-              → 2_converted_spc/ (playable .spc files)
-              → 3_converted_json/music_metadata.json (tempo, instruments)
+			  → 2_converted_spc/ (playable .spc files)
+			  → 3_converted_json/music_metadata.json (tempo, instruments)
 ```
 
 ### Data Tables (Bank $07 + others)
@@ -209,12 +209,12 @@ SPC700 region → data/music/1_original_bin/spc_sequences.bin
 **Extraction**:
 ```
 Bank $07 NPC tables → data/tables/1_original_bin/npc_configs.bin
-                    → 2_converted_csv/npc_configs.csv
-                    → 3_converted_json/npc_configs.json
+					→ 2_converted_csv/npc_configs.csv
+					→ 3_converted_json/npc_configs.json
 Enemy formations    → data/tables/1_original_bin/enemy_formations.bin
-                    → 2_converted_csv/enemy_formations.csv
+					→ 2_converted_csv/enemy_formations.csv
 Object placement    → data/tables/1_original_bin/object_placement.bin
-                    → 2_converted_csv/object_placement.csv
+					→ 2_converted_csv/object_placement.csv
 ```
 
 ## Implementation Priority

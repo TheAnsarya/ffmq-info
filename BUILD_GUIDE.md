@@ -1,4 +1,4 @@
-﻿# FFMQ Build Guide
+# FFMQ Build Guide
 
 Complete guide to building Final Fantasy: Mystic Quest ROM from source.
 
@@ -52,19 +52,19 @@ Expected output: `FC: no differences encountered`
    - Download: https://www.smwcentral.net/?p=section&a=details&id=19043
    - Version: 1.81 or later
    - Installation:
-     ```powershell
-     # Option 1: Add to PATH
-     # Extract to C:\asar\
-     # Add C:\asar\ to system PATH
-     
-     # Option 2: Copy to project directory
-     # Extract asar.exe to project root
-     ```
+	 ```powershell
+	 # Option 1: Add to PATH
+	 # Extract to C:\asar\
+	 # Add C:\asar\ to system PATH
+	 
+	 # Option 2: Copy to project directory
+	 # Extract asar.exe to project root
+	 ```
    - Verify installation:
-     ```powershell
-     asar --version
-     # Expected: Asar 1.81
-     ```
+	 ```powershell
+	 asar --version
+	 # Expected: Asar 1.81
+	 ```
 
 2. **.NET Framework** (for asset extraction tools)
    - Version: 4.7.2 or later
@@ -156,9 +156,9 @@ asar "src/asm/ffmq_master.asm" -o "build/ffmq_rebuild.sfc"
 │  Original ROM       │
 │  (ffmq-original.sfc)│
 └──────────┬──────────┘
-           │
-           │ [1. Extract Assets]
-           ▼
+		   │
+		   │ [1. Extract Assets]
+		   ▼
 ┌─────────────────────┐
 │  Assets Directory   │
 │  - Graphics         │
@@ -166,25 +166,25 @@ asar "src/asm/ffmq_master.asm" -o "build/ffmq_rebuild.sfc"
 │  - Music            │
 │  - Data             │
 └──────────┬──────────┘
-           │
-           │ [2. Disassemble/Document]
-           ▼
+		   │
+		   │ [2. Disassemble/Document]
+		   ▼
 ┌─────────────────────┐
 │  Source Files       │
 │  - ASM code         │
 │  - Include files    │
 │  - Data tables      │
 └──────────┬──────────┘
-           │
-           │ [3. Assemble with Asar]
-           ▼
+		   │
+		   │ [3. Assemble with Asar]
+		   ▼
 ┌─────────────────────┐
 │  Built ROM          │
 │  (ffmq.sfc)         │
 └──────────┬──────────┘
-           │
-           │ [4. Verify]
-           ▼
+		   │
+		   │ [4. Verify]
+		   ▼
 ┌─────────────────────┐
 │  Byte-Perfect Match │
 │  ✓ Success          │
@@ -353,7 +353,7 @@ Round-trip testing ensures the build system maintains ROM integrity.
 
 ```
 Original ROM → Extract Assets → Reassemble → Compare
-     ↓                                            ↓
+	 ↓                                            ↓
   [Baseline]  ←──────── Should Match ────────  [Output]
 ```
 
@@ -366,9 +366,9 @@ Create `test-roundtrip.ps1`:
 # Verifies build produces byte-perfect match with original ROM
 
 param(
-    [string]$OriginalROM = "roms\ffmq-original.sfc",
-    [string]$buildFile = "ffmq - onlygood.asm",
-    [string]$OutputROM = "ffmq - onlygood.sfc"
+	[string]$OriginalROM = "roms\ffmq-original.sfc",
+	[string]$buildFile = "ffmq - onlygood.asm",
+	[string]$OutputROM = "ffmq - onlygood.sfc"
 )
 
 Write-Host "FFMQ Round-Trip Test" -ForegroundColor Cyan
@@ -377,8 +377,8 @@ Write-Host "=" * 50
 # Step 1: Verify original ROM exists
 Write-Host "`n[1/4] Checking original ROM..." -ForegroundColor Yellow
 if (-not (Test-Path $OriginalROM)) {
-    Write-Host "ERROR: Original ROM not found at: $OriginalROM" -ForegroundColor Red
-    exit 1
+	Write-Host "ERROR: Original ROM not found at: $OriginalROM" -ForegroundColor Red
+	exit 1
 }
 $originalSize = (Get-Item $OriginalROM).Length
 Write-Host "  ✓ Original ROM found ($originalSize bytes)" -ForegroundColor Green
@@ -392,17 +392,17 @@ Write-Host "  ✓ Cleaned" -ForegroundColor Green
 Write-Host "`n[3/4] Building ROM from source..." -ForegroundColor Yellow
 $asarOutput = & asar $buildFile 2>&1
 if ($LASTEXITCODE -ne 0) {
-    Write-Host "ERROR: Build failed!" -ForegroundColor Red
-    Write-Host $asarOutput
-    exit 1
+	Write-Host "ERROR: Build failed!" -ForegroundColor Red
+	Write-Host $asarOutput
+	exit 1
 }
 Write-Host "  ✓ Build successful" -ForegroundColor Green
 
 # Step 4: Verify output
 Write-Host "`n[4/4] Verifying byte-perfect match..." -ForegroundColor Yellow
 if (-not (Test-Path $OutputROM)) {
-    Write-Host "ERROR: Output ROM not created!" -ForegroundColor Red
-    exit 1
+	Write-Host "ERROR: Output ROM not created!" -ForegroundColor Red
+	exit 1
 }
 
 $builtSize = (Get-Item $OutputROM).Length
@@ -410,24 +410,24 @@ Write-Host "  Original: $originalSize bytes" -ForegroundColor Cyan
 Write-Host "  Built:    $builtSize bytes" -ForegroundColor Cyan
 
 if ($originalSize -ne $builtSize) {
-    Write-Host "  ✗ SIZE MISMATCH!" -ForegroundColor Red
-    exit 1
+	Write-Host "  ✗ SIZE MISMATCH!" -ForegroundColor Red
+	exit 1
 }
 
 # Byte-by-byte comparison
 $comparison = fc.exe /b $OriginalROM $OutputROM 2>&1
 if ($LASTEXITCODE -eq 0) {
-    Write-Host "  ✓ PERFECT MATCH! ROMs are identical." -ForegroundColor Green
-    Write-Host "`n" + "=" * 50
-    Write-Host "Round-Trip Test: PASSED ✓" -ForegroundColor Green
-    exit 0
+	Write-Host "  ✓ PERFECT MATCH! ROMs are identical." -ForegroundColor Green
+	Write-Host "`n" + "=" * 50
+	Write-Host "Round-Trip Test: PASSED ✓" -ForegroundColor Green
+	exit 0
 } else {
-    Write-Host "  ✗ BYTE MISMATCH!" -ForegroundColor Red
-    Write-Host "`nDifferences found:" -ForegroundColor Yellow
-    Write-Host $comparison
-    Write-Host "`n" + "=" * 50
-    Write-Host "Round-Trip Test: FAILED ✗" -ForegroundColor Red
-    exit 1
+	Write-Host "  ✗ BYTE MISMATCH!" -ForegroundColor Red
+	Write-Host "`nDifferences found:" -ForegroundColor Yellow
+	Write-Host $comparison
+	Write-Host "`n" + "=" * 50
+	Write-Host "Round-Trip Test: FAILED ✗" -ForegroundColor Red
+	exit 1
 }
 ```
 
@@ -486,8 +486,8 @@ fc /b "roms\ffmq-original.sfc" "ffmq - onlygood.sfc" | Select-Object -First 10
 Output shows offset in hex:
 ```
 0001A3C0: 42 43
-         ^^  ^^
-    Original Built
+		 ^^  ^^
+	Original Built
 ```
 
 #### 3. Identify Bank/Offset
@@ -558,18 +558,18 @@ $currentFree = 0
 $freeRegions = @()
 
 for ($i = 0; $i -lt $rom.Length; $i++) {
-    if ($rom[$i] -eq 0x00 -or $rom[$i] -eq 0xFF) {
-        $currentFree++
-    } else {
-        if ($currentFree -ge 16) {  # Regions of 16+ bytes
-            $freeRegions += [PSCustomObject]@{
-                Offset = "0x{0:X6}" -f ($i - $currentFree)
-                Size = $currentFree
-            }
-            $freeBytes += $currentFree
-        }
-        $currentFree = 0
-    }
+	if ($rom[$i] -eq 0x00 -or $rom[$i] -eq 0xFF) {
+		$currentFree++
+	} else {
+		if ($currentFree -ge 16) {  # Regions of 16+ bytes
+			$freeRegions += [PSCustomObject]@{
+				Offset = "0x{0:X6}" -f ($i - $currentFree)
+				Size = $currentFree
+			}
+			$freeBytes += $currentFree
+		}
+		$currentFree = 0
+	}
 }
 
 Write-Host "Free Space Analysis" -ForegroundColor Cyan
@@ -856,14 +856,14 @@ echo Done!
 !ENABLE_CHEATS = 0
 
 if !DEBUG
-    ; Debug-only code
-    jml DebugMenu
+	; Debug-only code
+	jml DebugMenu
 endif
 
 if !ENABLE_CHEATS
-    ; Cheat code
-    lda #$ff
-    sta $7e0100  ; Max HP
+	; Cheat code
+	lda #$ff
+	sta $7e0100  ; Max HP
 endif
 ```
 
@@ -879,27 +879,27 @@ on: [push, pull_request]
 
 jobs:
   build:
-    runs-on: windows-latest
-    steps:
-      - uses: actions/checkout@v2
-      
-      - name: Download Asar
-        run: |
-          # Download and extract asar
-          
-      - name: Build ROM
-        run: |
-          asar "ffmq - onlygood.asm"
-          
-      - name: Verify Build
-        run: |
-          # Run verification script
-          
-      - name: Upload ROM
-        uses: actions/upload-artifact@v2
-        with:
-          name: ffmq-rom
-          path: "*.sfc"
+	runs-on: windows-latest
+	steps:
+	  - uses: actions/checkout@v2
+	  
+	  - name: Download Asar
+		run: |
+		  # Download and extract asar
+		  
+	  - name: Build ROM
+		run: |
+		  asar "ffmq - onlygood.asm"
+		  
+	  - name: Verify Build
+		run: |
+		  # Run verification script
+		  
+	  - name: Upload ROM
+		uses: actions/upload-artifact@v2
+		with:
+		  name: ffmq-rom
+		  path: "*.sfc"
 ```
 
 ### Multi-Language Builds
@@ -911,9 +911,9 @@ jobs:
 !LANGUAGE = !LANGUAGE_ENGLISH
 
 if !LANGUAGE == !LANGUAGE_ENGLISH
-    incsrc "text/english.asm"
+	incsrc "text/english.asm"
 elseif !LANGUAGE == !LANGUAGE_JAPANESE
-    incsrc "text/japanese.asm"
+	incsrc "text/japanese.asm"
 endif
 ```
 

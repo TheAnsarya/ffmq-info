@@ -6,201 +6,201 @@
   "type": "object",
   "required": ["version", "characters"],
   "properties": {
-    "version": {
-      "type": "string",
-      "description": "Schema version",
-      "pattern": "^\\d+\\.\\d+\\.\\d+$"
-    },
-    "description": {
-      "type": "string",
-      "description": "Description of this data file"
-    },
-    "characters": {
-      "type": "array",
-      "description": "Array of all playable characters",
-      "items": {
-        "$ref": "#/definitions/character"
-      }
-    }
+	"version": {
+	  "type": "string",
+	  "description": "Schema version",
+	  "pattern": "^\\d+\\.\\d+\\.\\d+$"
+	},
+	"description": {
+	  "type": "string",
+	  "description": "Description of this data file"
+	},
+	"characters": {
+	  "type": "array",
+	  "description": "Array of all playable characters",
+	  "items": {
+		"$ref": "#/definitions/character"
+	  }
+	}
   },
   "definitions": {
-    "character": {
-      "type": "object",
-      "required": ["id", "name", "starting_level", "base_stats", "stat_growth"],
-      "properties": {
-        "id": {
-          "type": "integer",
-          "description": "Unique character ID",
-          "minimum": 0
-        },
-        "name": {
-          "type": "string",
-          "description": "Character name",
-          "minLength": 1,
-          "maxLength": 16
-        },
-        "starting_level": {
-          "type": "integer",
-          "description": "Starting level",
-          "minimum": 1,
-          "maximum": 41
-        },
-        "base_stats": {
-          "$ref": "#/definitions/stats"
-        },
-        "stat_growth": {
-          "$ref": "#/definitions/growth"
-        },
-        "equipment_slots": {
-          "type": "array",
-          "description": "Available equipment slots",
-          "items": {
-            "type": "string",
-            "enum": ["weapon", "armor", "accessory"]
-          }
-        },
-        "starting_equipment": {
-          "type": "object",
-          "properties": {
-            "weapon": {
-              "type": ["string", "null"],
-              "description": "Starting weapon ID or null"
-            },
-            "armor": {
-              "type": ["string", "null"],
-              "description": "Starting armor ID or null"
-            },
-            "accessory": {
-              "type": ["string", "null"],
-              "description": "Starting accessory ID or null"
-            }
-          }
-        },
-        "available_magic": {
-          "type": "object",
-          "properties": {
-            "white_magic": {
-              "type": "boolean",
-              "description": "Can use White magic"
-            },
-            "black_magic": {
-              "type": "boolean",
-              "description": "Can use Black magic"
-            },
-            "wizard_magic": {
-              "type": "boolean",
-              "description": "Can use Wizard magic"
-            }
-          }
-        },
-        "rom_address": {
-          "type": "string",
-          "description": "ROM address of character data",
-          "pattern": "^\\$[0-9A-F]{6}$"
-        }
-      }
-    },
-    "stats": {
-      "type": "object",
-      "required": ["hp", "max_hp", "speed", "strength", "defense"],
-      "properties": {
-        "hp": {
-          "type": "integer",
-          "description": "Current HP",
-          "minimum": 0,
-          "maximum": 9999
-        },
-        "max_hp": {
-          "type": "integer",
-          "description": "Maximum HP",
-          "minimum": 1,
-          "maximum": 9999
-        },
-        "white_magic": {
-          "type": "integer",
-          "description": "White magic power",
-          "minimum": 0,
-          "maximum": 255
-        },
-        "black_magic": {
-          "type": "integer",
-          "description": "Black magic power",
-          "minimum": 0,
-          "maximum": 255
-        },
-        "wizard_magic": {
-          "type": "integer",
-          "description": "Wizard magic power",
-          "minimum": 0,
-          "maximum": 255
-        },
-        "speed": {
-          "type": "integer",
-          "description": "Speed stat (affects ATB gauge)",
-          "minimum": 0,
-          "maximum": 255
-        },
-        "strength": {
-          "type": "integer",
-          "description": "Strength stat (physical damage)",
-          "minimum": 0,
-          "maximum": 255
-        },
-        "defense": {
-          "type": "integer",
-          "description": "Defense stat (damage reduction)",
-          "minimum": 0,
-          "maximum": 255
-        }
-      }
-    },
-    "growth": {
-      "type": "object",
-      "description": "Stat growth per level",
-      "properties": {
-        "hp_per_level": {
-          "type": "integer",
-          "description": "HP gain per level",
-          "minimum": 0,
-          "maximum": 255
-        },
-        "white_magic_per_level": {
-          "type": "integer",
-          "description": "White magic gain per level",
-          "minimum": 0,
-          "maximum": 10
-        },
-        "black_magic_per_level": {
-          "type": "integer",
-          "description": "Black magic gain per level",
-          "minimum": 0,
-          "maximum": 10
-        },
-        "wizard_magic_per_level": {
-          "type": "integer",
-          "description": "Wizard magic gain per level",
-          "minimum": 0,
-          "maximum": 10
-        },
-        "speed_per_level": {
-          "type": "integer",
-          "description": "Speed gain per level",
-          "minimum": 0,
-          "maximum": 10
-        },
-        "strength_per_level": {
-          "type": "integer",
-          "description": "Strength gain per level",
-          "minimum": 0,
-          "maximum": 10
-        },
-        "defense_per_level": {
-          "type": "integer",
-          "description": "Defense gain per level",
-          "minimum": 0,
-          "maximum": 10
-        }
-      }
-    }
+	"character": {
+	  "type": "object",
+	  "required": ["id", "name", "starting_level", "base_stats", "stat_growth"],
+	  "properties": {
+		"id": {
+		  "type": "integer",
+		  "description": "Unique character ID",
+		  "minimum": 0
+		},
+		"name": {
+		  "type": "string",
+		  "description": "Character name",
+		  "minLength": 1,
+		  "maxLength": 16
+		},
+		"starting_level": {
+		  "type": "integer",
+		  "description": "Starting level",
+		  "minimum": 1,
+		  "maximum": 41
+		},
+		"base_stats": {
+		  "$ref": "#/definitions/stats"
+		},
+		"stat_growth": {
+		  "$ref": "#/definitions/growth"
+		},
+		"equipment_slots": {
+		  "type": "array",
+		  "description": "Available equipment slots",
+		  "items": {
+			"type": "string",
+			"enum": ["weapon", "armor", "accessory"]
+		  }
+		},
+		"starting_equipment": {
+		  "type": "object",
+		  "properties": {
+			"weapon": {
+			  "type": ["string", "null"],
+			  "description": "Starting weapon ID or null"
+			},
+			"armor": {
+			  "type": ["string", "null"],
+			  "description": "Starting armor ID or null"
+			},
+			"accessory": {
+			  "type": ["string", "null"],
+			  "description": "Starting accessory ID or null"
+			}
+		  }
+		},
+		"available_magic": {
+		  "type": "object",
+		  "properties": {
+			"white_magic": {
+			  "type": "boolean",
+			  "description": "Can use White magic"
+			},
+			"black_magic": {
+			  "type": "boolean",
+			  "description": "Can use Black magic"
+			},
+			"wizard_magic": {
+			  "type": "boolean",
+			  "description": "Can use Wizard magic"
+			}
+		  }
+		},
+		"rom_address": {
+		  "type": "string",
+		  "description": "ROM address of character data",
+		  "pattern": "^\\$[0-9A-F]{6}$"
+		}
+	  }
+	},
+	"stats": {
+	  "type": "object",
+	  "required": ["hp", "max_hp", "speed", "strength", "defense"],
+	  "properties": {
+		"hp": {
+		  "type": "integer",
+		  "description": "Current HP",
+		  "minimum": 0,
+		  "maximum": 9999
+		},
+		"max_hp": {
+		  "type": "integer",
+		  "description": "Maximum HP",
+		  "minimum": 1,
+		  "maximum": 9999
+		},
+		"white_magic": {
+		  "type": "integer",
+		  "description": "White magic power",
+		  "minimum": 0,
+		  "maximum": 255
+		},
+		"black_magic": {
+		  "type": "integer",
+		  "description": "Black magic power",
+		  "minimum": 0,
+		  "maximum": 255
+		},
+		"wizard_magic": {
+		  "type": "integer",
+		  "description": "Wizard magic power",
+		  "minimum": 0,
+		  "maximum": 255
+		},
+		"speed": {
+		  "type": "integer",
+		  "description": "Speed stat (affects ATB gauge)",
+		  "minimum": 0,
+		  "maximum": 255
+		},
+		"strength": {
+		  "type": "integer",
+		  "description": "Strength stat (physical damage)",
+		  "minimum": 0,
+		  "maximum": 255
+		},
+		"defense": {
+		  "type": "integer",
+		  "description": "Defense stat (damage reduction)",
+		  "minimum": 0,
+		  "maximum": 255
+		}
+	  }
+	},
+	"growth": {
+	  "type": "object",
+	  "description": "Stat growth per level",
+	  "properties": {
+		"hp_per_level": {
+		  "type": "integer",
+		  "description": "HP gain per level",
+		  "minimum": 0,
+		  "maximum": 255
+		},
+		"white_magic_per_level": {
+		  "type": "integer",
+		  "description": "White magic gain per level",
+		  "minimum": 0,
+		  "maximum": 10
+		},
+		"black_magic_per_level": {
+		  "type": "integer",
+		  "description": "Black magic gain per level",
+		  "minimum": 0,
+		  "maximum": 10
+		},
+		"wizard_magic_per_level": {
+		  "type": "integer",
+		  "description": "Wizard magic gain per level",
+		  "minimum": 0,
+		  "maximum": 10
+		},
+		"speed_per_level": {
+		  "type": "integer",
+		  "description": "Speed gain per level",
+		  "minimum": 0,
+		  "maximum": 10
+		},
+		"strength_per_level": {
+		  "type": "integer",
+		  "description": "Strength gain per level",
+		  "minimum": 0,
+		  "maximum": 10
+		},
+		"defense_per_level": {
+		  "type": "integer",
+		  "description": "Defense gain per level",
+		  "minimum": 0,
+		  "maximum": 10
+		}
+	  }
+	}
   }
 }

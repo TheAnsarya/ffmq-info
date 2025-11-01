@@ -1,4 +1,4 @@
-﻿# Asset Extraction Status - 66.7% Complete! 🎉
+# Asset Extraction Status - 66.7% Complete! 🎉
 
 ## Major Progress This Session
 
@@ -232,15 +232,15 @@ assets/
   │   ├── *_palette.bin       ← Palette data
   │   └── README.md
   └── text/
-      ├── item_names.txt      ← 232 strings
-      ├── weapon_names.txt    ← 57 strings
-      ├── armor_names.txt     ← 20 strings
-      ├── accessory_names.txt ← 24 strings
-      ├── spell_names.txt     ← 32 strings
-      ├── monster_names.txt   ← 202 strings
-      ├── location_names.txt  ← 112 strings
-      ├── dialog.txt          ← 245 strings
-      └── *.asm               ← Assembly sources
+	  ├── item_names.txt      ← 232 strings
+	  ├── weapon_names.txt    ← 57 strings
+	  ├── armor_names.txt     ← 20 strings
+	  ├── accessory_names.txt ← 24 strings
+	  ├── spell_names.txt     ← 32 strings
+	  ├── monster_names.txt   ← 202 strings
+	  ├── location_names.txt  ← 112 strings
+	  ├── dialog.txt          ← 245 strings
+	  └── *.asm               ← Assembly sources
 ```
 
 ### Reports

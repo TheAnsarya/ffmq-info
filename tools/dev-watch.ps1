@@ -1,11 +1,11 @@
-﻿# FFMQ Development Watch Mode
+# FFMQ Development Watch Mode
 # Auto-rebuilds on file changes and launches emulator
 # Modern SNES development workflow
 
 param(
-    [string]$emulatorPath = "mesen-s.exe",
-    [switch]$NoEmulator,
-    [switch]$Verbose
+	[string]$emulatorPath = "mesen-s.exe",
+	[switch]$NoEmulator,
+	[switch]$Verbose
 )
 
 $errorActionPreference = "Continue"
@@ -25,7 +25,7 @@ $buildDir = "build"
 
 # Ensure build directory exists
 if (!(Test-Path $buildDir)) {
-    New-Item -ItemType Directory -Path $buildDir -Force | Out-Null
+	New-Item -ItemType Directory -Path $buildDir -Force | Out-Null
 }
 
 # Banner
@@ -51,64 +51,64 @@ Write-Host ""
 
 # Build function
 function Invoke-Build {
-    param([bool]$IsInitial = $false)
-    
-    $buildStart = Get-Date
-    
-    if ($IsInitial) {
-        Write-Info "🔨 Initial build..."
-    } else {
-        Write-Host ""
-        Write-Info "🔄 Rebuilding... ($(Get-Date -Format 'HH:mm:ss'))"
-    }
-    
-    # Copy base ROM
-    Copy-Item $baseRom $OutputRom -Force
-    
-    # Run asar
-    $asarOutput = & asar --verbose --werror $MainAsm $OutputRom 2>&1
-    $exitCode = $LASTEXITCODE
-    
-    $buildTime = ((Get-Date) - $buildStart).TotalMilliseconds
-    
-    if ($exitCode -eq 0) {
-        $romSize = (Get-Item $OutputRom).Length
-        Write-Success "✓ Build successful! (${buildTime}ms, $romSize bytes)"
-        
-        # Launch emulator on initial build
-        if ($IsInitial -and !$NoEmulator) {
-            Write-Info "🎮 Launching emulator..."
-            try {
-                Start-Process $emulatorPath -ArgumentList $OutputRom -ErrorAction SilentlyContinue
-                Write-Success "✓ Emulator started"
-            } catch {
-                Write-Warning "⚠ Could not launch emulator: $_"
-                Write-Info "Continuing in watch mode without emulator..."
-            }
-        }
-        
-        return $true
-    } else {
-        Write-Error "✗ Build failed!"
-        if ($Verbose) {
-            Write-Host $asarOutput
-        } else {
-            # Show only error lines
-            $asarOutput | Where-Object { $_ -match "error|warning" } | ForEach-Object {
-                Write-Error "  $_"
-            }
-        }
-        return $false
-    }
+	param([bool]$IsInitial = $false)
+	
+	$buildStart = Get-Date
+	
+	if ($IsInitial) {
+		Write-Info "🔨 Initial build..."
+	} else {
+		Write-Host ""
+		Write-Info "🔄 Rebuilding... ($(Get-Date -Format 'HH:mm:ss'))"
+	}
+	
+	# Copy base ROM
+	Copy-Item $baseRom $OutputRom -Force
+	
+	# Run asar
+	$asarOutput = & asar --verbose --werror $MainAsm $OutputRom 2>&1
+	$exitCode = $LASTEXITCODE
+	
+	$buildTime = ((Get-Date) - $buildStart).TotalMilliseconds
+	
+	if ($exitCode -eq 0) {
+		$romSize = (Get-Item $OutputRom).Length
+		Write-Success "✓ Build successful! (${buildTime}ms, $romSize bytes)"
+		
+		# Launch emulator on initial build
+		if ($IsInitial -and !$NoEmulator) {
+			Write-Info "🎮 Launching emulator..."
+			try {
+				Start-Process $emulatorPath -ArgumentList $OutputRom -ErrorAction SilentlyContinue
+				Write-Success "✓ Emulator started"
+			} catch {
+				Write-Warning "⚠ Could not launch emulator: $_"
+				Write-Info "Continuing in watch mode without emulator..."
+			}
+		}
+		
+		return $true
+	} else {
+		Write-Error "✗ Build failed!"
+		if ($Verbose) {
+			Write-Host $asarOutput
+		} else {
+			# Show only error lines
+			$asarOutput | Where-Object { $_ -match "error|warning" } | ForEach-Object {
+				Write-Error "  $_"
+			}
+		}
+		return $false
+	}
 }
 
 # Initial build
 $buildSuccess = Invoke-Build -IsInitial $true
 
 if (!$buildSuccess) {
-    Write-Error ""
-    Write-Error "Initial build failed. Fix errors and save to rebuild."
-    Write-Host ""
+	Write-Error ""
+	Write-Error "Initial build failed. Fix errors and save to rebuild."
+	Write-Host ""
 }
 
 # File watcher
@@ -124,19 +124,19 @@ $debounceMs = 500
 
 # Change handler
 $onChange = {
-    param($sender, $e)
-    
-    $now = Get-Date
-    $timeSinceLastBuild = ($now - $script:lastBuild).TotalMilliseconds
-    
-    if ($timeSinceLastBuild -gt $script:debounceMs) {
-        $script:lastBuild = $now
-        
-        $changedFile = $e.FullPath | Resolve-Path -Relative
-        Write-Info "📝 Changed: $changedFile"
-        
-        Invoke-Build
-    }
+	param($sender, $e)
+	
+	$now = Get-Date
+	$timeSinceLastBuild = ($now - $script:lastBuild).TotalMilliseconds
+	
+	if ($timeSinceLastBuild -gt $script:debounceMs) {
+		$script:lastBuild = $now
+		
+		$changedFile = $e.FullPath | Resolve-Path -Relative
+		Write-Info "📝 Changed: $changedFile"
+		
+		Invoke-Build
+	}
 }
 
 # Register events
@@ -149,14 +149,14 @@ Write-Host ""
 
 # Keep running
 try {
-    while ($true) {
-        Start-Sleep -Seconds 1
-    }
+	while ($true) {
+		Start-Sleep -Seconds 1
+	}
 } finally {
-    # Cleanup
-    $watcher.EnableRaisingEvents = $false
-    $watcher.Dispose()
-    Get-EventSubscriber | Unregister-Event
-    Write-Host ""
-    Write-Info "Watch mode stopped."
+	# Cleanup
+	$watcher.EnableRaisingEvents = $false
+	$watcher.Dispose()
+	Get-EventSubscriber | Unregister-Event
+	Write-Host ""
+	Write-Info "Watch mode stopped."
 }

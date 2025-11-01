@@ -1,62 +1,62 @@
-﻿#!/usr/bin/env pwsh
+#!/usr/bin/env pwsh
 <#
 .SYNOPSIS
-    Creates granular GitHub issues for each major subtask category
+	Creates granular GitHub issues for each major subtask category
 
 .DESCRIPTION
-    This script creates individual GitHub issues for each major subtask category,
-    converting the hierarchical sub-task lists into standalone tracked issues.
-    Each parent issue gets child issues for its major categories.
+	This script creates individual GitHub issues for each major subtask category,
+	converting the hierarchical sub-task lists into standalone tracked issues.
+	Each parent issue gets child issues for its major categories.
 
 .PARAMETER DryRun
-    If specified, shows what would be created without making changes
+	If specified, shows what would be created without making changes
 
 .EXAMPLE
-    .\create_github_granular_issues.ps1
-    Creates all granular issues
+	.\create_github_granular_issues.ps1
+	Creates all granular issues
 
 .EXAMPLE
-    .\create_github_granular_issues.ps1 -DryRun
-    Shows what would be created without making changes
+	.\create_github_granular_issues.ps1 -DryRun
+	Shows what would be created without making changes
 #>
 
 param(
-    [switch]$dryRun
+	[switch]$dryRun
 )
 
 $errorActionPreference = "Stop"
 
 # Check if gh CLI is installed and authenticated
 function Test-GitHubCLI {
-    try {
-        $null = gh --version 2>$null
-        $authStatus = gh auth status 2>&1
-        if ($LASTEXITCODE -ne 0) {
-            Write-Error "GitHub CLI not authenticated. Run: gh auth login"
-            exit 1
-        }
-        Write-Host "✓ GitHub CLI authenticated" -ForegroundColor Green
-        return $true
-    }
-    catch {
-        Write-Error "GitHub CLI not found. Install from: https://cli.github.com"
-        exit 1
-    }
+	try {
+		$null = gh --version 2>$null
+		$authStatus = gh auth status 2>&1
+		if ($LASTEXITCODE -ne 0) {
+			Write-Error "GitHub CLI not authenticated. Run: gh auth login"
+			exit 1
+		}
+		Write-Host "✓ GitHub CLI authenticated" -ForegroundColor Green
+		return $true
+	}
+	catch {
+		Write-Error "GitHub CLI not found. Install from: https://cli.github.com"
+		exit 1
+	}
 }
 
 # Get the repository name
 function Get-RepoName {
-    try {
-        $remote = git remote get-url origin
-        if ($remote -match "github\.com[:/](.+)/(.+?)(\.git)?$") {
-            return "$($matches[1])/$($matches[2])"
-        }
-        throw "Could not parse repository name from git remote"
-    }
-    catch {
-        Write-Error "Could not determine repository name: $_"
-        exit 1
-    }
+	try {
+		$remote = git remote get-url origin
+		if ($remote -match "github\.com[:/](.+)/(.+?)(\.git)?$") {
+			return "$($matches[1])/$($matches[2])"
+		}
+		throw "Could not parse repository name from git remote"
+	}
+	catch {
+		Write-Error "Could not determine repository name: $_"
+		exit 1
+	}
 }
 
 Write-Host "🎯 GitHub Granular Issue Creator for FFMQ Disassembly Project" -ForegroundColor Cyan
@@ -68,17 +68,17 @@ $repo = Get-RepoName
 Write-Host "✓ Repository: $repo`n" -ForegroundColor Green
 
 if ($dryRun) {
-    Write-Host "🔍 DRY RUN MODE - No changes will be made`n" -ForegroundColor Yellow
+	Write-Host "🔍 DRY RUN MODE - No changes will be made`n" -ForegroundColor Yellow
 }
 
 # Define granular issues - each major subtask category becomes its own issue
 $granularIssues = @(
-    # Issue #1 - ASM Code Formatting - broken into 5 child issues
-    @{
-        parent = 1
-        title = "ASM Formatting: Prerequisites and Setup"
-        labels = @("priority: high", "type: formatting", "parent: #1")
-        body = @"
+	# Issue #1 - ASM Code Formatting - broken into 5 child issues
+	@{
+		parent = 1
+		title = "ASM Formatting: Prerequisites and Setup"
+		labels = @("priority: high", "type: formatting", "parent: #1")
+		body = @"
 **Parent Issue**: #1 🎨 ASM Code Formatting
 
 ## Description
@@ -102,12 +102,12 @@ Set up the prerequisites and tooling needed for ASM code formatting standardizat
 - Part of #1 (ASM Code Formatting)
 - See TODO.md section 2 for detailed requirements
 "@
-    },
-    @{
-        parent = 1
-        title = "ASM Formatting: Develop format_asm.ps1 Script"
-        labels = @("priority: high", "type: formatting", "type: tools", "parent: #1")
-        body = @"
+	},
+	@{
+		parent = 1
+		title = "ASM Formatting: Develop format_asm.ps1 Script"
+		labels = @("priority: high", "type: formatting", "type: tools", "parent: #1")
+		body = @"
 **Parent Issue**: #1 🎨 ASM Code Formatting
 
 ## Description
@@ -137,12 +137,12 @@ Create the main ASM formatting script with all required features.
 - Depends on Prerequisites issue
 - See TODO.md section 2 for detailed requirements
 "@
-    },
-    @{
-        parent = 1
-        title = "ASM Formatting: Testing and Validation"
-        labels = @("priority: high", "type: formatting", "requires: testing", "parent: #1")
-        body = @"
+	},
+	@{
+		parent = 1
+		title = "ASM Formatting: Testing and Validation"
+		labels = @("priority: high", "type: formatting", "requires: testing", "parent: #1")
+		body = @"
 **Parent Issue**: #1 🎨 ASM Code Formatting
 
 ## Description
@@ -170,12 +170,12 @@ Test the formatting script thoroughly before applying to all files.
 - Depends on Script Development issue
 - Critical: ROM match must be verified
 "@
-    },
-    @{
-        parent = 1
-        title = "ASM Formatting: Format Priority 1 Banks (6 files)"
-        labels = @("priority: high", "type: formatting", "effort: large", "parent: #1")
-        body = @"
+	},
+	@{
+		parent = 1
+		title = "ASM Formatting: Format Priority 1 Banks (6 files)"
+		labels = @("priority: high", "type: formatting", "effort: large", "parent: #1")
+		body = @"
 **Parent Issue**: #1 🎨 ASM Code Formatting
 
 ## Description
@@ -205,12 +205,12 @@ Apply formatting to the 6 main documented banks (those at 100% completion).
 - Depends on Testing issue
 - Affects ~35,000 lines of code
 "@
-    },
-    @{
-        parent = 1
-        title = "ASM Formatting: Format Priority 2-3 Banks and Integration"
-        labels = @("priority: medium", "type: formatting", "parent: #1")
-        body = @"
+	},
+	@{
+		parent = 1
+		title = "ASM Formatting: Format Priority 2-3 Banks and Integration"
+		labels = @("priority: medium", "type: formatting", "parent: #1")
+		body = @"
 **Parent Issue**: #1 🎨 ASM Code Formatting
 
 ## Description
@@ -243,14 +243,14 @@ Format remaining banks and integrate formatting into build process.
 - Part of #1 (ASM Code Formatting)
 - Final formatting tasks
 "@
-    },
+	},
 
-    # Issue #2 - Basic Documentation - broken into 5 child issues
-    @{
-        parent = 2
-        title = "Documentation: Planning and Templates"
-        labels = @("priority: high", "type: documentation", "parent: #2")
-        body = @"
+	# Issue #2 - Basic Documentation - broken into 5 child issues
+	@{
+		parent = 2
+		title = "Documentation: Planning and Templates"
+		labels = @("priority: high", "type: documentation", "parent: #2")
+		body = @"
 **Parent Issue**: #2 📚 Basic Documentation
 
 ## Description
@@ -275,12 +275,12 @@ Plan documentation structure and create reusable templates.
 - Part of #2 (Basic Documentation)
 - Foundation for all other documentation work
 "@
-    },
-    @{
-        parent = 2
-        title = "Documentation: ARCHITECTURE.md - System Overview"
-        labels = @("priority: high", "type: documentation", "parent: #2")
-        body = @"
+	},
+	@{
+		parent = 2
+		title = "Documentation: ARCHITECTURE.md - System Overview"
+		labels = @("priority: high", "type: documentation", "parent: #2")
+		body = @"
 **Parent Issue**: #2 📚 Basic Documentation
 
 ## Description
@@ -310,12 +310,12 @@ Create comprehensive system architecture documentation.
 - Most important overview document
 - See TODO.md section 7 for details
 "@
-    },
-    @{
-        parent = 2
-        title = "Documentation: BUILD_GUIDE.md - Building the ROM"
-        labels = @("priority: high", "type: documentation", "parent: #2")
-        body = @"
+	},
+	@{
+		parent = 2
+		title = "Documentation: BUILD_GUIDE.md - Building the ROM"
+		labels = @("priority: high", "type: documentation", "parent: #2")
+		body = @"
 **Parent Issue**: #2 📚 Basic Documentation
 
 ## Description
@@ -343,12 +343,12 @@ Create step-by-step build guide for contributors.
 - Part of #2 (Basic Documentation)
 - Critical for new contributors
 "@
-    },
-    @{
-        parent = 2
-        title = "Documentation: MODDING_GUIDE.md - Game Modifications"
-        labels = @("priority: high", "type: documentation", "parent: #2")
-        body = @"
+	},
+	@{
+		parent = 2
+		title = "Documentation: MODDING_GUIDE.md - Game Modifications"
+		labels = @("priority: high", "type: documentation", "parent: #2")
+		body = @"
 **Parent Issue**: #2 📚 Basic Documentation
 
 ## Description
@@ -378,12 +378,12 @@ Create guide for modding and customizing the game.
 - Part of #2 (Basic Documentation)
 - Enables community contributions
 "@
-    },
-    @{
-        parent = 2
-        title = "Documentation: CONTRIBUTING.md and Organization"
-        labels = @("priority: high", "type: documentation", "parent: #2")
-        body = @"
+	},
+	@{
+		parent = 2
+		title = "Documentation: CONTRIBUTING.md and Organization"
+		labels = @("priority: high", "type: documentation", "parent: #2")
+		body = @"
 **Parent Issue**: #2 📚 Basic Documentation
 
 ## Description
@@ -411,14 +411,14 @@ Create contribution guidelines and organize all documentation.
 - Part of #2 (Basic Documentation)
 - Final documentation tasks
 "@
-    },
+	},
 
-    # Issue #3 - Memory Labels - broken into 9 child issues (one per major category)
-    @{
-        parent = 3
-        title = "Memory Labels: Address Inventory and Analysis"
-        labels = @("priority: medium", "type: code-labeling", "parent: #3")
-        body = @"
+	# Issue #3 - Memory Labels - broken into 9 child issues (one per major category)
+	@{
+		parent = 3
+		title = "Memory Labels: Address Inventory and Analysis"
+		labels = @("priority: medium", "type: code-labeling", "parent: #3")
+		body = @"
 **Parent Issue**: #3 🏷️ Memory Address & Variable Labels
 
 ## Description
@@ -445,12 +445,12 @@ Scan and catalog all raw memory addresses used in the codebase.
 - Part of #3 (Memory Labels)
 - Foundation for all labeling work
 "@
-    },
-    @{
-        parent = 3
-        title = "Memory Labels: RAM Map Documentation"
-        labels = @("priority: medium", "type: documentation", "parent: #3")
-        body = @"
+	},
+	@{
+		parent = 3
+		title = "Memory Labels: RAM Map Documentation"
+		labels = @("priority: medium", "type: documentation", "parent: #3")
+		body = @"
 **Parent Issue**: #3 🏷️ Memory Address & Variable Labels
 
 ## Description
@@ -479,12 +479,12 @@ Document all RAM variables and create comprehensive RAM map.
 - Part of #3 (Memory Labels)
 - Critical reference document
 "@
-    },
-    @{
-        parent = 3
-        title = "Memory Labels: ROM Data Map Documentation"
-        labels = @("priority: medium", "type: documentation", "parent: #3")
-        body = @"
+	},
+	@{
+		parent = 3
+		title = "Memory Labels: ROM Data Map Documentation"
+		labels = @("priority: medium", "type: documentation", "parent: #3")
+		body = @"
 **Parent Issue**: #3 🏷️ Memory Address & Variable Labels
 
 ## Description
@@ -511,12 +511,12 @@ Document all ROM data tables and structures.
 - Part of #3 (Memory Labels)
 - Complements RAM_MAP.md
 "@
-    },
-    @{
-        parent = 3
-        title = "Memory Labels: Label Naming Conventions"
-        labels = @("priority: medium", "type: documentation", "parent: #3")
-        body = @"
+	},
+	@{
+		parent = 3
+		title = "Memory Labels: Label Naming Conventions"
+		labels = @("priority: medium", "type: documentation", "parent: #3")
+		body = @"
 **Parent Issue**: #3 🏷️ Memory Address & Variable Labels
 
 ## Description
@@ -544,12 +544,12 @@ Define and document naming conventions for all label types.
 - Part of #3 (Memory Labels)
 - Must be complete before labeling starts
 "@
-    },
-    @{
-        parent = 3
-        title = "Memory Labels: Label Replacement Tool Development"
-        labels = @("priority: medium", "type: tools", "parent: #3")
-        body = @"
+	},
+	@{
+		parent = 3
+		title = "Memory Labels: Label Replacement Tool Development"
+		labels = @("priority: medium", "type: tools", "parent: #3")
+		body = @"
 **Parent Issue**: #3 🏷️ Memory Address & Variable Labels
 
 ## Description
@@ -578,12 +578,12 @@ Create automated tool for applying labels to code.
 - Part of #3 (Memory Labels)
 - Critical tool for bulk labeling
 "@
-    },
-    @{
-        parent = 3
-        title = "Memory Labels: High Priority WRAM Labels"
-        labels = @("priority: medium", "type: code-labeling", "effort: large", "parent: #3")
-        body = @"
+	},
+	@{
+		parent = 3
+		title = "Memory Labels: High Priority WRAM Labels"
+		labels = @("priority: medium", "type: code-labeling", "effort: large", "parent: #3")
+		body = @"
 **Parent Issue**: #3 🏷️ Memory Address & Variable Labels
 
 ## Description
@@ -611,12 +611,12 @@ Label the most frequently used WRAM variables.
 - Part of #3 (Memory Labels)
 - Highest impact labeling work
 "@
-    },
-    @{
-        parent = 3
-        title = "Memory Labels: Medium Priority WRAM Labels"
-        labels = @("priority: low", "type: code-labeling", "parent: #3")
-        body = @"
+	},
+	@{
+		parent = 3
+		title = "Memory Labels: Medium Priority WRAM Labels"
+		labels = @("priority: low", "type: code-labeling", "parent: #3")
+		body = @"
 **Parent Issue**: #3 🏷️ Memory Address & Variable Labels
 
 ## Description
@@ -642,12 +642,12 @@ Label remaining important WRAM variables.
 - Part of #3 (Memory Labels)
 - Depends on high priority labels
 "@
-    },
-    @{
-        parent = 3
-        title = "Memory Labels: ROM Data Table Labels"
-        labels = @("priority: low", "type: code-labeling", "parent: #3")
-        body = @"
+	},
+	@{
+		parent = 3
+		title = "Memory Labels: ROM Data Table Labels"
+		labels = @("priority: low", "type: code-labeling", "parent: #3")
+		body = @"
 **Parent Issue**: #3 🏷️ Memory Address & Variable Labels
 
 ## Description
@@ -674,12 +674,12 @@ Label all ROM data tables and structures.
 - Part of #3 (Memory Labels)
 - Completes ROM labeling
 "@
-    },
-    @{
-        parent = 3
-        title = "Memory Labels: Documentation and Maintenance"
-        labels = @("priority: low", "type: documentation", "parent: #3")
-        body = @"
+	},
+	@{
+		parent = 3
+		title = "Memory Labels: Documentation and Maintenance"
+		labels = @("priority: low", "type: documentation", "parent: #3")
+		body = @"
 **Parent Issue**: #3 🏷️ Memory Address & Variable Labels
 
 ## Description
@@ -706,20 +706,20 @@ Keep documentation in sync with applied labels and create maintenance systems.
 - Part of #3 (Memory Labels)
 - Ongoing maintenance task
 "@
-    }
+	}
 
-    # Note: Issues #4-12 would continue this pattern
-    # For brevity, I'll create a representative sample for each major issue
+	# Note: Issues #4-12 would continue this pattern
+	# For brevity, I'll create a representative sample for each major issue
 )
 
 # Add more granular issues for remaining parent issues
 $granularIssues += @(
-    # Issue #4 - Graphics Extraction
-    @{
-        parent = 4
-        title = "Graphics: Core Extraction Tools Development"
-        labels = @("priority: medium", "type: graphics", "type: tools", "parent: #4")
-        body = @"
+	# Issue #4 - Graphics Extraction
+	@{
+		parent = 4
+		title = "Graphics: Core Extraction Tools Development"
+		labels = @("priority: medium", "type: graphics", "type: tools", "parent: #4")
+		body = @"
 **Parent Issue**: #4 🖼️ Graphics Extraction Pipeline
 
 ## Description
@@ -740,12 +740,12 @@ Create the core graphics extraction tools.
 ## Related
 - Part of #4 (Graphics Extraction)
 "@
-    },
-    @{
-        parent = 4
-        title = "Graphics: Palette Management System"
-        labels = @("priority: medium", "type: graphics", "type: tools", "parent: #4")
-        body = @"
+	},
+	@{
+		parent = 4
+		title = "Graphics: Palette Management System"
+		labels = @("priority: medium", "type: graphics", "type: tools", "parent: #4")
+		body = @"
 **Parent Issue**: #4 🖼️ Graphics Extraction Pipeline
 
 ## Description
@@ -766,12 +766,12 @@ Create comprehensive palette management tools.
 ## Related
 - Part of #4 (Graphics Extraction)
 "@
-    },
-    @{
-        parent = 4
-        title = "Graphics: Character and Enemy Sprites Extraction"
-        labels = @("priority: medium", "type: graphics", "type: extraction", "effort: large", "parent: #4")
-        body = @"
+	},
+	@{
+		parent = 4
+		title = "Graphics: Character and Enemy Sprites Extraction"
+		labels = @("priority: medium", "type: graphics", "type: extraction", "effort: large", "parent: #4")
+		body = @"
 **Parent Issue**: #4 🖼️ Graphics Extraction Pipeline
 
 ## Description
@@ -799,12 +799,12 @@ Extract all character and enemy sprites.
 ## Related
 - Part of #4 (Graphics Extraction)
 "@
-    },
-    @{
-        parent = 4
-        title = "Graphics: UI and Environmental Graphics Extraction"
-        labels = @("priority: medium", "type: graphics", "type: extraction", "parent: #4")
-        body = @"
+	},
+	@{
+		parent = 4
+		title = "Graphics: UI and Environmental Graphics Extraction"
+		labels = @("priority: medium", "type: graphics", "type: extraction", "parent: #4")
+		body = @"
 **Parent Issue**: #4 🖼️ Graphics Extraction Pipeline
 
 ## Description
@@ -831,12 +831,12 @@ Extract all UI elements and environmental graphics.
 ## Related
 - Part of #4 (Graphics Extraction)
 "@
-    },
-    @{
-        parent = 4
-        title = "Graphics: Asset Organization and Documentation"
-        labels = @("priority: medium", "type: graphics", "type: documentation", "parent: #4")
-        body = @"
+	},
+	@{
+		parent = 4
+		title = "Graphics: Asset Organization and Documentation"
+		labels = @("priority: medium", "type: graphics", "type: documentation", "parent: #4")
+		body = @"
 **Parent Issue**: #4 🖼️ Graphics Extraction Pipeline
 
 ## Description
@@ -856,14 +856,14 @@ Organize extracted assets and create comprehensive documentation.
 ## Related
 - Part of #4 (Graphics Extraction)
 "@
-    },
+	},
 
-    # Issue #5 - Data Extraction
-    @{
-        parent = 5
-        title = "Data: Core Extraction Tools Development"
-        labels = @("priority: medium", "type: data", "type: tools", "parent: #5")
-        body = @"
+	# Issue #5 - Data Extraction
+	@{
+		parent = 5
+		title = "Data: Core Extraction Tools Development"
+		labels = @("priority: medium", "type: data", "type: tools", "parent: #5")
+		body = @"
 **Parent Issue**: #5 📦 Data Extraction Pipeline
 
 ## Description
@@ -883,12 +883,12 @@ Create the core data extraction framework.
 ## Related
 - Part of #5 (Data Extraction)
 "@
-    },
-    @{
-        parent = 5
-        title = "Data: Game Data Extraction (Characters, Enemies, Items)"
-        labels = @("priority: medium", "type: data", "type: extraction", "effort: large", "parent: #5")
-        body = @"
+	},
+	@{
+		parent = 5
+		title = "Data: Game Data Extraction (Characters, Enemies, Items)"
+		labels = @("priority: medium", "type: data", "type: extraction", "effort: large", "parent: #5")
+		body = @"
 **Parent Issue**: #5 📦 Data Extraction Pipeline
 
 ## Description
@@ -923,12 +923,12 @@ Extract all character, enemy, and item data.
 ## Related
 - Part of #5 (Data Extraction)
 "@
-    },
-    @{
-        parent = 5
-        title = "Data: Map and Text Extraction"
-        labels = @("priority: medium", "type: data", "type: extraction", "parent: #5")
-        body = @"
+	},
+	@{
+		parent = 5
+		title = "Data: Map and Text Extraction"
+		labels = @("priority: medium", "type: data", "type: extraction", "parent: #5")
+		body = @"
 **Parent Issue**: #5 📦 Data Extraction Pipeline
 
 ## Description
@@ -958,12 +958,12 @@ Extract all map data and text/dialogue.
 ## Related
 - Part of #5 (Data Extraction)
 "@
-    },
-    @{
-        parent = 5
-        title = "Data: Asset Organization and Documentation"
-        labels = @("priority: medium", "type: data", "type: documentation", "parent: #5")
-        body = @"
+	},
+	@{
+		parent = 5
+		title = "Data: Asset Organization and Documentation"
+		labels = @("priority: medium", "type: data", "type: documentation", "parent: #5")
+		body = @"
 **Parent Issue**: #5 📦 Data Extraction Pipeline
 
 ## Description
@@ -983,17 +983,17 @@ Organize extracted data and create schemas and documentation.
 ## Related
 - Part of #5 (Data Extraction)
 "@
-    },
+	},
 
-    # Issues #6-10 are bank disassembly - already well-structured, minimal breakdown needed
-    # Just add a tracking issue for each
+	# Issues #6-10 are bank disassembly - already well-structured, minimal breakdown needed
+	# Just add a tracking issue for each
 
-    # Issue #11 - Asset Build System
-    @{
-        parent = 11
-        title = "Build System: Graphics and Data Import Tools"
-        labels = @("priority: medium", "type: build-system", "type: tools", "parent: #11")
-        body = @"
+	# Issue #11 - Asset Build System
+	@{
+		parent = 11
+		title = "Build System: Graphics and Data Import Tools"
+		labels = @("priority: medium", "type: build-system", "type: tools", "parent: #11")
+		body = @"
 **Parent Issue**: #11 🔄 Asset Build System
 
 ## Description
@@ -1021,12 +1021,12 @@ Create tools to import modified assets back into ROM format.
 ## Related
 - Part of #11 (Asset Build System)
 "@
-    },
-    @{
-        parent = 11
-        title = "Build System: Build Orchestration and ROM Integrity"
-        labels = @("priority: medium", "type: build-system", "requires: testing", "parent: #11")
-        body = @"
+	},
+	@{
+		parent = 11
+		title = "Build System: Build Orchestration and ROM Integrity"
+		labels = @("priority: medium", "type: build-system", "requires: testing", "parent: #11")
+		body = @"
 **Parent Issue**: #11 🔄 Asset Build System
 
 ## Description
@@ -1060,12 +1060,12 @@ Create the main build orchestration system and integrity verification.
 ## Related
 - Part of #11 (Asset Build System)
 "@
-    },
-    @{
-        parent = 11
-        title = "Build System: Round-Trip Testing and Documentation"
-        labels = @("priority: medium", "type: build-system", "requires: testing", "parent: #11")
-        body = @"
+	},
+	@{
+		parent = 11
+		title = "Build System: Round-Trip Testing and Documentation"
+		labels = @("priority: medium", "type: build-system", "requires: testing", "parent: #11")
+		body = @"
 **Parent Issue**: #11 🔄 Asset Build System
 
 ## Description
@@ -1093,14 +1093,14 @@ Verify complete round-trip integrity and document the build system.
 - Part of #11 (Asset Build System)
 - Critical: Round-trip must be perfect
 "@
-    },
+	},
 
-    # Issue #12 - Comprehensive Documentation
-    @{
-        parent = 12
-        title = "Docs: System Architecture Documentation"
-        labels = @("priority: low", "type: documentation", "effort: large", "parent: #12")
-        body = @"
+	# Issue #12 - Comprehensive Documentation
+	@{
+		parent = 12
+		title = "Docs: System Architecture Documentation"
+		labels = @("priority: low", "type: documentation", "effort: large", "parent: #12")
+		body = @"
 **Parent Issue**: #12 📚 Comprehensive Documentation
 
 ## Description
@@ -1121,12 +1121,12 @@ Create detailed system architecture documentation for all major systems.
 ## Related
 - Part of #12 (Comprehensive Documentation)
 "@
-    },
-    @{
-        parent = 12
-        title = "Docs: Data Structures and Function Reference"
-        labels = @("priority: low", "type: documentation", "effort: large", "parent: #12")
-        body = @"
+	},
+	@{
+		parent = 12
+		title = "Docs: Data Structures and Function Reference"
+		labels = @("priority: low", "type: documentation", "effort: large", "parent: #12")
+		body = @"
 **Parent Issue**: #12 📚 Comprehensive Documentation
 
 ## Description
@@ -1154,12 +1154,12 @@ Document all data structures and create complete function reference.
 - Part of #12 (Comprehensive Documentation)
 - Largest documentation effort
 "@
-    },
-    @{
-        parent = 12
-        title = "Docs: Visual Documentation and Community Resources"
-        labels = @("priority: low", "type: documentation", "parent: #12")
-        body = @"
+	},
+	@{
+		parent = 12
+		title = "Docs: Visual Documentation and Community Resources"
+		labels = @("priority: low", "type: documentation", "parent: #12")
+		body = @"
 **Parent Issue**: #12 📚 Comprehensive Documentation
 
 ## Description
@@ -1194,12 +1194,12 @@ Create visual documentation and community-facing resources.
 ## Related
 - Part of #12 (Comprehensive Documentation)
 "@
-    },
-    @{
-        parent = 12
-        title = "Docs: Documentation Maintenance System"
-        labels = @("priority: low", "type: documentation", "parent: #12")
-        body = @"
+	},
+	@{
+		parent = 12
+		title = "Docs: Documentation Maintenance System"
+		labels = @("priority: low", "type: documentation", "parent: #12")
+		body = @"
 **Parent Issue**: #12 📚 Comprehensive Documentation
 
 ## Description
@@ -1220,7 +1220,7 @@ Establish ongoing documentation maintenance processes.
 - Part of #12 (Comprehensive Documentation)
 - Ensures docs stay current
 "@
-    }
+	}
 )
 
 # Create all granular issues
@@ -1231,55 +1231,55 @@ $errorCount = 0
 $createdIssues = @()
 
 foreach ($issueData in $granularIssues) {
-    $issueCount++
-    $parentNum = $issueData.parent
-    $title = $issueData.title
-    $labels = $issueData.labels -join ","
-    $body = $issueData.body
+	$issueCount++
+	$parentNum = $issueData.parent
+	$title = $issueData.title
+	$labels = $issueData.labels -join ","
+	$body = $issueData.body
 
-    Write-Host "[$issueCount] Creating: $title" -ForegroundColor Yellow
-    Write-Host "  Parent: #$parentNum | Labels: $($issueData.labels -join ', ')" -ForegroundColor Gray
+	Write-Host "[$issueCount] Creating: $title" -ForegroundColor Yellow
+	Write-Host "  Parent: #$parentNum | Labels: $($issueData.labels -join ', ')" -ForegroundColor Gray
 
-    if ($dryRun) {
-        Write-Host "  [DRY RUN] Would create issue" -ForegroundColor Cyan
-        Write-Host "  Preview (first 150 chars of body):" -ForegroundColor Gray
-        Write-Host "  $($body.Substring(0, [Math]::Min(150, $body.Length)))..." -ForegroundColor DarkGray
-        Write-Host ""
-        $createdIssues += @{ number = "DRY-RUN-$issueCount"; title = $title; parent = $parentNum }
-    }
-    else {
-        try {
-            # Create the issue
-            $tempFile = [System.IO.Path]::GetTempFileName()
-            Set-Content -Path $tempFile -Value $body -NoNewline
+	if ($dryRun) {
+		Write-Host "  [DRY RUN] Would create issue" -ForegroundColor Cyan
+		Write-Host "  Preview (first 150 chars of body):" -ForegroundColor Gray
+		Write-Host "  $($body.Substring(0, [Math]::Min(150, $body.Length)))..." -ForegroundColor DarkGray
+		Write-Host ""
+		$createdIssues += @{ number = "DRY-RUN-$issueCount"; title = $title; parent = $parentNum }
+	}
+	else {
+		try {
+			# Create the issue
+			$tempFile = [System.IO.Path]::GetTempFileName()
+			Set-Content -Path $tempFile -Value $body -NoNewline
 
-            # Filter out parent labels (they don't exist yet in the repo)
-            $existingLabels = $labels -split "," | Where-Object { $_ -notmatch "parent:" } | ForEach-Object { $_.Trim() }
-            $labelString = $existingLabels -join ","
+			# Filter out parent labels (they don't exist yet in the repo)
+			$existingLabels = $labels -split "," | Where-Object { $_ -notmatch "parent:" } | ForEach-Object { $_.Trim() }
+			$labelString = $existingLabels -join ","
 
-            $result = gh issue create `
-                --repo $repo `
-                --title $title `
-                --body-file $tempFile `
-                --label $labelString
+			$result = gh issue create `
+				--repo $repo `
+				--title $title `
+				--body-file $tempFile `
+				--label $labelString
 
-            Remove-Item $tempFile
+			Remove-Item $tempFile
 
-            # Extract issue number from result (format: "https://github.com/owner/repo/issues/123")
-            if ($result -match "/issues/(\d+)") {
-                $issueNumber = $matches[1]
-                Write-Host "  ✓ Created issue #$issueNumber" -ForegroundColor Green
-                Write-Host "  $result" -ForegroundColor DarkGray
-                $createdIssues += @{ number = $issueNumber; title = $title; parent = $parentNum }
-            }
+			# Extract issue number from result (format: "https://github.com/owner/repo/issues/123")
+			if ($result -match "/issues/(\d+)") {
+				$issueNumber = $matches[1]
+				Write-Host "  ✓ Created issue #$issueNumber" -ForegroundColor Green
+				Write-Host "  $result" -ForegroundColor DarkGray
+				$createdIssues += @{ number = $issueNumber; title = $title; parent = $parentNum }
+			}
 
-            Start-Sleep -Milliseconds 500  # Rate limiting
-        }
-        catch {
-            Write-Host "  ✗ Error: $_" -ForegroundColor Red
-            $errorCount++
-        }
-    }
+			Start-Sleep -Milliseconds 500  # Rate limiting
+		}
+		catch {
+			Write-Host "  ✗ Error: $_" -ForegroundColor Red
+			$errorCount++
+		}
+	}
 }
 
 Write-Host "`n" + ("="*70) + "`n" -ForegroundColor Cyan
@@ -1287,25 +1287,25 @@ Write-Host "✨ Granular Issue Creation Summary" -ForegroundColor Green
 Write-Host ("="*70) + "`n" -ForegroundColor Cyan
 
 if ($dryRun) {
-    Write-Host "🔍 DRY RUN Complete!" -ForegroundColor Yellow
-    Write-Host "Would have created $issueCount granular issues`n" -ForegroundColor Yellow
+	Write-Host "🔍 DRY RUN Complete!" -ForegroundColor Yellow
+	Write-Host "Would have created $issueCount granular issues`n" -ForegroundColor Yellow
 } else {
-    Write-Host "✓ Created $issueCount granular issues" -ForegroundColor Green
+	Write-Host "✓ Created $issueCount granular issues" -ForegroundColor Green
 
-    if ($errorCount -gt 0) {
-        Write-Host "⚠ $errorCount errors encountered`n" -ForegroundColor Yellow
-    }
+	if ($errorCount -gt 0) {
+		Write-Host "⚠ $errorCount errors encountered`n" -ForegroundColor Yellow
+	}
 
-    Write-Host "`n📊 Issues Created by Parent:" -ForegroundColor Cyan
-    $createdIssues | Group-Object -Property parent | Sort-Object Name | ForEach-Object {
-        Write-Host "  Parent #$($_.Name): $($_.Count) child issues" -ForegroundColor White
-    }
+	Write-Host "`n📊 Issues Created by Parent:" -ForegroundColor Cyan
+	$createdIssues | Group-Object -Property parent | Sort-Object Name | ForEach-Object {
+		Write-Host "  Parent #$($_.Name): $($_.Count) child issues" -ForegroundColor White
+	}
 
-    Write-Host "`n🎯 Next Steps:" -ForegroundColor Cyan
-    Write-Host "  1. View all issues at: https://github.com/$repo/issues" -ForegroundColor White
-    Write-Host "  2. Add these granular issues to your project board" -ForegroundColor White
-    Write-Host "  3. Link child issues to parent issues in descriptions" -ForegroundColor White
-    Write-Host "  4. Start working on individual granular tasks`n" -ForegroundColor White
+	Write-Host "`n🎯 Next Steps:" -ForegroundColor Cyan
+	Write-Host "  1. View all issues at: https://github.com/$repo/issues" -ForegroundColor White
+	Write-Host "  2. Add these granular issues to your project board" -ForegroundColor White
+	Write-Host "  3. Link child issues to parent issues in descriptions" -ForegroundColor White
+	Write-Host "  4. Start working on individual granular tasks`n" -ForegroundColor White
 }
 
 Write-Host "Done! 🎉" -ForegroundColor Green

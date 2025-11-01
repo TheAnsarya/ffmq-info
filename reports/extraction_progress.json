@@ -1,77 +1,77 @@
 {
   "overall_progress": 66.66666666666667,
   "assets": {
-    "code": {
-      "description": "Game code (65816 assembly)",
-      "status": "complete",
-      "source": "Diztinguish disassembly",
-      "location": "src/asm/banks/",
-      "files": 18,
-      "coverage": 100.0
-    },
-    "graphics": {
-      "description": "Sprites, tiles, backgrounds",
-      "status": "complete",
-      "source": "extract_graphics_v2.py",
-      "location": "assets/graphics/",
-      "files": 3,
-      "coverage": 100.0
-    },
-    "text_tables": {
-      "description": "Item/monster names, etc",
-      "status": "complete",
-      "source": "extract_text.py",
-      "location": "assets/text/",
-      "files": 8,
-      "coverage": 100.0
-    },
-    "enemy_data": {
-      "description": "Enemy stats and properties",
-      "status": "complete",
-      "source": "extract_enemies.py",
-      "location": "assets/data/",
-      "files": 3,
-      "coverage": 100.0
-    },
-    "item_data": {
-      "description": "Item/equipment stats",
-      "status": "complete",
-      "source": "extract_items.py (TODO)",
-      "location": "assets/data/",
-      "files": 7,
-      "coverage": 100.0
-    },
-    "map_data": {
-      "description": "Level maps and layouts",
-      "status": "not_started",
-      "source": "extract_maps.py (TODO)",
-      "location": "assets/maps/",
-      "files": 0,
-      "coverage": 0.0
-    },
-    "palettes": {
-      "description": "Color palettes",
-      "status": "not_started",
-      "source": "extract_palettes.py (TODO)",
-      "location": "assets/palettes/",
-      "files": 0,
-      "coverage": 0.0
-    },
-    "audio": {
-      "description": "Music and sound effects",
-      "status": "not_started",
-      "source": "extract_audio.py (TODO)",
-      "location": "assets/audio/",
-      "files": 0,
-      "coverage": 0.0
-    },
-    "dialog": {
-      "description": "Game dialog text",
-      "status": "complete",
-      "source": "extract_text.py (needs address research)",
-      "location": "assets/text/",
-      "files": 1,
-      "coverage": 100.0
-    }
+	"code": {
+	  "description": "Game code (65816 assembly)",
+	  "status": "complete",
+	  "source": "Diztinguish disassembly",
+	  "location": "src/asm/banks/",
+	  "files": 18,
+	  "coverage": 100.0
+	},
+	"graphics": {
+	  "description": "Sprites, tiles, backgrounds",
+	  "status": "complete",
+	  "source": "extract_graphics_v2.py",
+	  "location": "assets/graphics/",
+	  "files": 3,
+	  "coverage": 100.0
+	},
+	"text_tables": {
+	  "description": "Item/monster names, etc",
+	  "status": "complete",
+	  "source": "extract_text.py",
+	  "location": "assets/text/",
+	  "files": 8,
+	  "coverage": 100.0
+	},
+	"enemy_data": {
+	  "description": "Enemy stats and properties",
+	  "status": "complete",
+	  "source": "extract_enemies.py",
+	  "location": "assets/data/",
+	  "files": 3,
+	  "coverage": 100.0
+	},
+	"item_data": {
+	  "description": "Item/equipment stats",
+	  "status": "complete",
+	  "source": "extract_items.py (TODO)",
+	  "location": "assets/data/",
+	  "files": 7,
+	  "coverage": 100.0
+	},
+	"map_data": {
+	  "description": "Level maps and layouts",
+	  "status": "not_started",
+	  "source": "extract_maps.py (TODO)",
+	  "location": "assets/maps/",
+	  "files": 0,
+	  "coverage": 0.0
+	},
+	"palettes": {
+	  "description": "Color palettes",
+	  "status": "not_started",
+	  "source": "extract_palettes.py (TODO)",
+	  "location": "assets/palettes/",
+	  "files": 0,
+	  "coverage": 0.0
+	},
+	"audio": {
+	  "description": "Music and sound effects",
+	  "status": "not_started",
+	  "source": "extract_audio.py (TODO)",
+	  "location": "assets/audio/",
+	  "files": 0,
+	  "coverage": 0.0
+	},
+	"dialog": {
+	  "description": "Game dialog text",
+	  "status": "complete",
+	  "source": "extract_text.py (needs address research)",
+	  "location": "assets/text/",
+	  "files": 1,
+	  "coverage": 100.0
+	}
   }
 }

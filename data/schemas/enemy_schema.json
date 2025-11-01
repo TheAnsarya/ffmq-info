@@ -6,207 +6,207 @@
   "type": "object",
   "required": ["version", "enemies"],
   "properties": {
-    "version": {
-      "type": "string",
-      "description": "Schema version",
-      "pattern": "^\\d+\\.\\d+\\.\\d+$"
-    },
-    "description": {
-      "type": "string",
-      "description": "Description of this data file"
-    },
-    "enemies": {
-      "type": "array",
-      "description": "Array of all enemies",
-      "items": {
-        "$ref": "#/definitions/enemy"
-      }
-    }
+	"version": {
+	  "type": "string",
+	  "description": "Schema version",
+	  "pattern": "^\\d+\\.\\d+\\.\\d+$"
+	},
+	"description": {
+	  "type": "string",
+	  "description": "Description of this data file"
+	},
+	"enemies": {
+	  "type": "array",
+	  "description": "Array of all enemies",
+	  "items": {
+		"$ref": "#/definitions/enemy"
+	  }
+	}
   },
   "definitions": {
-    "enemy": {
-      "type": "object",
-      "required": ["id", "name", "stats", "ai_pattern"],
-      "properties": {
-        "id": {
-          "type": "integer",
-          "description": "Unique enemy ID",
-          "minimum": 0
-        },
-        "name": {
-          "type": "string",
-          "description": "Enemy name",
-          "minLength": 1,
-          "maxLength": 16
-        },
-        "stats": {
-          "$ref": "#/definitions/enemy_stats"
-        },
-        "ai_pattern": {
-          "type": "string",
-          "description": "AI behavior pattern",
-          "enum": [
-            "simple_attack",
-            "magic_user",
-            "healer",
-            "conditional",
-            "counter_attack",
-            "boss_multi_phase"
-          ]
-        },
-        "ai_script": {
-          "type": "integer",
-          "description": "AI script ID",
-          "minimum": 0,
-          "maximum": 255
-        },
-        "attacks": {
-          "type": "array",
-          "description": "Available attack IDs",
-          "items": {
-            "type": "string"
-          }
-        },
-        "weaknesses": {
-          "type": "array",
-          "description": "Element weaknesses",
-          "items": {
-            "type": "string",
-            "enum": ["fire", "water", "thunder", "earth", "wind"]
-          }
-        },
-        "resistances": {
-          "type": "array",
-          "description": "Element resistances",
-          "items": {
-            "type": "string",
-            "enum": ["fire", "water", "thunder", "earth", "wind"]
-          }
-        },
-        "immunities": {
-          "type": "array",
-          "description": "Status immunities",
-          "items": {
-            "type": "string",
-            "enum": [
-              "poison", "sleep", "paralyze", "confuse", "blind",
-              "silence", "petrify", "death", "doom", "slow",
-              "stop", "berserk", "regen"
-            ]
-          }
-        },
-        "drops": {
-          "$ref": "#/definitions/drops"
-        },
-        "sprite_id": {
-          "type": "integer",
-          "description": "Battle sprite ID",
-          "minimum": 0
-        },
-        "palette_id": {
-          "type": "integer",
-          "description": "Palette ID",
-          "minimum": 0,
-          "maximum": 7
-        },
-        "boss": {
-          "type": "boolean",
-          "description": "Is this a boss enemy"
-        },
-        "rom_address": {
-          "type": "string",
-          "description": "ROM address of enemy data",
-          "pattern": "^\\$[0-9A-F]{6}$"
-        }
-      }
-    },
-    "enemy_stats": {
-      "type": "object",
-      "required": ["hp", "speed", "attack", "defense"],
-      "properties": {
-        "hp": {
-          "type": "integer",
-          "description": "Hit points",
-          "minimum": 1,
-          "maximum": 9999
-        },
-        "speed": {
-          "type": "integer",
-          "description": "Speed (affects turn order)",
-          "minimum": 0,
-          "maximum": 255
-        },
-        "attack": {
-          "type": "integer",
-          "description": "Attack power",
-          "minimum": 0,
-          "maximum": 255
-        },
-        "defense": {
-          "type": "integer",
-          "description": "Physical defense",
-          "minimum": 0,
-          "maximum": 255
-        },
-        "magic_defense": {
-          "type": "integer",
-          "description": "Magic defense",
-          "minimum": 0,
-          "maximum": 255
-        },
-        "evasion": {
-          "type": "integer",
-          "description": "Evasion percentage",
-          "minimum": 0,
-          "maximum": 100
-        }
-      }
-    },
-    "drops": {
-      "type": "object",
-      "description": "Enemy drop rewards",
-      "required": ["exp", "gp"],
-      "properties": {
-        "exp": {
-          "type": "integer",
-          "description": "Experience points",
-          "minimum": 0,
-          "maximum": 65535
-        },
-        "gp": {
-          "type": "integer",
-          "description": "Gold pieces",
-          "minimum": 0,
-          "maximum": 65535
-        },
-        "items": {
-          "type": "array",
-          "description": "Item drops",
-          "items": {
-            "$ref": "#/definitions/item_drop"
-          }
-        }
-      }
-    },
-    "item_drop": {
-      "type": "object",
-      "required": ["id", "rate"],
-      "properties": {
-        "id": {
-          "type": "string",
-          "description": "Item ID"
-        },
-        "rate": {
-          "type": "number",
-          "description": "Drop rate (0.0 to 1.0)",
-          "minimum": 0.0,
-          "maximum": 1.0
-        },
-        "rare": {
-          "type": "boolean",
-          "description": "Is this a rare drop"
-        }
-      }
-    }
+	"enemy": {
+	  "type": "object",
+	  "required": ["id", "name", "stats", "ai_pattern"],
+	  "properties": {
+		"id": {
+		  "type": "integer",
+		  "description": "Unique enemy ID",
+		  "minimum": 0
+		},
+		"name": {
+		  "type": "string",
+		  "description": "Enemy name",
+		  "minLength": 1,
+		  "maxLength": 16
+		},
+		"stats": {
+		  "$ref": "#/definitions/enemy_stats"
+		},
+		"ai_pattern": {
+		  "type": "string",
+		  "description": "AI behavior pattern",
+		  "enum": [
+			"simple_attack",
+			"magic_user",
+			"healer",
+			"conditional",
+			"counter_attack",
+			"boss_multi_phase"
+		  ]
+		},
+		"ai_script": {
+		  "type": "integer",
+		  "description": "AI script ID",
+		  "minimum": 0,
+		  "maximum": 255
+		},
+		"attacks": {
+		  "type": "array",
+		  "description": "Available attack IDs",
+		  "items": {
+			"type": "string"
+		  }
+		},
+		"weaknesses": {
+		  "type": "array",
+		  "description": "Element weaknesses",
+		  "items": {
+			"type": "string",
+			"enum": ["fire", "water", "thunder", "earth", "wind"]
+		  }
+		},
+		"resistances": {
+		  "type": "array",
+		  "description": "Element resistances",
+		  "items": {
+			"type": "string",
+			"enum": ["fire", "water", "thunder", "earth", "wind"]
+		  }
+		},
+		"immunities": {
+		  "type": "array",
+		  "description": "Status immunities",
+		  "items": {
+			"type": "string",
+			"enum": [
+			  "poison", "sleep", "paralyze", "confuse", "blind",
+			  "silence", "petrify", "death", "doom", "slow",
+			  "stop", "berserk", "regen"
+			]
+		  }
+		},
+		"drops": {
+		  "$ref": "#/definitions/drops"
+		},
+		"sprite_id": {
+		  "type": "integer",
+		  "description": "Battle sprite ID",
+		  "minimum": 0
+		},
+		"palette_id": {
+		  "type": "integer",
+		  "description": "Palette ID",
+		  "minimum": 0,
+		  "maximum": 7
+		},
+		"boss": {
+		  "type": "boolean",
+		  "description": "Is this a boss enemy"
+		},
+		"rom_address": {
+		  "type": "string",
+		  "description": "ROM address of enemy data",
+		  "pattern": "^\\$[0-9A-F]{6}$"
+		}
+	  }
+	},
+	"enemy_stats": {
+	  "type": "object",
+	  "required": ["hp", "speed", "attack", "defense"],
+	  "properties": {
+		"hp": {
+		  "type": "integer",
+		  "description": "Hit points",
+		  "minimum": 1,
+		  "maximum": 9999
+		},
+		"speed": {
+		  "type": "integer",
+		  "description": "Speed (affects turn order)",
+		  "minimum": 0,
+		  "maximum": 255
+		},
+		"attack": {
+		  "type": "integer",
+		  "description": "Attack power",
+		  "minimum": 0,
+		  "maximum": 255
+		},
+		"defense": {
+		  "type": "integer",
+		  "description": "Physical defense",
+		  "minimum": 0,
+		  "maximum": 255
+		},
+		"magic_defense": {
+		  "type": "integer",
+		  "description": "Magic defense",
+		  "minimum": 0,
+		  "maximum": 255
+		},
+		"evasion": {
+		  "type": "integer",
+		  "description": "Evasion percentage",
+		  "minimum": 0,
+		  "maximum": 100
+		}
+	  }
+	},
+	"drops": {
+	  "type": "object",
+	  "description": "Enemy drop rewards",
+	  "required": ["exp", "gp"],
+	  "properties": {
+		"exp": {
+		  "type": "integer",
+		  "description": "Experience points",
+		  "minimum": 0,
+		  "maximum": 65535
+		},
+		"gp": {
+		  "type": "integer",
+		  "description": "Gold pieces",
+		  "minimum": 0,
+		  "maximum": 65535
+		},
+		"items": {
+		  "type": "array",
+		  "description": "Item drops",
+		  "items": {
+			"$ref": "#/definitions/item_drop"
+		  }
+		}
+	  }
+	},
+	"item_drop": {
+	  "type": "object",
+	  "required": ["id", "rate"],
+	  "properties": {
+		"id": {
+		  "type": "string",
+		  "description": "Item ID"
+		},
+		"rate": {
+		  "type": "number",
+		  "description": "Drop rate (0.0 to 1.0)",
+		  "minimum": 0.0,
+		  "maximum": 1.0
+		},
+		"rare": {
+		  "type": "boolean",
+		  "description": "Is this a rare drop"
+		}
+	  }
+	}
   }
 }

@@ -6,237 +6,237 @@
   "type": "object",
   "required": ["version", "graphics"],
   "properties": {
-    "version": {
-      "type": "string",
-      "description": "Schema version",
-      "pattern": "^\\d+\\.\\d+\\.\\d+$"
-    },
-    "description": {
-      "type": "string",
-      "description": "Description of this data file"
-    },
-    "graphics": {
-      "type": "array",
-      "description": "Array of all graphics assets",
-      "items": {
-        "$ref": "#/definitions/graphic"
-      }
-    },
-    "palettes": {
-      "type": "array",
-      "description": "Color palette definitions",
-      "items": {
-        "$ref": "#/definitions/palette"
-      }
-    }
+	"version": {
+	  "type": "string",
+	  "description": "Schema version",
+	  "pattern": "^\\d+\\.\\d+\\.\\d+$"
+	},
+	"description": {
+	  "type": "string",
+	  "description": "Description of this data file"
+	},
+	"graphics": {
+	  "type": "array",
+	  "description": "Array of all graphics assets",
+	  "items": {
+		"$ref": "#/definitions/graphic"
+	  }
+	},
+	"palettes": {
+	  "type": "array",
+	  "description": "Color palette definitions",
+	  "items": {
+		"$ref": "#/definitions/palette"
+	  }
+	}
   },
   "definitions": {
-    "graphic": {
-      "type": "object",
-      "required": ["id", "file", "format"],
-      "properties": {
-        "id": {
-          "type": "string",
-          "description": "Unique graphics asset ID"
-        },
-        "file": {
-          "type": "string",
-          "description": "Graphics file path (relative to data/graphics/)"
-        },
-        "rom_address": {
-          "type": "string",
-          "description": "ROM address of graphics data",
-          "pattern": "^\\$[0-9A-F]{6}$"
-        },
-        "rom_offset": {
-          "type": "integer",
-          "description": "ROM offset (decimal)",
-          "minimum": 0
-        },
-        "size_bytes": {
-          "type": "integer",
-          "description": "Size in bytes",
-          "minimum": 0
-        },
-        "format": {
-          "type": "string",
-          "description": "Graphics format",
-          "enum": ["1bpp", "2bpp", "3bpp", "4bpp", "8bpp", "mode7"]
-        },
-        "tile_count": {
-          "type": "integer",
-          "description": "Number of 8x8 tiles",
-          "minimum": 0
-        },
-        "dimensions": {
-          "type": "object",
-          "description": "Dimensions in pixels",
-          "properties": {
-            "width": { "type": "integer", "minimum": 8 },
-            "height": { "type": "integer", "minimum": 8 }
-          }
-        },
-        "usage": {
-          "type": "string",
-          "description": "What this graphics asset is used for"
-        },
-        "category": {
-          "type": "string",
-          "description": "Graphics category",
-          "enum": [
-            "background", "sprite", "character", "enemy",
-            "ui", "title", "font", "misc"
-          ]
-        },
-        "palette_id": {
-          "type": "integer",
-          "description": "Default palette ID",
-          "minimum": 0,
-          "maximum": 7
-        },
-        "compression": {
-          "type": "string",
-          "description": "Compression method",
-          "enum": ["none", "RLE", "LZ77", "custom"]
-        },
-        "compressed_size": {
-          "type": "integer",
-          "description": "Compressed size in bytes",
-          "minimum": 0
-        },
-        "decompressed_size": {
-          "type": "integer",
-          "description": "Decompressed size in bytes",
-          "minimum": 0
-        },
-        "vram_destination": {
-          "type": "string",
-          "description": "VRAM destination address",
-          "pattern": "^\\$[0-9A-F]{4}$"
-        },
-        "layer": {
-          "type": "string",
-          "description": "Background layer",
-          "enum": ["BG1", "BG2", "BG3", "sprites", "mode7"]
-        },
-        "tileset_id": {
-          "type": "integer",
-          "description": "Tileset ID (for map tiles)",
-          "minimum": 0
-        },
-        "animation": {
-          "$ref": "#/definitions/animation"
-        }
-      }
-    },
-    "palette": {
-      "type": "object",
-      "required": ["id", "colors"],
-      "properties": {
-        "id": {
-          "type": "integer",
-          "description": "Palette ID (0-7)",
-          "minimum": 0,
-          "maximum": 7
-        },
-        "name": {
-          "type": "string",
-          "description": "Palette name"
-        },
-        "rom_address": {
-          "type": "string",
-          "description": "ROM address of palette data",
-          "pattern": "^\\$[0-9A-F]{6}$"
-        },
-        "colors": {
-          "type": "array",
-          "description": "Array of 15-bit BGR colors",
-          "items": {
-            "$ref": "#/definitions/color"
-          },
-          "minItems": 2,
-          "maxItems": 256
-        },
-        "usage": {
-          "type": "string",
-          "description": "What this palette is used for"
-        },
-        "subpalette": {
-          "type": "integer",
-          "description": "Subpalette number (for 16-color palettes)",
-          "minimum": 0,
-          "maximum": 15
-        }
-      }
-    },
-    "color": {
-      "type": "object",
-      "description": "15-bit BGR color",
-      "required": ["index"],
-      "properties": {
-        "index": {
-          "type": "integer",
-          "description": "Color index in palette",
-          "minimum": 0,
-          "maximum": 255
-        },
-        "bgr15": {
-          "type": "string",
-          "description": "15-bit BGR value",
-          "pattern": "^\\$[0-9A-F]{4}$"
-        },
-        "rgb24": {
-          "type": "string",
-          "description": "24-bit RGB hex value",
-          "pattern": "^#[0-9A-F]{6}$"
-        },
-        "r": {
-          "type": "integer",
-          "description": "Red (0-31 for SNES, 0-255 for RGB24)",
-          "minimum": 0,
-          "maximum": 255
-        },
-        "g": {
-          "type": "integer",
-          "description": "Green (0-31 for SNES, 0-255 for RGB24)",
-          "minimum": 0,
-          "maximum": 255
-        },
-        "b": {
-          "type": "integer",
-          "description": "Blue (0-31 for SNES, 0-255 for RGB24)",
-          "minimum": 0,
-          "maximum": 255
-        },
-        "transparent": {
-          "type": "boolean",
-          "description": "Is this color transparent (color 0)"
-        }
-      }
-    },
-    "animation": {
-      "type": "object",
-      "description": "Animation information",
-      "properties": {
-        "animated": {
-          "type": "boolean",
-          "description": "Is this graphic animated"
-        },
-        "frame_count": {
-          "type": "integer",
-          "description": "Number of animation frames",
-          "minimum": 1
-        },
-        "frame_delay": {
-          "type": "integer",
-          "description": "Delay between frames (in game ticks)",
-          "minimum": 1
-        },
-        "loop": {
-          "type": "boolean",
-          "description": "Does animation loop"
-        }
-      }
-    }
+	"graphic": {
+	  "type": "object",
+	  "required": ["id", "file", "format"],
+	  "properties": {
+		"id": {
+		  "type": "string",
+		  "description": "Unique graphics asset ID"
+		},
+		"file": {
+		  "type": "string",
+		  "description": "Graphics file path (relative to data/graphics/)"
+		},
+		"rom_address": {
+		  "type": "string",
+		  "description": "ROM address of graphics data",
+		  "pattern": "^\\$[0-9A-F]{6}$"
+		},
+		"rom_offset": {
+		  "type": "integer",
+		  "description": "ROM offset (decimal)",
+		  "minimum": 0
+		},
+		"size_bytes": {
+		  "type": "integer",
+		  "description": "Size in bytes",
+		  "minimum": 0
+		},
+		"format": {
+		  "type": "string",
+		  "description": "Graphics format",
+		  "enum": ["1bpp", "2bpp", "3bpp", "4bpp", "8bpp", "mode7"]
+		},
+		"tile_count": {
+		  "type": "integer",
+		  "description": "Number of 8x8 tiles",
+		  "minimum": 0
+		},
+		"dimensions": {
+		  "type": "object",
+		  "description": "Dimensions in pixels",
+		  "properties": {
+			"width": { "type": "integer", "minimum": 8 },
+			"height": { "type": "integer", "minimum": 8 }
+		  }
+		},
+		"usage": {
+		  "type": "string",
+		  "description": "What this graphics asset is used for"
+		},
+		"category": {
+		  "type": "string",
+		  "description": "Graphics category",
+		  "enum": [
+			"background", "sprite", "character", "enemy",
+			"ui", "title", "font", "misc"
+		  ]
+		},
+		"palette_id": {
+		  "type": "integer",
+		  "description": "Default palette ID",
+		  "minimum": 0,
+		  "maximum": 7
+		},
+		"compression": {
+		  "type": "string",
+		  "description": "Compression method",
+		  "enum": ["none", "RLE", "LZ77", "custom"]
+		},
+		"compressed_size": {
+		  "type": "integer",
+		  "description": "Compressed size in bytes",
+		  "minimum": 0
+		},
+		"decompressed_size": {
+		  "type": "integer",
+		  "description": "Decompressed size in bytes",
+		  "minimum": 0
+		},
+		"vram_destination": {
+		  "type": "string",
+		  "description": "VRAM destination address",
+		  "pattern": "^\\$[0-9A-F]{4}$"
+		},
+		"layer": {
+		  "type": "string",
+		  "description": "Background layer",
+		  "enum": ["BG1", "BG2", "BG3", "sprites", "mode7"]
+		},
+		"tileset_id": {
+		  "type": "integer",
+		  "description": "Tileset ID (for map tiles)",
+		  "minimum": 0
+		},
+		"animation": {
+		  "$ref": "#/definitions/animation"
+		}
+	  }
+	},
+	"palette": {
+	  "type": "object",
+	  "required": ["id", "colors"],
+	  "properties": {
+		"id": {
+		  "type": "integer",
+		  "description": "Palette ID (0-7)",
+		  "minimum": 0,
+		  "maximum": 7
+		},
+		"name": {
+		  "type": "string",
+		  "description": "Palette name"
+		},
+		"rom_address": {
+		  "type": "string",
+		  "description": "ROM address of palette data",
+		  "pattern": "^\\$[0-9A-F]{6}$"
+		},
+		"colors": {
+		  "type": "array",
+		  "description": "Array of 15-bit BGR colors",
+		  "items": {
+			"$ref": "#/definitions/color"
+		  },
+		  "minItems": 2,
+		  "maxItems": 256
+		},
+		"usage": {
+		  "type": "string",
+		  "description": "What this palette is used for"
+		},
+		"subpalette": {
+		  "type": "integer",
+		  "description": "Subpalette number (for 16-color palettes)",
+		  "minimum": 0,
+		  "maximum": 15
+		}
+	  }
+	},
+	"color": {
+	  "type": "object",
+	  "description": "15-bit BGR color",
+	  "required": ["index"],
+	  "properties": {
+		"index": {
+		  "type": "integer",
+		  "description": "Color index in palette",
+		  "minimum": 0,
+		  "maximum": 255
+		},
+		"bgr15": {
+		  "type": "string",
+		  "description": "15-bit BGR value",
+		  "pattern": "^\\$[0-9A-F]{4}$"
+		},
+		"rgb24": {
+		  "type": "string",
+		  "description": "24-bit RGB hex value",
+		  "pattern": "^#[0-9A-F]{6}$"
+		},
+		"r": {
+		  "type": "integer",
+		  "description": "Red (0-31 for SNES, 0-255 for RGB24)",
+		  "minimum": 0,
+		  "maximum": 255
+		},
+		"g": {
+		  "type": "integer",
+		  "description": "Green (0-31 for SNES, 0-255 for RGB24)",
+		  "minimum": 0,
+		  "maximum": 255
+		},
+		"b": {
+		  "type": "integer",
+		  "description": "Blue (0-31 for SNES, 0-255 for RGB24)",
+		  "minimum": 0,
+		  "maximum": 255
+		},
+		"transparent": {
+		  "type": "boolean",
+		  "description": "Is this color transparent (color 0)"
+		}
+	  }
+	},
+	"animation": {
+	  "type": "object",
+	  "description": "Animation information",
+	  "properties": {
+		"animated": {
+		  "type": "boolean",
+		  "description": "Is this graphic animated"
+		},
+		"frame_count": {
+		  "type": "integer",
+		  "description": "Number of animation frames",
+		  "minimum": 1
+		},
+		"frame_delay": {
+		  "type": "integer",
+		  "description": "Delay between frames (in game ticks)",
+		  "minimum": 1
+		},
+		"loop": {
+		  "type": "boolean",
+		  "description": "Does animation loop"
+		}
+	  }
+	}
   }
 }

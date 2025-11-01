@@ -1,4 +1,4 @@
-﻿# FFMQ Disassembly Project - Comprehensive TODO List
+# FFMQ Disassembly Project - Comprehensive TODO List
 **Created**: October 31, 2025  
 **Status**: Bank 01 100% COMPLETE! (6 banks total at 100%)
 
@@ -300,55 +300,55 @@
 
 2. [ ] **Disassemble remaining banks** ($04, $05, $06, $0e, $0f)
    - [ ] **Bank $04 Analysis**
-     * Run `grep_search` to identify code vs data regions
-     * Look for subroutine entry points (JSR/JSL targets)
-     * Create initial documented file with analysis
-     * Estimate: 20-30 hours
+	 * Run `grep_search` to identify code vs data regions
+	 * Look for subroutine entry points (JSR/JSL targets)
+	 * Create initial documented file with analysis
+	 * Estimate: 20-30 hours
    
    - [ ] **Bank $05 Analysis**
-     * Same process as Bank $04
-     * May be pure data (tables, stats, items, enemies)
-     * Estimate: 20-30 hours
+	 * Same process as Bank $04
+	 * May be pure data (tables, stats, items, enemies)
+	 * Estimate: 20-30 hours
    
    - [ ] **Bank $06 Analysis**
-     * Same process as Bank $04/$05
-     * Possible music/sound data continuation
-     * Estimate: 20-30 hours
+	 * Same process as Bank $04/$05
+	 * Possible music/sound data continuation
+	 * Estimate: 20-30 hours
    
    - [ ] **Bank $0e Analysis**
-     * Completely unknown - could be anything
-     * Initial exploration: search for JSR/RTS patterns (code) vs bulk data
-     * Estimate: 30-40 hours
+	 * Completely unknown - could be anything
+	 * Initial exploration: search for JSR/RTS patterns (code) vs bulk data
+	 * Estimate: 30-40 hours
    
    - [ ] **Bank $0f Analysis**
-     * Likely similar to $0e
-     * May contain additional systems or overflow data
-     * Estimate: 30-40 hours
+	 * Likely similar to $0e
+	 * May contain additional systems or overflow data
+	 * Estimate: 30-40 hours
 
 3. [ ] **Create system-level documentation** (cross-bank)
    - [ ] **Battle System Architecture** (Banks $01, $0b, $0c)
-     * Data flow diagrams
-     * State machine charts
-     * Function call graphs
-     * Timing diagrams (frame-by-frame execution)
+	 * Data flow diagrams
+	 * State machine charts
+	 * Function call graphs
+	 * Timing diagrams (frame-by-frame execution)
    
    - [ ] **Graphics Rendering Pipeline** (Banks $07, $08, $09, $0a, $0b, $0c)
-     * Decompression → VRAM loading → PPU rendering
-     * Palette management across banks
-     * Sprite animation system
-     * Screen effects (fades, transitions, mode 7)
+	 * Decompression → VRAM loading → PPU rendering
+	 * Palette management across banks
+	 * Sprite animation system
+	 * Screen effects (fades, transitions, mode 7)
    
    - [ ] **Text/Dialogue System** (Banks $03, $08)
-     * Script execution flow
-     * Compression/decompression
-     * Text rendering with control codes
-     * Window/menu integration
+	 * Script execution flow
+	 * Compression/decompression
+	 * Text rendering with control codes
+	 * Window/menu integration
    
    - [ ] **Sound/Music System** (Banks $07, $0d, possibly $06)
-     * SPC700 communication protocol
-     * Music track structure
-     * Sound effect triggering
-     * Audio memory management
+	 * SPC700 communication protocol
+	 * Music track structure
+	 * Sound effect triggering
+	 * Audio memory management
 
 4. [ ] **Document all functions by system**
    - [ ] Create `docs/FUNCTIONS_BY_SYSTEM.md`
@@ -401,36 +401,36 @@
    
    **Features**:
    - [ ] **Tile Extraction**
-     * Input: ROM offset, tile count, 2bpp/4bpp/8bpp mode
-     * Output: Raw binary (`.bin`), indexed PNG (`.png`), metadata (`.json`)
-     * Metadata: offset, size, format, palette reference
+	 * Input: ROM offset, tile count, 2bpp/4bpp/8bpp mode
+	 * Output: Raw binary (`.bin`), indexed PNG (`.png`), metadata (`.json`)
+	 * Metadata: offset, size, format, palette reference
    
    - [ ] **Palette Extraction**
-     * Input: ROM offset, color count (or auto-detect)
-     * Output: 
-       - Raw binary (`.pal`, `.bin`)
-       - PNG swatch (16×1 or 16×16 color grid)
-       - JSON (array of RGB888 values)
-       - CSS (for web tools)
-     * Support RGB555→RGB888 conversion
+	 * Input: ROM offset, color count (or auto-detect)
+	 * Output: 
+	   - Raw binary (`.pal`, `.bin`)
+	   - PNG swatch (16×1 or 16×16 color grid)
+	   - JSON (array of RGB888 values)
+	   - CSS (for web tools)
+	 * Support RGB555→RGB888 conversion
    
    - [ ] **Sprite Sheet Generation**
-     * Input: Tile range + palette + arrangement data
-     * Output: PNG sprite sheet with all animation frames
-     * Multiple views:
-       - `character_walk_east.png` (single animation)
-       - `character_all_animations.png` (sprite sheet grid)
-       - `character_with_palette_variants.png` (same sprite, different palettes)
+	 * Input: Tile range + palette + arrangement data
+	 * Output: PNG sprite sheet with all animation frames
+	 * Multiple views:
+	   - `character_walk_east.png` (single animation)
+	   - `character_all_animations.png` (sprite sheet grid)
+	   - `character_with_palette_variants.png` (same sprite, different palettes)
    
    - [ ] **Tilemap Rendering**
-     * Input: Tilemap data + tileset + palette
-     * Output: PNG of full screen/map
-     * Support SNES tilemap attributes (flip X/Y, priority, palette select)
+	 * Input: Tilemap data + tileset + palette
+	 * Output: PNG of full screen/map
+	 * Support SNES tilemap attributes (flip X/Y, priority, palette select)
    
    - [ ] **Compressed Graphics Decompression**
-     * Detect compression type (RLE, LZ, custom FFMQ format)
-     * Decompress to raw tile data
-     * Extract as normal tiles
+	 * Detect compression type (RLE, LZ, custom FFMQ format)
+	 * Decompress to raw tile data
+	 * Extract as normal tiles
 
 3. [ ] **Create `tools/palette_manager.py`**
    
@@ -448,46 +448,46 @@
    - [ ] Scan all graphics banks ($07, $08, $09, $0a, $0b)
    - [ ] Identify all graphics regions (tiles, palettes, sprites)
    - [ ] Generate comprehensive catalog:
-     * Bank → Offset → Type → Size → Description
+	 * Bank → Offset → Type → Size → Description
    - [ ] Output formats: JSON, CSV, Markdown table
    - [ ] Identify uncatalogued regions (unknown data)
 
 5. [ ] **Extract all graphics assets systematically**
    
    - [ ] **Character Sprites** (Benjamin, Kaeli, Phoebe, Reuben)
-     * Walking animations (4 directions × 3 frames)
-     * Battle sprites (idle, attack, defend, cast, hurt, victory)
-     * Overworld vs battle versions
-     * Output: Individual PNGs + sprite sheets + JSON metadata
+	 * Walking animations (4 directions × 3 frames)
+	 * Battle sprites (idle, attack, defend, cast, hurt, victory)
+	 * Overworld vs battle versions
+	 * Output: Individual PNGs + sprite sheets + JSON metadata
    
    - [ ] **Enemy Sprites**
-     * All battle enemies (~100+ different sprites?)
-     * Boss sprites (larger, multi-sprite)
-     * Animations (idle, attack, hurt, death)
-     * Output: Sprite sheets per enemy + metadata
+	 * All battle enemies (~100+ different sprites?)
+	 * Boss sprites (larger, multi-sprite)
+	 * Animations (idle, attack, hurt, death)
+	 * Output: Sprite sheets per enemy + metadata
    
    - [ ] **Battle Effects**
-     * Magic spells (White, Black, Wizard, elemental)
-     * Weapon strikes, explosions, particles
-     * Status effects (poison, sleep, etc.)
-     * Frame-by-frame PNG sequences + metadata
+	 * Magic spells (White, Black, Wizard, elemental)
+	 * Weapon strikes, explosions, particles
+	 * Status effects (poison, sleep, etc.)
+	 * Frame-by-frame PNG sequences + metadata
    
    - [ ] **UI Graphics**
-     * Fonts (dialogue, battle, menu)
-     * Windows, borders, cursors
-     * Icons (items, equipment, status)
-     * Health/mana bars, gauges
+	 * Fonts (dialogue, battle, menu)
+	 * Windows, borders, cursors
+	 * Icons (items, equipment, status)
+	 * Health/mana bars, gauges
    
    - [ ] **Environmental Graphics**
-     * Terrain tilesets (grass, desert, snow, dungeon, etc.)
-     * Animated tiles (water, lava, waterfalls)
-     * Background layers (parallax scrolling)
-     * Mode 7 textures (world map rotation)
+	 * Terrain tilesets (grass, desert, snow, dungeon, etc.)
+	 * Animated tiles (water, lava, waterfalls)
+	 * Background layers (parallax scrolling)
+	 * Mode 7 textures (world map rotation)
    
    - [ ] **Palettes**
-     * All color palettes with preview swatches
-     * Day/night variants, special effect palettes
-     * Palette animation sequences (color cycling)
+	 * All color palettes with preview swatches
+	 * Day/night variants, special effect palettes
+	 * Palette animation sequences (color cycling)
 
 6. [ ] **Create graphics extraction report** (`docs/GRAPHICS_EXTRACTION_REPORT.md`)
    - [ ] List every extracted asset with: bank, offset, size, type, filename
@@ -509,42 +509,42 @@
 2. [ ] **Extract all data tables**
    
    - [ ] **Character Stats**
-     * Base stats, growth curves, equipment slots
-     * Starting inventory, spells learned
-     * Output: `data/characters.json`, `data/characters.csv`
+	 * Base stats, growth curves, equipment slots
+	 * Starting inventory, spells learned
+	 * Output: `data/characters.json`, `data/characters.csv`
    
    - [ ] **Enemy Stats**
-     * HP, attack, defense, magic, speed
-     * Elemental affinities, status immunities
-     * Drop rates (items, gold, XP)
-     * AI behavior patterns
-     * Output: `data/enemies.json`, `data/enemies.csv`
+	 * HP, attack, defense, magic, speed
+	 * Elemental affinities, status immunities
+	 * Drop rates (items, gold, XP)
+	 * AI behavior patterns
+	 * Output: `data/enemies.json`, `data/enemies.csv`
    
    - [ ] **Item Data**
-     * Weapons, armor, accessories, consumables
-     * Stats, effects, prices, restrictions
-     * Output: `data/items.json`, `data/items.csv`
+	 * Weapons, armor, accessories, consumables
+	 * Stats, effects, prices, restrictions
+	 * Output: `data/items.json`, `data/items.csv`
    
    - [ ] **Spell Data**
-     * Magic spells (White, Black, Wizard)
-     * MP cost, power, elemental type, target type
-     * Animation references, status effects
-     * Output: `data/spells.json`, `data/spells.csv`
+	 * Magic spells (White, Black, Wizard)
+	 * MP cost, power, elemental type, target type
+	 * Animation references, status effects
+	 * Output: `data/spells.json`, `data/spells.csv`
    
    - [ ] **Map Data**
-     * Map layouts, collision maps, event triggers
-     * NPC placements, chest locations, enemy encounters
-     * Output: `data/maps/*.json` (one file per map)
+	 * Map layouts, collision maps, event triggers
+	 * NPC placements, chest locations, enemy encounters
+	 * Output: `data/maps/*.json` (one file per map)
    
    - [ ] **Shop Inventories**
-     * Items sold per shop, prices
-     * Output: `data/shops.json`
+	 * Items sold per shop, prices
+	 * Output: `data/shops.json`
    
    - [ ] **Text Strings**
-     * All dialogue, menus, descriptions
-     * Decompress from Banks $03/$08
-     * Output: `data/text_en.json` (JSON with ID→string mapping)
-     * Include control code metadata (pauses, colors, etc.)
+	 * All dialogue, menus, descriptions
+	 * Decompress from Banks $03/$08
+	 * Output: `data/text_en.json` (JSON with ID→string mapping)
+	 * Include control code metadata (pauses, colors, etc.)
 
 3. [ ] **Create `tools/text_extractor.py`** (specialized text extraction)
    
@@ -552,13 +552,13 @@
    - [ ] Decompress FFMQ text compression (dictionary-based)
    - [ ] Parse control codes ($f0-$ff) with descriptions
    - [ ] Export to translation-friendly formats:
-     * JSON: `{ "id": "DIALOG_001", "text": "Welcome to...", "metadata": {...} }`
-     * CSV: `id,context,text,character_limit,control_codes`
-     * PO files (gettext format for translation tools)
+	 * JSON: `{ "id": "DIALOG_001", "text": "Welcome to...", "metadata": {...} }`
+	 * CSV: `id,context,text,character_limit,control_codes`
+	 * PO files (gettext format for translation tools)
    - [ ] Generate text report with statistics:
-     * Total strings, total characters, compression ratio
-     * Control code usage frequency
-     * Longest/shortest strings
+	 * Total strings, total characters, compression ratio
+	 * Control code usage frequency
+	 * Longest/shortest strings
 
 4. [ ] **Create `tools/music_extractor.py`** (SPC700 music/sound)
    
@@ -567,10 +567,10 @@
    - [ ] Extract music track data (Bank $06? or $0d?)
    - [ ] Extract sound effect samples
    - [ ] Output formats:
-     * SPC (SNES music format, playable in emulators)
-     * MIDI (converted, for editing)
-     * WAV samples (instrument/SFX samples)
-     * JSON metadata (track info, tempo, instruments used)
+	 * SPC (SNES music format, playable in emulators)
+	 * MIDI (converted, for editing)
+	 * WAV samples (instrument/SFX samples)
+	 * JSON metadata (track info, tempo, instruments used)
    - [ ] Integration with existing SPC700 tools (BRR Tools, SPCTool)
 
 ##### **Phase 3: Extraction Organization & Metadata**
@@ -600,35 +600,35 @@
    │   ├── midi/         # Converted MIDI
    │   └── samples/      # WAV instrument samples
    └── metadata/
-       ├── extraction_manifest.json   # Complete list of all extracted assets
-       ├── asset_index.json           # Search index for assets
-       └── extraction_log.txt         # Extraction process log
+	   ├── extraction_manifest.json   # Complete list of all extracted assets
+	   ├── asset_index.json           # Search index for assets
+	   └── extraction_log.txt         # Extraction process log
    ```
 
 2. [ ] **Create `extraction_manifest.json`** (master asset registry)
    ```json
    {
-     "version": "1.0",
-     "rom_hash": "sha256:...",
-     "extraction_date": "2025-10-31",
-     "assets": [
-       {
-         "id": "character_benjamin_walk_east",
-         "type": "sprite_animation",
-         "source_bank": "$09",
-         "source_offset": "$1234",
-         "source_size": 256,
-         "files": {
-           "png": "assets/graphics/png/characters/benjamin_walk_east.png",
-           "bin": "assets/graphics/raw/benjamin_walk_east.bin",
-           "metadata": "assets/graphics/metadata/benjamin_walk_east.json"
-         },
-         "palette_ref": "palette_character_benjamin_01",
-         "frame_count": 3,
-         "frame_size": "16x16"
-       },
-       // ... thousands more assets
-     ]
+	 "version": "1.0",
+	 "rom_hash": "sha256:...",
+	 "extraction_date": "2025-10-31",
+	 "assets": [
+	   {
+		 "id": "character_benjamin_walk_east",
+		 "type": "sprite_animation",
+		 "source_bank": "$09",
+		 "source_offset": "$1234",
+		 "source_size": 256,
+		 "files": {
+		   "png": "assets/graphics/png/characters/benjamin_walk_east.png",
+		   "bin": "assets/graphics/raw/benjamin_walk_east.bin",
+		   "metadata": "assets/graphics/metadata/benjamin_walk_east.json"
+		 },
+		 "palette_ref": "palette_character_benjamin_01",
+		 "frame_count": 3,
+		 "frame_size": "16x16"
+	   },
+	   // ... thousands more assets
+	 ]
    }
    ```
 
@@ -654,69 +654,69 @@
    
    **Features**:
    - [ ] **PNG → SNES Tiles**
-     * Read PNG, convert RGB888 → palette index (4bpp/8bpp)
-     * Validate PNG dimensions (multiple of 8×8)
-     * Generate SNES tile data (bitplane format)
-     * Preserve original ROM layout/compression if unchanged
+	 * Read PNG, convert RGB888 → palette index (4bpp/8bpp)
+	 * Validate PNG dimensions (multiple of 8×8)
+	 * Generate SNES tile data (bitplane format)
+	 * Preserve original ROM layout/compression if unchanged
    
    - [ ] **Palette Import**
-     * Read JSON/PNG swatch, convert RGB888 → RGB555
-     * Generate SNES palette data (2 bytes/color)
-     * Validate color count (≤16 for 4bpp mode)
+	 * Read JSON/PNG swatch, convert RGB888 → RGB555
+	 * Generate SNES palette data (2 bytes/color)
+	 * Validate color count (≤16 for 4bpp mode)
    
    - [ ] **Sprite Sheet → Tile Data**
-     * Read sprite sheet PNG, slice into 8×8 tiles
-     * Convert to SNES format, maintaining tile order
-     * Generate OAM data if sprite layout changed
+	 * Read sprite sheet PNG, slice into 8×8 tiles
+	 * Convert to SNES format, maintaining tile order
+	 * Generate OAM data if sprite layout changed
    
    - [ ] **Compression**
-     * Re-compress graphics if original was compressed
-     * Detect compression type from metadata
-     * Fall back to uncompressed if compression fails
+	 * Re-compress graphics if original was compressed
+	 * Detect compression type from metadata
+	 * Fall back to uncompressed if compression fails
 
 2. [ ] **Create `tools/import_data.py`** (reverse of extract_data.py)
    
    **Features**:
    - [ ] **JSON/CSV → Binary Structs**
-     * Read modified JSON/CSV data
-     * Validate against schema (field types, value ranges)
-     * Pack into binary struct format
-     * Handle pointers, nested structures
+	 * Read modified JSON/CSV data
+	 * Validate against schema (field types, value ranges)
+	 * Pack into binary struct format
+	 * Handle pointers, nested structures
    
    - [ ] **Text Import**
-     * Read modified `text_en.json`
-     * Re-compress using FFMQ compression
-     * Validate string lengths (must fit in ROM space)
-     * Generate pointer tables if strings moved
+	 * Read modified `text_en.json`
+	 * Re-compress using FFMQ compression
+	 * Validate string lengths (must fit in ROM space)
+	 * Generate pointer tables if strings moved
    
    - [ ] **Data Validation**
-     * Check for out-of-range values (e.g., HP > 65535)
-     * Verify required fields present
-     * Warn on size changes (may overflow ROM space)
+	 * Check for out-of-range values (e.g., HP > 65535)
+	 * Verify required fields present
+	 * Warn on size changes (may overflow ROM space)
 
 3. [ ] **Create `tools/build_rom.py`** (orchestrate full build)
    
    **Features**:
    - [ ] **Multi-stage build process**:
-     1. Check for modified assets (compare timestamps/hashes)
-     2. Re-import only changed assets (incremental build)
-     3. Re-assemble ASM code (existing: `build.ps1` with asar)
-     4. Insert imported asset data into ROM
-     5. Update pointers/addresses if data moved
-     6. Calculate checksums, update ROM header
-     7. Verify ROM integrity (size, header, checksum)
+	 1. Check for modified assets (compare timestamps/hashes)
+	 2. Re-import only changed assets (incremental build)
+	 3. Re-assemble ASM code (existing: `build.ps1` with asar)
+	 4. Insert imported asset data into ROM
+	 5. Update pointers/addresses if data moved
+	 6. Calculate checksums, update ROM header
+	 7. Verify ROM integrity (size, header, checksum)
    
    - [ ] **Build Modes**:
-     * `--clean`: Full rebuild (re-import all assets)
-     * `--incremental`: Only changed assets (fast iteration)
-     * `--validate`: Build + extensive validation (slow, thorough)
-     * `--dry-run`: Show what would be built without writing files
+	 * `--clean`: Full rebuild (re-import all assets)
+	 * `--incremental`: Only changed assets (fast iteration)
+	 * `--validate`: Build + extensive validation (slow, thorough)
+	 * `--dry-run`: Show what would be built without writing files
    
    - [ ] **Build Report**:
-     * List all modified assets
-     * Show ROM size, free space remaining
-     * Warnings/errors encountered
-     * Build time statistics
+	 * List all modified assets
+	 * Show ROM size, free space remaining
+	 * Warnings/errors encountered
+	 * Build time statistics
 
 4. [ ] **Create `Makefile` or `build.ps1` orchestration**
    

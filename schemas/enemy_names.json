@@ -7,11 +7,11 @@
   "struct_name": "TextString",
   "struct_size": 16,
   "fields": [
-    {
-      "name": "text",
-      "type": "string",
-      "size": 16,
-      "description": "Enemy name (16 bytes, padded with asterisks)"
-    }
+	{
+	  "name": "text",
+	  "type": "string",
+	  "size": 16,
+	  "description": "Enemy name (16 bytes, padded with asterisks)"
+	}
   ]
 }

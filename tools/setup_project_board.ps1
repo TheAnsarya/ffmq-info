@@ -1,16 +1,16 @@
-﻿#!/usr/bin/env pwsh
+#!/usr/bin/env pwsh
 <#
 .SYNOPSIS
-    Helper script to set up GitHub Project Board for FFMQ Disassembly
+	Helper script to set up GitHub Project Board for FFMQ Disassembly
 
 .DESCRIPTION
-    This script provides commands and information to help set up the GitHub Project Board.
-    Due to GitHub CLI project permissions, some steps need to be done via web interface.
+	This script provides commands and information to help set up the GitHub Project Board.
+	Due to GitHub CLI project permissions, some steps need to be done via web interface.
 
 .NOTES
-    Project Board Setup Guide
-    - Creates a board with proper workflow columns
-    - Organizes 47 issues by priority and parent
+	Project Board Setup Guide
+	- Creates a board with proper workflow columns
+	- Organizes 47 issues by priority and parent
 #>
 
 $errorActionPreference = "Stop"
@@ -26,12 +26,12 @@ Write-Host @"
 # Check current repository
 $repo = git remote get-url origin
 if ($repo -match "github\.com[:/](.+)/(.+?)(\.git)?$") {
-    $owner = $matches[1]
-    $repoName = $matches[2]
-    Write-Host "Repository: $owner/$repoName" -ForegroundColor Green
+	$owner = $matches[1]
+	$repoName = $matches[2]
+	Write-Host "Repository: $owner/$repoName" -ForegroundColor Green
 } else {
-    Write-Error "Could not determine repository"
-    exit 1
+	Write-Error "Could not determine repository"
+	exit 1
 }
 
 Write-Host @"
@@ -181,11 +181,11 @@ A. Group by Parent Issue
    On the board, you can manually arrange child issues under their parent:
 
    #1 (Parent: ASM Formatting)
-     ↳ #13: Prerequisites
-     ↳ #14: Script Development
-     ↳ #15: Testing
-     ↳ #16: Priority 1 Banks
-     ↳ #17: Priority 2-3 Banks
+	 ↳ #13: Prerequisites
+	 ↳ #14: Script Development
+	 ↳ #15: Testing
+	 ↳ #16: Priority 1 Banks
+	 ↳ #17: Priority 2-3 Banks
 
 B. Add Custom Fields (Project Settings)
 ────────────────────────────────────────────────────────────────────────────
@@ -219,9 +219,9 @@ Checklist:
   ☐ Workflow columns configured (5 columns recommended)
   ☐ All 47 issues added to board
   ☐ Issues organized by priority:
-     - 17 issues in Ready (high priority)
-     - 15 issues in Todo (medium priority)
-     - 15 issues in Backlog (low priority)
+	 - 17 issues in Ready (high priority)
+	 - 15 issues in Todo (medium priority)
+	 - 15 issues in Backlog (low priority)
   ☐ Issues grouped by parent (optional)
   ☐ Automation enabled (optional)
 

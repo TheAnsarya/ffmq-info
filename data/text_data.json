@@ -2,13 +2,13 @@
   "bank": "$08",
   "description": "Text and dialog data",
   "pointer_table": {
-    "start_address": "$088000",
-    "count": 0,
-    "pointers": []
+	"start_address": "$088000",
+	"count": 0,
+	"pointers": []
   },
   "dialog_strings": {
-    "count": 0,
-    "strings": []
+	"count": 0,
+	"strings": []
   },
   "control_codes_used": {},
   "encoding_table_entries": 256

@@ -1,4 +1,4 @@
-﻿# Map System Architecture
+# Map System Architecture
 
 Complete documentation of the Final Fantasy Mystic Quest map and world navigation system.
 
@@ -33,8 +33,8 @@ FFMQ's map system manages all explorable areas:
 ┌──────────────────────┐
 │   Player Input       │
 └──────────┬───────────┘
-           │
-           v
+		   │
+		   v
 ┌──────────────────────┐
 │  Movement System     │
 ├──────────────────────┤
@@ -42,8 +42,8 @@ FFMQ's map system manages all explorable areas:
 │ - Update position    │
 │ - Trigger events     │
 └──────────┬───────────┘
-           │
-           v
+		   │
+		   v
 ┌──────────────────────┐
 │   Map Engine         │
 ├──────────────────────┤
@@ -115,11 +115,11 @@ Map Header (32 bytes):
   Bytes 12-13: Default spawn X
   Bytes 14-15: Default spawn Y
   Byte 16:   Flags
-    Bit 0: Enable encounters
-    Bit 1: Enable running
-    Bit 2: Town (safe area)
-    Bit 3: Show minimap
-    Bit 4-7: Reserved
+	Bit 0: Enable encounters
+	Bit 1: Enable running
+	Bit 2: Town (safe area)
+	Bit 3: Show minimap
+	Bit 4-7: Reserved
   Bytes 17-31: Reserved for future use
 ```
 
@@ -131,11 +131,11 @@ Tilemap Format:
   
   Byte 0: Tile ID (0-255)
   Byte 1: Attributes
-    Bits 0-2: Palette (0-7)
-    Bit 3: Priority
-    Bit 4: Flip H
-    Bit 5: Flip V
-    Bit 6-7: Special flags
+	Bits 0-2: Palette (0-7)
+	Bit 3: Priority
+	Bit 4: Flip H
+	Bit 5: Flip V
+	Bit 6-7: Special flags
   
 Special Flags:
   00 = Normal tile
@@ -204,63 +204,63 @@ Can combine: $c0 = Block South+West
 ;   Carry = Set if collision, Clear if walkable
 ; ==============================================================================
 CheckCollision:
-    ; Convert pixel position to tile coordinates
-    lda $01                 ; X high byte
-    lsr a                   ; /256
-    lsr a                   ; /128
-    lsr a                   ; /64
-    lsr a                   ; /32
-    lsr a                   ; /16
-    lsr a                   ; /8 (tile X)
-    sta $10
-    
-    lda $03                 ; Y high byte  
-    lsr a
-    lsr a
-    lsr a
-    sta $11                 ; Tile Y
-    
-    ; Calculate tilemap offset
-    ; Offset = (Y × MapWidth) + X
-    lda $11
-    sta $12
-    lda MapWidth
-    jsr Multiply8x8         ; A × $12 → $14
-    lda $14
-    clc
-    adc $10
-    sta $14                 ; Tilemap offset
-    
-    ; Read collision byte
-    tax
-    lda CollisionMap,x      ; Get collision flags
-    beq .walkable           ; $00 = no collision
-    
-    ; Check if it's a special tile
-    cmp #$03                ; Door?
-    beq .door
-    
-    cmp #$04                ; Counter?
-    beq .counter
-    
-    ; Solid collision
-    sec                     ; Set carry = blocked
-    rts
-    
+	; Convert pixel position to tile coordinates
+	lda $01                 ; X high byte
+	lsr a                   ; /256
+	lsr a                   ; /128
+	lsr a                   ; /64
+	lsr a                   ; /32
+	lsr a                   ; /16
+	lsr a                   ; /8 (tile X)
+	sta $10
+	
+	lda $03                 ; Y high byte  
+	lsr a
+	lsr a
+	lsr a
+	sta $11                 ; Tile Y
+	
+	; Calculate tilemap offset
+	; Offset = (Y × MapWidth) + X
+	lda $11
+	sta $12
+	lda MapWidth
+	jsr Multiply8x8         ; A × $12 → $14
+	lda $14
+	clc
+	adc $10
+	sta $14                 ; Tilemap offset
+	
+	; Read collision byte
+	tax
+	lda CollisionMap,x      ; Get collision flags
+	beq .walkable           ; $00 = no collision
+	
+	; Check if it's a special tile
+	cmp #$03                ; Door?
+	beq .door
+	
+	cmp #$04                ; Counter?
+	beq .counter
+	
+	; Solid collision
+	sec                     ; Set carry = blocked
+	rts
+	
 .door:
-    ; Trigger door event
-    jsr TriggerDoorEvent
-    clc                     ; Allow walking through
-    rts
-    
+	; Trigger door event
+	jsr TriggerDoorEvent
+	clc                     ; Allow walking through
+	rts
+	
 .counter:
-    ; Can walk here but can talk over it
-    clc
-    rts
-    
+	; Can walk here but can talk over it
+	clc
+	rts
+	
 .walkable:
-    clc                     ; Clear carry = walkable
-    rts
+	clc                     ; Clear carry = walkable
+	rts
 ```
 
 ### Special Collision Tiles
@@ -337,17 +337,17 @@ Event Entry (16 bytes):
   Bytes 2-3: X position (tile)
   Bytes 4-5: Y position (tile)
   Byte 6: Trigger type
-    $00 = Auto (step on)
-    $01 = Interact (press A)
-    $02 = Conditional
+	$00 = Auto (step on)
+	$01 = Interact (press A)
+	$02 = Conditional
   Byte 7: Event type (dialogue, chest, etc.)
   Bytes 8-9: Event data pointer
   Bytes 10-11: Required flag ID (0 = none)
   Byte 12: Completion flag ID
   Byte 13: Repeat behavior
-    $00 = One-time only
-    $01 = Repeatable
-    $02 = Once per map visit
+	$00 = One-time only
+	$01 = Repeatable
+	$02 = Once per map visit
   Bytes 14-15: Reserved
 ```
 
@@ -363,58 +363,58 @@ Event Entry (16 bytes):
 ;   $02 = Trigger type (0=auto, 1=interact)
 ; ==============================================================================
 CheckEventTriggers:
-    ; Loop through event table
-    ldx #$00
+	; Loop through event table
+	ldx #$00
 .eventLoop:
-    ; Check if event is at player position
-    lda EventTableX,x
-    cmp $00
-    bne .nextEvent
-    
-    lda EventTableY,x
-    cmp $01
-    bne .nextEvent
-    
-    ; Check trigger type matches
-    lda EventTableTrigger,x
-    cmp $02
-    bne .nextEvent
-    
-    ; Check if already completed
-    lda EventTableCompletionFlag,x
-    beq .notCompleted
-    
-    jsr CheckFlag           ; Check if flag is set
-    bcs .nextEvent          ; Already done? Skip
-    
+	; Check if event is at player position
+	lda EventTableX,x
+	cmp $00
+	bne .nextEvent
+	
+	lda EventTableY,x
+	cmp $01
+	bne .nextEvent
+	
+	; Check trigger type matches
+	lda EventTableTrigger,x
+	cmp $02
+	bne .nextEvent
+	
+	; Check if already completed
+	lda EventTableCompletionFlag,x
+	beq .notCompleted
+	
+	jsr CheckFlag           ; Check if flag is set
+	bcs .nextEvent          ; Already done? Skip
+	
 .notCompleted:
-    ; Check required flags
-    lda EventTableRequiredFlag,x
-    beq .execute            ; No requirement? Execute
-    
-    jsr CheckFlag
-    bcc .nextEvent          ; Requirement not met? Skip
-    
+	; Check required flags
+	lda EventTableRequiredFlag,x
+	beq .execute            ; No requirement? Execute
+	
+	jsr CheckFlag
+	bcc .nextEvent          ; Requirement not met? Skip
+	
 .execute:
-    ; Execute event
-    jsr ExecuteEvent
-    
-    ; Set completion flag if one-time
-    lda EventTableRepeat,x
-    bne .done
-    
-    lda EventTableCompletionFlag,x
-    jsr SetFlag
-    
+	; Execute event
+	jsr ExecuteEvent
+	
+	; Set completion flag if one-time
+	lda EventTableRepeat,x
+	bne .done
+	
+	lda EventTableCompletionFlag,x
+	jsr SetFlag
+	
 .done:
-    rts
-    
+	rts
+	
 .nextEvent:
-    inx
-    cpx EventCount
-    bcc .eventLoop
-    
-    rts
+	inx
+	cpx EventCount
+	bcc .eventLoop
+	
+	rts
 ```
 
 ## NPC System
@@ -429,20 +429,20 @@ NPC Entry (32 bytes):
   Byte 6: Sprite ID
   Byte 7: Palette
   Byte 8: Movement type
-    $00 = Stationary
-    $01 = Random walk
-    $02 = Patrol path
-    $03 = Follow player
-    $04 = Flee from player
+	$00 = Stationary
+	$01 = Random walk
+	$02 = Patrol path
+	$03 = Follow player
+	$04 = Flee from player
   Byte 9: Movement speed
   Bytes 10-11: Dialogue pointer
   Byte 12: Direction facing (0-3)
   Byte 13: Animation frame
   Byte 14: Flags
-    Bit 0: Enabled
-    Bit 1: Interactable
-    Bit 2: Block movement
-    Bit 3: Show on minimap
+	Bit 0: Enabled
+	Bit 1: Interactable
+	Bit 2: Block movement
+	Bit 3: Show on minimap
   Bytes 15-31: Movement data (path, etc.)
 ```
 
@@ -483,52 +483,52 @@ Flee from Player:
 ; UpdateNPCs - Update all NPCs on current map
 ; ==============================================================================
 UpdateNPCs:
-    ldx #$00
+	ldx #$00
 .npcLoop:
-    ; Check if NPC is enabled
-    lda NPCFlags,x
-    and #$01
-    beq .nextNPC
-    
-    ; Get movement type
-    lda NPCMovementType,x
-    beq .noMovement         ; Stationary
-    
-    cmp #$01
-    beq .randomWalk
-    
-    cmp #$02
-    beq .patrolPath
-    
-    ; ... handle other movement types
-    
+	; Check if NPC is enabled
+	lda NPCFlags,x
+	and #$01
+	beq .nextNPC
+	
+	; Get movement type
+	lda NPCMovementType,x
+	beq .noMovement         ; Stationary
+	
+	cmp #$01
+	beq .randomWalk
+	
+	cmp #$02
+	beq .patrolPath
+	
+	; ... handle other movement types
+	
 .randomWalk:
-    ; Decrement movement timer
-    dec NPCMoveTimer,x
-    bne .nextNPC
-    
-    ; Reset timer (random interval)
-    jsr Random
-    and #$3f                ; 0-63 frames
-    clc
-    adc #$20                ; +32 = 32-95 frames
-    sta NPCMoveTimer,x
-    
-    ; Choose random direction
-    jsr Random
-    and #$03                ; 0-3 (N,E,S,W)
-    sta NPCDirection,x
-    
-    ; Try to move
-    jsr MoveNPC
-    
+	; Decrement movement timer
+	dec NPCMoveTimer,x
+	bne .nextNPC
+	
+	; Reset timer (random interval)
+	jsr Random
+	and #$3f                ; 0-63 frames
+	clc
+	adc #$20                ; +32 = 32-95 frames
+	sta NPCMoveTimer,x
+	
+	; Choose random direction
+	jsr Random
+	and #$03                ; 0-3 (N,E,S,W)
+	sta NPCDirection,x
+	
+	; Try to move
+	jsr MoveNPC
+	
 .noMovement:
 .nextNPC:
-    inx
-    cpx NPCCount
-    bcc .npcLoop
-    
-    rts
+	inx
+	cpx NPCCount
+	bcc .npcLoop
+	
+	rts
 ```
 
 ## Door and Warp System
@@ -573,9 +573,9 @@ Warp Entry (16 bytes):
   Byte 13: Direction after warp
   Byte 14: Required key/item (0=none)
   Byte 15: Flags
-    Bit 0: Requires interaction (not auto)
-    Bit 1: Two-way warp
-    Bit 2: Save after warp
+	Bit 0: Requires interaction (not auto)
+	Bit 1: Two-way warp
+	Bit 2: Save after warp
 ```
 
 ### Warp Execution
@@ -588,64 +588,64 @@ Warp Entry (16 bytes):
 ;   X = Warp table index
 ; ==============================================================================
 ExecuteWarp:
-    ; Check required item
-    lda WarpRequiredItem,x
-    beq .noRequirement
-    
-    jsr CheckInventory      ; Do we have it?
-    bcc .cantWarp           ; No? Can't warp
-    
+	; Check required item
+	lda WarpRequiredItem,x
+	beq .noRequirement
+	
+	jsr CheckInventory      ; Do we have it?
+	bcc .cantWarp           ; No? Can't warp
+	
 .noRequirement:
-    ; Save warp destination
-    lda WarpDestMap,x
-    sta $10
-    lda WarpDestMap+1,x
-    sta $11
-    
-    lda WarpDestX,x
-    sta $12
-    lda WarpDestX+1,x
-    sta $13
-    
-    lda WarpDestY,x
-    sta $14
-    lda WarpDestY+1,x
-    sta $15
-    
-    ; Fade out
-    jsr FadeScreen
-    
-    ; Save game if flag set
-    lda WarpFlags,x
-    and #$04                ; Save flag?
-    beq .noSave
-    jsr AutoSaveGame
-    
+	; Save warp destination
+	lda WarpDestMap,x
+	sta $10
+	lda WarpDestMap+1,x
+	sta $11
+	
+	lda WarpDestX,x
+	sta $12
+	lda WarpDestX+1,x
+	sta $13
+	
+	lda WarpDestY,x
+	sta $14
+	lda WarpDestY+1,x
+	sta $15
+	
+	; Fade out
+	jsr FadeScreen
+	
+	; Save game if flag set
+	lda WarpFlags,x
+	and #$04                ; Save flag?
+	beq .noSave
+	jsr AutoSaveGame
+	
 .noSave:
-    ; Load new map
-    lda $10
-    jsr LoadMap
-    
-    ; Set player position
-    lda $12
-    sta PlayerX
-    lda $13
-    sta PlayerX+1
-    
-    lda $14
-    sta PlayerY
-    lda $15
-    sta PlayerY+1
-    
-    ; Set facing direction
-    lda WarpDirection,x
-    sta PlayerDirection
-    
-    ; Fade in
-    jsr UnfadeScreen
-    
+	; Load new map
+	lda $10
+	jsr LoadMap
+	
+	; Set player position
+	lda $12
+	sta PlayerX
+	lda $13
+	sta PlayerX+1
+	
+	lda $14
+	sta PlayerY
+	lda $15
+	sta PlayerY+1
+	
+	; Set facing direction
+	lda WarpDirection,x
+	sta PlayerDirection
+	
+	; Fade in
+	jsr UnfadeScreen
+	
 .cantWarp:
-    rts
+	rts
 ```
 
 ## Treasure and Items
@@ -658,10 +658,10 @@ Chest Data (8 bytes):
   Bytes 2-3: X position (tiles)
   Bytes 4-5: Y position (tiles)
   Byte 6: Contents type
-    $00 = Gold
-    $01 = Item
-    $02 = Equipment
-    $03 = Key item
+	$00 = Gold
+	$01 = Item
+	$02 = Equipment
+	$03 = Key item
   Byte 7: Contents ID/amount
   
 Chest States:
@@ -680,52 +680,52 @@ Chest States:
 ;   X = Chest index
 ; ==============================================================================
 OpenTreasureChest:
-    ; Check if already opened
-    lda ChestID,x
-    jsr CheckFlag
-    bcs .alreadyOpen
-    
-    ; Mark as opened
-    lda ChestID,x
-    jsr SetFlag
-    
-    ; Get contents
-    lda ChestContentsType,x
-    cmp #$00
-    beq .gold
-    
-    cmp #$01
-    beq .item
-    
-    ; Equipment or key item
-    lda ChestContentsID,x
-    jsr AddToInventory
-    jsr ShowItemGet
-    rts
-    
+	; Check if already opened
+	lda ChestID,x
+	jsr CheckFlag
+	bcs .alreadyOpen
+	
+	; Mark as opened
+	lda ChestID,x
+	jsr SetFlag
+	
+	; Get contents
+	lda ChestContentsType,x
+	cmp #$00
+	beq .gold
+	
+	cmp #$01
+	beq .item
+	
+	; Equipment or key item
+	lda ChestContentsID,x
+	jsr AddToInventory
+	jsr ShowItemGet
+	rts
+	
 .gold:
-    ; Add gold
-    lda ChestContentsID,x   ; Amount
-    clc
-    adc PartyGold
-    sta PartyGold
-    bcc .showGold
-    inc PartyGold+1
-    
+	; Add gold
+	lda ChestContentsID,x   ; Amount
+	clc
+	adc PartyGold
+	sta PartyGold
+	bcc .showGold
+	inc PartyGold+1
+	
 .showGold:
-    jsr ShowGoldGet
-    rts
-    
+	jsr ShowGoldGet
+	rts
+	
 .item:
-    ; Add item
-    lda ChestContentsID,x
-    jsr AddToInventory
-    jsr ShowItemGet
-    rts
-    
+	; Add item
+	lda ChestContentsID,x
+	jsr AddToInventory
+	jsr ShowItemGet
+	rts
+	
 .alreadyOpen:
-    ; Already opened, do nothing
-    rts
+	; Already opened, do nothing
+	rts
 ```
 
 ### Item Placement
@@ -802,16 +802,16 @@ Cache Priority:
 
 ```asm
 LoadMap:                    ; Load map data
-    ; Located at $01:D000
-    
+	; Located at $01:D000
+	
 InitializeMap:              ; Setup map state
-    ; Located at $01:D123
-    
+	; Located at $01:D123
+	
 UpdateMap:                  ; Per-frame map update
-    ; Located at $01:D234
-    
+	; Located at $01:D234
+	
 RenderMap:                  ; Draw map to screen
-    ; Located at $01:D345
+	; Located at $01:D345
 ```
 
 ### Collision System
@@ -820,13 +820,13 @@ RenderMap:                  ; Draw map to screen
 
 ```asm
 CheckCollision:             ; Test movement collision
-    ; Located at $01:E000
-    
+	; Located at $01:E000
+	
 GetCollisionTile:           ; Get tile collision data
-    ; Located at $01:E123
-    
+	; Located at $01:E123
+	
 ProcessSpecialTiles:        ; Handle ice, damage, etc.
-    ; Located at $01:E234
+	; Located at $01:E234
 ```
 
 ### Event System
@@ -835,13 +835,13 @@ ProcessSpecialTiles:        ; Handle ice, damage, etc.
 
 ```asm
 CheckEventTriggers:         ; Check for events
-    ; Located at $02:D000
-    
+	; Located at $02:D000
+	
 ExecuteEvent:               ; Run event script
-    ; Located at $02:D123
-    
+	; Located at $02:D123
+	
 ProcessDialogue:            ; Show NPC dialogue
-    ; Located at $02:D234
+	; Located at $02:D234
 ```
 
 ### NPC System
@@ -850,13 +850,13 @@ ProcessDialogue:            ; Show NPC dialogue
 
 ```asm
 UpdateNPCs:                 ; Update all NPCs
-    ; Located at $02:E000
-    
+	; Located at $02:E000
+	
 MoveNPC:                    ; Move NPC to new position
-    ; Located at $02:E123
-    
+	; Located at $02:E123
+	
 NPCInteraction:             ; Handle talking to NPC
-    ; Located at $02:E234
+	; Located at $02:E234
 ```
 
 ### Warp System
@@ -865,13 +865,13 @@ NPCInteraction:             ; Handle talking to NPC
 
 ```asm
 ExecuteWarp:                ; Teleport to new map
-    ; Located at $01:F000
-    
+	; Located at $01:F000
+	
 CheckWarpTriggers:          ; Check for warp zones
-    ; Located at $01:F123
-    
+	; Located at $01:F123
+	
 LoadMapData:                ; Load map from ROM
-    ; Located at $01:F234
+	; Located at $01:F234
 ```
 
 ## Performance Considerations
@@ -918,17 +918,17 @@ Total: ~7KB per map
 ```asm
 ; Disable collision (walk through walls)
 DebugNoClip:
-    lda #$01
-    sta NoClipMode
-    rts
+	lda #$01
+	sta NoClipMode
+	rts
 
 ; Teleport to coordinates
 DebugWarp:
-    lda #$20            ; X = 32
-    sta PlayerX
-    lda #$30            ; Y = 48
-    sta PlayerY
-    rts
+	lda #$20            ; X = 32
+	sta PlayerX
+	lda #$30            ; Y = 48
+	sta PlayerY
+	rts
 ```
 
 ## See Also

@@ -1,4 +1,4 @@
-﻿# FFMQ Complete Disassembly Integration
+# FFMQ Complete Disassembly Integration
 
 This directory contains the complete integrated disassembly of Final Fantasy Mystic Quest (SNES).
 
@@ -91,13 +91,13 @@ src/asm/
 ├── init.s                     # Modern initialization (ca65)
 ├── main.s                     # Modern main file (ca65)
 └── banks/                     # Diztinguish disassembly
-    ├── bank_00.asm            # Bank $00 (14,018 lines)
-    ├── bank_01.asm            # Bank $01
-    ├── bank_02.asm            # Bank $02
-    ├── ...                    # Banks $03-$0e
-    ├── bank_0F.asm            # Bank $0f
-    ├── labels.asm             # Global labels and constants
-    └── main.asm               # Diztinguish main file
+	├── bank_00.asm            # Bank $00 (14,018 lines)
+	├── bank_01.asm            # Bank $01
+	├── bank_02.asm            # Bank $02
+	├── ...                    # Banks $03-$0e
+	├── bank_0F.asm            # Bank $0f
+	├── labels.asm             # Global labels and constants
+	└── main.asm               # Diztinguish main file
 
 src/include/
 ├── snes_registers.inc         # SNES hardware registers
@@ -110,17 +110,17 @@ src/include/
 src/data/
 ├── character-start-stats.asm  # Character starting data
 └── text/                      # All text data
-    ├── weapon-names.asm
-    ├── armor-names.asm
-    ├── helmet-names.asm
-    ├── shield-names.asm
-    ├── accessory-names.asm
-    ├── item-names.asm
-    ├── spell-names.asm
-    ├── attack-descriptions.asm
-    ├── location-names.asm
-    ├── monster-names.asm
-    └── character-table.tbl
+	├── weapon-names.asm
+	├── armor-names.asm
+	├── helmet-names.asm
+	├── shield-names.asm
+	├── accessory-names.asm
+	├── item-names.asm
+	├── spell-names.asm
+	├── attack-descriptions.asm
+	├── location-names.asm
+	├── monster-names.asm
+	└── character-table.tbl
 ```
 
 ## Memory Map

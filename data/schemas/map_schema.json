@@ -6,333 +6,333 @@
   "type": "object",
   "required": ["version", "maps"],
   "properties": {
-    "version": {
-      "type": "string",
-      "description": "Schema version",
-      "pattern": "^\\d+\\.\\d+\\.\\d+$"
-    },
-    "description": {
-      "type": "string",
-      "description": "Description of this data file"
-    },
-    "maps": {
-      "type": "array",
-      "description": "Array of all maps",
-      "items": {
-        "$ref": "#/definitions/map"
-      }
-    }
+	"version": {
+	  "type": "string",
+	  "description": "Schema version",
+	  "pattern": "^\\d+\\.\\d+\\.\\d+$"
+	},
+	"description": {
+	  "type": "string",
+	  "description": "Description of this data file"
+	},
+	"maps": {
+	  "type": "array",
+	  "description": "Array of all maps",
+	  "items": {
+		"$ref": "#/definitions/map"
+	  }
+	}
   },
   "definitions": {
-    "map": {
-      "type": "object",
-      "required": ["map_id", "name", "type", "dimensions"],
-      "properties": {
-        "map_id": {
-          "type": "integer",
-          "description": "Unique map ID",
-          "minimum": 0
-        },
-        "name": {
-          "type": "string",
-          "description": "Map name",
-          "minLength": 1
-        },
-        "type": {
-          "type": "string",
-          "description": "Map type",
-          "enum": ["world_map", "town", "dungeon", "battle_bg"]
-        },
-        "dimensions": {
-          "$ref": "#/definitions/dimensions"
-        },
-        "tileset_id": {
-          "type": "integer",
-          "description": "Tileset ID",
-          "minimum": 0
-        },
-        "palette_id": {
-          "type": "integer",
-          "description": "Palette ID",
-          "minimum": 0,
-          "maximum": 7
-        },
-        "music_track": {
-          "type": "integer",
-          "description": "Background music track ID",
-          "minimum": 0
-        },
-        "layers": {
-          "$ref": "#/definitions/layers"
-        },
-        "metatiles": {
-          "$ref": "#/definitions/metatiles"
-        },
-        "collision_data": {
-          "type": "string",
-          "description": "Collision data description"
-        },
-        "events": {
-          "type": "array",
-          "description": "Map events",
-          "items": {
-            "$ref": "#/definitions/event"
-          }
-        },
-        "npcs": {
-          "type": "array",
-          "description": "NPCs on this map",
-          "items": {
-            "$ref": "#/definitions/npc"
-          }
-        },
-        "warps": {
-          "type": "array",
-          "description": "Warp points",
-          "items": {
-            "$ref": "#/definitions/warp"
-          }
-        },
-        "treasures": {
-          "type": "array",
-          "description": "Treasure chests",
-          "items": {
-            "$ref": "#/definitions/treasure"
-          }
-        },
-        "rom_address": {
-          "type": "string",
-          "description": "ROM address of map data",
-          "pattern": "^\\$[0-9A-F]{6}$"
-        }
-      }
-    },
-    "dimensions": {
-      "type": "object",
-      "required": ["width", "height"],
-      "properties": {
-        "width": {
-          "type": "integer",
-          "description": "Map width in tiles",
-          "minimum": 1
-        },
-        "height": {
-          "type": "integer",
-          "description": "Map height in tiles",
-          "minimum": 1
-        }
-      }
-    },
-    "layers": {
-      "type": "object",
-      "description": "Background layer configuration",
-      "properties": {
-        "bg1": {
-          "type": "string",
-          "description": "BG1 layer usage"
-        },
-        "bg2": {
-          "type": "string",
-          "description": "BG2 layer usage"
-        },
-        "bg3": {
-          "type": "string",
-          "description": "BG3 layer usage"
-        }
-      }
-    },
-    "metatiles": {
-      "type": "object",
-      "description": "Metatile information",
-      "properties": {
-        "count": {
-          "type": "integer",
-          "description": "Number of metatiles",
-          "minimum": 0
-        },
-        "format": {
-          "type": "string",
-          "description": "Metatile format description"
-        },
-        "data": {
-          "type": "array",
-          "description": "Metatile definitions",
-          "items": {
-            "$ref": "#/definitions/metatile"
-          }
-        }
-      }
-    },
-    "metatile": {
-      "type": "object",
-      "required": ["id", "tiles"],
-      "properties": {
-        "id": {
-          "type": "integer",
-          "description": "Metatile ID",
-          "minimum": 0
-        },
-        "tiles": {
-          "type": "object",
-          "description": "4x 8x8 tiles composing this metatile",
-          "required": ["top_left", "top_right", "bottom_left", "bottom_right"],
-          "properties": {
-            "top_left": { "type": "integer", "minimum": 0 },
-            "top_right": { "type": "integer", "minimum": 0 },
-            "bottom_left": { "type": "integer", "minimum": 0 },
-            "bottom_right": { "type": "integer", "minimum": 0 }
-          }
-        },
-        "collision": {
-          "type": "string",
-          "description": "Collision type",
-          "enum": [
-            "walkable", "wall", "water", "door", "warp",
-            "ice", "damage", "slow", "event", "npc",
-            "shop", "inn", "treasure", "stairs", "hidden", "special"
-          ]
-        },
-        "description": {
-          "type": "string",
-          "description": "Metatile description"
-        }
-      }
-    },
-    "event": {
-      "type": "object",
-      "required": ["event_id", "type", "position"],
-      "properties": {
-        "event_id": {
-          "type": "integer",
-          "description": "Event ID",
-          "minimum": 0
-        },
-        "type": {
-          "type": "string",
-          "description": "Event type",
-          "enum": [
-            "auto", "interact", "step_on", "conditional",
-            "cutscene", "battle", "treasure", "warp",
-            "npc_talk", "shop", "inn", "save_point"
-          ]
-        },
-        "position": {
-          "$ref": "#/definitions/position"
-        },
-        "trigger": {
-          "type": "string",
-          "description": "Trigger condition"
-        },
-        "script_id": {
-          "type": "integer",
-          "description": "Event script ID",
-          "minimum": 0
-        }
-      }
-    },
-    "npc": {
-      "type": "object",
-      "required": ["npc_id", "sprite_id", "position"],
-      "properties": {
-        "npc_id": {
-          "type": "integer",
-          "description": "NPC ID",
-          "minimum": 0
-        },
-        "sprite_id": {
-          "type": "integer",
-          "description": "NPC sprite ID",
-          "minimum": 0
-        },
-        "position": {
-          "$ref": "#/definitions/position"
-        },
-        "movement_pattern": {
-          "type": "string",
-          "description": "Movement AI",
-          "enum": ["stationary", "random_walk", "patrol", "follow_player", "flee"]
-        },
-        "dialog_id": {
-          "type": "integer",
-          "description": "Dialog text ID",
-          "minimum": 0
-        }
-      }
-    },
-    "warp": {
-      "type": "object",
-      "required": ["position", "destination"],
-      "properties": {
-        "position": {
-          "$ref": "#/definitions/position"
-        },
-        "destination": {
-          "type": "object",
-          "required": ["map_id", "position"],
-          "properties": {
-            "map_id": {
-              "type": "integer",
-              "description": "Destination map ID",
-              "minimum": 0
-            },
-            "position": {
-              "$ref": "#/definitions/position"
-            },
-            "facing": {
-              "type": "string",
-              "description": "Player facing direction after warp",
-              "enum": ["up", "down", "left", "right"]
-            }
-          }
-        },
-        "type": {
-          "type": "string",
-          "description": "Warp type",
-          "enum": ["door", "stairs", "teleport", "edge"]
-        }
-      }
-    },
-    "treasure": {
-      "type": "object",
-      "required": ["position", "contents"],
-      "properties": {
-        "position": {
-          "$ref": "#/definitions/position"
-        },
-        "contents": {
-          "type": "object",
-          "properties": {
-            "item_id": { "type": "string" },
-            "gp": { "type": "integer", "minimum": 0 }
-          }
-        },
-        "chest_id": {
-          "type": "integer",
-          "description": "Chest sprite ID",
-          "minimum": 0
-        },
-        "flag_id": {
-          "type": "integer",
-          "description": "Flag tracking if opened",
-          "minimum": 0
-        }
-      }
-    },
-    "position": {
-      "type": "object",
-      "required": ["x", "y"],
-      "properties": {
-        "x": {
-          "type": "integer",
-          "description": "X coordinate (tiles)",
-          "minimum": 0
-        },
-        "y": {
-          "type": "integer",
-          "description": "Y coordinate (tiles)",
-          "minimum": 0
-        }
-      }
-    }
+	"map": {
+	  "type": "object",
+	  "required": ["map_id", "name", "type", "dimensions"],
+	  "properties": {
+		"map_id": {
+		  "type": "integer",
+		  "description": "Unique map ID",
+		  "minimum": 0
+		},
+		"name": {
+		  "type": "string",
+		  "description": "Map name",
+		  "minLength": 1
+		},
+		"type": {
+		  "type": "string",
+		  "description": "Map type",
+		  "enum": ["world_map", "town", "dungeon", "battle_bg"]
+		},
+		"dimensions": {
+		  "$ref": "#/definitions/dimensions"
+		},
+		"tileset_id": {
+		  "type": "integer",
+		  "description": "Tileset ID",
+		  "minimum": 0
+		},
+		"palette_id": {
+		  "type": "integer",
+		  "description": "Palette ID",
+		  "minimum": 0,
+		  "maximum": 7
+		},
+		"music_track": {
+		  "type": "integer",
+		  "description": "Background music track ID",
+		  "minimum": 0
+		},
+		"layers": {
+		  "$ref": "#/definitions/layers"
+		},
+		"metatiles": {
+		  "$ref": "#/definitions/metatiles"
+		},
+		"collision_data": {
+		  "type": "string",
+		  "description": "Collision data description"
+		},
+		"events": {
+		  "type": "array",
+		  "description": "Map events",
+		  "items": {
+			"$ref": "#/definitions/event"
+		  }
+		},
+		"npcs": {
+		  "type": "array",
+		  "description": "NPCs on this map",
+		  "items": {
+			"$ref": "#/definitions/npc"
+		  }
+		},
+		"warps": {
+		  "type": "array",
+		  "description": "Warp points",
+		  "items": {
+			"$ref": "#/definitions/warp"
+		  }
+		},
+		"treasures": {
+		  "type": "array",
+		  "description": "Treasure chests",
+		  "items": {
+			"$ref": "#/definitions/treasure"
+		  }
+		},
+		"rom_address": {
+		  "type": "string",
+		  "description": "ROM address of map data",
+		  "pattern": "^\\$[0-9A-F]{6}$"
+		}
+	  }
+	},
+	"dimensions": {
+	  "type": "object",
+	  "required": ["width", "height"],
+	  "properties": {
+		"width": {
+		  "type": "integer",
+		  "description": "Map width in tiles",
+		  "minimum": 1
+		},
+		"height": {
+		  "type": "integer",
+		  "description": "Map height in tiles",
+		  "minimum": 1
+		}
+	  }
+	},
+	"layers": {
+	  "type": "object",
+	  "description": "Background layer configuration",
+	  "properties": {
+		"bg1": {
+		  "type": "string",
+		  "description": "BG1 layer usage"
+		},
+		"bg2": {
+		  "type": "string",
+		  "description": "BG2 layer usage"
+		},
+		"bg3": {
+		  "type": "string",
+		  "description": "BG3 layer usage"
+		}
+	  }
+	},
+	"metatiles": {
+	  "type": "object",
+	  "description": "Metatile information",
+	  "properties": {
+		"count": {
+		  "type": "integer",
+		  "description": "Number of metatiles",
+		  "minimum": 0
+		},
+		"format": {
+		  "type": "string",
+		  "description": "Metatile format description"
+		},
+		"data": {
+		  "type": "array",
+		  "description": "Metatile definitions",
+		  "items": {
+			"$ref": "#/definitions/metatile"
+		  }
+		}
+	  }
+	},
+	"metatile": {
+	  "type": "object",
+	  "required": ["id", "tiles"],
+	  "properties": {
+		"id": {
+		  "type": "integer",
+		  "description": "Metatile ID",
+		  "minimum": 0
+		},
+		"tiles": {
+		  "type": "object",
+		  "description": "4x 8x8 tiles composing this metatile",
+		  "required": ["top_left", "top_right", "bottom_left", "bottom_right"],
+		  "properties": {
+			"top_left": { "type": "integer", "minimum": 0 },
+			"top_right": { "type": "integer", "minimum": 0 },
+			"bottom_left": { "type": "integer", "minimum": 0 },
+			"bottom_right": { "type": "integer", "minimum": 0 }
+		  }
+		},
+		"collision": {
+		  "type": "string",
+		  "description": "Collision type",
+		  "enum": [
+			"walkable", "wall", "water", "door", "warp",
+			"ice", "damage", "slow", "event", "npc",
+			"shop", "inn", "treasure", "stairs", "hidden", "special"
+		  ]
+		},
+		"description": {
+		  "type": "string",
+		  "description": "Metatile description"
+		}
+	  }
+	},
+	"event": {
+	  "type": "object",
+	  "required": ["event_id", "type", "position"],
+	  "properties": {
+		"event_id": {
+		  "type": "integer",
+		  "description": "Event ID",
+		  "minimum": 0
+		},
+		"type": {
+		  "type": "string",
+		  "description": "Event type",
+		  "enum": [
+			"auto", "interact", "step_on", "conditional",
+			"cutscene", "battle", "treasure", "warp",
+			"npc_talk", "shop", "inn", "save_point"
+		  ]
+		},
+		"position": {
+		  "$ref": "#/definitions/position"
+		},
+		"trigger": {
+		  "type": "string",
+		  "description": "Trigger condition"
+		},
+		"script_id": {
+		  "type": "integer",
+		  "description": "Event script ID",
+		  "minimum": 0
+		}
+	  }
+	},
+	"npc": {
+	  "type": "object",
+	  "required": ["npc_id", "sprite_id", "position"],
+	  "properties": {
+		"npc_id": {
+		  "type": "integer",
+		  "description": "NPC ID",
+		  "minimum": 0
+		},
+		"sprite_id": {
+		  "type": "integer",
+		  "description": "NPC sprite ID",
+		  "minimum": 0
+		},
+		"position": {
+		  "$ref": "#/definitions/position"
+		},
+		"movement_pattern": {
+		  "type": "string",
+		  "description": "Movement AI",
+		  "enum": ["stationary", "random_walk", "patrol", "follow_player", "flee"]
+		},
+		"dialog_id": {
+		  "type": "integer",
+		  "description": "Dialog text ID",
+		  "minimum": 0
+		}
+	  }
+	},
+	"warp": {
+	  "type": "object",
+	  "required": ["position", "destination"],
+	  "properties": {
+		"position": {
+		  "$ref": "#/definitions/position"
+		},
+		"destination": {
+		  "type": "object",
+		  "required": ["map_id", "position"],
+		  "properties": {
+			"map_id": {
+			  "type": "integer",
+			  "description": "Destination map ID",
+			  "minimum": 0
+			},
+			"position": {
+			  "$ref": "#/definitions/position"
+			},
+			"facing": {
+			  "type": "string",
+			  "description": "Player facing direction after warp",
+			  "enum": ["up", "down", "left", "right"]
+			}
+		  }
+		},
+		"type": {
+		  "type": "string",
+		  "description": "Warp type",
+		  "enum": ["door", "stairs", "teleport", "edge"]
+		}
+	  }
+	},
+	"treasure": {
+	  "type": "object",
+	  "required": ["position", "contents"],
+	  "properties": {
+		"position": {
+		  "$ref": "#/definitions/position"
+		},
+		"contents": {
+		  "type": "object",
+		  "properties": {
+			"item_id": { "type": "string" },
+			"gp": { "type": "integer", "minimum": 0 }
+		  }
+		},
+		"chest_id": {
+		  "type": "integer",
+		  "description": "Chest sprite ID",
+		  "minimum": 0
+		},
+		"flag_id": {
+		  "type": "integer",
+		  "description": "Flag tracking if opened",
+		  "minimum": 0
+		}
+	  }
+	},
+	"position": {
+	  "type": "object",
+	  "required": ["x", "y"],
+	  "properties": {
+		"x": {
+		  "type": "integer",
+		  "description": "X coordinate (tiles)",
+		  "minimum": 0
+		},
+		"y": {
+		  "type": "integer",
+		  "description": "Y coordinate (tiles)",
+		  "minimum": 0
+		}
+	  }
+	}
   }
 }

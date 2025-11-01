@@ -1,4 +1,4 @@
-﻿# Graphics Tools Quick Start Guide
+# Graphics Tools Quick Start Guide
 
 Get started editing FFMQ graphics in 5 minutes!
 
@@ -43,9 +43,9 @@ Open PNG files in your favorite image editor:
 ```bash
 # Convert edited PNG to SNES tiles
 make convert-graphics-to-snes \
-    INPUT=assets/graphics/main_tiles_edited.png \
-    OUTPUT=assets/graphics/main_tiles_new.bin \
-    BPP=4
+	INPUT=assets/graphics/main_tiles_edited.png \
+	OUTPUT=assets/graphics/main_tiles_new.bin \
+	BPP=4
 ```
 
 ### 4. Test Your Changes
@@ -63,11 +63,11 @@ make test-launch
 ```bash
 # Convert SNES tiles to PNG for viewing
 python tools/convert_graphics.py to-png \
-    tiles.bin \
-    output.png \
-    --palette palette.bin \
-    --bpp 4 \
-    --tiles-per-row 16
+	tiles.bin \
+	output.png \
+	--palette palette.bin \
+	--bpp 4 \
+	--tiles-per-row 16
 ```
 
 **Options:**
@@ -81,18 +81,18 @@ python tools/convert_graphics.py to-png \
 ```bash
 # 1. Extract just the tiles you want
 python tools/convert_graphics.py to-png \
-    assets/graphics/sprite_tiles_raw.bin \
-    my_sprites.png \
-    --bpp 4 \
-    --indexed
+	assets/graphics/sprite_tiles_raw.bin \
+	my_sprites.png \
+	--bpp 4 \
+	--indexed
 
 # 2. Edit my_sprites.png in your image editor
 
 # 3. Convert back
 python tools/convert_graphics.py to-snes \
-    my_sprites.png \
-    sprite_tiles_modified.bin \
-    --bpp 4
+	my_sprites.png \
+	sprite_tiles_modified.bin \
+	--bpp 4
 ```
 
 ### Create Custom Tiles
@@ -106,10 +106,10 @@ python tools/convert_graphics.py to-snes \
 
 # 2. Convert to SNES format
 python tools/convert_graphics.py to-snes \
-    custom_tiles.png \
-    custom_tiles.bin \
-    --bpp 4 \
-    --palette custom_palette.bin
+	custom_tiles.png \
+	custom_tiles.bin \
+	--bpp 4 \
+	--palette custom_palette.bin
 
 # 3. Use in your assembly code
 # custom_tiles.bin now contains SNES-format tiles
@@ -130,10 +130,10 @@ make extract-graphics
 
 # 3. Or create new palette from PNG
 python tools/convert_graphics.py to-snes \
-    image_with_palette.png \
-    tiles.bin \
-    --bpp 4 \
-    --palette new_palette.bin
+	image_with_palette.png \
+	tiles.bin \
+	--bpp 4 \
+	--palette new_palette.bin
 ```
 
 ## Understanding SNES Graphics
@@ -231,9 +231,9 @@ pip install Pillow
 ```bash
 # Force re-quantize to correct color count
 python tools/convert_graphics.py to-snes \
-    input.png \
-    output.bin \
-    --bpp 4  # This will auto-quantize to 16 colors
+	input.png \
+	output.bin \
+	--bpp 4  # This will auto-quantize to 16 colors
 ```
 
 ## Advanced Usage
@@ -244,10 +244,10 @@ PowerShell:
 ```powershell
 # Convert all bin files to PNG
 Get-ChildItem assets/graphics/*.bin | ForEach-Object {
-    python tools/convert_graphics.py to-png `
-        $_.FullName `
-        ($_.BaseName + ".png") `
-        --bpp 4
+	python tools/convert_graphics.py to-png `
+		$_.FullName `
+		($_.BaseName + ".png") `
+		--bpp 4
 }
 ```
 
@@ -259,7 +259,7 @@ from snes_graphics import decode_tiles, SNESPalette
 from convert_graphics import TileImageConverter
 
 with open('tiles.bin', 'rb') as f:
-    data = f.read()
+	data = f.read()
 
 # Extract tiles 100-199 only
 tiles = decode_tiles(data, offset=100*32, count=100, bpp=4)
@@ -272,10 +272,10 @@ tiles = decode_tiles(data, offset=100*32, count=100, bpp=4)
 ```bash
 # This extracts both tiles AND generates palette
 python tools/convert_graphics.py to-snes \
-    reference_image.png \
-    tiles.bin \
-    --bpp 4 \
-    --palette extracted_palette.bin
+	reference_image.png \
+	tiles.bin \
+	--bpp 4 \
+	--palette extracted_palette.bin
 ```
 
 ## Next Steps

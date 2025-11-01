@@ -1,4 +1,4 @@
-﻿# FFMQ RAM Memory Map
+# FFMQ RAM Memory Map
 
 **Last Updated:** November 1, 2025
 **Related Issues:** #24, #28, #3
@@ -52,9 +52,9 @@ Bank $00 (Mirror)                Bank $7e (Extended)
 │ $0200-$1fff     │ 7.5K │ ←→   │ $7e:0200-$1fff  │ 7.5K │
 │ WRAM Low        │      │      │ (Same data)     │      │
 └─────────────────┴──────┘      ├─────────────────┼──────┤
-                                │ $7e:2000-$ffff  │ 56KB │
-                                │ Extended only   │      │
-                                └─────────────────┴──────┘
+								│ $7e:2000-$ffff  │ 56KB │
+								│ Extended only   │      │
+								└─────────────────┴──────┘
 
 Memory Layout
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━

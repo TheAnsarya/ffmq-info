@@ -1,4 +1,4 @@
-﻿# FFMQ Build Troubleshooting Guide
+# FFMQ Build Troubleshooting Guide
 
 Quick reference for resolving common build issues.
 
@@ -134,14 +134,14 @@ asar --version  # Should show 1.81 or later
    ```asm
    ; Global label
    main_routine:
-       ; code
+	   ; code
    .local_loop:     ; Local to main_routine
-       ; code
-       bra .local_loop
+	   ; code
+	   bra .local_loop
    
    other_routine:
    .local_loop:     ; Different scope, no conflict
-       ; code
+	   ; code
    ```
 
 3. **Use unique prefixes**:
@@ -218,8 +218,8 @@ asar --version  # Should show 1.81 or later
    ```asm
    ; Definition
    macro DefineMacro(param1, param2)
-       lda #<param1>
-       sta <param2>
+	   lda #<param1>
+	   sta <param2>
    endmacro
    
    ; Usage
@@ -517,7 +517,7 @@ asar --version  # Should show 1.81 or later
 # Use binary diff tool for detailed comparison
 # Example with WinMerge (if installed)
 "C:\Program Files\WinMerge\WinMergeU.exe" `
-    "roms\ffmq-original.sfc" "ffmq - onlygood.sfc"
+	"roms\ffmq-original.sfc" "ffmq - onlygood.sfc"
 ```
 
 ### Hex editor comparison
@@ -627,7 +627,7 @@ fc /b "roms\ffmq-original.sfc" "ffmq - onlygood.sfc" | Select-Object -First 20
 ; Option 2: Move to free space
 org $03f800  ; Free space in bank $03
 NewText:
-    db "Hello", $00
+	db "Hello", $00
 ; Update pointer to NewText
 ```
 
@@ -653,7 +653,7 @@ NewText:
 ; Use pad to ensure you don't exceed bank
 org $00f000  ; Start of new code
 NewRoutine:
-    ; code
+	; code
 pad $010000  ; Ensure we don't exceed bank boundary
 ```
 

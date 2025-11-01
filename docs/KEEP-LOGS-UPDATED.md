@@ -1,4 +1,4 @@
-﻿# Keep Chat Logs Updated - Always!
+# Keep Chat Logs Updated - Always!
 
 **Important:** Chat logs should be updated **ALL THE TIME**, not just on commits!
 
@@ -174,7 +174,7 @@ Add to your workflow:
 # Add to your PowerShell profile
 # Every time you open a terminal, it reminds you
 if (Test-Path ".\update.ps1") {
-    Write-Host "💡 Remember to log your changes with: .\update.ps1" -ForegroundColor Yellow
+	Write-Host "💡 Remember to log your changes with: .\update.ps1" -ForegroundColor Yellow
 }
 ```
 

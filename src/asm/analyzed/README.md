@@ -1,4 +1,4 @@
-﻿# FFMQ Disassembly Analysis - Enhanced Code Documentation
+# FFMQ Disassembly Analysis - Enhanced Code Documentation
 
 This directory contains **analyzed and enhanced** versions of the Diztinguish disassembly with meaningful labels, detailed comments, and reverse-engineered documentation.
 
@@ -215,9 +215,9 @@ Labels and comments have varying confidence:
 Example:
 ```asm
 BootEntry:                          ; ✅ High - This is definitely the entry point
-    JSR.W InitializeHardware        ; ✅ High - Writes to SNES_INIDISP
-    JSL.L InitializeGameState       ; ⚠️ Medium - Seems to init state based on what it does
-    LDA.L $7e3667                   ; ❓ Low - Don't know exact purpose yet
+	JSR.W InitializeHardware        ; ✅ High - Writes to SNES_INIDISP
+	JSL.L InitializeGameState       ; ⚠️ Medium - Seems to init state based on what it does
+	LDA.L $7e3667                   ; ❓ Low - Don't know exact purpose yet
 ```
 
 ## Contributing Analysis
@@ -355,7 +355,7 @@ Additional areas needing analysis:
   New_Presses = Current_State AND NOT Previous_State
   This detects 0→1 button transitions
   Example: If A was not pressed last frame but is now
-          → New_Press.A = 1 (trigger action)
+		  → New_Press.A = 1 (trigger action)
   ```
 
 **Key Discoveries:**

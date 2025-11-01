@@ -1,4 +1,4 @@
-﻿# Build System Integration - Summary
+# Build System Integration - Summary
 
 ## What Was Accomplished
 
@@ -51,20 +51,20 @@ test              # Launch emulator
   "id": 42,
   "name": "Behemoth",
   "stats": {
-    "hp": 1500,
-    "attack": 80,
-    "defense": 60,
-    ...
+	"hp": 1500,
+	"attack": 80,
+	"defense": 60,
+	...
   },
   "resistances": {
-    "elements": {"fire": "resist"},
-    "status": ["poison", "sleep"]
+	"elements": {"fire": "resist"},
+	"status": ["poison", "sleep"]
   },
   "rewards": {
-    "exp": 250,
-    "gold": 150,
-    "drop_item": 42,
-    "drop_rate": 25
+	"exp": 250,
+	"gold": 150,
+	"drop_item": 42,
+	"drop_rate": 25
   }
 }
 ```
@@ -151,15 +151,15 @@ ffmq-info/
 │   └── BUILD_SYSTEM.md        # Complete documentation
 │
 └── (Future directories created by build system)
-    ├── assets/                # EDITABLE extracted data
-    │   ├── graphics/          # PNG files
-    │   ├── text/              # Text files
-    │   ├── data/              # JSON/CSV files
-    │   └── palettes/          # Palette files
-    └── build/
-        ├── extracted/         # Raw extracted data
-        ├── converted/         # Converted SNES data
-        └── ffmq-modified.sfc  # Built ROM
+	├── assets/                # EDITABLE extracted data
+	│   ├── graphics/          # PNG files
+	│   ├── text/              # Text files
+	│   ├── data/              # JSON/CSV files
+	│   └── palettes/          # Palette files
+	└── build/
+		├── extracted/         # Raw extracted data
+		├── converted/         # Converted SNES data
+		└── ffmq-modified.sfc  # Built ROM
 ```
 
 ---

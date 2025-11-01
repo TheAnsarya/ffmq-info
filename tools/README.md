@@ -1,4 +1,4 @@
-﻿# FFMQ Disassembly Tools
+# FFMQ Disassembly Tools
 
 This directory contains automation tools for the FFMQ disassembly project.
 
@@ -296,16 +296,16 @@ $7e0040,player_x_pos,RAM,Player X position (word)
 ```json
 {
   "metadata": {
-    "project": "FFMQ Disassembly",
-    "version": "1.0"
+	"project": "FFMQ Disassembly",
+	"version": "1.0"
   },
   "mappings": [
-    {
-      "address": "$40",
-      "label": "player_x_pos_lo",
-      "type": "RAM",
-      "comment": "Player X position (low byte)"
-    }
+	{
+	  "address": "$40",
+	  "label": "player_x_pos_lo",
+	  "type": "RAM",
+	  "comment": "Player X position (low byte)"
+	}
   ]
 }
 ```
@@ -390,9 +390,9 @@ The tool recognizes labels in the following 65816 instructions:
 
 ```powershell
 .\apply_labels.ps1 `
-    -InputFile example_labels.csv `
-    -SourceFiles "src/asm/bank_00.asm" `
-    -DryRun
+	-InputFile example_labels.csv `
+	-SourceFiles "src/asm/bank_00.asm" `
+	-DryRun
 ```
 
 **Output:**
@@ -425,9 +425,9 @@ The tool recognizes labels in the following 65816 instructions:
 
 ```powershell
 .\apply_labels.ps1 `
-    -InputFile example_labels.json `
-    -SourceFiles "src/asm/bank_00.asm","src/asm/bank_01.asm" `
-    -Verify
+	-InputFile example_labels.json `
+	-SourceFiles "src/asm/bank_00.asm","src/asm/bank_01.asm" `
+	-Verify
 ```
 
 **Output:**
@@ -478,10 +478,10 @@ The tool recognizes labels in the following 65816 instructions:
 ```powershell
 # Process all assembly files in src/asm/
 .\apply_labels.ps1 `
-    -InputFile labels_batch1.csv `
-    -SourceFiles "src/asm/*.asm" `
-    -Verify `
-    -Verbose
+	-InputFile labels_batch1.csv `
+	-SourceFiles "src/asm/*.asm" `
+	-Verify `
+	-Verbose
 ```
 
 ### Workflow

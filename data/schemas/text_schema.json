@@ -6,169 +6,169 @@
   "type": "object",
   "required": ["version", "encoding_table", "text_entries"],
   "properties": {
-    "version": {
-      "type": "string",
-      "description": "Schema version",
-      "pattern": "^\\d+\\.\\d+\\.\\d+$"
-    },
-    "description": {
-      "type": "string",
-      "description": "Description of this data file"
-    },
-    "encoding_table": {
-      "$ref": "#/definitions/encoding_table"
-    },
-    "control_codes": {
-      "type": "object",
-      "description": "Control code definitions",
-      "additionalProperties": {
-        "type": "string",
-        "pattern": "^\\$[0-9A-F]{2}$"
-      }
-    },
-    "text_entries": {
-      "type": "array",
-      "description": "Array of all text entries",
-      "items": {
-        "$ref": "#/definitions/text_entry"
-      }
-    }
+	"version": {
+	  "type": "string",
+	  "description": "Schema version",
+	  "pattern": "^\\d+\\.\\d+\\.\\d+$"
+	},
+	"description": {
+	  "type": "string",
+	  "description": "Description of this data file"
+	},
+	"encoding_table": {
+	  "$ref": "#/definitions/encoding_table"
+	},
+	"control_codes": {
+	  "type": "object",
+	  "description": "Control code definitions",
+	  "additionalProperties": {
+		"type": "string",
+		"pattern": "^\\$[0-9A-F]{2}$"
+	  }
+	},
+	"text_entries": {
+	  "type": "array",
+	  "description": "Array of all text entries",
+	  "items": {
+		"$ref": "#/definitions/text_entry"
+	  }
+	}
   },
   "definitions": {
-    "encoding_table": {
-      "type": "object",
-      "description": "Character encoding table",
-      "properties": {
-        "type": {
-          "type": "string",
-          "description": "Encoding type",
-          "enum": ["DTE", "standard", "custom"]
-        },
-        "table_size": {
-          "type": "integer",
-          "description": "Number of character mappings",
-          "minimum": 0
-        },
-        "mappings": {
-          "type": "object",
-          "description": "Byte value to character mappings",
-          "additionalProperties": {
-            "type": "string"
-          }
-        },
-        "dte_pairs": {
-          "type": "object",
-          "description": "DTE (Dual-Tile Encoding) pairs",
-          "additionalProperties": {
-            "type": "string",
-            "pattern": "^.{2}$"
-          }
-        }
-      }
-    },
-    "text_entry": {
-      "type": "object",
-      "required": ["text_id", "type"],
-      "properties": {
-        "text_id": {
-          "type": "integer",
-          "description": "Unique text entry ID",
-          "minimum": 0
-        },
-        "type": {
-          "type": "string",
-          "description": "Text entry type",
-          "enum": [
-            "dialog", "menu", "battle", "system",
-            "item_description", "spell_description",
-            "cutscene", "credits"
-          ]
-        },
-        "bank": {
-          "type": "string",
-          "description": "ROM bank",
-          "pattern": "^\\$[0-9A-F]{2}$"
-        },
-        "address": {
-          "type": "string",
-          "description": "ROM address",
-          "pattern": "^\\$[0-9A-F]{6}$"
-        },
-        "offset": {
-          "type": "integer",
-          "description": "Offset within bank",
-          "minimum": 0
-        },
-        "speaker": {
-          "type": "string",
-          "description": "Character speaking (for dialog)"
-        },
-        "text": {
-          "type": "string",
-          "description": "Decoded text content"
-        },
-        "raw_bytes": {
-          "type": "array",
-          "description": "Raw byte values",
-          "items": {
-            "type": "integer",
-            "minimum": 0,
-            "maximum": 255
-          }
-        },
-        "compressed": {
-          "type": "boolean",
-          "description": "Is text compressed"
-        },
-        "compression_method": {
-          "type": "string",
-          "description": "Compression method used",
-          "enum": ["none", "DTE", "LZ77", "RLE", "custom"]
-        },
-        "control_codes_used": {
-          "type": "array",
-          "description": "Control codes in this text",
-          "items": {
-            "type": "object",
-            "properties": {
-              "code": {
-                "type": "string",
-                "description": "Control code name"
-              },
-              "value": {
-                "type": "string",
-                "description": "Byte value",
-                "pattern": "^\\$[0-9A-F]{2}$"
-              },
-              "position": {
-                "type": "integer",
-                "description": "Position in text",
-                "minimum": 0
-              }
-            }
-          }
-        },
-        "length_bytes": {
-          "type": "integer",
-          "description": "Length in bytes",
-          "minimum": 0
-        },
-        "length_decoded": {
-          "type": "integer",
-          "description": "Decoded text length",
-          "minimum": 0
-        },
-        "pages": {
-          "type": "integer",
-          "description": "Number of text pages/windows",
-          "minimum": 1
-        },
-        "window_type": {
-          "type": "string",
-          "description": "Text window type",
-          "enum": ["dialog", "menu", "battle", "choice", "system"]
-        }
-      }
-    }
+	"encoding_table": {
+	  "type": "object",
+	  "description": "Character encoding table",
+	  "properties": {
+		"type": {
+		  "type": "string",
+		  "description": "Encoding type",
+		  "enum": ["DTE", "standard", "custom"]
+		},
+		"table_size": {
+		  "type": "integer",
+		  "description": "Number of character mappings",
+		  "minimum": 0
+		},
+		"mappings": {
+		  "type": "object",
+		  "description": "Byte value to character mappings",
+		  "additionalProperties": {
+			"type": "string"
+		  }
+		},
+		"dte_pairs": {
+		  "type": "object",
+		  "description": "DTE (Dual-Tile Encoding) pairs",
+		  "additionalProperties": {
+			"type": "string",
+			"pattern": "^.{2}$"
+		  }
+		}
+	  }
+	},
+	"text_entry": {
+	  "type": "object",
+	  "required": ["text_id", "type"],
+	  "properties": {
+		"text_id": {
+		  "type": "integer",
+		  "description": "Unique text entry ID",
+		  "minimum": 0
+		},
+		"type": {
+		  "type": "string",
+		  "description": "Text entry type",
+		  "enum": [
+			"dialog", "menu", "battle", "system",
+			"item_description", "spell_description",
+			"cutscene", "credits"
+		  ]
+		},
+		"bank": {
+		  "type": "string",
+		  "description": "ROM bank",
+		  "pattern": "^\\$[0-9A-F]{2}$"
+		},
+		"address": {
+		  "type": "string",
+		  "description": "ROM address",
+		  "pattern": "^\\$[0-9A-F]{6}$"
+		},
+		"offset": {
+		  "type": "integer",
+		  "description": "Offset within bank",
+		  "minimum": 0
+		},
+		"speaker": {
+		  "type": "string",
+		  "description": "Character speaking (for dialog)"
+		},
+		"text": {
+		  "type": "string",
+		  "description": "Decoded text content"
+		},
+		"raw_bytes": {
+		  "type": "array",
+		  "description": "Raw byte values",
+		  "items": {
+			"type": "integer",
+			"minimum": 0,
+			"maximum": 255
+		  }
+		},
+		"compressed": {
+		  "type": "boolean",
+		  "description": "Is text compressed"
+		},
+		"compression_method": {
+		  "type": "string",
+		  "description": "Compression method used",
+		  "enum": ["none", "DTE", "LZ77", "RLE", "custom"]
+		},
+		"control_codes_used": {
+		  "type": "array",
+		  "description": "Control codes in this text",
+		  "items": {
+			"type": "object",
+			"properties": {
+			  "code": {
+				"type": "string",
+				"description": "Control code name"
+			  },
+			  "value": {
+				"type": "string",
+				"description": "Byte value",
+				"pattern": "^\\$[0-9A-F]{2}$"
+			  },
+			  "position": {
+				"type": "integer",
+				"description": "Position in text",
+				"minimum": 0
+			  }
+			}
+		  }
+		},
+		"length_bytes": {
+		  "type": "integer",
+		  "description": "Length in bytes",
+		  "minimum": 0
+		},
+		"length_decoded": {
+		  "type": "integer",
+		  "description": "Decoded text length",
+		  "minimum": 0
+		},
+		"pages": {
+		  "type": "integer",
+		  "description": "Number of text pages/windows",
+		  "minimum": 1
+		},
+		"window_type": {
+		  "type": "string",
+		  "description": "Text window type",
+		  "enum": ["dialog", "menu", "battle", "choice", "system"]
+		}
+	  }
+	}
   }
 }
