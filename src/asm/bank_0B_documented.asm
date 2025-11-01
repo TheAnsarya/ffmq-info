@@ -210,43 +210,43 @@ BattleSprite_AnimationExit:
 ;   - Called during battle initialization
 ;   - Pointer format: 24-bit address (bank:address)
 
-CODE_0B8000:
+BattleGfx_SetupByType:
 	LDA.W $0E8B					; Load battle type index
-	BEQ CODE_0B8017				; Type 0: Branch to first handler
+	BEQ BattleGfx_Type0			; Type 0: Branch to first handler
 	DEC A						; Decrement for type comparison
-	BEQ CODE_0B8023				; Type 1: Branch to second handler
+	BEQ BattleGfx_Type1			; Type 1: Branch to second handler
 	DEC A						; Decrement again
-	BEQ CODE_0B802F				; Type 2: Branch to third handler
+	BEQ BattleGfx_Type2			; Type 2: Branch to third handler
 
 	; Type 3 handler
 	LDA.B #$4A					; Graphics address low byte
 	STA.W $0507					; Store to pointer low
 	LDA.B #$1B					; Graphics address high byte
 	STA.W $0506					; Store to pointer high
-	BRA CODE_0B8039				; Jump to common bank setup
+	BRA BattleGfx_CommonSetup	; Jump to common bank setup
 
-CODE_0B8017:  ; Type 0 handler
+BattleGfx_Type0:  ; Type 0 handler
 	LDA.B #$A1					; Graphics address low byte
 	STA.W $0507					; Store to pointer low
 	LDA.B #$1F					; Graphics address high byte
 	STA.W $0506					; Store to pointer high
-	BRA CODE_0B8039				; Jump to common bank setup
+	BRA BattleGfx_CommonSetup	; Jump to common bank setup
 
-CODE_0B8023:  ; Type 1 handler
+BattleGfx_Type1:  ; Type 1 handler
 	LDA.B #$B6					; Graphics address low byte
 	STA.W $0507					; Store to pointer low
 	LDA.B #$1B					; Graphics address high byte
 	STA.W $0506					; Store to pointer high
-	BRA CODE_0B8039				; Jump to common bank setup
+	BRA BattleGfx_CommonSetup	; Jump to common bank setup
 
-CODE_0B802F:  ; Type 2 handler
+BattleGfx_Type2:  ; Type 2 handler
 	LDA.B #$5F					; Graphics address low byte
 	STA.W $0507					; Store to pointer low
 	LDA.B #$1F					; Graphics address high byte
 	STA.W $0506					; Store to pointer high
-	; Fall through to CODE_0B8039
+	; Fall through to BattleGfx_CommonSetup
 
-CODE_0B8039:  ; Common bank setup
+BattleGfx_CommonSetup:  ; Common bank setup
 	LDA.B #$0A					; Bank $0A (graphics data bank)
 	STA.W $0505					; Store to pointer bank byte
 	RTL							; Return to caller (long return)
@@ -316,7 +316,7 @@ CODE_0B8039:  ; Common bank setup
 	PLX							; Restore sprite index
 	JSL.L CODE_01AE86			; Call sprite rendering (Bank $01)
 
-CODE_0B8077:  ; OAM Data Update Routine
+BattleSprite_UpdateOAM:  ; OAM Data Update Routine
 	REP #$30					; Set A/X/Y to 16-bit mode
 	LDA.W $192D					; Load OAM slot index
 	AND.W #$00FF				; Mask to 8-bit value
@@ -338,7 +338,7 @@ CODE_0B8077:  ; OAM Data Update Routine
 	LDA.W $1A79,X				; Load sprite attributes
 	STA.W $0C0E,Y				; Store to OAM attributes
 
-CODE_0B80A1:  ; Exit routine
+BattleSprite_AnimationExit:  ; Exit routine
 	PLY							; Restore Y register
 	PLX							; Restore X register
 	PLB							; Restore data bank
@@ -615,19 +615,19 @@ BattleInit_CopyEnemyStats:  ; Copy enemy data loop (7 bytes)
 
 	LDY.W #$0000				; Y = destination index
 
-CODE_0B81E1:  ; Copy extended enemy data (10 bytes)
+BattleInit_CopyEnemyExtendedData:  ; Copy extended enemy data (10 bytes)
 	LDA.L DATA8_0B8CD9,X		; Load data from Bank $0B table
 	STA.W $1918,Y				; Store to battle RAM at $1918+Y
 	INX							; Increment source
 	INY							; Increment destination
 	CPY.W #$000A				; Copied 10 bytes?
-	BNE CODE_0B81E1				; Loop until 10 bytes copied
+	BNE BattleInit_CopyEnemyExtendedData	; Loop until 10 bytes copied
 
 	; Enemy graphics pointer setup
 	LDX.W #$FFFF				; Default = no graphics ($FFFF)
 	LDA.W $1912					; Load enemy graphics ID
 	CMP.B #$FF					; Check if no graphics
-	BEQ CODE_0B8207				; Skip graphics load if $FF
+	BEQ BattleInit_SetupEnemyPalette	; Skip graphics load if $FF
 	REP #$20					; Set A to 16-bit mode
 	AND.W #$00FF				; Mask to 8-bit value
 	ASL A						; Multiply by 2 (word table)
@@ -636,7 +636,7 @@ CODE_0B81E1:  ; Copy extended enemy data (10 bytes)
 	TAX							; Transfer to X (pointer value)
 	SEP #$20					; Set A to 8-bit mode
 
-CODE_0B8207:
+BattleInit_SetupEnemyPalette:
 	STX.W $19B9					; Store enemy graphics pointer
 
 	; Extract palette bits from enemy attributes
@@ -1040,10 +1040,10 @@ DATA8_0B83B2:
 ;   $1919 (enemy ID) × 128 bytes ($80) = offset in Bank $05
 ;   Source: Bank$05:$8000 + offset → Dest: $7F:$C588
 
-CODE_0B83B8:
+EnemyGfx_CopySpriteData:
 	LDA.W $1919					; Load enemy sprite ID
 	CMP.B #$19					; Check if special enemy (ID $19)
-	BEQ CODE_0B83DF				; Branch to special case
+	BEQ EnemyGfx_Special19		; Branch to special case
 
 	; Standard enemy graphics transfer
 	STA.W $4202					; Store ID to multiply register A
@@ -1062,7 +1062,7 @@ CODE_0B83B8:
 	SEP #$20					; Set A to 8-bit
 	RTL							; Return
 
-CODE_0B83DF:  ; Special enemy $19 handler
+EnemyGfx_Special19:  ; Special enemy $19 handler
 	REP #$20					; Set A to 16-bit
 	LDX.W #$D984				; Source address in Bank $07
 	LDY.W #$C588				; Dest address in WRAM
@@ -1074,7 +1074,7 @@ CODE_0B83DF:  ; Special enemy $19 handler
 	RTL							; Return
 
 ; -----------------------------------------------------------------------------
-; CODE_0B83F2: Battle Background Tile Data Transfer
+; Battle Background Tile Data Transfer
 ; -----------------------------------------------------------------------------
 ; Purpose: Copy 3 sets of 16 bytes each from Bank $07 to WRAM battle buffers
 ; Destination addresses suggest background tile patterns for layered rendering
@@ -1084,7 +1084,7 @@ CODE_0B83DF:  ; Special enemy $19 handler
 ;   2. Bank$07:D824 (16 bytes) → $7F:C4F8
 ;   3. Bank$07:D834 (16 bytes) → $7F:C548
 
-CODE_0B83F2:
+BattleBG_CopyTileData:
 	PHB							; Save data bank
 	REP #$20					; Set A to 16-bit
 
@@ -1126,7 +1126,7 @@ CODE_0B83F2:
 ;
 ; Battle layer configuration loaded from $1A4D-$1A51 (set by earlier routines)
 
-CODE_0B841D:
+BattlePPU_ConfigureRegisters:
 	LDA.B #$41					; BG1 map = $4100, size 32×32 tiles
 	STA.W $2107					; Write to BG1 tilemap register
 
@@ -1147,14 +1147,14 @@ CODE_0B841D:
 	LDA.W $19CB					; Load battle mode flags
 	AND.B #$70					; Check bits 4-6
 	CMP.B #$70					; All three bits set?
-	BNE CODE_0B844A				; Skip if not
+	BNE BattlePPU_WriteColorMath	; Skip if not
 
 	; Mode $70: Enable additional blending bit
 	TYA							; Transfer config to A
 	ORA.B #$10					; Set bit 4 (enable fixed color addition?)
 	TAY							; Transfer back to Y
 
-CODE_0B844A:
+BattlePPU_WriteColorMath:
 	TYA							; Transfer final config to A
 	STA.W $2131					; Write to color math mode register
 	RTL							; Return
@@ -1248,7 +1248,7 @@ DATA8_0B84E2:
 ;   4. Multiply by 3, lookup in DATA8_0B8735 table
 ;   5. Setup DMA parameters for graphics transfer
 
-CODE_0B84FB:
+BattleEnemy_SetupTileData:
 	REP #$20					; Set A to 16-bit
 	LDA.W $1918					; Load enemy graphics flags
 	AND.W #$00F0				; Mask bits 4-7 (graphics mode)
@@ -1279,7 +1279,7 @@ CODE_0B84FB:
 	LDA.L DATA8_0B8737,X		; Load source bank from table
 	STA.W $0902					; Store to DMA source bank
 
-	JSL.L CODE_0B8669			; Call graphics loading routine
+	JSL.L BattleGfx_DecompressLoad	; Call graphics loading routine
 	RTL							; Return
 
 ; Tile stride lookup table (16 entries × 2 bytes)
@@ -1296,7 +1296,7 @@ UNREACH_0B8540:
 ; Input: $1A4C = Layer type index (0-7)
 ; Method: Indirect JSR through table DATA8_0B856C
 
-CODE_0B8560:
+BattleLayer_TypeDispatcher:
 	LDA.B #$00					; Clear A high byte
 	XBA							; Prepare for 16-bit index
 	LDA.W $1A4C					; Load layer type
@@ -1342,11 +1342,11 @@ DATA8_0B856C:
 	LDX.W #$F37C				; Music pointer 3 (fallback)
 	LDA.B #$01					; Music bank 1
 	JSL.L CODE_009776			; Attempt to load music
-	BNE CODE_0B85A9				; Skip if loaded
+	BNE BattleGfx_SetupDMATransfer	; Skip if loaded
 
 	LDX.W #$F240				; Music pointer 4 (final fallback)
 
-CODE_0B85A9:
+BattleGfx_SetupDMATransfer:
 	; Setup DMA for graphics transfer
 	STX.W $0900					; Store music/graphics source
 	LDA.B #$07					; Source bank 7
@@ -1354,9 +1354,9 @@ CODE_0B85A9:
 	LDX.W #$7F90				; Dest = WRAM $7F:90xx
 	STX.W $0904					; Store to DMA dest pointer
 	STZ.W $0903					; Clear dest low byte
-	JSL.L CODE_0B86EA			; Call graphics decompression
+	JSL.L BattleGfx_DecompressToWRAM	; Call graphics decompression
 
-CODE_0B85BE:
+BattleLayer_TypeHandlerReturn:
 	RTS							; Return to dispatcher
 
 ; =============================================================================
@@ -1455,7 +1455,7 @@ DATA8_0B865B:
 ; Uses: Direct page relocation to $0900 for efficient parameter access
 ;       MVN instruction to copy routine code to $0918 for local execution
 
-CODE_0B8669:
+BattleGfx_DecompressLoad:
 	PHP							; Save processor status
 	PHD							; Save direct page register
 	PHB							; Save data bank
@@ -1492,16 +1492,16 @@ CODE_0B8669:
 	LDY.B $03					; Load dest address from DP+$03 ($0903)
 	STZ.B $0D					; Clear DP+$0D ($090D) = control flags
 
-CODE_0B869C:  ; Decompression main loop
+BattleGfx_DecompressMainLoop:  ; Decompression main loop
 	SEP #$20					; Set A to 8-bit
 	LDA.W $0000,X				; Load control byte from source
-	BEQ CODE_0B86DA				; Exit if $00 (end marker)
+	BEQ BattleGfx_DecompressExit	; Exit if $00 (end marker)
 	INX							; Increment source pointer
 
 	REP #$20					; Set A to 16-bit
 	PHA							; Save control byte
 	AND.W #$000F				; Mask lower nibble (repeat count)
-	BEQ CODE_0B86B6				; Skip repeat if 0
+	BEQ BattleGfx_DecompressCopyCmd	; Skip repeat if 0
 
 	; Repeat command: Fill (A) bytes with next byte value
 	PHX							; Save source pointer
@@ -1511,10 +1511,10 @@ CODE_0B869C:  ; Decompression main loop
 	STX.B $06					; Update end address
 	PLX							; Restore source pointer
 
-CODE_0B86B6:
+BattleGfx_DecompressCopyCmd:
 	PLA							; Restore control byte
 	AND.W #$00F0				; Mask upper nibble (copy count)
-	BEQ CODE_0B869C				; Loop if no copy command
+	BEQ BattleGfx_DecompressMainLoop	; Loop if no copy command
 
 	; Copy command: Copy (A >> 4) + 1 bytes from source
 	LSR A						; Shift right 4 times (divide by 16)
@@ -1538,9 +1538,9 @@ CODE_0B86B6:
 	INC A						; Increment (copy count+1 bytes)
 	JSR.W $091E					; Call copy subroutine
 	PLX							; Restore source pointer
-	BRA CODE_0B869C				; Loop to next command
+	BRA BattleGfx_DecompressMainLoop	; Loop to next command
 
-CODE_0B86DA:  ; Exit decompression
+BattleGfx_DecompressExit:  ; Exit decompression
 	PLB							; Restore data bank
 	PLD							; Restore direct page
 	PLP							; Restore processor status
@@ -1573,7 +1573,7 @@ CODE_0B86DA:  ; Exit decompression
 ;       Next byte = skip count
 ;       Fill (repeat_count) bytes with value at (current_pos - skip)
 
-CODE_0B86EA:
+BattleGfx_DecompressToWRAM:
 	PHP							; Save processor status
 	PHB							; Save data bank
 	PHD							; Save direct page
@@ -1600,9 +1600,9 @@ CODE_0B86EA:
 	INX							; Skip size bytes
 	INX
 
-CODE_0B870D:  ; Upload loop
+BattleGfx_WRAMUploadLoop:  ; Upload loop
 	LDA.W $0000,X				; Load control byte
-	BPL CODE_0B872B				; Branch if $00-$7F (direct copy)
+	BPL BattleGfx_WRAMDirectCopy	; Branch if $00-$7F (direct copy)
 
 	; RLE decompression mode ($80-$FF)
 	INX							; Increment source
@@ -1620,20 +1620,20 @@ CODE_0B870D:  ; Upload loop
 	PLA							; Restore control byte
 	AND.B #$7F					; Mask to repeat count (bits 0-6)
 
-CODE_0B8723:  ; Repeat fill loop
+BattleGfx_WRAMRepeatFill:  ; Repeat fill loop
 	STA.B SNES_WMDATA-$2100		; Write byte to WRAM ($2180)
 	DEY							; Decrement repeat counter
-	BNE CODE_0B8723				; Loop until done
+	BNE BattleGfx_WRAMRepeatFill	; Loop until done
 	PLY							; Restore remaining bytes count
-	BRA CODE_0B872D				; Continue
+	BRA BattleGfx_WRAMContinue	; Continue
 
-CODE_0B872B:  ; Direct copy mode
+BattleGfx_WRAMDirectCopy:  ; Direct copy mode
 	STA.B SNES_WMDATA-$2100		; Write byte directly to WRAM
 
-CODE_0B872D:
+BattleGfx_WRAMContinue:
 	INX							; Increment source
 	DEY							; Decrement remaining count
-	BNE CODE_0B870D				; Loop until all bytes written
+	BNE BattleGfx_WRAMUploadLoop	; Loop until all bytes written
 
 	PLD							; Restore direct page
 	PLB							; Restore data bank
@@ -1711,7 +1711,7 @@ DATA8_0B8737:
 ;   $0E03-$0E1E: Extended OAM data (sprite size/position bits)
 ;     Format: 2 bits per sprite (bit 0 = X hi, bit 1 = size)
 
-CODE_0B87B9:
+BattleOAM_ClearBuffers:
 	PHP							; Save processor status
 	PHB							; Save data bank
 	REP #$30					; Set A/X/Y to 16-bit
@@ -2089,13 +2089,13 @@ DATA8_0B8CD9:
 ; Called during V-blank to refresh battle graphics
 ; Uses: Direct page optimization, WRAM animation counters
 
-CODE_0B8E91:
+BattleAnim_StateHandler:
 	PHB							; Save data bank
 	PHK							; Push program bank ($0B)
 	PLB							; Set data bank = $0B
 
 	LDA.B $F8					; Load animation enable flag (DP)
-	BEQ CODE_0B8F01				; Skip if animations disabled
+	BEQ BattleAnim_Disabled		; Skip if animations disabled
 
 	; Update animation frame counter
 	LDX.B $DE					; Load animation index (DP)
@@ -2106,7 +2106,7 @@ CODE_0B8E91:
 	; Check for special animation mode
 	LDA.W $1021					; Load battle mode flags
 	BIT.B #$40					; Check bit 6 (special mode?)
-	BNE CODE_0B8EC0				; Skip transfer if set
+	BNE BattleAnim_SkipTransfer	; Skip transfer if set
 
 	; Transfer background tile data
 	REP #$30					; Set A/X/Y to 16-bit
@@ -2122,13 +2122,12 @@ CODE_0B8E91:
 	PLA							; Restore flags
 	SEP #$30					; Set A/X/Y to 8-bit
 
-CODE_0B8EC0:
-	JSR.W CODE_0B8F27			; Call animation update subroutine
+BattleAnim_SkipTransfer:
+	JSR.W BattleAnim_BitScanRoutine	; Call animation update subroutine
 	CMP.B $F4					; Compare with threshold (DP)
 	; [Routine continues beyond this read section]
 
-CODE_0B8F01:  ; Animation disabled path
-	; [Code continues...]
+; Fall through to BattleAnim_Disabled (already defined earlier)
 
 ; =============================================================================
 ; Bank $0B Cycle 3 Summary
@@ -2196,46 +2195,46 @@ CODE_0B8F01:  ; Animation disabled path
 ; Focus: Frame-based animation, OAM updates, sprite positioning
 ; =============================================================================
 
-; Continuation of CODE_0B8E91 from Cycle 3...
+; Continuation of BattleAnim_StateHandler from Cycle 3...
 
-CODE_0B8EC3:  ; Animation comparison/update path
+BattleAnim_CompareAndUpdate:  ; Animation comparison/update path
 	CMP.B $F4					; Compare animation frame with cached value (DP)
-	BEQ CODE_0B8ED2				; Skip update if unchanged
+	BEQ BattleAnim_FrameUnchanged	; Skip update if unchanged
 
 	; Animation frame changed - trigger update
 	STA.B $F4					; Store new cached frame value
 	PEA.W DATA8_0B8F15			; Push animation table pointer (changed state)
 	JSL.L CODE_0097BE			; Call animation dispatcher (Bank $00)
-	BRA CODE_0B8ED9				; Jump to next section
+	BRA BattleAnim_UpdateSecondary	; Jump to next section
 
-CODE_0B8ED2:  ; Animation frame unchanged path
+BattleAnim_FrameUnchanged:  ; Animation frame unchanged path
 	PEA.W DATA8_0B8F03			; Push animation table pointer (same state)
 	JSL.L CODE_0097BE			; Call animation dispatcher
-	; Fall through to CODE_0B8ED9
+	; Fall through to BattleAnim_UpdateSecondary
 
-CODE_0B8ED9:  ; Secondary animation counter update
+BattleAnim_UpdateSecondary:  ; Secondary animation counter update
 	LDX.W $0ADF					; Load secondary animation index
 	LDA.L $7EC360,X				; Load frame counter from WRAM
 	INC A						; Increment frame
 	STA.L $7EC360,X				; Store updated frame
 
 	LDA.W $10A1					; Load battle mode flags
-	JSR.W CODE_0B8F27			; Call bit scan routine (find first set bit)
+	JSR.W BattleAnim_BitScanRoutine	; Call bit scan routine (find first set bit)
 	CMP.B $F5					; Compare with cached value (DP)
-	BEQ CODE_0B8EFA				; Skip if unchanged
+	BEQ BattleAnim_SecondaryUnchanged	; Skip if unchanged
 
 	; Secondary animation changed
 	STA.B $F5					; Store new cached value
 	PEA.W DATA8_0B8F15			; Push changed-state table
 	JSL.L CODE_0097BE			; Call dispatcher
-	BRA CODE_0B8F01				; Exit
+	BRA BattleAnim_Disabled		; Exit
 
-CODE_0B8EFA:  ; Secondary animation unchanged
+BattleAnim_SecondaryUnchanged:  ; Secondary animation unchanged
 	PEA.W DATA8_0B8F03			; Push same-state table
 	JSL.L CODE_0097BE			; Call dispatcher
 	; Fall through to exit
 
-CODE_0B8F01:
+BattleAnim_Disabled:
 	PLB							; Restore data bank
 	RTL							; Return to caller
 
@@ -2268,7 +2267,7 @@ DATA8_0B8F15:  ; Changed-state animation handlers
 	db $B1,$92					; Handler 8: $0B92B1
 
 ; -----------------------------------------------------------------------------
-; CODE_0B8F27: Bit Scan Forward
+; BattleAnim_BitScanRoutine: Bit Scan Forward
 ; -----------------------------------------------------------------------------
 ; Purpose: Find position of first set bit in byte (1-8, or 0 if none)
 ; Input: A = byte to scan
@@ -2277,17 +2276,17 @@ DATA8_0B8F15:  ; Changed-state animation handlers
 ;
 ; Example: A=$08 (00001000) → Y=4 (bit 3 is first set, counting from right)
 
-CODE_0B8F27:
+BattleAnim_BitScanRoutine:
 	PHY							; Save Y register
 	LDY.B #$08					; Y = 8 (max bits to scan)
 
-CODE_0B8F2A:  ; Scan loop
+BattleAnim_BitScanLoop:  ; Scan loop
 	ASL A						; Shift left, bit 7 → carry
-	BCS CODE_0B8F30				; Exit if carry set (found bit)
+	BCS BattleAnim_BitFound		; Exit if carry set (found bit)
 	DEY							; Decrement bit counter
-	BNE CODE_0B8F2A				; Loop if more bits to check
+	BNE BattleAnim_BitScanLoop	; Loop if more bits to check
 
-CODE_0B8F30:
+BattleAnim_BitFound:
 	TYA							; Transfer bit position to A
 	PLY							; Restore Y register
 	RTS							; Return (A = bit position)
@@ -2302,12 +2301,12 @@ CODE_0B8F30:
 ; Entry at $0B8F33
 	LDA.B #$00					; Sprite state = 0 (inactive/default)
 	STA.L $7EC400,X				; Store to WRAM sprite state
-	JSR.W CODE_0B9304			; Calculate sprite OAM positions
+	JSR.W BattleSprite_CalculateOAMPositions	; Calculate sprite OAM positions
 	CPX.B #$00					; Check if sprite index = 0
-	BEQ CODE_0B8F44				; Skip setup if index 0
+	BEQ BattleAnim_SetStateFlag	; Skip setup if index 0
 	JSL.L CODE_0B935F			; Call extended sprite setup
 
-CODE_0B8F44:
+BattleAnim_SetStateFlag:
 	LDA.B #$80					; Set flag $80
 	STA.W $0AE5					; Store to battle state flags
 	RTS							; Return
@@ -2378,18 +2377,18 @@ CODE_0B8F44:
 	PHA							; Save it
 
 	LDA.L $7EC360,X				; Load frame counter again
-	BEQ CODE_0B8FBB				; Branch if frame 0
+	BEQ BattleAnim_Frame0		; Branch if frame 0
 	CMP.B #$40					; Check if frame = $40
-	BEQ CODE_0B8FD5				; Branch if frame $40
+	BEQ BattleAnim_Frame40_C0	; Branch if frame $40
 	CMP.B #$80					; Check if frame = $80
-	BEQ CODE_0B8FC5				; Branch if frame $80
+	BEQ BattleAnim_Frame80		; Branch if frame $80
 	CMP.B #$C0					; Check if frame = $C0
-	BEQ CODE_0B8FD5				; Branch if frame $C0
+	BEQ BattleAnim_Frame40_C0	; Branch if frame $C0
 
 	PLA							; Restore saved byte
 	db $2B,$FA,$60				; Restore DP/X, return
 
-CODE_0B8FBB:  ; Frame 0: Move sprite left
+BattleAnim_Frame0:  ; Frame 0: Move sprite left
 	PLA							; Restore OAM data
 	db $BB,$38,$E9,$03			; Restore stack, subtract 3 from position
 	db $95,$02,$95,$0A,$1A,$95,$06	; Store to X positions
@@ -2399,7 +2398,7 @@ CODE_0B8FBB:  ; Frame 0: Move sprite left
 	db $B5,$0F,$29,$3F,$95,$0F	; Repeat for second sprite
 	db $80,$E3					; Branch back (BRA -29)
 
-CODE_0B8FC5:  ; Frame $80: Move sprite right
+BattleAnim_Frame80:  ; Frame $80: Move sprite right
 	PLA							; Restore OAM data
 	db $BB,$18,$69,$03			; Restore stack, add 3 to position
 	db $95,$02,$95,$0A,$1A,$95,$06	; Store to X positions
@@ -2409,7 +2408,7 @@ CODE_0B8FC5:  ; Frame $80: Move sprite right
 	db $B5,$0F,$29,$3F,$95,$0F	; Clear flip on second sprite
 	db $80,$C9					; Branch back (BRA -55)
 
-CODE_0B8FD5:  ; Frame $40/$C0: Alternate flip
+BattleAnim_Frame40_C0:  ; Frame $40/$C0: Alternate flip
 	; Similar to above but different flip pattern
 	db $68,$BB,$18,$69,$03		; Pop, restore, add 3
 	db $95,$02,$95,$0A,$1A,$95,$06
@@ -2423,8 +2422,8 @@ CODE_0B8FD5:  ; Frame $40/$C0: Alternate flip
 ; Purpose: Initialize 4-sprite vertical formation
 ; Positions sprites in vertical line with sequential tile IDs
 
-CODE_0B8FFA:
-	JSR.W CODE_0B9304			; Calculate OAM positions
+BattleAnim_VerticalSpriteSetup:
+	JSR.W BattleSprite_CalculateOAMPositions	; Calculate OAM positions
 	LDA.L $7EC480,X				; Load sprite base tile ID
 	SEC							; Set carry
 	SBC.B #$0C					; Subtract 12 (start 12 tiles back)
@@ -2446,7 +2445,7 @@ CODE_0B8FFA:
 ; Purpose: Sprite expansion animation starting from center
 ; Creates "growing" effect by adjusting sprite positions outward
 
-CODE_0B9015:
+BattleAnim_ExpandingSetup:
 	LDA.B #$00					; Clear animation counter
 	STA.L $7EC360,X				; Store to WRAM
 	LDA.B #$0E					; A high byte = $0E
@@ -2455,7 +2454,7 @@ CODE_0B9015:
 	CLC							; Clear carry
 	ADC.B #$09					; Add offset 9
 	JSL.L CODE_0B92D6			; Call position calculator
-	JSR.W CODE_0B9304			; Calculate OAM positions
+	JSR.W BattleSprite_CalculateOAMPositions	; Calculate OAM positions
 
 	; Setup expanding sprite positions
 	LDA.W $0C00,Y				; Load sprite 0 X position
@@ -2477,7 +2476,7 @@ CODE_0B9015:
 ; Purpose: 4-frame rotation animation for sprite
 ; Cycles through 4 tile patterns based on frame counter
 
-CODE_0B9046:
+BattleAnim_SpinningUpdate:
 	LDA.L $7EC260,X				; Load sprite slot index
 	ASL A						; Multiply by 4
 	ASL A
@@ -2501,7 +2500,7 @@ DATA8_0B905F:  ; Rotation frame handlers
 
 ; Frame handlers set sprite tile IDs for rotation effect:
 ; Frame 0: Tiles $B9, $D2
-CODE_0B9067:
+BattleAnim_SpinFrame0:
 	LDA.B #$B9					; Tile ID $B9
 	STA.W $0C12,Y				; Store to sprite slot
 	LDA.B #$D2					; Tile ID $D2
@@ -2509,7 +2508,7 @@ CODE_0B9067:
 	RTS
 
 ; Frame 1: Tiles $B9, $B9 (same tile both)
-CODE_0B9072:
+BattleAnim_SpinFrame1:
 	LDA.B #$B9
 	STA.W $0C12,Y
 	LDA.B #$B9
@@ -2517,7 +2516,7 @@ CODE_0B9072:
 	RTS
 
 ; Frame 2: Tiles $BA, $B9
-CODE_0B907D:
+BattleAnim_SpinFrame2:
 	LDA.B #$BA
 	STA.W $0C12,Y
 	LDA.B #$B9
@@ -2525,7 +2524,7 @@ CODE_0B907D:
 	RTS
 
 ; Frame 3: Tiles $D2, $BA
-CODE_0B9088:
+BattleAnim_SpinFrame3:
 	LDA.B #$D2
 	STA.W $0C12,Y
 	LDA.B #$BA
@@ -2538,7 +2537,7 @@ CODE_0B9088:
 ; Purpose: Initialize 8-sprite formation (2×4 grid)
 ; Complex positioning with vertical/horizontal offsets
 
-CODE_0B9093:
+BattleAnim_MultiSpriteSetup:
 	PHX							; Save X
 	PHY							; Save Y
 	PHP							; Save processor status
@@ -2548,7 +2547,7 @@ CODE_0B9093:
 	CLC							; Clear carry
 	ADC.B #$09					; Add offset
 	JSL.L CODE_0B92D6			; Calculate positions
-	JSR.W CODE_0B9304			; Setup OAM
+	JSR.W BattleSprite_CalculateOAMPositions	; Setup OAM
 
 	; Position calculations for 8-sprite grid
 	LDA.W $0C00,Y				; Load base X position
@@ -2596,7 +2595,7 @@ CODE_0B9093:
 ; -----------------------------------------------------------------------------
 ; Purpose: Cycle through 4 tile patterns for multi-sprite effect
 
-CODE_0B90F9:
+BattleAnim_4FrameTileCycle:
 	LDA.L $7EC260,X				; Load sprite slot
 	ASL A						; Multiply by 4
 	ASL A
@@ -2620,7 +2619,7 @@ DATA8_0B9113:  ; 4-frame tile pattern handlers
 	db $56,$91					; Frame 3: $0B9156
 
 ; Frame 0: Tiles $AB, $AC, $AD (sequential)
-CODE_0B911B:
+BattleAnim_TileFrame0:
 	LDA.B #$AB
 	STA.W $0C12,Y
 	INC A
@@ -2630,7 +2629,7 @@ CODE_0B911B:
 	RTS
 
 ; Frame 1: Mixed pattern $D2, $D2, $D2, $AE, $AF
-CODE_0B9129:
+BattleAnim_TileFrame1:
 	LDA.B #$D2
 	STA.W $0C12,Y
 	STA.W $0C16,Y
@@ -2642,7 +2641,7 @@ CODE_0B9129:
 	RTS
 
 ; Frame 2: Pattern $D2, $D2, $AD, $B0, $B1
-CODE_0B913E:
+BattleAnim_TileFrame2:
 	LDA.B #$D2
 	STA.W $0C1E,Y
 	STA.W $0C22,Y
@@ -2657,7 +2656,7 @@ CODE_0B913E:
 	RTS
 
 ; Frame 3: All $D2 tiles (blank/transition)
-CODE_0B9156:
+BattleAnim_TileFrame3:
 	LDA.B #$D2
 	STA.W $0C26,Y
 	STA.W $0C2A,Y
@@ -2669,7 +2668,7 @@ CODE_0B9156:
 ; -----------------------------------------------------------------------------
 ; Purpose: Setup attack animation with sprite positioning
 
-CODE_0B9162:
+BattleAnim_AttackSetup:
 	PHX							; Save X
 	PHY							; Save Y
 	LDA.B #$00					; Clear A
@@ -2680,7 +2679,7 @@ CODE_0B9162:
 	CLC							; Clear carry
 	ADC.B #$09					; Add offset
 	JSL.L CODE_0B92D6			; Calculate positions
-	JSR.W CODE_0B9304			; Setup OAM
+	JSR.W BattleSprite_CalculateOAMPositions	; Setup OAM
 
 	LDA.B #$04					; Sprite count = 4
 	STA.L $7EC400,X				; Store sprite state
@@ -2722,7 +2721,7 @@ CODE_0B9162:
 ; -----------------------------------------------------------------------------
 ; Purpose: 4-frame attack motion (thrust/retreat cycle)
 
-CODE_0B91B6:
+BattleAnim_AttackMotion:
 	LDA.L $7EC260,X				; Load sprite slot
 	ASL A						; Multiply by 4
 	ASL A
@@ -2746,26 +2745,26 @@ DATA8_0B91D0:  ; Attack motion frames
 	db $F5,$91					; Frame 3: Retreat
 
 ; Motion frames set tile patterns for thrust animation
-CODE_0B91D8:  ; Frame 0: Both $D2 (neutral)
+BattleAnim_AttackNeutral:  ; Frame 0: Both $D2 (neutral)
 	LDA.B #$D2
 	STA.W $0C12,Y
 	STA.W $0C16,Y
 	RTS
 
-CODE_0B91E1:  ; Frame 1: $B4, $D2 (forward start)
+BattleAnim_AttackForward:  ; Frame 1: $B4, $D2 (forward start)
 	LDA.B #$B4
 	STA.W $0C12,Y
 	LDA.B #$D2
 	STA.W $0C16,Y
 	RTS
 
-CODE_0B91EC:  ; Frame 2: Both $B4 (max forward)
+BattleAnim_AttackMaxForward:  ; Frame 2: Both $B4 (max forward)
 	LDA.B #$B4
 	STA.W $0C12,Y
 	STA.W $0C16,Y
 	RTS
 
-CODE_0B91F5:  ; Frame 3: $D2, $B4 (retreat)
+BattleAnim_AttackRetreat:  ; Frame 3: $D2, $B4 (retreat)
 	LDA.B #$D2
 	STA.W $0C12,Y
 	LDA.B #$B4
@@ -2777,8 +2776,8 @@ CODE_0B91F5:  ; Frame 3: $D2, $B4 (retreat)
 ; -----------------------------------------------------------------------------
 ; Purpose: Initialize 4-sprite wing animation
 
-CODE_0B9200:
-	JSR.W CODE_0B9304			; Calculate OAM positions
+BattleAnim_WingFlapSetup:
+	JSR.W BattleSprite_CalculateOAMPositions	; Calculate OAM positions
 	LDA.B #$04					; A high = $04
 	XBA							; Swap
 	LDA.L $7EC320,X				; Load sprite base
@@ -2829,7 +2828,7 @@ CODE_0B9200:
 ; -----------------------------------------------------------------------------
 ; Purpose: Animate wing positions with sinusoidal motion
 
-CODE_0B9259:
+BattleAnim_WingOscillation:
 	LDA.L $7EC260,X				; Load sprite slot
 	ASL A
 	ASL A
@@ -2837,7 +2836,7 @@ CODE_0B9259:
 
 	LDA.L $7EC360,X				; Load frame counter
 	AND.B #$01					; Check if odd/even frame
-	BEQ CODE_0B927F				; Branch if even
+	BEQ BattleAnim_WingsOutward	; Branch if even
 
 	; Odd frames: Wings move inward
 	LDA.W $0C10,Y				; Load left wing X
@@ -2853,7 +2852,7 @@ CODE_0B9259:
 	STA.W $0C1C,Y
 	RTS
 
-CODE_0B927F:  ; Even frames: Wings move outward
+BattleAnim_WingsOutward:  ; Even frames: Wings move outward
 	LDA.W $0C10,Y				; Load left wing X
 	; [Continues beyond this section...]
 

@@ -281,7 +281,10 @@ continue adding labels, more labels per batch, use temp files if you need to to 
 continue adding labels, as many as you can
 continue adding labels, as many as you can
 
-
+update the label progress table and then continue adding labels, as many as you can
+update the label progress table and then continue adding labels, as many as you can, focusing on bank $01
+continue adding labels, as many as you can, add more than last time, focusing on bank $01
+update the label progress table and then continue adding labels, as many as you can, add more than last time, focusing on bank $01
 
 
 

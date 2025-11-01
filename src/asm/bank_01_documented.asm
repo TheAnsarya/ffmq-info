@@ -420,11 +420,11 @@ Battle_MainLoop:
 	; Check for specific enemy (ID $15)
 	LDA.W $0E88                      ; Get enemy ID
 	CMP.B #$15                       ; Compare to $15
-	BNE CODE_0182A9                  ; If not, skip special handling
+	BNE Battle_MainTurnLoop          ; If not, skip special handling
 
 	JSL.L CODE_009A60                ; Special enemy initialization
 
-CODE_0182A9:
+Battle_MainTurnLoop:
 	; Battle turn loop
 	INC.W $19F7                      ; Increment turn counter
 	STZ.W $19F8                      ; Clear turn phase
@@ -434,24 +434,24 @@ CODE_0182A9:
 
 	; Check for special battle mode
 	LDA.W $19B0                      ; Get battle flags
-	BEQ CODE_0182BE                  ; If clear, skip
+	BEQ Battle_WaitTurnComplete      ; If clear, skip
 
 	JSL.L CODE_01B24C                ; Special battle processing
 
-CODE_0182BE:
+Battle_WaitTurnComplete:
 	; Wait for turn completion
 	LDA.W $19F8                      ; Get turn phase
-	BNE CODE_0182A9                  ; If not zero, continue turn
+	BNE Battle_MainTurnLoop          ; If not zero, continue turn
 
 	JSR.W CODE_01AB5D                ; Update actor states
 	JSR.W CODE_01A081                ; Process status effects
 
-CODE_0182C9:
+Battle_WaitVBlank:
 	; Wait for VBlank
 	LDA.W $19F7                      ; Get VBlank flag
-	BNE CODE_0182C9                  ; Wait until zero
+	BNE Battle_WaitVBlank            ; Wait until zero
 
-	BRA CODE_0182A9                  ; Next turn
+	BRA Battle_MainTurnLoop          ; Next turn
 
 ;===============================================================================
 ; Progress: Bank $01 Initial Documentation
@@ -967,7 +967,7 @@ CODE_018222:
 ; Complex sprite coordinate processing with boundary checks and multi-sprite handling
 ; ==============================================================================
 
-CODE_01A0E5:
+BattleSprite_CalculatePositionWithClipping:
                        SEC                                  ;01A0E5|38      |      ;
                        SBC.B $00                          ;01A0E6|E500    |001A62;
                        AND.W #$03FF                       ;01A0E8|29FF03  |      ;
@@ -981,17 +981,17 @@ CODE_01A0E5:
                        LDA.B $1E,X                        ;01A0F9|B51E    |001A80;
                        EOR.W $19B4                        ;01A0FB|4DB419  |0119B4;
                        BIT.B #$08                         ;01A0FE|8908    |      ;
-                       BEQ CODE_01A105                     ;01A100|F003    |01A105;
-                       JMP.W CODE_01A186                   ;01A102|4C86A1  |01A186;
+                       BEQ .VisibleCheck                   ;01A100|F003    |01A105;
+                       JMP.W BattleSprite_HideOffScreen    ;01A102|4C86A1  |01A186;
 
-CODE_01A105:
+.VisibleCheck:
                        LDA.B #$00                         ;01A105|A900    |      ;
                        XBA                                 ;01A107|EB      |      ;
                        LDA.B $19,X                        ;01A108|B519    |001A7B;
-                       BPL CODE_01A10F                     ;01A10A|1003    |01A10F;
+                       BPL .PositiveX                     ;01A10A|1003    |01A10F;
                        db $EB,$3A,$EB                   ;01A10C|        |      ;
 
-CODE_01A10F:
+.PositiveX:
                        REP #$20                           ;01A10F|C220    |      ;
                        CLC                                 ;01A111|18      |      ;
                        ADC.B $23,X                        ;01A112|7523    |001A85;
@@ -999,10 +999,10 @@ CODE_01A10F:
                        LDA.W #$0000                       ;01A116|A90000  |      ;
                        SEP #$20                           ;01A119|E220    |      ;
                        LDA.B $1A,X                        ;01A11B|B51A    |001A7C;
-                       BPL CODE_01A122                     ;01A11D|1003    |01A122;
+                       BPL .PositiveY                     ;01A11D|1003    |01A122;
                        db $EB,$3A,$EB                   ;01A11F|        |      ;
 
-CODE_01A122:
+.PositiveY:
                        REP #$20                           ;01A122|C220    |      ;
                        CLC                                 ;01A124|18      |      ;
                        ADC.B $25,X                        ;01A125|7525    |001A87;
@@ -1014,35 +1014,35 @@ CODE_01A122:
                        TAX                                 ;01A133|AA      |      ;
                        LDA.B $0C                          ;01A134|A50C    |001A6E;
                        CMP.W #$00E8                       ;01A136|C9E800  |      ;
-                       BCC CODE_01A140                     ;01A139|9005    |01A140;
+                       BCC BattleSprite_SetupMultiSpriteOAM ;01A139|9005    |01A140;
                        CMP.W #$03F8                       ;01A13B|C9F803  |      ;
-                       BCC CODE_01A191                     ;01A13E|9051    |01A191;
+                       BCC .HideSprite                    ;01A13E|9051    |01A191;
 
 ; ==============================================================================
 ; Multi-Sprite OAM Setup with Complex Boundary Testing
 ; Handles 4-sprite large character display with screen clipping and priority
 ; ==============================================================================
 
-CODE_01A140:
+BattleSprite_SetupMultiSpriteOAM:
                        LDA.B $0A                          ;01A140|A50A    |001A6C;
                        CMP.W #$00F8                       ;01A142|C9F800  |      ;
-                       BCC CODE_01A15E                     ;01A145|9017    |01A15E;
+                       BCC .StandardSetup                 ;01A145|9017    |01A15E;
                        CMP.W #$0100                       ;01A147|C90001  |      ;
-                       BCC CODE_01A1A8                     ;01A14A|905C    |01A1A8;
+                       BCC BattleSprite_SetupRightEdgeClip ;01A14A|905C    |01A1A8;
                        CMP.W #$03F0                       ;01A14C|C9F003  |      ;
-                       BCC CODE_01A191                     ;01A14F|9040    |01A191;
+                       BCC .HideSprite                    ;01A14F|9040    |01A191;
                        CMP.W #$03F8                       ;01A151|C9F803  |      ;
-                       BCC CODE_01A1D3                     ;01A154|907D    |01A1D3;
+                       BCC BattleSprite_SetupLeftEdgeClip  ;01A154|907D    |01A1D3;
                        CMP.W #$0400                       ;01A156|C90004  |      ;
-                       BCS CODE_01A15E                     ;01A159|B003    |01A15E;
-                       JMP.W CODE_01A1FF                   ;01A15B|4CFFA1  |01A1FF;
+                       BCS .StandardSetup                 ;01A159|B003    |01A15E;
+                       JMP.W BattleSprite_SetupFullVisible ;01A15B|4CFFA1  |01A1FF;
 
 ; ==============================================================================
 ; Standard 4-Sprite OAM Configuration
 ; Sets up normal sprite display with 16x16 tile arrangement
 ; ==============================================================================
 
-CODE_01A15E:
+.StandardSetup:
                        SEP #$20                           ;01A15E|E220    |      ;
                        STA.W $0C00,X                      ;01A160|9D000C  |010C00;
                        STA.W $0C08,X                      ;01A163|9D080C  |010C08;
@@ -1066,14 +1066,14 @@ CODE_01A15E:
 ; Hides sprites that are completely outside visible screen area
 ; ==============================================================================
 
-CODE_01A186:
+BattleSprite_HideOffScreen:
                        REP #$20                           ;01A186|C220    |      ;
                        LDX.B $04                          ;01A188|A604    |001A66;
                        LDY.W DATA8_01A63C,X                ;01A18A|BC3CA6  |01A63C;
                        LDA.W DATA8_01A63A,X                ;01A18D|BD3AA6  |01A63A;
                        TAX                                 ;01A190|AA      |      ;
 
-CODE_01A191:
+.HideSprite:
                        LDA.W #$E080                       ;01A191|A980E0  |      ;
                        STA.W $0C00,X                      ;01A194|9D000C  |010C00;
                        STA.W $0C04,X                      ;01A197|9D040C  |010C04;
@@ -1089,7 +1089,7 @@ CODE_01A191:
 ; Handles sprites partially visible on right edge of screen
 ; ==============================================================================
 
-CODE_01A1A8:
+BattleSprite_SetupRightEdgeClip:
                        SEP #$20                           ;01A1A8|E220    |      ;
                        STA.W $0C00,X                      ;01A1AA|9D000C  |010C00;
                        STA.W $0C08,X                      ;01A1AD|9D080C  |010C08;
@@ -1114,7 +1114,7 @@ CODE_01A1A8:
 ; Handles sprites partially visible on left edge of screen
 ; ==============================================================================
 
-CODE_01A1D3:
+BattleSprite_SetupLeftEdgeClip:
                        SEP #$20                           ;01A1D3|E220    |      ;
                        CLC                                 ;01A1D5|18      |      ;
                        ADC.B #$08                         ;01A1D6|6908    |      ;
@@ -1140,7 +1140,7 @@ CODE_01A1D3:
 ; Handles sprites fully visible including wraparound positioning
 ; ==============================================================================
 
-CODE_01A1FF:
+BattleSprite_SetupFullVisible:
                        SEP #$20                           ;01A1FF|E220    |      ;
                        STA.W $0C00,X                      ;01A201|9D000C  |010C00;
                        STA.W $0C08,X                      ;01A204|9D080C  |010C08;
@@ -1164,7 +1164,7 @@ CODE_01A1FF:
 ; Complex audio channel management with battle sound coordination
 ; ==============================================================================
 
-CODE_01A227:
+BattleSound_InitializeSoundEffects:
                        PHP                                 ;01A227|08      |      ;
                        SEP #$20                           ;01A228|E220    |      ;
                        REP #$10                           ;01A22A|C210    |      ;
@@ -1173,7 +1173,7 @@ CODE_01A227:
                        STX.W $19E0                        ;01A232|8EE019  |0119E0;
                        LDA.W $1914                        ;01A235|AD1419  |011914;
                        BIT.B #$20                         ;01A238|8920    |      ;
-                       BEQ CODE_01A267                     ;01A23A|F02B    |01A267;
+                       BEQ .ClearBuffers                  ;01A23A|F02B    |01A267;
                        LDA.B #$00                         ;01A23C|A900    |      ;
                        XBA                                 ;01A23E|EB      |      ;
                        LDA.W $1913                        ;01A23F|AD1319  |011913;
@@ -3023,7 +3023,7 @@ CODE_01A808:
 ; Complex character sprite loading with bank coordination
 ; ==============================================================================
 
-CODE_01A865:
+BattleGraphics_LoadCharacterSprite:
                        PHB                                 ;01A865|8B      |      ;
                        PHD                                 ;01A866|0B      |      ;
                        PEA.W $192B                        ;01A867|F42B19  |00192B;
@@ -3032,7 +3032,7 @@ CODE_01A865:
                        REP #$10                           ;01A86D|C210    |      ;
                        STA.B $00                          ;01A86F|8500    |00192B;
                        BIT.B #$80                         ;01A871|8980    |      ;
-                       BNE CODE_01A89D                     ;01A873|D028    |01A89D;
+                       BNE .CompressedGraphics            ;01A873|D028    |01A89D;
                        REP #$30                           ;01A875|C230    |      ;
                        AND.W #$007F                       ;01A877|297F00  |      ;
                        ASL A                               ;01A87A|0A      |      ;
@@ -3057,14 +3057,14 @@ CODE_01A865:
                        REP #$10                           ;01A895|C210    |      ;
                        LDA.B #$10                         ;01A897|A910    |      ;
                        STA.B $08                          ;01A899|8508    |001933;
-                       BRA CODE_01A8BB                     ;01A89B|801E    |01A8BB;
+                       BRA .CoordinateTransfer            ;01A89B|801E    |01A8BB;
 
 ; ==============================================================================
 ; Alternate Graphics Loading Path
 ; Handles compressed or special format character graphics
 ; ==============================================================================
 
-CODE_01A89D:
+.CompressedGraphics:
                        REP #$30                           ;01A89D|C230    |      ;
                        AND.W #$007F                       ;01A89F|297F00  |      ;
                        ASL A                               ;01A8A2|0A      |      ;
@@ -3089,7 +3089,7 @@ CODE_01A89D:
 ; Main transfer loop with memory management and format handling
 ; ==============================================================================
 
-CODE_01A8BB:
+.CoordinateTransfer:
                        SEP #$20                           ;01A8BB|E220    |      ;
                        REP #$10                           ;01A8BD|C210    |      ;
                        LDA.B #$04                         ;01A8BF|A904    |      ;
@@ -3110,14 +3110,14 @@ CODE_01A8BB:
 ; Processes multiple graphics blocks with address management
 ; ==============================================================================
 
-CODE_01A8D6:
+.TransferBlocks:
                        SEP #$20                           ;01A8D6|E220    |      ;
                        REP #$10                           ;01A8D8|C210    |      ;
-                       JSR.W CODE_01A901                   ;01A8DA|2001A9  |01A901;
+                       JSR.W .LowLevelTransfer            ;01A8DA|2001A9  |01A901;
                        LDA.B $08                          ;01A8DD|A508    |001933;
                        DEC A                               ;01A8DF|3A      |      ;
                        STA.B $08                          ;01A8E0|8508    |001933;
-                       BEQ CODE_01A8FE                     ;01A8E2|F01A    |01A8FE;
+                       BEQ .Complete                      ;01A8E2|F01A    |01A8FE;
                        PHA                                 ;01A8E4|48      |      ;
                        REP #$30                           ;01A8E5|C230    |      ;
                        LDA.B $02                          ;01A8E7|A502    |00192D;
@@ -3131,9 +3131,9 @@ CODE_01A8D6:
                        SEP #$20                           ;01A8F7|E220    |      ;
                        REP #$10                           ;01A8F9|C210    |      ;
                        PLA                                 ;01A8FB|68      |      ;
-                       BRA CODE_01A8D6                     ;01A8FC|80D8    |01A8D6;
+                       BRA .TransferBlocks                ;01A8FC|80D8    |01A8D6;
 
-CODE_01A8FE:
+.Complete:
                        PLD                                 ;01A8FE|2B      |      ;
                        PLB                                 ;01A8FF|AB      |      ;
                        RTS                                 ;01A900|60      |      ;
@@ -3143,7 +3143,7 @@ CODE_01A8FE:
 ; Direct memory transfer with bank coordination and timing
 ; ==============================================================================
 
-CODE_01A901:
+.LowLevelTransfer:
                        PHB                                 ;01A901|8B      |      ;
                        PHY                                 ;01A902|5A      |      ;
                        PHP                                 ;01A903|08      |      ;
@@ -3167,7 +3167,7 @@ CODE_01A901:
 ; Processes individual bytes with complex bank management
 ; ==============================================================================
 
-CODE_01A91F:
+.ByteTransferLoop:
                        PHB                                 ;01A91F|8B      |      ;
                        LDA.B $06                          ;01A920|A506    |001931;
                        PHA                                 ;01A922|48      |      ;
