@@ -3197,7 +3197,7 @@ BattleGraphics_LoadCharacterSprite:
                        PLB                                 ;01A945|AB      |      ;
                        RTS                                 ;01A946|60      |      ;
 ; ==============================================================================
-; Bank  - FFMQ Main Battle Systems (Cycle 3, Part 1)
+; Bank 01 - FFMQ Main Battle Systems (Cycle 3, Part 1)
 ; Advanced Battle Menu and Data Management Systems
 ; ==============================================================================
 
@@ -3206,19 +3206,19 @@ BattleGraphics_LoadCharacterSprite:
 ; Validates character structures and sprite data integrity
 ; ==============================================================================
 
-CODE_01A947:
+BattleChar_VerifyData:
                        PHP                                 ;01A947|08      |      ;
                        SEP #$20                           ;01A948|E220    |      ;
                        REP #$10                           ;01A94A|C210    |      ;
                        LDA.W $1948                        ;01A94C|AD4819  |001948;
-                       BNE CODE_01A957                     ;01A94F|D006    |01A957;
+                       BNE .AlternateValidation           ;01A94F|D006    |01A957;
                        JSR.W CODE_019168                   ;01A951|206891  |019168;
-                       JMP.W CODE_01A95A                   ;01A954|4C5AA9  |01A95A;
+                       JMP.W .Complete                    ;01A954|4C5AA9  |01A95A;
 
-CODE_01A957:
+.AlternateValidation:
                        JSR.W CODE_0192AC                   ;01A957|20AC92  |0192AC;
 
-CODE_01A95A:
+.Complete:
                        PLP                                 ;01A95A|28      |      ;
                        RTS                                 ;01A95B|60      |      ;
 
@@ -3227,7 +3227,7 @@ CODE_01A95A:
 ; Ensures sprite data integrity across memory banks
 ; ==============================================================================
 
-CODE_01A95C:
+BattleSprite_ValidateDataBlock:
                        PHB                                 ;01A95C|8B      |      ;
                        PHY                                 ;01A95D|5A      |      ;
                        PHP                                 ;01A95E|08      |      ;
@@ -3251,7 +3251,7 @@ CODE_01A95C:
 ; Validates individual sprite data bytes with format checking
 ; ==============================================================================
 
-CODE_01A97A:
+.ByteValidationLoop:
                        PHB                                 ;01A97A|8B      |      ;
                        LDA.B $06                          ;01A97B|A506    |001931;
                        PHA                                 ;01A97D|48      |      ;
@@ -3274,7 +3274,7 @@ CODE_01A97A:
                        REP #$10                           ;01A996|C210    |      ;
                        PLB                                 ;01A998|AB      |      ;
                        DEC.B $01                          ;01A999|C601    |00192C;
-                       BNE CODE_01A97A                     ;01A99B|D0DD    |01A97A;
+                       BNE .ByteValidationLoop            ;01A99B|D0DD    |01A97A;
                        PLD                                 ;01A99D|2B      |      ;
                        PLP                                 ;01A99E|28      |      ;
                        PLY                                 ;01A99F|7A      |      ;
@@ -3286,7 +3286,7 @@ CODE_01A97A:
 ; Advanced validation of character sprite and animation data
 ; ==============================================================================
 
-CODE_01A988:
+BattleChar_ClearGraphicsData:
                        PHP                                 ;01A988|08      |      ;
                        SEP #$20                           ;01A989|E220    |      ;
                        REP #$10                           ;01A98B|C210    |      ;
@@ -3326,7 +3326,7 @@ CODE_01A988:
 ; Sets up initial character states for battle system
 ; ==============================================================================
 
-CODE_01A9C8:
+BattleChar_InitializeState:
                        PHP                                 ;01A9C8|08      |      ;
                        SEP #$20                           ;01A9C9|E220    |      ;
                        REP #$10                           ;01A9CB|C210    |      ;
@@ -3355,7 +3355,7 @@ CODE_01A9C8:
 ; Configures animation parameters for battle characters
 ; ==============================================================================
 
-CODE_01A9FE:
+BattleChar_SetupAnimationData:
                        PHP                                 ;01A9FE|08      |      ;
                        SEP #$20                           ;01A9FF|E220    |      ;
                        REP #$10                           ;01AA01|C210    |      ;
@@ -3388,7 +3388,7 @@ CODE_01A9FE:
 ; Complex character data initialization with multiple parameter blocks
 ; ==============================================================================
 
-CODE_01AA3B:
+BattleChar_InitializeDefaults:
                        PHP                                 ;01AA3B|08      |      ;
                        SEP #$20                           ;01AA3C|E220    |      ;
                        REP #$10                           ;01AA3E|C210    |      ;
@@ -3430,7 +3430,7 @@ CODE_01AA3B:
 ; Complex coordinate mapping for battle sprite positioning
 ; ==============================================================================
 
-CODE_01AA80:
+BattleSprite_TransformCoordinates:
                        PHP                                 ;01AA80|08      |      ;
                        SEP #$20                           ;01AA81|E220    |      ;
                        REP #$10                           ;01AA83|C210    |      ;
@@ -3465,7 +3465,7 @@ CODE_01AA80:
 ; Comprehensive character data loading with validation and setup
 ; ==============================================================================
 
-CODE_01AABE:
+BattleChar_LoadExtendedStats:
                        PHP                                 ;01AABE|08      |      ;
                        SEP #$20                           ;01AABF|E220    |      ;
                        REP #$10                           ;01AAC1|C210    |      ;
@@ -3542,38 +3542,38 @@ CODE_01AABE:
 ; Main coordination point for battle system data management
 ; ==============================================================================
 
-CODE_01AB78:
+BattleSystem_CoordinateDataLoad:
                        PHP                                 ;01AB78|08      |      ;
                        SEP #$20                           ;01AB79|E220    |      ;
                        REP #$10                           ;01AB7B|C210    |      ;
                        LDY.W $193B                        ;01AB7D|AC3B19  |00193B;
                        LDA.W $F0F0,Y                      ;01AB80|B9F0F0  |00F0F0;
-                       BEQ CODE_01AB89                     ;01AB83|F004    |01AB89;
+                       BEQ .NoSpecialMode                 ;01AB83|F004    |01AB89;
                        STA.W $1948                        ;01AB85|8D4819  |001948;
-                       BRA CODE_01AB8C                     ;01AB88|8002    |01AB8C;
+                       BRA .ProcessCharacter              ;01AB88|8002    |01AB8C;
 
-CODE_01AB89:
+.NoSpecialMode:
                        STZ.W $1948                        ;01AB89|9C4819  |001948;
 
-CODE_01AB8C:
+.ProcessCharacter:
                        JSR.W CODE_01A6FC                   ;01AB8C|20FCA6  |01A6FC;
-                       BCS CODE_01AB93                     ;01AB8F|B002    |01AB93;
+                       BCS .LoadFullData                  ;01AB8F|B002    |01AB93;
                        PLP                                 ;01AB91|28      |      ;
                        RTS                                 ;01AB92|60      |      ;
 
-CODE_01AB93:
-                       JSR.W CODE_01A988                   ;01AB93|2088A9  |01A988;
-                       JSR.W CODE_01A9C8                   ;01AB96|20C8A9  |01A9C8;
-                       JSR.W CODE_01A9FE                   ;01AB99|20FEA9  |01A9FE;
-                       JSR.W CODE_01AABE                   ;01AB9C|20BEAA  |01AABE;
-                       JSR.W CODE_01AA80                   ;01AB9F|2080AA  |01AA80;
+.LoadFullData:
+                       JSR.W BattleChar_ClearGraphicsData ;01AB93|2088A9  |01A988;
+                       JSR.W BattleChar_InitializeState   ;01AB96|20C8A9  |01A9C8;
+                       JSR.W BattleChar_SetupAnimationData ;01AB99|20FEA9  |01A9FE;
+                       JSR.W BattleChar_LoadExtendedStats ;01AB9C|20BEAA  |01AABE;
+                       JSR.W BattleSprite_TransformCoordinates ;01AB9F|2080AA  |01AA80;
                        LDX.W $1939                        ;01ABA2|AE3919  |001939;
                        LDA.B #$01                         ;01ABA5|A901    |      ;
                        STA.B $00,X                        ;01ABA7|7400    |001A72;
                        PLP                                 ;01ABA9|28      |      ;
                        RTS                                 ;01ABAA|60      |      ;
 ; ==============================================================================
-; Bank  - FFMQ Main Battle Systems (Cycle 3, Part 2)
+; Bank 01 - FFMQ Main Battle Systems (Cycle 3, Part 2)
 ; Battle Menu Management and Advanced Data Processing
 ; ==============================================================================
 
@@ -3582,7 +3582,7 @@ CODE_01AB93:
 ; Advanced menu handling for battle interface
 ; ==============================================================================
 
-CODE_01ABAB:
+BattleMenu_ClearStructure:
                        PHP                                 ;01ABAB|08      |      ;
                        SEP #$20                           ;01ABAC|E220    |      ;
                        REP #$10                           ;01ABAE|C210    |      ;
@@ -3627,7 +3627,7 @@ CODE_01ABAB:
 DATA8_01ABF9:
                        db $10                              ;01ABF9|        |      ;
 
-CODE_01ABFA:
+BattleTable_Initialize:
                        LDA.B #$1C                         ;01ABFA|A91C    |      ;
                        JSR.W CODE_01D0BB                   ;01ABFC|20BBD0  |01D0BB;
                        RTS                                 ;01ABFF|60      |      ;
@@ -3637,7 +3637,7 @@ CODE_01ABFA:
 ; Validates and processes battle character data structures
 ; ==============================================================================
 
-CODE_01AC00:
+BattleChar_Validate:
                        LDA.W $19EE                        ;01AC00|ADEE19  |0119EE;
                        JSR.W CODE_01C589                   ;01AC03|2089C5  |01C589;
                        RTS                                 ;01AC06|60      |      ;
@@ -3647,7 +3647,7 @@ CODE_01AC00:
 ; Complex character data loading with bank switching and validation
 ; ==============================================================================
 
-CODE_01AC07:
+BattleChar_LoadData:
                        PHB                                 ;01AC07|8B      |      ;
                        LDA.W $19EE                        ;01AC08|ADEE19  |0119EE;
                        AND.W #$00FF                       ;01AC0B|29FF00  |      ;
@@ -3667,13 +3667,13 @@ CODE_01AC07:
 ; Iterates through character data with complex validation
 ; ==============================================================================
 
-CODE_01AC1F:
+.ProcessDataLoop:
                        PHX                                 ;01AC1F|DA      |      ;
                        LDA.B #$00                         ;01AC20|A900    |      ;
                        XBA                                 ;01AC22|EB      |      ;
                        LDA.L DATA8_06BD78,X                ;01AC23|BF78BD06|06BD78;
                        CMP.B #$FF                         ;01AC27|C9FF    |      ;
-                       BEQ CODE_01AC58                     ;01AC29|F02D    |01AC58;
+                       BEQ .Complete                      ;01AC29|F02D    |01AC58;
                        TAY                                 ;01AC2B|A8      |      ;
                        LDA.L DATA8_06BD79,X                ;01AC2C|BF79BD06|06BD79;
                        TAX                                 ;01AC30|AA      |      ;
@@ -3681,10 +3681,10 @@ CODE_01AC1F:
                        STA.W $D0F4,Y                      ;01AC34|99F4D0  |7FD0F4;
                        PHP                                 ;01AC37|08      |      ;
                        REP #$30                           ;01AC38|C230    |      ;
-                       JSR.W CODE_01AC5C                   ;01AC3A|205CAC  |01AC5C;
+                       JSR.W BattleChar_TransformIndex    ;01AC3A|205CAC  |01AC5C;
                        LDA.W $D174,X                      ;01AC3D|BD74D1  |7FD174;
                        STA.W $D174,Y                      ;01AC40|9974D1  |7FD174;
-                       JSR.W CODE_01AC5C                   ;01AC43|205CAC  |01AC5C;
+                       JSR.W BattleChar_TransformIndex    ;01AC43|205CAC  |01AC5C;
                        LDA.W $CEF4,X                      ;01AC46|BDF4CE  |7FCEF4;
                        STA.W $CEF4,Y                      ;01AC49|99F4CE  |7FCEF4;
                        LDA.W $CEF6,X                      ;01AC4C|BDF6CE  |7FCEF6;
@@ -3693,9 +3693,9 @@ CODE_01AC1F:
                        PLX                                 ;01AC53|FA      |      ;
                        INX                                 ;01AC54|E8      |      ;
                        INX                                 ;01AC55|E8      |      ;
-                       BRA CODE_01AC1F                     ;01AC56|80C7    |01AC1F;
+                       BRA .ProcessDataLoop               ;01AC56|80C7    |01AC1F;
 
-CODE_01AC58:
+.Complete:
                        PLX                                 ;01AC58|FA      |      ;
                        PLP                                 ;01AC59|28      |      ;
                        PLB                                 ;01AC5A|AB      |      ;
@@ -3706,7 +3706,7 @@ CODE_01AC58:
 ; Transforms character indices for data table access
 ; ==============================================================================
 
-CODE_01AC5C:
+BattleChar_TransformIndex:
                        TYA                                 ;01AC5C|98      |      ;
                        ASL A                               ;01AC5D|0A      |      ;
                        TAY                                 ;01AC5E|A8      |      ;
@@ -3722,7 +3722,7 @@ CODE_01AC5C:
 
                        db $AD,$EE,$19,$29,$FF,$00,$E2,$20,$C2,$10,$8D,$19,$19,$60 ; 01AC63
 
-CODE_01AC71:
+BattleChar_DispatchOperation:
                        LDA.W $19EE                        ;01AC71|ADEE19  |0119EE;
                        AND.W #$00FF                       ;01AC74|29FF00  |      ;
                        ASL A                               ;01AC77|0A      |      ;
@@ -3748,7 +3748,7 @@ UNREACH_01AC7D:
 ; Handles special battle operations and state management
 ; ==============================================================================
 
-CODE_01ACDB:
+Battle_SetupSpecialOperation:
                        SEP #$20                           ;01ACDB|E220    |      ;
                        REP #$10                           ;01ACDD|C210    |      ;
                        LDA.B #$03                         ;01ACDF|A903    |      ;
@@ -3763,7 +3763,7 @@ CODE_01ACDB:
 ; Complex graphics loading for battle scenes and characters
 ; ==============================================================================
 
-CODE_01ACED:
+BattleGraphics_LoadSceneData:
                        PHB                                 ;01ACED|8B      |      ;
                        LDX.W #$02F0                       ;01ACEE|A2F002  |      ;
                        LDY.W #$C508                       ;01ACF1|A008C5  |      ;
@@ -3777,7 +3777,7 @@ CODE_01ACED:
 ; Transfers graphics data blocks with address management
 ; ==============================================================================
 
-CODE_01ACFC:
+.GraphicsTransferLoop:
                        PHA                                 ;01ACFC|48      |      ;
                        LDA.L DATA8_07D824,X                ;01ACFD|BF24D807|07D824;
                        STA.W $0000,Y                      ;01AD01|990000  |7F0000;
@@ -3787,7 +3787,7 @@ CODE_01ACFC:
                        INY                                 ;01AD07|C8      |      ;
                        PLA                                 ;01AD08|68      |      ;
                        DEC A                               ;01AD09|3A      |      ;
-                       BNE CODE_01ACFC                     ;01AD0A|D0F0    |01ACFC;
+                       BNE .GraphicsTransferLoop          ;01AD0A|D0F0    |01ACFC;
                        PLB                                 ;01AD0C|AB      |      ;
                        RTS                                 ;01AD0D|60      |      ;
 
@@ -3796,7 +3796,7 @@ CODE_01ACFC:
 ; Coordinates battle scene initialization and state management
 ; ==============================================================================
 
-CODE_01AD0E:
+BattleScene_Setup:
                        LDX.W #$0005                       ;01AD0E|A20500  |      ;
                        STX.W $192B                        ;01AD11|8E2B19  |01192B;
 

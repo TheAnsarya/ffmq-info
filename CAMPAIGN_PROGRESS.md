@@ -33,20 +33,20 @@
 | **Bank 0D** | `bank_0D_documented.asm` | **0** | 🏆 **100% COMPLETE!** | 10→0 (-10) | ✅ **100%** 🎉 |
 | **Bank 02** | `bank_02_documented.asm` | **0** | 🏆 **100% COMPLETE!** | 298→0 (-298) | ✅ **100%** 🎉 |
 | **Bank 0B** | `bank_0B_documented.asm` | **0** | 🏆 **100% COMPLETE!** | 94→0 (-94) | ✅ **100%** 🎉 |
-| **Bank 01** | `bank_01_documented.asm` | **354** | � In Progress | 375→354 (-21) | 6% |
+| **Bank 01** | `bank_01_documented.asm` | **330** | 🟢 In Progress | 375→330 (-45) | 12% |
 | **Bank 0C** | `bank_0C_documented.asm` | **112** | 🔴 Untouched | - | Future |
 | Main | `ffmq_full_disassembly.asm` | 9 | 🟡 Main File | - | Low Priority |
-| **TOTAL** | **All Files** | **503** | **In Progress** | **-933 this session** | **65% eliminated** |
+| **TOTAL** | **All Files** | **479** | **In Progress** | **-957 this session** | **67% eliminated** |
 
 ### 🏆 QUADRUPLE BANK COMPLETION SESSION! October 31, 2025 (Batches 29-32)
 
 **HISTORIC ACHIEVEMENT**: FOUR major banks completed to 100% + Bank 01 battle system started!
 
-- **Total Labels Eliminated This Session**: 153 labels (49 + 37 + 1 + 94 + 15 + 6)
+- **Total Labels Eliminated This Session**: 177 labels (49 + 37 + 1 + 94 + 15 + 6 + 24)
 - **Starting Point**: 1,436 CODE_* labels across all banks  
-- **Current State**: 503 CODE_* labels remaining (65% eliminated!) ⭐
+- **Current State**: 479 CODE_* labels remaining (67% eliminated!) ⭐
 - **Banks at 100%**: Bank 02 + Bank 00 + Bank 0D + Bank 0B = **FOUR COMPLETE BANKS!** 🏆🏆🏆🏆
-- **Bank 01 Progress**: 375 → 354 labels (21 eliminated, 6% complete)
+- **Bank 01 Progress**: 375 → 330 labels (45 eliminated, 12% complete)
 
 **Batch 29: Bank 02 Completion** (49 → 0 labels) 🏆
 - **FIRST MAJOR BANK** to achieve 100% CODE_* elimination
@@ -79,9 +79,9 @@
   * RLE decompression: Custom SNES compression format
   * Status: ✅ 100% COMPLETE
 
-**Batch 32: Bank 01 Battle System Started** (375 → 354 labels, 21 eliminated)
+**Batch 32: Bank 01 Battle System Started** (375 → 330 labels, 45 eliminated)
 - **Largest Remaining Bank**: Battle system with 9,671 lines
-- **Progress**: 6% complete (21/375 labels)
+- **Progress**: 12% complete (45/375 labels)
 - **Systems Documented**:
   * Battle Main Loop (3 labels): Turn execution, completion wait, VBlank sync
     - Battle_MainTurnLoop: Main turn counter and AI processing
@@ -98,6 +98,31 @@
     - BattleSound_InitializeSoundEffects: Channel management setup
   * Graphics Loading System (6 labels): Character sprite loading with bank coordination
     - BattleGraphics_LoadCharacterSprite: Main loader with compressed format support
+    - Plus 5 local labels for compression, transfer, byte loops
+  * Character Validation & Data Management (24 labels): Multi-layer validation and data loading
+    - BattleChar_VerifyData: Data verification system
+    - BattleSprite_ValidateDataBlock: Sprite data block validation
+    - BattleChar_ClearGraphicsData: Graphics validation engine (26-byte structure clear)
+    - BattleChar_InitializeState: Character state initialization (4-byte load)
+    - BattleChar_SetupAnimationData: Animation parameter configuration (5-byte setup)
+    - BattleChar_InitializeDefaults: Default parameter setup ($FF fill pattern)
+    - BattleSprite_TransformCoordinates: Coordinate transformation for positioning
+    - BattleChar_LoadExtendedStats: Extended stat loading (16-byte structure)
+    - BattleSystem_CoordinateDataLoad: Data loading coordinator with mode handling
+    - BattleMenu_ClearStructure: Menu structure clearing (26-byte zero-init)
+    - BattleTable_Initialize: Table initialization
+    - BattleChar_Validate: Character data validation
+    - BattleChar_LoadData: Character data loading engine with bank switching
+    - BattleChar_TransformIndex: Index transformation for table access
+    - BattleChar_DispatchOperation: Character operation dispatcher
+    - Battle_SetupSpecialOperation: Special operation setup
+    - BattleGraphics_LoadSceneData: Scene graphics loading (8-block transfer)
+    - BattleScene_Setup: Battle scene setup and management
+    - Plus 6 local labels for loops and branches
+- **ROM Verification**: 100% match maintained (SHA256: F71817F55FEBD32FD1DCE617A326A77B6B062DD0D4058ECD289F64AF1B7A1D05)
+- **Build Time**: 0.01 seconds (asar assembler)
+- **Challenge**: File has extensive duplicate sections (lines ~900-2700); working in unique areas (lines 3000+)
+- **Next Target**: >30 labels per batch to accelerate progress
     - Complex memory bank switching and iterative block transfers
 - **Challenge**: File contains extensive duplicate sections (lines ~900-2700)
 - **Status**: 🟡 In Progress (354 labels remaining)
