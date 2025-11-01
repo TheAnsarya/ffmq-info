@@ -1,46 +1,111 @@
 {
-  "schema": {
-	"name": "CharacterStartStats",
-	"version": "1.0",
-	"description": "Starting stats for the four main characters (Benjamin, Kaeli, Phoebe, Reuben)"
-  },
-  "data": [
-	{
-	  "name": "\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\u0003\u0003\u0003\u0003\u0003\u0003\u0003\u0003",
-	  "level": 1,
-	  "experience": 0,
-	  "unknown_data": "2800280003010003010000000000070c080a0706080a000600000000002080000010000000000000000006004b04000000000000000000000706080a",
-	  "_index": 0,
-	  "_offset": "0x0650b0"
-	},
-	{
-	  "name": "\ufffd\ufffd\ufffd\ufffd\ufffd\u0003\u0003\u0003\u0003\u0003\u0003\u0003\u0003\u0003\u0003\u0003",
-	  "level": 3,
-	  "experience": 0,
-	  "unknown_data": "78007800030000030000000081000b1d0b0e0b0b0b09001200050000002310000002010010004041404112004c12640000000000000000000b0b0b09",
-	  "_index": 1,
-	  "_offset": "0x065100"
-	},
-	{
-	  "name": "\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\u0003\u0003\u0003\u0003\u0003\u0003\u0003\u0003\u0003",
-	  "level": 7,
-	  "experience": 0,
-	  "unknown_data": "68016801070000070000000082001c202110170a1c10051605000000632e00020040400010002080208015004e1864000000000000000000170a1c10",
-	  "_index": 2,
-	  "_offset": "0x065150"
-	},
-	{
-	  "name": "\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\u0003\u0003\u0003\u0003\u0003\u0003\u0003\u0003\u0003\u0003",
-	  "level": 15,
-	  "experience": 0,
-	  "unknown_data": "a802a802150a05150a05000083002f2424362f14243100100005000063260200000101007280100110011300520f1e4600003c00280000002f142431",
-	  "_index": 3,
-	  "_offset": "0x0651a0"
-	}
+  "version": "1.0.0",
+  "description": "Final Fantasy Mystic Quest - Character Data",
+  "characters": [
+    {
+      "id": 0,
+      "name": "Benjamin",
+      "starting_level": 1,
+      "starting_experience": 0,
+      "base_stats": {
+        "hp": 40,
+        "mp": 40,
+        "strength": 12,
+        "defense": 8,
+        "speed": 10,
+        "magic": 7,
+        "accuracy": 6,
+        "evade": 8,
+        "magic_defense": 10
+      },
+      "starting_equipment": {
+        "weapon": 0,
+        "shield": 0,
+        "armor": 0,
+        "helmet": 0,
+        "accessory": 7
+      },
+      "rom_address": "$0650B0"
+    },
+    {
+      "id": 1,
+      "name": "Kaeli",
+      "starting_level": 3,
+      "starting_experience": 0,
+      "base_stats": {
+        "hp": 120,
+        "mp": 120,
+        "strength": 29,
+        "defense": 11,
+        "speed": 14,
+        "magic": 11,
+        "accuracy": 11,
+        "evade": 11,
+        "magic_defense": 9
+      },
+      "starting_equipment": {
+        "weapon": 0,
+        "shield": 0,
+        "armor": 129,
+        "helmet": 0,
+        "accessory": 11
+      },
+      "rom_address": "$065100"
+    },
+    {
+      "id": 2,
+      "name": "Phoebe",
+      "starting_level": 7,
+      "starting_experience": 0,
+      "base_stats": {
+        "hp": 360,
+        "mp": 360,
+        "strength": 32,
+        "defense": 33,
+        "speed": 16,
+        "magic": 23,
+        "accuracy": 10,
+        "evade": 28,
+        "magic_defense": 16
+      },
+      "starting_equipment": {
+        "weapon": 0,
+        "shield": 0,
+        "armor": 130,
+        "helmet": 0,
+        "accessory": 28
+      },
+      "rom_address": "$065150"
+    },
+    {
+      "id": 3,
+      "name": "Reuben",
+      "starting_level": 15,
+      "starting_experience": 0,
+      "base_stats": {
+        "hp": 680,
+        "mp": 680,
+        "strength": 36,
+        "defense": 36,
+        "speed": 54,
+        "magic": 47,
+        "accuracy": 20,
+        "evade": 36,
+        "magic_defense": 49
+      },
+      "starting_equipment": {
+        "weapon": 0,
+        "shield": 0,
+        "armor": 131,
+        "helmet": 0,
+        "accessory": 47
+      },
+      "rom_address": "$0651A0"
+    }
   ],
   "metadata": {
-	"count": 4,
-	"rom_offset": "0x0650b0",
-	"struct_size": 80
+    "rom_base_address": "$0650B0",
+    "entry_size": 80,
+    "character_count": 4
   }
 }
