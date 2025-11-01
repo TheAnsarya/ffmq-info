@@ -567,8 +567,8 @@ Display_EffectScriptInterpreter:
 	JSR.W CODE_0C83CB						;0C82CA	; Execute table entry
 	BRA CODE_0C825A							;0C82CD	; Continue script
 
-; High-range command handler ($80-$BF)
-CODE_0C82CF:
+; High-range command handler ($80-$BF) - Triple table dispatch system
+Display_EffectCommandHighRange:				; Process command $80-$BF with triple table lookup
 	STA.W $0161								;0C82CF	; Store command
 	REP #$30								;0C82D2	; 16-bit A/X/Y
 	LDA.W $015F								;0C82D4	; Load parameter
@@ -1598,16 +1598,16 @@ Display_Mode7RotationSequence:
 	PHY										;0C8A1A	; Save sprite count
 	PHX										;0C8A1B	; Save buffer pointer
 
-CODE_0C8A1C:									; Decrement sprite brightness
+.SpriteDecrementLoop:						; Per-sprite brightness decrement loop
 	DEC.W $0000,X							;0C8A1C	; Decrease sprite brightness
 	INX										;0C8A1F	; Next sprite
 	INX										;0C8A20	; (skip 2 bytes)
 	INX										;0C8A21	; (skip 2 bytes)
 	INX										;0C8A22	; (word + word structure)
 	DEY										;0C8A23	; Decrement sprite counter
-	BNE CODE_0C8A1C							;0C8A24	; Loop for all sprites
+	BNE Display_Mode7RotationSequence.SpriteDecrementLoop	;0C8A24	; Loop for all sprites
 
-	JSR.W CODE_0C8910						;0C8A26	; Update OAM via NMI
+	JSR.W Display_SetupNMIOAMTransfer		;0C8A26	; Update OAM via NMI
 	JSL.L CODE_0C8000						;0C8A29	; Wait for VBLANK
 	PLX										;0C8A2D	; Restore buffer pointer
 	PLY										;0C8A2E	; Restore sprite count
@@ -1619,20 +1619,20 @@ CODE_0C8A1C:									; Decrement sprite brightness
 	STA.B SNES_COLDATA-$2100				;0C8A36	; Update fixed color ($2132)
 	PLA										;0C8A38	; Clean up brightness from stack
 	DEC A									;0C8A39	; Decrement loop counter
-	BNE CODE_0C8A19							;0C8A3A	; Loop for all 8 brightness levels
+	BNE Display_Mode7RotationSequence.FadeBrightnessLoop ;0C8A3A	; Loop for all 8 brightness levels
 
 	STZ.B SNES_CGADSUB-$2100				;0C8A3C	; Disable color math ($2131)
 	RTS										;0C8A3E	; Return
 
 ; ==============================================================================
-; CODE_0C8A3F - Update Sprite Position
+; Display_SpritePositionCalculator - Calculate Sprite Screen Position
 ; ==============================================================================
 ; Calculates and sets sprite screen coordinates.
 ; Converts logical position to screen-relative offset.
 ; Input: $0062 = X position, $0063 = Y position
 ; ==============================================================================
 
-CODE_0C8A3F:
+Display_SpritePositionCalculator:
 	REP #$30								;0C8A3F	; 16-bit A/X/Y
 	SEC										;0C8A41	; Set carry for subtraction
 	LDA.W $0062								;0C8A42	; Load X position
@@ -1657,33 +1657,33 @@ CODE_0C8A3F:
 	JSL.L CODE_0C8000						;0C8A72	; Wait for VBLANK
 
 ; ==============================================================================
-; CODE_0C8A76 - Hardware Multiply Setup
+; Display_HardwareMultiplySetup - Hardware Multiply Initialization
 ; ==============================================================================
 ; Initializes hardware multiplier for Mode 7 calculations.
 ; Input: A = multiplicand value (typically $30 for 48×48 matrix)
 ; ==============================================================================
 
-CODE_0C8A76:
+Display_HardwareMultiplySetup:
 	LDA.B #$30								;0C8A76	; Multiplicand = 48
 
-CODE_0C8A78:
+.SetMultiplicand:
 	STA.W $4202								;0C8A78	; Set multiplicand register ($4202)
 	STA.W $0064								;0C8A7B	; Store to variable
-	JSR.W CODE_0C8AC8						;0C8A7E	; Read Mode 7 matrix element
+	JSR.W Display_ReadMultiplyMatrixElement	;0C8A7E	; Read Mode 7 matrix element
 	STY.W $0062								;0C8A81	; Store matrix A value
 	INX										;0C8A84	; Next matrix element
 	INX										;0C8A85	; (word offset)
-	JSR.W CODE_0C8AC8						;0C8A86	; Read Mode 7 matrix element
+	JSR.W Display_ReadMultiplyMatrixElement	;0C8A86	; Read Mode 7 matrix element
 	STY.W $0064								;0C8A89	; Store matrix B value
 	INX										;0C8A8C	; Next matrix element
 	INX										;0C8A8D	; (word offset)
 
 	; Check for table wrap
 	CPX.W #$8B96							;0C8A8E	; End of sine/cosine table?
-	BNE CODE_0C8A96							;0C8A91	; Branch if not
+	BNE .WriteMatrixRegisters				;0C8A91	; Branch if not
 	LDX.W #$8B66							;0C8A93	; Wrap to table start
 
-CODE_0C8A96:									; Write Mode 7 matrix registers
+.WriteMatrixRegisters:						; Write Mode 7 matrix registers
 	JSL.L CODE_0C8000						;0C8A96	; Wait for VBLANK
 
 	; Update Mode 7 matrix A register ($211B)
@@ -1717,7 +1717,7 @@ CODE_0C8A96:									; Write Mode 7 matrix registers
 	RTS										;0C8AC7	; Return
 
 ; ==============================================================================
-; CODE_0C8AC8 - Read & Multiply Matrix Element
+; Display_ReadMultiplyMatrixElement - Read & Multiply Matrix Element
 ; ==============================================================================
 ; Reads sine/cosine value from table and performs hardware multiply.
 ; Used for Mode 7 rotation matrix calculation.
@@ -1725,30 +1725,30 @@ CODE_0C8A96:									; Write Mode 7 matrix registers
 ; Output: Y = result from hardware multiplier
 ; ==============================================================================
 
-CODE_0C8AC8:
+Display_ReadMultiplyMatrixElement:
 	LDA.W $0001,X							;0C8AC8	; Load matrix value high byte
-	BMI CODE_0C8AF1							;0C8ACB	; Branch if negative (sign extend)
-	BNE CODE_0C8AE6							;0C8ACD	; Branch if non-zero high byte
+	BMI .NegativeValue						;0C8ACB	; Branch if negative (sign extend)
+	BNE .LargePositive						;0C8ACD	; Branch if non-zero high byte
 	LDA.W $0000,X							;0C8ACF	; Load low byte only
 
-CODE_0C8AD2:									; Small positive value path
+.SmallPositive:								; Small positive value path
 	JSL.L CODE_00971E						;0C8AD2	; Setup hardware multiply/divide
 	LDY.W $4216								;0C8AD6	; Read division remainder
 	STY.W $4204								;0C8AD9	; Store to dividend register
 
-CODE_0C8ADC:									; Common multiply path
+.CommonMultiply:							; Common multiply path
 	LDA.B #$30								;0C8ADC	; Multiplier = 48
 	JSL.L CODE_009726						;0C8ADE	; Perform hardware multiply
 	LDY.W $4214								;0C8AE2	; Read product result ($4214)
 	RTS										;0C8AE5	; Return with result in Y
 
-CODE_0C8AE6:									; Large positive value path
+.LargePositive:								; Large positive value path
 	STZ.W $4204								;0C8AE6	; Clear dividend high byte
 	LDA.W $0064								;0C8AE9	; Load multiplier value
 	STA.W $4205								;0C8AEC	; Set divisor register
-	BRA CODE_0C8ADC							;0C8AEF	; Continue to multiply
+	BRA .CommonMultiply						;0C8AEF	; Continue to multiply
 
-CODE_0C8AF1:									; Negative value path (sign extend)
+.NegativeValue:								; Negative value path (sign extend)
 	LDA.W $0000,X							;0C8AF1	; Load matrix value low byte
 	; [Additional processing continues...]
 
@@ -1768,13 +1768,13 @@ CODE_0C8AF1:									; Negative value path (sign extend)
 
 ; [Continued from Cycle 3 ending at $0C8AF1]
 
-	LDA.W $0000,X							;0C8AF1	; Load matrix value (continued from CODE_0C8AC8)
-	BEQ CODE_0C8B07							;0C8AF4	; Branch if zero (no processing needed)
+	LDA.W $0000,X							;0C8AF1	; Load matrix value (continued from Display_ReadMultiplyMatrixElement)
+	BEQ .ZeroValue							;0C8AF4	; Branch if zero (no processing needed)
 	EOR.B #$FF								;0C8AF6	; Invert bits (two's complement step 1)
 	INC A									;0C8AF8	; Increment (two's complement = negate)
-	JSR.W CODE_0C8AD2						;0C8AF9	; Process small positive value path
+	JSR.W Display_ReadMultiplyMatrixElement.SmallPositive ;0C8AF9	; Process small positive value path
 
-CODE_0C8AFC:								; Negate result and return
+.NegateResult:								; Negate result and return
 	REP #$30								;0C8AFC	; 16-bit A/X/Y
 	TYA										;0C8AFE	; Transfer result to A
 	EOR.W #$FFFF							;0C8AFF	; Invert all bits
@@ -1783,9 +1783,9 @@ CODE_0C8AFC:								; Negate result and return
 	SEP #$20								;0C8B04	; 8-bit accumulator
 	RTS										;0C8B06	; Return
 
-CODE_0C8B07:								; Zero value path
-	JSR.W CODE_0C8AE6						;0C8B07	; Process large positive value
-	BRA CODE_0C8AFC							;0C8B0A	; Negate and return
+.ZeroValue:									; Zero value path
+	JSR.W Display_ReadMultiplyMatrixElement.LargePositive ;0C8B07	; Process large positive value
+	BRA .NegateResult						;0C8B0A	; Negate and return
 
 ; ==============================================================================
 ; NMI Sprite Position Update Handler
@@ -1816,19 +1816,19 @@ CODE_0C8B07:								; Zero value path
 	RTL										;0C8B3B	; Return from NMI handler
 
 ; ==============================================================================
-; CODE_0C8B3C - Sprite Coordinate DMA Transfer
+; Display_SpriteCoordinateDMA - Sprite Coordinate DMA Transfer
 ; ==============================================================================
 ; Transfers sprite coordinate data to VRAM using DMA.
 ; Writes 5 bytes per row/column, advancing VRAM address by $80 each iteration.
 ; Input: A = coordinate value, X = VRAM address, Y = source buffer address
 ; ==============================================================================
 
-CODE_0C8B3C:
+Display_SpriteCoordinateDMA:
 	CLC										;0C8B3C	; Clear carry
 	XBA										;0C8B3D	; Swap bytes (prep for DMA count)
 	LDA.B #$05								;0C8B3E	; Transfer size = 5 bytes
 
-CODE_0C8B40:								; DMA transfer loop
+.DMALoop:									; DMA transfer loop
 	STX.W SNES_VMADDL						;0C8B40	; Set VRAM address ($2116)
 	XBA										;0C8B43	; Swap to get count
 	STA.B SNES_DMA0CNTL-$4300				;0C8B44	; Set DMA byte count low ($4305)
@@ -1852,7 +1852,7 @@ CODE_0C8B40:								; DMA transfer loop
 	SEP #$20								;0C8B5F	; 8-bit accumulator
 	XBA										;0C8B61	; Swap back
 	DEC A									;0C8B62	; Decrement row/column counter
-	BNE CODE_0C8B40							;0C8B63	; Loop for all rows/columns
+	BNE .DMALoop							;0C8B63	; Loop for all rows/columns
 	RTS										;0C8B65	; Return
 
 ; ==============================================================================
@@ -1876,14 +1876,14 @@ DATA8_0C8B93:								; Animation speed table (30 bytes)
 	db $14,$16,$18,$1C,$20,$24,$28,$2C,$30,$00 ;0C8BA3
 
 ; ==============================================================================
-; CODE_0C8BAD - Title Screen Initialization
+; Display_TitleScreenInit - Title Screen Initialization
 ; ==============================================================================
 ; Sets up title screen graphics, sprites, and tilemaps.
 ; Initializes Mode 7 perspective effect for logo animation.
 ; Uses multiple MVN block moves for efficient data transfer.
 ; ==============================================================================
 
-CODE_0C8BAD:
+Display_TitleScreenInit:
 	LDA.B #$18								;0C8BAD	; Effect timer = 24 frames
 	STA.W $0500								;0C8BAF	; Store effect state
 	REP #$30								;0C8BB2	; 16-bit A/X/Y
@@ -1917,36 +1917,36 @@ CODE_0C8BAD:
 	LDA.B #$40								;0C8BE7	; Starting tile = $40
 	CLC										;0C8BE9	; Clear carry
 
-CODE_0C8BEA:								; Outer loop: Process 11 tile rows
+.FillRowsLoop:							; Outer loop: Process 11 tile rows
 	LDX.W #$000B							;0C8BEA	; Column count = 11
 
-CODE_0C8BED:								; Inner loop: Fill tile row
+.FillColumnsLoop:							; Inner loop: Fill tile row
 	STA.W $0000,Y							;0C8BED	; Write tile number to buffer
 	INC A									;0C8BF0	; Next tile
 	INY										;0C8BF1	; Next buffer position
 	DEX										;0C8BF2	; Decrement column counter
-	BNE CODE_0C8BED							;0C8BF3	; Loop for all columns
+	BNE .FillColumnsLoop					;0C8BF3	; Loop for all columns
 	ADC.B #$05								;0C8BF5	; Advance to next row base (+16 total)
 	CMP.B #$90								;0C8BF7	; Reached tile $90?
-	BNE CODE_0C8BEA							;0C8BF9	; Loop for all rows
+	BNE .FillRowsLoop						;0C8BF9	; Loop for all rows
 
 	; Initialize secondary tile pattern buffer (8-column layout)
 	LDY.W #$6037							;0C8BFB	; Buffer address = $7F6037 (offset)
 	LDA.B #$A0								;0C8BFE	; Starting tile = $A0
 	CLC										;0C8C00	; Clear carry
 
-CODE_0C8C01:								; Outer loop: Process 8 tile rows
+.SecondaryRowsLoop:						; Outer loop: Process 8 tile rows
 	LDX.W #$0008							;0C8C01	; Column count = 8
 
-CODE_0C8C04:								; Inner loop: Fill tile row
+.SecondaryColumnsLoop:						; Inner loop: Fill tile row
 	STA.W $0000,Y							;0C8C04	; Write tile number
 	INC A									;0C8C07	; Next tile
 	INY										;0C8C08	; Next buffer position
 	DEX										;0C8C09	; Decrement column counter
-	BNE CODE_0C8C04							;0C8C0A	; Loop for all columns
+	BNE .SecondaryColumnsLoop				;0C8C0A	; Loop for all columns
 	ADC.B #$08								;0C8C0C	; Advance to next row base (+16 total)
 	CMP.B #$F0								;0C8C0E	; Reached tile $F0?
-	BNE CODE_0C8C01							;0C8C10	; Loop for all rows
+	BNE .SecondaryRowsLoop					;0C8C10	; Loop for all rows
 
 	PLB										;0C8C12	; Restore data bank
 	CLC										;0C8C13	; Clear carry
@@ -1973,7 +1973,7 @@ CODE_0C8C04:								; Inner loop: Fill tile row
 	LDY.W #$8D1E							;0C8C33	; Command table address
 	PHX										;0C8C36	; Save base VRAM address
 
-CODE_0C8C37:								; Tilemap fill loop
+.TilemapFillLoop:							; Tilemap fill loop
 	STX.B SNES_VMADDL-$2100					;0C8C37	; Set VRAM address ($2116)
 	LDA.B #$00								;0C8C39	; Clear high byte
 	XBA										;0C8C3B	; Swap (A = 0)
@@ -1981,15 +1981,15 @@ CODE_0C8C37:								; Tilemap fill loop
 	TAX										;0C8C3F	; Use as counter
 	LDA.W $0001,Y							;0C8C40	; Load starting tile number
 
-CODE_0C8C43:								; Fill repeat loop
+.FillRepeatLoop:							; Fill repeat loop
 	STA.B SNES_VMDATAL-$2100				;0C8C43	; Write tile to VRAM ($2118)
 	INC A									;0C8C45	; Increment tile number
 	DEX										;0C8C46	; Decrement counter
-	BNE CODE_0C8C43							;0C8C47	; Loop for repeat count
+	BNE .FillRepeatLoop						;0C8C47	; Loop for repeat count
 
 	; Check for next command
 	LDA.W $0002,Y							;0C8C49	; Load VRAM offset for next fill
-	BEQ CODE_0C8C5C							;0C8C4C	; Exit if offset = 0 (end marker)
+	BEQ .Exit								;0C8C4C	; Exit if offset = 0 (end marker)
 	INY										;0C8C4E	; Next command entry
 	INY										;0C8C4F	; (3 bytes per entry)
 	INY										;0C8C50	; Advance to next
@@ -1998,9 +1998,9 @@ CODE_0C8C43:								; Fill repeat loop
 	STA.B $01,S								;0C8C55	; Update base address on stack
 	TAX										;0C8C57	; Use as VRAM address
 	SEP #$20								;0C8C58	; 8-bit accumulator
-	BRA CODE_0C8C37							;0C8C5A	; Continue with next command
+	BRA .TilemapFillLoop					;0C8C5A	; Continue with next command
 
-CODE_0C8C5C:								; Cleanup and return
+.Exit:										; Cleanup and return
 	PLX										;0C8C5C	; Clean up stack
 	RTS										;0C8C5D	; Return
 
@@ -2052,14 +2052,14 @@ DATA8_0C8D1E:
 	db $80,$05,$6B,$80,$05,$7B,$81,$04,$8C,$04,$01,$E0,$00 ;0C8D6E	; End marker
 
 ; ==============================================================================
-; CODE_0C8D7B - Complex Title Screen VRAM Setup
+; Display_TitleScreenVRAMSetup - Complex Title Screen VRAM Setup
 ; ==============================================================================
 ; Initializes complete title screen graphics system.
 ; Sets up 3 palette groups, fills OAM, configures DMA for tilemap transfer.
 ; Highly optimized using DMA channel 0 for maximum VBLANK efficiency.
 ; ==============================================================================
 
-CODE_0C8D7B:
+Display_TitleScreenVRAMSetup:
 	PHP										;0C8D7B	; Save processor status
 	PHD										;0C8D7C	; Save direct page
 	REP #$30								;0C8D7D	; 16-bit A/X/Y
@@ -2128,7 +2128,8 @@ CODE_0C8D7B:
 	LDY.W #$5100							;0C8DF3	; VRAM base address = $5100
 	LDX.W #$8F14							;0C8DF6	; Command table address
 
-CODE_0C8DF9:								; Graphics command processing loop
+Display_GraphicsCommandProcessor:			; Graphics command DMA transfer loop (processes tile data commands)
+.CommandLoop:
 	REP #$30								;0C8DF9	; 16-bit A/X/Y
 	STY.W $2116								;0C8DFB	; Set VRAM address ($2116)
 
@@ -2176,7 +2177,7 @@ CODE_0C8DF9:								; Graphics command processing loop
 	INX										;0C8E36	; (3 bytes per entry)
 	INX										;0C8E37	; Advance pointer
 	PLP										;0C8E38	; Restore flags
-	BNE CODE_0C8DF9							;0C8E39	; Continue if not end marker
+	BNE Display_GraphicsCommandProcessor.CommandLoop	;0C8E39	; Continue if not end marker
 
 	; Copy graphics data to Bank $7F buffer
 	REP #$30								;0C8E3B	; 16-bit A/X/Y
@@ -2192,7 +2193,7 @@ CODE_0C8DF9:								; Graphics command processing loop
 	LDA.W #$0400							;0C8E50	; VRAM base address
 	PHA										;0C8E53	; Save base address
 
-CODE_0C8E54:								; Tilemap command loop
+Display_TilemapCommandProcessor:			; Process tilemap fill commands from table
 	STA.L SNES_VMADDL						;0C8E54	; Set VRAM address ($2116)
 	LDA.L DATA8_0C8F14,X					;0C8E58	; Load command entry
 	AND.W #$00FF							;0C8E5C	; Get repeat count (low byte)
@@ -2206,17 +2207,17 @@ CODE_0C8E54:								; Tilemap command loop
 	PHX										;0C8E6D	; Save command pointer
 	TAX										;0C8E6E	; Use tile base as index
 
-CODE_0C8E6F:								; Tile fill loop
+.TileFillLoop:
 	PHY										;0C8E6F	; Save counter
 	JSR.W CODE_0C8FB4						;0C8E70	; Write tile pattern (subroutine)
 	PLY										;0C8E73	; Restore counter
 	DEY										;0C8E74	; Decrement
-	BNE CODE_0C8E6F							;0C8E75	; Loop for repeat count
+	BNE Display_TilemapCommandProcessor.TileFillLoop	;0C8E75	; Loop for repeat count
 
 	PLX										;0C8E77	; Restore command pointer
 	LDA.L DATA8_0C8F15,X					;0C8E78	; Load next command offset
 	AND.W #$FF00							;0C8E7C	; Check high byte
-	BEQ CODE_0C8E8C							;0C8E7F	; Exit if zero (end marker)
+	BEQ Display_TilemapCommandProcessor.Exit	;0C8E7F	; Exit if zero (end marker)
 	INX										;0C8E81	; Next command entry
 	INX										;0C8E82	; (3 bytes)
 	INX										;0C8E83	; Advance pointer
@@ -2224,9 +2225,9 @@ CODE_0C8E6F:								; Tile fill loop
 	LSR A									;0C8E85	; (calculate VRAM offset)
 	ADC.B $01,S								;0C8E86	; Add to base VRAM address
 	STA.B $01,S								;0C8E88	; Update base on stack
-	BRA CODE_0C8E54							;0C8E8A	; Continue with next command
+	BRA Display_TilemapCommandProcessor		;0C8E8A	; Continue with next command
 
-CODE_0C8E8C:								; Cleanup and finalize
+.Exit:
 	PLA										;0C8E8C	; Clean up stack
 	PHK										;0C8E8D	; Push data bank
 	PLB										;0C8E8E	; Set data bank
@@ -2239,10 +2240,10 @@ CODE_0C8E8C:								; Cleanup and finalize
 	LDX.W #$0040							;0C8E9A	; Fill count = 64 tiles
 	LDA.B #$10								;0C8E9D	; Fill pattern = tile $10
 
-CODE_0C8E9F:								; Fill loop
+.BottomFillLoop:
 	STA.W $2119								;0C8E9F	; Write to VRAM data ($2119)
 	DEX										;0C8EA2	; Decrement counter
-	BNE CODE_0C8E9F							;0C8EA3	; Loop for all tiles
+	BNE Display_TilemapCommandProcessor.BottomFillLoop	;0C8EA3	; Loop for all tiles
 
 	PLD										;0C8EA5	; Restore direct page
 	PLP										;0C8EA6	; Restore processor status

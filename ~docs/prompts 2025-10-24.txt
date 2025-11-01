@@ -296,8 +296,7 @@ continue adding labels, as many as you can, focusing on banks $01 and $0c
 
 
 
-
-
+make a detailed todo list for the following items: finish up labeling code; determine labels for memory address and variables; finish disassembling code by bank and function and system; create a robust system of extracting graphics and transforming into bin/png/json/etc, and data into bin/json/csv/etc, and then transforming it back for the build step; build from code and transformed assets; document everything including data structures; format all of the asm code, using CRLF, utf-8, and especially tabs instead of spaces (size: 4 spaces per tab on display); 
 
 
 
