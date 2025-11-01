@@ -299,7 +299,35 @@ finish up all the labels left to be named if possible
 3. [ ] Set up project board (Kanban) to track progress
 &&&&&
 
+Step 2: Set Up Project Board
+--- FOLLOW MANUAL SETUP TASKS
+create a bunch of heirarchical sub-tickets for the kanban board based on the todo list
+make the primary subtasks be tickets in their own right
 
+&&&&&&&&
+Set up project board (~5 min):
+Add all 47 issues to board
+Organize by priority/parent
+Create workflow columns
+&&&&&&&&
+
+give the github cli what permissions it needs for projects, use the current kanban board
+---- manual stuff
+add the sub tasks to their parents
+add all of the the sub tasks to their parent task
+add all of the the sub issues to their parent issue
+no I just want all of the child issues linked to their parent issues so that we kknow what progress we've made in the oparent by completed the children.
+
+pick some issues/todos and implement them.
+pick some issues/todos and implement them.
+A
+(update chat and session logs) then B
+A
+A, but make sure to update the session logs and git commit and make sure the github issues are updated with the commits, comments, etc.
+A and then D
+Documentation 
+---- stop
+document changes, update session logs, and create git commits for the changes, then continue with the `documention` option A
 
 
 

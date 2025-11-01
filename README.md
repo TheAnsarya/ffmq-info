@@ -167,17 +167,29 @@ mesen build/ffmq-rebuilt.sfc
 
 ## Documentation
 
-### Comprehensive Documentation Available
+📚 **[Complete Documentation Index](docs/README.md)** - Start here for organized access to all documentation!
 
-- **[Integration Complete](docs/integration-complete.md)**: ⭐ Complete integration summary (300 lines)
-- **[Source Code README](src/asm/README.md)**: ⭐ Source organization and structure
-- **[Build Instructions](docs/build-instructions.md)**: ⭐ Complete build system guide
-- **[Graphics Format](docs/graphics-format.md)**: ⭐ SNES graphics format (600 lines)
-- **[Graphics Quick Start](docs/graphics-quickstart.md)**: ⭐ Graphics tools guide (400 lines)
-- **[ROM Map](docs/rom_map.md)**: Complete ROM memory layout
-- **[RAM Map](docs/ram_map.md)**: RAM usage and variables
-- **[Text Format](docs/text.md)**: Text encoding and compression
-- **[Music Format](docs/music.md)**: Sound/music system
+### Quick Links
+
+**Getting Started:**
+- **[BUILD_GUIDE.md](docs/BUILD_GUIDE.md)** ⭐ - Comprehensive build instructions and troubleshooting
+- **[MODDING_GUIDE.md](docs/MODDING_GUIDE.md)** ⭐ - Complete guide to creating game modifications
+- **[CONTRIBUTING.md](CONTRIBUTING.md)** ⭐ - How to contribute to the project
+
+**Technical Reference:**
+- **[Integration Complete](docs/integration-complete.md)** - Complete integration summary (300 lines)
+- **[Source Code README](src/asm/README.md)** - Source organization and structure
+- **[Graphics Format](docs/graphics-format.md)** - SNES graphics format (600 lines)
+- **[Data Formats](docs/data_formats.md)** - Game data structures and formats
+
+**Tools & Build System:**
+- **[Build Instructions](docs/build-instructions.md)** - Quick build reference
+- **[Graphics Quick Start](docs/graphics-quickstart.md)** - Graphics tools guide (400 lines)
+- **[Testing Guide](docs/testing.md)** - Testing framework and procedures
+
+### All Documentation
+
+See **[docs/README.md](docs/README.md)** for the complete, categorized documentation index with recommended reading orders for contributors, modders, and researchers.
 
 ### Implementation Status
 
