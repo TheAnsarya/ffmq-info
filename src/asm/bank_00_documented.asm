@@ -2053,7 +2053,7 @@ Boot_Tertiary_Entry:
 
 					   REP					 #$30		; 16-bit mode
 					   LDX.W				   #$1FFF	; Reset stack pointer
-TXS:
+TXS_Label:
 
 														;-------------------------------------------------------------------------------
 
@@ -2331,7 +2331,7 @@ Init_New_Game:
 					   JSL.L				   Some_Init_Function_3
 
 					   SEP					 #$20		; 8-bit A
-RTS:
+RTS_Label:
 
 														;-------------------------------------------------------------------------------
 
@@ -2392,7 +2392,7 @@ Some_Save_Handler:
 					   STY.B				   $53
 
 					   LDY.W				   Save_State_Table+4,X
-TYX:
+TYX_Label:
 
 					   REP					 #$30		; 16-bit mode
 					   LDY.W				   #$0EA8
@@ -2406,7 +2406,7 @@ TYX:
 
 					   SEP					 #$20		; 8-bit A
 					   JSL.L				   Some_Function_9319
-RTS:
+RTS_Label:
 
 														;-------------------------------------------------------------------------------
 														; Save State Data Table
@@ -2513,7 +2513,7 @@ Some_Function:
 
 														; Set data bank to $7E (WRAM)
 					   PEA.W				   $007E
-PLB:
+PLB_Label:
 
 					   LDA.W				   #$0170
 					   LDY.W				   #$3007
@@ -2523,7 +2523,7 @@ PLB:
 					   STA.W				   $31B5	 ; Store to WRAM variable
 
 					   PLB							   ; Restore data bank
-RTS:
+RTS_Label:
 
 														;-------------------------------------------------------------------------------
 
@@ -2544,7 +2544,7 @@ Init_Hardware:
 					   LDA.B				   #$80	  ; Force blank + full brightness
 					   STA.W				   !SNES_INIDISP ; $2100: Screen display control
 														; Bit 7 = force blank (screen off)
-RTS:
+RTS_Label:
 
 														;-------------------------------------------------------------------------------
 														; DMA Source Data (Register Init Values)
@@ -6619,7 +6619,7 @@ Graphics_CommandDispatch:
 					   STA.B				   $17
 					   LDA.B				   [$17]
 					   STA.B				   $17
-RTS:
+RTS_Label:
 
 UNREACH_00A2FF:
 db											 $1A,$0A,$65,$17,$85,$17,$60
@@ -6630,12 +6630,12 @@ Graphics_ConditionalDispatch:
 					   AND.W				   #$00FF
 					   DEC					 A
 					   CMP.B				   $9E
-PHP:
+PHP_Label:
 					   INC					 A
 					   ASL					 A
 					   ADC.B				   $17
-TAY:
-PLP:
+TAY_Label:
+PLP_Label:
 					   BCC					 Graphics_ConditionalDispatch_Continue
 					   LDA.B				   $9E
 					   ASL					 A
@@ -6651,7 +6651,7 @@ PLP:
 
 Graphics_ConditionalDispatch_Continue:
 					   STY.B				   $17
-RTS:
+RTS_Label:
 
 														; ---------------------------------------------------------------------------
 														; More graphics command handlers (block)
@@ -6659,13 +6659,13 @@ RTS:
 														; ---------------------------------------------------------------------------
 
 Graphics_InitDisplay:
-PHP:
+PHP_Label:
 					   REP					 #$30
-PHB:
-PHA:
-PHD:
-PHX:
-PHY:
+PHB_Label:
+PHA_Label:
+PHD_Label:
+PHX_Label:
+PHY_Label:
 					   LDA.B				   $46
 					   BNE					 +
 					   JMP					 Graphics_InitDisplay_End
@@ -6673,12 +6673,12 @@ PHY:
 					   STA.W				   $01EE
 					   LDA.B				   $44
 					   STA.W				   $01ED
-SEC:
+SEC_Label:
 					   SBC.B				   $3F
 					   LSR					 A
 					   ADC.B				   $42
 					   STA.B				   $48
-SEC:
+SEC_Label:
 					   LDA.B				   $46
 					   SBC.B				   $44
 					   STA.W				   $01EB
@@ -6692,14 +6692,14 @@ SEC:
 Graphics_InitDisplay_End:
 					   LDA.W				   #$0080
 					   TSB.W				   $00D0
-RTS:
+RTS_Label:
 
 Graphics_DispatchTable:
 					   LDA.B				   [$17]
 					   INC.B				   $17
 					   AND.W				   #$00FF
 					   ASL					 A
-TAX:
+TAX_Label:
 					   JMP.W				   (DATA8_009E6E,X)
 
 Graphics_CallSystem:
@@ -6708,13 +6708,13 @@ Graphics_CallSystem:
 					   JSL.L				   CODE_0C8000
 					   LDA.W				   #$0008
 					   TRB.W				   $00D4
-RTS:
+RTS_Label:
 
 Graphics_CheckDisplayReady:
 					   LDA.W				   #$0040
 					   AND.W				   $00D0
 					   BEQ					 Graphics_FadeOut
-RTS:
+RTS_Label:
 
 Graphics_FadeOut:
 					   LDA.W				   #$00FF
@@ -6733,7 +6733,7 @@ Graphics_WaitForEvent_Loop:
 					   JSL.L				   CODE_0096A0
 					   BIT.B				   $94
 					   BEQ					 Graphics_WaitForEvent_Loop
-RTS:
+RTS_Label:
 
 Graphics_WaitForEvent_Alt:
 					   LDA.B				   [$17]
@@ -6744,7 +6744,7 @@ Graphics_WaitForEvent_AltLoop:
 					   JSL.L				   CODE_0096A0
 					   BIT.B				   $07
 					   BEQ					 Graphics_WaitForEvent_AltLoop
-RTS:
+RTS_Label:
 
 														; A series of conditional calls to CODE_00B1C3/CODE_00B1D6 etc.:
 
@@ -6759,12 +6759,12 @@ Condition_CheckPartyMember:
 Condition_Skip:
 					   INC.B				   $17
 					   INC.B				   $17
-RTS:
+RTS_Label:
 
 Condition_Jump:
 					   LDA.B				   [$17]
 					   STA.B				   $17
-RTS:
+RTS_Label:
 
 Condition_CheckEventFlag:
 					   JSR.W				   CODE_00B1D6
@@ -6775,12 +6775,12 @@ Condition_CheckEventFlag:
 Condition_SkipJumpAddr:
 					   INC.B				   $17
 					   INC.B				   $17
-RTS:
+RTS_Label:
 
 Condition_SetPointer:
 					   LDA.B				   [$17]
 					   STA.B				   $17
-RTS:
+RTS_Label:
 
 														; (blocks calling CODE_00B1E8, CODE_00B204, CODE_00B21D, CODE_00B22F etc.)
 
@@ -6800,12 +6800,12 @@ Condition_CheckItem:
 Condition_SkipJumpAddr2:
 					   INC.B				   $17
 					   INC.B				   $17
-RTS:
+RTS_Label:
 
 Condition_SetPointer2:
 					   LDA.B				   [$17]
 					   STA.B				   $17
-RTS:
+RTS_Label:
 
 Condition_CheckCompanion:
 					   JSR.W				   CODE_00B21D
@@ -6822,38 +6822,38 @@ Condition_CheckWeapon:
 Condition_SkipJumpAddr3:
 					   INC.B				   $17
 					   INC.B				   $17
-RTS:
+RTS_Label:
 
 Condition_SetPointer3:
 					   LDA.B				   [$17]
 					   STA.B				   $17
-RTS:
+RTS_Label:
 
 Graphics_SetPointer:
 					   LDA.B				   [$17]
 					   STA.B				   $17
-RTS:
+RTS_Label:
 
 Graphics_SetBank:
 					   LDA.B				   [$17]
 					   INC.B				   $17
 					   INC.B				   $17
-TAX:
+TAX_Label:
 					   SEP					 #$20
 					   LDA.B				   [$17]
 					   STA.B				   $19
 					   STX.B				   $17
-RTS:
+RTS_Label:
 
 Condition_TestBitD0:
 					   LDA.B				   [$17]
 					   INC.B				   $17
 					   AND.W				   #$00FF
-PHD:
+PHD_Label:
 					   PEA.W				   $00D0
-PLD:
+PLD_Label:
 					   JSL.L				   Bit_TestBits
-PLD:
+PLD_Label:
 					   INC					 A
 					   DEC					 A
 					   BRA					 Condition_BranchOnZero
@@ -6862,11 +6862,11 @@ Condition_TestBitD0_Alt:
 					   LDA.B				   [$17]
 					   INC.B				   $17
 					   AND.W				   #$00FF
-PHD:
+PHD_Label:
 					   PEA.W				   $00D0
-PLD:
+PLD_Label:
 					   JSL.L				   CODE_00975A
-PLD:
+PLD_Label:
 					   INC					 A
 					   DEC					 A
 					   JMP					 CODE_00A57D
@@ -7938,7 +7938,7 @@ Cmd_TestVariable1:
 Cmd_TestVariable2:
 					   JSR.W				   CODE_00B1A1 ; Test variable (alternate)
 					   BEQ					 Cmd_TestItemJump_Check ; Branch to alternate handler
-RTS:
+RTS_Label:
 
 					   JSR.W				   CODE_00B1B4 ; Test condition
 					   BEQ					 +		   ; If zero, skip
@@ -7966,21 +7966,21 @@ Cmd_SkipJumpAddress:
 					   JMP					 CODE_00A744 ; Take jump (far)
 +	INC.B $17                      ; Skip address
 					   INC.B				   $17
-RTS:
+RTS_Label:
 
 					   JSR.W				   CODE_00B1C3
 					   BCS					 +
 					   JMP					 CODE_00A744
 +	INC.B $17
 					   INC.B				   $17
-RTS:
+RTS_Label:
 
 					   JSR.W				   CODE_00B1C3
 					   BCC					 +
 					   JMP					 CODE_00A744
 +	INC.B $17
 					   INC.B				   $17
-RTS:
+RTS_Label:
 
 					   JSR.W				   CODE_00B1C3
 					   BCC					 +
@@ -7988,21 +7988,21 @@ RTS:
 					   JMP					 CODE_00A744
 +	INC.B $17
 					   INC.B				   $17
-RTS:
+RTS_Label:
 
 					   JSR.W				   CODE_00B1C3
 					   BEQ					 +
 					   JMP					 CODE_00A744
 +	INC.B $17
 					   INC.B				   $17
-RTS:
+RTS_Label:
 
 					   JSR.W				   CODE_00B1C3
 					   BEQ					 +
 					   JMP					 CODE_00A744
 +	INC.B $17
 					   INC.B				   $17
-RTS:
+RTS_Label:
 
 														;===============================================================================
 														; CODE_00A5C8 - Skip Jump Address Helper
@@ -8038,21 +8038,21 @@ Cmd_LoadExecWithSwitch:
 					   JMP					 CODE_00A744
 +	INC.B $17
 					   INC.B				   $17
-RTS:
+RTS_Label:
 
 					   JSR.W				   CODE_00B1D6
 					   BCS					 +
 					   JMP					 CODE_00A744
 +	INC.B $17
 					   INC.B				   $17
-RTS:
+RTS_Label:
 
 					   JSR.W				   CODE_00B1D6
 					   BCC					 +
 					   JMP					 CODE_00A744
 +	INC.B $17
 					   INC.B				   $17
-RTS:
+RTS_Label:
 
 					   JSR.W				   CODE_00B1D6
 					   BCC					 +
@@ -8060,21 +8060,21 @@ RTS:
 					   JMP					 CODE_00A744
 +	INC.B $17
 					   INC.B				   $17
-RTS:
+RTS_Label:
 
 					   JSR.W				   CODE_00B1D6
 					   BEQ					 +
 					   JMP					 CODE_00A744
 +	INC.B $17
 					   INC.B				   $17
-RTS:
+RTS_Label:
 
 					   JSR.W				   CODE_00B1D6
 					   BEQ					 +
 					   JMP					 CODE_00A744
 +	INC.B $17
 					   INC.B				   $17
-RTS:
+RTS_Label:
 
 					   LDA.B				   [$17]	 ; Load address
 					   INC.B				   $17
@@ -8090,21 +8090,21 @@ RTS:
 					   JMP					 Graphics_LoadAddrExecute
 +	INC.B $17
 					   INC.B				   $17
-RTS:
+RTS_Label:
 
 					   JSR.W				   CODE_00B1E8
 					   BCS					 +
 					   JMP					 CODE_00A744
 +	INC.B $17
 					   INC.B				   $17
-RTS:
+RTS_Label:
 
 					   JSR.W				   CODE_00B1E8
 					   BCC					 +
 					   JMP					 CODE_00A744
 +	INC.B $17
 					   INC.B				   $17
-RTS:
+RTS_Label:
 
 					   JSR.W				   CODE_00B1E8
 					   BCC					 +
@@ -8112,26 +8112,26 @@ RTS:
 					   JMP					 CODE_00A744
 +	INC.B $17
 					   INC.B				   $17
-RTS:
+RTS_Label:
 
 					   JSR.W				   CODE_00B1E8
 					   BEQ					 +
 					   JMP					 CODE_00A744
 +	INC.B $17
 					   INC.B				   $17
-RTS:
+RTS_Label:
 
 					   JSR.W				   CODE_00B1E8
 					   BEQ					 +
 					   JMP					 CODE_00A744
 +	INC.B $17
 					   INC.B				   $17
-RTS:
+RTS_Label:
 
 					   LDA.B				   [$17]
 					   INC.B				   $17
 					   INC.B				   $17
-TAX:
+TAX_Label:
 					   LDA.B				   $19
 					   JMP.W				   CODE_00A71C
 
@@ -8142,21 +8142,21 @@ TAX:
 					   JMP					 CODE_00A744
 +	INC.B $17
 					   INC.B				   $17
-RTS:
+RTS_Label:
 
 					   JSR.W				   CODE_00B204
 					   BCS					 +
 					   JMP					 CODE_00A744
 +	INC.B $17
 					   INC.B				   $17
-RTS:
+RTS_Label:
 
 					   JSR.W				   CODE_00B204
 					   BCC					 +
 					   JMP					 CODE_00A744
 +	INC.B $17
 					   INC.B				   $17
-RTS:
+RTS_Label:
 
 					   JSR.W				   CODE_00B204
 					   BCC					 +
@@ -8164,26 +8164,26 @@ RTS:
 					   JMP					 CODE_00A744
 +	INC.B $17
 					   INC.B				   $17
-RTS:
+RTS_Label:
 
 					   JSR.W				   CODE_00B204
 					   BEQ					 +
 					   JMP					 CODE_00A744
 +	INC.B $17
 					   INC.B				   $17
-RTS:
+RTS_Label:
 
 					   JSR.W				   CODE_00B204
 					   BEQ					 +
 					   JMP					 CODE_00A744
 +	INC.B $17
 					   INC.B				   $17
-RTS:
+RTS_Label:
 
 					   LDA.B				   [$17]
 					   INC.B				   $17
 					   INC.B				   $17
-TAX:
+TAX_Label:
 					   LDA.B				   $19
 					   JMP.W				   CODE_00A71C
 
@@ -8194,21 +8194,21 @@ TAX:
 					   JMP					 CODE_00A744
 +	INC.B $17
 					   INC.B				   $17
-RTS:
+RTS_Label:
 
 					   JSR.W				   CODE_00B21D
 					   BCS					 +
 					   JMP					 CODE_00A744
 +	INC.B $17
 					   INC.B				   $17
-RTS:
+RTS_Label:
 
 					   JSR.W				   CODE_00B21D
 					   BCC					 +
 					   JMP					 CODE_00A744
 +	INC.B $17
 					   INC.B				   $17
-RTS:
+RTS_Label:
 
 					   JSR.W				   CODE_00B21D
 					   BCC					 +
@@ -8216,26 +8216,26 @@ RTS:
 					   JMP					 CODE_00A744
 +	INC.B $17
 					   INC.B				   $17
-RTS:
+RTS_Label:
 
 					   JSR.W				   CODE_00B21D
 					   BEQ					 +
 					   JMP					 CODE_00A744
 +	INC.B $17
 					   INC.B				   $17
-RTS:
+RTS_Label:
 
 					   JSR.W				   CODE_00B21D
 					   BEQ					 +
 					   JMP					 CODE_00A744
 +	INC.B $17
 					   INC.B				   $17
-RTS:
+RTS_Label:
 
 					   LDA.B				   [$17]
 					   INC.B				   $17
 					   INC.B				   $17
-TAX:
+TAX_Label:
 					   LDA.B				   $19
 					   BRA					 CODE_00A71C_alt1
 
@@ -8246,21 +8246,21 @@ TAX:
 					   JMP					 CODE_00A744
 +	INC.B $17
 					   INC.B				   $17
-RTS:
+RTS_Label:
 
 					   JSR.W				   CODE_00B22F
 					   BCS					 +
 					   JMP					 CODE_00A744
 +	INC.B $17
 					   INC.B				   $17
-RTS:
+RTS_Label:
 
 					   JSR.W				   CODE_00B22F
 					   BCC					 +
 					   JMP					 CODE_00A744
 +	INC.B $17
 					   INC.B				   $17
-RTS:
+RTS_Label:
 
 					   JSR.W				   CODE_00B22F
 					   BCC					 +
@@ -8268,26 +8268,26 @@ RTS:
 					   JMP					 CODE_00A744
 +	INC.B $17
 					   INC.B				   $17
-RTS:
+RTS_Label:
 
 					   JSR.W				   CODE_00B22F
 					   BEQ					 +
 					   JMP					 CODE_00A744
 +	INC.B $17
 					   INC.B				   $17
-RTS:
+RTS_Label:
 
 					   JSR.W				   CODE_00B22F
 					   BEQ					 +
 					   JMP					 CODE_00A744
 +	INC.B $17
 					   INC.B				   $17
-RTS:
+RTS_Label:
 
 					   LDA.B				   [$17]
 					   INC.B				   $17
 					   INC.B				   $17
-TAX:
+TAX_Label:
 					   LDA.B				   $19
 					   BRA					 CODE_00A71C_alt2
 
@@ -8379,7 +8379,7 @@ Graphics_LoadExec:
 					   AND.W				   #$00FF	; Mask to byte
 					   PHD							   ; Save direct page
 					   PEA.W				   $00D0	 ; Set DP to $D0
-PLD:
+PLD_Label:
 					   JSL.L				   CODE_00975A ; Test flag (external)
 					   PLD							   ; Restore DP
 					   INC					 A		   ; Test result (set Z flag)
@@ -8392,7 +8392,7 @@ PLD:
 					   AND.W				   #$00FF	; Mask to byte
 					   PHD							   ; Save direct page
 					   PEA.W				   $00D0	 ; Set DP to $D0
-PLD:
+PLD_Label:
 					   JSL.L				   CODE_00975A ; Test flag (external)
 					   PLD							   ; Restore DP
 					   INC					 A		   ; Test result
@@ -8555,7 +8555,7 @@ Graphics_LongCallReturn:
 
 Graphics_LongCallCleanup:
 					   PEA.W				   $0000	 ; Reset direct page to $0000
-PLD:
+PLD_Label:
 					   PHK							   ; Push program bank
 					   PLB							   ; Set data bank = program bank
 					   RTS							   ; Return
@@ -8594,7 +8594,7 @@ db											 $4C,$1F,$9D ; JMP CODE_009D1F (buffer overflow handler)
 
 Memory_UpdatePointer:
 					   STA.L				   $7E3367   ; Update pointer
-RTS:
+RTS_Label:
 
 														;-------------------------------------------------------------------------------
 														; CODE_00A89B - Copy data from RAM $7E3367 back to Bank $00
@@ -8611,14 +8611,14 @@ Memory_CopyFromRAM:
 					   AND.W				   #$00FF
 					   PHA							   ; Save count
 					   EOR.W				   #$FFFF	; Negate count
-SEC:
+SEC_Label:
 					   ADC.L				   $7E3367   ; Subtract from pointer (move backward)
 					   STA.L				   $7E3367   ; Update pointer
 					   TAX							   ; X = new source
 					   PLA							   ; Restore count
 					   DEC					 A		   ; Count-1 for MVN
 					   MVN					 $00,$7E	 ; Move (X)Bank$7E → (Y)Bank$00
-RTS:
+RTS_Label:
 
 														;-------------------------------------------------------------------------------
 														; CODE_00A8BD/CODE_00A8C0 - Pointer manipulation helpers
@@ -8635,7 +8635,7 @@ Pointer_CalcOffset:
 					   ORA.B				   $1A	   ; Combine with $1A
 					   ADC.W				   #$0040	; Add base offset
 					   STA.B				   $1A	   ; Store result
-RTS:
+RTS_Label:
 
 														;-------------------------------------------------------------------------------
 														; CODE_00A8D1 - Calculate pointer from $25 (coordinates/position)
@@ -8657,7 +8657,7 @@ Pointer_FromPosition:
 					   ADC.B				   $1A	   ; Add X offset
 					   ADC.B				   $3F	   ; Add base pointer
 					   STA.B				   $1A	   ; Store final pointer
-RTS:
+RTS_Label:
 
 														;-------------------------------------------------------------------------------
 														; CODE_00A8EB-CODE_00A93E - DMA/MVN transfer routines
@@ -8672,11 +8672,11 @@ DMA_TransferWithBank:
 					   LDA.B				   [$17]	 ; Load X parameter
 					   INC.B				   $17
 					   INC.B				   $17
-TAX:
+TAX_Label:
 					   LDA.B				   [$17]	 ; Load Y parameter
 					   INC.B				   $17
 					   INC.B				   $17
-TAY:
+TAY_Label:
 					   LDA.B				   [$17]	 ; Load count
 					   INC.B				   $17
 					   AND.W				   #$00FF
@@ -8688,7 +8688,7 @@ DMA_Transfer4Params:
 					   LDA.B				   [$17]	 ; Load parameter 1
 					   INC.B				   $17
 					   INC.B				   $17
-TAX:
+TAX_Label:
 					   LDA.B				   [$17]	 ; Load parameter 2
 					   INC.B				   $17
 					   AND.W				   #$00FF
@@ -8696,7 +8696,7 @@ TAX:
 					   LDA.B				   [$17]	 ; Load parameter 3
 					   INC.B				   $17
 					   INC.B				   $17
-TAY:
+TAY_Label:
 					   LDA.B				   [$17]	 ; Load parameter 4
 					   INC.B				   $17
 					   AND.W				   #$00FF
@@ -8709,7 +8709,7 @@ TAY:
 					   PHB							   ; Save data bank
 					   JSR.W				   $0030	 ; Execute transfer
 					   PLB							   ; Restore data bank
-RTS:
+RTS_Label:
 
 DMA_TransferSaved:
 					   LDA.B				   $35	   ; Load $35
@@ -8727,7 +8727,7 @@ DMA_TransferSaved:
 					   PLB							   ; Restore data bank
 
 DMA_TransferDone:
-RTS:
+RTS_Label:
 
 														;-------------------------------------------------------------------------------
 														; CODE_00A958 - Write 8-bit value to address
@@ -8760,7 +8760,7 @@ Script_Write16Bit:
 					   INC.B				   $17
 					   INC.B				   $17
 					   STA.W				   $0000,X   ; Store to address
-RTS:
+RTS_Label:
 
 														;-------------------------------------------------------------------------------
 														; CODE_00A97D - Write 16-bit value + 8-bit value to address
@@ -8774,7 +8774,7 @@ Script_Write24Bit:
 					   AND.W				   #$00FF
 					   SEP					 #$20		; 8-bit A
 					   STA.W				   $0002,X   ; Store at X+2
-RTS:
+RTS_Label:
 
 														;-------------------------------------------------------------------------------
 														; CODE_00A98D/CODE_00A999 - Indirect pointer writes (using $9E)
@@ -8786,14 +8786,14 @@ Script_WriteIndirect8:
 					   AND.W				   #$00FF
 					   SEP					 #$20		; 8-bit A
 					   STA.B				   [$9E]	 ; Store via indirect pointer
-RTS:
+RTS_Label:
 
 Script_WriteIndirect16:
 					   LDA.B				   [$17]	 ; Load 16-bit value
 					   INC.B				   $17
 					   INC.B				   $17
 					   STA.B				   [$9E]	 ; Store via indirect pointer
-RTS:
+RTS_Label:
 
 														;-------------------------------------------------------------------------------
 														; CODE_00A9A2 - Complex indirect write sequence
@@ -8814,18 +8814,18 @@ Script_ReadIndirect:
 					   INC.B				   $17
 					   TAX							   ; X = destination
 					   LDA.B				   [$9E]	 ; Load value via indirect
-RTS:
+RTS_Label:
 
 Script_ReadIndirect8:
 					   JSR.W				   Script_ReadIndirect ; Load via [$9E]
 					   SEP					 #$20		; 8-bit A
 					   STA.W				   $0000,X   ; Store low byte only
-RTS:
+RTS_Label:
 
 Script_ReadIndirect16:
 					   JSR.W				   Script_ReadIndirect ; Load via [$9E]
 					   STA.W				   $0000,X   ; Store full word
-RTS:
+RTS_Label:
 
 														;-------------------------------------------------------------------------------
 														; CODE_00A9CD - MVN transfer using $9E pointer
@@ -8857,7 +8857,7 @@ Script_WriteBanked8:
 					   SEP					 #$20		; 8-bit A
 					   STA.W				   $0000,X   ; Store to Bank $7E address
 					   PLB							   ; Restore data bank
-RTS:
+RTS_Label:
 
 Script_WriteBanked16:
 					   JSR.W				   Script_LoadAddrBank ; Load address and bank
@@ -8868,7 +8868,7 @@ Script_WriteBanked16:
 					   INC.B				   $17
 					   STA.W				   $0000,X   ; Store to Bank $7E address
 					   PLB							   ; Restore data bank
-RTS:
+RTS_Label:
 
 Script_WriteBanked24:
 db											 $20,$22,$AA,$48,$AB,$A7,$17,$E6,$17,$E6,$17,$9D,$00,$00,$A7,$17
@@ -8887,7 +8887,7 @@ Script_LoadAddrBank:
 					   LDA.B				   [$17]	 ; Load bank
 					   INC.B				   $17
 					   AND.W				   #$00FF	; Isolate bank byte
-RTS:
+RTS_Label:
 
 														;-------------------------------------------------------------------------------
 														; CODE_00AA31-CODE_00AA67 - Text positioning and display helpers
@@ -8901,11 +8901,11 @@ Text_CalcWindowPos:
 
 Text_CalcXPos:
 					   LDA.B				   #$20	  ; Load window width constant
-SEC:
+SEC_Label:
 					   SBC.B				   $2A	   ; Subtract text width
 					   LSR					 A		   ; / 2 (center)
 					   STA.B				   $28	   ; Store X offset
-RTS:
+RTS_Label:
 
 Text_CalcYPos:
 					   LDA.B				   $24	   ; Load flags
@@ -8920,21 +8920,21 @@ Text_CalcYDynamic:
 					   INC					 A
 
 Text_CalcYApply:
-CLC:
+CLC_Label:
 					   ADC.B				   $23	   ; Add offset
 					   STA.B				   $2C	   ; Store Y position
 					   LSR					 A		   ; / 4 (row)
 					   LSR					 A
 					   STA.B				   $29	   ; Store row index
-RTS:
+RTS_Label:
 
 Text_FinalizePos:
 					   REP					 #$30		; 16-bit mode
 					   LDA.B				   $28	   ; Load calculated position
-CLC:
+CLC_Label:
 					   ADC.W				   #$0101	; Add offset (both bytes)
 					   STA.B				   $25	   ; Store final position
-RTS:
+RTS_Label:
 
 														;-------------------------------------------------------------------------------
 														; CODE_00AA68 - Repeat text operation
@@ -8955,7 +8955,7 @@ Text_RepeatLoop:
 					   PLA							   ; Restore count
 					   DEC					 A		   ; Decrement count
 					   BNE					 Text_RepeatLoop ; Loop if not zero
-RTS:
+RTS_Label:
 
 														;-------------------------------------------------------------------------------
 														; CODE_00AA7C-CODE_00AACC - DMA transfer setup routines
@@ -9000,12 +9000,12 @@ DMA_SetupClear:
 					   LSR					 A		   ; / 4
 					   LSR					 A
 					   ADC.B				   $3F	   ; Add base
-TAX:
+TAX_Label:
 					   LDA.B				   $2A	   ; Load size
 					   AND.W				   #$FF00
 					   LSR					 A		   ; / 4
 					   LSR					 A
-TAY:
+TAY_Label:
 					   LDA.W				   #$2C00	; Different tile value (blank/clear)
 					   JMP.W				   CODE_009D4B ; Execute DMA
 
@@ -9084,7 +9084,7 @@ Sprite_DrawFilled:
 					   LDA.W				   #$00FE	; Tile $FE (solid fill)
 					   JSR.W				   Window_DrawTiles ; Draw tiles
 					   STY.B				   $1A	   ; Update pointer
-RTS:
+RTS_Label:
 
 														;-------------------------------------------------------------------------------
 														; Sprite_DrawWindowBorder - Draw window border with vertical flip
@@ -9096,7 +9096,7 @@ Sprite_DrawWindowBorder:
 					   ORA.B				   $1D	   ; Combine with tile flags
 					   STA.B				   $64	   ; Store flip flags
 					   JSR.W				   CODE_00B4A7 ; Setup drawing
-SEC:
+SEC_Label:
 					   LDA.B				   $1A	   ; Load pointer
 					   SBC.W				   #$0040	; Back up one row
 					   STA.B				   $1A
@@ -9116,7 +9116,7 @@ Window_CalcBounds:
 					   CMP.B				   $28	   ; Compare with window top
 					   BCS					 Window_CalcRowOffset ; If >= top, use it
 					   LDA.B				   $28	   ; Use window top
-SEC:
+SEC_Label:
 
 Window_CalcRowOffset:
 					   SBC.B				   $28	   ; Calculate row offset
@@ -9150,7 +9150,7 @@ Window_DrawBorder:
 					   LDA.W				   #$00FD	; Tile $FD
 					   EOR.B				   $64	   ; Apply flip flags
 					   STA.B				   ($1A),Y   ; Draw tile
-RTS:
+RTS_Label:
 
 														;-------------------------------------------------------------------------------
 														; Window_DrawFrame - Draw window frame (tiles $FC, $FF)
@@ -9194,7 +9194,7 @@ Window_DrawFilledBox:
 					   AND.W				   #$00FF
 					   JSR.W				   Window_FillRows ; Fill
 					   STY.B				   $1A	   ; Update pointer
-RTS:
+RTS_Label:
 
 														;-------------------------------------------------------------------------------
 														; Window_DrawItemIcon - Draw item icon box (tiles $45)
@@ -9310,7 +9310,7 @@ db											 $3A,$99,$36,$00,$3A,$99,$34,$00
 
 Window_FillDone:
 					   PLA							   ; Clean stack
-RTS:
+RTS_Label:
 
 														;-------------------------------------------------------------------------------
 														; Window_DrawFrameCorners - Draw window corners (tiles $F7/$F9/$FB)
@@ -9334,7 +9334,7 @@ Window_DrawFrameCorners:
 					   LDA.B				   $1A	   ; Advance pointer
 					   ADC.W				   #$0040
 					   STA.B				   $1A
-RTS:
+RTS_Label:
 
 														;-------------------------------------------------------------------------------
 														; Window_DrawItemCorners - Draw item icon corners (tiles $40-$44)
@@ -9358,7 +9358,7 @@ Window_DrawItemCorners:
 					   LDA.B				   $1A
 					   ADC.W				   #$0040
 					   STA.B				   $1A
-RTS:
+RTS_Label:
 
 														;-------------------------------------------------------------------------------
 														; Window_DrawSpellCorners - Draw spell icon corners (tiles $70-$74)
@@ -9382,7 +9382,7 @@ Window_DrawSpellCorners:
 					   LDA.B				   $1A
 					   ADC.W				   #$0040
 					   STA.B				   $1A
-RTS:
+RTS_Label:
 
 														;-------------------------------------------------------------------------------
 														; Window_SetupTopEdge - Setup top edge drawing
@@ -9392,7 +9392,7 @@ Window_SetupTopEdge:
 					   PHA							   ; Save tile
 					   LDY.B				   $1A	   ; Load pointer
 					   INY							   ; Skip first tile
-INY:
+INY_Label:
 					   LDA.B				   $2A	   ; Load width
 					   AND.W				   #$00FF
 					   DEC					 A		   ; -2 for corners
@@ -9433,7 +9433,7 @@ Window_CalcCornerPos:
 					   DEC					 A		   ; -2
 					   DEC					 A
 					   STA.B				   $62	   ; Row count
-RTS:
+RTS_Label:
 
 														;-------------------------------------------------------------------------------
 														; Window_DrawSideTiles - Draw vertical side tiles
@@ -9457,7 +9457,7 @@ Window_DrawSideLoop:
 					   STA.B				   $1A
 					   DEX							   ; Decrement counter
 					   BNE					 Window_DrawSideLoop ; Loop
-RTS:
+RTS_Label:
 
 														;-------------------------------------------------------------------------------
 														; Window_DrawTiles - Generic tile drawing routine
@@ -9471,11 +9471,11 @@ Window_DrawTileLoop:
 					   JSR.W				   (DATA8_009A1E,X) ; Call indexed routine
 					   TYA							   ; Get pointer
 					   ADC.W				   #$0040	; Next row
-TAY:
+TAY_Label:
 					   LDA.B				   $64	   ; Restore tile
 					   DEC.B				   $62	   ; Decrement row counter
 					   BNE					 Window_DrawTileLoop ; Loop
-RTS:
+RTS_Label:
 
 														;-------------------------------------------------------------------------------
 														; Sprite_ClearOAM - Clear sprite OAM entries
@@ -9491,20 +9491,20 @@ Sprite_ClearOAM:
 					   LDA.W				   #$01F0	; Off-screen Y position
 					   PEA.W				   $007E	 ; Push Bank $7E
 					   PLB							   ; Set data bank
-SEC:
+SEC_Label:
 
 Sprite_ClearLoop:
 					   TAX							   ; X = Y position
 					   JSR.W				   CODE_009A05 ; Clear sprite entry
 					   TYA							   ; Get OAM pointer
 					   SBC.W				   #$FFF0	; Move back (-16 bytes)
-TAY:
+TAY_Label:
 					   TXA							   ; Restore Y position
 					   ADC.W				   #$FFF8	; Adjust (-8)
 					   DEC.B				   $62	   ; Decrement count
 					   BNE					 Sprite_ClearLoop ; Loop
 					   PLB							   ; Restore bank
-RTS:
+RTS_Label:
 
 														;-------------------------------------------------------------------------------
 														; Sprite_DrawCompressed - Compressed tile drawing to Bank $7E
@@ -9521,7 +9521,7 @@ Sprite_DrawCompressed:
 					   LDA.W				   #$01F9	; Calculate offset
 					   SBC.B				   $64
 					   PEA.W				   $007E	 ; Bank $7E
-PLB:
+PLB_Label:
 					   STA.B				   $64	   ; Save offset
 					   AND.W				   #$0007	; Get low 3 bits
 					   ASL					 A		   ; × 2
@@ -9531,7 +9531,7 @@ PLB:
 					   ADC.W				   #$0008	; Adjust
 					   JSR.W				   (DATA8_009A1E,X) ; Call indexed routine
 					   SBC.W				   #$0007	; Adjust back
-TAX:
+TAX_Label:
 					   LDA.B				   $64
 					   AND.W				   #$0007	; Get bit offset
 					   STA.B				   $64
@@ -9539,7 +9539,7 @@ TAX:
 					   ASL					 A		   ; × 2
 					   ADC.B				   $62
 					   TAY							   ; Y = adjusted pointer
-SEC:
+SEC_Label:
 					   LDA.B				   $2D	   ; Load width
 					   SBC.B				   $64	   ; Subtract offset
 					   AND.W				   #$00FF
@@ -9548,16 +9548,16 @@ SEC:
 					   LSR					 A
 					   LSR					 A
 					   STA.B				   $62	   ; Row counter
-TXA:
-SEC:
+TXA_Label:
+SEC_Label:
 
 Sprite_CompressedLoop:
-TAX:
+TAX_Label:
 					   JSR.W				   Memory_Fill14Bytes ; Draw routine
-TYA:
+TYA_Label:
 					   SBC.W				   #$FFF0	; Adjust pointer
-TAY:
-TXA:
+TAY_Label:
+TXA_Label:
 					   ADC.W				   #$FFF8	; Adjust X
 					   DEC.B				   $62
 					   BNE					 Sprite_CompressedLoop ; Loop
@@ -9565,11 +9565,11 @@ TXA:
 					   PLA							   ; Restore width
 					   AND.W				   #$0007	; Get remainder
 					   ASL					 A		   ; × 2
-TAX:
+TAX_Label:
 					   LDA.B				   $64
 					   JSR.W				   (DATA8_009A1E,X) ; Final draw
 					   PLB							   ; Restore bank
-RTS:
+RTS_Label:
 
 														;-------------------------------------------------------------------------------
 														; Text_DrawRLE - RLE compressed text drawing
@@ -9578,7 +9578,7 @@ RTS:
 														;-------------------------------------------------------------------------------
 Text_DrawRLE:
 					   PEA.W				   $007E	 ; Bank $7E
-PLB:
+PLB_Label:
 					   LDA.B				   $2C	   ; Y coordinate
 					   AND.W				   #$00FF
 					   PHA							   ; Save
@@ -9591,7 +9591,7 @@ PLB:
 					   ASL					 A		   ; × 8
 					   ASL					 A
 					   ASL					 A
-SEC:
+SEC_Label:
 					   SBC.B				   $01,S	 ; Subtract Y
 					   STA.B				   $01,S	 ; Update stack
 					   LDA.B				   $2B	   ; Column count
@@ -9609,7 +9609,7 @@ Text_DrawRLE_Loop:
 					   STA.W				   $0000,X   ; Store
 					   TXY							   ; Y = X
 					   INY							   ; Advance
-INY:
+INY_Label:
 					   PLA							   ; Restore count
 					   DEC					 A		   ; -1
 					   BEQ					 Text_DrawRLE_Done ; If 1, done
@@ -9622,10 +9622,10 @@ Text_DrawRLE_Done:
 
 Text_DrawRLE_Skip:
 					   LDA.W				   #$0008	; 8 tiles
-SEC:
+SEC_Label:
 					   SBC.B				   [$17]	 ; Subtract used
 					   AND.W				   #$00FF
-CLC:
+CLC_Label:
 					   ADC.B				   $01,S	 ; Add to stack offset
 					   STA.B				   $01,S
 
@@ -9635,22 +9635,22 @@ Text_DrawRLE_Next:
 					   BNE					 Text_DrawRLE_Loop ; Loop
 					   PLA							   ; Clean stack
 					   PLB							   ; Restore bank
-RTS:
+RTS_Label:
 
 Text_DrawRLE_Special:
 					   AND.W				   #$007F	; Mask off high bit
 					   PHA							   ; Save count
 					   LDA.W				   #$0008
-SEC:
+SEC_Label:
 					   SBC.B				   $01,S	 ; Calculate skip
-CLC:
+CLC_Label:
 					   ADC.B				   $03,S	 ; Add to offset
 					   STA.B				   $03,S
 					   STA.W				   $0000,X   ; Store
-TXY:
-INY:
-INY:
-PLA:
+TXY_Label:
+INY_Label:
+INY_Label:
+PLA_Label:
 					   DEC					 A
 					   BEQ					 CODE_00AE9F
 					   ASL					 A
@@ -9658,7 +9658,7 @@ PLA:
 					   MVN					 $7E,$7E	 ; Block move
 
 Text_DrawRLE_SpecialDone:
-TYX:
+TYX_Label:
 					   BRA					 Text_DrawRLE_Next ; Continue
 
 														;-------------------------------------------------------------------------------
@@ -9669,7 +9669,7 @@ Cmd_CallGraphics8Bit:
 					   INC.B				   $17
 					   AND.W				   #$00FF
 					   JSL.L				   CODE_009760 ; Long call to graphics routine
-RTS:
+RTS_Label:
 
 db											 $A5,$9E,$22,$60,$97,$00,$60 ; Variant with $9E parameter
 
@@ -9682,10 +9682,10 @@ Cmd_CallGraphicsWithDP:
 					   AND.W				   #$00FF
 					   PHD							   ; Save direct page
 					   PEA.W				   $00D0	 ; Set DP to $D0
-PLD:
+PLD_Label:
 					   JSL.L				   CODE_00974E ; Call graphics routine
 					   PLD							   ; Restore DP
-RTS:
+RTS_Label:
 
 														;-------------------------------------------------------------------------------
 														; Cmd_CallSprite - Call sprite/tile function
@@ -9695,7 +9695,7 @@ Cmd_CallSprite:
 					   INC.B				   $17
 					   AND.W				   #$00FF
 					   JSL.L				   CODE_00976B ; Call sprite routine
-RTS:
+RTS_Label:
 
 db											 $A5,$9E,$22,$6B,$97,$00,$60 ; Variant with $9E
 
@@ -9706,12 +9706,12 @@ Cmd_CallGraphicsAlt:
 					   LDA.B				   [$17]
 					   INC.B				   $17
 					   AND.W				   #$00FF
-PHD:
+PHD_Label:
 					   PEA.W				   $00D0	 ; DP = $D0
-PLD:
+PLD_Label:
 					   JSL.L				   CODE_009754 ; Graphics call
-PLD:
-RTS:
+PLD_Label:
+RTS_Label:
 
 														; More variants with different parameter sources
 db											 $A5,$2E,$0B,$48,$A7,$17,$E6,$17,$29,$FF,$00,$2B,$22,$4E,$97,$00
@@ -9719,26 +9719,26 @@ db											 $2B,$60
 
 Cmd_CallFromOffset:
 					   LDA.B				   $2E	   ; From $2E
-PHD:
-PHA:
+PHD_Label:
+PHA_Label:
 					   LDA.B				   $9E	   ; From $9E
-PLD:
+PLD_Label:
 					   JSL.L				   CODE_00974E
-PLD:
-RTS:
+PLD_Label:
+RTS_Label:
 
 db											 $A5,$2E,$0B,$48,$A7,$17,$E6,$17,$29,$FF,$00,$2B,$22,$54,$97,$00
 db											 $2B,$60
 
 Cmd_CallFromOffset2:
 					   LDA.B				   $2E
-PHD:
-PHA:
+PHD_Label:
+PHA_Label:
 					   LDA.B				   $9E
-PLD:
+PLD_Label:
 					   JSL.L				   CODE_009754
-PLD:
-RTS:
+PLD_Label:
+RTS_Label:
 
 														;-------------------------------------------------------------------------------
 														; Memory_CopyWithTable - Memory copy with table offset
@@ -9756,7 +9756,7 @@ Memory_CopyWithTable:
 					   DEC.B				   $17
 					   DEC.B				   $17
 					   TYA							   ; Get count
-SEC:
+SEC_Label:
 					   ADC.B				   $17	   ; Advance script pointer
 					   STA.B				   $17
 					   LDX.W				   #$00A4	; X = $A4 (source pointer)
@@ -9779,7 +9779,7 @@ Memory_CopyTo98:
 					   STZ.B				   $9A	   ; Clear dest high
 					   LDY.W				   #$0098	; Y = $98
 					   MVN					 $00,$00	 ; Block move
-RTS:
+RTS_Label:
 
 														;-------------------------------------------------------------------------------
 														; Memory_CopyTo9E - Memory copy to $9E pointer
@@ -9793,7 +9793,7 @@ Memory_CopyTo9E:
 					   TXA							   ; A = count
 					   LDX.W				   #$009E	; X = $9E
 					   MVN					 $00,$00	 ; Block move
-RTS:
+RTS_Label:
 
 														;-------------------------------------------------------------------------------
 														; Memory_Copy1Byte/2Bytes/3Bytes - Memory copy variants with preset counts
@@ -9825,7 +9825,7 @@ Memory_StoreTo9E:
 					   STA.B				   $9E	   ; Store in $9E
 					   LDA.B				   $9A	   ; Load result high
 					   STA.B				   $A0	   ; Store in $A0
-RTS:
+RTS_Label:
 
 														;-------------------------------------------------------------------------------
 														; Memory_CopyTable1/2/3 - Copy variants with preset counts (table mode)
@@ -9857,7 +9857,7 @@ Pointer_Load16BitClear:
 					   JSR.W				   Pointer_LoadFromBank ; Load pointer
 					   STZ.B				   $9F	   ; Clear high byte
 					   STZ.B				   $A0
-RTS:
+RTS_Label:
 
 db											 $20,$BB,$AF,$64,$A0,$60,$20,$BB,$AF,$29,$FF,$00,$85,$A0,$60
 
@@ -9881,7 +9881,7 @@ Pointer_LoadFromBank:
 					   LDA.W				   $0002,X   ; Load second word
 					   PLB							   ; Restore bank
 					   STY.B				   $9E	   ; Store first word
-RTS:
+RTS_Label:
 
 														;-------------------------------------------------------------------------------
 														; Pointer_LoadByte - Load byte from address into $9E
@@ -9915,7 +9915,7 @@ Bitwise_ANDApply:
 					   LDA.B				   $A0	   ; Load $A0
 					   AND.B				   $9A	   ; AND with $9A
 					   STA.B				   $A0	   ; Store result
-RTS:
+RTS_Label:
 
 														;-------------------------------------------------------------------------------
 														; Bitwise_AND1Byte - Bitwise AND variants with preset counts
@@ -9950,7 +9950,7 @@ Bitwise_TSBApply:
 					   TSB.B				   $9E	   ; Test and Set Bits in $9E
 					   LDA.B				   $9A
 					   TSB.B				   $A0	   ; Test and Set Bits in $A0
-RTS:
+RTS_Label:
 
 db											 $A9,$00,$00,$80,$EA ; TSB variants with preset counts
 
@@ -9982,7 +9982,7 @@ Bitwise_XORApply:
 					   LDA.B				   $A0
 					   EOR.B				   $9A	   ; XOR with $9A
 					   STA.B				   $A0
-RTS:
+RTS_Label:
 
 														;-------------------------------------------------------------------------------
 														; XOR variants with preset counts
@@ -10009,14 +10009,14 @@ Math_AddDirect:
 					   JSR.W				   Memory_CopyDirect ; Copy direct
 
 Math_AddApply:
-CLC:
+CLC_Label:
 					   LDA.B				   $9E
 					   ADC.B				   $98	   ; Add $98
 					   STA.B				   $9E	   ; Store sum
 					   LDA.B				   $A0
 					   ADC.B				   $9A	   ; Add $9A with carry
 					   STA.B				   $A0
-RTS:
+RTS_Label:
 
 														;-------------------------------------------------------------------------------
 														; Math_Add1/2/3Byte - Addition variants with preset counts
@@ -10052,14 +10052,14 @@ Math_SubDirect:
 					   JSR.W				   Memory_CopyDirect ; Copy direct
 
 Math_SubApply:
-SEC:
+SEC_Label:
 					   LDA.B				   $9E
 					   SBC.B				   $98	   ; Subtract $98
 					   STA.B				   $9E	   ; Store difference
 					   LDA.B				   $A0
 					   SBC.B				   $9A	   ; Subtract $9A with borrow
 					   STA.B				   $A0
-RTS:
+RTS_Label:
 
 														;-------------------------------------------------------------------------------
 														; Subtraction variants with preset counts
@@ -10093,7 +10093,7 @@ Math_Divide:
 					   LDA.B				   $9E	   ; Load dividend
 					   STA.B				   $98	   ; Setup for division
 					   JSL.L				   CODE_0096B3 ; Call division routine
-RTS:
+RTS_Label:
 
 					   LDA.B				   [$17]	 ; Variant: divisor from script
 					   INC.B				   $17
@@ -10121,7 +10121,7 @@ Math_Multiply8:
 					   LDA.B				   $A0	   ; Load multiplicand high
 					   STA.B				   $9A
 					   JSL.L				   CODE_0096E4 ; Call multiplication routine
-RTS:
+RTS_Label:
 
 														;-------------------------------------------------------------------------------
 														; Math_Multiply8_Script: Multiplication variants
@@ -10151,7 +10151,7 @@ Math_GetRNGResult:
 					   LDA.B				   $A2	   ; Load RNG result
 					   STA.B				   $9E	   ; Store in $9E
 					   STZ.B				   $A0	   ; Clear high byte
-RTS:
+RTS_Label:
 
 					   JSR.W				   Math_Multiply8_Script ; Variant: multiply then get result
 					   BRA					 Math_GetRNGResult
@@ -10172,13 +10172,13 @@ Math_FormatDecimal:
 					   LDA.W				   #$000A	; Base 10 (decimal)
 					   STA.B				   $9C	   ; Store base
 					   LDX.W				   #$006D	; X = buffer pointer
-CLC:
+CLC_Label:
 					   JSL.L				   CODE_009824 ; Call BCD conversion
 					   PLA							   ; Restore $A0
 					   STA.B				   $A0
 					   PLA							   ; Restore $9E
 					   STA.B				   $9E
-RTS:
+RTS_Label:
 
 														;-------------------------------------------------------------------------------
 														; Math_FormatHex: Format hexadecimal number for display
@@ -10192,38 +10192,38 @@ Math_FormatHex:
 					   LDX.W				   #$006D	; Buffer pointer
 					   SEC							   ; Hex mode flag
 					   JSL.L				   CODE_009824 ; Call hex conversion
-PLA:
+PLA_Label:
 					   STA.B				   $A0
-PLA:
+PLA_Label:
 					   STA.B				   $9E
-RTS:
+RTS_Label:
 
 														;-------------------------------------------------------------------------------
 														; CODE_00B185 - Helper routines for loading test values
 														;-------------------------------------------------------------------------------
 System_LoadFrom3A:
 					   LDA.B				   $3A	   ; Load from $3A
-RTS:
+RTS_Label:
 
 Test_LoadValue8:
 					   LDA.B				   [$17]	 ; Load 8-bit from script
 					   INC.B				   $17
 					   AND.W				   #$00FF
-RTS:
+RTS_Label:
 
 Test_LoadValue9E:
 					   LDA.B				   $9E	   ; Load from $9E
-RTS:
+RTS_Label:
 
 Test_LoadValueRNG:
 					   LDA.B				   $A2	   ; Load from $A2 (RNG)
-RTS:
+RTS_Label:
 
 Test_LoadValue16:
 					   LDA.B				   [$17]	 ; Load 16-bit from script
 					   INC.B				   $17
 					   INC.B				   $17
-RTS:
+RTS_Label:
 
 														;-------------------------------------------------------------------------------
 														; Test_CompareValue24: Compare 16-bit values (equality test)
@@ -10250,7 +10250,7 @@ Test_CompareValue24:
 														; C flag = greater/equal result
 
 Test_CompareDone:
-RTS:
+RTS_Label:
 
 														;===============================================================================
 														; Progress: ~10,200 lines documented (72.8% of Bank $00)
@@ -10288,7 +10288,7 @@ Test_CompareDP:
 					   PLD							   ; Restore direct page
 					   INC					 A		   ; Set flags
 					   DEC					 A		   ; (Z flag = equality)
-RTS:
+RTS_Label:
 
 														;-------------------------------------------------------------------------------
 														; Test_Compare8: 8-bit comparison test
@@ -10311,7 +10311,7 @@ Test_Compare8:
 					   LDA.B				   $9E	   ; Compare low byte
 					   CMP.B				   $64	   ; Set C and Z flags
 Test_Compare8_Done:
-RTS:
+RTS_Label:
 
 														;-------------------------------------------------------------------------------
 														; Test_Compare16: 16-bit comparison test
@@ -10334,7 +10334,7 @@ Test_Compare16:
 					   LDA.B				   $9E	   ; Compare low word
 					   CMP.B				   $64	   ; Set C and Z flags
 Test_Compare16_Done:
-RTS:
+RTS_Label:
 
 														;-------------------------------------------------------------------------------
 														; Test_Compare24Full: 24-bit comparison test (full)
@@ -10362,7 +10362,7 @@ Test_Compare24Full:
 					   LDA.B				   $9E	   ; Compare low words
 					   CMP.B				   $64
 Test_Compare24Done:
-RTS:
+RTS_Label:
 
 														;-------------------------------------------------------------------------------
 														; Test_CompareIndirect8 - Comparison with indirect 8-bit value
@@ -10387,7 +10387,7 @@ Test_CompareIndirect8:
 					   LDA.B				   $9E	   ; Compare low byte
 					   CMP.B				   $64
 Test_CompareIndirect8Done:
-RTS:
+RTS_Label:
 
 														;-------------------------------------------------------------------------------
 														; Test_CompareIndirect16 - Comparison with indirect 16-bit value
@@ -10409,7 +10409,7 @@ Test_CompareIndirect16:
 					   LDA.B				   $9E	   ; Compare with value at pointer
 					   CMP.W				   $0000,X
 Test_CompareIndirect16Done:
-RTS:
+RTS_Label:
 
 														;-------------------------------------------------------------------------------
 														; Test_CompareIndirect24 - Comparison with indirect 24-bit value
@@ -10434,7 +10434,7 @@ Test_CompareIndirect24:
 					   LDA.B				   $9E	   ; Compare low words
 					   CMP.W				   $0000,X   ; With value at pointer
 Test_CompareIndirect24Done:
-RTS:
+RTS_Label:
 
 														;-------------------------------------------------------------------------------
 														; String_CountHighBit - Count characters with high bit set (string analysis)
@@ -10487,7 +10487,7 @@ String_CountHighBit_Next:
 					   DEY							   ; Decrement counter
 					   BNE					 String_CountHighBit_Loop ; Loop until done
 					   PLB							   ; Restore bank
-RTS:
+RTS_Label:
 
 														;-------------------------------------------------------------------------------
 														; Math_Negate - Negate value (two's complement)
@@ -10506,7 +10506,7 @@ Math_Negate:
 					   LDA.W				   #$0000	; Load 0
 					   SBC.B				   $A0	   ; 0 - high byte (with borrow)
 					   STA.B				   $A0
-RTS:
+RTS_Label:
 
 														;-------------------------------------------------------------------------------
 														; Bitfield_ToggleBits: Toggle bits in array (bitfield manipulation)
@@ -10541,7 +10541,7 @@ Tilemap_DecrementRow:
 					   SEC							   ; Set carry for subtraction
 					   SBC.W				   #$0040	; Subtract one row ($40 bytes)
 					   STA.B				   $1A	   ; Store result
-RTS:
+RTS_Label:
 
 														;-------------------------------------------------------------------------------
 														; Tilemap_IncrementRow: Increment tilemap pointer by one row
@@ -10556,7 +10556,7 @@ Tilemap_IncrementRow:
 					   CLC							   ; Clear carry for addition
 					   ADC.W				   #$0040	; Add one row ($40 bytes)
 					   STA.B				   $1A	   ; Store result
-RTS:
+RTS_Label:
 
 														;-------------------------------------------------------------------------------
 														; Tilemap_DecrementTile: Decrement tilemap pointer by one tile
@@ -10569,7 +10569,7 @@ RTS:
 Tilemap_DecrementTile:
 					   DEC.B				   $1A	   ; Decrement low byte
 					   DEC.B				   $1A	   ; Decrement again (2 bytes)
-RTS:
+RTS_Label:
 
 														;-------------------------------------------------------------------------------
 														; Tilemap_IncrementTile: Increment tilemap pointer by one tile
@@ -10582,7 +10582,7 @@ RTS:
 Tilemap_IncrementTile:
 					   INC.B				   $1A	   ; Increment low byte
 					   INC.B				   $1A	   ; Increment again (2 bytes)
-RTS:
+RTS_Label:
 
 														;-------------------------------------------------------------------------------
 														; Cmd_CallExternal16: Jump to external routine with 16-bit parameter
@@ -10634,7 +10634,7 @@ Math_ShiftRight_Loop:
 					   ROR.B				   $9E	   ; Rotate low byte right (carry in)
 					   DEC					 A		   ; Decrement shift count
 					   BNE					 Math_ShiftRight_Loop ; Loop until done
-RTS:
+RTS_Label:
 
 														;-------------------------------------------------------------------------------
 														; Math_ShiftLeft: Left shift $9E/$A0 by N bits
@@ -10656,7 +10656,7 @@ Math_ShiftLeft_Loop:
 					   ROL.B				   $A0	   ; Rotate high byte left (carry in)
 					   DEC					 A		   ; Decrement shift count
 					   BNE					 Math_ShiftLeft_Loop ; Loop until done
-RTS:
+RTS_Label:
 
 														;-------------------------------------------------------------------------------
 														; Math_ShiftRightIndirect: Right shift by N bits (from indirect address)
@@ -10695,7 +10695,7 @@ db											 $A0,$3A,$D0,$F9,$60
 														; Notes: May be unused or placeholder for future functionality
 														;-------------------------------------------------------------------------------
 Script_NoOp:
-RTS:
+RTS_Label:
 
 														;-------------------------------------------------------------------------------
 														; Script_Execute: Execute script or function call
@@ -10728,9 +10728,9 @@ Script_Execute_External:
 					   JSL.L				   CODE_01B24C ; Initialize and run script
 					   PLA							   ; Restore script pointer
 					   STA.B				   $18
-PLA:
+PLA_Label:
 					   STA.B				   $17
-RTS:
+RTS_Label:
 
 														;-------------------------------------------------------------------------------
 														; Script_ExecuteList: Execute script list (loop until $FFFF terminator)
@@ -10753,7 +10753,7 @@ Script_ExecuteList:
 					   BRA					 Script_ExecuteList ; Loop to next script
 
 Script_ExecuteList_Done:
-RTS:
+RTS_Label:
 
 														;-------------------------------------------------------------------------------
 														; Math_RandomTransform: Random number transformation
@@ -10767,7 +10767,7 @@ Math_RandomTransform:
 					   LDA.B				   $9E	   ; Load value
 					   JSL.L				   CODE_009730 ; Apply RNG transformation
 					   STA.B				   $9E	   ; Store result
-RTS:
+RTS_Label:
 
 														;-------------------------------------------------------------------------------
 														; Math_CountLeadingZeros: Count leading zeros (bit scan)
@@ -10787,7 +10787,7 @@ Math_CountLeadingZeros_Loop:
 					   ASL					 A		   ; Shift left (bit 15 → Carry)
 					   BCC					 Math_CountLeadingZeros_Loop ; If carry clear (bit was 0), continue
 					   STX.B				   $9E	   ; Store leading zero count
-RTS:
+RTS_Label:
 
 														;-------------------------------------------------------------------------------
 														; Math_Increment24: Increment $9E/$A0 (24-bit safe)
@@ -10803,7 +10803,7 @@ Math_Increment24:
 db											 $E6,$A0	 ; INC $A0 (high byte)
 
 Math_Increment24_Done:
-RTS:
+RTS_Label:
 
 														;-------------------------------------------------------------------------------
 														; Cmd_IncrementIndirect16: Increment 16-bit value at pointer (from script)
@@ -10819,7 +10819,7 @@ Cmd_IncrementIndirect16:
 					   INC.B				   $17	   ; (2 bytes)
 					   TAX							   ; X = pointer
 					   INC.W				   $0000,X   ; Increment word at pointer
-RTS:
+RTS_Label:
 
 														;-------------------------------------------------------------------------------
 														; Cmd_IncrementIndirect8: Increment 8-bit value at pointer (from script)
@@ -10837,7 +10837,7 @@ Cmd_IncrementIndirect8:
 					   TAX							   ; X = pointer
 					   SEP					 #$20		; 8-bit accumulator
 					   INC.W				   $0000,X   ; Increment byte at pointer
-RTS:
+RTS_Label:
 
 														;-------------------------------------------------------------------------------
 														; Math_Decrement24: Decrement $9E/$A0 (24-bit safe)
@@ -10856,7 +10856,7 @@ Math_Decrement24:
 					   DEC.B				   $A0	   ; Borrow from high byte
 
 Math_Decrement24_Done:
-RTS:
+RTS_Label:
 
 														;-------------------------------------------------------------------------------
 														; Cmd_DecrementIndirect16: Decrement 16-bit value at pointer (from script)
@@ -10872,7 +10872,7 @@ Cmd_DecrementIndirect16:
 					   INC.B				   $17	   ; (2 bytes)
 					   TAX							   ; X = pointer
 					   DEC.W				   $0000,X   ; Decrement word at pointer
-RTS:
+RTS_Label:
 
 														;-------------------------------------------------------------------------------
 														; Cmd_DecrementIndirect8: Decrement 8-bit value at pointer (from script)
@@ -10890,7 +10890,7 @@ Cmd_DecrementIndirect8:
 					   TAX							   ; X = pointer
 					   SEP					 #$20		; 8-bit accumulator
 					   DEC.W				   $0000,X   ; Decrement byte at pointer
-RTS:
+RTS_Label:
 
 														;-------------------------------------------------------------------------------
 														; Bitwise_ORIndirect16: Bitwise OR from indirect addresses
@@ -10929,7 +10929,7 @@ Bitwise_ANDIndirect8:
 					   SEP					 #$20		; 8-bit accumulator
 					   AND.W				   $0000,X   ; AND with destination
 					   STA.W				   $0000,X   ; Store result
-RTS:
+RTS_Label:
 
 														;-------------------------------------------------------------------------------
 														; Bitwise_ANDIndirect16: Bitwise OR from indirect addresses (16-bit)
@@ -10967,7 +10967,7 @@ Bitwise_ORIndirect8:
 					   SEP					 #$20		; 8-bit accumulator
 					   ORA.W				   $0000,X   ; OR with destination
 					   STA.W				   $0000,X   ; Store result
-RTS:
+RTS_Label:
 
 														;-------------------------------------------------------------------------------
 														; Bitwise_XORIndirect16: Bitwise XOR from indirect addresses (16-bit)
@@ -11005,7 +11005,7 @@ Bitwise_XORIndirect8:
 					   SEP					 #$20		; 8-bit accumulator
 					   EOR.W				   $0000,X   ; XOR with destination
 					   STA.W				   $0000,X   ; Store result
-RTS:
+RTS_Label:
 
 														;-------------------------------------------------------------------------------
 														; Sprite_CalcTileAddress: Calculate tile address for character sprite
@@ -11053,7 +11053,7 @@ Sprite_CalcTileAddress_Do:
 					   INC					 A		   ; Next tile
 					   LDY.B				   #$42	  ; Y = $42
 					   STA.B				   [$1A],Y   ; Store at tilemap+$42
-RTS:
+RTS_Label:
 
 														;-------------------------------------------------------------------------------
 														; Tilemap_UpdateMin: Update minimum tilemap pointer
@@ -11071,7 +11071,7 @@ Tilemap_UpdateMin:
 					   STA.B				   $44	   ; Update minimum
 
 Tilemap_UpdateMin_Done:
-RTS:
+RTS_Label:
 
 														;-------------------------------------------------------------------------------
 														; Tilemap_UpdateMax: Update maximum tilemap pointer
@@ -11089,7 +11089,7 @@ Tilemap_UpdateMax:
 					   STA.B				   $46	   ; Update maximum
 
 Tilemap_UpdateMax_Done:
-RTS:
+RTS_Label:
 
 														;-------------------------------------------------------------------------------
 														; CODE_00B4B0: Check flag and execute routine
@@ -11126,7 +11126,7 @@ Text_ClearModeSetNew:
 					   INC.B				   $17	   ; Advance script pointer
 					   AND.W				   #$00FF	; Mask to 8 bits
 					   TSB.B				   $1E	   ; Set bits in $1E
-RTS:
+RTS_Label:
 
 														;-------------------------------------------------------------------------------
 														; Math_RNGSeed: RNG seed setup and call
@@ -11149,7 +11149,7 @@ Math_RNGSeed:
 					   JSL.L				   CODE_009783 ; Call RNG routine
 					   LDA.W				   $00A9	 ; Load RNG result
 					   STA.B				   $9E	   ; Store in $9E
-RTS:
+RTS_Label:
 
 														;-------------------------------------------------------------------------------
 														; Cmd_CallExternal9E: Jump to external with $9E parameter
@@ -11233,7 +11233,7 @@ Text_CalcCentering_UseFirst:
 					   STA.B				   $25	   ; Store centered position
 					   REP					 #$30		; 16-bit A/X/Y
 					   JSR.W				   CODE_00A8D1 ; Call positioning routine
-RTS:
+RTS_Label:
 
 														;-------------------------------------------------------------------------------
 														; Text_SetCounter16: Set text counter and call text routine
@@ -11297,7 +11297,7 @@ Sprite_SetupCharacter:
 					   LDX.W				   #$5F78	; Sprite data pointer
 					   STX.B				   $22	   ; Store in $22
 					   PLP							   ; Restore processor status
-RTS:
+RTS_Label:
 
 Sprite_SetupCharacter_Normal:
 					   LDA.B				   #$04	  ; Bit 2 mask
@@ -11486,7 +11486,7 @@ Sprite_SetupCharacter_ToggleMode:
 
 Sprite_SetupCharacter_Done:
 					   PLP							   ; Restore processor status
-RTS:
+RTS_Label:
 
 														;-------------------------------------------------------------------------------
 														; Sprite_DisplayCharacter: Character sprite display setup
@@ -11517,7 +11517,7 @@ Sprite_DisplayCharacter_Do:
 					   LDA.B				   #$02	  ; Bit 1 mask
 					   TSB.W				   $00D4	 ; Set bit 1 of $D4
 					   JSL.L				   CODE_0C8000 ; Call external sprite display
-RTS:
+RTS_Label:
 
 Sprite_DisplayCharacter_Special:
 					   LDA.W				   #$0001	; Mode 1
@@ -11585,7 +11585,7 @@ Shop_SubtractGold_Done:
 					   STX.B				   $18	   ; Store in $18
 					   PLX							   ; Restore X (script pointer low)
 					   STX.B				   $17	   ; Store in $17
-RTS:
+RTS_Label:
 
 														;-------------------------------------------------------------------------------
 														; Menu_InputHandler: Input handler for menu navigation
@@ -11862,7 +11862,7 @@ Sprite_SetMode2D:
 					   LDA.B				   #$2D	  ; Mode $2D
 					   STA.W				   $0505	 ; Store in sprite mode
 					   PLP							   ; Restore processor status
-RTS:
+RTS_Label:
 
 														;-------------------------------------------------------------------------------
 														; Sprite_SetMode2C: Set sprite mode $2C
@@ -11878,7 +11878,7 @@ Sprite_SetMode2C:
 					   LDA.B				   #$2C	  ; Mode $2C
 					   STA.W				   $0505	 ; Store in sprite mode
 					   PLP							   ; Restore processor status
-RTS:
+RTS_Label:
 
 														;-------------------------------------------------------------------------------
 														; Anim_SetMode10: Set animation mode $10
@@ -11894,7 +11894,7 @@ Anim_SetMode10:
 					   LDA.B				   #$10	  ; Mode $10
 					   STA.W				   $050A	 ; Store in animation mode
 					   PLP							   ; Restore processor status
-RTS:
+RTS_Label:
 
 														;-------------------------------------------------------------------------------
 														; Anim_SetMode11: Set animation mode $11
@@ -11910,7 +11910,7 @@ Anim_SetMode11:
 					   LDA.B				   #$11	  ; Mode $11
 					   STA.W				   $050A	 ; Store in animation mode
 					   PLP							   ; Restore processor status
-RTS:
+RTS_Label:
 
 														;-------------------------------------------------------------------------------
 														; Input_PollWithToggle: Input polling loop with mode toggle
@@ -11947,7 +11947,7 @@ Input_PollWithToggle_Check:
 					   LDA.B				   $07	   ; Load button state
 					   LDX.B				   $01	   ; Load current state
 					   CPX.B				   $05	   ; Compare with compare state
-RTS:
+RTS_Label:
 
 														;-------------------------------------------------------------------------------
 														; Game_Initialize: Main initialization/game start routine
@@ -12363,7 +12363,7 @@ Palette_LoadColors:
 					   STA.B				   SNES_CGDATA-$2100
 					   LDA.W				   DATA8_07D803,X
 					   STA.B				   SNES_CGDATA-$2100
-RTS:
+RTS_Label:
 
 														;-------------------------------------------------------------------------------
 														; Screen_SetUpdateFlag: Set display update flag and execute screen update
@@ -12500,7 +12500,7 @@ Screen_UpdateFull:
 					   STX.B				   $8E	   ; Store in $8E
 					   PLD							   ; Restore direct page
 					   PLP							   ; Restore processor status
-RTS:
+RTS_Label:
 
 DATA_00BD61:
 db											 $F2,$82,$03 ; Configuration data
@@ -12537,11 +12537,11 @@ Memory_ClearBlock_Loop:
 					   INC.B				   $5F	   ; Next tile data
 					   INX							   ; Advance tilemap index
 					   INX							   ; (4 bytes per entry)
-INX:
-INX:
+INX_Label:
+INX_Label:
 					   DEY							   ; Decrement counter
 					   BNE					 Memory_ClearBlock_Loop ; Loop until done
-RTS:
+RTS_Label:
 
 														;-------------------------------------------------------------------------------
 														; DATA_00BD99: Character display tilemap data
@@ -12589,7 +12589,7 @@ Menu_Handler_Loop:
 					   STZ.B				   $8E	   ; Clear $8E
 
 Menu_Handler_Done:
-RTS:
+RTS_Label:
 
 LOOSE_OP_00BDE5:
 					   PLA							   ; Pull return address
@@ -12620,18 +12620,18 @@ Menu_Handler_AltMode:
 					   LDA.W				   #$FFFF	; Load $FFFF
 					   STA.B				   $01	   ; Store in $01
 					   STZ.B				   $8E	   ; Clear $8E
-RTS:
+RTS_Label:
 
 Menu_Handler_AltCancel:
 					   JSR.W				   Sprite_SetMode2C ; Set sprite mode $2D
 					   LDA.W				   #$00FF	; Load $FF
 					   STA.B				   $01	   ; Store in $01
-RTS:
+RTS_Label:
 
 Menu_Handler_Cancel:
 					   LDA.B				   #$01	  ; Bit 0 mask
 					   TRB.W				   $00D8	 ; Clear bit 0 of $D8
-RTS:
+RTS_Label:
 
 Menu_Handler_Update:
 					   LDX.W				   #$BE80	; Data pointer
@@ -12761,13 +12761,13 @@ Menu_OptionSelection:
 					   LDA.W				   #$FFFF	; Load $FFFF
 					   STA.B				   $01	   ; Store in $01
 					   STZ.B				   $8E	   ; Clear $8E
-RTS:
+RTS_Label:
 
 Menu_OptionSelection_Cancel:
 					   JSR.W				   Sprite_SetMode2C ; Set sprite mode $2C
 					   LDA.W				   #$00FF	; Load $FF (cancel code)
 					   STA.B				   $01	   ; Store in $01
-RTS:
+RTS_Label:
 
 UNREACH_00BEBB:
 db											 $A9,$01,$00,$1C,$D8,$00,$60 ; LDA #$0001; TRB $00D8; RTS
@@ -12822,7 +12822,7 @@ Menu_MultiOption_Loop:
 					   BIT.W				   #$0080	; Test B button
 					   BEQ					 Menu_MultiOption_Loop ; If not pressed, loop
 					   STZ.B				   $8E	   ; Clear $8E
-RTS:
+RTS_Label:
 
 UNREACH_00BF1B:
 db											 $20,$1C,$B9,$A9,$FF,$FF,$85,$01,$9C,$8E,$00,$60
@@ -12860,7 +12860,7 @@ Menu_Item_CleanupReturn:
 					   STX.B				   $8E	   ; Restore $8E
 					   LDA.B				   $14	   ; Load result code
 					   PLP							   ; Restore processor status
-RTS:
+RTS_Label:
 
 DATA_00BF48:
 db											 $9B,$8F,$03 ; Menu configuration
@@ -12997,7 +12997,7 @@ Menu_Item_ConfirmDiscard:
 					   PLX							   ; Restore X
 					   AND.W				   #$00FF	; Mask result
 					   CMP.W				   #$0001	; Check if confirmed
-RTS:
+RTS_Label:
 
 DATA_00C02F:
 db											 $E8,$8F,$03,$DD,$8F,$03,$8A,$8F,$03
@@ -13197,7 +13197,7 @@ db											 $46,$9E	 ; LSR $9E (halve result)
 Menu_Spell_ReturnPercent:
 					   LDA.B				   $9E	   ; Load result
 					   CLC							   ; Clear carry
-RTS:
+RTS_Label:
 
 														;-------------------------------------------------------------------------------
 														; Menu_Spell_ConfirmUse: Spell use confirmation
@@ -13222,7 +13222,7 @@ Menu_Spell_ConfirmUse:
 					   PLX							   ; Restore X
 					   AND.W				   #$00FF	; Mask result
 					   CMP.W				   #$00FF	; Check if cancelled
-RTS:
+RTS_Label:
 
 DATA_00C1D3:
 db											 $3A,$90,$03,$DD,$8F,$03
@@ -13255,7 +13255,7 @@ Menu_BattleSettings_InputLoop:
 					   STZ.B				   $8E	   ; Clear $8E
 					   LDA.W				   #$0020	; Bit 5 mask
 					   TRB.W				   $00D6	 ; Clear bit 5 of $D6
-RTS:
+RTS_Label:
 
 UNREACH_00C20E:
 db											 $E2,$20,$AD,$90,$10,$30,$D6,$4C,$D9,$C2
@@ -13471,7 +13471,7 @@ Menu_SaveDelete_InputLoop:
 Menu_SaveDelete_Exit:
 					   JSR.W				   CODE_00B91C ; Set animation mode $10
 					   STZ.B				   $8E	   ; Clear $8E
-RTS:
+RTS_Label:
 
 Menu_SaveDelete_Confirm:
 					   JSR.W				   CODE_00B908 ; Set sprite mode $2D
@@ -13679,7 +13679,7 @@ Menu_WaitInput_Poll:
 Menu_WaitInput_Confirm:
 					   JSR.W				   CODE_00B91C ; Update sprite
 					   STZ.B				   $8E	   ; Clear position
-RTS:
+RTS_Label:
 
 DATA_00C4D8:
 db											 $D1,$9C,$03
@@ -13714,7 +13714,7 @@ WRAM_BattleMenu_Init:
 					   LDA.B				   #$C0	  ; Bits 6-7
 					   TSB.W				   $0111	 ; Set bits in $0111
 					   REP					 #$30		; 16-bit A/X/Y
-RTS:
+RTS_Label:
 
 DATA_00C51B:
 db											 $FF,$07,$50,$D9,$05,$51,$00,$42,$0E,$00,$50,$7F,$07,$50,$7F,$FF
@@ -13729,7 +13729,7 @@ WRAM_BattleMenu_Update:
 					   LDY.W				   #$537D	; WRAM address
 					   JSR.W				   WRAM_BattleMenu_FillSection ; Call fill routine
 					   PLB							   ; Restore data bank
-RTS:
+RTS_Label:
 
 WRAM_BattleMenu_FillSection:
 					   LDX.W				   #$000D	; 13 iterations
@@ -13745,7 +13745,7 @@ WRAM_BattleMenu_FillLoop:
 					   TAY							   ; Back to Y
 					   DEX							   ; Decrement counter
 					   BNE					 WRAM_BattleMenu_FillLoop ; Loop if not zero
-RTS:
+RTS_Label:
 
 														;-------------------------------------------------------------------------------
 														; WRAM Buffer Clear Routines
@@ -13795,7 +13795,7 @@ WRAM_FillData:
 					   MVN					 $7E,$7E	 ; Fill $7E3007-$7E31B5 with 0
 					   LDA.W				   #$0120	; Value $0120
 					   STA.W				   $31B5	 ; Store at $7E31B5
-RTS:
+RTS_Label:
 
 WRAM_SetupBattleSprites2:
 					   TYA							   ; Y to A
@@ -13874,7 +13874,7 @@ Screen_FillWords_Loop:
 					   SBC.B				   #$07	  ; Subtract 7
 					   BNE					 Screen_FillWords_Loop ; Loop if not zero
 					   REP					 #$30		; 16-bit A/X/Y
-RTS:
+RTS_Label:
 
 Screen_FillWords:
 					   SEP					 #$20		; 8-bit accumulator
@@ -13886,7 +13886,7 @@ Screen_FillWords:
 					   STA.W				   $000A,X   ; Store at X+10
 					   STA.W				   $000C,X   ; Store at X+12
 					   STA.W				   $000E,X   ; Store at X+14
-RTS:
+RTS_Label:
 														; ==============================================================================
 														; Screen Setup and Sprite Systems - Battle_SetupSprites+
 														; ==============================================================================

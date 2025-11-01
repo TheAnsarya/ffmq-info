@@ -299,12 +299,12 @@ Battle_DecompressGraphics_Loop:
 					   JSR.W				   Battle_DecompressTile ; Decompress one tile
 
 					   LDA.B				   $00	   ; Get destination offset
-CLC:
+CLC_Label:
 					   ADC.W				   #$0018	; Add $18 (24 bytes per compressed tile)
 					   STA.B				   $00	   ; Update destination
 
 					   LDA.B				   $02	   ; Get source offset
-CLC:
+CLC_Label:
 					   ADC.W				   #$0020	; Add $20 (32 bytes per decompressed tile)
 					   STA.B				   $02	   ; Update source
 
@@ -332,7 +332,7 @@ Battle_DecompressTile:
 
 														; Calculate source address
 					   LDA.W				   $192B	 ; Get base offset from direct page
-CLC:
+CLC_Label:
 					   ADC.W				   #$CA20	; Add base address ($04CA20)
 					   TAX							   ; X = source address
 
@@ -344,7 +344,7 @@ CLC:
 
 														; Process decompression (insert zeros in second half)
 					   TXA							   ; Get updated source address
-SEC:
+SEC_Label:
 					   SBC.W				   #$CA20	; Convert back to offset
 					   TAX							   ; X = offset
 

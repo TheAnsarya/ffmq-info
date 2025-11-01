@@ -271,7 +271,7 @@ Time_Events_Done:
 CODE_008A2A:
 														; TODO: Document status icon animation logic
 														; Cycles through animation frames for defeated/inactive characters
-RTS:
+RTS_Label:
 
 														; ===========================================================================
 														; Input Handler Jump Table

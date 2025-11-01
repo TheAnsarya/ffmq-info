@@ -46,7 +46,7 @@ CODE_008C9C:
 					   BNE					 CODE_008CBB ; If set, use battle sprite
 
 														; Field sprite attributes (incomplete in original)
-PLB:
+PLB_Label:
 					   LDA.W				   $0001,X   ; Get sprite attribute byte
 					   AND.B				   #$E3	  ; Mask palette bits
 					   ORA.B				   #$94	  ; Set field palette
@@ -54,7 +54,7 @@ PLB:
 
 CODE_008CBB:
 														; Battle sprite attributes
-PLB:
+PLB_Label:
 					   LDA.W				   $0001,X   ; Get sprite attribute byte
 					   AND.B				   #$E3	  ; Mask palette bits
 					   ORA.B				   #$9C	  ; Set battle palette
@@ -62,7 +62,7 @@ PLB:
 
 CODE_008CC5:
 														; Normal sprite attributes
-PLB:
+PLB_Label:
 					   LDA.W				   $0001,X   ; Get sprite attribute byte
 					   AND.B				   #$E3	  ; Mask palette bits
 					   ORA.B				   #$88	  ; Set normal palette
@@ -262,7 +262,7 @@ CODE_008DA8:
 					   PHA							   ; Save direction
 
 														; Calculate offset (direction * 3 + base)
-CLC:
+CLC_Label:
 					   ADC.B				   $01,S	 ; Add direction again (x2)
 					   ADC.B				   $01,S	 ; Add direction again (x3)
 					   ADC.B				   #$22	  ; Add base offset
@@ -373,43 +373,43 @@ CODE_008DE8:
 
 														; Write 8 extra bytes
 					   LDA.W				   $0010,X
-TAY:
+TAY_Label:
 					   STY.B				   SNES_VMDATAL-$2100
 
 					   LDA.W				   $0011,X
-TAY:
+TAY_Label:
 					   STY.B				   SNES_VMDATAL-$2100
 
 					   LDA.W				   $0012,X
-TAY:
+TAY_Label:
 					   STY.B				   SNES_VMDATAL-$2100
 
 					   LDA.W				   $0013,X
-TAY:
+TAY_Label:
 					   STY.B				   SNES_VMDATAL-$2100
 
 					   LDA.W				   $0014,X
-TAY:
+TAY_Label:
 					   STY.B				   SNES_VMDATAL-$2100
 
 					   LDA.W				   $0015,X
-TAY:
+TAY_Label:
 					   STY.B				   SNES_VMDATAL-$2100
 
 					   LDA.W				   $0016,X
-TAY:
+TAY_Label:
 					   STY.B				   SNES_VMDATAL-$2100
 
 					   LDA.W				   $0017,X
-TAY:
+TAY_Label:
 					   STY.B				   SNES_VMDATAL-$2100
 
 					   REP					 #$30		; Back to 16-bit
 
 														; Advance source pointer
-TXA:
+TXA_Label:
 					   ADC.W				   #$0018	; Add $18 bytes (24 bytes = one tile)
-TAX:
+TAX_Label:
 
 					   PLY							   ; Restore tile count
 					   DEY							   ; Decrement
@@ -486,9 +486,9 @@ CODE_008E63:
 					   STA.B				   SNES_VMDATAL-$2100
 
 														; Advance source pointer
-TXA:
+TXA_Label:
 					   ADC.W				   #$0010	; Add $10 bytes
-TAX:
+TAX_Label:
 
 					   DEY							   ; Decrement count
 					   BNE					 CODE_008E63 ; Continue loop

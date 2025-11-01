@@ -353,7 +353,7 @@ CODE_0096C9:
 
 														; Add multiplicand to result
 					   TYA							   ; Multiplicand to A
-CLC:
+CLC_Label:
 					   ADC.B				   $9E	   ; Add to result low
 					   STA.B				   $9E	   ; Store back
 
@@ -419,7 +419,7 @@ CODE_0096FB:
 					   BCS					 UNREACH_009710 ; If carry set, definitely >= divisor
 
 														; Check if remainder >= divisor
-SEC:
+SEC_Label:
 					   SBC.B				   $9C	   ; Subtract divisor
 					   BCS					 CODE_009712 ; If no borrow, division succeeded
 					   BRA					 CODE_009716 ; Skip setting quotient bit
