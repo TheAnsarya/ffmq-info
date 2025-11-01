@@ -5,7 +5,8 @@ This directory contains automation tools for the FFMQ disassembly project.
 ## Table of Contents
 
 1. [Address Scanner](#address-scanner) - Scan and catalog all raw memory addresses
-2. [Label Application Tool](#label-application-tool) - Apply labels to assembly files
+2. [ROM Data Catalog](#rom-data-catalog) - Catalog all DATA8/DATA16/ADDR labels
+3. [Label Application Tool](#label-application-tool) - Apply labels to assembly files
 
 ---
 
@@ -139,6 +140,102 @@ The output CSV is compatible with the Label Application Tool (`apply_labels.ps1`
 
 # 3. Apply labels using the CSV
 .\apply_labels.ps1 -InputFile ..\reports\address_usage_report.csv -SourceFiles "..\src\asm\*.asm"
+```
+
+---
+
+## ROM Data Catalog
+
+**File:** `catalog_rom_data.ps1`  
+**Issue:** #25 - Memory Labels: ROM Data Map Documentation
+
+### Purpose
+
+Scans all documented ASM files to catalog DATA8/DATA16/ADDR labels, extracting table information, descriptions, and generating comprehensive reports organized by bank.
+
+### Features
+
+✅ **Complete cataloging** - Finds all DATA8_/DATA16_/ADDR_ labels  
+✅ **Bank organization** - Groups tables by ROM bank  
+✅ **Description extraction** - Pulls comments and descriptions from source  
+✅ **Statistics generation** - Provides bank and type breakdowns  
+✅ **CSV export** - Outputs structured catalog for analysis  
+
+### Quick Start
+
+```powershell
+# Run the catalog scan
+.\catalog_rom_data.ps1
+
+# With custom paths
+.\catalog_rom_data.ps1 -AsmPath "..\src\asm" -OutputPath "..\reports\catalog.csv"
+```
+
+### Output
+
+Generates `reports/rom_data_catalog.csv` with complete ROM data table inventory:
+
+- **Bank** - ROM bank number (00-0F)
+- **Address** - Full 6-digit address
+- **Label** - DATA8_/DATA16_/ADDR_ label name
+- **Type** - DATA8, DATA16, or ADDR
+- **DataType** - Data directive type (byte, word, long)
+- **EstimatedSize** - Approximate table size in bytes
+- **Description** - Extracted comment/description
+- **File** - Source filename
+
+### Usage Example
+
+```powershell
+PS> .\catalog_rom_data.ps1
+
+🔍 Cataloging ROM Data Tables...
+  Scanning bank_00_documented.asm...
+  Scanning bank_01_documented.asm...
+  ...
+  Scanning bank_0D_documented.asm...
+
+✅ Found 296 data tables
+📝 Catalog saved to: reports\rom_data_catalog.csv
+
+📊 Statistics by Bank:
+  Bank $00 : 23 tables
+  Bank $01 : 43 tables
+  Bank $02 : 64 tables
+  Bank $07 : 77 tables
+  ...
+
+📊 Statistics by Type:
+  DATA8 : 295 tables
+  DATA16 : 1 tables
+```
+
+### Statistics
+
+Current catalog includes:
+- **Total Tables:** 296 (295 DATA8, 1 DATA16)
+- **Largest Bank:** Bank $07 with 77 tables (character/enemy data)
+- **Complete Documentation:** `docs/ROM_DATA_MAP.md`
+
+### Parameters
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `AsmPath` | string | `../src/asm` | Directory containing ASM files |
+| `OutputPath` | string | `../reports/rom_data_catalog.csv` | Output CSV file path |
+
+### Integration
+
+Works with ROM_DATA_MAP.md documentation:
+
+```powershell
+# 1. Catalog all ROM data tables
+.\catalog_rom_data.ps1
+
+# 2. Review the catalog
+Import-Csv ..\reports\rom_data_catalog.csv | Where-Object { $_.Bank -eq "07" } | Format-Table
+
+# 3. Documentation is auto-updated in docs/ROM_DATA_MAP.md
 ```
 
 ---
