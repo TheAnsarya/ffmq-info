@@ -1,0 +1,42 @@
+================================================================================
+FFMQ ROM Comparison Report
+================================================================================
+
+Original ROM: C:\Users\me\source\repos\ffmq-info\~roms\Final Fantasy - Mystic Quest (U) (V1.1).sfc
+Built ROM:    build\ffmq-rebuilt.sfc
+
+Overall Statistics:
+--------------------------------------------------------------------------------
+Total Bytes:         524,288
+Matching Bytes:      524,267
+Differing Bytes:          21
+Match Percentage:     100.00%
+
+Statistics by Category:
+--------------------------------------------------------------------------------
+Category        Total        Matching     Differing    Match %   
+--------------------------------------------------------------------------------
+audio                49,152      49,152           0    100.00%
+code                245,760     245,760           0    100.00%
+data                114,768     114,747          21     99.98%
+graphics             98,304      98,304           0    100.00%
+text                 16,384      16,384           0    100.00%
+
+
+Difference Blocks (First 50):
+--------------------------------------------------------------------------------
+Start      End        Size     Region                    Category    
+--------------------------------------------------------------------------------
+$007FC2   $007FD3       17   Engine Data               data        
+$007FDC   $007FE0        4   Engine Data               data        
+
+
+Recommendations:
+--------------------------------------------------------------------------------
+1. Focus on 'data' category (21 differing bytes)
+
+2. Largest difference blocks to investigate:
+   1. $007FC2-$007FD3 (17 bytes) - Engine Data
+   2. $007FDC-$007FE0 (4 bytes) - Engine Data
+
+⚠️  Almost there! Only 21 bytes differ.

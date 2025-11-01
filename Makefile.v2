@@ -1,0 +1,228 @@
+# Final Fantasy Mystic Quest (SNES) - Modern Build System
+# Unified Makefile for cross-platform development
+# https://www.gnu.org/software/make/manual/make.html
+#
+# Author: Build System Team
+# Date: October 30, 2025
+# Version: 2.0.0
+#
+# Requires:
+#   - PowerShell (Windows) or Bash (Unix-like systems)
+#   - asar assembler (https://github.com/RPGHacker/asar)
+#   - Python 3.8+ (https://www.python.org/)
+#
+# Quick Start:
+#   make help          - Show available targets
+#   make build         - Build ROM from source
+#   make extract       - Extract assets from original ROM
+#   make validate      - Validate built ROM
+#   make watch         - Auto-rebuild on file changes
+#   make all           - Complete build pipeline
+
+.PHONY: all build clean rebuild extract validate compare symbols watch dev help
+.DEFAULT_GOAL := help
+
+# Project configuration
+PROJECT_NAME = ffmq
+CONFIG_FILE = build.config.json
+
+# Detect platform (Windows vs Unix-like)
+ifeq ($(OS),Windows_NT)
+	POWERSHELL = pwsh.exe
+	PYTHON = python
+	RM = del /Q
+	RMDIR = rmdir /S /Q
+	MKDIR = mkdir
+	SEP = \\
+else
+	POWERSHELL = pwsh
+	PYTHON = python3
+	RM = rm -f
+	RMDIR = rm -rf
+	MKDIR = mkdir -p
+	SEP = /
+endif
+
+# Build system scripts
+BUILD_SYSTEM = tools$(SEP)Build-System.ps1
+BUILD_VALIDATOR = tools$(SEP)Build-Validator.ps1
+BUILD_WATCH = tools$(SEP)Build-Watch.ps1
+
+# Paths (from configuration)
+SRC_DIR = src
+BUILD_DIR = build
+ASSETS_DIR = assets
+TOOLS_DIR = tools
+
+# Default target - shows help
+help:
+	@echo ═══════════════════════════════════════════════════════
+	@echo   FFMQ Build System - Make Targets
+	@echo ═══════════════════════════════════════════════════════
+	@echo.
+	@echo Core Build Targets:
+	@echo   build          Build ROM from source files
+	@echo   clean          Remove all build artifacts
+	@echo   rebuild        Clean and build from scratch
+	@echo   all            Complete build pipeline (clean, build, validate, compare)
+	@echo.
+	@echo Asset Management:
+	@echo   extract        Extract all assets from original ROM
+	@echo   extract-gfx    Extract graphics only
+	@echo   extract-text   Extract text only
+	@echo   extract-music  Extract music only
+	@echo.
+	@echo Validation:
+	@echo   validate       Validate built ROM (header, checksums)
+	@echo   compare        Compare built ROM with original
+	@echo   symbols        Generate symbol files
+	@echo.
+	@echo Development:
+	@echo   watch          Auto-rebuild on file changes
+	@echo   dev            Development mode (watch + auto-launch)
+	@echo.
+	@echo Setup:
+	@echo   setup          Initial project setup
+	@echo   deps           Install Python dependencies
+	@echo   check          Check for required tools
+	@echo.
+	@echo Information:
+	@echo   status         Show build status
+	@echo   help           Show this help message
+	@echo.
+	@echo Examples:
+	@echo   make build                    # Build the ROM
+	@echo   make extract                  # Extract all assets
+	@echo   make rebuild                  # Clean rebuild
+	@echo   make watch                    # Development mode
+	@echo.
+	@echo For detailed documentation, see BUILD_QUICK_START.md
+	@echo ═══════════════════════════════════════════════════════
+
+# Build ROM from source
+build:
+	@echo Building ROM from source...
+	$(POWERSHELL) -ExecutionPolicy Bypass -File $(BUILD_SYSTEM) -Target build
+
+# Clean build artifacts
+clean:
+	@echo Cleaning build artifacts...
+	$(POWERSHELL) -ExecutionPolicy Bypass -File $(BUILD_SYSTEM) -Target clean
+
+# Clean and rebuild
+rebuild:
+	@echo Rebuilding ROM from scratch...
+	$(POWERSHELL) -ExecutionPolicy Bypass -File $(BUILD_SYSTEM) -Target rebuild
+
+# Extract all assets from original ROM
+extract:
+	@echo Extracting all assets from original ROM...
+	$(POWERSHELL) -ExecutionPolicy Bypass -File $(BUILD_SYSTEM) -Target extract
+
+# Extract graphics only
+extract-gfx:
+	@echo Extracting graphics...
+	$(PYTHON) $(TOOLS_DIR)$(SEP)extract_graphics_v2.py
+
+# Extract text only
+extract-text:
+	@echo Extracting text...
+	$(PYTHON) $(TOOLS_DIR)$(SEP)extract_text.py
+
+# Extract music only
+extract-music:
+	@echo Extracting music...
+	$(PYTHON) $(TOOLS_DIR)$(SEP)extract_music.py
+
+# Validate built ROM
+validate:
+	@echo Validating built ROM...
+	$(POWERSHELL) -ExecutionPolicy Bypass -File $(BUILD_SYSTEM) -Target validate
+
+# Compare built ROM with original
+compare:
+	@echo Comparing ROMs...
+	$(POWERSHELL) -ExecutionPolicy Bypass -File $(BUILD_SYSTEM) -Target compare
+
+# Generate symbol files
+symbols:
+	@echo Generating symbol files...
+	$(POWERSHELL) -ExecutionPolicy Bypass -File $(BUILD_SYSTEM) -Target symbols
+
+# Complete build pipeline
+all:
+	@echo Running complete build pipeline...
+	$(POWERSHELL) -ExecutionPolicy Bypass -File $(BUILD_SYSTEM) -Target all
+
+# Watch mode - auto-rebuild on changes
+watch:
+	@echo Starting watch mode...
+	$(POWERSHELL) -ExecutionPolicy Bypass -File $(BUILD_WATCH)
+
+# Development mode - watch with auto-launch
+dev:
+	@echo Starting development mode...
+	$(POWERSHELL) -ExecutionPolicy Bypass -File $(BUILD_WATCH) -AutoLaunch
+
+# Initial project setup
+setup:
+	@echo Setting up project...
+	$(POWERSHELL) -ExecutionPolicy Bypass -File setup.ps1
+
+# Install Python dependencies
+deps:
+	@echo Installing Python dependencies...
+	$(PYTHON) -m pip install -r requirements.txt
+	@echo Dependencies installed successfully!
+
+# Check for required tools
+check:
+	@echo Checking for required tools...
+	@echo.
+	@echo Checking for asar assembler...
+	@-asar --version
+	@echo.
+	@echo Checking for Python...
+	@-$(PYTHON) --version
+	@echo.
+	@echo Checking for PowerShell...
+	@-$(POWERSHELL) -Command "$$PSVersionTable.PSVersion"
+	@echo.
+	@echo Tool check complete!
+
+# Show build status
+status:
+	@echo ═══════════════════════════════════════════════════════
+	@echo   FFMQ Build Status
+	@echo ═══════════════════════════════════════════════════════
+	@echo.
+	@echo Project: $(PROJECT_NAME)
+	@echo Config: $(CONFIG_FILE)
+	@echo.
+	@echo Source directory: $(SRC_DIR)
+	@echo Build directory: $(BUILD_DIR)
+	@echo Assets directory: $(ASSETS_DIR)
+	@echo Tools directory: $(TOOLS_DIR)
+	@echo.
+	@echo Build system scripts:
+	@echo   Build System: $(BUILD_SYSTEM)
+	@echo   Validator:    $(BUILD_VALIDATOR)
+	@echo   Watcher:      $(BUILD_WATCH)
+	@echo.
+	@if exist $(BUILD_DIR)$(SEP)ffmq-rebuilt.sfc (echo Built ROM exists: YES) else (echo Built ROM exists: NO)
+	@if exist $(CONFIG_FILE) (echo Configuration exists: YES) else (echo Configuration exists: NO)
+	@echo.
+	@echo Run 'make help' for available targets
+	@echo ═══════════════════════════════════════════════════════
+
+# Legacy targets for backwards compatibility
+.PHONY: rom test install-deps
+
+rom: build
+	@echo Note: 'make rom' is deprecated, use 'make build' instead
+
+test: validate
+	@echo Note: 'make test' is deprecated, use 'make validate' instead
+
+install-deps: deps
+	@echo Note: 'make install-deps' is deprecated, use 'make deps' instead

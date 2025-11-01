@@ -1,0 +1,152 @@
+{
+	"project": {
+		"name": "ffmq",
+		"fullName": "Final Fantasy Mystic Quest",
+		"version": "1.0.0",
+		"region": "U",
+		"romVersion": "V1.1"
+	},
+
+	"paths": {
+		"base": {
+			"root": ".",
+			"src": "src",
+			"build": "build",
+			"roms": "roms",
+			"tools": "tools",
+			"assets": "assets",
+			"data": "data",
+			"docs": "docs"
+		},
+		"src": {
+			"asm": "src/asm",
+			"include": "src/include",
+			"graphics": "src/graphics",
+			"text": "src/text",
+			"data": "src/data"
+		},
+		"assets": {
+			"graphics": "assets/graphics",
+			"text": "assets/text",
+			"music": "assets/music",
+			"data": "assets/data"
+		},
+		"roms": {
+			"original": "roms/Final Fantasy - Mystic Quest (U) (V1.1).sfc",
+			"output": "build/ffmq-rebuilt.sfc",
+			"compare": "build/ffmq-compare.sfc"
+		}
+	},
+
+	"tools": {
+		"assembler": {
+			"name": "asar",
+			"executable": "asar.exe",
+			"searchPaths": [
+				".",
+				"tools",
+				"tools/asar"
+			],
+			"downloadUrl": "https://github.com/RPGHacker/asar/releases",
+			"version": "1.90"
+		},
+		"python": {
+			"executable": "python",
+			"version": "3.8",
+			"requiredPackages": [
+				"Pillow",
+				"numpy"
+			]
+		},
+		"emulator": {
+			"name": "MesenS",
+			"executable": "Mesen-S.exe",
+			"searchPaths": [
+				"C:/Program Files/Mesen-S",
+				"C:/Program Files (x86)/Mesen-S",
+				"tools/Mesen-S"
+			]
+		}
+	},
+
+	"build": {
+		"mainSource": "src/asm/ffmq_working.asm",
+		"outputRom": "build/ffmq-rebuilt.sfc",
+		"symbolFile": "build/symbols.sym",
+		"mapFile": "build/memory.map",
+		"expectedSize": 1048576,
+		"options": {
+			"generateSymbols": true,
+			"generateMap": false,
+			"verbose": false,
+			"checkSize": true,
+			"compareOriginal": true
+		}
+	},
+
+	"validation": {
+		"enabled": true,
+		"checksum": {
+			"enabled": true,
+			"algorithm": "sha256",
+			"expectedHashes": {
+				"original": ""
+			}
+		},
+		"size": {
+			"enabled": true,
+			"expected": 1048576,
+			"tolerance": 0
+		},
+		"comparison": {
+			"enabled": true,
+			"reportDifferences": true,
+			"maxDifferences": 1000
+		}
+	},
+
+	"extraction": {
+		"graphics": {
+			"enabled": true,
+			"format": "png",
+			"includePalettes": true,
+			"generateDocs": true
+		},
+		"text": {
+			"enabled": true,
+			"encoding": "utf-8",
+			"includePointers": true
+		},
+		"music": {
+			"enabled": true,
+			"format": "spc"
+		},
+		"data": {
+			"enabled": true,
+			"formats": [
+				"json",
+				"csv"
+			]
+		}
+	},
+
+	"watch": {
+		"enabled": false,
+		"paths": [
+			"src/asm/**/*.asm",
+			"src/asm/**/*.s",
+			"src/include/**/*.inc"
+		],
+		"debounceMs": 500,
+		"autoRebuild": true,
+		"autoLaunch": false
+	},
+
+	"logging": {
+		"level": "info",
+		"file": "build/build.log",
+		"console": true,
+		"timestamps": true,
+		"colors": true
+	}
+}

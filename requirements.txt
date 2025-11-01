@@ -1,0 +1,11 @@
+# Python dependencies for FFMQ development tools
+
+# Graphics tools - PNG conversion
+Pillow>=10.0.0
+
+# General utilities
+typing-extensions>=4.0.0
+
+# Future additions (commented out for now):
+# numpy>=1.24.0  # For advanced graphics processing
+# pygame>=2.5.0  # For interactive tile editors

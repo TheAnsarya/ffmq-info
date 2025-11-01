@@ -1,0 +1,531 @@
+# Final Fantasy Mystic Quest (SNES) - Enhanced Build System
+# Complete data extraction, modification, and rebuild pipeline
+# Author: Reverse Engineering Project 2025
+# Date: 2025-10-25
+
+#==============================================================================
+# Project Configuration
+#==============================================================================
+
+PROJECT_NAME = ffmq
+ROM_NAME = Final Fantasy - Mystic Quest (U) (V1.1)
+BASE_ROM = ~roms/$(ROM_NAME).sfc
+OUTPUT_ROM = build/$(PROJECT_NAME)-modified.sfc
+CLEAN_ROM = build/$(PROJECT_NAME)-clean.sfc
+
+# Version tracking
+VERSION = 1.1-enhanced
+BUILD_DATE = $(shell date +%Y-%m-%d)
+
+#==============================================================================
+# Tools and Commands
+#==============================================================================
+
+# Assemblers
+ASAR = asar
+CA65 = ca65
+LD65 = ld65
+
+# Python
+PYTHON = python
+PIP = $(PYTHON) -m pip
+
+# Utilities
+DIFF = fc /b
+CMP = fc /b
+MKDIR = mkdir
+RM = del /Q
+RMDIR = rmdir /S /Q
+CP = copy /Y
+
+#==============================================================================
+# Directories
+#==============================================================================
+
+# Source
+SRC_DIR = src
+ASM_DIR = $(SRC_DIR)/asm
+ANALYZED_DIR = $(ASM_DIR)/analyzed
+BANKS_DIR = $(ASM_DIR)/banks
+INCLUDE_DIR = $(SRC_DIR)/include
+DATA_DIR = $(SRC_DIR)/data
+GRAPHICS_SRC = $(SRC_DIR)/graphics
+
+# Tools
+TOOLS_DIR = tools
+EXTRACT_TOOLS = $(TOOLS_DIR)/extraction
+CONVERT_TOOLS = $(TOOLS_DIR)/conversion
+INJECT_TOOLS = $(TOOLS_DIR)/injection
+
+# Build outputs
+BUILD_DIR = build
+OBJ_DIR = $(BUILD_DIR)/obj
+EXTRACTED_DIR = $(BUILD_DIR)/extracted
+CONVERTED_DIR = $(BUILD_DIR)/converted
+
+# Assets (editable versions)
+ASSETS_DIR = assets
+GRAPHICS_DIR = $(ASSETS_DIR)/graphics
+TEXT_DIR = $(ASSETS_DIR)/text
+DATA_ASSETS = $(ASSETS_DIR)/data
+PALETTES_DIR = $(ASSETS_DIR)/palettes
+
+# Documentation
+DOCS_DIR = docs
+MAPS_DIR = $(DOCS_DIR)/maps
+
+# Reports
+REPORTS_DIR = reports
+
+#==============================================================================
+# Source Files
+#==============================================================================
+
+# Main assembly files
+MAIN_ASM = $(ASM_DIR)/ffmq_complete.asm
+BANK_FILES = $(wildcard $(BANKS_DIR)/bank_*.asm)
+ANALYZED_FILES = $(wildcard $(ANALYZED_DIR)/*.asm)
+
+# Data files
+GRAPHICS_DATA = $(wildcard $(GRAPHICS_SRC)/*.bin)
+TEXT_DATA = $(wildcard $(DATA_DIR)/text_*.asm)
+ENEMY_DATA = $(DATA_DIR)/enemy_data.asm
+ITEM_DATA = $(DATA_DIR)/item_data.asm
+
+#==============================================================================
+# Python Scripts
+#==============================================================================
+
+# Graphics tools
+EXTRACT_GFX = $(TOOLS_DIR)/extract_graphics_v2.py
+CONVERT_GFX = $(TOOLS_DIR)/convert_graphics.py
+GFX_LIB = $(TOOLS_DIR)/snes_graphics.py
+
+# Data extraction scripts (to be created)
+EXTRACT_ENEMY = $(EXTRACT_TOOLS)/extract_enemies.py
+EXTRACT_TEXT = $(EXTRACT_TOOLS)/extract_text.py
+EXTRACT_ITEMS = $(EXTRACT_TOOLS)/extract_items.py
+EXTRACT_MAPS = $(EXTRACT_TOOLS)/extract_maps.py
+EXTRACT_PALETTES = $(EXTRACT_TOOLS)/extract_palettes.py
+
+# Data injection scripts (to be created)
+INJECT_ENEMY = $(INJECT_TOOLS)/inject_enemies.py
+INJECT_TEXT = $(INJECT_TOOLS)/inject_text.py
+INJECT_ITEMS = $(INJECT_TOOLS)/inject_items.py
+INJECT_GFX = $(INJECT_TOOLS)/inject_graphics.py
+
+# Verification and comparison
+ROM_COMPARE = $(TOOLS_DIR)/rom_compare.py
+
+#==============================================================================
+# Build Targets
+#==============================================================================
+
+.PHONY: all clean clean-all help setup
+.PHONY: extract extract-all extract-graphics extract-text extract-enemies extract-items extract-palettes
+.PHONY: convert convert-graphics convert-all
+.PHONY: build build-rom build-clean inject inject-all
+.PHONY: test verify diff compare compare-detailed report
+.PHONY: docs install-deps
+
+# Default target
+all: build-rom
+
+#------------------------------------------------------------------------------
+# Build ROM
+#------------------------------------------------------------------------------
+
+build-rom: $(OUTPUT_ROM)
+
+$(OUTPUT_ROM): $(MAIN_ASM) $(BANK_FILES) | $(BUILD_DIR)
+	@echo ============================================================
+	@echo Building Final Fantasy Mystic Quest ROM
+	@echo Version: $(VERSION)
+	@echo Date: $(BUILD_DATE)
+	@echo ============================================================
+	@echo.
+	@echo [1/3] Copying base ROM...
+	$(CP) "$(BASE_ROM)" "$(OUTPUT_ROM)"
+	@echo.
+	@echo [2/3] Assembling code...
+	$(ASAR) "$(MAIN_ASM)" "$(OUTPUT_ROM)"
+	@echo.
+	@echo [3/3] ROM built successfully!
+	@echo Output: $(OUTPUT_ROM)
+	@echo.
+
+# Build clean ROM without modifications
+build-clean: $(CLEAN_ROM)
+
+$(CLEAN_ROM): $(BASE_ROM) | $(BUILD_DIR)
+	@echo Building clean reference ROM...
+	$(CP) "$(BASE_ROM)" "$(CLEAN_ROM)"
+
+#------------------------------------------------------------------------------
+# Complete Pipeline: Extract → Edit → Build → Inject
+#------------------------------------------------------------------------------
+
+# Full extraction of all data
+extract-all: extract-graphics extract-text extract-enemies extract-items extract-palettes extract-maps
+	@echo.
+	@echo ============================================================
+	@echo All data extracted successfully!
+	@echo ============================================================
+	@echo Graphics: $(GRAPHICS_DIR)
+	@echo Text: $(TEXT_DIR)
+	@echo Data: $(DATA_ASSETS)
+	@echo ============================================================
+
+# Extract graphics to PNG
+extract-graphics: $(BASE_ROM) | $(GRAPHICS_DIR)
+	@echo ============================================================
+	@echo Extracting graphics from ROM to PNG format
+	@echo ============================================================
+	$(PYTHON) $(EXTRACT_GFX) "$(BASE_ROM)" "$(GRAPHICS_DIR)/" --docs --verbose
+	@echo.
+	@echo Graphics extracted to: $(GRAPHICS_DIR)
+	@echo.
+
+# Extract text/dialog
+extract-text: $(BASE_ROM) | $(TEXT_DIR)
+	@echo ============================================================
+	@echo Extracting text and dialog from ROM
+	@echo ============================================================
+	$(PYTHON) $(EXTRACT_TEXT) "$(BASE_ROM)" "$(TEXT_DIR)/"
+	@echo.
+	@echo Text extracted to: $(TEXT_DIR)
+	@echo.
+
+# Extract enemy data
+extract-enemies: $(BASE_ROM) | $(DATA_ASSETS)
+	@echo ============================================================
+	@echo Extracting enemy data from ROM
+	@echo ============================================================
+	$(PYTHON) $(EXTRACT_ENEMY) "$(BASE_ROM)" "$(DATA_ASSETS)/enemies.json" --format json --verbose
+	@echo.
+	@echo Enemy data: $(DATA_ASSETS)/enemies.json
+	@echo CSV export: $(DATA_ASSETS)/enemies.csv
+	@echo.
+
+# Extract item/equipment data
+extract-items: $(BASE_ROM) | $(DATA_ASSETS)
+	@echo ============================================================
+	@echo Extracting item and equipment data from ROM
+	@echo ============================================================
+	$(PYTHON) $(EXTRACT_ITEMS) "$(BASE_ROM)" "$(DATA_ASSETS)/" --all
+	@echo.
+	@echo Items extracted to: $(DATA_ASSETS)
+	@echo.
+
+# Extract palettes
+extract-palettes: $(BASE_ROM) | $(PALETTES_DIR)
+	@echo ============================================================
+	@echo Extracting color palettes from ROM
+	@echo ============================================================
+	$(PYTHON) $(EXTRACT_PALETTES) "$(BASE_ROM)" "$(PALETTES_DIR)/"
+	@echo.
+	@echo Palettes extracted to: $(PALETTES_DIR)
+	@echo.
+
+# Extract map data
+extract-maps: $(BASE_ROM) | $(MAPS_DIR)
+	@echo ============================================================
+	@echo Extracting map data from ROM
+	@echo ============================================================
+	$(PYTHON) $(EXTRACT_MAPS) "$(BASE_ROM)" "$(MAPS_DIR)/"
+	@echo.
+	@echo Maps extracted to: $(MAPS_DIR)
+	@echo.
+
+#------------------------------------------------------------------------------
+# Graphics Conversion
+#------------------------------------------------------------------------------
+
+# Convert all PNG graphics back to SNES format
+convert-graphics: | $(CONVERTED_DIR)
+	@echo ============================================================
+	@echo Converting PNG graphics to SNES binary format
+	@echo ============================================================
+	@for %%f in ($(GRAPHICS_DIR)\*.png) do (
+		@echo Converting %%~nf.png...
+		$(PYTHON) $(CONVERT_GFX) to-snes "%%f" "$(CONVERTED_DIR)\%%~nf.bin" --bpp 4
+	)
+	@echo.
+	@echo Graphics converted to: $(CONVERTED_DIR)
+	@echo.
+
+# Convert specific graphics file
+convert-one:
+	@if not defined INPUT (echo ERROR: INPUT not specified && exit /b 1)
+	@if not defined OUTPUT (echo ERROR: OUTPUT not specified && exit /b 1)
+	@echo Converting $(INPUT) to $(OUTPUT)...
+	$(PYTHON) $(CONVERT_GFX) to-snes "$(INPUT)" "$(OUTPUT)" $(if $(BPP),--bpp $(BPP))
+
+#------------------------------------------------------------------------------
+# Data Injection (Insert modified data back into ROM)
+#------------------------------------------------------------------------------
+
+# Inject all modified data
+inject-all: inject-graphics inject-text inject-enemies inject-items
+	@echo.
+	@echo ============================================================
+	@echo All data injected successfully!
+	@echo ============================================================
+	@echo Output ROM: $(OUTPUT_ROM)
+	@echo ============================================================
+
+# Inject modified graphics
+inject-graphics: $(CONVERTED_DIR)
+	@echo ============================================================
+	@echo Injecting modified graphics into ROM
+	@echo ============================================================
+	$(PYTHON) $(INJECT_GFX) "$(OUTPUT_ROM)" "$(CONVERTED_DIR)/" --backup
+	@echo Graphics injected.
+	@echo.
+
+# Inject modified text
+inject-text:
+	@echo ============================================================
+	@echo Injecting modified text into ROM
+	@echo ============================================================
+	$(PYTHON) $(INJECT_TEXT) "$(OUTPUT_ROM)" "$(TEXT_DIR)/" --backup
+	@echo Text injected.
+	@echo.
+
+# Inject modified enemy data
+inject-enemies:
+	@echo ============================================================
+	@echo Injecting modified enemy data into ROM
+	@echo ============================================================
+	$(PYTHON) $(INJECT_ENEMY) "$(OUTPUT_ROM)" "$(DATA_ASSETS)/enemies.json" --backup
+	@echo Enemy data injected.
+	@echo.
+
+# Inject modified item data
+inject-items:
+	@echo ============================================================
+	@echo Injecting modified item data into ROM
+	@echo ============================================================
+	$(PYTHON) $(INJECT_ITEMS) "$(OUTPUT_ROM)" "$(DATA_ASSETS)/" --all --backup
+	@echo Item data injected.
+	@echo.
+
+#------------------------------------------------------------------------------
+# Testing and Verification
+#------------------------------------------------------------------------------
+
+# Quick binary comparison (basic check)
+verify: $(OUTPUT_ROM)
+	@echo ============================================================
+	@echo Quick Verification: Binary Comparison
+	@echo ============================================================
+	@echo Comparing built ROM with original...
+	@echo Original: $(BASE_ROM)
+	@echo Built:    $(OUTPUT_ROM)
+	@echo.
+	-$(CMP) "$(OUTPUT_ROM)" "$(BASE_ROM)"
+	@echo.
+	@echo For detailed analysis, use: make compare-detailed
+	@echo.
+
+# Detailed comparison with reports
+compare: compare-detailed
+
+compare-detailed: $(OUTPUT_ROM) | $(REPORTS_DIR)
+	@echo ============================================================
+	@echo Detailed ROM Comparison Analysis
+	@echo ============================================================
+	@echo.
+	@echo Comparing:
+	@echo   Original: $(BASE_ROM)
+	@echo   Built:    $(OUTPUT_ROM)
+	@echo.
+	$(PYTHON) $(ROM_COMPARE) "$(BASE_ROM)" "$(OUTPUT_ROM)" --report-dir "$(REPORTS_DIR)"
+	@echo.
+	@echo ============================================================
+	@echo Reports generated in $(REPORTS_DIR)/
+	@echo   - comparison.txt  (human-readable)
+	@echo   - comparison.json (machine-readable)
+	@echo   - comparison.html (visual report)
+	@echo ============================================================
+	@echo.
+	@echo Open $(REPORTS_DIR)/comparison.html in browser for visual analysis
+	@echo.
+
+# Generate comprehensive rebuild report
+report: compare-detailed
+	@echo ============================================================
+	@echo Generating Comprehensive Rebuild Report
+	@echo ============================================================
+	@echo.
+	@echo This report shows progress toward byte-perfect rebuild
+	@echo.
+	@echo Reports available:
+	@echo   $(REPORTS_DIR)/comparison.txt
+	@echo   $(REPORTS_DIR)/comparison.json  
+	@echo   $(REPORTS_DIR)/comparison.html
+	@echo.
+	@type "$(REPORTS_DIR)\comparison.txt"
+	@echo.
+
+# Show differences (alias for compare)
+diff: compare-detailed
+
+# Test ROM in emulator
+test: $(OUTPUT_ROM)
+	@echo ============================================================
+	@echo Testing ROM in emulator
+	@echo ============================================================
+	$(PYTHON) $(TOOLS_DIR)/mesen_integration.py launch "$(OUTPUT_ROM)"
+
+#------------------------------------------------------------------------------
+# Documentation
+#------------------------------------------------------------------------------
+
+docs:
+	@echo ============================================================
+	@echo Generating documentation
+	@echo ============================================================
+	@echo.
+	@echo [1/3] Generating ROM map...
+	$(PYTHON) $(TOOLS_DIR)/generate_rom_map.py "$(BASE_ROM)" "$(DOCS_DIR)/rom_map.html"
+	@echo.
+	@echo [2/3] Generating data tables...
+	$(PYTHON) $(TOOLS_DIR)/generate_data_docs.py "$(DATA_ASSETS)" "$(DOCS_DIR)/data_tables.html"
+	@echo.
+	@echo [3/3] Generating function reference...
+	$(PYTHON) $(TOOLS_DIR)/analyze_functions.py "$(BANKS_DIR)" "$(DOCS_DIR)/functions.html"
+	@echo.
+	@echo Documentation generated in: $(DOCS_DIR)
+	@echo.
+
+#------------------------------------------------------------------------------
+# Setup and Utilities
+#------------------------------------------------------------------------------
+
+# Create directory structure
+$(BUILD_DIR) $(EXTRACTED_DIR) $(CONVERTED_DIR) $(GRAPHICS_DIR) $(TEXT_DIR) $(DATA_ASSETS) $(PALETTES_DIR) $(MAPS_DIR) $(REPORTS_DIR):
+	@if not exist "$@" mkdir "$@"
+
+# Install Python dependencies
+install-deps:
+	@echo ============================================================
+	@echo Installing Python dependencies
+	@echo ============================================================
+	$(PIP) install Pillow numpy
+	@echo.
+	@echo Dependencies installed!
+	@echo.
+
+# Setup complete development environment
+setup: install-deps
+	@echo ============================================================
+	@echo Setting up development environment
+	@echo ============================================================
+	@echo.
+	@echo Creating directory structure...
+	@if not exist "$(BUILD_DIR)" mkdir "$(BUILD_DIR)"
+	@if not exist "$(EXTRACTED_DIR)" mkdir "$(EXTRACTED_DIR)"
+	@if not exist "$(CONVERTED_DIR)" mkdir "$(CONVERTED_DIR)"
+	@if not exist "$(GRAPHICS_DIR)" mkdir "$(GRAPHICS_DIR)"
+	@if not exist "$(TEXT_DIR)" mkdir "$(TEXT_DIR)"
+	@if not exist "$(DATA_ASSETS)" mkdir "$(DATA_ASSETS)"
+	@if not exist "$(PALETTES_DIR)" mkdir "$(PALETTES_DIR)"
+	@if not exist "$(MAPS_DIR)" mkdir "$(MAPS_DIR)"
+	@if not exist "$(REPORTS_DIR)" mkdir "$(REPORTS_DIR)"
+	@echo.
+	@echo Environment setup complete!
+	@echo.
+
+# Clean build artifacts
+clean:
+	@echo Cleaning build artifacts...
+	@if exist "$(BUILD_DIR)" $(RMDIR) "$(BUILD_DIR)"
+	@echo Clean complete.
+
+# Clean everything including extracted assets
+clean-all: clean
+	@echo Cleaning all generated files...
+	@if exist "$(ASSETS_DIR)" $(RMDIR) "$(ASSETS_DIR)"
+	@if exist "$(DOCS_DIR)" $(RMDIR) "$(DOCS_DIR)"
+	@echo Clean all complete.
+
+#------------------------------------------------------------------------------
+# Help
+#------------------------------------------------------------------------------
+
+help:
+	@echo ============================================================
+	@echo Final Fantasy Mystic Quest - Enhanced Build System
+	@echo Version: $(VERSION)
+	@echo ============================================================
+	@echo.
+	@echo BUILD TARGETS:
+	@echo   all               - Build ROM (default)
+	@echo   build-rom         - Assemble and build ROM
+	@echo   build-clean       - Build clean reference ROM
+	@echo.
+	@echo EXTRACTION TARGETS:
+	@echo   extract-all       - Extract all data (graphics, text, enemies, etc.)
+	@echo   extract-graphics  - Extract graphics to PNG files
+	@echo   extract-text      - Extract text and dialog
+	@echo   extract-enemies   - Extract enemy data to JSON/CSV
+	@echo   extract-items     - Extract item/equipment data
+	@echo   extract-palettes  - Extract color palettes
+	@echo   extract-maps      - Extract map data
+	@echo.
+	@echo CONVERSION TARGETS:
+	@echo   convert-graphics  - Convert PNG graphics to SNES format
+	@echo   convert-one       - Convert single file (requires INPUT, OUTPUT)
+	@echo.
+	@echo INJECTION TARGETS:
+	@echo   inject-all        - Inject all modified data into ROM
+	@echo   inject-graphics   - Inject modified graphics
+	@echo   inject-text       - Inject modified text
+	@echo   inject-enemies    - Inject modified enemy data
+	@echo   inject-items      - Inject modified item data
+	@echo.
+	@echo TESTING TARGETS:
+	@echo   test              - Test ROM in emulator
+	@echo   verify            - Quick binary comparison with original
+	@echo   compare           - Detailed ROM comparison with reports
+	@echo   compare-detailed  - Generate comprehensive comparison reports
+	@echo   report            - Show detailed rebuild progress report
+	@echo   diff              - Show differences (alias for compare)
+	@echo.
+	@echo UTILITY TARGETS:
+	@echo   docs              - Generate documentation
+	@echo   setup             - Setup development environment
+	@echo   install-deps      - Install Python dependencies
+	@echo   clean             - Clean build artifacts
+	@echo   clean-all         - Clean all generated files
+	@echo   help              - Show this help
+	@echo.
+	@echo COMPLETE WORKFLOW:
+	@echo   1. make setup              - First time setup
+	@echo   2. make extract-all        - Extract all data from ROM
+	@echo   3. [Edit extracted files in assets/]
+	@echo   4. make convert-graphics   - Convert PNG to SNES format
+	@echo   5. make build-rom          - Build modified ROM
+	@echo   6. make inject-all         - Inject modifications
+	@echo   7. make compare-detailed   - Check progress toward byte-perfect
+	@echo   8. make test               - Test in emulator
+	@echo.
+	@echo BYTE-PERFECT REBUILD WORKFLOW:
+	@echo   1. make extract-all        - Extract everything from original
+	@echo   2. make build-rom          - Build from extracted sources
+	@echo   3. make compare-detailed   - See what differs
+	@echo   4. [Work on differences]
+	@echo   5. Repeat until 100%% match
+	@echo.
+	@echo EXAMPLES:
+	@echo   make extract-graphics
+	@echo   [Edit PNG files in assets/graphics/]
+	@echo   make convert-graphics build-rom
+	@echo.
+	@echo REQUIREMENTS:
+	@echo   - Python 3.x + Pillow
+	@echo   - asar assembler
+	@echo   - Original ROM in ~roms/
+	@echo.
+	@echo ============================================================
