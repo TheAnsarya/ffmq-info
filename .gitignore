@@ -6,3 +6,6 @@ pull-assets-from-rom/obj
 *.smc
 *.sfc
 roms/
+
+# Backups directory (created by formatting/refactoring scripts)
+backups/
