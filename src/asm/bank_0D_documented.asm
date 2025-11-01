@@ -1626,7 +1626,7 @@ SPC_StartDriver:
 ; Processes audio commands from CPU to SPC700.
 ; Handles command parsing, parameter extraction, DSP control.
 
-CODE_0D9B5C:           db $DC,$8F,$00,$05,$43,$C0,$05,$8F,$09,$C1,$2F,$08,$8F,$49,$C1,$60;0D9B5C| Command processor |
+SPC_CommandProcessorData:  db $DC,$8F,$00,$05,$43,$C0,$05,$8F,$09,$C1,$2F,$08,$8F,$49,$C1,$60;0D9B5C| Command processor data table |
                        db $88,$08,$E2,$05,$C4,$3C,$60,$88,$08,$C4,$04,$F8,$3C,$EB,$C1,$CB;0D9B6C| - Parse command byte |
                        db $F2,$EB,$F3,$6D,$BF,$CF,$DD,$28,$70,$C4,$3A,$EE,$BF,$CF,$DD,$D8;0D9B7C| - Extract parameters |
                        db $3C,$F8,$3B,$9F,$28,$07,$04,$3A,$04,$05,$AF,$D8,$3B,$60,$98,$10;0D9B8C| - Dispatch to handler |
