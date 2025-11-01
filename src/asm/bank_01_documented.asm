@@ -4254,7 +4254,7 @@ BattleChar_ValidateAndSetup:
                        LDA.W $1A79,X                      ;01B002|BD791A  |001A79;
                        STA.W $0C0E,Y                      ;01B005|990E0C  |010C0E;
 
-CODE_01B008:
+.Return:
                        RTS                                 ;01B008|60      |      ;
 
 ; ==============================================================================
@@ -4262,7 +4262,7 @@ CODE_01B008:
 ; Advanced status effect management with duration tracking
 ; ==============================================================================
 
-CODE_01B009:
+BattleStatus_ManageEffects:
                        SEP #$20                           ;01B009|E220    |      ;
                        REP #$10                           ;01B00B|C210    |      ;
                        LDA.W $1916                        ;01B00D|AD1619  |001916;
@@ -4284,12 +4284,12 @@ CODE_01B009:
 ; Central hub for processing battle commands and coordinating actions
 ; ==============================================================================
 
-CODE_01B01E:
+BattleCommand_ProcessHub:
                        SEP #$20                           ;01B01E|E220    |      ;
                        REP #$10                           ;01B020|C210    |      ;
                        LDA.W $19EE                        ;01B022|ADEE19  |0119EE;
                        JSR.W CODE_01B1EB                   ;01B025|20EBB1  |01B1EB;
-                       BCC CODE_01B081                     ;01B028|9057    |01B081;
+                       BCC .Exit                          ;01B028|9057    |01B081;
                        STA.W $192D                        ;01B02A|8D2D19  |01192D;
                        LDA.W $1A80,X                      ;01B02D|BD801A  |001A80;
                        AND.B #$CF                         ;01B030|29CF    |      ;
@@ -4329,7 +4329,7 @@ CODE_01B01E:
                        LDA.W $1A7D,X                      ;01B07D|BD7D1A  |001A7D;
                        STA.W $0C24,Y                      ;01B080|99240C  |010C24;
 
-CODE_01B081:
+.Exit:
                        RTS                                 ;01B081|60      |      ;
 
 ; ==============================================================================
@@ -4337,7 +4337,7 @@ CODE_01B081:
 ; Handles character restoration with complex data management
 ; ==============================================================================
 
-CODE_01B082:
+BattleChar_RestoreSystem:
                        SEP #$20                           ;01B082|E220    |      ;
                        REP #$10                           ;01B084|C210    |      ;
                        LDA.W $19EE                        ;01B086|ADEE19  |0119EE;
@@ -4349,7 +4349,7 @@ CODE_01B082:
                        STA.W $19EF                        ;01B096|8DEF19  |0119EF;
                        LDA.W $19EE                        ;01B099|ADEE19  |0119EE;
                        JSR.W CODE_01B1EB                   ;01B09C|20EBB1  |01B1EB;
-                       BCC CODE_01B104                     ;01B09F|9063    |01B104;
+                       BCC .Complete                      ;01B09F|9063    |01B104;
                        STA.W $192D                        ;01B0A1|8D2D19  |01192D;
                        LDA.W $1A80,X                      ;01B0A4|BD801A  |001A80;
                        AND.B #$CF                         ;01B0A7|29CF    |      ;
@@ -4393,7 +4393,7 @@ CODE_01B082:
                        LDA.W $1A81,X                      ;01B100|BD811A  |001A81;
                        STA.W $0C44,Y                      ;01B103|99440C  |010C44;
 
-CODE_01B104:
+.Complete:
                        RTS                                 ;01B104|60      |      ;
 
 ; ==============================================================================
@@ -4401,7 +4401,7 @@ CODE_01B104:
 ; Manages complex graphics coordinate systems for battle display
 ; ==============================================================================
 
-CODE_01B105:
+BattleGraphics_CoordinateManager:
                        REP #$30                           ;01B105|C230    |      ;
                        LDA.W $192A                        ;01B107|AD2A19  |01192A;
                        ASL A                               ;01B10A|0A      |      ;
@@ -4431,7 +4431,7 @@ CODE_01B105:
 ; Complex character data loading with battle scene management
 ; ==============================================================================
 
-CODE_01B13F:
+BattleChar_LoadAndManage:
                        SEP #$20                           ;01B13F|E220    |      ;
                        REP #$10                           ;01B141|C210    |      ;
                        LDA.B #$00                         ;01B143|A900    |      ;
@@ -4453,25 +4453,25 @@ CODE_01B13F:
                        STZ.W $193B                        ;01B16E|9C3B19  |00193B;
                        STZ.W $193D                        ;01B171|9C3D19  |00193D;
 
-CODE_01B174:
+.LoadLoop:
                        LDA.W $192A                        ;01B174|AD2A19  |01192A;
                        CMP.B #$04                         ;01B177|C904    |      ;
-                       BCS CODE_01B1E9                     ;01B179|B06E    |01B1E9;
-                       JSR.W CODE_01B105                   ;01B17B|2005B1  |01B105;
-                       JSR.W CODE_01B18E                   ;01B17E|208EB1  |01B18E;
+                       BCS .Complete                      ;01B179|B06E    |01B1E9;
+                       JSR.W BattleGraphics_CoordinateManager ;01B17B|2005B1  |01B105;
+                       JSR.W BattleData_TransferCoordination ;01B17E|208EB1  |01B18E;
                        INC.W $192A                        ;01B181|EE2A19  |01192A;
                        LDA.W $1935                        ;01B184|AD3519  |001935;
                        CLC                                 ;01B187|18      |      ;
                        ADC.B #$08                         ;01B188|6908    |      ;
                        STA.W $1935                        ;01B18A|8D3519  |001935;
-                       BRA CODE_01B174                     ;01B18D|80E5    |01B174;
+                       BRA .LoadLoop                      ;01B18D|80E5    |01B174;
 
 ; ==============================================================================
 ; Advanced Data Transfer and Coordination
 ; Handles advanced data transfer with multi-system coordination
 ; ==============================================================================
 
-CODE_01B18E:
+BattleData_TransferCoordination:
                        LDX.W $1935                        ;01B18E|AE3519  |001935;
                        LDA.W $193A                        ;01B191|AD3A19  |00193A;
                        STA.W $1A72,X                      ;01B194|9D721A  |001A72;
@@ -4496,30 +4496,30 @@ CODE_01B18E:
 ; Advanced memory initialization with loop control
 ; ==============================================================================
 
-CODE_01B1C2:
+BattleMem_InitializeLoops:
                        LDX.W #$0000                       ;01B1C2|A20000  |      ;
 
-CODE_01B1C5:
+.FillLoop:
                        LDA.W #$00FF                       ;01B1C5|A9FF00  |      ;
                        STA.W $1A72,X                      ;01B1C8|9D721A  |001A72;
                        INX                                 ;01B1CB|E8      |      ;
                        INX                                 ;01B1CC|E8      |      ;
                        CPX.W #$0020                       ;01B1CD|E02000  |      ;
-                       BNE CODE_01B1C5                     ;01B1D0|D0F3    |01B1C5;
+                       BNE .FillLoop                      ;01B1D0|D0F3    |01B1C5;
                        STZ.W $192A                        ;01B1D2|9C2A19  |01192A;
-                       JSR.W CODE_01B13F                   ;01B1D5|203FB1  |01B13F;
+                       JSR.W BattleChar_LoadAndManage      ;01B1D5|203FB1  |01B13F;
                        LDX.W #$0000                       ;01B1D8|A20000  |      ;
 
-CODE_01B1DB:
+.SetupLoop:
                        LDA.W #$00F0                       ;01B1DB|A9F000  |      ;
                        STA.W $1A80,X                      ;01B1DE|9D801A  |001A80;
                        INX                                 ;01B1E1|E8      |      ;
                        CPX.W #$0010                       ;01B1E2|E01000  |      ;
-                       BNE CODE_01B1DB                     ;01B1E5|D0F4    |01B1DB;
+                       BNE .SetupLoop                     ;01B1E5|D0F4    |01B1DB;
                        CLC                                 ;01B1E7|18      |      ;
                        RTS                                 ;01B1E8|60      |      ;
 
-CODE_01B1E9:
+.Complete:
                        CLC                                 ;01B1E9|18      |      ;
                        RTS                                 ;01B1EA|60      |      ;
 
@@ -4528,7 +4528,7 @@ CODE_01B1E9:
 ; Advanced character validation with coordinate processing
 ; ==============================================================================
 
-CODE_01B1EB:
+BattleChar_ValidateEngine:
                        AND.B #$1F                         ;01B1EB|291F    |      ;
                        CMP.B #$04                         ;01B1ED|C904    |      ;
                        BCS CODE_01B1F9                     ;01B1EF|B008    |01B1F9;
@@ -4540,7 +4540,7 @@ CODE_01B1EB:
                        SEC                                 ;01B1F7|38      |      ;
                        RTS                                 ;01B1F8|60      |      ;
 
-CODE_01B1F9:
+.Invalid:
                        CLC                                 ;01B1F9|18      |      ;
                        RTS                                 ;01B1FA|60      |      ;
 
@@ -4550,9 +4550,9 @@ CODE_01B1F9:
 ; ==============================================================================
 
 DATA8_01B1FB:
-                       dw CODE_01B20B                      ;01B1FB|0BB2    |01B20B;
-                       dw CODE_01B259                      ;01B1FD|59B2    |01B259;
-                       dw CODE_01B2A4                      ;01B1FF|A4B2    |01B2A4;
+                       dw BattleSystem_Dispatcher0        ;01B1FB|0BB2    |01B20B;
+                       dw BattleGraphics_LoadEngine       ;01B1FD|59B2    |01B259;
+                       dw BattleScene_StateManager        ;01B1FF|A4B2    |01B2A4;
                        dw CODE_01B2F3                      ;01B201|F3B2    |01B2F3;
                        dw CODE_01B347                      ;01B203|47B3    |01B347;
                        dw CODE_01B39A                      ;01B205|9AB3    |01B39A;
@@ -4612,7 +4612,7 @@ CODE_01B258:
 ; Advanced graphics loading with coordinate transformation
 ; ==============================================================================
 
-CODE_01B259:
+BattleGraphics_LoadEngine:
                        LDA.W $19EE                        ;01B259|ADEE19  |0119EE;
                        AND.B #$F0                         ;01B25C|29F0    |      ;
                        LSR A                               ;01B25E|4A      |      ;
@@ -4641,15 +4641,13 @@ DATA8_01B277:
 ; Complex scene management with state validation
 ; ==============================================================================
 
-CODE_01B29B:
+BattleScene_TransitionState:
                        LDA.W $19EF                        ;01B29B|ADEF19  |0119EF;
                        STA.W $1A81,X                      ;01B29E|9D811A  |001A81;
                        INC.W $19F8                        ;01B2A1|EEF819  |0119F8;
-
-CODE_01B2A3:
                        RTS                                 ;01B2A3|60      |      ;
 
-CODE_01B2A4:
+BattleScene_StateManager:
                        LDA.W $19EE                        ;01B2A4|ADEE19  |0119EE;
                        AND.B #$F0                         ;01B2A7|29F0    |      ;
                        LSR A                               ;01B2A9|4A      |      ;
@@ -4715,15 +4713,15 @@ DATA8_01B311:
 ; Complex state transitions with effect coordination systems
 ; ==============================================================================
 
-CODE_01B33C:
+BattleSystem_StateTransitionEffect:
                        LDA.B #$02                         ;01B33C|A902    |      ;
                        STA.W $19EB                        ;01B33E|8DEB19  |0119EB;
                        JMP.W CODE_01B37B                   ;01B341|4C7BB3  |01B37B;
 
-CODE_01B344:
+BattleSystem_EffectJump1:
                        JMP.W CODE_01B37B                   ;01B344|4C7BB3  |01B37B;
 
-CODE_01B346:
+BattleSystem_EffectExit1:
                        RTS                                 ;01B346|60      |      ;
 
 CODE_01B347:
@@ -4755,15 +4753,15 @@ DATA8_01B365:
 ; Central hub for advanced effect processing and coordination
 ; ==============================================================================
 
-CODE_01B390:
+BattleEffect_ProcessingHub:
                        LDA.B #$03                         ;01B390|A903    |      ;
                        STA.W $19EB                        ;01B392|8DEB19  |0119EB;
                        JMP.W CODE_01B37B                   ;01B395|4C7BB3  |01B37B;
 
-CODE_01B398:
+BattleEffect_JumpHub:
                        JMP.W CODE_01B37B                   ;01B398|4C7BB3  |01B37B;
 
-CODE_01B399:
+BattleEffect_Exit:
                        RTS                                 ;01B399|60      |      ;
 
 CODE_01B39A:
@@ -4795,18 +4793,18 @@ DATA8_01B3B8:
 ; Advanced graphics and scene coordination with complex processing
 ; ==============================================================================
 
-CODE_01B3E3:
+BattleGraphics_SceneCoordination:
                        LDA.B #$04                         ;01B3E3|A904    |      ;
                        STA.W $19EB                        ;01B3E5|8DEB19  |0119EB;
                        JMP.W CODE_01B37B                   ;01B3E8|4C7BB3  |01B37B;
 
-CODE_01B3EB:
+BattleGraphics_JumpPoint1:
                        JMP.W CODE_01B37B                   ;01B3EB|4C7BB3  |01B37B;
 
-CODE_01B3EE:
+BattleGraphics_JumpPoint2:
                        JMP.W CODE_01B37B                   ;01B3EE|4C7BB3  |01B37B;
 
-CODE_01B3EF:
+BattleGraphics_Return:
                        RTS                                 ;01B3EF|60      |      ;
 
 ; ==============================================================================
@@ -4838,15 +4836,15 @@ DATA8_01B40E:
                        db $01,$01,$01,$01,$01,$01,$01,$01,$01,$01,$01,$01,$01,$01,$01,$01 ; 01B41E
                        db $9D,$86,$1A,$A9,$05,$8D,$EB,$19,$4C,$7B,$B3 ; 01B42E
 
-CODE_01B439:
+BattleEffect_FinalSetup:
                        LDA.B #$05                         ;01B439|A905    |      ;
                        STA.W $19EB                        ;01B43B|8DEB19  |0119EB;
                        JMP.W CODE_01B37B                   ;01B43E|4C7BB3  |01B37B;
 
-CODE_01B441:
+BattleEffect_FinalJump:
                        JMP.W CODE_01B37B                   ;01B441|4C7BB3  |01B37B;
 
-CODE_01B443:
+BattleEffect_FinalReturn:
                        RTS                                 ;01B443|60      |      ;
 
 CODE_01B444:
@@ -4873,15 +4871,15 @@ DATA8_01B462:
                        db $01,$01,$01,$01,$01,$01,$01,$01,$01,$01,$01,$01,$01,$01,$01,$01 ; 01B472
                        db $9D,$87,$1A,$A9,$06,$8D,$EB,$19,$4C,$7B,$B3 ; 01B482
 
-CODE_01B48D:
+BattleSystem_FinalCoordinator:
                        LDA.B #$06                         ;01B48D|A906    |      ;
                        STA.W $19EB                        ;01B48F|8DEB19  |0119EB;
                        JMP.W CODE_01B37B                   ;01B492|4C7BB3  |01B37B;
 
-CODE_01B495:
+BattleSystem_CoordinatorJump:
                        JMP.W CODE_01B37B                   ;01B495|4C7BB3  |01B37B;
 
-CODE_01B497:
+BattleSystem_CoordinatorReturn:
                        RTS                                 ;01B497|60      |      ;
 
 ; ==============================================================================
@@ -4894,7 +4892,7 @@ CODE_01B497:
 ; Central coordination hub for advanced battle engine systems
 ; ==============================================================================
 
-CODE_01B498:
+BattleEngine_CoordinationHub:
                        PHP                                 ;01B498|08      |      ;
                        SEP #$20                           ;01B499|E220    |      ;
                        REP #$10                           ;01B49B|C210    |      ;
@@ -4915,22 +4913,22 @@ CODE_01B498:
 ; Handles advanced DMA transfer operations with coordination
 ; ==============================================================================
 
-CODE_01B4AC:
+BattleDMA_TransferSystem:
                        LDX.W #$B8AD                       ;01B4AC|A2ADB8  |      ;
-                       BRA CODE_01B4B4                     ;01B4AF|8003    |01B4B4;
+                       BRA .ExecuteTransfer               ;01B4AF|8003    |01B4B4;
 
-CODE_01B4B1:
+BattleDMA_AlternateEntry:
                        LDX.W #$B8B9                       ;01B4B1|A2B9B8  |      ;
 
-CODE_01B4B4:
+.ExecuteTransfer:
                        PEA.W $0006                        ;01B4B4|F40600  |010006;
                        PLB                                 ;01B4B7|AB      |      ;
                        PLA                                 ;01B4B8|68      |      ;
 
-CODE_01B4B9:
+.TransferLoop:
                        LDA.W $0000,X                      ;01B4B9|BD0000  |060000;
                        CMP.B #$FF                         ;01B4BC|C9FF    |      ;
-                       BEQ CODE_01B4E3                     ;01B4BE|F023    |01B4E3;
+                       BEQ .Complete                      ;01B4BE|F023    |01B4E3;
                        STA.W $19EE                        ;01B4C0|8DEE19  |0619EE;
                        LDA.B #$22                         ;01B4C3|A922    |      ;
                        STA.W $19EF                        ;01B4C5|8DEF19  |0619EF;
@@ -4944,22 +4942,22 @@ CODE_01B4B9:
                        PLP                                 ;01B4D1|28      |      ;
                        PLX                                 ;01B4D2|FA      |      ;
                        INX                                 ;01B4D3|E8      |      ;
-                       BRA CODE_01B4B9                     ;01B4D4|80E3    |01B4B9;
+                       BRA .TransferLoop                  ;01B4D4|80E3    |01B4B9;
 
 ; ==============================================================================
 ; Complex Memory Management Engine
 ; Advanced memory management with complex allocation systems
 ; ==============================================================================
 
-CODE_01B4D6:
+BattleMem_ManagementEngine:
                        LDA.B #$00                         ;01B4D6|A900    |      ;
                        XBA                                 ;01B4D8|EB      |      ;
                        LDA.W $0E91                        ;01B4D9|AD910E  |010E91;
                        TAX                                 ;01B4DC|AA      |      ;
                        LDA.L DATA8_06BE77,X                ;01B4DD|BF77BE06|06BE77;
-                       BMI CODE_01B4E3                     ;01B4E1|301C    |01B4E3;
+                       BMI .Complete                      ;01B4E1|301C    |01B4E3;
 
-CODE_01B4E3:
+.Complete:
                        ASL A                               ;01B4E3|0A      |      ;
                        TAX                                 ;01B4E4|AA      |      ;
                        PHP                                 ;01B4E5|08      |      ;

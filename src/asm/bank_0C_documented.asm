@@ -34,17 +34,24 @@
 ; See: https://wiki.superfamicom.org/vblank-and-nmi
 ; ==============================================================================
 
-CODE_0C8000:
+; ==============================================================================
+; VBLANK Synchronization Routine
+; ==============================================================================
+; Waits for VBLANK period to begin, then returns immediately.
+; Critical for safe PPU register updates and DMA transfers.
+; ==============================================================================
+
+Display_WaitVBlank:
 	PHP										;0C8000	; Save processor status
 	SEP #$20								;0C8001	; 8-bit accumulator
 	PHA										;0C8003	; Save accumulator
 	LDA.B #$40								;0C8004	; VBLANK flag bit
 	TRB.W $00D8								;0C8006	; Test and reset VBLANK flag
 
-CODE_0C8009:
+.WaitLoop:
 	LDA.B #$40								;0C8009	; VBLANK flag bit
 	AND.W $00D8								;0C800B	; Test VBLANK flag
-	BEQ CODE_0C8009							;0C800E	; Loop until VBLANK starts
+	BEQ .WaitLoop							;0C800E	; Loop until VBLANK starts
 	PLA										;0C8010	; Restore accumulator
 	PLP										;0C8011	; Restore processor status
 	RTL										;0C8012	; Return
@@ -57,7 +64,7 @@ CODE_0C8009:
 ; Uses stat lookup tables at $07EE84+
 ; ==============================================================================
 
-CODE_0C8013:
+Display_ShowCharStats:
 	PHP										;0C8013	; Save processor status
 	PHD										;0C8014	; Save direct page
 	PEA.W $0000								;0C8015	; Push $0000
@@ -76,16 +83,16 @@ CODE_0C8013:
 	LDA.L DATA8_07EE84,X					;0C802D	; Load stat byte 0
 	STA.W $015F								;0C8031	; Store to display buffer
 	LDA.L DATA8_07EE85,X					;0C8034	; Load stat byte 1
-	JSR.W CODE_0C8071						;0C8038	; Process stat value
+	JSR.W Display_ProcessStatValue			;0C8038	; Process stat value
 	STA.W $00B5								;0C803B	; Store processed value
 	LDA.L DATA8_07EE86,X					;0C803E	; Load stat byte 2
-	JSR.W CODE_0C8071						;0C8042	; Process stat value
+	JSR.W Display_ProcessStatValue			;0C8042	; Process stat value
 	STA.W $00B2								;0C8045	; Store processed value
 	LDA.L DATA8_07EE87,X					;0C8048	; Load stat byte 3
-	JSR.W CODE_0C8071						;0C804C	; Process stat value
+	JSR.W Display_ProcessStatValue			;0C804C	; Process stat value
 	STA.W $00B4								;0C804F	; Store processed value
 	LDA.L DATA8_07EE88,X					;0C8052	; Load stat byte 4
-	JSR.W CODE_0C8071						;0C8056	; Process stat value
+	JSR.W Display_ProcessStatValue			;0C8056	; Process stat value
 	STA.W $00B3								;0C8059	; Store processed value
 	LDX.W #$A433							;0C805C	; Load display routine address
 	STX.B $17								;0C805F	; Store to jump pointer
@@ -107,17 +114,17 @@ CODE_0C8013:
 ; Output: Accumulator = Processed value
 ; ==============================================================================
 
-CODE_0C8071:
-	BEQ CODE_0C807F							;0C8071	; Branch if zero
+Display_ProcessStatValue:
+	BEQ .ZeroStat							;0C8071	; Branch if zero
 	JSL.L CODE_009776						;0C8073	; Check stat condition
-	BEQ CODE_0C807D							;0C8077	; Branch if normal
+	BEQ .NormalStat							;0C8077	; Branch if normal
 	LDA.B #$02								;0C8079	; Stat modified flag
-	BRA CODE_0C807F							;0C807B	; Continue
+	BRA .ZeroStat							;0C807B	; Continue
 
-CODE_0C807D:
+.NormalStat:
 	LDA.B #$01								;0C807D	; Normal stat flag
 
-CODE_0C807F:
+.ZeroStat:
 	RTS										;0C807F	; Return
 
 ; ==============================================================================
@@ -128,7 +135,7 @@ CODE_0C807F:
 ; See: https://wiki.superfamicom.org/snes-initialization
 ; ==============================================================================
 
-CODE_0C8080:
+Display_InitScreen:
 	JSL.L CODE_00825C						;0C8080	; Call initialization helper
 	LDA.W #$0000							;0C8084	; Clear value
 	STA.L $7E3665							;0C8087	; Clear WRAM variable
@@ -237,30 +244,30 @@ CODE_0C8080:
 ; Called during screen transitions and battle entry.
 ; ==============================================================================
 
-CODE_0C8103:
+Display_MainScreenSetup:
 	LDA.B #$0C								;0C8103	; Bank $0C
 	STA.W $005A								;0C8105	; Set data bank
 	LDX.W #$90D7							;0C8108	; Address of palette DMA code
 	STX.W $0058								;0C810B	; Set DMA routine pointer
 	LDA.B #$40								;0C810E	; VBLANK DMA flag
 	TSB.W $00E2								;0C8110	; Set DMA pending flag
-	JSL.L CODE_0C8000						;0C8113	; Wait for VBLANK
+	JSL.L Display_WaitVBlank				;0C8113	; Wait for VBLANK
 	LDA.B #$07								;0C8117	; Background mode 7
 	STA.B SNES_BGMODE-$2100					;0C8119	; Set BG mode ($2105)
 	JSR.W CODE_0C87ED						;0C811B	; Mode 7 matrix setup
-	JSR.W CODE_0C81DA						;0C811E	; Palette load setup
+	JSR.W Display_PaletteLoadSetup			;0C811E	; Palette load setup
 	JSR.W CODE_0C88BE						;0C8121	; Additional graphics init
 	JSR.W CODE_0C8872						;0C8124	; Background scrolling setup
 	JSR.W CODE_0C87E9						;0C8127	; Finalize graphics state
 	LDA.B #$40								;0C812A	; VBLANK flag
 	TRB.W $00D6								;0C812C	; Clear VBLANK pending
-	JSL.L CODE_0C8000						;0C812F	; Wait for VBLANK
+	JSL.L Display_WaitVBlank				;0C812F	; Wait for VBLANK
 	LDA.B #$01								;0C8133	; BG mode 1
 	STA.B SNES_BGMODE-$2100					;0C8135	; Set BG mode ($2105)
 	STZ.B SNES_BG1VOFS-$2100				;0C8137	; BG1 V-scroll = 0 ($210E)
 	STZ.B SNES_BG1VOFS-$2100				;0C8139	; Write high byte
 	JSR.W CODE_0C8767						;0C813B	; Graphics state finalize
-	JSR.W CODE_0C8241						;0C813E	; Sprite/OAM setup
+	JSR.W Display_SpriteOAMSetup			;0C813E	; Sprite/OAM setup
 	RTS										;0C8141	; Return
 
 ; ==============================================================================
@@ -270,7 +277,7 @@ CODE_0C8103:
 ; Configures SNES window masking system.
 ; ==============================================================================
 
-CODE_0C8142:
+Display_WindowEffectSetup:
 	LDX.W #$4156							;0C8142	; Window config value 1
 	STX.W $0E08								;0C8145	; Store window settings
 	LDX.W #$5555							;0C8148	; Window config value 2
@@ -286,7 +293,7 @@ CODE_0C8142:
 ; Adds offset $0804 to base addresses for proper tile positioning.
 ; ==============================================================================
 
-CODE_0C8157:
+Display_VRAMAddressCalc:
 	CLC										;0C8157	; Clear carry
 	REP #$30								;0C8158	; 16-bit A/X/Y
 	LDA.W $0C84								;0C815A	; Load VRAM base address 1
@@ -307,13 +314,13 @@ CODE_0C8157:
 	STA.B SNES_VMAINC-$2100					;0C8186	; Set VRAM increment ($2115)
 	LDA.B #$08								;0C8188	; Tile pattern value
 	LDX.W #$6225							;0C818A	; VRAM address $6225
-	JSR.W CODE_0C81A5						;0C818D	; Call VRAM fill routine
+	JSR.W Display_VRAMPatternFill			;0C818D	; Call VRAM fill routine
 	LDA.B #$0C								;0C8190	; Tile pattern value
 	LDX.W #$622A							;0C8192	; VRAM address $622A
-	JSR.W CODE_0C81A5						;0C8195	; Call VRAM fill routine
+	JSR.W Display_VRAMPatternFill			;0C8195	; Call VRAM fill routine
 	LDA.B #$14								;0C8198	; Tile pattern value
 	LDX.W #$6234							;0C819A	; VRAM address $6234
-	JSR.W CODE_0C81A5						;0C819D	; Call VRAM fill routine
+	JSR.W Display_VRAMPatternFill			;0C819D	; Call VRAM fill routine
 	LDA.B #$10								;0C81A0	; Tile pattern value
 	LDX.W #$6239							;0C81A2	; VRAM address $6239
 
@@ -325,12 +332,12 @@ CODE_0C8157:
 ; Input: A = pattern start value, X = VRAM address
 ; ==============================================================================
 
-CODE_0C81A5:
+Display_VRAMPatternFill:
 	XBA										;0C81A5	; Swap A/B registers
 	LDA.B #$00								;0C81A6	; Clear low byte
 	REP #$30								;0C81A8	; 16-bit A/X/Y
 
-CODE_0C81AA:									; Loop: Fill VRAM pattern
+.FillLoop:									; Loop: Fill VRAM pattern
 	STX.B SNES_VMADDL-$2100					;0C81AA	; Set VRAM address ($2116)
 	STA.B SNES_VMDATAL-$2100				;0C81AC	; Write tile number ($2118)
 	INC A									;0C81AE	; Next tile
@@ -344,7 +351,7 @@ CODE_0C81AA:									; Loop: Fill VRAM pattern
 	TYA										;0C81BA	; Restore tile counter
 	ADC.W #$000E							;0C81BB	; Advance tile pattern
 	BIT.W #$0040							;0C81BE	; Test completion bit
-	BEQ CODE_0C81AA							;0C81C1	; Loop if not done
+	BEQ .FillLoop							;0C81C1	; Loop if not done
 	SEP #$20								;0C81C3	; 8-bit accumulator
 	RTS										;0C81C5	; Return
 
@@ -355,7 +362,7 @@ CODE_0C81AA:									; Loop: Fill VRAM pattern
 ; Resets window and color math registers.
 ; ==============================================================================
 
-CODE_0C81C6:
+Display_ColorMathDisable:
 	STZ.B SNES_CGSWSEL-$2100				;0C81C6	; Clear color window select ($2130)
 	STZ.B SNES_CGADSUB-$2100				;0C81C8	; Clear color math ($2131)
 	RTS										;0C81CA	; Return
@@ -367,7 +374,7 @@ CODE_0C81C6:
 ; Used for battle transitions, lightning, darkness, etc.
 ; ==============================================================================
 
-CODE_0C81CB:
+Display_ColorAdditionSetup:
 	LDX.W #$7002							;0C81CB	; Color window config
 	STX.B SNES_CGSWSEL-$2100				;0C81CE	; Set color window ($2130-$2131)
 	LDA.B #$E0								;0C81D0	; Fixed color data (brightness)
@@ -383,14 +390,14 @@ CODE_0C81CB:
 ; Sets up indirect DMA from Bank $0C address $81EF.
 ; ==============================================================================
 
-CODE_0C81DA:
+Display_PaletteLoadSetup:
 	LDA.B #$0C								;0C81DA	; Bank $0C
 	STA.W $005A								;0C81DC	; Set DMA source bank
 	LDX.W #$81EF							;0C81DF	; Palette DMA routine address
 	STX.W $0058								;0C81E2	; Set DMA routine pointer
 	LDA.B #$40								;0C81E5	; VBLANK DMA flag
 	TSB.W $00E2								;0C81E7	; Set DMA pending flag
-	JSL.L CODE_0C8000						;0C81EA	; Wait for VBLANK
+	JSL.L Display_WaitVBlank				;0C81EA	; Wait for VBLANK
 	RTS										;0C81EE	; Return
 
 ; ==============================================================================
@@ -407,19 +414,19 @@ CODE_0C81DA:
 	STA.B SNES_DMA0ADDRH-$4300				;0C81F6	; DMA0 source bank ($4304)
 	LDA.B #$10								;0C81F8	; Starting palette index = $10
 	LDY.W #$D974							;0C81FA	; Source address $07:D974
-	JSR.W CODE_0C8224						;0C81FD	; DMA 16 bytes to CGRAM
+	JSR.W Display_PaletteDMATransfer		;0C81FD	; DMA 16 bytes to CGRAM
 	LDY.W #$D934							;0C8200	; Source address $07:D934
-	JSR.W CODE_0C8224						;0C8203	; DMA 16 bytes
-	JSR.W CODE_0C8224						;0C8206	; DMA 16 bytes (auto-increment)
-	JSR.W CODE_0C8224						;0C8209	; DMA 16 bytes
-	JSR.W CODE_0C8224						;0C820C	; DMA 16 bytes
+	JSR.W Display_PaletteDMATransfer		;0C8203	; DMA 16 bytes
+	JSR.W Display_PaletteDMATransfer		;0C8206	; DMA 16 bytes (auto-increment)
+	JSR.W Display_PaletteDMATransfer		;0C8209	; DMA 16 bytes
+	JSR.W Display_PaletteDMATransfer		;0C820C	; DMA 16 bytes
 	LDA.B #$B0								;0C820F	; Palette index = $B0
-	JSR.W CODE_0C8224						;0C8211	; DMA 16 bytes
+	JSR.W Display_PaletteDMATransfer		;0C8211	; DMA 16 bytes
 	LDY.W #$D934							;0C8214	; Reset source to $07:D934
-	JSR.W CODE_0C8224						;0C8217	; DMA 16 bytes
-	JSR.W CODE_0C8224						;0C821A	; DMA 16 bytes
-	JSR.W CODE_0C8224						;0C821D	; DMA 16 bytes
-	JSR.W CODE_0C8224						;0C8220	; DMA 16 bytes
+	JSR.W Display_PaletteDMATransfer		;0C8217	; DMA 16 bytes
+	JSR.W Display_PaletteDMATransfer		;0C821A	; DMA 16 bytes
+	JSR.W Display_PaletteDMATransfer		;0C821D	; DMA 16 bytes
+	JSR.W Display_PaletteDMATransfer		;0C8220	; DMA 16 bytes
 	RTL										;0C8223	; Return from palette DMA
 
 ; ==============================================================================
@@ -430,7 +437,7 @@ CODE_0C81DA:
 ; Output: A += $10, Y += $10 (auto-incremented for next call)
 ; ==============================================================================
 
-CODE_0C8224:
+Display_PaletteDMATransfer:
 	PHA										;0C8224	; Save CGRAM address
 	STA.W SNES_CGADD						;0C8225	; Set CGRAM address ($2121)
 	STY.B SNES_DMA0ADDRL-$4300				;0C8228	; DMA0 source address ($4302)
@@ -454,7 +461,7 @@ CODE_0C8224:
 ; Uses MVN (block move) for fast 9-byte transfer.
 ; ==============================================================================
 
-CODE_0C8241:
+Display_SpriteOAMSetup:
 	REP #$30								;0C8241	; 16-bit A/X/Y
 	LDX.W #$8667							;0C8243	; Source address $0C:8667
 	LDY.W #$0202							;0C8246	; Destination address $00:0202
@@ -472,22 +479,22 @@ CODE_0C8241:
 ; Commands: 00=wait, 01=fade step, 02=color cycle, 03=palette load, etc.
 ; ==============================================================================
 
-CODE_0C825A:
+Display_EffectScriptInterpreter:
 	LDA.W $0000,X							;0C825A	; Load effect command byte
 	INX										;0C825D	; Advance script pointer
 	CMP.B #$01								;0C825E	; Command < 01?
-	BCC CODE_0C8297							;0C8260	; Branch to wait routine
-	BEQ CODE_0C8292							;0C8262	; Command = 01: Single frame delay
+	BCC .WaitCondition						;0C8260	; Branch to wait routine
+	BEQ .SingleFrame						;0C8262	; Command = 01: Single frame delay
 	CMP.B #$03								;0C8264	; Command < 03?
-	BCC CODE_0C8288							;0C8266	; Branch to color cycle
-	BEQ CODE_0C82A0							;0C8268	; Command = 03: Palette operation
+	BCC .ColorCycle							;0C8266	; Branch to color cycle
+	BEQ .PaletteOp							;0C8268	; Command = 03: Palette operation
 	CMP.B #$05								;0C826A	; Command = 05?
-	BEQ CODE_0C82A3							;0C826C	; Branch to special effect
-	BCS CODE_0C82A6							;0C826E	; Command >= 06: Complex operations
+	BEQ .SpecialEffect						;0C826C	; Branch to special effect
+	BCS .ComplexOps							;0C826E	; Command >= 06: Complex operations
 	LDY.W #$0004							;0C8270	; Loop count = 4
 
 ; Color flash effect loop (command 04)
-CODE_0C8273:
+.ColorFlash:
 	PHY										;0C8273	; Save loop counter
 	LDA.B #$3F								;0C8274	; Fixed color = white ($3F)
 	STA.B SNES_COLDATA-$2100				;0C8276	; Set color addition ($2132)
@@ -497,38 +504,38 @@ CODE_0C8273:
 	JSR.W CODE_0C85DB						;0C827F	; Wait one frame
 	PLY										;0C8282	; Restore loop counter
 	DEY										;0C8283	; Decrement
-	BNE CODE_0C8273							;0C8284	; Loop 4 times (4 flashes)
-	BRA CODE_0C825A							;0C8286	; Continue script
+	BNE .ColorFlash							;0C8284	; Loop 4 times (4 flashes)
+	BRA Display_EffectScriptInterpreter		;0C8286	; Continue script
 
 ; Color cycle effect (command 02)
-CODE_0C8288:
+.ColorCycle:
 	LDA.B #$3B								;0C8288	; Cycle duration = 59 frames
 
-CODE_0C828A:
+.CycleLoop:
 	PHA										;0C828A	; Save counter
 	JSR.W CODE_0C85DB						;0C828B	; Wait one frame
 	PLA										;0C828E	; Restore counter
 	DEC A									;0C828F	; Decrement
-	BNE CODE_0C828A							;0C8290	; Loop until counter = 0
+	BNE .CycleLoop							;0C8290	; Loop until counter = 0
 
 ; Single frame delay (command 01)
-CODE_0C8292:
+.SingleFrame:
 	JSR.W CODE_0C85DB						;0C8292	; Wait one frame
-	BRA CODE_0C825A							;0C8295	; Continue script
+	BRA Display_EffectScriptInterpreter		;0C8295	; Continue script
 
 ; Wait until condition met (command 00)
-CODE_0C8297:
+.WaitCondition:
 	JSR.W CODE_0C85DB						;0C8297	; Wait one frame
 	LDA.W $0C82								;0C829A	; Load condition flag
-	BNE CODE_0C8297							;0C829D	; Loop until flag clears
+	BNE .WaitCondition						;0C829D	; Loop until flag clears
 	RTS										;0C829F	; Return from effect script
 
 ; Palette load command (command 03)
-CODE_0C82A0:
+.PaletteOp:
 	JMP.W CODE_0C8460						;0C82A0	; Jump to palette loader
 
 ; Special effect command (command 05)
-CODE_0C82A3:
+.SpecialEffect:
 	JMP.W CODE_0C8421						;0C82A3	; Jump to special effect handler
 
 ; ==============================================================================
@@ -538,7 +545,7 @@ CODE_0C82A3:
 ; Format: [CMD:5bits][PARAM:3bits] for advanced visual effects.
 ; ==============================================================================
 
-CODE_0C82A6:
+.ComplexOps:
 	PHA										;0C82A6	; Save command byte
 	AND.B #$07								;0C82A7	; Extract parameter (bits 0-2)
 	STA.W $015F								;0C82A9	; Store parameter
@@ -672,18 +679,18 @@ CODE_0C8377:
 ; palette fades, and color window operations.
 ; ==============================================================================
 
-CODE_0C837D:
+Display_ComplexScreenEffect:
 	PHX										;0C837D	; Save script pointer
-	JSR.W CODE_0C8157						;0C837E	; Calculate VRAM addresses
-	JSR.W CODE_0C8142						;0C8381	; Setup window effects
-	JSR.W CODE_0C83B1						;0C8384	; Execute effect stage 1
-	JSR.W CODE_0C83B1						;0C8387	; Execute effect stage 2
-	JSR.W CODE_0C83B1						;0C838A	; Execute effect stage 3
+	JSR.W Display_VRAMAddressCalc			;0C837E	; Calculate VRAM addresses
+	JSR.W Display_WindowEffectSetup			;0C8381	; Setup window effects
+	JSR.W Display_FlashEffect				;0C8384	; Execute effect stage 1
+	JSR.W Display_FlashEffect				;0C8387	; Execute effect stage 2
+	JSR.W Display_FlashEffect				;0C838A	; Execute effect stage 3
 	LDA.B #$10								;0C838D	; Loop counter = 16 frames
 
-CODE_0C838F:
+.EffectLoop:
 	PHA										;0C838F	; Save counter
-	JSR.W CODE_0C81CB						;0C8390	; Enable color addition
+	JSR.W Display_ColorAdditionSetup		;0C8390	; Enable color addition
 	JSR.W CODE_0C85DB						;0C8393	; Wait one frame
 	JSR.W CODE_0C85DB						;0C8396	; Wait one frame
 
@@ -708,15 +715,15 @@ CODE_0C838F:
 	JSR.W CODE_0C85DB						;0C8396	; Wait one frame (VBLANK sync)
 	LDA.B #$11								;0C8399	; Layer enable mask
 	STA.B SNES_TM-$2100						;0C839B	; Set main screen layers ($212C)
-	JSR.W CODE_0C81C6						;0C839D	; Disable color math
+	JSR.W Display_ColorMathDisable			;0C839D	; Disable color math
 	JSR.W CODE_0C85DB						;0C83A0	; Wait one frame
 	JSR.W CODE_0C85DB						;0C83A3	; Wait one frame
 	PLA										;0C83A6	; Restore loop counter
 	DEC A									;0C83A7	; Decrement
-	BNE CODE_0C838F							;0C83A8	; Loop if not done (16 frames total)
-	JSR.W CODE_0C81CB						;0C83AA	; Re-enable color addition
+	BNE .EffectLoop							;0C83A8	; Loop if not done (16 frames total)
+	JSR.W Display_ColorAdditionSetup		;0C83AA	; Re-enable color addition
 	PLX										;0C83AD	; Restore script pointer
-	JMP.W CODE_0C825A						;0C83AE	; Continue effect script
+	JMP.W Display_EffectScriptInterpreter	;0C83AE	; Continue effect script
 
 ; ==============================================================================
 ; CODE_0C83B1 - Flash Effect Subroutine
@@ -725,14 +732,14 @@ CODE_0C838F:
 ; Used for lightning, magic spells, critical hits.
 ; ==============================================================================
 
-CODE_0C83B1:
-	JSR.W CODE_0C81CB						;0C83B1	; Enable color addition
+Display_FlashEffect:
+	JSR.W Display_ColorAdditionSetup		;0C83B1	; Enable color addition
 	LDA.B #$11								;0C83B4	; Layer enable mask
 	STA.B SNES_TM-$2100						;0C83B6	; Set layers ($212C)
 	LDA.B #$3F								;0C83B8	; Fixed color = white ($3F)
 	STA.B SNES_COLDATA-$2100				;0C83BA	; Set color addition ($2132)
 	JSR.W CODE_0C85DB						;0C83BC	; Wait one frame (flash)
-	JSR.W CODE_0C81C6						;0C83BF	; Disable color math
+	JSR.W Display_ColorMathDisable			;0C83BF	; Disable color math
 	JSR.W CODE_0C85DB						;0C83C2	; Wait one frame
 	JSR.W CODE_0C85DB						;0C83C5	; Wait one frame
 	JMP.W CODE_0C85DB						;0C83C8	; Wait one frame and return
@@ -745,38 +752,38 @@ CODE_0C83B1:
 ; Input: A = table offset, $0161 = command type, $0200 = adjustment value
 ; ==============================================================================
 
-CODE_0C83CB:
+Display_TableEffectExecutor:
 	PHX										;0C83CB	; Save X register
 	TAX										;0C83CC	; Use A as table index
 	SEP #$20								;0C83CD	; 8-bit accumulator
 	LDY.W $0161								;0C83CF	; Load command type
 	CPY.W #$00B8							;0C83D2	; Command = $B8 (specific effect)?
-	BEQ CODE_0C83DD							;0C83D5	; Branch if match
+	BEQ .ProcessEffect						;0C83D5	; Branch if match
 	CPY.W #$0089							;0C83D7	; Command >= $89?
 	BCS UNREACH_0C83E8						;0C83DA	; Branch if high range
 	SEC										;0C83DC	; Set carry for subtraction
 
-CODE_0C83DD:
+.ProcessEffect:
 	LDA.W $0001,X							;0C83DD	; Load table value
 	SBC.W $0200								;0C83E0	; Subtract adjustment
 	STA.W $0001,X							;0C83E3	; Store result
-	BRA CODE_0C83FB							;0C83E6	; Continue
+	BRA .ContinueEffect						;0C83E6	; Continue
 
 UNREACH_0C83E8:
 	db $C0,$98,$00,$90,$0E,$C0,$A9,$00,$B0,$09,$BD,$01,$00,$6D,$00,$02 ; Additional effect logic
 	db $9D,$01,$00
 
-CODE_0C83FB:
+.ContinueEffect:
 	CPY.W #$0088							;0C83FB	; Command < $88?
-	BCC CODE_0C8410							;0C83FE	; Branch if low range
+	BCC .LowRangeCheck						;0C83FE	; Branch if low range
 	db $C0,$99,$00,$B0,$0B,$BD,$00,$00,$6D,$00,$02,$9D,$00,$00,$80,$0E ; Effect processing
 
-CODE_0C8410:
+.LowRangeCheck:
 	CPY.W #$00A8							;0C8410	; Command < $A8?
-	BCC CODE_0C841E							;0C8413	; Branch if not A8+
+	BCC .Finalize							;0C8413	; Branch if not A8+
 	db $BD,$00,$00,$ED,$00,$02,$9D,$00,$00 ; Additional effect
 
-CODE_0C841E:
+.Finalize:
 	TXY										;0C841E	; Transfer result to Y
 	PLX										;0C841F	; Restore X
 	RTS										;0C8420	; Return
@@ -788,10 +795,10 @@ CODE_0C841E:
 ; Scrolls window positions over 32 frames, then holds for 60 frames.
 ; ==============================================================================
 
-CODE_0C8421:
+Display_ScreenScrollEffect:
 	LDA.B #$20								;0C8421	; Loop counter = 32 frames
 
-CODE_0C8423:
+.ScrollLoop:
 	PHA										;0C8423	; Save counter
 	SEC										;0C8424	; Set carry for subtraction
 	LDA.W $0CC1								;0C8425	; Load window position 1
@@ -809,18 +816,18 @@ CODE_0C8423:
 	JSR.W CODE_0C85DB						;0C8446	; Wait one frame
 	PLA										;0C8449	; Restore counter
 	DEC A									;0C844A	; Decrement
-	BNE CODE_0C8423							;0C844B	; Loop 32 times
+	BNE .ScrollLoop							;0C844B	; Loop 32 times
 	LDA.B #$3C								;0C844D	; Hold duration = 60 frames
 
-CODE_0C844F:
+.HoldLoop:
 	PHA										;0C844F	; Save counter
 	JSR.W CODE_0C85DB						;0C8450	; Wait one frame
 	PLA										;0C8453	; Restore counter
 	DEC A									;0C8454	; Decrement
-	BNE CODE_0C844F							;0C8455	; Loop 60 times
+	BNE .HoldLoop							;0C8455	; Loop 60 times
 	STZ.W $0E0D								;0C8457	; Clear window state 1
 	STZ.W $0E0E								;0C845A	; Clear window state 2
-	JMP.W CODE_0C825A						;0C845D	; Continue script
+	JMP.W Display_EffectScriptInterpreter	;0C845D	; Continue script
 
 ; ==============================================================================
 ; CODE_0C8460 - Complex Palette Fade Sequence
@@ -829,17 +836,17 @@ CODE_0C844F:
 ; Cycles through color transformations with precise timing.
 ; ==============================================================================
 
-CODE_0C8460:
+Display_ComplexPaletteFade:
 	PHX										;0C8460	; Save script pointer
 	LDY.W #$8575							;0C8461	; Function pointer 1
 	STY.W $0212								;0C8464	; Store function address
 	LDX.W #$0000							;0C8467	; Clear X (parameter)
 	LDY.W #$84CB							;0C846A	; Fade table address
-	JSR.W CODE_0C849E						;0C846D	; Execute fade stage 1
+	JSR.W Display_PaletteFadeStage			;0C846D	; Execute fade stage 1
 	LDY.W #$84CB							;0C8470	; Fade table address
-	JSR.W CODE_0C849E						;0C8473	; Execute fade stage 2
+	JSR.W Display_PaletteFadeStage			;0C8473	; Execute fade stage 2
 	LDY.W #$8520							;0C8476	; Different fade table
-	JSR.W CODE_0C849E						;0C8479	; Execute fade stage 3
+	JSR.W Display_PaletteFadeStage			;0C8479	; Execute fade stage 3
 	LDY.W #$84CC							;0C847C	; Fade table address
 	JSR.W CODE_0C849E						;0C847F	; Execute fade stage 4
 	LDY.W #$84F6							;0C8482	; Fade table address
@@ -1794,7 +1801,7 @@ CODE_0C8B07:								; Zero value path
 	LDX.W #$0414							;0C8B20	; Data buffer address
 	LDA.W $0063								;0C8B23	; Load Y position
 	JSR.W CODE_0C8B3C						;0C8B26	; Update vertical sprite positions
-	
+
 	; Update horizontal sprite positions
 	LDX.W #$000B							;0C8B29	; Column count = 11
 	STX.W $0064								;0C8B2C	; Store column counter
@@ -1827,7 +1834,7 @@ CODE_0C8B40:								; DMA transfer loop
 	LDA.B #$01								;0C8B4B	; Enable DMA channel 0
 	STA.W SNES_MDMAEN						;0C8B4D	; Start DMA transfer ($420B)
 	PLA										;0C8B50	; Restore count
-	
+
 	; Advance to next row/column
 	REP #$30								;0C8B51	; 16-bit A/X/Y
 	PHA										;0C8B53	; Save count
@@ -1876,31 +1883,31 @@ CODE_0C8BAD:
 	LDA.B #$18								;0C8BAD	; Effect timer = 24 frames
 	STA.W $0500								;0C8BAF	; Store effect state
 	REP #$30								;0C8BB2	; 16-bit A/X/Y
-	
+
 	; Transfer title screen configuration data
 	LDX.W #$8CE2							;0C8BB4	; Source: Title config table
 	LDY.W #$0D00							;0C8BB7	; Dest: $0D00 (config buffer)
 	LDA.W #$0037							;0C8BBA	; Transfer 56 bytes
 	MVN $00,$0C								;0C8BBD	; Block move Bank $0C → Bank $00
-	
+
 	LDY.W #$0E10							;0C8BC0	; Dest: $0E10 (secondary buffer)
 	LDA.W #$0003							;0C8BC3	; Transfer 4 bytes
 	MVN $00,$0C								;0C8BC6	; Block move
-	
+
 	; Transfer sprite attribute data
 	LDX.W #$8C5E							;0C8BC9	; Source: Sprite data table
 	LDY.W #$0C04							;0C8BCC	; Dest: $0C04 (sprite buffer)
 	LDA.W #$007B							;0C8BCF	; Transfer 124 bytes
 	MVN $00,$0C								;0C8BD2	; Block move
-	
+
 	LDY.W #$0E00							;0C8BD5	; Dest: $0E00 (effect params)
 	LDA.W #$0007							;0C8BD8	; Transfer 8 bytes
 	MVN $00,$0C								;0C8BDB	; Block move
-	
+
 	SEP #$20								;0C8BDE	; 8-bit accumulator
 	PEA.W $0C7F								;0C8BE0	; Push bank $7F
 	PLB										;0C8BE3	; Set data bank = $7F
-	
+
 	; Initialize tile pattern buffer ($7F6000-$7F6xxx)
 	LDY.W #$6000							;0C8BE4	; Buffer address = $7F6000
 	LDA.B #$40								;0C8BE7	; Starting tile = $40
@@ -1918,7 +1925,7 @@ CODE_0C8BED:								; Inner loop: Fill tile row
 	ADC.B #$05								;0C8BF5	; Advance to next row base (+16 total)
 	CMP.B #$90								;0C8BF7	; Reached tile $90?
 	BNE CODE_0C8BEA							;0C8BF9	; Loop for all rows
-	
+
 	; Initialize secondary tile pattern buffer (8-column layout)
 	LDY.W #$6037							;0C8BFB	; Buffer address = $7F6037 (offset)
 	LDA.B #$A0								;0C8BFE	; Starting tile = $A0
@@ -1936,12 +1943,12 @@ CODE_0C8C04:								; Inner loop: Fill tile row
 	ADC.B #$08								;0C8C0C	; Advance to next row base (+16 total)
 	CMP.B #$F0								;0C8C0E	; Reached tile $F0?
 	BNE CODE_0C8C01							;0C8C10	; Loop for all rows
-	
+
 	PLB										;0C8C12	; Restore data bank
 	CLC										;0C8C13	; Clear carry
 	JSL.L CODE_0C8000						;0C8C14	; Wait for VBLANK
 	STZ.B SNES_VMAINC-$2100					;0C8C18	; VRAM address increment = 1
-	
+
 	; Set Mode 7 center point
 	LDA.B #$8C								;0C8C1A	; Center X = $8C (140 decimal)
 	STA.B SNES_M7X-$2100					;0C8C1C	; Write M7 center X low ($211F)
@@ -1949,14 +1956,14 @@ CODE_0C8C04:								; Inner loop: Fill tile row
 	LDA.B #$50								;0C8C20	; Center Y = $50 (80 decimal)
 	STA.B SNES_M7Y-$2100					;0C8C22	; Write M7 center Y low ($2120)
 	STZ.B SNES_M7Y-$2100					;0C8C24	; Write M7 center Y high
-	
+
 	; Initialize Mode 7 identity matrix
 	LDA.B #$01								;0C8C26	; Matrix diagonal = 1.0
 	STA.B SNES_M7A-$2100					;0C8C28	; M7A = $0100 ($211B)
 	STZ.B SNES_M7A-$2100					;0C8C2A	; High byte
 	STA.B SNES_M7D-$2100					;0C8C2C	; M7D = $0100 ($211E)
 	STZ.B SNES_M7D-$2100					;0C8C2E	; High byte
-	
+
 	; Process tilemap fill commands from table
 	LDX.W #$0285							;0C8C30	; Initial VRAM address
 	LDY.W #$8D1E							;0C8C33	; Command table address
@@ -1975,7 +1982,7 @@ CODE_0C8C43:								; Fill repeat loop
 	INC A									;0C8C45	; Increment tile number
 	DEX										;0C8C46	; Decrement counter
 	BNE CODE_0C8C43							;0C8C47	; Loop for repeat count
-	
+
 	; Check for next command
 	LDA.W $0002,Y							;0C8C49	; Load VRAM offset for next fill
 	BEQ CODE_0C8C5C							;0C8C4C	; Exit if offset = 0 (end marker)
@@ -2058,19 +2065,19 @@ CODE_0C8D7B:
 	SEP #$20								;0C8D86	; 8-bit accumulator
 	LDA.B #$80								;0C8D88	; VRAM increment = +128 (vertical)
 	STA.W SNES_VMAINC						;0C8D8A	; Set increment mode ($2115)
-	
+
 	; Transfer palette group 1
 	LDA.B #$00								;0C8D8D	; Palette offset = 0
 	JSR.W CODE_0C8F98						;0C8D8F	; Transfer palette via DMA
-	
+
 	; Transfer palette group 2
 	LDA.B #$80								;0C8D92	; Palette offset = $80 (128 colors)
 	JSR.W CODE_0C8F98						;0C8D94	; Transfer palette via DMA
-	
+
 	; Transfer palette group 3
 	LDA.B #$C0								;0C8D97	; Palette offset = $C0 (192 colors)
 	JSR.W CODE_0C8F98						;0C8D99	; Transfer palette via DMA
-	
+
 	; Fill OAM sprite buffer with pattern
 	REP #$30								;0C8D9C	; 16-bit A/X/Y
 	LDA.W #$5555							;0C8D9E	; Fill pattern = $5555
@@ -2079,9 +2086,9 @@ CODE_0C8D7B:
 	LDY.W #$0C02							;0C8DA7	; Dest = $0C02
 	LDA.W #$021D							;0C8DAA	; Transfer 542 bytes (fill entire OAM)
 	MVN $00,$00								;0C8DAD	; Block move within Bank $00
-	
+
 	JSR.W CODE_0C8948						;0C8DB0	; Perform OAM DMA transfer
-	
+
 	; Setup tilemap DMA transfer
 	LDX.W #$1809							;0C8DB3	; DMA mode: Word, A→A, increment
 	STX.B SNES_DMA0PARAM-$4300				;0C8DB6	; Set DMA0 parameters ($4300)
@@ -2093,10 +2100,10 @@ CODE_0C8D7B:
 	STX.B SNES_DMA0CNTL-$4300				;0C8DC4	; Set DMA0 count ($4305)
 	LDA.B #$01								;0C8DC6	; Enable DMA channel 0
 	STA.W $420B								;0C8DC8	; Start DMA transfer ($420B)
-	
+
 	JSR.W CODE_0C90F9						;0C8DCB	; Additional VRAM setup routine
 	JSR.W CODE_0C9142						;0C8DCE	; Secondary graphics initialization
-	
+
 	; Transfer large graphics block to VRAM $4000
 	LDX.W #$1801							;0C8DD1	; DMA mode: Byte, A→A
 	STX.B SNES_DMA0PARAM-$4300				;0C8DD4	; Set DMA0 parameters
@@ -2110,7 +2117,7 @@ CODE_0C8D7B:
 	STX.B SNES_DMA0CNTL-$4300				;0C8DE8	; Set DMA0 count
 	LDA.B #$01								;0C8DEA	; Enable DMA channel 0
 	STA.W $420B								;0C8DEC	; Start DMA transfer
-	
+
 	; Process graphics command table
 	LDA.B #$0C								;0C8DEF	; Source bank = $0C
 	STA.B SNES_DMA0ADDRH-$4300				;0C8DF1	; Set DMA0 bank
@@ -2120,7 +2127,7 @@ CODE_0C8D7B:
 CODE_0C8DF9:								; Graphics command processing loop
 	REP #$30								;0C8DF9	; 16-bit A/X/Y
 	STY.W $2116								;0C8DFB	; Set VRAM address ($2116)
-	
+
 	; Calculate DMA transfer size (entry byte 0 × 32)
 	LDA.W $0000,X							;0C8DFE	; Load entry byte 0
 	AND.W #$00FF							;0C8E01	; Mask to 8-bit
@@ -2130,7 +2137,7 @@ CODE_0C8DF9:								; Graphics command processing loop
 	ASL A									;0C8E07	; ×16
 	ASL A									;0C8E08	; ×32 (tile size)
 	STA.B SNES_DMA0CNTL-$4300				;0C8E09	; Set DMA transfer size ($4305)
-	
+
 	; Calculate source address (entry byte 1 × 32 + $AA4C base)
 	LDA.W $0001,X							;0C8E0B	; Load entry byte 1
 	AND.W #$00FF							;0C8E0E	; Mask to 8-bit
@@ -2141,7 +2148,7 @@ CODE_0C8DF9:								; Graphics command processing loop
 	ASL A									;0C8E15	; ×32
 	ADC.W #$AA4C							;0C8E16	; Add base address
 	STA.B SNES_DMA0ADDRL-$4300				;0C8E19	; Set DMA source address ($4302)
-	
+
 	; Calculate VRAM offset (entry byte 2 × 16 + current VRAM)
 	LDA.W $0002,X							;0C8E1B	; Load entry byte 2
 	AND.W #$00FF							;0C8E1E	; Mask to 8-bit
@@ -2153,11 +2160,11 @@ CODE_0C8DF9:								; Graphics command processing loop
 	ADC.B $01,S								;0C8E26	; Add offset to VRAM address
 	TAY										;0C8E28	; Update VRAM address
 	PLA										;0C8E29	; Clean up stack
-	
+
 	SEP #$20								;0C8E2A	; 8-bit accumulator
 	LDA.B #$01								;0C8E2C	; Enable DMA channel 0
 	STA.W $420B								;0C8E2E	; Start DMA transfer ($420B)
-	
+
 	; Check for next command (entry byte 2 != 0)
 	LDA.W $0002,X							;0C8E31	; Load entry byte 2
 	PHP										;0C8E34	; Save flags (check for zero)
@@ -2166,7 +2173,7 @@ CODE_0C8DF9:								; Graphics command processing loop
 	INX										;0C8E37	; Advance pointer
 	PLP										;0C8E38	; Restore flags
 	BNE CODE_0C8DF9							;0C8E39	; Continue if not end marker
-	
+
 	; Copy graphics data to Bank $7F buffer
 	REP #$30								;0C8E3B	; 16-bit A/X/Y
 	LDA.W #$0000							;0C8E3D	; Clear A
@@ -2175,7 +2182,7 @@ CODE_0C8DF9:								; Graphics command processing loop
 	LDY.W #$0000							;0C8E44	; Dest = $7F0000
 	LDA.W #$0D5F							;0C8E47	; Transfer 3424 bytes
 	MVN $7F,$0C								;0C8E4A	; Block move Bank $0C → Bank $7F
-	
+
 	; Additional tilemap fill from command table
 	LDX.W #$0000							;0C8E4D	; Clear X
 	LDA.W #$0400							;0C8E50	; VRAM base address
@@ -2201,7 +2208,7 @@ CODE_0C8E6F:								; Tile fill loop
 	PLY										;0C8E73	; Restore counter
 	DEY										;0C8E74	; Decrement
 	BNE CODE_0C8E6F							;0C8E75	; Loop for repeat count
-	
+
 	PLX										;0C8E77	; Restore command pointer
 	LDA.L DATA8_0C8F15,X					;0C8E78	; Load next command offset
 	AND.W #$FF00							;0C8E7C	; Check high byte
@@ -2220,7 +2227,7 @@ CODE_0C8E8C:								; Cleanup and finalize
 	PHK										;0C8E8D	; Push data bank
 	PLB										;0C8E8E	; Set data bank
 	JSR.W CODE_0C8EA8						;0C8E8F	; Additional text/logo setup
-	
+
 	; Fill bottom screen area with pattern $10
 	SEP #$20								;0C8E92	; 8-bit accumulator
 	LDX.W #$3FC0							;0C8E94	; VRAM address = $3FC0
@@ -2232,7 +2239,7 @@ CODE_0C8E9F:								; Fill loop
 	STA.W $2119								;0C8E9F	; Write to VRAM data ($2119)
 	DEX										;0C8EA2	; Decrement counter
 	BNE CODE_0C8E9F							;0C8EA3	; Loop for all tiles
-	
+
 	PLD										;0C8EA5	; Restore direct page
 	PLP										;0C8EA6	; Restore processor status
 	RTS										;0C8EA7	; Return
@@ -2876,7 +2883,7 @@ CODE_0C8E9F:								; Fill loop
                        LDA.W #$001E                         ;0C924D|A91E00  |      ; 30 spacing units
                        STA.B $62                            ;0C9250|8562    |000062; Save spacing counter
                        LDX.W #$0000                         ;0C9252|A20000  |      ; Start at offset 0
-                       
+
           CODE_0C9255:
                        ; Double spacing application
                        JSR.W CODE_0C9260                    ;0C9255|206092  |0C9260; Apply spacing transform
@@ -2902,7 +2909,7 @@ CODE_0C8E9F:								; Fill loop
                        STA.W $0000,X                        ;0C9267|9D0000  |7F0000; Store at row 0
                        TYA                                  ;0C926A|98      |      ; Get row 0 back
                        STA.W $000E,X                        ;0C926B|9D0E00  |7F000E; Store at row 14
-                       
+
                        ; Swap row 2 with row 12 (offset $02 ↔ offset $0C)
                        LDA.W $0002,X                        ;0C926E|BD0200  |7F0002; Load row 2
                        TAY                                  ;0C9271|A8      |      ; Temp in Y
@@ -2910,7 +2917,7 @@ CODE_0C8E9F:								; Fill loop
                        STA.W $0002,X                        ;0C9275|9D0200  |7F0002; Store at row 2
                        TYA                                  ;0C9278|98      |      ; Get row 2 back
                        STA.W $000C,X                        ;0C9279|9D0C00  |7F000C; Store at row 12
-                       
+
                        ; Swap row 4 with row 10 (offset $04 ↔ offset $0A)
                        LDA.W $0004,X                        ;0C927C|BD0400  |7F0004; Load row 4
                        TAY                                  ;0C927F|A8      |      ; Temp in Y
@@ -2918,7 +2925,7 @@ CODE_0C8E9F:								; Fill loop
                        STA.W $0004,X                        ;0C9283|9D0400  |7F0004; Store at row 4
                        TYA                                  ;0C9286|98      |      ; Get row 4 back
                        STA.W $000A,X                        ;0C9287|9D0A00  |7F000A; Store at row 10
-                       
+
                        ; Swap row 6 with row 8 (offset $06 ↔ offset $08)
                        LDA.W $0006,X                        ;0C928A|BD0600  |7F0006; Load row 6
                        TAY                                  ;0C928D|A8      |      ; Temp in Y
@@ -2926,7 +2933,7 @@ CODE_0C8E9F:								; Fill loop
                        STA.W $0006,X                        ;0C9291|9D0600  |7F0006; Store at row 6
                        TYA                                  ;0C9294|98      |      ; Get row 6 back
                        STA.W $0008,X                        ;0C9295|9D0800  |7F0008; Store at row 8
-                       
+
                        ; Advance to next 16-byte block
                        TXA                                  ;0C9298|8A      |      ; Get X
                        ADC.W #$0010                         ;0C9299|691000  |      ; +$10 bytes (next tile row)
@@ -2947,26 +2954,26 @@ CODE_0C8E9F:								; Fill loop
                        PLB                                  ;0C92A2|AB      |      ;
                        LDY.W #$001E                         ;0C92A3|A01E00  |      ; 30 rows to process
                        LDX.W #$0000                         ;0C92A6|A20000  |      ; Start at offset 0
-                       
+
           CODE_0C92A9:
                        PHY                                  ;0C92A9|5A      |      ; Save row counter
                        LDY.W #$0010                         ;0C92AA|A01000  |      ; 16 bytes per row
-                       
+
           CODE_0C92AD:
                        ; Process each byte in row
                        JSR.W CODE_0C92C2                    ;0C92AD|20C292  |0C92C2; Apply bit rotation
                        DEY                                  ;0C92B0|88      |      ; Decrement byte counter
                        BNE CODE_0C92AD                      ;0C92B1|D0FA    |0C92AD; Loop for 16 bytes
-                       
+
                        ; Process additional 8 bytes (24 bytes total per row)
                        LDY.W #$0008                         ;0C92B3|A00800  |      ; 8 more bytes
-                       
+
           CODE_0C92B6:
                        JSR.W CODE_0C92C2                    ;0C92B6|20C292  |0C92C2; Apply bit rotation
                        INX                                  ;0C92B9|E8      |      ; Advance pointer
                        DEY                                  ;0C92BA|88      |      ; Decrement counter
                        BNE CODE_0C92B6                      ;0C92BB|D0F9    |0C92B6; Loop for 8 bytes
-                       
+
                        PLY                                  ;0C92BD|7A      |      ; Restore row counter
                        DEY                                  ;0C92BE|88      |      ; Decrement row counter
                        BNE CODE_0C92A9                      ;0C92BF|D0E8    |0C92A9; Loop for 30 rows
@@ -2984,7 +2991,7 @@ CODE_0C8E9F:								; Fill loop
           CODE_0C92C2:
                        SEP #$20                             ;0C92C2|E220    |      ; 8-bit accumulator
                        LDA.W $0000,X                        ;0C92C4|BD0000  |7F0000; Load byte
-                       
+
                        ; Extract bits by shifting right
                        LSR A                                ;0C92C7|4A      |      ; Shift right (bit 0 → carry)
                        LSR A                                ;0C92C8|4A      |      ; Shift right (bit 1 → carry)
@@ -3001,10 +3008,10 @@ CODE_0C8E9F:								; Fill loop
                        ROL.W $0000,X                        ;0C92DD|3E0000  |7F0000; Rebuild
                        LSR A                                ;0C92E0|4A      |      ; Extract final bit
                        ROL.W $0000,X                        ;0C92E1|3E0000  |7F0000; Rebuild
-                       
+
                        ; Final shift left
                        ASL.W $0000,X                        ;0C92E4|1E0000  |7F0000; Shift left once more
-                       
+
                        INX                                  ;0C92E7|E8      |      ; Move to next byte
                        REP #$30                             ;0C92E8|C230    |      ; 16-bit mode
                        RTS                                  ;0C92EA|60      |      ; Return
@@ -3022,7 +3029,7 @@ CODE_0C8E9F:								; Fill loop
                        LDA.W #$001E                         ;0C92EC|A91E00  |      ; 30 iterations
                        STA.B $62                            ;0C92EF|8562    |000062; Save counter
                        LDA.W #$0000                         ;0C92F1|A90000  |      ; Start offset = 0
-                       
+
           CODE_0C92F4:
                        ; Calculate source/dest offsets
                        ADC.W #$0018                         ;0C92F4|691800  |      ; +$18 (24 bytes)
@@ -3032,7 +3039,7 @@ CODE_0C8E9F:								; Fill loop
                        PHA                                  ;0C92FC|48      |      ; Save accumulator
                        LDA.W #$0008                         ;0C92FD|A90800  |      ; 8 bytes to copy
                        STA.B $64                            ;0C9300|8564    |000064; Save byte counter
-                       
+
           CODE_0C9302:
                        ; Copy bytes in reverse order
                        DEX                                  ;0C9302|CA      |      ; Decrement source
@@ -3043,7 +3050,7 @@ CODE_0C8E9F:								; Fill loop
                        STA.W $0000,Y                        ;0C930B|990000  |7F0000; Store at dest
                        DEC.B $64                            ;0C930E|C664    |000064; Decrement byte counter
                        BNE CODE_0C9302                      ;0C9310|D0F0    |0C9302; Loop for 8 bytes
-                       
+
                        PLA                                  ;0C9312|68      |      ; Restore accumulator
                        DEC.B $62                            ;0C9313|C662    |000062; Decrement iteration counter
                        BNE CODE_0C92F4                      ;0C9315|D0DD    |0C92F4; Loop for 30 iterations
@@ -3060,22 +3067,22 @@ CODE_0C8E9F:								; Fill loop
 ; ------------------------------------------------------------------------------
           CODE_0C9318:
                        CLC                                  ;0C9318|18      |      ; Clear carry
-                       
+
                        ; Copy block 1: 4 iterations from $04:E220
                        LDX.W #$E220                         ;0C9319|A220E2  |      ; Source: Bank $04, offset $E220
                        LDY.W #$0000                         ;0C931C|A00000  |      ; Dest: offset $0000
                        LDA.W #$0004                         ;0C931F|A90400  |      ; 4 iterations
                        JSR.W CODE_0C9334                    ;0C9322|203493  |0C9334; Copy routine
-                       
+
                        ; Copy block 2: 6 iterations from $04:E490
                        LDX.W #$E490                         ;0C9325|A290E4  |      ; Source: Bank $04, offset $E490
                        LDA.W #$0006                         ;0C9328|A90600  |      ; 6 iterations
                        JSR.W CODE_0C9334                    ;0C932B|203493  |0C9334; Copy routine
-                       
+
                        ; Copy block 3: 20 iterations from $04:FCC0
                        LDX.W #$FCC0                         ;0C932E|A2C0FC  |      ; Source: Bank $04, offset $FCC0
                        LDA.W #$0014                         ;0C9331|A91400  |      ; 20 iterations (fall through)
-                       
+
 ; ==============================================================================
 ; CODE_0C9334: Block Copy Loop (MVN-based)
 ; ==============================================================================
@@ -3086,13 +3093,13 @@ CODE_0C8E9F:								; Fill loop
 ; ------------------------------------------------------------------------------
           CODE_0C9334:
                        STA.B $62                            ;0C9334|8562    |000062; Save iteration counter
-                       
+
           CODE_0C9336:
                        LDA.W #$0017                         ;0C9336|A91700  |      ; 23 bytes to copy ($17 + 1)
                        MVN $7F,$04                          ;0C9339|547F04  |      ; Block move: $04:X → $7F:Y
                        ; MVN auto-increments X, Y and decrements A until A=$FFFF
                        ; After MVN: X += $18, Y += $18, A = $FFFF
-                       
+
                        TYA                                  ;0C933C|98      |      ; Get dest offset
                        ADC.W #$0008                         ;0C933D|690800  |      ; Add 8 (spacing between blocks)
                        TAY                                  ;0C9340|A8      |      ; Update Y
@@ -3116,7 +3123,7 @@ CODE_0C8E9F:								; Fill loop
 
                        ; Sprite Layer Data Table 2 ($0C:9392)
                        db $08,$81,$09,$FF;0C938F|        |      ; Simple 2-tile pattern
-                       
+
                        ; Sprite Layer Data Table 3 ($0C:9396)
                        db $00,$83,$00,$83,$00,$83,$00,$83,$02,$83,$02,$83,$02,$83,$02,$83;0C9396|        |      ;
                        db $04,$83,$04,$83,$04,$83,$04,$83,$06,$83,$06,$83,$06,$83,$06,$83;0C93A6|        |      ;
@@ -3149,19 +3156,19 @@ CODE_0C8E9F:								; Fill loop
 
                        ; Animation control data
                        db $E2;0C9420|        |      ; SEP #$20 instruction
-                       
+
           CODE_0C9421:
                        ; Graphics initialization sequence
                        SEP #$20                             ;0C9421|E220    |      ; 8-bit accumulator
                        REP #$10                             ;0C9423|C210    |      ; 16-bit index
                        PHK                                  ;0C9425|4B      |      ; Push program bank
                        PLB                                  ;0C9426|AB      |      ; Pull to data bank
-                       
+
                        ; Setup graphics buffer pointer
                        LDX.W #$A2F0                         ;0C9427|A2F0A2  |      ; Pointer value
                        LDA.B #$C0                           ;0C942A|A9C0    |      ; High byte
                        ; ... (complex initialization sequence continues)
-                       
+
                        RTS                                  ;0C9531|60      |      ; Return (placeholder position)
 
 ; Note: The remaining code from $0C9421-$0CA2C5 contains extensive animation
@@ -3238,30 +3245,30 @@ CODE_0C8E9F:								; Fill loop
                        LDA.B #$40                           ;0CA388|A940    |      ; Flag value
                        ORA.W $00E2                          ;0CA38A|0DE200  |0000E2; Set bit in flags
                        STA.W $00E2                          ;0CA38D|8DE200  |0000E2; Update flags
-                       
+
                        ; Execute animation sequence (5 times)
                        JSL.L CODE_0C8000                    ;0CA390|2200800C|0C8000; Main animation handler
                        JSL.L CODE_0C8000                    ;0CA394|2200800C|0C8000; Repeat
                        JSL.L CODE_0C8000                    ;0CA398|2200800C|0C8000; Repeat
                        JSL.L CODE_0C8000                    ;0CA39C|2200800C|0C8000; Repeat
                        JSL.L CODE_0C8000                    ;0CA3A0|2200800C|0C8000; Repeat
-                       
+
                        ; Setup palette update
                        LDA.B #$01                           ;0CA3A4|A901    |      ; Enable palette writes
                        STA.W $2105                          ;0CA3A6|8D0521  |002105; BG mode register ($2105)
-                       
+
                        ; DMA transfer for palette data
                        REP #$30                             ;0CA3A9|C230    |      ; 16-bit mode
                        LDX.W #$A4BB                         ;0CA3AB|A2BBA4  |      ; Source: palette data table
                        LDY.W #$0C00                         ;0CA3AE|A0000C  |      ; Dest: CGRAM address $0C00
                        LDA.W #$006F                         ;0CA3B1|A96F00  |      ; Transfer $6F bytes (111 colors)
                        MVN $00,$0C                          ;0CA3B4|54000C  |      ; Block move from Bank $0C to Bank $00
-                       
+
                        ; Setup OAM buffer
                        LDY.W #$0E00                         ;0CA3B7|A0000E  |      ; OAM buffer address
                        LDA.W #$0006                         ;0CA3BA|A90600  |      ; 6 sprites
                        MVN $00,$0C                          ;0CA3BD|54000C  |      ; Block move
-                       
+
                        JMP.W CODE_0C8910                    ;0CA3C0|4C1089  |0C8910; Continue to next sequence
 
 ; ==============================================================================
@@ -3269,7 +3276,7 @@ CODE_0C8E9F:								; Fill loop
 ; ==============================================================================
                        ; Sequence pointer table for different animation types
                        dw $A532, $A540, $A54E, $A55C        ;0CA3C4-0CA3CB; 4 animation sequences
-                       
+
           ; Individual sequence entry points
           CODE_0CA3C5:
                        LDY.W #$6100                         ;0CA3C5|A00061  |      ; Sequence 1 offset
@@ -3315,55 +3322,55 @@ CODE_0C8E9F:								; Fill loop
                        PLB                                  ;0CA406|AB      |      ; Pull to data bank
                        LDX.W #$0000                         ;0CA407|A20000  |      ; Clear counter
                        STX.W $00F0                          ;0CA40A|8EF000  |0000F0; Reset flag
-                       
+
                        ; Setup VRAM for graphics upload
                        LDA.B #$80                           ;0CA40D|A980    |      ; VRAM increment = 1 (word)
                        STA.W SNES_VMAINC                    ;0CA40F|8D1521  |002115; Set mode ($2115)
-                       
+
                        ; Upload graphics layer 1
                        LDX.W #$6010                         ;0CA412|A21060  |      ; VRAM address $6010
                        STX.W SNES_VMADDL                    ;0CA415|8E1621  |002116; Set address
                        LDX.W #$B714                         ;0CA418|A214B7  |      ; Source data $0C:B714
                        LDY.W #$000F                         ;0CA41B|A00F00  |      ; 15 iterations
                        JSL.L CODE_008DDF                    ;0CA41E|22DF8D00|008DDF; Upload routine
-                       
+
                        ; Upload graphics layer 2
                        LDX.W #$6700                         ;0CA422|A20067  |      ; VRAM address $6700
                        STX.W SNES_VMADDL                    ;0CA425|8E1621  |002116; Set address
                        LDX.W #$B87C                         ;0CA428|A27CB8  |      ; Source data $0C:B87C
                        LDY.W #$000D                         ;0CA42B|A00D00  |      ; 13 iterations
                        JSL.L CODE_008DDF                    ;0CA42E|22DF8D00|008DDF; Upload routine
-                       
+
                        ; Setup palette for graphics
                        LDA.B #$81                           ;0CA432|A981    |      ; Palette index $81
                        STA.W $2121                          ;0CA434|8D2121  |0C2121; CGADD ($2121)
-                       
+
                        ; Write 6 color entries
                        LDX.W #$0000                         ;0CA437|A20000  |      ; Start index
                        LDY.W #$0006                         ;0CA43A|A00600  |      ; 6 colors
-                       
+
           CODE_0CA43D:
                        LDA.L DATA_0CB70E,X                  ;0CA43D|BF0EB70C|0CB70E; Load color word
                        STA.W $2122                          ;0CA441|8D2221  |0C2122; Write to CGDATA ($2122)
                        INX                                  ;0CA444|E8      |      ; Next color
                        DEY                                  ;0CA445|88      |      ; Decrement counter
                        BNE CODE_0CA43D                      ;0CA446|D0F6    |0CA43D; Loop for 6 colors
-                       
+
                        ; Setup palette group 2
                        LDA.B #$91                           ;0CA448|A991    |      ; Palette index $91
                        STA.W $2121                          ;0CA44A|8D2121  |0C2121; CGADD
-                       
+
                        ; Write 14 color entries
                        LDX.W #$0000                         ;0CA44D|A20000  |      ; Start index
                        LDY.W #$000E                         ;0CA450|A00E00  |      ; 14 colors
-                       
+
           CODE_0CA453:
                        LDA.L DATA_0CB9B4,X                  ;0CA453|BFB4B90C|0CB9B4; Load color word
                        STA.W $2122                          ;0CA457|8D2221  |0C2122; Write to CGDATA
                        INX                                  ;0CA45A|E8      |      ; Next
                        DEY                                  ;0CA45B|88      |      ; Decrement
                        BNE CODE_0CA453                      ;0CA45C|D0F6    |0CA453; Loop
-                       
+
                        RTL                                  ;0CA45E|6B      |      ; Return long
 
 ; Note: The following section ($0CA45F-$0CBB9C) contains extensive tables:
@@ -3388,7 +3395,7 @@ CODE_0C8E9F:								; Fill loop
 ; ==============================================================================
 ; End of Bank $0C Cycle 7 Documentation
 ; ==============================================================================
-; Remaining sections (2900-4227) contain additional data tables and 
+; Remaining sections (2900-4227) contain additional data tables and
 ; final initialization routines for the graphics/sprite system.
 ; ==============================================================================
 ; ==============================================================================
@@ -3794,7 +3801,7 @@ SpriteGraphicsData_Part4:
                        db $18,$00,$24,$00,$42,$00,$81,$00,$00,$00,$00,$00,$00,$00,$00,$00;0CEC5D
                        db $81,$00,$42,$00,$24,$00,$18,$00,$18,$00,$24,$00,$42,$00,$81,$00;0CEC6D
                        db $00,$00,$00,$00,$00,$00,$00,$00   ;0CEC7D
-                       
+
 ; More complex bit patterns
                        db $6F,$90,$AF,$47,$F1,$37,$AF,$3F,$5B,$DB,$35,$91,$34,$47,$1D,$6E;0CEC85
                        db $FF,$F8,$C8,$C0,$A4,$EE,$78,$70,$0B,$2C,$0B,$2C,$09,$2E,$09,$2E;0CEC95
@@ -4181,7 +4188,7 @@ UNREACH_0CF717:
 ; ==============================================================================
 ; BANK PADDING SECTION ($0CFCB8-$0CFFFF)
 ; ==============================================================================
-; This section contains 840 bytes of $FF padding to fill the remainder of 
+; This section contains 840 bytes of $FF padding to fill the remainder of
 ; Bank $0C to the 64KB boundary at $0CFFFF. This is standard SNES ROM practice
 ; to align each bank to exactly 65,536 bytes ($10000 hex).
 ; ==============================================================================
