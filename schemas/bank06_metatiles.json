@@ -1,0 +1,31 @@
+{
+  "name": "Bank06Metatiles",
+  "version": "1.0",
+  "description": "16x16 pixel metatiles from Bank $06 (map tileset data)",
+  "rom_offset": 425984,
+  "count": 256,
+  "struct_name": "Metatile",
+  "struct_size": 4,
+  "fields": [
+    {
+      "name": "top_left",
+      "type": "uint8",
+      "description": "Top-left 8x8 tile index"
+    },
+    {
+      "name": "top_right",
+      "type": "uint8",
+      "description": "Top-right 8x8 tile index"
+    },
+    {
+      "name": "bottom_left",
+      "type": "uint8",
+      "description": "Bottom-left 8x8 tile index"
+    },
+    {
+      "name": "bottom_right",
+      "type": "uint8",
+      "description": "Bottom-right 8x8 tile index"
+    }
+  ]
+}

@@ -1,0 +1,33 @@
+{
+  "name": "CharacterStartStats",
+  "version": "1.0",
+  "description": "Starting stats for the four main characters (Benjamin, Kaeli, Phoebe, Reuben)",
+  "rom_offset": 413872,
+  "count": 4,
+  "struct_name": "CharacterStats",
+  "struct_size": 80,
+  "fields": [
+    {
+      "name": "name",
+      "type": "string",
+      "size": 16,
+      "description": "Character name (first 8 bytes used, rest are 0x03)"
+    },
+    {
+      "name": "level",
+      "type": "uint8",
+      "description": "Starting level"
+    },
+    {
+      "name": "experience",
+      "type": "uint24",
+      "description": "Starting experience points"
+    },
+    {
+      "name": "unknown_data",
+      "type": "bytes",
+      "size": 60,
+      "description": "Additional character data (stats, equipment, etc.)"
+    }
+  ]
+}
