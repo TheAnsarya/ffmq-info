@@ -1,0 +1,39 @@
+Address,Label,Type,Comment
+$40,player_x_pos_lo,RAM,Player X position (low byte)
+$41,player_x_pos_hi,RAM,Player X position (high byte)
+$42,player_y_pos_lo,RAM,Player Y position (low byte)
+$43,player_y_pos_hi,RAM,Player Y position (high byte)
+$44,player_direction,RAM,Facing direction (0=up 1=down 2=left 3=right)
+$45,player_speed,RAM,Movement speed
+$46,player_state,RAM,Current player state
+$47,player_animation,RAM,Animation frame counter
+$48,map_id,RAM,Current map ID
+$49,map_x_pos,RAM,Map X coordinate (tile)
+$4A,map_y_pos,RAM,Map Y coordinate (tile)
+$4B,collision_flags,RAM,Collision check results
+$60,joy1_current,RAM,Joypad 1 current frame state
+$61,joy1_previous,RAM,Joypad 1 previous frame state
+$62,joy1_pressed,RAM,Joypad 1 newly pressed buttons
+$63,joy1_held,RAM,Joypad 1 held buttons
+$64,joy2_current,RAM,Joypad 2 current frame state
+$65,joy2_previous,RAM,Joypad 2 previous frame state
+$66,joy2_pressed,RAM,Joypad 2 newly pressed buttons
+$67,joy2_held,RAM,Joypad 2 held buttons
+$70,game_mode,RAM,Current game mode
+$71,frame_counter,RAM,Frame counter
+$72,rng_seed_lo,RAM,RNG seed (low byte)
+$73,rng_seed_hi,RAM,RNG seed (high byte)
+$74,game_state,RAM,Game state flags
+$75,menu_selection,RAM,Current menu selection
+$76,menu_index,RAM,Menu index/cursor position
+$90,battle_state,RAM,Current battle state
+$91,battle_phase,RAM,Battle phase
+$92,active_character,RAM,Active character index
+$93,target_index,RAM,Target enemy/character index
+$94,command_index,RAM,Selected command index
+$95,atb_char1,RAM,Character 1 ATB gauge
+$96,atb_char2,RAM,Character 2 ATB gauge
+$97,atb_enemy1,RAM,Enemy 1 ATB gauge
+$98,atb_enemy2,RAM,Enemy 2 ATB gauge
+$7E0040,player_x_pos,RAM,Player X position (word)
+$7E0042,player_y_pos,RAM,Player Y position (word)
