@@ -2,6 +2,147 @@
 
 This directory contains automation tools for the FFMQ disassembly project.
 
+## Table of Contents
+
+1. [Address Scanner](#address-scanner) - Scan and catalog all raw memory addresses
+2. [Label Application Tool](#label-application-tool) - Apply labels to assembly files
+
+---
+
+## Address Scanner
+
+**File:** `scan_addresses.ps1`  
+**Issue:** #23 - Memory Labels: Address Inventory and Analysis
+
+### Purpose
+
+Scans all assembly files in the project to identify raw memory addresses, categorize them by type (WRAM, Hardware, ROM), count occurrences, and generate comprehensive reports for labeling prioritization.
+
+### Features
+
+✅ **Comprehensive scanning** - Analyzes all ASM files recursively  
+✅ **Smart categorization** - Identifies WRAM, PPU, Hardware, and ROM addresses  
+✅ **Usage tracking** - Counts occurrences of each unique address  
+✅ **Priority assignment** - Ranks addresses by usage frequency and type  
+✅ **Label suggestions** - Generates suggested label names based on address type  
+✅ **CSV reports** - Outputs detailed analysis in CSV format  
+
+### Quick Start
+
+```powershell
+# Basic scan with default settings
+.\scan_addresses.ps1
+
+# Scan with verbose output
+.\scan_addresses.ps1 -VerboseOutput
+
+# Scan custom source path
+.\scan_addresses.ps1 -SourcePath "C:\myproject\src"
+
+# Custom output location
+.\scan_addresses.ps1 -OutputPath "C:\myproject\analysis\addresses.csv"
+```
+
+### Output Format
+
+The tool generates `reports/address_usage_report.csv` with the following columns:
+
+- **Address** - The memory address (e.g., `$0000`, `$2116`)
+- **Type** - Category: WRAM, PPU, Hardware, ROM, Other
+- **Category** - Detailed category (e.g., "Zero Page", "PPU Registers")
+- **Occurrences** - Number of times the address appears in code
+- **Priority** - Labeling priority: Critical, High, Medium, Low
+- **Suggested_Label** - Auto-generated label suggestion
+- **Example_Contexts** - Sample usage contexts from source files
+
+### Priority Levels
+
+**WRAM Addresses:**
+- **Critical**: 50+ occurrences
+- **High**: 20-49 occurrences
+- **Medium**: 10-19 occurrences
+- **Low**: <10 occurrences
+
+**Hardware/PPU Addresses:**
+- **High**: 10+ occurrences
+- **Medium**: 5-9 occurrences
+- **Low**: <5 occurrences
+
+**ROM Addresses:**
+- **High**: 100+ occurrences
+- **Medium**: 50-99 occurrences
+- **Low**: <50 occurrences
+
+### Usage Example
+
+```powershell
+PS> .\scan_addresses.ps1
+
+=== FFMQ Address Scanner ===
+Scanning for raw memory addresses in assembly files
+
+==> Scanning ASM files in: C:\ffmq-info\src
+Found 68 ASM files
+✓ Scanned 68 files
+Found 192 unique addresses
+==> Generating report: C:\ffmq-info\reports\address_usage_report.csv
+✓ Report generated successfully
+
+=== Summary Statistics ===
+Total unique addresses: 192
+  Hardware: 14
+  PPU: 12
+  ROM: 36
+  WRAM: 123
+
+By Priority:
+  Critical: 1
+  High: 7
+  Medium: 16
+  Low: 168
+
+Top 10 Most-Used Addresses:
+  $0000 (WRAM): 60 occurrences - var_0000
+  $420B (Hardware): 26 occurrences - MDMAEN
+  $2116 (PPU): 20 occurrences - VMADDL
+  ...
+
+✓ Complete! Report saved to: reports\address_usage_report.csv
+```
+
+### Parameters
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `SourcePath` | string | `../src` | Directory containing ASM files to scan |
+| `OutputPath` | string | `../reports/address_usage_report.csv` | Output CSV file path |
+| `VerboseOutput` | switch | false | Display detailed progress information |
+
+### Known Hardware Registers
+
+The scanner automatically recognizes standard SNES hardware registers and suggests their official names:
+
+- **PPU Registers** (`$2100-$21FF`): INIDISP, BGMODE, VMAIN, VMADDL, CGADD, etc.
+- **CPU Registers** (`$4200-$43FF`): NMITIMEN, MDMAEN, HDMAEN, etc.
+- **Controller Ports** (`$4016-$4017`): JOYSER0, JOYSER1
+
+### Integration with Label Application
+
+The output CSV is compatible with the Label Application Tool (`apply_labels.ps1`):
+
+```powershell
+# 1. Scan addresses
+.\scan_addresses.ps1
+
+# 2. Edit the CSV to refine labels (optional)
+# Edit reports/address_usage_report.csv
+
+# 3. Apply labels using the CSV
+.\apply_labels.ps1 -InputFile ..\reports\address_usage_report.csv -SourceFiles "..\src\asm\*.asm"
+```
+
+---
+
 ## Label Application Tool
 
 **File:** `apply_labels.ps1`  
