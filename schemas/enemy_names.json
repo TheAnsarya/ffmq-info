@@ -1,0 +1,17 @@
+{
+  "name": "EnemyNames",
+  "version": "1.0",
+  "description": "Enemy/Monster name text strings",
+  "rom_offset": 412576,
+  "count": 44,
+  "struct_name": "TextString",
+  "struct_size": 16,
+  "fields": [
+    {
+      "name": "text",
+      "type": "string",
+      "size": 16,
+      "description": "Enemy name (16 bytes, padded with asterisks)"
+    }
+  ]
+}

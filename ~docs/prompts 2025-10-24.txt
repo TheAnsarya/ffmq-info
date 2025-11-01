@@ -354,6 +354,10 @@ Update/check-off the checklists on open github issues, update issue #1 `ASM Code
 Issue #48: ASM Formatting - Convert All Code to Lowercase
 always make sure the ROM builds and matches the reference rom, these scripts exist already, just make sure to always run them and update the progress/documentation tables. Then continue your previous work.
 I want you to continue with your work, but first: many of these `asm` files have outrageous indentation! Use tabs, next spaces, fix all the indentation so there are not so many levels of indentation, start with one level of indentation, not like 6, make an issue, fix the problem, then close the issue and continue previous work
+continue previous work
+pick some issues/todos and implement them.
+pick some issues/todos and implement them.
+
 
 
 

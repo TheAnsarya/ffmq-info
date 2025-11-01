@@ -366,7 +366,7 @@ class DataExtractor:
             flattened.append(flat)
 
         # Write CSV
-        with open(output_path, 'w', newline='') as f:
+        with open(output_path, 'w', newline='', encoding='utf-8') as f:
             if flattened:
                 writer = csv.DictWriter(f, fieldnames=flattened[0].keys())
                 writer.writeheader()
