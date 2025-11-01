@@ -1,0 +1,5 @@
+ID,Name,Starting Level,Starting XP,HP,MP,Strength,Defense,Speed,Magic,Accuracy,Evade,Magic Defense,Weapon,Shield,Armor,Helmet,Accessory,ROM Address
+0,Benjamin,1,0,40,40,12,8,10,7,6,8,10,0,0,0,0,7,$0650B0
+1,Kaeli,3,0,120,120,29,11,14,11,11,11,9,0,0,129,0,11,$065100
+2,Phoebe,7,0,360,360,32,33,16,23,10,28,16,0,0,130,0,28,$065150
+3,Reuben,15,0,680,680,36,36,54,47,20,36,49,0,0,131,0,47,$0651A0
