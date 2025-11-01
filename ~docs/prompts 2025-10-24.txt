@@ -299,6 +299,9 @@ finish up all the labels left to be named if possible
 3. [ ] Set up project board (Kanban) to track progress
 &&&&&
 
+Step 2: Set Up Project Board
+--- FOLLOW MANUAL SETUP TASKS
+create a bunch of heirarchical sub-tickets for the kanban board based on the todo list
 
 
 

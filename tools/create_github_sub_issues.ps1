@@ -6,7 +6,7 @@
 .DESCRIPTION
     This script creates detailed sub-tasks for each main GitHub issue by adding
     task list comments to each issue based on the hierarchical breakdown in TODO.md
-    
+
 .PARAMETER DryRun
     If specified, shows what would be created without making changes
 
@@ -741,13 +741,13 @@ $totalTasks = 0
 foreach ($issueNum in $subTasks.Keys | Sort-Object { [int]$_ }) {
     $issueCount++
     $body = $subTasks[$issueNum]
-    
+
     # Count tasks in this issue
     $taskMatches = ([regex]::Matches($body, "- \[ \]")).Count
     $totalTasks += $taskMatches
-    
+
     Write-Host "[$issueCount] Issue #$issueNum - $taskMatches sub-tasks" -ForegroundColor Yellow
-    
+
     if ($DryRun) {
         Write-Host "  [DRY RUN] Would add comment to issue #$issueNum" -ForegroundColor Cyan
         Write-Host "  Preview (first 200 chars):" -ForegroundColor Gray
@@ -761,7 +761,7 @@ foreach ($issueNum in $subTasks.Keys | Sort-Object { [int]$_ }) {
             Set-Content -Path $tempFile -Value $body -NoNewline
             gh issue comment $issueNum --repo $repo --body-file $tempFile
             Remove-Item $tempFile
-            
+
             Write-Host "  ✓ Added sub-task checklist comment" -ForegroundColor Green
             Start-Sleep -Milliseconds 500  # Rate limiting
         }
@@ -784,11 +784,11 @@ if ($DryRun) {
 else {
     Write-Host "✓ Updated $issueCount issues" -ForegroundColor Green
     Write-Host "✓ Added $totalTasks total sub-tasks across all issues" -ForegroundColor Green
-    
+
     if ($errorCount -gt 0) {
         Write-Host "⚠ $errorCount errors encountered" -ForegroundColor Yellow
     }
-    
+
     Write-Host "`n🎯 Next Steps:" -ForegroundColor Cyan
     Write-Host "  1. View issues at: https://github.com/$repo/issues" -ForegroundColor White
     Write-Host "  2. Check off sub-tasks as you complete them" -ForegroundColor White
