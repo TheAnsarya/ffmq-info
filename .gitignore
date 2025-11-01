@@ -6,3 +6,11 @@ pull-assets-from-rom/obj
 *.smc
 *.sfc
 roms/
+
+# Backup files
+**/*.bak
+**/*.pre_format_backup
+
+# Temporary files
+**/*.temp
+~docs/copilot-chats/*.temp
