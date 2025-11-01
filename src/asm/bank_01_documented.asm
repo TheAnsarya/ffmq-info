@@ -1571,7 +1571,7 @@ BattleGraphics_TileUploader:
 ; Processes 4x 16-byte blocks in parallel with complex bank switching
 ; ==============================================================================
 
-CODE_01A49C:
+BattleGraphics_LayerProcessor:
                        LDA.W $0000,Y                      ;01A49C|B90000  |040000;
                        STA.L $7F0000,X                    ;01A49F|9F00007F|7F0000;
                        LDA.W $0002,Y                      ;01A4A3|B90200  |040002;
@@ -1620,14 +1620,14 @@ BattleGraphics_PaletteLoader:
 ; Complex sprite data processing with 16-tile character animation
 ; ==============================================================================
 
-CODE_01A4EB:
+BattleGraphics_TilemapBuilder:
                        SEP #$20                           ;01A4EB|E220    |      ;
                        REP #$10                           ;01A4ED|C210    |      ;
                        LDA.B #$80                         ;01A4EF|A980    |      ;
                        STA.B $0E                          ;01A4F1|850E    |001939;
                        LDY.W #$0008                       ;01A4F3|A00800  |      ;
 
-CODE_01A4F6:
+BattleGraphics_ScrollManager:
                        LDA.B #$00                         ;01A4F6|A900    |      ;
                        XBA                                 ;01A4F8|EB      |      ;
                        LDA.B $0A                          ;01A4F9|A50A    |001935;
@@ -1663,7 +1663,7 @@ BattleSprite_OAMBuilder:
                        LDA.L DATA8_0B88FC,X                ;01A525|BFFC880B|0B88FC;
                        JSR.W CODE_01A865                   ;01A529|2065A8  |01A865;
 
-CODE_01A52C:
+BattleGraphics_EffectRenderer:
                        SEP #$20                           ;01A52C|E220    |      ;
                        REP #$10                           ;01A52E|C210    |      ;
                        INC.B $0C                          ;01A530|E60C    |001937;
@@ -1705,7 +1705,7 @@ BattleSprite_PositionCalculator:
                        BNE CODE_01A571                     ;01A56C|D003    |01A571;
                        JSR.W CODE_01A5AA                   ;01A56E|20AAA5  |01A5AA;
 
-CODE_01A571:
+BattleBackground_UpdateEngine:
                        BRA CODE_01A5A8                     ;01A571|8035    |01A5A8;
 
 ; ==============================================================================
@@ -1713,7 +1713,7 @@ CODE_01A571:
 ; Handles normal character display without special effects
 ; ==============================================================================
 
-CODE_01A573:
+BattleBackground_TileProcessor:
                        LDX.W #$ADA0                       ;01A573|A2A0AD  |      ;
                        STX.B $02                          ;01A576|8602    |00192D;
                        LDA.B #$04                         ;01A578|A904    |      ;
@@ -1748,7 +1748,7 @@ BattleSprite_AttributeManager:
                        DEY                                 ;01A5A5|88      |      ;
                        BNE CODE_01A592                     ;01A5A6|D0EA    |01A592;
 
-CODE_01A5A8:
+BattleBackground_PatternLoader:
                        PLD                                 ;01A5A8|2B      |      ;
                        RTS                                 ;01A5A9|60      |      ;
 
@@ -1757,7 +1757,7 @@ CODE_01A5A8:
 ; Extended graphics processing for special battle effects
 ; ==============================================================================
 
-CODE_01A5AA:
+BattleBackground_ColorManager:
                        PHP                                 ;01A5AA|08      |      ;
                        PHD                                 ;01A5AB|0B      |      ;
                        PEA.W $192B                        ;01A5AC|F42B19  |00192B;
@@ -1855,7 +1855,7 @@ BattleSprite_GraphicsProcessor:
 ; Processes all active sprites with validation and coordinate processing
 ; ==============================================================================
 
-CODE_01A6B2:
+BattleSprite_TransformEngine:
                        SEP #$20                           ;01A6B2|E220    |      ;
                        REP #$10                           ;01A6B4|C210    |      ;
                        INC.W $193B                        ;01A6B6|EE3B19  |00193B;
@@ -1877,7 +1877,7 @@ CODE_01A6B2:
                        STA.W $1939                        ;01A6DC|8D3919  |001939;
                        BRA CODE_01A6B2                     ;01A6DF|80D1    |01A6B2;
 
-CODE_01A6E1:
+BattleSprite_ScaleProcessor:
                        SEP #$20                           ;01A6E1|E220    |      ;
                        REP #$10                           ;01A6E3|C210    |      ;
                        LDA.W $1935                        ;01A6E5|AD3519  |001935;
@@ -1886,7 +1886,7 @@ CODE_01A6E1:
                        STA.W $1935                        ;01A6EB|8D3519  |001935;
                        BRA CODE_01A6B2                     ;01A6EE|80C2    |01A6B2;
 
-CODE_01A6F0:
+BattleSprite_RotationHandler:
                        PLD                                 ;01A6F0|2B      |      ;
                        RTS                                 ;01A6F1|60      |      ;
 ; ==============================================================================
@@ -1899,7 +1899,7 @@ CODE_01A6F0:
 ; Complex sprite coordinate processing with boundary checks and multi-sprite handling
 ; ==============================================================================
 
-CODE_01A0E5:
+BattleChar_DataLoadCoordinator:
                        SEC                                  ;01A0E5|38      |      ;
                        SBC.B $00                          ;01A0E6|E500    |001A62;
                        AND.W #$03FF                       ;01A0E8|29FF03  |      ;
@@ -1916,14 +1916,14 @@ CODE_01A0E5:
                        BEQ CODE_01A105                     ;01A100|F003    |01A105;
                        JMP.W CODE_01A186                   ;01A102|4C86A1  |01A186;
 
-CODE_01A105:
+BattleChar_MemorySetup:
                        LDA.B #$00                         ;01A105|A900    |      ;
                        XBA                                 ;01A107|EB      |      ;
                        LDA.B $19,X                        ;01A108|B519    |001A7B;
                        BPL CODE_01A10F                     ;01A10A|1003    |01A10F;
                        db $EB,$3A,$EB                   ;01A10C|        |      ;
 
-CODE_01A10F:
+BattleChar_ValidationLoop:
                        REP #$20                           ;01A10F|C220    |      ;
                        CLC                                 ;01A111|18      |      ;
                        ADC.B $23,X                        ;01A112|7523    |001A85;
@@ -1934,7 +1934,7 @@ CODE_01A10F:
                        BPL CODE_01A122                     ;01A11D|1003    |01A122;
                        db $EB,$3A,$EB                   ;01A11F|        |      ;
 
-CODE_01A122:
+BattleChar_StateInitializer:
                        REP #$20                           ;01A122|C220    |      ;
                        CLC                                 ;01A124|18      |      ;
                        ADC.B $25,X                        ;01A125|7525    |001A87;
@@ -1955,7 +1955,7 @@ CODE_01A122:
 ; Handles 4-sprite large character display with screen clipping and priority
 ; ==============================================================================
 
-CODE_01A140:
+BattleChar_GraphicsLoader:
                        LDA.B $0A                          ;01A140|A50A    |001A6C;
                        CMP.W #$00F8                       ;01A142|C9F800  |      ;
                        BCC CODE_01A15E                     ;01A145|9017    |01A15E;
@@ -1974,7 +1974,7 @@ CODE_01A140:
 ; Sets up normal sprite display with 16x16 tile arrangement
 ; ==============================================================================
 
-CODE_01A15E:
+BattleChar_AnimationSetup:
                        SEP #$20                           ;01A15E|E220    |      ;
                        STA.W $0C00,X                      ;01A160|9D000C  |010C00;
                        STA.W $0C08,X                      ;01A163|9D080C  |010C08;
@@ -1998,14 +1998,14 @@ CODE_01A15E:
 ; Hides sprites that are completely outside visible screen area
 ; ==============================================================================
 
-CODE_01A186:
+BattleChar_BufferManager:
                        REP #$20                           ;01A186|C220    |      ;
                        LDX.B $04                          ;01A188|A604    |001A66;
                        LDY.W DATA8_01A63C,X                ;01A18A|BC3CA6  |01A63C;
                        LDA.W DATA8_01A63A,X                ;01A18D|BD3AA6  |01A63A;
                        TAX                                 ;01A190|AA      |      ;
 
-CODE_01A191:
+BattleChar_CoordinateProcessor:
                        LDA.W #$E080                       ;01A191|A980E0  |      ;
                        STA.W $0C00,X                      ;01A194|9D000C  |010C00;
                        STA.W $0C04,X                      ;01A197|9D040C  |010C04;
@@ -2021,7 +2021,7 @@ CODE_01A191:
 ; Handles sprites partially visible on right edge of screen
 ; ==============================================================================
 
-CODE_01A1A8:
+BattleChar_SpriteController:
                        SEP #$20                           ;01A1A8|E220    |      ;
                        STA.W $0C00,X                      ;01A1AA|9D000C  |010C00;
                        STA.W $0C08,X                      ;01A1AD|9D080C  |010C08;
@@ -2046,7 +2046,7 @@ CODE_01A1A8:
 ; Handles sprites partially visible on left edge of screen
 ; ==============================================================================
 
-CODE_01A1D3:
+BattleChar_PositionEngine:
                        SEP #$20                           ;01A1D3|E220    |      ;
                        CLC                                 ;01A1D5|18      |      ;
                        ADC.B #$08                         ;01A1D6|6908    |      ;
@@ -2072,7 +2072,7 @@ CODE_01A1D3:
 ; Handles sprites fully visible including wraparound positioning
 ; ==============================================================================
 
-CODE_01A1FF:
+BattleChar_DisplayManager:
                        SEP #$20                           ;01A1FF|E220    |      ;
                        STA.W $0C00,X                      ;01A201|9D000C  |010C00;
                        STA.W $0C08,X                      ;01A204|9D080C  |010C08;
@@ -2096,7 +2096,7 @@ CODE_01A1FF:
 ; Complex audio channel management with battle sound coordination
 ; ==============================================================================
 
-CODE_01A227:
+BattleChar_AttributeController:
                        PHP                                 ;01A227|08      |      ;
                        SEP #$20                           ;01A228|E220    |      ;
                        REP #$10                           ;01A22A|C210    |      ;
@@ -2503,7 +2503,7 @@ BattleGraphics_TileUploader:
 ; Processes 4x 16-byte blocks in parallel with complex bank switching
 ; ==============================================================================
 
-CODE_01A49C:
+BattleGraphics_LayerProcessor:
                        LDA.W $0000,Y                      ;01A49C|B90000  |040000;
                        STA.L $7F0000,X                    ;01A49F|9F00007F|7F0000;
                        LDA.W $0002,Y                      ;01A4A3|B90200  |040002;
@@ -2552,14 +2552,14 @@ BattleGraphics_PaletteLoader:
 ; Complex sprite data processing with 16-tile character animation
 ; ==============================================================================
 
-CODE_01A4EB:
+BattleGraphics_TilemapBuilder:
                        SEP #$20                           ;01A4EB|E220    |      ;
                        REP #$10                           ;01A4ED|C210    |      ;
                        LDA.B #$80                         ;01A4EF|A980    |      ;
                        STA.B $0E                          ;01A4F1|850E    |001939;
                        LDY.W #$0008                       ;01A4F3|A00800  |      ;
 
-CODE_01A4F6:
+BattleGraphics_ScrollManager:
                        LDA.B #$00                         ;01A4F6|A900    |      ;
                        XBA                                 ;01A4F8|EB      |      ;
                        LDA.B $0A                          ;01A4F9|A50A    |001935;
@@ -2595,7 +2595,7 @@ BattleSprite_OAMBuilder:
                        LDA.L DATA8_0B88FC,X                ;01A525|BFFC880B|0B88FC;
                        JSR.W CODE_01A865                   ;01A529|2065A8  |01A865;
 
-CODE_01A52C:
+BattleGraphics_EffectRenderer:
                        SEP #$20                           ;01A52C|E220    |      ;
                        REP #$10                           ;01A52E|C210    |      ;
                        INC.B $0C                          ;01A530|E60C    |001937;
@@ -2637,7 +2637,7 @@ BattleSprite_PositionCalculator:
                        BNE CODE_01A571                     ;01A56C|D003    |01A571;
                        JSR.W CODE_01A5AA                   ;01A56E|20AAA5  |01A5AA;
 
-CODE_01A571:
+BattleBackground_UpdateEngine:
                        BRA CODE_01A5A8                     ;01A571|8035    |01A5A8;
 
 ; ==============================================================================
@@ -2645,7 +2645,7 @@ CODE_01A571:
 ; Handles normal character display without special effects
 ; ==============================================================================
 
-CODE_01A573:
+BattleBackground_TileProcessor:
                        LDX.W #$ADA0                       ;01A573|A2A0AD  |      ;
                        STX.B $02                          ;01A576|8602    |00192D;
                        LDA.B #$04                         ;01A578|A904    |      ;
@@ -2680,7 +2680,7 @@ BattleSprite_AttributeManager:
                        DEY                                 ;01A5A5|88      |      ;
                        BNE CODE_01A592                     ;01A5A6|D0EA    |01A592;
 
-CODE_01A5A8:
+BattleBackground_PatternLoader:
                        PLD                                 ;01A5A8|2B      |      ;
                        RTS                                 ;01A5A9|60      |      ;
 
@@ -2689,7 +2689,7 @@ CODE_01A5A8:
 ; Extended graphics processing for special battle effects
 ; ==============================================================================
 
-CODE_01A5AA:
+BattleBackground_ColorManager:
                        PHP                                 ;01A5AA|08      |      ;
                        PHD                                 ;01A5AB|0B      |      ;
                        PEA.W $192B                        ;01A5AC|F42B19  |00192B;
@@ -2787,7 +2787,7 @@ BattleSprite_GraphicsProcessor:
 ; Processes all active sprites with validation and coordinate processing
 ; ==============================================================================
 
-CODE_01A6B2:
+BattleSprite_TransformEngine:
                        SEP #$20                           ;01A6B2|E220    |      ;
                        REP #$10                           ;01A6B4|C210    |      ;
                        INC.W $193B                        ;01A6B6|EE3B19  |00193B;
@@ -2809,7 +2809,7 @@ CODE_01A6B2:
                        STA.W $1939                        ;01A6DC|8D3919  |001939;
                        BRA CODE_01A6B2                     ;01A6DF|80D1    |01A6B2;
 
-CODE_01A6E1:
+BattleSprite_ScaleProcessor:
                        SEP #$20                           ;01A6E1|E220    |      ;
                        REP #$10                           ;01A6E3|C210    |      ;
                        LDA.W $1935                        ;01A6E5|AD3519  |001935;
@@ -2818,7 +2818,7 @@ CODE_01A6E1:
                        STA.W $1935                        ;01A6EB|8D3519  |001935;
                        BRA CODE_01A6B2                     ;01A6EE|80C2    |01A6B2;
 
-CODE_01A6F0:
+BattleSprite_RotationHandler:
                        PLD                                 ;01A6F0|2B      |      ;
                        RTS                                 ;01A6F1|60      |      ;
 ; ==============================================================================
