@@ -1237,7 +1237,7 @@ BattleAudio_ProcessPrimaryChannel:
                        REP #$10                           ;01A2AB|C210    |      ;
                        LDA.W $19DF                        ;01A2AD|ADDF19  |0119DF;
                        CMP.B #$FF                         ;01A2B0|C9FF    |      ;
-                       BEQ CODE_01A2C9                     ;01A2B2|F015    |01A2C9;
+                       BEQ .Exit_PrimaryChannel                     ;01A2B2|F015    |01A2C9;
                        PEA.W $1CD7                        ;01A2B4|F4D71C  |011CD7;
                        PLD                                 ;01A2B7|2B      |      ;
                        LDY.W #$0007                       ;01A2B8|A00700  |      ;
@@ -1246,9 +1246,9 @@ BattleAudio_ProcessPrimaryChannel:
                        STX.B $00                          ;01A2C0|8600    |001CD7;
                        LDX.W $19DE                        ;01A2C2|AEDE19  |0119DE;
                        STX.B $02                          ;01A2C5|8602    |001CD9;
-                       BPL CODE_01A2CD                     ;01A2C7|1004    |01A2CD;
+                       BPL .ProcessLoop_Primary                     ;01A2C7|1004    |01A2CD;
 
-CODE_01A2C9:
+.Exit_PrimaryChannel:
                        PLD                                 ;01A2C9|2B      |      ;
                        PLP                                 ;01A2CA|28      |      ;
                        PLB                                 ;01A2CB|AB      |      ;
@@ -1259,18 +1259,18 @@ CODE_01A2C9:
 ; Main audio processing routine with data validation and channel management
 ; ==============================================================================
 
-CODE_01A2CD:
+.ProcessLoop_Primary:
                        SEP #$20                           ;01A2CD|E220    |      ;
                        REP #$10                           ;01A2CF|C210    |      ;
                        LDX.B $02                          ;01A2D1|A602    |001CD9;
                        LDA.L DATA8_0CD694,X                ;01A2D3|BF94D60C|0CD694;
                        CMP.B #$FF                         ;01A2D7|C9FF    |      ;
-                       BEQ CODE_01A32E                     ;01A2D9|F053    |01A32E;
+                       BEQ .NextChannel_Primary                     ;01A2D9|F053    |01A32E;
                        STA.B $04                          ;01A2DB|8504    |001CDB;
                        LDX.B $00                          ;01A2DD|A600    |001CD7;
                        LDA.L $7FCED8,X                    ;01A2DF|BFD8CE7F|7FCED8;
                        CMP.B $04                          ;01A2E3|C504    |001CDB;
-                       BCC CODE_01A32E                     ;01A2E5|9047    |01A32E;
+                       BCC .NextChannel_Primary                     ;01A2E5|9047    |01A32E;
                        LDA.B #$00                         ;01A2E7|A900    |      ;
                        STA.L $7FCED8,X                    ;01A2E9|9FD8CE7F|7FCED8;
                        XBA                                 ;01A2ED|EB      |      ;
@@ -1298,10 +1298,10 @@ CODE_01A2CD:
                        LDX.B $02                          ;01A31B|A602    |001CD9;
                        LDA.L DATA8_0CD695,X                ;01A31D|BF95D60C|0CD695;
                        CMP.B $04                          ;01A321|C504    |001CDB;
-                       BCS CODE_01A327                     ;01A323|B002    |01A327;
+                       BCS .ChannelIndexValid_Primary                     ;01A323|B002    |01A327;
                        STZ.B $04                          ;01A325|6404    |001CDB;
 
-CODE_01A327:
+.ChannelIndexValid_Primary:
                        PLX                                 ;01A327|FA      |      ;
                        LDA.B $04                          ;01A328|A504    |001CDB;
                        STA.L $7FCED9,X                    ;01A32A|9FD9CE7F|7FCED9;
@@ -1311,25 +1311,25 @@ CODE_01A327:
 ; Advances to next sound channel and validates data integrity
 ; ==============================================================================
 
-CODE_01A32E:
+.NextChannel_Primary:
                        DEC.B $06                          ;01A32E|C606    |001CDD;
-                       BNE CODE_01A335                     ;01A330|D003    |01A335;
-                       JMP.W CODE_01A2C9                   ;01A332|4CC9A2  |01A2C9;
+                       BNE .AdvanceChannel_Primary                     ;01A330|D003    |01A335;
+                       JMP.W .Exit_PrimaryChannel                   ;01A332|4CC9A2  |01A2C9;
 
-CODE_01A335:
+.AdvanceChannel_Primary:
                        LDX.B $00                          ;01A335|A600    |001CD7;
                        INX                                 ;01A337|E8      |      ;
                        INX                                 ;01A338|E8      |      ;
                        STX.B $00                          ;01A339|8600    |001CD7;
                        LDX.B $02                          ;01A33B|A602    |001CD9;
 
-CODE_01A33D:
+.FindTerminator_Primary:
                        LDA.L DATA8_0CD694,X                ;01A33D|BF94D60C|0CD694;
                        INX                                 ;01A341|E8      |      ;
                        CMP.B #$FF                         ;01A342|C9FF    |      ;
-                       BNE CODE_01A33D                     ;01A344|D0F7    |01A33D;
+                       BNE .FindTerminator_Primary                     ;01A344|D0F7    |01A33D;
                        STX.B $02                          ;01A346|8602    |001CD9;
-                       JMP.W CODE_01A2CD                   ;01A348|4CCDA2  |01A2CD;
+                       JMP.W .ProcessLoop_Primary                   ;01A348|4CCDA2  |01A2CD;
 
 ; ==============================================================================
 ; Secondary Sound Effect Processing System
@@ -1344,7 +1344,7 @@ BattleAudio_ProcessSecondaryChannel:
                        REP #$10                           ;01A350|C210    |      ;
                        LDA.W $19E1                        ;01A352|ADE119  |0119E1;
                        CMP.B #$FF                         ;01A355|C9FF    |      ;
-                       BEQ CODE_01A36E                     ;01A357|F015    |01A36E;
+                       BEQ .Exit_SecondaryChannel                     ;01A357|F015    |01A36E;
                        PEA.W $1CD7                        ;01A359|F4D71C  |011CD7;
                        PLD                                 ;01A35C|2B      |      ;
                        LDY.W #$0007                       ;01A35D|A00700  |      ;
@@ -1353,9 +1353,9 @@ BattleAudio_ProcessSecondaryChannel:
                        STX.B $00                          ;01A365|8600    |001CD7;
                        LDX.W $19E0                        ;01A367|AEE019  |0119E0;
                        STX.B $02                          ;01A36A|8602    |001CD9;
-                       BPL CODE_01A372                     ;01A36C|1004    |01A372;
+                       BPL .ProcessLoop_Secondary                     ;01A36C|1004    |01A372;
 
-CODE_01A36E:
+.Exit_SecondaryChannel:
                        PLD                                 ;01A36E|2B      |      ;
                        PLP                                 ;01A36F|28      |      ;
                        PLB                                 ;01A370|AB      |      ;
@@ -1366,18 +1366,18 @@ CODE_01A36E:
 ; Mirror of primary system for layered audio effects during battle
 ; ==============================================================================
 
-CODE_01A372:
+.ProcessLoop_Secondary:
                        SEP #$20                           ;01A372|E220    |      ;
                        REP #$10                           ;01A374|C210    |      ;
                        LDX.B $02                          ;01A376|A602    |001CD9;
                        LDA.L DATA8_0CD72F,X                ;01A378|BF2FD70C|0CD72F;
                        CMP.B #$FF                         ;01A37C|C9FF    |      ;
-                       BEQ CODE_01A3D3                     ;01A37E|F053    |01A3D3;
+                       BEQ .NextChannel_Secondary                     ;01A37E|F053    |01A3D3;
                        STA.B $04                          ;01A380|8504    |001CDB;
                        LDX.B $00                          ;01A382|A600    |001CD7;
                        LDA.L $7FCEE6,X                    ;01A384|BFE6CE7F|7FCEE6;
                        CMP.B $04                          ;01A388|C504    |001CDB;
-                       BCC CODE_01A3D3                     ;01A38A|9047    |01A3D3;
+                       BCC .NextChannel_Secondary                     ;01A38A|9047    |01A3D3;
                        LDA.B #$00                         ;01A38C|A900    |      ;
                        STA.L $7FCEE6,X                    ;01A38E|9FE6CE7F|7FCEE6;
                        XBA                                 ;01A392|EB      |      ;
@@ -1405,10 +1405,10 @@ CODE_01A372:
                        LDX.B $02                          ;01A3C0|A602    |001CD9;
                        LDA.L DATA8_0CD730,X                ;01A3C2|BF30D70C|0CD730;
                        CMP.B $04                          ;01A3C6|C504    |001CDB;
-                       BCS CODE_01A3CC                     ;01A3C8|B002    |01A3CC;
+                       BCS .ChannelIndexValid_Secondary                     ;01A3C8|B002    |01A3CC;
                        STZ.B $04                          ;01A3CA|6404    |001CDB;
 
-CODE_01A3CC:
+.ChannelIndexValid_Secondary:
                        PLX                                 ;01A3CC|FA      |      ;
                        LDA.B $04                          ;01A3CD|A504    |001CDB;
                        STA.L $7FCEE7,X                    ;01A3CF|9FE7CE7F|7FCEE7;
@@ -1418,25 +1418,25 @@ CODE_01A3CC:
 ; Iterator and validation for second audio layer
 ; ==============================================================================
 
-CODE_01A3D3:
+.NextChannel_Secondary:
                        DEC.B $06                          ;01A3D3|C606    |001CDD;
-                       BNE CODE_01A3DA                     ;01A3D5|D003    |01A3DA;
-                       JMP.W CODE_01A36E                   ;01A3D7|4C6EA3  |01A36E;
+                       BNE .AdvanceChannel_Secondary                     ;01A3D5|D003    |01A3DA;
+                       JMP.W .Exit_SecondaryChannel                   ;01A3D7|4C6EA3  |01A36E;
 
-CODE_01A3DA:
+.AdvanceChannel_Secondary:
                        LDX.B $00                          ;01A3DA|A600    |001CD7;
                        INX                                 ;01A3DC|E8      |      ;
                        INX                                 ;01A3DD|E8      |      ;
                        STX.B $00                          ;01A3DE|8600    |001CD7;
                        LDX.B $02                          ;01A3E0|A602    |001CD9;
 
-CODE_01A3E2:
+.FindTerminator_Secondary:
                        LDA.L DATA8_0CD72F,X                ;01A3E2|BF2FD70C|0CD72F;
                        INX                                 ;01A3E6|E8      |      ;
                        CMP.B #$FF                         ;01A3E7|C9FF    |      ;
-                       BNE CODE_01A3E2                     ;01A3E9|D0F7    |01A3E2;
+                       BNE .FindTerminator_Secondary                     ;01A3E9|D0F7    |01A3E2;
                        STX.B $02                          ;01A3EB|8602    |001CD9;
-                       JMP.W CODE_01A372                   ;01A3ED|4C72A3  |01A372;
+                       JMP.W .ProcessLoop_Secondary                   ;01A3ED|4C72A3  |01A372;
 
 ; ==============================================================================
 ; Main Battle Animation Controller
@@ -1448,12 +1448,12 @@ BattleAnimation_MainController:
                        PHB                                 ;01A3F1|8B      |      ;
                        REP #$30                           ;01A3F2|C230    |      ;
                        LDA.W $19B9                        ;01A3F4|ADB919  |0119B9;
-                       BMI CODE_01A401                     ;01A3F7|3008    |01A401;
+                       BMI .Exit_MainController                     ;01A3F7|3008    |01A401;
                        SEP #$20                           ;01A3F9|E220    |      ;
                        JSR.W CODE_01A423                   ;01A3FB|2023A4  |01A423;
                        JSR.W CODE_01A9EE                   ;01A3FE|20EEA9  |01A9EE;
 
-CODE_01A401:
+.Exit_MainController:
                        PLB                                 ;01A401|AB      |      ;
                        PLP                                 ;01A402|28      |      ;
                        RTS                                 ;01A403|60      |      ;
@@ -1468,7 +1468,7 @@ BattleAnimation_ExtendedHandler:
                        PHB                                 ;01A405|8B      |      ;
                        REP #$30                           ;01A406|C230    |      ;
                        LDA.W $19B9                        ;01A408|ADB919  |0119B9;
-                       BMI CODE_01A420                     ;01A40B|3013    |01A420;
+                       BMI .Exit_ExtendedHandler                     ;01A40B|3013    |01A420;
                        SEP #$20                           ;01A40D|E220    |      ;
                        JSR.W CODE_01A423                   ;01A40F|2023A4  |01A423;
                        JSR.W CODE_01A692                   ;01A412|2092A6  |01A692;
@@ -1477,7 +1477,7 @@ BattleAnimation_ExtendedHandler:
                        SEP #$20                           ;01A41B|E220    |      ;
                        STZ.W $1A71                        ;01A41D|9C711A  |001A71;
 
-CODE_01A420:
+.Exit_ExtendedHandler:
                        PLB                                 ;01A420|AB      |      ;
                        PLP                                 ;01A421|28      |      ;
                        RTS                                 ;01A422|60      |      ;
@@ -2169,7 +2169,7 @@ BattleAudio_ProcessPrimaryChannel:
                        REP #$10                           ;01A2AB|C210    |      ;
                        LDA.W $19DF                        ;01A2AD|ADDF19  |0119DF;
                        CMP.B #$FF                         ;01A2B0|C9FF    |      ;
-                       BEQ CODE_01A2C9                     ;01A2B2|F015    |01A2C9;
+                       BEQ .Exit_PrimaryChannel                     ;01A2B2|F015    |01A2C9;
                        PEA.W $1CD7                        ;01A2B4|F4D71C  |011CD7;
                        PLD                                 ;01A2B7|2B      |      ;
                        LDY.W #$0007                       ;01A2B8|A00700  |      ;
@@ -2178,9 +2178,9 @@ BattleAudio_ProcessPrimaryChannel:
                        STX.B $00                          ;01A2C0|8600    |001CD7;
                        LDX.W $19DE                        ;01A2C2|AEDE19  |0119DE;
                        STX.B $02                          ;01A2C5|8602    |001CD9;
-                       BPL CODE_01A2CD                     ;01A2C7|1004    |01A2CD;
+                       BPL .ProcessLoop_Primary                     ;01A2C7|1004    |01A2CD;
 
-CODE_01A2C9:
+.Exit_PrimaryChannel:
                        PLD                                 ;01A2C9|2B      |      ;
                        PLP                                 ;01A2CA|28      |      ;
                        PLB                                 ;01A2CB|AB      |      ;
@@ -2191,18 +2191,18 @@ CODE_01A2C9:
 ; Main audio processing routine with data validation and channel management
 ; ==============================================================================
 
-CODE_01A2CD:
+.ProcessLoop_Primary:
                        SEP #$20                           ;01A2CD|E220    |      ;
                        REP #$10                           ;01A2CF|C210    |      ;
                        LDX.B $02                          ;01A2D1|A602    |001CD9;
                        LDA.L DATA8_0CD694,X                ;01A2D3|BF94D60C|0CD694;
                        CMP.B #$FF                         ;01A2D7|C9FF    |      ;
-                       BEQ CODE_01A32E                     ;01A2D9|F053    |01A32E;
+                       BEQ .NextChannel_Primary                     ;01A2D9|F053    |01A32E;
                        STA.B $04                          ;01A2DB|8504    |001CDB;
                        LDX.B $00                          ;01A2DD|A600    |001CD7;
                        LDA.L $7FCED8,X                    ;01A2DF|BFD8CE7F|7FCED8;
                        CMP.B $04                          ;01A2E3|C504    |001CDB;
-                       BCC CODE_01A32E                     ;01A2E5|9047    |01A32E;
+                       BCC .NextChannel_Primary                     ;01A2E5|9047    |01A32E;
                        LDA.B #$00                         ;01A2E7|A900    |      ;
                        STA.L $7FCED8,X                    ;01A2E9|9FD8CE7F|7FCED8;
                        XBA                                 ;01A2ED|EB      |      ;
@@ -2230,10 +2230,10 @@ CODE_01A2CD:
                        LDX.B $02                          ;01A31B|A602    |001CD9;
                        LDA.L DATA8_0CD695,X                ;01A31D|BF95D60C|0CD695;
                        CMP.B $04                          ;01A321|C504    |001CDB;
-                       BCS CODE_01A327                     ;01A323|B002    |01A327;
+                       BCS .ChannelIndexValid_Primary                     ;01A323|B002    |01A327;
                        STZ.B $04                          ;01A325|6404    |001CDB;
 
-CODE_01A327:
+.ChannelIndexValid_Primary:
                        PLX                                 ;01A327|FA      |      ;
                        LDA.B $04                          ;01A328|A504    |001CDB;
                        STA.L $7FCED9,X                    ;01A32A|9FD9CE7F|7FCED9;
@@ -2243,25 +2243,25 @@ CODE_01A327:
 ; Advances to next sound channel and validates data integrity
 ; ==============================================================================
 
-CODE_01A32E:
+.NextChannel_Primary:
                        DEC.B $06                          ;01A32E|C606    |001CDD;
-                       BNE CODE_01A335                     ;01A330|D003    |01A335;
-                       JMP.W CODE_01A2C9                   ;01A332|4CC9A2  |01A2C9;
+                       BNE .AdvanceChannel_Primary                     ;01A330|D003    |01A335;
+                       JMP.W .Exit_PrimaryChannel                   ;01A332|4CC9A2  |01A2C9;
 
-CODE_01A335:
+.AdvanceChannel_Primary:
                        LDX.B $00                          ;01A335|A600    |001CD7;
                        INX                                 ;01A337|E8      |      ;
                        INX                                 ;01A338|E8      |      ;
                        STX.B $00                          ;01A339|8600    |001CD7;
                        LDX.B $02                          ;01A33B|A602    |001CD9;
 
-CODE_01A33D:
+.FindTerminator_Primary:
                        LDA.L DATA8_0CD694,X                ;01A33D|BF94D60C|0CD694;
                        INX                                 ;01A341|E8      |      ;
                        CMP.B #$FF                         ;01A342|C9FF    |      ;
-                       BNE CODE_01A33D                     ;01A344|D0F7    |01A33D;
+                       BNE .FindTerminator_Primary                     ;01A344|D0F7    |01A33D;
                        STX.B $02                          ;01A346|8602    |001CD9;
-                       JMP.W CODE_01A2CD                   ;01A348|4CCDA2  |01A2CD;
+                       JMP.W .ProcessLoop_Primary                   ;01A348|4CCDA2  |01A2CD;
 
 ; ==============================================================================
 ; Secondary Sound Effect Processing System
@@ -2276,7 +2276,7 @@ BattleAudio_ProcessSecondaryChannel:
                        REP #$10                           ;01A350|C210    |      ;
                        LDA.W $19E1                        ;01A352|ADE119  |0119E1;
                        CMP.B #$FF                         ;01A355|C9FF    |      ;
-                       BEQ CODE_01A36E                     ;01A357|F015    |01A36E;
+                       BEQ .Exit_SecondaryChannel                     ;01A357|F015    |01A36E;
                        PEA.W $1CD7                        ;01A359|F4D71C  |011CD7;
                        PLD                                 ;01A35C|2B      |      ;
                        LDY.W #$0007                       ;01A35D|A00700  |      ;
@@ -2285,9 +2285,9 @@ BattleAudio_ProcessSecondaryChannel:
                        STX.B $00                          ;01A365|8600    |001CD7;
                        LDX.W $19E0                        ;01A367|AEE019  |0119E0;
                        STX.B $02                          ;01A36A|8602    |001CD9;
-                       BPL CODE_01A372                     ;01A36C|1004    |01A372;
+                       BPL .ProcessLoop_Secondary                     ;01A36C|1004    |01A372;
 
-CODE_01A36E:
+.Exit_SecondaryChannel:
                        PLD                                 ;01A36E|2B      |      ;
                        PLP                                 ;01A36F|28      |      ;
                        PLB                                 ;01A370|AB      |      ;
@@ -2298,18 +2298,18 @@ CODE_01A36E:
 ; Mirror of primary system for layered audio effects during battle
 ; ==============================================================================
 
-CODE_01A372:
+.ProcessLoop_Secondary:
                        SEP #$20                           ;01A372|E220    |      ;
                        REP #$10                           ;01A374|C210    |      ;
                        LDX.B $02                          ;01A376|A602    |001CD9;
                        LDA.L DATA8_0CD72F,X                ;01A378|BF2FD70C|0CD72F;
                        CMP.B #$FF                         ;01A37C|C9FF    |      ;
-                       BEQ CODE_01A3D3                     ;01A37E|F053    |01A3D3;
+                       BEQ .NextChannel_Secondary                     ;01A37E|F053    |01A3D3;
                        STA.B $04                          ;01A380|8504    |001CDB;
                        LDX.B $00                          ;01A382|A600    |001CD7;
                        LDA.L $7FCEE6,X                    ;01A384|BFE6CE7F|7FCEE6;
                        CMP.B $04                          ;01A388|C504    |001CDB;
-                       BCC CODE_01A3D3                     ;01A38A|9047    |01A3D3;
+                       BCC .NextChannel_Secondary                     ;01A38A|9047    |01A3D3;
                        LDA.B #$00                         ;01A38C|A900    |      ;
                        STA.L $7FCEE6,X                    ;01A38E|9FE6CE7F|7FCEE6;
                        XBA                                 ;01A392|EB      |      ;
@@ -2337,10 +2337,10 @@ CODE_01A372:
                        LDX.B $02                          ;01A3C0|A602    |001CD9;
                        LDA.L DATA8_0CD730,X                ;01A3C2|BF30D70C|0CD730;
                        CMP.B $04                          ;01A3C6|C504    |001CDB;
-                       BCS CODE_01A3CC                     ;01A3C8|B002    |01A3CC;
+                       BCS .ChannelIndexValid_Secondary                     ;01A3C8|B002    |01A3CC;
                        STZ.B $04                          ;01A3CA|6404    |001CDB;
 
-CODE_01A3CC:
+.ChannelIndexValid_Secondary:
                        PLX                                 ;01A3CC|FA      |      ;
                        LDA.B $04                          ;01A3CD|A504    |001CDB;
                        STA.L $7FCEE7,X                    ;01A3CF|9FE7CE7F|7FCEE7;
@@ -2350,25 +2350,25 @@ CODE_01A3CC:
 ; Iterator and validation for second audio layer
 ; ==============================================================================
 
-CODE_01A3D3:
+.NextChannel_Secondary:
                        DEC.B $06                          ;01A3D3|C606    |001CDD;
-                       BNE CODE_01A3DA                     ;01A3D5|D003    |01A3DA;
-                       JMP.W CODE_01A36E                   ;01A3D7|4C6EA3  |01A36E;
+                       BNE .AdvanceChannel_Secondary                     ;01A3D5|D003    |01A3DA;
+                       JMP.W .Exit_SecondaryChannel                   ;01A3D7|4C6EA3  |01A36E;
 
-CODE_01A3DA:
+.AdvanceChannel_Secondary:
                        LDX.B $00                          ;01A3DA|A600    |001CD7;
                        INX                                 ;01A3DC|E8      |      ;
                        INX                                 ;01A3DD|E8      |      ;
                        STX.B $00                          ;01A3DE|8600    |001CD7;
                        LDX.B $02                          ;01A3E0|A602    |001CD9;
 
-CODE_01A3E2:
+.FindTerminator_Secondary:
                        LDA.L DATA8_0CD72F,X                ;01A3E2|BF2FD70C|0CD72F;
                        INX                                 ;01A3E6|E8      |      ;
                        CMP.B #$FF                         ;01A3E7|C9FF    |      ;
-                       BNE CODE_01A3E2                     ;01A3E9|D0F7    |01A3E2;
+                       BNE .FindTerminator_Secondary                     ;01A3E9|D0F7    |01A3E2;
                        STX.B $02                          ;01A3EB|8602    |001CD9;
-                       JMP.W CODE_01A372                   ;01A3ED|4C72A3  |01A372;
+                       JMP.W .ProcessLoop_Secondary                   ;01A3ED|4C72A3  |01A372;
 
 ; ==============================================================================
 ; Main Battle Animation Controller
@@ -2380,12 +2380,12 @@ BattleAnimation_MainController:
                        PHB                                 ;01A3F1|8B      |      ;
                        REP #$30                           ;01A3F2|C230    |      ;
                        LDA.W $19B9                        ;01A3F4|ADB919  |0119B9;
-                       BMI CODE_01A401                     ;01A3F7|3008    |01A401;
+                       BMI .Exit_MainController                     ;01A3F7|3008    |01A401;
                        SEP #$20                           ;01A3F9|E220    |      ;
                        JSR.W CODE_01A423                   ;01A3FB|2023A4  |01A423;
                        JSR.W CODE_01A9EE                   ;01A3FE|20EEA9  |01A9EE;
 
-CODE_01A401:
+.Exit_MainController:
                        PLB                                 ;01A401|AB      |      ;
                        PLP                                 ;01A402|28      |      ;
                        RTS                                 ;01A403|60      |      ;
@@ -2400,7 +2400,7 @@ BattleAnimation_ExtendedHandler:
                        PHB                                 ;01A405|8B      |      ;
                        REP #$30                           ;01A406|C230    |      ;
                        LDA.W $19B9                        ;01A408|ADB919  |0119B9;
-                       BMI CODE_01A420                     ;01A40B|3013    |01A420;
+                       BMI .Exit_ExtendedHandler                     ;01A40B|3013    |01A420;
                        SEP #$20                           ;01A40D|E220    |      ;
                        JSR.W CODE_01A423                   ;01A40F|2023A4  |01A423;
                        JSR.W CODE_01A692                   ;01A412|2092A6  |01A692;
@@ -2409,7 +2409,7 @@ BattleAnimation_ExtendedHandler:
                        SEP #$20                           ;01A41B|E220    |      ;
                        STZ.W $1A71                        ;01A41D|9C711A  |001A71;
 
-CODE_01A420:
+.Exit_ExtendedHandler:
                        PLB                                 ;01A420|AB      |      ;
                        PLP                                 ;01A421|28      |      ;
                        RTS                                 ;01A422|60      |      ;
@@ -2831,7 +2831,7 @@ BattleSprite_RotationHandler:
 ; Complex sprite validation and coordinate transformation
 ; ==============================================================================
 
-CODE_01A6F2:
+BattleEffect_LightningProcessor:
                        STZ.W $1948                        ;01A6F2|9C4819  |001948;
                        JSR.W CODE_01B078                   ;01A6F5|2078B0  |01B078;
                        BCC CODE_01A6FC                     ;01A6F8|9002    |01A6FC;
@@ -2843,7 +2843,7 @@ CODE_01A6F2:
 ; Sets up complete character data structures with coordinate processing
 ; ==============================================================================
 
-CODE_01A6FC:
+BattleEffect_ExplosionHandler:
                        SEP #$20                           ;01A6FC|E220    |      ;
                        REP #$10                           ;01A6FE|C210    |      ;
                        LDX.W $1939                        ;01A700|AE3919  |001939;
@@ -2882,7 +2882,7 @@ CODE_01A6FC:
 BattleEffect_TransitionHandler:
                        PLA                                 ;01A74A|68      |      ;
 
-CODE_01A74B:
+BattleEffect_StatusIconManager:
                        STA.B $0E,X                        ;01A74B|950E    |001A80;
                        INC.W $1935                        ;01A74D|EE3519  |001935;
                        LDA.W $1935                        ;01A750|AD3519  |001935;
@@ -2972,7 +2972,7 @@ CODE_01A74B:
                        LDA.W $0F2B,Y                      ;01A7FF|B92B0F  |000F2B;
                        STA.B $0C,X                        ;01A802|950C    |001A7E;
 
-CODE_01A804:
+BattleEffect_ParticleGenerator:
                        PLY                                 ;01A804|7A      |      ;
                        PLX                                 ;01A805|FA      |      ;
                        CLC                                 ;01A806|18      |      ;
@@ -2983,7 +2983,7 @@ CODE_01A804:
 ; Creates new sprite entries dynamically during battle
 ; ==============================================================================
 
-CODE_01A808:
+BattleEffect_TrailRenderer:
                        PHP                                 ;01A808|08      |      ;
                        SEP #$20                           ;01A809|E220    |      ;
                        REP #$10                           ;01A80B|C210    |      ;
@@ -3804,7 +3804,7 @@ BattleScene_Setup:
                        JSR.W BattleGraphics_LoadSceneData ;01AD14|20EDAC  |01ACED;
                        JSR.W Battle_UpdateState           ;01AD17|2078AD  |01AD78;
                        LDA.W #$0004                       ;01AD1A|A90400  |      ;
-                       JSR.W CODE_01D6C4                   ;01AD1D|20C4D6  |01D6C4;
+                       JSR.W .Exit_CastSpell                   ;01AD1D|20C4D6  |01D6C4;
                        LDY.W #$0008                       ;01AD20|A00800  |      ;
                        LDX.W #$0000                       ;01AD23|A20000  |      ;
                        LDA.W #$FFFF                       ;01AD26|A9FFFF  |      ;
@@ -3822,7 +3822,7 @@ BattleScene_Setup:
                        BNE .MemoryInitLoop                ;01AD30|D0F7    |01AD29;
                        JSR.W Battle_UpdateState           ;01AD32|2078AD  |01AD78;
                        LDA.W #$0004                       ;01AD35|A90400  |      ;
-                       JSR.W CODE_01D6C4                   ;01AD38|20C4D6  |01D6C4;
+                       JSR.W .Exit_CastSpell                   ;01AD38|20C4D6  |01D6C4;
                        DEC.W $192B                        ;01AD3B|CE2B19  |01192B;
                        BNE .SceneInitLoop                 ;01AD3E|D0D4    |01AD14;
                        LDX.W #$001F                       ;01AD40|A21F00  |      ;
@@ -3851,7 +3851,7 @@ BattleData_ProcessCalculations:
                        BNE .MathOperationLoop             ;01AD67|D0E3    |01AD4C;
                        JSR.W Battle_UpdateState           ;01AD69|2078AD  |01AD78;
                        LDA.W #$0004                       ;01AD6C|A90400  |      ;
-                       JSR.W CODE_01D6BD                   ;01AD6F|20BDD6  |01D6BD;
+                       JSR.W .ProcessEffect_CastSpell                   ;01AD6F|20BDD6  |01D6BD;
                        DEC.W $1935                        ;01AD72|CE3519  |011935;
                        BNE BattleData_ProcessCalculations ;01AD75|D0CF    |01AD46;
                        RTS                                 ;01AD77|60      |      ;
@@ -3877,7 +3877,7 @@ Battle_UpdateState:
 ; Coordinates special effects and timing for battle scenes
 ; ==============================================================================
 
-CODE_01AD8A:
+BattleHUD_UpdateHealthBar:
                        PHP                                 ;01AD8A|08      |      ;
                        SEP #$20                           ;01AD8B|E220    |      ;
                        REP #$10                           ;01AD8D|C210    |      ;
@@ -3886,7 +3886,7 @@ CODE_01AD8A:
                        LDA.B #$81                         ;01AD94|A981    |      ;
                        STA.W $050A                        ;01AD96|8D0A05  |01050A;
                        LDA.B #$14                         ;01AD99|A914    |      ;
-                       JSR.W CODE_01D6BD                   ;01AD9B|20BDD6  |01D6BD;
+                       JSR.W .ProcessEffect_CastSpell                   ;01AD9B|20BDD6  |01D6BD;
                        PLP                                 ;01AD9E|28      |      ;
                        RTS                                 ;01AD9F|60      |      ;
 
@@ -3897,7 +3897,7 @@ CODE_01AD8A:
 
                        db $AD,$09,$06,$8D,$EE,$19,$4C,$92,$BA          ; 01ADA0
 
-CODE_01ADA9:
+BattleHUD_UpdateManaBar:
                        SEP #$20                           ;01ADA9|E220    |      ;
                        REP #$10                           ;01ADAB|C210    |      ;
                        JSR.W CODE_01D2DF                   ;01ADAD|20DFD2  |01D2DF;
@@ -4024,7 +4024,7 @@ BattleAnim_ControlHub:
                        STX.W $19EE                        ;01AE99|8EEE19  |0119EE;
                        JSR.W CODE_01BC1B                   ;01AE9C|201BBC  |01BC1B;
 
-CODE_01AE9F:
+BattleHUD_UpdateStatusDisplay:
                        RTS                                 ;01AE9F|60      |      ;
 
 ; ==============================================================================
@@ -4032,7 +4032,7 @@ CODE_01AE9F:
 ; Synchronizes battle states between different systems
 ; ==============================================================================
 
-CODE_01AEA0:
+BattleHUD_DrawCharacterName:
                        LDX.W $1935                        ;01AEA0|AE3519  |001935;
                        LDA.W $1938                        ;01AEA3|AD3819  |001938;
                        STA.W $1A72,X                      ;01AEA6|9D721A  |001A72;
@@ -4083,7 +4083,7 @@ BattleAnim_ComplexLoop:
                        PHY                                 ;01AEF0|5A      |      ;
                        INC.W $19F7                        ;01AEF1|EEF719  |0119F7;
 
-CODE_01AEF4:
+BattleHUD_RefreshAllBars:
                        PHX                                 ;01AEF4|DA      |      ;
                        PHP                                 ;01AEF5|08      |      ;
                        JSR.W CODE_01CAED                   ;01AEF6|20EDCA  |01CAED;
@@ -4559,7 +4559,7 @@ DATA8_01B1FB:
                        dw CODE_01B3F0                      ;01B207|F0B3    |01B3F0;
                        dw CODE_01B444                      ;01B209|44B4    |01B444;
 
-CODE_01B20B:
+BattleFormation_InitializePositions:
                        SEP #$20                           ;01B20B|E220    |      ;
                        REP #$10                           ;01B20D|C210    |      ;
                        LDA.W $19EE                        ;01B20F|ADEE19  |0119EE;
@@ -4580,7 +4580,7 @@ CODE_01B20B:
 ; Advanced system control with complex event handling
 ; ==============================================================================
 
-CODE_01B21A:
+BattleFormation_CalculateSpacing:
                        LDA.W $19EE                        ;01B21A|ADEE19  |0119EE;
                        AND.B #$F0                         ;01B21D|29F0    |      ;
                        LSR A                               ;01B21F|4A      |      ;
@@ -4604,7 +4604,7 @@ DATA8_01B23B:
                        db $01,$01,$01,$01,$01,$01,$01,$01,$01,$01,$01,$01,$01,$01,$01,$01 ; 01B23B
                        db $01,$01,$01,$01,$01,$01,$01,$01,$01,$01,$01,$01,$01,$01,$01,$01 ; 01B24B
 
-CODE_01B258:
+BattleFormation_ApplyLayout:
                        RTS                                 ;01B258|60      |      ;
 
 ; ==============================================================================
@@ -4676,15 +4676,15 @@ DATA8_01B2C2:
 ; Handles complex battle command processing and state management
 ; ==============================================================================
 
-CODE_01B2EB:
+BattleFormation_ValidatePositions:
                        LDA.B #$01                         ;01B2EB|A901    |      ;
                        STA.W $19EB                        ;01B2ED|8DEB19  |0119EB;
                        JMP.W CODE_01B37B                   ;01B2F0|4C7BB3  |01B37B;
 
-CODE_01B2F2:
+BattleFormation_AdjustOverlap:
                        RTS                                 ;01B2F2|60      |      ;
 
-CODE_01B2F3:
+BattleFormation_FinalizeSetup:
                        LDA.W $19EE                        ;01B2F3|ADEE19  |0119EE;
                        AND.B #$F0                         ;01B2F6|29F0    |      ;
                        LSR A                               ;01B2F8|4A      |      ;
@@ -4724,7 +4724,7 @@ BattleSystem_EffectJump1:
 BattleSystem_EffectExit1:
                        RTS                                 ;01B346|60      |      ;
 
-CODE_01B347:
+BattleAI_EvaluateTargets:
                        LDA.W $19EE                        ;01B347|ADEE19  |0119EE;
                        AND.B #$F0                         ;01B34A|29F0    |      ;
                        LSR A                               ;01B34C|4A      |      ;
@@ -4764,7 +4764,7 @@ BattleEffect_JumpHub:
 BattleEffect_Exit:
                        RTS                                 ;01B399|60      |      ;
 
-CODE_01B39A:
+BattleAI_SelectSkill:
                        LDA.W $19EE                        ;01B39A|ADEE19  |0119EE;
                        AND.B #$F0                         ;01B39D|29F0    |      ;
                        LSR A                               ;01B39F|4A      |      ;
@@ -4812,7 +4812,7 @@ BattleGraphics_Return:
 ; Completes effect processing with system integration
 ; ==============================================================================
 
-CODE_01B3F0:
+BattleAI_CalculateThreat:
                        LDA.W $19EE                        ;01B3F0|ADEE19  |0119EE;
                        AND.B #$F0                         ;01B3F3|29F0    |      ;
                        LSR A                               ;01B3F5|4A      |      ;
@@ -4847,7 +4847,7 @@ BattleEffect_FinalJump:
 BattleEffect_FinalReturn:
                        RTS                                 ;01B443|60      |      ;
 
-CODE_01B444:
+BattleAI_DetermineAction:
                        LDA.W $19EE                        ;01B444|ADEE19  |0119EE;
                        AND.B #$F0                         ;01B447|29F0    |      ;
                        LSR A                               ;01B449|4A      |      ;
@@ -4966,7 +4966,7 @@ BattleMem_ManagementEngine:
                        TAX                                 ;01B4EC|AA      |      ;
                        PLP                                 ;01B4ED|28      |      ;
 
-CODE_01B4EE:
+BattleAI_ExecuteStrategy:
                        LDA.L DATA8_06BF15,X                ;01B4EE|BF15BF06|06BF15;
                        CMP.B #$FF                         ;01B4F2|C9FF    |      ;
                        BEQ CODE_01B51F                     ;01B4F4|F029    |01B51F;
@@ -4984,13 +4984,13 @@ CODE_01B4EE:
                        CPY.W #$2500                       ;01B515|C00025  |      ;
                        BEQ UNREACH_01B53F                  ;01B518|F025    |01B53F;
 
-CODE_01B51A:
+BattleAI_UpdatePriority:
                        INX                                 ;01B51A|E8      |      ;
                        INX                                 ;01B51B|E8      |      ;
                        INX                                 ;01B51C|E8      |      ;
                        BRA CODE_01B4EE                     ;01B51D|80CF    |01B4EE;
 
-CODE_01B51F:
+BattleAI_CheckConditions:
                        RTS                                 ;01B51F|60      |      ;
 
 ; ==============================================================================
@@ -4998,12 +4998,12 @@ CODE_01B51F:
 ; Advanced animation control with complex loop management
 ; ==============================================================================
 
-CODE_01B520:
+BattleAI_ProcessDecision:
                        LDA.W $19EE                        ;01B520|ADEE19  |0119EE;
                        STA.W $1919                        ;01B523|8D1919  |011919;
                        BRA CODE_01B51A                     ;01B526|80F2    |01B51A;
 
-CODE_01B528:
+BattleAI_FinalizeChoice:
                        LDA.W $19EE                        ;01B528|ADEE19  |0119EE;
                        ASL A                               ;01B52B|0A      |      ;
                        ASL A                               ;01B52C|0A      |      ;
@@ -5762,7 +5762,7 @@ BattleChar_SpriteDiscovery:
 .Exit:
                        RTS                                 ;01D14D|60      |      ;
 
-CODE_01D14E:
+BattleMagic_CastSpell:
                        LDA.W $1A80,X                      ;01D14E|BD801A  |011A80;
                        AND.B #$3F                         ;01D151|293F    |      ;
                        ORA.B #$80                         ;01D153|0980    |      ;
@@ -6156,7 +6156,7 @@ BattleGraphics_StreamingSystem:
                        LDA.B #$1A                         ;01D3D3|A91A    |      ;
                        STA.W $0500                        ;01D3D5|8D0005  |010500;
                        LDA.B #$14                         ;01D3D8|A914    |      ;
-                       JSR.W CODE_01D6BD                   ;01D3DA|20BDD6  |01D6BD;
+                       JSR.W .ProcessEffect_CastSpell                   ;01D3DA|20BDD6  |01D6BD;
                        LDX.W #$0000                       ;01D3DD|A20000  |      ;
                        STX.W $1933                        ;01D3E0|8E3319  |011933;
                        LDX.W #$0010                       ;01D3E3|A21000  |      ;
@@ -6275,7 +6275,7 @@ BattleChar_AnimationProcessor:
                        AND.W #$03FF                       ;01D4AF|29FF03  |      ;
                        STA.W $1A87,X                      ;01D4B2|9D871A  |011A87;
                        LDA.W #$0008                       ;01D4B5|A90800  |      ;
-                       JSR.W CODE_01D6BD                   ;01D4B8|20BDD6  |01D6BD;
+                       JSR.W .ProcessEffect_CastSpell                   ;01D4B8|20BDD6  |01D6BD;
                        PLY                                 ;01D4BB|7A      |      ;
                        DEY                                 ;01D4BC|88      |      ;
                        BNE .AnimationLoop                  ;01D4BD|D0EB    |01D4AA;
@@ -6285,7 +6285,7 @@ BattleChar_AnimationProcessor:
                        STA.W $192B                        ;01D4C6|8D2B19  |01192B;
                        JSR.W CODE_01D603                   ;01D4C9|2003D6  |01D603;
                        LDA.W #$0014                       ;01D4CC|A91400  |      ;
-                       JSR.W CODE_01D6BD                   ;01D4CF|20BDD6  |01D6BD;
+                       JSR.W .ProcessEffect_CastSpell                   ;01D4CF|20BDD6  |01D6BD;
                        LDY.W #$0008                       ;01D4D2|A00800  |      ;
 
 .InnerLoop:
@@ -6293,7 +6293,7 @@ BattleChar_AnimationProcessor:
                        STA.W $192B                        ;01D4D8|8D2B19  |01192B;
                        JSR.W CODE_01D603                   ;01D4DB|2003D6  |01D603;
                        LDA.W #$0004                       ;01D4DE|A90400  |      ;
-                       JSR.W CODE_01D6BD                   ;01D4E1|20BDD6  |01D6BD;
+                       JSR.W .ProcessEffect_CastSpell                   ;01D4E1|20BDD6  |01D6BD;
                        DEY                                 ;01D4E4|88      |      ;
                        BNE .InnerLoop                      ;01D4E5|D0EE    |01D4D5;
                        PLX                                 ;01D4E7|FA      |      ;
@@ -6314,7 +6314,7 @@ BattleChar_AnimationProcessor:
                        AND.W #$03FF                       ;01D500|29FF03  |      ;
                        STA.W $1A87,X                      ;01D503|9D871A  |011A87;
                        LDA.W #$0008                       ;01D506|A90800  |      ;
-                       JSR.W CODE_01D6C4                   ;01D509|20C4D6  |01D6C4;
+                       JSR.W .Exit_CastSpell                   ;01D509|20C4D6  |01D6C4;
                        PLY                                 ;01D50C|7A      |      ;
                        DEY                                 ;01D50D|88      |      ;
                        BNE .ReverseLoop                    ;01D50E|D0EB    |01D4FB;
@@ -6349,7 +6349,7 @@ BattlePalette_AnimationController:
                        STA.W $1A46                        ;01D53B|8D461A  |011A46;
                        JSR.W CODE_018DF3                   ;01D53E|20F38D  |018DF3;
                        LDA.B #$10                         ;01D541|A910    |      ;
-                       JSR.W CODE_01D6C4                   ;01D543|20C4D6  |01D6C4;
+                       JSR.W .Exit_CastSpell                   ;01D543|20C4D6  |01D6C4;
                        DEC.W $1935                        ;01D546|CE3519  |011935;
                        BNE BattlePalette_AnimationController ;01D549|D0CE    |01D519;
                        LDA.B #$70                         ;01D54B|A970    |      ;
@@ -6391,11 +6391,11 @@ BattleColor_BlendingProcessor:
                        LDA.B #$05                         ;01D58F|A905    |      ;
                        STA.W $1A46                        ;01D591|8D461A  |011A46;
                        LDA.B #$10                         ;01D594|A910    |      ;
-                       JSR.W CODE_01D6C4                   ;01D596|20C4D6  |01D6C4;
+                       JSR.W .Exit_CastSpell                   ;01D596|20C4D6  |01D6C4;
                        DEC.W $1935                        ;01D599|CE3519  |011935;
                        BNE CODE_01D565                     ;01D59C|D0C7    |01D565;
                        LDA.B #$28                         ;01D59E|A928    |      ;
-                       JSR.W CODE_01D6C4                   ;01D5A0|20C4D6  |01D6C4;
+                       JSR.W .Exit_CastSpell                   ;01D5A0|20C4D6  |01D6C4;
                        LDX.W #$0F08                       ;01D5A3|A2080F  |      ;
                        STX.W $0501                        ;01D5A6|8E0105  |010501;
                        LDA.W $1916                        ;01D5A9|AD1619  |011916;
@@ -6473,7 +6473,7 @@ BattleGraphics_DataProcessor:
                        LDX.W #$5000                       ;01D61E|A20050  |      ;
                        LDY.W #$0100                       ;01D621|A00001  |      ;
 
-CODE_01D624:
+BattleMagic_CalculatePower:
                        STA.L $7F0000,X                    ;01D624|9F00007F|7F0000;
                        INX                                 ;01D628|E8      |      ;
                        INX                                 ;01D629|E8      |      ;
@@ -6505,7 +6505,7 @@ CODE_01D624:
                        LDA.W $192B                        ;01D66D|AD2B19  |01192B;
                        BMI CODE_01D6A5                     ;01D670|3033    |01D6A5;
 
-CODE_01D672:
+BattleMagic_ApplyElemental:
                        JSR.W CODE_0182D9                   ;01D672|20D982  |0182D9;
                        DEC.W $192B                        ;01D675|CE2B19  |01192B;
                        BNE CODE_01D672                     ;01D678|D0F8    |01D672;
@@ -6513,7 +6513,7 @@ CODE_01D672:
                        LDA.W $192C                        ;01D67B|AD2C19  |01192C;
                        STA.W $1A51                        ;01D67E|8D511A  |011A51;
 
-CODE_01D681:
+BattleMagic_AnimationTrigger:
                        REP #$30                           ;01D681|C230    |      ;
                        LDX.W #$4000                       ;01D683|A20040  |      ;
                        LDY.W #$C588                       ;01D686|A088C5  |      ;
@@ -6529,7 +6529,7 @@ CODE_01D681:
                        LDA.B #$06                         ;01D6A0|A906    |      ;
                        STA.W $1A46                        ;01D6A2|8D461A  |011A46;
 
-CODE_01D6A5:
+BattleMagic_MPConsumption:
                        PLP                                 ;01D6A5|28      |      ;
                        PLY                                 ;01D6A6|7A      |      ;
                        PLX                                 ;01D6A7|FA      |      ;
@@ -6540,36 +6540,36 @@ CODE_01D6A5:
 ; Complex timing control with advanced synchronization
 ; ==============================================================================
 
-CODE_01D6A9:
+BattleMagic_SuccessCheck:
                        PHX                                 ;01D6A9|DA      |      ;
                        PHP                                 ;01D6AA|08      |      ;
                        LDX.W #$0000                       ;01D6AB|A20000  |      ;
 
-CODE_01D6AE:
+.MagicLoop_CastSpell:
                        SEP #$20                           ;01D6AE|E220    |      ;
                        REP #$10                           ;01D6B0|C210    |      ;
 
-CODE_01D6B2:
+.ValidTarget_CastSpell:
                        PHA                                 ;01D6B2|48      |      ;
                        JSR.W (DATA8_01D6CB,X)              ;01D6B3|FCCBD6  |01D6CB;
                        PLA                                 ;01D6B6|68      |      ;
                        DEC A                               ;01D6B7|3A      |      ;
-                       BNE CODE_01D6B2                     ;01D6B8|D0F8    |01D6B2;
+                       BNE .ValidTarget_CastSpell                     ;01D6B8|D0F8    |01D6B2;
                        PLP                                 ;01D6BA|28      |      ;
                        PLX                                 ;01D6BB|FA      |      ;
                        RTS                                 ;01D6BC|60      |      ;
 
-CODE_01D6BD:
+.ProcessEffect_CastSpell:
                        PHX                                 ;01D6BD|DA      |      ;
                        PHP                                 ;01D6BE|08      |      ;
                        LDX.W #$0002                       ;01D6BF|A20200  |      ;
-                       BRA CODE_01D6AE                     ;01D6C2|80EA    |01D6AE;
+                       BRA .MagicLoop_CastSpell                     ;01D6C2|80EA    |01D6AE;
 
-CODE_01D6C4:
+.Exit_CastSpell:
                        PHX                                 ;01D6C4|DA      |      ;
                        PHP                                 ;01D6C5|08      |      ;
                        LDX.W #$0004                       ;01D6C6|A20400  |      ;
-                       BRA CODE_01D6AE                     ;01D6C9|80E3    |01D6AE;
+                       BRA .MagicLoop_CastSpell                     ;01D6C9|80E3    |01D6AE;
 
 DATA8_01D6CB:
                        db $D1,$D6,$D0,$82,$D9,$82   ;01D6CB|        |      ;
@@ -6585,13 +6585,13 @@ DATA8_01D6CB:
                        REP #$10                           ;01D6D8|C210    |      ;
                        LDA.B #$03                         ;01D6DA|A903    |      ;
                        STA.W $19E2                        ;01D6DC|8DE219  |0119E2;
-                       BRA CODE_01D6E8                     ;01D6DF|8007    |01D6E8;
+                       BRA .PowerLoop_CalculatePower                     ;01D6DF|8007    |01D6E8;
 
                        SEP #$20                           ;01D6E1|E220    |      ;
                        REP #$10                           ;01D6E3|C210    |      ;
                        STZ.W $19E2                        ;01D6E5|9CE219  |0119E2;
 
-CODE_01D6E8:
+.PowerLoop_CalculatePower:
                        LDA.W $19E2                        ;01D6E8|ADE219  |0119E2;
                        JSR.W CODE_01B1EB                   ;01D6EB|20EBB1  |01B1EB;
                        STX.W $19EA                        ;01D6EE|8EEA19  |0119EA;
@@ -6631,7 +6631,7 @@ CODE_01D6E8:
                        JSR.W CODE_0196D3                   ;01D742|20D396  |0196D3;
                        JSR.W CODE_019058                   ;01D745|205890  |019058;
                        LDA.W $19E2                        ;01D748|ADE219  |0119E2;
-                       BNE CODE_01D76D                     ;01D74B|D020    |01D76D;
+                       BNE .ElementalCheck_ApplyElemental                     ;01D74B|D020    |01D76D;
                        LDX.W #$0000                       ;01D74D|A20000  |      ;
                        LDA.W $19BD                        ;01D750|ADBD19  |0119BD;
                        INC A                               ;01D753|1A      |      ;
@@ -6644,9 +6644,9 @@ CODE_01D6E8:
                        ADC.L DATA8_0196CC,X                ;01D762|7FCC9601|0196CC;
                        AND.B #$0F                         ;01D766|290F    |      ;
                        STA.W $19BF                        ;01D768|8DBF19  |0119BF;
-                       BRA CODE_01D78B                     ;01D76B|801E    |01D78B;
+                       BRA .WeaknessMultiplier_ApplyElemental                     ;01D76B|801E    |01D78B;
 
-CODE_01D76D:
+.ElementalCheck_ApplyElemental:
                        LDX.W #$0000                       ;01D76D|A20000  |      ;
                        LDA.W $19BD                        ;01D770|ADBD19  |0119BD;
                        CLC                                 ;01D773|18      |      ;
@@ -6660,7 +6660,7 @@ CODE_01D76D:
                        AND.B #$0F                         ;01D786|290F    |      ;
                        STA.W $19BF                        ;01D788|8DBF19  |0119BF;
 
-CODE_01D78B:
+.WeaknessMultiplier_ApplyElemental:
                        JSR.W CODE_0188CD                   ;01D78B|20CD88  |0188CD;
                        LDX.W $192B                        ;01D78E|AE2B19  |01192B;
                        STX.W $195F                        ;01D791|8E5F19  |01195F;
@@ -6681,37 +6681,37 @@ CODE_01D78B:
 ; Complex animation state control with advanced timing
 ; ==============================================================================
 
-CODE_01D7B1:
+.ResistanceReduction_ApplyElemental:
                        LDA.W $1926                        ;01D7B1|AD2619  |011926;
                        CMP.B #$0F                         ;01D7B4|C90F    |      ;
-                       BCS CODE_01D7C0                     ;01D7B6|B008    |01D7C0;
+                       BCS .AnimLoop_AnimationTrigger                     ;01D7B6|B008    |01D7C0;
                        CMP.B #$05                         ;01D7B8|C905    |      ;
-                       BCS CODE_01D7C4                     ;01D7BA|B008    |01D7C4;
+                       BCS .QueueFrame_AnimationTrigger                     ;01D7BA|B008    |01D7C4;
                        LDA.B #$39                         ;01D7BC|A939    |      ;
-                       BRA CODE_01D7C6                     ;01D7BE|8006    |01D7C6;
+                       BRA .NextFrame_AnimationTrigger                     ;01D7BE|8006    |01D7C6;
 
-CODE_01D7C0:
+.AnimLoop_AnimationTrigger:
                        LDA.B #$37                         ;01D7C0|A937    |      ;
-                       BRA CODE_01D7C6                     ;01D7C2|8002    |01D7C6;
+                       BRA .NextFrame_AnimationTrigger                     ;01D7C2|8002    |01D7C6;
 
-CODE_01D7C4:
+.QueueFrame_AnimationTrigger:
                        LDA.B #$36                         ;01D7C4|A936    |      ;
 
-CODE_01D7C6:
+.NextFrame_AnimationTrigger:
                        LDX.W $19EA                        ;01D7C6|AEEA19  |0119EA;
                        JSR.W CODE_01CACF                   ;01D7C9|20CFCA  |01CACF;
-                       BRA CODE_01D7CE                     ;01D7CC|8000    |01D7CE;
+                       BRA .Exit_AnimationTrigger                     ;01D7CC|8000    |01D7CE;
 
-CODE_01D7CE:
+.Exit_AnimationTrigger:
                        LDX.W $194D                        ;01D7CE|AE4D19  |01194D;
 
-CODE_01D7D1:
+.MPLoop_MPConsumption:
                        LDA.L DATA8_00F5F2,X                ;01D7D1|BFF2F500|00F5F2;
                        INX                                 ;01D7D5|E8      |      ;
                        CMP.B #$FF                         ;01D7D6|C9FF    |      ;
-                       BEQ CODE_01D809                     ;01D7D8|F02F    |01D809;
+                       BEQ .DeductMP_MPConsumption                     ;01D7D8|F02F    |01D809;
                        CMP.B #$80                         ;01D7DA|C980    |      ;
-                       BEQ CODE_01D7FC                     ;01D7DC|F01E    |01D7FC;
+                       BEQ .InsufficientMP_MPConsumption                     ;01D7DC|F01E    |01D7FC;
                        STA.W $1949                        ;01D7DE|8D4919  |011949;
                        LDA.B #$0C                         ;01D7E1|A90C    |      ;
                        STA.W $194A                        ;01D7E3|8D4A19  |01194A;
@@ -6723,27 +6723,27 @@ CODE_01D7D1:
                        STA.W $192E                        ;01D7F3|8D2E19  |01192E;
                        PLX                                 ;01D7F6|FA      |      ;
                        JSR.W CODE_019681                   ;01D7F7|208196  |019681;
-                       BRA CODE_01D7D1                     ;01D7FA|80D5    |01D7D1;
+                       BRA .MPLoop_MPConsumption                     ;01D7FA|80D5    |01D7D1;
 
-CODE_01D7FC:
+.InsufficientMP_MPConsumption:
                        LDA.L DATA8_00F5F2,X                ;01D7FC|BFF2F500|00F5F2;
                        INX                                 ;01D800|E8      |      ;
                        STA.W $1949                        ;01D801|8D4919  |011949;
                        JSR.W CODE_019EDD                   ;01D804|20DD9E  |019EDD;
-                       BRA CODE_01D7D1                     ;01D807|80C8    |01D7D1;
+                       BRA .MPLoop_MPConsumption                     ;01D807|80C8    |01D7D1;
 
-CODE_01D809:
+.DeductMP_MPConsumption:
                        STX.W $194D                        ;01D809|8E4D19  |01194D;
                        JSR.W CODE_0182D0                   ;01D80C|20D082  |0182D0;
                        LDA.W $1926                        ;01D80F|AD2619  |011926;
                        CMP.B #$0B                         ;01D812|C90B    |      ;
-                       BNE CODE_01D81B                     ;01D814|D005    |01D81B;
+                       BNE .SuccessLoop_SuccessCheck                     ;01D814|D005    |01D81B;
                        LDA.B #$22                         ;01D816|A922    |      ;
                        JSR.W CODE_01BAAD                   ;01D818|20ADBA  |01BAAD;
 
-CODE_01D81B:
+.SuccessLoop_SuccessCheck:
                        DEC.W $1926                        ;01D81B|CE2619  |011926;
-                       BPL CODE_01D7B1                     ;01D81E|1091    |01D7B1;
+                       BPL .ResistanceReduction_ApplyElemental                     ;01D81E|1091    |01D7B1;
                        LDA.W $19E7                        ;01D820|ADE719  |0119E7;
 ; Advanced Battle Coordination and Graphics Processing Systems for FFMQ Bank $01
 ; Cycle 7 Implementation Part 1: Battle State Management and DMA Operations
@@ -6839,9 +6839,9 @@ character_battle_processing_system:
                        LDX.W #$0000                         ; Initialize character index
                        LDA.W $0E91                          ; Load current battle map
                        CMP.B #$16                           ; Compare with specific map
-                       BEQ CODE_01D8CC                      ; Branch if matching
+                       BEQ .FailedCheck_SuccessCheck                      ; Branch if matching
                        LDX.W #$0001                         ; Set alternate character index
-CODE_01D8CC:
+.FailedCheck_SuccessCheck:
                        TXA                                  ; Transfer index to accumulator
                        JSR.W CODE_01B1EB                    ; Get character battle data
                        STX.W $19EA                          ; Store character index
@@ -6915,20 +6915,20 @@ battle_formation_processing:
 ; Implements multi-stage battle processing with error handling and state management
 battle_loop_control_system:
                        LDY.W #$000A                         ; Initialize loop counter
-CODE_01D954:
+.Exit_SuccessCheck:
                        PHY                                  ; Save loop counter
-CODE_01D955:
+.RandomFactor_SuccessCheck:
                        JSR.W CODE_01CAED                    ; Execute battle step
                        JSR.W CODE_0182D0                    ; Process memory operations
                        LDX.W $1935                          ; Load formation index
                        LDA.W $1A72,X                        ; Get formation status
-                       BNE CODE_01D955                      ; Continue if not ready
+                       BNE .RandomFactor_SuccessCheck                      ; Continue if not ready
                        PLY                                  ; Restore loop counter
                        DEY                                  ; Decrement counter
-                       BEQ CODE_01D96C                      ; Exit if completed
+                       BEQ .ApplyModifier_SuccessCheck                      ; Exit if completed
                        JSR.W CODE_01D96D                    ; Reset formation
-                       BRA CODE_01D954                      ; Continue loop
-CODE_01D96C:
+                       BRA .Exit_SuccessCheck                      ; Continue loop
+.ApplyModifier_SuccessCheck:
                        RTS                                  ; Return from loop control
 
 ; Advanced Formation State Management
@@ -7054,7 +7054,7 @@ battle_timing_synchronization_system:
                        PHY                                  ; Save Y register
                        LDY.W #$0002                         ; Set short delay counter
                        BRA timing_delay_common              ; Branch to common delay
-CODE_01E4FF:
+.BattleReward_CalculationLoop:
                        PHY                                  ; Save Y register
                        LDY.W #$0004                         ; Set medium delay counter
                        BRA timing_delay_common              ; Branch to common delay
@@ -7074,8 +7074,8 @@ timing_delay_common:
 ; Coordinates graphics timing with battle systems and DMA operations
 ; Implements sophisticated graphics synchronization with error handling
 graphics_synchronization_engine:
-                       JSR.W CODE_01E4FF                    ; Execute medium delay
-                       JSR.W CODE_01E4FF                    ; Execute medium delay
+                       JSR.W .BattleReward_CalculationLoop                    ; Execute medium delay
+                       JSR.W .BattleReward_CalculationLoop                    ; Execute medium delay
                        RTS                                  ; Return from synchronization
 
 ; Advanced Extended Graphics Processing
@@ -7384,7 +7384,7 @@ battle_state_memory_coordination_system:
                        LDA.B #$50                           ; Load additional battle flag
                        TRB.W $1A61                          ; Test and reset bit
 battle_state_processing:
-                       JSR.W CODE_01F1F3                    ; Execute battle state function
+                       JSR.W .BattleDefeat_FadeStart                    ; Execute battle state function
                        ASL A                                ; Shift for table lookup
                        TAX                                  ; Transfer to index
                        JMP.W (DATA8_01F3CB,X)               ; Jump to battle function
@@ -7394,7 +7394,7 @@ battle_world_map_processing:
                        LDY.W $0015                          ; Load world state
                        STY.W $1A60                          ; Store to state register
 world_map_complete:
-                       JSR.W CODE_01F1F3                    ; Execute world map function
+                       JSR.W .BattleDefeat_FadeStart                    ; Execute world map function
                        ASL A                                ; Shift for table lookup
                        TAX                                  ; Transfer to index
                        JMP.W (DATA8_01F3E1,X)               ; Jump to world map function
@@ -7464,7 +7464,7 @@ battle_direction_movement_processing_engine:
                        STX.W $19CB                          ; Store movement state
                        LDA.W $19D0                          ; Load movement flags
                        LDY.W $19F1                          ; Load movement index
-                       JSR.W CODE_01F36A                    ; Execute movement processing
+                       JSR.W .BattleMenu_SelectionConfirm                    ; Execute movement processing
                        LDA.W $193B                          ; Load movement buffer
                        EOR.W $19D5                          ; XOR with target direction
                        BMI battle_direction_reverse         ; Branch if direction reversed
@@ -7523,7 +7523,7 @@ character_interaction_advanced:
                        STA.W $19E7                          ; Store character state
                        LDA.W $19EC                          ; Load character mode
                        STA.W $19ED                          ; Store character backup
-                       JSR.W CODE_01F21F                    ; Execute character processing
+                       JSR.W .BattleDefeat_AudioStop                    ; Execute character processing
                        RTS                                  ; Return from interaction
 
 ; Advanced Battle Collision and Movement Validation
@@ -7536,7 +7536,7 @@ battle_collision_movement_validation:
                        EOR.W $19D1                          ; XOR with collision state
                        AND.B #$07                           ; Mask collision bits
                        BNE battle_state_standard            ; Branch if collision detected
-                       JSR.W CODE_01F2CB                    ; Execute collision validation
+                       JSR.W .BattleEscape_FailureHandling                    ; Execute collision validation
                        BCS battle_state_standard            ; Branch if collision confirmed
                        LDA.W $19D6                          ; Load collision data
                        LSR A                                ; Shift collision flags
@@ -7550,8 +7550,8 @@ battle_collision_movement_validation:
                        STA.W $1926                          ; Store validation state
                        LDY.W $19F1                          ; Load movement index
                        LDX.W #$0000                         ; Clear collision index
-                       JSR.W CODE_01F298                    ; Execute movement validation
-                       JSR.W CODE_01F326                    ; Execute collision processing
+                       JSR.W .BattleEscape_SuccessCheck                    ; Execute movement validation
+                       JSR.W .BattleMenu_InputLoop                    ; Execute collision processing
                        BCC collision_validation_complete    ; Branch if validation complete
                        INC.W $1926                          ; Increment validation state
 collision_validation_complete:
@@ -7561,7 +7561,7 @@ collision_validation_complete:
                        STX.W $19CB                          ; Store movement backup
                        LDA.W $19D0                          ; Load movement flags
                        LDY.W $19F1                          ; Load movement index
-                       JSR.W CODE_01F36A                    ; Execute movement coordination
+                       JSR.W .BattleMenu_SelectionConfirm                    ; Execute movement coordination
                        LDA.B #$0C                           ; Set movement completion code
                        RTS                                  ; Return from collision validation
 
@@ -7571,8 +7571,8 @@ collision_validation_complete:
 battle_environment_location_processing:
                        LDA.W $0E8B                          ; Load environment data
                        STA.W $19D7                          ; Store environment state
-                       JSR.W CODE_01F212                    ; Execute environment processing
-                       JSR.W CODE_01F2CB                    ; Execute location validation
+                       JSR.W .BattleDefeat_MemoryCleanup                    ; Execute environment processing
+                       JSR.W .BattleEscape_FailureHandling                    ; Execute location validation
                        BCC environment_processing_standard  ; Branch if standard processing
                        LDA.W $1A7F,X                        ; Load location flags
                        AND.B #$03                           ; Mask location type
@@ -7658,7 +7658,7 @@ battle_animation_state_setup:
                        STZ.W $1A60                          ; Clear animation state register
                        LDA.B #$F0                           ; Load animation mask
                        TRB.W $1A61                          ; Test and reset animation bits
-                       JSR.W CODE_01F1F3                    ; Execute animation function
+                       JSR.W .BattleDefeat_FadeStart                    ; Execute animation function
                        ASL A                                ; Shift for table lookup
                        TAX                                  ; Transfer to index
                        INC.W $194C                          ; Increment animation frame counter
@@ -7721,7 +7721,7 @@ UNREACH_01EF3B:
 
 ; Advanced Battle Entity State Management System
 ; Sophisticated state initialization with multi-register coordination
-CODE_01EF46:
+.BattleVictory_SequenceComplete:
     LDA.B #$01                     ; Initialize primary state register
     STA.W $19F9                    ; Set battle entity primary state
     STA.W $1928                    ; Set battle coordination flag
@@ -7730,8 +7730,8 @@ CODE_01EF46:
     STZ.W $1929                    ; Clear secondary state register
     LDA.W $0E8B                    ; Load battle environment context
     STA.W $19D7                    ; Store environment reference
-    JSR.W CODE_01F212              ; Execute coordinate preprocessing
-    JSR.W CODE_01F21F              ; Execute coordinate finalization
+    JSR.W .BattleDefeat_MemoryCleanup              ; Execute coordinate preprocessing
+    JSR.W .BattleDefeat_AudioStop              ; Execute coordinate finalization
 
 ; Advanced Coordinate Bit Analysis Engine
 ; Sophisticated bit field extraction and analysis for battle positioning
@@ -7752,7 +7752,7 @@ Multi_Entity_Coordinate_Processing:
     LDX.W #$0000                   ; Initialize entity index
     STX.W $193F                    ; Clear entity processing flags
     LDY.W $19F1                    ; Load primary entity reference
-    JSR.W CODE_01F2CB              ; Execute entity coordinate validation
+    JSR.W .BattleEscape_FailureHandling              ; Execute entity coordinate validation
     BCC Entity_Processing_Complete ; Branch if validation successful
 
 ; Advanced Entity Attribute Processing
@@ -7780,7 +7780,7 @@ Advanced_Attribute_Engine:
 Entity_Processing_Complete:
     ; Advanced secondary entity coordinate processing
     LDY.W $19F3                    ; Load secondary entity reference
-    JSR.W CODE_01F2CB              ; Execute coordinate validation
+    JSR.W .BattleEscape_FailureHandling              ; Execute coordinate validation
     BCC Secondary_Processing_Complete
 
 ; Secondary Entity Advanced Processing
@@ -7952,12 +7952,12 @@ Secondary_Battle_Processing:
     LDA.W $19D2                    ; Load secondary battle state
 
 Execute_Battle_Processing:
-    JSR.W CODE_01F36A              ; Execute advanced battle processing
+    JSR.W .BattleMenu_SelectionConfirm              ; Execute advanced battle processing
 
 Battle_Processing_Complete:
     ; Final battle validation and preparation for next cycle
     LDY.W $0E89                    ; Load environment context
-    JSR.W CODE_01F326              ; Execute environment validation
+    JSR.W .BattleMenu_InputLoop              ; Execute environment validation
     BCS Battle_Validation_Error    ; Branch if validation failed
 
 ; Multi-Level Battle Validation System
@@ -7977,13 +7977,13 @@ Primary_Validation_Mode:
     ASL A                          ; Shift for validation indexing
     TAX                            ; Transfer to index register
     PHX                            ; Preserve validation index
-    JSR.W CODE_01F326              ; Execute validation processing
+    JSR.W .BattleMenu_InputLoop              ; Execute validation processing
     PLX                            ; Restore validation index
     BCS Battle_Validation_Error    ; Branch if validation failed
 
 ; Final validation confirmation
     LDY.W $19F1                    ; Load final validation context
-    JSR.W CODE_01F326              ; Execute final validation
+    JSR.W .BattleMenu_InputLoop              ; Execute final validation
     BCS Battle_Validation_Error    ; Branch if final validation failed
 
 Battle_State_Success:
@@ -7998,7 +7998,7 @@ Battle_Validation_Error:
 ; Sophisticated environment processing with multi-layer validation
 Environment_Validation_System:
     LDY.W $0E89                    ; Load environment context
-    JSR.W CODE_01F326              ; Execute environment validation
+    JSR.W .BattleMenu_InputLoop              ; Execute environment validation
     BCS Environment_Validation_Error ; Branch if environment validation failed
 
 Environment_Success:
@@ -8015,7 +8015,7 @@ Advanced_Battle_Mode_Processing:
 ; Battle Mode Validation and State Management
 Battle_Mode_Validation:
     LDY.W $0E89                    ; Load battle mode context
-    JSR.W CODE_01F326              ; Execute mode validation
+    JSR.W .BattleMenu_InputLoop              ; Execute mode validation
     BCS Environment_Validation_Error ; Branch if mode validation failed
 
 Battle_Mode_Success:
@@ -8162,7 +8162,7 @@ Special_Graphics_Direct:
 
 ; Advanced Battle State Analysis Engine
 ; Sophisticated bit pattern analysis for battle state determination
-CODE_01F1F3:
+.BattleDefeat_FadeStart:
     LDA.B #$00                     ; Clear analysis register
     XBA                            ; Exchange for double-byte processing
     LDA.W $1A60                    ; Load primary battle state register
@@ -8188,8 +8188,8 @@ Battle_Bit_Found:
 
 ; Advanced Coordinate Processing and Validation System
 ; Multi-layered coordinate processing with validation and error handling
-CODE_01F212:
-    JSR.W CODE_01F22F              ; Execute primary coordinate processing
+.BattleDefeat_MemoryCleanup:
+    JSR.W .BattleDefeat_ScreenClear              ; Execute primary coordinate processing
     STA.W $19D5                    ; Store primary coordinate result
     STX.W $19CF                    ; Store coordinate transformation index
     STY.W $19F1                    ; Store coordinate validation reference
@@ -8197,9 +8197,9 @@ CODE_01F212:
 
 ; Secondary Coordinate Processing Engine
 ; Advanced secondary coordinate management with state synchronization
-CODE_01F21F:
+.BattleDefeat_AudioStop:
     LDY.W $19F1                    ; Load primary coordinate reference
-    JSR.W CODE_01F232              ; Execute secondary coordinate processing
+    JSR.W .BattleDefeat_Exit              ; Execute secondary coordinate processing
     STA.W $19D6                    ; Store secondary coordinate result
     STX.W $19D1                    ; Store secondary transformation index
     STY.W $19F3                    ; Store secondary validation reference
@@ -8207,12 +8207,12 @@ CODE_01F21F:
 
 ; Primary Coordinate Transformation Engine
 ; Sophisticated coordinate transformation with environment context
-CODE_01F22F:
+.BattleDefeat_ScreenClear:
     LDY.W $0E89                    ; Load environment coordinate context
 
 ; Advanced Coordinate Calculation Engine
 ; Complex mathematical coordinate processing with multiple validation layers
-CODE_01F232:
+.BattleDefeat_Exit:
     LDA.B #$00                     ; Clear coordinate calculation register
     XBA                            ; Exchange for calculation preparation
     LDA.W $19D7                    ; Load coordinate base reference
@@ -8277,7 +8277,7 @@ Finalize_Coordinate_Processing:
 
 ; Alternative Coordinate Processing Engine
 ; Specialized coordinate processing for specific battle scenarios
-CODE_01F298:
+.BattleEscape_SuccessCheck:
     REP #$20                       ; Set 16-bit mode for alternative processing
     TYA                            ; Transfer Y-coordinate context
     SEP #$20                       ; Set 8-bit mode
@@ -8310,7 +8310,7 @@ Alternative_Coordinate_Complete:
 
 ; Advanced Entity Detection and Validation System
 ; Sophisticated entity detection with multi-layer validation
-CODE_01F2CB:
+.BattleEscape_FailureHandling:
     PHD                            ; Preserve direct page register
     PEA.W $1A62                    ; Push entity data page address
     PLD                            ; Load entity data page
@@ -8369,7 +8369,7 @@ Entity_Found:
 
 ; Specialized Entity Detection System
 ; Alternative entity detection for specific battle scenarios
-CODE_01F326:
+.BattleMenu_InputLoop:
     PHD                            ; Preserve direct page register
     PEA.W $1A62                    ; Push specialized entity page address
     PLD                            ; Load specialized entity page
@@ -8417,7 +8417,7 @@ Specialized_Entity_Found:
 
 ; Advanced Battle Action Processing Engine
 ; Sophisticated battle action management with state coordination
-CODE_01F36A:
+.BattleMenu_SelectionConfirm:
     BIT.B #$80                     ; Test advanced battle action flag
     BEQ Battle_Action_Complete     ; Branch if standard action mode
     BIT.B #$60                     ; Test battle action type flags
@@ -8546,7 +8546,7 @@ Advanced_Sound_Processing:
 
 ; Advanced Battle Sequence Processing
 ; Complex battle sequence management with multi-state coordination
-CODE_01F468:
+.BattleCursor_UpdatePosition:
     LDA.B #$02                     ; Set battle sequence mode
     STA.W $0E8B                    ; Store battle sequence context
     JSR.W CODE_0194CD              ; Execute sequence initialization
@@ -8592,7 +8592,7 @@ Enhancement_Special_Processing:
     JSL.L CODE_01B24C              ; Execute final enhancement processing
 
 Enhancement_Processing_Complete:
-    BRA CODE_01F468                ; Branch to battle sequence processing
+    BRA .BattleCursor_UpdatePosition                ; Branch to battle sequence processing
 
 ; Advanced Battle State Toggle System
 ; Sophisticated state toggle with validation and error handling
@@ -8603,7 +8603,7 @@ Advanced_Battle_State_Toggle:
     db $93,$00,$89,$20,$D0,$F6
 
 ; Advanced Battle Completion System
-CODE_01F503:
+.BattleCursor_AnimationFrame:
     RTS                            ; Return battle completion
 
 ; Advanced Battle Direction Processing
@@ -8634,7 +8634,7 @@ Advanced_Graphics_Initialization:
     STX.W $1906                        ; Store secondary backup register
     LDA.B #$07                         ; Set advanced graphics mode
     STA.W $1A4C                        ; Store graphics mode control
-    JSR.W CODE_01F8A6                  ; Execute graphics buffer initialization
+    JSR.W .BattleText_PrintLoop                  ; Execute graphics buffer initialization
     LDX.W #$0000                       ; Initialize graphics loop counter
 
 ; Advanced Graphics Processing Loop Engine
@@ -8648,7 +8648,7 @@ Advanced_Graphics_Processing_Loop:
     ADC.W #$0400                       ; Add graphics buffer offset
     STA.W $1A16                        ; Store secondary graphics buffer address
     SEP #$20                           ; Set 8-bit accumulator mode
-    JSR.W CODE_01F8DB                  ; Execute graphics buffer processing
+    JSR.W .BattleText_NextCharacter                  ; Execute graphics buffer processing
     PLX                                ; Restore graphics loop index
     INX                                ; Increment graphics index
     INX                                ; Increment for double-byte addressing
@@ -8668,7 +8668,7 @@ DATA8_01F892:
 
 ; Advanced Graphics Buffer Initialization System
 ; Complex buffer setup with multi-layer memory management
-CODE_01F8A6:
+.BattleText_PrintLoop:
     LDX.W #$0000                       ; Initialize buffer index
     REP #$20                           ; Set 16-bit accumulator mode
     LDA.W #$00FB                       ; Set graphics buffer initialization pattern
@@ -8696,7 +8696,7 @@ Graphics_Buffer_Init_Loop:
 
 ; Advanced Graphics Buffer Processing Engine
 ; Sophisticated buffer processing with coordinate transformation
-CODE_01F8DB:
+.BattleText_NextCharacter:
     LDA.B #$08                         ; Set graphics processing iteration count
     STA.W $1A46                        ; Store iteration control
     JSR.W CODE_0182D0                  ; Execute graphics coordination
@@ -8752,18 +8752,18 @@ Advanced_Graphics_Enhancement:
 
 ; Advanced Coordinate Processing and Transformation System
 ; Sophisticated coordinate management with validation and transformation
-CODE_01F978:
+.BattleWindow_DrawBorder:
     PHP                                ; Preserve processor status
     SEP #$20                           ; Set 8-bit accumulator mode
     LDX.W #$0000                       ; Initialize coordinate processing index
     LDY.W $192D                        ; Load coordinate reference
-    JSR.W CODE_01F9A0                  ; Execute coordinate processing
+    JSR.W .BattleWindow_SetAttributes                  ; Execute coordinate processing
     PLP                                ; Restore processor status
     RTS                                ; Return coordinate processing complete
 
 ; Advanced Coordinate Calculation Engine
 ; Complex coordinate calculation with environment context
-CODE_01F986:
+.BattleWindow_FillBackground:
     LDA.W $19D7                        ; Load coordinate base reference
     ASL A                              ; Shift for coordinate indexing
     REP #$20                           ; Set 16-bit accumulator mode
@@ -8781,8 +8781,8 @@ CODE_01F986:
 
 ; Advanced Coordinate Processing Engine
 ; Sophisticated coordinate processing with multi-layer validation
-CODE_01F9A0:
-    JSR.W CODE_01FD51                  ; Execute coordinate validation
+.BattleWindow_SetAttributes:
+    JSR.W .BattleMessage_QueueSystem                  ; Execute coordinate validation
     STY.W $1A31                        ; Store primary coordinate result
     STY.W $1A2D                        ; Store coordinate backup
     LDY.W #$0000                       ; Clear coordinate offset
@@ -8814,7 +8814,7 @@ Advanced_Coordinate_Adjustment:
     ADC.W $1A57                        ; Add coordinate adjustment Y
     STA.W $1A32                        ; Store adjusted Y coordinate
     LDY.W $1A31                        ; Load adjusted coordinate reference
-    JSR.W CODE_01FD51                  ; Execute coordinate validation
+    JSR.W .BattleMessage_QueueSystem                  ; Execute coordinate validation
     STY.W $1A31                        ; Store validated coordinate
     LDY.W $1A4A                        ; Load coordinate processing context
     STY.W $1A2F                        ; Store coordinate context
@@ -8844,7 +8844,7 @@ Sprite_Processing_Loop:
     PHY                                ; Preserve sprite index
     LDY.W $1A31                        ; Load sprite coordinate reference
     LDA.W $1A33                        ; Load sprite processing flags
-    JSR.W CODE_01FC8F                  ; Execute sprite coordinate transformation
+    JSR.W .BattleDialogue_WaitForInput                  ; Execute sprite coordinate transformation
     PLY                                ; Restore sprite index
     REP #$20                           ; Set 16-bit accumulator mode
     LDA.W $1A3D                        ; Load sprite data component 1
@@ -8901,7 +8901,7 @@ Advanced_Sprite_Buffer_Management:
     CLC                                ; Clear carry for extended calculation
     ADC.W $1A0D                        ; Add configuration extended offset
     STA.W $1A09                        ; Store sprite buffer extended secondary
-    JSR.W CODE_01FD25                  ; Execute sprite buffer finalization
+    JSR.W .BattleDialogue_AdvanceText                  ; Execute sprite buffer finalization
     STA.W $19FB                        ; Store sprite buffer result
     CLC                                ; Clear carry for result calculation
     ADC.W #$0020                       ; Add sprite buffer increment
@@ -8925,7 +8925,7 @@ Alternative_Sprite_Loop:
     PHY                                ; Preserve alternative sprite index
     LDY.W $1A31                        ; Load alternative sprite coordinate
     LDA.W $1A33                        ; Load alternative sprite flags
-    JSR.W CODE_01FC8F                  ; Execute alternative sprite transformation
+    JSR.W .BattleDialogue_WaitForInput                  ; Execute alternative sprite transformation
     PLY                                ; Restore alternative sprite index
     REP #$20                           ; Set 16-bit accumulator mode
     LDA.W $1A3D                        ; Load alternative sprite component 1
@@ -8982,7 +8982,7 @@ Alternative_Sprite_Buffer_Management:
     CLC                                ; Clear carry for alternative extended calc
     ADC.W $1A0D                        ; Add alternative extended offset
     STA.W $1A09                        ; Store alternative buffer extended secondary
-    JSR.W CODE_01FD25                  ; Execute alternative buffer finalization
+    JSR.W .BattleDialogue_AdvanceText                  ; Execute alternative buffer finalization
     STA.W $19FB                        ; Store alternative buffer result
     INC A                              ; Increment alternative result
     STA.W $19FD                        ; Store alternative buffer next
@@ -9008,7 +9008,7 @@ Memory_Graphics_Processing_Loop:
     PHY                                ; Preserve memory graphics index
     LDY.W $1A31                        ; Load memory graphics coordinate
     LDA.W $1A33                        ; Load memory graphics flags
-    JSR.W CODE_01FC8F                  ; Execute memory graphics transformation
+    JSR.W .BattleDialogue_WaitForInput                  ; Execute memory graphics transformation
     PLY                                ; Restore memory graphics index
     REP #$20                           ; Set 16-bit accumulator mode
     LDA.W $1A3D                        ; Load memory graphics component 1
@@ -9065,7 +9065,7 @@ Advanced_Memory_Graphics_Buffer_Management:
     CLC                                ; Clear carry for extended calculation
     ADC.W $1A26                        ; Add configuration extended offset
     STA.W $1A22                        ; Store memory graphics extended secondary
-    JSR.W CODE_01FD25                  ; Execute memory graphics finalization
+    JSR.W .BattleDialogue_AdvanceText                  ; Execute memory graphics finalization
     ORA.W #$0800                       ; Set memory graphics bank flag
     STA.W $1A14                        ; Store memory graphics result
     CLC                                ; Clear carry for result calculation
@@ -9090,7 +9090,7 @@ Alternative_Memory_Graphics_Loop:
     PHY                                ; Preserve alternative memory index
     LDY.W $1A31                        ; Load alternative memory coordinate
     LDA.W $1A33                        ; Load alternative memory flags
-    JSR.W CODE_01FC8F                  ; Execute alternative memory transformation
+    JSR.W .BattleDialogue_WaitForInput                  ; Execute alternative memory transformation
     PLY                                ; Restore alternative memory index
     REP #$20                           ; Set 16-bit accumulator mode
     LDA.W $1A3D                        ; Load alternative memory component 1
@@ -9147,7 +9147,7 @@ Alternative_Memory_Buffer_Management:
     CLC                                ; Clear carry for alternative extended calc
     ADC.W $1A26                        ; Add alternative extended offset
     STA.W $1A22                        ; Store alternative memory extended secondary
-    JSR.W CODE_01FD25                  ; Execute alternative memory finalization
+    JSR.W .BattleDialogue_AdvanceText                  ; Execute alternative memory finalization
     ORA.W #$0800                       ; Set alternative memory bank flag
     STA.W $1A14                        ; Store alternative memory result
     INC A                              ; Increment alternative result
@@ -9163,7 +9163,7 @@ Alternative_Memory_Buffer_Management:
 
 ; Advanced Coordinate Transformation Engine
 ; Sophisticated coordinate transformation with mathematical precision
-CODE_01FC8F:
+.BattleDialogue_WaitForInput:
     STA.W $1A3A                        ; Store coordinate transformation flags
     REP #$20                           ; Set 16-bit accumulator mode
     TYA                                ; Transfer Y coordinate to accumulator
@@ -9248,7 +9248,7 @@ Coordinate_Attribute_Special:
 
 ; Advanced Graphics Buffer Finalization System
 ; Sophisticated buffer finalization with mathematical precision
-CODE_01FD25:
+.BattleDialogue_AdvanceText:
     SEP #$20                           ; Set 8-bit accumulator mode
     LDX.W #$0000                       ; Initialize buffer finalization index
     LDA.W $19BF                        ; Load graphics buffer configuration
@@ -9277,7 +9277,7 @@ DATA8_01FD4D:
 
 ; Advanced Coordinate Validation Engine
 ; Sophisticated coordinate validation with boundary management
-CODE_01FD51:
+.BattleMessage_QueueSystem:
     REP #$20                           ; Set 16-bit accumulator mode
     TYA                                ; Transfer Y coordinate to accumulator
     SEP #$20                           ; Set 8-bit accumulator mode
@@ -9312,7 +9312,7 @@ Coordinate_Validation_Complete:
 
 ; Advanced Bank-Switched Graphics Processing System
 ; Sophisticated graphics processing with bank switching and DMA
-CODE_01FD7C:
+.BattleMessage_DisplayNext:
     PHB                                ; Preserve data bank register
     LDA.B #$05                         ; Set graphics processing bank
     PHA                                ; Push bank for switching
@@ -9409,7 +9409,7 @@ Palette_Transfer_Loop:
 
 ; Advanced DMA Graphics Transfer System
 ; Sophisticated DMA transfer with memory management
-CODE_01FE0C:
+.BattleMessage_ClearBuffer:
     PHB                                ; Preserve data bank register
     LDA.B #$04                         ; Set DMA transfer bank
     PHA                                ; Push DMA bank for switching
@@ -9490,7 +9490,7 @@ Final_Graphics_Processing:
     ASL A                              ; Shift for final processing indexing
     TAX                                ; Transfer final processing index
     JSR.W (DATA8_01FE7B,X)             ; Execute final processing function
-    JSR.W CODE_01FFC2                  ; Execute final graphics coordination
+    JSR.W BattleGraphics_FinalCoordination                  ; Execute final graphics coordination
     RTS                                ; Return final graphics processing complete
 
 ; Final Processing Function Table
@@ -9553,7 +9553,7 @@ db $FF,$FF,$FF,$FF,$FF               ; System termination marker
 
 ; Advanced System Coordination and Finalization Engine
 ; Final comprehensive system coordination with complete integration
-CODE_01FFC2:
+BattleGraphics_FinalCoordination:
     LDA.W $0E89                        ; Load environment coordination context
     SEC                                ; Set carry for coordinate adjustment
     SBC.B #$08                         ; Subtract coordinate offset for precision
@@ -9571,7 +9571,7 @@ CODE_01FFC2:
 ; Advanced system-wide coordination with comprehensive processing
 Final_System_Coordination_Loop:
     PHX                                ; Preserve system coordination index
-    JSR.W CODE_01F978                  ; Execute advanced coordinate processing
+    JSR.W .BattleWindow_DrawBorder                  ; Execute advanced coordinate processing
     JSR.W CODE_0183BF                  ; Execute system integration coordination
     INC.W $192E                        ; Increment coordinate processing sequence
     PLX                                ; Restore system coordination index
