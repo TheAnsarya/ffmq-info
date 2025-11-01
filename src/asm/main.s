@@ -1,4 +1,4 @@
-; Final Fantasy Mystic Quest (SNES) - Main Assembly File
+﻿; Final Fantasy Mystic Quest (SNES) - Main Assembly File
 ; Modern SNES Development Environment
 ; Assembled with ca65/asar
 
@@ -26,7 +26,7 @@
 .endro
 
 ; ROM Header (SNES format)
-.orga $00FFC0
+.orga $00ffc0
 .db "FF MYSTIC QUEST     "      ; ROM Title (21 bytes)
 .db $30                         ; ROM Speed/Type: LoROM, FastROM
 .db $02                         ; Cartridge Type: ROM + SRAM
@@ -40,7 +40,7 @@
 .dw $0000, $0000               ; Complement, Checksum
 
 ; Interrupt Vectors
-.orga $00FFE4
+.orga $00ffe4
 .dw EmulationCOP               ; COP (Emulation)
 .dw EmulationBRK               ; BRK (Emulation)
 .dw EmulationABORT             ; ABORT (Emulation)

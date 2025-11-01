@@ -1,353 +1,353 @@
-﻿														; ===========================================================================
-														; Graphics Transfer - Battle Mode
-														; ===========================================================================
-														; Purpose: Upload battle graphics to VRAM during battle transitions
-														; Technical Details: Transfers character tiles and tilemap data
-														; Registers Used: A, X, Y
-														; ===========================================================================
+﻿; ===========================================================================
+; Graphics Transfer - Battle Mode
+; ===========================================================================
+; Purpose: Upload battle graphics to VRAM during battle transitions
+; Technical Details: Transfers character tiles and tilemap data
+; Registers Used: A, X, Y
+; ===========================================================================
 
 CODE_008577:
-														; Setup VRAM address for character data
-					   LDX.W				   #$4400	; VRAM address $4400
-					   STX.W				   SNES_VMADDL ; Set VRAM write address
+; Setup VRAM address for character data
+	ldx.W				   #$4400	; VRAM address $4400
+	stx.W				   SNES_VMADDL ; Set VRAM write address
 
-														; Configure DMA for 2-byte sequential write (VMDATAL/VMDATAH)
-					   LDX.W				   #$1801	; DMA mode: word write, increment source
-					   STX.B				   SNES_DMA5PARAM-$4300 ; Set DMA5 parameters
+; Configure DMA for 2-byte sequential write (VMDATAL/VMDATAH)
+	ldx.W				   #$1801	; DMA mode: word write, increment source
+	stx.B				   SNES_DMA5PARAM-$4300 ; Set DMA5 parameters
 
-														; Transfer character graphics from $7F0480
-					   LDX.W				   #$0480	; Source: $7F0480
-					   STX.B				   SNES_DMA5ADDRL-$4300 ; Set source address (low/mid)
-					   LDA.B				   #$7F	  ; Bank $7F (WRAM)
-					   STA.B				   SNES_DMA5ADDRH-$4300 ; Set source bank
-					   LDX.W				   #$0280	; Transfer size: $0280 bytes (640 bytes)
-					   STX.B				   SNES_DMA5CNTL-$4300 ; Set transfer size
-					   LDA.B				   #$20	  ; Trigger DMA channel 5
-					   STA.W				   SNES_MDMAEN ; Execute transfer
+; Transfer character graphics from $7f0480
+	ldx.W				   #$0480	; Source: $7f0480
+	stx.B				   SNES_DMA5ADDRL-$4300 ; Set source address (low/mid)
+	lda.B				   #$7f	  ; Bank $7f (WRAM)
+	sta.B				   SNES_DMA5ADDRH-$4300 ; Set source bank
+	ldx.W				   #$0280	; Transfer size: $0280 bytes (640 bytes)
+	stx.B				   SNES_DMA5CNTL-$4300 ; Set transfer size
+	lda.B				   #$20	  ; Trigger DMA channel 5
+	sta.W				   SNES_MDMAEN ; Execute transfer
 
-														; Transfer tilemap data to VRAM $5820
-					   LDX.W				   #$5820	; VRAM address $5820
-					   STX.W				   SNES_VMADDL ; Set VRAM write address
-					   LDX.W				   #$2040	; Source: $7E2040
-					   STX.B				   SNES_DMA5ADDRL-$4300 ; Set source address
-					   LDA.B				   #$7E	  ; Bank $7E (WRAM)
-					   STA.B				   SNES_DMA5ADDRH-$4300 ; Set source bank
-					   LDX.W				   #$0B00	; Transfer size: $0B00 bytes (2816 bytes)
-					   STX.B				   SNES_DMA5CNTL-$4300 ; Set transfer size
-					   LDA.B				   #$20	  ; Trigger DMA channel 5
-					   STA.W				   SNES_MDMAEN ; Execute transfer
+; Transfer tilemap data to VRAM $5820
+	ldx.W				   #$5820	; VRAM address $5820
+	stx.W				   SNES_VMADDL ; Set VRAM write address
+	ldx.W				   #$2040	; Source: $7e2040
+	stx.B				   SNES_DMA5ADDRL-$4300 ; Set source address
+	lda.B				   #$7e	  ; Bank $7e (WRAM)
+	sta.B				   SNES_DMA5ADDRH-$4300 ; Set source bank
+	ldx.W				   #$0b00	; Transfer size: $0b00 bytes (2816 bytes)
+	stx.B				   SNES_DMA5CNTL-$4300 ; Set transfer size
+	lda.B				   #$20	  ; Trigger DMA channel 5
+	sta.W				   SNES_MDMAEN ; Execute transfer
 
-														; Set flag indicating graphics updated
-					   LDA.B				   #$40	  ; Bit 6 flag
-					   TSB.W				   $00D2	 ; Set bit in status flags
-					   JSR.W				   CODE_008543 ; Transfer OAM data
-					   RTL							   ; Return from long call
+; Set flag indicating graphics updated
+	lda.B				   #$40	  ; Bit 6 flag
+	tsb.W				   $00d2	 ; Set bit in status flags
+	jsr.W				   CODE_008543 ; Transfer OAM data
+	rtl							   ; Return from long call
 
-														; ===========================================================================
-														; Graphics Update - Field Mode
-														; ===========================================================================
-														; Purpose: Update field/map graphics during gameplay
-														; Technical Details: Conditional updates based on game state flags
-														; Side Effects: Updates VRAM, modifies status flags
-														; ===========================================================================
+; ===========================================================================
+; Graphics Update - Field Mode
+; ===========================================================================
+; Purpose: Update field/map graphics during gameplay
+; Technical Details: Conditional updates based on game state flags
+; Side Effects: Updates VRAM, modifies status flags
+; ===========================================================================
 
 CODE_0085B7:
-														; Setup VRAM for vertical increment mode
-					   LDA.B				   #$80	  ; Increment after writing to $2119
-					   STA.W				   SNES_VMAINC ; Set VRAM increment mode
+; Setup VRAM for vertical increment mode
+	lda.B				   #$80	  ; Increment after writing to $2119
+	sta.W				   SNES_VMAINC ; Set VRAM increment mode
 
-														; Check if battle mode graphics needed
-					   LDA.B				   #$10	  ; Check bit 4 of display flags
-					   AND.W				   $00DA	 ; Test against display status
-					   BNE					 CODE_008577 ; If set, do battle graphics transfer
+; Check if battle mode graphics needed
+	lda.B				   #$10	  ; Check bit 4 of display flags
+	and.W				   $00da	 ; Test against display status
+	bne					 CODE_008577 ; If set, do battle graphics transfer
 
-														; Field mode graphics update
-					   LDX.W				   $0042	 ; Get current VRAM address from variable
-					   STX.W				   SNES_VMADDL ; Set VRAM write address
+; Field mode graphics update
+	ldx.W				   $0042	 ; Get current VRAM address from variable
+	stx.W				   SNES_VMADDL ; Set VRAM write address
 
-														; Setup DMA for character tile transfer
-					   LDX.W				   #$1801	; DMA mode: word write, increment
-					   STX.B				   SNES_DMA5PARAM-$4300 ; Set DMA5 parameters
-					   LDX.W				   #$0040	; Source: $7F0040
-					   STX.B				   SNES_DMA5ADDRL-$4300 ; Set source address
-					   LDA.B				   #$7F	  ; Bank $7F (WRAM)
-					   STA.B				   SNES_DMA5ADDRH-$4300 ; Set source bank
-					   LDX.W				   #$07C0	; Transfer size: $07C0 bytes (1984 bytes)
-					   STX.B				   SNES_DMA5CNTL-$4300 ; Set transfer size
-					   LDA.B				   #$20	  ; Trigger DMA channel 5
-					   STA.W				   SNES_MDMAEN ; Execute transfer
+; Setup DMA for character tile transfer
+	ldx.W				   #$1801	; DMA mode: word write, increment
+	stx.B				   SNES_DMA5PARAM-$4300 ; Set DMA5 parameters
+	ldx.W				   #$0040	; Source: $7f0040
+	stx.B				   SNES_DMA5ADDRL-$4300 ; Set source address
+	lda.B				   #$7f	  ; Bank $7f (WRAM)
+	sta.B				   SNES_DMA5ADDRH-$4300 ; Set source bank
+	ldx.W				   #$07c0	; Transfer size: $07c0 bytes (1984 bytes)
+	stx.B				   SNES_DMA5CNTL-$4300 ; Set transfer size
+	lda.B				   #$20	  ; Trigger DMA channel 5
+	sta.W				   SNES_MDMAEN ; Execute transfer
 
-					   REP					 #$30		; 16-bit A, X, Y
-					   CLC							   ; Clear carry for addition
-					   LDA.W				   $0042	 ; Get VRAM address
-					   ADC.W				   #$1000	; Add $1000 for next section
-					   STA.W				   SNES_VMADDL ; Set new VRAM address
-					   SEP					 #$20		; 8-bit A
+	rep					 #$30		; 16-bit A, X, Y
+	clc							   ; Clear carry for addition
+	lda.W				   $0042	 ; Get VRAM address
+	adc.W				   #$1000	; Add $1000 for next section
+	sta.W				   SNES_VMADDL ; Set new VRAM address
+	sep					 #$20		; 8-bit A
 
-														; Transfer second section of tiles
-					   LDX.W				   #$1801	; DMA mode: word write
-					   STX.B				   SNES_DMA5PARAM-$4300 ; Set DMA5 parameters
-					   LDX.W				   #$1040	; Source: $7F1040
-					   STX.B				   SNES_DMA5ADDRL-$4300 ; Set source address
-					   LDA.B				   #$7F	  ; Bank $7F (WRAM)
-					   STA.B				   SNES_DMA5ADDRH-$4300 ; Set source bank
-					   LDX.W				   #$07C0	; Transfer size: $07C0 bytes
-					   STX.B				   SNES_DMA5CNTL-$4300 ; Set transfer size
-					   LDA.B				   #$20	  ; Trigger DMA channel 5
-					   STA.W				   SNES_MDMAEN ; Execute transfer
+; Transfer second section of tiles
+	ldx.W				   #$1801	; DMA mode: word write
+	stx.B				   SNES_DMA5PARAM-$4300 ; Set DMA5 parameters
+	ldx.W				   #$1040	; Source: $7f1040
+	stx.B				   SNES_DMA5ADDRL-$4300 ; Set source address
+	lda.B				   #$7f	  ; Bank $7f (WRAM)
+	sta.B				   SNES_DMA5ADDRH-$4300 ; Set source bank
+	ldx.W				   #$07c0	; Transfer size: $07c0 bytes
+	stx.B				   SNES_DMA5CNTL-$4300 ; Set transfer size
+	lda.B				   #$20	  ; Trigger DMA channel 5
+	sta.W				   SNES_MDMAEN ; Execute transfer
 
-														; Check if tilemap update needed
-					   LDA.B				   #$80	  ; Check bit 7
-					   AND.W				   $00D6	 ; Test display flags
-					   BEQ					 CODE_00862D ; If clear, skip tilemap transfer
+; Check if tilemap update needed
+	lda.B				   #$80	  ; Check bit 7
+	and.W				   $00d6	 ; Test display flags
+	beq					 CODE_00862D ; If clear, skip tilemap transfer
 
-														; Transfer tilemap data
-					   LDX.W				   #$5820	; VRAM address $5820
-					   STX.W				   SNES_VMADDL ; Set VRAM write address
-					   LDX.W				   #$1801	; DMA mode: word write
-					   STX.B				   SNES_DMA5PARAM-$4300 ; Set DMA5 parameters
-					   LDX.W				   #$2040	; Source: $7E2040
-					   STX.B				   SNES_DMA5ADDRL-$4300 ; Set source address
-					   LDA.B				   #$7E	  ; Bank $7E (WRAM)
-					   STA.B				   SNES_DMA5ADDRH-$4300 ; Set source bank
-					   LDX.W				   #$0FC0	; Transfer size: $0FC0 bytes (4032 bytes)
-					   STX.B				   SNES_DMA5CNTL-$4300 ; Set transfer size
-					   LDA.B				   #$20	  ; Trigger DMA channel 5
-					   STA.W				   SNES_MDMAEN ; Execute transfer
-					   RTL							   ; Return
+; Transfer tilemap data
+	ldx.W				   #$5820	; VRAM address $5820
+	stx.W				   SNES_VMADDL ; Set VRAM write address
+	ldx.W				   #$1801	; DMA mode: word write
+	stx.B				   SNES_DMA5PARAM-$4300 ; Set DMA5 parameters
+	ldx.W				   #$2040	; Source: $7e2040
+	stx.B				   SNES_DMA5ADDRL-$4300 ; Set source address
+	lda.B				   #$7e	  ; Bank $7e (WRAM)
+	sta.B				   SNES_DMA5ADDRH-$4300 ; Set source bank
+	ldx.W				   #$0fc0	; Transfer size: $0fc0 bytes (4032 bytes)
+	stx.B				   SNES_DMA5CNTL-$4300 ; Set transfer size
+	lda.B				   #$20	  ; Trigger DMA channel 5
+	sta.W				   SNES_MDMAEN ; Execute transfer
+	rtl							   ; Return
 
 CODE_00862D:
-					   JSR.W				   CODE_008543 ; Transfer OAM data
+	jsr.W				   CODE_008543 ; Transfer OAM data
 
-														; Check if additional display update needed
-					   LDA.B				   #$20	  ; Check bit 5
-					   AND.W				   $00D6	 ; Test display flags
-					   BEQ					 CODE_00863C ; If clear, exit
-					   LDA.B				   #$78	  ; Set multiple flags (bits 3,4,5,6)
-					   TSB.W				   $00D4	 ; Set bits in status register
+; Check if additional display update needed
+	lda.B				   #$20	  ; Check bit 5
+	and.W				   $00d6	 ; Test display flags
+	beq					 CODE_00863C ; If clear, exit
+	lda.B				   #$78	  ; Set multiple flags (bits 3,4,5,6)
+	tsb.W				   $00d4	 ; Set bits in status register
 
 CODE_00863C:
-					   RTL							   ; Return
+	rtl							   ; Return
 
-														; ===========================================================================
-														; Main Game Loop - Frame Update
-														; ===========================================================================
-														; Purpose: Main game logic executed every frame
-														; Technical Details: Increments frame counter, processes game state
-														; ===========================================================================
+; ===========================================================================
+; Main Game Loop - Frame Update
+; ===========================================================================
+; Purpose: Main game logic executed every frame
+; Technical Details: Increments frame counter, processes game state
+; ===========================================================================
 
 CODE_008966:
-					   REP					 #$30		; 16-bit A, X, Y
-					   LDA.W				   #$0000	; Zero accumulator
-					   TCD							   ; Transfer to direct page (DP = $0000)
+	rep					 #$30		; 16-bit A, X, Y
+	lda.W				   #$0000	; Zero accumulator
+	tcd							   ; Transfer to direct page (DP = $0000)
 
-														; Increment frame counter (24-bit value)
-					   INC.W				   $0E97	 ; Increment low word
-					   BNE					 Skip_High_Increment ; If no overflow, skip high word
-					   INC.W				   $0E99	 ; Increment high word (24-bit counter)
+; Increment frame counter (24-bit value)
+	inc.W				   $0e97	 ; Increment low word
+	bne					 Skip_High_Increment ; If no overflow, skip high word
+	inc.W				   $0e99	 ; Increment high word (24-bit counter)
 
 Skip_High_Increment:
-					   JSR.W				   CODE_0089C6 ; Process time-based events
+	jsr.W				   CODE_0089C6 ; Process time-based events
 
-														; Check if full screen refresh needed
-					   LDA.W				   #$0004	; Check bit 2
-					   AND.W				   $00D4	 ; Test display flags
-					   BEQ					 Normal_Frame_Update ; If clear, do normal update
+; Check if full screen refresh needed
+	lda.W				   #$0004	; Check bit 2
+	and.W				   $00d4	 ; Test display flags
+	beq					 Normal_Frame_Update ; If clear, do normal update
 
-														; Full screen refresh (mode change)
-					   LDA.W				   #$0004	; Bit 2
-					   TRB.W				   $00D4	 ; Clear bit in flags
+; Full screen refresh (mode change)
+	lda.W				   #$0004	; Bit 2
+	trb.W				   $00d4	 ; Clear bit in flags
 
-														; Redraw layer 1
-					   LDA.W				   #$0000	; Layer 1 index
-					   JSR.W				   CODE_0091D4 ; Redraw layer routine
-					   JSR.W				   CODE_008C3D ; Additional layer 1 processing
+; Redraw layer 1
+	lda.W				   #$0000	; Layer 1 index
+	jsr.W				   CODE_0091D4 ; Redraw layer routine
+	jsr.W				   CODE_008C3D ; Additional layer 1 processing
 
-														; Redraw layer 2
-					   LDA.W				   #$0001	; Layer 2 index
-					   JSR.W				   CODE_0091D4 ; Redraw layer routine
-					   JSR.W				   CODE_008D29 ; Additional layer 2 processing
-					   BRA					 Frame_Update_Done ; Skip normal update
+; Redraw layer 2
+	lda.W				   #$0001	; Layer 2 index
+	jsr.W				   CODE_0091D4 ; Redraw layer routine
+	jsr.W				   CODE_008D29 ; Additional layer 2 processing
+	bra					 Frame_Update_Done ; Skip normal update
 
 Normal_Frame_Update:
-					   JSR.W				   CODE_008BFD ; Normal frame processing
+	jsr.W				   CODE_008BFD ; Normal frame processing
 
-														; Check if input processing allowed
-					   LDA.W				   #$0010	; Check bit 4
-					   AND.W				   $00DA	 ; Test input flags
-					   BNE					 Process_Input ; If set, process input
+; Check if input processing allowed
+	lda.W				   #$0010	; Check bit 4
+	and.W				   $00da	 ; Test input flags
+	bne					 Process_Input ; If set, process input
 
-														; Check alternate input enable flag
-					   LDA.W				   #$0004	; Check bit 2
-					   AND.W				   $00E2	 ; Test alternate flags
-					   BNE					 Frame_Update_Done ; If set, skip input
+; Check alternate input enable flag
+	lda.W				   #$0004	; Check bit 2
+	and.W				   $00e2	 ; Test alternate flags
+	bne					 Frame_Update_Done ; If set, skip input
 
 Process_Input:
-														; Process controller input
-					   LDA.B				   $07	   ; Get joypad state
-					   AND.B				   $8E	   ; Mask with enabled buttons
-					   BEQ					 Frame_Update_Done ; If no buttons pressed, done
+; Process controller input
+	lda.B				   $07	   ; Get joypad state
+	and.B				   $8e	   ; Mask with enabled buttons
+	beq					 Frame_Update_Done ; If no buttons pressed, done
 
-														; Execute input handler
-					   JSL.L				   CODE_009730 ; Get input handler function
-					   SEP					 #$30		; 8-bit A, X, Y
-					   ASL					 A		   ; Multiply by 2 (word pointer)
-					   TAX							   ; Transfer to X
-					   JSR.W				   (CODE_008A35,X) ; Call input handler via table
+; Execute input handler
+	jsl.L				   CODE_009730 ; Get input handler function
+	sep					 #$30		; 8-bit A, X, Y
+	asl					 a; Multiply by 2 (word pointer)
+	tax							   ; Transfer to X
+	jsr.W				   (CODE_008A35,x) ; Call input handler via table
 
 Frame_Update_Done:
-					   REP					 #$30		; 16-bit A, X, Y
-					   JSR.W				   CODE_009342 ; Update sprites
-					   JSR.W				   CODE_009264 ; Update animations
-					   RTL							   ; Return to caller
+	rep					 #$30		; 16-bit A, X, Y
+	jsr.W				   CODE_009342 ; Update sprites
+	jsr.W				   CODE_009264 ; Update animations
+	rtl							   ; Return to caller
 
-														; ===========================================================================
-														; Time-Based Event Processor
-														; ===========================================================================
-														; Purpose: Process events that occur at specific time intervals
-														; Technical Details: Checks status flags for various timed events
-														; ===========================================================================
+; ===========================================================================
+; Time-Based Event Processor
+; ===========================================================================
+; Purpose: Process events that occur at specific time intervals
+; Technical Details: Checks status flags for various timed events
+; ===========================================================================
 
 CODE_0089C6:
-					   PHD							   ; Preserve direct page
+	phd							   ; Preserve direct page
 
-														; Check if character status animation active
-					   LDA.W				   #$0080	; Check bit 7
-					   AND.W				   $00DE	 ; Test animation flags
-					   BEQ					 Time_Events_Done ; If clear, no status animation
+; Check if character status animation active
+	lda.W				   #$0080	; Check bit 7
+	and.W				   $00de	 ; Test animation flags
+	beq					 Time_Events_Done ; If clear, no status animation
 
-														; Process character status animation
-					   LDA.W				   #$0C00	; Direct page = $0C00
-					   TCD							   ; Set DP to character data area
+; Process character status animation
+	lda.W				   #$0c00	; Direct page = $0c00
+	tcd							   ; Set DP to character data area
 
-					   SEP					 #$30		; 8-bit A, X, Y
+	sep					 #$30		; 8-bit A, X, Y
 
-														; Decrement animation timer
-					   DEC.W				   $010D	 ; Decrement timer
-					   BPL					 Time_Events_Done ; If still positive, done
+; Decrement animation timer
+	dec.W				   $010d	 ; Decrement timer
+	bpl					 Time_Events_Done ; If still positive, done
 
-														; Timer expired, reset and check character slots
-					   LDA.B				   #$0C	  ; Reset timer to 12 frames
-					   STA.W				   $010D	 ; Store timer
+; Timer expired, reset and check character slots
+	lda.B				   #$0c	  ; Reset timer to 12 frames
+	sta.W				   $010d	 ; Store timer
 
-														; Check character slot 1 (Reuben/Kaeli)
-					   LDA.L				   $700027   ; Check character 1 in party
-					   BNE					 Check_Slot_2 ; If present, skip animation
-					   LDX.B				   #$40	  ; Animation offset for slot 1
-					   JSR.W				   CODE_008A2A ; Animate status icon
+; Check character slot 1 (Reuben/Kaeli)
+	lda.L				   $700027   ; Check character 1 in party
+	bne					 Check_Slot_2 ; If present, skip animation
+	ldx.B				   #$40	  ; Animation offset for slot 1
+	jsr.W				   CODE_008A2A ; Animate status icon
 
 Check_Slot_2:
-														; Check character slot 2 (Phoebe)
-					   LDA.L				   $700077   ; Check character 2 in party
-					   BNE					 Check_Slot_3 ; If present, skip animation
-					   LDX.B				   #$50	  ; Animation offset for slot 2
-					   JSR.W				   CODE_008A2A ; Animate status icon
+; Check character slot 2 (Phoebe)
+	lda.L				   $700077   ; Check character 2 in party
+	bne					 Check_Slot_3 ; If present, skip animation
+	ldx.B				   #$50	  ; Animation offset for slot 2
+	jsr.W				   CODE_008A2A ; Animate status icon
 
 Check_Slot_3:
-														; Check character slot 3 (Tristam)
-					   LDA.L				   $7003B3   ; Check character 3 in party
-					   BNE					 Check_Slot_4 ; If present, skip animation
-					   LDX.B				   #$60	  ; Animation offset for slot 3
-					   JSR.W				   CODE_008A2A ; Animate status icon
+; Check character slot 3 (Tristam)
+	lda.L				   $7003b3   ; Check character 3 in party
+	bne					 Check_Slot_4 ; If present, skip animation
+	ldx.B				   #$60	  ; Animation offset for slot 3
+	jsr.W				   CODE_008A2A ; Animate status icon
 
 Check_Slot_4:
-														; Check character slot 4 (Enemy/Guest)
-					   LDA.L				   $700403   ; Check character 4 in party
-					   BNE					 Time_Events_Done ; If present, skip animation
-					   LDX.B				   #$70	  ; Animation offset for slot 4
-					   JSR.W				   CODE_008A2A ; Animate status icon
+; Check character slot 4 (Enemy/Guest)
+	lda.L				   $700403   ; Check character 4 in party
+	bne					 Time_Events_Done ; If present, skip animation
+	ldx.B				   #$70	  ; Animation offset for slot 4
+	jsr.W				   CODE_008A2A ; Animate status icon
 
 Time_Events_Done:
-					   PLD							   ; Restore direct page
-					   RTS							   ; Return
+	pld							   ; Restore direct page
+	rts							   ; Return
 
-														; ===========================================================================
-														; Character Status Icon Animation
-														; ===========================================================================
-														; Purpose: Animate status icons for inactive/KO'd characters
-														; Input: X = OAM offset for character slot
-														; ===========================================================================
+; ===========================================================================
+; Character Status Icon Animation
+; ===========================================================================
+; Purpose: Animate status icons for inactive/KO'd characters
+; Input: X = OAM offset for character slot
+; ===========================================================================
 
 CODE_008A2A:
-														; TODO: Document status icon animation logic
-														; Cycles through animation frames for defeated/inactive characters
+; TODO: Document status icon animation logic
+; Cycles through animation frames for defeated/inactive characters
 RTS_Label:
 
-														; ===========================================================================
-														; Input Handler Jump Table
-														; ===========================================================================
+; ===========================================================================
+; Input Handler Jump Table
+; ===========================================================================
 
 CODE_008A35:
-														; TODO: Document input handler addresses
-														; Table of function pointers for different game modes
-dw											 Input_Handler_Field
-dw											 Input_Handler_Battle
-dw											 Input_Handler_Menu
-														; ... more handlers
+; TODO: Document input handler addresses
+; Table of function pointers for different game modes
+	dw											 Input_Handler_Field
+	dw											 Input_Handler_Battle
+	dw											 Input_Handler_Menu
+; ... more handlers
 
-														; ===========================================================================
-														; VBlank Main Handler
-														; ===========================================================================
-														; Purpose: Main VBlank routine that processes display updates
-														; Technical Details: Called every frame during VBlank period
-														; Side Effects: Updates VRAM, OAM, palettes based on flags
-														; ===========================================================================
+; ===========================================================================
+; VBlank Main Handler
+; ===========================================================================
+; Purpose: Main VBlank routine that processes display updates
+; Technical Details: Called every frame during VBlank period
+; Side Effects: Updates VRAM, OAM, palettes based on flags
+; ===========================================================================
 
 VBlank_Main_Handler:
-					   SEP					 #$20		; 8-bit A
-					   REP					 #$10		; 16-bit X, Y
+	sep					 #$20		; 8-bit A
+	rep					 #$10		; 16-bit X, Y
 
-														; Check if text window updates needed
-					   LDA.B				   #$20	  ; Check bit 5
-					   AND.W				   $00D4	 ; Test display flags
-					   BEQ					 Skip_Window_Update ; If clear, skip window update
+; Check if text window updates needed
+	lda.B				   #$20	  ; Check bit 5
+	and.W				   $00d4	 ; Test display flags
+	beq					 Skip_Window_Update ; If clear, skip window update
 
-														; Update text window tiles
-					   LDA.B				   #$20	  ; Bit 5
-					   TRB.W				   $00D4	 ; Clear bit in flags
+; Update text window tiles
+	lda.B				   #$20	  ; Bit 5
+	trb.W				   $00d4	 ; Clear bit in flags
 
-														; Setup source/dest for MVN block move
-					   LDX.W				   #$54F4	; Source address (bank will be set)
-					   LDY.W				   #$54F6	; Destination address
-					   REP					 #$30		; 16-bit A, X, Y
+; Setup source/dest for MVN block move
+	ldx.W				   #$54f4	; Source address (bank will be set)
+	ldy.W				   #$54f6	; Destination address
+	rep					 #$30		; 16-bit A, X, Y
 
-														; Check game mode for window type
-					   LDA.W				   #$0080	; Check bit 7
-					   AND.W				   $0EC6	 ; Test game mode flags
-					   BNE					 Alternate_Window ; If set, use alternate window
+; Check game mode for window type
+	lda.W				   #$0080	; Check bit 7
+	and.W				   $0ec6	 ; Test game mode flags
+	bne					 Alternate_Window ; If set, use alternate window
 
-														; Standard text window
-					   LDA.W				   #$0024	; Tile value $24 (window border?)
-					   STA.L				   $7F54F4   ; Store to WRAM buffer
-					   LDA.W				   #$000B	; Move $000B bytes
-					   MVN					 $7F,$7F	 ; Block move within bank $7F
-					   LDA.W				   #$0026	; Tile value $26 (different border)
-					   STA.W				   $5500	 ; Store to WRAM
-					   LDA.W				   #$0009	; Move $0009 bytes
-					   MVN					 $7F,$7F	 ; Block move
-					   BRA					 Window_Updated ; Done
+; Standard text window
+	lda.W				   #$0024	; Tile value $24 (window border?)
+	sta.L				   $7f54f4   ; Store to WRAM buffer
+	lda.W				   #$000b	; Move $000b bytes
+	mvn					 $7f,$7f	 ; Block move within bank $7f
+	lda.W				   #$0026	; Tile value $26 (different border)
+	sta.W				   $5500	 ; Store to WRAM
+	lda.W				   #$0009	; Move $0009 bytes
+	mvn					 $7f,$7f	 ; Block move
+	bra					 Window_Updated ; Done
 
 Alternate_Window:
-														; Alternate text window (battle/menu?)
-					   LDA.W				   #$0020	; Tile value $20
-					   STA.L				   $7F54F4   ; Store to WRAM buffer
-					   LDA.W				   #$0015	; Move $0015 bytes (21 bytes)
-					   MVN					 $7F,$7F	 ; Block move
+; Alternate text window (battle/menu?)
+	lda.W				   #$0020	; Tile value $20
+	sta.L				   $7f54f4   ; Store to WRAM buffer
+	lda.W				   #$0015	; Move $0015 bytes (21 bytes)
+	mvn					 $7f,$7f	 ; Block move
 
 Window_Updated:
-					   SEP					 #$20		; 8-bit A
+	sep					 #$20		; 8-bit A
 
 Skip_Window_Update:
-					   PHK							   ; Push program bank
-					   PLB							   ; Pull to data bank (set DB = PB)
+	phk							   ; Push program bank
+	plb							   ; Pull to data bank (set DB = PB)
 
-														; Apply HDMA channel enable settings
-					   LDA.W				   $0111	 ; Get HDMA channel mask
-					   STA.W				   SNES_HDMAEN ; Write to HDMA enable register
+; Apply HDMA channel enable settings
+	lda.W				   $0111	 ; Get HDMA channel mask
+	sta.W				   SNES_HDMAEN ; Write to HDMA enable register
 
-					   RTL							   ; Return from VBlank handler
+	rtl							   ; Return from VBlank handler
 
-														;===============================================================================
-														; Progress: ~1,200 lines documented (8.6% of Bank $00)
-														; Remaining: ~12,800 lines
-														;===============================================================================
+;===============================================================================
+; Progress: ~1,200 lines documented (8.6% of Bank $00)
+; Remaining: ~12,800 lines
+;===============================================================================

@@ -1,4 +1,4 @@
-; Final Fantasy Mystic Quest - Initialization Routines
+﻿; Final Fantasy Mystic Quest - Initialization Routines
 ; Hardware and game initialization
 
 ; Clear all Work RAM
@@ -6,20 +6,20 @@ ClearWRAM:
     php                         ; Save processor status
     SetAXY16
     
-    ; Clear $7E0000-$7FFFFF (128KB)
+    ; Clear $7e0000-$7fffff (128KB)
     lda #$0000
     ldx #$0000
 @clear_7e:
-    sta $7E0000, x
+    sta $7e0000, x
     inx
     inx
-    cpx #$0000                  ; Will wrap to 0 after $FFFF
+    cpx #$0000                  ; Will wrap to 0 after $ffff
     bne @clear_7e
     
-    ; Clear $7F0000-$7FFFFF (64KB)
+    ; Clear $7f0000-$7fffff (64KB)
     ldx #$0000
 @clear_7f:
-    sta $7F0000, x
+    sta $7f0000, x
     inx
     inx
     cpx #$0000
@@ -134,7 +134,7 @@ ClearOAM:
     stz OAMADDH
     
     ; Clear 512 bytes of OAM data
-    lda #$E0                    ; Y position off-screen
+    lda #$e0                    ; Y position off-screen
     ldx #$00
 @clear_oam_loop:
     sta OAMDATA                 ; Y position
@@ -191,7 +191,7 @@ InitializeSound:
     ldx #$00
 @apu_wait:
     lda APUIO0
-    cmp #$AA                    ; Wait for APU ready signal
+    cmp #$aa                    ; Wait for APU ready signal
     beq @apu_ready
     inx
     bne @apu_wait
@@ -246,25 +246,25 @@ LoadDefaultPalette:
     stz CGDATA
     
     ; Color 1: White
-    lda #$FF
+    lda #$ff
     sta CGDATA
-    lda #$7F
+    lda #$7f
     sta CGDATA
     
     ; Color 2: Red
-    lda #$1F
+    lda #$1f
     sta CGDATA
     stz CGDATA
     
     ; Color 3: Green
-    lda #$E0
+    lda #$e0
     sta CGDATA
     lda #$03
     sta CGDATA
     
     ; Color 4: Blue
     stz CGDATA
-    lda #$7C
+    lda #$7c
     sta CGDATA
     
     ; Add more colors as needed...

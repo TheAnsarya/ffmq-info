@@ -1,4 +1,4 @@
-; ==============================================================================
+﻿; ==============================================================================
 ; Final Fantasy Mystic Quest (SNES) - Working Build v1.0
 ; ==============================================================================
 ; Project: FFMQ Reverse Engineering & Enhancement
@@ -25,8 +25,8 @@
 ; - Add quality-of-life improvements
 ; ==============================================================================
 
-lorom           ; LoROM memory mapping (SNES standard for this game)
-arch 65816      ; 65816 CPU (SNES processor)
+	lorom           ; LoROM memory mapping (SNES standard for this game)
+	arch 65816      ; 65816 CPU (SNES processor)
 
 ; ==============================================================================
 ; Configuration
@@ -39,15 +39,15 @@ arch 65816      ; 65816 CPU (SNES processor)
 ; Boot Sequence (Analyzed & Verified)
 ; ==============================================================================
 
-org $008000
+	org $008000
 ; Game entry point - First code executed when ROM loads
 ; Original game jumps to initialization routine from here
 MainEntryPoint:
 	clc                 ; Clear carry flag
 	xce					; Exchange carry/emulation - Set native mode (65816)
-	                    ; (Original code continues - not overridden yet)
-	; NOTE: In original, this calls initialization routines
-	; We preserve original behavior for now
+; (Original code continues - not overridden yet)
+; NOTE: In original, this calls initialization routines
+; We preserve original behavior for now
 
 ; ==============================================================================
 ; Utility Macros - Register Size Management
@@ -55,21 +55,21 @@ MainEntryPoint:
 ; The 65816 CPU can switch between 8-bit and 16-bit modes for A, X, Y registers
 ; These macros make the code more readable
 
-macro setAXYto8bit()
+	macro setAXYto8bit()
 	sep #$30        ; SEP (Set Processor status) - bits 4&5 = X/Y and M flags
-endmacro
+	endmacro
 
-macro setAXYto16bit()
+	macro setAXYto16bit()
 	rep #$30        ; REP (Reset Processor status) - switch to 16-bit mode
-endmacro
+	endmacro
 
-macro setAto16bit()
+	macro setAto16bit()
 	rep #$20        ; Set accumulator (A) to 16-bit only
-endmacro
+	endmacro
 
-macro setAto8bit()
+	macro setAto8bit()
 	sep #$20        ; Set accumulator (A) to 8-bit only
-endmacro
+	endmacro
 
 ; ==============================================================================
 ; Well-Understood Routines (Safe to Override)
@@ -94,14 +94,14 @@ endmacro
 
 ; --- Weapon Names ---
 ; pushpc
-; org $0642A0  ; Weapon names location in ROM
+; org $0642a0  ; Weapon names location in ROM
 ; ; Replace with extracted data (allows easy editing via text files)
 ; incsrc "../../assets/data/weapon_names.asm"
 ; pullpc
 
 ; --- Enemy Data ---
 ; pushpc
-; org $04F800  ; Enemy data location (approximate - needs verification)
+; org $04f800  ; Enemy data location (approximate - needs verification)
 ; ; Replace with extracted enemy stats (allows balance modifications)
 ; incsrc "../../assets/data/enemies.asm"
 ; pullpc
@@ -115,7 +115,7 @@ endmacro
 
 ; --- Dialog Text ---
 ; pushpc
-; org $03D636  ; Dialog pointer table
+; org $03d636  ; Dialog pointer table
 ; ; Replace with extracted dialog (enables translation, text editing)
 ; incsrc "../../assets/text/dialog.asm"
 ; pullpc
@@ -136,11 +136,11 @@ endmacro
 ; ==============================================================================
 
 ; NOTE: For 100% ROM match, the SNES header must match the original exactly.
-; The header at $00FFC0 contains the internal ROM name "FF MYSTIC QUEST     "
+; The header at $00ffc0 contains the internal ROM name "FF MYSTIC QUEST     "
 ; If you want to create a modified version, uncomment the lines below:
 ;
 ; pushpc
-; org $00FFC0     ; ROM header area (internal name location)
+; org $00ffc0     ; ROM header area (internal name location)
 ; db "FFMQ Enhanced v1.0", $00  ; Null-terminated string (21 bytes)
 ; pullpc
 ;

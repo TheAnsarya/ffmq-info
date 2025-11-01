@@ -1,9 +1,9 @@
-
+﻿
 
 
 ;--------------------------------------------------------------------
-pushpc
-org $008252
+	pushpc
+	org $008252
 
 
 ; DATA: DataFillValues8252 ($008252)
@@ -14,7 +14,7 @@ DataFillValues8252:
 
 
 ; pc should equal ????????
-pullpc
+	pullpc
 ;--------------------------------------------------------------------
 
 
@@ -22,8 +22,8 @@ pullpc
 
 
 ;--------------------------------------------------------------------
-pushpc
-org $009754
+	pushpc
+	org $009754
 
 
 ; ROUTINE: Text - TRB value at direct page with mask from DataBitMask[] ($009754)
@@ -33,11 +33,11 @@ org $009754
 ;		A => low byte: aaaaabbb
 ;			aaaaa - increment direct page by
 ;			bbb - this value is XOR'ed to flip the bits
-;				invert = index to table 
+;				invert = index to table
 ;				invert * 2 = address offset
 ;		directpage => base of destination address
 ; returns:
-;		ram $00:directpage => 
+;		ram $00:directpage =>
 ; notes:
 ;		always PHD before calling and PLD after
 TRBWithBitMask:
@@ -47,10 +47,10 @@ TRBWithBitMask:
 
 
 ; pc should equal $00975a
-pullpc;--------------------------------------------------------------------
+	pullpc;--------------------------------------------------------------------
 
-pushpc
-org $00975a
+	pushpc
+	org $00975a
 
 
 ; ROUTINE: AND value at directpage with value from DataBitMask[] into A ($00975a)
@@ -60,10 +60,10 @@ org $00975a
 ;		A => low byte: aaaaabbb
 ;			aaaaa - increment direct page by
 ;			bbb - this value is XOR'ed to flip the bits
-;				invert = index to table 
+;				invert = index to table
 ;				invert * 2 = address offset
 ; returns:
-;		A => 
+;		A =>
 ; notes:
 ;		always PHD before calling and PLD after
 ANDBitMaskToA:
@@ -73,7 +73,7 @@ ANDBitMaskToA:
 
 
 ; pc should equal $009760
-pullpc;--------------------------------------------------------------------
+	pullpc;--------------------------------------------------------------------
 
 
 
@@ -83,8 +83,8 @@ pullpc;--------------------------------------------------------------------
 
 
 ;--------------------------------------------------------------------
-pushpc
-org $00976b
+	pushpc
+	org $00976b
 
 
 ; ROUTINE: TRB With Mask From Table DataBitMask[] To $0ea8[] ($00976b)
@@ -94,7 +94,7 @@ org $00976b
 ;		A => low byte: aaaaabbb
 ;			aaaaa - increment direct page by
 ;			bbb - this value is XOR'ed to flip the bits
-;				invert = index to table 
+;				invert = index to table
 ;				invert * 2 = address offset
 TRBWithBitMaskTo0ea8:
 	phd					; save directpage
@@ -107,10 +107,10 @@ TRBWithBitMaskTo0ea8:
 
 
 ; pc should equal $009776
-pullpc
+	pullpc
 ;--------------------------------------------------------------------
-pushpc
-org $009776
+	pushpc
+	org $009776
 
 
 ; ROUTINE: AND value at $0ea8[] with value from DataBitMask[] into A ($009776)
@@ -120,10 +120,10 @@ org $009776
 ;		A => low byte: aaaaabbb
 ;			aaaaa - increment direct page by
 ;			bbb - this value is XOR'ed to flip the bits
-;				invert = index to table 
+;				invert = index to table
 ;				invert * 2 = address offset
 ; returns:
-;		A => 
+;		A =>
 ; notes:
 ;		always PHD before calling and PLD after
 ANDBitMaskAnd0ea8ToA:
@@ -137,7 +137,7 @@ ANDBitMaskAnd0ea8ToA:
 
 
 ; pc should equal $009783
-pullpc
+	pullpc
 ;--------------------------------------------------------------------
 
 
@@ -148,8 +148,8 @@ pullpc
 
 
 ;--------------------------------------------------------------------
-pushpc
-org $0097da
+	pushpc
+	org $0097da
 
 
 ; ROUTINE: Increase direct page, fetch from DataBitMask[] ($0097da)
@@ -159,12 +159,12 @@ org $0097da
 ;		A => low byte: aaaaabbb
 ;			aaaaa - increment direct page by
 ;			bbb - this value is XOR'ed to flip the bits
-;				invert = index to table 
+;				invert = index to table
 ;				invert * 2 = address offset
-;		directpage => 
+;		directpage =>
 ; returns:
 ;		A => value from DataBitMask[]
-;		directpage => 
+;		directpage =>
 IncreaseDPAndFetchBitMask:
 	php					; save processor status
 	%setAXYto16bit()
@@ -175,14 +175,14 @@ IncreaseDPAndFetchBitMask:
 	lsr a				; A >> 3
 	lsr a				; get upper 5 bits
 
-	; add A to direct page
+; add A to direct page
 	phd					; get dp
 	clc
 	adc $01,s			; value at stack+$01 is dp
 	tcd					; set dp
 	pla					; throw away temp value (old dp)
 
-	; get index into DataBitMask[]
+; get index into DataBitMask[]
 	pla					; restore A
 	and #$0007			; only keep bottom 3 bits
 	eor #$0007			; invert bottom 3 bits
@@ -200,10 +200,10 @@ IncreaseDPAndFetchBitMask:
 
 
 ; pc should equal $0097fb
-pullpc
+	pullpc
 ;--------------------------------------------------------------------
-pushpc
-org $0097fb		;pctosnes ($0017fb)
+	pushpc
+	org $0097fb		;pctosnes ($0017fb)
 
 
 ; DATA:  ($0097fb)
@@ -212,7 +212,7 @@ DataBitMask:
 
 
 ; pc should equal $00980b
-pullpc
+	pullpc
 ;--------------------------------------------------------------------
 
 
@@ -223,8 +223,8 @@ pullpc
 
 
 ;--------------------------------------------------------------------
-pushpc
-org $009891
+	pushpc
+	org $009891
 
 
 ; ROUTINE: Copy by words ($009891)
@@ -234,77 +234,77 @@ org $009891
 ;		Y => destination offset
 CopyByWords:
 	.x20
-		lda $003e,x
-		sta $003e,y
-		lda $003c,x
-		sta $003c,y
-		lda $003a,x
-		sta $003a,y
-		lda $0038,x
-		sta $0038,y
-		lda $0036,x
-		sta $0036,y
-		lda $0034,x
-		sta $0034,y
-		lda $0032,x
-		sta $0032,y
-		lda $0030,x
-		sta $0030,y
-		lda $002e,x
-		sta $002e,y
-		lda $002c,x
-		sta $002c,y
-		lda $002a,x
-		sta $002a,y
-		lda $0028,x
-		sta $0028,y
-		lda $0026,x
-		sta $0026,y
-		lda $0024,x
-		sta $0024,y
-		lda $0022,x
-		sta $0022,y
-		lda $0020,x
-		sta $0020,y
+	lda $003e,x
+	sta $003e,y
+	lda $003c,x
+	sta $003c,y
+	lda $003a,x
+	sta $003a,y
+	lda $0038,x
+	sta $0038,y
+	lda $0036,x
+	sta $0036,y
+	lda $0034,x
+	sta $0034,y
+	lda $0032,x
+	sta $0032,y
+	lda $0030,x
+	sta $0030,y
+	lda $002e,x
+	sta $002e,y
+	lda $002c,x
+	sta $002c,y
+	lda $002a,x
+	sta $002a,y
+	lda $0028,x
+	sta $0028,y
+	lda $0026,x
+	sta $0026,y
+	lda $0024,x
+	sta $0024,y
+	lda $0022,x
+	sta $0022,y
+	lda $0020,x
+	sta $0020,y
 	.x10
-		lda $001e,x
-		sta $001e,y
-		lda $001c,x
-		sta $001c,y
-		lda $001a,x
-		sta $001a,y
-		lda $0018,x
-		sta $0018,y
-		lda $0016,x
-		sta $0016,y
-		lda $0014,x
-		sta $0014,y
-		lda $0012,x
-		sta $0012,y
-		lda $0010,x
-		sta $0010,y
-		lda $000e,x
-		sta $000e,y
-		lda $000c,x
-		sta $000c,y
-		lda $000a,x
-		sta $000a,y
-		lda $0008,x
-		sta $0008,y
-		lda $0006,x
-		sta $0006,y
-		lda $0004,x
-		sta $0004,y
-		lda $0002,x
-		sta $0002,y
-		lda $0000,x
-		sta $0000,y
+	lda $001e,x
+	sta $001e,y
+	lda $001c,x
+	sta $001c,y
+	lda $001a,x
+	sta $001a,y
+	lda $0018,x
+	sta $0018,y
+	lda $0016,x
+	sta $0016,y
+	lda $0014,x
+	sta $0014,y
+	lda $0012,x
+	sta $0012,y
+	lda $0010,x
+	sta $0010,y
+	lda $000e,x
+	sta $000e,y
+	lda $000c,x
+	sta $000c,y
+	lda $000a,x
+	sta $000a,y
+	lda $0008,x
+	sta $0008,y
+	lda $0006,x
+	sta $0006,y
+	lda $0004,x
+	sta $0004,y
+	lda $0002,x
+	sta $0002,y
+	lda $0000,x
+	sta $0000,y
 
 	rts					; exit routine
 
 
 ; pc should equal $009952
-pullpc
+	pullpc
 ;--------------------------------------------------------------------
 
 
@@ -320,8 +320,8 @@ pullpc
 
 
 ;--------------------------------------------------------------------
-pushpc
-org $009994
+	pushpc
+	org $009994
 
 
 ; ROUTINE: FillSectionWithA_LongJump ($009994)
@@ -335,17 +335,17 @@ FillSectionWithA_LongJump:
 
 
 ; pc should equal $009998
-pullpc
+	pullpc
 ;--------------------------------------------------------------------
-pushpc
-org $009998
+	pushpc
+	org $009998
 
 
 ; ROUTINE: FillSectionWithA ($009998)
 ;		fills a section of memory with A
 ; parameters:
 ;		A => not exactly the number of bytes to fill with A
-;			upper $A bits => fill size, number of $40 byte chunks to fill
+;			upper $a bits => fill size, number of $40 byte chunks to fill
 ;			bits 0-5 => offset into JumpTableFillWithA[]
 ;				this is the remainder except $08 only fills $06 and $24 only fills $22
 ;			bit 0 must be 0
@@ -368,14 +368,14 @@ FillSectionWithA:
 	clc
 
 	.Loop {
-		lda $03,s			; A => fill value from stack
-		jsr FillWithA_x20
+	lda $03,s			; A => fill value from stack
+	jsr FillWithA_x20
 
-		tya
-		adc #$0040
-		tay					; destination += $40
-		dex					; decrement counter
-		bne .Loop
+	tya
+	adc #$0040
+	tay					; destination += $40
+	dex					; decrement counter
+	bne .Loop
 	}
 
 	pla					; restore A
@@ -389,10 +389,10 @@ FillSectionWithA:
 
 
 ; pc should equal $009a1e
-pullpc
+	pullpc
 ;--------------------------------------------------------------------
-pushpc
-org $0099bd
+	pushpc
+	org $0099bd
 
 
 ; ROUTINE: Fill with A ($0099bd)
@@ -403,118 +403,118 @@ org $0099bd
 ; A => 16bit
 FillWithA:
 	.x20					; $99bd
-		sta $003e,y
+	sta $003e,y
 	.x1f					; $99c0
-		sta $003c,y
+	sta $003c,y
 	.x1e					; $99c3
-		sta $003a,y
+	sta $003a,y
 	.x1d					; $99c6
-		sta $0038,y
+	sta $0038,y
 	.x1c					; $99c9
-		sta $0036,y
+	sta $0036,y
 	.x1b					; $99cc
-		sta $0034,y
+	sta $0034,y
 	.x1a					; $99cf
-		sta $0032,y
+	sta $0032,y
 	.x19					; $99d2
-		sta $0030,y
+	sta $0030,y
 	.x18					; $99d5
-		sta $002e,y
+	sta $002e,y
 	.x17					; $99d8
-		sta $002c,y
+	sta $002c,y
 	.x16					; $99db
-		sta $002a,y
+	sta $002a,y
 	.x15					; $99de
-		sta $0028,y
+	sta $0028,y
 	.x14					; $99e1
-		sta $0026,y
+	sta $0026,y
 	.x13					; $99e4
-		sta $0024,y
-		sta $0022,y
+	sta $0024,y
+	sta $0022,y
 	.x11					; $99ea
-		sta $0020,y
+	sta $0020,y
 	.x10					; $99ed
-		sta $001e,y
+	sta $001e,y
 	.x0f					; $99f0
-		sta $001c,y
+	sta $001c,y
 	.x0e					; $99f3
-		sta $001a,y
+	sta $001a,y
 	.x0d					; $99f6
-		sta $0018,y
+	sta $0018,y
 	.x0c					; $99f9
-		sta $0016,y
+	sta $0016,y
 	.x0b					; $99fc
-		sta $0014,y
+	sta $0014,y
 	.x0a					; $99ff
-		sta $0012,y
+	sta $0012,y
 	.x09					; $9a02
-		sta $0010,y
+	sta $0010,y
 	.x08					; $9a05
-		sta $000e,y
+	sta $000e,y
 	.x07					; $9a08
-		sta $000c,y
+	sta $000c,y
 	.x06					; $9a0b
-		sta $000a,y
+	sta $000a,y
 	.x05					; $9a0e
-		sta $0008,y
-		sta $0006,y
+	sta $0008,y
+	sta $0006,y
 	.x03					; $9a14
-		sta $0004,y
+	sta $0004,y
 	.x02					; $9a17
-		sta $0002,y
+	sta $0002,y
 	.x01					; $9a1a
-		sta $0000,y
+	sta $0000,y
 	.Nothing					; $9a1d
-		rts					; exit routine
+	rts					; exit routine
 
 
 ; pc should equal $009a1e
-pullpc
+	pullpc
 ;--------------------------------------------------------------------
-pushpc
-org $009a1e
+	pushpc
+	org $009a1e
 
 
 ; JUMP: Entry points into the FillWithA routine ($009a1e)
 ;		$009a1e-$009a5f (in file = $001a1e-$001a5f)
 JumpTableFillWithA:
-	dw FillWithA_Nothing		; $9A1D
-	dw FillWithA_x01			; $9A1A
-	dw FillWithA_x02			; $9A17
-	dw FillWithA_x03			; $9A14
-	dw FillWithA_x03			; $9A14		there is no x04
-	dw FillWithA_x05			; $9A0E
-	dw FillWithA_x06			; $9A0B
-	dw FillWithA_x07			; $9A08
-	dw FillWithA_x08			; $9A05
-	dw FillWithA_x09			; $9A02
-	dw FillWithA_x0a			; $99FF
-	dw FillWithA_x0b			; $99FC
-	dw FillWithA_x0c			; $99F9
-	dw FillWithA_x0d			; $99F6
-	dw FillWithA_x0e			; $99F3
-	dw FillWithA_x0f			; $99F0
-	dw FillWithA_x10			; $99ED
-	dw FillWithA_x11			; $99EA
-	dw FillWithA_x11			; $99EA		there is no x12
-	dw FillWithA_x13			; $99E4
-	dw FillWithA_x14			; $99E1
-	dw FillWithA_x15			; $99DE
-	dw FillWithA_x16			; $99DB
-	dw FillWithA_x17			; $99D8
-	dw FillWithA_x18			; $99D5
-	dw FillWithA_x19			; $99D2
-	dw FillWithA_x1a			; $99CF
-	dw FillWithA_x1b			; $99CC
-	dw FillWithA_x1c			; $99C9
-	dw FillWithA_x1d			; $99C6
-	dw FillWithA_x1e			; $99C3
-	dw FillWithA_x1f			; $99C0
+	dw FillWithA_Nothing		; $9a1d
+	dw FillWithA_x01			; $9a1a
+	dw FillWithA_x02			; $9a17
+	dw FillWithA_x03			; $9a14
+	dw FillWithA_x03			; $9a14		there is no x04
+	dw FillWithA_x05			; $9a0e
+	dw FillWithA_x06			; $9a0b
+	dw FillWithA_x07			; $9a08
+	dw FillWithA_x08			; $9a05
+	dw FillWithA_x09			; $9a02
+	dw FillWithA_x0a			; $99ff
+	dw FillWithA_x0b			; $99fc
+	dw FillWithA_x0c			; $99f9
+	dw FillWithA_x0d			; $99f6
+	dw FillWithA_x0e			; $99f3
+	dw FillWithA_x0f			; $99f0
+	dw FillWithA_x10			; $99ed
+	dw FillWithA_x11			; $99ea
+	dw FillWithA_x11			; $99ea		there is no x12
+	dw FillWithA_x13			; $99e4
+	dw FillWithA_x14			; $99e1
+	dw FillWithA_x15			; $99de
+	dw FillWithA_x16			; $99db
+	dw FillWithA_x17			; $99d8
+	dw FillWithA_x18			; $99d5
+	dw FillWithA_x19			; $99d2
+	dw FillWithA_x1a			; $99cf
+	dw FillWithA_x1b			; $99cc
+	dw FillWithA_x1c			; $99c9
+	dw FillWithA_x1d			; $99c6
+	dw FillWithA_x1e			; $99c3
+	dw FillWithA_x1f			; $99c0
 	dw FillWithA_x20			; $99bd
 
 
 ; pc should equal $009a60
-pullpc
+	pullpc
 ;--------------------------------------------------------------------
 
 
@@ -531,8 +531,8 @@ pullpc
 
 
 ;--------------------------------------------------------------------
-pushpc
-org $04e220
+	pushpc
+	org $04e220
 
 
 ; DATA: Title screen crystals - compressed graphics part 01 ($04e220)
@@ -543,15 +543,15 @@ DataTitleScreenCrystals01:
 
 
 ; pc should equal $04e280
-pullpc
+	pullpc
 ;--------------------------------------------------------------------
 
 
 
 
 ;--------------------------------------------------------------------
-pushpc
-org $04e490
+	pushpc
+	org $04e490
 
 
 ; DATA: Title screen crystals - compressed graphics part 02 ($04e490)
@@ -562,15 +562,15 @@ DataTitleScreenCrystals02:
 
 
 ; pc should equal $‭04e520
-pullpc
+	pullpc
 ;--------------------------------------------------------------------
 
 
 
 
 ;--------------------------------------------------------------------
-pushpc
-org $04fcc0
+	pushpc
+	org $04fcc0
 
 
 ; DATA: Title screen crystals - compressed graphics part 01 ($04fcc0)
@@ -581,7 +581,7 @@ DataTitleScreenCrystals03:
 
 
 ; pc should equal $0‭4fe9a0
-pullpc
+	pullpc
 ;--------------------------------------------------------------------
 
 
@@ -597,21 +597,21 @@ pullpc
 
 
 ;--------------------------------------------------------------------
-pushpc
-org $0c8000
+	pushpc
+	org $0c8000
 
 ; ROUTINE: Idle until interrupt $d8 ($)
 ;		loops until bit 6 of !flags_d8 is set by an interrupt
-IdleUntilInterruptD8
+	IdleUntilInterruptD8
 	php					; save processor status
 	%setAto8bit()
 	pha					; save A
 	lda #$40
 	trb !flags_d8			; clear bit 6 of !flags_d8
 	.Loop {
-		lda #$40
-		and !flags_d8			; loop until bit 6 of !flags_d8 is set
-		beq .Loop
+	lda #$40
+	and !flags_d8			; loop until bit 6 of !flags_d8 is set
+	beq .Loop
 	}
 
 	pla					; restore A
@@ -620,7 +620,7 @@ IdleUntilInterruptD8
 
 
 ; pc should equal $0c8013
-pullpc
+	pullpc
 ;--------------------------------------------------------------------
 
 
@@ -629,8 +629,8 @@ pullpc
 
 
 ;--------------------------------------------------------------------
-pushpc
-org $0c8f14
+	pushpc
+	org $0c8f14
 
 
 ; DATA: DataTitleScreenWordsControlCodes ($0c8f14)
@@ -653,24 +653,24 @@ DataTitleScreenWordsControlCodes:
 	db $01,$07,$02
 	db $01,$08,$02
 	db $01,$09,$02
-	db $01,$0A,$02
-	db $01,$0B,$02
-	db $01,$0C,$02
+	db $01,$0a,$02
+	db $01,$0b,$02
+	db $01,$0c,$02
 	db $01,$09,$02
-	db $01,$0D,$02
-	db $01,$0E,$0E
-	db $03,$3B,$04
-	db $0B,$0F,$0B
-	db $05,$3E,$05
-	db $0A,$1A,$0B
+	db $01,$0d,$02
+	db $01,$0e,$0e
+	db $03,$3b,$04
+	db $0b,$0f,$0b
+	db $05,$3e,$05
+	db $0a,$1a,$0b
 	db $02,$47,$03
 	db $02,$49,$02
 	db $04,$24,$05
 	db $05,$28,$06
-	db $03,$4F,$04
+	db $03,$4f,$04
 	db $01,$52,$01
-	db $02,$2D,$03
-	db $01,$2F,$02
+	db $02,$2d,$03
+	db $01,$2f,$02
 	db $06,$30,$06
 	db $05,$57,$05
 	db $01,$36,$04
@@ -678,19 +678,19 @@ DataTitleScreenWordsControlCodes:
 	db $02,$39,$03
 	db $04,$60,$14
 	db $04,$43,$04
-	db $04,$13,$0C
-	db $04,$4B,$04
-	db $04,$1E,$0C
+	db $04,$13,$0c
+	db $04,$4b,$04
+	db $04,$1e,$0c
 	db $04,$53,$05
-	db $03,$28,$0B
-	db $04,$5C,$05
-	db $03,$30,$0B
+	db $03,$28,$0b
+	db $04,$5c,$05
+	db $03,$30,$0b
 	db $01,$64,$04
 	db $02,$37,$00
 
 
 ; pc should equal $0c8f98
-pullpc
+	pullpc
 ;--------------------------------------------------------------------
 
 
@@ -700,8 +700,8 @@ pullpc
 
 
 ;--------------------------------------------------------------------
-pushpc
-org $0c90d7
+	pushpc
+	org $0c90d7
 
 
 ; ROUTINE: Clear VRAM low bytes with $00 ($0c90d7)
@@ -717,7 +717,7 @@ ClearVRAMLowBytes:
 	ldx #$1808			; $18 is vram low, $08 is fixed address, write twice
 	stx $00
 
-	; source address => $008252, DataFillValues8252 ($00)
+; source address => $008252, DataFillValues8252 ($00)
 	ldx #$8252
 	stx $02				; source offset => $8252
 	lda #$00
@@ -732,10 +732,10 @@ ClearVRAMLowBytes:
 
 
 ; pc should equal $0c90f9
-pullpc
+	pullpc
 ;--------------------------------------------------------------------
-pushpc
-org $0c90f9
+	pushpc
+	org $0c90f9
 
 
 ; ROUTINE: Fill OAM2 with $01ff ($0c90f9)
@@ -743,15 +743,15 @@ org $0c90f9
 ;			with value $01ff ($ff $01) repeated
 ;		appears to be first half of OAM2 tile memory
 FillOAM2With_01ff:
-	; fill in the $ff values
+; fill in the $ff values
 	stz $2115			; vram control => $00, auto increment by 1 word on write low
 	ldx #$6000
 	stx $2116			; destination address => $6000
 	ldx #$1808			; $18 is vram low, $08 is fixed address, write twice
 	stx $4300
 
-	; source address => $0c9140, DataFillValues9140 ($ff)
-	ldx #$9140			
+; source address => $0c9140, DataFillValues9140 ($ff)
+	ldx #$9140
 	stx $4302			; source offset => $9140
 	lda #$0c
 	sta $4304			; source bank => $0c
@@ -761,7 +761,7 @@ FillOAM2With_01ff:
 	lda #$01
 	sta $420b			; start dma transfer on channel 0
 
-	; fill in the $01 values
+; fill in the $01 values
 	lda #$80
 	sta $2115			; vram control => $80, auto increment by 1 word on write high
 	ldx #$6000
@@ -769,7 +769,7 @@ FillOAM2With_01ff:
 	lda #$19
 	sta $4301			; $19 is vram high
 
-	; source address => $0c9141, DataFillValues9140+1 ($01)
+; source address => $0c9141, DataFillValues9140+1 ($01)
 	ldx #$9141
 	stx $4302			; source offset => $9141
 
@@ -782,10 +782,10 @@ FillOAM2With_01ff:
 
 
 ; pc should equal $0c9140
-pullpc
+	pullpc
 ;--------------------------------------------------------------------
-pushpc
-org $0c9140
+	pushpc
+	org $0c9140
 
 
 ; DATA: DataFillValues9140 ($0c9140)
@@ -796,10 +796,10 @@ DataFillValues9140:
 
 
 ; pc should equal $0c9142
-pullpc
+	pullpc
 ;--------------------------------------------------------------------
-pushpc
-org $0c9142
+	pushpc
+	org $0c9142
 
 
 ; ROUTINE: Copy and decompress title screen crystals graphics ($0c9142)
@@ -825,18 +825,18 @@ CopyAndDecompressCrystals:
 
 
 ; pc should equal $0c9161
-pullpc
+	pullpc
 ;--------------------------------------------------------------------
-pushpc
-org $0c9161
+	pushpc
+	org $0c9161
 
 
 ; ROUTINE: Decompress title screen crystals ($0c9161)
 ;		decompresses title screen crystals graphics
-;		destination of decompressed data => $7f2000-$7f3fff 
+;		destination of decompressed data => $7f2000-$7f3fff
 ; AXY => 16bit
 DecompressCrystals:
-	; Clear ram $7f2000-$7f3fff 
+; Clear ram $7f2000-$7f3fff
 	ldx #$0000			; fill value => $0000
 	ldy #$2000			; fill destination => $2000
 	lda #$2000			; fill size => $2000 bytes
@@ -893,48 +893,48 @@ DecompressCrystals:
 	ldx #$9396			; DataDecompressCrystalsControl03
 
 	.MainLoop {
-		phk
-		plb					; databank => program bank, $0c
-		lda $0000,x
-		and #$00ff			; A => control code ($0000[X].low)
-		cmp #$0080
-		bcs .SkipAhead			; if high bit set then .SkipAhead else .Decompress
+	phk
+	plb					; databank => program bank, $0c
+	lda $0000,x
+	and #$00ff			; A => control code ($0000[X].low)
+	cmp #$0080
+	bcs .SkipAhead			; if high bit set then .SkipAhead else .Decompress
 
-		.Decompress {
-			asl a
-			asl a
-			asl a
-			asl a
-			asl a				; A => A * $20
-			phx					; save control code offset
-			tax					; X => A
+	.Decompress {
+	asl a
+	asl a
+	asl a
+	asl a
+	asl a				; A => A * $20
+	phx					; save control code offset
+	tax					; X => A
 
-			jsr DecompressCrystalsChunk
+	jsr DecompressCrystalsChunk
 
-			plx					; restore control code offset
-			inx					; increment control code offset
-			bra .MainLoop
-		}
+	plx					; restore control code offset
+	inx					; increment control code offset
+	bra .MainLoop
+	}
 
-		.SkipAhead {
-			cmp #$00ff
-			beq .Exit			; exit when control code = $FF
+	.SkipAhead {
+	cmp #$00ff
+	beq .Exit			; exit when control code = $ff
 
-			and #$007f			; clear high bit
-			; skip A * $20 bytes of destination
-			asl a
-			asl a
-			asl a
-			asl a
-			asl a				; A => A * $20
-			sta !temp_64
-			tya
-			adc !temp_64
-			tay					; Y => Y + A
+	and #$007f			; clear high bit
+; skip A * $20 bytes of destination
+	asl a
+	asl a
+	asl a
+	asl a
+	asl a				; A => A * $20
+	sta !temp_64
+	tya
+	adc !temp_64
+	tay					; Y => Y + A
 
-			inx					; increment control code offset
-			bra .MainLoop
-		}
+	inx					; increment control code offset
+	bra .MainLoop
+	}
 	}
 
 	.Exit
@@ -942,14 +942,14 @@ DecompressCrystals:
 
 
 ; pc should equal $0c91ff
-pullpc
+	pullpc
 ;--------------------------------------------------------------------
-pushpc
-org $0c91ff
+	pushpc
+	org $0c91ff
 
 
 ; ROUTINE: Decompress chunk ($0c91ff)
-;		
+;
 ; parameters:
 ;		X => source data offset
 ;			bits 0-4 are 0, so processed in $20 byte chunks
@@ -966,32 +966,32 @@ DecompressCrystalsChunk:
 	plb					; databank => $7f
 
 	.Loop {
-		lda $0000,x
-		ora $0001,x
-		ora $0010,x
-		eor #$ff
-		sta !temp_64		; tmp => (source[x] | source[x+1] | source[x+$10]) xor $FF
+	lda $0000,x
+	ora $0001,x
+	ora $0010,x
+	eor #$ff
+	sta !temp_64		; tmp => (source[x] | source[x+1] | source[x+$10]) xor $ff
 
-		and $0000,y
-		ora $0000,x
-		sta $0000,y			; dest[y] => (tmp & dest[y]) | source[x]
+	and $0000,y
+	ora $0000,x
+	sta $0000,y			; dest[y] => (tmp & dest[y]) | source[x]
 
-		lda !temp_64
-		and $0001,y
-		ora $0001,x
-		sta $0001,y			; dest[y+1] => (tmp & dest[y+1]) | source[x+1]
+	lda !temp_64
+	and $0001,y
+	ora $0001,x
+	sta $0001,y			; dest[y+1] => (tmp & dest[y+1]) | source[x+1]
 
-		lda !temp_64
-		and $0010,y
-		ora $0010,x
-		sta $0010,y			; dest[y+$10] => (tmp & dest[y+$10]) | source[x+$10]
+	lda !temp_64
+	and $0010,y
+	ora $0010,x
+	sta $0010,y			; dest[y+$10] => (tmp & dest[y+$10]) | source[x+$10]
 
-		inx
-		inx					; X += 2
-		iny
-		iny					; Y += 2
-		dec !loop_counter_62
-		bne .Loop
+	inx
+	inx					; X += 2
+	iny
+	iny					; Y += 2
+	dec !loop_counter_62
+	bne .Loop
 	}
 
 	%setAXYto16bit()
@@ -1004,10 +1004,10 @@ DecompressCrystalsChunk:
 
 
 ; pc should equal $0c9247
-pullpc
+	pullpc
 ;--------------------------------------------------------------------
-pushpc
-org $0c9247
+	pushpc
+	org $0c9247
 
 
 ; ROUTINE: Reverse word arrays ($0c9247)
@@ -1026,21 +1026,21 @@ ReverseWordArrays:
 
 	ldx #$0000			; source offset => $0000
 	.Loop {
-		jsr ReverseWordArray
-		jsr ReverseWordArray
+	jsr ReverseWordArray
+	jsr ReverseWordArray
 
-		dec !loop_counter_62	; decrement counter
-		bne .Loop				; loop until counter = 0
+	dec !loop_counter_62	; decrement counter
+	bne .Loop				; loop until counter = 0
 	}
 
 	rts					; exit routine
 
 
 ; pc should equal $0c9260
-pullpc
+	pullpc
 ;--------------------------------------------------------------------
-pushpc
-org $0c9260
+	pushpc
+	org $0c9260
 
 
 ; ROUTINE: Reverse word array ($0c9260)
@@ -1083,10 +1083,10 @@ ReverseWordArray:
 
 
 ; pc should equal $0c929e
-pullpc
+	pullpc
 ;--------------------------------------------------------------------
-pushpc
-org $0c929e
+	pushpc
+	org $0c929e
 
 
 ; ROUTINE: Reverse bits and shift left section ($0c929e)
@@ -1102,36 +1102,36 @@ ReverseBitsAndShiftLeftSection:
 	ldy #$001e			; loop counter => $1e
 	ldx #$0000			; X => $0000
 	.Loop {
-		phy					; save counter
+	phy					; save counter
 
-		ldy #$0010			; loop 2 counter => $10
-		.Loop2 {
-			jsr ReverseBitsAndShiftLeft
-			dey					; decrement counter #2
-			bne .Loop2
-		}
+	ldy #$0010			; loop 2 counter => $10
+	.Loop2 {
+	jsr ReverseBitsAndShiftLeft
+	dey					; decrement counter #2
+	bne .Loop2
+	}
 
-		ldy #$0008			; loop 3 counter => $8
-		.Loop3 {
-			jsr ReverseBitsAndShiftLeft
-			inx					; increment offset (skip one byte)
-			dey					; decrement counter #3
-			bne .Loop3
-		}
+	ldy #$0008			; loop 3 counter => $8
+	.Loop3 {
+	jsr ReverseBitsAndShiftLeft
+	inx					; increment offset (skip one byte)
+	dey					; decrement counter #3
+	bne .Loop3
+	}
 
-		ply					; restore counter
-		dey					; decrement counter
-		bne .Loop
+	ply					; restore counter
+	dey					; decrement counter
+	bne .Loop
 	}
 
 	rts					; exit routine
 
 
 ; pc should equal $0c92c2
-pullpc
+	pullpc
 ;--------------------------------------------------------------------
-pushpc
-org $0c92c2
+	pushpc
+	org $0c92c2
 
 
 ; ROUTINE: Reverse bits in byte and shift left ($0c92c2)
@@ -1164,10 +1164,10 @@ ReverseBitsAndShiftLeft:
 
 
 ; pc should equal $0c92eb
-pullpc
+	pullpc
 ;--------------------------------------------------------------------
-pushpc
-org $0c92eb
+	pushpc
+	org $0c92eb
 
 
 ; ROUTINE: Expand second half with zeros ($0c92eb)
@@ -1184,45 +1184,45 @@ ExpandSecondHalfWithZeros:
 	sta !loop_counter_62		; loop counter => $1e
 	lda #$0000					; A => $0000
 	.Loop {
-		adc #$0018			; A += $18
-		tax					; X => A
-		adc #$0008			; A += $8
-		tay					; Y => A
-		pha					; save A
+	adc #$0018			; A += $18
+	tax					; X => A
+	adc #$0008			; A += $8
+	tay					; Y => A
+	pha					; save A
 
-		lda #$0008
-		sta !loop_counter_64		; loop counter #2 => $8
-		.Loop2 {
-			dex						; X -= 1
-			dey
-			dey						; Y => Y - 2
-			lda $0000,x
-			and #$00ff
-			sta $0000,y				; word at Y => $00(lower byte at X)
-			dec !loop_counter_64		; decrement counter #2
-			bne .Loop2
-		}
+	lda #$0008
+	sta !loop_counter_64		; loop counter #2 => $8
+	.Loop2 {
+	dex						; X -= 1
+	dey
+	dey						; Y => Y - 2
+	lda $0000,x
+	and #$00ff
+	sta $0000,y				; word at Y => $00(lower byte at X)
+	dec !loop_counter_64		; decrement counter #2
+	bne .Loop2
+	}
 
-		pla						; restore A
-		dec !loop_counter_62		; decrement counter
-		bne .Loop
+	pla						; restore A
+	dec !loop_counter_62		; decrement counter
+	bne .Loop
 	}
 
 	rts					; exit routine
 
 
 ; pc should equal $0c9318
-pullpc
+	pullpc
 ;--------------------------------------------------------------------
-pushpc
-org $0c9318
+	pushpc
+	org $0c9318
 
 
 ; ROUTINE: CopyTitleScreenCrystalsCompressed ($0c9318)
 ;		sources =>
 ;			$04e220-$04e27f - DataTitleScreenCrystals01 ($60 bytes)
 ;			$04e490-$‭04e51f - DataTitleScreenCrystals02 ($90 bytes)
-;			$04fcc0-$0‭4fe9f - DataTitleScreenCrystals03 ($1E0 bytes)
+;			$04fcc0-$0‭4fe9f - DataTitleScreenCrystals03 ($1e0 bytes)
 ;		destination => $7f0000-$7f0eb9
 ;			size => $3c0, chunk size => $20, number of chunks => $1e
 ;		copies $18 bytes then skips $8 bytes each chunk
@@ -1239,30 +1239,30 @@ CopyTitleScreenCrystalsCompressed:
 	lda #$0006			; times to loop => $6 ($90 bytes)
 	jsr CopyTitleScreenCrystalsCompressed_Entry
 	ldx #$fcc0			; source offset => $fcc0 (in file => $027cc0)
-	lda #$0014			; times to loop => $14 ($1E0 bytes)
+	lda #$0014			; times to loop => $14 ($1e0 bytes)
 
 CopyTitleScreenCrystalsCompressed_Entry:
-	; source offset => X, increases $18 each loop
-	; destination offset => Y, increases $20 each loop
+; source offset => X, increases $18 each loop
+; destination offset => Y, increases $20 each loop
 	sta !loop_counter_62
 	.Loop {
-		lda #$0017				; bytes to copy => $18
-		mvn $04,$7f				; copy $18 bytes from $04:X[] to $7f:Y[]
-		tya
-		adc #$0008
-		tay						; Y += $8, skip $8 bytes
-		dec !loop_counter_62		; decrement counter
-		bne .Loop
+	lda #$0017				; bytes to copy => $18
+	mvn $04,$7f				; copy $18 bytes from $04:X[] to $7f:Y[]
+	tya
+	adc #$0008
+	tay						; Y += $8, skip $8 bytes
+	dec !loop_counter_62		; decrement counter
+	bne .Loop
 	}
 
 	rts				; exit routine
 
 
 ; pc should equal $0c9346
-pullpc
+	pullpc
 ;--------------------------------------------------------------------
-pushpc
-org $0c9346
+	pushpc
+	org $0c9346
 
 
 ; DATA: DataDecompressCrystalsControl01 ($0c9346)
@@ -1272,29 +1272,29 @@ DataDecompressCrystalsControl01:
 	db $00,$01,$82,$00,$01,$82,$00,$01,$82,$00,$01,$82,$02,$03,$82,$02
 	db $03,$82,$02,$03,$82,$02,$03,$82,$04,$05,$82,$04,$05,$82,$04,$05
 	db $82,$04,$05,$82,$06,$07,$82,$06,$07,$82,$06,$07,$82,$06,$07,$82
-	db $00,$01,$82,$00,$01,$86,$08,$81,$09,$81,$02,$03,$82,$02,$03,$8A
-	db $04,$05,$82,$04,$05,$8A,$06,$07,$82,$06,$07,$FF
+	db $00,$01,$82,$00,$01,$86,$08,$81,$09,$81,$02,$03,$82,$02,$03,$8a
+	db $04,$05,$82,$04,$05,$8a,$06,$07,$82,$06,$07,$ff
 
 
 ; pc should equal $0c9392
-pullpc
+	pullpc
 ;--------------------------------------------------------------------
-pushpc
-org $0c9392
+	pushpc
+	org $0c9392
 
 
 ; DATA: DataDecompressCrystalsControl02 ($0c9392)
 ;		$0c9392-$0c9395 ($4 bytes)
 ;		in file: $061392-$061395
 DataDecompressCrystalsControl02:
-	db $08,$81,$09,$FF
+	db $08,$81,$09,$ff
 
 
 ; pc should equal $0c9396
-pullpc
+	pullpc
 ;--------------------------------------------------------------------
-pushpc
-org $0c9396
+	pushpc
+	org $0c9396
 
 
 ; DATA: DataDecompressCrystalsControl03 ($0c9396)
@@ -1303,71 +1303,71 @@ org $0c9396
 DataDecompressCrystalsControl03:
 	db $00,$83,$00,$83,$00,$83,$00,$83,$02,$83,$02,$83,$02,$83,$02,$83
 	db $04,$83,$04,$83,$04,$83,$04,$83,$06,$83,$06,$83,$06,$83,$06,$83
-	db $00,$83,$00,$86,$08,$81,$09,$82,$02,$83,$02,$8B,$04,$83,$04,$8B
-	db $06,$83,$06,$FF
+	db $00,$83,$00,$86,$08,$81,$09,$82,$02,$83,$02,$8b,$04,$83,$04,$8b
+	db $06,$83,$06,$ff
 
 
 ; pc should equal $0c93ca
-pullpc
+	pullpc
 ;--------------------------------------------------------------------
-pushpc
-org $0c93ca
+	pushpc
+	org $0c93ca
 
 
 ; DATA: DataDecompressCrystalsControl04 ($0c93ca)
 ;		$0c93ca-$0c93ea ($21 bytes)
 ;		in file: $0613ca-$0613ea
 DataDecompressCrystalsControl04:
-	db $0A,$0B,$83,$0F,$82,$13,$14,$86,$0C,$0D,$82,$10,$11,$82,$15,$16
-	db $87,$0E,$83,$12,$83,$17,$92,$18,$19,$82,$1D,$8B,$1A,$1B,$8F,$1C
-	db $FF
+	db $0a,$0b,$83,$0f,$82,$13,$14,$86,$0c,$0d,$82,$10,$11,$82,$15,$16
+	db $87,$0e,$83,$12,$83,$17,$92,$18,$19,$82,$1d,$8b,$1a,$1b,$8f,$1c
+	db $ff
 
 
 ; pc should equal $0c93eb
-pullpc
+	pullpc
 ;--------------------------------------------------------------------
-pushpc
-org $0c93eb
+	pushpc
+	org $0c93eb
 
 
 ; DATA: DataDecompressCrystalsControl05 ($0c93eb)
 ;		$0c93eb-$0c93ff ($15 bytes)
 ;		in file: $0613eb-$0613ff
 DataDecompressCrystalsControl05:
-	db $0C,$83,$10,$83,$15,$87,$0A,$0B,$83,$0F,$82,$13,$14,$A2,$1A,$8F
-	db $18,$19,$82,$1D,$FF
+	db $0c,$83,$10,$83,$15,$87,$0a,$0b,$83,$0f,$82,$13,$14,$a2,$1a,$8f
+	db $18,$19,$82,$1d,$ff
 
 
 ; pc should equal $0c9400
-pullpc
+	pullpc
 ;--------------------------------------------------------------------
-pushpc
-org $0c9400
+	pushpc
+	org $0c9400
 
 
 ; DATA: DataDecompressCrystalsControl06 ($0c9400)
 ;		$0c9400-$0c940f ($10 bytes)
 ;		in file: $061400-$06140f
 DataDecompressCrystalsControl06:
-	db $0C,$83,$10,$83,$15,$87,$0A,$87,$13,$A3,$1A,$8F,$18,$83,$1D,$FF
+	db $0c,$83,$10,$83,$15,$87,$0a,$87,$13,$a3,$1a,$8f,$18,$83,$1d,$ff
 
 
 ; pc should equal $0c9410
-pullpc
+	pullpc
 ;--------------------------------------------------------------------
-pushpc
-org $0c9410
+	pushpc
+	org $0c9410
 
 
 ; DATA: DataDecompressCrystalsControl07 ($0c9410)
 ;		$0c9410-$0c941f ($10 bytes)
 ;		in file: $061410-$06141f
 DataDecompressCrystalsControl07:
-	db $0A,$87,$13,$87,$0C,$83,$10,$83,$15,$A3,$18,$83,$1D,$8B,$1A,$FF
+	db $0a,$87,$13,$87,$0c,$83,$10,$83,$15,$a3,$18,$83,$1d,$8b,$1a,$ff
 
 
 ; pc should equal $0c9410
-pullpc
+	pullpc
 ;--------------------------------------------------------------------
 
 
@@ -1376,8 +1376,8 @@ pullpc
 
 
 ;--------------------------------------------------------------------
-pushpc
-org $0caa4c
+	pushpc
+	org $0caa4c
 
 
 ; DATA: Title screen word graphics ($0caa4c)
@@ -1392,7 +1392,7 @@ DataTitleScreenWordGraphics:
 
 ; TODO: this was the value, which is right?  pc should equal $0‭cb6ed
 ; pc should equal $0‭cb7ac
-pullpc
+	pullpc
 ;--------------------------------------------------------------------
 
 

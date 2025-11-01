@@ -1,4 +1,4 @@
-;==============================================================================
+﻿;==============================================================================
 ; Final Fantasy Mystic Quest - Input/Controller Handler Analysis
 ;==============================================================================
 ; Analyzes how the game reads and processes controller input
@@ -9,7 +9,7 @@
 ; Input Processing System Overview
 ;------------------------------------------------------------------------------
 ; The game uses a sophisticated input system that:
-; 1. Reads hardware controller registers ($4218-$421F)
+; 1. Reads hardware controller registers ($4218-$421f)
 ; 2. Stores current state in RAM variables
 ; 3. Detects new button presses (not just held buttons)
 ; 4. Implements auto-repeat with delay
@@ -64,85 +64,85 @@
 ; Called every frame to read controller and update input state
 ;
 ; Function flow:
-; 1. Check if input disabled ($00D6.6 set) → skip if disabled
+; 1. Check if input disabled ($00d6.6 set) → skip if disabled
 ; 2. Save previous state: $0092 → $0096
 ; 3. Check menu state flags
 ; 4. Read SNES_CNTRL1L ($4218) into A
 ; 5. OR with injected input ($0090)
-; 6. Mask to buttons only (AND #$FFF0)
+; 6. Mask to buttons only (AND #$fff0)
 ; 7. Store new press state in $0094
 ; 8. Clear old presses from $0096 (TRB operation)
 ; 9. Store raw state in $0092
 ; 10. Clear injected input
 
-CODE_008BA0:                        ; Main input reading entry point
-    REP #$30                        ; 16-bit A/X/Y
-    LDA #$0000
-    TCD                             ; Set direct page to $0000
-    
-    ; Check if input disabled
-    LDA #$0040                      ; Bit 6 = input disable flag
-    AND $00D6                       ; Check flags
-    BNE .InputDisabled              ; Skip reading if disabled
-    
-    ; Save previous state
-    LDA $92                         ; Current button state
-    STA $96                         ; → Previous state
-    
-    ; Check if menu system is processing input differently
-    LDA #$0008
-    AND $00D2                       ; Menu processing flag?
-    BNE .MenuInputMode
-    
-    ; Check dialog/text mode
-    LDA #$0004
-    AND $00DB
-    BNE .DialogInputMode
-    
-    ; Normal input mode - read hardware
-    LDA SNES_CNTRL1L                ; $4218 - Controller 1 state
-    BRA .ProcessInput
-    
-.MenuInputMode:
-    LDA SNES_CNTRL1L
-    AND #$FFF0                      ; Mask to button bits only
-    BEQ .ProcessInput
-    JMP CODE_0092F0                 ; Special menu processing
-    
-.DialogInputMode:
-    ; Check for auto-advance flag
-    LDA #$0002
-    AND $00D9
-    BEQ .ReadNormal
-    
-    ; Auto-advance mode (simulate button press)
-    LDA #$0080                      ; Inject A button?
-    BRA .InjectDone                 ; (code seems incomplete here)
-    
-.ReadNormal:
-    LDA SNES_CNTRL1L
-    AND #$FFF0
-    BEQ .ProcessInput
-    JMP CODE_0092F6                 ; Another special handler
-    
-.ProcessInput:
-    ; Combine hardware + injected input
-    ORA $90                         ; OR with injected buttons
-    AND #$FFF0                      ; Mask to buttons only
-    STA $94                         ; Store as "new presses"
-    TAX                             ; Save in X
-    
-    ; Clear buttons that were already pressed
-    TRB $96                         ; Clear new presses from old state
-    
-    ; Update states
-    LDA $92                         ; Old current state
-    TRB $94                         ; Remove from new presses
-    STX $92                         ; X = new current state
-    STZ $90                         ; Clear injected input
-    
-.InputDisabled:
-    RTS
+CODE_008BA0:	; Main input reading entry point
+	rep #$30                        ; 16-bit A/X/Y
+	lda #$0000
+	tcd                             ; Set direct page to $0000
+
+; Check if input disabled
+	lda #$0040                      ; Bit 6 = input disable flag
+	and $00d6                       ; Check flags
+	bne .InputDisabled              ; Skip reading if disabled
+
+; Save previous state
+	lda $92                         ; Current button state
+	sta $96                         ; → Previous state
+
+; Check if menu system is processing input differently
+	lda #$0008
+	and $00d2                       ; Menu processing flag?
+	bne .MenuInputMode
+
+; Check dialog/text mode
+	lda #$0004
+	and $00db
+	bne .DialogInputMode
+
+; Normal input mode - read hardware
+	lda SNES_CNTRL1L                ; $4218 - Controller 1 state
+	bra .ProcessInput
+
+	.MenuInputMode:
+	lda SNES_CNTRL1L
+	and #$fff0                      ; Mask to button bits only
+	beq .ProcessInput
+	jmp CODE_0092F0                 ; Special menu processing
+
+	.DialogInputMode:
+; Check for auto-advance flag
+	lda #$0002
+	and $00d9
+	beq .ReadNormal
+
+; Auto-advance mode (simulate button press)
+	lda #$0080                      ; Inject A button?
+	bra .InjectDone                 ; (code seems incomplete here)
+
+	.ReadNormal:
+	lda SNES_CNTRL1L
+	and #$fff0
+	beq .ProcessInput
+	jmp CODE_0092F6                 ; Another special handler
+
+	.ProcessInput:
+; Combine hardware + injected input
+	ora $90                         ; OR with injected buttons
+	and #$fff0                      ; Mask to buttons only
+	sta $94                         ; Store as "new presses"
+	tax                             ; Save in X
+
+; Clear buttons that were already pressed
+	trb $96                         ; Clear new presses from old state
+
+; Update states
+	lda $92                         ; Old current state
+	trb $94                         ; Remove from new presses
+	stx $92                         ; X = new current state
+	stz $90                         ; Clear injected input
+
+	.InputDisabled:
+	rts
 
 ;------------------------------------------------------------------------------
 ; Input Processing Routine (CODE_008BFD)
@@ -157,81 +157,81 @@ CODE_008BA0:                        ; Main input reading entry point
 ;
 ; Output: $07 = processed input for this frame
 
-CODE_008BFD:                        ; Process input with timing
-    STZ $07                         ; Clear output
-    
-    ; Check for new button press
-    LDA $94                         ; New presses this frame
-    BNE .NewPress
-    
-    ; No new press - check if button held
-    LDA $92                         ; Current button state
-    BEQ .NoInput                    ; Nothing pressed
-    
-    ; Button held - check auto-repeat timer
-    DEC $09                         ; Decrement timer
-    BPL .NoInput                    ; Not ready yet
-    
-    ; Auto-repeat triggered!
-    STA $07                         ; Output held button
-    LDA #$0005                      ; Reset timer to 5 frames
-    STA $09
-    
-.NoInput:
-    RTS
-    
-.NewPress:
-    ; New button press detected
-    STA $07                         ; Output immediately
-    LDA #$0019                      ; Set auto-repeat delay (25 frames)
-    STA $09
-    RTS
+CODE_008BFD:	; Process input with timing
+	stz $07                         ; Clear output
+
+; Check for new button press
+	lda $94                         ; New presses this frame
+	bne .NewPress
+
+; No new press - check if button held
+	lda $92                         ; Current button state
+	beq .NoInput                    ; Nothing pressed
+
+; Button held - check auto-repeat timer
+	dec $09                         ; Decrement timer
+	bpl .NoInput                    ; Not ready yet
+
+; Auto-repeat triggered!
+	sta $07                         ; Output held button
+	lda #$0005                      ; Reset timer to 5 frames
+	sta $09
+
+	.NoInput:
+	rts
+
+	.NewPress:
+; New button press detected
+	sta $07                         ; Output immediately
+	lda #$0019                      ; Set auto-repeat delay (25 frames)
+	sta $09
+	rts
 
 ;------------------------------------------------------------------------------
 ; Button State Flag Constants
 ;------------------------------------------------------------------------------
 ; These can be used with AND/TSB/TRB operations
 
-BUTTON_B      = $8000
-BUTTON_Y      = $4000
-BUTTON_SELECT = $2000
-BUTTON_START  = $1000
-BUTTON_UP     = $0800
-BUTTON_DOWN   = $0400
-BUTTON_LEFT   = $0200
-BUTTON_RIGHT  = $0100
-BUTTON_A      = $0080
-BUTTON_X      = $0040
-BUTTON_L      = $0020
-BUTTON_R      = $0010
+	BUTTON_B      = $8000
+	BUTTON_Y      = $4000
+	BUTTON_SELECT = $2000
+	BUTTON_START  = $1000
+	BUTTON_UP     = $0800
+	BUTTON_DOWN   = $0400
+	BUTTON_LEFT   = $0200
+	BUTTON_RIGHT  = $0100
+	BUTTON_A      = $0080
+	BUTTON_X      = $0040
+	BUTTON_L      = $0020
+	BUTTON_R      = $0010
 
 ; Directional pad mask
-DPAD_MASK     = $0F00    ; Up/Down/Left/Right
-; Action buttons mask  
-ACTION_MASK   = $80C0    ; A/X/B/Y
+	DPAD_MASK     = $0f00    ; Up/Down/Left/Right
+; Action buttons mask
+	ACTION_MASK   = $80c0    ; A/X/B/Y
 ; System buttons mask
-SYSTEM_MASK   = $3000    ; Select/Start
+	SYSTEM_MASK   = $3000    ; Select/Start
 
 ;------------------------------------------------------------------------------
 ; Input Control Flags
 ;------------------------------------------------------------------------------
 ; Flags that control how input is processed:
 ;
-; $00D6.6 ($40): Input disabled
+; $00d6.6 ($40): Input disabled
 ;   - When set, input reading is completely disabled
 ;   - Used during cutscenes, screen transitions
 ;   - Set: Input ignored
 ;   - Clear: Input processed normally
 ;
-; $00D2.3 ($08): Menu input mode
+; $00d2.3 ($08): Menu input mode
 ;   - Changes input processing for menu navigation
 ;   - Routes to CODE_0092F0 for special handling
 ;
-; $00DB.2 ($04): Dialog/text input mode
+; $00db.2 ($04): Dialog/text input mode
 ;   - Special processing for text boxes
 ;   - Can enable auto-advance mode
 ;
-; $00D9.1 ($02): Auto-advance dialog
+; $00d9.1 ($02): Auto-advance dialog
 ;   - When set, injects button presses automatically
 ;   - Used for demo mode or auto-play
 
@@ -280,7 +280,7 @@ SYSTEM_MASK   = $3000    ; Select/Start
 ;   → $07 = $0000 (no output)
 ;
 ; Frame 25: Timer expires
-;   → $09 = $FFFF (went negative)
+;   → $09 = $ffff (went negative)
 ;   → $07 = $0800 (output again!)
 ;   → $09 = $0005 (fast repeat: 5 frames)
 ;
@@ -297,7 +297,7 @@ SYSTEM_MASK   = $3000    ; Select/Start
 ;------------------------------------------------------------------------------
 ; Input Reading Best Practices (Observed)
 ;------------------------------------------------------------------------------
-; 1. Always check $00D6.6 before reading input
+; 1. Always check $00d6.6 before reading input
 ; 2. Use $94 (new presses) for one-shot actions
 ; 3. Use $92 (current state) for continuous actions
 ; 4. Use $07 (processed) for menu navigation
@@ -334,7 +334,7 @@ SYSTEM_MASK   = $3000    ; Select/Start
 ;   - Read SNES_CNTRL1L ($4218) directly
 ;   - 16-bit value with button state
 ;
-; Layer 2: State Management  
+; Layer 2: State Management
 ;   - Store in $92 (current)
 ;   - Compare with $96 (previous)
 ;   - Generate $94 (new presses)

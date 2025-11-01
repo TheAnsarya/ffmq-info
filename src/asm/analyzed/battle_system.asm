@@ -1,8 +1,8 @@
-; ============================================================================
+﻿; ============================================================================
 ; FFMQ Battle System Data Structures Analysis
 ; ============================================================================
 ; Analyzed from Diztinguish disassembly bank_09.asm
-; Bank $09 ($098000-$09FFFF) - Battle System and Enemy Data
+; Bank $09 ($098000-$09ffff) - Battle System and Enemy Data
 ;
 ; This file documents the battle system data structures discovered through
 ; analysis of bank_09 patterns and cross-referencing with gameplay.
@@ -23,40 +23,40 @@
 ; +$04    2     Color 2 (RGB555)
 ; +$06    2     Color 3 (RGB555)
 ; +$08    2     Color 4 (RGB555)
-; +$0A    2     Color 5 (RGB555)
-; +$0C    2     Color 6 (RGB555)
-; +$0E    2     Color 7 (RGB555)
+; +$0a    2     Color 5 (RGB555)
+; +$0c    2     Color 6 (RGB555)
+; +$0e    2     Color 7 (RGB555)
 
-EnemyPalette_00:                    ; $098000 - First enemy palette
-    .bg:        dw $0000            ; Transparent/background
-    .color1:    dw $737C            ; RGB(28,30,28) - Dark gray-green
-    .color2:    dw $5275            ; RGB(21,26,20) - Medium gray-green
-    .color3:    dw $356E            ; RGB(14,18,13) - Dark green
-    .color4:    dw $20A9            ; RGB(09,10,08) - Very dark
-    .color5:    dw $001F            ; RGB(00,00,31) - Pure blue
-    .color6:    dw $31E5            ; RGB(05,15,12) - Cyan-green
-    .color7:    dw $0000            ; Black
+EnemyPalette_00:	; $098000 - First enemy palette
+	.bg:        dw $0000            ; Transparent/background
+	.color1:    dw $737c            ; RGB(28,30,28) - Dark gray-green
+	.color2:    dw $5275            ; RGB(21,26,20) - Medium gray-green
+	.color3:    dw $356e            ; RGB(14,18,13) - Dark green
+	.color4:    dw $20a9            ; RGB(09,10,08) - Very dark
+	.color5:    dw $001f            ; RGB(00,00,31) - Pure blue
+	.color6:    dw $31e5            ; RGB(05,15,12) - Cyan-green
+	.color7:    dw $0000            ; Black
 
-EnemyPalette_01:                    ; $098010 - Second enemy palette
-    .bg:        dw $0000
-    .color1:    dw $7FFF            ; RGB(31,31,31) - Pure white
-    .color2:    dw $17FF            ; RGB(31,31,02) - Bright yellow
-    .color3:    dw $023F            ; RGB(31,01,00) - Bright red
-    .color4:    dw $011F            ; RGB(31,00,00) - Red
-    .color5:    dw $001A            ; RGB(26,00,00) - Dark red
-    .color6:    dw $7DD0            ; RGB(16,29,31) - Cyan
-    .color7:    dw $0000
+EnemyPalette_01:	; $098010 - Second enemy palette
+	.bg:        dw $0000
+	.color1:    dw $7fff            ; RGB(31,31,31) - Pure white
+	.color2:    dw $17ff            ; RGB(31,31,02) - Bright yellow
+	.color3:    dw $023f            ; RGB(31,01,00) - Bright red
+	.color4:    dw $011f            ; RGB(31,00,00) - Red
+	.color5:    dw $001a            ; RGB(26,00,00) - Dark red
+	.color6:    dw $7dd0            ; RGB(16,29,31) - Cyan
+	.color7:    dw $0000
 
 ; Pattern: Most palettes follow this structure
 ; - First word is usually $0000 (transparent) or $0058 (gray)
-; - Second word often $7FFF (white) for highlights
+; - Second word often $7fff (white) for highlights
 ; - Colors 2-7 define the enemy's color scheme
 ; - Brightness/shading achieved through similar hues at different intensities
 
 ; ============================================================================
 ; Enemy Sprite Data Pointers
 ; ============================================================================
-; Address: $098460-$0985F4
+; Address: $098460-$0985f4
 ; Format: 5-byte entries pointing to enemy sprite graphics
 ; Used to load enemy graphics into VRAM during battle
 ; ============================================================================
@@ -68,31 +68,31 @@ EnemyPalette_01:                    ; $098010 - Second enemy palette
 ; +$03    1     Sprite type/flags
 ; +$04    1     Unused/padding ($00)
 
-STRUCT EnemySpritePointer
-    .address    .word               ; 2 bytes - pointer to graphics data
-    .bank       .byte               ; 1 byte - ROM bank ($09-$0F typically)
-    .flags      .byte               ; 1 byte - sprite configuration flags
-    .padding    .byte               ; 1 byte - always $00
-ENDSTRUCT
+	STRUCT EnemySpritePointer
+	.address    .word               ; 2 bytes - pointer to graphics data
+	.bank       .byte               ; 1 byte - ROM bank ($09-$0f typically)
+	.flags      .byte               ; 1 byte - sprite configuration flags
+	.padding    .byte               ; 1 byte - always $00
+	ENDSTRUCT
 
 ; Example entries:
-Enemy_00_SpritePtr:                 ; $098460
-    dw $85F5                        ; Address in bank
-    db $09                          ; Bank $09
-    db $04                          ; Flags: sprite type 4
-    db $00                          ; Padding
+Enemy_00_SpritePtr:	; $098460
+	dw $85f5                        ; Address in bank
+	db $09                          ; Bank $09
+	db $04                          ; Flags: sprite type 4
+	db $00                          ; Padding
 
-Enemy_01_SpritePtr:                 ; $098465
-    dw $85F5                        ; Same graphics as enemy 0
-    db $09
-    db $03                          ; Different flags
-    db $00
+Enemy_01_SpritePtr:	; $098465
+	dw $85f5                        ; Same graphics as enemy 0
+	db $09
+	db $03                          ; Different flags
+	db $00
 
-Enemy_02_SpritePtr:                 ; $09846A
-    dw $85F5                        ; Reuses graphics
-    db $09
-    db $01                          ; Simpler sprite
-    db $00
+Enemy_02_SpritePtr:	; $09846a
+	dw $85f5                        ; Reuses graphics
+	db $09
+	db $01                          ; Simpler sprite
+	db $00
 
 ; Pattern observed:
 ; - Many enemies share sprite data (same address)
@@ -107,7 +107,7 @@ Enemy_02_SpritePtr:                 ; $09846A
 ; ============================================================================
 ; Enemy Sprite Graphics Data
 ; ============================================================================
-; Address: $0985F5+ 
+; Address: $0985f5+
 ; Format: Compressed or raw 4BPP tile data
 ; Contains the actual pixel data for enemy sprites
 ; ============================================================================
@@ -118,17 +118,17 @@ Enemy_02_SpritePtr:                 ; $09846A
 ; - 32 bytes per tile
 ; - May be compressed (needs further analysis)
 
-EnemySprite_Data_00:                ; $0985F5
-    ; First tile row (8 pixels)
-    db $00,$00                      ; Bitplane 0/1
-    db $03,$03                      ; Bitplane 2/3
-    db $0F,$0C                      ; Next row...
-    db $1C,$10
-    db $39,$20
-    db $72,$40
-    db $E4,$80
-    db $E1,$80
-    ; Continues for full sprite...
+EnemySprite_Data_00:	; $0985f5
+; First tile row (8 pixels)
+	db $00,$00                      ; Bitplane 0/1
+	db $03,$03                      ; Bitplane 2/3
+	db $0f,$0c                      ; Next row...
+	db $1c,$10
+	db $39,$20
+	db $72,$40
+	db $e4,$80
+	db $e1,$80
+; Continues for full sprite...
 
 ; ============================================================================
 ; Battle System RAM Variables (Inferred)
@@ -138,15 +138,15 @@ EnemySprite_Data_00:                ; $0985F5
 ; Enemy State Block (per enemy, ~32-64 bytes each):
 ; +$00  Enemy ID
 ; +$01  Enemy HP (current) - word
-; +$03  Enemy HP (max) - word  
+; +$03  Enemy HP (max) - word
 ; +$05  Enemy status flags - byte
 ; +$06  Enemy position X - byte
 ; +$07  Enemy position Y - byte
 ; +$08  Sprite pointer offset - word
-; +$0A  Palette index - byte
-; +$0B  Animation frame - byte
-; +$0C  AI routine pointer - word
-; +$0E  Stats (ATK/DEF/etc) - multiple bytes
+; +$0a  Palette index - byte
+; +$0b  Animation frame - byte
+; +$0c  AI routine pointer - word
+; +$0e  Stats (ATK/DEF/etc) - multiple bytes
 ; ============================================================================
 
 ; ============================================================================
@@ -174,10 +174,10 @@ EnemySprite_Data_00:                ; $0985F5
 ;
 ; Common colors in battle system:
 ; $0000 = RGB(00,00,00) = Black/Transparent
-; $7FFF = RGB(31,31,31) = White
-; $001F = RGB(31,00,00) = Pure Red
-; $03E0 = RGB(00,31,00) = Pure Green
-; $7C00 = RGB(00,00,31) = Pure Blue
+; $7fff = RGB(31,31,31) = White
+; $001f = RGB(31,00,00) = Pure Red
+; $03e0 = RGB(00,31,00) = Pure Green
+; $7c00 = RGB(00,00,31) = Pure Blue
 ; ============================================================================
 
 ; ============================================================================

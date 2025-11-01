@@ -1,508 +1,508 @@
-﻿														; ===========================================================================
-														; Continued Bank $00 Disassembly - Section 4
-														; Lines 1600-2400 (Graphics and VRAM routines)
-														; ===========================================================================
+﻿; ===========================================================================
+; Continued Bank $00 Disassembly - Section 4
+; Lines 1600-2400 (Graphics and VRAM routines)
+; ===========================================================================
 
-														; ===========================================================================
-														; Character Sprite Update - Single Buffer Mode
-														; ===========================================================================
-														; Purpose: Update character sprite in single buffer rendering mode
-														; Input: X = character position on map
-														; Technical Details: Simpler than dual-buffer mode, direct VRAM write
-														; ===========================================================================
+; ===========================================================================
+; Character Sprite Update - Single Buffer Mode
+; ===========================================================================
+; Purpose: Update character sprite in single buffer rendering mode
+; Input: X = character position on map
+; Technical Details: Simpler than dual-buffer mode, direct VRAM write
+; ===========================================================================
 
 CODE_008C83:
-														; Get character tile from map data
-					   LDA.L				   DATA8_049800,X ; Load tile number from map data
-					   ASL					 A		   ; Multiply by 4 (4 bytes per tile)
-					   ASL					 A
-					   STA.W				   $00F4	 ; Store tile offset
+; Get character tile from map data
+	lda.L				   DATA8_049800,x ; Load tile number from map data
+	asl					 a; Multiply by 4 (4 bytes per tile)
+	asl					 a
+	sta.W				   $00f4	 ; Store tile offset
 
-					   REP					 #$10		; 16-bit X,Y
-					   LDA.W				   $1031	 ; Get character map position
-					   JSR.W				   CODE_008D8A ; Convert to VRAM address
-					   STX.W				   $00F2	 ; Store VRAM address
+	rep					 #$10		; 16-bit X,Y
+	lda.W				   $1031	 ; Get character map position
+	jsr.W				   CODE_008D8A ; Convert to VRAM address
+	stx.W				   $00f2	 ; Store VRAM address
 
-					   LDX.W				   #$2D1A	; Source data pointer
-					   LDA.B				   #$7E	  ; Bank $7E (WRAM)
+	ldx.W				   #$2d1a	; Source data pointer
+	lda.B				   #$7e	  ; Bank $7e (WRAM)
 
 CODE_008C9C:
-														; Determine sprite attributes based on display mode
-					   PHA							   ; Save bank
+; Determine sprite attributes based on display mode
+	pha							   ; Save bank
 
-														; Check if special rendering mode
-					   LDA.B				   #$04	  ; Check bit 2
-					   AND.W				   $00DA	 ; Test display flags
-					   BEQ					 CODE_008CC5 ; If clear, use normal rendering
+; Check if special rendering mode
+	lda.B				   #$04	  ; Check bit 2
+	and.W				   $00da	 ; Test display flags
+	beq					 CODE_008CC5 ; If clear, use normal rendering
 
-														; Check frame counter for animation
-					   LDA.W				   $0014	 ; Get frame counter
-					   DEC					 A
-					   BEQ					 CODE_008CC5 ; If zero, use normal
+; Check frame counter for animation
+	lda.W				   $0014	 ; Get frame counter
+	dec					 a
+	beq					 CODE_008CC5 ; If zero, use normal
 
-														; Check if battle mode
-					   LDA.B				   #$10	  ; Check bit 4
-					   AND.W				   $00DA	 ; Test battle flag
-					   BNE					 CODE_008CBB ; If set, use battle sprite
+; Check if battle mode
+	lda.B				   #$10	  ; Check bit 4
+	and.W				   $00da	 ; Test battle flag
+	bne					 CODE_008CBB ; If set, use battle sprite
 
-														; Field sprite attributes (incomplete in original)
+; Field sprite attributes (incomplete in original)
 PLB_Label:
-					   LDA.W				   $0001,X   ; Get sprite attribute byte
-					   AND.B				   #$E3	  ; Mask palette bits
-					   ORA.B				   #$94	  ; Set field palette
-					   BRA					 CODE_008CCD ; Apply attributes
+	lda.W				   $0001,x   ; Get sprite attribute byte
+	and.B				   #$e3	  ; Mask palette bits
+	ora.B				   #$94	  ; Set field palette
+	bra					 CODE_008CCD ; Apply attributes
 
 CODE_008CBB:
-														; Battle sprite attributes
+; Battle sprite attributes
 PLB_Label:
-					   LDA.W				   $0001,X   ; Get sprite attribute byte
-					   AND.B				   #$E3	  ; Mask palette bits
-					   ORA.B				   #$9C	  ; Set battle palette
-					   BRA					 CODE_008CCD ; Apply attributes
+	lda.W				   $0001,x   ; Get sprite attribute byte
+	and.B				   #$e3	  ; Mask palette bits
+	ora.B				   #$9c	  ; Set battle palette
+	bra					 CODE_008CCD ; Apply attributes
 
 CODE_008CC5:
-														; Normal sprite attributes
+; Normal sprite attributes
 PLB_Label:
-					   LDA.W				   $0001,X   ; Get sprite attribute byte
-					   AND.B				   #$E3	  ; Mask palette bits
-					   ORA.B				   #$88	  ; Set normal palette
+	lda.W				   $0001,x   ; Get sprite attribute byte
+	and.B				   #$e3	  ; Mask palette bits
+	ora.B				   #$88	  ; Set normal palette
 
 CODE_008CCD:
-														; Apply sprite attributes
-					   XBA							   ; Swap to high byte
+; Apply sprite attributes
+	xba							   ; Swap to high byte
 
-														; Check character position range
-					   LDA.L				   $001031   ; Get character position
-					   CMP.B				   #$29	  ; Compare to boundary
-					   BCC					 CODE_008D11 ; If below, use standard display
-					   CMP.B				   #$2C	  ; Compare to upper boundary
-					   BEQ					 CODE_008D11 ; If equal, use standard
+; Check character position range
+	lda.L				   $001031   ; Get character position
+	cmp.B				   #$29	  ; Compare to boundary
+	bcc					 CODE_008D11 ; If below, use standard display
+	cmp.B				   #$2c	  ; Compare to upper boundary
+	beq					 CODE_008D11 ; If equal, use standard
 
-														; Special position handling (likely stair/elevation display)
-					   LDA.W				   $0001,X   ; Get attribute byte
-					   AND.B				   #$63	  ; Mask bits
-					   ORA.B				   #$08	  ; Set special bit
-					   STA.W				   $0001,X   ; Store to OAM +1
-					   STA.W				   $0003,X   ; Store to OAM +3
+; Special position handling (likely stair/elevation display)
+	lda.W				   $0001,x   ; Get attribute byte
+	and.B				   #$63	  ; Mask bits
+	ora.B				   #$08	  ; Set special bit
+	sta.W				   $0001,x   ; Store to OAM +1
+	sta.W				   $0003,x   ; Store to OAM +3
 
-														; Convert X position to decimal digits for display
-					   LDA.L				   $001030   ; Get X coordinate
-					   LDY.W				   #$FFFF	; Initialize digit counter
-					   SEC							   ; Set carry for subtraction
+; Convert X position to decimal digits for display
+	lda.L				   $001030   ; Get X coordinate
+	ldy.W				   #$ffff	; Initialize digit counter
+	sec							   ; Set carry for subtraction
 
 CODE_008CEF:
-														; Divide by 10 to get digits
-					   INY							   ; Increment digit count
-					   SBC.B				   #$0A	  ; Subtract 10
-					   BCS					 CODE_008CEF ; If still positive, continue
+; Divide by 10 to get digits
+	iny							   ; Increment digit count
+	sbc.B				   #$0a	  ; Subtract 10
+	bcs					 CODE_008CEF ; If still positive, continue
 
-					   ADC.B				   #$8A	  ; Add tile offset for digits (adjust remainder)
-					   STA.W				   $0002,X   ; Store ones digit tile
+	adc.B				   #$8a	  ; Add tile offset for digits (adjust remainder)
+	sta.W				   $0002,x   ; Store ones digit tile
 
-														; Handle tens digit
-					   CPY.W				   #$0000	; Check if any tens
-					   BEQ					 UNREACH_008D06 ; If zero, skip tens display
+; Handle tens digit
+	cpy.W				   #$0000	; Check if any tens
+	beq					 UNREACH_008D06 ; If zero, skip tens display
 
-					   TYA							   ; Get tens count
-					   ADC.B				   #$7F	  ; Add tile offset for tens
-					   STA.W				   $0000,X   ; Store tens digit tile
-					   BRA					 CODE_008D20 ; Done
+	tya							   ; Get tens count
+	adc.B				   #$7f	  ; Add tile offset for tens
+	sta.W				   $0000,x   ; Store tens digit tile
+	bra					 CODE_008D20 ; Done
 
 UNREACH_008D06:
-														; No tens digit (position < 10)
-db											 $A9,$45,$9D,$00,$00,$EB,$9D,$01,$00,$80,$0F ; Unreachable code segment
+; No tens digit (position < 10)
+	db											 $a9,$45,$9d,$00,$00,$eb,$9d,$01,$00,$80,$0f ; Unreachable code segment
 
 CODE_008D11:
-														; Standard character sprite display
-					   XBA							   ; Restore attribute byte
-					   STA.W				   $0001,X   ; Store to OAM +1
-					   STA.W				   $0003,X   ; Store to OAM +3
+; Standard character sprite display
+	xba							   ; Restore attribute byte
+	sta.W				   $0001,x   ; Store to OAM +1
+	sta.W				   $0003,x   ; Store to OAM +3
 
-					   LDA.B				   #$45	  ; Default tile number
-					   STA.W				   $0000,X   ; Store to OAM +0
-					   STA.W				   $0002,X   ; Store to OAM +2
+	lda.B				   #$45	  ; Default tile number
+	sta.W				   $0000,x   ; Store to OAM +0
+	sta.W				   $0002,x   ; Store to OAM +2
 
 CODE_008D20:
-														; Finalize sprite update
-					   PHK							   ; Push program bank
-					   PLB							   ; Pull to data bank
+; Finalize sprite update
+	phk							   ; Push program bank
+	plb							   ; Pull to data bank
 
-					   LDA.B				   #$80	  ; Set update flag
-					   TSB.W				   $00D4	 ; Set bit in display flags
+	lda.B				   #$80	  ; Set update flag
+	tsb.W				   $00d4	 ; Set bit in display flags
 
-					   PLP							   ; Restore processor status
-					   RTS							   ; Return
+	plp							   ; Restore processor status
+	rts							   ; Return
 
-														; ===========================================================================
-														; Character Sprite Update - Layer 2 (Dual Buffer Mode)
-														; ===========================================================================
-														; Purpose: Update character sprite in battle/transition mode with dual buffers
-														; Technical Details: Updates both WRAM buffers for smooth transitions
-														; ===========================================================================
+; ===========================================================================
+; Character Sprite Update - Layer 2 (Dual Buffer Mode)
+; ===========================================================================
+; Purpose: Update character sprite in battle/transition mode with dual buffers
+; Technical Details: Updates both WRAM buffers for smooth transitions
+; ===========================================================================
 
 CODE_008D29:
-					   PHP							   ; Preserve processor status
-					   SEP					 #$30		; 8-bit A,X,Y
+	php							   ; Preserve processor status
+	sep					 #$30		; 8-bit A,X,Y
 
-														; Check if dual buffer mode active
-					   LDA.B				   #$02	  ; Check bit 1
-					   AND.W				   $00D8	 ; Test display mode flags
-					   BEQ					 CODE_008D6C ; If clear, single buffer mode
+; Check if dual buffer mode active
+	lda.B				   #$02	  ; Check bit 1
+	and.W				   $00d8	 ; Test display mode flags
+	beq					 CODE_008D6C ; If clear, single buffer mode
 
-														; Dual buffer mode - get character position
-					   LDX.W				   $10B1	 ; Get character map position
-					   CPX.B				   #$FF	  ; Check if valid
-					   BEQ					 CODE_008D6A ; If invalid, exit
+; Dual buffer mode - get character position
+	ldx.W				   $10b1	 ; Get character map position
+	cpx.B				   #$ff	  ; Check if valid
+	beq					 CODE_008D6A ; If invalid, exit
 
-														; Get character tile and calculate buffer address
-					   LDA.L				   DATA8_049800,X ; Get tile number from map
-					   ADC.B				   #$0A	  ; Add animation offset
-					   XBA							   ; Swap to high byte
+; Get character tile and calculate buffer address
+	lda.L				   DATA8_049800,x ; Get tile number from map
+	adc.B				   #$0a	  ; Add animation offset
+	xba							   ; Swap to high byte
 
-														; Calculate tilemap coordinates
-					   TXA							   ; Position to A
-					   AND.B				   #$38	  ; Get Y coordinate (bits 3-5)
-					   ASL					 A		   ; Multiply by 2
-					   PHA							   ; Save
+; Calculate tilemap coordinates
+	txa							   ; Position to A
+	and.B				   #$38	  ; Get Y coordinate (bits 3-5)
+	asl					 a; Multiply by 2
+	pha							   ; Save
 
-					   TXA							   ; Position to A again
-					   AND.B				   #$07	  ; Get X coordinate (bits 0-2)
-					   ORA.B				   $01,S	 ; Combine with Y offset
-					   PLX							   ; Clean stack
-					   ASL					 A		   ; Multiply by 2 for word addressing
+	txa							   ; Position to A again
+	and.B				   #$07	  ; Get X coordinate (bits 0-2)
+	ora.B				   $01,s	 ; Combine with Y offset
+	plx							   ; Clean stack
+	asl					 a; Multiply by 2 for word addressing
 
-					   REP					 #$30		; 16-bit mode
+	rep					 #$30		; 16-bit mode
 
-														; Update both WRAM buffers
-					   STA.L				   $7F0778   ; Buffer 1 - tile 1
-					   INC					 A
-					   STA.L				   $7F077A   ; Buffer 1 - tile 2
-					   ADC.W				   #$000F	; Next row offset
-					   STA.L				   $7F07B8   ; Buffer 1 - tile 3
-					   INC					 A
-					   STA.L				   $7F07BA   ; Buffer 1 - tile 4
+; Update both WRAM buffers
+	sta.L				   $7f0778   ; Buffer 1 - tile 1
+	inc					 a
+	sta.L				   $7f077a   ; Buffer 1 - tile 2
+	adc.W				   #$000f	; Next row offset
+	sta.L				   $7f07b8   ; Buffer 1 - tile 3
+	inc					 a
+	sta.L				   $7f07ba   ; Buffer 1 - tile 4
 
-														; Set update flag
-					   LDA.W				   #$0080	; Bit 7
-					   TSB.W				   $00D4	 ; Set in display flags
+; Set update flag
+	lda.W				   #$0080	; Bit 7
+	tsb.W				   $00d4	 ; Set in display flags
 
 CODE_008D6A:
-					   PLP							   ; Restore processor status
-					   RTS							   ; Return
+	plp							   ; Restore processor status
+	rts							   ; Return
 
 CODE_008D6C:
-														; Single buffer mode path
-					   LDX.W				   $10B1	 ; Get character position
-					   LDA.L				   DATA8_049800,X ; Get tile number
-					   ASL					 A		   ; Multiply by 4
-					   ASL					 A
-					   STA.W				   $00F7	 ; Store tile offset
+; Single buffer mode path
+	ldx.W				   $10b1	 ; Get character position
+	lda.L				   DATA8_049800,x ; Get tile number
+	asl					 a; Multiply by 4
+	asl					 a
+	sta.W				   $00f7	 ; Store tile offset
 
-					   REP					 #$10		; 16-bit X,Y
-					   LDA.W				   $10B1	 ; Get position
-					   JSR.W				   CODE_008D8A ; Convert to VRAM address
-					   STX.W				   $00F5	 ; Store VRAM address
+	rep					 #$10		; 16-bit X,Y
+	lda.W				   $10b1	 ; Get position
+	jsr.W				   CODE_008D8A ; Convert to VRAM address
+	stx.W				   $00f5	 ; Store VRAM address
 
-					   LDA.B				   #$80	  ; Set update flag
-					   TSB.W				   $00D4	 ; Set in display flags
+	lda.B				   #$80	  ; Set update flag
+	tsb.W				   $00d4	 ; Set in display flags
 
-					   PLP							   ; Restore processor status
-					   RTS							   ; Return
+	plp							   ; Restore processor status
+	rts							   ; Return
 
-														; ===========================================================================
-														; Convert Map Position to VRAM Address
-														; ===========================================================================
-														; Purpose: Convert 8x8 tile position to VRAM word address
-														; Input: A = tile position (bits 0-2: X, bits 3-5: Y)
-														; Output: X = VRAM word address
-														; ===========================================================================
+; ===========================================================================
+; Convert Map Position to VRAM Address
+; ===========================================================================
+; Purpose: Convert 8x8 tile position to VRAM word address
+; Input: A = tile position (bits 0-2: X, bits 3-5: Y)
+; Output: X = VRAM word address
+; ===========================================================================
 
 CODE_008D8A:
-					   CMP.B				   #$FF	  ; Check if invalid position
-					   BEQ					 UNREACH_008D93 ; If invalid, return $FFFF
+	cmp.B				   #$ff	  ; Check if invalid position
+	beq					 UNREACH_008D93 ; If invalid, return $ffff
 
-					   JSR.W				   CODE_008C1B ; Calculate VRAM address
-					   TAX							   ; Transfer to X
-					   RTS							   ; Return
+	jsr.W				   CODE_008C1B ; Calculate VRAM address
+	tax							   ; Transfer to X
+	rts							   ; Return
 
 UNREACH_008D93:
-db											 $A2,$FF,$FF,$60 ; Unreachable: LDX #$FFFF, RTS
+	db											 $a2,$ff,$ff,$60 ; Unreachable: LDX #$ffff, RTS
 
-														; ===========================================================================
-														; Get Adjacent Tile Information
-														; ===========================================================================
-														; Purpose: Get information about tile adjacent to character
-														; Used for: Collision detection, interaction checks
-														; ===========================================================================
+; ===========================================================================
+; Get Adjacent Tile Information
+; ===========================================================================
+; Purpose: Get information about tile adjacent to character
+; Used for: Collision detection, interaction checks
+; ===========================================================================
 
 CODE_008D97:
-					   LDA.W				   $1031	 ; Get current character position
-					   PHA							   ; Save it
+	lda.W				   $1031	 ; Get current character position
+	pha							   ; Save it
 
-					   LDA.W				   #$0003	; Direction = right
-					   JSR.W				   CODE_008DA8 ; Get adjacent tile info
+	lda.W				   #$0003	; Direction = right
+	jsr.W				   CODE_008DA8 ; Get adjacent tile info
 
-					   PLA							   ; Restore original position
-					   STA.W				   $1031	 ; Write back
-					   STY.B				   $9E	   ; Store result
-					   RTS							   ; Return
+	pla							   ; Restore original position
+	sta.W				   $1031	 ; Write back
+	sty.B				   $9e	   ; Store result
+	rts							   ; Return
 
-														; ===========================================================================
-														; Get Tile Information by Direction
-														; ===========================================================================
-														; Purpose: Get tile at position offset by direction
-														; Input: A = direction (0=up, 1=down, 2=left, 3=right)
-														; Output: Y = tile data, $1031 = new position
-														; ===========================================================================
+; ===========================================================================
+; Get Tile Information by Direction
+; ===========================================================================
+; Purpose: Get tile at position offset by direction
+; Input: A = direction (0=up, 1=down, 2=left, 3=right)
+; Output: Y = tile data, $1031 = new position
+; ===========================================================================
 
 CODE_008DA8:
-					   PHP							   ; Preserve processor status
-					   SEP					 #$30		; 8-bit A,X,Y
+	php							   ; Preserve processor status
+	sep					 #$30		; 8-bit A,X,Y
 
-					   PHA							   ; Save direction
+	pha							   ; Save direction
 
-														; Calculate offset (direction * 3 + base)
+; Calculate offset (direction * 3 + base)
 CLC_Label:
-					   ADC.B				   $01,S	 ; Add direction again (x2)
-					   ADC.B				   $01,S	 ; Add direction again (x3)
-					   ADC.B				   #$22	  ; Add base offset
-					   TAY							   ; Transfer to Y (lookup index)
+	adc.B				   $01,s	 ; Add direction again (x2)
+	adc.B				   $01,s	 ; Add direction again (x3)
+	adc.B				   #$22	  ; Add base offset
+	tay							   ; Transfer to Y (lookup index)
 
-					   PLA							   ; Restore direction
+	pla							   ; Restore direction
 
-														; Calculate inverse direction for position adjustment
-					   EOR.B				   #$FF	  ; Invert bits
-					   SEC							   ; Set carry
-					   ADC.B				   #$04	  ; Add 4 (creates -direction)
-					   TAX							   ; Transfer to X (shift count)
+; Calculate inverse direction for position adjustment
+	eor.B				   #$ff	  ; Invert bits
+	sec							   ; Set carry
+	adc.B				   #$04	  ; Add 4 (creates -direction)
+	tax							   ; Transfer to X (shift count)
 
-														; Get character coordinates
-					   LDA.W				   $1032	 ; Get X coordinate
-					   XBA							   ; Swap to high byte
-					   LDA.W				   $1033	 ; Get Y coordinate
+; Get character coordinates
+	lda.W				   $1032	 ; Get X coordinate
+	xba							   ; Swap to high byte
+	lda.W				   $1033	 ; Get Y coordinate
 
-					   REP					 #$20		; 16-bit A
-					   SEP					 #$10		; 8-bit X,Y
+	rep					 #$20		; 16-bit A
+	sep					 #$10		; 8-bit X,Y
 
-					   LSR					 A		   ; Start bit shifting
+	lsr					 a; Start bit shifting
 
 CODE_008DC7:
-														; Shift coordinates based on direction
-					   LSR					 A		   ; Shift right 3 times per iteration
-					   LSR					 A
-					   LSR					 A
-					   DEX							   ; Decrement shift counter
-					   BNE					 CODE_008DC7 ; Continue shifting
+; Shift coordinates based on direction
+	lsr					 a; Shift right 3 times per iteration
+	lsr					 a
+	lsr					 a
+	dex							   ; Decrement shift counter
+	bne					 CODE_008DC7 ; Continue shifting
 
-														; Check collision bits
-					   LSR					 A		   ; Shift out bit
-					   BCS					 CODE_008DDA ; If carry set, tile exists
+; Check collision bits
+	lsr					 a; Shift out bit
+	bcs					 CODE_008DDA ; If carry set, tile exists
 
-					   DEY							   ; Try next tile
-					   LSR					 A		   ; Shift out next bit
-					   BCS					 CODE_008DDA ; If carry set, tile exists
+	dey							   ; Try next tile
+	lsr					 a; Shift out next bit
+	bcs					 CODE_008DDA ; If carry set, tile exists
 
-					   DEY							   ; Try next tile
-					   LSR					 A		   ; Shift out next bit
-					   BCS					 CODE_008DDA ; If carry set, tile exists
+	dey							   ; Try next tile
+	lsr					 a; Shift out next bit
+	bcs					 CODE_008DDA ; If carry set, tile exists
 
-					   LDY.B				   #$FF	  ; No valid tile found
+	ldy.B				   #$ff	  ; No valid tile found
 
 CODE_008DDA:
-					   STY.W				   $1031	 ; Store result position
-					   PLP							   ; Restore processor status
-					   RTS							   ; Return
+	sty.W				   $1031	 ; Store result position
+	plp							   ; Restore processor status
+	rts							   ; Return
 
-														; ===========================================================================
-														; VRAM Tile Transfer Loop
-														; ===========================================================================
-														; Purpose: Transfer multiple tiles to VRAM using optimized loop
-														; Input: X = source address, Y = tile count
-														; Technical Details: Uses direct page at $2100 for fast register access
-														; ===========================================================================
+; ===========================================================================
+; VRAM Tile Transfer Loop
+; ===========================================================================
+; Purpose: Transfer multiple tiles to VRAM using optimized loop
+; Input: X = source address, Y = tile count
+; Technical Details: Uses direct page at $2100 for fast register access
+; ===========================================================================
 
 CODE_008DDF:
-					   PHP							   ; Preserve processor status
-					   PHD							   ; Preserve direct page
+	php							   ; Preserve processor status
+	phd							   ; Preserve direct page
 
-					   REP					 #$30		; 16-bit A,X,Y
-					   LDA.W				   #$2100	; PPU register base
-					   TCD							   ; Set as direct page (fast access!)
+	rep					 #$30		; 16-bit A,X,Y
+	lda.W				   #$2100	; PPU register base
+	tcd							   ; Set as direct page (fast access!)
 
-					   CLC							   ; Clear carry for loops
+	clc							   ; Clear carry for loops
 
 CODE_008DE8:
-														; Transfer 8 words (16 bytes) per iteration
-					   PHY							   ; Save tile count
+; Transfer 8 words (16 bytes) per iteration
+	phy							   ; Save tile count
 
-														; Word 1
-					   LDA.W				   $0000,X   ; Load source word
-					   STA.B				   SNES_VMDATAL-$2100 ; Write to VRAM data (via direct page)
+; Word 1
+	lda.W				   $0000,x   ; Load source word
+	sta.B				   SNES_VMDATAL-$2100 ; Write to VRAM data (via direct page)
 
-														; Word 2
-					   LDA.W				   $0002,X
-					   STA.B				   SNES_VMDATAL-$2100
+; Word 2
+	lda.W				   $0002,x
+	sta.B				   SNES_VMDATAL-$2100
 
-														; Word 3
-					   LDA.W				   $0004,X
-					   STA.B				   SNES_VMDATAL-$2100
+; Word 3
+	lda.W				   $0004,x
+	sta.B				   SNES_VMDATAL-$2100
 
-														; Word 4
-					   LDA.W				   $0006,X
-					   STA.B				   SNES_VMDATAL-$2100
+; Word 4
+	lda.W				   $0006,x
+	sta.B				   SNES_VMDATAL-$2100
 
-														; Word 5
-					   LDA.W				   $0008,X
-					   STA.B				   SNES_VMDATAL-$2100
+; Word 5
+	lda.W				   $0008,x
+	sta.B				   SNES_VMDATAL-$2100
 
-														; Word 6
-					   LDA.W				   $000A,X
-					   STA.B				   SNES_VMDATAL-$2100
+; Word 6
+	lda.W				   $000a,x
+	sta.B				   SNES_VMDATAL-$2100
 
-														; Word 7
-					   LDA.W				   $000C,X
-					   STA.B				   SNES_VMDATAL-$2100
+; Word 7
+	lda.W				   $000c,x
+	sta.B				   SNES_VMDATAL-$2100
 
-														; Word 8
-					   LDA.W				   $000E,X
-					   STA.B				   SNES_VMDATAL-$2100
+; Word 8
+	lda.W				   $000e,x
+	sta.B				   SNES_VMDATAL-$2100
 
-														; Handle extra bytes (likely for 3bpp bitplane)
-					   LDA.W				   $00F0	 ; Get extra data flag
-					   SEP					 #$20		; 8-bit A for byte writes
+; Handle extra bytes (likely for 3bpp bitplane)
+	lda.W				   $00f0	 ; Get extra data flag
+	sep					 #$20		; 8-bit A for byte writes
 
-														; Write 8 extra bytes
-					   LDA.W				   $0010,X
+; Write 8 extra bytes
+	lda.W				   $0010,x
 TAY_Label:
-					   STY.B				   SNES_VMDATAL-$2100
+	sty.B				   SNES_VMDATAL-$2100
 
-					   LDA.W				   $0011,X
+	lda.W				   $0011,x
 TAY_Label:
-					   STY.B				   SNES_VMDATAL-$2100
+	sty.B				   SNES_VMDATAL-$2100
 
-					   LDA.W				   $0012,X
+	lda.W				   $0012,x
 TAY_Label:
-					   STY.B				   SNES_VMDATAL-$2100
+	sty.B				   SNES_VMDATAL-$2100
 
-					   LDA.W				   $0013,X
+	lda.W				   $0013,x
 TAY_Label:
-					   STY.B				   SNES_VMDATAL-$2100
+	sty.B				   SNES_VMDATAL-$2100
 
-					   LDA.W				   $0014,X
+	lda.W				   $0014,x
 TAY_Label:
-					   STY.B				   SNES_VMDATAL-$2100
+	sty.B				   SNES_VMDATAL-$2100
 
-					   LDA.W				   $0015,X
+	lda.W				   $0015,x
 TAY_Label:
-					   STY.B				   SNES_VMDATAL-$2100
+	sty.B				   SNES_VMDATAL-$2100
 
-					   LDA.W				   $0016,X
+	lda.W				   $0016,x
 TAY_Label:
-					   STY.B				   SNES_VMDATAL-$2100
+	sty.B				   SNES_VMDATAL-$2100
 
-					   LDA.W				   $0017,X
+	lda.W				   $0017,x
 TAY_Label:
-					   STY.B				   SNES_VMDATAL-$2100
+	sty.B				   SNES_VMDATAL-$2100
 
-					   REP					 #$30		; Back to 16-bit
+	rep					 #$30		; Back to 16-bit
 
-														; Advance source pointer
+; Advance source pointer
 TXA_Label:
-					   ADC.W				   #$0018	; Add $18 bytes (24 bytes = one tile)
+	adc.W				   #$0018	; Add $18 bytes (24 bytes = one tile)
 TAX_Label:
 
-					   PLY							   ; Restore tile count
-					   DEY							   ; Decrement
-					   BNE					 CODE_008DE8 ; Continue loop
+	ply							   ; Restore tile count
+	dey							   ; Decrement
+	bne					 CODE_008DE8 ; Continue loop
 
-					   PLD							   ; Restore direct page
-					   PLP							   ; Restore processor status
-					   RTL							   ; Return from long call
+	pld							   ; Restore direct page
+	plp							   ; Restore processor status
+	rtl							   ; Return from long call
 
-														; ===========================================================================
-														; VRAM Interleaved Write (Column Mode)
-														; ===========================================================================
-														; Purpose: Write tiles in column order with interleaved data
-														; Input: X = source, Y = count
-														; Technical Details: Writes data then $FF00, used for specific tile layouts
-														; ===========================================================================
+; ===========================================================================
+; VRAM Interleaved Write (Column Mode)
+; ===========================================================================
+; Purpose: Write tiles in column order with interleaved data
+; Input: X = source, Y = count
+; Technical Details: Writes data then $ff00, used for specific tile layouts
+; ===========================================================================
 
 CODE_008E54:
-					   PHP							   ; Preserve processor status
-					   PHD							   ; Preserve direct page
+	php							   ; Preserve processor status
+	phd							   ; Preserve direct page
 
-					   PEA.W				   $2100	 ; Push PPU base
-					   PLD							   ; Set as direct page
+	pea.W				   $2100	 ; Push PPU base
+	pld							   ; Set as direct page
 
-					   SEP					 #$20		; 8-bit A
-					   LDA.B				   #$88	  ; VRAM increment after high byte write, column mode
-					   STA.B				   SNES_VMAINC-$2100 ; Set VRAM increment mode
+	sep					 #$20		; 8-bit A
+	lda.B				   #$88	  ; VRAM increment after high byte write, column mode
+	sta.B				   SNES_VMAINC-$2100 ; Set VRAM increment mode
 
-					   REP					 #$30		; 16-bit A,X,Y
-					   CLC							   ; Clear carry
+	rep					 #$30		; 16-bit A,X,Y
+	clc							   ; Clear carry
 
 CODE_008E63:
-														; Write data word, then $FF00, repeatedly
-														; This creates striped patterns in VRAM
+; Write data word, then $ff00, repeatedly
+; This creates striped patterns in VRAM
 
-					   LDA.W				   $0000,X
-					   STA.B				   SNES_VMDATAL-$2100
-					   LDA.W				   $00F0	 ; Load filler value ($FF00)
-					   STA.B				   SNES_VMDATAL-$2100
+	lda.W				   $0000,x
+	sta.B				   SNES_VMDATAL-$2100
+	lda.W				   $00f0	 ; Load filler value ($ff00)
+	sta.B				   SNES_VMDATAL-$2100
 
-					   LDA.W				   $0002,X
-					   STA.B				   SNES_VMDATAL-$2100
-					   LDA.W				   $00F0
-					   STA.B				   SNES_VMDATAL-$2100
+	lda.W				   $0002,x
+	sta.B				   SNES_VMDATAL-$2100
+	lda.W				   $00f0
+	sta.B				   SNES_VMDATAL-$2100
 
-					   LDA.W				   $0004,X
-					   STA.B				   SNES_VMDATAL-$2100
-					   LDA.W				   $00F0
-					   STA.B				   SNES_VMDATAL-$2100
+	lda.W				   $0004,x
+	sta.B				   SNES_VMDATAL-$2100
+	lda.W				   $00f0
+	sta.B				   SNES_VMDATAL-$2100
 
-					   LDA.W				   $0006,X
-					   STA.B				   SNES_VMDATAL-$2100
-					   LDA.W				   $00F0
-					   STA.B				   SNES_VMDATAL-$2100
+	lda.W				   $0006,x
+	sta.B				   SNES_VMDATAL-$2100
+	lda.W				   $00f0
+	sta.B				   SNES_VMDATAL-$2100
 
-					   LDA.W				   $0008,X
-					   STA.B				   SNES_VMDATAL-$2100
-					   LDA.W				   $00F0
-					   STA.B				   SNES_VMDATAL-$2100
+	lda.W				   $0008,x
+	sta.B				   SNES_VMDATAL-$2100
+	lda.W				   $00f0
+	sta.B				   SNES_VMDATAL-$2100
 
-					   LDA.W				   $000A,X
-					   STA.B				   SNES_VMDATAL-$2100
-					   LDA.W				   $00F0
-					   STA.B				   SNES_VMDATAL-$2100
+	lda.W				   $000a,x
+	sta.B				   SNES_VMDATAL-$2100
+	lda.W				   $00f0
+	sta.B				   SNES_VMDATAL-$2100
 
-					   LDA.W				   $000C,X
-					   STA.B				   SNES_VMDATAL-$2100
-					   LDA.W				   $00F0
-					   STA.B				   SNES_VMDATAL-$2100
+	lda.W				   $000c,x
+	sta.B				   SNES_VMDATAL-$2100
+	lda.W				   $00f0
+	sta.B				   SNES_VMDATAL-$2100
 
-					   LDA.W				   $000E,X
-					   STA.B				   SNES_VMDATAL-$2100
-					   LDA.W				   $00F0
-					   STA.B				   SNES_VMDATAL-$2100
+	lda.W				   $000e,x
+	sta.B				   SNES_VMDATAL-$2100
+	lda.W				   $00f0
+	sta.B				   SNES_VMDATAL-$2100
 
-														; Advance source pointer
+; Advance source pointer
 TXA_Label:
-					   ADC.W				   #$0010	; Add $10 bytes
+	adc.W				   #$0010	; Add $10 bytes
 TAX_Label:
 
-					   DEY							   ; Decrement count
-					   BNE					 CODE_008E63 ; Continue loop
+	dey							   ; Decrement count
+	bne					 CODE_008E63 ; Continue loop
 
-					   SEP					 #$20		; 8-bit A
-					   LDA.B				   #$80	  ; Reset to normal increment mode
-					   STA.B				   SNES_VMAINC-$2100
+	sep					 #$20		; 8-bit A
+	lda.B				   #$80	  ; Reset to normal increment mode
+	sta.B				   SNES_VMAINC-$2100
 
-					   PLD							   ; Restore direct page
-					   PLP							   ; Restore processor status
-					   RTL							   ; Return
+	pld							   ; Restore direct page
+	plp							   ; Restore processor status
+	rtl							   ; Return
 
-														;===============================================================================
-														; Progress: Continued documentation of Bank $00
-														; Lines documented: ~1,900 / 14,017 (13.5%)
-														; Total progress: ~2,300 / 74,682 (3.1%)
-														;===============================================================================
+;===============================================================================
+; Progress: Continued documentation of Bank $00
+; Lines documented: ~1,900 / 14,017 (13.5%)
+; Total progress: ~2,300 / 74,682 (3.1%)
+;===============================================================================

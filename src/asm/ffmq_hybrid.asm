@@ -1,4 +1,4 @@
-; Final Fantasy Mystic Quest (SNES) - Hybrid Assembly
+﻿; Final Fantasy Mystic Quest (SNES) - Hybrid Assembly
 ; Combines: Historical working code + Diztinguish structure + Modern organization
 ; Assembler: asar 1.91
 ; Date: 2025-10-25
@@ -7,27 +7,27 @@
 ;           Integrate Diztinguish labels and structure
 ;           Add modern extracted assets
 
-lorom
-arch 65816
+	lorom
+	arch 65816
 
 ;==============================================================================
 ; Include Files
 ;==============================================================================
 
 ; RAM Variables (from historical - working)
-incsrc "../include/ffmq_ram_variables_historical.inc"
+	incsrc "../include/ffmq_ram_variables_historical.inc"
 
-; Macros (from historical - working)  
-incsrc "../include/ffmq_macros_original.inc"
+; Macros (from historical - working)
+	incsrc "../include/ffmq_macros_original.inc"
 
 ; SNES Register Definitions (modern - fixed)
-incsrc "../include/snes_registers.inc"
+	incsrc "../include/snes_registers.inc"
 
 ;==============================================================================
 ; Main Entry Point
 ;==============================================================================
 
-org $008000
+	org $008000
 ; Game entry point - everything starts here
 MainEntryPoint:
 	clc
@@ -38,8 +38,8 @@ MainEntryPoint:
 ; Core Routines (Historical - Known Working)
 ;==============================================================================
 
-pushpc
-org $008247
+	pushpc
+	org $008247
 
 ; ROUTINE: Basic init ($008247)
 ;		Screen off, no interrupts, AXY => 8bit
@@ -50,66 +50,66 @@ BasicInit:
 	sta $2100			; Turn screen off, set brightness to $0
 	rts					; Exit routine
 
-pullpc
+	pullpc
 
 ;==============================================================================
 ; Text Engine (Historical - Working)
 ;==============================================================================
 
-pushpc
-incsrc "text_engine_historical.asm"
-pullpc
+	pushpc
+	incsrc "text_engine_historical.asm"
+	pullpc
 
 ;==============================================================================
 ; Graphics Engine (Historical - Working)
 ;==============================================================================
 
-pushpc
-incsrc "graphics_engine_historical.asm"
-pullpc
+	pushpc
+	incsrc "graphics_engine_historical.asm"
+	pullpc
 
 ;==============================================================================
 ; Data Sections - Using Extracted Assets
 ;==============================================================================
 
 ; Background Tiles
-pushpc
-org pctosnes($028C80)
+	pushpc
+	org pctosnes($028c80)
 DataBackgroundTiles:
 	incbin "data\graphics\tiles.bin"
-pullpc
+	pullpc
 
 ; Additional Tiles
-pushpc
-org pctosnes($020000)
+	pushpc
+	org pctosnes($020000)
 DataTiles048000:
 	incbin "data\graphics\048000-tiles.bin"
-pullpc
+	pullpc
 
 ; Title Screen Graphics
-pushpc
-org $07B013
+	pushpc
+	org $07b013
 DataTitleScreenWords:
 	incbin "data\graphics\title-screen-words.bin"
-pullpc
+	pullpc
 
-pushpc
-org $04E220
+	pushpc
+	org $04e220
 DataTitleScreenCrystals01:
 	incbin "data\graphics\title-screen-crystals-01.bin"
-pullpc
+	pullpc
 
-pushpc
-org $04E280
+	pushpc
+	org $04e280
 DataTitleScreenCrystals02:
 	incbin "data\graphics\title-screen-crystals-02.bin"
-pullpc
+	pullpc
 
-pushpc
-org $04E2E0
+	pushpc
+	org $04e2e0
 DataTitleScreenCrystals03:
 	incbin "data\graphics\title-screen-crystals-03.bin"
-pullpc
+	pullpc
 
 ;==============================================================================
 ; Text Data - Using Modern Extracted Assets
@@ -118,40 +118,40 @@ pullpc
 ; Use extracted text instead of embedded
 ; This allows easy editing via assets/text/*.txt files
 
-pushpc
-org $0642A0  ; Weapon names location
+	pushpc
+	org $0642a0  ; Weapon names location
 
 ; NOTE: For now, use original data
 ; Later: Generate from assets/text/weapon_names.txt
 ; incsrc "../data/text/weapon-names.asm"
 
-pullpc
+	pullpc
 
 ;==============================================================================
 ; Enemy Data - Using Modern Extracted Assets
 ;==============================================================================
 
-pushpc
-org $04F800  ; Enemy data location (approximate)
+	pushpc
+	org $04f800  ; Enemy data location (approximate)
 
-; NOTE: For now, use original data  
+; NOTE: For now, use original data
 ; Later: Generate from assets/data/enemies.asm
 ; incsrc "../../assets/data/enemies.asm"
 
-pullpc
+	pullpc
 
 ;==============================================================================
 ; Character Data
 ;==============================================================================
 
-pushpc
-incsrc "../data/character-start-stats.asm"
-pullpc
+	pushpc
+	incsrc "../data/character-start-stats.asm"
+	pullpc
 
 ;==============================================================================
 ; End of ROM
 ;==============================================================================
 
 ; Pad to correct ROM size if needed
-; org $0FFFFF
+; org $0fffff
 ; db $00

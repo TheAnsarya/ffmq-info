@@ -1,15 +1,15 @@
-; FFMQ Minimal Working Build - Proof of Concept
+﻿; FFMQ Minimal Working Build - Proof of Concept
 ; Goal: Get FIRST successful build to establish baseline
 ; Strategy: Minimal changes, verify toolchain works
 
-lorom
-arch 65816
+	lorom
+	arch 65816
 
 ;==============================================================================
 ; Minimal Patch - Just prove we can build
 ;==============================================================================
 
-org $008000
+	org $008000
 ; Game entry point
 MainEntryPoint:
 	clc
@@ -18,7 +18,7 @@ MainEntryPoint:
 	stz $4200			; Disable interrupts
 	lda #$80
 	sta $2100			; Screen off
-	; Jump to original code
+; Jump to original code
 	jml $008010
 
 ;==============================================================================
