@@ -3800,9 +3800,9 @@ BattleScene_Setup:
                        LDX.W #$0005                       ;01AD0E|A20500  |      ;
                        STX.W $192B                        ;01AD11|8E2B19  |01192B;
 
-CODE_01AD14:
-                       JSR.W CODE_01ACED                   ;01AD14|20EDAC  |01ACED;
-                       JSR.W CODE_01AD78                   ;01AD17|2078AD  |01AD78;
+.SceneInitLoop:
+                       JSR.W BattleGraphics_LoadSceneData ;01AD14|20EDAC  |01ACED;
+                       JSR.W Battle_UpdateState           ;01AD17|2078AD  |01AD78;
                        LDA.W #$0004                       ;01AD1A|A90400  |      ;
                        JSR.W CODE_01D6C4                   ;01AD1D|20C4D6  |01D6C4;
                        LDY.W #$0008                       ;01AD20|A00800  |      ;
@@ -3814,17 +3814,17 @@ CODE_01AD14:
 ; Initializes memory regions for battle data
 ; ==============================================================================
 
-CODE_01AD29:
+.MemoryInitLoop:
                        STA.L $7FC508,X                    ;01AD29|9F08C57F|7FC508;
                        INX                                 ;01AD2D|E8      |      ;
                        INX                                 ;01AD2E|E8      |      ;
                        DEY                                 ;01AD2F|88      |      ;
-                       BNE CODE_01AD29                     ;01AD30|D0F7    |01AD29;
-                       JSR.W CODE_01AD78                   ;01AD32|2078AD  |01AD78;
+                       BNE .MemoryInitLoop                ;01AD30|D0F7    |01AD29;
+                       JSR.W Battle_UpdateState           ;01AD32|2078AD  |01AD78;
                        LDA.W #$0004                       ;01AD35|A90400  |      ;
                        JSR.W CODE_01D6C4                   ;01AD38|20C4D6  |01D6C4;
                        DEC.W $192B                        ;01AD3B|CE2B19  |01192B;
-                       BNE CODE_01AD14                     ;01AD3E|D0D4    |01AD14;
+                       BNE .SceneInitLoop                 ;01AD3E|D0D4    |01AD14;
                        LDX.W #$001F                       ;01AD40|A21F00  |      ;
                        STX.W $1935                        ;01AD43|8E3519  |011935;
 
@@ -3833,11 +3833,11 @@ CODE_01AD29:
 ; Complex data processing with mathematical operations
 ; ==============================================================================
 
-CODE_01AD46:
+BattleData_ProcessCalculations:
                        LDX.W #$0000                       ;01AD46|A20000  |      ;
                        LDY.W #$0008                       ;01AD49|A00800  |      ;
 
-CODE_01AD4C:
+.MathOperationLoop:
                        LDA.L $7FC508,X                    ;01AD4C|BF08C57F|7FC508;
                        STA.W $192B                        ;01AD50|8D2B19  |01192B;
                        LDA.L DATA8_07DB14,X                ;01AD53|BF14DB07|07DB14;
@@ -3848,12 +3848,12 @@ CODE_01AD4C:
                        INX                                 ;01AD64|E8      |      ;
                        INX                                 ;01AD65|E8      |      ;
                        DEY                                 ;01AD66|88      |      ;
-                       BNE CODE_01AD4C                     ;01AD67|D0E3    |01AD4C;
-                       JSR.W CODE_01AD78                   ;01AD69|2078AD  |01AD78;
+                       BNE .MathOperationLoop             ;01AD67|D0E3    |01AD4C;
+                       JSR.W Battle_UpdateState           ;01AD69|2078AD  |01AD78;
                        LDA.W #$0004                       ;01AD6C|A90400  |      ;
                        JSR.W CODE_01D6BD                   ;01AD6F|20BDD6  |01D6BD;
                        DEC.W $1935                        ;01AD72|CE3519  |011935;
-                       BNE CODE_01AD46                     ;01AD75|D0CF    |01AD46;
+                       BNE BattleData_ProcessCalculations ;01AD75|D0CF    |01AD46;
                        RTS                                 ;01AD77|60      |      ;
 
 ; ==============================================================================
@@ -3861,7 +3861,7 @@ CODE_01AD4C:
 ; Manages battle system state transitions and timing
 ; ==============================================================================
 
-CODE_01AD78:
+Battle_UpdateState:
                        PHP                                 ;01AD78|08      |      ;
                        SEP #$20                           ;01AD79|E220    |      ;
                        REP #$10                           ;01AD7B|C210    |      ;
@@ -3924,7 +3924,7 @@ CODE_01ADA9:
 ; Manages battle interface states and user input processing
 ; ==============================================================================
 
-CODE_01ADD1:
+BattleUI_ManageInterface:
                        SEP #$20                           ;01ADD1|E220    |      ;
                        REP #$10                           ;01ADD3|C210    |      ;
                        JSR.W CODE_01D2DF                   ;01ADD5|20DFD2  |01D2DF;
@@ -3946,7 +3946,7 @@ CODE_01ADD1:
 ; Coordinates special visual effects and animations for battle
 ; ==============================================================================
 
-CODE_01ADF9:
+BattleEffects_Coordinate:
                        SEP #$20                           ;01ADF9|E220    |      ;
                        REP #$10                           ;01ADFB|C210    |      ;
                        JSR.W CODE_01D2DF                   ;01ADFD|20DFD2  |01D2DF;
@@ -3970,7 +3970,7 @@ CODE_01ADF9:
 
                        db $E2,$20,$C2,$10,$20,$DF,$D2,$20,$5D,$D3,$20,$A6,$D3,$A2,$34,$46 ; 01AE21
 
-CODE_01AE31:
+BattleVictory_HandleSequence:
                        STX.W $19EE                        ;01AE31|8EEE19  |0119EE;
                        JSR.W CODE_01BEB2                   ;01AE34|20B2BE  |01BEB2;
                        LDX.W #$4635                       ;01AE37|A23546  |      ;
@@ -3986,14 +3986,14 @@ CODE_01AE31:
 ; Complex scene transition management for battle flow
 ; ==============================================================================
 
-CODE_01AE49:
+BattleScene_TransitionA:
                        LDX.W #$0004                       ;01AE49|A20400  |      ;
                        STX.W $1935                        ;01AE4C|8E3519  |011935;
                        LDA.W #$0005                       ;01AE4F|A90500  |      ;
                        STA.W $1937                        ;01AE52|8D3719  |011937;
                        JMP.W CODE_01CCE8                   ;01AE55|4CE8CC  |01CCE8;
 
-CODE_01AE58:
+BattleScene_TransitionB:
                        LDX.W #$0602                       ;01AE58|A20206  |      ;
                        STX.W $1935                        ;01AE5B|8E3519  |011935;
                        LDA.W #$0003                       ;01AE5E|A90300  |      ;
@@ -4007,7 +4007,7 @@ CODE_01AE58:
 ; Central hub for coordinating battle animations and timing
 ; ==============================================================================
 
-CODE_01AE76:
+BattleAnim_ControlHub:
                        SEP #$20                           ;01AE76|E220    |      ;
                        REP #$10                           ;01AE78|C210    |      ;
                        JSR.W CODE_01D120                   ;01AE7A|2020D1  |01D120;
@@ -4046,7 +4046,7 @@ CODE_01AEA0:
 ; Handles complex animation sequences with timing control
 ; ==============================================================================
 
-CODE_01AEB3:
+BattleAnim_HandleSequence:
                        PHY                                 ;01AEB3|5A      |      ;
                        LDX.W $1935                        ;01AEB4|AE3519  |001935;
                        LDA.B #$10                         ;01AEB7|A910    |      ;
@@ -4071,7 +4071,7 @@ CODE_01AEB3:
                        JSR.W CODE_01CC82                   ;01AEE5|2082CC  |01CC82;
                        PLY                                 ;01AEE8|7A      |      ;
                        LDX.W $1935                        ;01AEE9|AE3519  |001935;
-                       JSR.W CODE_01AEF0                   ;01AEEC|20F0AE  |01AEF0;
+                       JSR.W BattleAnim_ComplexLoop       ;01AEEC|20F0AE  |01AEF0;
                        RTS                                 ;01AEEF|60      |      ;
 
 ; ==============================================================================
@@ -4079,7 +4079,7 @@ CODE_01AEB3:
 ; Manages complex animation loops with frame timing
 ; ==============================================================================
 
-CODE_01AEF0:
+BattleAnim_ComplexLoop:
                        PHY                                 ;01AEF0|5A      |      ;
                        INC.W $19F7                        ;01AEF1|EEF719  |0119F7;
 
