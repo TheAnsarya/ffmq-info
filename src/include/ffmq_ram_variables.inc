@@ -36,6 +36,18 @@
 !temp_index         = $0B       ; Temporary index/counter
 !temp_flags         = $0C       ; Temporary flag byte
 
+; Additional temporary variables (Medium Priority - Issue #29)
+!temp_byte_4        = $0E       ; Temporary byte storage 4 (text engine)
+!temp_byte_5        = $14       ; Temporary byte storage 5
+
+!graphics_ptr       = $10       ; Graphics system pointer (2 bytes: $10-$11)
+!graphics_ptr_lo    = $10       ; Graphics system pointer (low byte)
+!graphics_ptr_hi    = $11       ; Graphics system pointer (high byte)
+
+!text_ptr           = $12       ; Text system pointer (2 bytes: $12-$13)
+!text_ptr_lo        = $12       ; Text system pointer (low byte)
+!text_ptr_hi        = $13       ; Text system pointer (high byte)
+
 !general_address    = $0017     ; General purpose address (legacy label)
 
 ; ----------------------------------------------------------------------------
@@ -257,6 +269,13 @@
 ; Tilemap / Graphics ($7E0800-$7E0FFF)
 ; ----------------------------------------------------------------------------
 !tilemap_wram_source_start      = $0800     ; Tilemap source start (legacy label)
+
+; Medium Priority Graphics Variables (Issue #29)
+!wram_data_ptr      = $06BF     ; WRAM data pointer/offset
+!rom_function_ptr   = $0B83     ; ROM function pointer base
+!tilemap_index      = $0E89     ; Tilemap indexing variable
+!tilemap_counter    = $0E91     ; Tilemap operation counter
+
 !tilemap_wram_source_start_2    = $0900     ; Tilemap source start 2 (legacy label)
 !ram_0900                       = $0900     ; Legacy label
 
@@ -272,6 +291,14 @@
 !ram_19b4           = $19b4     ; if bit 3 = 1 then !ram_1a33 => $80 else $00
 !ram_19bd           = $19bd     ; bottom 4 bits inversed are a DMA transfer size variable
 !ram_19bf           = $19bf     ; Legacy graphics variable
+
+; Medium Priority Graphics Control (Issue #29)
+!graphics_temp_1    = $19EE     ; Graphics temporary variable 1
+!dma_offset         = $1A2F     ; DMA transfer offset
+!bg_control         = $1A3B     ; Background control flags
+!graphics_flags     = $1A3D     ; Graphics system flags
+!sprite_control     = $1A45     ; Sprite control variable
+!layer_flags        = $1A55     ; Layer enable/disable flags
 
 ; Tilemap VRAM control structures
 !tilemap_vram_control               = $19fa     ; VMAIN flags (known: $80, $81)
@@ -296,8 +323,9 @@
 ; ----------------------------------------------------------------------------
 ; Menu / UI ($7E0E00-$7E0FFF)
 ; ----------------------------------------------------------------------------
-!menu_color         = $0e9c     ; Menu color setting
-!menu_color_high    = $0e9d     ; Menu color (high byte)
+!menu_color         = $0E9C     ; Menu color setting (2 bytes: $0E9C-$0E9D)
+!menu_color_lo      = $0E9C     ; Menu color setting (low byte)
+!menu_color_hi      = $0E9D     ; Menu color setting (high byte)
 
 ; ============================================================================
 ; HIGH RAM ($7E1000-$7EFFFF) - Buffers
