@@ -12,3 +12,6 @@ roms/
 **/*.pre_format_backup
 **/*.temp
 ~docs/copilot-chats/*.temp
+
+# Backups directory (created by formatting/refactoring scripts)
+backups/
