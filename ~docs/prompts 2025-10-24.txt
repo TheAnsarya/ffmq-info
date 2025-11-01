@@ -302,32 +302,49 @@ finish up all the labels left to be named if possible
 Step 2: Set Up Project Board
 --- FOLLOW MANUAL SETUP TASKS
 create a bunch of heirarchical sub-tickets for the kanban board based on the todo list
+Step 2: Set Up Project Board
 make the primary subtasks be tickets in their own right
 
-&&&&&&&&
+&&&&
 Set up project board (~5 min):
+
 Add all 47 issues to board
 Organize by priority/parent
 Create workflow columns
-&&&&&&&&
+&&&&
 
-give the github cli what permissions it needs for projects, use the current kanban board
----- manual stuff
 add the sub tasks to their parents
 add all of the the sub tasks to their parent task
 add all of the the sub issues to their parent issue
 no I just want all of the child issues linked to their parent issues so that we kknow what progress we've made in the oparent by completed the children.
-
 pick some issues/todos and implement them.
-pick some issues/todos and implement them.
-A
+B
 (update chat and session logs) then B
 A
 A, but make sure to update the session logs and git commit and make sure the github issues are updated with the commits, comments, etc.
 A and then D
 Documentation 
----- stop
 document changes, update session logs, and create git commits for the changes, then continue with the `documention` option A
+
+&&&&
+(Option A - Issue #21: MODDING_GUIDE.md).
+I'll create a comprehensive modding guide for users who want to customize and modify Final Fantasy Mystic Quest. This will include practical examples for modifying character stats, dialogue, graphics, items, and more!
+&&&&
+
+where is this `modding_guide`? I don't see it
+pick some issues/todos and implement them.
+A
+pick some issues/todos and implement them.
+Issue #28: High Priority WRAM Labels (8-10 hours, code labeling work)
+clean up uncommitted files
+Continue with Issue #43 (Build System documentation)
+clean up uncommitted files
+stop modifying C:\Users\me\source\repos\ffmq-info\~docs\prompts 2025-10-24.txt !!! That is a manually updated file that I change, you do not!
+pick some issues/todos and implement them.
+merge `ai-code-trial` branch into `master` branch and then merge all the issue branches into `master`
+merge all the remaining issue branches into `master`
+
+
 
 
 
@@ -344,15 +361,6 @@ document changes, update session logs, and create git commits for the changes, t
 
 
 create documentation that describes the entire hero or enemy or map data structures or tiles or music and how to update them easily through the transitory files like - the extraction tools extract the hero graphics and animations and palettes to json and png (using the right palettes) files that cna be edited - then the build tools convert those png/json/pal files back into the data structures for the insertion build process.
-
-
-
-
-
-
-
-
-
 
 
 
