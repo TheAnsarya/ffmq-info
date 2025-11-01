@@ -1,0 +1,224 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://github.com/TheAnsarya/ffmq-info/schemas/item_schema.json",
+  "title": "FFMQ Item Data Schema",
+  "description": "Schema for Final Fantasy: Mystic Quest item, weapon, armor data",
+  "type": "object",
+  "required": ["version", "items"],
+  "properties": {
+    "version": {
+      "type": "string",
+      "description": "Schema version",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$"
+    },
+    "description": {
+      "type": "string",
+      "description": "Description of this data file"
+    },
+    "items": {
+      "type": "array",
+      "description": "Array of all items",
+      "items": {
+        "$ref": "#/definitions/item"
+      }
+    }
+  },
+  "definitions": {
+    "item": {
+      "type": "object",
+      "required": ["id", "name", "type"],
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique item ID (snake_case)"
+        },
+        "name": {
+          "type": "string",
+          "description": "Display name",
+          "minLength": 1,
+          "maxLength": 16
+        },
+        "type": {
+          "type": "string",
+          "description": "Item type",
+          "enum": [
+            "weapon", "armor", "accessory",
+            "consumable", "key_item", "battle_item"
+          ]
+        },
+        "description": {
+          "type": "string",
+          "description": "In-game description"
+        },
+        "price_buy": {
+          "type": "integer",
+          "description": "Buy price (0 = can't buy)",
+          "minimum": 0,
+          "maximum": 65535
+        },
+        "price_sell": {
+          "type": "integer",
+          "description": "Sell price (0 = can't sell)",
+          "minimum": 0,
+          "maximum": 65535
+        },
+        "weapon_stats": {
+          "$ref": "#/definitions/weapon_stats"
+        },
+        "armor_stats": {
+          "$ref": "#/definitions/armor_stats"
+        },
+        "accessory_stats": {
+          "$ref": "#/definitions/accessory_stats"
+        },
+        "consumable_effect": {
+          "$ref": "#/definitions/consumable_effect"
+        },
+        "usable_in_battle": {
+          "type": "boolean",
+          "description": "Can be used during battle"
+        },
+        "usable_in_field": {
+          "type": "boolean",
+          "description": "Can be used in the field"
+        },
+        "icon_id": {
+          "type": "integer",
+          "description": "Menu icon ID",
+          "minimum": 0
+        },
+        "rom_address": {
+          "type": "string",
+          "description": "ROM address of item data",
+          "pattern": "^\\$[0-9A-F]{6}$"
+        }
+      }
+    },
+    "weapon_stats": {
+      "type": "object",
+      "description": "Weapon statistics",
+      "properties": {
+        "attack": {
+          "type": "integer",
+          "description": "Attack power bonus",
+          "minimum": 0,
+          "maximum": 255
+        },
+        "accuracy": {
+          "type": "integer",
+          "description": "Accuracy bonus",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "element": {
+          "type": "string",
+          "description": "Elemental attribute",
+          "enum": ["none", "fire", "water", "thunder", "earth", "wind"]
+        },
+        "special_effect": {
+          "type": "string",
+          "description": "Special weapon effect"
+        },
+        "two_handed": {
+          "type": "boolean",
+          "description": "Requires two hands"
+        }
+      }
+    },
+    "armor_stats": {
+      "type": "object",
+      "description": "Armor statistics",
+      "properties": {
+        "defense": {
+          "type": "integer",
+          "description": "Defense bonus",
+          "minimum": 0,
+          "maximum": 255
+        },
+        "magic_defense": {
+          "type": "integer",
+          "description": "Magic defense bonus",
+          "minimum": 0,
+          "maximum": 255
+        },
+        "resistances": {
+          "type": "array",
+          "description": "Element resistances",
+          "items": {
+            "type": "string",
+            "enum": ["fire", "water", "thunder", "earth", "wind"]
+          }
+        },
+        "status_immunities": {
+          "type": "array",
+          "description": "Status effect immunities",
+          "items": {
+            "type": "string"
+          }
+        },
+        "special_effect": {
+          "type": "string",
+          "description": "Special armor effect"
+        }
+      }
+    },
+    "accessory_stats": {
+      "type": "object",
+      "description": "Accessory statistics",
+      "properties": {
+        "stat_bonuses": {
+          "type": "object",
+          "description": "Stat bonuses",
+          "properties": {
+            "hp": { "type": "integer" },
+            "speed": { "type": "integer" },
+            "strength": { "type": "integer" },
+            "defense": { "type": "integer" }
+          }
+        },
+        "special_effect": {
+          "type": "string",
+          "description": "Special accessory effect"
+        },
+        "status_immunities": {
+          "type": "array",
+          "description": "Status effect immunities",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "consumable_effect": {
+      "type": "object",
+      "description": "Consumable item effect",
+      "properties": {
+        "effect_type": {
+          "type": "string",
+          "description": "Type of effect",
+          "enum": [
+            "heal_hp", "heal_status", "restore_hp_percent",
+            "revive", "buff_stat", "damage_enemy", "escape"
+          ]
+        },
+        "power": {
+          "type": "integer",
+          "description": "Effect power/amount",
+          "minimum": 0
+        },
+        "target": {
+          "type": "string",
+          "description": "Target type",
+          "enum": ["single_ally", "all_allies", "single_enemy", "all_enemies"]
+        },
+        "status_cured": {
+          "type": "array",
+          "description": "Status effects cured",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  }
+}
