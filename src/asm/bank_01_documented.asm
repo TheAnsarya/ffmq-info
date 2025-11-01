@@ -5024,14 +5024,14 @@ UNREACH_01B53F:
 ; Handles advanced effect processing with state management
 ; ==============================================================================
 
-CODE_01B545:
+BattleEffect_AdvancedProcessor:
                        LDA.B #$00                         ;01B545|A900    |      ;
                        STA.W $19F6                        ;01B547|8DF619  |0119F6;
                        XBA                                 ;01B54A|EB      |      ;
                        LDA.W $0E91                        ;01B54B|AD910E  |010E91;
                        TAX                                 ;01B54E|AA      |      ;
                        LDA.L DATA8_06BE77,X                ;01B54F|BF77BE06|06BE77;
-                       BMI CODE_01B58F                     ;01B553|303A    |01B58F;
+                       BMI .Exit                           ;01B553|303A    |01B58F;
                        ASL A                               ;01B555|0A      |      ;
                        TAX                                 ;01B556|AA      |      ;
                        PHP                                 ;01B557|08      |      ;
@@ -5040,34 +5040,32 @@ CODE_01B545:
                        TAX                                 ;01B55E|AA      |      ;
                        PLP                                 ;01B55F|28      |      ;
 
-CODE_01B560:
+.ProcessLoop:
                        LDA.L DATA8_06BF15,X                ;01B560|BF15BF06|06BF15;
                        CMP.B #$FF                         ;01B564|C9FF    |      ;
-                       BEQ CODE_01B58F                     ;01B566|F027    |01B58F;
+                       BEQ .Exit                           ;01B566|F027    |01B58F;
                        JSL.L CODE_009776                   ;01B568|22769700|009776;
-                       BEQ CODE_01B58A                     ;01B56C|F01C    |01B58A;
+                       BEQ .NextEffect                     ;01B56C|F01C    |01B58A;
                        LDA.L DATA8_06BF16,X                ;01B56E|BF16BF06|06BF16;
                        STA.W $19EE                        ;01B572|8DEE19  |0119EE;
                        LDA.L DATA8_06BF17,X                ;01B575|BF17BF06|06BF17;
                        STA.W $19EF                        ;01B579|8DEF19  |0119EF;
                        CMP.B #$24                         ;01B57C|C924    |      ;
-                       BEQ CODE_01B58A                     ;01B57E|F00A    |01B58A;
+                       BEQ .NextEffect                     ;01B57E|F00A    |01B58A;
                        CMP.B #$28                         ;01B580|C928    |      ;
-                       BEQ CODE_01B58A                     ;01B582|F006    |01B58A;
+                       BEQ .NextEffect                     ;01B582|F006    |01B58A;
                        PHX                                 ;01B584|DA      |      ;
                        JSL.L CODE_01B24C                   ;01B585|224CB201|01B24C;
-                       PLX                                 ;01B589|FA      |      ;
+	PLX                                 ;01B589|FA      |      ;
 
-CODE_01B58A:
-                       INX                                 ;01B58A|E8      |      ;
-                       INX                                 ;01B58B|E8      |      ;
-                       INX                                 ;01B58C|E8      |      ;
-                       BRA CODE_01B560                     ;01B58D|80D1    |01B560;
+.NextEffect:
+	INX                                 ;01B58A|E8      |      ;
+	INX                                 ;01B58B|E8      |      ;
+	INX                                 ;01B58C|E8      |      ;
+	BRA .ProcessLoop                    ;01B58D|80D1    |01B560;
 
-CODE_01B58F:
-                       RTS                                 ;01B58F|60      |      ;
-
-; ==============================================================================
+.Exit:
+	RTS                                 ;01B58F|60      |      ;; ==============================================================================
 ; Graphics Processing and Memory Transfer
 ; Advanced graphics processing with memory transfer coordination
 ; ==============================================================================
@@ -5085,7 +5083,7 @@ CODE_01B58F:
 ; Advanced battle state machine with complex state transitions
 ; ==============================================================================
 
-CODE_01B5FB:
+BattleState_MachineController:
                        PHP                                 ;01B5FB|08      |      ;
                        SEP #$20                           ;01B5FC|E220    |      ;
                        REP #$10                           ;01B5FE|C210    |      ;
@@ -5154,7 +5152,7 @@ CODE_01B5FB:
 ; Advanced sound effect processing with audio coordination
 ; ==============================================================================
 
-CODE_01B6E7:
+BattleAudio_SoundEffectCoordinator:
                        PHP                                 ;01B6E7|08      |      ;
                        SEP #$20                           ;01B6E8|E220    |      ;
                        REP #$10                           ;01B6EA|C210    |      ;
@@ -5202,18 +5200,18 @@ CODE_01B6E7:
 ; Handles complex pattern management with advanced battle logic
 ; ==============================================================================
 
-CODE_01B73D:
+BattlePattern_ComplexManager:
                        PHP                                 ;01B73D|08      |      ;
                        SEP #$20                           ;01B73E|E220    |      ;
                        REP #$10                           ;01B740|C210    |      ;
                        LDA.W $0E91                        ;01B742|AD910E  |010E91;
-                       BEQ CODE_01B752                     ;01B745|F00B    |01B752;
+                       BEQ .Exit                           ;01B745|F00B    |01B752;
                        LDA.B #$55                         ;01B747|A955    |      ;
                        STA.W $0E04                        ;01B749|8D040E  |010E04;
                        STA.W $0E0C                        ;01B74C|8D0C0E  |010E0C;
                        JSR.W CODE_0182D0                   ;01B74F|20D082  |0182D0;
 
-CODE_01B752:
+.Exit:
                        PLP                                 ;01B752|28      |      ;
                        RTS                                 ;01B753|60      |      ;
 
@@ -5222,7 +5220,7 @@ CODE_01B752:
 ; Advanced animation coordination with sprite management
 ; ==============================================================================
 
-CODE_01B754:
+BattleAnimation_SpriteCoordinator:
                        PHP                                 ;01B754|08      |      ;
                        PHX                                 ;01B755|DA      |      ;
                        PHY                                 ;01B756|5A      |      ;
@@ -5247,7 +5245,7 @@ CODE_01B754:
 ; Complex sprite processing with multi-layer coordination
 ; ==============================================================================
 
-CODE_01B772:
+BattleSprite_ProcessingEngine:
                        PHP                                 ;01B772|08      |      ;
                        PHD                                 ;01B773|0B      |      ;
                        SEP #$20                           ;01B774|E220    |      ;
@@ -5258,15 +5256,15 @@ CODE_01B772:
                        STX.W $1975                        ;01B77F|8E7519  |011975;
                        STX.W $1973                        ;01B782|8E7319  |011973;
 
-CODE_01B785:
+.ProcessSpriteLoop:
                        SEP #$20                           ;01B785|E220    |      ;
                        REP #$10                           ;01B787|C210    |      ;
                        LDX.W $1975                        ;01B789|AE7519  |011975;
                        LDA.B $00,X                        ;01B78C|B500    |001A72;
                        BIT.B #$10                         ;01B78E|8910    |      ;
-                       BEQ CODE_01B7BC                     ;01B790|F02A    |01B7BC;
+                       BEQ .NextSprite                     ;01B790|F02A    |01B7BC;
                        CMP.B #$FF                         ;01B792|C9FF    |      ;
-                       BEQ CODE_01B7BC                     ;01B794|F026    |01B7BC;
+                       BEQ .NextSprite                     ;01B794|F026    |01B7BC;
                        JSR.W CODE_01B7D8                   ;01B796|20D8B7  |01B7D8;
                        REP #$30                           ;01B799|C230    |      ;
                        PHX                                 ;01B79B|DA      |      ;
@@ -5286,19 +5284,19 @@ CODE_01B785:
                        LDA.B $07,X                        ;01B7B7|B507    |001A79;
                        STA.W $0C0E,Y                      ;01B7B9|990E0C  |010C0E;
 
-CODE_01B7BC:
+.NextSprite:
                        REP #$30                           ;01B7BC|C230    |      ;
                        INC.W $1973                        ;01B7BE|EE7319  |011973;
                        LDA.W $1973                        ;01B7C1|AD7319  |011973;
                        CMP.W #$0016                       ;01B7C4|C91600  |      ;
-                       BEQ CODE_01B7D5                     ;01B7C7|F00C    |01B7D5;
+                       BEQ .Exit                           ;01B7C7|F00C    |01B7D5;
                        LDA.W $1975                        ;01B7C9|AD7519  |011975;
                        CLC                                 ;01B7CC|18      |      ;
                        ADC.W #$001A                       ;01B7CD|691A00  |      ;
                        STA.W $1975                        ;01B7D0|8D7519  |011975;
-                       BRA CODE_01B785                     ;01B7D3|80B0    |01B785;
+                       BRA .ProcessSpriteLoop              ;01B7D3|80B0    |01B785;
 
-CODE_01B7D5:
+.Exit:
                        PLD                                 ;01B7D5|2B      |      ;
                        PLP                                 ;01B7D6|28      |      ;
                        RTS                                 ;01B7D7|60      |      ;
@@ -5308,7 +5306,7 @@ CODE_01B7D5:
 ; Handles complex animation frame processing with timing control
 ; ==============================================================================
 
-CODE_01B7D8:
+BattleAnimation_FrameProcessor:
                        SEP #$20                           ;01B7D8|E220    |      ;
                        REP #$10                           ;01B7DA|C210    |      ;
                        LDA.B $0E,X                        ;01B7DC|B50E    |001A80;
@@ -5319,7 +5317,7 @@ CODE_01B7D8:
                        STA.W $197D                        ;01B7E3|8D7D19  |01197D;
                        STA.W $197F                        ;01B7E6|8D7F19  |01197F;
                        CMP.B #$00                         ;01B7E9|C900    |      ;
-                       BNE CODE_01B804                     ;01B7EB|D017    |01B804;
+                       BNE .ProcessAnimation               ;01B7EB|D017    |01B804;
                        INC.W $197F                        ;01B7ED|EE7F19  |01197F;
                        LDA.B $17,X                        ;01B7F0|B517    |001A89;
                        PHA                                 ;01B7F2|48      |      ;
@@ -5330,10 +5328,10 @@ CODE_01B7D8:
                        STA.B $17,X                        ;01B7F9|9517    |001A89;
                        LSR A                               ;01B7FB|4A      |      ;
                        CMP.W $197E                        ;01B7FC|CD7E19  |01197E;
-                       BNE CODE_01B804                     ;01B7FF|D003    |01B804;
+                       BNE .ProcessAnimation               ;01B7FF|D003    |01B804;
                        JMP.W CODE_01CC81                   ;01B801|4C81CC  |01CC81;
 
-CODE_01B804:
+.ProcessAnimation:
                        LDA.B $0E,X                        ;01B804|B50E    |001A80;
                        LSR A                               ;01B806|4A      |      ;
                        LSR A                               ;01B807|4A      |      ;
@@ -5343,11 +5341,11 @@ CODE_01B804:
                        STA.W $197E                        ;01B80C|8D7E19  |01197E;
                        STA.W $1980                        ;01B80F|8D8019  |011980;
                        LDA.B $00,X                        ;01B812|B500    |001A72;
-                       BPL CODE_01B81B                     ;01B814|1005    |01B81B;
+                       BPL .LoadAnimationTable             ;01B814|1005    |01B81B;
                        AND.B #$03                         ;01B816|2903    |      ;
                        STA.W $197E                        ;01B818|8D7E19  |01197E;
 
-CODE_01B81B:
+.LoadAnimationTable:
                        LDA.B #$00                         ;01B81B|A900    |      ;
                        XBA                                 ;01B81D|EB      |      ;
                        LDA.B $10,X                        ;01B81E|B510    |001A82;
@@ -5361,19 +5359,19 @@ CODE_01B81B:
                        SEP #$20                           ;01B82D|E220    |      ;
                        REP #$10                           ;01B82F|C210    |      ;
                        LDA.W $197D                        ;01B831|AD7D19  |01197D;
-                       BNE CODE_01B83B                     ;01B834|D005    |01B83B;
+                       BNE .ProcessFrameShift              ;01B834|D005    |01B83B;
                        LDA.B $17,X                        ;01B836|B517    |001A89;
                        LSR A                               ;01B838|4A      |      ;
-                       BRA CODE_01B845                     ;01B839|800A    |01B845;
+                       BRA .CalculateFrameOffset           ;01B839|800A    |01B845;
 
-CODE_01B83B:
+.ProcessFrameShift:
                        LDA.B $17,X                        ;01B83B|B517    |001A89;
                        SEC                                 ;01B83D|38      |      ;
                        SBC.W $197F                        ;01B83E|ED7F19  |01197F;
                        STA.B $17,X                        ;01B841|9517    |001A89;
                        LDA.B $17,X                        ;01B843|B517    |001A89;
 
-CODE_01B845:
+.CalculateFrameOffset:
                        AND.B #$08                         ;01B845|2908    |      ;
                        LSR A                               ;01B847|4A      |      ;
                        LSR A                               ;01B848|4A      |      ;
@@ -5382,20 +5380,20 @@ CODE_01B845:
                        LDA.B $00,X                        ;01B84D|B500    |001A72;
                        AND.B #$B0                         ;01B84F|29B0    |      ;
                        CMP.B #$B0                         ;01B851|C9B0    |      ;
-                       BEQ CODE_01B87F                     ;01B853|F02A    |01B87F;
+                       BEQ .CalculateSpriteOffset          ;01B853|F02A    |01B87F;
                        LDA.B $10,X                        ;01B855|B510    |001A82;
                        CMP.B #$3E                         ;01B857|C93E    |      ;
-                       BNE CODE_01B860                     ;01B859|D005    |01B860;
+                       BNE .StandardOffset                 ;01B859|D005    |01B860;
                        LDA.W $1979                        ;01B85B|AD7919  |011979;
-                       BRA CODE_01B868                     ;01B85E|8008    |01B868;
+                       BRA .ApplyOffset                    ;01B85E|8008    |01B868;
 
-CODE_01B860:
+.StandardOffset:
                        LDA.W $1980                        ;01B860|AD8019  |011980;
                        ASL A                               ;01B863|0A      |      ;
                        CLC                                 ;01B864|18      |      ;
                        ADC.W $1979                        ;01B865|6D7919  |011979;
 
-CODE_01B868:
+.ApplyOffset:
                        REP #$30                           ;01B868|C230    |      ;
                        AND.W #$00FF                       ;01B86A|29FF00  |      ;
                        ASL A                               ;01B86D|0A      |      ;
@@ -5409,7 +5407,7 @@ CODE_01B868:
                        REP #$10                           ;01B87A|C210    |      ;
                        JSR.W CODE_01AE8A                   ;01B87C|208AAE  |01AE8A;
 
-CODE_01B87F:
+.CalculateSpriteOffset:
                        SEP #$20                           ;01B87F|E220    |      ;
                        REP #$10                           ;01B881|C210    |      ;
                        LDA.B #$00                         ;01B883|A900    |      ;
@@ -5427,7 +5425,7 @@ CODE_01B87F:
                        REP #$10                           ;01B89B|C210    |      ;
                        LDA.W $197D                        ;01B89D|AD7D19  |01197D;
                        CMP.B #$02                         ;01B8A0|C902    |      ;
-                       BNE CODE_01B8B2                     ;01B8A2|D00E    |01B8B2;
+                       BNE .ProcessHorizontalMovement      ;01B8A2|D00E    |01B8B2;
                        LDA.W $1977                        ;01B8A4|AD7719  |011977;
                        ASL A                               ;01B8A7|0A      |      ;
                        STA.W $1977                        ;01B8A8|8D7719  |011977;
@@ -5435,64 +5433,64 @@ CODE_01B87F:
                        ASL A                               ;01B8AE|0A      |      ;
                        STA.W $1978                        ;01B8AF|8D7819  |011978;
 
-CODE_01B8B2:
+.ProcessHorizontalMovement:
                        LDA.B #$00                         ;01B8B2|A900    |      ;
                        XBA                                 ;01B8B4|EB      |      ;
                        LDA.W $1977                        ;01B8B5|AD7719  |011977;
-                       BEQ CODE_01B8D5                     ;01B8B8|F01B    |01B8D5;
-                       BPL CODE_01B8C8                     ;01B8BA|100C    |01B8C8;
+                       BEQ .ProcessVerticalMovement        ;01B8B8|F01B    |01B8D5;
+                       BPL .PositiveHorizontal             ;01B8BA|100C    |01B8C8;
                        LDA.W $197F                        ;01B8BC|AD7F19  |01197F;
                        EOR.B #$FF                         ;01B8BF|49FF    |      ;
                        INC A                               ;01B8C1|1A      |      ;
                        XBA                                 ;01B8C2|EB      |      ;
                        LDA.B #$FF                         ;01B8C3|A9FF    |      ;
                        XBA                                 ;01B8C5|EB      |      ;
-                       BRA CODE_01B8CB                     ;01B8C6|8003    |01B8CB;
+                       BRA .ApplyHorizontalMovement        ;01B8C6|8003    |01B8CB;
 
-CODE_01B8C8:
+.PositiveHorizontal:
                        LDA.W $197F                        ;01B8C8|AD7F19  |01197F;
 
-CODE_01B8CB:
+.ApplyHorizontalMovement:
                        REP #$30                           ;01B8CB|C230    |      ;
                        CLC                                 ;01B8CD|18      |      ;
                        ADC.B $13,X                        ;01B8CE|7513    |001A85;
                        AND.W #$03FF                       ;01B8D0|29FF03  |      ;
                        STA.B $13,X                        ;01B8D3|9513    |001A85;
 
-CODE_01B8D5:
+.ProcessVerticalMovement:
                        SEP #$20                           ;01B8D5|E220    |      ;
                        REP #$10                           ;01B8D7|C210    |      ;
                        LDA.B #$00                         ;01B8D9|A900    |      ;
                        XBA                                 ;01B8DB|EB      |      ;
                        LDA.W $1978                        ;01B8DC|AD7819  |011978;
-                       BEQ CODE_01B8FC                     ;01B8DF|F01B    |01B8FC;
-                       BPL CODE_01B8EF                     ;01B8E1|100C    |01B8EF;
+                       BEQ .CheckFrameCounter              ;01B8DF|F01B    |01B8FC;
+                       BPL .PositiveVertical               ;01B8E1|100C    |01B8EF;
                        LDA.W $197F                        ;01B8E3|AD7F19  |01197F;
                        EOR.B #$FF                         ;01B8E6|49FF    |      ;
                        INC A                               ;01B8E8|1A      |      ;
                        XBA                                 ;01B8E9|EB      |      ;
                        LDA.B #$FF                         ;01B8EA|A9FF    |      ;
                        XBA                                 ;01B8EC|EB      |      ;
-                       BRA CODE_01B8F2                     ;01B8ED|8003    |01B8F2;
+                       BRA .ApplyVerticalMovement          ;01B8ED|8003    |01B8F2;
 
-CODE_01B8EF:
+.PositiveVertical:
                        LDA.W $197F                        ;01B8EF|AD7F19  |01197F;
 
-CODE_01B8F2:
+.ApplyVerticalMovement:
                        REP #$30                           ;01B8F2|C230    |      ;
                        CLC                                 ;01B8F4|18      |      ;
                        ADC.B $15,X                        ;01B8F5|7515    |001A87;
                        AND.W #$03FF                       ;01B8F7|29FF03  |      ;
                        STA.B $15,X                        ;01B8FA|9515    |001A87;
 
-CODE_01B8FC:
+.CheckFrameCounter:
                        SEP #$20                           ;01B8FC|E220    |      ;
                        REP #$10                           ;01B8FE|C210    |      ;
                        LDA.B $17,X                        ;01B900|B517    |001A89;
-                       BPL CODE_01B906                     ;01B902|1002    |01B906;
+                       BPL .Exit                           ;01B902|1002    |01B906;
                        STZ.B $00,X                        ;01B904|7400    |001A72;
 
-CODE_01B906:
+.Exit:
                        RTS                                 ;01B906|60      |      ;
 
 ; ==============================================================================
@@ -5500,7 +5498,7 @@ CODE_01B906:
 ; Complex system state control with coordination
 ; ==============================================================================
 
-CODE_01B907:
+BattleSystem_StateController:
                        PHP                                 ;01B907|08      |      ;
                        PHD                                 ;01B908|0B      |      ;
                        SEP #$20                           ;01B909|E220    |      ;
@@ -5509,14 +5507,14 @@ CODE_01B907:
                        PLD                                 ;01B910|2B      |      ;
                        LDA.B $0E,X                        ;01B911|B50E    |001A80;
                        AND.B #$C0                         ;01B913|29C0    |      ;
-                       BNE CODE_01B91B                     ;01B915|D004    |01B91B;
+                       BNE .UseLowerValue                  ;01B915|D004    |01B91B;
                        LDA.B #$1F                         ;01B917|A91F    |      ;
-                       BRA CODE_01B91D                     ;01B919|8002    |01B91D;
+                       BRA .StoreFrameValue                ;01B919|8002    |01B91D;
 
-CODE_01B91B:
+.UseLowerValue:
                        LDA.B #$0F                         ;01B91B|A90F    |      ;
 
-CODE_01B91D:
+.StoreFrameValue:
                        STA.B $17,X                        ;01B91D|9517    |001A89;
                        LDA.W $192B                        ;01B91F|AD2B19  |01192B;
                        STA.W $1979                        ;01B922|8D7919  |011979;
@@ -5551,7 +5549,7 @@ CODE_01B91D:
 ; Advanced scene transition with complex state management
 ; ==============================================================================
 
-CODE_01B96D:
+BattleScene_TransitionManager:
                        LDA.W $19CB                        ;01B96D|ADCB19  |0119CB;
                        AND.W #$FFF8                       ;01B970|29F8FF  |      ;
                        ORA.W #$0001                       ;01B973|090100  |      ;
@@ -5608,7 +5606,7 @@ CODE_01B96D:
 ; Complex tile coordinate processing with multi-layer graphics coordination
 ; ==============================================================================
 
-CODE_01D044:
+BattleGraphics_TileCoordProcessor1:
                        STA.W $0C58                        ;01D044|8D580C  |010C58;
                        CLC                                 ;01D047|18      |      ;
                        ADC.B #$08                         ;01D048|6908    |      ;
@@ -5616,7 +5614,7 @@ CODE_01D044:
                        STA.W $0C5C                        ;01D04D|8D5C0C  |010C5C;
                        RTS                                 ;01D050|60      |      ;
 
-CODE_01D051:
+BattleGraphics_TileCoordProcessor2:
                        STA.W $0C51                        ;01D051|8D510C  |010C51;
                        STA.W $0C55                        ;01D054|8D550C  |010C55;
                        CLC                                 ;01D057|18      |      ;
@@ -5630,18 +5628,18 @@ CODE_01D051:
 ; Complex graphics tile management with advanced coordination
 ; ==============================================================================
 
-CODE_01D061:
+BattleGraphics_TileManagementSystem:
                        PHP                                 ;01D061|08      |      ;
                        REP #$30                           ;01D062|C230    |      ;
                        LDA.W #$0140                       ;01D064|A94001  |      ;
-                       BRA CODE_01D06F                     ;01D067|8006    |01D06F;
+                       BRA .SetTilePatterns                ;01D067|8006    |01D06F;
 
-CODE_01D069:
+BattleGraphics_TileManagementSystem2:
                        PHP                                 ;01D069|08      |      ;
                        REP #$30                           ;01D06A|C230    |      ;
                        LDA.W #$0144                       ;01D06C|A94401  |      ;
 
-CODE_01D06F:
+.SetTilePatterns:
                        STA.W $0C52                        ;01D06F|8D520C  |010C52;
                        INC A                               ;01D072|1A      |      ;
                        STA.W $0C56                        ;01D073|8D560C  |010C56;
@@ -5673,13 +5671,13 @@ CODE_01D06F:
 ; Advanced graphics processing with battle coordination
 ; ==============================================================================
 
-CODE_01D0A5:
+BattleGraphics_ProcessingCoordinator:
                        LDA.B #$08                         ;01D0A5|A908    |      ;
                        JSR.W CODE_01BAAD                   ;01D0A7|20ADBA  |01BAAD;
-                       JSR.W CODE_01D069                   ;01D0AA|2069D0  |01D069;
+                       JSR.W BattleGraphics_TileManagementSystem2 ;01D0AA|2069D0  |01D069;
                        LDA.B #$06                         ;01D0AD|A906    |      ;
                        JSR.W CODE_01D6A9                   ;01D0AF|20A9D6  |01D6A9;
-                       JSR.W CODE_01D061                   ;01D0B2|2061D0  |01D061;
+                       JSR.W BattleGraphics_TileManagementSystem ;01D0B2|2061D0  |01D061;
                        LDA.B #$06                         ;01D0B5|A906    |      ;
                        JSR.W CODE_01D6A9                   ;01D0B7|20A9D6  |01D6A9;
                        RTS                                 ;01D0BA|60      |      ;
@@ -5689,7 +5687,7 @@ CODE_01D0A5:
 ; Complex animation loop control with advanced graphics coordination
 ; ==============================================================================
 
-CODE_01D0BB:
+BattleAnimation_LoopController:
                        PHP                                 ;01D0BB|08      |      ;
                        LDY.W #$0010                       ;01D0BC|A01000  |      ;
                        STZ.W $192B                        ;01D0BF|9C2B19  |01192B;
@@ -5706,10 +5704,10 @@ CODE_01D0BB:
                        BNE CODE_01D0E5                     ;01D0DD|D006    |01D0E5;
                        db $A2,$04,$00,$8E,$31,$19   ;01D0DF|        |      ;
 
-CODE_01D0E5:
+.ContinueLoop:
                        JSR.W CODE_018DF3                   ;01D0E5|20F38D  |018DF3;
 
-CODE_01D0E8:
+.AnimationUpdateLoop:
                        PHP                                 ;01D0E8|08      |      ;
                        REP #$30                           ;01D0E9|C230    |      ;
                        LDA.W $1900                        ;01D0EB|AD0019  |011900;
@@ -5730,7 +5728,7 @@ CODE_01D0E8:
                        AND.B #$0F                         ;01D10E|290F    |      ;
                        STA.W $192B                        ;01D110|8D2B19  |01192B;
                        DEY                                 ;01D113|88      |      ;
-                       BNE CODE_01D0E8                     ;01D114|D0D2    |01D0E8;
+                       BNE .AnimationUpdateLoop            ;01D114|D0D2    |01D0E8;
                        REP #$30                           ;01D116|C230    |      ;
                        LDA.W $1933                        ;01D118|AD3319  |011933;
                        STA.W $1900                        ;01D11B|8D0019  |011900;
@@ -5742,10 +5740,10 @@ CODE_01D0E8:
 ; Complex character sprite discovery with battle coordination
 ; ==============================================================================
 
-CODE_01D120:
+BattleChar_SpriteDiscovery:
                        LDA.B #$00                         ;01D120|A900    |      ;
                        JSR.W CODE_01B1EB                   ;01D122|20EBB1  |01B1EB;
-                       BCC CODE_01D14D                     ;01D125|9026    |01D14D;
+                       BCC .Exit                           ;01D125|9026    |01D14D;
                        STX.W $1935                        ;01D127|8E3519  |011935;
                        STA.W $1937                        ;01D12A|8D3719  |011937;
                        LDA.W $1A72,X                      ;01D12D|BD721A  |011A72;
@@ -5753,7 +5751,7 @@ CODE_01D120:
                        JSR.W CODE_01D14E                   ;01D133|204ED1  |01D14E;
                        LDA.B #$01                         ;01D136|A901    |      ;
                        JSR.W CODE_01B1EB                   ;01D138|20EBB1  |01B1EB;
-                       BCC CODE_01D14D                     ;01D13B|9010    |01D14D;
+                       BCC .Exit                           ;01D13B|9010    |01D14D;
                        STX.W $1939                        ;01D13D|8E3919  |011939;
                        STA.W $193B                        ;01D140|8D3B19  |01193B;
                        LDA.W $1A72,X                      ;01D143|BD721A  |011A72;
@@ -5761,7 +5759,7 @@ CODE_01D120:
                        JSR.W CODE_01D14E                   ;01D149|204ED1  |01D14E;
                        SEC                                 ;01D14C|38      |      ;
 
-CODE_01D14D:
+.Exit:
                        RTS                                 ;01D14D|60      |      ;
 
 CODE_01D14E:
@@ -5776,18 +5774,18 @@ CODE_01D14E:
 ; Complex color management with advanced coordination systems
 ; ==============================================================================
 
-CODE_01D159:
+BattleColor_ManagementSystem:
                        PHP                                 ;01D159|08      |      ;
                        REP #$30                           ;01D15A|C230    |      ;
                        LDA.W $192B                        ;01D15C|AD2B19  |01192B;
                        STA.W $192F                        ;01D15F|8D2F19  |01192F;
                        CMP.W #$7FFF                       ;01D162|C9FF7F  |      ;
-                       BEQ CODE_01D170                     ;01D165|F009    |01D170;
+                       BEQ .Exit                           ;01D165|F009    |01D170;
                        JSR.W CODE_01D1E1                   ;01D167|20E1D1  |01D1E1;
                        JSR.W CODE_01D1F4                   ;01D16A|20F4D1  |01D1F4;
                        JSR.W CODE_01D20D                   ;01D16D|200DD2  |01D20D;
 
-CODE_01D170:
+.Exit:
                        PLP                                 ;01D170|28      |      ;
                        RTS                                 ;01D171|60      |      ;
 

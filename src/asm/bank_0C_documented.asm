@@ -590,7 +590,7 @@ CODE_0C82CF:
 	JMP.W CODE_0C825A						;0C82F4	; Continue script
 
 ; Mid-range command handler ($40-$7F)
-CODE_0C82F7:
+Display_EffectCommandMidRange:
 	SBC.B #$30								;0C82F7	; Normalize command ($40+ → $10+)
 	LSR A									;0C82F9	; /2
 	LSR A									;0C82FA	; /4
@@ -599,11 +599,11 @@ CODE_0C82F7:
 	JMP.W CODE_0C825A						;0C82FF	; Continue script
 
 ; Low-range command handler ($08-$3F)
-CODE_0C8302:
+Display_EffectCommandLowRange:
 	CMP.B #$08								;0C8302	; Command = $08?
 	BNE CODE_0C837D							;0C8304	; Branch if not $08
 	LDA.W $015F								;0C8306	; Load parameter
-	BNE CODE_0C831E							;0C8309	; Branch if parameter != 0
+	BNE Display_EffectTableLookup			;0C8309	; Branch if parameter != 0
 	REP #$30								;0C830B	; 16-bit A/X/Y
 	LDA.W #$3C03							;0C830D	; Bit mask
 	TRB.W $0E08								;0C8310	; Clear bits in window config
@@ -613,7 +613,7 @@ CODE_0C8302:
 	JMP.W CODE_0C825A						;0C831B	; Continue script
 
 ; Parameter-based table lookup
-CODE_0C831E:
+Display_EffectTableLookup:
 	REP #$30								;0C831E	; 16-bit A/X/Y
 	LDA.W $015F								;0C8320	; Load parameter
 	ASL A									;0C8323	; *2
@@ -635,11 +635,11 @@ CODE_0C831E:
 	LDA.W #$0003							;0C8345	; Bit shift value = 3
 
 ; Bit shift loop
-CODE_0C8348:
+.BitShiftLoop:
 	ASL A									;0C8348	; Shift left *2
 	ASL A									;0C8349	; Shift left *2 (total *4)
 	DEY										;0C834A	; Decrement parameter
-	BNE CODE_0C8348							;0C834B	; Loop until parameter = 0
+	BNE .BitShiftLoop						;0C834B	; Loop until parameter = 0
 	PHA										;0C834D	; Save shifted value
 	TRB.W $0E08								;0C834E	; Clear bits in window config
 	AND.W #$AAAA							;0C8351	; Mask pattern ($AAAA)
@@ -650,11 +650,11 @@ CODE_0C8348:
 	LSR A									;0C835C	; Shift right /2 (total /4)
 
 ; Second bit shift loop
-CODE_0C835D:
+.SecondShiftLoop:
 	ASL A									;0C835D	; Shift left *2
 	ASL A									;0C835E	; Shift left *2 (total *4)
 	DEY										;0C835F	; Decrement parameter
-	BNE CODE_0C835D							;0C8360	; Loop until parameter = 0
+	BNE .SecondShiftLoop					;0C8360	; Loop until parameter = 0
 	LSR A									;0C8362	; Shift right /2
 	LSR A									;0C8363	; Shift right /2 (total /4)
 	PHA										;0C8364	; Save value
@@ -667,7 +667,7 @@ CODE_0C835D:
 	LDA.W #$C000							;0C8371	; Top bits mask
 	TRB.W $0E08								;0C8374	; Clear top bits in first window config
 
-CODE_0C8377:
+.CleanupAndExit:
 	PLA										;0C8377	; Clean up stack
 	SEP #$20								;0C8378	; 8-bit accumulator
 	JMP.W CODE_0C825A						;0C837A	; Continue script
@@ -679,7 +679,7 @@ CODE_0C8377:
 ; palette fades, and color window operations.
 ; ==============================================================================
 
-Display_ComplexScreenEffect:
+Display_EffectComplexParamCommand:
 	PHX										;0C837D	; Save script pointer
 	JSR.W Display_VRAMAddressCalc			;0C837E	; Calculate VRAM addresses
 	JSR.W Display_WindowEffectSetup			;0C8381	; Setup window effects
@@ -861,18 +861,18 @@ Display_ComplexPaletteFade:
 	JMP.W CODE_0C825A						;0C849B	; Continue script
 
 ; ==============================================================================
-; CODE_0C849E - Fade Stage Executor
+; Display_FadeStageExecutor - Fade Stage Executor
 ; ==============================================================================
 ; Executes one stage of palette fade using function table.
 ; Input: Y = fade curve table address
 ; Uses indirect JSR through $0210 and $0212 function pointers.
 ; ==============================================================================
 
-CODE_0C849E:
+Display_FadeStageExecutor:
 	STY.W $0210								;0C849E	; Store table address
 	LDY.W #$85B3							;0C84A1	; Fade curve start
 
-CODE_0C84A4:									; Loop through fade curve
+.FadeCurveLoop:									; Loop through fade curve
 	JSR.W ($0210,X)							;0C84A4	; Call effect function (indirect)
 	SEC										;0C84A7	; Set carry
 	LDA.W $0C81								;0C84A8	; Load base color value
@@ -880,10 +880,10 @@ CODE_0C84A4:									; Loop through fade curve
 	JSR.W ($0212,X)							;0C84AE	; Call adjustment function (indirect)
 	INY										;0C84B1	; Next curve entry
 	CPY.W #$85DB							;0C84B2	; End of curve?
-	BNE CODE_0C84A4							;0C84B5	; Loop if not done
+	BNE .FadeCurveLoop						;0C84B5	; Loop if not done
 	DEY										;0C84B7	; Back up one entry
 
-CODE_0C84B8:									; Reverse fade loop
+.ReverseFadeLoop:							; Reverse fade loop
 	DEY										;0C84B8	; Previous curve entry
 	JSR.W ($0210,X)							;0C84B9	; Call effect function
 	CLC										;0C84BC	; Clear carry
@@ -891,13 +891,14 @@ CODE_0C84B8:									; Reverse fade loop
 	ADC.W $0000,Y							;0C84C0	; Add curve value
 	JSR.W ($0212,X)							;0C84C3	; Call adjustment function
 	CPY.W #$85B2							;0C84C6	; Back at start?
-	BNE CODE_0C84B8							;0C84C9	; Loop if not done
+	BNE .ReverseFadeLoop					;0C84C9	; Loop if not done
 	RTS										;0C84CB	; Return
 
 ; [Fade function - adjusts window positions alternately]
+Display_FadeFunction1:
 	TYA										;0C84CC	; Transfer Y to A
 	BIT.B #$01								;0C84CD	; Test bit 0 (odd/even)
-	BEQ CODE_0C84F5							;0C84CF	; Skip if even frame
+	BEQ .Return								;0C84CF	; Skip if even frame
 	DEC.W $0C88								;0C84D1	; Adjust position 1
 	DEC.W $0CA4								;0C84D4	; Adjust position 2
 	DEC.W $0CA8								;0C84D7	; Adjust position 3
@@ -911,13 +912,14 @@ CODE_0C84B8:									; Reverse fade loop
 	DEC.W $0CAC								;0C84EF	; Adjust position 11
 	DEC.W $0CB0								;0C84F2	; Adjust position 12
 
-CODE_0C84F5:
+.Return:
 	RTS										;0C84F5	; Return
 
 ; [Fade function 2 - reverse direction adjustments]
+Display_FadeFunction2:
 	TYA										;0C84F6	; Transfer Y to A
 	BIT.B #$01								;0C84F7	; Test bit 0
-	BEQ CODE_0C851F							;0C84F9	; Skip if even
+	BEQ .Return								;0C84F9	; Skip if even
 	INC.W $0C88								;0C84FB	; Adjust opposite direction
 	INC.W $0CA4								;0C84FE	; Adjust position
 	INC.W $0CA8								;0C8501	; Adjust position
@@ -931,13 +933,14 @@ CODE_0C84F5:
 	INC.W $0CAC								;0C8519	; Adjust position
 	INC.W $0CB0								;0C851C	; Adjust position
 
-CODE_0C851F:
+.Return:
 	RTS										;0C851F	; Return
 
 ; [Fade function 3 - partial position adjustments]
+Display_FadeFunction3:
 	TYA										;0C8520	; Transfer Y
 	BIT.B #$01								;0C8521	; Test bit 0
-	BEQ CODE_0C8537							;0C8523	; Skip if even
+	BEQ .AdjustRemaining					;0C8523	; Skip if even
 	DEC.W $0C88								;0C8525	; Adjust subset of positions
 	DEC.W $0CA4								;0C8528	; Adjust position
 	DEC.W $0CA8								;0C852B	; Adjust position
@@ -945,7 +948,7 @@ CODE_0C851F:
 	INC.W $0CB4								;0C8531	; Adjust position
 	INC.W $0CB8								;0C8534	; Adjust position
 
-CODE_0C8537:
+.AdjustRemaining:
 	DEC.W $0C84								;0C8537	; Adjust remaining positions
 	DEC.W $0C9C								;0C853A	; Adjust position
 	DEC.W $0CA0								;0C853D	; Adjust position
@@ -955,19 +958,20 @@ CODE_0C8537:
 	RTS										;0C8549	; Return
 
 ; [Fade function 4 - complex bidirectional fade]
+Display_FadeFunction4:
 	LDA.W $0C81								;0C854A	; Load base value
 	PHA										;0C854D	; Save to stack
 	LDA.W $0214								;0C854E	; Load fade direction flag
-	BCS CODE_0C8559							;0C8551	; Branch if carry set
+	BCS .AddCurve							;0C8551	; Branch if carry set
 	SEC										;0C8553	; Set carry
 	SBC.W $0000,Y							;0C8554	; Subtract curve value
-	BRA CODE_0C855D							;0C8557	; Continue
+	BRA .ApplyFade							;0C8557	; Continue
 
-CODE_0C8559:
+.AddCurve:
 	CLC										;0C8559	; Clear carry
 	ADC.W $0000,Y							;0C855A	; Add curve value
 
-CODE_0C855D:
+.ApplyFade:
 	STA.W $0214								;0C855D	; Store new fade value
 	LSR A									;0C8560	; Divide by 2
 	PHA										;0C8561	; Save to stack
@@ -984,14 +988,14 @@ CODE_0C855D:
 	RTS										;0C8574	; Return
 
 ; ==============================================================================
-; CODE_0C8575 - Screen Color Value Updater
+; Display_ScreenColorValueUpdater - Screen Color Value Updater
 ; ==============================================================================
 ; Updates multiple screen color/position registers with same value.
 ; Spreads value across 5 primary + 5 secondary position registers.
 ; Input: A = value to write
 ; ==============================================================================
 
-CODE_0C8575:
+Display_ScreenColorValueUpdater:
 	SEC										;0C8575	; Set carry
 	STA.W $0C81								;0C8576	; Store to register 1
 	STA.W $0C85								;0C8579	; Store to register 2
@@ -1012,12 +1016,12 @@ CODE_0C8575:
 	STA.W $0CB9								;0C85A4	; Store to tertiary register 5
 	TYA										;0C85A7	; Transfer Y to A
 	BIT.B #$01								;0C85A8	; Test bit 0
-	BEQ CODE_0C85B1							;0C85AA	; Skip if even
+	BEQ .Return								;0C85AA	; Skip if even
 	PHY										;0C85AC	; Save Y
-	JSR.W CODE_0C85DB						;0C85AD	; Wait one frame
+	JSR.W Display_WaitVBlankAndUpdate		;0C85AD	; Wait one frame
 	PLY										;0C85B0	; Restore Y
 
-CODE_0C85B1:
+.Return:
 	RTS										;0C85B1	; Return
 
 ; Fade curve data table (40 bytes)
@@ -1026,14 +1030,14 @@ CODE_0C85B1:
 	db $00,$00,$00,$01,$00,$00,$00,$00,$00 ; End of curve
 
 ; ==============================================================================
-; CODE_0C85DB - Frame Wait & Sprite Animation Update
+; Display_WaitVBlankAndUpdate - Frame Wait & Sprite Animation Update
 ; ==============================================================================
 ; Primary VBLANK synchronization + sprite animation handler.
 ; Called hundreds of times per second - performance critical!
 ; Updates animated sprite tiles every 4 frames.
 ; ==============================================================================
 
-CODE_0C85DB:
+Display_WaitVBlankAndUpdate:
 	PHK										;0C85DB	; Push data bank
 	PLB										;0C85DC	; Set data bank = current bank
 	PHX										;0C85DD	; Save X register
@@ -1051,7 +1055,7 @@ CODE_0C85DB:
 	STA.W $020C								;0C85F9	; Store counter
 	STZ.W $020E								;0C85FC	; Clear sprite index
 
-CODE_0C85FF:									; Loop: Update each sprite
+.SpriteUpdateLoop:							; Loop: Update each sprite
 	LDA.W $020E								;0C85FF	; Load sprite index
 	ASL A									;0C8602	; *2 (word offset)
 	ADC.W #$0C80							;0C8603	; Add base address
@@ -1060,10 +1064,10 @@ CODE_0C85FF:									; Loop: Update each sprite
 	LDA.W $0202,X							;0C860A	; Load animation frame
 	INC A									;0C860D	; Next frame
 	CMP.W #$000E							;0C860E	; Frame >= 14?
-	BNE CODE_0C8616							;0C8611	; Branch if not
+	BNE .StoreFrame							;0C8611	; Branch if not
 	LDA.W #$0000							;0C8613	; Wrap to frame 0
 
-CODE_0C8616:
+.StoreFrame:
 	STA.W $0202,X							;0C8616	; Store new frame number
 	TAX										;0C8619	; Use frame as index
 	SEP #$20								;0C861A	; 8-bit accumulator
@@ -1078,24 +1082,24 @@ CODE_0C8616:
 	ADC.W #$0C94							;0C862C	; Add base address
 	TAY										;0C862F	; Use as pointer
 	PLP										;0C8630	; Restore comparison
-	BEQ CODE_0C863D							;0C8631	; Branch if tile was $44
+	BEQ .UseTile6C							;0C8631	; Branch if tile was $44
 	LDA.B #$48								;0C8633	; Tile pattern = $48
 	STA.W $0002,Y							;0C8635	; Update pattern 1
 	STA.W $0006,Y							;0C8638	; Update pattern 2
-	BRA CODE_0C8647							;0C863B	; Continue
+	BRA .ContinueSpriteLoop					;0C863B	; Continue
 
-CODE_0C863D:
+.UseTile6C:
 	LDA.B #$6C								;0C863D	; Tile pattern = $6C
 	STA.W $0002,Y							;0C863F	; Update pattern 1
 	LDA.B #$6E								;0C8642	; Tile pattern = $6E
 	STA.W $0006,Y							;0C8644	; Update pattern 2
 
-CODE_0C8647:
+.ContinueSpriteLoop:
 	REP #$30								;0C8647	; 16-bit A/X/Y
 	INC.W $020E								;0C8649	; Next sprite
 	INC.W $020E								;0C864C	; Increment by 2 (word addressing)
 	DEC.W $020C								;0C864F	; Decrement counter
-	BNE CODE_0C85FF							;0C8652	; Loop for all 5 sprites
+	BNE .SpriteUpdateLoop					;0C8652	; Loop for all 5 sprites
 	JSR.W CODE_0C8910						;0C8654	; Update PPU registers
 	PLX										;0C8657	; Restore X
 	RTS										;0C8658	; Return
@@ -1127,13 +1131,13 @@ DATA8_0C8659:
 	db $02,$04,$01,$01,$05,$02,$02,$02,$02,$02,$02,$02,$02,$00
 
 ; ==============================================================================
-; CODE_0C8767 - Sprite OAM Data Copy
+; Display_SpriteOAMDataCopy - Sprite OAM Data Copy
 ; ==============================================================================
 ; Block copies sprite configuration to OAM buffer.
 ; 112 bytes ($70) transferred via MVN instruction.
 ; ==============================================================================
 
-CODE_0C8767:
+Display_SpriteOAMDataCopy:
 	REP #$30								;0C8767	; 16-bit A/X/Y
 	LDX.W #$8779							;0C8769	; Source address
 	LDY.W #$0C80							;0C876C	; Destination address (OAM buffer)
@@ -1152,24 +1156,24 @@ CODE_0C8767:
 	db $80,$6F,$C8,$00,$90,$6F,$CA,$00,$A0,$6F,$CC,$00,$B0,$6F,$CE,$00
 
 ; ==============================================================================
-; CODE_0C87E9 - Clear NMI Flag
+; Display_ClearNMIFlag - Clear NMI Flag
 ; ==============================================================================
 ; Disables NMI interrupts by clearing flag.
 ; Called before major PPU updates.
 ; ==============================================================================
 
-CODE_0C87E9:
+Display_ClearNMIFlag:
 	STZ.W $0111								;0C87E9	; Clear NMI enable flag
 	RTS										;0C87EC	; Return
 
 ; ==============================================================================
-; CODE_0C87ED - Mode 7 Tilemap Setup
+; Display_Mode7TilemapSetup - Mode 7 Tilemap Setup
 ; ==============================================================================
 ; Initializes Mode 7 tilemap with block fill.
 ; Fills 30 rows ($1E) × 128 columns with pattern $C0.
 ; ==============================================================================
 
-CODE_0C87ED:
+Display_Mode7TilemapSetup:
 	REP #$30								;0C87ED	; 16-bit A/X/Y
 	PEA.W $0C7F								;0C87EF	; Push bank $0C
 	PLB										;0C87F2	; Pull to data bank register
@@ -1183,7 +1187,7 @@ CODE_0C87ED:
 	LDX.W #$00CE							;0C8806	; Table offset = $CE
 	LDY.W #$0082							;0C8809	; Y parameter = $82
 
-CODE_0C880C:									; Loop: Setup calculation
+.SetupCalculationLoop:					; Loop: Setup calculation
 	TYA										;0C880C	; Transfer Y to A
 	ASL A									;0C880D	; *2
 	STA.W $4205								;0C880E	; Store to multiply register
@@ -1216,7 +1220,7 @@ CODE_0C880C:									; Loop: Setup calculation
 	INX										;0C8823	; Next X offset
 	INX										;0C8824	; (word addressing)
 	CPY.W #$00E8							;0C8825	; Processed 232 values?
-	BNE CODE_0C880C							;0C8828	; Loop for all rows
+	BNE .SetupCalculationLoop				;0C8828	; Loop for all rows
 
 ; ==============================================================================
 ; HDMA Channel Configuration - Perspective Effect Setup
@@ -1269,18 +1273,18 @@ DATA8_0C886B:
 	db $FF,$10,$00,$D1,$0E,$01,$00		;0C886B	; HDMA: 255 lines, value=$0010, then $01D1
 
 ; ==============================================================================
-; CODE_0C8872 - Animated Vertical Scroll Effect
+; Display_AnimatedVerticalScroll - Animated Vertical Scroll Effect
 ; ==============================================================================
 ; Creates smooth scrolling animation from top to bottom of screen.
 ; Animates through 14-frame cycle using lookup table.
 ; Used for title screen, special transitions, dramatic reveals.
 ; ==============================================================================
 
-CODE_0C8872:
+Display_AnimatedVerticalScroll:
 	LDA.B #$F7								;0C8872	; Initial scroll value = -9 pixels
 	LDX.W #$0000							;0C8874	; Table index = 0
 
-CODE_0C8877:									; Main scroll animation loop
+.MainScrollLoop:							; Main scroll animation loop
 	PHK										;0C8877	; Push data bank
 	PLB										;0C8878	; Set data bank
 	PHA										;0C8879	; Save scroll value
@@ -1293,31 +1297,31 @@ CODE_0C8877:									; Main scroll animation loop
 	JSR.W CODE_0C88EB						;0C8887	; Draw tile pattern (3×3 grid)
 	PLX										;0C888A	; Restore index
 	CPX.W #$000E							;0C888B	; End of 14-entry table?
-	BNE CODE_0C8893							;0C888E	; Branch if not done
+	BNE .CheckScrollRange					;0C888E	; Branch if not done
 	LDX.W #$0000							;0C8890	; Wrap to start
 
-CODE_0C8893:									; Check scroll position ranges
+.CheckScrollRange:							; Check scroll position ranges
 	PLA										;0C8893	; Restore scroll value
 	CMP.B #$39								;0C8894	; Position < $39?
-	BCC CODE_0C88AB							;0C8896	; Branch if in range 1 (fast scroll)
+	BCC .FastScrollRange					;0C8896	; Branch if in range 1 (fast scroll)
 	CMP.B #$59								;0C8898	; Position < $59?
-	BCC CODE_0C88A7							;0C889A	; Branch if in range 2 (medium scroll)
+	BCC .MediumScrollRange					;0C889A	; Branch if in range 2 (medium scroll)
 	CMP.B #$79								;0C889C	; Position < $79?
-	BCC CODE_0C88A3							;0C889E	; Branch if in range 3 (slow scroll)
+	BCC .SlowScrollRange					;0C889E	; Branch if in range 3 (slow scroll)
 	DEC A									;0C88A0	; Range 4: Decrement by 1 (slowest)
-	BRA CODE_0C8877							;0C88A1	; Continue animation
+	BRA .MainScrollLoop						;0C88A1	; Continue animation
 
-CODE_0C88A3:								; Range 3: Slow scroll
+.SlowScrollRange:							; Range 3: Slow scroll
 	SBC.B #$01								;0C88A3	; Decrement by 2 (carry set from CMP)
-	BRA CODE_0C8877							;0C88A5	; Continue animation
+	BRA .MainScrollLoop						;0C88A5	; Continue animation
 
-CODE_0C88A7:								; Range 2: Medium scroll
+.MediumScrollRange:							; Range 2: Medium scroll
 	SBC.B #$03								;0C88A7	; Decrement by 4
-	BRA CODE_0C8877							;0C88A9	; Continue animation
+	BRA .MainScrollLoop						;0C88A9	; Continue animation
 
-CODE_0C88AB:								; Range 1: Fast scroll
+.FastScrollRange:							; Range 1: Fast scroll
 	SBC.B #$05								;0C88AB	; Decrement by 6 (fastest)
-	BCS CODE_0C8877							;0C88AD	; Continue if not wrapped negative
+	BCS .MainScrollLoop						;0C88AD	; Continue if not wrapped negative
 	RTS										;0C88AF	; Exit when scroll completes
 
 ; ==============================================================================
@@ -1331,14 +1335,14 @@ DATA8_0C88B0:
 	db $11,$15,$15,$11,$11,$19,$19,$19,$1D,$51,$51,$55,$55,$11 ;0C88B0
 
 ; ==============================================================================
-; CODE_0C88BE - Mode 7 Matrix Initialization
+; Display_Mode7MatrixInit - Mode 7 Matrix Initialization
 ; ==============================================================================
 ; Sets up Mode 7 affine transformation matrix for rotation/scaling.
 ; Initializes center point ($0118, $0184) and identity matrix.
 ; Called during screen setup, before 3D perspective effects.
 ; ==============================================================================
 
-CODE_0C88BE:
+Display_Mode7MatrixInit:
 	PHK										;0C88BE	; Push data bank
 	PLB										;0C88BF	; Set data bank
 	CLC										;0C88C0	; Clear carry
@@ -1370,29 +1374,29 @@ CODE_0C88BE:
 	LDA.B #$11								;0C88E9	; Base tile pattern
 
 ; ==============================================================================
-; CODE_0C88EB - Draw 3×3 Tile Pattern
+; Display_Draw3x3TilePattern - Draw 3×3 Tile Pattern
 ; ==============================================================================
 ; Draws 3×3 grid of tiles to VRAM at specified position.
 ; Uses sequential tile numbers with automatic wrapping.
 ; Input: A = base tile number, X = VRAM position base
 ; ==============================================================================
 
-CODE_0C88EB:
+Display_Draw3x3TilePattern:
 	CLC										;0C88EB	; Clear carry
 	LDX.W #$0F8F							;0C88EC	; VRAM base address = $0F8F
-	JSR.W CODE_0C88F8						;0C88EF	; Draw first row (3 tiles)
-	JSR.W CODE_0C88F8						;0C88F2	; Draw second row (3 tiles)
-	JSR.W CODE_0C88F8						;0C88F5	; Draw third row (3 tiles)
+	JSR.W Display_DrawTileRow				;0C88EF	; Draw first row (3 tiles)
+	JSR.W Display_DrawTileRow				;0C88F2	; Draw second row (3 tiles)
+	JSR.W Display_DrawTileRow				;0C88F5	; Draw third row (3 tiles)
 
 ; ==============================================================================
-; CODE_0C88F8 - Draw Single Tile Row (3 tiles)
+; Display_DrawTileRow - Draw Single Tile Row (3 tiles)
 ; ==============================================================================
 ; Writes 3 consecutive tile numbers to VRAM.
 ; Advances VRAM address by $80 (down one row in tilemap).
 ; Input: X = VRAM address, A = starting tile number
 ; ==============================================================================
 
-CODE_0C88F8:
+Display_DrawTileRow:
 	STX.B SNES_VMADDL-$2100					;0C88F8	; Set VRAM address ($2116)
 	STA.B SNES_VMDATAL-$2100				;0C88FA	; Write tile 1 ($2118)
 	INC A									;0C88FC	; Next tile
@@ -1410,14 +1414,14 @@ CODE_0C88F8:
 	RTS										;0C890F	; Return
 
 ; ==============================================================================
-; CODE_0C8910 - Setup NMI OAM Transfer
+; Display_SetupNMIOAMTransfer - Setup NMI OAM Transfer
 ; ==============================================================================
 ; Configures NMI handler to perform OAM sprite DMA during VBLANK.
 ; Sets up pointer to sprite transfer subroutine.
 ; Critical for smooth sprite updates without flicker.
 ; ==============================================================================
 
-CODE_0C8910:
+Display_SetupNMIOAMTransfer:
 	PHK										;0C8910	; Push data bank
 	PLB										;0C8911	; Set data bank
 	SEP #$20								;0C8912	; 8-bit accumulator
@@ -1453,14 +1457,14 @@ CODE_0C8910:
 	RTL										;0C8947	; Return from NMI handler
 
 ; ==============================================================================
-; CODE_0C8948 - Direct OAM DMA Transfer
+; Display_DirectOAMDMATransfer - Direct OAM DMA Transfer
 ; ==============================================================================
 ; Immediately performs OAM sprite DMA (non-NMI version).
 ; Identical to NMI routine but callable from main code.
 ; Used for initial sprite setup or forced updates.
 ; ==============================================================================
 
-CODE_0C8948:
+Display_DirectOAMDMATransfer:
 	SEP #$20								;0C8948	; 8-bit accumulator
 	LDX.W #$0000							;0C894A	; OAM address = 0
 	STX.W SNES_OAMADDL						;0C894D	; Set OAM write address ($2102)
@@ -1479,14 +1483,14 @@ CODE_0C8948:
 	RTS										;0C896E	; Return
 
 ; ==============================================================================
-; CODE_0C896F - Complex Mode 7 Rotation Sequence
+; Display_Mode7RotationSequence - Complex Mode 7 Rotation Sequence
 ; ==============================================================================
 ; Performs animated Mode 7 rotation effect with matrix calculations.
 ; Updates transformation matrix each frame for smooth rotation.
 ; Used for title screen rotation, special battle effects.
 ; ==============================================================================
 
-CODE_0C896F:
+Display_Mode7RotationSequence:
 	LDA.B #$D4								;0C896F	; Scroll offset = -44 pixels
 	STA.B SNES_BG1VOFS-$2100				;0C8971	; Set vertical scroll ($210E)
 	LDA.B #$FF								;0C8973	; High byte = -1 (negative scroll)
@@ -1494,9 +1498,9 @@ CODE_0C896F:
 	LDX.W #$8B86							;0C8977	; Sine/cosine table 1
 	LDY.W #$8B96							;0C897A	; Sine/cosine table 2
 
-CODE_0C897D:									; Main rotation loop
+.MainRotationLoop:							; Main rotation loop
 	LDA.W $0000,Y							;0C897D	; Load rotation angle
-	BEQ CODE_0C899B							;0C8980	; Exit if angle = 0 (no rotation)
+	BEQ .PostRotationFade					;0C8980	; Exit if angle = 0 (no rotation)
 	PHY										;0C8982	; Save table pointer
 	JSL.L CODE_0C8000						;0C8983	; Wait for VBLANK
 	JSR.W CODE_0C8A78						;0C8987	; Update Mode 7 matrix ($4202 multiply)
@@ -1508,30 +1512,30 @@ CODE_0C897D:									; Main rotation loop
 	SBC.B #$AB								;0C898D	; Subtract table base ($8B96 - $AB = $8BEB)
 	ASL A									;0C898F	; Multiply by 2 (pixel offset)
 	STA.B SNES_BG1VOFS-$2100				;0C8990	; Set vertical scroll ($210E)
-	BEQ CODE_0C8996							;0C8992	; Branch if offset = 0
+	BEQ .SetHighByteZero					;0C8992	; Branch if offset = 0
 	LDA.B #$FF								;0C8994	; High byte = -1 (negative)
 
-CODE_0C8996:
+.SetHighByteZero:
 	STA.B SNES_BG1VOFS-$2100				;0C8996	; Set high byte
 	INY										;0C8998	; Next rotation angle
-	BRA CODE_0C897D							;0C8999	; Continue rotation
+	BRA .MainRotationLoop					;0C8999	; Continue rotation
 
-CODE_0C899B:									; Post-rotation fade loop
+.PostRotationFade:							; Post-rotation fade loop
 	LDA.B #$1E								;0C899B	; Loop counter = 30 frames
 
-CODE_0C899D:
+.FadeLoop:
 	JSL.L CODE_0C8000						;0C899D	; Wait for VBLANK
 	PHA										;0C89A1	; Save counter
 	JSR.W CODE_0C8A76						;0C89A2	; Update Mode 7 matrix
 	PLA										;0C89A5	; Restore counter
 	DEC A									;0C89A6	; Decrement
-	BNE CODE_0C899D							;0C89A7	; Loop 30 times
+	BNE .FadeLoop							;0C89A7	; Loop 30 times
 
 	; Initialize sprite animation sequence
 	LDY.W #$0101							;0C89A9	; Start position = $0101
 	STY.W $0062								;0C89AC	; Store position counter
 
-CODE_0C89AF:									; Sprite position update loop
+.SpritePositionLoop:						; Sprite position update loop
 	LDY.W $0062								;0C89AF	; Load position
 	PHY										;0C89B2	; Save position
 	JSR.W CODE_0C8A3F						;0C89B3	; Update sprite coordinates
@@ -1552,7 +1556,7 @@ CODE_0C89AF:									; Sprite position update loop
 	; Check for triple update (every 3 cycles)
 	LDA.W $0062								;0C89D1	; Load X coordinate
 	CMP.B #$0C								;0C89D4	; Reached position $0C?
-	BEQ CODE_0C89E8							;0C89D6	; Branch if done
+	BEQ .WaitForTableSync					;0C89D6	; Branch if done
 
 	; Third sprite update (pattern of 3)
 	LDY.W $0062								;0C89D8	; Load position
@@ -1561,22 +1565,22 @@ CODE_0C89AF:									; Sprite position update loop
 	PLY										;0C89DF	; Restore position
 	STY.W $0062								;0C89E0	; Store position
 	INC.W $0062								;0C89E3	; Increment X coordinate
-	BRA CODE_0C89AF							;0C89E6	; Continue loop
+	BRA .SpritePositionLoop					;0C89E6	; Continue loop
 
-CODE_0C89E8:									; Wait for table sync loop
+.WaitForTableSync:							; Wait for table sync loop
 	JSL.L CODE_0C8000						;0C89E8	; Wait for VBLANK
 	JSR.W CODE_0C8A76						;0C89EC	; Update Mode 7 matrix
 	CPX.W #$8B66							;0C89EF	; Table index at $8B66?
-	BNE CODE_0C89E8							;0C89F2	; Loop until synced
+	BNE .WaitForTableSync					;0C89F2	; Loop until synced
 
-CODE_0C89F4:									; Final sync hold loop
+.FinalSyncHold:								; Final sync hold loop
 	JSL.L CODE_0C8000						;0C89F4	; Wait for VBLANK
 	JSR.W CODE_0C8A76						;0C89F8	; Update Mode 7 matrix
 	CPX.W #$8B66							;0C89FB	; Table index at $8B66?
-	BNE CODE_0C89F4							;0C89FE	; Loop until stable
+	BNE .FinalSyncHold						;0C89FE	; Loop until stable
 
 	; Setup final color effects
-	JSR.W CODE_0C8910						;0C8A00	; Enable NMI OAM transfer
+	JSR.W Display_SetupNMIOAMTransfer		;0C8A00	; Enable NMI OAM transfer
 	LDA.B #$30								;0C8A03	; Flag value = $30
 	STA.W $0505								;0C8A05	; Store effect state
 	LDX.W #$2100							;0C8A08	; Color math mode
@@ -1589,7 +1593,7 @@ CODE_0C89F4:									; Final sync hold loop
 	LDY.W #$000C							;0C8A13	; Sprite count = 12
 	LDX.W #$0C04							;0C8A16	; Sprite data buffer base
 
-CODE_0C8A19:									; Fade brightness loop
+.FadeBrightnessLoop:						; Fade brightness loop
 	PHA										;0C8A19	; Save brightness level
 	PHY										;0C8A1A	; Save sprite count
 	PHX										;0C8A1B	; Save buffer pointer

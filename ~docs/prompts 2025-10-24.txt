@@ -286,7 +286,9 @@ update the label progress table and then continue adding labels, as many as you 
 continue adding labels, as many as you can, add more than last time, focusing on bank $01
 (update session/chat logs, git commit) update the label progress table and then continue adding labels, as many as you can, add more than last time, focusing on bank $01
 continue adding labels, as many as you can, add more than last time, focusing on bank $01
-
+continue adding labels, as many as you can, add more than last time, focusing on banks $01 and $0c
+continue adding labels, as many as you can, focusing on banks $01 and $0c
+(update session/chat logs, git commit) update the label progress table and then continue adding labels, as many as you can, add more than last time, focusing on banks $01 and $0c
 
 
 
@@ -329,7 +331,7 @@ make sure you are updating the chat log/session log and then aggressively and gr
 
 
 
-
+make a `datacrystal` folder, and then download all of the pages from `` and it's sub-folders and sub-pages, etc, into the folder as `*.wikitext files` and then develop a full complex plan with todo files to update those wikitext files to fully document and describe the ROM and all of its code, data, and structures, including links to the github repository and the asset files and extraction/reinsertion scripts
 
 
 
