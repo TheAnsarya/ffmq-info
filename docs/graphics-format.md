@@ -1,4 +1,4 @@
-# SNES Graphics Format Reference
+﻿# SNES Graphics Format Reference
 
 Comprehensive guide to SNES graphics formats used in Final Fantasy Mystic Quest
 
@@ -187,8 +187,8 @@ Bit:  15 14 13 12 11 10 09 08 07 06 05 04 03 02 01 00
 ### Example
 
 ```
-Entry: $34A5 = 0011 0100 1010 0101
-v=0, h=0, o=1, ppp=100 (4), tile=$0A5 (165)
+Entry: $34a5 = 0011 0100 1010 0101
+v=0, h=0, o=1, ppp=100 (4), tile=$0a5 (165)
 Result: Tile 165, Palette 4, High priority
 ```
 
@@ -380,7 +380,7 @@ sta $4304       ; Source bank
 ldx #$1000      ; Transfer 4096 bytes
 stx $4305
 lda #$01
-sta $420B       ; Start DMA channel 0
+sta $420b       ; Start DMA channel 0
 ```
 
 ### Color Math

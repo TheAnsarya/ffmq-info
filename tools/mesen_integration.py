@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+﻿#!/usr/bin/env python3
 """
 Final Fantasy Mystic Quest - MesenS Emulator Integration
 Provides testing and debugging integration with MesenS emulator
@@ -74,29 +74,29 @@ class MesenSIntegration:
                 # RAM labels
                 f.write("# RAM Labels\n")
                 ram_labels = {
-                    "$7E1000": "Player_Name",
-                    "$7E1010": "Player_Level", 
-                    "$7E1011": "Player_Experience",
-                    "$7E1014": "Player_HP_Current",
-                    "$7E1016": "Player_HP_Max",
-                    "$7E1018": "Player_MP_White_Current",
-                    "$7E1019": "Player_MP_Black_Current",
-                    "$7E101A": "Player_MP_Wizard_Current",
-                    "$7E101B": "Player_MP_White_Max",
-                    "$7E101C": "Player_MP_Black_Max",
-                    "$7E101D": "Player_MP_Wizard_Max",
-                    "$7E101E": "Player_Attack",
-                    "$7E1020": "Player_Defense",
-                    "$7E1022": "Player_Speed",
-                    "$7E1024": "Player_Magic",
-                    "$7E1026": "Player_Weapon",
-                    "$7E1027": "Player_Armor",
-                    "$7E1028": "Player_Shield",
-                    "$7E1029": "Player_Helmet",
-                    "$7E102A": "Player_Accessory",
-                    "$7E0E88": "Map_ID",
-                    "$7E0E89": "Player_X_Position",
-                    "$7E0E8A": "Player_Y_Position",
+                    "$7e1000": "Player_Name",
+                    "$7e1010": "Player_Level", 
+                    "$7e1011": "Player_Experience",
+                    "$7e1014": "Player_HP_Current",
+                    "$7e1016": "Player_HP_Max",
+                    "$7e1018": "Player_MP_White_Current",
+                    "$7e1019": "Player_MP_Black_Current",
+                    "$7e101a": "Player_MP_Wizard_Current",
+                    "$7e101b": "Player_MP_White_Max",
+                    "$7e101c": "Player_MP_Black_Max",
+                    "$7e101d": "Player_MP_Wizard_Max",
+                    "$7e101e": "Player_Attack",
+                    "$7e1020": "Player_Defense",
+                    "$7e1022": "Player_Speed",
+                    "$7e1024": "Player_Magic",
+                    "$7e1026": "Player_Weapon",
+                    "$7e1027": "Player_Armor",
+                    "$7e1028": "Player_Shield",
+                    "$7e1029": "Player_Helmet",
+                    "$7e102a": "Player_Accessory",
+                    "$7e0e88": "Map_ID",
+                    "$7e0e89": "Player_X_Position",
+                    "$7e0e8a": "Player_Y_Position",
                 }
                 
                 for addr, label in ram_labels.items():
@@ -106,8 +106,8 @@ class MesenSIntegration:
                 rom_labels = {
                     "$008000": "GameStart",
                     "$008247": "BasicInit", 
-                    "$00FFE4": "Interrupt_Vectors",
-                    "$00FFC0": "ROM_Header",
+                    "$00ffe4": "Interrupt_Vectors",
+                    "$00ffc0": "ROM_Header",
                 }
                 
                 for addr, label in rom_labels.items():
@@ -158,23 +158,23 @@ class MesenSIntegration:
             ],
             "watches": [
                 {
-                    "address": "0x7E1010",
+                    "address": "0x7e1010",
                     "name": "Player Level",
                     "format": "decimal"
                 },
                 {
-                    "address": "0x7E1014",
+                    "address": "0x7e1014",
                     "name": "Player HP",
                     "format": "decimal"
                 },
                 {
-                    "address": "0x7E0E88",
+                    "address": "0x7e0e88",
                     "name": "Current Map",
                     "format": "hex"
                 }
             ],
             "memory_viewer": {
-                "ram_start": "0x7E0000",
+                "ram_start": "0x7e0000",
                 "ram_size": "0x20000"
             }
         }
@@ -240,7 +240,7 @@ class MesenSIntegration:
                 f.write("    \n")
                 f.write("    -- Check if game has started properly\n")
                 f.write("    if testFrames == 300 then  -- 5 seconds\n")
-                f.write("        local gameState = memory.readU8(0x7E0000, 'cpu')\n")
+                f.write("        local gameState = memory.readU8(0x7e0000, 'cpu')\n")
                 f.write("        console.log('Game state after 5s: ' .. gameState)\n")
                 f.write("    end\n")
                 f.write("    \n")

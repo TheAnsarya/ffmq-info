@@ -1,4 +1,4 @@
-# FFMQ Disassembly Project - Comprehensive TODO List
+﻿# FFMQ Disassembly Project - Comprehensive TODO List
 **Created**: October 31, 2025  
 **Status**: Bank 01 100% COMPLETE! (6 banks total at 100%)
 
@@ -174,26 +174,26 @@
 
 #### 📊 **Address Categories**
 
-##### **RAM Addresses** ($0000-$1FFF: WRAM, $7E0000-$7FFFFF: Extended RAM)
-- [ ] **Zero Page** ($00-$FF)
+##### **RAM Addresses** ($0000-$1fff: WRAM, $7e0000-$7fffff: Extended RAM)
+- [ ] **Zero Page** ($00-$ff)
   * Direct page variables (fast access)
   * Temporary calculation storage
   * Critical game state flags
   
-- [ ] **Stack Page** ($0100-$01FF)
+- [ ] **Stack Page** ($0100-$01ff)
   * System stack (not typically labeled)
   
-- [ ] **WRAM Low** ($0200-$1FFF)
+- [ ] **WRAM Low** ($0200-$1fff)
   * Game variables, buffers, arrays
   * Character stats, inventory, equipment
   * Map data, event flags, progression
   
-- [ ] **WRAM Extended** ($7E2000-$7FFFFF)
+- [ ] **WRAM Extended** ($7e2000-$7fffff)
   * Large buffers (graphics decompression, DMA staging)
   * Save game data structures
   * Extended arrays and tables
 
-##### **ROM Addresses** ($00:8000-$FF:FFFF: Banked ROM)
+##### **ROM Addresses** ($00:8000-$ff:FFFF: Banked ROM)
 - [ ] **Code Labels** (function entry points)
   * Already ~95% complete via CODE_* elimination
   * Remaining: 68 labels in section files
@@ -206,7 +206,7 @@
   * Text strings (compressed dialogue)
   * Music/sound data
 
-##### **Hardware Registers** ($2100-$21FF: PPU, $4000-$43FF: DMA/etc)
+##### **Hardware Registers** ($2100-$21ff: PPU, $4000-$43ff: DMA/etc)
 - [ ] Already well-documented in most disassemblers (standard SNES registers)
 - [ ] Verify consistent naming (e.g., `INIDISP` vs `$2100`)
 
@@ -219,9 +219,9 @@
    - [ ] Identify most-used addresses (priority targets)
 
 2. [ ] **Create RAM map documentation** (`docs/RAM_MAP.md`)
-   - [ ] Zero page variables ($00-$FF)
-   - [ ] WRAM variables ($0200-$1FFF)
-   - [ ] Extended RAM ($7E2000-$7FFFFF)
+   - [ ] Zero page variables ($00-$ff)
+   - [ ] WRAM variables ($0200-$1fff)
+   - [ ] Extended RAM ($7e2000-$7fffff)
    - [ ] Document size, type, purpose of each variable
    - [ ] Note which banks/systems use each variable
 
@@ -272,23 +272,23 @@
 - [x] Bank $00 - System Kernel (save/load, checksum, game state, screen)
 - [x] Bank $01 - Battle System (combat, AI, magic, effects, UI)
 - [x] Bank $02 - Overworld/Map (rendering, collision, NPCs, events)
-- [x] Bank $0B - Battle Graphics/Animation (sprites, OAM, decompression)
-- [x] Bank $0C - Display/PPU Management (VBLANK, palettes, effects)
-- [x] Bank $0D - APU/Sound (SPC700 driver, music, sound effects)
+- [x] Bank $0b - Battle Graphics/Animation (sprites, OAM, decompression)
+- [x] Bank $0c - Display/PPU Management (VBLANK, palettes, effects)
+- [x] Bank $0d - APU/Sound (SPC700 driver, music, sound effects)
 
 ##### ✅ **100% Documented** (5 banks - no CODE_* labels, but may need deeper analysis)
 - [x] Bank $03 - Script/Dialogue Engine (2,672 lines)
 - [x] Bank $07 - Graphics/Sound (2,307 lines)
 - [x] Bank $08 - Text/Dialogue Data (2,156 lines)
 - [x] Bank $09 - Color Palettes + Graphics (2,083 lines)
-- [x] Bank $0A - Extended Graphics/Palettes (2,058 lines)
+- [x] Bank $0a - Extended Graphics/Palettes (2,058 lines)
 
 ##### ⬜ **Not Started** (5 banks)
 - [ ] Bank $04 - Data Bank (~4,000 lines estimated)
 - [ ] Bank $05 - Data Bank (~4,000 lines estimated)
 - [ ] Bank $06 - Data Bank (~4,000 lines estimated)
-- [ ] Bank $0E - Unknown (~5,000 lines estimated)
-- [ ] Bank $0F - Unknown (~5,000 lines estimated)
+- [ ] Bank $0e - Unknown (~5,000 lines estimated)
+- [ ] Bank $0f - Unknown (~5,000 lines estimated)
 
 #### 🎯 **Action Items**
 
@@ -296,9 +296,9 @@
    - [ ] Bank $03: Deep dive into bytecode opcodes (all 20+ documented?)
    - [ ] Bank $07: Verify all decompression routines understood
    - [ ] Bank $08: Confirm all text/graphics data regions identified
-   - [ ] Bank $09/$0A: Ensure all palettes/graphics catalogued
+   - [ ] Bank $09/$0a: Ensure all palettes/graphics catalogued
 
-2. [ ] **Disassemble remaining banks** ($04, $05, $06, $0E, $0F)
+2. [ ] **Disassemble remaining banks** ($04, $05, $06, $0e, $0f)
    - [ ] **Bank $04 Analysis**
      * Run `grep_search` to identify code vs data regions
      * Look for subroutine entry points (JSR/JSL targets)
@@ -315,24 +315,24 @@
      * Possible music/sound data continuation
      * Estimate: 20-30 hours
    
-   - [ ] **Bank $0E Analysis**
+   - [ ] **Bank $0e Analysis**
      * Completely unknown - could be anything
      * Initial exploration: search for JSR/RTS patterns (code) vs bulk data
      * Estimate: 30-40 hours
    
-   - [ ] **Bank $0F Analysis**
-     * Likely similar to $0E
+   - [ ] **Bank $0f Analysis**
+     * Likely similar to $0e
      * May contain additional systems or overflow data
      * Estimate: 30-40 hours
 
 3. [ ] **Create system-level documentation** (cross-bank)
-   - [ ] **Battle System Architecture** (Banks $01, $0B, $0C)
+   - [ ] **Battle System Architecture** (Banks $01, $0b, $0c)
      * Data flow diagrams
      * State machine charts
      * Function call graphs
      * Timing diagrams (frame-by-frame execution)
    
-   - [ ] **Graphics Rendering Pipeline** (Banks $07, $08, $09, $0A, $0B, $0C)
+   - [ ] **Graphics Rendering Pipeline** (Banks $07, $08, $09, $0a, $0b, $0c)
      * Decompression → VRAM loading → PPU rendering
      * Palette management across banks
      * Sprite animation system
@@ -344,7 +344,7 @@
      * Text rendering with control codes
      * Window/menu integration
    
-   - [ ] **Sound/Music System** (Banks $07, $0D, possibly $06)
+   - [ ] **Sound/Music System** (Banks $07, $0d, possibly $06)
      * SPC700 communication protocol
      * Music track structure
      * Sound effect triggering
@@ -445,7 +445,7 @@
 4. [ ] **Create `tools/graphics_catalog.py`**
    
    **Features**:
-   - [ ] Scan all graphics banks ($07, $08, $09, $0A, $0B)
+   - [ ] Scan all graphics banks ($07, $08, $09, $0a, $0b)
    - [ ] Identify all graphics regions (tiles, palettes, sprites)
    - [ ] Generate comprehensive catalog:
      * Bank → Offset → Type → Size → Description
@@ -550,7 +550,7 @@
    
    **Features**:
    - [ ] Decompress FFMQ text compression (dictionary-based)
-   - [ ] Parse control codes ($F0-$FF) with descriptions
+   - [ ] Parse control codes ($f0-$ff) with descriptions
    - [ ] Export to translation-friendly formats:
      * JSON: `{ "id": "DIALOG_001", "text": "Welcome to...", "metadata": {...} }`
      * CSV: `id,context,text,character_limit,control_codes`
@@ -563,8 +563,8 @@
 4. [ ] **Create `tools/music_extractor.py`** (SPC700 music/sound)
    
    **Features**:
-   - [ ] Extract SPC700 driver code (Bank $0D)
-   - [ ] Extract music track data (Bank $06? or $0D?)
+   - [ ] Extract SPC700 driver code (Bank $0d)
+   - [ ] Extract music track data (Bank $06? or $0d?)
    - [ ] Extract sound effect samples
    - [ ] Output formats:
      * SPC (SNES music format, playable in emulators)
@@ -760,7 +760,7 @@
 #### 📖 **Documentation Categories**
 
 ##### **Code Documentation** (inline ASM comments)
-- [x] Bank $00-$02, $0B-$0D: Extensive inline comments ✅
+- [x] Bank $00-$02, $0b-$0d: Extensive inline comments ✅
 - [ ] Verify all other banks have adequate inline documentation
 - [ ] Add high-level "block comments" explaining complex algorithms
 - [ ] Document all function parameters (what goes in A/X/Y, what returns)
@@ -849,7 +849,7 @@
    For each documented function:
    ```markdown
    ### Battle_CalculateDamage
-   **Location**: Bank $01, $8A4C
+   **Location**: Bank $01, $8a4c
    **Purpose**: Calculate physical attack damage
    
    **Parameters**:
@@ -862,7 +862,7 @@
    - Carry: Set if critical hit
    
    **Side Effects**:
-   - Modifies: A, X, Y, $00-$0F (scratch RAM)
+   - Modifies: A, X, Y, $00-$0f (scratch RAM)
    - May trigger: Random number generator
    
    **Algorithm**:
@@ -1008,7 +1008,7 @@
 
 ### **Mid-Term Priorities** (Next 3-6 months)
 
-7. 🔍 **Remaining Banks** ($04, $05, $06, $0E, $0F) - **120-180 hours**
+7. 🔍 **Remaining Banks** ($04, $05, $06, $0e, $0f) - **120-180 hours**
    - Largest chunk of work
    - Unknown complexity (could be faster if mostly data)
 

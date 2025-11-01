@@ -1,4 +1,4 @@
-# HONEST PROGRESS ASSESSMENT
+﻿# HONEST PROGRESS ASSESSMENT
 **Date:** 2025-10-25  
 **Reality Check:** We were NOT at 99.996%  
 **Actual Progress:** ~5% (see breakdown below)
@@ -52,12 +52,12 @@ asar $Source $Output                # ← Patching a few bytes over it
 | Bank $07 | Raw disassembly | ??? | 0 | **0%** |
 | Bank $08 | Raw disassembly | ??? | 0 | **0%** |
 | Bank $09 | Raw disassembly | ??? | 0 | **0%** |
-| Bank $0A | Raw disassembly | ??? | 0 | **0%** |
-| Bank $0B | Raw disassembly | ??? | 0 | **0%** |
-| Bank $0C | Raw disassembly | ??? | 0 | **0%** |
-| Bank $0D | Raw disassembly | ??? | 0 | **0%** |
-| Bank $0E | Raw disassembly | ??? | 0 | **0%** |
-| Bank $0F | Raw disassembly | ??? | 0 | **0%** |
+| Bank $0a | Raw disassembly | ??? | 0 | **0%** |
+| Bank $0b | Raw disassembly | ??? | 0 | **0%** |
+| Bank $0c | Raw disassembly | ??? | 0 | **0%** |
+| Bank $0d | Raw disassembly | ??? | 0 | **0%** |
+| Bank $0e | Raw disassembly | ??? | 0 | **0%** |
+| Bank $0f | Raw disassembly | ??? | 0 | **0%** |
 
 **What "Raw Disassembly" Means:**
 - Diztinguish generated CODE_XXXXXX labels
@@ -103,10 +103,10 @@ asar $Source $Output                # ← Patching a few bytes over it
 ; Graphics not in build at all
 
 ; RIGHT (what we need):
-org $028C80
+org $028c80
 incbin "data/graphics/tiles.bin"  ; ← Actually include the tiles!
 
-org $07A000  
+org $07a000  
 incbin "assets/graphics/palettes/character_palettes.bin"  ; ← Include palettes!
 ```
 
@@ -197,21 +197,21 @@ Boot_Sequence:
 CODE_008000 → Boot_Sequence
 CODE_008247 → Init_Hardware_Registers  
 CODE_0081F0 → Setup_Graphics_Registers
-$7E3667 → save_file_state_flag_1
+$7e3667 → save_file_state_flag_1
 ```
 
 ### Medium Tasks (Stage 2 → 3)
 
 **4. Integrate graphics**
 ```assembly
-org $028C80
+org $028c80
 Graphics_Main_Tiles:
     incbin "data/graphics/tiles.bin"
 ```
 
 **5. Integrate palettes**
 ```assembly
-org $07A000
+org $07a000
 Palette_Characters:
     incbin "assets/graphics/palettes/character_palettes.bin"
 ```

@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+﻿#!/usr/bin/env python3
 """
 Final Fantasy Mystic Quest - Enemy Data Extractor
 Extracts enemy stats, AI, graphics references, and attack patterns from ROM
@@ -51,11 +51,11 @@ class EnemyExtractor:
     OFFSET_ACCURACY = 0x07
     OFFSET_EVADE = 0x08
     OFFSET_ELEM_RESIST = 0x09  # Bitfield
-    OFFSET_STATUS_RESIST = 0x0A  # Bitfield
-    OFFSET_EXP_LOW = 0x0C
-    OFFSET_EXP_HIGH = 0x0D
-    OFFSET_GOLD_LOW = 0x0E
-    OFFSET_GOLD_HIGH = 0x0F
+    OFFSET_STATUS_RESIST = 0x0a  # Bitfield
+    OFFSET_EXP_LOW = 0x0c
+    OFFSET_EXP_HIGH = 0x0d
+    OFFSET_GOLD_LOW = 0x0e
+    OFFSET_GOLD_HIGH = 0x0f
     OFFSET_DROP_ITEM = 0x10
     OFFSET_DROP_RATE = 0x11
     OFFSET_GRAPHICS_ID = 0x12
@@ -175,8 +175,8 @@ class EnemyExtractor:
         palette = self.read_byte(base_addr + self.OFFSET_PALETTE)
         ai_script = self.read_word(base_addr + self.OFFSET_AI_SCRIPT_LOW)
         
-        # Skip empty entries (all zeros or 0xFF)
-        if hp == 0 or hp == 0xFFFF:
+        # Skip empty entries (all zeros or 0xff)
+        if hp == 0 or hp == 0xffff:
             return None
             
         enemy = {

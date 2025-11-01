@@ -1,4 +1,4 @@
-# FFMQ Project - Quick TODO Summary
+﻿# FFMQ Project - Quick TODO Summary
 **Date**: October 31, 2025
 
 ## 🏆 RECENT ACHIEVEMENT
@@ -83,7 +83,7 @@
 
 ### 7. 🔍 Finish Disassembly (120-180 hours)
 - Banks $04, $05, $06 (data banks, ~12k lines)
-- Banks $0E, $0F (unknown, ~10k lines)
+- Banks $0e, $0f (unknown, ~10k lines)
 - Complete system documentation
 
 ### 8. 🔄 Asset Build System (40-50 hours)

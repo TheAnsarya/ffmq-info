@@ -1,4 +1,4 @@
-<#
+﻿<#
 .SYNOPSIS
     Apply labels to FFMQ assembly code
     
@@ -41,10 +41,10 @@
     Last Updated: November 1, 2025
     
     Addressing Modes Supported:
-    - Absolute: LDA $7E0040
+    - Absolute: LDA $7e0040
     - Direct Page: LDA $40
-    - Long: LDA $7E0040
-    - Indexed: LDA $7E0040,X
+    - Long: LDA $7e0040
+    - Indexed: LDA $7e0040,X
 #>
 
 [CmdletBinding()]
@@ -57,13 +57,13 @@ param(
     [string[]]$SourceFiles,
     
     [Parameter(HelpMessage="Show changes without modifying files")]
-    [switch]$DryRun,
+    [switch]$dryRun,
     
     [Parameter(HelpMessage="Verify ROM matches after replacement")]
     [switch]$Verify,
     
     [Parameter(HelpMessage="Backup directory")]
-    [string]$BackupDir = "backups",
+    [string]$backupDir = "backups",
     
     [Parameter(HelpMessage="Original ROM path for verification")]
     [string]$OriginalROM = "roms\ffmq-original.sfc",
@@ -76,7 +76,7 @@ param(
 # Configuration
 # ============================================================================
 
-$ErrorActionPreference = "Stop"
+$errorActionPreference = "Stop"
 $script:replacementCount = 0
 $script:fileCount = 0
 $script:errorCount = 0
@@ -88,9 +88,9 @@ $script:errorCount = 0
 function Write-ColorOutput {
     param(
         [string]$Message,
-        [string]$Color = "White"
+        [string]$color = "White"
     )
-    Write-Host $Message -ForegroundColor $Color
+    Write-Host $Message -ForegroundColor $color
 }
 
 function Write-Header {
@@ -127,19 +127,19 @@ function Write-Info {
 # ============================================================================
 
 function Load-LabelMappings {
-    param([string]$FilePath)
+    param([string]$filePath)
     
-    Write-Info "Loading label mappings from: $FilePath"
+    Write-Info "Loading label mappings from: $filePath"
     
-    $extension = [System.IO.Path]::GetExtension($FilePath).ToLower()
+    $extension = [System.IO.Path]::GetExtension($filePath).ToLower()
     $mappings = @{}
     
     try {
         switch ($extension) {
             ".csv" {
                 # CSV Format: Address,Label,Type,Comment
-                # Example: $7E0040,player_x_pos,RAM,Player X position
-                $csvData = Import-Csv $FilePath
+                # Example: $7e0040,player_x_pos,RAM,Player X position
+                $csvData = Import-Csv $filePath
                 
                 foreach ($row in $csvData) {
                     $address = $row.Address.Trim()
@@ -163,11 +163,11 @@ function Load-LabelMappings {
                 # JSON Format:
                 # {
                 #   "mappings": [
-                #     {"address": "$7E0040", "label": "player_x_pos", "type": "RAM", "comment": "Player X position"},
+                #     {"address": "$7e0040", "label": "player_x_pos", "type": "RAM", "comment": "Player X position"},
                 #     ...
                 #   ]
                 # }
-                $jsonData = Get-Content $FilePath -Raw | ConvertFrom-Json
+                $jsonData = Get-Content $filePath -Raw | ConvertFrom-Json
                 
                 foreach ($item in $jsonData.mappings) {
                     $address = $item.address.Trim()
@@ -201,10 +201,10 @@ function Load-LabelMappings {
 }
 
 function Normalize-Address {
-    param([string]$Address)
+    param([string]$address)
     
     # Remove $ prefix and convert to uppercase
-    $addr = $Address.TrimStart('$').ToUpper()
+    $addr = $address.TrimStart('$').ToUpper()
     
     # Pad to ensure consistent format
     # Direct page: 2 hex digits (00-FF)
@@ -237,7 +237,7 @@ function Get-AddressingModePatterns {
     $addrLen = $NormalizedAddress.Length
     
     if ($addrLen -eq 2) {
-        # Direct Page ($00-$FF)
+        # Direct Page ($00-$ff)
         $hex = $NormalizedAddress
         
         # Direct: LDA $40
@@ -247,23 +247,23 @@ function Get-AddressingModePatterns {
         $patterns += "\b(LD[AXYDS]|ST[AXYDZP]|CP[XY]|AD[CD]|SBC|AND|OR[AR]|EOR|BIT|INC|DEC|ASL|LSR|ROL|ROR)\s+\`$$hex\s*,\s*[XY]\b"
         
     } elseif ($addrLen -eq 4) {
-        # Absolute ($0000-$FFFF)
+        # Absolute ($0000-$ffff)
         $hex = $NormalizedAddress
         
-        # Absolute: LDA $7E40 or LDA $0040
+        # Absolute: LDA $7e40 or LDA $0040
         $patterns += "\b(LD[AXYDS]|ST[AXYDZP]|CP[XY]|AD[CD]|SBC|AND|OR[AR]|EOR|BIT|INC|DEC|ASL|LSR|ROL|ROR|TSB|TRB|JMP|JSR)\s+\`$$hex\b"
         
-        # Absolute indexed: LDA $7E40,X
+        # Absolute indexed: LDA $7e40,X
         $patterns += "\b(LD[AXYDS]|ST[AXYDZP]|CP[XY]|AD[CD]|SBC|AND|OR[AR]|EOR|BIT|INC|DEC|ASL|LSR|ROL|ROR)\s+\`$$hex\s*,\s*[XY]\b"
         
     } elseif ($addrLen -eq 6) {
-        # Long ($000000-$FFFFFF)
+        # Long ($000000-$ffffff)
         $hex = $NormalizedAddress
         
-        # Long: LDA $7E0040
+        # Long: LDA $7e0040
         $patterns += "\b(LD[AXYDS]|ST[AXYDZP]|CP[XY]|AD[CD]|SBC|AND|OR[AR]|EOR|BIT|JMP|JSR)\s+\`$$hex\b"
         
-        # Long indexed: LDA $7E0040,X
+        # Long indexed: LDA $7e0040,X
         $patterns += "\b(LD[AXYDS]|ST[AXYDZP]|CP[XY]|AD[CD]|SBC|AND|OR[AR]|EOR)\s+\`$$hex\s*,\s*[XY]\b"
     }
     
@@ -272,20 +272,20 @@ function Get-AddressingModePatterns {
 
 function Apply-LabelsToFile {
     param(
-        [string]$FilePath,
+        [string]$filePath,
         [hashtable]$Mappings,
         [bool]$IsDryRun
     )
     
-    if (-not (Test-Path $FilePath)) {
-        Write-Warning "File not found: $FilePath"
+    if (-not (Test-Path $filePath)) {
+        Write-Warning "File not found: $filePath"
         return
     }
     
-    Write-Info "Processing: $FilePath"
+    Write-Info "Processing: $filePath"
     
     # Read file content
-    $content = Get-Content $FilePath -Raw
+    $content = Get-Content $filePath -Raw
     $originalContent = $content
     $fileReplacements = 0
     $replacementDetails = @()
@@ -334,9 +334,9 @@ function Apply-LabelsToFile {
     
     # Show summary for this file
     if ($fileReplacements -gt 0) {
-        Write-Success "  $fileReplacements replacements in $(Split-Path $FilePath -Leaf)"
+        Write-Success "  $fileReplacements replacements in $(Split-Path $filePath -Leaf)"
         
-        if ($DryRun) {
+        if ($dryRun) {
             Write-Warning "  DRY RUN - No changes written to file"
             
             # Show first few replacements as examples
@@ -354,18 +354,18 @@ function Apply-LabelsToFile {
             }
         } else {
             # Create backup
-            $backupPath = Join-Path $BackupDir (Split-Path $FilePath -Leaf)
+            $backupPath = Join-Path $backupDir (Split-Path $filePath -Leaf)
             $backupPath = $backupPath + ".bak"
             
-            if (-not (Test-Path $BackupDir)) {
-                New-Item -ItemType Directory -Path $BackupDir -Force | Out-Null
+            if (-not (Test-Path $backupDir)) {
+                New-Item -ItemType Directory -Path $backupDir -Force | Out-Null
             }
             
-            Copy-Item $FilePath $backupPath -Force
+            Copy-Item $filePath $backupPath -Force
             Write-Info "  Backup created: $backupPath"
             
             # Write modified content
-            $content | Out-File $FilePath -Encoding UTF8 -NoNewline
+            $content | Out-File $filePath -Encoding UTF8 -NoNewline
             Write-Success "  File updated successfully"
             $script:fileCount++
         }
@@ -483,7 +483,7 @@ function Main {
     Write-Header "FFMQ LABEL APPLICATION TOOL"
     
     Write-Info "Input File: $InputFile"
-    Write-Info "Mode: $(if ($DryRun) { 'DRY RUN (no changes)' } else { 'APPLY CHANGES' })"
+    Write-Info "Mode: $(if ($dryRun) { 'DRY RUN (no changes)' } else { 'APPLY CHANGES' })"
     Write-Info "Verification: $(if ($Verify) { 'ENABLED' } else { 'DISABLED' })"
     
     # Load label mappings
@@ -515,13 +515,13 @@ function Main {
     
     # Process each file
     foreach ($file in $expandedFiles) {
-        Apply-LabelsToFile -FilePath $file.FullName -Mappings $mappings -IsDryRun $DryRun
+        Apply-LabelsToFile -FilePath $file.FullName -Mappings $mappings -IsDryRun $dryRun
     }
     
     # Summary
     Write-Header "SUMMARY"
     Write-Info "Total replacements: $script:replacementCount"
-    Write-Info "Files modified: $(if ($DryRun) { '0 (DRY RUN)' } else { $script:fileCount })"
+    Write-Info "Files modified: $(if ($dryRun) { '0 (DRY RUN)' } else { $script:fileCount })"
     
     if ($script:replacementCount -eq 0) {
         Write-Warning "No addresses were replaced. Possible reasons:"
@@ -531,23 +531,23 @@ function Main {
     }
     
     # ROM verification
-    if ($Verify -and -not $DryRun -and $script:replacementCount -gt 0) {
+    if ($Verify -and -not $dryRun -and $script:replacementCount -gt 0) {
         $verifyResult = Verify-ROMIntegrity $OriginalROM
         
         if (-not $verifyResult) {
             Write-Error "ROM verification failed! Label replacements may have introduced errors."
-            Write-Warning "Review backups in: $BackupDir"
+            Write-Warning "Review backups in: $backupDir"
             exit 1
         }
     }
     
     Write-Host ""
-    if ($DryRun) {
+    if ($dryRun) {
         Write-Info "DRY RUN complete. Use without -DryRun to apply changes."
     } else {
         Write-Success "Label application complete!"
         if ($script:fileCount -gt 0) {
-            Write-Info "Backups saved in: $BackupDir"
+            Write-Info "Backups saved in: $backupDir"
         }
     }
 }

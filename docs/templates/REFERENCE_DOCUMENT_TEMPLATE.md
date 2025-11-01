@@ -1,4 +1,4 @@
-# [Reference Name] Reference
+﻿# [Reference Name] Reference
 
 **Type**: Technical Reference  
 **Last Updated**: [Date]  
@@ -38,7 +38,7 @@
 
 | Convention | Meaning | Example |
 |------------|---------|---------|
-| `$XXXX` | Hexadecimal address | `$7E0000` |
+| `$XXXX` | Hexadecimal address | `$7e0000` |
 | `%XXXX` | Binary value | `%10101010` |
 | `#$XX` | Immediate value | `#$01` |
 | `[name]` | Placeholder | `[value]` |
@@ -57,9 +57,9 @@
 - [Category 3](#category-3)
 
 ### By Address Range
-- [$0000-$0FFF](#range-1)
-- [$1000-$1FFF](#range-2)
-- [$2000-$2FFF](#range-3)
+- [$0000-$0fff](#range-1)
+- [$1000-$1fff](#range-2)
+- [$2000-$2fff](#range-3)
 
 ## Detailed Reference
 
@@ -101,7 +101,7 @@ Bit 0: Description
 |-------|------|-------------|
 | `$00` | VALUE_NAME | Meaning |
 | `$01` | VALUE_NAME | Meaning |
-| `$FF` | VALUE_NAME | Meaning |
+| `$ff` | VALUE_NAME | Meaning |
 
 **Usage**:
 ```assembly
@@ -157,9 +157,9 @@ BEQ .label
 ```
 Address Range | Purpose            | Items
 --------------|-------------------|--------
-$0000-$00FF   | System Variables  | item1, item2, item3
-$0100-$01FF   | Game State        | item4, item5
-$0200-$02FF   | Character Data    | item6, item7
+$0000-$00ff   | System Variables  | item1, item2, item3
+$0100-$01ff   | Game State        | item4, item5
+$0200-$02ff   | Character Data    | item6, item7
 ```
 
 ## Usage Examples

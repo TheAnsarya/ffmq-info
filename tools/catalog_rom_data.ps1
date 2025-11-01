@@ -1,4 +1,4 @@
-# ===============================================
+﻿# ===============================================
 # Catalog ROM Data Tables
 # ===============================================
 # Scans all ASM files for DATA8/DATA16/ADDR labels
@@ -6,14 +6,14 @@
 # ===============================================
 
 param(
-    [string]$AsmPath = "$PSScriptRoot\..\src\asm",
+    [string]$asmPath = "$PSScriptRoot\..\src\asm",
     [string]$OutputPath = "$PSScriptRoot\..\reports\rom_data_catalog.csv"
 )
 
 Write-Host "🔍 Cataloging ROM Data Tables..." -ForegroundColor Cyan
 
 # Get all documented ASM files
-$asmFiles = Get-ChildItem -Path $AsmPath -Filter "*_documented.asm" -Recurse
+$asmFiles = Get-ChildItem -Path $asmPath -Filter "*_documented.asm" -Recurse
 
 $dataTables = @()
 

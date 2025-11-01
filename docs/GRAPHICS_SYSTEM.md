@@ -1,4 +1,4 @@
-# Graphics System Architecture
+﻿# Graphics System Architecture
 
 Complete documentation of the Final Fantasy Mystic Quest graphics rendering system.
 
@@ -75,13 +75,13 @@ Mode 1 Configuration:
 ```
 VRAM Address    Size      Purpose
 ────────────────────────────────────────────────
-$0000-$1FFF     8KB       BG1 Character Data (Tiles)
-$2000-$3FFF     8KB       BG2 Character Data
-$4000-$5FFF     8KB       Sprite Character Data
-$6000-$6FFF     4KB       BG1 Tilemap
-$7000-$77FF     2KB       BG2 Tilemap
-$7800-$7BFF     1KB       BG3 Tilemap
-$7C00-$7FFF     1KB       Sprite Attribute Table (OAM)
+$0000-$1fff     8KB       BG1 Character Data (Tiles)
+$2000-$3fff     8KB       BG2 Character Data
+$4000-$5fff     8KB       Sprite Character Data
+$6000-$6fff     4KB       BG1 Tilemap
+$7000-$77ff     2KB       BG2 Tilemap
+$7800-$7bff     1KB       BG3 Tilemap
+$7c00-$7fff     1KB       Sprite Attribute Table (OAM)
 ```
 
 ### Color Palette (512 bytes CGRAM)
@@ -156,7 +156,7 @@ Tilemap Entry (16 bits):
 
 - **Primary rendering** for dungeons, towns, battles
 - **32×32 tiles** (256×256 pixels)
-- **Scrolls independently** via $210D/$210E registers
+- **Scrolls independently** via $210d/$210e registers
 - **Uses palettes 0-3** typically
 
 **Code Location**: `bank_01.asm` - `UpdateBG1Scroll`
@@ -284,7 +284,7 @@ LoadPalette:
     sta $4306
     
     lda #$01        ; Trigger DMA on channel 0
-    sta $420B
+    sta $420b
     rts
 ```
 
@@ -386,7 +386,7 @@ LoadGraphicsToVRAM:
     
     ; Execute DMA
     lda #$01
-    sta $420B       ; Trigger DMA channel 0
+    sta $420b       ; Trigger DMA channel 0
     
     rts
 ```
@@ -403,7 +403,7 @@ Format:
   
 Example:
   $05 $12 $34 $56 $78 $90  →  Copy 5 bytes: 12 34 56 78 90
-  $83 $FF                   →  Repeat $FF 3 times: FF FF FF
+  $83 $ff                   →  Repeat $ff 3 times: FF FF FF
 ```
 
 **Code Location**: `bank_02.asm` - `DecompressGraphics`
@@ -421,8 +421,8 @@ Example:
    │  └─ Copy sprite buffer → OAM memory
    │
    ├─ Update Scroll Registers
-   │  ├─ BG1: $210D/$210E
-   │  ├─ BG2: $210F/$2110
+   │  ├─ BG1: $210d/$210e
+   │  ├─ BG2: $210f/$2110
    │  └─ BG3: $2111/$2112
    │
    ├─ Palette Updates (if needed)
@@ -434,7 +434,7 @@ Example:
    ├─ HDMA Setup (scanline effects)
    │  └─ Configure channels for gradients/wave effects
    │
-   └─ Enable rendering ($2100 = $0F)
+   └─ Enable rendering ($2100 = $0f)
 
 2. VBlank End
    │
@@ -552,11 +552,11 @@ $2105 - BGMODE  - BG mode and character size
 $2107 - BG1SC   - BG1 tilemap address
 $2108 - BG2SC   - BG2 tilemap address
 $2109 - BG3SC   - BG3 tilemap address
-$210B - BG12NBA - BG1/BG2 character address
-$210C - BG34NBA - BG3/BG4 character address
-$210D - BG1HOFS - BG1 horizontal scroll
-$210E - BG1VOFS - BG1 vertical scroll
-$210F - BG2HOFS - BG2 horizontal scroll
+$210b - BG12NBA - BG1/BG2 character address
+$210c - BG34NBA - BG3/BG4 character address
+$210d - BG1HOFS - BG1 horizontal scroll
+$210e - BG1VOFS - BG1 vertical scroll
+$210f - BG2HOFS - BG2 horizontal scroll
 $2110 - BG2VOFS - BG2 vertical scroll
 $2111 - BG3HOFS - BG3 horizontal scroll
 $2112 - BG3VOFS - BG3 vertical scroll
@@ -579,7 +579,7 @@ $4303 - A1T0H   - DMA source address high
 $4304 - A1B0    - DMA source bank
 $4305 - DAS0L   - DMA transfer size low
 $4306 - DAS0H   - DMA transfer size high
-$420B - MDMAEN  - DMA enable (trigger)
+$420b - MDMAEN  - DMA enable (trigger)
 ```
 
 ## Performance Considerations
@@ -636,7 +636,7 @@ Solution: Ensure VBlank code completes in time
 ```asm
 ; Visual debug: Flash color
 DebugFlashRed:
-    lda #$1F        ; Pure red (SNES BGR format)
+    lda #$1f        ; Pure red (SNES BGR format)
     sta $2122       ; Write to color 0
     rts
 

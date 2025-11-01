@@ -1,4 +1,4 @@
-# FFMQ Disassembly Progress Report# FFMQ Disassembly Progress Report# FFMQ Import Campaign Progress Report
+﻿# FFMQ Disassembly Progress Report# FFMQ Disassembly Progress Report# FFMQ Import Campaign Progress Report
 
 **Generated**: October 30, 2025  
 
@@ -66,13 +66,13 @@
 
 | $03 | 2,672 | Menu systems, UI logic | 6 |
 
-| $0B | 3,732 | Extended functionality | 0 || Missing Banks | 0/16 (0%) | ✅ All exist! |  - **Total:** 2,627 lines (100% of source)
+| $0b | 3,732 | Extended functionality | 0 || Missing Banks | 0/16 (0%) | ✅ All exist! |  - **Total:** 2,627 lines (100% of source)
 
-| $0C | 4,249 | Extended functionality | 0 |
+| $0c | 4,249 | Extended functionality | 0 |
 
-| $0D | 2,968 | Extended functionality | 0 || ROM Byte Match | **99.996%** | Maintained ✅ |  - Executable code: VRAM transfer, palette rotation/scaling, frame rotation
+| $0d | 2,968 | Extended functionality | 0 || ROM Byte Match | **99.996%** | Maintained ✅ |  - Executable code: VRAM transfer, palette rotation/scaling, frame rotation
 
-| $0E | 3,361 | Extended functionality | 0 |
+| $0e | 3,361 | Extended functionality | 0 |
 
 | Differing Bytes | 21 / 524,288 | - |  - Data tables: Animation sequences, sprite tiles, NPC/enemy configs, AI patterns
 
@@ -92,7 +92,7 @@
 
 | $09 | 2,083 | Unknown code | 2 |
 
-| $0A | 2,058 | Unknown code | 1 |
+| $0a | 2,058 | Unknown code | 1 |
 
 ## Bank Status Overview**ROM Build Status:** ⚙️ BUILD SYSTEM INTEGRATION IN PROGRESS
 
@@ -122,7 +122,7 @@
 
 | $06 | Map tiles, background graphics | 32KB | `db` bytes | ✅ Correct |
 
-| $0F | SPC700 music/audio data | 32KB | `db` bytes | ✅ Correct || $02 | 8,997 | 95% | Fully documented |**Documentation Achievement:**
+| $0f | SPC700 music/audio data | 32KB | `db` bytes | ✅ Correct || $02 | 8,997 | 95% | Fully documented |**Documentation Achievement:**
 
 
 
@@ -130,19 +130,19 @@
 
 
 
-**Note**: These banks contain compressed graphics (4bpp SNES tiles) and SPC700 audio data. They **SHOULD NOT be disassembled** - the `db` statement format is correct. Next step is asset extraction to PNG/SPC formats.| $0B | 3,732 | 95% | Fully documented |- **Documentation Quality:** Professional-grade comprehensive system analysis (80% code / 20% data focus)
+**Note**: These banks contain compressed graphics (4bpp SNES tiles) and SPC700 audio data. They **SHOULD NOT be disassembled** - the `db` statement format is correct. Next step is asset extraction to PNG/SPC formats.| $0b | 3,732 | 95% | Fully documented |- **Documentation Quality:** Professional-grade comprehensive system analysis (80% code / 20% data focus)
 
 
 
----| $0C | 4,249 | 95% | Fully documented |- **Success Rate:** 100% across all cycles with proven temp file strategy
+---| $0c | 4,249 | 95% | Fully documented |- **Success Rate:** 100% across all cycles with proven temp file strategy
 
 
 
-## 🏗️ Build Validation| $0D | 2,968 | 95% | Fully documented |
+## 🏗️ Build Validation| $0d | 2,968 | 95% | Fully documented |
 
 
 
-### ROM Comparison| $0E | 3,361 | 95% | Fully documented |### 🎯 BANK $03 CYCLE 1 - SCRIPT BYTECODE ENGINE DOCUMENTED
+### ROM Comparison| $0e | 3,361 | 95% | Fully documented |### 🎯 BANK $03 CYCLE 1 - SCRIPT BYTECODE ENGINE DOCUMENTED
 
 ✅ **Build Status**: Success  
 
@@ -164,25 +164,25 @@
 
 |-------|---------|-------|------|----------|| Bank | Lines | Progress This Session | Status |  - CALL/JUMP commands ($08): Subroutine execution and branching
 
-| 1 | $007FC2-$007FD3 | 17 | Metadata | Likely ROM header info |
+| 1 | $007fc2-$007fd3 | 17 | Metadata | Likely ROM header info |
 
-| 2 | $007FDC-$007FE0 | 4 | Metadata | Likely checksum data ||------|-------|----------------------|--------|  - LOAD/READ commands ($09): Memory address and data table access
+| 2 | $007fdc-$007fe0 | 4 | Metadata | Likely checksum data ||------|-------|----------------------|--------|  - LOAD/READ commands ($09): Memory address and data table access
 
 
 
-**Perfect Matches**:| $04 | 2,093 | **+1,920** (25%→75%) | Advanced ✨ |  - IF/COMPARE commands ($0C): Conditional checks and branching logic
+**Perfect Matches**:| $04 | 2,093 | **+1,920** (25%→75%) | Advanced ✨ |  - IF/COMPARE commands ($0c): Conditional checks and branching logic
 
 - ✅ Code: 100% (all 58,945 lines)
 
-- ✅ Graphics: 100%| $05 | 2,279 | **+2,068** (25%→75%) | Advanced ✨ |  - LOOP commands ($0A): Iteration with counters
+- ✅ Graphics: 100%| $05 | 2,279 | **+2,068** (25%→75%) | Advanced ✨ |  - LOOP commands ($0a): Iteration with counters
 
 - ✅ Audio: 100%
 
-- ✅ Text: 100%| $06 | 2,221 | **+2,065** (25%→75%) | Advanced ✨ |  - Extended commands ($0D): Multi-parameter operations
+- ✅ Text: 100%| $06 | 2,221 | **+2,065** (25%→75%) | Advanced ✨ |  - Extended commands ($0d): Multi-parameter operations
 
 
 
----| $07 | 2,307 | - | Advanced |  - CONFIG commands ($0F): Graphics/text/layer property management
+---| $07 | 2,307 | - | Advanced |  - CONFIG commands ($0f): Graphics/text/layer property management
 
 
 
@@ -194,11 +194,11 @@
 
 1. **disassembly_tracker.py** (450 lines)
 
-   - Automated progress tracking| $0A | 2,058 | - | Advanced |  - Entity ID tracking and coordinate management
+   - Automated progress tracking| $0a | 2,058 | - | Advanced |  - Entity ID tracking and coordinate management
 
    - Bank status analysis
 
-   - JSON reporting| $0F | 2,075 | **+2,000** (10%→75%) | Advanced ✨ |  - Map entrance configuration
+   - JSON reporting| $0f | 2,075 | **+2,000** (10%→75%) | Advanced ✨ |  - Map entrance configuration
 
 
 
@@ -218,7 +218,7 @@
 
    - Format conversion
 
-   - Batch processing  - Variable tracking ($4D, $43, $EA)
+   - Batch processing  - Variable tracking ($4d, $43, $ea)
 
 
 
@@ -274,11 +274,11 @@ Data Banks Preserved: 4/4 (100%)
 
 ## 🎯 Next Steps
 
-| 1 | $007FC2-$007FD3 | 17 bytes | Engine Data (likely header) |  - Music command identification ($F9)
+| 1 | $007fc2-$007fd3 | 17 bytes | Engine Data (likely header) |  - Music command identification ($f9)
 
 ### High Priority
 
-1. **Complete Code Banks $07-$0A**| 2 | $007FDC-$007FE0 | 4 bytes | Engine Data (likely checksum) |  - Sound effect integration
+1. **Complete Code Banks $07-$0a**| 2 | $007fdc-$007fe0 | 4 bytes | Engine Data (likely checksum) |  - Sound effect integration
 
    - Add function names and documentation
 
@@ -318,7 +318,7 @@ Data Banks Preserved: 4/4 (100%)
 
 
 
-5. **Extract Audio from Bank $0F**- Command opcode pattern recognition across 15+ command types
+5. **Extract Audio from Bank $0f**- Command opcode pattern recognition across 15+ command types
 
    - Extract SPC700 program
 
@@ -374,7 +374,7 @@ src/asm/
 
 ├── bank_09_documented.asm   2,083 lines 🔄 Code (in-progress)
 
-├── bank_0a_documented.asm   2,058 lines 🔄 Code (in-progress)3. **Import-Reference-Disassembly.ps1** (320 lines) ⭐ NEW- **Total Banks:** 16 banks ($00-$0F)
+├── bank_0a_documented.asm   2,058 lines 🔄 Code (in-progress)3. **Import-Reference-Disassembly.ps1** (320 lines) ⭐ NEW- **Total Banks:** 16 banks ($00-$0f)
 
 ├── bank_0b_documented.asm   3,732 lines ✅ Code (disassembled)
 
@@ -386,7 +386,7 @@ src/asm/
 
 └── bank_0f_documented.asm      75 lines 📦 Data (audio)
 
-```- **Remaining Banks:** Banks $03-$0F (~60,000+ lines estimated)
+```- **Remaining Banks:** Banks $03-$0f (~60,000+ lines estimated)
 
 
 
@@ -406,11 +406,11 @@ src/asm/
 
 - **Banks**: 16 × 32 KB each
 
-- **Address Space**: $000000 - $07FFFF- 🎯 Total Documented: 17,852+ lines of professional-grade analysis
+- **Address Space**: $000000 - $07ffff- 🎯 Total Documented: 17,852+ lines of professional-grade analysis
 
 
 
-### Code Banks ($00-$03, $07-$0E)---
+### Code Banks ($00-$03, $07-$0e)---
 
 - **CPU**: 65816 (16-bit)
 
@@ -422,7 +422,7 @@ src/asm/
 
 
 
-### Data Banks ($04-$06, $0F)**Immediate Priority:** Bank $03 Cycle 1 Execution
+### Data Banks ($04-$06, $0f)**Immediate Priority:** Bank $03 Cycle 1 Execution
 
 - **Graphics Format**: SNES 4bpp (2/4 bitplanes)
 
@@ -442,7 +442,7 @@ src/asm/
 
 
 
-- [SESSION_LOG](SESSION_LOG_DISASSEMBLY_2025-10-30.md) - Detailed session notes**Imported Banks**: ✅ $04, $05, $06, $0F (8,605 lines)  
+- [SESSION_LOG](SESSION_LOG_DISASSEMBLY_2025-10-30.md) - Detailed session notes**Imported Banks**: ✅ $04, $05, $06, $0f (8,605 lines)  
 
 - [BUILD_GUIDE](BUILD_QUICK_START.md) - Build system documentation
 
@@ -482,7 +482,7 @@ This is the **proper approach** for SNES disassembly. Graphics and audio data sh
 
 
 
-**Estimated Completion**:- Created bank $0F template- Target completion within similar cycle count
+**Estimated Completion**:- Created bank $0f template- Target completion within similar cycle count
 
 - Code disassembly: 2-3 weeks (71% → 95%)
 
@@ -500,7 +500,7 @@ This is the **proper approach** for SNES disassembly. Graphics and audio data sh
 
 - Created import tool
 
-- Imported banks $04, $05, $06, $0F**Configuration:** ✅ VERIFIED AND OPTIMIZED
+- Imported banks $04, $05, $06, $0f**Configuration:** ✅ VERIFIED AND OPTIMIZED
 
 - Added 8,053 lines of assembly- Source Files: Diztinguish disassembly banks in src/asm/banks/
 

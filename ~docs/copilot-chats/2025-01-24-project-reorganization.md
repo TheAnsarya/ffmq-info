@@ -1,4 +1,4 @@
-# Copilot Chat Log - Project Reorganization
+﻿# Copilot Chat Log - Project Reorganization
 **Date:** January 24, 2025  
 **Branch:** ai-code-trial  
 **Topic:** Complete FFMQ SNES Development Environment Setup
@@ -197,8 +197,8 @@ help             # Show help
 - **ROM Size:** Configured in header
 
 ### ROM Structure
-- **Header Location:** `$7FC0` (LoROM)
-- **Interrupt Vectors:** `$7FE4-$7FFF`
+- **Header Location:** `$7fc0` (LoROM)
+- **Interrupt Vectors:** `$7fe4-$7fff`
 - **Code Start:** Bank $00
 
 ### Debug Features

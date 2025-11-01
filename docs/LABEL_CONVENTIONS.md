@@ -1,4 +1,4 @@
-# FFMQ Label Naming Conventions
+﻿# FFMQ Label Naming Conventions
 
 **Version:** 1.0  
 **Last Updated:** November 1, 2025  
@@ -95,8 +95,8 @@ All RAM variables use the `!` prefix in asar syntax.
 !temp_ptr_1         = $00       ; Temporary pointer
 !temp_byte_1        = $06       ; Temporary byte
 !temp_word_1        = $09       ; Temporary word
-!temp_index         = $0B       ; Temporary index/counter
-!temp_flags         = $0C       ; Temporary flags
+!temp_index         = $0b       ; Temporary index/counter
+!temp_flags         = $0c       ; Temporary flags
 ```
 
 **Global Variables** (game-wide state):
@@ -121,7 +121,7 @@ All RAM variables use the `!` prefix in asar syntax.
 ; Graphics system
 !vram_write_addr    = $20
 !screen_brightness  = $29
-!bg_mode            = $2A
+!bg_mode            = $2a
 ```
 
 ### Common Patterns
@@ -500,7 +500,7 @@ When defining individual bits within a flag byte:
 
 ```assembly
 ; Status flags byte
-!status_flags       = $A0
+!status_flags       = $a0
 
 ; Individual bit definitions (using constants)
 STATUS_POISON       = %00000001     ; Bit 0
@@ -543,11 +543,11 @@ Replace magic numbers with named constants:
 
 ```assembly
 ; ❌ Bad
-LDA #$0F
+LDA #$0f
 STA $2100
 
 ; ✅ Good
-BRIGHTNESS_FULL = $0F
+BRIGHTNESS_FULL = $0f
 LDA #BRIGHTNESS_FULL
 STA INIDISP
 ```
@@ -573,7 +573,7 @@ When encountering existing labels that don't follow conventions:
 
 ```assembly
 ; ============================================================================
-; Battle System Variables ($90-$BF)
+; Battle System Variables ($90-$bf)
 ; ============================================================================
 
 ; Battle State
@@ -590,15 +590,15 @@ When encountering existing labels that don't follow conventions:
 !atb_enemy2             = $98       ; Enemy 2 ATB gauge
 
 ; Damage and Effects
-!damage_value           = $99       ; Last damage value (2 bytes: $99-$9A)
+!damage_value           = $99       ; Last damage value (2 bytes: $99-$9a)
 !damage_value_lo        = $99       ; Damage value (low byte)
-!damage_value_hi        = $9A       ; Damage value (high byte)
-!hit_chance             = $9B       ; Hit chance percentage
-!critical_flag          = $9C       ; Critical hit flag (1=critical)
-!status_effect          = $9D       ; Status effect to apply
-!exp_gained             = $9E       ; Experience gained (2 bytes: $9E-$9F)
-!exp_gained_lo          = $9E       ; Experience gained (low byte)
-!exp_gained_hi          = $9F       ; Experience gained (high byte)
+!damage_value_hi        = $9a       ; Damage value (high byte)
+!hit_chance             = $9b       ; Hit chance percentage
+!critical_flag          = $9c       ; Critical hit flag (1=critical)
+!status_effect          = $9d       ; Status effect to apply
+!exp_gained             = $9e       ; Experience gained (2 bytes: $9e-$9f)
+!exp_gained_lo          = $9e       ; Experience gained (low byte)
+!exp_gained_hi          = $9f       ; Experience gained (high byte)
 ```
 
 ### Complete ROM Data Block

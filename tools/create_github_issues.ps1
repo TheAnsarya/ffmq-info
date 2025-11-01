@@ -1,9 +1,9 @@
-# GitHub Issues Creation Script for FFMQ Disassembly Project
+﻿# GitHub Issues Creation Script for FFMQ Disassembly Project
 # Prerequisites: Install GitHub CLI (gh) and authenticate: gh auth login
 
 param(
-    [switch]$DryRun = $false,
-    [switch]$CreateProject = $true
+    [switch]$dryRun = $false,
+    [switch]$createProject = $true
 )
 
 $repo = "TheAnsarya/ffmq-info"
@@ -13,7 +13,7 @@ Write-Host "FFMQ GitHub Issues Creator" -ForegroundColor Cyan
 Write-Host "================================" -ForegroundColor Cyan
 Write-Host ""
 
-if ($DryRun) {
+if ($dryRun) {
     Write-Host "⚠️  DRY RUN MODE - No issues will be created" -ForegroundColor Yellow
     Write-Host ""
 }
@@ -355,10 +355,10 @@ Disassemble and document Bank $06 (Data Bank, ~4,000 lines estimated)
     },
 
     @{
-        title = "🔍 Complete Code Disassembly - Bank $0E"
+        title = "🔍 Complete Code Disassembly - Bank $0e"
         body = @"
 ## Goal
-Disassemble and document Bank $0E (Unknown, ~5,000 lines estimated)
+Disassemble and document Bank $0e (Unknown, ~5,000 lines estimated)
 
 ## Action Items
 1. [ ] Initial exploration: search for JSR/RTS patterns (code) vs bulk data
@@ -381,16 +381,16 @@ Disassemble and document Bank $0E (Unknown, ~5,000 lines estimated)
     },
 
     @{
-        title = "🔍 Complete Code Disassembly - Bank $0F"
+        title = "🔍 Complete Code Disassembly - Bank $0f"
         body = @"
 ## Goal
-Disassemble and document Bank $0F (Unknown, ~5,000 lines estimated)
+Disassemble and document Bank $0f (Unknown, ~5,000 lines estimated)
 
 ## Action Items
 1. [ ] Initial exploration: search for JSR/RTS patterns (code) vs bulk data
 2. [ ] Run ``grep_search`` to identify regions
 3. [ ] Create ``bank_0F_documented.asm`` with analysis
-4. [ ] Likely similar to $0E
+4. [ ] Likely similar to $0e
 5. [ ] May contain additional systems or overflow data
 6. [ ] Verify ROM match
 
@@ -473,7 +473,7 @@ Document all major systems with architecture guides and diagrams
 )
 
 # Create milestone if it doesn't exist
-if (-not $DryRun) {
+if (-not $dryRun) {
     Write-Host "Creating milestone: 100% Code Labels..." -ForegroundColor Cyan
     try {
         gh api repos/$repo/milestones -f title="100% Code Labels" -f description="Complete elimination of all CODE_* generic labels" -f state="open" 2>$null
@@ -507,7 +507,7 @@ $labelsToCreate = @(
     @{name="bank: 0F"; color="ededed"; description="Bank 0F"}
 )
 
-if (-not $DryRun) {
+if (-not $dryRun) {
     Write-Host "`nCreating labels..." -ForegroundColor Cyan
     foreach ($label in $labelsToCreate) {
         try {
@@ -526,7 +526,7 @@ $createdIssues = @()
 foreach ($issue in $issues) {
     Write-Host "`n📋 $($issue.title)" -ForegroundColor Yellow
 
-    if ($DryRun) {
+    if ($dryRun) {
         Write-Host "  [DRY RUN] Would create issue with:" -ForegroundColor Gray
         Write-Host "    Labels: $($issue.labels -join ', ')" -ForegroundColor Gray
         if ($issue.milestone) {
@@ -584,7 +584,7 @@ if ($createdIssues.Count -gt 0) {
     }
 }
 
-if ($CreateProject -and -not $DryRun) {
+if ($createProject -and -not $dryRun) {
     Write-Host "`n================================" -ForegroundColor Cyan
     Write-Host "PROJECT BOARD SETUP" -ForegroundColor Cyan
     Write-Host "================================" -ForegroundColor Cyan

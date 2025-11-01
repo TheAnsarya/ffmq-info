@@ -1,4 +1,4 @@
-# FFMQ Build Guide
+﻿# FFMQ Build Guide
 
 Complete guide to building Final Fantasy: Mystic Quest ROM from source.
 
@@ -265,8 +265,8 @@ The tool creates:
 | Tilemaps | 16-bit words | LZSS | Banks $05-$08 |
 | Text | DTE compressed | DTE | Bank $03 |
 | Music | SPC700 | BRR | Bank $08 |
-| Character data | Binary tables | None | Bank $0C |
-| Enemy data | Binary tables | None | Bank $0E |
+| Character data | Binary tables | None | Bank $0c |
+| Enemy data | Binary tables | None | Bank $0e |
 
 ### Manual Asset Extraction
 
@@ -274,7 +274,7 @@ For specific assets, you can extract manually:
 
 #### Extract Text Data
 ```powershell
-# Text is in Bank $03 (ROM offset $018000-$01FFFF)
+# Text is in Bank $03 (ROM offset $018000-$01ffff)
 # Use hex editor to extract and decode with DTE table
 ```
 
@@ -367,7 +367,7 @@ Create `test-roundtrip.ps1`:
 
 param(
     [string]$OriginalROM = "roms\ffmq-original.sfc",
-    [string]$BuildFile = "ffmq - onlygood.asm",
+    [string]$buildFile = "ffmq - onlygood.asm",
     [string]$OutputROM = "ffmq - onlygood.sfc"
 )
 
@@ -390,7 +390,7 @@ Write-Host "  ✓ Cleaned" -ForegroundColor Green
 
 # Step 3: Build ROM
 Write-Host "`n[3/4] Building ROM from source..." -ForegroundColor Yellow
-$asarOutput = & asar $BuildFile 2>&1
+$asarOutput = & asar $buildFile 2>&1
 if ($LASTEXITCODE -ne 0) {
     Write-Host "ERROR: Build failed!" -ForegroundColor Red
     Write-Host $asarOutput
@@ -493,7 +493,7 @@ Output shows offset in hex:
 #### 3. Identify Bank/Offset
 ```powershell
 # Convert hex offset to bank:address
-# Example: 0001A3C0 = Bank $03:$63C0 (LoROM)
+# Example: 0001A3C0 = Bank $03:$63c0 (LoROM)
 ```
 
 #### 4. Check Source
@@ -522,22 +522,22 @@ Review assembly source at that bank/address for:
 ```
 Bank  ROM Offset    Address Range  Size   Contents
 ----  ----------    -------------  -----  ---------
-$00   $000000       $008000-$00FFFF  32KB  Main engine
-$01   $008000       $018000-$01FFFF  32KB  Event handlers
-$02   $010000       $028000-$02FFFF  32KB  Extended logic
-$03   $018000       $038000-$03FFFF  32KB  Text data
-$04   $020000       $048000-$04FFFF  32KB  Graphics (sprites)
-$05   $028000       $058000-$05FFFF  32KB  Graphics (tilemaps)
-$06   $030000       $068000-$06FFFF  32KB  Graphics (animations)
-$07   $038000       $078000-$07FFFF  32KB  Graphics (palettes)
-$08   $040000       $088000-$08FFFF  32KB  Graphics (layouts)
-$09   $048000       $098000-$09FFFF  32KB  Graphics (sprite GFX)
-$0A   $050000       $0A8000-$0AFFFF  32KB  Graphics (anim seqs)
-$0B   $058000       $0B8000-$0BFFFF  32KB  Battle graphics
-$0C   $060000       $0C8000-$0CFFFF  32KB  Data tables
-$0D   $068000       $0D8000-$0DFFFF  32KB  Extended data
-$0E   $070000       $0E8000-$0EFFFF  32KB  Battle data
-$0F   $078000       $0F8000-$0FFFFF  32KB  Audio (SPC700)
+$00   $000000       $008000-$00ffff  32KB  Main engine
+$01   $008000       $018000-$01ffff  32KB  Event handlers
+$02   $010000       $028000-$02ffff  32KB  Extended logic
+$03   $018000       $038000-$03ffff  32KB  Text data
+$04   $020000       $048000-$04ffff  32KB  Graphics (sprites)
+$05   $028000       $058000-$05ffff  32KB  Graphics (tilemaps)
+$06   $030000       $068000-$06ffff  32KB  Graphics (animations)
+$07   $038000       $078000-$07ffff  32KB  Graphics (palettes)
+$08   $040000       $088000-$08ffff  32KB  Graphics (layouts)
+$09   $048000       $098000-$09ffff  32KB  Graphics (sprite GFX)
+$0a   $050000       $0a8000-$0affff  32KB  Graphics (anim seqs)
+$0b   $058000       $0b8000-$0bffff  32KB  Battle graphics
+$0c   $060000       $0c8000-$0cffff  32KB  Data tables
+$0d   $068000       $0d8000-$0dffff  32KB  Extended data
+$0e   $070000       $0e8000-$0effff  32KB  Battle data
+$0f   $078000       $0f8000-$0fffff  32KB  Audio (SPC700)
 ----  ----------                    -----
 Total $080000 (512KB) mapped, 1MB ROM total
 ```
@@ -590,11 +590,11 @@ When planning modifications, calculate required space:
 ; Required: +50 bytes
 
 ; Option 1: Find free space in same bank
-org $03F800  ; Check if free in Bank $03
+org $03f800  ; Check if free in Bank $03
   db "New dialog text..."
   
 ; Option 2: Use free space in different bank
-org $0FF000  ; Free space in Bank $0F
+org $0ff000  ; Free space in Bank $0f
   db "New dialog text..."
   ; Update pointer table to point here
 ```
@@ -764,8 +764,8 @@ org $018000  ; Bank $01 starts at $018000
 
 ; Ensure all banks are filled properly
 ; Use 'fillbyte' if needed
-fillbyte $FF
-fill $FF0000  ; Fill to specific address
+fillbyte $ff
+fill $ff0000  ; Fill to specific address
 ```
 
 #### Warning: "label 'xyz' already defined"
@@ -812,7 +812,7 @@ label_name:        ; Global
 **Testing**:
 ```powershell
 # Verify ROM header
-# Offset $00FFC0-$00FFDF contains header
+# Offset $00ffc0-$00ffdf contains header
 # Check with hex editor
 ```
 
@@ -862,8 +862,8 @@ endif
 
 if !ENABLE_CHEATS
     ; Cheat code
-    lda #$FF
-    sta $7E0100  ; Max HP
+    lda #$ff
+    sta $7e0100  ; Max HP
 endif
 ```
 

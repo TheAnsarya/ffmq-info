@@ -1,4 +1,4 @@
-# FFMQ Build Instructions
+﻿# FFMQ Build Instructions
 
 ## Overview
 
@@ -195,8 +195,8 @@ incsrc "../include/ffmq_macros_original.inc"   ; Must be before use
 Verify ROM is padded to 1MB:
 ```asm
 ; At end of ffmq_complete.asm
-org $0FFFFF
-db $FF
+org $0fffff
+db $ff
 ```
 
 ### Build Succeeds but ROM Doesn't Work

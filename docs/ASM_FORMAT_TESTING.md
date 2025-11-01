@@ -1,4 +1,4 @@
-# ASM Format Testing Documentation
+﻿# ASM Format Testing Documentation
 
 ## Overview
 
@@ -126,7 +126,7 @@ Contains 12 comprehensive test cases:
 ✅ **Instruction Formats**
 - Single instructions: `RTS`
 - Instructions with operands: `LDA #$00`
-- Long addressing: `STA.L $7E3667`
+- Long addressing: `STA.L $7e3667`
 - Indexed addressing: `LDA.W SNES_NMITIMEN,X`
 
 ✅ **Comment Styles**

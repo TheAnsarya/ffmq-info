@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+﻿#!/usr/bin/env python3
 """
 FFMQ ROM Data Extractor
 Extracts binary data from Final Fantasy Mystic Quest ROM banks
@@ -21,7 +21,7 @@ class FFMQRomExtractor:
 		self.rom_data = None
 		self.extractions = []
 
-		# SNES LoROM memory map (banks $00-$7F mapped to ROM)
+		# SNES LoROM memory map (banks $00-$7f mapped to ROM)
 		self.bank_size = 0x8000  # 32KB per bank in LoROM
 
 	def load_rom(self) -> bool:
@@ -90,23 +90,23 @@ class FFMQRomExtractor:
 	def extract_bank_07_graphics(self):
 		"""Extract Bank $07 graphics and animation data"""
 
-		# DATA8_07B013 - Multi-sprite configuration blocks (from Cycle 4 analysis)
-		# ROM offset: Bank $07 starts at $038000 (LoROM), $B013 offset = $03B013
+		# DATA8_07b013 - Multi-sprite configuration blocks (from Cycle 4 analysis)
+		# ROM offset: Bank $07 starts at $038000 (LoROM), $b013 offset = $03b013
 		self.extract_range(
 			name="bank07_sprite_configs",
-			rom_offset=0x03B013,
+			rom_offset=0x03b013,
 			size=0x1000,  # Estimate 4KB, adjust based on actual size
 			category="sprites",
-			description="Multi-sprite configuration blocks (DATA8_07B013) - scene objects, battle formations, NPC configs"
+			description="Multi-sprite configuration blocks (DATA8_07b013) - scene objects, battle formations, NPC configs"
 		)
 
-		# DATA8_07AF3B - Scene object lookup table (78 entries × 2 bytes = 156 bytes)
+		# DATA8_07af3b - Scene object lookup table (78 entries × 2 bytes = 156 bytes)
 		self.extract_range(
 			name="bank07_scene_lookup",
-			rom_offset=0x03AF3B,
+			rom_offset=0x03af3b,
 			size=156,
 			category="tables",
-			description="Scene object lookup table (DATA8_07AF3B) - 78 entries, 16-bit pointers to sprite configs"
+			description="Scene object lookup table (DATA8_07af3b) - 78 entries, 16-bit pointers to sprite configs"
 		)
 
 	def extract_title_screen_graphics(self):
@@ -120,7 +120,7 @@ class FFMQRomExtractor:
 			("title-screen-words.bin", "Title screen text/logo graphics"),
 			("tiles.bin", "General tile graphics data"),
 			("048000-tiles.bin", "Graphics tiles from ROM offset $048000"),
-			("data07b013.bin", "Bank $07 sprite data (matches DATA8_07B013)")
+			("data07b013.bin", "Bank $07 sprite data (matches DATA8_07b013)")
 		]
 
 		for filename, desc in existing_files:

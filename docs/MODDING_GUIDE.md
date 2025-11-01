@@ -1,4 +1,4 @@
-# Modding Guide - Final Fantasy Mystic Quest
+﻿# Modding Guide - Final Fantasy Mystic Quest
 
 A comprehensive guide to modifying and customizing Final Fantasy Mystic Quest using the disassembly project.
 
@@ -68,7 +68,7 @@ The disassembly is organized by ROM banks:
 - `bank_0C_documented.asm` - **Menu system and UI** ⭐
 - `bank_0D_documented.asm` - **Menu and UI** ⭐
 
-**Most modding happens in banks $0B, $0C, and $0D!**
+**Most modding happens in banks $0b, $0c, and $0d!**
 
 ## Quick Modifications
 
@@ -81,13 +81,13 @@ The disassembly is organized by ROM banks:
 ; Benjamin's starting stats
 .db $01     ; Starting level
 .db $14     ; Starting HP (20)
-.db $0A     ; Starting MP (10)
+.db $0a     ; Starting MP (10)
 ```
 
 **Change to**:
 ```asm
 ; Benjamin's starting stats  
-.db $0A     ; Starting level (NOW LEVEL 10!)
+.db $0a     ; Starting level (NOW LEVEL 10!)
 .db $64     ; Starting HP (100)
 .db $32     ; Starting MP (50)
 ```
@@ -162,7 +162,7 @@ CharacterData:
 BenjaminStartStats:
     .db $01     ; Level 1
     .db $14     ; HP: 20
-    .db $0A     ; MP: 10
+    .db $0a     ; MP: 10
     .db $08     ; Attack: 8
     .db $08     ; Defense: 8
     .db $08     ; Speed: 8
@@ -175,12 +175,12 @@ BenjaminStartStats:
     .db $01     ; Level 1
     .db $32     ; HP: 50 (2.5x increase!)
     .db $05     ; MP: 5 (reduced)
-    .db $0C     ; Attack: 12 (increased)
+    .db $0c     ; Attack: 12 (increased)
     .db $14     ; Defense: 20 (BIG increase!)
     .db $05     ; Speed: 5 (reduced)
     .db $04     ; Magic: 4 (reduced)
     .db $64     ; Accuracy: 100
-    .db $1E     ; Evasion: 30 (reduced)
+    .db $1e     ; Evasion: 30 (reduced)
 ```
 
 ### Level-Up Growth Rates
@@ -191,7 +191,7 @@ BenjaminStartStats:
 ; HP growth per level
 BenjaminHPGrowth:
     .db $05     ; +5 HP per level (default)
-    ; Change to $0A for +10 HP per level
+    ; Change to $0a for +10 HP per level
 
 ; Attack growth per level  
 BenjaminAttackGrowth:
@@ -209,9 +209,9 @@ KaeliStartStats:
     .db $32     ; MP: 50 (HIGH!)
     .db $06     ; Attack: 6 (low)
     .db $08     ; Defense: 8
-    .db $0C     ; Speed: 12 (good)
+    .db $0c     ; Speed: 12 (good)
     .db $14     ; Magic: 20 (VERY HIGH!)
-    .db $5A     ; Accuracy: 90
+    .db $5a     ; Accuracy: 90
     .db $46     ; Evasion: 70
 ```
 
@@ -224,7 +224,7 @@ FFMQ uses a custom text encoding with control codes:
 - `$00` - End of string
 - `$01` - Newline
 - `$02` - Wait for button press
-- `$FE` - Character name placeholder
+- `$fe` - Character name placeholder
 
 ### Finding Dialogue
 
@@ -264,9 +264,9 @@ MyCustomNPC:
 ### Character Name in Dialogue
 
 ```asm
-; Use $FE for player name
+; Use $fe for player name
 NPCGreeting:
-    .db "Hello, ", $FE, "!", $01
+    .db "Hello, ", $fe, "!", $01
     .db "How are you?", $00
 ```
 
@@ -334,24 +334,24 @@ python tools/convert_graphics.py to-snes \
 ; Example: Benjamin's palette
 BenjaminPalette:
     .dw $0000   ; Color 0: Transparent
-    .dw $7FFF   ; Color 1: White
-    .dw $001F   ; Color 2: Red
-    .dw $03E0   ; Color 3: Green
+    .dw $7fff   ; Color 1: White
+    .dw $001f   ; Color 2: Red
+    .dw $03e0   ; Color 3: Green
     ; ... more colors
 ```
 
 **Color Format**: SNES 15-bit BGR (5 bits each)
-- `$001F` = Red   (0, 0, 31)
-- `$03E0` = Green (0, 31, 0)
-- `$7C00` = Blue  (31, 0, 0)
+- `$001f` = Red   (0, 0, 31)
+- `$03e0` = Green (0, 31, 0)
+- `$7c00` = Blue  (31, 0, 0)
 
 ### Example: Make Benjamin Blue
 
 ```asm
 BenjaminPalette:
     .dw $0000   ; Transparent
-    .dw $7FFF   ; White  
-    .dw $7C00   ; Blue (was red!)
+    .dw $7fff   ; White  
+    .dw $7c00   ; Blue (was red!)
     .dw $5400   ; Dark blue (was green!)
 ```
 
@@ -376,7 +376,7 @@ ItemData:
 ```asm
 ; Super Excalibur - Overpowered sword!
 Item_SuperExcalibur:
-    .db $FF     ; Item ID (use unused ID)
+    .db $ff     ; Item ID (use unused ID)
     .db $01     ; Type: Weapon
     .db $63     ; Attack: +99
     .db $00     ; Defense: +0
@@ -397,13 +397,13 @@ ItemName_SuperExcalibur:
 Item_CurePotion:
     .db $01     ; Item ID
     .db $03     ; Type: Consumable
-    .db $1E     ; Restore 30 HP
+    .db $1e     ; Restore 30 HP
 
 ; Modified - FULL HEAL
 Item_CurePotion:
     .db $01     ; Item ID
     .db $03     ; Type: Consumable
-    .db $FF     ; Restore 255 HP (full heal!)
+    .db $ff     ; Restore 255 HP (full heal!)
 ```
 
 ### Equipment Effects
@@ -449,7 +449,7 @@ SpellData:
 Spell_Cure:
     .db $01     ; Spell ID: Cure
     .db $04     ; MP cost: 4
-    .db $1E     ; Power: 30 HP
+    .db $1e     ; Power: 30 HP
 
 ; Modified - MEGA CURE
 Spell_Cure:
@@ -463,12 +463,12 @@ Spell_Cure:
 ```asm
 ; Meteor - Ultimate attack spell
 Spell_Meteor:
-    .db $FF     ; Spell ID (unused)
+    .db $ff     ; Spell ID (unused)
     .db $63     ; MP cost: 99
-    .db $FF     ; Power: 255 (MAXIMUM!)
+    .db $ff     ; Power: 255 (MAXIMUM!)
     .db $00     ; Element: Non-elemental
     .db $01     ; Target: All enemies
-    .db $0F     ; Animation: Meteor animation
+    .db $0f     ; Animation: Meteor animation
 
 ; Add spell name
 SpellName_Meteor:
@@ -511,7 +511,7 @@ ForestEncounters:
 
 ; Make encounters more frequent
 ForestEncounters:
-    .db $0F     ; 15% encounter rate (3x more!)
+    .db $0f     ; 15% encounter rate (3x more!)
     .db $01     ; Enemy group 1
     .db $02     ; Enemy group 2
     .db $03     ; Enemy group 3
@@ -541,8 +541,8 @@ EnemyGroup_01:
 ```asm
 ; Make boss fights harder
 Boss_DarkKing:
-    .dw $03E8   ; HP: 1000 → Change to $07D0 (2000)
-    .db $64     ; Attack: 100 → Change to $C8 (200)
+    .dw $03e8   ; HP: 1000 → Change to $07d0 (2000)
+    .db $64     ; Attack: 100 → Change to $c8 (200)
     .db $32     ; Defense: 50 → Change to $64 (100)
 ```
 
@@ -573,7 +573,7 @@ NPCText:
 ✅ **Right**: Use appropriate size
 ```asm
 .dw $0999   ; Word (16-bit) for larger values
-.db $FF     ; Byte max is 255 ($FF)
+.db $ff     ; Byte max is 255 ($ff)
 ```
 
 ### 3. Breaking Critical Code
@@ -583,7 +583,7 @@ NPCText:
 ; Don't modify this unless you know what it does!
 SomeFunction:
     lda $00
-    sta $7E0000    ; Critical!
+    sta $7e0000    ; Critical!
 ```
 
 ✅ **Right**: Modify data tables instead
@@ -626,7 +626,7 @@ EnemyStats_Goblin:
 Spell_Cure:
     .db $01     ; ID
     .db $08     ; MP cost: 8 (doubled!)
-    .db $0F     ; Power: 15 (halved!)
+    .db $0f     ; Power: 15 (halved!)
 
 ; Reduce starting GP
 StartingGP:
@@ -639,8 +639,8 @@ StartingGP:
 ; Triple starting stats
 BenjaminStartStats:
     .db $01     ; Level 1
-    .db $3C     ; HP: 60 (was 20)
-    .db $1E     ; MP: 30 (was 10)
+    .db $3c     ; HP: 60 (was 20)
+    .db $1e     ; MP: 30 (was 10)
     .db $18     ; Attack: 24 (was 8)
     .db $18     ; Defense: 24 (was 8)
 
@@ -660,7 +660,7 @@ ForestEncounters:
 EnemyStats_Goblin:
     .dw $0064   ; HP: Random (100)
     .db $32     ; Attack: Random (50)
-    .db $1E     ; Defense: Random (30)
+    .db $1e     ; Defense: Random (30)
 
 EnemyStats_Dragon:
     .dw $0014   ; HP: Random (20) - weak!
@@ -674,15 +674,15 @@ EnemyStats_Dragon:
 ; Randomize character palettes
 BenjaminPalette:
     .dw $0000   ; Transparent
-    .dw $7C1F   ; Purple (was white)
-    .dw $03E0   ; Green (was red)
-    .dw $7C00   ; Blue (was blue)
+    .dw $7c1f   ; Purple (was white)
+    .dw $03e0   ; Green (was red)
+    .dw $7c00   ; Blue (was blue)
 
 KaeliPalette:
     .dw $0000   ; Transparent
-    .dw $001F   ; Red (was purple)
-    .dw $7FE0   ; Yellow (was green)
-    .dw $7FFF   ; White (was teal)
+    .dw $001f   ; Red (was purple)
+    .dw $7fe0   ; Yellow (was green)
+    .dw $7fff   ; White (was teal)
 ```
 
 ## Tips and Best Practices

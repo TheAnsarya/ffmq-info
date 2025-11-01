@@ -1,4 +1,4 @@
-#!/usr/bin/env pwsh
+﻿#!/usr/bin/env pwsh
 <#
 .SYNOPSIS
     Adds child issue links to parent issue task checklists
@@ -20,10 +20,10 @@
 #>
 
 param(
-    [switch]$DryRun
+    [switch]$dryRun
 )
 
-$ErrorActionPreference = "Stop"
+$errorActionPreference = "Stop"
 
 # Check if gh CLI is installed and authenticated
 function Test-GitHubCLI {
@@ -121,7 +121,7 @@ $repo = Get-RepoName
 Write-Host "✓ Repository: $repo" -ForegroundColor Green
 Write-Host ""
 
-if ($DryRun) {
+if ($dryRun) {
     Write-Host "🔍 DRY RUN MODE - No changes will be made" -ForegroundColor Yellow
     Write-Host ""
 }
@@ -183,7 +183,7 @@ Track progress by completing these granular issues:
         # Prepend child section to the existing comment (at the top)
         $newComment = "## Sub-Tasks Checklist`n`n" + $childSection + "`n" + $currentComment.Replace("## Sub-Tasks Checklist`n`n", "")
 
-        if ($DryRun) {
+        if ($dryRun) {
             Write-Host "  [DRY RUN] Would update comment with child issues" -ForegroundColor Yellow
             Write-Host "  Preview:" -ForegroundColor Gray
             Write-Host "  ---" -ForegroundColor DarkGray
@@ -221,7 +221,7 @@ Write-Host "✨ Parent Checklist Update Summary" -ForegroundColor Cyan
 Write-Host "====================================================================== + " -ForegroundColor Cyan
 Write-Host ""
 
-if ($DryRun) {
+if ($dryRun) {
     Write-Host "🔍 DRY RUN Complete!" -ForegroundColor Yellow
     Write-Host "Would have added child issue checklists to $($parentChildMap.Keys.Count) parent issues" -ForegroundColor Yellow
 }

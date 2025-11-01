@@ -1,4 +1,4 @@
-# Battle System Architecture
+﻿# Battle System Architecture
 
 Complete documentation of the Final Fantasy Mystic Quest battle system mechanics and implementation.
 
@@ -176,11 +176,11 @@ UpdateATBGauges:
     adc PartySpeed,x        ; Add speed stat
     sta PartyATB,x          ; Save new ATB
     
-    cmp #$FF                ; Check if full
+    cmp #$ff                ; Check if full
     bcc .nextParty
     
     ; ATB full - enable action
-    lda #$FF
+    lda #$ff
     sta PartyATB,x
     lda #$01
     sta PartyActionReady,x
@@ -294,7 +294,7 @@ CalculatePhysicalDamage:
     
     ; Random variance (88-100%)
     jsr Random              ; A = random 0-255
-    and #$1F                ; Limit to 0-31
+    and #$1f                ; Limit to 0-31
     clc
     adc #224                ; Add 224 = range 224-255
     sta $13
@@ -307,7 +307,7 @@ CalculatePhysicalDamage:
     
     ; Check for critical hit (5% chance)
     jsr Random
-    cmp #$0D                ; 13/256 ≈ 5%
+    cmp #$0d                ; 13/256 ≈ 5%
     bcs .noCritical
     
     ; Critical! Double damage
@@ -527,7 +527,7 @@ AIPattern_MagicUser:
     
     ; 70% magic, 30% attack
     jsr Random
-    cmp #$4D                ; 77/256 ≈ 30%
+    cmp #$4d                ; 77/256 ≈ 30%
     bcs .magic
     
     lda #$00                ; Attack
@@ -876,16 +876,16 @@ AwardBattleRewards:
 
 ```asm
 InitializeBattle:           ; Setup battle state
-    ; Located at $0B:8000
+    ; Located at $0b:8000
     
 LoadEnemyData:              ; Load enemy stats
-    ; Located at $0B:8123
+    ; Located at $0b:8123
     
 LoadBattleBackground:       ; Load battle scene
-    ; Located at $0B:8234
+    ; Located at $0b:8234
     
 InitializeATB:              ; Reset ATB gauges
-    ; Located at $0B:8345
+    ; Located at $0b:8345
 ```
 
 ### Battle Loop
@@ -894,16 +894,16 @@ InitializeATB:              ; Reset ATB gauges
 
 ```asm
 BattleMainLoop:             ; Main battle update
-    ; Located at $0B:9000
+    ; Located at $0b:9000
     
 UpdateATBGauges:            ; Fill ATB gauges
-    ; Located at $0B:9123
+    ; Located at $0b:9123
     
 ProcessTurns:               ; Handle ready turns
-    ; Located at $0B:9234
+    ; Located at $0b:9234
     
 CheckBattleEnd:             ; Check win/lose
-    ; Located at $0B:9345
+    ; Located at $0b:9345
 ```
 
 ### Damage Calculation
@@ -912,16 +912,16 @@ CheckBattleEnd:             ; Check win/lose
 
 ```asm
 CalculatePhysicalDamage:    ; Physical damage formula
-    ; Located at $0B:A000
+    ; Located at $0b:A000
     
 CalculateMagicDamage:       ; Magic damage formula
-    ; Located at $0B:A123
+    ; Located at $0b:A123
     
 ApplyElementalModifier:     ; Apply element bonuses
-    ; Located at $0B:A234
+    ; Located at $0b:A234
     
 CheckCriticalHit:           ; Roll for critical
-    ; Located at $0B:A345
+    ; Located at $0b:A345
 ```
 
 ### AI System
@@ -930,16 +930,16 @@ CheckCriticalHit:           ; Roll for critical
 
 ```asm
 EnemyAI:                    ; Main AI decision
-    ; Located at $0B:B000
+    ; Located at $0b:B000
     
 AIPattern_Simple:           ; Simple attack AI
-    ; Located at $0B:B123
+    ; Located at $0b:B123
     
 AIPattern_MagicUser:        ; Magic-focused AI
-    ; Located at $0B:B234
+    ; Located at $0b:B234
     
 AIPattern_Boss:             ; Complex boss AI
-    ; Located at $0B:B345
+    ; Located at $0b:B345
 ```
 
 ### Status Effects
@@ -948,16 +948,16 @@ AIPattern_Boss:             ; Complex boss AI
 
 ```asm
 ProcessStatusEffects:       ; Apply status each turn
-    ; Located at $0B:C000
+    ; Located at $0b:C000
     
 ApplyPoison:                ; Poison damage
-    ; Located at $0B:C123
+    ; Located at $0b:C123
     
 ApplyRegen:                 ; Regen healing
-    ; Located at $0B:C234
+    ; Located at $0b:C234
     
 CheckStatusResistance:      ; Check immunity
-    ; Located at $0B:C345
+    ; Located at $0b:C345
 ```
 
 ## Performance Considerations
@@ -1010,7 +1010,7 @@ DebugKillEnemy:
 
 ; Fill party ATB instantly
 DebugReadyParty:
-    lda #$FF
+    lda #$ff
     sta PartyATB+0
     sta PartyATB+1
     sta PartyATB+2

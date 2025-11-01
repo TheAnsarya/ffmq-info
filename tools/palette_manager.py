@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+﻿#!/usr/bin/env python3
 """
 FFMQ Palette Management System
 ================================
@@ -59,15 +59,15 @@ class RGB555Color:
 
     @property
     def r5(self) -> int:
-        return self.rgb555 & 0x1F
+        return self.rgb555 & 0x1f
 
     @property
     def g5(self) -> int:
-        return (self.rgb555 >> 5) & 0x1F
+        return (self.rgb555 >> 5) & 0x1f
 
     @property
     def b5(self) -> int:
-        return (self.rgb555 >> 10) & 0x1F
+        return (self.rgb555 >> 10) & 0x1f
 
     @property
     def r8(self) -> int:
@@ -134,11 +134,11 @@ class Palette:
 def snes_to_rom_offset(bank: int, offset: int) -> int:
     """Convert SNES address (bank:offset) to ROM file offset"""
     if bank < 0x80:
-        # LoROM: banks $00-$7F, offset $8000-$FFFF
-        return ((bank & 0x7F) << 15) | (offset & 0x7FFF)
+        # LoROM: banks $00-$7f, offset $8000-$ffff
+        return ((bank & 0x7f) << 15) | (offset & 0x7fff)
     else:
-        # HiROM: banks $80-$FF
-        return ((bank & 0x7F) << 15) | (offset & 0x7FFF)
+        # HiROM: banks $80-$ff
+        return ((bank & 0x7f) << 15) | (offset & 0x7fff)
 
 
 def read_palette_from_rom(rom_data: bytes, address: int, color_count: int) -> List[RGB555Color]:
@@ -269,16 +269,16 @@ class PaletteManager:
             high = self.rom_data[offset + 1]
             bank = self.rom_data[offset + 2]
 
-            # Skip invalid entries (all $00 or all $FF)
+            # Skip invalid entries (all $00 or all $ff)
             if (low == 0 and high == 0 and bank == 0) or \
-               (low == 0xFF and high == 0xFF and bank == 0xFF):
+               (low == 0xff and high == 0xff and bank == 0xff):
                 continue
 
             # Calculate SNES offset and ROM address
             pal_offset = (high << 8) | low
 
             # Validate bank and offset
-            if bank < 0x09 or bank > 0x0B:
+            if bank < 0x09 or bank > 0x0b:
                 continue
             if pal_offset < 0x8000:
                 continue

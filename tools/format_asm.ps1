@@ -1,4 +1,4 @@
-<#
+﻿<#
 .SYNOPSIS
 	Format ASM source files according to project standards.
 
@@ -54,13 +54,13 @@ param(
 	[string]$Path,
 
 	[Parameter(HelpMessage = "Preview changes without modifying files")]
-	[switch]$DryRun,
+	[switch]$dryRun,
 
 	[Parameter(HelpMessage = "Skip creating backup before modifying files")]
 	[switch]$SkipBackup,
 
 	[Parameter(HelpMessage = "File pattern filter for directory processing")]
-	[string[]]$Filter = @("*.asm", "*.s", "*.inc")
+	[string[]]$filter = @("*.asm", "*.s", "*.inc")
 )
 
 #region Configuration
@@ -122,15 +122,15 @@ function Write-ErrorMessage {
 }
 
 function Test-IsAsmFile {
-	param([string]$FilePath)
-	$extension = [System.IO.Path]::GetExtension($FilePath).ToLower()
+	param([string]$filePath)
+	$extension = [System.IO.Path]::GetExtension($filePath).ToLower()
 	return $extension -in @('.asm', '.s', '.inc')
 }
 
 function Get-AsmFiles {
 	param(
 		[string]$Path,
-		[string[]]$Filter
+		[string[]]$filter
 	)
 
 	if (Test-Path -Path $Path -PathType Leaf) {
@@ -144,7 +144,7 @@ function Get-AsmFiles {
 	}
 	elseif (Test-Path -Path $Path -PathType Container) {
 		$files = @()
-		foreach ($pattern in $Filter) {
+		foreach ($pattern in $filter) {
 			$files += Get-ChildItem -Path $Path -Filter $pattern -Recurse -File
 		}
 		return $files
@@ -225,7 +225,7 @@ function Add-Padding {
 function Format-AsmLine {
 	param(
 		[string]$Line,
-		[hashtable]$Config
+		[hashtable]$config
 	)
 
 	$originalLine = $Line
@@ -236,7 +236,7 @@ function Format-AsmLine {
 	}
 
 	# Convert leading spaces to tabs
-	$Line = Convert-SpacesToTabs -Line $Line -TabSize $Config.TabSize
+	$Line = Convert-SpacesToTabs -Line $Line -TabSize $config.TabSize
 
 	# Trim trailing whitespace
 	$Line = $Line.TrimEnd()
@@ -245,7 +245,7 @@ function Format-AsmLine {
 	if ($Line -match '^\s*(;.*)$') {
 		$comment = $Matches[1]
 		# Comments aligned to comment column
-		$padding = "`t" * [Math]::Floor($Config.CommentColumn / $Config.TabSize)
+		$padding = "`t" * [Math]::Floor($config.CommentColumn / $config.TabSize)
 		return $padding + $comment
 	}
 
@@ -267,13 +267,13 @@ function Format-AsmLine {
 
 		# Add operand
 		if ($args) {
-			$result = Add-Padding -Text $result -TargetColumn $Config.OperandColumn -TabSize $Config.TabSize -UseTabs (!$Config.UseSpaces)
+			$result = Add-Padding -Text $result -TargetColumn $config.OperandColumn -TabSize $config.TabSize -UseTabs (!$config.UseSpaces)
 			$result += $args
 		}
 
 		# Add comment
 		if ($comment) {
-			$result = Add-Padding -Text $result -TargetColumn $Config.CommentColumn -TabSize $Config.TabSize -UseTabs (!$Config.UseSpaces)
+			$result = Add-Padding -Text $result -TargetColumn $config.CommentColumn -TabSize $config.TabSize -UseTabs (!$config.UseSpaces)
 			$result += $comment
 		}
 
@@ -292,16 +292,16 @@ function Format-AsmLine {
 		if ($isInstruction) {
 			# Format as instruction
 			$result = ""
-			$result = Add-Padding -Text $result -TargetColumn $Config.OpcodeColumn -TabSize $Config.TabSize -UseTabs (!$Config.UseSpaces)
+			$result = Add-Padding -Text $result -TargetColumn $config.OpcodeColumn -TabSize $config.TabSize -UseTabs (!$config.UseSpaces)
 			$result += $directive
 
 			if ($args) {
-				$result = Add-Padding -Text $result -TargetColumn $Config.OperandColumn -TabSize $Config.TabSize -UseTabs (!$Config.UseSpaces)
+				$result = Add-Padding -Text $result -TargetColumn $config.OperandColumn -TabSize $config.TabSize -UseTabs (!$config.UseSpaces)
 				$result += $args
 			}
 
 			if ($comment) {
-				$result = Add-Padding -Text $result -TargetColumn $Config.CommentColumn -TabSize $Config.TabSize -UseTabs (!$Config.UseSpaces)
+				$result = Add-Padding -Text $result -TargetColumn $config.CommentColumn -TabSize $config.TabSize -UseTabs (!$config.UseSpaces)
 				$result += $comment
 			}
 
@@ -312,12 +312,12 @@ function Format-AsmLine {
 			$result = $directive
 
 			if ($args) {
-				$result = Add-Padding -Text $result -TargetColumn $Config.OperandColumn -TabSize $Config.TabSize -UseTabs (!$Config.UseSpaces)
+				$result = Add-Padding -Text $result -TargetColumn $config.OperandColumn -TabSize $config.TabSize -UseTabs (!$config.UseSpaces)
 				$result += $args
 			}
 
 			if ($comment) {
-				$result = Add-Padding -Text $result -TargetColumn $Config.CommentColumn -TabSize $Config.TabSize -UseTabs (!$Config.UseSpaces)
+				$result = Add-Padding -Text $result -TargetColumn $config.CommentColumn -TabSize $config.TabSize -UseTabs (!$config.UseSpaces)
 				$result += $comment
 			}
 
@@ -336,18 +336,18 @@ function Format-AsmLine {
 		$result = $label + ":"
 
 		# Opcode at opcode column
-		$result = Add-Padding -Text $result -TargetColumn $Config.OpcodeColumn -TabSize $Config.TabSize -UseTabs (!$Config.UseSpaces)
+		$result = Add-Padding -Text $result -TargetColumn $config.OpcodeColumn -TabSize $config.TabSize -UseTabs (!$config.UseSpaces)
 		$result += $opcode
 
 		# Operand
 		if ($operand) {
-			$result = Add-Padding -Text $result -TargetColumn $Config.OperandColumn -TabSize $Config.TabSize -UseTabs (!$Config.UseSpaces)
+			$result = Add-Padding -Text $result -TargetColumn $config.OperandColumn -TabSize $config.TabSize -UseTabs (!$config.UseSpaces)
 			$result += $operand
 		}
 
 		# Comment
 		if ($comment) {
-			$result = Add-Padding -Text $result -TargetColumn $Config.CommentColumn -TabSize $Config.TabSize -UseTabs (!$Config.UseSpaces)
+			$result = Add-Padding -Text $result -TargetColumn $config.CommentColumn -TabSize $config.TabSize -UseTabs (!$config.UseSpaces)
 			$result += $comment
 		}
 
@@ -361,16 +361,16 @@ function Format-AsmLine {
 		$comment = if ($Matches[3]) { $Matches[3] } else { "" }
 
 		$result = ""
-		$result = Add-Padding -Text $result -TargetColumn $Config.OpcodeColumn -TabSize $Config.TabSize -UseTabs (!$Config.UseSpaces)
+		$result = Add-Padding -Text $result -TargetColumn $config.OpcodeColumn -TabSize $config.TabSize -UseTabs (!$config.UseSpaces)
 		$result += $opcode
 
 		if ($operand) {
-			$result = Add-Padding -Text $result -TargetColumn $Config.OperandColumn -TabSize $Config.TabSize -UseTabs (!$Config.UseSpaces)
+			$result = Add-Padding -Text $result -TargetColumn $config.OperandColumn -TabSize $config.TabSize -UseTabs (!$config.UseSpaces)
 			$result += $operand
 		}
 
 		if ($comment) {
-			$result = Add-Padding -Text $result -TargetColumn $Config.CommentColumn -TabSize $Config.TabSize -UseTabs (!$Config.UseSpaces)
+			$result = Add-Padding -Text $result -TargetColumn $config.CommentColumn -TabSize $config.TabSize -UseTabs (!$config.UseSpaces)
 			$result += $comment
 		}
 
@@ -382,13 +382,13 @@ function Format-AsmLine {
 function Format-AsmContent {
 	param(
 		[string[]]$Lines,
-		[hashtable]$Config
+		[hashtable]$config
 	)
 
 	$formattedLines = @()
 
 	foreach ($line in $Lines) {
-		$formattedLine = Format-AsmLine -Line $line -Config $Config
+		$formattedLine = Format-AsmLine -Line $line -Config $config
 		$formattedLines += $formattedLine
 	}
 
@@ -396,15 +396,15 @@ function Format-AsmContent {
 }
 
 function Get-LineEndingType {
-	param([string]$Content)
+	param([string]$content)
 
-	if ($Content -match "`r`n") {
+	if ($content -match "`r`n") {
 		return "CRLF"
 	}
-	elseif ($Content -match "`n") {
+	elseif ($content -match "`n") {
 		return "LF"
 	}
-	elseif ($Content -match "`r") {
+	elseif ($content -match "`r") {
 		return "CR"
 	}
 	else {
@@ -415,7 +415,7 @@ function Get-LineEndingType {
 function Compare-FileChanges {
 	param(
 		[string[]]$OriginalLines,
-		[string[]]$FormattedLines
+		[string[]]$formattedLines
 	)
 
 	$changes = @{
@@ -425,11 +425,11 @@ function Compare-FileChanges {
 		TotalChanges = 0
 	}
 
-	$maxLines = [Math]::Max($OriginalLines.Count, $FormattedLines.Count)
+	$maxLines = [Math]::Max($OriginalLines.Count, $formattedLines.Count)
 
 	for ($i = 0; $i -lt $maxLines; $i++) {
 		$original = if ($i -lt $OriginalLines.Count) { $OriginalLines[$i] } else { $null }
-		$formatted = if ($i -lt $FormattedLines.Count) { $FormattedLines[$i] } else { $null }
+		$formatted = if ($i -lt $formattedLines.Count) { $formattedLines[$i] } else { $null }
 
 		if ($original -ne $formatted) {
 			if ($null -eq $original) {
@@ -450,17 +450,17 @@ function Compare-FileChanges {
 
 function Format-AsmFile {
 	param(
-		[System.IO.FileInfo]$File,
-		[hashtable]$Config,
-		[bool]$DryRun,
+		[System.IO.FileInfo]$file,
+		[hashtable]$config,
+		[bool]$dryRun,
 		[bool]$SkipBackup
 	)
 
-	Write-VerboseMessage "Processing: $($File.FullName)"
+	Write-VerboseMessage "Processing: $($file.FullName)"
 
 	try {
 		# Read file content (detect encoding)
-		$content = Get-Content -Path $File.FullName -Raw -Encoding UTF8
+		$content = Get-Content -Path $file.FullName -Raw -Encoding UTF8
 
 		# Detect original line endings
 		$originalLineEnding = Get-LineEndingType -Content $content
@@ -472,14 +472,14 @@ function Format-AsmFile {
 		Write-VerboseMessage "  Total lines: $($lines.Count)"
 
 		# Format lines
-		$formattedLines = Format-AsmContent -Lines $lines -Config $Config
+		$formattedLines = Format-AsmContent -Lines $lines -Config $config
 
 		# Join lines with CRLF
-		$formattedContent = ($formattedLines -join $Config.LineEnding)
+		$formattedContent = ($formattedLines -join $config.LineEnding)
 
 		# Ensure final newline
-		if ($Config.InsertFinalNewline -and -not $formattedContent.EndsWith($Config.LineEnding)) {
-			$formattedContent += $Config.LineEnding
+		if ($config.InsertFinalNewline -and -not $formattedContent.EndsWith($config.LineEnding)) {
+			$formattedContent += $config.LineEnding
 		}
 
 		# Compare changes
@@ -488,7 +488,7 @@ function Format-AsmFile {
 		if ($changes.TotalChanges -eq 0) {
 			Write-VerboseMessage "  No changes needed"
 			return @{
-				File = $File.FullName
+				File = $file.FullName
 				Changed = $false
 				Changes = $changes
 			}
@@ -503,10 +503,10 @@ function Format-AsmFile {
 			Write-VerboseMessage "    - Lines removed: $($changes.LinesRemoved)"
 		}
 
-		if ($DryRun) {
-			Write-Host "  [DRY-RUN] Would format: $($File.Name) ($($changes.TotalChanges) changes)" -ForegroundColor Yellow
+		if ($dryRun) {
+			Write-Host "  [DRY-RUN] Would format: $($file.Name) ($($changes.TotalChanges) changes)" -ForegroundColor Yellow
 			return @{
-				File = $File.FullName
+				File = $file.FullName
 				Changed = $true
 				DryRun = $true
 				Changes = $changes
@@ -515,27 +515,27 @@ function Format-AsmFile {
 
 		# Create backup if not skipped
 		if (-not $SkipBackup) {
-			$backupPath = $File.FullName + ".bak"
-			Copy-Item -Path $File.FullName -Destination $backupPath -Force
+			$backupPath = $file.FullName + ".bak"
+			Copy-Item -Path $file.FullName -Destination $backupPath -Force
 			Write-VerboseMessage "  Backup created: $backupPath"
 		}
 
 		# Write formatted content (UTF-8 with BOM)
-		[System.IO.File]::WriteAllText($File.FullName, $formattedContent, [System.Text.UTF8Encoding]::new($true))
+		[System.IO.File]::WriteAllText($file.FullName, $formattedContent, [System.Text.UTF8Encoding]::new($true))
 
-		Write-SuccessMessage "  ✓ Formatted: $($File.Name) ($($changes.TotalChanges) changes)"
+		Write-SuccessMessage "  ✓ Formatted: $($file.Name) ($($changes.TotalChanges) changes)"
 
 		return @{
-			File = $File.FullName
+			File = $file.FullName
 			Changed = $true
 			DryRun = $false
 			Changes = $changes
 		}
 	}
 	catch {
-		Write-ErrorMessage "  ✗ Error processing $($File.Name): $_"
+		Write-ErrorMessage "  ✗ Error processing $($file.Name): $_"
 		return @{
-			File = $File.FullName
+			File = $file.FullName
 			Changed = $false
 			Error = $_.Exception.Message
 		}
@@ -561,7 +561,7 @@ try {
 	$resolvedPath = Resolve-Path -Path $Path -ErrorAction Stop
 	Write-Host "Target: $resolvedPath" -ForegroundColor White
 
-	if ($DryRun) {
+	if ($dryRun) {
 		Write-Host "Mode: DRY-RUN (preview only, no changes)" -ForegroundColor Yellow
 	}
 	else {
@@ -571,10 +571,10 @@ try {
 	Write-Host ""
 
 	# Get files to process
-	$files = Get-AsmFiles -Path $resolvedPath -Filter $Filter
+	$files = Get-AsmFiles -Path $resolvedPath -Filter $filter
 
 	if ($files.Count -eq 0) {
-		Write-WarningMessage "No ASM files found matching filter: $($Filter -join ', ')"
+		Write-WarningMessage "No ASM files found matching filter: $($filter -join ', ')"
 		exit 0
 	}
 
@@ -584,7 +584,7 @@ try {
 	# Process files
 	$results = @()
 	foreach ($file in $files) {
-		$result = Format-AsmFile -File $file -Config $script:Config -DryRun:$DryRun -SkipBackup:$SkipBackup
+		$result = Format-AsmFile -File $file -Config $script:Config -DryRun:$dryRun -SkipBackup:$SkipBackup
 		$results += $result
 	}
 
@@ -602,7 +602,7 @@ try {
 		Write-Host "Errors: $totalErrors" -ForegroundColor Red
 	}
 
-	if ($DryRun -and $totalChanged -gt 0) {
+	if ($dryRun -and $totalChanged -gt 0) {
 		Write-Host "`nRe-run without -DryRun to apply changes." -ForegroundColor Yellow
 	}
 

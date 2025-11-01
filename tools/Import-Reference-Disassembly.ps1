@@ -1,4 +1,4 @@
-#Requires -Version 5.1
+﻿#Requires -Version 5.1
 <#
 .SYNOPSIS
 	Imports reference disassembly from DiztinGUIsh output to accelerate disassembly work.
@@ -25,7 +25,7 @@
 
 .EXAMPLE
 	.\Import-Reference-Disassembly.ps1 -Banks @('04','05','06','0F')
-	Imports banks $04, $05, $06, and $0F from reference
+	Imports banks $04, $05, $06, and $0f from reference
 
 .EXAMPLE
 	.\Import-Reference-Disassembly.ps1 -Banks @('04') -Force
@@ -46,17 +46,17 @@
 [CmdletBinding()]
 param(
 	[Parameter(Mandatory=$false)]
-	[string[]]$Banks,
+	[string[]]$banks,
 
 	[Parameter(Mandatory=$false)]
-	[switch]$Force,
+	[switch]$force,
 
 	[Parameter(Mandatory=$false)]
 	[switch]$NoBackup
 )
 
 Set-StrictMode -Version Latest
-$ErrorActionPreference = 'Stop'
+$errorActionPreference = 'Stop'
 
 # ============================================================================
 # Configuration
@@ -120,16 +120,16 @@ function Import-BankDisassembly {
 	[CmdletBinding()]
 	param(
 		[Parameter(Mandatory=$true)]
-		[string]$BankHex
+		[string]$bankHex
 	)
 
-	$bankNumber = [Convert]::ToInt32($BankHex, 16)
-	$bankHexUpper = $BankHex.ToUpper()
+	$bankNumber = [Convert]::ToInt32($bankHex, 16)
+	$bankHexUpper = $bankHex.ToUpper()
 
 	# Paths
-	$refFile = Join-Path $script:ReferenceDir "bank_$BankHex.asm"
-	$outputFile = Join-Path $script:OutputDir "bank_$($BankHex)_documented.asm"
-	$tempFile = Join-Path $script:TempDir "temp_bank$($BankHex)_import.asm"
+	$refFile = Join-Path $script:ReferenceDir "bank_$bankHex.asm"
+	$outputFile = Join-Path $script:OutputDir "bank_$($bankHex)_documented.asm"
+	$tempFile = Join-Path $script:TempDir "temp_bank$($bankHex)_import.asm"
 
 	# Validate reference file exists
 	if (-not (Test-Path $refFile)) {
@@ -138,7 +138,7 @@ function Import-BankDisassembly {
 	}
 
 	# Check if output file exists
-	if ((Test-Path $outputFile) -and -not $Force) {
+	if ((Test-Path $outputFile) -and -not $force) {
 		$response = Read-Host "File exists: $outputFile`nOverwrite? (y/N)"
 		if ($response -notmatch '^[Yy]') {
 			Write-Host "⏭️  Skipped bank $bankHexUpper" -ForegroundColor Yellow
@@ -187,7 +187,7 @@ function Import-BankDisassembly {
 "@
 
 	# Read reference file
-	Write-Host "📖 Reading reference: bank_$BankHex.asm ($((Get-Item $refFile).Length) bytes)" -ForegroundColor Gray
+	Write-Host "📖 Reading reference: bank_$bankHex.asm ($((Get-Item $refFile).Length) bytes)" -ForegroundColor Gray
 	$content = Get-Content $refFile -Raw
 
 	# Process content: remove DiztinGUIsh comment columns if present
@@ -264,25 +264,25 @@ try {
 	Write-Host ""
 
 	# If no banks specified, prompt
-	if (-not $Banks -or $Banks.Count -eq 0) {
+	if (-not $banks -or $banks.Count -eq 0) {
 		Write-Host "ℹ️  Enter bank numbers to import (space-separated, e.g., '04 05 06 0F'):" -ForegroundColor Yellow
 		$userInput = Read-Host "Banks"
-		$Banks = $userInput -split '\s+' | Where-Object { $_ -ne '' }
+		$banks = $userInput -split '\s+' | Where-Object { $_ -ne '' }
 	}
 
-	if (-not $Banks -or $Banks.Count -eq 0) {
+	if (-not $banks -or $banks.Count -eq 0) {
 		Write-Host "❌ No banks specified" -ForegroundColor Red
 		exit 1
 	}
 
-	Write-Host "ℹ️  Importing banks: $($Banks -join ', ')" -ForegroundColor Cyan
+	Write-Host "ℹ️  Importing banks: $($banks -join ', ')" -ForegroundColor Cyan
 	Write-Host ""
 
 	# Import each bank
 	$successCount = 0
 	$failCount = 0
 
-	foreach ($bankHex in $Banks) {
+	foreach ($bankHex in $banks) {
 		# Normalize to 2-digit lowercase hex
 		$bankHex = $bankHex.ToLower().PadLeft(2, '0')
 
@@ -310,7 +310,7 @@ try {
 	Write-Host "  Import Summary" -ForegroundColor Cyan
 	Write-Host "═══════════════════════════════════════════════════════" -ForegroundColor Cyan
 	Write-Host ""
-	Write-Host "ℹ️  Banks processed: $($Banks.Count)" -ForegroundColor Cyan
+	Write-Host "ℹ️  Banks processed: $($banks.Count)" -ForegroundColor Cyan
 	Write-Host "✅ Successful: $successCount" -ForegroundColor Green
 
 	if ($failCount -gt 0) {

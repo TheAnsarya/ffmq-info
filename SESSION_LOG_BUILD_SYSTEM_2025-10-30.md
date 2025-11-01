@@ -1,4 +1,4 @@
-# Build System Enhancement Session - October 30, 2025
+﻿# Build System Enhancement Session - October 30, 2025
 
 ## Session Objective
 Modernize and improve the FFMQ SNES disassembly project build system with comprehensive tooling, validation, and automation.
@@ -86,7 +86,7 @@ Modernize and improve the FFMQ SNES disassembly project build system with compre
 - `[CmdletBinding()]` for advanced features
 - Parameter validation
 - Set-StrictMode enabled
-- $ErrorActionPreference = 'Stop'
+- $errorActionPreference = 'Stop'
 - Try/catch error handling
 - Proper cleanup in finally blocks
 

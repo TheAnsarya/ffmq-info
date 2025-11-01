@@ -1,4 +1,4 @@
-# FFMQ Data Structures Documentation
+﻿# FFMQ Data Structures Documentation
 
 Complete reference for all data structures in Final Fantasy: Mystic Quest.
 
@@ -47,8 +47,8 @@ Character data defines the four playable characters: Benjamin, Kaeli, Tristam, a
 ### ROM Location
 
 ```
-Bank: $0C
-Base Address: $0C8000
+Bank: $0c
+Base Address: $0c8000
 Entry Size: 32 bytes per character
 Total Entries: 4 characters
 Total Size: 128 bytes
@@ -67,12 +67,12 @@ $04     2     starting_hp          Starting HP (little-endian)
 $06     2     max_hp               Maximum HP (little-endian)
 $08     1     white_magic          White magic power (0-255)
 $09     1     black_magic          Black magic power (0-255)
-$0A     1     wizard_magic         Wizard magic power (0-255)
-$0B     1     speed                Speed stat (affects ATB gauge)
-$0C     1     strength             Strength (physical damage)
-$0D     1     defense              Defense (damage reduction)
-$0E     1     hp_growth            HP gain per level
-$0F     1     wm_growth            White magic growth per level
+$0a     1     wizard_magic         Wizard magic power (0-255)
+$0b     1     speed                Speed stat (affects ATB gauge)
+$0c     1     strength             Strength (physical damage)
+$0d     1     defense              Defense (damage reduction)
+$0e     1     hp_growth            HP gain per level
+$0f     1     wm_growth            White magic growth per level
 $10     1     bm_growth            Black magic growth per level
 $11     1     wiz_growth           Wizard magic growth per level
 $12     1     speed_growth         Speed growth per level
@@ -80,10 +80,10 @@ $13     1     str_growth           Strength growth per level
 $14     1     def_growth           Defense growth per level
 $15     1     equipment_flags      Equipment slot flags
 $16     1     magic_flags          Available magic types (bitfield)
-$17     1     starting_weapon      Starting weapon ID (or $FF)
-$18     1     starting_armor       Starting armor ID (or $FF)
-$19     1     starting_accessory   Starting accessory ID (or $FF)
-$1A-1F  6     (reserved)           Unused/padding
+$17     1     starting_weapon      Starting weapon ID (or $ff)
+$18     1     starting_armor       Starting armor ID (or $ff)
+$19     1     starting_accessory   Starting accessory ID (or $ff)
+$1a-1F  6     (reserved)           Unused/padding
 ```
 
 ### Equipment Flags (Offset $15)
@@ -157,7 +157,7 @@ Characters gain stats per level according to growth values:
 
 ```
 Character stat loading: Bank $01, $018450
-Stat growth calculation: Bank $0B, $0B8200
+Stat growth calculation: Bank $0b, $0b8200
 Equipment application:  Bank $01, $018500
 ```
 
@@ -179,8 +179,8 @@ Enemy data defines all monsters, bosses, and battle encounters.
 ### ROM Location
 
 ```
-Bank: $0E
-Base Address: $0E8000
+Bank: $0e
+Base Address: $0e8000
 Entry Size: 64 bytes per enemy
 Total Entries: ~100 enemies (estimated)
 Total Size: ~6400 bytes
@@ -200,12 +200,12 @@ $05     1     ai_pattern           AI behavior pattern ID
 $06     1     ai_script            AI script pointer
 $07     1     level                Enemy level (for scaling)
 $08     2     hp                   Hit points (little-endian)
-$0A     1     speed                Speed stat (turn order)
-$0B     1     attack               Attack power
-$0C     1     defense              Physical defense
-$0D     1     magic_defense        Magic defense
-$0E     1     evasion              Evasion percentage (0-100)
-$0F     1     element_weak         Element weakness flags
+$0a     1     speed                Speed stat (turn order)
+$0b     1     attack               Attack power
+$0c     1     defense              Physical defense
+$0d     1     magic_defense        Magic defense
+$0e     1     evasion              Evasion percentage (0-100)
+$0f     1     element_weak         Element weakness flags
 $10     1     element_resist       Element resistance flags
 $11     1     element_absorb       Element absorption flags
 $12     1     status_immune        Status immunity flags (low)
@@ -214,9 +214,9 @@ $14     2     exp_reward           Experience points (little-endian)
 $16     2     gp_reward            Gold pieces (little-endian)
 $18     1     common_drop_id       Common item drop ID
 $19     1     common_drop_rate     Common drop rate (0-255, /256)
-$1A     1     rare_drop_id         Rare item drop ID
-$1B     1     rare_drop_rate       Rare drop rate (0-255, /256)
-$1C     4     attack_list          4 attack IDs
+$1a     1     rare_drop_id         Rare item drop ID
+$1b     1     rare_drop_rate       Rare drop rate (0-255, /256)
+$1c     4     attack_list          4 attack IDs
 $20-3F  32    (ai_data)            AI-specific data
 ```
 
@@ -279,9 +279,9 @@ Examples:
 ### Code References
 
 ```
-Enemy data loading:    Bank $0B, $0B8000
-AI pattern execution:  Bank $0B, $0B8500
-Drop calculation:      Bank $0B, $0B9200
+Enemy data loading:    Bank $0b, $0b8000
+AI pattern execution:  Bank $0b, $0b8500
+Drop calculation:      Bank $0b, $0b9200
 ```
 
 ### Extraction Status
@@ -302,10 +302,10 @@ Item data includes weapons, armor, accessories, and consumable items.
 ### ROM Location
 
 ```
-Weapons:     Bank $0C, $0C9000 (32 entries × 16 bytes)
-Armor:       Bank $0C, $0C9200 (32 entries × 16 bytes)
-Accessories: Bank $0C, $0C9400 (32 entries × 16 bytes)
-Consumables: Bank $0C, $0C9600 (64 entries × 8 bytes)
+Weapons:     Bank $0c, $0c9000 (32 entries × 16 bytes)
+Armor:       Bank $0c, $0c9200 (32 entries × 16 bytes)
+Accessories: Bank $0c, $0c9400 (32 entries × 16 bytes)
+Consumables: Bank $0c, $0c9600 (64 entries × 8 bytes)
 ```
 
 ### Weapon Data Structure
@@ -322,10 +322,10 @@ $05     1     element              Elemental attribute (0-5)
 $06     1     special_effect       Special effect ID
 $07     1     equipment_flags      Equipment restrictions
 $08     2     buy_price            Buy price in GP (little-endian)
-$0A     2     sell_price           Sell price in GP (little-endian)
-$0C     1     icon_id              Menu icon ID
-$0D     1     sprite_id            Battle sprite ID
-$0E-0F  2     (reserved)           Unused
+$0a     2     sell_price           Sell price in GP (little-endian)
+$0c     1     icon_id              Menu icon ID
+$0d     1     sprite_id            Battle sprite ID
+$0e-0F  2     (reserved)           Unused
 ```
 
 ### Armor Data Structure
@@ -342,10 +342,10 @@ $05     1     resistances          Element resistance flags
 $06     1     immunities           Status immunity flags
 $07     1     special_effect       Special effect ID
 $08     2     buy_price            Buy price in GP (little-endian)
-$0A     2     sell_price           Sell price in GP (little-endian)
-$0C     1     icon_id              Menu icon ID
-$0D     1     sprite_id            Equipment sprite ID
-$0E-0F  2     (reserved)           Unused
+$0a     2     sell_price           Sell price in GP (little-endian)
+$0c     1     icon_id              Menu icon ID
+$0d     1     sprite_id            Equipment sprite ID
+$0e-0F  2     (reserved)           Unused
 ```
 
 ### Accessory Data Structure
@@ -362,9 +362,9 @@ $05     1     str_bonus            Strength bonus
 $06     1     def_bonus            Defense bonus
 $07     1     special_effect       Special effect ID
 $08     2     buy_price            Buy price in GP (little-endian)
-$0A     2     sell_price           Sell price in GP (little-endian)
-$0C     1     icon_id              Menu icon ID
-$0D-0F  3     (reserved)           Unused
+$0a     2     sell_price           Sell price in GP (little-endian)
+$0c     1     icon_id              Menu icon ID
+$0d-0F  3     (reserved)           Unused
 ```
 
 ### Consumable Item Data Structure
@@ -398,7 +398,7 @@ $07     1     icon_id              Menu icon ID
 ```
 Item effect processing: Bank $01, $019000
 Equipment application:  Bank $01, $018500
-Shop data:             Bank $0C, $0CA000
+Shop data:             Bank $0c, $0ca000
 ```
 
 ### Extraction Status
@@ -421,7 +421,7 @@ Map data defines all game maps including the world map, towns, and dungeons.
 ```
 Map Headers:   Bank $06, $068000 (64 maps × 32 bytes)
 Metatiles:     Bank $06, $068800 (256 metatiles × 8 bytes)
-Tilemap Data:  Bank $06, $06A000 (variable size per map)
+Tilemap Data:  Bank $06, $06a000 (variable size per map)
 Collision:     Bank $06, $070000 (1 byte per tile)
 Events:        Bank $06, $078000 (variable, indexed)
 ```
@@ -440,9 +440,9 @@ $05     1     palette_id           Palette number (0-7)
 $06     1     music_track          Music track ID
 $07     1     encounter_group      Random encounter group ID
 $08     2     bg1_tilemap_ptr      BG1 tilemap pointer
-$0A     2     bg2_tilemap_ptr      BG2 tilemap pointer
-$0C     2     collision_ptr        Collision data pointer
-$0E     2     event_list_ptr       Event list pointer
+$0a     2     bg2_tilemap_ptr      BG2 tilemap pointer
+$0c     2     collision_ptr        Collision data pointer
+$0e     2     event_list_ptr       Event list pointer
 $10     2     npc_list_ptr         NPC list pointer
 $12     2     warp_list_ptr        Warp list pointer
 $14     2     treasure_list_ptr    Treasure list pointer
@@ -555,11 +555,11 @@ Text data includes all dialog, menus, battle messages, and system text.
 ### ROM Location
 
 ```
-Dialog Text:   Bank $0D, $0D8000-$0DBFFF (16 KB)
-Menu Text:     Bank $0D, $0DC000-$0DDFFF (8 KB)
-Battle Text:   Bank $0D, $0DE000-$0DEFFF (4 KB)
-System Text:   Bank $0D, $0DF000-$0DFFFF (4 KB)
-Encoding Table: Bank $0D, $0D0000 (256 bytes)
+Dialog Text:   Bank $0d, $0d8000-$0dbfff (16 KB)
+Menu Text:     Bank $0d, $0dc000-$0ddfff (8 KB)
+Battle Text:   Bank $0d, $0de000-$0defff (4 KB)
+System Text:   Bank $0d, $0df000-$0dffff (4 KB)
+Encoding Table: Bank $0d, $0d0000 (256 bytes)
 ```
 
 ### Text Entry Structure
@@ -604,24 +604,24 @@ Compression ratio: ~30% size reduction
 | $07  | NAME      | Insert player name             |
 | $08  | NUMBER    | Insert number variable         |
 | $09  | ITEM      | Insert item name               |
-| $0A  | CHOICE    | Present choice menu            |
-| $0B  | CLEAR     | Clear text window              |
-| $0C  | PAGE      | New page/window                |
+| $0a  | CHOICE    | Present choice menu            |
+| $0b  | CLEAR     | Clear text window              |
+| $0c  | PAGE      | New page/window                |
 
 ### Character Encoding Table
 
 ```
 Standard ASCII-like encoding:
-$20-$7E: Standard characters (A-Z, a-z, 0-9, punctuation)
-$80-$BF: DTE compressed pairs
-$C0-$FF: Special characters (Japanese, symbols)
+$20-$7e: Standard characters (A-Z, a-z, 0-9, punctuation)
+$80-$bf: DTE compressed pairs
+$c0-$ff: Special characters (Japanese, symbols)
 ```
 
 ### Code References
 
 ```
 Text rendering:        Bank $01, $013000
-DTE decompression:     Bank $0D, $0D0100
+DTE decompression:     Bank $0d, $0d0100
 Control code parser:   Bank $01, $013500
 Dialog system:         Bank $01, $014000
 ```
@@ -645,12 +645,12 @@ Graphics data includes tiles, sprites, palettes, and compressed graphics.
 ### ROM Location
 
 ```
-Title Graphics:   Bank $04, $048000-$04FFFF (32 KB)
-Map Tilesets:     Bank $05, $050000-$057FFF (32 KB)
-Character Sprites: Bank $05, $058000-$05BFFF (16 KB)
-Enemy Sprites:    Bank $05, $05C000-$05FFFF (16 KB)
-UI Graphics:      Bank $07, $070000-$073FFF (16 KB)
-Palettes:         Bank $07, $074000-$0747FF (2 KB)
+Title Graphics:   Bank $04, $048000-$04ffff (32 KB)
+Map Tilesets:     Bank $05, $050000-$057fff (32 KB)
+Character Sprites: Bank $05, $058000-$05bfff (16 KB)
+Enemy Sprites:    Bank $05, $05c000-$05ffff (16 KB)
+UI Graphics:      Bank $07, $070000-$073fff (16 KB)
+Palettes:         Bank $07, $074000-$0747ff (2 KB)
 ```
 
 ### Tile Data Format
@@ -680,7 +680,7 @@ Palettes use SNES 15-bit BGR format.
 
 ```
 Structure: 2 bytes per color
-Format: $0BBB_BBGG_GGGR_RRRR
+Format: $0bbb_BBGG_GGGR_RRRR
 
 Bit Layout:
   Bits 0-4:   Red (0-31)
@@ -745,10 +745,10 @@ Battle-specific data structures including formations, attacks, and status effect
 ### ROM Location
 
 ```
-Battle Formations: Bank $0E, $0E0000 (128 entries × 16 bytes)
-Attack Data:       Bank $0E, $0E0800 (256 attacks × 16 bytes)
-Status Effects:    Bank $0E, $0E2800 (13 effects × 8 bytes)
-Battle BG Data:    Bank $0E, $0E2900 (32 backgrounds × 4 bytes)
+Battle Formations: Bank $0e, $0e0000 (128 entries × 16 bytes)
+Attack Data:       Bank $0e, $0e0800 (256 attacks × 16 bytes)
+Status Effects:    Bank $0e, $0e2800 (13 effects × 8 bytes)
+Battle BG Data:    Bank $0e, $0e2900 (32 backgrounds × 4 bytes)
 ```
 
 ### Battle Formation Structure
@@ -766,9 +766,9 @@ $06     1     x_pos_flags          X position arrangement
 $07     1     y_pos_flags          Y position arrangement
 $08     1     background_id        Battle background ID
 $09     1     music_track          Battle music track
-$0A     1     escape_difficulty    Escape difficulty (0-255)
-$0B     1     surprise_rate        Back attack rate (0-100)
-$0C-0F  4     (reserved)           Formation-specific data
+$0a     1     escape_difficulty    Escape difficulty (0-255)
+$0b     1     surprise_rate        Back attack rate (0-100)
+$0c-0F  4     (reserved)           Formation-specific data
 ```
 
 ### Attack Data Structure
@@ -786,9 +786,9 @@ $06     1     element              Elemental type (0-5)
 $07     1     damage_type          Physical/Magic flag
 $08     1     target_type          Single/All flag
 $09     1     status_effect        Inflicted status ID
-$0A     1     status_rate          Status inflict rate (0-100)
-$0B     1     mp_cost              MP cost (for spells)
-$0C-0F  4     (special)            Attack-specific data
+$0a     1     status_rate          Status inflict rate (0-100)
+$0b     1     mp_cost              MP cost (for spells)
+$0c-0F  4     (special)            Attack-specific data
 ```
 
 ### Status Effect Structure
@@ -827,10 +827,10 @@ $07     1     proc_routine_hi      Processing routine pointer (high)
 ### Code References
 
 ```
-Formation loading:    Bank $0B, $0B0000
-Attack execution:     Bank $0B, $0B1000
-Status processing:    Bank $0B, $0B2000
-Damage calculation:   Bank $0B, $0B2500
+Formation loading:    Bank $0b, $0b0000
+Attack execution:     Bank $0b, $0b1000
+Status processing:    Bank $0b, $0b2000
+Damage calculation:   Bank $0b, $0b2500
 ```
 
 ### Extraction Status
@@ -851,10 +851,10 @@ Music and sound effect data for the SPC700 audio processor.
 ### ROM Location
 
 ```
-Music Tracks:      Bank $08, $080000-$087FFF (32 KB)
-Sound Effects:     Bank $08, $088000-$08BFFF (16 KB)
-Instrument Samples: Bank $08, $08C000-$08FFFF (16 KB)
-Audio Driver:      SPC RAM $0300-$07FF
+Music Tracks:      Bank $08, $080000-$087fff (32 KB)
+Sound Effects:     Bank $08, $088000-$08bfff (16 KB)
+Instrument Samples: Bank $08, $08c000-$08ffff (16 KB)
+Audio Driver:      SPC RAM $0300-$07ff
 ```
 
 ### Music Track Structure
@@ -869,8 +869,8 @@ $03     1     loop_flag            0=no loop, 1=loop
 $04     2     sequence_ptr         Sequence data pointer
 $06     2     pattern_ptr          Pattern table pointer
 $08     2     instrument_ptr       Instrument table pointer
-$0A     2     loop_point           Loop start offset
-$0C-0F  4     (reserved)           Track-specific data
+$0a     2     loop_point           Loop start offset
+$0c-0F  4     (reserved)           Track-specific data
 ```
 
 ### Sound Effect Structure

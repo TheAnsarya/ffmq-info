@@ -343,6 +343,17 @@ stop modifying C:\Users\me\source\repos\ffmq-info\~docs\prompts 2025-10-24.txt !
 pick some issues/todos and implement them.
 merge `ai-code-trial` branch into `master` branch and then merge all the issue branches into `master`
 merge all the remaining issue branches into `master`
+pick some issues/todos and implement them.
+start with 23, then do 24
+---- try again
+merge issue branches back into `master` when the issue is closed and everything is commited to the branch
+do #29: Memory Labels: Medium Priority WRAM Labels - Can leverage our new label replacement tool, and #30: Memory Labels: ROM Data Table Labels - Same tooling applies
+Stop! That is not the reference ROM file! We are using v1.1 not v1.0 as the reference file, the extraction source, and the build target. Stop using the 1.0 file for anything
+pick some issues/todos and implement them.
+Update/check-off the checklists on open github issues, update issue #1 `ASM Code Formatting Standardization` to add using lowercase for all asm code and for the entire project to use lowercase hexadecimal including adding a new sub-issue handling lowercasing all current code and documentation and examples
+Issue #48: ASM Formatting - Convert All Code to Lowercase
+always make sure the ROM builds and matches the reference rom, these scripts exist already, just make sure to always run them and update the progress/documentation tables. Then continue your previous work.
+I want you to continue with your work, but first: many of these `asm` files have outrageous indentation! Use tabs, next spaces, fix all the indentation so there are not so many levels of indentation, start with one level of indentation, not like 6, make an issue, fix the problem, then close the issue and continue previous work
 
 
 

@@ -1,4 +1,4 @@
-# GitHub Sub-Issues Guide
+﻿# GitHub Sub-Issues Guide
 
 This guide explains how to use the sub-issue creation system for the FFMQ Disassembly Project.
 
@@ -45,8 +45,8 @@ Adds task list comments to all 12 GitHub issues.
 | #6 | Bank $04 Disassembly | 19 | 20-30 |
 | #7 | Bank $05 Disassembly | 17 | 20-30 |
 | #8 | Bank $06 Disassembly | 17 | 20-30 |
-| #9 | Bank $0E Disassembly | 21 | 30-40 |
-| #10 | Bank $0F Disassembly | 21 | 30-40 |
+| #9 | Bank $0e Disassembly | 21 | 30-40 |
+| #10 | Bank $0f Disassembly | 21 | 30-40 |
 | #11 | Asset Build System | 39 | 40-50 |
 | #12 | Comprehensive Documentation | 46 | 80-120 |
 | **TOTAL** | **All Issues** | **420** | **404-606** |

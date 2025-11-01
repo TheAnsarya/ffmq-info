@@ -1,4 +1,4 @@
-# Byte-Perfect ROM Rebuild Guide
+﻿# Byte-Perfect ROM Rebuild Guide
 
 ## Goal
 
@@ -248,19 +248,19 @@ Understanding ROM structure helps target extraction efforts:
 | $018000-$020000 | $03 | Code | Menu system | Diztinguish ✅ |
 | $020000-$024000 | $04 | Code | Text engine | Diztinguish ✅ |
 | $024000-$028000 | $04 | Text | Dialog strings | extract_text.py ✅ |
-| $028000-$02C000 | $05 | Code | Magic system | Diztinguish ✅ |
-| $02C000-$030000 | $05 | Code | Item system | Diztinguish ✅ |
+| $028000-$02c000 | $05 | Code | Magic system | Diztinguish ✅ |
+| $02c000-$030000 | $05 | Code | Item system | Diztinguish ✅ |
 | $030000-$032000 | $06 | Data | Enemy stats | extract_enemies.py ✅ |
 | $032000-$038000 | $06 | Data | Battle data | extract_battles.py 🔧 |
 | $038000-$040000 | $07 | Graphics | Character sprites | extract_graphics_v2.py ✅ |
 | $040000-$048000 | $08 | Graphics | Enemy sprites | extract_graphics_v2.py ✅ |
 | $048000-$050000 | $09 | Graphics | Tile graphics | extract_graphics_v2.py ✅ |
-| $050000-$054000 | $0A | Code | Sound engine | Diztinguish ✅ |
-| $054000-$058000 | $0A | Audio | Music sequences | extract_music.py 🔧 |
-| $058000-$060000 | $0B | Audio | Sound effects | extract_music.py 🔧 |
-| $060000-$064000 | $0C | Code | VBlank handler | Diztinguish ✅ |
-| $064000-$068000 | $0D | Code | Save system | Diztinguish ✅ |
-| $068000-$080000 | $0E-$0F | Code/Data | Additional logic | Diztinguish ✅ |
+| $050000-$054000 | $0a | Code | Sound engine | Diztinguish ✅ |
+| $054000-$058000 | $0a | Audio | Music sequences | extract_music.py 🔧 |
+| $058000-$060000 | $0b | Audio | Sound effects | extract_music.py 🔧 |
+| $060000-$064000 | $0c | Code | VBlank handler | Diztinguish ✅ |
+| $064000-$068000 | $0d | Code | Save system | Diztinguish ✅ |
+| $068000-$080000 | $0e-$0f | Code/Data | Additional logic | Diztinguish ✅ |
 
 ---
 
@@ -312,8 +312,8 @@ make -f Makefile.enhanced report
 
 1. **Item/Equipment Data** (High Priority)
    - [ ] Create `extract_items.py`
-   - [ ] Extract weapon stats ($04FE00?)
-   - [ ] Extract armor stats ($04FF00?)
+   - [ ] Extract weapon stats ($04fe00?)
+   - [ ] Extract armor stats ($04ff00?)
    - [ ] Extract accessory stats ($050000?)
    - [ ] Extract item properties
    - [ ] Output to JSON

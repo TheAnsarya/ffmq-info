@@ -1,4 +1,4 @@
-# FFMQ Build System v2.0 - Quick Start Guide# FFMQ Build System - Quick Reference
+﻿# FFMQ Build System v2.0 - Quick Start Guide# FFMQ Build System - Quick Reference
 
 
 
@@ -74,9 +74,9 @@ assets/text/dialog.txt
 
 python -m pip install -r requirements.txt# Format: ID | Text | Address
 
-0001 | Cure           | $04F000
+0001 | Cure           | $04f000
 
-# Verify tools are installed0002 | Mega Cure      | $04F00C  # <-- Changed this
+# Verify tools are installed0002 | Mega Cure      | $04f00c  # <-- Changed this
 
 make check```
 

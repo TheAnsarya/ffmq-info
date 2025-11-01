@@ -1,4 +1,4 @@
-# Graphics Tools Quick Start Guide
+﻿# Graphics Tools Quick Start Guide
 
 Get started editing FFMQ graphics in 5 minutes!
 
@@ -124,9 +124,9 @@ make extract-graphics
 
 # 2. Edit palette.bin in hex editor
 #    Format: 2 bytes per color (RGB555)
-#    $0000-$001F: Red (5 bits)
-#    $0020-$03FF: Green (5 bits)
-#    $0400-$7FFF: Blue (5 bits)
+#    $0000-$001f: Red (5 bits)
+#    $0020-$03ff: Green (5 bits)
+#    $0400-$7fff: Blue (5 bits)
 
 # 3. Or create new palette from PNG
 python tools/convert_graphics.py to-snes \

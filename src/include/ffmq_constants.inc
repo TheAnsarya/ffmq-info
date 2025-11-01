@@ -1,56 +1,56 @@
-; Final Fantasy Mystic Quest - Constants and Definitions
+﻿; Final Fantasy Mystic Quest - Constants and Definitions
 ; Game-specific constants, addresses, and data structures
 
 ; === RAM Addresses ===
 ; Main character data
-.define PLAYER_NAME         $7E1000     ; Player name (8 bytes)
-.define PLAYER_LEVEL        $7E1010     ; Player level
-.define PLAYER_EXPERIENCE   $7E1011     ; Player experience (3 bytes)
-.define PLAYER_HP_CURRENT   $7E1014     ; Current HP (2 bytes)
-.define PLAYER_HP_MAX       $7E1016     ; Max HP (2 bytes)
-.define PLAYER_MP_WHITE_CUR $7E1018     ; Current White MP
-.define PLAYER_MP_BLACK_CUR $7E1019     ; Current Black MP
-.define PLAYER_MP_WIZARD_CUR $7E101A    ; Current Wizard MP
-.define PLAYER_MP_WHITE_MAX $7E101B     ; Max White MP
-.define PLAYER_MP_BLACK_MAX $7E101C     ; Max Black MP
-.define PLAYER_MP_WIZARD_MAX $7E101D    ; Max Wizard MP
+.define PLAYER_NAME         $7e1000     ; Player name (8 bytes)
+.define PLAYER_LEVEL        $7e1010     ; Player level
+.define PLAYER_EXPERIENCE   $7e1011     ; Player experience (3 bytes)
+.define PLAYER_HP_CURRENT   $7e1014     ; Current HP (2 bytes)
+.define PLAYER_HP_MAX       $7e1016     ; Max HP (2 bytes)
+.define PLAYER_MP_WHITE_CUR $7e1018     ; Current White MP
+.define PLAYER_MP_BLACK_CUR $7e1019     ; Current Black MP
+.define PLAYER_MP_WIZARD_CUR $7e101a    ; Current Wizard MP
+.define PLAYER_MP_WHITE_MAX $7e101b     ; Max White MP
+.define PLAYER_MP_BLACK_MAX $7e101c     ; Max Black MP
+.define PLAYER_MP_WIZARD_MAX $7e101d    ; Max Wizard MP
 
 ; Player stats
-.define PLAYER_ATTACK       $7E101E     ; Attack power (2 bytes)
-.define PLAYER_DEFENSE      $7E1020     ; Defense power (2 bytes)
-.define PLAYER_SPEED        $7E1022     ; Speed stat (2 bytes)
-.define PLAYER_MAGIC        $7E1024     ; Magic power (2 bytes)
+.define PLAYER_ATTACK       $7e101e     ; Attack power (2 bytes)
+.define PLAYER_DEFENSE      $7e1020     ; Defense power (2 bytes)
+.define PLAYER_SPEED        $7e1022     ; Speed stat (2 bytes)
+.define PLAYER_MAGIC        $7e1024     ; Magic power (2 bytes)
 
 ; Equipment
-.define PLAYER_WEAPON       $7E1026     ; Equipped weapon
-.define PLAYER_ARMOR        $7E1027     ; Equipped armor
-.define PLAYER_SHIELD       $7E1028     ; Equipped shield
-.define PLAYER_HELMET       $7E1029     ; Equipped helmet
-.define PLAYER_ACCESSORY    $7E102A     ; Equipped accessory
+.define PLAYER_WEAPON       $7e1026     ; Equipped weapon
+.define PLAYER_ARMOR        $7e1027     ; Equipped armor
+.define PLAYER_SHIELD       $7e1028     ; Equipped shield
+.define PLAYER_HELMET       $7e1029     ; Equipped helmet
+.define PLAYER_ACCESSORY    $7e102a     ; Equipped accessory
 
 ; Magic spells known
-.define PLAYER_WHITE_MAGIC  $7E1037     ; White magic flags
-.define PLAYER_BLACK_MAGIC  $7E1038     ; Black magic flags
-.define PLAYER_WIZARD_MAGIC $7E1039     ; Wizard magic flags
+.define PLAYER_WHITE_MAGIC  $7e1037     ; White magic flags
+.define PLAYER_BLACK_MAGIC  $7e1038     ; Black magic flags
+.define PLAYER_WIZARD_MAGIC $7e1039     ; Wizard magic flags
 
 ; World map and location
-.define MAP_ID              $7E0E88     ; Current map ID
-.define PLAYER_X_POS        $7E0E89     ; Player X position on map
-.define PLAYER_Y_POS        $7E0E8A     ; Player Y position on map
+.define MAP_ID              $7e0e88     ; Current map ID
+.define PLAYER_X_POS        $7e0e89     ; Player X position on map
+.define PLAYER_Y_POS        $7e0e8a     ; Player Y position on map
 
 ; Game progress flags
-.define GAME_FLAGS_START    $7E0E8B     ; Game progress flags start
-.define CRYSTALS_OBTAINED   $7E0E8C     ; Crystals obtained flags
-.define BATTLEFIELDS_CLEAR  $7E0E8D     ; Battlefields cleared flags
+.define GAME_FLAGS_START    $7e0e8b     ; Game progress flags start
+.define CRYSTALS_OBTAINED   $7e0e8c     ; Crystals obtained flags
+.define BATTLEFIELDS_CLEAR  $7e0e8d     ; Battlefields cleared flags
 
 ; Inventory
-.define INVENTORY_START     $7E0E90     ; Inventory start
+.define INVENTORY_START     $7e0e90     ; Inventory start
 .define INVENTORY_SIZE      $20         ; Max inventory slots
 
 ; === Game Constants ===
 ; Maximum values
 .define MAX_LEVEL           41          ; Maximum player level
-.define MAX_EXPERIENCE      $98967F     ; Maximum experience (9,999,999)
+.define MAX_EXPERIENCE      $98967f     ; Maximum experience (9,999,999)
 .define MAX_HP              999         ; Maximum HP
 .define MAX_MP              99          ; Maximum MP per type
 
@@ -84,7 +84,7 @@
 ; Wizard Magic
 .define SPELL_METEOR        $08
 .define SPELL_FLARE         $09
-.define SPELL_TELEPORT      $0A
+.define SPELL_TELEPORT      $0a
 
 ; Monster types
 .define MONSTER_TYPE_NORMAL     $00
@@ -117,12 +117,12 @@
 .define MAP_FOCUS_TOWER         $07
 .define MAP_ICE_PYRAMID         $08
 .define MAP_VOLCANO             $09
-.define MAP_LAVA_DOME           $0A
-.define MAP_MINE                $0B
-.define MAP_SEALED_TEMPLE       $0C
-.define MAP_SPENCER_CAVE        $0D
-.define MAP_WINDY_CAVE          $0E
-.define MAP_MOUNT_GALE          $0F
+.define MAP_LAVA_DOME           $0a
+.define MAP_MINE                $0b
+.define MAP_SEALED_TEMPLE       $0c
+.define MAP_SPENCER_CAVE        $0d
+.define MAP_WINDY_CAVE          $0e
+.define MAP_MOUNT_GALE          $0f
 .define MAP_GIANT_TREE          $10
 .define MAP_MYSTIC_PYRAMID      $11
 .define MAP_FINAL_CASTLE        $12
@@ -149,7 +149,7 @@
 .define SFX_ATTACK_HIT          $07
 .define SFX_ATTACK_MISS         $08
 .define SFX_CRITICAL_HIT        $09
-.define SFX_DEATH               $0A
+.define SFX_DEATH               $0a
 
 ; Music track IDs
 .define MUSIC_TITLE             $00
@@ -166,15 +166,15 @@
 .define GFX_FONT_START          $80000   ; Font graphics
 .define GFX_SPRITES_START       $85000   ; Sprite graphics
 .define GFX_TILES_START         $90000   ; Tile graphics
-.define GFX_PORTRAITS_START     $A0000   ; Character portraits
+.define GFX_PORTRAITS_START     $a0000   ; Character portraits
 
 ; Text table addresses (ROM)
-.define TEXT_TABLE_START        $B0000   ; Main text table
-.define TEXT_NAMES_START        $B5000   ; Character/item names
-.define TEXT_MENU_START         $B6000   ; Menu text
+.define TEXT_TABLE_START        $b0000   ; Main text table
+.define TEXT_NAMES_START        $b5000   ; Character/item names
+.define TEXT_MENU_START         $b6000   ; Menu text
 
 ; Data table addresses (ROM)
-.define DATA_MONSTERS_START     $C0000   ; Monster data
-.define DATA_ITEMS_START        $C5000   ; Item data
-.define DATA_SPELLS_START       $C6000   ; Spell data
-.define DATA_MAPS_START         $C7000   ; Map data
+.define DATA_MONSTERS_START     $c0000   ; Monster data
+.define DATA_ITEMS_START        $c5000   ; Item data
+.define DATA_SPELLS_START       $c6000   ; Spell data
+.define DATA_MAPS_START         $c7000   ; Map data

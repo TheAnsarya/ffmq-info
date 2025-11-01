@@ -1,4 +1,4 @@
-#!/usr/bin/env pwsh
+﻿#!/usr/bin/env pwsh
 <#
 .SYNOPSIS
     Creates granular GitHub issues for each major subtask category
@@ -21,10 +21,10 @@
 #>
 
 param(
-    [switch]$DryRun
+    [switch]$dryRun
 )
 
-$ErrorActionPreference = "Stop"
+$errorActionPreference = "Stop"
 
 # Check if gh CLI is installed and authenticated
 function Test-GitHubCLI {
@@ -67,7 +67,7 @@ Test-GitHubCLI
 $repo = Get-RepoName
 Write-Host "✓ Repository: $repo`n" -ForegroundColor Green
 
-if ($DryRun) {
+if ($dryRun) {
     Write-Host "🔍 DRY RUN MODE - No changes will be made`n" -ForegroundColor Yellow
 }
 
@@ -458,9 +458,9 @@ Document all RAM variables and create comprehensive RAM map.
 
 ## Tasks
 - [ ] Create docs/RAM_MAP.md structure
-- [ ] Document Zero Page variables (\$00-\$FF)
-- [ ] Document WRAM variables (\$0200-\$1FFF)
-- [ ] Document Extended RAM (\$7E2000-\$7FFFFF)
+- [ ] Document Zero Page variables (\$00-\$ff)
+- [ ] Document WRAM variables (\$0200-\$1fff)
+- [ ] Document Extended RAM (\$7e2000-\$7fffff)
 - [ ] Document variable size, type, purpose for each
 - [ ] Note which banks/systems use each variable
 - [ ] Add visual memory map diagram
@@ -1240,7 +1240,7 @@ foreach ($issueData in $granularIssues) {
     Write-Host "[$issueCount] Creating: $title" -ForegroundColor Yellow
     Write-Host "  Parent: #$parentNum | Labels: $($issueData.labels -join ', ')" -ForegroundColor Gray
 
-    if ($DryRun) {
+    if ($dryRun) {
         Write-Host "  [DRY RUN] Would create issue" -ForegroundColor Cyan
         Write-Host "  Preview (first 150 chars of body):" -ForegroundColor Gray
         Write-Host "  $($body.Substring(0, [Math]::Min(150, $body.Length)))..." -ForegroundColor DarkGray
@@ -1286,7 +1286,7 @@ Write-Host "`n" + ("="*70) + "`n" -ForegroundColor Cyan
 Write-Host "✨ Granular Issue Creation Summary" -ForegroundColor Green
 Write-Host ("="*70) + "`n" -ForegroundColor Cyan
 
-if ($DryRun) {
+if ($dryRun) {
     Write-Host "🔍 DRY RUN Complete!" -ForegroundColor Yellow
     Write-Host "Would have created $issueCount granular issues`n" -ForegroundColor Yellow
 } else {

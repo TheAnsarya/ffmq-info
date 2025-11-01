@@ -1,4 +1,4 @@
-<#
+﻿<#
 .SYNOPSIS
     Format Priority 2 bank files with individual git commits.
 
@@ -36,18 +36,18 @@
 
 [CmdletBinding()]
 param(
-    [switch]$DryRun,
+    [switch]$dryRun,
     [switch]$NoCommit
 )
 
 # Script configuration
-$ErrorActionPreference = 'Stop'
+$errorActionPreference = 'Stop'
 $ScriptRoot = Split-Path -Parent $PSScriptRoot
-$FormatScript = Join-Path $ScriptRoot "tools\format_asm.ps1"
+$formatScript = Join-Path $ScriptRoot "tools\format_asm.ps1"
 $SrcDir = Join-Path $ScriptRoot "src\asm"
 
 # Bank configuration
-$Banks = @(
+$banks = @(
     @{
         File = "bank_03_documented.asm"
         Description = "Bank 03 - Battle System"
@@ -77,7 +77,7 @@ $Banks = @(
 
 # Statistics
 $Stats = @{
-    TotalBanks = $Banks.Count
+    TotalBanks = $banks.Count
     Successful = 0
     Failed = 0
     StartTime = Get-Date
@@ -120,13 +120,13 @@ function Get-FileStats {
 
 function Format-Bank {
     param(
-        [hashtable]$Bank,
+        [hashtable]$bank,
         [int]$Number,
         [int]$Total
     )
 
-    $bankDesc = $Bank.Description
-    $bankFile = $Bank.File
+    $bankDesc = $bank.Description
+    $bankFile = $bank.File
     $bankPath = Join-Path $SrcDir $bankFile
     $backupPath = "$bankPath.pre_format_backup"
 
@@ -148,9 +148,9 @@ function Format-Bank {
     Write-Step "Executing: .\tools\format_asm.ps1 -Path $bankPath -DryRun"
     Write-Host ""
 
-    & $FormatScript -Path $bankPath -DryRun | Out-String | Write-Host
+    & $formatScript -Path $bankPath -DryRun | Out-String | Write-Host
 
-    if ($DryRun) {
+    if ($dryRun) {
         Write-Step "DRY-RUN MODE: Stopping here"
         return $true
     }
@@ -174,7 +174,7 @@ function Format-Bank {
     Write-Host ""
 
     try {
-        & $FormatScript -Path $bankPath | Out-String | Write-Host
+        & $formatScript -Path $bankPath | Out-String | Write-Host
         Write-Step "Formatting applied" -Status success
     }
     catch {
@@ -263,8 +263,8 @@ Clear-Host
 Write-Header "ASM Priority 2 Banks Formatting"
 
 # Display configuration
-$mode = if ($DryRun) { "DRY-RUN (preview only)" } else { "PRODUCTION (will modify files)" }
-$commits = if ($NoCommit -or $DryRun) { "Disabled" } else { "Enabled" }
+$mode = if ($dryRun) { "DRY-RUN (preview only)" } else { "PRODUCTION (will modify files)" }
+$commits = if ($NoCommit -or $dryRun) { "Disabled" } else { "Enabled" }
 
 Write-Host "Mode: $mode"
 Write-Host "Commits: $commits"
@@ -272,25 +272,25 @@ Write-Host "Started: $($Stats.StartTime.ToString('yyyy-MM-dd HH:mm:ss'))"
 Write-Host ""
 
 # Verify format script exists
-if (-not (Test-Path $FormatScript)) {
-    Write-Step "Format script not found: $FormatScript" -Status error
+if (-not (Test-Path $formatScript)) {
+    Write-Step "Format script not found: $formatScript" -Status error
     exit 1
 }
 
 # Display banks to process
-Write-Host "Banks to process: $($Banks.Count)"
-foreach ($bank in $Banks) {
+Write-Host "Banks to process: $($banks.Count)"
+foreach ($bank in $banks) {
     $path = Join-Path $SrcDir $bank.File
     Write-Host "  - $path ($($bank.Description))"
 }
 Write-Host ""
 
 # Process each bank
-for ($i = 0; $i -lt $Banks.Count; $i++) {
-    $bank = $Banks[$i]
+for ($i = 0; $i -lt $banks.Count; $i++) {
+    $bank = $banks[$i]
     $number = $i + 1
 
-    $success = Format-Bank -Bank $bank -Number $number -Total $Banks.Count
+    $success = Format-Bank -Bank $bank -Number $number -Total $banks.Count
 
     if ($success) {
         $Stats.Successful++
@@ -319,7 +319,7 @@ $duration = $endTime - $Stats.StartTime
 Write-Host ""
 Write-Host "Duration: $($duration.ToString('mm\:ss'))"
 
-if ($DryRun) {
+if ($dryRun) {
     Write-Host ""
     Write-Step "DRY-RUN complete - no changes applied"
 }

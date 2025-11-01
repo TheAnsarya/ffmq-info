@@ -1,4 +1,4 @@
-#Requires -Version 5.1
+﻿#Requires -Version 5.1
 <#
 .SYNOPSIS
 	Aggressive bank disassembly script for rapid ROM bank extraction.
@@ -25,7 +25,7 @@
 
 .EXAMPLE
 	.\Aggressive-Disassemble.ps1 -Banks @('0F')
-	Disassemble bank $0F
+	Disassemble bank $0f
 
 .EXAMPLE
 	.\Aggressive-Disassemble.ps1 -Banks @('04','05','06') -Force
@@ -47,7 +47,7 @@
 [CmdletBinding()]
 param(
 	[Parameter(Mandatory = $true)]
-	[string[]]$Banks,
+	[string[]]$banks,
 
 	[Parameter()]
 	[string]$ReferenceRom = "roms\Final Fantasy - Mystic Quest (U) (V1.1).sfc",
@@ -56,11 +56,11 @@ param(
 	[string]$OutputDir = ".",
 
 	[Parameter()]
-	[switch]$Force
+	[switch]$force
 )
 
 Set-StrictMode -Version Latest
-$ErrorActionPreference = 'Stop'
+$errorActionPreference = 'Stop'
 
 $script:ScriptRoot = $PSScriptRoot | Split-Path -Parent
 $script:BankSize = 0x8000  # 32KB per bank
@@ -108,7 +108,7 @@ function Write-Section {
 #>
 function Get-BankData {
 	param(
-		[int]$BankNumber,
+		[int]$bankNumber,
 		[string]$RomPath
 	)
 
@@ -118,9 +118,9 @@ function Get-BankData {
 
 	# Calculate bank offset
 	# For HiROM: Bank $00 = offset $0000, Bank $01 = offset $8000, etc.
-	$offset = $BankNumber * $script:BankSize
+	$offset = $bankNumber * $script:BankSize
 
-	Write-Info "Extracting bank $($BankNumber.ToString('x2').ToUpper()) from offset 0x$($offset.ToString('x6'))"
+	Write-Info "Extracting bank $($bankNumber.ToString('x2').ToUpper()) from offset 0x$($offset.ToString('x6'))"
 
 	# Read bank data
 	$romData = [System.IO.File]::ReadAllBytes($RomPath)
@@ -143,14 +143,14 @@ function Get-BankData {
 #>
 function New-BankTemplate {
 	param(
-		[int]$BankNumber,
-		[byte[]]$BankData,
+		[int]$bankNumber,
+		[byte[]]$bankData,
 		[string]$OutputPath
 	)
 
-	$bankHex = $BankNumber.ToString('x2')
-	$bankAddr = ($BankNumber * $script:BankSize).ToString('x6')
-	$endAddr = ($BankNumber * $script:BankSize + $script:BankSize - 1).ToString('x6')
+	$bankHex = $bankNumber.ToString('x2')
+	$bankAddr = ($bankNumber * $script:BankSize).ToString('x6')
+	$endAddr = ($bankNumber * $script:BankSize + $script:BankSize - 1).ToString('x6')
 	$timestamp = Get-Date -Format 'yyyy-MM-dd HH:mm:ss'
 	$bankHexUpper = $bankHex.ToUpper()
 
@@ -196,7 +196,7 @@ Bank${BANKHEXUPPER}_Start:
 
 	# Analyze data to identify code vs data regions
 	# Simple heuristic: look for common opcodes
-	$codeRegions = Find-CodeRegions -BankData $BankData
+	$codeRegions = Find-CodeRegions -BankData $bankData
 
 	if ($codeRegions -and $codeRegions.Length -gt 0) {
 		$template += "`r`n"
@@ -208,8 +208,8 @@ Bank${BANKHEXUPPER}_Start:
 		$template += ";`r`n"
 
 		foreach ($region in $codeRegions) {
-			$startAddr = ($BankNumber * $script:BankSize + $region.Start).ToString('x6')
-			$endAddr = ($BankNumber * $script:BankSize + $region.End).ToString('x6')
+			$startAddr = ($bankNumber * $script:BankSize + $region.Start).ToString('x6')
+			$endAddr = ($bankNumber * $script:BankSize + $region.End).ToString('x6')
 			$template += "; Region: `$$startAddr - `$$endAddr ($($region.Length) bytes)`r`n"
 		}
 	}
@@ -233,16 +233,16 @@ Bank${BANKHEXUPPER}_Start:
 	# Output first chunk of data as db statements
 	# This gives a starting point for manual disassembly
 	$chunkSize = 16
-	for ($i = 0; $i -lt [Math]::Min(256, $BankData.Length); $i += $chunkSize) {
-		$bytes = $BankData[$i..[Math]::Min($i + $chunkSize - 1, $BankData.Length - 1)]
+	for ($i = 0; $i -lt [Math]::Min(256, $bankData.Length); $i += $chunkSize) {
+		$bytes = $bankData[$i..[Math]::Min($i + $chunkSize - 1, $bankData.Length - 1)]
 		$hexBytes = ($bytes | ForEach-Object { '$' + $_.ToString('x2') }) -join ','
-		$addr = ($BankNumber * $script:BankSize + $i).ToString('x6')
+		$addr = ($bankNumber * $script:BankSize + $i).ToString('x6')
 		$template += "db $hexBytes  ; `$$addr`r`n"
 	}
 
 	$template += @"
 
-; ... (Remaining $(($BankData.Length - 256).ToString('N0')) bytes to disassemble)
+; ... (Remaining $(($bankData.Length - 256).ToString('N0')) bytes to disassemble)
 
 ; ===============================================================================
 ; End of Bank `$$bankHex
@@ -266,7 +266,7 @@ Bank${BANKHEXUPPER}_Start:
 	https://wiki.superfamicom.org/65816-reference
 #>
 function Find-CodeRegions {
-	param([byte[]]$BankData)
+	param([byte[]]$bankData)
 
 	$regions = [System.Collections.ArrayList]::new()
 
@@ -294,8 +294,8 @@ function Find-CodeRegions {
 	$windowSize = 64
 	$threshold = 0.3  # 30% common opcodes
 
-	for ($i = 0; $i -lt ($BankData.Length - $windowSize); $i += $windowSize) {
-		$window = $BankData[$i..($i + $windowSize - 1)]
+	for ($i = 0; $i -lt ($bankData.Length - $windowSize); $i += $windowSize) {
+		$window = $bankData[$i..($i + $windowSize - 1)]
 		$matchingBytes = @($window | Where-Object { $_ -in $commonOpcodes })
 		$opcodeCount = $matchingBytes.Count
 		$density = $opcodeCount / $windowSize
@@ -319,13 +319,13 @@ function Find-CodeRegions {
 #>
 function New-TempBankFile {
 	param(
-		[int]$BankNumber,
-		[int]$Cycle = 1,
+		[int]$bankNumber,
+		[int]$cycle = 1,
 		[string]$OutputDir
 	)
 
-	$bankHex = $BankNumber.ToString('x2')
-	$fileName = "temp_bank$($bankHex)_cycle$('{0:D2}' -f $Cycle).asm"
+	$bankHex = $bankNumber.ToString('x2')
+	$fileName = "temp_bank$($bankHex)_cycle$('{0:D2}' -f $cycle).asm"
 	$filePath = Join-Path $OutputDir $fileName
 
 	Write-Info "Creating temp file: $fileName"
@@ -333,12 +333,12 @@ function New-TempBankFile {
 	# For now, just create a reference to the main bank file
 	$content = @"
 ; ===============================================================================
-; Temp Bank `$$bankHex - Cycle $Cycle
+; Temp Bank `$$bankHex - Cycle $cycle
 ; ===============================================================================
 ; This is a temporary working file for iterative disassembly.
 ; Merge back into bank_$($bankHex)_documented.asm when complete.
 ;
-; Cycle: $Cycle
+; Cycle: $cycle
 ; Date: $(Get-Date -Format 'yyyy-MM-dd')
 ; ===============================================================================
 
@@ -346,7 +346,7 @@ function New-TempBankFile {
 ; incsrc "src/asm/bank_$($bankHex)_documented.asm"
 
 ; ===============================================================================
-; Work Area - Cycle $Cycle
+; Work Area - Cycle $cycle
 ; ===============================================================================
 
 ; Add your disassembly work here
@@ -355,7 +355,7 @@ function New-TempBankFile {
 ; TODO: Disassemble next section of bank `$$bankHex
 
 ; ===============================================================================
-; End of Cycle $Cycle
+; End of Cycle $cycle
 ; ===============================================================================
 
 "@
@@ -371,20 +371,20 @@ function New-TempBankFile {
 #>
 function Invoke-BankDisassembly {
 	param(
-		[int]$BankNumber,
+		[int]$bankNumber,
 		[string]$RomPath,
 		[string]$OutputDir,
-		[bool]$ForceOverwrite
+		[bool]$forceOverwrite
 	)
 
-	$bankHex = $BankNumber.ToString('x2')
+	$bankHex = $bankNumber.ToString('x2')
 
 	Write-Section "Disassembling Bank `$$($bankHex.ToUpper())"
 
 	# Check if documented file already exists
 	$docFile = Join-Path $script:ScriptRoot "src\asm\bank_$($bankHex)_documented.asm"
 
-	if ((Test-Path $docFile) -and -not $ForceOverwrite) {
+	if ((Test-Path $docFile) -and -not $forceOverwrite) {
 		Write-Warning "Bank `$$($bankHex) already has documented file: $docFile"
 		Write-Info "Use -Force to overwrite"
 
@@ -397,7 +397,7 @@ function Invoke-BankDisassembly {
 
 	# Extract bank data
 	try {
-		$bankData = Get-BankData -BankNumber $BankNumber -RomPath $RomPath
+		$bankData = Get-BankData -BankNumber $bankNumber -RomPath $RomPath
 		Write-Success "Extracted $($bankData.Length) bytes"
 	}
 	catch {
@@ -406,7 +406,7 @@ function Invoke-BankDisassembly {
 	}
 
 	# Create/update documented file
-	if ($ForceOverwrite -or -not (Test-Path $docFile)) {
+	if ($forceOverwrite -or -not (Test-Path $docFile)) {
 		try {
 			$docDir = Split-Path $docFile -Parent
 			if (-not (Test-Path $docDir)) {
@@ -414,7 +414,7 @@ function Invoke-BankDisassembly {
 			}
 
 			Write-Info "Creating template for bank `$$($bankHex)..."
-			New-BankTemplate -BankNumber $BankNumber -BankData $bankData -OutputPath $docFile | Out-Null
+			New-BankTemplate -BankNumber $bankNumber -BankData $bankData -OutputPath $docFile | Out-Null
 			Write-Success "Created documented file: $docFile"
 		}
 		catch {
@@ -428,7 +428,7 @@ function Invoke-BankDisassembly {
 
 	# Create temp file for this disassembly session
 	try {
-		$tempFile = New-TempBankFile -BankNumber $BankNumber -Cycle 1 -OutputDir $OutputDir
+		$tempFile = New-TempBankFile -BankNumber $bankNumber -Cycle 1 -OutputDir $OutputDir
 		Write-Success "Created temp file: $tempFile"
 	}
 	catch {
@@ -456,7 +456,7 @@ function Invoke-BankDisassembly {
 try {
 	Write-Section "FFMQ Aggressive Bank Disassembler v1.0"
 
-	Write-Info "Target banks: $($Banks -join ', ')"
+	Write-Info "Target banks: $($banks -join ', ')"
 	Write-Info "Reference ROM: $ReferenceRom"
 	Write-Info "Output directory: $OutputDir"
 	Write-Host ""
@@ -473,7 +473,7 @@ try {
 	Write-Host ""
 
 	# Process each bank
-	foreach ($bankHex in $Banks) {
+	foreach ($bankHex in $banks) {
 		# Convert hex string to number
 		$bankNum = [Convert]::ToInt32($bankHex, 16)
 
@@ -486,13 +486,13 @@ try {
 			-BankNumber $bankNum `
 			-RomPath $romFullPath `
 			-OutputDir $OutputDir `
-			-ForceOverwrite $Force
+			-ForceOverwrite $force
 	}
 
 	# Summary
 	Write-Section "Disassembly Summary"
 
-	Write-Info "Processed banks: $script:ProcessedBanks/$($Banks.Count)"
+	Write-Info "Processed banks: $script:ProcessedBanks/$($banks.Count)"
 
 	if ($script:ProcessedBanks -gt 0) {
 		Write-Success "Disassembly initiated successfully!"

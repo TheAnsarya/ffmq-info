@@ -1,4 +1,4 @@
-<#
+﻿<#
 .SYNOPSIS
 	Format priority ASM bank files with verification and individual commits.
 
@@ -41,13 +41,13 @@
 [CmdletBinding()]
 param(
 	[Parameter(HelpMessage = "Specific bank file to format")]
-	[string]$BankFile,
+	[string]$bankFile,
 
 	[Parameter(HelpMessage = "Skip git commit")]
 	[switch]$SkipCommit,
 
 	[Parameter(HelpMessage = "Preview changes without applying")]
-	[switch]$DryRun
+	[switch]$dryRun
 )
 
 #region Configuration
@@ -70,17 +70,17 @@ $script:PriorityBanks = @(
 	},
 	@{
 		File = "src\asm\bank_0B_documented.asm"
-		Description = "Bank $0B - Game Logic"
+		Description = "Bank $0b - Game Logic"
 		EstimatedLines = 3700
 	},
 	@{
 		File = "src\asm\bank_0C_documented.asm"
-		Description = "Bank $0C - Menu System & UI"
+		Description = "Bank $0c - Menu System & UI"
 		EstimatedLines = 4200
 	},
 	@{
 		File = "src\asm\bank_0D_documented.asm"
-		Description = "Bank $0D - Menu & UI"
+		Description = "Bank $0d - Menu & UI"
 		EstimatedLines = 2900
 	}
 )
@@ -117,27 +117,27 @@ function Write-Info {
 }
 
 function Get-LineCount {
-	param([string]$FilePath)
-	if (-not (Test-Path $FilePath)) {
+	param([string]$filePath)
+	if (-not (Test-Path $filePath)) {
 		return 0
 	}
-	return (Get-Content $FilePath).Count
+	return (Get-Content $filePath).Count
 }
 
 function Format-BankFile {
 	param(
-		[hashtable]$Bank,
+		[hashtable]$bank,
 		[int]$Number,
 		[int]$Total,
-		[bool]$DryRun,
+		[bool]$dryRun,
 		[bool]$SkipCommit
 	)
 
-	$bankDesc = $Bank.Description
+	$bankDesc = $bank.Description
 	$bankNum = "$Number/$Total"
 	Write-BankHeader "Processing Bank $bankNum - $bankDesc"
 
-	$file = $Bank.File
+	$file = $bank.File
 	$fileName = Split-Path $file -Leaf
 
 	# Step 1: Verify file exists
@@ -166,7 +166,7 @@ function Format-BankFile {
 
 	Write-Info "Changes detected: $changes"
 
-	if ($DryRun) {
+	if ($dryRun) {
 		Write-Info "DRY-RUN MODE: Stopping here, no changes applied"
 		return @{
 			Success = $true
@@ -269,7 +269,7 @@ Statistics:
 - Size: $($originalInfo.Length) → $($formattedInfo.Length) bytes ($sizeDiff change, $sizeChangePercent%)
 - Changes: $changes line modifications
 
-Bank: $($Bank.Description)
+Bank: $($bank.Description)
 
 Related: #16 (Format Priority 1 Banks), #14 (format_asm.ps1), #15 (Testing)
 "@
@@ -310,7 +310,7 @@ Related: #16 (Format Priority 1 Banks), #14 (format_asm.ps1), #15 (Testing)
 
 try {
 	Write-BankHeader "ASM Priority Banks Formatting"
-	Write-Host "Mode: $(if ($DryRun) { 'DRY-RUN (preview only)' } else { 'PRODUCTION (will modify files)' })"
+	Write-Host "Mode: $(if ($dryRun) { 'DRY-RUN (preview only)' } else { 'PRODUCTION (will modify files)' })"
 	Write-Host "Commits: $(if ($SkipCommit) { 'Disabled' } else { 'Enabled' })"
 	Write-Host "Started: $(Get-Date -Format 'yyyy-MM-dd HH:mm:ss')"
 
@@ -321,8 +321,8 @@ try {
 	}
 
 	# Determine which banks to process
-	$banksToProcess = if ($BankFile) {
-		$script:PriorityBanks | Where-Object { $_.File -eq $BankFile }
+	$banksToProcess = if ($bankFile) {
+		$script:PriorityBanks | Where-Object { $_.File -eq $bankFile }
 	}
 	else {
 		$script:PriorityBanks
@@ -350,7 +350,7 @@ try {
 			-Bank $bank `
 			-Number $currentBank `
 			-Total $totalBanks `
-			-DryRun:$DryRun `
+			-DryRun:$dryRun `
 			-SkipCommit:$SkipCommit
 
 		$results += $result
@@ -378,7 +378,7 @@ try {
 		Write-Host "✗" -ForegroundColor Red
 	}
 
-	if (-not $DryRun) {
+	if (-not $dryRun) {
 		$totalOriginalLines = ($results | Where-Object { $_.Success } | Measure-Object -Property OriginalLines -Sum).Sum
 		$totalFormattedLines = ($results | Where-Object { $_.Success } | Measure-Object -Property FormattedLines -Sum).Sum
 		$totalChanges = ($results | Where-Object { $_.Success } | ForEach-Object { [int]$_.Changes } | Measure-Object -Sum).Sum
@@ -398,7 +398,7 @@ try {
 	}
 
 	# Cleanup backups if all successful
-	if ($successful -eq $results.Count -and -not $DryRun) {
+	if ($successful -eq $results.Count -and -not $dryRun) {
 		Write-Host "`nCleaning up backups..."
 		foreach ($result in $results) {
 			if ($result.File) {

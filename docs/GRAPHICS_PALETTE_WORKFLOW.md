@@ -1,4 +1,4 @@
-# FFMQ Graphics + Palette Workflow
+﻿# FFMQ Graphics + Palette Workflow
 **Status:** ✅ **WORKING** - Recognizable sprites with correct colors!  
 **Date:** 2025-10-25
 
@@ -156,10 +156,10 @@ b8 = (b5 * 255) // 31
 
 | Type | ROM Address | Size | Palettes | Colors/Pal |
 |------|-------------|------|----------|------------|
-| Character | $07A000 | 256 bytes | 8 | 16 |
-| Enemy | $07A100 | 512 bytes | 16 | 16 |
-| Background | $07A300 | 256 bytes | 8 | 16 |
-| Battle BG | $07A500 | 128 bytes | 4 | 16 |
+| Character | $07a000 | 256 bytes | 8 | 16 |
+| Enemy | $07a100 | 512 bytes | 16 | 16 |
+| Background | $07a300 | 256 bytes | 8 | 16 |
+| Battle BG | $07a500 | 128 bytes | 4 | 16 |
 
 ### Color Index in Tiles
 

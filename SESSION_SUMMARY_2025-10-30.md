@@ -1,4 +1,4 @@
-# Session Summary - October 30, 2025
+﻿# Session Summary - October 30, 2025
 
 ## 🎯 Session Objective
 Aggressively disassemble remaining ROM banks using DiztinGUIsh reference, create automation tools, build and validate ROM match.
@@ -7,13 +7,13 @@ Aggressively disassemble remaining ROM banks using DiztinGUIsh reference, create
 
 ### Investigation
 Started session believing ROM had:
-- 12 CODE banks ($00-$03, $07-$0E)
-- 4 DATA banks ($04-$06, $0F)
+- 12 CODE banks ($00-$03, $07-$0e)
+- 4 DATA banks ($04-$06, $0f)
 
-**Imported banks $07-$0A from DiztinGUIsh reference** to boost code completion...
+**Imported banks $07-$0a from DiztinGUIsh reference** to boost code completion...
 
 ### Critical Finding
-Banks $07-$0A contain **GRAPHICS DATA**, not executable code!
+Banks $07-$0a contain **GRAPHICS DATA**, not executable code!
 
 **Evidence**:
 - DiztinGUIsh bank_07.asm: All `db` statements (color palettes)
@@ -25,11 +25,11 @@ Banks $07-$0A contain **GRAPHICS DATA**, not executable code!
 ### Corrected ROM Map
 **CODE BANKS** (8 total - 256KB):
 - $00-$03: Main engine, logic, event systems
-- $0B-$0E: Battle graphics, display management
+- $0b-$0e: Battle graphics, display management
 
 **DATA BANKS** (8 total - 256KB):
-- $04-$0A: Graphics tiles, palettes, tilemaps, animations
-- $0F: Audio (SPC700 driver + samples)
+- $04-$0a: Graphics tiles, palettes, tilemaps, animations
+- $0f: Audio (SPC700 driver + samples)
 
 ## ✅ Completed Work
 
@@ -57,7 +57,7 @@ Banks $07-$0A contain **GRAPHICS DATA**, not executable code!
 ### 3. Progress Assessment
 **Before Session**:
 - Believed 71.56% complete (code banks only)
-- Thought banks $07-$0A needed disassembly
+- Thought banks $07-$0a needed disassembly
 
 **After Discovery**:
 - **95% CODE DISASSEMBLY COMPLETE** ✅
@@ -88,8 +88,8 @@ Banks $07-$0A contain **GRAPHICS DATA**, not executable code!
 3. **Improve function labels** across all code banks
 
 ### Future
-4. **Extract graphics** from banks $04-$0A → PNG files
-5. **Extract audio** from bank $0F → SPC file
+4. **Extract graphics** from banks $04-$0a → PNG files
+5. **Extract audio** from bank $0f → SPC file
 6. **Document data formats** (palettes, tilemaps, sprite layouts)
 7. **Create asset tools** for re-importing edited graphics/audio
 

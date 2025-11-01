@@ -1,4 +1,4 @@
-# Asset Extraction Status - 66.7% Complete! 🎉
+﻿# Asset Extraction Status - 66.7% Complete! 🎉
 
 ## Major Progress This Session
 
@@ -45,7 +45,7 @@
   * **245 dialog strings** 🎉 (NEW!)
 - Formats: Individual `.txt` files and `.asm` sources
 - Location: `assets/text/`
-- **Dialog extraction**: Uses pointer table at $00D636, strings in bank $03
+- **Dialog extraction**: Uses pointer table at $00d636, strings in bank $03
 
 #### 5. Graphics (100%) ✅
 - **9,295 total tiles** converted to PNG:
@@ -64,14 +64,14 @@
 - Background palettes
 - Sprite palettes
 - Special effect palettes
-- **Estimated location**: $066400-$0667FF range
+- **Estimated location**: $066400-$0667ff range
 
 #### 2. Map Data (0%) - Tool Needed
 - Level layouts and tilemaps
 - Background map data
 - Collision data
 - Trigger/event data
-- **Estimated location**: Banks $08-$0B
+- **Estimated location**: Banks $08-$0b
 
 #### 3. Audio (0%) - Tool Needed
 - SPC700 music data
@@ -285,7 +285,7 @@ tools/
 
 ### Dialog Extraction
 - ✅ **FIXED!** Dialog now extracts correctly
-- Uses pointer table at ROM address $00D636
+- Uses pointer table at ROM address $00d636
 - Pointers are 16-bit little-endian
 - Strings stored in bank $03 (SNES address space)
 - Extracted **245 dialog strings** successfully

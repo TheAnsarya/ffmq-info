@@ -1,4 +1,4 @@
-#Requires -Version 5.1
+﻿#Requires -Version 5.1
 <#
 .SYNOPSIS
 	ROM validation and comparison tool for FFMQ build system.
@@ -52,7 +52,7 @@ param(
 )
 
 Set-StrictMode -Version Latest
-$ErrorActionPreference = 'Stop'
+$errorActionPreference = 'Stop'
 
 $script:ScriptRoot = Split-Path -Parent $PSScriptRoot
 
@@ -263,7 +263,7 @@ function Compare-Roms {
 #>
 function New-ComparisonReport {
 	param(
-		[hashtable]$ComparisonResult,
+		[hashtable]$comparisonResult,
 		[hashtable]$Rom1Header,
 		[hashtable]$Rom2Header,
 		[string]$Rom1Path,
@@ -309,13 +309,13 @@ Complement: 0x$($Rom2Header.Complement.ToString('x4'))
 ───────────────────────────────────────────────────────────────────────────
   Comparison Results
 ───────────────────────────────────────────────────────────────────────────
-Identical:      $($ComparisonResult.Identical)
-Differences:    $($ComparisonResult.Differences)
-Match Percent:  $([math]::Round($ComparisonResult.MatchPercent, 4))%
+Identical:      $($comparisonResult.Identical)
+Differences:    $($comparisonResult.Differences)
+Match Percent:  $([math]::Round($comparisonResult.MatchPercent, 4))%
 
 "@
 
-	if (-not $ComparisonResult.Identical -and $ComparisonResult.DiffList) {
+	if (-not $comparisonResult.Identical -and $comparisonResult.DiffList) {
 		$report += @"
 ───────────────────────────────────────────────────────────────────────────
   Detailed Differences
@@ -326,7 +326,7 @@ Offset       ROM 1    ROM 2
 
 "@
 
-		foreach ($diff in $ComparisonResult.DiffList) {
+		foreach ($diff in $comparisonResult.DiffList) {
 			$offsetStr = "0x$($diff.Offset.ToString('x6'))"
 			$byte1Str = "0x$($diff.Byte1.ToString('x2'))"
 			$byte2Str = "0x$($diff.Byte2.ToString('x2'))"

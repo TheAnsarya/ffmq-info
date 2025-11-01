@@ -1,4 +1,4 @@
-# FFMQ ROM Bank Classification
+﻿# FFMQ ROM Bank Classification
 
 **Generated**: October 30, 2025
 **Source**: Investigation of DiztinGUIsh reference + manual verification
@@ -14,14 +14,14 @@ The ROM contains **8 CODE banks** and **8 DATA banks**, not 12 code banks as ini
 
 | Bank | Address Range | Status | Content |
 |------|---------------|--------|---------|
-| $00  | $008000-$00FFFF | ✅ 95% | Main engine, initialization, core systems |
-| $01  | $018000-$01FFFF | ✅ 95% | Event handlers, game logic |
-| $02  | $018000-$02FFFF | ✅ 95% | Extended game logic, AI routines |
-| $03  | $038000-$03FFFF | ✅ 95% | Additional game systems |
-| $0B  | $0B8000-$0BFFFF | ✅ 95% | Battle graphics routines, OAM management |
-| $0C  | $0C8000-$0CFFFF | ✅ 95% | Display/screen management code |
-| $0D  | $0D8000-$0DFFFF | ✅ 95% | Extended display code |
-| $0E  | $0E8000-$0EFFFF | ✅ 95% | Additional battle/display code |
+| $00  | $008000-$00ffff | ✅ 95% | Main engine, initialization, core systems |
+| $01  | $018000-$01ffff | ✅ 95% | Event handlers, game logic |
+| $02  | $018000-$02ffff | ✅ 95% | Extended game logic, AI routines |
+| $03  | $038000-$03ffff | ✅ 95% | Additional game systems |
+| $0b  | $0b8000-$0bffff | ✅ 95% | Battle graphics routines, OAM management |
+| $0c  | $0c8000-$0cffff | ✅ 95% | Display/screen management code |
+| $0d  | $0d8000-$0dffff | ✅ 95% | Extended display code |
+| $0e  | $0e8000-$0effff | ✅ 95% | Additional battle/display code |
 
 **Total CODE**: ~60,000 lines of disassembled 65816 assembly
 **Code Completion**: **95%** ✅
@@ -33,14 +33,14 @@ The ROM contains **8 CODE banks** and **8 DATA banks**, not 12 code banks as ini
 
 | Bank | Address Range | Type | Content |
 |------|---------------|------|---------|
-| $04  | $048000-$04FFFF | Graphics | Sprite tiles (4bpp SNES format) |
-| $05  | $058000-$05FFFF | Graphics | Tilemap data, backgrounds |
-| $06  | $068000-$06FFFF | Graphics | Animation frames |
-| $07  | $078000-$07FFFF | Graphics | Color palettes (15-bit RGB) |
-| $08  | $088000-$08FFFF | Graphics | Tilemap layouts |
-| $09  | $098000-$09FFFF | Graphics | Sprite graphics (4bpp) |
-| $0A  | $0A8000-$0AFFFF | Graphics | Animation sequences |
-| $0F  | $0F8000-$0FFFFF | Audio | SPC700 driver + sound samples |
+| $04  | $048000-$04ffff | Graphics | Sprite tiles (4bpp SNES format) |
+| $05  | $058000-$05ffff | Graphics | Tilemap data, backgrounds |
+| $06  | $068000-$06ffff | Graphics | Animation frames |
+| $07  | $078000-$07ffff | Graphics | Color palettes (15-bit RGB) |
+| $08  | $088000-$08ffff | Graphics | Tilemap layouts |
+| $09  | $098000-$09ffff | Graphics | Sprite graphics (4bpp) |
+| $0a  | $0a8000-$0affff | Graphics | Animation sequences |
+| $0f  | $0f8000-$0fffff | Audio | SPC700 driver + sound samples |
 
 **Data Preservation**: **100%** (correctly stored as `db` statements) ✅
 
@@ -72,10 +72,10 @@ The ROM contains **8 CODE banks** and **8 DATA banks**, not 12 code banks as ini
 
 ## 🔬 Verification Evidence
 
-### Bank $0B (CODE) - Sample Instructions
+### Bank $0b (CODE) - Sample Instructions
 ```asm
 CODE_0B8000:
-	LDA.W $0E8B			; Load battle type
+	LDA.W $0e8b			; Load battle type
 	BEQ CODE_0B8017		; Branch if zero
 	DEC A				; Decrement accumulator
 	JSR SubRoutine		; Call subroutine
@@ -90,7 +90,7 @@ DATA8_078001:
 	db $22				; Palette byte
 DATA8_078002:
 	db $00				; Palette byte
-	db $FF,$7F,$4F,$3E	; 15-bit RGB color data
+	db $ff,$7f,$4f,$3e	; 15-bit RGB color data
 ```
 
 ---
@@ -103,8 +103,8 @@ DATA8_078002:
 3. **Improve function labels** across all 8 code banks
 
 ### Future (Data Focus)
-4. **Extract graphics** from banks $04-$0A → PNG files
-5. **Extract audio** from bank $0F → SPC file
+4. **Extract graphics** from banks $04-$0a → PNG files
+5. **Extract audio** from bank $0f → SPC file
 6. **Document data formats** (palette structure, tilemap layout)
 7. **Create graphics tools** for re-importing edited assets
 

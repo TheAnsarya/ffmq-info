@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+﻿#!/usr/bin/env python3
 """
 Final Fantasy Mystic Quest - ROM Comparison Tool
 Compares original ROM with built ROM to identify differences and track progress toward byte-perfect rebuild
@@ -71,8 +71,8 @@ class ROMComparator:
         ROMRegion("Dialog Data", 0x024000, 0x028000, "text", "Dialog strings and tables"),
         
         # Bank $05 - Magic/Items
-        ROMRegion("Magic System", 0x028000, 0x02C000, "code", "Spell effects, magic engine"),
-        ROMRegion("Item System", 0x02C000, 0x030000, "code", "Item handling, inventory"),
+        ROMRegion("Magic System", 0x028000, 0x02c000, "code", "Spell effects, magic engine"),
+        ROMRegion("Item System", 0x02c000, 0x030000, "code", "Item handling, inventory"),
         
         # Bank $06 - Enemy/Battle Data
         ROMRegion("Enemy Stats", 0x030000, 0x032000, "data", "Enemy stats, resistances, rewards"),
@@ -83,23 +83,23 @@ class ROMComparator:
         ROMRegion("Enemy Graphics", 0x040000, 0x048000, "graphics", "Enemy and boss sprites"),
         ROMRegion("Tile Graphics", 0x048000, 0x050000, "graphics", "Map tiles, backgrounds"),
         
-        # Bank $0A-$0B - Audio
+        # Bank $0a-$0b - Audio
         ROMRegion("Sound Engine", 0x050000, 0x054000, "code", "SPC700 sound driver"),
         ROMRegion("Music Data", 0x054000, 0x058000, "audio", "Music sequences (SPC)"),
         ROMRegion("Sound Effects", 0x058000, 0x060000, "audio", "Sound effect samples"),
         
-        # Bank $0C - VBlank/IRQ
+        # Bank $0c - VBlank/IRQ
         ROMRegion("VBlank Handler", 0x060000, 0x064000, "code", "NMI/IRQ handlers, screen updates"),
         
-        # Bank $0D - Save/Load
+        # Bank $0d - Save/Load
         ROMRegion("Save System", 0x064000, 0x068000, "code", "Save/load, SRAM handling"),
         
-        # Bank $0E-$0F - Additional code/data
+        # Bank $0e-$0f - Additional code/data
         ROMRegion("Additional Code", 0x068000, 0x070000, "code", "Misc game logic"),
         ROMRegion("Additional Data", 0x070000, 0x080000, "data", "Misc data tables"),
         
         # Header
-        ROMRegion("ROM Header", 0x007FB0, 0x008000, "data", "SNES ROM header and vectors"),
+        ROMRegion("ROM Header", 0x007fb0, 0x008000, "data", "SNES ROM header and vectors"),
     ]
     
     def __init__(self, original_path: str, built_path: str):

@@ -1,14 +1,14 @@
-#!/usr/bin/env python3
+﻿#!/usr/bin/env python3
 """
 FFMQ Palette Extraction Tool
 =============================
 
 Extracts SNES RGB555 color palettes from Final Fantasy Mystic Quest ROM.
-Supports multi-bank palette architecture (Banks $09/$0A/$0B).
+Supports multi-bank palette architecture (Banks $09/$0a/$0b).
 
 Features:
-- Parse pointer tables from Bank $09 ($098460-$0985F4)
-- Follow cross-bank references to Banks $0A and $0B
+- Parse pointer tables from Bank $09 ($098460-$0985f4)
+- Follow cross-bank references to Banks $0a and $0b
 - Convert RGB555 to standard RGB888 format
 - Export to PNG swatches (16x16 pixels per color)
 - Generate JSON palette data for tools/editors
@@ -52,17 +52,17 @@ class RGB555Color:
     @property
     def r5(self) -> int:
         """Red channel (5-bit, 0-31)"""
-        return self.rgb555 & 0x1F
+        return self.rgb555 & 0x1f
 
     @property
     def g5(self) -> int:
         """Green channel (5-bit, 0-31)"""
-        return (self.rgb555 >> 5) & 0x1F
+        return (self.rgb555 >> 5) & 0x1f
 
     @property
     def b5(self) -> int:
         """Blue channel (5-bit, 0-31)"""
-        return (self.rgb555 >> 10) & 0x1F
+        return (self.rgb555 >> 10) & 0x1f
 
     @property
     def r8(self) -> int:
@@ -93,7 +93,7 @@ class PaletteEntry:
     """Single palette entry from pointer table"""
     index: int          # Entry index in table
     address: int        # 24-bit ROM address (bank included)
-    bank: int          # SNES bank number ($09/$0A/$0B)
+    bank: int          # SNES bank number ($09/$0a/$0b)
     color_count: int   # Number of colors (0 = full palette = 16)
     flags: int         # Special flags ($00 standard, $03/$12 special)
     colors: List[RGB555Color]
@@ -139,13 +139,13 @@ class ROMReader:
 
     def snes_to_pc(self, snes_addr: int) -> int:
         """Convert SNES address to PC file offset (LoROM mapping)"""
-        bank = (snes_addr >> 16) & 0xFF
-        offset = snes_addr & 0xFFFF
+        bank = (snes_addr >> 16) & 0xff
+        offset = snes_addr & 0xffff
 
         if offset < 0x8000:
             raise ValueError(f"Invalid SNES address ${snes_addr:06X} (offset < $8000)")
 
-        # LoROM: Bank $XX:$8000-$FFFF maps to PC $(XX*32KB)
+        # LoROM: Bank $XX:$8000-$ffff maps to PC $(XX*32KB)
         pc_addr = (bank * 0x8000) + (offset - 0x8000) + self.header_size
         return pc_addr
 
@@ -180,7 +180,7 @@ class PaletteExtractor:
 
     # Pointer table location in Bank $09
     POINTER_TABLE_START = 0x098460
-    POINTER_TABLE_END = 0x0985F4
+    POINTER_TABLE_END = 0x0985f4
     POINTER_ENTRY_SIZE = 5  # [addr_low, addr_mid, addr_high, count, flags]
 
     def __init__(self, rom: ROMReader):
@@ -199,8 +199,8 @@ class PaletteExtractor:
             # Read 5-byte pointer entry
             entry_data = self.rom.read_bytes(addr, self.POINTER_ENTRY_SIZE)
 
-            # Check for terminator ($FF,$FF at bytes 0-1)
-            if entry_data[0] == 0xFF and entry_data[1] == 0xFF:
+            # Check for terminator ($ff,$ff at bytes 0-1)
+            if entry_data[0] == 0xff and entry_data[1] == 0xff:
                 print(f"  Found terminator at ${addr:06X}")
                 break
 

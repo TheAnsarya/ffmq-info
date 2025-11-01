@@ -1,4 +1,4 @@
-# FFMQ Disassembly Campaign - Progress Summary
+﻿# FFMQ Disassembly Campaign - Progress Summary
 **Last Updated**: October 31, 2025
 
 ---
@@ -13,7 +13,7 @@
 | **Total Source Lines** | 85,000 (est.) | 85,000 | 🔍 Baseline |
 | **Lines Documented** | **38,349** | 85,000 | ✅ 45.1% |
 | **Banks Complete** | **10 of 16** | 16 | ✅ 62.5% |
-| **Bank $0D Complete!** | **2,968 / 2,956** | 2,956 | ✅ **100.4%** |
+| **Bank $0d Complete!** | **2,968 / 2,956** | 2,956 | ✅ **100.4%** |
 | **Bank $02 Complete!** | **9,000 / 9,000** | 9,000 | ✅ **100.0%** 🏆 |
 | **Next Milestone** | 42,500 (50%) | 85,000 (100%) | 🎯 +4,151 lines |
 
@@ -105,7 +105,7 @@
     - BattleChar_ClearGraphicsData: Graphics validation engine (26-byte structure clear)
     - BattleChar_InitializeState: Character state initialization (4-byte load)
     - BattleChar_SetupAnimationData: Animation parameter configuration (5-byte setup)
-    - BattleChar_InitializeDefaults: Default parameter setup ($FF fill pattern)
+    - BattleChar_InitializeDefaults: Default parameter setup ($ff fill pattern)
     - BattleSprite_TransformCoordinates: Coordinate transformation for positioning
     - BattleChar_LoadExtendedStats: Extended stat loading (16-byte structure)
     - BattleSystem_CoordinateDataLoad: Data loading coordinator with mode handling
@@ -197,14 +197,14 @@
 - **Bank 0C: 100% COMPLETE** 🏆 (42 → 0 labels, **FIFTH BANK FINISHED!**)
   * Graphics Command System: Display_GraphicsCommandProcessor with DMA transfer loop
     - Command processor: 3-byte entry parsing (tile count, source, VRAM offset)
-    - DMA automation: Calculates transfer size (×32), source address (+$AA4C), VRAM offset (×16)
-    - Block move: 3424-byte graphics transfer ($0CAA4C → $7F0000, MVN instruction)
+    - DMA automation: Calculates transfer size (×32), source address (+$aa4c), VRAM offset (×16)
+    - Block move: 3424-byte graphics transfer ($0caa4c → $7f0000, MVN instruction)
   * Tilemap Command System: Display_TilemapCommandProcessor with table-driven fills
     - 4 local labels: .TileFillLoop, .Exit, .BottomFillLoop
     - Command table parsing: Repeat count (low byte), tile base (high byte)
     - Dual loop system: Per-tile fill + multi-command processing
-    - Bottom screen fill: 64-tile pattern $10 at VRAM $3FC0
-  * Effect Command Handler: Display_EffectCommandHighRange ($80-$BF)
+    - Bottom screen fill: 64-tile pattern $10 at VRAM $3fc0
+  * Effect Command Handler: Display_EffectCommandHighRange ($80-$bf)
     - Triple table dispatch: 3 sequential JSR calls with offset calculation (×4, ×8)
     - Parameter-based lookup: Entry byte 1 used for all 3 table accesses
   * Final 2 labels: Effect command high-range + brightness decrement loop label
@@ -240,15 +240,15 @@
 - **Bank 01**: 167 → 137 labels (30 eliminated, 63% complete)
 - **Systems Renamed**:
   * Audio Processing (6 labels): Dual-layer audio system with 7-channel management
-    - BattleAudio_ClearMemoryBuffers: Clears 14-word battle sound effect buffer ($7FCED8-$7FCEF2)
+    - BattleAudio_ClearMemoryBuffers: Clears 14-word battle sound effect buffer ($7fced8-$7fcef2)
     - BattleAudio_ProcessPrimaryChannel: Primary 7-channel processor with priority system
     - BattleAudio_ProcessSecondaryChannel: Secondary 7-channel processor (parallel audio layer)
-    - Data validation: #$FF terminator scanning, priority comparison ($19DF/$19E1 flags)
+    - Data validation: #$ff terminator scanning, priority comparison ($19df/$19e1 flags)
     - Sound lookup: DATA8_0CD694 (primary) + DATA8_0CD72F (secondary) pointer tables
   * Animation Controllers (3 labels): Battle sprite animation and graphics coordination
     - BattleAnimation_MainController: Main sprite animation controller with PHB/PHP state save
     - BattleAnimation_ExtendedHandler: Extended animation with palette/graphics coordination
-    - BattleGraphics_PreparationSystem: Memory initialization (MVN $7F,$7F clear + graphics load)
+    - BattleGraphics_PreparationSystem: Memory initialization (MVN $7f,$7f clear + graphics load)
   * Graphics Systems (6 labels): VRAM, tiles, palettes, sprites
     - BattleGraphics_VRAMAllocator, TileUploader, PaletteLoader
     - BattleSprite_OAMBuilder, PositionCalculator, AttributeManager, PriorityHandler
@@ -417,8 +417,8 @@ This epic session delivered:
 - **+5,943 lines** documented in a single session (21.1% growth)
 - **+7.0 percentage points** (33.2% → 40.2%)
 - **7 milestones** achieved: 35%, 36%, 37%, 38%, Halfway (50% banks), 39.6%, **40%**
-- **3 banks completed** to 100%: Banks $09, $0A, $0B
-- **Bank $0C advanced** from 4.5% → 53.2% (+48.7 percentage points!)
+- **3 banks completed** to 100%: Banks $09, $0a, $0b
+- **Bank $0c advanced** from 4.5% → 53.2% (+48.7 percentage points!)
 - **Velocity**: Sustained **1,450+ lines/hour** across 15 cycles
 - **Quality**: **100% temp file success** (25 of 25 perfect)
 
@@ -440,14 +440,14 @@ This epic session delivered:
 | **$07** | Graphics/Sound | 2,561 | 2,307 | **100%** | ✅ **COMPLETE** |
 | **$08** | Text/Dialogue Data | 2,057 | **2,156** | **100%** | ✅ **COMPLETE** |
 | **$09** | Color Palettes + Graphics | 2,082 | **2,083** | **100%** | ✅ **COMPLETE** |
-| **$0A** | Extended Graphics/Palettes | 2,058 | **2,058** | **100%** | ✅ **COMPLETE** |
-| **$0B** | Battle Graphics/Animation | 3,727 | **3,732** | **100.1%** | ✅ **COMPLETE** |
-| **$0C** | Display/PPU Management | 4,226 | **4,249** | **100.5%** | ✅ **COMPLETE** |
-| **$0D** | APU Communication/Sound | 2,956 | **2,968** | **100.4%** | ✅ **COMPLETE** |
-| **$0E** | Unknown | ~5,000 | 0 | 0% | ⬜ Not Started |
-| **$0F** | Unknown | ~5,000 | 0 | 0% | ⬜ Not Started |
+| **$0a** | Extended Graphics/Palettes | 2,058 | **2,058** | **100%** | ✅ **COMPLETE** |
+| **$0b** | Battle Graphics/Animation | 3,727 | **3,732** | **100.1%** | ✅ **COMPLETE** |
+| **$0c** | Display/PPU Management | 4,226 | **4,249** | **100.5%** | ✅ **COMPLETE** |
+| **$0d** | APU Communication/Sound | 2,956 | **2,968** | **100.4%** | ✅ **COMPLETE** |
+| **$0e** | Unknown | ~5,000 | 0 | 0% | ⬜ Not Started |
+| **$0f** | Unknown | ~5,000 | 0 | 0% | ⬜ Not Started |
 
-**Banks 100% Complete**: 10 of 16 (62.5%) ← **+1 Bank $0D COMPLETE!** 🎉  
+**Banks 100% Complete**: 10 of 16 (62.5%) ← **+1 Bank $0d COMPLETE!** 🎉  
 **Banks 90%+ Complete**: 0 of 16 (0%)  
 **Banks 75%+ Complete**: 0 of 16 (0%)  
 **Banks In Progress**: 0 of 16 (0%)  
@@ -459,7 +459,7 @@ This epic session delivered:
 
 ### 🎉 32% Campaign Milestone - SURPASSED! (October 29, 2025) ← **NEW!**
 - **Total**: **27,920 lines documented (32.8%)**
-- **Session Growth**: +1,813 lines (Bank $09: +842, Bank $0A: +328, Palette Tool: +643 equiv)
+- **Session Growth**: +1,813 lines (Bank $09: +842, Bank $0a: +328, Palette Tool: +643 equiv)
 - **Surplus**: +720 lines beyond 32% threshold (27,200)
 - **Velocity**: 280.7 lines/cycle average (Cycles 3-5), 427 lines/cycle overall session
 - **Achievements**: Bank $09 Graphics System complete (94.2%), Palette extraction tool created
@@ -486,8 +486,8 @@ This epic session delivered:
   - Dual-purpose bank architecture (text + graphics combined)
   - Complete text rendering pipeline (7 steps across 4 banks)
   - Compression system analyzed (40-50% space savings)
-  - All control codes documented ($F0-$FF)
-  - DMA transfer markers identified ($3F byte pattern)
+  - All control codes documented ($f0-$ff)
+  - DMA transfer markers identified ($3f byte pattern)
   - Bank termination analyzed (578 bytes padding = 0.9% waste)
   - 64,958 bytes of data documented in 65,536 byte bank
 
@@ -533,14 +533,14 @@ This epic session delivered:
 ✅ **Text/Dialogue Data** (Bank $08):
 - Dual-purpose architecture (text + graphics combined)
 - Text compression system (40-50% space savings)
-- Complete control codes ($F0-$FF) documented
+- Complete control codes ($f0-$ff) documented
 - Graphics tile arrangement tables
 - Text rendering pipeline (7 steps across 4 banks)
 
 ### Systems Partially Documented
 🟡 **Color Palettes** (Bank $09 - 53.8%):
 - RGB555 palette data (SNES PPU format) ✅
-- Multi-bank palette architecture (Banks $09/$0A/$0B) ✅
+- Multi-bank palette architecture (Banks $09/$0a/$0b) ✅
 - Pointer tables with cross-bank references ✅
 - Graphics tile pattern data (4bpp bitplanes) ✅
 - Complete SNES rendering pipeline ✅
@@ -549,7 +549,7 @@ This epic session delivered:
 ### Major Technical Discoveries
 
 1. **Multi-Bank Palette Architecture** (Bank $09): ← **NEW!**
-   - Unified palette index spans 3 banks ($09, $0A, $0B)
+   - Unified palette index spans 3 banks ($09, $0a, $0b)
    - RGB555 format: 15-bit color (5 bits per R/G/B channel)
    - Pointer tables reference palettes across banks
    - Variable color counts (1-39 colors per palette)
@@ -617,9 +617,9 @@ This epic session delivered:
    - Previous: 30.7%
    - Current: **35,285 lines (41.5%)**
    - Exceeded by: +785 lines
-   - Strategy: Bank $0C aggressive sprint (Cycles 4-7, +1,144 lines)
+   - Strategy: Bank $0c aggressive sprint (Cycles 4-7, +1,144 lines)
 
-4. 🔄 **Bank $0C Display/PPU Management** ← **80.3% COMPLETE!**
+4. 🔄 **Bank $0c Display/PPU Management** ← **80.3% COMPLETE!**
    - Current: **3,393 / 4,226 lines (80.3%)**
    - Content: **Graphics decompression, sprite animation, VRAM management**
    - Cycles completed: 7 of ~9-10 expected
@@ -637,12 +637,12 @@ This epic session delivered:
    - Current: 35,285 lines (41.5%)
    - Target: 42,500 lines (50%)
    - Need: +7,215 lines
-   - Strategy: Complete Bank $0C (+833) + 75% of next bank (~6,400 lines)
+   - Strategy: Complete Bank $0c (+833) + 75% of next bank (~6,400 lines)
 
-7. 🔍 **Bank $0D/$0E/$0F Analysis**
+7. 🔍 **Bank $0d/$0e/$0f Analysis**
    - Size: ~5,000 lines each (estimated)
    - Content: Combat logic, AI, battle sequences
-   - Target: Begin after Bank $0C completion
+   - Target: Begin after Bank $0c completion
 
 8. 🛠️ **EditorConfig Implementation**
    - Apply tab_width=23, indent_size=23 to all ASM files
@@ -657,8 +657,8 @@ This epic session delivered:
 ### Long-Term (10-20 Sessions)
 7. 🎯 **50% Campaign Milestone**
    - Target: 42,500 lines (50%)
-   - Strategy: Complete Banks $08-$0F systematically
-   - Expected: Banks $09-$0B at 100%, Bank $0C in progress
+   - Strategy: Complete Banks $08-$0f systematically
+   - Expected: Banks $09-$0b at 100%, Bank $0c in progress
 
 8. 🔬 **Bank $00 System Kernel**
    - Critical dependency for many other banks
@@ -742,7 +742,7 @@ ffmq-info/
 🟢 **Low Risk - Methodology**: Temp file strategy proven reliable  
 🟢 **Low Risk - Quality**: Technical depth maintained at high level  
 🟡 **Medium Risk - Complexity**: Bank $00 will require advanced analysis  
-🟡 **Medium Risk - Unknown Banks**: $09-$0F content/size uncertain  
+🟡 **Medium Risk - Unknown Banks**: $09-$0f content/size uncertain  
 
 ### Mitigation Strategies
 - Continue temp file strategy (100% success rate)

@@ -1,4 +1,4 @@
-<#
+﻿<#
 .SYNOPSIS
     Format Priority 3 bank section files with individual git commits.
 
@@ -35,14 +35,14 @@
 
 [CmdletBinding()]
 param(
-    [switch]$DryRun,
+    [switch]$dryRun,
     [switch]$NoCommit
 )
 
 # Script configuration
-$ErrorActionPreference = 'Stop'
+$errorActionPreference = 'Stop'
 $ScriptRoot = Split-Path -Parent $PSScriptRoot
-$FormatScript = Join-Path $ScriptRoot "tools\format_asm.ps1"
+$formatScript = Join-Path $ScriptRoot "tools\format_asm.ps1"
 $SrcDir = Join-Path $ScriptRoot "src\asm"
 
 # Section configuration
@@ -142,9 +142,9 @@ function Format-Section {
     Write-Step "Executing: .\tools\format_asm.ps1 -Path $sectionPath -DryRun"
     Write-Host ""
     
-    & $FormatScript -Path $sectionPath -DryRun | Out-String | Write-Host
+    & $formatScript -Path $sectionPath -DryRun | Out-String | Write-Host
     
-    if ($DryRun) {
+    if ($dryRun) {
         Write-Step "DRY-RUN MODE: Stopping here"
         return $true
     }
@@ -168,7 +168,7 @@ function Format-Section {
     Write-Host ""
     
     try {
-        & $FormatScript -Path $sectionPath | Out-String | Write-Host
+        & $formatScript -Path $sectionPath | Out-String | Write-Host
         Write-Step "Formatting applied" -Status success
     }
     catch {
@@ -257,8 +257,8 @@ Clear-Host
 Write-Header "ASM Priority 3 Sections Formatting"
 
 # Display configuration
-$mode = if ($DryRun) { "DRY-RUN (preview only)" } else { "PRODUCTION (will modify files)" }
-$commits = if ($NoCommit -or $DryRun) { "Disabled" } else { "Enabled" }
+$mode = if ($dryRun) { "DRY-RUN (preview only)" } else { "PRODUCTION (will modify files)" }
+$commits = if ($NoCommit -or $dryRun) { "Disabled" } else { "Enabled" }
 
 Write-Host "Mode: $mode"
 Write-Host "Commits: $commits"
@@ -266,8 +266,8 @@ Write-Host "Started: $($Stats.StartTime.ToString('yyyy-MM-dd HH:mm:ss'))"
 Write-Host ""
 
 # Verify format script exists
-if (-not (Test-Path $FormatScript)) {
-    Write-Step "Format script not found: $FormatScript" -Status error
+if (-not (Test-Path $formatScript)) {
+    Write-Step "Format script not found: $formatScript" -Status error
     exit 1
 }
 
@@ -313,7 +313,7 @@ $duration = $endTime - $Stats.StartTime
 Write-Host ""
 Write-Host "Duration: $($duration.ToString('mm\:ss'))"
 
-if ($DryRun) {
+if ($dryRun) {
     Write-Host ""
     Write-Step "DRY-RUN complete - no changes applied"
 }

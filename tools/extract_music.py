@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+﻿#!/usr/bin/env python3
 """
 Final Fantasy Mystic Quest - Music Extractor
 Extracts music and sound data from FFMQ ROM
@@ -19,11 +19,11 @@ class FFMQMusicExtractor:
         
         # Music/sound locations in ROM (estimated)
         self.music_locations = {
-            'spc_driver': (0xC8000, 0x2000),       # SPC-700 driver code
-            'sample_table': (0xCA000, 0x1000),     # Sample pointer table
-            'instrument_data': (0xCB000, 0x2000),  # Instrument definitions
-            'sequence_data': (0xCD000, 0x8000),    # Music sequences
-            'sample_data': (0xD5000, 0x10000),     # Audio samples
+            'spc_driver': (0xc8000, 0x2000),       # SPC-700 driver code
+            'sample_table': (0xca000, 0x1000),     # Sample pointer table
+            'instrument_data': (0xcb000, 0x2000),  # Instrument definitions
+            'sequence_data': (0xcd000, 0x8000),    # Music sequences
+            'sample_data': (0xd5000, 0x10000),     # Audio samples
         }
         
         # Known music track info (from game analysis)
@@ -38,7 +38,7 @@ class FFMQMusicExtractor:
             0x07: "Game Over",
             0x08: "Crystal Theme",
             0x09: "Final Battle",
-            0x0A: "Ending Theme",
+            0x0a: "Ending Theme",
         }
     
     def load_rom(self) -> bool:
@@ -137,23 +137,23 @@ class FFMQMusicExtractor:
             0x07: "OR A,[dp+X]",
             0x08: "OR A,#imm",
             0x09: "OR dp,dp",
-            0x0A: "OR1 C,mem.bit",
-            0x0B: "ASL dp",
-            0x0C: "ASL abs",
-            0x0D: "PUSH PSW",
-            0x0E: "TSET1 abs",
-            0x0F: "BRK",
+            0x0a: "OR1 C,mem.bit",
+            0x0b: "ASL dp",
+            0x0c: "ASL abs",
+            0x0d: "PUSH PSW",
+            0x0e: "TSET1 abs",
+            0x0f: "BRK",
             0x20: "CLRP",
             0x40: "SETP",
             0x60: "CLRC",
             0x80: "SETC",
-            0xCD: "MOV X,#imm",
-            0xE8: "MOV A,#imm",
-            0xF0: "BEQ rel",
-            0xFC: "INC Y",
-            0xFD: "MOV Y,A",
-            0xFE: "DBNZ Y,rel",
-            0xFF: "STOP",
+            0xcd: "MOV X,#imm",
+            0xe8: "MOV A,#imm",
+            0xf0: "BEQ rel",
+            0xfc: "INC Y",
+            0xfd: "MOV Y,A",
+            0xfe: "DBNZ Y,rel",
+            0xff: "STOP",
         }
         return spc_opcodes.get(opcode)
     
@@ -166,7 +166,7 @@ class FFMQMusicExtractor:
         for i in range(0, len(data) - 1, 2):
             if i + 1 < len(data):
                 word = struct.unpack('<H', data[i:i+2])[0]
-                if 0x0200 <= word <= 0xFFFF:  # Valid SPC-700 address range
+                if 0x0200 <= word <= 0xffff:  # Valid SPC-700 address range
                     pattern_counts[f"ptr_{word:04X}"] = pattern_counts.get(f"ptr_{word:04X}", 0) + 1
         
         output_file.write("Potential pointer tables:\n")
@@ -199,7 +199,7 @@ class FFMQMusicExtractor:
             sequence_starts = []
             for i in range(len(data) - 4):
                 # Look for potential sequence headers
-                if data[i] in [0xF0, 0xF1, 0xF2, 0xF3, 0xF4, 0xF5]:  # Common sequence commands
+                if data[i] in [0xf0, 0xf1, 0xf2, 0xf3, 0xf4, 0xf5]:  # Common sequence commands
                     sequence_starts.append(i)
             
             f.write(f"Found {len(sequence_starts)} potential sequence starts\n\n")
@@ -222,30 +222,30 @@ class FFMQMusicExtractor:
         """Analyze music sequence commands"""
         # Common music sequence commands in SNES games
         commands = {
-            0xF0: "End of track",
-            0xF1: "Jump",
-            0xF2: "Call subroutine",
-            0xF3: "Return",
-            0xF4: "Set tempo",
-            0xF5: "Set volume",
-            0xF6: "Set instrument",
-            0xF7: "Pan",
-            0xF8: "Vibrato",
-            0xF9: "Tremolo",
-            0xFA: "Echo",
-            0xFB: "Pitch bend",
-            0xFC: "Note length",
-            0xFD: "Transpose",
-            0xFE: "Loop",
-            0xFF: "Special command",
+            0xf0: "End of track",
+            0xf1: "Jump",
+            0xf2: "Call subroutine",
+            0xf3: "Return",
+            0xf4: "Set tempo",
+            0xf5: "Set volume",
+            0xf6: "Set instrument",
+            0xf7: "Pan",
+            0xf8: "Vibrato",
+            0xf9: "Tremolo",
+            0xfa: "Echo",
+            0xfb: "Pitch bend",
+            0xfc: "Note length",
+            0xfd: "Transpose",
+            0xfe: "Loop",
+            0xff: "Special command",
         }
         
         output_file.write("  Commands found:\n")
         for i, byte in enumerate(data[:16]):
             if byte in commands:
                 output_file.write(f"    ${i:02X}: ${byte:02X} - {commands[byte]}\n")
-            elif 0x00 <= byte <= 0x7F:  # Potential note data
-                note = byte & 0x7F
+            elif 0x00 <= byte <= 0x7f:  # Potential note data
+                note = byte & 0x7f
                 output_file.write(f"    ${i:02X}: ${byte:02X} - Note {note}\n")
     
     def extract_sample_data(self) -> bool:
@@ -292,7 +292,7 @@ class FFMQMusicExtractor:
             header = data[i]
             
             # Check if this looks like a BRR header
-            range_val = (header >> 4) & 0x0F
+            range_val = (header >> 4) & 0x0f
             filter_val = (header >> 2) & 0x03
             loop_flag = (header >> 1) & 0x01
             end_flag = header & 0x01

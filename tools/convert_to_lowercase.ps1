@@ -1,4 +1,4 @@
-<#
+﻿<#
 .SYNOPSIS
 	Convert all ASM code and hex values to lowercase.
 
@@ -7,8 +7,8 @@
 	- Assembly instructions (LDA → lda, STA → sta, etc.)
 	- Registers (A, X, Y → a, x, y)
 	- Directives (.ORG → .org, .DB → .db, etc.)
-	- Hexadecimal values ($0ABC → $0abc, $FF → $ff)
-	- Label hex addresses (DATA8_0A8000 → DATA8_0a8000)
+	- Hexadecimal values ($0abc → $0abc, $ff → $ff)
+	- Label hex addresses (DATA8_0a8000 → DATA8_0a8000)
 
 .PARAMETER Path
 	File or directory to convert. Directories are processed recursively.
@@ -51,16 +51,16 @@ param(
 
 	[Parameter(Mandatory = $false)]
 	[ValidateSet('ASM', 'Markdown', 'CSV', 'JSON', 'PowerShell', 'Python', 'All')]
-	[string]$FileType = 'ASM',
+	[string]$fileType = 'ASM',
 
 	[Parameter()]
-	[switch]$DryRun,
+	[switch]$dryRun,
 
 	[Parameter()]
 	[switch]$SkipBackup,
 
 	[Parameter()]
-	[string[]]$Filter
+	[string[]]$filter
 )
 
 #region Configuration
@@ -273,10 +273,10 @@ function Convert-LabelHexToLowercase {
 
 	return $codePart + $commentPart
 }function Convert-MarkdownContent {
-	param([string]$Content)
+	param([string]$content)
 
 	# Convert hex values in markdown
-	$result = Convert-HexToLowercase -Text $Content
+	$result = Convert-HexToLowercase -Text $content
 
 	# Convert hex in code blocks and inline code
 	# This preserves the structure but lowercases hex
@@ -285,11 +285,11 @@ function Convert-LabelHexToLowercase {
 }
 
 function Convert-CsvContent {
-	param([string]$Content)
+	param([string]$content)
 
 	# Convert hex values in CSV
 	# Be careful with quoted fields
-	$lines = $Content -split "`r`n|`r|`n"
+	$lines = $content -split "`r`n|`r|`n"
 	$convertedLines = @()
 
 	foreach ($line in $lines) {
@@ -302,22 +302,22 @@ function Convert-CsvContent {
 }
 
 function Convert-JsonContent {
-	param([string]$Content)
+	param([string]$content)
 
 	# Convert hex values in JSON
 	# Be careful with string values
-	$result = Convert-HexToLowercase -Text $Content
+	$result = Convert-HexToLowercase -Text $content
 	$result = Convert-LabelHexToLowercase -Text $result
 
 	return $result
 }
 
 function Convert-PowerShellContent {
-	param([string]$Content)
+	param([string]$content)
 
 	# Convert hex values in PowerShell scripts
 	# Be careful with strings and comments
-	$lines = $Content -split "`r`n|`r|`n"
+	$lines = $content -split "`r`n|`r|`n"
 	$convertedLines = @()
 
 	foreach ($line in $lines) {
@@ -331,10 +331,10 @@ function Convert-PowerShellContent {
 }
 
 function Convert-PythonContent {
-	param([string]$Content)
+	param([string]$content)
 
 	# Convert hex values in Python scripts
-	$lines = $Content -split "`r`n|`r|`n"
+	$lines = $content -split "`r`n|`r|`n"
 	$convertedLines = @()
 
 	foreach ($line in $lines) {
@@ -355,13 +355,13 @@ function Convert-PythonContent {
 	return ($convertedLines -join "`r`n")
 }function Convert-FileContent {
 	param(
-		[string]$Content,
-		[string]$Extension
+		[string]$content,
+		[string]$extension
 	)
 
-	switch ($Extension.ToLower()) {
+	switch ($extension.ToLower()) {
 		{ $_ -in @('.asm', '.s', '.inc') } {
-			$lines = $Content -split "`r`n|`r|`n"
+			$lines = $content -split "`r`n|`r|`n"
 			$convertedLines = @()
 			foreach ($line in $lines) {
 				$convertedLines += Convert-AsmLine -Line $line
@@ -369,23 +369,23 @@ function Convert-PythonContent {
 			return ($convertedLines -join "`r`n")
 		}
 		'.md' {
-			return Convert-MarkdownContent -Content $Content
+			return Convert-MarkdownContent -Content $content
 		}
 		'.csv' {
-			return Convert-CsvContent -Content $Content
+			return Convert-CsvContent -Content $content
 		}
 		'.json' {
-			return Convert-JsonContent -Content $Content
+			return Convert-JsonContent -Content $content
 		}
 		'.ps1' {
-			return Convert-PowerShellContent -Content $Content
+			return Convert-PowerShellContent -Content $content
 		}
 		'.py' {
-			return Convert-PythonContent -Content $Content
+			return Convert-PythonContent -Content $content
 		}
 		default {
-			Write-Status "Unknown file type: $Extension" -Type Warning
-			return $Content
+			Write-Status "Unknown file type: $extension" -Type Warning
+			return $content
 		}
 	}
 }
@@ -393,24 +393,24 @@ function Convert-PythonContent {
 function Test-FileChanged {
 	param(
 		[string]$Original,
-		[string]$Converted
+		[string]$converted
 	)
 
-	return $Original -cne $Converted  # Case-sensitive comparison
+	return $Original -cne $converted  # Case-sensitive comparison
 }
 
 function Get-ChangeCount {
 	param(
 		[string]$Original,
-		[string]$Converted
+		[string]$converted
 	)
 
-	if ([string]::IsNullOrEmpty($Original) -and [string]::IsNullOrEmpty($Converted)) {
+	if ([string]::IsNullOrEmpty($Original) -and [string]::IsNullOrEmpty($converted)) {
 		return 0
 	}
 
 	$originalLines = if ($Original) { $Original -split "`r`n|`r|`n" } else { @() }
-	$convertedLines = if ($Converted) { $Converted -split "`r`n|`r|`n" } else { @() }
+	$convertedLines = if ($converted) { $converted -split "`r`n|`r|`n" } else { @() }
 
 	$maxCount = [Math]::Max($originalLines.Count, $convertedLines.Count)
 	if ($maxCount -eq 0) { return 0 }
@@ -429,7 +429,7 @@ function Get-ChangeCount {
 }function Get-FilesToProcess {
 	param(
 		[string]$Path,
-		[string[]]$Filter
+		[string[]]$filter
 	)
 
 	if (Test-Path -Path $Path -PathType Leaf) {
@@ -437,7 +437,7 @@ function Get-ChangeCount {
 	}
 	elseif (Test-Path -Path $Path -PathType Container) {
 		$files = @()
-		foreach ($pattern in $Filter) {
+		foreach ($pattern in $filter) {
 			$files += Get-ChildItem -Path $Path -Filter $pattern -Recurse -File
 		}
 		return $files
@@ -449,21 +449,21 @@ function Get-ChangeCount {
 
 function Convert-File {
 	param(
-		[System.IO.FileInfo]$File,
-		[bool]$DryRun,
+		[System.IO.FileInfo]$file,
+		[bool]$dryRun,
 		[bool]$SkipBackup
 	)
 
-	Write-Status "Processing: $($File.FullName)" -Type Verbose
+	Write-Status "Processing: $($file.FullName)" -Type Verbose
 
 	try {
 		# Read file
-		$originalContent = Get-Content -Path $File.FullName -Raw -Encoding UTF8
+		$originalContent = Get-Content -Path $file.FullName -Raw -Encoding UTF8
 
 		if ([string]::IsNullOrEmpty($originalContent)) {
 			Write-Status "  File is empty, skipping" -Type Verbose
 			return @{
-				File = $File.FullName
+				File = $file.FullName
 				Changed = $false
 				ChangeCount = 0
 			}
@@ -471,13 +471,13 @@ function Convert-File {
 
 		# Convert content
 		try {
-			$convertedContent = Convert-FileContent -Content $originalContent -Extension $File.Extension
+			$convertedContent = Convert-FileContent -Content $originalContent -Extension $file.Extension
 		}
 		catch {
 			Write-Status "  ✗ Error converting content: $_" -Type Error
 			Write-Status "  Stack trace: $($_.ScriptStackTrace)" -Type Verbose
 			return @{
-				File = $File.FullName
+				File = $file.FullName
 				Changed = $false
 				Error = "Conversion error: $($_.Exception.Message)"
 			}
@@ -487,7 +487,7 @@ function Convert-File {
 		if (-not (Test-FileChanged -Original $originalContent -Converted $convertedContent)) {
 			Write-Status "  No changes needed" -Type Verbose
 			return @{
-				File = $File.FullName
+				File = $file.FullName
 				Changed = $false
 				ChangeCount = 0
 			}
@@ -495,10 +495,10 @@ function Convert-File {
 
 		$changeCount = Get-ChangeCount -Original $originalContent -Converted $convertedContent
 
-		if ($DryRun) {
-			Write-Status "  [DRY-RUN] Would convert: $($File.Name) ($changeCount lines changed)" -Type Warning
+		if ($dryRun) {
+			Write-Status "  [DRY-RUN] Would convert: $($file.Name) ($changeCount lines changed)" -Type Warning
 			return @{
-				File = $File.FullName
+				File = $file.FullName
 				Changed = $true
 				DryRun = $true
 				ChangeCount = $changeCount
@@ -507,18 +507,18 @@ function Convert-File {
 
 		# Create backup
 		if (-not $SkipBackup) {
-			$backupPath = $File.FullName + '.bak'
-			Copy-Item -Path $File.FullName -Destination $backupPath -Force
+			$backupPath = $file.FullName + '.bak'
+			Copy-Item -Path $file.FullName -Destination $backupPath -Force
 			Write-Status "  Backup created: $backupPath" -Type Verbose
 		}
 
 		# Write converted content (preserve encoding)
-		[System.IO.File]::WriteAllText($File.FullName, $convertedContent, [System.Text.UTF8Encoding]::new($true))
+		[System.IO.File]::WriteAllText($file.FullName, $convertedContent, [System.Text.UTF8Encoding]::new($true))
 
-		Write-Status "  ✓ Converted: $($File.Name) ($changeCount lines changed)" -Type Success
+		Write-Status "  ✓ Converted: $($file.Name) ($changeCount lines changed)" -Type Success
 
 		return @{
-			File = $File.FullName
+			File = $file.FullName
 			Changed = $true
 			DryRun = $false
 			ChangeCount = $changeCount
@@ -528,7 +528,7 @@ function Convert-File {
 		Write-Status "  ✗ Error: $_" -Type Error
 		Write-Status "  Stack trace: $($_.ScriptStackTrace)" -Type Verbose
 		return @{
-			File = $File.FullName
+			File = $file.FullName
 			Changed = $false
 			Error = $_.Exception.Message
 		}
@@ -551,13 +551,13 @@ try {
 	# Resolve path
 	$resolvedPath = Resolve-Path -Path $Path -ErrorAction Stop
 	Write-Host "Target: $resolvedPath" -ForegroundColor White
-	Write-Host "File Type: $FileType" -ForegroundColor White
+	Write-Host "File Type: $fileType" -ForegroundColor White
 
 	# Determine filter
-	$actualFilter = if ($Filter) { $Filter } else { $script:FileTypeFilters[$FileType] }
+	$actualFilter = if ($filter) { $filter } else { $script:FileTypeFilters[$fileType] }
 	Write-Host "Filter: $($actualFilter -join ', ')" -ForegroundColor White
 
-	if ($DryRun) {
+	if ($dryRun) {
 		Write-Host "Mode: DRY-RUN (preview only)" -ForegroundColor Yellow
 	}
 	else {
@@ -579,7 +579,7 @@ try {
 	# Process files
 	$results = @()
 	foreach ($file in $files) {
-		$result = Convert-File -File $file -DryRun:$DryRun -SkipBackup:$SkipBackup
+		$result = Convert-File -File $file -DryRun:$dryRun -SkipBackup:$SkipBackup
 		$results += $result
 	}
 
@@ -601,7 +601,7 @@ try {
 		Write-Host "Errors: $totalErrors" -ForegroundColor Red
 	}
 
-	if ($DryRun -and $totalChanged -gt 0) {
+	if ($dryRun -and $totalChanged -gt 0) {
 		Write-Host "`nRe-run without -DryRun to apply changes." -ForegroundColor Yellow
 	}
 

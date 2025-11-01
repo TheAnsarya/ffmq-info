@@ -1,4 +1,4 @@
-# FFMQ SNES Development - Coding Standards & Directives
+﻿# FFMQ SNES Development - Coding Standards & Directives
 
 **Version:** 1.0  
 **Last Updated:** January 24, 2025  
@@ -117,7 +117,7 @@ function Test-RomIntegrity {
 
 ### Hexadecimal Notation
 - **Always use lowercase:** `0xff`, `0x1234`, `$80`, `$c000`
-- **Never use uppercase:** ~~0xFF~~, ~~0x1234~~, ~~$C000~~
+- **Never use uppercase:** ~~0xFF~~, ~~0x1234~~, ~~$c000~~
 
 ### Comments
 Every assembly file should include:

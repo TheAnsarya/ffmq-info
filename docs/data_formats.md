@@ -1,4 +1,4 @@
-# FFMQ Data Format Specifications
+﻿# FFMQ Data Format Specifications
 
 This document describes all binary data formats used in Final Fantasy: Mystic Quest.
 
@@ -44,19 +44,19 @@ db $20,$22,$22,$20
 ### Special Tile Values
 | Value | Meaning |
 |-------|---------|
-| `$FB` | Empty/transparent tile |
-| `$9A` | Common padding/filler |
-| `$9B` | Common padding/filler |
-| `$00-$7F` | Standard graphics tiles |
-| `$80-$FF` | Extended/special tiles |
+| `$fb` | Empty/transparent tile |
+| `$9a` | Common padding/filler |
+| `$9b` | Common padding/filler |
+| `$00-$7f` | Standard graphics tiles |
+| `$80-$ff` | Extended/special tiles |
 
 ### Memory Map
 | Address Range | Description |
 |---------------|-------------|
-| `$068000-$0681FF` | Metatile Set 1 (Overworld/outdoor, 128 metatiles) |
-| `$068200-$0683FF` | Metatile Set 2 (Indoor/building, 128 metatiles) |
-| `$068400-$0685FF` | Metatile Set 3 (Dungeon/cave, 128 metatiles) |
-| `$06A000-$06AFFF` | Collision data (interleaved with screen layouts) |
+| `$068000-$0681ff` | Metatile Set 1 (Overworld/outdoor, 128 metatiles) |
+| `$068200-$0683ff` | Metatile Set 2 (Indoor/building, 128 metatiles) |
+| `$068400-$0685ff` | Metatile Set 3 (Dungeon/cave, 128 metatiles) |
+| `$06a000-$06afff` | Collision data (interleaved with screen layouts) |
 
 ### Python Class
 ```python
@@ -164,9 +164,9 @@ Byte 0: Low byte of address
 Byte 1: High byte of address
 
 Example:
-db $2D,$03
-	; Address = $032D (little-endian)
-	; Points to text string at Bank $08 offset $032D
+db $2d,$03
+	; Address = $032d (little-endian)
+	; Points to text string at Bank $08 offset $032d
 ```
 
 ### Address Calculation
@@ -175,8 +175,8 @@ ROM Address = Bank Base + Pointer Value
 Bank Base = $088000 (Bank $08 start)
 
 Example:
-Pointer = $032D
-ROM Address = $088000 + $032D = $08832D
+Pointer = $032d
+ROM Address = $088000 + $032d = $08832d
 ```
 
 ### Python Class
@@ -191,7 +191,7 @@ print(f"Message 0 points to ${pointer.address:04X}")
 
 # Generate ASM
 asm_code = pointer.to_asm()
-# Output: db $2D,$03  ; Msg $00: $032D
+# Output: db $2d,$03  ; Msg $00: $032d
 ```
 
 ---
@@ -214,41 +214,41 @@ Structure:
 ### Control Codes
 | Code | Name | Function |
 |------|------|----------|
-| `$F0` | END | End message, close dialog box |
-| `$F1` | NEWLINE | Start new line within dialog |
-| `$F2` | WAIT | Wait for player input before continuing |
-| `$F3` | CLEAR | Clear screen, continue dialog |
-| `$F4` | VAR | Insert variable (number, stat, etc.) |
-| `$F5` | ITEM | Insert item name |
-| `$F6` | CHAR | Insert character name |
-| `$F7` | NUM | Format number with padding |
+| `$f0` | END | End message, close dialog box |
+| `$f1` | NEWLINE | Start new line within dialog |
+| `$f2` | WAIT | Wait for player input before continuing |
+| `$f3` | CLEAR | Clear screen, continue dialog |
+| `$f4` | VAR | Insert variable (number, stat, etc.) |
+| `$f5` | ITEM | Insert item name |
+| `$f6` | CHAR | Insert character name |
+| `$f7` | NUM | Format number with padding |
 
 ### Example
 ```asm
 ; "Hello World!" message
 DATA8_088400:
-	db $48,$65,$6C,$6C,$6F  ; "Hello"
+	db $48,$65,$6c,$6c,$6f  ; "Hello"
 	db $20                   ; Space
-	db $57,$6F,$72,$6C,$64  ; "World"
+	db $57,$6f,$72,$6c,$64  ; "World"
 	db $21                   ; "!"
-	db $F0                   ; END control code
+	db $f0                   ; END control code
 	db $00                   ; Null terminator
 
 ; Multi-line dialog
 DATA8_088410:
-	db $47,$72,$65,$65,$74,$69,$6E,$67,$73,$21  ; "Greetings!"
-	db $F1                   ; NEWLINE
-	db $57,$65,$6C,$63,$6F,$6D,$65,$21          ; "Welcome!"
-	db $F2                   ; WAIT for input
-	db $F0                   ; END
+	db $47,$72,$65,$65,$74,$69,$6e,$67,$73,$21  ; "Greetings!"
+	db $f1                   ; NEWLINE
+	db $57,$65,$6c,$63,$6f,$6d,$65,$21          ; "Welcome!"
+	db $f2                   ; WAIT for input
+	db $f0                   ; END
 	db $00                   ; Null terminator
 ```
 
 ### Character Encoding
 See `simple.tbl` for full character map. Common mappings:
-- `$20-$5A`: Standard ASCII letters/numbers
-- `$61-$7A`: Lowercase letters
-- `$F0-$F7`: Control codes
+- `$20-$5a`: Standard ASCII letters/numbers
+- `$61-$7a`: Lowercase letters
+- `$f0-$f7`: Control codes
 - `$00`: Null terminator
 
 ### Python Class
@@ -294,24 +294,24 @@ Bit  15:    Unused (always 0)
 ### Example
 ```asm
 ; Pure red (R=31, G=0, B=0)
-db $1F,$00
+db $1f,$00
 	; Binary: 00000_00000_11111
-	; RGB555: $001F
+	; RGB555: $001f
 
 ; Pure green (R=0, G=31, B=0)
-db $E0,$03
+db $e0,$03
 	; Binary: 00000_11111_00000
-	; RGB555: $03E0
+	; RGB555: $03e0
 
 ; Pure blue (R=0, G=0, B=31)
-db $00,$7C
+db $00,$7c
 	; Binary: 11111_00000_00000
-	; RGB555: $7C00
+	; RGB555: $7c00
 
 ; White (R=31, G=31, B=31)
-db $FF,$7F
+db $ff,$7f
 	; Binary: 11111_11111_11111
-	; RGB555: $7FFF
+	; RGB555: $7fff
 
 ; Black (R=0, G=0, B=0)
 db $00,$00
@@ -340,7 +340,7 @@ print(f"RGB888: {color.to_rgb888()}")
 
 # Generate ASM
 asm_code = color.to_asm()
-# Output: db $1F,$00  ; RGB(31, 0, 0)
+# Output: db $1f,$00  ; RGB(31, 0, 0)
 ```
 
 ---

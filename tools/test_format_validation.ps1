@@ -1,4 +1,4 @@
-<#
+﻿<#
 .SYNOPSIS
 	Comprehensive test suite for format_asm.ps1 validation.
 
@@ -76,32 +76,32 @@ function Write-TestInfo {
 }
 
 function Get-FileHash256 {
-	param([string]$FilePath)
-	if (-not (Test-Path $FilePath)) {
+	param([string]$filePath)
+	if (-not (Test-Path $filePath)) {
 		return $null
 	}
-	return (Get-FileHash -Path $FilePath -Algorithm SHA256).Hash
+	return (Get-FileHash -Path $filePath -Algorithm SHA256).Hash
 }
 
 function Compare-Files {
 	param(
-		[string]$File1,
-		[string]$File2
+		[string]$file1,
+		[string]$file2
 	)
 
-	if (-not (Test-Path $File1)) {
-		return @{ Match = $false; Reason = "File1 not found: $File1" }
+	if (-not (Test-Path $file1)) {
+		return @{ Match = $false; Reason = "File1 not found: $file1" }
 	}
 
-	if (-not (Test-Path $File2)) {
-		return @{ Match = $false; Reason = "File2 not found: $File2" }
+	if (-not (Test-Path $file2)) {
+		return @{ Match = $false; Reason = "File2 not found: $file2" }
 	}
 
-	$hash1 = Get-FileHash256 -FilePath $File1
-	$hash2 = Get-FileHash256 -FilePath $File2
+	$hash1 = Get-FileHash256 -FilePath $file1
+	$hash2 = Get-FileHash256 -FilePath $file2
 
-	$size1 = (Get-Item $File1).Length
-	$size2 = (Get-Item $File2).Length
+	$size1 = (Get-Item $file1).Length
+	$size2 = (Get-Item $file2).Length
 
 	return @{
 		Match = ($hash1 -eq $hash2)
@@ -130,8 +130,8 @@ function Add-TestResult {
 	param(
 		[string]$TestName,
 		[bool]$Passed,
-		[string]$Details = "",
-		[string]$Evidence = ""
+		[string]$details = "",
+		[string]$evidence = ""
 	)
 
 	$script:TestResults.TotalTests++
@@ -145,8 +145,8 @@ function Add-TestResult {
 	$script:TestResults.Tests += @{
 		Name = $TestName
 		Passed = $Passed
-		Details = $Details
-		Evidence = $Evidence
+		Details = $details
+		Evidence = $evidence
 		Timestamp = Get-Date
 	}
 }

@@ -1,4 +1,4 @@
-"""
+﻿"""
 Extract Bank $06 Map Tilemap Data
 ==================================
 
@@ -31,7 +31,7 @@ METATILE_DATA_START = 0x068000  # All metatiles stored sequentially
 METATILE_COUNT = 256  # Total metatiles in Bank $06 (256 * 4 bytes = 1024 bytes = $400)
 
 # Collision data appears interleaved with tilemap data
-# Starting around 0x06A000
+# Starting around 0x06a000
 
 def load_rom(filepath: str) -> bytes:
     """Load ROM file and return raw bytes."""
@@ -83,7 +83,7 @@ def classify_metatile(metatile: Metatile, tile_id: int) -> str:
         return "Empty/transparent"
     
     # Check for common padding
-    if all(t in [0x9A, 0x9B] for t in tiles):
+    if all(t in [0x9a, 0x9b] for t in tiles):
         return "Padding/filler"
     
     # Check if all tiles are same (solid color/pattern)
@@ -167,7 +167,7 @@ def main():
     
     # Extract collision data (heuristic - actual location may vary)
     print("  - Collision data...")
-    collision_start = 0x06A000  # Estimated based on ROM analysis
+    collision_start = 0x06a000  # Estimated based on ROM analysis
     collision_data = extract_collision_data(rom_data, collision_start, 256)
     
     print(f"  Total collision entries: {len(collision_data)}")

@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+﻿#!/usr/bin/env python3
 """
 Final Fantasy Mystic Quest - Text Extractor
 Extracts text data from FFMQ ROM for translation and analysis
@@ -20,33 +20,33 @@ class FFMQTextExtractor:
         # Text character table (basic ASCII mapping)
         self.char_table = {
             0x00: ' ',   0x01: '!',   0x02: '"',   0x03: '#',   0x04: '$',   0x05: '%',   0x06: '&',   0x07: "'",
-            0x08: '(',   0x09: ')',   0x0A: '*',   0x0B: '+',   0x0C: ',',   0x0D: '-',   0x0E: '.',   0x0F: '/',
+            0x08: '(',   0x09: ')',   0x0a: '*',   0x0b: '+',   0x0c: ',',   0x0d: '-',   0x0e: '.',   0x0f: '/',
             0x10: '0',   0x11: '1',   0x12: '2',   0x13: '3',   0x14: '4',   0x15: '5',   0x16: '6',   0x17: '7',
-            0x18: '8',   0x19: '9',   0x1A: ':',   0x1B: ';',   0x1C: '<',   0x1D: '=',   0x1E: '>',   0x1F: '?',
+            0x18: '8',   0x19: '9',   0x1a: ':',   0x1b: ';',   0x1c: '<',   0x1d: '=',   0x1e: '>',   0x1f: '?',
             0x20: '@',   0x21: 'A',   0x22: 'B',   0x23: 'C',   0x24: 'D',   0x25: 'E',   0x26: 'F',   0x27: 'G',
-            0x28: 'H',   0x29: 'I',   0x2A: 'J',   0x2B: 'K',   0x2C: 'L',   0x2D: 'M',   0x2E: 'N',   0x2F: 'O',
+            0x28: 'H',   0x29: 'I',   0x2a: 'J',   0x2b: 'K',   0x2c: 'L',   0x2d: 'M',   0x2e: 'N',   0x2f: 'O',
             0x30: 'P',   0x31: 'Q',   0x32: 'R',   0x33: 'S',   0x34: 'T',   0x35: 'U',   0x36: 'V',   0x37: 'W',
-            0x38: 'X',   0x39: 'Y',   0x3A: 'Z',   0x3B: '[',   0x3C: '\\',  0x3D: ']',   0x3E: '^',   0x3F: '_',
+            0x38: 'X',   0x39: 'Y',   0x3a: 'Z',   0x3b: '[',   0x3c: '\\',  0x3d: ']',   0x3e: '^',   0x3f: '_',
             0x40: '`',   0x41: 'a',   0x42: 'b',   0x43: 'c',   0x44: 'd',   0x45: 'e',   0x46: 'f',   0x47: 'g',
-            0x48: 'h',   0x49: 'i',   0x4A: 'j',   0x4B: 'k',   0x4C: 'l',   0x4D: 'm',   0x4E: 'n',   0x4F: 'o',
+            0x48: 'h',   0x49: 'i',   0x4a: 'j',   0x4b: 'k',   0x4c: 'l',   0x4d: 'm',   0x4e: 'n',   0x4f: 'o',
             0x50: 'p',   0x51: 'q',   0x52: 'r',   0x53: 's',   0x54: 't',   0x55: 'u',   0x56: 'v',   0x57: 'w',
-            0x58: 'x',   0x59: 'y',   0x5A: 'z',   0x5B: '{',   0x5C: '|',   0x5D: '}',   0x5E: '~',   0x5F: ' ',
+            0x58: 'x',   0x59: 'y',   0x5a: 'z',   0x5b: '{',   0x5c: '|',   0x5d: '}',   0x5e: '~',   0x5f: ' ',
             # Special characters and control codes
-            0xFE: '[NEWLINE]',
-            0xFF: '[END]',
-            0xFD: '[WAIT]',
-            0xFC: '[CLEAR]',
+            0xfe: '[NEWLINE]',
+            0xff: '[END]',
+            0xfd: '[WAIT]',
+            0xfc: '[CLEAR]',
         }
         
         # Text section locations in ROM (estimated)
         self.text_locations = {
-            'main_dialogue': (0xB0000, 0x8000),     # Main story dialogue
-            'item_names': (0xB8000, 0x1000),       # Item names
-            'spell_names': (0xB9000, 0x800),       # Spell names
-            'character_names': (0xB9800, 0x400),   # Character names
-            'location_names': (0xBA000, 0x800),    # Location names
-            'menu_text': (0xBB000, 0x1000),        # Menu text
-            'battle_text': (0xBC000, 0x1000),      # Battle messages
+            'main_dialogue': (0xb0000, 0x8000),     # Main story dialogue
+            'item_names': (0xb8000, 0x1000),       # Item names
+            'spell_names': (0xb9000, 0x800),       # Spell names
+            'character_names': (0xb9800, 0x400),   # Character names
+            'location_names': (0xba000, 0x800),    # Location names
+            'menu_text': (0xbb000, 0x1000),        # Menu text
+            'battle_text': (0xbc000, 0x1000),      # Battle messages
         }
     
     def load_rom(self) -> bool:
@@ -83,7 +83,7 @@ class FFMQTextExtractor:
             byte = data[offset]
             
             # End of string
-            if byte == 0xFF or byte == 0x00:
+            if byte == 0xff or byte == 0x00:
                 break
             
             # Convert byte to character
@@ -129,7 +129,7 @@ class FFMQTextExtractor:
                 pointer = struct.unpack('<H', data[i:i+2])[0]
                 
                 # Check if this looks like a valid text pointer
-                if 0x8000 <= pointer <= 0xFFFF:
+                if 0x8000 <= pointer <= 0xffff:
                     # Convert to offset within the text section
                     text_offset = pointer - 0x8000
                     if 0 <= text_offset < len(data) - text_section_start:

@@ -1,4 +1,4 @@
-# REALITY CHECK SESSION - 2025-10-25
+﻿# REALITY CHECK SESSION - 2025-10-25
 **Commit:** b70f3a2  
 **Status:** ✅ **Truth Revealed - 0.27% Real Progress**
 
@@ -130,7 +130,7 @@ Boot_Sequence:
     ; Inputs: None (system just powered on or reset)
     ; Outputs: CPU in native mode, ready for 16-bit operations
     ; Side Effects: Clears carry flag, changes processor mode
-    ; Called By: RESET vector at $00FFFC
+    ; Called By: RESET vector at $00fffc
     ; Calls: CODE_008247 (hardware init)
     ; ===========================================================================
     CLC                     ; Clear carry flag (required for XCE)
@@ -149,14 +149,14 @@ Boot_Sequence:
 
 **Graphics:**
 ```assembly
-org $028C80
+org $028c80
 Graphics_Main_Tiles:
     incbin "data/graphics/tiles.bin"    ; 9,295 tiles
 ```
 
 **Palettes:**
 ```assembly
-org $07A000
+org $07a000
 Palette_Characters:
     incbin "assets/graphics/palettes/character_palettes.bin"
 ```

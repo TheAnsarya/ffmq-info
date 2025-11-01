@@ -1,4 +1,4 @@
-# Changelog - FFMQ Reverse Engineering Project
+﻿# Changelog - FFMQ Reverse Engineering Project
 
 ## [1.2.0] - 2025-10-25 - REALITY CHECK: Honest Progress Assessment 🎯
 
@@ -144,7 +144,7 @@
 ### 📚 Documentation Added
 - **GRAPHICS_PALETTE_WORKFLOW.md** - Complete palette editing guide
   * Explains SNES BGR555 color format
-  * Palette memory map ($07A000-$07A500)
+  * Palette memory map ($07a000-$07a500)
   * Editing workflow (JSON → BIN → ROM)
   * Before/After comparison (grayscale → colorized)
 - **SPRITE_GUIDE.md** - Quick reference in palettes directory
@@ -293,7 +293,7 @@
 - Fixed character table file location
 
 **Extraction:**
-- ✅ Fixed dialog extraction (was $100000 beyond ROM, now $00D636 pointer table)
+- ✅ Fixed dialog extraction (was $100000 beyond ROM, now $00d636 pointer table)
 - ✅ Fixed text extraction crash on invalid address
 - ✅ Added pointer-based text extraction method
 - ✅ Fixed graphics tracker (now shows 100% instead of 0%)

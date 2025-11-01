@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+﻿#!/usr/bin/env python3
 """
 Final Fantasy Mystic Quest - Graphics Extractor
 Extracts graphics data from FFMQ ROM for editing and analysis
@@ -22,10 +22,10 @@ class FFMQGraphicsExtractor:
             'font': (0x80000, 0x2000),          # Font graphics
             'sprites': (0x85000, 0x8000),       # Character sprites  
             'tiles': (0x90000, 0x10000),        # Background tiles
-            'portraits': (0xA0000, 0x8000),     # Character portraits
-            'ui_elements': (0xA8000, 0x4000),   # UI graphics
-            'enemies': (0xAC000, 0x8000),       # Enemy sprites
-            'effects': (0xB4000, 0x4000),       # Special effects
+            'portraits': (0xa0000, 0x8000),     # Character portraits
+            'ui_elements': (0xa8000, 0x4000),   # UI graphics
+            'enemies': (0xac000, 0x8000),       # Enemy sprites
+            'effects': (0xb4000, 0x4000),       # Special effects
         }
         
     def load_rom(self) -> bool:
@@ -164,9 +164,9 @@ class FFMQGraphicsExtractor:
         """Extract palette data from ROM"""
         # Palette locations (estimated based on typical SNES layout)
         palette_locations = [
-            (0x8D800, 0x200, "main_palette"),
-            (0x8DA00, 0x200, "battle_palette"),
-            (0x8DC00, 0x200, "menu_palette"),
+            (0x8d800, 0x200, "main_palette"),
+            (0x8da00, 0x200, "battle_palette"),
+            (0x8dc00, 0x200, "menu_palette"),
         ]
         
         os.makedirs(self.output_dir, exist_ok=True)
@@ -195,9 +195,9 @@ class FFMQGraphicsExtractor:
                     if i + 1 < len(data):
                         color_word = struct.unpack('<H', data[i:i+2])[0]
                         # SNES RGB555 format: 0BBBBBGGGGGRRRRR
-                        r = (color_word & 0x1F) << 3
-                        g = ((color_word >> 5) & 0x1F) << 3
-                        b = ((color_word >> 10) & 0x1F) << 3
+                        r = (color_word & 0x1f) << 3
+                        g = ((color_word >> 5) & 0x1f) << 3
+                        b = ((color_word >> 10) & 0x1f) << 3
                         f.write(f"Color {i//2:02X}: RGB({r:02X},{g:02X},{b:02X}) SNES:${color_word:04X}\n")
             
             print(f"Palette extracted: {name}")

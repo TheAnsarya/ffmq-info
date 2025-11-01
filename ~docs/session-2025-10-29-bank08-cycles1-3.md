@@ -1,4 +1,4 @@
-# Disassembly Documentation Session - October 29, 2025
+﻿# Disassembly Documentation Session - October 29, 2025
 ## Bank $08 Text/Dialogue Data - Cycles 1-3
 
 ### Session Overview
@@ -35,31 +35,31 @@
 
 **Major Discovery**: Bank $08 contains BOTH text data AND graphics tile mapping data!
 
-#### Section 1: Compressed Text Strings ($088000-$08B300)
+#### Section 1: Compressed Text Strings ($088000-$08b300)
 - **NPC Dialogue**: Character conversations, quest text, story events
 - **Battle Messages**: Attack text, damage notifications, status effects
 - **Menu Labels**: Equipment names, item descriptions, UI labels
 - **Character Encoding**: Custom tile mapping via `simple.tbl` file (NOT ASCII)
 - **Compression System**:
   - **RLE (Run-Length Encoding)**: Repeated characters compressed
-  - **Dictionary References**: Common phrases stored once, referenced by HIGH BYTES ($80-$EF)
+  - **Dictionary References**: Common phrases stored once, referenced by HIGH BYTES ($80-$ef)
   - **Variable-Length Encoding**: Frequent characters use fewer bits
   - **Compression Ratio**: ~40-50% space savings vs uncompressed
 
-#### Section 2: Tile Mapping Tables ($08B300-$08B500)
+#### Section 2: Tile Mapping Tables ($08b300-$08b500)
 - **Graphics Tile Indices**: Direct references to tile bitmaps in Bank $07
 - **Border Graphics**: Dialogue window borders, menu box edges
 - **Background Patterns**: Fill tiles for text box interiors
 - **Layout Data**: Tile arrangement for 8x8 and 16x16 meta-tiles
 - **No Compression**: Direct 1-byte-per-tile mapping (different from text)
 
-#### Section 3: Mixed Pointers + Formatting ($08B500-$08C300)
+#### Section 3: Mixed Pointers + Formatting ($08b500-$08c300)
 - **Hybrid Data**: Pointers to both text strings AND tile data
 - **Control Code Templates**: Multi-line formatting sequences
 - **Parameters**: Spacing, scroll speed, positioning coordinates
 - **Flags**: String type identifiers, graphics mode selectors
 
-#### Section 4: Graphics Pattern Data ($08C300+)
+#### Section 4: Graphics Pattern Data ($08c300+)
 - **Tile Arrangement Patterns**: Pre-built UI element layouts
 - **Window Border Construction**: Multi-tile border assembly data
 - **Shadow/Highlight Combinations**: Visual depth effects for text boxes
@@ -73,36 +73,36 @@ Bank $08 integration with game engine:
 3. **Bank $00 Decompression**: Text string decompressed using dictionary lookups
 4. **Tile Pattern Load**: Graphics tiles for dialogue window background loaded
 5. **Character Rendering**: Text rendered character-by-character using `simple.tbl` mapping
-6. **Control Code Processing**: $F0-$FF codes handle newlines, pauses, colors
+6. **Control Code Processing**: $f0-$ff codes handle newlines, pauses, colors
 7. **Graphics Assembly**: Window borders/backgrounds arranged from tile indices
 
 ### Character Encoding Specifications
 
 **Text Mode** (string data):
-- `$00-$1F`: Control characters, punctuation, low ASCII
+- `$00-$1f`: Control characters, punctuation, low ASCII
 - `$20`: SPACE (extremely common in all strings)
-- `$21-$7F`: Standard character tiles (letters, numbers, symbols via simple.tbl)
-- `$80-$EF`: Dictionary references or extended characters
-  - Example: `$C9,$03` = "dictionary entry #3" (common phrase like "I am" or "the knight")
-- `$F0`: END_STRING marker (terminates all text strings)
-- `$F1-$F7`: Formatting codes (newline, pause, clear, wait, color, scroll)
-- `$F8-$FF`: Extended control codes (advanced text functions)
+- `$21-$7f`: Standard character tiles (letters, numbers, symbols via simple.tbl)
+- `$80-$ef`: Dictionary references or extended characters
+  - Example: `$c9,$03` = "dictionary entry #3" (common phrase like "I am" or "the knight")
+- `$f0`: END_STRING marker (terminates all text strings)
+- `$f1-$f7`: Formatting codes (newline, pause, clear, wait, color, scroll)
+- `$f8-$ff`: Extended control codes (advanced text functions)
 
 **Tile Mode** (graphics data):
-- `$00-$FF`: Direct graphics tile indices (different context from text!)
-- `$6C-$6E`: Border tiles (horizontal/vertical edges, corners)
-- `$76,$7A`: Window edge tiles
-- `$38-$4B`: Interior fill patterns, shadow effects
+- `$00-$ff`: Direct graphics tile indices (different context from text!)
+- `$6c-$6e`: Border tiles (horizontal/vertical edges, corners)
+- `$76,$7a`: Window edge tiles
+- `$38-$4b`: Interior fill patterns, shadow effects
 
 ### Control Code Functions
 
 Documented in Cycles 1-3:
-- **$F0**: END_STRING - Marks text termination
-- **$F1**: NEWLINE - Line break with optional spacing parameter
-- **$F2**: CLEAR_WINDOW - Clear text box or scroll content
-- **$F3**: SCROLL_TEXT - Scroll with speed/distance parameter
-- **$FE**: WAIT_FOR_INPUT - Pause until button press (page breaks)
-- **$FF**: EFFECT_TRIGGER - Visual/audio effect synchronization
+- **$f0**: END_STRING - Marks text termination
+- **$f1**: NEWLINE - Line break with optional spacing parameter
+- **$f2**: CLEAR_WINDOW - Clear text box or scroll content
+- **$f3**: SCROLL_TEXT - Scroll with speed/distance parameter
+- **$fe**: WAIT_FOR_INPUT - Pause until button press (page breaks)
+- **$ff**: EFFECT_TRIGGER - Visual/audio effect synchronization
 
 ### Compression Examples
 
@@ -114,15 +114,15 @@ Documented in Cycles 1-3:
 
 **Bank $08 Compressed**:
 ```
-$26,$07,$07,$00,$06,$11,$2D,$49,$48 [9 bytes = "Hello, t"]
-+ $8F,$03 [2 bytes = dictionary "raveler. I am "]
-+ $49,$38,$2E,$27 [4 bytes = "Benj"]
-+ $C9,$12 [2 bytes = dictionary "amin, the "]
-+ $2D,$18,$0A,$1E [4 bytes = "Knig"]
-+ $8F,$07 [2 bytes = dictionary "ht of "]
-+ $39,$07,$2D,$07 [4 bytes = "Gemi"]
-+ $DB,$01 [2 bytes = dictionary "ni."]
-+ $F0 [1 byte = END]
+$26,$07,$07,$00,$06,$11,$2d,$49,$48 [9 bytes = "Hello, t"]
++ $8f,$03 [2 bytes = dictionary "raveler. I am "]
++ $49,$38,$2e,$27 [4 bytes = "Benj"]
++ $c9,$12 [2 bytes = dictionary "amin, the "]
++ $2d,$18,$0a,$1e [4 bytes = "Knig"]
++ $8f,$07 [2 bytes = dictionary "ht of "]
++ $39,$07,$2d,$07 [4 bytes = "Gemi"]
++ $db,$01 [2 bytes = dictionary "ni."]
++ $f0 [1 byte = END]
 = Total: ~30 bytes compressed vs 53 uncompressed
 = 43% compression ratio
 ```
@@ -139,7 +139,7 @@ $26,$07,$07,$00,$06,$11,$2D,$49,$48 [9 bytes = "Hello, t"]
 - Text Pointer Table Structure ($088000-$088330)
   - Variable-length entries: 2-6 bytes per pointer
   - Bank-relative addressing: `$088000 + pointer = absolute address`
-  - Example: Pointer `$032D` → address `$08832D`
+  - Example: Pointer `$032d` → address `$08832d`
 - Character Encoding System explained
   - Custom tile mapping (NOT ASCII)
   - Control code ranges defined
@@ -157,21 +157,21 @@ $26,$07,$07,$00,$06,$11,$2D,$49,$48 [9 bytes = "Hello, t"]
 
 **Key Content**:
 - Battle Text Analysis:
-  - Damage placeholder markers (`$7E` = damage value insertion point)
-  - Color change codes (`$ED` = highlight damage numbers)
-  - Effect triggers (`$FF` = screen shake/flash sync)
+  - Damage placeholder markers (`$7e` = damage value insertion point)
+  - Color change codes (`$ed` = highlight damage numbers)
+  - Effect triggers (`$ff` = screen shake/flash sync)
 - Menu and Equipment Text:
   - Sequential numbering patterns (`$21-$24` = "1234" menu items)
-  - Separator codes (`$5C` = menu cursor/divider)
+  - Separator codes (`$5c` = menu cursor/divider)
   - Item list structures
 - Control Code Sequences:
-  - Pure formatting blocks (multiple `$F0,$F1` with parameters)
+  - Pure formatting blocks (multiple `$f0,$f1` with parameters)
   - Padding/alignment sections
   - Section boundary markers
 - Compression System Analysis:
   - RLE pattern identification (repeated `$39` bytes)
-  - Dictionary reference patterns (`$C9,$03` = phrase lookup)
-  - HIGH BYTE usage ($80-$EF range)
+  - Dictionary reference patterns (`$c9,$03` = phrase lookup)
+  - HIGH BYTE usage ($80-$ef range)
 
 **Technical Depth**: 80.5% documentation ratio (322 docs / 400 source)
 
@@ -186,9 +186,9 @@ $26,$07,$07,$00,$06,$11,$2D,$49,$48 [9 bytes = "Hello, t"]
   - Sequential patterns (`$01,$02,$03` = adjacent tiles)
   - Repeated tiles (`$10,$10,$10` = solid fills)
 - Dialogue Window Graphics:
-  - Border tile arrangements (`$6C` = horizontal edges)
-  - Corner/junction tiles (`$6E`)
-  - Interior fill patterns (`$38-$4B` range)
+  - Border tile arrangements (`$6c` = horizontal edges)
+  - Corner/junction tiles (`$6e`)
+  - Interior fill patterns (`$38-$4b` range)
 - Mixed Data Sections:
   - Pointers to both text AND graphics
   - Hybrid formatting blocks
@@ -205,8 +205,8 @@ $26,$07,$07,$00,$06,$11,$2D,$49,$48 [9 bytes = "Hello, t"]
 
 ### Bank $00 (System Kernel)
 - **Text Rendering Engine**: Decompression routines, character display
-- **Dictionary Lookup**: Common phrase table ($80-$EF references)
-- **Control Code Handlers**: $F0-$FF function implementations
+- **Dictionary Lookup**: Common phrase table ($80-$ef references)
+- **Control Code Handlers**: $f0-$ff function implementations
 
 ### Bank $03 (Script/Dialogue Engine)
 - **Text Display Commands**: Calls Bank $08 with dialogue ID parameters

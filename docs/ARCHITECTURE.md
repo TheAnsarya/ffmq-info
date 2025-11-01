@@ -1,4 +1,4 @@
-# Final Fantasy Mystic Quest - System Architecture
+﻿# Final Fantasy Mystic Quest - System Architecture
 
 ## Document Overview
 
@@ -31,7 +31,7 @@ Final Fantasy Mystic Quest is a Super Nintendo Entertainment System (SNES) game 
 - **Platform:** Super Nintendo Entertainment System (SNES)
 - **Processor:** 65816 CPU (16-bit with 8-bit mode)
 - **ROM Size:** 512KB (4 Mbit)
-- **ROM Mapping:** LoROM (banks $00-$0F mapped to $8000-$FFFF)
+- **ROM Mapping:** LoROM (banks $00-$0f mapped to $8000-$ffff)
 - **SRAM:** Battery-backed save data
 - **Architecture:** Event-driven with fixed game loop
 
@@ -54,26 +54,26 @@ The game is organized into several major subsystems:
 
 ### Bank Organization (LoROM Mapping)
 
-Each bank occupies $8000 bytes ($0000-$7FFF in PC space, $8000-$FFFF in SNES space).
+Each bank occupies $8000 bytes ($0000-$7fff in PC space, $8000-$ffff in SNES space).
 
 | Bank | SNES Address | PC Address | Primary Contents | Key Components |
 |------|--------------|------------|------------------|----------------|
-| **$00** | $00:8000-$00:FFFF | $000000-$007FFF | **Core Engine & Initialization** | Boot sequence, NMI/IRQ handlers, core engine routines, initialization code |
-| **$01** | $01:8000-$01:FFFF | $008000-$00FFFF | **Engine Code** | Additional engine routines, DMA handlers, utility functions |
-| **$02** | $02:8000-$02:FFFF | $010000-$017FFF | **Engine Routines** | Extended engine code, graphics helpers, system utilities |
-| **$03** | $03:8000-$03:FFFF | $018000-$01FFFF | **Game Logic** | Core game logic, event handlers, script interpreter |
-| **$04** | $04:8000-$04:FFFF | $020000-$027FFF | **Graphics Data (Tiles)** | Character/enemy sprite graphics (2BPP/4BPP format at $04:8000) |
-| **$05** | $05:8000-$05:FFFF | $028000-$02FFFF | **Graphics Data (Main Tiles)** | Primary tileset graphics ($05:8C80), background tiles, metatiles |
-| **$06** | $06:8000-$06:FFFF | $030000-$037FFF | **Map Data & Routines** | Map tilemaps ($06:8000+), collision data, map-related code |
-| **$07** | $07:8000-$07:FFFF | $038000-$03FFFF | **Palettes & Sprite Graphics** | Color palettes ($07:B013+), additional sprite data, visual assets |
-| **$08** | $08:8000-$08:FFFF | $040000-$047FFF | **Game Data & Text** | Text pointers, dialogue strings, compressed text, item/spell names |
-| **$09** | $09:8000-$09:FFFF | $048000-$04FFFF | **Battle System** | Combat engine, damage formulas, enemy AI, battle animations |
-| **$0A** | $0A:8000-$0A:FFFF | $050000-$057FFF | **Game Logic** | Character management, inventory system, progression tracking |
-| **$0B** | $0B:8000-$0B:FFFF | $058000-$05FFFF | **Game Logic** | Additional game mechanics, field abilities, puzzle logic |
-| **$0C** | $0C:8000-$0C:FFFF | $060000-$067FFF | **Menu System & UI** | Menu rendering, text display routines, UI navigation, OAM clearing ($0C:8948) |
-| **$0D** | $0D:8000-$0D:FFFF | $068000-$06FFFF | **Menu & UI** | Extended menu code, character screens, inventory display |
-| **$0E** | $0E:8000-$0E:FFFF | $070000-$077FFF | **Additional Systems** | Supplementary game systems, special events |
-| **$0F** | $0F:8000-$0F:FFFF | $078000-$07FFFF | **Additional Code** | Extended routines, overflow code, miscellaneous |
+| **$00** | $00:8000-$00:FFFF | $000000-$007fff | **Core Engine & Initialization** | Boot sequence, NMI/IRQ handlers, core engine routines, initialization code |
+| **$01** | $01:8000-$01:FFFF | $008000-$00ffff | **Engine Code** | Additional engine routines, DMA handlers, utility functions |
+| **$02** | $02:8000-$02:FFFF | $010000-$017fff | **Engine Routines** | Extended engine code, graphics helpers, system utilities |
+| **$03** | $03:8000-$03:FFFF | $018000-$01ffff | **Game Logic** | Core game logic, event handlers, script interpreter |
+| **$04** | $04:8000-$04:FFFF | $020000-$027fff | **Graphics Data (Tiles)** | Character/enemy sprite graphics (2BPP/4BPP format at $04:8000) |
+| **$05** | $05:8000-$05:FFFF | $028000-$02ffff | **Graphics Data (Main Tiles)** | Primary tileset graphics ($05:8C80), background tiles, metatiles |
+| **$06** | $06:8000-$06:FFFF | $030000-$037fff | **Map Data & Routines** | Map tilemaps ($06:8000+), collision data, map-related code |
+| **$07** | $07:8000-$07:FFFF | $038000-$03ffff | **Palettes & Sprite Graphics** | Color palettes ($07:B013+), additional sprite data, visual assets |
+| **$08** | $08:8000-$08:FFFF | $040000-$047fff | **Game Data & Text** | Text pointers, dialogue strings, compressed text, item/spell names |
+| **$09** | $09:8000-$09:FFFF | $048000-$04ffff | **Battle System** | Combat engine, damage formulas, enemy AI, battle animations |
+| **$0a** | $0a:8000-$0a:FFFF | $050000-$057fff | **Game Logic** | Character management, inventory system, progression tracking |
+| **$0b** | $0b:8000-$0b:FFFF | $058000-$05ffff | **Game Logic** | Additional game mechanics, field abilities, puzzle logic |
+| **$0c** | $0c:8000-$0c:FFFF | $060000-$067fff | **Menu System & UI** | Menu rendering, text display routines, UI navigation, OAM clearing ($0c:8948) |
+| **$0d** | $0d:8000-$0d:FFFF | $068000-$06ffff | **Menu & UI** | Extended menu code, character screens, inventory display |
+| **$0e** | $0e:8000-$0e:FFFF | $070000-$077fff | **Additional Systems** | Supplementary game systems, special events |
+| **$0f** | $0f:8000-$0f:FFFF | $078000-$07ffff | **Additional Code** | Extended routines, overflow code, miscellaneous |
 
 ### Bank Usage Patterns
 
@@ -85,11 +85,11 @@ Each bank occupies $8000 bytes ($0000-$7FFF in PC space, $8000-$FFFF in SNES spa
 ├─────────────────────────────────────────┤
 │ Banks $06-$08: Maps, Palettes, Text     │ ← Streamed/loaded as needed
 ├─────────────────────────────────────────┤
-│ Banks $09-$0B: Battle & Game Logic      │ ← Context-switched during battles
+│ Banks $09-$0b: Battle & Game Logic      │ ← Context-switched during battles
 ├─────────────────────────────────────────┤
-│ Banks $0C-$0D: Menu System              │ ← Loaded when menus active
+│ Banks $0c-$0d: Menu System              │ ← Loaded when menus active
 ├─────────────────────────────────────────┤
-│ Banks $0E-$0F: Extended Systems         │ ← Auxiliary/overflow code
+│ Banks $0e-$0f: Extended Systems         │ ← Auxiliary/overflow code
 └─────────────────────────────────────────┘
 ```
 
@@ -127,8 +127,8 @@ Byte 3: Bottom-Right 8x8 tile index
 - Item/spell/monster names
 - Compressed text data
 
-#### Bank $0C: OAM Management
-- **$0C:8948** - `ClearOAM` routine (fills $220 bytes of OAM via DMA channel 5)
+#### Bank $0c: OAM Management
+- **$0c:8948** - `ClearOAM` routine (fills $220 bytes of OAM via DMA channel 5)
 
 ---
 
@@ -142,12 +142,12 @@ The SNES uses a complex memory map with multiple regions. FFMQ uses the followin
 
 | Address Range | Size | Purpose | Details |
 |---------------|------|---------|---------|
-| **$7E:0000-$7E:1FFF** | 8KB | Low RAM (Bank $00 mirror) | Fast access, critical variables, stack ($0100-$01FF) |
-| **$7E:2000-$7E:7FFF** | 24KB | Extended WRAM | Game variables, buffers, temporary storage |
-| **$7E:8000-$7E:FFFF** | 32KB | WRAM Bank $7E | Additional game state, large buffers |
-| **$7F:0000-$7F:FFFF** | 64KB | WRAM Bank $7F | Extended memory, rarely used in FFMQ |
+| **$7e:0000-$7e:1FFF** | 8KB | Low RAM (Bank $00 mirror) | Fast access, critical variables, stack ($0100-$01ff) |
+| **$7e:2000-$7e:7FFF** | 24KB | Extended WRAM | Game variables, buffers, temporary storage |
+| **$7e:8000-$7e:FFFF** | 32KB | WRAM Bank $7e | Additional game state, large buffers |
+| **$7f:0000-$7f:FFFF** | 64KB | WRAM Bank $7f | Extended memory, rarely used in FFMQ |
 
-**Total WRAM:** 128KB (FFMQ primarily uses ~64KB in banks $7E-$7F)
+**Total WRAM:** 128KB (FFMQ primarily uses ~64KB in banks $7e-$7f)
 
 #### Save RAM (SRAM)
 
@@ -171,7 +171,7 @@ The SNES uses a complex memory map with multiple regions. FFMQ uses the followin
 **Critical PPU Registers:**
 - **$2100 (INIDISP)** - Screen brightness/blanking
 - **$2105 (BGMODE)** - Background mode selection
-- **$2107-$210A** - Background tilemap addresses
+- **$2107-$210a** - Background tilemap addresses
 - **$2115-$2119** - VRAM access control/data
 - **$2121-$2122 (CGADD/CGDATA)** - Palette (CGRAM) access
 - **$2140-$2143** - SPC700 audio communication ports
@@ -180,7 +180,7 @@ The SNES uses a complex memory map with multiple regions. FFMQ uses the followin
 
 | Address Range | Size | Purpose |
 |---------------|------|---------|
-| **$0000-$7FFF** | 32KB word-addressable | Tile graphics ($0000-$5FFF), Tilemaps ($6000-$7FFF) |
+| **$0000-$7fff** | 32KB word-addressable | Tile graphics ($0000-$5fff), Tilemaps ($6000-$7fff) |
 
 **VRAM Access:** Through PPU registers $2115-$2119 (VMAIN, VMADDL, VMADDH, VMDATAL, VMDATAH)
 
@@ -188,7 +188,7 @@ The SNES uses a complex memory map with multiple regions. FFMQ uses the followin
 
 | Address Range | Size | Purpose |
 |---------------|------|---------|
-| **$00-$FF** | 512 bytes (256 colors × 2 bytes) | Palette memory (RGB555 format) |
+| **$00-$ff** | 512 bytes (256 colors × 2 bytes) | Palette memory (RGB555 format) |
 
 **CGRAM Access:** Through registers $2121 (CGADD) and $2122 (CGDATA)
 
@@ -196,18 +196,18 @@ The SNES uses a complex memory map with multiple regions. FFMQ uses the followin
 
 | Address Range | Size | Purpose |
 |---------------|------|---------|
-| **$00-$1FF** | 512 bytes | Sprite attributes (128 sprites × 4 bytes) |
-| **$200-$21F** | 32 bytes | Extended sprite attributes (size/toggle bits) |
+| **$00-$1ff** | 512 bytes | Sprite attributes (128 sprites × 4 bytes) |
+| **$200-$21f** | 32 bytes | Extended sprite attributes (size/toggle bits) |
 
 **OAM Access:** Through registers $2102-$2104 (OAMADDL, OAMADDH, OAMDATA)
 
-### RAM Variable Map (WRAM $7E:0000+)
+### RAM Variable Map (WRAM $7e:0000+)
 
 Key game variables are documented in `src/include/ffmq_ram_variables.inc`:
 
 **Critical Memory Locations:**
-- **$0100-$01FF** - CPU Stack
-- **$0C00+** - OAM buffer (544 bytes, DMA'd to hardware OAM)
+- **$0100-$01ff** - CPU Stack
+- **$0c00+** - OAM buffer (544 bytes, DMA'd to hardware OAM)
 - Game state flags, character stats, inventory, map state, etc.
 
 > **Note:** See [`RAM_MAP.md`](RAM_MAP.md) (future) for complete RAM variable documentation.
@@ -215,9 +215,9 @@ Key game variables are documented in `src/include/ffmq_ram_variables.inc`:
 ### Memory Access Patterns
 
 ```
-CPU ←──────────→ WRAM ($7E/$7F)
+CPU ←──────────→ WRAM ($7e/$7f)
  ↓               ↓
- ├──→ ROM Banks ($00-$0F:8000-FFFF via LoROM mapping)
+ ├──→ ROM Banks ($00-$0f:8000-FFFF via LoROM mapping)
  ├──→ SRAM ($70/$71 for save data)
  └──→ Hardware Registers ($21xx-$43xx)
       ↓
@@ -244,7 +244,7 @@ The SNES boot process follows this sequence when the console powers on:
 1. CPU starts in **8-bit mode** (emulation mode)
 2. Disable interrupts (SEI)
 3. Clear decimal mode (CLD)
-4. Initialize stack pointer ($0100-$01FF)
+4. Initialize stack pointer ($0100-$01ff)
 5. Switch to **native mode** (CLC, XCE for 65816 native 16-bit mode)
 
 #### 2. Hardware Initialization
@@ -267,9 +267,9 @@ The SNES boot process follows this sequence when the console powers on:
 #### 3. Memory Initialization
 
 **WRAM Clear:**
-- Zero out critical RAM regions ($7E:0000-$7E:1FFF)
+- Zero out critical RAM regions ($7e:0000-$7e:1FFF)
 - Initialize game variables to default states
-- Clear buffers (OAM buffer at $0C00+, etc.)
+- Clear buffers (OAM buffer at $0c00+, etc.)
 
 **SRAM Detection:**
 - Test SRAM presence
@@ -304,7 +304,7 @@ The SNES boot process follows this sequence when the console powers on:
 #### 7. Jump to Title Screen
 
 - Initialize title screen state
-- Enable screen rendering ($2100 = $0F)
+- Enable screen rendering ($2100 = $0f)
 - Enter main game loop
 
 ### Boot Sequence Diagram
@@ -349,7 +349,7 @@ RESET Vector ($00:8000)
    └─ Set interrupt vectors
    ↓
 [7] Enable Screen
-   ├─ Set brightness ($2100 = $0F)
+   ├─ Set brightness ($2100 = $0f)
    └─ Jump to main loop
    ↓
 Main Game Loop (Title Screen)
@@ -434,9 +434,9 @@ FFMQ uses a **mode-based architecture** where different game states (field, batt
 | Mode | State Variable | Handler Bank | Description |
 |------|----------------|--------------|-------------|
 | **Title Screen** | $00 | Banks $00-$03 | Logo, main menu, file select |
-| **Field/Overworld** | $01 | Banks $03, $06, $0A-$0B | Map navigation, NPC interaction, collision |
+| **Field/Overworld** | $01 | Banks $03, $06, $0a-$0b | Map navigation, NPC interaction, collision |
 | **Battle** | $02 | Bank $09 | Combat engine, enemy AI, animations |
-| **Menu** | $03 | Banks $0C-$0D | Inventory, equipment, status screens |
+| **Menu** | $03 | Banks $0c-$0d | Inventory, equipment, status screens |
 | **Event/Cutscene** | $04 | Bank $03 | Scripted sequences, dialogue, triggers |
 | **Transition** | $05 | Banks $00-$01 | Screen fades, map transitions |
 
@@ -470,11 +470,11 @@ Field Mode (walking)
 
 **Critical Operations During VBlank:**
 
-1. **DMA Sprite Data** - Transfer OAM buffer ($7E:0C00+) → hardware OAM
+1. **DMA Sprite Data** - Transfer OAM buffer ($7e:0C00+) → hardware OAM
 2. **DMA Tile Updates** - Transfer changed tiles → VRAM
 3. **Update Palettes** - Write CGRAM changes
-4. **Update Scroll Registers** - Background positions ($210D-$2114)
-5. **Read Controllers** - Joypad auto-read ($4218-$421B after auto-read completes)
+4. **Update Scroll Registers** - Background positions ($210d-$2114)
+5. **Read Controllers** - Joypad auto-read ($4218-$421b after auto-read completes)
 6. **Increment Timers** - Frame counter, RNG seed
 
 **Code Location:** Bank $00, NMI vector handler
@@ -494,9 +494,9 @@ FFMQ systems communicate through shared memory (WRAM) and function calls. There 
 **Example - Battle System → Graphics Engine:**
 ```
 Battle System writes to:
-  $7E:XXXX - Enemy sprite ID
-  $7E:YYYY - Enemy X position
-  $7E:ZZZZ - Enemy Y position
+  $7e:XXXX - Enemy sprite ID
+  $7e:YYYY - Enemy X position
+  $7e:ZZZZ - Enemy Y position
 
 Graphics Engine reads these and:
   - Builds OAM entries
@@ -524,7 +524,7 @@ Graphics Engine reads these and:
 ```asm
 ; Call text display routine from game logic
 LDA #$1234          ; Text string ID
-JSL DisplayText     ; Long call to text engine (Bank $0C)
+JSL DisplayText     ; Long call to text engine (Bank $0c)
 ; Text engine displays string, returns
 ```
 
@@ -540,11 +540,11 @@ JSL DisplayText     ; Long call to text engine (Bank $0C)
 **Graphics Data Flow:**
 
 ```
-Game Logic (Banks $03/$09/$0A/etc.)
+Game Logic (Banks $03/$09/$0a/etc.)
    ↓
 Build graphics data in WRAM buffers:
    - Tile changes → VRAM queue buffer
-   - Sprite positions → OAM buffer ($0C00+)
+   - Sprite positions → OAM buffer ($0c00+)
    - Palette changes → CGRAM queue buffer
    ↓
 VBlank Handler (NMI) triggered
@@ -560,7 +560,7 @@ Screen displays updated graphics
 **DMA Channels Used by FFMQ:**
 - **Channel 0:** VRAM tile uploads
 - **Channel 1:** Tilemap uploads
-- **Channel 5:** OAM transfers (`ClearOAM` at $0C:8948 uses channel 5)
+- **Channel 5:** OAM transfers (`ClearOAM` at $0c:8948 uses channel 5)
 - **Other channels:** Audio, palettes, dynamic transfers
 
 #### 4. Audio Communication (APU Ports)
@@ -672,7 +672,7 @@ Main CPU reads $2140 to confirm
          ↓                    ↓                    ↓
 ┌──────────────────┐  ┌──────────────────┐  ┌──────────────────┐
 │ Graphics Engine  │  │   Text Engine    │  │  Audio Engine    │
-│  (Banks 00-02)   │  │   (Bank $0C)     │  │  (SPC700 CPU)    │
+│  (Banks 00-02)   │  │   (Bank $0c)     │  │  (SPC700 CPU)    │
 ├──────────────────┤  ├──────────────────┤  ├──────────────────┤
 │ • Tile DMA       │  │ • Text Rendering │  │ • Music Playback │
 │ • Sprite Mgmt    │  │ • Text Boxes     │  │ • Sound Effects  │
@@ -693,8 +693,8 @@ Main CPU reads $2140 to confirm
 │ Screen │  │ System │  │ System │  │ System │  │ System │
 ├────────┤  ├────────┤  ├────────┤  ├────────┤  ├────────┤
 │ Bank   │  │ Banks  │  │ Bank   │  │ Banks  │  │ Bank   │
-│ $00-03 │  │ $03,06 │  │ $09    │  │ $0C-0D │  │ $03    │
-│        │  │ $0A-0B │  │        │  │        │  │        │
+│ $00-03 │  │ $03,06 │  │ $09    │  │ $0c-0D │  │ $03    │
+│        │  │ $0a-0B │  │        │  │        │  │        │
 ├────────┤  ├────────┤  ├────────┤  ├────────┤  ├────────┤
 │• Logo  │  │• Map   │  │• Combat│  │• Invent│  │• Script│
 │• Menu  │  │• Walk  │  │• AI    │  │• Equip │  │• NPC   │
@@ -724,7 +724,7 @@ Main CPU reads $2140 to confirm
 └──────┬──────┘
        ↓
 ┌──────────────────────────────────┐
-│  Joypad Auto-Read ($4218-$421B)  │
+│  Joypad Auto-Read ($4218-$421b)  │
 │  (During VBlank)                 │
 └──────────────┬───────────────────┘
                ↓
@@ -752,7 +752,7 @@ Main CPU reads $2140 to confirm
                ↓
 ┌──────────────────────────────────┐
 │  Build Graphics Buffers (WRAM)   │
-│  • OAM buffer ($0C00+)           │
+│  • OAM buffer ($0c00+)           │
 │  • VRAM update queue             │
 │  • Palette update queue          │
 └──────────────┬───────────────────┘

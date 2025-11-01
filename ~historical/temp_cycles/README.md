@@ -1,4 +1,4 @@
-# Temporary Cycle Files Archive
+﻿# Temporary Cycle Files Archive
 
 This directory contains 64 temporary assembly files that were created during the aggressive disassembly campaign on October 28-29, 2025.
 
@@ -34,8 +34,8 @@ The temp files are preserved here for historical reference and to document the d
 | $07  | 8 files    | cycle07-08 | ✅ Merged into bank_07_documented.asm (2,647 lines) |
 | $08  | 7 files    | cycle06 | ✅ Merged into bank_08_documented.asm (2,156 lines) |
 | $09  | 2 files    | cycle02 | ✅ Merged into bank_09_documented.asm (2,083 lines) |
-| $0A  | 1 file     | cycle01 | ✅ Merged into bank_0A_documented.asm (2,078 lines) |
-| $0F  | 1 file     | cycle01 | ✅ Merged into bank_0F_documented.asm |
+| $0a  | 1 file     | cycle01 | ✅ Merged into bank_0A_documented.asm (2,078 lines) |
+| $0f  | 1 file     | cycle01 | ✅ Merged into bank_0F_documented.asm |
 
 Additionally, 8 `*_import.asm` files from the DiztinGUIsh reference integration.
 

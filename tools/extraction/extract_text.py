@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+﻿#!/usr/bin/env python3
 """
 Final Fantasy Mystic Quest - Text/Dialog Extractor
 Extracts all text strings, dialog, item names, monster names from ROM
@@ -18,27 +18,27 @@ class TextExtractor:
     # Known text table locations in ROM (LoROM addresses)
     TEXT_TABLES = {
         'item_names': {
-            'address': 0x04F000,  # Approximate - needs verification
+            'address': 0x04f000,  # Approximate - needs verification
             'count': 256,
             'max_length': 12
         },
         'weapon_names': {
-            'address': 0x04F800,
+            'address': 0x04f800,
             'count': 64,
             'max_length': 12
         },
         'armor_names': {
-            'address': 0x04FC00,
+            'address': 0x04fc00,
             'count': 64,
             'max_length': 12
         },
         'accessory_names': {
-            'address': 0x04FD00,
+            'address': 0x04fd00,
             'count': 64,
             'max_length': 12
         },
         'spell_names': {
-            'address': 0x04FE00,
+            'address': 0x04fe00,
             'count': 64,
             'max_length': 12
         },
@@ -56,9 +56,9 @@ class TextExtractor:
         # Pointer table at $01d636 (PC address), points to strings in bank $03
         # See notes.txt: "$01d636 - start of a bank of text string pointers"
         'dialog': {
-            'pointer_table': 0x00D636,  # PC address of 16-bit pointer table
+            'pointer_table': 0x00d636,  # PC address of 16-bit pointer table
             'count': 256,  # Number of dialog strings
-            'bank': 0x03,  # Dialog stored in bank $03 (PC: $018000-$01FFFF)
+            'bank': 0x03,  # Dialog stored in bank $03 (PC: $018000-$01ffff)
             'max_length': 512
         }
     }
@@ -217,7 +217,7 @@ class TextExtractor:
             
             # Convert SNES address to PC address
             # Bank $03 SNES address to PC: $03xxxx -> $01xxxx (PC)
-            pc_addr = ((bank - 2) * 0x8000) + (ptr_addr & 0x7FFF)
+            pc_addr = ((bank - 2) * 0x8000) + (ptr_addr & 0x7fff)
             
             # Bounds check
             if pc_addr >= len(self.rom_data):

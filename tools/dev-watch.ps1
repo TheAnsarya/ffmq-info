@@ -1,14 +1,14 @@
-# FFMQ Development Watch Mode
+﻿# FFMQ Development Watch Mode
 # Auto-rebuilds on file changes and launches emulator
 # Modern SNES development workflow
 
 param(
-    [string]$EmulatorPath = "mesen-s.exe",
+    [string]$emulatorPath = "mesen-s.exe",
     [switch]$NoEmulator,
     [switch]$Verbose
 )
 
-$ErrorActionPreference = "Continue"
+$errorActionPreference = "Continue"
 
 # Colors
 function Write-Success { Write-Host $args -ForegroundColor Green }
@@ -18,14 +18,14 @@ function Write-Error { Write-Host $args -ForegroundColor Red }
 
 # Configuration
 $MainAsm = "src/asm/ffmq_complete.asm"
-$BaseRom = Resolve-Path "roms/Final Fantasy - Mystic Quest (U) (V1.1).sfc"
+$baseRom = Resolve-Path "roms/Final Fantasy - Mystic Quest (U) (V1.1).sfc"
 $OutputRom = "build/ffmq-modified.sfc"
 $WatchPath = "src/asm"
-$BuildDir = "build"
+$buildDir = "build"
 
 # Ensure build directory exists
-if (!(Test-Path $BuildDir)) {
-    New-Item -ItemType Directory -Path $BuildDir -Force | Out-Null
+if (!(Test-Path $buildDir)) {
+    New-Item -ItemType Directory -Path $buildDir -Force | Out-Null
 }
 
 # Banner
@@ -41,7 +41,7 @@ Write-Host "  • Build performance tracking"
 Write-Host "  • Error highlighting"
 Write-Host ""
 Write-Info "📂 Watching: $WatchPath/**/*.asm"
-Write-Info "🎮 Emulator: $EmulatorPath"
+Write-Info "🎮 Emulator: $emulatorPath"
 Write-Info "🔧 Main file: $MainAsm"
 Write-Host ""
 Write-Warning "Press Ctrl+C to exit"
@@ -63,7 +63,7 @@ function Invoke-Build {
     }
     
     # Copy base ROM
-    Copy-Item $BaseRom $OutputRom -Force
+    Copy-Item $baseRom $OutputRom -Force
     
     # Run asar
     $asarOutput = & asar --verbose --werror $MainAsm $OutputRom 2>&1
@@ -79,7 +79,7 @@ function Invoke-Build {
         if ($IsInitial -and !$NoEmulator) {
             Write-Info "🎮 Launching emulator..."
             try {
-                Start-Process $EmulatorPath -ArgumentList $OutputRom -ErrorAction SilentlyContinue
+                Start-Process $emulatorPath -ArgumentList $OutputRom -ErrorAction SilentlyContinue
                 Write-Success "✓ Emulator started"
             } catch {
                 Write-Warning "⚠ Could not launch emulator: $_"

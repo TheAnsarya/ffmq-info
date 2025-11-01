@@ -1,4 +1,4 @@
-# Build System v2.0 - Implementation Summary
+﻿# Build System v2.0 - Implementation Summary
 
 **Date**: October 30, 2025
 **Author**: Build System Team
@@ -109,7 +109,7 @@ Implemented a comprehensive, modern build system for the FFMQ SNES disassembly p
 
 ### Error Handling
 - Set-StrictMode enabled
-- $ErrorActionPreference = 'Stop'
+- $errorActionPreference = 'Stop'
 - Try/catch blocks around critical operations
 - Descriptive error messages
 - Proper cleanup in finally blocks

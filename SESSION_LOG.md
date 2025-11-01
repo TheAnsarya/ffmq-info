@@ -1,4 +1,4 @@
-# FFMQ Disassembly Session Log
+﻿# FFMQ Disassembly Session Log
 ## Session: October 26, 2025
 
 ### CRITICAL DISCOVERY: Graphics are COMPRESSED!
@@ -97,7 +97,7 @@
 ### SNES Architecture
 - 65816 CPU (16-bit)
 - LoROM mapping
-- Banks $00-$0F contain code
+- Banks $00-$0f contain code
 - DMA channels for fast transfers
 - VBlank for display updates
 

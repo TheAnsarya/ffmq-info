@@ -1,4 +1,4 @@
-"""
+﻿"""
 FFMQ Data Structures - Living data format classes
 ==================================================
 
@@ -47,11 +47,11 @@ class Metatile:
     
     Tile indices reference 8x8 graphics in VRAM.
     Special values:
-        $FB = Empty/transparent tile
-        $9A/$9B = Common padding/filler
+        $fb = Empty/transparent tile
+        $9a/$9b = Common padding/filler
     """
     
-    top_left: int  # 0x00-0xFF
+    top_left: int  # 0x00-0xff
     top_right: int
     bottom_left: int
     bottom_right: int
@@ -61,8 +61,8 @@ class Metatile:
     def __post_init__(self):
         """Validate tile indices are in valid range."""
         for tile in [self.top_left, self.top_right, self.bottom_left, self.bottom_right]:
-            if not (0 <= tile <= 0xFF):
-                raise ValueError(f"Tile index ${tile:02X} out of range (must be $00-$FF)")
+            if not (0 <= tile <= 0xff):
+                raise ValueError(f"Tile index ${tile:02X} out of range (must be $00-$ff)")
     
     @classmethod
     def from_bytes(cls, data: bytes, metatile_id: Optional[int] = None) -> 'Metatile':
@@ -144,8 +144,8 @@ class Metatile:
         )
     
     def is_empty(self) -> bool:
-        """Check if metatile is empty (all $FB tiles)."""
-        return all(tile == 0xFB for tile in [self.top_left, self.top_right, self.bottom_left, self.bottom_right])
+        """Check if metatile is empty (all $fb tiles)."""
+        return all(tile == 0xfb for tile in [self.top_left, self.top_right, self.bottom_left, self.bottom_right])
 
 
 @dataclass
@@ -265,8 +265,8 @@ class TextPointer:
     
     def to_asm(self) -> str:
         """Generate ASM pointer."""
-        low = self.address & 0xFF
-        high = (self.address >> 8) & 0xFF
+        low = self.address & 0xff
+        high = (self.address >> 8) & 0xff
         return f"    db ${low:02X},${high:02X}  ; Msg ${self.message_id:02X}: ${self.address:04X}"
     
     def to_dict(self) -> Dict[str, Any]:
@@ -290,14 +290,14 @@ class DialogString:
     Format:
         - Variable length, null-terminated ($00)
         - Control codes:
-            $F0 = End message
-            $F1 = Newline
-            $F2 = Wait for input
-            $F3 = Clear screen
-            $F4 = Variable insertion
-            $F5 = Item name
-            $F6 = Character name
-            $F7 = Number formatting
+            $f0 = End message
+            $f1 = Newline
+            $f2 = Wait for input
+            $f3 = Clear screen
+            $f4 = Variable insertion
+            $f5 = Item name
+            $f6 = Character name
+            $f7 = Number formatting
         - Text uses custom character encoding (see simple.tbl)
     """
     
@@ -322,7 +322,7 @@ class DialogString:
             data = data[:null_pos]
         
         # Extract control codes
-        control_codes = [i for i, b in enumerate(data) if 0xF0 <= b <= 0xF7]
+        control_codes = [i for i, b in enumerate(data) if 0xf0 <= b <= 0xf7]
         
         # Decode text if encoding table provided
         text = ""
@@ -330,7 +330,7 @@ class DialogString:
             for byte in data:
                 if byte in encoding_table:
                     text += encoding_table[byte]
-                elif 0xF0 <= byte <= 0xF7:
+                elif 0xf0 <= byte <= 0xf7:
                     text += f"<{byte:02X}>"  # Control code placeholder
                 else:
                     text += f"[{byte:02X}]"  # Unknown byte
@@ -426,15 +426,15 @@ class PaletteEntry:
         
         rgb555 = struct.unpack("<H", data)[0]
         
-        red = rgb555 & 0x1F
-        green = (rgb555 >> 5) & 0x1F
-        blue = (rgb555 >> 10) & 0x1F
+        red = rgb555 & 0x1f
+        green = (rgb555 >> 5) & 0x1f
+        blue = (rgb555 >> 10) & 0x1f
         
         return cls(red=red, green=green, blue=blue, palette_id=palette_id, color_index=color_index)
     
     def to_bytes(self) -> bytes:
         """Convert to 2-byte RGB555 little-endian."""
-        rgb555 = (self.red & 0x1F) | ((self.green & 0x1F) << 5) | ((self.blue & 0x1F) << 10)
+        rgb555 = (self.red & 0x1f) | ((self.green & 0x1f) << 5) | ((self.blue & 0x1f) << 10)
         return struct.pack("<H", rgb555)
     
     def to_asm(self) -> str:
@@ -469,7 +469,7 @@ class PaletteEntry:
     
     def to_rgb555(self) -> int:
         """Get RGB555 value as integer."""
-        return (self.red & 0x1F) | ((self.green & 0x1F) << 5) | ((self.blue & 0x1F) << 10)
+        return (self.red & 0x1f) | ((self.green & 0x1f) << 5) | ((self.blue & 0x1f) << 10)
     
     def to_rgb888(self) -> tuple[int, int, int]:
         """Convert to 8-bit RGB (for display/editing)."""

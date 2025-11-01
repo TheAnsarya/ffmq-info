@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+﻿#!/usr/bin/env python3
 """
 FFMQ Graphics + Palette Processor
 ==================================
@@ -44,23 +44,23 @@ class FFMQPaletteExtractor:
     PALETTE_DATA = {
         # Main gameplay palettes
         'character_palettes': {
-            'address': 0x07A000,  # Character sprite palettes
+            'address': 0x07a000,  # Character sprite palettes
             'count': 8,           # 8 different character palette sets
             'colors_per': 16,     # 16 colors per palette
         },
         'enemy_palettes': {
-            'address': 0x07A100,  # Enemy sprite palettes
+            'address': 0x07a100,  # Enemy sprite palettes
             'count': 16,          # Multiple enemy palettes
             'colors_per': 16,
         },
         'bg_palettes': {
-            'address': 0x07A300,  # Background tile palettes
+            'address': 0x07a300,  # Background tile palettes
             'count': 8,           # Multiple BG palettes
             'colors_per': 16,
         },
         # Battle palettes
         'battle_bg_palettes': {
-            'address': 0x07A500,  # Battle background palettes
+            'address': 0x07a500,  # Battle background palettes
             'count': 4,
             'colors_per': 16,
         },
@@ -92,9 +92,9 @@ class FFMQPaletteExtractor:
         color_word = struct.unpack('<H', self.rom_data[offset:offset+2])[0]
         
         # Extract BGR555
-        blue = (color_word >> 10) & 0x1F
-        green = (color_word >> 5) & 0x1F
-        red = color_word & 0x1F
+        blue = (color_word >> 10) & 0x1f
+        green = (color_word >> 5) & 0x1f
+        red = color_word & 0x1f
         
         return SNESColor(red, green, blue)
     

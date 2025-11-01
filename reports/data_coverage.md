@@ -1,4 +1,4 @@
-# Data Coverage Report
+﻿# Data Coverage Report
 
 **Generated**: November 1, 2025  
 **Project**: Final Fantasy: Mystic Quest Info  
@@ -46,7 +46,7 @@ This report tracks the extraction and documentation progress for all game data i
 | In-Game Testing         | ❌     | 0%       | Needs extracted data        |
 
 **ROM Locations**:
-- Character Data: Bank $0C, $0C8000 (4 entries × 32 bytes = 128 bytes)
+- Character Data: Bank $0c, $0c8000 (4 entries × 32 bytes = 128 bytes)
 - Stat Growth: Embedded in character entries
 
 **Extraction Priority**: HIGH  
@@ -74,8 +74,8 @@ This report tracks the extraction and documentation progress for all game data i
 | ROM Verification        | ❌     | 0%       | Needs extracted data        |
 
 **ROM Locations**:
-- Enemy Data: Bank $0E, $0E8000 (~100 enemies × 64 bytes = ~6400 bytes)
-- AI Scripts: Bank $0E, $0E0000-$0E1FFF (variable)
+- Enemy Data: Bank $0e, $0e8000 (~100 enemies × 64 bytes = ~6400 bytes)
+- AI Scripts: Bank $0e, $0e0000-$0e1fff (variable)
 
 **Extraction Priority**: MEDIUM  
 **Estimated Effort**: 6-8 hours  
@@ -104,10 +104,10 @@ This report tracks the extraction and documentation progress for all game data i
 | ROM Verification        | ❌     | 0%       | Needs extracted data        |
 
 **ROM Locations**:
-- Weapons: Bank $0C, $0C9000 (32 entries × 16 bytes = 512 bytes)
-- Armor: Bank $0C, $0C9200 (32 entries × 16 bytes = 512 bytes)
-- Accessories: Bank $0C, $0C9400 (32 entries × 16 bytes = 512 bytes)
-- Consumables: Bank $0C, $0C9600 (64 entries × 8 bytes = 512 bytes)
+- Weapons: Bank $0c, $0c9000 (32 entries × 16 bytes = 512 bytes)
+- Armor: Bank $0c, $0c9200 (32 entries × 16 bytes = 512 bytes)
+- Accessories: Bank $0c, $0c9400 (32 entries × 16 bytes = 512 bytes)
+- Consumables: Bank $0c, $0c9600 (64 entries × 8 bytes = 512 bytes)
 
 **Total**: 160 items, 2048 bytes
 
@@ -142,7 +142,7 @@ This report tracks the extraction and documentation progress for all game data i
 **ROM Locations**:
 - Map Headers: Bank $06, $068000 (64 maps × 32 bytes = 2048 bytes)
 - Metatiles: Bank $06, $068800 (256 metatiles × 8 bytes = 2048 bytes) ✅
-- Tilemap Data: Bank $06, $06A000 (variable size)
+- Tilemap Data: Bank $06, $06a000 (variable size)
 - Collision: Bank $06, $070000 (variable size)
 - Events: Bank $06, $078000 (variable size)
 
@@ -176,11 +176,11 @@ This report tracks the extraction and documentation progress for all game data i
 | Battle Text Extraction  | ⏳     | 0%       | ~100 entries estimated      |
 
 **ROM Locations**:
-- Encoding Table: Bank $0D, $0D0000 (256 bytes)
-- Dialog Text: Bank $0D, $0D8000-$0DBFFF (16 KB)
-- Menu Text: Bank $0D, $0DC000-$0DDFFF (8 KB)
-- Battle Text: Bank $0D, $0DE000-$0DEFFF (4 KB)
-- System Text: Bank $0D, $0DF000-$0DFFFF (4 KB)
+- Encoding Table: Bank $0d, $0d0000 (256 bytes)
+- Dialog Text: Bank $0d, $0d8000-$0dbfff (16 KB)
+- Menu Text: Bank $0d, $0dc000-$0ddfff (8 KB)
+- Battle Text: Bank $0d, $0de000-$0defff (4 KB)
+- System Text: Bank $0d, $0df000-$0dffff (4 KB)
 
 **Extraction Priority**: MEDIUM  
 **Estimated Effort**: 8-12 hours  
@@ -213,12 +213,12 @@ This report tracks the extraction and documentation progress for all game data i
 | Metadata Generation     | ⏳     | 0%       | JSON metadata files         |
 
 **ROM Locations**:
-- Title Graphics: Bank $04, $048000-$04FFFF (32 KB)
-- Map Tilesets: Bank $05, $050000-$057FFF (32 KB)
-- Character Sprites: Bank $05, $058000-$05BFFF (16 KB)
-- Enemy Sprites: Bank $05, $05C000-$05FFFF (16 KB)
-- UI Graphics: Bank $07, $070000-$073FFF (16 KB)
-- Palettes: Bank $07, $074000-$0747FF (2 KB)
+- Title Graphics: Bank $04, $048000-$04ffff (32 KB)
+- Map Tilesets: Bank $05, $050000-$057fff (32 KB)
+- Character Sprites: Bank $05, $058000-$05bfff (16 KB)
+- Enemy Sprites: Bank $05, $05c000-$05ffff (16 KB)
+- UI Graphics: Bank $07, $070000-$073fff (16 KB)
+- Palettes: Bank $07, $074000-$0747ff (2 KB)
 
 **Extraction Priority**: LOW  
 **Estimated Effort**: 12-16 hours  
@@ -250,10 +250,10 @@ This report tracks the extraction and documentation progress for all game data i
 | Battle BG Extraction    | ⏳     | 0%       | 32 battle backgrounds       |
 
 **ROM Locations**:
-- Formations: Bank $0E, $0E0000 (128 entries × 16 bytes = 2048 bytes)
-- Attacks: Bank $0E, $0E0800 (256 entries × 16 bytes = 4096 bytes)
-- Status Effects: Bank $0E, $0E2800 (13 entries × 8 bytes = 104 bytes)
-- Battle BGs: Bank $0E, $0E2900 (32 entries × 4 bytes = 128 bytes)
+- Formations: Bank $0e, $0e0000 (128 entries × 16 bytes = 2048 bytes)
+- Attacks: Bank $0e, $0e0800 (256 entries × 16 bytes = 4096 bytes)
+- Status Effects: Bank $0e, $0e2800 (13 entries × 8 bytes = 104 bytes)
+- Battle BGs: Bank $0e, $0e2900 (32 entries × 4 bytes = 128 bytes)
 
 **Extraction Priority**: MEDIUM  
 **Estimated Effort**: 6-8 hours  
@@ -282,10 +282,10 @@ This report tracks the extraction and documentation progress for all game data i
 | BRR Sample Extraction   | ⏳     | 0%       | Variable count              |
 
 **ROM Locations**:
-- Music Tracks: Bank $08, $080000-$087FFF (32 KB)
-- Sound Effects: Bank $08, $088000-$08BFFF (16 KB)
-- Instruments: Bank $08, $08C000-$08FFFF (16 KB)
-- Audio Driver: SPC RAM $0300-$07FF
+- Music Tracks: Bank $08, $080000-$087fff (32 KB)
+- Sound Effects: Bank $08, $088000-$08bfff (16 KB)
+- Instruments: Bank $08, $08c000-$08ffff (16 KB)
+- Audio Driver: SPC RAM $0300-$07ff
 
 **Extraction Priority**: LOW  
 **Estimated Effort**: 10-12 hours  

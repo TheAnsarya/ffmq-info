@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+﻿#!/usr/bin/env python3
 """
 FFMQ Disassembly Progress Tracker
 
@@ -59,7 +59,7 @@ class DisassemblyTracker:
 		self.config_file = project_root / "build.config.json"
 		self.rom_size = 1048576  # 1 MB SNES ROM
 		self.bank_size = 0x8000  # 32KB per bank
-		self.num_banks = 16  # Banks $00-$0F for 1MB ROM
+		self.num_banks = 16  # Banks $00-$0f for 1MB ROM
 
 		# Load configuration
 		self.config = self._load_config()
@@ -77,7 +77,7 @@ class DisassemblyTracker:
 		Get status information for a specific bank.
 
 		Args:
-			bank_num: Bank number (0x00 - 0x0F)
+			bank_num: Bank number (0x00 - 0x0f)
 
 		Returns:
 			BankStatus object with current status

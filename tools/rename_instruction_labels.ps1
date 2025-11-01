@@ -1,4 +1,4 @@
-<#
+﻿<#
 .SYNOPSIS
 	Rename labels that conflict with instruction names.
 
@@ -28,7 +28,7 @@ param(
 	[string]$Path,
 
 	[Parameter()]
-	[switch]$DryRun
+	[switch]$dryRun
 )
 
 # List of instruction names that might be used as labels
@@ -47,14 +47,14 @@ $script:InstructionNames = @(
 
 function Rename-InstructionLabels {
 	param(
-		[System.IO.FileInfo]$File,
-		[bool]$DryRun
+		[System.IO.FileInfo]$file,
+		[bool]$dryRun
 	)
 
-	Write-Host "Processing: $($File.FullName)" -ForegroundColor Cyan
+	Write-Host "Processing: $($file.FullName)" -ForegroundColor Cyan
 
 	# Read file
-	$content = Get-Content -Path $File.FullName -Raw -Encoding UTF8
+	$content = Get-Content -Path $file.FullName -Raw -Encoding UTF8
 	$lines = $content -split "`r`n|`r|`n"
 
 	$modified = $false
@@ -90,16 +90,16 @@ function Rename-InstructionLabels {
 	if (-not $modified) {
 		Write-Host "  No conflicting labels found" -ForegroundColor Gray
 		return @{
-			File = $File.FullName
+			File = $file.FullName
 			Changed = $false
 			ChangeCount = 0
 		}
 	}
 
-	if ($DryRun) {
+	if ($dryRun) {
 		Write-Host "  [DRY-RUN] Would rename $changeCount labels" -ForegroundColor Yellow
 		return @{
-			File = $File.FullName
+			File = $file.FullName
 			Changed = $true
 			DryRun = $true
 			ChangeCount = $changeCount
@@ -113,16 +113,16 @@ function Rename-InstructionLabels {
 	}
 
 	# Create backup
-	$backupPath = $File.FullName + '.bak'
-	Copy-Item -Path $File.FullName -Destination $backupPath -Force
+	$backupPath = $file.FullName + '.bak'
+	Copy-Item -Path $file.FullName -Destination $backupPath -Force
 
 	# Write file
-	[System.IO.File]::WriteAllText($File.FullName, $newContent, [System.Text.UTF8Encoding]::new($true))
+	[System.IO.File]::WriteAllText($file.FullName, $newContent, [System.Text.UTF8Encoding]::new($true))
 
 	Write-Host "  ✓ Renamed $changeCount labels" -ForegroundColor Green
 
 	return @{
-		File = $File.FullName
+		File = $file.FullName
 		Changed = $true
 		DryRun = $false
 		ChangeCount = $changeCount
@@ -146,7 +146,7 @@ Write-Host "Files to process: $($files.Count)`n" -ForegroundColor White
 # Process files
 $results = @()
 foreach ($file in $files) {
-	$result = Rename-InstructionLabels -File $file -DryRun:$DryRun
+	$result = Rename-InstructionLabels -File $file -DryRun:$dryRun
 	$results += $result
 }
 
@@ -159,7 +159,7 @@ Write-Host "Files processed: $($files.Count)" -ForegroundColor White
 Write-Host "Files modified: $totalChanged" -ForegroundColor Green
 Write-Host "Labels renamed: $totalLabelsRenamed" -ForegroundColor White
 
-if ($DryRun -and $totalChanged -gt 0) {
+if ($dryRun -and $totalChanged -gt 0) {
 	Write-Host "`nRe-run without -DryRun to apply changes." -ForegroundColor Yellow
 }
 

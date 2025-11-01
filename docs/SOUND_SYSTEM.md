@@ -1,4 +1,4 @@
-# Sound System Architecture
+﻿# Sound System Architecture
 
 Complete documentation of the Final Fantasy Mystic Quest sound and music system.
 
@@ -66,16 +66,16 @@ FFMQ uses the SNES SPC700 audio processor for all sound and music:
 ```
 Address     Size    Purpose
 ────────────────────────────────────────────
-$0000-$00FF  256B   Zero page (variables)
-$0100-$01FF  256B   Stack
-$0200-$02FF  256B   Communication buffer
-$0300-$07FF  1.25KB Audio driver code
-$0800-$0FFF  2KB    Instrument table
-$1000-$1FFF  4KB    Music sequence data
-$2000-$5FFF  16KB   Sample data (BRR format)
-$6000-$BFFF  24KB   Additional samples
-$C000-$EFFF  12KB   Echo buffer
-$F000-$FFFF  4KB    Audio driver (continued)
+$0000-$00ff  256B   Zero page (variables)
+$0100-$01ff  256B   Stack
+$0200-$02ff  256B   Communication buffer
+$0300-$07ff  1.25KB Audio driver code
+$0800-$0fff  2KB    Instrument table
+$1000-$1fff  4KB    Music sequence data
+$2000-$5fff  16KB   Sample data (BRR format)
+$6000-$bfff  24KB   Additional samples
+$c000-$efff  12KB   Echo buffer
+$f000-$ffff  4KB    Audio driver (continued)
 ```
 
 ### SPC700 Registers
@@ -88,18 +88,18 @@ I/O Ports (Main CPU ↔ SPC700):
   $2143: Port 3 - Data byte 3
 
 DSP Registers (Sound chip):
-  $00-$0F: Voice 0 registers
-  $10-$1F: Voice 1 registers
+  $00-$0f: Voice 0 registers
+  $10-$1f: Voice 1 registers
   ...
-  $70-$7F: Voice 7 registers
-  $0C: Main volume L
-  $1C: Main volume R
-  $2C: Echo volume L
-  $3C: Echo volume R
-  $4C: Key on
-  $5C: Key off
-  $6C: Flags (mute, echo, etc.)
-  $7C: Echo feedback
+  $70-$7f: Voice 7 registers
+  $0c: Main volume L
+  $1c: Main volume R
+  $2c: Echo volume L
+  $3c: Echo volume R
+  $4c: Key on
+  $5c: Key off
+  $6c: Flags (mute, echo, etc.)
+  $7c: Echo feedback
 ```
 
 ## Music Format
@@ -148,7 +148,7 @@ Music File Structure:
 ```
 Command Byte Format:
 
-$00-$7F: Note On
+$00-$7f: Note On
   - Value = Note number (C0-G8)
   - Next byte = Duration
 
@@ -181,10 +181,10 @@ $88: Vibrato
 $89: Program Change
   - Next byte = Instrument ID
 
-$8A-$8F: Reserved
+$8a-$8f: Reserved
 
-$90-$FF: Pattern Call
-  - Jump to pattern ($90-$FF = pattern 0-111)
+$90-$ff: Pattern Call
+  - Jump to pattern ($90-$ff = pattern 0-111)
 ```
 
 ### Note Duration Encoding
@@ -195,7 +195,7 @@ Duration Values:
   $02 = 1/32 note
   $04 = 1/16 note
   $08 = 1/8 note
-  $0C = Dotted 1/8
+  $0c = Dotted 1/8
   $10 = 1/4 note
   $18 = Dotted 1/4
   $20 = 1/2 note
@@ -204,7 +204,7 @@ Duration Values:
   
 Special:
   $00 = Previous duration (repeat)
-  $FF = Hold (tie to next note)
+  $ff = Hold (tie to next note)
 ```
 
 ## Sound Effects
@@ -250,7 +250,7 @@ PlaySoundEffect:
     ; Wait for acknowledgment
 .wait:
     lda $2140
-    cmp #$AA                ; Check ACK byte
+    cmp #$aa                ; Check ACK byte
     bne .wait
     
 .ignore:
@@ -292,7 +292,7 @@ $42     Game Over           Party defeated
 ; ==============================================================================
 InitializeAudio:
     ; Wait for SPC700 ready
-    lda #$AA
+    lda #$aa
 .waitReady:
     cmp $2140
     bne .waitReady
@@ -304,7 +304,7 @@ InitializeAudio:
     sta $2143
     
     ; Send driver load command
-    lda #$CC
+    lda #$cc
     sta $2141
     lda #$01                ; Upload command
     sta $2140
@@ -535,7 +535,7 @@ PlaySampleOnChannel:
     
     ; Key on
     lda ChannelMask,x       ; Get channel bit
-    sta DspAddress          ; Register $4C (key on)
+    sta DspAddress          ; Register $4c (key on)
     sta DspData
     
     rts
@@ -675,7 +675,7 @@ LoadMusic:
     ; Wait for SPC acknowledgment
 .waitAck:
     lda $2140
-    cmp #$AA
+    cmp #$aa
     bne .waitAck
     
     iny
@@ -801,7 +801,7 @@ Sample optimization:
 DebugMuteChannel:
     lda #$07                ; Channel 7
     sta $2140
-    lda #$FF                ; Mute command
+    lda #$ff                ; Mute command
     sta $2141
     rts
 

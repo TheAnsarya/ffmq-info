@@ -1,4 +1,4 @@
-# Keep Chat Logs Updated - Always!
+﻿# Keep Chat Logs Updated - Always!
 
 **Important:** Chat logs should be updated **ALL THE TIME**, not just on commits!
 
@@ -98,7 +98,7 @@ Best: "Fixed bug in tile decoder - was using row*2 instead of (row*2 + 16) for b
 .\update.ps1 -Type question -Message "What's the difference between LoROM and HiROM?"
 
 # When you find the answer (even 5 minutes later)
-.\update.ps1 -Type question -Message "What's the difference between LoROM and HiROM?" -Answer "LoROM maps banks to $8000-$FFFF with mirrors, HiROM to $0000-$FFFF. FFMQ uses LoROM."
+.\update.ps1 -Type question -Message "What's the difference between LoROM and HiROM?" -Answer "LoROM maps banks to $8000-$ffff with mirrors, HiROM to $0000-$ffff. FFMQ uses LoROM."
 ```
 
 ## Logging Workflow Examples
@@ -118,7 +118,7 @@ Best: "Fixed bug in tile decoder - was using row*2 instead of (row*2 + 16) for b
 .\update.ps1 -Type change -Message "Fixed palette offset bug - was missing bank boundary check"
 
 # Test
-.\update.ps1 -Type change -Message "Verified fix with all tiles in banks $07-$0A, no more corruption"
+.\update.ps1 -Type change -Message "Verified fix with all tiles in banks $07-$0a, no more corruption"
 
 # Commit (auto-logged)
 git commit -m "Fix palette offset bug causing tile corruption"

@@ -1,4 +1,4 @@
-# FFMQ Complete Disassembly Integration
+﻿# FFMQ Complete Disassembly Integration
 
 This directory contains the complete integrated disassembly of Final Fantasy Mystic Quest (SNES).
 
@@ -94,8 +94,8 @@ src/asm/
     ├── bank_00.asm            # Bank $00 (14,018 lines)
     ├── bank_01.asm            # Bank $01
     ├── bank_02.asm            # Bank $02
-    ├── ...                    # Banks $03-$0E
-    ├── bank_0F.asm            # Bank $0F
+    ├── ...                    # Banks $03-$0e
+    ├── bank_0F.asm            # Bank $0f
     ├── labels.asm             # Global labels and constants
     └── main.asm               # Diztinguish main file
 
@@ -129,32 +129,32 @@ src/data/
 
 | SNES Address | PC Address | Bank | Contents |
 |--------------|------------|------|----------|
-| $00:8000-$00:FFFF | $000000-$007FFF | $00 | Main initialization, core engine |
-| $01:8000-$01:FFFF | $008000-$00FFFF | $01 | Additional engine code |
-| $02:8000-$02:FFFF | $010000-$017FFF | $02 | Engine routines |
-| $03:8000-$03:FFFF | $018000-$01FFFF | $03 | Game logic |
-| $04:8000-$04:FFFF | $020000-$027FFF | $04 | Graphics data ($04:8000 tiles) |
-| $05:8000-$05:FFFF | $028000-$02FFFF | $05 | Main tiles ($05:8C80) |
-| $06:8000-$06:FFFF | $030000-$037FFF | $06 | Data and routines |
-| $07:8000-$07:FFFF | $038000-$03FFFF | $07 | Palettes, sprite graphics ($07:B013) |
-| $08:8000-$08:FFFF | $040000-$047FFF | $08 | Game data |
-| $09:8000-$09:FFFF | $048000-$04FFFF | $09 | Battle system |
-| $0A:8000-$0A:FFFF | $050000-$057FFF | $0A | Game logic |
-| $0B:8000-$0B:FFFF | $058000-$05FFFF | $0B | Game logic |
-| $0C:8000-$0C:FFFF | $060000-$067FFF | $0C | Menu system, UI, text |
-| $0D:8000-$0D:FFFF | $068000-$06FFFF | $0D | Menu and UI |
-| $0E:8000-$0E:FFFF | $070000-$077FFF | $0E | Additional systems |
-| $0F:8000-$0F:FFFF | $078000-$07FFFF | $0F | Additional code |
+| $00:8000-$00:FFFF | $000000-$007fff | $00 | Main initialization, core engine |
+| $01:8000-$01:FFFF | $008000-$00ffff | $01 | Additional engine code |
+| $02:8000-$02:FFFF | $010000-$017fff | $02 | Engine routines |
+| $03:8000-$03:FFFF | $018000-$01ffff | $03 | Game logic |
+| $04:8000-$04:FFFF | $020000-$027fff | $04 | Graphics data ($04:8000 tiles) |
+| $05:8000-$05:FFFF | $028000-$02ffff | $05 | Main tiles ($05:8C80) |
+| $06:8000-$06:FFFF | $030000-$037fff | $06 | Data and routines |
+| $07:8000-$07:FFFF | $038000-$03ffff | $07 | Palettes, sprite graphics ($07:B013) |
+| $08:8000-$08:FFFF | $040000-$047fff | $08 | Game data |
+| $09:8000-$09:FFFF | $048000-$04ffff | $09 | Battle system |
+| $0a:8000-$0a:FFFF | $050000-$057fff | $0a | Game logic |
+| $0b:8000-$0b:FFFF | $058000-$05ffff | $0b | Game logic |
+| $0c:8000-$0c:FFFF | $060000-$067fff | $0c | Menu system, UI, text |
+| $0d:8000-$0d:FFFF | $068000-$06ffff | $0d | Menu and UI |
+| $0e:8000-$0e:FFFF | $070000-$077fff | $0e | Additional systems |
+| $0f:8000-$0f:FFFF | $078000-$07ffff | $0f | Additional code |
 
 ### Key Data Locations
 
 | Description | SNES Address | PC Address | File |
 |-------------|--------------|------------|------|
-| Main tiles | $05:8C80 | $028C80 | 34 banks of 4BPP tiles |
+| Main tiles | $05:8C80 | $028c80 | 34 banks of 4BPP tiles |
 | Extra tiles | $04:8000 | $020000 | $100 tiles, 4BPP |
-| Sprite graphics | $07:B013 | $03B013 | Character/enemy sprites |
+| Sprite graphics | $07:B013 | $03b013 | Character/enemy sprites |
 | Palettes | $07:8000 | $038000 | Color palettes |
-| Text data | $0C:xxxx | $06xxxx | Compressed dialogue |
+| Text data | $0c:xxxx | $06xxxx | Compressed dialogue |
 
 ## Build Instructions
 
@@ -244,15 +244,15 @@ Use `ffmq_complete.asm` as the main file - it includes everything in the correct
 PC Address:   $0x28C80
 SNES Address: $05:8C80
 
-Formula: SNES = ((PC >> 15) << 16) | (PC & $7FFF) | $8000
+Formula: SNES = ((PC >> 15) << 16) | (PC & $7fff) | $8000
 ```
 
 **SNES to PC (LoROM):**
 ```
 SNES Address: $05:8C80  
-PC Address:   $028C80
+PC Address:   $028c80
 
-Formula: PC = ((SNES >> 16) << 15) | (SNES & $7FFF)
+Formula: PC = ((SNES >> 16) << 15) | (SNES & $7fff)
 ```
 
 ### Macro Reference

@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+﻿#!/usr/bin/env python3
 """
 Automated Mass Disassembly Script for FFMQ
 Processes multiple banks in parallel to maximize progress
@@ -22,12 +22,12 @@ BANKS = {
     0x07: {"lines": 4891, "desc": "Enemy AI", "priority": 2},
     0x08: {"lines": 3445, "desc": "Text/Dialog", "priority": 4},
     0x09: {"lines": 2977, "desc": "Save System", "priority": 4},
-    0x0A: {"lines": 3621, "desc": "Magic System", "priority": 3},
-    0x0B: {"lines": 2845, "desc": "Equipment", "priority": 4},
-    0x0C: {"lines": 4102, "desc": "Cutscenes", "priority": 4},
-    0x0D: {"lines": 3856, "desc": "World Map", "priority": 3},
-    0x0E: {"lines": 2498, "desc": "Shops/NPCs", "priority": 4},
-    0x0F: {"lines": 3147, "desc": "Misc Systems", "priority": 4},
+    0x0a: {"lines": 3621, "desc": "Magic System", "priority": 3},
+    0x0b: {"lines": 2845, "desc": "Equipment", "priority": 4},
+    0x0c: {"lines": 4102, "desc": "Cutscenes", "priority": 4},
+    0x0d: {"lines": 3856, "desc": "World Map", "priority": 3},
+    0x0e: {"lines": 2498, "desc": "Shops/NPCs", "priority": 4},
+    0x0f: {"lines": 3147, "desc": "Misc Systems", "priority": 4},
 }
 
 TOTAL_LINES = 74682

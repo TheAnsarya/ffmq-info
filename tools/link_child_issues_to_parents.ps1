@@ -1,4 +1,4 @@
-#!/usr/bin/env pwsh
+﻿#!/usr/bin/env pwsh
 <#
 .SYNOPSIS
     Links granular child issues to their parent issues
@@ -20,10 +20,10 @@
 #>
 
 param(
-    [switch]$DryRun
+    [switch]$dryRun
 )
 
-$ErrorActionPreference = "Stop"
+$errorActionPreference = "Stop"
 
 # Check if gh CLI is installed and authenticated
 function Test-GitHubCLI {
@@ -121,7 +121,7 @@ $repo = Get-RepoName
 Write-Host "✓ Repository: $repo" -ForegroundColor Green
 Write-Host ""
 
-if ($DryRun) {
+if ($dryRun) {
     Write-Host "🔍 DRY RUN MODE - No changes will be made" -ForegroundColor Yellow
     Write-Host ""
 }
@@ -169,7 +169,7 @@ This parent issue is broken down into the following trackable sub-issues:
         # Append child section to body
         $newBody = $currentBody + $childSection
 
-        if ($DryRun) {
+        if ($dryRun) {
             Write-Host "  [DRY RUN] Would append child issues section" -ForegroundColor Yellow
             Write-Host "  Preview:" -ForegroundColor Gray
             Write-Host "  ---" -ForegroundColor DarkGray
@@ -206,7 +206,7 @@ Write-Host "✨ Parent Issue Update Summary" -ForegroundColor Cyan
 Write-Host "====================================================================== + " -ForegroundColor Cyan
 Write-Host ""
 
-if ($DryRun) {
+if ($dryRun) {
     Write-Host "🔍 DRY RUN Complete!" -ForegroundColor Yellow
     Write-Host "Would have updated $($parentChildMap.Keys.Count) parent issues with child issue links" -ForegroundColor Yellow
 }

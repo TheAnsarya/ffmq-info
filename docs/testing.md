@@ -1,4 +1,4 @@
-# FFMQ Testing Environment
+﻿# FFMQ Testing Environment
 
 This document describes the testing environment for the Final Fantasy Mystic Quest SNES disassembly project.
 
@@ -97,9 +97,9 @@ The testing tools will automatically detect MesenS in common installation locati
 When launching with debugging (`make test-debug`), the following features are available:
 
 1. **Memory Watches:**
-   - Player Level (`$7E1010`)
-   - Player HP (`$7E1014`)
-   - Current Map (`$7E0E88`)
+   - Player Level (`$7e1010`)
+   - Player HP (`$7e1014`)
+   - Current Map (`$7e0e88`)
 
 2. **Breakpoints:**
    - Game start (`$008000`)

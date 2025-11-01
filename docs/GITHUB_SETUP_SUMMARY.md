@@ -1,4 +1,4 @@
-# GitHub Project Management Setup - Complete! ✅
+﻿# GitHub Project Management Setup - Complete! ✅
 
 **Date**: October 31, 2025  
 **Status**: All infrastructure complete, ready to start work!
@@ -26,8 +26,8 @@ Successfully set up comprehensive GitHub project management infrastructure for t
 | [#6](https://github.com/TheAnsarya/ffmq-info/issues/6) | 🔍 Bank $04 Disassembly | LOW | 19 | 20-30h |
 | [#7](https://github.com/TheAnsarya/ffmq-info/issues/7) | 🔍 Bank $05 Disassembly | LOW | 17 | 20-30h |
 | [#8](https://github.com/TheAnsarya/ffmq-info/issues/8) | 🔍 Bank $06 Disassembly | LOW | 17 | 20-30h |
-| [#9](https://github.com/TheAnsarya/ffmq-info/issues/9) | 🔍 Bank $0E Disassembly | LOW | 21 | 30-40h |
-| [#10](https://github.com/TheAnsarya/ffmq-info/issues/10) | 🔍 Bank $0F Disassembly | LOW | 21 | 30-40h |
+| [#9](https://github.com/TheAnsarya/ffmq-info/issues/9) | 🔍 Bank $0e Disassembly | LOW | 21 | 30-40h |
+| [#10](https://github.com/TheAnsarya/ffmq-info/issues/10) | 🔍 Bank $0f Disassembly | LOW | 21 | 30-40h |
 | [#11](https://github.com/TheAnsarya/ffmq-info/issues/11) | 🔄 Asset Build System | MEDIUM | 39 | 40-50h |
 | [#12](https://github.com/TheAnsarya/ffmq-info/issues/12) | 📚 Comprehensive Documentation | LOW | 46 | 80-120h |
 | **TOTAL** | | | **420** | **404-606h** |
@@ -138,8 +138,8 @@ Each issue has a detailed comment with:
 - **Bank $04** (19 tasks): Analysis, code/data documentation, verification
 - **Bank $05** (17 tasks): Analysis, code/data documentation, verification
 - **Bank $06** (17 tasks): Analysis, code/data documentation, verification
-- **Bank $0E** (21 tasks): Exploration, deep analysis, documentation
-- **Bank $0F** (21 tasks): Exploration, deep analysis, final disassembly
+- **Bank $0e** (21 tasks): Exploration, deep analysis, documentation
+- **Bank $0f** (21 tasks): Exploration, deep analysis, final disassembly
 - **Comprehensive Docs** (46 tasks): System architecture, data structures, function reference, visual docs
 
 ## Project Organization

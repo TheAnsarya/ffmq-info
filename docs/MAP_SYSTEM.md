@@ -1,4 +1,4 @@
-# Map System Architecture
+﻿# Map System Architecture
 
 Complete documentation of the Final Fantasy Mystic Quest map and world navigation system.
 
@@ -180,7 +180,7 @@ Collision Flags (per tile):
   $05 = Pit/Damage (lose HP)
   $06 = Ice (slide)
   $07 = Spikes (damage + knockback)
-  $08-$0F = Reserved
+  $08-$0f = Reserved
   
 Directional Collision:
   $10 = Block North
@@ -188,7 +188,7 @@ Directional Collision:
   $40 = Block South
   $80 = Block West
   
-Can combine: $C0 = Block South+West
+Can combine: $c0 = Block South+West
 ```
 
 ### Collision Detection
@@ -299,9 +299,9 @@ Event Categories:
   $07 = Inn
   $08 = Battle trigger (boss)
   $09 = Item acquisition
-  $0A = Switch/lever
-  $0B = Puzzle element
-  $0C-$FF = Custom events
+  $0a = Switch/lever
+  $0b = Puzzle element
+  $0c-$ff = Custom events
 ```
 
 ### Event Triggers
@@ -509,7 +509,7 @@ UpdateNPCs:
     
     ; Reset timer (random interval)
     jsr Random
-    and #$3F                ; 0-63 frames
+    and #$3f                ; 0-63 frames
     clc
     adc #$20                ; +32 = 32-95 frames
     sta NPCMoveTimer,x

@@ -1,4 +1,4 @@
-# Data Extraction Process
+﻿# Data Extraction Process
 
 Documentation for extracting game data from Final Fantasy: Mystic Quest ROM.
 
@@ -163,7 +163,7 @@ Required packages:
    - Drops (EXP, GP, items)
    - Weaknesses and resistances
    
-   ROM Address: $0E8000-$0E9900
+   ROM Address: $0e8000-$0e9900
    Validated against enemy_schema.json"
    ```
 
@@ -304,7 +304,7 @@ python tools/coverage_report.py --output reports/coverage.md
 
 ### Character Data Extraction
 
-**Location**: Bank $0C, $0C8000 (4 characters × 32 bytes)
+**Location**: Bank $0c, $0c8000 (4 characters × 32 bytes)
 
 **Process**:
 1. Extract 4 character entries
@@ -330,10 +330,10 @@ python tools/extract_data.py \
 
 ### Enemy Data Extraction
 
-**Location**: Bank $0E, $0E8000 (~100 enemies × 64 bytes)
+**Location**: Bank $0e, $0e8000 (~100 enemies × 64 bytes)
 
 **Process**:
-1. Determine enemy count (scan for $FF terminator)
+1. Determine enemy count (scan for $ff terminator)
 2. Extract enemy entries
 3. Parse AI pattern references
 4. Map element/status flags
@@ -382,10 +382,10 @@ python tools/extract_maps.py \
 
 ### Text Data Extraction
 
-**Location**: Bank $0D, $0D8000-$0DFFFF
+**Location**: Bank $0d, $0d8000-$0dffff
 
 **Process**:
-1. Extract encoding table ($0D0000, 256 bytes)
+1. Extract encoding table ($0d0000, 256 bytes)
 2. Build DTE dictionary
 3. Extract pointer table
 4. Decompress text entries

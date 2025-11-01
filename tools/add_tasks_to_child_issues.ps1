@@ -1,4 +1,4 @@
-#!/usr/bin/env pwsh
+﻿#!/usr/bin/env pwsh
 <#
 .SYNOPSIS
     Adds task checklists as comments to child issues
@@ -20,10 +20,10 @@
 #>
 
 param(
-    [switch]$DryRun
+    [switch]$dryRun
 )
 
-$ErrorActionPreference = "Stop"
+$errorActionPreference = "Stop"
 
 # Check if gh CLI is installed and authenticated
 function Test-GitHubCLI {
@@ -68,7 +68,7 @@ $repo = Get-RepoName
 Write-Host "✓ Repository: $repo" -ForegroundColor Green
 Write-Host ""
 
-if ($DryRun) {
+if ($dryRun) {
     Write-Host "🔍 DRY RUN MODE - No changes will be made" -ForegroundColor Yellow
     Write-Host ""
 }
@@ -76,7 +76,7 @@ if ($DryRun) {
 # Child issues range: #13-#47
 $childIssues = 13..47
 
-$addedCount = 0
+$addedcount = 0
 $skippedCount = 0
 $errorCount = 0
 
@@ -121,7 +121,7 @@ $tasks
 **💡 Tip**: Check off tasks as you complete them to track progress!
 "@
 
-            if ($DryRun) {
+            if ($dryRun) {
                 Write-Host "  [DRY RUN] Would add checklist comment" -ForegroundColor Yellow
                 Write-Host "  Preview (first 150 chars):" -ForegroundColor Gray
                 Write-Host "  $($comment.Substring(0, [Math]::Min(150, $comment.Length)))..." -ForegroundColor DarkGray
@@ -135,7 +135,7 @@ $tasks
                 Remove-Item $tempFile
 
                 Write-Host "  ✓ Added checklist comment" -ForegroundColor Green
-                $addedCount++
+                $addedcount++
 
                 Start-Sleep -Milliseconds 500  # Rate limiting
             }
@@ -160,12 +160,12 @@ Write-Host "✨ Task Checklist Addition Summary" -ForegroundColor Cyan
 Write-Host "====================================================================== + " -ForegroundColor Cyan
 Write-Host ""
 
-if ($DryRun) {
+if ($dryRun) {
     Write-Host "🔍 DRY RUN Complete!" -ForegroundColor Yellow
     Write-Host "Would have added checklist comments to child issues" -ForegroundColor Yellow
 }
 else {
-    Write-Host "✓ Added checklists: $addedCount" -ForegroundColor Green
+    Write-Host "✓ Added checklists: $addedcount" -ForegroundColor Green
     Write-Host "⚠ Skipped: $skippedCount" -ForegroundColor Yellow
     if ($errorCount -gt 0) {
         Write-Host "✗ Errors: $errorCount" -ForegroundColor Red

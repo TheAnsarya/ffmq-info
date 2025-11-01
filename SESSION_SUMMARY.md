@@ -1,4 +1,4 @@
-# FFMQ DISASSEMBLY - SESSION SUMMARY
+﻿# FFMQ DISASSEMBLY - SESSION SUMMARY
 **Date:** October 28, 2025 - ACTIVE AGGRESSIVE CAMPAIGN
 **Status:** Bank $02 Cycle 12 COMPLETE - Continuing "Don't Stop Until All Banks Done"
 **Achievement:** BANK $02 AT 31% COMPLETION
@@ -285,7 +285,7 @@ Created `ffmq_compression.py` with all 3 compression algorithms:
 
 ### FFMQ-Specific Observations
 1. **Dual buffer rendering** for battle/field modes
-2. **Menu command queue** at $0500-$050F
+2. **Menu command queue** at $0500-$050f
 3. **CLI/SEI pairs** for sound timing
 4. **Direct page tricks** for menu speed
 5. **Shift-and-add** multiplication (no hardware mul in all cases)

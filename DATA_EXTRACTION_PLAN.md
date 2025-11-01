@@ -1,4 +1,4 @@
-# FFMQ Data Extraction Pipeline
+﻿# FFMQ Data Extraction Pipeline
 # Complete asset extraction, conversion, and re-insertion system
 
 ## Directory Structure
@@ -97,14 +97,14 @@ Rebuild binary data from converted formats to `4_reinsert_bin/` and validate:
 
 ### Graphics Data (Bank $07 + others)
 **Source Addresses**:
-- $07B013: Graphics DMA configuration table
-- $07D274: Graphics tile buffer (32-byte blocks)
+- $07b013: Graphics DMA configuration table
+- $07d274: Graphics tile buffer (32-byte blocks)
 - $048000: Main graphics tiles (tiles.bin exists)
 
 **Extraction**:
 ```
-Bank $07 $B013-$B07A → data/graphics/1_original_bin/dma_config.bin
-Bank $07 $D274-$FFFF → data/graphics/1_original_bin/tile_buffer.bin
+Bank $07 $b013-$b07a → data/graphics/1_original_bin/dma_config.bin
+Bank $07 $d274-$ffff → data/graphics/1_original_bin/tile_buffer.bin
 ROM $048000+        → data/graphics/1_original_bin/main_tiles.bin
 ```
 
@@ -116,13 +116,13 @@ main_tiles.bin → 2_converted_png/tiles_sheet.png (4bpp planar → indexed PNG)
 
 ### Palette Data (Multiple Banks)
 **Source Addresses**:
-- $7FCDC8: Active palette buffer (32 bytes per layer)
+- $7fcdc8: Active palette buffer (32 bytes per layer)
 - Bank $03: Embedded BGR555 palette data
 
 **Extraction**:
 ```
 Bank $03 palette data → data/palettes/1_original_bin/bgr555_palettes.bin
-Bank $07 $CDC8 refs   → data/palettes/1_original_bin/active_palettes.bin
+Bank $07 $cdc8 refs   → data/palettes/1_original_bin/active_palettes.bin
 ```
 
 **Conversion**:
@@ -133,15 +133,15 @@ bgr555_palettes.bin → 2_converted_json/palettes.json (BGR555 → RGB JSON)
 
 ### Sprite Data (Bank $07)
 **Source Addresses**:
-- $07A736: Character/NPC sprite configurations
-- $07A906: Monster/enemy sprite data
-- $07AA60: Item/treasure sprite data
+- $07a736: Character/NPC sprite configurations
+- $07a906: Monster/enemy sprite data
+- $07aa60: Item/treasure sprite data
 
 **Extraction**:
 ```
-Bank $07 $A736-$A805 → data/sprites/1_original_bin/character_sprites.bin
-Bank $07 $A906-$AA5F → data/sprites/1_original_bin/enemy_sprites.bin
-Bank $07 $AA60-$AAAD → data/sprites/1_original_bin/item_sprites.bin
+Bank $07 $a736-$a805 → data/sprites/1_original_bin/character_sprites.bin
+Bank $07 $a906-$aa5f → data/sprites/1_original_bin/enemy_sprites.bin
+Bank $07 $aa60-$aaad → data/sprites/1_original_bin/item_sprites.bin
 ```
 
 **Conversion**:
@@ -154,14 +154,14 @@ enemy_sprites.bin     → 2_converted_png/enemies/ (individual PNGs)
 
 ### Animation Data (Bank $07)
 **Source Addresses**:
-- $07921E: Sprite animation command sequences
-- $07AF3B: Animation pointer table
+- $07921e: Sprite animation command sequences
+- $07af3b: Animation pointer table
 - $079174: Frame rotation routines
 
 **Extraction**:
 ```
-Bank $07 $921E-$93FF → data/animation/1_original_bin/animation_sequences.bin
-Bank $07 $AF3B-$B012 → data/animation/1_original_bin/animation_pointers.bin
+Bank $07 $921e-$93ff → data/animation/1_original_bin/animation_sequences.bin
+Bank $07 $af3b-$b012 → data/animation/1_original_bin/animation_pointers.bin
 ```
 
 **Conversion**:
@@ -202,9 +202,9 @@ SPC700 region → data/music/1_original_bin/spc_sequences.bin
 
 ### Data Tables (Bank $07 + others)
 **Source Addresses**:
-- $07B932+: NPC configurations
-- $07BA52+: Enemy formations
-- $07AB38+: Object placement
+- $07b932+: NPC configurations
+- $07ba52+: Enemy formations
+- $07ab38+: Object placement
 
 **Extraction**:
 ```

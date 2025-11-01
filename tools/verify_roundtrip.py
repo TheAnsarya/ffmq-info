@@ -1,4 +1,4 @@
-"""
+﻿"""
 Round-Trip Verification Tool for FFMQ Data Pipeline
 ====================================================
 
@@ -96,7 +96,7 @@ def verify_bank06_collision(rom_data: bytes, json_path: str) -> dict:
     with open(json_path, 'r') as f:
         data = json.load(f)
     
-    collision_addr = 0x06A000
+    collision_addr = 0x06a000
     collision_data = data['collision']['entries']
     
     for entry_dict in collision_data:

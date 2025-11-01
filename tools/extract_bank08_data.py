@@ -1,4 +1,4 @@
-"""
+﻿"""
 Extract Bank $08 Text/Dialog Data
 ==================================
 
@@ -51,7 +51,7 @@ def load_character_encoding(tbl_path: str = "simple.tbl") -> dict:
     if not os.path.exists(tbl_path):
         print(f"Warning: {tbl_path} not found, using ASCII fallback")
         # Fallback to basic ASCII
-        for i in range(0x20, 0x7F):
+        for i in range(0x20, 0x7f):
             encoding[i] = chr(i)
         return encoding
     
@@ -248,14 +248,14 @@ def main():
     # Control codes
     print(f"\nControl Codes Used:")
     control_code_names = {
-        0xF0: "END (close dialog)",
-        0xF1: "NEWLINE",
-        0xF2: "WAIT (for input)",
-        0xF3: "CLEAR (screen)",
-        0xF4: "VAR (insert variable)",
-        0xF5: "ITEM (insert item name)",
-        0xF6: "CHAR (insert character name)",
-        0xF7: "NUM (format number)"
+        0xf0: "END (close dialog)",
+        0xf1: "NEWLINE",
+        0xf2: "WAIT (for input)",
+        0xf3: "CLEAR (screen)",
+        0xf4: "VAR (insert variable)",
+        0xf5: "ITEM (insert item name)",
+        0xf6: "CHAR (insert character name)",
+        0xf7: "NUM (format number)"
     }
     
     for code, count in sorted(control_codes.items()):

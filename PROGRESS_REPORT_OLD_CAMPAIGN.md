@@ -1,4 +1,4 @@
-# FFMQ Import Campaign Progress Report
+﻿# FFMQ Import Campaign Progress Report
 ## October 29, 2025 - 🎉 BANK $07 100% COMPLETE! 🎉
 
 ### 🚀 CAMPAIGN STATUS: BANK $07 FULLY DOCUMENTED - ALL 2,627 LINES ANALYZED
@@ -41,10 +41,10 @@
   - SET commands ($05): Variable/memory write operations
   - CALL/JUMP commands ($08): Subroutine execution and branching
   - LOAD/READ commands ($09): Memory address and data table access
-  - IF/COMPARE commands ($0C): Conditional checks and branching logic
-  - LOOP commands ($0A): Iteration with counters
-  - Extended commands ($0D): Multi-parameter operations
-  - CONFIG commands ($0F): Graphics/text/layer property management
+  - IF/COMPARE commands ($0c): Conditional checks and branching logic
+  - LOOP commands ($0a): Iteration with counters
+  - Extended commands ($0d): Multi-parameter operations
+  - CONFIG commands ($0f): Graphics/text/layer property management
 
 - **Entity Spawn System:** NPC and enemy placement initialization
   - Entity ID tracking and coordinate management
@@ -53,7 +53,7 @@
 
 - **Map Transition Engine:** Scene changes and warp management
   - Map ID and entrance point configuration
-  - Variable tracking ($4D, $43, $EA)
+  - Variable tracking ($4d, $43, $ea)
   - Multi-stage transition sequences
 
 - **Dialog/Text System:** Conversation triggers and display control
@@ -67,7 +67,7 @@
   - Encounter type classification
 
 - **Audio/Music Control:** Track playback triggers
-  - Music command identification ($F9)
+  - Music command identification ($f9)
   - Sound effect integration
   - Audio state management
 
@@ -92,10 +92,10 @@
 - **Success Rate:** 100% across all 24 cycles with temp file strategy
 
 **Overall Campaign Status:**
-- **Total Banks:** 16 banks ($00-$0F)
+- **Total Banks:** 16 banks ($00-$0f)
 - **Completed Banks:** Bank $00 + Bank $01 + Bank $02 (3/16 = 18.75%)
 - **Active Bank:** Bank $03 (0% complete - READY TO START)
-- **Remaining Banks:** Banks $03-$0F (~60,000+ lines estimated)
+- **Remaining Banks:** Banks $03-$0f (~60,000+ lines estimated)
 
 **Campaign Achievements:**
 - ✅ Bank $01: 8,855 lines - Complete battle engine and graphics systems

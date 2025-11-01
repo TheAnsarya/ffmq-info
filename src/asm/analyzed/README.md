@@ -1,4 +1,4 @@
-# FFMQ Disassembly Analysis - Enhanced Code Documentation
+﻿# FFMQ Disassembly Analysis - Enhanced Code Documentation
 
 This directory contains **analyzed and enhanced** versions of the Diztinguish disassembly with meaningful labels, detailed comments, and reverse-engineered documentation.
 
@@ -15,15 +15,15 @@ While the Diztinguish disassembly in `src/asm/banks/` provides complete code cov
 ## Files
 
 ### `boot_sequence.asm` (150+ lines)
-**Original Code**: bank_00.asm $008000-$0080FF  
+**Original Code**: bank_00.asm $008000-$0080ff  
 **Analysis**: Complete boot and initialization sequence  
 **Status**: ✅ Complete
 
 **Key Discoveries**:
-- Three entry points: BootEntry ($008000), AlternateEntry ($008016), WarmBootEntry ($00803A)
+- Three entry points: BootEntry ($008000), AlternateEntry ($008016), WarmBootEntry ($00803a)
 - DMA fill operation to clear VRAM on boot
-- Save data detection at SRAM $700000, $70038C, $700718
-- Boot flags at $7E3665, $7E3667, $7E3668
+- Save data detection at SRAM $700000, $70038c, $700718
+- Boot flags at $7e3665, $7e3667, $7e3668
 - Hardware initialization sequence
 - Interrupt setup and NMI enable process
 
@@ -45,7 +45,7 @@ While the Diztinguish disassembly in `src/asm/banks/` provides complete code cov
 - Three DMA patterns: VRAM fill, tile transfer, palette transfer
 - Channel 5 used for most graphics DMA
 - VRAM increment modes: $80 (standard), $84 (by 128)
-- Source banks: $04-$07 for ROM data, $7E-$7F for RAM
+- Source banks: $04-$07 for ROM data, $7e-$7f for RAM
 - Transfer sizes: 16-byte tiles (2BPP), 32-byte tiles (4BPP)
 
 **Functions Documented**:
@@ -57,10 +57,10 @@ While the Diztinguish disassembly in `src/asm/banks/` provides complete code cov
 - `ExecuteStandardTransfer` - Execute configured DMA
 
 **RAM Variables Mapped**:
-- $00D2 - DMA request flags (palette, tile, VRAM)
-- $00D4 - Additional DMA flags
-- $00D8 - Transfer mode flags
-- $01EB-$01F8 - DMA parameter storage
+- $00d2 - DMA request flags (palette, tile, VRAM)
+- $00d4 - Additional DMA flags
+- $00d8 - Transfer mode flags
+- $01eb-$01f8 - DMA parameter storage
 - $0048, $0062, $0064 - Transfer configuration
 
 ### `battle_system.asm` (280+ lines)
@@ -84,20 +84,20 @@ While the Diztinguish disassembly in `src/asm/banks/` provides complete code cov
 
 **Color Format**:
 - RGB555: 0BBBBBGGGGGRRRRR (15-bit)
-- Common values: $0000 (black), $7FFF (white), $001F (red)
+- Common values: $0000 (black), $7fff (white), $001f (red)
 
 ### `menu_system.asm` (350+ lines) ✨ NEW
-**Original Code**: bank_0C.asm $0C8000-$0C8200+  
+**Original Code**: bank_0C.asm $0c8000-$0c8200+  
 **Analysis**: Menu system, UI, and VBlank control  
 **Status**: ✅ Complete
 
 **Key Discoveries**:
-- VBlank wait routine (`WaitForVBlank` at $0C8000) - most called routine!
+- VBlank wait routine (`WaitForVBlank` at $0c8000) - most called routine!
 - Equipment display system with stat conversion
 - Menu initialization sequence (MenuSystemInit)
 - PPU mode switching (Mode 1 ↔ Mode 7)
 - Display layer configuration (BG1, BG2, OBJ)
-- Callback system for deferred rendering ($0058-$005A)
+- Callback system for deferred rendering ($0058-$005a)
 - Direct page manipulation for fast PPU access
 
 **Functions Documented**:
@@ -108,11 +108,11 @@ While the Diztinguish disassembly in `src/asm/banks/` provides complete code cov
 - `LoadMenuContent` - Menu rendering and updates
 
 **RAM Variables Mapped**:
-- $00D8 bit 6 - VBlank occurred flag (THE synchronization flag)
-- $00D2/$00D4/$00D6 - DMA and display flags
-- $00E2 - Callback pending flags
-- $00AA - Screen brightness
-- $7E3665 - Menu initialized flag
+- $00d8 bit 6 - VBlank occurred flag (THE synchronization flag)
+- $00d2/$00d4/$00d6 - DMA and display flags
+- $00e2 - Callback pending flags
+- $00aa - Screen brightness
+- $7e3665 - Menu initialized flag
 
 **Display Modes**:
 - Mode 1: Standard gameplay (BG1+BG2+OBJ, 4-color)
@@ -124,29 +124,29 @@ While the Diztinguish disassembly in `src/asm/banks/` provides complete code cov
 **Status**: ✅ Complete
 
 **Key Discoveries**:
-- Comprehensive memory layout ($0000-$7FFFFF)
-- Critical flag byte documentation ($00D2-$00DF)
-- VBlank flag at $00D8 bit 6 (set by NMI, cleared by wait)
-- DMA parameter storage ($01EB-$01F8)
+- Comprehensive memory layout ($0000-$7fffff)
+- Critical flag byte documentation ($00d2-$00df)
+- VBlank flag at $00d8 bit 6 (set by NMI, cleared by wait)
+- DMA parameter storage ($01eb-$01f8)
 - Save data structure (3 slots × ~900 bytes in SRAM)
-- Boot flags ($7E3665, $7E3667, $7E3668)
+- Boot flags ($7e3665, $7e3667, $7e3668)
 - Flag byte usage patterns (TSB/TRB/AND)
 
 **Memory Regions Mapped**:
-- Zero Page ($0000-$00FF) - Fast access variables
-- Page 1 ($0100-$01FF) - System parameters
-- Low RAM ($0200-$1FFF) - Game data
-- Work RAM $7E ($7E0000-$7E7FFF) - Main game state
-- Work RAM $7F ($7F0000-$7FFFFF) - Buffers
-- SRAM ($700000-$7FFFFF) - Save data
+- Zero Page ($0000-$00ff) - Fast access variables
+- Page 1 ($0100-$01ff) - System parameters
+- Low RAM ($0200-$1fff) - Game data
+- Work RAM $7e ($7e0000-$7e7fff) - Main game state
+- Work RAM $7f ($7f0000-$7fffff) - Buffers
+- SRAM ($700000-$7fffff) - Save data
 
 **Critical Variables Identified**:
-- $00D8 - VBlank sync (most important!)
-- $00D2 - DMA flags
-- $00D4 - Transfer flags
-- $01F4-$01F8 - DMA parameters
-- $7E3665 - Save/init flag
-- $700000/$70038C/$700718 - Save slots
+- $00d8 - VBlank sync (most important!)
+- $00d2 - DMA flags
+- $00d4 - Transfer flags
+- $01f4-$01f8 - DMA parameters
+- $7e3665 - Save/init flag
+- $700000/$70038c/$700718 - Save slots
 
 **Confidence Levels**:
 - ✅ High: VBlank flag, DMA flags, boot flags, save slots
@@ -173,7 +173,7 @@ While the Diztinguish disassembly in `src/asm/banks/` provides complete code cov
 
 3. **Cross-reference**:
    ```
-   # Analysis shows boot calls InitializeGameState at $0D8000
+   # Analysis shows boot calls InitializeGameState at $0d8000
    # Look at banks/bank_0D.asm at that address
    # Find related code
    ```
@@ -217,7 +217,7 @@ Example:
 BootEntry:                          ; ✅ High - This is definitely the entry point
     JSR.W InitializeHardware        ; ✅ High - Writes to SNES_INIDISP
     JSL.L InitializeGameState       ; ⚠️ Medium - Seems to init state based on what it does
-    LDA.L $7E3667                   ; ❓ Low - Don't know exact purpose yet
+    LDA.L $7e3667                   ; ❓ Low - Don't know exact purpose yet
 ```
 
 ## Contributing Analysis
@@ -256,60 +256,60 @@ Additional areas needing analysis:
 **Purpose:** Document the NMI (VBlank) interrupt handler - the heartbeat of the graphics system.
 
 **Analysis:**
-- **NMI Vector:** $00FFE6 → Points to $011B
-- **IRQ Vector:** $00FFEE → Points to $0117
+- **NMI Vector:** $00ffe6 → Points to $011b
+- **IRQ Vector:** $00ffee → Points to $0117
 
 - **VBlank Synchronization System:**
   - NMI fires ~60 times/second at start of VBlank
-  - Sets flag at $00D8.6 to signal VBlank occurred
-  - WaitForVBlank ($0C8000) clears flag and waits for NMI to set it
+  - Sets flag at $00d8.6 to signal VBlank occurred
+  - WaitForVBlank ($0c8000) clears flag and waits for NMI to set it
   - This ensures ALL graphics updates happen during safe VBlank period!
 
 - **DMA Transfer Patterns:**
   - Main VRAM transfer: Channel 5, mode $1801
-  - Source: Bank $7F + offset from $01F6-$01F8
-  - Size: From $01F4-$01F5
-  - Dest VRAM: Address in $01F8-$01F9
+  - Source: Bank $7f + offset from $01f6-$01f8
+  - Size: From $01f4-$01f5
+  - Dest VRAM: Address in $01f8-$01f9
   - VMAINC = $84 (word increment)
-  - Trigger: Write $20 to MDMAEN ($420B)
+  - Trigger: Write $20 to MDMAEN ($420b)
 
 - **OAM (Sprite) Updates:**
-  - Main OAM: 512 bytes from $0C00 → $2102
-  - Extended OAM: 32 bytes from $0E00 → $2102+$100
-  - Size controlled by $01F0-$01F3
+  - Main OAM: 512 bytes from $0c00 → $2102
+  - Extended OAM: 32 bytes from $0e00 → $2102+$100
+  - Size controlled by $01f0-$01f3
   - Mode $0400 (byte to fixed address)
 
 - **Update Flags (checked by NMI):**
-  - $00D2.7: VRAM tilemap update
-  - $00D2.6: Full background refresh
-  - $00D2.5: Palette transfer
-  - $00DD.6: Major DMA operation pending
-  - $00D4.1: Tilemap reload
-  - $00E2.6: Execute callback at [$0058]
+  - $00d2.7: VRAM tilemap update
+  - $00d2.6: Full background refresh
+  - $00d2.5: Palette transfer
+  - $00dd.6: Major DMA operation pending
+  - $00d4.1: Tilemap reload
+  - $00e2.6: Execute callback at [$0058]
 
 - **Typical NMI Flow:**
   1. Save registers
-  2. Check and execute callback if $00E2.6 set
-  3. Process tilemap transfer if $00D4.1 set
-  4. Execute major DMA if $00DD.6 set
-  5. Update VRAM if $00D2.7 set
-  6. Transfer palettes if $00D2.5 set
-  7. Refresh background if $00D2.6 set
-  8. **Set VBlank flag** at $00D8.6
+  2. Check and execute callback if $00e2.6 set
+  3. Process tilemap transfer if $00d4.1 set
+  4. Execute major DMA if $00dd.6 set
+  5. Update VRAM if $00d2.7 set
+  6. Transfer palettes if $00d2.5 set
+  7. Refresh background if $00d2.6 set
+  8. **Set VBlank flag** at $00d8.6
   9. Return from interrupt
 
 **Key Discoveries:**
-- **CRITICAL:** VBlank flag at $00D8.6 is the fundamental sync point for entire graphics system
+- **CRITICAL:** VBlank flag at $00d8.6 is the fundamental sync point for entire graphics system
 - Main game loop pattern: Update logic → Prepare data → WaitForVBlank → NMI transfers data
 - All screen updates synchronized through flag system (main code sets, NMI checks/clears)
 - DMA transfers happen ONLY during VBlank for glitch-free rendering
-- Callback system at $0058-$005A for custom NMI operations
+- Callback system at $0058-$005a for custom NMI operations
 
 **Confidence:** MEDIUM-HIGH
 - VBlank flag system: VERIFIED
 - DMA patterns: VERIFIED  
 - Flag system: VERIFIED
-- Complete NMI flow: INFERRED (actual handler code at $011B needs manual trace)
+- Complete NMI flow: INFERRED (actual handler code at $011b needs manual trace)
 
 ---
 
@@ -340,9 +340,9 @@ Additional areas needing analysis:
 
 - **Input Processing Modes:**
   - Normal mode: Standard gameplay input
-  - Menu mode ($00D2.3): Special handler at CODE_0092F0
-  - Dialog mode ($00DB.2): Text advance handling
-  - Disabled ($00D6.6): Input completely ignored
+  - Menu mode ($00d2.3): Special handler at CODE_0092F0
+  - Dialog mode ($00db.2): Text advance handling
+  - Disabled ($00d6.6): Input completely ignored
 
 - **Input Injection:**
   - $0090 can be set by code to simulate button presses
@@ -383,29 +383,29 @@ Additional areas needing analysis:
 |------|---------|------|---------|
 | $00 | $008000 | BootEntry | Main entry point |
 | $00 | $008247 | InitializeHardware | Disable screen/NMI |
-| $00 | $0081F0 | ClearMemory | Clear work RAM |
+| $00 | $0081f0 | ClearMemory | Clear work RAM |
 | $00 | $008385 | DMA_TransferToVRAM_Ch5 | VRAM DMA channel 5 |
 | $09 | $098000 | EnemyPaletteTable | Enemy color data |
 | $09 | $098460 | EnemySpritePointers | Enemy graphics pointers |
-| $0C | $0C8000 | WaitForVBlank | Wait for vertical blank |
-| $0C | $0C8080 | MenuSystemInit | Initialize menus |
-| $0D | $0D8000 | InitializeGameState | Initialize game vars |
-| $0D | $0D8004 | InitializeInterrupts | Setup NMI/IRQ |
+| $0c | $0c8000 | WaitForVBlank | Wait for vertical blank |
+| $0c | $0c8080 | MenuSystemInit | Initialize menus |
+| $0d | $0d8000 | InitializeGameState | Initialize game vars |
+| $0d | $0d8004 | InitializeInterrupts | Setup NMI/IRQ |
 
 ### Important RAM Variables
 
 | Address | Size | Name | Purpose |
 |---------|------|------|---------|
-| $7E3665 | 1 | SaveDataFlag | Save data present flag |
-| $7E3667 | 1 | BootFlag1 | Boot sequence flag 1 |
-| $7E3668 | 1 | BootFlag2 | Boot sequence flag 2 |
-| $00AA | 1 | ScreenBrightness | Screen brightness (0-15) |
-| $00D2 | 1 | DMARequestFlags1 | DMA request flags |
-| $00D4 | 1 | DMARequestFlags2 | Additional DMA flags |
-| $00D6 | 1 | SystemFlags | System control flags |
-| $00D8 | 1 | VBlankFlag | VBlank & timing flags |
-| $00DA | 2 | HardwareFlags | Hardware configuration |
-| $00DE | 1 | GeneralFlags1 | General purpose flags |
+| $7e3665 | 1 | SaveDataFlag | Save data present flag |
+| $7e3667 | 1 | BootFlag1 | Boot sequence flag 1 |
+| $7e3668 | 1 | BootFlag2 | Boot sequence flag 2 |
+| $00aa | 1 | ScreenBrightness | Screen brightness (0-15) |
+| $00d2 | 1 | DMARequestFlags1 | DMA request flags |
+| $00d4 | 1 | DMARequestFlags2 | Additional DMA flags |
+| $00d6 | 1 | SystemFlags | System control flags |
+| $00d8 | 1 | VBlankFlag | VBlank & timing flags |
+| $00da | 2 | HardwareFlags | Hardware configuration |
+| $00de | 1 | GeneralFlags1 | General purpose flags |
 | $0090 | 2 | InjectedInput | Injected button state |
 | $0092 | 2 | CurrentButtons | Current frame buttons |
 | $0094 | 2 | NewPresses | New button presses (edge) |

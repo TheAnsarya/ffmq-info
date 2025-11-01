@@ -1,4 +1,4 @@
-#Requires -Version 5.1
+﻿#Requires -Version 5.1
 <#
 .SYNOPSIS
 	File watcher for automatic rebuilding during development.
@@ -46,20 +46,20 @@ param(
 	[string[]]$WatchPath = @("src\asm"),
 
 	[Parameter()]
-	[string]$BuildScript = "tools\Build-System.ps1",
+	[string]$buildScript = "tools\Build-System.ps1",
 
 	[Parameter()]
-	[int]$DebounceMs = 500,
+	[int]$debounceMs = 500,
 
 	[Parameter()]
-	[switch]$AutoLaunch,
+	[switch]$autoLaunch,
 
 	[Parameter()]
 	[switch]$Verbose
 )
 
 Set-StrictMode -Version Latest
-$ErrorActionPreference = 'Stop'
+$errorActionPreference = 'Stop'
 
 $script:ScriptRoot = Split-Path -Parent $PSScriptRoot
 $script:LastBuildTime = [DateTime]::MinValue
@@ -121,7 +121,7 @@ function Invoke-DebouncedBuild {
 	$now = Get-Date
 	$timeSinceLastBuild = ($now - $script:LastBuildTime).TotalMilliseconds
 
-	if ($timeSinceLastBuild -lt $DebounceMs) {
+	if ($timeSinceLastBuild -lt $debounceMs) {
 		Write-Debug "Build debounced ($([math]::Round($timeSinceLastBuild))ms since last)"
 		$script:PendingBuild = $true
 		return
@@ -145,7 +145,7 @@ function Invoke-Build {
 
 	Write-Section "Build #$script:BuildCount - $Reason"
 
-	$buildScriptPath = Join-Path $script:ScriptRoot $BuildScript
+	$buildScriptPath = Join-Path $script:ScriptRoot $buildScript
 
 	if (-not (Test-Path $buildScriptPath)) {
 		Write-Error "Build script not found: $buildScriptPath"
@@ -171,7 +171,7 @@ function Invoke-Build {
 		$script:SuccessCount++
 
 		# Auto-launch if requested
-		if ($AutoLaunch) {
+		if ($autoLaunch) {
 			Invoke-AutoLaunch
 		}
 
@@ -333,7 +333,7 @@ try {
 
 	Write-Info "Development mode: Automatic rebuild on file changes"
 	Write-Info "Debounce delay: ${DebounceMs}ms"
-	if ($AutoLaunch) {
+	if ($autoLaunch) {
 		Write-Info "Auto-launch: Enabled"
 	}
 	Write-Host ""
@@ -368,7 +368,7 @@ try {
 		# Check if there's a pending build after debounce period
 		if ($script:PendingBuild) {
 			$timeSinceLastBuild = ([DateTime]::Now - $script:LastBuildTime).TotalMilliseconds
-			if ($timeSinceLastBuild -ge $DebounceMs) {
+			if ($timeSinceLastBuild -ge $debounceMs) {
 				Invoke-DebouncedBuild -Reason "Debounced file changes"
 			}
 		}

@@ -1,4 +1,4 @@
-# Final Fantasy Mystic Quest - Complete Build System Integration Guide
+﻿# Final Fantasy Mystic Quest - Complete Build System Integration Guide
 
 ## Overview
 
@@ -322,9 +322,9 @@ assets/text/
 ```
 # ITEM_NAMES
 # ID | Text | Address
-0001 | Cure           | $04F000
-0002 | Heal           | $04F00C
-0003 | Life           | $04F018
+0001 | Cure           | $04f000
+0002 | Heal           | $04f00c
+0003 | Life           | $04f018
 ```
 
 ### Enemy Data Extraction
@@ -528,14 +528,14 @@ To add analyzed labels to bank files:
 
 ; OLD (generic label)
 CODE_008123:
-    lda $00D8
+    lda $00d8
     bit #$40
     beq CODE_008123
     ; ... more code
 
 ; NEW (with analyzed label)
 WaitForVBlank:              ; From nmi_handler.asm analysis
-    lda VBLANK_FLAGS        ; $00D8 - VBlank sync flags
+    lda VBLANK_FLAGS        ; $00d8 - VBlank sync flags
     bit #$40                ; Check bit 6 (VBlank occurred)
     beq WaitForVBlank       ; Loop until VBlank
     ; ... more code

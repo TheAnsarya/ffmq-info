@@ -1,4 +1,4 @@
-# Text System Architecture
+﻿# Text System Architecture
 
 Complete documentation of the Final Fantasy Mystic Quest text rendering and dialogue system.
 
@@ -60,13 +60,13 @@ Value   Character   Notes
 $00     [END]       End of string
 $01     [NL]        Newline
 $02     [WAIT]      Wait for button press
-$03-$0C [CTRL]      Control codes (see below)
-$0D     [SPACE]     Space character
-$0E-$27 0-9, A-Z    Alphanumeric (uppercase)
+$03-$0c [CTRL]      Control codes (see below)
+$0d     [SPACE]     Space character
+$0e-$27 0-9, A-Z    Alphanumeric (uppercase)
 $28-$41 a-z         Lowercase letters
-$42-$5F !?.,        Punctuation
-$60-$7F [SPECIAL]   Special characters
-$80-$FF [DTE]       Dual-Tile Encoding (2 chars)
+$42-$5f !?.,        Punctuation
+$60-$7f [SPECIAL]   Special characters
+$80-$ff [DTE]       Dual-Tile Encoding (2 chars)
 ```
 
 ### Dual-Tile Encoding (DTE)
@@ -89,7 +89,7 @@ $87 = "at"
 ```
 Text: "The hero entered the castle"
 Raw:  "Th[DTE]e her[DTE]o [DTE]enter[DTE]ed th[DTE]e castle"
-Encoded: $80e $FE1o $82$83$8F $80e castle
+Encoded: $80e $fe1o $82$83$8f $80e castle
 Savings: ~30% compression
 ```
 
@@ -188,7 +188,7 @@ DrawCharacter:
 .newline:
     ; Move to next line
     txa
-    and #$E0            ; Keep line start
+    and #$e0            ; Keep line start
     clc
     adc #$20            ; Add 32 (next line)
     tax
@@ -204,7 +204,7 @@ DrawCharacter:
     
 .end_text:
     ; Mark text complete
-    lda #$FF
+    lda #$ff
     sta TextCompleteFlag
     rts
 ```
@@ -339,15 +339,15 @@ FFMQ uses several window styles:
 **Border Tiles**:
 ```
 Tile Map:
-  $E0 = ┌ (Top-left corner)
-  $E1 = ─ (Top edge)
-  $E2 = ┐ (Top-right corner)
-  $E3 = │ (Left edge)
-  $E4 = │ (Right edge)
-  $E5 = └ (Bottom-left corner)
-  $E6 = ─ (Bottom edge)
-  $E7 = ┘ (Bottom-right corner)
-  $E8 = [Space/Fill]
+  $e0 = ┌ (Top-left corner)
+  $e1 = ─ (Top edge)
+  $e2 = ┐ (Top-right corner)
+  $e3 = │ (Left edge)
+  $e4 = │ (Right edge)
+  $e5 = └ (Bottom-left corner)
+  $e6 = ─ (Bottom edge)
+  $e7 = ┘ (Bottom-right corner)
+  $e8 = [Space/Fill]
 ```
 
 **Draw Algorithm**:
@@ -374,7 +374,7 @@ DrawWindow:
     tax                 ; X = tilemap offset
     
     ; Draw top edge
-    lda #$E0            ; Top-left corner
+    lda #$e0            ; Top-left corner
     sta TextBuffer,x
     inx
     
@@ -382,13 +382,13 @@ DrawWindow:
     dey                 ; Minus 2 (corners)
     dey
 .topEdge:
-    lda #$E1            ; Top edge
+    lda #$e1            ; Top edge
     sta TextBuffer,x
     inx
     dey
     bne .topEdge
     
-    lda #$E2            ; Top-right corner
+    lda #$e2            ; Top-right corner
     sta TextBuffer,x
     
     ; ... (continue for sides and bottom)
@@ -404,11 +404,11 @@ Font stored as 2bpp tiles in VRAM:
 
 ```
 Character Set:
-  Tiles $00-$3F: Uppercase A-Z, 0-9, symbols
-  Tiles $40-$5F: Lowercase a-z
-  Tiles $60-$7F: Punctuation and special
-  Tiles $80-$9F: Japanese kana (unused in English)
-  Tiles $A0-$BF: Additional symbols
+  Tiles $00-$3f: Uppercase A-Z, 0-9, symbols
+  Tiles $40-$5f: Lowercase a-z
+  Tiles $60-$7f: Punctuation and special
+  Tiles $80-$9f: Japanese kana (unused in English)
+  Tiles $a0-$bf: Additional symbols
 ```
 
 ### Font Loading
@@ -475,13 +475,13 @@ SystemMessages:
 ### Text Sections
 
 ```
-ROM Bank $0D (Text Bank):
-  $0D:0000-$0D:3FFF: Dialogue text (compressed)
-  $0D:4000-$0D:7FFF: Menu text
-  $0D:8000-$0D:9FFF: Battle text
-  $0D:A000-$0D:BFFF: Item/equipment descriptions
-  $0D:C000-$0D:DFFF: Location names
-  $0D:E000-$0D:FFFF: System messages
+ROM Bank $0d (Text Bank):
+  $0d:0000-$0d:3FFF: Dialogue text (compressed)
+  $0d:4000-$0d:7FFF: Menu text
+  $0d:8000-$0d:9FFF: Battle text
+  $0d:A000-$0d:BFFF: Item/equipment descriptions
+  $0d:C000-$0d:DFFF: Location names
+  $0d:E000-$0d:FFFF: System messages
 ```
 
 ## Control Codes
@@ -501,9 +501,9 @@ $06     COLOR       Change text color
 $07     SHAKE       Screen shake effect
 $08     SOUND       Play sound effect
 $09     PAUSE       Pause for N frames
-$0A     CHOICE      Display choice window
-$0B     NAME        Insert player/character name
-$0C     NUMBER      Display numeric value
+$0a     CHOICE      Display choice window
+$0b     NAME        Insert player/character name
+$0c     NUMBER      Display numeric value
 ```
 
 ### Control Code Examples
@@ -517,7 +517,7 @@ $0C     NUMBER      Display numeric value
 **Choice Window**:
 ```
 .db "Will you help?", $01
-.db $0A             ; CHOICE
+.db $0a             ; CHOICE
 .db "Yes", $00
 .db "No", $00
 .db $00             ; End choices
@@ -525,7 +525,7 @@ $0C     NUMBER      Display numeric value
 
 **Name Insertion**:
 ```
-.db $0B, $00        ; NAME, Player
+.db $0b, $00        ; NAME, Player
 .db " received the", $01
 .db "Excalibur!", $00
 ```
@@ -551,12 +551,12 @@ FFMQ uses dictionary-based compression:
 
 ```
 Compressed Format:
-  - Uncompressed: $00-$7F (literal bytes)
-  - Dictionary:   $80-$FF (references)
+  - Uncompressed: $00-$7f (literal bytes)
+  - Dictionary:   $80-$ff (references)
   
 Dictionary Reference:
-  High bit set ($80-$FF) = lookup in dictionary
-  Value & $7F = dictionary index
+  High bit set ($80-$ff) = lookup in dictionary
+  Value & $7f = dictionary index
   
 Example:
   $85 → Dictionary[5] = "the "
@@ -590,7 +590,7 @@ DecompressText:
     bra .loop
     
 .dictionary:
-    and #$7F            ; Get dictionary index
+    and #$7f            ; Get dictionary index
     asl a               ; × 2 (word pointers)
     tax
     
@@ -625,16 +625,16 @@ DecompressText:
 ```asm
 ; Main text rendering
 RenderText:                 ; Main text rendering loop
-    ; Located at $0D:8000
+    ; Located at $0d:8000
     
 DrawCharacter:              ; Draw single character
-    ; Located at $0D:8123
+    ; Located at $0d:8123
     
 ProcessControlCode:         ; Handle control codes
-    ; Located at $0D:8234
+    ; Located at $0d:8234
     
 WordWrap:                   ; Auto word wrapping
-    ; Located at $0D:8345
+    ; Located at $0d:8345
 ```
 
 ### Dialogue System
@@ -643,16 +643,16 @@ WordWrap:                   ; Auto word wrapping
 
 ```asm
 ShowDialogue:               ; Display dialogue window
-    ; Located at $0D:9000
+    ; Located at $0d:9000
     
 LoadPortrait:               ; Load character portrait
-    ; Located at $0D:9123
+    ; Located at $0d:9123
     
 WaitForInput:               ; Wait for button press
-    ; Located at $0D:9234
+    ; Located at $0d:9234
     
 CloseDialogue:              ; Close text window
-    ; Located at $0D:9345
+    ; Located at $0d:9345
 ```
 
 ### Text Utilities
@@ -661,16 +661,16 @@ CloseDialogue:              ; Close text window
 
 ```asm
 DecompressText:             ; Decompress text data
-    ; Located at $0D:A000
+    ; Located at $0d:A000
     
 GetTextPointer:             ; Look up text by ID
-    ; Located at $0D:A123
+    ; Located at $0d:A123
     
 DrawWindow:                 ; Draw bordered window
-    ; Located at $0D:A234
+    ; Located at $0d:A234
     
 LoadFont:                   ; Load font to VRAM
-    ; Located at $0D:A345
+    ; Located at $0d:A345
 ```
 
 ## Performance Considerations

@@ -1,4 +1,4 @@
-# Graphics + Palette Extraction Summary
+﻿# Graphics + Palette Extraction Summary
 **Date:** 2025-10-25  
 **Commit:** 5d41935  
 **Status:** ✅ **SUCCESS** - Recognizable sprite workflow implemented!
@@ -146,10 +146,10 @@ Bit:  15  14-10   9-5    4-0
 
 | Address | Size | Type | Description |
 |---------|------|------|-------------|
-| $07A000 | 256 bytes | Character | 8 palettes for party members |
-| $07A100 | 512 bytes | Enemy | 16 palettes for enemies |
-| $07A300 | 256 bytes | BG | 8 palettes for backgrounds |
-| $07A500 | 128 bytes | Battle BG | 4 palettes for battles |
+| $07a000 | 256 bytes | Character | 8 palettes for party members |
+| $07a100 | 512 bytes | Enemy | 16 palettes for enemies |
+| $07a300 | 256 bytes | BG | 8 palettes for backgrounds |
+| $07a500 | 128 bytes | Battle BG | 4 palettes for battles |
 
 ## Workflow: Editing Colors
 

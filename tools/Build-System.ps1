@@ -1,4 +1,4 @@
-#Requires -Version 5.1
+﻿#Requires -Version 5.1
 <#
 .SYNOPSIS
 	Modern build system for Final Fantasy Mystic Quest SNES disassembly project.
@@ -57,16 +57,16 @@ param(
 	[string]$Target = 'build',
 
 	[Parameter()]
-	[string]$Configuration = 'build.config.json',
+	[string]$configuration = 'build.config.json',
 
 	[Parameter()]
-	[switch]$Force
+	[switch]$force
 )
 
 # Set strict mode for better error handling
 # https://docs.microsoft.com/en-us/powershell/module/microsoft.powershell.core/set-strictmode
 Set-StrictMode -Version Latest
-$ErrorActionPreference = 'Stop'
+$errorActionPreference = 'Stop'
 
 # Script metadata
 $script:BuildSystemVersion = '2.0.0'
@@ -175,12 +175,12 @@ function Write-Log {
 	https://docs.microsoft.com/en-us/powershell/module/microsoft.powershell.utility/convertfrom-json
 #>
 function Get-BuildConfiguration {
-	param([string]$ConfigPath)
+	param([string]$configPath)
 
-	Write-DebugLog "Loading configuration from: $ConfigPath"
+	Write-DebugLog "Loading configuration from: $configPath"
 
 	# Resolve path relative to script root
-	$fullPath = Join-Path $script:ScriptRoot $ConfigPath
+	$fullPath = Join-Path $script:ScriptRoot $configPath
 
 	if (-not (Test-Path $fullPath)) {
 		throw "Configuration file not found: $fullPath"
@@ -205,14 +205,14 @@ function Get-BuildConfiguration {
 function Find-Tool {
 	param(
 		[string]$Name,
-		[string]$Executable,
+		[string]$executable,
 		[string[]]$SearchPaths
 	)
 
-	Write-DebugLog "Searching for $Name ($Executable)..."
+	Write-DebugLog "Searching for $Name ($executable)..."
 
 	# First check if it's in PATH
-	$pathTool = Get-Command $Executable -ErrorAction SilentlyContinue
+	$pathTool = Get-Command $executable -ErrorAction SilentlyContinue
 	if ($pathTool) {
 		Write-DebugLog "Found $Name in PATH: $($pathTool.Source)"
 		return $pathTool.Source
@@ -221,7 +221,7 @@ function Find-Tool {
 	# Search in configured paths
 	foreach ($searchPath in $SearchPaths) {
 		$fullPath = Join-Path $script:ScriptRoot $searchPath
-		$toolPath = Join-Path $fullPath $Executable
+		$toolPath = Join-Path $fullPath $executable
 
 		Write-DebugLog "Checking: $toolPath"
 
@@ -664,8 +664,8 @@ try {
 	}
 
 	# Load configuration
-	$script:BuildConfig = Get-BuildConfiguration -ConfigPath $Configuration
-	Write-Success "Configuration loaded: $Configuration"
+	$script:BuildConfig = Get-BuildConfiguration -ConfigPath $configuration
+	Write-Success "Configuration loaded: $configuration"
 
 	# Validate tools
 	Test-RequiredTools

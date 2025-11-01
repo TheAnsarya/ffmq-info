@@ -1,4 +1,4 @@
-#!/usr/bin/env pwsh
+﻿#!/usr/bin/env pwsh
 <#
 .SYNOPSIS
     Helper script to set up GitHub Project Board for FFMQ Disassembly
@@ -13,7 +13,7 @@
     - Organizes 47 issues by priority and parent
 #>
 
-$ErrorActionPreference = "Stop"
+$errorActionPreference = "Stop"
 
 Write-Host @"
 ╔════════════════════════════════════════════════════════════════════════════╗

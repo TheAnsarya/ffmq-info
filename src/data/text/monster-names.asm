@@ -1,8 +1,8 @@
-
+﻿
 ; TEXT: Monster names ($064ba0)
 ; 
 ; for some reason most names use $06 for space
-; but some names use $FF for space
+; but some names use $ff for space
 ; 
 ; TODO: find out if the code treats the two spaces differently
 MonsterNames:

@@ -1,4 +1,4 @@
-# FFMQ Disassembly Tools
+﻿# FFMQ Disassembly Tools
 
 This directory contains automation tools for the FFMQ disassembly project.
 
@@ -104,7 +104,7 @@ By Priority:
 
 Top 10 Most-Used Addresses:
   $0000 (WRAM): 60 occurrences - var_0000
-  $420B (Hardware): 26 occurrences - MDMAEN
+  $420b (Hardware): 26 occurrences - MDMAEN
   $2116 (PPU): 20 occurrences - VMADDL
   ...
 
@@ -123,8 +123,8 @@ Top 10 Most-Used Addresses:
 
 The scanner automatically recognizes standard SNES hardware registers and suggests their official names:
 
-- **PPU Registers** (`$2100-$21FF`): INIDISP, BGMODE, VMAIN, VMADDL, CGADD, etc.
-- **CPU Registers** (`$4200-$43FF`): NMITIMEN, MDMAEN, HDMAEN, etc.
+- **PPU Registers** (`$2100-$21ff`): INIDISP, BGMODE, VMAIN, VMADDL, CGADD, etc.
+- **CPU Registers** (`$4200-$43ff`): NMITIMEN, MDMAEN, HDMAEN, etc.
 - **Controller Ports** (`$4016-$4017`): JOYSER0, JOYSER1
 
 ### Integration with Label Application
@@ -282,7 +282,7 @@ Automates the process of replacing memory addresses with descriptive labels in a
 Address,Label,Type,Comment
 $40,player_x_pos_lo,RAM,Player X position (low byte)
 $41,player_x_pos_hi,RAM,Player X position (high byte)
-$7E0040,player_x_pos,RAM,Player X position (word)
+$7e0040,player_x_pos,RAM,Player X position (word)
 ```
 
 **Columns:**
@@ -314,7 +314,7 @@ $7E0040,player_x_pos,RAM,Player X position (word)
 
 The tool automatically detects and handles different addressing modes:
 
-#### Direct Page ($00-$FF)
+#### Direct Page ($00-$ff)
 ```assembly
 ; Before
 LDA $40
@@ -325,22 +325,22 @@ LDA !player_x_pos_lo
 STA !player_x_pos_hi,X
 ```
 
-#### Absolute ($0000-$FFFF)
+#### Absolute ($0000-$ffff)
 ```assembly
 ; Before
-LDA $7E40
-INC $7E41,X
+LDA $7e40
+INC $7e41,X
 
 ; After
 LDA !player_x_pos
 INC !player_y_pos,X
 ```
 
-#### Long ($000000-$FFFFFF)
+#### Long ($000000-$ffffff)
 ```assembly
 ; Before
-LDA $7E0040
-STA $7E0042,X
+LDA $7e0040
+STA $7e0042,X
 
 ; After
 LDA !player_x_pos

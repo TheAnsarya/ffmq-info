@@ -1,4 +1,4 @@
-# FFMQ Build Troubleshooting Guide
+﻿# FFMQ Build Troubleshooting Guide
 
 Quick reference for resolving common build issues.
 
@@ -177,7 +177,7 @@ asar --version  # Should show 1.81 or later
    ```asm
    ; Each bank is 32KB (0x8000 bytes)
    org $008000
-   ; ... code up to $00FFFF
+   ; ... code up to $00ffff
    
    org $018000  ; Next bank
    ```
@@ -185,7 +185,7 @@ asar --version  # Should show 1.81 or later
 3. **Check for missing fills**:
    ```asm
    ; Fill unused space to maintain ROM size
-   org $00FF00
+   org $00ff00
    ; ... some code
    
    ; Fill rest of bank
@@ -291,7 +291,7 @@ asar --version  # Should show 1.81 or later
 3. **Check source at that location**:
    ```asm
    ; Find corresponding org in source
-   org $038000  ; If bank $03, address $A3C0 → org $03A3C0
+   org $038000  ; If bank $03, address $a3c0 → org $03a3c0
    ; Check data definition at this point
    ```
 
@@ -414,8 +414,8 @@ asar --version  # Should show 1.81 or later
 
 1. **Check reset vector**:
    ```asm
-   ; Reset vector should be at $00FFFC-$00FFFD
-   org $00FFFC
+   ; Reset vector should be at $00fffc-$00fffd
+   org $00fffc
    dw reset_routine  ; Ensure correct address
    ```
 
@@ -625,7 +625,7 @@ fc /b "roms\ffmq-original.sfc" "ffmq - onlygood.sfc" | Select-Object -First 20
 "Hi!" (3 bytes)
 
 ; Option 2: Move to free space
-org $03F800  ; Free space in bank $03
+org $03f800  ; Free space in bank $03
 NewText:
     db "Hello", $00
 ; Update pointer to NewText
@@ -651,7 +651,7 @@ NewText:
 ```asm
 ; Check if area is free first
 ; Use pad to ensure you don't exceed bank
-org $00F000  ; Start of new code
+org $00f000  ; Start of new code
 NewRoutine:
     ; code
 pad $010000  ; Ensure we don't exceed bank boundary

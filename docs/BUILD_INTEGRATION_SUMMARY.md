@@ -1,4 +1,4 @@
-# Build System Integration - Summary
+﻿# Build System Integration - Summary
 
 ## What Was Accomplished
 
@@ -93,9 +93,9 @@ test              # Launch emulator
 ```
 # ITEM_NAMES
 # ID | Text | Address
-0001 | Cure           | $04F000
-0002 | Heal           | $04F00C
-0003 | Life           | $04F018
+0001 | Cure           | $04f000
+0002 | Heal           | $04f00c
+0003 | Life           | $04f018
 ```
 
 ### 4. Build System Documentation (`docs/BUILD_SYSTEM.md`)

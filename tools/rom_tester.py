@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+﻿#!/usr/bin/env python3
 """
 Final Fantasy Mystic Quest - ROM Testing Framework
 Basic automated testing for ROM functionality
@@ -39,7 +39,7 @@ class FFMQROMTester:
             return False
         
         # Test header locations (LoROM format)
-        header_offset = 0x7FC0  # LoROM header location
+        header_offset = 0x7fc0  # LoROM header location
         
         # Check for valid header signature
         try:
@@ -87,7 +87,7 @@ class FFMQROMTester:
         """Test ROM checksums"""
         print("Testing ROM checksums...")
         
-        header_offset = 0x7FC0
+        header_offset = 0x7fc0
         
         try:
             # Read checksums from header
@@ -104,8 +104,8 @@ class FFMQROMTester:
                 if not (checksum_offset <= i < checksum_offset + 4):  # Skip checksum area
                     calculated_sum += self.rom_data[i]
             
-            calculated_sum &= 0xFFFF
-            calculated_complement = calculated_sum ^ 0xFFFF
+            calculated_sum &= 0xffff
+            calculated_complement = calculated_sum ^ 0xffff
             
             print(f"  Calculated sum: 0x{calculated_sum:04X}")
             print(f"  Calculated complement: 0x{calculated_complement:04X}")
@@ -127,7 +127,7 @@ class FFMQROMTester:
         print("Testing interrupt vectors...")
         
         try:
-            vector_offset = 0x7FE4  # Start of vector table in LoROM
+            vector_offset = 0x7fe4  # Start of vector table in LoROM
             
             vectors = {
                 'COP': vector_offset,
@@ -144,7 +144,7 @@ class FFMQROMTester:
                     print(f"  {name}: 0x{vector:04X}")
                     
                     # Basic sanity check - vectors should be in valid address ranges
-                    if vector < 0x8000 or vector > 0xFFFF:
+                    if vector < 0x8000 or vector > 0xffff:
                         self.warnings.append(f"Unusual {name} vector: 0x{vector:04X}")
                 else:
                     self.errors.append(f"ROM too small for {name} vector")
@@ -161,7 +161,7 @@ class FFMQROMTester:
         
         try:
             # Get reset vector
-            reset_vector = struct.unpack('<H', self.rom_data[0x7FEC:0x7FEE])[0]
+            reset_vector = struct.unpack('<H', self.rom_data[0x7fec:0x7fee])[0]
             print(f"  Reset vector: 0x{reset_vector:04X}")
             
             # Convert to ROM offset
@@ -205,9 +205,9 @@ class FFMQROMTester:
                 if chunk == b'\x00' * chunk_size:
                     self.warnings.append(f"Found large zero block at 0x{i:06X}")
                 
-                # Check for all 0xFF
+                # Check for all 0xff
                 elif chunk == b'\xFF' * chunk_size:
-                    self.warnings.append(f"Found large 0xFF block at 0x{i:06X}")
+                    self.warnings.append(f"Found large 0xff block at 0x{i:06X}")
                 
                 # Check for repeating patterns
                 elif len(set(chunk)) < 4:

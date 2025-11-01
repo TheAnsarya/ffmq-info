@@ -1,4 +1,4 @@
-# FFMQ Graphics Extraction Report
+﻿# FFMQ Graphics Extraction Report
 
 **Generated:** 2025-11-01 18:08:22
 **Total Assets:** 22
@@ -152,13 +152,13 @@ assets/graphics/
 
 Areas of the ROM that may contain graphics data but haven't been extracted yet:
 
-- **Bank $0A:** Additional compressed graphics
-- **Bank $0E:** Compressed tileset data
-- **Bank $0F:** Unknown graphics regions
+- **Bank $0a:** Additional compressed graphics
+- **Bank $0e:** Compressed tileset data
+- **Bank $0f:** Unknown graphics regions
 
 ## Next Steps
 
-- [ ] Extract remaining compressed graphics from Banks $0A, $0E, $0F
+- [ ] Extract remaining compressed graphics from Banks $0a, $0e, $0f
 - [ ] Catalog all sprite animation frames
 - [ ] Extract and document all UI elements
 - [ ] Create sprite sheet assemblies

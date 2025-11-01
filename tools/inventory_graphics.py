@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+﻿#!/usr/bin/env python3
 """
 FFMQ Graphics Asset Inventory Tool
 ===================================
@@ -174,7 +174,7 @@ class GraphicsInventory:
 
     def _extract_metadata(self, filepath: Path) -> Tuple[Optional[str], Optional[str], Optional[str]]:
         """Extract ROM bank/address metadata from filename"""
-        # Look for patterns like bank_0B, 0x08A000, etc.
+        # Look for patterns like bank_0B, 0x08a000, etc.
         name = filepath.stem
 
         bank = None
@@ -357,13 +357,13 @@ assets/graphics/
 
 Areas of the ROM that may contain graphics data but haven't been extracted yet:
 
-- **Bank $0A:** Additional compressed graphics
-- **Bank $0E:** Compressed tileset data
-- **Bank $0F:** Unknown graphics regions
+- **Bank $0a:** Additional compressed graphics
+- **Bank $0e:** Compressed tileset data
+- **Bank $0f:** Unknown graphics regions
 
 ## Next Steps
 
-- [ ] Extract remaining compressed graphics from Banks $0A, $0E, $0F
+- [ ] Extract remaining compressed graphics from Banks $0a, $0e, $0f
 - [ ] Catalog all sprite animation frames
 - [ ] Extract and document all UI elements
 - [ ] Create sprite sheet assemblies

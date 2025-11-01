@@ -1,4 +1,4 @@
-#!/usr/bin/env pwsh
+﻿#!/usr/bin/env pwsh
 <#
 .SYNOPSIS
     Creates hierarchical sub-issues (task lists) for GitHub issues based on TODO.md
@@ -20,10 +20,10 @@
 #>
 
 param(
-    [switch]$DryRun
+    [switch]$dryRun
 )
 
-$ErrorActionPreference = "Stop"
+$errorActionPreference = "Stop"
 
 # Check if gh CLI is installed and authenticated
 function Test-GitHubCLI {
@@ -66,7 +66,7 @@ Test-GitHubCLI
 $repo = Get-RepoName
 Write-Host "✓ Repository: $repo`n" -ForegroundColor Green
 
-if ($DryRun) {
+if ($dryRun) {
     Write-Host "🔍 DRY RUN MODE - No changes will be made`n" -ForegroundColor Yellow
 }
 
@@ -197,9 +197,9 @@ $subTasks = @{
 
 ### RAM Map Documentation
 - [ ] Create docs/RAM_MAP.md structure
-- [ ] Document Zero Page variables ($00-$FF)
-- [ ] Document WRAM variables ($0200-$1FFF)
-- [ ] Document Extended RAM ($7E2000-$7FFFFF)
+- [ ] Document Zero Page variables ($00-$ff)
+- [ ] Document WRAM variables ($0200-$1fff)
+- [ ] Document Extended RAM ($7e2000-$7fffff)
 - [ ] Document variable size, type, purpose for each
 - [ ] Note which banks/systems use each variable
 - [ ] Add visual memory map diagram
@@ -284,7 +284,7 @@ $subTasks = @{
 
 ### Graphics Cataloging
 - [ ] Create tools/graphics_catalog.py
-- [ ] Scan graphics banks ($07, $08, $09, $0A, $0B)
+- [ ] Scan graphics banks ($07, $08, $09, $0a, $0b)
 - [ ] Identify all graphics regions (tiles, palettes, sprites)
 - [ ] Generate comprehensive catalog (JSON/CSV/Markdown)
 - [ ] Identify uncatalogued regions for further analysis
@@ -410,7 +410,7 @@ $subTasks = @{
 ### Text & Dialogue Extraction
 - [ ] Create tools/text_extractor.py specialized tool
 - [ ] Implement FFMQ text decompression (dictionary-based)
-- [ ] Parse text control codes ($F0-$FF) with descriptions
+- [ ] Parse text control codes ($f0-$ff) with descriptions
 - [ ] Extract all dialogue strings
 - [ ] Extract menu text and descriptions
 - [ ] Generate data/text_en.json with ID→string mapping
@@ -533,12 +533,12 @@ $subTasks = @{
 ### Initial Exploration
 - [ ] Scan for JSR/RTS patterns to identify code regions
 - [ ] Scan for bulk data patterns
-- [ ] Create ROM offset map for bank $0E
+- [ ] Create ROM offset map for bank $0e
 - [ ] Generate byte frequency analysis
 - [ ] Determine likely contents (code, data, graphics, sound)
 
 ### Deep Analysis
-- [ ] Trace all JSL/JSR calls into bank $0E
+- [ ] Trace all JSL/JSR calls into bank $0e
 - [ ] Identify subroutine entry points
 - [ ] Analyze data access patterns
 - [ ] Determine bank purpose and system relationships
@@ -571,12 +571,12 @@ $subTasks = @{
 ### Initial Exploration
 - [ ] Scan for JSR/RTS patterns to identify code regions
 - [ ] Scan for bulk data patterns
-- [ ] Create ROM offset map for bank $0F
+- [ ] Create ROM offset map for bank $0f
 - [ ] Generate byte frequency analysis
-- [ ] Compare patterns with bank $0E (likely similar)
+- [ ] Compare patterns with bank $0e (likely similar)
 
 ### Deep Analysis
-- [ ] Trace all JSL/JSR calls into bank $0F
+- [ ] Trace all JSL/JSR calls into bank $0f
 - [ ] Identify subroutine entry points
 - [ ] Analyze data access patterns
 - [ ] Determine bank purpose (overflow from other banks?)
@@ -748,7 +748,7 @@ foreach ($issueNum in $subTasks.Keys | Sort-Object { [int]$_ }) {
 
     Write-Host "[$issueCount] Issue #$issueNum - $taskMatches sub-tasks" -ForegroundColor Yellow
 
-    if ($DryRun) {
+    if ($dryRun) {
         Write-Host "  [DRY RUN] Would add comment to issue #$issueNum" -ForegroundColor Cyan
         Write-Host "  Preview (first 200 chars):" -ForegroundColor Gray
         Write-Host "  $($body.Substring(0, [Math]::Min(200, $body.Length)))..." -ForegroundColor DarkGray
@@ -776,7 +776,7 @@ Write-Host "`n" + ("="*70) + "`n" -ForegroundColor Cyan
 Write-Host "✨ Sub-Task Creation Summary" -ForegroundColor Green
 Write-Host ("="*70) + "`n" -ForegroundColor Cyan
 
-if ($DryRun) {
+if ($dryRun) {
     Write-Host "🔍 DRY RUN Complete!" -ForegroundColor Yellow
     Write-Host "Would have updated $issueCount issues with $totalTasks total sub-tasks`n" -ForegroundColor Yellow
     Write-Host "Run without -DryRun to create actual comments" -ForegroundColor Yellow

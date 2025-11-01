@@ -1,4 +1,4 @@
-# Final Fantasy Mystic Quest - Extracted Graphics
+﻿# Final Fantasy Mystic Quest - Extracted Graphics
 
 This directory contains graphics extracted from the FFMQ ROM.
 
@@ -6,7 +6,7 @@ This directory contains graphics extracted from the FFMQ ROM.
 
 ### main_tiles
 - **Description:** Main background tiles (34 banks)
-- **PC Address:** $028C80
+- **PC Address:** $028c80
 - **Size:** 222720 bytes
 - **Format:** 4BPP
 - **Files:**
@@ -24,7 +24,7 @@ This directory contains graphics extracted from the FFMQ ROM.
 
 ### sprite_tiles
 - **Description:** Sprite graphics data
-- **PC Address:** $03B013
+- **PC Address:** $03b013
 - **Size:** 68585 bytes
 - **Format:** 4BPP
 - **Files:**

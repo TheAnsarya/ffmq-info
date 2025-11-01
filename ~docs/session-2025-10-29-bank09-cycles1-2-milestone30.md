@@ -1,4 +1,4 @@
-# Session Log - Bank $09 Cycles 1-2 Complete + 30% Milestone Achieved
+﻿# Session Log - Bank $09 Cycles 1-2 Complete + 30% Milestone Achieved
 **Date**: October 29, 2025  
 **Session Goal**: Push to 30% campaign milestone via Bank $09 exploration  
 **Result**: ✅ **30.7% ACHIEVED** (exceeded target!)
@@ -50,15 +50,15 @@
 Bank $09 contains **SNES PPU color palette data** in RGB555 format:
 - 15-bit color: `%0BBBBBGGGGGRRRRR` (5 bits per R/G/B channel)
 - Byte order: Little-endian (LOW byte, HIGH byte)
-- Color range: $0000 (black) → $7FFF (white)
+- Color range: $0000 (black) → $7fff (white)
 
 **Common Color Values**:
 ```
 $00,$00 = Transparent/Black
-$FF,$7F = White (maximum brightness)
-$FF,$03 = Bright red
-$E0,$03 = Bright green  
-$1F,$7C = Bright blue
+$ff,$7f = White (maximum brightness)
+$ff,$03 = Bright red
+$e0,$03 = Bright green  
+$1f,$7c = Bright blue
 ```
 
 **Palette Structure**:
@@ -73,17 +73,17 @@ $1F,$7C = Bright blue
 
 **Bank $09** (THIS BANK - PRIMARY):
 - Character/NPC palettes ($098000-$098460, ~1,120 bytes)
-- Pointer table to all palettes ($098460-$0985F4, ~400 bytes)
-- Tile pattern data ($0985F5+, ~55KB)
+- Pointer table to all palettes ($098460-$0985f4, ~400 bytes)
+- Tile pattern data ($0985f5+, ~55KB)
 
-**Bank $0A** (EXTENDED PALETTES):
+**Bank $0a** (EXTENDED PALETTES):
 - Backgrounds, special effects, animations
 - Referenced by pointers starting at $098582
-- Examples: $0A8618, $0A9038, $0A9788, $0AAB08, etc.
+- Examples: $0a8618, $0a9038, $0a9788, $0aab08, etc.
 
-**Bank $0B** (ADDITIONAL STORAGE):
+**Bank $0b** (ADDITIONAL STORAGE):
 - Overflow/rare palettes
-- Referenced at $0985E6: $0B971C
+- Referenced at $0985e6: $0b971c
 - Likely late-game or boss-specific colors
 
 **Pointer Format** (5 bytes per entry):
@@ -95,16 +95,16 @@ Byte 3: Color count (1-39, or 0 for full palette)
 Byte 4: Flags ($00 standard, $03/$12 for special modes)
 ```
 
-**Example**: `$F5,$85,$09,$04,$00`
-- Address: $0985F5 (Bank $09, offset $85F5)
+**Example**: `$f5,$85,$09,$04,$00`
+- Address: $0985f5 (Bank $09, offset $85f5)
 - Count: 4 colors (8 bytes)
 - Flags: $00 (standard load)
 
 ### 3. **Pointer Table Terminator**
 
-Discovered **$FF,$FF** end marker at $0985F0:
+Discovered **$ff,$ff** end marker at $0985f0:
 ```asm
-db $3C,$B3,$0B,$FF,$FF  ; Last entry + terminator
+db $3c,$b3,$0b,$ff,$ff  ; Last entry + terminator
 ```
 
 - Marks boundary between metadata and actual data
@@ -163,12 +163,12 @@ Bank $09 (colors) + Bank $07 (patterns) + Bank $08 (positions)
 **Discovered Palette Groups**:
 
 **Marker $48,$22** (Battle Palettes):
-- Appears at $0982C0+
+- Appears at $0982c0+
 - Indicates battle scene colors
 - Enemy sprites, battle backgrounds, effects
 
 **Marker $00,$58** (Environment Palettes):
-- Appears at $0983C0+
+- Appears at $0983c0+
 - Overworld, dungeons, towns
 - Background tiles, environmental objects
 
@@ -185,11 +185,11 @@ Bank $09 (colors) + Bank $07 (patterns) + Bank $08 (positions)
 
 **Variable Color Counts** allow partial palette uploads:
 
-Example palette $0A9038 has **3 pointer entries**:
+Example palette $0a9038 has **3 pointer entries**:
 ```
-$38,$90,$0A,$1C,$00  → Load 28 colors (full scene)
-$38,$90,$0A,$0E,$00  → Load 14 colors (half palette)
-$38,$90,$0A,$01,$00  → Load 1 color (single swap)
+$38,$90,$0a,$1c,$00  → Load 28 colors (full scene)
+$38,$90,$0a,$0e,$00  → Load 14 colors (half palette)
+$38,$90,$0a,$01,$00  → Load 1 color (single swap)
 ```
 
 **Use Cases**:
@@ -222,15 +222,15 @@ $38,$90,$0A,$01,$00  → Load 1 color (single swap)
 
 1. **temp_bank09_cycle01.asm** (773 lines)
    - Palette entries 1-12 (character/NPC colors)
-   - Palette pointer table start ($098460-$0984D8)
+   - Palette pointer table start ($098460-$0984d8)
    - Initial tile pattern data
    - SNES color format documentation
    - Cross-bank dependency notes
 
 2. **temp_bank09_cycle02.asm** (347 lines)
    - Remaining pointer table entries
-   - Cross-bank discoveries (Banks $0A/$0B)
-   - Pointer terminator ($FF,$FF)
+   - Cross-bank discoveries (Banks $0a/$0b)
+   - Pointer terminator ($ff,$ff)
    - Extensive tile pattern data
    - Complete rendering pipeline documentation
 
@@ -272,13 +272,13 @@ $38,$90,$0A,$01,$00  → Load 1 color (single swap)
 - Additional tile patterns
 - ⚠️ 53.8% documented (1,120 / 2,082 lines)
 
-**Bank $0A** - Extended Palettes:
+**Bank $0a** - Extended Palettes:
 - Background palettes
 - Special effect colors
 - Referenced by Bank $09 pointers
 - ⬜ 0% documented (not started)
 
-**Bank $0B** - Additional Storage:
+**Bank $0b** - Additional Storage:
 - Overflow palettes
 - Rare/boss-specific colors
 - ⬜ 0% documented (not started)
@@ -308,7 +308,7 @@ Bank $08 Arrange   →  OAM (544 bytes, sprite positions)
 
 ✅ **Exceptional Velocity**: 560 lines/cycle average (187% of 300-line target)
 
-✅ **Cross-Bank Discovery**: Found multi-bank palette architecture (Banks $09/$0A/$0B)
+✅ **Cross-Bank Discovery**: Found multi-bank palette architecture (Banks $09/$0a/$0b)
 
 ✅ **Complete Pipeline**: Fully documented graphics rendering (4 banks integrated)
 
@@ -326,7 +326,7 @@ Bank $08 Arrange   →  OAM (544 bytes, sprite positions)
 
 🔧 **Flexible Loading**: Variable color counts enable efficient palette management
 
-🔧 **Terminator Marker**: $FF,$FF boundary detection for metadata parsing
+🔧 **Terminator Marker**: $ff,$ff boundary detection for metadata parsing
 
 ### Future Enhancements
 
@@ -365,19 +365,19 @@ Bank $08 Arrange   →  OAM (544 bytes, sprite positions)
 
 3. **Decide Next Target**:
    - **Option A**: Continue Bank $09 to 100% (need +966 more lines)
-   - **Option B**: Begin Bank $0A (extended palettes)
+   - **Option B**: Begin Bank $0a (extended palettes)
    - **Option C**: Extract palette data tools
 
 ### Mid-Term (2-3 Sessions)
 
 1. Complete Bank $09 to 100%
-2. Begin Bank $0A (extended palettes + graphics)
+2. Begin Bank $0a (extended palettes + graphics)
 3. Reach 35% milestone (~29,750 lines, need +3,643)
 4. Implement palette extraction tools
 
 ### Long-Term (5-10 Sessions)
 
-1. Complete Banks $0A-$0F systematically
+1. Complete Banks $0a-$0f systematically
 2. Reach 50% campaign milestone
 3. Begin Bank $00 (System Kernel)
 4. Full graphics pipeline tools
@@ -396,10 +396,10 @@ Bank $08 Arrange   →  OAM (544 bytes, sprite positions)
 **Bank $09 Progress**:
 - Cycles completed: 2 of ~5 expected
 - Current: 53.8% (1,120 / 2,082 lines)
-- Next: Continue to 75-100% or explore Bank $0A
+- Next: Continue to 75-100% or explore Bank $0a
 
 **Major Discoveries**:
-1. Multi-bank palette architecture (Banks $09/$0A/$0B)
+1. Multi-bank palette architecture (Banks $09/$0a/$0b)
 2. Pointer table with cross-bank references
 3. Complete SNES PPU rendering pipeline
 4. RGB555 color format fully documented
@@ -416,7 +416,7 @@ Bank $08 Arrange   →  OAM (544 bytes, sprite positions)
 - **30.7% complete** (26,107 / ~85,000 lines)
 - **5 banks 100% done**: $01, $02, $03, $07, $08
 - **1 bank in progress**: $09 (53.8%)
-- **10 banks remaining**: $00, $04, $05, $06, $0A-$0F
+- **10 banks remaining**: $00, $04, $05, $06, $0a-$0f
 
 ---
 
@@ -428,6 +428,6 @@ This session successfully achieved the **30% campaign milestone** through aggres
 
 ---
 
-**Next Session Goal**: Complete Bank $09 or begin Bank $0A exploration  
+**Next Session Goal**: Complete Bank $09 or begin Bank $0a exploration  
 **Target**: 35% milestone (~29,750 lines, need +3,643 from current 26,107)
 

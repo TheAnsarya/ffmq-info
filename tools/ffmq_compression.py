@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+﻿#!/usr/bin/env python3
 """
 FFMQ Compression/Decompression Tools
 Based on algorithms from https://github.com/TheAnsarya/logsmall
@@ -96,8 +96,8 @@ class SimpleTailWindowCompression:
                 break  # End of decompression
             
             # Low nibble: copy from data array
-            if command & 0x0F:
-                length = command & 0x0F
+            if command & 0x0f:
+                length = command & 0x0f
                 for _ in range(length):
                     if data_pos >= len(source):
                         break
@@ -105,8 +105,8 @@ class SimpleTailWindowCompression:
                     data_pos += 1
             
             # High nibble: copy from output (LZ back-reference)
-            if command & 0xF0:
-                length = ((command & 0xF0) >> 4) + 2
+            if command & 0xf0:
+                length = ((command & 0xf0) >> 4) + 2
                 if cmd_pos >= len(source):
                     break
                 offset = source[cmd_pos] + 1
@@ -163,7 +163,7 @@ class SimpleTailWindowCompression:
                 pos += max_match_len
             else:
                 # No match - add to data stream
-                if copy_data == 0xF:
+                if copy_data == 0xf:
                     commands.append(copy_data)
                     copy_data = 1
                 else:
@@ -182,8 +182,8 @@ class SimpleTailWindowCompression:
         # Build output
         output = bytearray()
         data_offset = len(commands)
-        output.append(data_offset & 0xFF)
-        output.append((data_offset >> 8) & 0xFF)
+        output.append(data_offset & 0xff)
+        output.append((data_offset >> 8) & 0xff)
         output.extend(commands)
         output.extend(data)
         

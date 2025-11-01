@@ -1,4 +1,4 @@
-<#
+﻿<#
 .SYNOPSIS
     Scans ASM files for raw memory addresses and generates usage reports.
 
@@ -45,9 +45,9 @@ param(
 function Write-ColorOutput {
     param(
         [string]$Message,
-        [string]$Color = "White"
+        [string]$color = "White"
     )
-    Write-Host $Message -ForegroundColor $Color
+    Write-Host $Message -ForegroundColor $color
 }
 
 function Write-Step {
@@ -73,11 +73,11 @@ function Write-Error {
 # Address categorization functions
 function Get-AddressCategory {
     param(
-        [string]$Address
+        [string]$address
     )
     
     # Convert to integer for range checking
-    $addr = [Convert]::ToInt32($Address.TrimStart('$'), 16)
+    $addr = [Convert]::ToInt32($address.TrimStart('$'), 16)
     
     # SNES Memory Map categorization
     if ($addr -ge 0x0000 -and $addr -le 0x00FF) {
@@ -120,10 +120,10 @@ function Get-AddressCategory {
 
 function Get-AddressType {
     param(
-        [string]$Address
+        [string]$address
     )
     
-    $addr = [Convert]::ToInt32($Address.TrimStart('$'), 16)
+    $addr = [Convert]::ToInt32($address.TrimStart('$'), 16)
     
     if ($addr -ge 0x0000 -and $addr -le 0x1FFF) {
         return "WRAM"
@@ -172,12 +172,12 @@ function Get-AddressPriority {
 
 function Get-SuggestedLabel {
     param(
-        [string]$Address,
+        [string]$address,
         [string]$Type,
-        [string]$Category
+        [string]$category
     )
     
-    $addr = [Convert]::ToInt32($Address.TrimStart('$'), 16)
+    $addr = [Convert]::ToInt32($address.TrimStart('$'), 16)
     
     # Known hardware registers
     $hardwareRegisters = @{
@@ -263,14 +263,14 @@ function Get-SuggestedLabel {
         '421B' = 'JOY2H'
     }
     
-    $addrHex = $Address.TrimStart('$').ToUpper()
+    $addrHex = $address.TrimStart('$').ToUpper()
     if ($hardwareRegisters.ContainsKey($addrHex)) {
         return $hardwareRegisters[$addrHex]
     }
     
     # Generate suggested label based on category
     if ($Type -eq "WRAM") {
-        if ($Category -eq "Zero Page (Direct Page)") {
+        if ($category -eq "Zero Page (Direct Page)") {
             return "var_" + $addrHex.ToLower()
         }
         else {
@@ -377,7 +377,7 @@ function Scan-AsmFiles {
 function Generate-Report {
     param(
         [hashtable]$Occurrences,
-        [hashtable]$Contexts,
+        [hashtable]$contexts,
         [string]$OutputPath
     )
     
@@ -398,7 +398,7 @@ function Generate-Report {
         $category = Get-AddressCategory -Address $address
         $priority = Get-AddressPriority -Occurrences $count -Type $type
         $suggestedLabel = Get-SuggestedLabel -Address $address -Type $type -Category $category
-        $exampleContexts = ($Contexts[$address] | Select-Object -First 3) -join '; '
+        $exampleContexts = ($contexts[$address] | Select-Object -First 3) -join '; '
         
         $reportData += [PSCustomObject]@{
             Address = $address

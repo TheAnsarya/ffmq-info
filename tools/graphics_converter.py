@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+﻿#!/usr/bin/env python3
 """
 FFMQ Graphics Converter
 Converts SNES 4bpp/8bpp tile data to PNG images
@@ -27,9 +27,9 @@ class SNESGraphicsConverter:
 	def bgr555_to_rgb(self, color: int) -> Tuple[int, int, int]:
 		"""Convert SNES BGR555 color to RGB888"""
 		# BGR555 format: 0bbbbbgg gggrrrrr
-		r = (color & 0x001F) << 3  # 5 bits -> 8 bits
-		g = ((color & 0x03E0) >> 5) << 3
-		b = ((color & 0x7C00) >> 10) << 3
+		r = (color & 0x001f) << 3  # 5 bits -> 8 bits
+		g = ((color & 0x03e0) >> 5) << 3
+		b = ((color & 0x7c00) >> 10) << 3
 
 		# Expand 5-bit to 8-bit (repeat top 3 bits in bottom 3 bits)
 		r |= (r >> 5)

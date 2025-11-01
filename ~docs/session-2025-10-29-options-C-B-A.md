@@ -1,11 +1,11 @@
-# Session Log: 2025-10-29 - Option C+B+A Execution (Palette Tools + Bank $0A + Progress)
+﻿# Session Log: 2025-10-29 - Option C+B+A Execution (Palette Tools + Bank $0a + Progress)
 
 ## Session Overview
 
 **Date**: October 29, 2025  
 **Session Type**: Multi-option execution (C → B → A progression)  
 **Starting Status**: 30.7% campaign (26,107 lines), Bank $09 @ 53.8% (1,120 lines)  
-**Ending Status**: 31.1% campaign (26,435 lines), Bank $0A @ 20.8% (428 lines)  
+**Ending Status**: 31.1% campaign (26,435 lines), Bank $0a @ 20.8% (428 lines)  
 **Session Growth**: +328 lines documented (+1.2% campaign progress)
 
 ## Execution Plan (User Request)
@@ -17,7 +17,7 @@ User requested: **"option C, then option B, then option A, then continue"** with
 
 **Options Defined**:
 - **Option C**: Create palette extraction tools (PNG swatches + JSON exports)
-- **Option B**: Begin Bank $0A exploration (extended palettes)
+- **Option B**: Begin Bank $0a exploration (extended palettes)
 - **Option A**: Complete Bank $09 to 100% (need +962 lines)
 - **Continue**: Push toward 35% milestone
 
@@ -36,10 +36,10 @@ User requested: **"option C, then option B, then option A, then continue"** with
    - SNES→PC address conversion
 
 2. **Palette Parsing**
-   - Read Bank $09 pointer table ($098460-$0985F4)
+   - Read Bank $09 pointer table ($098460-$0985f4)
    - Parse 5-byte entries: [addr_low, addr_mid, addr_high, count, flags]
-   - Follow cross-bank references to Banks $0A and $0B
-   - Detect pointer terminator ($FF,$FF)
+   - Follow cross-bank references to Banks $0a and $0b
+   - Detect pointer terminator ($ff,$ff)
 
 3. **RGB555 Color Conversion**
    - 15-bit SNES format: `%0BBBBBGGGGGRRRRR`
@@ -65,14 +65,14 @@ User requested: **"option C, then option B, then option A, then continue"** with
 
 **Bank Distribution**:
 - **Bank $09**: 60 entries, 752 colors (character/NPC/battle palettes)
-- **Bank $0A**: 18 entries, 464 colors (backgrounds/effects)
-- **Bank $0B**: 3 entries, 328 colors (overflow/rare)
+- **Bank $0a**: 18 entries, 464 colors (backgrounds/effects)
+- **Bank $0b**: 3 entries, 328 colors (overflow/rare)
 
 **Cross-Bank References Confirmed**:
-- $0A8618, $0A9038, $0A9788 (backgrounds)
-- $0AAB08, $0AB7C8, $0AC338 (effects)
-- $0AD430, $0AE888 (late-game/bosses)
-- $0B971C (special overflow)
+- $0a8618, $0a9038, $0a9788 (backgrounds)
+- $0aab08, $0ab7c8, $0ac338 (effects)
+- $0ad430, $0ae888 (late-game/bosses)
+- $0b971c (special overflow)
 
 **Output Files Created**:
 - 20 PNG palette swatches (first 20 palettes)
@@ -84,12 +84,12 @@ User requested: **"option C, then option B, then option A, then continue"** with
 ```
 tools/assets/palettes/
 ├── swatches/
-│   ├── palette_000_$0985F5.png (4 colors)
-│   ├── palette_001_$0985F5.png (3 colors)
+│   ├── palette_000_$0985f5.png (4 colors)
+│   ├── palette_001_$0985f5.png (3 colors)
 │   ├── ... (18 more individual swatches)
 │   ├── bank_$09_overview.png (60 palettes grid)
-│   ├── bank_$0A_overview.png (18 palettes grid)
-│   └── bank_$0B_overview.png (3 palettes grid)
+│   ├── bank_$0a_overview.png (18 palettes grid)
+│   └── bank_$0b_overview.png (3 palettes grid)
 └── json/
     ├── all_palettes.json (complete dataset)
     ├── palette_000.json
@@ -100,7 +100,7 @@ tools/assets/palettes/
 - Multi-bank palette architecture **VALIDATED**
 - Pointer table format confirmed (5 bytes per entry)
 - Variable color counts: 1-39 colors per palette
-- Terminator pattern: $FF,$FF at end of table
+- Terminator pattern: $ff,$ff at end of table
 - RGB555 conversion accuracy verified
 
 **Use Cases**:
@@ -111,9 +111,9 @@ tools/assets/palettes/
 
 ---
 
-## Option B: Begin Bank $0A Exploration - ✅ COMPLETE!
+## Option B: Begin Bank $0a Exploration - ✅ COMPLETE!
 
-### Bank $0A Analysis
+### Bank $0a Analysis
 
 **Bank Purpose**: Extended graphics data + palettes (cross-bank architecture)
 
@@ -129,19 +129,19 @@ tools/assets/palettes/
 
 **Content Documented**:
 
-1. **Graphics Tile Patterns Block 1** ($0A8000-$0A830B, ~780 bytes)
+1. **Graphics Tile Patterns Block 1** ($0a8000-$0a830b, ~780 bytes)
    - 4bpp SNES format (4 bitplanes, 32 bytes/tile)
    - Background tiles, environmental effects
    - Character/NPC sprite patterns
    - ~24 tiles total (8×8 pixels each)
 
-2. **Graphics Tile Patterns Block 2** ($0A830C-$0A8617, ~780 bytes)
+2. **Graphics Tile Patterns Block 2** ($0a830c-$0a8617, ~780 bytes)
    - UI elements (borders, windows, menus)
    - Sprite animation frames
    - Transparency/mask tiles
    - ~24 tiles total
 
-3. **Extended Palette Data Start** ($0A8618+)
+3. **Extended Palette Data Start** ($0a8618+)
    - **CROSS-BANK REFERENCE CONFIRMED!**
    - Palette entry 58 from Bank $09 pointer table
    - RGB555 color data begins exactly as predicted
@@ -150,10 +150,10 @@ tools/assets/palettes/
 ### Key Discoveries
 
 **Multi-Bank Palette Architecture Validated**:
-- Bank $09 pointer table at $098460 successfully references Bank $0A
-- Pointer entry 58: `$58,$86,$0A,$15,$00` → $0A8618, 21 colors
+- Bank $09 pointer table at $098460 successfully references Bank $0a
+- Pointer entry 58: `$58,$86,$0a,$15,$00` → $0a8618, 21 colors
 - Cross-bank loading system confirmed operational
-- Unified indexing across 3 banks ($09/$0A/$0B)
+- Unified indexing across 3 banks ($09/$0a/$0b)
 
 **Graphics Format Confirmed**:
 - 4bpp bitplane structure validated
@@ -178,7 +178,7 @@ tools/assets/palettes/
 
 **Complete SNES PPU Rendering Pipeline** (4-bank system):
 1. **Bank $09** Primary Palettes → CGRAM
-2. **Bank $0A** Extended Palettes → CGRAM (THIS BANK!)
+2. **Bank $0a** Extended Palettes → CGRAM (THIS BANK!)
 3. **Bank $07** Tile Bitmaps → VRAM
 4. **Bank $08** Tile Arrangements → OAM/Tilemap
 5. **Bank $00** Rendering → PPU → Screen (256×224)
@@ -187,9 +187,9 @@ tools/assets/palettes/
 ```
 Bank $09 colors (752 colors, 60 palettes)
     +
-Bank $0A colors (464 colors, 18 palettes)
+Bank $0a colors (464 colors, 18 palettes)
     +
-Bank $0B colors (328 colors, 3 palettes)
+Bank $0b colors (328 colors, 3 palettes)
     ↓
 CGRAM (512 bytes, 256 colors max)
     ↓
@@ -200,7 +200,7 @@ Bank $08 arrangements → OAM
 Bank $00 PPU rendering → Screen
 ```
 
-### Bank $0A Progress Summary
+### Bank $0a Progress Summary
 
 **Documentation Metrics**:
 - Source lines: 2,057
@@ -208,7 +208,7 @@ Bank $00 PPU rendering → Screen
 - Remaining: 1,629 lines (79.2%)
 - Estimated cycles: ~4-5 more needed for 100%
 
-**Next Steps for Bank $0A**:
+**Next Steps for Bank $0a**:
 - Cycle 2: Lines 500-900 (document remaining extended palettes)
 - Cycle 3: Lines 900-1300 (more graphics tile patterns)
 - Cycle 4: Lines 1300-1700 (special effects, animations)
@@ -228,7 +228,7 @@ Bank $00 PPU rendering → Screen
 
 **Rationale**: 
 - Option C (palette tools) took priority due to validation requirements
-- Option B (Bank $0A) provided critical cross-bank confirmation
+- Option B (Bank $0a) provided critical cross-bank confirmation
 - Bank $09 remains high priority for next session
 - Current 53.8% still represents strong progress (first 800 source lines)
 
@@ -252,14 +252,14 @@ Bank $00 PPU rendering → Screen
 **Ending State** (after this session):
 - Campaign: **26,435 lines (31.1%)**
 - Bank $09: 1,120 lines (53.8%, unchanged)
-- Bank $0A: **428 lines (20.8%, new!)**
+- Bank $0a: **428 lines (20.8%, new!)**
 - Banks 100%: 5 of 16 (31.25%)
 - Banks in progress: **2 of 16 (12.5%)**
 
 **Session Growth**:
 - Total lines added: **+328 lines**
 - Campaign growth: **+0.4% (30.7% → 31.1%)**
-- New bank started: Bank $0A (0% → 20.8%)
+- New bank started: Bank $0a (0% → 20.8%)
 
 ### Milestone Tracking
 
@@ -275,7 +275,7 @@ Bank $00 PPU rendering → Screen
 
 **Progress Velocity**:
 - Previous session: +1,120 lines (Bank $09 Cycles 1-2)
-- This session: +328 lines (Bank $0A Cycle 1)
+- This session: +328 lines (Bank $0a Cycle 1)
 - Average: ~724 lines/session
 - Time to 35%: 3,315 / 724 = ~4.6 sessions
 
@@ -290,10 +290,10 @@ Bank $00 PPU rendering → Screen
 
 **In Progress** (2 banks, +1 this session):
 1. Bank $09 Color Palettes: 1,120 / 2,082 (53.8%)
-2. **Bank $0A Extended Graphics**: 428 / 2,057 (20.8%) ← NEW!
+2. **Bank $0a Extended Graphics**: 428 / 2,057 (20.8%) ← NEW!
 
 **Remaining** (9 banks, 56.25%):
-- Banks $00, $04, $05, $06, $0B, $0C, $0D, $0E, $0F
+- Banks $00, $04, $05, $06, $0b, $0c, $0d, $0e, $0f
 
 ---
 
@@ -337,13 +337,13 @@ class PaletteEntry:
 **Discovery Chain**:
 1. **Bank $09** (previous session): Found cross-bank pointer refs
 2. **Palette Tool** (this session): Extracted and validated refs
-3. **Bank $0A** (this session): Confirmed palette data at $0A8618
+3. **Bank $0a** (this session): Confirmed palette data at $0a8618
 
 **Validation Method**:
 ```
-Prediction:   Bank $09 pointer → $0A8618 (21 colors)
-Tool Extract: Entry 58 = $0A8618, 21 colors ✓
-Bank $0A ASM: Palette data starts $0A8618 ✓
+Prediction:   Bank $09 pointer → $0a8618 (21 colors)
+Tool Extract: Entry 58 = $0a8618, 21 colors ✓
+Bank $0a ASM: Palette data starts $0a8618 ✓
 TRIPLE CONFIRMATION!
 ```
 
@@ -351,14 +351,14 @@ TRIPLE CONFIRMATION!
 ```
 ┌─────────────┐
 │  Bank $09   │ Primary: 60 palettes, 752 colors
-│  Pointer    │ Unified table: $098460-$0985F4
-│  Table      │ 5 bytes/entry, $FF,$FF terminator
+│  Pointer    │ Unified table: $098460-$0985f4
+│  Table      │ 5 bytes/entry, $ff,$ff terminator
 └──────┬──────┘
        │ References ↓
     ┌──┴──┬──────┬───────┐
     ↓     ↓      ↓       ↓
 ┌────────┬─────────┬──────────┐
-│Bank $09│Bank $0A │Bank $0B  │
+│Bank $09│Bank $0a │Bank $0b  │
 │752 col │464 col  │328 col   │
 │60 pal  │18 pal   │3 pal     │
 └────────┴─────────┴──────────┘
@@ -378,7 +378,7 @@ TRIPLE CONFIRMATION!
 - RGB555 format (2 bytes/color)
 - Upload to CGRAM during V-blank
 
-**Bank $0A** - Extended Palettes + Graphics:
+**Bank $0a** - Extended Palettes + Graphics:
 - Extended palettes (18 entries)
 - Background graphics tiles
 - 4bpp tile patterns
@@ -405,7 +405,7 @@ TRIPLE CONFIRMATION!
 **Rendering Flow**:
 ```
 1. V-Blank Start (16ms window at 60fps)
-2. DMA: Bank $09/$0A palettes → CGRAM (512 bytes)
+2. DMA: Bank $09/$0a palettes → CGRAM (512 bytes)
 3. DMA: Bank $07 tiles → VRAM (64KB)
 4. CPU: Bank $08 arrangements → OAM (544 bytes)
 5. PPU: Scanline rendering (256×224 pixels)
@@ -439,7 +439,7 @@ pixel[x,y] = (plane0[y][x] << 0) |
 - Bank $07 documentation (100% complete)
 - Bank $08 documentation (100% complete)
 - Bank $09 documentation (53.8% complete)
-- Bank $0A documentation (20.8% complete, this session)
+- Bank $0a documentation (20.8% complete, this session)
 - Palette extraction tool (cross-validation)
 
 ---
@@ -456,7 +456,7 @@ pixel[x,y] = (plane0[y][x] << 0) |
    - Multi-bank architecture support
 
 2. **temp_bank0A_cycle01.asm** (328 lines)
-   - Bank $0A Cycle 1 documentation
+   - Bank $0a Cycle 1 documentation
    - Graphics tile patterns analysis
    - Extended palette data confirmation
    - Cross-bank reference validation
@@ -530,7 +530,7 @@ pixel[x,y] = (plane0[y][x] << 0) |
 - Add +962 lines to reach 100%
 - Campaign impact: +962 → 32.4%
 
-**2. Bank $0A Continuation**:
+**2. Bank $0a Continuation**:
 - Execute Cycles 2-3 (lines 500-1300)
 - Document remaining extended palettes
 - Analyze more graphics tile patterns
@@ -555,9 +555,9 @@ pixel[x,y] = (plane0[y][x] << 0) |
 **Priority 1**: Complete Bank $09 to 100%
 - Execute Cycles 3-5 (lines 800-2082)
 - Add +962 lines documented
-- Close out first multi-bank pair ($09+$0A)
+- Close out first multi-bank pair ($09+$0a)
 
-**Priority 2**: Continue Bank $0A
+**Priority 2**: Continue Bank $0a
 - Execute Cycles 2-3 (lines 500-1300)
 - Target: Reach 50-60% completion
 - Add +600-800 lines
@@ -566,14 +566,14 @@ pixel[x,y] = (plane0[y][x] << 0) |
 - Current: 26,435 lines (31.1%)
 - Target: 29,750 lines (35.0%)
 - Need: +3,315 lines
-- Strategy: Bank $09 completion (+962) + Bank $0A progress (+800) + new bank start (+1,553)
+- Strategy: Bank $09 completion (+962) + Bank $0a progress (+800) + new bank start (+1,553)
 
 ### Mid-Term (2-3 Sessions)
 
-**1. Bank $0B Analysis** (Palette overflow, ~1,000 lines estimated)
+**1. Bank $0b Analysis** (Palette overflow, ~1,000 lines estimated)
 - Third bank in palette architecture
 - Complete multi-bank documentation
-- Cross-reference with Banks $09/$0A
+- Cross-reference with Banks $09/$0a
 
 **2. Palette Tool Enhancements**:
 - Editing interface (GUI or CLI)
@@ -587,7 +587,7 @@ pixel[x,y] = (plane0[y][x] << 0) |
 
 ### Long-Term (5-10 Sessions)
 
-**1. Complete Graphics System** (Banks $07/$08/$09/$0A/$0B all at 100%)
+**1. Complete Graphics System** (Banks $07/$08/$09/$0a/$0b all at 100%)
 - Full rendering pipeline documented
 - All cross-bank dependencies mapped
 - Complete modding toolkit
@@ -615,7 +615,7 @@ pixel[x,y] = (plane0[y][x] << 0) |
 - Multi-bank architecture validated
 - 81 palettes, 1,544 colors extracted
 
-**Option B** (Bank $0A): ✅ COMPLETE (Cycle 1)
+**Option B** (Bank $0a): ✅ COMPLETE (Cycle 1)
 - Documentation: +328 lines (0% → 20.8%)
 - Cross-bank references confirmed
 - Graphics tile patterns analyzed
@@ -630,13 +630,13 @@ pixel[x,y] = (plane0[y][x] << 0) |
 - Starting: 26,107 lines (30.7%)
 - Ending: 26,435 lines (31.1%)
 - Growth: +328 lines (+0.4%)
-- Banks in progress: 1 → 2 (Bank $0A added)
+- Banks in progress: 1 → 2 (Bank $0a added)
 
 **Major Achievements**:
 1. Palette extraction tool fully operational
 2. Multi-bank palette architecture confirmed (3 banks)
 3. Complete SNES PPU pipeline documented (4 banks)
-4. Bank $0A started (0% → 20.8%)
+4. Bank $0a started (0% → 20.8%)
 5. 81 palettes extracted and visualized
 
 **Technical Excellence**:
@@ -645,7 +645,7 @@ pixel[x,y] = (plane0[y][x] << 0) |
 - Practical modding toolkit created
 - Visual and machine-readable assets
 
-**Ready for Next Session**: Continue aggressive documentation, complete Bank $09 to 100%, push Bank $0A to 50%, target 35% campaign milestone!
+**Ready for Next Session**: Continue aggressive documentation, complete Bank $09 to 100%, push Bank $0a to 50%, target 35% campaign milestone!
 
 ---
 

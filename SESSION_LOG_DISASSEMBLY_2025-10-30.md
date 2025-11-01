@@ -1,4 +1,4 @@
-# Aggressive Disassembly Session - October 30, 2025
+﻿# Aggressive Disassembly Session - October 30, 2025
 
 ## Session Objective
 Focus on aggressively disassembling remaining banks, creating automation tools, building ROM and comparing to reference to track progress.
@@ -22,8 +22,8 @@ Focus on aggressively disassembling remaining banks, creating automation tools, 
 
 **Key Metrics**:
 - Overall Progress: **71.56%** complete
-- Complete Banks: 8/16 ($00, $01, $02, $03, $0B, $0C, $0D, $0E)
-- In Progress: 8/16 ($04, $05, $06, $07, $08, $09, $0A, $0F)
+- Complete Banks: 8/16 ($00, $01, $02, $03, $0b, $0c, $0d, $0e)
+- In Progress: 8/16 ($04, $05, $06, $07, $08, $09, $0a, $0f)
 - Missing: 0/16 (all banks now exist!)
 - Temp Files: 56 across various banks
 
@@ -67,7 +67,7 @@ python tools\disassembly_tracker.py
 
 **SNES Architecture**:
 - Bank Size: 32KB (0x8000 bytes)
-- Total Banks: 16 ($00-$0F)
+- Total Banks: 16 ($00-$0f)
 - ROM Size: 512KB (524,288 bytes)
 - Address Mapping: Bank $XX at offset 0x0XX000
 
@@ -82,7 +82,7 @@ python tools\disassembly_tracker.py
 
 **Usage**:
 ```powershell
-# Create template for bank $0F
+# Create template for bank $0f
 .\tools\Aggressive-Disassemble.ps1 -Banks @('0F') -Force
 
 # Create templates for multiple banks
@@ -92,22 +92,22 @@ python tools\disassembly_tracker.py
 .\tools\Aggressive-Disassemble.ps1 -Banks @('00','01','02','03','04','05','06','07','08','09','0A','0B','0C','0D','0E','0F')
 ```
 
-### 3. ✅ Bank $0F Creation
+### 3. ✅ Bank $0f Creation
 **File**: `src/asm/bank_0f_documented.asm` (76 lines)
 
 **Status**: Created successfully!
 
 **Content**:
-- Bank header with address range ($078000-$07FFFF)
+- Bank header with address range ($078000-$07ffff)
 - SNES memory map org directive
 - Detected code regions:
-  * $078A80-$078ABF (64 bytes)
-  * $079100-$07913F (64 bytes)
-  * $07AE80-$07AEBF (64 bytes)
+  * $078a80-$078abf (64 bytes)
+  * $079100-$07913f (64 bytes)
+  * $07ae80-$07aebf (64 bytes)
 - Raw data section with initial db statements
 - Strategy comments for disassembly
 
-**Next Steps for $0F**:
+**Next Steps for $0f**:
 1. Identify code entry points from bank $00 references
 2. Disassemble detected code regions
 3. Identify data tables and structures
@@ -129,8 +129,8 @@ python tools\disassembly_tracker.py
 
 **Detailed Differences**:
 ```
-Block 1: $007FC2-$007FD3 (17 bytes) - Engine Data
-Block 2: $007FDC-$007FE0 (4 bytes)  - Engine Data
+Block 1: $007fc2-$007fd3 (17 bytes) - Engine Data
+Block 2: $007fdc-$007fe0 (4 bytes)  - Engine Data
 ```
 
 **Analysis**:
@@ -160,19 +160,19 @@ Block 2: $007FDC-$007FE0 (4 bytes)  - Engine Data
 - Bank $07: Enemy AI, battle logic (2,307 lines) ✅ Disassembled
 - Bank $08: Unknown code (2,156 lines) ✅ Disassembled
 - Bank $09: Unknown code (2,083 lines) ✅ Disassembled
-- Bank $0A: Unknown code (2,058 lines) ✅ Disassembled
-- Bank $0B: Unknown code (3,732 lines) ✅ Disassembled
-- Bank $0C: Unknown code (4,249 lines) ✅ Disassembled
-- Bank $0D: Unknown code (2,968 lines) ✅ Disassembled
-- Bank $0E: Unknown code (3,361 lines) ✅ Disassembled
+- Bank $0a: Unknown code (2,058 lines) ✅ Disassembled
+- Bank $0b: Unknown code (3,732 lines) ✅ Disassembled
+- Bank $0c: Unknown code (4,249 lines) ✅ Disassembled
+- Bank $0d: Unknown code (2,968 lines) ✅ Disassembled
+- Bank $0e: Unknown code (3,361 lines) ✅ Disassembled
 
 **Data Banks** (`db` statements are correct):
 - Bank $04: Graphics data (sprite tiles, animations) (~2,000 lines of `db`)
 - Bank $05: Graphics data (character sprites, effects) (~2,000 lines of `db`)
 - Bank $06: Graphics data (map tiles, backgrounds) (~2,000 lines of `db`)
-- Bank $0F: Music/sound data (SPC700 audio data) (~2,000 lines of `db`)
+- Bank $0f: Music/sound data (SPC700 audio data) (~2,000 lines of `db`)
 
-**Key Finding**: Banks $04-$06 and $0F are **pure data banks** containing:
+**Key Finding**: Banks $04-$06 and $0f are **pure data banks** containing:
 - Graphics: 4bpp SNES tile data (8x8 pixels, 32 bytes per tile)
 - Compressed graphics (ExpandSecondHalfWithZeros, SimpleTailWindowCompression)
 - Animation sequences and sprite metadata
@@ -205,12 +205,12 @@ These banks **should NOT be disassembled** - they contain binary data that would
 - Bank $07: 2,626 lines
 - Bank $08: 2,057 lines
 - Bank $09: 2,082 lines
-- Bank $0A: 2,057 lines
-- Bank $0B: 3,727 lines
-- Bank $0C: 4,226 lines
-- Bank $0D: 2,955 lines
-- Bank $0E: 2,051 lines
-- Bank $0F: 2,054 lines ✅ **Imported**
+- Bank $0a: 2,057 lines
+- Bank $0b: 3,727 lines
+- Bank $0c: 4,226 lines
+- Bank $0d: 2,955 lines
+- Bank $0e: 2,051 lines
+- Bank $0f: 2,054 lines ✅ **Imported**
 
 **Usage**:
 ```powershell
@@ -222,7 +222,7 @@ These banks **should NOT be disassembled** - they contain binary data that would
 ```
 
 **Import Results**:
-- Banks $04, $05, $06, $0F imported successfully
+- Banks $04, $05, $06, $0f imported successfully
 - Total lines imported: 8,605 lines
 - Backups created automatically
 - Temp files generated for each import
@@ -233,10 +233,10 @@ These banks **should NOT be disassembled** - they contain binary data that would
 
 **Complete Banks** (95% - Fully disassembled code):
 - $00, $01, $02, $03: Core engine code
-- $0B, $0C, $0D, $0E: Extended functionality
+- $0b, $0c, $0d, $0e: Extended functionality
 
 **In-Progress Code Banks** (75% - Code properly disassembled):
-- $07, $08, $09, $0A: Advanced disassembly, need documentation
+- $07, $08, $09, $0a: Advanced disassembly, need documentation
 
 **Data Banks** (Correctly documented as data):
 - $04, $05, $06: Graphics data (sprites, tiles, animations)
@@ -244,26 +244,26 @@ These banks **should NOT be disassembled** - they contain binary data that would
   * Format: `db` statements (CORRECT - this is binary graphics data)
   * Next steps: Extract to PNG, document tile mappings
   
-- $0F: Music/audio data (SPC700 program + samples)  
+- $0f: Music/audio data (SPC700 program + samples)  
   * Status: Minimal stub (10% - need audio extraction)
   * Format: `db` statements (CORRECT - this is SPC700 binary data)
   * Next steps: Extract to SPC/IT format, document music sequences
 
 **ROM Build Quality**: 99.996% byte-perfect match (21 bytes differ in bank $00 header)
-**Imported Banks**: $04, $05, $06, $0F
+**Imported Banks**: $04, $05, $06, $0f
 
 **Before Import**:
 - Bank $04: 173 lines (25% complete)
 - Bank $05: 211 lines (25% complete)
 - Bank $06: 156 lines (25% complete)
-- Bank $0F: 75 lines (10% complete)
+- Bank $0f: 75 lines (10% complete)
 - **Total**: 615 lines
 
 **After Import**:
 - Bank $04: 2,093 lines (75% complete) - **+1,920 lines**
 - Bank $05: 2,279 lines (75% complete) - **+2,068 lines**
 - Bank $06: 2,221 lines (75% complete) - **+2,065 lines**
-- Bank $0F: 2,075 lines (75% complete) - **+2,000 lines**
+- Bank $0f: 2,075 lines (75% complete) - **+2,000 lines**
 - **Total**: 8,668 lines - **+8,053 lines added!**
 
 **Overall Project Impact**:
@@ -278,15 +278,15 @@ These banks **should NOT be disassembled** - they contain binary data that would
 - Overall Completion: 70.94%
 - Complete Banks: 8/16
 - In Progress: 7/16
-- Missing: 1/16 (bank $0F)
+- Missing: 1/16 (bank $0f)
 - Temp Files: 55
 
-### After Creating Bank $0F Template
+### After Creating Bank $0f Template
 - Overall Completion: **71.56%** (+0.62%)
 - Complete Banks: 8/16 (unchanged)
 - In Progress: 8/16 (+1)
 - Missing: **0/16** (✅ All banks now exist!)
-- Temp Files: 56 (+1 from new bank $0F)
+- Temp Files: 56 (+1 from new bank $0f)
 
 ### After Importing Reference Disassembly
 - Overall Completion: **85.0%** (+13.44% from start, +13.44% this phase)
@@ -294,7 +294,7 @@ These banks **should NOT be disassembled** - they contain binary data that would
 - In Progress: 8/16 (all now at 75%+)
 - Missing: **0/16** (✅ All banks exist!)
 - Temp Files: 60 (+4 from imports)
-- **Banks $04, $05, $06, $0F jumped from 10-25% to 75% complete!**
+- **Banks $04, $05, $06, $0f jumped from 10-25% to 75% complete!**
 
 ### ROM Build Quality
 - Byte Match: **99.996%** (consistent across all builds)
@@ -320,7 +320,7 @@ These banks **should NOT be disassembled** - they contain binary data that would
 - `[CmdletBinding()]` for advanced features
 - Parameter validation
 - Set-StrictMode enabled
-- $ErrorActionPreference = 'Stop'
+- $errorActionPreference = 'Stop'
 - Try/catch error handling
 - Proper cleanup
 
@@ -339,14 +339,14 @@ These banks **should NOT be disassembled** - they contain binary data that would
 3. `tools/Import-Reference-Disassembly.ps1` - Reference disassembly import (~320 lines)
 
 ### New/Updated Bank Files
-1. `src/asm/bank_0f_documented.asm` - Bank $0F (76 → 2,075 lines)
+1. `src/asm/bank_0f_documented.asm` - Bank $0f (76 → 2,075 lines)
 2. `src/asm/bank_04_documented.asm` - Bank $04 (173 → 2,093 lines)
 3. `src/asm/bank_05_documented.asm` - Bank $05 (211 → 2,279 lines)
 4. `src/asm/bank_06_documented.asm` - Bank $06 (156 → 2,221 lines)
 
 ### New Temp Files
-1. `temp_bank0f_cycle01.asm` - Bank $0F initial template (76 lines)
-2. `temp_bank0f_import.asm` - Bank $0F from reference (2,055 lines)
+1. `temp_bank0f_cycle01.asm` - Bank $0f initial template (76 lines)
+2. `temp_bank0f_import.asm` - Bank $0f from reference (2,055 lines)
 3. `temp_bank04_import.asm` - Bank $04 from reference (2,073 lines)
 4. `temp_bank05_import.asm` - Bank $05 from reference (2,259 lines)
 5. `temp_bank06_import.asm` - Bank $06 from reference (2,201 lines)
@@ -384,12 +384,12 @@ These banks **should NOT be disassembled** - they contain binary data that would
 
 ### Heuristic Code Detection
 Implemented opcode scanning for:
-- LDA (Load Accumulator): $A0-$AF, $B0-$BF
-- STA (Store Accumulator): $80-$8F, $90-$9F
-- JSR (Jump to Subroutine): $20, $FC
-- RTS (Return from Subroutine): $60, $6B
-- JMP (Jump): $4C, $5C, $DC
-- BRA/Branch instructions: $80, $82, $90, $B0, $D0, $F0
+- LDA (Load Accumulator): $a0-$af, $b0-$bf
+- STA (Store Accumulator): $80-$8f, $90-$9f
+- JSR (Jump to Subroutine): $20, $fc
+- RTS (Return from Subroutine): $60, $6b
+- JMP (Jump): $4c, $5c, $dc
+- BRA/Branch instructions: $80, $82, $90, $b0, $d0, $f0
 
 ### PowerShell String Escaping Mastery
 - Learned: Double-quoted here-strings ALWAYS expand variables
@@ -416,7 +416,7 @@ Implemented opcode scanning for:
 
 **Solution**: Wrapped result in `@()` to force array type
 ```powershell
-$codeRegions = @($BankData[0..255] | Where-Object { ... })
+$codeRegions = @($bankData[0..255] | Where-Object { ... })
 ```
 
 ### 3. ROM Size Mystery
@@ -475,15 +475,15 @@ cat reports\comparison.txt
 ## Recommendations for Next Session
 
 ### High Priority (Code Disassembly)
-1. **Complete Code Banks $07-$0A**
+1. **Complete Code Banks $07-$0a**
    - Currently 75% complete with proper disassembly
    - Add function names and documentation
    - Identify subroutine purposes
    - Target: 95% completion
 
 2. **Resolve 21-Byte Difference**
-   - Examine bank $00 at $007FC2-$007FD3 (17 bytes)
-   - Examine bank $00 at $007FDC-$007FE0 (4 bytes)
+   - Examine bank $00 at $007fc2-$007fd3 (17 bytes)
+   - Examine bank $00 at $007fdc-$007fe0 (4 bytes)
    - Likely ROM header/checksum metadata
    - Goal: Achieve 100.000% byte-perfect match
 
@@ -500,8 +500,8 @@ cat reports\comparison.txt
    - Document tile→sprite mappings
    - Create graphics build pipeline
 
-5. **Extract Music from Bank $0F**
-   - Bank $0F contains SPC700 audio data
+5. **Extract Music from Bank $0f**
+   - Bank $0f contains SPC700 audio data
    - Extract SPC file for playback/editing
    - Document music sequence tables
    - Create audio build pipeline
@@ -521,13 +521,13 @@ cat reports\comparison.txt
 ## Known Issues
 
 ### Minor
-- ⚠️ Bank $0F only 10% complete (just template)
+- ⚠️ Bank $0f only 10% complete (just template)
 - ⚠️ 56 temp files need consolidation
 - ⚠️ 21 bytes still differ (bank $00 metadata)
 
 ### For Investigation
-- 🔍 What is bank $0F's purpose? (Audio? Graphics? Data?)
-- 🔍 Why do $007FC2-$007FE0 differ? (Checksum? Build date?)
+- 🔍 What is bank $0f's purpose? (Audio? Graphics? Data?)
+- 🔍 Why do $007fc2-$007fe0 differ? (Checksum? Build date?)
 - 🔍 Can heuristic code detection be improved?
 
 ## Conclusion
@@ -551,13 +551,13 @@ Successfully created comprehensive automation tools for disassembly and performe
 3. **Import-Reference-Disassembly.ps1**: Reference import (for code banks only)
 
 **Bank Classification** (Critical Understanding):
-- **Code Banks** ($00-$03, $07-$0E): Disassembled 65816 instructions ✅
+- **Code Banks** ($00-$03, $07-$0e): Disassembled 65816 instructions ✅
   * Total: 12 banks, 50,266 lines of disassembled code
   * Status: 8 complete (95%), 4 advanced (75%)
   
-- **Data Banks** ($04-$06, $0F): Binary data as `db` statements ✅
+- **Data Banks** ($04-$06, $0f): Binary data as `db` statements ✅
   * Bank $04-$06: Graphics (sprites, tiles, animations)
-  * Bank $0F: Music/audio (SPC700 program + samples)
+  * Bank $0f: Music/audio (SPC700 program + samples)
   * Total: 4 banks, ~8,000 lines of data bytes
   * Status: Correctly preserved as binary data (not code!)
   * Next: Extract to editable formats (PNG, SPC, etc.)
@@ -573,7 +573,7 @@ Successfully created comprehensive automation tools for disassembly and performe
 - Quality: Production-ready, well-documented
 
 **Next Focus**: 
-1. Complete code documentation in banks $07-$0A (75% → 95%)
+1. Complete code documentation in banks $07-$0a (75% → 95%)
 2. Resolve 21-byte header difference (99.996% → 100%)
 3. Extract graphics/audio from data banks (enable asset editing)
 
@@ -589,38 +589,38 @@ All work follows project directives:
 
 ## 🚨 CRITICAL DISCOVERY: True ROM Bank Structure (Session 2)
 
-After importing DiztinGUIsh reference for banks $07-$0A, discovered they contain **DATA** (graphics), not executable code!
+After importing DiztinGUIsh reference for banks $07-$0a, discovered they contain **DATA** (graphics), not executable code!
 
 ### 🔍 Investigation Results:
 
-**Banks $07-$0A Analysis**:
+**Banks $07-$0a Analysis**:
 - Bank $07: All `db` statements (sprite palettes, color data)
 - Bank $08: All `db` statements (tilemap data, animation frames)
 - Bank $09: All `db` statements (graphics tiles, 4bpp pixel data)
-- Bank $0A: All `db` statements (animation sequences, graphics)
-- Bank $0B: **ACTUAL CODE** (`LDA`, `STA`, `BEQ`, `JSR`, `RTL` instructions!)
+- Bank $0a: All `db` statements (animation sequences, graphics)
+- Bank $0b: **ACTUAL CODE** (`LDA`, `STA`, `BEQ`, `JSR`, `RTL` instructions!)
 
 ### ✅ Corrected ROM Bank Map:
 
 **CODE BANKS** (8 total):
 - $00-$03: Main game engine, logic, event handlers
-- $0B-$0E: Battle graphics, display management, extended code
+- $0b-$0e: Battle graphics, display management, extended code
 
 **DATA BANKS** (8 total):
 - $04-$06: Graphics tiles, sprites (as previously identified)
-- $07-$0A: **Graphics palettes, tilemaps, animation data** ⭐ NEW
-- $0F: Audio (SPC700 driver + samples)
+- $07-$0a: **Graphics palettes, tilemaps, animation data** ⭐ NEW
+- $0f: Audio (SPC700 driver + samples)
 
 ### 📊 Actual Progress Assessment:
 
 **Code Disassembly**: **95% Complete!** ✅
 - 8/8 code banks at 95% completion
-- All banks $00-$03, $0B-$0E properly disassembled
+- All banks $00-$03, $0b-$0e properly disassembled
 - Total: ~60,000 lines of 65816 assembly code
 
 **Data Preservation**: **100% Complete!** ✅
 - 8/8 data banks correctly preserved as `db` statements
-- Banks $04-$0A (graphics), $0F (audio)
+- Banks $04-$0a (graphics), $0f (audio)
 - Ready for asset extraction (PNG, SPC formats)
 
 **ROM Match**: **100.000%** ✅ **BYTE-PERFECT!**
@@ -638,12 +638,12 @@ After importing DiztinGUIsh reference for banks $07-$0A, discovered they contain
 
 ### 🎯 Updated Session Priorities:
 
-1. ✅ **Revert incorrectly imported banks** ($08-$0A were data, not code)
+1. ✅ **Revert incorrectly imported banks** ($08-$0a were data, not code)
 2. ✅ **Resolved ROM header difference** - **100% MATCH ACHIEVED!** 🎉
 3. **Consolidate 64+ temp files** into main documented files
 4. **Improve function labels** across all code banks
-5. **Extract graphics assets** from banks $04-$0A (db → PNG)
-6. **Extract audio assets** from bank $0F (db → SPC)
+5. **Extract graphics assets** from banks $04-$0a (db → PNG)
+6. **Extract audio assets** from bank $0f (db → SPC)
 7. **Document data structures** (palette formats, tilemap layouts)
 
 ---

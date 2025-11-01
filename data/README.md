@@ -1,4 +1,4 @@
-# FFMQ Data Directory
+﻿# FFMQ Data Directory
 
 This directory contains extracted and organized game data from Final Fantasy: Mystic Quest, structured for analysis, modding, and documentation purposes.
 
@@ -211,8 +211,8 @@ JSON Schema files validate data structure and enforce consistency:
 ```json
 {
   "text_id": 0,
-  "bank": "$0D",
-  "address": "$0D8000",
+  "bank": "$0d",
+  "address": "$0d8000",
   "type": "dialog",
   "speaker": "Old Man",
   "text": "Welcome to Foresta!{NEWLINE}The Crystal is in danger!",
