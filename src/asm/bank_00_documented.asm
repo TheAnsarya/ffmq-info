@@ -13965,16 +13965,16 @@ Battle_SetupSprites4:
     LDX.W #$56A4                         ;00C71A|A2A456  |      ;
     LDY.W #$0018                         ;00C71D|A01800  |      ;
     LDA.L $000103                        ;00C720|AF030100|000103;
-    JSR.W CODE_00C729                    ;00C724|2029C7  |00C729;
+    JSR.W SaveData_ProcessFlag           ;00C724|2029C7  |00C729;
     PLB                                  ;00C727|AB      |      ;
     RTS                                  ;00C728|60      |      ;
 
-CODE_00C729:
+SaveData_ProcessFlag:
     AND.W #$0080                         ;00C729|298000  |      ;
-    BEQ CODE_00C73E                      ;00C72C|F010    |00C73E;
+    BEQ SaveData_FlagDone                ;00C72C|F010    |00C73E;
     db $E2,$20,$98,$9D,$00,$00,$9B,$C8,$C8,$A9,$15,$54,$7F,$7F,$C2,$30 ;00C72E|        |      ;
 
-CODE_00C73E:
+SaveData_FlagDone:
     RTS                                  ;00C73E|60      |      ;
 
 DATA_00C73F:
@@ -14260,7 +14260,7 @@ Save_ReadByte:
     PLP                                  ;00C94D|28      |      ;
     RTS                                  ;00C94E|60      |      ;
 
-CODE_00C94F:
+SaveData_SetBank70:
     PHP                                  ;00C94F|08      |      ;
     SEP #$20                             ;00C950|E220    |      ;
     REP #$10                             ;00C952|C210    |      ;
@@ -14271,7 +14271,7 @@ CODE_00C94F:
     PLP                                  ;00C95A|28      |      ;
     RTS                                  ;00C95B|60      |      ;
 
-CODE_00C95C:
+Checksum_Calculator:
     PHA                                  ;00C95C|48      |      ;
     PHX                                  ;00C95D|DA      |      ;
     LDA.W #$4646                         ;00C95E|A94646  |      ;
@@ -14282,35 +14282,35 @@ CODE_00C95C:
     LDA.W #$0000                         ;00C96B|A90000  |      ;
     CLC                                  ;00C96E|18      |      ;
 
-CODE_00C96F:
+Checksum_SumLoop:
     ADC.B [$5F]                          ;00C96F|675F    |00005F;
     INC.B $5F                            ;00C971|E65F    |00005F;
     INC.B $5F                            ;00C973|E65F    |00005F;
     DEX                                  ;00C975|CA      |      ;
-    BNE CODE_00C96F                      ;00C976|D0F7    |00C96F;
+    BNE Checksum_SumLoop                 ;00C976|D0F7    |00C96F;
     STA.B $12                            ;00C978|8512    |000012;
     PLX                                  ;00C97A|FA      |      ;
     PLA                                  ;00C97B|68      |      ;
     RTS                                  ;00C97C|60      |      ;
 
-CODE_00C97D:
+Checksum_Validator:
     LDX.W #$0000                         ;00C97D|A20000  |      ;
 
-CODE_00C980:
+Checksum_ValidateLoop:
     LDA.B $0E,X                          ;00C980|B50E    |00000E;
     CMP.B [$0B]                          ;00C982|C70B    |00000B;
-    BNE CODE_00C991                      ;00C984|D00B    |00C991;
+    BNE Checksum_ValidateDone            ;00C984|D00B    |00C991;
     INC.B $0B                            ;00C986|E60B    |00000B;
     INC.B $0B                            ;00C988|E60B    |00000B;
     INX                                  ;00C98A|E8      |      ;
     INX                                  ;00C98B|E8      |      ;
     CPX.W #$0006                         ;00C98C|E00600  |      ;
-    BNE CODE_00C980                      ;00C98F|D0EF    |00C980;
+    BNE Checksum_ValidateLoop            ;00C98F|D0EF    |00C980;
 
-CODE_00C991:
+Checksum_ValidateDone:
     RTS                                  ;00C991|60      |      ;
 
-CODE_00C992:
+SaveData_Processor:
     PHB                                  ;00C992|8B      |      ;
     PHX                                  ;00C993|DA      |      ;
     PHY                                  ;00C994|5A      |      ;
@@ -14333,20 +14333,20 @@ CODE_00C992:
     JSR.W CODE_00C95C                    ;00C9BF|205CC9  |00C95C;
     CMP.B $12                            ;00C9C2|C512    |000012;
     BNE UNREACH_00C9CB                   ;00C9C4|D005    |00C9CB;
-    JSR.W CODE_00C97D                    ;00C9C6|207DC9  |00C97D;
-    BEQ CODE_00C9CE                      ;00C9C9|F003    |00C9CE;
+    JSR.W Checksum_Validator             ;00C9C6|207DC9  |00C97D;
+    BEQ SaveData_RestoreRegisters        ;00C9C9|F003    |00C9CE;
 
 UNREACH_00C9CB:
     db $68,$80,$C7                       ;00C9CB|        |      ;
 
-CODE_00C9CE:
+SaveData_RestoreRegisters:
     PLA                                  ;00C9CE|68      |      ;
     PLY                                  ;00C9CF|7A      |      ;
     PLX                                  ;00C9D0|FA      |      ;
     PLB                                  ;00C9D1|AB      |      ;
     RTS                                  ;00C9D2|60      |      ;
 
-CODE_00C9D3:
+SaveData_MemoryCopy:
     PHP                                  ;00C9D3|08      |      ;
     REP #$30                             ;00C9D4|C230    |      ;
     PHB                                  ;00C9D6|8B      |      ;
@@ -14371,31 +14371,31 @@ CODE_00C9D3:
     PLA                                  ;00C9FE|68      |      ;
     LDX.W #$0003                         ;00C9FF|A20300  |      ;
 
-CODE_00CA02:
-    JSR.W CODE_00C992                    ;00CA02|2092C9  |00C992;
+SaveData_ProcessMultiple:
+    JSR.W SaveData_Processor             ;00CA02|2092C9  |00C992;
     CLC                                  ;00CA05|18      |      ;
     ADC.W #$0003                         ;00CA06|690300  |      ;
     DEX                                  ;00CA09|CA      |      ;
-    BNE CODE_00CA02                      ;00CA0A|D0F6    |00CA02;
+    BNE SaveData_ProcessMultiple         ;00CA0A|D0F6    |00CA02;
     LDA.W #$FFF0                         ;00CA0C|A9F0FF  |      ;
     STA.B $8E                            ;00CA0F|858E    |00008E;
     JMP.W CODE_00981B                    ;00CA11|4C1B98  |00981B;
 
-CODE_00CA14:
+LoadData_ValidateChecksum:
     PHX                                  ;00CA14|DA      |      ;
     PHY                                  ;00CA15|5A      |      ;
     PHA                                  ;00CA16|48      |      ;
 
-CODE_00CA17:
+LoadData_RetryLoop:
     LDA.B $01,S                          ;00CA17|A301    |000001;
     JSR.W CODE_00C92B                    ;00CA19|202BC9  |00C92B;
     CLC                                  ;00CA1C|18      |      ;
     ADC.W #$0006                         ;00CA1D|690600  |      ;
     STA.B $5F                            ;00CA20|855F    |00005F;
-    JSR.W CODE_00C94F                    ;00CA22|204FC9  |00C94F;
-    JSR.W CODE_00C95C                    ;00CA25|205CC9  |00C95C;
-    JSR.W CODE_00C97D                    ;00CA28|207DC9  |00C97D;
-    BNE CODE_00CA54                      ;00CA2B|D027    |00CA54;
+    JSR.W SaveData_SetBank70             ;00CA22|204FC9  |00C94F;
+    JSR.W Checksum_Calculator            ;00CA25|205CC9  |00C95C;
+    JSR.W Checksum_Validator             ;00CA28|207DC9  |00C97D;
+    BNE LoadData_InvalidChecksum         ;00CA2B|D027    |00CA54;
     LDA.B $01,S                          ;00CA2D|A301    |000001;
     JSR.W CODE_00C92B                    ;00CA2F|202BC9  |00C92B;
     CLC                                  ;00CA32|18      |      ;
@@ -14408,26 +14408,26 @@ CODE_00CA17:
     LDX.W #$3000                         ;00CA42|A20030  |      ;
     STX.B $5F                            ;00CA45|865F    |00005F;
     JSR.W CODE_00C942                    ;00CA47|2042C9  |00C942;
-    JSR.W CODE_00C95C                    ;00CA4A|205CC9  |00C95C;
+    JSR.W Checksum_Calculator            ;00CA4A|205CC9  |00C95C;
     CMP.B $12                            ;00CA4D|C512    |000012;
-    BNE CODE_00CA17                      ;00CA4F|D0C6    |00CA17;
+    BNE LoadData_RetryLoop               ;00CA4F|D0C6    |00CA17;
     CLC                                  ;00CA51|18      |      ;
-    BRA CODE_00CA5F                      ;00CA52|800B    |00CA5F;
+    BRA LoadData_Success                 ;00CA52|800B    |00CA5F;
 
-CODE_00CA54:
+LoadData_InvalidChecksum:
     LDA.B $01,S                          ;00CA54|A301    |000001;
     JSR.W CODE_00C92B                    ;00CA56|202BC9  |00C92B;
     LDA.W #$0000                         ;00CA59|A90000  |      ;
     STA.B [$0B]                          ;00CA5C|870B    |00000B;
     SEC                                  ;00CA5E|38      |      ;
 
-CODE_00CA5F:
+LoadData_Success:
     PLA                                  ;00CA5F|68      |      ;
     PLY                                  ;00CA60|7A      |      ;
     PLX                                  ;00CA61|FA      |      ;
     RTS                                  ;00CA62|60      |      ;
 
-CODE_00CA63:
+SaveData_MainHandler:
     PEA.W LOOSE_OP_00CAB5                ;00CA63|F4B5CA  |00CAB5;
     PHP                                  ;00CA66|08      |      ;
     REP #$30                             ;00CA67|C230    |      ;
@@ -14441,17 +14441,17 @@ CODE_00CA63:
     LDA.B $01,S                          ;00CA71|A301    |000001;
     LDX.W #$0003                         ;00CA73|A20300  |      ;
 
-CODE_00CA76:
-    JSR.W CODE_00CA14                    ;00CA76|2014CA  |00CA14;
-    BCC CODE_00CA87                      ;00CA79|900C    |00CA87;
+LoadData_RetryNext:
+    JSR.W LoadData_ValidateChecksum      ;00CA76|2014CA  |00CA14;
+    BCC LoadData_CopyToRAM               ;00CA79|900C    |00CA87;
     ADC.W #$0002                         ;00CA7B|690200  |      ;
     DEX                                  ;00CA7E|CA      |      ;
-    BNE CODE_00CA76                      ;00CA7F|D0F5    |00CA76;
+    BNE LoadData_RetryNext               ;00CA7F|D0F5    |00CA76;
     PLA                                  ;00CA81|68      |      ;
     LDA.W #$FFFF                         ;00CA82|A9FFFF  |      ;
-    BRA CODE_00CAAC                      ;00CA85|8025    |00CAAC;
+    BRA LoadData_Complete                ;00CA85|8025    |00CAAC;
 
-CODE_00CA87:
+LoadData_CopyToRAM:
     LDX.W #$3000                         ;00CA87|A20030  |      ;
     LDY.W #$1000                         ;00CA8A|A00010  |      ;
     LDA.W #$004F                         ;00CA8D|A94F00  |      ;
@@ -14463,10 +14463,10 @@ CODE_00CA87:
     LDA.W #$017B                         ;00CA9F|A97B01  |      ;
     MVN $00,$7F                          ;00CAA2|54007F  |      ;
     PLA                                  ;00CAA5|68      |      ;
-    JSR.W CODE_00C9D3                    ;00CAA6|20D3C9  |00C9D3;
+    JSR.W SaveData_MemoryCopy            ;00CAA6|20D3C9  |00C9D3;
     LDA.W #$0000                         ;00CAA9|A90000  |      ;
 
-CODE_00CAAC:
+LoadData_Complete:
     STA.B $64                            ;00CAAC|8564    |000064;
     LDA.W #$FFF0                         ;00CAAE|A9F0FF  |      ;
     STA.B $8E                            ;00CAB1|858E    |00008E;
@@ -14476,7 +14476,7 @@ LOOSE_OP_00CAB5:
     LDA.B $64                            ;00CAB6|A564    |000064;
     RTS                                  ;00CAB8|60      |      ;
 
-CODE_00CAB9:
+GameState_CheckFlags:
     PHP                                  ;00CAB9|08      |      ;
     REP #$30                             ;00CABA|C230    |      ;
     PHB                                  ;00CABC|8B      |      ;
@@ -14489,42 +14489,42 @@ CODE_00CAB9:
     SEP #$20                             ;00CAC5|E220    |      ;
     LDA.B #$01                           ;00CAC7|A901    |      ;
     AND.W $00DA                          ;00CAC9|2DDA00  |0000DA;
-    BNE CODE_00CAEC                      ;00CACC|D01E    |00CAEC;
+    BNE GameState_Flag1Set               ;00CACC|D01E    |00CAEC;
     LDA.B #$40                           ;00CACE|A940    |      ;
     AND.W $00DB                          ;00CAD0|2DDB00  |0000DB;
-    BNE CODE_00CB07                      ;00CAD3|D032    |00CB07;
+    BNE GameState_Flag40Set              ;00CAD3|D032    |00CB07;
     LDX.W #$9300                         ;00CAD5|A20093  |      ;
     STX.W SNES_CGSWSEL                   ;00CAD8|8E3021  |002130;
     LDA.B #$02                           ;00CADB|A902    |      ;
     AND.W $00DA                          ;00CADD|2DDA00  |0000DA;
-    BNE CODE_00CB11                      ;00CAE0|D02F    |00CB11;
+    BNE GameState_FlagCheck2             ;00CAE0|D02F    |00CB11;
     LDA.B #$80                           ;00CAE2|A980    |      ;
     AND.W $00DB                          ;00CAE4|2DDB00  |0000DB;
-    BNE CODE_00CB4E                      ;00CAE7|D065    |00CB4E;
-    JMP.W CODE_00CB76                    ;00CAE9|4C76CB  |00CB76;
+    BNE GameState_Flag80Set              ;00CAE7|D065    |00CB4E;
+    JMP.W GameState_FlagsComplete        ;00CAE9|4C76CB  |00CB76;
 
-CODE_00CAEC:
+GameState_Flag1Set:
     LDA.B #$01                           ;00CAEC|A901    |      ;
     TRB.W $00DA                          ;00CAEE|1CDA00  |0000DA;
-    JSR.W CODE_00CC09                    ;00CAF1|2009CC  |00CC09;
+    JSR.W Screen_ColorProcessor          ;00CAF1|2009CC  |00CC09;
     LDX.W #$5555                         ;00CAF4|A25555  |      ;
     STX.W $0E04                          ;00CAF7|8E040E  |000E04;
     STX.W $0E06                          ;00CAFA|8E060E  |000E06;
     STX.W $0E08                          ;00CAFD|8E080E  |000E08;
     LDA.B #$80                           ;00CB00|A980    |      ;
     TRB.W $00DE                          ;00CB02|1CDE00  |0000DE;
-    BRA CODE_00CB79                      ;00CB05|8072    |00CB79;
+    BRA GameState_RestoreAndExit         ;00CB05|8072    |00CB79;
 
-CODE_00CB07:
+GameState_Flag40Set:
     LDA.B #$40                           ;00CB07|A940    |      ;
     TRB.W $00DB                          ;00CB09|1CDB00  |0000DB;
     JSR.W CODE_00CCBD                    ;00CB0C|20BDCC  |00CCBD;
-    BRA CODE_00CB79                      ;00CB0F|8068    |00CB79;
+    BRA GameState_RestoreAndExit         ;00CB0F|8068    |00CB79;
 ; ==============================================================================
 ; Screen Color Management and Final Systems - CODE_00CB11+
 ; ==============================================================================
 
-CODE_00CB11:
+GameState_FlagCheck2:
     JSR.W CODE_00CD22                    ;00CB11|2022CD  |00CD22;
     REP #$30                             ;00CB14|C230    |      ;
     LDX.W #$016F                         ;00CB16|A26F01  |      ;
@@ -14547,7 +14547,7 @@ CODE_00CB11:
     TRB.W $00D4                          ;00CB48|1CD400  |0000D4;
     JMP.W CODE_00981B                    ;00CB4B|4C1B98  |00981B;
 
-CODE_00CB4E:
+GameState_Flag80Set:
     JSR.W CODE_00CD22                    ;00CB4E|2022CD  |00CD22;
     JSR.W CODE_00CD60                    ;00CB51|2060CD  |00CD60;
     JSR.W CODE_00CC6E                    ;00CB54|206ECC  |00CC6E;
@@ -14562,10 +14562,10 @@ CODE_00CB4E:
     TRB.W $00D4                          ;00CB70|1CD400  |0000D4;
     JMP.W CODE_00981B                    ;00CB73|4C1B98  |00981B;
 
-CODE_00CB76:
+GameState_FlagsComplete:
     JSR.W CODE_00CD22                    ;00CB76|2022CD  |00CD22;
 
-CODE_00CB79:
+GameState_RestoreAndExit:
     JSR.W CODE_00CD60                    ;00CB79|2060CD  |00CD60;
     JSR.W CODE_00CD42                    ;00CB7C|2042CD  |00CD42;
     JSL.L CODE_0C8000                    ;00CB7F|2200800C|0C8000;
@@ -14575,7 +14575,7 @@ CODE_00CB79:
     STX.W SNES_CGSWSEL                   ;00CB8B|8E3021  |002130;
     JMP.W CODE_00981B                    ;00CB8E|4C1B98  |00981B;
 
-CODE_00CB91:
+GameState_DataCopy:
     REP #$30                             ;00CB91|C230    |      ;
     PHB                                  ;00CB93|8B      |      ;
     LDX.W #$CBBD                         ;00CB94|A2BDCB  |      ;
@@ -14600,11 +14600,11 @@ CODE_00CB91:
 DATA_00CBBD:
     db $27,$EC,$3C,$EC,$3C,$EC,$38,$EC,$00 ;00CBBD|        |      ;
 
-CODE_00CBC6:
-    JSR.W CODE_00CB91                    ;00CBC6|2091CB  |00CB91;
+Screen_FadeSetup:
+    JSR.W GameState_DataCopy             ;00CBC6|2091CB  |00CB91;
     LDA.B #$E9                           ;00CBC9|A9E9    |      ;
 
-CODE_00CBCB:
+Screen_FadeLoop:
     LDY.B $17                            ;00CBCB|A417    |000017;
     JSR.W CODE_009D75                    ;00CBCD|20759D  |009D75;
     STY.B $17                            ;00CBD0|8417    |000017;
@@ -14614,16 +14614,16 @@ CODE_00CBCB:
     DEC A                                ;00CBDE|3A      |      ;
     DEC A                                ;00CBDF|3A      |      ;
     CMP.B #$E1                           ;00CBE0|C9E1    |      ;
-    BNE CODE_00CBCB                      ;00CBE2|D0E7    |00CBCB;
+    BNE Screen_FadeLoop                  ;00CBE2|D0E7    |00CBCB;
     LDY.B $17                            ;00CBE4|A417    |000017;
     JSR.W CODE_009D75                    ;00CBE6|20759D  |009D75;
     STY.B $17                            ;00CBE9|8417    |000017;
     RTS                                  ;00CBEB|60      |      ;
 
-CODE_00CBEC:
+Screen_BrightnessMax:
     LDY.W #$9300                         ;00CBEC|A00093  |      ;
     STY.W SNES_CGSWSEL                   ;00CBEF|8C3021  |002130;
-    JSR.W CODE_00CB91                    ;00CBF2|2091CB  |00CB91;
+    JSR.W GameState_DataCopy             ;00CBF2|2091CB  |00CB91;
     LDA.B #$E0                           ;00CBF5|A9E0    |      ;
     STA.L $7F56D8                        ;00CBF7|8FD8567F|7F56D8;
     STA.L $7F56D8,X                      ;00CBFB|9FD8567F|7F56D8;
@@ -14632,12 +14632,12 @@ CODE_00CBEC:
     TRB.W $00D4                          ;00CC05|1CD400  |0000D4;
     RTS                                  ;00CC08|60      |      ;
 
-CODE_00CC09:
+Screen_ColorProcessor:
     LDA.B #$08                           ;00CC09|A908    |      ;
     TSB.W $00D4                          ;00CC0B|0CD400  |0000D4;
     LDX.W #$0007                         ;00CC0E|A20700  |      ;
 
-CODE_00CC11:
+Screen_ColorProcessLoop:
     JSL.L CODE_0C8000                    ;00CC11|2200800C|0C8000;
     LDA.L $7F56D8                        ;00CC15|AFD8567F|7F56D8;
     JSR.W CODE_00CC5B                    ;00CC19|205BCC  |00CC5B;
@@ -14664,17 +14664,17 @@ CODE_00CC11:
     TRB.W $00DA                          ;00CC57|1CDA00  |0000DA;
     RTS                                  ;00CC5A|60      |      ;
 
-CODE_00CC5B:
+Screen_ColorAdjust:
     CLC                                  ;00CC5B|18      |      ;
-    ADC.L CODE_00CC66,X                  ;00CC5C|7F66CC00|00CC66;
+    ADC.L Screen_ColorAdjustTable,X      ;00CC5C|7F66CC00|00CC66;
     CMP.B #$F0                           ;00CC60|C9F0    |      ;
-    BCC CODE_00CC66                      ;00CC62|9002    |00CC66;
+    BCC Screen_ColorAdjustDone           ;00CC62|9002    |00CC66;
     LDA.B #$EF                           ;00CC64|A9EF    |      ;
 
-CODE_00CC66:
+Screen_ColorAdjustDone:
     RTS                                  ;00CC66|60      |      ;
 
-DATA_00CC67:
+Screen_ColorAdjustTable:
     db $03,$02,$02,$02,$02,$01,$03       ;00CC67|        |      ;
 
 ; ==============================================================================
@@ -14682,9 +14682,9 @@ DATA_00CC67:
 ; ==============================================================================
 
 ; Final stub definitions for any remaining external routines
-CODE_00CF3F:
+ExternalRoutine_00CF3F:
     = $CF3F
-CODE_00CF62:
+ExternalRoutine_00CF62:
     = $CF62
 
 ; ==============================================================================
