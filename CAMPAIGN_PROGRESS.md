@@ -30,13 +30,13 @@
 | Bank 00 | `bank_00_section3.asm` | 10 | 🟡 Sections | - | - |
 | Bank 00 | `bank_00_section4.asm` | 20 | 🟡 Sections | - | - |
 | Bank 00 | `bank_00_section5.asm` | 30 | 🟡 Sections | - | - |
-| **Bank 0D** | `bank_0D_documented.asm` | **3** | 🟢 **70% Complete** | 10→3 (-7) | ✅ 70% |
+| **Bank 0D** | `bank_0D_documented.asm` | **1** | 🟢 **90% Complete** | 10→1 (-9) | ✅ 90% |
 | **Bank 02** | `bank_02_documented.asm` | **0** | 🏆 **100% COMPLETE!** | 298→0 (-298) | ✅ **100%** 🎉 |
 | **Bank 01** | `bank_01_documented.asm` | **375** | 🔴 Largest Bank | - | Future |
 | **Bank 0B** | `bank_0B_documented.asm` | **94** | 🔴 Untouched | - | Future |
 | **Bank 0C** | `bank_0C_documented.asm` | **112** | 🔴 Untouched | - | Future |
 | Main | `ffmq_full_disassembly.asm` | 9 | 🟡 Main File | - | Low Priority |
-| **TOTAL** | **All Files** | **731** | **In Progress** | **-705 this session** | **49% eliminated** |
+| **TOTAL** | **All Files** | **729** | **In Progress** | **-707 this session** | **49% eliminated** |
 
 ### 🏆 DOUBLE BANK COMPLETION SESSION! October 31, 2025 (Batches 29-30)
 
