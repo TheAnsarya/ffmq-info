@@ -481,7 +481,7 @@ go for it
 go!
 continue doing as many renamings as you can
 bank_02 
-
+focus on cleaning up the DATA labels
 
 
 
