@@ -1,4 +1,4 @@
-﻿;      |        |      ;
+;      |        |      ;
 	org $008000                          ;      |        |      ;
 ;      |        |      ;
 ;      |        |      ;
@@ -347,11 +347,12 @@ Menu_InitializeQueues:
 	plb                                  ;008327|AB      |      ;
 	ldx.W #$99c0                         ;008328|A2C099  |      ;
 	ldy.W #$0004                         ;00832B|A00400  |      ;
-	jsl.L CODE_008DDF                    ;00832E|22DF8D00|008DDF;
+	jsl.L VRAM_ByteCopy                    ;00832E|22DF8D00|008DDF;
 	plb                                  ;008332|AB      |      ;
 	rtl                                  ;008333|6B      |      ;
 ;      |        |      ;
 	db $fc,$a6,$03                       ;008334|        |      ;
+VBlank_Handler:
 	rep #$30                             ;008337|C230    |      ;
 	lda.W #$4300                         ;008339|A90043  |      ;
 	tcd                                  ;00833C|5B      |      ;
@@ -359,46 +360,46 @@ Menu_InitializeQueues:
 	stz.W $420c                          ;00833F|9C0C42  |02420C;
 	lda.B #$40                           ;008342|A940    |      ;
 	and.W $00e2                          ;008344|2DE200  |0200E2;
-	bne CODE_00837D                      ;008347|D034    |00837D;
+	bne VBlank_JumpHandler               ;008347|D034    |00837D;
 	lda.B #$02                           ;008349|A902    |      ;
 	and.W $00d4                          ;00834B|2DD400  |0200D4;
-	bne CODE_00837A                      ;00834E|D02A    |00837A;
+	bne VBlank_PaletteTransfer           ;00834E|D02A    |00837A;
 	lda.B #$40                           ;008350|A940    |      ;
 	and.W $00dd                          ;008352|2DDD00  |0200DD;
-	bne CODE_008385                      ;008355|D02E    |008385;
+	bne VBlank_VRAMTransfer              ;008355|D02E    |008385;
 	lda.B #$80                           ;008357|A980    |      ;
 	and.W $00d8                          ;008359|2DD800  |0200D8;
-	beq CODE_008366                      ;00835C|F008    |008366;
+	beq VBlank_CheckModeFlags            ;00835C|F008    |008366;
 	lda.B #$80                           ;00835E|A980    |      ;
 	trb.W $00d8                          ;008360|1CD800  |0000D8;
-	jmp.W CODE_0085B7                    ;008363|4CB785  |0085B7;
+	jmp.W VBlank_FieldMode               ;008363|4CB785  |0085B7;
 ;      |        |      ;
 ;      |        |      ;
-CODE_008366:
+VBlank_CheckModeFlags:
 	lda.B #$c0                           ;008366|A9C0    |      ;
 	and.W $00d2                          ;008368|2DD200  |0200D2;
-	bne CODE_0083A8                      ;00836B|D03B    |0083A8;
+	bne VBlank_FinalTransfers            ;00836B|D03B    |0083A8;
 	lda.B #$10                           ;00836D|A910    |      ;
 	and.W $00d2                          ;00836F|2DD200  |0200D2;
-	bne CODE_008377                      ;008372|D003    |008377;
-	jmp.W CODE_008428                    ;008374|4C2884  |008428;
+	bne VBlank_BattleMode                ;008372|D003    |008377;
+	jmp.W VBlank_StandardMode            ;008374|4C2884  |008428;
 ;      |        |      ;
 ;      |        |      ;
-CODE_008377:
-	jmp.W CODE_00863D                    ;008377|4C3D86  |00863D;
+VBlank_BattleMode:
+	jmp.W VBlank_BattleTransfer          ;008377|4C3D86  |00863D;
 ;      |        |      ;
 ;      |        |      ;
-CODE_00837A:
-	jmp.W CODE_0083E8                    ;00837A|4CE883  |0083E8;
+VBlank_PaletteTransfer:
+	jmp.W VBlank_PaletteDMA              ;00837A|4CE883  |0083E8;
 ;      |        |      ;
 ;      |        |      ;
-CODE_00837D:
+VBlank_JumpHandler:
 	lda.B #$40                           ;00837D|A940    |      ;
 	trb.W $00e2                          ;00837F|1CE200  |0000E2;
 	jml.W [$0058]                        ;008382|DC5800  |000058;
 ;      |        |      ;
 ;      |        |      ;
-CODE_008385:
+VBlank_VRAMTransfer:
 	ldx.W #$1801                         ;008385|A20118  |      ;
 	stx.B SNES_DMA5PARAM-$4300           ;008388|8650    |004350;
 	ldx.W $01f6                          ;00838A|AEF601  |0001F6;
@@ -414,10 +415,10 @@ CODE_008385:
 	lda.B #$20                           ;0083A3|A920    |      ;
 	sta.W SNES_MDMAEN                    ;0083A5|8D0B42  |00420B;
 ;      |        |      ;
-CODE_0083A8:
+VBlank_FinalTransfers:
 	lda.B #$80                           ;0083A8|A980    |      ;
 	and.W $00d2                          ;0083AA|2DD200  |0200D2;
-	beq CODE_0083D3                      ;0083AD|F024    |0083D3;
+	beq VBlank_CheckOAMFlag              ;0083AD|F024    |0083D3;
 	lda.B #$80                           ;0083AF|A980    |      ;
 	sta.W SNES_VMAINC                    ;0083B1|8D1521  |002115;
 	ldx.W #$1801                         ;0083B4|A20118  |      ;
@@ -433,13 +434,13 @@ CODE_0083A8:
 	lda.B #$20                           ;0083CE|A920    |      ;
 	sta.W SNES_MDMAEN                    ;0083D0|8D0B42  |00420B;
 ;      |        |      ;
-CODE_0083D3:
+VBlank_CheckOAMFlag:
 	lda.B #$20                           ;0083D3|A920    |      ;
 	and.W $00d2                          ;0083D5|2DD200  |0200D2;
-	beq CODE_0083DD                      ;0083D8|F003    |0083DD;
-	jsr.W CODE_008543                    ;0083DA|204385  |008543;
+	beq VBlank_CleanupReturn             ;0083D8|F003    |0083DD;
+	jsr.W VBlank_OAMTransfer             ;0083DA|204385  |008543;
 ;      |        |      ;
-CODE_0083DD:
+VBlank_CleanupReturn:
 	lda.B #$40                           ;0083DD|A940    |      ;
 	trb.W $00dd                          ;0083DF|1CDD00  |0200DD;
 	lda.B #$a0                           ;0083E2|A9A0    |      ;
@@ -447,7 +448,7 @@ CODE_0083DD:
 	rtl                                  ;0083E7|6B      |      ;
 ;      |        |      ;
 ;      |        |      ;
-CODE_0083E8:
+VBlank_PaletteDMA:
 	lda.B #$02                           ;0083E8|A902    |      ;
 	trb.W $00d4                          ;0083EA|1CD400  |0200D4;
 	lda.B #$80                           ;0083ED|A980    |      ;
@@ -458,38 +459,38 @@ CODE_0083E8:
 	sta.B SNES_DMA5ADDRH-$4300           ;0083F9|8554    |004354;
 	lda.B #$a8                           ;0083FB|A9A8    |      ;
 	ldx.W $0064                          ;0083FD|AE6400  |020064;
-	jsr.W CODE_008504                    ;008400|200485  |008504;
+	jsr.W VBlank_PaletteHelper           ;008400|200485  |008504;
 	rep #$30                             ;008403|C230    |      ;
 	ldx.W #$ff00                         ;008405|A200FF  |      ;
 	stx.W $00f0                          ;008408|8EF000  |0200F0;
 	ldx.W $0062                          ;00840B|AE6200  |020062;
 	lda.W #$6080                         ;00840E|A98060  |      ;
 	cpx.W #$0001                         ;008411|E00100  |      ;
-	beq CODE_00841A                      ;008414|F004    |00841A;
-	jsr.W CODE_008520                    ;008416|202085  |008520;
+	beq VBlank_TileTransferAlt           ;008414|F004    |00841A;
+	jsr.W VBlank_TileTransfer            ;008416|202085  |008520;
 	rtl                                  ;008419|6B      |      ;
 ;      |        |      ;
 ;      |        |      ;
-CODE_00841A:
+VBlank_TileTransferAlt:
 	phk                                  ;00841A|4B      |      ;
 	plb                                  ;00841B|AB      |      ;
 	sta.W SNES_VMADDL                    ;00841C|8D1621  |002116;
 	ldx.W #$f0c1                         ;00841F|A2C1F0  |      ;
 	ldy.W #$0004                         ;008422|A00400  |      ;
-	jmp.W CODE_008DDF                    ;008425|4CDF8D  |008DDF;
+	jmp.W VRAM_ByteCopy                  ;008425|4CDF8D  |008DDF;
 ;      |        |      ;
 ;      |        |      ;
-CODE_008428:
+VBlank_StandardMode:
 	lda.B #$80                           ;008428|A980    |      ;
 	and.W $00d4                          ;00842A|2DD400  |0200D4;
-	beq CODE_008476                      ;00842D|F047    |008476;
+	beq VBlank_StandardEnd               ;00842D|F047    |008476;
 	lda.B #$80                           ;00842F|A980    |      ;
 	trb.W $00d4                          ;008431|1CD400  |0200D4;
 	lda.B #$80                           ;008434|A980    |      ;
 	sta.W $2115                          ;008436|8D1521  |022115;
 	lda.B #$02                           ;008439|A902    |      ;
 	and.W $00d8                          ;00843B|2DD800  |0200D8;
-	beq CODE_008479                      ;00843E|F039    |008479;
+	beq VBlank_StandardLowPrio           ;00843E|F039    |008479;
 	ldx.W #$1801                         ;008440|A20118  |      ;
 	stx.B SNES_DMA5PARAM-$4300           ;008443|8650    |004350;
 	ldx.W #$075a                         ;008445|A25A07  |      ;
@@ -511,11 +512,11 @@ CODE_008428:
 	sta.W $2118                          ;008471|8D1821  |022118;
 	sep #$20                             ;008474|E220    |      ;
 ;      |        |      ;
-CODE_008476:
-	jmp.W CODE_0083A8                    ;008476|4CA883  |0083A8;
+VBlank_StandardEnd:
+	jmp.W VBlank_FinalTransfers          ;008476|4CA883  |0083A8;
 ;      |        |      ;
 ;      |        |      ;
-CODE_008479:
+VBlank_StandardLowPrio:
 	ldx.W #$2200                         ;008479|A20022  |      ;
 	stx.B SNES_DMA5PARAM-$4300           ;00847C|8650    |004350;
 	lda.B #$07                           ;00847E|A907    |      ;
@@ -571,10 +572,10 @@ CODE_0084F8:
 	ldx.W #$ffff                         ;0084F8|A2FFFF  |      ;
 	stx.W $00f2                          ;0084FB|8EF200  |0000F2;
 	stx.W $00f5                          ;0084FE|8EF500  |0000F5;
-	jmp.W CODE_0083A8                    ;008501|4CA883  |0083A8;
+	jmp.W VBlank_FinalTransfers          ;008501|4CA883  |0083A8;
 ;      |        |      ;
 ;      |        |      ;
-CODE_008504:
+VBlank_PaletteHelper:
 	sta.W $2121                          ;008504|8D2121  |022121;
 	ldy.W #$0010                         ;008507|A01000  |      ;
 	sty.B SNES_DMA5CNTL-$4300            ;00850A|8455    |004355;
@@ -590,28 +591,28 @@ CODE_008504:
 	rts                                  ;00851F|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
-CODE_008520:
+VBlank_TileTransfer:
 	cpx.W #$ffff                         ;008520|E0FFFF  |      ;
-	beq CODE_008542                      ;008523|F01D    |008542;
+	beq VBlank_TileReturn                ;008523|F01D    |008542;
 	sta.W SNES_VMADDL                    ;008525|8D1621  |002116;
 	pea.W $0004                          ;008528|F40400  |000004;
 	plb                                  ;00852B|AB      |      ;
 	phx                                  ;00852C|DA      |      ;
 	ldy.W #$0002                         ;00852D|A00200  |      ;
-	jsl.L CODE_008DDF                    ;008530|22DF8D00|008DDF;
+	jsl.L VRAM_ByteCopy                    ;008530|22DF8D00|008DDF;
 	pla                                  ;008534|68      |      ;
 	clc                                  ;008535|18      |      ;
 	adc.W #$0180                         ;008536|698001  |      ;
 	tax                                  ;008539|AA      |      ;
 	ldy.W #$0002                         ;00853A|A00200  |      ;
-	jsl.L CODE_008DDF                    ;00853D|22DF8D00|008DDF;
+	jsl.L VRAM_ByteCopy                    ;00853D|22DF8D00|008DDF;
 	plb                                  ;008541|AB      |      ;
 ;      |        |      ;
-CODE_008542:
+VBlank_TileReturn:
 	rts                                  ;008542|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
-CODE_008543:
+VBlank_OAMTransfer:
 	ldx.W #$0400                         ;008543|A20004  |      ;
 	stx.B SNES_DMA5PARAM-$4300           ;008546|8650    |004350;
 	ldx.W #$0c00                         ;008548|A2000C  |      ;
@@ -635,7 +636,7 @@ CODE_008543:
 	rts                                  ;008576|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
-CODE_008577:
+VBlank_BattleVRAMSetup:
 	ldx.W #$4400                         ;008577|A20044  |      ;
 	stx.W SNES_VMADDL                    ;00857A|8E1621  |002116;
 	ldx.W #$1801                         ;00857D|A20118  |      ;
@@ -664,12 +665,12 @@ CODE_008577:
 	rtl                                  ;0085B6|6B      |      ;
 ;      |        |      ;
 ;      |        |      ;
-CODE_0085B7:
+VBlank_FieldMode:
 	lda.B #$80                           ;0085B7|A980    |      ;
 	sta.W SNES_VMAINC                    ;0085B9|8D1521  |002115;
 	lda.B #$10                           ;0085BC|A910    |      ;
 	and.W $00da                          ;0085BE|2DDA00  |0000DA;
-	bne CODE_008577                      ;0085C1|D0B4    |008577;
+	bne VBlank_BattleVRAMSetup           ;0085C1|D0B4    |008577;
 	ldx.W $0042                          ;0085C3|AE4200  |000042;
 	stx.W SNES_VMADDL                    ;0085C6|8E1621  |002116;
 	ldx.W #$1801                         ;0085C9|A20118  |      ;
@@ -716,26 +717,26 @@ CODE_0085B7:
 	rtl                                  ;00862C|6B      |      ;
 ;      |        |      ;
 ;      |        |      ;
-CODE_00862D:
+VBlank_FieldOAMCheck:
 	jsr.W CODE_008543                    ;00862D|204385  |008543;
 	lda.B #$20                           ;008630|A920    |      ;
 	and.W $00d6                          ;008632|2DD600  |0000D6;
-	beq CODE_00863C                      ;008635|F005    |00863C;
+	beq VBlank_FieldReturn               ;008635|F005    |00863C;
 	lda.B #$78                           ;008637|A978    |      ;
 	tsb.W $00d4                          ;008639|0CD400  |0000D4;
 ;      |        |      ;
-CODE_00863C:
+VBlank_FieldReturn:
 	rtl                                  ;00863C|6B      |      ;
 ;      |        |      ;
 ;      |        |      ;
-CODE_00863D:
+VBlank_BattleTransfer:
 	lda.B #$10                           ;00863D|A910    |      ;
 	trb.W $00d2                          ;00863F|1CD200  |0000D2;
 	lda.B #$80                           ;008642|A980    |      ;
 	sta.W SNES_VMAINC                    ;008644|8D1521  |002115;
 	lda.B #$10                           ;008647|A910    |      ;
 	and.W $00da                          ;008649|2DDA00  |0000DA;
-	beq CODE_00869D                      ;00864C|F04F    |00869D;
+	beq VBlank_BattleAlt                 ;00864C|F04F    |00869D;
 	pea.W $0004                          ;00864E|F40400  |000004;
 	plb                                  ;008651|AB      |      ;
 	ldx.W #$60c0                         ;008652|A2C060  |      ;
@@ -744,7 +745,7 @@ CODE_00863D:
 	stx.W $00f0                          ;00865B|8EF000  |0400F0;
 	ldx.W #$99c0                         ;00865E|A2C099  |      ;
 	ldy.W #$0004                         ;008661|A00400  |      ;
-	jsl.L CODE_008DDF                    ;008664|22DF8D00|008DDF;
+	jsl.L VRAM_ByteCopy                    ;008664|22DF8D00|008DDF;
 	plb                                  ;008668|AB      |      ;
 	lda.B #$a8                           ;008669|A9A8    |      ;
 	sta.W SNES_CGADD                     ;00866B|8D2121  |002121;
@@ -769,7 +770,7 @@ CODE_00863D:
 	rtl                                  ;00869C|6B      |      ;
 ;      |        |      ;
 ;      |        |      ;
-CODE_00869D:
+VBlank_BattleAlt:
 	ldx.W #$2200                         ;00869D|A20022  |      ;
 	stx.B SNES_DMA5PARAM-$4300           ;0086A0|8650    |004350;
 	ldx.W #$d824                         ;0086A2|A224D8  |      ;
@@ -818,10 +819,10 @@ CODE_0086F3:
 	sta.W $2116                          ;0086F6|8D1621  |042116;
 	ldx.W #$9a20                         ;0086F9|A2209A  |      ;
 	ldy.W #$0004                         ;0086FC|A00400  |      ;
-	jsl.L CODE_008DDF                    ;0086FF|22DF8D00|008DDF;
+	jsl.L VRAM_ByteCopy                    ;0086FF|22DF8D00|008DDF;
 	ldx.W #$cd20                         ;008703|A220CD  |      ;
 	ldy.W #$0004                         ;008706|A00400  |      ;
-	jsl.L CODE_008DDF                    ;008709|22DF8D00|008DDF;
+	jsl.L VRAM_ByteCopy                    ;008709|22DF8D00|008DDF;
 	ldx.W $0107                          ;00870D|AE0701  |040107;
 	jsr.W CODE_008751                    ;008710|205187  |008751;
 	lda.W #$6280                         ;008713|A98062  |      ;
@@ -853,12 +854,12 @@ CODE_008751:
 	lda.L $000000,x                      ;008752|BF000000|000000;
 	tax                                  ;008756|AA      |      ;
 	ldy.W #$0004                         ;008757|A00400  |      ;
-	jsl.L CODE_008DDF                    ;00875A|22DF8D00|008DDF;
+	jsl.L VRAM_ByteCopy                    ;00875A|22DF8D00|008DDF;
 	plx                                  ;00875E|FA      |      ;
 	lda.L $000002,x                      ;00875F|BF020000|000002;
 	tax                                  ;008763|AA      |      ;
 	ldy.W #$0004                         ;008764|A00400  |      ;
-	jsl.L CODE_008DDF                    ;008767|22DF8D00|008DDF;
+	jsl.L VRAM_ByteCopy                    ;008767|22DF8D00|008DDF;
 	rts                                  ;00876B|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
@@ -1808,7 +1809,7 @@ CODE_008DDA:
 	rts                                  ;008DDE|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
-CODE_008DDF:
+VRAM_ByteCopy:
 	php                                  ;008DDF|08      |      ;
 	phd                                  ;008DE0|0B      |      ;
 	rep #$30                             ;008DE1|C230    |      ;
@@ -1816,7 +1817,7 @@ CODE_008DDF:
 	tcd                                  ;008DE6|5B      |      ;
 	clc                                  ;008DE7|18      |      ;
 ;      |        |      ;
-CODE_008DE8:
+VRAM_CopyLoop:
 	phy                                  ;008DE8|5A      |      ;
 	lda.W $0000,x                        ;008DE9|BD0000  |040000;
 	sta.B SNES_VMDATAL-$2100             ;008DEC|8518    |002118;
@@ -1961,7 +1962,7 @@ CODE_008EC4:
 	plb                                  ;008F07|AB      |      ;
 	ldx.W #$8000                         ;008F08|A20080  |      ;
 	ldy.W #$0100                         ;008F0B|A00001  |      ;
-	jsl.L CODE_008DDF                    ;008F0E|22DF8D00|008DDF;
+	jsl.L VRAM_ByteCopy                    ;008F0E|22DF8D00|008DDF;
 	plb                                  ;008F12|AB      |      ;
 	sep #$30                             ;008F13|E230    |      ;
 	pea.W $0007                          ;008F15|F40700  |000007;
@@ -7284,7 +7285,7 @@ CODE_00BAF0:
 	plb                                  ;00BB37|AB      |      ;
 	ldx.W #$9840                         ;00BB38|A24098  |      ;
 	ldy.W #$0010                         ;00BB3B|A01000  |      ;
-	jsl.L CODE_008DDF                    ;00BB3E|22DF8D00|008DDF;
+	jsl.L VRAM_ByteCopy                    ;00BB3E|22DF8D00|008DDF;
 	plb                                  ;00BB42|AB      |      ;
 	ldx.W #$6080                         ;00BB43|A28060  |      ;
 	stx.B SNES_VMADDL-$2100              ;00BB46|8616    |002116;
@@ -7292,7 +7293,7 @@ CODE_00BAF0:
 	plb                                  ;00BB4B|AB      |      ;
 	ldx.W #$99c0                         ;00BB4C|A2C099  |      ;
 	ldy.W #$0004                         ;00BB4F|A00400  |      ;
-	jsl.L CODE_008DDF                    ;00BB52|22DF8D00|008DDF;
+	jsl.L VRAM_ByteCopy                    ;00BB52|22DF8D00|008DDF;
 	plb                                  ;00BB56|AB      |      ;
 	sep #$30                             ;00BB57|E230    |      ;
 	pea.W $0007                          ;00BB59|F40700  |000007;
@@ -10232,7 +10233,7 @@ CODE_00D194:
 	plb                                  ;00D209|AB      |      ;
 	ldx.W #$97e8                         ;00D20A|A2E897  |      ;
 	ldy.W #$0001                         ;00D20D|A00100  |      ;
-	jsl.L CODE_008DDF                    ;00D210|22DF8D00|008DDF;
+	jsl.L VRAM_ByteCopy                    ;00D210|22DF8D00|008DDF;
 	plb                                  ;00D214|AB      |      ;
 	plx                                  ;00D215|FA      |      ;
 	stx.W $0017                          ;00D216|8E1700  |000017;
