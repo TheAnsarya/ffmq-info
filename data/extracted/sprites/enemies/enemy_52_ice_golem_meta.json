@@ -1,0 +1,19 @@
+{
+  "name": "enemy_52_ice_golem",
+  "category": "enemy",
+  "format": "4BPP",
+  "rom_offset": "0x04E175",
+  "dimensions": {
+    "width_tiles": 2,
+    "height_tiles": 2,
+    "width_pixels": 16,
+    "height_pixels": 16
+  },
+  "palette_index": 6,
+  "num_tiles": 4,
+  "animation": {
+    "num_frames": 1,
+    "frame_offsets": []
+  },
+  "notes": "Ice Golem (ID 52)"
+}

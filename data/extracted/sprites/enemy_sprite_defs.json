@@ -1,0 +1,761 @@
+{
+  "metadata": {
+    "source": "Bank 09 sprite pointer table",
+    "table_offset": "0x048460",
+    "total_enemies": 83,
+    "unique_sprites": 39
+  },
+  "sprites": [
+    {
+      "name": "dark_king_phase_1",
+      "tile_offset": "0x010000",
+      "num_tiles": 9,
+      "width_tiles": 3,
+      "height_tiles": 3,
+      "palette_index": 7,
+      "format": "4BPP",
+      "category": "enemy",
+      "enemy_ids": [
+        81
+      ],
+      "flags": [
+        3
+      ],
+      "notes": "Enemy IDs: [81]"
+    },
+    {
+      "name": "brownie",
+      "tile_offset": "0x0485F5",
+      "num_tiles": 9,
+      "width_tiles": 3,
+      "height_tiles": 3,
+      "palette_index": 4,
+      "format": "4BPP",
+      "category": "enemy",
+      "enemy_ids": [
+        0,
+        1,
+        2
+      ],
+      "flags": [
+        4,
+        3,
+        1
+      ],
+      "notes": "Enemy IDs: [0, 1, 2]"
+    },
+    {
+      "name": "mad_plant",
+      "tile_offset": "0x0488AD",
+      "num_tiles": 36,
+      "width_tiles": 6,
+      "height_tiles": 6,
+      "palette_index": 4,
+      "format": "4BPP",
+      "category": "enemy",
+      "enemy_ids": [
+        3,
+        4,
+        5
+      ],
+      "flags": [
+        5,
+        20,
+        0
+      ],
+      "notes": "Enemy IDs: [3, 4, 5]"
+    },
+    {
+      "name": "slime",
+      "tile_offset": "0x048E05",
+      "num_tiles": 9,
+      "width_tiles": 3,
+      "height_tiles": 3,
+      "palette_index": 4,
+      "format": "4BPP",
+      "category": "enemy",
+      "enemy_ids": [
+        6,
+        7,
+        8
+      ],
+      "flags": [
+        2,
+        1,
+        6
+      ],
+      "notes": "Enemy IDs: [6, 7, 8]"
+    },
+    {
+      "name": "poison_toad",
+      "tile_offset": "0x049135",
+      "num_tiles": 36,
+      "width_tiles": 6,
+      "height_tiles": 6,
+      "palette_index": 4,
+      "format": "4BPP",
+      "category": "enemy",
+      "enemy_ids": [
+        9,
+        10,
+        11
+      ],
+      "flags": [
+        11,
+        7,
+        9
+      ],
+      "notes": "Enemy IDs: [9, 10, 11]"
+    },
+    {
+      "name": "basilisk",
+      "tile_offset": "0x049555",
+      "num_tiles": 36,
+      "width_tiles": 6,
+      "height_tiles": 6,
+      "palette_index": 4,
+      "format": "4BPP",
+      "category": "enemy",
+      "enemy_ids": [
+        12,
+        13,
+        14
+      ],
+      "flags": [
+        8,
+        1,
+        23
+      ],
+      "notes": "Enemy IDs: [12, 13, 14]"
+    },
+    {
+      "name": "sand_worm",
+      "tile_offset": "0x049945",
+      "num_tiles": 64,
+      "width_tiles": 8,
+      "height_tiles": 8,
+      "palette_index": 4,
+      "format": "4BPP",
+      "category": "enemy",
+      "enemy_ids": [
+        15,
+        16,
+        17
+      ],
+      "flags": [
+        16,
+        8,
+        17
+      ],
+      "notes": "Enemy IDs: [15, 16, 17]"
+    },
+    {
+      "name": "skeleton",
+      "tile_offset": "0x049DDD",
+      "num_tiles": 36,
+      "width_tiles": 6,
+      "height_tiles": 6,
+      "palette_index": 4,
+      "format": "4BPP",
+      "category": "enemy",
+      "enemy_ids": [
+        18,
+        19,
+        20
+      ],
+      "flags": [
+        0,
+        10,
+        24
+      ],
+      "notes": "Enemy IDs: [18, 19, 20]"
+    },
+    {
+      "name": "roc",
+      "tile_offset": "0x04A19D",
+      "num_tiles": 36,
+      "width_tiles": 6,
+      "height_tiles": 6,
+      "palette_index": 5,
+      "format": "4BPP",
+      "category": "enemy",
+      "enemy_ids": [
+        21,
+        22,
+        23
+      ],
+      "flags": [
+        18,
+        19,
+        1
+      ],
+      "notes": "Enemy IDs: [21, 22, 23]"
+    },
+    {
+      "name": "zombie",
+      "tile_offset": "0x04A695",
+      "num_tiles": 36,
+      "width_tiles": 6,
+      "height_tiles": 6,
+      "palette_index": 5,
+      "format": "4BPP",
+      "category": "enemy",
+      "enemy_ids": [
+        24,
+        25
+      ],
+      "flags": [
+        0,
+        23
+      ],
+      "notes": "Enemy IDs: [24, 25]"
+    },
+    {
+      "name": "desert_hag",
+      "tile_offset": "0x04ABA5",
+      "num_tiles": 64,
+      "width_tiles": 8,
+      "height_tiles": 8,
+      "palette_index": 5,
+      "format": "4BPP",
+      "category": "enemy",
+      "enemy_ids": [
+        26,
+        27
+      ],
+      "flags": [
+        20,
+        13
+      ],
+      "notes": "Enemy IDs: [26, 27]"
+    },
+    {
+      "name": "ninja",
+      "tile_offset": "0x04AF35",
+      "num_tiles": 64,
+      "width_tiles": 8,
+      "height_tiles": 8,
+      "palette_index": 5,
+      "format": "4BPP",
+      "category": "enemy",
+      "enemy_ids": [
+        28,
+        29
+      ],
+      "flags": [
+        8,
+        20
+      ],
+      "notes": "Enemy IDs: [28, 29]"
+    },
+    {
+      "name": "sphinx",
+      "tile_offset": "0x04B265",
+      "num_tiles": 64,
+      "width_tiles": 8,
+      "height_tiles": 8,
+      "palette_index": 5,
+      "format": "4BPP",
+      "category": "enemy",
+      "enemy_ids": [
+        30,
+        31
+      ],
+      "flags": [
+        12,
+        20
+      ],
+      "notes": "Enemy IDs: [30, 31]"
+    },
+    {
+      "name": "centaur",
+      "tile_offset": "0x04B72D",
+      "num_tiles": 64,
+      "width_tiles": 8,
+      "height_tiles": 8,
+      "palette_index": 5,
+      "format": "4BPP",
+      "category": "enemy",
+      "enemy_ids": [
+        32,
+        33
+      ],
+      "flags": [
+        12,
+        17
+      ],
+      "notes": "Enemy IDs: [32, 33]"
+    },
+    {
+      "name": "stoney_roost",
+      "tile_offset": "0x04BB05",
+      "num_tiles": 36,
+      "width_tiles": 6,
+      "height_tiles": 6,
+      "palette_index": 5,
+      "format": "4BPP",
+      "category": "enemy",
+      "enemy_ids": [
+        34,
+        35
+      ],
+      "flags": [
+        17,
+        1
+      ],
+      "notes": "Enemy IDs: [34, 35]"
+    },
+    {
+      "name": "ghost",
+      "tile_offset": "0x04BF9D",
+      "num_tiles": 36,
+      "width_tiles": 6,
+      "height_tiles": 6,
+      "palette_index": 5,
+      "format": "4BPP",
+      "category": "enemy",
+      "enemy_ids": [
+        36,
+        37
+      ],
+      "flags": [
+        24,
+        0
+      ],
+      "notes": "Enemy IDs: [36, 37]"
+    },
+    {
+      "name": "gather",
+      "tile_offset": "0x04C38D",
+      "num_tiles": 16,
+      "width_tiles": 4,
+      "height_tiles": 4,
+      "palette_index": 5,
+      "format": "4BPP",
+      "category": "enemy",
+      "enemy_ids": [
+        38,
+        39
+      ],
+      "flags": [
+        7,
+        2
+      ],
+      "notes": "Enemy IDs: [38, 39]"
+    },
+    {
+      "name": "fangpire",
+      "tile_offset": "0x04C7F5",
+      "num_tiles": 36,
+      "width_tiles": 6,
+      "height_tiles": 6,
+      "palette_index": 6,
+      "format": "4BPP",
+      "category": "enemy",
+      "enemy_ids": [
+        40,
+        41
+      ],
+      "flags": [
+        10,
+        6
+      ],
+      "notes": "Enemy IDs: [40, 41]"
+    },
+    {
+      "name": "mage",
+      "tile_offset": "0x04CBE5",
+      "num_tiles": 16,
+      "width_tiles": 4,
+      "height_tiles": 4,
+      "palette_index": 6,
+      "format": "4BPP",
+      "category": "enemy",
+      "enemy_ids": [
+        42,
+        43
+      ],
+      "flags": [
+        5,
+        8
+      ],
+      "notes": "Enemy IDs: [42, 43]"
+    },
+    {
+      "name": "land_turtle",
+      "tile_offset": "0x04D0C5",
+      "num_tiles": 64,
+      "width_tiles": 8,
+      "height_tiles": 8,
+      "palette_index": 6,
+      "format": "4BPP",
+      "category": "enemy",
+      "enemy_ids": [
+        44,
+        45
+      ],
+      "flags": [
+        15,
+        20
+      ],
+      "notes": "Enemy IDs: [44, 45]"
+    },
+    {
+      "name": "stone_man",
+      "tile_offset": "0x04D49D",
+      "num_tiles": 16,
+      "width_tiles": 4,
+      "height_tiles": 4,
+      "palette_index": 6,
+      "format": "4BPP",
+      "category": "enemy",
+      "enemy_ids": [
+        46,
+        47
+      ],
+      "flags": [
+        1,
+        11
+      ],
+      "notes": "Enemy IDs: [46, 47]"
+    },
+    {
+      "name": "wasp",
+      "tile_offset": "0x04D88D",
+      "num_tiles": 64,
+      "width_tiles": 8,
+      "height_tiles": 8,
+      "palette_index": 6,
+      "format": "4BPP",
+      "category": "enemy",
+      "enemy_ids": [
+        48,
+        49
+      ],
+      "flags": [
+        12,
+        22
+      ],
+      "notes": "Enemy IDs: [48, 49]"
+    },
+    {
+      "name": "minotaur",
+      "tile_offset": "0x04DE45",
+      "num_tiles": 36,
+      "width_tiles": 6,
+      "height_tiles": 6,
+      "palette_index": 6,
+      "format": "4BPP",
+      "category": "enemy",
+      "enemy_ids": [
+        50,
+        51
+      ],
+      "flags": [
+        9,
+        16
+      ],
+      "notes": "Enemy IDs: [50, 51]"
+    },
+    {
+      "name": "ice_golem",
+      "tile_offset": "0x04E175",
+      "num_tiles": 4,
+      "width_tiles": 2,
+      "height_tiles": 2,
+      "palette_index": 6,
+      "format": "4BPP",
+      "category": "enemy",
+      "enemy_ids": [
+        52,
+        53
+      ],
+      "flags": [
+        0,
+        0
+      ],
+      "notes": "Enemy IDs: [52, 53]"
+    },
+    {
+      "name": "jinn",
+      "tile_offset": "0x04E595",
+      "num_tiles": 64,
+      "width_tiles": 8,
+      "height_tiles": 8,
+      "palette_index": 6,
+      "format": "4BPP",
+      "category": "enemy",
+      "enemy_ids": [
+        54,
+        55
+      ],
+      "flags": [
+        14,
+        21
+      ],
+      "notes": "Enemy IDs: [54, 55]"
+    },
+    {
+      "name": "thunder_eye",
+      "tile_offset": "0x04E9CD",
+      "num_tiles": 64,
+      "width_tiles": 8,
+      "height_tiles": 8,
+      "palette_index": 6,
+      "format": "4BPP",
+      "category": "enemy",
+      "enemy_ids": [
+        56,
+        66
+      ],
+      "flags": [
+        25,
+        13
+      ],
+      "notes": "Enemy IDs: [56, 66]"
+    },
+    {
+      "name": "doom_eye",
+      "tile_offset": "0x04F1DD",
+      "num_tiles": 64,
+      "width_tiles": 8,
+      "height_tiles": 8,
+      "palette_index": 6,
+      "format": "4BPP",
+      "category": "enemy",
+      "enemy_ids": [
+        57,
+        67
+      ],
+      "flags": [
+        26,
+        12
+      ],
+      "notes": "Enemy IDs: [57, 67]"
+    },
+    {
+      "name": "succubus",
+      "tile_offset": "0x050618",
+      "num_tiles": 64,
+      "width_tiles": 8,
+      "height_tiles": 8,
+      "palette_index": 6,
+      "format": "4BPP",
+      "category": "enemy",
+      "enemy_ids": [
+        58,
+        68
+      ],
+      "flags": [
+        21,
+        27
+      ],
+      "notes": "Enemy IDs: [58, 68]"
+    },
+    {
+      "name": "freeze_crab",
+      "tile_offset": "0x051038",
+      "num_tiles": 64,
+      "width_tiles": 8,
+      "height_tiles": 8,
+      "palette_index": 6,
+      "format": "4BPP",
+      "category": "enemy",
+      "enemy_ids": [
+        59,
+        69
+      ],
+      "flags": [
+        28,
+        14
+      ],
+      "notes": "Enemy IDs: [59, 69]"
+    },
+    {
+      "name": "gemini_crest_l",
+      "tile_offset": "0x051788",
+      "num_tiles": 64,
+      "width_tiles": 8,
+      "height_tiles": 8,
+      "palette_index": 7,
+      "format": "4BPP",
+      "category": "enemy",
+      "enemy_ids": [
+        60,
+        70
+      ],
+      "flags": [
+        29,
+        1
+      ],
+      "notes": "Enemy IDs: [60, 70]"
+    },
+    {
+      "name": "gemini_crest_r",
+      "tile_offset": "0x052208",
+      "num_tiles": 64,
+      "width_tiles": 8,
+      "height_tiles": 8,
+      "palette_index": 7,
+      "format": "4BPP",
+      "category": "enemy",
+      "enemy_ids": [
+        61,
+        71
+      ],
+      "flags": [
+        18,
+        30
+      ],
+      "notes": "Enemy IDs: [61, 71]"
+    },
+    {
+      "name": "sky_beast",
+      "tile_offset": "0x052B08",
+      "num_tiles": 64,
+      "width_tiles": 8,
+      "height_tiles": 8,
+      "palette_index": 7,
+      "format": "4BPP",
+      "category": "enemy",
+      "enemy_ids": [
+        63,
+        73
+      ],
+      "flags": [
+        17,
+        31
+      ],
+      "notes": "Enemy IDs: [63, 73]"
+    },
+    {
+      "name": "pazuzu",
+      "tile_offset": "0x0537C8",
+      "num_tiles": 64,
+      "width_tiles": 8,
+      "height_tiles": 8,
+      "palette_index": 7,
+      "format": "4BPP",
+      "category": "enemy",
+      "enemy_ids": [
+        62,
+        72
+      ],
+      "flags": [
+        8,
+        29
+      ],
+      "notes": "Enemy IDs: [62, 72]"
+    },
+    {
+      "name": "captain",
+      "tile_offset": "0x054338",
+      "num_tiles": 64,
+      "width_tiles": 8,
+      "height_tiles": 8,
+      "palette_index": 7,
+      "format": "4BPP",
+      "category": "enemy",
+      "enemy_ids": [
+        64,
+        74
+      ],
+      "flags": [
+        35,
+        34
+      ],
+      "notes": "Enemy IDs: [64, 74]"
+    },
+    {
+      "name": "hydra",
+      "tile_offset": "0x055430",
+      "num_tiles": 64,
+      "width_tiles": 8,
+      "height_tiles": 8,
+      "palette_index": 7,
+      "format": "4BPP",
+      "category": "enemy",
+      "enemy_ids": [
+        65,
+        75
+      ],
+      "flags": [
+        33,
+        32
+      ],
+      "notes": "Enemy IDs: [65, 75]"
+    },
+    {
+      "name": "medusa_quest",
+      "tile_offset": "0x056888",
+      "num_tiles": 64,
+      "width_tiles": 8,
+      "height_tiles": 8,
+      "palette_index": 7,
+      "format": "4BPP",
+      "category": "enemy",
+      "enemy_ids": [
+        76,
+        77
+      ],
+      "flags": [
+        38,
+        39
+      ],
+      "notes": "Enemy IDs: [76, 77]"
+    },
+    {
+      "name": "gorgon_bull",
+      "tile_offset": "0x05971C",
+      "num_tiles": 64,
+      "width_tiles": 8,
+      "height_tiles": 8,
+      "palette_index": 7,
+      "format": "4BPP",
+      "category": "enemy",
+      "enemy_ids": [
+        78,
+        79
+      ],
+      "flags": [
+        36,
+        37
+      ],
+      "notes": "Enemy IDs: [78, 79]"
+    },
+    {
+      "name": "skullrus_rex",
+      "tile_offset": "0x05B33C",
+      "num_tiles": 64,
+      "width_tiles": 8,
+      "height_tiles": 8,
+      "palette_index": 7,
+      "format": "4BPP",
+      "category": "enemy",
+      "enemy_ids": [
+        80
+      ],
+      "flags": [
+        255
+      ],
+      "notes": "Enemy IDs: [80]"
+    },
+    {
+      "name": "dark_king_spider",
+      "tile_offset": "0x079C0C",
+      "num_tiles": 64,
+      "width_tiles": 8,
+      "height_tiles": 8,
+      "palette_index": 7,
+      "format": "4BPP",
+      "category": "enemy",
+      "enemy_ids": [
+        82
+      ],
+      "flags": [
+        57
+      ],
+      "notes": "Enemy IDs: [82]"
+    }
+  ]
+}

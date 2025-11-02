@@ -510,4 +510,5 @@ Discord channels about SNES development include invites of: `https://discord.gg/
 
 
 
+create a github project for making an `FFMQ Editor UI` where the project and all issues and tasks and milestones are associated with the `ffmq-info` repository; make a massive amount of issues and child issues and sub-children issues and todo lists for the ffmq-editor-ui for an eventual game editor for `Final Fantasy Mystic Quest` using our complete disassembly and resource and graphics and data extraction and schemas, planning for a bunch of different data and graphics editors, and UI for _editing_ and viewing maps (overworld, dungeon, town), not affecting the original files, but a new set of files that can then be used for building a new rom; you need a big UI for easy graphics, palette, data, monster groups, spells, event commands (moving the characters around and text) dialog, etc; UI easily interacts with backend to initiate  extractions, data, and building a new rom. Expand this big style, and organize the github issues and projects and kanban boards for easy development.
 

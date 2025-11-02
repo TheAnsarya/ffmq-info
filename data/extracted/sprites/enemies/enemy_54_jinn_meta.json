@@ -1,0 +1,19 @@
+{
+  "name": "enemy_54_jinn",
+  "category": "enemy",
+  "format": "4BPP",
+  "rom_offset": "0x04E595",
+  "dimensions": {
+    "width_tiles": 8,
+    "height_tiles": 8,
+    "width_pixels": 64,
+    "height_pixels": 64
+  },
+  "palette_index": 6,
+  "num_tiles": 64,
+  "animation": {
+    "num_frames": 1,
+    "frame_offsets": []
+  },
+  "notes": "Jinn (ID 54)"
+}

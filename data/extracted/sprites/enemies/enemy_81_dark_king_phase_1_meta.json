@@ -1,0 +1,19 @@
+{
+  "name": "enemy_81_dark_king_phase_1",
+  "category": "enemy",
+  "format": "4BPP",
+  "rom_offset": "0x010000",
+  "dimensions": {
+    "width_tiles": 3,
+    "height_tiles": 3,
+    "width_pixels": 24,
+    "height_pixels": 24
+  },
+  "palette_index": 7,
+  "num_tiles": 9,
+  "animation": {
+    "num_frames": 1,
+    "frame_offsets": []
+  },
+  "notes": "Dark King (Phase 1) (ID 81)"
+}

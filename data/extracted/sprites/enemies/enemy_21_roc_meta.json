@@ -1,0 +1,19 @@
+{
+  "name": "enemy_21_roc",
+  "category": "enemy",
+  "format": "4BPP",
+  "rom_offset": "0x04A19D",
+  "dimensions": {
+    "width_tiles": 6,
+    "height_tiles": 6,
+    "width_pixels": 48,
+    "height_pixels": 48
+  },
+  "palette_index": 5,
+  "num_tiles": 36,
+  "animation": {
+    "num_frames": 1,
+    "frame_offsets": []
+  },
+  "notes": "Roc (ID 21)"
+}

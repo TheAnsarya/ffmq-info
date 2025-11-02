@@ -1,0 +1,19 @@
+{
+  "name": "enemy_40_fangpire",
+  "category": "enemy",
+  "format": "4BPP",
+  "rom_offset": "0x04C7F5",
+  "dimensions": {
+    "width_tiles": 6,
+    "height_tiles": 6,
+    "width_pixels": 48,
+    "height_pixels": 48
+  },
+  "palette_index": 6,
+  "num_tiles": 36,
+  "animation": {
+    "num_frames": 1,
+    "frame_offsets": []
+  },
+  "notes": "Fangpire (ID 40)"
+}

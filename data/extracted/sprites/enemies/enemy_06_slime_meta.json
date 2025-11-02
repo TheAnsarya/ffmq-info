@@ -1,0 +1,19 @@
+{
+  "name": "enemy_06_slime",
+  "category": "enemy",
+  "format": "4BPP",
+  "rom_offset": "0x048E05",
+  "dimensions": {
+    "width_tiles": 3,
+    "height_tiles": 3,
+    "width_pixels": 24,
+    "height_pixels": 24
+  },
+  "palette_index": 4,
+  "num_tiles": 9,
+  "animation": {
+    "num_frames": 1,
+    "frame_offsets": []
+  },
+  "notes": "Slime (ID 6)"
+}
