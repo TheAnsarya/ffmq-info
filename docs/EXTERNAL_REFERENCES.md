@@ -2,6 +2,14 @@
 
 This document catalogs all external resources used as references for FFMQ reverse engineering and documentation.
 
+## Project Management
+
+**GitHub Project:** https://github.com/users/TheAnsarya/projects/3  
+**Repository:** https://github.com/TheAnsarya/ffmq-info  
+**Owner:** TheAnsarya
+
+All issues, tasks, and project tracking are managed through GitHub Project #3.
+
 ## GitHub Repositories
 
 ### FFMQ Randomizer

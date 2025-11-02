@@ -3,6 +3,8 @@
 > **🤖 Automatic Logging Active:** Just run `.\start-tracking.ps1` once and all your work is logged automatically!  
 > No manual logging needed - the system tracks everything for you in the background.
 
+> **📊 Project Management:** All issues and tasks are tracked in [GitHub Project #3](https://github.com/users/TheAnsarya/projects/3)
+
 A comprehensive disassembly and development environment for Final Fantasy Mystic Quest (SNES) using modern tools and practices.
 
 ## Project Overview

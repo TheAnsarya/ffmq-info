@@ -2,6 +2,8 @@
 
 Thank you for your interest in contributing to the Final Fantasy Mystic Quest disassembly project! This document provides guidelines and standards for contributing.
 
+**Project Management:** All tasks and issues are tracked in [GitHub Project #3](https://github.com/users/TheAnsarya/projects/3). Please check there for current work items and priorities.
+
 ## Table of Contents
 
 - [Getting Started](#getting-started)

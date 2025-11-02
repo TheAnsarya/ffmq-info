@@ -2,6 +2,8 @@
 
 This document lists all GitHub issues that should be created to expand our data extraction capabilities based on findings from the FFMQ Randomizer codebase.
 
+**Project Management:** All issues are tracked in [GitHub Project #3](https://github.com/users/TheAnsarya/projects/3)
+
 ## High Priority Issues
 
 ### Issue 1: Add Enemy Data Extraction Tool
