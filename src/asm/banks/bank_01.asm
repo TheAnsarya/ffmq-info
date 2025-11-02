@@ -257,7 +257,7 @@ Field_FrameLoop:
 Field_CheckScript:
 	lda.W $19f8                          ;0182BE|ADF819  |0119F8;
 	bne Field_FrameLoop                      ;0182C1|D0E6    |0182A9;
-	jsr.W CODE_01AB5D                    ;0182C3|205DAB  |01AB5D;
+	jsr.W Camera_UpdatePosition                    ;0182C3|205DAB  |01AB5D;
 	jsr.W NPC_AIIdle                    ;0182C6|2081A0  |01A081;
 ;      |        |      ;
 Field_WaitForScript:
@@ -281,7 +281,7 @@ Field_UpdateAndWait:
 	phy                                  ;0182DB|5A      |      ;
 	sep #$20                             ;0182DC|E220    |      ;
 	rep #$10                             ;0182DE|C210    |      ;
-	jsr.W CODE_01AB5D                    ;0182E0|205DAB  |01AB5D;
+	jsr.W Camera_UpdatePosition                    ;0182E0|205DAB  |01AB5D;
 ;      |        |      ;
 Field_ProcessFrame:
 	jsr.W NPC_AIIdle                    ;0182E3|2081A0  |01A081;
@@ -1069,8 +1069,8 @@ Field_HandleInput:
 ;      |        |      ;
 ;      |        |      ;
 Field_InputCheck:
-	jsr.W CODE_01A2A6                    ;018A4B|20A6A2  |01A2A6;
-	jsr.W CODE_01A34B                    ;018A4E|204BA3  |01A34B;
+	jsr.W Object_ProcessMusic                    ;018A4B|20A6A2  |01A2A6;
+	jsr.W Object_ProcessSound                    ;018A4E|204BA3  |01A34B;
 ;      |        |      ;
 Field_InputProcess:
 	rts                                  ;018A51|60      |      ;
@@ -1214,7 +1214,7 @@ Field_InputEnd:
 	clc                                  ;018B40|18      |      ;
 	adc.W $192d                          ;018B41|6D2D19  |01192D;
 	tay                                  ;018B44|A8      |      ;
-	jsr.W CODE_01AE8A                    ;018B45|208AAE  |01AE8A;
+	jsr.W Collision_FlagEnd                    ;018B45|208AAE  |01AE8A;
 	phx                                  ;018B48|DA      |      ;
 	lda.W $192b                          ;018B49|AD2B19  |01192B;
 	and.W #$00ff                         ;018B4C|29FF00  |      ;
@@ -2036,7 +2036,7 @@ Field_LoadMap:
 	jsr.W Field_CameraScroll                    ;01914D|20768B  |018B76;
 	jsl.L CODE_0B8149                    ;019150|2249810B|0B8149;
 	jsr.W CODE_01C83A                    ;019154|203AC8  |01C83A;
-	jsr.W CODE_01AF56                    ;019157|2056AF  |01AF56;
+	jsr.W Collision_ProcessEntity                    ;019157|2056AF  |01AF56;
 	jsl.L CODE_0B87B9                    ;01915A|22B9870B|0B87B9;
 	jsl.L CODE_0B836A                    ;01915E|226A830B|0B836A;
 	jsr.W CODE_01FD7C                    ;019162|207CFD  |01FD7C;
@@ -2061,14 +2061,14 @@ Field_LoadMap:
 	php                                  ;0191A0|08      |      ;
 	jsr.W NPC_InitializeAll                    ;0191A1|20AF9F  |019FAF;
 	plp                                  ;0191A4|28      |      ;
-	jsr.W CODE_01A227                    ;0191A5|2027A2  |01A227;
+	jsr.W Object_InitializeAll                    ;0191A5|2027A2  |01A227;
 	ldx.W #$ffff                         ;0191A8|A2FFFF  |      ;
 	stx.W $195f                          ;0191AB|8E5F19  |01195F;
-	jsr.W CODE_01A404                    ;0191AE|2004A4  |01A404;
+	jsr.W Object_UpdateFull                    ;0191AE|2004A4  |01A404;
 	jsr.W CODE_01E76B                    ;0191B1|206BE7  |01E76B;
-	jsr.W CODE_01AB5D                    ;0191B4|205DAB  |01AB5D;
-	jsr.W CODE_01AB5D                    ;0191B7|205DAB  |01AB5D;
-	jsr.W CODE_01AB5D                    ;0191BA|205DAB  |01AB5D;
+	jsr.W Camera_UpdatePosition                    ;0191B4|205DAB  |01AB5D;
+	jsr.W Camera_UpdatePosition                    ;0191B7|205DAB  |01AB5D;
+	jsr.W Camera_UpdatePosition                    ;0191BA|205DAB  |01AB5D;
 	jsr.W CODE_01C8A9                    ;0191BD|20A9C8  |01C8A9;
 	jsl.L CODE_0B82AA                    ;0191C0|22AA820B|0B82AA;
 	lda.W $1cc2                          ;0191C4|ADC21C  |011CC2;
@@ -2190,7 +2190,7 @@ MapEvent_SetupNewMap:
 	php                                  ;0192DB|08      |      ;
 	jsr.W NPC_InitializeAll                    ;0192DC|20AF9F  |019FAF;
 	plp                                  ;0192DF|28      |      ;
-	jsr.W CODE_01A227                    ;0192E0|2027A2  |01A227;
+	jsr.W Object_InitializeAll                    ;0192E0|2027A2  |01A227;
 	ldx.W #$0000                         ;0192E3|A20000  |      ;
 	stx.W $1908                          ;0192E6|8E0819  |011908;
 	stx.W $190a                          ;0192E9|8E0A19  |01190A;
@@ -2199,11 +2199,11 @@ MapEvent_SetupNewMap:
 	ldx.W #$00f8                         ;0192F2|A2F800  |      ;
 	stx.W $1902                          ;0192F5|8E0219  |011902;
 	jsl.L CODE_0B82AA                    ;0192F8|22AA820B|0B82AA;
-	jsr.W CODE_01A3F0                    ;0192FC|20F0A3  |01A3F0;
+	jsr.W Object_UpdateMain                    ;0192FC|20F0A3  |01A3F0;
 	jsr.W CODE_01E76B                    ;0192FF|206BE7  |01E76B;
-	jsr.W CODE_01AB5D                    ;019302|205DAB  |01AB5D;
-	jsr.W CODE_01AB5D                    ;019305|205DAB  |01AB5D;
-	jsr.W CODE_01AB5D                    ;019308|205DAB  |01AB5D;
+	jsr.W Camera_UpdatePosition                    ;019302|205DAB  |01AB5D;
+	jsr.W Camera_UpdatePosition                    ;019305|205DAB  |01AB5D;
+	jsr.W Camera_UpdatePosition                    ;019308|205DAB  |01AB5D;
 	jsr.W CODE_01E61D                    ;01930B|201DE6  |01E61D;
 	jsr.W NPC_CheckInteraction                    ;01930E|208BA0  |01A08B;
 	jsr.W MapEvent_InitializeSprite                    ;019311|20CD94  |0194CD;
@@ -4010,18 +4010,18 @@ NPC_DialogProcess:
 	lda.B $1e,x                          ;01A0F9|B51E    |001A80;
 	eor.W $19b4                          ;01A0FB|4DB419  |0119B4;
 	bit.B #$08                           ;01A0FE|8908    |      ;
-	beq CODE_01A105                      ;01A100|F003    |01A105;
-	jmp.W CODE_01A186                    ;01A102|4C86A1  |01A186;
+	beq Sprite_CheckXPosition                      ;01A100|F003    |01A105;
+	jmp.W Sprite_RenderOffscreen                    ;01A102|4C86A1  |01A186;
 ;      |        |      ;
 ;      |        |      ;
-CODE_01A105:
+Sprite_CheckXPosition:
 	lda.B #$00                           ;01A105|A900    |      ;
 	xba                                  ;01A107|EB      |      ;
 	lda.B $19,x                          ;01A108|B519    |001A7B;
-	bpl CODE_01A10F                      ;01A10A|1003    |01A10F;
+	bpl Sprite_CalculateXOffset                      ;01A10A|1003    |01A10F;
 	db $eb,$3a,$eb                       ;01A10C|        |      ;
 ;      |        |      ;
-CODE_01A10F:
+Sprite_CalculateXOffset:
 	rep #$20                             ;01A10F|C220    |      ;
 	clc                                  ;01A111|18      |      ;
 	adc.B $23,x                          ;01A112|7523    |001A85;
@@ -4029,10 +4029,10 @@ CODE_01A10F:
 	lda.W #$0000                         ;01A116|A90000  |      ;
 	sep #$20                             ;01A119|E220    |      ;
 	lda.B $1a,x                          ;01A11B|B51A    |001A7C;
-	bpl CODE_01A122                      ;01A11D|1003    |01A122;
+	bpl Sprite_CalculateYOffset                      ;01A11D|1003    |01A122;
 	db $eb,$3a,$eb                       ;01A11F|        |      ;
 ;      |        |      ;
-CODE_01A122:
+Sprite_CalculateYOffset:
 	rep #$20                             ;01A122|C220    |      ;
 	clc                                  ;01A124|18      |      ;
 	adc.B $25,x                          ;01A125|7525    |001A87;
@@ -4044,26 +4044,26 @@ CODE_01A122:
 	tax                                  ;01A133|AA      |      ;
 	lda.B $0c                            ;01A134|A50C    |001A6E;
 	cmp.W #$00e8                         ;01A136|C9E800  |      ;
-	bcc CODE_01A140                      ;01A139|9005    |01A140;
+	bcc Sprite_CheckOffscreen                      ;01A139|9005    |01A140;
 	cmp.W #$03f8                         ;01A13B|C9F803  |      ;
-	bcc CODE_01A191                      ;01A13E|9051    |01A191;
+	bcc Sprite_HideSprite                      ;01A13E|9051    |01A191;
 ;      |        |      ;
-CODE_01A140:
+Sprite_CheckOffscreen:
 	lda.B $0a                            ;01A140|A50A    |001A6C;
 	cmp.W #$00f8                         ;01A142|C9F800  |      ;
-	bcc CODE_01A15E                      ;01A145|9017    |01A15E;
+	bcc Sprite_RenderNormal                      ;01A145|9017    |01A15E;
 	cmp.W #$0100                         ;01A147|C90001  |      ;
-	bcc CODE_01A1A8                      ;01A14A|905C    |01A1A8;
+	bcc Sprite_RenderLeft                      ;01A14A|905C    |01A1A8;
 	cmp.W #$03f0                         ;01A14C|C9F003  |      ;
-	bcc CODE_01A191                      ;01A14F|9040    |01A191;
+	bcc Sprite_HideSprite                      ;01A14F|9040    |01A191;
 	cmp.W #$03f8                         ;01A151|C9F803  |      ;
-	bcc CODE_01A1D3                      ;01A154|907D    |01A1D3;
+	bcc Sprite_RenderRight                      ;01A154|907D    |01A1D3;
 	cmp.W #$0400                         ;01A156|C90004  |      ;
-	bcs CODE_01A15E                      ;01A159|B003    |01A15E;
-	jmp.W CODE_01A1FF                    ;01A15B|4CFFA1  |01A1FF;
+	bcs Sprite_RenderNormal                      ;01A159|B003    |01A15E;
+	jmp.W Sprite_RenderComplete                    ;01A15B|4CFFA1  |01A1FF;
 ;      |        |      ;
 ;      |        |      ;
-CODE_01A15E:
+Sprite_RenderNormal:
 	sep #$20                             ;01A15E|E220    |      ;
 	sta.W $0c00,x                        ;01A160|9D000C  |010C00;
 	sta.W $0c08,x                        ;01A163|9D080C  |010C08;
@@ -4083,14 +4083,14 @@ CODE_01A15E:
 	rts                                  ;01A185|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
-CODE_01A186:
+Sprite_RenderOffscreen:
 	rep #$20                             ;01A186|C220    |      ;
 	ldx.B $04                            ;01A188|A604    |001A66;
 	ldy.W DATA8_01a63c,x                 ;01A18A|BC3CA6  |01A63C;
 	lda.W DATA8_01a63a,x                 ;01A18D|BD3AA6  |01A63A;
 	tax                                  ;01A190|AA      |      ;
 ;      |        |      ;
-CODE_01A191:
+Sprite_HideSprite:
 	lda.W #$e080                         ;01A191|A980E0  |      ;
 	sta.W $0c00,x                        ;01A194|9D000C  |010C00;
 	sta.W $0c04,x                        ;01A197|9D040C  |010C04;
@@ -4102,7 +4102,7 @@ CODE_01A191:
 	rts                                  ;01A1A7|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
-CODE_01A1A8:
+Sprite_RenderLeft:
 	sep #$20                             ;01A1A8|E220    |      ;
 	sta.W $0c00,x                        ;01A1AA|9D000C  |010C00;
 	sta.W $0c08,x                        ;01A1AD|9D080C  |010C08;
@@ -4123,7 +4123,7 @@ CODE_01A1A8:
 	rts                                  ;01A1D2|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
-CODE_01A1D3:
+Sprite_RenderRight:
 	sep #$20                             ;01A1D3|E220    |      ;
 	clc                                  ;01A1D5|18      |      ;
 	adc.B #$08                           ;01A1D6|6908    |      ;
@@ -4145,7 +4145,7 @@ CODE_01A1D3:
 	rts                                  ;01A1FE|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
-CODE_01A1FF:
+Sprite_RenderComplete:
 	sep #$20                             ;01A1FF|E220    |      ;
 	sta.W $0c00,x                        ;01A201|9D000C  |010C00;
 	sta.W $0c08,x                        ;01A204|9D080C  |010C08;
@@ -4165,7 +4165,7 @@ CODE_01A1FF:
 	rts                                  ;01A226|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
-CODE_01A227:
+Object_InitializeAll:
 	php                                  ;01A227|08      |      ;
 	sep #$20                             ;01A228|E220    |      ;
 	rep #$10                             ;01A22A|C210    |      ;
@@ -4174,7 +4174,7 @@ CODE_01A227:
 	stx.W $19e0                          ;01A232|8EE019  |0119E0;
 	lda.W $1914                          ;01A235|AD1419  |011914;
 	bit.B #$20                           ;01A238|8920    |      ;
-	beq CODE_01A267                      ;01A23A|F02B    |01A267;
+	beq Object_ClearMemory                      ;01A23A|F02B    |01A267;
 	lda.B #$00                           ;01A23C|A900    |      ;
 	xba                                  ;01A23E|EB      |      ;
 	lda.W $1913                          ;01A23F|AD1319  |011913;
@@ -4196,7 +4196,7 @@ CODE_01A227:
 	lda.L DATA8_0cd727,x                 ;01A260|BF27D70C|0CD727;
 	sta.W $19e0                          ;01A264|8DE019  |0119E0;
 ;      |        |      ;
-CODE_01A267:
+Object_ClearMemory:
 	rep #$30                             ;01A267|C230    |      ;
 	lda.W #$0000                         ;01A269|A90000  |      ;
 	sta.L $7fced8                        ;01A26C|8FD8CE7F|7FCED8;
@@ -4217,7 +4217,7 @@ CODE_01A267:
 	rts                                  ;01A2A5|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
-CODE_01A2A6:
+Object_ProcessMusic:
 	phb                                  ;01A2A6|8B      |      ;
 	php                                  ;01A2A7|08      |      ;
 	phd                                  ;01A2A8|0B      |      ;
@@ -4225,7 +4225,7 @@ CODE_01A2A6:
 	rep #$10                             ;01A2AB|C210    |      ;
 	lda.W $19df                          ;01A2AD|ADDF19  |0119DF;
 	cmp.B #$ff                           ;01A2B0|C9FF    |      ;
-	beq CODE_01A2C9                      ;01A2B2|F015    |01A2C9;
+	beq Object_MusicEnd                      ;01A2B2|F015    |01A2C9;
 	pea.W $1cd7                          ;01A2B4|F4D71C  |011CD7;
 	pld                                  ;01A2B7|2B      |      ;
 	ldy.W #$0007                         ;01A2B8|A00700  |      ;
@@ -4234,27 +4234,27 @@ CODE_01A2A6:
 	stx.B $00                            ;01A2C0|8600    |001CD7;
 	ldx.W $19de                          ;01A2C2|AEDE19  |0119DE;
 	stx.B $02                            ;01A2C5|8602    |001CD9;
-	bpl CODE_01A2CD                      ;01A2C7|1004    |01A2CD;
+	bpl Object_MusicLoop                      ;01A2C7|1004    |01A2CD;
 ;      |        |      ;
-CODE_01A2C9:
+Object_MusicEnd:
 	pld                                  ;01A2C9|2B      |      ;
 	plp                                  ;01A2CA|28      |      ;
 	plb                                  ;01A2CB|AB      |      ;
 	rts                                  ;01A2CC|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
-CODE_01A2CD:
+Object_MusicLoop:
 	sep #$20                             ;01A2CD|E220    |      ;
 	rep #$10                             ;01A2CF|C210    |      ;
 	ldx.B $02                            ;01A2D1|A602    |001CD9;
 	lda.L DATA8_0cd694,x                 ;01A2D3|BF94D60C|0CD694;
 	cmp.B #$ff                           ;01A2D7|C9FF    |      ;
-	beq CODE_01A32E                      ;01A2D9|F053    |01A32E;
+	beq Object_MusicNext                      ;01A2D9|F053    |01A32E;
 	sta.B $04                            ;01A2DB|8504    |001CDB;
 	ldx.B $00                            ;01A2DD|A600    |001CD7;
 	lda.L $7fced8,x                      ;01A2DF|BFD8CE7F|7FCED8;
 	cmp.B $04                            ;01A2E3|C504    |001CDB;
-	bcc CODE_01A32E                      ;01A2E5|9047    |01A32E;
+	bcc Object_MusicNext                      ;01A2E5|9047    |01A32E;
 	lda.B #$00                           ;01A2E7|A900    |      ;
 	sta.L $7fced8,x                      ;01A2E9|9FD8CE7F|7FCED8;
 	xba                                  ;01A2ED|EB      |      ;
@@ -4290,29 +4290,29 @@ CODE_01A327:
 	lda.B $04                            ;01A328|A504    |001CDB;
 	sta.L $7fced9,x                      ;01A32A|9FD9CE7F|7FCED9;
 ;      |        |      ;
-CODE_01A32E:
+Object_MusicNext:
 	dec.B $06                            ;01A32E|C606    |001CDD;
-	bne CODE_01A335                      ;01A330|D003    |01A335;
-	jmp.W CODE_01A2C9                    ;01A332|4CC9A2  |01A2C9;
+	bne Object_MusicAdvance                      ;01A330|D003    |01A335;
+	jmp.W Object_MusicEnd                    ;01A332|4CC9A2  |01A2C9;
 ;      |        |      ;
 ;      |        |      ;
-CODE_01A335:
+Object_MusicAdvance:
 	ldx.B $00                            ;01A335|A600    |001CD7;
 	inx                                  ;01A337|E8      |      ;
 	inx                                  ;01A338|E8      |      ;
 	stx.B $00                            ;01A339|8600    |001CD7;
 	ldx.B $02                            ;01A33B|A602    |001CD9;
 ;      |        |      ;
-CODE_01A33D:
+Object_MusicSeek:
 	lda.L DATA8_0cd694,x                 ;01A33D|BF94D60C|0CD694;
 	inx                                  ;01A341|E8      |      ;
 	cmp.B #$ff                           ;01A342|C9FF    |      ;
-	bne CODE_01A33D                      ;01A344|D0F7    |01A33D;
+	bne Object_MusicSeek                      ;01A344|D0F7    |01A33D;
 	stx.B $02                            ;01A346|8602    |001CD9;
-	jmp.W CODE_01A2CD                    ;01A348|4CCDA2  |01A2CD;
+	jmp.W Object_MusicLoop                    ;01A348|4CCDA2  |01A2CD;
 ;      |        |      ;
 ;      |        |      ;
-CODE_01A34B:
+Object_ProcessSound:
 	phb                                  ;01A34B|8B      |      ;
 	php                                  ;01A34C|08      |      ;
 	phd                                  ;01A34D|0B      |      ;
@@ -4320,7 +4320,7 @@ CODE_01A34B:
 	rep #$10                             ;01A350|C210    |      ;
 	lda.W $19e1                          ;01A352|ADE119  |0119E1;
 	cmp.B #$ff                           ;01A355|C9FF    |      ;
-	beq CODE_01A36E                      ;01A357|F015    |01A36E;
+	beq Object_SoundEnd                      ;01A357|F015    |01A36E;
 	pea.W $1cd7                          ;01A359|F4D71C  |011CD7;
 	pld                                  ;01A35C|2B      |      ;
 	ldy.W #$0007                         ;01A35D|A00700  |      ;
@@ -4329,27 +4329,27 @@ CODE_01A34B:
 	stx.B $00                            ;01A365|8600    |001CD7;
 	ldx.W $19e0                          ;01A367|AEE019  |0119E0;
 	stx.B $02                            ;01A36A|8602    |001CD9;
-	bpl CODE_01A372                      ;01A36C|1004    |01A372;
+	bpl Object_SoundLoop                      ;01A36C|1004    |01A372;
 ;      |        |      ;
-CODE_01A36E:
+Object_SoundEnd:
 	pld                                  ;01A36E|2B      |      ;
 	plp                                  ;01A36F|28      |      ;
 	plb                                  ;01A370|AB      |      ;
 	rts                                  ;01A371|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
-CODE_01A372:
+Object_SoundLoop:
 	sep #$20                             ;01A372|E220    |      ;
 	rep #$10                             ;01A374|C210    |      ;
 	ldx.B $02                            ;01A376|A602    |001CD9;
 	lda.L DATA8_0cd72f,x                 ;01A378|BF2FD70C|0CD72F;
 	cmp.B #$ff                           ;01A37C|C9FF    |      ;
-	beq CODE_01A3D3                      ;01A37E|F053    |01A3D3;
+	beq Object_SoundNext                      ;01A37E|F053    |01A3D3;
 	sta.B $04                            ;01A380|8504    |001CDB;
 	ldx.B $00                            ;01A382|A600    |001CD7;
 	lda.L $7fcee6,x                      ;01A384|BFE6CE7F|7FCEE6;
 	cmp.B $04                            ;01A388|C504    |001CDB;
-	bcc CODE_01A3D3                      ;01A38A|9047    |01A3D3;
+	bcc Object_SoundNext                      ;01A38A|9047    |01A3D3;
 	lda.B #$00                           ;01A38C|A900    |      ;
 	sta.L $7fcee6,x                      ;01A38E|9FE6CE7F|7FCEE6;
 	xba                                  ;01A392|EB      |      ;
@@ -4377,73 +4377,73 @@ CODE_01A372:
 	ldx.B $02                            ;01A3C0|A602    |001CD9;
 	lda.L DATA8_0cd730,x                 ;01A3C2|BF30D70C|0CD730;
 	cmp.B $04                            ;01A3C6|C504    |001CDB;
-	bcs CODE_01A3CC                      ;01A3C8|B002    |01A3CC;
+	bcs Object_SoundUpdate                      ;01A3C8|B002    |01A3CC;
 	stz.B $04                            ;01A3CA|6404    |001CDB;
 ;      |        |      ;
-CODE_01A3CC:
+Object_SoundUpdate:
 	plx                                  ;01A3CC|FA      |      ;
 	lda.B $04                            ;01A3CD|A504    |001CDB;
 	sta.L $7fcee7,x                      ;01A3CF|9FE7CE7F|7FCEE7;
 ;      |        |      ;
-CODE_01A3D3:
+Object_SoundNext:
 	dec.B $06                            ;01A3D3|C606    |001CDD;
-	bne CODE_01A3DA                      ;01A3D5|D003    |01A3DA;
-	jmp.W CODE_01A36E                    ;01A3D7|4C6EA3  |01A36E;
+	bne Object_SoundAdvance                      ;01A3D5|D003    |01A3DA;
+	jmp.W Object_SoundEnd                    ;01A3D7|4C6EA3  |01A36E;
 ;      |        |      ;
 ;      |        |      ;
-CODE_01A3DA:
+Object_SoundAdvance:
 	ldx.B $00                            ;01A3DA|A600    |001CD7;
 	inx                                  ;01A3DC|E8      |      ;
 	inx                                  ;01A3DD|E8      |      ;
 	stx.B $00                            ;01A3DE|8600    |001CD7;
 	ldx.B $02                            ;01A3E0|A602    |001CD9;
 ;      |        |      ;
-CODE_01A3E2:
+Object_SoundSeek:
 	lda.L DATA8_0cd72f,x                 ;01A3E2|BF2FD70C|0CD72F;
 	inx                                  ;01A3E6|E8      |      ;
 	cmp.B #$ff                           ;01A3E7|C9FF    |      ;
-	bne CODE_01A3E2                      ;01A3E9|D0F7    |01A3E2;
+	bne Object_SoundSeek                      ;01A3E9|D0F7    |01A3E2;
 	stx.B $02                            ;01A3EB|8602    |001CD9;
-	jmp.W CODE_01A372                    ;01A3ED|4C72A3  |01A372;
+	jmp.W Object_SoundLoop                    ;01A3ED|4C72A3  |01A372;
 ;      |        |      ;
 ;      |        |      ;
-CODE_01A3F0:
+Object_UpdateMain:
 	php                                  ;01A3F0|08      |      ;
 	phb                                  ;01A3F1|8B      |      ;
 	rep #$30                             ;01A3F2|C230    |      ;
 	lda.W $19b9                          ;01A3F4|ADB919  |0119B9;
-	bmi CODE_01A401                      ;01A3F7|3008    |01A401;
+	bmi Object_UpdateComplete                      ;01A3F7|3008    |01A401;
 	sep #$20                             ;01A3F9|E220    |      ;
-	jsr.W CODE_01A423                    ;01A3FB|2023A4  |01A423;
-	jsr.W CODE_01A9EE                    ;01A3FE|20EEA9  |01A9EE;
+	jsr.W Object_InitializeGraphics                    ;01A3FB|2023A4  |01A423;
+	jsr.W Entity_UpdateSprites                    ;01A3FE|20EEA9  |01A9EE;
 ;      |        |      ;
-CODE_01A401:
+Object_UpdateComplete:
 	plb                                  ;01A401|AB      |      ;
 	plp                                  ;01A402|28      |      ;
 	rts                                  ;01A403|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
-CODE_01A404:
+Object_UpdateFull:
 	php                                  ;01A404|08      |      ;
 	phb                                  ;01A405|8B      |      ;
 	rep #$30                             ;01A406|C230    |      ;
 	lda.W $19b9                          ;01A408|ADB919  |0119B9;
-	bmi CODE_01A420                      ;01A40B|3013    |01A420;
+	bmi Object_FullUpdateEnd                      ;01A40B|3013    |01A420;
 	sep #$20                             ;01A40D|E220    |      ;
-	jsr.W CODE_01A423                    ;01A40F|2023A4  |01A423;
-	jsr.W CODE_01A692                    ;01A412|2092A6  |01A692;
-	jsr.W CODE_01A947                    ;01A415|2047A9  |01A947;
-	jsr.W CODE_01A9EE                    ;01A418|20EEA9  |01A9EE;
+	jsr.W Object_InitializeGraphics                    ;01A40F|2023A4  |01A423;
+	jsr.W Entity_InitializeAll                    ;01A412|2092A6  |01A692;
+	jsr.W Entity_ProcessAnimation                    ;01A415|2047A9  |01A947;
+	jsr.W Entity_UpdateSprites                    ;01A418|20EEA9  |01A9EE;
 	sep #$20                             ;01A41B|E220    |      ;
 	stz.W $1a71                          ;01A41D|9C711A  |001A71;
 ;      |        |      ;
-CODE_01A420:
+Object_FullUpdateEnd:
 	plb                                  ;01A420|AB      |      ;
 	plp                                  ;01A421|28      |      ;
 	rts                                  ;01A422|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
-CODE_01A423:
+Object_InitializeGraphics:
 	rep #$30                             ;01A423|C230    |      ;
 	phd                                  ;01A425|0B      |      ;
 	pea.W $192b                          ;01A426|F42B19  |01192B;
@@ -4469,7 +4469,7 @@ CODE_01A423:
 	ldx.W $19b9                          ;01A455|AEB919  |0119B9;
 	rep #$30                             ;01A458|C230    |      ;
 ;      |        |      ;
-CODE_01A45A:
+Object_LoadPalettes:
 	lda.L DATA8_0b88fc,x                 ;01A45A|BFFC880B|0B88FC;
 	and.W #$00ff                         ;01A45E|29FF00  |      ;
 	asl a;01A461|0A      |      ;
@@ -4494,7 +4494,7 @@ CODE_01A45A:
 	adc.W #$0020                         ;01A47C|692000  |      ;
 	sta.B $00                            ;01A47F|8500    |00192B;
 	dey                                  ;01A481|88      |      ;
-	bne CODE_01A45A                      ;01A482|D0D6    |01A45A;
+	bne Object_LoadPalettes                      ;01A482|D0D6    |01A45A;
 	rep #$30                             ;01A484|C230    |      ;
 	pea.W $0004                          ;01A486|F40400  |010004;
 	plb                                  ;01A489|AB      |      ;
@@ -4503,12 +4503,12 @@ CODE_01A45A:
 	ldy.W #$e520                         ;01A48F|A020E5  |      ;
 	ldx.W #$0000                         ;01A492|A20000  |      ;
 ;      |        |      ;
-CODE_01A495:
+Object_LoadTiles:
 	rep #$30                             ;01A495|C230    |      ;
 	lda.W #$0002                         ;01A497|A90200  |      ;
 	sta.B $16                            ;01A49A|8516    |001941;
 ;      |        |      ;
-CODE_01A49C:
+Object_TileLoadLoop:
 	lda.W $0000,y                        ;01A49C|B90000  |040000;
 	sta.L $7f0000,x                      ;01A49F|9F00007F|7F0000;
 	lda.W $0002,y                        ;01A4A3|B90200  |040002;
@@ -4526,13 +4526,13 @@ CODE_01A49C:
 	adc.W #$0008                         ;01A4C0|690800  |      ;
 	tax                                  ;01A4C3|AA      |      ;
 	dec.B $16                            ;01A4C4|C616    |001941;
-	bne CODE_01A49C                      ;01A4C6|D0D4    |01A49C;
+	bne Object_TileLoadLoop                      ;01A4C6|D0D4    |01A49C;
 	sep #$20                             ;01A4C8|E220    |      ;
 	rep #$10                             ;01A4CA|C210    |      ;
 	lda.B #$08                           ;01A4CC|A908    |      ;
 	sta.B $18                            ;01A4CE|8518    |001943;
 ;      |        |      ;
-CODE_01A4D0:
+Object_ProcessTransparency:
 	lda.W $0000,y                        ;01A4D0|B90000  |040000;
 	sta.L $7f0000,x                      ;01A4D3|9F00007F|7F0000;
 	lda.B #$00                           ;01A4D7|A900    |      ;
@@ -4541,20 +4541,20 @@ CODE_01A4D0:
 	inx                                  ;01A4DE|E8      |      ;
 	iny                                  ;01A4DF|C8      |      ;
 	dec.B $18                            ;01A4E0|C618    |001943;
-	bne CODE_01A4D0                      ;01A4E2|D0EC    |01A4D0;
+	bne Object_ProcessTransparency                      ;01A4E2|D0EC    |01A4D0;
 	rep #$30                             ;01A4E4|C230    |      ;
 	dec.B $14                            ;01A4E6|C614    |00193F;
-	bne CODE_01A495                      ;01A4E8|D0AB    |01A495;
+	bne Object_LoadTiles                      ;01A4E8|D0AB    |01A495;
 	plb                                  ;01A4EA|AB      |      ;
 ;      |        |      ;
-CODE_01A4EB:
+Object_BeginBitPlanes:
 	sep #$20                             ;01A4EB|E220    |      ;
 	rep #$10                             ;01A4ED|C210    |      ;
 	lda.B #$80                           ;01A4EF|A980    |      ;
 	sta.B $0e                            ;01A4F1|850E    |001939;
 	ldy.W #$0008                         ;01A4F3|A00800  |      ;
 ;      |        |      ;
-CODE_01A4F6:
+Object_ProcessBitPlane:
 	lda.B #$00                           ;01A4F6|A900    |      ;
 	xba                                  ;01A4F8|EB      |      ;
 	lda.B $0a                            ;01A4F9|A50A    |001935;
@@ -4567,11 +4567,11 @@ CODE_01A4F6:
 	lda.L DATA8_0b88fc,x                 ;01A506|BFFC880B|0B88FC;
 	sta.B $0d                            ;01A50A|850D    |001938;
 ;      |        |      ;
-CODE_01A50C:
+Object_BitPlaneLoop:
 	phy                                  ;01A50C|5A      |      ;
 	lda.B $0d                            ;01A50D|A50D    |001938;
 	and.B $0e                            ;01A50F|250E    |001939;
-	beq CODE_01A52C                      ;01A511|F019    |01A52C;
+	beq Object_NextBit                      ;01A511|F019    |01A52C;
 	lda.B #$00                           ;01A513|A900    |      ;
 	xba                                  ;01A515|EB      |      ;
 	lda.B $0b                            ;01A516|A50B    |001936;
@@ -4583,9 +4583,9 @@ CODE_01A50C:
 	sep #$20                             ;01A521|E220    |      ;
 	rep #$10                             ;01A523|C210    |      ;
 	lda.L DATA8_0b88fc,x                 ;01A525|BFFC880B|0B88FC;
-	jsr.W CODE_01A865                    ;01A529|2065A8  |01A865;
+	jsr.W Entity_WriteTileData                    ;01A529|2065A8  |01A865;
 ;      |        |      ;
-CODE_01A52C:
+Object_NextBit:
 	sep #$20                             ;01A52C|E220    |      ;
 	rep #$10                             ;01A52E|C210    |      ;
 	inc.B $0c                            ;01A530|E60C    |001937;
@@ -4594,20 +4594,20 @@ CODE_01A52C:
 	sta.B $0e                            ;01A535|850E    |001939;
 	ply                                  ;01A537|7A      |      ;
 	dey                                  ;01A538|88      |      ;
-	bne CODE_01A50C                      ;01A539|D0D1    |01A50C;
+	bne Object_BitPlaneLoop                      ;01A539|D0D1    |01A50C;
 	inc.B $0a                            ;01A53B|E60A    |001935;
 	lda.B $0a                            ;01A53D|A50A    |001935;
 	cmp.B #$0c                           ;01A53F|C90C    |      ;
-	beq CODE_01A550                      ;01A541|F00D    |01A550;
+	beq Object_CheckCompression                      ;01A541|F00D    |01A550;
 	cmp.B #$0b                           ;01A543|C90B    |      ;
-	bne CODE_01A4EB                      ;01A545|D0A4    |01A4EB;
+	bne Object_BeginBitPlanes                      ;01A545|D0A4    |01A4EB;
 	lda.B #$80                           ;01A547|A980    |      ;
 	sta.B $0e                            ;01A549|850E    |001939;
 	ldy.W #$0004                         ;01A54B|A00400  |      ;
-	bra CODE_01A4F6                      ;01A54E|80A6    |01A4F6;
+	bra Object_ProcessBitPlane                      ;01A54E|80A6    |01A4F6;
 ;      |        |      ;
 ;      |        |      ;
-CODE_01A550:
+Object_CheckCompression:
 	rep #$30                             ;01A550|C230    |      ;
 	lda.W #$000b                         ;01A552|A90B00  |      ;
 	clc                                  ;01A555|18      |      ;
@@ -4617,17 +4617,17 @@ CODE_01A550:
 	rep #$10                             ;01A55C|C210    |      ;
 	lda.L DATA8_0b88fc,x                 ;01A55E|BFFC880B|0B88FC;
 	bit.B #$01                           ;01A562|8901    |      ;
-	beq CODE_01A573                      ;01A564|F00D    |01A573;
+	beq Object_UncompressedPath                      ;01A564|F00D    |01A573;
 	lda.B #$f2                           ;01A566|A9F2    |      ;
 	jsl.L CODE_009776                    ;01A568|22769700|009776;
-	bne CODE_01A571                      ;01A56C|D003    |01A571;
-	jsr.W CODE_01A5AA                    ;01A56E|20AAA5  |01A5AA;
+	bne Object_CompressedPath                      ;01A56C|D003    |01A571;
+	jsr.W Object_LoadCompressed                    ;01A56E|20AAA5  |01A5AA;
 ;      |        |      ;
-CODE_01A571:
-	bra CODE_01A5A8                      ;01A571|8035    |01A5A8;
+Object_CompressedPath:
+	bra Object_GraphicsEnd                      ;01A571|8035    |01A5A8;
 ;      |        |      ;
 ;      |        |      ;
-CODE_01A573:
+Object_UncompressedPath:
 	ldx.W #$ada0                         ;01A573|A2A0AD  |      ;
 	stx.B $02                            ;01A576|8602    |00192D;
 	lda.B #$04                           ;01A578|A904    |      ;
@@ -4644,8 +4644,8 @@ CODE_01A573:
 	sta.B $04                            ;01A58D|8504    |00192F;
 	ldy.W #$0060                         ;01A58F|A06000  |      ;
 ;      |        |      ;
-CODE_01A592:
-	jsr.W CODE_01A901                    ;01A592|2001A9  |01A901;
+Object_CopyLoop:
+	jsr.W Entity_CopyTileRow                    ;01A592|2001A9  |01A901;
 	lda.B $02                            ;01A595|A502    |00192D;
 	clc                                  ;01A597|18      |      ;
 	adc.W #$0018                         ;01A598|691800  |      ;
@@ -4655,14 +4655,14 @@ CODE_01A592:
 	adc.W #$0020                         ;01A5A0|692000  |      ;
 	sta.B $04                            ;01A5A3|8504    |00192F;
 	dey                                  ;01A5A5|88      |      ;
-	bne CODE_01A592                      ;01A5A6|D0EA    |01A592;
+	bne Object_CopyLoop                      ;01A5A6|D0EA    |01A592;
 ;      |        |      ;
-CODE_01A5A8:
+Object_GraphicsEnd:
 	pld                                  ;01A5A8|2B      |      ;
 	rts                                  ;01A5A9|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
-CODE_01A5AA:
+Object_LoadCompressed:
 	php                                  ;01A5AA|08      |      ;
 	phd                                  ;01A5AB|0B      |      ;
 	pea.W $192b                          ;01A5AC|F42B19  |00192B;
@@ -4678,8 +4678,8 @@ CODE_01A5AA:
 	sta.B $04                            ;01A5C2|8504    |00192F;
 	ldy.W #$0080                         ;01A5C4|A08000  |      ;
 ;      |        |      ;
-CODE_01A5C7:
-	jsr.W CODE_01A901                    ;01A5C7|2001A9  |01A901;
+Object_CompressedLoop:
+	jsr.W Entity_CopyTileRow                    ;01A5C7|2001A9  |01A901;
 	lda.B $02                            ;01A5CA|A502    |00192D;
 	clc                                  ;01A5CC|18      |      ;
 	adc.W #$0018                         ;01A5CD|691800  |      ;
@@ -4689,7 +4689,7 @@ CODE_01A5C7:
 	adc.W #$0020                         ;01A5D5|692000  |      ;
 	sta.B $04                            ;01A5D8|8504    |00192F;
 	dey                                  ;01A5DA|88      |      ;
-	bne CODE_01A5C7                      ;01A5DB|D0EA    |01A5C7;
+	bne Object_CompressedLoop                      ;01A5DB|D0EA    |01A5C7;
 	pld                                  ;01A5DD|2B      |      ;
 	plp                                  ;01A5DE|28      |      ;
 	rts                                  ;01A5DF|60      |      ;
@@ -4720,7 +4720,7 @@ DATA8_01a63c:
 	db $1a,$02,$b0,$01,$1b,$02,$c0,$01,$1c,$02,$d0,$01,$1d,$02,$e0,$01;01A67C|        |      ;
 	db $1e,$02,$f0,$01,$1f,$02           ;01A68C|        |      ;
 ;      |        |      ;
-CODE_01A692:
+Entity_InitializeAll:
 	sep #$20                             ;01A692|E220    |      ;
 	rep #$10                             ;01A694|C210    |      ;
 	phd                                  ;01A696|0B      |      ;
@@ -4728,7 +4728,7 @@ CODE_01A692:
 	pld                                  ;01A69A|2B      |      ;
 	ldx.W #$0000                         ;01A69B|A20000  |      ;
 	stx.W $1939                          ;01A69E|8E3919  |001939;
-	jsr.W CODE_01AF56                    ;01A6A1|2056AF  |01AF56;
+	jsr.W Collision_ProcessEntity                    ;01A6A1|2056AF  |01AF56;
 	sep #$20                             ;01A6A4|E220    |      ;
 	rep #$10                             ;01A6A6|C210    |      ;
 	lda.B #$ff                           ;01A6A8|A9FF    |      ;
@@ -4736,16 +4736,16 @@ CODE_01A692:
 	lda.B #$08                           ;01A6AD|A908    |      ;
 	sta.W $1935                          ;01A6AF|8D3519  |001935;
 ;      |        |      ;
-CODE_01A6B2:
+Entity_LoadLoop:
 	sep #$20                             ;01A6B2|E220    |      ;
 	rep #$10                             ;01A6B4|C210    |      ;
 	inc.W $193b                          ;01A6B6|EE3B19  |00193B;
 	lda.W $1935                          ;01A6B9|AD3519  |001935;
 	jsr.W Field_CheckEntityCollision                    ;01A6BC|20DD90  |0190DD;
 	cmp.B #$ff                           ;01A6BF|C9FF    |      ;
-	beq CODE_01A6F0                      ;01A6C1|F02D    |01A6F0;
-	jsr.W CODE_01A6F2                    ;01A6C3|20F2A6  |01A6F2;
-	bcs CODE_01A6E1                      ;01A6C6|B019    |01A6E1;
+	beq Entity_LoadEnd                      ;01A6C1|F02D    |01A6F0;
+	jsr.W Entity_ValidateSlot                    ;01A6C3|20F2A6  |01A6F2;
+	bcs Entity_LoadRetry                      ;01A6C6|B019    |01A6E1;
 	rep #$30                             ;01A6C8|C230    |      ;
 	ldx.W $1939                          ;01A6CA|AE3919  |001939;
 	lda.B $01,x                          ;01A6CD|B501    |001A73;
@@ -4756,33 +4756,33 @@ CODE_01A6B2:
 	clc                                  ;01A6D8|18      |      ;
 	adc.W #$001a                         ;01A6D9|691A00  |      ;
 	sta.W $1939                          ;01A6DC|8D3919  |001939;
-	bra CODE_01A6B2                      ;01A6DF|80D1    |01A6B2;
+	bra Entity_LoadLoop                      ;01A6DF|80D1    |01A6B2;
 ;      |        |      ;
 ;      |        |      ;
-CODE_01A6E1:
+Entity_LoadRetry:
 	sep #$20                             ;01A6E1|E220    |      ;
 	rep #$10                             ;01A6E3|C210    |      ;
 	lda.W $1935                          ;01A6E5|AD3519  |001935;
 	clc                                  ;01A6E8|18      |      ;
 	adc.B #$07                           ;01A6E9|6907    |      ;
 	sta.W $1935                          ;01A6EB|8D3519  |001935;
-	bra CODE_01A6B2                      ;01A6EE|80C2    |01A6B2;
+	bra Entity_LoadLoop                      ;01A6EE|80C2    |01A6B2;
 ;      |        |      ;
 ;      |        |      ;
-CODE_01A6F0:
+Entity_LoadEnd:
 	pld                                  ;01A6F0|2B      |      ;
 	rts                                  ;01A6F1|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
-CODE_01A6F2:
+Entity_ValidateSlot:
 	stz.W $1948                          ;01A6F2|9C4819  |001948;
 	jsr.W CODE_01B078                    ;01A6F5|2078B0  |01B078;
-	bcc CODE_01A6FC                      ;01A6F8|9002    |01A6FC;
+	bcc Entity_SetupData                      ;01A6F8|9002    |01A6FC;
 	sec                                  ;01A6FA|38      |      ;
 	rts                                  ;01A6FB|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
-CODE_01A6FC:
+Entity_SetupData:
 	sep #$20                             ;01A6FC|E220    |      ;
 	rep #$10                             ;01A6FE|C210    |      ;
 	ldx.W $1939                          ;01A700|AE3919  |001939;
@@ -4811,18 +4811,18 @@ CODE_01A6FC:
 	lsr a;01A73B|4A      |      ;
 	pha                                  ;01A73C|48      |      ;
 	lda.W $1948                          ;01A73D|AD4819  |001948;
-	beq CODE_01A74A                      ;01A740|F008    |01A74A;
+	beq Entity_SetupDirection2                      ;01A740|F008    |01A74A;
 	pla                                  ;01A742|68      |      ;
 	clc                                  ;01A743|18      |      ;
 	adc.B #$10                           ;01A744|6910    |      ;
 	and.B #$30                           ;01A746|2930    |      ;
-	bra CODE_01A74B                      ;01A748|8001    |01A74B;
+	bra Entity_SetupDirection                      ;01A748|8001    |01A74B;
 ;      |        |      ;
 ;      |        |      ;
-CODE_01A74A:
+Entity_SetupDirection2:
 	pla                                  ;01A74A|68      |      ;
 ;      |        |      ;
-CODE_01A74B:
+Entity_SetupDirection:
 	sta.B $0e,x                          ;01A74B|950E    |001A80;
 	inc.W $1935                          ;01A74D|EE3519  |001935;
 	lda.W $1935                          ;01A750|AD3519  |001935;
@@ -4906,20 +4906,20 @@ CODE_01A74B:
 	txy                                  ;01A7F3|9B      |      ;
 	plx                                  ;01A7F4|FA      |      ;
 	lda.W $0f28,y                        ;01A7F5|B9280F  |000F28;
-	beq CODE_01A804                      ;01A7F8|F00A    |01A804;
+	beq Entity_CalculatePosition                      ;01A7F8|F00A    |01A804;
 	lda.W $0f2a,y                        ;01A7FA|B92A0F  |000F2A;
 	sta.B $0b,x                          ;01A7FD|950B    |001A7D;
 	lda.W $0f2b,y                        ;01A7FF|B92B0F  |000F2B;
 	sta.B $0c,x                          ;01A802|950C    |001A7E;
 ;      |        |      ;
-CODE_01A804:
+Entity_CalculatePosition:
 	ply                                  ;01A804|7A      |      ;
 	plx                                  ;01A805|FA      |      ;
 	clc                                  ;01A806|18      |      ;
 	rts                                  ;01A807|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
-CODE_01A808:
+Entity_CalculateOffset:
 	php                                  ;01A808|08      |      ;
 	sep #$20                             ;01A809|E220    |      ;
 	rep #$10                             ;01A80B|C210    |      ;
@@ -4928,8 +4928,8 @@ CODE_01A808:
 	pea.W $1a72                          ;01A811|F4721A  |011A72;
 	pld                                  ;01A814|2B      |      ;
 	phy                                  ;01A815|5A      |      ;
-	jsr.W CODE_01A6FC                    ;01A816|20FCA6  |01A6FC;
-	jsr.W CODE_01A988                    ;01A819|2088A9  |01A988;
+	jsr.W Entity_SetupData                    ;01A816|20FCA6  |01A6FC;
+	jsr.W Entity_UpdateAnimFrame                    ;01A819|2088A9  |01A988;
 	ply                                  ;01A81C|7A      |      ;
 	lda.W #$eb00                         ;01A81D|A900EB  |      ;
 	tya                                  ;01A820|98      |      ;
@@ -4937,7 +4937,7 @@ CODE_01A808:
 	asl a;01A822|0A      |      ;
 	tay                                  ;01A823|A8      |      ;
 	sty.W $193b                          ;01A824|8C3B19  |01193B;
-	jsr.W CODE_01AA3B                    ;01A827|203BAA  |01AA3B;
+	jsr.W Entity_CalculateSpritePos                    ;01A827|203BAA  |01AA3B;
 	plp                                  ;01A82A|28      |      ;
 	ldx.W $1939                          ;01A82B|AE3919  |011939;
 	lda.B #$02                           ;01A82E|A902    |      ;
@@ -4949,7 +4949,7 @@ CODE_01A808:
 	db $01,$8d,$00,$43,$a9,$18,$8d,$01,$43,$a2,$00,$00,$8e,$02,$43,$a9;01A845|        |00008D;
 	db $7f,$8d,$04,$43,$a2,$00,$2e,$8e,$05,$43,$a9,$01,$8d,$0b,$42,$60;01A855|        |43048D;
 ;      |        |      ;
-CODE_01A865:
+Entity_WriteTileData:
 	phb                                  ;01A865|8B      |      ;
 	phd                                  ;01A866|0B      |      ;
 	pea.W $192b                          ;01A867|F42B19  |00192B;
@@ -4958,7 +4958,7 @@ CODE_01A865:
 	rep #$10                             ;01A86D|C210    |      ;
 	sta.B $00                            ;01A86F|8500    |00192B;
 	bit.B #$80                           ;01A871|8980    |      ;
-	bne CODE_01A89D                      ;01A873|D028    |01A89D;
+	bne Entity_ProcessTileFlags                      ;01A873|D028    |01A89D;
 	rep #$30                             ;01A875|C230    |      ;
 	and.W #$007f                         ;01A877|297F00  |      ;
 	asl a;01A87A|0A      |      ;
@@ -4983,10 +4983,10 @@ CODE_01A865:
 	rep #$10                             ;01A895|C210    |      ;
 	lda.B #$10                           ;01A897|A910    |      ;
 	sta.B $08                            ;01A899|8508    |001933;
-	bra CODE_01A8BB                      ;01A89B|801E    |01A8BB;
+	bra Entity_SetTileAddress                      ;01A89B|801E    |01A8BB;
 ;      |        |      ;
 ;      |        |      ;
-CODE_01A89D:
+Entity_ProcessTileFlags:
 	rep #$30                             ;01A89D|C230    |      ;
 	and.W #$007f                         ;01A89F|297F00  |      ;
 	asl a;01A8A2|0A      |      ;
@@ -5006,7 +5006,7 @@ CODE_01A89D:
 	lda.B #$08                           ;01A8B7|A908    |      ;
 	sta.B $08                            ;01A8B9|8508    |001933;
 ;      |        |      ;
-CODE_01A8BB:
+Entity_SetTileAddress:
 	sep #$20                             ;01A8BB|E220    |      ;
 	rep #$10                             ;01A8BD|C210    |      ;
 	lda.B #$04                           ;01A8BF|A904    |      ;
@@ -5022,14 +5022,14 @@ CODE_01A8BB:
 	lda.L DATA8_01a5e0,x                 ;01A8D0|BFE0A501|01A5E0;
 	sta.B $04                            ;01A8D4|8504    |00192F;
 ;      |        |      ;
-CODE_01A8D6:
+Entity_WriteTiles:
 	sep #$20                             ;01A8D6|E220    |      ;
 	rep #$10                             ;01A8D8|C210    |      ;
-	jsr.W CODE_01A901                    ;01A8DA|2001A9  |01A901;
+	jsr.W Entity_CopyTileRow                    ;01A8DA|2001A9  |01A901;
 	lda.B $08                            ;01A8DD|A508    |001933;
 	dec a;01A8DF|3A      |      ;
 	sta.B $08                            ;01A8E0|8508    |001933;
-	beq CODE_01A8FE                      ;01A8E2|F01A    |01A8FE;
+	beq Entity_NextTile                      ;01A8E2|F01A    |01A8FE;
 	pha                                  ;01A8E4|48      |      ;
 	rep #$30                             ;01A8E5|C230    |      ;
 	lda.B $02                            ;01A8E7|A502    |00192D;
@@ -5043,16 +5043,16 @@ CODE_01A8D6:
 	sep #$20                             ;01A8F7|E220    |      ;
 	rep #$10                             ;01A8F9|C210    |      ;
 	pla                                  ;01A8FB|68      |      ;
-	bra CODE_01A8D6                      ;01A8FC|80D8    |01A8D6;
+	bra Entity_WriteTiles                      ;01A8FC|80D8    |01A8D6;
 ;      |        |      ;
 ;      |        |      ;
-CODE_01A8FE:
+Entity_NextTile:
 	pld                                  ;01A8FE|2B      |      ;
 	plb                                  ;01A8FF|AB      |      ;
 	rts                                  ;01A900|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
-CODE_01A901:
+Entity_CopyTileRow:
 	phb                                  ;01A901|8B      |      ;
 	phy                                  ;01A902|5A      |      ;
 	php                                  ;01A903|08      |      ;
@@ -5071,7 +5071,7 @@ CODE_01A901:
 	lda.B #$08                           ;01A91B|A908    |      ;
 	sta.B $01                            ;01A91D|8501    |00192C;
 ;      |        |      ;
-CODE_01A91F:
+Entity_TileRowLoop:
 	phb                                  ;01A91F|8B      |      ;
 	lda.B $06                            ;01A920|A506    |001931;
 	pha                                  ;01A922|48      |      ;
@@ -5094,7 +5094,7 @@ CODE_01A91F:
 	rep #$10                             ;01A93B|C210    |      ;
 	plb                                  ;01A93D|AB      |      ;
 	dec.B $01                            ;01A93E|C601    |00192C;
-	bne CODE_01A91F                      ;01A940|D0DD    |01A91F;
+	bne Entity_TileRowLoop                      ;01A940|D0DD    |01A91F;
 	pld                                  ;01A942|2B      |      ;
 	plp                                  ;01A943|28      |      ;
 	ply                                  ;01A944|7A      |      ;
@@ -5102,7 +5102,7 @@ CODE_01A91F:
 	rts                                  ;01A946|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
-CODE_01A947:
+Entity_ProcessAnimation:
 	sep #$20                             ;01A947|E220    |      ;
 	rep #$10                             ;01A949|C210    |      ;
 	phd                                  ;01A94B|0B      |      ;
@@ -5112,36 +5112,36 @@ CODE_01A947:
 	ldx.W #$0000                         ;01A953|A20000  |      ;
 	stx.W $1939                          ;01A956|8E3919  |001939;
 ;      |        |      ;
-CODE_01A959:
+Entity_AnimationLoop:
 	sep #$20                             ;01A959|E220    |      ;
 	rep #$10                             ;01A95B|C210    |      ;
 	ldx.W $1939                          ;01A95D|AE3919  |001939;
 	lda.B $00,x                          ;01A960|B500    |001A72;
 	cmp.B #$ff                           ;01A962|C9FF    |      ;
-	beq CODE_01A969                      ;01A964|F003    |01A969;
-	jsr.W CODE_01A988                    ;01A966|2088A9  |01A988;
+	beq Entity_CheckAnimFrame                      ;01A964|F003    |01A969;
+	jsr.W Entity_UpdateAnimFrame                    ;01A966|2088A9  |01A988;
 ;      |        |      ;
-CODE_01A969:
+Entity_CheckAnimFrame:
 	sep #$20                             ;01A969|E220    |      ;
 	rep #$10                             ;01A96B|C210    |      ;
 	inc.W $1938                          ;01A96D|EE3819  |001938;
 	lda.W $1938                          ;01A970|AD3819  |001938;
 	cmp.B #$17                           ;01A973|C917    |      ;
-	beq CODE_01A986                      ;01A975|F00F    |01A986;
+	beq Entity_AnimationUpdate                      ;01A975|F00F    |01A986;
 	rep #$30                             ;01A977|C230    |      ;
 	lda.W $1939                          ;01A979|AD3919  |001939;
 	clc                                  ;01A97C|18      |      ;
 	adc.W #$001a                         ;01A97D|691A00  |      ;
 	sta.W $1939                          ;01A980|8D3919  |001939;
-	jmp.W CODE_01A959                    ;01A983|4C59A9  |01A959;
+	jmp.W Entity_AnimationLoop                    ;01A983|4C59A9  |01A959;
 ;      |        |      ;
 ;      |        |      ;
-CODE_01A986:
+Entity_AnimationUpdate:
 	pld                                  ;01A986|2B      |      ;
 	rts                                  ;01A987|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
-CODE_01A988:
+Entity_UpdateAnimFrame:
 	ldx.W $1939                          ;01A988|AE3919  |001939;
 	lda.B $18,x                          ;01A98B|B518    |001A8A;
 	and.B #$c0                           ;01A98D|29C0    |      ;
@@ -5166,48 +5166,48 @@ CODE_01A988:
 	pha                                  ;01A9B0|48      |      ;
 	lda.W $193d                          ;01A9B1|AD3D19  |00193D;
 	cmp.W #$0005                         ;01A9B4|C90500  |      ;
-	bcc CODE_01A9BD                      ;01A9B7|9004    |01A9BD;
+	bcc Entity_LoadAnimData                      ;01A9B7|9004    |01A9BD;
 	pla                                  ;01A9B9|68      |      ;
 	lsr a;01A9BA|4A      |      ;
-	bra CODE_01A9BE                      ;01A9BB|8001    |01A9BE;
+	bra Entity_LoadAnimNext                      ;01A9BB|8001    |01A9BE;
 ;      |        |      ;
 ;      |        |      ;
-CODE_01A9BD:
+Entity_LoadAnimData:
 	pla                                  ;01A9BD|68      |      ;
 ;      |        |      ;
-CODE_01A9BE:
+Entity_LoadAnimNext:
 	clc                                  ;01A9BE|18      |      ;
 	adc.W $193b                          ;01A9BF|6D3B19  |00193B;
 	tay                                  ;01A9C2|A8      |      ;
 	lda.W #$0000                         ;01A9C3|A90000  |      ;
-	jsr.W CODE_01AE8A                    ;01A9C6|208AAE  |01AE8A;
-	jsr.W CODE_01A9CD                    ;01A9C9|20CDA9  |01A9CD;
+	jsr.W Collision_FlagEnd                    ;01A9C6|208AAE  |01AE8A;
+	jsr.W Entity_AnimDataLoop                    ;01A9C9|20CDA9  |01A9CD;
 	rts                                  ;01A9CC|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
-CODE_01A9CD:
+Entity_AnimDataLoop:
 	php                                  ;01A9CD|08      |      ;
 	rep #$30                             ;01A9CE|C230    |      ;
 	phx                                  ;01A9D0|DA      |      ;
 	lda.B $0b,x                          ;01A9D1|B50B    |001A7D;
 	sta.W $197f                          ;01A9D3|8D7F19  |00197F;
-	jsr.W CODE_01AF1A                    ;01A9D6|201AAF  |01AF1A;
+	jsr.W Collision_CheckSolid                    ;01A9D6|201AAF  |01AF1A;
 	sep #$20                             ;01A9D9|E220    |      ;
 	rep #$10                             ;01A9DB|C210    |      ;
 	lda.L $7f8000,x                      ;01A9DD|BF00807F|7F8000;
 	plx                                  ;01A9E1|FA      |      ;
 	bit.B #$80                           ;01A9E2|8980    |      ;
-	beq CODE_01A9EC                      ;01A9E4|F006    |01A9EC;
+	beq Entity_AnimDataEnd                      ;01A9E4|F006    |01A9EC;
 	lda.B $0e,x                          ;01A9E6|B50E    |001A80;
 	ora.B #$08                           ;01A9E8|0908    |      ;
 	sta.B $0e,x                          ;01A9EA|950E    |001A80;
 ;      |        |      ;
-CODE_01A9EC:
+Entity_AnimDataEnd:
 	plp                                  ;01A9EC|28      |      ;
 	rts                                  ;01A9ED|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
-CODE_01A9EE:
+Entity_UpdateSprites:
 	sep #$20                             ;01A9EE|E220    |      ;
 	rep #$10                             ;01A9F0|C210    |      ;
 	phd                                  ;01A9F2|0B      |      ;
@@ -5218,22 +5218,22 @@ CODE_01A9EE:
 	stx.W $1939                          ;01A9FD|8E3919  |001939;
 	stx.W $193b                          ;01AA00|8E3B19  |00193B;
 ;      |        |      ;
-CODE_01AA03:
+Entity_SpriteLoop:
 	sep #$20                             ;01AA03|E220    |      ;
 	rep #$10                             ;01AA05|C210    |      ;
 	ldx.W $1939                          ;01AA07|AE3919  |001939;
 	lda.B $00,x                          ;01AA0A|B500    |001A72;
 	cmp.B #$ff                           ;01AA0C|C9FF    |      ;
-	beq CODE_01AA13                      ;01AA0E|F003    |01AA13;
-	jsr.W CODE_01AA3B                    ;01AA10|203BAA  |01AA3B;
+	beq Entity_CheckSpriteActive                      ;01AA0E|F003    |01AA13;
+	jsr.W Entity_CalculateSpritePos                    ;01AA10|203BAA  |01AA3B;
 ;      |        |      ;
-CODE_01AA13:
+Entity_CheckSpriteActive:
 	sep #$20                             ;01AA13|E220    |      ;
 	rep #$10                             ;01AA15|C210    |      ;
 	inc.W $1938                          ;01AA17|EE3819  |001938;
 	lda.W $1938                          ;01AA1A|AD3819  |001938;
 	cmp.B #$16                           ;01AA1D|C916    |      ;
-	beq CODE_01AA39                      ;01AA1F|F018    |01AA39;
+	beq Entity_RenderSprite                      ;01AA1F|F018    |01AA39;
 	rep #$30                             ;01AA21|C230    |      ;
 	lda.W $1939                          ;01AA23|AD3919  |001939;
 	clc                                  ;01AA26|18      |      ;
@@ -5243,58 +5243,58 @@ CODE_01AA13:
 	clc                                  ;01AA30|18      |      ;
 	adc.W #$0004                         ;01AA31|690400  |      ;
 	sta.W $193b                          ;01AA34|8D3B19  |00193B;
-	bra CODE_01AA03                      ;01AA37|80CA    |01AA03;
+	bra Entity_SpriteLoop                      ;01AA37|80CA    |01AA03;
 ;      |        |      ;
 ;      |        |      ;
-CODE_01AA39:
+Entity_RenderSprite:
 	pld                                  ;01AA39|2B      |      ;
 	rts                                  ;01AA3A|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
-CODE_01AA3B:
+Entity_CalculateSpritePos:
 	sep #$20                             ;01AA3B|E220    |      ;
 	rep #$10                             ;01AA3D|C210    |      ;
 	ldx.W $1939                          ;01AA3F|AE3919  |001939;
 	lda.B $00,x                          ;01AA42|B500    |001A72;
 	cmp.B #$01                           ;01AA44|C901    |      ;
-	bne CODE_01AA4A                      ;01AA46|D002    |01AA4A;
+	bne Entity_ApplyCameraOffset                      ;01AA46|D002    |01AA4A;
 	stz.B $00,x                          ;01AA48|7400    |001A72;
 ;      |        |      ;
-CODE_01AA4A:
+Entity_ApplyCameraOffset:
 	lda.B $10,x                          ;01AA4A|B510    |001A82;
 	cmp.B #$04                           ;01AA4C|C904    |      ;
-	beq CODE_01AA64                      ;01AA4E|F014    |01AA64;
+	beq Entity_ClampToScreen                      ;01AA4E|F014    |01AA64;
 	cmp.B #$06                           ;01AA50|C906    |      ;
-	beq CODE_01AA64                      ;01AA52|F010    |01AA64;
+	beq Entity_ClampToScreen                      ;01AA52|F010    |01AA64;
 	cmp.B #$07                           ;01AA54|C907    |      ;
-	beq CODE_01AA64                      ;01AA56|F00C    |01AA64;
+	beq Entity_ClampToScreen                      ;01AA56|F00C    |01AA64;
 	cmp.B #$08                           ;01AA58|C908    |      ;
-	beq CODE_01AA64                      ;01AA5A|F008    |01AA64;
+	beq Entity_ClampToScreen                      ;01AA5A|F008    |01AA64;
 	cmp.B #$09                           ;01AA5C|C909    |      ;
-	beq CODE_01AA64                      ;01AA5E|F004    |01AA64;
+	beq Entity_ClampToScreen                      ;01AA5E|F004    |01AA64;
 	lda.B #$00                           ;01AA60|A900    |      ;
-	bra CODE_01AA71                      ;01AA62|800D    |01AA71;
+	bra Entity_WriteSpriteData                      ;01AA62|800D    |01AA71;
 ;      |        |      ;
 ;      |        |      ;
-CODE_01AA64:
+Entity_ClampToScreen:
 	lda.B #$08                           ;01AA64|A908    |      ;
 	sta.W $00a8                          ;01AA66|8DA800  |0000A8;
 	jsl.L CODE_009783                    ;01AA69|22839700|009783;
 	lda.W $00a9                          ;01AA6D|ADA900  |0000A9;
 	asl a;01AA70|0A      |      ;
 ;      |        |      ;
-CODE_01AA71:
+Entity_WriteSpriteData:
 	sta.B $17,x                          ;01AA71|9517    |001A89;
 	lda.B $0b,x                          ;01AA73|B50B    |001A7D;
 	sta.W $197f                          ;01AA75|8D7F19  |00197F;
 	lda.B $0c,x                          ;01AA78|B50C    |001A7E;
 	sta.W $1980                          ;01AA7A|8D8019  |001980;
 	phx                                  ;01AA7D|DA      |      ;
-	jsr.W CODE_01AF1A                    ;01AA7E|201AAF  |01AF1A;
-	jsr.W CODE_01AF3A                    ;01AA81|203AAF  |01AF3A;
+	jsr.W Collision_CheckSolid                    ;01AA7E|201AAF  |01AF1A;
+	jsr.W Collision_CheckDamage                    ;01AA81|203AAF  |01AF3A;
 	plx                                  ;01AA84|FA      |      ;
-	jsr.W CODE_01A9CD                    ;01AA85|20CDA9  |01A9CD;
-	jsr.W CODE_01AFF0                    ;01AA88|20F0AF  |01AFF0;
+	jsr.W Entity_AnimDataLoop                    ;01AA85|20CDA9  |01A9CD;
+	jsr.W Collision_EntityComplete                    ;01AA88|20F0AF  |01AFF0;
 	rep #$30                             ;01AA8B|C230    |      ;
 	ldx.W $193b                          ;01AA8D|AE3B19  |00193B;
 	lda.L DATA8_01a63a,x                 ;01AA90|BF3AA601|01A63A;
@@ -5360,22 +5360,22 @@ CODE_01AA71:
 	sta.W $192d                          ;01AB1F|8D2D19  |00192D;
 	lda.B $18,x                          ;01AB22|B518    |001A8A;
 	bit.W #$0020                         ;01AB24|892000  |      ;
-	beq CODE_01AB33                      ;01AB27|F00A    |01AB33;
+	beq Entity_NextSprite                      ;01AB27|F00A    |01AB33;
 	lda.W $192b                          ;01AB29|AD2B19  |00192B;
 	clc                                  ;01AB2C|18      |      ;
 	adc.W #$0008                         ;01AB2D|690800  |      ;
 	sta.W $192b                          ;01AB30|8D2B19  |00192B;
 ;      |        |      ;
-CODE_01AB33:
+Entity_NextSprite:
 	lda.B $18,x                          ;01AB33|B518    |001A8A;
 	bit.W #$0010                         ;01AB35|891000  |      ;
-	beq CODE_01AB44                      ;01AB38|F00A    |01AB44;
+	beq Entity_SpriteEnd                      ;01AB38|F00A    |01AB44;
 	lda.W $192d                          ;01AB3A|AD2D19  |00192D;
 	clc                                  ;01AB3D|18      |      ;
 	adc.W #$0008                         ;01AB3E|690800  |      ;
 	sta.W $192d                          ;01AB41|8D2D19  |00192D;
 ;      |        |      ;
-CODE_01AB44:
+Entity_SpriteEnd:
 	rep #$30                             ;01AB44|C230    |      ;
 	lda.W $192b                          ;01AB46|AD2B19  |00192B;
 	and.W #$03ff                         ;01AB49|29FF03  |      ;
@@ -5392,7 +5392,7 @@ DATA8_01ab57:
 DATA8_01ab5a:
 	db $00,$07,$0e                       ;01AB5A|        |      ;
 ;      |        |      ;
-CODE_01AB5D:
+Camera_UpdatePosition:
 	php                                  ;01AB5D|08      |      ;
 	sep #$20                             ;01AB5E|E220    |      ;
 	rep #$10                             ;01AB60|C210    |      ;
@@ -5435,33 +5435,33 @@ CODE_01AB5D:
 	inc.W $1a71                          ;01ABAE|EE711A  |011A71;
 	lda.W $1a71                          ;01ABB1|AD711A  |011A71;
 	cmp.B #$03                           ;01ABB4|C903    |      ;
-	bne CODE_01ABBB                      ;01ABB6|D003    |01ABBB;
+	bne Camera_CalculateTarget                      ;01ABB6|D003    |01ABBB;
 	stz.W $1a71                          ;01ABB8|9C711A  |011A71;
 ;      |        |      ;
-CODE_01ABBB:
+Camera_CalculateTarget:
 	sep #$20                             ;01ABBB|E220    |      ;
 	rep #$10                             ;01ABBD|C210    |      ;
 	ldx.W $1975                          ;01ABBF|AE7519  |011975;
 	lda.B $00,x                          ;01ABC2|B500    |001A72;
-	bne CODE_01ABC9                      ;01ABC4|D003    |01ABC9;
-	jmp.W CODE_01AD01                    ;01ABC6|4C01AD  |01AD01;
+	bne Camera_TargetLoop                      ;01ABC4|D003    |01ABC9;
+	jmp.W Camera_ScrollComplete                    ;01ABC6|4C01AD  |01AD01;
 ;      |        |      ;
 ;      |        |      ;
-CODE_01ABC9:
+Camera_TargetLoop:
 	cmp.B #$ff                           ;01ABC9|C9FF    |      ;
-	beq CODE_01AC03                      ;01ABCB|F036    |01AC03;
+	beq Camera_ClampBounds                      ;01ABCB|F036    |01AC03;
 	cmp.B #$04                           ;01ABCD|C904    |      ;
-	beq CODE_01AC03                      ;01ABCF|F032    |01AC03;
+	beq Camera_ClampBounds                      ;01ABCF|F032    |01AC03;
 	cmp.B #$01                           ;01ABD1|C901    |      ;
-	beq CODE_01AC1F                      ;01ABD3|F04A    |01AC1F;
+	beq Camera_UpdateY                      ;01ABD3|F04A    |01AC1F;
 	cmp.B #$03                           ;01ABD5|C903    |      ;
-	bne CODE_01ABE0                      ;01ABD7|D007    |01ABE0;
+	bne Camera_ApplySmoothing                      ;01ABD7|D007    |01ABE0;
 	and.B #$10                           ;01ABD9|2910    |      ;
-	bne CODE_01AC03                      ;01ABDB|D026    |01AC03;
-	jmp.W CODE_01ADD6                    ;01ABDD|4CD6AD  |01ADD6;
+	bne Camera_ClampBounds                      ;01ABDB|D026    |01AC03;
+	jmp.W Collision_CalculateBounds                    ;01ABDD|4CD6AD  |01ADD6;
 ;      |        |      ;
 ;      |        |      ;
-CODE_01ABE0:
+Camera_ApplySmoothing:
 	rep #$30                             ;01ABE0|C230    |      ;
 	phx                                  ;01ABE2|DA      |      ;
 	lda.W $1973                          ;01ABE3|AD7319  |011973;
@@ -5480,26 +5480,26 @@ CODE_01ABE0:
 	lda.B $07,x                          ;01ABFE|B507    |001A79;
 	sta.W $0c0e,y                        ;01AC00|990E0C  |010C0E;
 ;      |        |      ;
-CODE_01AC03:
+Camera_ClampBounds:
 	rep #$30                             ;01AC03|C230    |      ;
 	inc.W $1973                          ;01AC05|EE7319  |011973;
 	lda.W $1973                          ;01AC08|AD7319  |011973;
 	cmp.W $1985                          ;01AC0B|CD8519  |011985;
-	beq CODE_01AC1C                      ;01AC0E|F00C    |01AC1C;
+	beq Camera_UpdateX                      ;01AC0E|F00C    |01AC1C;
 	lda.W $1975                          ;01AC10|AD7519  |011975;
 	clc                                  ;01AC13|18      |      ;
 	adc.W #$001a                         ;01AC14|691A00  |      ;
 	sta.W $1975                          ;01AC17|8D7519  |011975;
-	bra CODE_01ABBB                      ;01AC1A|809F    |01ABBB;
+	bra Camera_CalculateTarget                      ;01AC1A|809F    |01ABBB;
 ;      |        |      ;
 ;      |        |      ;
-CODE_01AC1C:
+Camera_UpdateX:
 	pld                                  ;01AC1C|2B      |      ;
 	plp                                  ;01AC1D|28      |      ;
 	rts                                  ;01AC1E|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
-CODE_01AC1F:
+Camera_UpdateY:
 	sep #$20                             ;01AC1F|E220    |      ;
 	rep #$10                             ;01AC21|C210    |      ;
 	lda.B $0e,x                          ;01AC23|B50E    |001A80;
@@ -5512,10 +5512,10 @@ CODE_01AC1F:
 	inc a;01AC2E|1A      |      ;
 	sta.W $197f                          ;01AC2F|8D7F19  |01197F;
 	cmp.B #$03                           ;01AC32|C903    |      ;
-	bne CODE_01AC39                      ;01AC34|D003    |01AC39;
+	bne Camera_WriteRegisters                      ;01AC34|D003    |01AC39;
 	inc.W $197f                          ;01AC36|EE7F19  |01197F;
 ;      |        |      ;
-CODE_01AC39:
+Camera_WriteRegisters:
 	pla                                  ;01AC39|68      |      ;
 	lsr a;01AC3A|4A      |      ;
 	lsr a;01AC3B|4A      |      ;
@@ -5561,7 +5561,7 @@ CODE_01AC39:
 	tay                                  ;01AC82|A8      |      ;
 	sep #$20                             ;01AC83|E220    |      ;
 	rep #$10                             ;01AC85|C210    |      ;
-	jsr.W CODE_01AE8A                    ;01AC87|208AAE  |01AE8A;
+	jsr.W Collision_FlagEnd                    ;01AC87|208AAE  |01AE8A;
 	sep #$20                             ;01AC8A|E220    |      ;
 	rep #$10                             ;01AC8C|C210    |      ;
 	lda.B #$00                           ;01AC8E|A900    |      ;
@@ -5580,83 +5580,83 @@ CODE_01AC39:
 	lda.B #$00                           ;01ACA8|A900    |      ;
 	xba                                  ;01ACAA|EB      |      ;
 	lda.W $1977                          ;01ACAB|AD7719  |011977;
-	beq CODE_01ACCB                      ;01ACAE|F01B    |01ACCB;
-	bpl CODE_01ACBE                      ;01ACB0|100C    |01ACBE;
+	beq Camera_ScrollUp                      ;01ACAE|F01B    |01ACCB;
+	bpl Camera_CheckScrollMode                      ;01ACB0|100C    |01ACBE;
 	lda.W $197f                          ;01ACB2|AD7F19  |01197F;
 	eor.B #$ff                           ;01ACB5|49FF    |      ;
 	inc a;01ACB7|1A      |      ;
 	xba                                  ;01ACB8|EB      |      ;
 	lda.B #$ff                           ;01ACB9|A9FF    |      ;
 	xba                                  ;01ACBB|EB      |      ;
-	bra CODE_01ACC1                      ;01ACBC|8003    |01ACC1;
+	bra Camera_ProcessScroll                      ;01ACBC|8003    |01ACC1;
 ;      |        |      ;
 ;      |        |      ;
-CODE_01ACBE:
+Camera_CheckScrollMode:
 	lda.W $197f                          ;01ACBE|AD7F19  |01197F;
 ;      |        |      ;
-CODE_01ACC1:
+Camera_ProcessScroll:
 	rep #$30                             ;01ACC1|C230    |      ;
 	clc                                  ;01ACC3|18      |      ;
 	adc.B $13,x                          ;01ACC4|7513    |001A85;
 	and.W #$03ff                         ;01ACC6|29FF03  |      ;
 	sta.B $13,x                          ;01ACC9|9513    |001A85;
 ;      |        |      ;
-CODE_01ACCB:
+Camera_ScrollUp:
 	sep #$20                             ;01ACCB|E220    |      ;
 	rep #$10                             ;01ACCD|C210    |      ;
 	lda.B #$00                           ;01ACCF|A900    |      ;
 	xba                                  ;01ACD1|EB      |      ;
 	lda.W $1978                          ;01ACD2|AD7819  |011978;
-	beq CODE_01ACF2                      ;01ACD5|F01B    |01ACF2;
-	bpl CODE_01ACE5                      ;01ACD7|100C    |01ACE5;
+	beq Camera_ScrollRight                      ;01ACD5|F01B    |01ACF2;
+	bpl Camera_ScrollDown                      ;01ACD7|100C    |01ACE5;
 	lda.W $197f                          ;01ACD9|AD7F19  |01197F;
 	eor.B #$ff                           ;01ACDC|49FF    |      ;
 	inc a;01ACDE|1A      |      ;
 	xba                                  ;01ACDF|EB      |      ;
 	lda.B #$ff                           ;01ACE0|A9FF    |      ;
 	xba                                  ;01ACE2|EB      |      ;
-	bra CODE_01ACE8                      ;01ACE3|8003    |01ACE8;
+	bra Camera_ScrollLeft                      ;01ACE3|8003    |01ACE8;
 ;      |        |      ;
 ;      |        |      ;
-CODE_01ACE5:
+Camera_ScrollDown:
 	lda.W $197f                          ;01ACE5|AD7F19  |01197F;
 ;      |        |      ;
-CODE_01ACE8:
+Camera_ScrollLeft:
 	rep #$30                             ;01ACE8|C230    |      ;
 	clc                                  ;01ACEA|18      |      ;
 	adc.B $15,x                          ;01ACEB|7515    |001A87;
 	and.W #$03ff                         ;01ACED|29FF03  |      ;
 	sta.B $15,x                          ;01ACF0|9515    |001A87;
 ;      |        |      ;
-CODE_01ACF2:
+Camera_ScrollRight:
 	sep #$20                             ;01ACF2|E220    |      ;
 	rep #$10                             ;01ACF4|C210    |      ;
 	lda.B $17,x                          ;01ACF6|B517    |001A89;
-	bne CODE_01ACFE                      ;01ACF8|D004    |01ACFE;
+	bne Camera_ScrollDiagonal                      ;01ACF8|D004    |01ACFE;
 	lda.B #$00                           ;01ACFA|A900    |      ;
 	sta.B $00,x                          ;01ACFC|9500    |001A72;
 ;      |        |      ;
-CODE_01ACFE:
-	jmp.W CODE_01ABE0                    ;01ACFE|4CE0AB  |01ABE0;
+Camera_ScrollDiagonal:
+	jmp.W Camera_ApplySmoothing                    ;01ACFE|4CE0AB  |01ABE0;
 ;      |        |      ;
 ;      |        |      ;
-CODE_01AD01:
+Camera_ScrollComplete:
 	sep #$20                             ;01AD01|E220    |      ;
 	rep #$10                             ;01AD03|C210    |      ;
 	lda.W $1a70                          ;01AD05|AD701A  |011A70;
 	cmp.B #$02                           ;01AD08|C902    |      ;
-	beq CODE_01AD1A                      ;01AD0A|F00E    |01AD1A;
+	beq Camera_UpdateScroll                      ;01AD0A|F00E    |01AD1A;
 	stz.W $00a8                          ;01AD0C|9CA800  |0100A8;
 	jsl.L CODE_009783                    ;01AD0F|22839700|009783;
 	lda.W $00a9                          ;01AD13|ADA900  |0100A9;
 	cmp.B #$f0                           ;01AD16|C9F0    |      ;
-	bcs CODE_01AD1D                      ;01AD18|B003    |01AD1D;
+	bcs Camera_ScrollEnd                      ;01AD18|B003    |01AD1D;
 ;      |        |      ;
-CODE_01AD1A:
-	jmp.W CODE_01ABE0                    ;01AD1A|4CE0AB  |01ABE0;
+Camera_UpdateScroll:
+	jmp.W Camera_ApplySmoothing                    ;01AD1A|4CE0AB  |01ABE0;
 ;      |        |      ;
 ;      |        |      ;
-CODE_01AD1D:
+Camera_ScrollEnd:
 	inc.W $1a70                          ;01AD1D|EE701A  |011A70;
 	lda.W $00a9                          ;01AD20|ADA900  |0100A9;
 	and.B #$03                           ;01AD23|2903    |      ;
@@ -5666,19 +5666,19 @@ CODE_01AD1D:
 	sta.W $197f                          ;01AD2D|8D7F19  |01197F;
 	lda.B $0c,x                          ;01AD30|B50C    |001A7E;
 	sta.W $1980                          ;01AD32|8D8019  |011980;
-	jsr.W CODE_01AEE7                    ;01AD35|20E7AE  |01AEE7;
+	jsr.W Collision_TileProperties                    ;01AD35|20E7AE  |01AEE7;
 	sep #$20                             ;01AD38|E220    |      ;
 	rep #$10                             ;01AD3A|C210    |      ;
 	lda.W $197f                          ;01AD3C|AD7F19  |01197F;
-	bmi CODE_01AD1A                      ;01AD3F|30D9    |01AD1A;
+	bmi Camera_UpdateScroll                      ;01AD3F|30D9    |01AD1A;
 	cmp.W $1924                          ;01AD41|CD2419  |011924;
-	bcs CODE_01AD1A                      ;01AD44|B0D4    |01AD1A;
+	bcs Camera_UpdateScroll                      ;01AD44|B0D4    |01AD1A;
 	lda.W $1980                          ;01AD46|AD8019  |011980;
-	bmi CODE_01AD1A                      ;01AD49|30CF    |01AD1A;
+	bmi Camera_UpdateScroll                      ;01AD49|30CF    |01AD1A;
 	cmp.W $1925                          ;01AD4B|CD2519  |011925;
-	bcs CODE_01AD1A                      ;01AD4E|B0CA    |01AD1A;
-	jsr.W CODE_01AFB7                    ;01AD50|20B7AF  |01AFB7;
-	bcs CODE_01AD1A                      ;01AD53|B0C5    |01AD1A;
+	bcs Camera_UpdateScroll                      ;01AD4E|B0CA    |01AD1A;
+	jsr.W Collision_EntityBounds                    ;01AD50|20B7AF  |01AFB7;
+	bcs Camera_UpdateScroll                      ;01AD53|B0C5    |01AD1A;
 	lda.W $1982                          ;01AD55|AD8219  |011982;
 	and.B #$80                           ;01AD58|2980    |      ;
 	lsr a;01AD5A|4A      |      ;
@@ -5689,33 +5689,33 @@ CODE_01AD1D:
 	lda.B $0e,x                          ;01AD61|B50E    |001A80;
 	and.B #$08                           ;01AD63|2908    |      ;
 	cmp.W $1982                          ;01AD65|CD8219  |011982;
-	bne CODE_01AD1A                      ;01AD68|D0B0    |01AD1A;
+	bne Camera_UpdateScroll                      ;01AD68|D0B0    |01AD1A;
 	rep #$30                             ;01AD6A|C230    |      ;
 	lda.W $197f                          ;01AD6C|AD7F19  |01197F;
 	cmp.W $0e89                          ;01AD6F|CD890E  |010E89;
-	beq CODE_01AD1A                      ;01AD72|F0A6    |01AD1A;
+	beq Camera_UpdateScroll                      ;01AD72|F0A6    |01AD1A;
 	lda.W $1983                          ;01AD74|AD8319  |011983;
 	bit.W #$8000                         ;01AD77|890080  |      ;
-	bne CODE_01AD1A                      ;01AD7A|D09E    |01AD1A;
+	bne Camera_UpdateScroll                      ;01AD7A|D09E    |01AD1A;
 	bit.W #$0400                         ;01AD7C|890004  |      ;
-	bne CODE_01AD1A                      ;01AD7F|D099    |01AD1A;
+	bne Camera_UpdateScroll                      ;01AD7F|D099    |01AD1A;
 	and.W #$0007                         ;01AD81|290700  |      ;
 	sta.W $197d                          ;01AD84|8D7D19  |01197D;
 	cmp.W #$0007                         ;01AD87|C90700  |      ;
-	beq CODE_01AD1A                      ;01AD8A|F08E    |01AD1A;
+	beq Camera_UpdateScroll                      ;01AD8A|F08E    |01AD1A;
 	lda.B $0e,x                          ;01AD8C|B50E    |001A80;
 	and.W #$0007                         ;01AD8E|290700  |      ;
 	sta.W $197b                          ;01AD91|8D7B19  |01197B;
 	cmp.W $197d                          ;01AD94|CD7D19  |01197D;
-	bne CODE_01AD1A                      ;01AD97|D081    |01AD1A;
+	bne Camera_UpdateScroll                      ;01AD97|D081    |01AD1A;
 	lda.W $1983                          ;01AD99|AD8319  |011983;
 	and.W #$0070                         ;01AD9C|297000  |      ;
 	cmp.W #$0070                         ;01AD9F|C97000  |      ;
-	bne CODE_01ADA7                      ;01ADA2|D003    |01ADA7;
+	bne Collision_CheckObject                      ;01ADA2|D003    |01ADA7;
 	db $4c,$1a,$ad                       ;01ADA4|        |01AD1A;
 ;      |        |      ;
-CODE_01ADA7:
-	jsr.W CODE_01AFF0                    ;01ADA7|20F0AF  |01AFF0;
+Collision_CheckObject:
+	jsr.W Collision_EntityComplete                    ;01ADA7|20F0AF  |01AFF0;
 	sep #$20                             ;01ADAA|E220    |      ;
 	rep #$10                             ;01ADAC|C210    |      ;
 	lda.W $1979                          ;01ADAE|AD7919  |011979;
@@ -5736,10 +5736,10 @@ CODE_01ADA7:
 	sta.B $0b,x                          ;01ADCC|950B    |001A7D;
 	lda.W $1980                          ;01ADCE|AD8019  |011980;
 	sta.B $0c,x                          ;01ADD1|950C    |001A7E;
-	jmp.W CODE_01AC1F                    ;01ADD3|4C1FAC  |01AC1F;
+	jmp.W Camera_UpdateY                    ;01ADD3|4C1FAC  |01AC1F;
 ;      |        |      ;
 ;      |        |      ;
-CODE_01ADD6:
+Collision_CalculateBounds:
 	sep #$20                             ;01ADD6|E220    |      ;
 	rep #$10                             ;01ADD8|C210    |      ;
 	lda.B #$00                           ;01ADDA|A900    |      ;
@@ -5757,16 +5757,16 @@ CODE_01ADD6:
 	ldy.W #$0008                         ;01ADF1|A00800  |      ;
 	lda.B $0e,x                          ;01ADF4|B50E    |001A80;
 	and.B #$c0                           ;01ADF6|29C0    |      ;
-	beq CODE_01AE04                      ;01ADF8|F00A    |01AE04;
+	beq Collision_TestOverlap                      ;01ADF8|F00A    |01AE04;
 	ldy.W #$0004                         ;01ADFA|A00400  |      ;
 	cmp.B #$40                           ;01ADFD|C940    |      ;
-	beq CODE_01AE04                      ;01ADFF|F003    |01AE04;
+	beq Collision_TestOverlap                      ;01ADFF|F003    |01AE04;
 	ldy.W #$0001                         ;01AE01|A00100  |      ;
 ;      |        |      ;
-CODE_01AE04:
+Collision_TestOverlap:
 	tya                                  ;01AE04|98      |      ;
 	and.W $1978                          ;01AE05|2D7819  |011978;
-	beq CODE_01AE71                      ;01AE08|F067    |01AE71;
+	beq Collision_UpdateFlags                      ;01AE08|F067    |01AE71;
 	lda.W $1977                          ;01AE0A|AD7719  |011977;
 	lsr a;01AE0D|4A      |      ;
 	lsr a;01AE0E|4A      |      ;
@@ -5802,22 +5802,22 @@ CODE_01AE04:
 	sta.W $197b                          ;01AE40|8D7B19  |01197B;
 	pla                                  ;01AE43|68      |      ;
 	cmp.W #$0005                         ;01AE44|C90500  |      ;
-	bcc CODE_01AE4F                      ;01AE47|9006    |01AE4F;
+	bcc Collision_ProcessResult                      ;01AE47|9006    |01AE4F;
 	lda.W $197b                          ;01AE49|AD7B19  |01197B;
 	lsr a;01AE4C|4A      |      ;
-	bra CODE_01AE52                      ;01AE4D|8003    |01AE52;
+	bra Collision_HandleHit                      ;01AE4D|8003    |01AE52;
 ;      |        |      ;
 ;      |        |      ;
-CODE_01AE4F:
+Collision_ProcessResult:
 	lda.W $197b                          ;01AE4F|AD7B19  |01197B;
 ;      |        |      ;
-CODE_01AE52:
+Collision_HandleHit:
 	clc                                  ;01AE52|18      |      ;
 	adc.W $1979                          ;01AE53|6D7919  |011979;
 	tay                                  ;01AE56|A8      |      ;
 	sep #$20                             ;01AE57|E220    |      ;
 	rep #$10                             ;01AE59|C210    |      ;
-	jsr.W CODE_01AE8A                    ;01AE5B|208AAE  |01AE8A;
+	jsr.W Collision_FlagEnd                    ;01AE5B|208AAE  |01AE8A;
 	lda.W $1977                          ;01AE5E|AD7719  |011977;
 	asl a;01AE61|0A      |      ;
 	asl a;01AE62|0A      |      ;
@@ -5826,34 +5826,34 @@ CODE_01AE52:
 	sta.B $17,x                          ;01AE65|9517    |001A89;
 	lda.B $18,x                          ;01AE67|B518    |001A8A;
 	bit.B #$08                           ;01AE69|8908    |      ;
-	bne CODE_01AE74                      ;01AE6B|D007    |01AE74;
+	bne Collision_SetFlag                      ;01AE6B|D007    |01AE74;
 	bit.B #$04                           ;01AE6D|8904    |      ;
-	bne CODE_01AE7D                      ;01AE6F|D00C    |01AE7D;
+	bne Collision_ClearFlag                      ;01AE6F|D00C    |01AE7D;
 ;      |        |      ;
-CODE_01AE71:
-	jmp.W CODE_01ABE0                    ;01AE71|4CE0AB  |01ABE0;
+Collision_UpdateFlags:
+	jmp.W Camera_ApplySmoothing                    ;01AE71|4CE0AB  |01ABE0;
 ;      |        |      ;
 ;      |        |      ;
-CODE_01AE74:
+Collision_SetFlag:
 	lda.W $1977                          ;01AE74|AD7719  |011977;
 	and.B #$01                           ;01AE77|2901    |      ;
 	sta.B $09,x                          ;01AE79|9509    |001A7B;
-	bra CODE_01AE71                      ;01AE7B|80F4    |01AE71;
+	bra Collision_UpdateFlags                      ;01AE7B|80F4    |01AE71;
 ;      |        |      ;
 ;      |        |      ;
-CODE_01AE7D:
+Collision_ClearFlag:
 	lda.W $1977                          ;01AE7D|AD7719  |011977;
 	and.B #$01                           ;01AE80|2901    |      ;
 	sta.B $0a,x                          ;01AE82|950A    |001A7C;
-	bra CODE_01AE71                      ;01AE84|80EB    |01AE71;
+	bra Collision_UpdateFlags                      ;01AE84|80EB    |01AE71;
 ;      |        |      ;
 ;      |        |      ;
-CODE_01AE86:
-	jsr.W CODE_01AE8A                    ;01AE86|208AAE  |01AE8A;
+Collision_CheckFlag:
+	jsr.W Collision_FlagEnd                    ;01AE86|208AAE  |01AE8A;
 	rtl                                  ;01AE89|6B      |      ;
 ;      |        |      ;
 ;      |        |      ;
-CODE_01AE8A:
+Collision_FlagEnd:
 	php                                  ;01AE8A|08      |      ;
 	phb                                  ;01AE8B|8B      |      ;
 	phd                                  ;01AE8C|0B      |      ;
@@ -5876,7 +5876,7 @@ CODE_01AE8A:
 	lda.B #$04                           ;01AEAB|A904    |      ;
 	sta.W $1989                          ;01AEAD|8D8919  |001989;
 ;      |        |      ;
-CODE_01AEB0:
+Collision_ProcessTile:
 	rep #$30                             ;01AEB0|C230    |      ;
 	lda.W DATA8_00f13c,y                 ;01AEB2|B93CF1  |00F13C;
 	iny                                  ;01AEB5|C8      |      ;
@@ -5897,7 +5897,7 @@ CODE_01AEB0:
 	inx                                  ;01AED2|E8      |      ;
 	inx                                  ;01AED3|E8      |      ;
 	dec.W $1989                          ;01AED4|CE8919  |001989;
-	bne CODE_01AEB0                      ;01AED7|D0D7    |01AEB0;
+	bne Collision_ProcessTile                      ;01AED7|D0D7    |01AEB0;
 	plx                                  ;01AED9|FA      |      ;
 	stx.W $1989                          ;01AEDA|8E8919  |001989;
 	plx                                  ;01AEDD|FA      |      ;
@@ -5910,20 +5910,20 @@ CODE_01AEB0:
 	rts                                  ;01AEE6|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
-CODE_01AEE7:
+Collision_TileProperties:
 	phy                                  ;01AEE7|5A      |      ;
 	phx                                  ;01AEE8|DA      |      ;
 	php                                  ;01AEE9|08      |      ;
-	jsr.W CODE_01AEF7                    ;01AEEA|20F7AE  |01AEF7;
-	jsr.W CODE_01AF1A                    ;01AEED|201AAF  |01AF1A;
-	jsr.W CODE_01AF3A                    ;01AEF0|203AAF  |01AF3A;
+	jsr.W Collision_TileResult                    ;01AEEA|20F7AE  |01AEF7;
+	jsr.W Collision_CheckSolid                    ;01AEED|201AAF  |01AF1A;
+	jsr.W Collision_CheckDamage                    ;01AEF0|203AAF  |01AF3A;
 	plp                                  ;01AEF3|28      |      ;
 	plx                                  ;01AEF4|FA      |      ;
 	ply                                  ;01AEF5|7A      |      ;
 	rts                                  ;01AEF6|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
-CODE_01AEF7:
+Collision_TileResult:
 	sep #$20                             ;01AEF7|E220    |      ;
 	rep #$10                             ;01AEF9|C210    |      ;
 	lda.B #$00                           ;01AEFB|A900    |      ;
@@ -5942,7 +5942,7 @@ CODE_01AEF7:
 	rts                                  ;01AF19|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
-CODE_01AF1A:
+Collision_CheckSolid:
 	sep #$20                             ;01AF1A|E220    |      ;
 	rep #$10                             ;01AF1C|C210    |      ;
 	lda.B #$00                           ;01AF1E|A900    |      ;
@@ -5961,7 +5961,7 @@ CODE_01AF1A:
 	rts                                  ;01AF39|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
-CODE_01AF3A:
+Collision_CheckDamage:
 	phx                                  ;01AF3A|DA      |      ;
 	sep #$20                             ;01AF3B|E220    |      ;
 	rep #$10                             ;01AF3D|C210    |      ;
@@ -5977,7 +5977,7 @@ CODE_01AF3A:
 	rts                                  ;01AF55|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
-CODE_01AF56:
+Collision_ProcessEntity:
 	php                                  ;01AF56|08      |      ;
 	rep #$30                             ;01AF57|C230    |      ;
 	ldx.W #$0000                         ;01AF59|A20000  |      ;
@@ -6017,7 +6017,7 @@ CODE_01AF56:
 	rts                                  ;01AFB6|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
-CODE_01AFB7:
+Collision_EntityBounds:
 	php                                  ;01AFB7|08      |      ;
 	rep #$30                             ;01AFB8|C230    |      ;
 	phx                                  ;01AFBA|DA      |      ;
@@ -6026,31 +6026,31 @@ CODE_01AFB7:
 	ldx.W #$0000                         ;01AFC1|A20000  |      ;
 	pha                                  ;01AFC4|48      |      ;
 ;      |        |      ;
-CODE_01AFC5:
+Collision_EntityLoop:
 	lda.W $1a72,x                        ;01AFC5|BD721A  |011A72;
 	bit.W #$0080                         ;01AFC8|898000  |      ;
-	bne CODE_01AFDA                      ;01AFCB|D00D    |01AFDA;
+	bne Collision_EntityHit                      ;01AFCB|D00D    |01AFDA;
 	lda.W $1a7d,x                        ;01AFCD|BD7D1A  |011A7D;
 	cmp.W $197f                          ;01AFD0|CD7F19  |01197F;
-	beq CODE_01AFE7                      ;01AFD3|F012    |01AFE7;
+	beq Collision_EntityNext                      ;01AFD3|F012    |01AFE7;
 ;      |        |      ;
-CODE_01AFD5:
+Collision_EntityTest:
 	pla                                  ;01AFD5|68      |      ;
 	dec a;01AFD6|3A      |      ;
-	beq CODE_01AFEC                      ;01AFD7|F013    |01AFEC;
+	beq Collision_EntityEnd                      ;01AFD7|F013    |01AFEC;
 	pha                                  ;01AFD9|48      |      ;
 ;      |        |      ;
-CODE_01AFDA:
+Collision_EntityHit:
 	txa                                  ;01AFDA|8A      |      ;
 	clc                                  ;01AFDB|18      |      ;
 	adc.W #$001a                         ;01AFDC|691A00  |      ;
 	tax                                  ;01AFDF|AA      |      ;
 	cmp.W $1987                          ;01AFE0|CD8719  |011987;
-	beq CODE_01AFD5                      ;01AFE3|F0F0    |01AFD5;
-	bra CODE_01AFC5                      ;01AFE5|80DE    |01AFC5;
+	beq Collision_EntityTest                      ;01AFE3|F0F0    |01AFD5;
+	bra Collision_EntityLoop                      ;01AFE5|80DE    |01AFC5;
 ;      |        |      ;
 ;      |        |      ;
-CODE_01AFE7:
+Collision_EntityNext:
 	pla                                  ;01AFE7|68      |      ;
 	plx                                  ;01AFE8|FA      |      ;
 	plp                                  ;01AFE9|28      |      ;
@@ -6058,14 +6058,14 @@ CODE_01AFE7:
 	rts                                  ;01AFEB|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
-CODE_01AFEC:
+Collision_EntityEnd:
 	plx                                  ;01AFEC|FA      |      ;
 	plp                                  ;01AFED|28      |      ;
 	clc                                  ;01AFEE|18      |      ;
 	rts                                  ;01AFEF|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
-CODE_01AFF0:
+Collision_EntityComplete:
 	php                                  ;01AFF0|08      |      ;
 	phx                                  ;01AFF1|DA      |      ;
 	phy                                  ;01AFF2|5A      |      ;
@@ -6321,7 +6321,7 @@ CODE_01B172:
 	clc                                  ;01B1A3|18      |      ;
 	adc.B #$08                           ;01B1A4|6908    |      ;
 	sta.W $1935                          ;01B1A6|8D3519  |011935;
-	jsr.W CODE_01A808                    ;01B1A9|2008A8  |01A808;
+	jsr.W Entity_CalculateOffset                    ;01B1A9|2008A8  |01A808;
 	plx                                  ;01B1AC|FA      |      ;
 	rts                                  ;01B1AD|60      |      ;
 ;      |        |      ;
@@ -6675,7 +6675,7 @@ CODE_01B3CE:
 	lda.B #$33                           ;01B421|A933    |      ;
 	jsr.W CODE_01BAAD                    ;01B423|20ADBA  |01BAAD;
 	jsr.W CODE_01B73C                    ;01B426|203CB7  |01B73C;
-	jsr.W CODE_01A9EE                    ;01B429|20EEA9  |01A9EE;
+	jsr.W Entity_UpdateSprites                    ;01B429|20EEA9  |01A9EE;
 	jsr.W CODE_01C6A1                    ;01B42C|20A1C6  |01C6A1;
 ;      |        |      ;
 CODE_01B42F:
@@ -6822,7 +6822,7 @@ DATA8_01b551:
 	phb                                  ;01B575|8B      |      ;
 	sep #$20                             ;01B576|E220    |      ;
 	rep #$10                             ;01B578|C210    |      ;
-	jsr.W CODE_01A5AA                    ;01B57A|20AAA5  |01A5AA;
+	jsr.W Object_LoadCompressed                    ;01B57A|20AAA5  |01A5AA;
 	lda.B #$7f                           ;01B57D|A97F    |      ;
 	sta.W $1937                          ;01B57F|8D3719  |011937;
 	ldx.W #$3000                         ;01B582|A20030  |      ;
@@ -7447,7 +7447,7 @@ CODE_01BAAD:
 	adc.W #$0008                         ;01BB23|690800  |      ;
 	tay                                  ;01BB26|A8      |      ;
 	plx                                  ;01BB27|FA      |      ;
-	jsr.W CODE_01AE8A                    ;01BB28|208AAE  |01AE8A;
+	jsr.W Collision_FlagEnd                    ;01BB28|208AAE  |01AE8A;
 	lda.W $192d                          ;01BB2B|AD2D19  |01192D;
 	and.W #$00ff                         ;01BB2E|29FF00  |      ;
 	asl a;01BB31|0A      |      ;
@@ -9298,7 +9298,7 @@ CODE_01CACF:
 	lda.L DATA8_00fdca,x                 ;01CADA|BFCAFD00|00FDCA;
 	tay                                  ;01CADE|A8      |      ;
 	plx                                  ;01CADF|FA      |      ;
-	jsr.W CODE_01AE8A                    ;01CAE0|208AAE  |01AE8A;
+	jsr.W Collision_FlagEnd                    ;01CAE0|208AAE  |01AE8A;
 	lda.W $19e7                          ;01CAE3|ADE719  |0119E7;
 	jsr.W CODE_01B119                    ;01CAE6|2019B1  |01B119;
 	ply                                  ;01CAE9|7A      |      ;
@@ -9467,7 +9467,7 @@ CODE_01CBE3:
 	tay                                  ;01CBF2|A8      |      ;
 	sep #$20                             ;01CBF3|E220    |      ;
 	rep #$10                             ;01CBF5|C210    |      ;
-	jsr.W CODE_01AE8A                    ;01CBF7|208AAE  |01AE8A;
+	jsr.W Collision_FlagEnd                    ;01CBF7|208AAE  |01AE8A;
 ;      |        |      ;
 CODE_01CBFA:
 	sep #$20                             ;01CBFA|E220    |      ;
@@ -9585,13 +9585,13 @@ CODE_01CC98:
 	lda.B $0c,x                          ;01CCA8|B50C    |001A7E;
 	sta.W $1980                          ;01CCAA|8D8019  |011980;
 	phx                                  ;01CCAD|DA      |      ;
-	jsr.W CODE_01AEE7                    ;01CCAE|20E7AE  |01AEE7;
+	jsr.W Collision_TileProperties                    ;01CCAE|20E7AE  |01AEE7;
 	plx                                  ;01CCB1|FA      |      ;
 	lda.W $197f                          ;01CCB2|AD7F19  |01197F;
 	sta.B $0b,x                          ;01CCB5|950B    |001A7D;
 	lda.W $1980                          ;01CCB7|AD8019  |011980;
 	sta.B $0c,x                          ;01CCBA|950C    |001A7E;
-	jsr.W CODE_01AFF0                    ;01CCBC|20F0AF  |01AFF0;
+	jsr.W Collision_EntityComplete                    ;01CCBC|20F0AF  |01AFF0;
 	pld                                  ;01CCBF|2B      |      ;
 	plp                                  ;01CCC0|28      |      ;
 	rts                                  ;01CCC1|60      |      ;
