@@ -785,7 +785,7 @@ VBlank_BattleAlt:
 	plb                                  ;0086B8|AB      |      ;
 	lda.W #$0040                         ;0086B9|A94000  |      ;
 	and.W $00de                          ;0086BC|2DDE00  |0400DE;
-	beq CODE_0086F3                      ;0086BF|F032    |0086F3;
+	beq Battle_PaletteLoadAlt            ;0086BF|F032    |0086F3;
 	lda.W #$0040                         ;0086C1|A94000  |      ;
 	trb.W $00de                          ;0086C4|1CDE00  |0400DE;
 	lda.W $010d                          ;0086C7|AD0D01  |04010D;
@@ -799,7 +799,7 @@ VBlank_BattleAlt:
 	lda.W $0107,x                        ;0086D9|BD0701  |040107;
 	tax                                  ;0086DC|AA      |      ;
 	pha                                  ;0086DD|48      |      ;
-	jsr.W CODE_008751                    ;0086DE|205187  |008751;
+	jsr.W Battle_DoubleVRAMCopy          ;0086DE|205187  |008751;
 	ply                                  ;0086E1|7A      |      ;
 	plb                                  ;0086E2|AB      |      ;
 	clc                                  ;0086E3|18      |      ;
@@ -810,11 +810,11 @@ VBlank_BattleAlt:
 	asl a;0086EC|0A      |      ;
 	asl a;0086ED|0A      |      ;
 	tax                                  ;0086EE|AA      |      ;
-	jsr.W CODE_00876C                    ;0086EF|206C87  |00876C;
+	jsr.W Battle_PaletteCopy             ;0086EF|206C87  |00876C;
 	rtl                                  ;0086F2|6B      |      ;
 ;      |        |      ;
 ;      |        |      ;
-CODE_0086F3:
+Battle_PaletteLoadAlt:
 	lda.W #$6100                         ;0086F3|A90061  |      ;
 	sta.W $2116                          ;0086F6|8D1621  |042116;
 	ldx.W #$9a20                         ;0086F9|A2209A  |      ;
@@ -824,32 +824,32 @@ CODE_0086F3:
 	ldy.W #$0004                         ;008706|A00400  |      ;
 	jsl.L VRAM_ByteCopy                    ;008709|22DF8D00|008DDF;
 	ldx.W $0107                          ;00870D|AE0701  |040107;
-	jsr.W CODE_008751                    ;008710|205187  |008751;
+	jsr.W Battle_DoubleVRAMCopy          ;008710|205187  |008751;
 	lda.W #$6280                         ;008713|A98062  |      ;
 	sta.W $2116                          ;008716|8D1621  |042116;
 	ldx.W $0109                          ;008719|AE0901  |040109;
-	jsr.W CODE_008751                    ;00871C|205187  |008751;
+	jsr.W Battle_DoubleVRAMCopy          ;00871C|205187  |008751;
 	lda.W #$6380                         ;00871F|A98063  |      ;
 	sta.W $2116                          ;008722|8D1621  |042116;
 	ldx.W $010b                          ;008725|AE0B01  |04010B;
-	jsr.W CODE_008751                    ;008728|205187  |008751;
+	jsr.W Battle_DoubleVRAMCopy          ;008728|205187  |008751;
 	plb                                  ;00872B|AB      |      ;
 	lda.W #$d824                         ;00872C|A924D8  |      ;
 	ldx.W #$00c0                         ;00872F|A2C000  |      ;
-	jsr.W CODE_00876F                    ;008732|206F87  |00876F;
+	jsr.W Battle_PaletteHelper           ;008732|206F87  |00876F;
 	ldy.W $0107                          ;008735|AC0701  |000107;
 	ldx.W #$00d0                         ;008738|A2D000  |      ;
-	jsr.W CODE_00876C                    ;00873B|206C87  |00876C;
+	jsr.W Battle_PaletteCopy             ;00873B|206C87  |00876C;
 	ldy.W $0109                          ;00873E|AC0901  |000109;
 	ldx.W #$00e0                         ;008741|A2E000  |      ;
-	jsr.W CODE_00876C                    ;008744|206C87  |00876C;
+	jsr.W Battle_PaletteCopy             ;008744|206C87  |00876C;
 	ldy.W $010b                          ;008747|AC0B01  |00010B;
 	ldx.W #$00f0                         ;00874A|A2F000  |      ;
-	jsr.W CODE_00876C                    ;00874D|206C87  |00876C;
+	jsr.W Battle_PaletteCopy             ;00874D|206C87  |00876C;
 	rtl                                  ;008750|6B      |      ;
 ;      |        |      ;
 ;      |        |      ;
-CODE_008751:
+Battle_DoubleVRAMCopy:
 	phx                                  ;008751|DA      |      ;
 	lda.L $000000,x                      ;008752|BF000000|000000;
 	tax                                  ;008756|AA      |      ;
@@ -863,10 +863,10 @@ CODE_008751:
 	rts                                  ;00876B|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
-CODE_00876C:
+Battle_PaletteCopy:
 	lda.W $0004,y                        ;00876C|B90400  |000004;
 ;      |        |      ;
-CODE_00876F:
+Battle_PaletteHelper:
 	sta.B SNES_DMA5ADDRL-$4300           ;00876F|8552    |004352;
 	txa                                  ;008771|8A      |      ;
 	sep #$20                             ;008772|E220    |      ;
@@ -882,7 +882,7 @@ CODE_00876F:
 	rep #$10                             ;008786|C210    |      ;
 	lda.B #$20                           ;008788|A920    |      ;
 	and.W $00d4                          ;00878A|2DD400  |0200D4;
-	beq CODE_0087CE                      ;00878D|F03F    |0087CE;
+	beq Graphics_HDMASetup               ;00878D|F03F    |0087CE;
 	lda.B #$20                           ;00878F|A920    |      ;
 	trb.W $00d4                          ;008791|1CD400  |0000D4;
 	ldx.W #$54f4                         ;008794|A2F454  |      ;
@@ -890,7 +890,7 @@ CODE_00876F:
 	rep #$30                             ;00879A|C230    |      ;
 	lda.W #$0080                         ;00879C|A98000  |      ;
 	and.W $0ec6                          ;00879F|2DC60E  |000EC6;
-	bne CODE_0087BF                      ;0087A2|D01B    |0087BF;
+	bne Graphics_WindowCopyAlt           ;0087A2|D01B    |0087BF;
 	lda.W #$0024                         ;0087A4|A92400  |      ;
 	sta.L $7f54f4                        ;0087A7|8FF4547F|7F54F4;
 	lda.W #$000b                         ;0087AB|A90B00  |      ;
@@ -899,46 +899,46 @@ CODE_00876F:
 	sta.W $5500                          ;0087B4|8D0055  |7F5500;
 	lda.W #$0009                         ;0087B7|A90900  |      ;
 	mvn $7f,$7f                          ;0087BA|547F7F  |      ;
-	bra CODE_0087CC                      ;0087BD|800D    |0087CC;
+	bra Graphics_WindowCopyDone          ;0087BD|800D    |0087CC;
 ;      |        |      ;
 ;      |        |      ;
-CODE_0087BF:
+Graphics_WindowCopyAlt:
 	lda.W #$0020                         ;0087BF|A92000  |      ;
 	sta.L $7f54f4                        ;0087C2|8FF4547F|7F54F4;
 	lda.W #$0015                         ;0087C6|A91500  |      ;
 	mvn $7f,$7f                          ;0087C9|547F7F  |      ;
 ;      |        |      ;
-CODE_0087CC:
+Graphics_WindowCopyDone:
 	sep #$20                             ;0087CC|E220    |      ;
 ;      |        |      ;
-CODE_0087CE:
+Graphics_HDMASetup:
 	phk                                  ;0087CE|4B      |      ;
 	plb                                  ;0087CF|AB      |      ;
 	lda.B #$40                           ;0087D0|A940    |      ;
 	and.W $00d4                          ;0087D2|2DD400  |0000D4;
-	beq CODE_00883A                      ;0087D5|F063    |00883A;
+	beq Graphics_PaletteEnd              ;0087D5|F063    |00883A;
 	lda.B #$40                           ;0087D7|A940    |      ;
 	trb.W $00d4                          ;0087D9|1CD400  |0000D4;
 	lda.W $1090                          ;0087DC|AD9010  |001090;
-	bmi CODE_00883A                      ;0087DF|3059    |00883A;
+	bmi Graphics_PaletteEnd              ;0087DF|3059    |00883A;
 	pea.W SNES_INIDISP                   ;0087E1|F40021  |002100;
 	pld                                  ;0087E4|2B      |      ;
 	stz.B SNES_VMAINC-$2100              ;0087E5|6415    |002115;
 	ldx.W #$5e1b                         ;0087E7|A21B5E  |      ;
 	lda.B #$02                           ;0087EA|A902    |      ;
 	and.W $00d8                          ;0087EC|2DD800  |0000D8;
-	beq CODE_0087F4                      ;0087EF|F003    |0087F4;
+	beq Graphics_WriteVRAM               ;0087EF|F003    |0087F4;
 	ldx.W #$4b7b                         ;0087F1|A27B4B  |      ;
 ;      |        |      ;
-CODE_0087F4:
+Graphics_WriteVRAM:
 	stx.B SNES_VMADDL-$2100              ;0087F4|8616    |002116;
 	ldx.W #$0000                         ;0087F6|A20000  |      ;
 	lda.B #$80                           ;0087F9|A980    |      ;
 	and.W $10a0                          ;0087FB|2DA010  |0010A0;
-	beq CODE_008803                      ;0087FE|F003    |008803;
+	beq Graphics_LoadData                ;0087FE|F003    |008803;
 	ldx.W #$0003                         ;008800|A20300  |      ;
 ;      |        |      ;
-CODE_008803:
+Graphics_LoadData:
 	lda.W DATA8_008960,x                 ;008803|BD6089  |008960;
 	sta.B SNES_VMDATAL-$2100             ;008806|8518    |002118;
 	lda.W DATA8_008961,x                 ;008808|BD6189  |008961;
@@ -947,7 +947,7 @@ CODE_008803:
 	sta.B SNES_VMDATAL-$2100             ;008810|8518    |002118;
 	lda.B #$02                           ;008812|A902    |      ;
 	and.W $00d8                          ;008814|2DD800  |0000D8;
-	beq CODE_00883A                      ;008817|F021    |00883A;
+	beq Graphics_PaletteEnd              ;008817|F021    |00883A;
 	lda.W DATA8_008960,x                 ;008819|BD6089  |008960;
 	sta.L $7e26f6                        ;00881C|8FF6267E|7E26F6;
 	sta.L $7f16f6                        ;008820|8FF6167F|7F16F6;
@@ -958,11 +958,11 @@ CODE_008803:
 	sta.L $7e26fa                        ;008832|8FFA267E|7E26FA;
 	sta.L $7f16fa                        ;008836|8FFA167F|7F16FA;
 ;      |        |      ;
-CODE_00883A:
+Graphics_PaletteEnd:
 	rep #$30                             ;00883A|C230    |      ;
 	lda.W #$0040                         ;00883C|A94000  |      ;
 	and.W $00d2                          ;00883F|2DD200  |0000D2;
-	beq CODE_0088A7                      ;008842|F063    |0088A7;
+	beq Graphics_CheckColorMath          ;008842|F063    |0088A7;
 	lda.W #$0040                         ;008844|A94000  |      ;
 	trb.W $00d2                          ;008847|1CD200  |0000D2;
 	pea.W $007e                          ;00884A|F47E00  |00007E;
@@ -1015,33 +1015,33 @@ CODE_00883A:
 	jsr.W CODE_0098F1                    ;0088A3|20F198  |0098F1;
 	plb                                  ;0088A6|AB      |      ;
 ;      |        |      ;
-CODE_0088A7:
+Graphics_CheckColorMath:
 	sep #$20                             ;0088A7|E220    |      ;
 	lda.B #$04                           ;0088A9|A904    |      ;
 	and.W $00d8                          ;0088AB|2DD800  |0000D8;
-	beq CODE_0088CA                      ;0088AE|F01A    |0088CA;
+	beq Graphics_ColorMathSetup          ;0088AE|F01A    |0088CA;
 	lda.B #$80                           ;0088B0|A980    |      ;
 	and.W $00e0                          ;0088B2|2DE000  |0000E0;
 	beq CODE_0088C5                      ;0088B5|F00E    |0088C5;
 	lda.B #$40                           ;0088B7|A940    |      ;
 	and.W $00e0                          ;0088B9|2DE000  |0000E0;
-	beq CODE_0088C5                      ;0088BC|F007    |0088C5;
+	beq Graphics_ColorMathDisable        ;0088BC|F007    |0088C5;
 	lda.B #$c8                           ;0088BE|A9C8    |      ;
 	tsb.W $0111                          ;0088C0|0C1101  |000111;
-	bra CODE_0088CA                      ;0088C3|8005    |0088CA;
+	bra Graphics_ColorMathSetup          ;0088C3|8005    |0088CA;
 ;      |        |      ;
 ;      |        |      ;
-CODE_0088C5:
+Graphics_ColorMathDisable:
 	lda.B #$c8                           ;0088C5|A9C8    |      ;
 	trb.W $0111                          ;0088C7|1C1101  |000111;
 ;      |        |      ;
-CODE_0088CA:
+Graphics_ColorMathSetup:
 	lda.B #$80                           ;0088CA|A980    |      ;
 	and.W $00da                          ;0088CC|2DDA00  |0000DA;
-	beq CODE_00890C                      ;0088CF|F03B    |00890C;
+	beq Graphics_HandlePaletteFlags      ;0088CF|F03B    |00890C;
 	lda.B #$08                           ;0088D1|A908    |      ;
 	and.W $00d4                          ;0088D3|2DD400  |0000D4;
-	beq CODE_0088FB                      ;0088D6|F023    |0088FB;
+	beq Graphics_CGRAMSetup              ;0088D6|F023    |0088FB;
 	pea.W $007f                          ;0088D8|F47F00  |00007F;
 	plb                                  ;0088DB|AB      |      ;
 	ldx.W $56d7                          ;0088DC|AED756  |7F56D7;
@@ -1056,7 +1056,7 @@ CODE_0088CA:
 	sta.W $56d6                          ;0088F7|8DD656  |7F56D6;
 	plb                                  ;0088FA|AB      |      ;
 ;      |        |      ;
-CODE_0088FB:
+Graphics_CGRAMSetup:
 	ldx.W #$3200                         ;0088FB|A20032  |      ;
 	stx.W SNES_DMA5PARAM                 ;0088FE|8E5043  |004350;
 	ldx.W #$56ce                         ;008901|A2CE56  |      ;
@@ -1064,10 +1064,10 @@ CODE_0088FB:
 	lda.B #$7f                           ;008907|A97F    |      ;
 	sta.W SNES_DMA5ADDRH                 ;008909|8D5443  |004354;
 ;      |        |      ;
-CODE_00890C:
+Graphics_HandlePaletteFlags:
 	lda.B #$10                           ;00890C|A910    |      ;
 	and.W $00d4                          ;00890E|2DD400  |0000D4;
-	beq CODE_008934                      ;008911|F021    |008934;
+	beq Graphics_CheckWindowFlag         ;008911|F021    |008934;
 	sep #$30                             ;008913|E230    |      ;
 	lda.B #$10                           ;008915|A910    |      ;
 	trb.W $00d4                          ;008917|1CD400  |0000D4;
@@ -1080,27 +1080,27 @@ CODE_00890C:
 	lda.B #$31                           ;00892A|A931    |      ;
 	jsr.W CODE_008956                    ;00892C|205689  |008956;
 	lda.B #$71                           ;00892F|A971    |      ;
-	jsr.W CODE_008956                    ;008931|205689  |008956;
+	jsr.W Graphics_WritePaletteSlot      ;008931|205689  |008956;
 ;      |        |      ;
-CODE_008934:
+Graphics_CheckWindowFlag:
 	rep #$30                             ;008934|C230    |      ;
 	lda.W #$0020                         ;008936|A92000  |      ;
 	and.W $0eac                          ;008939|2DAC0E  |000EAC;
-	bne CODE_00894D                      ;00893C|D00F    |00894D;
+	bne Graphics_WriteHDMAEnable         ;00893C|D00F    |00894D;
 	lda.W #$0001                         ;00893E|A90100  |      ;
 	and.W $00e2                          ;008941|2DE200  |0000E2;
-	beq CODE_00894D                      ;008944|F007    |00894D;
+	beq Graphics_WriteHDMAEnable         ;008944|F007    |00894D;
 	lda.W #$0169                         ;008946|A96901  |      ;
 	sta.L $7e3015                        ;008949|8F15307E|7E3015;
 ;      |        |      ;
-CODE_00894D:
+Graphics_WriteHDMAEnable:
 	sep #$20                             ;00894D|E220    |      ;
 	lda.W $0111                          ;00894F|AD1101  |000111;
 	sta.W SNES_HDMAEN                    ;008952|8D0C42  |00420C;
 	rtl                                  ;008955|6B      |      ;
 ;      |        |      ;
 ;      |        |      ;
-CODE_008956:
+Graphics_WritePaletteSlot:
 	sta.W SNES_CGADD                     ;008956|8D2121  |002121;
 	stx.W SNES_CGDATA                    ;008959|8E2221  |002122;
 	sty.W SNES_CGDATA                    ;00895C|8C2221  |002122;
