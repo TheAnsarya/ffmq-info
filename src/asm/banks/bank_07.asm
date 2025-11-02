@@ -1,4 +1,4 @@
-﻿;      |        |      ;
+;      |        |      ;
 	org $078000                          ;      |        |      ;
 ;      |        |      ;
 ;      |        |      ;
@@ -295,14 +295,14 @@ DATA8_078031:
 	db $0f,$ff,$ff,$ff,$ef,$ff,$ff,$ff,$ff,$ff,$f0,$ff,$00,$27,$3c,$00;079011|        |      ;
 	db $00,$e4,$3c,$00,$00,$27,$3c,$ff,$00,$28,$38,$00,$00,$ff,$00;079021|        |      ;
 ;      |        |      ;
-CODE_079030:
+Anim_ProcessMovementEffects:
 	phd                                  ;079030|0B      |      ;
 	php                                  ;079031|08      |      ;
 	sep #$20                             ;079032|E220    |      ;
 	rep #$10                             ;079034|C210    |      ;
 	lda.W $19ab                          ;079036|ADAB19  |0119AB;
 	cmp.B #$ff                           ;079039|C9FF    |      ;
-	beq CODE_079050                      ;07903B|F013    |079050;
+	beq Anim_Return                      ;07903B|F013    |079050;
 	pea.W $1953                          ;07903D|F45319  |011953;
 	pld                                  ;079040|2B      |      ;
 	ldx.W $19d8                          ;079041|AED819  |0119D8;
@@ -311,27 +311,27 @@ CODE_079030:
 	inx                                  ;079049|E8      |      ;
 	stx.B $02                            ;07904A|8602    |001955;
 	cmp.B #$ff                           ;07904C|C9FF    |      ;
-	bne CODE_079053                      ;07904E|D003    |079053;
+	bne Anim_InitializeLoop                      ;07904E|D003    |079053;
 ;      |        |      ;
-CODE_079050:
+Anim_Return:
 	plp                                  ;079050|28      |      ;
 	pld                                  ;079051|2B      |      ;
 	rtl                                  ;079052|6B      |      ;
 ;      |        |      ;
 ;      |        |      ;
-CODE_079053:
+Anim_InitializeLoop:
 	sta.B $0a                            ;079053|850A    |00195D;
 	ldx.W #$0000                         ;079055|A20000  |      ;
 	stx.B $04                            ;079058|8604    |001957;
 	stx.B $06                            ;07905A|8606    |001959;
 ;      |        |      ;
-CODE_07905C:
+Anim_ProcessTileLoop:
 	sep #$20                             ;07905C|E220    |      ;
 	rep #$10                             ;07905E|C210    |      ;
 	ldx.B $02                            ;079060|A602    |001955;
 	lda.L UNREACH_0CD500,x               ;079062|BF00D50C|0CD500;
 	cmp.B #$ff                           ;079066|C9FF    |      ;
-	beq CODE_079092                      ;079068|F028    |079092;
+	beq Anim_NextColumn                      ;079068|F028    |079092;
 	phx                                  ;07906A|DA      |      ;
 	ldx.B $06                            ;07906B|A606    |001959;
 	lda.L $7fcec8,x                      ;07906D|BFC8CE7F|7FCEC8;
@@ -339,7 +339,7 @@ CODE_07905C:
 	plx                                  ;079073|FA      |      ;
 	lda.L UNREACH_0CD500,x               ;079074|BF00D50C|0CD500;
 	cmp.B $00                            ;079078|C500    |001953;
-	bcs CODE_079092                      ;07907A|B016    |079092;
+	bcs Anim_NextColumn                      ;07907A|B016    |079092;
 	lda.B #$00                           ;07907C|A900    |      ;
 	phx                                  ;07907E|DA      |      ;
 	ldx.B $06                            ;07907F|A606    |001959;
@@ -352,11 +352,11 @@ CODE_07905C:
 	tax                                  ;07908E|AA      |      ;
 	jsr.W (DATA8_0790bb,x)               ;07908F|FCBB90  |0790BB;
 ;      |        |      ;
-CODE_079092:
+Anim_NextColumn:
 	rep #$30                             ;079092|C230    |      ;
 	lda.B $06                            ;079094|A506    |001959;
 	cmp.W #$000e                         ;079096|C90E00  |      ;
-	beq CODE_079050                      ;079099|F0B5    |079050;
+	beq Anim_Return                      ;079099|F0B5    |079050;
 	inc a;07909B|1A      |      ;
 	inc a;07909C|1A      |      ;
 	sta.B $06                            ;07909D|8506    |001959;
@@ -368,13 +368,13 @@ CODE_079092:
 	rep #$10                             ;0790A9|C210    |      ;
 	ldx.B $02                            ;0790AB|A602    |001955;
 ;      |        |      ;
-CODE_0790AD:
+Anim_SkipToNextEffect:
 	lda.L UNREACH_0CD500,x               ;0790AD|BF00D50C|0CD500;
 	inx                                  ;0790B1|E8      |      ;
 	cmp.B #$ff                           ;0790B2|C9FF    |      ;
-	bne CODE_0790AD                      ;0790B4|D0F7    |0790AD;
+	bne Anim_SkipToNextEffect                      ;0790B4|D0F7    |0790AD;
 	stx.B $02                            ;0790B6|8602    |001955;
-	jmp.W CODE_07905C                    ;0790B8|4C5C90  |07905C;
+	jmp.W Anim_ProcessTileLoop                    ;0790B8|4C5C90  |07905C;
 ;      |        |      ;
 ;      |        |      ;
 DATA8_0790bb:
@@ -394,11 +394,11 @@ DATA8_0790bb:
 	lda.L $7fcec9,x                      ;0790DA|BFC9CE7F|7FCEC9;
 	inc a;0790DE|1A      |      ;
 	cmp.B $00                            ;0790DF|C500    |001953;
-	beq CODE_0790E7                      ;0790E1|F004    |0790E7;
-	bcc CODE_0790E7                      ;0790E3|9002    |0790E7;
+	beq Anim_StoreFrameIndex                      ;0790E1|F004    |0790E7;
+	bcc Anim_StoreFrameIndex                      ;0790E3|9002    |0790E7;
 	lda.B #$00                           ;0790E5|A900    |      ;
 ;      |        |      ;
-CODE_0790E7:
+Anim_StoreFrameIndex:
 	sta.L $7fcec9,x                      ;0790E7|9FC9CE7F|7FCEC9;
 	plx                                  ;0790EB|FA      |      ;
 	rep #$30                             ;0790EC|C230    |      ;
@@ -427,7 +427,7 @@ CODE_0790E7:
 	plb                                  ;079114|AB      |      ;
 	lda.W #$0010                         ;079115|A91000  |      ;
 ;      |        |      ;
-CODE_079118:
+Anim_CopyTileData:
 	pha                                  ;079118|48      |      ;
 	lda.L $7fd274,x                      ;079119|BF74D27F|7FD274;
 	sta.W $0000,y                        ;07911D|990000  |7F0000;
@@ -437,7 +437,7 @@ CODE_079118:
 	iny                                  ;079123|C8      |      ;
 	pla                                  ;079124|68      |      ;
 	dec a;079125|3A      |      ;
-	bne CODE_079118                      ;079126|D0F0    |079118;
+	bne Anim_CopyTileData                      ;079126|D0F0    |079118;
 	plb                                  ;079128|AB      |      ;
 	rts                                  ;079129|60      |      ;
 ;      |        |      ;
@@ -446,11 +446,11 @@ CODE_079118:
 	ldx.B $04                            ;07912E|A604    |001957;
 	ldy.W #$0020                         ;079130|A02000  |      ;
 ;      |        |      ;
-CODE_079133:
+Anim_DivideByTwo_Loop:
 	lda.L $7fcdc8,x                      ;079133|BFC8CD7F|7FCDC8;
-	beq CODE_07914E                      ;079137|F015    |07914E;
+	beq Anim_DivideByTwo_Next                      ;079137|F015    |07914E;
 	cmp.B #$ff                           ;079139|C9FF    |      ;
-	beq CODE_07914E                      ;07913B|F011    |07914E;
+	beq Anim_DivideByTwo_Next                      ;07913B|F011    |07914E;
 	pha                                  ;07913D|48      |      ;
 	and.B #$01                           ;07913E|2901    |      ;
 	clc                                  ;079140|18      |      ;
@@ -463,10 +463,10 @@ CODE_079133:
 	adc.B $00                            ;079148|6500    |001953;
 	sta.L $7fcdc8,x                      ;07914A|9FC8CD7F|7FCDC8;
 ;      |        |      ;
-CODE_07914E:
+Anim_DivideByTwo_Next:
 	inx                                  ;07914E|E8      |      ;
 	dey                                  ;07914F|88      |      ;
-	bne CODE_079133                      ;079150|D0E1    |079133;
+	bne Anim_DivideByTwo_Loop                      ;079150|D0E1    |079133;
 	rts                                  ;079152|60      |      ;
 ;      |        |      ;
 	sep #$20                             ;079153|E220    |      ;
@@ -474,27 +474,27 @@ CODE_07914E:
 	ldx.B $04                            ;079157|A604    |001957;
 	ldy.W #$0020                         ;079159|A02000  |      ;
 ;      |        |      ;
-CODE_07915C:
+Anim_MultiplyByTwo_Loop:
 	lda.L $7fcdc8,x                      ;07915C|BFC8CD7F|7FCDC8;
-	beq CODE_07916F                      ;079160|F00D    |07916F;
+	beq Anim_MultiplyByTwo_Next                      ;079160|F00D    |07916F;
 	cmp.B #$ff                           ;079162|C9FF    |      ;
-	beq CODE_07916F                      ;079164|F009    |07916F;
+	beq Anim_MultiplyByTwo_Next                      ;079164|F009    |07916F;
 	stz.B $00                            ;079166|6400    |001953;
 	asl a;079168|0A      |      ;
 	adc.B $00                            ;079169|6500    |001953;
 	sta.L $7fcdc8,x                      ;07916B|9FC8CD7F|7FCDC8;
 ;      |        |      ;
-CODE_07916F:
+Anim_MultiplyByTwo_Next:
 	inx                                  ;07916F|E8      |      ;
 	dey                                  ;079170|88      |      ;
-	bne CODE_07915C                      ;079171|D0E9    |07915C;
+	bne Anim_MultiplyByTwo_Loop                      ;079171|D0E9    |07915C;
 	rts                                  ;079173|60      |      ;
 ;      |        |      ;
 	rep #$30                             ;079174|C230    |      ;
 	ldx.B $04                            ;079176|A604    |001957;
 	ldy.W #$0002                         ;079178|A00200  |      ;
 ;      |        |      ;
-CODE_07917B:
+Anim_RotateLeft_Loop:
 	lda.L $7fcdc8,x                      ;07917B|BFC8CD7F|7FCDC8;
 	sta.B $00                            ;07917F|8500    |001953;
 	lda.L $7fcdca,x                      ;079181|BFCACD7F|7FCDCA;
@@ -518,14 +518,14 @@ CODE_07917B:
 	adc.W #$0010                         ;0791C1|691000  |      ;
 	tax                                  ;0791C4|AA      |      ;
 	dey                                  ;0791C5|88      |      ;
-	bne CODE_07917B                      ;0791C6|D0B3    |07917B;
+	bne Anim_RotateLeft_Loop                      ;0791C6|D0B3    |07917B;
 	rts                                  ;0791C8|60      |      ;
 ;      |        |      ;
 	rep #$30                             ;0791C9|C230    |      ;
 	ldx.B $04                            ;0791CB|A604    |001957;
 	ldy.W #$0002                         ;0791CD|A00200  |      ;
 ;      |        |      ;
-CODE_0791D0:
+Anim_RotateRight_Loop:
 	lda.L $7fcdd6,x                      ;0791D0|BFD6CD7F|7FCDD6;
 	sta.B $00                            ;0791D4|8500    |001953;
 	lda.L $7fcdd4,x                      ;0791D6|BFD4CD7F|7FCDD4;
@@ -549,7 +549,7 @@ CODE_0791D0:
 	adc.W #$0010                         ;079216|691000  |      ;
 	tax                                  ;079219|AA      |      ;
 	dey                                  ;07921A|88      |      ;
-	bne CODE_0791D0                      ;07921B|D0B3    |0791D0;
+	bne Anim_RotateRight_Loop                      ;07921B|D0B3    |0791D0;
 	rts                                  ;07921D|60      |      ;
 ;      |        |      ;
 	db $17,$02,$f1,$00,$f0,$00,$f0,$00,$f0,$00,$f0,$00,$f0,$00,$f0,$00;07921E|        |      ;
