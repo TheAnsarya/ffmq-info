@@ -1,4 +1,4 @@
-﻿; ==============================================================================
+; ==============================================================================
 ; Final Fantasy Mystic Quest - Bank $00 - Main Game Engine
 ; ==============================================================================
 ; This bank contains the core game engine including:
@@ -4969,14 +4969,14 @@ Palette_Load8Colors:
 ; routines. These are small inline subroutines stored as raw bytes.
 ;===============================================================================
 
-DATA_008FDF:
+CoordHelper_EmbeddedCode:
 ; ===========================================================================
 ; Embedded Helper Subroutine ($008fdf-$009013)
 ; ===========================================================================
 ; Small helper routine stored as data bytes
 ; Appears to handle coordinate/offset calculations
 ; ===========================================================================
-DATA_008FDF_bytes:
+CoordHelper_Bytes:
 	db											 $08,$0b,$c2,$30,$da,$48,$3b,$38,$e9,$02,$00,$1b,$5b,$e2,$20,$a5
 	db											 $04,$85,$02,$64,$04,$a9,$00,$c2,$30,$a2,$08,$00,$c6,$03,$0a,$06
 	db											 $01,$90,$02,$65,$03,$ca,$d0,$f6,$85,$03,$3b,$18,$69,$02,$00,$1b
@@ -11671,7 +11671,7 @@ UNREACH_00B7B5:
 ; Format: Unknown structure for menu system
 ; Used by: CODE_009BC4 (menu update routine)
 ;-------------------------------------------------------------------------------
-DATA_00B7DD:
+MenuDisplayConfig:
 	db											 $2b,$8d,$03,$04,$00,$8f,$03,$00,$00,$01,$00,$08,$00,$09,$00,$42
 	db											 $4b,$5a,$00,$00,$03,$16,$00,$11,$00,$00,$00,$00,$00,$00,$00,$00
 	db											 $00,$00,$17,$00,$00,$00,$00,$00,$e0,$00,$cc,$20,$0e,$00,$00,$ff
@@ -12031,7 +12031,7 @@ UNREACH_00B9E0:
 	db											 $00,$4c,$a0,$b9
 ; STX $05; JSR Anim_SetMode10; SEP #$30; (sprite setup code)
 
-DATA_00BA14:
+MenuConfig_TitleScreen:
 	db											 $38,$ac,$03,$0b,$95,$03 ; Menu configuration data
 
 ;-------------------------------------------------------------------------------
@@ -12153,10 +12153,10 @@ CharName_UpdateDisplay:
 	jsr.W				   CODE_009BC4 ; Update menu
 	bra					 CharName_InputLoop ; Loop
 
-DATA_00BAE7:
+MenuConfig_CharName1:
 	db											 $ca,$ac,$03 ; Menu configuration
 
-DATA_00BAEA:
+MenuConfig_CharName2:
 	db											 $34,$ad,$03,$21,$ad,$03 ; Menu configuration
 
 ;-------------------------------------------------------------------------------
@@ -12502,7 +12502,7 @@ Screen_UpdateFull:
 	plp							   ; Restore processor status
 RTS_Label:
 
-DATA_00BD61:
+SystemData_Config1:
 	db											 $f2,$82,$03 ; Configuration data
 
 ;-------------------------------------------------------------------------------
@@ -12544,12 +12544,12 @@ INX_Label:
 RTS_Label:
 
 ;-------------------------------------------------------------------------------
-; DATA_00BD99: Character display tilemap data
+; SystemData_Config2: Character display tilemap data
 ;
 ; Purpose: Tile numbers for character name/stats display
 ; Format: 32 tile numbers (1 byte each)
 ;-------------------------------------------------------------------------------
-DATA_00BD99:
+SystemData_Config2:
 	db											 $08,$0a,$09,$0b,$08,$09,$0a,$0b,$10,$11,$12,$13,$18,$19,$1a,$1b
 	db											 $10,$11,$12,$13,$28,$29,$2a,$2b,$10,$11,$12,$13,$38,$39,$3a,$3b
 
@@ -12638,22 +12638,22 @@ Menu_Handler_Update:
 	jsr.W				   CODE_009BC4 ; Update menu
 	bra					 Menu_Handler_Loop ; Loop
 
-DATA_00BE38:
+SystemData_Config3:
 	db											 $02,$04	 ; Configuration data
 
-DATA_00BE3A:
+SystemData_Config4:
 	db											 $2b,$bf,$03,$06,$02,$00,$04,$00,$06,$00,$08,$00,$04,$01,$06,$01
 	db											 $00,$00,$02,$00,$04,$00,$06,$00,$08,$00,$04,$01,$06,$01,$00,$02
 	db											 $02,$02,$04,$02,$06,$02,$08,$02,$04,$03,$06,$03
 
-DATA_00BE66:
+SystemData_Config5:
 	db											 $1c,$bf,$80,$00,$11,$0e,$11,$0e,$30,$70,$80,$00,$2f,$03,$2e,$03
 	db											 $00,$00,$80,$00
 
-DATA_00BE7A:
+SystemData_Config6:
 	db											 $78,$be,$03,$6b,$be,$03,$38,$be,$03
 
-DATA_00BE83:
+SystemData_Config7:
 	db											 $7a,$be,$03,$3a,$be,$03,$66,$be,$03
 
 ;-------------------------------------------------------------------------------
@@ -12772,10 +12772,10 @@ RTS_Label:
 UNREACH_00BEBB:
 	db											 $a9,$01,$00,$1c,$d8,$00,$60 ; LDA #$0001; TRB $00d8; RTS
 
-DATA_00BEC2:
+SystemData_Config8:
 	db											 $d8,$00,$03,$c2,$00,$03,$f5,$00,$03
 
-DATA_00BECB:
+SystemData_Config9:
 	db											 $f2,$82,$03
 
 LOOSE_OP_00BECE:
@@ -12828,7 +12828,7 @@ UNREACH_00BF1B:
 	db											 $20,$1c,$b9,$a9,$ff,$ff,$85,$01,$9c,$8e,$00,$60
 ; JSR Anim_SetMode10; LDA #$ffff; STA $01; STZ $8e; RTS
 
-DATA_00BF27:
+SystemData_Config10:
 	db											 $00		 ; Padding
 
 Menu_MultiOption_Process:
@@ -12862,7 +12862,7 @@ Menu_Item_CleanupReturn:
 	plp							   ; Restore processor status
 RTS_Label:
 
-DATA_00BF48:
+SystemData_Config11:
 	db											 $9b,$8f,$03 ; Menu configuration
 
 ;-------------------------------------------------------------------------------
@@ -12999,7 +12999,7 @@ Menu_Item_ConfirmDiscard:
 	cmp.W				   #$0001	; Check if confirmed
 RTS_Label:
 
-DATA_00C02F:
+SystemData_Config12:
 	db											 $e8,$8f,$03,$dd,$8f,$03,$8a,$8f,$03
 
 ;-------------------------------------------------------------------------------
@@ -13224,7 +13224,7 @@ Menu_Spell_ConfirmUse:
 	cmp.W				   #$00ff	; Check if cancelled
 RTS_Label:
 
-DATA_00C1D3:
+SystemData_Config13:
 	db											 $3a,$90,$03,$dd,$8f,$03
 
 ;-------------------------------------------------------------------------------
@@ -13438,7 +13438,7 @@ Menu_BattleSettings_SetBlue_Store:
 	tsb.W				   $0e9c	 ; Set blue bits
 	bra					 Menu_BattleSettings_Commit ; Update display
 
-DATA_00C339:
+SystemData_Config14:
 	db											 $1f		 ; Blue data
 DATA8_00c339:
 	db											 $1f		 ; Blue data
@@ -13447,7 +13447,7 @@ DATA8_00c33a:
 DATA8_00c33b:
 	db											 $78,$3f,$20,$58,$5f,$20,$38,$7f,$38,$00
 
-DATA_00C345:
+SystemData_Config15:
 	db											 $94,$92,$03
 
 ;-------------------------------------------------------------------------------
@@ -13522,7 +13522,7 @@ Menu_SaveDelete_UpdateDisplay:
 	rep					 #$30		; 16-bit A/X/Y
 	jmp.W				   Menu_SaveDelete_InputLoop ; Jump back to loop
 
-DATA_00C3D8:
+SystemData_Config16:
 	db											 $c3,$95,$03
 
 ;-------------------------------------------------------------------------------
@@ -13589,10 +13589,10 @@ Menu_Scroll_Display:
 	jsr.W				   CODE_009BC4 ; Update menu
 	bra					 Menu_Scroll_InputLoop ; Loop
 
-DATA_00C441:
+SystemData_Config17:
 	db											 $8e,$90,$03
 
-DATA_00C444:
+SystemData_Config18:
 	db											 $47,$91,$03
 
 ;-------------------------------------------------------------------------------
@@ -13647,10 +13647,10 @@ Menu_Scroll2_Display:
 	jsr.W				   CODE_009BC4 ; Update menu
 	bra					 Menu_Scroll2_InputLoop ; Loop
 
-DATA_00C49C:
+SystemData_Config19:
 	db											 $e3,$91,$03
 
-DATA_00C49F:
+SystemData_Config20:
 	db											 $47,$91,$03
 
 ;-------------------------------------------------------------------------------
@@ -13681,7 +13681,7 @@ Menu_WaitInput_Confirm:
 	stz.B				   $8e	   ; Clear position
 RTS_Label:
 
-DATA_00C4D8:
+SystemData_Config21:
 	db											 $d1,$9c,$03
 ;===============================================================================
 ; WRAM Buffer Management & Screen Setup (CODE_00C4DB - CODE_00C7DD)
@@ -13716,7 +13716,7 @@ WRAM_BattleMenu_Init:
 	rep					 #$30		; 16-bit A/X/Y
 RTS_Label:
 
-DATA_00C51B:
+SystemData_Config22:
 	db											 $ff,$07,$50,$d9,$05,$51,$00,$42,$0e,$00,$50,$7f,$07,$50,$7f,$ff
 	db											 $6e,$53,$d9,$6c,$54,$00,$42,$10,$67,$53,$7f,$6e,$53,$7f
 
@@ -13811,7 +13811,7 @@ WRAM_SetupBattleSprites2:
 WRAM_SetupBattleSprites2_Continue:
 	jmp.W				   WRAM_SetupSprites ; Jump to sprite setup
 
-DATA_00C5E7:
+SystemData_Config23:
 	db											 $0c,$20,$06,$24,$06,$26,$08,$28,$00
 	db											 $18,$20,$08,$28,$00
 
@@ -13823,7 +13823,7 @@ WRAM_SetupBattleSprites1:
 	ldx.W				   #$c601	; Data pointer
 	jmp.W				   WRAM_SetupSprites ; Jump to sprite setup
 
-DATA_00C601:
+SystemData_Config24:
 	db											 $20,$28,$00
 
 WRAM_FillData_Jump:
@@ -13902,7 +13902,7 @@ Battle_SetupSprites1:
 	plb							   ;00C684|AB      |      ;
 	rts							   ;00C685|60      |      ;
 
-DATA_00C686:
+SystemData_Config25:
 	db											 $0c,$04,$18,$08,$00 ;00C686|        |      ;
 
 Battle_SetupSprites2:
@@ -13918,10 +13918,10 @@ Battle_SetupSprites2:
 	plb							   ;00C6A4|AB      |      ;
 	rts							   ;00C6A5|60      |      ;
 
-DATA_00C6A6:
+SystemData_Config26:
 	db											 $0c,$04,$0c,$08,$1c,$0c,$1c,$10,$1c,$14,$10,$18,$00 ;00C6A6|        |      ;
 
-DATA_00C6B3:
+SystemData_Config27:
 	db											 $1c,$04,$10,$08,$00 ;00C6B3|        |      ;
 
 Battle_SetupSprites3:
@@ -13937,10 +13937,10 @@ Battle_SetupSprites3:
 	plb							   ;00C6D1|AB      |      ;
 	rts							   ;00C6D2|60      |      ;
 
-DATA_00C6D3:
+SystemData_Config28:
 	db											 $0c,$04,$00 ;00C6D3|        |      ;
 
-DATA_00C6D6:
+SystemData_Config29:
 	db											 $0c,$04,$14,$08,$0c,$0c,$34,$10,$0c,$14,$0c,$18,$0c ;00C6D6|        |      ;
 	db											 $1c,$08,$20,$00 ;00C6E3|        |      ;
 
@@ -13977,10 +13977,10 @@ SaveData_ProcessFlag:
 SaveData_FlagDone:
 	rts							   ;00C73E|60      |      ;
 
-DATA_00C73F:
+SystemData_Config30:
 	db											 $3c,$04,$38,$08,$00 ;00C73F|        |      ;
 
-DATA_00C744:
+SystemData_Config31:
 	db											 $06,$04,$06,$06,$0c,$08,$24,$0c,$06,$10,$06,$12,$0c,$14,$24,$18 ;00C744|        |      ;
 	db											 $06,$1c,$06,$1e,$08,$20,$00 ;00C754|        |      ;
 ; ==============================================================================
@@ -14226,7 +14226,7 @@ Screen_EffectLoop:
 ; ==============================================================================
 
 ; Save file data table pointers
-DATA_00C8E3:
+SystemData_Config32:
 	db											 $a7,$8f,$03,$f2,$aa,$03,$55,$ab,$03,$aa,$92,$03,$14,$93,$03,$19 ;00C8E3|        |      ;
 	db											 $93,$03,$1f,$93,$03,$28,$93,$03,$33,$93,$03,$3c,$93,$03,$42,$93 ;00C8F3|        |      ;
 	db											 $03,$4b,$93,$03,$57,$93,$03,$60,$93,$03,$a9,$93,$03,$ae,$93,$03 ;00C903|        |      ;
@@ -14597,7 +14597,7 @@ GameState_DataCopy:
 	tsb.W				   $00d4	 ;00CBB9|0CD400  |0000D4;
 	rts							   ;00CBBC|60      |      ;
 
-DATA_00CBBD:
+SystemData_Config33:
 	db											 $27,$ec,$3c,$ec,$3c,$ec,$38,$ec,$00 ;00CBBD|        |      ;
 
 Screen_FadeSetup:

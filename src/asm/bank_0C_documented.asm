@@ -1,4 +1,4 @@
-﻿; ==============================================================================
+; ==============================================================================
 ; Bank $0C - Display and Graphics Management
 ; ==============================================================================
 ; This bank contains executable code for screen management, graphics transfers,
@@ -3444,7 +3444,7 @@ CODE_0CA453:
 ; Format: 15-bit color values (%0BBBBBGGGGGRRRRR)
 ; Used by PPU for sprite and background rendering
 ; ==============================================================================
-DATA_0CBC7A:
+PaletteData_RGB555:
 ; Color values for various graphics elements
 	db											 $EE,$D5,$E5,$F6,$AF,$D6,$43,$97,$22,$91,$72,$57,$D8,$31,$21,$DF ;0CBC7A-0CBC89; RGB555 palette
 	db											 $FF,$FF,$FF,$FF,$FF,$B9,$FF,$FF,$04,$1A,$00,$00,$00,$00,$20,$D0 ;0CBC8A-0CBC99; Additional colors
@@ -3455,12 +3455,12 @@ DATA_0CBC7A:
 ; 4bpp tile data, format: 2 bytes per row, 8 rows per 8×8 tile
 ; Used for sprite/background rendering
 ; ==============================================================================
-DATA_0CBC9A:
+GraphicsPattern_Tiles1:
 	db											 $00,$00,$00,$00,$02,$0D,$00,$00,$1E,$00,$00,$F0,$00,$00,$0F,$00 ;0CBC9A|        |      ;
 	db											 $08,$06,$10,$00,$00,$00,$60,$10,$80,$00,$00,$00,$04,$03,$08,$00 ;0CBCAA|        |      ;
 	db											 $0E,$10,$00,$70,$80,$00,$07,$08 ;0CBCBA|        |      ; Graphics pattern
 
-DATA_0CBCC2:
+GraphicsPattern_Tiles2:
 ; Tile pattern data - multiple 8×8 tiles
 	db											 $FE,$FE,$94,$94,$FE,$FE,$F0,$F0,$FC,$FC,$FC,$FC,$D4,$D4,$FE,$FE ;0CBCC2|        |      ;
 	db											 $FE,$94,$FE,$F0,$FC,$FC,$D4,$FE,$F8,$F8,$20,$20,$20,$20,$D8,$D8 ;0CBCD2|        |      ;
@@ -3479,13 +3479,13 @@ DATA_0CBCC2:
 ; ==============================================================================
 ; DATA: Additional Color Palette Data
 ; ==============================================================================
-DATA_0CBD6A:
+PaletteData_Extended:
 	db											 $20,$7E,$35,$3E,$D2,$31,$6F,$25,$0C,$19,$A9,$0C,$4A,$29,$BD,$77 ;0CBD6A|        |      ;
 	db											 $5A,$6B,$B5,$56,$60,$7F,$00,$7F,$40,$72,$A0,$51,$A0,$51,$40,$72 ;0CBD7A|        |      ;
 	db											 $D2,$31,$6F,$25,$0C,$19,$A9,$0C,$4A,$29,$AD,$3D,$9C,$73,$16,$67 ;0CBD8A|        |      ;
 	db											 $50,$4E	 ;0CBD9A|        |      ; Palette entries
 
-DATA_0CBD9C:
+ColorData_Complex:
 	db											 $D8,$01,$80,$59,$40,$24,$00,$02,$00,$6C,$02,$01,$04,$2B,$01,$5E ;0CBD9C|        |      ;
 	db											 $43,$3C,$0F,$71,$3E,$C7,$02,$EE,$14,$B1,$69,$22,$08,$31,$00,$10 ;0CBDAC|        |      ;
 	db											 $00,$8E,$80,$6C,$40,$90,$E0,$40,$C0,$C0,$80,$00,$00,$00 ;0CBDBC|        |      ; Color data
@@ -3495,7 +3495,7 @@ DATA_0CBD9C:
 ; ==============================================================================
 ; Multi-byte patterns for sprite rendering with bitplane structure
 ; ==============================================================================
-DATA_0CBDCA:
+SpritePattern_Bitplane:
 	db											 $10,$DF,$7E,$18,$02,$04,$00,$00,$00,$01,$00,$03,$01,$06,$03,$04 ;0CBDCA|        |      ;
 	db											 $07,$08,$0F,$31,$1E,$23,$3E,$47,$00,$00,$01,$02,$04,$08,$10,$20 ;0CBDDA|        |      ;
 	db											 $7C,$8E,$F8,$1C,$F0,$38,$C0,$70,$C0,$E0,$80,$C0,$00,$80,$00,$00 ;0CBDEA|        |      ;
@@ -3523,7 +3523,7 @@ DATA_0CBDCA:
 ; $FF = special command (precedes certain entries)
 ; Characters: $9A-$D1 map to uppercase/lowercase letters
 ; ==============================================================================
-DATA_0CBECC:
+LocationNames_Text:
 ; Location/dungeon names
 	db											 $B0,$C2,$C5,$BF,$B7,$03,$03,$03,$03,$03,$03,$03,$03,$03,$03,$03 ;0CBECC|        | "WORLD"
 	db											 $9F,$C2,$B6,$C8,$C6,$FF,$AD,$C2,$CA,$B8,$C5,$03,$03,$03,$03,$03 ;0CBEDC|        | "FOCUS TOWER"
@@ -3568,7 +3568,7 @@ DATA_0CBECC:
 ; ==============================================================================
 ; DATA: Menu/UI Text Strings
 ; ==============================================================================
-DATA_0CC11C:
+TextData_Extended1:
 ; Menu options and UI labels
 	db											 $03,$03,$03,$9E,$BF,$BC,$CB,$BC,$C5,$03,$03,$03,$03 ;0CC11C|        | "  ELIXIR   "
 	db											 $AD,$C5,$B8,$B8,$FF,$B0,$BC,$C7,$BB,$B8,$C5,$03,$03 ;0CC129|        | "TREE WITHER"
@@ -3590,7 +3590,7 @@ DATA_0CC11C:
 ; ==============================================================================
 ; DATA: Item/Action Text Strings
 ; ==============================================================================
-DATA_0CC1DC:
+TextData_Extended2:
 	db											 $03,$9C,$C8,$C5,$B8,$FF,$A9,$C2,$C7,$BC,$C2,$C1,$03 ;0CC1DC|        | " CURE POTION"
 	db											 $A1,$B8,$B4,$BF,$FF,$A9,$C2,$C7,$BC,$C2,$C1,$03,$03,$03,$03 ;0CC1E9|        | "HEAL POTION"
 	db											 $AC,$B8,$B8,$B7,$03,$03,$03,$03,$03,$03 ;0CC1F8|        | "SEED"
@@ -3611,7 +3611,7 @@ DATA_0CC1DC:
 ; ==============================================================================
 ; DATA: Equipment/Weapon Names
 ; ==============================================================================
-DATA_0CC29B:
+TextData_Extended3:
 	db											 $03,$AC,$C7,$B8,$B8,$BF,$FF,$AC,$CA,$C2,$C5,$B7 ;0CC29B|        | " STEEL SWORD"
 	db											 $A4,$C1,$BC,$BA,$BB,$C7,$FF,$AC,$CA,$C2,$C5,$B7,$03 ;0CC2A7|        | "KNIGHT SWORD"
 	db											 $03,$9E,$CB,$B6,$B4,$BF,$BC,$B5,$C8,$C5,$03,$03,$03,$03,$03,$03 ;0CC2B4|        | " EXCALIBUR"
@@ -3631,7 +3631,7 @@ DATA_0CC29B:
 ; - Stats/attributes (bytes 15+)
 ; ==============================================================================
 
-DATA_0CD0C0:
+DataTable_Config1:
 ; Entity configuration entry 1
 	db											 $01,$00,$00,$00,$28,$00,$28,$00,$03,$01,$00,$03,$01,$00,$00,$00 ;0CD0C0|        |      ;
 	db											 $00,$00,$07,$0C,$08,$0A,$07,$06,$08,$0A,$00,$06,$00,$00,$00,$00 ;0CD0D0|        |      ;
@@ -3640,7 +3640,7 @@ DATA_0CD0C0:
 ; Name: "Kaeli"
 	db											 $A4,$B4,$B8,$BF,$BC,$03,$03,$03,$03,$03,$03,$03,$03,$03,$03,$03 ;0CD100|        |      ;
 
-DATA_0CD110:
+DataTable_Config2:
 ; Entity configuration entry 2
 	db											 $03,$00,$00,$00,$78,$00,$78,$00,$03,$00,$00,$03,$00,$00,$00,$00 ;0CD110|        |      ;
 	db											 $81,$00,$0B,$1D,$0B,$0E,$0B,$0B,$0B,$09,$00,$12,$00,$05,$00,$00 ;0CD120|        |      ;
@@ -3649,7 +3649,7 @@ DATA_0CD110:
 ; Name: "Tristam"
 	db											 $AD,$C5,$BC,$C6,$C7,$B4,$C0,$03,$03,$03,$03,$03,$03,$03,$03,$03 ;0CD150|        |      ;
 
-DATA_0CD160:
+DataTable_Config3:
 ; Entity configuration entry 3
 	db											 $07,$00,$00,$00,$68,$01,$68,$01,$07,$00,$00,$07,$00,$00,$00,$00 ;0CD160|        |      ;
 	db											 $82,$00,$1C,$20,$21,$10,$17,$0A,$1C,$10,$05,$16,$05,$00,$00,$00 ;0CD170|        |      ;
@@ -3658,7 +3658,7 @@ DATA_0CD160:
 ; Name: "Phoebe"
 	db											 $A9,$BB,$C2,$B8,$B5,$B8,$03,$03,$03,$03,$03,$03,$03,$03,$03,$03 ;0CD1A0|        |      ;
 
-DATA_0CD1B0:
+DataTable_Config4:
 ; Entity configuration entry 4
 	db											 $0F,$00,$00,$00,$A8,$02,$A8,$02,$15,$0A,$05,$15,$0A,$05,$00,$00 ;0CD1B0|        |      ;
 	db											 $83,$00,$2F,$24,$24,$36,$2F,$14,$24,$31,$00,$10,$00,$05,$00,$00 ;0CD1C0|        |      ;
