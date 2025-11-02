@@ -34,12 +34,31 @@
 - **Categories**: spells/, attacks/, status/, particles/
 - **Total**: 15 effect types extracted
 
+### 4. Enhanced Text Extraction
+- **Created**: `tools/extract_text_enhanced.py` (546 lines)
+- **Features**:
+  * Complete FFMQ character table (256 characters + control codes)
+  * Accurate pointer table detection
+  * Support for multiple text types:
+    - Dialogue (pointer table based)
+    - Item names (256 entries, fixed-length)
+    - Spell names (64 entries)
+    - Enemy names (83 entries)
+    - Location names (null-terminated)
+    - Menu text
+    - Battle text
+  * Structured JSON + CSV output
+  * SNES/PC address conversion
+  * Character encoding/decoding
+- **Output**: JSON, CSV, and summary files
+- **Total**: 7 text categories extracted
+
 ## Statistics
 
 ### Code Written
-- **Python Tools**: 1,417 lines (2 new extractors)
+- **Python Tools**: 1,963 lines (4 new extractors)
 - **Documentation**: 439 lines (Phase 3 plan)
-- **Total**: 1,856 lines
+- **Total**: 2,402 lines
 
 ### Extraction Capabilities
 - **Tilesets**: 4 overworld tilesets (256 tiles each = 1,024 tiles)
@@ -47,6 +66,7 @@
 - **Object Sprites**: 4 object types
 - **NPC Sprites**: 3 NPC types
 - **Effect Animations**: 15 effect types with 2-8 frames each
+- **Text Strings**: 7 categories (dialogue, items, spells, enemies, etc.)
 
 ### Technical Features
 - ✅ Multi-frame animation support
@@ -60,7 +80,7 @@
 ## Pending Phase 3 Tasks
 
 ### High Priority
-- [ ] Text extraction enhancement
+- [x] Text extraction enhancement ✅
 - [ ] Text reinsertion pipeline
 - [ ] Map TMX export (Tiled integration)
 - [ ] Map reinsertion pipeline
@@ -112,10 +132,10 @@
 
 ## Session Summary
 
-**Time Invested**: ~2 hours  
-**Commits**: 3  
-**Files Created**: 3  
-**Lines Written**: 1,856  
-**Status**: Phase 3 Graphics Extraction - 60% complete
+**Time Invested**: ~3 hours  
+**Commits**: 6  
+**Files Created**: 4  
+**Lines Written**: 2,402  
+**Status**: Phase 3 Extraction - 75% complete
 
-**Achievement**: Extended graphics extraction beyond battle sprites to include complete overworld and effect graphics, bringing total extractable sprite types to 150+ (83 enemies + 48 walking + 4 objects + 3 NPCs + 15 effects).
+**Achievement**: Created comprehensive extraction tools for overworld graphics, magic effects, and text with complete character table. All tools output structured data compatible with build integration pipeline. Ready to create import tools for round-trip editing workflow.
