@@ -13,17 +13,17 @@
 ;   - Handles sound effect triggers
 ; ===========================================================================
 
-CODE_009264:
+Menu_ProcessCommands:
 	sep					 #$30		; 8-bit A,X,Y
 
 ; Check if menu command processing enabled
 	lda.B				   #$20	  ; Bit 5 = menu active
 	and.W				   $00d9	 ; Check display flags
-	bne					 CODE_009270 ; If set, skip processing
+	bne					 Menu_ProcessCommands_Skip ; If set, skip processing
 
-	jsr.W				   CODE_009273 ; Process menu command
+	jsr.W				   Menu_ProcessCommandQueue ; Process menu command
 
-CODE_009270:
+Menu_ProcessCommands_Skip:
 	rep					 #$30		; 16-bit A,X,Y
 	rts							   ; Return
 
@@ -37,7 +37,7 @@ CODE_009270:
 ;   - Manages CLI/SEI for timing-critical operations
 ; ===========================================================================
 
-CODE_009273:
+Menu_ProcessCommandQueue:
 	rep					 #$10		; 16-bit X,Y
 
 ; Set menu processing flag
@@ -53,11 +53,11 @@ CODE_009273:
 ; Check if cutscene mode active
 	lda.B				   #$04	  ; Bit 2
 	and.W				   $00e2	 ; Check cutscene flags
-	bne					 CODE_0092A3 ; If set, skip command 0
+	bne					 Menu_ProcessCommand1 ; If set, skip command 0
 
 ; Process Command 0 (primary menu action)
 	lda.B				   $00	   ; Get command 0 (DP $0500)
-	bmi					 CODE_0092A3 ; If negative, skip (no command)
+	bmi					 Menu_ProcessCommand1 ; If negative, skip (no command)
 
 	sta.W				   $0601	 ; Store to command execution register
 
@@ -76,7 +76,7 @@ CODE_009273:
 	ldx.B				   $03	   ; Get result parameter (DP $0503)
 	stx.B				   $01	   ; Store back to parameter slot
 
-CODE_0092A3:
+Menu_ProcessCommand1:
 ; Process Command 1 (secondary menu action)
 	lda.B				   $05	   ; Get command 1 (DP $0505)
 	bmi					 CODE_0092C2 ; If negative, skip
@@ -99,28 +99,28 @@ CODE_0092A3:
 	ldx.B				   $08	   ; Get result (DP $0508)
 	stx.B				   $06	   ; Store back
 
-CODE_0092C2:
+Menu_ProcessCommand2:
 ; Process Command 2 (special actions)
 	lda.B				   $0a	   ; Get command 2 (DP $050a)
-	beq					 CODE_0092E9 ; If zero, skip
+	beq					 Menu_CommandCleanup ; If zero, skip
 
 ; Check command type
 	cmp.B				   #$02	  ; Compare to type 2
-	beq					 CODE_0092D9 ; If equal, execute directly
+	beq					 Menu_ExecuteCommand2 ; If equal, execute directly
 
 	cmp.B				   #$10	  ; Compare to threshold
-	bcc					 CODE_0092D2 ; If below, check cutscene
+	bcc					 Menu_CheckCutsceneMode ; If below, check cutscene
 
 	cmp.B				   #$20	  ; Compare to upper threshold
-	bcc					 CODE_0092D9 ; If in range $10-$1f, execute
+	bcc					 Menu_ExecuteCommand2 ; If in range $10-$1f, execute
 
-CODE_0092D2:
+Menu_CheckCutsceneMode:
 ; Check cutscene mode for non-special commands
 	lda.B				   #$04	  ; Cutscene bit
 	and.W				   $00e2	 ; Check flags
 	bne					 CODE_0092E9 ; If cutscene, skip command
 
-CODE_0092D9:
+Menu_ExecuteCommand2:
 ; Execute command 2
 	ldx.B				   $0a	   ; Get command (DP $050a)
 	stx.W				   $0600	 ; Store command type
@@ -132,7 +132,7 @@ CODE_0092D9:
 
 	stz.B				   $0a	   ; Clear command 2
 
-CODE_0092E9:
+Menu_CommandCleanup:
 ; Cleanup and return
 	sei							   ; Disable interrupts
 
@@ -147,17 +147,17 @@ CODE_0092E9:
 ; Purpose: Handle menu opening/closing transitions
 ; ===========================================================================
 
-CODE_0092F0:
+Menu_TransitionOpen:
 ; Open menu transition
-	jsr.W				   CODE_0092FC ; Common transition setup
+	jsr.W				   Menu_TransitionSetup ; Common transition setup
 	jmp.W				   CODE_00803A ; Jump to menu open handler
 
-CODE_0092F6:
+Menu_TransitionClose:
 ; Close menu transition
-	jsr.W				   CODE_0092FC ; Common transition setup
+	jsr.W				   Menu_TransitionSetup ; Common transition setup
 	jmp.W				   CODE_008016 ; Jump to menu close handler
 
-CODE_0092FC:
+Menu_TransitionSetup:
 ; Common transition setup
 	sep					 #$30		; 8-bit A,X,Y
 
@@ -191,7 +191,7 @@ CODE_0092FC:
 ;   - Used for menu cursor movement
 ; ===========================================================================
 
-CODE_009319:
+Input_ProcessDirectional:
 	php							   ; Save processor status
 	phb							   ; Save data bank
 	phk							   ; Push program bank
@@ -233,20 +233,20 @@ CODE_009319:
 ; Returns: A = 0 if time elapsed, non-zero otherwise
 ; ===========================================================================
 
-CODE_009342:
+Animation_CheckFrameCounter:
 	lda.W				   #$0004	; Bit 2
 	and.W				   $00db	 ; Check menu flags
-	beq					 CODE_009352 ; If clear, skip check
+	beq					 Animation_FrameNotReady ; If clear, skip check
 
 ; Check frame counter
 	lda.W				   $0e97	 ; Get frame counter
 	and.W				   #$000f	; Mask to 15 frames (0-15)
-	beq					 CODE_009353 ; If zero, continue processing
+	beq					 Animation_FrameReady ; If zero, continue processing
 
-CODE_009352:
+Animation_FrameNotReady:
 	rts							   ; Return (not ready yet)
 
-CODE_009353:
+Animation_FrameReady:
 ; Check battle mode
 	lda.W				   #$0010	; Bit 4 = battle active
 	and.W				   $00da	 ; Check display flags
@@ -259,13 +259,13 @@ CODE_009353:
 	dec.B				   $51	   ; Decrement delay
 	rts							   ; Return (still delaying)
 
-CODE_009362:
+Input_CheckDelayCounter:
 ; Check if input locked
 	lda.W				   #$0080	; Bit 7 = input lock
 	and.W				   $00e2	 ; Check state flags
 	bne					 UNREACH_0093C9 ; If locked, skip
 
-	jsr.W				   CODE_0095FB ; Read controller state
+	jsr.W				   Input_ReadControllerState ; Read controller state
 	bne					 UNREACH_0093C9 ; If buttons pressed, skip text processing
 
 ; Check text scroll state
@@ -289,19 +289,25 @@ UNREACH_009385:
 ; Continue text scroll (get low nibble)
 	db											 $a9,$02,$00,$1c,$db,$00,$a7,$53,$e6,$53 ; Clear scroll, get low nibble
 
-CODE_00938F:
+; ===========================================================================
+; Text Processing - Control Codes
+; ===========================================================================
+; Purpose: Process text control codes for dialogue/menus
+; ===========================================================================
+
+Text_ProcessControlCode:
 ; Process text control code
 	and.W				   #$000f	; Mask to nibble
 
 	cmp.W				   #$0004	; Compare to threshold
-	bcs					 CODE_0093C3 ; If >= 4, process as text code
+	bcs					 Text_LoadCharacter ; If >= 4, process as text code
 
 ; Check for special control codes (0-3)
 	db											 $c9,$01,$00,$90,$24,$f0,$0b,$c9,$02,$00,$f0,$07,$a9,$03,$00,$85
 	db											 $51,$60,$60,$a9,$02,$00,$2d,$d9,$00,$f0,$07,$a9,$02,$00,$1c,$d9
 	db											 $00,$60,$a9,$02,$00,$0c,$d9,$00,$60,$4c,$f6,$92
 
-CODE_0093C3:
+Text_LoadCharacter:
 ; Load text character
 	jsr.W				   CODE_0097F2 ; Get character from text table
 	sta.B				   $90	   ; Store character (DP $0090)
@@ -322,7 +328,7 @@ UNREACH_0093C9:
 ;   $a0-$a1 = Product (high word) [for 32-bit result]
 ; ===========================================================================
 
-CODE_0096B3:
+Math_Multiply16x16:
 	php							   ; Save processor status
 	rep					 #$30		; 16-bit A,X,Y
 	phd							   ; Save direct page
@@ -343,13 +349,13 @@ CODE_0096B3:
 	ldx.W				   #$0010	; 16 bits to process
 	ldy.B				   $98	   ; Get multiplicand (DP $0098)
 
-CODE_0096C9:
+Math_MultiplyLoop:
 ; Shift and add algorithm
 	asl.B				   $9e	   ; Shift result left
 	rol.B				   $a0	   ; Rotate high word
 
 	asl.B				   $a4	   ; Shift multiplier left
-	bcc					 CODE_0096DB ; If bit was 0, skip add
+	bcc					 Math_MultiplySkipAdd ; If bit was 0, skip add
 
 ; Add multiplicand to result
 	tya							   ; Multiplicand to A
@@ -357,13 +363,13 @@ CLC_Label:
 	adc.B				   $9e	   ; Add to result low
 	sta.B				   $9e	   ; Store back
 
-	bcc					 CODE_0096DB ; If no carry, continue
+	bcc					 Math_MultiplySkipAdd ; If no carry, continue
 
 	inc.B				   $a0	   ; Increment high word
 
-CODE_0096DB:
+Math_MultiplySkipAdd:
 	dex							   ; Decrement bit counter
-	bne					 CODE_0096C9 ; Continue for all 16 bits
+	bne					 Math_MultiplyLoop ; Continue for all 16 bits
 
 	ply							   ; Restore Y
 	plx							   ; Restore X
@@ -384,7 +390,7 @@ CODE_0096DB:
 ;   $a2-$a3 = Remainder (16-bit)
 ; ===========================================================================
 
-CODE_0096E4:
+Math_Divide32by16:
 	php							   ; Save processor status
 	rep					 #$30		; 16-bit A,X,Y
 	phd							   ; Save direct page
@@ -406,7 +412,7 @@ CODE_0096E4:
 
 	ldx.W				   #$0020	; 32 bits to process
 
-CODE_0096FB:
+Math_DivideLoop:
 ; Shift and subtract algorithm
 	asl.B				   $9e	   ; Shift quotient left
 	rol.B				   $a0	   ; Rotate high word
@@ -421,19 +427,19 @@ CODE_0096FB:
 ; Check if remainder >= divisor
 SEC_Label:
 	sbc.B				   $9c	   ; Subtract divisor
-	bcs					 CODE_009712 ; If no borrow, division succeeded
-	bra					 CODE_009716 ; Skip setting quotient bit
+	bcs					 Math_DivisionSucceeded ; If no borrow, division succeeded
+	bra					 Math_SkipQuotientBit ; Skip setting quotient bit
 
 UNREACH_009710:
 	db											 $e5,$9c	 ; SBC.B $9c (subtract divisor)
 
-CODE_009712:
+Math_DivisionSucceeded:
 	sta.B				   $a2	   ; Store new remainder
 	inc.B				   $9e	   ; Set quotient bit
 
-CODE_009716:
+Math_SkipQuotientBit:
 	dex							   ; Decrement bit counter
-	bne					 CODE_0096FB ; Continue for all 32 bits
+	bne					 Math_DivideLoop ; Continue for all 32 bits
 
 	plx							   ; Restore X
 	pla							   ; Restore A
@@ -449,7 +455,7 @@ CODE_009716:
 ; Output: Hardware multiply result in $4216-$4217
 ; ===========================================================================
 
-CODE_00971E:
+Math_HardwareMultiply:
 	php							   ; Save processor status
 	sep					 #$20		; 8-bit A
 
@@ -466,7 +472,7 @@ CODE_00971E:
 ; Output: Hardware divide result in $4214-$4217
 ; ===========================================================================
 
-CODE_009726:
+Math_HardwareDivide:
 	php							   ; Save processor status
 	sep					 #$20		; 8-bit A
 
@@ -486,17 +492,17 @@ CODE_009726:
 ; Output: A = bit position (0-15), or $ffff if value was 0
 ; ===========================================================================
 
-CODE_009730:
+Util_CountLeadingZeros:
 	php							   ; Save processor status
 	rep					 #$30		; 16-bit A,X,Y
 	phx							   ; Save X
 
 	ldx.W				   #$ffff	; Start at -1
 
-CODE_009737:
+Util_BitPositionLoop:
 	inx							   ; Increment bit count
 	lsr					 a; Shift right
-	bcc					 CODE_009737 ; Continue until carry (bit found)
+	bcc					 Util_BitPositionLoop ; Continue until carry (bit found)
 
 	txa							   ; Transfer bit position to A
 	plx							   ; Restore X
@@ -510,7 +516,7 @@ CODE_009737:
 ; Returns: A = combined controller state
 ; ===========================================================================
 
-CODE_0095FB:
+Input_ReadControllerState:
 	lda.W				   $102f	 ; Get player 1 state
 	ora.W				   $10af	 ; OR with player 2 state
 	and.W				   #$0003	; Mask to directional bits
