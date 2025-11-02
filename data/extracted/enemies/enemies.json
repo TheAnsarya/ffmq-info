@@ -1,0 +1,1947 @@
+{
+  "metadata": {
+    "game": "FFMQ",
+    "count": 83
+  },
+  "enemies": [
+    {
+      "id": 0,
+      "name": "Brownie",
+      "hp": 50,
+      "attack": 3,
+      "defense": 1,
+      "speed": 3,
+      "magic": 1,
+      "accuracy": 2,
+      "evade": 1,
+      "magic_defense": 1,
+      "magic_evade": 1,
+      "level": 1,
+      "xp_mult": 22,
+      "gp_mult": 1,
+      "resistances": [],
+      "weaknesses": []
+    },
+    {
+      "id": 1,
+      "name": "Mintmint",
+      "hp": 160,
+      "attack": 12,
+      "defense": 11,
+      "speed": 12,
+      "magic": 9,
+      "accuracy": 13,
+      "evade": 10,
+      "magic_defense": 11,
+      "magic_evade": 10,
+      "level": 6,
+      "xp_mult": 39,
+      "gp_mult": 1,
+      "resistances": [],
+      "weaknesses": []
+    },
+    {
+      "id": 2,
+      "name": "Red Cap",
+      "hp": 480,
+      "attack": 36,
+      "defense": 36,
+      "speed": 38,
+      "magic": 32,
+      "accuracy": 40,
+      "evade": 36,
+      "magic_defense": 38,
+      "magic_evade": 40,
+      "level": 16,
+      "xp_mult": 98,
+      "gp_mult": 4,
+      "resistances": [],
+      "weaknesses": [
+        "Water"
+      ]
+    },
+    {
+      "id": 3,
+      "name": "Mad Plant",
+      "hp": 60,
+      "attack": 4,
+      "defense": 3,
+      "speed": 3,
+      "magic": 2,
+      "accuracy": 3,
+      "evade": 2,
+      "magic_defense": 2,
+      "magic_evade": 2,
+      "level": 2,
+      "xp_mult": 19,
+      "gp_mult": 1,
+      "resistances": [],
+      "weaknesses": [
+        "Axe"
+      ]
+    },
+    {
+      "id": 4,
+      "name": "Plant Man",
+      "hp": 460,
+      "attack": 34,
+      "defense": 33,
+      "speed": 34,
+      "magic": 30,
+      "accuracy": 35,
+      "evade": 32,
+      "magic_defense": 32,
+      "magic_evade": 34,
+      "level": 15,
+      "xp_mult": 86,
+      "gp_mult": 3,
+      "resistances": [
+        "Axe",
+        "Fire"
+      ],
+      "weaknesses": [
+        "Axe",
+        "Fire"
+      ]
+    },
+    {
+      "id": 5,
+      "name": "Live Oak",
+      "hp": 710,
+      "attack": 52,
+      "defense": 53,
+      "speed": 51,
+      "magic": 44,
+      "accuracy": 55,
+      "evade": 52,
+      "magic_defense": 53,
+      "magic_evade": 52,
+      "level": 1,
+      "xp_mult": 149,
+      "gp_mult": 5,
+      "resistances": [
+        "Axe",
+        "Fire"
+      ],
+      "weaknesses": [
+        "Axe",
+        "Fire"
+      ]
+    },
+    {
+      "id": 6,
+      "name": "Slime",
+      "hp": 55,
+      "attack": 3,
+      "defense": 2,
+      "speed": 3,
+      "magic": 1,
+      "accuracy": 2,
+      "evade": 1,
+      "magic_defense": 1,
+      "magic_evade": 2,
+      "level": 1,
+      "xp_mult": 24,
+      "gp_mult": 1,
+      "resistances": [],
+      "weaknesses": [
+        "Bomb"
+      ]
+    },
+    {
+      "id": 7,
+      "name": "Jelly",
+      "hp": 420,
+      "attack": 31,
+      "defense": 30,
+      "speed": 28,
+      "magic": 25,
+      "accuracy": 30,
+      "evade": 28,
+      "magic_defense": 28,
+      "magic_evade": 29,
+      "level": 14,
+      "xp_mult": 81,
+      "gp_mult": 3,
+      "resistances": [],
+      "weaknesses": [
+        "Bomb"
+      ]
+    },
+    {
+      "id": 8,
+      "name": "Ooze",
+      "hp": 750,
+      "attack": 57,
+      "defense": 58,
+      "speed": 59,
+      "magic": 49,
+      "accuracy": 62,
+      "evade": 60,
+      "magic_defense": 56,
+      "magic_evade": 56,
+      "level": 25,
+      "xp_mult": 180,
+      "gp_mult": 6,
+      "resistances": [
+        "Axe",
+        "Air",
+        "Fire",
+        "Earth"
+      ],
+      "weaknesses": [
+        "Bomb"
+      ]
+    },
+    {
+      "id": 9,
+      "name": "Poison Toad",
+      "hp": 70,
+      "attack": 5,
+      "defense": 4,
+      "speed": 3,
+      "magic": 4,
+      "accuracy": 6,
+      "evade": 6,
+      "magic_defense": 3,
+      "magic_evade": 4,
+      "level": 2,
+      "xp_mult": 21,
+      "gp_mult": 1,
+      "resistances": [
+        "Axe"
+      ],
+      "weaknesses": []
+    },
+    {
+      "id": 10,
+      "name": "Giant Toad",
+      "hp": 180,
+      "attack": 14,
+      "defense": 14,
+      "speed": 15,
+      "magic": 14,
+      "accuracy": 16,
+      "evade": 14,
+      "magic_defense": 13,
+      "magic_evade": 14,
+      "level": 6,
+      "xp_mult": 38,
+      "gp_mult": 1,
+      "resistances": [
+        "Fire"
+      ],
+      "weaknesses": []
+    },
+    {
+      "id": 11,
+      "name": "Mad Toad",
+      "hp": 740,
+      "attack": 55,
+      "defense": 56,
+      "speed": 57,
+      "magic": 48,
+      "accuracy": 59,
+      "evade": 57,
+      "magic_defense": 57,
+      "magic_evade": 56,
+      "level": 24,
+      "xp_mult": 160,
+      "gp_mult": 6,
+      "resistances": [
+        "Fire",
+        "Water"
+      ],
+      "weaknesses": [
+        "Water"
+      ]
+    },
+    {
+      "id": 12,
+      "name": "Basilisk",
+      "hp": 90,
+      "attack": 8,
+      "defense": 6,
+      "speed": 6,
+      "magic": 5,
+      "accuracy": 8,
+      "evade": 7,
+      "magic_defense": 7,
+      "magic_evade": 5,
+      "level": 3,
+      "xp_mult": 27,
+      "gp_mult": 1,
+      "resistances": [],
+      "weaknesses": []
+    },
+    {
+      "id": 13,
+      "name": "Flazzard",
+      "hp": 450,
+      "attack": 34,
+      "defense": 34,
+      "speed": 34,
+      "magic": 31,
+      "accuracy": 37,
+      "evade": 37,
+      "magic_defense": 38,
+      "magic_evade": 38,
+      "level": 15,
+      "xp_mult": 87,
+      "gp_mult": 3,
+      "resistances": [
+        "Paralysis",
+        "Axe"
+      ],
+      "weaknesses": [
+        "Water"
+      ]
+    },
+    {
+      "id": 14,
+      "name": "Salamand",
+      "hp": 640,
+      "attack": 50,
+      "defense": 48,
+      "speed": 49,
+      "magic": 46,
+      "accuracy": 50,
+      "evade": 50,
+      "magic_defense": 54,
+      "magic_evade": 56,
+      "level": 21,
+      "xp_mult": 137,
+      "gp_mult": 5,
+      "resistances": [
+        "Paralysis",
+        "Axe"
+      ],
+      "weaknesses": [
+        "Water"
+      ]
+    },
+    {
+      "id": 15,
+      "name": "Sand Worm",
+      "hp": 140,
+      "attack": 9,
+      "defense": 8,
+      "speed": 3,
+      "magic": 6,
+      "accuracy": 10,
+      "evade": 2,
+      "magic_defense": 2,
+      "magic_evade": 2,
+      "level": 4,
+      "xp_mult": 33,
+      "gp_mult": 1,
+      "resistances": [],
+      "weaknesses": [
+        "Axe",
+        "Earth"
+      ]
+    },
+    {
+      "id": 16,
+      "name": "Land Worm",
+      "hp": 265,
+      "attack": 18,
+      "defense": 16,
+      "speed": 4,
+      "magic": 13,
+      "accuracy": 18,
+      "evade": 6,
+      "magic_defense": 14,
+      "magic_evade": 5,
+      "level": 8,
+      "xp_mult": 48,
+      "gp_mult": 2,
+      "resistances": [],
+      "weaknesses": [
+        "Axe",
+        "Earth"
+      ]
+    },
+    {
+      "id": 17,
+      "name": "Leech",
+      "hp": 745,
+      "attack": 54,
+      "defense": 56,
+      "speed": 52,
+      "magic": 45,
+      "accuracy": 56,
+      "evade": 48,
+      "magic_defense": 52,
+      "magic_evade": 40,
+      "level": 24,
+      "xp_mult": 168,
+      "gp_mult": 6,
+      "resistances": [
+        "Paralysis"
+      ],
+      "weaknesses": [
+        "Axe",
+        "Air",
+        "Earth"
+      ]
+    },
+    {
+      "id": 18,
+      "name": "Skeleton",
+      "hp": 120,
+      "attack": 9,
+      "defense": 10,
+      "speed": 8,
+      "magic": 6,
+      "accuracy": 10,
+      "evade": 5,
+      "magic_defense": 9,
+      "magic_evade": 5,
+      "level": 4,
+      "xp_mult": 31,
+      "gp_mult": 1,
+      "resistances": [
+        "Earth"
+      ],
+      "weaknesses": [
+        "Zombie",
+        "Earth"
+      ]
+    },
+    {
+      "id": 19,
+      "name": "Red Bone",
+      "hp": 510,
+      "attack": 39,
+      "defense": 40,
+      "speed": 38,
+      "magic": 34,
+      "accuracy": 44,
+      "evade": 40,
+      "magic_defense": 44,
+      "magic_evade": 38,
+      "level": 17,
+      "xp_mult": 105,
+      "gp_mult": 4,
+      "resistances": [
+        "Earth"
+      ],
+      "weaknesses": [
+        "Zombie",
+        "Water"
+      ]
+    },
+    {
+      "id": 20,
+      "name": "Skuldier",
+      "hp": 750,
+      "attack": 57,
+      "defense": 61,
+      "speed": 57,
+      "magic": 50,
+      "accuracy": 60,
+      "evade": 60,
+      "magic_defense": 63,
+      "magic_evade": 60,
+      "level": 25,
+      "xp_mult": 171,
+      "gp_mult": 6,
+      "resistances": [
+        "Earth"
+      ],
+      "weaknesses": [
+        "Projectile",
+        "Zombie",
+        "Air"
+      ]
+    },
+    {
+      "id": 21,
+      "name": "Roc",
+      "hp": 100,
+      "attack": 7,
+      "defense": 5,
+      "speed": 9,
+      "magic": 6,
+      "accuracy": 8,
+      "evade": 9,
+      "magic_defense": 3,
+      "magic_evade": 7,
+      "level": 3,
+      "xp_mult": 32,
+      "gp_mult": 1,
+      "resistances": [
+        "Doom"
+      ],
+      "weaknesses": [
+        "Projectile"
+      ]
+    },
+    {
+      "id": 22,
+      "name": "Sparna",
+      "hp": 260,
+      "attack": 19,
+      "defense": 17,
+      "speed": 26,
+      "magic": 18,
+      "accuracy": 24,
+      "evade": 25,
+      "magic_defense": 22,
+      "magic_evade": 19,
+      "level": 9,
+      "xp_mult": 51,
+      "gp_mult": 2,
+      "resistances": [
+        "Doom"
+      ],
+      "weaknesses": [
+        "Projectile"
+      ]
+    },
+    {
+      "id": 23,
+      "name": "Garuda",
+      "hp": 825,
+      "attack": 61,
+      "defense": 61,
+      "speed": 69,
+      "magic": 52,
+      "accuracy": 68,
+      "evade": 70,
+      "magic_defense": 60,
+      "magic_evade": 60,
+      "level": 27,
+      "xp_mult": 196,
+      "gp_mult": 6,
+      "resistances": [
+        "Doom"
+      ],
+      "weaknesses": [
+        "Projectile",
+        "Air"
+      ]
+    },
+    {
+      "id": 24,
+      "name": "Zombie",
+      "hp": 500,
+      "attack": 35,
+      "defense": 38,
+      "speed": 35,
+      "magic": 29,
+      "accuracy": 37,
+      "evade": 37,
+      "magic_defense": 28,
+      "magic_evade": 30,
+      "level": 16,
+      "xp_mult": 108,
+      "gp_mult": 4,
+      "resistances": [
+        "Axe",
+        "Air",
+        "Fire",
+        "Earth"
+      ],
+      "weaknesses": [
+        "Zombie",
+        "Air",
+        "Water"
+      ]
+    },
+    {
+      "id": 25,
+      "name": "Mummy",
+      "hp": 685,
+      "attack": 51,
+      "defense": 56,
+      "speed": 53,
+      "magic": 46,
+      "accuracy": 56,
+      "evade": 56,
+      "magic_defense": 51,
+      "magic_evade": 54,
+      "level": 22,
+      "xp_mult": 153,
+      "gp_mult": 5,
+      "resistances": [
+        "Axe",
+        "Air",
+        "Fire",
+        "Earth"
+      ],
+      "weaknesses": [
+        "Zombie",
+        "Air",
+        "Water"
+      ]
+    },
+    {
+      "id": 26,
+      "name": "Desert Hag",
+      "hp": 280,
+      "attack": 23,
+      "defense": 24,
+      "speed": 20,
+      "magic": 16,
+      "accuracy": 28,
+      "evade": 26,
+      "magic_defense": 16,
+      "magic_evade": 20,
+      "level": 10,
+      "xp_mult": 56,
+      "gp_mult": 2,
+      "resistances": [
+        "Zombie",
+        "Fire"
+      ],
+      "weaknesses": [
+        "Fire"
+      ]
+    },
+    {
+      "id": 27,
+      "name": "Water Hag",
+      "hp": 765,
+      "attack": 57,
+      "defense": 60,
+      "speed": 60,
+      "magic": 45,
+      "accuracy": 63,
+      "evade": 54,
+      "magic_defense": 52,
+      "magic_evade": 53,
+      "level": 26,
+      "xp_mult": 192,
+      "gp_mult": 6,
+      "resistances": [
+        "Stone",
+        "Zombie",
+        "Fire"
+      ],
+      "weaknesses": [
+        "Fire"
+      ]
+    },
+    {
+      "id": 28,
+      "name": "Ninja",
+      "hp": 580,
+      "attack": 44,
+      "defense": 44,
+      "speed": 49,
+      "magic": 36,
+      "accuracy": 48,
+      "evade": 46,
+      "magic_defense": 46,
+      "magic_evade": 45,
+      "level": 19,
+      "xp_mult": 132,
+      "gp_mult": 4,
+      "resistances": [
+        "Bomb",
+        "Air"
+      ],
+      "weaknesses": [
+        "Air",
+        "Water"
+      ]
+    },
+    {
+      "id": 29,
+      "name": "Shadow",
+      "hp": 925,
+      "attack": 70,
+      "defense": 67,
+      "speed": 78,
+      "magic": 56,
+      "accuracy": 70,
+      "evade": 92,
+      "magic_defense": 78,
+      "magic_evade": 90,
+      "level": 30,
+      "xp_mult": 225,
+      "gp_mult": 7,
+      "resistances": [
+        "Bomb",
+        "Air"
+      ],
+      "weaknesses": [
+        "Air",
+        "Water"
+      ]
+    },
+    {
+      "id": 30,
+      "name": "Sphinx",
+      "hp": 360,
+      "attack": 27,
+      "defense": 32,
+      "speed": 30,
+      "magic": 22,
+      "accuracy": 32,
+      "evade": 30,
+      "magic_defense": 25,
+      "magic_evade": 29,
+      "level": 12,
+      "xp_mult": 67,
+      "gp_mult": 3,
+      "resistances": [
+        "Doom",
+        "Zombie"
+      ],
+      "weaknesses": []
+    },
+    {
+      "id": 31,
+      "name": "Manticor",
+      "hp": 840,
+      "attack": 63,
+      "defense": 70,
+      "speed": 68,
+      "magic": 55,
+      "accuracy": 70,
+      "evade": 69,
+      "magic_defense": 63,
+      "magic_evade": 66,
+      "level": 28,
+      "xp_mult": 204,
+      "gp_mult": 7,
+      "resistances": [
+        "Paralysis",
+        "Doom",
+        "Zombie",
+        "Water"
+      ],
+      "weaknesses": [
+        "Water"
+      ]
+    },
+    {
+      "id": 32,
+      "name": "Centaur",
+      "hp": 230,
+      "attack": 17,
+      "defense": 18,
+      "speed": 22,
+      "magic": 14,
+      "accuracy": 19,
+      "evade": 19,
+      "magic_defense": 17,
+      "magic_evade": 18,
+      "level": 8,
+      "xp_mult": 41,
+      "gp_mult": 2,
+      "resistances": [
+        "Zombie",
+        "Air"
+      ],
+      "weaknesses": []
+    },
+    {
+      "id": 33,
+      "name": "Nitemare",
+      "hp": 535,
+      "attack": 40,
+      "defense": 43,
+      "speed": 46,
+      "magic": 35,
+      "accuracy": 53,
+      "evade": 56,
+      "magic_defense": 53,
+      "magic_evade": 53,
+      "level": 18,
+      "xp_mult": 110,
+      "gp_mult": 4,
+      "resistances": [
+        "Paralysis",
+        "Zombie",
+        "Air"
+      ],
+      "weaknesses": [
+        "Air",
+        "Water"
+      ]
+    },
+    {
+      "id": 34,
+      "name": "Stoney Roost",
+      "hp": 350,
+      "attack": 25,
+      "defense": 23,
+      "speed": 24,
+      "magic": 24,
+      "accuracy": 20,
+      "evade": 21,
+      "magic_defense": 28,
+      "magic_evade": 22,
+      "level": 11,
+      "xp_mult": 55,
+      "gp_mult": 2,
+      "resistances": [
+        "Doom",
+        "Water"
+      ],
+      "weaknesses": [
+        "Projectile"
+      ]
+    },
+    {
+      "id": 35,
+      "name": "Hot Wings",
+      "hp": 585,
+      "attack": 43,
+      "defense": 42,
+      "speed": 48,
+      "magic": 40,
+      "accuracy": 41,
+      "evade": 46,
+      "magic_defense": 48,
+      "magic_evade": 46,
+      "level": 19,
+      "xp_mult": 124,
+      "gp_mult": 4,
+      "resistances": [
+        "Paralysis",
+        "Doom"
+      ],
+      "weaknesses": [
+        "Projectile",
+        "Air"
+      ]
+    },
+    {
+      "id": 36,
+      "name": "Ghost",
+      "hp": 550,
+      "attack": 39,
+      "defense": 37,
+      "speed": 40,
+      "magic": 38,
+      "accuracy": 41,
+      "evade": 41,
+      "magic_defense": 38,
+      "magic_evade": 38,
+      "level": 17,
+      "xp_mult": 110,
+      "gp_mult": 4,
+      "resistances": [
+        "Stone",
+        "Doom",
+        "Earth"
+      ],
+      "weaknesses": [
+        "Zombie"
+      ]
+    },
+    {
+      "id": 37,
+      "name": "Spector",
+      "hp": 690,
+      "attack": 49,
+      "defense": 47,
+      "speed": 52,
+      "magic": 46,
+      "accuracy": 47,
+      "evade": 47,
+      "magic_defense": 53,
+      "magic_evade": 54,
+      "level": 22,
+      "xp_mult": 151,
+      "gp_mult": 5,
+      "resistances": [
+        "Stone",
+        "Doom",
+        "Earth"
+      ],
+      "weaknesses": [
+        "Projectile",
+        "Zombie",
+        "Air"
+      ]
+    },
+    {
+      "id": 38,
+      "name": "Gather",
+      "hp": 360,
+      "attack": 24,
+      "defense": 27,
+      "speed": 25,
+      "magic": 26,
+      "accuracy": 26,
+      "evade": 27,
+      "magic_defense": 25,
+      "magic_evade": 26,
+      "level": 12,
+      "xp_mult": 64,
+      "gp_mult": 3,
+      "resistances": [
+        "Zombie"
+      ],
+      "weaknesses": [
+        "Bomb",
+        "Air",
+        "Water"
+      ]
+    },
+    {
+      "id": 39,
+      "name": "Beholder",
+      "hp": 810,
+      "attack": 61,
+      "defense": 63,
+      "speed": 60,
+      "magic": 57,
+      "accuracy": 61,
+      "evade": 61,
+      "magic_defense": 60,
+      "magic_evade": 62,
+      "level": 27,
+      "xp_mult": 192,
+      "gp_mult": 6,
+      "resistances": [
+        "Zombie"
+      ],
+      "weaknesses": [
+        "Bomb"
+      ]
+    },
+    {
+      "id": 40,
+      "name": "Fangpire",
+      "hp": 600,
+      "attack": 46,
+      "defense": 44,
+      "speed": 48,
+      "magic": 40,
+      "accuracy": 51,
+      "evade": 44,
+      "magic_defense": 49,
+      "magic_evade": 51,
+      "level": 20,
+      "xp_mult": 127,
+      "gp_mult": 5,
+      "resistances": [],
+      "weaknesses": [
+        "Fire"
+      ]
+    },
+    {
+      "id": 41,
+      "name": "Vampire",
+      "hp": 780,
+      "attack": 59,
+      "defense": 57,
+      "speed": 62,
+      "magic": 54,
+      "accuracy": 65,
+      "evade": 59,
+      "magic_defense": 62,
+      "magic_evade": 65,
+      "level": 26,
+      "xp_mult": 187,
+      "gp_mult": 6,
+      "resistances": [
+        "Projectile"
+      ],
+      "weaknesses": [
+        "Projectile",
+        "Air"
+      ]
+    },
+    {
+      "id": 42,
+      "name": "Mage",
+      "hp": 330,
+      "attack": 21,
+      "defense": 10,
+      "speed": 21,
+      "magic": 25,
+      "accuracy": 26,
+      "evade": 16,
+      "magic_defense": 30,
+      "magic_evade": 26,
+      "level": 11,
+      "xp_mult": 62,
+      "gp_mult": 2,
+      "resistances": [
+        "Doom"
+      ],
+      "weaknesses": [
+        "Fire"
+      ]
+    },
+    {
+      "id": 43,
+      "name": "Sorcerer",
+      "hp": 840,
+      "attack": 59,
+      "defense": 56,
+      "speed": 70,
+      "magic": 65,
+      "accuracy": 56,
+      "evade": 56,
+      "magic_defense": 85,
+      "magic_evade": 72,
+      "level": 28,
+      "xp_mult": 209,
+      "gp_mult": 7,
+      "resistances": [
+        "Doom"
+      ],
+      "weaknesses": [
+        "Projectile",
+        "Air"
+      ]
+    },
+    {
+      "id": 44,
+      "name": "Land Turtle",
+      "hp": 270,
+      "attack": 20,
+      "defense": 32,
+      "speed": 16,
+      "magic": 16,
+      "accuracy": 20,
+      "evade": 16,
+      "magic_defense": 24,
+      "magic_evade": 17,
+      "level": 9,
+      "xp_mult": 48,
+      "gp_mult": 2,
+      "resistances": [
+        "Fire"
+      ],
+      "weaknesses": [
+        "Axe",
+        "Air",
+        "Water"
+      ]
+    },
+    {
+      "id": 45,
+      "name": "Sea Turtle",
+      "hp": 630,
+      "attack": 47,
+      "defense": 70,
+      "speed": 44,
+      "magic": 40,
+      "accuracy": 54,
+      "evade": 44,
+      "magic_defense": 54,
+      "magic_evade": 52,
+      "level": 21,
+      "xp_mult": 140,
+      "gp_mult": 5,
+      "resistances": [
+        "Paralysis",
+        "Fire"
+      ],
+      "weaknesses": [
+        "Axe",
+        "Earth"
+      ]
+    },
+    {
+      "id": 46,
+      "name": "Stone Man",
+      "hp": 210,
+      "attack": 16,
+      "defense": 16,
+      "speed": 18,
+      "magic": 16,
+      "accuracy": 18,
+      "evade": 13,
+      "magic_defense": 12,
+      "magic_evade": 13,
+      "level": 7,
+      "xp_mult": 43,
+      "gp_mult": 1,
+      "resistances": [
+        "Axe"
+      ],
+      "weaknesses": [
+        "Fire"
+      ]
+    },
+    {
+      "id": 47,
+      "name": "Lizard Man",
+      "hp": 690,
+      "attack": 51,
+      "defense": 55,
+      "speed": 56,
+      "magic": 52,
+      "accuracy": 55,
+      "evade": 52,
+      "magic_defense": 52,
+      "magic_evade": 54,
+      "level": 23,
+      "xp_mult": 153,
+      "gp_mult": 5,
+      "resistances": [
+        "Axe"
+      ],
+      "weaknesses": [
+        "Fire"
+      ]
+    },
+    {
+      "id": 48,
+      "name": "Wasp",
+      "hp": 555,
+      "attack": 41,
+      "defense": 45,
+      "speed": 44,
+      "magic": 38,
+      "accuracy": 45,
+      "evade": 40,
+      "magic_defense": 46,
+      "magic_evade": 44,
+      "level": 18,
+      "xp_mult": 118,
+      "gp_mult": 4,
+      "resistances": [
+        "Zombie"
+      ],
+      "weaknesses": [
+        "Water"
+      ]
+    },
+    {
+      "id": 49,
+      "name": "Fly Eye",
+      "hp": 935,
+      "attack": 70,
+      "defense": 71,
+      "speed": 72,
+      "magic": 64,
+      "accuracy": 74,
+      "evade": 70,
+      "magic_defense": 76,
+      "magic_evade": 72,
+      "level": 30,
+      "xp_mult": 225,
+      "gp_mult": 7,
+      "resistances": [
+        "Zombie",
+        "Water"
+      ],
+      "weaknesses": [
+        "Fire"
+      ]
+    },
+    {
+      "id": 50,
+      "name": "Minotaur",
+      "hp": 220,
+      "attack": 17,
+      "defense": 21,
+      "speed": 19,
+      "magic": 10,
+      "accuracy": 20,
+      "evade": 16,
+      "magic_defense": 10,
+      "magic_evade": 12,
+      "level": 7,
+      "xp_mult": 45,
+      "gp_mult": 1,
+      "resistances": [
+        "Bomb",
+        "Fire"
+      ],
+      "weaknesses": [
+        "Fire"
+      ]
+    },
+    {
+      "id": 51,
+      "name": "Medusa",
+      "hp": 420,
+      "attack": 33,
+      "defense": 40,
+      "speed": 36,
+      "magic": 28,
+      "accuracy": 34,
+      "evade": 32,
+      "magic_defense": 28,
+      "magic_evade": 30,
+      "level": 14,
+      "xp_mult": 84,
+      "gp_mult": 3,
+      "resistances": [
+        "Axe",
+        "Fire"
+      ],
+      "weaknesses": [
+        "Water"
+      ]
+    },
+    {
+      "id": 52,
+      "name": "Ice Golem",
+      "hp": 300,
+      "attack": 21,
+      "defense": 18,
+      "speed": 18,
+      "magic": 20,
+      "accuracy": 24,
+      "evade": 18,
+      "magic_defense": 25,
+      "magic_evade": 24,
+      "level": 10,
+      "xp_mult": 50,
+      "gp_mult": 2,
+      "resistances": [
+        "Zombie",
+        "Air"
+      ],
+      "weaknesses": [
+        "Air",
+        "Water"
+      ]
+    },
+    {
+      "id": 53,
+      "name": "Fire Golem",
+      "hp": 870,
+      "attack": 65,
+      "defense": 65,
+      "speed": 67,
+      "magic": 60,
+      "accuracy": 64,
+      "evade": 67,
+      "magic_defense": 71,
+      "magic_evade": 69,
+      "level": 29,
+      "xp_mult": 209,
+      "gp_mult": 7,
+      "resistances": [
+        "Zombie",
+        "Air"
+      ],
+      "weaknesses": [
+        "Air",
+        "Water"
+      ]
+    },
+    {
+      "id": 54,
+      "name": "Jinn",
+      "hp": 666,
+      "attack": 49,
+      "defense": 52,
+      "speed": 52,
+      "magic": 38,
+      "accuracy": 53,
+      "evade": 44,
+      "magic_defense": 44,
+      "magic_evade": 44,
+      "level": 20,
+      "xp_mult": 134,
+      "gp_mult": 5,
+      "resistances": [
+        "Doom",
+        "Projectile"
+      ],
+      "weaknesses": [
+        "Projectile",
+        "Air"
+      ]
+    },
+    {
+      "id": 55,
+      "name": "Cockatrice",
+      "hp": 888,
+      "attack": 66,
+      "defense": 73,
+      "speed": 70,
+      "magic": 58,
+      "accuracy": 70,
+      "evade": 64,
+      "magic_defense": 63,
+      "magic_evade": 64,
+      "level": 29,
+      "xp_mult": 223,
+      "gp_mult": 7,
+      "resistances": [
+        "Stone",
+        "Doom",
+        "Projectile"
+      ],
+      "weaknesses": [
+        "Projectile",
+        "Air"
+      ]
+    },
+    {
+      "id": 56,
+      "name": "Thunder Eye",
+      "hp": 150,
+      "attack": 11,
+      "defense": 11,
+      "speed": 12,
+      "magic": 8,
+      "accuracy": 15,
+      "evade": 13,
+      "magic_defense": 12,
+      "magic_evade": 14,
+      "level": 5,
+      "xp_mult": 38,
+      "gp_mult": 1,
+      "resistances": [],
+      "weaknesses": []
+    },
+    {
+      "id": 57,
+      "name": "Doom Eye",
+      "hp": 190,
+      "attack": 13,
+      "defense": 13,
+      "speed": 13,
+      "magic": 10,
+      "accuracy": 13,
+      "evade": 15,
+      "magic_defense": 15,
+      "magic_evade": 13,
+      "level": 5,
+      "xp_mult": 40,
+      "gp_mult": 1,
+      "resistances": [],
+      "weaknesses": [
+        "Zombie"
+      ]
+    },
+    {
+      "id": 58,
+      "name": "Succubus",
+      "hp": 400,
+      "attack": 30,
+      "defense": 27,
+      "speed": 29,
+      "magic": 24,
+      "accuracy": 34,
+      "evade": 35,
+      "magic_defense": 33,
+      "magic_evade": 32,
+      "level": 13,
+      "xp_mult": 77,
+      "gp_mult": 3,
+      "resistances": [
+        "Sleep",
+        "Stone"
+      ],
+      "weaknesses": [
+        "Fire"
+      ]
+    },
+    {
+      "id": 59,
+      "name": "Freeze Crab",
+      "hp": 410,
+      "attack": 31,
+      "defense": 40,
+      "speed": 32,
+      "magic": 28,
+      "accuracy": 34,
+      "evade": 31,
+      "magic_defense": 30,
+      "magic_evade": 30,
+      "level": 13,
+      "xp_mult": 79,
+      "gp_mult": 3,
+      "resistances": [],
+      "weaknesses": [
+        "Axe"
+      ]
+    },
+    {
+      "id": 60,
+      "name": "Gemini Crest (L)",
+      "hp": 660,
+      "attack": 50,
+      "defense": 49,
+      "speed": 50,
+      "magic": 45,
+      "accuracy": 56,
+      "evade": 56,
+      "magic_defense": 51,
+      "magic_evade": 51,
+      "level": 21,
+      "xp_mult": 140,
+      "gp_mult": 5,
+      "resistances": [
+        "Paralysis",
+        "Axe",
+        "Zombie"
+      ],
+      "weaknesses": [
+        "Water"
+      ]
+    },
+    {
+      "id": 61,
+      "name": "Gemini Crest (R)",
+      "hp": 630,
+      "attack": 47,
+      "defense": 48,
+      "speed": 51,
+      "magic": 43,
+      "accuracy": 53,
+      "evade": 51,
+      "magic_defense": 56,
+      "magic_evade": 54,
+      "level": 21,
+      "xp_mult": 144,
+      "gp_mult": 5,
+      "resistances": [
+        "Axe",
+        "Fire",
+        "Water"
+      ],
+      "weaknesses": [
+        "Earth"
+      ]
+    },
+    {
+      "id": 62,
+      "name": "Pazuzu",
+      "hp": 870,
+      "attack": 65,
+      "defense": 66,
+      "speed": 69,
+      "magic": 58,
+      "accuracy": 69,
+      "evade": 67,
+      "magic_defense": 71,
+      "magic_evade": 70,
+      "level": 29,
+      "xp_mult": 228,
+      "gp_mult": 7,
+      "resistances": [
+        "Paralysis",
+        "Projectile",
+        "Bomb",
+        "Axe",
+        "Fire",
+        "Water",
+        "Earth"
+      ],
+      "weaknesses": [
+        "Projectile",
+        "Air"
+      ]
+    },
+    {
+      "id": 63,
+      "name": "Sky Beast",
+      "hp": 900,
+      "attack": 67,
+      "defense": 68,
+      "speed": 68,
+      "magic": 57,
+      "accuracy": 70,
+      "evade": 65,
+      "magic_defense": 67,
+      "magic_evade": 66,
+      "level": 29,
+      "xp_mult": 218,
+      "gp_mult": 7,
+      "resistances": [
+        "Air",
+        "Fire"
+      ],
+      "weaknesses": [
+        "Air",
+        "Water"
+      ]
+    },
+    {
+      "id": 64,
+      "name": "Captain",
+      "hp": 10000,
+      "attack": 10,
+      "defense": 180,
+      "speed": 98,
+      "magic": 96,
+      "accuracy": 90,
+      "evade": 91,
+      "magic_defense": 230,
+      "magic_evade": 85,
+      "level": 32,
+      "xp_mult": 253,
+      "gp_mult": 0,
+      "resistances": [],
+      "weaknesses": [
+        "Zombie"
+      ]
+    },
+    {
+      "id": 65,
+      "name": "Hydra",
+      "hp": 10000,
+      "attack": 5,
+      "defense": 98,
+      "speed": 99,
+      "magic": 98,
+      "accuracy": 93,
+      "evade": 88,
+      "magic_defense": 90,
+      "magic_evade": 88,
+      "level": 32,
+      "xp_mult": 254,
+      "gp_mult": 0,
+      "resistances": [
+        "Paralysis",
+        "Doom",
+        "Axe",
+        "Air",
+        "Fire",
+        "Water",
+        "Earth"
+      ],
+      "weaknesses": []
+    },
+    {
+      "id": 66,
+      "name": "Squid Eye",
+      "hp": 80,
+      "attack": 1,
+      "defense": 25,
+      "speed": 12,
+      "magic": 1,
+      "accuracy": 5,
+      "evade": 1,
+      "magic_defense": 1,
+      "magic_evade": 1,
+      "level": 1,
+      "xp_mult": 28,
+      "gp_mult": 1,
+      "resistances": [],
+      "weaknesses": []
+    },
+    {
+      "id": 67,
+      "name": "Libra Crest",
+      "hp": 240,
+      "attack": 4,
+      "defense": 50,
+      "speed": 12,
+      "magic": 8,
+      "accuracy": 15,
+      "evade": 7,
+      "magic_defense": 10,
+      "magic_evade": 8,
+      "level": 3,
+      "xp_mult": 34,
+      "gp_mult": 10,
+      "resistances": [],
+      "weaknesses": []
+    },
+    {
+      "id": 68,
+      "name": "Dullahan",
+      "hp": 2500,
+      "attack": 50,
+      "defense": 50,
+      "speed": 30,
+      "magic": 31,
+      "accuracy": 40,
+      "evade": 33,
+      "magic_defense": 180,
+      "magic_evade": 34,
+      "level": 11,
+      "xp_mult": 73,
+      "gp_mult": 2,
+      "resistances": [
+        "Doom",
+        "Air",
+        "Fire",
+        "Water",
+        "Earth"
+      ],
+      "weaknesses": []
+    },
+    {
+      "id": 69,
+      "name": "Dark Lord",
+      "hp": 3000,
+      "attack": 100,
+      "defense": 50,
+      "speed": 34,
+      "magic": 32,
+      "accuracy": 60,
+      "evade": 30,
+      "magic_defense": 150,
+      "magic_evade": 30,
+      "level": 11,
+      "xp_mult": 78,
+      "gp_mult": 2,
+      "resistances": [
+        "Axe",
+        "Air",
+        "Fire",
+        "Water",
+        "Earth"
+      ],
+      "weaknesses": [
+        "Axe"
+      ]
+    },
+    {
+      "id": 70,
+      "name": "Twinhead Wyvern",
+      "hp": 6000,
+      "attack": 115,
+      "defense": 58,
+      "speed": 52,
+      "magic": 115,
+      "accuracy": 80,
+      "evade": 40,
+      "magic_defense": 200,
+      "magic_evade": 50,
+      "level": 20,
+      "xp_mult": 168,
+      "gp_mult": 5,
+      "resistances": [
+        "Paralysis",
+        "Projectile",
+        "Air",
+        "Fire",
+        "Water",
+        "Earth"
+      ],
+      "weaknesses": []
+    },
+    {
+      "id": 71,
+      "name": "Lamia",
+      "hp": 6500,
+      "attack": 100,
+      "defense": 56,
+      "speed": 62,
+      "magic": 68,
+      "accuracy": 88,
+      "evade": 62,
+      "magic_defense": 160,
+      "magic_evade": 65,
+      "level": 20,
+      "xp_mult": 170,
+      "gp_mult": 5,
+      "resistances": [
+        "Sleep",
+        "Stone",
+        "Projectile",
+        "Axe",
+        "Air",
+        "Fire",
+        "Water",
+        "Earth"
+      ],
+      "weaknesses": []
+    },
+    {
+      "id": 72,
+      "name": "Gargoyle",
+      "hp": 13000,
+      "attack": 130,
+      "defense": 75,
+      "speed": 78,
+      "magic": 80,
+      "accuracy": 90,
+      "evade": 75,
+      "magic_defense": 220,
+      "magic_evade": 75,
+      "level": 27,
+      "xp_mult": 243,
+      "gp_mult": 6,
+      "resistances": [
+        "Paralysis",
+        "Bomb",
+        "Axe",
+        "Air",
+        "Fire",
+        "Water",
+        "Earth"
+      ],
+      "weaknesses": [
+        "Air"
+      ]
+    },
+    {
+      "id": 73,
+      "name": "Gargoyle Statue",
+      "hp": 14000,
+      "attack": 160,
+      "defense": 85,
+      "speed": 72,
+      "magic": 83,
+      "accuracy": 93,
+      "evade": 78,
+      "magic_defense": 85,
+      "magic_evade": 80,
+      "level": 28,
+      "xp_mult": 250,
+      "gp_mult": 7,
+      "resistances": [
+        "Paralysis",
+        "Water",
+        "Earth"
+      ],
+      "weaknesses": []
+    },
+    {
+      "id": 74,
+      "name": "Dullahan (Phoebe)",
+      "hp": 2200,
+      "attack": 70,
+      "defense": 60,
+      "speed": 32,
+      "magic": 28,
+      "accuracy": 88,
+      "evade": 70,
+      "magic_defense": 100,
+      "magic_evade": 75,
+      "level": 10,
+      "xp_mult": 40,
+      "gp_mult": 0,
+      "resistances": [
+        "Axe",
+        "Fire",
+        "Water",
+        "Earth"
+      ],
+      "weaknesses": [
+        "Zombie"
+      ]
+    },
+    {
+      "id": 75,
+      "name": "Dark Lord (Phoebe)",
+      "hp": 6500,
+      "attack": 80,
+      "defense": 48,
+      "speed": 41,
+      "magic": 48,
+      "accuracy": 98,
+      "evade": 88,
+      "magic_defense": 180,
+      "magic_evade": 72,
+      "level": 16,
+      "xp_mult": 82,
+      "gp_mult": 0,
+      "resistances": [
+        "Stone",
+        "Doom",
+        "Axe",
+        "Zombie",
+        "Air",
+        "Fire",
+        "Water",
+        "Earth"
+      ],
+      "weaknesses": [
+        "Fire"
+      ]
+    },
+    {
+      "id": 76,
+      "name": "Medusa (Quest)",
+      "hp": 14000,
+      "attack": 125,
+      "defense": 145,
+      "speed": 60,
+      "magic": 115,
+      "accuracy": 93,
+      "evade": 85,
+      "magic_defense": 98,
+      "magic_evade": 80,
+      "level": 27,
+      "xp_mult": 143,
+      "gp_mult": 0,
+      "resistances": [
+        "Paralysis",
+        "Projectile",
+        "Axe",
+        "Zombie",
+        "Air",
+        "Fire",
+        "Water",
+        "Earth"
+      ],
+      "weaknesses": []
+    },
+    {
+      "id": 77,
+      "name": "Stone Golem",
+      "hp": 15000,
+      "attack": 235,
+      "defense": 90,
+      "speed": 108,
+      "magic": 250,
+      "accuracy": 90,
+      "evade": 90,
+      "magic_defense": 150,
+      "magic_evade": 93,
+      "level": 34,
+      "xp_mult": 200,
+      "gp_mult": 0,
+      "resistances": [
+        "Paralysis",
+        "Axe",
+        "Zombie",
+        "Air",
+        "Fire",
+        "Water",
+        "Earth"
+      ],
+      "weaknesses": [
+        "Air",
+        "Water"
+      ]
+    },
+    {
+      "id": 78,
+      "name": "Gorgon Bull",
+      "hp": 25000,
+      "attack": 110,
+      "defense": 95,
+      "speed": 78,
+      "magic": 93,
+      "accuracy": 95,
+      "evade": 90,
+      "magic_defense": 90,
+      "magic_evade": 92,
+      "level": 35,
+      "xp_mult": 206,
+      "gp_mult": 0,
+      "resistances": [
+        "Doom",
+        "Bomb",
+        "Axe",
+        "Zombie",
+        "Air",
+        "Fire",
+        "Water",
+        "Earth"
+      ],
+      "weaknesses": [
+        "Projectile",
+        "Air"
+      ]
+    },
+    {
+      "id": 79,
+      "name": "Minotaur (Quest)",
+      "hp": 20000,
+      "attack": 240,
+      "defense": 95,
+      "speed": 100,
+      "magic": 98,
+      "accuracy": 93,
+      "evade": 91,
+      "magic_defense": 180,
+      "magic_evade": 90,
+      "level": 36,
+      "xp_mult": 250,
+      "gp_mult": 0,
+      "resistances": [
+        "Doom",
+        "Bomb",
+        "Axe",
+        "Zombie",
+        "Air",
+        "Fire",
+        "Water",
+        "Earth"
+      ],
+      "weaknesses": [
+        "Projectile",
+        "Air"
+      ]
+    },
+    {
+      "id": 80,
+      "name": "Skullrus Rex",
+      "hp": 40000,
+      "attack": 50,
+      "defense": 120,
+      "speed": 86,
+      "magic": 75,
+      "accuracy": 97,
+      "evade": 80,
+      "magic_defense": 160,
+      "magic_evade": 70,
+      "level": 40,
+      "xp_mult": 0,
+      "gp_mult": 0,
+      "resistances": [
+        "Sleep",
+        "Stone",
+        "Doom",
+        "Projectile",
+        "Bomb",
+        "Axe",
+        "Zombie",
+        "Air",
+        "Fire",
+        "Water",
+        "Earth"
+      ],
+      "weaknesses": []
+    },
+    {
+      "id": 81,
+      "name": "Dark King (Phase 1)",
+      "hp": 400,
+      "attack": 40,
+      "defense": 30,
+      "speed": 20,
+      "magic": 10,
+      "accuracy": 80,
+      "evade": 40,
+      "magic_defense": 50,
+      "magic_evade": 50,
+      "level": 1,
+      "xp_mult": 0,
+      "gp_mult": 0,
+      "resistances": [
+        "Paralysis",
+        "Doom",
+        "Water",
+        "Earth"
+      ],
+      "weaknesses": [
+        "Air",
+        "Water"
+      ]
+    },
+    {
+      "id": 82,
+      "name": "Dark King Spider",
+      "hp": 400,
+      "attack": 40,
+      "defense": 30,
+      "speed": 20,
+      "magic": 10,
+      "accuracy": 80,
+      "evade": 40,
+      "magic_defense": 50,
+      "magic_evade": 50,
+      "level": 1,
+      "xp_mult": 0,
+      "gp_mult": 0,
+      "resistances": [
+        "Paralysis",
+        "Doom",
+        "Water",
+        "Earth"
+      ],
+      "weaknesses": [
+        "Air",
+        "Water"
+      ]
+    }
+  ]
+}

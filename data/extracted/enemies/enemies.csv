@@ -1,0 +1,84 @@
+id,name,hp,attack,defense,speed,magic,accuracy,evade,magic_defense,magic_evade,level,xp_mult,gp_mult,resistances,weaknesses
+0,Brownie,50,3,1,3,1,2,1,1,1,1,22,1,None,None
+1,Mintmint,160,12,11,12,9,13,10,11,10,6,39,1,None,None
+2,Red Cap,480,36,36,38,32,40,36,38,40,16,98,4,None,Water
+3,Mad Plant,60,4,3,3,2,3,2,2,2,2,19,1,None,Axe
+4,Plant Man,460,34,33,34,30,35,32,32,34,15,86,3,"Axe, Fire","Axe, Fire"
+5,Live Oak,710,52,53,51,44,55,52,53,52,1,149,5,"Axe, Fire","Axe, Fire"
+6,Slime,55,3,2,3,1,2,1,1,2,1,24,1,None,Bomb
+7,Jelly,420,31,30,28,25,30,28,28,29,14,81,3,None,Bomb
+8,Ooze,750,57,58,59,49,62,60,56,56,25,180,6,"Axe, Air, Fire, Earth",Bomb
+9,Poison Toad,70,5,4,3,4,6,6,3,4,2,21,1,Axe,None
+10,Giant Toad,180,14,14,15,14,16,14,13,14,6,38,1,Fire,None
+11,Mad Toad,740,55,56,57,48,59,57,57,56,24,160,6,"Fire, Water",Water
+12,Basilisk,90,8,6,6,5,8,7,7,5,3,27,1,None,None
+13,Flazzard,450,34,34,34,31,37,37,38,38,15,87,3,"Paralysis, Axe",Water
+14,Salamand,640,50,48,49,46,50,50,54,56,21,137,5,"Paralysis, Axe",Water
+15,Sand Worm,140,9,8,3,6,10,2,2,2,4,33,1,None,"Axe, Earth"
+16,Land Worm,265,18,16,4,13,18,6,14,5,8,48,2,None,"Axe, Earth"
+17,Leech,745,54,56,52,45,56,48,52,40,24,168,6,Paralysis,"Axe, Air, Earth"
+18,Skeleton,120,9,10,8,6,10,5,9,5,4,31,1,Earth,"Zombie, Earth"
+19,Red Bone,510,39,40,38,34,44,40,44,38,17,105,4,Earth,"Zombie, Water"
+20,Skuldier,750,57,61,57,50,60,60,63,60,25,171,6,Earth,"Projectile, Zombie, Air"
+21,Roc,100,7,5,9,6,8,9,3,7,3,32,1,Doom,Projectile
+22,Sparna,260,19,17,26,18,24,25,22,19,9,51,2,Doom,Projectile
+23,Garuda,825,61,61,69,52,68,70,60,60,27,196,6,Doom,"Projectile, Air"
+24,Zombie,500,35,38,35,29,37,37,28,30,16,108,4,"Axe, Air, Fire, Earth","Zombie, Air, Water"
+25,Mummy,685,51,56,53,46,56,56,51,54,22,153,5,"Axe, Air, Fire, Earth","Zombie, Air, Water"
+26,Desert Hag,280,23,24,20,16,28,26,16,20,10,56,2,"Zombie, Fire",Fire
+27,Water Hag,765,57,60,60,45,63,54,52,53,26,192,6,"Stone, Zombie, Fire",Fire
+28,Ninja,580,44,44,49,36,48,46,46,45,19,132,4,"Bomb, Air","Air, Water"
+29,Shadow,925,70,67,78,56,70,92,78,90,30,225,7,"Bomb, Air","Air, Water"
+30,Sphinx,360,27,32,30,22,32,30,25,29,12,67,3,"Doom, Zombie",None
+31,Manticor,840,63,70,68,55,70,69,63,66,28,204,7,"Paralysis, Doom, Zombie, Water",Water
+32,Centaur,230,17,18,22,14,19,19,17,18,8,41,2,"Zombie, Air",None
+33,Nitemare,535,40,43,46,35,53,56,53,53,18,110,4,"Paralysis, Zombie, Air","Air, Water"
+34,Stoney Roost,350,25,23,24,24,20,21,28,22,11,55,2,"Doom, Water",Projectile
+35,Hot Wings,585,43,42,48,40,41,46,48,46,19,124,4,"Paralysis, Doom","Projectile, Air"
+36,Ghost,550,39,37,40,38,41,41,38,38,17,110,4,"Stone, Doom, Earth",Zombie
+37,Spector,690,49,47,52,46,47,47,53,54,22,151,5,"Stone, Doom, Earth","Projectile, Zombie, Air"
+38,Gather,360,24,27,25,26,26,27,25,26,12,64,3,Zombie,"Bomb, Air, Water"
+39,Beholder,810,61,63,60,57,61,61,60,62,27,192,6,Zombie,Bomb
+40,Fangpire,600,46,44,48,40,51,44,49,51,20,127,5,None,Fire
+41,Vampire,780,59,57,62,54,65,59,62,65,26,187,6,Projectile,"Projectile, Air"
+42,Mage,330,21,10,21,25,26,16,30,26,11,62,2,Doom,Fire
+43,Sorcerer,840,59,56,70,65,56,56,85,72,28,209,7,Doom,"Projectile, Air"
+44,Land Turtle,270,20,32,16,16,20,16,24,17,9,48,2,Fire,"Axe, Air, Water"
+45,Sea Turtle,630,47,70,44,40,54,44,54,52,21,140,5,"Paralysis, Fire","Axe, Earth"
+46,Stone Man,210,16,16,18,16,18,13,12,13,7,43,1,Axe,Fire
+47,Lizard Man,690,51,55,56,52,55,52,52,54,23,153,5,Axe,Fire
+48,Wasp,555,41,45,44,38,45,40,46,44,18,118,4,Zombie,Water
+49,Fly Eye,935,70,71,72,64,74,70,76,72,30,225,7,"Zombie, Water",Fire
+50,Minotaur,220,17,21,19,10,20,16,10,12,7,45,1,"Bomb, Fire",Fire
+51,Medusa,420,33,40,36,28,34,32,28,30,14,84,3,"Axe, Fire",Water
+52,Ice Golem,300,21,18,18,20,24,18,25,24,10,50,2,"Zombie, Air","Air, Water"
+53,Fire Golem,870,65,65,67,60,64,67,71,69,29,209,7,"Zombie, Air","Air, Water"
+54,Jinn,666,49,52,52,38,53,44,44,44,20,134,5,"Doom, Projectile","Projectile, Air"
+55,Cockatrice,888,66,73,70,58,70,64,63,64,29,223,7,"Stone, Doom, Projectile","Projectile, Air"
+56,Thunder Eye,150,11,11,12,8,15,13,12,14,5,38,1,None,None
+57,Doom Eye,190,13,13,13,10,13,15,15,13,5,40,1,None,Zombie
+58,Succubus,400,30,27,29,24,34,35,33,32,13,77,3,"Sleep, Stone",Fire
+59,Freeze Crab,410,31,40,32,28,34,31,30,30,13,79,3,None,Axe
+60,Gemini Crest (L),660,50,49,50,45,56,56,51,51,21,140,5,"Paralysis, Axe, Zombie",Water
+61,Gemini Crest (R),630,47,48,51,43,53,51,56,54,21,144,5,"Axe, Fire, Water",Earth
+62,Pazuzu,870,65,66,69,58,69,67,71,70,29,228,7,"Paralysis, Projectile, Bomb, Axe, Fire, Water, Earth","Projectile, Air"
+63,Sky Beast,900,67,68,68,57,70,65,67,66,29,218,7,"Air, Fire","Air, Water"
+64,Captain,10000,10,180,98,96,90,91,230,85,32,253,0,None,Zombie
+65,Hydra,10000,5,98,99,98,93,88,90,88,32,254,0,"Paralysis, Doom, Axe, Air, Fire, Water, Earth",None
+66,Squid Eye,80,1,25,12,1,5,1,1,1,1,28,1,None,None
+67,Libra Crest,240,4,50,12,8,15,7,10,8,3,34,10,None,None
+68,Dullahan,2500,50,50,30,31,40,33,180,34,11,73,2,"Doom, Air, Fire, Water, Earth",None
+69,Dark Lord,3000,100,50,34,32,60,30,150,30,11,78,2,"Axe, Air, Fire, Water, Earth",Axe
+70,Twinhead Wyvern,6000,115,58,52,115,80,40,200,50,20,168,5,"Paralysis, Projectile, Air, Fire, Water, Earth",None
+71,Lamia,6500,100,56,62,68,88,62,160,65,20,170,5,"Sleep, Stone, Projectile, Axe, Air, Fire, Water, Earth",None
+72,Gargoyle,13000,130,75,78,80,90,75,220,75,27,243,6,"Paralysis, Bomb, Axe, Air, Fire, Water, Earth",Air
+73,Gargoyle Statue,14000,160,85,72,83,93,78,85,80,28,250,7,"Paralysis, Water, Earth",None
+74,Dullahan (Phoebe),2200,70,60,32,28,88,70,100,75,10,40,0,"Axe, Fire, Water, Earth",Zombie
+75,Dark Lord (Phoebe),6500,80,48,41,48,98,88,180,72,16,82,0,"Stone, Doom, Axe, Zombie, Air, Fire, Water, Earth",Fire
+76,Medusa (Quest),14000,125,145,60,115,93,85,98,80,27,143,0,"Paralysis, Projectile, Axe, Zombie, Air, Fire, Water, Earth",None
+77,Stone Golem,15000,235,90,108,250,90,90,150,93,34,200,0,"Paralysis, Axe, Zombie, Air, Fire, Water, Earth","Air, Water"
+78,Gorgon Bull,25000,110,95,78,93,95,90,90,92,35,206,0,"Doom, Bomb, Axe, Zombie, Air, Fire, Water, Earth","Projectile, Air"
+79,Minotaur (Quest),20000,240,95,100,98,93,91,180,90,36,250,0,"Doom, Bomb, Axe, Zombie, Air, Fire, Water, Earth","Projectile, Air"
+80,Skullrus Rex,40000,50,120,86,75,97,80,160,70,40,0,0,"Sleep, Stone, Doom, Projectile, Bomb, Axe, Zombie, Air, Fire, Water, Earth",None
+81,Dark King (Phase 1),400,40,30,20,10,80,40,50,50,1,0,0,"Paralysis, Doom, Water, Earth","Air, Water"
+82,Dark King Spider,400,40,30,20,10,80,40,50,50,1,0,0,"Paralysis, Doom, Water, Earth","Air, Water"
