@@ -486,6 +486,8 @@ yes do bank 0d! however, you've been stalling on the summaries - don't take so l
 no, do verbose summaries please, it was just taking much longer than usual. I restarted VSCode, so maybe it will be faster? continue onwards!
 focus on cleaning up the DATA labels
 update issues and task lists and review what has been done, then pick an issue and implement it, and then another, etc
+check off all completed task in the github issues and then pick one or two and implement them
+both! create the github issues and then do the rest!
 
 
 

@@ -196,3 +196,55 @@
 	LOOSE_OP_00BCF3 = $00bcf3            ;      |        |      ;
 	LOOSE_OP_00CAB5 = $00cab5            ;      |        |      ;
 	PTR16_00FFFF = $00ffff               ;      |        |      ;
+
+; ===============================================================================
+; SYSTEM CONSTANTS
+; ===============================================================================
+; Common boolean/state values
+	FALSE = $00                          ;      |        |      ; Boolean false / state off
+	TRUE = $01                           ;      |        |      ; Boolean true / state on
+	INIT_ZERO = $00                      ;      |        |      ; Initialize to zero
+
+; Common bit flags (for AND/OR/BIT operations)
+	BIT_0 = $01                          ;      |        |      ; Bit 0 mask ($01)
+	BIT_1 = $02                          ;      |        |      ; Bit 1 mask ($02)
+	BIT_2 = $04                          ;      |        |      ; Bit 2 mask ($04)
+	BIT_3 = $08                          ;      |        |      ; Bit 3 mask ($08)
+	BIT_4 = $10                          ;      |        |      ; Bit 4 mask ($10)
+	BIT_5 = $20                          ;      |        |      ; Bit 5 mask ($20)
+	BIT_6 = $40                          ;      |        |      ; Bit 6 mask ($40)
+	BIT_7 = $80                          ;      |        |      ; Bit 7 mask ($80)
+
+; Processor status flag bits
+	SIGN_BIT = $80                       ;      |        |      ; Sign bit (N flag)
+	OVERFLOW_BIT = $40                   ;      |        |      ; Overflow bit (V flag)
+	CARRY_BIT = $01                      ;      |        |      ; Carry bit (C flag)
+	ZERO_BIT = $02                       ;      |        |      ; Zero bit (Z flag)
+
+; Common processor mode flags
+	P_FLAG_CARRY = $01                   ;      |        |      ; Carry flag mask
+	P_FLAG_ZERO = $02                    ;      |        |      ; Zero flag mask
+	P_FLAG_IRQ_DISABLE = $04             ;      |        |      ; IRQ disable flag mask
+	P_FLAG_DECIMAL = $08                 ;      |        |      ; Decimal mode flag mask
+	P_FLAG_INDEX_8BIT = $10              ;      |        |      ; 8-bit index registers (6502 emulation)
+	P_FLAG_MEM_8BIT = $20                ;      |        |      ; 8-bit accumulator/memory
+	P_FLAG_OVERFLOW = $40                ;      |        |      ; Overflow flag mask
+	P_FLAG_NEGATIVE = $80                ;      |        |      ; Negative flag mask
+
+; Common SNES register mode values
+	REP_FLAGS_16BIT = $30                ;      |        |      ; REP #$30 - 16-bit A/X/Y mode
+	SEP_FLAGS_8BIT = $30                 ;      |        |      ; SEP #$30 - 8-bit A/X/Y mode
+	REP_FLAG_ACCUM = $20                 ;      |        |      ; REP #$20 - 16-bit accumulator
+	SEP_FLAG_ACCUM = $20                 ;      |        |      ; SEP #$20 - 8-bit accumulator
+	REP_FLAG_INDEX = $10                 ;      |        |      ; REP #$10 - 16-bit index
+	SEP_FLAG_INDEX = $10                 ;      |        |      ; SEP #$10 - 8-bit index
+
+; Common byte values
+	BYTE_00 = $00                        ;      |        |      ; Zero byte
+	BYTE_FF = $ff                        ;      |        |      ; All bits set ($FF)
+	BYTE_80 = $80                        ;      |        |      ; High bit set ($80)
+
+; Common word values
+	WORD_0000 = $0000                    ;      |        |      ; Zero word
+	WORD_FFFF = $ffff                    ;      |        |      ; All bits set ($FFFF)
+	WORD_8000 = $8000                    ;      |        |      ; High bit set ($8000)

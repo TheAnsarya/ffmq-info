@@ -195,20 +195,28 @@
 ### Issue #10: Extract All Game Constants
 **Priority**: LOW  
 **Effort**: 4 hours  
-**Status**: 🔴 TODO
+**Status**: � IN PROGRESS (Phase 1 - Common System Constants)
 
-**Description**: Create constants.inc file with all magic numbers.
+**Description**: Extract magic numbers to named constants for better code readability.
+
+**Note**: `src/include/ffmq_constants.inc` already exists with game-specific constants.
+This task focuses on **system/technical constants** used in the actual code.
+
+**Phase 1 - Common System Constants** (IMPLEMENTING):
+- Boolean/state values: $00 (FALSE/OFF), $01 (TRUE/ON)
+- Common bit flags: $80, $40, $20, $10, $08, $04, $02, $01
+- Common init values for registers/counters
 
 **Examples**:
 ```asm
-; Instead of: LDA #$03
-; Use: LDA #MAX_PARTY_SIZE
+; Instead of: LDA #$00
+; Use: LDA #FALSE  or  LDA #INIT_ZERO
 
-; Instead of: CMP #$63
-; Use: CMP #MAX_LEVEL
+; Instead of: AND #$80
+; Use: AND #BIT_7  or  AND #SIGN_BIT
 ```
 
-**Deliverable**: `src/asm/includes/constants.inc`
+**Deliverable**: Enhanced `src/asm/banks/labels.asm` with system constants section
 
 ---
 
