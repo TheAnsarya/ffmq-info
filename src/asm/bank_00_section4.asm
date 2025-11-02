@@ -11,7 +11,7 @@
 ; Technical Details: Simpler than dual-buffer mode, direct VRAM write
 ; ===========================================================================
 
-CODE_008C83:
+Sprite_UpdateCharacterSingleBuffer:
 ; Get character tile from map data
 	lda.L				   DATA8_049800,x ; Load tile number from map data
 	asl					 a; Multiply by 4 (4 bytes per tile)
@@ -20,63 +20,63 @@ CODE_008C83:
 
 	rep					 #$10		; 16-bit X,Y
 	lda.W				   $1031	 ; Get character map position
-	jsr.W				   CODE_008D8A ; Convert to VRAM address
+	jsr.W				   Map_PositionToVRAMAddress ; Convert to VRAM address
 	stx.W				   $00f2	 ; Store VRAM address
 
 	ldx.W				   #$2d1a	; Source data pointer
 	lda.B				   #$7e	  ; Bank $7e (WRAM)
 
-CODE_008C9C:
+Sprite_DeterminePalette:
 ; Determine sprite attributes based on display mode
 	pha							   ; Save bank
 
 ; Check if special rendering mode
 	lda.B				   #$04	  ; Check bit 2
 	and.W				   $00da	 ; Test display flags
-	beq					 CODE_008CC5 ; If clear, use normal rendering
+	beq					 Sprite_PaletteNormal ; If clear, use normal rendering
 
 ; Check frame counter for animation
 	lda.W				   $0014	 ; Get frame counter
 	dec					 a
-	beq					 CODE_008CC5 ; If zero, use normal
+	beq					 Sprite_PaletteNormal ; If zero, use normal
 
 ; Check if battle mode
 	lda.B				   #$10	  ; Check bit 4
 	and.W				   $00da	 ; Test battle flag
-	bne					 CODE_008CBB ; If set, use battle sprite
+	bne					 Sprite_PaletteBattle ; If set, use battle sprite
 
 ; Field sprite attributes (incomplete in original)
 PLB_Label:
 	lda.W				   $0001,x   ; Get sprite attribute byte
 	and.B				   #$e3	  ; Mask palette bits
 	ora.B				   #$94	  ; Set field palette
-	bra					 CODE_008CCD ; Apply attributes
+	bra					 Sprite_ApplyAttributes ; Apply attributes
 
-CODE_008CBB:
+Sprite_PaletteBattle:
 ; Battle sprite attributes
 PLB_Label:
 	lda.W				   $0001,x   ; Get sprite attribute byte
 	and.B				   #$e3	  ; Mask palette bits
 	ora.B				   #$9c	  ; Set battle palette
-	bra					 CODE_008CCD ; Apply attributes
+	bra					 Sprite_ApplyAttributes ; Apply attributes
 
-CODE_008CC5:
+Sprite_PaletteNormal:
 ; Normal sprite attributes
 PLB_Label:
 	lda.W				   $0001,x   ; Get sprite attribute byte
 	and.B				   #$e3	  ; Mask palette bits
 	ora.B				   #$88	  ; Set normal palette
 
-CODE_008CCD:
+Sprite_ApplyAttributes:
 ; Apply sprite attributes
 	xba							   ; Swap to high byte
 
 ; Check character position range
 	lda.L				   $001031   ; Get character position
 	cmp.B				   #$29	  ; Compare to boundary
-	bcc					 CODE_008D11 ; If below, use standard display
+	bcc					 Sprite_StandardDisplay ; If below, use standard display
 	cmp.B				   #$2c	  ; Compare to upper boundary
-	beq					 CODE_008D11 ; If equal, use standard
+	beq					 Sprite_StandardDisplay ; If equal, use standard
 
 ; Special position handling (likely stair/elevation display)
 	lda.W				   $0001,x   ; Get attribute byte
@@ -90,11 +90,11 @@ CODE_008CCD:
 	ldy.W				   #$ffff	; Initialize digit counter
 	sec							   ; Set carry for subtraction
 
-CODE_008CEF:
+Sprite_ConvertDigit:
 ; Divide by 10 to get digits
 	iny							   ; Increment digit count
 	sbc.B				   #$0a	  ; Subtract 10
-	bcs					 CODE_008CEF ; If still positive, continue
+	bcs					 Sprite_ConvertDigit ; If still positive, continue
 
 	adc.B				   #$8a	  ; Add tile offset for digits (adjust remainder)
 	sta.W				   $0002,x   ; Store ones digit tile
@@ -112,7 +112,7 @@ UNREACH_008D06:
 ; No tens digit (position < 10)
 	db											 $a9,$45,$9d,$00,$00,$eb,$9d,$01,$00,$80,$0f ; Unreachable code segment
 
-CODE_008D11:
+Sprite_StandardDisplay:
 ; Standard character sprite display
 	xba							   ; Restore attribute byte
 	sta.W				   $0001,x   ; Store to OAM +1
@@ -122,7 +122,7 @@ CODE_008D11:
 	sta.W				   $0000,x   ; Store to OAM +0
 	sta.W				   $0002,x   ; Store to OAM +2
 
-CODE_008D20:
+Sprite_FinalizeUpdate:
 ; Finalize sprite update
 	phk							   ; Push program bank
 	plb							   ; Pull to data bank
@@ -140,19 +140,19 @@ CODE_008D20:
 ; Technical Details: Updates both WRAM buffers for smooth transitions
 ; ===========================================================================
 
-CODE_008D29:
+Sprite_UpdateCharacterDualBuffer:
 	php							   ; Preserve processor status
 	sep					 #$30		; 8-bit A,X,Y
 
 ; Check if dual buffer mode active
 	lda.B				   #$02	  ; Check bit 1
 	and.W				   $00d8	 ; Test display mode flags
-	beq					 CODE_008D6C ; If clear, single buffer mode
+	beq					 Sprite_UpdateSingleBufferAlt ; If clear, single buffer mode
 
 ; Dual buffer mode - get character position
 	ldx.W				   $10b1	 ; Get character map position
 	cpx.B				   #$ff	  ; Check if valid
-	beq					 CODE_008D6A ; If invalid, exit
+	beq					 Sprite_UpdateDone ; If invalid, exit
 
 ; Get character tile and calculate buffer address
 	lda.L				   DATA8_049800,x ; Get tile number from map
@@ -186,11 +186,11 @@ CODE_008D29:
 	lda.W				   #$0080	; Bit 7
 	tsb.W				   $00d4	 ; Set in display flags
 
-CODE_008D6A:
+Sprite_UpdateDone:
 	plp							   ; Restore processor status
 	rts							   ; Return
 
-CODE_008D6C:
+Sprite_UpdateSingleBufferAlt:
 ; Single buffer mode path
 	ldx.W				   $10b1	 ; Get character position
 	lda.L				   DATA8_049800,x ; Get tile number
@@ -200,7 +200,7 @@ CODE_008D6C:
 
 	rep					 #$10		; 16-bit X,Y
 	lda.W				   $10b1	 ; Get position
-	jsr.W				   CODE_008D8A ; Convert to VRAM address
+	jsr.W				   Map_PositionToVRAMAddress ; Convert to VRAM address
 	stx.W				   $00f5	 ; Store VRAM address
 
 	lda.B				   #$80	  ; Set update flag
@@ -217,11 +217,11 @@ CODE_008D6C:
 ; Output: X = VRAM word address
 ; ===========================================================================
 
-CODE_008D8A:
+Map_PositionToVRAMAddress:
 	cmp.B				   #$ff	  ; Check if invalid position
 	beq					 UNREACH_008D93 ; If invalid, return $ffff
 
-	jsr.W				   CODE_008C1B ; Calculate VRAM address
+	jsr.W				   Map_TilePositionToVRAM ; Calculate VRAM address
 	tax							   ; Transfer to X
 	rts							   ; Return
 
@@ -235,12 +235,12 @@ UNREACH_008D93:
 ; Used for: Collision detection, interaction checks
 ; ===========================================================================
 
-CODE_008D97:
+Map_GetAdjacentTileInfo:
 	lda.W				   $1031	 ; Get current character position
 	pha							   ; Save it
 
 	lda.W				   #$0003	; Direction = right
-	jsr.W				   CODE_008DA8 ; Get adjacent tile info
+	jsr.W				   Map_GetTileByDirection ; Get adjacent tile info
 
 	pla							   ; Restore original position
 	sta.W				   $1031	 ; Write back
@@ -255,7 +255,7 @@ CODE_008D97:
 ; Output: Y = tile data, $1031 = new position
 ; ===========================================================================
 
-CODE_008DA8:
+Map_GetTileByDirection:
 	php							   ; Preserve processor status
 	sep					 #$30		; 8-bit A,X,Y
 
@@ -286,29 +286,29 @@ CLC_Label:
 
 	lsr					 a; Start bit shifting
 
-CODE_008DC7:
+Map_ShiftCoordinates:
 ; Shift coordinates based on direction
 	lsr					 a; Shift right 3 times per iteration
 	lsr					 a
 	lsr					 a
 	dex							   ; Decrement shift counter
-	bne					 CODE_008DC7 ; Continue shifting
+	bne					 Map_ShiftCoordinates ; Continue shifting
 
 ; Check collision bits
 	lsr					 a; Shift out bit
-	bcs					 CODE_008DDA ; If carry set, tile exists
+	bcs					 Map_TileFound ; If carry set, tile exists
 
 	dey							   ; Try next tile
 	lsr					 a; Shift out next bit
-	bcs					 CODE_008DDA ; If carry set, tile exists
+	bcs					 Map_TileFound ; If carry set, tile exists
 
 	dey							   ; Try next tile
 	lsr					 a; Shift out next bit
-	bcs					 CODE_008DDA ; If carry set, tile exists
+	bcs					 Map_TileFound ; If carry set, tile exists
 
 	ldy.B				   #$ff	  ; No valid tile found
 
-CODE_008DDA:
+Map_TileFound:
 	sty.W				   $1031	 ; Store result position
 	plp							   ; Restore processor status
 	rts							   ; Return
@@ -321,7 +321,7 @@ CODE_008DDA:
 ; Technical Details: Uses direct page at $2100 for fast register access
 ; ===========================================================================
 
-CODE_008DDF:
+VRAM_TransferTileLoop:
 	php							   ; Preserve processor status
 	phd							   ; Preserve direct page
 
@@ -331,7 +331,7 @@ CODE_008DDF:
 
 	clc							   ; Clear carry for loops
 
-CODE_008DE8:
+VRAM_TransferTile:
 ; Transfer 8 words (16 bytes) per iteration
 	phy							   ; Save tile count
 
@@ -413,7 +413,7 @@ TAX_Label:
 
 	ply							   ; Restore tile count
 	dey							   ; Decrement
-	bne					 CODE_008DE8 ; Continue loop
+	bne					 VRAM_TransferTile ; Continue loop
 
 	pld							   ; Restore direct page
 	plp							   ; Restore processor status
@@ -427,7 +427,7 @@ TAX_Label:
 ; Technical Details: Writes data then $ff00, used for specific tile layouts
 ; ===========================================================================
 
-CODE_008E54:
+VRAM_InterleavedWrite:
 	php							   ; Preserve processor status
 	phd							   ; Preserve direct page
 
@@ -441,7 +441,7 @@ CODE_008E54:
 	rep					 #$30		; 16-bit A,X,Y
 	clc							   ; Clear carry
 
-CODE_008E63:
+VRAM_InterleavedWriteLoop:
 ; Write data word, then $ff00, repeatedly
 ; This creates striped patterns in VRAM
 
@@ -491,7 +491,7 @@ TXA_Label:
 TAX_Label:
 
 	dey							   ; Decrement count
-	bne					 CODE_008E63 ; Continue loop
+	bne					 VRAM_InterleavedWriteLoop ; Continue loop
 
 	sep					 #$20		; 8-bit A
 	lda.B				   #$80	  ; Reset to normal increment mode
