@@ -2417,7 +2417,7 @@ Battle_CheckSpellMP:
 ;      |        |      ;
 Battle_SpellMPSufficient:
 	jsr.W Battle_ProcessPetrifySpell                    ;029103|20DA99  |0299DA;
-	jmp.W CODE_02A008                    ;029106|4C08A0  |02A008;
+	jmp.W Battle_ProcessAccuracyCheck                    ;029106|4C08A0  |02A008;
 ;      |        |      ;
 	lda.B $90                            ;029109|A590    |000490;
 	cmp.B $8f                            ;02910B|C58F    |00048F;
@@ -2442,7 +2442,7 @@ Battle_MPDeducted:
 ;      |        |      ;
 Battle_ExecuteSpellEffect:
 	jsr.W Battle_ProcessPetrifySpell                    ;029130|20DA99  |0299DA;
-	jmp.W CODE_02A008                    ;029133|4C08A0  |02A008;
+	jmp.W Battle_ProcessAccuracyCheck                    ;029133|4C08A0  |02A008;
 ;      |        |      ;
 	lda.B $3a                            ;029136|A53A    |00043A;
 	cmp.B #$13                           ;029138|C913    |      ;
@@ -2470,7 +2470,7 @@ Battle_SpellAnimationComplete:
 ;      |        |      ;
 ;      |        |      ;
 Battle_CommandItem:
-	jsr.W CODE_02A0E1                    ;02917E|20E1A0  |02A0E1;
+	jsr.W Battle_CalculateHitChance                    ;02917E|20E1A0  |02A0E1;
 	jsr.W Battle_DeathResistCheck                    ;029181|209D99  |02999D;
 	lda.B #$1e                           ;029184|A91E    |      ;
 	sta.W $4202                          ;029186|8D0242  |024202;
@@ -2512,7 +2512,7 @@ Battle_UseItem:
 	cmp.B $8f                            ;02926F|C58F    |00048F;
 	bne Battle_ValidateItem                      ;029271|D006    |029279;
 	jsr.W Battle_CureMute                    ;029273|20BE97  |0297BE;
-	jsr.W CODE_02A0E1                    ;029276|20E1A0  |02A0E1;
+	jsr.W Battle_CalculateHitChance                    ;029276|20E1A0  |02A0E1;
 ;      |        |      ;
 Battle_ValidateItem:
 	phd                                  ;029279|0B      |      ;
@@ -2553,7 +2553,7 @@ Battle_ItemValidated:
 	sta.B $e2                            ;029312|85E2    |0004E2;
 	lda.B #$15                           ;029314|A915    |      ;
 	sta.B $df                            ;029316|85DF    |0004DF;
-	jsr.W CODE_02A0E1                    ;029318|20E1A0  |02A0E1;
+	jsr.W Battle_CalculateHitChance                    ;029318|20E1A0  |02A0E1;
 	bra Battle_ItemEffectApplied                      ;02931B|800C    |029329;
 ;      |        |      ;
 ;      |        |      ;
@@ -2562,7 +2562,7 @@ Battle_ApplyItemEffect:
 	cmp.B $8f                            ;02931F|C58F    |00048F;
 	bne Battle_ItemEffectApplied                      ;029321|D006    |029329;
 	jsr.W Battle_CureMute                    ;029323|20BE97  |0297BE;
-	jsr.W CODE_02A0E1                    ;029326|20E1A0  |02A0E1;
+	jsr.W Battle_CalculateHitChance                    ;029326|20E1A0  |02A0E1;
 ;      |        |      ;
 Battle_ItemEffectApplied:
 	phd                                  ;029329|0B      |      ;
@@ -2613,7 +2613,7 @@ Battle_DefendStateSet:
 	jsr.W Battle_CureMute                    ;0293AC|20BE97  |0297BE;
 ;      |        |      ;
 Battle_ProcessDefend:
-	jsr.W CODE_02A0E1                    ;0293AF|20E1A0  |02A0E1;
+	jsr.W Battle_CalculateHitChance                    ;0293AF|20E1A0  |02A0E1;
 ;      |        |      ;
 Battle_DefendComplete:
 	lda.B $38                            ;0293B2|A538    |000438;
@@ -3128,7 +3128,7 @@ Battle_ProcessCure:
 	jsr.W Battle_DisplayMessage                    ;0297A0|203588  |028835;
 	jsr.W CODE_02A22B                    ;0297A3|202BA2  |02A22B;
 	jsr.W CODE_02A22B                    ;0297A6|202BA2  |02A22B;
-	jmp.W CODE_02A0E1                    ;0297A9|4CE1A0  |02A0E1;
+	jmp.W Battle_CalculateHitChance                    ;0297A9|4CE1A0  |02A0E1;
 ;      |        |      ;
 ;      |        |      ;
 Battle_RemoveStatusEffect:
@@ -4371,7 +4371,7 @@ Battle_VictoryComplete:
 	rts                                  ;02A007|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
-CODE_02A008:
+Battle_ProcessAccuracyCheck:
 	phd                                  ;02A008|0B      |      ;
 	jsr.W Battle_SetEntityContextEnemy                    ;02A009|202F8F  |028F2F;
 	lda.B $2e                            ;02A00C|A52E    |0011AE;
@@ -4396,22 +4396,22 @@ UNREACH_02A014:
 	db $85,$b6,$64,$e2,$c2,$30,$a5,$77,$64,$77,$48,$a5,$8b,$29,$0f,$00;02A0C4|        |0000B6;
 	db $0a,$aa,$68,$18,$75,$d1,$95,$d1,$e2,$20,$c2,$10,$60;02A0D4|        |      ;
 ;      |        |      ;
-CODE_02A0E1:
+Battle_CalculateHitChance:
 	lda.B $90                            ;02A0E1|A590    |000490;
 	cmp.B $8f                            ;02A0E3|C58F    |00048F;
-	beq CODE_02A0E8                      ;02A0E5|F001    |02A0E8;
+	beq Battle_RollHitDice                      ;02A0E5|F001    |02A0E8;
 	db $60                               ;02A0E7|        |      ;
 ;      |        |      ;
-CODE_02A0E8:
+Battle_RollHitDice:
 	lda.B $df                            ;02A0E8|A5DF    |0004DF;
 	sta.W $0505                          ;02A0EA|8D0505  |020505;
 	lda.B $8d                            ;02A0ED|A58D    |00048D;
 	cmp.B #$02                           ;02A0EF|C902    |      ;
-	bcs CODE_02A123                      ;02A0F1|B030    |02A123;
+	bcs Battle_ProcessMissAnimation                      ;02A0F1|B030    |02A123;
 	jsr.W CODE_02A18E                    ;02A0F3|208EA1  |02A18E;
 	lda.B $39                            ;02A0F6|A539    |000439;
 	and.B #$80                           ;02A0F8|2980    |      ;
-	bne CODE_02A109                      ;02A0FA|D00D    |02A109;
+	bne Battle_CompareHitRoll                      ;02A0FA|D00D    |02A109;
 	lda.B #$00                           ;02A0FC|A900    |      ;
 	xba                                  ;02A0FE|EB      |      ;
 	lda.B $8d                            ;02A0FF|A58D    |00048D;
@@ -4421,29 +4421,29 @@ CODE_02A0E8:
 	bra CODE_02A15D                      ;02A107|8054    |02A15D;
 ;      |        |      ;
 ;      |        |      ;
-CODE_02A109:
+Battle_CompareHitRoll:
 	lda.W $1021                          ;02A109|AD2110  |021021;
 	and.B #$c0                           ;02A10C|29C0    |      ;
-	bne CODE_02A115                      ;02A10E|D005    |02A115;
+	bne Battle_HitSuccess                      ;02A10E|D005    |02A115;
 	lda.B $e3                            ;02A110|A5E3    |0004E3;
 	sta.W $0ab2                          ;02A112|8DB20A  |020AB2;
 ;      |        |      ;
-CODE_02A115:
+Battle_HitSuccess:
 	lda.W $10a1                          ;02A115|ADA110  |0210A1;
 	and.B #$c0                           ;02A118|29C0    |      ;
-	bne CODE_02A121                      ;02A11A|D005    |02A121;
+	bne Battle_HitFailed                      ;02A11A|D005    |02A121;
 	lda.B $e3                            ;02A11C|A5E3    |0004E3;
 	sta.W $0ab3                          ;02A11E|8DB30A  |020AB3;
 ;      |        |      ;
-CODE_02A121:
+Battle_HitFailed:
 	bra CODE_02A15D                      ;02A121|803A    |02A15D;
 ;      |        |      ;
 ;      |        |      ;
-CODE_02A123:
+Battle_ProcessMissAnimation:
 	jsr.W CODE_02A1A4                    ;02A123|20A4A1  |02A1A4;
 	lda.B $39                            ;02A126|A539    |000439;
 	and.B #$80                           ;02A128|2980    |      ;
-	bne CODE_02A139                      ;02A12A|D00D    |02A139;
+	bne Battle_DisplayMiss                      ;02A12A|D00D    |02A139;
 	lda.B #$00                           ;02A12C|A900    |      ;
 	xba                                  ;02A12E|EB      |      ;
 	lda.B $8d                            ;02A12F|A58D    |00048D;
@@ -4453,21 +4453,21 @@ CODE_02A123:
 	bra CODE_02A15D                      ;02A137|8024    |02A15D;
 ;      |        |      ;
 ;      |        |      ;
-CODE_02A139:
+Battle_DisplayMiss:
 	lda.W $1121                          ;02A139|AD2111  |021121;
 	and.B #$c0                           ;02A13C|29C0    |      ;
-	bne CODE_02A145                      ;02A13E|D005    |02A145;
+	bne Battle_MissComplete                      ;02A13E|D005    |02A145;
 	lda.B $e2                            ;02A140|A5E2    |0004E2;
 	sta.W $0ab4                          ;02A142|8DB40A  |020AB4;
 ;      |        |      ;
-CODE_02A145:
+Battle_MissComplete:
 	lda.W $11a1                          ;02A145|ADA111  |0211A1;
 	and.B #$c0                           ;02A148|29C0    |      ;
-	bne CODE_02A151                      ;02A14A|D005    |02A151;
+	bne Battle_ProcessCounter                      ;02A14A|D005    |02A151;
 	lda.B $e2                            ;02A14C|A5E2    |0004E2;
 	sta.W $0ab5                          ;02A14E|8DB50A  |020AB5;
 ;      |        |      ;
-CODE_02A151:
+Battle_ProcessCounter:
 	lda.W $1221                          ;02A151|AD2112  |021221;
 	and.B #$c0                           ;02A154|29C0    |      ;
 	bne CODE_02A15D                      ;02A156|D005    |02A15D;
