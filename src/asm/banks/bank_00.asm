@@ -6355,10 +6355,10 @@ Math_IncrementReturn:
 	sec                                  ;00B3C2|38      |      ;
 	sbc.W #$0001                         ;00B3C3|E90100  |      ;
 	sta.B $9e                            ;00B3C6|859E    |00009E;
-	bcs CODE_00B3CC                      ;00B3C8|B002    |00B3CC;
+	bcs Script_Return                      ;00B3C8|B002    |00B3CC;
 	dec.B $a0                            ;00B3CA|C6A0    |0000A0;
 ;      |        |      ;
-CODE_00B3CC:
+Script_Return:
 	rts                                  ;00B3CC|60      |      ;
 ;      |        |      ;
 	lda.B [$17]                          ;00B3CD|A717    |000017;
@@ -6456,20 +6456,20 @@ Sprite_CalculatePosition_Ten:
 Display_ClampMin:
 	lda.B $1a                            ;00B49E|A51A    |00001A;
 	cmp.B $44                            ;00B4A0|C544    |000044;
-	bcs CODE_00B4A6                      ;00B4A2|B002    |00B4A6;
+	bcs Display_ClampMin_Return                      ;00B4A2|B002    |00B4A6;
 	sta.B $44                            ;00B4A4|8544    |000044;
 ;      |        |      ;
-CODE_00B4A6:
+Display_ClampMin_Return:
 	rts                                  ;00B4A6|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
 Display_ClampMax:
 	lda.B $1a                            ;00B4A7|A51A    |00001A;
 	cmp.B $46                            ;00B4A9|C546    |000046;
-	bcc CODE_00B4AF                      ;00B4AB|9002    |00B4AF;
+	bcc Display_ClampMax_Return                      ;00B4AB|9002    |00B4AF;
 	sta.B $46                            ;00B4AD|8546    |000046;
 ;      |        |      ;
-CODE_00B4AF:
+Display_ClampMax_Return:
 	rts                                  ;00B4AF|60      |      ;
 ;      |        |      ;
 	lda.W #$0020                         ;00B4B0|A92000  |      ;
@@ -6813,7 +6813,7 @@ Item_SubtractGold:
 	sta.W $0e9f,x                        ;00B70B|9D9F0E  |000E9F;
 	lda.W $015f                          ;00B70E|AD5F01  |00015F;
 	sta.W $0e9e,x                        ;00B711|9D9E0E  |000E9E;
-	bra CODE_00B727                      ;00B714|8011    |00B727;
+	bra Text_WrapCheck_Return                      ;00B714|8011    |00B727;
 ;      |        |      ;
 ;      |        |      ;
 Item_UpdateGPCounter:
@@ -6821,14 +6821,14 @@ Item_UpdateGPCounter:
 	lda.W $1030                          ;00B717|AD3010  |001030;
 	adc.W $0162                          ;00B71A|6D6201  |000162;
 	sta.W $1030                          ;00B71D|8D3010  |001030;
-	bra CODE_00B727                      ;00B720|8005    |00B727;
+	bra Text_WrapCheck_Return                      ;00B720|8005    |00B727;
 ;      |        |      ;
 ;      |        |      ;
 Dialog_RestorePointer:
 	sep #$20                             ;00B722|E220    |      ;
 	stz.W $0162                          ;00B724|9C6201  |000162;
 ;      |        |      ;
-CODE_00B727:
+Text_WrapCheck_Return:
 	plx                                  ;00B727|FA      |      ;
 	stx.B $18                            ;00B728|8618    |000018;
 	plx                                  ;00B72A|FA      |      ;
@@ -11972,32 +11972,32 @@ Graphics_ProcessSprite:
 	sta.B $05                            ;00DE7A|8505    |001F9B;
 	sep #$20                             ;00DE7C|E220    |      ;
 	ldx.B $11                            ;00DE7E|A611    |001FA7;
-	lda.W CODE_00DF0D,x                  ;00DE80|BD0DDF  |00DF0D;
+	lda.W Graphics_TileDrawComplete,x                  ;00DE80|BD0DDF  |00DF0D;
 	ldx.B $0f                            ;00DE83|A60F    |001FA5;
-	beq CODE_00DE8B                      ;00DE85|F004    |00DE8B;
+	beq Graphics_StoreShiftedMask                      ;00DE85|F004    |00DE8B;
 ;      |        |      ;
-CODE_00DE87:
+Graphics_ShiftMaskBits:
 	lsr a;00DE87|4A      |      ;
 	dex                                  ;00DE88|CA      |      ;
-	bne CODE_00DE87                      ;00DE89|D0FC    |00DE87;
+	bne Graphics_ShiftMaskBits                      ;00DE89|D0FC    |00DE87;
 ;      |        |      ;
-CODE_00DE8B:
+Graphics_StoreShiftedMask:
 	sta.B $09                            ;00DE8B|8509    |001F9F;
 	sta.B $0a                            ;00DE8D|850A    |001FA0;
 	rep #$30                             ;00DE8F|C230    |      ;
 	pea.W $007f                          ;00DE91|F47F00  |00007F;
 	plb                                  ;00DE94|AB      |      ;
-	jsr.W CODE_00DEB7                    ;00DE95|20B7DE  |00DEB7;
+	jsr.W Graphics_TileDrawLoop                    ;00DE95|20B7DE  |00DEB7;
 	plb                                  ;00DE98|AB      |      ;
 	lda.B $11                            ;00DE99|A511    |001FA7;
 	adc.W $00b8                          ;00DE9B|6DB800  |0000B8;
 	cmp.W #$0008                         ;00DE9E|C90800  |      ;
-	bcc CODE_00DEAC                      ;00DEA1|9009    |00DEAC;
+	bcc Graphics_AdjustNextRow                      ;00DEA1|9009    |00DEAC;
 	inc.W $00b6                          ;00DEA3|EEB600  |0000B6;
 	inc.W $00b6                          ;00DEA6|EEB600  |0000B6;
 	sbc.W #$0008                         ;00DEA9|E90800  |      ;
 ;      |        |      ;
-CODE_00DEAC:
+Graphics_AdjustNextRow:
 	sta.W $00b8                          ;00DEAC|8DB800  |0000B8;
 	tsc                                  ;00DEAF|3B      |      ;
 	clc                                  ;00DEB0|18      |      ;
@@ -12007,10 +12007,10 @@ CODE_00DEAC:
 	rts                                  ;00DEB6|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
-CODE_00DEB7:
+Graphics_TileDrawLoop:
 	ldx.B $0d                            ;00DEB7|A60D    |001FA3;
 ;      |        |      ;
-CODE_00DEB9:
+Graphics_ProcessTileRow:
 	stz.B $01                            ;00DEB9|6401    |001F97;
 	lda.L DATA8_078030,x                 ;00DEBB|BF308007|078030;
 	eor.W #$00ff                         ;00DEBF|49FF00  |      ;
@@ -12039,7 +12039,7 @@ CODE_00DEB9:
 	and.B $05                            ;00DEE8|2505    |001F9B;
 	ora.W $0002,y                        ;00DEEA|190200  |7F0002;
 	sta.W $0002,y                        ;00DEED|990200  |7F0002;
-	bra CODE_00DEFF                      ;00DEF0|800D    |00DEFF;
+	bra Graphics_NextTileRow                      ;00DEF0|800D    |00DEFF;
 ;      |        |      ;
 	db $0a,$0a,$0a                       ;00DEF2|        |      ;
 	asl a;00DEF5|0A      |      ;
@@ -12049,7 +12049,7 @@ CODE_00DEB9:
 	ora.W $0000,y                        ;00DEF9|190000  |7F0000;
 	sta.W $0000,y                        ;00DEFC|990000  |7F0000;
 ;      |        |      ;
-CODE_00DEFF:
+Graphics_NextTileRow:
 	clc                                  ;00DEFF|18      |      ;
 	tya                                  ;00DF00|98      |      ;
 	adc.B $0b                            ;00DF01|650B    |001FA1;
@@ -12058,9 +12058,9 @@ CODE_00DEFF:
 	adc.W #$0040                         ;00DF05|694000  |      ;
 	tax                                  ;00DF08|AA      |      ;
 	dec.B $13                            ;00DF09|C613    |001FA9;
-	bne CODE_00DEB9                      ;00DF0B|D0AC    |00DEB9;
+	bne Graphics_ProcessTileRow                      ;00DF0B|D0AC    |00DEB9;
 ;      |        |      ;
-CODE_00DF0D:
+Graphics_TileDrawComplete:
 	rts                                  ;00DF0D|60      |      ;
 ;      |        |      ;
 	db $80                               ;00DF0E|        |00DED0;
@@ -12353,13 +12353,13 @@ Dialog_MainLoop:
 	and.W $00d0                          ;00E107|2DD000  |0000D0;
 	bne Dialog_ProcessAltInput                   ;00E10A|D005    |00E111;
 	lda.W $0094                          ;00E10C|AD9400  |000094;
-	bra CODE_00E114                      ;00E10F|8003    |00E114;
+	bra Graphics_8x8Tile_Draw                      ;00E10F|8003    |00E114;
 ;      |        |      ;
 ;      |        |      ;
 Dialog_ProcessAltInput:
 	db $ad,$07,$00                       ;00E111|        |000007;
 ;      |        |      ;
-CODE_00E114:
+Graphics_8x8Tile_Draw:
 	and.W #$8080                         ;00E114|298080  |      ;
 	beq Dialog_MainLoop                      ;00E117|F0DF    |00E0F8;
 ;      |        |      ;
@@ -12385,11 +12385,11 @@ Dialog_ProcessSpriteCommand:
 	bne Dialog_AdjustPosition                      ;00E132|D043    |00E177;
 	lda.B $03,s                          ;00E134|A303    |000003;
 	cmp.W #$00ff                         ;00E136|C9FF00  |      ;
-	bne CODE_00E141                      ;00E139|D006    |00E141;
+	bne Graphics_8x8Tile_Process                      ;00E139|D006    |00E141;
 	jsr.W Item_ItemUsable                    ;00E13B|205EDC  |00DC5E;
 	stz.W $00ca                          ;00E13E|9CCA00  |0000CA;
 ;      |        |      ;
-CODE_00E141:
+Graphics_8x8Tile_Process:
 	lda.B $60                            ;00E141|A560    |0000BE;
 	cmp.B $58                            ;00E143|C558    |0000B6;
 	bcc Dialog_CheckBufferBounds                      ;00E145|9007    |00E14E;
@@ -12868,10 +12868,10 @@ Graphics_ScrollDisplay:
 	sta.W $00ce                          ;00E6F5|8DCE00  |0000CE;
 	jsr.W Graphics_ScrollLoop                    ;00E6F8|2017E7  |00E717;
 	lda.B $09                            ;00E6FB|A509    |001F82;
-	beq CODE_00E70E                      ;00E6FD|F00F    |00E70E;
+	beq Graphics_LoadFont                      ;00E6FD|F00F    |00E70E;
 	db $85,$05,$38,$ad,$c6,$00,$e5,$05,$85,$11,$e6,$07,$20,$17,$e7;00E6FF|        |000005;
 ;      |        |      ;
-CODE_00E70E:
+Graphics_LoadFont:
 	tsc                                  ;00E70E|3B      |      ;
 	clc                                  ;00E70F|18      |      ;
 	adc.W #$0012                         ;00E710|691200  |      ;
@@ -12972,7 +12972,7 @@ Graphics_DrawPixel:
 	sta.B $06                            ;00E96D|8506    |000064;
 	lda.W DATA8_00eab1,x                 ;00E96F|BDB1EA  |00EAB1;
 	sta.B $04                            ;00E972|8504    |000062;
-	jsr.W CODE_00EB62                    ;00E974|2062EB  |00EB62;
+	jsr.W Graphics_CalcScreenAddr                    ;00E974|2062EB  |00EB62;
 	tax                                  ;00E977|AA      |      ;
 	lda.L $7f2000,x                      ;00E978|BF00207F|7F2000;
 	and.B $04                            ;00E97C|2504    |000062;
@@ -12984,7 +12984,7 @@ Graphics_DrawPixel:
 	tcd                                  ;00E988|5B      |      ;
 	lda.B $58                            ;00E989|A558    |0000B6;
 	cmp.B $5c                            ;00E98B|C55C    |0000BA;
-	beq CODE_00E9B3                      ;00E98D|F024    |00E9B3;
+	beq Graphics_Line_Shallow                      ;00E98D|F024    |00E9B3;
 	lda.B $5a                            ;00E98F|A55A    |0000B8;
 	cmp.B $5e                            ;00E991|C55E    |0000BC;
 	bne UNREACH_00E9B6                   ;00E993|D021    |00E9B6;
@@ -12992,7 +12992,7 @@ Graphics_DrawPixel:
 	lda.B $5c                            ;00E996|A55C    |0000BA;
 	sbc.B $58                            ;00E998|E558    |0000B6;
 	cmp.W #$0008                         ;00E99A|C90800  |      ;
-	bcs CODE_00E9B0                      ;00E99D|B011    |00E9B0;
+	bcs Graphics_Line_Steep                      ;00E99D|B011    |00E9B0;
 	pei.B ($58)                          ;00E99F|D458    |0000B6;
 ;      |        |      ;
 Graphics_DrawPixelLoop:
@@ -13006,12 +13006,12 @@ Graphics_DrawPixelLoop:
 	rts                                  ;00E9AF|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
-CODE_00E9B0:
-	jmp.W CODE_00EAD1                    ;00E9B0|4CD1EA  |00EAD1;
+Graphics_Line_Steep:
+	jmp.W Graphics_Line_Vertical                    ;00E9B0|4CD1EA  |00EAD1;
 ;      |        |      ;
 ;      |        |      ;
-CODE_00E9B3:
-	jmp.W CODE_00EA76                    ;00E9B3|4C76EA  |00EA76;
+Graphics_Line_Shallow:
+	jmp.W Graphics_Pixel_CalcAddr                    ;00E9B3|4C76EA  |00EA76;
 ;      |        |      ;
 ;      |        |      ;
 UNREACH_00E9B6:
@@ -13028,7 +13028,7 @@ UNREACH_00E9B6:
 	db $85,$03,$c5,$01,$90,$dc,$e5,$01,$85,$03,$18,$ad,$b8,$00,$65,$05;00EA56|        |000003;
 	db $8d,$b8,$00,$80,$cd,$a5,$06,$8d,$b6,$00,$a5,$07,$8d,$b8,$00,$60;00EA66|        |0000B8;
 ;      |        |      ;
-CODE_00EA76:
+Graphics_Pixel_CalcAddr:
 	lda.W #$005e                         ;00EA76|A95E00  |      ;
 	tcd                                  ;00EA79|5B      |      ;
 	lda.B $58                            ;00EA7A|A558    |0000B6;
@@ -13043,7 +13043,7 @@ CODE_00EA76:
 	sta.B $06                            ;00EA8B|8506    |000064;
 	lda.W DATA8_00eab1,x                 ;00EA8D|BDB1EA  |00EAB1;
 	sta.B $04                            ;00EA90|8504    |000062;
-	jsr.W CODE_00EB62                    ;00EA92|2062EB  |00EB62;
+	jsr.W Graphics_CalcScreenAddr                    ;00EA92|2062EB  |00EB62;
 	tax                                  ;00EA95|AA      |      ;
 	sec                                  ;00EA96|38      |      ;
 	lda.B $5e                            ;00EA97|A55E    |0000BC;
@@ -13051,7 +13051,7 @@ CODE_00EA76:
 	tay                                  ;00EA9B|A8      |      ;
 	clc                                  ;00EA9C|18      |      ;
 ;      |        |      ;
-CODE_00EA9D:
+Graphics_Pixel_Store:
 	lda.L $7f2000,x                      ;00EA9D|BF00207F|7F2000;
 	and.B $04                            ;00EAA1|2504    |000062;
 	ora.B $06                            ;00EAA3|0506    |000064;
@@ -13060,7 +13060,7 @@ CODE_00EA9D:
 	adc.B $56                            ;00EAAA|6556    |0000B4;
 	tax                                  ;00EAAC|AA      |      ;
 	dey                                  ;00EAAD|88      |      ;
-	bpl CODE_00EA9D                      ;00EAAE|10ED    |00EA9D;
+	bpl Graphics_Pixel_Store                      ;00EAAE|10ED    |00EA9D;
 	rts                                  ;00EAB0|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
@@ -13070,7 +13070,7 @@ DATA8_00eab1:
 DATA8_00eac1:
 	db $80,$80,$40,$40,$20,$20,$10,$10,$08,$08,$04,$04,$02,$02,$01,$01;00EAC1|        |      ;
 ;      |        |      ;
-CODE_00EAD1:
+Graphics_Line_Vertical:
 	lda.W #$005e                         ;00EAD1|A95E00  |      ;
 	tcd                                  ;00EAD4|5B      |      ;
 	lda.B $60                            ;00EAD5|A560    |0000BE;
@@ -13078,7 +13078,7 @@ CODE_00EAD1:
 	tax                                  ;00EAD8|AA      |      ;
 	lda.W DATA8_00eb5a,x                 ;00EAD9|BD5AEB  |00EB5A;
 	sta.B $04                            ;00EADC|8504    |000062;
-	jsr.W CODE_00EB62                    ;00EADE|2062EB  |00EB62;
+	jsr.W Graphics_CalcScreenAddr                    ;00EADE|2062EB  |00EB62;
 	tax                                  ;00EAE1|AA      |      ;
 	lda.B $58                            ;00EAE2|A558    |0000B6;
 	and.W #$0007                         ;00EAE4|290700  |      ;
@@ -13097,9 +13097,9 @@ CODE_00EAD1:
 	inx                                  ;00EB05|E8      |      ;
 	inx                                  ;00EB06|E8      |      ;
 ;      |        |      ;
-CODE_00EB07:
+Graphics_Line_Process:
 	cmp.B $5c                            ;00EB07|C55C    |0000BA;
-	bcs CODE_00EB1A                      ;00EB09|B00F    |00EB1A;
+	bcs Graphics_Line_PlotPixel                      ;00EB09|B00F    |00EB1A;
 	tay                                  ;00EB0B|A8      |      ;
 	lda.B $04                            ;00EB0C|A504    |000062;
 	sta.L $7f2000,x                      ;00EB0E|9F00207F|7F2000;
@@ -13107,10 +13107,10 @@ CODE_00EB07:
 	adc.W #$0008                         ;00EB13|690800  |      ;
 	inx                                  ;00EB16|E8      |      ;
 	inx                                  ;00EB17|E8      |      ;
-	bra CODE_00EB07                      ;00EB18|80ED    |00EB07;
+	bra Graphics_Line_Process                      ;00EB18|80ED    |00EB07;
 ;      |        |      ;
 ;      |        |      ;
-CODE_00EB1A:
+Graphics_Line_PlotPixel:
 	lda.B $5c                            ;00EB1A|A55C    |0000BA;
 	and.W #$0007                         ;00EB1C|290700  |      ;
 	asl a;00EB1F|0A      |      ;
@@ -13140,7 +13140,7 @@ DATA8_00eb4a:
 DATA8_00eb5a:
 	db $00,$00,$ff,$00,$00,$ff,$ff,$ff   ;00EB5A|        |      ;
 ;      |        |      ;
-CODE_00EB62:
+Graphics_CalcScreenAddr:
 	sep #$20                             ;00EB62|E220    |      ;
 	lda.B $5a                            ;00EB64|A55A    |0000B8;
 	sta.W SNES_WRMPYA                    ;00EB66|8D0242  |004202;
@@ -13184,139 +13184,139 @@ CODE_00EB62:
 	db $9c,$9c,$0e,$a9,$10,$00,$0c,$d4,$00,$a0,$00,$20,$a2,$ff,$00,$a9;00EBB1|        |000E9C;
 	db $50,$07,$f4,$7f,$00,$ab,$20,$98,$99,$ab,$60;00EBC1|        |00EBCA;
 	ldx.W #$2000                         ;00EBCC|A20020  |      ;
-	bra CODE_00EBD4                      ;00EBCF|8003    |00EBD4;
+	bra Graphics_ClearLayer_Loop                      ;00EBCF|8003    |00EBD4;
 ;      |        |      ;
 	ldx.W #$2750                         ;00EBD1|A25027  |      ;
 ;      |        |      ;
-CODE_00EBD4:
+Graphics_ClearLayer_Loop:
 	pea.W $007f                          ;00EBD4|F47F00  |00007F;
 	plb                                  ;00EBD7|AB      |      ;
 	ldy.W #$0009                         ;00EBD8|A00900  |      ;
 	clc                                  ;00EBDB|18      |      ;
 ;      |        |      ;
-CODE_00EBDC:
-	jsr.W CODE_00ECA0                    ;00EBDC|20A0EC  |00ECA0;
+Graphics_ClearRow_Loop:
+	jsr.W Graphics_ClearTileLine                    ;00EBDC|20A0EC  |00ECA0;
 	txa                                  ;00EBDF|8A      |      ;
 	adc.W #$0034                         ;00EBE0|693400  |      ;
 	tax                                  ;00EBE3|AA      |      ;
-	jsr.W CODE_00EE76                    ;00EBE4|2076EE  |00EE76;
+	jsr.W Graphics_FillPattern_Process                    ;00EBE4|2076EE  |00EE76;
 	txa                                  ;00EBE7|8A      |      ;
 	adc.W #$0034                         ;00EBE8|693400  |      ;
 	tax                                  ;00EBEB|AA      |      ;
-	jsr.W CODE_00ED8B                    ;00EBEC|208BED  |00ED8B;
+	jsr.W Graphics_FillPattern_Layer                    ;00EBEC|208BED  |00ED8B;
 	txa                                  ;00EBEF|8A      |      ;
 	adc.W #$0034                         ;00EBF0|693400  |      ;
 	tax                                  ;00EBF3|AA      |      ;
-	jsr.W CODE_00EF61                    ;00EBF4|2061EF  |00EF61;
+	jsr.W Graphics_FillTiles_Loop                    ;00EBF4|2061EF  |00EF61;
 	txa                                  ;00EBF7|8A      |      ;
 	adc.W #$0034                         ;00EBF8|693400  |      ;
 	tax                                  ;00EBFB|AA      |      ;
 	dey                                  ;00EBFC|88      |      ;
-	bne CODE_00EBDC                      ;00EBFD|D0DD    |00EBDC;
+	bne Graphics_ClearRow_Loop                      ;00EBFD|D0DD    |00EBDC;
 	plb                                  ;00EBFF|AB      |      ;
 	rts                                  ;00EC00|60      |      ;
 ;      |        |      ;
 	ldx.W #$2000                         ;00EC01|A20020  |      ;
-	bra CODE_00EC09                      ;00EC04|8003    |00EC09;
+	bra Graphics_ClearRow2_Loop                      ;00EC04|8003    |00EC09;
 ;      |        |      ;
 	ldx.W #$2750                         ;00EC06|A25027  |      ;
 ;      |        |      ;
-CODE_00EC09:
+Graphics_ClearRow2_Loop:
 	pea.W $007f                          ;00EC09|F47F00  |00007F;
 	plb                                  ;00EC0C|AB      |      ;
 	ldy.W #$0009                         ;00EC0D|A00900  |      ;
 	clc                                  ;00EC10|18      |      ;
 ;      |        |      ;
-CODE_00EC11:
-	jsr.W CODE_00EE76                    ;00EC11|2076EE  |00EE76;
+Graphics_ClearRow2_NextRow:
+	jsr.W Graphics_FillPattern_Process                    ;00EC11|2076EE  |00EE76;
 	txa                                  ;00EC14|8A      |      ;
 	adc.W #$0034                         ;00EC15|693400  |      ;
 	tax                                  ;00EC18|AA      |      ;
-	jsr.W CODE_00ECA0                    ;00EC19|20A0EC  |00ECA0;
+	jsr.W Graphics_ClearTileLine                    ;00EC19|20A0EC  |00ECA0;
 	txa                                  ;00EC1C|8A      |      ;
 	adc.W #$0034                         ;00EC1D|693400  |      ;
 	tax                                  ;00EC20|AA      |      ;
-	jsr.W CODE_00EF61                    ;00EC21|2061EF  |00EF61;
+	jsr.W Graphics_FillTiles_Loop                    ;00EC21|2061EF  |00EF61;
 	txa                                  ;00EC24|8A      |      ;
 	adc.W #$0034                         ;00EC25|693400  |      ;
 	tax                                  ;00EC28|AA      |      ;
-	jsr.W CODE_00ED8B                    ;00EC29|208BED  |00ED8B;
+	jsr.W Graphics_FillPattern_Layer                    ;00EC29|208BED  |00ED8B;
 	txa                                  ;00EC2C|8A      |      ;
 	adc.W #$0034                         ;00EC2D|693400  |      ;
 	tax                                  ;00EC30|AA      |      ;
 	dey                                  ;00EC31|88      |      ;
-	bne CODE_00EC11                      ;00EC32|D0DD    |00EC11;
+	bne Graphics_ClearRow2_NextRow                      ;00EC32|D0DD    |00EC11;
 	plb                                  ;00EC34|AB      |      ;
 	rts                                  ;00EC35|60      |      ;
 ;      |        |      ;
 	ldx.W #$2000                         ;00EC36|A20020  |      ;
-	bra CODE_00EC3E                      ;00EC39|8003    |00EC3E;
+	bra Graphics_ClearRow3_Loop                      ;00EC39|8003    |00EC3E;
 ;      |        |      ;
 	ldx.W #$2750                         ;00EC3B|A25027  |      ;
 ;      |        |      ;
-CODE_00EC3E:
+Graphics_ClearRow3_Loop:
 	pea.W $007f                          ;00EC3E|F47F00  |00007F;
 	plb                                  ;00EC41|AB      |      ;
 	ldy.W #$0009                         ;00EC42|A00900  |      ;
 	clc                                  ;00EC45|18      |      ;
 ;      |        |      ;
-CODE_00EC46:
-	jsr.W CODE_00EF61                    ;00EC46|2061EF  |00EF61;
+Graphics_ClearRow3_NextRow:
+	jsr.W Graphics_FillTiles_Loop                    ;00EC46|2061EF  |00EF61;
 	txa                                  ;00EC49|8A      |      ;
 	adc.W #$0034                         ;00EC4A|693400  |      ;
 	tax                                  ;00EC4D|AA      |      ;
-	jsr.W CODE_00ED8B                    ;00EC4E|208BED  |00ED8B;
+	jsr.W Graphics_FillPattern_Layer                    ;00EC4E|208BED  |00ED8B;
 	txa                                  ;00EC51|8A      |      ;
 	adc.W #$0034                         ;00EC52|693400  |      ;
 	tax                                  ;00EC55|AA      |      ;
-	jsr.W CODE_00ECA0                    ;00EC56|20A0EC  |00ECA0;
+	jsr.W Graphics_ClearTileLine                    ;00EC56|20A0EC  |00ECA0;
 	txa                                  ;00EC59|8A      |      ;
 	adc.W #$0034                         ;00EC5A|693400  |      ;
 	tax                                  ;00EC5D|AA      |      ;
-	jsr.W CODE_00EE76                    ;00EC5E|2076EE  |00EE76;
+	jsr.W Graphics_FillPattern_Process                    ;00EC5E|2076EE  |00EE76;
 	txa                                  ;00EC61|8A      |      ;
 	adc.W #$0034                         ;00EC62|693400  |      ;
 	tax                                  ;00EC65|AA      |      ;
 	dey                                  ;00EC66|88      |      ;
-	bne CODE_00EC46                      ;00EC67|D0DD    |00EC46;
+	bne Graphics_ClearRow3_NextRow                      ;00EC67|D0DD    |00EC46;
 	plb                                  ;00EC69|AB      |      ;
 	rts                                  ;00EC6A|60      |      ;
 ;      |        |      ;
 	ldx.W #$2000                         ;00EC6B|A20020  |      ;
-	bra CODE_00EC73                      ;00EC6E|8003    |00EC73;
+	bra Graphics_ClearRow4_Loop                      ;00EC6E|8003    |00EC73;
 ;      |        |      ;
 	ldx.W #$2750                         ;00EC70|A25027  |      ;
 ;      |        |      ;
-CODE_00EC73:
+Graphics_ClearRow4_Loop:
 	pea.W $007f                          ;00EC73|F47F00  |00007F;
 	plb                                  ;00EC76|AB      |      ;
 	ldy.W #$0009                         ;00EC77|A00900  |      ;
 	clc                                  ;00EC7A|18      |      ;
 ;      |        |      ;
-CODE_00EC7B:
-	jsr.W CODE_00ED8B                    ;00EC7B|208BED  |00ED8B;
+Graphics_ClearRow4_NextRow:
+	jsr.W Graphics_FillPattern_Layer                    ;00EC7B|208BED  |00ED8B;
 	txa                                  ;00EC7E|8A      |      ;
 	adc.W #$0034                         ;00EC7F|693400  |      ;
 	tax                                  ;00EC82|AA      |      ;
-	jsr.W CODE_00EF61                    ;00EC83|2061EF  |00EF61;
+	jsr.W Graphics_FillTiles_Loop                    ;00EC83|2061EF  |00EF61;
 	txa                                  ;00EC86|8A      |      ;
 	adc.W #$0034                         ;00EC87|693400  |      ;
 	tax                                  ;00EC8A|AA      |      ;
-	jsr.W CODE_00EE76                    ;00EC8B|2076EE  |00EE76;
+	jsr.W Graphics_FillPattern_Process                    ;00EC8B|2076EE  |00EE76;
 	txa                                  ;00EC8E|8A      |      ;
 	adc.W #$0034                         ;00EC8F|693400  |      ;
 	tax                                  ;00EC92|AA      |      ;
-	jsr.W CODE_00ECA0                    ;00EC93|20A0EC  |00ECA0;
+	jsr.W Graphics_ClearTileLine                    ;00EC93|20A0EC  |00ECA0;
 	txa                                  ;00EC96|8A      |      ;
 	adc.W #$0034                         ;00EC97|693400  |      ;
 	tax                                  ;00EC9A|AA      |      ;
 	dey                                  ;00EC9B|88      |      ;
-	bne CODE_00EC7B                      ;00EC9C|D0DD    |00EC7B;
+	bne Graphics_ClearRow4_NextRow                      ;00EC9C|D0DD    |00EC7B;
 	plb                                  ;00EC9E|AB      |      ;
 	rts                                  ;00EC9F|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
-CODE_00ECA0:
+Graphics_ClearTileLine:
 	lda.W $0000,x                        ;00ECA0|BD0000  |7F0000;
 	and.W #$7777                         ;00ECA3|297777  |      ;
 	sta.W $0000,x                        ;00ECA6|9D0000  |7F0000;
@@ -13398,7 +13398,7 @@ CODE_00ECA0:
 	rts                                  ;00ED8A|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
-CODE_00ED8B:
+Graphics_FillPattern_Layer:
 	lda.W $0000,x                        ;00ED8B|BD0000  |7F0000;
 	and.W #$bbbb                         ;00ED8E|29BBBB  |      ;
 	sta.W $0000,x                        ;00ED91|9D0000  |7F0000;
@@ -13480,7 +13480,7 @@ CODE_00ED8B:
 	rts                                  ;00EE75|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
-CODE_00EE76:
+Graphics_FillPattern_Process:
 	lda.W $0000,x                        ;00EE76|BD0000  |7F0000;
 	and.W #$dddd                         ;00EE79|29DDDD  |      ;
 	sta.W $0000,x                        ;00EE7C|9D0000  |7F0000;
@@ -13562,7 +13562,7 @@ CODE_00EE76:
 	rts                                  ;00EF60|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
-CODE_00EF61:
+Graphics_FillTiles_Loop:
 	lda.W $0000,x                        ;00EF61|BD0000  |7F0000;
 	and.W #$eeee                         ;00EF64|29EEEE  |      ;
 	sta.W $0000,x                        ;00EF67|9D0000  |7F0000;
@@ -13650,14 +13650,14 @@ CODE_00EF61:
 	pea.W $007f                          ;00F056|F47F00  |00007F;
 	plb                                  ;00F059|AB      |      ;
 ;      |        |      ;
-CODE_00F05A:
+Graphics_FillTiles_Store:
 	tay                                  ;00F05A|A8      |      ;
 	lda.W #$0000                         ;00F05B|A90000  |      ;
 	jsr.W Memory_Fill_14Bytes                    ;00F05E|20059A  |009A05;
 	tya                                  ;00F061|98      |      ;
 	adc.W #$0034                         ;00F062|693400  |      ;
 	dex                                  ;00F065|CA      |      ;
-	bne CODE_00F05A                      ;00F066|D0F2    |00F05A;
+	bne Graphics_FillTiles_Store                      ;00F066|D0F2    |00F05A;
 	plb                                  ;00F068|AB      |      ;
 	rts                                  ;00F069|60      |      ;
 ;      |        |      ;
