@@ -1,6 +1,12 @@
 #!/usr/bin/env python3
 # FFMQ Enemy Data Extractor
-# Extracts enemy stats from ROM Bank 02 offset C275
+# Extracts enemy stats from ROM
+#
+# ROM Addresses (SNES CPU addresses, need conversion to file offsets):
+#  - Enemy Stats: Bank $02, ROM $C275 (14 bytes each, 83 enemies)
+#  - Enemy Level/Mult: Bank $02, ROM $C17C (3 bytes each, 83 enemies)
+#
+# LoROM file offset formula: bank * 0x8000 + (rom_addr - 0x8000)
 
 import sys, struct, csv, json
 from pathlib import Path
@@ -31,8 +37,15 @@ ENEMY_NAMES = [
     "Dark King Spider"
 ]
 
-def snes_to_pc(bank, offset):
-    return ((bank & 0x3F) * 0x8000) + (offset & 0x7FFF)
+def rom_to_file_offset(bank, rom_addr):
+    """Convert SNES ROM address to file offset (LoROM)."""
+    return bank * 0x8000 + (rom_addr - 0x8000)
+
+# ROM addresses (SNES CPU addresses)
+ENEMY_STATS_BANK = 0x02
+ENEMY_STATS_ROM = 0xC275
+ENEMY_LEVEL_BANK = 0x02
+ENEMY_LEVEL_ROM = 0xC17C
 
 def decode_elements(value):
     return [name for bit, name in ELEMENT_TYPES.items() if value & bit]
@@ -46,8 +59,8 @@ print("Extracting 83 enemies...")
 
 enemies = []
 for i in range(83):
-    stats_addr = snes_to_pc(0x02, 0xC275 + i * 14)
-    level_addr = snes_to_pc(0x02, 0xC17C + i * 3)
+    stats_addr = rom_to_file_offset(ENEMY_STATS_BANK, ENEMY_STATS_ROM + i * 14)
+    level_addr = rom_to_file_offset(ENEMY_LEVEL_BANK, ENEMY_LEVEL_ROM + i * 3)
 
     s = rom[stats_addr:stats_addr+14]
     l = rom[level_addr:level_addr+3]

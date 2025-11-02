@@ -1,5 +1,11 @@
 #!/usr/bin/env python3
-"""Extract attack/battle action data from FFMQ ROM."""
+"""
+Extract attack/battle action data from FFMQ ROM.
+
+ROM Address: Bank $02, ROM $BC78 (7 bytes each, 169 attacks)
+LoROM file offset formula: bank * 0x8000 + (rom_addr - 0x8000)
+File offset: 0x013C78
+"""
 
 import sys
 import json
@@ -8,7 +14,10 @@ from pathlib import Path
 
 # ROM Configuration
 ROM_PATH = Path("roms/Final Fantasy - Mystic Quest (U) (V1.1).sfc")
-ATTACK_DATA_OFFSET = 0x0BC78  # File address for attack data
+
+# ROM Address (SNES CPU address - needs conversion)
+ATTACK_DATA_BANK = 0x02
+ATTACK_DATA_ROM = 0xBC78
 ATTACK_COUNT = 169
 ATTACK_SIZE = 7  # bytes per attack entry
 
@@ -17,13 +26,18 @@ OUTPUT_DIR = Path("data/extracted/attacks")
 CSV_OUTPUT = OUTPUT_DIR / "attacks.csv"
 JSON_OUTPUT = OUTPUT_DIR / "attacks.json"
 
+def rom_to_file_offset(bank, rom_addr):
+    """Convert SNES ROM address to file offset (LoROM)."""
+    return bank * 0x8000 + (rom_addr - 0x8000)
+
 def read_attacks(rom_data):
     """Extract all attack entries from ROM."""
     attacks = []
-    offset = ATTACK_DATA_OFFSET
+    file_offset = rom_to_file_offset(ATTACK_DATA_BANK, ATTACK_DATA_ROM)
 
     for i in range(ATTACK_COUNT):
         # Read 7 bytes for this attack
+        offset = file_offset + (i * ATTACK_SIZE)
         attack_data = rom_data[offset:offset + ATTACK_SIZE]
 
         attack = {
@@ -64,8 +78,9 @@ def save_json(attacks):
     output = {
         "metadata": {
             "source": "Final Fantasy Mystic Quest (U) V1.1",
-            "rom_address": f"${ATTACK_DATA_OFFSET:06X}",
-            "bank": "$02",
+            "bank": f"${ATTACK_DATA_BANK:02X}",
+            "rom_address": f"${ATTACK_DATA_ROM:04X}",
+            "file_offset": f"${rom_to_file_offset(ATTACK_DATA_BANK, ATTACK_DATA_ROM):06X}",
             "entry_size": ATTACK_SIZE,
             "entry_count": len(attacks),
             "description": "Battle action data (player, companion, and enemy attacks)"
@@ -87,7 +102,9 @@ def main():
     print(f"Reading ROM from: {ROM_PATH}")
     rom_data = ROM_PATH.read_bytes()
 
-    print(f"Extracting {ATTACK_COUNT} attacks from offset ${ATTACK_DATA_OFFSET:06X}...")
+    file_offset = rom_to_file_offset(ATTACK_DATA_BANK, ATTACK_DATA_ROM)
+    print(f"Extracting {ATTACK_COUNT} attacks from Bank ${ATTACK_DATA_BANK:02X}, ROM ${ATTACK_DATA_ROM:04X}")
+    print(f"  File offset: ${file_offset:06X}")
     attacks = read_attacks(rom_data)
 
     save_csv(attacks)
