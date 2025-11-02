@@ -471,12 +471,16 @@ yes
 continue with even larger batches
 continue with even larger batches
 yes
-
-
-
-
-
-
+continue with even larger batches
+continue with even larger batches
+continue with even larger batches and continue into other banks
+continue doing as many renamings as you can, finishing bank 00 and then working the other banks
+continue with even larger batches
+go for it
+go for it
+go!
+continue doing as many renamings as you can
+bank_02 
 
 
 
