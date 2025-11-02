@@ -33,7 +33,11 @@ MAIN_ASM = $(ASM_DIR)/main.s
         convert-graphics install-deps build-tools docs test test-rom test-setup \
         test-launch test-debug extract-bank06 extract-all verify-bank06 verify-all \
         generate-asm pipeline graphics-extract graphics-rebuild graphics-full \
-        graphics-validate graphics-asm
+        graphics-validate graphics-asm graphics-pipeline rom-with-graphics \
+        text-extract text-rebuild text-pipeline \
+        maps-extract maps-rebuild maps-pipeline \
+        overworld-extract effects-extract \
+        extract-all-phase3 rebuild-all-phase3 full-pipeline
 
 # Default target
 all: rom
@@ -295,4 +299,110 @@ graphics-pipeline: graphics-rebuild graphics-asm
 # Build ROM with graphics integration
 rom-with-graphics: graphics-rebuild rom
 	@echo "ROM built with integrated graphics!"
+
+# ============================================
+# Phase 3: Text Editing Pipeline
+# ============================================
+
+# Extract all text to JSON/CSV
+text-extract:
+	@echo "Extracting text from ROM..."
+	$(PYTHON) $(TOOLS_DIR)/build_integration.py --extract-text
+
+# Rebuild text from edited JSON/CSV
+text-rebuild:
+	@echo "Rebuilding text data..."
+	$(PYTHON) $(TOOLS_DIR)/build_integration.py --rebuild-text
+
+# Complete text workflow
+text-pipeline: text-extract text-rebuild
+	@echo ""
+	@echo "=========================================="
+	@echo "Text pipeline complete!"
+	@echo "Edit data/extracted/text/text_complete.json"
+	@echo "Then run 'make text-rebuild' to update ROM"
+	@echo "=========================================="
+
+# ============================================
+# Phase 3: Map Editing Pipeline
+# ============================================
+
+# Extract all maps to TMX (Tiled format)
+maps-extract:
+	@echo "Extracting maps to TMX format..."
+	$(PYTHON) $(TOOLS_DIR)/build_integration.py --extract-maps
+
+# Rebuild maps from edited TMX files
+maps-rebuild:
+	@echo "Rebuilding maps from TMX..."
+	$(PYTHON) $(TOOLS_DIR)/build_integration.py --rebuild-maps
+
+# Complete maps workflow
+maps-pipeline: maps-extract maps-rebuild
+	@echo ""
+	@echo "=========================================="
+	@echo "Maps pipeline complete!"
+	@echo "Edit TMX files in Tiled Map Editor"
+	@echo "Then run 'make maps-rebuild' to update ROM"
+	@echo "=========================================="
+
+# ============================================
+# Phase 3: Overworld Graphics Pipeline
+# ============================================
+
+# Extract overworld graphics (tilesets, sprites, objects, NPCs)
+overworld-extract:
+	@echo "Extracting overworld graphics..."
+	$(PYTHON) $(TOOLS_DIR)/build_integration.py --extract-overworld
+
+# ============================================
+# Phase 3: Effects Graphics Pipeline
+# ============================================
+
+# Extract effect graphics (spells, attacks, status, particles)
+effects-extract:
+	@echo "Extracting effect graphics..."
+	$(PYTHON) $(TOOLS_DIR)/build_integration.py --extract-effects
+
+# ============================================
+# Phase 3: Combined Operations
+# ============================================
+
+# Extract everything (Phase 2 + Phase 3)
+extract-all-phase3: graphics-extract text-extract maps-extract overworld-extract effects-extract
+	@echo ""
+	@echo "=========================================="
+	@echo "All Phase 3 extraction complete!"
+	@echo "=========================================="
+	@echo "Extracted:"
+	@echo "  - Battle graphics (sprites)"
+	@echo "  - Text data (dialogue, items, spells, enemies)"
+	@echo "  - Maps (TMX for Tiled editor)"
+	@echo "  - Overworld graphics (tilesets, walking sprites)"
+	@echo "  - Effect graphics (spells, attacks, particles)"
+	@echo ""
+	@echo "Edit files in data/extracted/"
+	@echo "Then run 'make rebuild-all-phase3'"
+	@echo "=========================================="
+
+# Rebuild everything that changed
+rebuild-all-phase3: graphics-rebuild text-rebuild maps-rebuild
+	@echo ""
+	@echo "=========================================="
+	@echo "All Phase 3 rebuild complete!"
+	@echo "=========================================="
+
+# Full pipeline: extract all + rebuild all
+full-pipeline:
+	@echo "Running complete FFMQ modding pipeline..."
+	$(PYTHON) $(TOOLS_DIR)/build_integration.py --pipeline
+
+# Build complete ROM with all modifications
+rom-full: rebuild-all-phase3 rom
+	@echo ""
+	@echo "=========================================="
+	@echo "Complete ROM built with all modifications!"
+	@echo "=========================================="
+	@echo "Output: $(OUTPUT_ROM)"
+	@echo ""
 

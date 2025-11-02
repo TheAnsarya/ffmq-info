@@ -1,29 +1,34 @@
 #!/usr/bin/env python3
 """
-Build Integration System
-Manages the complete graphics pipeline: Extract → Edit → Rebuild
+Build Integration System - Phase 3 Enhanced
+Manages complete ROM hacking pipeline: Graphics, Text, Maps, Effects
 
-This script coordinates the round-trip graphics workflow:
-1. Extract graphics from ROM → PNG + JSON
-2. Edit PNGs in external tools (Aseprite, GIMP, etc.)
-3. Re-import edited PNGs → Binary data
-4. Insert binary data into ROM during build
+This script coordinates all round-trip workflows:
+1. Graphics: Extract → Edit → Rebuild (Phase 2)
+2. Text: Extract → Edit → Import (Phase 3)
+3. Maps: Extract → Edit in Tiled → Import (Phase 3)
+4. Overworld: Extract → Edit → Rebuild (Phase 3)
+5. Effects: Extract → Edit → Rebuild (Phase 3)
 
 Features:
-- Automatic detection of modified PNGs
-- Incremental rebuild (only changed graphics)
+- Automatic detection of modified files
+- Incremental rebuild (only changed data)
 - Validation and error checking
 - Build manifest generation
+- Multi-format support (PNG, JSON, CSV, TMX)
 - Integration with asar assembler
 
 Usage:
-	python build_integration.py --extract    # Extract all graphics
-	python build_integration.py --rebuild    # Rebuild changed graphics
-	python build_integration.py --full       # Full rebuild
-	python build_integration.py --validate   # Validate all graphics
+	python build_integration.py --extract-all     # Extract everything
+	python build_integration.py --rebuild-all     # Rebuild all changes
+	python build_integration.py --full            # Full rebuild
+	python build_integration.py --validate        # Validate all data
+	python build_integration.py --graphics        # Graphics only
+	python build_integration.py --text            # Text only
+	python build_integration.py --maps            # Maps only
 
-Author: FFMQ Disassembly Project
-Date: 2025-11-02
+Author: FFMQ Modding Project
+Date: 2025-11-02 (Phase 3 Enhanced)
 """
 
 import sys
@@ -330,22 +335,352 @@ class BuildIntegration:
 		else:
 			return False
 
+	# ========================================
+	# Phase 3: Text Pipeline Methods
+	# ========================================
+
+	def extract_all_text(self) -> bool:
+		"""Extract all text from ROM."""
+		print("\n=== Extracting Text Data ===")
+
+		rom_path = self.project_root / 'roms' / 'FFMQ.sfc'
+		output_dir = self.extracted_dir / 'text'
+
+		if not rom_path.exists():
+			print(f"❌ ROM not found: {rom_path}")
+			return False
+
+		# Run text extraction
+		cmd = [
+			sys.executable,
+			str(self.project_root / 'tools' / 'extract_text_enhanced.py'),
+			str(rom_path),
+			str(output_dir)
+		]
+
+		result = subprocess.run(cmd, capture_output=True, text=True)
+
+		if result.returncode == 0:
+			print("✓ Text extraction complete")
+			return True
+		else:
+			print(f"❌ Text extraction failed: {result.stderr}")
+			return False
+
+	def rebuild_text(self) -> bool:
+		"""Rebuild text data back to ROM."""
+		print("\n=== Rebuilding Text Data ===")
+
+		source_rom = self.project_root / 'roms' / 'FFMQ.sfc'
+		text_json = self.extracted_dir / 'text' / 'text_complete.json'
+		output_rom = self.build_dir / 'ffmq_text_modified.sfc'
+
+		if not text_json.exists():
+			print(f"❌ Text data not found: {text_json}")
+			print("   Run --extract-text first")
+			return False
+
+		# Check if text was modified
+		text_hash = self.compute_file_hash(text_json)
+		manifest_hash = self.manifest.get('text', {}).get('hash')
+
+		if text_hash == manifest_hash:
+			print("  ℹ️  Text unchanged, skipping rebuild")
+			return True
+
+		# Run text import
+		cmd = [
+			sys.executable,
+			str(self.project_root / 'tools' / 'import' / 'import_text.py'),
+			str(source_rom),
+			str(text_json),
+			str(output_rom)
+		]
+
+		result = subprocess.run(cmd, capture_output=True, text=True)
+
+		if result.returncode == 0:
+			# Update manifest
+			self.manifest['text'] = {
+				'hash': text_hash,
+				'timestamp': datetime.now().isoformat()
+			}
+			self.save_manifest()
+
+			print("✓ Text rebuild complete")
+			return True
+		else:
+			print(f"❌ Text rebuild failed: {result.stderr}")
+			return False
+
+	# ========================================
+	# Phase 3: Map Pipeline Methods
+	# ========================================
+
+	def extract_all_maps(self) -> bool:
+		"""Extract all maps to TMX format."""
+		print("\n=== Extracting Map Data ===")
+
+		rom_path = self.project_root / 'roms' / 'FFMQ.sfc'
+		output_dir = self.extracted_dir / 'maps'
+
+		if not rom_path.exists():
+			print(f"❌ ROM not found: {rom_path}")
+			return False
+
+		# Run map extraction
+		cmd = [
+			sys.executable,
+			str(self.project_root / 'tools' / 'extract_maps_enhanced.py'),
+			str(rom_path),
+			str(output_dir),
+			'tmx,json'
+		]
+
+		result = subprocess.run(cmd, capture_output=True, text=True)
+
+		if result.returncode == 0:
+			print("✓ Map extraction complete")
+			return True
+		else:
+			print(f"❌ Map extraction failed: {result.stderr}")
+			return False
+
+	def rebuild_maps(self) -> bool:
+		"""Rebuild maps from TMX files."""
+		print("\n=== Rebuilding Map Data ===")
+
+		source_rom = self.project_root / 'roms' / 'FFMQ.sfc'
+		maps_dir = self.extracted_dir / 'maps' / 'maps'
+		output_rom = self.build_dir / 'ffmq_maps_modified.sfc'
+
+		if not maps_dir.exists():
+			print(f"❌ Maps directory not found: {maps_dir}")
+			print("   Run --extract-maps first")
+			return False
+
+		# Check for modified TMX files
+		modified_maps = []
+		for tmx_file in maps_dir.glob('*.tmx'):
+			file_hash = self.compute_file_hash(tmx_file)
+			manifest_key = f'map_{tmx_file.stem}'
+			manifest_hash = self.manifest.get('maps', {}).get(manifest_key)
+
+			if file_hash != manifest_hash:
+				modified_maps.append(tmx_file)
+
+		if not modified_maps:
+			print("  ℹ️  No maps modified, skipping rebuild")
+			return True
+
+		print(f"  Found {len(modified_maps)} modified maps")
+
+		# Run map import
+		cmd = [
+			sys.executable,
+			str(self.project_root / 'tools' / 'import' / 'import_maps.py'),
+			str(source_rom),
+			str(maps_dir),
+			str(output_rom)
+		]
+
+		result = subprocess.run(cmd, capture_output=True, text=True)
+
+		if result.returncode == 0:
+			# Update manifest for all maps
+			if 'maps' not in self.manifest:
+				self.manifest['maps'] = {}
+
+			for tmx_file in maps_dir.glob('*.tmx'):
+				file_hash = self.compute_file_hash(tmx_file)
+				manifest_key = f'map_{tmx_file.stem}'
+				self.manifest['maps'][manifest_key] = file_hash
+
+			self.manifest['maps']['timestamp'] = datetime.now().isoformat()
+			self.save_manifest()
+
+			print("✓ Map rebuild complete")
+			return True
+		else:
+			print(f"❌ Map rebuild failed: {result.stderr}")
+			return False
+
+	# ========================================
+	# Phase 3: Overworld Graphics Methods
+	# ========================================
+
+	def extract_overworld_graphics(self) -> bool:
+		"""Extract overworld graphics (tilesets, sprites)."""
+		print("\n=== Extracting Overworld Graphics ===")
+
+		rom_path = self.project_root / 'roms' / 'FFMQ.sfc'
+		output_dir = self.extracted_dir / 'overworld'
+
+		if not rom_path.exists():
+			print(f"❌ ROM not found: {rom_path}")
+			return False
+
+		# Run overworld extraction
+		cmd = [
+			sys.executable,
+			str(self.project_root / 'tools' / 'extract_overworld.py'),
+			str(rom_path),
+			str(output_dir)
+		]
+
+		result = subprocess.run(cmd, capture_output=True, text=True)
+
+		if result.returncode == 0:
+			print("✓ Overworld extraction complete")
+			return True
+		else:
+			print(f"❌ Overworld extraction failed: {result.stderr}")
+			return False
+
+	# ========================================
+	# Phase 3: Effects Graphics Methods
+	# ========================================
+
+	def extract_effects_graphics(self) -> bool:
+		"""Extract spell/battle effect graphics."""
+		print("\n=== Extracting Effect Graphics ===")
+
+		rom_path = self.project_root / 'roms' / 'FFMQ.sfc'
+		output_dir = self.extracted_dir / 'effects'
+
+		if not rom_path.exists():
+			print(f"❌ ROM not found: {rom_path}")
+			return False
+
+		# Run effects extraction
+		cmd = [
+			sys.executable,
+			str(self.project_root / 'tools' / 'extract_effects.py'),
+			str(rom_path),
+			str(output_dir)
+		]
+
+		result = subprocess.run(cmd, capture_output=True, text=True)
+
+		if result.returncode == 0:
+			print("✓ Effects extraction complete")
+			return True
+		else:
+			print(f"❌ Effects extraction failed: {result.stderr}")
+			return False
+
+	# ========================================
+	# Phase 3: Combined Operations
+	# ========================================
+
+	def extract_all_phase3(self) -> bool:
+		"""Extract all Phase 3 data (text, maps, overworld, effects)."""
+		print("\n=== Phase 3: Extracting All Data ===")
+
+		success = True
+		success = self.extract_all_text() and success
+		success = self.extract_all_maps() and success
+		success = self.extract_overworld_graphics() and success
+		success = self.extract_effects_graphics() and success
+
+		if success:
+			print("\n✓ All Phase 3 extraction complete!")
+		else:
+			print("\n❌ Some Phase 3 extractions failed")
+
+		return success
+
+	def rebuild_all_phase3(self) -> bool:
+		"""Rebuild all Phase 3 data."""
+		print("\n=== Phase 3: Rebuilding All Data ===")
+
+		success = True
+		success = self.rebuild_text() and success
+		success = self.rebuild_maps() and success
+
+		if success:
+			print("\n✓ All Phase 3 rebuild complete!")
+		else:
+			print("\n❌ Some Phase 3 rebuilds failed")
+
+		return success
+
+	def full_pipeline(self) -> bool:
+		"""Execute complete pipeline: extract everything, rebuild everything."""
+		print("\n" + "="*60)
+		print("FFMQ Complete Build Pipeline")
+		print("="*60)
+
+		success = True
+
+		# Phase 2: Graphics
+		success = self.extract_all_graphics() and success
+		success = self.rebuild_modified_graphics() and success
+
+		# Phase 3: All data types
+		success = self.extract_all_phase3() and success
+		success = self.rebuild_all_phase3() and success
+
+		if success:
+			print("\n" + "="*60)
+			print("✓ Complete pipeline executed successfully!")
+			print("="*60)
+		else:
+			print("\n" + "="*60)
+			print("❌ Pipeline completed with errors")
+			print("="*60)
+
+		return success
+
 
 def main():
 	"""Main function for command-line usage."""
 	import argparse
 
 	parser = argparse.ArgumentParser(
-		description='Graphics build integration system for FFMQ'
+		description='Complete build integration system for FFMQ (Phase 2 + Phase 3)'
 	)
+
+	# Phase 2: Graphics operations
 	parser.add_argument('--extract', action='store_true',
-						help='Extract all graphics from ROM')
+						help='Extract all graphics from ROM (Phase 2)')
 	parser.add_argument('--rebuild', action='store_true',
-						help='Rebuild modified graphics')
+						help='Rebuild modified graphics (Phase 2)')
 	parser.add_argument('--full', action='store_true',
 						help='Full rebuild (extract + rebuild)')
 	parser.add_argument('--validate', action='store_true',
 						help='Validate all graphics')
+
+	# Phase 3: Individual operations
+	parser.add_argument('--extract-text', action='store_true',
+						help='Extract all text data')
+	parser.add_argument('--rebuild-text', action='store_true',
+						help='Rebuild text data')
+	parser.add_argument('--extract-maps', action='store_true',
+						help='Extract all maps (TMX/JSON)')
+	parser.add_argument('--rebuild-maps', action='store_true',
+						help='Rebuild maps from TMX')
+	parser.add_argument('--extract-overworld', action='store_true',
+						help='Extract overworld graphics')
+	parser.add_argument('--extract-effects', action='store_true',
+						help='Extract effect graphics')
+
+	# Phase 3: Combined operations
+	parser.add_argument('--extract-all', action='store_true',
+						help='Extract everything (graphics + text + maps + overworld + effects)')
+	parser.add_argument('--rebuild-all', action='store_true',
+						help='Rebuild everything that changed')
+	parser.add_argument('--pipeline', action='store_true',
+						help='Full pipeline: extract all + rebuild all')
+
+	# Utility operations
+	parser.add_argument('--graphics', action='store_true',
+						help='Graphics pipeline only (extract + rebuild)')
+	parser.add_argument('--text', action='store_true',
+						help='Text pipeline only (extract + rebuild)')
+	parser.add_argument('--maps', action='store_true',
+						help='Maps pipeline only (extract + rebuild)')
+
 	parser.add_argument('--project-root', type=Path, default=Path.cwd(),
 						help='Project root directory')
 
@@ -356,19 +691,82 @@ def main():
 
 	success = True
 
-	# Execute requested operation
-	if args.extract or args.full:
-		success = integration.extract_all_graphics() and success
+	# Execute requested operations
 
-	if args.rebuild or args.full:
+	# Pipeline mode: everything
+	if args.pipeline:
+		success = integration.full_pipeline() and success
+
+	# Extract all mode
+	elif args.extract_all:
+		success = integration.extract_all_graphics() and success
+		success = integration.extract_all_phase3() and success
+
+	# Rebuild all mode
+	elif args.rebuild_all:
+		success = integration.rebuild_modified_graphics() and success
+		success = integration.rebuild_all_phase3() and success
+
+	# Individual pipeline shortcuts
+	elif args.graphics:
+		success = integration.extract_all_graphics() and success
 		success = integration.rebuild_modified_graphics() and success
 
-	if args.validate:
-		success = integration.validate_graphics() and success
+	elif args.text:
+		success = integration.extract_all_text() and success
+		success = integration.rebuild_text() and success
 
-	if not (args.extract or args.rebuild or args.full or args.validate):
-		parser.print_help()
-		return 1
+	elif args.maps:
+		success = integration.extract_all_maps() and success
+		success = integration.rebuild_maps() and success
+
+	# Individual operations
+	else:
+		# Phase 2 graphics
+		if args.extract or args.full:
+			success = integration.extract_all_graphics() and success
+
+		if args.rebuild or args.full:
+			success = integration.rebuild_modified_graphics() and success
+
+		if args.validate:
+			success = integration.validate_graphics() and success
+
+		# Phase 3 text
+		if args.extract_text:
+			success = integration.extract_all_text() and success
+
+		if args.rebuild_text:
+			success = integration.rebuild_text() and success
+
+		# Phase 3 maps
+		if args.extract_maps:
+			success = integration.extract_all_maps() and success
+
+		if args.rebuild_maps:
+			success = integration.rebuild_maps() and success
+
+		# Phase 3 overworld
+		if args.extract_overworld:
+			success = integration.extract_overworld_graphics() and success
+
+		# Phase 3 effects
+		if args.extract_effects:
+			success = integration.extract_effects_graphics() and success
+
+		# Show help if no operations specified
+		if not any([args.extract, args.rebuild, args.full, args.validate,
+					args.extract_text, args.rebuild_text, args.extract_maps,
+					args.rebuild_maps, args.extract_overworld, args.extract_effects]):
+			parser.print_help()
+			print("\nExamples:")
+			print("  python build_integration.py --pipeline          # Full workflow")
+			print("  python build_integration.py --extract-all       # Extract everything")
+			print("  python build_integration.py --rebuild-all       # Rebuild changes")
+			print("  python build_integration.py --graphics          # Graphics only")
+			print("  python build_integration.py --text              # Text only")
+			print("  python build_integration.py --maps              # Maps only")
+			return 1
 
 	return 0 if success else 1
 
