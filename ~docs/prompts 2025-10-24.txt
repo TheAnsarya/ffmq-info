@@ -485,6 +485,7 @@ continue doing as many labels as you can
 yes do bank 0d! however, you've been stalling on the summaries - don't take so long, resume, continue doing as many labels as you can, but please timestamp your chat responses so I can see how long I have been waiting, etc
 no, do verbose summaries please, it was just taking much longer than usual. I restarted VSCode, so maybe it will be faster? continue onwards!
 focus on cleaning up the DATA labels
+update issues and task lists and review what has been done, then pick an issue and implement it, and then another, etc
 
 
 
