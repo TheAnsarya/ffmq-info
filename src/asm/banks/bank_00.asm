@@ -7388,7 +7388,7 @@ Screen_InitializeVideoRegisters:
 	tcd                                  ;00BC24|5B      |      ;
 	ldx.W #$c8e6                         ;00BC25|A2E6C8  |      ;
 	jsr.W DMA_CopyParamsAndExecute                    ;00BC28|20C49B  |009BC4;
-	jsr.W CODE_00C4DB                    ;00BC2B|20DBC4  |00C4DB;
+	jsr.W Battle_InitializeGraphics                    ;00BC2B|20DBC4  |00C4DB;
 	jsr.W Battle_InitializeTilemap                    ;00BC2E|2064BD  |00BD64;
 	lda.W #$0200                         ;00BC31|A90002  |      ;
 	sta.W $01f0                          ;00BC34|8DF001  |0001F0;
@@ -7834,7 +7834,7 @@ Input_UpdateCursorSprite:
 	cmp.W #$0011                         ;00BF9D|C91100  |      ;
 	bcc Sprite_StoreToOAM                      ;00BFA0|904D    |00BFEF;
 	beq Sprite_CalculateOAM                      ;00BFA2|F034    |00BFD8;
-	jsr.W CODE_00C012                    ;00BFA4|2012C0  |00C012;
+	jsr.W Menu_ProcessItemSelection                    ;00BFA4|2012C0  |00C012;
 	bcc Sprite_UpdatePosition                      ;00BFA7|9005    |00BFAE;
 	bne Input_PlayMoveSound_Check                      ;00BFA9|D0AF    |00BF5A;
 	lda.W #$0080                         ;00BFAB|A98000  |      ;
@@ -7864,7 +7864,7 @@ UNREACH_00BFD5:
 	db $4c,$5a,$bf                       ;00BFD5|        |00BF5A;
 ;      |        |      ;
 Sprite_CalculateOAM:
-	jsr.W CODE_00C012                    ;00BFD8|2012C0  |00C012;
+	jsr.W Menu_ProcessItemSelection                    ;00BFD8|2012C0  |00C012;
 	bcc Sprite_ApplyOffset                      ;00BFDB|9005    |00BFE2;
 	bne UNREACH_00BFD5                   ;00BFDD|D0F6    |00BFD5;
 	lda.W #$0080                         ;00BFDF|A98000  |      ;
@@ -7879,7 +7879,7 @@ Sprite_ApplyOffset:
 ;      |        |      ;
 ;      |        |      ;
 Sprite_StoreToOAM:
-	jsr.W CODE_00C012                    ;00BFEF|2012C0  |00C012;
+	jsr.W Menu_ProcessItemSelection                    ;00BFEF|2012C0  |00C012;
 	bcc Sprite_Complete                      ;00BFF2|9005    |00BFF9;
 	bne UNREACH_00BFD5                   ;00BFF4|D0DF    |00BFD5;
 	lda.W #$0080                         ;00BFF6|A98000  |      ;
@@ -7892,15 +7892,15 @@ Sprite_Complete:
 	lsr a;00C001|4A      |      ;
 	adc.W $1014,x                        ;00C002|7D1410  |001014;
 	cmp.W $1016,x                        ;00C005|DD1610  |001016;
-	bcc CODE_00C00D                      ;00C008|9003    |00C00D;
+	bcc Sprite_SetPosition                      ;00C008|9003    |00C00D;
 	lda.W $1016,x                        ;00C00A|BD1610  |001016;
 ;      |        |      ;
-CODE_00C00D:
+Sprite_SetPosition:
 	sta.W $1014,x                        ;00C00D|9D1410  |001014;
 	bra Sprite_WriteOAM                      ;00C010|80AE    |00BFC0;
 ;      |        |      ;
 ;      |        |      ;
-CODE_00C012:
+Menu_ProcessItemSelection:
 	phx                                  ;00C012|DA      |      ;
 	sep #$20                             ;00C013|E220    |      ;
 	sta.W $043a                          ;00C015|8D3A04  |00043A;
@@ -7919,20 +7919,20 @@ CODE_00C012:
 	sta.B $03                            ;00C03B|8503    |000003;
 	ldx.W #$fff0                         ;00C03D|A2F0FF  |      ;
 	stx.B $8e                            ;00C040|868E    |00008E;
-	bra CODE_00C08D                      ;00C042|8049    |00C08D;
+	bra Menu_RefreshDisplay                      ;00C042|8049    |00C08D;
 ;      |        |      ;
 ;      |        |      ;
 UNREACH_00C044:
 	db $20,$12,$b9                       ;00C044|        |00B912;
 ;      |        |      ;
-CODE_00C047:
+Menu_WaitForInput:
 	lda.W #$cfb0                         ;00C047|A9B0CF  |      ;
 	jsr.W Input_WaitForButton                    ;00C04A|2030B9  |00B930;
-	bne CODE_00C08D                      ;00C04D|D03E    |00C08D;
+	bne Menu_RefreshDisplay                      ;00C04D|D03E    |00C08D;
 	bit.W #$0080                         ;00C04F|898000  |      ;
-	bne CODE_00C098                      ;00C052|D044    |00C098;
+	bne Menu_ValidateItem                      ;00C052|D044    |00C098;
 	bit.W #$8000                         ;00C054|890080  |      ;
-	beq CODE_00C047                      ;00C057|F0EE    |00C047;
+	beq Menu_WaitForInput                      ;00C057|F0EE    |00C047;
 	jsr.W Sound_PlayEffect_WindowOpen                    ;00C059|201CB9  |00B91C;
 	stz.B $8e                            ;00C05C|648E    |00008E;
 	ldx.W #$c1d6                         ;00C05E|A2D6C1  |      ;
@@ -7944,19 +7944,19 @@ UNREACH_00C064:
 	db $de,$18,$10,$e2,$20,$a9,$14,$8d,$3a,$04,$22,$e0,$8a,$02,$ad,$df;00C074|        |001018;
 	db $04,$8d,$05,$05,$a9,$14,$4c,$f4,$bc;00C084|        |00008D;
 ;      |        |      ;
-CODE_00C08D:
+Menu_RefreshDisplay:
 	ldx.W #$c1d3                         ;00C08D|A2D3C1  |      ;
 	jsr.W DMA_CopyParamsAndExecute                    ;00C090|20C49B  |009BC4;
-	bra CODE_00C047                      ;00C093|80B2    |00C047;
+	bra Menu_WaitForInput                      ;00C093|80B2    |00C047;
 ;      |        |      ;
 ;      |        |      ;
 UNREACH_00C095:
 	db $4c,$44,$c0                       ;00C095|        |00C044;
 ;      |        |      ;
-CODE_00C098:
+Menu_ValidateItem:
 	lda.B $01                            ;00C098|A501    |000001;
 	and.W #$00ff                         ;00C09A|29FF00  |      ;
-	beq CODE_00C0B2                      ;00C09D|F013    |00C0B2;
+	beq Menu_CheckItemValid                      ;00C09D|F013    |00C0B2;
 	cmp.W #$0003                         ;00C09F|C90300  |      ;
 	bne UNREACH_00C044                   ;00C0A2|D0A0    |00C044;
 	lda.W $1090                          ;00C0A4|AD9010  |001090;
@@ -7965,7 +7965,7 @@ CODE_00C098:
 	beq UNREACH_00C044                   ;00C0AD|F095    |00C044;
 	lda.W #$0080                         ;00C0AF|A98000  |      ;
 ;      |        |      ;
-CODE_00C0B2:
+Menu_CheckItemValid:
 	tax                                  ;00C0B2|AA      |      ;
 	lda.W $1021,x                        ;00C0B3|BD2110  |001021;
 	and.W #$00f9                         ;00C0B6|29F900  |      ;
@@ -7984,65 +7984,65 @@ CODE_00C0B2:
 	and.W #$00ff                         ;00C0D6|29FF00  |      ;
 	beq UNREACH_00C064                   ;00C0D9|F089    |00C064;
 	cmp.W #$0002                         ;00C0DB|C90200  |      ;
-	bcc CODE_00C13B                      ;00C0DE|905B    |00C13B;
-	beq CODE_00C11F                      ;00C0E0|F03D    |00C11F;
-	jsr.W CODE_00C1B1                    ;00C0E2|20B1C1  |00C1B1;
-	beq CODE_00C138                      ;00C0E5|F051    |00C138;
+	bcc Menu_ProcessUsableItem                      ;00C0DE|905B    |00C13B;
+	beq Menu_ProcessEquipment                      ;00C0E0|F03D    |00C11F;
+	jsr.W Menu_ConfirmItemUse                    ;00C0E2|20B1C1  |00C1B1;
+	beq Menu_Return                      ;00C0E5|F051    |00C138;
 	cmp.W #$0001                         ;00C0E7|C90100  |      ;
-	beq CODE_00C0F4                      ;00C0EA|F008    |00C0F4;
+	beq Menu_UpdateItemCount                      ;00C0EA|F008    |00C0F4;
 	tax                                  ;00C0EC|AA      |      ;
 	lda.W $1016                          ;00C0ED|AD1610  |001016;
 	sta.W $1014                          ;00C0F0|8D1410  |001014;
 	txa                                  ;00C0F3|8A      |      ;
 ;      |        |      ;
-CODE_00C0F4:
+Menu_UpdateItemCount:
 	cmp.W #$0000                         ;00C0F4|C90000  |      ;
-	beq CODE_00C0FF                      ;00C0F7|F006    |00C0FF;
+	beq Menu_DecrementItem                      ;00C0F7|F006    |00C0FF;
 	lda.W $1096                          ;00C0F9|AD9610  |001096;
 	sta.W $1094                          ;00C0FC|8D9410  |001094;
 ;      |        |      ;
-CODE_00C0FF:
+Menu_DecrementItem:
 	sep #$20                             ;00C0FF|E220    |      ;
 	ldx.W #$0000                         ;00C101|A20000  |      ;
 	lda.B $01                            ;00C104|A501    |000001;
-	beq CODE_00C10B                      ;00C106|F003    |00C10B;
+	beq Menu_UpdateItemDisplay                      ;00C106|F003    |00C10B;
 	ldx.W #$0080                         ;00C108|A28000  |      ;
 ;      |        |      ;
-CODE_00C10B:
+Menu_UpdateItemDisplay:
 	dec.W $1018,x                        ;00C10B|DE1810  |001018;
 	lda.W $04df                          ;00C10E|ADDF04  |0004DF;
 	sta.W $0505                          ;00C111|8D0505  |000505;
 	rep #$30                             ;00C114|C230    |      ;
 	ldx.W #$c035                         ;00C116|A235C0  |      ;
 	jsr.W DMA_CopyParamsAndExecute                    ;00C119|20C49B  |009BC4;
-	jmp.W CODE_00C08D                    ;00C11C|4C8DC0  |00C08D;
+	jmp.W Menu_RefreshDisplay                    ;00C11C|4C8DC0  |00C08D;
 ;      |        |      ;
 ;      |        |      ;
-CODE_00C11F:
-	jsr.W CODE_00C1B1                    ;00C11F|20B1C1  |00C1B1;
-	beq CODE_00C138                      ;00C122|F014    |00C138;
+Menu_ProcessEquipment:
+	jsr.W Menu_ConfirmItemUse                    ;00C11F|20B1C1  |00C1B1;
+	beq Menu_Return                      ;00C122|F014    |00C138;
 	sep #$20                             ;00C124|E220    |      ;
 	cmp.B #$01                           ;00C126|C901    |      ;
-	beq CODE_00C12D                      ;00C128|F003    |00C12D;
+	beq Menu_ClearEquipmentFlag                      ;00C128|F003    |00C12D;
 	stz.W $1021                          ;00C12A|9C2110  |001021;
 ;      |        |      ;
-CODE_00C12D:
+Menu_ClearEquipmentFlag:
 	cmp.B #$00                           ;00C12D|C900    |      ;
-	beq CODE_00C134                      ;00C12F|F003    |00C134;
+	beq Menu_ProcessEquipment_Done                      ;00C12F|F003    |00C134;
 	stz.W $10a1                          ;00C131|9CA110  |0010A1;
 ;      |        |      ;
-CODE_00C134:
+Menu_ProcessEquipment_Done:
 	rep #$30                             ;00C134|C230    |      ;
-	bra CODE_00C0FF                      ;00C136|80C7    |00C0FF;
+	bra Menu_DecrementItem                      ;00C136|80C7    |00C0FF;
 ;      |        |      ;
 ;      |        |      ;
-CODE_00C138:
-	jmp.W CODE_00C047                    ;00C138|4C47C0  |00C047;
+Menu_Return:
+	jmp.W Menu_WaitForInput                    ;00C138|4C47C0  |00C047;
 ;      |        |      ;
 ;      |        |      ;
-CODE_00C13B:
-	jsr.W CODE_00C1B1                    ;00C13B|20B1C1  |00C1B1;
-	beq CODE_00C138                      ;00C13E|F0F8    |00C138;
+Menu_ProcessUsableItem:
+	jsr.W Menu_ConfirmItemUse                    ;00C13B|20B1C1  |00C1B1;
+	beq Menu_Return                      ;00C13E|F0F8    |00C138;
 	pha                                  ;00C140|48      |      ;
 	lda.W $1025,x                        ;00C141|BD2510  |001025;
 	and.W #$00ff                         ;00C144|29FF00  |      ;
@@ -8056,37 +8056,37 @@ CODE_00C13B:
 	tay                                  ;00C153|A8      |      ;
 	lda.B $01,s                          ;00C154|A301    |000001;
 	cmp.W #$0001                         ;00C156|C90100  |      ;
-	beq CODE_00C16F                      ;00C159|F014    |00C16F;
+	beq Menu_ProcessItemPercent                      ;00C159|F014    |00C16F;
 	lda.W $1016                          ;00C15B|AD1610  |001016;
-	jsr.W CODE_00C18D                    ;00C15E|208DC1  |00C18D;
+	jsr.W Math_CalculatePercent                    ;00C15E|208DC1  |00C18D;
 	adc.W $1014                          ;00C161|6D1410  |001014;
 	cmp.W $1016                          ;00C164|CD1610  |001016;
-	bcc CODE_00C16C                      ;00C167|9003    |00C16C;
+	bcc Menu_UpdateItemPercent                      ;00C167|9003    |00C16C;
 	lda.W $1016                          ;00C169|AD1610  |001016;
 ;      |        |      ;
-CODE_00C16C:
+Menu_UpdateItemPercent:
 	sta.W $1014                          ;00C16C|8D1410  |001014;
 ;      |        |      ;
-CODE_00C16F:
+Menu_ProcessItemPercent:
 	sty.B $98                            ;00C16F|8498    |000098;
 	lda.B $01,s                          ;00C171|A301    |000001;
-	beq CODE_00C189                      ;00C173|F014    |00C189;
+	beq Menu_CompleteItemUpdate                      ;00C173|F014    |00C189;
 	lda.W $1096                          ;00C175|AD9610  |001096;
-	jsr.W CODE_00C18D                    ;00C178|208DC1  |00C18D;
+	jsr.W Math_CalculatePercent                    ;00C178|208DC1  |00C18D;
 	adc.W $1094                          ;00C17B|6D9410  |001094;
 	cmp.W $1096                          ;00C17E|CD9610  |001096;
-	bcc CODE_00C186                      ;00C181|9003    |00C186;
+	bcc Menu_StoreItemPercent                      ;00C181|9003    |00C186;
 	lda.W $1096                          ;00C183|AD9610  |001096;
 ;      |        |      ;
-CODE_00C186:
+Menu_StoreItemPercent:
 	sta.W $1094                          ;00C186|8D9410  |001094;
 ;      |        |      ;
-CODE_00C189:
+Menu_CompleteItemUpdate:
 	pla                                  ;00C189|68      |      ;
-	jmp.W CODE_00C0FF                    ;00C18A|4CFFC0  |00C0FF;
+	jmp.W Menu_DecrementItem                    ;00C18A|4CFFC0  |00C0FF;
 ;      |        |      ;
 ;      |        |      ;
-CODE_00C18D:
+Math_CalculatePercent:
 	sta.B $9c                            ;00C18D|859C    |00009C;
 	jsl.L Math_Multiply16x16                    ;00C18F|22B39600|0096B3;
 	lda.B $9e                            ;00C193|A59E    |00009E;
@@ -8098,16 +8098,16 @@ CODE_00C18D:
 	jsl.L Math_Divide32by16                    ;00C1A0|22E49600|0096E4;
 	lda.B $03,s                          ;00C1A4|A303    |000003;
 	cmp.W #$0080                         ;00C1A6|C98000  |      ;
-	bne CODE_00C1AD                      ;00C1A9|D002    |00C1AD;
+	bne Math_CheckDivideByTwo                      ;00C1A9|D002    |00C1AD;
 	db $46,$9e                           ;00C1AB|        |00009E;
 ;      |        |      ;
-CODE_00C1AD:
+Math_CheckDivideByTwo:
 	lda.B $9e                            ;00C1AD|A59E    |00009E;
 	clc                                  ;00C1AF|18      |      ;
 	rts                                  ;00C1B0|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
-CODE_00C1B1:
+Menu_ConfirmItemUse:
 	phx                                  ;00C1B1|DA      |      ;
 	sep #$20                             ;00C1B2|E220    |      ;
 	lda.B $02                            ;00C1B4|A502    |000002;
@@ -8131,19 +8131,19 @@ CODE_00C1B1:
 	sta.B $03                            ;00C1E2|8503    |000003;
 	lda.W #$bff0                         ;00C1E4|A9F0BF  |      ;
 	sta.B $8e                            ;00C1E7|858E    |00008E;
-	bra CODE_00C1EE                      ;00C1E9|8003    |00C1EE;
+	bra ColorSelect_WaitInput                      ;00C1E9|8003    |00C1EE;
 ;      |        |      ;
 	db $20,$12,$b9                       ;00C1EB|        |00B912;
 ;      |        |      ;
-CODE_00C1EE:
+ColorSelect_WaitInput:
 	rep #$30                             ;00C1EE|C230    |      ;
 	lda.W #$cf30                         ;00C1F0|A930CF  |      ;
 	jsr.W Input_WaitForButton                    ;00C1F3|2030B9  |00B930;
-	bne CODE_00C218                      ;00C1F6|D020    |00C218;
+	bne ColorSelect_ProcessSelection                      ;00C1F6|D020    |00C218;
 	bit.W #$4000                         ;00C1F8|890040  |      ;
 	bne UNREACH_00C20E                   ;00C1FB|D011    |00C20E;
 	bit.W #$8000                         ;00C1FD|890080  |      ;
-	beq CODE_00C1EE                      ;00C200|F0EC    |00C1EE;
+	beq ColorSelect_WaitInput                      ;00C200|F0EC    |00C1EE;
 	jsr.W Sound_PlayEffect_WindowOpen                    ;00C202|201CB9  |00B91C;
 	stz.B $8e                            ;00C205|648E    |00008E;
 	lda.W #$0020                         ;00C207|A92000  |      ;
@@ -8154,35 +8154,35 @@ CODE_00C1EE:
 UNREACH_00C20E:
 	db $e2,$20,$ad,$90,$10,$30,$d6,$4c,$d9,$c2;00C20E|        |      ;
 ;      |        |      ;
-CODE_00C218:
+ColorSelect_ProcessSelection:
 	txa                                  ;00C218|8A      |      ;
 	sep #$20                             ;00C219|E220    |      ;
 	lda.B #$00                           ;00C21B|A900    |      ;
 	xba                                  ;00C21D|EB      |      ;
 	cmp.W $0006                          ;00C21E|CD0600  |000006;
-	bne CODE_00C226                      ;00C221|D003    |00C226;
-	jmp.W CODE_00C2C3                    ;00C223|4CC3C2  |00C2C3;
+	bne ColorSelect_ApplyChange                      ;00C221|D003    |00C226;
+	jmp.W ColorSelect_ToggleSetting                    ;00C223|4CC3C2  |00C2C3;
 ;      |        |      ;
 ;      |        |      ;
-CODE_00C226:
+ColorSelect_ApplyChange:
 	pha                                  ;00C226|48      |      ;
 	jsr.W Sound_PlayEffect_WindowOpen                    ;00C227|201CB9  |00B91C;
 	pla                                  ;00C22A|68      |      ;
 	cmp.B #$01                           ;00C22B|C901    |      ;
-	bcc CODE_00C28E                      ;00C22D|905F    |00C28E;
-	beq CODE_00C26D                      ;00C22F|F03C    |00C26D;
+	bcc ColorSelect_ProcessField                      ;00C22D|905F    |00C28E;
+	beq ColorSelect_CheckBattleMode                      ;00C22F|F03C    |00C26D;
 	cmp.B #$03                           ;00C231|C903    |      ;
-	bcc CODE_00C260                      ;00C233|902B    |00C260;
-	beq CODE_00C250                      ;00C235|F019    |00C250;
+	bcc ColorSelect_Blue                      ;00C233|902B    |00C260;
+	beq ColorSelect_Red                      ;00C235|F019    |00C250;
 	cmp.B #$05                           ;00C237|C905    |      ;
-	bcc CODE_00C242                      ;00C239|9007    |00C242;
+	bcc ColorSelect_Green                      ;00C239|9007    |00C242;
 	lda.W $0e9d                          ;00C23B|AD9D0E  |000E9D;
 	lsr a;00C23E|4A      |      ;
 	lsr a;00C23F|4A      |      ;
-	bra CODE_00C253                      ;00C240|8011    |00C253;
+	bra ColorSelect_ExtractChannel                      ;00C240|8011    |00C253;
 ;      |        |      ;
 ;      |        |      ;
-CODE_00C242:
+ColorSelect_Green:
 	rep #$30                             ;00C242|C230    |      ;
 	lda.W $0e9c                          ;00C244|AD9C0E  |000E9C;
 	lsr a;00C247|4A      |      ;
@@ -8191,64 +8191,64 @@ CODE_00C242:
 	lsr a;00C24B|4A      |      ;
 	lsr a;00C24C|4A      |      ;
 	lsr a;00C24D|4A      |      ;
-	bra CODE_00C253                      ;00C24E|8003    |00C253;
+	bra ColorSelect_ExtractChannel                      ;00C24E|8003    |00C253;
 ;      |        |      ;
 ;      |        |      ;
-CODE_00C250:
+ColorSelect_Red:
 	lda.W $0e9c                          ;00C250|AD9C0E  |000E9C;
 ;      |        |      ;
-CODE_00C253:
+ColorSelect_ExtractChannel:
 	and.B #$1f                           ;00C253|291F    |      ;
 	inc a;00C255|1A      |      ;
 	lsr a;00C256|4A      |      ;
 	lsr a;00C257|4A      |      ;
 	ldx.W #$0009                         ;00C258|A20900  |      ;
 	ldy.W #$0609                         ;00C25B|A00906  |      ;
-	bra CODE_00C29D                      ;00C25E|803D    |00C29D;
+	bra ColorSelect_UpdateDisplay                      ;00C25E|803D    |00C29D;
 ;      |        |      ;
 ;      |        |      ;
-CODE_00C260:
+ColorSelect_Blue:
 	lda.W $0e9b                          ;00C260|AD9B0E  |000E9B;
 	and.B #$07                           ;00C263|2907    |      ;
 	ldx.W #$0006                         ;00C265|A20600  |      ;
 	ldy.W #$0607                         ;00C268|A00706  |      ;
-	bra CODE_00C29D                      ;00C26B|8030    |00C29D;
+	bra ColorSelect_UpdateDisplay                      ;00C26B|8030    |00C29D;
 ;      |        |      ;
 ;      |        |      ;
-CODE_00C26D:
+ColorSelect_CheckBattleMode:
 	lda.W $1090                          ;00C26D|AD9010  |001090;
-	bpl CODE_00C27C                      ;00C270|100A    |00C27C;
+	bpl ColorSelect_ProcessBattleColor                      ;00C270|100A    |00C27C;
 	lda.B $06                            ;00C272|A506    |000006;
 	eor.B #$02                           ;00C274|4902    |      ;
 	and.B #$fe                           ;00C276|29FE    |      ;
 	sta.B $02                            ;00C278|8502    |000002;
-	bra CODE_00C226                      ;00C27A|80AA    |00C226;
+	bra ColorSelect_ApplyChange                      ;00C27A|80AA    |00C226;
 ;      |        |      ;
 ;      |        |      ;
-CODE_00C27C:
+ColorSelect_ProcessBattleColor:
 	lda.B #$80                           ;00C27C|A980    |      ;
 	and.W $10a0                          ;00C27E|2DA010  |0010A0;
-	beq CODE_00C285                      ;00C281|F002    |00C285;
+	beq ColorSelect_ProcessBattleColor_Value                      ;00C281|F002    |00C285;
 	lda.B #$ff                           ;00C283|A9FF    |      ;
 ;      |        |      ;
-CODE_00C285:
+ColorSelect_ProcessBattleColor_Value:
 	inc a;00C285|1A      |      ;
 	ldx.W #$0003                         ;00C286|A20300  |      ;
 	ldy.W #$0602                         ;00C289|A00206  |      ;
-	bra CODE_00C29D                      ;00C28C|800F    |00C29D;
+	bra ColorSelect_UpdateDisplay                      ;00C28C|800F    |00C29D;
 ;      |        |      ;
 ;      |        |      ;
-CODE_00C28E:
+ColorSelect_ProcessField:
 	lda.B #$80                           ;00C28E|A980    |      ;
 	and.W $0ec6                          ;00C290|2DC60E  |000EC6;
-	beq CODE_00C297                      ;00C293|F002    |00C297;
+	beq ColorSelect_StoreSelection                      ;00C293|F002    |00C297;
 	db $a9,$01                           ;00C295|        |      ;
 ;      |        |      ;
-CODE_00C297:
+ColorSelect_StoreSelection:
 	ldx.W #$0000                         ;00C297|A20000  |      ;
 	ldy.W #$0602                         ;00C29A|A00206  |      ;
 ;      |        |      ;
-CODE_00C29D:
+ColorSelect_UpdateDisplay:
 	sty.B $03                            ;00C29D|8403    |000003;
 	sta.B $01                            ;00C29F|8501    |000001;
 	lda.W DATA8_00c339,x                 ;00C2A1|BD39C3  |00C339;
@@ -8258,48 +8258,48 @@ CODE_00C29D:
 	lda.W DATA8_00c33b,x                 ;00C2AF|BD3BC3  |00C33B;
 	sta.L $7f56db                        ;00C2B2|8FDB567F|7F56DB;
 ;      |        |      ;
-CODE_00C2B6:
+ColorSelect_RefreshColors:
 	ldx.B $01                            ;00C2B6|A601    |000001;
 	stx.B $05                            ;00C2B8|8605    |000005;
 	ldx.W #$c345                         ;00C2BA|A245C3  |      ;
 	jsr.W DMA_CopyParamsAndExecute                    ;00C2BD|20C49B  |009BC4;
-	jmp.W CODE_00C1EE                    ;00C2C0|4CEEC1  |00C1EE;
+	jmp.W ColorSelect_WaitInput                    ;00C2C0|4CEEC1  |00C1EE;
 ;      |        |      ;
 ;      |        |      ;
-CODE_00C2C3:
+ColorSelect_ToggleSetting:
 	lda.B $02                            ;00C2C3|A502    |000002;
-	beq CODE_00C2E3                      ;00C2C5|F01C    |00C2E3;
+	beq ColorSelect_ToggleFieldMode                      ;00C2C5|F01C    |00C2E3;
 	cmp.B #$02                           ;00C2C7|C902    |      ;
-	bcc CODE_00C2D9                      ;00C2C9|900E    |00C2D9;
-	bne CODE_00C2F0                      ;00C2CB|D023    |00C2F0;
+	bcc ColorSelect_ToggleBattleMode                      ;00C2C9|900E    |00C2D9;
+	bne ColorSelect_ProcessBrightness                      ;00C2CB|D023    |00C2F0;
 	lda.W $0e9b                          ;00C2CD|AD9B0E  |000E9B;
 	and.B #$f8                           ;00C2D0|29F8    |      ;
 	ora.B $01                            ;00C2D2|0501    |000001;
 	sta.W $0e9b                          ;00C2D4|8D9B0E  |000E9B;
-	bra CODE_00C2EB                      ;00C2D7|8012    |00C2EB;
+	bra ColorSelect_PlaySound                      ;00C2D7|8012    |00C2EB;
 ;      |        |      ;
 ;      |        |      ;
-CODE_00C2D9:
+ColorSelect_ToggleBattleMode:
 	lda.W $10a0                          ;00C2D9|ADA010  |0010A0;
 	eor.B #$80                           ;00C2DC|4980    |      ;
 	sta.W $10a0                          ;00C2DE|8DA010  |0010A0;
-	bra CODE_00C2EB                      ;00C2E1|8008    |00C2EB;
+	bra ColorSelect_PlaySound                      ;00C2E1|8008    |00C2EB;
 ;      |        |      ;
 ;      |        |      ;
-CODE_00C2E3:
+ColorSelect_ToggleFieldMode:
 	lda.W $0ec6                          ;00C2E3|ADC60E  |000EC6;
 	eor.B #$80                           ;00C2E6|4980    |      ;
 	sta.W $0ec6                          ;00C2E8|8DC60E  |000EC6;
 ;      |        |      ;
-CODE_00C2EB:
+ColorSelect_PlaySound:
 	jsr.W Sound_PlayEffect_MenuSelect                    ;00C2EB|2008B9  |00B908;
-	bra CODE_00C2B6                      ;00C2EE|80C6    |00C2B6;
+	bra ColorSelect_RefreshColors                      ;00C2EE|80C6    |00C2B6;
 ;      |        |      ;
 ;      |        |      ;
-CODE_00C2F0:
+ColorSelect_ProcessBrightness:
 	cmp.B #$04                           ;00C2F0|C904    |      ;
-	bcc CODE_00C325                      ;00C2F2|9031    |00C325;
-	beq CODE_00C30A                      ;00C2F4|F014    |00C30A;
+	bcc ColorSelect_ProcessBlue                      ;00C2F2|9031    |00C325;
+	beq ColorSelect_ProcessGreen                      ;00C2F4|F014    |00C30A;
 	lda.B #$7c                           ;00C2F6|A97C    |      ;
 	trb.W $0e9d                          ;00C2F8|1C9D0E  |000E9D;
 	lda.B $01                            ;00C2FB|A501    |000001;
@@ -8307,15 +8307,15 @@ CODE_00C2F0:
 	asl a;00C2FE|0A      |      ;
 	asl a;00C2FF|0A      |      ;
 	asl a;00C300|0A      |      ;
-	bpl CODE_00C305                      ;00C301|1002    |00C305;
+	bpl ColorSelect_StoreBrightness                      ;00C301|1002    |00C305;
 	lda.B #$7c                           ;00C303|A97C    |      ;
 ;      |        |      ;
-CODE_00C305:
+ColorSelect_StoreBrightness:
 	tsb.W $0e9d                          ;00C305|0C9D0E  |000E9D;
-	bra CODE_00C2EB                      ;00C308|80E1    |00C2EB;
+	bra ColorSelect_PlaySound                      ;00C308|80E1    |00C2EB;
 ;      |        |      ;
 ;      |        |      ;
-CODE_00C30A:
+ColorSelect_ProcessGreen:
 	rep #$30                             ;00C30A|C230    |      ;
 	lda.W #$03e0                         ;00C30C|A9E003  |      ;
 	trb.W $0e9c                          ;00C30F|1C9C0E  |000E9C;
@@ -8323,27 +8323,27 @@ CODE_00C30A:
 	and.W #$ff00                         ;00C314|2900FF  |      ;
 	lsr a;00C317|4A      |      ;
 	cmp.W #$0400                         ;00C318|C90004  |      ;
-	bne CODE_00C320                      ;00C31B|D003    |00C320;
+	bne ColorSelect_StoreGreen                      ;00C31B|D003    |00C320;
 	lda.W #$03e0                         ;00C31D|A9E003  |      ;
 ;      |        |      ;
-CODE_00C320:
+ColorSelect_StoreGreen:
 	tsb.W $0e9c                          ;00C320|0C9C0E  |000E9C;
-	bra CODE_00C2EB                      ;00C323|80C6    |00C2EB;
+	bra ColorSelect_PlaySound                      ;00C323|80C6    |00C2EB;
 ;      |        |      ;
 ;      |        |      ;
-CODE_00C325:
+ColorSelect_ProcessBlue:
 	lda.B #$1f                           ;00C325|A91F    |      ;
 	trb.W $0e9c                          ;00C327|1C9C0E  |000E9C;
 	lda.B $01                            ;00C32A|A501    |000001;
 	asl a;00C32C|0A      |      ;
 	asl a;00C32D|0A      |      ;
 	cmp.B #$20                           ;00C32E|C920    |      ;
-	bne CODE_00C334                      ;00C330|D002    |00C334;
+	bne ColorSelect_StoreBlue                      ;00C330|D002    |00C334;
 	lda.B #$1f                           ;00C332|A91F    |      ;
 ;      |        |      ;
-CODE_00C334:
+ColorSelect_StoreBlue:
 	tsb.W $0e9c                          ;00C334|0C9C0E  |000E9C;
-	bra CODE_00C2EB                      ;00C337|80B2    |00C2EB;
+	bra ColorSelect_PlaySound                      ;00C337|80B2    |00C2EB;
 ;      |        |      ;
 ;      |        |      ;
 DATA8_00c339:
@@ -8359,22 +8359,22 @@ DATA8_00c33b:
 	ldx.W #$0c00                         ;00C34D|A2000C  |      ;
 	stx.B $8e                            ;00C350|868E    |00008E;
 ;      |        |      ;
-CODE_00C352:
+FileSelect_WaitInput:
 	lda.W #$8c80                         ;00C352|A9808C  |      ;
 	jsr.W Input_WaitForButton                    ;00C355|2030B9  |00B930;
-	bne CODE_00C39D                      ;00C358|D043    |00C39D;
+	bne FileSelect_UpdateCursor                      ;00C358|D043    |00C39D;
 	bit.W #$0080                         ;00C35A|898000  |      ;
-	bne CODE_00C36A                      ;00C35D|D00B    |00C36A;
+	bne FileSelect_Confirm                      ;00C35D|D00B    |00C36A;
 	bit.W #$8000                         ;00C35F|890080  |      ;
-	beq CODE_00C352                      ;00C362|F0EE    |00C352;
+	beq FileSelect_WaitInput                      ;00C362|F0EE    |00C352;
 ;      |        |      ;
-CODE_00C364:
+FileSelect_Cancel:
 	jsr.W Sound_PlayEffect_WindowOpen                    ;00C364|201CB9  |00B91C;
 	stz.B $8e                            ;00C367|648E    |00008E;
 	rts                                  ;00C369|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
-CODE_00C36A:
+FileSelect_Confirm:
 	jsr.W Sound_PlayEffect_MenuSelect                    ;00C36A|2008B9  |00B908;
 	sep #$20                             ;00C36D|E220    |      ;
 	lda.B $02                            ;00C36F|A502    |000002;
@@ -8392,11 +8392,11 @@ CODE_00C36A:
 	jsr.W DMA_CopyParamsAndExecute                    ;00C38E|20C49B  |009BC4;
 	lda.B $9e                            ;00C391|A59E    |00009E;
 	bit.W #$8000                         ;00C393|890080  |      ;
-	bne CODE_00C364                      ;00C396|D0CC    |00C364;
+	bne FileSelect_Cancel                      ;00C396|D0CC    |00C364;
 	bit.W #$0c00                         ;00C398|89000C  |      ;
-	beq CODE_00C352                      ;00C39B|F0B5    |00C352;
+	beq FileSelect_WaitInput                      ;00C39B|F0B5    |00C352;
 ;      |        |      ;
-CODE_00C39D:
+FileSelect_UpdateCursor:
 	lda.W #$0000                         ;00C39D|A90000  |      ;
 	sep #$20                             ;00C3A0|E220    |      ;
 	lda.B #$ec                           ;00C3A2|A9EC    |      ;
@@ -8405,12 +8405,12 @@ CODE_00C39D:
 	sta.L $7f56de                        ;00C3AC|8FDE567F|7F56DE;
 	lda.B $02                            ;00C3B0|A502    |000002;
 	cmp.B $06                            ;00C3B2|C506    |000006;
-	beq CODE_00C3BD                      ;00C3B4|F007    |00C3BD;
+	beq FileSelect_ShowCursor                      ;00C3B4|F007    |00C3BD;
 	sta.B $06                            ;00C3B6|8506    |000006;
 	jsr.W Sound_PlayEffect_WindowOpen                    ;00C3B8|201CB9  |00B91C;
 	lda.B $06                            ;00C3BB|A506    |000006;
 ;      |        |      ;
-CODE_00C3BD:
+FileSelect_ShowCursor:
 	asl a;00C3BD|0A      |      ;
 	tax                                  ;00C3BE|AA      |      ;
 	lda.B #$e0                           ;00C3BF|A9E0    |      ;
@@ -8421,39 +8421,39 @@ CODE_00C3BD:
 	lda.B #$08                           ;00C3CE|A908    |      ;
 	trb.W $00d4                          ;00C3D0|1CD400  |0000D4;
 	rep #$30                             ;00C3D3|C230    |      ;
-	jmp.W CODE_00C352                    ;00C3D5|4C52C3  |00C352;
+	jmp.W FileSelect_WaitInput                    ;00C3D5|4C52C3  |00C352;
 ;      |        |      ;
 	db $c3,$95,$03                       ;00C3D8|        |      ;
 	lda.W #$0305                         ;00C3DB|A90503  |      ;
 	sta.B $03                            ;00C3DE|8503    |000003;
 	ldx.W #$fff0                         ;00C3E0|A2F0FF  |      ;
 	stx.B $8e                            ;00C3E3|868E    |00008E;
-	bra CODE_00C439                      ;00C3E5|8052    |00C439;
+	bra BattleSpeed_RefreshDisplay                      ;00C3E5|8052    |00C439;
 ;      |        |      ;
 ;      |        |      ;
-CODE_00C3E7:
+BattleSpeed_WaitInput:
 	lda.W #$cf30                         ;00C3E7|A930CF  |      ;
 	jsr.W Input_WaitForButton                    ;00C3EA|2030B9  |00B930;
 	bit.W #$0300                         ;00C3ED|890003  |      ;
-	bne CODE_00C407                      ;00C3F0|D015    |00C407;
+	bne BattleSpeed_ProcessSelection                      ;00C3F0|D015    |00C407;
 	bit.W #$0c00                         ;00C3F2|89000C  |      ;
-	bne CODE_00C439                      ;00C3F5|D042    |00C439;
+	bne BattleSpeed_RefreshDisplay                      ;00C3F5|D042    |00C439;
 	bit.W #$8000                         ;00C3F7|890080  |      ;
-	beq CODE_00C3E7                      ;00C3FA|F0EB    |00C3E7;
+	beq BattleSpeed_WaitInput                      ;00C3FA|F0EB    |00C3E7;
 	jsr.W Sound_PlayEffect_WindowOpen                    ;00C3FC|201CB9  |00B91C;
 	stz.B $8e                            ;00C3FF|648E    |00008E;
 	ldx.W #$c444                         ;00C401|A244C4  |      ;
 	jmp.W DMA_CopyParamsAndExecute                    ;00C404|4CC49B  |009BC4;
 ;      |        |      ;
 ;      |        |      ;
-CODE_00C407:
+BattleSpeed_ProcessSelection:
 	sep #$20                             ;00C407|E220    |      ;
 	lda.B $01                            ;00C409|A501    |000001;
 	cmp.B #$04                           ;00C40B|C904    |      ;
-	beq CODE_00C423                      ;00C40D|F014    |00C423;
+	beq BattleSpeed_ScrollDown                      ;00C40D|F014    |00C423;
 	lda.B $04                            ;00C40F|A504    |000004;
 	cmp.B #$03                           ;00C411|C903    |      ;
-	beq CODE_00C437                      ;00C413|F022    |00C437;
+	beq BattleSpeed_Update                      ;00C413|F022    |00C437;
 	dec.B $04                            ;00C415|C604    |000004;
 	lda.B $02                            ;00C417|A502    |000002;
 	sbc.B #$02                           ;00C419|E902    |      ;
@@ -8462,117 +8462,117 @@ CODE_00C407:
 ;      |        |      ;
 CODE_00C41F:
 	sta.B $02                            ;00C41F|8502    |000002;
-	bra CODE_00C437                      ;00C421|8014    |00C437;
+	bra BattleSpeed_Update                      ;00C421|8014    |00C437;
 ;      |        |      ;
 ;      |        |      ;
-CODE_00C423:
+BattleSpeed_ScrollDown:
 	lda.B $04                            ;00C423|A504    |000004;
 	cmp.B #$04                           ;00C425|C904    |      ;
-	beq CODE_00C437                      ;00C427|F00E    |00C437;
+	beq BattleSpeed_Update                      ;00C427|F00E    |00C437;
 	inc.B $04                            ;00C429|E604    |000004;
 	lda.B $02                            ;00C42B|A502    |000002;
 	adc.B #$02                           ;00C42D|6902    |      ;
 	cmp.B #$04                           ;00C42F|C904    |      ;
-	bne CODE_00C435                      ;00C431|D002    |00C435;
+	bne BattleSpeed_StoreSpeed                      ;00C431|D002    |00C435;
 	lda.B #$03                           ;00C433|A903    |      ;
 ;      |        |      ;
-CODE_00C435:
+BattleSpeed_StoreSpeed:
 	sta.B $02                            ;00C435|8502    |000002;
 ;      |        |      ;
-CODE_00C437:
+BattleSpeed_Update:
 	rep #$30                             ;00C437|C230    |      ;
 ;      |        |      ;
-CODE_00C439:
+BattleSpeed_RefreshDisplay:
 	ldx.W #$c441                         ;00C439|A241C4  |      ;
 	jsr.W DMA_CopyParamsAndExecute                    ;00C43C|20C49B  |009BC4;
-	bra CODE_00C3E7                      ;00C43F|80A6    |00C3E7;
+	bra BattleSpeed_WaitInput                      ;00C43F|80A6    |00C3E7;
 ;      |        |      ;
 	db $8e,$90,$03,$47,$91,$03           ;00C441|        |      ;
 	lda.W #$0305                         ;00C447|A90503  |      ;
 	sta.B $03                            ;00C44A|8503    |000003;
 	ldx.W #$fff0                         ;00C44C|A2F0FF  |      ;
 	stx.B $8e                            ;00C44F|868E    |00008E;
-	bra CODE_00C494                      ;00C451|8041    |00C494;
+	bra MessageSpeed_RefreshDisplay                      ;00C451|8041    |00C494;
 ;      |        |      ;
 ;      |        |      ;
-CODE_00C453:
+MessageSpeed_WaitInput:
 	lda.W #$cf30                         ;00C453|A930CF  |      ;
 	jsr.W Input_WaitForButton                    ;00C456|2030B9  |00B930;
 	bit.W #$0300                         ;00C459|890003  |      ;
-	bne CODE_00C473                      ;00C45C|D015    |00C473;
+	bne MessageSpeed_ProcessSelection                      ;00C45C|D015    |00C473;
 	bit.W #$0c00                         ;00C45E|89000C  |      ;
-	bne CODE_00C494                      ;00C461|D031    |00C494;
+	bne MessageSpeed_RefreshDisplay                      ;00C461|D031    |00C494;
 	bit.W #$8000                         ;00C463|890080  |      ;
-	beq CODE_00C453                      ;00C466|F0EB    |00C453;
+	beq MessageSpeed_WaitInput                      ;00C466|F0EB    |00C453;
 	jsr.W Sound_PlayEffect_WindowOpen                    ;00C468|201CB9  |00B91C;
 	stz.B $8e                            ;00C46B|648E    |00008E;
 	ldx.W #$c49f                         ;00C46D|A29FC4  |      ;
 	jmp.W DMA_CopyParamsAndExecute                    ;00C470|4CC49B  |009BC4;
 ;      |        |      ;
 ;      |        |      ;
-CODE_00C473:
+MessageSpeed_ProcessSelection:
 	sep #$20                             ;00C473|E220    |      ;
 	lda.B $01                            ;00C475|A501    |000001;
 	cmp.B #$04                           ;00C477|C904    |      ;
-	beq CODE_00C488                      ;00C479|F00D    |00C488;
+	beq MessageSpeed_ScrollDown                      ;00C479|F00D    |00C488;
 	lda.B #$03                           ;00C47B|A903    |      ;
 	cmp.B $04                            ;00C47D|C504    |000004;
-	beq CODE_00C492                      ;00C47F|F011    |00C492;
+	beq MessageSpeed_Update                      ;00C47F|F011    |00C492;
 	sta.B $04                            ;00C481|8504    |000004;
 	dec a;00C483|3A      |      ;
 	sta.B $02                            ;00C484|8502    |000002;
-	bra CODE_00C492                      ;00C486|800A    |00C492;
+	bra MessageSpeed_Update                      ;00C486|800A    |00C492;
 ;      |        |      ;
 ;      |        |      ;
-CODE_00C488:
+MessageSpeed_ScrollDown:
 	lda.B #$01                           ;00C488|A901    |      ;
 	cmp.B $04                            ;00C48A|C504    |000004;
-	beq CODE_00C492                      ;00C48C|F004    |00C492;
+	beq MessageSpeed_Update                      ;00C48C|F004    |00C492;
 	sta.B $04                            ;00C48E|8504    |000004;
 	stz.B $02                            ;00C490|6402    |000002;
 ;      |        |      ;
-CODE_00C492:
+MessageSpeed_Update:
 	rep #$30                             ;00C492|C230    |      ;
 ;      |        |      ;
-CODE_00C494:
+MessageSpeed_RefreshDisplay:
 	ldx.W #$c49c                         ;00C494|A29CC4  |      ;
 	jsr.W DMA_CopyParamsAndExecute                    ;00C497|20C49B  |009BC4;
-	bra CODE_00C453                      ;00C49A|80B7    |00C453;
+	bra MessageSpeed_WaitInput                      ;00C49A|80B7    |00C453;
 ;      |        |      ;
 	db $e3,$91,$03,$47,$91,$03           ;00C49C|        |      ;
 	ldx.W #$fff0                         ;00C4A2|A2F0FF  |      ;
 	stx.B $8e                            ;00C4A5|868E    |00008E;
 ;      |        |      ;
-CODE_00C4A7:
+SoundTest_WaitInput:
 	jsl.L NMI_WaitForVBlank                    ;00C4A7|22A09600|0096A0;
 	lda.W #$0080                         ;00C4AB|A98000  |      ;
 	and.W $00d9                          ;00C4AE|2DD900  |0000D9;
-	beq CODE_00C4C1                      ;00C4B1|F00E    |00C4C1;
+	beq SoundTest_CheckInput                      ;00C4B1|F00E    |00C4C1;
 	db $a9,$80,$00,$1c,$d9,$00,$a2,$d8,$c4,$20,$c4,$9b,$80,$e6;00C4B3|        |      ;
 ;      |        |      ;
-CODE_00C4C1:
+SoundTest_CheckInput:
 	lda.B $07                            ;00C4C1|A507    |000007;
 	and.W #$bfcf                         ;00C4C3|29CFBF  |      ;
-	beq CODE_00C4A7                      ;00C4C6|F0DF    |00C4A7;
+	beq SoundTest_WaitInput                      ;00C4C6|F0DF    |00C4A7;
 	and.W #$8000                         ;00C4C8|290080  |      ;
-	bne CODE_00C4D2                      ;00C4CB|D005    |00C4D2;
+	bne SoundTest_Exit                      ;00C4CB|D005    |00C4D2;
 	jsr.W Sound_PlayEffect_MenuMove                    ;00C4CD|2012B9  |00B912;
-	bra CODE_00C4A7                      ;00C4D0|80D5    |00C4A7;
+	bra SoundTest_WaitInput                      ;00C4D0|80D5    |00C4A7;
 ;      |        |      ;
 ;      |        |      ;
-CODE_00C4D2:
+SoundTest_Exit:
 	jsr.W Sound_PlayEffect_WindowOpen                    ;00C4D2|201CB9  |00B91C;
 	stz.B $8e                            ;00C4D5|648E    |00008E;
 	rts                                  ;00C4D7|60      |      ;
 ;      |        |      ;
 	db $d1,$9c,$03                       ;00C4D8|        |00009C;
 ;      |        |      ;
-CODE_00C4DB:
-	jsr.W CODE_00C561                    ;00C4DB|2061C5  |00C561;
-	jsr.W CODE_00C576                    ;00C4DE|2076C5  |00C576;
-	jsr.W CODE_00C58B                    ;00C4E1|208BC5  |00C58B;
-	jsr.W CODE_00C5A0                    ;00C4E4|20A0C5  |00C5A0;
-	jsr.W CODE_00C604                    ;00C4E7|2004C6  |00C604;
+Battle_InitializeGraphics:
+	jsr.W Graphics_ClearBattlePalette1                    ;00C4DB|2061C5  |00C561;
+	jsr.W Graphics_ClearBattlePalette2                    ;00C4DE|2076C5  |00C576;
+	jsr.W Graphics_ClearBattlePalette3                    ;00C4E1|208BC5  |00C58B;
+	jsr.W Graphics_ClearBattlePalette4                    ;00C4E4|20A0C5  |00C5A0;
+	jsr.W Graphics_InitializeBattleColors                    ;00C4E7|2004C6  |00C604;
 	ldx.W #$c51b                         ;00C4EA|A21BC5  |      ;
 	ldy.W #$5000                         ;00C4ED|A00050  |      ;
 	lda.W #$0006                         ;00C4F0|A90600  |      ;
@@ -8597,18 +8597,18 @@ CODE_00C4DB:
 	pea.W $007f                          ;00C539|F47F00  |00007F;
 	plb                                  ;00C53C|AB      |      ;
 	ldy.W #$5016                         ;00C53D|A01650  |      ;
-	jsr.W CODE_00C54B                    ;00C540|204BC5  |00C54B;
+	jsr.W Graphics_ClearPaletteArea                    ;00C540|204BC5  |00C54B;
 	ldy.W #$537d                         ;00C543|A07D53  |      ;
-	jsr.W CODE_00C54B                    ;00C546|204BC5  |00C54B;
+	jsr.W Graphics_ClearPaletteArea                    ;00C546|204BC5  |00C54B;
 	plb                                  ;00C549|AB      |      ;
 	rts                                  ;00C54A|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
-CODE_00C54B:
+Graphics_ClearPaletteArea:
 	ldx.W #$000d                         ;00C54B|A20D00  |      ;
 	clc                                  ;00C54E|18      |      ;
 ;      |        |      ;
-CODE_00C54F:
+Graphics_ClearPaletteArea_Loop:
 	sep #$20                             ;00C54F|E220    |      ;
 	lda.B #$00                           ;00C551|A900    |      ;
 	jsr.W Memory_Fill_32Bytes                    ;00C553|20EA99  |0099EA;
@@ -8617,51 +8617,51 @@ CODE_00C54F:
 	adc.W #$0020                         ;00C559|692000  |      ;
 	tay                                  ;00C55C|A8      |      ;
 	dex                                  ;00C55D|CA      |      ;
-	bne CODE_00C54F                      ;00C55E|D0EF    |00C54F;
+	bne Graphics_ClearPaletteArea_Loop                      ;00C55E|D0EF    |00C54F;
 	rts                                  ;00C560|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
-CODE_00C561:
+Graphics_ClearBattlePalette1:
 	lda.W #$0000                         ;00C561|A90000  |      ;
 	sta.L $7f5007                        ;00C564|8F07507F|7F5007;
 	ldx.W #$5007                         ;00C568|A20750  |      ;
 	ldy.W #$5009                         ;00C56B|A00950  |      ;
 	lda.W #$01ad                         ;00C56E|A9AD01  |      ;
 	mvn $7f,$7f                          ;00C571|547F7F  |      ;
-	bra CODE_00C5F5                      ;00C574|807F    |00C5F5;
+	bra Graphics_CopyPaletteData2                      ;00C574|807F    |00C5F5;
 ;      |        |      ;
 ;      |        |      ;
-CODE_00C576:
+Graphics_ClearBattlePalette2:
 	lda.W #$0100                         ;00C576|A90001  |      ;
 	sta.L $7f51b7                        ;00C579|8FB7517F|7F51B7;
 	ldx.W #$51b7                         ;00C57D|A2B751  |      ;
 	ldy.W #$51b9                         ;00C580|A0B951  |      ;
 	lda.W #$01ad                         ;00C583|A9AD01  |      ;
 	mvn $7f,$7f                          ;00C586|547F7F  |      ;
-	bra CODE_00C5F5                      ;00C589|806A    |00C5F5;
+	bra Graphics_CopyPaletteData2                      ;00C589|806A    |00C5F5;
 ;      |        |      ;
 ;      |        |      ;
-CODE_00C58B:
+Graphics_ClearBattlePalette3:
 	lda.W #$0000                         ;00C58B|A90000  |      ;
 	sta.L $7f536e                        ;00C58E|8F6E537F|7F536E;
 	ldx.W #$536e                         ;00C592|A26E53  |      ;
 	ldy.W #$5370                         ;00C595|A07053  |      ;
 	lda.W #$01ad                         ;00C598|A9AD01  |      ;
 	mvn $7f,$7f                          ;00C59B|547F7F  |      ;
-	bra CODE_00C5CF                      ;00C59E|802F    |00C5CF;
+	bra Graphics_SetBattlePaletteOffset                      ;00C59E|802F    |00C5CF;
 ;      |        |      ;
 ;      |        |      ;
-CODE_00C5A0:
+Graphics_ClearBattlePalette4:
 	lda.W #$0100                         ;00C5A0|A90001  |      ;
 	sta.L $7f551e                        ;00C5A3|8F1E557F|7F551E;
 	ldx.W #$551e                         ;00C5A7|A21E55  |      ;
 	ldy.W #$5520                         ;00C5AA|A02055  |      ;
 	lda.W #$01ad                         ;00C5AD|A9AD01  |      ;
 	mvn $7f,$7f                          ;00C5B0|547F7F  |      ;
-	bra CODE_00C5CF                      ;00C5B3|801A    |00C5CF;
+	bra Graphics_SetBattlePaletteOffset                      ;00C5B3|801A    |00C5CF;
 ;      |        |      ;
 ;      |        |      ;
-CODE_00C5B5:
+Graphics_ClearMenuPalette:
 	lda.W #$0000                         ;00C5B5|A90000  |      ;
 	sta.L $7e3007                        ;00C5B8|8F07307E|7E3007;
 	ldx.W #$3007                         ;00C5BC|A20730  |      ;
@@ -8673,7 +8673,7 @@ CODE_00C5B5:
 	rts                                  ;00C5CE|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
-CODE_00C5CF:
+Graphics_SetBattlePaletteOffset:
 	tya                                  ;00C5CF|98      |      ;
 	sec                                  ;00C5D0|38      |      ;
 	sbc.W #$0042                         ;00C5D1|E94200  |      ;
@@ -8681,16 +8681,16 @@ CODE_00C5CF:
 	ldx.W #$c5e7                         ;00C5D5|A2E7C5  |      ;
 	lda.L $000ec6                        ;00C5D8|AFC60E00|000EC6;
 	and.W #$0080                         ;00C5DC|298000  |      ;
-	beq CODE_00C5E4                      ;00C5DF|F003    |00C5E4;
+	beq Graphics_CopyPaletteData                      ;00C5DF|F003    |00C5E4;
 	db $a2,$f0,$c5                       ;00C5E1|        |      ;
 ;      |        |      ;
-CODE_00C5E4:
+Graphics_CopyPaletteData:
 	jmp.W CODE_00C75B                    ;00C5E4|4C5BC7  |00C75B;
 ;      |        |      ;
 	db $0c,$20,$06,$24,$06,$26,$08,$28,$00;00C5E7|        |      ;
 	db $18,$20,$08,$28,$00               ;00C5F0|        |      ;
 ;      |        |      ;
-CODE_00C5F5:
+Graphics_CopyPaletteData2:
 	tya                                  ;00C5F5|98      |      ;
 	sec                                  ;00C5F6|38      |      ;
 	sbc.W #$0042                         ;00C5F7|E94200  |      ;
@@ -8700,36 +8700,36 @@ CODE_00C5F5:
 ;      |        |      ;
 	db $20,$28,$00                       ;00C601|        |      ;
 ;      |        |      ;
-CODE_00C604:
-	jmp.W CODE_00C5B5                    ;00C604|4CB5C5  |00C5B5;
+Graphics_InitializeBattleColors:
+	jmp.W Graphics_ClearMenuPalette                    ;00C604|4CB5C5  |00C5B5;
 ;      |        |      ;
 ;      |        |      ;
-CODE_00C607:
-	jsr.W CODE_00C5B5                    ;00C607|20B5C5  |00C5B5;
+Graphics_InitializeBattleColors_Alt:
+	jsr.W Graphics_ClearMenuPalette                    ;00C607|20B5C5  |00C5B5;
 	lda.W #$0060                         ;00C60A|A96000  |      ;
 	ldx.W #$3025                         ;00C60D|A22530  |      ;
-	jsr.W CODE_00C65A                    ;00C610|205AC6  |00C65A;
+	jsr.W Graphics_LoadBattlePalettes                    ;00C610|205AC6  |00C65A;
 	ldx.W #$3035                         ;00C613|A23530  |      ;
-	bra CODE_00C62C                      ;00C616|8014    |00C62C;
+	bra Graphics_ProcessPaletteEntry                      ;00C616|8014    |00C62C;
 ;      |        |      ;
 ;      |        |      ;
-CODE_00C618:
-	jsr.W CODE_00C561                    ;00C618|2061C5  |00C561;
+Graphics_SetPaletteEntry:
+	jsr.W Graphics_ClearBattlePalette1                    ;00C618|2061C5  |00C561;
 	lda.W #$0030                         ;00C61B|A93000  |      ;
 	ldx.W #$50f5                         ;00C61E|A2F550  |      ;
-	bra CODE_00C62C                      ;00C621|8009    |00C62C;
+	bra Graphics_ProcessPaletteEntry                      ;00C621|8009    |00C62C;
 ;      |        |      ;
 ;      |        |      ;
-CODE_00C623:
-	jsr.W CODE_00C576                    ;00C623|2076C5  |00C576;
+Graphics_SetPaletteEntry_Done:
+	jsr.W Graphics_ClearBattlePalette2                    ;00C623|2076C5  |00C576;
 	lda.W #$0030                         ;00C626|A93000  |      ;
 	ldx.W #$52a5                         ;00C629|A2A552  |      ;
 ;      |        |      ;
-CODE_00C62C:
-	jsr.W CODE_00C65A                    ;00C62C|205AC6  |00C65A;
+Graphics_ProcessPaletteEntry:
+	jsr.W Graphics_LoadBattlePalettes                    ;00C62C|205AC6  |00C65A;
 	sec                                  ;00C62F|38      |      ;
 ;      |        |      ;
-CODE_00C630:
+Graphics_StorePaletteValue:
 	sta.W $0010,x                        ;00C630|9D1000  |7E0010;
 	sta.W $0012,x                        ;00C633|9D1200  |7E0012;
 	sta.W $0014,x                        ;00C636|9D1400  |7E0014;
@@ -8746,12 +8746,12 @@ CODE_00C630:
 	sep #$20                             ;00C650|E220    |      ;
 	tya                                  ;00C652|98      |      ;
 	sbc.B #$07                           ;00C653|E907    |      ;
-	bne CODE_00C630                      ;00C655|D0D9    |00C630;
+	bne Graphics_StorePaletteValue                      ;00C655|D0D9    |00C630;
 	rep #$30                             ;00C657|C230    |      ;
 	rts                                  ;00C659|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
-CODE_00C65A:
+Graphics_LoadBattlePalettes:
 	sep #$20                             ;00C65A|E220    |      ;
 	sta.W $0000,x                        ;00C65C|9D0000  |7E0000;
 	sta.W $0002,x                        ;00C65F|9D0200  |7E0002;
@@ -8766,7 +8766,7 @@ CODE_00C65A:
 	ldy.W #$521d                         ;00C675|A01D52  |      ;
 	phb                                  ;00C678|8B      |      ;
 	phy                                  ;00C679|5A      |      ;
-	jsr.W CODE_00C576                    ;00C67A|2076C5  |00C576;
+	jsr.W Graphics_ClearBattlePalette2                    ;00C67A|2076C5  |00C576;
 	ply                                  ;00C67D|7A      |      ;
 	ldx.W #$c686                         ;00C67E|A286C6  |      ;
 	jsr.W CODE_00C75B                    ;00C681|205BC7  |00C75B;
@@ -8775,11 +8775,11 @@ CODE_00C65A:
 ;      |        |      ;
 	db $0c,$04,$18,$08,$00               ;00C686|        |      ;
 	phb                                  ;00C68B|8B      |      ;
-	jsr.W CODE_00C576                    ;00C68C|2076C5  |00C576;
+	jsr.W Graphics_ClearBattlePalette2                    ;00C68C|2076C5  |00C576;
 	ldx.W #$c6a6                         ;00C68F|A2A6C6  |      ;
 	ldy.W #$522d                         ;00C692|A02D52  |      ;
 	jsr.W CODE_00C75B                    ;00C695|205BC7  |00C75B;
-	jsr.W CODE_00C5A0                    ;00C698|20A0C5  |00C5A0;
+	jsr.W Graphics_ClearBattlePalette4                    ;00C698|20A0C5  |00C5A0;
 	ldx.W #$c6b3                         ;00C69B|A2B3C6  |      ;
 	ldy.W #$5634                         ;00C69E|A03456  |      ;
 	jsr.W CODE_00C75B                    ;00C6A1|205BC7  |00C75B;
@@ -8789,11 +8789,11 @@ CODE_00C65A:
 	db $0c,$04,$0c,$08,$1c,$0c,$1c,$10,$1c,$14,$10,$18,$00,$1c,$04,$10;00C6A6|        |      ;
 	db $08,$00                           ;00C6B6|        |      ;
 	phb                                  ;00C6B8|8B      |      ;
-	jsr.W CODE_00C576                    ;00C6B9|2076C5  |00C576;
+	jsr.W Graphics_ClearBattlePalette2                    ;00C6B9|2076C5  |00C576;
 	ldx.W #$c6d3                         ;00C6BC|A2D3C6  |      ;
 	ldy.W #$528d                         ;00C6BF|A08D52  |      ;
 	jsr.W CODE_00C75B                    ;00C6C2|205BC7  |00C75B;
-	jsr.W CODE_00C5A0                    ;00C6C5|20A0C5  |00C5A0;
+	jsr.W Graphics_ClearBattlePalette4                    ;00C6C5|20A0C5  |00C5A0;
 	ldx.W #$c6d6                         ;00C6C8|A2D6C6  |      ;
 	ldy.W #$5574                         ;00C6CB|A07455  |      ;
 	jsr.W CODE_00C75B                    ;00C6CE|205BC7  |00C75B;
@@ -8803,11 +8803,11 @@ CODE_00C65A:
 	db $0c,$04,$00,$0c,$04,$14,$08,$0c,$0c,$34,$10,$0c,$14,$0c,$18,$0c;00C6D3|        |      ;
 	db $1c,$08,$20,$00                   ;00C6E3|        |      ;
 	phb                                  ;00C6E7|8B      |      ;
-	jsr.W CODE_00C576                    ;00C6E8|2076C5  |00C576;
+	jsr.W Graphics_ClearBattlePalette2                    ;00C6E8|2076C5  |00C576;
 	ldx.W #$c73f                         ;00C6EB|A23FC7  |      ;
 	ldy.W #$527d                         ;00C6EE|A07D52  |      ;
 	jsr.W CODE_00C75B                    ;00C6F1|205BC7  |00C75B;
-	jsr.W CODE_00C5A0                    ;00C6F4|20A0C5  |00C5A0;
+	jsr.W Graphics_ClearBattlePalette4                    ;00C6F4|20A0C5  |00C5A0;
 	ldx.W #$c744                         ;00C6F7|A244C7  |      ;
 	ldy.W #$55b4                         ;00C6FA|A0B455  |      ;
 	jsr.W CODE_00C75B                    ;00C6FD|205BC7  |00C75B;
@@ -8936,8 +8936,8 @@ CODE_00C7CF:
 ;      |        |      ;
 ;      |        |      ;
 CODE_00C7DE:
-	jsr.W CODE_00C618                    ;00C7DE|2018C6  |00C618;
-	jsr.W CODE_00C58B                    ;00C7E1|208BC5  |00C58B;
+	jsr.W Graphics_SetPaletteEntry                    ;00C7DE|2018C6  |00C618;
+	jsr.W Graphics_ClearBattlePalette3                    ;00C7E1|208BC5  |00C58B;
 	ldx.W #$c8ec                         ;00C7E4|A2ECC8  |      ;
 	jsr.W DMA_CopyParamsAndExecute                    ;00C7E7|20C49B  |009BC4;
 	ldx.W #$c8e3                         ;00C7EA|A2E3C8  |      ;
@@ -8966,7 +8966,7 @@ CODE_00C7F8:
 	mvn $00,$00                          ;00C819|540000  |      ;
 	lda.W #$0020                         ;00C81C|A92000  |      ;
 	tsb.W $00d2                          ;00C81F|0CD200  |0000D2;
-	jsr.W CODE_00C607                    ;00C822|2007C6  |00C607;
+	jsr.W Graphics_InitializeBattleColors_Alt                    ;00C822|2007C6  |00C607;
 	ldx.W #$51c5                         ;00C825|A2C551  |      ;
 	ldy.W #$5015                         ;00C828|A01550  |      ;
 	lda.W #$019f                         ;00C82B|A99F01  |      ;
@@ -8991,8 +8991,8 @@ CODE_00C7F8:
 	tsb.W $00da                          ;00C857|0CDA00  |0000DA;
 ;      |        |      ;
 CODE_00C85A:
-	jsr.W CODE_00C623                    ;00C85A|2023C6  |00C623;
-	jsr.W CODE_00C5A0                    ;00C85D|20A0C5  |00C5A0;
+	jsr.W Graphics_SetPaletteEntry_Done                    ;00C85A|2023C6  |00C623;
+	jsr.W Graphics_ClearBattlePalette4                    ;00C85D|20A0C5  |00C5A0;
 	ldx.W #$c8ec                         ;00C860|A2ECC8  |      ;
 	bra CODE_00C89D                      ;00C863|8038    |00C89D;
 ;      |        |      ;
