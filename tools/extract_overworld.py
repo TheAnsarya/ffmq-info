@@ -73,7 +73,7 @@ OVERWORLD_TILESETS = {
 
 
 # ============================================================================
-# Overworld Sprite Definitions  
+# Overworld Sprite Definitions
 # ============================================================================
 # Walking sprites and NPC sprites with animations
 
@@ -224,67 +224,67 @@ NPC_SPRITES = [
 
 class OverworldGraphicsExtractor:
     """Extract overworld-specific graphics from FFMQ ROM."""
-    
+
     def __init__(self, rom_path: str, output_dir: str = "data/extracted/overworld"):
         self.rom_path = rom_path
         self.output_dir = Path(output_dir)
         self.graphics_extractor = GraphicsExtractor(rom_path)
-        
+
         # Create output directories
         self.tileset_dir = self.output_dir / "tilesets"
         self.sprite_dir = self.output_dir / "sprites"
         self.object_dir = self.output_dir / "objects"
         self.npc_dir = self.output_dir / "npcs"
-        
+
         for d in [self.tileset_dir, self.sprite_dir, self.object_dir, self.npc_dir]:
             d.mkdir(parents=True, exist_ok=True)
-    
+
     def extract_tileset(self, tileset_name: str, tileset_def: dict) -> bool:
         """Extract a tileset to PNG + JSON."""
         print(f"\nExtracting tileset: {tileset_name}")
         print(f"  Offset: 0x{tileset_def['offset']:06X}")
         print(f"  Size: {tileset_def['size']} bytes")
         print(f"  Format: {tileset_def['format']}")
-        
+
         try:
             # Extract tiles
             tiles = []
             tile_size = 32 if tileset_def['format'] == "4BPP" else 16
             num_tiles = tileset_def['size'] // tile_size
-            
+
             for i in range(num_tiles):
                 tile_offset = tileset_def['offset'] + (i * tile_size)
-                
+
                 if tileset_def['format'] == "4BPP":
                     tile = self.graphics_extractor.decode_tile_4bpp(tile_offset)
                 else:
                     tile = self.graphics_extractor.decode_tile_2bpp(tile_offset)
-                
+
                 tiles.append(tile)
-            
+
             # Create tileset image
             tiles_wide = tileset_def['tiles_wide']
             tiles_high = (num_tiles + tiles_wide - 1) // tiles_wide
-            
+
             img = Image.new('RGB', (tiles_wide * 8, tiles_high * 8))
-            
+
             # Default grayscale palette for preview
             palette = self._create_default_palette()
-            
+
             for idx, tile in enumerate(tiles):
                 tile_x = (idx % tiles_wide) * 8
                 tile_y = (idx // tiles_wide) * 8
-                
+
                 for y in range(8):
                     for x in range(8):
                         color = palette[tile[y][x]]
                         img.putpixel((tile_x + x, tile_y + y), color)
-            
+
             # Save PNG
             output_path = self.tileset_dir / f"{tileset_name}.png"
             img.save(output_path)
             print(f"  ✓ Saved: {output_path}")
-            
+
             # Save metadata
             metadata = {
                 "name": tileset_name,
@@ -301,65 +301,65 @@ class OverworldGraphicsExtractor:
                 },
                 "notes": tileset_def['notes']
             }
-            
+
             meta_path = self.tileset_dir / f"{tileset_name}_meta.json"
             with open(meta_path, 'w') as f:
                 json.dump(metadata, f, indent=2)
-            
+
             print(f"  ✓ Metadata: {meta_path}")
             return True
-            
+
         except Exception as e:
             print(f"  ✗ Error: {e}")
             return False
-    
+
     def extract_sprite(self, sprite_def: SpriteDefinition, output_dir: Path) -> bool:
         """Extract a sprite with animation frames."""
         print(f"\nExtracting sprite: {sprite_def.name}")
         print(f"  Size: {sprite_def.width_tiles}×{sprite_def.height_tiles} tiles")
         print(f"  Frames: {len(sprite_def.frames) if sprite_def.frames else 1}")
-        
+
         try:
             # Get tile size based on format
             tile_size = 32 if sprite_def.format == "4BPP" else 16
-            
+
             # Extract each frame
             frames = []
             frame_offsets = sprite_def.frames if sprite_def.frames else [0]
-            
+
             for frame_idx, frame_offset in enumerate(frame_offsets):
                 # Create frame image
                 width = sprite_def.width_tiles * 8
                 height = sprite_def.height_tiles * 8
                 frame_img = Image.new('RGB', (width, height))
-                
+
                 # Default palette
                 palette = self._create_default_palette()
-                
+
                 # Extract tiles for this frame
                 tiles_in_frame = sprite_def.width_tiles * sprite_def.height_tiles
-                
+
                 for tile_idx in range(tiles_in_frame):
                     tile_file_offset = sprite_def.tile_offset + (frame_offset * tile_size) + (tile_idx * tile_size)
-                    
+
                     if sprite_def.format == "4BPP":
                         tile = self.graphics_extractor.decode_tile_4bpp(tile_file_offset)
                     else:
                         tile = self.graphics_extractor.decode_tile_2bpp(tile_file_offset)
-                    
+
                     # Calculate tile position in frame
                     tile_x = (tile_idx % sprite_def.width_tiles) * 8
                     tile_y = (tile_idx // sprite_def.width_tiles) * 8
-                    
+
                     # Draw tile
                     for y in range(8):
                         for x in range(8):
                             pixel_value = tile[y][x]
                             color = palette[pixel_value]
                             frame_img.putpixel((tile_x + x, tile_y + y), color)
-                
+
                 frames.append(frame_img)
-            
+
             # Save frames
             if len(frames) == 1:
                 # Single frame sprite
@@ -371,21 +371,21 @@ class OverworldGraphicsExtractor:
                 for idx, frame in enumerate(frames):
                     frame_path = output_dir / f"{sprite_def.name}_frame{idx:02d}.png"
                     frame.save(frame_path)
-                
+
                 # Create sprite sheet
                 sheet_width = width * min(len(frames), 4)  # Max 4 frames per row
                 sheet_height = height * ((len(frames) + 3) // 4)
                 sprite_sheet = Image.new('RGB', (sheet_width, sheet_height))
-                
+
                 for idx, frame in enumerate(frames):
                     x = (idx % 4) * width
                     y = (idx // 4) * height
                     sprite_sheet.paste(frame, (x, y))
-                
+
                 sheet_path = output_dir / f"{sprite_def.name}_sheet.png"
                 sprite_sheet.save(sheet_path)
                 print(f"  ✓ Saved {len(frames)} frames + sheet: {sheet_path}")
-            
+
             # Save metadata
             metadata = {
                 "name": sprite_def.name,
@@ -406,77 +406,77 @@ class OverworldGraphicsExtractor:
                 },
                 "notes": sprite_def.notes
             }
-            
+
             meta_path = output_dir / f"{sprite_def.name}_meta.json"
             with open(meta_path, 'w') as f:
                 json.dump(metadata, f, indent=2)
-            
+
             return True
-            
+
         except Exception as e:
             print(f"  ✗ Error: {e}")
             import traceback
             traceback.print_exc()
             return False
-    
+
     def _create_default_palette(self) -> List[Tuple[int, int, int]]:
         """Create a default grayscale palette for preview."""
         return [(i * 17, i * 17, i * 17) for i in range(16)]
-    
+
     def extract_all(self):
         """Extract all overworld graphics."""
         print("=" * 80)
         print("FFMQ Overworld Graphics Extraction")
         print("=" * 80)
-        
+
         # Extract tilesets
         print("\n" + "=" * 80)
         print("TILESETS")
         print("=" * 80)
-        
+
         success_count = 0
         for name, tileset_def in OVERWORLD_TILESETS.items():
             if self.extract_tileset(name, tileset_def):
                 success_count += 1
-        
+
         print(f"\n✓ Extracted {success_count}/{len(OVERWORLD_TILESETS)} tilesets")
-        
+
         # Extract walking sprites
         print("\n" + "=" * 80)
         print("WALKING SPRITES")
         print("=" * 80)
-        
+
         success_count = 0
         for sprite_def in WALKING_SPRITES:
             if self.extract_sprite(sprite_def, self.sprite_dir):
                 success_count += 1
-        
+
         print(f"\n✓ Extracted {success_count}/{len(WALKING_SPRITES)} walking sprites")
-        
+
         # Extract object sprites
         print("\n" + "=" * 80)
         print("OBJECT SPRITES")
         print("=" * 80)
-        
+
         success_count = 0
         for sprite_def in OBJECT_SPRITES:
             if self.extract_sprite(sprite_def, self.object_dir):
                 success_count += 1
-        
+
         print(f"\n✓ Extracted {success_count}/{len(OBJECT_SPRITES)} object sprites")
-        
+
         # Extract NPC sprites
         print("\n" + "=" * 80)
         print("NPC SPRITES")
         print("=" * 80)
-        
+
         success_count = 0
         for sprite_def in NPC_SPRITES:
             if self.extract_sprite(sprite_def, self.npc_dir):
                 success_count += 1
-        
+
         print(f"\n✓ Extracted {success_count}/{len(NPC_SPRITES)} NPC sprites")
-        
+
         # Summary
         print("\n" + "=" * 80)
         print("EXTRACTION COMPLETE")
@@ -495,17 +495,17 @@ def main():
         print("Usage: python extract_overworld.py <rom_file> [output_dir]")
         print("Example: python extract_overworld.py roms/FFMQ.sfc data/extracted/overworld")
         return 1
-    
+
     rom_path = sys.argv[1]
     output_dir = sys.argv[2] if len(sys.argv) > 2 else "data/extracted/overworld"
-    
+
     if not os.path.exists(rom_path):
         print(f"Error: ROM file not found: {rom_path}")
         return 1
-    
+
     extractor = OverworldGraphicsExtractor(rom_path, output_dir)
     extractor.extract_all()
-    
+
     return 0
 
 
