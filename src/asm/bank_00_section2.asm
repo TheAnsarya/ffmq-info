@@ -6,7 +6,7 @@
 ; Registers Used: A, X, Y
 ; ===========================================================================
 
-CODE_008577:
+Graphics_TransferBattleMode:
 ; Setup VRAM address for character data
 	ldx.W				   #$4400	; VRAM address $4400
 	stx.W				   SNES_VMADDL ; Set VRAM write address
@@ -51,7 +51,7 @@ CODE_008577:
 ; Side Effects: Updates VRAM, modifies status flags
 ; ===========================================================================
 
-CODE_0085B7:
+Graphics_UpdateFieldMode:
 ; Setup VRAM for vertical increment mode
 	lda.B				   #$80	  ; Increment after writing to $2119
 	sta.W				   SNES_VMAINC ; Set VRAM increment mode
@@ -59,7 +59,7 @@ CODE_0085B7:
 ; Check if battle mode graphics needed
 	lda.B				   #$10	  ; Check bit 4 of display flags
 	and.W				   $00da	 ; Test against display status
-	bne					 CODE_008577 ; If set, do battle graphics transfer
+	bne					 Graphics_TransferBattleMode ; If set, do battle graphics transfer
 
 ; Field mode graphics update
 	ldx.W				   $0042	 ; Get current VRAM address from variable
@@ -99,7 +99,7 @@ CODE_0085B7:
 ; Check if tilemap update needed
 	lda.B				   #$80	  ; Check bit 7
 	and.W				   $00d6	 ; Test display flags
-	beq					 CODE_00862D ; If clear, skip tilemap transfer
+	beq					 Graphics_TransferFieldTilemap_Skip ; If clear, skip tilemap transfer
 
 ; Transfer tilemap data
 	ldx.W				   #$5820	; VRAM address $5820
@@ -116,17 +116,17 @@ CODE_0085B7:
 	sta.W				   SNES_MDMAEN ; Execute transfer
 	rtl							   ; Return
 
-CODE_00862D:
+Graphics_TransferFieldTilemap_Skip:
 	jsr.W				   CODE_008543 ; Transfer OAM data
 
 ; Check if additional display update needed
 	lda.B				   #$20	  ; Check bit 5
 	and.W				   $00d6	 ; Test display flags
-	beq					 CODE_00863C ; If clear, exit
+	beq					 Graphics_TransferFieldMode_Exit ; If clear, exit
 	lda.B				   #$78	  ; Set multiple flags (bits 3,4,5,6)
 	tsb.W				   $00d4	 ; Set bits in status register
 
-CODE_00863C:
+Graphics_TransferFieldMode_Exit:
 	rtl							   ; Return
 
 ; ===========================================================================
@@ -136,7 +136,7 @@ CODE_00863C:
 ; Technical Details: Increments frame counter, processes game state
 ; ===========================================================================
 
-CODE_008966:
+GameLoop_FrameUpdate:
 	rep					 #$30		; 16-bit A, X, Y
 	lda.W				   #$0000	; Zero accumulator
 	tcd							   ; Transfer to direct page (DP = $0000)
@@ -147,7 +147,7 @@ CODE_008966:
 	inc.W				   $0e99	 ; Increment high word (24-bit counter)
 
 Skip_High_Increment:
-	jsr.W				   CODE_0089C6 ; Process time-based events
+	jsr.W				   GameLoop_ProcessTimeEvents ; Process time-based events
 
 ; Check if full screen refresh needed
 	lda.W				   #$0004	; Check bit 2
@@ -208,7 +208,7 @@ Frame_Update_Done:
 ; Technical Details: Checks status flags for various timed events
 ; ===========================================================================
 
-CODE_0089C6:
+GameLoop_ProcessTimeEvents:
 	phd							   ; Preserve direct page
 
 ; Check if character status animation active
@@ -234,28 +234,28 @@ CODE_0089C6:
 	lda.L				   $700027   ; Check character 1 in party
 	bne					 Check_Slot_2 ; If present, skip animation
 	ldx.B				   #$40	  ; Animation offset for slot 1
-	jsr.W				   CODE_008A2A ; Animate status icon
+	jsr.W				   StatusIcon_AnimateCharacter ; Animate status icon
 
 Check_Slot_2:
 ; Check character slot 2 (Phoebe)
 	lda.L				   $700077   ; Check character 2 in party
 	bne					 Check_Slot_3 ; If present, skip animation
 	ldx.B				   #$50	  ; Animation offset for slot 2
-	jsr.W				   CODE_008A2A ; Animate status icon
+	jsr.W				   StatusIcon_AnimateCharacter ; Animate status icon
 
 Check_Slot_3:
 ; Check character slot 3 (Tristam)
 	lda.L				   $7003b3   ; Check character 3 in party
 	bne					 Check_Slot_4 ; If present, skip animation
 	ldx.B				   #$60	  ; Animation offset for slot 3
-	jsr.W				   CODE_008A2A ; Animate status icon
+	jsr.W				   StatusIcon_AnimateCharacter ; Animate status icon
 
 Check_Slot_4:
 ; Check character slot 4 (Enemy/Guest)
 	lda.L				   $700403   ; Check character 4 in party
 	bne					 Time_Events_Done ; If present, skip animation
 	ldx.B				   #$70	  ; Animation offset for slot 4
-	jsr.W				   CODE_008A2A ; Animate status icon
+	jsr.W				   StatusIcon_AnimateCharacter ; Animate status icon
 
 Time_Events_Done:
 	pld							   ; Restore direct page
@@ -268,7 +268,7 @@ Time_Events_Done:
 ; Input: X = OAM offset for character slot
 ; ===========================================================================
 
-CODE_008A2A:
+StatusIcon_AnimateCharacter:
 ; TODO: Document status icon animation logic
 ; Cycles through animation frames for defeated/inactive characters
 RTS_Label:
@@ -277,7 +277,7 @@ RTS_Label:
 ; Input Handler Jump Table
 ; ===========================================================================
 
-CODE_008A35:
+InputHandler_JumpTable:
 ; TODO: Document input handler addresses
 ; Table of function pointers for different game modes
 	dw											 Input_Handler_Field
