@@ -1119,14 +1119,14 @@ DATA8_008962:
 	lda.W #$0000                         ;008968|A90000  |      ;
 	tcd                                  ;00896B|5B      |      ;
 	inc.W $0e97                          ;00896C|EE970E  |020E97;
-	bne CODE_008974                      ;00896F|D003    |008974;
+	bne Frame_NoOverflow                 ;00896F|D003    |008974;
 	inc.W $0e99                          ;008971|EE990E  |020E99;
 ;      |        |      ;
-CODE_008974:
-	jsr.W CODE_0089C6                    ;008974|20C689  |0089C6;
+Frame_NoOverflow:
+	jsr.W Frame_UpdateCharSprites        ;008974|20C689  |0089C6;
 	lda.W #$0004                         ;008977|A90400  |      ;
 	and.W $00d4                          ;00897A|2DD400  |0200D4;
-	beq CODE_008999                      ;00897D|F01A    |008999;
+	beq Frame_StandardUpdate             ;00897D|F01A    |008999;
 	lda.W #$0004                         ;00897F|A90400  |      ;
 	trb.W $00d4                          ;008982|1CD400  |0200D4;
 	lda.W #$0000                         ;008985|A90000  |      ;
@@ -1135,93 +1135,93 @@ CODE_008974:
 	lda.W #$0001                         ;00898E|A90100  |      ;
 	jsr.W CODE_0091D4                    ;008991|20D491  |0091D4;
 	jsr.W CODE_008D29                    ;008994|20298D  |008D29;
-	bra CODE_0089BD                      ;008997|8024    |0089BD;
+	bra Frame_ProcessInput               ;008997|8024    |0089BD;
 ;      |        |      ;
 ;      |        |      ;
-CODE_008999:
+Frame_StandardUpdate:
 	jsr.W CODE_008BFD                    ;008999|20FD8B  |008BFD;
 	lda.W #$0010                         ;00899C|A91000  |      ;
 	and.W $00da                          ;00899F|2DDA00  |0200DA;
-	bne CODE_0089AC                      ;0089A2|D008    |0089AC;
+	bne Frame_CheckInputMask             ;0089A2|D008    |0089AC;
 	lda.W #$0004                         ;0089A4|A90400  |      ;
 	and.W $00e2                          ;0089A7|2DE200  |0200E2;
-	bne CODE_0089BD                      ;0089AA|D011    |0089BD;
+	bne Frame_ProcessInput               ;0089AA|D011    |0089BD;
 ;      |        |      ;
-CODE_0089AC:
+Frame_CheckInputMask:
 	lda.B $07                            ;0089AC|A507    |000007;
 	and.B $8e                            ;0089AE|258E    |00008E;
-	beq CODE_0089BD                      ;0089B0|F00B    |0089BD;
+	beq Frame_ProcessInput               ;0089B0|F00B    |0089BD;
 	jsl.L CODE_009730                    ;0089B2|22309700|009730;
 	sep #$30                             ;0089B6|E230    |      ;
 	asl a;0089B8|0A      |      ;
 	tax                                  ;0089B9|AA      |      ;
 	jsr.W (CODE_008A35,x)                ;0089BA|FC358A  |008A35;
 ;      |        |      ;
-CODE_0089BD:
+Frame_ProcessInput:
 	rep #$30                             ;0089BD|C230    |      ;
 	jsr.W CODE_009342                    ;0089BF|204293  |009342;
 	jsr.W CODE_009264                    ;0089C2|206492  |009264;
 	rtl                                  ;0089C5|6B      |      ;
 ;      |        |      ;
 ;      |        |      ;
-CODE_0089C6:
+Frame_UpdateCharSprites:
 	phd                                  ;0089C6|0B      |      ;
 	lda.W #$0080                         ;0089C7|A98000  |      ;
 	and.W $00de                          ;0089CA|2DDE00  |0200DE;
-	beq CODE_008A26                      ;0089CD|F057    |008A26;
+	beq Frame_SpriteReturn               ;0089CD|F057    |008A26;
 	lda.W #$0c00                         ;0089CF|A9000C  |      ;
 	tcd                                  ;0089D2|5B      |      ;
 	sep #$30                             ;0089D3|E230    |      ;
 	dec.W $010d                          ;0089D5|CE0D01  |02010D;
-	bpl CODE_008A26                      ;0089D8|104C    |008A26;
+	bpl Frame_SpriteReturn               ;0089D8|104C    |008A26;
 	lda.B #$0c                           ;0089DA|A90C    |      ;
 	sta.W $010d                          ;0089DC|8D0D01  |02010D;
 	lda.L $700027                        ;0089DF|AF270070|700027;
-	bne CODE_0089EA                      ;0089E3|D005    |0089EA;
+	bne Char_CheckSecond                 ;0089E3|D005    |0089EA;
 	ldx.B #$40                           ;0089E5|A240    |      ;
-	jsr.W CODE_008A2A                    ;0089E7|202A8A  |008A2A;
+	jsr.W Char_AnimateSprite             ;0089E7|202A8A  |008A2A;
 ;      |        |      ;
-CODE_0089EA:
+Char_CheckSecond:
 	lda.L $700077                        ;0089EA|AF770070|700077;
-	bne CODE_0089F5                      ;0089EE|D005    |0089F5;
+	bne Char_CheckThird                  ;0089EE|D005    |0089F5;
 	ldx.B #$50                           ;0089F0|A250    |      ;
-	jsr.W CODE_008A2A                    ;0089F2|202A8A  |008A2A;
+	jsr.W Char_AnimateSprite             ;0089F2|202A8A  |008A2A;
 ;      |        |      ;
-CODE_0089F5:
+Char_CheckThird:
 	lda.L $7003b3                        ;0089F5|AFB30370|7003B3;
-	bne CODE_008A00                      ;0089F9|D005    |008A00;
+	bne Char_CheckFourth                 ;0089F9|D005    |008A00;
 	ldx.B #$60                           ;0089FB|A260    |      ;
-	jsr.W CODE_008A2A                    ;0089FD|202A8A  |008A2A;
+	jsr.W Char_AnimateSprite             ;0089FD|202A8A  |008A2A;
 ;      |        |      ;
-CODE_008A00:
+Char_CheckFourth:
 	lda.L $700403                        ;008A00|AF030470|700403;
-	bne CODE_008A0B                      ;008A04|D005    |008A0B;
+	bne Char_CheckFifth                  ;008A04|D005    |008A0B;
 	ldx.B #$70                           ;008A06|A270    |      ;
-	jsr.W CODE_008A2A                    ;008A08|202A8A  |008A2A;
+	jsr.W Char_AnimateSprite             ;008A08|202A8A  |008A2A;
 ;      |        |      ;
-CODE_008A0B:
+Char_CheckFifth:
 	lda.L $70073f                        ;008A0B|AF3F0770|70073F;
-	bne CODE_008A16                      ;008A0F|D005    |008A16;
+	bne Char_CheckSixth                  ;008A0F|D005    |008A16;
 	ldx.B #$80                           ;008A11|A280    |      ;
-	jsr.W CODE_008A2A                    ;008A13|202A8A  |008A2A;
+	jsr.W Char_AnimateSprite             ;008A13|202A8A  |008A2A;
 ;      |        |      ;
-CODE_008A16:
+Char_CheckSixth:
 	lda.L $70078f                        ;008A16|AF8F0770|70078F;
-	bne CODE_008A21                      ;008A1A|D005    |008A21;
+	bne Char_SetOAMFlag                  ;008A1A|D005    |008A21;
 	ldx.B #$90                           ;008A1C|A290    |      ;
-	jsr.W CODE_008A2A                    ;008A1E|202A8A  |008A2A;
+	jsr.W Char_AnimateSprite             ;008A1E|202A8A  |008A2A;
 ;      |        |      ;
-CODE_008A21:
+Char_SetOAMFlag:
 	lda.B #$20                           ;008A21|A920    |      ;
 	tsb.W $00d2                          ;008A23|0CD200  |0200D2;
 ;      |        |      ;
-CODE_008A26:
+Frame_SpriteReturn:
 	rep #$30                             ;008A26|C230    |      ;
 	pld                                  ;008A28|2B      |      ;
 	rts                                  ;008A29|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
-CODE_008A2A:
+Char_AnimateSprite:
 	lda.B $02,x                          ;008A2A|B502    |000C02;
 	eor.B #$04                           ;008A2C|4904    |      ;
 	sta.B $02,x                          ;008A2E|9502    |000C02;
@@ -1250,156 +1250,156 @@ CODE_008A35:
 ;      |        |      ;
 	inc.B $01                            ;008A61|E601    |000001;
 ;      |        |      ;
-CODE_008A63:
+Cursor_CheckBounds:
 	lda.B $01                            ;008A63|A501    |000001;
-	bmi CODE_008A78                      ;008A65|3011    |008A78;
+	bmi Cursor_CheckWrap1                ;008A65|3011    |008A78;
 	cmp.B $03                            ;008A67|C503    |000003;
-	bcc CODE_008A80                      ;008A69|9015    |008A80;
+	bcc Cursor_CheckHorizontal           ;008A69|9015    |008A80;
 	lda.B $95                            ;008A6B|A595    |000095;
 	and.B #$01                           ;008A6D|2901    |      ;
-	bne CODE_008A78                      ;008A6F|D007    |008A78;
+	bne Cursor_CheckWrap1                ;008A6F|D007    |008A78;
 ;      |        |      ;
-CODE_008A71:
+Cursor_ClampVertical:
 	lda.B $03                            ;008A71|A503    |000003;
 	dec a;008A73|3A      |      ;
 	sta.B $01                            ;008A74|8501    |000001;
-	bra CODE_008A80                      ;008A76|8008    |008A80;
+	bra Cursor_CheckHorizontal           ;008A76|8008    |008A80;
 ;      |        |      ;
 ;      |        |      ;
-CODE_008A78:
+Cursor_CheckWrap1:
 	lda.B $95                            ;008A78|A595    |000095;
 	and.B #$02                           ;008A7A|2902    |      ;
-	bne CODE_008A71                      ;008A7C|D0F3    |008A71;
+	bne Cursor_ClampVertical             ;008A7C|D0F3    |008A71;
 	stz.B $01                            ;008A7E|6401    |000001;
 ;      |        |      ;
-CODE_008A80:
+Cursor_CheckHorizontal:
 	lda.B $02                            ;008A80|A502    |000002;
-	bmi CODE_008A94                      ;008A82|3010    |008A94;
+	bmi Cursor_CheckWrap2                ;008A82|3010    |008A94;
 	cmp.B $04                            ;008A84|C504    |000004;
-	bcc CODE_008A9C                      ;008A86|9014    |008A9C;
+	bcc Cursor_UpdateComplete            ;008A86|9014    |008A9C;
 	lda.B $95                            ;008A88|A595    |000095;
 	and.B #$04                           ;008A8A|2904    |      ;
-	bne CODE_008A94                      ;008A8C|D006    |008A94;
+	bne Cursor_CheckWrap2                ;008A8C|D006    |008A94;
 ;      |        |      ;
-CODE_008A8E:
+Cursor_ClampHorizontal:
 	lda.B $04                            ;008A8E|A504    |000004;
 	dec a;008A90|3A      |      ;
 	sta.B $02                            ;008A91|8502    |000002;
 	rts                                  ;008A93|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
-CODE_008A94:
+Cursor_CheckWrap2:
 	lda.B $95                            ;008A94|A595    |000095;
 	and.B #$08                           ;008A96|2908    |      ;
-	bne CODE_008A8E                      ;008A98|D0F4    |008A8E;
+	bne Cursor_ClampHorizontal           ;008A98|D0F4    |008A8E;
 	stz.B $02                            ;008A9A|6402    |000002;
 ;      |        |      ;
-CODE_008A9C:
+Cursor_UpdateComplete:
 	rts                                  ;008A9C|60      |      ;
 ;      |        |      ;
-	jsr.W CODE_008B57                    ;008A9D|20578B  |008B57;
-	bne CODE_008ABC                      ;008AA0|D01A    |008ABC;
+	jsr.W Input_CheckCancel              ;008A9D|20578B  |008B57;
+	bne Input_ToggleReturn               ;008AA0|D01A    |008ABC;
 	lda.W $1090                          ;008AA2|AD9010  |021090;
-	bmi CODE_008AB9                      ;008AA5|3012    |008AB9;
+	bmi Input_ToggleAlt                  ;008AA5|3012    |008AB9;
 	lda.W $10a0                          ;008AA7|ADA010  |0210A0;
 	eor.B #$80                           ;008AAA|4980    |      ;
 	sta.W $10a0                          ;008AAC|8DA010  |0210A0;
 	lda.B #$40                           ;008AAF|A940    |      ;
 	tsb.W $00d4                          ;008AB1|0CD400  |0200D4;
 	jsr.W CODE_00B908                    ;008AB4|2008B9  |00B908;
-	bra CODE_008ABC                      ;008AB7|8003    |008ABC;
+	bra Input_ToggleReturn               ;008AB7|8003    |008ABC;
 ;      |        |      ;
 ;      |        |      ;
-CODE_008AB9:
+Input_ToggleAlt:
 	jsr.W CODE_00B912                    ;008AB9|2012B9  |00B912;
 ;      |        |      ;
-CODE_008ABC:
+Input_ToggleReturn:
 	rts                                  ;008ABC|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
-CODE_008ABD:
+Menu_CheckDisplayMode:
 	lda.W $1032                          ;008ABD|AD3210  |021032;
 	cmp.B #$80                           ;008AC0|C980    |      ;
-	bne CODE_008ACC                      ;008AC2|D008    |008ACC;
+	bne Menu_StandardDisplay             ;008AC2|D008    |008ACC;
 	lda.W $1033                          ;008AC4|AD3310  |021033;
-	bne CODE_008ACC                      ;008AC7|D003    |008ACC;
+	bne Menu_StandardDisplay             ;008AC7|D003    |008ACC;
 	jmp.W CODE_00B912                    ;008AC9|4C12B9  |00B912;
 ;      |        |      ;
 ;      |        |      ;
-CODE_008ACC:
+Menu_StandardDisplay:
 	jmp.W CODE_00B908                    ;008ACC|4C08B9  |00B908;
 ;      |        |      ;
-	jsr.W CODE_008B57                    ;008ACF|20578B  |008B57;
-	bne CODE_008AF7                      ;008AD2|D023    |008AF7;
-	jsr.W CODE_008ABD                    ;008AD4|20BD8A  |008ABD;
+	jsr.W Input_CheckCancel              ;008ACF|20578B  |008B57;
+	bne Menu_CycleDone                   ;008AD2|D023    |008AF7;
+	jsr.W Menu_CheckDisplayMode          ;008AD4|20BD8A  |008ABD;
 	lda.W $1031                          ;008AD7|AD3110  |021031;
 	sec                                  ;008ADA|38      |      ;
 	sbc.B #$20                           ;008ADB|E920    |      ;
 	ldx.B #$ff                           ;008ADD|A2FF    |      ;
 ;      |        |      ;
-CODE_008ADF:
+Menu_CycleUp_Loop:
 	inx                                  ;008ADF|E8      |      ;
 	sbc.B #$03                           ;008AE0|E903    |      ;
-	bcs CODE_008ADF                      ;008AE2|B0FB    |008ADF;
+	bcs Menu_CycleUp_Loop                ;008AE2|B0FB    |008ADF;
 	txa                                  ;008AE4|8A      |      ;
 ;      |        |      ;
-CODE_008AE5:
+Menu_CycleUp_FindNext:
 	inc a;008AE5|1A      |      ;
 	and.B #$03                           ;008AE6|2903    |      ;
 	pha                                  ;008AE8|48      |      ;
 	jsr.W CODE_008DA8                    ;008AE9|20A88D  |008DA8;
 	pla                                  ;008AEC|68      |      ;
 	cpy.B #$ff                           ;008AED|C0FF    |      ;
-	beq CODE_008AE5                      ;008AEF|F0F4    |008AE5;
-	jsr.W CODE_008B21                    ;008AF1|20218B  |008B21;
+	beq Menu_CycleUp_FindNext            ;008AEF|F0F4    |008AE5;
+	jsr.W Menu_UpdateSelection           ;008AF1|20218B  |008B21;
 	jsr.W CODE_008C3D                    ;008AF4|203D8C  |008C3D;
 ;      |        |      ;
-CODE_008AF7:
+Menu_CycleDone:
 	rts                                  ;008AF7|60      |      ;
 ;      |        |      ;
-	jsr.W CODE_008B57                    ;008AF8|20578B  |008B57;
-	bne CODE_008B20                      ;008AFB|D023    |008B20;
-	jsr.W CODE_008ABD                    ;008AFD|20BD8A  |008ABD;
+	jsr.W Input_CheckCancel              ;008AF8|20578B  |008B57;
+	bne Menu_CycleDown_Done              ;008AFB|D023    |008B20;
+	jsr.W Menu_CheckDisplayMode          ;008AFD|20BD8A  |008ABD;
 	lda.W $1031                          ;008B00|AD3110  |021031;
 	sec                                  ;008B03|38      |      ;
 	sbc.B #$20                           ;008B04|E920    |      ;
 	ldx.B #$ff                           ;008B06|A2FF    |      ;
 ;      |        |      ;
-CODE_008B08:
+Menu_CycleDown_Loop:
 	inx                                  ;008B08|E8      |      ;
 	sbc.B #$03                           ;008B09|E903    |      ;
-	bcs CODE_008B08                      ;008B0B|B0FB    |008B08;
+	bcs Menu_CycleDown_Loop              ;008B0B|B0FB    |008B08;
 	txa                                  ;008B0D|8A      |      ;
 ;      |        |      ;
-CODE_008B0E:
+Menu_CycleDown_FindPrev:
 	dec a;008B0E|3A      |      ;
 	and.B #$03                           ;008B0F|2903    |      ;
 	pha                                  ;008B11|48      |      ;
 	jsr.W CODE_008DA8                    ;008B12|20A88D  |008DA8;
 	pla                                  ;008B15|68      |      ;
 	cpy.B #$ff                           ;008B16|C0FF    |      ;
-	beq CODE_008B0E                      ;008B18|F0F4    |008B0E;
-	jsr.W CODE_008B21                    ;008B1A|20218B  |008B21;
+	beq Menu_CycleDown_FindPrev          ;008B18|F0F4    |008B0E;
+	jsr.W Menu_UpdateSelection           ;008B1A|20218B  |008B21;
 	jsr.W CODE_008C3D                    ;008B1D|203D8C  |008C3D;
 ;      |        |      ;
-CODE_008B20:
+Menu_CycleDown_Done:
 	rts                                  ;008B20|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
-CODE_008B21:
+Menu_UpdateSelection:
 	rep #$30                             ;008B21|C230    |      ;
 	ldx.W #$3709                         ;008B23|A20937  |      ;
 	cpy.W #$0023                         ;008B26|C02300  |      ;
-	bcc CODE_008B3E                      ;008B29|9013    |008B3E;
+	bcc Menu_UpdateSelection_Copy        ;008B29|9013    |008B3E;
 	ldx.W #$3719                         ;008B2B|A21937  |      ;
 	cpy.W #$0026                         ;008B2E|C02600  |      ;
-	bcc CODE_008B3E                      ;008B31|900B    |008B3E;
+	bcc Menu_UpdateSelection_Copy        ;008B31|900B    |008B3E;
 	ldx.W #$3729                         ;008B33|A22937  |      ;
 	cpy.W #$0029                         ;008B36|C02900  |      ;
-	bcc CODE_008B3E                      ;008B39|9003    |008B3E;
+	bcc Menu_UpdateSelection_Copy        ;008B39|9003    |008B3E;
 	ldx.W #$3739                         ;008B3B|A23937  |      ;
 ;      |        |      ;
-CODE_008B3E:
+Menu_UpdateSelection_Copy:
 	ldy.W #$3669                         ;008B3E|A06936  |      ;
 	lda.W #$000f                         ;008B41|A90F00  |      ;
 	mvn $7e,$7e                          ;008B44|547E7E  |      ;
@@ -1413,7 +1413,7 @@ CODE_008B3E:
 	rts                                  ;008B56|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
-CODE_008B57:
+Input_CheckCancel:
 	lda.B #$10                           ;008B57|A910    |      ;
 	and.W $00d6                          ;008B59|2DD600  |0200D6;
 	beq CODE_008B67                      ;008B5C|F009    |008B67;
