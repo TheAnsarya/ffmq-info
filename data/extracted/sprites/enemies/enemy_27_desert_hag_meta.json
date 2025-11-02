@@ -1,0 +1,22 @@
+{
+  "name": "enemy_27_desert_hag",
+  "enemy_id": 27,
+  "enemy_name": "Water Hag",
+  "category": "enemy",
+  "format": "4BPP",
+  "rom_offset": "0x04ABA5",
+  "palette_offset": "0x0481B0",
+  "dimensions": {
+    "width_tiles": 8,
+    "height_tiles": 8,
+    "width_pixels": 64,
+    "height_pixels": 64
+  },
+  "num_tiles": 64,
+  "shares_graphics": true,
+  "shared_with": [
+    26,
+    27
+  ],
+  "notes": "Water Hag (ID 27) - Palette from Bank 09"
+}

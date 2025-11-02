@@ -1,0 +1,23 @@
+{
+  "name": "enemy_00_brownie",
+  "enemy_id": 0,
+  "enemy_name": "Brownie",
+  "category": "enemy",
+  "format": "4BPP",
+  "rom_offset": "0x0485F5",
+  "palette_offset": "0x048000",
+  "dimensions": {
+    "width_tiles": 3,
+    "height_tiles": 3,
+    "width_pixels": 24,
+    "height_pixels": 24
+  },
+  "num_tiles": 9,
+  "shares_graphics": true,
+  "shared_with": [
+    0,
+    1,
+    2
+  ],
+  "notes": "Brownie (ID 0) - Palette from Bank 09"
+}

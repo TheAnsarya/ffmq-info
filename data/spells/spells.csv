@@ -1,0 +1,17 @@
+id,name,power,mp_cost,element,byte3,byte4,byte5,effects,address
+0,Fire,11,2,Fire,12,2,1,Fire elemental; 11 base damage/healing,$060F36
+1,Blizzard,9,2,Fire,13,2,1,Fire elemental; 9 base damage/healing,$060F3C
+2,Thunder,14,14,Wind,59,4,11,Wind elemental; 14 base damage/healing,$060F42
+3,Aero,15,11,Unknown,62,5,10,15 base damage/healing,$060F48
+4,Cure,26,11,Water,71,3,2,Water elemental; 26 base damage/healing,$060F4E
+5,Life,73,2,Earth,36,5,5,Earth elemental; 73 base damage/healing,$060F54
+6,Heal,40,6,Wind,79,4,1,Wind elemental; 40 base damage/healing,$060F5A
+7,Esuna,82,1,Water,45,3,1,Water elemental; 82 base damage/healing,$060F60
+8,Quake,47,2,Unknown,48,6,5,47 base damage/healing,$060F66
+9,Flare,87,5,Fire,54,4,2,Fire elemental; 87 base damage/healing,$060F6C
+10,White,55,5,Water,57,3,4,Water elemental; 55 base damage/healing,$060F72
+11,Meteor,96,20,Earth,67,4,4,Earth elemental; 96 base damage/healing,$060F78
+12,Exit,19,12,Earth,75,4,4,Earth elemental; 19 base damage/healing,$060F7E
+13,Seed,30,12,Earth,83,5,3,Earth elemental; 30 base damage/healing,$060F84
+14,Heal,40,11,Earth,92,5,3,Earth elemental; 40 base damage/healing,$060F8A
+15,Steel,48,11,Fire,100,4,2,Fire elemental; 48 base damage/healing,$060F90

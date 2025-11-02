@@ -366,11 +366,83 @@ pick some issues/todos and implement them.
 make sure to git commit after each effort and merge the branches back into master; use all the new tools and then continue with another issue.
 Update/check-off the checklists on open github issues; make sure issue #39 is done and then continue with another issue.
 Update/check-off the checklists on closed github issues if they're aren't checked off for completed tasks, and create a new issue or issues for any straggling tasks;  and then continue with another issue.
+Issue #52: Research spell data ROM address (4-6 hours, medium priority)
+spell data MP cost is always 1, but there are three types of spells, so there is a spell type (white, black, wizard), use that info in your investigations and continue
+spells have "strong against" and "weak against" flags, like weapons and armor have "strong against" so certain enemies are susceptible to certain spells and weapons (certain elements?), use that info in your investigations and continue with your current issue or pick anew related one and work that
+
+update session/chat logs, update and git-commit and then close issue #52 (checklists update); Use the code from the FFMQ Randomizer as reference to verify data structures and schemas at `https://github.com/wildham0/FFMQRando` ; create any gh issues that you need to for updating schemas and objects and documentation and such with this information and then implement them. also make sure to keep the documentation updated with all the external links you're using for reference! I'd like to see an `.md` document with all of the external sites and references in an organized manner with descriptions ; then continue doing other stuff
+1 and then 2 and then pick one of the new issues and work it
+yes you do have access, you have made all of my guthub issues, whats wrong? do I have to log in again? do that and then 1 and then 2 and then pick one of the new issues and work it
+NO! MAKE THE GITHUB ISSUES DIRECTLY! You have done it EVERY TIME so far, continue to do so
+Everything in this project is in `https://github.com/users/TheAnsarya/projects/3` so add that to configuration and documentation and active working session, so issues added go with this project and this is where you look for issues etc, and all the standard stuff
+make sure you doing git commit; then Continue with Issue #54
+do all of the early code disassembly issues so code and asset extraction works more accurately, and verify that the code and thus data addresses matches the `v1.1` reference rom, and make sure the extraction script addresses match those as well; and make sure the build process is using the extracted files to reconvert back into ROM schema formats and converted to dat files that are included in rom building or whatever. if there is not github issues, make them and implement them, for the `original rom` -> `bin data` -> `extracted files (graphics/json/etc)` -> `back into different bin files` -> `included in build process` -> `final build rom` pipeline
+you're stuck, break out and continue
+always format the files before `git commit` so tabs-not-spaces is always enforced; format recent files; continue your current progress, updating session/chat logs and issues and issue task checklists, and continuing work.
+
+&&&&&
+Continue ROM pipeline implementation (Phases 2-5)
+Fix remaining extraction scripts (graphics, text, etc.)
+Create binary data layer for round-trip conversion
+Integrate extracted data into build system
+Cross-reference all combat data for battle mechanics documentation
+&&&&&&
+
+so, work through one or more of the code disassembly issues, like #6 or #7 or #8, the stabilize the disassembly before resuming the pipeline
+
+&&&&&&&&&&&&&&&&&&&&&
+Option 1: Continue Bank Imports (Recommended for consistency)
+Import Bank 04 (similar size to Bank 06)
+Import Bank 05 (similar size to Bank 06)
+Complete the disassembly stabilization trio
+
+Option 2: Enhance Bank 06 (Deep dive)
+Label specific metatile purposes
+Document collision bitfield meanings
+Map metatile usage to game locations
+Create visual reference chart
+
+Option 3: Resume Data Pipeline (Return to original goal)
+Now have stable Bank 06 foundation
+Continue with Phase 2: Binary extraction layer
+Build format converters (bin↔json, chr↔png)
+Integrate with build system
+&&&&&&&&&&&&&&&&&&&&&&&&&&&&
+
+Option 1: Continue Bank Imports (Recommended for consistency)
+
+&&&&&&&&&&
+Which option would you like to pursue next?
+Enhance graphics documentation (deep dive)
+Continue other bank imports (breadth)
+Resume data extraction pipeline (original goal)
+&&&&&&&&&&&
+
+Resume data extraction pipeline (original goal)
+continue with option #1 so all the resources are there when we finally do options #2 and #3
+
+&&&&&&&&&
+Ready For Next Phase  --  Immediate options:
+Extract remaining 82 enemy sprites (5-8 hours)
+Move to Option #2: Build integration (import pipeline)
+Move to Option #3: Other data types (maps, text, music)
+&&&&&&&&&&&&
+
+Extract remaining 82 enemy sprites (5-8 hours)
+You're extracting graphics data for editing, but `C:\Users\me\source\repos\ffmq-info\data\extracted\sprites\enemies\enemy_18_skeleton.png` does not look anything like the skeleton enemy or any part of it, not in color or shape or appearance; graphics should extract into literal file copies for reference, but also interpreted copies that actually look like the real graphics as displayed for editing and eventual re-insertion into the build-rom.
+log session/chat, git commit, merge everything to `master` branch and remove old branches, and then continue doing pipeline stuff
 
 
 
 
 
+
+
+
+
+merge issue branches back into `master` when the issue is closed and everything is commited to the branch
+
+run formating for all recent files (tabs!) and then
 
 
 
@@ -444,4 +516,5 @@ Discord channels about SNES development include invites of: `https://discord.gg/
 
 
 
+create a github project for making an `FFMQ Editor UI` where the project and all issues and tasks and milestones are associated with the `ffmq-info` repository; make a massive amount of issues and child issues and sub-children issues and todo lists for the ffmq-editor-ui for an eventual game editor for `Final Fantasy Mystic Quest` using our complete disassembly and resource and graphics and data extraction and schemas, planning for a bunch of different data and graphics editors, and UI for _editing_ and viewing maps (overworld, dungeon, town), not affecting the original files, but a new set of files that can then be used for building a new rom; you need a big UI for easy graphics, palette, data, monster groups, spells, event commands (moving the characters around and text) dialog, etc; UI easily interacts with backend to initiate  extractions, data, and building a new rom. Expand this big style, and organize the github issues and projects and kanban boards for easy development.
 

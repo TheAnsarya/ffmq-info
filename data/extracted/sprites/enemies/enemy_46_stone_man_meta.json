@@ -1,0 +1,22 @@
+{
+  "name": "enemy_46_stone_man",
+  "enemy_id": 46,
+  "enemy_name": "Stone Man",
+  "category": "enemy",
+  "format": "4BPP",
+  "rom_offset": "0x04D49D",
+  "palette_offset": "0x0482E0",
+  "dimensions": {
+    "width_tiles": 4,
+    "height_tiles": 4,
+    "width_pixels": 32,
+    "height_pixels": 32
+  },
+  "num_tiles": 16,
+  "shares_graphics": true,
+  "shared_with": [
+    46,
+    47
+  ],
+  "notes": "Stone Man (ID 46) - Palette from Bank 09"
+}

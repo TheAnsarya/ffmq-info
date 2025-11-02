@@ -1,0 +1,22 @@
+{
+  "name": "enemy_70_gemini_crest_l",
+  "enemy_id": 70,
+  "enemy_name": "Twinhead Wyvern",
+  "category": "enemy",
+  "format": "4BPP",
+  "rom_offset": "0x051788",
+  "palette_offset": "0x048460",
+  "dimensions": {
+    "width_tiles": 8,
+    "height_tiles": 8,
+    "width_pixels": 64,
+    "height_pixels": 64
+  },
+  "num_tiles": 64,
+  "shares_graphics": true,
+  "shared_with": [
+    60,
+    70
+  ],
+  "notes": "Twinhead Wyvern (ID 70) - Palette from Bank 09"
+}

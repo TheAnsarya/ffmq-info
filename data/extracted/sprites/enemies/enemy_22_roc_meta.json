@@ -1,0 +1,23 @@
+{
+  "name": "enemy_22_roc",
+  "enemy_id": 22,
+  "enemy_name": "Sparna",
+  "category": "enemy",
+  "format": "4BPP",
+  "rom_offset": "0x04A19D",
+  "palette_offset": "0x048160",
+  "dimensions": {
+    "width_tiles": 6,
+    "height_tiles": 6,
+    "width_pixels": 48,
+    "height_pixels": 48
+  },
+  "num_tiles": 36,
+  "shares_graphics": true,
+  "shared_with": [
+    21,
+    22,
+    23
+  ],
+  "notes": "Sparna (ID 22) - Palette from Bank 09"
+}

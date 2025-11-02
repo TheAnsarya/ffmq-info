@@ -1,0 +1,22 @@
+{
+  "name": "enemy_66_thunder_eye",
+  "enemy_id": 66,
+  "enemy_name": "Squid Eye",
+  "category": "enemy",
+  "format": "4BPP",
+  "rom_offset": "0x04E9CD",
+  "palette_offset": "0x048420",
+  "dimensions": {
+    "width_tiles": 8,
+    "height_tiles": 8,
+    "width_pixels": 64,
+    "height_pixels": 64
+  },
+  "num_tiles": 64,
+  "shares_graphics": true,
+  "shared_with": [
+    56,
+    66
+  ],
+  "notes": "Squid Eye (ID 66) - Palette from Bank 09"
+}

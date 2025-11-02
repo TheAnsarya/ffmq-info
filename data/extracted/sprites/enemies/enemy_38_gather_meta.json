@@ -1,0 +1,22 @@
+{
+  "name": "enemy_38_gather",
+  "enemy_id": 38,
+  "enemy_name": "Gather",
+  "category": "enemy",
+  "format": "4BPP",
+  "rom_offset": "0x04C38D",
+  "palette_offset": "0x048260",
+  "dimensions": {
+    "width_tiles": 4,
+    "height_tiles": 4,
+    "width_pixels": 32,
+    "height_pixels": 32
+  },
+  "num_tiles": 16,
+  "shares_graphics": true,
+  "shared_with": [
+    38,
+    39
+  ],
+  "notes": "Gather (ID 38) - Palette from Bank 09"
+}

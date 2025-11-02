@@ -4,7 +4,12 @@
 		"fullName": "Final Fantasy Mystic Quest",
 		"version": "1.0.0",
 		"region": "U",
-		"romVersion": "V1.1"
+		"romVersion": "V1.1",
+		"github": {
+			"owner": "TheAnsarya",
+			"repo": "ffmq-info",
+			"projectUrl": "https://github.com/users/TheAnsarya/projects/3"
+		}
 	},
 
 	"paths": {

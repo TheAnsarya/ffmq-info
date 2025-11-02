@@ -1,0 +1,23 @@
+{
+  "name": "enemy_12_basilisk",
+  "enemy_id": 12,
+  "enemy_name": "Basilisk",
+  "category": "enemy",
+  "format": "4BPP",
+  "rom_offset": "0x049555",
+  "palette_offset": "0x0480C0",
+  "dimensions": {
+    "width_tiles": 6,
+    "height_tiles": 6,
+    "width_pixels": 48,
+    "height_pixels": 48
+  },
+  "num_tiles": 36,
+  "shares_graphics": true,
+  "shared_with": [
+    12,
+    13,
+    14
+  ],
+  "notes": "Basilisk (ID 12) - Palette from Bank 09"
+}

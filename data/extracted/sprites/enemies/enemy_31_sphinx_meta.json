@@ -1,0 +1,22 @@
+{
+  "name": "enemy_31_sphinx",
+  "enemy_id": 31,
+  "enemy_name": "Manticor",
+  "category": "enemy",
+  "format": "4BPP",
+  "rom_offset": "0x04B265",
+  "palette_offset": "0x0481F0",
+  "dimensions": {
+    "width_tiles": 8,
+    "height_tiles": 8,
+    "width_pixels": 64,
+    "height_pixels": 64
+  },
+  "num_tiles": 64,
+  "shares_graphics": true,
+  "shared_with": [
+    30,
+    31
+  ],
+  "notes": "Manticor (ID 31) - Palette from Bank 09"
+}

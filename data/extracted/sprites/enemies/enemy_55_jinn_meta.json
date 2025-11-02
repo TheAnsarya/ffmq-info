@@ -1,0 +1,22 @@
+{
+  "name": "enemy_55_jinn",
+  "enemy_id": 55,
+  "enemy_name": "Cockatrice",
+  "category": "enemy",
+  "format": "4BPP",
+  "rom_offset": "0x04E595",
+  "palette_offset": "0x048370",
+  "dimensions": {
+    "width_tiles": 8,
+    "height_tiles": 8,
+    "width_pixels": 64,
+    "height_pixels": 64
+  },
+  "num_tiles": 64,
+  "shares_graphics": true,
+  "shared_with": [
+    54,
+    55
+  ],
+  "notes": "Cockatrice (ID 55) - Palette from Bank 09"
+}

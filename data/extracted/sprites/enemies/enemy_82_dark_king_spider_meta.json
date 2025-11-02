@@ -1,0 +1,19 @@
+{
+  "name": "enemy_82_dark_king_spider",
+  "enemy_id": 82,
+  "enemy_name": "Dark King Spider",
+  "category": "enemy",
+  "format": "4BPP",
+  "rom_offset": "0x079C0C",
+  "palette_offset": "0x048520",
+  "dimensions": {
+    "width_tiles": 8,
+    "height_tiles": 8,
+    "width_pixels": 64,
+    "height_pixels": 64
+  },
+  "num_tiles": 64,
+  "shares_graphics": false,
+  "shared_with": null,
+  "notes": "Dark King Spider (ID 82) - Palette from Bank 09"
+}

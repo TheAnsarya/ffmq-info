@@ -1,0 +1,23 @@
+{
+  "name": "enemy_07_slime",
+  "enemy_id": 7,
+  "enemy_name": "Jelly",
+  "category": "enemy",
+  "format": "4BPP",
+  "rom_offset": "0x048E05",
+  "palette_offset": "0x048070",
+  "dimensions": {
+    "width_tiles": 3,
+    "height_tiles": 3,
+    "width_pixels": 24,
+    "height_pixels": 24
+  },
+  "num_tiles": 9,
+  "shares_graphics": true,
+  "shared_with": [
+    6,
+    7,
+    8
+  ],
+  "notes": "Jelly (ID 7) - Palette from Bank 09"
+}

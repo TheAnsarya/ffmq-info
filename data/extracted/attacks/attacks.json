@@ -1,0 +1,1703 @@
+{
+  "metadata": {
+    "source": "Final Fantasy Mystic Quest (U) V1.1",
+    "bank": "$02",
+    "rom_address": "$BC78",
+    "file_offset": "$013C78",
+    "entry_size": 7,
+    "entry_count": 169,
+    "description": "Battle action data (player, companion, and enemy attacks)"
+  },
+  "attacks": [
+    {
+      "id": 0,
+      "unknown1": 2,
+      "unknown2": 0,
+      "power": 5,
+      "attack_type": 194,
+      "attack_sound": 194,
+      "unknown3": 129,
+      "attack_target_animation": 88
+    },
+    {
+      "id": 1,
+      "unknown1": 2,
+      "unknown2": 0,
+      "power": 10,
+      "attack_type": 194,
+      "attack_sound": 194,
+      "unknown3": 129,
+      "attack_target_animation": 88
+    },
+    {
+      "id": 2,
+      "unknown1": 2,
+      "unknown2": 0,
+      "power": 10,
+      "attack_type": 194,
+      "attack_sound": 194,
+      "unknown3": 129,
+      "attack_target_animation": 88
+    },
+    {
+      "id": 3,
+      "unknown1": 2,
+      "unknown2": 0,
+      "power": 48,
+      "attack_type": 194,
+      "attack_sound": 195,
+      "unknown3": 129,
+      "attack_target_animation": 88
+    },
+    {
+      "id": 4,
+      "unknown1": 2,
+      "unknown2": 0,
+      "power": 5,
+      "attack_type": 195,
+      "attack_sound": 202,
+      "unknown3": 129,
+      "attack_target_animation": 88
+    },
+    {
+      "id": 5,
+      "unknown1": 1,
+      "unknown2": 0,
+      "power": 22,
+      "attack_type": 197,
+      "attack_sound": 218,
+      "unknown3": 129,
+      "attack_target_animation": 80
+    },
+    {
+      "id": 6,
+      "unknown1": 1,
+      "unknown2": 0,
+      "power": 6,
+      "attack_type": 197,
+      "attack_sound": 199,
+      "unknown3": 129,
+      "attack_target_animation": 4
+    },
+    {
+      "id": 7,
+      "unknown1": 1,
+      "unknown2": 0,
+      "power": 15,
+      "attack_type": 198,
+      "attack_sound": 201,
+      "unknown3": 129,
+      "attack_target_animation": 88
+    },
+    {
+      "id": 8,
+      "unknown1": 1,
+      "unknown2": 0,
+      "power": 15,
+      "attack_type": 198,
+      "attack_sound": 201,
+      "unknown3": 129,
+      "attack_target_animation": 88
+    },
+    {
+      "id": 9,
+      "unknown1": 0,
+      "unknown2": 0,
+      "power": 25,
+      "attack_type": 206,
+      "attack_sound": 212,
+      "unknown3": 132,
+      "attack_target_animation": 140
+    },
+    {
+      "id": 10,
+      "unknown1": 0,
+      "unknown2": 64,
+      "power": 0,
+      "attack_type": 205,
+      "attack_sound": 213,
+      "unknown3": 132,
+      "attack_target_animation": 144
+    },
+    {
+      "id": 11,
+      "unknown1": 128,
+      "unknown2": 0,
+      "power": 20,
+      "attack_type": 201,
+      "attack_sound": 203,
+      "unknown3": 130,
+      "attack_target_animation": 152
+    },
+    {
+      "id": 12,
+      "unknown1": 64,
+      "unknown2": 0,
+      "power": 10,
+      "attack_type": 200,
+      "attack_sound": 205,
+      "unknown3": 129,
+      "attack_target_animation": 76
+    },
+    {
+      "id": 13,
+      "unknown1": 32,
+      "unknown2": 0,
+      "power": 15,
+      "attack_type": 200,
+      "attack_sound": 206,
+      "unknown3": 129,
+      "attack_target_animation": 68
+    },
+    {
+      "id": 14,
+      "unknown1": 80,
+      "unknown2": 0,
+      "power": 20,
+      "attack_type": 200,
+      "attack_sound": 204,
+      "unknown3": 129,
+      "attack_target_animation": 80
+    },
+    {
+      "id": 15,
+      "unknown1": 0,
+      "unknown2": 0,
+      "power": 0,
+      "attack_type": 28,
+      "attack_sound": 30,
+      "unknown3": 129,
+      "attack_target_animation": 108
+    },
+    {
+      "id": 16,
+      "unknown1": 0,
+      "unknown2": 0,
+      "power": 209,
+      "attack_type": 202,
+      "attack_sound": 218,
+      "unknown3": 129,
+      "attack_target_animation": 80
+    },
+    {
+      "id": 17,
+      "unknown1": 0,
+      "unknown2": 0,
+      "power": 17,
+      "attack_type": 202,
+      "attack_sound": 223,
+      "unknown3": 129,
+      "attack_target_animation": 88
+    },
+    {
+      "id": 18,
+      "unknown1": 0,
+      "unknown2": 0,
+      "power": 18,
+      "attack_type": 202,
+      "attack_sound": 204,
+      "unknown3": 129,
+      "attack_target_animation": 80
+    },
+    {
+      "id": 19,
+      "unknown1": 0,
+      "unknown2": 0,
+      "power": 82,
+      "attack_type": 202,
+      "attack_sound": 197,
+      "unknown3": 129,
+      "attack_target_animation": 88
+    },
+    {
+      "id": 20,
+      "unknown1": 1,
+      "unknown2": 0,
+      "power": 81,
+      "attack_type": 202,
+      "attack_sound": 225,
+      "unknown3": 129,
+      "attack_target_animation": 88
+    },
+    {
+      "id": 21,
+      "unknown1": 1,
+      "unknown2": 0,
+      "power": 146,
+      "attack_type": 202,
+      "attack_sound": 203,
+      "unknown3": 129,
+      "attack_target_animation": 120
+    },
+    {
+      "id": 22,
+      "unknown1": 1,
+      "unknown2": 128,
+      "power": 0,
+      "attack_type": 211,
+      "attack_sound": 93,
+      "unknown3": 129,
+      "attack_target_animation": 116
+    },
+    {
+      "id": 23,
+      "unknown1": 1,
+      "unknown2": 128,
+      "power": 0,
+      "attack_type": 211,
+      "attack_sound": 91,
+      "unknown3": 129,
+      "attack_target_animation": 116
+    },
+    {
+      "id": 24,
+      "unknown1": 0,
+      "unknown2": 0,
+      "power": 0,
+      "attack_type": 14,
+      "attack_sound": 63,
+      "unknown3": 132,
+      "attack_target_animation": 0
+    },
+    {
+      "id": 25,
+      "unknown1": 32,
+      "unknown2": 0,
+      "power": 92,
+      "attack_type": 221,
+      "attack_sound": 219,
+      "unknown3": 130,
+      "attack_target_animation": 68
+    },
+    {
+      "id": 26,
+      "unknown1": 2,
+      "unknown2": 0,
+      "power": 4,
+      "attack_type": 207,
+      "attack_sound": 214,
+      "unknown3": 129,
+      "attack_target_animation": 88
+    },
+    {
+      "id": 27,
+      "unknown1": 2,
+      "unknown2": 0,
+      "power": 5,
+      "attack_type": 207,
+      "attack_sound": 214,
+      "unknown3": 129,
+      "attack_target_animation": 88
+    },
+    {
+      "id": 28,
+      "unknown1": 2,
+      "unknown2": 0,
+      "power": 15,
+      "attack_type": 207,
+      "attack_sound": 214,
+      "unknown3": 129,
+      "attack_target_animation": 88
+    },
+    {
+      "id": 29,
+      "unknown1": 2,
+      "unknown2": 0,
+      "power": 5,
+      "attack_type": 207,
+      "attack_sound": 214,
+      "unknown3": 129,
+      "attack_target_animation": 88
+    },
+    {
+      "id": 30,
+      "unknown1": 2,
+      "unknown2": 0,
+      "power": 15,
+      "attack_type": 207,
+      "attack_sound": 214,
+      "unknown3": 129,
+      "attack_target_animation": 88
+    },
+    {
+      "id": 31,
+      "unknown1": 2,
+      "unknown2": 0,
+      "power": 10,
+      "attack_type": 207,
+      "attack_sound": 214,
+      "unknown3": 129,
+      "attack_target_animation": 88
+    },
+    {
+      "id": 32,
+      "unknown1": 2,
+      "unknown2": 0,
+      "power": 15,
+      "attack_type": 207,
+      "attack_sound": 214,
+      "unknown3": 129,
+      "attack_target_animation": 88
+    },
+    {
+      "id": 33,
+      "unknown1": 2,
+      "unknown2": 0,
+      "power": 10,
+      "attack_type": 207,
+      "attack_sound": 216,
+      "unknown3": 129,
+      "attack_target_animation": 88
+    },
+    {
+      "id": 34,
+      "unknown1": 2,
+      "unknown2": 0,
+      "power": 20,
+      "attack_type": 207,
+      "attack_sound": 216,
+      "unknown3": 129,
+      "attack_target_animation": 88
+    },
+    {
+      "id": 35,
+      "unknown1": 2,
+      "unknown2": 0,
+      "power": 20,
+      "attack_type": 207,
+      "attack_sound": 202,
+      "unknown3": 129,
+      "attack_target_animation": 88
+    },
+    {
+      "id": 36,
+      "unknown1": 2,
+      "unknown2": 0,
+      "power": 11,
+      "attack_type": 207,
+      "attack_sound": 214,
+      "unknown3": 129,
+      "attack_target_animation": 88
+    },
+    {
+      "id": 37,
+      "unknown1": 2,
+      "unknown2": 0,
+      "power": 50,
+      "attack_type": 207,
+      "attack_sound": 216,
+      "unknown3": 129,
+      "attack_target_animation": 88
+    },
+    {
+      "id": 38,
+      "unknown1": 2,
+      "unknown2": 0,
+      "power": 50,
+      "attack_type": 207,
+      "attack_sound": 214,
+      "unknown3": 129,
+      "attack_target_animation": 88
+    },
+    {
+      "id": 39,
+      "unknown1": 2,
+      "unknown2": 0,
+      "power": 5,
+      "attack_type": 207,
+      "attack_sound": 202,
+      "unknown3": 129,
+      "attack_target_animation": 88
+    },
+    {
+      "id": 40,
+      "unknown1": 2,
+      "unknown2": 0,
+      "power": 2,
+      "attack_type": 209,
+      "attack_sound": 216,
+      "unknown3": 129,
+      "attack_target_animation": 88
+    },
+    {
+      "id": 41,
+      "unknown1": 2,
+      "unknown2": 0,
+      "power": 10,
+      "attack_type": 209,
+      "attack_sound": 202,
+      "unknown3": 129,
+      "attack_target_animation": 88
+    },
+    {
+      "id": 42,
+      "unknown1": 2,
+      "unknown2": 0,
+      "power": 80,
+      "attack_type": 221,
+      "attack_sound": 202,
+      "unknown3": 129,
+      "attack_target_animation": 88
+    },
+    {
+      "id": 43,
+      "unknown1": 2,
+      "unknown2": 0,
+      "power": 70,
+      "attack_type": 221,
+      "attack_sound": 217,
+      "unknown3": 130,
+      "attack_target_animation": 88
+    },
+    {
+      "id": 44,
+      "unknown1": 2,
+      "unknown2": 0,
+      "power": 10,
+      "attack_type": 209,
+      "attack_sound": 216,
+      "unknown3": 129,
+      "attack_target_animation": 88
+    },
+    {
+      "id": 45,
+      "unknown1": 2,
+      "unknown2": 0,
+      "power": 10,
+      "attack_type": 209,
+      "attack_sound": 217,
+      "unknown3": 129,
+      "attack_target_animation": 88
+    },
+    {
+      "id": 46,
+      "unknown1": 2,
+      "unknown2": 0,
+      "power": 10,
+      "attack_type": 209,
+      "attack_sound": 216,
+      "unknown3": 129,
+      "attack_target_animation": 88
+    },
+    {
+      "id": 47,
+      "unknown1": 2,
+      "unknown2": 0,
+      "power": 5,
+      "attack_type": 209,
+      "attack_sound": 223,
+      "unknown3": 129,
+      "attack_target_animation": 88
+    },
+    {
+      "id": 48,
+      "unknown1": 2,
+      "unknown2": 0,
+      "power": 5,
+      "attack_type": 209,
+      "attack_sound": 195,
+      "unknown3": 129,
+      "attack_target_animation": 88
+    },
+    {
+      "id": 49,
+      "unknown1": 2,
+      "unknown2": 0,
+      "power": 10,
+      "attack_type": 209,
+      "attack_sound": 195,
+      "unknown3": 129,
+      "attack_target_animation": 88
+    },
+    {
+      "id": 50,
+      "unknown1": 2,
+      "unknown2": 0,
+      "power": 5,
+      "attack_type": 209,
+      "attack_sound": 195,
+      "unknown3": 129,
+      "attack_target_animation": 88
+    },
+    {
+      "id": 51,
+      "unknown1": 2,
+      "unknown2": 0,
+      "power": 15,
+      "attack_type": 209,
+      "attack_sound": 201,
+      "unknown3": 129,
+      "attack_target_animation": 88
+    },
+    {
+      "id": 52,
+      "unknown1": 2,
+      "unknown2": 0,
+      "power": 5,
+      "attack_type": 209,
+      "attack_sound": 214,
+      "unknown3": 129,
+      "attack_target_animation": 88
+    },
+    {
+      "id": 53,
+      "unknown1": 2,
+      "unknown2": 0,
+      "power": 5,
+      "attack_type": 209,
+      "attack_sound": 214,
+      "unknown3": 129,
+      "attack_target_animation": 88
+    },
+    {
+      "id": 54,
+      "unknown1": 2,
+      "unknown2": 0,
+      "power": 10,
+      "attack_type": 209,
+      "attack_sound": 194,
+      "unknown3": 129,
+      "attack_target_animation": 88
+    },
+    {
+      "id": 55,
+      "unknown1": 2,
+      "unknown2": 0,
+      "power": 5,
+      "attack_type": 209,
+      "attack_sound": 223,
+      "unknown3": 129,
+      "attack_target_animation": 88
+    },
+    {
+      "id": 56,
+      "unknown1": 2,
+      "unknown2": 0,
+      "power": 5,
+      "attack_type": 209,
+      "attack_sound": 195,
+      "unknown3": 129,
+      "attack_target_animation": 88
+    },
+    {
+      "id": 57,
+      "unknown1": 2,
+      "unknown2": 0,
+      "power": 10,
+      "attack_type": 209,
+      "attack_sound": 202,
+      "unknown3": 129,
+      "attack_target_animation": 88
+    },
+    {
+      "id": 58,
+      "unknown1": 2,
+      "unknown2": 0,
+      "power": 10,
+      "attack_type": 209,
+      "attack_sound": 194,
+      "unknown3": 129,
+      "attack_target_animation": 88
+    },
+    {
+      "id": 59,
+      "unknown1": 2,
+      "unknown2": 0,
+      "power": 5,
+      "attack_type": 209,
+      "attack_sound": 195,
+      "unknown3": 129,
+      "attack_target_animation": 88
+    },
+    {
+      "id": 60,
+      "unknown1": 2,
+      "unknown2": 0,
+      "power": 1,
+      "attack_type": 209,
+      "attack_sound": 195,
+      "unknown3": 129,
+      "attack_target_animation": 88
+    },
+    {
+      "id": 61,
+      "unknown1": 2,
+      "unknown2": 0,
+      "power": 25,
+      "attack_type": 209,
+      "attack_sound": 194,
+      "unknown3": 129,
+      "attack_target_animation": 88
+    },
+    {
+      "id": 62,
+      "unknown1": 2,
+      "unknown2": 0,
+      "power": 250,
+      "attack_type": 209,
+      "attack_sound": 202,
+      "unknown3": 130,
+      "attack_target_animation": 88
+    },
+    {
+      "id": 63,
+      "unknown1": 2,
+      "unknown2": 0,
+      "power": 1,
+      "attack_type": 209,
+      "attack_sound": 202,
+      "unknown3": 129,
+      "attack_target_animation": 88
+    },
+    {
+      "id": 64,
+      "unknown1": 129,
+      "unknown2": 0,
+      "power": 150,
+      "attack_type": 210,
+      "attack_sound": 203,
+      "unknown3": 130,
+      "attack_target_animation": 152
+    },
+    {
+      "id": 65,
+      "unknown1": 33,
+      "unknown2": 0,
+      "power": 80,
+      "attack_type": 210,
+      "attack_sound": 206,
+      "unknown3": 129,
+      "attack_target_animation": 68
+    },
+    {
+      "id": 66,
+      "unknown1": 33,
+      "unknown2": 0,
+      "power": 200,
+      "attack_type": 210,
+      "attack_sound": 206,
+      "unknown3": 130,
+      "attack_target_animation": 68
+    },
+    {
+      "id": 67,
+      "unknown1": 33,
+      "unknown2": 0,
+      "power": 140,
+      "attack_type": 210,
+      "attack_sound": 206,
+      "unknown3": 129,
+      "attack_target_animation": 68
+    },
+    {
+      "id": 68,
+      "unknown1": 33,
+      "unknown2": 0,
+      "power": 250,
+      "attack_type": 210,
+      "attack_sound": 206,
+      "unknown3": 130,
+      "attack_target_animation": 68
+    },
+    {
+      "id": 69,
+      "unknown1": 49,
+      "unknown2": 49,
+      "power": 220,
+      "attack_type": 210,
+      "attack_sound": 206,
+      "unknown3": 130,
+      "attack_target_animation": 68
+    },
+    {
+      "id": 70,
+      "unknown1": 65,
+      "unknown2": 0,
+      "power": 60,
+      "attack_type": 210,
+      "attack_sound": 205,
+      "unknown3": 129,
+      "attack_target_animation": 76
+    },
+    {
+      "id": 71,
+      "unknown1": 65,
+      "unknown2": 0,
+      "power": 65,
+      "attack_type": 210,
+      "attack_sound": 205,
+      "unknown3": 129,
+      "attack_target_animation": 76
+    },
+    {
+      "id": 72,
+      "unknown1": 65,
+      "unknown2": 0,
+      "power": 80,
+      "attack_type": 210,
+      "attack_sound": 205,
+      "unknown3": 129,
+      "attack_target_animation": 76
+    },
+    {
+      "id": 73,
+      "unknown1": 65,
+      "unknown2": 0,
+      "power": 120,
+      "attack_type": 210,
+      "attack_sound": 217,
+      "unknown3": 129,
+      "attack_target_animation": 12
+    },
+    {
+      "id": 74,
+      "unknown1": 65,
+      "unknown2": 0,
+      "power": 250,
+      "attack_type": 207,
+      "attack_sound": 205,
+      "unknown3": 130,
+      "attack_target_animation": 76
+    },
+    {
+      "id": 75,
+      "unknown1": 65,
+      "unknown2": 0,
+      "power": 200,
+      "attack_type": 210,
+      "attack_sound": 207,
+      "unknown3": 130,
+      "attack_target_animation": 124
+    },
+    {
+      "id": 76,
+      "unknown1": 65,
+      "unknown2": 0,
+      "power": 70,
+      "attack_type": 210,
+      "attack_sound": 219,
+      "unknown3": 129,
+      "attack_target_animation": 76
+    },
+    {
+      "id": 77,
+      "unknown1": 17,
+      "unknown2": 0,
+      "power": 80,
+      "attack_type": 210,
+      "attack_sound": 207,
+      "unknown3": 129,
+      "attack_target_animation": 72
+    },
+    {
+      "id": 78,
+      "unknown1": 17,
+      "unknown2": 0,
+      "power": 250,
+      "attack_type": 210,
+      "attack_sound": 207,
+      "unknown3": 130,
+      "attack_target_animation": 72
+    },
+    {
+      "id": 79,
+      "unknown1": 17,
+      "unknown2": 0,
+      "power": 10,
+      "attack_type": 210,
+      "attack_sound": 207,
+      "unknown3": 129,
+      "attack_target_animation": 72
+    },
+    {
+      "id": 80,
+      "unknown1": 81,
+      "unknown2": 0,
+      "power": 100,
+      "attack_type": 210,
+      "attack_sound": 204,
+      "unknown3": 129,
+      "attack_target_animation": 80
+    },
+    {
+      "id": 81,
+      "unknown1": 81,
+      "unknown2": 0,
+      "power": 80,
+      "attack_type": 210,
+      "attack_sound": 218,
+      "unknown3": 129,
+      "attack_target_animation": 80
+    },
+    {
+      "id": 82,
+      "unknown1": 0,
+      "unknown2": 128,
+      "power": 50,
+      "attack_type": 211,
+      "attack_sound": 219,
+      "unknown3": 129,
+      "attack_target_animation": 84
+    },
+    {
+      "id": 83,
+      "unknown1": 0,
+      "unknown2": 128,
+      "power": 200,
+      "attack_type": 211,
+      "attack_sound": 92,
+      "unknown3": 129,
+      "attack_target_animation": 120
+    },
+    {
+      "id": 84,
+      "unknown1": 1,
+      "unknown2": 8,
+      "power": 50,
+      "attack_type": 212,
+      "attack_sound": 225,
+      "unknown3": 129,
+      "attack_target_animation": 88
+    },
+    {
+      "id": 85,
+      "unknown1": 1,
+      "unknown2": 8,
+      "power": 70,
+      "attack_type": 212,
+      "attack_sound": 225,
+      "unknown3": 129,
+      "attack_target_animation": 88
+    },
+    {
+      "id": 86,
+      "unknown1": 1,
+      "unknown2": 8,
+      "power": 250,
+      "attack_type": 212,
+      "attack_sound": 225,
+      "unknown3": 129,
+      "attack_target_animation": 88
+    },
+    {
+      "id": 87,
+      "unknown1": 0,
+      "unknown2": 32,
+      "power": 70,
+      "attack_type": 212,
+      "attack_sound": 201,
+      "unknown3": 129,
+      "attack_target_animation": 88
+    },
+    {
+      "id": 88,
+      "unknown1": 0,
+      "unknown2": 32,
+      "power": 70,
+      "attack_type": 212,
+      "attack_sound": 195,
+      "unknown3": 129,
+      "attack_target_animation": 88
+    },
+    {
+      "id": 89,
+      "unknown1": 0,
+      "unknown2": 32,
+      "power": 230,
+      "attack_type": 212,
+      "attack_sound": 194,
+      "unknown3": 129,
+      "attack_target_animation": 88
+    },
+    {
+      "id": 90,
+      "unknown1": 1,
+      "unknown2": 32,
+      "power": 180,
+      "attack_type": 212,
+      "attack_sound": 219,
+      "unknown3": 129,
+      "attack_target_animation": 96
+    },
+    {
+      "id": 91,
+      "unknown1": 0,
+      "unknown2": 4,
+      "power": 70,
+      "attack_type": 212,
+      "attack_sound": 201,
+      "unknown3": 129,
+      "attack_target_animation": 88
+    },
+    {
+      "id": 92,
+      "unknown1": 0,
+      "unknown2": 4,
+      "power": 70,
+      "attack_type": 212,
+      "attack_sound": 201,
+      "unknown3": 129,
+      "attack_target_animation": 88
+    },
+    {
+      "id": 93,
+      "unknown1": 0,
+      "unknown2": 4,
+      "power": 70,
+      "attack_type": 212,
+      "attack_sound": 223,
+      "unknown3": 129,
+      "attack_target_animation": 88
+    },
+    {
+      "id": 94,
+      "unknown1": 0,
+      "unknown2": 4,
+      "power": 80,
+      "attack_type": 212,
+      "attack_sound": 223,
+      "unknown3": 129,
+      "attack_target_animation": 88
+    },
+    {
+      "id": 95,
+      "unknown1": 1,
+      "unknown2": 4,
+      "power": 250,
+      "attack_type": 212,
+      "attack_sound": 219,
+      "unknown3": 130,
+      "attack_target_animation": 92
+    },
+    {
+      "id": 96,
+      "unknown1": 0,
+      "unknown2": 2,
+      "power": 75,
+      "attack_type": 212,
+      "attack_sound": 219,
+      "unknown3": 129,
+      "attack_target_animation": 100
+    },
+    {
+      "id": 97,
+      "unknown1": 1,
+      "unknown2": 2,
+      "power": 75,
+      "attack_type": 212,
+      "attack_sound": 219,
+      "unknown3": 129,
+      "attack_target_animation": 88
+    },
+    {
+      "id": 98,
+      "unknown1": 0,
+      "unknown2": 64,
+      "power": 45,
+      "attack_type": 212,
+      "attack_sound": 221,
+      "unknown3": 129,
+      "attack_target_animation": 88
+    },
+    {
+      "id": 99,
+      "unknown1": 1,
+      "unknown2": 8,
+      "power": 0,
+      "attack_type": 213,
+      "attack_sound": 221,
+      "unknown3": 129,
+      "attack_target_animation": 116
+    },
+    {
+      "id": 100,
+      "unknown1": 1,
+      "unknown2": 8,
+      "power": 0,
+      "attack_type": 213,
+      "attack_sound": 221,
+      "unknown3": 129,
+      "attack_target_animation": 116
+    },
+    {
+      "id": 101,
+      "unknown1": 1,
+      "unknown2": 8,
+      "power": 0,
+      "attack_type": 213,
+      "attack_sound": 221,
+      "unknown3": 129,
+      "attack_target_animation": 116
+    },
+    {
+      "id": 102,
+      "unknown1": 1,
+      "unknown2": 8,
+      "power": 0,
+      "attack_type": 213,
+      "attack_sound": 221,
+      "unknown3": 129,
+      "attack_target_animation": 116
+    },
+    {
+      "id": 103,
+      "unknown1": 1,
+      "unknown2": 32,
+      "power": 0,
+      "attack_type": 213,
+      "attack_sound": 219,
+      "unknown3": 129,
+      "attack_target_animation": 96
+    },
+    {
+      "id": 104,
+      "unknown1": 1,
+      "unknown2": 32,
+      "power": 0,
+      "attack_type": 213,
+      "attack_sound": 219,
+      "unknown3": 129,
+      "attack_target_animation": 96
+    },
+    {
+      "id": 105,
+      "unknown1": 1,
+      "unknown2": 32,
+      "power": 0,
+      "attack_type": 213,
+      "attack_sound": 221,
+      "unknown3": 129,
+      "attack_target_animation": 116
+    },
+    {
+      "id": 106,
+      "unknown1": 1,
+      "unknown2": 4,
+      "power": 0,
+      "attack_type": 213,
+      "attack_sound": 223,
+      "unknown3": 129,
+      "attack_target_animation": 88
+    },
+    {
+      "id": 107,
+      "unknown1": 1,
+      "unknown2": 4,
+      "power": 0,
+      "attack_type": 213,
+      "attack_sound": 219,
+      "unknown3": 129,
+      "attack_target_animation": 88
+    },
+    {
+      "id": 108,
+      "unknown1": 1,
+      "unknown2": 16,
+      "power": 0,
+      "attack_type": 213,
+      "attack_sound": 220,
+      "unknown3": 129,
+      "attack_target_animation": 64
+    },
+    {
+      "id": 109,
+      "unknown1": 1,
+      "unknown2": 16,
+      "power": 0,
+      "attack_type": 213,
+      "attack_sound": 220,
+      "unknown3": 129,
+      "attack_target_animation": 64
+    },
+    {
+      "id": 110,
+      "unknown1": 1,
+      "unknown2": 16,
+      "power": 0,
+      "attack_type": 213,
+      "attack_sound": 220,
+      "unknown3": 129,
+      "attack_target_animation": 64
+    },
+    {
+      "id": 111,
+      "unknown1": 1,
+      "unknown2": 16,
+      "power": 0,
+      "attack_type": 213,
+      "attack_sound": 219,
+      "unknown3": 129,
+      "attack_target_animation": 88
+    },
+    {
+      "id": 112,
+      "unknown1": 1,
+      "unknown2": 2,
+      "power": 0,
+      "attack_type": 213,
+      "attack_sound": 218,
+      "unknown3": 129,
+      "attack_target_animation": 88
+    },
+    {
+      "id": 113,
+      "unknown1": 1,
+      "unknown2": 2,
+      "power": 0,
+      "attack_type": 213,
+      "attack_sound": 219,
+      "unknown3": 129,
+      "attack_target_animation": 100
+    },
+    {
+      "id": 114,
+      "unknown1": 1,
+      "unknown2": 1,
+      "power": 0,
+      "attack_type": 213,
+      "attack_sound": 220,
+      "unknown3": 129,
+      "attack_target_animation": 112
+    },
+    {
+      "id": 115,
+      "unknown1": 1,
+      "unknown2": 1,
+      "power": 0,
+      "attack_type": 213,
+      "attack_sound": 220,
+      "unknown3": 129,
+      "attack_target_animation": 112
+    },
+    {
+      "id": 116,
+      "unknown1": 1,
+      "unknown2": 64,
+      "power": 0,
+      "attack_type": 213,
+      "attack_sound": 219,
+      "unknown3": 129,
+      "attack_target_animation": 84
+    },
+    {
+      "id": 117,
+      "unknown1": 1,
+      "unknown2": 64,
+      "power": 0,
+      "attack_type": 213,
+      "attack_sound": 221,
+      "unknown3": 129,
+      "attack_target_animation": 116
+    },
+    {
+      "id": 118,
+      "unknown1": 2,
+      "unknown2": 0,
+      "power": 10,
+      "attack_type": 214,
+      "attack_sound": 193,
+      "unknown3": 129,
+      "attack_target_animation": 89
+    },
+    {
+      "id": 119,
+      "unknown1": 2,
+      "unknown2": 0,
+      "power": 10,
+      "attack_type": 214,
+      "attack_sound": 193,
+      "unknown3": 129,
+      "attack_target_animation": 89
+    },
+    {
+      "id": 120,
+      "unknown1": 2,
+      "unknown2": 0,
+      "power": 70,
+      "attack_type": 215,
+      "attack_sound": 193,
+      "unknown3": 129,
+      "attack_target_animation": 90
+    },
+    {
+      "id": 121,
+      "unknown1": 2,
+      "unknown2": 0,
+      "power": 60,
+      "attack_type": 215,
+      "attack_sound": 215,
+      "unknown3": 129,
+      "attack_target_animation": 89
+    },
+    {
+      "id": 122,
+      "unknown1": 2,
+      "unknown2": 0,
+      "power": 50,
+      "attack_type": 215,
+      "attack_sound": 193,
+      "unknown3": 129,
+      "attack_target_animation": 89
+    },
+    {
+      "id": 123,
+      "unknown1": 2,
+      "unknown2": 0,
+      "power": 200,
+      "attack_type": 215,
+      "attack_sound": 215,
+      "unknown3": 129,
+      "attack_target_animation": 90
+    },
+    {
+      "id": 124,
+      "unknown1": 2,
+      "unknown2": 0,
+      "power": 50,
+      "attack_type": 215,
+      "attack_sound": 215,
+      "unknown3": 129,
+      "attack_target_animation": 91
+    },
+    {
+      "id": 125,
+      "unknown1": 2,
+      "unknown2": 0,
+      "power": 5,
+      "attack_type": 215,
+      "attack_sound": 215,
+      "unknown3": 129,
+      "attack_target_animation": 91
+    },
+    {
+      "id": 126,
+      "unknown1": 8,
+      "unknown2": 0,
+      "power": 100,
+      "attack_type": 216,
+      "attack_sound": 223,
+      "unknown3": 129,
+      "attack_target_animation": 88
+    },
+    {
+      "id": 127,
+      "unknown1": 8,
+      "unknown2": 0,
+      "power": 100,
+      "attack_type": 216,
+      "attack_sound": 223,
+      "unknown3": 129,
+      "attack_target_animation": 88
+    },
+    {
+      "id": 128,
+      "unknown1": 8,
+      "unknown2": 0,
+      "power": 60,
+      "attack_type": 216,
+      "attack_sound": 223,
+      "unknown3": 130,
+      "attack_target_animation": 88
+    },
+    {
+      "id": 129,
+      "unknown1": 0,
+      "unknown2": 0,
+      "power": 50,
+      "attack_type": 217,
+      "attack_sound": 200,
+      "unknown3": 129,
+      "attack_target_animation": 88
+    },
+    {
+      "id": 130,
+      "unknown1": 0,
+      "unknown2": 0,
+      "power": 0,
+      "attack_type": 218,
+      "attack_sound": 225,
+      "unknown3": 129,
+      "attack_target_animation": 136
+    },
+    {
+      "id": 131,
+      "unknown1": 0,
+      "unknown2": 32,
+      "power": 0,
+      "attack_type": 213,
+      "attack_sound": 219,
+      "unknown3": 129,
+      "attack_target_animation": 96
+    },
+    {
+      "id": 132,
+      "unknown1": 128,
+      "unknown2": 0,
+      "power": 45,
+      "attack_type": 210,
+      "attack_sound": 203,
+      "unknown3": 130,
+      "attack_target_animation": 152
+    },
+    {
+      "id": 133,
+      "unknown1": 128,
+      "unknown2": 0,
+      "power": 1,
+      "attack_type": 212,
+      "attack_sound": 217,
+      "unknown3": 129,
+      "attack_target_animation": 16
+    },
+    {
+      "id": 134,
+      "unknown1": 16,
+      "unknown2": 0,
+      "power": 5,
+      "attack_type": 210,
+      "attack_sound": 207,
+      "unknown3": 129,
+      "attack_target_animation": 72
+    },
+    {
+      "id": 135,
+      "unknown1": 0,
+      "unknown2": 0,
+      "power": 55,
+      "attack_type": 215,
+      "attack_sound": 193,
+      "unknown3": 129,
+      "attack_target_animation": 89
+    },
+    {
+      "id": 136,
+      "unknown1": 0,
+      "unknown2": 0,
+      "power": 0,
+      "attack_type": 221,
+      "attack_sound": 222,
+      "unknown3": 144,
+      "attack_target_animation": 0
+    },
+    {
+      "id": 137,
+      "unknown1": 0,
+      "unknown2": 0,
+      "power": 200,
+      "attack_type": 221,
+      "attack_sound": 224,
+      "unknown3": 129,
+      "attack_target_animation": 88
+    },
+    {
+      "id": 138,
+      "unknown1": 2,
+      "unknown2": 0,
+      "power": 80,
+      "attack_type": 221,
+      "attack_sound": 223,
+      "unknown3": 129,
+      "attack_target_animation": 88
+    },
+    {
+      "id": 139,
+      "unknown1": 2,
+      "unknown2": 0,
+      "power": 115,
+      "attack_type": 221,
+      "attack_sound": 204,
+      "unknown3": 129,
+      "attack_target_animation": 48
+    },
+    {
+      "id": 140,
+      "unknown1": 2,
+      "unknown2": 0,
+      "power": 88,
+      "attack_type": 221,
+      "attack_sound": 205,
+      "unknown3": 129,
+      "attack_target_animation": 88
+    },
+    {
+      "id": 141,
+      "unknown1": 2,
+      "unknown2": 0,
+      "power": 100,
+      "attack_type": 221,
+      "attack_sound": 206,
+      "unknown3": 129,
+      "attack_target_animation": 88
+    },
+    {
+      "id": 142,
+      "unknown1": 2,
+      "unknown2": 0,
+      "power": 75,
+      "attack_type": 221,
+      "attack_sound": 222,
+      "unknown3": 129,
+      "attack_target_animation": 88
+    },
+    {
+      "id": 143,
+      "unknown1": 2,
+      "unknown2": 0,
+      "power": 70,
+      "attack_type": 221,
+      "attack_sound": 203,
+      "unknown3": 130,
+      "attack_target_animation": 52
+    },
+    {
+      "id": 144,
+      "unknown1": 1,
+      "unknown2": 0,
+      "power": 70,
+      "attack_type": 221,
+      "attack_sound": 212,
+      "unknown3": 129,
+      "attack_target_animation": 56
+    },
+    {
+      "id": 145,
+      "unknown1": 0,
+      "unknown2": 0,
+      "power": 120,
+      "attack_type": 221,
+      "attack_sound": 218,
+      "unknown3": 129,
+      "attack_target_animation": 80
+    },
+    {
+      "id": 146,
+      "unknown1": 0,
+      "unknown2": 0,
+      "power": 108,
+      "attack_type": 221,
+      "attack_sound": 215,
+      "unknown3": 129,
+      "attack_target_animation": 44
+    },
+    {
+      "id": 147,
+      "unknown1": 0,
+      "unknown2": 12,
+      "power": 80,
+      "attack_type": 221,
+      "attack_sound": 194,
+      "unknown3": 129,
+      "attack_target_animation": 24
+    },
+    {
+      "id": 148,
+      "unknown1": 0,
+      "unknown2": 64,
+      "power": 70,
+      "attack_type": 221,
+      "attack_sound": 202,
+      "unknown3": 129,
+      "attack_target_animation": 20
+    },
+    {
+      "id": 149,
+      "unknown1": 32,
+      "unknown2": 0,
+      "power": 125,
+      "attack_type": 221,
+      "attack_sound": 209,
+      "unknown3": 129,
+      "attack_target_animation": 128
+    },
+    {
+      "id": 150,
+      "unknown1": 0,
+      "unknown2": 0,
+      "power": 88,
+      "attack_type": 221,
+      "attack_sound": 208,
+      "unknown3": 130,
+      "attack_target_animation": 132
+    },
+    {
+      "id": 151,
+      "unknown1": 32,
+      "unknown2": 0,
+      "power": 120,
+      "attack_type": 210,
+      "attack_sound": 219,
+      "unknown3": 129,
+      "attack_target_animation": 68
+    },
+    {
+      "id": 152,
+      "unknown1": 2,
+      "unknown2": 0,
+      "power": 250,
+      "attack_type": 209,
+      "attack_sound": 217,
+      "unknown3": 130,
+      "attack_target_animation": 88
+    },
+    {
+      "id": 153,
+      "unknown1": 2,
+      "unknown2": 0,
+      "power": 10,
+      "attack_type": 209,
+      "attack_sound": 202,
+      "unknown3": 129,
+      "attack_target_animation": 88
+    },
+    {
+      "id": 154,
+      "unknown1": 17,
+      "unknown2": 0,
+      "power": 15,
+      "attack_type": 210,
+      "attack_sound": 207,
+      "unknown3": 129,
+      "attack_target_animation": 72
+    },
+    {
+      "id": 155,
+      "unknown1": 49,
+      "unknown2": 49,
+      "power": 220,
+      "attack_type": 210,
+      "attack_sound": 206,
+      "unknown3": 130,
+      "attack_target_animation": 68
+    },
+    {
+      "id": 156,
+      "unknown1": 0,
+      "unknown2": 0,
+      "power": 0,
+      "attack_type": 18,
+      "attack_sound": 14,
+      "unknown3": 130,
+      "attack_target_animation": 68
+    },
+    {
+      "id": 157,
+      "unknown1": 0,
+      "unknown2": 0,
+      "power": 0,
+      "attack_type": 203,
+      "attack_sound": 210,
+      "unknown3": 161,
+      "attack_target_animation": 34
+    },
+    {
+      "id": 158,
+      "unknown1": 8,
+      "unknown2": 0,
+      "power": 50,
+      "attack_type": 206,
+      "attack_sound": 212,
+      "unknown3": 63,
+      "attack_target_animation": 35
+    },
+    {
+      "id": 159,
+      "unknown1": 0,
+      "unknown2": 64,
+      "power": 0,
+      "attack_type": 205,
+      "attack_sound": 213,
+      "unknown3": 21,
+      "attack_target_animation": 36
+    },
+    {
+      "id": 160,
+      "unknown1": 8,
+      "unknown2": 128,
+      "power": 0,
+      "attack_type": 204,
+      "attack_sound": 213,
+      "unknown3": 21,
+      "attack_target_animation": 37
+    },
+    {
+      "id": 161,
+      "unknown1": 128,
+      "unknown2": 0,
+      "power": 25,
+      "attack_type": 201,
+      "attack_sound": 203,
+      "unknown3": 130,
+      "attack_target_animation": 38
+    },
+    {
+      "id": 162,
+      "unknown1": 64,
+      "unknown2": 0,
+      "power": 135,
+      "attack_type": 200,
+      "attack_sound": 141,
+      "unknown3": 131,
+      "attack_target_animation": 39
+    },
+    {
+      "id": 163,
+      "unknown1": 32,
+      "unknown2": 0,
+      "power": 85,
+      "attack_type": 200,
+      "attack_sound": 78,
+      "unknown3": 131,
+      "attack_target_animation": 40
+    },
+    {
+      "id": 164,
+      "unknown1": 16,
+      "unknown2": 0,
+      "power": 235,
+      "attack_type": 200,
+      "attack_sound": 15,
+      "unknown3": 131,
+      "attack_target_animation": 41
+    },
+    {
+      "id": 165,
+      "unknown1": 80,
+      "unknown2": 0,
+      "power": 180,
+      "attack_type": 136,
+      "attack_sound": 140,
+      "unknown3": 131,
+      "attack_target_animation": 42
+    },
+    {
+      "id": 166,
+      "unknown1": 0,
+      "unknown2": 0,
+      "power": 140,
+      "attack_type": 137,
+      "attack_sound": 80,
+      "unknown3": 130,
+      "attack_target_animation": 43
+    },
+    {
+      "id": 167,
+      "unknown1": 128,
+      "unknown2": 0,
+      "power": 170,
+      "attack_type": 137,
+      "attack_sound": 147,
+      "unknown3": 130,
+      "attack_target_animation": 44
+    },
+    {
+      "id": 168,
+      "unknown1": 32,
+      "unknown2": 0,
+      "power": 200,
+      "attack_type": 73,
+      "attack_sound": 145,
+      "unknown3": 130,
+      "attack_target_animation": 45
+    }
+  ]
+}

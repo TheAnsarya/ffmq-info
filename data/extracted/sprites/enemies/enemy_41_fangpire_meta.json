@@ -1,0 +1,22 @@
+{
+  "name": "enemy_41_fangpire",
+  "enemy_id": 41,
+  "enemy_name": "Vampire",
+  "category": "enemy",
+  "format": "4BPP",
+  "rom_offset": "0x04C7F5",
+  "palette_offset": "0x048290",
+  "dimensions": {
+    "width_tiles": 6,
+    "height_tiles": 6,
+    "width_pixels": 48,
+    "height_pixels": 48
+  },
+  "num_tiles": 36,
+  "shares_graphics": true,
+  "shared_with": [
+    40,
+    41
+  ],
+  "notes": "Vampire (ID 41) - Palette from Bank 09"
+}

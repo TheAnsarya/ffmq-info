@@ -1,0 +1,45 @@
+{
+  "project": {
+    "name": "ffmq-info",
+    "fullName": "Final Fantasy Mystic Quest - Disassembly & ROM Hack Project",
+    "description": "Comprehensive disassembly and development environment for Final Fantasy Mystic Quest (SNES)",
+    "owner": "TheAnsarya",
+    "repository": "ffmq-info"
+  },
+  "github": {
+    "owner": "TheAnsarya",
+    "repo": "ffmq-info",
+    "projectNumber": 3,
+    "projectUrl": "https://github.com/users/TheAnsarya/projects/3",
+    "repoUrl": "https://github.com/TheAnsarya/ffmq-info",
+    "issuesUrl": "https://github.com/TheAnsarya/ffmq-info/issues",
+    "defaultBranch": "master"
+  },
+  "workflow": {
+    "issueCreation": {
+      "addToProject": true,
+      "projectUrl": "https://github.com/users/TheAnsarya/projects/3"
+    },
+    "labels": {
+      "priority": ["priority: high", "priority: medium", "priority: low"],
+      "type": [
+        "type: data",
+        "type: extraction",
+        "type: documentation",
+        "type: tools",
+        "type: code-labeling",
+        "type: formatting",
+        "type: graphics",
+        "type: build-system",
+        "type: disassembly"
+      ],
+      "effort": ["effort: large"],
+      "status": ["requires: testing"]
+    }
+  },
+  "documentation": {
+    "projectManagement": "All issues and tasks are tracked in GitHub Project #3",
+    "externalReferences": "docs/EXTERNAL_REFERENCES.md",
+    "buildConfiguration": "build.config.json"
+  }
+}

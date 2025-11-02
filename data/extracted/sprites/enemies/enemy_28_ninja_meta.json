@@ -1,0 +1,22 @@
+{
+  "name": "enemy_28_ninja",
+  "enemy_id": 28,
+  "enemy_name": "Ninja",
+  "category": "enemy",
+  "format": "4BPP",
+  "rom_offset": "0x04AF35",
+  "palette_offset": "0x0481C0",
+  "dimensions": {
+    "width_tiles": 8,
+    "height_tiles": 8,
+    "width_pixels": 64,
+    "height_pixels": 64
+  },
+  "num_tiles": 64,
+  "shares_graphics": true,
+  "shared_with": [
+    28,
+    29
+  ],
+  "notes": "Ninja (ID 28) - Palette from Bank 09"
+}

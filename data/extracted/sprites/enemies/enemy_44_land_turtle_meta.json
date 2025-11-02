@@ -1,0 +1,22 @@
+{
+  "name": "enemy_44_land_turtle",
+  "enemy_id": 44,
+  "enemy_name": "Land Turtle",
+  "category": "enemy",
+  "format": "4BPP",
+  "rom_offset": "0x04D0C5",
+  "palette_offset": "0x0482C0",
+  "dimensions": {
+    "width_tiles": 8,
+    "height_tiles": 8,
+    "width_pixels": 64,
+    "height_pixels": 64
+  },
+  "num_tiles": 64,
+  "shares_graphics": true,
+  "shared_with": [
+    44,
+    45
+  ],
+  "notes": "Land Turtle (ID 44) - Palette from Bank 09"
+}

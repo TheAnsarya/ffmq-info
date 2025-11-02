@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>FFMQ Graphics Catalog</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #1e1e1e;
+            color: #d4d4d4;
+            margin: 0;
+            padding: 20px;
+        }
+        h1 {
+            color: #569cd6;
+            border-bottom: 2px solid #569cd6;
+            padding-bottom: 10px;
+        }
+        h2 {
+            color: #4ec9b0;
+            margin-top: 30px;
+        }
+        .catalog-section {
+            margin: 20px 0;
+            padding: 20px;
+            background: #252526;
+            border-radius: 8px;
+        }
+        img {
+            max-width: 100%;
+            border: 1px solid #3e3e42;
+            border-radius: 4px;
+            margin: 10px 0;
+        }
+        .info {
+            background: #2d2d30;
+            padding: 10px;
+            border-left: 3px solid #007acc;
+            margin: 10px 0;
+        }
+        a {
+            color: #569cd6;
+            text-decoration: none;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <h1>🎮 Final Fantasy Mystic Quest - Graphics Catalog</h1>
+
+    <div class="info">
+        <p><strong>Generated:</strong> Auto-extracted from ROM v1.1</p>
+        <p><strong>Source:</strong> Banks 04 (tiles) and 05 (palettes)</p>
+        <p><strong>Format:</strong> SNES 2BPP/4BPP tiles, RGB555 palettes</p>
+    </div>
+
+    <h2>📊 Color Palettes</h2>
+    <div class="catalog-section">
+        <p>16 color palettes extracted from Bank 05 (RGB555 → RGB888)</p>
+        <img src="palettes_catalog.png" alt="Palettes Catalog">
+    </div>
+
+    <h2>👥 Character Sprites</h2>
+    <div class="catalog-section">
+        <p>Battle sprites for playable characters with animation frames</p>
+        <img src="characters_catalog.png" alt="Characters Catalog">
+    </div>
+
+    <h2>👹 Enemy Sprites</h2>
+    <div class="catalog-section">
+        <p>Enemy battle sprites</p>
+        <img src="enemies_catalog.png" alt="Enemies Catalog">
+    </div>
+
+    <h2>🎨 UI Elements</h2>
+    <div class="catalog-section">
+        <p>User interface graphics (fonts, borders, icons)</p>
+        <img src="ui_catalog.png" alt="UI Catalog">
+    </div>
+
+    <h2>💫 Effects</h2>
+    <div class="catalog-section">
+        <p>Visual effects and spell animations</p>
+        <img src="effects_catalog.png" alt="Effects Catalog">
+    </div>
+
+    <h2>📚 Documentation</h2>
+    <div class="catalog-section">
+        <ul>
+            <li><a href="../../src/asm/bank_04_documented.asm">Bank 04 Documentation</a> - Tile format reference</li>
+            <li><a href="../../src/asm/bank_05_documented.asm">Bank 05 Documentation</a> - Palette format reference</li>
+            <li><a href="../../tools/extraction/extract_graphics.py">Graphics Extractor</a> - Extraction tool source</li>
+            <li><a href="../../tools/extraction/extract_sprites.py">Sprite Extractor</a> - Sprite assembly tool</li>
+        </ul>
+    </div>
+</body>
+</html>

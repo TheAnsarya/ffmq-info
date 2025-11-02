@@ -1,0 +1,22 @@
+{
+  "name": "enemy_53_ice_golem",
+  "enemy_id": 53,
+  "enemy_name": "Fire Golem",
+  "category": "enemy",
+  "format": "4BPP",
+  "rom_offset": "0x04E175",
+  "palette_offset": "0x048350",
+  "dimensions": {
+    "width_tiles": 2,
+    "height_tiles": 2,
+    "width_pixels": 16,
+    "height_pixels": 16
+  },
+  "num_tiles": 4,
+  "shares_graphics": true,
+  "shared_with": [
+    52,
+    53
+  ],
+  "notes": "Fire Golem (ID 53) - Palette from Bank 09"
+}

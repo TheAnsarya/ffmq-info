@@ -1,0 +1,24 @@
+{
+  "name": "kaeli_battle",
+  "category": "character",
+  "format": "4BPP",
+  "rom_offset": "0x028800",
+  "dimensions": {
+    "width_tiles": 4,
+    "height_tiles": 4,
+    "width_pixels": 32,
+    "height_pixels": 32
+  },
+  "palette_index": 1,
+  "num_tiles": 64,
+  "animation": {
+    "num_frames": 4,
+    "frame_offsets": [
+      0,
+      16,
+      32,
+      48
+    ]
+  },
+  "notes": "Kaeli battle sprite"
+}

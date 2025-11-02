@@ -1,0 +1,22 @@
+{
+  "name": "enemy_49_wasp",
+  "enemy_id": 49,
+  "enemy_name": "Fly Eye",
+  "category": "enemy",
+  "format": "4BPP",
+  "rom_offset": "0x04D88D",
+  "palette_offset": "0x048310",
+  "dimensions": {
+    "width_tiles": 8,
+    "height_tiles": 8,
+    "width_pixels": 64,
+    "height_pixels": 64
+  },
+  "num_tiles": 64,
+  "shares_graphics": true,
+  "shared_with": [
+    48,
+    49
+  ],
+  "notes": "Fly Eye (ID 49) - Palette from Bank 09"
+}

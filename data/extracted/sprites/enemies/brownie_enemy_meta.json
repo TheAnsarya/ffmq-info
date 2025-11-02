@@ -1,0 +1,19 @@
+{
+  "name": "brownie_enemy",
+  "category": "enemy",
+  "format": "4BPP",
+  "rom_offset": "0x02B000",
+  "dimensions": {
+    "width_tiles": 4,
+    "height_tiles": 4,
+    "width_pixels": 32,
+    "height_pixels": 32
+  },
+  "palette_index": 4,
+  "num_tiles": 16,
+  "animation": {
+    "num_frames": 1,
+    "frame_offsets": []
+  },
+  "notes": "Brownie - first enemy in game"
+}

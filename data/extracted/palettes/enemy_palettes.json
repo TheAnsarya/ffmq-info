@@ -1,0 +1,7231 @@
+{
+  "metadata": {
+    "source": "Bank 09 enemy palette table",
+    "rom_offset": "0x048000",
+    "format": "RGB555 (8 colors per enemy)",
+    "total_enemies": 83
+  },
+  "palettes": [
+    {
+      "enemy_id": 0,
+      "enemy_name": "Brownie",
+      "rom_offset": "0x048000",
+      "colors": [
+        {
+          "index": 0,
+          "rgb": [
+            0,
+            0,
+            0
+          ],
+          "hex": "#000000",
+          "name": "transparent"
+        },
+        {
+          "index": 1,
+          "rgb": [
+            231,
+            222,
+            231
+          ],
+          "hex": "#E7DEE7",
+          "name": "primary"
+        },
+        {
+          "index": 2,
+          "rgb": [
+            173,
+            156,
+            165
+          ],
+          "hex": "#AD9CA5",
+          "name": "secondary"
+        },
+        {
+          "index": 3,
+          "rgb": [
+            115,
+            90,
+            107
+          ],
+          "hex": "#735A6B",
+          "name": "shadow"
+        },
+        {
+          "index": 4,
+          "rgb": [
+            74,
+            41,
+            66
+          ],
+          "hex": "#4A2942",
+          "name": "dark"
+        },
+        {
+          "index": 5,
+          "rgb": [
+            255,
+            0,
+            0
+          ],
+          "hex": "#FF0000",
+          "name": "accent"
+        },
+        {
+          "index": 6,
+          "rgb": [
+            41,
+            123,
+            99
+          ],
+          "hex": "#297B63",
+          "name": "highlight"
+        },
+        {
+          "index": 7,
+          "rgb": [
+            0,
+            0,
+            0
+          ],
+          "hex": "#000000",
+          "name": "outline"
+        }
+      ]
+    },
+    {
+      "enemy_id": 1,
+      "enemy_name": "Mintmint",
+      "rom_offset": "0x048010",
+      "colors": [
+        {
+          "index": 0,
+          "rgb": [
+            0,
+            0,
+            0
+          ],
+          "hex": "#000000",
+          "name": "transparent"
+        },
+        {
+          "index": 1,
+          "rgb": [
+            255,
+            255,
+            255
+          ],
+          "hex": "#FFFFFF",
+          "name": "primary"
+        },
+        {
+          "index": 2,
+          "rgb": [
+            255,
+            255,
+            41
+          ],
+          "hex": "#FFFF29",
+          "name": "secondary"
+        },
+        {
+          "index": 3,
+          "rgb": [
+            255,
+            140,
+            0
+          ],
+          "hex": "#FF8C00",
+          "name": "shadow"
+        },
+        {
+          "index": 4,
+          "rgb": [
+            255,
+            66,
+            0
+          ],
+          "hex": "#FF4200",
+          "name": "dark"
+        },
+        {
+          "index": 5,
+          "rgb": [
+            214,
+            0,
+            0
+          ],
+          "hex": "#D60000",
+          "name": "accent"
+        },
+        {
+          "index": 6,
+          "rgb": [
+            132,
+            115,
+            255
+          ],
+          "hex": "#8473FF",
+          "name": "highlight"
+        },
+        {
+          "index": 7,
+          "rgb": [
+            0,
+            0,
+            0
+          ],
+          "hex": "#000000",
+          "name": "outline"
+        }
+      ]
+    },
+    {
+      "enemy_id": 2,
+      "enemy_name": "Red Cap",
+      "rom_offset": "0x048020",
+      "colors": [
+        {
+          "index": 0,
+          "rgb": [
+            0,
+            0,
+            0
+          ],
+          "hex": "#000000",
+          "name": "transparent"
+        },
+        {
+          "index": 1,
+          "rgb": [
+            255,
+            255,
+            255
+          ],
+          "hex": "#FFFFFF",
+          "name": "primary"
+        },
+        {
+          "index": 2,
+          "rgb": [
+            156,
+            198,
+            156
+          ],
+          "hex": "#9CC69C",
+          "name": "secondary"
+        },
+        {
+          "index": 3,
+          "rgb": [
+            82,
+            165,
+            82
+          ],
+          "hex": "#52A552",
+          "name": "shadow"
+        },
+        {
+          "index": 4,
+          "rgb": [
+            0,
+            123,
+            0
+          ],
+          "hex": "#007B00",
+          "name": "dark"
+        },
+        {
+          "index": 5,
+          "rgb": [
+            0,
+            0,
+            165
+          ],
+          "hex": "#0000A5",
+          "name": "accent"
+        },
+        {
+          "index": 6,
+          "rgb": [
+            255,
+            132,
+            206
+          ],
+          "hex": "#FF84CE",
+          "name": "highlight"
+        },
+        {
+          "index": 7,
+          "rgb": [
+            0,
+            0,
+            0
+          ],
+          "hex": "#000000",
+          "name": "outline"
+        }
+      ]
+    },
+    {
+      "enemy_id": 3,
+      "enemy_name": "Mad Plant",
+      "rom_offset": "0x048030",
+      "colors": [
+        {
+          "index": 0,
+          "rgb": [
+            0,
+            0,
+            0
+          ],
+          "hex": "#000000",
+          "name": "transparent"
+        },
+        {
+          "index": 1,
+          "rgb": [
+            255,
+            255,
+            255
+          ],
+          "hex": "#FFFFFF",
+          "name": "primary"
+        },
+        {
+          "index": 2,
+          "rgb": [
+            255,
+            189,
+            140
+          ],
+          "hex": "#FFBD8C",
+          "name": "secondary"
+        },
+        {
+          "index": 3,
+          "rgb": [
+            255,
+            115,
+            24
+          ],
+          "hex": "#FF7318",
+          "name": "shadow"
+        },
+        {
+          "index": 4,
+          "rgb": [
+            57,
+            255,
+            0
+          ],
+          "hex": "#39FF00",
+          "name": "dark"
+        },
+        {
+          "index": 5,
+          "rgb": [
+            0,
+            123,
+            0
+          ],
+          "hex": "#007B00",
+          "name": "accent"
+        },
+        {
+          "index": 6,
+          "rgb": [
+            107,
+            107,
+            107
+          ],
+          "hex": "#6B6B6B",
+          "name": "highlight"
+        },
+        {
+          "index": 7,
+          "rgb": [
+            0,
+            0,
+            0
+          ],
+          "hex": "#000000",
+          "name": "outline"
+        }
+      ]
+    },
+    {
+      "enemy_id": 4,
+      "enemy_name": "Plant Man",
+      "rom_offset": "0x048040",
+      "colors": [
+        {
+          "index": 0,
+          "rgb": [
+            0,
+            0,
+            0
+          ],
+          "hex": "#000000",
+          "name": "transparent"
+        },
+        {
+          "index": 1,
+          "rgb": [
+            255,
+            255,
+            255
+          ],
+          "hex": "#FFFFFF",
+          "name": "primary"
+        },
+        {
+          "index": 2,
+          "rgb": [
+            173,
+            156,
+            165
+          ],
+          "hex": "#AD9CA5",
+          "name": "secondary"
+        },
+        {
+          "index": 3,
+          "rgb": [
+            107,
+            82,
+            99
+          ],
+          "hex": "#6B5263",
+          "name": "shadow"
+        },
+        {
+          "index": 4,
+          "rgb": [
+            181,
+            99,
+            0
+          ],
+          "hex": "#B56300",
+          "name": "dark"
+        },
+        {
+          "index": 5,
+          "rgb": [
+            132,
+            33,
+            0
+          ],
+          "hex": "#842100",
+          "name": "accent"
+        },
+        {
+          "index": 6,
+          "rgb": [
+            82,
+            214,
+            255
+          ],
+          "hex": "#52D6FF",
+          "name": "highlight"
+        },
+        {
+          "index": 7,
+          "rgb": [
+            0,
+            0,
+            0
+          ],
+          "hex": "#000000",
+          "name": "outline"
+        }
+      ]
+    },
+    {
+      "enemy_id": 5,
+      "enemy_name": "Live Oak",
+      "rom_offset": "0x048050",
+      "colors": [
+        {
+          "index": 0,
+          "rgb": [
+            0,
+            0,
+            0
+          ],
+          "hex": "#000000",
+          "name": "transparent"
+        },
+        {
+          "index": 1,
+          "rgb": [
+            255,
+            255,
+            255
+          ],
+          "hex": "#FFFFFF",
+          "name": "primary"
+        },
+        {
+          "index": 2,
+          "rgb": [
+            255,
+            189,
+            140
+          ],
+          "hex": "#FFBD8C",
+          "name": "secondary"
+        },
+        {
+          "index": 3,
+          "rgb": [
+            214,
+            99,
+            41
+          ],
+          "hex": "#D66329",
+          "name": "shadow"
+        },
+        {
+          "index": 4,
+          "rgb": [
+            132,
+            33,
+            0
+          ],
+          "hex": "#842100",
+          "name": "dark"
+        },
+        {
+          "index": 5,
+          "rgb": [
+            66,
+            16,
+            0
+          ],
+          "hex": "#421000",
+          "name": "accent"
+        },
+        {
+          "index": 6,
+          "rgb": [
+            255,
+            0,
+            255
+          ],
+          "hex": "#FF00FF",
+          "name": "highlight"
+        },
+        {
+          "index": 7,
+          "rgb": [
+            0,
+            0,
+            0
+          ],
+          "hex": "#000000",
+          "name": "outline"
+        }
+      ]
+    },
+    {
+      "enemy_id": 6,
+      "enemy_name": "Slime",
+      "rom_offset": "0x048060",
+      "colors": [
+        {
+          "index": 0,
+          "rgb": [
+            0,
+            0,
+            0
+          ],
+          "hex": "#000000",
+          "name": "transparent"
+        },
+        {
+          "index": 1,
+          "rgb": [
+            255,
+            255,
+            255
+          ],
+          "hex": "#FFFFFF",
+          "name": "primary"
+        },
+        {
+          "index": 2,
+          "rgb": [
+            115,
+            115,
+            115
+          ],
+          "hex": "#737373",
+          "name": "secondary"
+        },
+        {
+          "index": 3,
+          "rgb": [
+            74,
+            74,
+            74
+          ],
+          "hex": "#4A4A4A",
+          "name": "shadow"
+        },
+        {
+          "index": 4,
+          "rgb": [
+            41,
+            41,
+            41
+          ],
+          "hex": "#292929",
+          "name": "dark"
+        },
+        {
+          "index": 5,
+          "rgb": [
+            255,
+            0,
+            0
+          ],
+          "hex": "#FF0000",
+          "name": "accent"
+        },
+        {
+          "index": 6,
+          "rgb": [
+            198,
+            165,
+            255
+          ],
+          "hex": "#C6A5FF",
+          "name": "highlight"
+        },
+        {
+          "index": 7,
+          "rgb": [
+            0,
+            0,
+            0
+          ],
+          "hex": "#000000",
+          "name": "outline"
+        }
+      ]
+    },
+    {
+      "enemy_id": 7,
+      "enemy_name": "Jelly",
+      "rom_offset": "0x048070",
+      "colors": [
+        {
+          "index": 0,
+          "rgb": [
+            0,
+            0,
+            0
+          ],
+          "hex": "#000000",
+          "name": "transparent"
+        },
+        {
+          "index": 1,
+          "rgb": [
+            255,
+            255,
+            255
+          ],
+          "hex": "#FFFFFF",
+          "name": "primary"
+        },
+        {
+          "index": 2,
+          "rgb": [
+            255,
+            255,
+            115
+          ],
+          "hex": "#FFFF73",
+          "name": "secondary"
+        },
+        {
+          "index": 3,
+          "rgb": [
+            165,
+            165,
+            123
+          ],
+          "hex": "#A5A57B",
+          "name": "shadow"
+        },
+        {
+          "index": 4,
+          "rgb": [
+            99,
+            99,
+            140
+          ],
+          "hex": "#63638C",
+          "name": "dark"
+        },
+        {
+          "index": 5,
+          "rgb": [
+            33,
+            33,
+            148
+          ],
+          "hex": "#212194",
+          "name": "accent"
+        },
+        {
+          "index": 6,
+          "rgb": [
+            255,
+            0,
+            0
+          ],
+          "hex": "#FF0000",
+          "name": "highlight"
+        },
+        {
+          "index": 7,
+          "rgb": [
+            0,
+            0,
+            0
+          ],
+          "hex": "#000000",
+          "name": "outline"
+        }
+      ]
+    },
+    {
+      "enemy_id": 8,
+      "enemy_name": "Ooze",
+      "rom_offset": "0x048080",
+      "colors": [
+        {
+          "index": 0,
+          "rgb": [
+            0,
+            0,
+            0
+          ],
+          "hex": "#000000",
+          "name": "transparent"
+        },
+        {
+          "index": 1,
+          "rgb": [
+            255,
+            255,
+            255
+          ],
+          "hex": "#FFFFFF",
+          "name": "primary"
+        },
+        {
+          "index": 2,
+          "rgb": [
+            255,
+            255,
+            115
+          ],
+          "hex": "#FFFF73",
+          "name": "secondary"
+        },
+        {
+          "index": 3,
+          "rgb": [
+            222,
+            165,
+            156
+          ],
+          "hex": "#DEA59C",
+          "name": "shadow"
+        },
+        {
+          "index": 4,
+          "rgb": [
+            181,
+            66,
+            189
+          ],
+          "hex": "#B542BD",
+          "name": "dark"
+        },
+        {
+          "index": 5,
+          "rgb": [
+            82,
+            0,
+            107
+          ],
+          "hex": "#52006B",
+          "name": "accent"
+        },
+        {
+          "index": 6,
+          "rgb": [
+            198,
+            99,
+            0
+          ],
+          "hex": "#C66300",
+          "name": "highlight"
+        },
+        {
+          "index": 7,
+          "rgb": [
+            0,
+            0,
+            0
+          ],
+          "hex": "#000000",
+          "name": "outline"
+        }
+      ]
+    },
+    {
+      "enemy_id": 9,
+      "enemy_name": "Poison Toad",
+      "rom_offset": "0x048090",
+      "colors": [
+        {
+          "index": 0,
+          "rgb": [
+            0,
+            0,
+            0
+          ],
+          "hex": "#000000",
+          "name": "transparent"
+        },
+        {
+          "index": 1,
+          "rgb": [
+            181,
+            239,
+            255
+          ],
+          "hex": "#B5EFFF",
+          "name": "primary"
+        },
+        {
+          "index": 2,
+          "rgb": [
+            255,
+            181,
+            156
+          ],
+          "hex": "#FFB59C",
+          "name": "secondary"
+        },
+        {
+          "index": 3,
+          "rgb": [
+            214,
+            115,
+            82
+          ],
+          "hex": "#D67352",
+          "name": "shadow"
+        },
+        {
+          "index": 4,
+          "rgb": [
+            74,
+            148,
+            132
+          ],
+          "hex": "#4A9484",
+          "name": "dark"
+        },
+        {
+          "index": 5,
+          "rgb": [
+            16,
+            74,
+            74
+          ],
+          "hex": "#104A4A",
+          "name": "accent"
+        },
+        {
+          "index": 6,
+          "rgb": [
+            255,
+            0,
+            0
+          ],
+          "hex": "#FF0000",
+          "name": "highlight"
+        },
+        {
+          "index": 7,
+          "rgb": [
+            0,
+            0,
+            0
+          ],
+          "hex": "#000000",
+          "name": "outline"
+        }
+      ]
+    },
+    {
+      "enemy_id": 10,
+      "enemy_name": "Giant Toad",
+      "rom_offset": "0x0480A0",
+      "colors": [
+        {
+          "index": 0,
+          "rgb": [
+            0,
+            0,
+            0
+          ],
+          "hex": "#000000",
+          "name": "transparent"
+        },
+        {
+          "index": 1,
+          "rgb": [
+            255,
+            255,
+            255
+          ],
+          "hex": "#FFFFFF",
+          "name": "primary"
+        },
+        {
+          "index": 2,
+          "rgb": [
+            255,
+            115,
+            132
+          ],
+          "hex": "#FF7384",
+          "name": "secondary"
+        },
+        {
+          "index": 3,
+          "rgb": [
+            255,
+            0,
+            0
+          ],
+          "hex": "#FF0000",
+          "name": "shadow"
+        },
+        {
+          "index": 4,
+          "rgb": [
+            99,
+            0,
+            0
+          ],
+          "hex": "#630000",
+          "name": "dark"
+        },
+        {
+          "index": 5,
+          "rgb": [
+            255,
+            255,
+            0
+          ],
+          "hex": "#FFFF00",
+          "name": "accent"
+        },
+        {
+          "index": 6,
+          "rgb": [
+            0,
+            181,
+            156
+          ],
+          "hex": "#00B59C",
+          "name": "highlight"
+        },
+        {
+          "index": 7,
+          "rgb": [
+            0,
+            0,
+            0
+          ],
+          "hex": "#000000",
+          "name": "outline"
+        }
+      ]
+    },
+    {
+      "enemy_id": 11,
+      "enemy_name": "Mad Toad",
+      "rom_offset": "0x0480B0",
+      "colors": [
+        {
+          "index": 0,
+          "rgb": [
+            0,
+            0,
+            0
+          ],
+          "hex": "#000000",
+          "name": "transparent"
+        },
+        {
+          "index": 1,
+          "rgb": [
+            255,
+            255,
+            255
+          ],
+          "hex": "#FFFFFF",
+          "name": "primary"
+        },
+        {
+          "index": 2,
+          "rgb": [
+            99,
+            222,
+            140
+          ],
+          "hex": "#63DE8C",
+          "name": "secondary"
+        },
+        {
+          "index": 3,
+          "rgb": [
+            99,
+            165,
+            140
+          ],
+          "hex": "#63A58C",
+          "name": "shadow"
+        },
+        {
+          "index": 4,
+          "rgb": [
+            99,
+            90,
+            140
+          ],
+          "hex": "#635A8C",
+          "name": "dark"
+        },
+        {
+          "index": 5,
+          "rgb": [
+            99,
+            49,
+            140
+          ],
+          "hex": "#63318C",
+          "name": "accent"
+        },
+        {
+          "index": 6,
+          "rgb": [
+            255,
+            0,
+            0
+          ],
+          "hex": "#FF0000",
+          "name": "highlight"
+        },
+        {
+          "index": 7,
+          "rgb": [
+            0,
+            0,
+            0
+          ],
+          "hex": "#000000",
+          "name": "outline"
+        }
+      ]
+    },
+    {
+      "enemy_id": 12,
+      "enemy_name": "Basilisk",
+      "rom_offset": "0x0480C0",
+      "colors": [
+        {
+          "index": 0,
+          "rgb": [
+            0,
+            0,
+            0
+          ],
+          "hex": "#000000",
+          "name": "transparent"
+        },
+        {
+          "index": 1,
+          "rgb": [
+            255,
+            255,
+            255
+          ],
+          "hex": "#FFFFFF",
+          "name": "primary"
+        },
+        {
+          "index": 2,
+          "rgb": [
+            255,
+            189,
+            140
+          ],
+          "hex": "#FFBD8C",
+          "name": "secondary"
+        },
+        {
+          "index": 3,
+          "rgb": [
+            214,
+            123,
+            33
+          ],
+          "hex": "#D67B21",
+          "name": "shadow"
+        },
+        {
+          "index": 4,
+          "rgb": [
+            165,
+            74,
+            0
+          ],
+          "hex": "#A54A00",
+          "name": "dark"
+        },
+        {
+          "index": 5,
+          "rgb": [
+            90,
+            41,
+            0
+          ],
+          "hex": "#5A2900",
+          "name": "accent"
+        },
+        {
+          "index": 6,
+          "rgb": [
+            140,
+            49,
+            198
+          ],
+          "hex": "#8C31C6",
+          "name": "highlight"
+        },
+        {
+          "index": 7,
+          "rgb": [
+            0,
+            0,
+            0
+          ],
+          "hex": "#000000",
+          "name": "outline"
+        }
+      ]
+    },
+    {
+      "enemy_id": 13,
+      "enemy_name": "Flazzard",
+      "rom_offset": "0x0480D0",
+      "colors": [
+        {
+          "index": 0,
+          "rgb": [
+            0,
+            0,
+            0
+          ],
+          "hex": "#000000",
+          "name": "transparent"
+        },
+        {
+          "index": 1,
+          "rgb": [
+            255,
+            255,
+            255
+          ],
+          "hex": "#FFFFFF",
+          "name": "primary"
+        },
+        {
+          "index": 2,
+          "rgb": [
+            206,
+            165,
+            255
+          ],
+          "hex": "#CEA5FF",
+          "name": "secondary"
+        },
+        {
+          "index": 3,
+          "rgb": [
+            107,
+            156,
+            156
+          ],
+          "hex": "#6B9C9C",
+          "name": "shadow"
+        },
+        {
+          "index": 4,
+          "rgb": [
+            0,
+            148,
+            49
+          ],
+          "hex": "#009431",
+          "name": "dark"
+        },
+        {
+          "index": 5,
+          "rgb": [
+            0,
+            99,
+            24
+          ],
+          "hex": "#006318",
+          "name": "accent"
+        },
+        {
+          "index": 6,
+          "rgb": [
+            255,
+            0,
+            0
+          ],
+          "hex": "#FF0000",
+          "name": "highlight"
+        },
+        {
+          "index": 7,
+          "rgb": [
+            0,
+            0,
+            0
+          ],
+          "hex": "#000000",
+          "name": "outline"
+        }
+      ]
+    },
+    {
+      "enemy_id": 14,
+      "enemy_name": "Salamand",
+      "rom_offset": "0x0480E0",
+      "colors": [
+        {
+          "index": 0,
+          "rgb": [
+            0,
+            0,
+            0
+          ],
+          "hex": "#000000",
+          "name": "transparent"
+        },
+        {
+          "index": 1,
+          "rgb": [
+            255,
+            255,
+            255
+          ],
+          "hex": "#FFFFFF",
+          "name": "primary"
+        },
+        {
+          "index": 2,
+          "rgb": [
+            107,
+            231,
+            255
+          ],
+          "hex": "#6BE7FF",
+          "name": "secondary"
+        },
+        {
+          "index": 3,
+          "rgb": [
+            74,
+            173,
+            206
+          ],
+          "hex": "#4AADCE",
+          "name": "shadow"
+        },
+        {
+          "index": 4,
+          "rgb": [
+            49,
+            115,
+            165
+          ],
+          "hex": "#3173A5",
+          "name": "dark"
+        },
+        {
+          "index": 5,
+          "rgb": [
+            24,
+            57,
+            123
+          ],
+          "hex": "#18397B",
+          "name": "accent"
+        },
+        {
+          "index": 6,
+          "rgb": [
+            255,
+            247,
+            0
+          ],
+          "hex": "#FFF700",
+          "name": "highlight"
+        },
+        {
+          "index": 7,
+          "rgb": [
+            0,
+            0,
+            0
+          ],
+          "hex": "#000000",
+          "name": "outline"
+        }
+      ]
+    },
+    {
+      "enemy_id": 15,
+      "enemy_name": "Sand Worm",
+      "rom_offset": "0x0480F0",
+      "colors": [
+        {
+          "index": 0,
+          "rgb": [
+            0,
+            0,
+            0
+          ],
+          "hex": "#000000",
+          "name": "transparent"
+        },
+        {
+          "index": 1,
+          "rgb": [
+            255,
+            255,
+            255
+          ],
+          "hex": "#FFFFFF",
+          "name": "primary"
+        },
+        {
+          "index": 2,
+          "rgb": [
+            156,
+            214,
+            255
+          ],
+          "hex": "#9CD6FF",
+          "name": "secondary"
+        },
+        {
+          "index": 3,
+          "rgb": [
+            115,
+            148,
+            214
+          ],
+          "hex": "#7394D6",
+          "name": "shadow"
+        },
+        {
+          "index": 4,
+          "rgb": [
+            66,
+            57,
+            173
+          ],
+          "hex": "#4239AD",
+          "name": "dark"
+        },
+        {
+          "index": 5,
+          "rgb": [
+            74,
+            0,
+            107
+          ],
+          "hex": "#4A006B",
+          "name": "accent"
+        },
+        {
+          "index": 6,
+          "rgb": [
+            255,
+            0,
+            0
+          ],
+          "hex": "#FF0000",
+          "name": "highlight"
+        },
+        {
+          "index": 7,
+          "rgb": [
+            0,
+            0,
+            0
+          ],
+          "hex": "#000000",
+          "name": "outline"
+        }
+      ]
+    },
+    {
+      "enemy_id": 16,
+      "enemy_name": "Land Worm",
+      "rom_offset": "0x048100",
+      "colors": [
+        {
+          "index": 0,
+          "rgb": [
+            0,
+            0,
+            0
+          ],
+          "hex": "#000000",
+          "name": "transparent"
+        },
+        {
+          "index": 1,
+          "rgb": [
+            255,
+            255,
+            255
+          ],
+          "hex": "#FFFFFF",
+          "name": "primary"
+        },
+        {
+          "index": 2,
+          "rgb": [
+            255,
+            165,
+            255
+          ],
+          "hex": "#FFA5FF",
+          "name": "secondary"
+        },
+        {
+          "index": 3,
+          "rgb": [
+            181,
+            132,
+            74
+          ],
+          "hex": "#B5844A",
+          "name": "shadow"
+        },
+        {
+          "index": 4,
+          "rgb": [
+            189,
+            41,
+            115
+          ],
+          "hex": "#BD2973",
+          "name": "dark"
+        },
+        {
+          "index": 5,
+          "rgb": [
+            74,
+            8,
+            41
+          ],
+          "hex": "#4A0829",
+          "name": "accent"
+        },
+        {
+          "index": 6,
+          "rgb": [
+            255,
+            0,
+            0
+          ],
+          "hex": "#FF0000",
+          "name": "highlight"
+        },
+        {
+          "index": 7,
+          "rgb": [
+            0,
+            0,
+            0
+          ],
+          "hex": "#000000",
+          "name": "outline"
+        }
+      ]
+    },
+    {
+      "enemy_id": 17,
+      "enemy_name": "Leech",
+      "rom_offset": "0x048110",
+      "colors": [
+        {
+          "index": 0,
+          "rgb": [
+            0,
+            0,
+            0
+          ],
+          "hex": "#000000",
+          "name": "transparent"
+        },
+        {
+          "index": 1,
+          "rgb": [
+            255,
+            255,
+            255
+          ],
+          "hex": "#FFFFFF",
+          "name": "primary"
+        },
+        {
+          "index": 2,
+          "rgb": [
+            255,
+            173,
+            189
+          ],
+          "hex": "#FFADBD",
+          "name": "secondary"
+        },
+        {
+          "index": 3,
+          "rgb": [
+            156,
+            82,
+            255
+          ],
+          "hex": "#9C52FF",
+          "name": "shadow"
+        },
+        {
+          "index": 4,
+          "rgb": [
+            49,
+            107,
+            140
+          ],
+          "hex": "#316B8C",
+          "name": "dark"
+        },
+        {
+          "index": 5,
+          "rgb": [
+            0,
+            74,
+            57
+          ],
+          "hex": "#004A39",
+          "name": "accent"
+        },
+        {
+          "index": 6,
+          "rgb": [
+            255,
+            0,
+            0
+          ],
+          "hex": "#FF0000",
+          "name": "highlight"
+        },
+        {
+          "index": 7,
+          "rgb": [
+            0,
+            0,
+            0
+          ],
+          "hex": "#000000",
+          "name": "outline"
+        }
+      ]
+    },
+    {
+      "enemy_id": 18,
+      "enemy_name": "Skeleton",
+      "rom_offset": "0x048120",
+      "colors": [
+        {
+          "index": 0,
+          "rgb": [
+            0,
+            0,
+            0
+          ],
+          "hex": "#000000",
+          "name": "transparent"
+        },
+        {
+          "index": 1,
+          "rgb": [
+            255,
+            255,
+            255
+          ],
+          "hex": "#FFFFFF",
+          "name": "primary"
+        },
+        {
+          "index": 2,
+          "rgb": [
+            255,
+            214,
+            82
+          ],
+          "hex": "#FFD652",
+          "name": "secondary"
+        },
+        {
+          "index": 3,
+          "rgb": [
+            198,
+            148,
+            140
+          ],
+          "hex": "#C6948C",
+          "name": "shadow"
+        },
+        {
+          "index": 4,
+          "rgb": [
+            156,
+            57,
+            214
+          ],
+          "hex": "#9C39D6",
+          "name": "dark"
+        },
+        {
+          "index": 5,
+          "rgb": [
+            41,
+            49,
+            140
+          ],
+          "hex": "#29318C",
+          "name": "accent"
+        },
+        {
+          "index": 6,
+          "rgb": [
+            255,
+            57,
+            0
+          ],
+          "hex": "#FF3900",
+          "name": "highlight"
+        },
+        {
+          "index": 7,
+          "rgb": [
+            0,
+            0,
+            0
+          ],
+          "hex": "#000000",
+          "name": "outline"
+        }
+      ]
+    },
+    {
+      "enemy_id": 19,
+      "enemy_name": "Red Bone",
+      "rom_offset": "0x048130",
+      "colors": [
+        {
+          "index": 0,
+          "rgb": [
+            0,
+            0,
+            0
+          ],
+          "hex": "#000000",
+          "name": "transparent"
+        },
+        {
+          "index": 1,
+          "rgb": [
+            255,
+            255,
+            255
+          ],
+          "hex": "#FFFFFF",
+          "name": "primary"
+        },
+        {
+          "index": 2,
+          "rgb": [
+            255,
+            123,
+            165
+          ],
+          "hex": "#FF7BA5",
+          "name": "secondary"
+        },
+        {
+          "index": 3,
+          "rgb": [
+            173,
+            132,
+            99
+          ],
+          "hex": "#AD8463",
+          "name": "shadow"
+        },
+        {
+          "index": 4,
+          "rgb": [
+            57,
+            156,
+            0
+          ],
+          "hex": "#399C00",
+          "name": "dark"
+        },
+        {
+          "index": 5,
+          "rgb": [
+            0,
+            99,
+            49
+          ],
+          "hex": "#006331",
+          "name": "accent"
+        },
+        {
+          "index": 6,
+          "rgb": [
+            255,
+            0,
+            123
+          ],
+          "hex": "#FF007B",
+          "name": "highlight"
+        },
+        {
+          "index": 7,
+          "rgb": [
+            0,
+            0,
+            0
+          ],
+          "hex": "#000000",
+          "name": "outline"
+        }
+      ]
+    },
+    {
+      "enemy_id": 20,
+      "enemy_name": "Skuldier",
+      "rom_offset": "0x048140",
+      "colors": [
+        {
+          "index": 0,
+          "rgb": [
+            0,
+            0,
+            0
+          ],
+          "hex": "#000000",
+          "name": "transparent"
+        },
+        {
+          "index": 1,
+          "rgb": [
+            255,
+            255,
+            255
+          ],
+          "hex": "#FFFFFF",
+          "name": "primary"
+        },
+        {
+          "index": 2,
+          "rgb": [
+            255,
+            156,
+            115
+          ],
+          "hex": "#FF9C73",
+          "name": "secondary"
+        },
+        {
+          "index": 3,
+          "rgb": [
+            165,
+            123,
+            107
+          ],
+          "hex": "#A57B6B",
+          "name": "shadow"
+        },
+        {
+          "index": 4,
+          "rgb": [
+            82,
+            82,
+            99
+          ],
+          "hex": "#525263",
+          "name": "dark"
+        },
+        {
+          "index": 5,
+          "rgb": [
+            41,
+            41,
+            57
+          ],
+          "hex": "#292939",
+          "name": "accent"
+        },
+        {
+          "index": 6,
+          "rgb": [
+            107,
+            49,
+            24
+          ],
+          "hex": "#6B3118",
+          "name": "highlight"
+        },
+        {
+          "index": 7,
+          "rgb": [
+            0,
+            0,
+            0
+          ],
+          "hex": "#000000",
+          "name": "outline"
+        }
+      ]
+    },
+    {
+      "enemy_id": 21,
+      "enemy_name": "Roc",
+      "rom_offset": "0x048150",
+      "colors": [
+        {
+          "index": 0,
+          "rgb": [
+            0,
+            0,
+            0
+          ],
+          "hex": "#000000",
+          "name": "transparent"
+        },
+        {
+          "index": 1,
+          "rgb": [
+            255,
+            255,
+            255
+          ],
+          "hex": "#FFFFFF",
+          "name": "primary"
+        },
+        {
+          "index": 2,
+          "rgb": [
+            255,
+            165,
+            255
+          ],
+          "hex": "#FFA5FF",
+          "name": "secondary"
+        },
+        {
+          "index": 3,
+          "rgb": [
+            231,
+            90,
+            198
+          ],
+          "hex": "#E75AC6",
+          "name": "shadow"
+        },
+        {
+          "index": 4,
+          "rgb": [
+            198,
+            24,
+            123
+          ],
+          "hex": "#C6187B",
+          "name": "dark"
+        },
+        {
+          "index": 5,
+          "rgb": [
+            74,
+            8,
+            41
+          ],
+          "hex": "#4A0829",
+          "name": "accent"
+        },
+        {
+          "index": 6,
+          "rgb": [
+            255,
+            206,
+            0
+          ],
+          "hex": "#FFCE00",
+          "name": "highlight"
+        },
+        {
+          "index": 7,
+          "rgb": [
+            0,
+            0,
+            0
+          ],
+          "hex": "#000000",
+          "name": "outline"
+        }
+      ]
+    },
+    {
+      "enemy_id": 22,
+      "enemy_name": "Sparna",
+      "rom_offset": "0x048160",
+      "colors": [
+        {
+          "index": 0,
+          "rgb": [
+            0,
+            0,
+            0
+          ],
+          "hex": "#000000",
+          "name": "transparent"
+        },
+        {
+          "index": 1,
+          "rgb": [
+            255,
+            255,
+            255
+          ],
+          "hex": "#FFFFFF",
+          "name": "primary"
+        },
+        {
+          "index": 2,
+          "rgb": [
+            231,
+            173,
+            115
+          ],
+          "hex": "#E7AD73",
+          "name": "secondary"
+        },
+        {
+          "index": 3,
+          "rgb": [
+            123,
+            140,
+            90
+          ],
+          "hex": "#7B8C5A",
+          "name": "shadow"
+        },
+        {
+          "index": 4,
+          "rgb": [
+            66,
+            99,
+            66
+          ],
+          "hex": "#426342",
+          "name": "dark"
+        },
+        {
+          "index": 5,
+          "rgb": [
+            0,
+            66,
+            41
+          ],
+          "hex": "#004229",
+          "name": "accent"
+        },
+        {
+          "index": 6,
+          "rgb": [
+            206,
+            0,
+            123
+          ],
+          "hex": "#CE007B",
+          "name": "highlight"
+        },
+        {
+          "index": 7,
+          "rgb": [
+            0,
+            0,
+            0
+          ],
+          "hex": "#000000",
+          "name": "outline"
+        }
+      ]
+    },
+    {
+      "enemy_id": 23,
+      "enemy_name": "Garuda",
+      "rom_offset": "0x048170",
+      "colors": [
+        {
+          "index": 0,
+          "rgb": [
+            0,
+            0,
+            0
+          ],
+          "hex": "#000000",
+          "name": "transparent"
+        },
+        {
+          "index": 1,
+          "rgb": [
+            255,
+            255,
+            255
+          ],
+          "hex": "#FFFFFF",
+          "name": "primary"
+        },
+        {
+          "index": 2,
+          "rgb": [
+            255,
+            181,
+            57
+          ],
+          "hex": "#FFB539",
+          "name": "secondary"
+        },
+        {
+          "index": 3,
+          "rgb": [
+            255,
+            66,
+            0
+          ],
+          "hex": "#FF4200",
+          "name": "shadow"
+        },
+        {
+          "index": 4,
+          "rgb": [
+            24,
+            132,
+            49
+          ],
+          "hex": "#188431",
+          "name": "dark"
+        },
+        {
+          "index": 5,
+          "rgb": [
+            0,
+            82,
+            0
+          ],
+          "hex": "#005200",
+          "name": "accent"
+        },
+        {
+          "index": 6,
+          "rgb": [
+            74,
+            148,
+            107
+          ],
+          "hex": "#4A946B",
+          "name": "highlight"
+        },
+        {
+          "index": 7,
+          "rgb": [
+            0,
+            0,
+            0
+          ],
+          "hex": "#000000",
+          "name": "outline"
+        }
+      ]
+    },
+    {
+      "enemy_id": 24,
+      "enemy_name": "Zombie",
+      "rom_offset": "0x048180",
+      "colors": [
+        {
+          "index": 0,
+          "rgb": [
+            0,
+            0,
+            0
+          ],
+          "hex": "#000000",
+          "name": "transparent"
+        },
+        {
+          "index": 1,
+          "rgb": [
+            255,
+            255,
+            173
+          ],
+          "hex": "#FFFFAD",
+          "name": "primary"
+        },
+        {
+          "index": 2,
+          "rgb": [
+            222,
+            156,
+            0
+          ],
+          "hex": "#DE9C00",
+          "name": "secondary"
+        },
+        {
+          "index": 3,
+          "rgb": [
+            107,
+            132,
+            0
+          ],
+          "hex": "#6B8400",
+          "name": "shadow"
+        },
+        {
+          "index": 4,
+          "rgb": [
+            49,
+            49,
+            0
+          ],
+          "hex": "#313100",
+          "name": "dark"
+        },
+        {
+          "index": 5,
+          "rgb": [
+            255,
+            255,
+            255
+          ],
+          "hex": "#FFFFFF",
+          "name": "accent"
+        },
+        {
+          "index": 6,
+          "rgb": [
+            123,
+            165,
+            214
+          ],
+          "hex": "#7BA5D6",
+          "name": "highlight"
+        },
+        {
+          "index": 7,
+          "rgb": [
+            0,
+            0,
+            0
+          ],
+          "hex": "#000000",
+          "name": "outline"
+        }
+      ]
+    },
+    {
+      "enemy_id": 25,
+      "enemy_name": "Mummy",
+      "rom_offset": "0x048190",
+      "colors": [
+        {
+          "index": 0,
+          "rgb": [
+            0,
+            0,
+            0
+          ],
+          "hex": "#000000",
+          "name": "transparent"
+        },
+        {
+          "index": 1,
+          "rgb": [
+            255,
+            255,
+            255
+          ],
+          "hex": "#FFFFFF",
+          "name": "primary"
+        },
+        {
+          "index": 2,
+          "rgb": [
+            173,
+            181,
+            123
+          ],
+          "hex": "#ADB57B",
+          "name": "secondary"
+        },
+        {
+          "index": 3,
+          "rgb": [
+            74,
+            132,
+            148
+          ],
+          "hex": "#4A8494",
+          "name": "shadow"
+        },
+        {
+          "index": 4,
+          "rgb": [
+            74,
+            82,
+            82
+          ],
+          "hex": "#4A5252",
+          "name": "dark"
+        },
+        {
+          "index": 5,
+          "rgb": [
+            74,
+            49,
+            49
+          ],
+          "hex": "#4A3131",
+          "name": "accent"
+        },
+        {
+          "index": 6,
+          "rgb": [
+            255,
+            0,
+            0
+          ],
+          "hex": "#FF0000",
+          "name": "highlight"
+        },
+        {
+          "index": 7,
+          "rgb": [
+            0,
+            0,
+            0
+          ],
+          "hex": "#000000",
+          "name": "outline"
+        }
+      ]
+    },
+    {
+      "enemy_id": 26,
+      "enemy_name": "Desert Hag",
+      "rom_offset": "0x0481A0",
+      "colors": [
+        {
+          "index": 0,
+          "rgb": [
+            0,
+            0,
+            0
+          ],
+          "hex": "#000000",
+          "name": "transparent"
+        },
+        {
+          "index": 1,
+          "rgb": [
+            255,
+            255,
+            255
+          ],
+          "hex": "#FFFFFF",
+          "name": "primary"
+        },
+        {
+          "index": 2,
+          "rgb": [
+            189,
+            181,
+            255
+          ],
+          "hex": "#BDB5FF",
+          "name": "secondary"
+        },
+        {
+          "index": 3,
+          "rgb": [
+            123,
+            140,
+            148
+          ],
+          "hex": "#7B8C94",
+          "name": "shadow"
+        },
+        {
+          "index": 4,
+          "rgb": [
+            66,
+            107,
+            66
+          ],
+          "hex": "#426B42",
+          "name": "dark"
+        },
+        {
+          "index": 5,
+          "rgb": [
+            24,
+            66,
+            0
+          ],
+          "hex": "#184200",
+          "name": "accent"
+        },
+        {
+          "index": 6,
+          "rgb": [
+            140,
+            74,
+            0
+          ],
+          "hex": "#8C4A00",
+          "name": "highlight"
+        },
+        {
+          "index": 7,
+          "rgb": [
+            0,
+            0,
+            0
+          ],
+          "hex": "#000000",
+          "name": "outline"
+        }
+      ]
+    },
+    {
+      "enemy_id": 27,
+      "enemy_name": "Water Hag",
+      "rom_offset": "0x0481B0",
+      "colors": [
+        {
+          "index": 0,
+          "rgb": [
+            0,
+            0,
+            0
+          ],
+          "hex": "#000000",
+          "name": "transparent"
+        },
+        {
+          "index": 1,
+          "rgb": [
+            255,
+            255,
+            255
+          ],
+          "hex": "#FFFFFF",
+          "name": "primary"
+        },
+        {
+          "index": 2,
+          "rgb": [
+            231,
+            165,
+            189
+          ],
+          "hex": "#E7A5BD",
+          "name": "secondary"
+        },
+        {
+          "index": 3,
+          "rgb": [
+            148,
+            115,
+            132
+          ],
+          "hex": "#947384",
+          "name": "shadow"
+        },
+        {
+          "index": 4,
+          "rgb": [
+            82,
+            82,
+            90
+          ],
+          "hex": "#52525A",
+          "name": "dark"
+        },
+        {
+          "index": 5,
+          "rgb": [
+            74,
+            41,
+            0
+          ],
+          "hex": "#4A2900",
+          "name": "accent"
+        },
+        {
+          "index": 6,
+          "rgb": [
+            222,
+            189,
+            0
+          ],
+          "hex": "#DEBD00",
+          "name": "highlight"
+        },
+        {
+          "index": 7,
+          "rgb": [
+            0,
+            0,
+            0
+          ],
+          "hex": "#000000",
+          "name": "outline"
+        }
+      ]
+    },
+    {
+      "enemy_id": 28,
+      "enemy_name": "Ninja",
+      "rom_offset": "0x0481C0",
+      "colors": [
+        {
+          "index": 0,
+          "rgb": [
+            0,
+            0,
+            0
+          ],
+          "hex": "#000000",
+          "name": "transparent"
+        },
+        {
+          "index": 1,
+          "rgb": [
+            255,
+            255,
+            255
+          ],
+          "hex": "#FFFFFF",
+          "name": "primary"
+        },
+        {
+          "index": 2,
+          "rgb": [
+            82,
+            132,
+            165
+          ],
+          "hex": "#5284A5",
+          "name": "secondary"
+        },
+        {
+          "index": 3,
+          "rgb": [
+            33,
+            82,
+            115
+          ],
+          "hex": "#215273",
+          "name": "shadow"
+        },
+        {
+          "index": 4,
+          "rgb": [
+            8,
+            49,
+            90
+          ],
+          "hex": "#08315A",
+          "name": "dark"
+        },
+        {
+          "index": 5,
+          "rgb": [
+            8,
+            24,
+            49
+          ],
+          "hex": "#081831",
+          "name": "accent"
+        },
+        {
+          "index": 6,
+          "rgb": [
+            0,
+            255,
+            0
+          ],
+          "hex": "#00FF00",
+          "name": "highlight"
+        },
+        {
+          "index": 7,
+          "rgb": [
+            0,
+            0,
+            0
+          ],
+          "hex": "#000000",
+          "name": "outline"
+        }
+      ]
+    },
+    {
+      "enemy_id": 29,
+      "enemy_name": "Shadow",
+      "rom_offset": "0x0481D0",
+      "colors": [
+        {
+          "index": 0,
+          "rgb": [
+            0,
+            0,
+            0
+          ],
+          "hex": "#000000",
+          "name": "transparent"
+        },
+        {
+          "index": 1,
+          "rgb": [
+            255,
+            255,
+            255
+          ],
+          "hex": "#FFFFFF",
+          "name": "primary"
+        },
+        {
+          "index": 2,
+          "rgb": [
+            255,
+            255,
+            0
+          ],
+          "hex": "#FFFF00",
+          "name": "secondary"
+        },
+        {
+          "index": 3,
+          "rgb": [
+            198,
+            115,
+            57
+          ],
+          "hex": "#C67339",
+          "name": "shadow"
+        },
+        {
+          "index": 4,
+          "rgb": [
+            165,
+            66,
+            0
+          ],
+          "hex": "#A54200",
+          "name": "dark"
+        },
+        {
+          "index": 5,
+          "rgb": [
+            90,
+            49,
+            0
+          ],
+          "hex": "#5A3100",
+          "name": "accent"
+        },
+        {
+          "index": 6,
+          "rgb": [
+            123,
+            165,
+            214
+          ],
+          "hex": "#7BA5D6",
+          "name": "highlight"
+        },
+        {
+          "index": 7,
+          "rgb": [
+            0,
+            0,
+            0
+          ],
+          "hex": "#000000",
+          "name": "outline"
+        }
+      ]
+    },
+    {
+      "enemy_id": 30,
+      "enemy_name": "Sphinx",
+      "rom_offset": "0x0481E0",
+      "colors": [
+        {
+          "index": 0,
+          "rgb": [
+            0,
+            0,
+            0
+          ],
+          "hex": "#000000",
+          "name": "transparent"
+        },
+        {
+          "index": 1,
+          "rgb": [
+            255,
+            255,
+            255
+          ],
+          "hex": "#FFFFFF",
+          "name": "primary"
+        },
+        {
+          "index": 2,
+          "rgb": [
+            99,
+            189,
+            255
+          ],
+          "hex": "#63BDFF",
+          "name": "secondary"
+        },
+        {
+          "index": 3,
+          "rgb": [
+            255,
+            148,
+            123
+          ],
+          "hex": "#FF947B",
+          "name": "shadow"
+        },
+        {
+          "index": 4,
+          "rgb": [
+            156,
+            132,
+            49
+          ],
+          "hex": "#9C8431",
+          "name": "dark"
+        },
+        {
+          "index": 5,
+          "rgb": [
+            49,
+            99,
+            0
+          ],
+          "hex": "#316300",
+          "name": "accent"
+        },
+        {
+          "index": 6,
+          "rgb": [
+            255,
+            0,
+            0
+          ],
+          "hex": "#FF0000",
+          "name": "highlight"
+        },
+        {
+          "index": 7,
+          "rgb": [
+            0,
+            0,
+            0
+          ],
+          "hex": "#000000",
+          "name": "outline"
+        }
+      ]
+    },
+    {
+      "enemy_id": 31,
+      "enemy_name": "Manticor",
+      "rom_offset": "0x0481F0",
+      "colors": [
+        {
+          "index": 0,
+          "rgb": [
+            0,
+            0,
+            0
+          ],
+          "hex": "#000000",
+          "name": "transparent"
+        },
+        {
+          "index": 1,
+          "rgb": [
+            255,
+            255,
+            255
+          ],
+          "hex": "#FFFFFF",
+          "name": "primary"
+        },
+        {
+          "index": 2,
+          "rgb": [
+            99,
+            189,
+            255
+          ],
+          "hex": "#63BDFF",
+          "name": "secondary"
+        },
+        {
+          "index": 3,
+          "rgb": [
+            90,
+            140,
+            181
+          ],
+          "hex": "#5A8CB5",
+          "name": "shadow"
+        },
+        {
+          "index": 4,
+          "rgb": [
+            90,
+            99,
+            99
+          ],
+          "hex": "#5A6363",
+          "name": "dark"
+        },
+        {
+          "index": 5,
+          "rgb": [
+            74,
+            49,
+            49
+          ],
+          "hex": "#4A3131",
+          "name": "accent"
+        },
+        {
+          "index": 6,
+          "rgb": [
+            255,
+            0,
+            0
+          ],
+          "hex": "#FF0000",
+          "name": "highlight"
+        },
+        {
+          "index": 7,
+          "rgb": [
+            0,
+            0,
+            0
+          ],
+          "hex": "#000000",
+          "name": "outline"
+        }
+      ]
+    },
+    {
+      "enemy_id": 32,
+      "enemy_name": "Centaur",
+      "rom_offset": "0x048200",
+      "colors": [
+        {
+          "index": 0,
+          "rgb": [
+            0,
+            0,
+            0
+          ],
+          "hex": "#000000",
+          "name": "transparent"
+        },
+        {
+          "index": 1,
+          "rgb": [
+            255,
+            255,
+            255
+          ],
+          "hex": "#FFFFFF",
+          "name": "primary"
+        },
+        {
+          "index": 2,
+          "rgb": [
+            148,
+            198,
+            255
+          ],
+          "hex": "#94C6FF",
+          "name": "secondary"
+        },
+        {
+          "index": 3,
+          "rgb": [
+            99,
+            165,
+            181
+          ],
+          "hex": "#63A5B5",
+          "name": "shadow"
+        },
+        {
+          "index": 4,
+          "rgb": [
+            49,
+            140,
+            99
+          ],
+          "hex": "#318C63",
+          "name": "dark"
+        },
+        {
+          "index": 5,
+          "rgb": [
+            107,
+            57,
+            173
+          ],
+          "hex": "#6B39AD",
+          "name": "accent"
+        },
+        {
+          "index": 6,
+          "rgb": [
+            57,
+            57,
+            115
+          ],
+          "hex": "#393973",
+          "name": "highlight"
+        },
+        {
+          "index": 7,
+          "rgb": [
+            0,
+            0,
+            0
+          ],
+          "hex": "#000000",
+          "name": "outline"
+        }
+      ]
+    },
+    {
+      "enemy_id": 33,
+      "enemy_name": "Nitemare",
+      "rom_offset": "0x048210",
+      "colors": [
+        {
+          "index": 0,
+          "rgb": [
+            0,
+            0,
+            0
+          ],
+          "hex": "#000000",
+          "name": "transparent"
+        },
+        {
+          "index": 1,
+          "rgb": [
+            148,
+            148,
+            181
+          ],
+          "hex": "#9494B5",
+          "name": "primary"
+        },
+        {
+          "index": 2,
+          "rgb": [
+            115,
+            115,
+            132
+          ],
+          "hex": "#737384",
+          "name": "secondary"
+        },
+        {
+          "index": 3,
+          "rgb": [
+            74,
+            74,
+            82
+          ],
+          "hex": "#4A4A52",
+          "name": "shadow"
+        },
+        {
+          "index": 4,
+          "rgb": [
+            57,
+            57,
+            57
+          ],
+          "hex": "#393939",
+          "name": "dark"
+        },
+        {
+          "index": 5,
+          "rgb": [
+            24,
+            24,
+            24
+          ],
+          "hex": "#181818",
+          "name": "accent"
+        },
+        {
+          "index": 6,
+          "rgb": [
+            0,
+            0,
+            0
+          ],
+          "hex": "#000000",
+          "name": "highlight"
+        },
+        {
+          "index": 7,
+          "rgb": [
+            0,
+            0,
+            0
+          ],
+          "hex": "#000000",
+          "name": "outline"
+        }
+      ]
+    },
+    {
+      "enemy_id": 34,
+      "enemy_name": "Stoney Roost",
+      "rom_offset": "0x048220",
+      "colors": [
+        {
+          "index": 0,
+          "rgb": [
+            0,
+            0,
+            0
+          ],
+          "hex": "#000000",
+          "name": "transparent"
+        },
+        {
+          "index": 1,
+          "rgb": [
+            255,
+            214,
+            206
+          ],
+          "hex": "#FFD6CE",
+          "name": "primary"
+        },
+        {
+          "index": 2,
+          "rgb": [
+            255,
+            99,
+            90
+          ],
+          "hex": "#FF635A",
+          "name": "secondary"
+        },
+        {
+          "index": 3,
+          "rgb": [
+            255,
+            0,
+            0
+          ],
+          "hex": "#FF0000",
+          "name": "shadow"
+        },
+        {
+          "index": 4,
+          "rgb": [
+            132,
+            33,
+            0
+          ],
+          "hex": "#842100",
+          "name": "dark"
+        },
+        {
+          "index": 5,
+          "rgb": [
+            66,
+            16,
+            0
+          ],
+          "hex": "#421000",
+          "name": "accent"
+        },
+        {
+          "index": 6,
+          "rgb": [
+            0,
+            206,
+            255
+          ],
+          "hex": "#00CEFF",
+          "name": "highlight"
+        },
+        {
+          "index": 7,
+          "rgb": [
+            0,
+            0,
+            0
+          ],
+          "hex": "#000000",
+          "name": "outline"
+        }
+      ]
+    },
+    {
+      "enemy_id": 35,
+      "enemy_name": "Hot Wings",
+      "rom_offset": "0x048230",
+      "colors": [
+        {
+          "index": 0,
+          "rgb": [
+            0,
+            0,
+            0
+          ],
+          "hex": "#000000",
+          "name": "transparent"
+        },
+        {
+          "index": 1,
+          "rgb": [
+            255,
+            255,
+            255
+          ],
+          "hex": "#FFFFFF",
+          "name": "primary"
+        },
+        {
+          "index": 2,
+          "rgb": [
+            214,
+            214,
+            173
+          ],
+          "hex": "#D6D6AD",
+          "name": "secondary"
+        },
+        {
+          "index": 3,
+          "rgb": [
+            165,
+            156,
+            107
+          ],
+          "hex": "#A59C6B",
+          "name": "shadow"
+        },
+        {
+          "index": 4,
+          "rgb": [
+            90,
+            82,
+            49
+          ],
+          "hex": "#5A5231",
+          "name": "dark"
+        },
+        {
+          "index": 5,
+          "rgb": [
+            49,
+            41,
+            16
+          ],
+          "hex": "#312910",
+          "name": "accent"
+        },
+        {
+          "index": 6,
+          "rgb": [
+            255,
+            0,
+            0
+          ],
+          "hex": "#FF0000",
+          "name": "highlight"
+        },
+        {
+          "index": 7,
+          "rgb": [
+            0,
+            0,
+            0
+          ],
+          "hex": "#000000",
+          "name": "outline"
+        }
+      ]
+    },
+    {
+      "enemy_id": 36,
+      "enemy_name": "Ghost",
+      "rom_offset": "0x048240",
+      "colors": [
+        {
+          "index": 0,
+          "rgb": [
+            0,
+            0,
+            0
+          ],
+          "hex": "#000000",
+          "name": "transparent"
+        },
+        {
+          "index": 1,
+          "rgb": [
+            255,
+            255,
+            255
+          ],
+          "hex": "#FFFFFF",
+          "name": "primary"
+        },
+        {
+          "index": 2,
+          "rgb": [
+            156,
+            156,
+            189
+          ],
+          "hex": "#9C9CBD",
+          "name": "secondary"
+        },
+        {
+          "index": 3,
+          "rgb": [
+            82,
+            82,
+            115
+          ],
+          "hex": "#525273",
+          "name": "shadow"
+        },
+        {
+          "index": 4,
+          "rgb": [
+            255,
+            255,
+            0
+          ],
+          "hex": "#FFFF00",
+          "name": "dark"
+        },
+        {
+          "index": 5,
+          "rgb": [
+            148,
+            90,
+            0
+          ],
+          "hex": "#945A00",
+          "name": "accent"
+        },
+        {
+          "index": 6,
+          "rgb": [
+            247,
+            0,
+            0
+          ],
+          "hex": "#F70000",
+          "name": "highlight"
+        },
+        {
+          "index": 7,
+          "rgb": [
+            0,
+            0,
+            0
+          ],
+          "hex": "#000000",
+          "name": "outline"
+        }
+      ]
+    },
+    {
+      "enemy_id": 37,
+      "enemy_name": "Spector",
+      "rom_offset": "0x048250",
+      "colors": [
+        {
+          "index": 0,
+          "rgb": [
+            0,
+            0,
+            0
+          ],
+          "hex": "#000000",
+          "name": "transparent"
+        },
+        {
+          "index": 1,
+          "rgb": [
+            255,
+            255,
+            255
+          ],
+          "hex": "#FFFFFF",
+          "name": "primary"
+        },
+        {
+          "index": 2,
+          "rgb": [
+            255,
+            115,
+            8
+          ],
+          "hex": "#FF7308",
+          "name": "secondary"
+        },
+        {
+          "index": 3,
+          "rgb": [
+            140,
+            0,
+            41
+          ],
+          "hex": "#8C0029",
+          "name": "shadow"
+        },
+        {
+          "index": 4,
+          "rgb": [
+            140,
+            189,
+            214
+          ],
+          "hex": "#8CBDD6",
+          "name": "dark"
+        },
+        {
+          "index": 5,
+          "rgb": [
+            74,
+            74,
+            82
+          ],
+          "hex": "#4A4A52",
+          "name": "accent"
+        },
+        {
+          "index": 6,
+          "rgb": [
+            0,
+            115,
+            0
+          ],
+          "hex": "#007300",
+          "name": "highlight"
+        },
+        {
+          "index": 7,
+          "rgb": [
+            0,
+            0,
+            0
+          ],
+          "hex": "#000000",
+          "name": "outline"
+        }
+      ]
+    },
+    {
+      "enemy_id": 38,
+      "enemy_name": "Gather",
+      "rom_offset": "0x048260",
+      "colors": [
+        {
+          "index": 0,
+          "rgb": [
+            0,
+            0,
+            0
+          ],
+          "hex": "#000000",
+          "name": "transparent"
+        },
+        {
+          "index": 1,
+          "rgb": [
+            255,
+            255,
+            255
+          ],
+          "hex": "#FFFFFF",
+          "name": "primary"
+        },
+        {
+          "index": 2,
+          "rgb": [
+            255,
+            181,
+            165
+          ],
+          "hex": "#FFB5A5",
+          "name": "secondary"
+        },
+        {
+          "index": 3,
+          "rgb": [
+            255,
+            107,
+            74
+          ],
+          "hex": "#FF6B4A",
+          "name": "shadow"
+        },
+        {
+          "index": 4,
+          "rgb": [
+            255,
+            0,
+            41
+          ],
+          "hex": "#FF0029",
+          "name": "dark"
+        },
+        {
+          "index": 5,
+          "rgb": [
+            132,
+            0,
+            0
+          ],
+          "hex": "#840000",
+          "name": "accent"
+        },
+        {
+          "index": 6,
+          "rgb": [
+            255,
+            255,
+            0
+          ],
+          "hex": "#FFFF00",
+          "name": "highlight"
+        },
+        {
+          "index": 7,
+          "rgb": [
+            0,
+            0,
+            0
+          ],
+          "hex": "#000000",
+          "name": "outline"
+        }
+      ]
+    },
+    {
+      "enemy_id": 39,
+      "enemy_name": "Beholder",
+      "rom_offset": "0x048270",
+      "colors": [
+        {
+          "index": 0,
+          "rgb": [
+            0,
+            0,
+            0
+          ],
+          "hex": "#000000",
+          "name": "transparent"
+        },
+        {
+          "index": 1,
+          "rgb": [
+            255,
+            255,
+            255
+          ],
+          "hex": "#FFFFFF",
+          "name": "primary"
+        },
+        {
+          "index": 2,
+          "rgb": [
+            255,
+            181,
+            165
+          ],
+          "hex": "#FFB5A5",
+          "name": "secondary"
+        },
+        {
+          "index": 3,
+          "rgb": [
+            165,
+            165,
+            123
+          ],
+          "hex": "#A5A57B",
+          "name": "shadow"
+        },
+        {
+          "index": 4,
+          "rgb": [
+            49,
+            156,
+            57
+          ],
+          "hex": "#319C39",
+          "name": "dark"
+        },
+        {
+          "index": 5,
+          "rgb": [
+            0,
+            90,
+            0
+          ],
+          "hex": "#005A00",
+          "name": "accent"
+        },
+        {
+          "index": 6,
+          "rgb": [
+            0,
+            255,
+            255
+          ],
+          "hex": "#00FFFF",
+          "name": "highlight"
+        },
+        {
+          "index": 7,
+          "rgb": [
+            0,
+            0,
+            0
+          ],
+          "hex": "#000000",
+          "name": "outline"
+        }
+      ]
+    },
+    {
+      "enemy_id": 40,
+      "enemy_name": "Fangpire",
+      "rom_offset": "0x048280",
+      "colors": [
+        {
+          "index": 0,
+          "rgb": [
+            0,
+            0,
+            0
+          ],
+          "hex": "#000000",
+          "name": "transparent"
+        },
+        {
+          "index": 1,
+          "rgb": [
+            255,
+            255,
+            255
+          ],
+          "hex": "#FFFFFF",
+          "name": "primary"
+        },
+        {
+          "index": 2,
+          "rgb": [
+            24,
+            198,
+            99
+          ],
+          "hex": "#18C663",
+          "name": "secondary"
+        },
+        {
+          "index": 3,
+          "rgb": [
+            0,
+            99,
+            16
+          ],
+          "hex": "#006310",
+          "name": "shadow"
+        },
+        {
+          "index": 4,
+          "rgb": [
+            247,
+            206,
+            0
+          ],
+          "hex": "#F7CE00",
+          "name": "dark"
+        },
+        {
+          "index": 5,
+          "rgb": [
+            132,
+            90,
+            0
+          ],
+          "hex": "#845A00",
+          "name": "accent"
+        },
+        {
+          "index": 6,
+          "rgb": [
+            173,
+            0,
+            0
+          ],
+          "hex": "#AD0000",
+          "name": "highlight"
+        },
+        {
+          "index": 7,
+          "rgb": [
+            0,
+            0,
+            0
+          ],
+          "hex": "#000000",
+          "name": "outline"
+        }
+      ]
+    },
+    {
+      "enemy_id": 41,
+      "enemy_name": "Vampire",
+      "rom_offset": "0x048290",
+      "colors": [
+        {
+          "index": 0,
+          "rgb": [
+            0,
+            0,
+            0
+          ],
+          "hex": "#000000",
+          "name": "transparent"
+        },
+        {
+          "index": 1,
+          "rgb": [
+            255,
+            255,
+            255
+          ],
+          "hex": "#FFFFFF",
+          "name": "primary"
+        },
+        {
+          "index": 2,
+          "rgb": [
+            132,
+            132,
+            132
+          ],
+          "hex": "#848484",
+          "name": "secondary"
+        },
+        {
+          "index": 3,
+          "rgb": [
+            90,
+            0,
+            0
+          ],
+          "hex": "#5A0000",
+          "name": "shadow"
+        },
+        {
+          "index": 4,
+          "rgb": [
+            115,
+            0,
+            181
+          ],
+          "hex": "#7300B5",
+          "name": "dark"
+        },
+        {
+          "index": 5,
+          "rgb": [
+            57,
+            0,
+            107
+          ],
+          "hex": "#39006B",
+          "name": "accent"
+        },
+        {
+          "index": 6,
+          "rgb": [
+            173,
+            0,
+            0
+          ],
+          "hex": "#AD0000",
+          "name": "highlight"
+        },
+        {
+          "index": 7,
+          "rgb": [
+            0,
+            0,
+            0
+          ],
+          "hex": "#000000",
+          "name": "outline"
+        }
+      ]
+    },
+    {
+      "enemy_id": 42,
+      "enemy_name": "Mage",
+      "rom_offset": "0x0482A0",
+      "colors": [
+        {
+          "index": 0,
+          "rgb": [
+            0,
+            0,
+            0
+          ],
+          "hex": "#000000",
+          "name": "transparent"
+        },
+        {
+          "index": 1,
+          "rgb": [
+            255,
+            255,
+            255
+          ],
+          "hex": "#FFFFFF",
+          "name": "primary"
+        },
+        {
+          "index": 2,
+          "rgb": [
+            132,
+            132,
+            132
+          ],
+          "hex": "#848484",
+          "name": "secondary"
+        },
+        {
+          "index": 3,
+          "rgb": [
+            90,
+            0,
+            0
+          ],
+          "hex": "#5A0000",
+          "name": "shadow"
+        },
+        {
+          "index": 4,
+          "rgb": [
+            115,
+            0,
+            181
+          ],
+          "hex": "#7300B5",
+          "name": "dark"
+        },
+        {
+          "index": 5,
+          "rgb": [
+            57,
+            0,
+            107
+          ],
+          "hex": "#39006B",
+          "name": "accent"
+        },
+        {
+          "index": 6,
+          "rgb": [
+            247,
+            206,
+            0
+          ],
+          "hex": "#F7CE00",
+          "name": "highlight"
+        },
+        {
+          "index": 7,
+          "rgb": [
+            0,
+            0,
+            0
+          ],
+          "hex": "#000000",
+          "name": "outline"
+        }
+      ]
+    },
+    {
+      "enemy_id": 43,
+      "enemy_name": "Sorcerer",
+      "rom_offset": "0x0482B0",
+      "colors": [
+        {
+          "index": 0,
+          "rgb": [
+            0,
+            0,
+            0
+          ],
+          "hex": "#000000",
+          "name": "transparent"
+        },
+        {
+          "index": 1,
+          "rgb": [
+            255,
+            255,
+            255
+          ],
+          "hex": "#FFFFFF",
+          "name": "primary"
+        },
+        {
+          "index": 2,
+          "rgb": [
+            148,
+            148,
+            148
+          ],
+          "hex": "#949494",
+          "name": "secondary"
+        },
+        {
+          "index": 3,
+          "rgb": [
+            74,
+            74,
+            74
+          ],
+          "hex": "#4A4A4A",
+          "name": "shadow"
+        },
+        {
+          "index": 4,
+          "rgb": [
+            247,
+            206,
+            0
+          ],
+          "hex": "#F7CE00",
+          "name": "dark"
+        },
+        {
+          "index": 5,
+          "rgb": [
+            181,
+            123,
+            0
+          ],
+          "hex": "#B57B00",
+          "name": "accent"
+        },
+        {
+          "index": 6,
+          "rgb": [
+            173,
+            0,
+            0
+          ],
+          "hex": "#AD0000",
+          "name": "highlight"
+        },
+        {
+          "index": 7,
+          "rgb": [
+            0,
+            0,
+            0
+          ],
+          "hex": "#000000",
+          "name": "outline"
+        }
+      ]
+    },
+    {
+      "enemy_id": 44,
+      "enemy_name": "Land Turtle",
+      "rom_offset": "0x0482C0",
+      "colors": [
+        {
+          "index": 0,
+          "rgb": [
+            66,
+            148,
+            66
+          ],
+          "hex": "#429442",
+          "name": "transparent"
+        },
+        {
+          "index": 1,
+          "rgb": [
+            0,
+            0,
+            0
+          ],
+          "hex": "#000000",
+          "name": "primary"
+        },
+        {
+          "index": 2,
+          "rgb": [
+            255,
+            255,
+            255
+          ],
+          "hex": "#FFFFFF",
+          "name": "secondary"
+        },
+        {
+          "index": 3,
+          "rgb": [
+            255,
+            255,
+            0
+          ],
+          "hex": "#FFFF00",
+          "name": "shadow"
+        },
+        {
+          "index": 4,
+          "rgb": [
+            255,
+            148,
+            66
+          ],
+          "hex": "#FF9442",
+          "name": "dark"
+        },
+        {
+          "index": 5,
+          "rgb": [
+            255,
+            8,
+            0
+          ],
+          "hex": "#FF0800",
+          "name": "accent"
+        },
+        {
+          "index": 6,
+          "rgb": [
+            99,
+            57,
+            0
+          ],
+          "hex": "#633900",
+          "name": "highlight"
+        },
+        {
+          "index": 7,
+          "rgb": [
+            115,
+            107,
+            90
+          ],
+          "hex": "#736B5A",
+          "name": "outline"
+        }
+      ]
+    },
+    {
+      "enemy_id": 45,
+      "enemy_name": "Sea Turtle",
+      "rom_offset": "0x0482D0",
+      "colors": [
+        {
+          "index": 0,
+          "rgb": [
+            66,
+            148,
+            66
+          ],
+          "hex": "#429442",
+          "name": "transparent"
+        },
+        {
+          "index": 1,
+          "rgb": [
+            49,
+            57,
+            74
+          ],
+          "hex": "#31394A",
+          "name": "primary"
+        },
+        {
+          "index": 2,
+          "rgb": [
+            181,
+            189,
+            181
+          ],
+          "hex": "#B5BDB5",
+          "name": "secondary"
+        },
+        {
+          "index": 3,
+          "rgb": [
+            222,
+            255,
+            255
+          ],
+          "hex": "#DEFFFF",
+          "name": "shadow"
+        },
+        {
+          "index": 4,
+          "rgb": [
+            156,
+            99,
+            0
+          ],
+          "hex": "#9C6300",
+          "name": "dark"
+        },
+        {
+          "index": 5,
+          "rgb": [
+            214,
+            173,
+            0
+          ],
+          "hex": "#D6AD00",
+          "name": "accent"
+        },
+        {
+          "index": 6,
+          "rgb": [
+            231,
+            222,
+            214
+          ],
+          "hex": "#E7DED6",
+          "name": "highlight"
+        },
+        {
+          "index": 7,
+          "rgb": [
+            255,
+            255,
+            255
+          ],
+          "hex": "#FFFFFF",
+          "name": "outline"
+        }
+      ]
+    },
+    {
+      "enemy_id": 46,
+      "enemy_name": "Stone Man",
+      "rom_offset": "0x0482E0",
+      "colors": [
+        {
+          "index": 0,
+          "rgb": [
+            66,
+            148,
+            66
+          ],
+          "hex": "#429442",
+          "name": "transparent"
+        },
+        {
+          "index": 1,
+          "rgb": [
+            16,
+            49,
+            41
+          ],
+          "hex": "#103129",
+          "name": "primary"
+        },
+        {
+          "index": 2,
+          "rgb": [
+            255,
+            255,
+            255
+          ],
+          "hex": "#FFFFFF",
+          "name": "secondary"
+        },
+        {
+          "index": 3,
+          "rgb": [
+            206,
+            206,
+            206
+          ],
+          "hex": "#CECECE",
+          "name": "shadow"
+        },
+        {
+          "index": 4,
+          "rgb": [
+            173,
+            173,
+            173
+          ],
+          "hex": "#ADADAD",
+          "name": "dark"
+        },
+        {
+          "index": 5,
+          "rgb": [
+            115,
+            115,
+            115
+          ],
+          "hex": "#737373",
+          "name": "accent"
+        },
+        {
+          "index": 6,
+          "rgb": [
+            255,
+            8,
+            33
+          ],
+          "hex": "#FF0821",
+          "name": "highlight"
+        },
+        {
+          "index": 7,
+          "rgb": [
+            82,
+            82,
+            82
+          ],
+          "hex": "#525252",
+          "name": "outline"
+        }
+      ]
+    },
+    {
+      "enemy_id": 47,
+      "enemy_name": "Lizard Man",
+      "rom_offset": "0x0482F0",
+      "colors": [
+        {
+          "index": 0,
+          "rgb": [
+            66,
+            148,
+            66
+          ],
+          "hex": "#429442",
+          "name": "transparent"
+        },
+        {
+          "index": 1,
+          "rgb": [
+            0,
+            0,
+            0
+          ],
+          "hex": "#000000",
+          "name": "primary"
+        },
+        {
+          "index": 2,
+          "rgb": [
+            255,
+            255,
+            255
+          ],
+          "hex": "#FFFFFF",
+          "name": "secondary"
+        },
+        {
+          "index": 3,
+          "rgb": [
+            198,
+            222,
+            255
+          ],
+          "hex": "#C6DEFF",
+          "name": "shadow"
+        },
+        {
+          "index": 4,
+          "rgb": [
+            132,
+            148,
+            255
+          ],
+          "hex": "#8494FF",
+          "name": "dark"
+        },
+        {
+          "index": 5,
+          "rgb": [
+            107,
+            107,
+            255
+          ],
+          "hex": "#6B6BFF",
+          "name": "accent"
+        },
+        {
+          "index": 6,
+          "rgb": [
+            82,
+            82,
+            132
+          ],
+          "hex": "#525284",
+          "name": "highlight"
+        },
+        {
+          "index": 7,
+          "rgb": [
+            255,
+            231,
+            0
+          ],
+          "hex": "#FFE700",
+          "name": "outline"
+        }
+      ]
+    },
+    {
+      "enemy_id": 48,
+      "enemy_name": "Wasp",
+      "rom_offset": "0x048300",
+      "colors": [
+        {
+          "index": 0,
+          "rgb": [
+            66,
+            148,
+            66
+          ],
+          "hex": "#429442",
+          "name": "transparent"
+        },
+        {
+          "index": 1,
+          "rgb": [
+            16,
+            41,
+            49
+          ],
+          "hex": "#102931",
+          "name": "primary"
+        },
+        {
+          "index": 2,
+          "rgb": [
+            255,
+            90,
+            156
+          ],
+          "hex": "#FF5A9C",
+          "name": "secondary"
+        },
+        {
+          "index": 3,
+          "rgb": [
+            66,
+            123,
+            255
+          ],
+          "hex": "#427BFF",
+          "name": "shadow"
+        },
+        {
+          "index": 4,
+          "rgb": [
+            198,
+            206,
+            255
+          ],
+          "hex": "#C6CEFF",
+          "name": "dark"
+        },
+        {
+          "index": 5,
+          "rgb": [
+            173,
+            173,
+            255
+          ],
+          "hex": "#ADADFF",
+          "name": "accent"
+        },
+        {
+          "index": 6,
+          "rgb": [
+            255,
+            255,
+            255
+          ],
+          "hex": "#FFFFFF",
+          "name": "highlight"
+        },
+        {
+          "index": 7,
+          "rgb": [
+            189,
+            90,
+            99
+          ],
+          "hex": "#BD5A63",
+          "name": "outline"
+        }
+      ]
+    },
+    {
+      "enemy_id": 49,
+      "enemy_name": "Fly Eye",
+      "rom_offset": "0x048310",
+      "colors": [
+        {
+          "index": 0,
+          "rgb": [
+            66,
+            148,
+            66
+          ],
+          "hex": "#429442",
+          "name": "transparent"
+        },
+        {
+          "index": 1,
+          "rgb": [
+            49,
+            57,
+            74
+          ],
+          "hex": "#31394A",
+          "name": "primary"
+        },
+        {
+          "index": 2,
+          "rgb": [
+            132,
+            132,
+            132
+          ],
+          "hex": "#848484",
+          "name": "secondary"
+        },
+        {
+          "index": 3,
+          "rgb": [
+            173,
+            173,
+            173
+          ],
+          "hex": "#ADADAD",
+          "name": "shadow"
+        },
+        {
+          "index": 4,
+          "rgb": [
+            181,
+            148,
+            0
+          ],
+          "hex": "#B59400",
+          "name": "dark"
+        },
+        {
+          "index": 5,
+          "rgb": [
+            165,
+            123,
+            0
+          ],
+          "hex": "#A57B00",
+          "name": "accent"
+        },
+        {
+          "index": 6,
+          "rgb": [
+            222,
+            222,
+            222
+          ],
+          "hex": "#DEDEDE",
+          "name": "highlight"
+        },
+        {
+          "index": 7,
+          "rgb": [
+            239,
+            247,
+            255
+          ],
+          "hex": "#EFF7FF",
+          "name": "outline"
+        }
+      ]
+    },
+    {
+      "enemy_id": 50,
+      "enemy_name": "Minotaur",
+      "rom_offset": "0x048320",
+      "colors": [
+        {
+          "index": 0,
+          "rgb": [
+            66,
+            148,
+            66
+          ],
+          "hex": "#429442",
+          "name": "transparent"
+        },
+        {
+          "index": 1,
+          "rgb": [
+            49,
+            57,
+            74
+          ],
+          "hex": "#31394A",
+          "name": "primary"
+        },
+        {
+          "index": 2,
+          "rgb": [
+            181,
+            189,
+            255
+          ],
+          "hex": "#B5BDFF",
+          "name": "secondary"
+        },
+        {
+          "index": 3,
+          "rgb": [
+            239,
+            247,
+            255
+          ],
+          "hex": "#EFF7FF",
+          "name": "shadow"
+        },
+        {
+          "index": 4,
+          "rgb": [
+            255,
+            57,
+            0
+          ],
+          "hex": "#FF3900",
+          "name": "dark"
+        },
+        {
+          "index": 5,
+          "rgb": [
+            239,
+            189,
+            0
+          ],
+          "hex": "#EFBD00",
+          "name": "accent"
+        },
+        {
+          "index": 6,
+          "rgb": [
+            115,
+            247,
+            107
+          ],
+          "hex": "#73F76B",
+          "name": "highlight"
+        },
+        {
+          "index": 7,
+          "rgb": [
+            189,
+            189,
+            206
+          ],
+          "hex": "#BDBDCE",
+          "name": "outline"
+        }
+      ]
+    },
+    {
+      "enemy_id": 51,
+      "enemy_name": "Medusa",
+      "rom_offset": "0x048330",
+      "colors": [
+        {
+          "index": 0,
+          "rgb": [
+            66,
+            148,
+            66
+          ],
+          "hex": "#429442",
+          "name": "transparent"
+        },
+        {
+          "index": 1,
+          "rgb": [
+            74,
+            74,
+            74
+          ],
+          "hex": "#4A4A4A",
+          "name": "primary"
+        },
+        {
+          "index": 2,
+          "rgb": [
+            148,
+            156,
+            148
+          ],
+          "hex": "#949C94",
+          "name": "secondary"
+        },
+        {
+          "index": 3,
+          "rgb": [
+            198,
+            206,
+            198
+          ],
+          "hex": "#C6CEC6",
+          "name": "shadow"
+        },
+        {
+          "index": 4,
+          "rgb": [
+            255,
+            255,
+            0
+          ],
+          "hex": "#FFFF00",
+          "name": "dark"
+        },
+        {
+          "index": 5,
+          "rgb": [
+            255,
+            123,
+            0
+          ],
+          "hex": "#FF7B00",
+          "name": "accent"
+        },
+        {
+          "index": 6,
+          "rgb": [
+            214,
+            0,
+            0
+          ],
+          "hex": "#D60000",
+          "name": "highlight"
+        },
+        {
+          "index": 7,
+          "rgb": [
+            115,
+            107,
+            90
+          ],
+          "hex": "#736B5A",
+          "name": "outline"
+        }
+      ]
+    },
+    {
+      "enemy_id": 52,
+      "enemy_name": "Ice Golem",
+      "rom_offset": "0x048340",
+      "colors": [
+        {
+          "index": 0,
+          "rgb": [
+            66,
+            148,
+            66
+          ],
+          "hex": "#429442",
+          "name": "transparent"
+        },
+        {
+          "index": 1,
+          "rgb": [
+            173,
+            140,
+            107
+          ],
+          "hex": "#AD8C6B",
+          "name": "primary"
+        },
+        {
+          "index": 2,
+          "rgb": [
+            132,
+            99,
+            66
+          ],
+          "hex": "#846342",
+          "name": "secondary"
+        },
+        {
+          "index": 3,
+          "rgb": [
+            255,
+            255,
+            0
+          ],
+          "hex": "#FFFF00",
+          "name": "shadow"
+        },
+        {
+          "index": 4,
+          "rgb": [
+            255,
+            181,
+            0
+          ],
+          "hex": "#FFB500",
+          "name": "dark"
+        },
+        {
+          "index": 5,
+          "rgb": [
+            255,
+            123,
+            0
+          ],
+          "hex": "#FF7B00",
+          "name": "accent"
+        },
+        {
+          "index": 6,
+          "rgb": [
+            99,
+            74,
+            57
+          ],
+          "hex": "#634A39",
+          "name": "highlight"
+        },
+        {
+          "index": 7,
+          "rgb": [
+            255,
+            0,
+            0
+          ],
+          "hex": "#FF0000",
+          "name": "outline"
+        }
+      ]
+    },
+    {
+      "enemy_id": 53,
+      "enemy_name": "Fire Golem",
+      "rom_offset": "0x048350",
+      "colors": [
+        {
+          "index": 0,
+          "rgb": [
+            66,
+            148,
+            66
+          ],
+          "hex": "#429442",
+          "name": "transparent"
+        },
+        {
+          "index": 1,
+          "rgb": [
+            33,
+            33,
+            33
+          ],
+          "hex": "#212121",
+          "name": "primary"
+        },
+        {
+          "index": 2,
+          "rgb": [
+            107,
+            74,
+            156
+          ],
+          "hex": "#6B4A9C",
+          "name": "secondary"
+        },
+        {
+          "index": 3,
+          "rgb": [
+            123,
+            107,
+            189
+          ],
+          "hex": "#7B6BBD",
+          "name": "shadow"
+        },
+        {
+          "index": 4,
+          "rgb": [
+            206,
+            206,
+            255
+          ],
+          "hex": "#CECEFF",
+          "name": "dark"
+        },
+        {
+          "index": 5,
+          "rgb": [
+            255,
+            255,
+            255
+          ],
+          "hex": "#FFFFFF",
+          "name": "accent"
+        },
+        {
+          "index": 6,
+          "rgb": [
+            255,
+            231,
+            0
+          ],
+          "hex": "#FFE700",
+          "name": "highlight"
+        },
+        {
+          "index": 7,
+          "rgb": [
+            156,
+            173,
+            222
+          ],
+          "hex": "#9CADDE",
+          "name": "outline"
+        }
+      ]
+    },
+    {
+      "enemy_id": 54,
+      "enemy_name": "Jinn",
+      "rom_offset": "0x048360",
+      "colors": [
+        {
+          "index": 0,
+          "rgb": [
+            66,
+            148,
+            66
+          ],
+          "hex": "#429442",
+          "name": "transparent"
+        },
+        {
+          "index": 1,
+          "rgb": [
+            33,
+            33,
+            33
+          ],
+          "hex": "#212121",
+          "name": "primary"
+        },
+        {
+          "index": 2,
+          "rgb": [
+            239,
+            173,
+            132
+          ],
+          "hex": "#EFAD84",
+          "name": "secondary"
+        },
+        {
+          "index": 3,
+          "rgb": [
+            214,
+            148,
+            99
+          ],
+          "hex": "#D69463",
+          "name": "shadow"
+        },
+        {
+          "index": 4,
+          "rgb": [
+            255,
+            222,
+            0
+          ],
+          "hex": "#FFDE00",
+          "name": "dark"
+        },
+        {
+          "index": 5,
+          "rgb": [
+            239,
+            181,
+            0
+          ],
+          "hex": "#EFB500",
+          "name": "accent"
+        },
+        {
+          "index": 6,
+          "rgb": [
+            222,
+            231,
+            247
+          ],
+          "hex": "#DEE7F7",
+          "name": "highlight"
+        },
+        {
+          "index": 7,
+          "rgb": [
+            198,
+            206,
+            247
+          ],
+          "hex": "#C6CEF7",
+          "name": "outline"
+        }
+      ]
+    },
+    {
+      "enemy_id": 55,
+      "enemy_name": "Cockatrice",
+      "rom_offset": "0x048370",
+      "colors": [
+        {
+          "index": 0,
+          "rgb": [
+            66,
+            148,
+            66
+          ],
+          "hex": "#429442",
+          "name": "transparent"
+        },
+        {
+          "index": 1,
+          "rgb": [
+            0,
+            0,
+            0
+          ],
+          "hex": "#000000",
+          "name": "primary"
+        },
+        {
+          "index": 2,
+          "rgb": [
+            0,
+            255,
+            148
+          ],
+          "hex": "#00FF94",
+          "name": "secondary"
+        },
+        {
+          "index": 3,
+          "rgb": [
+            0,
+            214,
+            82
+          ],
+          "hex": "#00D652",
+          "name": "shadow"
+        },
+        {
+          "index": 4,
+          "rgb": [
+            0,
+            239,
+            0
+          ],
+          "hex": "#00EF00",
+          "name": "dark"
+        },
+        {
+          "index": 5,
+          "rgb": [
+            0,
+            0,
+            0
+          ],
+          "hex": "#000000",
+          "name": "accent"
+        },
+        {
+          "index": 6,
+          "rgb": [
+            0,
+            0,
+            0
+          ],
+          "hex": "#000000",
+          "name": "highlight"
+        },
+        {
+          "index": 7,
+          "rgb": [
+            255,
+            255,
+            255
+          ],
+          "hex": "#FFFFFF",
+          "name": "outline"
+        }
+      ]
+    },
+    {
+      "enemy_id": 56,
+      "enemy_name": "Thunder Eye",
+      "rom_offset": "0x048380",
+      "colors": [
+        {
+          "index": 0,
+          "rgb": [
+            66,
+            148,
+            66
+          ],
+          "hex": "#429442",
+          "name": "transparent"
+        },
+        {
+          "index": 1,
+          "rgb": [
+            0,
+            0,
+            0
+          ],
+          "hex": "#000000",
+          "name": "primary"
+        },
+        {
+          "index": 2,
+          "rgb": [
+            0,
+            0,
+            0
+          ],
+          "hex": "#000000",
+          "name": "secondary"
+        },
+        {
+          "index": 3,
+          "rgb": [
+            255,
+            0,
+            0
+          ],
+          "hex": "#FF0000",
+          "name": "shadow"
+        },
+        {
+          "index": 4,
+          "rgb": [
+            255,
+            255,
+            255
+          ],
+          "hex": "#FFFFFF",
+          "name": "dark"
+        },
+        {
+          "index": 5,
+          "rgb": [
+            198,
+            222,
+            255
+          ],
+          "hex": "#C6DEFF",
+          "name": "accent"
+        },
+        {
+          "index": 6,
+          "rgb": [
+            132,
+            148,
+            255
+          ],
+          "hex": "#8494FF",
+          "name": "highlight"
+        },
+        {
+          "index": 7,
+          "rgb": [
+            0,
+            0,
+            0
+          ],
+          "hex": "#000000",
+          "name": "outline"
+        }
+      ]
+    },
+    {
+      "enemy_id": 57,
+      "enemy_name": "Doom Eye",
+      "rom_offset": "0x048390",
+      "colors": [
+        {
+          "index": 0,
+          "rgb": [
+            66,
+            148,
+            66
+          ],
+          "hex": "#429442",
+          "name": "transparent"
+        },
+        {
+          "index": 1,
+          "rgb": [
+            0,
+            0,
+            0
+          ],
+          "hex": "#000000",
+          "name": "primary"
+        },
+        {
+          "index": 2,
+          "rgb": [
+            173,
+            140,
+            0
+          ],
+          "hex": "#AD8C00",
+          "name": "secondary"
+        },
+        {
+          "index": 3,
+          "rgb": [
+            222,
+            181,
+            0
+          ],
+          "hex": "#DEB500",
+          "name": "shadow"
+        },
+        {
+          "index": 4,
+          "rgb": [
+            0,
+            156,
+            115
+          ],
+          "hex": "#009C73",
+          "name": "dark"
+        },
+        {
+          "index": 5,
+          "rgb": [
+            0,
+            189,
+            148
+          ],
+          "hex": "#00BD94",
+          "name": "accent"
+        },
+        {
+          "index": 6,
+          "rgb": [
+            247,
+            214,
+            0
+          ],
+          "hex": "#F7D600",
+          "name": "highlight"
+        },
+        {
+          "index": 7,
+          "rgb": [
+            255,
+            255,
+            255
+          ],
+          "hex": "#FFFFFF",
+          "name": "outline"
+        }
+      ]
+    },
+    {
+      "enemy_id": 58,
+      "enemy_name": "Succubus",
+      "rom_offset": "0x0483A0",
+      "colors": [
+        {
+          "index": 0,
+          "rgb": [
+            66,
+            148,
+            66
+          ],
+          "hex": "#429442",
+          "name": "transparent"
+        },
+        {
+          "index": 1,
+          "rgb": [
+            0,
+            0,
+            0
+          ],
+          "hex": "#000000",
+          "name": "primary"
+        },
+        {
+          "index": 2,
+          "rgb": [
+            239,
+            0,
+            239
+          ],
+          "hex": "#EF00EF",
+          "name": "secondary"
+        },
+        {
+          "index": 3,
+          "rgb": [
+            0,
+            99,
+            255
+          ],
+          "hex": "#0063FF",
+          "name": "shadow"
+        },
+        {
+          "index": 4,
+          "rgb": [
+            239,
+            0,
+            239
+          ],
+          "hex": "#EF00EF",
+          "name": "dark"
+        },
+        {
+          "index": 5,
+          "rgb": [
+            173,
+            0,
+            173
+          ],
+          "hex": "#AD00AD",
+          "name": "accent"
+        },
+        {
+          "index": 6,
+          "rgb": [
+            107,
+            74,
+            156
+          ],
+          "hex": "#6B4A9C",
+          "name": "highlight"
+        },
+        {
+          "index": 7,
+          "rgb": [
+            173,
+            0,
+            173
+          ],
+          "hex": "#AD00AD",
+          "name": "outline"
+        }
+      ]
+    },
+    {
+      "enemy_id": 59,
+      "enemy_name": "Freeze Crab",
+      "rom_offset": "0x0483B0",
+      "colors": [
+        {
+          "index": 0,
+          "rgb": [
+            66,
+            148,
+            66
+          ],
+          "hex": "#429442",
+          "name": "transparent"
+        },
+        {
+          "index": 1,
+          "rgb": [
+            33,
+            33,
+            33
+          ],
+          "hex": "#212121",
+          "name": "primary"
+        },
+        {
+          "index": 2,
+          "rgb": [
+            206,
+            206,
+            206
+          ],
+          "hex": "#CECECE",
+          "name": "secondary"
+        },
+        {
+          "index": 3,
+          "rgb": [
+            173,
+            173,
+            173
+          ],
+          "hex": "#ADADAD",
+          "name": "shadow"
+        },
+        {
+          "index": 4,
+          "rgb": [
+            132,
+            132,
+            132
+          ],
+          "hex": "#848484",
+          "name": "dark"
+        },
+        {
+          "index": 5,
+          "rgb": [
+            206,
+            206,
+            206
+          ],
+          "hex": "#CECECE",
+          "name": "accent"
+        },
+        {
+          "index": 6,
+          "rgb": [
+            173,
+            173,
+            173
+          ],
+          "hex": "#ADADAD",
+          "name": "highlight"
+        },
+        {
+          "index": 7,
+          "rgb": [
+            132,
+            132,
+            132
+          ],
+          "hex": "#848484",
+          "name": "outline"
+        }
+      ]
+    },
+    {
+      "enemy_id": 60,
+      "enemy_name": "Gemini Crest (L)",
+      "rom_offset": "0x0483C0",
+      "colors": [
+        {
+          "index": 0,
+          "rgb": [
+            0,
+            0,
+            181
+          ],
+          "hex": "#0000B5",
+          "name": "transparent"
+        },
+        {
+          "index": 1,
+          "rgb": [
+            255,
+            255,
+            255
+          ],
+          "hex": "#FFFFFF",
+          "name": "primary"
+        },
+        {
+          "index": 2,
+          "rgb": [
+            148,
+            198,
+            255
+          ],
+          "hex": "#94C6FF",
+          "name": "secondary"
+        },
+        {
+          "index": 3,
+          "rgb": [
+            99,
+            165,
+            181
+          ],
+          "hex": "#63A5B5",
+          "name": "shadow"
+        },
+        {
+          "index": 4,
+          "rgb": [
+            49,
+            140,
+            99
+          ],
+          "hex": "#318C63",
+          "name": "dark"
+        },
+        {
+          "index": 5,
+          "rgb": [
+            107,
+            57,
+            173
+          ],
+          "hex": "#6B39AD",
+          "name": "accent"
+        },
+        {
+          "index": 6,
+          "rgb": [
+            57,
+            57,
+            115
+          ],
+          "hex": "#393973",
+          "name": "highlight"
+        },
+        {
+          "index": 7,
+          "rgb": [
+            0,
+            0,
+            0
+          ],
+          "hex": "#000000",
+          "name": "outline"
+        }
+      ]
+    },
+    {
+      "enemy_id": 61,
+      "enemy_name": "Gemini Crest (R)",
+      "rom_offset": "0x0483D0",
+      "colors": [
+        {
+          "index": 0,
+          "rgb": [
+            0,
+            0,
+            181
+          ],
+          "hex": "#0000B5",
+          "name": "transparent"
+        },
+        {
+          "index": 1,
+          "rgb": [
+            148,
+            148,
+            181
+          ],
+          "hex": "#9494B5",
+          "name": "primary"
+        },
+        {
+          "index": 2,
+          "rgb": [
+            115,
+            115,
+            132
+          ],
+          "hex": "#737384",
+          "name": "secondary"
+        },
+        {
+          "index": 3,
+          "rgb": [
+            74,
+            74,
+            82
+          ],
+          "hex": "#4A4A52",
+          "name": "shadow"
+        },
+        {
+          "index": 4,
+          "rgb": [
+            57,
+            57,
+            57
+          ],
+          "hex": "#393939",
+          "name": "dark"
+        },
+        {
+          "index": 5,
+          "rgb": [
+            24,
+            24,
+            24
+          ],
+          "hex": "#181818",
+          "name": "accent"
+        },
+        {
+          "index": 6,
+          "rgb": [
+            0,
+            0,
+            0
+          ],
+          "hex": "#000000",
+          "name": "highlight"
+        },
+        {
+          "index": 7,
+          "rgb": [
+            0,
+            0,
+            0
+          ],
+          "hex": "#000000",
+          "name": "outline"
+        }
+      ]
+    },
+    {
+      "enemy_id": 62,
+      "enemy_name": "Pazuzu",
+      "rom_offset": "0x0483E0",
+      "colors": [
+        {
+          "index": 0,
+          "rgb": [
+            0,
+            0,
+            181
+          ],
+          "hex": "#0000B5",
+          "name": "transparent"
+        },
+        {
+          "index": 1,
+          "rgb": [
+            255,
+            214,
+            206
+          ],
+          "hex": "#FFD6CE",
+          "name": "primary"
+        },
+        {
+          "index": 2,
+          "rgb": [
+            255,
+            99,
+            90
+          ],
+          "hex": "#FF635A",
+          "name": "secondary"
+        },
+        {
+          "index": 3,
+          "rgb": [
+            255,
+            0,
+            0
+          ],
+          "hex": "#FF0000",
+          "name": "shadow"
+        },
+        {
+          "index": 4,
+          "rgb": [
+            132,
+            33,
+            0
+          ],
+          "hex": "#842100",
+          "name": "dark"
+        },
+        {
+          "index": 5,
+          "rgb": [
+            255,
+            255,
+            0
+          ],
+          "hex": "#FFFF00",
+          "name": "accent"
+        },
+        {
+          "index": 6,
+          "rgb": [
+            255,
+            107,
+            0
+          ],
+          "hex": "#FF6B00",
+          "name": "highlight"
+        },
+        {
+          "index": 7,
+          "rgb": [
+            0,
+            0,
+            0
+          ],
+          "hex": "#000000",
+          "name": "outline"
+        }
+      ]
+    },
+    {
+      "enemy_id": 63,
+      "enemy_name": "Sky Beast",
+      "rom_offset": "0x0483F0",
+      "colors": [
+        {
+          "index": 0,
+          "rgb": [
+            0,
+            0,
+            181
+          ],
+          "hex": "#0000B5",
+          "name": "transparent"
+        },
+        {
+          "index": 1,
+          "rgb": [
+            255,
+            255,
+            255
+          ],
+          "hex": "#FFFFFF",
+          "name": "primary"
+        },
+        {
+          "index": 2,
+          "rgb": [
+            214,
+            214,
+            173
+          ],
+          "hex": "#D6D6AD",
+          "name": "secondary"
+        },
+        {
+          "index": 3,
+          "rgb": [
+            165,
+            156,
+            107
+          ],
+          "hex": "#A59C6B",
+          "name": "shadow"
+        },
+        {
+          "index": 4,
+          "rgb": [
+            90,
+            82,
+            49
+          ],
+          "hex": "#5A5231",
+          "name": "dark"
+        },
+        {
+          "index": 5,
+          "rgb": [
+            0,
+            165,
+            255
+          ],
+          "hex": "#00A5FF",
+          "name": "accent"
+        },
+        {
+          "index": 6,
+          "rgb": [
+            0,
+            0,
+            255
+          ],
+          "hex": "#0000FF",
+          "name": "highlight"
+        },
+        {
+          "index": 7,
+          "rgb": [
+            0,
+            0,
+            0
+          ],
+          "hex": "#000000",
+          "name": "outline"
+        }
+      ]
+    },
+    {
+      "enemy_id": 64,
+      "enemy_name": "Captain",
+      "rom_offset": "0x048400",
+      "colors": [
+        {
+          "index": 0,
+          "rgb": [
+            0,
+            0,
+            181
+          ],
+          "hex": "#0000B5",
+          "name": "transparent"
+        },
+        {
+          "index": 1,
+          "rgb": [
+            255,
+            255,
+            255
+          ],
+          "hex": "#FFFFFF",
+          "name": "primary"
+        },
+        {
+          "index": 2,
+          "rgb": [
+            156,
+            156,
+            189
+          ],
+          "hex": "#9C9CBD",
+          "name": "secondary"
+        },
+        {
+          "index": 3,
+          "rgb": [
+            82,
+            82,
+            115
+          ],
+          "hex": "#525273",
+          "name": "shadow"
+        },
+        {
+          "index": 4,
+          "rgb": [
+            255,
+            255,
+            0
+          ],
+          "hex": "#FFFF00",
+          "name": "dark"
+        },
+        {
+          "index": 5,
+          "rgb": [
+            148,
+            90,
+            0
+          ],
+          "hex": "#945A00",
+          "name": "accent"
+        },
+        {
+          "index": 6,
+          "rgb": [
+            255,
+            0,
+            255
+          ],
+          "hex": "#FF00FF",
+          "name": "highlight"
+        },
+        {
+          "index": 7,
+          "rgb": [
+            0,
+            0,
+            0
+          ],
+          "hex": "#000000",
+          "name": "outline"
+        }
+      ]
+    },
+    {
+      "enemy_id": 65,
+      "enemy_name": "Hydra",
+      "rom_offset": "0x048410",
+      "colors": [
+        {
+          "index": 0,
+          "rgb": [
+            0,
+            0,
+            181
+          ],
+          "hex": "#0000B5",
+          "name": "transparent"
+        },
+        {
+          "index": 1,
+          "rgb": [
+            255,
+            255,
+            255
+          ],
+          "hex": "#FFFFFF",
+          "name": "primary"
+        },
+        {
+          "index": 2,
+          "rgb": [
+            0,
+            198,
+            165
+          ],
+          "hex": "#00C6A5",
+          "name": "secondary"
+        },
+        {
+          "index": 3,
+          "rgb": [
+            0,
+            99,
+            66
+          ],
+          "hex": "#006342",
+          "name": "shadow"
+        },
+        {
+          "index": 4,
+          "rgb": [
+            255,
+            255,
+            0
+          ],
+          "hex": "#FFFF00",
+          "name": "dark"
+        },
+        {
+          "index": 5,
+          "rgb": [
+            148,
+            90,
+            0
+          ],
+          "hex": "#945A00",
+          "name": "accent"
+        },
+        {
+          "index": 6,
+          "rgb": [
+            255,
+            0,
+            255
+          ],
+          "hex": "#FF00FF",
+          "name": "highlight"
+        },
+        {
+          "index": 7,
+          "rgb": [
+            0,
+            0,
+            0
+          ],
+          "hex": "#000000",
+          "name": "outline"
+        }
+      ]
+    },
+    {
+      "enemy_id": 66,
+      "enemy_name": "Squid Eye",
+      "rom_offset": "0x048420",
+      "colors": [
+        {
+          "index": 0,
+          "rgb": [
+            0,
+            0,
+            181
+          ],
+          "hex": "#0000B5",
+          "name": "transparent"
+        },
+        {
+          "index": 1,
+          "rgb": [
+            255,
+            255,
+            255
+          ],
+          "hex": "#FFFFFF",
+          "name": "primary"
+        },
+        {
+          "index": 2,
+          "rgb": [
+            255,
+            255,
+            0
+          ],
+          "hex": "#FFFF00",
+          "name": "secondary"
+        },
+        {
+          "index": 3,
+          "rgb": [
+            148,
+            90,
+            0
+          ],
+          "hex": "#945A00",
+          "name": "shadow"
+        },
+        {
+          "index": 4,
+          "rgb": [
+            148,
+            148,
+            148
+          ],
+          "hex": "#949494",
+          "name": "dark"
+        },
+        {
+          "index": 5,
+          "rgb": [
+            82,
+            82,
+            82
+          ],
+          "hex": "#525252",
+          "name": "accent"
+        },
+        {
+          "index": 6,
+          "rgb": [
+            255,
+            0,
+            0
+          ],
+          "hex": "#FF0000",
+          "name": "highlight"
+        },
+        {
+          "index": 7,
+          "rgb": [
+            0,
+            0,
+            0
+          ],
+          "hex": "#000000",
+          "name": "outline"
+        }
+      ]
+    },
+    {
+      "enemy_id": 67,
+      "enemy_name": "Libra Crest",
+      "rom_offset": "0x048430",
+      "colors": [
+        {
+          "index": 0,
+          "rgb": [
+            0,
+            0,
+            181
+          ],
+          "hex": "#0000B5",
+          "name": "transparent"
+        },
+        {
+          "index": 1,
+          "rgb": [
+            255,
+            255,
+            255
+          ],
+          "hex": "#FFFFFF",
+          "name": "primary"
+        },
+        {
+          "index": 2,
+          "rgb": [
+            255,
+            0,
+            255
+          ],
+          "hex": "#FF00FF",
+          "name": "secondary"
+        },
+        {
+          "index": 3,
+          "rgb": [
+            255,
+            0,
+            255
+          ],
+          "hex": "#FF00FF",
+          "name": "shadow"
+        },
+        {
+          "index": 4,
+          "rgb": [
+            255,
+            0,
+            255
+          ],
+          "hex": "#FF00FF",
+          "name": "dark"
+        },
+        {
+          "index": 5,
+          "rgb": [
+            255,
+            0,
+            255
+          ],
+          "hex": "#FF00FF",
+          "name": "accent"
+        },
+        {
+          "index": 6,
+          "rgb": [
+            255,
+            0,
+            255
+          ],
+          "hex": "#FF00FF",
+          "name": "highlight"
+        },
+        {
+          "index": 7,
+          "rgb": [
+            0,
+            0,
+            0
+          ],
+          "hex": "#000000",
+          "name": "outline"
+        }
+      ]
+    },
+    {
+      "enemy_id": 68,
+      "enemy_name": "Dullahan",
+      "rom_offset": "0x048440",
+      "colors": [
+        {
+          "index": 0,
+          "rgb": [
+            57,
+            148,
+            66
+          ],
+          "hex": "#399442",
+          "name": "transparent"
+        },
+        {
+          "index": 1,
+          "rgb": [
+            0,
+            0,
+            0
+          ],
+          "hex": "#000000",
+          "name": "primary"
+        },
+        {
+          "index": 2,
+          "rgb": [
+            255,
+            255,
+            255
+          ],
+          "hex": "#FFFFFF",
+          "name": "secondary"
+        },
+        {
+          "index": 3,
+          "rgb": [
+            123,
+            148,
+            123
+          ],
+          "hex": "#7B947B",
+          "name": "shadow"
+        },
+        {
+          "index": 4,
+          "rgb": [
+            82,
+            82,
+            82
+          ],
+          "hex": "#525252",
+          "name": "dark"
+        },
+        {
+          "index": 5,
+          "rgb": [
+            107,
+            107,
+            107
+          ],
+          "hex": "#6B6B6B",
+          "name": "accent"
+        },
+        {
+          "index": 6,
+          "rgb": [
+            66,
+            57,
+            66
+          ],
+          "hex": "#423942",
+          "name": "highlight"
+        },
+        {
+          "index": 7,
+          "rgb": [
+            123,
+            123,
+            123
+          ],
+          "hex": "#7B7B7B",
+          "name": "outline"
+        }
+      ]
+    },
+    {
+      "enemy_id": 69,
+      "enemy_name": "Dark Lord",
+      "rom_offset": "0x048450",
+      "colors": [
+        {
+          "index": 0,
+          "rgb": [
+            0,
+            0,
+            0
+          ],
+          "hex": "#000000",
+          "name": "transparent"
+        },
+        {
+          "index": 1,
+          "rgb": [
+            140,
+            140,
+            140
+          ],
+          "hex": "#8C8C8C",
+          "name": "primary"
+        },
+        {
+          "index": 2,
+          "rgb": [
+            214,
+            214,
+            214
+          ],
+          "hex": "#D6D6D6",
+          "name": "secondary"
+        },
+        {
+          "index": 3,
+          "rgb": [
+            99,
+            90,
+            99
+          ],
+          "hex": "#635A63",
+          "name": "shadow"
+        },
+        {
+          "index": 4,
+          "rgb": [
+            74,
+            66,
+            74
+          ],
+          "hex": "#4A424A",
+          "name": "dark"
+        },
+        {
+          "index": 5,
+          "rgb": [
+            57,
+            49,
+            57
+          ],
+          "hex": "#393139",
+          "name": "accent"
+        },
+        {
+          "index": 6,
+          "rgb": [
+            41,
+            33,
+            41
+          ],
+          "hex": "#292129",
+          "name": "highlight"
+        },
+        {
+          "index": 7,
+          "rgb": [
+            16,
+            16,
+            24
+          ],
+          "hex": "#101018",
+          "name": "outline"
+        }
+      ]
+    },
+    {
+      "enemy_id": 70,
+      "enemy_name": "Twinhead Wyvern",
+      "rom_offset": "0x048460",
+      "colors": [
+        {
+          "index": 0,
+          "rgb": [
+            173,
+            123,
+            8
+          ],
+          "hex": "#AD7B08",
+          "name": "transparent"
+        },
+        {
+          "index": 1,
+          "rgb": [
+            74,
+            0,
+            8
+          ],
+          "hex": "#4A0008",
+          "name": "primary"
+        },
+        {
+          "index": 2,
+          "rgb": [
+            0,
+            66,
+            239
+          ],
+          "hex": "#0042EF",
+          "name": "secondary"
+        },
+        {
+          "index": 3,
+          "rgb": [
+            41,
+            99,
+            16
+          ],
+          "hex": "#296310",
+          "name": "shadow"
+        },
+        {
+          "index": 4,
+          "rgb": [
+            24,
+            0,
+            0
+          ],
+          "hex": "#180000",
+          "name": "dark"
+        },
+        {
+          "index": 5,
+          "rgb": [
+            173,
+            123,
+            8
+          ],
+          "hex": "#AD7B08",
+          "name": "accent"
+        },
+        {
+          "index": 6,
+          "rgb": [
+            74,
+            66,
+            0
+          ],
+          "hex": "#4A4200",
+          "name": "highlight"
+        },
+        {
+          "index": 7,
+          "rgb": [
+            0,
+            66,
+            90
+          ],
+          "hex": "#00425A",
+          "name": "outline"
+        }
+      ]
+    },
+    {
+      "enemy_id": 71,
+      "enemy_name": "Lamia",
+      "rom_offset": "0x048470",
+      "colors": [
+        {
+          "index": 0,
+          "rgb": [
+            66,
+            99,
+            16
+          ],
+          "hex": "#426310",
+          "name": "transparent"
+        },
+        {
+          "index": 1,
+          "rgb": [
+            41,
+            0,
+            0
+          ],
+          "hex": "#290000",
+          "name": "primary"
+        },
+        {
+          "index": 2,
+          "rgb": [
+            107,
+            41,
+            16
+          ],
+          "hex": "#6B2910",
+          "name": "secondary"
+        },
+        {
+          "index": 3,
+          "rgb": [
+            74,
+            0,
+            41
+          ],
+          "hex": "#4A0029",
+          "name": "shadow"
+        },
+        {
+          "index": 4,
+          "rgb": [
+            0,
+            66,
+            90
+          ],
+          "hex": "#00425A",
+          "name": "dark"
+        },
+        {
+          "index": 5,
+          "rgb": [
+            66,
+            99,
+            16
+          ],
+          "hex": "#426310",
+          "name": "accent"
+        },
+        {
+          "index": 6,
+          "rgb": [
+            0,
+            0,
+            0
+          ],
+          "hex": "#000000",
+          "name": "highlight"
+        },
+        {
+          "index": 7,
+          "rgb": [
+            41,
+            132,
+            24
+          ],
+          "hex": "#298418",
+          "name": "outline"
+        }
+      ]
+    },
+    {
+      "enemy_id": 72,
+      "enemy_name": "Gargoyle",
+      "rom_offset": "0x048480",
+      "colors": [
+        {
+          "index": 0,
+          "rgb": [
+            74,
+            132,
+            0
+          ],
+          "hex": "#4A8400",
+          "name": "transparent"
+        },
+        {
+          "index": 1,
+          "rgb": [
+            0,
+            66,
+            8
+          ],
+          "hex": "#004208",
+          "name": "primary"
+        },
+        {
+          "index": 2,
+          "rgb": [
+            115,
+            99,
+            16
+          ],
+          "hex": "#736310",
+          "name": "secondary"
+        },
+        {
+          "index": 3,
+          "rgb": [
+            8,
+            0,
+            0
+          ],
+          "hex": "#080000",
+          "name": "shadow"
+        },
+        {
+          "index": 4,
+          "rgb": [
+            41,
+            132,
+            24
+          ],
+          "hex": "#298418",
+          "name": "dark"
+        },
+        {
+          "index": 5,
+          "rgb": [
+            74,
+            132,
+            8
+          ],
+          "hex": "#4A8408",
+          "name": "accent"
+        },
+        {
+          "index": 6,
+          "rgb": [
+            0,
+            66,
+            107
+          ],
+          "hex": "#00426B",
+          "name": "highlight"
+        },
+        {
+          "index": 7,
+          "rgb": [
+            140,
+            99,
+            16
+          ],
+          "hex": "#8C6310",
+          "name": "outline"
+        }
+      ]
+    },
+    {
+      "enemy_id": 73,
+      "enemy_name": "Gargoyle Statue",
+      "rom_offset": "0x048490",
+      "colors": [
+        {
+          "index": 0,
+          "rgb": [
+            90,
+            0,
+            0
+          ],
+          "hex": "#5A0000",
+          "name": "transparent"
+        },
+        {
+          "index": 1,
+          "rgb": [
+            173,
+            74,
+            33
+          ],
+          "hex": "#AD4A21",
+          "name": "primary"
+        },
+        {
+          "index": 2,
+          "rgb": [
+            74,
+            198,
+            8
+          ],
+          "hex": "#4AC608",
+          "name": "secondary"
+        },
+        {
+          "index": 3,
+          "rgb": [
+            0,
+            66,
+            107
+          ],
+          "hex": "#00426B",
+          "name": "shadow"
+        },
+        {
+          "index": 4,
+          "rgb": [
+            140,
+            99,
+            16
+          ],
+          "hex": "#8C6310",
+          "name": "dark"
+        },
+        {
+          "index": 5,
+          "rgb": [
+            74,
+            0,
+            0
+          ],
+          "hex": "#4A0000",
+          "name": "accent"
+        },
+        {
+          "index": 6,
+          "rgb": [
+            173,
+            82,
+            41
+          ],
+          "hex": "#AD5229",
+          "name": "highlight"
+        },
+        {
+          "index": 7,
+          "rgb": [
+            74,
+            0,
+            16
+          ],
+          "hex": "#4A0010",
+          "name": "outline"
+        }
+      ]
+    },
+    {
+      "enemy_id": 74,
+      "enemy_name": "Dullahan (Phoebe)",
+      "rom_offset": "0x0484A0",
+      "colors": [
+        {
+          "index": 0,
+          "rgb": [
+            0,
+            66,
+            173
+          ],
+          "hex": "#0042AD",
+          "name": "transparent"
+        },
+        {
+          "index": 1,
+          "rgb": [
+            173,
+            99,
+            16
+          ],
+          "hex": "#AD6310",
+          "name": "primary"
+        },
+        {
+          "index": 2,
+          "rgb": [
+            8,
+            0,
+            0
+          ],
+          "hex": "#080000",
+          "name": "secondary"
+        },
+        {
+          "index": 3,
+          "rgb": [
+            173,
+            82,
+            41
+          ],
+          "hex": "#AD5229",
+          "name": "shadow"
+        },
+        {
+          "index": 4,
+          "rgb": [
+            74,
+            198,
+            41
+          ],
+          "hex": "#4AC629",
+          "name": "dark"
+        },
+        {
+          "index": 5,
+          "rgb": [
+            0,
+            66,
+            140
+          ],
+          "hex": "#00428C",
+          "name": "accent"
+        },
+        {
+          "index": 6,
+          "rgb": [
+            206,
+            99,
+            16
+          ],
+          "hex": "#CE6310",
+          "name": "highlight"
+        },
+        {
+          "index": 7,
+          "rgb": [
+            132,
+            0,
+            0
+          ],
+          "hex": "#840000",
+          "name": "outline"
+        }
+      ]
+    },
+    {
+      "enemy_id": 75,
+      "enemy_name": "Dark Lord (Phoebe)",
+      "rom_offset": "0x0484B0",
+      "colors": [
+        {
+          "index": 0,
+          "rgb": [
+            41,
+            82,
+            49
+          ],
+          "hex": "#295231",
+          "name": "transparent"
+        },
+        {
+          "index": 1,
+          "rgb": [
+            74,
+            0,
+            16
+          ],
+          "hex": "#4A0010",
+          "name": "primary"
+        },
+        {
+          "index": 2,
+          "rgb": [
+            0,
+            66,
+            140
+          ],
+          "hex": "#00428C",
+          "name": "secondary"
+        },
+        {
+          "index": 3,
+          "rgb": [
+            206,
+            99,
+            16
+          ],
+          "hex": "#CE6310",
+          "name": "shadow"
+        },
+        {
+          "index": 4,
+          "rgb": [
+            140,
+            0,
+            0
+          ],
+          "hex": "#8C0000",
+          "name": "dark"
+        },
+        {
+          "index": 5,
+          "rgb": [
+            239,
+            115,
+            57
+          ],
+          "hex": "#EF7339",
+          "name": "accent"
+        },
+        {
+          "index": 6,
+          "rgb": [
+            74,
+            0,
+            0
+          ],
+          "hex": "#4A0000",
+          "name": "highlight"
+        },
+        {
+          "index": 7,
+          "rgb": [
+            0,
+            66,
+            189
+          ],
+          "hex": "#0042BD",
+          "name": "outline"
+        }
+      ]
+    },
+    {
+      "enemy_id": 76,
+      "enemy_name": "Medusa (Quest)",
+      "rom_offset": "0x0484C0",
+      "colors": [
+        {
+          "index": 0,
+          "rgb": [
+            239,
+            99,
+            16
+          ],
+          "hex": "#EF6310",
+          "name": "transparent"
+        },
+        {
+          "index": 1,
+          "rgb": [
+            82,
+            0,
+            0
+          ],
+          "hex": "#520000",
+          "name": "primary"
+        },
+        {
+          "index": 2,
+          "rgb": [
+            239,
+            115,
+            57
+          ],
+          "hex": "#EF7339",
+          "name": "secondary"
+        },
+        {
+          "index": 3,
+          "rgb": [
+            74,
+            0,
+            49
+          ],
+          "hex": "#4A0031",
+          "name": "shadow"
+        },
+        {
+          "index": 4,
+          "rgb": [
+            0,
+            66,
+            57
+          ],
+          "hex": "#004239",
+          "name": "dark"
+        },
+        {
+          "index": 5,
+          "rgb": [
+            8,
+            107,
+            16
+          ],
+          "hex": "#086B10",
+          "name": "accent"
+        },
+        {
+          "index": 6,
+          "rgb": [
+            148,
+            0,
+            0
+          ],
+          "hex": "#940000",
+          "name": "highlight"
+        },
+        {
+          "index": 7,
+          "rgb": [
+            239,
+            99,
+            66
+          ],
+          "hex": "#EF6342",
+          "name": "outline"
+        }
+      ]
+    },
+    {
+      "enemy_id": 77,
+      "enemy_name": "Stone Golem",
+      "rom_offset": "0x0484D0",
+      "colors": [
+        {
+          "index": 0,
+          "rgb": [
+            74,
+            198,
+            33
+          ],
+          "hex": "#4AC621",
+          "name": "transparent"
+        },
+        {
+          "index": 1,
+          "rgb": [
+            0,
+            66,
+            57
+          ],
+          "hex": "#004239",
+          "name": "primary"
+        },
+        {
+          "index": 2,
+          "rgb": [
+            8,
+            107,
+            16
+          ],
+          "hex": "#086B10",
+          "name": "secondary"
+        },
+        {
+          "index": 3,
+          "rgb": [
+            8,
+            0,
+            0
+          ],
+          "hex": "#080000",
+          "name": "shadow"
+        },
+        {
+          "index": 4,
+          "rgb": [
+            173,
+            165,
+            74
+          ],
+          "hex": "#ADA54A",
+          "name": "dark"
+        },
+        {
+          "index": 5,
+          "rgb": [
+            74,
+            0,
+            0
+          ],
+          "hex": "#4A0000",
+          "name": "accent"
+        },
+        {
+          "index": 6,
+          "rgb": [
+            0,
+            66,
+            41
+          ],
+          "hex": "#004229",
+          "name": "highlight"
+        },
+        {
+          "index": 7,
+          "rgb": [
+            49,
+            107,
+            16
+          ],
+          "hex": "#316B10",
+          "name": "outline"
+        }
+      ]
+    },
+    {
+      "enemy_id": 78,
+      "enemy_name": "Gorgon Bull",
+      "rom_offset": "0x0484E0",
+      "colors": [
+        {
+          "index": 0,
+          "rgb": [
+            189,
+            0,
+            0
+          ],
+          "hex": "#BD0000",
+          "name": "transparent"
+        },
+        {
+          "index": 1,
+          "rgb": [
+            41,
+            239,
+            82
+          ],
+          "hex": "#29EF52",
+          "name": "primary"
+        },
+        {
+          "index": 2,
+          "rgb": [
+            74,
+            0,
+            41
+          ],
+          "hex": "#4A0029",
+          "name": "secondary"
+        },
+        {
+          "index": 3,
+          "rgb": [
+            0,
+            66,
+            74
+          ],
+          "hex": "#00424A",
+          "name": "shadow"
+        },
+        {
+          "index": 4,
+          "rgb": [
+            90,
+            107,
+            16
+          ],
+          "hex": "#5A6B10",
+          "name": "dark"
+        },
+        {
+          "index": 5,
+          "rgb": [
+            107,
+            0,
+            0
+          ],
+          "hex": "#6B0000",
+          "name": "accent"
+        },
+        {
+          "index": 6,
+          "rgb": [
+            173,
+            206,
+            90
+          ],
+          "hex": "#ADCE5A",
+          "name": "highlight"
+        },
+        {
+          "index": 7,
+          "rgb": [
+            74,
+            0,
+            16
+          ],
+          "hex": "#4A0010",
+          "name": "outline"
+        }
+      ]
+    },
+    {
+      "enemy_id": 79,
+      "enemy_name": "Minotaur (Quest)",
+      "rom_offset": "0x0484F0",
+      "colors": [
+        {
+          "index": 0,
+          "rgb": [
+            0,
+            66,
+            107
+          ],
+          "hex": "#00426B",
+          "name": "transparent"
+        },
+        {
+          "index": 1,
+          "rgb": [
+            123,
+            107,
+            16
+          ],
+          "hex": "#7B6B10",
+          "name": "primary"
+        },
+        {
+          "index": 2,
+          "rgb": [
+            165,
+            0,
+            0
+          ],
+          "hex": "#A50000",
+          "name": "secondary"
+        },
+        {
+          "index": 3,
+          "rgb": [
+            41,
+            156,
+            99
+          ],
+          "hex": "#299C63",
+          "name": "shadow"
+        },
+        {
+          "index": 4,
+          "rgb": [
+            74,
+            0,
+            24
+          ],
+          "hex": "#4A0018",
+          "name": "dark"
+        },
+        {
+          "index": 5,
+          "rgb": [
+            0,
+            66,
+            206
+          ],
+          "hex": "#0042CE",
+          "name": "accent"
+        },
+        {
+          "index": 6,
+          "rgb": [
+            148,
+            107,
+            16
+          ],
+          "hex": "#946B10",
+          "name": "highlight"
+        },
+        {
+          "index": 7,
+          "rgb": [
+            165,
+            0,
+            0
+          ],
+          "hex": "#A50000",
+          "name": "outline"
+        }
+      ]
+    },
+    {
+      "enemy_id": 80,
+      "enemy_name": "Skullrus Rex",
+      "rom_offset": "0x048500",
+      "colors": [
+        {
+          "index": 0,
+          "rgb": [
+            107,
+            206,
+            107
+          ],
+          "hex": "#6BCE6B",
+          "name": "transparent"
+        },
+        {
+          "index": 1,
+          "rgb": [
+            74,
+            0,
+            24
+          ],
+          "hex": "#4A0018",
+          "name": "primary"
+        },
+        {
+          "index": 2,
+          "rgb": [
+            0,
+            66,
+            90
+          ],
+          "hex": "#00425A",
+          "name": "secondary"
+        },
+        {
+          "index": 3,
+          "rgb": [
+            189,
+            107,
+            16
+          ],
+          "hex": "#BD6B10",
+          "name": "shadow"
+        },
+        {
+          "index": 4,
+          "rgb": [
+            140,
+            0,
+            0
+          ],
+          "hex": "#8C0000",
+          "name": "dark"
+        },
+        {
+          "index": 5,
+          "rgb": [
+            41,
+            198,
+            115
+          ],
+          "hex": "#29C673",
+          "name": "accent"
+        },
+        {
+          "index": 6,
+          "rgb": [
+            74,
+            66,
+            33
+          ],
+          "hex": "#4A4221",
+          "name": "highlight"
+        },
+        {
+          "index": 7,
+          "rgb": [
+            0,
+            66,
+            8
+          ],
+          "hex": "#004208",
+          "name": "outline"
+        }
+      ]
+    },
+    {
+      "enemy_id": 81,
+      "enemy_name": "Dark King (Phase 1)",
+      "rom_offset": "0x048510",
+      "colors": [
+        {
+          "index": 0,
+          "rgb": [
+            222,
+            107,
+            16
+          ],
+          "hex": "#DE6B10",
+          "name": "transparent"
+        },
+        {
+          "index": 1,
+          "rgb": [
+            8,
+            0,
+            0
+          ],
+          "hex": "#080000",
+          "name": "primary"
+        },
+        {
+          "index": 2,
+          "rgb": [
+            239,
+            231,
+            123
+          ],
+          "hex": "#EFE77B",
+          "name": "secondary"
+        },
+        {
+          "index": 3,
+          "rgb": [
+            74,
+            0,
+            49
+          ],
+          "hex": "#4A0031",
+          "name": "shadow"
+        },
+        {
+          "index": 4,
+          "rgb": [
+            0,
+            66,
+            57
+          ],
+          "hex": "#004239",
+          "name": "dark"
+        },
+        {
+          "index": 5,
+          "rgb": [
+            255,
+            107,
+            16
+          ],
+          "hex": "#FF6B10",
+          "name": "accent"
+        },
+        {
+          "index": 6,
+          "rgb": [
+            0,
+            0,
+            0
+          ],
+          "hex": "#000000",
+          "name": "highlight"
+        },
+        {
+          "index": 7,
+          "rgb": [
+            107,
+            231,
+            132
+          ],
+          "hex": "#6BE784",
+          "name": "outline"
+        }
+      ]
+    },
+    {
+      "enemy_id": 82,
+      "enemy_name": "Dark King Spider",
+      "rom_offset": "0x048520",
+      "colors": [
+        {
+          "index": 0,
+          "rgb": [
+            74,
+            198,
+            8
+          ],
+          "hex": "#4AC608",
+          "name": "transparent"
+        },
+        {
+          "index": 1,
+          "rgb": [
+            0,
+            66,
+            24
+          ],
+          "hex": "#004218",
+          "name": "primary"
+        },
+        {
+          "index": 2,
+          "rgb": [
+            24,
+            115,
+            16
+          ],
+          "hex": "#187310",
+          "name": "secondary"
+        },
+        {
+          "index": 3,
+          "rgb": [
+            16,
+            0,
+            0
+          ],
+          "hex": "#100000",
+          "name": "shadow"
+        },
+        {
+          "index": 4,
+          "rgb": [
+            173,
+            255,
+            140
+          ],
+          "hex": "#ADFF8C",
+          "name": "dark"
+        },
+        {
+          "index": 5,
+          "rgb": [
+            74,
+            132,
+            16
+          ],
+          "hex": "#4A8410",
+          "name": "accent"
+        },
+        {
+          "index": 6,
+          "rgb": [
+            0,
+            66,
+            239
+          ],
+          "hex": "#0042EF",
+          "name": "highlight"
+        },
+        {
+          "index": 7,
+          "rgb": [
+            57,
+            115,
+            16
+          ],
+          "hex": "#397310",
+          "name": "outline"
+        }
+      ]
+    }
+  ]
+}

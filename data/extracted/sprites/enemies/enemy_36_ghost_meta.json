@@ -1,0 +1,22 @@
+{
+  "name": "enemy_36_ghost",
+  "enemy_id": 36,
+  "enemy_name": "Ghost",
+  "category": "enemy",
+  "format": "4BPP",
+  "rom_offset": "0x04BF9D",
+  "palette_offset": "0x048240",
+  "dimensions": {
+    "width_tiles": 6,
+    "height_tiles": 6,
+    "width_pixels": 48,
+    "height_pixels": 48
+  },
+  "num_tiles": 36,
+  "shares_graphics": true,
+  "shared_with": [
+    36,
+    37
+  ],
+  "notes": "Ghost (ID 36) - Palette from Bank 09"
+}

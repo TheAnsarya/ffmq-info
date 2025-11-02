@@ -1,0 +1,23 @@
+{
+  "name": "enemy_18_skeleton",
+  "enemy_id": 18,
+  "enemy_name": "Skeleton",
+  "category": "enemy",
+  "format": "4BPP",
+  "rom_offset": "0x049DDD",
+  "palette_offset": "0x048120",
+  "dimensions": {
+    "width_tiles": 6,
+    "height_tiles": 6,
+    "width_pixels": 48,
+    "height_pixels": 48
+  },
+  "num_tiles": 36,
+  "shares_graphics": true,
+  "shared_with": [
+    18,
+    19,
+    20
+  ],
+  "notes": "Skeleton (ID 18) - Palette from Bank 09"
+}
