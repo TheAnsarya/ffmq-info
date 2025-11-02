@@ -1416,29 +1416,29 @@ Menu_UpdateSelection_Copy:
 Input_CheckCancel:
 	lda.B #$10                           ;008B57|A910    |      ;
 	and.W $00d6                          ;008B59|2DD600  |0200D6;
-	beq CODE_008B67                      ;008B5C|F009    |008B67;
+	beq Input_CheckCancel_Return         ;008B5C|F009    |008B67;
 	rep #$30                             ;008B5E|C230    |      ;
 	lda.B $92                            ;008B60|A592    |000092;
 	and.W #$bfcf                         ;008B62|29CFBF  |      ;
 	sep #$30                             ;008B65|E230    |      ;
 ;      |        |      ;
-CODE_008B67:
+Input_CheckCancel_Return:
 	rts                                  ;008B67|60      |      ;
 ;      |        |      ;
 	rts                                  ;008B68|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
-CODE_008B69:
+Main_HandleFrame:
 	lda.W $00d2                          ;008B69|ADD200  |0000D2;
-	bne CODE_008B7A                      ;008B6C|D00C    |008B7A;
+	bne Main_HandleFrame_Jump            ;008B6C|D00C    |008B7A;
 	lda.W $00d7                          ;008B6E|ADD700  |0000D7;
-	bmi CODE_008B7A                      ;008B71|3007    |008B7A;
+	bmi Main_HandleFrame_Jump            ;008B71|3007    |008B7A;
 	jsl.L $00012f                        ;008B73|222F0100|00012F;
 	rep #$30                             ;008B77|C230    |      ;
 	rts                                  ;008B79|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
-CODE_008B7A:
+Main_HandleFrame_Jump:
 	phk                                  ;008B7A|4B      |      ;
 	pea.W LOOSE_OP_008B76                ;008B7B|F4768B  |008B76;
 	phk                                  ;008B7E|4B      |      ;
@@ -1448,62 +1448,62 @@ CODE_008B7A:
 	jml.W [$014c]                        ;008B85|DC4C01  |00014C;
 ;      |        |      ;
 ;      |        |      ;
-CODE_008B88:
+Main_HandleVBlank:
 	lda.W $00d2                          ;008B88|ADD200  |0000D2;
-	bne CODE_008B99                      ;008B8B|D00C    |008B99;
+	bne Main_HandleVBlank_Jump           ;008B8B|D00C    |008B99;
 	lda.W $00d7                          ;008B8D|ADD700  |0000D7;
-	bmi CODE_008B99                      ;008B90|3007    |008B99;
+	bmi Main_HandleVBlank_Jump           ;008B90|3007    |008B99;
 	jsl.L $00014f                        ;008B92|224F0100|00014F;
 	rep #$30                             ;008B96|C230    |      ;
 	rts                                  ;008B98|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
-CODE_008B99:
+Main_HandleVBlank_Jump:
 	phk                                  ;008B99|4B      |      ;
 	pea.W LOOSE_OP_008B95                ;008B9A|F4958B  |008B95;
 	jml.W [$015c]                        ;008B9D|DC5C01  |00015C;
 ;      |        |      ;
 ;      |        |      ;
-CODE_008BA0:
+Input_ReadController:
 	rep #$30                             ;008BA0|C230    |      ;
 	lda.W #$0000                         ;008BA2|A90000  |      ;
 	tcd                                  ;008BA5|5B      |      ;
 	lda.W #$0040                         ;008BA6|A94000  |      ;
 	and.W $00d6                          ;008BA9|2DD600  |0000D6;
-	bne CODE_008BFC                      ;008BAC|D04E    |008BFC;
+	bne Input_ReadController_Return      ;008BAC|D04E    |008BFC;
 	lda.B $92                            ;008BAE|A592    |000092;
 	sta.B $96                            ;008BB0|8596    |000096;
 	lda.W #$0008                         ;008BB2|A90800  |      ;
 	and.W $00d2                          ;008BB5|2DD200  |0000D2;
-	bne CODE_008BC7                      ;008BB8|D00D    |008BC7;
+	bne Input_ReadController_Limited     ;008BB8|D00D    |008BC7;
 	lda.W #$0004                         ;008BBA|A90400  |      ;
 	and.W $00db                          ;008BBD|2DDB00  |0000DB;
-	bne CODE_008BD2                      ;008BC0|D010    |008BD2;
+	bne Input_ReadController_MenuMode    ;008BC0|D010    |008BD2;
 	lda.W SNES_CNTRL1L                   ;008BC2|AD1842  |004218;
-	bra CODE_008BEA                      ;008BC5|8023    |008BEA;
+	bra Input_ReadController_Process     ;008BC5|8023    |008BEA;
 ;      |        |      ;
 ;      |        |      ;
-CODE_008BC7:
+Input_ReadController_Limited:
 	lda.W SNES_CNTRL1L                   ;008BC7|AD1842  |004218;
 	and.W #$fff0                         ;008BCA|29F0FF  |      ;
-	beq CODE_008BEA                      ;008BCD|F01B    |008BEA;
+	beq Input_ReadController_Process     ;008BCD|F01B    |008BEA;
 	jmp.W CODE_0092F0                    ;008BCF|4CF092  |0092F0;
 ;      |        |      ;
 ;      |        |      ;
-CODE_008BD2:
+Input_ReadController_MenuMode:
 	lda.W #$0002                         ;008BD2|A90200  |      ;
 	and.W $00d9                          ;008BD5|2DD900  |0000D9;
-	beq CODE_008BDF                      ;008BD8|F005    |008BDF;
+	beq Input_ReadController_MenuRead    ;008BD8|F005    |008BDF;
 	db $a9,$80,$00,$04,$90               ;008BDA|        |      ;
 ;      |        |      ;
-CODE_008BDF:
+Input_ReadController_MenuRead:
 	lda.W SNES_CNTRL1L                   ;008BDF|AD1842  |004218;
 	and.W #$fff0                         ;008BE2|29F0FF  |      ;
-	beq CODE_008BEA                      ;008BE5|F003    |008BEA;
+	beq Input_ReadController_Process     ;008BE5|F003    |008BEA;
 	jmp.W CODE_0092F6                    ;008BE7|4CF692  |0092F6;
 ;      |        |      ;
 ;      |        |      ;
-CODE_008BEA:
+Input_ReadController_Process:
 	ora.B $90                            ;008BEA|0590    |000090;
 	and.W #$fff0                         ;008BEC|29F0FF  |      ;
 	sta.B $94                            ;008BEF|8594    |000094;
@@ -1514,34 +1514,34 @@ CODE_008BEA:
 	stx.B $92                            ;008BF8|8692    |000092;
 	stz.B $90                            ;008BFA|6490    |000090;
 ;      |        |      ;
-CODE_008BFC:
+Input_ReadController_Return:
 	rts                                  ;008BFC|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
-CODE_008BFD:
+Input_ProcessRepeat:
 	stz.B $07                            ;008BFD|6407    |000007;
 	lda.B $94                            ;008BFF|A594    |000094;
-	bne CODE_008C13                      ;008C01|D010    |008C13;
+	bne Input_ProcessRepeat_NewPress     ;008C01|D010    |008C13;
 	lda.B $92                            ;008C03|A592    |000092;
-	beq CODE_008C12                      ;008C05|F00B    |008C12;
+	beq Input_ProcessRepeat_Return       ;008C05|F00B    |008C12;
 	dec.B $09                            ;008C07|C609    |000009;
-	bpl CODE_008C12                      ;008C09|1007    |008C12;
+	bpl Input_ProcessRepeat_Return       ;008C09|1007    |008C12;
 	sta.B $07                            ;008C0B|8507    |000007;
 	lda.W #$0005                         ;008C0D|A90500  |      ;
 	sta.B $09                            ;008C10|8509    |000009;
 ;      |        |      ;
-CODE_008C12:
+Input_ProcessRepeat_Return:
 	rts                                  ;008C12|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
-CODE_008C13:
+Input_ProcessRepeat_NewPress:
 	sta.B $07                            ;008C13|8507    |000007;
 	lda.W #$0019                         ;008C15|A91900  |      ;
 	sta.B $09                            ;008C18|8509    |000009;
 	rts                                  ;008C1A|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
-CODE_008C1B:
+Cursor_CalcPosition:
 	php                                  ;008C1B|08      |      ;
 	rep #$30                             ;008C1C|C230    |      ;
 	and.W #$00ff                         ;008C1E|29FF00  |      ;
@@ -1566,7 +1566,7 @@ CODE_008C1B:
 	rts                                  ;008C3C|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
-CODE_008C3D:
+Cursor_UpdateSprite:
 	php                                  ;008C3D|08      |      ;
 	sep #$30                             ;008C3E|E230    |      ;
 	ldx.W $1031                          ;008C40|AE3110  |001031;
@@ -1574,7 +1574,7 @@ CODE_008C3D:
 	beq UNREACH_008C81                   ;008C45|F03A    |008C81;
 	lda.B #$02                           ;008C47|A902    |      ;
 	and.W $00d8                          ;008C49|2DD800  |0000D8;
-	beq CODE_008C83                      ;008C4C|F035    |008C83;
+	beq Cursor_UpdateSprite_Field        ;008C4C|F035    |008C83;
 	lda.L DATA8_049800,x                 ;008C4E|BF009804|049800;
 	adc.B #$0a                           ;008C52|690A    |      ;
 	xba                                  ;008C54|EB      |      ;
@@ -1598,58 +1598,58 @@ CODE_008C3D:
 	sep #$20                             ;008C78|E220    |      ;
 	ldx.W #$17da                         ;008C7A|A2DA17  |      ;
 	lda.B #$7f                           ;008C7D|A97F    |      ;
-	bra CODE_008C9C                      ;008C7F|801B    |008C9C;
+	bra Cursor_UpdateSprite_SetAttr      ;008C7F|801B    |008C9C;
 ;      |        |      ;
 ;      |        |      ;
 UNREACH_008C81:
 	db $28,$60                           ;008C81|        |      ;
 ;      |        |      ;
-CODE_008C83:
+Cursor_UpdateSprite_Field:
 	lda.L DATA8_049800,x                 ;008C83|BF009804|049800;
 	asl a;008C87|0A      |      ;
 	asl a;008C88|0A      |      ;
 	sta.W $00f4                          ;008C89|8DF400  |0000F4;
 	rep #$10                             ;008C8C|C210    |      ;
 	lda.W $1031                          ;008C8E|AD3110  |001031;
-	jsr.W CODE_008D8A                    ;008C91|208A8D  |008D8A;
+	jsr.W Cursor_CalcTileIndex           ;008C91|208A8D  |008D8A;
 	stx.W $00f2                          ;008C94|8EF200  |0000F2;
 	ldx.W #$2d1a                         ;008C97|A21A2D  |      ;
 	lda.B #$7e                           ;008C9A|A97E    |      ;
 ;      |        |      ;
-CODE_008C9C:
+Cursor_UpdateSprite_SetAttr:
 	pha                                  ;008C9C|48      |      ;
 	lda.B #$04                           ;008C9D|A904    |      ;
 	and.W $00da                          ;008C9F|2DDA00  |0000DA;
-	beq CODE_008CC5                      ;008CA2|F021    |008CC5;
+	beq Cursor_UpdateSprite_Normal       ;008CA2|F021    |008CC5;
 	lda.W $0014                          ;008CA4|AD1400  |000014;
 	dec a;008CA7|3A      |      ;
-	beq CODE_008CC5                      ;008CA8|F01B    |008CC5;
+	beq Cursor_UpdateSprite_Normal       ;008CA8|F01B    |008CC5;
 	lda.B #$10                           ;008CAA|A910    |      ;
 	and.W $00da                          ;008CAC|2DDA00  |0000DA;
-	bne CODE_008CBB                      ;008CAF|D00A    |008CBB;
+	bne Cursor_UpdateSprite_Blink2       ;008CAF|D00A    |008CBB;
 	db $ab,$bd,$01,$00,$29,$e3,$09,$94,$80,$12;008CB1|        |      ;
 ;      |        |      ;
-CODE_008CBB:
+Cursor_UpdateSprite_Blink2:
 	plb                                  ;008CBB|AB      |      ;
 	lda.W $0001,x                        ;008CBC|BD0100  |7E0001;
 	and.B #$e3                           ;008CBF|29E3    |      ;
 	ora.B #$9c                           ;008CC1|099C    |      ;
-	bra CODE_008CCD                      ;008CC3|8008    |008CCD;
+	bra Cursor_UpdateSprite_SetPalette   ;008CC3|8008    |008CCD;
 ;      |        |      ;
 ;      |        |      ;
-CODE_008CC5:
+Cursor_UpdateSprite_Normal:
 	plb                                  ;008CC5|AB      |      ;
 	lda.W $0001,x                        ;008CC6|BD0100  |7E0001;
 	and.B #$e3                           ;008CC9|29E3    |      ;
 	ora.B #$88                           ;008CCB|0988    |      ;
 ;      |        |      ;
-CODE_008CCD:
+Cursor_UpdateSprite_SetPalette:
 	xba                                  ;008CCD|EB      |      ;
 	lda.L $001031                        ;008CCE|AF311000|001031;
 	cmp.B #$29                           ;008CD2|C929    |      ;
-	bcc CODE_008D11                      ;008CD4|903B    |008D11;
+	bcc Cursor_UpdateSprite_Simple       ;008CD4|903B    |008D11;
 	cmp.B #$2c                           ;008CD6|C92C    |      ;
-	beq CODE_008D11                      ;008CD8|F037    |008D11;
+	beq Cursor_UpdateSprite_Simple       ;008CD8|F037    |008D11;
 	lda.W $0001,x                        ;008CDA|BD0100  |7E0001;
 	and.B #$63                           ;008CDD|2963    |      ;
 	ora.B #$08                           ;008CDF|0908    |      ;
@@ -1659,10 +1659,10 @@ CODE_008CCD:
 	ldy.W #$ffff                         ;008CEB|A0FFFF  |      ;
 	sec                                  ;008CEE|38      |      ;
 ;      |        |      ;
-CODE_008CEF:
+Cursor_UpdateSprite_DigitLoop:
 	iny                                  ;008CEF|C8      |      ;
 	sbc.B #$0a                           ;008CF0|E90A    |      ;
-	bcs CODE_008CEF                      ;008CF2|B0FB    |008CEF;
+	bcs Cursor_UpdateSprite_DigitLoop    ;008CF2|B0FB    |008CEF;
 	adc.B #$8a                           ;008CF4|698A    |      ;
 	sta.W $0002,x                        ;008CF6|9D0200  |7E0002;
 	cpy.W #$0000                         ;008CF9|C00000  |      ;
@@ -1670,13 +1670,13 @@ CODE_008CEF:
 	tya                                  ;008CFE|98      |      ;
 	adc.B #$7f                           ;008CFF|697F    |      ;
 	sta.W $0000,x                        ;008D01|9D0000  |7E0000;
-	bra CODE_008D20                      ;008D04|801A    |008D20;
+	bra Cursor_UpdateSprite_Done         ;008D04|801A    |008D20;
 ;      |        |      ;
 ;      |        |      ;
 UNREACH_008D06:
 	db $a9,$45,$9d,$00,$00,$eb,$9d,$01,$00,$80,$0f;008D06|        |      ;
 ;      |        |      ;
-CODE_008D11:
+Cursor_UpdateSprite_Simple:
 	xba                                  ;008D11|EB      |      ;
 	sta.W $0001,x                        ;008D12|9D0100  |7E0001;
 	sta.W $0003,x                        ;008D15|9D0300  |7E0003;
@@ -1684,7 +1684,7 @@ CODE_008D11:
 	sta.W $0000,x                        ;008D1A|9D0000  |7E0000;
 	sta.W $0002,x                        ;008D1D|9D0200  |7E0002;
 ;      |        |      ;
-CODE_008D20:
+Cursor_UpdateSprite_Done:
 	phk                                  ;008D20|4B      |      ;
 	plb                                  ;008D21|AB      |      ;
 	lda.B #$80                           ;008D22|A980    |      ;
@@ -1693,15 +1693,15 @@ CODE_008D20:
 	rts                                  ;008D28|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
-CODE_008D29:
+Menu2_UpdateCursor:
 	php                                  ;008D29|08      |      ;
 	sep #$30                             ;008D2A|E230    |      ;
 	lda.B #$02                           ;008D2C|A902    |      ;
 	and.W $00d8                          ;008D2E|2DD800  |0000D8;
-	beq CODE_008D6C                      ;008D31|F039    |008D6C;
+	beq Menu2_UpdateCursor_Field         ;008D31|F039    |008D6C;
 	ldx.W $10b1                          ;008D33|AEB110  |0010B1;
 	cpx.B #$ff                           ;008D36|E0FF    |      ;
-	beq CODE_008D6A                      ;008D38|F030    |008D6A;
+	beq Menu2_UpdateCursor_Return        ;008D38|F030    |008D6A;
 	lda.L DATA8_049800,x                 ;008D3A|BF009804|049800;
 	adc.B #$0a                           ;008D3E|690A    |      ;
 	xba                                  ;008D40|EB      |      ;
@@ -1725,12 +1725,12 @@ CODE_008D29:
 	lda.W #$0080                         ;008D64|A98000  |      ;
 	tsb.W $00d4                          ;008D67|0CD400  |0000D4;
 ;      |        |      ;
-CODE_008D6A:
+Menu2_UpdateCursor_Return:
 	plp                                  ;008D6A|28      |      ;
 	rts                                  ;008D6B|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
-CODE_008D6C:
+Menu2_UpdateCursor_Field:
 	ldx.W $10b1                          ;008D6C|AEB110  |0010B1;
 	lda.L DATA8_049800,x                 ;008D6F|BF009804|049800;
 	asl a;008D73|0A      |      ;
@@ -1738,7 +1738,7 @@ CODE_008D6C:
 	sta.W $00f7                          ;008D75|8DF700  |0000F7;
 	rep #$10                             ;008D78|C210    |      ;
 	lda.W $10b1                          ;008D7A|ADB110  |0010B1;
-	jsr.W CODE_008D8A                    ;008D7D|208A8D  |008D8A;
+	jsr.W Cursor_CalcTileIndex           ;008D7D|208A8D  |008D8A;
 	stx.W $00f5                          ;008D80|8EF500  |0000F5;
 	lda.B #$80                           ;008D83|A980    |      ;
 	tsb.W $00d4                          ;008D85|0CD400  |0000D4;
@@ -1746,10 +1746,10 @@ CODE_008D6C:
 	rts                                  ;008D89|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
-CODE_008D8A:
+Cursor_CalcTileIndex:
 	cmp.B #$ff                           ;008D8A|C9FF    |      ;
 	beq UNREACH_008D93                   ;008D8C|F005    |008D93;
-	jsr.W CODE_008C1B                    ;008D8E|201B8C  |008C1B;
+	jsr.W Cursor_CalcPosition            ;008D8E|201B8C  |008C1B;
 	tax                                  ;008D91|AA      |      ;
 	rts                                  ;008D92|60      |      ;
 ;      |        |      ;
@@ -1759,14 +1759,14 @@ UNREACH_008D93:
 	lda.W $1031                          ;008D97|AD3110  |001031;
 	pha                                  ;008D9A|48      |      ;
 	lda.W #$0003                         ;008D9B|A90300  |      ;
-	jsr.W CODE_008DA8                    ;008D9E|20A88D  |008DA8;
+	jsr.W Menu_ValidateItem              ;008D9E|20A88D  |008DA8;
 	pla                                  ;008DA1|68      |      ;
 	sta.W $1031                          ;008DA2|8D3110  |001031;
 	sty.B $9e                            ;008DA5|849E    |00009E;
 	rts                                  ;008DA7|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
-CODE_008DA8:
+Menu_ValidateItem:
 	php                                  ;008DA8|08      |      ;
 	sep #$30                             ;008DA9|E230    |      ;
 	pha                                  ;008DAB|48      |      ;
@@ -1787,23 +1787,23 @@ CODE_008DA8:
 	sep #$10                             ;008DC4|E210    |      ;
 	lsr a;008DC6|4A      |      ;
 ;      |        |      ;
-CODE_008DC7:
+Menu_ValidateItem_Loop:
 	lsr a;008DC7|4A      |      ;
 	lsr a;008DC8|4A      |      ;
 	lsr a;008DC9|4A      |      ;
 	dex                                  ;008DCA|CA      |      ;
-	bne CODE_008DC7                      ;008DCB|D0FA    |008DC7;
+	bne Menu_ValidateItem_Loop           ;008DCB|D0FA    |008DC7;
 	lsr a;008DCD|4A      |      ;
-	bcs CODE_008DDA                      ;008DCE|B00A    |008DDA;
+	bcs Menu_ValidateItem_Invalid        ;008DCE|B00A    |008DDA;
 	dey                                  ;008DD0|88      |      ;
 	lsr a;008DD1|4A      |      ;
-	bcs CODE_008DDA                      ;008DD2|B006    |008DDA;
+	bcs Menu_ValidateItem_Invalid        ;008DD2|B006    |008DDA;
 	dey                                  ;008DD4|88      |      ;
 	lsr a;008DD5|4A      |      ;
-	bcs CODE_008DDA                      ;008DD6|B002    |008DDA;
+	bcs Menu_ValidateItem_Invalid        ;008DD6|B002    |008DDA;
 	ldy.B #$ff                           ;008DD8|A0FF    |      ;
 ;      |        |      ;
-CODE_008DDA:
+Menu_ValidateItem_Invalid:
 	sty.W $1031                          ;008DDA|8C3110  |021031;
 	plp                                  ;008DDD|28      |      ;
 	rts                                  ;008DDE|60      |      ;
