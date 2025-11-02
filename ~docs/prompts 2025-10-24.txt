@@ -482,7 +482,9 @@ go!
 continue doing as many renamings as you can
 bank_02 
 continue doing as many labels as you can
-continue doing as many labels as you can, but please timestamp your chat responses so I can see how long I have been waiting, etc
+yes do bank 0d! however, you've been stalling on the summaries - don't take so long, resume, continue doing as many labels as you can, but please timestamp your chat responses so I can see how long I have been waiting, etc
+no, do verbose summaries please, it was just taking much longer than usual. I restarted VSCode, so maybe it will be faster? continue onwards!
+
 
 
 
