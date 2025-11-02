@@ -26,9 +26,11 @@ OUTPUT_DIR = Path("data/extracted/attacks")
 CSV_OUTPUT = OUTPUT_DIR / "attacks.csv"
 JSON_OUTPUT = OUTPUT_DIR / "attacks.json"
 
+
 def rom_to_file_offset(bank, rom_addr):
     """Convert SNES ROM address to file offset (LoROM)."""
     return bank * 0x8000 + (rom_addr - 0x8000)
+
 
 def read_attacks(rom_data):
     """Extract all attack entries from ROM."""
@@ -56,6 +58,7 @@ def read_attacks(rom_data):
 
     return attacks
 
+
 def save_csv(attacks):
     """Save attacks to CSV file."""
     OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
@@ -70,6 +73,7 @@ def save_csv(attacks):
             writer.writerow(attack)
 
     print(f"✓ Saved {len(attacks)} attacks to {CSV_OUTPUT}")
+
 
 def save_json(attacks):
     """Save attacks to JSON file."""
@@ -93,6 +97,7 @@ def save_json(attacks):
 
     print(f"✓ Saved {len(attacks)} attacks to {JSON_OUTPUT}")
 
+
 def main():
     if not ROM_PATH.exists():
         print(f"✗ Error: ROM file not found at {ROM_PATH}")
@@ -103,7 +108,10 @@ def main():
     rom_data = ROM_PATH.read_bytes()
 
     file_offset = rom_to_file_offset(ATTACK_DATA_BANK, ATTACK_DATA_ROM)
-    print(f"Extracting {ATTACK_COUNT} attacks from Bank ${ATTACK_DATA_BANK:02X}, ROM ${ATTACK_DATA_ROM:04X}")
+    print(
+        f"Extracting {ATTACK_COUNT} attacks from Bank ${
+            ATTACK_DATA_BANK:02X}, ROM ${
+            ATTACK_DATA_ROM:04X}")
     print(f"  File offset: ${file_offset:06X}")
     attacks = read_attacks(rom_data)
 
@@ -115,9 +123,11 @@ def main():
     print(f"\n📊 Attack Statistics:")
     print(f"   Total attacks: {len(attacks)}")
     print(f"   Power range: {min(powers)} - {max(powers)}")
-    print(f"   Unique attack types: {len(set(a['attack_type'] for a in attacks))}")
+    print(
+        f"   Unique attack types: {len(set(a['attack_type'] for a in attacks))}")
     print(f"   Unique sounds: {len(set(a['attack_sound'] for a in attacks))}")
     print(f"\n✓ Extraction complete!")
+
 
 if __name__ == "__main__":
     main()

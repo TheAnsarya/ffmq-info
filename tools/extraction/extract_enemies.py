@@ -8,7 +8,10 @@
 #
 # LoROM file offset formula: bank * 0x8000 + (rom_addr - 0x8000)
 
-import sys, struct, csv, json
+import sys
+import struct
+import csv
+import json
 from pathlib import Path
 
 ELEMENT_TYPES = {
@@ -37,9 +40,11 @@ ENEMY_NAMES = [
     "Dark King Spider"
 ]
 
+
 def rom_to_file_offset(bank, rom_addr):
     """Convert SNES ROM address to file offset (LoROM)."""
     return bank * 0x8000 + (rom_addr - 0x8000)
+
 
 # ROM addresses (SNES CPU addresses)
 ENEMY_STATS_BANK = 0x02
@@ -47,8 +52,10 @@ ENEMY_STATS_ROM = 0xC275
 ENEMY_LEVEL_BANK = 0x02
 ENEMY_LEVEL_ROM = 0xC17C
 
+
 def decode_elements(value):
     return [name for bit, name in ELEMENT_TYPES.items() if value & bit]
+
 
 rom_path = Path("roms/Final Fantasy - Mystic Quest (U) (V1.1).sfc")
 with open(rom_path, 'rb') as f:
@@ -62,36 +69,68 @@ for i in range(83):
     stats_addr = rom_to_file_offset(ENEMY_STATS_BANK, ENEMY_STATS_ROM + i * 14)
     level_addr = rom_to_file_offset(ENEMY_LEVEL_BANK, ENEMY_LEVEL_ROM + i * 3)
 
-    s = rom[stats_addr:stats_addr+14]
-    l = rom[level_addr:level_addr+3]
+    s = rom[stats_addr:stats_addr + 14]
+    l = rom[level_addr:level_addr + 3]
 
     hp = struct.unpack('<H', s[0:2])[0]
     resist = struct.unpack('<H', s[6:8])[0]
     weak = s[12] * 0x100
 
-    enemies.append({
-        'id': i, 'name': ENEMY_NAMES[i], 'hp': hp,
-        'attack': s[2], 'defense': s[3], 'speed': s[4], 'magic': s[5],
-        'accuracy': s[10], 'evade': s[11], 'magic_defense': s[8], 'magic_evade': s[9],
-        'level': l[0], 'xp_mult': l[1], 'gp_mult': l[2],
-        'resistances': decode_elements(resist), 'weaknesses': decode_elements(weak)
-    })
+    enemies.append({'id': i,
+                    'name': ENEMY_NAMES[i],
+                    'hp': hp,
+                    'attack': s[2],
+                    'defense': s[3],
+                    'speed': s[4],
+                    'magic': s[5],
+                    'accuracy': s[10],
+                    'evade': s[11],
+                    'magic_defense': s[8],
+                    'magic_evade': s[9],
+                    'level': l[0],
+                    'xp_mult': l[1],
+                    'gp_mult': l[2],
+                    'resistances': decode_elements(resist),
+                    'weaknesses': decode_elements(weak)})
 
 Path("data/extracted/enemies").mkdir(parents=True, exist_ok=True)
 
 with open("data/extracted/enemies/enemies.json", 'w') as f:
-    json.dump({'metadata': {'game': 'FFMQ', 'count': 83}, 'enemies': enemies}, f, indent=2)
+    json.dump({'metadata': {'game': 'FFMQ', 'count': 83},
+              'enemies': enemies}, f, indent=2)
 
 with open("data/extracted/enemies/enemies.csv", 'w', newline='') as f:
-    w = csv.DictWriter(f, ['id','name','hp','attack','defense','speed','magic','accuracy','evade',
-                            'magic_defense','magic_evade','level','xp_mult','gp_mult','resistances','weaknesses'])
+    w = csv.DictWriter(f,
+                       ['id',
+                        'name',
+                        'hp',
+                        'attack',
+                        'defense',
+                        'speed',
+                        'magic',
+                        'accuracy',
+                        'evade',
+                        'magic_defense',
+                        'magic_evade',
+                        'level',
+                        'xp_mult',
+                        'gp_mult',
+                        'resistances',
+                        'weaknesses'])
     w.writeheader()
     for e in enemies:
-        e['resistances'] = ', '.join(e['resistances']) if e['resistances'] else 'None'
-        e['weaknesses'] = ', '.join(e['weaknesses']) if e['weaknesses'] else 'None'
+        e['resistances'] = ', '.join(
+            e['resistances']) if e['resistances'] else 'None'
+        e['weaknesses'] = ', '.join(
+            e['weaknesses']) if e['weaknesses'] else 'None'
         w.writerow(e)
 
 print(f"Extracted {len(enemies)} enemies")
-print(f"HP range: {min(e['hp'] for e in enemies)} - {max(e['hp'] for e in enemies)}")
-print(f"First 3: {enemies[0]['name']}, {enemies[1]['name']}, {enemies[2]['name']}")
+print(
+    f"HP range: {min(e['hp'] for e in enemies)} - {max(e['hp'] for e in enemies)}")
+print(
+    f"First 3: {
+        enemies[0]['name']}, {
+            enemies[1]['name']}, {
+                enemies[2]['name']}")
 print("Saved to data/extracted/enemies/")
