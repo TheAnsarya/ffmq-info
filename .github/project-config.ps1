@@ -12,29 +12,29 @@ function New-ProjectIssue {
     param(
         [Parameter(Mandatory=$true)]
         [string]$Title,
-        
+
         [Parameter(Mandatory=$true)]
         [string]$Body,
-        
+
         [string[]]$Labels,
-        
+
         [switch]$AddToProject
     )
-    
+
     # Create the issue
     $labelArgs = if ($Labels) { "--label", ($Labels -join ",") } else { @() }
-    
+
     $issueUrl = gh issue create --title $Title --body $Body @labelArgs
-    
+
     if ($issueUrl) {
         Write-Host "✓ Created issue: $issueUrl" -ForegroundColor Green
-        
+
         # Note: Adding to project requires additional GraphQL API calls
         # For now, issues can be manually added to the project board
         if ($AddToProject) {
             Write-Host "⚠ Note: Please manually add this issue to Project #3: $ProjectUrl" -ForegroundColor Yellow
         }
-        
+
         return $issueUrl
     }
     else {
