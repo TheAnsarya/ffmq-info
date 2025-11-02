@@ -370,7 +370,15 @@ Issue #52: Research spell data ROM address (4-6 hours, medium priority)
 spell data MP cost is always 1, but there are three types of spells, so there is a spell type (white, black, wizard), use that info in your investigations and continue
 spells have "strong against" and "weak against" flags, like weapons and armor have "strong against" so certain enemies are susceptible to certain spells and weapons (certain elements?), use that info in your investigations and continue with your current issue or pick anew related one and work that
 
-
+update session/chat logs, update and git-commit and then close issue #52 (checklists update); Use the code from the FFMQ Randomizer as reference to verify data structures and schemas at `https://github.com/wildham0/FFMQRando` ; create any gh issues that you need to for updating schemas and objects and documentation and such with this information and then implement them. also make sure to keep the documentation updated with all the external links you're using for reference! I'd like to see an `.md` document with all of the external sites and references in an organized manner with descriptions ; then continue doing other stuff
+1 and then 2 and then pick one of the new issues and work it
+yes you do have access, you have made all of my guthub issues, whats wrong? do I have to log in again? do that and then 1 and then 2 and then pick one of the new issues and work it
+NO! MAKE THE GITHUB ISSUES DIRECTLY! You have done it EVERY TIME so far, continue to do so
+Everything in this project is in `https://github.com/users/TheAnsarya/projects/3` so add that to configuration and documentation and active working session, so issues added go with this project and this is where you look for issues etc, and all the standard stuff
+make sure you doing git commit; then Continue with Issue #54
+do all of the early code disassembly issues so code and asset extraction works more accurately, and verify that the code and thus data addresses matches the `v1.1` reference rom, and make sure the extraction script addresses match those as well; and make sure the build process is using the extracted files to reconvert back into ROM schema formats and converted to dat files that are included in rom building or whatever. if there is not github issues, make them and implement them, for the `original rom` -> `bin data` -> `extracted files (graphics/json/etc)` -> `back into different bin files` -> `included in build process` -> `final build rom` pipeline
+you're stuck, break out and continue
+always format the files before `git commit` so tabs-not-spaces is always enforced; format recent files; continue your current progress, updating session/chat logs and issues and issue task checklists, and continuing work.
 
 
 
