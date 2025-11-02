@@ -362,9 +362,10 @@ you haven't hit every file, for instance `C:\Users\me\source\repos\ffmq-info\too
 continue with game data extraction (Issue #38)
 finish issue #38
 pick some issues/todos and implement them.
-
-
-
+pick some issues/todos and implement them.
+make sure to git commit after each effort and merge the branches back into master; use all the new tools and then continue with another issue.
+Update/check-off the checklists on open github issues; make sure issue #39 is done and then continue with another issue.
+Update/check-off the checklists on closed github issues if they're aren't checked off for completed tasks, and create a new issue or issues for any straggling tasks;  and then continue with another issue.
 
 
 
