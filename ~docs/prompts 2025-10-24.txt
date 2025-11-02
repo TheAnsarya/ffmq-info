@@ -380,6 +380,61 @@ do all of the early code disassembly issues so code and asset extraction works m
 you're stuck, break out and continue
 always format the files before `git commit` so tabs-not-spaces is always enforced; format recent files; continue your current progress, updating session/chat logs and issues and issue task checklists, and continuing work.
 
+&&&&&
+Continue ROM pipeline implementation (Phases 2-5)
+Fix remaining extraction scripts (graphics, text, etc.)
+Create binary data layer for round-trip conversion
+Integrate extracted data into build system
+Cross-reference all combat data for battle mechanics documentation
+&&&&&&
+
+so, work through one or more of the code disassembly issues, like #6 or #7 or #8, the stabilize the disassembly before resuming the pipeline
+
+&&&&&&&&&&&&&&&&&&&&&
+Option 1: Continue Bank Imports (Recommended for consistency)
+Import Bank 04 (similar size to Bank 06)
+Import Bank 05 (similar size to Bank 06)
+Complete the disassembly stabilization trio
+
+Option 2: Enhance Bank 06 (Deep dive)
+Label specific metatile purposes
+Document collision bitfield meanings
+Map metatile usage to game locations
+Create visual reference chart
+
+Option 3: Resume Data Pipeline (Return to original goal)
+Now have stable Bank 06 foundation
+Continue with Phase 2: Binary extraction layer
+Build format converters (bin↔json, chr↔png)
+Integrate with build system
+&&&&&&&&&&&&&&&&&&&&&&&&&&&&
+
+Option 1: Continue Bank Imports (Recommended for consistency)
+
+&&&&&&&&&&
+Which option would you like to pursue next?
+Enhance graphics documentation (deep dive)
+Continue other bank imports (breadth)
+Resume data extraction pipeline (original goal)
+&&&&&&&&&&&
+
+Resume data extraction pipeline (original goal)
+continue with option #1 so all the resources are there when we finally do options #2 and #3
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+merge issue branches back into `master` when the issue is closed and everything is commited to the branch
 
 
 

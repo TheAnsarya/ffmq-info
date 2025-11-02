@@ -1,0 +1,19 @@
+{
+  "name": "menu_borders",
+  "category": "ui",
+  "format": "2BPP",
+  "rom_offset": "0x02A600",
+  "dimensions": {
+    "width_tiles": 2,
+    "height_tiles": 2,
+    "width_pixels": 16,
+    "height_pixels": 16
+  },
+  "palette_index": 14,
+  "num_tiles": 32,
+  "animation": {
+    "num_frames": 1,
+    "frame_offsets": []
+  },
+  "notes": "Menu window borders and decorations"
+}
