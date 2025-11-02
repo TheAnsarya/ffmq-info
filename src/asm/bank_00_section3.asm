@@ -2,26 +2,26 @@
 ; Character Status Animation (continued from earlier sections)
 ; ===========================================================================
 
-CODE_008A0B:
+StatusIcon_CheckCharacterSlot5:
 ; Check character slot 5
 	lda.L				   $70073f   ; Check character 5 in party data
-	bne					 CODE_008A16 ; If present, skip animation
+	bne					 StatusIcon_CheckCharacterSlot6 ; If present, skip animation
 	ldx.B				   #$80	  ; Animation offset for slot 5
 	jsr.W				   CODE_008A2A ; Animate status icon
 
-CODE_008A16:
+StatusIcon_CheckCharacterSlot6:
 ; Check character slot 6
 	lda.L				   $70078f   ; Check character 6 in party data
-	bne					 CODE_008A21 ; If present, skip animation
+	bne					 StatusIcon_SetUpdateFlag ; If present, skip animation
 	ldx.B				   #$90	  ; Animation offset for slot 6
 	jsr.W				   CODE_008A2A ; Animate status icon
 
-CODE_008A21:
+StatusIcon_SetUpdateFlag:
 ; Set update flag and return
 	lda.B				   #$20	  ; Bit 5 flag
 	tsb.W				   $00d2	 ; Set bit in display flags
 
-CODE_008A26:
+StatusIcon_AnimationComplete:
 	rep					 #$30		; 16-bit A, X, Y
 	pld							   ; Restore direct page
 	rts							   ; Return
@@ -34,7 +34,7 @@ CODE_008A26:
 ; Technical Details: Toggles tile numbers to create animation effect
 ; ===========================================================================
 
-CODE_008A2A:
+StatusIcon_ToggleTileFrame:
 ; Toggle tile animation frame
 	lda.B				   $02,x	 ; Get current tile number
 	eor.B				   #$04	  ; Toggle bit 2 (animation frame)
@@ -158,7 +158,7 @@ Cursor_Valid:
 ; ===========================================================================
 
 Input_Switch_Character:
-	jsr.W				   CODE_008B57 ; Check if switching allowed
+	jsr.W				   Input_CheckBlocking ; Check if switching allowed
 	bne					 Switch_Done ; If not allowed, exit
 
 ; Check if character is valid
@@ -189,7 +189,7 @@ Switch_Done:
 ; Technical Details: Validates based on map position and character state
 ; ===========================================================================
 
-CODE_008ABD:
+Menu_ValidateAction:
 ; Check if on valid action tile
 	lda.W				   $1032	 ; Get tile X position
 	cmp.B				   #$80	  ; Compare to invalid marker
@@ -209,9 +209,9 @@ Action_Valid:
 ; ===========================================================================
 
 Scroll_Menu_Down:
-	jsr.W				   CODE_008B57 ; Check if scrolling allowed
+	jsr.W				   Input_CheckBlocking ; Check if scrolling allowed
 	bne					 Scroll_Down_Done ; If blocked, exit
-	jsr.W				   CODE_008ABD ; Play appropriate sound
+	jsr.W				   Menu_ValidateAction ; Play appropriate sound
 
 ; Calculate current row from pixel position
 	lda.W				   $1031	 ; Get Y pixel position
@@ -237,8 +237,8 @@ Find_Next_Valid_Row:
 	beq					 Find_Next_Valid_Row ; If invalid, try next row
 
 ; Update display with new row
-	jsr.W				   CODE_008B21 ; Update menu display
-	jsr.W				   CODE_008C3D ; Update graphics
+	jsr.W				   Menu_UpdateDisplay ; Update menu display
+	jsr.W				   Menu_UpdateCharacterTile ; Update graphics
 
 Scroll_Down_Done:
 	rts							   ; Return
@@ -251,9 +251,9 @@ Scroll_Down_Done:
 ; ===========================================================================
 
 Scroll_Menu_Up:
-	jsr.W				   CODE_008B57 ; Check if scrolling allowed
+	jsr.W				   Input_CheckBlocking ; Check if scrolling allowed
 	bne					 Scroll_Up_Done ; If blocked, exit
-	jsr.W				   CODE_008ABD ; Play appropriate sound
+	jsr.W				   Menu_ValidateAction ; Play appropriate sound
 
 ; Calculate current row
 	lda.W				   $1031	 ; Get Y pixel position
@@ -278,8 +278,8 @@ Find_Previous_Valid_Row:
 	beq					 Find_Previous_Valid_Row ; If invalid, try previous
 
 ; Update display
-	jsr.W				   CODE_008B21 ; Update menu display
-	jsr.W				   CODE_008C3D ; Update graphics
+	jsr.W				   Menu_UpdateDisplay ; Update menu display
+	jsr.W				   Menu_UpdateCharacterTile ; Update graphics
 
 Scroll_Up_Done:
 	rts							   ; Return
@@ -291,7 +291,7 @@ Scroll_Up_Done:
 ; Technical Details: Copies appropriate tile data to WRAM buffer
 ; ===========================================================================
 
-CODE_008B21:
+Menu_UpdateDisplay:
 	rep					 #$30		; 16-bit A, X, Y
 
 ; Determine source tilemap based on Y position
@@ -332,7 +332,7 @@ Copy_Menu_Tiles:
 ; Output: Z flag set if input blocked
 ; ===========================================================================
 
-CODE_008B57:
+Input_CheckBlocking:
 	lda.B				   #$10	  ; Check bit 4
 	and.W				   $00d6	 ; Test blocking flags
 	beq					 Input_Not_Blocked ; If clear, input allowed
@@ -354,7 +354,7 @@ Input_Not_Blocked:
 ; Output: A = VRAM address
 ; ===========================================================================
 
-CODE_008C1B:
+Map_TilePositionToVRAM:
 	php							   ; Preserve processor status
 	rep					 #$30		; 16-bit A, X, Y
 	and.W				   #$00ff	; Clear high byte
@@ -392,7 +392,7 @@ CODE_008C1B:
 ; Technical Details: Updates both WRAM buffers for seamless display
 ; ===========================================================================
 
-CODE_008C3D:
+Menu_UpdateCharacterTile:
 	php							   ; Preserve processor status
 	sep					 #$30		; 8-bit A, X, Y
 
