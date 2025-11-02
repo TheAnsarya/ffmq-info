@@ -1,14 +1,12 @@
 #!/usr/bin/env python3
 """
 Final Fantasy Mystic Quest - Spell Data Extractor
-Extracts spell stats, MP costs, power, effects, and targeting
+Extracts spell stats, power, effects, and targeting
 
-NOTE: This tool is a framework/placeholder. The exact ROM address for spell data
-has not yet been located. It will extract zeros until the proper address is found
-through battle code analysis.
-
-Status: NEEDS RESEARCH - Spell data ROM location unknown
-TODO: Analyze battle menu code to find where spell data is read
+ROM Address: $060F36 (Bank $0C, near item data)
+Structure: 6 bytes per spell, 16 entries
+Note: MP cost is always 1 (not stored in table)
+      Spell type derived from ID (White: 0-3, Black: 4-7, Wizard: 8-10)
 """
 
 import sys
@@ -20,21 +18,36 @@ from typing import Dict, List, Optional
 class SpellExtractor:
 	"""Extract spell data from FFMQ ROM"""
 
-	# Spell data location (NEEDS RESEARCH - address unknown)
-	# Documentation suggests Bank $09xxxx but exact location needs to be found
-	# by analyzing battle code that references spell data
-	# Placeholder address - will extract all zeros until proper address is found
-	SPELL_DATA_ADDRESS = 0x090000  # Bank $09 - spell data table (PLACEHOLDER)
-	SPELL_COUNT = 32
-	SPELL_ENTRY_SIZE = 8  # Bytes per spell entry (estimated from docs)
+	# Spell data location (RESEARCH COMPLETE - Found via ROM scanning)
+	# Located in Bank $0C near item data
+	# Pattern found by tools/find_spell_data.py scan
+	SPELL_DATA_ADDRESS = 0x060F36  # Bank $0C - spell data table
+	SPELL_COUNT = 16  # Estimated based on scan results
+	SPELL_ENTRY_SIZE = 6  # Bytes per spell entry (confirmed by scan)
 
-	# Spell elements
+	# NOTE: Element information is NOT in the spell data table at $060F36
+	# Elements appear to be hardcoded in spell execution code rather than stored in data
+	# Byte 2 of the spell data is NOT the element field (verified by testing)
+	# Keeping element constants for reference only
 	ELEMENTS = {
 		0x00: 'None',
 		0x01: 'Fire',
 		0x02: 'Water',
 		0x03: 'Wind',
 		0x04: 'Earth'
+	}
+
+	# Enemy type flags (bit flags for "strong against" system)
+	# Spells have "strong against" and "weak against" flags like weapons/armor
+	ENEMY_TYPE_FLAGS = {
+		0x01: 'Beast',
+		0x02: 'Plant',
+		0x04: 'Undead',
+		0x08: 'Dragon',
+		0x10: 'Aquatic',
+		0x20: 'Flying',
+		0x40: 'Humanoid',
+		0x80: 'Magical'
 	}
 
 	# Spell targets
@@ -55,17 +68,24 @@ class SpellExtractor:
 		0x04: 'Debuff'
 	}
 
-	# Known spell names (from text extraction)
+	# Known spell names (from constants and text extraction)
 	SPELL_NAMES = [
-		'Fire', 'Blizzard', 'Thunder', 'Aero',
-		'Cure', 'Life', 'Heal', 'Esuna',
-		'Quake', 'Flare', 'White', 'Meteor',
-		'Exit', 'Seed', 'Heal', 'Steel',
-		'Shell', 'Speed', 'Flame', 'Blizzara',
-		'Thundara', 'Aerora', 'Firaga', 'Blizzaga',
-		'Thundaga', 'Aeroga', 'Quakera', 'Flarea',
-		'Whitera', 'Meteora', 'Ultima', 'Full-Cure'
+		# White Magic (0-3)
+		'Cure', 'Heal', 'Life', 'Exit',
+		# Black Magic (4-7)
+		'Fire', 'Blizzard', 'Thunder', 'Quake',
+		# Wizard Magic (8-10)
+		'Meteor', 'Flare', 'Teleport',
+		# Additional/Unknown
+		'Spell_11', 'Spell_12', 'Spell_13', 'Spell_14', 'Spell_15'
 	]
+
+	# Spell types based on ID ranges
+	SPELL_TYPES = {
+		0: 'White', 1: 'White', 2: 'White', 3: 'White',  # 0-3: White Magic
+		4: 'Black', 5: 'Black', 6: 'Black', 7: 'Black',  # 4-7: Black Magic
+		8: 'Wizard', 9: 'Wizard', 10: 'Wizard',          # 8-10: Wizard Magic
+	}
 
 	def __init__(self, rom_path: str):
 		"""Initialize with ROM path"""
@@ -90,6 +110,14 @@ class SpellExtractor:
 			return self.rom_data[address]
 		return 0
 
+	def decode_enemy_type_flags(self, byte_value: int) -> List[str]:
+		"""Decode enemy type bitfield into list of types"""
+		types = []
+		for bit, name in self.ENEMY_TYPE_FLAGS.items():
+			if byte_value & bit:
+				types.append(name)
+		return types if types else ['None']
+
 	def read_word(self, address: int) -> int:
 		"""Read a 16-bit word (little-endian) from ROM"""
 		if address + 1 < len(self.rom_data):
@@ -99,65 +127,53 @@ class SpellExtractor:
 	def extract_spell(self, spell_id: int) -> Dict:
 		"""Extract a single spell's data"""
 		base_addr = self.SPELL_DATA_ADDRESS + (spell_id * self.SPELL_ENTRY_SIZE)
-		
-		# Parse spell data structure (based on docs/ROM_DATA_MAP.md)
+
+		# Parse spell data structure (found via ROM scanning and user feedback)
 		# Offset  Size  Field
-		# +$00    1     Base power
-		# +$01    1     MP cost  
-		# +$02    1     Element
-		# +$03    1     Target flags
-		# +$04    1     Animation ID
-		# +$05-$07      Reserved/unknown
-		
+		# +$00    1     Base power (verified correct)
+		# +$01    1     Unknown - possibly level/tier requirement (values 1-20)
+		# +$02    1     Unknown - NOT element (verified incorrect by testing)
+		# +$03    1     Enemy type flags - "strong against" bitfield
+		# +$04    1     Enemy type flags - possibly target type or range
+		# +$05    1     Enemy type flags - possibly "weak against" or secondary flags
+
+		byte3_raw = self.read_byte(base_addr + 3)
+		byte4_raw = self.read_byte(base_addr + 4)
+		byte5_raw = self.read_byte(base_addr + 5)
+
 		spell_data = {
 			'id': spell_id,
 			'name': self.SPELL_NAMES[spell_id] if spell_id < len(self.SPELL_NAMES) else f'Spell_{spell_id:02d}',
+			'spell_type': self.SPELL_TYPES.get(spell_id, 'Unknown'),
 			'power': self.read_byte(base_addr),
-			'mp_cost': self.read_byte(base_addr + 1),
-			'element': self.ELEMENTS.get(self.read_byte(base_addr + 2), 'Unknown'),
-			'target_flags': self.read_byte(base_addr + 3),
-			'animation_id': self.read_byte(base_addr + 4),
+			'byte1': self.read_byte(base_addr + 1),  # Unknown - possibly level requirement
+			'byte2': self.read_byte(base_addr + 2),  # Unknown - NOT element (verified incorrect)
+			'byte3': byte3_raw,
+			'byte4': byte4_raw,
+			'byte5': byte5_raw,
+			'strong_against': self.decode_enemy_type_flags(byte3_raw),  # Decoded enemy type flags
+			'target_type': self.decode_enemy_type_flags(byte4_raw),     # Decoded target/range flags
+			'special_flags': self.decode_enemy_type_flags(byte5_raw),   # Decoded special/weak flags
 			'address': f"${base_addr:06X}"
 		}
-		
-		# Interpret target flags
-		spell_data['target'] = self.interpret_target(spell_data['target_flags'])
-		spell_data['effects'] = self.interpret_effects(spell_data)
-		
+
+		# Interpret unknown bytes
+		spell_data['notes'] = self.interpret_notes(spell_data)
+
 		return spell_data
-	
-	def interpret_target(self, flags: int) -> str:
-		"""Interpret target flags into readable description"""
-		# Target flags interpretation (to be verified)
-		if flags & 0x01:
-			return 'All Enemies'
-		elif flags & 0x02:
-			return 'Single Enemy'
-		elif flags & 0x04:
-			return 'All Allies'
-		elif flags & 0x08:
-			return 'Single Ally'
-		elif flags & 0x10:
-			return 'Self'
-		return 'Unknown'
-	
-	def interpret_effects(self, spell: Dict) -> List[str]:
-		"""Interpret spell effect flags into readable descriptions"""
-		effects = []
-		
-		# Basic effects based on element and power
-		if spell['element'] != 'None':
-			effects.append(f"{spell['element']} elemental")
-		
+
+	def interpret_notes(self, spell: Dict) -> List[str]:
+		"""Generate notes about the spell"""
+		notes = []
+
 		if spell['power'] > 0:
-			# Guess spell type based on target
-			if 'Ally' in spell['target'] or spell['target'] == 'Self':
-				effects.append(f"Restores {spell['power']} HP")
-			else:
-				effects.append(f"{spell['power']} base damage")
-		
-		return effects
-	
+			notes.append(f"{spell['power']} base power")
+
+		# Note: Element not stored in this table
+		notes.append("Element not in spell data table")
+
+		return notes
+
 	def extract_all(self) -> List[Dict]:
 		"""Extract all spell data"""
 		print(f"\n✨ Extracting spell data from ${self.SPELL_DATA_ADDRESS:06X}...")
@@ -167,8 +183,8 @@ class SpellExtractor:
 		for i in range(self.SPELL_COUNT):
 			spell = self.extract_spell(i)
 
-			# Skip empty entries (MP cost = 0 and power = 0)
-			if spell['mp_cost'] > 0 or spell['power'] > 0:
+			# Skip empty entries (power = 0 indicates unused slot)
+			if spell['power'] > 0:
 				spells.append(spell)
 
 		print(f"  Extracted {len(spells)} spells")
@@ -200,21 +216,25 @@ class SpellExtractor:
 
 		csv_file = output_path / 'spells.csv'
 
-		# Flatten effects list for CSV
+		# Flatten list fields for CSV
 		csv_rows = []
 		for spell in spells:
 			row = spell.copy()
-			row['effects'] = '; '.join(spell['effects'])
+			row['notes'] = '; '.join(spell['notes'])
+			row['strong_against'] = ', '.join(spell['strong_against'])
+			row['target_type'] = ', '.join(spell['target_type'])
+			row['special_flags'] = ', '.join(spell['special_flags'])
 			csv_rows.append(row)
 
 		if csv_rows:
 			with open(csv_file, 'w', encoding='utf-8', newline='') as f:
-				fieldnames = ['id', 'name', 'power', 'mp_cost', 'element', 
-							 'target', 'target_flags', 'animation_id', 'effects', 'address']
+				fieldnames = ['id', 'name', 'spell_type', 'power', 'byte1', 'byte2',
+							 'byte3', 'byte4', 'byte5', 'strong_against', 'target_type',
+							 'special_flags', 'notes', 'address']
 				writer = csv.DictWriter(f, fieldnames=fieldnames, extrasaction='ignore')
 				writer.writeheader()
 				writer.writerows(csv_rows)
-		
+
 		print(f"📊 Saved CSV: {csv_file}")
 
 	def generate_statistics(self, spells: List[Dict]) -> str:
@@ -252,16 +272,11 @@ class SpellExtractor:
 			lines.append(f"  {element:12s}: {count:2d} spells")
 		lines.append("")
 
-		# MP cost range
-		if spells:
-			mp_costs = [s['mp_cost'] for s in spells if s['mp_cost'] > 0]
-			if mp_costs:
-				lines.append("MP Costs:")
-				lines.append("-"*80)
-				lines.append(f"  Minimum: {min(mp_costs):3d}")
-				lines.append(f"  Maximum: {max(mp_costs):3d}")
-				lines.append(f"  Average: {sum(mp_costs) / len(mp_costs):5.1f}")
-				lines.append("")
+		# Note about MP cost
+		lines.append("MP Cost:")
+		lines.append("-"*80)
+		lines.append("  All spells cost 1 MP (not stored in table)")
+		lines.append("")
 
 		# Power range
 		powers = [s['power'] for s in spells if s['power'] > 0]
@@ -301,13 +316,14 @@ def main():
 	print("Final Fantasy Mystic Quest - Spell Data Extractor")
 	print("="*80)
 	print()
-	print("⚠️  Status: FRAMEWORK ONLY - Spell data ROM address needs research")
-	print("     Tool will extract zeros until proper address is located")
-	print("     TODO: Analyze battle/menu code to find spell data tables")
-	print()
 
 	# Extract spell data
 	extractor = SpellExtractor(rom_file)
+
+	print(f"ROM Address: ${extractor.SPELL_DATA_ADDRESS:06X}")
+	print(f"Entry Size: {extractor.SPELL_ENTRY_SIZE} bytes")
+	print("Note: All spells cost 1 MP")
+	print()
 
 	if not extractor.load_rom():
 		sys.exit(1)

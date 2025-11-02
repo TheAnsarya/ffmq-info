@@ -1,0 +1,464 @@
+{
+  "version": "1.0.0",
+  "game": "Final Fantasy Mystic Quest",
+  "note": "Spell data addresses are approximate and need verification",
+  "spells": [
+    {
+      "id": 0,
+      "name": "Cure",
+      "spell_type": "White",
+      "power": 11,
+      "byte1": 2,
+      "byte2": 1,
+      "byte3": 12,
+      "byte4": 2,
+      "byte5": 1,
+      "strong_against": [
+        "Undead",
+        "Dragon"
+      ],
+      "target_type": [
+        "Plant"
+      ],
+      "special_flags": [
+        "Beast"
+      ],
+      "address": "$060F36",
+      "notes": [
+        "11 base power",
+        "Element not in spell data table"
+      ]
+    },
+    {
+      "id": 1,
+      "name": "Heal",
+      "spell_type": "White",
+      "power": 9,
+      "byte1": 2,
+      "byte2": 1,
+      "byte3": 13,
+      "byte4": 2,
+      "byte5": 1,
+      "strong_against": [
+        "Beast",
+        "Undead",
+        "Dragon"
+      ],
+      "target_type": [
+        "Plant"
+      ],
+      "special_flags": [
+        "Beast"
+      ],
+      "address": "$060F3C",
+      "notes": [
+        "9 base power",
+        "Element not in spell data table"
+      ]
+    },
+    {
+      "id": 2,
+      "name": "Life",
+      "spell_type": "White",
+      "power": 14,
+      "byte1": 14,
+      "byte2": 3,
+      "byte3": 59,
+      "byte4": 4,
+      "byte5": 11,
+      "strong_against": [
+        "Beast",
+        "Plant",
+        "Dragon",
+        "Aquatic",
+        "Flying"
+      ],
+      "target_type": [
+        "Undead"
+      ],
+      "special_flags": [
+        "Beast",
+        "Plant",
+        "Dragon"
+      ],
+      "address": "$060F42",
+      "notes": [
+        "14 base power",
+        "Element not in spell data table"
+      ]
+    },
+    {
+      "id": 3,
+      "name": "Exit",
+      "spell_type": "White",
+      "power": 15,
+      "byte1": 11,
+      "byte2": 5,
+      "byte3": 62,
+      "byte4": 5,
+      "byte5": 10,
+      "strong_against": [
+        "Plant",
+        "Undead",
+        "Dragon",
+        "Aquatic",
+        "Flying"
+      ],
+      "target_type": [
+        "Beast",
+        "Undead"
+      ],
+      "special_flags": [
+        "Plant",
+        "Dragon"
+      ],
+      "address": "$060F48",
+      "notes": [
+        "15 base power",
+        "Element not in spell data table"
+      ]
+    },
+    {
+      "id": 4,
+      "name": "Fire",
+      "spell_type": "Black",
+      "power": 26,
+      "byte1": 11,
+      "byte2": 2,
+      "byte3": 71,
+      "byte4": 3,
+      "byte5": 2,
+      "strong_against": [
+        "Beast",
+        "Plant",
+        "Undead",
+        "Humanoid"
+      ],
+      "target_type": [
+        "Beast",
+        "Plant"
+      ],
+      "special_flags": [
+        "Plant"
+      ],
+      "address": "$060F4E",
+      "notes": [
+        "26 base power",
+        "Element not in spell data table"
+      ]
+    },
+    {
+      "id": 5,
+      "name": "Blizzard",
+      "spell_type": "Black",
+      "power": 73,
+      "byte1": 2,
+      "byte2": 4,
+      "byte3": 36,
+      "byte4": 5,
+      "byte5": 5,
+      "strong_against": [
+        "Undead",
+        "Flying"
+      ],
+      "target_type": [
+        "Beast",
+        "Undead"
+      ],
+      "special_flags": [
+        "Beast",
+        "Undead"
+      ],
+      "address": "$060F54",
+      "notes": [
+        "73 base power",
+        "Element not in spell data table"
+      ]
+    },
+    {
+      "id": 6,
+      "name": "Thunder",
+      "spell_type": "Black",
+      "power": 40,
+      "byte1": 6,
+      "byte2": 3,
+      "byte3": 79,
+      "byte4": 4,
+      "byte5": 1,
+      "strong_against": [
+        "Beast",
+        "Plant",
+        "Undead",
+        "Dragon",
+        "Humanoid"
+      ],
+      "target_type": [
+        "Undead"
+      ],
+      "special_flags": [
+        "Beast"
+      ],
+      "address": "$060F5A",
+      "notes": [
+        "40 base power",
+        "Element not in spell data table"
+      ]
+    },
+    {
+      "id": 7,
+      "name": "Quake",
+      "spell_type": "Black",
+      "power": 82,
+      "byte1": 1,
+      "byte2": 2,
+      "byte3": 45,
+      "byte4": 3,
+      "byte5": 1,
+      "strong_against": [
+        "Beast",
+        "Undead",
+        "Dragon",
+        "Flying"
+      ],
+      "target_type": [
+        "Beast",
+        "Plant"
+      ],
+      "special_flags": [
+        "Beast"
+      ],
+      "address": "$060F60",
+      "notes": [
+        "82 base power",
+        "Element not in spell data table"
+      ]
+    },
+    {
+      "id": 8,
+      "name": "Meteor",
+      "spell_type": "Wizard",
+      "power": 47,
+      "byte1": 2,
+      "byte2": 6,
+      "byte3": 48,
+      "byte4": 6,
+      "byte5": 5,
+      "strong_against": [
+        "Aquatic",
+        "Flying"
+      ],
+      "target_type": [
+        "Plant",
+        "Undead"
+      ],
+      "special_flags": [
+        "Beast",
+        "Undead"
+      ],
+      "address": "$060F66",
+      "notes": [
+        "47 base power",
+        "Element not in spell data table"
+      ]
+    },
+    {
+      "id": 9,
+      "name": "Flare",
+      "spell_type": "Wizard",
+      "power": 87,
+      "byte1": 5,
+      "byte2": 1,
+      "byte3": 54,
+      "byte4": 4,
+      "byte5": 2,
+      "strong_against": [
+        "Plant",
+        "Undead",
+        "Aquatic",
+        "Flying"
+      ],
+      "target_type": [
+        "Undead"
+      ],
+      "special_flags": [
+        "Plant"
+      ],
+      "address": "$060F6C",
+      "notes": [
+        "87 base power",
+        "Element not in spell data table"
+      ]
+    },
+    {
+      "id": 10,
+      "name": "Teleport",
+      "spell_type": "Wizard",
+      "power": 55,
+      "byte1": 5,
+      "byte2": 2,
+      "byte3": 57,
+      "byte4": 3,
+      "byte5": 4,
+      "strong_against": [
+        "Beast",
+        "Dragon",
+        "Aquatic",
+        "Flying"
+      ],
+      "target_type": [
+        "Beast",
+        "Plant"
+      ],
+      "special_flags": [
+        "Undead"
+      ],
+      "address": "$060F72",
+      "notes": [
+        "55 base power",
+        "Element not in spell data table"
+      ]
+    },
+    {
+      "id": 11,
+      "name": "Spell_11",
+      "spell_type": "Unknown",
+      "power": 96,
+      "byte1": 20,
+      "byte2": 4,
+      "byte3": 67,
+      "byte4": 4,
+      "byte5": 4,
+      "strong_against": [
+        "Beast",
+        "Plant",
+        "Humanoid"
+      ],
+      "target_type": [
+        "Undead"
+      ],
+      "special_flags": [
+        "Undead"
+      ],
+      "address": "$060F78",
+      "notes": [
+        "96 base power",
+        "Element not in spell data table"
+      ]
+    },
+    {
+      "id": 12,
+      "name": "Spell_12",
+      "spell_type": "Unknown",
+      "power": 19,
+      "byte1": 12,
+      "byte2": 4,
+      "byte3": 75,
+      "byte4": 4,
+      "byte5": 4,
+      "strong_against": [
+        "Beast",
+        "Plant",
+        "Dragon",
+        "Humanoid"
+      ],
+      "target_type": [
+        "Undead"
+      ],
+      "special_flags": [
+        "Undead"
+      ],
+      "address": "$060F7E",
+      "notes": [
+        "19 base power",
+        "Element not in spell data table"
+      ]
+    },
+    {
+      "id": 13,
+      "name": "Spell_13",
+      "spell_type": "Unknown",
+      "power": 30,
+      "byte1": 12,
+      "byte2": 4,
+      "byte3": 83,
+      "byte4": 5,
+      "byte5": 3,
+      "strong_against": [
+        "Beast",
+        "Plant",
+        "Aquatic",
+        "Humanoid"
+      ],
+      "target_type": [
+        "Beast",
+        "Undead"
+      ],
+      "special_flags": [
+        "Beast",
+        "Plant"
+      ],
+      "address": "$060F84",
+      "notes": [
+        "30 base power",
+        "Element not in spell data table"
+      ]
+    },
+    {
+      "id": 14,
+      "name": "Spell_14",
+      "spell_type": "Unknown",
+      "power": 40,
+      "byte1": 11,
+      "byte2": 4,
+      "byte3": 92,
+      "byte4": 5,
+      "byte5": 3,
+      "strong_against": [
+        "Undead",
+        "Dragon",
+        "Aquatic",
+        "Humanoid"
+      ],
+      "target_type": [
+        "Beast",
+        "Undead"
+      ],
+      "special_flags": [
+        "Beast",
+        "Plant"
+      ],
+      "address": "$060F8A",
+      "notes": [
+        "40 base power",
+        "Element not in spell data table"
+      ]
+    },
+    {
+      "id": 15,
+      "name": "Spell_15",
+      "spell_type": "Unknown",
+      "power": 48,
+      "byte1": 11,
+      "byte2": 1,
+      "byte3": 100,
+      "byte4": 4,
+      "byte5": 2,
+      "strong_against": [
+        "Undead",
+        "Flying",
+        "Humanoid"
+      ],
+      "target_type": [
+        "Undead"
+      ],
+      "special_flags": [
+        "Plant"
+      ],
+      "address": "$060F90",
+      "notes": [
+        "48 base power",
+        "Element not in spell data table"
+      ]
+    }
+  ]
+}

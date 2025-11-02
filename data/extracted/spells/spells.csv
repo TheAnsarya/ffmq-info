@@ -1,0 +1,17 @@
+id,name,spell_type,power,byte1,byte2,byte3,byte4,byte5,strong_against,target_type,special_flags,notes,address
+0,Cure,White,11,2,1,12,2,1,"Undead, Dragon",Plant,Beast,11 base power; Element not in spell data table,$060F36
+1,Heal,White,9,2,1,13,2,1,"Beast, Undead, Dragon",Plant,Beast,9 base power; Element not in spell data table,$060F3C
+2,Life,White,14,14,3,59,4,11,"Beast, Plant, Dragon, Aquatic, Flying",Undead,"Beast, Plant, Dragon",14 base power; Element not in spell data table,$060F42
+3,Exit,White,15,11,5,62,5,10,"Plant, Undead, Dragon, Aquatic, Flying","Beast, Undead","Plant, Dragon",15 base power; Element not in spell data table,$060F48
+4,Fire,Black,26,11,2,71,3,2,"Beast, Plant, Undead, Humanoid","Beast, Plant",Plant,26 base power; Element not in spell data table,$060F4E
+5,Blizzard,Black,73,2,4,36,5,5,"Undead, Flying","Beast, Undead","Beast, Undead",73 base power; Element not in spell data table,$060F54
+6,Thunder,Black,40,6,3,79,4,1,"Beast, Plant, Undead, Dragon, Humanoid",Undead,Beast,40 base power; Element not in spell data table,$060F5A
+7,Quake,Black,82,1,2,45,3,1,"Beast, Undead, Dragon, Flying","Beast, Plant",Beast,82 base power; Element not in spell data table,$060F60
+8,Meteor,Wizard,47,2,6,48,6,5,"Aquatic, Flying","Plant, Undead","Beast, Undead",47 base power; Element not in spell data table,$060F66
+9,Flare,Wizard,87,5,1,54,4,2,"Plant, Undead, Aquatic, Flying",Undead,Plant,87 base power; Element not in spell data table,$060F6C
+10,Teleport,Wizard,55,5,2,57,3,4,"Beast, Dragon, Aquatic, Flying","Beast, Plant",Undead,55 base power; Element not in spell data table,$060F72
+11,Spell_11,Unknown,96,20,4,67,4,4,"Beast, Plant, Humanoid",Undead,Undead,96 base power; Element not in spell data table,$060F78
+12,Spell_12,Unknown,19,12,4,75,4,4,"Beast, Plant, Dragon, Humanoid",Undead,Undead,19 base power; Element not in spell data table,$060F7E
+13,Spell_13,Unknown,30,12,4,83,5,3,"Beast, Plant, Aquatic, Humanoid","Beast, Undead","Beast, Plant",30 base power; Element not in spell data table,$060F84
+14,Spell_14,Unknown,40,11,4,92,5,3,"Undead, Dragon, Aquatic, Humanoid","Beast, Undead","Beast, Plant",40 base power; Element not in spell data table,$060F8A
+15,Spell_15,Unknown,48,11,1,100,4,2,"Undead, Flying, Humanoid",Undead,Plant,48 base power; Element not in spell data table,$060F90

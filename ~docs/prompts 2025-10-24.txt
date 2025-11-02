@@ -366,6 +366,9 @@ pick some issues/todos and implement them.
 make sure to git commit after each effort and merge the branches back into master; use all the new tools and then continue with another issue.
 Update/check-off the checklists on open github issues; make sure issue #39 is done and then continue with another issue.
 Update/check-off the checklists on closed github issues if they're aren't checked off for completed tasks, and create a new issue or issues for any straggling tasks;  and then continue with another issue.
+Issue #52: Research spell data ROM address (4-6 hours, medium priority)
+spell data MP cost is always 1, but there are three types of spells, so there is a spell type (white, black, wizard), use that info in your investigations and continue
+spells have "strong against" and "weak against" flags, like weapons and armor have "strong against" so certain enemies are susceptible to certain spells and weapons (certain elements?), use that info in your investigations and continue with your current issue or pick anew related one and work that
 
 
 

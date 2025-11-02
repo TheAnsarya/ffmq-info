@@ -2,5 +2,244 @@
   "version": "1.0.0",
   "game": "Final Fantasy Mystic Quest",
   "note": "Spell data addresses are approximate and need verification",
-  "spells": []
+  "spells": [
+    {
+      "id": 0,
+      "name": "Fire",
+      "power": 11,
+      "mp_cost": 2,
+      "element": "Fire",
+      "byte3": 12,
+      "byte4": 2,
+      "byte5": 1,
+      "address": "$060F36",
+      "effects": [
+        "Fire elemental",
+        "11 base damage/healing"
+      ]
+    },
+    {
+      "id": 1,
+      "name": "Blizzard",
+      "power": 9,
+      "mp_cost": 2,
+      "element": "Fire",
+      "byte3": 13,
+      "byte4": 2,
+      "byte5": 1,
+      "address": "$060F3C",
+      "effects": [
+        "Fire elemental",
+        "9 base damage/healing"
+      ]
+    },
+    {
+      "id": 2,
+      "name": "Thunder",
+      "power": 14,
+      "mp_cost": 14,
+      "element": "Wind",
+      "byte3": 59,
+      "byte4": 4,
+      "byte5": 11,
+      "address": "$060F42",
+      "effects": [
+        "Wind elemental",
+        "14 base damage/healing"
+      ]
+    },
+    {
+      "id": 3,
+      "name": "Aero",
+      "power": 15,
+      "mp_cost": 11,
+      "element": "Unknown",
+      "byte3": 62,
+      "byte4": 5,
+      "byte5": 10,
+      "address": "$060F48",
+      "effects": [
+        "15 base damage/healing"
+      ]
+    },
+    {
+      "id": 4,
+      "name": "Cure",
+      "power": 26,
+      "mp_cost": 11,
+      "element": "Water",
+      "byte3": 71,
+      "byte4": 3,
+      "byte5": 2,
+      "address": "$060F4E",
+      "effects": [
+        "Water elemental",
+        "26 base damage/healing"
+      ]
+    },
+    {
+      "id": 5,
+      "name": "Life",
+      "power": 73,
+      "mp_cost": 2,
+      "element": "Earth",
+      "byte3": 36,
+      "byte4": 5,
+      "byte5": 5,
+      "address": "$060F54",
+      "effects": [
+        "Earth elemental",
+        "73 base damage/healing"
+      ]
+    },
+    {
+      "id": 6,
+      "name": "Heal",
+      "power": 40,
+      "mp_cost": 6,
+      "element": "Wind",
+      "byte3": 79,
+      "byte4": 4,
+      "byte5": 1,
+      "address": "$060F5A",
+      "effects": [
+        "Wind elemental",
+        "40 base damage/healing"
+      ]
+    },
+    {
+      "id": 7,
+      "name": "Esuna",
+      "power": 82,
+      "mp_cost": 1,
+      "element": "Water",
+      "byte3": 45,
+      "byte4": 3,
+      "byte5": 1,
+      "address": "$060F60",
+      "effects": [
+        "Water elemental",
+        "82 base damage/healing"
+      ]
+    },
+    {
+      "id": 8,
+      "name": "Quake",
+      "power": 47,
+      "mp_cost": 2,
+      "element": "Unknown",
+      "byte3": 48,
+      "byte4": 6,
+      "byte5": 5,
+      "address": "$060F66",
+      "effects": [
+        "47 base damage/healing"
+      ]
+    },
+    {
+      "id": 9,
+      "name": "Flare",
+      "power": 87,
+      "mp_cost": 5,
+      "element": "Fire",
+      "byte3": 54,
+      "byte4": 4,
+      "byte5": 2,
+      "address": "$060F6C",
+      "effects": [
+        "Fire elemental",
+        "87 base damage/healing"
+      ]
+    },
+    {
+      "id": 10,
+      "name": "White",
+      "power": 55,
+      "mp_cost": 5,
+      "element": "Water",
+      "byte3": 57,
+      "byte4": 3,
+      "byte5": 4,
+      "address": "$060F72",
+      "effects": [
+        "Water elemental",
+        "55 base damage/healing"
+      ]
+    },
+    {
+      "id": 11,
+      "name": "Meteor",
+      "power": 96,
+      "mp_cost": 20,
+      "element": "Earth",
+      "byte3": 67,
+      "byte4": 4,
+      "byte5": 4,
+      "address": "$060F78",
+      "effects": [
+        "Earth elemental",
+        "96 base damage/healing"
+      ]
+    },
+    {
+      "id": 12,
+      "name": "Exit",
+      "power": 19,
+      "mp_cost": 12,
+      "element": "Earth",
+      "byte3": 75,
+      "byte4": 4,
+      "byte5": 4,
+      "address": "$060F7E",
+      "effects": [
+        "Earth elemental",
+        "19 base damage/healing"
+      ]
+    },
+    {
+      "id": 13,
+      "name": "Seed",
+      "power": 30,
+      "mp_cost": 12,
+      "element": "Earth",
+      "byte3": 83,
+      "byte4": 5,
+      "byte5": 3,
+      "address": "$060F84",
+      "effects": [
+        "Earth elemental",
+        "30 base damage/healing"
+      ]
+    },
+    {
+      "id": 14,
+      "name": "Heal",
+      "power": 40,
+      "mp_cost": 11,
+      "element": "Earth",
+      "byte3": 92,
+      "byte4": 5,
+      "byte5": 3,
+      "address": "$060F8A",
+      "effects": [
+        "Earth elemental",
+        "40 base damage/healing"
+      ]
+    },
+    {
+      "id": 15,
+      "name": "Steel",
+      "power": 48,
+      "mp_cost": 11,
+      "element": "Fire",
+      "byte3": 100,
+      "byte4": 4,
+      "byte5": 2,
+      "address": "$060F90",
+      "effects": [
+        "Fire elemental",
+        "48 base damage/healing"
+      ]
+    }
+  ]
 }
