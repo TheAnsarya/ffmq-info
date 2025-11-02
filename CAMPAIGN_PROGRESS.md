@@ -63,6 +63,39 @@ After completing Phase 3, returning to core disassembly work with Bank 00 sectio
 
 **Campaign Status**: 60 labels remaining in Bank 00 sections
 
+**Batch 40: Bank 00 Section 3 Cleanup** (10 labels eliminated)
+
+Continuing Bank 00 section file cleanup with menu and input systems.
+
+- **File**: `bank_00_section3.asm` (464 lines)
+- **Labels**: 10 → 0 (100% complete for this file!)
+- **Systems Documented**:
+  * **Status Icon Animation** (4 labels):
+    - StatusIcon_CheckCharacterSlot5: Character slot 5 animation check
+    - StatusIcon_CheckCharacterSlot6: Character slot 6 animation check
+    - StatusIcon_SetUpdateFlag: Set display update flag
+    - StatusIcon_AnimationComplete: Animation cycle completion
+  * **Menu System** (3 labels):
+    - Menu_ValidateAction: Validate menu action at cursor position
+    - Menu_UpdateDisplay: Update menu tilemap based on selection
+    - Menu_UpdateCharacterTile: Update character sprite on map (dual buffer)
+  * **Input System** (2 labels):
+    - Input_CheckBlocking: Check if input should be blocked
+    - Map_TilePositionToVRAM: Convert tile coordinates to VRAM address
+  * **Status Icon Animation** (1 label):
+    - StatusIcon_ToggleTileFrame: Toggle animation frame (tile XOR $04)
+- **Technical Details**:
+  * Party slots 5-6: Characters at $70073f, $70078f
+  * Animation: 4-tile metasprite per character (OAM offsets $80, $90)
+  * Menu: 4-row display with wrapping, cursor bounds at $03/$04
+  * Tilemap sources: $3709 (rows 0-2), $3719 (3-5), $3729 (6-8), $3739 (9+)
+  * Dual buffer mode: Updates both $7f075a and $7f079a WRAM regions
+  * Tile position encoding: 3 bits Y (bits 3-5), 3 bits X (bits 0-2)
+- **ROM Verification**: 100% match (SHA256: F71817F55FEBD32FD1DCE617A326A77B6B062DD0D4058ECD289F64AF1B7A1D05)
+- **Build Time**: 0.02 seconds
+
+**Campaign Status**: 50 labels remaining in Bank 00 sections (2 files complete!)
+
 ---
 
 ## 📊 Advanced Metrics Dashboard
