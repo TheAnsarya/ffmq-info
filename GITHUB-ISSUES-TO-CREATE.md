@@ -361,12 +361,32 @@ Create validation suite that compares our extracted data against FFMQ Randomizer
 - Issues 7 (Visualizations) depends on Issues 1, 2, 3
 - Issue 8 (Validation) benefits from Issues 1, 2, 3 being complete
 
+---
+
+## ✅ GitHub Issues Created
+
+**Date Created:** November 2, 2025
+
+| Priority | Issue # | Title | Status |
+|----------|---------|-------|--------|
+| High | [#53](https://github.com/TheAnsarya/ffmq-info/issues/53) | Add enemy stats data extraction tool (ROM $C275) | ✅ Created |
+| High | [#61](https://github.com/TheAnsarya/ffmq-info/issues/61) | Add attack/battle action data extraction tool (ROM $BC78) | ✅ Created |
+| Medium | [#62](https://github.com/TheAnsarya/ffmq-info/issues/62) | Extract enemy attack link data (ROM $C6FF) | ✅ Created |
+| Medium | [#56](https://github.com/TheAnsarya/ffmq-info/issues/56) | Add comprehensive element type definitions to all schemas | ✅ Created |
+| Medium | [#57](https://github.com/TheAnsarya/ffmq-info/issues/57) | Document battle mechanics and damage formulas | ✅ Created |
+| Low | [#58](https://github.com/TheAnsarya/ffmq-info/issues/58) | Research spell data unknown bytes (byte 1-2) | ✅ Created |
+| Low | [#59](https://github.com/TheAnsarya/ffmq-info/issues/59) | Create data relationship visualizations | ✅ Created |
+| Low | [#60](https://github.com/TheAnsarya/ffmq-info/issues/60) | Cross-validate all extracted data with FFMQ Randomizer | ✅ Created |
+
+**All 8 issues successfully created!** 🎉
+
 **Next Steps:**
-1. Create these issues on GitHub
+1. ✅ ~~Create these issues on GitHub~~
 2. Prioritize high-priority data extraction issues
 3. Begin with enemy data extraction (builds on spell data research)
 
 ---
 
 **Date:** 2025-11-01  
+**Updated:** 2025-11-02  
 **Reference:** docs/EXTERNAL_REFERENCES.md
