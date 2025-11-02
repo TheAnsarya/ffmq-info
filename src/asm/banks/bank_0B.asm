@@ -1,44 +1,44 @@
-﻿;      |        |      ;
+;      |        |      ;
 	org $0b8000                          ;      |        |      ;
 ;      |        |      ;
 ;      |        |      ;
-CODE_0B8000:
+BattleEvent_EventDispatcher:
 	lda.W $0e8b                          ;0B8000|AD8B0E  |010E8B;
-	beq CODE_0B8017                      ;0B8003|F012    |0B8017;
+	beq Event_Type0                      ;0B8003|F012    |0B8017;
 	dec a;0B8005|3A      |      ;
-	beq CODE_0B8023                      ;0B8006|F01B    |0B8023;
+	beq Event_Type1                      ;0B8006|F01B    |0B8023;
 	dec a;0B8008|3A      |      ;
-	beq CODE_0B802F                      ;0B8009|F024    |0B802F;
+	beq Event_Type2                      ;0B8009|F024    |0B802F;
 	lda.B #$4a                           ;0B800B|A94A    |      ;
 	sta.W $0507                          ;0B800D|8D0705  |010507;
 	lda.B #$1b                           ;0B8010|A91B    |      ;
 	sta.W $0506                          ;0B8012|8D0605  |010506;
-	bra CODE_0B8039                      ;0B8015|8022    |0B8039;
+	bra Event_SetupCommon                      ;0B8015|8022    |0B8039;
 ;      |        |      ;
 ;      |        |      ;
-CODE_0B8017:
+Event_Type0:
 	lda.B #$a1                           ;0B8017|A9A1    |      ;
 	sta.W $0507                          ;0B8019|8D0705  |010507;
 	lda.B #$1f                           ;0B801C|A91F    |      ;
 	sta.W $0506                          ;0B801E|8D0605  |010506;
-	bra CODE_0B8039                      ;0B8021|8016    |0B8039;
+	bra Event_SetupCommon                      ;0B8021|8016    |0B8039;
 ;      |        |      ;
 ;      |        |      ;
-CODE_0B8023:
+Event_Type1:
 	lda.B #$b6                           ;0B8023|A9B6    |      ;
 	sta.W $0507                          ;0B8025|8D0705  |010507;
 	lda.B #$1b                           ;0B8028|A91B    |      ;
 	sta.W $0506                          ;0B802A|8D0605  |010506;
-	bra CODE_0B8039                      ;0B802D|800A    |0B8039;
+	bra Event_SetupCommon                      ;0B802D|800A    |0B8039;
 ;      |        |      ;
 ;      |        |      ;
-CODE_0B802F:
+Event_Type2:
 	lda.B #$5f                           ;0B802F|A95F    |      ;
 	sta.W $0507                          ;0B8031|8D0705  |010507;
 	lda.B #$1f                           ;0B8034|A91F    |      ;
 	sta.W $0506                          ;0B8036|8D0605  |010506;
 ;      |        |      ;
-CODE_0B8039:
+Event_SetupCommon:
 	lda.B #$0a                           ;0B8039|A90A    |      ;
 	sta.W $0505                          ;0B803B|8D0505  |010505;
 	rtl                                  ;0B803E|6B      |      ;
@@ -51,10 +51,10 @@ CODE_0B8039:
 	rep #$10                             ;0B8045|C210    |      ;
 	phk                                  ;0B8047|4B      |      ;
 	plb                                  ;0B8048|AB      |      ;
-	jsr.W CODE_0B80D9                    ;0B8049|20D980  |0B80D9;
+	jsr.W BattleEvent_InitSearch                    ;0B8049|20D980  |0B80D9;
 	ldx.W $192b                          ;0B804C|AE2B19  |0B192B;
 	cpx.W #$ffff                         ;0B804F|E0FFFF  |      ;
-	beq CODE_0B80A1                      ;0B8052|F04D    |0B80A1;
+	beq BattleEvent_Return                      ;0B8052|F04D    |0B80A1;
 	lda.W $1a80,x                        ;0B8054|BD801A  |0B1A80;
 	and.B #$cf                           ;0B8057|29CF    |      ;
 	ora.B #$10                           ;0B8059|0910    |      ;
@@ -72,7 +72,7 @@ CODE_0B8039:
 	plx                                  ;0B8072|FA      |      ;
 	jsl.L CODE_01AE86                    ;0B8073|2286AE01|01AE86;
 ;      |        |      ;
-CODE_0B8077:
+BattleEvent_UpdateOAM:
 	rep #$30                             ;0B8077|C230    |      ;
 	lda.W $192d                          ;0B8079|AD2D19  |00192D;
 	and.W #$00ff                         ;0B807C|29FF00  |      ;
@@ -92,7 +92,7 @@ CODE_0B8077:
 	lda.W $1a79,x                        ;0B809B|BD791A  |001A79;
 	sta.W $0c0e,y                        ;0B809E|990E0C  |000C0E;
 ;      |        |      ;
-CODE_0B80A1:
+BattleEvent_Return:
 	ply                                  ;0B80A1|7A      |      ;
 	plx                                  ;0B80A2|FA      |      ;
 	plb                                  ;0B80A3|AB      |      ;
@@ -105,10 +105,10 @@ CODE_0B80A1:
 	phy                                  ;0B80A9|5A      |      ;
 	sep #$20                             ;0B80AA|E220    |      ;
 	rep #$10                             ;0B80AC|C210    |      ;
-	jsr.W CODE_0B80D9                    ;0B80AE|20D980  |0B80D9;
+	jsr.W BattleEvent_InitSearch                    ;0B80AE|20D980  |0B80D9;
 	ldx.W $192b                          ;0B80B1|AE2B19  |00192B;
 	cpx.W #$ffff                         ;0B80B4|E0FFFF  |      ;
-	beq CODE_0B80A1                      ;0B80B7|F0E8    |0B80A1;
+	beq BattleEvent_Return                      ;0B80B7|F0E8    |0B80A1;
 	lda.W $1a80,x                        ;0B80B9|BD801A  |001A80;
 	and.B #$cf                           ;0B80BC|29CF    |      ;
 	sta.W $1a80,x                        ;0B80BE|9D801A  |001A80;
@@ -123,10 +123,10 @@ CODE_0B80A1:
 	tay                                  ;0B80D1|A8      |      ;
 	plx                                  ;0B80D2|FA      |      ;
 	jsl.L CODE_01AE86                    ;0B80D3|2286AE01|01AE86;
-	bra CODE_0B8077                      ;0B80D7|809E    |0B8077;
+	bra BattleEvent_UpdateOAM                      ;0B80D7|809E    |0B8077;
 ;      |        |      ;
 ;      |        |      ;
-CODE_0B80D9:
+BattleEvent_InitSearch:
 	lda.W $009e                          ;0B80D9|AD9E00  |00009E;
 	sta.W $192c                          ;0B80DC|8D2C19  |00192C;
 	lda.B #$02                           ;0B80DF|A902    |      ;
@@ -146,13 +146,13 @@ CODE_0B80D9:
 	ldx.W #$0000                         ;0B80F6|A20000  |      ;
 	ldy.W #$0016                         ;0B80F9|A01600  |      ;
 ;      |        |      ;
-CODE_0B80FC:
+FindBattlerLoop:
 	lda.B $00,x                          ;0B80FC|B500    |001A72;
 	cmp.B #$ff                           ;0B80FE|C9FF    |      ;
-	beq CODE_0B8114                      ;0B8100|F012    |0B8114;
+	beq FindBattler_Next                      ;0B8100|F012    |0B8114;
 	lda.B $19,x                          ;0B8102|B519    |001A8B;
 	cmp.W $1502                          ;0B8104|CD0215  |001502;
-	bne CODE_0B8114                      ;0B8107|D00B    |0B8114;
+	bne FindBattler_Next                      ;0B8107|D00B    |0B8114;
 	ldy.B $0b,x                          ;0B8109|B40B    |001A7D;
 	sty.W $1500                          ;0B810B|8C0015  |001500;
 	pld                                  ;0B810E|2B      |      ;
@@ -163,7 +163,7 @@ CODE_0B80FC:
 	rtl                                  ;0B8113|6B      |      ;
 ;      |        |      ;
 ;      |        |      ;
-CODE_0B8114:
+FindBattler_Next:
 	php                                  ;0B8114|08      |      ;
 	rep #$30                             ;0B8115|C230    |      ;
 	txa                                  ;0B8117|8A      |      ;
@@ -172,9 +172,9 @@ CODE_0B8114:
 	tax                                  ;0B811C|AA      |      ;
 	plp                                  ;0B811D|28      |      ;
 	dey                                  ;0B811E|88      |      ;
-	bne CODE_0B80FC                      ;0B811F|D0DB    |0B80FC;
+	bne FindBattlerLoop                      ;0B811F|D0DB    |0B80FC;
 ;      |        |      ;
-CODE_0B8121:
+BattleEvent_LoadFont:
 	lda.B #$00                           ;0B8121|A900    |      ;
 	xba                                  ;0B8123|EB      |      ;
 	lda.W $0e8b                          ;0B8124|AD8B0E  |010E8B;
@@ -199,7 +199,7 @@ UNREACH_0B8144:
 	db $0f                               ;0B8144|        |6F4F2F;
 	db $2f,$4f,$6f,$8f                   ;0B8145|        |      ;
 ;      |        |      ;
-CODE_0B8149:
+InitBattleGraphics:
 	stz.W $19f6                          ;0B8149|9CF619  |0119F6;
 	lda.B #$80                           ;0B814C|A980    |      ;
 	sta.W $19a5                          ;0B814E|8DA519  |0119A5;
@@ -209,7 +209,7 @@ CODE_0B8149:
 	stx.W $0e89                          ;0B8159|8E890E  |010E89;
 	lda.W $19f0                          ;0B815C|ADF019  |0119F0;
 	sta.W $0e91                          ;0B815F|8D910E  |010E91;
-	bne CODE_0B81A5                      ;0B8162|D041    |0B81A5;
+	bne LoadEnemyTileData                      ;0B8162|D041    |0B81A5;
 	lda.B #$f2                           ;0B8164|A9F2    |      ;
 	jsl.L CODE_00976B                    ;0B8166|226B9700|00976B;
 	stz.W $1a5b                          ;0B816A|9C5B1A  |011A5B;
@@ -223,27 +223,27 @@ CODE_0B8149:
 	sep #$20                             ;0B817E|E220    |      ;
 	lda.B #$f3                           ;0B8180|A9F3    |      ;
 	jsl.L CODE_009776                    ;0B8182|22769700|009776;
-	bne CODE_0B81A5                      ;0B8186|D01D    |0B81A5;
+	bne LoadEnemyTileData                      ;0B8186|D01D    |0B81A5;
 	lda.B #$02                           ;0B8188|A902    |      ;
 	sta.W $0e8b                          ;0B818A|8D8B0E  |010E8B;
 	ldx.W #$0000                         ;0B818D|A20000  |      ;
 	lda.B #$20                           ;0B8190|A920    |      ;
 ;      |        |      ;
-CODE_0B8192:
+ClearGraphicsLoop1:
 	stz.W $0ec8,x                        ;0B8192|9EC80E  |010EC8;
 	stz.W $0f28,x                        ;0B8195|9E280F  |010F28;
 	inx                                  ;0B8198|E8      |      ;
 	dec a;0B8199|3A      |      ;
-	bne CODE_0B8192                      ;0B819A|D0F6    |0B8192;
+	bne ClearGraphicsLoop1                      ;0B819A|D0F6    |0B8192;
 	lda.B #$30                           ;0B819C|A930    |      ;
 ;      |        |      ;
-CODE_0B819E:
+ClearGraphicsLoop2:
 	stz.W $0ec8,x                        ;0B819E|9EC80E  |010EC8;
 	inx                                  ;0B81A1|E8      |      ;
 	dec a;0B81A2|3A      |      ;
-	bne CODE_0B819E                      ;0B81A3|D0F9    |0B819E;
+	bne ClearGraphicsLoop2                      ;0B81A3|D0F9    |0B819E;
 ;      |        |      ;
-CODE_0B81A5:
+LoadEnemyTileData:
 	lda.W $0e91                          ;0B81A5|AD910E  |010E91;
 	rep #$20                             ;0B81A8|C220    |      ;
 	and.W #$00ff                         ;0B81AA|29FF00  |      ;
@@ -255,13 +255,13 @@ CODE_0B81A5:
 	stx.W $19b5                          ;0B81B6|8EB519  |0119B5;
 	ldy.W #$0000                         ;0B81B9|A00000  |      ;
 ;      |        |      ;
-CODE_0B81BC:
+LoadEnemyLoop:
 	lda.L DATA8_07b013,x                 ;0B81BC|BF13B007|07B013;
 	sta.W $1910,y                        ;0B81C0|991019  |011910;
 	inx                                  ;0B81C3|E8      |      ;
 	iny                                  ;0B81C4|C8      |      ;
 	cpy.W #$0007                         ;0B81C5|C00700  |      ;
-	bne CODE_0B81BC                      ;0B81C8|D0F2    |0B81BC;
+	bne LoadEnemyLoop                      ;0B81C8|D0F2    |0B81BC;
 	lda.B #$0a                           ;0B81CA|A90A    |      ;
 	sta.W $211b                          ;0B81CC|8D1B21  |01211B;
 	stz.W $211b                          ;0B81CF|9C1B21  |01211B;
@@ -271,17 +271,17 @@ CODE_0B81BC:
 	stx.W $19b7                          ;0B81DB|8EB719  |0119B7;
 	ldy.W #$0000                         ;0B81DE|A00000  |      ;
 ;      |        |      ;
-CODE_0B81E1:
+LoadSampleLoop:
 	lda.L DATA8_0b8cd9,x                 ;0B81E1|BFD98C0B|0B8CD9;
 	sta.W $1918,y                        ;0B81E5|991819  |011918;
 	inx                                  ;0B81E8|E8      |      ;
 	iny                                  ;0B81E9|C8      |      ;
 	cpy.W #$000a                         ;0B81EA|C00A00  |      ;
-	bne CODE_0B81E1                      ;0B81ED|D0F2    |0B81E1;
+	bne LoadSampleLoop                      ;0B81ED|D0F2    |0B81E1;
 	ldx.W #$ffff                         ;0B81EF|A2FFFF  |      ;
 	lda.W $1912                          ;0B81F2|AD1219  |011912;
 	cmp.B #$ff                           ;0B81F5|C9FF    |      ;
-	beq CODE_0B8207                      ;0B81F7|F00E    |0B8207;
+	beq LoadEnemyRemap                      ;0B81F7|F00E    |0B8207;
 	rep #$20                             ;0B81F9|C220    |      ;
 	and.W #$00ff                         ;0B81FB|29FF00  |      ;
 	asl a;0B81FE|0A      |      ;
@@ -290,7 +290,7 @@ CODE_0B81E1:
 	tax                                  ;0B8204|AA      |      ;
 	sep #$20                             ;0B8205|E220    |      ;
 ;      |        |      ;
-CODE_0B8207:
+LoadEnemyRemap:
 	stx.W $19b9                          ;0B8207|8EB919  |0119B9;
 	lda.W $1916                          ;0B820A|AD1619  |011916;
 	and.B #$e0                           ;0B820D|29E0    |      ;
@@ -307,7 +307,7 @@ CODE_0B8207:
 	rtl                                  ;0B8222|6B      |      ;
 ;      |        |      ;
 ;      |        |      ;
-CODE_0B8223:
+InitBattleMap:
 	phb                                  ;0B8223|8B      |      ;
 	phk                                  ;0B8224|4B      |      ;
 	plb                                  ;0B8225|AB      |      ;
@@ -317,14 +317,14 @@ CODE_0B8223:
 	stx.W $190c                          ;0B822B|8E0C19  |0B190C;
 	stx.W $190e                          ;0B822E|8E0E19  |0B190E;
 ;      |        |      ;
-CODE_0B8231:
+InitMapLoop:
 	lda.W DATA8_0b8296,x                 ;0B8231|BD9682  |0B8296;
 	sta.W $1a4a,x                        ;0B8234|9D4A1A  |0B1A4A;
 	inx                                  ;0B8237|E8      |      ;
 	cpx.W #$000b                         ;0B8238|E00B00  |      ;
-	bne CODE_0B8231                      ;0B823B|D0F4    |0B8231;
+	bne InitMapLoop                      ;0B823B|D0F4    |0B8231;
 	lda.W $1a55                          ;0B823D|AD551A  |0B1A55;
-	beq CODE_0B8294                      ;0B8240|F052    |0B8294;
+	beq InitMap_Return                      ;0B8240|F052    |0B8294;
 	dec a;0B8242|3A      |      ;
 	asl a;0B8243|0A      |      ;
 	asl a;0B8244|0A      |      ;
@@ -361,7 +361,7 @@ CODE_0B8231:
 	lda.B #$17                           ;0B828F|A917    |      ;
 	sta.W $1a4e                          ;0B8291|8D4E1A  |0B1A4E;
 ;      |        |      ;
-CODE_0B8294:
+InitMap_Return:
 	plb                                  ;0B8294|AB      |      ;
 	rtl                                  ;0B8295|6B      |      ;
 ;      |        |      ;
@@ -383,69 +383,69 @@ DATA8_0b82a0:
 	db $00,$20,$30                       ;0B82A6|        |      ;
 	db $00                               ;0B82A9|        |      ;
 ;      |        |      ;
-CODE_0B82AA:
+LoadMapTile:
 	ldy.W $0e89                          ;0B82AA|AC890E  |010E89;
-	jsr.W CODE_0B8338                    ;0B82AD|203883  |0B8338;
+	jsr.W CalculateTileAddress                    ;0B82AD|203883  |0B8338;
 	sta.W $19d3                          ;0B82B0|8DD319  |0119D3;
 	stx.W $19cb                          ;0B82B3|8ECB19  |0119CB;
 	lda.W $19cc                          ;0B82B6|ADCC19  |0119CC;
-	bpl CODE_0B82CB                      ;0B82B9|1010    |0B82CB;
+	bpl ProcessMapTile                      ;0B82B9|1010    |0B82CB;
 	and.B #$40                           ;0B82BB|2940    |      ;
-	beq CODE_0B82CB                      ;0B82BD|F00C    |0B82CB;
+	beq ProcessMapTile                      ;0B82BD|F00C    |0B82CB;
 	tyx                                  ;0B82BF|BB      |      ;
 	lda.L $7f8000,x                      ;0B82C0|BF00807F|7F8000;
 	inc a;0B82C4|1A      |      ;
 	sta.L $7f8000,x                      ;0B82C5|9F00807F|7F8000;
-	bra CODE_0B82AA                      ;0B82C9|80DF    |0B82AA;
+	bra LoadMapTile                      ;0B82C9|80DF    |0B82AA;
 ;      |        |      ;
 ;      |        |      ;
-CODE_0B82CB:
+ProcessMapTile:
 	lda.W $19b4                          ;0B82CB|ADB419  |0119B4;
 	and.B #$f0                           ;0B82CE|29F0    |      ;
 	sta.W $19b4                          ;0B82D0|8DB419  |0119B4;
 	lda.W $19cb                          ;0B82D3|ADCB19  |0119CB;
 	and.B #$08                           ;0B82D6|2908    |      ;
-	beq CODE_0B82E3                      ;0B82D8|F009    |0B82E3;
+	beq ProcessTile_CheckDuplicate                      ;0B82D8|F009    |0B82E3;
 	lda.W $0e8d                          ;0B82DA|AD8D0E  |010E8D;
-	beq CODE_0B82E3                      ;0B82DD|F004    |0B82E3;
+	beq ProcessTile_CheckDuplicate                      ;0B82DD|F004    |0B82E3;
 	db $a9,$01,$80,$05                   ;0B82DF|        |      ;
 ;      |        |      ;
-CODE_0B82E3:
+ProcessTile_CheckDuplicate:
 	lda.W $19cb                          ;0B82E3|ADCB19  |0119CB;
 	and.B #$07                           ;0B82E6|2907    |      ;
 	xba                                  ;0B82E8|EB      |      ;
 	lda.W $19d3                          ;0B82E9|ADD319  |0119D3;
-	bpl CODE_0B82F2                      ;0B82EC|1004    |0B82F2;
+	bpl ProcessTile_SetDirection                      ;0B82EC|1004    |0B82F2;
 	xba                                  ;0B82EE|EB      |      ;
 	ora.B #$08                           ;0B82EF|0908    |      ;
 	xba                                  ;0B82F1|EB      |      ;
 ;      |        |      ;
-CODE_0B82F2:
+ProcessTile_SetDirection:
 	xba                                  ;0B82F2|EB      |      ;
 	ora.W $19b4                          ;0B82F3|0DB419  |0119B4;
 	sta.W $19b4                          ;0B82F6|8DB419  |0119B4;
 	ldx.W #$0000                         ;0B82F9|A20000  |      ;
 	and.B #$07                           ;0B82FC|2907    |      ;
 	dec a;0B82FE|3A      |      ;
-	beq CODE_0B8304                      ;0B82FF|F003    |0B8304;
+	beq ProcessTile_SetTable                      ;0B82FF|F003    |0B8304;
 	ldx.W #$000a                         ;0B8301|A20A00  |      ;
 ;      |        |      ;
-CODE_0B8304:
+ProcessTile_SetTable:
 	ldy.W #$0000                         ;0B8304|A00000  |      ;
 ;      |        |      ;
-CODE_0B8307:
+LoadTableLoop:
 	lda.L DATA8_0b8324,x                 ;0B8307|BF24830B|0B8324;
 	sta.W $1993,y                        ;0B830B|999319  |011993;
 	inx                                  ;0B830E|E8      |      ;
 	iny                                  ;0B830F|C8      |      ;
 	cpy.W #$000a                         ;0B8310|C00A00  |      ;
-	bne CODE_0B8307                      ;0B8313|D0F2    |0B8307;
+	bne LoadTableLoop                      ;0B8313|D0F2    |0B8307;
 	ldx.W #$0e06                         ;0B8315|A2060E  |      ;
 	lda.W $1910                          ;0B8318|AD1019  |011910;
-	bpl CODE_0B8320                      ;0B831B|1003    |0B8320;
+	bpl UpdateBattleRegisters                      ;0B831B|1003    |0B8320;
 	ldx.W #$0e0e                         ;0B831D|A20E0E  |      ;
 ;      |        |      ;
-CODE_0B8320:
+UpdateBattleRegisters:
 	stx.W $19b2                          ;0B8320|8EB219  |0119B2;
 	rtl                                  ;0B8323|6B      |      ;
 ;      |        |      ;
@@ -454,7 +454,7 @@ DATA8_0b8324:
 	db $10,$40,$04,$02,$0c,$02,$00,$00,$00,$00,$10,$c0,$0c,$02,$04,$02;0B8324|        |      ;
 	db $00,$00,$00,$00                   ;0B8334|        |      ;
 ;      |        |      ;
-CODE_0B8338:
+CalculateTileAddress:
 	rep #$20                             ;0B8338|C220    |      ;
 	tya                                  ;0B833A|98      |      ;
 	sep #$20                             ;0B833B|E220    |      ;
@@ -483,7 +483,7 @@ CODE_0B8338:
 	rts                                  ;0B8369|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
-CODE_0B836A:
+TransferTileData:
 	phb                                  ;0B836A|8B      |      ;
 	phk                                  ;0B836B|4B      |      ;
 	plb                                  ;0B836C|AB      |      ;
@@ -492,7 +492,7 @@ CODE_0B836A:
 	lda.W $1918                          ;0B8373|AD1819  |0B1918;
 	and.B #$0f                           ;0B8376|290F    |      ;
 ;      |        |      ;
-CODE_0B8378:
+TransferLoop:
 	phx                                  ;0B8378|DA      |      ;
 	pha                                  ;0B8379|48      |      ;
 	xba                                  ;0B837A|EB      |      ;
@@ -519,7 +519,7 @@ CODE_0B8378:
 	inx                                  ;0B83A3|E8      |      ;
 	inx                                  ;0B83A4|E8      |      ;
 	cpx.W #$0006                         ;0B83A5|E00600  |      ;
-	bne CODE_0B8378                      ;0B83A8|D0CE    |0B8378;
+	bne TransferLoop                      ;0B83A8|D0CE    |0B8378;
 	plb                                  ;0B83AA|AB      |      ;
 	rtl                                  ;0B83AB|6B      |      ;
 ;      |        |      ;
@@ -533,10 +533,10 @@ DATA8_0b83ad:
 DATA8_0b83b2:
 	db $00,$80,$00,$a0,$00,$a8           ;0B83B2|        |      ;
 ;      |        |      ;
-CODE_0B83B8:
+LoadBattleBackground:
 	lda.W $1919                          ;0B83B8|AD1919  |011919;
 	cmp.B #$19                           ;0B83BB|C919    |      ;
-	beq CODE_0B83DF                      ;0B83BD|F020    |0B83DF;
+	beq LoadSpecialBackground                      ;0B83BD|F020    |0B83DF;
 	sta.W $4202                          ;0B83BF|8D0242  |014202;
 	lda.B #$80                           ;0B83C2|A980    |      ;
 	sta.W $4203                          ;0B83C4|8D0342  |014203;
@@ -554,7 +554,7 @@ CODE_0B83B8:
 	rtl                                  ;0B83DE|6B      |      ;
 ;      |        |      ;
 ;      |        |      ;
-CODE_0B83DF:
+LoadSpecialBackground:
 	rep #$20                             ;0B83DF|C220    |      ;
 	ldx.W #$d984                         ;0B83E1|A284D9  |      ;
 	ldy.W #$c588                         ;0B83E4|A088C5  |      ;
@@ -566,7 +566,7 @@ CODE_0B83DF:
 	rtl                                  ;0B83F1|6B      |      ;
 ;      |        |      ;
 ;      |        |      ;
-CODE_0B83F2:
+LoadDecorativeTiles:
 	phb                                  ;0B83F2|8B      |      ;
 	rep #$20                             ;0B83F3|C220    |      ;
 	ldx.W #$d824                         ;0B83F5|A224D8  |      ;
@@ -586,7 +586,7 @@ CODE_0B83F2:
 	rtl                                  ;0B841C|6B      |      ;
 ;      |        |      ;
 ;      |        |      ;
-CODE_0B841D:
+SetupBattleDisplay:
 	lda.B #$41                           ;0B841D|A941    |      ;
 	sta.W $2107                          ;0B841F|8D0721  |012107;
 	lda.W $1a4d                          ;0B8422|AD4D1A  |011A4D;
@@ -601,12 +601,12 @@ CODE_0B841D:
 	lda.W $19cb                          ;0B843D|ADCB19  |0119CB;
 	and.B #$70                           ;0B8440|2970    |      ;
 	cmp.B #$70                           ;0B8442|C970    |      ;
-	bne CODE_0B844A                      ;0B8444|D004    |0B844A;
+	bne ApplyColorMath                      ;0B8444|D004    |0B844A;
 	tya                                  ;0B8446|98      |      ;
 	ora.B #$10                           ;0B8447|0910    |      ;
 	tay                                  ;0B8449|A8      |      ;
 ;      |        |      ;
-CODE_0B844A:
+ApplyColorMath:
 	tya                                  ;0B844A|98      |      ;
 	sta.W $2131                          ;0B844B|8D3121  |012131;
 	rtl                                  ;0B844E|6B      |      ;
@@ -652,7 +652,7 @@ DATA8_0b84e2:
 	db $02,$02,$40,$00,$02,$00,$00,$04,$02,$00,$c2,$00,$02,$00,$00,$08;0B84E2|        |      ;
 	db $02,$02,$51,$00,$02,$00,$c1,$04,$01;0B84F2|        |      ;
 ;      |        |      ;
-CODE_0B84FB:
+LoadEnemySpriteTiles:
 	rep #$20                             ;0B84FB|C220    |      ;
 	lda.W $1918                          ;0B84FD|AD1819  |011918;
 	and.W #$00f0                         ;0B8500|29F000  |      ;
@@ -678,7 +678,7 @@ CODE_0B84FB:
 	sep #$20                             ;0B8532|E220    |      ;
 	lda.L DATA8_0b8737,x                 ;0B8534|BF37870B|0B8737;
 	sta.W $0902                          ;0B8538|8D0209  |010902;
-	jsl.L CODE_0B8669                    ;0B853B|2269860B|0B8669;
+	jsl.L DecompressTiles                    ;0B853B|2269860B|0B8669;
 	rtl                                  ;0B853F|6B      |      ;
 ;      |        |      ;
 ;      |        |      ;
@@ -690,7 +690,7 @@ UNREACH_0B8540:
 	db $10,$40,$20,$40                   ;0B8558|        |0B859A;
 	db $30,$40,$40,$40                   ;0B855C|        |      ;
 ;      |        |      ;
-CODE_0B8560:
+ProcessAnimationFrame:
 	lda.B #$00                           ;0B8560|A900    |      ;
 	xba                                  ;0B8562|EB      |      ;
 	lda.W $1a4c                          ;0B8563|AD4C1A  |011A4C;
@@ -704,33 +704,33 @@ DATA8_0b856c:
 	db $33,$86,$7a,$85,$bf,$85,$33,$86,$34,$86,$2e,$86;0B856C|        |      ;
 	db $bf,$85                           ;0B8578|        |55AD85;
 	lda.W $1a55                          ;0B857A|AD551A  |011A55;
-	bpl CODE_0B85BE                      ;0B857D|103F    |0B85BE;
+	bpl ProcessAnimation_Return                      ;0B857D|103F    |0B85BE;
 	ldx.W #$1000                         ;0B857F|A20010  |      ;
 	stx.W $1a4a                          ;0B8582|8E4A1A  |011A4A;
 	ldx.W #$f6d1                         ;0B8585|A2D1F6  |      ;
 	lda.B #$03                           ;0B8588|A903    |      ;
 	jsl.L CODE_009776                    ;0B858A|22769700|009776;
-	bne CODE_0B85A9                      ;0B858E|D019    |0B85A9;
+	bne LoadMagicAnimData                      ;0B858E|D019    |0B85A9;
 	ldx.W #$f538                         ;0B8590|A238F5  |      ;
 	lda.B #$02                           ;0B8593|A902    |      ;
 	jsl.L CODE_009776                    ;0B8595|22769700|009776;
-	bne CODE_0B85A9                      ;0B8599|D00E    |0B85A9;
+	bne LoadMagicAnimData                      ;0B8599|D00E    |0B85A9;
 	ldx.W #$f37c                         ;0B859B|A27CF3  |      ;
 	lda.B #$01                           ;0B859E|A901    |      ;
 	jsl.L CODE_009776                    ;0B85A0|22769700|009776;
-	bne CODE_0B85A9                      ;0B85A4|D003    |0B85A9;
+	bne LoadMagicAnimData                      ;0B85A4|D003    |0B85A9;
 	ldx.W #$f240                         ;0B85A6|A240F2  |      ;
 ;      |        |      ;
-CODE_0B85A9:
+LoadMagicAnimData:
 	stx.W $0900                          ;0B85A9|8E0009  |010900;
 	lda.B #$07                           ;0B85AC|A907    |      ;
 	sta.W $0902                          ;0B85AE|8D0209  |010902;
 	ldx.W #$7f90                         ;0B85B1|A2907F  |      ;
 	stx.W $0904                          ;0B85B4|8E0409  |010904;
 	stz.W $0903                          ;0B85B7|9C0309  |010903;
-	jsl.L CODE_0B86EA                    ;0B85BA|22EA860B|0B86EA;
+	jsl.L UploadCompressedData                    ;0B85BA|22EA860B|0B86EA;
 ;      |        |      ;
-CODE_0B85BE:
+ProcessAnimation_Return:
 	rts                                  ;0B85BE|60      |      ;
 ;      |        |      ;
 	lda.B #$08                           ;0B85BF|A908    |      ;
@@ -774,7 +774,7 @@ CODE_0B85BE:
 	sep #$20                             ;0B8621|E220    |      ;
 	lda.L DATA8_0b8737,x                 ;0B8623|BF37870B|0B8737;
 	sta.W $0902                          ;0B8627|8D0209  |010902;
-	jsl.L CODE_0B8669                    ;0B862A|2269860B|0B8669;
+	jsl.L DecompressTiles                    ;0B862A|2269860B|0B8669;
 	lda.B #$4b                           ;0B862E|A94B    |      ;
 	sta.W $1a4d                          ;0B8630|8D4D1A  |011A4D;
 	rts                                  ;0B8633|60      |      ;
@@ -802,7 +802,7 @@ DATA8_0b8659:
 DATA8_0b865b:
 	db $01,$00,$ff,$ff,$00,$00,$00,$00,$ff,$ff,$01,$00,$00,$00;0B865B|        |      ;
 ;      |        |      ;
-CODE_0B8669:
+DecompressTiles:
 	php                                  ;0B8669|08      |      ;
 	phd                                  ;0B866A|0B      |      ;
 	phb                                  ;0B866B|8B      |      ;
@@ -832,15 +832,15 @@ CODE_0B8669:
 	ldy.B $03                            ;0B8698|A403    |000903;
 	stz.B $0d                            ;0B869A|640D    |00090D;
 ;      |        |      ;
-CODE_0B869C:
+DecompressLoop:
 	sep #$20                             ;0B869C|E220    |      ;
 	lda.W $0000,x                        ;0B869E|BD0000  |080000;
-	beq CODE_0B86DA                      ;0B86A1|F037    |0B86DA;
+	beq Decompress_Return                      ;0B86A1|F037    |0B86DA;
 	inx                                  ;0B86A3|E8      |      ;
 	rep #$20                             ;0B86A4|C220    |      ;
 	pha                                  ;0B86A6|48      |      ;
 	and.W #$000f                         ;0B86A7|290F00  |      ;
-	beq CODE_0B86B6                      ;0B86AA|F00A    |0B86B6;
+	beq Decompress_CheckOpcode                      ;0B86AA|F00A    |0B86B6;
 	phx                                  ;0B86AC|DA      |      ;
 	ldx.B $06                            ;0B86AD|A606    |000906;
 	dec a;0B86AF|3A      |      ;
@@ -848,10 +848,10 @@ CODE_0B869C:
 	stx.B $06                            ;0B86B3|8606    |000906;
 	plx                                  ;0B86B5|FA      |      ;
 ;      |        |      ;
-CODE_0B86B6:
+Decompress_CheckOpcode:
 	pla                                  ;0B86B6|68      |      ;
 	and.W #$00f0                         ;0B86B7|29F000  |      ;
-	beq CODE_0B869C                      ;0B86BA|F0E0    |0B869C;
+	beq DecompressLoop                      ;0B86BA|F0E0    |0B869C;
 	lsr a;0B86BC|4A      |      ;
 	lsr a;0B86BD|4A      |      ;
 	lsr a;0B86BE|4A      |      ;
@@ -870,10 +870,10 @@ CODE_0B86B6:
 	inc a;0B86D3|1A      |      ;
 	jsr.W $091e                          ;0B86D4|201E09  |0B091E;
 	plx                                  ;0B86D7|FA      |      ;
-	bra CODE_0B869C                      ;0B86D8|80C2    |0B869C;
+	bra DecompressLoop                      ;0B86D8|80C2    |0B869C;
 ;      |        |      ;
 ;      |        |      ;
-CODE_0B86DA:
+Decompress_Return:
 	plb                                  ;0B86DA|AB      |      ;
 	pld                                  ;0B86DB|2B      |      ;
 	plp                                  ;0B86DC|28      |      ;
@@ -881,7 +881,7 @@ CODE_0B86DA:
 ;      |        |      ;
 	db $8b,$54,$7f,$00,$ab,$60,$8b,$54,$7f,$00,$ab,$60;0B86DE|        |      ;
 ;      |        |      ;
-CODE_0B86EA:
+UploadCompressedData:
 	php                                  ;0B86EA|08      |      ;
 	phb                                  ;0B86EB|8B      |      ;
 	phd                                  ;0B86EC|0B      |      ;
@@ -903,9 +903,9 @@ CODE_0B86EA:
 	inx                                  ;0B870B|E8      |      ;
 	inx                                  ;0B870C|E8      |      ;
 ;      |        |      ;
-CODE_0B870D:
+UploadLoop:
 	lda.W $0000,x                        ;0B870D|BD0000  |070000;
-	bpl CODE_0B872B                      ;0B8710|1019    |0B872B;
+	bpl UploadNormalByte                      ;0B8710|1019    |0B872B;
 	inx                                  ;0B8712|E8      |      ;
 	dey                                  ;0B8713|88      |      ;
 	phy                                  ;0B8714|5A      |      ;
@@ -920,21 +920,21 @@ CODE_0B870D:
 	pla                                  ;0B8720|68      |      ;
 	and.B #$7f                           ;0B8721|297F    |      ;
 ;      |        |      ;
-CODE_0B8723:
+UploadRLEByte:
 	sta.B SNES_WMDATA-$2100              ;0B8723|8580    |002180;
 	dey                                  ;0B8725|88      |      ;
-	bne CODE_0B8723                      ;0B8726|D0FB    |0B8723;
+	bne UploadRLEByte                      ;0B8726|D0FB    |0B8723;
 	ply                                  ;0B8728|7A      |      ;
-	bra CODE_0B872D                      ;0B8729|8002    |0B872D;
+	bra UploadNext                      ;0B8729|8002    |0B872D;
 ;      |        |      ;
 ;      |        |      ;
-CODE_0B872B:
+UploadNormalByte:
 	sta.B SNES_WMDATA-$2100              ;0B872B|8580    |002180;
 ;      |        |      ;
-CODE_0B872D:
+UploadNext:
 	inx                                  ;0B872D|E8      |      ;
 	dey                                  ;0B872E|88      |      ;
-	bne CODE_0B870D                      ;0B872F|D0DC    |0B870D;
+	bne UploadLoop                      ;0B872F|D0DC    |0B870D;
 	pld                                  ;0B8731|2B      |      ;
 	plb                                  ;0B8732|AB      |      ;
 	plp                                  ;0B8733|28      |      ;
@@ -965,7 +965,7 @@ DATA8_0b8737:
 	db $a2,$ac,$07                       ;0B87B3|        |      ;
 	db $a1,$ae,$07                       ;0B87B6|        |0000AE;
 ;      |        |      ;
-CODE_0B87B9:
+InitBattleMemory:
 	php                                  ;0B87B9|08      |      ;
 	phb                                  ;0B87BA|8B      |      ;
 	rep #$30                             ;0B87BB|C230    |      ;
@@ -1169,19 +1169,19 @@ DATA8_0b8cd9:
 	db $14,$15,$1b,$18,$1d,$07,$5e,$07,$08,$09,$0a,$0b,$0c,$0d,$04,$1d;0B8E77|        |000015;
 	db $51,$0e,$00,$01,$02,$09,$06,$07,$11,$13;0B8E87|        |00000E;
 ;      |        |      ;
-CODE_0B8E91:
+ProcessInputButtons:
 	phb                                  ;0B8E91|8B      |      ;
 	phk                                  ;0B8E92|4B      |      ;
 	plb                                  ;0B8E93|AB      |      ;
 	lda.B $f8                            ;0B8E94|A5F8    |000AF8;
-	beq CODE_0B8F01                      ;0B8E96|F069    |0B8F01;
+	beq ProcessButtons_Return                      ;0B8E96|F069    |0B8F01;
 	ldx.B $de                            ;0B8E98|A6DE    |000ADE;
 	lda.L $7ec360,x                      ;0B8E9A|BF60C37E|7EC360;
 	inc a;0B8E9E|1A      |      ;
 	sta.L $7ec360,x                      ;0B8E9F|9F60C37E|7EC360;
 	lda.W $1021                          ;0B8EA3|AD2110  |0B1021;
 	bit.B #$40                           ;0B8EA6|8940    |      ;
-	bne CODE_0B8EC0                      ;0B8EA8|D016    |0B8EC0;
+	bne ProcessButtons_CheckFlags                      ;0B8EA8|D016    |0B8EC0;
 	rep #$30                             ;0B8EAA|C230    |      ;
 	pha                                  ;0B8EAC|48      |      ;
 	phx                                  ;0B8EAD|DA      |      ;
@@ -1195,40 +1195,40 @@ CODE_0B8E91:
 	pla                                  ;0B8EBD|68      |      ;
 	sep #$30                             ;0B8EBE|E230    |      ;
 ;      |        |      ;
-CODE_0B8EC0:
-	jsr.W CODE_0B8F27                    ;0B8EC0|20278F  |0B8F27;
+ProcessButtons_CheckFlags:
+	jsr.W FindFirstSetBit                    ;0B8EC0|20278F  |0B8F27;
 	cmp.B $f4                            ;0B8EC3|C5F4    |000AF4;
-	beq CODE_0B8ED2                      ;0B8EC5|F00B    |0B8ED2;
+	beq ProcessButtons_SameState                      ;0B8EC5|F00B    |0B8ED2;
 	sta.B $f4                            ;0B8EC7|85F4    |000AF4;
 	pea.W DATA8_0b8f15                   ;0B8EC9|F4158F  |0B8F15;
 	jsl.L CODE_0097BE                    ;0B8ECC|22BE9700|0097BE;
-	bra CODE_0B8ED9                      ;0B8ED0|8007    |0B8ED9;
+	bra ProcessButtons_UpdateSecond                      ;0B8ED0|8007    |0B8ED9;
 ;      |        |      ;
 ;      |        |      ;
-CODE_0B8ED2:
+ProcessButtons_SameState:
 	pea.W DATA8_0b8f03                   ;0B8ED2|F4038F  |0B8F03;
 	jsl.L CODE_0097BE                    ;0B8ED5|22BE9700|0097BE;
 ;      |        |      ;
-CODE_0B8ED9:
+ProcessButtons_UpdateSecond:
 	ldx.W $0adf                          ;0B8ED9|AEDF0A  |0B0ADF;
 	lda.L $7ec360,x                      ;0B8EDC|BF60C37E|7EC360;
 	inc a;0B8EE0|1A      |      ;
 	sta.L $7ec360,x                      ;0B8EE1|9F60C37E|7EC360;
 	lda.W $10a1                          ;0B8EE5|ADA110  |0B10A1;
-	jsr.W CODE_0B8F27                    ;0B8EE8|20278F  |0B8F27;
+	jsr.W FindFirstSetBit                    ;0B8EE8|20278F  |0B8F27;
 	cmp.B $f5                            ;0B8EEB|C5F5    |000AF5;
-	beq CODE_0B8EFA                      ;0B8EED|F00B    |0B8EFA;
+	beq ProcessButtons_SameState2                      ;0B8EED|F00B    |0B8EFA;
 	sta.B $f5                            ;0B8EEF|85F5    |000AF5;
 	pea.W DATA8_0b8f15                   ;0B8EF1|F4158F  |0B8F15;
 	jsl.L CODE_0097BE                    ;0B8EF4|22BE9700|0097BE;
-	bra CODE_0B8F01                      ;0B8EF8|8007    |0B8F01;
+	bra ProcessButtons_Return                      ;0B8EF8|8007    |0B8F01;
 ;      |        |      ;
 ;      |        |      ;
-CODE_0B8EFA:
+ProcessButtons_SameState2:
 	pea.W DATA8_0b8f03                   ;0B8EFA|F4038F  |0B8F03;
 	jsl.L CODE_0097BE                    ;0B8EFD|22BE9700|0097BE;
 ;      |        |      ;
-CODE_0B8F01:
+ProcessButtons_Return:
 	plb                                  ;0B8F01|AB      |      ;
 	rtl                                  ;0B8F02|6B      |      ;
 ;      |        |      ;
@@ -1243,29 +1243,29 @@ DATA8_0b8f15:
 	db $4b,$8f                           ;0B8F17|        |      ;
 	db $fa,$8f,$15,$90,$93,$90,$62,$91,$00,$92,$96,$92,$b1,$92;0B8F19|        |      ;
 ;      |        |      ;
-CODE_0B8F27:
+FindFirstSetBit:
 	phy                                  ;0B8F27|5A      |      ;
 	ldy.B #$08                           ;0B8F28|A008    |      ;
 ;      |        |      ;
-CODE_0B8F2A:
+FirstSetBit_Loop:
 	asl a;0B8F2A|0A      |      ;
-	bcs CODE_0B8F30                      ;0B8F2B|B003    |0B8F30;
+	bcs FirstSetBit_Found                      ;0B8F2B|B003    |0B8F30;
 	dey                                  ;0B8F2D|88      |      ;
-	bne CODE_0B8F2A                      ;0B8F2E|D0FA    |0B8F2A;
+	bne FirstSetBit_Loop                      ;0B8F2E|D0FA    |0B8F2A;
 ;      |        |      ;
-CODE_0B8F30:
+FirstSetBit_Found:
 	tya                                  ;0B8F30|98      |      ;
 	ply                                  ;0B8F31|7A      |      ;
 	rts                                  ;0B8F32|60      |      ;
 ;      |        |      ;
 	lda.B #$00                           ;0B8F33|A900    |      ;
 	sta.L $7ec400,x                      ;0B8F35|9F00C47E|7EC400;
-	jsr.W CODE_0B9304                    ;0B8F39|200493  |0B9304;
+	jsr.W InitSpriteOAM                    ;0B8F39|200493  |0B9304;
 	cpx.B #$00                           ;0B8F3C|E000    |      ;
-	beq CODE_0B8F44                      ;0B8F3E|F004    |0B8F44;
-	jsl.L CODE_0B935F                    ;0B8F40|225F930B|0B935F;
+	beq ProcessButtons_SetFlag                      ;0B8F3E|F004    |0B8F44;
+	jsl.L UpdateBattleSprites                    ;0B8F40|225F930B|0B935F;
 ;      |        |      ;
-CODE_0B8F44:
+ProcessButtons_SetFlag:
 	lda.B #$80                           ;0B8F44|A980    |      ;
 	sta.W $0ae5                          ;0B8F46|8DE50A  |0B0AE5;
 	rts                                  ;0B8F49|60      |      ;
@@ -1283,7 +1283,7 @@ CODE_0B8F44:
 	db $95,$02,$95,$0a,$1a,$95,$06,$b5,$07,$29,$3f,$95,$07,$b5,$0f,$29;0B8FCB|        |000002;
 	db $3f,$95,$0f,$80,$e3,$68,$bb,$18,$69,$03,$95,$02,$95,$0a,$1a,$95;0B8FDB|        |800F95;
 	db $06,$b5,$07,$09,$40,$95,$07,$b5,$0f,$29,$3f,$95,$0f,$80,$c9;0B8FEB|        |0000B5;
-	jsr.W CODE_0B9304                    ;0B8FFA|200493  |0B9304;
+	jsr.W InitSpriteOAM                    ;0B8FFA|200493  |0B9304;
 	lda.L $7ec480,x                      ;0B8FFD|BF80C47E|7EC480;
 	sec                                  ;0B9001|38      |      ;
 	sbc.B #$0c                           ;0B9002|E90C    |      ;
@@ -1305,8 +1305,8 @@ CODE_0B8F44:
 	lda.L $7ec320,x                      ;0B901E|BF20C37E|7EC320;
 	clc                                  ;0B9022|18      |      ;
 	adc.B #$09                           ;0B9023|6909    |      ;
-	jsl.L CODE_0B92D6                    ;0B9025|22D6920B|0B92D6;
-	jsr.W CODE_0B9304                    ;0B9029|200493  |0B9304;
+	jsl.L LoadGraphicsBlock                    ;0B9025|22D6920B|0B92D6;
+	jsr.W InitSpriteOAM                    ;0B9029|200493  |0B9304;
 	lda.W $0c00,y                        ;0B902C|B9000C  |0B0C00;
 	sec                                  ;0B902F|38      |      ;
 	sbc.B #$04                           ;0B9030|E904    |      ;
@@ -1368,8 +1368,8 @@ DATA8_0b905f:
 	lda.L $7ec320,x                      ;0B9099|BF20C37E|7EC320;
 	clc                                  ;0B909D|18      |      ;
 	adc.B #$09                           ;0B909E|6909    |      ;
-	jsl.L CODE_0B92D6                    ;0B90A0|22D6920B|0B92D6;
-	jsr.W CODE_0B9304                    ;0B90A4|200493  |0B9304;
+	jsl.L LoadGraphicsBlock                    ;0B90A0|22D6920B|0B92D6;
+	jsr.W InitSpriteOAM                    ;0B90A4|200493  |0B9304;
 	lda.W $0c00,y                        ;0B90A7|B9000C  |0B0C00;
 	sbc.B #$0d                           ;0B90AA|E90D    |      ;
 	sta.W $0c10,y                        ;0B90AC|99100C  |0B0C10;
@@ -1469,8 +1469,8 @@ DATA8_0b9113:
 	lda.L $7ec320,x                      ;0B916D|BF20C37E|7EC320;
 	clc                                  ;0B9171|18      |      ;
 	adc.B #$09                           ;0B9172|6909    |      ;
-	jsl.L CODE_0B92D6                    ;0B9174|22D6920B|0B92D6;
-	jsr.W CODE_0B9304                    ;0B9178|200493  |0B9304;
+	jsl.L LoadGraphicsBlock                    ;0B9174|22D6920B|0B92D6;
+	jsr.W InitSpriteOAM                    ;0B9178|200493  |0B9304;
 	lda.B #$04                           ;0B917B|A904    |      ;
 	sta.L $7ec400,x                      ;0B917D|9F00C47E|7EC400;
 	lda.L $7ec480,x                      ;0B9181|BF80C47E|7EC480;
@@ -1539,13 +1539,13 @@ DATA8_0b91d0:
 	sta.W $0c16,y                        ;0B91FC|99160C  |0B0C16;
 	rts                                  ;0B91FF|60      |      ;
 ;      |        |      ;
-	jsr.W CODE_0B9304                    ;0B9200|200493  |0B9304;
+	jsr.W InitSpriteOAM                    ;0B9200|200493  |0B9304;
 	lda.B #$04                           ;0B9203|A904    |      ;
 	xba                                  ;0B9205|EB      |      ;
 	lda.L $7ec320,x                      ;0B9206|BF20C37E|7EC320;
 	clc                                  ;0B920A|18      |      ;
 	adc.B #$09                           ;0B920B|6909    |      ;
-	jsl.L CODE_0B92D6                    ;0B920D|22D6920B|0B92D6;
+	jsl.L LoadGraphicsBlock                    ;0B920D|22D6920B|0B92D6;
 	lda.B #$04                           ;0B9211|A904    |      ;
 	sta.L $7ec400,x                      ;0B9213|9F00C47E|7EC400;
 	lda.B #$b7                           ;0B9217|A9B7    |      ;
@@ -1582,7 +1582,7 @@ DATA8_0b91d0:
 	tay                                  ;0B925F|A8      |      ;
 	lda.L $7ec360,x                      ;0B9260|BF60C37E|7EC360;
 	and.B #$01                           ;0B9264|2901    |      ;
-	beq CODE_0B927F                      ;0B9266|F017    |0B927F;
+	beq UpdateCursorPosition                      ;0B9266|F017    |0B927F;
 	lda.W $0c10,y                        ;0B9268|B9100C  |0B0C10;
 	inc a;0B926B|1A      |      ;
 	inc a;0B926C|1A      |      ;
@@ -1596,7 +1596,7 @@ DATA8_0b91d0:
 	rts                                  ;0B927E|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
-CODE_0B927F:
+UpdateCursorPosition:
 	lda.W $0c10,y                        ;0B927F|B9100C  |0B0C10;
 	dec a;0B9282|3A      |      ;
 	dec a;0B9283|3A      |      ;
@@ -1610,7 +1610,7 @@ CODE_0B927F:
 	rts                                  ;0B9295|60      |      ;
 ;      |        |      ;
 	php                                  ;0B9296|08      |      ;
-	jsr.W CODE_0B9304                    ;0B9297|200493  |0B9304;
+	jsr.W InitSpriteOAM                    ;0B9297|200493  |0B9304;
 	lda.B #$04                           ;0B929A|A904    |      ;
 	sta.L $7ec400,x                      ;0B929C|9F00C47E|7EC400;
 	lda.B #$0f                           ;0B92A0|A90F    |      ;
@@ -1618,7 +1618,7 @@ CODE_0B927F:
 	lda.L $7ec320,x                      ;0B92A3|BF20C37E|7EC320;
 	clc                                  ;0B92A7|18      |      ;
 	adc.B #$08                           ;0B92A8|6908    |      ;
-	jsl.L CODE_0B92D6                    ;0B92AA|22D6920B|0B92D6;
+	jsl.L LoadGraphicsBlock                    ;0B92AA|22D6920B|0B92D6;
 	plp                                  ;0B92AE|28      |      ;
 	rts                                  ;0B92AF|60      |      ;
 ;      |        |      ;
@@ -1626,7 +1626,7 @@ CODE_0B927F:
 ;      |        |      ;
 	phx                                  ;0B92B1|DA      |      ;
 	phy                                  ;0B92B2|5A      |      ;
-	jsr.W CODE_0B9304                    ;0B92B3|200493  |0B9304;
+	jsr.W InitSpriteOAM                    ;0B92B3|200493  |0B9304;
 	lda.B #$04                           ;0B92B6|A904    |      ;
 	sta.L $7ec400,x                      ;0B92B8|9F00C47E|7EC400;
 	lda.L $7ec480,x                      ;0B92BC|BF80C47E|7EC480;
@@ -1646,7 +1646,7 @@ CODE_0B927F:
 	rts                                  ;0B92D5|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
-CODE_0B92D6:
+LoadGraphicsBlock:
 	phx                                  ;0B92D6|DA      |      ;
 	phy                                  ;0B92D7|5A      |      ;
 	php                                  ;0B92D8|08      |      ;
@@ -1681,7 +1681,7 @@ CODE_0B92D6:
 	rtl                                  ;0B9303|6B      |      ;
 ;      |        |      ;
 ;      |        |      ;
-CODE_0B9304:
+InitSpriteOAM:
 	lda.L $7ec260,x                      ;0B9304|BF60C27E|7EC260;
 	asl a;0B9308|0A      |      ;
 	asl a;0B9309|0A      |      ;
@@ -1720,7 +1720,7 @@ CODE_0B9304:
 	rts                                  ;0B935E|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
-CODE_0B935F:
+UpdateBattleSprites:
 	pha                                  ;0B935F|48      |      ;
 	phx                                  ;0B9360|DA      |      ;
 	phy                                  ;0B9361|5A      |      ;
