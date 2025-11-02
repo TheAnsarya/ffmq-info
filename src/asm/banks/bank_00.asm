@@ -2,25 +2,25 @@
 	org $008000                          ;      |        |      ;
 ;      |        |      ;
 ;      |        |      ;
-CODE_008000:
+Main_Entry:
 	clc                                  ;008000|18      |      ;
 	xce                                  ;008001|FB      |      ;
-	jsr.W CODE_008247                    ;008002|204782  |008247;
+	jsr.W Init_ClearFlags                ;008002|204782  |008247;
 	jsl.L CODE_0D8000                    ;008005|2200800D|0D8000;
 	lda.B #$00                           ;008009|A900    |      ;
 	sta.L $7e3667                        ;00800B|8F67367E|7E3667;
 	dec a;00800F|3A      |      ;
 	sta.L $7e3668                        ;008010|8F68367E|7E3668;
-	bra CODE_008023                      ;008014|800D    |008023;
+	bra Main_InitSequence                ;008014|800D    |008023;
 ;      |        |      ;
 ;      |        |      ;
-CODE_008016:
-	jsr.W CODE_008247                    ;008016|204782  |008247;
+Menu_CloseHandler:
+	jsr.W Init_ClearFlags                ;008016|204782  |008247;
 	lda.B #$f0                           ;008019|A9F0    |      ;
 	sta.L $000600                        ;00801B|8F000600|000600;
 	jsl.L CODE_0D8004                    ;00801F|2204800D|0D8004;
 ;      |        |      ;
-CODE_008023:
+Main_InitSequence:
 	rep #$30                             ;008023|C230    |      ;
 	ldx.W #$1fff                         ;008025|A2FF1F  |      ;
 	txs                                  ;008028|9A      |      ;
@@ -41,8 +41,8 @@ CODE_00803A:
 	ldx.W #$1fff                         ;008049|A2FF1F  |      ;
 	txs                                  ;00804C|9A      |      ;
 ;      |        |      ;
-CODE_00804D:
-	jsr.W CODE_0081F0                    ;00804D|20F081  |0081F0;
+Init_SetupDMA:
+	jsr.W Init_SNES                      ;00804D|20F081  |0081F0;
 	sep #$20                             ;008050|E220    |      ;
 	ldx.W #$1809                         ;008052|A20918  |      ;
 	stx.W SNES_DMA0PARAM                 ;008055|8E0043  |004300;
@@ -55,7 +55,7 @@ CODE_00804D:
 	lda.B #$01                           ;008069|A901    |      ;
 	sta.W SNES_MDMAEN                    ;00806B|8D0B42  |00420B;
 ;      |        |      ;
-CODE_00806E:
+Main_NormalStart:
 	jsl.L $00011f                        ;00806E|221F0100|00011F;
 	rep #$30                             ;008072|C230    |      ;
 	lda.W #$0000                         ;008074|A90000  |      ;
@@ -69,24 +69,24 @@ CODE_00806E:
 	jsl.L CODE_0C8000                    ;008086|2200800C|0C8000;
 	jsl.L CODE_0C8000                    ;00808A|2200800C|0C8000;
 	lda.L $7e3665                        ;00808E|AF65367E|7E3665;
-	bne CODE_0080A8                      ;008092|D014    |0080A8;
+	bne Init_ContinueGame                ;008092|D014    |0080A8;
 	lda.L $700000                        ;008094|AF000070|700000;
 	ora.L $70038c                        ;008098|0F8C0370|70038C;
 	ora.L $700718                        ;00809C|0F180770|700718;
-	beq CODE_0080AD                      ;0080A0|F00B    |0080AD;
+	beq Init_NewGame                     ;0080A0|F00B    |0080AD;
 	jsl.L CODE_00B950                    ;0080A2|2250B900|00B950;
-	bra CODE_0080B0                      ;0080A6|8008    |0080B0;
+	bra Init_GraphicsSetup               ;0080A6|8008    |0080B0;
 ;      |        |      ;
 ;      |        |      ;
-CODE_0080A8:
-	jsr.W CODE_008166                    ;0080A8|206681  |008166;
-	bra CODE_0080DC                      ;0080AB|802F    |0080DC;
+Init_ContinueGame:
+	jsr.W SaveData_LoadCharacters        ;0080A8|206681  |008166;
+	bra Init_FinalSetup                  ;0080AB|802F    |0080DC;
 ;      |        |      ;
 ;      |        |      ;
-CODE_0080AD:
-	jsr.W CODE_008117                    ;0080AD|201781  |008117;
+Init_NewGame:
+	jsr.W Init_TitleScreen               ;0080AD|201781  |008117;
 ;      |        |      ;
-CODE_0080B0:
+Init_GraphicsSetup:
 	lda.B #$80                           ;0080B0|A980    |      ;
 	trb.W $00de                          ;0080B2|1CDE00  |0000DE;
 	lda.B #$e0                           ;0080B5|A9E0    |      ;
@@ -127,7 +127,7 @@ CODE_0080DC:
 	jml.L CODE_018272                    ;008113|5C728201|018272;
 ;      |        |      ;
 ;      |        |      ;
-CODE_008117:
+Init_TitleScreen:
 	lda.B #$14                           ;008117|A914    |      ;
 	sta.W SNES_TM                        ;008119|8D2C21  |00212C;
 	rep #$30                             ;00811C|C230    |      ;
@@ -158,7 +158,7 @@ CODE_008117:
 	rts                                  ;008165|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
-CODE_008166:
+SaveData_LoadCharacters:
 	rep #$30                             ;008166|C230    |      ;
 	ldx.W #$a9c2                         ;008168|A2C2A9  |      ;
 	ldy.W #$1010                         ;00816B|A01010  |      ;
@@ -243,16 +243,16 @@ CODE_0081F0:
 	ldx.W #$822a                         ;008218|A22A82  |      ;
 	lda.L $7e3667                        ;00821B|AF67367E|7E3667;
 	and.W #$00ff                         ;00821F|29FF00  |      ;
-	beq CODE_008227                      ;008222|F003    |008227;
+	beq SaveData_LoadSlot                ;008222|F003    |008227;
 	db $a2,$2d,$82                       ;008224|        |      ;
 ;      |        |      ;
-CODE_008227:
+SaveData_LoadSlot:
 	jmp.W CODE_009BC4                    ;008227|4CC49B  |009BC4;
 ;      |        |      ;
 	db $2d,$a6,$03                       ;00822A|        |      ;
 	db $2b,$a6,$03                       ;00822D|        |      ;
 ;      |        |      ;
-CODE_008230:
+Init_SetupFields:
 	rep #$30                             ;008230|C230    |      ;
 	pea.W $007e                          ;008232|F47E00  |00007E;
 	plb                                  ;008235|AB      |      ;
@@ -265,7 +265,7 @@ CODE_008230:
 	rts                                  ;008246|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
-CODE_008247:
+Init_ClearFlags:
 	sep #$30                             ;008247|E230    |      ;
 	stz.W SNES_NMITIMEN                  ;008249|9C0042  |004200;
 	lda.B #$80                           ;00824C|A980    |      ;
@@ -275,7 +275,7 @@ CODE_008247:
 	db $00                               ;008252|        |      ;
 	db $db,$80,$fd,$db,$80,$fd,$db,$80,$fd;008253|        |      ;
 ;      |        |      ;
-CODE_00825C:
+Menu_InitializeQueues:
 	rep #$30                             ;00825C|C230    |      ;
 	lda.W #$0000                         ;00825E|A90000  |      ;
 	tcd                                  ;008261|5B      |      ;

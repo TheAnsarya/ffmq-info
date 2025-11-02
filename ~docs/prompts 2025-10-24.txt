@@ -439,6 +439,37 @@ Additional graphics extraction (overworld, NPCs, effects)
 Other data types (maps, text, music)
 &&&&&&&&&&&&&&&&
 
+Asar assembler integration (auto-include rebuilt graphics)
+Asar assembler integration (auto-include rebuilt graphics)
+A and then B
+Option B: Start Phase 3 work (more graphics, maps, text, etc.)
+
+do the next logical step and continue (make sure the git commit, session log, etc cycle is maintained)
+continue with creating the text import tool
+
+&&&&&&&&&&&&&&&&&&&&&&
+What's Next? I recommend we:
+Commit the session log (quick)
+Option A: Complete Phase 3 with map enhancement
+Option B: Integrate everything into the build system
+Option C: Documentation sprint
+&&&&&&&&&&&&&&&&&&&&&&&
+
+Commit the session log (quick), then Option A: Complete Phase 3 with map enhancement, then Option B: Integrate everything into the build system, then Option C: Documentation sprint
+1, 2, and then 4
+update the guthub issues, check off task lists, and then pick a disassembly task or three and complete them
+continue recent efforts and related gh issues
+continue on this path
+
+
+
+
+
+
+
+
+
+
 
 
 
