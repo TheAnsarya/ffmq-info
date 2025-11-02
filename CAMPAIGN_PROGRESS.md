@@ -96,6 +96,107 @@ Continuing Bank 00 section file cleanup with menu and input systems.
 
 **Campaign Status**: 50 labels remaining in Bank 00 sections (2 files complete!)
 
+**Batch 41: Bank 00 Section 4 Cleanup** (20 labels eliminated)
+
+Continuing systematic Bank 00 section file cleanup with sprite rendering and map systems.
+
+- **File**: `bank_00_section4.asm` (509 lines)
+- **Labels**: 20 → 0 (100% complete for this file!)
+- **Systems Documented**:
+  * **Sprite Rendering** (12 labels):
+    - Sprite_UpdateCharacterSingleBuffer: Direct VRAM write mode
+    - Sprite_DeterminePalette: Field/Battle/Normal palette selection
+    - Sprite_PaletteBattle, Sprite_PaletteNormal, Sprite_PaletteField: Palette setters
+    - Sprite_ApplyAttributes: Position-based special rendering ($29-$2c)
+    - Sprite_ConvertDigit: Decimal position display (divide by 10)
+    - Sprite_StandardDisplay: Standard sprite tile rendering
+    - Sprite_FinalizeUpdate: Complete sprite update cycle
+    - Sprite_UpdateCharacterDualBuffer: Battle mode dual buffering
+    - Sprite_UpdateDone: Update complete exit
+    - Sprite_UpdateSingleBufferAlt: Alternative single buffer path
+  * **Map Position System** (4 labels):
+    - Map_PositionToVRAMAddress: 8x8 tile position → VRAM address
+    - Map_GetAdjacentTileInfo: Get tile data in direction
+    - Map_GetTileByDirection: Direction lookup (0=up, 1=down, 2=left, 3=right)
+    - Map_ShiftCoordinates: Coordinate bit shifting for collision
+  * **VRAM Transfer System** (4 labels):
+    - VRAM_TransferTileLoop: Direct page $2100 loop
+    - VRAM_TransferTile: 24-byte tile transfer
+    - VRAM_InterleavedWrite: Column mode interleaved writes
+    - VRAM_InterleavedWriteLoop: $ff00 pattern interleaving
+- **Technical Details**:
+  * Palettes: Field=$94, Battle=$9c, Normal=$88
+  * Sprite attributes: OAM offsets, tile indices $6120-$6124
+  * Frame counter: $0014 for animation
+  * Display flags: $00da (battle mode bit 4), $00d8 (render modes)
+  * Position boundary: $29-$2c triggers special rendering
+  * VRAM addressing: 8x8 grid, word-aligned addresses
+  * Interleaved mode: Column writes with $ff00 gaps (bit 7 of $88)
+- **ROM Verification**: 100% match (SHA256: F71817F55FEBD32FD1DCE617A326A77B6B062DD0D4058ECD289F64AF1B7A1D05)
+- **Build Time**: 0.04 seconds
+
+**Campaign Status**: 30 labels remaining in Bank 00 sections (3 files complete!)
+
+**Batch 42: Bank 00 Section 5 Cleanup** (30 labels eliminated) 🎉
+
+Final Bank 00 section file - achieving 100% section file completion!
+
+- **File**: `bank_00_section5.asm` (537 lines)
+- **Labels**: 30 → 0 (100% complete for this file!)
+- **Systems Documented**:
+  * **Menu Command Processing** (9 labels):
+    - Menu_ProcessCommands: Main command processor (bit 5 of $00d9)
+    - Menu_ProcessCommandQueue: Command queue executor (DP $0500)
+    - Menu_ProcessCommand1: Secondary menu action (command slot $0505)
+    - Menu_ProcessCommand2: Special actions (types $02, $10-$1f)
+    - Menu_CheckCutsceneMode: Cutscene check (bit 2 of $00e2)
+    - Menu_ExecuteCommand2: Command 2 execution path
+    - Menu_CommandCleanup: SEI and cleanup (clear bit 5)
+  * **Menu Transitions** (3 labels):
+    - Menu_TransitionOpen: Open menu ($00803A jump)
+    - Menu_TransitionClose: Close menu ($008016 jump)
+    - Menu_TransitionSetup: Common transition setup (NMI config)
+  * **Input Handling** (5 labels):
+    - Input_ProcessDirectional: Directional input (8-frame delay, 12-frame repeat)
+    - Animation_CheckFrameCounter: Frame counter check ($0e97 AND $000f)
+    - Animation_FrameNotReady, Animation_FrameReady: Frame gates
+    - Input_CheckDelayCounter: Input delay counter check ($0051)
+  * **Text Processing** (2 labels):
+    - Text_ProcessControlCode: Process text control codes
+    - Text_LoadCharacter: Load text character (JSR $0097F2)
+  * **16x16 Multiplication** (2 labels):
+    - Math_Multiply16x16: Setup ($98-$99 × $9c-$9d → $9e-$a1)
+    - Math_MultiplyLoop: Shift-and-add algorithm (16 iterations)
+  * **32÷16 Division** (4 labels):
+    - Math_Divide32by16: Setup ($98-$9b ÷ $9c-$9d)
+    - Math_DivideLoop: Shift-and-subtract (32 iterations)
+    - Math_DivisionSucceeded: Quotient bit set path
+    - Math_SkipQuotientBit: Skip quotient bit path
+  * **Hardware Math** (2 labels):
+    - Math_HardwareMultiply: WRMPYB $4203 wrapper
+    - Math_HardwareDivide: WRDIVB $4206 wrapper (16-cycle delay)
+  * **Utilities** (3 labels):
+    - Util_CountLeadingZeros: Find highest bit set (returns $ffff if 0)
+    - Util_BitPositionLoop: Bit position iteration
+    - Input_ReadControllerState: Controller state ($102f, $10af, $1021, $10a1)
+- **Technical Details**:
+  * Command queue: Direct page $0500-$050f
+  * Three command slots: $00 (primary), $05 (secondary), $0a (special)
+  * Command execution: JSL $0D8004 (Bank $0d)
+  * Menu flags: Bit 5 of $00d9 (active), bit 2 of $00e2 (cutscene)
+  * Input timing: $0051 (delay counter), $0055 (repeat rate)
+  * Frame window: $0e97 AND $000f = 15-frame cycles
+  * Math registers: $98-$a7 zero page area
+  * Hardware math: WRMPYA ($4202), WRMPYB ($4203), WRDIVL ($4204-$4205), WRDIVB ($4206)
+- **ROM Verification**: 100% match (SHA256: F71817F55FEBD32FD1DCE617A326A77B6B062DD0D4058ECD289F64AF1B7A1D05)
+- **Build Time**: 0.02 seconds
+
+**🎉 ACHIEVEMENT UNLOCKED: 100% Bank 00 Section Files Complete!**
+- **Total**: 68 labels across 4 section files → All documented!
+- **Files Complete**: bank_00_section2.asm, bank_00_section3.asm, bank_00_section4.asm, bank_00_section5.asm
+- **Campaign Status**: 0 labels remaining in Bank 00 sections (4/4 files = 100%)
+- **Overall Progress**: 98% code label documentation complete!
+
 ---
 
 ## 📊 Advanced Metrics Dashboard
