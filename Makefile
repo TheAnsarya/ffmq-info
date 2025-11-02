@@ -32,7 +32,8 @@ MAIN_ASM = $(ASM_DIR)/main.s
 .PHONY: all clean rom extract-assets extract-graphics extract-text extract-music \
         convert-graphics install-deps build-tools docs test test-rom test-setup \
         test-launch test-debug extract-bank06 extract-all verify-bank06 verify-all \
-        generate-asm pipeline
+        generate-asm pipeline graphics-extract graphics-rebuild graphics-full \
+        graphics-validate graphics-asm
 
 # Default target
 all: rom
@@ -254,3 +255,44 @@ pipeline: extract-bank06 generate-asm verify-bank06
 	@echo "=========================================="
 	@echo "Data pipeline complete!"
 	@echo "=========================================="
+
+# ============================================
+# Graphics Build Integration Pipeline
+# ============================================
+
+# Extract all graphics from ROM to PNG
+graphics-extract:
+	@echo "Extracting graphics from ROM..."
+	$(PYTHON) $(TOOLS_DIR)/build_integration.py --extract
+
+# Rebuild modified graphics (incremental)
+graphics-rebuild:
+	@echo "Rebuilding modified graphics..."
+	$(PYTHON) $(TOOLS_DIR)/build_integration.py --rebuild
+
+# Full graphics rebuild (extract + rebuild)
+graphics-full:
+	@echo "Full graphics rebuild..."
+	$(PYTHON) $(TOOLS_DIR)/build_integration.py --full
+
+# Validate all graphics
+graphics-validate:
+	@echo "Validating graphics..."
+	$(PYTHON) $(TOOLS_DIR)/build_integration.py --validate
+
+# Generate ASM includes for graphics
+graphics-asm:
+	@echo "Generating graphics ASM includes..."
+	$(PYTHON) $(TOOLS_DIR)/generate_graphics_asm.py
+
+# Complete graphics workflow
+graphics-pipeline: graphics-rebuild graphics-asm
+	@echo ""
+	@echo "=========================================="
+	@echo "Graphics pipeline complete!"
+	@echo "=========================================="
+
+# Build ROM with graphics integration
+rom-with-graphics: graphics-rebuild rom
+	@echo "ROM built with integrated graphics!"
+
