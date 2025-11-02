@@ -1,24 +1,24 @@
-﻿;      |        |      ;
+;      |        |      ;
 	org $0c8000                          ;      |        |      ;
 ;      |        |      ;
 ;      |        |      ;
-CODE_0C8000:
+WaitForVBlank:
 	php                                  ;0C8000|08      |      ;
 	sep #$20                             ;0C8001|E220    |      ;
 	pha                                  ;0C8003|48      |      ;
 	lda.B #$40                           ;0C8004|A940    |      ;
 	trb.W $00d8                          ;0C8006|1CD800  |0000D8;
 ;      |        |      ;
-CODE_0C8009:
+VBlankWaitLoop:
 	lda.B #$40                           ;0C8009|A940    |      ;
 	and.W $00d8                          ;0C800B|2DD800  |0000D8;
-	beq CODE_0C8009                      ;0C800E|F0F9    |0C8009;
+	beq VBlankWaitLoop                      ;0C800E|F0F9    |0C8009;
 	pla                                  ;0C8010|68      |      ;
 	plp                                  ;0C8011|28      |      ;
 	rtl                                  ;0C8012|6B      |      ;
 ;      |        |      ;
 ;      |        |      ;
-CODE_0C8013:
+LoadScriptParameter:
 	php                                  ;0C8013|08      |      ;
 	phd                                  ;0C8014|0B      |      ;
 	pea.W $0000                          ;0C8015|F40000  |010000;
@@ -37,16 +37,16 @@ CODE_0C8013:
 	lda.L DATA8_07ee84,x                 ;0C802D|BF84EE07|07EE84;
 	sta.W $015f                          ;0C8031|8D5F01  |01015F;
 	lda.L DATA8_07ee85,x                 ;0C8034|BF85EE07|07EE85;
-	jsr.W CODE_0C8071                    ;0C8038|207180  |0C8071;
+	jsr.W CheckScriptExecution                    ;0C8038|207180  |0C8071;
 	sta.W $00b5                          ;0C803B|8DB500  |0100B5;
 	lda.L DATA8_07ee86,x                 ;0C803E|BF86EE07|07EE86;
-	jsr.W CODE_0C8071                    ;0C8042|207180  |0C8071;
+	jsr.W CheckScriptExecution                    ;0C8042|207180  |0C8071;
 	sta.W $00b2                          ;0C8045|8DB200  |0100B2;
 	lda.L DATA8_07ee87,x                 ;0C8048|BF87EE07|07EE87;
-	jsr.W CODE_0C8071                    ;0C804C|207180  |0C8071;
+	jsr.W CheckScriptExecution                    ;0C804C|207180  |0C8071;
 	sta.W $00b4                          ;0C804F|8DB400  |0100B4;
 	lda.L DATA8_07ee88,x                 ;0C8052|BF88EE07|07EE88;
-	jsr.W CODE_0C8071                    ;0C8056|207180  |0C8071;
+	jsr.W CheckScriptExecution                    ;0C8056|207180  |0C8071;
 	sta.W $00b3                          ;0C8059|8DB300  |0100B3;
 	ldx.W #$a433                         ;0C805C|A233A4  |      ;
 	stx.B $17                            ;0C805F|8617    |000017;
@@ -61,22 +61,22 @@ CODE_0C8013:
 	rtl                                  ;0C8070|6B      |      ;
 ;      |        |      ;
 ;      |        |      ;
-CODE_0C8071:
-	beq CODE_0C807F                      ;0C8071|F00C    |0C807F;
+CheckScriptExecution:
+	beq Script_Return                      ;0C8071|F00C    |0C807F;
 	jsl.L CODE_009776                    ;0C8073|22769700|009776;
-	beq CODE_0C807D                      ;0C8077|F004    |0C807D;
+	beq Script_ReturnSuccess                      ;0C8077|F004    |0C807D;
 	lda.B #$02                           ;0C8079|A902    |      ;
-	bra CODE_0C807F                      ;0C807B|8002    |0C807F;
+	bra Script_Return                      ;0C807B|8002    |0C807F;
 ;      |        |      ;
 ;      |        |      ;
-CODE_0C807D:
+Script_ReturnSuccess:
 	lda.B #$01                           ;0C807D|A901    |      ;
 ;      |        |      ;
-CODE_0C807F:
+Script_Return:
 	rts                                  ;0C807F|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
-CODE_0C8080:
+InitWorldMapDisplay:
 	jsl.L CODE_00825C                    ;0C8080|225C8200|00825C;
 	lda.W #$0000                         ;0C8084|A90000  |      ;
 	sta.L $7e3665                        ;0C8087|8F65367E|7E3665;
@@ -98,7 +98,7 @@ CODE_0C8080:
 	sta.B SNES_M7SEL-$2100               ;0C80AE|851A    |00211A;
 	lda.B #$11                           ;0C80B0|A911    |      ;
 	sta.B SNES_TM-$2100                  ;0C80B2|852C    |00212C;
-	jsr.W CODE_0C8D7B                    ;0C80B4|207B8D  |0C8D7B;
+	jsr.W ConfigureHDMAChannels                    ;0C80B4|207B8D  |0C8D7B;
 	lda.W $0112                          ;0C80B7|AD1201  |0C0112;
 	sta.W $4200                          ;0C80BA|8D0042  |0C4200;
 	cli                                  ;0C80BD|58      |      ;
@@ -106,9 +106,9 @@ CODE_0C8080:
 	sta.W $00aa                          ;0C80C0|8DAA00  |0C00AA;
 	stz.W $0110                          ;0C80C3|9C1001  |0C0110;
 	jsl.L CODE_00C795                    ;0C80C6|2295C700|00C795;
-	jsr.W CODE_0C8BAD                    ;0C80CA|20AD8B  |0C8BAD;
-	jsr.W CODE_0C896F                    ;0C80CD|206F89  |0C896F;
-	jsl.L CODE_0C8000                    ;0C80D0|2200800C|0C8000;
+	jsr.W InitializeWorldData                    ;0C80CA|20AD8B  |0C8BAD;
+	jsr.W ClearVRAMRegion                    ;0C80CD|206F89  |0C896F;
+	jsl.L WaitForVBlank                    ;0C80D0|2200800C|0C8000;
 	lda.B #$01                           ;0C80D4|A901    |      ;
 	sta.B SNES_BGMODE-$2100              ;0C80D6|8505    |002105;
 	lda.B #$62                           ;0C80D8|A962    |      ;
@@ -119,8 +119,8 @@ CODE_0C8080:
 	sta.B SNES_BG12NBA-$2100             ;0C80E2|850B    |00210B;
 	lda.B #$13                           ;0C80E4|A913    |      ;
 	sta.B SNES_TM-$2100                  ;0C80E6|852C    |00212C;
-	jsr.W CODE_0C9037                    ;0C80E8|203790  |0C9037;
-	jsr.W CODE_0C8103                    ;0C80EB|200381  |0C8103;
+	jsr.W UpdateWorldMapCamera                    ;0C80E8|203790  |0C9037;
+	jsr.W SetupWorldMapGraphics                    ;0C80EB|200381  |0C8103;
 	rep #$30                             ;0C80EE|C230    |      ;
 	lda.W #$0001                         ;0C80F0|A90100  |      ;
 	sta.L $7e3665                        ;0C80F3|8F65367E|7E3665;
@@ -131,44 +131,44 @@ CODE_0C8080:
 	rtl                                  ;0C8102|6B      |      ;
 ;      |        |      ;
 ;      |        |      ;
-CODE_0C8103:
+SetupWorldMapGraphics:
 	lda.B #$0c                           ;0C8103|A90C    |      ;
 	sta.W $005a                          ;0C8105|8D5A00  |00005A;
 	ldx.W #$90d7                         ;0C8108|A2D790  |      ;
 	stx.W $0058                          ;0C810B|8E5800  |000058;
 	lda.B #$40                           ;0C810E|A940    |      ;
 	tsb.W $00e2                          ;0C8110|0CE200  |0000E2;
-	jsl.L CODE_0C8000                    ;0C8113|2200800C|0C8000;
+	jsl.L WaitForVBlank                    ;0C8113|2200800C|0C8000;
 	lda.B #$07                           ;0C8117|A907    |      ;
 	sta.B SNES_BGMODE-$2100              ;0C8119|8505    |002105;
-	jsr.W CODE_0C87ED                    ;0C811B|20ED87  |0C87ED;
-	jsr.W CODE_0C81DA                    ;0C811E|20DA81  |0C81DA;
-	jsr.W CODE_0C88BE                    ;0C8121|20BE88  |0C88BE;
-	jsr.W CODE_0C8872                    ;0C8124|207288  |0C8872;
-	jsr.W CODE_0C87E9                    ;0C8127|20E987  |0C87E9;
+	jsr.W SetupMode7Registers                    ;0C811B|20ED87  |0C87ED;
+	jsr.W LoadWorldPalettes                    ;0C811E|20DA81  |0C81DA;
+	jsr.W LoadWorldMapTiles                    ;0C8121|20BE88  |0C88BE;
+	jsr.W Mode7_ConfigureTilemap                    ;0C8124|207288  |0C8872;
+	jsr.W ClearDisplayFlags                    ;0C8127|20E987  |0C87E9;
 	lda.B #$40                           ;0C812A|A940    |      ;
 	trb.W $00d6                          ;0C812C|1CD600  |0C00D6;
-	jsl.L CODE_0C8000                    ;0C812F|2200800C|0C8000;
+	jsl.L WaitForVBlank                    ;0C812F|2200800C|0C8000;
 	lda.B #$01                           ;0C8133|A901    |      ;
 	sta.B SNES_BGMODE-$2100              ;0C8135|8505    |002105;
 	stz.B SNES_BG1VOFS-$2100             ;0C8137|640E    |00210E;
 	stz.B SNES_BG1VOFS-$2100             ;0C8139|640E    |00210E;
-	jsr.W CODE_0C8767                    ;0C813B|206787  |0C8767;
-	jsr.W CODE_0C8241                    ;0C813E|204182  |0C8241;
+	jsr.W InitializeOAMData                    ;0C813B|206787  |0C8767;
+	jsr.W InitWorldMapSprites                    ;0C813E|204182  |0C8241;
 	rts                                  ;0C8141|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
-CODE_0C8142:
+ConfigureWorldTiles:
 	ldx.W #$4156                         ;0C8142|A25641  |      ;
 	stx.W $0e08                          ;0C8145|8E080E  |0C0E08;
 	ldx.W #$5555                         ;0C8148|A25555  |      ;
 	stx.W $0e0a                          ;0C814B|8E0A0E  |0C0E0A;
 	ldx.W #$5500                         ;0C814E|A20055  |      ;
 	stx.W $0e0c                          ;0C8151|8E0C0E  |0C0E0C;
-	jmp.W CODE_0C8910                    ;0C8154|4C1089  |0C8910;
+	jmp.W TransferOAMToVRAM                    ;0C8154|4C1089  |0C8910;
 ;      |        |      ;
 ;      |        |      ;
-CODE_0C8157:
+CalculateSpriteOffsets:
 	clc                                  ;0C8157|18      |      ;
 	rep #$30                             ;0C8158|C230    |      ;
 	lda.W $0c84                          ;0C815A|AD840C  |0C0C84;
@@ -185,26 +185,26 @@ CODE_0C8157:
 	sta.W $0ccc                          ;0C817B|8DCC0C  |0C0CCC;
 	sep #$20                             ;0C817E|E220    |      ;
 	lda.B #$80                           ;0C8180|A980    |      ;
-	jsl.L CODE_0C8000                    ;0C8182|2200800C|0C8000;
+	jsl.L WaitForVBlank                    ;0C8182|2200800C|0C8000;
 	sta.B SNES_VMAINC-$2100              ;0C8186|8515    |002115;
 	lda.B #$08                           ;0C8188|A908    |      ;
 	ldx.W #$6225                         ;0C818A|A22562  |      ;
-	jsr.W CODE_0C81A5                    ;0C818D|20A581  |0C81A5;
+	jsr.W UploadTileRow                    ;0C818D|20A581  |0C81A5;
 	lda.B #$0c                           ;0C8190|A90C    |      ;
 	ldx.W #$622a                         ;0C8192|A22A62  |      ;
-	jsr.W CODE_0C81A5                    ;0C8195|20A581  |0C81A5;
+	jsr.W UploadTileRow                    ;0C8195|20A581  |0C81A5;
 	lda.B #$14                           ;0C8198|A914    |      ;
 	ldx.W #$6234                         ;0C819A|A23462  |      ;
-	jsr.W CODE_0C81A5                    ;0C819D|20A581  |0C81A5;
+	jsr.W UploadTileRow                    ;0C819D|20A581  |0C81A5;
 	lda.B #$10                           ;0C81A0|A910    |      ;
 	ldx.W #$6239                         ;0C81A2|A23962  |      ;
 ;      |        |      ;
-CODE_0C81A5:
+UploadTileRow:
 	xba                                  ;0C81A5|EB      |      ;
 	lda.B #$00                           ;0C81A6|A900    |      ;
 	rep #$30                             ;0C81A8|C230    |      ;
 ;      |        |      ;
-CODE_0C81AA:
+UploadTileLoop:
 	stx.B SNES_VMADDL-$2100              ;0C81AA|8616    |002116;
 	sta.B SNES_VMDATAL-$2100             ;0C81AC|8518    |002118;
 	inc a;0C81AE|1A      |      ;
@@ -218,18 +218,18 @@ CODE_0C81AA:
 	tya                                  ;0C81BA|98      |      ;
 	adc.W #$000e                         ;0C81BB|690E00  |      ;
 	bit.W #$0040                         ;0C81BE|894000  |      ;
-	beq CODE_0C81AA                      ;0C81C1|F0E7    |0C81AA;
+	beq UploadTileLoop                      ;0C81C1|F0E7    |0C81AA;
 	sep #$20                             ;0C81C3|E220    |      ;
 	rts                                  ;0C81C5|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
-CODE_0C81C6:
+ClearColorMath:
 	stz.B SNES_CGSWSEL-$2100             ;0C81C6|6430    |002130;
 	stz.B SNES_CGADSUB-$2100             ;0C81C8|6431    |002131;
 	rts                                  ;0C81CA|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
-CODE_0C81CB:
+SetupColorSubtraction:
 	ldx.W #$7002                         ;0C81CB|A20270  |      ;
 	stx.B SNES_CGSWSEL-$2100             ;0C81CE|8630    |002130;
 	lda.B #$e0                           ;0C81D0|A9E0    |      ;
@@ -239,14 +239,14 @@ CODE_0C81CB:
 	rts                                  ;0C81D9|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
-CODE_0C81DA:
+LoadWorldPalettes:
 	lda.B #$0c                           ;0C81DA|A90C    |      ;
 	sta.W $005a                          ;0C81DC|8D5A00  |0C005A;
 	ldx.W #$81ef                         ;0C81DF|A2EF81  |      ;
 	stx.W $0058                          ;0C81E2|8E5800  |0C0058;
 	lda.B #$40                           ;0C81E5|A940    |      ;
 	tsb.W $00e2                          ;0C81E7|0CE200  |0C00E2;
-	jsl.L CODE_0C8000                    ;0C81EA|2200800C|0C8000;
+	jsl.L WaitForVBlank                    ;0C81EA|2200800C|0C8000;
 	rts                                  ;0C81EE|60      |      ;
 ;      |        |      ;
 	ldx.W #$2200                         ;0C81EF|A20022  |      ;
@@ -255,23 +255,23 @@ CODE_0C81DA:
 	sta.B SNES_DMA0ADDRH-$4300           ;0C81F6|8504    |004304;
 	lda.B #$10                           ;0C81F8|A910    |      ;
 	ldy.W #$d974                         ;0C81FA|A074D9  |      ;
-	jsr.W CODE_0C8224                    ;0C81FD|202482  |0C8224;
+	jsr.W UploadPaletteBlock                    ;0C81FD|202482  |0C8224;
 	ldy.W #$d934                         ;0C8200|A034D9  |      ;
-	jsr.W CODE_0C8224                    ;0C8203|202482  |0C8224;
-	jsr.W CODE_0C8224                    ;0C8206|202482  |0C8224;
-	jsr.W CODE_0C8224                    ;0C8209|202482  |0C8224;
-	jsr.W CODE_0C8224                    ;0C820C|202482  |0C8224;
+	jsr.W UploadPaletteBlock                    ;0C8203|202482  |0C8224;
+	jsr.W UploadPaletteBlock                    ;0C8206|202482  |0C8224;
+	jsr.W UploadPaletteBlock                    ;0C8209|202482  |0C8224;
+	jsr.W UploadPaletteBlock                    ;0C820C|202482  |0C8224;
 	lda.B #$b0                           ;0C820F|A9B0    |      ;
-	jsr.W CODE_0C8224                    ;0C8211|202482  |0C8224;
+	jsr.W UploadPaletteBlock                    ;0C8211|202482  |0C8224;
 	ldy.W #$d934                         ;0C8214|A034D9  |      ;
-	jsr.W CODE_0C8224                    ;0C8217|202482  |0C8224;
-	jsr.W CODE_0C8224                    ;0C821A|202482  |0C8224;
-	jsr.W CODE_0C8224                    ;0C821D|202482  |0C8224;
-	jsr.W CODE_0C8224                    ;0C8220|202482  |0C8224;
+	jsr.W UploadPaletteBlock                    ;0C8217|202482  |0C8224;
+	jsr.W UploadPaletteBlock                    ;0C821A|202482  |0C8224;
+	jsr.W UploadPaletteBlock                    ;0C821D|202482  |0C8224;
+	jsr.W UploadPaletteBlock                    ;0C8220|202482  |0C8224;
 	rtl                                  ;0C8223|6B      |      ;
 ;      |        |      ;
 ;      |        |      ;
-CODE_0C8224:
+UploadPaletteBlock:
 	pha                                  ;0C8224|48      |      ;
 	sta.W SNES_CGADD                     ;0C8225|8D2121  |002121;
 	sty.B SNES_DMA0ADDRL-$4300           ;0C8228|8402    |004302;
@@ -289,7 +289,7 @@ CODE_0C8224:
 	rts                                  ;0C8240|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
-CODE_0C8241:
+InitWorldMapSprites:
 	rep #$30                             ;0C8241|C230    |      ;
 	ldx.W #$8667                         ;0C8243|A26786  |      ;
 	ldy.W #$0202                         ;0C8246|A00202  |      ;
@@ -300,76 +300,76 @@ CODE_0C8241:
 	stz.W $0201                          ;0C8254|9C0102  |0C0201;
 	ldx.W #$8671                         ;0C8257|A27186  |      ;
 ;      |        |      ;
-CODE_0C825A:
+ProcessAnimationScript:
 	lda.W $0000,x                        ;0C825A|BD0000  |0C0000;
 	inx                                  ;0C825D|E8      |      ;
 	cmp.B #$01                           ;0C825E|C901    |      ;
-	bcc CODE_0C8297                      ;0C8260|9035    |0C8297;
-	beq CODE_0C8292                      ;0C8262|F02E    |0C8292;
+	bcc Animation_WaitComplete                      ;0C8260|9035    |0C8297;
+	beq Animation_NextFrame                      ;0C8262|F02E    |0C8292;
 	cmp.B #$03                           ;0C8264|C903    |      ;
-	bcc CODE_0C8288                      ;0C8266|9020    |0C8288;
-	beq CODE_0C82A0                      ;0C8268|F036    |0C82A0;
+	bcc Animation_RepeatFrame                      ;0C8266|9020    |0C8288;
+	beq Animation_JumpToEffect                      ;0C8268|F036    |0C82A0;
 	cmp.B #$05                           ;0C826A|C905    |      ;
-	beq CODE_0C82A3                      ;0C826C|F035    |0C82A3;
-	bcs CODE_0C82A6                      ;0C826E|B036    |0C82A6;
+	beq Animation_SpecialZoom                      ;0C826C|F035    |0C82A3;
+	bcs Animation_ProcessOpcode                      ;0C826E|B036    |0C82A6;
 	ldy.W #$0004                         ;0C8270|A00400  |      ;
 ;      |        |      ;
-CODE_0C8273:
+Animation_FadeLoop:
 	phy                                  ;0C8273|5A      |      ;
 	lda.B #$3f                           ;0C8274|A93F    |      ;
 	sta.B SNES_COLDATA-$2100             ;0C8276|8532    |002132;
-	jsr.W CODE_0C85DB                    ;0C8278|20DB85  |0C85DB;
+	jsr.W AnimateWorldSprites                    ;0C8278|20DB85  |0C85DB;
 	lda.B #$e0                           ;0C827B|A9E0    |      ;
 	sta.B SNES_COLDATA-$2100             ;0C827D|8532    |002132;
-	jsr.W CODE_0C85DB                    ;0C827F|20DB85  |0C85DB;
+	jsr.W AnimateWorldSprites                    ;0C827F|20DB85  |0C85DB;
 	ply                                  ;0C8282|7A      |      ;
 	dey                                  ;0C8283|88      |      ;
-	bne CODE_0C8273                      ;0C8284|D0ED    |0C8273;
-	bra CODE_0C825A                      ;0C8286|80D2    |0C825A;
+	bne Animation_FadeLoop                      ;0C8284|D0ED    |0C8273;
+	bra ProcessAnimationScript                      ;0C8286|80D2    |0C825A;
 ;      |        |      ;
 ;      |        |      ;
-CODE_0C8288:
+Animation_RepeatFrame:
 	lda.B #$3b                           ;0C8288|A93B    |      ;
 ;      |        |      ;
-CODE_0C828A:
+RepeatFrameLoop:
 	pha                                  ;0C828A|48      |      ;
-	jsr.W CODE_0C85DB                    ;0C828B|20DB85  |0C85DB;
+	jsr.W AnimateWorldSprites                    ;0C828B|20DB85  |0C85DB;
 	pla                                  ;0C828E|68      |      ;
 	dec a;0C828F|3A      |      ;
-	bne CODE_0C828A                      ;0C8290|D0F8    |0C828A;
+	bne RepeatFrameLoop                      ;0C8290|D0F8    |0C828A;
 ;      |        |      ;
-CODE_0C8292:
-	jsr.W CODE_0C85DB                    ;0C8292|20DB85  |0C85DB;
-	bra CODE_0C825A                      ;0C8295|80C3    |0C825A;
+Animation_NextFrame:
+	jsr.W AnimateWorldSprites                    ;0C8292|20DB85  |0C85DB;
+	bra ProcessAnimationScript                      ;0C8295|80C3    |0C825A;
 ;      |        |      ;
 ;      |        |      ;
-CODE_0C8297:
-	jsr.W CODE_0C85DB                    ;0C8297|20DB85  |0C85DB;
+Animation_WaitComplete:
+	jsr.W AnimateWorldSprites                    ;0C8297|20DB85  |0C85DB;
 	lda.W $0c82                          ;0C829A|AD820C  |0C0C82;
-	bne CODE_0C8297                      ;0C829D|D0F8    |0C8297;
+	bne Animation_WaitComplete                      ;0C829D|D0F8    |0C8297;
 	rts                                  ;0C829F|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
-CODE_0C82A0:
-	jmp.W CODE_0C8460                    ;0C82A0|4C6084  |0C8460;
+Animation_JumpToEffect:
+	jmp.W Animation_ComplexRotation                    ;0C82A0|4C6084  |0C8460;
 ;      |        |      ;
 ;      |        |      ;
-CODE_0C82A3:
-	jmp.W CODE_0C8421                    ;0C82A3|4C2184  |0C8421;
+Animation_SpecialZoom:
+	jmp.W Animation_ZoomOut                    ;0C82A3|4C2184  |0C8421;
 ;      |        |      ;
 ;      |        |      ;
-CODE_0C82A6:
+Animation_ProcessOpcode:
 	pha                                  ;0C82A6|48      |      ;
 	and.B #$07                           ;0C82A7|2907    |      ;
 	sta.W $015f                          ;0C82A9|8D5F01  |0C015F;
 	pla                                  ;0C82AC|68      |      ;
 	and.B #$f8                           ;0C82AD|29F8    |      ;
 	cmp.B #$40                           ;0C82AF|C940    |      ;
-	bcc CODE_0C8302                      ;0C82B1|904F    |0C8302;
+	bcc ProcessOpcode_ConfigureMode7                      ;0C82B1|904F    |0C8302;
 	cmp.B #$80                           ;0C82B3|C980    |      ;
-	bcc CODE_0C82F7                      ;0C82B5|9040    |0C82F7;
+	bcc ProcessOpcode_Type4                      ;0C82B5|9040    |0C82F7;
 	cmp.B #$c0                           ;0C82B7|C9C0    |      ;
-	bcc CODE_0C82CF                      ;0C82B9|9014    |0C82CF;
+	bcc ProcessOpcode_Type8                      ;0C82B9|9014    |0C82CF;
 	sbc.B #$40                           ;0C82BB|E940    |      ;
 	sta.W $0161                          ;0C82BD|8D6101  |0C0161;
 	rep #$30                             ;0C82C0|C230    |      ;
@@ -377,11 +377,11 @@ CODE_0C82A6:
 	asl a;0C82C5|0A      |      ;
 	asl a;0C82C6|0A      |      ;
 	adc.W #$0cbc                         ;0C82C7|69BC0C  |      ;
-	jsr.W CODE_0C83CB                    ;0C82CA|20CB83  |0C83CB;
-	bra CODE_0C825A                      ;0C82CD|808B    |0C825A;
+	jsr.W ApplyScreenOffset                    ;0C82CA|20CB83  |0C83CB;
+	bra ProcessAnimationScript                      ;0C82CD|808B    |0C825A;
 ;      |        |      ;
 ;      |        |      ;
-CODE_0C82CF:
+ProcessOpcode_Type8:
 	sta.W $0161                          ;0C82CF|8D6101  |0C0161;
 	rep #$30                             ;0C82D2|C230    |      ;
 	lda.W $015f                          ;0C82D4|AD5F01  |0C015F;
@@ -389,44 +389,44 @@ CODE_0C82CF:
 	asl a;0C82D8|0A      |      ;
 	pha                                  ;0C82D9|48      |      ;
 	adc.W #$0c80                         ;0C82DA|69800C  |      ;
-	jsr.W CODE_0C83CB                    ;0C82DD|20CB83  |0C83CB;
+	jsr.W ApplyScreenOffset                    ;0C82DD|20CB83  |0C83CB;
 	rep #$30                             ;0C82E0|C230    |      ;
 	pla                                  ;0C82E2|68      |      ;
 	asl a;0C82E3|0A      |      ;
 	adc.W #$0c94                         ;0C82E4|69940C  |      ;
-	jsr.W CODE_0C83CB                    ;0C82E7|20CB83  |0C83CB;
+	jsr.W ApplyScreenOffset                    ;0C82E7|20CB83  |0C83CB;
 	rep #$30                             ;0C82EA|C230    |      ;
 	tya                                  ;0C82EC|98      |      ;
 	clc                                  ;0C82ED|18      |      ;
 	adc.W #$0004                         ;0C82EE|690400  |      ;
-	jsr.W CODE_0C83CB                    ;0C82F1|20CB83  |0C83CB;
-	jmp.W CODE_0C825A                    ;0C82F4|4C5A82  |0C825A;
+	jsr.W ApplyScreenOffset                    ;0C82F1|20CB83  |0C83CB;
+	jmp.W ProcessAnimationScript                    ;0C82F4|4C5A82  |0C825A;
 ;      |        |      ;
 ;      |        |      ;
-CODE_0C82F7:
+ProcessOpcode_Type4:
 	sbc.B #$30                           ;0C82F7|E930    |      ;
 	lsr a;0C82F9|4A      |      ;
 	lsr a;0C82FA|4A      |      ;
 	lsr a;0C82FB|4A      |      ;
 	sta.W $0200                          ;0C82FC|8D0002  |0C0200;
-	jmp.W CODE_0C825A                    ;0C82FF|4C5A82  |0C825A;
+	jmp.W ProcessAnimationScript                    ;0C82FF|4C5A82  |0C825A;
 ;      |        |      ;
 ;      |        |      ;
-CODE_0C8302:
+ProcessOpcode_ConfigureMode7:
 	cmp.B #$08                           ;0C8302|C908    |      ;
-	bne CODE_0C837D                      ;0C8304|D077    |0C837D;
+	bne Animation_FlashEffect                      ;0C8304|D077    |0C837D;
 	lda.W $015f                          ;0C8306|AD5F01  |0C015F;
-	bne CODE_0C831E                      ;0C8309|D013    |0C831E;
+	bne ConfigureMode7_Setup                      ;0C8309|D013    |0C831E;
 	rep #$30                             ;0C830B|C230    |      ;
 	lda.W #$3c03                         ;0C830D|A9033C  |      ;
 	trb.W $0e08                          ;0C8310|1C080E  |0C0E08;
 	lda.W #$0002                         ;0C8313|A90200  |      ;
 	tsb.W $0e08                          ;0C8316|0C080E  |0C0E08;
 	sep #$20                             ;0C8319|E220    |      ;
-	jmp.W CODE_0C825A                    ;0C831B|4C5A82  |0C825A;
+	jmp.W ProcessAnimationScript                    ;0C831B|4C5A82  |0C825A;
 ;      |        |      ;
 ;      |        |      ;
-CODE_0C831E:
+ConfigureMode7_Setup:
 	rep #$30                             ;0C831E|C230    |      ;
 	lda.W $015f                          ;0C8320|AD5F01  |0C015F;
 	asl a;0C8323|0A      |      ;
@@ -447,11 +447,11 @@ CODE_0C831E:
 	ldy.W $015f                          ;0C8342|AC5F01  |0C015F;
 	lda.W #$0003                         ;0C8345|A90300  |      ;
 ;      |        |      ;
-CODE_0C8348:
+Mode7_CalculateMask:
 	asl a;0C8348|0A      |      ;
 	asl a;0C8349|0A      |      ;
 	dey                                  ;0C834A|88      |      ;
-	bne CODE_0C8348                      ;0C834B|D0FB    |0C8348;
+	bne Mode7_CalculateMask                      ;0C834B|D0FB    |0C8348;
 	pha                                  ;0C834D|48      |      ;
 	trb.W $0e08                          ;0C834E|1C080E  |0C0E08;
 	and.W #$aaaa                         ;0C8351|29AAAA  |      ;
@@ -461,11 +461,11 @@ CODE_0C8348:
 	lsr a;0C835B|4A      |      ;
 	lsr a;0C835C|4A      |      ;
 ;      |        |      ;
-CODE_0C835D:
+Mode7_CalculateShift:
 	asl a;0C835D|0A      |      ;
 	asl a;0C835E|0A      |      ;
 	dey                                  ;0C835F|88      |      ;
-	bne CODE_0C835D                      ;0C8360|D0FB    |0C835D;
+	bne Mode7_CalculateShift                      ;0C8360|D0FB    |0C835D;
 	lsr a;0C8362|4A      |      ;
 	lsr a;0C8363|4A      |      ;
 	pha                                  ;0C8364|48      |      ;
@@ -474,98 +474,98 @@ CODE_0C835D:
 	ora.B $01,s                          ;0C8367|0301    |000001;
 	trb.W $0e0a                          ;0C8369|1C0A0E  |0C0E0A;
 	cmp.W #$0003                         ;0C836C|C90300  |      ;
-	bne CODE_0C8377                      ;0C836F|D006    |0C8377;
+	bne Mode7_ClearHighBits                      ;0C836F|D006    |0C8377;
 	lda.W #$c000                         ;0C8371|A900C0  |      ;
 	trb.W $0e08                          ;0C8374|1C080E  |0C0E08;
 ;      |        |      ;
-CODE_0C8377:
+Mode7_ClearHighBits:
 	pla                                  ;0C8377|68      |      ;
 	sep #$20                             ;0C8378|E220    |      ;
-	jmp.W CODE_0C825A                    ;0C837A|4C5A82  |0C825A;
+	jmp.W ProcessAnimationScript                    ;0C837A|4C5A82  |0C825A;
 ;      |        |      ;
 ;      |        |      ;
-CODE_0C837D:
+Animation_FlashEffect:
 	phx                                  ;0C837D|DA      |      ;
-	jsr.W CODE_0C8157                    ;0C837E|205781  |0C8157;
-	jsr.W CODE_0C8142                    ;0C8381|204281  |0C8142;
-	jsr.W CODE_0C83B1                    ;0C8384|20B183  |0C83B1;
-	jsr.W CODE_0C83B1                    ;0C8387|20B183  |0C83B1;
-	jsr.W CODE_0C83B1                    ;0C838A|20B183  |0C83B1;
+	jsr.W CalculateSpriteOffsets                    ;0C837E|205781  |0C8157;
+	jsr.W ConfigureWorldTiles                    ;0C8381|204281  |0C8142;
+	jsr.W FlashEffect_Cycle                    ;0C8384|20B183  |0C83B1;
+	jsr.W FlashEffect_Cycle                    ;0C8387|20B183  |0C83B1;
+	jsr.W FlashEffect_Cycle                    ;0C838A|20B183  |0C83B1;
 	lda.B #$10                           ;0C838D|A910    |      ;
 ;      |        |      ;
-CODE_0C838F:
+FlashEffect_Loop:
 	pha                                  ;0C838F|48      |      ;
-	jsr.W CODE_0C81CB                    ;0C8390|20CB81  |0C81CB;
-	jsr.W CODE_0C85DB                    ;0C8393|20DB85  |0C85DB;
-	jsr.W CODE_0C85DB                    ;0C8396|20DB85  |0C85DB;
+	jsr.W SetupColorSubtraction                    ;0C8390|20CB81  |0C81CB;
+	jsr.W AnimateWorldSprites                    ;0C8393|20DB85  |0C85DB;
+	jsr.W AnimateWorldSprites                    ;0C8396|20DB85  |0C85DB;
 	lda.B #$11                           ;0C8399|A911    |      ;
 	sta.B SNES_TM-$2100                  ;0C839B|852C    |00212C;
-	jsr.W CODE_0C81C6                    ;0C839D|20C681  |0C81C6;
-	jsr.W CODE_0C85DB                    ;0C83A0|20DB85  |0C85DB;
-	jsr.W CODE_0C85DB                    ;0C83A3|20DB85  |0C85DB;
+	jsr.W ClearColorMath                    ;0C839D|20C681  |0C81C6;
+	jsr.W AnimateWorldSprites                    ;0C83A0|20DB85  |0C85DB;
+	jsr.W AnimateWorldSprites                    ;0C83A3|20DB85  |0C85DB;
 	pla                                  ;0C83A6|68      |      ;
 	dec a;0C83A7|3A      |      ;
-	bne CODE_0C838F                      ;0C83A8|D0E5    |0C838F;
-	jsr.W CODE_0C81CB                    ;0C83AA|20CB81  |0C81CB;
+	bne FlashEffect_Loop                      ;0C83A8|D0E5    |0C838F;
+	jsr.W SetupColorSubtraction                    ;0C83AA|20CB81  |0C81CB;
 	plx                                  ;0C83AD|FA      |      ;
-	jmp.W CODE_0C825A                    ;0C83AE|4C5A82  |0C825A;
+	jmp.W ProcessAnimationScript                    ;0C83AE|4C5A82  |0C825A;
 ;      |        |      ;
 ;      |        |      ;
-CODE_0C83B1:
-	jsr.W CODE_0C81CB                    ;0C83B1|20CB81  |0C81CB;
+FlashEffect_Cycle:
+	jsr.W SetupColorSubtraction                    ;0C83B1|20CB81  |0C81CB;
 	lda.B #$11                           ;0C83B4|A911    |      ;
 	sta.B SNES_TM-$2100                  ;0C83B6|852C    |00212C;
 	lda.B #$3f                           ;0C83B8|A93F    |      ;
 	sta.B SNES_COLDATA-$2100             ;0C83BA|8532    |002132;
-	jsr.W CODE_0C85DB                    ;0C83BC|20DB85  |0C85DB;
-	jsr.W CODE_0C81C6                    ;0C83BF|20C681  |0C81C6;
-	jsr.W CODE_0C85DB                    ;0C83C2|20DB85  |0C85DB;
-	jsr.W CODE_0C85DB                    ;0C83C5|20DB85  |0C85DB;
-	jmp.W CODE_0C85DB                    ;0C83C8|4CDB85  |0C85DB;
+	jsr.W AnimateWorldSprites                    ;0C83BC|20DB85  |0C85DB;
+	jsr.W ClearColorMath                    ;0C83BF|20C681  |0C81C6;
+	jsr.W AnimateWorldSprites                    ;0C83C2|20DB85  |0C85DB;
+	jsr.W AnimateWorldSprites                    ;0C83C5|20DB85  |0C85DB;
+	jmp.W AnimateWorldSprites                    ;0C83C8|4CDB85  |0C85DB;
 ;      |        |      ;
 ;      |        |      ;
-CODE_0C83CB:
+ApplyScreenOffset:
 	phx                                  ;0C83CB|DA      |      ;
 	tax                                  ;0C83CC|AA      |      ;
 	sep #$20                             ;0C83CD|E220    |      ;
 	ldy.W $0161                          ;0C83CF|AC6101  |0C0161;
 	cpy.W #$00b8                         ;0C83D2|C0B800  |      ;
-	beq CODE_0C83DD                      ;0C83D5|F006    |0C83DD;
+	beq ScreenOffset_AdjustY                      ;0C83D5|F006    |0C83DD;
 	cpy.W #$0089                         ;0C83D7|C08900  |      ;
 	bcs UNREACH_0C83E8                   ;0C83DA|B00C    |0C83E8;
 	sec                                  ;0C83DC|38      |      ;
 ;      |        |      ;
-CODE_0C83DD:
+ScreenOffset_AdjustY:
 	lda.W $0001,x                        ;0C83DD|BD0100  |0C0001;
 	sbc.W $0200                          ;0C83E0|ED0002  |0C0200;
 	sta.W $0001,x                        ;0C83E3|9D0100  |0C0001;
-	bra CODE_0C83FB                      ;0C83E6|8013    |0C83FB;
+	bra ScreenOffset_CheckRange                      ;0C83E6|8013    |0C83FB;
 ;      |        |      ;
 ;      |        |      ;
 UNREACH_0C83E8:
 	db $c0,$98,$00,$90,$0e,$c0,$a9,$00,$b0,$09,$bd,$01,$00,$6d,$00,$02;0C83E8|        |      ;
 	db $9d,$01,$00                       ;0C83F8|        |000001;
 ;      |        |      ;
-CODE_0C83FB:
+ScreenOffset_CheckRange:
 	cpy.W #$0088                         ;0C83FB|C08800  |      ;
-	bcc CODE_0C8410                      ;0C83FE|9010    |0C8410;
+	bcc ScreenOffset_ApplyX                      ;0C83FE|9010    |0C8410;
 	db $c0,$99,$00,$b0,$0b,$bd,$00,$00,$6d,$00,$02,$9d,$00,$00,$80,$0e;0C8400|        |      ;
 ;      |        |      ;
-CODE_0C8410:
+ScreenOffset_ApplyX:
 	cpy.W #$00a8                         ;0C8410|C0A800  |      ;
-	bcc CODE_0C841E                      ;0C8413|9009    |0C841E;
+	bcc ScreenOffset_Complete                      ;0C8413|9009    |0C841E;
 	db $bd,$00,$00,$ed,$00,$02,$9d,$00,$00;0C8415|        |000000;
 ;      |        |      ;
-CODE_0C841E:
+ScreenOffset_Complete:
 	txy                                  ;0C841E|9B      |      ;
 	plx                                  ;0C841F|FA      |      ;
 	rts                                  ;0C8420|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
-CODE_0C8421:
+Animation_ZoomOut:
 	lda.B #$20                           ;0C8421|A920    |      ;
 ;      |        |      ;
-CODE_0C8423:
+ZoomOut_Loop:
 	pha                                  ;0C8423|48      |      ;
 	sec                                  ;0C8424|38      |      ;
 	lda.W $0cc1                          ;0C8425|ADC10C  |0C0CC1;
@@ -580,53 +580,53 @@ CODE_0C8423:
 	lda.W $0cc0                          ;0C843E|ADC00C  |0C0CC0;
 	adc.B #$03                           ;0C8441|6903    |      ;
 	sta.W $0cc0                          ;0C8443|8DC00C  |0C0CC0;
-	jsr.W CODE_0C85DB                    ;0C8446|20DB85  |0C85DB;
+	jsr.W AnimateWorldSprites                    ;0C8446|20DB85  |0C85DB;
 	pla                                  ;0C8449|68      |      ;
 	dec a;0C844A|3A      |      ;
-	bne CODE_0C8423                      ;0C844B|D0D6    |0C8423;
+	bne ZoomOut_Loop                      ;0C844B|D0D6    |0C8423;
 	lda.B #$3c                           ;0C844D|A93C    |      ;
 ;      |        |      ;
-CODE_0C844F:
+ZoomOut_FinalFrames:
 	pha                                  ;0C844F|48      |      ;
-	jsr.W CODE_0C85DB                    ;0C8450|20DB85  |0C85DB;
+	jsr.W AnimateWorldSprites                    ;0C8450|20DB85  |0C85DB;
 	pla                                  ;0C8453|68      |      ;
 	dec a;0C8454|3A      |      ;
-	bne CODE_0C844F                      ;0C8455|D0F8    |0C844F;
+	bne ZoomOut_FinalFrames                      ;0C8455|D0F8    |0C844F;
 	stz.W $0e0d                          ;0C8457|9C0D0E  |0C0E0D;
 	stz.W $0e0e                          ;0C845A|9C0E0E  |0C0E0E;
-	jmp.W CODE_0C825A                    ;0C845D|4C5A82  |0C825A;
+	jmp.W ProcessAnimationScript                    ;0C845D|4C5A82  |0C825A;
 ;      |        |      ;
 ;      |        |      ;
-CODE_0C8460:
+Animation_ComplexRotation:
 	phx                                  ;0C8460|DA      |      ;
 	ldy.W #$8575                         ;0C8461|A07585  |      ;
 	sty.W $0212                          ;0C8464|8C1202  |0C0212;
 	ldx.W #$0000                         ;0C8467|A20000  |      ;
 	ldy.W #$84cb                         ;0C846A|A0CB84  |      ;
-	jsr.W CODE_0C849E                    ;0C846D|209E84  |0C849E;
+	jsr.W ComplexRotation_Execute                    ;0C846D|209E84  |0C849E;
 	ldy.W #$84cb                         ;0C8470|A0CB84  |      ;
-	jsr.W CODE_0C849E                    ;0C8473|209E84  |0C849E;
+	jsr.W ComplexRotation_Execute                    ;0C8473|209E84  |0C849E;
 	ldy.W #$8520                         ;0C8476|A02085  |      ;
-	jsr.W CODE_0C849E                    ;0C8479|209E84  |0C849E;
+	jsr.W ComplexRotation_Execute                    ;0C8479|209E84  |0C849E;
 	ldy.W #$84cc                         ;0C847C|A0CC84  |      ;
-	jsr.W CODE_0C849E                    ;0C847F|209E84  |0C849E;
+	jsr.W ComplexRotation_Execute                    ;0C847F|209E84  |0C849E;
 	ldy.W #$84f6                         ;0C8482|A0F684  |      ;
-	jsr.W CODE_0C849E                    ;0C8485|209E84  |0C849E;
+	jsr.W ComplexRotation_Execute                    ;0C8485|209E84  |0C849E;
 	stz.W $0214                          ;0C8488|9C1402  |0C0214;
 	ldy.W #$854a                         ;0C848B|A04A85  |      ;
 	sty.W $0212                          ;0C848E|8C1202  |0C0212;
 	ldy.W #$84cb                         ;0C8491|A0CB84  |      ;
-	jsr.W CODE_0C849E                    ;0C8494|209E84  |0C849E;
-	jsr.W CODE_0C85DB                    ;0C8497|20DB85  |0C85DB;
+	jsr.W ComplexRotation_Execute                    ;0C8494|209E84  |0C849E;
+	jsr.W AnimateWorldSprites                    ;0C8497|20DB85  |0C85DB;
 	plx                                  ;0C849A|FA      |      ;
-	jmp.W CODE_0C825A                    ;0C849B|4C5A82  |0C825A;
+	jmp.W ProcessAnimationScript                    ;0C849B|4C5A82  |0C825A;
 ;      |        |      ;
 ;      |        |      ;
-CODE_0C849E:
+ComplexRotation_Execute:
 	sty.W $0210                          ;0C849E|8C1002  |0C0210;
 	ldy.W #$85b3                         ;0C84A1|A0B385  |      ;
 ;      |        |      ;
-CODE_0C84A4:
+Rotation_ProcessStep:
 	jsr.W ($0210,x)                      ;0C84A4|FC1002  |0C0210;
 	sec                                  ;0C84A7|38      |      ;
 	lda.W $0c81                          ;0C84A8|AD810C  |0C0C81;
@@ -634,10 +634,10 @@ CODE_0C84A4:
 	jsr.W ($0212,x)                      ;0C84AE|FC1202  |0C0212;
 	iny                                  ;0C84B1|C8      |      ;
 	cpy.W #$85db                         ;0C84B2|C0DB85  |      ;
-	bne CODE_0C84A4                      ;0C84B5|D0ED    |0C84A4;
+	bne Rotation_ProcessStep                      ;0C84B5|D0ED    |0C84A4;
 	dey                                  ;0C84B7|88      |      ;
 ;      |        |      ;
-CODE_0C84B8:
+Rotation_ReverseStep:
 	dey                                  ;0C84B8|88      |      ;
 	jsr.W ($0210,x)                      ;0C84B9|FC1002  |0C0210;
 	clc                                  ;0C84BC|18      |      ;
@@ -645,12 +645,12 @@ CODE_0C84B8:
 	adc.W $0000,y                        ;0C84C0|790000  |0C0000;
 	jsr.W ($0212,x)                      ;0C84C3|FC1202  |0C0212;
 	cpy.W #$85b2                         ;0C84C6|C0B285  |      ;
-	bne CODE_0C84B8                      ;0C84C9|D0ED    |0C84B8;
+	bne Rotation_ReverseStep                      ;0C84C9|D0ED    |0C84B8;
 	rts                                  ;0C84CB|60      |      ;
 ;      |        |      ;
 	tya                                  ;0C84CC|98      |      ;
 	bit.B #$01                           ;0C84CD|8901    |      ;
-	beq CODE_0C84F5                      ;0C84CF|F024    |0C84F5;
+	beq Rotation_Return                      ;0C84CF|F024    |0C84F5;
 	dec.W $0c88                          ;0C84D1|CE880C  |0C0C88;
 	dec.W $0ca4                          ;0C84D4|CEA40C  |0C0CA4;
 	dec.W $0ca8                          ;0C84D7|CEA80C  |0C0CA8;
@@ -664,12 +664,12 @@ CODE_0C84B8:
 	dec.W $0cac                          ;0C84EF|CEAC0C  |0C0CAC;
 	dec.W $0cb0                          ;0C84F2|CEB00C  |0C0CB0;
 ;      |        |      ;
-CODE_0C84F5:
+Rotation_Return:
 	rts                                  ;0C84F5|60      |      ;
 ;      |        |      ;
 	tya                                  ;0C84F6|98      |      ;
 	bit.B #$01                           ;0C84F7|8901    |      ;
-	beq CODE_0C851F                      ;0C84F9|F024    |0C851F;
+	beq Rotation_HalfStep                      ;0C84F9|F024    |0C851F;
 	inc.W $0c88                          ;0C84FB|EE880C  |0C0C88;
 	inc.W $0ca4                          ;0C84FE|EEA40C  |0C0CA4;
 	inc.W $0ca8                          ;0C8501|EEA80C  |0C0CA8;
@@ -683,12 +683,12 @@ CODE_0C84F5:
 	inc.W $0cac                          ;0C8519|EEAC0C  |0C0CAC;
 	inc.W $0cb0                          ;0C851C|EEB00C  |0C0CB0;
 ;      |        |      ;
-CODE_0C851F:
+Rotation_HalfStep:
 	rts                                  ;0C851F|60      |      ;
 ;      |        |      ;
 	tya                                  ;0C8520|98      |      ;
 	bit.B #$01                           ;0C8521|8901    |      ;
-	beq CODE_0C8537                      ;0C8523|F012    |0C8537;
+	beq Rotation_QuarterStep                      ;0C8523|F012    |0C8537;
 	dec.W $0c88                          ;0C8525|CE880C  |0C0C88;
 	dec.W $0ca4                          ;0C8528|CEA40C  |0C0CA4;
 	dec.W $0ca8                          ;0C852B|CEA80C  |0C0CA8;
@@ -696,7 +696,7 @@ CODE_0C851F:
 	inc.W $0cb4                          ;0C8531|EEB40C  |0C0CB4;
 	inc.W $0cb8                          ;0C8534|EEB80C  |0C0CB8;
 ;      |        |      ;
-CODE_0C8537:
+Rotation_QuarterStep:
 	dec.W $0c84                          ;0C8537|CE840C  |0C0C84;
 	dec.W $0c9c                          ;0C853A|CE9C0C  |0C0C9C;
 	dec.W $0ca0                          ;0C853D|CEA00C  |0C0CA0;
@@ -708,34 +708,34 @@ CODE_0C8537:
 	lda.W $0c81                          ;0C854A|AD810C  |0C0C81;
 	pha                                  ;0C854D|48      |      ;
 	lda.W $0214                          ;0C854E|AD1402  |0C0214;
-	bcs CODE_0C8559                      ;0C8551|B006    |0C8559;
+	bcs Rotation_AdjustOffset                      ;0C8551|B006    |0C8559;
 	sec                                  ;0C8553|38      |      ;
 	sbc.W $0000,y                        ;0C8554|F90000  |0C0000;
-	bra CODE_0C855D                      ;0C8557|8004    |0C855D;
+	bra Rotation_StoreOffset                      ;0C8557|8004    |0C855D;
 ;      |        |      ;
 ;      |        |      ;
-CODE_0C8559:
+Rotation_AdjustOffset:
 	clc                                  ;0C8559|18      |      ;
 	adc.W $0000,y                        ;0C855A|790000  |0C0000;
 ;      |        |      ;
-CODE_0C855D:
+Rotation_StoreOffset:
 	sta.W $0214                          ;0C855D|8D1402  |0C0214;
 	lsr a;0C8560|4A      |      ;
 	pha                                  ;0C8561|48      |      ;
 	lda.B $02,s                          ;0C8562|A302    |000002;
 	sec                                  ;0C8564|38      |      ;
 	sbc.B $01,s                          ;0C8565|E301    |000001;
-	jsr.W CODE_0C8575                    ;0C8567|207585  |0C8575;
+	jsr.W UpdateSpritePositions                    ;0C8567|207585  |0C8575;
 	pla                                  ;0C856A|68      |      ;
 	pla                                  ;0C856B|68      |      ;
 	phy                                  ;0C856C|5A      |      ;
 	ldy.W #$0000                         ;0C856D|A00000  |      ;
-	jsr.W CODE_0C8575                    ;0C8570|207585  |0C8575;
+	jsr.W UpdateSpritePositions                    ;0C8570|207585  |0C8575;
 	ply                                  ;0C8573|7A      |      ;
 	rts                                  ;0C8574|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
-CODE_0C8575:
+UpdateSpritePositions:
 	sec                                  ;0C8575|38      |      ;
 	sta.W $0c81                          ;0C8576|8D810C  |0C0C81;
 	sta.W $0c85                          ;0C8579|8D850C  |0C0C85;
@@ -756,19 +756,19 @@ CODE_0C8575:
 	sta.W $0cb9                          ;0C85A4|8DB90C  |0C0CB9;
 	tya                                  ;0C85A7|98      |      ;
 	bit.B #$01                           ;0C85A8|8901    |      ;
-	beq CODE_0C85B1                      ;0C85AA|F005    |0C85B1;
+	beq Sprite_UpdateComplete                      ;0C85AA|F005    |0C85B1;
 	phy                                  ;0C85AC|5A      |      ;
-	jsr.W CODE_0C85DB                    ;0C85AD|20DB85  |0C85DB;
+	jsr.W AnimateWorldSprites                    ;0C85AD|20DB85  |0C85DB;
 	ply                                  ;0C85B0|7A      |      ;
 ;      |        |      ;
-CODE_0C85B1:
+Sprite_UpdateComplete:
 	rts                                  ;0C85B1|60      |      ;
 ;      |        |      ;
 	db $00,$04,$02,$01,$02,$01,$01,$01,$01,$00,$01,$01,$00,$01,$00,$01;0C85B2|        |      ;
 	db $01,$00,$01,$00,$01,$00,$00,$01,$00,$00,$01,$00,$00,$00,$01,$00;0C85C2|        |      ;
 	db $00,$00,$00,$01,$00,$00,$00,$00,$00;0C85D2|        |      ;
 ;      |        |      ;
-CODE_0C85DB:
+AnimateWorldSprites:
 	phk                                  ;0C85DB|4B      |      ;
 	plb                                  ;0C85DC|AB      |      ;
 	phx                                  ;0C85DD|DA      |      ;
@@ -786,7 +786,7 @@ CODE_0C85DB:
 	sta.W $020c                          ;0C85F9|8D0C02  |0C020C;
 	stz.W $020e                          ;0C85FC|9C0E02  |0C020E;
 ;      |        |      ;
-CODE_0C85FF:
+AnimateSprites_Loop:
 	lda.W $020e                          ;0C85FF|AD0E02  |0C020E;
 	asl a;0C8602|0A      |      ;
 	adc.W #$0c80                         ;0C8603|69800C  |      ;
@@ -795,10 +795,10 @@ CODE_0C85FF:
 	lda.W $0202,x                        ;0C860A|BD0202  |0C0202;
 	inc a;0C860D|1A      |      ;
 	cmp.W #$000e                         ;0C860E|C90E00  |      ;
-	bne CODE_0C8616                      ;0C8611|D003    |0C8616;
+	bne Sprite_UpdateTile                      ;0C8611|D003    |0C8616;
 	lda.W #$0000                         ;0C8613|A90000  |      ;
 ;      |        |      ;
-CODE_0C8616:
+Sprite_UpdateTile:
 	sta.W $0202,x                        ;0C8616|9D0202  |0C0202;
 	tax                                  ;0C8619|AA      |      ;
 	sep #$20                             ;0C861A|E220    |      ;
@@ -813,26 +813,26 @@ CODE_0C8616:
 	adc.W #$0c94                         ;0C862C|69940C  |      ;
 	tay                                  ;0C862F|A8      |      ;
 	plp                                  ;0C8630|28      |      ;
-	beq CODE_0C863D                      ;0C8631|F00A    |0C863D;
+	beq Sprite_SetFrame44                      ;0C8631|F00A    |0C863D;
 	lda.B #$48                           ;0C8633|A948    |      ;
 	sta.W $0002,y                        ;0C8635|990200  |0C0002;
 	sta.W $0006,y                        ;0C8638|990600  |0C0006;
-	bra CODE_0C8647                      ;0C863B|800A    |0C8647;
+	bra Sprite_UpdatePalette                      ;0C863B|800A    |0C8647;
 ;      |        |      ;
 ;      |        |      ;
-CODE_0C863D:
+Sprite_SetFrame44:
 	lda.B #$6c                           ;0C863D|A96C    |      ;
 	sta.W $0002,y                        ;0C863F|990200  |0C0002;
 	lda.B #$6e                           ;0C8642|A96E    |      ;
 	sta.W $0006,y                        ;0C8644|990600  |0C0006;
 ;      |        |      ;
-CODE_0C8647:
+Sprite_UpdatePalette:
 	rep #$30                             ;0C8647|C230    |      ;
 	inc.W $020e                          ;0C8649|EE0E02  |0C020E;
 	inc.W $020e                          ;0C864C|EE0E02  |0C020E;
 	dec.W $020c                          ;0C864F|CE0C02  |0C020C;
-	bne CODE_0C85FF                      ;0C8652|D0AB    |0C85FF;
-	jsr.W CODE_0C8910                    ;0C8654|201089  |0C8910;
+	bne AnimateSprites_Loop                      ;0C8652|D0AB    |0C85FF;
+	jsr.W TransferOAMToVRAM                    ;0C8654|201089  |0C8910;
 	plx                                  ;0C8657|FA      |      ;
 	rts                                  ;0C8658|60      |      ;
 ;      |        |      ;
@@ -856,13 +856,13 @@ DATA8_0c8659:
 	db $c2,$c4,$01,$01,$c2,$c4,$01,$01,$c2,$c4,$01,$01,$c2,$c4,$01,$01;0C8749|        |      ;
 	db $02,$04,$01,$01,$05,$02,$02,$02,$02,$02,$02,$02,$02,$00;0C8759|        |      ;
 ;      |        |      ;
-CODE_0C8767:
+InitializeOAMData:
 	rep #$30                             ;0C8767|C230    |      ;
 	ldx.W #$8779                         ;0C8769|A27987  |      ;
 	ldy.W #$0c80                         ;0C876C|A0800C  |      ;
 	lda.W #$006f                         ;0C876F|A96F00  |      ;
 	mvn $00,$0c                          ;0C8772|54000C  |      ;
-	jsr.W CODE_0C8910                    ;0C8775|201089  |0C8910;
+	jsr.W TransferOAMToVRAM                    ;0C8775|201089  |0C8910;
 	rts                                  ;0C8778|60      |      ;
 ;      |        |      ;
 	db $74,$cf,$00,$36,$74,$cf,$00,$38,$74,$cf,$00,$3a,$74,$cf,$00,$3c;0C8779|        |      ;
@@ -873,12 +873,12 @@ CODE_0C8767:
 	db $40,$6f,$c0,$00,$50,$6f,$c2,$00,$60,$6f,$c4,$00,$70,$6f,$c6,$00;0C87C9|        |      ;
 	db $80,$6f,$c8,$00,$90,$6f,$ca,$00,$a0,$6f,$cc,$00,$b0,$6f,$ce,$00;0C87D9|        |      ;
 ;      |        |      ;
-CODE_0C87E9:
+ClearDisplayFlags:
 	stz.W $0111                          ;0C87E9|9C1101  |0C0111;
 	rts                                  ;0C87EC|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
-CODE_0C87ED:
+SetupMode7Registers:
 	rep #$30                             ;0C87ED|C230    |      ;
 	pea.W $0c7f                          ;0C87EF|F47F0C  |000C7F;
 	plb                                  ;0C87F2|AB      |      ;
@@ -892,7 +892,7 @@ CODE_0C87ED:
 	ldx.W #$00ce                         ;0C8806|A2CE00  |      ;
 	ldy.W #$0082                         ;0C8809|A08200  |      ;
 ;      |        |      ;
-CODE_0C880C:
+Mode7_CalculateMatrix:
 	tya                                  ;0C880C|98      |      ;
 	asl a;0C880D|0A      |      ;
 	sta.W $4205                          ;0C880E|8D0542  |0C4205;
@@ -906,7 +906,7 @@ CODE_0C880C:
 	inx                                  ;0C8823|E8      |      ;
 	inx                                  ;0C8824|E8      |      ;
 	cpy.W #$00e8                         ;0C8825|C0E800  |      ;
-	bne CODE_0C880C                      ;0C8828|D0E2    |0C880C;
+	bne Mode7_CalculateMatrix                      ;0C8828|D0E2    |0C880C;
 	rep #$30                             ;0C882A|C230    |      ;
 	ldx.W #$886b                         ;0C882C|A26B88  |      ;
 	ldy.W #$0000                         ;0C882F|A00000  |      ;
@@ -936,63 +936,63 @@ CODE_0C880C:
 ;      |        |      ;
 	db $ff,$10,$00,$d1,$0e,$01,$00       ;0C886B|        |      ;
 ;      |        |      ;
-CODE_0C8872:
+Mode7_ConfigureTilemap:
 	lda.B #$f7                           ;0C8872|A9F7    |      ;
 	ldx.W #$0000                         ;0C8874|A20000  |      ;
 ;      |        |      ;
-CODE_0C8877:
+Mode7_UploadTilemap:
 	phk                                  ;0C8877|4B      |      ;
 	plb                                  ;0C8878|AB      |      ;
 	pha                                  ;0C8879|48      |      ;
-	jsl.L CODE_0C8000                    ;0C887A|2200800C|0C8000;
+	jsl.L WaitForVBlank                    ;0C887A|2200800C|0C8000;
 	sta.B SNES_BG1VOFS-$2100             ;0C887E|850E    |00210E;
 	stz.B SNES_BG1VOFS-$2100             ;0C8880|640E    |00210E;
 	lda.W DATA8_0c88b0,x                 ;0C8882|BDB088  |0C88B0;
 	inx                                  ;0C8885|E8      |      ;
 	phx                                  ;0C8886|DA      |      ;
-	jsr.W CODE_0C88EB                    ;0C8887|20EB88  |0C88EB;
+	jsr.W WorldTiles_CalculateOffset                    ;0C8887|20EB88  |0C88EB;
 	plx                                  ;0C888A|FA      |      ;
 	cpx.W #$000e                         ;0C888B|E00E00  |      ;
-	bne CODE_0C8893                      ;0C888E|D003    |0C8893;
+	bne UploadTilemap_Decompress                      ;0C888E|D003    |0C8893;
 	ldx.W #$0000                         ;0C8890|A20000  |      ;
 ;      |        |      ;
-CODE_0C8893:
+UploadTilemap_Decompress:
 	pla                                  ;0C8893|68      |      ;
 	cmp.B #$39                           ;0C8894|C939    |      ;
-	bcc CODE_0C88AB                      ;0C8896|9013    |0C88AB;
+	bcc Decompress_LiteralMode                      ;0C8896|9013    |0C88AB;
 	cmp.B #$59                           ;0C8898|C959    |      ;
-	bcc CODE_0C88A7                      ;0C889A|900B    |0C88A7;
+	bcc Decompress_RLEMode                      ;0C889A|900B    |0C88A7;
 	cmp.B #$79                           ;0C889C|C979    |      ;
-	bcc CODE_0C88A3                      ;0C889E|9003    |0C88A3;
+	bcc Decompress_ProcessByte                      ;0C889E|9003    |0C88A3;
 	dec a;0C88A0|3A      |      ;
-	bra CODE_0C8877                      ;0C88A1|80D4    |0C8877;
+	bra Mode7_UploadTilemap                      ;0C88A1|80D4    |0C8877;
 ;      |        |      ;
 ;      |        |      ;
-CODE_0C88A3:
+Decompress_ProcessByte:
 	sbc.B #$01                           ;0C88A3|E901    |      ;
-	bra CODE_0C8877                      ;0C88A5|80D0    |0C8877;
+	bra Mode7_UploadTilemap                      ;0C88A5|80D0    |0C8877;
 ;      |        |      ;
 ;      |        |      ;
-CODE_0C88A7:
+Decompress_RLEMode:
 	sbc.B #$03                           ;0C88A7|E903    |      ;
-	bra CODE_0C8877                      ;0C88A9|80CC    |0C8877;
+	bra Mode7_UploadTilemap                      ;0C88A9|80CC    |0C8877;
 ;      |        |      ;
 ;      |        |      ;
-CODE_0C88AB:
+Decompress_LiteralMode:
 	sbc.B #$05                           ;0C88AB|E905    |      ;
-	bcs CODE_0C8877                      ;0C88AD|B0C8    |0C8877;
+	bcs Mode7_UploadTilemap                      ;0C88AD|B0C8    |0C8877;
 	rts                                  ;0C88AF|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
 DATA8_0c88b0:
 	db $11,$15,$15,$11,$11,$19,$19,$19,$1d,$51,$51,$55,$55,$11;0C88B0|        |      ;
 ;      |        |      ;
-CODE_0C88BE:
+LoadWorldMapTiles:
 	phk                                  ;0C88BE|4B      |      ;
 	plb                                  ;0C88BF|AB      |      ;
 	clc                                  ;0C88C0|18      |      ;
 	lda.B #$84                           ;0C88C1|A984    |      ;
-	jsl.L CODE_0C8000                    ;0C88C3|2200800C|0C8000;
+	jsl.L WaitForVBlank                    ;0C88C3|2200800C|0C8000;
 	stz.B SNES_VMAINC-$2100              ;0C88C7|6415    |002115;
 	sta.B SNES_M7X-$2100                 ;0C88C9|851F    |00211F;
 	stz.B SNES_M7X-$2100                 ;0C88CB|641F    |00211F;
@@ -1012,14 +1012,14 @@ CODE_0C88BE:
 	stz.B SNES_BG1VOFS-$2100             ;0C88E7|640E    |00210E;
 	lda.B #$11                           ;0C88E9|A911    |      ;
 ;      |        |      ;
-CODE_0C88EB:
+WorldTiles_CalculateOffset:
 	clc                                  ;0C88EB|18      |      ;
 	ldx.W #$0f8f                         ;0C88EC|A28F0F  |      ;
-	jsr.W CODE_0C88F8                    ;0C88EF|20F888  |0C88F8;
-	jsr.W CODE_0C88F8                    ;0C88F2|20F888  |0C88F8;
-	jsr.W CODE_0C88F8                    ;0C88F5|20F888  |0C88F8;
+	jsr.W WorldTiles_Upload                    ;0C88EF|20F888  |0C88F8;
+	jsr.W WorldTiles_Upload                    ;0C88F2|20F888  |0C88F8;
+	jsr.W WorldTiles_Upload                    ;0C88F5|20F888  |0C88F8;
 ;      |        |      ;
-CODE_0C88F8:
+WorldTiles_Upload:
 	stx.B SNES_VMADDL-$2100              ;0C88F8|8616    |002116;
 	sta.B SNES_VMDATAL-$2100             ;0C88FA|8518    |002118;
 	inc a;0C88FC|1A      |      ;
@@ -1037,7 +1037,7 @@ CODE_0C88F8:
 	rts                                  ;0C890F|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
-CODE_0C8910:
+TransferOAMToVRAM:
 	phk                                  ;0C8910|4B      |      ;
 	plb                                  ;0C8911|AB      |      ;
 	sep #$20                             ;0C8912|E220    |      ;
@@ -1047,7 +1047,7 @@ CODE_0C8910:
 	stx.W $0058                          ;0C891C|8E5800  |0C0058;
 	lda.B #$40                           ;0C891F|A940    |      ;
 	tsb.W $00e2                          ;0C8921|0CE200  |0C00E2;
-	jsl.L CODE_0C8000                    ;0C8924|2200800C|0C8000;
+	jsl.L WaitForVBlank                    ;0C8924|2200800C|0C8000;
 	rts                                  ;0C8928|60      |      ;
 ;      |        |      ;
 	ldx.W #$0000                         ;0C8929|A20000  |      ;
@@ -1065,7 +1065,7 @@ CODE_0C8910:
 	rtl                                  ;0C8947|6B      |      ;
 ;      |        |      ;
 ;      |        |      ;
-CODE_0C8948:
+OAM_PrepareTransfer:
 	sep #$20                             ;0C8948|E220    |      ;
 	ldx.W #$0000                         ;0C894A|A20000  |      ;
 	stx.W SNES_OAMADDL                   ;0C894D|8E0221  |002102;
@@ -1084,7 +1084,7 @@ CODE_0C8948:
 	rts                                  ;0C896E|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
-CODE_0C896F:
+ClearVRAMRegion:
 	lda.B #$d4                           ;0C896F|A9D4    |      ;
 	sta.B SNES_BG1VOFS-$2100             ;0C8971|850E    |00210E;
 	lda.B #$ff                           ;0C8973|A9FF    |      ;
@@ -1092,79 +1092,79 @@ CODE_0C896F:
 	ldx.W #$8b86                         ;0C8977|A2868B  |      ;
 	ldy.W #$8b96                         ;0C897A|A0968B  |      ;
 ;      |        |      ;
-CODE_0C897D:
+VRAM_ClearLoop:
 	lda.W $0000,y                        ;0C897D|B90000  |0C0000;
-	beq CODE_0C899B                      ;0C8980|F019    |0C899B;
+	beq VRAM_BlockComplete                      ;0C8980|F019    |0C899B;
 	phy                                  ;0C8982|5A      |      ;
-	jsl.L CODE_0C8000                    ;0C8983|2200800C|0C8000;
-	jsr.W CODE_0C8A78                    ;0C8987|20788A  |0C8A78;
+	jsl.L WaitForVBlank                    ;0C8983|2200800C|0C8000;
+	jsr.W Graphics_ContinueDecompress                    ;0C8987|20788A  |0C8A78;
 	ply                                  ;0C898A|7A      |      ;
 	tya                                  ;0C898B|98      |      ;
 	sec                                  ;0C898C|38      |      ;
 	sbc.B #$ab                           ;0C898D|E9AB    |      ;
 	asl a;0C898F|0A      |      ;
 	sta.B SNES_BG1VOFS-$2100             ;0C8990|850E    |00210E;
-	beq CODE_0C8996                      ;0C8992|F002    |0C8996;
+	beq VRAM_PrepareNextBlock                      ;0C8992|F002    |0C8996;
 	lda.B #$ff                           ;0C8994|A9FF    |      ;
 ;      |        |      ;
-CODE_0C8996:
+VRAM_PrepareNextBlock:
 	sta.B SNES_BG1VOFS-$2100             ;0C8996|850E    |00210E;
 	iny                                  ;0C8998|C8      |      ;
-	bra CODE_0C897D                      ;0C8999|80E2    |0C897D;
+	bra VRAM_ClearLoop                      ;0C8999|80E2    |0C897D;
 ;      |        |      ;
 ;      |        |      ;
-CODE_0C899B:
+VRAM_BlockComplete:
 	lda.B #$1e                           ;0C899B|A91E    |      ;
 ;      |        |      ;
-CODE_0C899D:
-	jsl.L CODE_0C8000                    ;0C899D|2200800C|0C8000;
+VRAM_NextBlock:
+	jsl.L WaitForVBlank                    ;0C899D|2200800C|0C8000;
 	pha                                  ;0C89A1|48      |      ;
-	jsr.W CODE_0C8A76                    ;0C89A2|20768A  |0C8A76;
+	jsr.W Graphics_NextCommand                    ;0C89A2|20768A  |0C8A76;
 	pla                                  ;0C89A5|68      |      ;
 	dec a;0C89A6|3A      |      ;
-	bne CODE_0C899D                      ;0C89A7|D0F4    |0C899D;
+	bne VRAM_NextBlock                      ;0C89A7|D0F4    |0C899D;
 	ldy.W #$0101                         ;0C89A9|A00101  |      ;
 	sty.W $0062                          ;0C89AC|8C6200  |0C0062;
 ;      |        |      ;
-CODE_0C89AF:
+VRAM_AllBlocksComplete:
 	ldy.W $0062                          ;0C89AF|AC6200  |0C0062;
 	phy                                  ;0C89B2|5A      |      ;
-	jsr.W CODE_0C8A3F                    ;0C89B3|203F8A  |0C8A3F;
+	jsr.W Graphics_LiteralCommand                    ;0C89B3|203F8A  |0C8A3F;
 	ply                                  ;0C89B6|7A      |      ;
 	sty.W $0062                          ;0C89B7|8C6200  |0C0062;
 	inc.W $0062                          ;0C89BA|EE6200  |0C0062;
 	inc.W $0063                          ;0C89BD|EE6300  |0C0063;
 	ldy.W $0062                          ;0C89C0|AC6200  |0C0062;
 	phy                                  ;0C89C3|5A      |      ;
-	jsr.W CODE_0C8A3F                    ;0C89C4|203F8A  |0C8A3F;
+	jsr.W Graphics_LiteralCommand                    ;0C89C4|203F8A  |0C8A3F;
 	ply                                  ;0C89C7|7A      |      ;
 	sty.W $0062                          ;0C89C8|8C6200  |0C0062;
 	inc.W $0062                          ;0C89CB|EE6200  |0C0062;
 	inc.W $0063                          ;0C89CE|EE6300  |0C0063;
 	lda.W $0062                          ;0C89D1|AD6200  |0C0062;
 	cmp.B #$0c                           ;0C89D4|C90C    |      ;
-	beq CODE_0C89E8                      ;0C89D6|F010    |0C89E8;
+	beq LoadCompressedGraphics                      ;0C89D6|F010    |0C89E8;
 	ldy.W $0062                          ;0C89D8|AC6200  |0C0062;
 	phy                                  ;0C89DB|5A      |      ;
-	jsr.W CODE_0C8A3F                    ;0C89DC|203F8A  |0C8A3F;
+	jsr.W Graphics_LiteralCommand                    ;0C89DC|203F8A  |0C8A3F;
 	ply                                  ;0C89DF|7A      |      ;
 	sty.W $0062                          ;0C89E0|8C6200  |0C0062;
 	inc.W $0062                          ;0C89E3|EE6200  |0C0062;
-	bra CODE_0C89AF                      ;0C89E6|80C7    |0C89AF;
+	bra VRAM_AllBlocksComplete                      ;0C89E6|80C7    |0C89AF;
 ;      |        |      ;
 ;      |        |      ;
-CODE_0C89E8:
-	jsl.L CODE_0C8000                    ;0C89E8|2200800C|0C8000;
-	jsr.W CODE_0C8A76                    ;0C89EC|20768A  |0C8A76;
+LoadCompressedGraphics:
+	jsl.L WaitForVBlank                    ;0C89E8|2200800C|0C8000;
+	jsr.W Graphics_NextCommand                    ;0C89EC|20768A  |0C8A76;
 	cpx.W #$8b66                         ;0C89EF|E0668B  |      ;
-	bne CODE_0C89E8                      ;0C89F2|D0F4    |0C89E8;
+	bne LoadCompressedGraphics                      ;0C89F2|D0F4    |0C89E8;
 ;      |        |      ;
-CODE_0C89F4:
-	jsl.L CODE_0C8000                    ;0C89F4|2200800C|0C8000;
-	jsr.W CODE_0C8A76                    ;0C89F8|20768A  |0C8A76;
+Graphics_DecompressLoop:
+	jsl.L WaitForVBlank                    ;0C89F4|2200800C|0C8000;
+	jsr.W Graphics_NextCommand                    ;0C89F8|20768A  |0C8A76;
 	cpx.W #$8b66                         ;0C89FB|E0668B  |      ;
-	bne CODE_0C89F4                      ;0C89FE|D0F4    |0C89F4;
-	jsr.W CODE_0C8910                    ;0C8A00|201089  |0C8910;
+	bne Graphics_DecompressLoop                      ;0C89FE|D0F4    |0C89F4;
+	jsr.W TransferOAMToVRAM                    ;0C8A00|201089  |0C8910;
 	lda.B #$30                           ;0C8A03|A930    |      ;
 	sta.W $0505                          ;0C8A05|8D0505  |0C0505;
 	ldx.W #$2100                         ;0C8A08|A20021  |      ;
@@ -1175,21 +1175,21 @@ CODE_0C89F4:
 	ldy.W #$000c                         ;0C8A13|A00C00  |      ;
 	ldx.W #$0c04                         ;0C8A16|A2040C  |      ;
 ;      |        |      ;
-CODE_0C8A19:
+Graphics_ProcessCommand:
 	pha                                  ;0C8A19|48      |      ;
 	phy                                  ;0C8A1A|5A      |      ;
 	phx                                  ;0C8A1B|DA      |      ;
 ;      |        |      ;
-CODE_0C8A1C:
+Graphics_RLECommand:
 	dec.W $0000,x                        ;0C8A1C|DE0000  |0C0000;
 	inx                                  ;0C8A1F|E8      |      ;
 	inx                                  ;0C8A20|E8      |      ;
 	inx                                  ;0C8A21|E8      |      ;
 	inx                                  ;0C8A22|E8      |      ;
 	dey                                  ;0C8A23|88      |      ;
-	bne CODE_0C8A1C                      ;0C8A24|D0F6    |0C8A1C;
-	jsr.W CODE_0C8910                    ;0C8A26|201089  |0C8910;
-	jsl.L CODE_0C8000                    ;0C8A29|2200800C|0C8000;
+	bne Graphics_RLECommand                      ;0C8A24|D0F6    |0C8A1C;
+	jsr.W TransferOAMToVRAM                    ;0C8A26|201089  |0C8910;
+	jsl.L WaitForVBlank                    ;0C8A29|2200800C|0C8000;
 	plx                                  ;0C8A2D|FA      |      ;
 	ply                                  ;0C8A2E|7A      |      ;
 	lda.B $01,s                          ;0C8A2F|A301    |000001;
@@ -1200,12 +1200,12 @@ CODE_0C8A1C:
 	sta.B SNES_COLDATA-$2100             ;0C8A36|8532    |002132;
 	pla                                  ;0C8A38|68      |      ;
 	dec a;0C8A39|3A      |      ;
-	bne CODE_0C8A19                      ;0C8A3A|D0DD    |0C8A19;
+	bne Graphics_ProcessCommand                      ;0C8A3A|D0DD    |0C8A19;
 	stz.B SNES_CGADSUB-$2100             ;0C8A3C|6431    |002131;
 	rts                                  ;0C8A3E|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
-CODE_0C8A3F:
+Graphics_LiteralCommand:
 	rep #$30                             ;0C8A3F|C230    |      ;
 	sec                                  ;0C8A41|38      |      ;
 	lda.W $0062                          ;0C8A42|AD6200  |0C0062;
@@ -1225,28 +1225,28 @@ CODE_0C8A3F:
 	sty.W $0058                          ;0C8A6A|8C5800  |0C0058;
 	lda.B #$40                           ;0C8A6D|A940    |      ;
 	tsb.W $00e2                          ;0C8A6F|0CE200  |0C00E2;
-	jsl.L CODE_0C8000                    ;0C8A72|2200800C|0C8000;
+	jsl.L WaitForVBlank                    ;0C8A72|2200800C|0C8000;
 ;      |        |      ;
-CODE_0C8A76:
+Graphics_NextCommand:
 	lda.B #$30                           ;0C8A76|A930    |      ;
 ;      |        |      ;
-CODE_0C8A78:
+Graphics_ContinueDecompress:
 	sta.W $4202                          ;0C8A78|8D0242  |0C4202;
 	sta.W $0064                          ;0C8A7B|8D6400  |0C0064;
-	jsr.W CODE_0C8AC8                    ;0C8A7E|20C88A  |0C8AC8;
+	jsr.W VRAM_WriteData                    ;0C8A7E|20C88A  |0C8AC8;
 	sty.W $0062                          ;0C8A81|8C6200  |0C0062;
 	inx                                  ;0C8A84|E8      |      ;
 	inx                                  ;0C8A85|E8      |      ;
-	jsr.W CODE_0C8AC8                    ;0C8A86|20C88A  |0C8AC8;
+	jsr.W VRAM_WriteData                    ;0C8A86|20C88A  |0C8AC8;
 	sty.W $0064                          ;0C8A89|8C6400  |0C0064;
 	inx                                  ;0C8A8C|E8      |      ;
 	inx                                  ;0C8A8D|E8      |      ;
 	cpx.W #$8b96                         ;0C8A8E|E0968B  |      ;
-	bne CODE_0C8A96                      ;0C8A91|D003    |0C8A96;
+	bne CalculateVRAMAddress                      ;0C8A91|D003    |0C8A96;
 	ldx.W #$8b66                         ;0C8A93|A2668B  |      ;
 ;      |        |      ;
-CODE_0C8A96:
-	jsl.L CODE_0C8000                    ;0C8A96|2200800C|0C8000;
+CalculateVRAMAddress:
+	jsl.L WaitForVBlank                    ;0C8A96|2200800C|0C8000;
 	lda.W $0062                          ;0C8A9A|AD6200  |0C0062;
 	sta.B SNES_M7A-$2100                 ;0C8A9D|851B    |00211B;
 	lda.W $0063                          ;0C8A9F|AD6300  |0C0063;
@@ -1271,39 +1271,39 @@ CODE_0C8A96:
 	rts                                  ;0C8AC7|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
-CODE_0C8AC8:
+VRAM_WriteData:
 	lda.W $0001,x                        ;0C8AC8|BD0100  |0C0001;
-	bmi CODE_0C8AF1                      ;0C8ACB|3024    |0C8AF1;
-	bne CODE_0C8AE6                      ;0C8ACD|D017    |0C8AE6;
+	bmi VRAM_ProcessNegative                      ;0C8ACB|3024    |0C8AF1;
+	bne VRAM_PrepareNextWrite                      ;0C8ACD|D017    |0C8AE6;
 	lda.W $0000,x                        ;0C8ACF|BD0000  |0C0000;
 ;      |        |      ;
-CODE_0C8AD2:
+VRAM_SetupWrite:
 	jsl.L CODE_00971E                    ;0C8AD2|221E9700|00971E;
 	ldy.W $4216                          ;0C8AD6|AC1642  |0C4216;
 	sty.W $4204                          ;0C8AD9|8C0442  |0C4204;
 ;      |        |      ;
-CODE_0C8ADC:
+VRAM_IncrementPointer:
 	lda.B #$30                           ;0C8ADC|A930    |      ;
 	jsl.L CODE_009726                    ;0C8ADE|22269700|009726;
 	ldy.W $4214                          ;0C8AE2|AC1442  |0C4214;
 	rts                                  ;0C8AE5|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
-CODE_0C8AE6:
+VRAM_PrepareNextWrite:
 	stz.W $4204                          ;0C8AE6|9C0442  |0C4204;
 	lda.W $0064                          ;0C8AE9|AD6400  |0C0064;
 	sta.W $4205                          ;0C8AEC|8D0542  |0C4205;
-	bra CODE_0C8ADC                      ;0C8AEF|80EB    |0C8ADC;
+	bra VRAM_IncrementPointer                      ;0C8AEF|80EB    |0C8ADC;
 ;      |        |      ;
 ;      |        |      ;
-CODE_0C8AF1:
+VRAM_ProcessNegative:
 	lda.W $0000,x                        ;0C8AF1|BD0000  |0C0000;
-	beq CODE_0C8B07                      ;0C8AF4|F011    |0C8B07;
+	beq VRAM_CompleteWrite                      ;0C8AF4|F011    |0C8B07;
 	eor.B #$ff                           ;0C8AF6|49FF    |      ;
 	inc a;0C8AF8|1A      |      ;
-	jsr.W CODE_0C8AD2                    ;0C8AF9|20D28A  |0C8AD2;
+	jsr.W VRAM_SetupWrite                    ;0C8AF9|20D28A  |0C8AD2;
 ;      |        |      ;
-CODE_0C8AFC:
+VRAM_InvertValue:
 	rep #$30                             ;0C8AFC|C230    |      ;
 	tya                                  ;0C8AFE|98      |      ;
 	eor.W #$ffff                         ;0C8AFF|49FFFF  |      ;
@@ -1313,9 +1313,9 @@ CODE_0C8AFC:
 	rts                                  ;0C8B06|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
-CODE_0C8B07:
-	jsr.W CODE_0C8AE6                    ;0C8B07|20E68A  |0C8AE6;
-	bra CODE_0C8AFC                      ;0C8B0A|80F0    |0C8AFC;
+VRAM_CompleteWrite:
+	jsr.W VRAM_PrepareNextWrite                    ;0C8B07|20E68A  |0C8AE6;
+	bra VRAM_InvertValue                      ;0C8B0A|80F0    |0C8AFC;
 ;      |        |      ;
 	ldy.W #$1800                         ;0C8B0C|A00018  |      ;
 	sty.B SNES_DMA0PARAM-$4300           ;0C8B0F|8400    |004300;
@@ -1327,22 +1327,22 @@ CODE_0C8B07:
 	stx.W $0064                          ;0C8B1D|8E6400  |000064;
 	ldx.W #$0414                         ;0C8B20|A21404  |      ;
 	lda.W $0063                          ;0C8B23|AD6300  |000063;
-	jsr.W CODE_0C8B3C                    ;0C8B26|203C8B  |0C8B3C;
+	jsr.W UploadGraphicsBlock                    ;0C8B26|203C8B  |0C8B3C;
 	ldx.W #$000b                         ;0C8B29|A20B00  |      ;
 	stx.W $0064                          ;0C8B2C|8E6400  |000064;
 	ldy.W #$6000                         ;0C8B2F|A00060  |      ;
 	ldx.W $0400                          ;0C8B32|AE0004  |000400;
 	lda.W $0062                          ;0C8B35|AD6200  |000062;
-	jsr.W CODE_0C8B3C                    ;0C8B38|203C8B  |0C8B3C;
+	jsr.W UploadGraphicsBlock                    ;0C8B38|203C8B  |0C8B3C;
 	rtl                                  ;0C8B3B|6B      |      ;
 ;      |        |      ;
 ;      |        |      ;
-CODE_0C8B3C:
+UploadGraphicsBlock:
 	clc                                  ;0C8B3C|18      |      ;
 	xba                                  ;0C8B3D|EB      |      ;
 	lda.B #$05                           ;0C8B3E|A905    |      ;
 ;      |        |      ;
-CODE_0C8B40:
+Graphics_UploadLoop:
 	stx.W SNES_VMADDL                    ;0C8B40|8E1621  |002116;
 	xba                                  ;0C8B43|EB      |      ;
 	sta.B SNES_DMA0CNTL-$4300            ;0C8B44|8505    |004305;
@@ -1364,7 +1364,7 @@ CODE_0C8B40:
 	sep #$20                             ;0C8B5F|E220    |      ;
 	xba                                  ;0C8B61|EB      |      ;
 	dec a;0C8B62|3A      |      ;
-	bne CODE_0C8B40                      ;0C8B63|D0DB    |0C8B40;
+	bne Graphics_UploadLoop                      ;0C8B63|D0DB    |0C8B40;
 	rts                                  ;0C8B65|60      |      ;
 ;      |        |      ;
 	db $dd,$00,$80,$00,$80,$00,$dd,$00,$00,$00;0C8B66|        |      ;
@@ -1376,7 +1376,7 @@ CODE_0C8B40:
 	db $01,$00,$00,$01,$02,$03,$04,$05,$06,$07,$08,$0a,$0c,$0e,$10,$12;0C8B93|        |      ;
 	db $14,$16,$18,$1c,$20,$24,$28,$2c,$30,$00;0C8BA3|        |      ;
 ;      |        |      ;
-CODE_0C8BAD:
+InitializeWorldData:
 	lda.B #$18                           ;0C8BAD|A918    |      ;
 	sta.W $0500                          ;0C8BAF|8D0005  |0C0500;
 	rep #$30                             ;0C8BB2|C230    |      ;
@@ -1401,37 +1401,37 @@ CODE_0C8BAD:
 	lda.B #$40                           ;0C8BE7|A940    |      ;
 	clc                                  ;0C8BE9|18      |      ;
 ;      |        |      ;
-CODE_0C8BEA:
+WorldData_GenerateTiles:
 	ldx.W #$000b                         ;0C8BEA|A20B00  |      ;
 ;      |        |      ;
-CODE_0C8BED:
+GenerateTiles_InnerLoop:
 	sta.W $0000,y                        ;0C8BED|990000  |7F0000;
 	inc a;0C8BF0|1A      |      ;
 	iny                                  ;0C8BF1|C8      |      ;
 	dex                                  ;0C8BF2|CA      |      ;
-	bne CODE_0C8BED                      ;0C8BF3|D0F8    |0C8BED;
+	bne GenerateTiles_InnerLoop                      ;0C8BF3|D0F8    |0C8BED;
 	adc.B #$05                           ;0C8BF5|6905    |      ;
 	cmp.B #$90                           ;0C8BF7|C990    |      ;
-	bne CODE_0C8BEA                      ;0C8BF9|D0EF    |0C8BEA;
+	bne WorldData_GenerateTiles                      ;0C8BF9|D0EF    |0C8BEA;
 	ldy.W #$6037                         ;0C8BFB|A03760  |      ;
 	lda.B #$a0                           ;0C8BFE|A9A0    |      ;
 	clc                                  ;0C8C00|18      |      ;
 ;      |        |      ;
-CODE_0C8C01:
+WorldData_GeneratePalettes:
 	ldx.W #$0008                         ;0C8C01|A20800  |      ;
 ;      |        |      ;
-CODE_0C8C04:
+GeneratePalettes_Loop:
 	sta.W $0000,y                        ;0C8C04|990000  |7F0000;
 	inc a;0C8C07|1A      |      ;
 	iny                                  ;0C8C08|C8      |      ;
 	dex                                  ;0C8C09|CA      |      ;
-	bne CODE_0C8C04                      ;0C8C0A|D0F8    |0C8C04;
+	bne GeneratePalettes_Loop                      ;0C8C0A|D0F8    |0C8C04;
 	adc.B #$08                           ;0C8C0C|6908    |      ;
 	cmp.B #$f0                           ;0C8C0E|C9F0    |      ;
-	bne CODE_0C8C01                      ;0C8C10|D0EF    |0C8C01;
+	bne WorldData_GeneratePalettes                      ;0C8C10|D0EF    |0C8C01;
 	plb                                  ;0C8C12|AB      |      ;
 	clc                                  ;0C8C13|18      |      ;
-	jsl.L CODE_0C8000                    ;0C8C14|2200800C|0C8000;
+	jsl.L WaitForVBlank                    ;0C8C14|2200800C|0C8000;
 	stz.B SNES_VMAINC-$2100              ;0C8C18|6415    |002115;
 	lda.B #$8c                           ;0C8C1A|A98C    |      ;
 	sta.B SNES_M7X-$2100                 ;0C8C1C|851F    |00211F;
@@ -1448,7 +1448,7 @@ CODE_0C8C04:
 	ldy.W #$8d1e                         ;0C8C33|A01E8D  |      ;
 	phx                                  ;0C8C36|DA      |      ;
 ;      |        |      ;
-CODE_0C8C37:
+WorldData_UploadTilemap:
 	stx.B SNES_VMADDL-$2100              ;0C8C37|8616    |002116;
 	lda.B #$00                           ;0C8C39|A900    |      ;
 	xba                                  ;0C8C3B|EB      |      ;
@@ -1456,13 +1456,13 @@ CODE_0C8C37:
 	tax                                  ;0C8C3F|AA      |      ;
 	lda.W $0001,y                        ;0C8C40|B90100  |0C0001;
 ;      |        |      ;
-CODE_0C8C43:
+Tilemap_UploadTile:
 	sta.B SNES_VMDATAL-$2100             ;0C8C43|8518    |002118;
 	inc a;0C8C45|1A      |      ;
 	dex                                  ;0C8C46|CA      |      ;
-	bne CODE_0C8C43                      ;0C8C47|D0FA    |0C8C43;
+	bne Tilemap_UploadTile                      ;0C8C47|D0FA    |0C8C43;
 	lda.W $0002,y                        ;0C8C49|B90200  |0C0002;
-	beq CODE_0C8C5C                      ;0C8C4C|F00E    |0C8C5C;
+	beq Tilemap_Complete                      ;0C8C4C|F00E    |0C8C5C;
 	iny                                  ;0C8C4E|C8      |      ;
 	iny                                  ;0C8C4F|C8      |      ;
 	iny                                  ;0C8C50|C8      |      ;
@@ -1471,10 +1471,10 @@ CODE_0C8C43:
 	sta.B $01,s                          ;0C8C55|8301    |000001;
 	tax                                  ;0C8C57|AA      |      ;
 	sep #$20                             ;0C8C58|E220    |      ;
-	bra CODE_0C8C37                      ;0C8C5A|80DB    |0C8C37;
+	bra WorldData_UploadTilemap                      ;0C8C5A|80DB    |0C8C37;
 ;      |        |      ;
 ;      |        |      ;
-CODE_0C8C5C:
+Tilemap_Complete:
 	plx                                  ;0C8C5C|FA      |      ;
 	rts                                  ;0C8C5D|60      |      ;
 ;      |        |      ;
@@ -1497,7 +1497,7 @@ CODE_0C8C5C:
 	db $ff,$02,$01,$ff,$02,$01,$ff,$74,$03,$3c,$7f,$05,$4b,$80,$05,$5b;0C8D5E|        |      ;
 	db $80,$05,$6b,$80,$05,$7b,$81,$04,$8c,$04,$01,$e0,$00;0C8D6E|        |      ;
 ;      |        |      ;
-CODE_0C8D7B:
+ConfigureHDMAChannels:
 	php                                  ;0C8D7B|08      |      ;
 	phd                                  ;0C8D7C|0B      |      ;
 	rep #$30                             ;0C8D7D|C230    |      ;
@@ -1508,11 +1508,11 @@ CODE_0C8D7B:
 	lda.B #$80                           ;0C8D88|A980    |      ;
 	sta.W SNES_VMAINC                    ;0C8D8A|8D1521  |002115;
 	lda.B #$00                           ;0C8D8D|A900    |      ;
-	jsr.W CODE_0C8F98                    ;0C8D8F|20988F  |0C8F98;
+	jsr.W ProcessWorldMapInput                    ;0C8D8F|20988F  |0C8F98;
 	lda.B #$80                           ;0C8D92|A980    |      ;
-	jsr.W CODE_0C8F98                    ;0C8D94|20988F  |0C8F98;
+	jsr.W ProcessWorldMapInput                    ;0C8D94|20988F  |0C8F98;
 	lda.B #$c0                           ;0C8D97|A9C0    |      ;
-	jsr.W CODE_0C8F98                    ;0C8D99|20988F  |0C8F98;
+	jsr.W ProcessWorldMapInput                    ;0C8D99|20988F  |0C8F98;
 	rep #$30                             ;0C8D9C|C230    |      ;
 	lda.W #$5555                         ;0C8D9E|A95555  |      ;
 	sta.W $0c00                          ;0C8DA1|8D000C  |000C00;
@@ -1520,7 +1520,7 @@ CODE_0C8D7B:
 	ldy.W #$0c02                         ;0C8DA7|A0020C  |      ;
 	lda.W #$021d                         ;0C8DAA|A91D02  |      ;
 	mvn $00,$00                          ;0C8DAD|540000  |      ;
-	jsr.W CODE_0C8948                    ;0C8DB0|204889  |0C8948;
+	jsr.W OAM_PrepareTransfer                    ;0C8DB0|204889  |0C8948;
 	ldx.W #$1809                         ;0C8DB3|A20918  |      ;
 	stx.B SNES_DMA0PARAM-$4300           ;0C8DB6|8600    |004300;
 	ldx.W #$8f12                         ;0C8DB8|A2128F  |      ;
@@ -1531,8 +1531,8 @@ CODE_0C8D7B:
 	stx.B SNES_DMA0CNTL-$4300            ;0C8DC4|8605    |004305;
 	lda.B #$01                           ;0C8DC6|A901    |      ;
 	sta.W $420b                          ;0C8DC8|8D0B42  |0C420B;
-	jsr.W CODE_0C90F9                    ;0C8DCB|20F990  |0C90F9;
-	jsr.W CODE_0C9142                    ;0C8DCE|204291  |0C9142;
+	jsr.W UpdateMode7Matrix                    ;0C8DCB|20F990  |0C90F9;
+	jsr.W Mode7Matrix_Calculate                    ;0C8DCE|204291  |0C9142;
 	ldx.W #$1801                         ;0C8DD1|A20118  |      ;
 	stx.B SNES_DMA0PARAM-$4300           ;0C8DD4|8600    |004300;
 	ldx.W #$4000                         ;0C8DD6|A20040  |      ;
@@ -1550,7 +1550,7 @@ CODE_0C8D7B:
 	ldy.W #$5100                         ;0C8DF3|A00051  |      ;
 	ldx.W #$8f14                         ;0C8DF6|A2148F  |      ;
 ;      |        |      ;
-CODE_0C8DF9:
+HDMA_SetupRegisters:
 	rep #$30                             ;0C8DF9|C230    |      ;
 	sty.W $2116                          ;0C8DFB|8C1621  |0C2116;
 	lda.W $0000,x                        ;0C8DFE|BD0000  |0C0000;
@@ -1589,7 +1589,7 @@ CODE_0C8DF9:
 	inx                                  ;0C8E36|E8      |      ;
 	inx                                  ;0C8E37|E8      |      ;
 	plp                                  ;0C8E38|28      |      ;
-	bne CODE_0C8DF9                      ;0C8E39|D0BE    |0C8DF9;
+	bne HDMA_SetupRegisters                      ;0C8E39|D0BE    |0C8DF9;
 	rep #$30                             ;0C8E3B|C230    |      ;
 	lda.W #$0000                         ;0C8E3D|A90000  |      ;
 	tcd                                  ;0C8E40|5B      |      ;
@@ -1601,7 +1601,7 @@ CODE_0C8DF9:
 	lda.W #$0400                         ;0C8E50|A90004  |      ;
 	pha                                  ;0C8E53|48      |      ;
 ;      |        |      ;
-CODE_0C8E54:
+HDMA_ConfigureChannel0:
 	sta.L SNES_VMADDL                    ;0C8E54|8F162100|002116;
 	lda.L DATA8_0c8f14,x                 ;0C8E58|BF148F0C|0C8F14;
 	and.W #$00ff                         ;0C8E5C|29FF00  |      ;
@@ -1615,16 +1615,16 @@ CODE_0C8E54:
 	phx                                  ;0C8E6D|DA      |      ;
 	tax                                  ;0C8E6E|AA      |      ;
 ;      |        |      ;
-CODE_0C8E6F:
+HDMA_ConfigureChannel1:
 	phy                                  ;0C8E6F|5A      |      ;
-	jsr.W CODE_0C8FB4                    ;0C8E70|20B48F  |0C8FB4;
+	jsr.W WorldInput_CheckButtons                    ;0C8E70|20B48F  |0C8FB4;
 	ply                                  ;0C8E73|7A      |      ;
 	dey                                  ;0C8E74|88      |      ;
-	bne CODE_0C8E6F                      ;0C8E75|D0F8    |0C8E6F;
+	bne HDMA_ConfigureChannel1                      ;0C8E75|D0F8    |0C8E6F;
 	plx                                  ;0C8E77|FA      |      ;
 	lda.L DATA8_0c8f15,x                 ;0C8E78|BF158F0C|0C8F15;
 	and.W #$ff00                         ;0C8E7C|2900FF  |      ;
-	beq CODE_0C8E8C                      ;0C8E7F|F00B    |0C8E8C;
+	beq HDMA_ConfigureChannel2                      ;0C8E7F|F00B    |0C8E8C;
 	inx                                  ;0C8E81|E8      |      ;
 	inx                                  ;0C8E82|E8      |      ;
 	inx                                  ;0C8E83|E8      |      ;
@@ -1632,47 +1632,47 @@ CODE_0C8E6F:
 	lsr a;0C8E85|4A      |      ;
 	adc.B $01,s                          ;0C8E86|6301    |000001;
 	sta.B $01,s                          ;0C8E88|8301    |000001;
-	bra CODE_0C8E54                      ;0C8E8A|80C8    |0C8E54;
+	bra HDMA_ConfigureChannel0                      ;0C8E8A|80C8    |0C8E54;
 ;      |        |      ;
 ;      |        |      ;
-CODE_0C8E8C:
+HDMA_ConfigureChannel2:
 	pla                                  ;0C8E8C|68      |      ;
 	phk                                  ;0C8E8D|4B      |      ;
 	plb                                  ;0C8E8E|AB      |      ;
-	jsr.W CODE_0C8EA8                    ;0C8E8F|20A88E  |0C8EA8;
+	jsr.W HDMA_Complete                    ;0C8E8F|20A88E  |0C8EA8;
 	sep #$20                             ;0C8E92|E220    |      ;
 	ldx.W #$3fc0                         ;0C8E94|A2C03F  |      ;
 	stx.W $2116                          ;0C8E97|8E1621  |0C2116;
 	ldx.W #$0040                         ;0C8E9A|A24000  |      ;
 	lda.B #$10                           ;0C8E9D|A910    |      ;
 ;      |        |      ;
-CODE_0C8E9F:
+HDMA_ConfigureChannel3:
 	sta.W $2119                          ;0C8E9F|8D1921  |0C2119;
 	dex                                  ;0C8EA2|CA      |      ;
-	bne CODE_0C8E9F                      ;0C8EA3|D0FA    |0C8E9F;
+	bne HDMA_ConfigureChannel3                      ;0C8EA3|D0FA    |0C8E9F;
 	pld                                  ;0C8EA5|2B      |      ;
 	plp                                  ;0C8EA6|28      |      ;
 	rts                                  ;0C8EA7|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
-CODE_0C8EA8:
+HDMA_Complete:
 	ldy.W #$4800                         ;0C8EA8|A00048  |      ;
 	sty.W $2116                          ;0C8EAB|8C1621  |0C2116;
 	ldx.W #$8edb                         ;0C8EAE|A2DB8E  |      ;
 	ldy.W #$0008                         ;0C8EB1|A00800  |      ;
-	jsr.W CODE_0C8FE9                    ;0C8EB4|20E98F  |0C8FE9;
+	jsr.W WorldInput_CheckCollision                    ;0C8EB4|20E98F  |0C8FE9;
 	ldy.W #$4a00                         ;0C8EB7|A0004A  |      ;
 	sty.W $2116                          ;0C8EBA|8C1621  |0C2116;
 	ldy.W #$0010                         ;0C8EBD|A01000  |      ;
-	jsr.W CODE_0C8FE9                    ;0C8EC0|20E98F  |0C8FE9;
+	jsr.W WorldInput_CheckCollision                    ;0C8EC0|20E98F  |0C8FE9;
 	ldy.W #$4c00                         ;0C8EC3|A0004C  |      ;
 	sty.W $2116                          ;0C8EC6|8C1621  |0C2116;
 	ldy.W #$0010                         ;0C8EC9|A01000  |      ;
-	jsr.W CODE_0C8FE9                    ;0C8ECC|20E98F  |0C8FE9;
+	jsr.W WorldInput_CheckCollision                    ;0C8ECC|20E98F  |0C8FE9;
 	ldy.W #$4e10                         ;0C8ECF|A0104E  |      ;
 	sty.W $2116                          ;0C8ED2|8C1621  |0C2116;
 	ldy.W #$000f                         ;0C8ED5|A00F00  |      ;
-	jmp.W CODE_0C8FE9                    ;0C8ED8|4CE98F  |0C8FE9;
+	jmp.W WorldInput_CheckCollision                    ;0C8ED8|4CE98F  |0C8FE9;
 ;      |        |      ;
 	db $ad,$a6,$ac,$aa,$ae,$9a,$ab,$9e,$9c,$a8,$d2,$d0,$a5,$ad,$9d,$d2;0C8EDB|        |      ;
 	db $a5,$a2,$9c,$9e,$a7,$ac,$9e,$9d,$a9,$c5,$b8,$c6,$c6,$fe,$b4,$c1;0C8EEB|        |      ;
@@ -1694,7 +1694,7 @@ DATA8_0c8f15:
 	db $0c,$04,$53,$05,$03,$28,$0b,$04,$5c,$05,$03,$30,$0b,$01,$64,$04;0C8F85|        |      ;
 	db $02,$37,$00                       ;0C8F95|        |      ;
 ;      |        |      ;
-CODE_0C8F98:
+ProcessWorldMapInput:
 	sta.W SNES_CGADD                     ;0C8F98|8D2121  |002121;
 	ldx.W #$2200                         ;0C8F9B|A20022  |      ;
 	stx.B SNES_DMA0PARAM-$4300           ;0C8F9E|8600    |004300;
@@ -1709,11 +1709,11 @@ CODE_0C8F98:
 	rts                                  ;0C8FB3|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
-CODE_0C8FB4:
+WorldInput_CheckButtons:
 	sep #$20                             ;0C8FB4|E220    |      ;
 	lda.B #$08                           ;0C8FB6|A908    |      ;
 ;      |        |      ;
-CODE_0C8FB8:
+WorldInput_ProcessDPad:
 	pha                                  ;0C8FB8|48      |      ;
 	ldy.W $0010,x                        ;0C8FB9|BC1000  |7F0010;
 	sty.B $64                            ;0C8FBC|8464    |000064;
@@ -1721,7 +1721,7 @@ CODE_0C8FB8:
 	sty.B $62                            ;0C8FC1|8462    |000062;
 	ldy.W #$0008                         ;0C8FC3|A00800  |      ;
 ;      |        |      ;
-CODE_0C8FC6:
+WorldInput_UpdatePosition:
 	asl.B $65                            ;0C8FC6|0665    |000065;
 	rol a;0C8FC8|2A      |      ;
 	asl.B $64                            ;0C8FC9|0664    |000064;
@@ -1733,12 +1733,12 @@ CODE_0C8FC6:
 	and.B #$0f                           ;0C8FD2|290F    |      ;
 	sta.L SNES_VMDATAH                   ;0C8FD4|8F192100|002119;
 	dey                                  ;0C8FD8|88      |      ;
-	bne CODE_0C8FC6                      ;0C8FD9|D0EB    |0C8FC6;
+	bne WorldInput_UpdatePosition                      ;0C8FD9|D0EB    |0C8FC6;
 	inx                                  ;0C8FDB|E8      |      ;
 	inx                                  ;0C8FDC|E8      |      ;
 	pla                                  ;0C8FDD|68      |      ;
 	dec a;0C8FDE|3A      |      ;
-	bne CODE_0C8FB8                      ;0C8FDF|D0D7    |0C8FB8;
+	bne WorldInput_ProcessDPad                      ;0C8FDF|D0D7    |0C8FB8;
 	rep #$30                             ;0C8FE1|C230    |      ;
 	txa                                  ;0C8FE3|8A      |      ;
 	adc.W #$0010                         ;0C8FE4|691000  |      ;
@@ -1746,16 +1746,16 @@ CODE_0C8FC6:
 	rts                                  ;0C8FE8|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
-CODE_0C8FE9:
+WorldInput_CheckCollision:
 	lda.W $0000,x                        ;0C8FE9|BD0000  |0C0000;
-	jsr.W CODE_0C8FF4                    ;0C8FEC|20F48F  |0C8FF4;
+	jsr.W WorldInput_ApplyMovement                    ;0C8FEC|20F48F  |0C8FF4;
 	inx                                  ;0C8FEF|E8      |      ;
 	dey                                  ;0C8FF0|88      |      ;
-	bne CODE_0C8FE9                      ;0C8FF1|D0F6    |0C8FE9;
+	bne WorldInput_CheckCollision                      ;0C8FF1|D0F6    |0C8FE9;
 	rts                                  ;0C8FF3|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
-CODE_0C8FF4:
+WorldInput_ApplyMovement:
 	phy                                  ;0C8FF4|5A      |      ;
 	phx                                  ;0C8FF5|DA      |      ;
 	pha                                  ;0C8FF6|48      |      ;
@@ -1771,7 +1771,7 @@ CODE_0C8FF4:
 	ora.B $64                            ;0C9005|0564    |000064;
 	ldy.W #$0008                         ;0C9007|A00800  |      ;
 ;      |        |      ;
-CODE_0C900A:
+WorldInput_UpdateCamera:
 	tax                                  ;0C900A|AA      |      ;
 	lda.L DATA8_078031,x                 ;0C900B|BF318007|078031;
 	and.W #$00ff                         ;0C900F|29FF00  |      ;
@@ -1779,7 +1779,7 @@ CODE_0C900A:
 	txa                                  ;0C9015|8A      |      ;
 	adc.W #$0040                         ;0C9016|694000  |      ;
 	dey                                  ;0C9019|88      |      ;
-	bne CODE_0C900A                      ;0C901A|D0EE    |0C900A;
+	bne WorldInput_UpdateCamera                      ;0C901A|D0EE    |0C900A;
 	stz.W $2118                          ;0C901C|9C1821  |0C2118;
 	stz.W $2118                          ;0C901F|9C1821  |0C2118;
 	stz.W $2118                          ;0C9022|9C1821  |0C2118;
@@ -1793,7 +1793,7 @@ CODE_0C900A:
 	rts                                  ;0C9036|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
-CODE_0C9037:
+UpdateWorldMapCamera:
 	php                                  ;0C9037|08      |      ;
 	phd                                  ;0C9038|0B      |      ;
 	rep #$30                             ;0C9039|C230    |      ;
@@ -1808,12 +1808,12 @@ CODE_0C9037:
 	pea.W $007f                          ;0C904F|F47F00  |0C007F;
 	plb                                  ;0C9052|AB      |      ;
 ;      |        |      ;
-CODE_0C9053:
+Camera_CalculateOffset:
 	pha                                  ;0C9053|48      |      ;
-	jsr.W CODE_0C9099                    ;0C9054|209990  |0C9099;
+	jsr.W Camera_UpdateScrolling                    ;0C9054|209990  |0C9099;
 	pla                                  ;0C9057|68      |      ;
 	dec a;0C9058|3A      |      ;
-	bne CODE_0C9053                      ;0C9059|D0F8    |0C9053;
+	bne Camera_CalculateOffset                      ;0C9059|D0F8    |0C9053;
 	plb                                  ;0C905B|AB      |      ;
 	sep #$20                             ;0C905C|E220    |      ;
 	lda.B #$0c                           ;0C905E|A90C    |      ;
@@ -1822,7 +1822,7 @@ CODE_0C9053:
 	stx.W $0058                          ;0C9066|8E5800  |000058;
 	lda.B #$40                           ;0C9069|A940    |      ;
 	tsb.W $00e2                          ;0C906B|0CE200  |0000E2;
-	jsl.L CODE_0C8000                    ;0C906E|2200800C|0C8000;
+	jsl.L WaitForVBlank                    ;0C906E|2200800C|0C8000;
 	pld                                  ;0C9072|2B      |      ;
 	plp                                  ;0C9073|28      |      ;
 	rts                                  ;0C9074|60      |      ;
@@ -1844,11 +1844,11 @@ CODE_0C9053:
 	rtl                                  ;0C9098|6B      |      ;
 ;      |        |      ;
 ;      |        |      ;
-CODE_0C9099:
+Camera_UpdateScrolling:
 	sep #$20                             ;0C9099|E220    |      ;
 	lda.B #$08                           ;0C909B|A908    |      ;
 ;      |        |      ;
-CODE_0C909D:
+Camera_AdjustHorizontal:
 	pha                                  ;0C909D|48      |      ;
 	ldy.W $0010,x                        ;0C909E|BC1000  |7F0010;
 	sty.B $64                            ;0C90A1|8464    |000064;
@@ -1856,7 +1856,7 @@ CODE_0C909D:
 	sty.B $62                            ;0C90A6|8462    |000062;
 	ldy.W #$0008                         ;0C90A8|A00800  |      ;
 ;      |        |      ;
-CODE_0C90AB:
+Camera_AdjustVertical:
 	asl.B $65                            ;0C90AB|0665    |000065;
 	rol a;0C90AD|2A      |      ;
 	asl.B $64                            ;0C90AE|0664    |000064;
@@ -1866,21 +1866,21 @@ CODE_0C90AB:
 	asl.B $62                            ;0C90B4|0662    |000062;
 	rol a;0C90B6|2A      |      ;
 	and.B #$0f                           ;0C90B7|290F    |      ;
-	beq CODE_0C90BD                      ;0C90B9|F002    |0C90BD;
+	beq Camera_ApplyLimits                      ;0C90B9|F002    |0C90BD;
 	ora.B #$10                           ;0C90BB|0910    |      ;
 ;      |        |      ;
-CODE_0C90BD:
+Camera_ApplyLimits:
 	sta.B [$5f]                          ;0C90BD|875F    |00005F;
 	rep #$30                             ;0C90BF|C230    |      ;
 	inc.B $5f                            ;0C90C1|E65F    |00005F;
 	sep #$20                             ;0C90C3|E220    |      ;
 	dey                                  ;0C90C5|88      |      ;
-	bne CODE_0C90AB                      ;0C90C6|D0E3    |0C90AB;
+	bne Camera_AdjustVertical                      ;0C90C6|D0E3    |0C90AB;
 	inx                                  ;0C90C8|E8      |      ;
 	inx                                  ;0C90C9|E8      |      ;
 	pla                                  ;0C90CA|68      |      ;
 	dec a;0C90CB|3A      |      ;
-	bne CODE_0C909D                      ;0C90CC|D0CF    |0C909D;
+	bne Camera_AdjustHorizontal                      ;0C90CC|D0CF    |0C909D;
 	rep #$30                             ;0C90CE|C230    |      ;
 	clc                                  ;0C90D0|18      |      ;
 	txa                                  ;0C90D1|8A      |      ;
@@ -1904,7 +1904,7 @@ CODE_0C90BD:
 	rtl                                  ;0C90F8|6B      |      ;
 ;      |        |      ;
 ;      |        |      ;
-CODE_0C90F9:
+UpdateMode7Matrix:
 	stz.W $2115                          ;0C90F9|9C1521  |0C2115;
 	ldx.W #$6000                         ;0C90FC|A20060  |      ;
 	stx.W $2116                          ;0C90FF|8E1621  |0C2116;
@@ -1934,15 +1934,15 @@ CODE_0C90F9:
 ;      |        |      ;
 	db $ff,$01                           ;0C9140|        |      ;
 ;      |        |      ;
-CODE_0C9142:
+Mode7Matrix_Calculate:
 	php                                  ;0C9142|08      |      ;
 	phd                                  ;0C9143|0B      |      ;
 	rep #$30                             ;0C9144|C230    |      ;
 	lda.W #$0000                         ;0C9146|A90000  |      ;
 	tcd                                  ;0C9149|5B      |      ;
-	jsr.W CODE_0C9318                    ;0C914A|201893  |0C9318;
-	jsr.W CODE_0C92EB                    ;0C914D|20EB92  |0C92EB;
-	jsr.W CODE_0C9161                    ;0C9150|206191  |0C9161;
+	jsr.W LoadWorldMapTilesets                    ;0C914A|201893  |0C9318;
+	jsr.W ClearTileBuffer                    ;0C914D|20EB92  |0C92EB;
+	jsr.W Mode7Matrix_ApplyRotation                    ;0C9150|206191  |0C9161;
 	lda.W #$0010                         ;0C9153|A91000  |      ;
 	sta.L $7f2f9c                        ;0C9156|8F9C2F7F|7F2F9C;
 	sta.L $7f2dd2                        ;0C915A|8FD22D7F|7F2DD2;
@@ -1951,74 +1951,74 @@ CODE_0C9142:
 	rts                                  ;0C9160|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
-CODE_0C9161:
+Mode7Matrix_ApplyRotation:
 	ldx.W #$0000                         ;0C9161|A20000  |      ;
 	ldy.W #$2000                         ;0C9164|A00020  |      ;
 	lda.W #$2000                         ;0C9167|A90020  |      ;
 	jsl.L CODE_009994                    ;0C916A|22949900|009994;
-	jsr.W CODE_0C91AF                    ;0C916E|20AF91  |0C91AF;
-	jsr.W CODE_0C9197                    ;0C9171|209791  |0C9197;
-	jsr.W CODE_0C9247                    ;0C9174|204792  |0C9247;
-	jsr.W CODE_0C91B7                    ;0C9177|20B791  |0C91B7;
-	jsr.W CODE_0C919F                    ;0C917A|209F91  |0C919F;
-	jsr.W CODE_0C929E                    ;0C917D|209E92  |0C929E;
-	jsr.W CODE_0C91BF                    ;0C9180|20BF91  |0C91BF;
-	jsr.W CODE_0C9247                    ;0C9183|204792  |0C9247;
-	jsr.W CODE_0C91C7                    ;0C9186|20C791  |0C91C7;
-	jsr.W CODE_0C91A7                    ;0C9189|20A791  |0C91A7;
-	jsr.W CODE_0C9247                    ;0C918C|204792  |0C9247;
+	jsr.W Mode7Matrix_SetRegister3                    ;0C916E|20AF91  |0C91AF;
+	jsr.W Mode7Matrix_SetRegister0                    ;0C9171|209791  |0C9197;
+	jsr.W RotateTileData                    ;0C9174|204792  |0C9247;
+	jsr.W Mode7Matrix_SetRegister4                    ;0C9177|20B791  |0C91B7;
+	jsr.W Mode7Matrix_SetRegister1                    ;0C917A|209F91  |0C919F;
+	jsr.W MirrorTileData                    ;0C917D|209E92  |0C929E;
+	jsr.W Mode7Matrix_SetRegister5                    ;0C9180|20BF91  |0C91BF;
+	jsr.W RotateTileData                    ;0C9183|204792  |0C9247;
+	jsr.W Mode7Matrix_SetRegister6                    ;0C9186|20C791  |0C91C7;
+	jsr.W Mode7Matrix_SetRegister2                    ;0C9189|20A791  |0C91A7;
+	jsr.W RotateTileData                    ;0C918C|204792  |0C9247;
 	ldy.W #$24c0                         ;0C918F|A0C024  |      ;
 	ldx.W #$9400                         ;0C9192|A20094  |      ;
-	bra CODE_0C91CD                      ;0C9195|8036    |0C91CD;
+	bra ProcessTileScriptCommand                      ;0C9195|8036    |0C91CD;
 ;      |        |      ;
 ;      |        |      ;
-CODE_0C9197:
+Mode7Matrix_SetRegister0:
 	ldy.W #$2080                         ;0C9197|A08020  |      ;
 	ldx.W #$93ca                         ;0C919A|A2CA93  |      ;
-	bra CODE_0C91CD                      ;0C919D|802E    |0C91CD;
+	bra ProcessTileScriptCommand                      ;0C919D|802E    |0C91CD;
 ;      |        |      ;
 ;      |        |      ;
-CODE_0C919F:
+Mode7Matrix_SetRegister1:
 	ldy.W #$2480                         ;0C919F|A08024  |      ;
 	ldx.W #$93eb                         ;0C91A2|A2EB93  |      ;
-	bra CODE_0C91CD                      ;0C91A5|8026    |0C91CD;
+	bra ProcessTileScriptCommand                      ;0C91A5|8026    |0C91CD;
 ;      |        |      ;
 ;      |        |      ;
-CODE_0C91A7:
+Mode7Matrix_SetRegister2:
 	ldy.W #$20c0                         ;0C91A7|A0C020  |      ;
 	ldx.W #$9410                         ;0C91AA|A21094  |      ;
-	bra CODE_0C91CD                      ;0C91AD|801E    |0C91CD;
+	bra ProcessTileScriptCommand                      ;0C91AD|801E    |0C91CD;
 ;      |        |      ;
 ;      |        |      ;
-CODE_0C91AF:
+Mode7Matrix_SetRegister3:
 	ldy.W #$2000                         ;0C91AF|A00020  |      ;
 	ldx.W #$9346                         ;0C91B2|A24693  |      ;
-	bra CODE_0C91CD                      ;0C91B5|8016    |0C91CD;
+	bra ProcessTileScriptCommand                      ;0C91B5|8016    |0C91CD;
 ;      |        |      ;
 ;      |        |      ;
-CODE_0C91B7:
+Mode7Matrix_SetRegister4:
 	ldy.W #$2b80                         ;0C91B7|A0802B  |      ;
 	ldx.W #$9392                         ;0C91BA|A29293  |      ;
-	bra CODE_0C91CD                      ;0C91BD|800E    |0C91CD;
+	bra ProcessTileScriptCommand                      ;0C91BD|800E    |0C91CD;
 ;      |        |      ;
 ;      |        |      ;
-CODE_0C91BF:
+Mode7Matrix_SetRegister5:
 	ldy.W #$2ba0                         ;0C91BF|A0A02B  |      ;
 	ldx.W #$9392                         ;0C91C2|A29293  |      ;
-	bra CODE_0C91CD                      ;0C91C5|8006    |0C91CD;
+	bra ProcessTileScriptCommand                      ;0C91C5|8006    |0C91CD;
 ;      |        |      ;
 ;      |        |      ;
-CODE_0C91C7:
+Mode7Matrix_SetRegister6:
 	ldy.W #$2040                         ;0C91C7|A04020  |      ;
 	ldx.W #$9396                         ;0C91CA|A29693  |      ;
 ;      |        |      ;
-CODE_0C91CD:
+ProcessTileScriptCommand:
 	phk                                  ;0C91CD|4B      |      ;
 	plb                                  ;0C91CE|AB      |      ;
 	lda.W $0000,x                        ;0C91CF|BD0000  |0C0000;
 	and.W #$00ff                         ;0C91D2|29FF00  |      ;
 	cmp.W #$0080                         ;0C91D5|C98000  |      ;
-	bcs CODE_0C91E8                      ;0C91D8|B00E    |0C91E8;
+	bcs TileScript_JumpToOffset                      ;0C91D8|B00E    |0C91E8;
 	asl a;0C91DA|0A      |      ;
 	asl a;0C91DB|0A      |      ;
 	asl a;0C91DC|0A      |      ;
@@ -2026,15 +2026,15 @@ CODE_0C91CD:
 	asl a;0C91DE|0A      |      ;
 	phx                                  ;0C91DF|DA      |      ;
 	tax                                  ;0C91E0|AA      |      ;
-	jsr.W CODE_0C91FF                    ;0C91E1|20FF91  |0C91FF;
+	jsr.W DrawTileToMap                    ;0C91E1|20FF91  |0C91FF;
 	plx                                  ;0C91E4|FA      |      ;
 	inx                                  ;0C91E5|E8      |      ;
-	bra CODE_0C91CD                      ;0C91E6|80E5    |0C91CD;
+	bra ProcessTileScriptCommand                      ;0C91E6|80E5    |0C91CD;
 ;      |        |      ;
 ;      |        |      ;
-CODE_0C91E8:
+TileScript_JumpToOffset:
 	cmp.W #$00ff                         ;0C91E8|C9FF00  |      ;
-	beq CODE_0C91FE                      ;0C91EB|F011    |0C91FE;
+	beq TileScript_Return                      ;0C91EB|F011    |0C91FE;
 	and.W #$007f                         ;0C91ED|297F00  |      ;
 	asl a;0C91F0|0A      |      ;
 	asl a;0C91F1|0A      |      ;
@@ -2046,14 +2046,14 @@ CODE_0C91E8:
 	adc.B $64                            ;0C91F8|6564    |000064;
 	tay                                  ;0C91FA|A8      |      ;
 	inx                                  ;0C91FB|E8      |      ;
-	bra CODE_0C91CD                      ;0C91FC|80CF    |0C91CD;
+	bra ProcessTileScriptCommand                      ;0C91FC|80CF    |0C91CD;
 ;      |        |      ;
 ;      |        |      ;
-CODE_0C91FE:
+TileScript_Return:
 	rts                                  ;0C91FE|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
-CODE_0C91FF:
+DrawTileToMap:
 	sep #$20                             ;0C91FF|E220    |      ;
 	lda.B #$08                           ;0C9201|A908    |      ;
 	sta.B $62                            ;0C9203|8562    |000062;
@@ -2061,7 +2061,7 @@ CODE_0C91FF:
 	plb                                  ;0C9208|AB      |      ;
 	plb                                  ;0C9209|AB      |      ;
 ;      |        |      ;
-CODE_0C920A:
+DrawTile_ProcessPixels:
 	lda.W $0000,x                        ;0C920A|BD0000  |7F0000;
 	ora.W $0001,x                        ;0C920D|1D0100  |7F0001;
 	ora.W $0010,x                        ;0C9210|1D1000  |7F0010;
@@ -2083,7 +2083,7 @@ CODE_0C920A:
 	iny                                  ;0C9238|C8      |      ;
 	iny                                  ;0C9239|C8      |      ;
 	dec.B $62                            ;0C923A|C662    |000062;
-	bne CODE_0C920A                      ;0C923C|D0CC    |0C920A;
+	bne DrawTile_ProcessPixels                      ;0C923C|D0CC    |0C920A;
 	rep #$30                             ;0C923E|C230    |      ;
 	clc                                  ;0C9240|18      |      ;
 	tya                                  ;0C9241|98      |      ;
@@ -2092,7 +2092,7 @@ CODE_0C920A:
 	rts                                  ;0C9246|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
-CODE_0C9247:
+RotateTileData:
 	pea.W $7f00                          ;0C9247|F4007F  |0C7F00;
 	plb                                  ;0C924A|AB      |      ;
 	plb                                  ;0C924B|AB      |      ;
@@ -2101,15 +2101,15 @@ CODE_0C9247:
 	sta.B $62                            ;0C9250|8562    |000062;
 	ldx.W #$0000                         ;0C9252|A20000  |      ;
 ;      |        |      ;
-CODE_0C9255:
-	jsr.W CODE_0C9260                    ;0C9255|206092  |0C9260;
-	jsr.W CODE_0C9260                    ;0C9258|206092  |0C9260;
+RotateTile_Loop:
+	jsr.W RotateTile_SwapBytes                    ;0C9255|206092  |0C9260;
+	jsr.W RotateTile_SwapBytes                    ;0C9258|206092  |0C9260;
 	dec.B $62                            ;0C925B|C662    |000062;
-	bne CODE_0C9255                      ;0C925D|D0F6    |0C9255;
+	bne RotateTile_Loop                      ;0C925D|D0F6    |0C9255;
 	rts                                  ;0C925F|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
-CODE_0C9260:
+RotateTile_SwapBytes:
 	lda.W $0000,x                        ;0C9260|BD0000  |7F0000;
 	tay                                  ;0C9263|A8      |      ;
 	lda.W $000e,x                        ;0C9264|BD0E00  |7F000E;
@@ -2140,35 +2140,35 @@ CODE_0C9260:
 	rts                                  ;0C929D|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
-CODE_0C929E:
+MirrorTileData:
 	pea.W $7f00                          ;0C929E|F4007F  |0C7F00;
 	plb                                  ;0C92A1|AB      |      ;
 	plb                                  ;0C92A2|AB      |      ;
 	ldy.W #$001e                         ;0C92A3|A01E00  |      ;
 	ldx.W #$0000                         ;0C92A6|A20000  |      ;
 ;      |        |      ;
-CODE_0C92A9:
+MirrorTile_OuterLoop:
 	phy                                  ;0C92A9|5A      |      ;
 	ldy.W #$0010                         ;0C92AA|A01000  |      ;
 ;      |        |      ;
-CODE_0C92AD:
-	jsr.W CODE_0C92C2                    ;0C92AD|20C292  |0C92C2;
+MirrorTile_InnerLoop:
+	jsr.W MirrorTile_ProcessBit                    ;0C92AD|20C292  |0C92C2;
 	dey                                  ;0C92B0|88      |      ;
-	bne CODE_0C92AD                      ;0C92B1|D0FA    |0C92AD;
+	bne MirrorTile_InnerLoop                      ;0C92B1|D0FA    |0C92AD;
 	ldy.W #$0008                         ;0C92B3|A00800  |      ;
 ;      |        |      ;
-CODE_0C92B6:
-	jsr.W CODE_0C92C2                    ;0C92B6|20C292  |0C92C2;
+MirrorTile_FinalLoop:
+	jsr.W MirrorTile_ProcessBit                    ;0C92B6|20C292  |0C92C2;
 	inx                                  ;0C92B9|E8      |      ;
 	dey                                  ;0C92BA|88      |      ;
-	bne CODE_0C92B6                      ;0C92BB|D0F9    |0C92B6;
+	bne MirrorTile_FinalLoop                      ;0C92BB|D0F9    |0C92B6;
 	ply                                  ;0C92BD|7A      |      ;
 	dey                                  ;0C92BE|88      |      ;
-	bne CODE_0C92A9                      ;0C92BF|D0E8    |0C92A9;
+	bne MirrorTile_OuterLoop                      ;0C92BF|D0E8    |0C92A9;
 	rts                                  ;0C92C1|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
-CODE_0C92C2:
+MirrorTile_ProcessBit:
 	sep #$20                             ;0C92C2|E220    |      ;
 	lda.W $0000,x                        ;0C92C4|BD0000  |7F0000;
 	lsr a;0C92C7|4A      |      ;
@@ -2192,13 +2192,13 @@ CODE_0C92C2:
 	rts                                  ;0C92EA|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
-CODE_0C92EB:
+ClearTileBuffer:
 	clc                                  ;0C92EB|18      |      ;
 	lda.W #$001e                         ;0C92EC|A91E00  |      ;
 	sta.B $62                            ;0C92EF|8562    |000062;
 	lda.W #$0000                         ;0C92F1|A90000  |      ;
 ;      |        |      ;
-CODE_0C92F4:
+TileBuffer_ClearLoop:
 	adc.W #$0018                         ;0C92F4|691800  |      ;
 	tax                                  ;0C92F7|AA      |      ;
 	adc.W #$0008                         ;0C92F8|690800  |      ;
@@ -2207,7 +2207,7 @@ CODE_0C92F4:
 	lda.W #$0008                         ;0C92FD|A90800  |      ;
 	sta.B $64                            ;0C9300|8564    |000064;
 ;      |        |      ;
-CODE_0C9302:
+TileBuffer_NextRow:
 	dex                                  ;0C9302|CA      |      ;
 	dey                                  ;0C9303|88      |      ;
 	dey                                  ;0C9304|88      |      ;
@@ -2215,36 +2215,36 @@ CODE_0C9302:
 	and.W #$00ff                         ;0C9308|29FF00  |      ;
 	sta.W $0000,y                        ;0C930B|990000  |7F0000;
 	dec.B $64                            ;0C930E|C664    |000064;
-	bne CODE_0C9302                      ;0C9310|D0F0    |0C9302;
+	bne TileBuffer_NextRow                      ;0C9310|D0F0    |0C9302;
 	pla                                  ;0C9312|68      |      ;
 	dec.B $62                            ;0C9313|C662    |000062;
-	bne CODE_0C92F4                      ;0C9315|D0DD    |0C92F4;
+	bne TileBuffer_ClearLoop                      ;0C9315|D0DD    |0C92F4;
 	rts                                  ;0C9317|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
-CODE_0C9318:
+LoadWorldMapTilesets:
 	clc                                  ;0C9318|18      |      ;
 	ldx.W #$e220                         ;0C9319|A220E2  |      ;
 	ldy.W #$0000                         ;0C931C|A00000  |      ;
 	lda.W #$0004                         ;0C931F|A90400  |      ;
-	jsr.W CODE_0C9334                    ;0C9322|203493  |0C9334;
+	jsr.W Tilesets_CalculatePointer                    ;0C9322|203493  |0C9334;
 	ldx.W #$e490                         ;0C9325|A290E4  |      ;
 	lda.W #$0006                         ;0C9328|A90600  |      ;
-	jsr.W CODE_0C9334                    ;0C932B|203493  |0C9334;
+	jsr.W Tilesets_CalculatePointer                    ;0C932B|203493  |0C9334;
 	ldx.W #$fcc0                         ;0C932E|A2C0FC  |      ;
 	lda.W #$0014                         ;0C9331|A91400  |      ;
 ;      |        |      ;
-CODE_0C9334:
+Tilesets_CalculatePointer:
 	sta.B $62                            ;0C9334|8562    |000062;
 ;      |        |      ;
-CODE_0C9336:
+Tilesets_Return:
 	lda.W #$0017                         ;0C9336|A91700  |      ;
 	mvn $7f,$04                          ;0C9339|547F04  |      ;
 	tya                                  ;0C933C|98      |      ;
 	adc.W #$0008                         ;0C933D|690800  |      ;
 	tay                                  ;0C9340|A8      |      ;
 	dec.B $62                            ;0C9341|C662    |000062;
-	bne CODE_0C9336                      ;0C9343|D0F1    |0C9336;
+	bne Tilesets_Return                      ;0C9343|D0F1    |0C9336;
 	rts                                  ;0C9345|60      |      ;
 ;      |        |      ;
 	db $00,$01,$82,$00,$01,$82,$00,$01,$82,$00,$01,$82,$02,$03,$82,$02;0C9346|        |      ;
