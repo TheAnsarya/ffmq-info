@@ -4240,29 +4240,29 @@ Dialog_WaitForAltInput_Loop:
 	beq Dialog_WaitForAltInput_Loop                      ;00A3D2|F0F8    |00A3CC;
 	rts                                  ;00A3D4|60      |      ;
 ;      |        |      ;
-	jsr.W CODE_00B1C3                    ;00A3D5|20C3B1  |00B1C3;
+	jsr.W Conditional_CompareByte                    ;00A3D5|20C3B1  |00B1C3;
 	bcc Dialog_Conditional_SkipOffset                      ;00A3D8|9027    |00A401;
 	beq Dialog_Conditional_SkipOffset                      ;00A3DA|F025    |00A401;
 	bra Dialog_Conditional_Jump                      ;00A3DC|8028    |00A406;
 ;      |        |      ;
-	jsr.W CODE_00B1C3                    ;00A3DE|20C3B1  |00B1C3;
+	jsr.W Conditional_CompareByte                    ;00A3DE|20C3B1  |00B1C3;
 	bcc Dialog_Conditional_SkipOffset                      ;00A3E1|901E    |00A401;
 	bra Dialog_Conditional_Jump                      ;00A3E3|8021    |00A406;
 ;      |        |      ;
-	jsr.W CODE_00B1C3                    ;00A3E5|20C3B1  |00B1C3;
+	jsr.W Conditional_CompareByte                    ;00A3E5|20C3B1  |00B1C3;
 	bcs Dialog_Conditional_SkipOffset                      ;00A3E8|B017    |00A401;
 	bra Dialog_Conditional_Jump                      ;00A3EA|801A    |00A406;
 ;      |        |      ;
-	jsr.W CODE_00B1C3                    ;00A3EC|20C3B1  |00B1C3;
+	jsr.W Conditional_CompareByte                    ;00A3EC|20C3B1  |00B1C3;
 	bcc Dialog_Conditional_Jump                      ;00A3EF|9015    |00A406;
 	beq Dialog_Conditional_Jump                      ;00A3F1|F013    |00A406;
 	bra Dialog_Conditional_SkipOffset                      ;00A3F3|800C    |00A401;
 ;      |        |      ;
-	jsr.W CODE_00B1C3                    ;00A3F5|20C3B1  |00B1C3;
+	jsr.W Conditional_CompareByte                    ;00A3F5|20C3B1  |00B1C3;
 	bne Dialog_Conditional_SkipOffset                      ;00A3F8|D007    |00A401;
 	bra Dialog_Conditional_Jump                      ;00A3FA|800A    |00A406;
 ;      |        |      ;
-	jsr.W CODE_00B1C3                    ;00A3FC|20C3B1  |00B1C3;
+	jsr.W Conditional_CompareByte                    ;00A3FC|20C3B1  |00B1C3;
 	bne Dialog_Conditional_Jump                      ;00A3FF|D005    |00A406;
 ;      |        |      ;
 Dialog_Conditional_SkipOffset:
@@ -4276,24 +4276,24 @@ Dialog_Conditional_Jump:
 	sta.B $17                            ;00A408|8517    |000017;
 	rts                                  ;00A40A|60      |      ;
 ;      |        |      ;
-	jsr.W CODE_00B1D6                    ;00A40B|20D6B1  |00B1D6;
+	jsr.W Conditional_CompareWord                    ;00A40B|20D6B1  |00B1D6;
 	bcc Dialog_ConditionalParty_SkipOffset                      ;00A40E|9027    |00A437;
 	beq Dialog_ConditionalParty_SkipOffset                      ;00A410|F025    |00A437;
 	bra Dialog_ConditionalParty_Jump                      ;00A412|8028    |00A43C;
 ;      |        |      ;
-	jsr.W CODE_00B1D6                    ;00A414|20D6B1  |00B1D6;
+	jsr.W Conditional_CompareWord                    ;00A414|20D6B1  |00B1D6;
 	bcc Dialog_ConditionalParty_SkipOffset                      ;00A417|901E    |00A437;
 	db $80,$21                           ;00A419|        |00A43C;
-	jsr.W CODE_00B1D6                    ;00A41B|20D6B1  |00B1D6;
+	jsr.W Conditional_CompareWord                    ;00A41B|20D6B1  |00B1D6;
 	bcs Dialog_ConditionalParty_SkipOffset                      ;00A41E|B017    |00A437;
 	bra Dialog_ConditionalParty_Jump                      ;00A420|801A    |00A43C;
 ;      |        |      ;
 	db $20,$d6,$b1,$90,$15,$f0,$13,$80,$0c;00A422|        |00B1D6;
-	jsr.W CODE_00B1D6                    ;00A42B|20D6B1  |00B1D6;
+	jsr.W Conditional_CompareWord                    ;00A42B|20D6B1  |00B1D6;
 	bne Dialog_ConditionalParty_SkipOffset                      ;00A42E|D007    |00A437;
 	bra Dialog_ConditionalParty_Jump                      ;00A430|800A    |00A43C;
 ;      |        |      ;
-	jsr.W CODE_00B1D6                    ;00A432|20D6B1  |00B1D6;
+	jsr.W Conditional_CompareWord                    ;00A432|20D6B1  |00B1D6;
 	bne Dialog_ConditionalParty_Jump                      ;00A435|D005    |00A43C;
 ;      |        |      ;
 Dialog_ConditionalParty_SkipOffset:
@@ -4455,17 +4455,17 @@ Dialog_ConditionalFlag_True:
 	beq Dialog_JumpToPointer                      ;00A57D|F09A    |00A519;
 	bra Dialog_ConditionalFlag_SkipOffset                      ;00A57F|8016    |00A597;
 ;      |        |      ;
-	jsr.W CODE_00B1A1                    ;00A581|20A1B1  |00B1A1;
+	jsr.W Conditional_TestBitfield                    ;00A581|20A1B1  |00B1A1;
 	bra Dialog_ConditionalFlag_False                      ;00A584|80E8    |00A56E;
 ;      |        |      ;
-	jsr.W CODE_00B1A1                    ;00A586|20A1B1  |00B1A1;
+	jsr.W Conditional_TestBitfield                    ;00A586|20A1B1  |00B1A1;
 	bra Dialog_ConditionalFlag_True                      ;00A589|80F2    |00A57D;
 ;      |        |      ;
-	jsr.W CODE_00B1B4                    ;00A58B|20B4B1  |00B1B4;
+	jsr.W Conditional_TestPointer                    ;00A58B|20B4B1  |00B1B4;
 	bne Dialog_JumpToPointer                      ;00A58E|D089    |00A519;
 	bra Dialog_ConditionalFlag_SkipOffset                      ;00A590|8005    |00A597;
 ;      |        |      ;
-	jsr.W CODE_00B1B4                    ;00A592|20B4B1  |00B1B4;
+	jsr.W Conditional_TestPointer                    ;00A592|20B4B1  |00B1B4;
 	beq Dialog_JumpToPointer                      ;00A595|F082    |00A519;
 ;      |        |      ;
 Dialog_ConditionalFlag_SkipOffset:
@@ -4475,10 +4475,10 @@ Dialog_ConditionalFlag_SkipOffset:
 ;      |        |      ;
 	db $20,$c3,$b1,$90,$27,$f0,$25,$80,$28,$20,$c3,$b1,$90,$1e,$80,$21;00A59C|        |00B1C3;
 	db $20,$c3,$b1,$b0,$17,$80,$1a,$20,$c3,$b1,$90,$15,$f0,$13,$80,$0c;00A5AC|        |00B1C3;
-	jsr.W CODE_00B1C3                    ;00A5BC|20C3B1  |00B1C3;
+	jsr.W Conditional_CompareByte                    ;00A5BC|20C3B1  |00B1C3;
 	bne Dialog_ConditionalValue_SkipOffset                      ;00A5BF|D007    |00A5C8;
 	db $80,$0a                           ;00A5C1|        |00A5CD;
-	jsr.W CODE_00B1C3                    ;00A5C3|20C3B1  |00B1C3;
+	jsr.W Conditional_CompareByte                    ;00A5C3|20C3B1  |00B1C3;
 	bne Dialog_ConditionalValue_ExecuteCall                      ;00A5C6|D005    |00A5CD;
 ;      |        |      ;
 Dialog_ConditionalValue_SkipOffset:
@@ -4698,10 +4698,10 @@ Dialog_ExecuteNestedCall_Return:
 	rep #$10                             ;00A85E|C210    |      ;
 	plx                                  ;00A860|FA      |      ;
 	cpx.W #$ffff                         ;00A861|E0FFFF  |      ;
-	beq CODE_00A867                      ;00A864|F001    |00A867;
+	beq Dialog_ExecuteNestedCall_RestoreState                      ;00A864|F001    |00A867;
 	pla                                  ;00A866|68      |      ;
 ;      |        |      ;
-CODE_00A867:
+Dialog_ExecuteNestedCall_RestoreState:
 	pea.W $0000                          ;00A867|F40000  |000000;
 	pld                                  ;00A86A|2B      |      ;
 	phk                                  ;00A86B|4B      |      ;
@@ -4724,10 +4724,10 @@ CODE_00A867:
 	plb                                  ;00A88C|AB      |      ;
 	tya                                  ;00A88D|98      |      ;
 	cmp.W #$35d9                         ;00A88E|C9D935  |      ;
-	bcc CODE_00A896                      ;00A891|9003    |00A896;
+	bcc Dialog_CopyToBuffer                      ;00A891|9003    |00A896;
 	db $4c,$1f,$9d                       ;00A893|        |009D1F;
 ;      |        |      ;
-CODE_00A896:
+Dialog_CopyToBuffer:
 	sta.L $7e3367                        ;00A896|8F67337E|7E3367;
 	rts                                  ;00A89A|60      |      ;
 ;      |        |      ;
@@ -4749,9 +4749,9 @@ CODE_00A896:
 	mvn $00,$7e                          ;00A8B9|54007E  |      ;
 	rts                                  ;00A8BC|60      |      ;
 ;      |        |      ;
-	jsr.W CODE_00A8C0                    ;00A8BD|20C0A8  |00A8C0;
+	jsr.W Text_CalculateDisplayPosition                    ;00A8BD|20C0A8  |00A8C0;
 ;      |        |      ;
-CODE_00A8C0:
+Text_CalculateDisplayPosition:
 	lda.W #$003e                         ;00A8C0|A93E00  |      ;
 	trb.B $1a                            ;00A8C3|141A    |00001A;
 	lsr a;00A8C5|4A      |      ;
@@ -4763,7 +4763,7 @@ CODE_00A8C0:
 	rts                                  ;00A8D0|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
-CODE_00A8D1:
+Text_CalculateScreenPosition:
 	lda.B $40                            ;00A8D1|A540    |000040;
 	sta.B $1b                            ;00A8D3|851B    |00001B;
 	lda.B $25                            ;00A8D5|A525    |000025;
@@ -4830,7 +4830,7 @@ CODE_00A8D1:
 	rep #$30                             ;00A945|C230    |      ;
 	sta.B $31                            ;00A947|8531    |000031;
 	lda.B $3a                            ;00A949|A53A    |00003A;
-	beq CODE_00A957                      ;00A94B|F00A    |00A957;
+	beq Text_RenderCustom_Return                      ;00A94B|F00A    |00A957;
 	dec a;00A94D|3A      |      ;
 	ldx.B $34                            ;00A94E|A634    |000034;
 	ldy.B $37                            ;00A950|A437    |000037;
@@ -4838,7 +4838,7 @@ CODE_00A8D1:
 	jsr.W $0030                          ;00A953|203000  |000030;
 	plb                                  ;00A956|AB      |      ;
 ;      |        |      ;
-CODE_00A957:
+Text_RenderCustom_Return:
 	rts                                  ;00A957|60      |      ;
 ;      |        |      ;
 	lda.B [$17]                          ;00A958|A717    |000017;
@@ -4853,7 +4853,7 @@ CODE_00A957:
 	rts                                  ;00A96B|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
-CODE_00A96C:
+Memory_WriteWordToAddress:
 	lda.B [$17]                          ;00A96C|A717    |000017;
 	inc.B $17                            ;00A96E|E617    |000017;
 	inc.B $17                            ;00A970|E617    |000017;
@@ -4864,7 +4864,7 @@ CODE_00A96C:
 	sta.W $0000,x                        ;00A979|9D0000  |000000;
 	rts                                  ;00A97C|60      |      ;
 ;      |        |      ;
-	jsr.W CODE_00A96C                    ;00A97D|206CA9  |00A96C;
+	jsr.W Memory_WriteWordToAddress                    ;00A97D|206CA9  |00A96C;
 	lda.B [$17]                          ;00A980|A717    |000017;
 	inc.B $17                            ;00A982|E617    |000017;
 	and.W #$00ff                         ;00A984|29FF00  |      ;
@@ -4888,7 +4888,7 @@ CODE_00A96C:
 	db $20,$99,$a9,$e6,$9e,$e6,$9e,$20,$8d,$a9,$c2,$30,$c6,$9e,$c6,$9e;00A9A2|        |00A999;
 	db $60                               ;00A9B2|        |      ;
 ;      |        |      ;
-CODE_00A9B3:
+Memory_ReadWordFromPointer:
 	lda.B [$17]                          ;00A9B3|A717    |000017;
 	inc.B $17                            ;00A9B5|E617    |000017;
 	inc.B $17                            ;00A9B7|E617    |000017;
@@ -4896,12 +4896,12 @@ CODE_00A9B3:
 	lda.B [$9e]                          ;00A9BA|A79E    |00009E;
 	rts                                  ;00A9BC|60      |      ;
 ;      |        |      ;
-	jsr.W CODE_00A9B3                    ;00A9BD|20B3A9  |00A9B3;
+	jsr.W Memory_ReadWordFromPointer                    ;00A9BD|20B3A9  |00A9B3;
 	sep #$20                             ;00A9C0|E220    |      ;
 	sta.W $0000,x                        ;00A9C2|9D0000  |000000;
 	rts                                  ;00A9C5|60      |      ;
 ;      |        |      ;
-	jsr.W CODE_00A9B3                    ;00A9C6|20B3A9  |00A9B3;
+	jsr.W Memory_ReadWordFromPointer                    ;00A9C6|20B3A9  |00A9B3;
 	sta.W $0000,x                        ;00A9C9|9D0000  |000000;
 	rts                                  ;00A9CC|60      |      ;
 ;      |        |      ;
@@ -4916,7 +4916,7 @@ CODE_00A9B3:
 	lda.W #$0002                         ;00A9DD|A90200  |      ;
 	jmp.W $0030                          ;00A9E0|4C3000  |000030;
 ;      |        |      ;
-	jsr.W CODE_00AA22                    ;00A9E3|2022AA  |00AA22;
+	jsr.W Dialog_ReadAddressAndBank                    ;00A9E3|2022AA  |00AA22;
 	pha                                  ;00A9E6|48      |      ;
 	plb                                  ;00A9E7|AB      |      ;
 	lda.B [$17]                          ;00A9E8|A717    |000017;
@@ -4927,7 +4927,7 @@ CODE_00A9B3:
 	plb                                  ;00A9F4|AB      |      ;
 	rts                                  ;00A9F5|60      |      ;
 ;      |        |      ;
-	jsr.W CODE_00AA22                    ;00A9F6|2022AA  |00AA22;
+	jsr.W Dialog_ReadAddressAndBank                    ;00A9F6|2022AA  |00AA22;
 	pha                                  ;00A9F9|48      |      ;
 	plb                                  ;00A9FA|AB      |      ;
 	lda.B [$17]                          ;00A9FB|A717    |000017;
@@ -4940,7 +4940,7 @@ CODE_00A9B3:
 	db $20,$22,$aa,$48,$ab,$a7,$17,$e6,$17,$e6,$17,$9d,$00,$00,$a7,$17;00AA06|        |00AA22;
 	db $e6,$17,$29,$ff,$00,$e2,$20,$9d,$02,$00,$ab,$60;00AA16|        |000017;
 ;      |        |      ;
-CODE_00AA22:
+Dialog_ReadAddressAndBank:
 	lda.B [$17]                          ;00AA22|A717    |000017;
 	inc.B $17                            ;00AA24|E617    |000017;
 	inc.B $17                            ;00AA26|E617    |000017;
@@ -4951,12 +4951,12 @@ CODE_00AA22:
 	rts                                  ;00AA30|60      |      ;
 ;      |        |      ;
 	sep #$30                             ;00AA31|E230    |      ;
-	jsr.W CODE_00AA3B                    ;00AA33|203BAA  |00AA3B;
-	jsr.W CODE_00AA44                    ;00AA36|2044AA  |00AA44;
-	bra CODE_00AA5D                      ;00AA39|8022    |00AA5D;
+	jsr.W Text_CalculateHorizontalCenter                    ;00AA33|203BAA  |00AA3B;
+	jsr.W Text_CalculateVerticalPosition                    ;00AA36|2044AA  |00AA44;
+	bra Text_ApplyTextPosition                      ;00AA39|8022    |00AA5D;
 ;      |        |      ;
 ;      |        |      ;
-CODE_00AA3B:
+Text_CalculateHorizontalCenter:
 	lda.B #$20                           ;00AA3B|A920    |      ;
 	sec                                  ;00AA3D|38      |      ;
 	sbc.B $2a                            ;00AA3E|E52A    |00002A;
@@ -4965,20 +4965,20 @@ CODE_00AA3B:
 	rts                                  ;00AA43|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
-CODE_00AA44:
+Text_CalculateVerticalPosition:
 	lda.B $24                            ;00AA44|A524    |000024;
 	and.B #$08                           ;00AA46|2908    |      ;
-	beq CODE_00AA4E                      ;00AA48|F004    |00AA4E;
+	beq Text_CalculateVerticalPosition_Normal                      ;00AA48|F004    |00AA4E;
 	lda.B #$10                           ;00AA4A|A910    |      ;
-	bra CODE_00AA53                      ;00AA4C|8005    |00AA53;
+	bra Text_CalculateVerticalPosition_Center                      ;00AA4C|8005    |00AA53;
 ;      |        |      ;
 ;      |        |      ;
-CODE_00AA4E:
+Text_CalculateVerticalPosition_Normal:
 	lda.B $2d                            ;00AA4E|A52D    |00002D;
 	eor.B #$ff                           ;00AA50|49FF    |      ;
 	inc a;00AA52|1A      |      ;
 ;      |        |      ;
-CODE_00AA53:
+Text_CalculateVerticalPosition_Center:
 	clc                                  ;00AA53|18      |      ;
 	adc.B $23                            ;00AA54|6523    |000023;
 	sta.B $2c                            ;00AA56|852C    |00002C;
@@ -4988,7 +4988,7 @@ CODE_00AA53:
 	rts                                  ;00AA5C|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
-CODE_00AA5D:
+Text_ApplyTextPosition:
 	rep #$30                             ;00AA5D|C230    |      ;
 	lda.B $28                            ;00AA5F|A528    |000028;
 	clc                                  ;00AA61|18      |      ;
@@ -5000,7 +5000,7 @@ CODE_00AA5D:
 	and.W #$00ff                         ;00AA6A|29FF00  |      ;
 	ldx.B $17                            ;00AA6D|A617    |000017;
 ;      |        |      ;
-CODE_00AA6F:
+Dialog_RepeatCharacter_Loop:
 	pha                                  ;00AA6F|48      |      ;
 	phx                                  ;00AA70|DA      |      ;
 	stx.B $17                            ;00AA71|8617    |000017;
@@ -5008,7 +5008,7 @@ CODE_00AA6F:
 	plx                                  ;00AA76|FA      |      ;
 	pla                                  ;00AA77|68      |      ;
 	dec a;00AA78|3A      |      ;
-	bne CODE_00AA6F                      ;00AA79|D0F4    |00AA6F;
+	bne Dialog_RepeatCharacter_Loop                      ;00AA79|D0F4    |00AA6F;
 	rts                                  ;00AA7B|60      |      ;
 ;      |        |      ;
 	lda.B $40                            ;00AA7C|A540    |000040;
@@ -5063,7 +5063,7 @@ CODE_00AA6F:
 	pei.B ($25)                          ;00AAD6|D425    |000025;
 	lda.B $28                            ;00AAD8|A528    |000028;
 	sta.B $25                            ;00AADA|8525    |000025;
-	jsr.W CODE_00A8D1                    ;00AADC|20D1A8  |00A8D1;
+	jsr.W Text_CalculateScreenPosition                    ;00AADC|20D1A8  |00A8D1;
 	jsr.W CODE_00B49E                    ;00AADF|209EB4  |00B49E;
 	lda.B $1c                            ;00AAE2|A51C    |00001C;
 	and.W #$00ff                         ;00AAE4|29FF00  |      ;
@@ -5074,7 +5074,7 @@ CODE_00AA6F:
 	jsr.W CODE_00B4A7                    ;00AAED|20A7B4  |00B4A7;
 	pla                                  ;00AAF0|68      |      ;
 	sta.B $25                            ;00AAF1|8525    |000025;
-	jmp.W CODE_00A8D1                    ;00AAF3|4CD1A8  |00A8D1;
+	jmp.W Text_CalculateScreenPosition                    ;00AAF3|4CD1A8  |00A8D1;
 ;      |        |      ;
 	db $60                               ;00AAF6|        |      ;
 ;      |        |      ;
@@ -5090,11 +5090,11 @@ UNREACH_00AAF7:
 	tax                                  ;00AB14|AA      |      ;
 	ldy.B $1a                            ;00AB15|A41A    |00001A;
 	lda.W #$00fe                         ;00AB17|A9FE00  |      ;
-	jsr.W CODE_00AD85                    ;00AB1A|2085AD  |00AD85;
+	jsr.W TextBox_DrawPattern_WithXOR                    ;00AB1A|2085AD  |00AD85;
 	sty.B $1a                            ;00AB1D|841A    |00001A;
 	rts                                  ;00AB1F|60      |      ;
 ;      |        |      ;
-	jsr.W CODE_00AB9F                    ;00AB20|209FAB  |00AB9F;
+	jsr.W TextBox_DrawCorners                    ;00AB20|209FAB  |00AB9F;
 	lda.W #$4000                         ;00AB23|A90040  |      ;
 	ora.B $1d                            ;00AB26|051D    |00001D;
 	sta.B $64                            ;00AB28|8564    |000064;
@@ -5105,46 +5105,46 @@ UNREACH_00AAF7:
 	sta.B $1a                            ;00AB33|851A    |00001A;
 	lda.B $24                            ;00AB35|A524    |000024;
 	bit.W #$0008                         ;00AB37|890800  |      ;
-	beq CODE_00AB44                      ;00AB3A|F008    |00AB44;
-	jsr.W CODE_00A8D1                    ;00AB3C|20D1A8  |00A8D1;
+	beq TextBox_DrawBorder_TopBottom                      ;00AB3A|F008    |00AB44;
+	jsr.W Text_CalculateScreenPosition                    ;00AB3C|20D1A8  |00A8D1;
 	lda.W #$8000                         ;00AB3F|A90080  |      ;
 	tsb.B $64                            ;00AB42|0464    |000064;
 ;      |        |      ;
-CODE_00AB44:
+TextBox_DrawBorder_TopBottom:
 	sep #$20                             ;00AB44|E220    |      ;
 	lda.B $22                            ;00AB46|A522    |000022;
 	lsr a;00AB48|4A      |      ;
 	lsr a;00AB49|4A      |      ;
 	lsr a;00AB4A|4A      |      ;
 	cmp.B $28                            ;00AB4B|C528    |000028;
-	bcs CODE_00AB52                      ;00AB4D|B003    |00AB52;
+	bcs TextBox_DrawBorder_Sides                      ;00AB4D|B003    |00AB52;
 	lda.B $28                            ;00AB4F|A528    |000028;
 	sec                                  ;00AB51|38      |      ;
 ;      |        |      ;
-CODE_00AB52:
+TextBox_DrawBorder_Sides:
 	sbc.B $28                            ;00AB52|E528    |000028;
 	sta.B $62                            ;00AB54|8562    |000062;
 	lda.B $22                            ;00AB56|A522    |000022;
 	cmp.B #$78                           ;00AB58|C978    |      ;
-	bcc CODE_00AB64                      ;00AB5A|9008    |00AB64;
-	bne CODE_00AB6A                      ;00AB5C|D00C    |00AB6A;
+	bcc TextBox_DrawBorder_NoBottom                      ;00AB5A|9008    |00AB64;
+	bne TextBox_DrawBorder_CheckBottom                      ;00AB5C|D00C    |00AB6A;
 	lda.B $24                            ;00AB5E|A524    |000024;
 	bit.B #$01                           ;00AB60|8901    |      ;
-	beq CODE_00AB6A                      ;00AB62|F006    |00AB6A;
+	beq TextBox_DrawBorder_CheckBottom                      ;00AB62|F006    |00AB6A;
 ;      |        |      ;
-CODE_00AB64:
+TextBox_DrawBorder_NoBottom:
 	inc.B $62                            ;00AB64|E662    |000062;
 	lda.B #$40                           ;00AB66|A940    |      ;
 	trb.B $65                            ;00AB68|1465    |000065;
 ;      |        |      ;
-CODE_00AB6A:
+TextBox_DrawBorder_CheckBottom:
 	lda.B $62                            ;00AB6A|A562    |000062;
 	inc a;00AB6C|1A      |      ;
 	cmp.B $2a                            ;00AB6D|C52A    |00002A;
-	bcc CODE_00AB77                      ;00AB6F|9006    |00AB77;
+	bcc TextBox_DrawBorder_ClampHeight                      ;00AB6F|9006    |00AB77;
 	db $a5,$2a,$e9,$02,$85,$62           ;00AB71|        |00002A;
 ;      |        |      ;
-CODE_00AB77:
+TextBox_DrawBorder_ClampHeight:
 	rep #$30                             ;00AB77|C230    |      ;
 	lda.B $62                            ;00AB79|A562    |000062;
 	and.W #$00ff                         ;00AB7B|29FF00  |      ;
@@ -5156,27 +5156,27 @@ CODE_00AB77:
 	rts                                  ;00AB87|60      |      ;
 ;      |        |      ;
 	lda.W #$00fc                         ;00AB88|A9FC00  |      ;
-	jsr.W CODE_00AD2D                    ;00AB8B|202DAD  |00AD2D;
+	jsr.W TextBox_DrawSides_Vertical                    ;00AB8B|202DAD  |00AD2D;
 	lda.W #$00ff                         ;00AB8E|A9FF00  |      ;
-	jsr.W CODE_00AD44                    ;00AB91|2044AD  |00AD44;
+	jsr.W TextBox_DrawSides_Horizontal                    ;00AB91|2044AD  |00AD44;
 	inc.B $62                            ;00AB94|E662    |000062;
 	lda.W #$80fc                         ;00AB96|A9FC80  |      ;
-	jsr.W CODE_00AD85                    ;00AB99|2085AD  |00AD85;
-	jmp.W CODE_00ACA6                    ;00AB9C|4CA6AC  |00ACA6;
+	jsr.W TextBox_DrawPattern_WithXOR                    ;00AB99|2085AD  |00AD85;
+	jmp.W TextBox_DrawCorners_TopLeft                    ;00AB9C|4CA6AC  |00ACA6;
 ;      |        |      ;
 ;      |        |      ;
-CODE_00AB9F:
+TextBox_DrawCorners:
 	lda.W #$00fc                         ;00AB9F|A9FC00  |      ;
-	jsr.W CODE_00AD2D                    ;00ABA2|202DAD  |00AD2D;
+	jsr.W TextBox_DrawSides_Vertical                    ;00ABA2|202DAD  |00AD2D;
 	lda.B $2b                            ;00ABA5|A52B    |00002B;
 	and.W #$00ff                         ;00ABA7|29FF00  |      ;
 	dec a;00ABAA|3A      |      ;
 	dec a;00ABAB|3A      |      ;
-	jsr.W CODE_00ABFC                    ;00ABAC|20FCAB  |00ABFC;
+	jsr.W TextBox_FillBackground                    ;00ABAC|20FCAB  |00ABFC;
 	inc.B $62                            ;00ABAF|E662    |000062;
 	lda.W #$80fc                         ;00ABB1|A9FC80  |      ;
-	jsr.W CODE_00AD85                    ;00ABB4|2085AD  |00AD85;
-	jmp.W CODE_00ACA6                    ;00ABB7|4CA6AC  |00ACA6;
+	jsr.W TextBox_DrawPattern_WithXOR                    ;00ABB4|2085AD  |00AD85;
+	jmp.W TextBox_DrawCorners_TopLeft                    ;00ABB7|4CA6AC  |00ACA6;
 ;      |        |      ;
 	ldy.B $1a                            ;00ABBA|A41A    |00001A;
 	lda.B $2a                            ;00ABBC|A52A    |00002A;
@@ -5185,30 +5185,30 @@ CODE_00AB9F:
 	tax                                  ;00ABC2|AA      |      ;
 	lda.B $2b                            ;00ABC3|A52B    |00002B;
 	and.W #$00ff                         ;00ABC5|29FF00  |      ;
-	jsr.W CODE_00ABFC                    ;00ABC8|20FCAB  |00ABFC;
+	jsr.W TextBox_FillBackground                    ;00ABC8|20FCAB  |00ABFC;
 	sty.B $1a                            ;00ABCB|841A    |00001A;
 	rts                                  ;00ABCD|60      |      ;
 ;      |        |      ;
 	lda.W #$0045                         ;00ABCE|A94500  |      ;
-	jsr.W CODE_00AD2D                    ;00ABD1|202DAD  |00AD2D;
+	jsr.W TextBox_DrawSides_Vertical                    ;00ABD1|202DAD  |00AD2D;
 	lda.W #$00ff                         ;00ABD4|A9FF00  |      ;
-	jsr.W CODE_00AD44                    ;00ABD7|2044AD  |00AD44;
+	jsr.W TextBox_DrawSides_Horizontal                    ;00ABD7|2044AD  |00AD44;
 	inc.B $62                            ;00ABDA|E662    |000062;
 	lda.W #$8045                         ;00ABDC|A94580  |      ;
-	jsr.W CODE_00AD85                    ;00ABDF|2085AD  |00AD85;
-	jmp.W CODE_00ACD3                    ;00ABE2|4CD3AC  |00ACD3;
+	jsr.W TextBox_DrawPattern_WithXOR                    ;00ABDF|2085AD  |00AD85;
+	jmp.W TextBox_DrawCorners_Arrow                    ;00ABE2|4CD3AC  |00ACD3;
 ;      |        |      ;
 	lda.W #$0075                         ;00ABE5|A97500  |      ;
-	jsr.W CODE_00AD2D                    ;00ABE8|202DAD  |00AD2D;
+	jsr.W TextBox_DrawSides_Vertical                    ;00ABE8|202DAD  |00AD2D;
 	lda.W #$00ff                         ;00ABEB|A9FF00  |      ;
-	jsr.W CODE_00AD44                    ;00ABEE|2044AD  |00AD44;
+	jsr.W TextBox_DrawSides_Horizontal                    ;00ABEE|2044AD  |00AD44;
 	inc.B $62                            ;00ABF1|E662    |000062;
 	lda.W #$8075                         ;00ABF3|A97580  |      ;
-	jsr.W CODE_00AD85                    ;00ABF6|2085AD  |00AD85;
-	jmp.W CODE_00AD00                    ;00ABF9|4C00AD  |00AD00;
+	jsr.W TextBox_DrawPattern_WithXOR                    ;00ABF6|2085AD  |00AD85;
+	jmp.W TextBox_DrawCorners_Choice                    ;00ABF9|4C00AD  |00AD00;
 ;      |        |      ;
 ;      |        |      ;
-CODE_00ABFC:
+TextBox_FillBackground:
 	sta.B $62                            ;00ABFC|8562    |000062;
 	txa                                  ;00ABFE|8A      |      ;
 	asl a;00ABFF|0A      |      ;
@@ -5219,7 +5219,7 @@ CODE_00ABFC:
 	lsr a;00AC09|4A      |      ;
 	pha                                  ;00AC0A|48      |      ;
 ;      |        |      ;
-CODE_00AC0B:
+TextBox_FillBackground_Loop:
 	adc.L $00015f                        ;00AC0B|6F5F0100|00015F;
 	sta.L $00015f                        ;00AC0F|8F5F0100|00015F;
 	jmp.W ($0064)                        ;00AC13|6C6400  |000064;
@@ -5283,17 +5283,17 @@ CODE_00AC0B:
 	tay                                  ;00AC9A|A8      |      ;
 	lda.B $01,s                          ;00AC9B|A301    |000001;
 	dec.B $62                            ;00AC9D|C662    |000062;
-	beq CODE_00ACA4                      ;00AC9F|F003    |00ACA4;
-	jmp.W CODE_00AC0B                    ;00ACA1|4C0BAC  |00AC0B;
+	beq TextBox_FillBackground_Return                      ;00AC9F|F003    |00ACA4;
+	jmp.W TextBox_FillBackground_Loop                    ;00ACA1|4C0BAC  |00AC0B;
 ;      |        |      ;
 ;      |        |      ;
-CODE_00ACA4:
+TextBox_FillBackground_Return:
 	pla                                  ;00ACA4|68      |      ;
 	rts                                  ;00ACA5|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
-CODE_00ACA6:
-	jsr.W CODE_00AD52                    ;00ACA6|2052AD  |00AD52;
+TextBox_DrawCorners_TopLeft:
+	jsr.W TextBox_CalculateDimensions                    ;00ACA6|2052AD  |00AD52;
 	lda.B $1d                            ;00ACA9|A51D    |00001D;
 	eor.W #$00f7                         ;00ACAB|49F700  |      ;
 	sta.B ($1a)                          ;00ACAE|921A    |00001A;
@@ -5301,7 +5301,7 @@ CODE_00ACA6:
 	eor.W #$00f9                         ;00ACB2|49F900  |      ;
 	sta.B ($1a),y                        ;00ACB5|911A    |00001A;
 	lda.W #$00fb                         ;00ACB7|A9FB00  |      ;
-	jsr.W CODE_00AD64                    ;00ACBA|2064AD  |00AD64;
+	jsr.W TextBox_DrawPattern                    ;00ACBA|2064AD  |00AD64;
 	lda.B $1d                            ;00ACBD|A51D    |00001D;
 	eor.W #$00f8                         ;00ACBF|49F800  |      ;
 	sta.B ($1a)                          ;00ACC2|921A    |00001A;
@@ -5314,8 +5314,8 @@ CODE_00ACA6:
 	rts                                  ;00ACD2|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
-CODE_00ACD3:
-	jsr.W CODE_00AD52                    ;00ACD3|2052AD  |00AD52;
+TextBox_DrawCorners_Arrow:
+	jsr.W TextBox_CalculateDimensions                    ;00ACD3|2052AD  |00AD52;
 	lda.B $1d                            ;00ACD6|A51D    |00001D;
 	eor.W #$0040                         ;00ACD8|494000  |      ;
 	sta.B ($1a)                          ;00ACDB|921A    |00001A;
@@ -5323,7 +5323,7 @@ CODE_00ACD3:
 	eor.W #$0042                         ;00ACDF|494200  |      ;
 	sta.B ($1a),y                        ;00ACE2|911A    |00001A;
 	lda.W #$0044                         ;00ACE4|A94400  |      ;
-	jsr.W CODE_00AD64                    ;00ACE7|2064AD  |00AD64;
+	jsr.W TextBox_DrawPattern                    ;00ACE7|2064AD  |00AD64;
 	lda.B $1d                            ;00ACEA|A51D    |00001D;
 	eor.W #$0041                         ;00ACEC|494100  |      ;
 	sta.B ($1a)                          ;00ACEF|921A    |00001A;
@@ -5336,8 +5336,8 @@ CODE_00ACD3:
 	rts                                  ;00ACFF|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
-CODE_00AD00:
-	jsr.W CODE_00AD52                    ;00AD00|2052AD  |00AD52;
+TextBox_DrawCorners_Choice:
+	jsr.W TextBox_CalculateDimensions                    ;00AD00|2052AD  |00AD52;
 	lda.B $1d                            ;00AD03|A51D    |00001D;
 	eor.W #$0070                         ;00AD05|497000  |      ;
 	sta.B ($1a)                          ;00AD08|921A    |00001A;
@@ -5345,7 +5345,7 @@ CODE_00AD00:
 	eor.W #$0072                         ;00AD0C|497200  |      ;
 	sta.B ($1a),y                        ;00AD0F|911A    |00001A;
 	lda.W #$0074                         ;00AD11|A97400  |      ;
-	jsr.W CODE_00AD64                    ;00AD14|2064AD  |00AD64;
+	jsr.W TextBox_DrawPattern                    ;00AD14|2064AD  |00AD64;
 	lda.B $1d                            ;00AD17|A51D    |00001D;
 	eor.W #$0071                         ;00AD19|497100  |      ;
 	sta.B ($1a)                          ;00AD1C|921A    |00001A;
@@ -5358,7 +5358,7 @@ CODE_00AD00:
 	rts                                  ;00AD2C|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
-CODE_00AD2D:
+TextBox_DrawSides_Vertical:
 	pha                                  ;00AD2D|48      |      ;
 	ldy.B $1a                            ;00AD2E|A41A    |00001A;
 	iny                                  ;00AD30|C8      |      ;
@@ -5372,10 +5372,10 @@ CODE_00AD2D:
 	lda.W #$0001                         ;00AD3B|A90100  |      ;
 	sta.B $62                            ;00AD3E|8562    |000062;
 	pla                                  ;00AD40|68      |      ;
-	jmp.W CODE_00AD85                    ;00AD41|4C85AD  |00AD85;
+	jmp.W TextBox_DrawPattern_WithXOR                    ;00AD41|4C85AD  |00AD85;
 ;      |        |      ;
 ;      |        |      ;
-CODE_00AD44:
+TextBox_DrawSides_Horizontal:
 	pha                                  ;00AD44|48      |      ;
 	lda.B $2b                            ;00AD45|A52B    |00002B;
 	and.W #$00ff                         ;00AD47|29FF00  |      ;
@@ -5383,10 +5383,10 @@ CODE_00AD44:
 	dec a;00AD4B|3A      |      ;
 	sta.B $62                            ;00AD4C|8562    |000062;
 	pla                                  ;00AD4E|68      |      ;
-	jmp.W CODE_00AD85                    ;00AD4F|4C85AD  |00AD85;
+	jmp.W TextBox_DrawPattern_WithXOR                    ;00AD4F|4C85AD  |00AD85;
 ;      |        |      ;
 ;      |        |      ;
-CODE_00AD52:
+TextBox_CalculateDimensions:
 	lda.B $2a                            ;00AD52|A52A    |00002A;
 	and.W #$00ff                         ;00AD54|29FF00  |      ;
 	dec a;00AD57|3A      |      ;
@@ -5400,7 +5400,7 @@ CODE_00AD52:
 	rts                                  ;00AD63|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
-CODE_00AD64:
+TextBox_DrawPattern:
 	eor.B $1d                            ;00AD64|451D    |00001D;
 	sta.B $64                            ;00AD66|8564    |000064;
 	lda.B $1a                            ;00AD68|A51A    |00001A;
@@ -5408,7 +5408,7 @@ CODE_00AD64:
 	sta.B $1a                            ;00AD6D|851A    |00001A;
 	ldx.B $62                            ;00AD6F|A662    |000062;
 ;      |        |      ;
-CODE_00AD71:
+TextBox_DrawPattern_Loop:
 	lda.B $64                            ;00AD71|A564    |000064;
 	sta.B ($1a)                          ;00AD73|921A    |00001A;
 	eor.W #$4000                         ;00AD75|490040  |      ;
@@ -5417,22 +5417,22 @@ CODE_00AD71:
 	adc.W #$0040                         ;00AD7C|694000  |      ;
 	sta.B $1a                            ;00AD7F|851A    |00001A;
 	dex                                  ;00AD81|CA      |      ;
-	bne CODE_00AD71                      ;00AD82|D0ED    |00AD71;
+	bne TextBox_DrawPattern_Loop                      ;00AD82|D0ED    |00AD71;
 	rts                                  ;00AD84|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
-CODE_00AD85:
+TextBox_DrawPattern_WithXOR:
 	eor.B $1d                            ;00AD85|451D    |00001D;
 	sta.B $64                            ;00AD87|8564    |000064;
 ;      |        |      ;
-CODE_00AD89:
+TextBox_DrawPattern_WithXOR_Loop:
 	jsr.W (DATA8_009a1e,x)               ;00AD89|FC1E9A  |009A1E;
 	tya                                  ;00AD8C|98      |      ;
 	adc.W #$0040                         ;00AD8D|694000  |      ;
 	tay                                  ;00AD90|A8      |      ;
 	lda.B $64                            ;00AD91|A564    |000064;
 	dec.B $62                            ;00AD93|C662    |000062;
-	bne CODE_00AD89                      ;00AD95|D0F2    |00AD89;
+	bne TextBox_DrawPattern_WithXOR_Loop                      ;00AD95|D0F2    |00AD89;
 	rts                                  ;00AD97|60      |      ;
 ;      |        |      ;
 	lda.B [$17]                          ;00AD98|A717    |000017;
@@ -5445,7 +5445,7 @@ CODE_00AD89:
 	plb                                  ;00ADAA|AB      |      ;
 	sec                                  ;00ADAB|38      |      ;
 ;      |        |      ;
-CODE_00ADAC:
+Menu_InitializeSlots_Loop:
 	tax                                  ;00ADAC|AA      |      ;
 	jsr.W Memory_Fill_14Bytes                    ;00ADAD|20059A  |009A05;
 	tya                                  ;00ADB0|98      |      ;
@@ -5454,7 +5454,7 @@ CODE_00ADAC:
 	txa                                  ;00ADB5|8A      |      ;
 	adc.W #$fff8                         ;00ADB6|69F8FF  |      ;
 	dec.B $62                            ;00ADB9|C662    |000062;
-	bne CODE_00ADAC                      ;00ADBB|D0EF    |00ADAC;
+	bne Menu_InitializeSlots_Loop                      ;00ADBB|D0EF    |00ADAC;
 	plb                                  ;00ADBD|AB      |      ;
 	rts                                  ;00ADBE|60      |      ;
 ;      |        |      ;
@@ -5497,7 +5497,7 @@ CODE_00ADAC:
 	txa                                  ;00AE05|8A      |      ;
 	sec                                  ;00AE06|38      |      ;
 ;      |        |      ;
-CODE_00AE07:
+Menu_ClearSlots_Loop:
 	tax                                  ;00AE07|AA      |      ;
 	jsr.W Memory_Fill_14Bytes                    ;00AE08|20059A  |009A05;
 	tya                                  ;00AE0B|98      |      ;
@@ -5506,7 +5506,7 @@ CODE_00AE07:
 	txa                                  ;00AE10|8A      |      ;
 	adc.W #$fff8                         ;00AE11|69F8FF  |      ;
 	dec.B $62                            ;00AE14|C662    |000062;
-	bne CODE_00AE07                      ;00AE16|D0EF    |00AE07;
+	bne Menu_ClearSlots_Loop                      ;00AE16|D0EF    |00AE07;
 	sta.B $64                            ;00AE18|8564    |000064;
 	pla                                  ;00AE1A|68      |      ;
 	and.W #$0007                         ;00AE1B|290700  |      ;
@@ -5538,12 +5538,12 @@ CODE_00AE07:
 	and.W #$00ff                         ;00AE46|29FF00  |      ;
 	sta.B $62                            ;00AE49|8562    |000062;
 ;      |        |      ;
-CODE_00AE4B:
+Menu_RenderText_ProcessByte:
 	lda.B [$17]                          ;00AE4B|A717    |000017;
 	and.W #$00ff                         ;00AE4D|29FF00  |      ;
-	beq CODE_00AE6A                      ;00AE50|F018    |00AE6A;
+	beq Menu_RenderText_CalculateOffset                      ;00AE50|F018    |00AE6A;
 	bit.W #$0080                         ;00AE52|898000  |      ;
-	bne CODE_00AE81                      ;00AE55|D02A    |00AE81;
+	bne Menu_RenderText_CompressedData                      ;00AE55|D02A    |00AE81;
 	pha                                  ;00AE57|48      |      ;
 	lda.B $03,s                          ;00AE58|A303    |000003;
 	sta.W $0000,x                        ;00AE5A|9D0000  |7E0000;
@@ -5552,15 +5552,15 @@ CODE_00AE4B:
 	iny                                  ;00AE5F|C8      |      ;
 	pla                                  ;00AE60|68      |      ;
 	dec a;00AE61|3A      |      ;
-	beq CODE_00AE69                      ;00AE62|F005    |00AE69;
+	beq Menu_RenderText_CopyComplete                      ;00AE62|F005    |00AE69;
 	asl a;00AE64|0A      |      ;
 	dec a;00AE65|3A      |      ;
 	mvn $7e,$7e                          ;00AE66|547E7E  |      ;
 ;      |        |      ;
-CODE_00AE69:
+Menu_RenderText_CopyComplete:
 	tyx                                  ;00AE69|BB      |      ;
 ;      |        |      ;
-CODE_00AE6A:
+Menu_RenderText_CalculateOffset:
 	lda.W #$0008                         ;00AE6A|A90800  |      ;
 	sec                                  ;00AE6D|38      |      ;
 	sbc.B [$17]                          ;00AE6E|E717    |000017;
@@ -5569,16 +5569,16 @@ CODE_00AE6A:
 	adc.B $01,s                          ;00AE74|6301    |000001;
 	sta.B $01,s                          ;00AE76|8301    |000001;
 ;      |        |      ;
-CODE_00AE78:
+Menu_RenderText_NextByte:
 	inc.B $17                            ;00AE78|E617    |000017;
 	dec.B $62                            ;00AE7A|C662    |000062;
-	bne CODE_00AE4B                      ;00AE7C|D0CD    |00AE4B;
+	bne Menu_RenderText_ProcessByte                      ;00AE7C|D0CD    |00AE4B;
 	pla                                  ;00AE7E|68      |      ;
 	plb                                  ;00AE7F|AB      |      ;
 	rts                                  ;00AE80|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
-CODE_00AE81:
+Menu_RenderText_CompressedData:
 	and.W #$007f                         ;00AE81|297F00  |      ;
 	pha                                  ;00AE84|48      |      ;
 	lda.W #$0008                         ;00AE85|A90800  |      ;
@@ -5593,14 +5593,14 @@ CODE_00AE81:
 	iny                                  ;00AE95|C8      |      ;
 	pla                                  ;00AE96|68      |      ;
 	dec a;00AE97|3A      |      ;
-	beq CODE_00AE9F                      ;00AE98|F005    |00AE9F;
+	beq Menu_RenderText_CopyNext                      ;00AE98|F005    |00AE9F;
 	asl a;00AE9A|0A      |      ;
 	dec a;00AE9B|3A      |      ;
 	mvn $7e,$7e                          ;00AE9C|547E7E  |      ;
 ;      |        |      ;
-CODE_00AE9F:
+Menu_RenderText_CopyNext:
 	tyx                                  ;00AE9F|BB      |      ;
-	bra CODE_00AE78                      ;00AEA0|80D6    |00AE78;
+	bra Menu_RenderText_NextByte                      ;00AEA0|80D6    |00AE78;
 ;      |        |      ;
 	lda.B [$17]                          ;00AEA2|A717    |000017;
 	inc.B $17                            ;00AEA4|E617    |000017;
@@ -5659,7 +5659,7 @@ CODE_00AE9F:
 	rts                                  ;00AF29|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
-CODE_00AF2A:
+Memory_BlockCopy_WithPointerIndirect:
 	tay                                  ;00AF2A|A8      |      ;
 	lda.B [$17]                          ;00AF2B|A717    |000017;
 	sta.B $a4                            ;00AF2D|85A4    |0000A4;
@@ -5675,10 +5675,10 @@ CODE_00AF2A:
 	sta.B $17                            ;00AF3F|8517    |000017;
 	ldx.W #$00a4                         ;00AF41|A2A400  |      ;
 	tya                                  ;00AF44|98      |      ;
-	bra CODE_00AF50                      ;00AF45|8009    |00AF50;
+	bra Memory_BlockCopy_Execute                      ;00AF45|8009    |00AF50;
 ;      |        |      ;
 ;      |        |      ;
-CODE_00AF47:
+Memory_BlockCopy_WithPointer:
 	tay                                  ;00AF47|A8      |      ;
 	lda.B [$17]                          ;00AF48|A717    |000017;
 	inc.B $17                            ;00AF4A|E617    |000017;
@@ -5686,7 +5686,7 @@ CODE_00AF47:
 	tax                                  ;00AF4E|AA      |      ;
 	tya                                  ;00AF4F|98      |      ;
 ;      |        |      ;
-CODE_00AF50:
+Memory_BlockCopy_Execute:
 	stz.B $98                            ;00AF50|6498    |000098;
 	stz.B $9a                            ;00AF52|649A    |00009A;
 	ldy.W #$0098                         ;00AF54|A09800  |      ;
@@ -5694,7 +5694,7 @@ CODE_00AF50:
 	rts                                  ;00AF5A|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
-CODE_00AF5B:
+Memory_BlockCopy_ToPointer:
 	tax                                  ;00AF5B|AA      |      ;
 	lda.B [$17]                          ;00AF5C|A717    |000017;
 	inc.B $17                            ;00AF5E|E617    |000017;
@@ -5706,24 +5706,24 @@ CODE_00AF5B:
 	rts                                  ;00AF6A|60      |      ;
 ;      |        |      ;
 	lda.W #$0000                         ;00AF6B|A90000  |      ;
-	bra CODE_00AF5B                      ;00AF6E|80EB    |00AF5B;
+	bra Memory_BlockCopy_ToPointer                      ;00AF6E|80EB    |00AF5B;
 ;      |        |      ;
 	lda.W #$0001                         ;00AF70|A90100  |      ;
-	bra CODE_00AF5B                      ;00AF73|80E6    |00AF5B;
+	bra Memory_BlockCopy_ToPointer                      ;00AF73|80E6    |00AF5B;
 ;      |        |      ;
 	lda.W #$0002                         ;00AF75|A90200  |      ;
-	bra CODE_00AF5B                      ;00AF78|80E1    |00AF5B;
+	bra Memory_BlockCopy_ToPointer                      ;00AF78|80E1    |00AF5B;
 ;      |        |      ;
 ;      |        |      ;
-CODE_00AF7A:
-	jsr.W CODE_00AF2A                    ;00AF7A|202AAF  |00AF2A;
-	bra CODE_00AF82                      ;00AF7D|8003    |00AF82;
+Memory_BlockCopy_ToPointer_Indirect:
+	jsr.W Memory_BlockCopy_WithPointerIndirect                    ;00AF7A|202AAF  |00AF2A;
+	bra Memory_BlockCopy_StoreResult                      ;00AF7D|8003    |00AF82;
 ;      |        |      ;
 ;      |        |      ;
-CODE_00AF7F:
-	jsr.W CODE_00AF47                    ;00AF7F|2047AF  |00AF47;
+Memory_BlockCopy_ToPointer_Direct:
+	jsr.W Memory_BlockCopy_WithPointer                    ;00AF7F|2047AF  |00AF47;
 ;      |        |      ;
-CODE_00AF82:
+Memory_BlockCopy_StoreResult:
 	lda.B $98                            ;00AF82|A598    |000098;
 	sta.B $9e                            ;00AF84|859E    |00009E;
 	lda.B $9a                            ;00AF86|A59A    |00009A;
@@ -5731,28 +5731,28 @@ CODE_00AF82:
 	rts                                  ;00AF8A|60      |      ;
 ;      |        |      ;
 	lda.W #$0000                         ;00AF8B|A90000  |      ;
-	bra CODE_00AF7A                      ;00AF8E|80EA    |00AF7A;
+	bra Memory_BlockCopy_ToPointer_Indirect                      ;00AF8E|80EA    |00AF7A;
 ;      |        |      ;
 	lda.W #$0001                         ;00AF90|A90100  |      ;
-	bra CODE_00AF7A                      ;00AF93|80E5    |00AF7A;
+	bra Memory_BlockCopy_ToPointer_Indirect                      ;00AF93|80E5    |00AF7A;
 ;      |        |      ;
 	lda.W #$0002                         ;00AF95|A90200  |      ;
-	bra CODE_00AF7A                      ;00AF98|80E0    |00AF7A;
+	bra Memory_BlockCopy_ToPointer_Indirect                      ;00AF98|80E0    |00AF7A;
 ;      |        |      ;
 	lda.W #$0001                         ;00AF9A|A90100  |      ;
-	bra CODE_00AF7F                      ;00AF9D|80E0    |00AF7F;
+	bra Memory_BlockCopy_ToPointer_Direct                      ;00AF9D|80E0    |00AF7F;
 ;      |        |      ;
 	lda.W #$0002                         ;00AF9F|A90200  |      ;
-	bra CODE_00AF7F                      ;00AFA2|80DB    |00AF7F;
+	bra Memory_BlockCopy_ToPointer_Direct                      ;00AFA2|80DB    |00AF7F;
 ;      |        |      ;
-	jsr.W CODE_00AFBB                    ;00AFA4|20BBAF  |00AFBB;
+	jsr.W Memory_ReadPointerFromTable                    ;00AFA4|20BBAF  |00AFBB;
 	stz.B $9f                            ;00AFA7|649F    |00009F;
 	stz.B $a0                            ;00AFA9|64A0    |0000A0;
 	rts                                  ;00AFAB|60      |      ;
 ;      |        |      ;
 	db $20,$bb,$af,$64,$a0,$60,$20,$bb,$af,$29,$ff,$00,$85,$a0,$60;00AFAC|        |00AFBB;
 ;      |        |      ;
-CODE_00AFBB:
+Memory_ReadPointerFromTable:
 	lda.B [$17]                          ;00AFBB|A717    |000017;
 	inc.B $17                            ;00AFBD|E617    |000017;
 	inc.B $17                            ;00AFBF|E617    |000017;
@@ -5781,15 +5781,15 @@ CODE_00AFBB:
 	rts                                  ;00AFE8|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
-CODE_00AFE9:
-	jsr.W CODE_00AF2A                    ;00AFE9|202AAF  |00AF2A;
-	bra CODE_00AFF1                      ;00AFEC|8003    |00AFF1;
+Bitwise_AND_Indirect:
+	jsr.W Memory_BlockCopy_WithPointerIndirect                    ;00AFE9|202AAF  |00AF2A;
+	bra Bitwise_AND_Store                      ;00AFEC|8003    |00AFF1;
 ;      |        |      ;
 ;      |        |      ;
-CODE_00AFEE:
-	jsr.W CODE_00AF47                    ;00AFEE|2047AF  |00AF47;
+Bitwise_AND_Direct:
+	jsr.W Memory_BlockCopy_WithPointer                    ;00AFEE|2047AF  |00AF47;
 ;      |        |      ;
-CODE_00AFF1:
+Bitwise_AND_Store:
 	lda.B $9e                            ;00AFF1|A59E    |00009E;
 	and.B $98                            ;00AFF3|2598    |000098;
 	sta.B $9e                            ;00AFF5|859E    |00009E;
@@ -5799,26 +5799,26 @@ CODE_00AFF1:
 	rts                                  ;00AFFD|60      |      ;
 ;      |        |      ;
 	lda.W #$0000                         ;00AFFE|A90000  |      ;
-	bra CODE_00AFE9                      ;00B001|80E6    |00AFE9;
+	bra Bitwise_AND_Indirect                      ;00B001|80E6    |00AFE9;
 ;      |        |      ;
 	lda.W #$0001                         ;00B003|A90100  |      ;
-	bra CODE_00AFE9                      ;00B006|80E1    |00AFE9;
+	bra Bitwise_AND_Indirect                      ;00B006|80E1    |00AFE9;
 ;      |        |      ;
 	db $a9,$02,$00,$80,$dc,$a9,$00,$00,$80,$dc;00B008|        |      ;
 	lda.W #$0001                         ;00B012|A90100  |      ;
-	bra CODE_00AFEE                      ;00B015|80D7    |00AFEE;
+	bra Bitwise_AND_Direct                      ;00B015|80D7    |00AFEE;
 ;      |        |      ;
 	db $a9,$02,$00,$80,$d2               ;00B017|        |      ;
 ;      |        |      ;
-CODE_00B01C:
-	jsr.W CODE_00AF2A                    ;00B01C|202AAF  |00AF2A;
-	bra CODE_00B024                      ;00B01F|8003    |00B024;
+Bitwise_OR_Indirect:
+	jsr.W Memory_BlockCopy_WithPointerIndirect                    ;00B01C|202AAF  |00AF2A;
+	bra Bitwise_OR_Store                      ;00B01F|8003    |00B024;
 ;      |        |      ;
 ;      |        |      ;
-CODE_00B021:
-	jsr.W CODE_00AF47                    ;00B021|2047AF  |00AF47;
+Bitwise_OR_Direct:
+	jsr.W Memory_BlockCopy_WithPointer                    ;00B021|2047AF  |00AF47;
 ;      |        |      ;
-CODE_00B024:
+Bitwise_OR_Store:
 	lda.B $98                            ;00B024|A598    |000098;
 	tsb.B $9e                            ;00B026|049E    |00009E;
 	lda.B $9a                            ;00B028|A59A    |00009A;
@@ -5827,23 +5827,23 @@ CODE_00B024:
 ;      |        |      ;
 	db $a9,$00,$00,$80,$ea               ;00B02D|        |      ;
 	lda.W #$0001                         ;00B032|A90100  |      ;
-	bra CODE_00B01C                      ;00B035|80E5    |00B01C;
+	bra Bitwise_OR_Indirect                      ;00B035|80E5    |00B01C;
 ;      |        |      ;
 	db $a9,$02,$00,$80,$e0               ;00B037|        |      ;
 	lda.W #$0000                         ;00B03C|A90000  |      ;
-	bra CODE_00B021                      ;00B03F|80E0    |00B021;
+	bra Bitwise_OR_Direct                      ;00B03F|80E0    |00B021;
 ;      |        |      ;
 	db $a9,$01,$00,$80,$db,$a9,$02,$00,$80,$d6;00B041|        |      ;
 ;      |        |      ;
-CODE_00B04B:
-	jsr.W CODE_00AF2A                    ;00B04B|202AAF  |00AF2A;
-	bra CODE_00B053                      ;00B04E|8003    |00B053;
+Bitwise_XOR_Indirect:
+	jsr.W Memory_BlockCopy_WithPointerIndirect                    ;00B04B|202AAF  |00AF2A;
+	bra Bitwise_XOR_Store                      ;00B04E|8003    |00B053;
 ;      |        |      ;
 ;      |        |      ;
-CODE_00B050:
-	jsr.W CODE_00AF47                    ;00B050|2047AF  |00AF47;
+Bitwise_XOR_Direct:
+	jsr.W Memory_BlockCopy_WithPointer                    ;00B050|2047AF  |00AF47;
 ;      |        |      ;
-CODE_00B053:
+Bitwise_XOR_Store:
 	lda.B $9e                            ;00B053|A59E    |00009E;
 	eor.B $98                            ;00B055|4598    |000098;
 	sta.B $9e                            ;00B057|859E    |00009E;
@@ -5853,23 +5853,23 @@ CODE_00B053:
 	rts                                  ;00B05F|60      |      ;
 ;      |        |      ;
 	lda.W #$0000                         ;00B060|A90000  |      ;
-	bra CODE_00B04B                      ;00B063|80E6    |00B04B;
+	bra Bitwise_XOR_Indirect                      ;00B063|80E6    |00B04B;
 ;      |        |      ;
 	db $a9,$01,$00,$80,$e1,$a9,$02,$00,$80,$dc,$a9,$00,$00,$80,$dc;00B065|        |      ;
 	lda.W #$0001                         ;00B074|A90100  |      ;
-	bra CODE_00B050                      ;00B077|80D7    |00B050;
+	bra Bitwise_XOR_Direct                      ;00B077|80D7    |00B050;
 ;      |        |      ;
 	db $a9,$02,$00,$80,$d2               ;00B079|        |      ;
 ;      |        |      ;
-CODE_00B07E:
-	jsr.W CODE_00AF2A                    ;00B07E|202AAF  |00AF2A;
-	bra CODE_00B086                      ;00B081|8003    |00B086;
+Math_Add_Indirect:
+	jsr.W Memory_BlockCopy_WithPointerIndirect                    ;00B07E|202AAF  |00AF2A;
+	bra Math_Add_Store                      ;00B081|8003    |00B086;
 ;      |        |      ;
 ;      |        |      ;
-CODE_00B083:
-	jsr.W CODE_00AF47                    ;00B083|2047AF  |00AF47;
+Math_Add_Direct:
+	jsr.W Memory_BlockCopy_WithPointer                    ;00B083|2047AF  |00AF47;
 ;      |        |      ;
-CODE_00B086:
+Math_Add_Store:
 	clc                                  ;00B086|18      |      ;
 	lda.B $9e                            ;00B087|A59E    |00009E;
 	adc.B $98                            ;00B089|6598    |000098;
@@ -5880,33 +5880,33 @@ CODE_00B086:
 	rts                                  ;00B093|60      |      ;
 ;      |        |      ;
 	lda.W #$0000                         ;00B094|A90000  |      ;
-	bra CODE_00B07E                      ;00B097|80E5    |00B07E;
+	bra Math_Add_Indirect                      ;00B097|80E5    |00B07E;
 ;      |        |      ;
 	lda.W #$0001                         ;00B099|A90100  |      ;
-	bra CODE_00B07E                      ;00B09C|80E0    |00B07E;
+	bra Math_Add_Indirect                      ;00B09C|80E0    |00B07E;
 ;      |        |      ;
 	lda.W #$0002                         ;00B09E|A90200  |      ;
-	bra CODE_00B07E                      ;00B0A1|80DB    |00B07E;
+	bra Math_Add_Indirect                      ;00B0A1|80DB    |00B07E;
 ;      |        |      ;
 	lda.W #$0000                         ;00B0A3|A90000  |      ;
-	bra CODE_00B083                      ;00B0A6|80DB    |00B083;
+	bra Math_Add_Direct                      ;00B0A6|80DB    |00B083;
 ;      |        |      ;
 	lda.W #$0001                         ;00B0A8|A90100  |      ;
-	bra CODE_00B083                      ;00B0AB|80D6    |00B083;
+	bra Math_Add_Direct                      ;00B0AB|80D6    |00B083;
 ;      |        |      ;
 	lda.W #$0002                         ;00B0AD|A90200  |      ;
-	bra CODE_00B083                      ;00B0B0|80D1    |00B083;
+	bra Math_Add_Direct                      ;00B0B0|80D1    |00B083;
 ;      |        |      ;
 ;      |        |      ;
-CODE_00B0B2:
-	jsr.W CODE_00AF2A                    ;00B0B2|202AAF  |00AF2A;
-	bra CODE_00B0BA                      ;00B0B5|8003    |00B0BA;
+Math_Subtract_Indirect:
+	jsr.W Memory_BlockCopy_WithPointerIndirect                    ;00B0B2|202AAF  |00AF2A;
+	bra Math_Subtract_Store                      ;00B0B5|8003    |00B0BA;
 ;      |        |      ;
 ;      |        |      ;
-CODE_00B0B7:
-	jsr.W CODE_00AF47                    ;00B0B7|2047AF  |00AF47;
+Math_Subtract_Direct:
+	jsr.W Memory_BlockCopy_WithPointer                    ;00B0B7|2047AF  |00AF47;
 ;      |        |      ;
-CODE_00B0BA:
+Math_Subtract_Store:
 	sec                                  ;00B0BA|38      |      ;
 	lda.B $9e                            ;00B0BB|A59E    |00009E;
 	sbc.B $98                            ;00B0BD|E598    |000098;
@@ -5917,25 +5917,25 @@ CODE_00B0BA:
 	rts                                  ;00B0C7|60      |      ;
 ;      |        |      ;
 	lda.W #$0000                         ;00B0C8|A90000  |      ;
-	bra CODE_00B0B2                      ;00B0CB|80E5    |00B0B2;
+	bra Math_Subtract_Indirect                      ;00B0CB|80E5    |00B0B2;
 ;      |        |      ;
 	lda.W #$0001                         ;00B0CD|A90100  |      ;
-	bra CODE_00B0B2                      ;00B0D0|80E0    |00B0B2;
+	bra Math_Subtract_Indirect                      ;00B0D0|80E0    |00B0B2;
 ;      |        |      ;
 	lda.W #$0002                         ;00B0D2|A90200  |      ;
-	bra CODE_00B0B2                      ;00B0D5|80DB    |00B0B2;
+	bra Math_Subtract_Indirect                      ;00B0D5|80DB    |00B0B2;
 ;      |        |      ;
 	lda.W #$0000                         ;00B0D7|A90000  |      ;
-	bra CODE_00B0B7                      ;00B0DA|80DB    |00B0B7;
+	bra Math_Subtract_Direct                      ;00B0DA|80DB    |00B0B7;
 ;      |        |      ;
 	lda.W #$0001                         ;00B0DC|A90100  |      ;
-	bra CODE_00B0B7                      ;00B0DF|80D6    |00B0B7;
+	bra Math_Subtract_Direct                      ;00B0DF|80D6    |00B0B7;
 ;      |        |      ;
 	lda.W #$0002                         ;00B0E1|A90200  |      ;
-	bra CODE_00B0B7                      ;00B0E4|80D1    |00B0B7;
+	bra Math_Subtract_Direct                      ;00B0E4|80D1    |00B0B7;
 ;      |        |      ;
 ;      |        |      ;
-CODE_00B0E6:
+Math_Multiply_WithValue:
 	sta.B $9c                            ;00B0E6|859C    |00009C;
 	lda.B $9e                            ;00B0E8|A59E    |00009E;
 	sta.B $98                            ;00B0EA|8598    |000098;
@@ -5945,17 +5945,17 @@ CODE_00B0E6:
 	lda.B [$17]                          ;00B0F1|A717    |000017;
 	inc.B $17                            ;00B0F3|E617    |000017;
 	and.W #$00ff                         ;00B0F5|29FF00  |      ;
-	bra CODE_00B0E6                      ;00B0F8|80EC    |00B0E6;
+	bra Math_Multiply_WithValue                      ;00B0F8|80EC    |00B0E6;
 ;      |        |      ;
 	db $a7,$17,$e6,$17,$e6,$17,$80,$e4   ;00B0FA|        |000017;
-	jsr.W CODE_00B188                    ;00B102|2088B1  |00B188;
-	bra CODE_00B0E6                      ;00B105|80DF    |00B0E6;
+	jsr.W Memory_ReadByteFromPointer                    ;00B102|2088B1  |00B188;
+	bra Math_Multiply_WithValue                      ;00B105|80DF    |00B0E6;
 ;      |        |      ;
-	jsr.W CODE_00B196                    ;00B107|2096B1  |00B196;
-	bra CODE_00B0E6                      ;00B10A|80DA    |00B0E6;
+	jsr.W Memory_ReadWordFromPointer_Direct                    ;00B107|2096B1  |00B196;
+	bra Math_Multiply_WithValue                      ;00B10A|80DA    |00B0E6;
 ;      |        |      ;
 ;      |        |      ;
-CODE_00B10C:
+Math_Divide_WithValue:
 	sta.B $9c                            ;00B10C|859C    |00009C;
 	lda.B $9e                            ;00B10E|A59E    |00009E;
 	sta.B $98                            ;00B110|8598    |000098;
@@ -5965,30 +5965,30 @@ CODE_00B10C:
 	rts                                  ;00B11A|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
-CODE_00B11B:
+Math_Divide_WithValue_Byte:
 	lda.B [$17]                          ;00B11B|A717    |000017;
 	inc.B $17                            ;00B11D|E617    |000017;
 	and.W #$00ff                         ;00B11F|29FF00  |      ;
-	bra CODE_00B10C                      ;00B122|80E8    |00B10C;
+	bra Math_Divide_WithValue                      ;00B122|80E8    |00B10C;
 ;      |        |      ;
 	lda.B [$17]                          ;00B124|A717    |000017;
 	inc.B $17                            ;00B126|E617    |000017;
 	inc.B $17                            ;00B128|E617    |000017;
-	bra CODE_00B10C                      ;00B12A|80E0    |00B10C;
+	bra Math_Divide_WithValue                      ;00B12A|80E0    |00B10C;
 ;      |        |      ;
 	db $20,$88,$b1,$80,$db               ;00B12C|        |00B188;
-	jsr.W CODE_00B196                    ;00B131|2096B1  |00B196;
-	bra CODE_00B10C                      ;00B134|80D6    |00B10C;
+	jsr.W Memory_ReadWordFromPointer_Direct                    ;00B131|2096B1  |00B196;
+	bra Math_Divide_WithValue                      ;00B134|80D6    |00B10C;
 ;      |        |      ;
 ;      |        |      ;
-CODE_00B136:
+Math_Divide_GetRemainder:
 	lda.B $a2                            ;00B136|A5A2    |0000A2;
 	sta.B $9e                            ;00B138|859E    |00009E;
 	stz.B $a0                            ;00B13A|64A0    |0000A0;
 	rts                                  ;00B13C|60      |      ;
 ;      |        |      ;
-	jsr.W CODE_00B11B                    ;00B13D|201BB1  |00B11B;
-	bra CODE_00B136                      ;00B140|80F4    |00B136;
+	jsr.W Math_Divide_WithValue_Byte                    ;00B13D|201BB1  |00B11B;
+	bra Math_Divide_GetRemainder                      ;00B140|80F4    |00B136;
 ;      |        |      ;
 	db $20,$24,$b1,$80,$ef,$20,$2c,$b1,$80,$ea,$20,$31,$b1,$80,$e5;00B142|        |00B124;
 	pei.B ($9e)                          ;00B151|D49E    |00009E;
@@ -6000,11 +6000,11 @@ CODE_00B136:
 	ldx.W #$006d                         ;00B15F|A26D00  |      ;
 	clc                                  ;00B162|18      |      ;
 ;      |        |      ;
-CODE_00B163:
+Math_ConvertToDecimal_Loop:
 	lda.B $9e                            ;00B163|A59E    |00009E;
 	sta.B $98                            ;00B165|8598    |000098;
 	ora.B $a0                            ;00B167|05A0    |0000A0;
-	beq CODE_00B181                      ;00B169|F016    |00B181;
+	beq Math_ConvertToDecimal_Return                      ;00B169|F016    |00B181;
 	lda.B $a0                            ;00B16B|A5A0    |0000A0;
 	sta.B $9a                            ;00B16D|859A    |00009A;
 	jsl.L Math_Divide32by16                    ;00B16F|22E49600|0096E4;
@@ -6014,10 +6014,10 @@ CODE_00B163:
 	sta.W $0000,x                        ;00B179|9D0000  |000000;
 	rep #$30                             ;00B17C|C230    |      ;
 	dex                                  ;00B17E|CA      |      ;
-	bra CODE_00B163                      ;00B17F|80E2    |00B163;
+	bra Math_ConvertToDecimal_Loop                      ;00B17F|80E2    |00B163;
 ;      |        |      ;
 ;      |        |      ;
-CODE_00B181:
+Math_ConvertToDecimal_Return:
 	pla                                  ;00B181|68      |      ;
 	sta.B $a0                            ;00B182|85A0    |0000A0;
 	pla                                  ;00B184|68      |      ;
@@ -6025,7 +6025,7 @@ CODE_00B181:
 	rts                                  ;00B187|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
-CODE_00B188:
+Memory_ReadByteFromPointer:
 	lda.B [$17]                          ;00B188|A717    |000017;
 	inc.B $17                            ;00B18A|E617    |000017;
 	inc.B $17                            ;00B18C|E617    |000017;
@@ -6035,7 +6035,7 @@ CODE_00B188:
 	rts                                  ;00B195|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
-CODE_00B196:
+Memory_ReadWordFromPointer_Direct:
 	lda.B [$17]                          ;00B196|A717    |000017;
 	inc.B $17                            ;00B198|E617    |000017;
 	inc.B $17                            ;00B19A|E617    |000017;
@@ -6044,7 +6044,7 @@ CODE_00B196:
 	rts                                  ;00B1A0|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
-CODE_00B1A1:
+Conditional_TestBitfield:
 	phd                                  ;00B1A1|0B      |      ;
 	lda.B [$17]                          ;00B1A2|A717    |000017;
 	inc.B $17                            ;00B1A4|E617    |000017;
@@ -6058,7 +6058,7 @@ CODE_00B1A1:
 	rts                                  ;00B1B3|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
-CODE_00B1B4:
+Conditional_TestPointer:
 	lda.B $2e                            ;00B1B4|A52E    |00002E;
 	phd                                  ;00B1B6|0B      |      ;
 	tcd                                  ;00B1B7|5B      |      ;
@@ -6070,33 +6070,33 @@ CODE_00B1B4:
 	rts                                  ;00B1C2|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
-CODE_00B1C3:
+Conditional_CompareByte:
 	lda.B [$17]                          ;00B1C3|A717    |000017;
 	inc.B $17                            ;00B1C5|E617    |000017;
 	and.W #$00ff                         ;00B1C7|29FF00  |      ;
 	sta.B $64                            ;00B1CA|8564    |000064;
 	sec                                  ;00B1CC|38      |      ;
 	lda.B $a0                            ;00B1CD|A5A0    |0000A0;
-	bne CODE_00B1D5                      ;00B1CF|D004    |00B1D5;
+	bne Conditional_CompareByte_Check                      ;00B1CF|D004    |00B1D5;
 	lda.B $9e                            ;00B1D1|A59E    |00009E;
 	cmp.B $64                            ;00B1D3|C564    |000064;
 ;      |        |      ;
-CODE_00B1D5:
+Conditional_CompareByte_Check:
 	rts                                  ;00B1D5|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
-CODE_00B1D6:
+Conditional_CompareWord:
 	lda.B [$17]                          ;00B1D6|A717    |000017;
 	inc.B $17                            ;00B1D8|E617    |000017;
 	inc.B $17                            ;00B1DA|E617    |000017;
 	sta.B $64                            ;00B1DC|8564    |000064;
 	sec                                  ;00B1DE|38      |      ;
 	lda.B $a0                            ;00B1DF|A5A0    |0000A0;
-	bne CODE_00B1E7                      ;00B1E1|D004    |00B1E7;
+	bne Conditional_CompareWord_Check                      ;00B1E1|D004    |00B1E7;
 	lda.B $9e                            ;00B1E3|A59E    |00009E;
 	cmp.B $64                            ;00B1E5|C564    |000064;
 ;      |        |      ;
-CODE_00B1E7:
+Conditional_CompareWord_Check:
 	rts                                  ;00B1E7|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
@@ -6475,7 +6475,7 @@ CODE_00B4AF:
 	lda.W #$0020                         ;00B4B0|A92000  |      ;
 	and.W $00da                          ;00B4B3|2DDA00  |0000DA;
 	beq UNREACH_00B4BB                   ;00B4B6|F003    |00B4BB;
-	jmp.W CODE_00A8C0                    ;00B4B8|4CC0A8  |00A8C0;
+	jmp.W Text_CalculateDisplayPosition                    ;00B4B8|4CC0A8  |00A8C0;
 ;      |        |      ;
 ;      |        |      ;
 UNREACH_00B4BB:
@@ -6548,7 +6548,7 @@ CODE_00B534:
 	adc.B $25                            ;00B53F|6525    |000025;
 	sta.B $25                            ;00B541|8525    |000025;
 	rep #$30                             ;00B543|C230    |      ;
-	jsr.W CODE_00A8D1                    ;00B545|20D1A8  |00A8D1;
+	jsr.W Text_CalculateScreenPosition                    ;00B545|20D1A8  |00A8D1;
 	lda.W #$0010                         ;00B548|A91000  |      ;
 	sta.B $3a                            ;00B54B|853A    |00003A;
 	jmp.W Dialog_WriteCustomText                    ;00B54D|4CDEA7  |00A7DE;
