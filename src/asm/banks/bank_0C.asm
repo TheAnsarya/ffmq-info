@@ -1536,7 +1536,7 @@ ConfigureHDMAChannels:
 	ldx.W #$1801                         ;0C8DD1|A20118  |      ;
 	stx.B SNES_DMA0PARAM-$4300           ;0C8DD4|8600    |004300;
 	ldx.W #$4000                         ;0C8DD6|A20040  |      ;
-	stx.W $2116                          ;0C8DD9|8E1621  |0C2116;
+	stx.W SNES_VMADDL                          ;0C8DD9|8E1621  |0C2116;
 	ldx.W #$2000                         ;0C8DDC|A20020  |      ;
 	stx.B SNES_DMA0ADDRL-$4300           ;0C8DDF|8602    |004302;
 	lda.B #$7f                           ;0C8DE1|A97F    |      ;
@@ -1552,7 +1552,7 @@ ConfigureHDMAChannels:
 ;      |        |      ;
 HDMA_SetupRegisters:
 	rep #$30                             ;0C8DF9|C230    |      ;
-	sty.W $2116                          ;0C8DFB|8C1621  |0C2116;
+	sty.W SNES_VMADDL                          ;0C8DFB|8C1621  |0C2116;
 	lda.W $0000,x                        ;0C8DFE|BD0000  |0C0000;
 	and.W #$00ff                         ;0C8E01|29FF00  |      ;
 	asl a;0C8E04|0A      |      ;
@@ -1642,12 +1642,12 @@ HDMA_ConfigureChannel2:
 	jsr.W HDMA_Complete                    ;0C8E8F|20A88E  |0C8EA8;
 	sep #$20                             ;0C8E92|E220    |      ;
 	ldx.W #$3fc0                         ;0C8E94|A2C03F  |      ;
-	stx.W $2116                          ;0C8E97|8E1621  |0C2116;
+	stx.W SNES_VMADDL                          ;0C8E97|8E1621  |0C2116;
 	ldx.W #$0040                         ;0C8E9A|A24000  |      ;
 	lda.B #$10                           ;0C8E9D|A910    |      ;
 ;      |        |      ;
 HDMA_ConfigureChannel3:
-	sta.W $2119                          ;0C8E9F|8D1921  |0C2119;
+	sta.W SNES_VMDATAH                          ;0C8E9F|8D1921  |0C2119;
 	dex                                  ;0C8EA2|CA      |      ;
 	bne HDMA_ConfigureChannel3                      ;0C8EA3|D0FA    |0C8E9F;
 	pld                                  ;0C8EA5|2B      |      ;
@@ -1657,20 +1657,20 @@ HDMA_ConfigureChannel3:
 ;      |        |      ;
 HDMA_Complete:
 	ldy.W #$4800                         ;0C8EA8|A00048  |      ;
-	sty.W $2116                          ;0C8EAB|8C1621  |0C2116;
+	sty.W SNES_VMADDL                          ;0C8EAB|8C1621  |0C2116;
 	ldx.W #$8edb                         ;0C8EAE|A2DB8E  |      ;
 	ldy.W #$0008                         ;0C8EB1|A00800  |      ;
 	jsr.W WorldInput_CheckCollision                    ;0C8EB4|20E98F  |0C8FE9;
 	ldy.W #$4a00                         ;0C8EB7|A0004A  |      ;
-	sty.W $2116                          ;0C8EBA|8C1621  |0C2116;
+	sty.W SNES_VMADDL                          ;0C8EBA|8C1621  |0C2116;
 	ldy.W #$0010                         ;0C8EBD|A01000  |      ;
 	jsr.W WorldInput_CheckCollision                    ;0C8EC0|20E98F  |0C8FE9;
 	ldy.W #$4c00                         ;0C8EC3|A0004C  |      ;
-	sty.W $2116                          ;0C8EC6|8C1621  |0C2116;
+	sty.W SNES_VMADDL                          ;0C8EC6|8C1621  |0C2116;
 	ldy.W #$0010                         ;0C8EC9|A01000  |      ;
 	jsr.W WorldInput_CheckCollision                    ;0C8ECC|20E98F  |0C8FE9;
 	ldy.W #$4e10                         ;0C8ECF|A0104E  |      ;
-	sty.W $2116                          ;0C8ED2|8C1621  |0C2116;
+	sty.W SNES_VMADDL                          ;0C8ED2|8C1621  |0C2116;
 	ldy.W #$000f                         ;0C8ED5|A00F00  |      ;
 	jmp.W WorldInput_CheckCollision                    ;0C8ED8|4CE98F  |0C8FE9;
 ;      |        |      ;
@@ -1775,19 +1775,19 @@ WorldInput_UpdateCamera:
 	tax                                  ;0C900A|AA      |      ;
 	lda.L DATA8_078031,x                 ;0C900B|BF318007|078031;
 	and.W #$00ff                         ;0C900F|29FF00  |      ;
-	sta.W $2118                          ;0C9012|8D1821  |0C2118;
+	sta.W SNES_VMDATAL                          ;0C9012|8D1821  |0C2118;
 	txa                                  ;0C9015|8A      |      ;
 	adc.W #$0040                         ;0C9016|694000  |      ;
 	dey                                  ;0C9019|88      |      ;
 	bne WorldInput_UpdateCamera                      ;0C901A|D0EE    |0C900A;
-	stz.W $2118                          ;0C901C|9C1821  |0C2118;
-	stz.W $2118                          ;0C901F|9C1821  |0C2118;
-	stz.W $2118                          ;0C9022|9C1821  |0C2118;
-	stz.W $2118                          ;0C9025|9C1821  |0C2118;
-	stz.W $2118                          ;0C9028|9C1821  |0C2118;
-	stz.W $2118                          ;0C902B|9C1821  |0C2118;
-	stz.W $2118                          ;0C902E|9C1821  |0C2118;
-	stz.W $2118                          ;0C9031|9C1821  |0C2118;
+	stz.W SNES_VMDATAL                          ;0C901C|9C1821  |0C2118;
+	stz.W SNES_VMDATAL                          ;0C901F|9C1821  |0C2118;
+	stz.W SNES_VMDATAL                          ;0C9022|9C1821  |0C2118;
+	stz.W SNES_VMDATAL                          ;0C9025|9C1821  |0C2118;
+	stz.W SNES_VMDATAL                          ;0C9028|9C1821  |0C2118;
+	stz.W SNES_VMDATAL                          ;0C902B|9C1821  |0C2118;
+	stz.W SNES_VMDATAL                          ;0C902E|9C1821  |0C2118;
+	stz.W SNES_VMDATAL                          ;0C9031|9C1821  |0C2118;
 	plx                                  ;0C9034|FA      |      ;
 	ply                                  ;0C9035|7A      |      ;
 	rts                                  ;0C9036|60      |      ;
@@ -1905,9 +1905,9 @@ Camera_ApplyLimits:
 ;      |        |      ;
 ;      |        |      ;
 UpdateMode7Matrix:
-	stz.W $2115                          ;0C90F9|9C1521  |0C2115;
+	stz.W SNES_VMAINC                          ;0C90F9|9C1521  |0C2115;
 	ldx.W #$6000                         ;0C90FC|A20060  |      ;
-	stx.W $2116                          ;0C90FF|8E1621  |0C2116;
+	stx.W SNES_VMADDL                          ;0C90FF|8E1621  |0C2116;
 	ldx.W #$1808                         ;0C9102|A20818  |      ;
 	stx.W $4300                          ;0C9105|8E0043  |0C4300;
 	ldx.W #$9140                         ;0C9108|A24091  |      ;
@@ -1919,9 +1919,9 @@ UpdateMode7Matrix:
 	lda.B #$01                           ;0C9119|A901    |      ;
 	sta.W $420b                          ;0C911B|8D0B42  |0C420B;
 	lda.B #$80                           ;0C911E|A980    |      ;
-	sta.W $2115                          ;0C9120|8D1521  |0C2115;
+	sta.W SNES_VMAINC                          ;0C9120|8D1521  |0C2115;
 	ldx.W #$6000                         ;0C9123|A20060  |      ;
-	stx.W $2116                          ;0C9126|8E1621  |0C2116;
+	stx.W SNES_VMADDL                          ;0C9126|8E1621  |0C2116;
 	lda.B #$19                           ;0C9129|A919    |      ;
 	sta.W $4301                          ;0C912B|8D0143  |0C4301;
 	ldx.W #$9141                         ;0C912E|A24191  |      ;
