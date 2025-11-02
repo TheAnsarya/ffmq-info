@@ -252,7 +252,7 @@ Field_FrameLoop:
 	jsr.W Field_DispatchMode                    ;0182B2|20F282  |0182F2;
 	lda.W $19b0                          ;0182B5|ADB019  |0119B0;
 	beq Field_CheckScript                      ;0182B8|F004    |0182BE;
-	jsl.L CODE_01B24C                    ;0182BA|224CB201|01B24C;
+	jsl.L DMA_QueueTransfer                    ;0182BA|224CB201|01B24C;
 ;      |        |      ;
 Field_CheckScript:
 	lda.W $19f8                          ;0182BE|ADF819  |0119F8;
@@ -2050,7 +2050,7 @@ Field_LoadMap:
 	sty.W $0e89                          ;01917D|8C890E  |010E89;
 	jsl.L CODE_0B8223                    ;019180|2223820B|0B8223;
 	jsl.L CODE_0B8560                    ;019184|2260850B|0B8560;
-	jsr.W CODE_01C751                    ;019188|2051C7  |01C751;
+	jsr.W Menu_MoveCursorRight                    ;019188|2051C7  |01C751;
 	ldx.W #$0000                         ;01918B|A20000  |      ;
 	stx.W $1908                          ;01918E|8E0819  |011908;
 	stx.W $190a                          ;019191|8E0A19  |01190A;
@@ -2103,12 +2103,12 @@ Field_MapDataLoad:
 	sta.W $19f5                          ;019219|8DF519  |0119F5;
 	lda.B #$26                           ;01921C|A926    |      ;
 	sta.W $19ef                          ;01921E|8DEF19  |0119EF;
-	jsl.L CODE_01B24C                    ;019221|224CB201|01B24C;
+	jsl.L DMA_QueueTransfer                    ;019221|224CB201|01B24C;
 	lda.W $19f6                          ;019225|ADF619  |0119F6;
 	beq MapEvent_InitComplete                      ;019228|F00A    |019234;
 	ldx.W #$2502                         ;01922A|A20225  |      ;
 	stx.W $19ee                          ;01922D|8EEE19  |0119EE;
-	jsl.L CODE_01B24C                    ;019230|224CB201|01B24C;
+	jsl.L DMA_QueueTransfer                    ;019230|224CB201|01B24C;
 ;      |        |      ;
 MapEvent_InitComplete:
 	pla                                  ;019234|68      |      ;
@@ -2253,7 +2253,7 @@ MapEvent_ScrollWithDialog:
 	ldx.W $19f1                          ;019372|AEF119  |0119F1;
 	stx.W $0e89                          ;019375|8E890E  |010E89;
 	lda.B #$33                           ;019378|A933    |      ;
-	jsr.W CODE_01BAAD                    ;01937A|20ADBA  |01BAAD;
+	jsr.W Sound_PlayEffect                    ;01937A|20ADBA  |01BAAD;
 	jsr.W CODE_01C95F                    ;01937D|205FC9  |01C95F;
 	ldy.W #$0004                         ;019380|A00400  |      ;
 	jsr.W CODE_01F7C7                    ;019383|20C7F7  |01F7C7;
@@ -2608,12 +2608,12 @@ Dialog_UpdateFrame:
 	ldx.W $192b                          ;01962F|AE2B19  |01192B;
 	stx.W $195f                          ;019632|8E5F19  |01195F;
 	lda.B #$22                           ;019635|A922    |      ;
-	jsr.W CODE_01BAAD                    ;019637|20ADBA  |01BAAD;
+	jsr.W Sound_PlayEffect                    ;019637|20ADBA  |01BAAD;
 ;      |        |      ;
 Dialog_CheckEndCondition:
 	dec.W $1926                          ;01963A|CE2619  |011926;
 	bpl Dialog_MainLoop                      ;01963D|10AE    |0195ED;
-	jsr.W CODE_01C450                    ;01963F|2050C4  |01C450;
+	jsr.W Battle_CheckVictory                    ;01963F|2050C4  |01C450;
 	jsr.W Field_CameraUpdate                    ;019642|20838B  |018B83;
 	plb                                  ;019645|AB      |      ;
 	rts                                  ;019646|60      |      ;
@@ -2799,7 +2799,7 @@ VRAM_UpdateComplete:
 ;      |        |      ;
 ;      |        |      ;
 VRAM_TriggerDMA:
-	jsl.L CODE_01B24C                    ;019782|224CB201|01B24C;
+	jsl.L DMA_QueueTransfer                    ;019782|224CB201|01B24C;
 	rts                                  ;019786|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
@@ -2810,7 +2810,7 @@ ScreenEffect_Initialize:
 	pea.W $192b                          ;01978C|F42B19  |01192B;
 	pld                                  ;01978F|2B      |      ;
 	lda.B #$02                           ;019790|A902    |      ;
-	jsr.W CODE_01BAAD                    ;019792|20ADBA  |01BAAD;
+	jsr.W Sound_PlayEffect                    ;019792|20ADBA  |01BAAD;
 	jsr.W Field_CameraScroll                    ;019795|20768B  |018B76;
 	lda.B #$00                           ;019798|A900    |      ;
 	xba                                  ;01979A|EB      |      ;
@@ -2864,7 +2864,7 @@ ScreenEffect_UpdateFrame:
 	dec a;0197EC|3A      |      ;
 	sta.W $1926                          ;0197ED|8D2619  |011926;
 	bpl ScreenEffect_MainLoop                      ;0197F0|10C7    |0197B9;
-	jsr.W CODE_01C450                    ;0197F2|2050C4  |01C450;
+	jsr.W Battle_CheckVictory                    ;0197F2|2050C4  |01C450;
 	jsr.W Field_CameraUpdate                    ;0197F5|20838B  |018B83;
 	pld                                  ;0197F8|2B      |      ;
 	rts                                  ;0197F9|60      |      ;
@@ -2956,7 +2956,7 @@ ScreenEffect_SetupSprite:
 	jsr.W (DATA8_0198a7,x)               ;019898|FCA798  |0198A7;
 	lda.B #$f2                           ;01989B|A9F2    |      ;
 	sta.W $050a                          ;01989D|8D0A05  |01050A;
-	jsr.W CODE_01C450                    ;0198A0|2050C4  |01C450;
+	jsr.W Battle_CheckVictory                    ;0198A0|2050C4  |01C450;
 	jsr.W Field_CameraUpdate                    ;0198A3|20838B  |018B83;
 	rts                                  ;0198A6|60      |      ;
 ;      |        |      ;
@@ -3450,7 +3450,7 @@ Char_CalculateSpeed:
 	phb                                  ;019CF7|8B      |      ;
 	jsr.W Field_CameraScroll                    ;019CF8|20768B  |018B76;
 	lda.B #$29                           ;019CFB|A929    |      ;
-	jsr.W CODE_01BAAD                    ;019CFD|20ADBA  |01BAAD;
+	jsr.W Sound_PlayEffect                    ;019CFD|20ADBA  |01BAAD;
 	ldx.W $0e89                          ;019D00|AE890E  |010E89;
 	stx.W $193f                          ;019D03|8E3F19  |01193F;
 	lda.W $1926                          ;019D06|AD2619  |011926;
@@ -3636,7 +3636,7 @@ Char_JumpCalculate:
 	stx.W $0e89                          ;019E7D|8E890E  |010E89;
 ;      |        |      ;
 Char_JumpApply:
-	jsr.W CODE_01C450                    ;019E80|2050C4  |01C450;
+	jsr.W Battle_CheckVictory                    ;019E80|2050C4  |01C450;
 	sep #$20                             ;019E83|E220    |      ;
 	rep #$10                             ;019E85|C210    |      ;
 	lda.W $19cb                          ;019E87|ADCB19  |0119CB;
@@ -4776,7 +4776,7 @@ Entity_LoadEnd:
 ;      |        |      ;
 Entity_ValidateSlot:
 	stz.W $1948                          ;01A6F2|9C4819  |001948;
-	jsr.W CODE_01B078                    ;01A6F5|2078B0  |01B078;
+	jsr.W Trigger_CheckValid                    ;01A6F5|2078B0  |01B078;
 	bcc Entity_SetupData                      ;01A6F8|9002    |01A6FC;
 	sec                                  ;01A6FA|38      |      ;
 	rts                                  ;01A6FB|60      |      ;
@@ -6076,7 +6076,7 @@ Collision_EntityComplete:
 	lda.W $1983                          ;01AFFA|AD8319  |001983;
 	and.B #$70                           ;01AFFD|2970    |      ;
 	cmp.B #$70                           ;01AFFF|C970    |      ;
-	beq CODE_01B00B                      ;01B001|F008    |01B00B;
+	beq Palette_ProcessComplete                      ;01B001|F008    |01B00B;
 	lsr a;01B003|4A      |      ;
 	lsr a;01B004|4A      |      ;
 	lsr a;01B005|4A      |      ;
@@ -6084,7 +6084,7 @@ Collision_EntityComplete:
 	tax                                  ;01B007|AA      |      ;
 	jsr.W (DATA8_01b00f,x)               ;01B008|FC0FB0  |01B00F;
 ;      |        |      ;
-CODE_01B00B:
+Palette_ProcessComplete:
 	ply                                  ;01B00B|7A      |      ;
 	plx                                  ;01B00C|FA      |      ;
 	plp                                  ;01B00D|28      |      ;
@@ -6097,7 +6097,7 @@ DATA8_01b00f:
 	lda.W $1a54                          ;01B018|AD541A  |001A54;
 	sta.W $1989                          ;01B01B|8D8919  |001989;
 	sta.W $198a                          ;01B01E|8D8A19  |00198A;
-	jmp.W CODE_01B051                    ;01B021|4C51B0  |01B051;
+	jmp.W Palette_ApplyPriority                    ;01B021|4C51B0  |01B051;
 ;      |        |      ;
 	tyx                                  ;01B024|BB      |      ;
 	lda.W $1a54                          ;01B025|AD541A  |001A54;
@@ -6105,7 +6105,7 @@ DATA8_01b00f:
 	sec                                  ;01B02B|38      |      ;
 	sbc.B #$10                           ;01B02C|E910    |      ;
 	sta.W $198a                          ;01B02E|8D8A19  |00198A;
-	jmp.W CODE_01B051                    ;01B031|4C51B0  |01B051;
+	jmp.W Palette_ApplyPriority                    ;01B031|4C51B0  |01B051;
 ;      |        |      ;
 	tyx                                  ;01B034|BB      |      ;
 	lda.W $1a54                          ;01B035|AD541A  |001A54;
@@ -6113,7 +6113,7 @@ DATA8_01b00f:
 	sec                                  ;01B03B|38      |      ;
 	sbc.B #$10                           ;01B03C|E910    |      ;
 	sta.W $1989                          ;01B03E|8D8919  |001989;
-	jmp.W CODE_01B051                    ;01B041|4C51B0  |01B051;
+	jmp.W Palette_ApplyPriority                    ;01B041|4C51B0  |01B051;
 ;      |        |      ;
 	tyx                                  ;01B044|BB      |      ;
 	lda.W $1a54                          ;01B045|AD541A  |001A54;
@@ -6122,7 +6122,7 @@ DATA8_01b00f:
 	sta.W $1989                          ;01B04B|8D8919  |001989;
 	sta.W $198a                          ;01B04E|8D8A19  |00198A;
 ;      |        |      ;
-CODE_01B051:
+Palette_ApplyPriority:
 	pha                                  ;01B051|48      |      ;
 	lda.B $02,x                          ;01B052|B502    |001A74;
 	and.B #$cf                           ;01B054|29CF    |      ;
@@ -6144,22 +6144,22 @@ CODE_01B051:
 	rts                                  ;01B077|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
-CODE_01B078:
+Trigger_CheckValid:
 	lda.W $1935                          ;01B078|AD3519  |001935;
 	clc                                  ;01B07B|18      |      ;
 	adc.B #$05                           ;01B07C|6905    |      ;
 	jsr.W Field_CheckEntityCollision                    ;01B07E|20DD90  |0190DD;
 	and.B #$18                           ;01B081|2918    |      ;
-	beq CODE_01B0B8                      ;01B083|F033    |01B0B8;
+	beq Trigger_ValidateType                      ;01B083|F033    |01B0B8;
 	cmp.B #$18                           ;01B085|C918    |      ;
-	beq CODE_01B0B8                      ;01B087|F02F    |01B0B8;
+	beq Trigger_ValidateType                      ;01B087|F02F    |01B0B8;
 	cmp.B #$10                           ;01B089|C910    |      ;
-	bne CODE_01B0AD                      ;01B08B|D020    |01B0AD;
+	bne Trigger_CheckSpecial                      ;01B08B|D020    |01B0AD;
 	lda.W $1935                          ;01B08D|AD3519  |001935;
 	inc a;01B090|1A      |      ;
 	jsr.W Field_CheckEntityCollision                    ;01B091|20DD90  |0190DD;
 	cmp.B #$1d                           ;01B094|C91D    |      ;
-	bcc CODE_01B0B8                      ;01B096|9020    |01B0B8;
+	bcc Trigger_ValidateType                      ;01B096|9020    |01B0B8;
 	phd                                  ;01B098|0B      |      ;
 	pea.W $0ec8                          ;01B099|F4C80E  |000EC8;
 	pld                                  ;01B09C|2B      |      ;
@@ -6167,82 +6167,82 @@ CODE_01B078:
 	pld                                  ;01B0A1|2B      |      ;
 	inc a;01B0A2|1A      |      ;
 	dec a;01B0A3|3A      |      ;
-	beq CODE_01B0B8                      ;01B0A4|F012    |01B0B8;
+	beq Trigger_ValidateType                      ;01B0A4|F012    |01B0B8;
 	lda.B #$01                           ;01B0A6|A901    |      ;
 	sta.W $1948                          ;01B0A8|8D4819  |001948;
-	bra CODE_01B0C4                      ;01B0AB|8017    |01B0C4;
+	bra Trigger_ReturnInvalid                      ;01B0AB|8017    |01B0C4;
 ;      |        |      ;
 ;      |        |      ;
-CODE_01B0AD:
+Trigger_CheckSpecial:
 	lda.W $193b                          ;01B0AD|AD3B19  |00193B;
 	sta.W $19e6                          ;01B0B0|8DE619  |0019E6;
 	jsr.W CODE_01E097                    ;01B0B3|2097E0  |01E097;
-	bne CODE_01B0C6                      ;01B0B6|D00E    |01B0C6;
+	bne Trigger_ReturnValid                      ;01B0B6|D00E    |01B0C6;
 ;      |        |      ;
-CODE_01B0B8:
+Trigger_ValidateType:
 	lda.W $1935                          ;01B0B8|AD3519  |001935;
 	jsr.W Field_CheckEntityCollision                    ;01B0BB|20DD90  |0190DD;
 	jsl.L CODE_009776                    ;01B0BE|22769700|009776;
-	beq CODE_01B0C6                      ;01B0C2|F002    |01B0C6;
+	beq Trigger_ReturnValid                      ;01B0C2|F002    |01B0C6;
 ;      |        |      ;
-CODE_01B0C4:
+Trigger_ReturnInvalid:
 	clc                                  ;01B0C4|18      |      ;
 	rts                                  ;01B0C5|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
-CODE_01B0C6:
+Trigger_ReturnValid:
 	sec                                  ;01B0C6|38      |      ;
 	rts                                  ;01B0C7|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
-CODE_01B0C8:
+Trigger_ScanAll:
 	lda.B #$08                           ;01B0C8|A908    |      ;
 	sta.W $1935                          ;01B0CA|8D3519  |011935;
 	stz.W $193b                          ;01B0CD|9C3B19  |01193B;
 ;      |        |      ;
-CODE_01B0D0:
+Trigger_ScanLoop:
 	lda.W $1935                          ;01B0D0|AD3519  |011935;
 	jsr.W Field_CheckEntityCollision                    ;01B0D3|20DD90  |0190DD;
 	cmp.B #$ff                           ;01B0D6|C9FF    |      ;
-	beq CODE_01B118                      ;01B0D8|F03E    |01B118;
-	jsr.W CODE_01B078                    ;01B0DA|2078B0  |01B078;
-	bcs CODE_01B10B                      ;01B0DD|B02C    |01B10B;
+	beq Trigger_ScanEnd                      ;01B0D8|F03E    |01B118;
+	jsr.W Trigger_CheckValid                    ;01B0DA|2078B0  |01B078;
+	bcs Trigger_ProcessSpecial                      ;01B0DD|B02C    |01B10B;
 	lda.W $193b                          ;01B0DF|AD3B19  |01193B;
-	jsr.W CODE_01B1EB                    ;01B0E2|20EBB1  |01B1EB;
-	bcs CODE_01B0FD                      ;01B0E5|B016    |01B0FD;
+	jsr.W Sprite_CheckActive                    ;01B0E2|20EBB1  |01B1EB;
+	bcs Trigger_NextEntry                      ;01B0E5|B016    |01B0FD;
 	ldx.W $1935                          ;01B0E7|AE3519  |011935;
 	phx                                  ;01B0EA|DA      |      ;
 	ldx.W $193b                          ;01B0EB|AE3B19  |01193B;
 	phx                                  ;01B0EE|DA      |      ;
 	lda.W $193b                          ;01B0EF|AD3B19  |01193B;
-	jsr.W CODE_01B172                    ;01B0F2|2072B1  |01B172;
+	jsr.W Sprite_CalculateIndex                    ;01B0F2|2072B1  |01B172;
 	plx                                  ;01B0F5|FA      |      ;
 	stx.W $193b                          ;01B0F6|8E3B19  |01193B;
 	plx                                  ;01B0F9|FA      |      ;
 	stx.W $1935                          ;01B0FA|8E3519  |011935;
 ;      |        |      ;
-CODE_01B0FD:
+Trigger_NextEntry:
 	inc.W $193b                          ;01B0FD|EE3B19  |01193B;
 	lda.W $1935                          ;01B100|AD3519  |011935;
 	clc                                  ;01B103|18      |      ;
 	adc.B #$07                           ;01B104|6907    |      ;
 	sta.W $1935                          ;01B106|8D3519  |011935;
-	bra CODE_01B0D0                      ;01B109|80C5    |01B0D0;
+	bra Trigger_ScanLoop                      ;01B109|80C5    |01B0D0;
 ;      |        |      ;
 ;      |        |      ;
-CODE_01B10B:
+Trigger_ProcessSpecial:
 	lda.W $193b                          ;01B10B|AD3B19  |01193B;
-	jsr.W CODE_01B1EB                    ;01B10E|20EBB1  |01B1EB;
-	bcc CODE_01B0FD                      ;01B111|90EA    |01B0FD;
-	jsr.W CODE_01B1B6                    ;01B113|20B6B1  |01B1B6;
-	bra CODE_01B0FD                      ;01B116|80E5    |01B0FD;
+	jsr.W Sprite_CheckActive                    ;01B10E|20EBB1  |01B1EB;
+	bcc Trigger_NextEntry                      ;01B111|90EA    |01B0FD;
+	jsr.W Sprite_ClearSlot                    ;01B113|20B6B1  |01B1B6;
+	bra Trigger_NextEntry                      ;01B116|80E5    |01B0FD;
 ;      |        |      ;
 ;      |        |      ;
-CODE_01B118:
+Trigger_ScanEnd:
 	rts                                  ;01B118|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
-CODE_01B119:
+Sprite_WriteTileData:
 	php                                  ;01B119|08      |      ;
 	phd                                  ;01B11A|0B      |      ;
 	pea.W $1a62                          ;01B11B|F4621A  |011A62;
@@ -6288,14 +6288,14 @@ CODE_01B119:
 	rts                                  ;01B168|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
-CODE_01B169:
+Sprite_ProcessEffect:
 	lda.W $19ee                          ;01B169|ADEE19  |0119EE;
 	and.B #$0f                           ;01B16C|290F    |      ;
-	jsr.W CODE_01B172                    ;01B16E|2072B1  |01B172;
+	jsr.W Sprite_CalculateIndex                    ;01B16E|2072B1  |01B172;
 	rts                                  ;01B171|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
-CODE_01B172:
+Sprite_CalculateIndex:
 	sta.W $193b                          ;01B172|8D3B19  |01193B;
 	sta.W $4202                          ;01B175|8D0242  |014202;
 	lda.B #$07                           ;01B178|A907    |      ;
@@ -6309,7 +6309,7 @@ CODE_01B172:
 	sta.W $1935                          ;01B18A|8D3519  |011935;
 	sep #$20                             ;01B18D|E220    |      ;
 	lda.W $193b                          ;01B18F|AD3B19  |01193B;
-	jsr.W CODE_01B21B                    ;01B192|201BB2  |01B21B;
+	jsr.W Sprite_ProcessPriority                    ;01B192|201BB2  |01B21B;
 	stx.W $1939                          ;01B195|8E3919  |011939;
 	phx                                  ;01B198|DA      |      ;
 	lda.W $193b                          ;01B199|AD3B19  |01193B;
@@ -6326,14 +6326,14 @@ CODE_01B172:
 	rts                                  ;01B1AD|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
-CODE_01B1AE:
+Sprite_WriteOAM:
 	lda.W $19ee                          ;01B1AE|ADEE19  |0119EE;
 	and.B #$0f                           ;01B1B1|290F    |      ;
 ;      |        |      ;
-CODE_01B1B3:
-	jsr.W CODE_01B1EB                    ;01B1B3|20EBB1  |01B1EB;
+Sprite_OAMLoop:
+	jsr.W Sprite_CheckActive                    ;01B1B3|20EBB1  |01B1EB;
 ;      |        |      ;
-CODE_01B1B6:
+Sprite_ClearSlot:
 	asl a;01B1B6|0A      |      ;
 	asl a;01B1B7|0A      |      ;
 	xba                                  ;01B1B8|EB      |      ;
@@ -6343,11 +6343,11 @@ CODE_01B1B6:
 	inx                                  ;01B1BF|E8      |      ;
 	ldy.W #$0019                         ;01B1C0|A01900  |      ;
 ;      |        |      ;
-CODE_01B1C3:
+Sprite_HideSlot:
 	stz.W $1a72,x                        ;01B1C3|9E721A  |011A72;
 	inx                                  ;01B1C6|E8      |      ;
 	dey                                  ;01B1C7|88      |      ;
-	bne CODE_01B1C3                      ;01B1C8|D0F9    |01B1C3;
+	bne Sprite_HideSlot                      ;01B1C8|D0F9    |01B1C3;
 	xba                                  ;01B1CA|EB      |      ;
 	tax                                  ;01B1CB|AA      |      ;
 	ldy.W DATA8_01a63a,x                 ;01B1CC|BC3AA6  |01A63A;
@@ -6364,7 +6364,7 @@ CODE_01B1C3:
 	rts                                  ;01B1EA|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
-CODE_01B1EB:
+Sprite_CheckActive:
 	phd                                  ;01B1EB|0B      |      ;
 	pea.W $1a62                          ;01B1EC|F4621A  |011A62;
 	pld                                  ;01B1EF|2B      |      ;
@@ -6375,11 +6375,11 @@ CODE_01B1EB:
 	xba                                  ;01B1F7|EB      |      ;
 	ldx.W #$0000                         ;01B1F8|A20000  |      ;
 ;      |        |      ;
-CODE_01B1FB:
+Sprite_ValidateSlot:
 	cmp.B $29,x                          ;01B1FB|D529    |001A8B;
-	beq CODE_01B216                      ;01B1FD|F017    |01B216;
+	beq Sprite_SlotInvalid                      ;01B1FD|F017    |01B216;
 	dec.B $00                            ;01B1FF|C600    |001A62;
-	beq CODE_01B213                      ;01B201|F010    |01B213;
+	beq Sprite_SlotValid                      ;01B201|F010    |01B213;
 	inc.B $01                            ;01B203|E601    |001A63;
 	pha                                  ;01B205|48      |      ;
 	rep #$20                             ;01B206|C220    |      ;
@@ -6389,23 +6389,23 @@ CODE_01B1FB:
 	tax                                  ;01B20D|AA      |      ;
 	sep #$20                             ;01B20E|E220    |      ;
 	pla                                  ;01B210|68      |      ;
-	bra CODE_01B1FB                      ;01B211|80E8    |01B1FB;
+	bra Sprite_ValidateSlot                      ;01B211|80E8    |01B1FB;
 ;      |        |      ;
 ;      |        |      ;
-CODE_01B213:
+Sprite_SlotValid:
 	pld                                  ;01B213|2B      |      ;
 	clc                                  ;01B214|18      |      ;
 	rts                                  ;01B215|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
-CODE_01B216:
+Sprite_SlotInvalid:
 	lda.B $01                            ;01B216|A501    |001A63;
 	pld                                  ;01B218|2B      |      ;
 	sec                                  ;01B219|38      |      ;
 	rts                                  ;01B21A|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
-CODE_01B21B:
+Sprite_ProcessPriority:
 	phd                                  ;01B21B|0B      |      ;
 	pea.W $1a62                          ;01B21C|F4621A  |011A62;
 	pld                                  ;01B21F|2B      |      ;
@@ -6414,9 +6414,9 @@ CODE_01B21B:
 	ldx.W #$0000                         ;01B224|A20000  |      ;
 	ldy.W #$0000                         ;01B227|A00000  |      ;
 ;      |        |      ;
-CODE_01B22A:
+Sprite_ApplyPalette:
 	lda.B $10,x                          ;01B22A|B510    |001A72;
-	bmi CODE_01B244                      ;01B22C|3016    |01B244;
+	bmi Sprite_UpdatePalette                      ;01B22C|3016    |01B244;
 	iny                                  ;01B22E|C8      |      ;
 	dec.B $00                            ;01B22F|C600    |001A62;
 	beq UNREACH_01B241                   ;01B231|F00E    |01B241;
@@ -6428,20 +6428,20 @@ CODE_01B22A:
 	tax                                  ;01B23B|AA      |      ;
 	sep #$20                             ;01B23C|E220    |      ;
 	pla                                  ;01B23E|68      |      ;
-	bra CODE_01B22A                      ;01B23F|80E9    |01B22A;
+	bra Sprite_ApplyPalette                      ;01B23F|80E9    |01B22A;
 ;      |        |      ;
 ;      |        |      ;
 UNREACH_01B241:
 	db $2b,$18,$60                       ;01B241|        |      ;
 ;      |        |      ;
-CODE_01B244:
+Sprite_UpdatePalette:
 	pld                                  ;01B244|2B      |      ;
 	sec                                  ;01B245|38      |      ;
 	rts                                  ;01B246|60      |      ;
 ;      |        |      ;
 	db $22,$4c,$b2,$01,$60               ;01B247|        |01B24C;
 ;      |        |      ;
-CODE_01B24C:
+DMA_QueueTransfer:
 	php                                  ;01B24C|08      |      ;
 	phb                                  ;01B24D|8B      |      ;
 	phd                                  ;01B24E|0B      |      ;
@@ -6453,16 +6453,16 @@ CODE_01B24C:
 	jsr.W Field_CameraScroll                    ;01B255|20768B  |018B76;
 	lda.W $19ee                          ;01B258|ADEE19  |0119EE;
 	cmp.W #$ffff                         ;01B25B|C9FFFF  |      ;
-	beq CODE_01B28D                      ;01B25E|F02D    |01B28D;
+	beq DMA_ConfigureMode                      ;01B25E|F02D    |01B28D;
 	lda.W $19ef                          ;01B260|ADEF19  |0119EF;
 	and.W #$00ff                         ;01B263|29FF00  |      ;
 	cmp.W #$0040                         ;01B266|C94000  |      ;
-	bcc CODE_01B285                      ;01B269|901A    |01B285;
+	bcc DMA_SetupChannel                      ;01B269|901A    |01B285;
 	and.W #$00f0                         ;01B26B|29F000  |      ;
 	cmp.W #$0030                         ;01B26E|C93000  |      ;
-	beq CODE_01B28D                      ;01B271|F01A    |01B28D;
+	beq DMA_ConfigureMode                      ;01B271|F01A    |01B28D;
 	cmp.W #$0080                         ;01B273|C98000  |      ;
-	bcs CODE_01B28D                      ;01B276|B015    |01B28D;
+	bcs DMA_ConfigureMode                      ;01B276|B015    |01B28D;
 	sec                                  ;01B278|38      |      ;
 	sbc.W #$0040                         ;01B279|E94000  |      ;
 	lsr a;01B27C|4A      |      ;
@@ -6470,16 +6470,16 @@ CODE_01B24C:
 	lsr a;01B27E|4A      |      ;
 	tax                                  ;01B27F|AA      |      ;
 	jsr.W (DATA8_01c402,x)               ;01B280|FC02C4  |01C402;
-	bra CODE_01B28D                      ;01B283|8008    |01B28D;
+	bra DMA_ConfigureMode                      ;01B283|8008    |01B28D;
 ;      |        |      ;
 ;      |        |      ;
-CODE_01B285:
+DMA_SetupChannel:
 	asl a;01B285|0A      |      ;
 	tax                                  ;01B286|AA      |      ;
 	lda.W #$0000                         ;01B287|A90000  |      ;
 	jsr.W (DATA8_01c3a6,x)               ;01B28A|FCA6C3  |01C3A6;
 ;      |        |      ;
-CODE_01B28D:
+DMA_ConfigureMode:
 	jsl.L CODE_0096A0                    ;01B28D|22A09600|0096A0;
 	jsr.W Field_CameraUpdate                    ;01B291|20838B  |018B83;
 	stz.W $19b0                          ;01B294|9CB019  |0019B0;
@@ -6491,10 +6491,10 @@ CODE_01B28D:
 	rtl                                  ;01B29C|6B      |      ;
 ;      |        |      ;
 ;      |        |      ;
-CODE_01B29D:
+DMA_SetAddress:
 	ldx.W #$f4a0                         ;01B29D|A2A0F4  |      ;
 ;      |        |      ;
-CODE_01B2A0:
+DMA_SetLength:
 	lda.W $19ee                          ;01B2A0|ADEE19  |0119EE;
 	and.W #$00ff                         ;01B2A3|29FF00  |      ;
 	sta.W $192b                          ;01B2A6|8D2B19  |01192B;
@@ -6513,7 +6513,7 @@ CODE_01B2A0:
 	plb                                  ;01B2BF|AB      |      ;
 	pla                                  ;01B2C0|68      |      ;
 ;      |        |      ;
-CODE_01B2C1:
+DMA_Execute:
 	lda.W $0000,x                        ;01B2C1|BD0000  |050000;
 	sta.W $19f0                          ;01B2C4|8DF019  |0519F0;
 	lda.W $0001,x                        ;01B2C7|BD0100  |050001;
@@ -6532,11 +6532,11 @@ CODE_01B2C1:
 	jmp.W Field_DispatchMode                    ;01B2E3|4CF282  |0182F2;
 ;      |        |      ;
 	ldx.W #$f79a                         ;01B2E6|A29AF7  |      ;
-	bra CODE_01B2A0                      ;01B2E9|80B5    |01B2A0;
+	bra DMA_SetLength                      ;01B2E9|80B5    |01B2A0;
 ;      |        |      ;
 ;      |        |      ;
-CODE_01B2EB:
-	jsr.W CODE_01C40A                    ;01B2EB|200AC4  |01C40A;
+DMA_Complete:
+	jsr.W Battle_ProcessTurn                    ;01B2EB|200AC4  |01C40A;
 	lda.W $19ee                          ;01B2EE|ADEE19  |0119EE;
 	and.W #$00ff                         ;01B2F1|29FF00  |      ;
 	sta.W $192b                          ;01B2F4|8D2B19  |01192B;
@@ -6564,11 +6564,11 @@ CODE_01B2EB:
 ;      |        |      ;
 	sep #$20                             ;01B329|E220    |      ;
 	rep #$10                             ;01B32B|C210    |      ;
-	jsr.W CODE_01C42D                    ;01B32D|202DC4  |01C42D;
+	jsr.W Battle_UpdateStatus                    ;01B32D|202DC4  |01C42D;
 	lda.B #$01                           ;01B330|A901    |      ;
 	jmp.W Field_DispatchMode                    ;01B332|4CF282  |0182F2;
 ;      |        |      ;
-	jmp.W CODE_01B29D                    ;01B335|4C9DB2  |01B29D;
+	jmp.W DMA_SetAddress                    ;01B335|4C9DB2  |01B29D;
 ;      |        |      ;
 	lda.W $0e89                          ;01B338|AD890E  |010E89;
 	sep #$20                             ;01B33B|E220    |      ;
@@ -6579,7 +6579,7 @@ CODE_01B2EB:
 	jsr.W CODE_01FD51                    ;01B341|2051FD  |01FD51;
 	sty.W $0e89                          ;01B344|8C890E  |010E89;
 	rep #$20                             ;01B347|C220    |      ;
-	bra CODE_01B2EB                      ;01B349|80A0    |01B2EB;
+	bra DMA_Complete                      ;01B349|80A0    |01B2EB;
 ;      |        |      ;
 	lda.W $19ee                          ;01B34B|ADEE19  |0119EE;
 	and.W #$00ff                         ;01B34E|29FF00  |      ;
@@ -6597,7 +6597,7 @@ CODE_01B2EB:
 	lda.W $0000,x                        ;01B362|BD0000  |050000;
 	sta.W $0e88                          ;01B365|8D880E  |050E88;
 	inx                                  ;01B368|E8      |      ;
-	jmp.W CODE_01B2C1                    ;01B369|4CC1B2  |01B2C1;
+	jmp.W DMA_Execute                    ;01B369|4CC1B2  |01B2C1;
 ;      |        |      ;
 	lda.W $19ee                          ;01B36C|ADEE19  |0119EE;
 	sec                                  ;01B36F|38      |      ;
@@ -6608,37 +6608,37 @@ CODE_01B2EB:
 ;      |        |      ;
 	sep #$20                             ;01B37B|E220    |      ;
 	rep #$10                             ;01B37D|C210    |      ;
-	jsr.W CODE_01C619                    ;01B37F|2019C6  |01C619;
+	jsr.W Battle_CalculateGold                    ;01B37F|2019C6  |01C619;
 	bcs UNREACH_01B395                   ;01B382|B011    |01B395;
 	lda.W $19ee                          ;01B384|ADEE19  |0119EE;
 	cmp.B #$f0                           ;01B387|C9F0    |      ;
-	beq CODE_01B396                      ;01B389|F00B    |01B396;
+	beq VRAM_BeginWrite                      ;01B389|F00B    |01B396;
 	cmp.B #$f1                           ;01B38B|C9F1    |      ;
-	beq CODE_01B39B                      ;01B38D|F00C    |01B39B;
-	jsr.W CODE_01B73C                    ;01B38F|203CB7  |01B73C;
-	jmp.W CODE_01C6A1                    ;01B392|4CA1C6  |01C6A1;
+	beq VRAM_WriteData                      ;01B38D|F00C    |01B39B;
+	jsr.W Mode7_WriteRegisters                    ;01B38F|203CB7  |01B73C;
+	jmp.W Menu_Initialize                    ;01B392|4CA1C6  |01C6A1;
 ;      |        |      ;
 ;      |        |      ;
 UNREACH_01B395:
 	db $60                               ;01B395|        |      ;
 ;      |        |      ;
-CODE_01B396:
+VRAM_BeginWrite:
 	ldx.W #$b8ad                         ;01B396|A2ADB8  |      ;
-	bra CODE_01B39E                      ;01B399|8003    |01B39E;
+	bra VRAM_WriteLoop                      ;01B399|8003    |01B39E;
 ;      |        |      ;
 ;      |        |      ;
-CODE_01B39B:
+VRAM_WriteData:
 	ldx.W #$b8b9                         ;01B39B|A2B9B8  |      ;
 ;      |        |      ;
-CODE_01B39E:
+VRAM_WriteLoop:
 	pea.W $0006                          ;01B39E|F40600  |010006;
 	plb                                  ;01B3A1|AB      |      ;
 	pla                                  ;01B3A2|68      |      ;
 ;      |        |      ;
-CODE_01B3A3:
+VRAM_WriteComplete:
 	lda.W $0000,x                        ;01B3A3|BD0000  |060000;
 	cmp.B #$ff                           ;01B3A6|C9FF    |      ;
-	beq CODE_01B3CE                      ;01B3A8|F024    |01B3CE;
+	beq VRAM_CopyBlock                      ;01B3A8|F024    |01B3CE;
 	sta.W $19ee                          ;01B3AA|8DEE19  |0619EE;
 	lda.B #$22                           ;01B3AD|A922    |      ;
 	sta.W $19ef                          ;01B3AF|8DEF19  |0619EF;
@@ -6647,20 +6647,20 @@ CODE_01B3A3:
 	phb                                  ;01B3B4|8B      |      ;
 	phk                                  ;01B3B5|4B      |      ;
 	plb                                  ;01B3B6|AB      |      ;
-	jsr.W CODE_01B73C                    ;01B3B7|203CB7  |01B73C;
+	jsr.W Mode7_WriteRegisters                    ;01B3B7|203CB7  |01B73C;
 	jsr.W CODE_01DF92                    ;01B3BA|2092DF  |01DF92;
 	lda.B #$08                           ;01B3BD|A908    |      ;
-	jsr.W CODE_01BAAD                    ;01B3BF|20ADBA  |01BAAD;
-	jsr.W CODE_01C6A1                    ;01B3C2|20A1C6  |01C6A1;
+	jsr.W Sound_PlayEffect                    ;01B3BF|20ADBA  |01BAAD;
+	jsr.W Menu_Initialize                    ;01B3C2|20A1C6  |01C6A1;
 	jsr.W CODE_01E028                    ;01B3C5|2028E0  |01E028;
 	plb                                  ;01B3C8|AB      |      ;
 	plp                                  ;01B3C9|28      |      ;
 	plx                                  ;01B3CA|FA      |      ;
 	inx                                  ;01B3CB|E8      |      ;
-	bra CODE_01B3A3                      ;01B3CC|80D5    |01B3A3;
+	bra VRAM_WriteComplete                      ;01B3CC|80D5    |01B3A3;
 ;      |        |      ;
 ;      |        |      ;
-CODE_01B3CE:
+VRAM_CopyBlock:
 	rts                                  ;01B3CE|60      |      ;
 ;      |        |      ;
 	db $ad,$ee,$19,$29,$0f,$00,$f0,$40,$8d,$2b,$19,$0a,$18,$6d,$2b,$19;01B3CF|        |0019EE;
@@ -6670,15 +6670,15 @@ CODE_01B3CE:
 	db $bf,$c1,$b8,$06,$22,$60,$97,$00,$60;01B40F|        |06B8C1;
 	sep #$20                             ;01B418|E220    |      ;
 	rep #$10                             ;01B41A|C210    |      ;
-	jsr.W CODE_01C65D                    ;01B41C|205DC6  |01C65D;
-	bcs CODE_01B42F                      ;01B41F|B00E    |01B42F;
+	jsr.W Battle_ProcessLevelUp                    ;01B41C|205DC6  |01C65D;
+	bcs VRAM_SetupTransfer                      ;01B41F|B00E    |01B42F;
 	lda.B #$33                           ;01B421|A933    |      ;
-	jsr.W CODE_01BAAD                    ;01B423|20ADBA  |01BAAD;
-	jsr.W CODE_01B73C                    ;01B426|203CB7  |01B73C;
+	jsr.W Sound_PlayEffect                    ;01B423|20ADBA  |01BAAD;
+	jsr.W Mode7_WriteRegisters                    ;01B426|203CB7  |01B73C;
 	jsr.W Entity_UpdateSprites                    ;01B429|20EEA9  |01A9EE;
-	jsr.W CODE_01C6A1                    ;01B42C|20A1C6  |01C6A1;
+	jsr.W Menu_Initialize                    ;01B42C|20A1C6  |01C6A1;
 ;      |        |      ;
-CODE_01B42F:
+VRAM_SetupTransfer:
 	rts                                  ;01B42F|60      |      ;
 ;      |        |      ;
 	db $08,$ae,$ee,$19,$da,$a9,$16,$00,$20,$ad,$ba,$20,$d2,$c9,$20,$d0;01B430|        |      ;
@@ -6686,7 +6686,7 @@ CODE_01B42F:
 	db $22,$4c,$b2,$01,$20,$76,$8b,$60   ;01B450|        |01B24C;
 	ldx.W #$bdeb                         ;01B458|A2EBBD  |      ;
 ;      |        |      ;
-CODE_01B45B:
+VRAM_Transfer:
 	sep #$20                             ;01B45B|E220    |      ;
 	rep #$10                             ;01B45D|C210    |      ;
 	phb                                  ;01B45F|8B      |      ;
@@ -6695,20 +6695,20 @@ CODE_01B45B:
 	pla                                  ;01B464|68      |      ;
 	xba                                  ;01B465|EB      |      ;
 ;      |        |      ;
-CODE_01B466:
+VRAM_TransferLoop:
 	lda.W $0000,x                        ;01B466|BD0000  |060000;
 	cmp.B #$ff                           ;01B469|C9FF    |      ;
-	beq CODE_01B4AE                      ;01B46B|F041    |01B4AE;
+	beq HDMA_Initialize                      ;01B46B|F041    |01B4AE;
 	cmp.W $0e91                          ;01B46D|CD910E  |060E91;
-	beq CODE_01B478                      ;01B470|F006    |01B478;
+	beq VRAM_TransferEnd                      ;01B470|F006    |01B478;
 	inx                                  ;01B472|E8      |      ;
 	inx                                  ;01B473|E8      |      ;
 	inx                                  ;01B474|E8      |      ;
 	inx                                  ;01B475|E8      |      ;
-	bra CODE_01B466                      ;01B476|80EE    |01B466;
+	bra VRAM_TransferLoop                      ;01B476|80EE    |01B466;
 ;      |        |      ;
 ;      |        |      ;
-CODE_01B478:
+VRAM_TransferEnd:
 	lda.W $0001,x                        ;01B478|BD0100  |060001;
 	sta.W $19f0                          ;01B47B|8DF019  |0619F0;
 	lda.W $0002,x                        ;01B47E|BD0200  |060002;
@@ -6724,24 +6724,24 @@ CODE_01B478:
 	sta.W $0e8b                          ;01B494|8D8B0E  |060E8B;
 	plb                                  ;01B497|AB      |      ;
 	lda.B #$2b                           ;01B498|A92B    |      ;
-	jsr.W CODE_01BAAD                    ;01B49A|20ADBA  |01BAAD;
-	jsr.W CODE_01C241                    ;01B49D|2041C2  |01C241;
-	jsr.W CODE_01C241                    ;01B4A0|2041C2  |01C241;
+	jsr.W Sound_PlayEffect                    ;01B49A|20ADBA  |01BAAD;
+	jsr.W Battle_Initialize                    ;01B49D|2041C2  |01C241;
+	jsr.W Battle_Initialize                    ;01B4A0|2041C2  |01C241;
 	jsr.W CODE_01CAB8                    ;01B4A3|20B8CA  |01CAB8;
 	jsr.W Field_WaitForVBlank                    ;01B4A6|20D082  |0182D0;
 	lda.B #$01                           ;01B4A9|A901    |      ;
 	jsr.W Field_DispatchMode                    ;01B4AB|20F282  |0182F2;
 ;      |        |      ;
-CODE_01B4AE:
+HDMA_Initialize:
 	rts                                  ;01B4AE|60      |      ;
 ;      |        |      ;
 	db $a2,$1b,$be,$80,$a7               ;01B4AF|        |      ;
 	ldx.W #$be2f                         ;01B4B4|A22FBE  |      ;
-	bra CODE_01B45B                      ;01B4B7|80A2    |01B45B;
+	bra VRAM_Transfer                      ;01B4B7|80A2    |01B45B;
 ;      |        |      ;
 	db $a2,$43,$be,$80,$9d               ;01B4B9|        |      ;
 	ldx.W #$be53                         ;01B4BE|A253BE  |      ;
-	bra CODE_01B45B                      ;01B4C1|8098    |01B45B;
+	bra VRAM_Transfer                      ;01B4C1|8098    |01B45B;
 ;      |        |      ;
 	db $a2,$5f,$be,$80,$93,$a2,$67,$be,$80,$8e,$a2,$6f,$be,$80,$89;01B4C3|        |      ;
 	lda.W $19ee                          ;01B4D2|ADEE19  |0119EE;
@@ -6762,7 +6762,7 @@ DATA8_01b4dd:
 	lda.W $1900                          ;01B4FA|AD0019  |011900;
 	tax                                  ;01B4FD|AA      |      ;
 ;      |        |      ;
-CODE_01B4FE:
+HDMA_Configure:
 	txa                                  ;01B4FE|8A      |      ;
 	sec                                  ;01B4FF|38      |      ;
 	sbc.W #$0002                         ;01B500|E90200  |      ;
@@ -6774,7 +6774,7 @@ CODE_01B4FE:
 	sta.W $1900                          ;01B50E|8D0019  |011900;
 	jsr.W Field_WaitForVBlank                    ;01B511|20D082  |0182D0;
 	dey                                  ;01B514|88      |      ;
-	bne CODE_01B4FE                      ;01B515|D0E7    |01B4FE;
+	bne HDMA_Configure                      ;01B515|D0E7    |01B4FE;
 	stx.W $1900                          ;01B517|8E0019  |011900;
 	rts                                  ;01B51A|60      |      ;
 ;      |        |      ;
@@ -6782,25 +6782,25 @@ CODE_01B4FE:
 	sep #$20                             ;01B525|E220    |      ;
 	rep #$10                             ;01B527|C210    |      ;
 ;      |        |      ;
-CODE_01B529:
+HDMA_SetupTable:
 	jsr.W Field_UpdateAndWait                    ;01B529|20D982  |0182D9;
 	dec.W $0110                          ;01B52C|CE1001  |010110;
-	bne CODE_01B529                      ;01B52F|D0F8    |01B529;
+	bne HDMA_SetupTable                      ;01B52F|D0F8    |01B529;
 	rts                                  ;01B531|60      |      ;
 ;      |        |      ;
 	sep #$20                             ;01B532|E220    |      ;
 	rep #$10                             ;01B534|C210    |      ;
 ;      |        |      ;
-CODE_01B536:
+HDMA_Enable:
 	jsr.W Field_UpdateAndWait                    ;01B536|20D982  |0182D9;
 	lda.W $0110                          ;01B539|AD1001  |010110;
 	cmp.B #$0f                           ;01B53C|C90F    |      ;
-	beq CODE_01B545                      ;01B53E|F005    |01B545;
+	beq HDMA_Disable                      ;01B53E|F005    |01B545;
 	inc.W $0110                          ;01B540|EE1001  |010110;
-	bra CODE_01B536                      ;01B543|80F1    |01B536;
+	bra HDMA_Enable                      ;01B543|80F1    |01B536;
 ;      |        |      ;
 ;      |        |      ;
-CODE_01B545:
+HDMA_Disable:
 	rts                                  ;01B545|60      |      ;
 ;      |        |      ;
 	lda.W $19ee                          ;01B546|ADEE19  |0119EE;
@@ -6843,7 +6843,7 @@ DATA8_01b551:
 	plb                                  ;01B5A8|AB      |      ;
 	plp                                  ;01B5A9|28      |      ;
 ;      |        |      ;
-CODE_01B5AA:
+Mode7_Initialize:
 	lda.W #$3000                         ;01B5AA|A90030  |      ;
 	clc                                  ;01B5AD|18      |      ;
 	adc.L $00192b                        ;01B5AE|6F2B1900|00192B;
@@ -6860,7 +6860,7 @@ CODE_01B5AA:
 	lda.W #$0800                         ;01B5CB|A90008  |      ;
 	sta.L $00192f                        ;01B5CE|8F2F1900|00192F;
 ;      |        |      ;
-CODE_01B5D2:
+Mode7_SetMatrix:
 	lda.W $0000,y                        ;01B5D2|B90000  |7F0000;
 	sta.W $0000,x                        ;01B5D5|9D0000  |7F0000;
 	iny                                  ;01B5D8|C8      |      ;
@@ -6870,7 +6870,7 @@ CODE_01B5D2:
 	lda.L $00192f                        ;01B5DC|AF2F1900|00192F;
 	dec a;01B5E0|3A      |      ;
 	sta.L $00192f                        ;01B5E1|8F2F1900|00192F;
-	bne CODE_01B5D2                      ;01B5E5|D0EB    |01B5D2;
+	bne Mode7_SetMatrix                      ;01B5E5|D0EB    |01B5D2;
 	php                                  ;01B5E7|08      |      ;
 	sep #$20                             ;01B5E8|E220    |      ;
 	rep #$10                             ;01B5EA|C210    |      ;
@@ -6881,7 +6881,7 @@ CODE_01B5D2:
 	lda.L $00192d                        ;01B5F6|AF2D1900|00192D;
 	dec a;01B5FA|3A      |      ;
 	sta.L $00192d                        ;01B5FB|8F2D1900|00192D;
-	bne CODE_01B5AA                      ;01B5FF|D0A9    |01B5AA;
+	bne Mode7_Initialize                      ;01B5FF|D0A9    |01B5AA;
 	plb                                  ;01B601|AB      |      ;
 	rts                                  ;01B602|60      |      ;
 ;      |        |      ;
@@ -6891,7 +6891,7 @@ CODE_01B5D2:
 ;      |        |      ;
 	sep #$20                             ;01B60A|E220    |      ;
 	rep #$10                             ;01B60C|C210    |      ;
-	jsr.W CODE_01B0C8                    ;01B60E|20C8B0  |01B0C8;
+	jsr.W Trigger_ScanAll                    ;01B60E|20C8B0  |01B0C8;
 	rts                                  ;01B611|60      |      ;
 ;      |        |      ;
 	db $a0,$10,$00,$9c,$2b,$19,$a2,$00,$78,$8e,$2d,$19,$a2,$80,$00,$8e;01B612|        |      ;
@@ -6912,14 +6912,14 @@ CODE_01B5D2:
 	sta.W $19ee                          ;01B67B|8DEE19  |0119EE;
 	lda.B #$44                           ;01B67E|A944    |      ;
 	sta.W $19ef                          ;01B680|8DEF19  |0119EF;
-	jsr.W CODE_01BC1B                    ;01B683|201BBC  |01BC1B;
+	jsr.W Sound_UpdateFade                    ;01B683|201BBC  |01BC1B;
 	lda.B #$00                           ;01B686|A900    |      ;
-	jsr.W CODE_01B1EB                    ;01B688|20EBB1  |01B1EB;
-	bcc CODE_01B6F9                      ;01B68B|906C    |01B6F9;
+	jsr.W Sprite_CheckActive                    ;01B688|20EBB1  |01B1EB;
+	bcc Mode7_ApplyZoom                      ;01B68B|906C    |01B6F9;
 	stx.W $1935                          ;01B68D|8E3519  |011935;
 	lda.B #$01                           ;01B690|A901    |      ;
-	jsr.W CODE_01B1EB                    ;01B692|20EBB1  |01B1EB;
-	bcc CODE_01B6F9                      ;01B695|9062    |01B6F9;
+	jsr.W Sprite_CheckActive                    ;01B692|20EBB1  |01B1EB;
+	bcc Mode7_ApplyZoom                      ;01B695|9062    |01B6F9;
 	stx.W $1937                          ;01B697|8E3719  |011937;
 	lda.B #$00                           ;01B69A|A900    |      ;
 	xba                                  ;01B69C|EB      |      ;
@@ -6937,11 +6937,11 @@ CODE_01B5D2:
 	lda.B #$10                           ;01B6B3|A910    |      ;
 	sta.W $193d                          ;01B6B5|8D3D19  |01193D;
 ;      |        |      ;
-CODE_01B6B8:
-	jsr.W CODE_01B6FA                    ;01B6B8|20FAB6  |01B6FA;
+Mode7_UpdateMatrix:
+	jsr.W Mode7_SetZoom                    ;01B6B8|20FAB6  |01B6FA;
 	jsr.W Field_WaitForVBlank                    ;01B6BB|20D082  |0182D0;
 	dec.W $193d                          ;01B6BE|CE3D19  |01193D;
-	bne CODE_01B6B8                      ;01B6C1|D0F5    |01B6B8;
+	bne Mode7_UpdateMatrix                      ;01B6C1|D0F5    |01B6B8;
 	php                                  ;01B6C3|08      |      ;
 	rep #$30                             ;01B6C4|C230    |      ;
 	lda.W $1939                          ;01B6C6|AD3919  |011939;
@@ -6958,32 +6958,32 @@ CODE_01B6B8:
 	lda.W DATA8_01b736,x                 ;01B6DE|BD36B7  |01B736;
 	sta.W $193d                          ;01B6E1|8D3D19  |01193D;
 ;      |        |      ;
-CODE_01B6E4:
-	jsr.W CODE_01B6FA                    ;01B6E4|20FAB6  |01B6FA;
+Mode7_CalculateRotation:
+	jsr.W Mode7_SetZoom                    ;01B6E4|20FAB6  |01B6FA;
 	jsr.W Field_WaitForVBlank                    ;01B6E7|20D082  |0182D0;
 	dec.W $193d                          ;01B6EA|CE3D19  |01193D;
-	bne CODE_01B6E4                      ;01B6ED|D0F5    |01B6E4;
+	bne Mode7_CalculateRotation                      ;01B6ED|D0F5    |01B6E4;
 	lda.B #$00                           ;01B6EF|A900    |      ;
-	jsr.W CODE_01B1B3                    ;01B6F1|20B3B1  |01B1B3;
+	jsr.W Sprite_OAMLoop                    ;01B6F1|20B3B1  |01B1B3;
 	lda.B #$01                           ;01B6F4|A901    |      ;
-	jsr.W CODE_01B1B3                    ;01B6F6|20B3B1  |01B1B3;
+	jsr.W Sprite_OAMLoop                    ;01B6F6|20B3B1  |01B1B3;
 ;      |        |      ;
-CODE_01B6F9:
+Mode7_ApplyZoom:
 	rts                                  ;01B6F9|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
-CODE_01B6FA:
+Mode7_SetZoom:
 	php                                  ;01B6FA|08      |      ;
 	rep #$30                             ;01B6FB|C230    |      ;
 	ldx.W $1935                          ;01B6FD|AE3519  |011935;
-	jsr.W CODE_01B70B                    ;01B700|200BB7  |01B70B;
+	jsr.W Mode7_UpdatePosition                    ;01B700|200BB7  |01B70B;
 	ldx.W $1937                          ;01B703|AE3719  |011937;
-	jsr.W CODE_01B70B                    ;01B706|200BB7  |01B70B;
+	jsr.W Mode7_UpdatePosition                    ;01B706|200BB7  |01B70B;
 	plp                                  ;01B709|28      |      ;
 	rts                                  ;01B70A|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
-CODE_01B70B:
+Mode7_UpdatePosition:
 	lda.W $1a85,x                        ;01B70B|BD851A  |011A85;
 	clc                                  ;01B70E|18      |      ;
 	adc.W $1939                          ;01B70F|6D3919  |011939;
@@ -7011,9 +7011,9 @@ DATA8_01b736:
 	rts                                  ;01B73B|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
-CODE_01B73C:
+Mode7_WriteRegisters:
 	lda.W $19ee                          ;01B73C|ADEE19  |0119EE;
-	jsr.W CODE_01C589                    ;01B73F|2089C5  |01C589;
+	jsr.W Battle_ProcessDeath                    ;01B73F|2089C5  |01C589;
 	rts                                  ;01B742|60      |      ;
 ;      |        |      ;
 	phb                                  ;01B743|8B      |      ;
@@ -7030,13 +7030,13 @@ CODE_01B73C:
 	plb                                  ;01B759|AB      |      ;
 	plb                                  ;01B75A|AB      |      ;
 ;      |        |      ;
-CODE_01B75B:
+Mode7_Complete:
 	phx                                  ;01B75B|DA      |      ;
 	lda.B #$00                           ;01B75C|A900    |      ;
 	xba                                  ;01B75E|EB      |      ;
 	lda.L DATA8_06bd78,x                 ;01B75F|BF78BD06|06BD78;
 	cmp.B #$ff                           ;01B763|C9FF    |      ;
-	beq CODE_01B794                      ;01B765|F02D    |01B794;
+	beq Window_Initialize                      ;01B765|F02D    |01B794;
 	tay                                  ;01B767|A8      |      ;
 	lda.L DATA8_06bd79,x                 ;01B768|BF79BD06|06BD79;
 	tax                                  ;01B76C|AA      |      ;
@@ -7044,10 +7044,10 @@ CODE_01B75B:
 	sta.W $d0f4,y                        ;01B770|99F4D0  |7FD0F4;
 	php                                  ;01B773|08      |      ;
 	rep #$30                             ;01B774|C230    |      ;
-	jsr.W CODE_01B798                    ;01B776|2098B7  |01B798;
+	jsr.W Window_Configure                    ;01B776|2098B7  |01B798;
 	lda.W $d174,x                        ;01B779|BD74D1  |7FD174;
 	sta.W $d174,y                        ;01B77C|9974D1  |7FD174;
-	jsr.W CODE_01B798                    ;01B77F|2098B7  |01B798;
+	jsr.W Window_Configure                    ;01B77F|2098B7  |01B798;
 	lda.W $cef4,x                        ;01B782|BDF4CE  |7FCEF4;
 	sta.W $cef4,y                        ;01B785|99F4CE  |7FCEF4;
 	lda.W $cef6,x                        ;01B788|BDF6CE  |7FCEF6;
@@ -7056,17 +7056,17 @@ CODE_01B75B:
 	plx                                  ;01B78F|FA      |      ;
 	inx                                  ;01B790|E8      |      ;
 	inx                                  ;01B791|E8      |      ;
-	bra CODE_01B75B                      ;01B792|80C7    |01B75B;
+	bra Mode7_Complete                      ;01B792|80C7    |01B75B;
 ;      |        |      ;
 ;      |        |      ;
-CODE_01B794:
+Window_Initialize:
 	plx                                  ;01B794|FA      |      ;
 	plp                                  ;01B795|28      |      ;
 	plb                                  ;01B796|AB      |      ;
 	rts                                  ;01B797|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
-CODE_01B798:
+Window_Configure:
 	tya                                  ;01B798|98      |      ;
 	asl a;01B799|0A      |      ;
 	tay                                  ;01B79A|A8      |      ;
@@ -7112,7 +7112,7 @@ UNREACH_01B7B9:
 	rts                                  ;01B828|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
-CODE_01B829:
+Window_SetPosition:
 	phb                                  ;01B829|8B      |      ;
 	ldx.W #$02f0                         ;01B82A|A2F002  |      ;
 	ldy.W #$c508                         ;01B82D|A008C5  |      ;
@@ -7121,7 +7121,7 @@ CODE_01B829:
 	plb                                  ;01B834|AB      |      ;
 	lda.W #$0008                         ;01B835|A90800  |      ;
 ;      |        |      ;
-CODE_01B838:
+Window_SetSize:
 	pha                                  ;01B838|48      |      ;
 	lda.L DATA8_07d824,x                 ;01B839|BF24D807|07D824;
 	sta.W $0000,y                        ;01B83D|990000  |7F0000;
@@ -7131,41 +7131,41 @@ CODE_01B838:
 	iny                                  ;01B843|C8      |      ;
 	pla                                  ;01B844|68      |      ;
 	dec a;01B845|3A      |      ;
-	bne CODE_01B838                      ;01B846|D0F0    |01B838;
+	bne Window_SetSize                      ;01B846|D0F0    |01B838;
 	plb                                  ;01B848|AB      |      ;
 	rts                                  ;01B849|60      |      ;
 ;      |        |      ;
 	ldx.W #$0005                         ;01B84A|A20500  |      ;
 	stx.W $192b                          ;01B84D|8E2B19  |01192B;
 ;      |        |      ;
-CODE_01B850:
-	jsr.W CODE_01B829                    ;01B850|2029B8  |01B829;
-	jsr.W CODE_01B8B4                    ;01B853|20B4B8  |01B8B4;
+Window_Enable:
+	jsr.W Window_SetPosition                    ;01B850|2029B8  |01B829;
+	jsr.W Window_Complete                    ;01B853|20B4B8  |01B8B4;
 	lda.W #$0004                         ;01B856|A90400  |      ;
 	jsr.W CODE_01D6C4                    ;01B859|20C4D6  |01D6C4;
 	ldy.W #$0008                         ;01B85C|A00800  |      ;
 	ldx.W #$0000                         ;01B85F|A20000  |      ;
 	lda.W #$ffff                         ;01B862|A9FFFF  |      ;
 ;      |        |      ;
-CODE_01B865:
+Window_Disable:
 	sta.L $7fc508,x                      ;01B865|9F08C57F|7FC508;
 	inx                                  ;01B869|E8      |      ;
 	inx                                  ;01B86A|E8      |      ;
 	dey                                  ;01B86B|88      |      ;
-	bne CODE_01B865                      ;01B86C|D0F7    |01B865;
-	jsr.W CODE_01B8B4                    ;01B86E|20B4B8  |01B8B4;
+	bne Window_Disable                      ;01B86C|D0F7    |01B865;
+	jsr.W Window_Complete                    ;01B86E|20B4B8  |01B8B4;
 	lda.W #$0004                         ;01B871|A90400  |      ;
 	jsr.W CODE_01D6C4                    ;01B874|20C4D6  |01D6C4;
 	dec.W $192b                          ;01B877|CE2B19  |01192B;
-	bne CODE_01B850                      ;01B87A|D0D4    |01B850;
+	bne Window_Enable                      ;01B87A|D0D4    |01B850;
 	ldx.W #$001f                         ;01B87C|A21F00  |      ;
 	stx.W $1935                          ;01B87F|8E3519  |011935;
 ;      |        |      ;
-CODE_01B882:
+Window_UpdateMask:
 	ldx.W #$0000                         ;01B882|A20000  |      ;
 	ldy.W #$0008                         ;01B885|A00800  |      ;
 ;      |        |      ;
-CODE_01B888:
+Window_ApplyMask:
 	lda.L $7fc508,x                      ;01B888|BF08C57F|7FC508;
 	sta.W $192b                          ;01B88C|8D2B19  |01192B;
 	lda.L DATA8_07db14,x                 ;01B88F|BF14DB07|07DB14;
@@ -7176,16 +7176,16 @@ CODE_01B888:
 	inx                                  ;01B8A0|E8      |      ;
 	inx                                  ;01B8A1|E8      |      ;
 	dey                                  ;01B8A2|88      |      ;
-	bne CODE_01B888                      ;01B8A3|D0E3    |01B888;
-	jsr.W CODE_01B8B4                    ;01B8A5|20B4B8  |01B8B4;
+	bne Window_ApplyMask                      ;01B8A3|D0E3    |01B888;
+	jsr.W Window_Complete                    ;01B8A5|20B4B8  |01B8B4;
 	lda.W #$0004                         ;01B8A8|A90400  |      ;
 	jsr.W CODE_01D6BD                    ;01B8AB|20BDD6  |01D6BD;
 	dec.W $1935                          ;01B8AE|CE3519  |011935;
-	bne CODE_01B882                      ;01B8B1|D0CF    |01B882;
+	bne Window_UpdateMask                      ;01B8B1|D0CF    |01B882;
 	rts                                  ;01B8B3|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
-CODE_01B8B4:
+Window_Complete:
 	php                                  ;01B8B4|08      |      ;
 	sep #$20                             ;01B8B5|E220    |      ;
 	rep #$10                             ;01B8B7|C210    |      ;
@@ -7216,10 +7216,10 @@ CODE_01B8B4:
 	jsr.W CODE_01D3A6                    ;01B8EF|20A6D3  |01D3A6;
 	ldx.W #$463c                         ;01B8F2|A23C46  |      ;
 	stx.W $19ee                          ;01B8F5|8EEE19  |0119EE;
-	jsr.W CODE_01BEB2                    ;01B8F8|20B2BE  |01BEB2;
+	jsr.W Music_QueueNext                    ;01B8F8|20B2BE  |01BEB2;
 	ldx.W #$463d                         ;01B8FB|A23D46  |      ;
 	stx.W $19ee                          ;01B8FE|8EEE19  |0119EE;
-	jsr.W CODE_01BEB2                    ;01B901|20B2BE  |01BEB2;
+	jsr.W Music_QueueNext                    ;01B901|20B2BE  |01BEB2;
 	jsr.W CODE_01D3CD                    ;01B904|20CDD3  |01D3CD;
 	lda.B #$0c                           ;01B907|A90C    |      ;
 	jsr.W CODE_01D49B                    ;01B909|209BD4  |01D49B;
@@ -7232,10 +7232,10 @@ CODE_01B8B4:
 	jsr.W CODE_01D3C2                    ;01B917|20C2D3  |01D3C2;
 	ldx.W #$4636                         ;01B91A|A23646  |      ;
 	stx.W $19ee                          ;01B91D|8EEE19  |0119EE;
-	jsr.W CODE_01BEB2                    ;01B920|20B2BE  |01BEB2;
+	jsr.W Music_QueueNext                    ;01B920|20B2BE  |01BEB2;
 	ldx.W #$4637                         ;01B923|A23746  |      ;
 	stx.W $19ee                          ;01B926|8EEE19  |0119EE;
-	jsr.W CODE_01BEB2                    ;01B929|20B2BE  |01BEB2;
+	jsr.W Music_QueueNext                    ;01B929|20B2BE  |01BEB2;
 	jsr.W CODE_01D3CD                    ;01B92C|20CDD3  |01D3CD;
 	lda.B #$06                           ;01B92F|A906    |      ;
 	jsr.W CODE_01D49B                    ;01B931|209BD4  |01D49B;
@@ -7248,10 +7248,10 @@ CODE_01B8B4:
 	jsr.W CODE_01D3C2                    ;01B93F|20C2D3  |01D3C2;
 	ldx.W #$4635                         ;01B942|A23546  |      ;
 	stx.W $19ee                          ;01B945|8EEE19  |0119EE;
-	jsr.W CODE_01BEB2                    ;01B948|20B2BE  |01BEB2;
+	jsr.W Music_QueueNext                    ;01B948|20B2BE  |01BEB2;
 	ldx.W #$4636                         ;01B94B|A23646  |      ;
 	stx.W $19ee                          ;01B94E|8EEE19  |0119EE;
-	jsr.W CODE_01BEB2                    ;01B951|20B2BE  |01BEB2;
+	jsr.W Music_QueueNext                    ;01B951|20B2BE  |01BEB2;
 	jsr.W CODE_01D3CD                    ;01B954|20CDD3  |01D3CD;
 	lda.B #$05                           ;01B957|A905    |      ;
 	jsr.W CODE_01D49B                    ;01B959|209BD4  |01D49B;
@@ -7277,24 +7277,24 @@ CODE_01B8B4:
 	sep #$20                             ;01B9C1|E220    |      ;
 	rep #$10                             ;01B9C3|C210    |      ;
 	jsr.W CODE_01D120                    ;01B9C5|2020D1  |01D120;
-	bcc CODE_01B9EA                      ;01B9C8|9020    |01B9EA;
+	bcc ColorMath_Initialize                      ;01B9C8|9020    |01B9EA;
 	stz.W $192b                          ;01B9CA|9C2B19  |01192B;
 	ldy.W #$000c                         ;01B9CD|A00C00  |      ;
-	jsr.W CODE_01B9FE                    ;01B9D0|20FEB9  |01B9FE;
+	jsr.W ColorMath_Configure                    ;01B9D0|20FEB9  |01B9FE;
 	lda.B #$01                           ;01B9D3|A901    |      ;
 	sta.W $192b                          ;01B9D5|8D2B19  |01192B;
 	ldy.W #$0004                         ;01B9D8|A00400  |      ;
-	jsr.W CODE_01B9FE                    ;01B9DB|20FEB9  |01B9FE;
-	jsr.W CODE_01B9EB                    ;01B9DE|20EBB9  |01B9EB;
+	jsr.W ColorMath_Configure                    ;01B9DB|20FEB9  |01B9FE;
+	jsr.W ColorMath_SetMode                    ;01B9DE|20EBB9  |01B9EB;
 	ldx.W #$4420                         ;01B9E1|A22044  |      ;
 	stx.W $19ee                          ;01B9E4|8EEE19  |0119EE;
-	jsr.W CODE_01BC1B                    ;01B9E7|201BBC  |01BC1B;
+	jsr.W Sound_UpdateFade                    ;01B9E7|201BBC  |01BC1B;
 ;      |        |      ;
-CODE_01B9EA:
+ColorMath_Initialize:
 	rts                                  ;01B9EA|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
-CODE_01B9EB:
+ColorMath_SetMode:
 	ldx.W $1935                          ;01B9EB|AE3519  |011935;
 	lda.W $1938                          ;01B9EE|AD3819  |011938;
 	sta.W $1a72,x                        ;01B9F1|9D721A  |011A72;
@@ -7304,7 +7304,7 @@ CODE_01B9EB:
 	rts                                  ;01B9FD|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
-CODE_01B9FE:
+ColorMath_Configure:
 	phy                                  ;01B9FE|5A      |      ;
 	ldx.W $1935                          ;01B9FF|AE3519  |011935;
 	lda.B #$10                           ;01BA02|A910    |      ;
@@ -7329,15 +7329,15 @@ CODE_01B9FE:
 	jsr.W CODE_01CC82                    ;01BA30|2082CC  |01CC82;
 	ply                                  ;01BA33|7A      |      ;
 	ldx.W $1935                          ;01BA34|AE3519  |011935;
-	jsr.W CODE_01BA3B                    ;01BA37|203BBA  |01BA3B;
+	jsr.W ColorMath_SetIntensity                    ;01BA37|203BBA  |01BA3B;
 	rts                                  ;01BA3A|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
-CODE_01BA3B:
+ColorMath_SetIntensity:
 	phy                                  ;01BA3B|5A      |      ;
 	inc.W $19f7                          ;01BA3C|EEF719  |0119F7;
 ;      |        |      ;
-CODE_01BA3F:
+ColorMath_ApplyIntensity:
 	phx                                  ;01BA3F|DA      |      ;
 	php                                  ;01BA40|08      |      ;
 	jsr.W CODE_01CAED                    ;01BA41|20EDCA  |01CAED;
@@ -7345,10 +7345,10 @@ CODE_01BA3F:
 	plp                                  ;01BA47|28      |      ;
 	plx                                  ;01BA48|FA      |      ;
 	lda.W $1a72,x                        ;01BA49|BD721A  |011A72;
-	bne CODE_01BA3F                      ;01BA4C|D0F1    |01BA3F;
+	bne ColorMath_ApplyIntensity                      ;01BA4C|D0F1    |01BA3F;
 	ply                                  ;01BA4E|7A      |      ;
 	dey                                  ;01BA4F|88      |      ;
-	beq CODE_01BA70                      ;01BA50|F01E    |01BA70;
+	beq ColorMath_UpdateColor                      ;01BA50|F01E    |01BA70;
 	phy                                  ;01BA52|5A      |      ;
 	ldx.W $1935                          ;01BA53|AE3519  |011935;
 	lda.W $193d                          ;01BA56|AD3D19  |01193D;
@@ -7359,26 +7359,26 @@ CODE_01BA3F:
 	sta.W $1a72,x                        ;01BA65|9D721A  |011A72;
 	jsr.W CODE_01CC82                    ;01BA68|2082CC  |01CC82;
 	inc.W $19f7                          ;01BA6B|EEF719  |0119F7;
-	bra CODE_01BA3F                      ;01BA6E|80CF    |01BA3F;
+	bra ColorMath_ApplyIntensity                      ;01BA6E|80CF    |01BA3F;
 ;      |        |      ;
 ;      |        |      ;
-CODE_01BA70:
+ColorMath_UpdateColor:
 	rts                                  ;01BA70|60      |      ;
 ;      |        |      ;
 	sep #$20                             ;01BA71|E220    |      ;
 	rep #$10                             ;01BA73|C210    |      ;
 	jsr.W CODE_01D120                    ;01BA75|2020D1  |01D120;
-	bcc CODE_01BA91                      ;01BA78|9017    |01BA91;
+	bcc ColorMath_Complete                      ;01BA78|9017    |01BA91;
 	lda.B #$01                           ;01BA7A|A901    |      ;
 	sta.W $192b                          ;01BA7C|8D2B19  |01192B;
 	ldy.W #$0003                         ;01BA7F|A00300  |      ;
-	jsr.W CODE_01B9FE                    ;01BA82|20FEB9  |01B9FE;
+	jsr.W ColorMath_Configure                    ;01BA82|20FEB9  |01B9FE;
 	stz.W $192b                          ;01BA85|9C2B19  |01192B;
 	ldy.W #$0002                         ;01BA88|A00200  |      ;
-	jsr.W CODE_01B9FE                    ;01BA8B|20FEB9  |01B9FE;
-	jsr.W CODE_01B9EB                    ;01BA8E|20EBB9  |01B9EB;
+	jsr.W ColorMath_Configure                    ;01BA8B|20FEB9  |01B9FE;
+	jsr.W ColorMath_SetMode                    ;01BA8E|20EBB9  |01B9EB;
 ;      |        |      ;
-CODE_01BA91:
+ColorMath_Complete:
 	rts                                  ;01BA91|60      |      ;
 ;      |        |      ;
 	lda.W #$0f08                         ;01BA92|A9080F  |      ;
@@ -7395,7 +7395,7 @@ CODE_01BA91:
 	lda.W $19ee                          ;01BAA7|ADEE19  |0119EE;
 	and.W #$00ff                         ;01BAAA|29FF00  |      ;
 ;      |        |      ;
-CODE_01BAAD:
+Sound_PlayEffect:
 	phx                                  ;01BAAD|DA      |      ;
 	php                                  ;01BAAE|08      |      ;
 	sep #$20                             ;01BAAF|E220    |      ;
@@ -7420,8 +7420,8 @@ CODE_01BAAD:
 	rep #$10                             ;01BAD9|C210    |      ;
 	lda.B #$22                           ;01BADB|A922    |      ;
 	sta.W $19ef                          ;01BADD|8DEF19  |0119EF;
-	jsr.W CODE_01B73C                    ;01BAE0|203CB7  |01B73C;
-	jsr.W CODE_01C6A1                    ;01BAE3|20A1C6  |01C6A1;
+	jsr.W Mode7_WriteRegisters                    ;01BAE0|203CB7  |01B73C;
+	jsr.W Menu_Initialize                    ;01BAE3|20A1C6  |01C6A1;
 	rts                                  ;01BAE6|60      |      ;
 ;      |        |      ;
 	db $ad,$ee,$19,$29,$ff,$00,$09,$00,$23,$8d,$ee,$19,$20,$43,$b7,$20;01BAE7|        |0019EE;
@@ -7429,8 +7429,8 @@ CODE_01BAAD:
 	sep #$20                             ;01BAFA|E220    |      ;
 	rep #$10                             ;01BAFC|C210    |      ;
 	lda.W $19ee                          ;01BAFE|ADEE19  |0119EE;
-	jsr.W CODE_01B1EB                    ;01BB01|20EBB1  |01B1EB;
-	bcc CODE_01BB53                      ;01BB04|904D    |01BB53;
+	jsr.W Sprite_CheckActive                    ;01BB01|20EBB1  |01B1EB;
+	bcc Sound_StopEffect                      ;01BB04|904D    |01BB53;
 	sta.W $192d                          ;01BB06|8D2D19  |01192D;
 	lda.W $1a80,x                        ;01BB09|BD801A  |011A80;
 	and.B #$cf                           ;01BB0C|29CF    |      ;
@@ -7466,7 +7466,7 @@ CODE_01BAAD:
 	lda.W $1a79,x                        ;01BB4D|BD791A  |011A79;
 	sta.W $0c0e,y                        ;01BB50|990E0C  |010C0E;
 ;      |        |      ;
-CODE_01BB53:
+Sound_StopEffect:
 	rts                                  ;01BB53|60      |      ;
 ;      |        |      ;
 	sep #$20                             ;01BB54|E220    |      ;
@@ -7497,7 +7497,7 @@ DATA8_01bb78:
 	sep #$20                             ;01BB96|E220    |      ;
 	rep #$10                             ;01BB98|C210    |      ;
 	jsr.W CODE_01CF9E                    ;01BB9A|209ECF  |01CF9E;
-	bcc CODE_01BBF3                      ;01BB9D|9054    |01BBF3;
+	bcc Sound_FadeIn                      ;01BB9D|9054    |01BBF3;
 	lda.W $1a72,x                        ;01BB9F|BD721A  |011A72;
 	pha                                  ;01BBA2|48      |      ;
 	lda.B #$10                           ;01BBA3|A910    |      ;
@@ -7525,7 +7525,7 @@ DATA8_01bb78:
 	tay                                  ;01BBCF|A8      |      ;
 	phy                                  ;01BBD0|5A      |      ;
 ;      |        |      ;
-CODE_01BBD1:
+Sound_SetVolume:
 	phx                                  ;01BBD1|DA      |      ;
 	php                                  ;01BBD2|08      |      ;
 	jsr.W CODE_01CAED                    ;01BBD3|20EDCA  |01CAED;
@@ -7533,22 +7533,22 @@ CODE_01BBD1:
 	plp                                  ;01BBD9|28      |      ;
 	plx                                  ;01BBDA|FA      |      ;
 	lda.W $1a72,x                        ;01BBDB|BD721A  |011A72;
-	bne CODE_01BBD1                      ;01BBDE|D0F1    |01BBD1;
+	bne Sound_SetVolume                      ;01BBDE|D0F1    |01BBD1;
 	ply                                  ;01BBE0|7A      |      ;
 	dey                                  ;01BBE1|88      |      ;
-	beq CODE_01BBEF                      ;01BBE2|F00B    |01BBEF;
+	beq Sound_FadeOut                      ;01BBE2|F00B    |01BBEF;
 	phy                                  ;01BBE4|5A      |      ;
 	lda.B #$10                           ;01BBE5|A910    |      ;
 	sta.W $1a72,x                        ;01BBE7|9D721A  |011A72;
 	jsr.W CODE_01CC82                    ;01BBEA|2082CC  |01CC82;
-	bra CODE_01BBD1                      ;01BBED|80E2    |01BBD1;
+	bra Sound_SetVolume                      ;01BBED|80E2    |01BBD1;
 ;      |        |      ;
 ;      |        |      ;
-CODE_01BBEF:
+Sound_FadeOut:
 	pla                                  ;01BBEF|68      |      ;
 	sta.W $1a72,x                        ;01BBF0|9D721A  |011A72;
 ;      |        |      ;
-CODE_01BBF3:
+Sound_FadeIn:
 	rts                                  ;01BBF3|60      |      ;
 ;      |        |      ;
 	lda.W $19ee                          ;01BBF4|ADEE19  |0119EE;
@@ -7568,11 +7568,11 @@ DATA8_01bc01:
 	db $1d,$bd                           ;01BC17|        |      ;
 	db $63,$bd                           ;01BC19|        |0000BD;
 ;      |        |      ;
-CODE_01BC1B:
+Sound_UpdateFade:
 	sep #$20                             ;01BC1B|E220    |      ;
 	rep #$10                             ;01BC1D|C210    |      ;
 	jsr.W CODE_01CF9E                    ;01BC1F|209ECF  |01CF9E;
-	bcc CODE_01BC34                      ;01BC22|9010    |01BC34;
+	bcc Sound_ProcessQueue                      ;01BC22|9010    |01BC34;
 	sta.W $192b                          ;01BC24|8D2B19  |01192B;
 	lda.W $19ee                          ;01BC27|ADEE19  |0119EE;
 	lsr a;01BC2A|4A      |      ;
@@ -7582,7 +7582,7 @@ CODE_01BC1B:
 	sta.W $192c                          ;01BC2E|8D2C19  |01192C;
 	jsr.W Field_InputEnd                    ;01BC31|20E58A  |018AE5;
 ;      |        |      ;
-CODE_01BC34:
+Sound_ProcessQueue:
 	rts                                  ;01BC34|60      |      ;
 ;      |        |      ;
 	php                                  ;01BC35|08      |      ;
@@ -7607,7 +7607,7 @@ CODE_01BC34:
 	lda.W $19ee                          ;01BC5D|ADEE19  |0119EE;
 	and.W #$ff3f                         ;01BC60|293FFF  |      ;
 	sta.W $19ee                          ;01BC63|8DEE19  |0119EE;
-	bra CODE_01BC1B                      ;01BC66|80B3    |01BC1B;
+	bra Sound_UpdateFade                      ;01BC66|80B3    |01BC1B;
 ;      |        |      ;
 ;      |        |      ;
 UNREACH_01BC68:
@@ -7616,12 +7616,12 @@ UNREACH_01BC68:
 	sep #$20                             ;01BC6A|E220    |      ;
 	rep #$10                             ;01BC6C|C210    |      ;
 	jsr.W CODE_01CF9E                    ;01BC6E|209ECF  |01CF9E;
-	bcc CODE_01BCDB                      ;01BC71|9068    |01BCDB;
+	bcc Music_PlayTrack                      ;01BC71|9068    |01BCDB;
 	phx                                  ;01BC73|DA      |      ;
 	pha                                  ;01BC74|48      |      ;
 	ldy.W #$0000                         ;01BC75|A00000  |      ;
 ;      |        |      ;
-CODE_01BC78:
+Sound_ClearQueue:
 	phy                                  ;01BC78|5A      |      ;
 	lda.W $19ee                          ;01BC79|ADEE19  |0119EE;
 	and.B #$0f                           ;01BC7C|290F    |      ;
@@ -7634,13 +7634,13 @@ CODE_01BC78:
 	asl a;01BC87|0A      |      ;
 	ora.W $19ee                          ;01BC88|0DEE19  |0119EE;
 	sta.W $19ee                          ;01BC8B|8DEE19  |0119EE;
-	jsr.W CODE_01BC1B                    ;01BC8E|201BBC  |01BC1B;
+	jsr.W Sound_UpdateFade                    ;01BC8E|201BBC  |01BC1B;
 	lda.B #$03                           ;01BC91|A903    |      ;
 	jsr.W CODE_01D6A9                    ;01BC93|20A9D6  |01D6A9;
 	ply                                  ;01BC96|7A      |      ;
 	iny                                  ;01BC97|C8      |      ;
 	cpy.W #$0009                         ;01BC98|C00900  |      ;
-	bne CODE_01BC78                      ;01BC9B|D0DB    |01BC78;
+	bne Sound_ClearQueue                      ;01BC9B|D0DB    |01BC78;
 	pla                                  ;01BC9D|68      |      ;
 	xba                                  ;01BC9E|EB      |      ;
 	lda.B #$00                           ;01BC9F|A900    |      ;
@@ -7671,7 +7671,7 @@ CODE_01BC78:
 	sta.W $0c0e,y                        ;01BCD5|990E0C  |010C0E;
 	jsr.W Field_UpdateAndWait                    ;01BCD8|20D982  |0182D9;
 ;      |        |      ;
-CODE_01BCDB:
+Music_PlayTrack:
 	rts                                  ;01BCDB|60      |      ;
 ;      |        |      ;
 	db $08,$e2,$20,$c2,$10,$20,$9e,$cf,$90,$36,$8d,$e7,$19,$28,$da,$bd;01BCDC|        |      ;
@@ -7708,7 +7708,7 @@ CODE_01BCDB:
 	and.W #$0030                         ;01BD56|293000  |      ;
 	ora.W $19ee                          ;01BD59|0DEE19  |0119EE;
 	sta.W $19ee                          ;01BD5C|8DEE19  |0119EE;
-	jmp.W CODE_01BC1B                    ;01BD5F|4C1BBC  |01BC1B;
+	jmp.W Sound_UpdateFade                    ;01BD5F|4C1BBC  |01BC1B;
 ;      |        |      ;
 ;      |        |      ;
 UNREACH_01BD62:
@@ -7733,18 +7733,18 @@ DATA8_01bdab:
 	db $d2,$bd                           ;01BDC1|        |      ;
 	db $db,$bd                           ;01BDC3|        |      ;
 	db $f4,$bd,$29,$be                   ;01BDC5|        |      ;
-	jsr.W CODE_01C457                    ;01BDC9|2057C4  |01C457;
-	bcc CODE_01BDD1                      ;01BDCC|9003    |01BDD1;
-	jsr.W CODE_01C49F                    ;01BDCE|209FC4  |01C49F;
+	jsr.W Battle_CheckDefeat                    ;01BDC9|2057C4  |01C457;
+	bcc Music_StopTrack                      ;01BDCC|9003    |01BDD1;
+	jsr.W Battle_ApplyDamage                    ;01BDCE|209FC4  |01C49F;
 ;      |        |      ;
-CODE_01BDD1:
+Music_StopTrack:
 	rts                                  ;01BDD1|60      |      ;
 ;      |        |      ;
-	jsr.W CODE_01C457                    ;01BDD2|2057C4  |01C457;
-	bcc CODE_01BDDA                      ;01BDD5|9003    |01BDDA;
-	jsr.W CODE_01C4D2                    ;01BDD7|20D2C4  |01C4D2;
+	jsr.W Battle_CheckDefeat                    ;01BDD2|2057C4  |01C457;
+	bcc Music_PauseTrack                      ;01BDD5|9003    |01BDDA;
+	jsr.W Battle_ApplyHealing                    ;01BDD7|20D2C4  |01C4D2;
 ;      |        |      ;
-CODE_01BDDA:
+Music_PauseTrack:
 	rts                                  ;01BDDA|60      |      ;
 ;      |        |      ;
 	db $e2,$20,$c2,$10,$20,$9e,$cf,$90,$0f,$bc,$85,$1a,$8c,$2b,$19,$bc;01BDDB|        |      ;
@@ -7752,11 +7752,11 @@ CODE_01BDDA:
 	sep #$20                             ;01BDF4|E220    |      ;
 	rep #$10                             ;01BDF6|C210    |      ;
 	jsr.W CODE_01CF9E                    ;01BDF8|209ECF  |01CF9E;
-	bcc CODE_01BE28                      ;01BDFB|902B    |01BE28;
+	bcc Music_UpdateTempo                      ;01BDFB|902B    |01BE28;
 	sta.W $192b                          ;01BDFD|8D2B19  |01192B;
 	stx.W $192d                          ;01BE00|8E2D19  |01192D;
 ;      |        |      ;
-CODE_01BE03:
+Music_ResumeTrack:
 	lda.W $1a80,x                        ;01BE03|BD801A  |011A80;
 	and.B #$30                           ;01BE06|2930    |      ;
 	lsr a;01BE08|4A      |      ;
@@ -7766,7 +7766,7 @@ CODE_01BE03:
 	sta.W $192c                          ;01BE0C|8D2C19  |01192C;
 	ldy.W #$0004                         ;01BE0F|A00400  |      ;
 ;      |        |      ;
-CODE_01BE12:
+Music_SetTempo:
 	phy                                  ;01BE12|5A      |      ;
 	lda.W $192c                          ;01BE13|AD2C19  |01192C;
 	inc a;01BE16|1A      |      ;
@@ -7777,47 +7777,47 @@ CODE_01BE12:
 	jsr.W CODE_01D6BD                    ;01BE21|20BDD6  |01D6BD;
 	ply                                  ;01BE24|7A      |      ;
 	dey                                  ;01BE25|88      |      ;
-	bne CODE_01BE12                      ;01BE26|D0EA    |01BE12;
+	bne Music_SetTempo                      ;01BE26|D0EA    |01BE12;
 ;      |        |      ;
-CODE_01BE28:
+Music_UpdateTempo:
 	rts                                  ;01BE28|60      |      ;
 ;      |        |      ;
 	sep #$20                             ;01BE29|E220    |      ;
 	rep #$10                             ;01BE2B|C210    |      ;
 	jsr.W CODE_01CF9E                    ;01BE2D|209ECF  |01CF9E;
-	bcc CODE_01BE67                      ;01BE30|9035    |01BE67;
+	bcc Music_UpdateFade                      ;01BE30|9035    |01BE67;
 	sta.W $192b                          ;01BE32|8D2B19  |01192B;
 	stx.W $192d                          ;01BE35|8E2D19  |01192D;
 	rep #$30                             ;01BE38|C230    |      ;
 	phx                                  ;01BE3A|DA      |      ;
 	ldy.W #$000c                         ;01BE3B|A00C00  |      ;
 ;      |        |      ;
-CODE_01BE3E:
+Music_FadeOut:
 	phy                                  ;01BE3E|5A      |      ;
 	dec.W $1a87,x                        ;01BE3F|DE871A  |011A87;
 	dec.W $1a87,x                        ;01BE42|DE871A  |011A87;
 	jsr.W Field_WaitForVBlank                    ;01BE45|20D082  |0182D0;
 	ply                                  ;01BE48|7A      |      ;
 	dey                                  ;01BE49|88      |      ;
-	bne CODE_01BE3E                      ;01BE4A|D0F2    |01BE3E;
+	bne Music_FadeOut                      ;01BE4A|D0F2    |01BE3E;
 	php                                  ;01BE4C|08      |      ;
 	sep #$20                             ;01BE4D|E220    |      ;
 	rep #$10                             ;01BE4F|C210    |      ;
-	jsr.W CODE_01BE03                    ;01BE51|2003BE  |01BE03;
+	jsr.W Music_ResumeTrack                    ;01BE51|2003BE  |01BE03;
 	plp                                  ;01BE54|28      |      ;
 	plx                                  ;01BE55|FA      |      ;
 	ldy.W #$000c                         ;01BE56|A00C00  |      ;
 ;      |        |      ;
-CODE_01BE59:
+Music_FadeIn:
 	phy                                  ;01BE59|5A      |      ;
 	inc.W $1a87,x                        ;01BE5A|FE871A  |011A87;
 	inc.W $1a87,x                        ;01BE5D|FE871A  |011A87;
 	jsr.W Field_WaitForVBlank                    ;01BE60|20D082  |0182D0;
 	ply                                  ;01BE63|7A      |      ;
 	dey                                  ;01BE64|88      |      ;
-	bne CODE_01BE59                      ;01BE65|D0F2    |01BE59;
+	bne Music_FadeIn                      ;01BE65|D0F2    |01BE59;
 ;      |        |      ;
-CODE_01BE67:
+Music_UpdateFade:
 	rts                                  ;01BE67|60      |      ;
 ;      |        |      ;
 	lda.W $19ee                          ;01BE68|ADEE19  |0119EE;
@@ -7836,7 +7836,7 @@ UNREACH_01BE75:
 	sep #$20                             ;01BE93|E220    |      ;
 	rep #$10                             ;01BE95|C210    |      ;
 	jsr.W CODE_01CF9E                    ;01BE97|209ECF  |01CF9E;
-	bcc CODE_01BEB1                      ;01BE9A|9015    |01BEB1;
+	bcc Music_ProcessQueue                      ;01BE9A|9015    |01BEB1;
 	lda.W $1a80,x                        ;01BE9C|BD801A  |011A80;
 	and.B #$3f                           ;01BE9F|293F    |      ;
 	sta.W $1a80,x                        ;01BEA1|9D801A  |011A80;
@@ -7847,24 +7847,24 @@ UNREACH_01BE75:
 	ora.W $1a80,x                        ;01BEAB|1D801A  |011A80;
 	sta.W $1a80,x                        ;01BEAE|9D801A  |011A80;
 ;      |        |      ;
-CODE_01BEB1:
+Music_ProcessQueue:
 	rts                                  ;01BEB1|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
-CODE_01BEB2:
+Music_QueueNext:
 	sep #$20                             ;01BEB2|E220    |      ;
 	rep #$10                             ;01BEB4|C210    |      ;
-	jsr.W CODE_01B169                    ;01BEB6|2069B1  |01B169;
+	jsr.W Sprite_ProcessEffect                    ;01BEB6|2069B1  |01B169;
 	rts                                  ;01BEB9|60      |      ;
 ;      |        |      ;
 	sep #$20                             ;01BEBA|E220    |      ;
 	rep #$10                             ;01BEBC|C210    |      ;
-	jsr.W CODE_01B1AE                    ;01BEBE|20AEB1  |01B1AE;
+	jsr.W Sprite_WriteOAM                    ;01BEBE|20AEB1  |01B1AE;
 	rts                                  ;01BEC1|60      |      ;
 ;      |        |      ;
 	sep #$20                             ;01BEC2|E220    |      ;
 	rep #$10                             ;01BEC4|C210    |      ;
-	jsr.W CODE_01B169                    ;01BEC6|2069B1  |01B169;
+	jsr.W Sprite_ProcessEffect                    ;01BEC6|2069B1  |01B169;
 	lda.W $19ee                          ;01BEC9|ADEE19  |0119EE;
 	and.B #$0f                           ;01BECC|290F    |      ;
 	jsr.W CODE_01CF5E                    ;01BECE|205ECF  |01CF5E;
@@ -7879,20 +7879,20 @@ CODE_01BEB2:
 	lda.W $19ee                          ;01BEE0|ADEE19  |0119EE;
 	and.B #$0f                           ;01BEE3|290F    |      ;
 	jsr.W CODE_01CF5E                    ;01BEE5|205ECF  |01CF5E;
-	jsr.W CODE_01B1AE                    ;01BEE8|20AEB1  |01B1AE;
+	jsr.W Sprite_WriteOAM                    ;01BEE8|20AEB1  |01B1AE;
 	rts                                  ;01BEEB|60      |      ;
 ;      |        |      ;
 	php                                  ;01BEEC|08      |      ;
 	sep #$20                             ;01BEED|E220    |      ;
 	rep #$10                             ;01BEEF|C210    |      ;
 	jsr.W CODE_01CF9E                    ;01BEF1|209ECF  |01CF9E;
-	bcc CODE_01BF00                      ;01BEF4|900A    |01BF00;
+	bcc Music_Complete                      ;01BEF4|900A    |01BF00;
 	sta.W $19e7                          ;01BEF6|8DE719  |0119E7;
 	plp                                  ;01BEF9|28      |      ;
 	lda.W #$003e                         ;01BEFA|A93E00  |      ;
 	jsr.W CODE_01CACF                    ;01BEFD|20CFCA  |01CACF;
 ;      |        |      ;
-CODE_01BF00:
+Music_Complete:
 	rts                                  ;01BF00|60      |      ;
 ;      |        |      ;
 	db $08,$e2,$20,$c2,$10,$20,$9e,$cf,$90,$11,$28,$29,$ff,$00,$0a,$0a;01BF01|        |      ;
@@ -7904,7 +7904,7 @@ CODE_01BF00:
 	sep #$20                             ;01BF56|E220    |      ;
 	rep #$10                             ;01BF58|C210    |      ;
 	jsr.W CODE_01CF9E                    ;01BF5A|209ECF  |01CF9E;
-	bcc CODE_01BFA5                      ;01BF5D|9046    |01BFA5;
+	bcc Event_ScriptLoop                      ;01BF5D|9046    |01BFA5;
 	lda.W $1a72,x                        ;01BF5F|BD721A  |011A72;
 	pha                                  ;01BF62|48      |      ;
 	lda.W $19ef                          ;01BF63|ADEF19  |0119EF;
@@ -7924,7 +7924,7 @@ CODE_01BF00:
 	tay                                  ;01BF7E|A8      |      ;
 	phy                                  ;01BF7F|5A      |      ;
 ;      |        |      ;
-CODE_01BF80:
+Event_Initialize:
 	phx                                  ;01BF80|DA      |      ;
 	php                                  ;01BF81|08      |      ;
 	jsr.W CODE_01CAED                    ;01BF82|20EDCA  |01CAED;
@@ -7932,29 +7932,29 @@ CODE_01BF80:
 	plp                                  ;01BF88|28      |      ;
 	plx                                  ;01BF89|FA      |      ;
 	lda.W $1a72,x                        ;01BF8A|BD721A  |011A72;
-	bne CODE_01BF80                      ;01BF8D|D0F1    |01BF80;
+	bne Event_Initialize                      ;01BF8D|D0F1    |01BF80;
 	ply                                  ;01BF8F|7A      |      ;
 	dey                                  ;01BF90|88      |      ;
-	beq CODE_01BFA1                      ;01BF91|F00E    |01BFA1;
+	beq Event_ProcessScript                      ;01BF91|F00E    |01BFA1;
 	phy                                  ;01BF93|5A      |      ;
 	lda.W $192b                          ;01BF94|AD2B19  |01192B;
 	ora.B #$90                           ;01BF97|0990    |      ;
 	sta.W $1a72,x                        ;01BF99|9D721A  |011A72;
 	jsr.W CODE_01CC82                    ;01BF9C|2082CC  |01CC82;
-	bra CODE_01BF80                      ;01BF9F|80DF    |01BF80;
+	bra Event_Initialize                      ;01BF9F|80DF    |01BF80;
 ;      |        |      ;
 ;      |        |      ;
-CODE_01BFA1:
+Event_ProcessScript:
 	pla                                  ;01BFA1|68      |      ;
 	sta.W $1a72,x                        ;01BFA2|9D721A  |011A72;
 ;      |        |      ;
-CODE_01BFA5:
+Event_ScriptLoop:
 	rts                                  ;01BFA5|60      |      ;
 ;      |        |      ;
 	sep #$20                             ;01BFA6|E220    |      ;
 	rep #$10                             ;01BFA8|C210    |      ;
 	jsr.W CODE_01CF9E                    ;01BFAA|209ECF  |01CF9E;
-	bcc CODE_01C002                      ;01BFAD|9053    |01C002;
+	bcc Event_ProcessParameter                      ;01BFAD|9053    |01C002;
 	lda.W $1a72,x                        ;01BFAF|BD721A  |011A72;
 	pha                                  ;01BFB2|48      |      ;
 	lda.W $1a82,x                        ;01BFB3|BD821A  |011A82;
@@ -7978,7 +7978,7 @@ CODE_01BFA5:
 	tay                                  ;01BFD7|A8      |      ;
 	phy                                  ;01BFD8|5A      |      ;
 ;      |        |      ;
-CODE_01BFD9:
+Event_ExecuteCommand:
 	phx                                  ;01BFD9|DA      |      ;
 	php                                  ;01BFDA|08      |      ;
 	jsr.W CODE_01CAED                    ;01BFDB|20EDCA  |01CAED;
@@ -7986,25 +7986,25 @@ CODE_01BFD9:
 	plp                                  ;01BFE1|28      |      ;
 	plx                                  ;01BFE2|FA      |      ;
 	lda.W $1a72,x                        ;01BFE3|BD721A  |011A72;
-	bne CODE_01BFD9                      ;01BFE6|D0F1    |01BFD9;
+	bne Event_ExecuteCommand                      ;01BFE6|D0F1    |01BFD9;
 	ply                                  ;01BFE8|7A      |      ;
 	dey                                  ;01BFE9|88      |      ;
-	beq CODE_01BFFA                      ;01BFEA|F00E    |01BFFA;
+	beq Event_CommandDispatch                      ;01BFEA|F00E    |01BFFA;
 	phy                                  ;01BFEC|5A      |      ;
 	lda.W $192b                          ;01BFED|AD2B19  |01192B;
 	ora.B #$90                           ;01BFF0|0990    |      ;
 	sta.W $1a72,x                        ;01BFF2|9D721A  |011A72;
 	jsr.W CODE_01CC82                    ;01BFF5|2082CC  |01CC82;
-	bra CODE_01BFD9                      ;01BFF8|80DF    |01BFD9;
+	bra Event_ExecuteCommand                      ;01BFF8|80DF    |01BFD9;
 ;      |        |      ;
 ;      |        |      ;
-CODE_01BFFA:
+Event_CommandDispatch:
 	pla                                  ;01BFFA|68      |      ;
 	sta.W $1a82,x                        ;01BFFB|9D821A  |011A82;
 	pla                                  ;01BFFE|68      |      ;
 	sta.W $1a72,x                        ;01BFFF|9D721A  |011A72;
 ;      |        |      ;
-CODE_01C002:
+Event_ProcessParameter:
 	rts                                  ;01C002|60      |      ;
 ;      |        |      ;
 	lda.W $19ef                          ;01C003|ADEF19  |0119EF;
@@ -8036,7 +8036,7 @@ DATA8_01c012:
 	lda.B #$01                           ;01C049|A901    |      ;
 	sta.W $1928                          ;01C04B|8D2819  |011928;
 ;      |        |      ;
-CODE_01C04E:
+Event_UpdateFlags:
 	lda.B #$01                           ;01C04E|A901    |      ;
 	sta.W $192a                          ;01C050|8D2A19  |01192A;
 	sta.W $19f7                          ;01C053|8DF719  |0119F7;
@@ -8049,19 +8049,19 @@ CODE_01C04E:
 	lsr a;01C05F|4A      |      ;
 	tay                                  ;01C060|A8      |      ;
 ;      |        |      ;
-CODE_01C061:
+Event_CheckCondition:
 	phy                                  ;01C061|5A      |      ;
-	jsr.W CODE_01C073                    ;01C062|2073C0  |01C073;
+	jsr.W Event_BranchScript                    ;01C062|2073C0  |01C073;
 	jsr.W MapEvent_ScrollScreen                    ;01C065|205D93  |01935D;
 	ply                                  ;01C068|7A      |      ;
 	dey                                  ;01C069|88      |      ;
-	bne CODE_01C061                      ;01C06A|D0F5    |01C061;
+	bne Event_CheckCondition                      ;01C06A|D0F5    |01C061;
 	stz.W $1929                          ;01C06C|9C2919  |011929;
 	stz.W $192a                          ;01C06F|9C2A19  |01192A;
 	rts                                  ;01C072|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
-CODE_01C073:
+Event_BranchScript:
 	php                                  ;01C073|08      |      ;
 	sep #$20                             ;01C074|E220    |      ;
 	rep #$10                             ;01C076|C210    |      ;
@@ -8077,17 +8077,17 @@ CODE_01C073:
 	lda.W $19b4                          ;01C092|ADB419  |0119B4;
 	and.B #$07                           ;01C095|2907    |      ;
 	cmp.W $192b                          ;01C097|CD2B19  |01192B;
-	beq CODE_01C0AA                      ;01C09A|F00E    |01C0AA;
+	beq Event_ScriptEnd                      ;01C09A|F00E    |01C0AA;
 	lda.W $19cf                          ;01C09C|ADCF19  |0119CF;
 	and.B #$08                           ;01C09F|2908    |      ;
-	beq CODE_01C0AA                      ;01C0A1|F007    |01C0AA;
+	beq Event_ScriptEnd                      ;01C0A1|F007    |01C0AA;
 	lda.B #$ff                           ;01C0A3|A9FF    |      ;
 	sta.W $0e8d                          ;01C0A5|8D8D0E  |010E8D;
 	plp                                  ;01C0A8|28      |      ;
 	rts                                  ;01C0A9|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
-CODE_01C0AA:
+Event_ScriptEnd:
 	lda.W $19cb                          ;01C0AA|ADCB19  |0119CB;
 	jsr.W Field_MovementCalculate                    ;01C0AD|206088  |018860;
 	plp                                  ;01C0B0|28      |      ;
@@ -8138,7 +8138,7 @@ DATA8_01c0bf:
 	jsr.W Field_MapSetupEntity                    ;01C10E|20B08C  |018CB0;
 	lda.B #$2d                           ;01C111|A92D    |      ;
 	jsr.W CODE_01D6A9                    ;01C113|20A9D6  |01D6A9;
-	jsr.W CODE_01C450                    ;01C116|2050C4  |01C450;
+	jsr.W Battle_CheckVictory                    ;01C116|2050C4  |01C450;
 	rts                                  ;01C119|60      |      ;
 ;      |        |      ;
 	sep #$20                             ;01C11A|E220    |      ;
@@ -8177,7 +8177,7 @@ DATA8_01c0bf:
 	jsr.W Field_MapSetupEntity                    ;01C15E|20B08C  |018CB0;
 	lda.B #$2d                           ;01C161|A92D    |      ;
 	jsr.W CODE_01D6A9                    ;01C163|20A9D6  |01D6A9;
-	jsr.W CODE_01C450                    ;01C166|2050C4  |01C450;
+	jsr.W Battle_CheckVictory                    ;01C166|2050C4  |01C450;
 	rts                                  ;01C169|60      |      ;
 ;      |        |      ;
 	db $e2,$20,$c2,$10,$a9,$20,$8d,$93,$19,$a9,$00,$20,$b0,$8c,$a9,$2d;01C16A|        |      ;
@@ -8231,25 +8231,25 @@ DATA8_01c201:
 	db $26,$c2,$26,$c2                   ;01C215|        |      ;
 	db $2d,$c2                           ;01C219|        |0041C2;
 	db $41,$c2,$64,$c2                   ;01C21B|        |      ;
-	jsr.W CODE_01C488                    ;01C21F|2088C4  |01C488;
-	jsr.W CODE_01C49F                    ;01C222|209FC4  |01C49F;
+	jsr.W Battle_CalculateDamage                    ;01C21F|2088C4  |01C488;
+	jsr.W Battle_ApplyDamage                    ;01C222|209FC4  |01C49F;
 	rts                                  ;01C225|60      |      ;
 ;      |        |      ;
-	jsr.W CODE_01C488                    ;01C226|2088C4  |01C488;
-	jsr.W CODE_01C4D2                    ;01C229|20D2C4  |01C4D2;
+	jsr.W Battle_CalculateDamage                    ;01C226|2088C4  |01C488;
+	jsr.W Battle_ApplyHealing                    ;01C229|20D2C4  |01C4D2;
 	rts                                  ;01C22C|60      |      ;
 ;      |        |      ;
 	db $e2,$20,$c2,$10,$ad,$9d,$19,$8d,$2b,$19,$ad,$9e,$19,$8d,$2d,$19;01C22D|        |      ;
 	db $20,$f4,$c8,$60                   ;01C23D|        |01C8F4;
 ;      |        |      ;
-CODE_01C241:
+Battle_Initialize:
 	sep #$20                             ;01C241|E220    |      ;
 	rep #$10                             ;01C243|C210    |      ;
 	lda.B #$10                           ;01C245|A910    |      ;
 	sta.W $1993                          ;01C247|8D9319  |011993;
 	ldy.W #$0004                         ;01C24A|A00400  |      ;
 ;      |        |      ;
-CODE_01C24D:
+Battle_LoadData:
 	phy                                  ;01C24D|5A      |      ;
 	lda.W $0e8b                          ;01C24E|AD8B0E  |010E8B;
 	inc a;01C251|1A      |      ;
@@ -8260,14 +8260,14 @@ CODE_01C24D:
 	jsr.W CODE_01D6A9                    ;01C25C|20A9D6  |01D6A9;
 	ply                                  ;01C25F|7A      |      ;
 	dey                                  ;01C260|88      |      ;
-	bne CODE_01C24D                      ;01C261|D0EA    |01C24D;
+	bne Battle_LoadData                      ;01C261|D0EA    |01C24D;
 	rts                                  ;01C263|60      |      ;
 ;      |        |      ;
 	sep #$20                             ;01C264|E220    |      ;
 	rep #$10                             ;01C266|C210    |      ;
 	ldy.W #$000c                         ;01C268|A00C00  |      ;
 ;      |        |      ;
-CODE_01C26B:
+Battle_SetupEnemies:
 	phy                                  ;01C26B|5A      |      ;
 	dec.W $199e                          ;01C26C|CE9E19  |01199E;
 	dec.W $199e                          ;01C26F|CE9E19  |01199E;
@@ -8277,15 +8277,15 @@ CODE_01C26B:
 	dec.W $19a2                          ;01C27B|CEA219  |0119A2;
 	dec.W $19a4                          ;01C27E|CEA419  |0119A4;
 	dec.W $19a4                          ;01C281|CEA419  |0119A4;
-	jsr.W CODE_01C450                    ;01C284|2050C4  |01C450;
+	jsr.W Battle_CheckVictory                    ;01C284|2050C4  |01C450;
 	jsr.W Field_UpdateAndWait                    ;01C287|20D982  |0182D9;
 	ply                                  ;01C28A|7A      |      ;
 	dey                                  ;01C28B|88      |      ;
-	bne CODE_01C26B                      ;01C28C|D0DD    |01C26B;
-	jsr.W CODE_01C241                    ;01C28E|2041C2  |01C241;
+	bne Battle_SetupEnemies                      ;01C28C|D0DD    |01C26B;
+	jsr.W Battle_Initialize                    ;01C28E|2041C2  |01C241;
 	ldy.W #$000c                         ;01C291|A00C00  |      ;
 ;      |        |      ;
-CODE_01C294:
+Battle_SetupParty:
 	phy                                  ;01C294|5A      |      ;
 	inc.W $199e                          ;01C295|EE9E19  |01199E;
 	inc.W $199e                          ;01C298|EE9E19  |01199E;
@@ -8295,11 +8295,11 @@ CODE_01C294:
 	inc.W $19a2                          ;01C2A4|EEA219  |0119A2;
 	inc.W $19a4                          ;01C2A7|EEA419  |0119A4;
 	inc.W $19a4                          ;01C2AA|EEA419  |0119A4;
-	jsr.W CODE_01C450                    ;01C2AD|2050C4  |01C450;
+	jsr.W Battle_CheckVictory                    ;01C2AD|2050C4  |01C450;
 	jsr.W Field_UpdateAndWait                    ;01C2B0|20D982  |0182D9;
 	ply                                  ;01C2B3|7A      |      ;
 	dey                                  ;01C2B4|88      |      ;
-	bne CODE_01C294                      ;01C2B5|D0DD    |01C294;
+	bne Battle_SetupParty                      ;01C2B5|D0DD    |01C294;
 	rts                                  ;01C2B7|60      |      ;
 ;      |        |      ;
 	lda.W $19ee                          ;01C2B8|ADEE19  |0119EE;
@@ -8324,7 +8324,7 @@ UNREACH_01C2C5:
 	jsl.L CODE_009760                    ;01C30A|22609700|009760;
 	sep #$20                             ;01C30E|E220    |      ;
 	rep #$10                             ;01C310|C210    |      ;
-	jsr.W CODE_01C450                    ;01C312|2050C4  |01C450;
+	jsr.W Battle_CheckVictory                    ;01C312|2050C4  |01C450;
 	rts                                  ;01C315|60      |      ;
 ;      |        |      ;
 	lda.W #$00f5                         ;01C316|A9F500  |      ;
@@ -8334,21 +8334,21 @@ UNREACH_01C2C5:
 	lda.W $19b4                          ;01C321|ADB419  |0119B4;
 	and.B #$7f                           ;01C324|297F    |      ;
 	sta.W $19b4                          ;01C326|8DB419  |0119B4;
-	jsr.W CODE_01C450                    ;01C329|2050C4  |01C450;
+	jsr.W Battle_CheckVictory                    ;01C329|2050C4  |01C450;
 	rts                                  ;01C32C|60      |      ;
 ;      |        |      ;
 	sep #$20                             ;01C32D|E220    |      ;
 	rep #$10                             ;01C32F|C210    |      ;
-	jsr.W CODE_01C488                    ;01C331|2088C4  |01C488;
+	jsr.W Battle_CalculateDamage                    ;01C331|2088C4  |01C488;
 	stz.W $192b                          ;01C334|9C2B19  |01192B;
 	lda.W $19ee                          ;01C337|ADEE19  |0119EE;
 	cmp.B #$b0                           ;01C33A|C9B0    |      ;
-	beq CODE_01C343                      ;01C33C|F005    |01C343;
+	beq Battle_Begin                      ;01C33C|F005    |01C343;
 	lda.B #$03                           ;01C33E|A903    |      ;
 	sta.W $192b                          ;01C340|8D2B19  |01192B;
 ;      |        |      ;
-CODE_01C343:
-	jsr.W CODE_01C4F6                    ;01C343|20F6C4  |01C4F6;
+Battle_Begin:
+	jsr.W Battle_UpdateHP                    ;01C343|20F6C4  |01C4F6;
 	rts                                  ;01C346|60      |      ;
 ;      |        |      ;
 	sep #$20                             ;01C347|E220    |      ;
@@ -8363,7 +8363,7 @@ CODE_01C343:
 	sta.W $1929                          ;01C35B|8D2919  |011929;
 	lda.B #$01                           ;01C35E|A901    |      ;
 	sta.W $1928                          ;01C360|8D2819  |011928;
-	jmp.W CODE_01C04E                    ;01C363|4C4EC0  |01C04E;
+	jmp.W Event_UpdateFlags                    ;01C363|4C4EC0  |01C04E;
 ;      |        |      ;
 	sep #$20                             ;01C366|E220    |      ;
 	rep #$10                             ;01C368|C210    |      ;
@@ -8378,7 +8378,7 @@ CODE_01C343:
 	sta.W $1929                          ;01C37D|8D2919  |011929;
 	lda.B #$02                           ;01C380|A902    |      ;
 	sta.W $1928                          ;01C382|8D2819  |011928;
-	jmp.W CODE_01C04E                    ;01C385|4C4EC0  |01C04E;
+	jmp.W Event_UpdateFlags                    ;01C385|4C4EC0  |01C04E;
 ;      |        |      ;
 	db $60                               ;01C388|        |      ;
 	sep #$20                             ;01C389|E220    |      ;
@@ -8426,7 +8426,7 @@ DATA8_01c402:
 	db $88,$c3                           ;01C406|        |      ;
 	db $89,$c3                           ;01C408|        |      ;
 ;      |        |      ;
-CODE_01C40A:
+Battle_ProcessTurn:
 	php                                  ;01C40A|08      |      ;
 	rep #$30                             ;01C40B|C230    |      ;
 	phb                                  ;01C40D|8B      |      ;
@@ -8445,7 +8445,7 @@ CODE_01C40A:
 	rts                                  ;01C42C|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
-CODE_01C42D:
+Battle_UpdateStatus:
 	php                                  ;01C42D|08      |      ;
 	sep #$20                             ;01C42E|E220    |      ;
 	rep #$10                             ;01C430|C210    |      ;
@@ -8464,18 +8464,18 @@ CODE_01C42D:
 	rts                                  ;01C44F|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
-CODE_01C450:
+Battle_CheckVictory:
 	lda.W $0e8b                          ;01C450|AD8B0E  |010E8B;
 	asl a;01C453|0A      |      ;
 	jmp.W Field_MapSetupEntity                    ;01C454|4CB08C  |018CB0;
 ;      |        |      ;
 ;      |        |      ;
-CODE_01C457:
+Battle_CheckDefeat:
 	sep #$20                             ;01C457|E220    |      ;
 	rep #$10                             ;01C459|C210    |      ;
 	lda.W $19ee                          ;01C45B|ADEE19  |0119EE;
 	and.B #$0f                           ;01C45E|290F    |      ;
-	jsr.W CODE_01B1EB                    ;01C460|20EBB1  |01B1EB;
+	jsr.W Sprite_CheckActive                    ;01C460|20EBB1  |01B1EB;
 	bcc UNREACH_01C487                   ;01C463|9022    |01C487;
 	lda.W $1a86,x                        ;01C465|BD861A  |011A86;
 	ora.W $1a88,x                        ;01C468|1D881A  |011A88;
@@ -8498,7 +8498,7 @@ CODE_01C457:
 UNREACH_01C487:
 	db $60                               ;01C487|        |      ;
 ;      |        |      ;
-CODE_01C488:
+Battle_CalculateDamage:
 	sep #$20                             ;01C488|E220    |      ;
 	rep #$10                             ;01C48A|C210    |      ;
 	ldx.W $199d                          ;01C48C|AE9D19  |01199D;
@@ -8513,7 +8513,7 @@ CODE_01C488:
 	rts                                  ;01C49E|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
-CODE_01C49F:
+Battle_ApplyDamage:
 	lda.B #$3e                           ;01C49F|A93E    |      ;
 	sta.W $0c52                          ;01C4A1|8D520C  |010C52;
 	sta.W $0c56                          ;01C4A4|8D560C  |010C56;
@@ -8528,8 +8528,8 @@ CODE_01C49F:
 	sta.W $0c57                          ;01C4BB|8D570C  |010C57;
 	sta.W $0c5f                          ;01C4BE|8D5F0C  |010C5F;
 ;      |        |      ;
-CODE_01C4C1:
-	jsr.W CODE_01C542                    ;01C4C1|2042C5  |01C542;
+Battle_ProcessHealing:
+	jsr.W Battle_CheckDeath                    ;01C4C1|2042C5  |01C542;
 	stz.W $0e05                          ;01C4C4|9C050E  |010E05;
 	lda.B #$2d                           ;01C4C7|A92D    |      ;
 	jsr.W CODE_01D6A9                    ;01C4C9|20A9D6  |01D6A9;
@@ -8538,7 +8538,7 @@ CODE_01C4C1:
 	rts                                  ;01C4D1|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
-CODE_01C4D2:
+Battle_ApplyHealing:
 	lda.B #$4c                           ;01C4D2|A94C    |      ;
 	sta.W $0c52                          ;01C4D4|8D520C  |010C52;
 	inc a;01C4D7|1A      |      ;
@@ -8553,10 +8553,10 @@ CODE_01C4D2:
 	sta.W $0c5b                          ;01C4EB|8D5B0C  |010C5B;
 	sta.W $0c57                          ;01C4EE|8D570C  |010C57;
 	sta.W $0c5f                          ;01C4F1|8D5F0C  |010C5F;
-	bra CODE_01C4C1                      ;01C4F4|80CB    |01C4C1;
+	bra Battle_ProcessHealing                      ;01C4F4|80CB    |01C4C1;
 ;      |        |      ;
 ;      |        |      ;
-CODE_01C4F6:
+Battle_UpdateHP:
 	lda.B #$48                           ;01C4F6|A948    |      ;
 	sta.W $0c52                          ;01C4F8|8D520C  |010C52;
 	sta.W $0c56                          ;01C4FB|8D560C  |010C56;
@@ -8570,7 +8570,7 @@ CODE_01C4F6:
 	ora.B #$40                           ;01C510|0940    |      ;
 	sta.W $0c57                          ;01C512|8D570C  |010C57;
 	sta.W $0c5f                          ;01C515|8D5F0C  |010C5F;
-	jsr.W CODE_01C542                    ;01C518|2042C5  |01C542;
+	jsr.W Battle_CheckDeath                    ;01C518|2042C5  |01C542;
 	stz.W $0e05                          ;01C51B|9C050E  |010E05;
 	lda.B #$14                           ;01C51E|A914    |      ;
 	jsr.W CODE_01D6A9                    ;01C520|20A9D6  |01D6A9;
@@ -8589,7 +8589,7 @@ CODE_01C4F6:
 	rts                                  ;01C541|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
-CODE_01C542:
+Battle_CheckDeath:
 	lda.B #$00                           ;01C542|A900    |      ;
 	xba                                  ;01C544|EB      |      ;
 	lda.W $192b                          ;01C545|AD2B19  |01192B;
@@ -8629,7 +8629,7 @@ DATA8_01c582:
 	db $0a,$0c                           ;01C583|        |      ;
 	db $f6,$0c,$f6,$f4                   ;01C585|        |      ;
 ;      |        |      ;
-CODE_01C589:
+Battle_ProcessDeath:
 	php                                  ;01C589|08      |      ;
 	phb                                  ;01C58A|8B      |      ;
 	rep #$30                             ;01C58B|C230    |      ;
@@ -8675,12 +8675,12 @@ CODE_01C589:
 	inx                                  ;01C5DF|E8      |      ;
 	inx                                  ;01C5E0|E8      |      ;
 ;      |        |      ;
-CODE_01C5E1:
+Battle_Reward:
 	lda.L $00192b                        ;01C5E1|AF2B1900|00192B;
 	sta.L $00192d                        ;01C5E5|8F2D1900|00192D;
 	phy                                  ;01C5E9|5A      |      ;
 ;      |        |      ;
-CODE_01C5EA:
+Battle_CalculateEXP:
 	lda.L DATA8_06ba0e,x                 ;01C5EA|BF0EBA06|06BA0E;
 	inx                                  ;01C5EE|E8      |      ;
 	sta.W $8000,y                        ;01C5EF|990080  |7F8000;
@@ -8688,7 +8688,7 @@ CODE_01C5EA:
 	lda.L $00192d                        ;01C5F3|AF2D1900|00192D;
 	dec a;01C5F7|3A      |      ;
 	sta.L $00192d                        ;01C5F8|8F2D1900|00192D;
-	bne CODE_01C5EA                      ;01C5FC|D0EC    |01C5EA;
+	bne Battle_CalculateEXP                      ;01C5FC|D0EC    |01C5EA;
 	ply                                  ;01C5FE|7A      |      ;
 	php                                  ;01C5FF|08      |      ;
 	rep #$30                             ;01C600|C230    |      ;
@@ -8700,14 +8700,14 @@ CODE_01C5EA:
 	lda.L $00192c                        ;01C60A|AF2C1900|00192C;
 	dec a;01C60E|3A      |      ;
 	sta.L $00192c                        ;01C60F|8F2C1900|00192C;
-	bne CODE_01C5E1                      ;01C613|D0CC    |01C5E1;
+	bne Battle_Reward                      ;01C613|D0CC    |01C5E1;
 	plx                                  ;01C615|FA      |      ;
 	plb                                  ;01C616|AB      |      ;
 	plp                                  ;01C617|28      |      ;
 	rts                                  ;01C618|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
-CODE_01C619:
+Battle_CalculateGold:
 	php                                  ;01C619|08      |      ;
 	phb                                  ;01C61A|8B      |      ;
 	sep #$20                             ;01C61B|E220    |      ;
@@ -8717,30 +8717,30 @@ CODE_01C619:
 	pla                                  ;01C623|68      |      ;
 	ldy.W #$0000                         ;01C624|A00000  |      ;
 ;      |        |      ;
-CODE_01C627:
+Battle_GainEXP:
 	lda.W DATA8_06b800,y                 ;01C627|B900B8  |06B800;
 	cmp.W $0e91                          ;01C62A|CD910E  |060E91;
-	beq CODE_01C639                      ;01C62D|F00A    |01C639;
+	beq Battle_CheckLevelUp                      ;01C62D|F00A    |01C639;
 	cmp.B #$ff                           ;01C62F|C9FF    |      ;
 	beq UNREACH_01C659                   ;01C631|F026    |01C659;
 ;      |        |      ;
-CODE_01C633:
+Battle_GainGold:
 	iny                                  ;01C633|C8      |      ;
 	iny                                  ;01C634|C8      |      ;
 	iny                                  ;01C635|C8      |      ;
 	iny                                  ;01C636|C8      |      ;
-	bra CODE_01C627                      ;01C637|80EE    |01C627;
+	bra Battle_GainEXP                      ;01C637|80EE    |01C627;
 ;      |        |      ;
 ;      |        |      ;
-CODE_01C639:
+Battle_CheckLevelUp:
 	ldx.W DATA8_06b801,y                 ;01C639|BE01B8  |06B801;
 	cpx.W $19f1                          ;01C63C|ECF119  |0619F1;
-	bne CODE_01C633                      ;01C63F|D0F2    |01C633;
+	bne Battle_GainGold                      ;01C63F|D0F2    |01C633;
 	tya                                  ;01C641|98      |      ;
 	lsr a;01C642|4A      |      ;
 	lsr a;01C643|4A      |      ;
 	sta.W $19ee                          ;01C644|8DEE19  |0619EE;
-	jsr.W CODE_01C71F                    ;01C647|201FC7  |01C71F;
+	jsr.W Menu_UpdateCursor                    ;01C647|201FC7  |01C71F;
 	lda.W DATA8_06b803,y                 ;01C64A|B903B8  |06B803;
 	sta.W $19ee                          ;01C64D|8DEE19  |0619EE;
 	lda.B #$22                           ;01C650|A922    |      ;
@@ -8754,7 +8754,7 @@ CODE_01C639:
 UNREACH_01C659:
 	db $ab,$28,$38,$60                   ;01C659|        |      ;
 ;      |        |      ;
-CODE_01C65D:
+Battle_ProcessLevelUp:
 	php                                  ;01C65D|08      |      ;
 	phb                                  ;01C65E|8B      |      ;
 	sep #$20                             ;01C65F|E220    |      ;
@@ -8764,30 +8764,30 @@ CODE_01C65D:
 	pla                                  ;01C667|68      |      ;
 	ldy.W #$0000                         ;01C668|A00000  |      ;
 ;      |        |      ;
-CODE_01C66B:
+Battle_UpdateStats:
 	lda.W DATA8_06b8cd,y                 ;01C66B|B9CDB8  |06B8CD;
 	cmp.W $0e91                          ;01C66E|CD910E  |060E91;
-	beq CODE_01C67D                      ;01C671|F00A    |01C67D;
+	beq Battle_Complete                      ;01C671|F00A    |01C67D;
 	cmp.B #$ff                           ;01C673|C9FF    |      ;
 	beq UNREACH_01C69D                   ;01C675|F026    |01C69D;
 ;      |        |      ;
-CODE_01C677:
+Battle_LearnSpell:
 	iny                                  ;01C677|C8      |      ;
 	iny                                  ;01C678|C8      |      ;
 	iny                                  ;01C679|C8      |      ;
 	iny                                  ;01C67A|C8      |      ;
-	bra CODE_01C66B                      ;01C67B|80EE    |01C66B;
+	bra Battle_UpdateStats                      ;01C67B|80EE    |01C66B;
 ;      |        |      ;
 ;      |        |      ;
-CODE_01C67D:
+Battle_Complete:
 	ldx.W DATA8_06b8ce,y                 ;01C67D|BECEB8  |06B8CE;
 	cpx.W $19f1                          ;01C680|ECF119  |0619F1;
-	bne CODE_01C677                      ;01C683|D0F2    |01C677;
+	bne Battle_LearnSpell                      ;01C683|D0F2    |01C677;
 	tya                                  ;01C685|98      |      ;
 	lsr a;01C686|4A      |      ;
 	lsr a;01C687|4A      |      ;
 	sta.W $19ee                          ;01C688|8DEE19  |0619EE;
-	jsr.W CODE_01C71F                    ;01C68B|201FC7  |01C71F;
+	jsr.W Menu_UpdateCursor                    ;01C68B|201FC7  |01C71F;
 	lda.W DATA8_06b8d0,y                 ;01C68E|B9D0B8  |06B8D0;
 	sta.W $19ee                          ;01C691|8DEE19  |0619EE;
 	lda.B #$22                           ;01C694|A922    |      ;
@@ -8801,7 +8801,7 @@ CODE_01C67D:
 UNREACH_01C69D:
 	db $ab,$28,$38,$60                   ;01C69D|        |      ;
 ;      |        |      ;
-CODE_01C6A1:
+Menu_Initialize:
 	php                                  ;01C6A1|08      |      ;
 	phb                                  ;01C6A2|8B      |      ;
 	phx                                  ;01C6A3|DA      |      ;
@@ -8816,7 +8816,7 @@ CODE_01C6A1:
 	stx.W $19c3                          ;01C6BA|8EC319  |0119C3;
 	ldy.W #$000a                         ;01C6BD|A00A00  |      ;
 ;      |        |      ;
-CODE_01C6C0:
+Menu_ProcessInput:
 	phy                                  ;01C6C0|5A      |      ;
 	ldx.W $19c1                          ;01C6C1|AEC119  |0119C1;
 	stx.W $19bd                          ;01C6C4|8EBD19  |0119BD;
@@ -8847,7 +8847,7 @@ CODE_01C6C0:
 	jsr.W Field_EntityCollision                    ;01C703|20F38D  |018DF3;
 	ply                                  ;01C706|7A      |      ;
 	dey                                  ;01C707|88      |      ;
-	bpl CODE_01C6C0                      ;01C708|10B6    |01C6C0;
+	bpl Menu_ProcessInput                      ;01C708|10B6    |01C6C0;
 	ldx.W $19f1                          ;01C70A|AEF119  |0119F1;
 	stx.W $0e89                          ;01C70D|8E890E  |010E89;
 	plx                                  ;01C710|FA      |      ;
@@ -8859,44 +8859,44 @@ CODE_01C6C0:
 DATA8_01c714:
 	db $05,$fb,$04,$fc,$03,$fd,$02,$fe,$01,$ff,$00;01C714|        |      ;
 ;      |        |      ;
-CODE_01C71F:
+Menu_UpdateCursor:
 	php                                  ;01C71F|08      |      ;
 	phx                                  ;01C720|DA      |      ;
 	sep #$20                             ;01C721|E220    |      ;
 	rep #$10                             ;01C723|C210    |      ;
 	lda.W $19ef                          ;01C725|ADEF19  |0619EF;
 	cmp.B #$0d                           ;01C728|C90D    |      ;
-	beq CODE_01C733                      ;01C72A|F007    |01C733;
+	beq Menu_MoveCursorDown                      ;01C72A|F007    |01C733;
 	cmp.B #$0f                           ;01C72C|C90F    |      ;
-	beq CODE_01C742                      ;01C72E|F012    |01C742;
+	beq Menu_MoveCursorLeft                      ;01C72E|F012    |01C742;
 ;      |        |      ;
-CODE_01C730:
+Menu_MoveCursorUp:
 	plx                                  ;01C730|FA      |      ;
 	plp                                  ;01C731|28      |      ;
 	rts                                  ;01C732|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
-CODE_01C733:
+Menu_MoveCursorDown:
 	lda.W $19ee                          ;01C733|ADEE19  |0619EE;
 	phd                                  ;01C736|0B      |      ;
 	pea.W $0f48                          ;01C737|F4480F  |060F48;
 	pld                                  ;01C73A|2B      |      ;
 	jsl.L CODE_00974E                    ;01C73B|224E9700|00974E;
 	pld                                  ;01C73F|2B      |      ;
-	bra CODE_01C730                      ;01C740|80EE    |01C730;
+	bra Menu_MoveCursorUp                      ;01C740|80EE    |01C730;
 ;      |        |      ;
 ;      |        |      ;
-CODE_01C742:
+Menu_MoveCursorLeft:
 	lda.W $19ee                          ;01C742|ADEE19  |0619EE;
 	phd                                  ;01C745|0B      |      ;
 	pea.W $0f68                          ;01C746|F4680F  |060F68;
 	pld                                  ;01C749|2B      |      ;
 	jsl.L CODE_00974E                    ;01C74A|224E9700|00974E;
 	pld                                  ;01C74E|2B      |      ;
-	bra CODE_01C730                      ;01C74F|80DF    |01C730;
+	bra Menu_MoveCursorUp                      ;01C74F|80DF    |01C730;
 ;      |        |      ;
 ;      |        |      ;
-CODE_01C751:
+Menu_MoveCursorRight:
 	php                                  ;01C751|08      |      ;
 	sep #$20                             ;01C752|E220    |      ;
 	rep #$10                             ;01C754|C210    |      ;
@@ -8904,7 +8904,7 @@ CODE_01C751:
 	sta.W $192b                          ;01C758|8D2B19  |01192B;
 	ldy.W #$0100                         ;01C75B|A00001  |      ;
 ;      |        |      ;
-CODE_01C75E:
+Menu_ConfirmSelection:
 	lda.W $192b                          ;01C75E|AD2B19  |01192B;
 	phd                                  ;01C761|0B      |      ;
 	pea.W $0f48                          ;01C762|F4480F  |010F48;
@@ -8913,7 +8913,7 @@ CODE_01C75E:
 	pld                                  ;01C76A|2B      |      ;
 	inc a;01C76B|1A      |      ;
 	dec a;01C76C|3A      |      ;
-	beq CODE_01C794                      ;01C76D|F025    |01C794;
+	beq Menu_CancelSelection                      ;01C76D|F025    |01C794;
 	php                                  ;01C76F|08      |      ;
 	rep #$30                             ;01C770|C230    |      ;
 	lda.W $192b                          ;01C772|AD2B19  |01192B;
@@ -8924,22 +8924,22 @@ CODE_01C75E:
 	plp                                  ;01C77B|28      |      ;
 	lda.L DATA8_06b800,x                 ;01C77C|BF00B806|06B800;
 	cmp.W $0e91                          ;01C780|CD910E  |010E91;
-	bne CODE_01C794                      ;01C783|D00F    |01C794;
+	bne Menu_CancelSelection                      ;01C783|D00F    |01C794;
 	lda.L DATA8_06b803,x                 ;01C785|BF03B806|06B803;
 	sta.W $19ee                          ;01C789|8DEE19  |0119EE;
 	lda.B #$22                           ;01C78C|A922    |      ;
 	sta.W $19ef                          ;01C78E|8DEF19  |0119EF;
 	jsr.W CODE_01C7ED                    ;01C791|20EDC7  |01C7ED;
 ;      |        |      ;
-CODE_01C794:
+Menu_CancelSelection:
 	dec.W $192b                          ;01C794|CE2B19  |01192B;
 	dey                                  ;01C797|88      |      ;
-	bne CODE_01C75E                      ;01C798|D0C4    |01C75E;
+	bne Menu_ConfirmSelection                      ;01C798|D0C4    |01C75E;
 	lda.B #$7f                           ;01C79A|A97F    |      ;
 	sta.W $192b                          ;01C79C|8D2B19  |01192B;
 	ldy.W #$0080                         ;01C79F|A08000  |      ;
 ;      |        |      ;
-CODE_01C7A2:
+Menu_UpdateDisplay:
 	lda.W $192b                          ;01C7A2|AD2B19  |01192B;
 	phd                                  ;01C7A5|0B      |      ;
 	pea.W $0f68                          ;01C7A6|F4680F  |010F68;
@@ -8968,7 +8968,7 @@ CODE_01C7A2:
 	phx                                  ;01C7D8|DA      |      ;
 	phy                                  ;01C7D9|5A      |      ;
 	php                                  ;01C7DA|08      |      ;
-	jsl.L CODE_01B24C                    ;01C7DB|224CB201|01B24C;
+	jsl.L DMA_QueueTransfer                    ;01C7DB|224CB201|01B24C;
 	plp                                  ;01C7DF|28      |      ;
 	ply                                  ;01C7E0|7A      |      ;
 	plx                                  ;01C7E1|FA      |      ;
@@ -8977,7 +8977,7 @@ CODE_01C7A2:
 CODE_01C7E5:
 	dec.W $192b                          ;01C7E5|CE2B19  |01192B;
 	dey                                  ;01C7E8|88      |      ;
-	bne CODE_01C7A2                      ;01C7E9|D0B7    |01C7A2;
+	bne Menu_UpdateDisplay                      ;01C7E9|D0B7    |01C7A2;
 	plp                                  ;01C7EB|28      |      ;
 	rts                                  ;01C7EC|60      |      ;
 ;      |        |      ;
@@ -8996,7 +8996,7 @@ CODE_01C7ED:
 	beq CODE_01C815                      ;01C7FE|F015    |01C815;
 	phy                                  ;01C800|5A      |      ;
 	php                                  ;01C801|08      |      ;
-	jsr.W CODE_01B73C                    ;01C802|203CB7  |01B73C;
+	jsr.W Mode7_WriteRegisters                    ;01C802|203CB7  |01B73C;
 	plp                                  ;01C805|28      |      ;
 	ply                                  ;01C806|7A      |      ;
 ;      |        |      ;
@@ -9035,7 +9035,7 @@ CODE_01C81D:
 	phb                                  ;01C82E|8B      |      ;
 	phk                                  ;01C82F|4B      |      ;
 	plb                                  ;01C830|AB      |      ;
-	jsr.W CODE_01B73C                    ;01C831|203CB7  |01B73C;
+	jsr.W Mode7_WriteRegisters                    ;01C831|203CB7  |01B73C;
 	plb                                  ;01C834|AB      |      ;
 	plp                                  ;01C835|28      |      ;
 	plx                                  ;01C836|FA      |      ;
@@ -9141,7 +9141,7 @@ CODE_01C8C4:
 	cmp.B #$28                           ;01C8E4|C928    |      ;
 	beq CODE_01C8EE                      ;01C8E6|F006    |01C8EE;
 	phx                                  ;01C8E8|DA      |      ;
-	jsl.L CODE_01B24C                    ;01C8E9|224CB201|01B24C;
+	jsl.L DMA_QueueTransfer                    ;01C8E9|224CB201|01B24C;
 	plx                                  ;01C8ED|FA      |      ;
 ;      |        |      ;
 CODE_01C8EE:
@@ -9300,7 +9300,7 @@ CODE_01CACF:
 	plx                                  ;01CADF|FA      |      ;
 	jsr.W Collision_FlagEnd                    ;01CAE0|208AAE  |01AE8A;
 	lda.W $19e7                          ;01CAE3|ADE719  |0119E7;
-	jsr.W CODE_01B119                    ;01CAE6|2019B1  |01B119;
+	jsr.W Sprite_WriteTileData                    ;01CAE6|2019B1  |01B119;
 	ply                                  ;01CAE9|7A      |      ;
 	plx                                  ;01CAEA|FA      |      ;
 	plp                                  ;01CAEB|28      |      ;
@@ -9636,7 +9636,7 @@ CODE_01CCE8:
 	jsr.W CODE_01CECA                    ;01CD0C|20CACE  |01CECA;
 	jsr.W MapEvent_ScrollScreen                    ;01CD0F|205D93  |01935D;
 	lda.W $1935                          ;01CD12|AD3519  |011935;
-	jsr.W CODE_01B1EB                    ;01CD15|20EBB1  |01B1EB;
+	jsr.W Sprite_CheckActive                    ;01CD15|20EBB1  |01B1EB;
 	sta.W $1939                          ;01CD18|8D3919  |011939;
 	stx.W $193b                          ;01CD1B|8E3B19  |01193B;
 	lda.W $1a72,x                        ;01CD1E|BD721A  |011A72;
@@ -9665,7 +9665,7 @@ CODE_01CCE8:
 	ldx.W $192b                          ;01CD58|AE2B19  |01192B;
 	stx.W $193f                          ;01CD5B|8E3F19  |01193F;
 	lda.W $1936                          ;01CD5E|AD3619  |011936;
-	jsr.W CODE_01B1EB                    ;01CD61|20EBB1  |01B1EB;
+	jsr.W Sprite_CheckActive                    ;01CD61|20EBB1  |01B1EB;
 	sta.W $1941                          ;01CD64|8D4119  |011941;
 	stx.W $1943                          ;01CD67|8E4319  |011943;
 	lda.W $1a72,x                        ;01CD6A|BD721A  |011A72;
@@ -9692,7 +9692,7 @@ CODE_01CCE8:
 	lda.B #$80                           ;01CDA4|A980    |      ;
 	sta.W $1929                          ;01CDA6|8D2919  |011929;
 	lda.B #$37                           ;01CDA9|A937    |      ;
-	jsr.W CODE_01BAAD                    ;01CDAB|20ADBA  |01BAAD;
+	jsr.W Sound_PlayEffect                    ;01CDAB|20ADBA  |01BAAD;
 ;      |        |      ;
 CODE_01CDAE:
 	jsr.W MapEvent_ScrollScreen                    ;01CDAE|205D93  |01935D;
@@ -9716,7 +9716,7 @@ CODE_01CDCA:
 	adc.W $1937                          ;01CDD7|6D3719  |011937;
 	sta.W $1a7e,x                        ;01CDDA|9D7E1A  |011A7E;
 	lda.B #$38                           ;01CDDD|A938    |      ;
-	jsr.W CODE_01BAAD                    ;01CDDF|20ADBA  |01BAAD;
+	jsr.W Sound_PlayEffect                    ;01CDDF|20ADBA  |01BAAD;
 	ldx.W $193b                          ;01CDE2|AE3B19  |01193B;
 	lda.W $1939                          ;01CDE5|AD3919  |011939;
 	sta.W $19e7                          ;01CDE8|8DE719  |0119E7;
@@ -9891,7 +9891,7 @@ CODE_01CF5E:
 	php                                  ;01CF5E|08      |      ;
 	sep #$20                             ;01CF5F|E220    |      ;
 	rep #$10                             ;01CF61|C210    |      ;
-	jsr.W CODE_01B1EB                    ;01CF63|20EBB1  |01B1EB;
+	jsr.W Sprite_CheckActive                    ;01CF63|20EBB1  |01B1EB;
 	phx                                  ;01CF66|DA      |      ;
 	rep #$30                             ;01CF67|C230    |      ;
 	and.W #$00ff                         ;01CF69|29FF00  |      ;
@@ -9925,7 +9925,7 @@ CODE_01CF7D:
 CODE_01CF9E:
 	lda.W $19ee                          ;01CF9E|ADEE19  |0119EE;
 	and.B #$0f                           ;01CFA1|290F    |      ;
-	jsr.W CODE_01B1EB                    ;01CFA3|20EBB1  |01B1EB;
+	jsr.W Sprite_CheckActive                    ;01CFA3|20EBB1  |01B1EB;
 	rts                                  ;01CFA6|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
@@ -9946,7 +9946,7 @@ CODE_01CFA7:
 ;      |        |      ;
 CODE_01CFD0:
 	txa                                  ;01CFD0|8A      |      ;
-	jsr.W CODE_01B1EB                    ;01CFD1|20EBB1  |01B1EB;
+	jsr.W Sprite_CheckActive                    ;01CFD1|20EBB1  |01B1EB;
 	lda.W $1a85,x                        ;01CFD4|BD851A  |011A85;
 	jsr.W CODE_01D041                    ;01CFD7|2041D0  |01D041;
 	lda.W $1a87,x                        ;01CFDA|BD871A  |011A87;
@@ -10057,7 +10057,7 @@ CODE_01D06F:
 ;      |        |      ;
 CODE_01D0A5:
 	lda.B #$08                           ;01D0A5|A908    |      ;
-	jsr.W CODE_01BAAD                    ;01D0A7|20ADBA  |01BAAD;
+	jsr.W Sound_PlayEffect                    ;01D0A7|20ADBA  |01BAAD;
 	jsr.W CODE_01D069                    ;01D0AA|2069D0  |01D069;
 	lda.B #$06                           ;01D0AD|A906    |      ;
 	jsr.W CODE_01D6A9                    ;01D0AF|20A9D6  |01D6A9;
@@ -10118,7 +10118,7 @@ CODE_01D0E8:
 ;      |        |      ;
 CODE_01D120:
 	lda.B #$00                           ;01D120|A900    |      ;
-	jsr.W CODE_01B1EB                    ;01D122|20EBB1  |01B1EB;
+	jsr.W Sprite_CheckActive                    ;01D122|20EBB1  |01B1EB;
 	bcc CODE_01D14D                      ;01D125|9026    |01D14D;
 	stx.W $1935                          ;01D127|8E3519  |011935;
 	sta.W $1937                          ;01D12A|8D3719  |011937;
@@ -10126,7 +10126,7 @@ CODE_01D120:
 	sta.W $1938                          ;01D130|8D3819  |011938;
 	jsr.W CODE_01D14E                    ;01D133|204ED1  |01D14E;
 	lda.B #$01                           ;01D136|A901    |      ;
-	jsr.W CODE_01B1EB                    ;01D138|20EBB1  |01B1EB;
+	jsr.W Sprite_CheckActive                    ;01D138|20EBB1  |01B1EB;
 	bcc CODE_01D14D                      ;01D13B|9010    |01D14D;
 	stx.W $1939                          ;01D13D|8E3919  |011939;
 	sta.W $193b                          ;01D140|8D3B19  |01193B;
@@ -10560,7 +10560,7 @@ CODE_01D481:
 ;      |        |      ;
 CODE_01D49B:
 	php                                  ;01D49B|08      |      ;
-	jsr.W CODE_01B1EB                    ;01D49C|20EBB1  |01B1EB;
+	jsr.W Sprite_CheckActive                    ;01D49C|20EBB1  |01B1EB;
 	stx.W $192b                          ;01D49F|8E2B19  |01192B;
 	sta.W $192d                          ;01D4A2|8D2D19  |01192D;
 	rep #$30                             ;01D4A5|C230    |      ;
@@ -10845,7 +10845,7 @@ DATA8_01d6cb:
 ;      |        |      ;
 CODE_01D6E8:
 	lda.W $19e2                          ;01D6E8|ADE219  |0119E2;
-	jsr.W CODE_01B1EB                    ;01D6EB|20EBB1  |01B1EB;
+	jsr.W Sprite_CheckActive                    ;01D6EB|20EBB1  |01B1EB;
 	stx.W $19ea                          ;01D6EE|8EEA19  |0119EA;
 	sta.W $19e7                          ;01D6F1|8DE719  |0119E7;
 	lda.W $1a7d,x                        ;01D6F4|BD7D1A  |011A7D;
@@ -10992,7 +10992,7 @@ CODE_01D809:
 	cmp.B #$0b                           ;01D812|C90B    |      ;
 	bne CODE_01D81B                      ;01D814|D005    |01D81B;
 	lda.B #$22                           ;01D816|A922    |      ;
-	jsr.W CODE_01BAAD                    ;01D818|20ADBA  |01BAAD;
+	jsr.W Sound_PlayEffect                    ;01D818|20ADBA  |01BAAD;
 ;      |        |      ;
 CODE_01D81B:
 	dec.W $1926                          ;01D81B|CE2619  |011926;
@@ -11010,7 +11010,7 @@ CODE_01D81B:
 	stz.W $1926                          ;01D837|9C2619  |011926;
 	jsr.W CODE_01E28B                    ;01D83A|208BE2  |01E28B;
 	lda.B #$00                           ;01D83D|A900    |      ;
-	jsr.W CODE_01B1EB                    ;01D83F|20EBB1  |01B1EB;
+	jsr.W Sprite_CheckActive                    ;01D83F|20EBB1  |01B1EB;
 	stx.W $19ea                          ;01D842|8EEA19  |0119EA;
 	sta.W $19e7                          ;01D845|8DE719  |0119E7;
 	lda.B #$3e                           ;01D848|A93E    |      ;
@@ -11049,11 +11049,11 @@ CODE_01D81B:
 	jsr.W CODE_01E3AA                    ;01D89B|20AAE3  |01E3AA;
 	ldx.W #$0d01                         ;01D89E|A2010D  |      ;
 	stx.W $19ee                          ;01D8A1|8EEE19  |0119EE;
-	jsr.W CODE_01C71F                    ;01D8A4|201FC7  |01C71F;
+	jsr.W Menu_UpdateCursor                    ;01D8A4|201FC7  |01C71F;
 	ldx.W #$2216                         ;01D8A7|A21622  |      ;
 	stx.W $19ee                          ;01D8AA|8EEE19  |0119EE;
-	jsl.L CODE_01B24C                    ;01D8AD|224CB201|01B24C;
-	jsr.W CODE_01C6A1                    ;01D8B1|20A1C6  |01C6A1;
+	jsl.L DMA_QueueTransfer                    ;01D8AD|224CB201|01B24C;
+	jsr.W Menu_Initialize                    ;01D8B1|20A1C6  |01C6A1;
 	rts                                  ;01D8B4|60      |      ;
 ;      |        |      ;
 	sep #$20                             ;01D8B5|E220    |      ;
@@ -11068,7 +11068,7 @@ CODE_01D81B:
 ;      |        |      ;
 CODE_01D8CC:
 	txa                                  ;01D8CC|8A      |      ;
-	jsr.W CODE_01B1EB                    ;01D8CD|20EBB1  |01B1EB;
+	jsr.W Sprite_CheckActive                    ;01D8CD|20EBB1  |01B1EB;
 	stx.W $19ea                          ;01D8D0|8EEA19  |0119EA;
 	sta.W $19e7                          ;01D8D3|8DE719  |0119E7;
 	lda.B #$37                           ;01D8D6|A937    |      ;
@@ -11100,19 +11100,19 @@ CODE_01D8CC:
 	sep #$20                             ;01D91B|E220    |      ;
 	rep #$10                             ;01D91D|C210    |      ;
 	lda.B #$06                           ;01D91F|A906    |      ;
-	jsr.W CODE_01B1EB                    ;01D921|20EBB1  |01B1EB;
+	jsr.W Sprite_CheckActive                    ;01D921|20EBB1  |01B1EB;
 	stx.W $1935                          ;01D924|8E3519  |011935;
 	sta.W $1937                          ;01D927|8D3719  |011937;
 	lda.B #$07                           ;01D92A|A907    |      ;
-	jsr.W CODE_01B1EB                    ;01D92C|20EBB1  |01B1EB;
+	jsr.W Sprite_CheckActive                    ;01D92C|20EBB1  |01B1EB;
 	stx.W $1939                          ;01D92F|8E3919  |011939;
 	sta.W $193b                          ;01D932|8D3B19  |01193B;
 	lda.B #$08                           ;01D935|A908    |      ;
-	jsr.W CODE_01B1EB                    ;01D937|20EBB1  |01B1EB;
+	jsr.W Sprite_CheckActive                    ;01D937|20EBB1  |01B1EB;
 	stx.W $193d                          ;01D93A|8E3D19  |01193D;
 	sta.W $193f                          ;01D93D|8D3F19  |01193F;
 	lda.B #$09                           ;01D940|A909    |      ;
-	jsr.W CODE_01B1EB                    ;01D942|20EBB1  |01B1EB;
+	jsr.W Sprite_CheckActive                    ;01D942|20EBB1  |01B1EB;
 	stx.W $1941                          ;01D945|8E4119  |011941;
 	sta.W $1943                          ;01D948|8D4319  |011943;
 	jsr.W CODE_01D96D                    ;01D94B|206DD9  |01D96D;
@@ -11158,7 +11158,7 @@ CODE_01D987:
 ;      |        |      ;
 CODE_01D98F:
 	lda.B #$0b                           ;01D98F|A90B    |      ;
-	jsr.W CODE_01BAAD                    ;01D991|20ADBA  |01BAAD;
+	jsr.W Sound_PlayEffect                    ;01D991|20ADBA  |01BAAD;
 	rts                                  ;01D994|60      |      ;
 ;      |        |      ;
 	db $e2,$20,$c2,$10,$a9,$03,$8d,$e2,$19,$a9,$03,$8d,$e4,$19,$80,$0c;01D995|        |      ;
@@ -11170,7 +11170,7 @@ CODE_01D98F:
 	jsr.W CODE_01DF72                    ;01D9B1|2072DF  |01DF72;
 	jsr.W Field_CameraScroll                    ;01D9B4|20768B  |018B76;
 	lda.W $19e4                          ;01D9B7|ADE419  |0119E4;
-	jsr.W CODE_01B1EB                    ;01D9BA|20EBB1  |01B1EB;
+	jsr.W Sprite_CheckActive                    ;01D9BA|20EBB1  |01B1EB;
 	stx.W $19ea                          ;01D9BD|8EEA19  |0119EA;
 	sta.W $19e7                          ;01D9C0|8DE719  |0119E7;
 	lda.B #$04                           ;01D9C3|A904    |      ;
@@ -11209,7 +11209,7 @@ CODE_01D98F:
 	ora.W $19e4                          ;01DA10|0DE419  |0119E4;
 	tax                                  ;01DA13|AA      |      ;
 	stx.W $19ee                          ;01DA14|8EEE19  |0119EE;
-	jsl.L CODE_01B24C                    ;01DA17|224CB201|01B24C;
+	jsl.L DMA_QueueTransfer                    ;01DA17|224CB201|01B24C;
 	jsr.W CODE_01DF34                    ;01DA1B|2034DF  |01DF34;
 	jsr.W Field_CameraUpdate                    ;01DA1E|20838B  |018B83;
 	rts                                  ;01DA21|60      |      ;
@@ -11442,7 +11442,7 @@ CODE_01E028:
 	sta.W $0513                          ;01E03A|8D1305  |010513;
 	jsr.W Field_CameraCalculate                    ;01E03D|20908B  |018B90;
 	lda.B #$27                           ;01E040|A927    |      ;
-	jsr.W CODE_01BAAD                    ;01E042|20ADBA  |01BAAD;
+	jsr.W Sound_PlayEffect                    ;01E042|20ADBA  |01BAAD;
 	jsl.L CODE_00D080                    ;01E045|2280D000|00D080;
 	lda.W $1020                          ;01E049|AD2010  |011020;
 	and.B #$40                           ;01E04C|2940    |      ;
@@ -11450,7 +11450,7 @@ CODE_01E028:
 	jsr.W CODE_01E05D                    ;01E050|205DE0  |01E05D;
 	lda.W $19ec                          ;01E053|ADEC19  |0119EC;
 	ldx.W $19e8                          ;01E056|AEE819  |0119E8;
-	jsr.W CODE_01B1B6                    ;01E059|20B6B1  |01B1B6;
+	jsr.W Sprite_ClearSlot                    ;01E059|20B6B1  |01B1B6;
 ;      |        |      ;
 CODE_01E05C:
 	rts                                  ;01E05C|60      |      ;
@@ -11738,7 +11738,7 @@ CODE_01E210:
 	jsr.W CODE_01E3AA                    ;01E273|20AAE3  |01E3AA;
 	lda.W $19b0                          ;01E276|ADB019  |0119B0;
 	beq CODE_01E27F                      ;01E279|F004    |01E27F;
-	jsl.L CODE_01B24C                    ;01E27B|224CB201|01B24C;
+	jsl.L DMA_QueueTransfer                    ;01E27B|224CB201|01B24C;
 ;      |        |      ;
 CODE_01E27F:
 	jsr.W Field_CameraUpdate                    ;01E27F|20838B  |018B83;
@@ -11847,7 +11847,7 @@ CODE_01E32A:
 CODE_01E330:
 	lda.B #$10                           ;01E330|A910    |      ;
 	sta.W $1993                          ;01E332|8D9319  |011993;
-	jsr.W CODE_01C450                    ;01E335|2050C4  |01C450;
+	jsr.W Battle_CheckVictory                    ;01E335|2050C4  |01C450;
 	rts                                  ;01E338|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
@@ -12155,10 +12155,10 @@ CODE_01E52D:
 	jsr.W CODE_01E3AA                    ;01E56C|20AAE3  |01E3AA;
 	lda.B #$10                           ;01E56F|A910    |      ;
 	sta.W $1993                          ;01E571|8D9319  |011993;
-	jsr.W CODE_01C450                    ;01E574|2050C4  |01C450;
+	jsr.W Battle_CheckVictory                    ;01E574|2050C4  |01C450;
 	lda.W $19b0                          ;01E577|ADB019  |0119B0;
 	beq CODE_01E580                      ;01E57A|F004    |01E580;
-	jsl.L CODE_01B24C                    ;01E57C|224CB201|01B24C;
+	jsl.L DMA_QueueTransfer                    ;01E57C|224CB201|01B24C;
 ;      |        |      ;
 CODE_01E580:
 	jsr.W Field_CameraUpdate                    ;01E580|20838B  |018B83;
@@ -14248,10 +14248,10 @@ CODE_01F4A7:
 	jsr.W MapEvent_InitializeSprite                    ;01F4B4|20CD94  |0194CD;
 	ldx.W #$270b                         ;01F4B7|A20B27  |      ;
 	stx.W $19ee                          ;01F4BA|8EEE19  |0119EE;
-	jsl.L CODE_01B24C                    ;01F4BD|224CB201|01B24C;
+	jsl.L DMA_QueueTransfer                    ;01F4BD|224CB201|01B24C;
 	ldx.W #$2000                         ;01F4C1|A20020  |      ;
 	stx.W $19ee                          ;01F4C4|8EEE19  |0119EE;
-	jsl.L CODE_01B24C                    ;01F4C7|224CB201|01B24C;
+	jsl.L DMA_QueueTransfer                    ;01F4C7|224CB201|01B24C;
 ;      |        |      ;
 CODE_01F4CB:
 	bra CODE_01F468                      ;01F4CB|809B    |01F468;
@@ -14592,7 +14592,7 @@ CODE_01F8E9:
 	sep #$20                             ;01F8F8|E220    |      ;
 	ldx.W #$270b                         ;01F8FA|A20B27  |      ;
 	stx.W $19ee                          ;01F8FD|8EEE19  |0119EE;
-	jsl.L CODE_01B24C                    ;01F900|224CB201|01B24C;
+	jsl.L DMA_QueueTransfer                    ;01F900|224CB201|01B24C;
 	jsr.W Field_WaitForVBlank                    ;01F904|20D082  |0182D0;
 	ldx.W #$0008                         ;01F907|A20800  |      ;
 ;      |        |      ;
