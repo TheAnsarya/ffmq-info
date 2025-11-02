@@ -202,7 +202,7 @@ CODE_00818E:
 	mvn $00,$0c                          ;0081C3|54000C  |      ;
 	ldx.W #$0e92                         ;0081C6|A2920E  |      ;
 	stx.B $17                            ;0081C9|8617    |000017;
-	jsr.W CODE_00A236                    ;0081CB|2036A2  |00A236;
+	jsr.W Party_LoadCharacterData                    ;0081CB|2036A2  |00A236;
 	sep #$20                             ;0081CE|E220    |      ;
 	jsl.L Timer_Initialize                    ;0081D0|22199300|009319;
 	rts                                  ;0081D4|60      |      ;
@@ -3194,7 +3194,7 @@ DMA_TransferDialog:
 	sep #$20                             ;009A6F|E220    |      ;
 	lda.B #$03                           ;009A71|A903    |      ;
 	sta.B $19                            ;009A73|8519    |000019;
-	jsr.W CODE_009D75                    ;009A75|20759D  |009D75;
+	jsr.W Dialog_ExecuteInternal                    ;009A75|20759D  |009D75;
 	rep #$30                             ;009A78|C230    |      ;
 	pla                                  ;009A7A|68      |      ;
 	pld                                  ;009A7B|2B      |      ;
@@ -3242,7 +3242,7 @@ DMA_PrepareAndTransfer:
 	lda.B $27                            ;009B19|A527    |000027;
 	pha                                  ;009B1B|48      |      ;
 	jsl.L DMA_TransferGFX                    ;009B1C|222F9B00|009B2F;
-	jsr.W CODE_00A342                    ;009B20|2042A3  |00A342;
+	jsr.W Cutscene_ProcessScroll                    ;009B20|2042A3  |00A342;
 	pla                                  ;009B23|68      |      ;
 	sta.B $27                            ;009B24|8527    |000027;
 	plx                                  ;009B26|FA      |      ;
@@ -3297,13 +3297,13 @@ DMA_TransferFont:
 	lda.B [$17]                          ;009B68|A717    |000017;
 	and.W #$00ff                         ;009B6A|29FF00  |      ;
 	cmp.W #$0004                         ;009B6D|C90400  |      ;
-	beq CODE_009B78                      ;009B70|F006    |009B78;
+	beq DMA_TransferFont_ProcessParams                      ;009B70|F006    |009B78;
 	ldx.W #$9b9d                         ;009B72|A29D9B  |      ;
 	jsr.W DMA_CopyParamsAndExecute                    ;009B75|20C49B  |009BC4;
 ;      |        |      ;
-CODE_009B78:
+DMA_TransferFont_ProcessParams:
 	jsr.W DMA_SetFontPointer                    ;009B78|208A9B  |009B8A;
-	jsr.W CODE_009D75                    ;009B7B|20759D  |009D75;
+	jsr.W Dialog_ExecuteInternal                    ;009B7B|20759D  |009D75;
 	jsr.W DMA_TransferFont_Return                    ;009B7E|20A39B  |009BA3;
 	ldx.W #$9ba0                         ;009B81|A2A09B  |      ;
 	jsr.W DMA_CopyParamsAndExecute                    ;009B84|20C49B  |009BC4;
@@ -3345,7 +3345,7 @@ DMA_TransferTilemap:
 	tax                                  ;009BB7|AA      |      ;
 	lda.L DATA8_03bb81,x                 ;009BB8|BF81BB03|03BB81;
 	sta.B $17                            ;009BBC|8517    |000017;
-	jsr.W CODE_009D75                    ;009BBE|20759D  |009D75;
+	jsr.W Dialog_ExecuteInternal                    ;009BBE|20759D  |009D75;
 	pld                                  ;009BC1|2B      |      ;
 	plp                                  ;009BC2|28      |      ;
 	rtl                                  ;009BC3|6B      |      ;
@@ -3362,17 +3362,17 @@ DMA_CopyParamsAndExecute:
 	pla                                  ;009BD2|68      |      ;
 	ply                                  ;009BD3|7A      |      ;
 	plp                                  ;009BD4|28      |      ;
-	jmp.W CODE_009D75                    ;009BD5|4C759D  |009D75;
+	jmp.W Dialog_ExecuteInternal                    ;009BD5|4C759D  |009D75;
 ;      |        |      ;
 	lda.W #$0004                         ;009BD8|A90400  |      ;
 	and.W $00d8                          ;009BDB|2DD800  |0000D8;
-	beq CODE_009BEC                      ;009BDE|F00C    |009BEC;
+	beq DMA_ClearDisplayBuffer                      ;009BDE|F00C    |009BEC;
 	lda.W #$0004                         ;009BE0|A90400  |      ;
 	trb.W $00d8                          ;009BE3|1CD800  |0000D8;
 	lda.W #$00c8                         ;009BE6|A9C800  |      ;
 	trb.W $0111                          ;009BE9|1C1101  |000111;
 ;      |        |      ;
-CODE_009BEC:
+DMA_ClearDisplayBuffer:
 	rts                                  ;009BEC|60      |      ;
 ;      |        |      ;
 	ldx.W #$9c87                         ;009BED|A2879C  |      ;
@@ -3383,13 +3383,13 @@ CODE_009BEC:
 	sta.W $5011                          ;009BFD|8D1150  |7F5011;
 	sta.W $5014                          ;009C00|8D1450  |7F5014;
 	sta.W $501a                          ;009C03|8D1A50  |7F501A;
-	jsr.W CODE_009C52                    ;009C06|20529C  |009C52;
+	jsr.W Color_DarkenPalette                    ;009C06|20529C  |009C52;
 	sta.W $5017                          ;009C09|8D1750  |7F5017;
 	lda.L DATA8_07800c                   ;009C0C|AF0C8007|07800C;
 	sta.W $501e                          ;009C10|8D1E50  |7F501E;
 	sta.W $5021                          ;009C13|8D2150  |7F5021;
 	sta.W $5027                          ;009C16|8D2750  |7F5027;
-	jsr.W CODE_009C52                    ;009C19|20529C  |009C52;
+	jsr.W Color_DarkenPalette                    ;009C19|20529C  |009C52;
 	sta.W $5024                          ;009C1C|8D2450  |7F5024;
 	phk                                  ;009C1F|4B      |      ;
 	plb                                  ;009C20|AB      |      ;
@@ -3413,33 +3413,33 @@ CODE_009BEC:
 	rts                                  ;009C51|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
-CODE_009C52:
+Color_DarkenPalette:
 	pha                                  ;009C52|48      |      ;
 	sec                                  ;009C53|38      |      ;
 	and.W #$7c00                         ;009C54|29007C  |      ;
 	sbc.W #$3000                         ;009C57|E90030  |      ;
-	bcs CODE_009C60                      ;009C5A|B004    |009C60;
+	bcs Color_DarkenPalette_Green                      ;009C5A|B004    |009C60;
 	db $a9,$00,$00,$38                   ;009C5C|        |      ;
 ;      |        |      ;
-CODE_009C60:
+Color_DarkenPalette_Green:
 	pha                                  ;009C60|48      |      ;
 	lda.B $03,s                          ;009C61|A303    |000003;
 	and.W #$03e0                         ;009C63|29E003  |      ;
 	sbc.W #$0180                         ;009C66|E98001  |      ;
-	bcs CODE_009C6F                      ;009C69|B004    |009C6F;
+	bcs Color_DarkenPalette_Blue                      ;009C69|B004    |009C6F;
 	lda.W #$0000                         ;009C6B|A90000  |      ;
 	sec                                  ;009C6E|38      |      ;
 ;      |        |      ;
-CODE_009C6F:
+Color_DarkenPalette_Blue:
 	ora.B $01,s                          ;009C6F|0301    |000001;
 	sta.B $01,s                          ;009C71|8301    |000001;
 	lda.B $03,s                          ;009C73|A303    |000003;
 	and.W #$001f                         ;009C75|291F00  |      ;
 	sbc.W #$000c                         ;009C78|E90C00  |      ;
-	bcs CODE_009C80                      ;009C7B|B003    |009C80;
+	bcs Color_DarkenPalette_Combine                      ;009C7B|B003    |009C80;
 	lda.W #$0000                         ;009C7D|A90000  |      ;
 ;      |        |      ;
-CODE_009C80:
+Color_DarkenPalette_Combine:
 	ora.B $01,s                          ;009C80|0301    |000001;
 	sta.B $03,s                          ;009C82|8303    |000003;
 	pla                                  ;009C84|68      |      ;
@@ -3450,15 +3450,15 @@ CODE_009C80:
 	db $b4,$1f,$01,$40,$51,$00,$00,$ff,$7f,$01,$ff,$7f,$01,$73,$4e,$01;009C97|        |      ;
 	db $ff,$7f,$00                       ;009CA7|        |      ;
 ;      |        |      ;
-CODE_009CAA:
+Display_UpdateBrightness:
 	sep #$20                             ;009CAA|E220    |      ;
 	ldx.W #$01ad                         ;009CAC|A2AD01  |      ;
 	lda.B #$20                           ;009CAF|A920    |      ;
 	and.W $00e0                          ;009CB1|2DE000  |0000E0;
-	bne CODE_009CB9                      ;009CB4|D003    |009CB9;
+	bne Display_UpdateBrightness_Apply                      ;009CB4|D003    |009CB9;
 	ldx.W #$016f                         ;009CB6|A26F01  |      ;
 ;      |        |      ;
-CODE_009CB9:
+Display_UpdateBrightness_Apply:
 	lda.W $0013,x                        ;009CB9|BD1300  |000013;
 	sta.L $7f500b                        ;009CBC|8F0B507F|7F500B;
 	sta.L $7f5016                        ;009CC0|8F16507F|7F5016;
@@ -3479,11 +3479,11 @@ CODE_009CB9:
 	rts                                  ;009CEE|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
-CODE_009CEF:
+Display_UpdateBrightness_Return:
 	rts                                  ;009CEF|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
-CODE_009CF0:
+Stack_PushDialogState:
 	php                                  ;009CF0|08      |      ;
 	rep #$30                             ;009CF1|C230    |      ;
 	phb                                  ;009CF3|8B      |      ;
@@ -3501,16 +3501,16 @@ CODE_009CF0:
 	mvn $7e,$00                          ;009D0C|547E00  |      ;
 	tya                                  ;009D0F|98      |      ;
 	cmp.W #$35d9                         ;009D10|C9D935  |      ;
-	bcc CODE_009D18                      ;009D13|9003    |009D18;
+	bcc Stack_PushDialogState_CheckLimit                      ;009D13|9003    |009D18;
 	db $4c,$1f,$9d                       ;009D15|        |009D1F;
 ;      |        |      ;
-CODE_009D18:
+Stack_PushDialogState_CheckLimit:
 	sta.L $7e3367                        ;009D18|8F67337E|7E3367;
 	jmp.W Stack_RestoreRegisters                    ;009D1C|4C1B98  |00981B;
 ;      |        |      ;
 	db $80,$fe                           ;009D1F|        |009D1F;
 ;      |        |      ;
-CODE_009D21:
+Stack_PopDialogState:
 	php                                  ;009D21|08      |      ;
 	rep #$30                             ;009D22|C230    |      ;
 	phb                                  ;009D24|8B      |      ;
@@ -3532,7 +3532,7 @@ CODE_009D21:
 	jmp.W Stack_RestoreRegisters                    ;009D48|4C1B98  |00981B;
 ;      |        |      ;
 ;      |        |      ;
-CODE_009D4B:
+Memory_FillFromPointer:
 	phy                                  ;009D4B|5A      |      ;
 	stx.B $1a                            ;009D4C|861A    |00001A;
 	txy                                  ;009D4E|9B      |      ;
@@ -3554,16 +3554,16 @@ CODE_009D4B:
 	rts                                  ;009D6A|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
-CODE_009D6B:
+Dialog_Execute:
 	phd                                  ;009D6B|0B      |      ;
 	pea.W $0000                          ;009D6C|F40000  |010000;
 	pld                                  ;009D6F|2B      |      ;
-	jsr.W CODE_009D75                    ;009D70|20759D  |009D75;
+	jsr.W Dialog_ExecuteInternal                    ;009D70|20759D  |009D75;
 	pld                                  ;009D73|2B      |      ;
 	rtl                                  ;009D74|6B      |      ;
 ;      |        |      ;
 ;      |        |      ;
-CODE_009D75:
+Dialog_ExecuteInternal:
 	php                                  ;009D75|08      |      ;
 	rep #$30                             ;009D76|C230    |      ;
 	phb                                  ;009D78|8B      |      ;
@@ -3575,65 +3575,65 @@ CODE_009D75:
 	plb                                  ;009D7E|AB      |      ;
 	lda.W #$0008                         ;009D7F|A90800  |      ;
 	and.W $00db                          ;009D82|2DDB00  |0000DB;
-	beq CODE_009DA2                      ;009D85|F01B    |009DA2;
+	beq Dialog_ProcessLoop_CheckFlags                      ;009D85|F01B    |009DA2;
 	lda.W #$0010                         ;009D87|A91000  |      ;
 	and.W $00d0                          ;009D8A|2DD000  |0000D0;
-	bne CODE_009D9A                      ;009D8D|D00B    |009D9A;
+	bne Dialog_ProcessLoop_Alternate                      ;009D8D|D00B    |009D9A;
 ;      |        |      ;
-CODE_009D8F:
-	jsr.W CODE_009DBD                    ;009D8F|20BD9D  |009DBD;
+Dialog_ProcessLoop:
+	jsr.W Dialog_ReadNextByte                    ;009D8F|20BD9D  |009DBD;
 	lda.B $17                            ;009D92|A517    |000017;
 	cmp.B $3d                            ;009D94|C53D    |00003D;
-	bne CODE_009D8F                      ;009D96|D0F7    |009D8F;
-	bra CODE_009DBA                      ;009D98|8020    |009DBA;
+	bne Dialog_ProcessLoop                      ;009D96|D0F7    |009D8F;
+	bra Dialog_ProcessLoop_Finish                      ;009D98|8020    |009DBA;
 ;      |        |      ;
 ;      |        |      ;
-CODE_009D9A:
+Dialog_ProcessLoop_Alternate:
 	jsr.W CODE_00E055                    ;009D9A|2055E0  |00E055;
-	bra CODE_009DBA                      ;009D9D|801B    |009DBA;
+	bra Dialog_ProcessLoop_Finish                      ;009D9D|801B    |009DBA;
 ;      |        |      ;
 ;      |        |      ;
-CODE_009D9F:
-	jsr.W CODE_009DBD                    ;009D9F|20BD9D  |009DBD;
+Dialog_ProcessLoop_Wait:
+	jsr.W Dialog_ReadNextByte                    ;009D9F|20BD9D  |009DBD;
 ;      |        |      ;
-CODE_009DA2:
+Dialog_ProcessLoop_CheckFlags:
 	lda.W $00d0                          ;009DA2|ADD000  |0000D0;
 	bit.W #$0090                         ;009DA5|899000  |      ;
-	beq CODE_009D9F                      ;009DA8|F0F5    |009D9F;
+	beq Dialog_ProcessLoop_Wait                      ;009DA8|F0F5    |009D9F;
 	bit.W #$0080                         ;009DAA|898000  |      ;
-	bne CODE_009DB4                      ;009DAD|D005    |009DB4;
+	bne Dialog_ProcessLoop_ClearFlag                      ;009DAD|D005    |009DB4;
 	jsr.W CODE_00E055                    ;009DAF|2055E0  |00E055;
-	bra CODE_009DA2                      ;009DB2|80EE    |009DA2;
+	bra Dialog_ProcessLoop_CheckFlags                      ;009DB2|80EE    |009DA2;
 ;      |        |      ;
 ;      |        |      ;
-CODE_009DB4:
+Dialog_ProcessLoop_ClearFlag:
 	lda.W #$0080                         ;009DB4|A98000  |      ;
 	trb.W $00d0                          ;009DB7|1CD000  |0000D0;
 ;      |        |      ;
-CODE_009DBA:
+Dialog_ProcessLoop_Finish:
 	jmp.W Stack_RestoreRegisters                    ;009DBA|4C1B98  |00981B;
 ;      |        |      ;
 ;      |        |      ;
-CODE_009DBD:
+Dialog_ReadNextByte:
 	lda.B [$17]                          ;009DBD|A717    |000017;
 	inc.B $17                            ;009DBF|E617    |000017;
 	and.W #$00ff                         ;009DC1|29FF00  |      ;
 	cmp.W #$0080                         ;009DC4|C98000  |      ;
-	bcc CODE_009DD2                      ;009DC7|9009    |009DD2;
+	bcc Dialog_ProcessCommand                      ;009DC7|9009    |009DD2;
 ;      |        |      ;
-CODE_009DC9:
+Dialog_WriteCharacter:
 	eor.B $1d                            ;009DC9|451D    |00001D;
 ;      |        |      ;
-CODE_009DCB:
+Dialog_WriteCharacter_Store:
 	sta.B [$1a]                          ;009DCB|871A    |00001A;
 	inc.B $1a                            ;009DCD|E61A    |00001A;
 	inc.B $1a                            ;009DCF|E61A    |00001A;
 	rts                                  ;009DD1|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
-CODE_009DD2:
+Dialog_ProcessCommand:
 	cmp.W #$0030                         ;009DD2|C93000  |      ;
-	bcs CODE_009DDF                      ;009DD5|B008    |009DDF;
+	bcs Dialog_ProcessCommand_TextReference                      ;009DD5|B008    |009DDF;
 	asl a;009DD7|0A      |      ;
 	tax                                  ;009DD8|AA      |      ;
 	jsr.W (DATA8_009e0e,x)               ;009DD9|FC0E9E  |009E0E;
@@ -3641,13 +3641,13 @@ CODE_009DD2:
 	rts                                  ;009DDE|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
-CODE_009DDF:
+Dialog_ProcessCommand_TextReference:
 	ldx.W #$0000                         ;009DDF|A20000  |      ;
 	sbc.W #$0030                         ;009DE2|E93000  |      ;
-	beq CODE_009DF9                      ;009DE5|F012    |009DF9;
+	beq Dialog_ProcessCommand_TextReference_Jump                      ;009DE5|F012    |009DF9;
 	tay                                  ;009DE7|A8      |      ;
 ;      |        |      ;
-CODE_009DE8:
+Dialog_ProcessCommand_TextReference_Loop:
 	lda.L DATA8_03ba35,x                 ;009DE8|BF35BA03|03BA35;
 	and.W #$00ff                         ;009DEC|29FF00  |      ;
 	sta.B $64                            ;009DEF|8564    |000064;
@@ -3656,9 +3656,9 @@ CODE_009DE8:
 	adc.B $64                            ;009DF3|6564    |000064;
 	tax                                  ;009DF5|AA      |      ;
 	dey                                  ;009DF6|88      |      ;
-	bne CODE_009DE8                      ;009DF7|D0EF    |009DE8;
+	bne Dialog_ProcessCommand_TextReference_Loop                      ;009DF7|D0EF    |009DE8;
 ;      |        |      ;
-CODE_009DF9:
+Dialog_ProcessCommand_TextReference_Jump:
 	txa                                  ;009DF9|8A      |      ;
 	clc                                  ;009DFA|18      |      ;
 	adc.W #$ba36                         ;009DFB|6936BA  |      ;
@@ -3669,7 +3669,7 @@ CODE_009DF9:
 	lda.L DATA8_03ba35,x                 ;009E04|BF35BA03|03BA35;
 	tyx                                  ;009E08|BB      |      ;
 	rep #$30                             ;009E09|C230    |      ;
-	jmp.W CODE_00A7F9                    ;009E0B|4CF9A7  |00A7F9;
+	jmp.W Dialog_ExecuteNestedCall                    ;009E0B|4CF9A7  |00A7F9;
 ;      |        |      ;
 ;      |        |      ;
 DATA8_009e0e:
@@ -3841,7 +3841,7 @@ DATA8_009e6e:
 	stz.B $a0                            ;00A0CD|64A0    |0000A0;
 	lda.W #$0003                         ;00A0CF|A90300  |      ;
 	ldx.W #$82bb                         ;00A0D2|A2BB82  |      ;
-	jsr.W CODE_00A71C                    ;00A0D5|201CA7  |00A71C;
+	jsr.W Dialog_ExecuteSubroutine                    ;00A0D5|201CA7  |00A71C;
 	plx                                  ;00A0D8|FA      |      ;
 	stx.B $a0                            ;00A0D9|86A0    |0000A0;
 	plx                                  ;00A0DB|FA      |      ;
@@ -3859,7 +3859,7 @@ DATA8_009e6e:
 	stz.B $a0                            ;00A10B|64A0    |0000A0;
 	lda.W #$0003                         ;00A10D|A90300  |      ;
 	ldx.W #$8383                         ;00A110|A28383  |      ;
-	jsr.W CODE_00A71C                    ;00A113|201CA7  |00A71C;
+	jsr.W Dialog_ExecuteSubroutine                    ;00A113|201CA7  |00A71C;
 	plx                                  ;00A116|FA      |      ;
 	stx.B $a0                            ;00A117|86A0    |0000A0;
 	plx                                  ;00A119|FA      |      ;
@@ -3892,7 +3892,7 @@ DATA8_009e6e:
 	stz.B $a0                            ;00A145|64A0    |0000A0;
 	lda.W #$0003                         ;00A147|A90300  |      ;
 	ldx.W #$a7f6                         ;00A14A|A2F6A7  |      ;
-	jmp.W CODE_00A71C                    ;00A14D|4C1CA7  |00A71C;
+	jmp.W Dialog_ExecuteSubroutine                    ;00A14D|4C1CA7  |00A71C;
 ;      |        |      ;
 	sep #$20                             ;00A150|E220    |      ;
 	lda.B #$03                           ;00A152|A903    |      ;
@@ -3916,7 +3916,7 @@ DATA8_009e6e:
 	rep #$30                             ;00A173|C230    |      ;
 	lda.W #$0003                         ;00A175|A90300  |      ;
 	ldx.W #$a831                         ;00A178|A231A8  |      ;
-	jmp.W CODE_00A71C                    ;00A17B|4C1CA7  |00A71C;
+	jmp.W Dialog_ExecuteSubroutine                    ;00A17B|4C1CA7  |00A71C;
 ;      |        |      ;
 	lda.B [$17]                          ;00A17E|A717    |000017;
 	inc.B $17                            ;00A180|E617    |000017;
@@ -3926,20 +3926,20 @@ DATA8_009e6e:
 	rep #$30                             ;00A189|C230    |      ;
 	lda.W #$0003                         ;00A18B|A90300  |      ;
 	ldx.W #$a895                         ;00A18E|A295A8  |      ;
-	jmp.W CODE_00A71C                    ;00A191|4C1CA7  |00A71C;
+	jmp.W Dialog_ExecuteSubroutine                    ;00A191|4C1CA7  |00A71C;
 ;      |        |      ;
-	jsr.W CODE_00A1AB                    ;00A194|20ABA1  |00A1AB;
+	jsr.W Dialog_LoadPointerFromTable                    ;00A194|20ABA1  |00A1AB;
 	stz.B $9f                            ;00A197|649F    |00009F;
 	stz.B $a0                            ;00A199|64A0    |0000A0;
 	rts                                  ;00A19B|60      |      ;
 ;      |        |      ;
-	jsr.W CODE_00A1AB                    ;00A19C|20ABA1  |00A1AB;
+	jsr.W Dialog_LoadPointerFromTable                    ;00A19C|20ABA1  |00A1AB;
 	stz.B $a0                            ;00A19F|64A0    |0000A0;
 	rts                                  ;00A1A1|60      |      ;
 ;      |        |      ;
 	db $20,$ab,$a1,$29,$ff,$00,$85,$a0,$60;00A1A2|        |00A1AB;
 ;      |        |      ;
-CODE_00A1AB:
+Dialog_LoadPointerFromTable:
 	lda.B [$17]                          ;00A1AB|A717    |000017;
 	inc.B $17                            ;00A1AD|E617    |000017;
 	inc.B $17                            ;00A1AF|E617    |000017;
@@ -3984,8 +3984,8 @@ CODE_00A1AB:
 	rts                                  ;00A1F7|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
-CODE_00A1F8:
-	jsr.W CODE_00A220                    ;00A1F8|2020A2  |00A220;
+Party_CopyPositionData:
+	jsr.W Party_UpdatePositionData                    ;00A1F8|2020A2  |00A220;
 	sep #$20                             ;00A1FB|E220    |      ;
 	ldx.W $101b                          ;00A1FD|AE1B10  |00101B;
 	stx.W $1018                          ;00A200|8E1810  |001018;
@@ -3997,13 +3997,13 @@ CODE_00A1F8:
 	sta.W $109a                          ;00A212|8D9A10  |00109A;
 	rts                                  ;00A215|60      |      ;
 ;      |        |      ;
-	jsr.W CODE_00A1F8                    ;00A216|20F8A1  |00A1F8;
+	jsr.W Party_CopyPositionData                    ;00A216|20F8A1  |00A1F8;
 	stz.W $1021                          ;00A219|9C2110  |001021;
 	stz.W $10a1                          ;00A21C|9CA110  |0010A1;
 	rts                                  ;00A21F|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
-CODE_00A220:
+Party_UpdatePositionData:
 	ldx.W $1016                          ;00A220|AE1610  |001016;
 	stx.W $1014                          ;00A223|8E1410  |001014;
 	ldx.W $1096                          ;00A226|AE9610  |001096;
@@ -4014,7 +4014,7 @@ CODE_00A220:
 	rts                                  ;00A235|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
-CODE_00A236:
+Party_LoadCharacterData:
 	lda.W #$0080                         ;00A236|A98000  |      ;
 	and.W $10a0                          ;00A239|2DA010  |0010A0;
 	php                                  ;00A23C|08      |      ;
@@ -4038,16 +4038,16 @@ CODE_00A236:
 	jsr.W Memory_CopyLarge                    ;00A266|205D98  |00985D;
 	plb                                  ;00A269|AB      |      ;
 	plp                                  ;00A26A|28      |      ;
-	bne CODE_00A273                      ;00A26B|D006    |00A273;
+	bne Party_LoadCharacterData_Return                      ;00A26B|D006    |00A273;
 	lda.W #$0080                         ;00A26D|A98000  |      ;
 	trb.W $10a0                          ;00A270|1CA010  |0010A0;
 ;      |        |      ;
-CODE_00A273:
+Party_LoadCharacterData_Return:
 	rts                                  ;00A273|60      |      ;
 ;      |        |      ;
 	lda.W #$0003                         ;00A274|A90300  |      ;
 	ldx.W #$8457                         ;00A277|A25784  |      ;
-	jsr.W CODE_00A71C                    ;00A27A|201CA7  |00A71C;
+	jsr.W Dialog_ExecuteSubroutine                    ;00A27A|201CA7  |00A71C;
 	rep #$30                             ;00A27D|C230    |      ;
 	lda.B [$17]                          ;00A27F|A717    |000017;
 	inc.B $17                            ;00A281|E617    |000017;
@@ -4067,10 +4067,10 @@ CODE_00A273:
 	inc.B $17                            ;00A29D|E617    |000017;
 	and.W #$00ff                         ;00A29F|29FF00  |      ;
 ;      |        |      ;
-CODE_00A2A2:
+Dialog_WaitFrames:
 	jsl.L NMI_WaitForVBlank                    ;00A2A2|22A09600|0096A0;
 	dec a;00A2A6|3A      |      ;
-	bne CODE_00A2A2                      ;00A2A7|D0F9    |00A2A2;
+	bne Dialog_WaitFrames                      ;00A2A7|D0F9    |00A2A2;
 	rts                                  ;00A2A9|60      |      ;
 ;      |        |      ;
 	db $a7,$17,$e6,$17,$29,$ff,$00,$48,$80,$02;00A2AA|        |000017;
@@ -4078,19 +4078,19 @@ CODE_00A2A2:
 	sep #$20                             ;00A2B6|E220    |      ;
 	ldx.W #$0000                         ;00A2B8|A20000  |      ;
 ;      |        |      ;
-CODE_00A2BB:
+Dialog_LoadCharacterPointer:
 	lda.W DATA8_00a2dd,x                 ;00A2BB|BDDDA2  |00A2DD;
 	cmp.B #$ff                           ;00A2BE|C9FF    |      ;
 	beq UNREACH_00A2D4                   ;00A2C0|F012    |00A2D4;
 	cmp.B $01,s                          ;00A2C2|C301    |000001;
-	beq CODE_00A2CB                      ;00A2C4|F005    |00A2CB;
+	beq Dialog_LoadCharacterPointer_Found                      ;00A2C4|F005    |00A2CB;
 	inx                                  ;00A2C6|E8      |      ;
 	inx                                  ;00A2C7|E8      |      ;
 	inx                                  ;00A2C8|E8      |      ;
-	bra CODE_00A2BB                      ;00A2C9|80F0    |00A2BB;
+	bra Dialog_LoadCharacterPointer                      ;00A2C9|80F0    |00A2BB;
 ;      |        |      ;
 ;      |        |      ;
-CODE_00A2CB:
+Dialog_LoadCharacterPointer_Found:
 	rep #$30                             ;00A2CB|C230    |      ;
 	lda.W DATA8_00a2de,x                 ;00A2CD|BDDEA2  |00A2DE;
 	sta.B $9e                            ;00A2D0|859E    |00009E;
@@ -4135,7 +4135,7 @@ UNREACH_00A2FF:
 	adc.B $17                            ;00A313|6517    |000017;
 	tay                                  ;00A315|A8      |      ;
 	plp                                  ;00A316|28      |      ;
-	bcc CODE_00A32F                      ;00A317|9016    |00A32F;
+	bcc Dialog_JumpTable_Return                      ;00A317|9016    |00A32F;
 	lda.B $9e                            ;00A319|A59E    |00009E;
 	asl a;00A31B|0A      |      ;
 	adc.B $17                            ;00A31C|6517    |000017;
@@ -4144,17 +4144,17 @@ UNREACH_00A2FF:
 	sta.B $17                            ;00A322|8517    |000017;
 	sep #$20                             ;00A324|E220    |      ;
 	lda.B $19                            ;00A326|A519    |000019;
-	jsr.W CODE_009D75                    ;00A328|20759D  |009D75;
+	jsr.W Dialog_ExecuteInternal                    ;00A328|20759D  |009D75;
 	sta.B $19                            ;00A32B|8519    |000019;
 	rep #$30                             ;00A32D|C230    |      ;
 ;      |        |      ;
-CODE_00A32F:
+Dialog_JumpTable_Return:
 	sty.B $17                            ;00A32F|8417    |000017;
 	rts                                  ;00A331|60      |      ;
 ;      |        |      ;
 	db $a7,$17,$e6,$17,$29,$ff,$00,$22,$65,$da,$00,$85,$9e,$64,$a0,$60;00A332|        |000017;
 ;      |        |      ;
-CODE_00A342:
+Cutscene_ProcessScroll:
 	php                                  ;00A342|08      |      ;
 	rep #$30                             ;00A343|C230    |      ;
 	phb                                  ;00A345|8B      |      ;
@@ -4163,7 +4163,7 @@ CODE_00A342:
 	phx                                  ;00A348|DA      |      ;
 	phy                                  ;00A349|5A      |      ;
 	lda.B $46                            ;00A34A|A546    |000046;
-	beq CODE_00A375                      ;00A34C|F027    |00A375;
+	beq Cutscene_ProcessScroll_Finish                      ;00A34C|F027    |00A375;
 	lda.B $40                            ;00A34E|A540    |000040;
 	sta.W $01ee                          ;00A350|8DEE01  |0001EE;
 	lda.B $44                            ;00A353|A544    |000044;
@@ -4183,7 +4183,7 @@ CODE_00A342:
 	sta.B $44                            ;00A371|8544    |000044;
 	stz.B $46                            ;00A373|6446    |000046;
 ;      |        |      ;
-CODE_00A375:
+Cutscene_ProcessScroll_Finish:
 	jmp.W Stack_RestoreRegisters                    ;00A375|4C1B98  |00981B;
 ;      |        |      ;
 	lda.W #$0080                         ;00A378|A98000  |      ;
@@ -4206,198 +4206,198 @@ CODE_00A375:
 ;      |        |      ;
 	lda.W #$0040                         ;00A39C|A94000  |      ;
 	and.W $00d0                          ;00A39F|2DD000  |0000D0;
-	beq CODE_00A3A5                      ;00A3A2|F001    |00A3A5;
+	beq Dialog_WritePixelPattern                      ;00A3A2|F001    |00A3A5;
 	rts                                  ;00A3A4|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
-CODE_00A3A5:
+Dialog_WritePixelPattern:
 	lda.W #$00ff                         ;00A3A5|A9FF00  |      ;
-	jmp.W CODE_009DC9                    ;00A3A8|4CC99D  |009DC9;
+	jmp.W Dialog_WriteCharacter                    ;00A3A8|4CC99D  |009DC9;
 ;      |        |      ;
 	jsl.L CODE_0C8000                    ;00A3AB|2200800C|0C8000;
 	lda.W #$0020                         ;00A3AF|A92000  |      ;
 	and.W $00d0                          ;00A3B2|2DD000  |0000D0;
-	bne CODE_00A3C6                      ;00A3B5|D00F    |00A3C6;
+	bne Dialog_WaitForAltInput                      ;00A3B5|D00F    |00A3C6;
 	lda.B [$17]                          ;00A3B7|A717    |000017;
 	inc.B $17                            ;00A3B9|E617    |000017;
 	inc.B $17                            ;00A3BB|E617    |000017;
 ;      |        |      ;
-CODE_00A3BD:
+Dialog_WaitForInput_Loop:
 	jsl.L NMI_WaitForVBlank                    ;00A3BD|22A09600|0096A0;
 	bit.B $94                            ;00A3C1|2494    |000094;
-	beq CODE_00A3BD                      ;00A3C3|F0F8    |00A3BD;
+	beq Dialog_WaitForInput_Loop                      ;00A3C3|F0F8    |00A3BD;
 	rts                                  ;00A3C5|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
-CODE_00A3C6:
+Dialog_WaitForAltInput:
 	lda.B [$17]                          ;00A3C6|A717    |000017;
 	inc.B $17                            ;00A3C8|E617    |000017;
 	inc.B $17                            ;00A3CA|E617    |000017;
 ;      |        |      ;
-CODE_00A3CC:
+Dialog_WaitForAltInput_Loop:
 	jsl.L NMI_WaitForVBlank                    ;00A3CC|22A09600|0096A0;
 	bit.B $07                            ;00A3D0|2407    |000007;
-	beq CODE_00A3CC                      ;00A3D2|F0F8    |00A3CC;
+	beq Dialog_WaitForAltInput_Loop                      ;00A3D2|F0F8    |00A3CC;
 	rts                                  ;00A3D4|60      |      ;
 ;      |        |      ;
 	jsr.W CODE_00B1C3                    ;00A3D5|20C3B1  |00B1C3;
-	bcc CODE_00A401                      ;00A3D8|9027    |00A401;
-	beq CODE_00A401                      ;00A3DA|F025    |00A401;
-	bra CODE_00A406                      ;00A3DC|8028    |00A406;
+	bcc Dialog_Conditional_SkipOffset                      ;00A3D8|9027    |00A401;
+	beq Dialog_Conditional_SkipOffset                      ;00A3DA|F025    |00A401;
+	bra Dialog_Conditional_Jump                      ;00A3DC|8028    |00A406;
 ;      |        |      ;
 	jsr.W CODE_00B1C3                    ;00A3DE|20C3B1  |00B1C3;
-	bcc CODE_00A401                      ;00A3E1|901E    |00A401;
-	bra CODE_00A406                      ;00A3E3|8021    |00A406;
+	bcc Dialog_Conditional_SkipOffset                      ;00A3E1|901E    |00A401;
+	bra Dialog_Conditional_Jump                      ;00A3E3|8021    |00A406;
 ;      |        |      ;
 	jsr.W CODE_00B1C3                    ;00A3E5|20C3B1  |00B1C3;
-	bcs CODE_00A401                      ;00A3E8|B017    |00A401;
-	bra CODE_00A406                      ;00A3EA|801A    |00A406;
+	bcs Dialog_Conditional_SkipOffset                      ;00A3E8|B017    |00A401;
+	bra Dialog_Conditional_Jump                      ;00A3EA|801A    |00A406;
 ;      |        |      ;
 	jsr.W CODE_00B1C3                    ;00A3EC|20C3B1  |00B1C3;
-	bcc CODE_00A406                      ;00A3EF|9015    |00A406;
-	beq CODE_00A406                      ;00A3F1|F013    |00A406;
-	bra CODE_00A401                      ;00A3F3|800C    |00A401;
+	bcc Dialog_Conditional_Jump                      ;00A3EF|9015    |00A406;
+	beq Dialog_Conditional_Jump                      ;00A3F1|F013    |00A406;
+	bra Dialog_Conditional_SkipOffset                      ;00A3F3|800C    |00A401;
 ;      |        |      ;
 	jsr.W CODE_00B1C3                    ;00A3F5|20C3B1  |00B1C3;
-	bne CODE_00A401                      ;00A3F8|D007    |00A401;
-	bra CODE_00A406                      ;00A3FA|800A    |00A406;
+	bne Dialog_Conditional_SkipOffset                      ;00A3F8|D007    |00A401;
+	bra Dialog_Conditional_Jump                      ;00A3FA|800A    |00A406;
 ;      |        |      ;
 	jsr.W CODE_00B1C3                    ;00A3FC|20C3B1  |00B1C3;
-	bne CODE_00A406                      ;00A3FF|D005    |00A406;
+	bne Dialog_Conditional_Jump                      ;00A3FF|D005    |00A406;
 ;      |        |      ;
-CODE_00A401:
+Dialog_Conditional_SkipOffset:
 	inc.B $17                            ;00A401|E617    |000017;
 	inc.B $17                            ;00A403|E617    |000017;
 	rts                                  ;00A405|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
-CODE_00A406:
+Dialog_Conditional_Jump:
 	lda.B [$17]                          ;00A406|A717    |000017;
 	sta.B $17                            ;00A408|8517    |000017;
 	rts                                  ;00A40A|60      |      ;
 ;      |        |      ;
 	jsr.W CODE_00B1D6                    ;00A40B|20D6B1  |00B1D6;
-	bcc CODE_00A437                      ;00A40E|9027    |00A437;
-	beq CODE_00A437                      ;00A410|F025    |00A437;
-	bra CODE_00A43C                      ;00A412|8028    |00A43C;
+	bcc Dialog_ConditionalParty_SkipOffset                      ;00A40E|9027    |00A437;
+	beq Dialog_ConditionalParty_SkipOffset                      ;00A410|F025    |00A437;
+	bra Dialog_ConditionalParty_Jump                      ;00A412|8028    |00A43C;
 ;      |        |      ;
 	jsr.W CODE_00B1D6                    ;00A414|20D6B1  |00B1D6;
-	bcc CODE_00A437                      ;00A417|901E    |00A437;
+	bcc Dialog_ConditionalParty_SkipOffset                      ;00A417|901E    |00A437;
 	db $80,$21                           ;00A419|        |00A43C;
 	jsr.W CODE_00B1D6                    ;00A41B|20D6B1  |00B1D6;
-	bcs CODE_00A437                      ;00A41E|B017    |00A437;
-	bra CODE_00A43C                      ;00A420|801A    |00A43C;
+	bcs Dialog_ConditionalParty_SkipOffset                      ;00A41E|B017    |00A437;
+	bra Dialog_ConditionalParty_Jump                      ;00A420|801A    |00A43C;
 ;      |        |      ;
 	db $20,$d6,$b1,$90,$15,$f0,$13,$80,$0c;00A422|        |00B1D6;
 	jsr.W CODE_00B1D6                    ;00A42B|20D6B1  |00B1D6;
-	bne CODE_00A437                      ;00A42E|D007    |00A437;
-	bra CODE_00A43C                      ;00A430|800A    |00A43C;
+	bne Dialog_ConditionalParty_SkipOffset                      ;00A42E|D007    |00A437;
+	bra Dialog_ConditionalParty_Jump                      ;00A430|800A    |00A43C;
 ;      |        |      ;
 	jsr.W CODE_00B1D6                    ;00A432|20D6B1  |00B1D6;
-	bne CODE_00A43C                      ;00A435|D005    |00A43C;
+	bne Dialog_ConditionalParty_Jump                      ;00A435|D005    |00A43C;
 ;      |        |      ;
-CODE_00A437:
+Dialog_ConditionalParty_SkipOffset:
 	inc.B $17                            ;00A437|E617    |000017;
 	inc.B $17                            ;00A439|E617    |000017;
 	rts                                  ;00A43B|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
-CODE_00A43C:
+Dialog_ConditionalParty_Jump:
 	lda.B [$17]                          ;00A43C|A717    |000017;
 	sta.B $17                            ;00A43E|8517    |000017;
 	rts                                  ;00A440|60      |      ;
 ;      |        |      ;
 	db $20,$e8,$b1,$90,$27,$f0,$25,$80,$28,$20,$e8,$b1,$90,$1e,$80,$21;00A441|        |00B1E8;
 	jsr.W CODE_00B1E8                    ;00A451|20E8B1  |00B1E8;
-	bcs CODE_00A46D                      ;00A454|B017    |00A46D;
-	bra CODE_00A472                      ;00A456|801A    |00A472;
+	bcs Dialog_ConditionalItem_SkipOffset                      ;00A454|B017    |00A46D;
+	bra Dialog_ConditionalItem_Jump                      ;00A456|801A    |00A472;
 ;      |        |      ;
 	jsr.W CODE_00B1E8                    ;00A458|20E8B1  |00B1E8;
-	bcc CODE_00A472                      ;00A45B|9015    |00A472;
+	bcc Dialog_ConditionalItem_Jump                      ;00A45B|9015    |00A472;
 	db $f0,$13,$80,$0c,$20,$e8,$b1,$d0,$07,$80,$0a,$20,$e8,$b1,$d0,$05;00A45D|        |00A472;
 ;      |        |      ;
-CODE_00A46D:
+Dialog_ConditionalItem_SkipOffset:
 	inc.B $17                            ;00A46D|E617    |000017;
 	inc.B $17                            ;00A46F|E617    |000017;
 	rts                                  ;00A471|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
-CODE_00A472:
+Dialog_ConditionalItem_Jump:
 	lda.B [$17]                          ;00A472|A717    |000017;
 	sta.B $17                            ;00A474|8517    |000017;
 	rts                                  ;00A476|60      |      ;
 ;      |        |      ;
 	db $20,$04,$b2,$90,$27,$f0,$25,$80,$28;00A477|        |00B204;
 	jsr.W CODE_00B204                    ;00A480|2004B2  |00B204;
-	bcc CODE_00A4A3                      ;00A483|901E    |00A4A3;
-	bra CODE_00A4A8                      ;00A485|8021    |00A4A8;
+	bcc Dialog_ConditionalSpell_SkipOffset                      ;00A483|901E    |00A4A3;
+	bra Dialog_ConditionalSpell_Jump                      ;00A485|8021    |00A4A8;
 ;      |        |      ;
 	db $20,$04,$b2,$b0,$17,$80,$1a,$20,$04,$b2,$90,$15,$f0,$13,$80,$0c;00A487|        |00B204;
 	jsr.W CODE_00B204                    ;00A497|2004B2  |00B204;
-	bne CODE_00A4A3                      ;00A49A|D007    |00A4A3;
-	bra CODE_00A4A8                      ;00A49C|800A    |00A4A8;
+	bne Dialog_ConditionalSpell_SkipOffset                      ;00A49A|D007    |00A4A3;
+	bra Dialog_ConditionalSpell_Jump                      ;00A49C|800A    |00A4A8;
 ;      |        |      ;
 	jsr.W CODE_00B204                    ;00A49E|2004B2  |00B204;
-	bne CODE_00A4A8                      ;00A4A1|D005    |00A4A8;
+	bne Dialog_ConditionalSpell_Jump                      ;00A4A1|D005    |00A4A8;
 ;      |        |      ;
-CODE_00A4A3:
+Dialog_ConditionalSpell_SkipOffset:
 	inc.B $17                            ;00A4A3|E617    |000017;
 	inc.B $17                            ;00A4A5|E617    |000017;
 	rts                                  ;00A4A7|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
-CODE_00A4A8:
+Dialog_ConditionalSpell_Jump:
 	lda.B [$17]                          ;00A4A8|A717    |000017;
 	sta.B $17                            ;00A4AA|8517    |000017;
 	rts                                  ;00A4AC|60      |      ;
 ;      |        |      ;
 	db $20,$1d,$b2,$90,$27,$f0,$25,$80,$28,$20,$1d,$b2,$90,$1e,$80,$21;00A4AD|        |00B21D;
 	jsr.W CODE_00B21D                    ;00A4BD|201DB2  |00B21D;
-	bcs CODE_00A4D9                      ;00A4C0|B017    |00A4D9;
+	bcs Dialog_ConditionalBoss_SkipOffset                      ;00A4C0|B017    |00A4D9;
 	db $80,$1a,$20,$1d,$b2,$90,$15,$f0,$13,$80,$0c;00A4C2|        |00A4DE;
 	jsr.W CODE_00B21D                    ;00A4CD|201DB2  |00B21D;
-	bne CODE_00A4D9                      ;00A4D0|D007    |00A4D9;
-	bra CODE_00A4DE                      ;00A4D2|800A    |00A4DE;
+	bne Dialog_ConditionalBoss_SkipOffset                      ;00A4D0|D007    |00A4D9;
+	bra Dialog_ConditionalBoss_Jump                      ;00A4D2|800A    |00A4DE;
 ;      |        |      ;
 	jsr.W CODE_00B21D                    ;00A4D4|201DB2  |00B21D;
-	bne CODE_00A4DE                      ;00A4D7|D005    |00A4DE;
+	bne Dialog_ConditionalBoss_Jump                      ;00A4D7|D005    |00A4DE;
 ;      |        |      ;
-CODE_00A4D9:
+Dialog_ConditionalBoss_SkipOffset:
 	inc.B $17                            ;00A4D9|E617    |000017;
 	inc.B $17                            ;00A4DB|E617    |000017;
 	rts                                  ;00A4DD|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
-CODE_00A4DE:
+Dialog_ConditionalBoss_Jump:
 	lda.B [$17]                          ;00A4DE|A717    |000017;
 	sta.B $17                            ;00A4E0|8517    |000017;
 	rts                                  ;00A4E2|60      |      ;
 ;      |        |      ;
 	jsr.W CODE_00B22F                    ;00A4E3|202FB2  |00B22F;
-	bcc CODE_00A50F                      ;00A4E6|9027    |00A50F;
-	beq CODE_00A50F                      ;00A4E8|F025    |00A50F;
-	bra CODE_00A514                      ;00A4EA|8028    |00A514;
+	bcc Dialog_ConditionalCompanion_SkipOffset                      ;00A4E6|9027    |00A50F;
+	beq Dialog_ConditionalCompanion_SkipOffset                      ;00A4E8|F025    |00A50F;
+	bra Dialog_ConditionalCompanion_Jump                      ;00A4EA|8028    |00A514;
 ;      |        |      ;
 	jsr.W CODE_00B22F                    ;00A4EC|202FB2  |00B22F;
-	bcc CODE_00A50F                      ;00A4EF|901E    |00A50F;
-	bra CODE_00A514                      ;00A4F1|8021    |00A514;
+	bcc Dialog_ConditionalCompanion_SkipOffset                      ;00A4EF|901E    |00A50F;
+	bra Dialog_ConditionalCompanion_Jump                      ;00A4F1|8021    |00A514;
 ;      |        |      ;
 	db $20,$2f,$b2,$b0,$17,$80,$1a,$20,$2f,$b2,$90,$15,$f0,$13,$80,$0c;00A4F3|        |00B22F;
 	db $20,$2f,$b2,$d0,$07,$80,$0a,$20,$2f,$b2,$d0,$05;00A503|        |00B22F;
 ;      |        |      ;
-CODE_00A50F:
+Dialog_ConditionalCompanion_SkipOffset:
 	inc.B $17                            ;00A50F|E617    |000017;
 	inc.B $17                            ;00A511|E617    |000017;
 	rts                                  ;00A513|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
-CODE_00A514:
+Dialog_ConditionalCompanion_Jump:
 	lda.B [$17]                          ;00A514|A717    |000017;
 	sta.B $17                            ;00A516|8517    |000017;
 	rts                                  ;00A518|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
-CODE_00A519:
+Dialog_JumpToPointer:
 	lda.B [$17]                          ;00A519|A717    |000017;
 	sta.B $17                            ;00A51B|8517    |000017;
 	rts                                  ;00A51D|60      |      ;
@@ -4423,7 +4423,7 @@ CODE_00A519:
 	pld                                  ;00A549|2B      |      ;
 	inc a;00A54A|1A      |      ;
 	dec a;00A54B|3A      |      ;
-	bra CODE_00A56E                      ;00A54C|8020    |00A56E;
+	bra Dialog_ConditionalFlag_False                      ;00A54C|8020    |00A56E;
 ;      |        |      ;
 	lda.B [$17]                          ;00A54E|A717    |000017;
 	inc.B $17                            ;00A550|E617    |000017;
@@ -4435,40 +4435,40 @@ CODE_00A519:
 	pld                                  ;00A55E|2B      |      ;
 	inc a;00A55F|1A      |      ;
 	dec a;00A560|3A      |      ;
-	bra CODE_00A57D                      ;00A561|801A    |00A57D;
+	bra Dialog_ConditionalFlag_True                      ;00A561|801A    |00A57D;
 ;      |        |      ;
 	lda.B [$17]                          ;00A563|A717    |000017;
 	inc.B $17                            ;00A565|E617    |000017;
 	and.W #$00ff                         ;00A567|29FF00  |      ;
 	jsl.L Bitfield_TestBits_Entity                    ;00A56A|22769700|009776;
 ;      |        |      ;
-CODE_00A56E:
-	bne CODE_00A519                      ;00A56E|D0A9    |00A519;
-	bra CODE_00A597                      ;00A570|8025    |00A597;
+Dialog_ConditionalFlag_False:
+	bne Dialog_JumpToPointer                      ;00A56E|D0A9    |00A519;
+	bra Dialog_ConditionalFlag_SkipOffset                      ;00A570|8025    |00A597;
 ;      |        |      ;
 	lda.B [$17]                          ;00A572|A717    |000017;
 	inc.B $17                            ;00A574|E617    |000017;
 	and.W #$00ff                         ;00A576|29FF00  |      ;
 	jsl.L Bitfield_TestBits_Entity                    ;00A579|22769700|009776;
 ;      |        |      ;
-CODE_00A57D:
-	beq CODE_00A519                      ;00A57D|F09A    |00A519;
-	bra CODE_00A597                      ;00A57F|8016    |00A597;
+Dialog_ConditionalFlag_True:
+	beq Dialog_JumpToPointer                      ;00A57D|F09A    |00A519;
+	bra Dialog_ConditionalFlag_SkipOffset                      ;00A57F|8016    |00A597;
 ;      |        |      ;
 	jsr.W CODE_00B1A1                    ;00A581|20A1B1  |00B1A1;
-	bra CODE_00A56E                      ;00A584|80E8    |00A56E;
+	bra Dialog_ConditionalFlag_False                      ;00A584|80E8    |00A56E;
 ;      |        |      ;
 	jsr.W CODE_00B1A1                    ;00A586|20A1B1  |00B1A1;
-	bra CODE_00A57D                      ;00A589|80F2    |00A57D;
+	bra Dialog_ConditionalFlag_True                      ;00A589|80F2    |00A57D;
 ;      |        |      ;
 	jsr.W CODE_00B1B4                    ;00A58B|20B4B1  |00B1B4;
-	bne CODE_00A519                      ;00A58E|D089    |00A519;
-	bra CODE_00A597                      ;00A590|8005    |00A597;
+	bne Dialog_JumpToPointer                      ;00A58E|D089    |00A519;
+	bra Dialog_ConditionalFlag_SkipOffset                      ;00A590|8005    |00A597;
 ;      |        |      ;
 	jsr.W CODE_00B1B4                    ;00A592|20B4B1  |00B1B4;
-	beq CODE_00A519                      ;00A595|F082    |00A519;
+	beq Dialog_JumpToPointer                      ;00A595|F082    |00A519;
 ;      |        |      ;
-CODE_00A597:
+Dialog_ConditionalFlag_SkipOffset:
 	inc.B $17                            ;00A597|E617    |000017;
 	inc.B $17                            ;00A599|E617    |000017;
 	rts                                  ;00A59B|60      |      ;
@@ -4476,24 +4476,24 @@ CODE_00A597:
 	db $20,$c3,$b1,$90,$27,$f0,$25,$80,$28,$20,$c3,$b1,$90,$1e,$80,$21;00A59C|        |00B1C3;
 	db $20,$c3,$b1,$b0,$17,$80,$1a,$20,$c3,$b1,$90,$15,$f0,$13,$80,$0c;00A5AC|        |00B1C3;
 	jsr.W CODE_00B1C3                    ;00A5BC|20C3B1  |00B1C3;
-	bne CODE_00A5C8                      ;00A5BF|D007    |00A5C8;
+	bne Dialog_ConditionalValue_SkipOffset                      ;00A5BF|D007    |00A5C8;
 	db $80,$0a                           ;00A5C1|        |00A5CD;
 	jsr.W CODE_00B1C3                    ;00A5C3|20C3B1  |00B1C3;
-	bne CODE_00A5CD                      ;00A5C6|D005    |00A5CD;
+	bne Dialog_ConditionalValue_ExecuteCall                      ;00A5C6|D005    |00A5CD;
 ;      |        |      ;
-CODE_00A5C8:
+Dialog_ConditionalValue_SkipOffset:
 	inc.B $17                            ;00A5C8|E617    |000017;
 	inc.B $17                            ;00A5CA|E617    |000017;
 	rts                                  ;00A5CC|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
-CODE_00A5CD:
+Dialog_ConditionalValue_ExecuteCall:
 	lda.B [$17]                          ;00A5CD|A717    |000017;
 	inc.B $17                            ;00A5CF|E617    |000017;
 	inc.B $17                            ;00A5D1|E617    |000017;
 	tax                                  ;00A5D3|AA      |      ;
 	lda.B $19                            ;00A5D4|A519    |000019;
-	jmp.W CODE_00A71C                    ;00A5D6|4C1CA7  |00A71C;
+	jmp.W Dialog_ExecuteSubroutine                    ;00A5D6|4C1CA7  |00A71C;
 ;      |        |      ;
 	db $20,$d6,$b1,$90,$27,$f0,$25,$80,$28,$20,$d6,$b1,$90,$1e,$80,$21;00A5D9|        |00B1D6;
 	db $20,$d6,$b1,$b0,$17,$80,$1a,$20,$d6,$b1,$90,$15,$f0,$13,$80,$0c;00A5E9|        |00B1D6;
@@ -4521,12 +4521,12 @@ CODE_00A5CD:
 	lda.B [$17]                          ;00A70F|A717    |000017;
 	inc.B $17                            ;00A711|E617    |000017;
 	and.W #$00ff                         ;00A713|29FF00  |      ;
-	bra CODE_00A71C                      ;00A716|8004    |00A71C;
+	bra Dialog_ExecuteSubroutine                      ;00A716|8004    |00A71C;
 ;      |        |      ;
 	ldx.B $9e                            ;00A718|A69E    |00009E;
 	lda.B $a0                            ;00A71A|A5A0    |0000A0;
 ;      |        |      ;
-CODE_00A71C:
+Dialog_ExecuteSubroutine:
 	sep #$20                             ;00A71C|E220    |      ;
 	xba                                  ;00A71E|EB      |      ;
 	lda.B $19                            ;00A71F|A519    |000019;
@@ -4539,13 +4539,13 @@ CODE_00A71C:
 	php                                  ;00A72D|08      |      ;
 	lda.B #$08                           ;00A72E|A908    |      ;
 	trb.W $00db                          ;00A730|1CDB00  |0000DB;
-	jsr.W CODE_009D75                    ;00A733|20759D  |009D75;
+	jsr.W Dialog_ExecuteInternal                    ;00A733|20759D  |009D75;
 	plp                                  ;00A736|28      |      ;
-	beq CODE_00A73E                      ;00A737|F005    |00A73E;
+	beq Dialog_ExecuteSubroutine_Return                      ;00A737|F005    |00A73E;
 	lda.B #$08                           ;00A739|A908    |      ;
 	tsb.W $00db                          ;00A73B|0CDB00  |0000DB;
 ;      |        |      ;
-CODE_00A73E:
+Dialog_ExecuteSubroutine_Return:
 	xba                                  ;00A73E|EB      |      ;
 	sta.B $19                            ;00A73F|8519    |000019;
 	sty.B $17                            ;00A741|8417    |000017;
@@ -4554,19 +4554,19 @@ CODE_00A73E:
 	lda.B [$17]                          ;00A744|A717    |000017;
 	inc.B $17                            ;00A746|E617    |000017;
 	inc.B $17                            ;00A748|E617    |000017;
-	jsr.W CODE_009CF0                    ;00A74A|20F09C  |009CF0;
+	jsr.W Stack_PushDialogState                    ;00A74A|20F09C  |009CF0;
 	sta.B $17                            ;00A74D|8517    |000017;
-	jsr.W CODE_009D75                    ;00A74F|20759D  |009D75;
-	jmp.W CODE_009D21                    ;00A752|4C219D  |009D21;
+	jsr.W Dialog_ExecuteInternal                    ;00A74F|20759D  |009D75;
+	jmp.W Stack_PopDialogState                    ;00A752|4C219D  |009D21;
 ;      |        |      ;
 ;      |        |      ;
-CODE_00A755:
+Dialog_ExecuteSubroutine_WithPointer:
 	lda.B [$17]                          ;00A755|A717    |000017;
 	inc.B $17                            ;00A757|E617    |000017;
 	inc.B $17                            ;00A759|E617    |000017;
 	tax                                  ;00A75B|AA      |      ;
 	lda.B $19                            ;00A75C|A519    |000019;
-	bra CODE_00A71C                      ;00A75E|80BC    |00A71C;
+	bra Dialog_ExecuteSubroutine                      ;00A75E|80BC    |00A71C;
 ;      |        |      ;
 	lda.B [$17]                          ;00A760|A717    |000017;
 	inc.B $17                            ;00A762|E617    |000017;
@@ -4578,8 +4578,8 @@ CODE_00A755:
 	pld                                  ;00A770|2B      |      ;
 	inc a;00A771|1A      |      ;
 	dec a;00A772|3A      |      ;
-	bne CODE_00A755                      ;00A773|D0E0    |00A755;
-	bra CODE_00A7C6                      ;00A775|804F    |00A7C6;
+	bne Dialog_ExecuteSubroutine_WithPointer                      ;00A773|D0E0    |00A755;
+	bra Dialog_ConditionalLoop_SkipOffset                      ;00A775|804F    |00A7C6;
 ;      |        |      ;
 	lda.B [$17]                          ;00A777|A717    |000017;
 	inc.B $17                            ;00A779|E617    |000017;
@@ -4591,18 +4591,18 @@ CODE_00A755:
 	pld                                  ;00A787|2B      |      ;
 	inc a;00A788|1A      |      ;
 	dec a;00A789|3A      |      ;
-	beq CODE_00A755                      ;00A78A|F0C9    |00A755;
+	beq Dialog_ExecuteSubroutine_WithPointer                      ;00A78A|F0C9    |00A755;
 	db $80,$38,$a7,$17,$e6,$17,$29,$ff,$00,$22,$76,$97,$00,$d0,$ba,$80;00A78C|        |00A7C6;
 	db $29                               ;00A79C|        |      ;
 	lda.B [$17]                          ;00A79D|A717    |000017;
 	inc.B $17                            ;00A79F|E617    |000017;
 	and.W #$00ff                         ;00A7A1|29FF00  |      ;
 	jsl.L Bitfield_TestBits_Entity                    ;00A7A4|22769700|009776;
-	beq CODE_00A755                      ;00A7A8|F0AB    |00A755;
+	beq Dialog_ExecuteSubroutine_WithPointer                      ;00A7A8|F0AB    |00A755;
 	db $80,$1a,$20,$a1,$b1,$d0,$a4,$80,$13,$20,$a1,$b1,$f0,$9d,$80,$0c;00A7AA|        |00A7C6;
 	db $20,$b4,$b1,$d0,$96,$80,$05,$20,$b4,$b1,$f0,$8f;00A7BA|        |00B1B4;
 ;      |        |      ;
-CODE_00A7C6:
+Dialog_ConditionalLoop_SkipOffset:
 	inc.B $17                            ;00A7C6|E617    |000017;
 	inc.B $17                            ;00A7C8|E617    |000017;
 	rts                                  ;00A7CA|60      |      ;
@@ -4616,17 +4616,17 @@ CODE_00A7C6:
 	lda.B $a0                            ;00A7D7|A5A0    |0000A0;
 	xba                                  ;00A7D9|EB      |      ;
 	rep #$30                             ;00A7DA|C230    |      ;
-	bra CODE_00A7F9                      ;00A7DC|801B    |00A7F9;
+	bra Dialog_ExecuteNestedCall                      ;00A7DC|801B    |00A7F9;
 ;      |        |      ;
 ;      |        |      ;
-CODE_00A7DE:
+Dialog_WriteCustomText:
 	sep #$20                             ;00A7DE|E220    |      ;
 	ldx.B $9e                            ;00A7E0|A69E    |00009E;
 	lda.B $a0                            ;00A7E2|A5A0    |0000A0;
 	xba                                  ;00A7E4|EB      |      ;
 	lda.B $3a                            ;00A7E5|A53A    |00003A;
 	rep #$30                             ;00A7E7|C230    |      ;
-	bra CODE_00A7F9                      ;00A7E9|800E    |00A7F9;
+	bra Dialog_ExecuteNestedCall                      ;00A7E9|800E    |00A7F9;
 ;      |        |      ;
 	lda.B [$17]                          ;00A7EB|A717    |000017;
 	inc.B $17                            ;00A7ED|E617    |000017;
@@ -4636,7 +4636,7 @@ CODE_00A7DE:
 	inc.B $17                            ;00A7F4|E617    |000017;
 	and.W #$00ff                         ;00A7F6|29FF00  |      ;
 ;      |        |      ;
-CODE_00A7F9:
+Dialog_ExecuteNestedCall:
 	sta.B $64                            ;00A7F9|8564    |000064;
 	stx.B $62                            ;00A7FB|8662    |000062;
 	rep #$20                             ;00A7FD|C220    |      ;
@@ -4659,13 +4659,13 @@ CODE_00A7F9:
 	php                                  ;00A820|08      |      ;
 	lda.W #$0008                         ;00A821|A90800  |      ;
 	tsb.W $00db                          ;00A824|0CDB00  |0000DB;
-	jsr.W CODE_009D75                    ;00A827|20759D  |009D75;
+	jsr.W Dialog_ExecuteInternal                    ;00A827|20759D  |009D75;
 	plp                                  ;00A82A|28      |      ;
-	bne CODE_00A833                      ;00A82B|D006    |00A833;
+	bne Dialog_ExecuteNestedCall_Cleanup                      ;00A82B|D006    |00A833;
 	lda.W #$0008                         ;00A82D|A90800  |      ;
 	trb.W $00db                          ;00A830|1CDB00  |0000DB;
 ;      |        |      ;
-CODE_00A833:
+Dialog_ExecuteNestedCall_Cleanup:
 	pla                                  ;00A833|68      |      ;
 	sta.B $3d                            ;00A834|853D    |00003D;
 	plx                                  ;00A836|FA      |      ;
@@ -4686,12 +4686,12 @@ CODE_00A833:
 	sep #$20                             ;00A850|E220    |      ;
 	dey                                  ;00A852|88      |      ;
 	phk                                  ;00A853|4B      |      ;
-	pea.W CODE_00A85B                    ;00A854|F45BA8  |00A85B;
+	pea.W Dialog_ExecuteNestedCall_Return                    ;00A854|F45BA8  |00A85B;
 	pha                                  ;00A857|48      |      ;
 	phy                                  ;00A858|5A      |      ;
 	rep #$30                             ;00A859|C230    |      ;
 ;      |        |      ;
-CODE_00A85B:
+Dialog_ExecuteNestedCall_Return:
 	rtl                                  ;00A85B|6B      |      ;
 ;      |        |      ;
 	sep #$20                             ;00A85C|E220    |      ;
@@ -5004,7 +5004,7 @@ CODE_00AA6F:
 	pha                                  ;00AA6F|48      |      ;
 	phx                                  ;00AA70|DA      |      ;
 	stx.B $17                            ;00AA71|8617    |000017;
-	jsr.W CODE_009DBD                    ;00AA73|20BD9D  |009DBD;
+	jsr.W Dialog_ReadNextByte                    ;00AA73|20BD9D  |009DBD;
 	plx                                  ;00AA76|FA      |      ;
 	pla                                  ;00AA77|68      |      ;
 	dec a;00AA78|3A      |      ;
@@ -5018,7 +5018,7 @@ CODE_00AA6F:
 	lda.W #$2cfe                         ;00AA84|A9FE2C  |      ;
 	ldx.B $3f                            ;00AA87|A63F    |00003F;
 	ldy.W #$1000                         ;00AA89|A00010  |      ;
-	jmp.W CODE_009D4B                    ;00AA8C|4C4B9D  |009D4B;
+	jmp.W Memory_FillFromPointer                    ;00AA8C|4C4B9D  |009D4B;
 ;      |        |      ;
 	lda.B $40                            ;00AA8F|A540    |000040;
 	sta.B $1b                            ;00AA91|851B    |00001B;
@@ -5036,7 +5036,7 @@ CODE_00AA6F:
 	lsr a;00AAA7|4A      |      ;
 	tay                                  ;00AAA8|A8      |      ;
 	lda.W #$2cfe                         ;00AAA9|A9FE2C  |      ;
-	jmp.W CODE_009D4B                    ;00AAAC|4C4B9D  |009D4B;
+	jmp.W Memory_FillFromPointer                    ;00AAAC|4C4B9D  |009D4B;
 ;      |        |      ;
 	lda.B $40                            ;00AAAF|A540    |000040;
 	sta.B $1b                            ;00AAB1|851B    |00001B;
@@ -5054,7 +5054,7 @@ CODE_00AA6F:
 	lsr a;00AAC7|4A      |      ;
 	tay                                  ;00AAC8|A8      |      ;
 	lda.W #$2c00                         ;00AAC9|A9002C  |      ;
-	jmp.W CODE_009D4B                    ;00AACC|4C4B9D  |009D4B;
+	jmp.W Memory_FillFromPointer                    ;00AACC|4C4B9D  |009D4B;
 ;      |        |      ;
 	lda.B $27                            ;00AACF|A527    |000027;
 	and.W #$00ff                         ;00AAD1|29FF00  |      ;
@@ -6242,12 +6242,12 @@ CODE_00B285:
 	lda.B [$17]                          ;00B2F9|A717    |000017;
 	inc.B $17                            ;00B2FB|E617    |000017;
 	inc.B $17                            ;00B2FD|E617    |000017;
-	jmp.W CODE_009DCB                    ;00B2FF|4CCB9D  |009DCB;
+	jmp.W Dialog_WriteCharacter_Store                    ;00B2FF|4CCB9D  |009DCB;
 ;      |        |      ;
 	lda.B [$17]                          ;00B302|A717    |000017;
 	inc.B $17                            ;00B304|E617    |000017;
 	and.W #$00ff                         ;00B306|29FF00  |      ;
-	jmp.W CODE_009DC9                    ;00B309|4CC99D  |009DC9;
+	jmp.W Dialog_WriteCharacter                    ;00B309|4CC99D  |009DC9;
 ;      |        |      ;
 	lda.B [$17]                          ;00B30C|A717    |000017;
 	inc.B $17                            ;00B30E|E617    |000017;
@@ -6285,7 +6285,7 @@ CODE_00B35B:
 	bcc CODE_00B367                      ;00B35E|9007    |00B367;
 	tax                                  ;00B360|AA      |      ;
 	lda.W #$0003                         ;00B361|A90300  |      ;
-	jmp.W CODE_00A71C                    ;00B364|4C1CA7  |00A71C;
+	jmp.W Dialog_ExecuteSubroutine                    ;00B364|4C1CA7  |00A71C;
 ;      |        |      ;
 ;      |        |      ;
 CODE_00B367:
@@ -6491,7 +6491,7 @@ UNREACH_00B4BB:
 	db $64,$9e,$64,$a0,$a7,$17,$e6,$17,$29,$ff,$00,$e2,$20,$8d,$a8,$00;00B4D0|        |00009E;
 	db $22,$83,$97,$00,$ad,$a9,$00,$85,$9e,$60;00B4E0|        |009783;
 	lda.B $9e                            ;00B4EA|A59E    |00009E;
-	jmp.W CODE_009DCB                    ;00B4EC|4CCB9D  |009DCB;
+	jmp.W Dialog_WriteCharacter_Store                    ;00B4EC|4CCB9D  |009DCB;
 ;      |        |      ;
 	lda.B [$17]                          ;00B4EF|A717    |000017;
 	inc.B $17                            ;00B4F1|E617    |000017;
@@ -6551,7 +6551,7 @@ CODE_00B534:
 	jsr.W CODE_00A8D1                    ;00B545|20D1A8  |00A8D1;
 	lda.W #$0010                         ;00B548|A91000  |      ;
 	sta.B $3a                            ;00B54B|853A    |00003A;
-	jmp.W CODE_00A7DE                    ;00B54D|4CDEA7  |00A7DE;
+	jmp.W Dialog_WriteCustomText                    ;00B54D|4CDEA7  |00A7DE;
 ;      |        |      ;
 	db $c2,$20,$e2,$10,$ad,$5f,$01,$a4,$1f,$87,$1a,$e6,$1a,$e6,$1a,$1a;00B550|        |      ;
 	db $88,$d0,$f6,$8d,$5f,$01,$60       ;00B560|        |      ;
@@ -7524,7 +7524,7 @@ CODE_00BD30:
 	jsr.W CODE_008C3D                    ;00BD47|203D8C  |008C3D;
 	jsr.W CODE_008D29                    ;00BD4A|20298D  |008D29;
 	jsl.L DMA_TransferGFX                    ;00BD4D|222F9B00|009B2F;
-	jsr.W CODE_00A342                    ;00BD51|2042A3  |00A342;
+	jsr.W Cutscene_ProcessScroll                    ;00BD51|2042A3  |00A342;
 	lda.B #$10                           ;00BD54|A910    |      ;
 	tsb.W $00d6                          ;00BD56|0CD600  |0000D6;
 	ldx.W #$fff0                         ;00BD59|A2F0FF  |      ;
@@ -9457,7 +9457,7 @@ CODE_00CBC6:
 ;      |        |      ;
 CODE_00CBCB:
 	ldy.B $17                            ;00CBCB|A417    |000017;
-	jsr.W CODE_009D75                    ;00CBCD|20759D  |009D75;
+	jsr.W Dialog_ExecuteInternal                    ;00CBCD|20759D  |009D75;
 	sty.B $17                            ;00CBD0|8417    |000017;
 	jsl.L CODE_0C8000                    ;00CBD2|2200800C|0C8000;
 	sta.L $7f56d8                        ;00CBD6|8FD8567F|7F56D8;
@@ -9467,7 +9467,7 @@ CODE_00CBCB:
 	cmp.B #$e1                           ;00CBE0|C9E1    |      ;
 	bne CODE_00CBCB                      ;00CBE2|D0E7    |00CBCB;
 	ldy.B $17                            ;00CBE4|A417    |000017;
-	jsr.W CODE_009D75                    ;00CBE6|20759D  |009D75;
+	jsr.W Dialog_ExecuteInternal                    ;00CBE6|20759D  |009D75;
 	sty.B $17                            ;00CBE9|8417    |000017;
 	rts                                  ;00CBEB|60      |      ;
 ;      |        |      ;
@@ -9505,7 +9505,7 @@ CODE_00CC11:
 	jsr.W CODE_00CC5B                    ;00CC3A|205BCC  |00CC5B;
 	sta.L $7f56de                        ;00CC3D|8FDE567F|7F56DE;
 	ldy.B $17                            ;00CC41|A417    |000017;
-	jsr.W CODE_009D75                    ;00CC43|20759D  |009D75;
+	jsr.W Dialog_ExecuteInternal                    ;00CC43|20759D  |009D75;
 	sty.B $17                            ;00CC46|8417    |000017;
 	dex                                  ;00CC48|CA      |      ;
 	bne CODE_00CC11                      ;00CC49|D0C6    |00CC11;
@@ -9549,7 +9549,7 @@ CODE_00CC6E:
 ;      |        |      ;
 CODE_00CC93:
 	ldy.B $17                            ;00CC93|A417    |000017;
-	jsr.W CODE_009D75                    ;00CC95|20759D  |009D75;
+	jsr.W Dialog_ExecuteInternal                    ;00CC95|20759D  |009D75;
 	sty.B $17                            ;00CC98|8417    |000017;
 	jsl.L CODE_0C8000                    ;00CC9A|2200800C|0C8000;
 	sta.L $7f56da                        ;00CC9E|8FDA567F|7F56DA;
@@ -9559,7 +9559,7 @@ CODE_00CC93:
 	cmp.B #$e1                           ;00CCA8|C9E1    |      ;
 	bne CODE_00CC93                      ;00CCAA|D0E7    |00CC93;
 	ldy.B $17                            ;00CCAC|A417    |000017;
-	jsr.W CODE_009D75                    ;00CCAE|20759D  |009D75;
+	jsr.W Dialog_ExecuteInternal                    ;00CCAE|20759D  |009D75;
 	sty.B $17                            ;00CCB1|8417    |000017;
 	rts                                  ;00CCB3|60      |      ;
 ;      |        |      ;
@@ -9585,7 +9585,7 @@ CODE_00CCC5:
 	jsr.W CODE_00CD0F                    ;00CCEE|200FCD  |00CD0F;
 	sta.L $7f56de                        ;00CCF1|8FDE567F|7F56DE;
 	ldy.B $17                            ;00CCF5|A417    |000017;
-	jsr.W CODE_009D75                    ;00CCF7|20759D  |009D75;
+	jsr.W Dialog_ExecuteInternal                    ;00CCF7|20759D  |009D75;
 	sty.B $17                            ;00CCFA|8417    |000017;
 	dex                                  ;00CCFC|CA      |      ;
 	bne CODE_00CCC5                      ;00CCFD|D0C6    |00CCC5;
@@ -9618,7 +9618,7 @@ CODE_00CD25:
 	lda.L CODE_00CD3A,x                  ;00CD29|BF3ACD00|00CD3A;
 	sta.W SNES_COLDATA                   ;00CD2D|8D3221  |002132;
 	ldy.B $17                            ;00CD30|A417    |000017;
-	jsr.W CODE_009D75                    ;00CD32|20759D  |009D75;
+	jsr.W Dialog_ExecuteInternal                    ;00CD32|20759D  |009D75;
 	sty.B $17                            ;00CD35|8417    |000017;
 	dex                                  ;00CD37|CA      |      ;
 	bne CODE_00CD25                      ;00CD38|D0EB    |00CD25;
@@ -9636,7 +9636,7 @@ CODE_00CD45:
 	lda.L CODE_00CD5A,x                  ;00CD49|BF5ACD00|00CD5A;
 	sta.W SNES_COLDATA                   ;00CD4D|8D3221  |002132;
 	ldy.B $17                            ;00CD50|A417    |000017;
-	jsr.W CODE_009D75                    ;00CD52|20759D  |009D75;
+	jsr.W Dialog_ExecuteInternal                    ;00CD52|20759D  |009D75;
 	sty.B $17                            ;00CD55|8417    |000017;
 	dex                                  ;00CD57|CA      |      ;
 	bne CODE_00CD45                      ;00CD58|D0EB    |00CD45;
@@ -10058,7 +10058,7 @@ CODE_00D02C:
 CODE_00D04B:
 	lda.B #$03                           ;00D04B|A903    |      ;
 	sta.B $19                            ;00D04D|8519    |000019;
-	jmp.W CODE_009D75                    ;00D04F|4C759D  |009D75;
+	jmp.W Dialog_ExecuteInternal                    ;00D04F|4C759D  |009D75;
 ;      |        |      ;
 	db $a9,$10,$0c,$db,$00,$22,$00,$80,$0c,$22,$a0,$96,$00,$d4,$17,$a2;00D052|        |      ;
 	db $7a,$d0,$20,$c4,$9b,$fa,$86,$17,$a9,$03,$85,$19,$20,$75,$9d,$a2;00D062|        |      ;
@@ -12285,7 +12285,7 @@ CODE_00E082:
 CODE_00E08A:
 	cmp.W #$0030                         ;00E08A|C93000  |      ;
 	bcc CODE_00E092                      ;00E08D|9003    |00E092;
-	jmp.W CODE_009DDF                    ;00E08F|4CDF9D  |009DDF;
+	jmp.W Dialog_ProcessCommand_TextReference                    ;00E08F|4CDF9D  |009DDF;
 ;      |        |      ;
 ;      |        |      ;
 CODE_00E092:
@@ -12312,12 +12312,12 @@ CODE_00E0A5:
 	cmp.B $58                            ;00E0AF|C558    |0000B6;
 	bne CODE_00E122                      ;00E0B1|D06F    |00E122;
 	jsl.L CODE_0C8000                    ;00E0B3|2200800C|0C8000;
-	jsr.W CODE_009CEF                    ;00E0B7|20EF9C  |009CEF;
+	jsr.W Display_UpdateBrightness_Return                    ;00E0B7|20EF9C  |009CEF;
 	lda.W $00e0                          ;00E0BA|ADE000  |0000E0;
 	and.W #$00c0                         ;00E0BD|29C000  |      ;
 	cmp.W #$00c0                         ;00E0C0|C9C000  |      ;
 	bne CODE_00E0C8                      ;00E0C3|D003    |00E0C8;
-	jsr.W CODE_009CAA                    ;00E0C5|20AA9C  |009CAA;
+	jsr.W Display_UpdateBrightness                    ;00E0C5|20AA9C  |009CAA;
 ;      |        |      ;
 CODE_00E0C8:
 	lda.W #$0008                         ;00E0C8|A90800  |      ;
@@ -12331,7 +12331,7 @@ CODE_00E0D5:
 	jsr.W CODE_00E5C8                    ;00E0D5|20C8E5  |00E5C8;
 	lda.W #$0000                         ;00E0D8|A90000  |      ;
 	tcd                                  ;00E0DB|5B      |      ;
-	jsr.W CODE_00A342                    ;00E0DC|2042A3  |00A342;
+	jsr.W Cutscene_ProcessScroll                    ;00E0DC|2042A3  |00A342;
 	lda.W #$005e                         ;00E0DF|A95E00  |      ;
 	tcd                                  ;00E0E2|5B      |      ;
 	lda.W #$0008                         ;00E0E3|A90800  |      ;
@@ -12456,7 +12456,7 @@ CODE_00E1A4:
 	rep #$30                             ;00E1B5|C230    |      ;
 	beq CODE_00E1BF                      ;00E1B7|F006    |00E1BF;
 	ldx.W #$35d9                         ;00E1B9|A2D935  |      ;
-	jsr.W CODE_00A7F9                    ;00E1BC|20F9A7  |00A7F9;
+	jsr.W Dialog_ExecuteNestedCall                    ;00E1BC|20F9A7  |00A7F9;
 ;      |        |      ;
 CODE_00E1BF:
 	lda.W #$0080                         ;00E1BF|A98000  |      ;
