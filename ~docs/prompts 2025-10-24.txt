@@ -359,6 +359,9 @@ pick some issues/todos and implement them.
 pick some issues/todos and implement them.
 make sure to use a new branch for each issue and then close out that branch (merge to master) afterwards; make sure everything is formatted according to our formatting rules; I see a lot of files (`json` and `ps1` especially) that are using spaces instead of tabs. If we could convert all our python files to use tabs instead of spaces as well I would be so happy. Edit the editorconfig if necessary and format everything. TABS NOT SPACES ALWAYS AND FOREVER.
 you haven't hit every file, for instance `C:\Users\me\source\repos\ffmq-info\tools\add_tasks_to_child_issues.ps1` is formatted with spaces instead of tabs
+continue with game data extraction (Issue #38)
+finish issue #38
+pick some issues/todos and implement them.
 
 
 
