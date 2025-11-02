@@ -43,7 +43,7 @@ Battle_Initialize:
 	sta.W $0514                          ;02805D|8D1405  |020514;
 ;      |        |      ;
 Battle_SetupEnvironment:
-	jsr.W CODE_028C06                    ;028060|20068C  |028C06;
+	jsr.W Battle_InitializeEnemies                    ;028060|20068C  |028C06;
 	jsl.L CODE_02DA98                    ;028063|2298DA02|02DA98;
 	sep #$20                             ;028067|E220    |      ;
 	rep #$10                             ;028069|C210    |      ;
@@ -88,7 +88,7 @@ Battle_ProcessCharacterSlot:
 	lda.B $7c,x                          ;0280B5|B57C    |00047C;
 	sta.B $8b                            ;0280B7|858B    |00048B;
 	phd                                  ;0280B9|0B      |      ;
-	jsr.W CODE_028F22                    ;0280BA|20228F  |028F22;
+	jsr.W Battle_SetEntityContextParty                    ;0280BA|20228F  |028F22;
 	lda.B $21                            ;0280BD|A521    |001021;
 	xba                                  ;0280BF|EB      |      ;
 	lda.B $10                            ;0280C0|A510    |001010;
@@ -101,7 +101,7 @@ Battle_ProcessCharacterSlot:
 	jsr.W Battle_PrepareCharacterTurn                    ;0280CB|20A883  |0283A8;
 	rep #$30                             ;0280CE|C230    |      ;
 	phd                                  ;0280D0|0B      |      ;
-	jsr.W CODE_028F22                    ;0280D1|20228F  |028F22;
+	jsr.W Battle_SetEntityContextParty                    ;0280D1|20228F  |028F22;
 	lda.B $42                            ;0280D4|A542    |001042;
 	and.W #$7f7f                         ;0280D6|297F7F  |      ;
 	sta.B $42                            ;0280D9|8542    |001042;
@@ -145,7 +145,7 @@ Battle_NextCharacter:
 ;      |        |      ;
 Battle_ClearStatusFlags:
 	phd                                  ;028127|0B      |      ;
-	jsr.W CODE_028F22                    ;028128|20228F  |028F22;
+	jsr.W Battle_SetEntityContextParty                    ;028128|20228F  |028F22;
 	lda.B $20                            ;02812B|A520    |001220;
 	and.B #$8f                           ;02812D|298F    |      ;
 	sta.B $20                            ;02812F|8520    |001220;
@@ -168,7 +168,7 @@ Battle_Victory:
 Battle_VictorySound:
 	ldx.W #$d4f1                         ;02814C|A2F1D4  |      ;
 	jsr.W Battle_DisplayMessage                    ;02814F|203588  |028835;
-	jsr.W CODE_028938                    ;028152|203889  |028938;
+	jsr.W Battle_CalculateRewards                    ;028152|203889  |028938;
 	bra Battle_Cleanup                      ;028155|800C    |028163;
 ;      |        |      ;
 ;      |        |      ;
@@ -189,7 +189,7 @@ Battle_Cleanup:
 ;      |        |      ;
 Battle_RestoreStats:
 	phd                                  ;02816B|0B      |      ;
-	jsr.W CODE_028F22                    ;02816C|20228F  |028F22;
+	jsr.W Battle_SetEntityContextParty                    ;02816C|20228F  |028F22;
 	ldx.W #$0003                         ;02816F|A20300  |      ;
 ;      |        |      ;
 Battle_RestoreStatsLoop:
@@ -451,7 +451,7 @@ Battle_ProcessSlotLoop:
 	lda.B $a0                            ;02832D|A5A0    |0004A0;
 	sta.B $8b                            ;02832F|858B    |00048B;
 	phd                                  ;028331|0B      |      ;
-	jsr.W CODE_028F22                    ;028332|20228F  |028F22;
+	jsr.W Battle_SetEntityContextParty                    ;028332|20228F  |028F22;
 	lda.B $21                            ;028335|A521    |001221;
 	and.B #$c0                           ;028337|29C0    |      ;
 	beq Battle_IncrementActiveCount                      ;028339|F004    |02833F;
@@ -547,7 +547,7 @@ Battle_PrepareCharacterTurn:
 	sta.B $bd                            ;0283B9|85BD    |0004BD;
 	stz.B $b6                            ;0283BB|64B6    |0004B6;
 	phd                                  ;0283BD|0B      |      ;
-	jsr.W CODE_028F22                    ;0283BE|20228F  |028F22;
+	jsr.W Battle_SetEntityContextParty                    ;0283BE|20228F  |028F22;
 	lda.B $60                            ;0283C1|A560    |001060;
 	sta.W $043b                          ;0283C3|8D3B04  |02043B;
 	lda.B $21                            ;0283C6|A521    |001021;
@@ -559,10 +559,10 @@ Battle_PrepareCharacterTurn:
 Battle_CheckCharacterStatus:
 	and.B #$38                           ;0283CE|2938    |      ;
 	beq Battle_ProcessStatusEffects                      ;0283D0|F01A    |0283EC;
-	jsr.W CODE_0288E0                    ;0283D2|20E088  |0288E0;
+	jsr.W Battle_CheckStatusRecovery                    ;0283D2|20E088  |0288E0;
 	jsl.L CODE_009B02                    ;0283D5|22029B00|009B02;
 	phd                                  ;0283D9|0B      |      ;
-	jsr.W CODE_028F22                    ;0283DA|20228F  |028F22;
+	jsr.W Battle_SetEntityContextParty                    ;0283DA|20228F  |028F22;
 	lda.B $21                            ;0283DD|A521    |001021;
 	pld                                  ;0283DF|2B      |      ;
 	sta.B $11                            ;0283E0|8511    |000411;
@@ -579,7 +579,7 @@ Battle_StatusCheckComplete:
 ;      |        |      ;
 Battle_ProcessStatusEffects:
 	phd                                  ;0283EC|0B      |      ;
-	jsr.W CODE_028F22                    ;0283ED|20228F  |028F22;
+	jsr.W Battle_SetEntityContextParty                    ;0283ED|20228F  |028F22;
 	lda.B $21                            ;0283F0|A521    |001021;
 	sta.W $0411                          ;0283F2|8D1104  |020411;
 	lda.B $10                            ;0283F5|A510    |001010;
@@ -623,7 +623,7 @@ Battle_ApplyStatusDamage:
 ;      |        |      ;
 Battle_UpdateStatusCounters:
 	phd                                  ;028443|0B      |      ;
-	jsr.W CODE_028F22                    ;028444|20228F  |028F22;
+	jsr.W Battle_SetEntityContextParty                    ;028444|20228F  |028F22;
 	lda.B $31                            ;028447|A531    |001031;
 	pha                                  ;028449|48      |      ;
 	lda.B $50                            ;02844A|A550    |001050;
@@ -680,8 +680,8 @@ Battle_ProcessParalysis:
 	db $60,$c9,$20,$f0,$eb               ;0284AC|        |      ;
 ;      |        |      ;
 Battle_CheckConfusion:
-	jsr.W CODE_028B0F                    ;0284B1|200F8B  |028B0F;
-	jsr.W CODE_028EC0                    ;0284B4|20C08E  |028EC0;
+	jsr.W Battle_SetupTargeting                    ;0284B1|200F8B  |028B0F;
+	jsr.W Battle_CheckTargetType                    ;0284B4|20C08E  |028EC0;
 	lda.B $39                            ;0284B7|A539    |000439;
 	bit.B #$80                           ;0284B9|8980    |      ;
 	beq Battle_TargetValid                      ;0284BB|F048    |028505;
@@ -767,7 +767,7 @@ Battle_CheckPoison:
 ;      |        |      ;
 Battle_ProcessPoison:
 	phd                                  ;028532|0B      |      ;
-	jsr.W CODE_028F2F                    ;028533|202F8F  |028F2F;
+	jsr.W Battle_SetEntityContextEnemy                    ;028533|202F8F  |028F2F;
 	lda.B $21                            ;028536|A521    |001121;
 	xba                                  ;028538|EB      |      ;
 	lda.B $10                            ;028539|A510    |001110;
@@ -790,7 +790,7 @@ Battle_CalculatePoisonDamage:
 ;      |        |      ;
 Battle_ApplyPoisonDamage:
 	phd                                  ;028554|0B      |      ;
-	jsr.W CODE_028F2F                    ;028555|202F8F  |028F2F;
+	jsr.W Battle_SetEntityContextEnemy                    ;028555|202F8F  |028F2F;
 	lda.B $21                            ;028558|A521    |001221;
 	xba                                  ;02855A|EB      |      ;
 	lda.B $10                            ;02855B|A510    |001210;
@@ -812,7 +812,7 @@ Battle_CheckSleep:
 	cmp.B #$02                           ;02856A|C902    |      ;
 	bcc Battle_ProcessSleep                      ;02856C|9022    |028590;
 	phd                                  ;02856E|0B      |      ;
-	jsr.W CODE_028F2F                    ;02856F|202F8F  |028F2F;
+	jsr.W Battle_SetEntityContextEnemy                    ;02856F|202F8F  |028F2F;
 	lda.B $20                            ;028572|A520    |001020;
 	pld                                  ;028574|2B      |      ;
 	and.B #$30                           ;028575|2930    |      ;
@@ -824,7 +824,7 @@ Battle_CheckSleep:
 	lsr a;02857E|4A      |      ;
 	sta.B $8d                            ;02857F|858D    |00048D;
 	phd                                  ;028581|0B      |      ;
-	jsr.W CODE_028F2F                    ;028582|202F8F  |028F2F;
+	jsr.W Battle_SetEntityContextEnemy                    ;028582|202F8F  |028F2F;
 	lda.B $21                            ;028585|A521    |0010A1;
 	pld                                  ;028587|2B      |      ;
 	and.B #$fa                           ;028588|29FA    |      ;
@@ -859,7 +859,7 @@ Battle_SleepLoop:
 	lda.W $4214                          ;0285BE|AD1442  |024214;
 	tax                                  ;0285C1|AA      |      ;
 	phd                                  ;0285C2|0B      |      ;
-	jsr.W CODE_028F22                    ;0285C3|20228F  |028F22;
+	jsr.W Battle_SetEntityContextParty                    ;0285C3|20228F  |028F22;
 	dec.B $18,x                          ;0285C6|D618    |001098;
 	pld                                  ;0285C8|2B      |      ;
 ;      |        |      ;
@@ -867,7 +867,7 @@ Battle_WakeProbability:
 	sep #$20                             ;0285C9|E220    |      ;
 	rep #$10                             ;0285CB|C210    |      ;
 	phd                                  ;0285CD|0B      |      ;
-	jsr.W CODE_028F2F                    ;0285CE|202F8F  |028F2F;
+	jsr.W Battle_SetEntityContextEnemy                    ;0285CE|202F8F  |028F2F;
 	lda.B $60                            ;0285D1|A560    |001260;
 	sta.W $0475                          ;0285D3|8D7504  |020475;
 	lda.B $21                            ;0285D6|A521    |001221;
@@ -913,7 +913,7 @@ Battle_MuteCheck:
 ;      |        |      ;
 Battle_ProcessMute:
 	phd                                  ;028611|0B      |      ;
-	jsr.W CODE_028F2F                    ;028612|202F8F  |028F2F;
+	jsr.W Battle_SetEntityContextEnemy                    ;028612|202F8F  |028F2F;
 	lda.B $21                            ;028615|A521    |001221;
 	pld                                  ;028617|2B      |      ;
 	and.B #$c0                           ;028618|29C0    |      ;
@@ -940,7 +940,7 @@ Battle_CheckFatal:
 	sta.B $a0                            ;02862F|85A0    |0004A0;
 	bpl Battle_ProcessFatal                      ;028631|100F    |028642;
 	phd                                  ;028633|0B      |      ;
-	jsr.W CODE_028F2F                    ;028634|202F8F  |028F2F;
+	jsr.W Battle_SetEntityContextEnemy                    ;028634|202F8F  |028F2F;
 	lda.B $14                            ;028637|A514    |001014;
 	sec                                  ;028639|38      |      ;
 	sbc.W $04a0                          ;02863A|EDA004  |0204A0;
@@ -956,7 +956,7 @@ Battle_ProcessFatal:
 	cmp.W #$7ffe                         ;02864A|C9FE7F  |      ;
 	beq Battle_RemoveMute                      ;02864D|F0DB    |02862A;
 	phd                                  ;02864F|0B      |      ;
-	jsr.W CODE_028F2F                    ;028650|202F8F  |028F2F;
+	jsr.W Battle_SetEntityContextEnemy                    ;028650|202F8F  |028F2F;
 	lda.B $14                            ;028653|A514    |001214;
 	cmp.W $04a0                          ;028655|CDA004  |0204A0;
 	beq Battle_FatalCountdown                      ;028658|F004    |02865E;
@@ -983,7 +983,7 @@ Battle_FatalCountdown:
 	lda.B #$ff                           ;028678|A9FF    |      ;
 	sta.W $0a02,x                        ;02867A|9D020A  |020A02;
 	phd                                  ;02867D|0B      |      ;
-	jsr.W CODE_028F2F                    ;02867E|202F8F  |028F2F;
+	jsr.W Battle_SetEntityContextEnemy                    ;02867E|202F8F  |028F2F;
 	lda.B $60                            ;028681|A560    |001260;
 	pld                                  ;028683|2B      |      ;
 	phd                                  ;028684|0B      |      ;
@@ -1010,7 +1010,7 @@ Battle_CheckRegen:
 ;      |        |      ;
 Battle_ProcessRegen:
 	phd                                  ;0286A3|0B      |      ;
-	jsr.W CODE_028F2F                    ;0286A4|202F8F  |028F2F;
+	jsr.W Battle_SetEntityContextEnemy                    ;0286A4|202F8F  |028F2F;
 	lda.B $14                            ;0286A7|A514    |001214;
 	sta.W $0098                          ;0286A9|8D9800  |020098;
 	lda.W #$0004                         ;0286AC|A90400  |      ;
@@ -1106,7 +1106,7 @@ Battle_ProcessManualInput:
 	rep #$10                             ;028753|C210    |      ;
 	phd                                  ;028755|0B      |      ;
 	stz.B $8b                            ;028756|648B    |00048B;
-	jsr.W CODE_028F22                    ;028758|20228F  |028F22;
+	jsr.W Battle_SetEntityContextParty                    ;028758|20228F  |028F22;
 	lda.B $10                            ;02875B|A510    |001010;
 	sta.W $04a0                          ;02875D|8DA004  |0204A0;
 	inc a;028760|1A      |      ;
@@ -1276,7 +1276,7 @@ Battle_ScanPartyLoop:
 	lda.B $7c,x                          ;028887|B57C    |00047C;
 	sta.B $8b                            ;028889|858B    |00048B;
 	phd                                  ;02888B|0B      |      ;
-	jsr.W CODE_028F22                    ;02888C|20228F  |028F22;
+	jsr.W Battle_SetEntityContextParty                    ;02888C|20228F  |028F22;
 	lda.B $10                            ;02888F|A510    |001110;
 	inc a;028891|1A      |      ;
 	beq Battle_CheckEnemyDead                      ;028892|F03C    |0288D0;
@@ -1325,55 +1325,55 @@ Battle_ScanEnemyLoop:
 	jmp.W Battle_CheckPoison                    ;0288DD|4C2285  |028522;
 ;      |        |      ;
 ;      |        |      ;
-CODE_0288E0:
+Battle_CheckStatusRecovery:
 	sep #$20                             ;0288E0|E220    |      ;
 	rep #$10                             ;0288E2|C210    |      ;
 	phd                                  ;0288E4|0B      |      ;
-	jsr.W CODE_028F22                    ;0288E5|20228F  |028F22;
+	jsr.W Battle_SetEntityContextParty                    ;0288E5|20228F  |028F22;
 	lda.B $21                            ;0288E8|A521    |001021;
 	and.B #$20                           ;0288EA|2920    |      ;
-	beq CODE_028902                      ;0288EC|F014    |028902;
+	beq Battle_CheckMuteRecovery                      ;0288EC|F014    |028902;
 	lda.B #$65                           ;0288EE|A965    |      ;
 	sta.W $00a8                          ;0288F0|8DA800  |0200A8;
 	jsl.L CODE_009783                    ;0288F3|22839700|009783;
 	lda.W $00a9                          ;0288F7|ADA900  |0200A9;
 	cmp.B #$14                           ;0288FA|C914    |      ;
-	bcs CODE_028902                      ;0288FC|B004    |028902;
+	bcs Battle_CheckMuteRecovery                      ;0288FC|B004    |028902;
 	lda.B #$20                           ;0288FE|A920    |      ;
 	trb.B $21                            ;028900|1421    |0011A1;
 ;      |        |      ;
-CODE_028902:
+Battle_CheckMuteRecovery:
 	lda.B $21                            ;028902|A521    |001021;
 	and.B #$10                           ;028904|2910    |      ;
-	beq CODE_02891C                      ;028906|F014    |02891C;
+	beq Battle_CheckConfuseRecovery                      ;028906|F014    |02891C;
 	lda.B #$65                           ;028908|A965    |      ;
 	sta.W $00a8                          ;02890A|8DA800  |0200A8;
 	jsl.L CODE_009783                    ;02890D|22839700|009783;
 	lda.W $00a9                          ;028911|ADA900  |0200A9;
 	cmp.B #$1e                           ;028914|C91E    |      ;
-	bcs CODE_02891C                      ;028916|B004    |02891C;
+	bcs Battle_CheckConfuseRecovery                      ;028916|B004    |02891C;
 	lda.B #$10                           ;028918|A910    |      ;
 	trb.B $21                            ;02891A|1421    |0010A1;
 ;      |        |      ;
-CODE_02891C:
+Battle_CheckConfuseRecovery:
 	lda.B $21                            ;02891C|A521    |001021;
 	and.B #$08                           ;02891E|2908    |      ;
-	beq CODE_028936                      ;028920|F014    |028936;
+	beq Battle_StatusRecoveryComplete                      ;028920|F014    |028936;
 	lda.B #$65                           ;028922|A965    |      ;
 	sta.W $00a8                          ;028924|8DA800  |0200A8;
 	jsl.L CODE_009783                    ;028927|22839700|009783;
 	lda.W $00a9                          ;02892B|ADA900  |0200A9;
 	cmp.B #$28                           ;02892E|C928    |      ;
-	bcs CODE_028936                      ;028930|B004    |028936;
+	bcs Battle_StatusRecoveryComplete                      ;028930|B004    |028936;
 	lda.B #$08                           ;028932|A908    |      ;
 	trb.B $21                            ;028934|1421    |001021;
 ;      |        |      ;
-CODE_028936:
+Battle_StatusRecoveryComplete:
 	pld                                  ;028936|2B      |      ;
 	rts                                  ;028937|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
-CODE_028938:
+Battle_CalculateRewards:
 	php                                  ;028938|08      |      ;
 	sep #$20                             ;028939|E220    |      ;
 	rep #$10                             ;02893B|C210    |      ;
@@ -1384,17 +1384,17 @@ CODE_028938:
 	lda.B #$02                           ;028947|A902    |      ;
 	sta.B $8b                            ;028949|858B    |00048B;
 ;      |        |      ;
-CODE_02894B:
+Battle_ProcessEnemyReward:
 	phd                                  ;02894B|0B      |      ;
-	jsr.W CODE_028F22                    ;02894C|20228F  |028F22;
+	jsr.W Battle_SetEntityContextParty                    ;02894C|20228F  |028F22;
 	lda.B $10                            ;02894F|A510    |001210;
 	inc a;028951|1A      |      ;
-	bne CODE_028957                      ;028952|D003    |028957;
+	bne Battle_CalculateGPReward                      ;028952|D003    |028957;
 	pld                                  ;028954|2B      |      ;
-	bra CODE_02899F                      ;028955|8048    |02899F;
+	bra Battle_NextEnemyReward                      ;028955|8048    |02899F;
 ;      |        |      ;
 ;      |        |      ;
-CODE_028957:
+Battle_CalculateGPReward:
 	lda.B $53                            ;028957|A553    |001253;
 	pha                                  ;028959|48      |      ;
 	lda.B $54                            ;02895A|A554    |001254;
@@ -1402,13 +1402,13 @@ CODE_028957:
 	cmp.B #$42                           ;02895D|C942    |      ;
 	bcs UNREACH_028965                   ;02895F|B004    |028965;
 	lda.B #$03                           ;028961|A903    |      ;
-	bra CODE_02896F                      ;028963|800A    |02896F;
+	bra Battle_MultiplyRewardByLevel                      ;028963|800A    |02896F;
 ;      |        |      ;
 ;      |        |      ;
 UNREACH_028965:
 	db $c9,$4a,$b0,$04,$a9,$06,$80,$02,$a9,$0a;028965|        |      ;
 ;      |        |      ;
-CODE_02896F:
+Battle_MultiplyRewardByLevel:
 	sta.W $4202                          ;02896F|8D0242  |024202;
 	pla                                  ;028972|68      |      ;
 	sta.W $4203                          ;028973|8D0342  |024203;
@@ -1434,17 +1434,17 @@ CODE_02896F:
 	rep #$10                             ;02899C|C210    |      ;
 	pld                                  ;02899E|2B      |      ;
 ;      |        |      ;
-CODE_02899F:
+Battle_NextEnemyReward:
 	inx                                  ;02899F|E8      |      ;
 	inc.B $8b                            ;0289A0|E68B    |00048B;
 	lda.B $8b                            ;0289A2|A58B    |00048B;
 	cmp.B #$05                           ;0289A4|C905    |      ;
-	bcc CODE_02894B                      ;0289A6|90A3    |02894B;
+	bcc Battle_ProcessEnemyReward                      ;0289A6|90A3    |02894B;
 	ldx.B $a2                            ;0289A8|A6A2    |0004A2;
 	phx                                  ;0289AA|DA      |      ;
 	ldx.W #$d2b8                         ;0289AB|A2B8D2  |      ;
 	jsr.W Battle_DisplayMessage                    ;0289AE|203588  |028835;
-	jsr.W CODE_028A43                    ;0289B1|20438A  |028A43;
+	jsr.W Battle_DisplayNumberValue                    ;0289B1|20438A  |028A43;
 	plx                                  ;0289B4|FA      |      ;
 	stx.B $a2                            ;0289B5|86A2    |0004A2;
 	ldx.W #$d2c8                         ;0289B7|A2C8D2  |      ;
@@ -1453,24 +1453,24 @@ CODE_02899F:
 	xba                                  ;0289BF|EB      |      ;
 	lda.W $0514                          ;0289C0|AD1405  |020514;
 	cmp.B #$14                           ;0289C3|C914    |      ;
-	bcc CODE_0289CA                      ;0289C5|9003    |0289CA;
+	bcc Battle_UpdateBattleCount                      ;0289C5|9003    |0289CA;
 ;      |        |      ;
-CODE_0289C7:
-	jmp.W CODE_028A41                    ;0289C7|4C418A  |028A41;
+Battle_DisplayRewardsComplete:
+	jmp.W Battle_RewardsEnd                    ;0289C7|4C418A  |028A41;
 ;      |        |      ;
 ;      |        |      ;
-CODE_0289CA:
+Battle_UpdateBattleCount:
 	tax                                  ;0289CA|AA      |      ;
 	dec.W $0fd4,x                        ;0289CB|DED40F  |020FD4;
-	beq CODE_0289DE                      ;0289CE|F00E    |0289DE;
+	beq Battle_ProcessBossDefeat                      ;0289CE|F00E    |0289DE;
 	lda.W $0fd4,x                        ;0289D0|BDD40F  |020FD4;
 	sta.W $009e                          ;0289D3|8D9E00  |02009E;
 	ldx.W #$d54d                         ;0289D6|A24DD5  |      ;
 	jsr.W Battle_DisplayMessage                    ;0289D9|203588  |028835;
-	bra CODE_0289C7                      ;0289DC|80E9    |0289C7;
+	bra Battle_DisplayRewardsComplete                      ;0289DC|80E9    |0289C7;
 ;      |        |      ;
 ;      |        |      ;
-CODE_0289DE:
+Battle_ProcessBossDefeat:
 	pha                                  ;0289DE|48      |      ;
 	lda.B #$81                           ;0289DF|A981    |      ;
 	clc                                  ;0289E1|18      |      ;
@@ -1490,7 +1490,7 @@ CODE_0289DE:
 	rep #$30                             ;0289FC|C230    |      ;
 	lda.L DATA8_07efa1,x                 ;0289FE|BFA1EF07|07EFA1;
 	bit.W #$8000                         ;028A02|890080  |      ;
-	beq CODE_028A1D                      ;028A05|F016    |028A1D;
+	beq Battle_SetRewardBonus                      ;028A05|F016    |028A1D;
 	and.W #$7fff                         ;028A07|29FF7F  |      ;
 	pha                                  ;028A0A|48      |      ;
 	asl a;028A0B|0A      |      ;
@@ -1500,21 +1500,21 @@ CODE_0289DE:
 	pla                                  ;028A11|68      |      ;
 	ldx.W #$d56c                         ;028A12|A26CD5  |      ;
 	jsr.W Battle_DisplayMessage                    ;028A15|203588  |028835;
-	jsr.W CODE_028A43                    ;028A18|20438A  |028A43;
-	bra CODE_028A41                      ;028A1B|8024    |028A41;
+	jsr.W Battle_DisplayNumberValue                    ;028A18|20438A  |028A43;
+	bra Battle_RewardsEnd                      ;028A1B|8024    |028A41;
 ;      |        |      ;
 ;      |        |      ;
-CODE_028A1D:
+Battle_SetRewardBonus:
 	bit.W #$4000                         ;028A1D|890040  |      ;
-	beq CODE_028A30                      ;028A20|F00E    |028A30;
+	beq Battle_ApplyRewardBonus                      ;028A20|F00E    |028A30;
 	and.W #$00ff                         ;028A22|29FF00  |      ;
 	sta.W $009e                          ;028A25|8D9E00  |02009E;
 	ldx.W #$d583                         ;028A28|A283D5  |      ;
 	jsr.W Battle_DisplayMessage                    ;028A2B|203588  |028835;
-	bra CODE_028A41                      ;028A2E|8011    |028A41;
+	bra Battle_RewardsEnd                      ;028A2E|8011    |028A41;
 ;      |        |      ;
 ;      |        |      ;
-CODE_028A30:
+Battle_ApplyRewardBonus:
 	and.W #$3fff                         ;028A30|29FF3F  |      ;
 	pha                                  ;028A33|48      |      ;
 	asl a;028A34|0A      |      ;
@@ -1525,34 +1525,34 @@ CODE_028A30:
 	ldx.W #$d578                         ;028A3B|A278D5  |      ;
 	jsr.W Battle_DisplayMessage                    ;028A3E|203588  |028835;
 ;      |        |      ;
-CODE_028A41:
+Battle_RewardsEnd:
 	plp                                  ;028A41|28      |      ;
 	rts                                  ;028A42|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
-CODE_028A43:
+Battle_DisplayNumberValue:
 	sep #$20                             ;028A43|E220    |      ;
 	rep #$10                             ;028A45|C210    |      ;
 	sec                                  ;028A47|38      |      ;
 	lda.W $0512                          ;028A48|AD1205  |020512;
 	cmp.W $1013                          ;028A4B|CD1310  |021013;
-	beq CODE_028A53                      ;028A4E|F003    |028A53;
-	bcc CODE_028A64                      ;028A50|9012    |028A64;
+	beq Battle_ConvertNumberLoop                      ;028A4E|F003    |028A53;
+	bcc Battle_DisplayDigitLoop                      ;028A50|9012    |028A64;
 	rts                                  ;028A52|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
-CODE_028A53:
+Battle_ConvertNumberLoop:
 	rep #$30                             ;028A53|C230    |      ;
 	lda.W $0510                          ;028A55|AD1005  |020510;
 	cmp.W $1011                          ;028A58|CD1110  |021011;
-	beq CODE_028A64                      ;028A5B|F007    |028A64;
-	bcc CODE_028A64                      ;028A5D|9005    |028A64;
+	beq Battle_DisplayDigitLoop                      ;028A5B|F007    |028A64;
+	bcc Battle_DisplayDigitLoop                      ;028A5D|9005    |028A64;
 	sep #$20                             ;028A5F|E220    |      ;
 	rep #$10                             ;028A61|C210    |      ;
 	rts                                  ;028A63|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
-CODE_028A64:
+Battle_DisplayDigitLoop:
 	sep #$20                             ;028A64|E220    |      ;
 	rep #$10                             ;028A66|C210    |      ;
 	jmp.W Battle_ProcessManualInput                    ;028A68|4C5187  |028751;
@@ -1566,7 +1566,7 @@ CODE_028A64:
 	db $2a,$d5,$20,$35,$88,$a9,$7f,$14,$21,$2b,$e6,$89,$a5,$89,$c9,$05;028ACB|        |      ;
 	db $90,$94,$d0,$01,$60               ;028ADB|        |028A71;
 ;      |        |      ;
-CODE_028AE0:
+Battle_GetNumberDigit:
 	php                                  ;028AE0|08      |      ;
 	phb                                  ;028AE1|8B      |      ;
 	phd                                  ;028AE2|0B      |      ;
@@ -1579,17 +1579,17 @@ CODE_028AE0:
 	ldx.W #$0000                         ;028AED|A20000  |      ;
 	lda.B $3a                            ;028AF0|A53A    |00043A;
 ;      |        |      ;
-CODE_028AF2:
+Battle_ExtractDigit:
 	cmp.W DATA8_028b06,x                 ;028AF2|DD068B  |028B06;
-	bcc CODE_028AFA                      ;028AF5|9003    |028AFA;
+	bcc Battle_ProcessDigitConversion                      ;028AF5|9003    |028AFA;
 	inx                                  ;028AF7|E8      |      ;
-	bra CODE_028AF2                      ;028AF8|80F8    |028AF2;
+	bra Battle_ExtractDigit                      ;028AF8|80F8    |028AF2;
 ;      |        |      ;
 ;      |        |      ;
-CODE_028AFA:
+Battle_ProcessDigitConversion:
 	lda.W DATA8_028b0a,x                 ;028AFA|BD0A8B  |028B0A;
 	sta.B $38                            ;028AFD|8538    |000438;
-	jsr.W CODE_028B0F                    ;028AFF|200F8B  |028B0F;
+	jsr.W Battle_SetupTargeting                    ;028AFF|200F8B  |028B0F;
 	pld                                  ;028B02|2B      |      ;
 	plb                                  ;028B03|AB      |      ;
 	plp                                  ;028B04|28      |      ;
@@ -1603,7 +1603,7 @@ DATA8_028b0a:
 	db $30,$20,$00,$40                   ;028B0A|        |      ;
 	db $10                               ;028B0E|        |028B04;
 ;      |        |      ;
-CODE_028B0F:
+Battle_SetupTargeting:
 	pea.W $0400                          ;028B0F|F40004  |020400;
 	pld                                  ;028B12|2B      |      ;
 	sep #$20                             ;028B13|E220    |      ;
@@ -1634,7 +1634,7 @@ CODE_028B0F:
 	rep #$10                             ;028B3F|C210    |      ;
 	lda.B $38                            ;028B41|A538    |000438;
 	cmp.B #$30                           ;028B43|C930    |      ;
-	beq CODE_028B5A                      ;028B45|F013    |028B5A;
+	beq Battle_ValidateAllTargets                      ;028B45|F013    |028B5A;
 	rep #$30                             ;028B47|C230    |      ;
 	lda.W $0000,x                        ;028B49|BD0000  |020000;
 	sta.B $db                            ;028B4C|85DB    |0004DB;
@@ -1644,9 +1644,9 @@ CODE_028B0F:
 	inx                                  ;028B53|E8      |      ;
 	lda.B $38                            ;028B54|A538    |000438;
 	cmp.B #$40                           ;028B56|C940    |      ;
-	beq CODE_028BAB                      ;028B58|F051    |028BAB;
+	beq Battle_ProcessTargetCheck                      ;028B58|F051    |028BAB;
 ;      |        |      ;
-CODE_028B5A:
+Battle_ValidateAllTargets:
 	rep #$30                             ;028B5A|C230    |      ;
 	phb                                  ;028B5C|8B      |      ;
 	ldy.W #$04dd                         ;028B5D|A0DD04  |      ;
@@ -1680,28 +1680,28 @@ CODE_028B5A:
 	rep #$10                             ;028B91|C210    |      ;
 	lda.B $38                            ;028B93|A538    |000438;
 	cmp.B #$30                           ;028B95|C930    |      ;
-	bne CODE_028B9A                      ;028B97|D001    |028B9A;
+	bne Battle_CheckTargetStatus                      ;028B97|D001    |028B9A;
 	rts                                  ;028B99|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
-CODE_028B9A:
+Battle_CheckTargetStatus:
 	cmp.B #$10                           ;028B9A|C910    |      ;
-	beq CODE_028BAB                      ;028B9C|F00D    |028BAB;
+	beq Battle_ProcessTargetCheck                      ;028B9C|F00D    |028BAB;
 	lda.W $0000,x                        ;028B9E|BD0000  |020000;
 	sta.B $e2                            ;028BA1|85E2    |0004E2;
 	lda.B $38                            ;028BA3|A538    |000438;
 	cmp.B #$20                           ;028BA5|C920    |      ;
-	bne CODE_028BAA                      ;028BA7|D001    |028BAA;
+	bne Battle_TargetStatusValid                      ;028BA7|D001    |028BAA;
 	rts                                  ;028BA9|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
-CODE_028BAA:
+Battle_TargetStatusValid:
 	inx                                  ;028BAA|E8      |      ;
 ;      |        |      ;
-CODE_028BAB:
+Battle_ProcessTargetCheck:
 	sep #$20                             ;028BAB|E220    |      ;
 	rep #$10                             ;028BAD|C210    |      ;
-	jsr.W CODE_028BE9                    ;028BAF|20E98B  |028BE9;
+	jsr.W Battle_TargetCheckComplete                    ;028BAF|20E98B  |028BE9;
 	sta.B $e5                            ;028BB2|85E5    |0004E5;
 	xba                                  ;028BB4|EB      |      ;
 	and.B #$f0                           ;028BB5|29F0    |      ;
@@ -1716,12 +1716,12 @@ CODE_028BAB:
 	sta.B $e3                            ;028BC2|85E3    |0004E3;
 	lda.B $38                            ;028BC4|A538    |000438;
 	cmp.B #$40                           ;028BC6|C940    |      ;
-	beq CODE_028BCB                      ;028BC8|F001    |028BCB;
+	beq Battle_TargetCheckLoop                      ;028BC8|F001    |028BCB;
 	rts                                  ;028BCA|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
-CODE_028BCB:
-	jsr.W CODE_028BE8                    ;028BCB|20E88B  |028BE8;
+Battle_TargetCheckLoop:
+	jsr.W Battle_NextTargetCheck                    ;028BCB|20E88B  |028BE8;
 	sta.B $e7                            ;028BCE|85E7    |0004E7;
 	xba                                  ;028BD0|EB      |      ;
 	and.B #$f0                           ;028BD1|29F0    |      ;
@@ -1730,7 +1730,7 @@ CODE_028BCB:
 	lsr a;028BD5|4A      |      ;
 	lsr a;028BD6|4A      |      ;
 	sta.B $e6                            ;028BD7|85E6    |0004E6;
-	jsr.W CODE_028BE8                    ;028BD9|20E88B  |028BE8;
+	jsr.W Battle_NextTargetCheck                    ;028BD9|20E88B  |028BE8;
 	sta.B $e9                            ;028BDC|85E9    |0004E9;
 	xba                                  ;028BDE|EB      |      ;
 	and.B #$f0                           ;028BDF|29F0    |      ;
@@ -1742,10 +1742,10 @@ CODE_028BCB:
 	rts                                  ;028BE7|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
-CODE_028BE8:
+Battle_NextTargetCheck:
 	inx                                  ;028BE8|E8      |      ;
 ;      |        |      ;
-CODE_028BE9:
+Battle_TargetCheckComplete:
 	lda.W $0000,x                        ;028BE9|BD0000  |020000;
 	pha                                  ;028BEC|48      |      ;
 	xba                                  ;028BED|EB      |      ;
@@ -1763,7 +1763,7 @@ DATA8_028bfc:
 DATA8_028c01:
 	db $20,$40,$14,$10,$2f               ;028C01|        |      ;
 ;      |        |      ;
-CODE_028C06:
+Battle_InitializeEnemies:
 	pea.W $0400                          ;028C06|F40004  |020400;
 	pld                                  ;028C09|2B      |      ;
 	sep #$20                             ;028C0A|E220    |      ;
@@ -1775,11 +1775,11 @@ CODE_028C06:
 	xba                                  ;028C19|EB      |      ;
 	lda.W $0513                          ;028C1A|AD1305  |020513;
 	cmp.B #$ff                           ;028C1D|C9FF    |      ;
-	bne CODE_028C24                      ;028C1F|D003    |028C24;
-	jmp.W CODE_028C6E                    ;028C21|4C6E8C  |028C6E;
+	bne Battle_LoadEnemyData                      ;028C1F|D003    |028C24;
+	jmp.W Battle_CopyEnemyData                    ;028C21|4C6E8C  |028C6E;
 ;      |        |      ;
 ;      |        |      ;
-CODE_028C24:
+Battle_LoadEnemyData:
 	rep #$30                             ;028C24|C230    |      ;
 	pha                                  ;028C26|48      |      ;
 	asl a;028C27|0A      |      ;
@@ -1790,46 +1790,46 @@ CODE_028C24:
 	sep #$20                             ;028C2D|E220    |      ;
 	rep #$10                             ;028C2F|C210    |      ;
 	cmp.B #$14                           ;028C31|C914    |      ;
-	bcs CODE_028C4D                      ;028C33|B018    |028C4D;
+	bcs Battle_ProcessEnemySlot                      ;028C33|B018    |028C4D;
 	lda.B #$00                           ;028C35|A900    |      ;
 	xba                                  ;028C37|EB      |      ;
 	lda.W $00a9                          ;028C38|ADA900  |0200A9;
 	cmp.B #$22                           ;028C3B|C922    |      ;
-	bcc CODE_028C63                      ;028C3D|9024    |028C63;
+	bcc Battle_InitEnemyStats                      ;028C3D|9024    |028C63;
 	sec                                  ;028C3F|38      |      ;
 	sbc.B #$22                           ;028C40|E922    |      ;
 	inx                                  ;028C42|E8      |      ;
 	cmp.B #$22                           ;028C43|C922    |      ;
-	bcc CODE_028C63                      ;028C45|901C    |028C63;
+	bcc Battle_InitEnemyStats                      ;028C45|901C    |028C63;
 	sec                                  ;028C47|38      |      ;
 	sbc.B #$22                           ;028C48|E922    |      ;
 	inx                                  ;028C4A|E8      |      ;
-	bra CODE_028C63                      ;028C4B|8016    |028C63;
+	bra Battle_InitEnemyStats                      ;028C4B|8016    |028C63;
 ;      |        |      ;
 ;      |        |      ;
-CODE_028C4D:
+Battle_ProcessEnemySlot:
 	lda.B #$00                           ;028C4D|A900    |      ;
 	xba                                  ;028C4F|EB      |      ;
 	lda.W $00a9                          ;028C50|ADA900  |0200A9;
 	cmp.B #$22                           ;028C53|C922    |      ;
-	bcc CODE_028C63                      ;028C55|900C    |028C63;
+	bcc Battle_InitEnemyStats                      ;028C55|900C    |028C63;
 	sec                                  ;028C57|38      |      ;
 	sbc.B #$22                           ;028C58|E922    |      ;
 	inx                                  ;028C5A|E8      |      ;
 	cmp.B #$22                           ;028C5B|C922    |      ;
-	bcc CODE_028C63                      ;028C5D|9004    |028C63;
+	bcc Battle_InitEnemyStats                      ;028C5D|9004    |028C63;
 	sec                                  ;028C5F|38      |      ;
 	sbc.B #$22                           ;028C60|E922    |      ;
 	inx                                  ;028C62|E8      |      ;
 ;      |        |      ;
-CODE_028C63:
+Battle_InitEnemyStats:
 	lda.W DATA8_02ce12,x                 ;028C63|BD12CE  |02CE12;
 	sta.W $0515                          ;028C66|8D1505  |020515;
 	lda.B #$ff                           ;028C69|A9FF    |      ;
 	sta.W $0513                          ;028C6B|8D1305  |020513;
 ;      |        |      ;
-CODE_028C6E:
-	jmp.W CODE_028CC8                    ;028C6E|4CC88C  |028CC8;
+Battle_CopyEnemyData:
+	jmp.W Battle_SetEnemyHP                    ;028C6E|4CC88C  |028CC8;
 ;      |        |      ;
 	db $a2,$54,$8f,$8e,$17,$00,$a9,$02,$8d,$19,$00,$a9,$1f,$8d,$2c,$21;028C71|        |      ;
 	db $a9,$0f,$8d,$00,$21,$22,$6b,$9d,$00,$ad,$95,$00,$29,$0f,$f0,$1c;028C81|        |      ;
@@ -1838,7 +1838,7 @@ CODE_028C6E:
 	db $10,$f0,$ba,$a2,$5a,$8f,$8e,$17,$00,$a9,$02,$8d,$19,$00,$a9,$0f;028CB1|        |028CA3;
 	db $8d,$00,$21,$22,$6b,$9d,$00       ;028CC1|        |002100;
 ;      |        |      ;
-CODE_028CC8:
+Battle_SetEnemyHP:
 	lda.B #$00                           ;028CC8|A900    |      ;
 	xba                                  ;028CCA|EB      |      ;
 	lda.W $0515                          ;028CCB|AD1505  |020515;
@@ -1850,14 +1850,14 @@ CODE_028CC8:
 	tax                                  ;028CD6|AA      |      ;
 	ldy.W #$0000                         ;028CD7|A00000  |      ;
 ;      |        |      ;
-CODE_028CDA:
+Battle_SetEnemyLevel:
 	lda.W UNREACH_02CA6A,x               ;028CDA|BD6ACA  |02CA6A;
 	pha                                  ;028CDD|48      |      ;
 	cmp.B #$ff                           ;028CDE|C9FF    |      ;
-	beq CODE_028CE4                      ;028CE0|F002    |028CE4;
+	beq Battle_CalculateEnemyDefense                      ;028CE0|F002    |028CE4;
 	and.B #$7f                           ;028CE2|297F    |      ;
 ;      |        |      ;
-CODE_028CE4:
+Battle_CalculateEnemyDefense:
 	sta.W $04ac,y                        ;028CE4|99AC04  |0204AC;
 	sta.W $0a02,y                        ;028CE7|99020A  |020A02;
 	pla                                  ;028CEA|68      |      ;
@@ -1868,7 +1868,7 @@ CODE_028CE4:
 	iny                                  ;028CF4|C8      |      ;
 	tya                                  ;028CF5|98      |      ;
 	cmp.B #$03                           ;028CF6|C903    |      ;
-	bne CODE_028CDA                      ;028CF8|D0E0    |028CDA;
+	bne Battle_SetEnemyLevel                      ;028CF8|D0E0    |028CDA;
 	lda.W UNREACH_02CA6A,x               ;028CFA|BD6ACA  |02CA6A;
 	sta.B $af                            ;028CFD|85AF    |0004AF;
 	and.B #$30                           ;028CFF|2930    |      ;
@@ -1876,39 +1876,39 @@ CODE_028CE4:
 	stz.B $b3                            ;028D04|64B3    |0004B3;
 	lda.B $ac                            ;028D06|A5AC    |0004AC;
 	inc a;028D08|1A      |      ;
-	beq CODE_028D0D                      ;028D09|F002    |028D0D;
+	beq Battle_CalculateEnemyMagicDef                      ;028D09|F002    |028D0D;
 	inc.B $b3                            ;028D0B|E6B3    |0004B3;
 ;      |        |      ;
-CODE_028D0D:
+Battle_CalculateEnemyMagicDef:
 	lda.B $ad                            ;028D0D|A5AD    |0004AD;
 	inc a;028D0F|1A      |      ;
-	beq CODE_028D14                      ;028D10|F002    |028D14;
+	beq Battle_SetEnemyAttack                      ;028D10|F002    |028D14;
 	inc.B $b3                            ;028D12|E6B3    |0004B3;
 ;      |        |      ;
-CODE_028D14:
+Battle_SetEnemyAttack:
 	lda.B $ae                            ;028D14|A5AE    |0004AE;
 	inc a;028D16|1A      |      ;
-	beq CODE_028D1B                      ;028D17|F002    |028D1B;
+	beq Battle_SetEnemyAccuracy                      ;028D17|F002    |028D1B;
 	inc.B $b3                            ;028D19|E6B3    |0004B3;
 ;      |        |      ;
-CODE_028D1B:
+Battle_SetEnemyAccuracy:
 	lda.B $b3                            ;028D1B|A5B3    |0004B3;
 	sta.B $b4                            ;028D1D|85B4    |0004B4;
 	sta.W $0a00                          ;028D1F|8D000A  |020A00;
 	ldx.W #$1100                         ;028D22|A20011  |      ;
 	stx.B $92                            ;028D25|8692    |000492;
 	lda.B $ac                            ;028D27|A5AC    |0004AC;
-	jsr.W CODE_028D37                    ;028D29|20378D  |028D37;
+	jsr.W Battle_SetEnemySpeed                    ;028D29|20378D  |028D37;
 	lda.B $ad                            ;028D2C|A5AD    |0004AD;
-	jsr.W CODE_028D37                    ;028D2E|20378D  |028D37;
+	jsr.W Battle_SetEnemySpeed                    ;028D2E|20378D  |028D37;
 	lda.B $ae                            ;028D31|A5AE    |0004AE;
-	jsr.W CODE_028D37                    ;028D33|20378D  |028D37;
+	jsr.W Battle_SetEnemySpeed                    ;028D33|20378D  |028D37;
 	rts                                  ;028D36|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
-CODE_028D37:
+Battle_SetEnemySpeed:
 	inc a;028D37|1A      |      ;
-	bne CODE_028D49                      ;028D38|D00F    |028D49;
+	bne Battle_SetEnemyAttributes                      ;028D38|D00F    |028D49;
 	rep #$30                             ;028D3A|C230    |      ;
 	lda.B $92                            ;028D3C|A592    |000492;
 	clc                                  ;028D3E|18      |      ;
@@ -1919,7 +1919,7 @@ CODE_028D37:
 	rts                                  ;028D48|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
-CODE_028D49:
+Battle_SetEnemyAttributes:
 	dec a;028D49|3A      |      ;
 	pha                                  ;028D4A|48      |      ;
 	pha                                  ;028D4B|48      |      ;
@@ -2066,15 +2066,15 @@ CODE_028D49:
 	ldy.W #$0060                         ;028E54|A06000  |      ;
 	lda.B ($92),y                        ;028E57|B192    |000492;
 	cmp.B #$42                           ;028E59|C942    |      ;
-	bcc CODE_028E61                      ;028E5B|9004    |028E61;
+	bcc Battle_ProcessEnemyAI                      ;028E5B|9004    |028E61;
 	lda.B #$80                           ;028E5D|A980    |      ;
-	bra CODE_028E63                      ;028E5F|8002    |028E63;
+	bra Battle_AIDecisionTree                      ;028E5F|8002    |028E63;
 ;      |        |      ;
 ;      |        |      ;
-CODE_028E61:
+Battle_ProcessEnemyAI:
 	lda.B #$00                           ;028E61|A900    |      ;
 ;      |        |      ;
-CODE_028E63:
+Battle_AIDecisionTree:
 	ply                                  ;028E63|7A      |      ;
 	iny                                  ;028E64|C8      |      ;
 	sta.B ($92),y                        ;028E65|9192    |000492;
@@ -2122,87 +2122,87 @@ CODE_028E63:
 ;      |        |      ;
 	db $64,$8b,$0b,$20,$22,$8f,$2b,$e6,$8b,$a5,$8b,$c9,$05;028EB3|        |00008B;
 ;      |        |      ;
-CODE_028EC0:
+Battle_CheckTargetType:
 	lda.B $39                            ;028EC0|A539    |000439;
 	and.B #$80                           ;028EC2|2980    |      ;
-	beq CODE_028EC7                      ;028EC4|F001    |028EC7;
+	beq Battle_ValidateTargetType                      ;028EC4|F001    |028EC7;
 	rts                                  ;028EC6|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
-CODE_028EC7:
+Battle_ValidateTargetType:
 	lda.B $3a                            ;028EC7|A53A    |00043A;
 	cmp.B #$11                           ;028EC9|C911    |      ;
-	bne CODE_028ECE                      ;028ECB|D001    |028ECE;
+	bne Battle_SetTargetGroup                      ;028ECB|D001    |028ECE;
 	rts                                  ;028ECD|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
-CODE_028ECE:
+Battle_SetTargetGroup:
 	lda.B $dc                            ;028ECE|A5DC    |0004DC;
 	and.B #$c0                           ;028ED0|29C0    |      ;
-	beq CODE_028EE1                      ;028ED2|F00D    |028EE1;
+	beq Battle_TargetGroupSet                      ;028ED2|F00D    |028EE1;
 	lda.B $8b                            ;028ED4|A58B    |00048B;
 	cmp.B #$02                           ;028ED6|C902    |      ;
-	bcs CODE_028EE1                      ;028ED8|B007    |028EE1;
+	bcs Battle_TargetGroupSet                      ;028ED8|B007    |028EE1;
 	lda.B $39                            ;028EDA|A539    |000439;
 	cmp.B #$02                           ;028EDC|C902    |      ;
-	bcs CODE_028EE1                      ;028EDE|B001    |028EE1;
+	bcs Battle_TargetGroupSet                      ;028EDE|B001    |028EE1;
 	rts                                  ;028EE0|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
-CODE_028EE1:
+Battle_TargetGroupSet:
 	lda.B $39                            ;028EE1|A539    |000439;
 	sta.B $8d                            ;028EE3|858D    |00048D;
 	phd                                  ;028EE5|0B      |      ;
-	jsr.W CODE_028F2F                    ;028EE6|202F8F  |028F2F;
+	jsr.W Battle_SetEntityContextEnemy                    ;028EE6|202F8F  |028F2F;
 	lda.B $21                            ;028EE9|A521    |001221;
 	pld                                  ;028EEB|2B      |      ;
 	and.B #$c0                           ;028EEC|29C0    |      ;
-	bne CODE_028EF1                      ;028EEE|D001    |028EF1;
+	bne Battle_ProcessTargetGroup                      ;028EEE|D001    |028EF1;
 	rts                                  ;028EF0|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
-CODE_028EF1:
+Battle_ProcessTargetGroup:
 	lda.B $39                            ;028EF1|A539    |000439;
 	cmp.B #$02                           ;028EF3|C902    |      ;
-	bcs CODE_028EFC                      ;028EF5|B005    |028EFC;
+	bcs Battle_TargetGroupLoop                      ;028EF5|B005    |028EFC;
 	ldx.W #$0100                         ;028EF7|A20001  |      ;
-	bra CODE_028EFF                      ;028EFA|8003    |028EFF;
+	bra Battle_SelectNextTarget                      ;028EFA|8003    |028EFF;
 ;      |        |      ;
 ;      |        |      ;
-CODE_028EFC:
+Battle_TargetGroupLoop:
 	ldx.W #$0402                         ;028EFC|A20204  |      ;
 ;      |        |      ;
-CODE_028EFF:
+Battle_SelectNextTarget:
 	stx.B $8d                            ;028EFF|868D    |00048D;
 ;      |        |      ;
-CODE_028F01:
+Battle_TargetSelectionComplete:
 	phd                                  ;028F01|0B      |      ;
-	jsr.W CODE_028F2F                    ;028F02|202F8F  |028F2F;
+	jsr.W Battle_SetEntityContextEnemy                    ;028F02|202F8F  |028F2F;
 	lda.B $21                            ;028F05|A521    |0011A1;
 	xba                                  ;028F07|EB      |      ;
 	lda.B $10                            ;028F08|A510    |001190;
 	pld                                  ;028F0A|2B      |      ;
 	inc a;028F0B|1A      |      ;
-	beq CODE_028F15                      ;028F0C|F007    |028F15;
+	beq Battle_GetEntityPointer                      ;028F0C|F007    |028F15;
 	xba                                  ;028F0E|EB      |      ;
 	and.B #$c0                           ;028F0F|29C0    |      ;
-	bne CODE_028F15                      ;028F11|D002    |028F15;
-	bra CODE_028F1D                      ;028F13|8008    |028F1D;
+	bne Battle_GetEntityPointer                      ;028F11|D002    |028F15;
+	bra Battle_CalculatePointerOffset                      ;028F13|8008    |028F1D;
 ;      |        |      ;
 ;      |        |      ;
-CODE_028F15:
+Battle_GetEntityPointer:
 	inc.B $8d                            ;028F15|E68D    |00048D;
 	lda.B $8e                            ;028F17|A58E    |00048E;
 	cmp.B $8d                            ;028F19|C58D    |00048D;
-	bcs CODE_028F01                      ;028F1B|B0E4    |028F01;
+	bcs Battle_TargetSelectionComplete                      ;028F1B|B0E4    |028F01;
 ;      |        |      ;
-CODE_028F1D:
+Battle_CalculatePointerOffset:
 	lda.B $8d                            ;028F1D|A58D    |00048D;
 	sta.B $39                            ;028F1F|8539    |000439;
 	rts                                  ;028F21|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
-CODE_028F22:
+Battle_SetEntityContextParty:
 	pha                                  ;028F22|48      |      ;
 	phx                                  ;028F23|DA      |      ;
 	phy                                  ;028F24|5A      |      ;
@@ -2210,10 +2210,10 @@ CODE_028F22:
 	sep #$20                             ;028F26|E220    |      ;
 	rep #$10                             ;028F28|C210    |      ;
 	lda.W $048b                          ;028F2A|AD8B04  |02048B;
-	bra CODE_028F3A                      ;028F2D|800B    |028F3A;
+	bra Battle_GetBattleEntityData                      ;028F2D|800B    |028F3A;
 ;      |        |      ;
 ;      |        |      ;
-CODE_028F2F:
+Battle_SetEntityContextEnemy:
 	pha                                  ;028F2F|48      |      ;
 	phx                                  ;028F30|DA      |      ;
 	phy                                  ;028F31|5A      |      ;
@@ -2222,7 +2222,7 @@ CODE_028F2F:
 	rep #$10                             ;028F35|C210    |      ;
 	lda.W $048d                          ;028F37|AD8D04  |02048D;
 ;      |        |      ;
-CODE_028F3A:
+Battle_GetBattleEntityData:
 	asl a;028F3A|0A      |      ;
 	rep #$20                             ;028F3B|C220    |      ;
 	sep #$10                             ;028F3D|E210    |      ;
@@ -2246,7 +2246,7 @@ DATA8_028f4a:
 	db $00,$00,$05,$e3,$10,$07,$00,$0b,$00,$96,$8f,$00,$05,$32,$05,$35;028F94|        |      ;
 	db $16,$05,$00,$00                   ;028FA4|        |000005;
 ;      |        |      ;
-CODE_028FA8:
+Battle_LoadEntityTableData:
 	ldx.W #$d3ff                         ;028FA8|A2FFD3  |      ;
 	jmp.W Battle_DisplayMessage                    ;028FAB|4C3588  |028835;
 ;      |        |      ;
@@ -2257,32 +2257,32 @@ CODE_028FA8:
 	jsr.W CODE_0297D9                    ;028FD7|20D997  |0297D9;
 	lda.B $b7                            ;028FDA|A5B7    |0004B7;
 	cmp.B $b8                            ;028FDC|C5B8    |0004B8;
-	bcs CODE_028FE3                      ;028FDE|B003    |028FE3;
+	bcs Battle_ProcessEntityTable                      ;028FDE|B003    |028FE3;
 	jmp.W CODE_029785                    ;028FE0|4C8597  |029785;
 ;      |        |      ;
 ;      |        |      ;
-CODE_028FE3:
+Battle_ProcessEntityTable:
 	jsr.W CODE_02999D                    ;028FE3|209D99  |02999D;
 	jsr.W CODE_029A4A                    ;028FE6|204A9A  |029A4A;
 	jsr.W CODE_029BED                    ;028FE9|20ED9B  |029BED;
 	lda.B $8d                            ;028FEC|A58D    |00048D;
 	cmp.B #$02                           ;028FEE|C902    |      ;
-	bcc CODE_028FF5                      ;028FF0|9003    |028FF5;
+	bcc Battle_LoadEntityDataLoop                      ;028FF0|9003    |028FF5;
 	jsr.W CODE_029B39                    ;028FF2|20399B  |029B39;
 ;      |        |      ;
-CODE_028FF5:
+Battle_LoadEntityDataLoop:
 	jsr.W CODE_0299DA                    ;028FF5|20DA99  |0299DA;
 	lda.B $3a                            ;028FF8|A53A    |00043A;
 	cmp.B #$26                           ;028FFA|C926    |      ;
-	beq CODE_029007                      ;028FFC|F009    |029007;
+	beq Battle_ProcessEntityEntry                      ;028FFC|F009    |029007;
 	cmp.B #$27                           ;028FFE|C927    |      ;
-	beq CODE_029007                      ;029000|F005    |029007;
+	beq Battle_ProcessEntityEntry                      ;029000|F005    |029007;
 	cmp.B #$28                           ;029002|C928    |      ;
-	beq CODE_029007                      ;029004|F001    |029007;
+	beq Battle_ProcessEntityEntry                      ;029004|F001    |029007;
 	rts                                  ;029006|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
-CODE_029007:
+Battle_ProcessEntityEntry:
 	lsr.B $b7                            ;029007|46B7    |0004B7;
 	lda.B #$65                           ;029009|A965    |      ;
 	sta.W $00a8                          ;02900B|8DA800  |0200A8;
@@ -2294,60 +2294,60 @@ CODE_029007:
 	sta.B $b8                            ;02901E|85B8    |0004B8;
 	lda.B $b7                            ;029020|A5B7    |0004B7;
 	cmp.B $b8                            ;029022|C5B8    |0004B8;
-	bcs CODE_029027                      ;029024|B001    |029027;
+	bcs Battle_InitializeCommand                      ;029024|B001    |029027;
 	rts                                  ;029026|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
-CODE_029027:
+Battle_InitializeCommand:
 	jmp.W CODE_029CCA                    ;029027|4CCA9C  |029CCA;
 ;      |        |      ;
 	phd                                  ;02902A|0B      |      ;
-	jsr.W CODE_028F22                    ;02902B|20228F  |028F22;
+	jsr.W Battle_SetEntityContextParty                    ;02902B|20228F  |028F22;
 	lda.B $30                            ;02902E|A530    |0011B0;
 	pld                                  ;029030|2B      |      ;
 	inc a;029031|1A      |      ;
 	dec a;029032|3A      |      ;
-	bne CODE_029038                      ;029033|D003    |029038;
+	bne Battle_SelectCommand                      ;029033|D003    |029038;
 	db $4c,$ae,$8f                       ;029035|        |028FAE;
 ;      |        |      ;
-CODE_029038:
+Battle_SelectCommand:
 	lda.B $90                            ;029038|A590    |000490;
 	cmp.B $8f                            ;02903A|C58F    |00048F;
-	bne CODE_029052                      ;02903C|D014    |029052;
+	bne Battle_CommandAttack                      ;02903C|D014    |029052;
 	lda.B $3a                            ;02903E|A53A    |00043A;
 	cmp.B #$46                           ;029040|C946    |      ;
-	bne CODE_029048                      ;029042|D004    |029048;
+	bne Battle_ProcessCommandType                      ;029042|D004    |029048;
 	lda.B #$01                           ;029044|A901    |      ;
 	sta.B $e3                            ;029046|85E3    |0004E3;
 ;      |        |      ;
-CODE_029048:
+Battle_ProcessCommandType:
 	jsr.W CODE_029797                    ;029048|209797  |029797;
 	phd                                  ;02904B|0B      |      ;
-	jsr.W CODE_028F22                    ;02904C|20228F  |028F22;
+	jsr.W Battle_SetEntityContextParty                    ;02904C|20228F  |028F22;
 	dec.B $30                            ;02904F|C630    |0011B0;
 	pld                                  ;029051|2B      |      ;
 ;      |        |      ;
-CODE_029052:
+Battle_CommandAttack:
 	lda.B $8b                            ;029052|A58B    |00048B;
 	cmp.B #$02                           ;029054|C902    |      ;
-	bcs CODE_029058                      ;029056|B000    |029058;
+	bcs Battle_CommandWhiteMagic                      ;029056|B000    |029058;
 ;      |        |      ;
-CODE_029058:
+Battle_CommandWhiteMagic:
 	jsr.W CODE_0297D9                    ;029058|20D997  |0297D9;
 	jsr.W CODE_02999D                    ;02905B|209D99  |02999D;
 	jsr.W CODE_029A69                    ;02905E|20699A  |029A69;
 	jsr.W CODE_029727                    ;029061|202797  |029727;
 	cmp.B $8f                            ;029064|C58F    |00048F;
 	lda.B $90                            ;029066|A590    |000490;
-	bne CODE_02906A                      ;029068|D000    |02906A;
+	bne Battle_CommandBlackMagic                      ;029068|D000    |02906A;
 ;      |        |      ;
-CODE_02906A:
+Battle_CommandBlackMagic:
 	lda.B $8d                            ;02906A|A58D    |00048D;
 	cmp.B #$02                           ;02906C|C902    |      ;
-	bcc CODE_029073                      ;02906E|9003    |029073;
+	bcc Battle_CommandWizardMagic                      ;02906E|9003    |029073;
 	jsr.W CODE_029B39                    ;029070|20399B  |029B39;
 ;      |        |      ;
-CODE_029073:
+Battle_CommandWizardMagic:
 	jsr.W CODE_0299DA                    ;029073|20DA99  |0299DA;
 	lda.B $3a                            ;029076|A53A    |00043A;
 	cmp.B #$4f                           ;029078|C94F    |      ;
@@ -2360,51 +2360,51 @@ UNREACH_02907D:
 	db $22,$83,$97,$00,$ad,$a9,$00,$85,$b8,$a5,$b7,$c5,$b8,$b0,$01,$60;02908D|        |009783;
 	db $4c,$9b,$9c                       ;02909D|        |029C9B;
 	phd                                  ;0290A0|0B      |      ;
-	jsr.W CODE_028F22                    ;0290A1|20228F  |028F22;
+	jsr.W Battle_SetEntityContextParty                    ;0290A1|20228F  |028F22;
 	lda.B $30                            ;0290A4|A530    |0010B0;
 	pld                                  ;0290A6|2B      |      ;
 	inc a;0290A7|1A      |      ;
 	dec a;0290A8|3A      |      ;
-	bne CODE_0290AE                      ;0290A9|D003    |0290AE;
+	bne Battle_ExecuteSpell                      ;0290A9|D003    |0290AE;
 	db $4c,$ae,$8f                       ;0290AB|        |028FAE;
 ;      |        |      ;
-CODE_0290AE:
+Battle_ExecuteSpell:
 	jsr.W CODE_029797                    ;0290AE|209797  |029797;
 	lda.B $8b                            ;0290B1|A58B    |00048B;
 	cmp.B #$02                           ;0290B3|C902    |      ;
-	bcs CODE_0290BE                      ;0290B5|B007    |0290BE;
+	bcs Battle_ValidateSpell                      ;0290B5|B007    |0290BE;
 	phd                                  ;0290B7|0B      |      ;
-	jsr.W CODE_028F22                    ;0290B8|20228F  |028F22;
+	jsr.W Battle_SetEntityContextParty                    ;0290B8|20228F  |028F22;
 	dec.B $30                            ;0290BB|C630    |0010B0;
 	pld                                  ;0290BD|2B      |      ;
 ;      |        |      ;
-CODE_0290BE:
+Battle_ValidateSpell:
 	jsr.W CODE_0297D9                    ;0290BE|20D997  |0297D9;
 	lda.B $b7                            ;0290C1|A5B7    |0004B7;
 	cmp.B $b8                            ;0290C3|C5B8    |0004B8;
-	bcs CODE_0290CA                      ;0290C5|B003    |0290CA;
+	bcs Battle_SpellValidated                      ;0290C5|B003    |0290CA;
 	jmp.W CODE_029785                    ;0290C7|4C8597  |029785;
 ;      |        |      ;
 ;      |        |      ;
-CODE_0290CA:
+Battle_SpellValidated:
 	jsr.W CODE_02999D                    ;0290CA|209D99  |02999D;
 	jsr.W CODE_029A7B                    ;0290CD|207B9A  |029A7B;
 	jsr.W CODE_029BED                    ;0290D0|20ED9B  |029BED;
 	lda.B $8d                            ;0290D3|A58D    |00048D;
 	cmp.B #$02                           ;0290D5|C902    |      ;
-	bcc CODE_0290DC                      ;0290D7|9003    |0290DC;
+	bcc Battle_ProcessSpellCast                      ;0290D7|9003    |0290DC;
 	jsr.W CODE_029B39                    ;0290D9|20399B  |029B39;
 ;      |        |      ;
-CODE_0290DC:
+Battle_ProcessSpellCast:
 	jsr.W CODE_0299DA                    ;0290DC|20DA99  |0299DA;
 	jmp.W CODE_029CCA                    ;0290DF|4CCA9C  |029CCA;
 ;      |        |      ;
 	lda.B $90                            ;0290E2|A590    |000490;
 	cmp.B $8f                            ;0290E4|C58F    |00048F;
-	bne CODE_0290EB                      ;0290E6|D003    |0290EB;
+	bne Battle_CheckSpellMP                      ;0290E6|D003    |0290EB;
 	jsr.W CODE_029797                    ;0290E8|209797  |029797;
 ;      |        |      ;
-CODE_0290EB:
+Battle_CheckSpellMP:
 	jsr.W CODE_0297D9                    ;0290EB|20D997  |0297D9;
 	jsr.W CODE_0299C4                    ;0290EE|20C499  |0299C4;
 	jsr.W CODE_029A8B                    ;0290F1|208B9A  |029A8B;
@@ -2412,50 +2412,50 @@ CODE_0290EB:
 	jsr.W CODE_029BED                    ;0290F7|20ED9B  |029BED;
 	lda.B $8d                            ;0290FA|A58D    |00048D;
 	cmp.B #$02                           ;0290FC|C902    |      ;
-	bcc CODE_029103                      ;0290FE|9003    |029103;
+	bcc Battle_SpellMPSufficient                      ;0290FE|9003    |029103;
 	jsr.W CODE_029B39                    ;029100|20399B  |029B39;
 ;      |        |      ;
-CODE_029103:
+Battle_SpellMPSufficient:
 	jsr.W CODE_0299DA                    ;029103|20DA99  |0299DA;
 	jmp.W CODE_02A008                    ;029106|4C08A0  |02A008;
 ;      |        |      ;
 	lda.B $90                            ;029109|A590    |000490;
 	cmp.B $8f                            ;02910B|C58F    |00048F;
-	bne CODE_029112                      ;02910D|D003    |029112;
+	bne Battle_DeductSpellMP                      ;02910D|D003    |029112;
 	jsr.W CODE_029797                    ;02910F|209797  |029797;
 ;      |        |      ;
-CODE_029112:
+Battle_DeductSpellMP:
 	jsr.W CODE_0297D9                    ;029112|20D997  |0297D9;
 	jsr.W CODE_0299C4                    ;029115|20C499  |0299C4;
 	jsr.W CODE_029AA5                    ;029118|20A59A  |029AA5;
 	jsr.W CODE_029727                    ;02911B|202797  |029727;
 	cmp.B $8f                            ;02911E|C58F    |00048F;
 	lda.B $90                            ;029120|A590    |000490;
-	bne CODE_029124                      ;029122|D000    |029124;
+	bne Battle_MPDeducted                      ;029122|D000    |029124;
 ;      |        |      ;
-CODE_029124:
+Battle_MPDeducted:
 	jsr.W CODE_029BED                    ;029124|20ED9B  |029BED;
 	lda.B $8d                            ;029127|A58D    |00048D;
 	cmp.B #$02                           ;029129|C902    |      ;
-	bcc CODE_029130                      ;02912B|9003    |029130;
+	bcc Battle_ExecuteSpellEffect                      ;02912B|9003    |029130;
 	jsr.W CODE_029B39                    ;02912D|20399B  |029B39;
 ;      |        |      ;
-CODE_029130:
+Battle_ExecuteSpellEffect:
 	jsr.W CODE_0299DA                    ;029130|20DA99  |0299DA;
 	jmp.W CODE_02A008                    ;029133|4C08A0  |02A008;
 ;      |        |      ;
 	lda.B $3a                            ;029136|A53A    |00043A;
 	cmp.B #$13                           ;029138|C913    |      ;
-	bne CODE_02914C                      ;02913A|D010    |02914C;
+	bne Battle_ProcessSpellAnimation                      ;02913A|D010    |02914C;
 	db $a5,$90,$c5,$8f,$d0,$30,$20,$b8,$97,$a5,$df,$8d,$05,$05,$80,$51;02913C|        |000090;
 ;      |        |      ;
-CODE_02914C:
+Battle_ProcessSpellAnimation:
 	lda.B $3a                            ;02914C|A53A    |00043A;
 	cmp.B #$1d                           ;02914E|C91D    |      ;
-	bne CODE_029160                      ;029150|D00E    |029160;
+	bne Battle_SpellAnimationComplete                      ;029150|D00E    |029160;
 	db $20,$64,$99,$1a,$d0,$b1,$20,$be,$97,$20,$e1,$a0,$80,$3d;029152|        |029964;
 ;      |        |      ;
-CODE_029160:
+Battle_SpellAnimationComplete:
 	ldx.W #$d3d7                         ;029160|A2D7D3  |      ;
 	jsr.W Battle_DisplayMessage                    ;029163|203588  |028835;
 	ldx.W #$d3ec                         ;029166|A2ECD3  |      ;
@@ -2465,11 +2465,11 @@ CODE_029160:
 	jsr.W CODE_0297D9                    ;029172|20D997  |0297D9;
 	lda.B $b7                            ;029175|A5B7    |0004B7;
 	cmp.B $b8                            ;029177|C5B8    |0004B8;
-	bcs CODE_02917E                      ;029179|B003    |02917E;
+	bcs Battle_CommandItem                      ;029179|B003    |02917E;
 	jmp.W CODE_029785                    ;02917B|4C8597  |029785;
 ;      |        |      ;
 ;      |        |      ;
-CODE_02917E:
+Battle_CommandItem:
 	jsr.W CODE_02A0E1                    ;02917E|20E1A0  |02A0E1;
 	jsr.W CODE_02999D                    ;029181|209D99  |02999D;
 	lda.B #$1e                           ;029184|A91E    |      ;
@@ -2497,7 +2497,7 @@ CODE_02917E:
 	bne UNREACH_029215                   ;02920D|D006    |029215;
 	jsr.W CODE_029964                    ;02920F|206499  |029964;
 	inc a;029212|1A      |      ;
-	beq CODE_02926D                      ;029213|F058    |02926D;
+	beq Battle_UseItem                      ;029213|F058    |02926D;
 ;      |        |      ;
 UNREACH_029215:
 	db $a5,$90,$c5,$8f,$d0,$03,$20,$97,$97,$a5,$17,$29,$80,$f0,$03,$4c;029215|        |000090;
@@ -2507,16 +2507,16 @@ UNREACH_029215:
 	db $00,$85,$b9,$22,$83,$97,$00,$ad,$a9,$00,$85,$b8,$a5,$b7,$c5,$b8;029255|        |      ;
 	db $b0,$03,$4c,$85,$97,$4c,$9b,$9c   ;029265|        |02926A;
 ;      |        |      ;
-CODE_02926D:
+Battle_UseItem:
 	lda.B $90                            ;02926D|A590    |000490;
 	cmp.B $8f                            ;02926F|C58F    |00048F;
-	bne CODE_029279                      ;029271|D006    |029279;
+	bne Battle_ValidateItem                      ;029271|D006    |029279;
 	jsr.W CODE_0297BE                    ;029273|20BE97  |0297BE;
 	jsr.W CODE_02A0E1                    ;029276|20E1A0  |02A0E1;
 ;      |        |      ;
-CODE_029279:
+Battle_ValidateItem:
 	phd                                  ;029279|0B      |      ;
-	jsr.W CODE_028F2F                    ;02927A|202F8F  |028F2F;
+	jsr.W Battle_SetEntityContextEnemy                    ;02927A|202F8F  |028F2F;
 	rep #$30                             ;02927D|C230    |      ;
 	lda.B $16                            ;02927F|A516    |001016;
 	sec                                  ;029281|38      |      ;
@@ -2525,18 +2525,18 @@ CODE_029279:
 	sta.B $77                            ;029285|8577    |000477;
 	sep #$20                             ;029287|E220    |      ;
 	rep #$10                             ;029289|C210    |      ;
-	jsr.W CODE_0295DE                    ;02928B|20DE95  |0295DE;
+	jsr.W Battle_CheckTargetDeath                    ;02928B|20DE95  |0295DE;
 	jmp.W CODE_029C9B                    ;02928E|4C9B9C  |029C9B;
 ;      |        |      ;
 	lda.B $3a                            ;029291|A53A    |00043A;
 	cmp.B #$11                           ;029293|C911    |      ;
-	beq CODE_02930D                      ;029295|F076    |02930D;
+	beq Battle_ItemValidated                      ;029295|F076    |02930D;
 	lda.B $11                            ;029297|A511    |000411;
 	and.B #$08                           ;029299|2908    |      ;
 	bne UNREACH_0292A3                   ;02929B|D006    |0292A3;
 	jsr.W CODE_029964                    ;02929D|206499  |029964;
 	inc a;0292A0|1A      |      ;
-	beq CODE_02931D                      ;0292A1|F07A    |02931D;
+	beq Battle_ApplyItemEffect                      ;0292A1|F07A    |02931D;
 ;      |        |      ;
 UNREACH_0292A3:
 	db $a5,$90,$c5,$8f,$d0,$03,$20,$97,$97,$20,$d9,$97,$a5,$3a,$c9,$16;0292A3|        |000090;
@@ -2547,26 +2547,26 @@ UNREACH_0292A3:
 	db $a9,$00,$aa,$bd,$35,$93,$24,$4d,$d0,$e9,$85,$dc,$4c,$ca,$9c,$ae;0292F3|        |      ;
 	db $bc,$d0,$86,$77,$20,$9d,$99,$4c,$da,$99;029303|        |0086D0;
 ;      |        |      ;
-CODE_02930D:
+Battle_ItemValidated:
 	jsr.W CODE_0297B8                    ;02930D|20B897  |0297B8;
 	lda.B #$24                           ;029310|A924    |      ;
 	sta.B $e2                            ;029312|85E2    |0004E2;
 	lda.B #$15                           ;029314|A915    |      ;
 	sta.B $df                            ;029316|85DF    |0004DF;
 	jsr.W CODE_02A0E1                    ;029318|20E1A0  |02A0E1;
-	bra CODE_029329                      ;02931B|800C    |029329;
+	bra Battle_ItemEffectApplied                      ;02931B|800C    |029329;
 ;      |        |      ;
 ;      |        |      ;
-CODE_02931D:
+Battle_ApplyItemEffect:
 	lda.B $90                            ;02931D|A590    |000490;
 	cmp.B $8f                            ;02931F|C58F    |00048F;
-	bne CODE_029329                      ;029321|D006    |029329;
+	bne Battle_ItemEffectApplied                      ;029321|D006    |029329;
 	jsr.W CODE_0297BE                    ;029323|20BE97  |0297BE;
 	jsr.W CODE_02A0E1                    ;029326|20E1A0  |02A0E1;
 ;      |        |      ;
-CODE_029329:
+Battle_ItemEffectApplied:
 	phd                                  ;029329|0B      |      ;
-	jsr.W CODE_028F2F                    ;02932A|202F8F  |028F2F;
+	jsr.W Battle_SetEntityContextEnemy                    ;02932A|202F8F  |028F2F;
 	lda.B $21                            ;02932D|A521    |0010A1;
 	and.B #$80                           ;02932F|2980    |      ;
 	sta.B $21                            ;029331|8521    |0010A1;
@@ -2576,18 +2576,18 @@ CODE_029329:
 	db $40,$20,$10,$08,$04,$02,$01       ;029335|        |      ;
 	lda.B $38                            ;02933C|A538    |000438;
 	cmp.B #$20                           ;02933E|C920    |      ;
-	beq CODE_029345                      ;029340|F003    |029345;
-	jmp.W CODE_029399                    ;029342|4C9993  |029399;
+	beq Battle_CommandDefend                      ;029340|F003    |029345;
+	jmp.W Battle_SetDefendState                    ;029342|4C9993  |029399;
 ;      |        |      ;
 ;      |        |      ;
-CODE_029345:
+Battle_CommandDefend:
 	lda.B $11                            ;029345|A511    |000411;
 	and.B #$08                           ;029347|2908    |      ;
 	bne UNREACH_029354                   ;029349|D009    |029354;
 	jsr.W CODE_029964                    ;02934B|206499  |029964;
 	inc a;02934E|1A      |      ;
 	bne UNREACH_029354                   ;02934F|D003    |029354;
-	jmp.W CODE_0293A6                    ;029351|4CA693  |0293A6;
+	jmp.W Battle_DefendStateSet                    ;029351|4CA693  |0293A6;
 ;      |        |      ;
 ;      |        |      ;
 UNREACH_029354:
@@ -2597,90 +2597,90 @@ UNREACH_029354:
 	db $04,$f0,$06,$20,$17,$a0,$4c,$7f,$97,$4c,$1a,$9e,$20,$27,$97,$20;029384|        |0000F0;
 	db $da,$99,$4c,$08,$a0               ;029394|        |      ;
 ;      |        |      ;
-CODE_029399:
+Battle_SetDefendState:
 	jsr.W CODE_0297B8                    ;029399|20B897  |0297B8;
 	lda.B #$23                           ;02939C|A923    |      ;
 	sta.B $e2                            ;02939E|85E2    |0004E2;
 	lda.B #$14                           ;0293A0|A914    |      ;
 	sta.B $df                            ;0293A2|85DF    |0004DF;
-	bra CODE_0293AF                      ;0293A4|8009    |0293AF;
+	bra Battle_ProcessDefend                      ;0293A4|8009    |0293AF;
 ;      |        |      ;
 ;      |        |      ;
-CODE_0293A6:
+Battle_DefendStateSet:
 	lda.B $90                            ;0293A6|A590    |000490;
 	cmp.B $8f                            ;0293A8|C58F    |00048F;
-	bne CODE_0293B2                      ;0293AA|D006    |0293B2;
+	bne Battle_DefendComplete                      ;0293AA|D006    |0293B2;
 	jsr.W CODE_0297BE                    ;0293AC|20BE97  |0297BE;
 ;      |        |      ;
-CODE_0293AF:
+Battle_ProcessDefend:
 	jsr.W CODE_02A0E1                    ;0293AF|20E1A0  |02A0E1;
 ;      |        |      ;
-CODE_0293B2:
+Battle_DefendComplete:
 	lda.B $38                            ;0293B2|A538    |000438;
 	cmp.B #$30                           ;0293B4|C930    |      ;
-	bne CODE_0293BB                      ;0293B6|D003    |0293BB;
+	bne Battle_CommandRun                      ;0293B6|D003    |0293BB;
 	jmp.W CODE_029E79                    ;0293B8|4C799E  |029E79;
 ;      |        |      ;
 ;      |        |      ;
-CODE_0293BB:
+Battle_CommandRun:
 	jmp.W CODE_029E1A                    ;0293BB|4C1A9E  |029E1A;
 ;      |        |      ;
 	lda.B $90                            ;0293BE|A590    |000490;
 	cmp.B $8f                            ;0293C0|C58F    |00048F;
-	bne CODE_0293C7                      ;0293C2|D003    |0293C7;
+	bne Battle_AttemptEscape                      ;0293C2|D003    |0293C7;
 	jsr.W CODE_029797                    ;0293C4|209797  |029797;
 ;      |        |      ;
-CODE_0293C7:
+Battle_AttemptEscape:
 	jsr.W CODE_0297D9                    ;0293C7|20D997  |0297D9;
 	jsr.W CODE_02999D                    ;0293CA|209D99  |02999D;
 	lda.B $de                            ;0293CD|A5DE    |0004DE;
 	cmp.B #$0f                           ;0293CF|C90F    |      ;
-	beq CODE_0293E0                      ;0293D1|F00D    |0293E0;
+	beq Battle_EscapeSuccessful                      ;0293D1|F00D    |0293E0;
 	cmp.B #$10                           ;0293D3|C910    |      ;
 	beq UNREACH_0293E5                   ;0293D5|F00E    |0293E5;
 	cmp.B #$11                           ;0293D7|C911    |      ;
-	beq CODE_0293EA                      ;0293D9|F00F    |0293EA;
+	beq Battle_EscapeFail                      ;0293D9|F00F    |0293EA;
 	jsr.W CODE_029ADA                    ;0293DB|20DA9A  |029ADA;
-	bra CODE_0293ED                      ;0293DE|800D    |0293ED;
+	bra Battle_ProcessEscapeAttempt                      ;0293DE|800D    |0293ED;
 ;      |        |      ;
 ;      |        |      ;
-CODE_0293E0:
+Battle_EscapeSuccessful:
 	jsr.W CODE_029AAE                    ;0293E0|20AE9A  |029AAE;
-	bra CODE_0293ED                      ;0293E3|8008    |0293ED;
+	bra Battle_ProcessEscapeAttempt                      ;0293E3|8008    |0293ED;
 ;      |        |      ;
 ;      |        |      ;
 UNREACH_0293E5:
 	db $20,$da,$9a,$80,$03               ;0293E5|        |029ADA;
 ;      |        |      ;
-CODE_0293EA:
+Battle_EscapeFail:
 	jsr.W CODE_029ADA                    ;0293EA|20DA9A  |029ADA;
 ;      |        |      ;
-CODE_0293ED:
+Battle_ProcessEscapeAttempt:
 	jsr.W CODE_029BED                    ;0293ED|20ED9B  |029BED;
 	jsr.W CODE_029727                    ;0293F0|202797  |029727;
 	jsr.W CODE_0299DA                    ;0293F3|20DA99  |0299DA;
 	lda.B $3a                            ;0293F6|A53A    |00043A;
 	cmp.B #$8a                           ;0293F8|C98A    |      ;
-	beq CODE_0293FD                      ;0293FA|F001    |0293FD;
+	beq Battle_CalculateDamage                      ;0293FA|F001    |0293FD;
 	rts                                  ;0293FC|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
-CODE_0293FD:
+Battle_CalculateDamage:
 	rep #$30                             ;0293FD|C230    |      ;
 	lda.W $1116                          ;0293FF|AD1611  |021116;
 	sec                                  ;029402|38      |      ;
 	sbc.W $1114                          ;029403|ED1411  |021114;
 	cmp.W DATA8_02d081                   ;029406|CD81D0  |02D081;
-	bcc CODE_02940E                      ;029409|9003    |02940E;
+	bcc Battle_ApplyAttackPower                      ;029409|9003    |02940E;
 	lda.W DATA8_02d081                   ;02940B|AD81D0  |02D081;
 ;      |        |      ;
-CODE_02940E:
+Battle_ApplyAttackPower:
 	eor.W #$ffff                         ;02940E|49FFFF  |      ;
 	inc a;029411|1A      |      ;
-	bne CODE_029417                      ;029412|D003    |029417;
+	bne Battle_CalculateDefenseReduction                      ;029412|D003    |029417;
 	db $a9,$fe,$7f                       ;029414|        |      ;
 ;      |        |      ;
-CODE_029417:
+Battle_CalculateDefenseReduction:
 	tay                                  ;029417|A8      |      ;
 	sep #$20                             ;029418|E220    |      ;
 	rep #$10                             ;02941A|C210    |      ;
@@ -2694,20 +2694,20 @@ CODE_029417:
 ;      |        |      ;
 	lda.B $90                            ;029426|A590    |000490;
 	cmp.B $8f                            ;029428|C58F    |00048F;
-	bne CODE_02942F                      ;02942A|D003    |02942F;
+	bne Battle_ApplyDefense                      ;02942A|D003    |02942F;
 	jsr.W CODE_029797                    ;02942C|209797  |029797;
 ;      |        |      ;
-CODE_02942F:
+Battle_ApplyDefense:
 	jsr.W CODE_0297D9                    ;02942F|20D997  |0297D9;
 	lda.B $b7                            ;029432|A5B7    |0004B7;
 	cmp.B $b8                            ;029434|C5B8    |0004B8;
-	bcs CODE_02943B                      ;029436|B003    |02943B;
+	bcs Battle_ProcessDamageVariance                      ;029436|B003    |02943B;
 ;      |        |      ;
-CODE_029438:
+Battle_DefenseApplied:
 	jmp.W CODE_029785                    ;029438|4C8597  |029785;
 ;      |        |      ;
 ;      |        |      ;
-CODE_02943B:
+Battle_ProcessDamageVariance:
 	jsr.W CODE_02999D                    ;02943B|209D99  |02999D;
 	jsr.W CODE_029B34                    ;02943E|20349B  |029B34;
 	jsr.W CODE_0299DA                    ;029441|20DA99  |0299DA;
@@ -2722,36 +2722,36 @@ CODE_02943B:
 	sta.B $b8                            ;02945B|85B8    |0004B8;
 	lda.B $b7                            ;02945D|A5B7    |0004B7;
 	cmp.B $b8                            ;02945F|C5B8    |0004B8;
-	bcc CODE_029438                      ;029461|90D5    |029438;
+	bcc Battle_DefenseApplied                      ;029461|90D5    |029438;
 	db $20,$ca,$9c,$4c,$9b,$9c           ;029463|        |029CCA;
 	lda.B $90                            ;029469|A590    |000490;
 	cmp.B $8f                            ;02946B|C58F    |00048F;
-	bne CODE_029472                      ;02946D|D003    |029472;
+	bne Battle_ApplyVariance                      ;02946D|D003    |029472;
 	jsr.W CODE_029797                    ;02946F|209797  |029797;
 ;      |        |      ;
-CODE_029472:
+Battle_ApplyVariance:
 	jsr.W CODE_0297D9                    ;029472|20D997  |0297D9;
 	lda.B $de                            ;029475|A5DE    |0004DE;
 	cmp.B #$15                           ;029477|C915    |      ;
-	beq CODE_029487                      ;029479|F00C    |029487;
+	beq Battle_CalculateCritical                      ;029479|F00C    |029487;
 	jsr.W CODE_02999D                    ;02947B|209D99  |02999D;
 	jsr.W CODE_029B34                    ;02947E|20349B  |029B34;
 	jsr.W CODE_029727                    ;029481|202797  |029727;
 	jsr.W CODE_0299DA                    ;029484|20DA99  |0299DA;
 ;      |        |      ;
-CODE_029487:
+Battle_CalculateCritical:
 	phd                                  ;029487|0B      |      ;
-	jsr.W CODE_028F2F                    ;029488|202F8F  |028F2F;
+	jsr.W Battle_SetEntityContextEnemy                    ;029488|202F8F  |028F2F;
 	lda.B $2e                            ;02948B|A52E    |00102E;
 	pld                                  ;02948D|2B      |      ;
 	and.B #$04                           ;02948E|2904    |      ;
-	beq CODE_029495                      ;029490|F003    |029495;
+	beq Battle_CheckCriticalHit                      ;029490|F003    |029495;
 	db $4c,$7f,$97                       ;029492|        |02977F;
 ;      |        |      ;
-CODE_029495:
+Battle_CheckCriticalHit:
 	lda.B $de                            ;029495|A5DE    |0004DE;
 	cmp.B #$15                           ;029497|C915    |      ;
-	beq CODE_0294BB                      ;029499|F020    |0294BB;
+	beq Battle_CriticalHitConfirmed                      ;029499|F020    |0294BB;
 	lsr.B $b7                            ;02949B|46B7    |0004B7;
 	lda.B #$65                           ;02949D|A965    |      ;
 	sta.W $00a8                          ;02949F|8DA800  |0200A8;
@@ -2763,67 +2763,67 @@ CODE_029495:
 	sta.B $b8                            ;0294B2|85B8    |0004B8;
 	lda.B $b7                            ;0294B4|A5B7    |0004B7;
 	cmp.B $b8                            ;0294B6|C5B8    |0004B8;
-	bcs CODE_0294BB                      ;0294B8|B001    |0294BB;
+	bcs Battle_CriticalHitConfirmed                      ;0294B8|B001    |0294BB;
 	rts                                  ;0294BA|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
-CODE_0294BB:
+Battle_CriticalHitConfirmed:
 	jmp.W CODE_029CCA                    ;0294BB|4CCA9C  |029CCA;
 ;      |        |      ;
 	jsr.W CODE_029797                    ;0294BE|209797  |029797;
 	jsr.W CODE_02997E                    ;0294C1|207E99  |02997E;
 	lda.B $ba                            ;0294C4|A5BA    |0004BA;
-	bne CODE_0294CB                      ;0294C6|D003    |0294CB;
+	bne Battle_ApplyCriticalMultiplier                      ;0294C6|D003    |0294CB;
 	jmp.W CODE_029785                    ;0294C8|4C8597  |029785;
 ;      |        |      ;
 ;      |        |      ;
-CODE_0294CB:
+Battle_ApplyCriticalMultiplier:
 	dec a;0294CB|3A      |      ;
-	bne CODE_0294D3                      ;0294CC|D005    |0294D3;
+	bne Battle_CriticalComplete                      ;0294CC|D005    |0294D3;
 	jsr.W CODE_0297AC                    ;0294CE|20AC97  |0297AC;
-	bra CODE_0294D6                      ;0294D1|8003    |0294D6;
+	bra Battle_ProcessElementalDamage                      ;0294D1|8003    |0294D6;
 ;      |        |      ;
 ;      |        |      ;
-CODE_0294D3:
+Battle_CriticalComplete:
 	jsr.W CODE_0297B2                    ;0294D3|20B297  |0297B2;
 ;      |        |      ;
-CODE_0294D6:
+Battle_ProcessElementalDamage:
 	jsr.W CODE_02999D                    ;0294D6|209D99  |02999D;
 	lda.B $de                            ;0294D9|A5DE    |0004DE;
 	cmp.B #$17                           ;0294DB|C917    |      ;
-	bcc CODE_0294E4                      ;0294DD|9005    |0294E4;
+	bcc Battle_CheckElemental                      ;0294DD|9005    |0294E4;
 	jsr.W CODE_029B34                    ;0294DF|20349B  |029B34;
-	bra CODE_0294E7                      ;0294E2|8003    |0294E7;
+	bra Battle_ApplyElementalBonus                      ;0294E2|8003    |0294E7;
 ;      |        |      ;
 ;      |        |      ;
-CODE_0294E4:
+Battle_CheckElemental:
 	jsr.W CODE_029B28                    ;0294E4|20289B  |029B28;
 ;      |        |      ;
-CODE_0294E7:
+Battle_ApplyElementalBonus:
 	rep #$20                             ;0294E7|C220    |      ;
 	sep #$10                             ;0294E9|E210    |      ;
 	ldx.B $ba                            ;0294EB|A6BA    |0004BA;
 	lda.B $77                            ;0294ED|A577    |000477;
 ;      |        |      ;
-CODE_0294EF:
+Battle_ElementalBonusApplied:
 	dex                                  ;0294EF|CA      |      ;
-	beq CODE_0294F7                      ;0294F0|F005    |0294F7;
+	beq Battle_CalculateFinalDamage                      ;0294F0|F005    |0294F7;
 	clc                                  ;0294F2|18      |      ;
 	adc.B $77                            ;0294F3|6577    |000477;
-	bra CODE_0294EF                      ;0294F5|80F8    |0294EF;
+	bra Battle_ElementalBonusApplied                      ;0294F5|80F8    |0294EF;
 ;      |        |      ;
 ;      |        |      ;
-CODE_0294F7:
+Battle_CalculateFinalDamage:
 	sta.B $77                            ;0294F7|8577    |000477;
 	lda.B $de                            ;0294F9|A5DE    |0004DE;
 	and.W #$00ff                         ;0294FB|29FF00  |      ;
 	cmp.W #$0016                         ;0294FE|C91600  |      ;
-	beq CODE_029508                      ;029501|F005    |029508;
+	beq Battle_ClampDamage                      ;029501|F005    |029508;
 	lda.B $77                            ;029503|A577    |000477;
 	lsr a;029505|4A      |      ;
 	sta.B $77                            ;029506|8577    |000477;
 ;      |        |      ;
-CODE_029508:
+Battle_ClampDamage:
 	sep #$20                             ;029508|E220    |      ;
 	rep #$10                             ;02950A|C210    |      ;
 	jsr.W CODE_029BED                    ;02950C|20ED9B  |029BED;
@@ -2831,10 +2831,10 @@ CODE_029508:
 ;      |        |      ;
 	lda.B $90                            ;029512|A590    |000490;
 	cmp.B $8f                            ;029514|C58F    |00048F;
-	bne CODE_02951B                      ;029516|D003    |02951B;
+	bne Battle_DamageCalculated                      ;029516|D003    |02951B;
 	jsr.W CODE_029797                    ;029518|209797  |029797;
 ;      |        |      ;
-CODE_02951B:
+Battle_DamageCalculated:
 	jsr.W CODE_0297D9                    ;02951B|20D997  |0297D9;
 	jsr.W CODE_02999D                    ;02951E|209D99  |02999D;
 	jsr.W CODE_029B34                    ;029521|20349B  |029B34;
@@ -2842,16 +2842,16 @@ CODE_02951B:
 	stx.B $79                            ;029527|8679    |000479;
 	jsr.W CODE_029BED                    ;029529|20ED9B  |029BED;
 	ldx.B $79                            ;02952C|A679    |000479;
-	beq CODE_029561                      ;02952E|F031    |029561;
+	beq Battle_ApplyDamageToTarget                      ;02952E|F031    |029561;
 	db $20,$da,$99,$a9,$00,$eb,$a5,$8b,$0a,$aa,$a4,$77,$94,$d1,$20,$8c;029530|        |0299DA;
 	db $95,$0b,$20,$2f,$8f,$20,$c7,$95,$2b,$20,$de,$95,$a6,$77,$d0,$05;029540|        |00000B;
 	db $a2,$fe,$7f,$86,$77,$a2,$df,$d2,$20,$35,$88,$a2,$cf,$d4,$4c,$35;029550|        |      ;
 	db $88                               ;029560|        |      ;
 ;      |        |      ;
-CODE_029561:
+Battle_ApplyDamageToTarget:
 	jsr.W CODE_0299DA                    ;029561|20DA99  |0299DA;
 	phd                                  ;029564|0B      |      ;
-	jsr.W CODE_028F2F                    ;029565|202F8F  |028F2F;
+	jsr.W Battle_SetEntityContextEnemy                    ;029565|202F8F  |028F2F;
 	lda.B $10                            ;029568|A510    |001010;
 	pld                                  ;02956A|2B      |      ;
 	cmp.B $00                            ;02956B|C500    |000400;
@@ -2868,25 +2868,25 @@ UNREACH_029572:
 	db $a9,$64,$8d,$9c,$00,$9c,$9d,$00,$22,$e4,$96,$00,$c2,$30,$ad,$9e;0295B2|        |      ;
 	db $00,$85,$77,$28,$60               ;0295C2|        |      ;
 ;      |        |      ;
-CODE_0295C7:
+Battle_UpdateTargetHP:
 	php                                  ;0295C7|08      |      ;
 	rep #$30                             ;0295C8|C230    |      ;
 	lda.B $14                            ;0295CA|A514    |001214;
 	clc                                  ;0295CC|18      |      ;
 	adc.W $0477                          ;0295CD|6D7704  |020477;
 	cmp.B $16                            ;0295D0|C516    |001216;
-	bcc CODE_0295DC                      ;0295D2|9008    |0295DC;
+	bcc Battle_HPUpdated                      ;0295D2|9008    |0295DC;
 	lda.B $16                            ;0295D4|A516    |001216;
 	sec                                  ;0295D6|38      |      ;
 	sbc.B $14                            ;0295D7|E514    |001214;
 	sta.W $0477                          ;0295D9|8D7704  |020477;
 ;      |        |      ;
-CODE_0295DC:
+Battle_HPUpdated:
 	plp                                  ;0295DC|28      |      ;
 	rts                                  ;0295DD|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
-CODE_0295DE:
+Battle_CheckTargetDeath:
 	rep #$30                             ;0295DE|C230    |      ;
 	lda.B $77                            ;0295E0|A577    |000477;
 	eor.W #$ffff                         ;0295E2|49FFFF  |      ;
@@ -2898,13 +2898,13 @@ CODE_0295DE:
 ;      |        |      ;
 	lda.B $90                            ;0295ED|A590    |000490;
 	cmp.B $8f                            ;0295EF|C58F    |00048F;
-	bne CODE_0295F6                      ;0295F1|D003    |0295F6;
+	bne Battle_ProcessTargetDeath                      ;0295F1|D003    |0295F6;
 	jsr.W CODE_029797                    ;0295F3|209797  |029797;
 ;      |        |      ;
-CODE_0295F6:
+Battle_ProcessTargetDeath:
 	jsr.W CODE_02999D                    ;0295F6|209D99  |02999D;
 	phd                                  ;0295F9|0B      |      ;
-	jsr.W CODE_028F22                    ;0295FA|20228F  |028F22;
+	jsr.W Battle_SetEntityContextParty                    ;0295FA|20228F  |028F22;
 	rep #$30                             ;0295FD|C230    |      ;
 	lda.B $14                            ;0295FF|A514    |001214;
 	sta.W $0479                          ;029601|8D7904  |020479;
@@ -2932,45 +2932,45 @@ CODE_0295F6:
 	sta.B $be                            ;029628|85BE    |0004BE;
 	lda.W $1121                          ;02962A|AD2111  |021121;
 	and.B #$80                           ;02962D|2980    |      ;
-	bne CODE_02964C                      ;02962F|D01B    |02964C;
+	bne Battle_DisplayDamage                      ;02962F|D01B    |02964C;
 	inc.B $be                            ;029631|E6BE    |0004BE;
 	lda.W $11a1                          ;029633|ADA111  |0211A1;
 	and.B #$80                           ;029636|2980    |      ;
-	bne CODE_02964C                      ;029638|D012    |02964C;
+	bne Battle_DisplayDamage                      ;029638|D012    |02964C;
 	lda.B $b4                            ;02963A|A5B4    |0004B4;
 	cmp.B #$02                           ;02963C|C902    |      ;
-	beq CODE_029649                      ;02963E|F009    |029649;
+	beq Battle_TargetDefeated                      ;02963E|F009    |029649;
 	inc.B $be                            ;029640|E6BE    |0004BE;
 	lda.W $1221                          ;029642|AD2112  |021221;
 	and.B #$80                           ;029645|2980    |      ;
-	bne CODE_02964C                      ;029647|D003    |02964C;
+	bne Battle_DisplayDamage                      ;029647|D003    |02964C;
 ;      |        |      ;
-CODE_029649:
-	jmp.W CODE_028FA8                    ;029649|4CA88F  |028FA8;
+Battle_TargetDefeated:
+	jmp.W Battle_LoadEntityTableData                    ;029649|4CA88F  |028FA8;
 ;      |        |      ;
 ;      |        |      ;
-CODE_02964C:
+Battle_DisplayDamage:
 	jsr.W CODE_0297D9                    ;02964C|20D997  |0297D9;
 	lda.B $b7                            ;02964F|A5B7    |0004B7;
 	cmp.B $b8                            ;029651|C5B8    |0004B8;
-	bcs CODE_029658                      ;029653|B003    |029658;
-	jmp.W CODE_028FA8                    ;029655|4CA88F  |028FA8;
+	bcs Battle_AnimateDamage                      ;029653|B003    |029658;
+	jmp.W Battle_LoadEntityTableData                    ;029655|4CA88F  |028FA8;
 ;      |        |      ;
 ;      |        |      ;
-CODE_029658:
+Battle_AnimateDamage:
 	lda.B $8b                            ;029658|A58B    |00048B;
 	pha                                  ;02965A|48      |      ;
 	lda.B $be                            ;02965B|A5BE    |0004BE;
 	sta.B $8b                            ;02965D|858B    |00048B;
 	phd                                  ;02965F|0B      |      ;
-	jsr.W CODE_028F22                    ;029660|20228F  |028F22;
+	jsr.W Battle_SetEntityContextParty                    ;029660|20228F  |028F22;
 	phd                                  ;029663|0B      |      ;
 	ply                                  ;029664|7A      |      ;
 	pld                                  ;029665|2B      |      ;
 	pla                                  ;029666|68      |      ;
 	sta.B $8b                            ;029667|858B    |00048B;
 	phd                                  ;029669|0B      |      ;
-	jsr.W CODE_028F22                    ;02966A|20228F  |028F22;
+	jsr.W Battle_SetEntityContextParty                    ;02966A|20228F  |028F22;
 	phd                                  ;02966D|0B      |      ;
 	plx                                  ;02966E|FA      |      ;
 	pld                                  ;02966F|2B      |      ;
@@ -3015,7 +3015,7 @@ CODE_029658:
 	lda.B #$14                           ;0296B7|A914    |      ;
 	sta.W $0505                          ;0296B9|8D0505  |020505;
 	phd                                  ;0296BC|0B      |      ;
-	jsr.W CODE_028F2F                    ;0296BD|202F8F  |028F2F;
+	jsr.W Battle_SetEntityContextEnemy                    ;0296BD|202F8F  |028F2F;
 	lda.B $21                            ;0296C0|A521    |001021;
 	and.B #$c0                           ;0296C2|29C0    |      ;
 	bne CODE_0296D2                      ;0296C4|D00C    |0296D2;
@@ -3299,7 +3299,7 @@ CODE_0298A9:
 	cmp.B #$02                           ;0298AB|C902    |      ;
 	bcc CODE_0298EC                      ;0298AD|903D    |0298EC;
 	phd                                  ;0298AF|0B      |      ;
-	jsr.W CODE_028F2F                    ;0298B0|202F8F  |028F2F;
+	jsr.W Battle_SetEntityContextEnemy                    ;0298B0|202F8F  |028F2F;
 	lda.B $10                            ;0298B3|A510    |001010;
 	xba                                  ;0298B5|EB      |      ;
 	lda.B $2f                            ;0298B6|A52F    |00102F;
@@ -3320,7 +3320,7 @@ CODE_0298A9:
 ;      |        |      ;
 CODE_0298D2:
 	phd                                  ;0298D2|0B      |      ;
-	jsr.W CODE_028F2F                    ;0298D3|202F8F  |028F2F;
+	jsr.W Battle_SetEntityContextEnemy                    ;0298D3|202F8F  |028F2F;
 	lda.B #$64                           ;0298D6|A964    |      ;
 	sec                                  ;0298D8|38      |      ;
 	sbc.B $3f                            ;0298D9|E53F    |00103F;
@@ -3331,7 +3331,7 @@ CODE_0298D2:
 ;      |        |      ;
 CODE_0298E0:
 	phd                                  ;0298E0|0B      |      ;
-	jsr.W CODE_028F2F                    ;0298E1|202F8F  |028F2F;
+	jsr.W Battle_SetEntityContextEnemy                    ;0298E1|202F8F  |028F2F;
 	lda.B #$64                           ;0298E4|A964    |      ;
 	sec                                  ;0298E6|38      |      ;
 	sbc.B $41                            ;0298E7|E541    |001041;
@@ -3435,7 +3435,7 @@ CODE_029998:
 ;      |        |      ;
 CODE_02999D:
 	phd                                  ;02999D|0B      |      ;
-	jsr.W CODE_028F2F                    ;02999E|202F8F  |028F2F;
+	jsr.W Battle_SetEntityContextEnemy                    ;02999E|202F8F  |028F2F;
 	lda.B $23                            ;0299A1|A523    |001223;
 	sta.W $044e                          ;0299A3|8D4E04  |02044E;
 	lda.B $20                            ;0299A6|A520    |001220;
@@ -3461,7 +3461,7 @@ CODE_0299C3:
 ;      |        |      ;
 CODE_0299C4:
 	phd                                  ;0299C4|0B      |      ;
-	jsr.W CODE_028F2F                    ;0299C5|202F8F  |028F2F;
+	jsr.W Battle_SetEntityContextEnemy                    ;0299C5|202F8F  |028F2F;
 	lda.B $25                            ;0299C8|A525    |0011A5;
 	clc                                  ;0299CA|18      |      ;
 	adc.B $3e                            ;0299CB|653E    |0011BE;
@@ -3493,7 +3493,7 @@ CODE_0299EC:
 CODE_0299EF:
 	sta.B $77                            ;0299EF|8577    |000477;
 	phd                                  ;0299F1|0B      |      ;
-	jsr.W CODE_028F2F                    ;0299F2|202F8F  |028F2F;
+	jsr.W Battle_SetEntityContextEnemy                    ;0299F2|202F8F  |028F2F;
 	lda.B $14                            ;0299F5|A514    |001214;
 	pld                                  ;0299F7|2B      |      ;
 	cmp.B $77                            ;0299F8|C577    |000477;
@@ -3520,7 +3520,7 @@ CODE_029A14:
 	cmp.B $8e                            ;029A1C|C58E    |00048E;
 	bne CODE_029A30                      ;029A1E|D010    |029A30;
 	phd                                  ;029A20|0B      |      ;
-	jsr.W CODE_028F2F                    ;029A21|202F8F  |028F2F;
+	jsr.W Battle_SetEntityContextEnemy                    ;029A21|202F8F  |028F2F;
 	lda.B $2e                            ;029A24|A52E    |00102E;
 	pld                                  ;029A26|2B      |      ;
 	sta.B $4f                            ;029A27|854F    |00044F;
@@ -3639,7 +3639,7 @@ CODE_029AAE:
 ;      |        |      ;
 CODE_029AD2:
 	phd                                  ;029AD2|0B      |      ;
-	jsr.W CODE_028F22                    ;029AD3|20228F  |028F22;
+	jsr.W Battle_SetEntityContextParty                    ;029AD3|20228F  |028F22;
 	lda.B $16                            ;029AD6|A516    |001216;
 	pld                                  ;029AD8|2B      |      ;
 	rts                                  ;029AD9|60      |      ;
@@ -3721,7 +3721,7 @@ CODE_029B39:
 ;      |        |      ;
 CODE_029B40:
 	phd                                  ;029B40|0B      |      ;
-	jsr.W CODE_028F2F                    ;029B41|202F8F  |028F2F;
+	jsr.W Battle_SetEntityContextEnemy                    ;029B41|202F8F  |028F2F;
 	lda.B $56                            ;029B44|A556    |001256;
 	pld                                  ;029B46|2B      |      ;
 	sta.B $74                            ;029B47|8574    |000474;
@@ -3904,7 +3904,7 @@ CODE_029C9B:
 ;      |        |      ;
 CODE_029CB6:
 	phd                                  ;029CB6|0B      |      ;
-	jsr.W CODE_028F2F                    ;029CB7|202F8F  |028F2F;
+	jsr.W Battle_SetEntityContextEnemy                    ;029CB7|202F8F  |028F2F;
 	stz.B $21                            ;029CBA|6421    |001021;
 	pld                                  ;029CBC|2B      |      ;
 	rts                                  ;029CBD|60      |      ;
@@ -4048,7 +4048,7 @@ CODE_029DAA:
 	bcs UNREACH_029DC8                   ;029DB7|B00F    |029DC8;
 	lda.B $dc                            ;029DB9|A5DC    |0004DC;
 	phd                                  ;029DBB|0B      |      ;
-	jsr.W CODE_028F2F                    ;029DBC|202F8F  |028F2F;
+	jsr.W Battle_SetEntityContextEnemy                    ;029DBC|202F8F  |028F2F;
 	sta.B $21                            ;029DBF|8521    |001021;
 	pld                                  ;029DC1|2B      |      ;
 	ldx.W #$0000                         ;029DC2|A20000  |      ;
@@ -4071,7 +4071,7 @@ CODE_029DE9:
 ;      |        |      ;
 CODE_029DF8:
 	phd                                  ;029DF8|0B      |      ;
-	jsr.W CODE_028F2F                    ;029DF9|202F8F  |028F2F;
+	jsr.W Battle_SetEntityContextEnemy                    ;029DF9|202F8F  |028F2F;
 	tsb.B $21                            ;029DFC|0421    |0010A1;
 	pld                                  ;029DFE|2B      |      ;
 	rts                                  ;029DFF|60      |      ;
@@ -4080,7 +4080,7 @@ CODE_029DF8:
 CODE_029E00:
 	lda.B $dc                            ;029E00|A5DC    |0004DC;
 	phd                                  ;029E02|0B      |      ;
-	jsr.W CODE_028F2F                    ;029E03|202F8F  |028F2F;
+	jsr.W Battle_SetEntityContextEnemy                    ;029E03|202F8F  |028F2F;
 	trb.B $21                            ;029E06|1421    |0010A1;
 	pld                                  ;029E08|2B      |      ;
 	rts                                  ;029E09|60      |      ;
@@ -4088,7 +4088,7 @@ CODE_029E00:
 ;      |        |      ;
 CODE_029E0A:
 	phd                                  ;029E0A|0B      |      ;
-	jsr.W CODE_028F2F                    ;029E0B|202F8F  |028F2F;
+	jsr.W Battle_SetEntityContextEnemy                    ;029E0B|202F8F  |028F2F;
 	lda.B $3d                            ;029E0E|A53D    |00103D;
 	pld                                  ;029E10|2B      |      ;
 	rts                                  ;029E11|60      |      ;
@@ -4096,7 +4096,7 @@ CODE_029E0A:
 ;      |        |      ;
 CODE_029E12:
 	phd                                  ;029E12|0B      |      ;
-	jsr.W CODE_028F2F                    ;029E13|202F8F  |028F2F;
+	jsr.W Battle_SetEntityContextEnemy                    ;029E13|202F8F  |028F2F;
 	lda.B $3c                            ;029E16|A53C    |00123C;
 	pld                                  ;029E18|2B      |      ;
 	rts                                  ;029E19|60      |      ;
@@ -4109,10 +4109,10 @@ CODE_029E1A:
 ;      |        |      ;
 CODE_029E21:
 	phd                                  ;029E21|0B      |      ;
-	jsr.W CODE_028F2F                    ;029E22|202F8F  |028F2F;
-	jsr.W CODE_0295C7                    ;029E25|20C795  |0295C7;
+	jsr.W Battle_SetEntityContextEnemy                    ;029E22|202F8F  |028F2F;
+	jsr.W Battle_UpdateTargetHP                    ;029E25|20C795  |0295C7;
 	pld                                  ;029E28|2B      |      ;
-	jsr.W CODE_0295DE                    ;029E29|20DE95  |0295DE;
+	jsr.W Battle_CheckTargetDeath                    ;029E29|20DE95  |0295DE;
 	ldx.B $77                            ;029E2C|A677    |000477;
 	bne CODE_029E35                      ;029E2E|D005    |029E35;
 	db $a2,$fe,$7f,$86,$77               ;029E30|        |      ;
@@ -4125,7 +4125,7 @@ CODE_029E36:
 	sep #$20                             ;029E36|E220    |      ;
 	rep #$10                             ;029E38|C210    |      ;
 	phd                                  ;029E3A|0B      |      ;
-	jsr.W CODE_028F22                    ;029E3B|20228F  |028F22;
+	jsr.W Battle_SetEntityContextParty                    ;029E3B|20228F  |028F22;
 	lda.B $25                            ;029E3E|A525    |001225;
 	lsr a;029E40|4A      |      ;
 	clc                                  ;029E41|18      |      ;
@@ -4133,7 +4133,7 @@ CODE_029E36:
 	adc.W $04dd                          ;029E44|6DDD04  |0204DD;
 	sta.W $0098                          ;029E47|8D9800  |020098;
 	stz.W $0099                          ;029E4A|9C9900  |020099;
-	jsr.W CODE_028F2F                    ;029E4D|202F8F  |028F2F;
+	jsr.W Battle_SetEntityContextEnemy                    ;029E4D|202F8F  |028F2F;
 	ldx.B $16                            ;029E50|A616    |001216;
 	pld                                  ;029E52|2B      |      ;
 	stx.W $009c                          ;029E53|8E9C00  |02009C;
@@ -4155,7 +4155,7 @@ CODE_029E5A:
 ;      |        |      ;
 CODE_029E79:
 	phd                                  ;029E79|0B      |      ;
-	jsr.W CODE_028F2F                    ;029E7A|202F8F  |028F2F;
+	jsr.W Battle_SetEntityContextEnemy                    ;029E7A|202F8F  |028F2F;
 	ldx.B $16                            ;029E7D|A616    |001016;
 	stx.W $0098                          ;029E7F|8E9800  |020098;
 	lda.W $04dd                          ;029E82|ADDD04  |0204DD;
@@ -4200,7 +4200,7 @@ CODE_029E95:
 	sta.W $4203                          ;029EC8|8D0342  |024203;
 	plx                                  ;029ECB|FA      |      ;
 	phd                                  ;029ECC|0B      |      ;
-	jsr.W CODE_028F2F                    ;029ECD|202F8F  |028F2F;
+	jsr.W Battle_SetEntityContextEnemy                    ;029ECD|202F8F  |028F2F;
 	lda.B $26,x                          ;029ED0|B526    |001026;
 	sec                                  ;029ED2|38      |      ;
 	sbc.W $4216                          ;029ED3|ED1642  |024216;
@@ -4373,7 +4373,7 @@ CODE_029FEE:
 ;      |        |      ;
 CODE_02A008:
 	phd                                  ;02A008|0B      |      ;
-	jsr.W CODE_028F2F                    ;02A009|202F8F  |028F2F;
+	jsr.W Battle_SetEntityContextEnemy                    ;02A009|202F8F  |028F2F;
 	lda.B $2e                            ;02A00C|A52E    |0011AE;
 	pld                                  ;02A00E|2B      |      ;
 	and.B #$04                           ;02A00F|2904    |      ;
@@ -4479,7 +4479,7 @@ CODE_02A15D:
 	cmp.B #$20                           ;02A15F|C920    |      ;
 	bne CODE_02A189                      ;02A161|D026    |02A189;
 	phd                                  ;02A163|0B      |      ;
-	jsr.W CODE_028F2F                    ;02A164|202F8F  |028F2F;
+	jsr.W Battle_SetEntityContextEnemy                    ;02A164|202F8F  |028F2F;
 	lda.B $2e                            ;02A167|A52E    |00112E;
 	pld                                  ;02A169|2B      |      ;
 	and.B #$04                           ;02A16A|2904    |      ;
@@ -4832,7 +4832,7 @@ CODE_02A40E:
 	sep #$20                             ;02A416|E220    |      ;
 	rep #$10                             ;02A418|C210    |      ;
 	phd                                  ;02A41A|0B      |      ;
-	jsr.W CODE_028F22                    ;02A41B|20228F  |028F22;
+	jsr.W Battle_SetEntityContextParty                    ;02A41B|20228F  |028F22;
 	lda.B $10                            ;02A41E|A510    |001210;
 	inc a;02A420|1A      |      ;
 	beq CODE_02A441                      ;02A421|F01E    |02A441;
@@ -4924,7 +4924,7 @@ CODE_02A497:
 	phd                                  ;02A4A0|0B      |      ;
 ;      |        |      ;
 CODE_02A4A1:
-	jsr.W CODE_028F2F                    ;02A4A1|202F8F  |028F2F;
+	jsr.W Battle_SetEntityContextEnemy                    ;02A4A1|202F8F  |028F2F;
 	lda.B $21                            ;02A4A4|A521    |001221;
 	and.W #$0080                         ;02A4A6|298000  |      ;
 	beq CODE_02A4B3                      ;02A4A9|F008    |02A4B3;
@@ -4942,7 +4942,7 @@ CODE_02A4B8:
 	lda.W #$0005                         ;02A4BB|A90500  |      ;
 	cmp.W $048d                          ;02A4BE|CD8D04  |02048D;
 	beq CODE_02A4DF                      ;02A4C1|F01C    |02A4DF;
-	jsr.W CODE_028F2F                    ;02A4C3|202F8F  |028F2F;
+	jsr.W Battle_SetEntityContextEnemy                    ;02A4C3|202F8F  |028F2F;
 	lda.B $21                            ;02A4C6|A521    |001221;
 	and.W #$0080                         ;02A4C8|298000  |      ;
 	bne CODE_02A4B8                      ;02A4CB|D0EB    |02A4B8;
@@ -4958,7 +4958,7 @@ CODE_02A4B8:
 CODE_02A4DF:
 	sep #$20                             ;02A4DF|E220    |      ;
 	rep #$10                             ;02A4E1|C210    |      ;
-	jsr.W CODE_028F22                    ;02A4E3|20228F  |028F22;
+	jsr.W Battle_SetEntityContextParty                    ;02A4E3|20228F  |028F22;
 	lda.B $21                            ;02A4E6|A521    |001221;
 	and.B #$08                           ;02A4E8|2908    |      ;
 	beq CODE_02A4FA                      ;02A4EA|F00E    |02A4FA;
@@ -5008,13 +5008,13 @@ CODE_02A528:
 	cmp.B #$01                           ;02A52E|C901    |      ;
 	beq CODE_02A550                      ;02A530|F01E    |02A550;
 	phd                                  ;02A532|0B      |      ;
-	jsr.W CODE_028F22                    ;02A533|20228F  |028F22;
+	jsr.W Battle_SetEntityContextParty                    ;02A533|20228F  |028F22;
 	lda.B $5e                            ;02A536|A55E    |00115E;
 	pld                                  ;02A538|2B      |      ;
 	cmp.B #$4a                           ;02A539|C94A    |      ;
 	bne CODE_02A58F                      ;02A53B|D052    |02A58F;
 	phd                                  ;02A53D|0B      |      ;
-	jsr.W CODE_028F22                    ;02A53E|20228F  |028F22;
+	jsr.W Battle_SetEntityContextParty                    ;02A53E|20228F  |028F22;
 	lda.B #$10                           ;02A541|A910    |      ;
 	sta.B $50                            ;02A543|8550    |0011D0;
 	lda.B #$4a                           ;02A545|A94A    |      ;
@@ -5043,7 +5043,7 @@ CODE_02A550:
 ;      |        |      ;
 CODE_02A56C:
 	phd                                  ;02A56C|0B      |      ;
-	jsr.W CODE_028F22                    ;02A56D|20228F  |028F22;
+	jsr.W Battle_SetEntityContextParty                    ;02A56D|20228F  |028F22;
 	lda.B $18                            ;02A570|A518    |001098;
 	xba                                  ;02A572|EB      |      ;
 	lda.B $38                            ;02A573|A538    |0010B8;
@@ -5080,13 +5080,13 @@ CODE_02A5AA:
 	cmp.B #$01                           ;02A5B0|C901    |      ;
 	beq CODE_02A5CF                      ;02A5B2|F01B    |02A5CF;
 	phd                                  ;02A5B4|0B      |      ;
-	jsr.W CODE_028F22                    ;02A5B5|20228F  |028F22;
+	jsr.W Battle_SetEntityContextParty                    ;02A5B5|20228F  |028F22;
 	lda.B $5f                            ;02A5B8|A55F    |0011DF;
 	pld                                  ;02A5BA|2B      |      ;
 	cmp.B #$49                           ;02A5BB|C949    |      ;
 	bne CODE_02A620                      ;02A5BD|D061    |02A620;
 	phd                                  ;02A5BF|0B      |      ;
-	jsr.W CODE_028F22                    ;02A5C0|20228F  |028F22;
+	jsr.W Battle_SetEntityContextParty                    ;02A5C0|20228F  |028F22;
 	lda.B #$10                           ;02A5C3|A910    |      ;
 	sta.B $50                            ;02A5C5|8550    |001250;
 	lda.B #$49                           ;02A5C7|A949    |      ;
@@ -5097,7 +5097,7 @@ CODE_02A5AA:
 ;      |        |      ;
 CODE_02A5CF:
 	phd                                  ;02A5CF|0B      |      ;
-	jsr.W CODE_028F22                    ;02A5D0|20228F  |028F22;
+	jsr.W Battle_SetEntityContextParty                    ;02A5D0|20228F  |028F22;
 	lda.B $18                            ;02A5D3|A518    |001098;
 	xba                                  ;02A5D5|EB      |      ;
 	lda.B $38                            ;02A5D6|A538    |0010B8;
@@ -5176,13 +5176,13 @@ CODE_02A647:
 ;      |        |      ;
 CODE_02A654:
 	phd                                  ;02A654|0B      |      ;
-	jsr.W CODE_028F22                    ;02A655|20228F  |028F22;
+	jsr.W Battle_SetEntityContextParty                    ;02A655|20228F  |028F22;
 	lda.B $21                            ;02A658|A521    |001021;
 	pld                                  ;02A65A|2B      |      ;
 	and.B #$08                           ;02A65B|2908    |      ;
 	beq CODE_02A6C7                      ;02A65D|F068    |02A6C7;
 	phd                                  ;02A65F|0B      |      ;
-	jsr.W CODE_028F22                    ;02A660|20228F  |028F22;
+	jsr.W Battle_SetEntityContextParty                    ;02A660|20228F  |028F22;
 	lda.B $38                            ;02A663|A538    |001038;
 	and.B #$0f                           ;02A665|290F    |      ;
 	ora.B $39                            ;02A667|0539    |001039;
@@ -5202,7 +5202,7 @@ CODE_02A67F:
 ;      |        |      ;
 CODE_02A682:
 	phd                                  ;02A682|0B      |      ;
-	jsr.W CODE_028F22                    ;02A683|20228F  |028F22;
+	jsr.W Battle_SetEntityContextParty                    ;02A683|20228F  |028F22;
 	lda.B $38                            ;02A686|A538    |001038;
 	xba                                  ;02A688|EB      |      ;
 	lda.B $39                            ;02A689|A539    |001039;
@@ -5314,7 +5314,7 @@ CODE_02A725:
 	dec a;02A737|3A      |      ;
 	beq CODE_02A743                      ;02A738|F009    |02A743;
 	phd                                  ;02A73A|0B      |      ;
-	jsr.W CODE_028F2F                    ;02A73B|202F8F  |028F2F;
+	jsr.W Battle_SetEntityContextEnemy                    ;02A73B|202F8F  |028F2F;
 	lda.B $56                            ;02A73E|A556    |0011D6;
 	pld                                  ;02A740|2B      |      ;
 	bne CODE_02A74A                      ;02A741|D007    |02A74A;
@@ -5333,7 +5333,7 @@ CODE_02A74A:
 	lda.W $10b1                          ;02A751|ADB110  |0210B1;
 	sta.B $3a                            ;02A754|853A    |00043A;
 	sta.W $10d2                          ;02A756|8DD210  |0210D2;
-	jsr.W CODE_028B0F                    ;02A759|200F8B  |028B0F;
+	jsr.W Battle_SetupTargeting                    ;02A759|200F8B  |028B0F;
 	lda.B $db                            ;02A75C|A5DB    |0004DB;
 	and.B $a7                            ;02A75E|25A7    |0004A7;
 	and.B #$07                           ;02A760|2907    |      ;
@@ -5442,7 +5442,7 @@ CODE_02A7F5:
 	lda.B #$20                           ;02A7F5|A920    |      ;
 	sta.B $38                            ;02A7F7|8538    |000438;
 	sta.W $10d0                          ;02A7F9|8DD010  |0210D0;
-	jsr.W CODE_028B0F                    ;02A7FC|200F8B  |028B0F;
+	jsr.W Battle_SetupTargeting                    ;02A7FC|200F8B  |028B0F;
 	and.B #$03                           ;02A7FF|2903    |      ;
 	cmp.B #$02                           ;02A801|C902    |      ;
 	bne CODE_02A808                      ;02A803|D003    |02A808;
@@ -5467,7 +5467,7 @@ CODE_02A81A:
 ;      |        |      ;
 CODE_02A81F:
 	phd                                  ;02A81F|0B      |      ;
-	jsr.W CODE_028F2F                    ;02A820|202F8F  |028F2F;
+	jsr.W Battle_SetEntityContextEnemy                    ;02A820|202F8F  |028F2F;
 	lda.B $2e                            ;02A823|A52E    |0011AE;
 	pld                                  ;02A825|2B      |      ;
 	and.B #$04                           ;02A826|2904    |      ;
@@ -5509,7 +5509,7 @@ CODE_02A86E:
 ;      |        |      ;
 CODE_02A881:
 	phd                                  ;02A881|0B      |      ;
-	jsr.W CODE_028F22                    ;02A882|20228F  |028F22;
+	jsr.W Battle_SetEntityContextParty                    ;02A882|20228F  |028F22;
 	stz.B $50                            ;02A885|6450    |0010D0;
 	lda.B $31                            ;02A887|A531    |0010B1;
 	sta.B $52                            ;02A889|8552    |0010D2;
@@ -5548,7 +5548,7 @@ CODE_02A8C6:
 	clc                                  ;02A8C7|18      |      ;
 	adc.B #$18                           ;02A8C8|6918    |      ;
 	phd                                  ;02A8CA|0B      |      ;
-	jsr.W CODE_028F22                    ;02A8CB|20228F  |028F22;
+	jsr.W Battle_SetEntityContextParty                    ;02A8CB|20228F  |028F22;
 	sta.B $52                            ;02A8CE|8552    |001052;
 	lda.B #$20                           ;02A8D0|A920    |      ;
 	sta.B $50                            ;02A8D2|8550    |001050;
@@ -5581,12 +5581,12 @@ CODE_02A8EE:
 ;      |        |      ;
 CODE_02A8F6:
 	phd                                  ;02A8F6|0B      |      ;
-	jsr.W CODE_028F22                    ;02A8F7|20228F  |028F22;
+	jsr.W Battle_SetEntityContextParty                    ;02A8F7|20228F  |028F22;
 	lda.B $51                            ;02A8FA|A551    |0010D1;
 	bit.B #$80                           ;02A8FC|8980    |      ;
 	bne CODE_02A92F                      ;02A8FE|D02F    |02A92F;
 	sta.W $048d                          ;02A900|8D8D04  |02048D;
-	jsr.W CODE_028F2F                    ;02A903|202F8F  |028F2F;
+	jsr.W Battle_SetEntityContextEnemy                    ;02A903|202F8F  |028F2F;
 	lda.B $2e                            ;02A906|A52E    |00122E;
 	xba                                  ;02A908|EB      |      ;
 	lda.B $60                            ;02A909|A560    |001260;
@@ -5627,7 +5627,7 @@ CODE_02A92F:
 ;      |        |      ;
 CODE_02A934:
 	phd                                  ;02A934|0B      |      ;
-	jsr.W CODE_028F2F                    ;02A935|202F8F  |028F2F;
+	jsr.W Battle_SetEntityContextEnemy                    ;02A935|202F8F  |028F2F;
 	lda.B $2e                            ;02A938|A52E    |00122E;
 	xba                                  ;02A93A|EB      |      ;
 	lda.B $21                            ;02A93B|A521    |001221;
@@ -5648,13 +5648,13 @@ CODE_02A947:
 ;      |        |      ;
 CODE_02A950:
 	phd                                  ;02A950|0B      |      ;
-	jsr.W CODE_028F22                    ;02A951|20228F  |028F22;
+	jsr.W Battle_SetEntityContextParty                    ;02A951|20228F  |028F22;
 	lda.B $50                            ;02A954|A550    |001050;
 	sta.W $0438                          ;02A956|8D3804  |020438;
 	lda.B $52                            ;02A959|A552    |001052;
 	sta.W $043a                          ;02A95B|8D3A04  |02043A;
 	pld                                  ;02A95E|2B      |      ;
-	jsr.W CODE_028B0F                    ;02A95F|200F8B  |028B0F;
+	jsr.W Battle_SetupTargeting                    ;02A95F|200F8B  |028B0F;
 	lda.B $e0                            ;02A962|A5E0    |0004E0;
 	and.B #$03                           ;02A964|2903    |      ;
 	cmp.B #$02                           ;02A966|C902    |      ;
@@ -5673,7 +5673,7 @@ CODE_02A97C:
 ;      |        |      ;
 CODE_02A97F:
 	phd                                  ;02A97F|0B      |      ;
-	jsr.W CODE_028F22                    ;02A980|20228F  |028F22;
+	jsr.W Battle_SetEntityContextParty                    ;02A980|20228F  |028F22;
 	lda.B #$81                           ;02A983|A981    |      ;
 	sta.B $51                            ;02A985|8551    |001051;
 	lda.B $21                            ;02A987|A521    |001021;
@@ -5707,7 +5707,7 @@ CODE_02A9B0:
 	and.B #$08                           ;02A9B2|2908    |      ;
 	beq CODE_02A9D2                      ;02A9B4|F01C    |02A9D2;
 	phd                                  ;02A9B6|0B      |      ;
-	jsr.W CODE_028F22                    ;02A9B7|20228F  |028F22;
+	jsr.W Battle_SetEntityContextParty                    ;02A9B7|20228F  |028F22;
 ;      |        |      ;
 CODE_02A9BA:
 	lda.B #$06                           ;02A9BA|A906    |      ;
@@ -5728,7 +5728,7 @@ CODE_02A9D2:
 	bne CODE_02A9EC                      ;02A9D4|D016    |02A9EC;
 	ldx.W #$0007                         ;02A9D6|A20700  |      ;
 	phd                                  ;02A9D9|0B      |      ;
-	jsr.W CODE_028F22                    ;02A9DA|20228F  |028F22;
+	jsr.W Battle_SetEntityContextParty                    ;02A9DA|20228F  |028F22;
 ;      |        |      ;
 CODE_02A9DD:
 	lda.B $44,x                          ;02A9DD|B544    |001244;
@@ -5751,7 +5751,7 @@ CODE_02A9EC:
 	lda.W $00a9                          ;02A9F5|ADA900  |0200A9;
 	sta.B $a0                            ;02A9F8|85A0    |0004A0;
 	phd                                  ;02A9FA|0B      |      ;
-	jsr.W CODE_028F22                    ;02A9FB|20228F  |028F22;
+	jsr.W Battle_SetEntityContextParty                    ;02A9FB|20228F  |028F22;
 	ldx.W #$0007                         ;02A9FE|A20700  |      ;
 ;      |        |      ;
 CODE_02AA01:
@@ -5786,7 +5786,7 @@ CODE_02AA1F:
 ;      |        |      ;
 ;      |        |      ;
 CODE_02AA2E:
-	jsr.W CODE_028B0F                    ;02AA2E|200F8B  |028B0F;
+	jsr.W Battle_SetupTargeting                    ;02AA2E|200F8B  |028B0F;
 	lda.B $e0                            ;02AA31|A5E0    |0004E0;
 	and.B #$03                           ;02AA33|2903    |      ;
 	cmp.B #$02                           ;02AA35|C902    |      ;
@@ -5808,7 +5808,7 @@ CODE_02AA4B:
 ;      |        |      ;
 CODE_02AA4F:
 	phd                                  ;02AA4F|0B      |      ;
-	jsr.W CODE_028F22                    ;02AA50|20228F  |028F22;
+	jsr.W Battle_SetEntityContextParty                    ;02AA50|20228F  |028F22;
 	lda.W $0439                          ;02AA53|AD3904  |020439;
 	sta.B $51                            ;02AA56|8551    |001251;
 	pld                                  ;02AA58|2B      |      ;
@@ -5832,7 +5832,7 @@ CODE_02AA5A:
 	asl a;02AA70|0A      |      ;
 	tax                                  ;02AA71|AA      |      ;
 	phd                                  ;02AA72|0B      |      ;
-	jsr.W CODE_028F22                    ;02AA73|20228F  |028F22;
+	jsr.W Battle_SetEntityContextParty                    ;02AA73|20228F  |028F22;
 	ldy.W DATA8_02d0be,x                 ;02AA76|BCBED0  |02D0BE;
 	sty.B $44                            ;02AA79|8444    |001144;
 	ldy.W DATA8_02d0c0,x                 ;02AA7B|BCC0D0  |02D0C0;
@@ -5856,7 +5856,7 @@ CODE_02AA8B:
 	cmp.B #$03                           ;02AA9A|C903    |      ;
 	bne CODE_02AAA7                      ;02AA9C|D009    |02AAA7;
 	phd                                  ;02AA9E|0B      |      ;
-	jsr.W CODE_028F22                    ;02AA9F|20228F  |028F22;
+	jsr.W Battle_SetEntityContextParty                    ;02AA9F|20228F  |028F22;
 	lda.B #$c4                           ;02AAA2|A9C4    |      ;
 	sta.B $58                            ;02AAA4|8558    |001158;
 	pld                                  ;02AAA6|2B      |      ;
@@ -5893,7 +5893,7 @@ CODE_02AAD3:
 ;      |        |      ;
 CODE_02AAE5:
 	phd                                  ;02AAE5|0B      |      ;
-	jsr.W CODE_028F22                    ;02AAE6|20228F  |028F22;
+	jsr.W Battle_SetEntityContextParty                    ;02AAE6|20228F  |028F22;
 	lda.B #$00                           ;02AAE9|A900    |      ;
 	xba                                  ;02AAEB|EB      |      ;
 	lda.B $61                            ;02AAEC|A561    |001161;
@@ -5915,7 +5915,7 @@ CODE_02AAE5:
 	cmp.W $0002,y                        ;02AB07|D90200  |020002;
 	bcs CODE_02AB35                      ;02AB0A|B029    |02AB35;
 	phd                                  ;02AB0C|0B      |      ;
-	jsr.W CODE_028F22                    ;02AB0D|20228F  |028F22;
+	jsr.W Battle_SetEntityContextParty                    ;02AB0D|20228F  |028F22;
 	phd                                  ;02AB10|0B      |      ;
 	pla                                  ;02AB11|68      |      ;
 	clc                                  ;02AB12|18      |      ;
@@ -5949,7 +5949,7 @@ DATA8_02ab3c:
 CODE_02AB44:
 	rep #$30                             ;02AB44|C230    |      ;
 	phd                                  ;02AB46|0B      |      ;
-	jsr.W CODE_028F22                    ;02AB47|20228F  |028F22;
+	jsr.W Battle_SetEntityContextParty                    ;02AB47|20228F  |028F22;
 	lda.B $14                            ;02AB4A|A514    |001114;
 	pld                                  ;02AB4C|2B      |      ;
 	rts                                  ;02AB4D|60      |      ;
@@ -5959,7 +5959,7 @@ CODE_02AB4E:
 	sep #$20                             ;02AB4E|E220    |      ;
 	rep #$10                             ;02AB50|C210    |      ;
 	phd                                  ;02AB52|0B      |      ;
-	jsr.W CODE_028F22                    ;02AB53|20228F  |028F22;
+	jsr.W Battle_SetEntityContextParty                    ;02AB53|20228F  |028F22;
 	inc.B $61                            ;02AB56|E661    |001161;
 	inc.B $62                            ;02AB58|E662    |001162;
 	pld                                  ;02AB5A|2B      |      ;
