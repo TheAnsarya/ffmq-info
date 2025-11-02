@@ -1,19 +1,22 @@
 {
   "name": "enemy_59_freeze_crab",
+  "enemy_id": 59,
+  "enemy_name": "Freeze Crab",
   "category": "enemy",
   "format": "4BPP",
   "rom_offset": "0x051038",
+  "palette_offset": "0x0483B0",
   "dimensions": {
     "width_tiles": 8,
     "height_tiles": 8,
     "width_pixels": 64,
     "height_pixels": 64
   },
-  "palette_index": 6,
   "num_tiles": 64,
-  "animation": {
-    "num_frames": 1,
-    "frame_offsets": []
-  },
-  "notes": "Freeze Crab (ID 59)"
+  "shares_graphics": true,
+  "shared_with": [
+    59,
+    69
+  ],
+  "notes": "Freeze Crab (ID 59) - Palette from Bank 09"
 }

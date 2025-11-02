@@ -1,0 +1,22 @@
+{
+  "name": "enemy_72_pazuzu",
+  "enemy_id": 72,
+  "enemy_name": "Gargoyle",
+  "category": "enemy",
+  "format": "4BPP",
+  "rom_offset": "0x0537C8",
+  "palette_offset": "0x048480",
+  "dimensions": {
+    "width_tiles": 8,
+    "height_tiles": 8,
+    "width_pixels": 64,
+    "height_pixels": 64
+  },
+  "num_tiles": 64,
+  "shares_graphics": true,
+  "shared_with": [
+    62,
+    72
+  ],
+  "notes": "Gargoyle (ID 72) - Palette from Bank 09"
+}

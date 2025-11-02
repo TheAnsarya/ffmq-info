@@ -1,19 +1,22 @@
 {
   "name": "enemy_54_jinn",
+  "enemy_id": 54,
+  "enemy_name": "Jinn",
   "category": "enemy",
   "format": "4BPP",
   "rom_offset": "0x04E595",
+  "palette_offset": "0x048360",
   "dimensions": {
     "width_tiles": 8,
     "height_tiles": 8,
     "width_pixels": 64,
     "height_pixels": 64
   },
-  "palette_index": 6,
   "num_tiles": 64,
-  "animation": {
-    "num_frames": 1,
-    "frame_offsets": []
-  },
-  "notes": "Jinn (ID 54)"
+  "shares_graphics": true,
+  "shared_with": [
+    54,
+    55
+  ],
+  "notes": "Jinn (ID 54) - Palette from Bank 09"
 }

@@ -1,0 +1,22 @@
+{
+  "name": "enemy_69_freeze_crab",
+  "enemy_id": 69,
+  "enemy_name": "Dark Lord",
+  "category": "enemy",
+  "format": "4BPP",
+  "rom_offset": "0x051038",
+  "palette_offset": "0x048450",
+  "dimensions": {
+    "width_tiles": 8,
+    "height_tiles": 8,
+    "width_pixels": 64,
+    "height_pixels": 64
+  },
+  "num_tiles": 64,
+  "shares_graphics": true,
+  "shared_with": [
+    59,
+    69
+  ],
+  "notes": "Dark Lord (ID 69) - Palette from Bank 09"
+}

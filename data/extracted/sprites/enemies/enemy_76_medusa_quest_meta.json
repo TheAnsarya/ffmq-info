@@ -1,19 +1,22 @@
 {
   "name": "enemy_76_medusa_quest",
+  "enemy_id": 76,
+  "enemy_name": "Medusa (Quest)",
   "category": "enemy",
   "format": "4BPP",
   "rom_offset": "0x056888",
+  "palette_offset": "0x0484C0",
   "dimensions": {
     "width_tiles": 8,
     "height_tiles": 8,
     "width_pixels": 64,
     "height_pixels": 64
   },
-  "palette_index": 7,
   "num_tiles": 64,
-  "animation": {
-    "num_frames": 1,
-    "frame_offsets": []
-  },
-  "notes": "Medusa (Quest) (ID 76)"
+  "shares_graphics": true,
+  "shared_with": [
+    76,
+    77
+  ],
+  "notes": "Medusa (Quest) (ID 76) - Palette from Bank 09"
 }

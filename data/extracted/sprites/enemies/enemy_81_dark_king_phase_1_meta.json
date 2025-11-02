@@ -1,19 +1,19 @@
 {
   "name": "enemy_81_dark_king_phase_1",
+  "enemy_id": 81,
+  "enemy_name": "Dark King (Phase 1)",
   "category": "enemy",
   "format": "4BPP",
   "rom_offset": "0x010000",
+  "palette_offset": "0x048510",
   "dimensions": {
     "width_tiles": 3,
     "height_tiles": 3,
     "width_pixels": 24,
     "height_pixels": 24
   },
-  "palette_index": 7,
   "num_tiles": 9,
-  "animation": {
-    "num_frames": 1,
-    "frame_offsets": []
-  },
-  "notes": "Dark King (Phase 1) (ID 81)"
+  "shares_graphics": false,
+  "shared_with": null,
+  "notes": "Dark King (Phase 1) (ID 81) - Palette from Bank 09"
 }

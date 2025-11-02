@@ -1,19 +1,22 @@
 {
   "name": "enemy_56_thunder_eye",
+  "enemy_id": 56,
+  "enemy_name": "Thunder Eye",
   "category": "enemy",
   "format": "4BPP",
   "rom_offset": "0x04E9CD",
+  "palette_offset": "0x048380",
   "dimensions": {
     "width_tiles": 8,
     "height_tiles": 8,
     "width_pixels": 64,
     "height_pixels": 64
   },
-  "palette_index": 6,
   "num_tiles": 64,
-  "animation": {
-    "num_frames": 1,
-    "frame_offsets": []
-  },
-  "notes": "Thunder Eye (ID 56)"
+  "shares_graphics": true,
+  "shared_with": [
+    56,
+    66
+  ],
+  "notes": "Thunder Eye (ID 56) - Palette from Bank 09"
 }

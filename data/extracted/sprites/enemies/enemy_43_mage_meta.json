@@ -1,0 +1,22 @@
+{
+  "name": "enemy_43_mage",
+  "enemy_id": 43,
+  "enemy_name": "Sorcerer",
+  "category": "enemy",
+  "format": "4BPP",
+  "rom_offset": "0x04CBE5",
+  "palette_offset": "0x0482B0",
+  "dimensions": {
+    "width_tiles": 4,
+    "height_tiles": 4,
+    "width_pixels": 32,
+    "height_pixels": 32
+  },
+  "num_tiles": 16,
+  "shares_graphics": true,
+  "shared_with": [
+    42,
+    43
+  ],
+  "notes": "Sorcerer (ID 43) - Palette from Bank 09"
+}

@@ -1,0 +1,22 @@
+{
+  "name": "enemy_79_gorgon_bull",
+  "enemy_id": 79,
+  "enemy_name": "Minotaur (Quest)",
+  "category": "enemy",
+  "format": "4BPP",
+  "rom_offset": "0x05971C",
+  "palette_offset": "0x0484F0",
+  "dimensions": {
+    "width_tiles": 8,
+    "height_tiles": 8,
+    "width_pixels": 64,
+    "height_pixels": 64
+  },
+  "num_tiles": 64,
+  "shares_graphics": true,
+  "shared_with": [
+    78,
+    79
+  ],
+  "notes": "Minotaur (Quest) (ID 79) - Palette from Bank 09"
+}

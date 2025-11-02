@@ -132,7 +132,8 @@ class SpriteCatalog:
 
             # Draw sprite info
             info = f"{meta['dimensions']['width_pixels']}x{meta['dimensions']['height_pixels']}px"
-            if meta['animation']['num_frames'] > 1:
+            # Handle both old and new metadata formats
+            if 'animation' in meta and meta['animation']['num_frames'] > 1:
                 info += f" • {meta['animation']['num_frames']} frames"
 
             info_bbox = draw.textbbox((0, 0), info)

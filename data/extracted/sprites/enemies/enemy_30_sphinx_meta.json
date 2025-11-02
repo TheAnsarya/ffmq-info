@@ -1,19 +1,22 @@
 {
   "name": "enemy_30_sphinx",
+  "enemy_id": 30,
+  "enemy_name": "Sphinx",
   "category": "enemy",
   "format": "4BPP",
   "rom_offset": "0x04B265",
+  "palette_offset": "0x0481E0",
   "dimensions": {
     "width_tiles": 8,
     "height_tiles": 8,
     "width_pixels": 64,
     "height_pixels": 64
   },
-  "palette_index": 5,
   "num_tiles": 64,
-  "animation": {
-    "num_frames": 1,
-    "frame_offsets": []
-  },
-  "notes": "Sphinx (ID 30)"
+  "shares_graphics": true,
+  "shared_with": [
+    30,
+    31
+  ],
+  "notes": "Sphinx (ID 30) - Palette from Bank 09"
 }

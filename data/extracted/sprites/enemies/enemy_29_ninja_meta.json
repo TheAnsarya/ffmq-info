@@ -1,0 +1,22 @@
+{
+  "name": "enemy_29_ninja",
+  "enemy_id": 29,
+  "enemy_name": "Shadow",
+  "category": "enemy",
+  "format": "4BPP",
+  "rom_offset": "0x04AF35",
+  "palette_offset": "0x0481D0",
+  "dimensions": {
+    "width_tiles": 8,
+    "height_tiles": 8,
+    "width_pixels": 64,
+    "height_pixels": 64
+  },
+  "num_tiles": 64,
+  "shares_graphics": true,
+  "shared_with": [
+    28,
+    29
+  ],
+  "notes": "Shadow (ID 29) - Palette from Bank 09"
+}

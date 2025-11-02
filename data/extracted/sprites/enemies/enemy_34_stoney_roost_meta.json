@@ -1,19 +1,22 @@
 {
   "name": "enemy_34_stoney_roost",
+  "enemy_id": 34,
+  "enemy_name": "Stoney Roost",
   "category": "enemy",
   "format": "4BPP",
   "rom_offset": "0x04BB05",
+  "palette_offset": "0x048220",
   "dimensions": {
     "width_tiles": 6,
     "height_tiles": 6,
     "width_pixels": 48,
     "height_pixels": 48
   },
-  "palette_index": 5,
   "num_tiles": 36,
-  "animation": {
-    "num_frames": 1,
-    "frame_offsets": []
-  },
-  "notes": "Stoney Roost (ID 34)"
+  "shares_graphics": true,
+  "shared_with": [
+    34,
+    35
+  ],
+  "notes": "Stoney Roost (ID 34) - Palette from Bank 09"
 }

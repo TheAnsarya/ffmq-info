@@ -421,10 +421,15 @@ Resume data extraction pipeline (original goal)
 Resume data extraction pipeline (original goal)
 continue with option #1 so all the resources are there when we finally do options #2 and #3
 
+&&&&&&&&&
+Ready For Next Phase  --  Immediate options:
+Extract remaining 82 enemy sprites (5-8 hours)
+Move to Option #2: Build integration (import pipeline)
+Move to Option #3: Other data types (maps, text, music)
+&&&&&&&&&&&&
 
-
-
-
+Extract remaining 82 enemy sprites (5-8 hours)
+You're extracting graphics data for editing, but `C:\Users\me\source\repos\ffmq-info\data\extracted\sprites\enemies\enemy_18_skeleton.png` does not look anything like the skeleton enemy or any part of it, not in color or shape or appearance; graphics should extract into literal file copies for reference, but also interpreted copies that actually look like the real graphics as displayed for editing and eventual re-insertion into the build-rom.
 
 
 

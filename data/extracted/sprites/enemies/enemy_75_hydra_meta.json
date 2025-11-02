@@ -1,0 +1,22 @@
+{
+  "name": "enemy_75_hydra",
+  "enemy_id": 75,
+  "enemy_name": "Dark Lord (Phoebe)",
+  "category": "enemy",
+  "format": "4BPP",
+  "rom_offset": "0x055430",
+  "palette_offset": "0x0484B0",
+  "dimensions": {
+    "width_tiles": 8,
+    "height_tiles": 8,
+    "width_pixels": 64,
+    "height_pixels": 64
+  },
+  "num_tiles": 64,
+  "shares_graphics": true,
+  "shared_with": [
+    65,
+    75
+  ],
+  "notes": "Dark Lord (Phoebe) (ID 75) - Palette from Bank 09"
+}

@@ -1,19 +1,22 @@
 {
   "name": "enemy_61_gemini_crest_r",
+  "enemy_id": 61,
+  "enemy_name": "Gemini Crest (R)",
   "category": "enemy",
   "format": "4BPP",
   "rom_offset": "0x052208",
+  "palette_offset": "0x0483D0",
   "dimensions": {
     "width_tiles": 8,
     "height_tiles": 8,
     "width_pixels": 64,
     "height_pixels": 64
   },
-  "palette_index": 7,
   "num_tiles": 64,
-  "animation": {
-    "num_frames": 1,
-    "frame_offsets": []
-  },
-  "notes": "Gemini Crest (R) (ID 61)"
+  "shares_graphics": true,
+  "shared_with": [
+    61,
+    71
+  ],
+  "notes": "Gemini Crest (R) (ID 61) - Palette from Bank 09"
 }

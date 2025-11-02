@@ -1,0 +1,22 @@
+{
+  "name": "enemy_47_stone_man",
+  "enemy_id": 47,
+  "enemy_name": "Lizard Man",
+  "category": "enemy",
+  "format": "4BPP",
+  "rom_offset": "0x04D49D",
+  "palette_offset": "0x0482F0",
+  "dimensions": {
+    "width_tiles": 4,
+    "height_tiles": 4,
+    "width_pixels": 32,
+    "height_pixels": 32
+  },
+  "num_tiles": 16,
+  "shares_graphics": true,
+  "shared_with": [
+    46,
+    47
+  ],
+  "notes": "Lizard Man (ID 47) - Palette from Bank 09"
+}

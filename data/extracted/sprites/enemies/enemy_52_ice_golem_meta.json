@@ -1,19 +1,22 @@
 {
   "name": "enemy_52_ice_golem",
+  "enemy_id": 52,
+  "enemy_name": "Ice Golem",
   "category": "enemy",
   "format": "4BPP",
   "rom_offset": "0x04E175",
+  "palette_offset": "0x048340",
   "dimensions": {
     "width_tiles": 2,
     "height_tiles": 2,
     "width_pixels": 16,
     "height_pixels": 16
   },
-  "palette_index": 6,
   "num_tiles": 4,
-  "animation": {
-    "num_frames": 1,
-    "frame_offsets": []
-  },
-  "notes": "Ice Golem (ID 52)"
+  "shares_graphics": true,
+  "shared_with": [
+    52,
+    53
+  ],
+  "notes": "Ice Golem (ID 52) - Palette from Bank 09"
 }

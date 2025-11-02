@@ -1,0 +1,22 @@
+{
+  "name": "enemy_25_zombie",
+  "enemy_id": 25,
+  "enemy_name": "Mummy",
+  "category": "enemy",
+  "format": "4BPP",
+  "rom_offset": "0x04A695",
+  "palette_offset": "0x048190",
+  "dimensions": {
+    "width_tiles": 6,
+    "height_tiles": 6,
+    "width_pixels": 48,
+    "height_pixels": 48
+  },
+  "num_tiles": 36,
+  "shares_graphics": true,
+  "shared_with": [
+    24,
+    25
+  ],
+  "notes": "Mummy (ID 25) - Palette from Bank 09"
+}

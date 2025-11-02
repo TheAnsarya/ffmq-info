@@ -1,0 +1,22 @@
+{
+  "name": "enemy_51_minotaur",
+  "enemy_id": 51,
+  "enemy_name": "Medusa",
+  "category": "enemy",
+  "format": "4BPP",
+  "rom_offset": "0x04DE45",
+  "palette_offset": "0x048330",
+  "dimensions": {
+    "width_tiles": 6,
+    "height_tiles": 6,
+    "width_pixels": 48,
+    "height_pixels": 48
+  },
+  "num_tiles": 36,
+  "shares_graphics": true,
+  "shared_with": [
+    50,
+    51
+  ],
+  "notes": "Medusa (ID 51) - Palette from Bank 09"
+}
