@@ -2039,14 +2039,14 @@ Field_LoadMap:
 	jsr.W Collision_ProcessEntity                    ;019157|2056AF  |01AF56;
 	jsl.L CODE_0B87B9                    ;01915A|22B9870B|0B87B9;
 	jsl.L CODE_0B836A                    ;01915E|226A830B|0B836A;
-	jsr.W CODE_01FD7C                    ;019162|207CFD  |01FD7C;
+	jsr.W Field_CopyCharacterGraphics                    ;019162|207CFD  |01FD7C;
 	jsl.L CODE_0B83B8                    ;019165|22B8830B|0B83B8;
 	jsl.L CODE_0B83F2                    ;019169|22F2830B|0B83F2;
 	jsr.W Field_LoadTilesets                    ;01916D|20DC81  |0181DC;
-	jsr.W CODE_01FE0C                    ;019170|200CFE  |01FE0C;
+	jsr.W Field_LoadFontGraphics                    ;019170|200CFE  |01FE0C;
 	jsl.L CODE_0B84FB                    ;019173|22FB840B|0B84FB;
 	ldy.W $0e89                          ;019177|AC890E  |010E89;
-	jsr.W CODE_01FD51                    ;01917A|2051FD  |01FD51;
+	jsr.W Field_NormalizeCoordinates                    ;01917A|2051FD  |01FD51;
 	sty.W $0e89                          ;01917D|8C890E  |010E89;
 	jsl.L CODE_0B8223                    ;019180|2223820B|0B8223;
 	jsl.L CODE_0B8560                    ;019184|2260850B|0B8560;
@@ -2094,7 +2094,7 @@ Field_MapDataLoad:
 	jsr.W Field_CharPaletteNext                    ;0191FF|209384  |018493;
 	jsr.W Field_InitializeSprites                    ;019202|20B984  |0184B9;
 	jsr.W Field_LoadPalettes                    ;019205|206D83  |01836D;
-	jsr.W CODE_01FE6C                    ;019208|206CFE  |01FE6C;
+	jsr.W Field_UpdateWorldSprites                    ;019208|206CFE  |01FE6C;
 	jsr.W Field_UpdateSpriteFlags                    ;01920B|207386  |018673;
 	jsr.W Field_SpriteLoop                    ;01920E|20E184  |0184E1;
 	lda.W $1916                          ;019211|AD1619  |011916;
@@ -2186,7 +2186,7 @@ MapEvent_LoadNewMap:
 MapEvent_SetupNewMap:
 	jsr.W CODE_01C83A                    ;0192D1|203AC8  |01C83A;
 	jsl.L CODE_0B87B9                    ;0192D4|22B9870B|0B87B9;
-	jsr.W CODE_01FE0C                    ;0192D8|200CFE  |01FE0C;
+	jsr.W Field_LoadFontGraphics                    ;0192D8|200CFE  |01FE0C;
 	php                                  ;0192DB|08      |      ;
 	jsr.W NPC_InitializeAll                    ;0192DC|20AF9F  |019FAF;
 	plp                                  ;0192DF|28      |      ;
@@ -2224,7 +2224,7 @@ MapEvent_WaitForVBlank:
 	jsr.W Field_InitializeSprites                    ;019337|20B984  |0184B9;
 	jsr.W Field_LoadPalettes                    ;01933A|206D83  |01836D;
 	jsr.W Field_SpriteLoop                    ;01933D|20E184  |0184E1;
-	jsr.W CODE_01FE6C                    ;019340|206CFE  |01FE6C;
+	jsr.W Field_UpdateWorldSprites                    ;019340|206CFE  |01FE6C;
 	jsr.W Field_UpdateSpriteFlags                    ;019343|207386  |018673;
 	pla                                  ;019346|68      |      ;
 	sta.W $0111                          ;019347|8D1101  |010111;
@@ -2256,14 +2256,14 @@ MapEvent_ScrollWithDialog:
 	jsr.W Sound_PlayEffect                    ;01937A|20ADBA  |01BAAD;
 	jsr.W CODE_01C95F                    ;01937D|205FC9  |01C95F;
 	ldy.W #$0004                         ;019380|A00400  |      ;
-	jsr.W CODE_01F7C7                    ;019383|20C7F7  |01F7C7;
+	jsr.W Field_WaitFrameLoop                    ;019383|20C7F7  |01F7C7;
 	plx                                  ;019386|FA      |      ;
 	stx.W $0e89                          ;019387|8E890E  |010E89;
 ;      |        |      ;
 MapEvent_CheckCollision:
 	jsr.W Field_TileCollisionLoop                    ;01938A|205890  |019058;
 	jsr.W Field_TileCollisionCheck                    ;01938D|207B90  |01907B;
-	jsr.W CODE_01F986                    ;019390|2086F9  |01F986;
+	jsr.W Field_CalculateWorldCoords                    ;019390|2086F9  |01F986;
 	lda.B #$02                           ;019393|A902    |      ;
 	sta.W $1a46                          ;019395|8D461A  |011A46;
 	jsr.W Field_TileCollisionResult                    ;019398|20BD90  |0190BD;
@@ -2299,7 +2299,7 @@ DATA8_0193c1:
 	ldx.W $19bf                          ;0193D1|AEBF19  |0119BF;
 	stx.W $19c3                          ;0193D4|8EC319  |0119C3;
 	jsr.W Field_TileCollisionCheck                    ;0193D7|207B90  |01907B;
-	jsr.W CODE_01F986                    ;0193DA|2086F9  |01F986;
+	jsr.W Field_CalculateWorldCoords                    ;0193DA|2086F9  |01F986;
 	lda.B #$02                           ;0193DD|A902    |      ;
 	sta.W $1a46                          ;0193DF|8D461A  |011A46;
 	ldy.W #$000a                         ;0193E2|A00A00  |      ;
@@ -2343,7 +2343,7 @@ MapEvent_ScrollLoop:
 	adc.W $19bf                          ;019436|6DBF19  |0119BF;
 	and.W #$000f                         ;019439|290F00  |      ;
 	sta.W $19bf                          ;01943C|8DBF19  |0119BF;
-	jsr.W CODE_01F978                    ;01943F|2078F9  |01F978;
+	jsr.W Field_RenderWorldMap                    ;01943F|2078F9  |01F978;
 	plx                                  ;019442|FA      |      ;
 	stx.W $0e89                          ;019443|8E890E  |010E89;
 	ldy.W $1991                          ;019446|AC9119  |011991;
@@ -3529,7 +3529,7 @@ Char_AnimationNext:
 	stx.W $0e89                          ;019DA3|8E890E  |010E89;
 	jsr.W Field_TileCollisionLoop                    ;019DA6|205890  |019058;
 	jsr.W Field_TileCollisionCheck                    ;019DA9|207B90  |01907B;
-	jsr.W CODE_01F986                    ;019DAC|2086F9  |01F986;
+	jsr.W Field_CalculateWorldCoords                    ;019DAC|2086F9  |01F986;
 	ldx.W $0e89                          ;019DAF|AE890E  |010E89;
 	stx.W $193f                          ;019DB2|8E3F19  |01193F;
 	ldx.W $19f3                          ;019DB5|AEF319  |0119F3;
@@ -6576,7 +6576,7 @@ DMA_Complete:
 	inc a;01B33E|1A      |      ;
 	xba                                  ;01B33F|EB      |      ;
 	tay                                  ;01B340|A8      |      ;
-	jsr.W CODE_01FD51                    ;01B341|2051FD  |01FD51;
+	jsr.W Field_NormalizeCoordinates                    ;01B341|2051FD  |01FD51;
 	sty.W $0e89                          ;01B344|8C890E  |010E89;
 	rep #$20                             ;01B347|C220    |      ;
 	bra DMA_Complete                      ;01B349|80A0    |01B2EB;
@@ -8840,7 +8840,7 @@ Menu_ProcessInput:
 	adc.L DATA8_01c714,x                 ;01C6EF|7F14C701|01C714;
 	and.B #$0f                           ;01C6F3|290F    |      ;
 	sta.W $19bf                          ;01C6F5|8DBF19  |0119BF;
-	jsr.W CODE_01F978                    ;01C6F8|2078F9  |01F978;
+	jsr.W Field_RenderWorldMap                    ;01C6F8|2078F9  |01F978;
 	stx.W $0e89                          ;01C6FB|8E890E  |010E89;
 	lda.B #$02                           ;01C6FE|A902    |      ;
 	sta.W $1a46                          ;01C700|8D461A  |011A46;
@@ -12949,7 +12949,7 @@ Field_EnableMovementFlag:
 ;      |        |      ;
 Field_ExecuteMovementLogic:
 	jsr.W Field_CalculateCharacterPosition                    ;01EAB0|2012F2  |01F212;
-	jsr.W CODE_01F2CB                    ;01EAB3|20CBF2  |01F2CB;
+	jsr.W Field_CheckEntityTrigger                    ;01EAB3|20CBF2  |01F2CB;
 	bcc Field_CheckMovementFlags                      ;01EAB6|9003    |01EABB;
 	jmp.W Field_ProcessCollisionTrigger                    ;01EAB8|4C46EB  |01EB46;
 ;      |        |      ;
@@ -13006,7 +13006,7 @@ Field_ApplyMovementDirection:
 	stx.W $19cb                          ;01EB17|8ECB19  |0119CB;
 	lda.W $19d0                          ;01EB1A|ADD019  |0119D0;
 	ldy.W $19f1                          ;01EB1D|ACF119  |0119F1;
-	jsr.W CODE_01F36A                    ;01EB20|206AF3  |01F36A;
+	jsr.W Field_ProcessNPCTrigger                    ;01EB20|206AF3  |01F36A;
 	lda.W $193b                          ;01EB23|AD3B19  |01193B;
 	eor.W $19d5                          ;01EB26|4DD519  |0119D5;
 	bmi Field_UpdateMovementState                      ;01EB29|3003    |01EB2E;
@@ -13068,7 +13068,7 @@ Field_ExecuteTrigger:
 	eor.W $19d1                          ;01EB91|4DD119  |0119D1;
 	and.B #$07                           ;01EB94|2907    |      ;
 	bne Field_CompleteMovementCycle                      ;01EB96|D0A1    |01EB39;
-	jsr.W CODE_01F2CB                    ;01EB98|20CBF2  |01F2CB;
+	jsr.W Field_CheckEntityTrigger                    ;01EB98|20CBF2  |01F2CB;
 	bcs Field_CompleteMovementCycle                      ;01EB9B|B09C    |01EB39;
 	lda.W $19d6                          ;01EB9D|ADD619  |0119D6;
 	lsr a;01EBA0|4A      |      ;
@@ -13082,8 +13082,8 @@ Field_ExecuteTrigger:
 	sta.W $1926                          ;01EBAD|8D2619  |011926;
 	ldy.W $19f1                          ;01EBB0|ACF119  |0119F1;
 	ldx.W #$0000                         ;01EBB3|A20000  |      ;
-	jsr.W CODE_01F298                    ;01EBB6|2098F2  |01F298;
-	jsr.W CODE_01F326                    ;01EBB9|2026F3  |01F326;
+	jsr.W Field_CalculateWrappedPosition                    ;01EBB6|2098F2  |01F298;
+	jsr.W Field_CheckEntityBridge                    ;01EBB9|2026F3  |01F326;
 	bcc Field_ProcessMapTransition                      ;01EBBC|9003    |01EBC1;
 	inc.W $1926                          ;01EBBE|EE2619  |011926;
 ;      |        |      ;
@@ -13094,14 +13094,14 @@ Field_ProcessMapTransition:
 	stx.W $19cb                          ;01EBCA|8ECB19  |0119CB;
 	lda.W $19d0                          ;01EBCD|ADD019  |0119D0;
 	ldy.W $19f1                          ;01EBD0|ACF119  |0119F1;
-	jsr.W CODE_01F36A                    ;01EBD3|206AF3  |01F36A;
+	jsr.W Field_ProcessNPCTrigger                    ;01EBD3|206AF3  |01F36A;
 	lda.B #$0c                           ;01EBD6|A90C    |      ;
 	rts                                  ;01EBD8|60      |      ;
 ;      |        |      ;
 	lda.W $0e8b                          ;01EBD9|AD8B0E  |010E8B;
 	sta.W $19d7                          ;01EBDC|8DD719  |0119D7;
 	jsr.W Field_CalculateCharacterPosition                    ;01EBDF|2012F2  |01F212;
-	jsr.W CODE_01F2CB                    ;01EBE2|20CBF2  |01F2CB;
+	jsr.W Field_CheckEntityTrigger                    ;01EBE2|20CBF2  |01F2CB;
 	bcc Field_SetMapData                      ;01EBE5|9025    |01EC0C;
 	lda.W $1a7f,x                        ;01EBE7|BD7F1A  |011A7F;
 	and.B #$03                           ;01EBEA|2903    |      ;
@@ -13300,7 +13300,7 @@ Field_ProcessMapParameter:
 	cmp.B #$30                           ;01ED47|C930    |      ;
 	beq Field_CheckMapCondition                      ;01ED49|F071    |01EDBC;
 	ldy.W $1943                          ;01ED4B|AC4319  |011943;
-	jsr.W CODE_01F2CB                    ;01ED4E|20CBF2  |01F2CB;
+	jsr.W Field_CheckEntityTrigger                    ;01ED4E|20CBF2  |01F2CB;
 	bcc Field_UpdateMapFlags                      ;01ED51|9020    |01ED73;
 	lda.W $1a7f,x                        ;01ED53|BD7F1A  |011A7F;
 	and.B #$18                           ;01ED56|2918    |      ;
@@ -13427,7 +13427,7 @@ Field_CompleteMapEvent:
 	sta.W $192b,x                        ;01EE78|9D2B19  |01192B;
 	sep #$20                             ;01EE7B|E220    |      ;
 	ldy.W $193b                          ;01EE7D|AC3B19  |01193B;
-	jsr.W CODE_01F2CB                    ;01EE80|20CBF2  |01F2CB;
+	jsr.W Field_CheckEntityTrigger                    ;01EE80|20CBF2  |01F2CB;
 	bcc Field_ProcessChestOpen                      ;01EE83|9009    |01EE8E;
 	db $bd,$7f,$1a,$29,$18,$c9,$18,$d0,$4c;01EE85|        |001A7F;
 ;      |        |      ;
@@ -13529,7 +13529,7 @@ Field_ProcessDoorOpen:
 	ldx.W #$0000                         ;01EF7A|A20000  |      ;
 	stx.W $193f                          ;01EF7D|8E3F19  |01193F;
 	ldy.W $19f1                          ;01EF80|ACF119  |0119F1;
-	jsr.W CODE_01F2CB                    ;01EF83|20CBF2  |01F2CB;
+	jsr.W Field_CheckEntityTrigger                    ;01EF83|20CBF2  |01F2CB;
 	bcc Field_ProcessDoorAnimation                      ;01EF86|9044    |01EFCC;
 	lda.W $1a7f,x                        ;01EF88|BD7F1A  |011A7F;
 	and.B #$03                           ;01EF8B|2903    |      ;
@@ -13548,7 +13548,7 @@ Field_OpenDoor:
 ;      |        |      ;
 Field_ProcessDoorAnimation:
 	ldy.W $19f3                          ;01EFCC|ACF319  |0119F3;
-	jsr.W CODE_01F2CB                    ;01EFCF|20CBF2  |01F2CB;
+	jsr.W Field_CheckEntityTrigger                    ;01EFCF|20CBF2  |01F2CB;
 	bcc Field_CompleteDoorOpen                      ;01EFD2|9022    |01EFF6;
 	inc.W $1940                          ;01EFD4|EE4019  |011940;
 	lda.W $1a7f,x                        ;01EFD7|BD7F1A  |011A7F;
@@ -13684,11 +13684,11 @@ Field_CloseShopMenu:
 	lda.W $19d2                          ;01F0BB|ADD219  |0119D2;
 ;      |        |      ;
 Field_ProcessInnStay:
-	jsr.W CODE_01F36A                    ;01F0BE|206AF3  |01F36A;
+	jsr.W Field_ProcessNPCTrigger                    ;01F0BE|206AF3  |01F36A;
 ;      |        |      ;
 Field_RestAtInn:
 	ldy.W $0e89                          ;01F0C1|AC890E  |010E89;
-	jsr.W CODE_01F326                    ;01F0C4|2026F3  |01F326;
+	jsr.W Field_CheckEntityBridge                    ;01F0C4|2026F3  |01F326;
 	bcs Field_WakeFromRest                      ;01F0C7|B02A    |01F0F3;
 	lda.W $1926                          ;01F0C9|AD2619  |011926;
 	beq Field_CompleteInnStay                      ;01F0CC|F020    |01F0EE;
@@ -13704,11 +13704,11 @@ Field_RestorePartyHP:
 	asl a;01F0DD|0A      |      ;
 	tax                                  ;01F0DE|AA      |      ;
 	phx                                  ;01F0DF|DA      |      ;
-	jsr.W CODE_01F326                    ;01F0E0|2026F3  |01F326;
+	jsr.W Field_CheckEntityBridge                    ;01F0E0|2026F3  |01F326;
 	plx                                  ;01F0E3|FA      |      ;
 	bcs Field_WakeFromRest                      ;01F0E4|B00D    |01F0F3;
 	ldy.W $19f1                          ;01F0E6|ACF119  |0119F1;
-	jsr.W CODE_01F326                    ;01F0E9|2026F3  |01F326;
+	jsr.W Field_CheckEntityBridge                    ;01F0E9|2026F3  |01F326;
 	bcs Field_WakeFromRest                      ;01F0EC|B005    |01F0F3;
 ;      |        |      ;
 Field_CompleteInnStay:
@@ -13720,7 +13720,7 @@ Field_WakeFromRest:
 	rts                                  ;01F0F5|60      |      ;
 ;      |        |      ;
 	ldy.W $0e89                          ;01F0F6|AC890E  |010E89;
-	jsr.W CODE_01F326                    ;01F0F9|2026F3  |01F326;
+	jsr.W Field_CheckEntityBridge                    ;01F0F9|2026F3  |01F326;
 	bcs UNREACH_01F119                   ;01F0FC|B01B    |01F119;
 ;      |        |      ;
 Field_ProcessSavePoint:
@@ -13732,7 +13732,7 @@ Field_ProcessSavePoint:
 	jmp.W Field_DispatchState                    ;01F106|4CEAE9  |01E9EA;
 ;      |        |      ;
 	ldy.W $0e89                          ;01F109|AC890E  |010E89;
-	jsr.W CODE_01F326                    ;01F10C|2026F3  |01F326;
+	jsr.W Field_CheckEntityBridge                    ;01F10C|2026F3  |01F326;
 	bcs UNREACH_01F119                   ;01F10F|B008    |01F119;
 ;      |        |      ;
 Field_DisplaySaveMenu:
@@ -13910,33 +13910,33 @@ Field_ValidateCharacterPosition:
 	xba                                  ;01F243|EB      |      ;
 	clc                                  ;01F244|18      |      ;
 	adc.W DATA8_0190d6,x                 ;01F245|7DD690  |0190D6;
-	bpl CODE_01F250                      ;01F248|1006    |01F250;
+	bpl Field_WrapCoordinateX                      ;01F248|1006    |01F250;
 	clc                                  ;01F24A|18      |      ;
 	adc.W $1925                          ;01F24B|6D2519  |011925;
-	bra CODE_01F259                      ;01F24E|8009    |01F259;
+	bra Field_WrapCoordinateY                      ;01F24E|8009    |01F259;
 ;      |        |      ;
 ;      |        |      ;
-CODE_01F250:
+Field_WrapCoordinateX:
 	cmp.W $1925                          ;01F250|CD2519  |011925;
-	bcc CODE_01F259                      ;01F253|9004    |01F259;
+	bcc Field_WrapCoordinateY                      ;01F253|9004    |01F259;
 	sec                                  ;01F255|38      |      ;
 	sbc.W $1925                          ;01F256|ED2519  |011925;
 ;      |        |      ;
-CODE_01F259:
+Field_WrapCoordinateY:
 	xba                                  ;01F259|EB      |      ;
-	bpl CODE_01F262                      ;01F25A|1006    |01F262;
+	bpl Field_ClampCoordinateY                      ;01F25A|1006    |01F262;
 	clc                                  ;01F25C|18      |      ;
 	adc.W $1924                          ;01F25D|6D2419  |011924;
-	bra CODE_01F26B                      ;01F260|8009    |01F26B;
+	bra Field_ComputeTileAddress                      ;01F260|8009    |01F26B;
 ;      |        |      ;
 ;      |        |      ;
-CODE_01F262:
+Field_ClampCoordinateY:
 	cmp.W $1924                          ;01F262|CD2419  |011924;
-	bcc CODE_01F26B                      ;01F265|9004    |01F26B;
+	bcc Field_ComputeTileAddress                      ;01F265|9004    |01F26B;
 	sec                                  ;01F267|38      |      ;
 	sbc.W $1924                          ;01F268|ED2419  |011924;
 ;      |        |      ;
-CODE_01F26B:
+Field_ComputeTileAddress:
 	tay                                  ;01F26B|A8      |      ;
 	xba                                  ;01F26C|EB      |      ;
 	sta.W $4202                          ;01F26D|8D0242  |014202;
@@ -13962,7 +13962,7 @@ CODE_01F26B:
 	rts                                  ;01F297|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
-CODE_01F298:
+Field_CalculateWrappedPosition:
 	rep #$20                             ;01F298|C220    |      ;
 	tya                                  ;01F29A|98      |      ;
 	sep #$20                             ;01F29B|E220    |      ;
@@ -13971,30 +13971,30 @@ CODE_01F298:
 	xba                                  ;01F2A1|EB      |      ;
 	clc                                  ;01F2A2|18      |      ;
 	adc.W DATA8_0190d6,x                 ;01F2A3|7DD690  |0190D6;
-	bpl CODE_01F2AE                      ;01F2A6|1006    |01F2AE;
+	bpl Field_CheckXBoundary                      ;01F2A6|1006    |01F2AE;
 	db $18,$6d,$25,$19,$80,$09           ;01F2A8|        |      ;
 ;      |        |      ;
-CODE_01F2AE:
+Field_CheckXBoundary:
 	cmp.W $1925                          ;01F2AE|CD2519  |011925;
-	bcc CODE_01F2B7                      ;01F2B1|9004    |01F2B7;
+	bcc Field_CheckYBoundary                      ;01F2B1|9004    |01F2B7;
 	db $38,$ed,$25,$19                   ;01F2B3|        |      ;
 ;      |        |      ;
-CODE_01F2B7:
+Field_CheckYBoundary:
 	xba                                  ;01F2B7|EB      |      ;
-	bpl CODE_01F2C0                      ;01F2B8|1006    |01F2C0;
+	bpl Field_ValidateYPosition                      ;01F2B8|1006    |01F2C0;
 	db $18,$6d,$24,$19,$80,$09           ;01F2BA|        |      ;
 ;      |        |      ;
-CODE_01F2C0:
+Field_ValidateYPosition:
 	cmp.W $1924                          ;01F2C0|CD2419  |011924;
-	bcc CODE_01F2C9                      ;01F2C3|9004    |01F2C9;
+	bcc Field_ReturnPosition                      ;01F2C3|9004    |01F2C9;
 	db $38,$ed,$24,$19                   ;01F2C5|        |      ;
 ;      |        |      ;
-CODE_01F2C9:
+Field_ReturnPosition:
 	tay                                  ;01F2C9|A8      |      ;
 	rts                                  ;01F2CA|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
-CODE_01F2CB:
+Field_CheckEntityTrigger:
 	phd                                  ;01F2CB|0B      |      ;
 	pea.W $1a62                          ;01F2CC|F4621A  |011A62;
 	pld                                  ;01F2CF|2B      |      ;
@@ -14005,27 +14005,27 @@ CODE_01F2CB:
 	ldx.W #$0000                         ;01F2D9|A20000  |      ;
 	txa                                  ;01F2DC|8A      |      ;
 ;      |        |      ;
-CODE_01F2DD:
+Field_ScanEntityLoop:
 	xba                                  ;01F2DD|EB      |      ;
 	lda.B $10,x                          ;01F2DE|B510    |001A72;
-	bmi CODE_01F300                      ;01F2E0|301E    |01F300;
+	bmi Field_NextEntitySlot                      ;01F2E0|301E    |01F300;
 	ldy.B $1b,x                          ;01F2E2|B41B    |001A7D;
 	cpy.B $00                            ;01F2E4|C400    |001A62;
-	bne CODE_01F300                      ;01F2E6|D018    |01F300;
+	bne Field_NextEntitySlot                      ;01F2E6|D018    |01F300;
 	lda.B $1d,x                          ;01F2E8|B51D    |001A7F;
 	bit.B #$04                           ;01F2EA|8904    |      ;
-	bne CODE_01F300                      ;01F2EC|D012    |01F300;
+	bne Field_NextEntitySlot                      ;01F2EC|D012    |01F300;
 	lda.B $02                            ;01F2EE|A502    |001A64;
-	beq CODE_01F317                      ;01F2F0|F025    |01F317;
+	beq Field_EntityTriggerFound                      ;01F2F0|F025    |01F317;
 	lda.B $1e,x                          ;01F2F2|B51E    |001A80;
 	and.B #$07                           ;01F2F4|2907    |      ;
-	beq CODE_01F317                      ;01F2F6|F01F    |01F317;
+	beq Field_EntityTriggerFound                      ;01F2F6|F01F    |01F317;
 	cmp.B #$07                           ;01F2F8|C907    |      ;
-	beq CODE_01F317                      ;01F2FA|F01B    |01F317;
+	beq Field_EntityTriggerFound                      ;01F2FA|F01B    |01F317;
 	cmp.B $02                            ;01F2FC|C502    |001A64;
-	beq CODE_01F317                      ;01F2FE|F017    |01F317;
+	beq Field_EntityTriggerFound                      ;01F2FE|F017    |01F317;
 ;      |        |      ;
-CODE_01F300:
+Field_NextEntitySlot:
 	lda.B #$1a                           ;01F300|A91A    |      ;
 	sta.W $211b                          ;01F302|8D1B21  |01211B;
 	stz.W $211b                          ;01F305|9C1B21  |01211B;
@@ -14034,13 +14034,13 @@ CODE_01F300:
 	sta.W $211c                          ;01F30A|8D1C21  |01211C;
 	ldx.W $2134                          ;01F30D|AE3421  |012134;
 	cmp.B #$16                           ;01F310|C916    |      ;
-	bne CODE_01F2DD                      ;01F312|D0C9    |01F2DD;
+	bne Field_ScanEntityLoop                      ;01F312|D0C9    |01F2DD;
 	pld                                  ;01F314|2B      |      ;
 	clc                                  ;01F315|18      |      ;
 	rts                                  ;01F316|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
-CODE_01F317:
+Field_EntityTriggerFound:
 	lda.B $1f,x                          ;01F317|B51F    |001A81;
 	sta.W $19e6                          ;01F319|8DE619  |0119E6;
 	stx.W $19e8                          ;01F31C|8EE819  |0119E8;
@@ -14051,7 +14051,7 @@ CODE_01F317:
 	rts                                  ;01F325|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
-CODE_01F326:
+Field_CheckEntityBridge:
 	phd                                  ;01F326|0B      |      ;
 	pea.W $1a62                          ;01F327|F4621A  |011A62;
 	pld                                  ;01F32A|2B      |      ;
@@ -14059,19 +14059,19 @@ CODE_01F326:
 	ldx.W #$0000                         ;01F32D|A20000  |      ;
 	txa                                  ;01F330|8A      |      ;
 ;      |        |      ;
-CODE_01F331:
+Field_ScanBridgeLoop:
 	xba                                  ;01F331|EB      |      ;
 	lda.B $10,x                          ;01F332|B510    |001A72;
-	bmi CODE_01F344                      ;01F334|300E    |01F344;
+	bmi Field_NextBridgeSlot                      ;01F334|300E    |01F344;
 	ldy.B $1b,x                          ;01F336|B41B    |001A7D;
 	cpy.B $00                            ;01F338|C400    |001A62;
-	bne CODE_01F344                      ;01F33A|D008    |01F344;
+	bne Field_NextBridgeSlot                      ;01F33A|D008    |01F344;
 	lda.B $1d,x                          ;01F33C|B51D    |001A7F;
 	and.B #$18                           ;01F33E|2918    |      ;
 	cmp.B #$18                           ;01F340|C918    |      ;
-	beq CODE_01F35B                      ;01F342|F017    |01F35B;
+	beq Field_BridgeTriggerFound                      ;01F342|F017    |01F35B;
 ;      |        |      ;
-CODE_01F344:
+Field_NextBridgeSlot:
 	lda.B #$1a                           ;01F344|A91A    |      ;
 	sta.W $211b                          ;01F346|8D1B21  |01211B;
 	stz.W $211b                          ;01F349|9C1B21  |01211B;
@@ -14080,13 +14080,13 @@ CODE_01F344:
 	sta.W $211c                          ;01F34E|8D1C21  |01211C;
 	ldx.W $2134                          ;01F351|AE3421  |012134;
 	cmp.B #$16                           ;01F354|C916    |      ;
-	bne CODE_01F331                      ;01F356|D0D9    |01F331;
+	bne Field_ScanBridgeLoop                      ;01F356|D0D9    |01F331;
 	pld                                  ;01F358|2B      |      ;
 	clc                                  ;01F359|18      |      ;
 	rts                                  ;01F35A|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
-CODE_01F35B:
+Field_BridgeTriggerFound:
 	lda.B $1f,x                          ;01F35B|B51F    |001A81;
 	sta.W $19e6                          ;01F35D|8DE619  |0119E6;
 	stx.W $19e8                          ;01F360|8EE819  |0119E8;
@@ -14097,19 +14097,19 @@ CODE_01F35B:
 	rts                                  ;01F369|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
-CODE_01F36A:
+Field_ProcessNPCTrigger:
 	bit.B #$80                           ;01F36A|8980    |      ;
-	beq CODE_01F3B5                      ;01F36C|F047    |01F3B5;
+	beq Field_ReturnNPCResult                      ;01F36C|F047    |01F3B5;
 	bit.B #$60                           ;01F36E|8960    |      ;
-	bne CODE_01F3B5                      ;01F370|D043    |01F3B5;
+	bne Field_ReturnNPCResult                      ;01F370|D043    |01F3B5;
 	inc.W $19b0                          ;01F372|EEB019  |0119B0;
 	stz.W $19ee                          ;01F375|9CEE19  |0119EE;
 	and.B #$1f                           ;01F378|291F    |      ;
 	sta.W $19ef                          ;01F37A|8DEF19  |0119EF;
 	cmp.B #$03                           ;01F37D|C903    |      ;
-	beq CODE_01F3B5                      ;01F37F|F034    |01F3B5;
+	beq Field_ReturnNPCResult                      ;01F37F|F034    |01F3B5;
 	cmp.B #$16                           ;01F381|C916    |      ;
-	bcs CODE_01F3B6                      ;01F383|B031    |01F3B6;
+	bcs Field_InvalidNPCTrigger                      ;01F383|B031    |01F3B6;
 	sty.W $192b                          ;01F385|8C2B19  |01192B;
 	phb                                  ;01F388|8B      |      ;
 	lda.B #$05                           ;01F389|A905    |      ;
@@ -14124,30 +14124,30 @@ CODE_01F36A:
 	tax                                  ;01F39B|AA      |      ;
 	sep #$20                             ;01F39C|E220    |      ;
 ;      |        |      ;
-CODE_01F39E:
+Field_ScanNPCDataLoop:
 	ldy.W DATA8_05f9f8,x                 ;01F39E|BCF8F9  |05F9F8;
 	cpy.W $192b                          ;01F3A1|CC2B19  |05192B;
-	bne CODE_01F3AE                      ;01F3A4|D008    |01F3AE;
+	bne Field_NextNPCEntry                      ;01F3A4|D008    |01F3AE;
 	lda.W UNREACH_05F9FA,x               ;01F3A6|BDFAF9  |05F9FA;
 	sta.W $19ee                          ;01F3A9|8DEE19  |0519EE;
-	bra CODE_01F3B4                      ;01F3AC|8006    |01F3B4;
+	bra Field_CompleteNPCScan                      ;01F3AC|8006    |01F3B4;
 ;      |        |      ;
 ;      |        |      ;
-CODE_01F3AE:
+Field_NextNPCEntry:
 	inx                                  ;01F3AE|E8      |      ;
 	inx                                  ;01F3AF|E8      |      ;
 	inx                                  ;01F3B0|E8      |      ;
 	tya                                  ;01F3B1|98      |      ;
-	bpl CODE_01F39E                      ;01F3B2|10EA    |01F39E;
+	bpl Field_ScanNPCDataLoop                      ;01F3B2|10EA    |01F39E;
 ;      |        |      ;
-CODE_01F3B4:
+Field_CompleteNPCScan:
 	plb                                  ;01F3B4|AB      |      ;
 ;      |        |      ;
-CODE_01F3B5:
+Field_ReturnNPCResult:
 	rts                                  ;01F3B5|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
-CODE_01F3B6:
+Field_InvalidNPCTrigger:
 	rts                                  ;01F3B6|60      |      ;
 ;      |        |      ;
 	db $ad,$89,$0e,$dd,$49,$f4,$f0,$0a,$ad,$8a,$0e,$dd,$4a,$f4,$f0,$02;01F3B7|        |000E89;
@@ -14211,7 +14211,7 @@ DATA8_01f453:
 	sta.W $0505                          ;01F461|8D0505  |010505;
 	jsl.L CODE_00D080                    ;01F464|2280D000|00D080;
 ;      |        |      ;
-CODE_01F468:
+Field_InitializeMapMode:
 	lda.B #$02                           ;01F468|A902    |      ;
 	sta.W $0e8b                          ;01F46A|8D8B0E  |010E8B;
 	jsr.W MapEvent_InitializeSprite                    ;01F46D|20CD94  |0194CD;
@@ -14227,22 +14227,22 @@ CODE_01F468:
 	stz.W $1929                          ;01F486|9C2919  |011929;
 	lda.B #$01                           ;01F489|A901    |      ;
 	sta.W $1928                          ;01F48B|8D2819  |011928;
-	jsr.W CODE_01F52F                    ;01F48E|202FF5  |01F52F;
+	jsr.W Field_ProcessMapScript                    ;01F48E|202FF5  |01F52F;
 	lda.W $1a5a                          ;01F491|AD5A1A  |011A5A;
 	sta.W $0e88                          ;01F494|8D880E  |010E88;
 	cmp.B #$0c                           ;01F497|C90C    |      ;
-	bcc CODE_01F4CB                      ;01F499|9030    |01F4CB;
+	bcc Field_MapInitLoop                      ;01F499|9030    |01F4CB;
 	cmp.B #$12                           ;01F49B|C912    |      ;
-	bcc CODE_01F4A7                      ;01F49D|9008    |01F4A7;
+	bcc Field_CheckSpecialMap                      ;01F49D|9008    |01F4A7;
 	cmp.B #$26                           ;01F49F|C926    |      ;
-	bcc CODE_01F4CB                      ;01F4A1|9028    |01F4CB;
+	bcc Field_MapInitLoop                      ;01F4A1|9028    |01F4CB;
 	cmp.B #$2b                           ;01F4A3|C92B    |      ;
-	bcs CODE_01F4CB                      ;01F4A5|B024    |01F4CB;
+	bcs Field_MapInitLoop                      ;01F4A5|B024    |01F4CB;
 ;      |        |      ;
-CODE_01F4A7:
+Field_CheckSpecialMap:
 	lda.B #$03                           ;01F4A7|A903    |      ;
 	jsl.L CODE_009776                    ;01F4A9|22769700|009776;
-	bne CODE_01F4CB                      ;01F4AD|D01C    |01F4CB;
+	bne Field_MapInitLoop                      ;01F4AD|D01C    |01F4CB;
 	lda.B #$02                           ;01F4AF|A902    |      ;
 	sta.W $0e8b                          ;01F4B1|8D8B0E  |010E8B;
 	jsr.W MapEvent_InitializeSprite                    ;01F4B4|20CD94  |0194CD;
@@ -14253,25 +14253,25 @@ CODE_01F4A7:
 	stx.W $19ee                          ;01F4C4|8EEE19  |0119EE;
 	jsl.L DMA_QueueTransfer                    ;01F4C7|224CB201|01B24C;
 ;      |        |      ;
-CODE_01F4CB:
-	bra CODE_01F468                      ;01F4CB|809B    |01F468;
+Field_MapInitLoop:
+	bra Field_InitializeMapMode                      ;01F4CB|809B    |01F468;
 ;      |        |      ;
 	db $a9,$ff,$4d,$5b,$1a,$8d,$5b,$1a,$d0,$11,$20,$04,$f5,$20,$f9,$f4;01F4CD|        |      ;
 	db $a9,$80,$1c,$b4,$19,$20,$f6,$f4,$4c,$68,$f4,$20,$f9,$f4,$ae,$89;01F4DD|        |      ;
 	db $0e,$8e,$f3,$19,$a9,$80,$0c,$b4,$19,$4c,$cd,$94,$20,$d9,$82,$ad;01F4ED|        |00F38E;
 	db $93,$00,$89,$20,$d0,$f6           ;01F4FD|        |000000;
 ;      |        |      ;
-CODE_01F503:
+Field_ReturnMapInit:
 	rts                                  ;01F503|60      |      ;
 ;      |        |      ;
 	db $a9,$08,$8d,$28,$19,$ad,$89,$0e,$cd,$f3,$19,$f0,$0b,$a9,$03,$b0;01F504|        |      ;
 	db $02,$a9,$01,$20,$5a,$f5,$80,$ed,$ad,$8a,$0e,$cd,$f4,$19,$f0,$df;01F514|        |      ;
 	db $a9,$00,$b0,$02,$a9,$02,$20,$5a,$f5,$80,$ed;01F524|        |      ;
 ;      |        |      ;
-CODE_01F52F:
+Field_ProcessMapScript:
 	ldx.W $1a5d                          ;01F52F|AE5D1A  |011A5D;
 	lda.L $070000,x                      ;01F532|BF000007|070000;
-	bpl CODE_01F503                      ;01F536|10CB    |01F503;
+	bpl Field_ReturnMapInit                      ;01F536|10CB    |01F503;
 	inx                                  ;01F538|E8      |      ;
 	stx.W $1a5d                          ;01F539|8E5D1A  |011A5D;
 	pha                                  ;01F53C|48      |      ;
@@ -14287,39 +14287,39 @@ CODE_01F52F:
 	sta.W $0e8b                          ;01F54A|8D8B0E  |010E8B;
 	sta.W $19d7                          ;01F54D|8DD719  |0119D7;
 ;      |        |      ;
-CODE_01F550:
-	jsr.W CODE_01F55D                    ;01F550|205DF5  |01F55D;
+Field_ExecuteScriptLoop:
+	jsr.W Field_ProcessScriptCommand                    ;01F550|205DF5  |01F55D;
 	dec.W $1a5f                          ;01F553|CE5F1A  |011A5F;
-	bne CODE_01F550                      ;01F556|D0F8    |01F550;
-	bra CODE_01F52F                      ;01F558|80D5    |01F52F;
+	bne Field_ExecuteScriptLoop                      ;01F556|D0F8    |01F550;
+	bra Field_ProcessMapScript                      ;01F558|80D5    |01F52F;
 ;      |        |      ;
 	db $8d,$d7,$19                       ;01F55A|        |0019D7;
 ;      |        |      ;
-CODE_01F55D:
+Field_ProcessScriptCommand:
 	ldx.W #$0000                         ;01F55D|A20000  |      ;
 	lda.W $19cb                          ;01F560|ADCB19  |0119CB;
 	and.B #$07                           ;01F563|2907    |      ;
 	dec a;01F565|3A      |      ;
-	bne CODE_01F56B                      ;01F566|D003    |01F56B;
+	bne Field_ApplyCommandDirection                      ;01F566|D003    |01F56B;
 	db $a9,$ff,$ca                       ;01F568|        |      ;
 ;      |        |      ;
-CODE_01F56B:
+Field_ApplyCommandDirection:
 	txa                                  ;01F56B|8A      |      ;
 	sta.W $0e8d                          ;01F56C|8D8D0E  |010E8D;
 	jsr.W Field_CalculateCharacterPosition                    ;01F56F|2012F2  |01F212;
 	ldx.W $19cf                          ;01F572|AECF19  |0119CF;
 	txa                                  ;01F575|8A      |      ;
 	and.B #$08                           ;01F576|2908    |      ;
-	bne CODE_01F57D                      ;01F578|D003    |01F57D;
+	bne Field_ExecuteMovement                      ;01F578|D003    |01F57D;
 	stz.W $0e8d                          ;01F57A|9C8D0E  |010E8D;
 ;      |        |      ;
-CODE_01F57D:
+Field_ExecuteMovement:
 	lda.W $0e8d                          ;01F57D|AD8D0E  |010E8D;
-	bne CODE_01F586                      ;01F580|D004    |01F586;
+	bne Field_UpdateMovementState                      ;01F580|D004    |01F586;
 	txa                                  ;01F582|8A      |      ;
 	jsr.W Field_MovementCalculate                    ;01F583|206088  |018860;
 ;      |        |      ;
-CODE_01F586:
+Field_UpdateMovementState:
 	lda.W $19d5                          ;01F586|ADD519  |0119D5;
 	sta.W $19d3                          ;01F589|8DD319  |0119D3;
 	ldx.W $19cf                          ;01F58C|AECF19  |0119CF;
@@ -14352,7 +14352,7 @@ CODE_01F586:
 	stz.W $19f0                          ;01F695|9CF019  |0119F0;
 	jsr.W Field_LoadMap                    ;01F698|204D91  |01914D;
 	jsr.W Field_CameraScroll                    ;01F69B|20768B  |018B76;
-	jsr.W CODE_01F6B5                    ;01F69E|20B5F6  |01F6B5;
+	jsr.W Field_BeginTransition                    ;01F69E|20B5F6  |01F6B5;
 	lda.B #$80                           ;01F6A1|A980    |      ;
 	trb.W $19b4                          ;01F6A3|1CB419  |0119B4;
 	plx                                  ;01F6A6|FA      |      ;
@@ -14364,13 +14364,13 @@ CODE_01F586:
 	rts                                  ;01F6B4|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
-CODE_01F6B5:
+Field_BeginTransition:
 	lda.B #$36                           ;01F6B5|A936    |      ;
 	jsl.L CODE_00976B                    ;01F6B7|226B9700|00976B;
 	ldy.W #$0038                         ;01F6BB|A03800  |      ;
 	ldx.W #$0000                         ;01F6BE|A20000  |      ;
 ;      |        |      ;
-CODE_01F6C1:
+Field_TransitionScrollLoop:
 	inc.W $0d01                          ;01F6C1|EE010D  |010D01;
 	inc.W $0d05                          ;01F6C4|EE050D  |010D05;
 	inc.W $0d09                          ;01F6C7|EE090D  |010D09;
@@ -14388,7 +14388,7 @@ CODE_01F6C1:
 	phy                                  ;01F6EB|5A      |      ;
 	jsr.W Field_ScrollRight                    ;01F6EC|208FD9  |01D98F;
 	lda.B #$02                           ;01F6EF|A902    |      ;
-	jsr.W CODE_01F7A5                    ;01F6F1|20A5F7  |01F7A5;
+	jsr.W Field_DelayFrames                    ;01F6F1|20A5F7  |01F7A5;
 	ply                                  ;01F6F4|7A      |      ;
 	tya                                  ;01F6F5|98      |      ;
 	rep #$20                             ;01F6F6|C220    |      ;
@@ -14397,8 +14397,8 @@ CODE_01F6C1:
 	tax                                  ;01F6FC|AA      |      ;
 	sep #$20                             ;01F6FD|E220    |      ;
 	dey                                  ;01F6FF|88      |      ;
-	bne CODE_01F6C1                      ;01F700|D0BF    |01F6C1;
-	jsr.W CODE_01F7C4                    ;01F702|20C4F7  |01F7C4;
+	bne Field_TransitionScrollLoop                      ;01F700|D0BF    |01F6C1;
+	jsr.W Field_WaitMultipleFrames                    ;01F702|20C4F7  |01F7C4;
 	rts                                  ;01F705|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
@@ -14418,7 +14418,7 @@ DATA8_01f707:
 	db $29,$01,$00,$0a,$aa,$e2,$20,$20,$a3,$f7,$88,$d0,$b0,$20,$c4,$f7;01F78A|        |      ;
 	db $60,$e0,$61,$ce,$61,$ce,$21,$e0,$21,$a9,$04;01F79A|        |      ;
 ;      |        |      ;
-CODE_01F7A5:
+Field_DelayFrames:
 	pha                                  ;01F7A5|48      |      ;
 	rep #$20                             ;01F7A6|C220    |      ;
 	lda.W $1902                          ;01F7A8|AD0219  |011902;
@@ -14433,17 +14433,17 @@ CODE_01F7A5:
 	jsr.W Field_WaitForVBlank                    ;01F7BC|20D082  |0182D0;
 	pla                                  ;01F7BF|68      |      ;
 	dec a;01F7C0|3A      |      ;
-	bne CODE_01F7A5                      ;01F7C1|D0E2    |01F7A5;
+	bne Field_DelayFrames                      ;01F7C1|D0E2    |01F7A5;
 	rts                                  ;01F7C3|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
-CODE_01F7C4:
+Field_WaitMultipleFrames:
 	ldy.W #$0030                         ;01F7C4|A03000  |      ;
 ;      |        |      ;
-CODE_01F7C7:
+Field_WaitFrameLoop:
 	jsr.W Field_WaitForVBlank                    ;01F7C7|20D082  |0182D0;
 	dey                                  ;01F7CA|88      |      ;
-	bne CODE_01F7C7                      ;01F7CB|D0FA    |01F7C7;
+	bne Field_WaitFrameLoop                      ;01F7CB|D0FA    |01F7C7;
 	rts                                  ;01F7CD|60      |      ;
 ;      |        |      ;
 	sep #$20                             ;01F7CE|E220    |      ;
@@ -14459,8 +14459,8 @@ CODE_01F7C7:
 	jsr.W Field_LoadMap                    ;01F7E5|204D91  |01914D;
 	jsr.W Field_CameraScroll                    ;01F7E8|20768B  |018B76;
 	jsr.W Field_WaitForVBlank                    ;01F7EB|20D082  |0182D0;
-	jsr.W CODE_01F80E                    ;01F7EE|200EF8  |01F80E;
-	jsr.W CODE_01F7C4                    ;01F7F1|20C4F7  |01F7C4;
+	jsr.W Field_SetupTransitionGraphics                    ;01F7EE|200EF8  |01F80E;
+	jsr.W Field_WaitMultipleFrames                    ;01F7F1|20C4F7  |01F7C4;
 	lda.B #$80                           ;01F7F4|A980    |      ;
 	trb.W $19b4                          ;01F7F6|1CB419  |0119B4;
 	lda.B #$03                           ;01F7F9|A903    |      ;
@@ -14474,7 +14474,7 @@ CODE_01F7C7:
 	rts                                  ;01F80D|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
-CODE_01F80E:
+Field_SetupTransitionGraphics:
 	rep #$20                             ;01F80E|C220    |      ;
 	ldx.W #$ee65                         ;01F810|A265EE  |      ;
 	ldy.W #$0c80                         ;01F813|A0800C  |      ;
@@ -14487,25 +14487,25 @@ CODE_01F80E:
 	tax                                  ;01F825|AA      |      ;
 	tay                                  ;01F826|A8      |      ;
 ;      |        |      ;
-CODE_01F827:
+Field_ProcessPaletteLoop:
 	phy                                  ;01F827|5A      |      ;
 	lda.B #$00                           ;01F828|A900    |      ;
 	xba                                  ;01F82A|EB      |      ;
 	tya                                  ;01F82B|98      |      ;
 	and.B #$03                           ;01F82C|2903    |      ;
-	bne CODE_01F831                      ;01F82E|D001    |01F831;
+	bne Field_ApplyPaletteEffect                      ;01F82E|D001    |01F831;
 	inx                                  ;01F830|E8      |      ;
 ;      |        |      ;
-CODE_01F831:
+Field_ApplyPaletteEffect:
 	tay                                  ;01F831|A8      |      ;
 	lda.W DATA8_01f846,y                 ;01F832|B946F8  |01F846;
 	sta.W $0e07,x                        ;01F835|9D070E  |010E07;
 	ldy.W #$0020                         ;01F838|A02000  |      ;
-	jsr.W CODE_01F7C7                    ;01F83B|20C7F7  |01F7C7;
+	jsr.W Field_WaitFrameLoop                    ;01F83B|20C7F7  |01F7C7;
 	ply                                  ;01F83E|7A      |      ;
 	iny                                  ;01F83F|C8      |      ;
 	cpy.W #$0009                         ;01F840|C00900  |      ;
-	bne CODE_01F827                      ;01F843|D0E2    |01F827;
+	bne Field_ProcessPaletteLoop                      ;01F843|D0E2    |01F827;
 	rts                                  ;01F845|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
@@ -14520,10 +14520,10 @@ DATA8_01f846:
 	stx.W $1906                          ;01F85B|8E0619  |011906;
 	lda.B #$07                           ;01F85E|A907    |      ;
 	sta.W $1a4c                          ;01F860|8D4C1A  |011A4C;
-	jsr.W CODE_01F8A6                    ;01F863|20A6F8  |01F8A6;
+	jsr.W Field_ClearSpriteBuffer                    ;01F863|20A6F8  |01F8A6;
 	ldx.W #$0000                         ;01F866|A20000  |      ;
 ;      |        |      ;
-CODE_01F869:
+Field_InitializeLayerLoop:
 	phx                                  ;01F869|DA      |      ;
 	rep #$20                             ;01F86A|C220    |      ;
 	lda.W DATA8_01f892,x                 ;01F86C|BD92F8  |01F892;
@@ -14532,12 +14532,12 @@ CODE_01F869:
 	adc.W #$0400                         ;01F873|690004  |      ;
 	sta.W $1a16                          ;01F876|8D161A  |011A16;
 	sep #$20                             ;01F879|E220    |      ;
-	jsr.W CODE_01F8DB                    ;01F87B|20DBF8  |01F8DB;
+	jsr.W Field_ProcessLayerScroll                    ;01F87B|20DBF8  |01F8DB;
 	plx                                  ;01F87E|FA      |      ;
 	inx                                  ;01F87F|E8      |      ;
 	inx                                  ;01F880|E8      |      ;
 	cpx.W #$0014                         ;01F881|E01400  |      ;
-	bne CODE_01F869                      ;01F884|D0E3    |01F869;
+	bne Field_InitializeLayerLoop                      ;01F884|D0E3    |01F869;
 	stz.W $1a4c                          ;01F886|9C4C1A  |011A4C;
 	lda.B #$15                           ;01F889|A915    |      ;
 	sta.W $1a4e                          ;01F88B|8D4E1A  |011A4E;
@@ -14549,17 +14549,17 @@ DATA8_01f892:
 	db $00,$48,$c0,$4b,$80,$4b,$40,$4b,$00,$4b,$c0,$4a,$80,$4a,$40,$4a;01F892|        |      ;
 	db $00,$4a,$c0,$49                   ;01F8A2|        |      ;
 ;      |        |      ;
-CODE_01F8A6:
+Field_ClearSpriteBuffer:
 	ldx.W #$0000                         ;01F8A6|A20000  |      ;
 	rep #$20                             ;01F8A9|C220    |      ;
 	lda.W #$00fb                         ;01F8AB|A9FB00  |      ;
 ;      |        |      ;
-CODE_01F8AE:
+Field_ClearBufferLoop:
 	sta.W $0900,x                        ;01F8AE|9D0009  |010900;
 	inx                                  ;01F8B1|E8      |      ;
 	inx                                  ;01F8B2|E8      |      ;
 	cpx.W #$0080                         ;01F8B3|E08000  |      ;
-	bne CODE_01F8AE                      ;01F8B6|D0F6    |01F8AE;
+	bne Field_ClearBufferLoop                      ;01F8B6|D0F6    |01F8AE;
 	sep #$20                             ;01F8B8|E220    |      ;
 	lda.B #$80                           ;01F8BA|A980    |      ;
 	sta.W $1a13                          ;01F8BC|8D131A  |011A13;
@@ -14575,14 +14575,14 @@ CODE_01F8AE:
 	rts                                  ;01F8DA|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
-CODE_01F8DB:
+Field_ProcessLayerScroll:
 	lda.B #$08                           ;01F8DB|A908    |      ;
 	sta.W $1a46                          ;01F8DD|8D461A  |011A46;
 	jsr.W Field_WaitForVBlank                    ;01F8E0|20D082  |0182D0;
 	ldx.W #$0004                         ;01F8E3|A20400  |      ;
 	inc.W $1904                          ;01F8E6|EE0419  |011904;
 ;      |        |      ;
-CODE_01F8E9:
+Field_ScrollStepLoop:
 	phx                                  ;01F8E9|DA      |      ;
 	rep #$20                             ;01F8EA|C220    |      ;
 	dec.W $1906                          ;01F8EC|CE0619  |011906;
@@ -14596,7 +14596,7 @@ CODE_01F8E9:
 	jsr.W Field_WaitForVBlank                    ;01F904|20D082  |0182D0;
 	ldx.W #$0008                         ;01F907|A20800  |      ;
 ;      |        |      ;
-CODE_01F90A:
+Field_ScrollAnimLoop:
 	phx                                  ;01F90A|DA      |      ;
 	rep #$20                             ;01F90B|C220    |      ;
 	dec.W $1900                          ;01F90D|CE0019  |011900;
@@ -14612,10 +14612,10 @@ CODE_01F90A:
 	sep #$20                             ;01F92B|E220    |      ;
 	plx                                  ;01F92D|FA      |      ;
 	dex                                  ;01F92E|CA      |      ;
-	bne CODE_01F90A                      ;01F92F|D0D9    |01F90A;
+	bne Field_ScrollAnimLoop                      ;01F92F|D0D9    |01F90A;
 	plx                                  ;01F931|FA      |      ;
 	dex                                  ;01F932|CA      |      ;
-	bne CODE_01F8E9                      ;01F933|D0B4    |01F8E9;
+	bne Field_ScrollStepLoop                      ;01F933|D0B4    |01F8E9;
 	rts                                  ;01F935|60      |      ;
 ;      |        |      ;
 	db $e2,$20,$20,$d0,$82,$a9,$08,$8d,$4c,$1a,$a2,$01,$00,$8e,$0c,$19;01F936|        |      ;
@@ -14624,17 +14624,17 @@ CODE_01F90A:
 	db $c4,$f7,$fa,$ca,$d0,$eb,$a9,$02,$8d,$4c,$1a,$a2,$00,$00,$8e,$0c;01F966|        |0000F7;
 	db $19,$60                           ;01F976|        |000860;
 ;      |        |      ;
-CODE_01F978:
+Field_RenderWorldMap:
 	php                                  ;01F978|08      |      ;
 	sep #$20                             ;01F979|E220    |      ;
 	ldx.W #$0000                         ;01F97B|A20000  |      ;
 	ldy.W $192d                          ;01F97E|AC2D19  |01192D;
-	jsr.W CODE_01F9A0                    ;01F981|20A0F9  |01F9A0;
+	jsr.W Field_ProcessWorldTiles                    ;01F981|20A0F9  |01F9A0;
 	plp                                  ;01F984|28      |      ;
 	rts                                  ;01F985|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
-CODE_01F986:
+Field_CalculateWorldCoords:
 	lda.W $19d7                          ;01F986|ADD719  |0119D7;
 	asl a;01F989|0A      |      ;
 	rep #$20                             ;01F98A|C220    |      ;
@@ -14650,8 +14650,8 @@ CODE_01F986:
 	xba                                  ;01F99E|EB      |      ;
 	tay                                  ;01F99F|A8      |      ;
 ;      |        |      ;
-CODE_01F9A0:
-	jsr.W CODE_01FD51                    ;01F9A0|2051FD  |01FD51;
+Field_ProcessWorldTiles:
+	jsr.W Field_NormalizeCoordinates                    ;01F9A0|2051FD  |01FD51;
 	sty.W $1a31                          ;01F9A3|8C311A  |011A31;
 	sty.W $1a2d                          ;01F9A6|8C2D1A  |011A2D;
 	ldy.W #$0000                         ;01F9A9|A00000  |      ;
@@ -14670,7 +14670,7 @@ CODE_01F9A0:
 	plx                                  ;01F9C5|FA      |      ;
 	lda.W $1a4c                          ;01F9C6|AD4C1A  |011A4C;
 	dec a;01F9C9|3A      |      ;
-	bne CODE_01F9FB                      ;01F9CA|D02F    |01F9FB;
+	bne Field_ReturnWorldRender                      ;01F9CA|D02F    |01F9FB;
 	lda.W $1a2d                          ;01F9CC|AD2D1A  |011A2D;
 	clc                                  ;01F9CF|18      |      ;
 	adc.W $1a56                          ;01F9D0|6D561A  |011A56;
@@ -14680,7 +14680,7 @@ CODE_01F9A0:
 	adc.W $1a57                          ;01F9DA|6D571A  |011A57;
 	sta.W $1a32                          ;01F9DD|8D321A  |011A32;
 	ldy.W $1a31                          ;01F9E0|AC311A  |011A31;
-	jsr.W CODE_01FD51                    ;01F9E3|2051FD  |01FD51;
+	jsr.W Field_NormalizeCoordinates                    ;01F9E3|2051FD  |01FD51;
 	sty.W $1a31                          ;01F9E6|8C311A  |011A31;
 	ldy.W $1a4a                          ;01F9E9|AC4A1A  |011A4A;
 	sty.W $1a2f                          ;01F9EC|8C2F1A  |011A2F;
@@ -14689,7 +14689,7 @@ CODE_01F9A0:
 	sta.W $1a34                          ;01F9F5|8D341A  |011A34;
 	jsr.W (DATA8_01fa04,x)               ;01F9F8|FC04FA  |01FA04;
 ;      |        |      ;
-CODE_01F9FB:
+Field_ReturnWorldRender:
 	rts                                  ;01F9FB|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
@@ -14700,11 +14700,11 @@ DATA8_01fa04:
 	db $4a,$fb,$f0,$fb,$4a,$fb,$f0,$fb   ;01FA04|        |      ;
 	ldy.W #$0000                         ;01FA0C|A00000  |      ;
 ;      |        |      ;
-CODE_01FA0F:
+Field_RenderHorizontalMap:
 	phy                                  ;01FA0F|5A      |      ;
 	ldy.W $1a31                          ;01FA10|AC311A  |011A31;
 	lda.W $1a33                          ;01FA13|AD331A  |011A33;
-	jsr.W CODE_01FC8F                    ;01FA16|208FFC  |01FC8F;
+	jsr.W Field_CalculateTileGraphics                    ;01FA16|208FFC  |01FC8F;
 	ply                                  ;01FA19|7A      |      ;
 	rep #$20                             ;01FA1A|C220    |      ;
 	lda.W $1a3d                          ;01FA1C|AD3D1A  |011A3D;
@@ -14723,14 +14723,14 @@ CODE_01FA0F:
 	lda.W $1a31                          ;01FA3A|AD311A  |011A31;
 	inc a;01FA3D|1A      |      ;
 	cmp.W $1924                          ;01FA3E|CD2419  |011924;
-	bcc CODE_01FA47                      ;01FA41|9004    |01FA47;
+	bcc Field_WrapHorizontalCoord                      ;01FA41|9004    |01FA47;
 	sec                                  ;01FA43|38      |      ;
 	sbc.W $1924                          ;01FA44|ED2419  |011924;
 ;      |        |      ;
-CODE_01FA47:
+Field_WrapHorizontalCoord:
 	sta.W $1a31                          ;01FA47|8D311A  |011A31;
 	cpy.W #$0044                         ;01FA4A|C04400  |      ;
-	bne CODE_01FA0F                      ;01FA4D|D0C0    |01FA0F;
+	bne Field_RenderHorizontalMap                      ;01FA4D|D0C0    |01FA0F;
 	lda.B #$80                           ;01FA4F|A980    |      ;
 	sta.W $19fa                          ;01FA51|8DFA19  |0119FA;
 	rep #$20                             ;01FA54|C220    |      ;
@@ -14757,7 +14757,7 @@ CODE_01FA47:
 	clc                                  ;01FA88|18      |      ;
 	adc.W $1a0d                          ;01FA89|6D0D1A  |011A0D;
 	sta.W $1a09                          ;01FA8C|8D091A  |011A09;
-	jsr.W CODE_01FD25                    ;01FA8F|2025FD  |01FD25;
+	jsr.W Field_CalculateVRAMAddress                    ;01FA8F|2025FD  |01FD25;
 	sta.W $19fb                          ;01FA92|8DFB19  |0119FB;
 	clc                                  ;01FA95|18      |      ;
 	adc.W #$0020                         ;01FA96|692000  |      ;
@@ -14773,11 +14773,11 @@ CODE_01FA47:
 ;      |        |      ;
 	ldy.W #$0000                         ;01FAAF|A00000  |      ;
 ;      |        |      ;
-CODE_01FAB2:
+Field_RenderVerticalMap:
 	phy                                  ;01FAB2|5A      |      ;
 	ldy.W $1a31                          ;01FAB3|AC311A  |011A31;
 	lda.W $1a33                          ;01FAB6|AD331A  |011A33;
-	jsr.W CODE_01FC8F                    ;01FAB9|208FFC  |01FC8F;
+	jsr.W Field_CalculateTileGraphics                    ;01FAB9|208FFC  |01FC8F;
 	ply                                  ;01FABC|7A      |      ;
 	rep #$20                             ;01FABD|C220    |      ;
 	lda.W $1a3d                          ;01FABF|AD3D1A  |011A3D;
@@ -14796,14 +14796,14 @@ CODE_01FAB2:
 	lda.W $1a32                          ;01FADD|AD321A  |011A32;
 	inc a;01FAE0|1A      |      ;
 	cmp.W $1925                          ;01FAE1|CD2519  |011925;
-	bcc CODE_01FAEA                      ;01FAE4|9004    |01FAEA;
+	bcc Field_WrapVerticalCoord                      ;01FAE4|9004    |01FAEA;
 	sec                                  ;01FAE6|38      |      ;
 	sbc.W $1925                          ;01FAE7|ED2519  |011925;
 ;      |        |      ;
-CODE_01FAEA:
+Field_WrapVerticalCoord:
 	sta.W $1a32                          ;01FAEA|8D321A  |011A32;
 	cpy.W #$0040                         ;01FAED|C04000  |      ;
-	bne CODE_01FAB2                      ;01FAF0|D0C0    |01FAB2;
+	bne Field_RenderVerticalMap                      ;01FAF0|D0C0    |01FAB2;
 	lda.B #$81                           ;01FAF2|A981    |      ;
 	sta.W $19fa                          ;01FAF4|8DFA19  |0119FA;
 	rep #$20                             ;01FAF7|C220    |      ;
@@ -14830,7 +14830,7 @@ CODE_01FAEA:
 	clc                                  ;01FB2B|18      |      ;
 	adc.W $1a0d                          ;01FB2C|6D0D1A  |011A0D;
 	sta.W $1a09                          ;01FB2F|8D091A  |011A09;
-	jsr.W CODE_01FD25                    ;01FB32|2025FD  |01FD25;
+	jsr.W Field_CalculateVRAMAddress                    ;01FB32|2025FD  |01FD25;
 	sta.W $19fb                          ;01FB35|8DFB19  |0119FB;
 	inc a;01FB38|1A      |      ;
 	sta.W $19fd                          ;01FB39|8DFD19  |0119FD;
@@ -14844,11 +14844,11 @@ CODE_01FAEA:
 ;      |        |      ;
 	ldy.W #$0000                         ;01FB4A|A00000  |      ;
 ;      |        |      ;
-CODE_01FB4D:
+Field_RenderAltHorizontalMap:
 	phy                                  ;01FB4D|5A      |      ;
 	ldy.W $1a31                          ;01FB4E|AC311A  |011A31;
 	lda.W $1a33                          ;01FB51|AD331A  |011A33;
-	jsr.W CODE_01FC8F                    ;01FB54|208FFC  |01FC8F;
+	jsr.W Field_CalculateTileGraphics                    ;01FB54|208FFC  |01FC8F;
 	ply                                  ;01FB57|7A      |      ;
 	rep #$20                             ;01FB58|C220    |      ;
 	lda.W $1a3d                          ;01FB5A|AD3D1A  |011A3D;
@@ -14867,14 +14867,14 @@ CODE_01FB4D:
 	lda.W $1a31                          ;01FB78|AD311A  |011A31;
 	inc a;01FB7B|1A      |      ;
 	cmp.W $1924                          ;01FB7C|CD2419  |011924;
-	bcc CODE_01FB85                      ;01FB7F|9004    |01FB85;
+	bcc Field_WrapAltHorizontalCoord                      ;01FB7F|9004    |01FB85;
 	sec                                  ;01FB81|38      |      ;
 	sbc.W $1924                          ;01FB82|ED2419  |011924;
 ;      |        |      ;
-CODE_01FB85:
+Field_WrapAltHorizontalCoord:
 	sta.W $1a31                          ;01FB85|8D311A  |011A31;
 	cpy.W #$0044                         ;01FB88|C04400  |      ;
-	bne CODE_01FB4D                      ;01FB8B|D0C0    |01FB4D;
+	bne Field_RenderAltHorizontalMap                      ;01FB8B|D0C0    |01FB4D;
 	lda.B #$80                           ;01FB8D|A980    |      ;
 	sta.W $1a13                          ;01FB8F|8D131A  |011A13;
 	rep #$20                             ;01FB92|C220    |      ;
@@ -14901,7 +14901,7 @@ CODE_01FB85:
 	clc                                  ;01FBC6|18      |      ;
 	adc.W $1a26                          ;01FBC7|6D261A  |011A26;
 	sta.W $1a22                          ;01FBCA|8D221A  |011A22;
-	jsr.W CODE_01FD25                    ;01FBCD|2025FD  |01FD25;
+	jsr.W Field_CalculateVRAMAddress                    ;01FBCD|2025FD  |01FD25;
 	ora.W #$0800                         ;01FBD0|090008  |      ;
 	sta.W $1a14                          ;01FBD3|8D141A  |011A14;
 	clc                                  ;01FBD6|18      |      ;
@@ -14918,11 +14918,11 @@ CODE_01FB85:
 ;      |        |      ;
 	ldy.W #$0000                         ;01FBF0|A00000  |      ;
 ;      |        |      ;
-CODE_01FBF3:
+Field_RenderAltVerticalMap:
 	phy                                  ;01FBF3|5A      |      ;
 	ldy.W $1a31                          ;01FBF4|AC311A  |011A31;
 	lda.W $1a33                          ;01FBF7|AD331A  |011A33;
-	jsr.W CODE_01FC8F                    ;01FBFA|208FFC  |01FC8F;
+	jsr.W Field_CalculateTileGraphics                    ;01FBFA|208FFC  |01FC8F;
 	ply                                  ;01FBFD|7A      |      ;
 	rep #$20                             ;01FBFE|C220    |      ;
 	lda.W $1a3d                          ;01FC00|AD3D1A  |011A3D;
@@ -14941,14 +14941,14 @@ CODE_01FBF3:
 	lda.W $1a32                          ;01FC1E|AD321A  |011A32;
 	inc a;01FC21|1A      |      ;
 	cmp.W $1925                          ;01FC22|CD2519  |011925;
-	bcc CODE_01FC2B                      ;01FC25|9004    |01FC2B;
+	bcc Field_WrapAltVerticalCoord                      ;01FC25|9004    |01FC2B;
 	sec                                  ;01FC27|38      |      ;
 	sbc.W $1925                          ;01FC28|ED2519  |011925;
 ;      |        |      ;
-CODE_01FC2B:
+Field_WrapAltVerticalCoord:
 	sta.W $1a32                          ;01FC2B|8D321A  |011A32;
 	cpy.W #$0040                         ;01FC2E|C04000  |      ;
-	bne CODE_01FBF3                      ;01FC31|D0C0    |01FBF3;
+	bne Field_RenderAltVerticalMap                      ;01FC31|D0C0    |01FBF3;
 	lda.B #$81                           ;01FC33|A981    |      ;
 	sta.W $1a13                          ;01FC35|8D131A  |011A13;
 	rep #$20                             ;01FC38|C220    |      ;
@@ -14975,7 +14975,7 @@ CODE_01FC2B:
 	clc                                  ;01FC6C|18      |      ;
 	adc.W $1a26                          ;01FC6D|6D261A  |011A26;
 	sta.W $1a22                          ;01FC70|8D221A  |011A22;
-	jsr.W CODE_01FD25                    ;01FC73|2025FD  |01FD25;
+	jsr.W Field_CalculateVRAMAddress                    ;01FC73|2025FD  |01FD25;
 	ora.W #$0800                         ;01FC76|090008  |      ;
 	sta.W $1a14                          ;01FC79|8D141A  |011A14;
 	inc a;01FC7C|1A      |      ;
@@ -14990,7 +14990,7 @@ CODE_01FC2B:
 	rts                                  ;01FC8E|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
-CODE_01FC8F:
+Field_CalculateTileGraphics:
 	sta.W $1a3a                          ;01FC8F|8D3A1A  |011A3A;
 	rep #$20                             ;01FC92|C220    |      ;
 	tya                                  ;01FC94|98      |      ;
@@ -15011,10 +15011,10 @@ CODE_01FC8F:
 	sep #$20                             ;01FCB3|E220    |      ;
 	lda.L $7f8000,x                      ;01FCB5|BF00807F|7F8000;
 	eor.W $1a3a                          ;01FCB9|4D3A1A  |011A3A;
-	bpl CODE_01FCC0                      ;01FCBC|1002    |01FCC0;
+	bpl Field_ProcessTileAttributes                      ;01FCBC|1002    |01FCC0;
 	lda.B #$80                           ;01FCBE|A980    |      ;
 ;      |        |      ;
-CODE_01FCC0:
+Field_ProcessTileAttributes:
 	rep #$20                             ;01FCC0|C220    |      ;
 	and.W #$007f                         ;01FCC2|297F00  |      ;
 	tay                                  ;01FCC5|A8      |      ;
@@ -15030,18 +15030,18 @@ CODE_01FCC0:
 	lda.L $7fd0f4,x                      ;01FCDA|BFF4D07F|7FD0F4;
 	sta.W $1a39                          ;01FCDE|8D391A  |011A39;
 	sta.W $1a3c                          ;01FCE1|8D3C1A  |011A3C;
-	bpl CODE_01FCED                      ;01FCE4|1007    |01FCED;
+	bpl Field_DecodeTileLoop                      ;01FCE4|1007    |01FCED;
 	and.B #$70                           ;01FCE6|2970    |      ;
 	lsr a;01FCE8|4A      |      ;
 	lsr a;01FCE9|4A      |      ;
 	sta.W $1a3b                          ;01FCEA|8D3B1A  |011A3B;
 ;      |        |      ;
-CODE_01FCED:
+Field_DecodeTileLoop:
 	sep #$10                             ;01FCED|E210    |      ;
 	ldx.B #$00                           ;01FCEF|A200    |      ;
 	txy                                  ;01FCF1|9B      |      ;
 ;      |        |      ;
-CODE_01FCF2:
+Field_ProcessTileBitplane:
 	lda.W $1a35,y                        ;01FCF2|B9351A  |011A35;
 	sta.W $1a3d,x                        ;01FCF5|9D3D1A  |011A3D;
 	phx                                  ;01FCF8|DA      |      ;
@@ -15052,13 +15052,13 @@ CODE_01FCF2:
 	and.B #$40                           ;01FCFF|2940    |      ;
 	xba                                  ;01FD01|EB      |      ;
 	lda.W $1a39                          ;01FD02|AD391A  |011A39;
-	bmi CODE_01FD10                      ;01FD05|3009    |01FD10;
+	bmi Field_ApplyTilePalette                      ;01FD05|3009    |01FD10;
 	lda.L $7ff274,x                      ;01FD07|BF74F27F|7FF274;
 	asl a;01FD0B|0A      |      ;
 	asl a;01FD0C|0A      |      ;
 	sta.W $1a3b                          ;01FD0D|8D3B1A  |011A3B;
 ;      |        |      ;
-CODE_01FD10:
+Field_ApplyTilePalette:
 	xba                                  ;01FD10|EB      |      ;
 	plx                                  ;01FD11|FA      |      ;
 	ora.W $1a34                          ;01FD12|0D341A  |011A34;
@@ -15068,12 +15068,12 @@ CODE_01FD10:
 	inx                                  ;01FD1C|E8      |      ;
 	iny                                  ;01FD1D|C8      |      ;
 	cpy.B #$04                           ;01FD1E|C004    |      ;
-	bne CODE_01FCF2                      ;01FD20|D0D0    |01FCF2;
+	bne Field_ProcessTileBitplane                      ;01FD20|D0D0    |01FCF2;
 	rep #$10                             ;01FD22|C210    |      ;
 	rts                                  ;01FD24|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
-CODE_01FD25:
+Field_CalculateVRAMAddress:
 	sep #$20                             ;01FD25|E220    |      ;
 	ldx.W #$0000                         ;01FD27|A20000  |      ;
 	lda.W $19bf                          ;01FD2A|ADBF19  |0119BF;
@@ -15082,11 +15082,11 @@ CODE_01FD25:
 	sta.W $4203                          ;01FD32|8D0342  |014203;
 	lda.W $19bd                          ;01FD35|ADBD19  |0119BD;
 	bit.B #$10                           ;01FD38|8910    |      ;
-	beq CODE_01FD3E                      ;01FD3A|F002    |01FD3E;
+	beq Field_AdjustVRAMOffset                      ;01FD3A|F002    |01FD3E;
 	inx                                  ;01FD3C|E8      |      ;
 	inx                                  ;01FD3D|E8      |      ;
 ;      |        |      ;
-CODE_01FD3E:
+Field_AdjustVRAMOffset:
 	asl a;01FD3E|0A      |      ;
 	rep #$20                             ;01FD3F|C220    |      ;
 	and.W #$001e                         ;01FD41|291E00  |      ;
@@ -15100,43 +15100,43 @@ CODE_01FD3E:
 DATA8_01fd4d:
 	db $00,$40,$00,$44                   ;01FD4D|        |      ;
 ;      |        |      ;
-CODE_01FD51:
+Field_NormalizeCoordinates:
 	rep #$20                             ;01FD51|C220    |      ;
 	tya                                  ;01FD53|98      |      ;
 	sep #$20                             ;01FD54|E220    |      ;
 	xba                                  ;01FD56|EB      |      ;
-	bpl CODE_01FD5F                      ;01FD57|1006    |01FD5F;
+	bpl Field_WrapXCoordinate                      ;01FD57|1006    |01FD5F;
 	clc                                  ;01FD59|18      |      ;
 	adc.W $1925                          ;01FD5A|6D2519  |011925;
-	bra CODE_01FD68                      ;01FD5D|8009    |01FD68;
+	bra Field_ProcessXWrap                      ;01FD5D|8009    |01FD68;
 ;      |        |      ;
 ;      |        |      ;
-CODE_01FD5F:
+Field_WrapXCoordinate:
 	cmp.W $1925                          ;01FD5F|CD2519  |011925;
-	bcc CODE_01FD68                      ;01FD62|9004    |01FD68;
+	bcc Field_ProcessXWrap                      ;01FD62|9004    |01FD68;
 	sec                                  ;01FD64|38      |      ;
 	sbc.W $1925                          ;01FD65|ED2519  |011925;
 ;      |        |      ;
-CODE_01FD68:
+Field_ProcessXWrap:
 	xba                                  ;01FD68|EB      |      ;
-	bpl CODE_01FD71                      ;01FD69|1006    |01FD71;
+	bpl Field_WrapYCoordinate                      ;01FD69|1006    |01FD71;
 	clc                                  ;01FD6B|18      |      ;
 	adc.W $1924                          ;01FD6C|6D2419  |011924;
-	bra CODE_01FD7A                      ;01FD6F|8009    |01FD7A;
+	bra Field_ProcessYWrap                      ;01FD6F|8009    |01FD7A;
 ;      |        |      ;
 ;      |        |      ;
-CODE_01FD71:
+Field_WrapYCoordinate:
 	cmp.W $1924                          ;01FD71|CD2419  |011924;
-	bcc CODE_01FD7A                      ;01FD74|9004    |01FD7A;
+	bcc Field_ProcessYWrap                      ;01FD74|9004    |01FD7A;
 	sec                                  ;01FD76|38      |      ;
 	sbc.W $1924                          ;01FD77|ED2419  |011924;
 ;      |        |      ;
-CODE_01FD7A:
+Field_ProcessYWrap:
 	tay                                  ;01FD7A|A8      |      ;
 	rts                                  ;01FD7B|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
-CODE_01FD7C:
+Field_CopyCharacterGraphics:
 	phb                                  ;01FD7C|8B      |      ;
 	lda.B #$05                           ;01FD7D|A905    |      ;
 	pha                                  ;01FD7F|48      |      ;
@@ -15147,19 +15147,19 @@ CODE_01FD7C:
 	sta.W $2183                          ;01FD89|8D8321  |052183;
 	ldx.W #$0000                         ;01FD8C|A20000  |      ;
 ;      |        |      ;
-CODE_01FD8F:
+Field_ProcessCharacterLoop:
 	lda.W $191a,x                        ;01FD8F|BD1A19  |05191A;
-	bpl CODE_01FD9F                      ;01FD92|100B    |01FD9F;
+	bpl Field_LoadCharacterTile                      ;01FD92|100B    |01FD9F;
 	ldy.W #$0020                         ;01FD94|A02000  |      ;
 ;      |        |      ;
-CODE_01FD97:
+Field_ClearTileLoop:
 	jsr.W Field_ClearTileData                    ;01FD97|2047E9  |01E947;
 	dey                                  ;01FD9A|88      |      ;
-	bne CODE_01FD97                      ;01FD9B|D0FA    |01FD97;
-	bra CODE_01FDC3                      ;01FD9D|8024    |01FDC3;
+	bne Field_ClearTileLoop                      ;01FD9B|D0FA    |01FD97;
+	bra Field_NextCharacterSlot                      ;01FD9D|8024    |01FDC3;
 ;      |        |      ;
 ;      |        |      ;
-CODE_01FD9F:
+Field_LoadCharacterTile:
 	xba                                  ;01FD9F|EB      |      ;
 	stz.W $211b                          ;01FDA0|9C1B21  |05211B;
 	lda.B #$03                           ;01FDA3|A903    |      ;
@@ -15175,16 +15175,16 @@ CODE_01FD9F:
 	phx                                  ;01FDB8|DA      |      ;
 	ldx.W #$0020                         ;01FDB9|A22000  |      ;
 ;      |        |      ;
-CODE_01FDBC:
+Field_DecodeTileLoop2:
 	jsr.W Field_DecodeTileData4                    ;01FDBC|200DE9  |01E90D;
 	dex                                  ;01FDBF|CA      |      ;
-	bne CODE_01FDBC                      ;01FDC0|D0FA    |01FDBC;
+	bne Field_DecodeTileLoop2                      ;01FDC0|D0FA    |01FDBC;
 	plx                                  ;01FDC2|FA      |      ;
 ;      |        |      ;
-CODE_01FDC3:
+Field_NextCharacterSlot:
 	inx                                  ;01FDC3|E8      |      ;
 	cpx.W #$0008                         ;01FDC4|E00800  |      ;
-	bne CODE_01FD8F                      ;01FDC7|D0C6    |01FD8F;
+	bne Field_ProcessCharacterLoop                      ;01FDC7|D0C6    |01FD8F;
 	lda.B #$05                           ;01FDC9|A905    |      ;
 	pha                                  ;01FDCB|48      |      ;
 	plb                                  ;01FDCC|AB      |      ;
@@ -15192,7 +15192,7 @@ CODE_01FDC3:
 	stx.W $2181                          ;01FDD0|8E8121  |052181;
 	ldx.W #$0000                         ;01FDD3|A20000  |      ;
 ;      |        |      ;
-CODE_01FDD6:
+Field_ProcessPaletteDataLoop:
 	lda.W $191a,x                        ;01FDD6|BD1A19  |05191A;
 	phx                                  ;01FDD9|DA      |      ;
 	sta.W $211b                          ;01FDDA|8D1B21  |05211B;
@@ -15202,7 +15202,7 @@ CODE_01FDD6:
 	ldy.W $2134                          ;01FDE5|AC3421  |052134;
 	ldx.W #$0010                         ;01FDE8|A21000  |      ;
 ;      |        |      ;
-CODE_01FDEB:
+Field_ExtractPaletteLoop:
 	lda.W DATA8_05f280,y                 ;01FDEB|B980F2  |05F280;
 	and.B #$07                           ;01FDEE|2907    |      ;
 	sta.W $2180                          ;01FDF0|8D8021  |052180;
@@ -15215,16 +15215,16 @@ CODE_01FDEB:
 	sta.W $2180                          ;01FDFC|8D8021  |052180;
 	iny                                  ;01FDFF|C8      |      ;
 	dex                                  ;01FE00|CA      |      ;
-	bne CODE_01FDEB                      ;01FE01|D0E8    |01FDEB;
+	bne Field_ExtractPaletteLoop                      ;01FE01|D0E8    |01FDEB;
 	plx                                  ;01FE03|FA      |      ;
 	inx                                  ;01FE04|E8      |      ;
 	cpx.W #$0008                         ;01FE05|E00800  |      ;
-	bne CODE_01FDD6                      ;01FE08|D0CC    |01FDD6;
+	bne Field_ProcessPaletteDataLoop                      ;01FE08|D0CC    |01FDD6;
 	plb                                  ;01FE0A|AB      |      ;
 	rts                                  ;01FE0B|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
-CODE_01FE0C:
+Field_LoadFontGraphics:
 	phb                                  ;01FE0C|8B      |      ;
 	lda.B #$04                           ;01FE0D|A904    |      ;
 	pha                                  ;01FE0F|48      |      ;
@@ -15234,44 +15234,44 @@ CODE_01FE0C:
 	stx.W $2182                          ;01FE17|8E8221  |042182;
 	ldy.W #$9a20                         ;01FE1A|A0209A  |      ;
 ;      |        |      ;
-CODE_01FE1D:
+Field_DecodeFontLoop1:
 	jsr.W Field_DecodeTileData4                    ;01FE1D|200DE9  |01E90D;
 	cpy.W #$9ba0                         ;01FE20|C0A09B  |      ;
-	bne CODE_01FE1D                      ;01FE23|D0F8    |01FE1D;
+	bne Field_DecodeFontLoop1                      ;01FE23|D0F8    |01FE1D;
 	ldy.W #$ca20                         ;01FE25|A020CA  |      ;
 ;      |        |      ;
-CODE_01FE28:
+Field_DecodeFontLoop2:
 	jsr.W Field_DecodeTileData4                    ;01FE28|200DE9  |01E90D;
 	cpy.W #$d1a0                         ;01FE2B|C0A0D1  |      ;
-	bne CODE_01FE28                      ;01FE2E|D0F8    |01FE28;
+	bne Field_DecodeFontLoop2                      ;01FE2E|D0F8    |01FE28;
 	ldx.W #$0000                         ;01FE30|A20000  |      ;
 	lda.W $1910                          ;01FE33|AD1019  |041910;
-	bpl CODE_01FE3B                      ;01FE36|1003    |01FE3B;
+	bpl Field_ProcessFontBank                      ;01FE36|1003    |01FE3B;
 	ldx.W #$000c                         ;01FE38|A20C00  |      ;
 ;      |        |      ;
-CODE_01FE3B:
+Field_ProcessFontBank:
 	lda.B #$7f                           ;01FE3B|A97F    |      ;
 	pha                                  ;01FE3D|48      |      ;
 	plb                                  ;01FE3E|AB      |      ;
 	ldy.W #$4000                         ;01FE3F|A00040  |      ;
 	lda.B #$0c                           ;01FE42|A90C    |      ;
 ;      |        |      ;
-CODE_01FE44:
+Field_MergeFontLoop:
 	pha                                  ;01FE44|48      |      ;
 	lda.L DATA8_018a15,x                 ;01FE45|BF158A01|018A15;
 	inx                                  ;01FE49|E8      |      ;
 	phx                                  ;01FE4A|DA      |      ;
 	ldx.W #$0008                         ;01FE4B|A20800  |      ;
 ;      |        |      ;
-CODE_01FE4E:
+Field_ProcessFontByte:
 	asl a;01FE4E|0A      |      ;
 	pha                                  ;01FE4F|48      |      ;
-	bcc CODE_01FE57                      ;01FE50|9005    |01FE57;
+	bcc Field_AdvanceFontPosition                      ;01FE50|9005    |01FE57;
 	phy                                  ;01FE52|5A      |      ;
 	jsr.W Field_MergeTileData                    ;01FE53|2030E9  |01E930;
 	ply                                  ;01FE56|7A      |      ;
 ;      |        |      ;
-CODE_01FE57:
+Field_AdvanceFontPosition:
 	rep #$20                             ;01FE57|C220    |      ;
 	tya                                  ;01FE59|98      |      ;
 	clc                                  ;01FE5A|18      |      ;
@@ -15280,23 +15280,23 @@ CODE_01FE57:
 	sep #$20                             ;01FE5F|E220    |      ;
 	pla                                  ;01FE61|68      |      ;
 	dex                                  ;01FE62|CA      |      ;
-	bne CODE_01FE4E                      ;01FE63|D0E9    |01FE4E;
+	bne Field_ProcessFontByte                      ;01FE63|D0E9    |01FE4E;
 	plx                                  ;01FE65|FA      |      ;
 	pla                                  ;01FE66|68      |      ;
 	dec a;01FE67|3A      |      ;
-	bne CODE_01FE44                      ;01FE68|D0DA    |01FE44;
+	bne Field_MergeFontLoop                      ;01FE68|D0DA    |01FE44;
 	plb                                  ;01FE6A|AB      |      ;
 	rts                                  ;01FE6B|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
-CODE_01FE6C:
+Field_UpdateWorldSprites:
 	lda.B #$00                           ;01FE6C|A900    |      ;
 	xba                                  ;01FE6E|EB      |      ;
 	lda.W $1a4c                          ;01FE6F|AD4C1A  |011A4C;
 	asl a;01FE72|0A      |      ;
 	tax                                  ;01FE73|AA      |      ;
 	jsr.W (DATA8_01fe7b,x)               ;01FE74|FC7BFE  |01FE7B;
-	jsr.W CODE_01FFC2                    ;01FE77|20C2FF  |01FFC2;
+	jsr.W Field_SetupWorldCamera                    ;01FE77|20C2FF  |01FFC2;
 	rts                                  ;01FE7A|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
@@ -15304,20 +15304,20 @@ DATA8_01fe7b:
 	db $7a,$fe,$7a,$fe,$d5,$fe,$89,$fe,$89,$fe,$8d,$fe;01FE7B|        |      ;
 	db $d5,$fe                           ;01FE87|        |0000FE;
 	lda.B #$20                           ;01FE89|A920    |      ;
-	bra CODE_01FE8F                      ;01FE8B|8002    |01FE8F;
+	bra Field_InitializeWorldSprite                      ;01FE8B|8002    |01FE8F;
 ;      |        |      ;
 	lda.B #$40                           ;01FE8D|A940    |      ;
 ;      |        |      ;
-CODE_01FE8F:
+Field_InitializeWorldSprite:
 	sta.W $1a2c                          ;01FE8F|8D2C1A  |011A2C;
 	lda.W $1a53                          ;01FE92|AD531A  |011A53;
 	sta.W $1a34                          ;01FE95|8D341A  |011A34;
 	lda.W $1a55                          ;01FE98|AD551A  |011A55;
-	jsr.W CODE_01FCC0                    ;01FE9B|20C0FC  |01FCC0;
+	jsr.W Field_ProcessTileAttributes                    ;01FE9B|20C0FC  |01FCC0;
 	ldy.W #$0000                         ;01FE9E|A00000  |      ;
 	rep #$20                             ;01FEA1|C220    |      ;
 ;      |        |      ;
-CODE_01FEA3:
+Field_RenderWorldSpriteLoop:
 	lda.W $1a3d                          ;01FEA3|AD3D1A  |011A3D;
 	sta.W $0900,y                        ;01FEA6|990009  |010900;
 	lda.W $1a3f                          ;01FEA9|AD3F1A  |011A3F;
@@ -15331,23 +15331,23 @@ CODE_01FEA3:
 	iny                                  ;01FEBD|C8      |      ;
 	iny                                  ;01FEBE|C8      |      ;
 	cpy.W #$0040                         ;01FEBF|C04000  |      ;
-	bne CODE_01FEA3                      ;01FEC2|D0DF    |01FEA3;
+	bne Field_RenderWorldSpriteLoop                      ;01FEC2|D0DF    |01FEA3;
 	sep #$20                             ;01FEC4|E220    |      ;
-	jsr.W CODE_01FF82                    ;01FEC6|2082FF  |01FF82;
+	jsr.W Field_SetupWorldDMA                    ;01FEC6|2082FF  |01FF82;
 ;      |        |      ;
-CODE_01FEC9:
-	jsr.W CODE_01FFAC                    ;01FEC9|20ACFF  |01FFAC;
+Field_AnimateWorldSprite:
+	jsr.W Field_UpdateWorldVRAM                    ;01FEC9|20ACFF  |01FFAC;
 	jsr.W Field_DMASecondary                    ;01FECC|200184  |018401;
 	dec.W $1a2c                          ;01FECF|CE2C1A  |011A2C;
-	bne CODE_01FEC9                      ;01FED2|D0F5    |01FEC9;
+	bne Field_AnimateWorldSprite                      ;01FED2|D0F5    |01FEC9;
 	rts                                  ;01FED4|60      |      ;
 ;      |        |      ;
 	lda.W $1a53                          ;01FED5|AD531A  |011A53;
 	sta.W $1a34                          ;01FED8|8D341A  |011A34;
-	jsr.W CODE_01FF82                    ;01FEDB|2082FF  |01FF82;
+	jsr.W Field_SetupWorldDMA                    ;01FEDB|2082FF  |01FF82;
 	ldx.W #$0000                         ;01FEDE|A20000  |      ;
 ;      |        |      ;
-CODE_01FEE1:
+Field_ProcessWorldLayerLoop:
 	rep #$20                             ;01FEE1|C220    |      ;
 	lda.W DATA8_01ff45,x                 ;01FEE3|BD45FF  |01FF45;
 	sta.W $1a2f                          ;01FEE6|8D2F1A  |011A2F;
@@ -15356,10 +15356,10 @@ CODE_01FEE1:
 	sta.W $1a2c                          ;01FEED|8D2C1A  |011A2C;
 	phx                                  ;01FEF0|DA      |      ;
 ;      |        |      ;
-CODE_01FEF1:
+Field_RenderWorldLayer:
 	ldx.W $1a2f                          ;01FEF1|AE2F1A  |011A2F;
-	jsr.W CODE_01FF4D                    ;01FEF4|204DFF  |01FF4D;
-	jsr.W CODE_01FFAC                    ;01FEF7|20ACFF  |01FFAC;
+	jsr.W Field_RenderWorldTileRow                    ;01FEF4|204DFF  |01FF4D;
+	jsr.W Field_UpdateWorldVRAM                    ;01FEF7|20ACFF  |01FFAC;
 	jsr.W Field_DMASecondary                    ;01FEFA|200184  |018401;
 	rep #$20                             ;01FEFD|C220    |      ;
 	lda.W $1a2f                          ;01FEFF|AD2F1A  |011A2F;
@@ -15368,34 +15368,34 @@ CODE_01FEF1:
 	sta.W $1a2f                          ;01FF06|8D2F1A  |011A2F;
 	sep #$20                             ;01FF09|E220    |      ;
 	dec.W $1a2c                          ;01FF0B|CE2C1A  |011A2C;
-	bne CODE_01FEF1                      ;01FF0E|D0E1    |01FEF1;
+	bne Field_RenderWorldLayer                      ;01FF0E|D0E1    |01FEF1;
 	plx                                  ;01FF10|FA      |      ;
 	inx                                  ;01FF11|E8      |      ;
 	inx                                  ;01FF12|E8      |      ;
 	cpx.W #$0008                         ;01FF13|E00800  |      ;
-	bne CODE_01FEE1                      ;01FF16|D0C9    |01FEE1;
+	bne Field_ProcessWorldLayerLoop                      ;01FF16|D0C9    |01FEE1;
 	lda.W $1a4c                          ;01FF18|AD4C1A  |011A4C;
 	cmp.B #$06                           ;01FF1B|C906    |      ;
-	bne CODE_01FF44                      ;01FF1D|D025    |01FF44;
+	bne Field_CompleteWorldRender                      ;01FF1D|D025    |01FF44;
 	db $a9,$49,$8d,$08,$21,$a2,$04,$00,$8e,$0c,$19,$a2,$ff,$ff,$8e,$0e;01FF1F|        |      ;
 	db $19,$a9,$e4,$22,$76,$97,$00,$d0,$04,$a9,$03,$80,$02,$a9,$06,$8d;01FF2F|        |00E4A9;
 	db $58,$1a,$8d,$59,$1a               ;01FF3F|        |      ;
 ;      |        |      ;
-CODE_01FF44:
+Field_CompleteWorldRender:
 	rts                                  ;01FF44|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
 DATA8_01ff45:
 	db $00,$00,$10,$00,$00,$02,$10,$02   ;01FF45|        |      ;
 ;      |        |      ;
-CODE_01FF4D:
+Field_RenderWorldTileRow:
 	ldy.W #$0000                         ;01FF4D|A00000  |      ;
 ;      |        |      ;
-CODE_01FF50:
+Field_RenderWorldTileLoop:
 	lda.L $7f9000,x                      ;01FF50|BF00907F|7F9000;
 	phx                                  ;01FF54|DA      |      ;
 	phy                                  ;01FF55|5A      |      ;
-	jsr.W CODE_01FCC0                    ;01FF56|20C0FC  |01FCC0;
+	jsr.W Field_ProcessTileAttributes                    ;01FF56|20C0FC  |01FCC0;
 	ply                                  ;01FF59|7A      |      ;
 	plx                                  ;01FF5A|FA      |      ;
 	rep #$20                             ;01FF5B|C220    |      ;
@@ -15414,11 +15414,11 @@ CODE_01FF50:
 	iny                                  ;01FF7A|C8      |      ;
 	iny                                  ;01FF7B|C8      |      ;
 	cpy.W #$0040                         ;01FF7C|C04000  |      ;
-	bne CODE_01FF50                      ;01FF7F|D0CF    |01FF50;
+	bne Field_RenderWorldTileLoop                      ;01FF7F|D0CF    |01FF50;
 	rts                                  ;01FF81|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
-CODE_01FF82:
+Field_SetupWorldDMA:
 	lda.B #$80                           ;01FF82|A980    |      ;
 	sta.W $1a13                          ;01FF84|8D131A  |011A13;
 	ldx.W #$0040                         ;01FF87|A24000  |      ;
@@ -15436,7 +15436,7 @@ CODE_01FF82:
 	rts                                  ;01FFAB|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
-CODE_01FFAC:
+Field_UpdateWorldVRAM:
 	rep #$20                             ;01FFAC|C220    |      ;
 	lda.W $1a14                          ;01FFAE|AD141A  |011A14;
 	clc                                  ;01FFB1|18      |      ;
@@ -15449,7 +15449,7 @@ CODE_01FFAC:
 	rts                                  ;01FFC1|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
-CODE_01FFC2:
+Field_SetupWorldCamera:
 	lda.W $0e89                          ;01FFC2|AD890E  |010E89;
 	sec                                  ;01FFC5|38      |      ;
 	sbc.B #$08                           ;01FFC6|E908    |      ;
@@ -15463,16 +15463,16 @@ CODE_01FFC2:
 	ldx.W #$0000                         ;01FFDA|A20000  |      ;
 	stx.W $19bd                          ;01FFDD|8EBD19  |0119BD;
 ;      |        |      ;
-CODE_01FFE0:
+Field_RenderWorldMapLoop:
 	phx                                  ;01FFE0|DA      |      ;
-	jsr.W CODE_01F978                    ;01FFE1|2078F9  |01F978;
+	jsr.W Field_RenderWorldMap                    ;01FFE1|2078F9  |01F978;
 	jsr.W Field_ProcessDMA                    ;01FFE4|20BF83  |0183BF;
 	inc.W $192e                          ;01FFE7|EE2E19  |01192E;
 	plx                                  ;01FFEA|FA      |      ;
 	stx.W $19bf                          ;01FFEB|8EBF19  |0119BF;
 	inx                                  ;01FFEE|E8      |      ;
 	cpx.W #$000d                         ;01FFEF|E00D00  |      ;
-	bne CODE_01FFE0                      ;01FFF2|D0EC    |01FFE0;
+	bne Field_RenderWorldMapLoop                      ;01FFF2|D0EC    |01FFE0;
 	ldx.W #$0000                         ;01FFF4|A20000  |      ;
 	stx.W $19bf                          ;01FFF7|8EBF19  |0119BF;
 	rts                                  ;01FFFA|60      |      ;
