@@ -10224,7 +10224,7 @@ Battle_RepelComplete:
 	lda.B #$0b                           ;02EB5E|A90B    |      ;
 	pha                                  ;02EB60|48      |      ;
 	plb                                  ;02EB61|AB      |      ;
-	jsr.W CODE_02EC45                    ;02EB62|2045EC  |02EC45;
+	jsr.W Battle_BlueComplete                    ;02EB62|2045EC  |02EC45;
 	lda.B #$06                           ;02EB65|A906    |      ;
 	sta.B $8a                            ;02EB67|858A    |000A8A;
 	lda.B #$7e                           ;02EB69|A97E    |      ;
@@ -10235,7 +10235,7 @@ Battle_RepelComplete:
 	and.B #$08                           ;02EB73|2908    |      ;
 	sta.B $cd                            ;02EB75|85CD    |000ACD;
 	lda.B $ca                            ;02EB77|A5CA    |000ACA;
-	jsr.W CODE_02EBD2                    ;02EB79|20D2EB  |02EBD2;
+	jsr.W Battle_ApplyMimic                    ;02EB79|20D2EB  |02EBD2;
 	sty.B $cf                            ;02EB7C|84CF    |000ACF;
 ;      |        |      ;
 Battle_ProcessLure:
@@ -10255,7 +10255,7 @@ Battle_ProcessLure:
 	beq Battle_ApplyLure                      ;02EB98|F006    |02EBA0;
 	lda.B #$02                           ;02EB9A|A902    |      ;
 	trb.B $90                            ;02EB9C|1490    |000A90;
-	bra CODE_02EBAD                      ;02EB9E|800D    |02EBAD;
+	bra Battle_ApplyWonder                      ;02EB9E|800D    |02EBAD;
 ;      |        |      ;
 ;      |        |      ;
 Battle_ApplyLure:
@@ -10267,30 +10267,30 @@ Battle_ApplyLure:
 	lda.W $0000,x                        ;02EBA9|BD0000  |0B0000;
 	inx                                  ;02EBAC|E8      |      ;
 ;      |        |      ;
-CODE_02EBAD:
+Battle_ApplyWonder:
 	and.B #$1f                           ;02EBAD|291F    |      ;
 	sta.B $d0                            ;02EBAF|85D0    |000AD0;
 ;      |        |      ;
-CODE_02EBB1:
-	jsr.W CODE_02EBEB                    ;02EBB1|20EBEB  |02EBEB;
+Battle_WonderRandomEffect:
+	jsr.W Battle_MimicCopyLast                    ;02EBB1|20EBEB  |02EBEB;
 	lda.B $cb                            ;02EBB4|A5CB    |000ACB;
 	and.B #$08                           ;02EBB6|2908    |      ;
 	cmp.B $cd                            ;02EBB8|C5CD    |000ACD;
-	beq CODE_02EBC3                      ;02EBBA|F007    |02EBC3;
+	beq Battle_WonderSelectTarget                      ;02EBBA|F007    |02EBC3;
 	lda.B $cb                            ;02EBBC|A5CB    |000ACB;
 	clc                                  ;02EBBE|18      |      ;
 	adc.B #$08                           ;02EBBF|6908    |      ;
 	sta.B $cb                            ;02EBC1|85CB    |000ACB;
 ;      |        |      ;
-CODE_02EBC3:
+Battle_WonderSelectTarget:
 	dec.B $ce                            ;02EBC3|C6CE    |000ACE;
-	beq CODE_02EBCC                      ;02EBC5|F005    |02EBCC;
+	beq Battle_WonderComplete                      ;02EBC5|F005    |02EBCC;
 	dey                                  ;02EBC7|88      |      ;
-	bne CODE_02EBB1                      ;02EBC8|D0E7    |02EBB1;
+	bne Battle_WonderRandomEffect                      ;02EBC8|D0E7    |02EBB1;
 	bra Battle_ProcessLure                      ;02EBCA|80B2    |02EB7E;
 ;      |        |      ;
 ;      |        |      ;
-CODE_02EBCC:
+Battle_WonderComplete:
 	plp                                  ;02EBCC|28      |      ;
 	ply                                  ;02EBCD|7A      |      ;
 	plx                                  ;02EBCE|FA      |      ;
@@ -10299,7 +10299,7 @@ CODE_02EBCC:
 	rts                                  ;02EBD1|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
-CODE_02EBD2:
+Battle_ApplyMimic:
 	pha                                  ;02EBD2|48      |      ;
 	php                                  ;02EBD3|08      |      ;
 	rep #$30                             ;02EBD4|C230    |      ;
@@ -10318,13 +10318,13 @@ CODE_02EBD2:
 	rts                                  ;02EBEA|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
-CODE_02EBEB:
+Battle_MimicCopyLast:
 	pha                                  ;02EBEB|48      |      ;
 	php                                  ;02EBEC|08      |      ;
 	sep #$20                             ;02EBED|E220    |      ;
 	lda.B $90                            ;02EBEF|A590    |000A90;
 	bit.B #$02                           ;02EBF1|8902    |      ;
-	beq CODE_02EC40                      ;02EBF3|F04B    |02EC40;
+	beq Battle_BlueLearnSkill                      ;02EBF3|F04B    |02EC40;
 	lda.B #$04                           ;02EBF5|A904    |      ;
 	tsb.B $90                            ;02EBF7|0490    |000A90;
 	lda.B $cf                            ;02EBF9|A5CF    |000ACF;
@@ -10334,17 +10334,17 @@ CODE_02EBEB:
 	lda.B #$30                           ;02EC01|A930    |      ;
 	jsl.L CODE_00971E                    ;02EC03|221E9700|00971E;
 	lda.B $cc                            ;02EC07|A5CC    |000ACC;
-	beq CODE_02EC12                      ;02EC09|F007    |02EC12;
+	beq Battle_MimicExecute                      ;02EC09|F007    |02EC12;
 	rep #$20                             ;02EC0B|C220    |      ;
 	lda.W #$efc1                         ;02EC0D|A9C1EF  |      ;
-	bra CODE_02EC17                      ;02EC10|8005    |02EC17;
+	bra Battle_MimicComplete                      ;02EC10|8005    |02EC17;
 ;      |        |      ;
 ;      |        |      ;
-CODE_02EC12:
+Battle_MimicExecute:
 	rep #$20                             ;02EC12|C220    |      ;
 	lda.W #$bfc1                         ;02EC14|A9C1BF  |      ;
 ;      |        |      ;
-CODE_02EC17:
+Battle_MimicComplete:
 	clc                                  ;02EC17|18      |      ;
 	adc.W $4216                          ;02EC18|6D1642  |0B4216;
 	sta.B $8b                            ;02EC1B|858B    |000A8B;
@@ -10366,14 +10366,14 @@ CODE_02EC17:
 	tsb.B $90                            ;02EC3A|0490    |000A90;
 	jsl.L Battle_ReflectMagicComplete                    ;02EC3C|22C3E102|02E1C3;
 ;      |        |      ;
-CODE_02EC40:
+Battle_BlueLearnSkill:
 	inc.B $cb                            ;02EC40|E6CB    |000ACB;
 	plp                                  ;02EC42|28      |      ;
 	pla                                  ;02EC43|68      |      ;
 	rts                                  ;02EC44|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
-CODE_02EC45:
+Battle_BlueComplete:
 	php                                  ;02EC45|08      |      ;
 	phd                                  ;02EC46|0B      |      ;
 	sep #$20                             ;02EC47|E220    |      ;
@@ -10391,12 +10391,12 @@ CODE_02EC45:
 	adc.W $4216                          ;02EC63|6D1642  |0B4216;
 	ldx.W #$0008                         ;02EC66|A20800  |      ;
 ;      |        |      ;
-CODE_02EC69:
+Battle_MorphTransform:
 	sta.B SNES_WMADDL-$2100              ;02EC69|8581    |002181;
 	sep #$20                             ;02EC6B|E220    |      ;
 	ldy.W #$0004                         ;02EC6D|A00400  |      ;
 ;      |        |      ;
-CODE_02EC70:
+Battle_MorphComplete:
 	stz.B SNES_WMDATA-$2100              ;02EC70|6480    |002180;
 	stz.B SNES_WMDATA-$2100              ;02EC72|6480    |002180;
 	stz.B SNES_WMDATA-$2100              ;02EC74|6480    |002180;
@@ -10462,20 +10462,20 @@ CODE_02EC70:
 	stz.B SNES_WMDATA-$2100              ;02ECEC|6480    |002180;
 	stz.B SNES_WMDATA-$2100              ;02ECEE|6480    |002180;
 	dey                                  ;02ECF0|88      |      ;
-	beq CODE_02ECF6                      ;02ECF1|F003    |02ECF6;
-	brl CODE_02EC70                      ;02ECF3|827AFF  |02EC70;
+	beq Battle_ProcessRageEffect                      ;02ECF1|F003    |02ECF6;
+	brl Battle_MorphComplete                      ;02ECF3|827AFF  |02EC70;
 ;      |        |      ;
 ;      |        |      ;
-CODE_02ECF6:
+Battle_ProcessRageEffect:
 	rep #$20                             ;02ECF6|C220    |      ;
 	clc                                  ;02ECF8|18      |      ;
 	adc.W #$0200                         ;02ECF9|690002  |      ;
 	dex                                  ;02ECFC|CA      |      ;
-	beq CODE_02ED02                      ;02ECFD|F003    |02ED02;
-	brl CODE_02EC69                      ;02ECFF|8267FF  |02EC69;
+	beq Battle_ApplyRage                      ;02ECFD|F003    |02ED02;
+	brl Battle_MorphTransform                      ;02ECFF|8267FF  |02EC69;
 ;      |        |      ;
 ;      |        |      ;
-CODE_02ED02:
+Battle_ApplyRage:
 	pld                                  ;02ED02|2B      |      ;
 	plp                                  ;02ED03|28      |      ;
 	rts                                  ;02ED04|60      |      ;
@@ -10499,30 +10499,30 @@ Battle_ProcessStatusAnimation:
 	ora.W $04d5                          ;02ED1B|0DD504  |0204D5;
 	ora.W $04d7                          ;02ED1E|0DD704  |0204D7;
 	ora.W $04d9                          ;02ED21|0DD904  |0204D9;
-	bne CODE_02ED28                      ;02ED24|D002    |02ED28;
-	bra CODE_02ED80                      ;02ED26|8058    |02ED80;
+	bne Battle_RageComplete                      ;02ED24|D002    |02ED28;
+	bra Battle_ProcessLimitBreak                      ;02ED26|8058    |02ED80;
 ;      |        |      ;
 ;      |        |      ;
-CODE_02ED28:
-	jsr.W CODE_02EE91                    ;02ED28|2091EE  |02EE91;
+Battle_RageComplete:
+	jsr.W Battle_ApplyChain                    ;02ED28|2091EE  |02EE91;
 	jsl.L CODE_0096A0                    ;02ED2B|22A09600|0096A0;
 	rep #$20                             ;02ED2F|C220    |      ;
 	sep #$10                             ;02ED31|E210    |      ;
 	ldx.B #$00                           ;02ED33|A200    |      ;
 ;      |        |      ;
-CODE_02ED35:
+Battle_ProcessFuryEffect:
 	ldy.B #$07                           ;02ED35|A007    |      ;
 	sty.W $0add                          ;02ED37|8CDD0A  |020ADD;
 	lda.W $04d1,x                        ;02ED3A|BDD104  |0204D1;
-	beq CODE_02ED6B                      ;02ED3D|F02C    |02ED6B;
-	bmi CODE_02ED87                      ;02ED3F|3046    |02ED87;
+	beq Battle_FuryDamageMultiplier                      ;02ED3D|F02C    |02ED6B;
+	bmi Battle_ApplyLimitBreak                      ;02ED3F|3046    |02ED87;
 	cmp.W #$7ffe                         ;02ED41|C9FE7F  |      ;
 	beq UNREACH_02ED90                   ;02ED44|F04A    |02ED90;
 ;      |        |      ;
-CODE_02ED46:
-	jsr.W CODE_02EE1F                    ;02ED46|201FEE  |02EE1F;
+Battle_ApplyFury:
+	jsr.W Battle_OverdriveExecute                    ;02ED46|201FEE  |02EE1F;
 	sep #$30                             ;02ED49|E230    |      ;
-	jsr.W CODE_02EDFC                    ;02ED4B|20FCED  |02EDFC;
+	jsr.W Battle_OverdrivePower                    ;02ED4B|20FCED  |02EDFC;
 	phx                                  ;02ED4E|DA      |      ;
 	jsr.W Battle_MPLinkComplete                    ;02ED4F|2060EA  |02EA60;
 	lda.B #$82                           ;02ED52|A982    |      ;
@@ -10532,25 +10532,25 @@ CODE_02ED46:
 	ldy.B #$05                           ;02ED5E|A005    |      ;
 	jsr.W Battle_VanishEvadePhysical                    ;02ED60|207FEA  |02EA7F;
 	sta.L $7ec260,x                      ;02ED63|9F60C27E|7EC260;
-	jsr.W CODE_02ED98                    ;02ED67|2098ED  |02ED98;
+	jsr.W Battle_LimitBreakPower                    ;02ED67|2098ED  |02ED98;
 	plx                                  ;02ED6A|FA      |      ;
 ;      |        |      ;
-CODE_02ED6B:
+Battle_FuryDamageMultiplier:
 	rep #$20                             ;02ED6B|C220    |      ;
 	sep #$10                             ;02ED6D|E210    |      ;
 	inx                                  ;02ED6F|E8      |      ;
 	inx                                  ;02ED70|E8      |      ;
 	cpx.B #$0a                           ;02ED71|E00A    |      ;
-	bne CODE_02ED35                      ;02ED73|D0C0    |02ED35;
+	bne Battle_ProcessFuryEffect                      ;02ED73|D0C0    |02ED35;
 	sep #$30                             ;02ED75|E230    |      ;
 	lda.B #$3c                           ;02ED77|A93C    |      ;
 ;      |        |      ;
-CODE_02ED79:
+Battle_FuryComplete:
 	jsl.L CODE_0096A0                    ;02ED79|22A09600|0096A0;
 	dec a;02ED7D|3A      |      ;
-	bne CODE_02ED79                      ;02ED7E|D0F9    |02ED79;
+	bne Battle_FuryComplete                      ;02ED7E|D0F9    |02ED79;
 ;      |        |      ;
-CODE_02ED80:
+Battle_ProcessLimitBreak:
 	plp                                  ;02ED80|28      |      ;
 	ply                                  ;02ED81|7A      |      ;
 	plx                                  ;02ED82|FA      |      ;
@@ -10560,17 +10560,17 @@ CODE_02ED80:
 	rtl                                  ;02ED86|6B      |      ;
 ;      |        |      ;
 ;      |        |      ;
-CODE_02ED87:
+Battle_ApplyLimitBreak:
 	eor.W #$ffff                         ;02ED87|49FFFF  |      ;
 	inc a;02ED8A|1A      |      ;
 	dec.W $0add                          ;02ED8B|CEDD0A  |020ADD;
-	bra CODE_02ED46                      ;02ED8E|80B6    |02ED46;
+	bra Battle_ApplyFury                      ;02ED8E|80B6    |02ED46;
 ;      |        |      ;
 ;      |        |      ;
 UNREACH_02ED90:
 	db $a9,$00,$00,$ce,$dd,$0a,$80,$ae   ;02ED90|        |      ;
 ;      |        |      ;
-CODE_02ED98:
+Battle_LimitBreakPower:
 	phx                                  ;02ED98|DA      |      ;
 	phy                                  ;02ED99|5A      |      ;
 	php                                  ;02ED9A|08      |      ;
@@ -10588,11 +10588,11 @@ CODE_02ED98:
 	sta.B $db                            ;02EDAE|85DB    |000ADB;
 	ldy.W #$0004                         ;02EDB0|A00400  |      ;
 ;      |        |      ;
-CODE_02EDB3:
+Battle_LimitBreakExecute:
 	lda.W $0ad1,y                        ;02EDB3|B9D10A  |020AD1;
-	bne CODE_02EDCC                      ;02EDB6|D014    |02EDCC;
+	bne Battle_LimitBreakComplete                      ;02EDB6|D014    |02EDCC;
 	cpy.W #$0004                         ;02EDB8|C00400  |      ;
-	beq CODE_02EDCC                      ;02EDBB|F00F    |02EDCC;
+	beq Battle_LimitBreakComplete                      ;02EDBB|F00F    |02EDCC;
 	pha                                  ;02EDBD|48      |      ;
 	phy                                  ;02EDBE|5A      |      ;
 	lda.B #$05                           ;02EDBF|A905    |      ;
@@ -10600,11 +10600,11 @@ CODE_02EDB3:
 	sbc.B $01,s                          ;02EDC2|E301    |000001;
 	sec                                  ;02EDC4|38      |      ;
 	cmp.W $0ad7                          ;02EDC5|CDD70A  |020AD7;
-	bpl CODE_02EDF8                      ;02EDC8|102E    |02EDF8;
+	bpl Battle_ApplyOverdrive                      ;02EDC8|102E    |02EDF8;
 	ply                                  ;02EDCA|7A      |      ;
 	pla                                  ;02EDCB|68      |      ;
 ;      |        |      ;
-CODE_02EDCC:
+Battle_LimitBreakComplete:
 	clc                                  ;02EDCC|18      |      ;
 	adc.B #$90                           ;02EDCD|6990    |      ;
 	sta.W $0c02,x                        ;02EDCF|9D020C  |020C02;
@@ -10627,22 +10627,22 @@ CODE_02EDCC:
 	inx                                  ;02EDED|E8      |      ;
 	dey                                  ;02EDEE|88      |      ;
 	cpy.W #$00ff                         ;02EDEF|C0FF00  |      ;
-	bne CODE_02EDB3                      ;02EDF2|D0BF    |02EDB3;
+	bne Battle_LimitBreakExecute                      ;02EDF2|D0BF    |02EDB3;
 ;      |        |      ;
-CODE_02EDF4:
+Battle_ProcessOverdrive:
 	plp                                  ;02EDF4|28      |      ;
 	plx                                  ;02EDF5|FA      |      ;
 	ply                                  ;02EDF6|7A      |      ;
 	rts                                  ;02EDF7|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
-CODE_02EDF8:
+Battle_ApplyOverdrive:
 	ply                                  ;02EDF8|7A      |      ;
 	pla                                  ;02EDF9|68      |      ;
-	bra CODE_02EDF4                      ;02EDFA|80F8    |02EDF4;
+	bra Battle_ProcessOverdrive                      ;02EDFA|80F8    |02EDF4;
 ;      |        |      ;
 ;      |        |      ;
-CODE_02EDFC:
+Battle_OverdrivePower:
 	phy                                  ;02EDFC|5A      |      ;
 	txa                                  ;02EDFD|8A      |      ;
 	asl a;02EDFE|0A      |      ;
@@ -10669,7 +10669,7 @@ CODE_02EDFC:
 	rts                                  ;02EE1E|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
-CODE_02EE1F:
+Battle_OverdriveExecute:
 	phx                                  ;02EE1F|DA      |      ;
 	phy                                  ;02EE20|5A      |      ;
 	stz.W $0ad1                          ;02EE21|9CD10A  |020AD1;
@@ -10679,7 +10679,7 @@ CODE_02EE1F:
 	ldx.B #$ff                           ;02EE2D|A2FF    |      ;
 	stx.W $0ad6                          ;02EE2F|8ED60A  |020AD6;
 	cmp.W #$7fff                         ;02EE32|C9FF7F  |      ;
-	bne CODE_02EE53                      ;02EE35|D01C    |02EE53;
+	bne Battle_OverdriveComplete                      ;02EE35|D01C    |02EE53;
 	ldx.B #$05                           ;02EE37|A205    |      ;
 	stx.W $0ad7                          ;02EE39|8ED70A  |020AD7;
 	ldx.B #$0a                           ;02EE3C|A20A    |      ;
@@ -10692,48 +10692,48 @@ CODE_02EE1F:
 	stx.W $0ad4                          ;02EE4A|8ED40A  |020AD4;
 	inx                                  ;02EE4D|E8      |      ;
 	stx.W $0ad5                          ;02EE4E|8ED50A  |020AD5;
-	bra CODE_02EE84                      ;02EE51|8031    |02EE84;
+	bra Battle_ProcessElementalChain                      ;02EE51|8031    |02EE84;
 ;      |        |      ;
 ;      |        |      ;
-CODE_02EE53:
+Battle_OverdriveComplete:
 	cmp.W #$0000                         ;02EE53|C90000  |      ;
-	bne CODE_02EE5D                      ;02EE56|D005    |02EE5D;
+	bne Battle_ProcessTrance                      ;02EE56|D005    |02EE5D;
 	db $ee,$d7,$0a,$80,$27               ;02EE58|        |000AD7;
 ;      |        |      ;
-CODE_02EE5D:
+Battle_ProcessTrance:
 	ldx.B #$00                           ;02EE5D|A200    |      ;
 	txy                                  ;02EE5F|9B      |      ;
 ;      |        |      ;
-CODE_02EE60:
+Battle_ApplyTrance:
 	phx                                  ;02EE60|DA      |      ;
 	ldx.W $0ad7                          ;02EE61|AED70A  |020AD7;
-	bne CODE_02EE6B                      ;02EE64|D005    |02EE6B;
+	bne Battle_TranceTransform                      ;02EE64|D005    |02EE6B;
 	cmp.W DATA8_02ee87,y                 ;02EE66|D987EE  |02EE87;
-	bmi CODE_02EE6E                      ;02EE69|3003    |02EE6E;
+	bmi Battle_TrancePowerBoost                      ;02EE69|3003    |02EE6E;
 ;      |        |      ;
-CODE_02EE6B:
+Battle_TranceTransform:
 	inc.W $0ad7                          ;02EE6B|EED70A  |020AD7;
 ;      |        |      ;
-CODE_02EE6E:
+Battle_TrancePowerBoost:
 	plx                                  ;02EE6E|FA      |      ;
 ;      |        |      ;
-CODE_02EE6F:
+Battle_TranceDuration:
 	cmp.W DATA8_02ee87,y                 ;02EE6F|D987EE  |02EE87;
-	bmi CODE_02EE7D                      ;02EE72|3009    |02EE7D;
+	bmi Battle_TranceComplete                      ;02EE72|3009    |02EE7D;
 	inc.W $0ad1,x                        ;02EE74|FED10A  |020AD1;
 	sec                                  ;02EE77|38      |      ;
 	sbc.W DATA8_02ee87,y                 ;02EE78|F987EE  |02EE87;
-	bra CODE_02EE6F                      ;02EE7B|80F2    |02EE6F;
+	bra Battle_TranceDuration                      ;02EE7B|80F2    |02EE6F;
 ;      |        |      ;
 ;      |        |      ;
-CODE_02EE7D:
+Battle_TranceComplete:
 	iny                                  ;02EE7D|C8      |      ;
 	iny                                  ;02EE7E|C8      |      ;
 	inx                                  ;02EE7F|E8      |      ;
 	cpx.B #$05                           ;02EE80|E005    |      ;
-	bne CODE_02EE60                      ;02EE82|D0DC    |02EE60;
+	bne Battle_ApplyTrance                      ;02EE82|D0DC    |02EE60;
 ;      |        |      ;
-CODE_02EE84:
+Battle_ProcessElementalChain:
 	ply                                  ;02EE84|7A      |      ;
 	plx                                  ;02EE85|FA      |      ;
 	rts                                  ;02EE86|60      |      ;
@@ -10742,7 +10742,7 @@ CODE_02EE84:
 DATA8_02ee87:
 	db $10,$27,$e8,$03,$64,$00,$0a,$00,$01,$00;02EE87|        |      ;
 ;      |        |      ;
-CODE_02EE91:
+Battle_ApplyChain:
 	phb                                  ;02EE91|8B      |      ;
 	phx                                  ;02EE92|DA      |      ;
 	phy                                  ;02EE93|5A      |      ;
@@ -10752,9 +10752,9 @@ CODE_02EE91:
 	rep #$10                             ;02EE98|C210    |      ;
 	inc.B $e6                            ;02EE9A|E6E6    |000AE6;
 ;      |        |      ;
-CODE_02EE9C:
+Battle_ChainMultiplier:
 	lda.B $e6                            ;02EE9C|A5E6    |000AE6;
-	bne CODE_02EE9C                      ;02EE9E|D0FC    |02EE9C;
+	bne Battle_ChainMultiplier                      ;02EE9E|D0FC    |02EE9C;
 	rep #$30                             ;02EEA0|C230    |      ;
 	ldx.W #$eec7                         ;02EEA2|A2C7EE  |      ;
 	ldy.W #$c200                         ;02EEA5|A000C2  |      ;
@@ -10767,9 +10767,9 @@ CODE_02EE9C:
 	rep #$10                             ;02EEB9|C210    |      ;
 	inc.B $e5                            ;02EEBB|E6E5    |000AE5;
 ;      |        |      ;
-CODE_02EEBD:
+Battle_ChainBonus:
 	lda.B $e5                            ;02EEBD|A5E5    |000AE5;
-	bne CODE_02EEBD                      ;02EEBF|D0FC    |02EEBD;
+	bne Battle_ChainBonus                      ;02EEBF|D0FC    |02EEBD;
 	plp                                  ;02EEC1|28      |      ;
 	pla                                  ;02EEC2|68      |      ;
 	ply                                  ;02EEC3|7A      |      ;
@@ -10785,26 +10785,26 @@ CODE_02EEBD:
 	pld                                  ;02EEEC|2B      |      ;
 	sep #$30                             ;02EEED|E230    |      ;
 	lda.W $0ae2                          ;02EEEF|ADE20A  |020AE2;
-	beq CODE_02EF0D                      ;02EEF2|F019    |02EF0D;
-	jsr.W CODE_02F0C0                    ;02EEF4|20C0F0  |02F0C0;
+	beq Battle_ApplyBurst                      ;02EEF2|F019    |02EF0D;
+	jsr.W Battle_ApplyFinisher                    ;02EEF4|20C0F0  |02F0C0;
 	ldx.B #$00                           ;02EEF7|A200    |      ;
 	ldy.B #$04                           ;02EEF9|A004    |      ;
 ;      |        |      ;
-CODE_02EEFB:
+Battle_ChainComplete:
 	lda.B $e3,x                          ;02EEFB|B5E3    |000AE3;
-	bne CODE_02EF05                      ;02EEFD|D006    |02EF05;
+	bne Battle_ProcessBurstDamage                      ;02EEFD|D006    |02EF05;
 	inx                                  ;02EEFF|E8      |      ;
 	dey                                  ;02EF00|88      |      ;
-	bne CODE_02EEFB                      ;02EF01|D0F8    |02EEFB;
-	bra CODE_02EF0D                      ;02EF03|8008    |02EF0D;
+	bne Battle_ChainComplete                      ;02EF01|D0F8    |02EEFB;
+	bra Battle_ApplyBurst                      ;02EF03|8008    |02EF0D;
 ;      |        |      ;
 ;      |        |      ;
-CODE_02EF05:
+Battle_ProcessBurstDamage:
 	txa                                  ;02EF05|8A      |      ;
 	pea.W DATA8_02ef0e                   ;02EF06|F40EEF  |02EF0E;
 	jsl.L CODE_0097BE                    ;02EF09|22BE9700|0097BE;
 ;      |        |      ;
-CODE_02EF0D:
+Battle_ApplyBurst:
 	rtl                                  ;02EF0D|6B      |      ;
 ;      |        |      ;
 ;      |        |      ;
@@ -10825,12 +10825,12 @@ DATA8_02ef0e:
 	lda.B #$00                           ;02EF2E|A900    |      ;
 	sec                                  ;02EF30|38      |      ;
 ;      |        |      ;
-CODE_02EF31:
+Battle_BurstCalculate:
 	inx                                  ;02EF31|E8      |      ;
 	inx                                  ;02EF32|E8      |      ;
 	rol a;02EF33|2A      |      ;
 	trb.B $e3                            ;02EF34|14E3    |000AE3;
-	beq CODE_02EF31                      ;02EF36|F0F9    |02EF31;
+	beq Battle_BurstCalculate                      ;02EF36|F0F9    |02EF31;
 	rep #$30                             ;02EF38|C230    |      ;
 	lda.W DATA8_02ef63,x                 ;02EF3A|BD63EF  |02EF63;
 	sta.W $2116                          ;02EF3D|8D1621  |022116;
@@ -10877,12 +10877,12 @@ DATA8_02ef7f:
 	lda.B #$00                           ;02EFA5|A900    |      ;
 	sec                                  ;02EFA7|38      |      ;
 ;      |        |      ;
-CODE_02EFA8:
+Battle_ProcessOverkill:
 	inx                                  ;02EFA8|E8      |      ;
 	inx                                  ;02EFA9|E8      |      ;
 	rol a;02EFAA|2A      |      ;
 	trb.B $e4                            ;02EFAB|14E4    |000AE4;
-	beq CODE_02EFA8                      ;02EFAD|F0F9    |02EFA8;
+	beq Battle_ProcessOverkill                      ;02EFAD|F0F9    |02EFA8;
 	rep #$30                             ;02EFAF|C230    |      ;
 	lda.W DATA8_02efe4,x                 ;02EFB1|BDE4EF  |02EFE4;
 	sta.W $2116                          ;02EFB4|8D1621  |022116;
@@ -10898,11 +10898,11 @@ CODE_02EFA8:
 	rep #$20                             ;02EFCF|C220    |      ;
 	txa                                  ;02EFD1|8A      |      ;
 	cmp.W #$0002                         ;02EFD2|C90200  |      ;
-	bne CODE_02EFDB                      ;02EFD5|D004    |02EFDB;
+	bne Battle_ProcessCombo                      ;02EFD5|D004    |02EFDB;
 	sep #$20                             ;02EFD7|E220    |      ;
 	stz.B $e7                            ;02EFD9|64E7    |000AE7;
 ;      |        |      ;
-CODE_02EFDB:
+Battle_ProcessCombo:
 	plp                                  ;02EFDB|28      |      ;
 	ply                                  ;02EFDC|7A      |      ;
 	plx                                  ;02EFDD|FA      |      ;
@@ -10931,13 +10931,13 @@ DATA8_02f000:
 	rep #$10                             ;02F041|C210    |      ;
 	ldy.W #$0000                         ;02F043|A00000  |      ;
 ;      |        |      ;
-CODE_02F046:
+Battle_ComboHitCount:
 	lda.B #$00                           ;02F046|A900    |      ;
 	xba                                  ;02F048|EB      |      ;
 	lda.W DATA8_02f077,y                 ;02F049|B977F0  |02F077;
 	iny                                  ;02F04C|C8      |      ;
 	cmp.B #$ff                           ;02F04D|C9FF    |      ;
-	beq CODE_02F071                      ;02F04F|F020    |02F071;
+	beq Battle_ComboComplete                      ;02F04F|F020    |02F071;
 	asl a;02F051|0A      |      ;
 	asl a;02F052|0A      |      ;
 	asl a;02F053|0A      |      ;
@@ -10950,17 +10950,17 @@ CODE_02F046:
 	sep #$20                             ;02F05F|E220    |      ;
 	rep #$10                             ;02F061|C210    |      ;
 ;      |        |      ;
-CODE_02F063:
+Battle_ComboMultiplier:
 	lda.L $7ec040,x                      ;02F063|BF40C07E|7EC040;
 	inx                                  ;02F067|E8      |      ;
 	sta.W $2122                          ;02F068|8D2221  |022122;
 	dey                                  ;02F06B|88      |      ;
-	bne CODE_02F063                      ;02F06C|D0F5    |02F063;
+	bne Battle_ComboMultiplier                      ;02F06C|D0F5    |02F063;
 	ply                                  ;02F06E|7A      |      ;
-	bra CODE_02F046                      ;02F06F|80D5    |02F046;
+	bra Battle_ComboHitCount                      ;02F06F|80D5    |02F046;
 ;      |        |      ;
 ;      |        |      ;
-CODE_02F071:
+Battle_ComboComplete:
 	stz.B $e5                            ;02F071|64E5    |000AE5;
 	plp                                  ;02F073|28      |      ;
 	ply                                  ;02F074|7A      |      ;
@@ -10977,12 +10977,12 @@ DATA8_02f077:
 	sep #$20                             ;02F08F|E220    |      ;
 	rep #$10                             ;02F091|C210    |      ;
 	stz.B $e6                            ;02F093|64E6    |000AE6;
-	bra CODE_02F0B5                      ;02F095|801E    |02F0B5;
+	bra Battle_ProcessFinisher                      ;02F095|801E    |02F0B5;
 ;      |        |      ;
 	db $a5,$e5,$d0,$1a,$a2,$b9,$f0,$a0,$00,$43,$a9,$00,$eb,$a9,$06,$54;02F097|        |0000E5;
 	db $02,$02,$e2,$20,$9c,$21,$21,$a9,$01,$8d,$0b,$42,$64,$e6;02F0A7|        |      ;
 ;      |        |      ;
-CODE_02F0B5:
+Battle_ProcessFinisher:
 	plp                                  ;02F0B5|28      |      ;
 	ply                                  ;02F0B6|7A      |      ;
 	plx                                  ;02F0B7|FA      |      ;
@@ -10990,7 +10990,7 @@ CODE_02F0B5:
 ;      |        |      ;
 	db $80,$3b,$40,$c0,$7e,$00,$02       ;02F0B9|        |02F0F6;
 ;      |        |      ;
-CODE_02F0C0:
+Battle_ApplyFinisher:
 	phx                                  ;02F0C0|DA      |      ;
 	phy                                  ;02F0C1|5A      |      ;
 	php                                  ;02F0C2|08      |      ;
@@ -11024,7 +11024,7 @@ CODE_02F0C0:
 	pea.W $0a00                          ;02F0FA|F4000A  |020A00;
 	pld                                  ;02F0FD|2B      |      ;
 	lda.W $0ae2                          ;02F0FE|ADE20A  |020AE2;
-	beq CODE_02F11B                      ;02F101|F018    |02F11B;
+	beq Battle_FinisherPower                      ;02F101|F018    |02F11B;
 	lda.B $f1                            ;02F103|A5F1    |000AF1;
 	sta.W $210f                          ;02F105|8D0F21  |02210F;
 	stz.W $210f                          ;02F108|9C0F21  |02210F;
@@ -11035,7 +11035,7 @@ CODE_02F0C0:
 	lda.W DATA8_02f11d,x                 ;02F115|BD1DF1  |02F11D;
 	sta.W $2101                          ;02F118|8D0121  |022101;
 ;      |        |      ;
-CODE_02F11B:
+Battle_FinisherPower:
 	plp                                  ;02F11B|28      |      ;
 	rtl                                  ;02F11C|6B      |      ;
 ;      |        |      ;
@@ -11049,60 +11049,60 @@ DATA8_02f11d:
 	pea.W $0a00                          ;02F124|F4000A  |020A00;
 	pld                                  ;02F127|2B      |      ;
 	lda.W $0ae2                          ;02F128|ADE20A  |020AE2;
-	beq CODE_02F196                      ;02F12B|F069    |02F196;
+	beq Battle_SummonAnimation                      ;02F12B|F069    |02F196;
 	inc.B $ed                            ;02F12D|E6ED    |000AED;
 	lda.B $9c                            ;02F12F|A59C    |000A9C;
-	bne CODE_02F155                      ;02F131|D022    |02F155;
+	bne Battle_FinisherExecute                      ;02F131|D022    |02F155;
 	db $a5,$ed,$29,$01,$d0,$1c,$e2,$20,$c2,$10,$a2,$00,$00,$a0,$64,$00;02F133|        |0000ED;
 	db $ad,$3a,$0b,$ee,$3a,$0b,$c2,$30,$29,$ff,$00,$0a,$69,$60,$c6,$8d;02F143|        |000B3A;
 	db $48,$0b                           ;02F153|        |      ;
 ;      |        |      ;
-CODE_02F155:
+Battle_FinisherExecute:
 	sep #$30                             ;02F155|E230    |      ;
 	jsr.W CODE_02F5C3                    ;02F157|20C3F5  |02F5C3;
 	jsl.L CODE_0B8E91                    ;02F15A|22918E0B|0B8E91;
 	ldx.B #$00                           ;02F15E|A200    |      ;
 	ldy.B #$20                           ;02F160|A020    |      ;
 ;      |        |      ;
-CODE_02F162:
+Battle_FinisherComplete:
 	lda.L $7ec240,x                      ;02F162|BF40C27E|7EC240;
 	bit.B #$80                           ;02F166|8980    |      ;
-	bne CODE_02F197                      ;02F168|D02D    |02F197;
+	bne Battle_SummonAttack                      ;02F168|D02D    |02F197;
 ;      |        |      ;
-CODE_02F16A:
+Battle_ProcessSummon:
 	inx                                  ;02F16A|E8      |      ;
 	dey                                  ;02F16B|88      |      ;
-	bne CODE_02F162                      ;02F16C|D0F4    |02F162;
+	bne Battle_FinisherComplete                      ;02F16C|D0F4    |02F162;
 	lda.B $ec                            ;02F16E|A5EC    |000AEC;
 	clc                                  ;02F170|18      |      ;
 	adc.B #$40                           ;02F171|6940    |      ;
 	sta.B $ec                            ;02F173|85EC    |000AEC;
-	bne CODE_02F196                      ;02F175|D01F    |02F196;
+	bne Battle_SummonAnimation                      ;02F175|D01F    |02F196;
 	lda.W $04af                          ;02F177|ADAF04  |0204AF;
 	and.B #$20                           ;02F17A|2920    |      ;
-	beq CODE_02F196                      ;02F17C|F018    |02F196;
+	beq Battle_SummonAnimation                      ;02F17C|F018    |02F196;
 	lda.B $eb                            ;02F17E|A5EB    |000AEB;
 	cmp.B #$04                           ;02F180|C904    |      ;
-	bpl CODE_02F189                      ;02F182|1005    |02F189;
+	bpl Battle_ApplySummon                      ;02F182|1005    |02F189;
 	inc.W $0b37                          ;02F184|EE370B  |020B37;
-	bra CODE_02F18C                      ;02F187|8003    |02F18C;
+	bra Battle_SummonCall                      ;02F187|8003    |02F18C;
 ;      |        |      ;
 ;      |        |      ;
-CODE_02F189:
+Battle_ApplySummon:
 	dec.W $0b37                          ;02F189|CE370B  |020B37;
 ;      |        |      ;
-CODE_02F18C:
+Battle_SummonCall:
 	inc.B $eb                            ;02F18C|E6EB    |000AEB;
 	lda.B $eb                            ;02F18E|A5EB    |000AEB;
 	cmp.B #$08                           ;02F190|C908    |      ;
-	bmi CODE_02F196                      ;02F192|3002    |02F196;
+	bmi Battle_SummonAnimation                      ;02F192|3002    |02F196;
 	stz.B $eb                            ;02F194|64EB    |000AEB;
 ;      |        |      ;
-CODE_02F196:
+Battle_SummonAnimation:
 	rtl                                  ;02F196|6B      |      ;
 ;      |        |      ;
 ;      |        |      ;
-CODE_02F197:
+Battle_SummonAttack:
 	and.B #$07                           ;02F197|2907    |      ;
 	phx                                  ;02F199|DA      |      ;
 	phy                                  ;02F19A|5A      |      ;
@@ -11110,7 +11110,7 @@ CODE_02F197:
 	jsl.L CODE_0097BE                    ;02F19E|22BE9700|0097BE;
 	ply                                  ;02F1A2|7A      |      ;
 	plx                                  ;02F1A3|FA      |      ;
-	bra CODE_02F16A                      ;02F1A4|80C4    |02F16A;
+	bra Battle_ProcessSummon                      ;02F1A4|80C4    |02F16A;
 ;      |        |      ;
 ;      |        |      ;
 DATA8_02f1a6:
@@ -11131,25 +11131,25 @@ DATA8_02f1a6:
 	plp                                  ;02F1CC|28      |      ;
 	plx                                  ;02F1CD|FA      |      ;
 	lda.B $e8                            ;02F1CE|A5E8    |000AE8;
-	beq CODE_02F1E1                      ;02F1D0|F00F    |02F1E1;
+	beq Battle_SummonComplete                      ;02F1D0|F00F    |02F1E1;
 	lda.L $7ec340,x                      ;02F1D2|BF40C37E|7EC340;
-	beq CODE_02F1E5                      ;02F1D6|F00D    |02F1E5;
-	bmi CODE_02F1E1                      ;02F1D8|3007    |02F1E1;
+	beq Battle_ProcessTransform                      ;02F1D6|F00D    |02F1E5;
+	bmi Battle_SummonComplete                      ;02F1D8|3007    |02F1E1;
 	dec a;02F1DA|3A      |      ;
-	beq CODE_02F1E5                      ;02F1DB|F008    |02F1E5;
+	beq Battle_ProcessTransform                      ;02F1DB|F008    |02F1E5;
 	sta.L $7ec340,x                      ;02F1DD|9F40C37E|7EC340;
 ;      |        |      ;
-CODE_02F1E1:
+Battle_SummonComplete:
 	plp                                  ;02F1E1|28      |      ;
 	ply                                  ;02F1E2|7A      |      ;
 	plx                                  ;02F1E3|FA      |      ;
 	rts                                  ;02F1E4|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
-CODE_02F1E5:
+Battle_ProcessTransform:
 	lda.L $7ec400,x                      ;02F1E5|BF00C47E|7EC400;
 	bit.B #$80                           ;02F1E9|8980    |      ;
-	bne CODE_02F1F9                      ;02F1EB|D00C    |02F1F9;
+	bne Battle_ApplyTransform                      ;02F1EB|D00C    |02F1F9;
 	and.B #$07                           ;02F1ED|2907    |      ;
 	asl a;02F1EF|0A      |      ;
 	asl a;02F1F0|0A      |      ;
@@ -11157,12 +11157,12 @@ CODE_02F1E5:
 	lda.B #$03                           ;02F1F5|A903    |      ;
 	tsb.B $e4                            ;02F1F7|04E4    |000AE4;
 ;      |        |      ;
-CODE_02F1F9:
-	jsr.W CODE_02F1FE                    ;02F1F9|20FEF1  |02F1FE;
-	bra CODE_02F1E1                      ;02F1FC|80E3    |02F1E1;
+Battle_ApplyTransform:
+	jsr.W Battle_TransformChange                    ;02F1F9|20FEF1  |02F1FE;
+	bra Battle_SummonComplete                      ;02F1FC|80E3    |02F1E1;
 ;      |        |      ;
 ;      |        |      ;
-CODE_02F1FE:
+Battle_TransformChange:
 	phx                                  ;02F1FE|DA      |      ;
 	phy                                  ;02F1FF|5A      |      ;
 	php                                  ;02F200|08      |      ;
@@ -11186,30 +11186,30 @@ CODE_02F1FE:
 	sta.L $7ec420,x                      ;02F223|9F20C47E|7EC420;
 	xba                                  ;02F227|EB      |      ;
 	sta.L $7ec400,x                      ;02F228|9F00C47E|7EC400;
-	bpl CODE_02F24E                      ;02F22C|1020    |02F24E;
+	bpl Battle_TransformComplete                      ;02F22C|1020    |02F24E;
 	cmp.B #$ff                           ;02F22E|C9FF    |      ;
-	bne CODE_02F240                      ;02F230|D00E    |02F240;
+	bne Battle_TransformStats                      ;02F230|D00E    |02F240;
 	lda.B #$00                           ;02F232|A900    |      ;
 	sta.L $7ec360,x                      ;02F234|9F60C37E|7EC360;
 	lda.B #$0a                           ;02F238|A90A    |      ;
 	sta.L $7ec380,x                      ;02F23A|9F80C37E|7EC380;
-	bra CODE_02F258                      ;02F23E|8018    |02F258;
+	bra Battle_EndBattle                      ;02F23E|8018    |02F258;
 ;      |        |      ;
 ;      |        |      ;
-CODE_02F240:
+Battle_TransformStats:
 	and.B #$7f                           ;02F240|297F    |      ;
 	sta.L $7ec380,x                      ;02F242|9F80C37E|7EC380;
 	lda.B #$00                           ;02F246|A900    |      ;
 	sta.L $7ec360,x                      ;02F248|9F60C37E|7EC360;
-	bra CODE_02F258                      ;02F24C|800A    |02F258;
+	bra Battle_EndBattle                      ;02F24C|800A    |02F258;
 ;      |        |      ;
 ;      |        |      ;
-CODE_02F24E:
+Battle_TransformComplete:
 	lda.B #$00                           ;02F24E|A900    |      ;
 	sta.L $7ec380,x                      ;02F250|9F80C37E|7EC380;
 	sta.L $7ec360,x                      ;02F254|9F60C37E|7EC360;
 ;      |        |      ;
-CODE_02F258:
+Battle_EndBattle:
 	rep #$30                             ;02F258|C230    |      ;
 	tya                                  ;02F25A|98      |      ;
 	sep #$20                             ;02F25B|E220    |      ;
@@ -11232,12 +11232,12 @@ CODE_02F258:
 	lda.L $7ec340,x                      ;02F278|BF40C37E|7EC340;
 	dec a;02F27C|3A      |      ;
 	sta.L $7ec340,x                      ;02F27D|9F40C37E|7EC340;
-	beq CODE_02F2B8                      ;02F281|F035    |02F2B8;
+	beq Battle_FinalCleanup                      ;02F281|F035    |02F2B8;
 	rep #$30                             ;02F283|C230    |      ;
 	and.W #$00ff                         ;02F285|29FF00  |      ;
 	sec                                  ;02F288|38      |      ;
 	sbc.W #$0018                         ;02F289|E91800  |      ;
-	bmi CODE_02F2B3                      ;02F28C|3025    |02F2B3;
+	bmi Battle_Cleanup                      ;02F28C|3025    |02F2B3;
 	tay                                  ;02F28E|A8      |      ;
 	lda.L $7ec260,x                      ;02F28F|BF60C27E|7EC260;
 	and.W #$00ff                         ;02F293|29FF00  |      ;
@@ -11255,7 +11255,7 @@ CODE_02F258:
 	sta.W $0c0d,x                        ;02F2AD|9D0D0C  |020C0D;
 	sta.W $0c11,x                        ;02F2B0|9D110C  |020C11;
 ;      |        |      ;
-CODE_02F2B3:
+Battle_Cleanup:
 	plp                                  ;02F2B3|28      |      ;
 	ply                                  ;02F2B4|7A      |      ;
 	plx                                  ;02F2B5|FA      |      ;
@@ -11263,14 +11263,14 @@ CODE_02F2B3:
 	rts                                  ;02F2B7|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
-CODE_02F2B8:
+Battle_FinalCleanup:
 	lda.B #$00                           ;02F2B8|A900    |      ;
 	sta.L $7ec240,x                      ;02F2BA|9F40C27E|7EC240;
 	xba                                  ;02F2BE|EB      |      ;
 	lda.L $7ec260,x                      ;02F2BF|BF60C27E|7EC260;
 	ldy.W #$0005                         ;02F2C3|A00500  |      ;
 ;      |        |      ;
-CODE_02F2C6:
+Battle_ExitBattle:
 	jsr.W Battle_SafeguardComplete                    ;02F2C6|20CAEA  |02EACA;
 	pha                                  ;02F2C9|48      |      ;
 	rep #$30                             ;02F2CA|C230    |      ;
@@ -11294,8 +11294,8 @@ CODE_02F2C6:
 	pla                                  ;02F2F0|68      |      ;
 	inc a;02F2F1|1A      |      ;
 	dey                                  ;02F2F2|88      |      ;
-	bne CODE_02F2C6                      ;02F2F3|D0D1    |02F2C6;
-	bra CODE_02F2B3                      ;02F2F5|80BC    |02F2B3;
+	bne Battle_ExitBattle                      ;02F2F3|D0D1    |02F2C6;
+	bra Battle_Cleanup                      ;02F2F5|80BC    |02F2B3;
 ;      |        |      ;
 ;      |        |      ;
 DATA8_02f2f7:
