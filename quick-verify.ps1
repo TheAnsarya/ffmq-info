@@ -66,11 +66,11 @@ if ($hash -eq $EXPECTED_HASH) {
 	Write-Host "✅ VERIFICATION PASSED" -ForegroundColor Green
 	Write-Host "   ROM builds correctly and matches expected hash!" -ForegroundColor Green
 	Write-Host ""
-	
+
 	# Step 3: Run integrity check
 	Write-Host "🔍 Step 3: Running integrity check..." -ForegroundColor Yellow
 	python tools\rom_integrity.py $BUILD_OUTPUT
-	
+
 	exit 0
 } else {
 	Write-Host "❌ VERIFICATION FAILED" -ForegroundColor Red
@@ -78,9 +78,9 @@ if ($hash -eq $EXPECTED_HASH) {
 	Write-Host ""
 	Write-Host "This could mean:" -ForegroundColor Yellow
 	Write-Host "  • Assembly source has been modified" -ForegroundColor Yellow
-	Write-Host "  • Build tools generated different output" -ForegroundColor Yellow  
+	Write-Host "  • Build tools generated different output" -ForegroundColor Yellow
 	Write-Host "  • ROM header or padding changed" -ForegroundColor Yellow
 	Write-Host ""
-	
+
 	exit 1
 }
