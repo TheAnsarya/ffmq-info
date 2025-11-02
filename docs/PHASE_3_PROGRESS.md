@@ -53,12 +53,27 @@
 - **Output**: JSON, CSV, and summary files
 - **Total**: 7 text categories extracted
 
+### 5. Text Reinsertion Pipeline
+- **Created**: `tools/import/import_text.py` (447 lines)
+- **Features**:
+  * Import from JSON or CSV
+  * Complete FFMQ character encoding
+  * Text length validation
+  * Automatic padding for fixed-length entries
+  * ROM backup creation
+  * Category-based processing
+  * Detailed error reporting
+- **Workflow**: Extract → Edit → Import → Test
+- **Supports**: All 7 text categories
+
 ## Statistics
 
 ### Code Written
-- **Python Tools**: 1,963 lines (4 new extractors)
-- **Documentation**: 439 lines (Phase 3 plan)
-- **Total**: 2,402 lines
+- **Extraction Tools**: 1,963 lines (4 extractors)
+- **Import Tools**: 447 lines (1 importer)
+- **Total Python**: 2,410 lines
+- **Documentation**: 560 lines
+- **Grand Total**: 2,970 lines
 
 ### Extraction Capabilities
 - **Tilesets**: 4 overworld tilesets (256 tiles each = 1,024 tiles)
