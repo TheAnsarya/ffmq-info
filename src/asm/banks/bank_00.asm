@@ -10116,12 +10116,12 @@ BattleEnd_MainLoop:
 	tax                                  ;00D0E6|AA      |      ;
 	lda.W #$00c0                         ;00D0E7|A9C000  |      ;
 	inx                                  ;00D0EA|E8      |      ;
-	beq CODE_00D0F5                      ;00D0EB|F008    |00D0F5;
+	beq BattleEnd_CheckExit                      ;00D0EB|F008    |00D0F5;
 	and.W $10a1                          ;00D0ED|2DA110  |0010A1;
 	beq BattleEnd_CheckInput                      ;00D0F0|F008    |00D0FA;
 	lda.W #$00c0                         ;00D0F2|A9C000  |      ;
 ;      |        |      ;
-CODE_00D0F5:
+BattleEnd_CheckExit:
 	and.W $1021                          ;00D0F5|2D2110  |001021;
 	bne BattleEnd_UpdateDisplay                      ;00D0F8|D042    |00D13C;
 ;      |        |      ;
@@ -10291,7 +10291,7 @@ BattleEnd_ReturnValue:
 	rts                                  ;00D2A5|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
-CODE_00D2A6:
+Character_SelectScreen:
 	php                                  ;00D2A6|08      |      ;
 	phb                                  ;00D2A7|8B      |      ;
 	phd                                  ;00D2A8|0B      |      ;
@@ -10317,7 +10317,7 @@ CODE_00D2A6:
 	ldx.W #$d3f9                         ;00D2CD|A2F9D3  |      ;
 	jsr.W DMA_CopyParamsAndExecute                    ;00D2D0|20C49B  |009BC4;
 ;      |        |      ;
-CODE_00D2D3:
+Character_RefreshDisplay:
 	sep #$20                             ;00D2D3|E220    |      ;
 	rep #$10                             ;00D2D5|C210    |      ;
 	ldx.W #$d3f0                         ;00D2D7|A2F0D3  |      ;
@@ -10327,42 +10327,42 @@ CODE_00D2D3:
 	ldx.W #$fff0                         ;00D2E3|A2F0FF  |      ;
 	stx.B $8e                            ;00D2E6|868E    |00008E;
 ;      |        |      ;
-CODE_00D2E8:
+Character_WaitInput:
 	ldx.W #$d3f3                         ;00D2E8|A2F3D3  |      ;
 	jsr.W DMA_CopyParamsAndExecute                    ;00D2EB|20C49B  |009BC4;
 ;      |        |      ;
-CODE_00D2EE:
+Character_ProcessInput:
 	jsl.L NMI_WaitForVBlank                    ;00D2EE|22A09600|0096A0;
 	ldx.B $07                            ;00D2F2|A607    |000007;
 	stx.B $15                            ;00D2F4|8615    |000015;
 	lda.B $16                            ;00D2F6|A516    |000016;
 	bit.B #$03                           ;00D2F8|8903    |      ;
-	bne CODE_00D2E8                      ;00D2FA|D0EC    |00D2E8;
+	bne Character_WaitInput                      ;00D2FA|D0EC    |00D2E8;
 	lda.B $15                            ;00D2FC|A515    |000015;
 	bit.B #$80                           ;00D2FE|8980    |      ;
-	bne CODE_00D307                      ;00D300|D005    |00D307;
+	bne Character_ProcessSelection                      ;00D300|D005    |00D307;
 	jsr.W Input_CheckMenuSound                    ;00D302|20F1CF  |00CFF1;
-	bra CODE_00D2EE                      ;00D305|80E7    |00D2EE;
+	bra Character_ProcessInput                      ;00D305|80E7    |00D2EE;
 ;      |        |      ;
 ;      |        |      ;
-CODE_00D307:
+Character_ProcessSelection:
 	lda.B $01                            ;00D307|A501    |000001;
 	sta.L $7e3659                        ;00D309|8F59367E|7E3659;
-	beq CODE_00D345                      ;00D30D|F036    |00D345;
+	beq Character_Cancel                      ;00D30D|F036    |00D345;
 	dec a;00D30F|3A      |      ;
-	beq CODE_00D319                      ;00D310|F007    |00D319;
+	beq Character_ConfirmSelection                      ;00D310|F007    |00D319;
 	ldx.W #$4000                         ;00D312|A20040  |      ;
 	stx.B $90                            ;00D315|8690    |000090;
-	bra CODE_00D2EE                      ;00D317|80D5    |00D2EE;
+	bra Character_ProcessInput                      ;00D317|80D5    |00D2EE;
 ;      |        |      ;
 ;      |        |      ;
-CODE_00D319:
+Character_ConfirmSelection:
 	jsr.W Sound_PlayEffect_MenuSelect                    ;00D319|2008B9  |00B908;
 	lda.B #$40                           ;00D31C|A940    |      ;
 	tsb.W $1020                          ;00D31E|0C2010  |001020;
 ;      |        |      ;
-CODE_00D321:
-	jsr.W CODE_00D397                    ;00D321|2097D3  |00D397;
+Character_UpdateDisplay:
+	jsr.W Character_UpdateFlags                    ;00D321|2097D3  |00D397;
 	ldx.W #$d3ed                         ;00D324|A2EDD3  |      ;
 	jsr.W DMA_CopyParamsAndExecute                    ;00D327|20C49B  |009BC4;
 	rep #$30                             ;00D32A|C230    |      ;
@@ -10376,7 +10376,7 @@ CODE_00D321:
 	rtl                                  ;00D334|6B      |      ;
 ;      |        |      ;
 ;      |        |      ;
-CODE_00D335:
+Character_ReturnToMenu:
 	plx                                  ;00D335|FA      |      ;
 	stx.B $03                            ;00D336|8603    |000003;
 	plx                                  ;00D338|FA      |      ;
@@ -10384,139 +10384,139 @@ CODE_00D335:
 	stx.B $05                            ;00D33B|8605    |000005;
 	lda.B $16                            ;00D33D|A516    |000016;
 	and.B #$80                           ;00D33F|2980    |      ;
-	bne CODE_00D2D3                      ;00D341|D090    |00D2D3;
-	bra CODE_00D321                      ;00D343|80DC    |00D321;
+	bne Character_RefreshDisplay                      ;00D341|D090    |00D2D3;
+	bra Character_UpdateDisplay                      ;00D343|80DC    |00D321;
 ;      |        |      ;
 ;      |        |      ;
-CODE_00D345:
+Character_Cancel:
 	jsr.W Sound_PlayEffect_MenuSelect                    ;00D345|2008B9  |00B908;
 	stz.B $8e                            ;00D348|648E    |00008E;
 	stz.B $8f                            ;00D34A|648F    |00008F;
 	pei.B ($01)                          ;00D34C|D401    |000001;
 	pei.B ($03)                          ;00D34E|D403    |000003;
 ;      |        |      ;
-CODE_00D350:
+Character_InputLoop:
 	stz.B $14                            ;00D350|6414    |000014;
 	lda.W $1021                          ;00D352|AD2110  |001021;
 	and.B #$f8                           ;00D355|29F8    |      ;
-	bne CODE_00D362                      ;00D357|D009    |00D362;
-	jsr.W CODE_00D424                    ;00D359|2024D4  |00D424;
+	bne Character_CheckPlayerInput                      ;00D357|D009    |00D362;
+	jsr.W Character_LoadCharacterData                    ;00D359|2024D4  |00D424;
 	lda.B $16                            ;00D35C|A516    |000016;
 	and.B #$80                           ;00D35E|2980    |      ;
-	bne CODE_00D335                      ;00D360|D0D3    |00D335;
+	bne Character_ReturnToMenu                      ;00D360|D0D3    |00D335;
 ;      |        |      ;
-CODE_00D362:
+Character_CheckPlayerInput:
 	inc.B $14                            ;00D362|E614    |000014;
 	lda.W $1090                          ;00D364|AD9010  |001090;
 	inc a;00D367|1A      |      ;
-	beq CODE_00D335                      ;00D368|F0CB    |00D335;
+	beq Character_ReturnToMenu                      ;00D368|F0CB    |00D335;
 	lda.W $10a1                          ;00D36A|ADA110  |0010A1;
 	and.B #$f8                           ;00D36D|29F8    |      ;
-	bne CODE_00D335                      ;00D36F|D0C4    |00D335;
+	bne Character_ReturnToMenu                      ;00D36F|D0C4    |00D335;
 	lda.W $10a0                          ;00D371|ADA010  |0010A0;
 	and.B #$80                           ;00D374|2980    |      ;
-	bne CODE_00D335                      ;00D376|D0BD    |00D335;
-	jsr.W CODE_00D424                    ;00D378|2024D4  |00D424;
+	bne Character_ReturnToMenu                      ;00D376|D0BD    |00D335;
+	jsr.W Character_LoadCharacterData                    ;00D378|2024D4  |00D424;
 	lda.B $16                            ;00D37B|A516    |000016;
 	and.B #$80                           ;00D37D|2980    |      ;
-	beq CODE_00D335                      ;00D37F|F0B4    |00D335;
+	beq Character_ReturnToMenu                      ;00D37F|F0B4    |00D335;
 	lda.W $1021                          ;00D381|AD2110  |001021;
 	and.B #$f8                           ;00D384|29F8    |      ;
-	bne CODE_00D335                      ;00D386|D0AD    |00D335;
+	bne Character_ReturnToMenu                      ;00D386|D0AD    |00D335;
 	lda.W $1050                          ;00D388|AD5010  |001050;
 	cmp.B #$30                           ;00D38B|C930    |      ;
-	bne CODE_00D350                      ;00D38D|D0C1    |00D350;
+	bne Character_InputLoop                      ;00D38D|D0C1    |00D350;
 	lda.W $1052                          ;00D38F|AD5210  |001052;
 	jsr.W CODE_00DB3B                    ;00D392|203BDB  |00DB3B;
-	bra CODE_00D350                      ;00D395|80B9    |00D350;
+	bra Character_InputLoop                      ;00D395|80B9    |00D350;
 ;      |        |      ;
 ;      |        |      ;
-CODE_00D397:
+Character_UpdateFlags:
 	lda.B #$30                           ;00D397|A930    |      ;
 	trb.W $1020                          ;00D399|1C2010  |001020;
 	trb.W $10a0                          ;00D39C|1CA010  |0010A0;
 	lda.W $1050                          ;00D39F|AD5010  |001050;
 	dec a;00D3A2|3A      |      ;
-	bne CODE_00D3AA                      ;00D3A3|D005    |00D3AA;
+	bne Character_UpdateP1Flags                      ;00D3A3|D005    |00D3AA;
 	lda.B #$20                           ;00D3A5|A920    |      ;
 	tsb.W $1020                          ;00D3A7|0C2010  |001020;
 ;      |        |      ;
-CODE_00D3AA:
+Character_UpdateP1Flags:
 	lda.W $10d0                          ;00D3AA|ADD010  |0010D0;
 	dec a;00D3AD|3A      |      ;
-	bne CODE_00D3B5                      ;00D3AE|D005    |00D3B5;
+	bne Character_UpdateP2Flags                      ;00D3AE|D005    |00D3B5;
 	db $a9,$30,$0c,$a0,$10               ;00D3B0|        |      ;
 ;      |        |      ;
-CODE_00D3B5:
+Character_UpdateP2Flags:
 	lda.W $1050                          ;00D3B5|AD5010  |001050;
 	cmp.B #$11                           ;00D3B8|C911    |      ;
-	bne CODE_00D3C6                      ;00D3BA|D00A    |00D3C6;
+	bne Character_CheckP1                      ;00D3BA|D00A    |00D3C6;
 	lda.B #$30                           ;00D3BC|A930    |      ;
 	trb.W $10a0                          ;00D3BE|1CA010  |0010A0;
 	lda.B #$20                           ;00D3C1|A920    |      ;
 	tsb.W $10a0                          ;00D3C3|0CA010  |0010A0;
 ;      |        |      ;
-CODE_00D3C6:
+Character_CheckP1:
 	lda.W $10d0                          ;00D3C6|ADD010  |0010D0;
 	cmp.B #$11                           ;00D3C9|C911    |      ;
-	bne CODE_00D3D2                      ;00D3CB|D005    |00D3D2;
+	bne Character_CheckP2                      ;00D3CB|D005    |00D3D2;
 	lda.B #$30                           ;00D3CD|A930    |      ;
 	tsb.W $1020                          ;00D3CF|0C2010  |001020;
 ;      |        |      ;
-CODE_00D3D2:
+Character_CheckP2:
 	lda.W $1050                          ;00D3D2|AD5010  |001050;
 	cmp.B #$30                           ;00D3D5|C930    |      ;
-	bne CODE_00D3DF                      ;00D3D7|D006    |00D3DF;
+	bne Character_UpdateP1Portrait                      ;00D3D7|D006    |00D3DF;
 	lda.W $1052                          ;00D3D9|AD5210  |001052;
 	jsr.W CODE_00DB3B                    ;00D3DC|203BDB  |00DB3B;
 ;      |        |      ;
-CODE_00D3DF:
+Character_UpdateP1Portrait:
 	lda.W $10d0                          ;00D3DF|ADD010  |0010D0;
 	cmp.B #$30                           ;00D3E2|C930    |      ;
-	bne CODE_00D3EC                      ;00D3E4|D006    |00D3EC;
+	bne Character_UpdateP2Portrait                      ;00D3E4|D006    |00D3EC;
 	lda.W $10d2                          ;00D3E6|ADD210  |0010D2;
 	jsr.W CODE_00DB3B                    ;00D3E9|203BDB  |00DB3B;
 ;      |        |      ;
-CODE_00D3EC:
+Character_UpdateP2Portrait:
 	rts                                  ;00D3EC|60      |      ;
 ;      |        |      ;
 	db $d7,$a0,$03,$7a,$b0,$03,$b1,$b0,$03,$dc,$af,$03,$90,$a0,$03;00D3ED|        |      ;
 ;      |        |      ;
-CODE_00D3FC:
+Character_CalculateInputMask:
 	php                                  ;00D3FC|08      |      ;
 	rep #$20                             ;00D3FD|C220    |      ;
 	sep #$10                             ;00D3FF|E210    |      ;
 	ldx.B $14                            ;00D401|A614    |000014;
-	beq CODE_00D412                      ;00D403|F00D    |00D412;
+	beq Character_DefaultMask                      ;00D403|F00D    |00D412;
 	lda.W #$4000                         ;00D405|A90040  |      ;
 	ldx.W $1050                          ;00D408|AE5010  |001050;
-	bne CODE_00D41D                      ;00D40B|D010    |00D41D;
+	bne Character_ApplyMask                      ;00D40B|D010    |00D41D;
 	lda.W #$4030                         ;00D40D|A93040  |      ;
-	bra CODE_00D41D                      ;00D410|800B    |00D41D;
+	bra Character_ApplyMask                      ;00D410|800B    |00D41D;
 ;      |        |      ;
 ;      |        |      ;
-CODE_00D412:
+Character_DefaultMask:
 	lda.W #$0040                         ;00D412|A94000  |      ;
 	and.W $00d9                          ;00D415|2DD900  |0000D9;
-	beq CODE_00D41D                      ;00D418|F003    |00D41D;
+	beq Character_ApplyMask                      ;00D418|F003    |00D41D;
 	lda.W #$0030                         ;00D41A|A93000  |      ;
 ;      |        |      ;
-CODE_00D41D:
+Character_ApplyMask:
 	eor.W #$fff0                         ;00D41D|49F0FF  |      ;
 	sta.B $8e                            ;00D420|858E    |00008E;
 	plp                                  ;00D422|28      |      ;
 	rts                                  ;00D423|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
-CODE_00D424:
+Character_LoadCharacterData:
 	ldx.W #$0202                         ;00D424|A20202  |      ;
 	stx.B $03                            ;00D427|8603    |000003;
 	ldx.W #$0000                         ;00D429|A20000  |      ;
 	lda.B $14                            ;00D42C|A514    |000014;
-	beq CODE_00D433                      ;00D42E|F003    |00D433;
+	beq Character_SetDataPointer                      ;00D42E|F003    |00D433;
 	ldx.W #$0005                         ;00D430|A20500  |      ;
 ;      |        |      ;
-CODE_00D433:
+Character_SetDataPointer:
 	rep #$30                             ;00D433|C230    |      ;
 	lda.L $7e365a,x                      ;00D435|BF5A367E|7E365A;
 	sta.B $01                            ;00D439|8501    |000001;
@@ -10525,137 +10525,137 @@ CODE_00D433:
 	lda.B #$04                           ;00D43F|A904    |      ;
 	tsb.W $00da                          ;00D441|0CDA00  |0000DA;
 ;      |        |      ;
-CODE_00D444:
-	jsr.W CODE_00D538                    ;00D444|2038D5  |00D538;
+Character_DisplayLoop:
+	jsr.W Character_SaveSelectionState                    ;00D444|2038D5  |00D538;
 	ldx.W #$d576                         ;00D447|A276D5  |      ;
 	jsr.W DMA_CopyParamsAndExecute                    ;00D44A|20C49B  |009BC4;
 	ldx.W #$d57c                         ;00D44D|A27CD5  |      ;
 	jsr.W DMA_CopyParamsAndExecute                    ;00D450|20C49B  |009BC4;
-	jsr.W CODE_00D3FC                    ;00D453|20FCD3  |00D3FC;
+	jsr.W Character_CalculateInputMask                    ;00D453|20FCD3  |00D3FC;
 ;      |        |      ;
-CODE_00D456:
+Character_WaitVBlank:
 	ldx.W #$d579                         ;00D456|A279D5  |      ;
 	jsr.W DMA_CopyParamsAndExecute                    ;00D459|20C49B  |009BC4;
 ;      |        |      ;
-CODE_00D45C:
+Character_ProcessFrame:
 	jsl.L NMI_WaitForVBlank                    ;00D45C|22A09600|0096A0;
 	ldx.B $07                            ;00D460|A607    |000007;
 	stx.B $15                            ;00D462|8615    |000015;
-	beq CODE_00D45C                      ;00D464|F0F6    |00D45C;
+	beq Character_ProcessFrame                      ;00D464|F0F6    |00D45C;
 	lda.B $16                            ;00D466|A516    |000016;
 	bit.B #$80                           ;00D468|8980    |      ;
-	bne CODE_00D4D0                      ;00D46A|D064    |00D4D0;
+	bne Character_PlaySound                      ;00D46A|D064    |00D4D0;
 	bit.B #$0f                           ;00D46C|890F    |      ;
-	bne CODE_00D456                      ;00D46E|D0E6    |00D456;
+	bne Character_WaitVBlank                      ;00D46E|D0E6    |00D456;
 	lda.B $15                            ;00D470|A515    |000015;
 	bit.B #$80                           ;00D472|8980    |      ;
-	bne CODE_00D47B                      ;00D474|D005    |00D47B;
+	bne Character_Confirm                      ;00D474|D005    |00D47B;
 	jsr.W Input_CheckMenuSound                    ;00D476|20F1CF  |00CFF1;
-	bra CODE_00D45C                      ;00D479|80E1    |00D45C;
+	bra Character_ProcessFrame                      ;00D479|80E1    |00D45C;
 ;      |        |      ;
 ;      |        |      ;
-CODE_00D47B:
+Character_Confirm:
 	jsr.W Sound_PlayEffect_MenuSelect                    ;00D47B|2008B9  |00B908;
 	stz.B $8e                            ;00D47E|648E    |00008E;
 	stz.B $8f                            ;00D480|648F    |00008F;
-	jsr.W CODE_00D54D                    ;00D482|204DD5  |00D54D;
+	jsr.W Character_UpdateSelectionState                    ;00D482|204DD5  |00D54D;
 	lda.B $02                            ;00D485|A502    |000002;
 	asl a;00D487|0A      |      ;
 	ora.B $01                            ;00D488|0501    |000001;
-	beq CODE_00D4E0                      ;00D48A|F054    |00D4E0;
+	beq Character_InitiateEquipment                      ;00D48A|F054    |00D4E0;
 	cmp.B #$02                           ;00D48C|C902    |      ;
-	bcc CODE_00D4C3                      ;00D48E|9033    |00D4C3;
-	beq CODE_00D4B6                      ;00D490|F024    |00D4B6;
+	bcc Character_ShowWeapon                      ;00D48E|9033    |00D4C3;
+	beq Character_ShowAbilities                      ;00D490|F024    |00D4B6;
 	lda.B #$04                           ;00D492|A904    |      ;
 	sta.W $04e0                          ;00D494|8DE004  |0004E0;
-	jsr.W CODE_00D722                    ;00D497|2022D7  |00D722;
+	jsr.W Equipment_ShowConfirmDialog                    ;00D497|2022D7  |00D722;
 	lda.B $16                            ;00D49A|A516    |000016;
 	bit.B #$80                           ;00D49C|8980    |      ;
-	bne CODE_00D4B4                      ;00D49E|D014    |00D4B4;
+	bne Character_ReturnToDisplay                      ;00D49E|D014    |00D4B4;
 	ldx.W #$0000                         ;00D4A0|A20000  |      ;
 	lda.B $14                            ;00D4A3|A514    |000014;
-	beq CODE_00D4AA                      ;00D4A5|F003    |00D4AA;
+	beq Character_CheckEquipment                      ;00D4A5|F003    |00D4AA;
 	ldx.W #$0080                         ;00D4A7|A28000  |      ;
 ;      |        |      ;
-CODE_00D4AA:
+Character_CheckEquipment:
 	eor.W $1051,x                        ;00D4AA|5D5110  |001051;
 	asl a;00D4AD|0A      |      ;
 	asl a;00D4AE|0A      |      ;
 	asl a;00D4AF|0A      |      ;
 	sec                                  ;00D4B0|38      |      ;
 	rol a;00D4B1|2A      |      ;
-	bra CODE_00D502                      ;00D4B2|804E    |00D502;
+	bra Character_StoreSelection                      ;00D4B2|804E    |00D502;
 ;      |        |      ;
 ;      |        |      ;
-CODE_00D4B4:
-	bra CODE_00D444                      ;00D4B4|808E    |00D444;
+Character_ReturnToDisplay:
+	bra Character_DisplayLoop                      ;00D4B4|808E    |00D444;
 ;      |        |      ;
 ;      |        |      ;
-CODE_00D4B6:
-	jsr.W CODE_00D585                    ;00D4B6|2085D5  |00D585;
+Character_ShowAbilities:
+	jsr.W Abilities_ShowScreen                    ;00D4B6|2085D5  |00D585;
 	lda.B $16                            ;00D4B9|A516    |000016;
 	bit.B #$80                           ;00D4BB|8980    |      ;
-	bne CODE_00D4B4                      ;00D4BD|D0F5    |00D4B4;
+	bne Character_ReturnToDisplay                      ;00D4BD|D0F5    |00D4B4;
 	lda.B #$30                           ;00D4BF|A930    |      ;
-	bra CODE_00D502                      ;00D4C1|803F    |00D502;
+	bra Character_StoreSelection                      ;00D4C1|803F    |00D502;
 ;      |        |      ;
 ;      |        |      ;
-CODE_00D4C3:
-	jsr.W CODE_00D663                    ;00D4C3|2063D6  |00D663;
+Character_ShowWeapon:
+	jsr.W Weapon_ShowScreen                    ;00D4C3|2063D6  |00D663;
 	lda.B $16                            ;00D4C6|A516    |000016;
 	bit.B #$80                           ;00D4C8|8980    |      ;
-	bne CODE_00D4B4                      ;00D4CA|D0E8    |00D4B4;
+	bne Character_ReturnToDisplay                      ;00D4CA|D0E8    |00D4B4;
 	lda.B #$20                           ;00D4CC|A920    |      ;
-	bra CODE_00D502                      ;00D4CE|8032    |00D502;
+	bra Character_StoreSelection                      ;00D4CE|8032    |00D502;
 ;      |        |      ;
 ;      |        |      ;
-CODE_00D4D0:
+Character_PlaySound:
 	jsr.W Sound_PlayEffect_WindowOpen                    ;00D4D0|201CB9  |00B91C;
 ;      |        |      ;
-CODE_00D4D3:
+Character_CleanupDisplay:
 	stz.B $8e                            ;00D4D3|648E    |00008E;
 	stz.B $8f                            ;00D4D5|648F    |00008F;
-	jsr.W CODE_00D538                    ;00D4D7|2038D5  |00D538;
+	jsr.W Character_SaveSelectionState                    ;00D4D7|2038D5  |00D538;
 	lda.B #$04                           ;00D4DA|A904    |      ;
 	trb.W $00da                          ;00D4DC|1CDA00  |0000DA;
 	rts                                  ;00D4DF|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
-CODE_00D4E0:
+Character_InitiateEquipment:
 	ldx.W #$0000                         ;00D4E0|A20000  |      ;
 	lda.B $14                            ;00D4E3|A514    |000014;
-	beq CODE_00D4EA                      ;00D4E5|F003    |00D4EA;
+	beq Character_LoadEquipmentScreen                      ;00D4E5|F003    |00D4EA;
 	ldx.W #$0080                         ;00D4E7|A28000  |      ;
 ;      |        |      ;
-CODE_00D4EA:
-	jsr.W CODE_00D513                    ;00D4EA|2013D5  |00D513;
+Character_LoadEquipmentScreen:
+	jsr.W Character_LoadCharacter                    ;00D4EA|2013D5  |00D513;
 	lda.B #$40                           ;00D4ED|A940    |      ;
 	tsb.W $00d9                          ;00D4EF|0CD900  |0000D9;
-	jsr.W CODE_00D722                    ;00D4F2|2022D7  |00D722;
+	jsr.W Equipment_ShowConfirmDialog                    ;00D4F2|2022D7  |00D722;
 	lda.B #$40                           ;00D4F5|A940    |      ;
 	trb.W $00d9                          ;00D4F7|1CD900  |0000D9;
 	lda.B $16                            ;00D4FA|A516    |000016;
 	bit.B #$80                           ;00D4FC|8980    |      ;
-	bne CODE_00D4B4                      ;00D4FE|D0B4    |00D4B4;
+	bne Character_ReturnToDisplay                      ;00D4FE|D0B4    |00D4B4;
 	lda.B #$00                           ;00D500|A900    |      ;
 ;      |        |      ;
-CODE_00D502:
+Character_StoreSelection:
 	tay                                  ;00D502|A8      |      ;
 	ldx.W #$0000                         ;00D503|A20000  |      ;
 	lda.B $14                            ;00D506|A514    |000014;
-	beq CODE_00D50D                      ;00D508|F003    |00D50D;
+	beq Character_UpdateCharacterSlot                      ;00D508|F003    |00D50D;
 	ldx.W #$0080                         ;00D50A|A28000  |      ;
 ;      |        |      ;
-CODE_00D50D:
+Character_UpdateCharacterSlot:
 	tya                                  ;00D50D|98      |      ;
 	sta.W $1050,x                        ;00D50E|9D5010  |001050;
-	bra CODE_00D4D3                      ;00D511|80C0    |00D4D3;
+	bra Character_CleanupDisplay                      ;00D511|80C0    |00D4D3;
 ;      |        |      ;
 ;      |        |      ;
-CODE_00D513:
+Character_LoadCharacter:
 	lda.W $1031,x                        ;00D513|BD3110  |001031;
 	cmp.B #$ff                           ;00D516|C9FF    |      ;
-	beq UNREACH_00D532                   ;00D518|F018    |00D532;
+	beq Character_SetUnavailable                   ;00D518|F018    |00D532;
 	sta.W $043a                          ;00D51A|8D3A04  |00043A;
 	pha                                  ;00D51D|48      |      ;
 	phx                                  ;00D51E|DA      |      ;
@@ -10663,26 +10663,26 @@ CODE_00D513:
 	plx                                  ;00D523|FA      |      ;
 	pla                                  ;00D524|68      |      ;
 	cmp.B #$29                           ;00D525|C929    |      ;
-	bcc CODE_00D537                      ;00D527|900E    |00D537;
+	bcc Character_LoadComplete                      ;00D527|900E    |00D537;
 	cmp.B #$2c                           ;00D529|C92C    |      ;
-	beq CODE_00D537                      ;00D52B|F00A    |00D537;
+	beq Character_LoadComplete                      ;00D52B|F00A    |00D537;
 	lda.W $1030,x                        ;00D52D|BD3010  |001030;
-	bne CODE_00D537                      ;00D530|D005    |00D537;
+	bne Character_LoadComplete                      ;00D530|D005    |00D537;
 ;      |        |      ;
-UNREACH_00D532:
+Character_SetUnavailable:
 	db $a9,$81,$8d,$e0,$04               ;00D532|        |      ;
 ;      |        |      ;
-CODE_00D537:
+Character_LoadComplete:
 	rts                                  ;00D537|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
-CODE_00D538:
+Character_SaveSelectionState:
 	ldx.W #$0000                         ;00D538|A20000  |      ;
 	lda.B $14                            ;00D53B|A514    |000014;
-	beq CODE_00D542                      ;00D53D|F003    |00D542;
+	beq Character_GetStatePointer                      ;00D53D|F003    |00D542;
 	ldx.W #$0005                         ;00D53F|A20500  |      ;
 ;      |        |      ;
-CODE_00D542:
+Character_GetStatePointer:
 	rep #$30                             ;00D542|C230    |      ;
 	lda.B $01                            ;00D544|A501    |000001;
 	sta.L $7e365a,x                      ;00D546|9F5A367E|7E365A;
@@ -10690,17 +10690,17 @@ CODE_00D542:
 	rts                                  ;00D54C|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
-CODE_00D54D:
+Character_UpdateSelectionState:
 	ldx.W #$0000                         ;00D54D|A20000  |      ;
 	lda.B $14                            ;00D550|A514    |000014;
-	beq CODE_00D557                      ;00D552|F003    |00D557;
+	beq Character_CheckStateChanged                      ;00D552|F003    |00D557;
 	ldx.W #$0005                         ;00D554|A20500  |      ;
 ;      |        |      ;
-CODE_00D557:
+Character_CheckStateChanged:
 	rep #$30                             ;00D557|C230    |      ;
 	lda.B $01                            ;00D559|A501    |000001;
 	cmp.L $7e365a,x                      ;00D55B|DF5A367E|7E365A;
-	beq CODE_00D573                      ;00D55F|F012    |00D573;
+	beq Character_StateUnchanged                      ;00D55F|F012    |00D573;
 	sta.L $7e365a,x                      ;00D561|9F5A367E|7E365A;
 	lda.W #$0000                         ;00D565|A90000  |      ;
 	sta.L $7e365c,x                      ;00D568|9F5C367E|7E365C;
@@ -10709,101 +10709,101 @@ CODE_00D557:
 	rts                                  ;00D572|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
-CODE_00D573:
+Character_StateUnchanged:
 	sep #$20                             ;00D573|E220    |      ;
 	rts                                  ;00D575|60      |      ;
 ;      |        |      ;
 	db $f4,$b0,$03,$2a,$b1,$03,$dc,$af,$03;00D576|        |      ;
 	db $10,$a2,$03,$89,$a2,$03           ;00D57F|        |00D523;
 ;      |        |      ;
-CODE_00D585:
+Abilities_ShowScreen:
 	pei.B ($01)                          ;00D585|D401    |000001;
 	pei.B ($03)                          ;00D587|D403    |000003;
 	ldx.W #$0104                         ;00D589|A20401  |      ;
 	stx.B $03                            ;00D58C|8603    |000003;
 	ldx.W #$0000                         ;00D58E|A20000  |      ;
 	lda.B $14                            ;00D591|A514    |000014;
-	beq CODE_00D598                      ;00D593|F003    |00D598;
+	beq Abilities_LoadData                      ;00D593|F003    |00D598;
 	ldx.W #$0005                         ;00D595|A20500  |      ;
 ;      |        |      ;
-CODE_00D598:
+Abilities_LoadData:
 	rep #$30                             ;00D598|C230    |      ;
 	lda.L $7e365c,x                      ;00D59A|BF5C367E|7E365C;
 	sta.B $01                            ;00D59E|8501    |000001;
 	sta.B $05                            ;00D5A0|8505    |000005;
 	sep #$20                             ;00D5A2|E220    |      ;
 ;      |        |      ;
-CODE_00D5A4:
+Abilities_DisplayLoop:
 	ldx.W #$d639                         ;00D5A4|A239D6  |      ;
 	jsr.W DMA_CopyParamsAndExecute                    ;00D5A7|20C49B  |009BC4;
 	ldx.W #$d636                         ;00D5AA|A236D6  |      ;
 	jsr.W DMA_CopyParamsAndExecute                    ;00D5AD|20C49B  |009BC4;
-	jsr.W CODE_00D3FC                    ;00D5B0|20FCD3  |00D3FC;
+	jsr.W Character_CalculateInputMask                    ;00D5B0|20FCD3  |00D3FC;
 ;      |        |      ;
-CODE_00D5B3:
+Abilities_WaitVBlank:
 	ldx.W #$d63c                         ;00D5B3|A23CD6  |      ;
 	jsr.W DMA_CopyParamsAndExecute                    ;00D5B6|20C49B  |009BC4;
 ;      |        |      ;
-CODE_00D5B9:
+Abilities_ProcessFrame:
 	jsl.L NMI_WaitForVBlank                    ;00D5B9|22A09600|0096A0;
 	ldx.B $07                            ;00D5BD|A607    |000007;
 	stx.B $15                            ;00D5BF|8615    |000015;
-	beq CODE_00D5B9                      ;00D5C1|F0F6    |00D5B9;
+	beq Abilities_ProcessFrame                      ;00D5C1|F0F6    |00D5B9;
 	lda.B $16                            ;00D5C3|A516    |000016;
 	bit.B #$80                           ;00D5C5|8980    |      ;
-	bne CODE_00D614                      ;00D5C7|D04B    |00D614;
+	bne Abilities_PlayCancel                      ;00D5C7|D04B    |00D614;
 	bit.B #$03                           ;00D5C9|8903    |      ;
-	bne CODE_00D5B3                      ;00D5CB|D0E6    |00D5B3;
+	bne Abilities_WaitVBlank                      ;00D5CB|D0E6    |00D5B3;
 	lda.B $15                            ;00D5CD|A515    |000015;
 	bit.B #$80                           ;00D5CF|8980    |      ;
-	bne CODE_00D5D8                      ;00D5D1|D005    |00D5D8;
+	bne Abilities_Confirm                      ;00D5D1|D005    |00D5D8;
 	jsr.W Input_CheckMenuSound                    ;00D5D3|20F1CF  |00CFF1;
-	bra CODE_00D5B9                      ;00D5D6|80E1    |00D5B9;
+	bra Abilities_ProcessFrame                      ;00D5D6|80E1    |00D5B9;
 ;      |        |      ;
 ;      |        |      ;
-CODE_00D5D8:
-	jsr.W CODE_00D63F                    ;00D5D8|203FD6  |00D63F;
+Abilities_Confirm:
+	jsr.W Abilities_UpdateSelectionState                    ;00D5D8|203FD6  |00D63F;
 	ldx.W #$0000                         ;00D5DB|A20000  |      ;
 	stx.B $8e                            ;00D5DE|868E    |00008E;
 	lda.B $14                            ;00D5E0|A514    |000014;
-	beq CODE_00D5E7                      ;00D5E2|F003    |00D5E7;
+	beq Abilities_LoadCharacterAbility                      ;00D5E2|F003    |00D5E7;
 	ldx.W #$0080                         ;00D5E4|A28000  |      ;
 ;      |        |      ;
-CODE_00D5E7:
+Abilities_LoadCharacterAbility:
 	phx                                  ;00D5E7|DA      |      ;
 	lda.W $1052,x                        ;00D5E8|BD5210  |001052;
 	jsl.L CODE_00DA65                    ;00D5EB|2265DA00|00DA65;
 	plx                                  ;00D5EF|FA      |      ;
 	cmp.B #$00                           ;00D5F0|C900    |      ;
-	bne CODE_00D5F9                      ;00D5F2|D005    |00D5F9;
+	bne Abilities_PlayConfirm                      ;00D5F2|D005    |00D5F9;
 	db $20,$12,$b9,$80,$b7               ;00D5F4|        |00B912;
 ;      |        |      ;
-CODE_00D5F9:
+Abilities_PlayConfirm:
 	jsr.W Sound_PlayEffect_MenuSelect                    ;00D5F9|2008B9  |00B908;
 	lda.B #$04                           ;00D5FC|A904    |      ;
 	sta.W $04e0                          ;00D5FE|8DE004  |0004E0;
 	phx                                  ;00D601|DA      |      ;
-	jsr.W CODE_00D722                    ;00D602|2022D7  |00D722;
+	jsr.W Equipment_ShowConfirmDialog                    ;00D602|2022D7  |00D722;
 	plx                                  ;00D605|FA      |      ;
 	lda.B $16                            ;00D606|A516    |000016;
 	bit.B #$80                           ;00D608|8980    |      ;
-	bne CODE_00D5A4                      ;00D60A|D098    |00D5A4;
+	bne Abilities_DisplayLoop                      ;00D60A|D098    |00D5A4;
 	lda.W $1052,x                        ;00D60C|BD5210  |001052;
 	jsr.W CODE_00DBF8                    ;00D60F|20F8DB  |00DBF8;
-	bra CODE_00D617                      ;00D612|8003    |00D617;
+	bra Abilities_CleanupDisplay                      ;00D612|8003    |00D617;
 ;      |        |      ;
 ;      |        |      ;
-CODE_00D614:
+Abilities_PlayCancel:
 	jsr.W Sound_PlayEffect_WindowOpen                    ;00D614|201CB9  |00B91C;
 ;      |        |      ;
-CODE_00D617:
+Abilities_CleanupDisplay:
 	ldx.W #$0000                         ;00D617|A20000  |      ;
 	stx.B $8e                            ;00D61A|868E    |00008E;
 	lda.B $14                            ;00D61C|A514    |000014;
-	beq CODE_00D623                      ;00D61E|F003    |00D623;
+	beq Abilities_SaveState                      ;00D61E|F003    |00D623;
 	ldx.W #$0005                         ;00D620|A20500  |      ;
 ;      |        |      ;
-CODE_00D623:
+Abilities_SaveState:
 	rep #$30                             ;00D623|C230    |      ;
 	lda.B $01                            ;00D625|A501    |000001;
 	sta.L $7e365c,x                      ;00D627|9F5C367E|7E365C;
@@ -10817,7 +10817,7 @@ CODE_00D623:
 ;      |        |      ;
 	db $dc,$af,$03,$16,$a1,$03,$68,$a1,$03;00D636|        |      ;
 ;      |        |      ;
-CODE_00D63F:
+Abilities_UpdateSelectionState:
 	ldx.W #$0000                         ;00D63F|A20000  |      ;
 	lda.B $14                            ;00D642|A514    |000014;
 	beq CODE_00D649                      ;00D644|F003    |00D649;
@@ -10827,7 +10827,7 @@ CODE_00D649:
 	rep #$30                             ;00D649|C230    |      ;
 	lda.B $01                            ;00D64B|A501    |000001;
 	cmp.L $7e365c,x                      ;00D64D|DF5C367E|7E365C;
-	beq CODE_00D660                      ;00D651|F00D    |00D660;
+	beq Abilities_StateUnchanged                      ;00D651|F00D    |00D660;
 	sta.L $7e365c,x                      ;00D653|9F5C367E|7E365C;
 	sep #$20                             ;00D657|E220    |      ;
 	lda.B #$00                           ;00D659|A900    |      ;
@@ -10835,80 +10835,80 @@ CODE_00D649:
 	rts                                  ;00D65F|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
-CODE_00D660:
+Abilities_StateUnchanged:
 	sep #$20                             ;00D660|E220    |      ;
 	rts                                  ;00D662|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
-CODE_00D663:
+Weapon_ShowScreen:
 	pei.B ($01)                          ;00D663|D401    |000001;
 	pei.B ($03)                          ;00D665|D403    |000003;
 	ldx.W #$0304                         ;00D667|A20403  |      ;
 	stx.B $03                            ;00D66A|8603    |000003;
 	ldx.W #$0000                         ;00D66C|A20000  |      ;
 	lda.B $14                            ;00D66F|A514    |000014;
-	beq CODE_00D676                      ;00D671|F003    |00D676;
+	beq Weapon_LoadData                      ;00D671|F003    |00D676;
 	ldx.W #$0005                         ;00D673|A20500  |      ;
 ;      |        |      ;
-CODE_00D676:
+Weapon_LoadData:
 	rep #$30                             ;00D676|C230    |      ;
 	lda.L $7e365c,x                      ;00D678|BF5C367E|7E365C;
 	sta.B $01                            ;00D67C|8501    |000001;
 	sta.B $05                            ;00D67E|8505    |000005;
 	sep #$20                             ;00D680|E220    |      ;
 ;      |        |      ;
-CODE_00D682:
+Weapon_DisplayLoop:
 	ldx.W #$d71c                         ;00D682|A21CD7  |      ;
 	jsr.W DMA_CopyParamsAndExecute                    ;00D685|20C49B  |009BC4;
 	ldx.W #$d719                         ;00D688|A219D7  |      ;
 	jsr.W DMA_CopyParamsAndExecute                    ;00D68B|20C49B  |009BC4;
 ;      |        |      ;
-CODE_00D68E:
-	jsr.W CODE_00D3FC                    ;00D68E|20FCD3  |00D3FC;
+Weapon_RefreshMask:
+	jsr.W Character_CalculateInputMask                    ;00D68E|20FCD3  |00D3FC;
 ;      |        |      ;
-CODE_00D691:
+Weapon_WaitVBlank:
 	ldx.W #$d71f                         ;00D691|A21FD7  |      ;
 	jsr.W DMA_CopyParamsAndExecute                    ;00D694|20C49B  |009BC4;
 ;      |        |      ;
-CODE_00D697:
+Weapon_ProcessFrame:
 	jsl.L NMI_WaitForVBlank                    ;00D697|22A09600|0096A0;
 	ldx.B $07                            ;00D69B|A607    |000007;
 	stx.B $15                            ;00D69D|8615    |000015;
-	beq CODE_00D697                      ;00D69F|F0F6    |00D697;
+	beq Weapon_ProcessFrame                      ;00D69F|F0F6    |00D697;
 	lda.B $16                            ;00D6A1|A516    |000016;
 	bit.B #$80                           ;00D6A3|8980    |      ;
-	bne CODE_00D6F7                      ;00D6A5|D050    |00D6F7;
+	bne Weapon_PlayCancel                      ;00D6A5|D050    |00D6F7;
 	bit.B #$0f                           ;00D6A7|890F    |      ;
-	bne CODE_00D691                      ;00D6A9|D0E6    |00D691;
+	bne Weapon_WaitVBlank                      ;00D6A9|D0E6    |00D691;
 	lda.B $15                            ;00D6AB|A515    |000015;
 	bit.B #$80                           ;00D6AD|8980    |      ;
-	bne CODE_00D6B6                      ;00D6AF|D005    |00D6B6;
+	bne Weapon_Confirm                      ;00D6AF|D005    |00D6B6;
 	jsr.W Input_CheckMenuSound                    ;00D6B1|20F1CF  |00CFF1;
-	bra CODE_00D697                      ;00D6B4|80E1    |00D697;
+	bra Weapon_ProcessFrame                      ;00D6B4|80E1    |00D697;
 ;      |        |      ;
 ;      |        |      ;
-CODE_00D6B6:
-	jsr.W CODE_00D63F                    ;00D6B6|203FD6  |00D63F;
+Weapon_Confirm:
+	jsr.W Abilities_UpdateSelectionState                    ;00D6B6|203FD6  |00D63F;
 	ldx.W #$0000                         ;00D6B9|A20000  |      ;
 	stx.B $8e                            ;00D6BC|868E    |00008E;
 	lda.B $14                            ;00D6BE|A514    |000014;
-	beq CODE_00D6C5                      ;00D6C0|F003    |00D6C5;
+	beq Weapon_CheckWeapon                      ;00D6C0|F003    |00D6C5;
 	ldx.W #$0080                         ;00D6C2|A28000  |      ;
 ;      |        |      ;
-CODE_00D6C5:
+Weapon_CheckWeapon:
 	lda.W $1052,x                        ;00D6C5|BD5210  |001052;
 	cmp.B #$ff                           ;00D6C8|C9FF    |      ;
-	bne CODE_00D6D1                      ;00D6CA|D005    |00D6D1;
+	bne Weapon_ValidWeapon                      ;00D6CA|D005    |00D6D1;
 ;      |        |      ;
-CODE_00D6CC:
+Weapon_PlayError:
 	jsr.W Sound_PlayEffect_MenuMove                    ;00D6CC|2012B9  |00B912;
-	bra CODE_00D68E                      ;00D6CF|80BD    |00D68E;
+	bra Weapon_RefreshMask                      ;00D6CF|80BD    |00D68E;
 ;      |        |      ;
 ;      |        |      ;
-CODE_00D6D1:
+Weapon_ValidWeapon:
 	jsr.W CODE_00DC3A                    ;00D6D1|203ADC  |00DC3A;
 	inc a;00D6D4|1A      |      ;
-	bne CODE_00D6CC                      ;00D6D5|D0F5    |00D6CC;
+	bne Weapon_PlayError                      ;00D6D5|D0F5    |00D6CC;
 	jsr.W Sound_PlayEffect_MenuSelect                    ;00D6D7|2008B9  |00B908;
 	lda.W $1052,x                        ;00D6DA|BD5210  |001052;
 	jsr.W CODE_00DC16                    ;00D6DD|2016DC  |00DC16;
@@ -10916,25 +10916,25 @@ CODE_00D6D1:
 	sta.W $043a                          ;00D6E3|8D3A04  |00043A;
 	phx                                  ;00D6E6|DA      |      ;
 	jsl.L CODE_028AE0                    ;00D6E7|22E08A02|028AE0;
-	jsr.W CODE_00D722                    ;00D6EB|2022D7  |00D722;
+	jsr.W Equipment_ShowConfirmDialog                    ;00D6EB|2022D7  |00D722;
 	plx                                  ;00D6EE|FA      |      ;
 	lda.B $16                            ;00D6EF|A516    |000016;
 	bit.B #$80                           ;00D6F1|8980    |      ;
-	bne CODE_00D682                      ;00D6F3|D08D    |00D682;
-	bra CODE_00D6FA                      ;00D6F5|8003    |00D6FA;
+	bne Weapon_DisplayLoop                      ;00D6F3|D08D    |00D682;
+	bra Weapon_CleanupDisplay                      ;00D6F5|8003    |00D6FA;
 ;      |        |      ;
 ;      |        |      ;
-CODE_00D6F7:
+Weapon_PlayCancel:
 	jsr.W Sound_PlayEffect_WindowOpen                    ;00D6F7|201CB9  |00B91C;
 ;      |        |      ;
-CODE_00D6FA:
+Weapon_CleanupDisplay:
 	ldx.W #$0000                         ;00D6FA|A20000  |      ;
 	stx.B $8e                            ;00D6FD|868E    |00008E;
 	lda.B $14                            ;00D6FF|A514    |000014;
-	beq CODE_00D706                      ;00D701|F003    |00D706;
+	beq Weapon_SaveState                      ;00D701|F003    |00D706;
 	ldx.W #$0005                         ;00D703|A20500  |      ;
 ;      |        |      ;
-CODE_00D706:
+Weapon_SaveState:
 	rep #$30                             ;00D706|C230    |      ;
 	lda.B $01                            ;00D708|A501    |000001;
 	sta.L $7e365c,x                      ;00D70A|9F5C367E|7E365C;
@@ -10948,14 +10948,14 @@ CODE_00D706:
 ;      |        |      ;
 	db $dc,$af,$03,$10,$a2,$03,$89,$a2,$03;00D719|        |      ;
 ;      |        |      ;
-CODE_00D722:
+Equipment_ShowConfirmDialog:
 	pei.B ($01)                          ;00D722|D401    |000001;
 	pei.B ($03)                          ;00D724|D403    |000003;
 	ldx.W #$da56                         ;00D726|A256DA  |      ;
 	jsr.W DMA_CopyParamsAndExecute                    ;00D729|20C49B  |009BC4;
 	ldx.W #$0403                         ;00D72C|A20304  |      ;
 	stx.B $03                            ;00D72F|8603    |000003;
-	jsr.W CODE_00D3FC                    ;00D731|20FCD3  |00D3FC;
+	jsr.W Character_CalculateInputMask                    ;00D731|20FCD3  |00D3FC;
 	rep #$30                             ;00D734|C230    |      ;
 	lda.W #$0f00                         ;00D736|A9000F  |      ;
 	trb.B $8e                            ;00D739|148E    |00008E;
@@ -10964,27 +10964,27 @@ CODE_00D722:
 	stx.B $05                            ;00D740|8605    |000005;
 	inx                                  ;00D742|E8      |      ;
 	lda.B $14                            ;00D743|A514    |000014;
-	beq CODE_00D74A                      ;00D745|F003    |00D74A;
+	beq Equipment_InitializeDialog                      ;00D745|F003    |00D74A;
 	ldx.W #$0005                         ;00D747|A20500  |      ;
 ;      |        |      ;
-CODE_00D74A:
+Equipment_InitializeDialog:
 	lda.B #$80                           ;00D74A|A980    |      ;
 	sta.W SNES_WRMPYA                    ;00D74C|8D0242  |004202;
 	lda.L $7e365e,x                      ;00D74F|BF5E367E|7E365E;
-	beq CODE_00D7B9                      ;00D753|F064    |00D7B9;
+	beq Equipment_DefaultState                      ;00D753|F064    |00D7B9;
 	jsl.L Math_SetMultiplier                    ;00D755|221E9700|00971E;
-	bmi CODE_00D7A5                      ;00D759|304A    |00D7A5;
+	bmi Equipment_CheckNegativeFlag                      ;00D759|304A    |00D7A5;
 	ldy.W SNES_RDMPYL                    ;00D75B|AC1642  |004216;
 	cmp.B #$02                           ;00D75E|C902    |      ;
-	bcc CODE_00D788                      ;00D760|9026    |00D788;
+	bcc Equipment_CheckCharacterAlive                      ;00D760|9026    |00D788;
 	lda.W $04e0                          ;00D762|ADE004  |0004E0;
 	bit.B #$01                           ;00D765|8901    |      ;
-	beq CODE_00D7B9                      ;00D767|F050    |00D7B9;
+	beq Equipment_DefaultState                      ;00D767|F050    |00D7B9;
 	lda.W $1010,y                        ;00D769|B91010  |001010;
-	bmi CODE_00D7B9                      ;00D76C|304B    |00D7B9;
+	bmi Equipment_DefaultState                      ;00D76C|304B    |00D7B9;
 	lda.W $1021,y                        ;00D76E|B92110  |001021;
 	bit.B #$c0                           ;00D771|89C0    |      ;
-	bne CODE_00D7B9                      ;00D773|D044    |00D7B9;
+	bne Equipment_DefaultState                      ;00D773|D044    |00D7B9;
 	rep #$30                             ;00D775|C230    |      ;
 	lda.L $7e365e,x                      ;00D777|BF5E367E|7E365E;
 	and.W #$0007                         ;00D77B|290700  |      ;
@@ -10993,212 +10993,212 @@ CODE_00D74A:
 	ora.W #$0100                         ;00D780|090001  |      ;
 	tax                                  ;00D783|AA      |      ;
 	sep #$20                             ;00D784|E220    |      ;
-	bra CODE_00D7F7                      ;00D786|806F    |00D7F7;
+	bra Equipment_StoreSlot                      ;00D786|806F    |00D7F7;
 ;      |        |      ;
 ;      |        |      ;
-CODE_00D788:
+Equipment_CheckCharacterAlive:
 	lda.W $04e0                          ;00D788|ADE004  |0004E0;
 	bit.B #$04                           ;00D78B|8904    |      ;
-	beq CODE_00D7B9                      ;00D78D|F02A    |00D7B9;
+	beq Equipment_DefaultState                      ;00D78D|F02A    |00D7B9;
 	lda.W $1010,y                        ;00D78F|B91010  |001010;
-	bmi CODE_00D7B9                      ;00D792|3025    |00D7B9;
+	bmi Equipment_DefaultState                      ;00D792|3025    |00D7B9;
 	rep #$30                             ;00D794|C230    |      ;
 	lda.L $7e365e,x                      ;00D796|BF5E367E|7E365E;
 	and.W #$0007                         ;00D79A|290700  |      ;
 	ora.W #$0200                         ;00D79D|090002  |      ;
 	tax                                  ;00D7A0|AA      |      ;
 	sep #$20                             ;00D7A1|E220    |      ;
-	bra CODE_00D7FC                      ;00D7A3|8057    |00D7FC;
+	bra Equipment_UpdatePointer                      ;00D7A3|8057    |00D7FC;
 ;      |        |      ;
 ;      |        |      ;
-CODE_00D7A5:
+Equipment_CheckNegativeFlag:
 	bit.B #$01                           ;00D7A5|8901    |      ;
 	beq UNREACH_00D7B2                   ;00D7A7|F009    |00D7B2;
 	lda.W $04e0                          ;00D7A9|ADE004  |0004E0;
 	bit.B #$02                           ;00D7AC|8902    |      ;
-	bne CODE_00D7F9                      ;00D7AE|D049    |00D7F9;
-	bra CODE_00D7B9                      ;00D7B0|8007    |00D7B9;
+	bne Equipment_NoEquipment                      ;00D7AE|D049    |00D7F9;
+	bra Equipment_DefaultState                      ;00D7B0|8007    |00D7B9;
 ;      |        |      ;
 ;      |        |      ;
 UNREACH_00D7B2:
 	db $ad,$e0,$04,$89,$08,$d0,$13       ;00D7B2|        |0004E0;
 ;      |        |      ;
-CODE_00D7B9:
+Equipment_DefaultState:
 	lda.W $04e0                          ;00D7B9|ADE004  |0004E0;
 	bit.B #$80                           ;00D7BC|8980    |      ;
-	bne CODE_00D7D1                      ;00D7BE|D011    |00D7D1;
+	bne Equipment_CheckUnequip                      ;00D7BE|D011    |00D7D1;
 	lda.W $04e0                          ;00D7C0|ADE004  |0004E0;
 	bit.B #$04                           ;00D7C3|8904    |      ;
 	beq UNREACH_00D7CC                   ;00D7C5|F005    |00D7CC;
 	ldx.W #$0200                         ;00D7C7|A20002  |      ;
-	bra CODE_00D7FC                      ;00D7CA|8030    |00D7FC;
+	bra Equipment_UpdatePointer                      ;00D7CA|8030    |00D7FC;
 ;      |        |      ;
 ;      |        |      ;
 UNREACH_00D7CC:
 	db $a2,$00,$03,$80,$2b               ;00D7CC|        |      ;
 ;      |        |      ;
-CODE_00D7D1:
+Equipment_CheckUnequip:
 	lda.W $04e0                          ;00D7D1|ADE004  |0004E0;
 	bit.B #$01                           ;00D7D4|8901    |      ;
-	beq CODE_00D7F9                      ;00D7D6|F021    |00D7F9;
+	beq Equipment_NoEquipment                      ;00D7D6|F021    |00D7F9;
 	ldx.W #$0100                         ;00D7D8|A20001  |      ;
 	lda.W $1110                          ;00D7DB|AD1011  |001110;
 	inc a;00D7DE|1A      |      ;
-	beq CODE_00D7E8                      ;00D7DF|F007    |00D7E8;
+	beq Equipment_CheckAlly2                      ;00D7DF|F007    |00D7E8;
 	lda.W $1121                          ;00D7E1|AD2111  |001121;
 	and.B #$c0                           ;00D7E4|29C0    |      ;
-	beq CODE_00D7F7                      ;00D7E6|F00F    |00D7F7;
+	beq Equipment_StoreSlot                      ;00D7E6|F00F    |00D7F7;
 ;      |        |      ;
-CODE_00D7E8:
+Equipment_CheckAlly2:
 	inx                                  ;00D7E8|E8      |      ;
 	lda.W $1190                          ;00D7E9|AD9011  |001190;
 	inc a;00D7EC|1A      |      ;
-	beq CODE_00D7F6                      ;00D7ED|F007    |00D7F6;
+	beq Equipment_IncrementSlot                      ;00D7ED|F007    |00D7F6;
 	lda.W $11a1                          ;00D7EF|ADA111  |0011A1;
 	and.B #$c0                           ;00D7F2|29C0    |      ;
-	beq CODE_00D7F7                      ;00D7F4|F001    |00D7F7;
+	beq Equipment_StoreSlot                      ;00D7F4|F001    |00D7F7;
 ;      |        |      ;
-CODE_00D7F6:
+Equipment_IncrementSlot:
 	inx                                  ;00D7F6|E8      |      ;
 ;      |        |      ;
-CODE_00D7F7:
-	bra CODE_00D7FC                      ;00D7F7|8003    |00D7FC;
+Equipment_StoreSlot:
+	bra Equipment_UpdatePointer                      ;00D7F7|8003    |00D7FC;
 ;      |        |      ;
 ;      |        |      ;
-CODE_00D7F9:
+Equipment_NoEquipment:
 	ldx.W #$0000                         ;00D7F9|A20000  |      ;
 ;      |        |      ;
-CODE_00D7FC:
+Equipment_UpdatePointer:
 	stx.B $01                            ;00D7FC|8601    |000001;
 	ldy.B $05                            ;00D7FE|A405    |000005;
 	iny                                  ;00D800|C8      |      ;
-	bne CODE_00D864                      ;00D801|D061    |00D864;
+	bne Equipment_RefreshDisplay                      ;00D801|D061    |00D864;
 	stx.B $05                            ;00D803|8605    |000005;
-	bra CODE_00D864                      ;00D805|805D    |00D864;
+	bra Equipment_RefreshDisplay                      ;00D805|805D    |00D864;
 ;      |        |      ;
 	db $a9,$04,$2d,$e0,$04,$d0,$b2,$a9,$08,$2d,$e0,$04,$f0,$5b,$a9,$03;00D807|        |      ;
 	db $80,$3c                           ;00D817|        |00D855;
 ;      |        |      ;
-UNREACH_00D819:
+Equipment_CheckDirection:
 	db $a5,$02,$c9,$03,$f0,$45,$c9,$01,$f0,$e4,$b0,$e9,$a9,$01,$2d,$e0;00D819|        |000002;
 	db $04,$f0,$db,$a9,$01,$80,$25       ;00D829|        |0000F0;
 ;      |        |      ;
-CODE_00D830:
+Equipment_ProcessDPad:
 	lda.B $02                            ;00D830|A502    |000002;
-	beq CODE_00D864                      ;00D832|F030    |00D864;
+	beq Equipment_RefreshDisplay                      ;00D832|F030    |00D864;
 	cmp.B #$02                           ;00D834|C902    |      ;
-	bcc CODE_00D84C                      ;00D836|9014    |00D84C;
+	bcc Equipment_ProcessConfirm                      ;00D836|9014    |00D84C;
 	db $f0,$0b,$a9,$04,$2d,$e0,$04,$f0,$04,$a9,$02,$80,$10,$a9,$01,$2d;00D838|        |00D845;
 	db $e0,$04,$d0,$85                   ;00D848|        |      ;
 ;      |        |      ;
-CODE_00D84C:
+Equipment_ProcessConfirm:
 	lda.B #$02                           ;00D84C|A902    |      ;
 	and.W $04e0                          ;00D84E|2DE004  |0004E0;
-	beq CODE_00D870                      ;00D851|F01D    |00D870;
+	beq Equipment_WaitFrame                      ;00D851|F01D    |00D870;
 	lda.B #$00                           ;00D853|A900    |      ;
 	sta.B $02                            ;00D855|8502    |000002;
 	jsr.W CODE_00DA1E                    ;00D857|201EDA  |00DA1E;
-	bra CODE_00D864                      ;00D85A|8008    |00D864;
+	bra Equipment_RefreshDisplay                      ;00D85A|8008    |00D864;
 ;      |        |      ;
 ;      |        |      ;
-CODE_00D85C:
+Equipment_ProcessB:
 	jsr.W CODE_00D900                    ;00D85C|2000D9  |00D900;
-	bra CODE_00D864                      ;00D85F|8003    |00D864;
+	bra Equipment_RefreshDisplay                      ;00D85F|8003    |00D864;
 ;      |        |      ;
 ;      |        |      ;
-CODE_00D861:
+Equipment_ProcessA:
 	jsr.W CODE_00D98E                    ;00D861|208ED9  |00D98E;
 ;      |        |      ;
-CODE_00D864:
+Equipment_RefreshDisplay:
 	ldx.W #$da59                         ;00D864|A259DA  |      ;
 	jsr.W DMA_CopyParamsAndExecute                    ;00D867|20C49B  |009BC4;
 	ldx.B $07                            ;00D86A|A607    |000007;
 	cpx.B $15                            ;00D86C|E415    |000015;
-	bne CODE_00D876                      ;00D86E|D006    |00D876;
+	bne Equipment_UpdateFrame                      ;00D86E|D006    |00D876;
 ;      |        |      ;
-CODE_00D870:
+Equipment_WaitFrame:
 	jsl.L NMI_WaitForVBlank                    ;00D870|22A09600|0096A0;
 	ldx.B $07                            ;00D874|A607    |000007;
 ;      |        |      ;
-CODE_00D876:
+Equipment_UpdateFrame:
 	stx.B $15                            ;00D876|8615    |000015;
-	beq CODE_00D899                      ;00D878|F01F    |00D899;
+	beq Equipment_CheckBlink                      ;00D878|F01F    |00D899;
 	lda.B $16                            ;00D87A|A516    |000016;
 	bit.B #$80                           ;00D87C|8980    |      ;
-	bne CODE_00D8A2                      ;00D87E|D022    |00D8A2;
+	bne Equipment_ConfirmExit                      ;00D87E|D022    |00D8A2;
 	bit.B #$02                           ;00D880|8902    |      ;
-	bne CODE_00D85C                      ;00D882|D0D8    |00D85C;
+	bne Equipment_ProcessB                      ;00D882|D0D8    |00D85C;
 	bit.B #$01                           ;00D884|8901    |      ;
-	bne CODE_00D861                      ;00D886|D0D9    |00D861;
+	bne Equipment_ProcessA                      ;00D886|D0D9    |00D861;
 	bit.B #$08                           ;00D888|8908    |      ;
-	bne CODE_00D830                      ;00D88A|D0A4    |00D830;
+	bne Equipment_ProcessDPad                      ;00D88A|D0A4    |00D830;
 	bit.B #$04                           ;00D88C|8904    |      ;
-	bne UNREACH_00D819                   ;00D88E|D089    |00D819;
+	bne Equipment_CheckDirection                   ;00D88E|D089    |00D819;
 	lda.B $15                            ;00D890|A515    |000015;
 	bit.B #$80                           ;00D892|8980    |      ;
-	bne CODE_00D8A7                      ;00D894|D011    |00D8A7;
+	bne Equipment_PlaySelect                      ;00D894|D011    |00D8A7;
 	jsr.W Input_CheckMenuSound                    ;00D896|20F1CF  |00CFF1;
 ;      |        |      ;
-CODE_00D899:
+Equipment_CheckBlink:
 	lda.W $0e97                          ;00D899|AD970E  |000E97;
 	and.B #$01                           ;00D89C|2901    |      ;
-	bne CODE_00D870                      ;00D89E|D0D0    |00D870;
-	bra CODE_00D864                      ;00D8A0|80C2    |00D864;
+	bne Equipment_WaitFrame                      ;00D89E|D0D0    |00D870;
+	bra Equipment_RefreshDisplay                      ;00D8A0|80C2    |00D864;
 ;      |        |      ;
 ;      |        |      ;
-CODE_00D8A2:
+Equipment_ConfirmExit:
 	jsr.W Sound_PlayEffect_WindowOpen                    ;00D8A2|201CB9  |00B91C;
-	bra CODE_00D8AA                      ;00D8A5|8003    |00D8AA;
+	bra Equipment_CleanupDialog                      ;00D8A5|8003    |00D8AA;
 ;      |        |      ;
 ;      |        |      ;
-CODE_00D8A7:
+Equipment_PlaySelect:
 	jsr.W Sound_PlayEffect_MenuSelect                    ;00D8A7|2008B9  |00B908;
 ;      |        |      ;
-CODE_00D8AA:
+Equipment_CleanupDialog:
 	lda.W $0e97                          ;00D8AA|AD970E  |000E97;
 	dec a;00D8AD|3A      |      ;
 	bit.B #$02                           ;00D8AE|8902    |      ;
-	beq CODE_00D8C0                      ;00D8B0|F00E    |00D8C0;
+	beq Equipment_PrepareExit                      ;00D8B0|F00E    |00D8C0;
 	bit.B #$01                           ;00D8B2|8901    |      ;
-	bne CODE_00D8BA                      ;00D8B4|D004    |00D8BA;
+	bne Equipment_RefreshOnExit                      ;00D8B4|D004    |00D8BA;
 	jsl.L NMI_WaitForVBlank                    ;00D8B6|22A09600|0096A0;
 ;      |        |      ;
-CODE_00D8BA:
+Equipment_RefreshOnExit:
 	ldx.W #$da59                         ;00D8BA|A259DA  |      ;
 	jsr.W DMA_CopyParamsAndExecute                    ;00D8BD|20C49B  |009BC4;
 ;      |        |      ;
-CODE_00D8C0:
+Equipment_PrepareExit:
 	ldx.W #$0000                         ;00D8C0|A20000  |      ;
 	stx.B $8e                            ;00D8C3|868E    |00008E;
 	txy                                  ;00D8C5|9B      |      ;
 	lda.B $14                            ;00D8C6|A514    |000014;
-	beq CODE_00D8D0                      ;00D8C8|F006    |00D8D0;
+	beq Equipment_CheckMode                      ;00D8C8|F006    |00D8D0;
 	ldx.W #$0005                         ;00D8CA|A20500  |      ;
 	ldy.W #$0080                         ;00D8CD|A08000  |      ;
 ;      |        |      ;
-CODE_00D8D0:
+Equipment_CheckMode:
 	lda.B $02                            ;00D8D0|A502    |000002;
-	beq CODE_00D8E8                      ;00D8D2|F014    |00D8E8;
+	beq Equipment_ReturnDefault                      ;00D8D2|F014    |00D8E8;
 	cmp.B #$02                           ;00D8D4|C902    |      ;
-	bcc CODE_00D8E2                      ;00D8D6|900A    |00D8E2;
-	beq CODE_00D8DE                      ;00D8D8|F004    |00D8DE;
+	bcc Equipment_ReturnMode1                      ;00D8D6|900A    |00D8E2;
+	beq Equipment_ReturnMode3                      ;00D8D8|F004    |00D8DE;
 	db $a9,$80,$80,$0c                   ;00D8DA|        |      ;
 ;      |        |      ;
-CODE_00D8DE:
+Equipment_ReturnMode3:
 	lda.B $01                            ;00D8DE|A501    |000001;
-	bra CODE_00D8EA                      ;00D8E0|8008    |00D8EA;
+	bra Equipment_StoreResult                      ;00D8E0|8008    |00D8EA;
 ;      |        |      ;
 ;      |        |      ;
-CODE_00D8E2:
+Equipment_ReturnMode1:
 	lda.B $01                            ;00D8E2|A501    |000001;
 	adc.B #$02                           ;00D8E4|6902    |      ;
-	bra CODE_00D8EA                      ;00D8E6|8002    |00D8EA;
+	bra Equipment_StoreResult                      ;00D8E6|8002    |00D8EA;
 ;      |        |      ;
 ;      |        |      ;
-CODE_00D8E8:
+Equipment_ReturnDefault:
 	lda.B #$81                           ;00D8E8|A981    |      ;
 ;      |        |      ;
-CODE_00D8EA:
+Equipment_StoreResult:
 	sta.W $1051,y                        ;00D8EA|995110  |001051;
 	sta.L $7e365e,x                      ;00D8ED|9F5E367E|7E365E;
 	ldx.W #$d3f9                         ;00D8F1|A2F9D3  |      ;
