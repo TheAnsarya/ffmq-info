@@ -110,7 +110,7 @@ CODE_0080DC:
 	lda.B #$01                           ;0080E4|A901    |      ;
 	jsr.W Stats_UpdateDisplay                    ;0080E6|20D491  |0091D4;
 	ldx.W #$81ed                         ;0080E9|A2ED81  |      ;
-	jsr.W CODE_009BC4                    ;0080EC|20C49B  |009BC4;
+	jsr.W DMA_CopyParamsAndExecute                    ;0080EC|20C49B  |009BC4;
 	lda.B #$04                           ;0080EF|A904    |      ;
 	tsb.W $00d4                          ;0080F1|0CD400  |0000D4;
 	lda.B #$80                           ;0080F4|A980    |      ;
@@ -122,7 +122,7 @@ CODE_0080DC:
 	tsb.W $00d6                          ;008103|0CD600  |0000D6;
 	ldx.W #$fff0                         ;008106|A2F0FF  |      ;
 	stx.W $008e                          ;008109|8E8E00  |00008E;
-	jsl.L CODE_009B2F                    ;00810C|222F9B00|009B2F;
+	jsl.L DMA_TransferGFX                    ;00810C|222F9B00|009B2F;
 	jsr.W CODE_008230                    ;008110|203082  |008230;
 	jml.L CODE_018272                    ;008113|5C728201|018272;
 ;      |        |      ;
@@ -204,7 +204,7 @@ CODE_00818E:
 	stx.B $17                            ;0081C9|8617    |000017;
 	jsr.W CODE_00A236                    ;0081CB|2036A2  |00A236;
 	sep #$20                             ;0081CE|E220    |      ;
-	jsl.L CODE_009319                    ;0081D0|22199300|009319;
+	jsl.L Timer_Initialize                    ;0081D0|22199300|009319;
 	rts                                  ;0081D4|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
@@ -247,7 +247,7 @@ CODE_0081F0:
 	db $a2,$2d,$82                       ;008224|        |      ;
 ;      |        |      ;
 SaveData_LoadSlot:
-	jmp.W CODE_009BC4                    ;008227|4CC49B  |009BC4;
+	jmp.W DMA_CopyParamsAndExecute                    ;008227|4CC49B  |009BC4;
 ;      |        |      ;
 	db $2d,$a6,$03                       ;00822A|        |      ;
 	db $2b,$a6,$03                       ;00822D|        |      ;
@@ -258,7 +258,7 @@ Init_SetupFields:
 	plb                                  ;008235|AB      |      ;
 	lda.W #$0170                         ;008236|A97001  |      ;
 	ldy.W #$3007                         ;008239|A00730  |      ;
-	jsr.W CODE_009A08                    ;00823C|20089A  |009A08;
+	jsr.W Memory_Fill_12Bytes                    ;00823C|20089A  |009A08;
 	lda.W #$0098                         ;00823F|A99800  |      ;
 	sta.W $31b5                          ;008242|8DB531  |7E31B5;
 	plb                                  ;008245|AB      |      ;
@@ -300,7 +300,7 @@ Menu_InitializeQueues:
 	sta.L $7e365f                        ;00829A|8F5F367E|7E365F;
 	sta.L $7e3661                        ;00829E|8F61367E|7E3661;
 	ldx.W #$8334                         ;0082A2|A23483  |      ;
-	jsr.W CODE_009BC4                    ;0082A5|20C49B  |009BC4;
+	jsr.W DMA_CopyParamsAndExecute                    ;0082A5|20C49B  |009BC4;
 	lda.W #$0040                         ;0082A8|A94000  |      ;
 	sta.W $01f0                          ;0082AB|8DF001  |0001F0;
 	lda.W #$0004                         ;0082AE|A90400  |      ;
@@ -970,49 +970,49 @@ Graphics_PaletteEnd:
 	ldx.W #$31c5                         ;00884E|A2C531  |      ;
 	ldy.W #$3015                         ;008851|A01530  |      ;
 	clc                                  ;008854|18      |      ;
-	jsr.W CODE_009891                    ;008855|209198  |009891;
+	jsr.W Memory_Copy64Bytes                    ;008855|209198  |009891;
 	txa                                  ;008858|8A      |      ;
 	adc.W #$0040                         ;008859|694000  |      ;
 	tax                                  ;00885C|AA      |      ;
 	tya                                  ;00885D|98      |      ;
 	adc.W #$0040                         ;00885E|694000  |      ;
 	tay                                  ;008861|A8      |      ;
-	jsr.W CODE_009891                    ;008862|209198  |009891;
+	jsr.W Memory_Copy64Bytes                    ;008862|209198  |009891;
 	txa                                  ;008865|8A      |      ;
 	adc.W #$0040                         ;008866|694000  |      ;
 	tax                                  ;008869|AA      |      ;
 	tya                                  ;00886A|98      |      ;
 	adc.W #$0040                         ;00886B|694000  |      ;
 	tay                                  ;00886E|A8      |      ;
-	jsr.W CODE_009891                    ;00886F|209198  |009891;
+	jsr.W Memory_Copy64Bytes                    ;00886F|209198  |009891;
 	txa                                  ;008872|8A      |      ;
 	adc.W #$0040                         ;008873|694000  |      ;
 	tax                                  ;008876|AA      |      ;
 	tya                                  ;008877|98      |      ;
 	adc.W #$0040                         ;008878|694000  |      ;
 	tay                                  ;00887B|A8      |      ;
-	jsr.W CODE_009891                    ;00887C|209198  |009891;
+	jsr.W Memory_Copy64Bytes                    ;00887C|209198  |009891;
 	txa                                  ;00887F|8A      |      ;
 	adc.W #$0040                         ;008880|694000  |      ;
 	tax                                  ;008883|AA      |      ;
 	tya                                  ;008884|98      |      ;
 	adc.W #$0040                         ;008885|694000  |      ;
 	tay                                  ;008888|A8      |      ;
-	jsr.W CODE_009891                    ;008889|209198  |009891;
+	jsr.W Memory_Copy64Bytes                    ;008889|209198  |009891;
 	txa                                  ;00888C|8A      |      ;
 	adc.W #$0040                         ;00888D|694000  |      ;
 	tax                                  ;008890|AA      |      ;
 	tya                                  ;008891|98      |      ;
 	adc.W #$0040                         ;008892|694000  |      ;
 	tay                                  ;008895|A8      |      ;
-	jsr.W CODE_009891                    ;008896|209198  |009891;
+	jsr.W Memory_Copy64Bytes                    ;008896|209198  |009891;
 	txa                                  ;008899|8A      |      ;
 	adc.W #$0040                         ;00889A|694000  |      ;
 	tax                                  ;00889D|AA      |      ;
 	tya                                  ;00889E|98      |      ;
 	adc.W #$0040                         ;00889F|694000  |      ;
 	tay                                  ;0088A2|A8      |      ;
-	jsr.W CODE_0098F1                    ;0088A3|20F198  |0098F1;
+	jsr.W Memory_Copy32Bytes                    ;0088A3|20F198  |0098F1;
 	plb                                  ;0088A6|AB      |      ;
 ;      |        |      ;
 Graphics_CheckColorMath:
@@ -1151,7 +1151,7 @@ Frame_CheckInputMask:
 	lda.B $07                            ;0089AC|A507    |000007;
 	and.B $8e                            ;0089AE|258E    |00008E;
 	beq Frame_ProcessInput               ;0089B0|F00B    |0089BD;
-	jsl.L CODE_009730                    ;0089B2|22309700|009730;
+	jsl.L Math_CountSetBits                    ;0089B2|22309700|009730;
 	sep #$30                             ;0089B6|E230    |      ;
 	asl a;0089B8|0A      |      ;
 	tax                                  ;0089B9|AA      |      ;
@@ -1159,7 +1159,7 @@ Frame_CheckInputMask:
 ;      |        |      ;
 Frame_ProcessInput:
 	rep #$30                             ;0089BD|C230    |      ;
-	jsr.W CODE_009342                    ;0089BF|204293  |009342;
+	jsr.W Timer_CheckCountdown                    ;0089BF|204293  |009342;
 	jsr.W Sound_ProcessQueue                    ;0089C2|206492  |009264;
 	rtl                                  ;0089C5|6B      |      ;
 ;      |        |      ;
@@ -2085,7 +2085,7 @@ Menu_InitializeItemCounts:
 	lda.B $32                            ;009033|A532    |001032;
 	and.B #$e0                           ;009035|29E0    |      ;
 	beq Menu_CountWeapons                      ;009037|F00E    |009047;
-	jsl.L CODE_009730                    ;009039|22309700|009730;
+	jsl.L Math_CountSetBits                    ;009039|22309700|009730;
 	eor.B #$ff                           ;00903D|49FF    |      ;
 	sec                                  ;00903F|38      |      ;
 	adc.B #$27                           ;009040|6927    |      ;
@@ -2096,7 +2096,7 @@ Menu_CountWeapons:
 	lda.B $32                            ;009047|A532    |001032;
 	and.B #$1c                           ;009049|291C    |      ;
 	beq Menu_CountArmor                      ;00904B|F00E    |00905B;
-	jsl.L CODE_009730                    ;00904D|22309700|009730;
+	jsl.L Math_CountSetBits                    ;00904D|22309700|009730;
 	eor.B #$ff                           ;009051|49FF    |      ;
 	sec                                  ;009053|38      |      ;
 	adc.B #$27                           ;009054|6927    |      ;
@@ -2113,7 +2113,7 @@ Menu_CountArmor:
 	db $22,$30,$97,$00,$18,$69,$08,$80,$04;009067|        |009730;
 ;      |        |      ;
 Menu_CountItems:
-	jsl.L CODE_009730                    ;009070|22309700|009730;
+	jsl.L Math_CountSetBits                    ;009070|22309700|009730;
 	eor.B #$ff                           ;009074|49FF    |      ;
 	sec                                  ;009076|38      |      ;
 	adc.B #$2f                           ;009077|692F    |      ;
@@ -2124,7 +2124,7 @@ Menu_CountAccessories:
 	lda.B $33                            ;00907E|A533    |001033;
 	and.B #$70                           ;009080|2970    |      ;
 	beq Menu_CountSpells                      ;009082|F00E    |009092;
-	jsl.L CODE_009730                    ;009084|22309700|009730;
+	jsl.L Math_CountSetBits                    ;009084|22309700|009730;
 	eor.B #$ff                           ;009088|49FF    |      ;
 	sec                                  ;00908A|38      |      ;
 	adc.B #$2f                           ;00908B|692F    |      ;
@@ -2152,7 +2152,7 @@ Menu_UpdateItemReturn:
 	lda.B $35                            ;0090AA|A535    |0010B5;
 	and.B #$e0                           ;0090AC|29E0    |      ;
 	beq Menu_CountBattleItems                      ;0090AE|F00C    |0090BC;
-	jsl.L CODE_009730                    ;0090B0|22309700|009730;
+	jsl.L Math_CountSetBits                    ;0090B0|22309700|009730;
 	eor.B #$ff                           ;0090B4|49FF    |      ;
 	sec                                  ;0090B6|38      |      ;
 	adc.B #$36                           ;0090B7|6936    |      ;
@@ -2165,7 +2165,7 @@ Menu_CountBattleItems:
 	lda.B $35                            ;0090C2|A535    |0010B5;
 	and.B #$1f                           ;0090C4|291F    |      ;
 	beq Menu_CountCharms                      ;0090C6|F015    |0090DD;
-	jsl.L CODE_009730                    ;0090C8|22309700|009730;
+	jsl.L Math_CountSetBits                    ;0090C8|22309700|009730;
 	clc                                  ;0090CC|18      |      ;
 	adc.B #$08                           ;0090CD|6908    |      ;
 	bra Menu_CountBattleItems_Store                      ;0090CF|8004    |0090D5;
@@ -2184,7 +2184,7 @@ Menu_CountCharms:
 	lda.B $36                            ;0090DD|A536    |0010B6;
 	and.B #$3c                           ;0090DF|293C    |      ;
 	beq Menu_CountRings                      ;0090E1|F00C    |0090EF;
-	jsl.L CODE_009730                    ;0090E3|22309700|009730;
+	jsl.L Math_CountSetBits                    ;0090E3|22309700|009730;
 	eor.B #$ff                           ;0090E7|49FF    |      ;
 	sec                                  ;0090E9|38      |      ;
 	adc.B #$3e                           ;0090EA|693E    |      ;
@@ -2197,7 +2197,7 @@ Menu_CountRings:
 	lda.B $36                            ;0090F5|A536    |0010B6;
 	and.B #$03                           ;0090F7|2903    |      ;
 	beq Menu_CountComplete                      ;0090F9|F015    |009110;
-	jsl.L CODE_009730                    ;0090FB|22309700|009730;
+	jsl.L Math_CountSetBits                    ;0090FB|22309700|009730;
 	clc                                  ;0090FF|18      |      ;
 	adc.B #$08                           ;009100|6908    |      ;
 	bra Menu_CountRings_Store                      ;009102|8004    |009108;
@@ -2492,16 +2492,16 @@ Sound_EnableInterrupts:
 ;      |        |      ;
 ;      |        |      ;
 Input_HandleCancel:
-	jsr.W CODE_0092FC                    ;0092F0|20FC92  |0092FC;
+	jsr.W NMI_EnableAndProcess                    ;0092F0|20FC92  |0092FC;
 	jmp.W CODE_00803A                    ;0092F3|4C3A80  |00803A;
 ;      |        |      ;
 ;      |        |      ;
 Input_HandleMenu:
-	jsr.W CODE_0092FC                    ;0092F6|20FC92  |0092FC;
+	jsr.W NMI_EnableAndProcess                    ;0092F6|20FC92  |0092FC;
 	jmp.W CODE_008016                    ;0092F9|4C1680  |008016;
 ;      |        |      ;
 ;      |        |      ;
-CODE_0092FC:
+NMI_EnableAndProcess:
 	sep #$30                             ;0092FC|E230    |      ;
 	lda.B #$40                           ;0092FE|A940    |      ;
 	tsb.W $00d6                          ;009300|0CD600  |0000D6;
@@ -2516,7 +2516,7 @@ CODE_0092FC:
 	rts                                  ;009318|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
-CODE_009319:
+Timer_Initialize:
 	php                                  ;009319|08      |      ;
 	phb                                  ;00931A|8B      |      ;
 	phk                                  ;00931B|4B      |      ;
@@ -2541,33 +2541,33 @@ CODE_009319:
 	rtl                                  ;009341|6B      |      ;
 ;      |        |      ;
 ;      |        |      ;
-CODE_009342:
+Timer_CheckCountdown:
 	lda.W #$0004                         ;009342|A90400  |      ;
 	and.W $00db                          ;009345|2DDB00  |0200DB;
-	beq CODE_009352                      ;009348|F008    |009352;
+	beq Timer_CheckCountdown_Return                      ;009348|F008    |009352;
 	lda.W $0e97                          ;00934A|AD970E  |020E97;
 	and.W #$000f                         ;00934D|290F00  |      ;
-	beq CODE_009353                      ;009350|F001    |009353;
+	beq Timer_ProcessFrame                      ;009350|F001    |009353;
 ;      |        |      ;
-CODE_009352:
+Timer_CheckCountdown_Return:
 	rts                                  ;009352|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
-CODE_009353:
+Timer_ProcessFrame:
 	lda.W #$0010                         ;009353|A91000  |      ;
 	and.W $00da                          ;009356|2DDA00  |0200DA;
 	bne UNREACH_0093CC                   ;009359|D071    |0093CC;
 	lda.B $51                            ;00935B|A551    |000051;
-	beq CODE_009362                      ;00935D|F003    |009362;
+	beq Timer_UpdateCounter                      ;00935D|F003    |009362;
 	dec.B $51                            ;00935F|C651    |000051;
 	rts                                  ;009361|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
-CODE_009362:
+Timer_UpdateCounter:
 	lda.W #$0080                         ;009362|A98000  |      ;
 	and.W $00e2                          ;009365|2DE200  |0200E2;
 	bne UNREACH_0093C9                   ;009368|D05F    |0093C9;
-	jsr.W CODE_0095FB                    ;00936A|20FB95  |0095FB;
+	jsr.W Input_CheckAnyPressed                    ;00936A|20FB95  |0095FB;
 	bne UNREACH_0093C9                   ;00936D|D05A    |0093C9;
 	lda.W #$0002                         ;00936F|A90200  |      ;
 	and.W $00db                          ;009372|2DDB00  |0200DB;
@@ -2579,22 +2579,22 @@ CODE_009362:
 	lsr a;009380|4A      |      ;
 	lsr a;009381|4A      |      ;
 	lsr a;009382|4A      |      ;
-	bra CODE_00938F                      ;009383|800A    |00938F;
+	bra Text_ProcessNibble                      ;009383|800A    |00938F;
 ;      |        |      ;
 ;      |        |      ;
 UNREACH_009385:
 	db $a9,$02,$00,$1c,$db,$00,$a7,$53,$e6,$53;009385|        |      ;
 ;      |        |      ;
-CODE_00938F:
+Text_ProcessNibble:
 	and.W #$000f                         ;00938F|290F00  |      ;
 	cmp.W #$0004                         ;009392|C90400  |      ;
-	bcs CODE_0093C3                      ;009395|B02C    |0093C3;
+	bcs Text_GetBitmask                      ;009395|B02C    |0093C3;
 	db $c9,$01,$00,$90,$24,$f0,$0b,$c9,$02,$00,$f0,$07,$a9,$03,$00,$85;009397|        |      ;
 	db $51,$60,$60,$a9,$02,$00,$2d,$d9,$00,$f0,$07,$a9,$02,$00,$1c,$d9;0093A7|        |000060;
 	db $00,$60,$a9,$02,$00,$0c,$d9,$00,$60,$4c,$f6,$92;0093B7|        |      ;
 ;      |        |      ;
-CODE_0093C3:
-	jsr.W CODE_0097F2                    ;0093C3|20F297  |0097F2;
+Text_GetBitmask:
+	jsr.W Bitfield_GetBitmask                    ;0093C3|20F297  |0097F2;
 	sta.B $90                            ;0093C6|8590    |000090;
 	rts                                  ;0093C8|60      |      ;
 ;      |        |      ;
@@ -2639,7 +2639,7 @@ UNREACH_0093CC:
 	db $01,$e8,$a9,$00,$08,$a4,$13,$30,$0a,$a9,$00,$01,$e4,$01,$d0,$03;0095DC|        |0000E8;
 	db $a9,$80,$00,$85,$90,$60,$a9,$00,$04,$a6,$13,$10,$f6,$80,$f1;0095EC|        |      ;
 ;      |        |      ;
-CODE_0095FB:
+Input_CheckAnyPressed:
 	lda.W $102f                          ;0095FB|AD2F10  |02102F;
 	ora.W $10af                          ;0095FE|0DAF10  |0210AF;
 	and.W #$0003                         ;009601|290300  |      ;
@@ -2661,23 +2661,23 @@ CODE_0095FB:
 	rtl                                  ;00969F|6B      |      ;
 ;      |        |      ;
 ;      |        |      ;
-CODE_0096A0:
+NMI_WaitForVBlank:
 	php                                  ;0096A0|08      |      ;
 	sep #$20                             ;0096A1|E220    |      ;
 	pha                                  ;0096A3|48      |      ;
 	lda.B #$20                           ;0096A4|A920    |      ;
 	trb.W $00d8                          ;0096A6|1CD800  |0000D8;
 ;      |        |      ;
-CODE_0096A9:
+NMI_WaitForVBlank_Loop:
 	lda.B #$20                           ;0096A9|A920    |      ;
 	and.W $00d8                          ;0096AB|2DD800  |0000D8;
-	beq CODE_0096A9                      ;0096AE|F0F9    |0096A9;
+	beq NMI_WaitForVBlank_Loop                      ;0096AE|F0F9    |0096A9;
 	pla                                  ;0096B0|68      |      ;
 	plp                                  ;0096B1|28      |      ;
 	rtl                                  ;0096B2|6B      |      ;
 ;      |        |      ;
 ;      |        |      ;
-CODE_0096B3:
+Math_Multiply16x16:
 	php                                  ;0096B3|08      |      ;
 	rep #$30                             ;0096B4|C230    |      ;
 	phd                                  ;0096B6|0B      |      ;
@@ -2692,21 +2692,21 @@ CODE_0096B3:
 	ldx.W #$0010                         ;0096C4|A21000  |      ;
 	ldy.B $98                            ;0096C7|A498    |000098;
 ;      |        |      ;
-CODE_0096C9:
+Math_Multiply16x16_Loop:
 	asl.B $9e                            ;0096C9|069E    |00009E;
 	rol.B $a0                            ;0096CB|26A0    |0000A0;
 	asl.B $a4                            ;0096CD|06A4    |0000A4;
-	bcc CODE_0096DB                      ;0096CF|900A    |0096DB;
+	bcc Math_Multiply16x16_AddShift                      ;0096CF|900A    |0096DB;
 	tya                                  ;0096D1|98      |      ;
 	clc                                  ;0096D2|18      |      ;
 	adc.B $9e                            ;0096D3|659E    |00009E;
 	sta.B $9e                            ;0096D5|859E    |00009E;
-	bcc CODE_0096DB                      ;0096D7|9002    |0096DB;
+	bcc Math_Multiply16x16_AddShift                      ;0096D7|9002    |0096DB;
 	inc.B $a0                            ;0096D9|E6A0    |0000A0;
 ;      |        |      ;
-CODE_0096DB:
+Math_Multiply16x16_AddShift:
 	dex                                  ;0096DB|CA      |      ;
-	bne CODE_0096C9                      ;0096DC|D0EB    |0096C9;
+	bne Math_Multiply16x16_Loop                      ;0096DC|D0EB    |0096C9;
 	ply                                  ;0096DE|7A      |      ;
 	plx                                  ;0096DF|FA      |      ;
 	pla                                  ;0096E0|68      |      ;
@@ -2715,7 +2715,7 @@ CODE_0096DB:
 	rtl                                  ;0096E3|6B      |      ;
 ;      |        |      ;
 ;      |        |      ;
-CODE_0096E4:
+Math_Divide32by16:
 	php                                  ;0096E4|08      |      ;
 	rep #$30                             ;0096E5|C230    |      ;
 	phd                                  ;0096E7|0B      |      ;
@@ -2730,7 +2730,7 @@ CODE_0096E4:
 	stz.B $a2                            ;0096F6|64A2    |0000A2;
 	ldx.W #$0020                         ;0096F8|A22000  |      ;
 ;      |        |      ;
-CODE_0096FB:
+Math_Divide32by16_Loop:
 	asl.B $9e                            ;0096FB|069E    |00009E;
 	rol.B $a0                            ;0096FD|26A0    |0000A0;
 	asl.B $a4                            ;0096FF|06A4    |0000A4;
@@ -2740,20 +2740,20 @@ CODE_0096FB:
 	bcs UNREACH_009710                   ;009707|B007    |009710;
 	sec                                  ;009709|38      |      ;
 	sbc.B $9c                            ;00970A|E59C    |00009C;
-	bcs CODE_009712                      ;00970C|B004    |009712;
-	bra CODE_009716                      ;00970E|8006    |009716;
+	bcs Math_Divide32by16_Store                      ;00970C|B004    |009712;
+	bra Math_Divide32by16_Next                      ;00970E|8006    |009716;
 ;      |        |      ;
 ;      |        |      ;
 UNREACH_009710:
 	db $e5,$9c                           ;009710|        |00009C;
 ;      |        |      ;
-CODE_009712:
+Math_Divide32by16_Store:
 	sta.B $a2                            ;009712|85A2    |0000A2;
 	inc.B $9e                            ;009714|E69E    |00009E;
 ;      |        |      ;
-CODE_009716:
+Math_Divide32by16_Next:
 	dex                                  ;009716|CA      |      ;
-	bne CODE_0096FB                      ;009717|D0E2    |0096FB;
+	bne Math_Divide32by16_Loop                      ;009717|D0E2    |0096FB;
 	plx                                  ;009719|FA      |      ;
 	pla                                  ;00971A|68      |      ;
 	pld                                  ;00971B|2B      |      ;
@@ -2761,7 +2761,7 @@ CODE_009716:
 	rtl                                  ;00971D|6B      |      ;
 ;      |        |      ;
 ;      |        |      ;
-CODE_00971E:
+Math_SetMultiplier:
 	php                                  ;00971E|08      |      ;
 	sep #$20                             ;00971F|E220    |      ;
 	sta.W SNES_WRMPYB                    ;009721|8D0342  |004203;
@@ -2769,7 +2769,7 @@ CODE_00971E:
 	rtl                                  ;009725|6B      |      ;
 ;      |        |      ;
 ;      |        |      ;
-CODE_009726:
+Math_SetDivisor:
 	php                                  ;009726|08      |      ;
 	sep #$20                             ;009727|E220    |      ;
 	sta.W SNES_WRDIVB                    ;009729|8D0642  |004206;
@@ -2779,16 +2779,16 @@ CODE_009726:
 	rtl                                  ;00972F|6B      |      ;
 ;      |        |      ;
 ;      |        |      ;
-CODE_009730:
+Math_CountSetBits:
 	php                                  ;009730|08      |      ;
 	rep #$30                             ;009731|C230    |      ;
 	phx                                  ;009733|DA      |      ;
 	ldx.W #$ffff                         ;009734|A2FFFF  |      ;
 ;      |        |      ;
-CODE_009737:
+Math_CountSetBits_Loop:
 	inx                                  ;009737|E8      |      ;
 	lsr a;009738|4A      |      ;
-	bcc CODE_009737                      ;009739|90FC    |009737;
+	bcc Math_CountSetBits_Loop                      ;009739|90FC    |009737;
 	txa                                  ;00973B|8A      |      ;
 	plx                                  ;00973C|FA      |      ;
 	plp                                  ;00973D|28      |      ;
@@ -2796,54 +2796,54 @@ CODE_009737:
 ;      |        |      ;
 	db $08,$c2,$30,$da,$a2,$10,$00,$ca,$0a,$90,$fc,$8a,$fa,$28,$6b;00973F|        |      ;
 ;      |        |      ;
-CODE_00974E:
-	jsr.W CODE_0097DA                    ;00974E|20DA97  |0097DA;
+Bitfield_SetBits:
+	jsr.W Bitfield_PrepareAccess                    ;00974E|20DA97  |0097DA;
 	tsb.B $00                            ;009751|0400    |0000D2;
 	rtl                                  ;009753|6B      |      ;
 ;      |        |      ;
 ;      |        |      ;
-CODE_009754:
-	jsr.W CODE_0097DA                    ;009754|20DA97  |0097DA;
+Bitfield_ClearBits:
+	jsr.W Bitfield_PrepareAccess                    ;009754|20DA97  |0097DA;
 	trb.B $00                            ;009757|1400    |0000D0;
 	rtl                                  ;009759|6B      |      ;
 ;      |        |      ;
 ;      |        |      ;
-CODE_00975A:
-	jsr.W CODE_0097DA                    ;00975A|20DA97  |0097DA;
+Bitfield_TestBits:
+	jsr.W Bitfield_PrepareAccess                    ;00975A|20DA97  |0097DA;
 	and.B $00                            ;00975D|2500    |0000DA;
 	rtl                                  ;00975F|6B      |      ;
 ;      |        |      ;
 ;      |        |      ;
-CODE_009760:
+Bitfield_SetBits_Entity:
 	phd                                  ;009760|0B      |      ;
 	pea.W $0ea8                          ;009761|F4A80E  |000EA8;
 	pld                                  ;009764|2B      |      ;
-	jsl.L CODE_00974E                    ;009765|224E9700|00974E;
+	jsl.L Bitfield_SetBits                    ;009765|224E9700|00974E;
 	pld                                  ;009769|2B      |      ;
 	rtl                                  ;00976A|6B      |      ;
 ;      |        |      ;
 ;      |        |      ;
-CODE_00976B:
+Bitfield_ClearBits_Entity:
 	phd                                  ;00976B|0B      |      ;
 	pea.W $0ea8                          ;00976C|F4A80E  |000EA8;
 	pld                                  ;00976F|2B      |      ;
-	jsl.L CODE_009754                    ;009770|22549700|009754;
+	jsl.L Bitfield_ClearBits                    ;009770|22549700|009754;
 	pld                                  ;009774|2B      |      ;
 	rtl                                  ;009775|6B      |      ;
 ;      |        |      ;
 ;      |        |      ;
-CODE_009776:
+Bitfield_TestBits_Entity:
 	phd                                  ;009776|0B      |      ;
 	pea.W $0ea8                          ;009777|F4A80E  |000EA8;
 	pld                                  ;00977A|2B      |      ;
-	jsl.L CODE_00975A                    ;00977B|225A9700|00975A;
+	jsl.L Bitfield_TestBits                    ;00977B|225A9700|00975A;
 	pld                                  ;00977F|2B      |      ;
 	inc a;009780|1A      |      ;
 	dec a;009781|3A      |      ;
 	rtl                                  ;009782|6B      |      ;
 ;      |        |      ;
 ;      |        |      ;
-CODE_009783:
+RNG_GenerateRandom:
 	php                                  ;009783|08      |      ;
 	phd                                  ;009784|0B      |      ;
 	rep #$30                             ;009785|C230    |      ;
@@ -2863,12 +2863,12 @@ CODE_009783:
 	sta.W SNES_WRDIVL                    ;0097A5|8D0442  |004204;
 	stz.W SNES_WRDIVH                    ;0097A8|9C0542  |004205;
 	lda.B $4a                            ;0097AB|A54A    |0000A8;
-	beq CODE_0097B8                      ;0097AD|F009    |0097B8;
-	jsl.L CODE_009726                    ;0097AF|22269700|009726;
+	beq RNG_GenerateRandom_ModuloFinish                      ;0097AD|F009    |0097B8;
+	jsl.L Math_SetDivisor                    ;0097AF|22269700|009726;
 	lda.W SNES_RDMPYL                    ;0097B3|AD1642  |004216;
 	sta.B $4b                            ;0097B6|854B    |0000A9;
 ;      |        |      ;
-CODE_0097B8:
+RNG_GenerateRandom_ModuloFinish:
 	rep #$30                             ;0097B8|C230    |      ;
 	pla                                  ;0097BA|68      |      ;
 	pld                                  ;0097BB|2B      |      ;
@@ -2876,7 +2876,7 @@ CODE_0097B8:
 	rtl                                  ;0097BD|6B      |      ;
 ;      |        |      ;
 ;      |        |      ;
-CODE_0097BE:
+Stack_IndirectJump:
 	php                                  ;0097BE|08      |      ;
 	phb                                  ;0097BF|8B      |      ;
 	rep #$30                             ;0097C0|C230    |      ;
@@ -2899,7 +2899,7 @@ CODE_0097BE:
 	rti                                  ;0097D9|40      |      ;
 ;      |        |      ;
 ;      |        |      ;
-CODE_0097DA:
+Bitfield_PrepareAccess:
 	php                                  ;0097DA|08      |      ;
 	rep #$30                             ;0097DB|C230    |      ;
 	and.W #$00ff                         ;0097DD|29FF00  |      ;
@@ -2917,7 +2917,7 @@ CODE_0097DA:
 	eor.W #$0007                         ;0097EE|490700  |      ;
 	plp                                  ;0097F1|28      |      ;
 ;      |        |      ;
-CODE_0097F2:
+Bitfield_GetBitmask:
 	phx                                  ;0097F2|DA      |      ;
 	asl a;0097F3|0A      |      ;
 	tax                                  ;0097F4|AA      |      ;
@@ -2930,7 +2930,7 @@ DATA8_0097fb:
 	db $01,$00,$02,$00,$04,$00,$08,$00,$10,$00,$20,$00,$40,$00,$80,$00;0097FB|        |      ;
 	db $00,$01,$00,$02,$00,$04,$00,$08,$00,$10,$00,$20,$00,$40,$00,$80;00980B|        |      ;
 ;      |        |      ;
-CODE_00981B:
+Stack_RestoreRegisters:
 	rep #$30                             ;00981B|C230    |      ;
 	ply                                  ;00981D|7A      |      ;
 	plx                                  ;00981E|FA      |      ;
@@ -2945,14 +2945,14 @@ CODE_00981B:
 	db $a6,$34,$a4,$37,$18,$a5,$3a,$20,$30,$00,$8a,$65,$64,$aa,$98,$65;009844|        |000034;
 	db $64,$a8,$c6,$62,$d0,$ef,$ab,$28,$60;009854|        |0000A8;
 ;      |        |      ;
-CODE_00985D:
+Memory_CopyLarge:
 	clc                                  ;00985D|18      |      ;
 ;      |        |      ;
-CODE_00985E:
+Memory_CopyLarge_Loop:
 	sbc.W #$003f                         ;00985E|E93F00  |      ;
-	bcc CODE_009874                      ;009861|9011    |009874;
+	bcc Memory_CopyLarge_Final                      ;009861|9011    |009874;
 	pha                                  ;009863|48      |      ;
-	jsr.W CODE_009891                    ;009864|209198  |009891;
+	jsr.W Memory_Copy64Bytes                    ;009864|209198  |009891;
 	txa                                  ;009867|8A      |      ;
 	adc.W #$003f                         ;009868|693F00  |      ;
 	tax                                  ;00986B|AA      |      ;
@@ -2960,10 +2960,10 @@ CODE_00985E:
 	adc.W #$0040                         ;00986D|694000  |      ;
 	tay                                  ;009870|A8      |      ;
 	pla                                  ;009871|68      |      ;
-	bra CODE_00985E                      ;009872|80EA    |00985E;
+	bra Memory_CopyLarge_Loop                      ;009872|80EA    |00985E;
 ;      |        |      ;
 ;      |        |      ;
-CODE_009874:
+Memory_CopyLarge_Final:
 	adc.W #$0040                         ;009874|694000  |      ;
 	pha                                  ;009877|48      |      ;
 	asl a;009878|0A      |      ;
@@ -2985,7 +2985,7 @@ CODE_009874:
 	rts                                  ;009890|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
-CODE_009891:
+Memory_Copy64Bytes:
 	lda.W $003e,x                        ;009891|BD3E00  |7E003E;
 	sta.W $003e,y                        ;009894|993E00  |7E003E;
 	lda.W $003c,x                        ;009897|BD3C00  |7E003C;
@@ -3019,7 +3019,7 @@ CODE_009891:
 	lda.W $0020,x                        ;0098EB|BD2000  |7E0020;
 	sta.W $0020,y                        ;0098EE|992000  |7E0020;
 ;      |        |      ;
-CODE_0098F1:
+Memory_Copy32Bytes:
 	lda.W $001e,x                        ;0098F1|BD1E00  |7E001E;
 	sta.W $001e,y                        ;0098F4|991E00  |7E001E;
 	lda.W $001c,x                        ;0098F7|BD1C00  |7E001C;
@@ -3084,15 +3084,15 @@ UNREACH_009952:
 	db $b5,$98                           ;009986|        |      ;
 	db $af,$98,$a9,$98,$a3,$98,$9d,$98,$97,$98,$91,$98;009988|        |98A998;
 ;      |        |      ;
-CODE_009994:
-	jsr.W CODE_009998                    ;009994|209899  |009998;
+Memory_FillLong:
+	jsr.W Memory_Fill                    ;009994|209899  |009998;
 	rtl                                  ;009997|6B      |      ;
 ;      |        |      ;
 ;      |        |      ;
-CODE_009998:
+Memory_Fill:
 	phx                                  ;009998|DA      |      ;
 	cmp.W #$0040                         ;009999|C94000  |      ;
-	bcc CODE_0099B8                      ;00999C|901A    |0099B8;
+	bcc Memory_Fill_TableJump                      ;00999C|901A    |0099B8;
 	pha                                  ;00999E|48      |      ;
 	lsr a;00999F|4A      |      ;
 	lsr a;0099A0|4A      |      ;
@@ -3103,24 +3103,24 @@ CODE_009998:
 	tax                                  ;0099A5|AA      |      ;
 	clc                                  ;0099A6|18      |      ;
 ;      |        |      ;
-CODE_0099A7:
+Memory_Fill_64ByteLoop:
 	lda.B $03,s                          ;0099A7|A303    |000003;
-	jsr.W CODE_0099BD                    ;0099A9|20BD99  |0099BD;
+	jsr.W Memory_Fill_64Bytes                    ;0099A9|20BD99  |0099BD;
 	tya                                  ;0099AC|98      |      ;
 	adc.W #$0040                         ;0099AD|694000  |      ;
 	tay                                  ;0099B0|A8      |      ;
 	dex                                  ;0099B1|CA      |      ;
-	bne CODE_0099A7                      ;0099B2|D0F3    |0099A7;
+	bne Memory_Fill_64ByteLoop                      ;0099B2|D0F3    |0099A7;
 	pla                                  ;0099B4|68      |      ;
 	and.W #$003f                         ;0099B5|293F00  |      ;
 ;      |        |      ;
-CODE_0099B8:
+Memory_Fill_TableJump:
 	tax                                  ;0099B8|AA      |      ;
 	pla                                  ;0099B9|68      |      ;
 	jmp.W (DATA8_009a1e,x)               ;0099BA|7C1E9A  |009A1E;
 ;      |        |      ;
 ;      |        |      ;
-CODE_0099BD:
+Memory_Fill_64Bytes:
 	sta.W $003e,y                        ;0099BD|993E00  |7F003E;
 	sta.W $003c,y                        ;0099C0|993C00  |7F003C;
 	sta.W $003a,y                        ;0099C3|993A00  |7F003A;
@@ -3137,7 +3137,7 @@ CODE_0099BD:
 	sta.W $0024,y                        ;0099E4|992400  |7F0024;
 	sta.W $0022,y                        ;0099E7|992200  |7F0022;
 ;      |        |      ;
-CODE_0099EA:
+Memory_Fill_32Bytes:
 	sta.W $0020,y                        ;0099EA|992000  |7F0020;
 	sta.W $001e,y                        ;0099ED|991E00  |7F001E;
 	sta.W $001c,y                        ;0099F0|991C00  |7F001C;
@@ -3147,18 +3147,18 @@ CODE_0099EA:
 	sta.W $0014,y                        ;0099FC|991400  |7F0014;
 	sta.W $0012,y                        ;0099FF|991200  |7F0012;
 ;      |        |      ;
-CODE_009A02:
+Memory_Fill_16Bytes:
 	sta.W $0010,y                        ;009A02|991000  |7F0010;
 ;      |        |      ;
-CODE_009A05:
+Memory_Fill_14Bytes:
 	sta.W $000e,y                        ;009A05|990E00  |7F000E;
 ;      |        |      ;
-CODE_009A08:
+Memory_Fill_12Bytes:
 	sta.W $000c,y                        ;009A08|990C00  |7F000C;
 	sta.W $000a,y                        ;009A0B|990A00  |7F000A;
 	sta.W $0008,y                        ;009A0E|990800  |7F0008;
 ;      |        |      ;
-CODE_009A11:
+Memory_Fill_8Bytes:
 	sta.W $0006,y                        ;009A11|990600  |7F0006;
 	sta.W $0004,y                        ;009A14|990400  |7F0004;
 	sta.W $0002,y                        ;009A17|990200  |7F0002;
@@ -3181,7 +3181,7 @@ DATA8_009a1e:
 	db $c9,$99                           ;009A56|        |      ;
 	db $c6,$99,$c3,$99,$c0,$99,$bd,$99   ;009A58|        |000099;
 ;      |        |      ;
-CODE_009A60:
+DMA_TransferDialog:
 	php                                  ;009A60|08      |      ;
 	phb                                  ;009A61|8B      |      ;
 	phd                                  ;009A62|0B      |      ;
@@ -3210,7 +3210,7 @@ CODE_009A60:
 	db $01,$00,$c9,$78,$02,$f0,$15,$f4,$7f,$00,$ab,$aa,$e2,$20,$ca,$e8;009ACF|        |000000;
 	db $bd,$00,$00,$d0,$fa,$e8,$ab,$8e,$5f,$01,$c2,$30,$60;009ADF|        |000000;
 ;      |        |      ;
-CODE_009AEC:
+DMA_TransferSprites:
 	php                                  ;009AEC|08      |      ;
 	phd                                  ;009AED|0B      |      ;
 	pea.W $0000                          ;009AEE|F40000  |010000;
@@ -3218,7 +3218,7 @@ CODE_009AEC:
 	rep #$30                             ;009AF2|C230    |      ;
 	phx                                  ;009AF4|DA      |      ;
 	ldx.W #$9aff                         ;009AF5|A2FF9A  |      ;
-	jsr.W CODE_009BC4                    ;009AF8|20C49B  |009BC4;
+	jsr.W DMA_CopyParamsAndExecute                    ;009AF8|20C49B  |009BC4;
 	plx                                  ;009AFB|FA      |      ;
 	pld                                  ;009AFC|2B      |      ;
 	plp                                  ;009AFD|28      |      ;
@@ -3226,7 +3226,7 @@ CODE_009AEC:
 ;      |        |      ;
 	db $1e,$a7,$03                       ;009AFF|        |      ;
 ;      |        |      ;
-CODE_009B02:
+DMA_PrepareAndTransfer:
 	php                                  ;009B02|08      |      ;
 	phd                                  ;009B03|0B      |      ;
 	phb                                  ;009B04|8B      |      ;
@@ -3237,11 +3237,11 @@ CODE_009B02:
 	pea.W $0000                          ;009B0B|F40000  |020000;
 	pld                                  ;009B0E|2B      |      ;
 	jsl.L CODE_0C8000                    ;009B0F|2200800C|0C8000;
-	jsl.L CODE_0096A0                    ;009B13|22A09600|0096A0;
+	jsl.L NMI_WaitForVBlank                    ;009B13|22A09600|0096A0;
 	pei.B ($1d)                          ;009B17|D41D    |00001D;
 	lda.B $27                            ;009B19|A527    |000027;
 	pha                                  ;009B1B|48      |      ;
-	jsl.L CODE_009B2F                    ;009B1C|222F9B00|009B2F;
+	jsl.L DMA_TransferGFX                    ;009B1C|222F9B00|009B2F;
 	jsr.W CODE_00A342                    ;009B20|2042A3  |00A342;
 	pla                                  ;009B23|68      |      ;
 	sta.B $27                            ;009B24|8527    |000027;
@@ -3255,7 +3255,7 @@ CODE_009B02:
 	rtl                                  ;009B2E|6B      |      ;
 ;      |        |      ;
 ;      |        |      ;
-CODE_009B2F:
+DMA_TransferGFX:
 	php                                  ;009B2F|08      |      ;
 	phd                                  ;009B30|0B      |      ;
 	pea.W $0000                          ;009B31|F40000  |000000;
@@ -3263,7 +3263,7 @@ CODE_009B2F:
 	rep #$30                             ;009B35|C230    |      ;
 	phx                                  ;009B37|DA      |      ;
 	ldx.W #$9b42                         ;009B38|A2429B  |      ;
-	jsr.W CODE_009BC4                    ;009B3B|20C49B  |009BC4;
+	jsr.W DMA_CopyParamsAndExecute                    ;009B3B|20C49B  |009BC4;
 	plx                                  ;009B3E|FA      |      ;
 	pld                                  ;009B3F|2B      |      ;
 	plp                                  ;009B40|28      |      ;
@@ -3271,21 +3271,21 @@ CODE_009B2F:
 ;      |        |      ;
 	db $ff,$81,$03                       ;009B42|        |      ;
 ;      |        |      ;
-CODE_009B45:
+DMA_TransferPalettes:
 	php                                  ;009B45|08      |      ;
 	phd                                  ;009B46|0B      |      ;
 	rep #$30                             ;009B47|C230    |      ;
 	lda.W #$0000                         ;009B49|A90000  |      ;
 	tcd                                  ;009B4C|5B      |      ;
 	ldx.W #$9b56                         ;009B4D|A2569B  |      ;
-	jsr.W CODE_009BC4                    ;009B50|20C49B  |009BC4;
+	jsr.W DMA_CopyParamsAndExecute                    ;009B50|20C49B  |009BC4;
 	pld                                  ;009B53|2B      |      ;
 	plp                                  ;009B54|28      |      ;
 	rtl                                  ;009B55|6B      |      ;
 ;      |        |      ;
 	db $86,$86,$03                       ;009B56|        |      ;
 ;      |        |      ;
-CODE_009B59:
+DMA_TransferFont:
 	php                                  ;009B59|08      |      ;
 	phd                                  ;009B5A|0B      |      ;
 	rep #$30                             ;009B5B|C230    |      ;
@@ -3293,26 +3293,26 @@ CODE_009B59:
 	tcd                                  ;009B60|5B      |      ;
 	lda.B $20                            ;009B61|A520    |000020;
 	sta.B $4f                            ;009B63|854F    |00004F;
-	jsr.W CODE_009B8A                    ;009B65|208A9B  |009B8A;
+	jsr.W DMA_SetFontPointer                    ;009B65|208A9B  |009B8A;
 	lda.B [$17]                          ;009B68|A717    |000017;
 	and.W #$00ff                         ;009B6A|29FF00  |      ;
 	cmp.W #$0004                         ;009B6D|C90400  |      ;
 	beq CODE_009B78                      ;009B70|F006    |009B78;
 	ldx.W #$9b9d                         ;009B72|A29D9B  |      ;
-	jsr.W CODE_009BC4                    ;009B75|20C49B  |009BC4;
+	jsr.W DMA_CopyParamsAndExecute                    ;009B75|20C49B  |009BC4;
 ;      |        |      ;
 CODE_009B78:
-	jsr.W CODE_009B8A                    ;009B78|208A9B  |009B8A;
+	jsr.W DMA_SetFontPointer                    ;009B78|208A9B  |009B8A;
 	jsr.W CODE_009D75                    ;009B7B|20759D  |009D75;
-	jsr.W CODE_009BA3                    ;009B7E|20A39B  |009BA3;
+	jsr.W DMA_TransferFont_Return                    ;009B7E|20A39B  |009BA3;
 	ldx.W #$9ba0                         ;009B81|A2A09B  |      ;
-	jsr.W CODE_009BC4                    ;009B84|20C49B  |009BC4;
+	jsr.W DMA_CopyParamsAndExecute                    ;009B84|20C49B  |009BC4;
 	pld                                  ;009B87|2B      |      ;
 	plp                                  ;009B88|28      |      ;
 	rtl                                  ;009B89|6B      |      ;
 ;      |        |      ;
 ;      |        |      ;
-CODE_009B8A:
+DMA_SetFontPointer:
 	sep #$20                             ;009B8A|E220    |      ;
 	lda.B #$03                           ;009B8C|A903    |      ;
 	sta.B $19                            ;009B8E|8519    |000019;
@@ -3326,11 +3326,11 @@ CODE_009B8A:
 ;      |        |      ;
 	db $31,$a8,$03,$57,$84,$03           ;009B9D|        |      ;
 ;      |        |      ;
-CODE_009BA3:
+DMA_TransferFont_Return:
 	rts                                  ;009BA3|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
-CODE_009BA4:
+DMA_TransferTilemap:
 	php                                  ;009BA4|08      |      ;
 	phd                                  ;009BA5|0B      |      ;
 	rep #$30                             ;009BA6|C230    |      ;
@@ -3351,7 +3351,7 @@ CODE_009BA4:
 	rtl                                  ;009BC3|6B      |      ;
 ;      |        |      ;
 ;      |        |      ;
-CODE_009BC4:
+DMA_CopyParamsAndExecute:
 	php                                  ;009BC4|08      |      ;
 	rep #$30                             ;009BC5|C230    |      ;
 	phy                                  ;009BC7|5A      |      ;
@@ -3506,7 +3506,7 @@ CODE_009CF0:
 ;      |        |      ;
 CODE_009D18:
 	sta.L $7e3367                        ;009D18|8F67337E|7E3367;
-	jmp.W CODE_00981B                    ;009D1C|4C1B98  |00981B;
+	jmp.W Stack_RestoreRegisters                    ;009D1C|4C1B98  |00981B;
 ;      |        |      ;
 	db $80,$fe                           ;009D1F|        |009D1F;
 ;      |        |      ;
@@ -3529,7 +3529,7 @@ CODE_009D21:
 	ldy.W #$00d0                         ;009D3F|A0D000  |      ;
 	lda.W #$0000                         ;009D42|A90000  |      ;
 	mvn $00,$7e                          ;009D45|54007E  |      ;
-	jmp.W CODE_00981B                    ;009D48|4C1B98  |00981B;
+	jmp.W Stack_RestoreRegisters                    ;009D48|4C1B98  |00981B;
 ;      |        |      ;
 ;      |        |      ;
 CODE_009D4B:
@@ -3548,7 +3548,7 @@ CODE_009D4B:
 	pha                                  ;009D61|48      |      ;
 	plb                                  ;009D62|AB      |      ;
 	lda.B $02,s                          ;009D63|A302    |000002;
-	jsr.W CODE_009998                    ;009D65|209899  |009998;
+	jsr.W Memory_Fill                    ;009D65|209899  |009998;
 	plb                                  ;009D68|AB      |      ;
 	pla                                  ;009D69|68      |      ;
 	rts                                  ;009D6A|60      |      ;
@@ -3611,7 +3611,7 @@ CODE_009DB4:
 	trb.W $00d0                          ;009DB7|1CD000  |0000D0;
 ;      |        |      ;
 CODE_009DBA:
-	jmp.W CODE_00981B                    ;009DBA|4C1B98  |00981B;
+	jmp.W Stack_RestoreRegisters                    ;009DBA|4C1B98  |00981B;
 ;      |        |      ;
 ;      |        |      ;
 CODE_009DBD:
@@ -3975,12 +3975,12 @@ CODE_00A1AB:
 	lda.B [$17]                          ;00A1E4|A717    |000017;
 	inc.B $17                            ;00A1E6|E617    |000017;
 	and.W #$00ff                         ;00A1E8|29FF00  |      ;
-	jmp.W CODE_009998                    ;00A1EB|4C9899  |009998;
+	jmp.W Memory_Fill                    ;00A1EB|4C9899  |009998;
 ;      |        |      ;
 	jsl.L CODE_0C8000                    ;00A1EE|2200800C|0C8000;
 	rts                                  ;00A1F2|60      |      ;
 ;      |        |      ;
-	jsl.L CODE_0096A0                    ;00A1F3|22A09600|0096A0;
+	jsl.L NMI_WaitForVBlank                    ;00A1F3|22A09600|0096A0;
 	rts                                  ;00A1F7|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
@@ -4025,7 +4025,7 @@ CODE_00A236:
 	sta.W $0e92                          ;00A246|8D920E  |000E92;
 	sta.W SNES_WRMPYA                    ;00A249|8D0242  |004202;
 	lda.B #$50                           ;00A24C|A950    |      ;
-	jsl.L CODE_00971E                    ;00A24E|221E9700|00971E;
+	jsl.L Math_SetMultiplier                    ;00A24E|221E9700|00971E;
 	rep #$30                             ;00A252|C230    |      ;
 	clc                                  ;00A254|18      |      ;
 	lda.W #$d0b0                         ;00A255|A9B0D0  |      ;
@@ -4035,7 +4035,7 @@ CODE_00A236:
 	lda.W #$0050                         ;00A25F|A95000  |      ;
 	pea.W $000c                          ;00A262|F40C00  |00000C;
 	plb                                  ;00A265|AB      |      ;
-	jsr.W CODE_00985D                    ;00A266|205D98  |00985D;
+	jsr.W Memory_CopyLarge                    ;00A266|205D98  |00985D;
 	plb                                  ;00A269|AB      |      ;
 	plp                                  ;00A26A|28      |      ;
 	bne CODE_00A273                      ;00A26B|D006    |00A273;
@@ -4068,7 +4068,7 @@ CODE_00A273:
 	and.W #$00ff                         ;00A29F|29FF00  |      ;
 ;      |        |      ;
 CODE_00A2A2:
-	jsl.L CODE_0096A0                    ;00A2A2|22A09600|0096A0;
+	jsl.L NMI_WaitForVBlank                    ;00A2A2|22A09600|0096A0;
 	dec a;00A2A6|3A      |      ;
 	bne CODE_00A2A2                      ;00A2A7|D0F9    |00A2A2;
 	rts                                  ;00A2A9|60      |      ;
@@ -4184,7 +4184,7 @@ CODE_00A342:
 	stz.B $46                            ;00A373|6446    |000046;
 ;      |        |      ;
 CODE_00A375:
-	jmp.W CODE_00981B                    ;00A375|4C1B98  |00981B;
+	jmp.W Stack_RestoreRegisters                    ;00A375|4C1B98  |00981B;
 ;      |        |      ;
 	lda.W #$0080                         ;00A378|A98000  |      ;
 	tsb.W $00d0                          ;00A37B|0CD000  |0000D0;
@@ -4223,7 +4223,7 @@ CODE_00A3A5:
 	inc.B $17                            ;00A3BB|E617    |000017;
 ;      |        |      ;
 CODE_00A3BD:
-	jsl.L CODE_0096A0                    ;00A3BD|22A09600|0096A0;
+	jsl.L NMI_WaitForVBlank                    ;00A3BD|22A09600|0096A0;
 	bit.B $94                            ;00A3C1|2494    |000094;
 	beq CODE_00A3BD                      ;00A3C3|F0F8    |00A3BD;
 	rts                                  ;00A3C5|60      |      ;
@@ -4235,7 +4235,7 @@ CODE_00A3C6:
 	inc.B $17                            ;00A3CA|E617    |000017;
 ;      |        |      ;
 CODE_00A3CC:
-	jsl.L CODE_0096A0                    ;00A3CC|22A09600|0096A0;
+	jsl.L NMI_WaitForVBlank                    ;00A3CC|22A09600|0096A0;
 	bit.B $07                            ;00A3D0|2407    |000007;
 	beq CODE_00A3CC                      ;00A3D2|F0F8    |00A3CC;
 	rts                                  ;00A3D4|60      |      ;
@@ -4419,7 +4419,7 @@ CODE_00A519:
 	phd                                  ;00A540|0B      |      ;
 	pea.W $00d0                          ;00A541|F4D000  |0000D0;
 	pld                                  ;00A544|2B      |      ;
-	jsl.L CODE_00975A                    ;00A545|225A9700|00975A;
+	jsl.L Bitfield_TestBits                    ;00A545|225A9700|00975A;
 	pld                                  ;00A549|2B      |      ;
 	inc a;00A54A|1A      |      ;
 	dec a;00A54B|3A      |      ;
@@ -4431,7 +4431,7 @@ CODE_00A519:
 	phd                                  ;00A555|0B      |      ;
 	pea.W $00d0                          ;00A556|F4D000  |0000D0;
 	pld                                  ;00A559|2B      |      ;
-	jsl.L CODE_00975A                    ;00A55A|225A9700|00975A;
+	jsl.L Bitfield_TestBits                    ;00A55A|225A9700|00975A;
 	pld                                  ;00A55E|2B      |      ;
 	inc a;00A55F|1A      |      ;
 	dec a;00A560|3A      |      ;
@@ -4440,7 +4440,7 @@ CODE_00A519:
 	lda.B [$17]                          ;00A563|A717    |000017;
 	inc.B $17                            ;00A565|E617    |000017;
 	and.W #$00ff                         ;00A567|29FF00  |      ;
-	jsl.L CODE_009776                    ;00A56A|22769700|009776;
+	jsl.L Bitfield_TestBits_Entity                    ;00A56A|22769700|009776;
 ;      |        |      ;
 CODE_00A56E:
 	bne CODE_00A519                      ;00A56E|D0A9    |00A519;
@@ -4449,7 +4449,7 @@ CODE_00A56E:
 	lda.B [$17]                          ;00A572|A717    |000017;
 	inc.B $17                            ;00A574|E617    |000017;
 	and.W #$00ff                         ;00A576|29FF00  |      ;
-	jsl.L CODE_009776                    ;00A579|22769700|009776;
+	jsl.L Bitfield_TestBits_Entity                    ;00A579|22769700|009776;
 ;      |        |      ;
 CODE_00A57D:
 	beq CODE_00A519                      ;00A57D|F09A    |00A519;
@@ -4574,7 +4574,7 @@ CODE_00A755:
 	phd                                  ;00A767|0B      |      ;
 	pea.W $00d0                          ;00A768|F4D000  |0000D0;
 	pld                                  ;00A76B|2B      |      ;
-	jsl.L CODE_00975A                    ;00A76C|225A9700|00975A;
+	jsl.L Bitfield_TestBits                    ;00A76C|225A9700|00975A;
 	pld                                  ;00A770|2B      |      ;
 	inc a;00A771|1A      |      ;
 	dec a;00A772|3A      |      ;
@@ -4587,7 +4587,7 @@ CODE_00A755:
 	phd                                  ;00A77E|0B      |      ;
 	pea.W $00d0                          ;00A77F|F4D000  |0000D0;
 	pld                                  ;00A782|2B      |      ;
-	jsl.L CODE_00975A                    ;00A783|225A9700|00975A;
+	jsl.L Bitfield_TestBits                    ;00A783|225A9700|00975A;
 	pld                                  ;00A787|2B      |      ;
 	inc a;00A788|1A      |      ;
 	dec a;00A789|3A      |      ;
@@ -4597,7 +4597,7 @@ CODE_00A755:
 	lda.B [$17]                          ;00A79D|A717    |000017;
 	inc.B $17                            ;00A79F|E617    |000017;
 	and.W #$00ff                         ;00A7A1|29FF00  |      ;
-	jsl.L CODE_009776                    ;00A7A4|22769700|009776;
+	jsl.L Bitfield_TestBits_Entity                    ;00A7A4|22769700|009776;
 	beq CODE_00A755                      ;00A7A8|F0AB    |00A755;
 	db $80,$1a,$20,$a1,$b1,$d0,$a4,$80,$13,$20,$a1,$b1,$f0,$9d,$80,$0c;00A7AA|        |00A7C6;
 	db $20,$b4,$b1,$d0,$96,$80,$05,$20,$b4,$b1,$f0,$8f;00A7BA|        |00B1B4;
@@ -5447,7 +5447,7 @@ CODE_00AD89:
 ;      |        |      ;
 CODE_00ADAC:
 	tax                                  ;00ADAC|AA      |      ;
-	jsr.W CODE_009A05                    ;00ADAD|20059A  |009A05;
+	jsr.W Memory_Fill_14Bytes                    ;00ADAD|20059A  |009A05;
 	tya                                  ;00ADB0|98      |      ;
 	sbc.W #$fff0                         ;00ADB1|E9F0FF  |      ;
 	tay                                  ;00ADB4|A8      |      ;
@@ -5499,7 +5499,7 @@ CODE_00ADAC:
 ;      |        |      ;
 CODE_00AE07:
 	tax                                  ;00AE07|AA      |      ;
-	jsr.W CODE_009A05                    ;00AE08|20059A  |009A05;
+	jsr.W Memory_Fill_14Bytes                    ;00AE08|20059A  |009A05;
 	tya                                  ;00AE0B|98      |      ;
 	sbc.W #$fff0                         ;00AE0C|E9F0FF  |      ;
 	tay                                  ;00AE0F|A8      |      ;
@@ -5605,7 +5605,7 @@ CODE_00AE9F:
 	lda.B [$17]                          ;00AEA2|A717    |000017;
 	inc.B $17                            ;00AEA4|E617    |000017;
 	and.W #$00ff                         ;00AEA6|29FF00  |      ;
-	jsl.L CODE_009760                    ;00AEA9|22609700|009760;
+	jsl.L Bitfield_SetBits_Entity                    ;00AEA9|22609700|009760;
 	rts                                  ;00AEAD|60      |      ;
 ;      |        |      ;
 	db $a5,$9e,$22,$60,$97,$00,$60       ;00AEAE|        |00009E;
@@ -5615,14 +5615,14 @@ CODE_00AE9F:
 	phd                                  ;00AEBC|0B      |      ;
 	pea.W $00d0                          ;00AEBD|F4D000  |0000D0;
 	pld                                  ;00AEC0|2B      |      ;
-	jsl.L CODE_00974E                    ;00AEC1|224E9700|00974E;
+	jsl.L Bitfield_SetBits                    ;00AEC1|224E9700|00974E;
 	pld                                  ;00AEC5|2B      |      ;
 	rts                                  ;00AEC6|60      |      ;
 ;      |        |      ;
 	lda.B [$17]                          ;00AEC7|A717    |000017;
 	inc.B $17                            ;00AEC9|E617    |000017;
 	and.W #$00ff                         ;00AECB|29FF00  |      ;
-	jsl.L CODE_00976B                    ;00AECE|226B9700|00976B;
+	jsl.L Bitfield_ClearBits_Entity                    ;00AECE|226B9700|00976B;
 	rts                                  ;00AED2|60      |      ;
 ;      |        |      ;
 	db $a5,$9e,$22,$6b,$97,$00,$60       ;00AED3|        |00009E;
@@ -5632,7 +5632,7 @@ CODE_00AE9F:
 	phd                                  ;00AEE1|0B      |      ;
 	pea.W $00d0                          ;00AEE2|F4D000  |0000D0;
 	pld                                  ;00AEE5|2B      |      ;
-	jsl.L CODE_009754                    ;00AEE6|22549700|009754;
+	jsl.L Bitfield_ClearBits                    ;00AEE6|22549700|009754;
 	pld                                  ;00AEEA|2B      |      ;
 	rts                                  ;00AEEB|60      |      ;
 ;      |        |      ;
@@ -5643,7 +5643,7 @@ CODE_00AE9F:
 	pha                                  ;00AF01|48      |      ;
 	lda.B $9e                            ;00AF02|A59E    |00009E;
 	pld                                  ;00AF04|2B      |      ;
-	jsl.L CODE_00974E                    ;00AF05|224E9700|00974E;
+	jsl.L Bitfield_SetBits                    ;00AF05|224E9700|00974E;
 	pld                                  ;00AF09|2B      |      ;
 	rts                                  ;00AF0A|60      |      ;
 ;      |        |      ;
@@ -5654,7 +5654,7 @@ CODE_00AE9F:
 	pha                                  ;00AF20|48      |      ;
 	lda.B $9e                            ;00AF21|A59E    |00009E;
 	pld                                  ;00AF23|2B      |      ;
-	jsl.L CODE_009754                    ;00AF24|22549700|009754;
+	jsl.L Bitfield_ClearBits                    ;00AF24|22549700|009754;
 	pld                                  ;00AF28|2B      |      ;
 	rts                                  ;00AF29|60      |      ;
 ;      |        |      ;
@@ -5939,7 +5939,7 @@ CODE_00B0E6:
 	sta.B $9c                            ;00B0E6|859C    |00009C;
 	lda.B $9e                            ;00B0E8|A59E    |00009E;
 	sta.B $98                            ;00B0EA|8598    |000098;
-	jsl.L CODE_0096B3                    ;00B0EC|22B39600|0096B3;
+	jsl.L Math_Multiply16x16                    ;00B0EC|22B39600|0096B3;
 	rts                                  ;00B0F0|60      |      ;
 ;      |        |      ;
 	lda.B [$17]                          ;00B0F1|A717    |000017;
@@ -5961,7 +5961,7 @@ CODE_00B10C:
 	sta.B $98                            ;00B110|8598    |000098;
 	lda.B $a0                            ;00B112|A5A0    |0000A0;
 	sta.B $9a                            ;00B114|859A    |00009A;
-	jsl.L CODE_0096E4                    ;00B116|22E49600|0096E4;
+	jsl.L Math_Divide32by16                    ;00B116|22E49600|0096E4;
 	rts                                  ;00B11A|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
@@ -6007,7 +6007,7 @@ CODE_00B163:
 	beq CODE_00B181                      ;00B169|F016    |00B181;
 	lda.B $a0                            ;00B16B|A5A0    |0000A0;
 	sta.B $9a                            ;00B16D|859A    |00009A;
-	jsl.L CODE_0096E4                    ;00B16F|22E49600|0096E4;
+	jsl.L Math_Divide32by16                    ;00B16F|22E49600|0096E4;
 	sep #$20                             ;00B173|E220    |      ;
 	lda.B $a2                            ;00B175|A5A2    |0000A2;
 	adc.B #$90                           ;00B177|6990    |      ;
@@ -6051,7 +6051,7 @@ CODE_00B1A1:
 	and.W #$00ff                         ;00B1A6|29FF00  |      ;
 	pei.B ($2e)                          ;00B1A9|D42E    |00002E;
 	pld                                  ;00B1AB|2B      |      ;
-	jsl.L CODE_00975A                    ;00B1AC|225A9700|00975A;
+	jsl.L Bitfield_TestBits                    ;00B1AC|225A9700|00975A;
 	pld                                  ;00B1B0|2B      |      ;
 	inc a;00B1B1|1A      |      ;
 	dec a;00B1B2|3A      |      ;
@@ -6063,7 +6063,7 @@ CODE_00B1B4:
 	phd                                  ;00B1B6|0B      |      ;
 	tcd                                  ;00B1B7|5B      |      ;
 	lda.W $009e                          ;00B1B8|AD9E00  |00009E;
-	jsl.L CODE_00975A                    ;00B1BB|225A9700|00975A;
+	jsl.L Bitfield_TestBits                    ;00B1BB|225A9700|00975A;
 	pld                                  ;00B1BF|2B      |      ;
 	inc a;00B1C0|1A      |      ;
 	dec a;00B1C1|3A      |      ;
@@ -6315,7 +6315,7 @@ CODE_00B38B:
 	rts                                  ;00B38B|60      |      ;
 ;      |        |      ;
 	lda.B $9e                            ;00B38C|A59E    |00009E;
-	jsl.L CODE_009730                    ;00B38E|22309700|009730;
+	jsl.L Math_CountSetBits                    ;00B38E|22309700|009730;
 	sta.B $9e                            ;00B392|859E    |00009E;
 	rts                                  ;00B394|60      |      ;
 ;      |        |      ;
@@ -6838,7 +6838,7 @@ CODE_00B727:
 ;      |        |      ;
 CODE_00B72E:
 	rep #$30                             ;00B72E|C230    |      ;
-	jsl.L CODE_0096A0                    ;00B730|22A09600|0096A0;
+	jsl.L NMI_WaitForVBlank                    ;00B730|22A09600|0096A0;
 	lda.B $07                            ;00B734|A507    |000007;
 	sta.B $15                            ;00B736|8515    |000015;
 	bit.W #$8000                         ;00B738|890080  |      ;
@@ -6888,7 +6888,7 @@ CODE_00B788:
 CODE_00B78D:
 	rep #$30                             ;00B78D|C230    |      ;
 	ldx.W #$b7dd                         ;00B78F|A2DDB7  |      ;
-	jsr.W CODE_009BC4                    ;00B792|20C49B  |009BC4;
+	jsr.W DMA_CopyParamsAndExecute                    ;00B792|20C49B  |009BC4;
 	bra CODE_00B72E                      ;00B795|8097    |00B72E;
 ;      |        |      ;
 ;      |        |      ;
@@ -7063,7 +7063,7 @@ CODE_00B926:
 ;      |        |      ;
 ;      |        |      ;
 CODE_00B930:
-	jsl.L CODE_0096A0                    ;00B930|22A09600|0096A0;
+	jsl.L NMI_WaitForVBlank                    ;00B930|22A09600|0096A0;
 	bit.B $07                            ;00B934|2407    |000007;
 	bne CODE_00B949                      ;00B936|D011    |00B949;
 	eor.W #$ffff                         ;00B938|49FFFF  |      ;
@@ -7100,7 +7100,7 @@ CODE_00B950:
 	jsr.W CODE_00CBEC                    ;00B969|20ECCB  |00CBEC;
 	rep #$30                             ;00B96C|C230    |      ;
 	ldx.W #$ba17                         ;00B96E|A217BA  |      ;
-	jsr.W CODE_009BC4                    ;00B971|20C49B  |009BC4;
+	jsr.W DMA_CopyParamsAndExecute                    ;00B971|20C49B  |009BC4;
 	tsc                                  ;00B974|3B      |      ;
 	sta.W $0105                          ;00B975|8D0501  |000105;
 	lda.W #$0080                         ;00B978|A98000  |      ;
@@ -7115,7 +7115,7 @@ CODE_00B950:
 	sta.B $05                            ;00B990|8505    |000005;
 	pea.W LOOSE_OP_00BCF3                ;00B992|F4F3BC  |00BCF3;
 	ldx.W #$ba14                         ;00B995|A214BA  |      ;
-	jsr.W CODE_009BC4                    ;00B998|20C49B  |009BC4;
+	jsr.W DMA_CopyParamsAndExecute                    ;00B998|20C49B  |009BC4;
 	lda.W #$0f00                         ;00B99B|A9000F  |      ;
 	sta.B $8e                            ;00B99E|858E    |00008E;
 ;      |        |      ;
@@ -7159,10 +7159,10 @@ UNREACH_00B9E0:
 CODE_00BA1A:
 	ldy.W #$1000                         ;00BA1A|A00010  |      ;
 	lda.W #$0303                         ;00BA1D|A90303  |      ;
-	jsr.W CODE_009A11                    ;00BA20|20119A  |009A11;
+	jsr.W Memory_Fill_8Bytes                    ;00BA20|20119A  |009A11;
 	sep #$20                             ;00BA23|E220    |      ;
 	ldx.W #$bae7                         ;00BA25|A2E7BA  |      ;
-	jsr.W CODE_009BC4                    ;00BA28|20C49B  |009BC4;
+	jsr.W DMA_CopyParamsAndExecute                    ;00BA28|20C49B  |009BC4;
 	lda.B #$10                           ;00BA2B|A910    |      ;
 	trb.W $0111                          ;00BA2D|1C1101  |000111;
 	jsl.L CODE_0C8000                    ;00BA30|2200800C|0C8000;
@@ -7217,7 +7217,7 @@ CODE_00BA70:
 	lda.B $06                            ;00BA99|A506    |000006;
 	sta.W SNES_WRMPYA                    ;00BA9B|8D0242  |004202;
 	lda.B #$1a                           ;00BA9E|A91A    |      ;
-	jsl.L CODE_00971E                    ;00BAA0|221E9700|00971E;
+	jsl.L Math_SetMultiplier                    ;00BAA0|221E9700|00971E;
 	lda.B $05                            ;00BAA4|A505    |000005;
 	asl a;00BAA6|0A      |      ;
 	adc.W SNES_RDMPYL                    ;00BAA7|6D1642  |004216;
@@ -7228,7 +7228,7 @@ CODE_00BA70:
 	sta.W $1000,y                        ;00BAB4|990010  |001000;
 	jsr.W CODE_00B926                    ;00BAB7|2026B9  |00B926;
 	ldx.W #$baed                         ;00BABA|A2EDBA  |      ;
-	jsr.W CODE_009BC4                    ;00BABD|20C49B  |009BC4;
+	jsr.W DMA_CopyParamsAndExecute                    ;00BABD|20C49B  |009BC4;
 	bra CODE_00BA70                      ;00BAC0|80AE    |00BA70;
 ;      |        |      ;
 ;      |        |      ;
@@ -7247,7 +7247,7 @@ CODE_00BAD9:
 ;      |        |      ;
 CODE_00BADF:
 	ldx.W #$baea                         ;00BADF|A2EABA  |      ;
-	jsr.W CODE_009BC4                    ;00BAE2|20C49B  |009BC4;
+	jsr.W DMA_CopyParamsAndExecute                    ;00BAE2|20C49B  |009BC4;
 	bra CODE_00BA70                      ;00BAE5|8089    |00BA70;
 ;      |        |      ;
 	db $ca,$ac,$03,$34,$ad,$03,$21,$ad,$03;00BAE7|        |      ;
@@ -7387,7 +7387,7 @@ CODE_00BAF0:
 	lda.W #$0000                         ;00BC21|A90000  |      ;
 	tcd                                  ;00BC24|5B      |      ;
 	ldx.W #$c8e6                         ;00BC25|A2E6C8  |      ;
-	jsr.W CODE_009BC4                    ;00BC28|20C49B  |009BC4;
+	jsr.W DMA_CopyParamsAndExecute                    ;00BC28|20C49B  |009BC4;
 	jsr.W CODE_00C4DB                    ;00BC2B|20DBC4  |00C4DB;
 	jsr.W CODE_00BD64                    ;00BC2E|2064BD  |00BD64;
 	lda.W #$0200                         ;00BC31|A90002  |      ;
@@ -7469,7 +7469,7 @@ CODE_00BCCB:
 ;      |        |      ;
 CODE_00BCCE:
 	ldx.W #$be80                         ;00BCCE|A280BE  |      ;
-	jsr.W CODE_009BC4                    ;00BCD1|20C49B  |009BC4;
+	jsr.W DMA_CopyParamsAndExecute                    ;00BCD1|20C49B  |009BC4;
 	lda.W #$0020                         ;00BCD4|A92000  |      ;
 	tsb.W $00d2                          ;00BCD7|0CD200  |0000D2;
 	jsl.L CODE_00C795                    ;00BCDA|2295C700|00C795;
@@ -7489,7 +7489,7 @@ CODE_00BCCE:
 	jsl.L CODE_00C7B8                    ;00BCFF|22B8C700|00C7B8;
 	jsr.W CODE_00BD64                    ;00BD03|2064BD  |00BD64;
 	ldx.W #$c8e9                         ;00BD06|A2E9C8  |      ;
-	jsr.W CODE_009BC4                    ;00BD09|20C49B  |009BC4;
+	jsr.W DMA_CopyParamsAndExecute                    ;00BD09|20C49B  |009BC4;
 	jsl.L CODE_0C8000                    ;00BD0C|2200800C|0C8000;
 	lda.W #$0040                         ;00BD10|A94000  |      ;
 	sta.W $01f0                          ;00BD13|8DF001  |0001F0;
@@ -7518,12 +7518,12 @@ CODE_00BD30:
 	pea.W $0000                          ;00BD36|F40000  |010000;
 	pld                                  ;00BD39|2B      |      ;
 	ldx.W #$bd61                         ;00BD3A|A261BD  |      ;
-	jsr.W CODE_009BC4                    ;00BD3D|20C49B  |009BC4;
+	jsr.W DMA_CopyParamsAndExecute                    ;00BD3D|20C49B  |009BC4;
 	jsl.L CODE_0C8000                    ;00BD40|2200800C|0C8000;
 	jsr.W Battle_LoadGraphics                    ;00BD44|20C48E  |008EC4;
 	jsr.W CODE_008C3D                    ;00BD47|203D8C  |008C3D;
 	jsr.W CODE_008D29                    ;00BD4A|20298D  |008D29;
-	jsl.L CODE_009B2F                    ;00BD4D|222F9B00|009B2F;
+	jsl.L DMA_TransferGFX                    ;00BD4D|222F9B00|009B2F;
 	jsr.W CODE_00A342                    ;00BD51|2042A3  |00A342;
 	lda.B #$10                           ;00BD54|A910    |      ;
 	tsb.W $00d6                          ;00BD56|0CD600  |0000D6;
@@ -7605,7 +7605,7 @@ CODE_00BDE4:
 ;      |        |      ;
 CODE_00BDF5:
 	ldx.W #$be80                         ;00BDF5|A280BE  |      ;
-	jsr.W CODE_009BC4                    ;00BDF8|20C49B  |009BC4;
+	jsr.W DMA_CopyParamsAndExecute                    ;00BDF8|20C49B  |009BC4;
 	bra CODE_00BDCD                      ;00BDFB|80D0    |00BDCD;
 ;      |        |      ;
 ;      |        |      ;
@@ -7736,7 +7736,7 @@ CODE_00BED6:
 ;      |        |      ;
 CODE_00BEEA:
 	ldx.W #$bf48                         ;00BEEA|A248BF  |      ;
-	jsr.W CODE_009BC4                    ;00BEED|20C49B  |009BC4;
+	jsr.W DMA_CopyParamsAndExecute                    ;00BEED|20C49B  |009BC4;
 	ldx.W #$fff0                         ;00BEF0|A2F0FF  |      ;
 	stx.B $8e                            ;00BEF3|868E    |00008E;
 ;      |        |      ;
@@ -7775,7 +7775,7 @@ CODE_00BF30:
 	lda.B #$04                           ;00BF30|A904    |      ;
 	trb.W $00da                          ;00BF32|1CDA00  |0000DA;
 	ldx.W #$bf48                         ;00BF35|A248BF  |      ;
-	jsr.W CODE_009BC4                    ;00BF38|20C49B  |009BC4;
+	jsr.W DMA_CopyParamsAndExecute                    ;00BF38|20C49B  |009BC4;
 	plx                                  ;00BF3B|FA      |      ;
 	stx.B $03                            ;00BF3C|8603    |000003;
 	plx                                  ;00BF3E|FA      |      ;
@@ -7808,12 +7808,12 @@ CODE_00BF5A:
 	jsr.W CODE_00B91C                    ;00BF6C|201CB9  |00B91C;
 	stz.B $8e                            ;00BF6F|648E    |00008E;
 	ldx.W #$c032                         ;00BF71|A232C0  |      ;
-	jmp.W CODE_009BC4                    ;00BF74|4CC49B  |009BC4;
+	jmp.W DMA_CopyParamsAndExecute                    ;00BF74|4CC49B  |009BC4;
 ;      |        |      ;
 ;      |        |      ;
 CODE_00BF77:
 	ldx.W #$c02f                         ;00BF77|A22FC0  |      ;
-	jsr.W CODE_009BC4                    ;00BF7A|20C49B  |009BC4;
+	jsr.W DMA_CopyParamsAndExecute                    ;00BF7A|20C49B  |009BC4;
 	bra CODE_00BF5A                      ;00BF7D|80DB    |00BF5A;
 ;      |        |      ;
 ;      |        |      ;
@@ -7856,7 +7856,7 @@ CODE_00BFC0:
 	rep #$30                             ;00BFC8|C230    |      ;
 	jsr.W CODE_00DAA5                    ;00BFCA|20A5DA  |00DAA5;
 	ldx.W #$c035                         ;00BFCD|A235C0  |      ;
-	jsr.W CODE_009BC4                    ;00BFD0|20C49B  |009BC4;
+	jsr.W DMA_CopyParamsAndExecute                    ;00BFD0|20C49B  |009BC4;
 	bra CODE_00BF77                      ;00BFD3|80A2    |00BF77;
 ;      |        |      ;
 ;      |        |      ;
@@ -7936,7 +7936,7 @@ CODE_00C047:
 	jsr.W CODE_00B91C                    ;00C059|201CB9  |00B91C;
 	stz.B $8e                            ;00C05C|648E    |00008E;
 	ldx.W #$c1d6                         ;00C05E|A2D6C1  |      ;
-	jmp.W CODE_009BC4                    ;00C061|4CC49B  |009BC4;
+	jmp.W DMA_CopyParamsAndExecute                    ;00C061|4CC49B  |009BC4;
 ;      |        |      ;
 ;      |        |      ;
 UNREACH_00C064:
@@ -7946,7 +7946,7 @@ UNREACH_00C064:
 ;      |        |      ;
 CODE_00C08D:
 	ldx.W #$c1d3                         ;00C08D|A2D3C1  |      ;
-	jsr.W CODE_009BC4                    ;00C090|20C49B  |009BC4;
+	jsr.W DMA_CopyParamsAndExecute                    ;00C090|20C49B  |009BC4;
 	bra CODE_00C047                      ;00C093|80B2    |00C047;
 ;      |        |      ;
 ;      |        |      ;
@@ -7974,7 +7974,7 @@ CODE_00C0B2:
 	sec                                  ;00C0BE|38      |      ;
 	sbc.B $02                            ;00C0BF|E502    |000002;
 	and.W #$00ff                         ;00C0C1|29FF00  |      ;
-	jsr.W CODE_0097F2                    ;00C0C4|20F297  |0097F2;
+	jsr.W Bitfield_GetBitmask                    ;00C0C4|20F297  |0097F2;
 	and.W $1038,x                        ;00C0C7|3D3810  |001038;
 	beq UNREACH_00C095                   ;00C0CA|F0C9    |00C095;
 	lda.W $1018,x                        ;00C0CC|BD1810  |001018;
@@ -8014,7 +8014,7 @@ CODE_00C10B:
 	sta.W $0505                          ;00C111|8D0505  |000505;
 	rep #$30                             ;00C114|C230    |      ;
 	ldx.W #$c035                         ;00C116|A235C0  |      ;
-	jsr.W CODE_009BC4                    ;00C119|20C49B  |009BC4;
+	jsr.W DMA_CopyParamsAndExecute                    ;00C119|20C49B  |009BC4;
 	jmp.W CODE_00C08D                    ;00C11C|4C8DC0  |00C08D;
 ;      |        |      ;
 ;      |        |      ;
@@ -8088,14 +8088,14 @@ CODE_00C189:
 ;      |        |      ;
 CODE_00C18D:
 	sta.B $9c                            ;00C18D|859C    |00009C;
-	jsl.L CODE_0096B3                    ;00C18F|22B39600|0096B3;
+	jsl.L Math_Multiply16x16                    ;00C18F|22B39600|0096B3;
 	lda.B $9e                            ;00C193|A59E    |00009E;
 	sta.B $98                            ;00C195|8598    |000098;
 	lda.B $a0                            ;00C197|A5A0    |0000A0;
 	sta.B $9a                            ;00C199|859A    |00009A;
 	lda.W #$0064                         ;00C19B|A96400  |      ;
 	sta.B $9c                            ;00C19E|859C    |00009C;
-	jsl.L CODE_0096E4                    ;00C1A0|22E49600|0096E4;
+	jsl.L Math_Divide32by16                    ;00C1A0|22E49600|0096E4;
 	lda.B $03,s                          ;00C1A4|A303    |000003;
 	cmp.W #$0080                         ;00C1A6|C98000  |      ;
 	bne CODE_00C1AD                      ;00C1A9|D002    |00C1AD;
@@ -8262,7 +8262,7 @@ CODE_00C2B6:
 	ldx.B $01                            ;00C2B6|A601    |000001;
 	stx.B $05                            ;00C2B8|8605    |000005;
 	ldx.W #$c345                         ;00C2BA|A245C3  |      ;
-	jsr.W CODE_009BC4                    ;00C2BD|20C49B  |009BC4;
+	jsr.W DMA_CopyParamsAndExecute                    ;00C2BD|20C49B  |009BC4;
 	jmp.W CODE_00C1EE                    ;00C2C0|4CEEC1  |00C1EE;
 ;      |        |      ;
 ;      |        |      ;
@@ -8389,7 +8389,7 @@ CODE_00C36A:
 	tsb.W $00de                          ;00C385|0CDE00  |0000DE;
 	jsr.W CODE_00CF3F                    ;00C388|203FCF  |00CF3F;
 	ldx.W #$c3d8                         ;00C38B|A2D8C3  |      ;
-	jsr.W CODE_009BC4                    ;00C38E|20C49B  |009BC4;
+	jsr.W DMA_CopyParamsAndExecute                    ;00C38E|20C49B  |009BC4;
 	lda.B $9e                            ;00C391|A59E    |00009E;
 	bit.W #$8000                         ;00C393|890080  |      ;
 	bne CODE_00C364                      ;00C396|D0CC    |00C364;
@@ -8443,7 +8443,7 @@ CODE_00C3E7:
 	jsr.W CODE_00B91C                    ;00C3FC|201CB9  |00B91C;
 	stz.B $8e                            ;00C3FF|648E    |00008E;
 	ldx.W #$c444                         ;00C401|A244C4  |      ;
-	jmp.W CODE_009BC4                    ;00C404|4CC49B  |009BC4;
+	jmp.W DMA_CopyParamsAndExecute                    ;00C404|4CC49B  |009BC4;
 ;      |        |      ;
 ;      |        |      ;
 CODE_00C407:
@@ -8484,7 +8484,7 @@ CODE_00C437:
 ;      |        |      ;
 CODE_00C439:
 	ldx.W #$c441                         ;00C439|A241C4  |      ;
-	jsr.W CODE_009BC4                    ;00C43C|20C49B  |009BC4;
+	jsr.W DMA_CopyParamsAndExecute                    ;00C43C|20C49B  |009BC4;
 	bra CODE_00C3E7                      ;00C43F|80A6    |00C3E7;
 ;      |        |      ;
 	db $8e,$90,$03,$47,$91,$03           ;00C441|        |      ;
@@ -8507,7 +8507,7 @@ CODE_00C453:
 	jsr.W CODE_00B91C                    ;00C468|201CB9  |00B91C;
 	stz.B $8e                            ;00C46B|648E    |00008E;
 	ldx.W #$c49f                         ;00C46D|A29FC4  |      ;
-	jmp.W CODE_009BC4                    ;00C470|4CC49B  |009BC4;
+	jmp.W DMA_CopyParamsAndExecute                    ;00C470|4CC49B  |009BC4;
 ;      |        |      ;
 ;      |        |      ;
 CODE_00C473:
@@ -8536,7 +8536,7 @@ CODE_00C492:
 ;      |        |      ;
 CODE_00C494:
 	ldx.W #$c49c                         ;00C494|A29CC4  |      ;
-	jsr.W CODE_009BC4                    ;00C497|20C49B  |009BC4;
+	jsr.W DMA_CopyParamsAndExecute                    ;00C497|20C49B  |009BC4;
 	bra CODE_00C453                      ;00C49A|80B7    |00C453;
 ;      |        |      ;
 	db $e3,$91,$03,$47,$91,$03           ;00C49C|        |      ;
@@ -8544,7 +8544,7 @@ CODE_00C494:
 	stx.B $8e                            ;00C4A5|868E    |00008E;
 ;      |        |      ;
 CODE_00C4A7:
-	jsl.L CODE_0096A0                    ;00C4A7|22A09600|0096A0;
+	jsl.L NMI_WaitForVBlank                    ;00C4A7|22A09600|0096A0;
 	lda.W #$0080                         ;00C4AB|A98000  |      ;
 	and.W $00d9                          ;00C4AE|2DD900  |0000D9;
 	beq CODE_00C4C1                      ;00C4B1|F00E    |00C4C1;
@@ -8611,7 +8611,7 @@ CODE_00C54B:
 CODE_00C54F:
 	sep #$20                             ;00C54F|E220    |      ;
 	lda.B #$00                           ;00C551|A900    |      ;
-	jsr.W CODE_0099EA                    ;00C553|20EA99  |0099EA;
+	jsr.W Memory_Fill_32Bytes                    ;00C553|20EA99  |0099EA;
 	rep #$30                             ;00C556|C230    |      ;
 	tya                                  ;00C558|98      |      ;
 	adc.W #$0020                         ;00C559|692000  |      ;
@@ -8939,9 +8939,9 @@ CODE_00C7DE:
 	jsr.W CODE_00C618                    ;00C7DE|2018C6  |00C618;
 	jsr.W CODE_00C58B                    ;00C7E1|208BC5  |00C58B;
 	ldx.W #$c8ec                         ;00C7E4|A2ECC8  |      ;
-	jsr.W CODE_009BC4                    ;00C7E7|20C49B  |009BC4;
+	jsr.W DMA_CopyParamsAndExecute                    ;00C7E7|20C49B  |009BC4;
 	ldx.W #$c8e3                         ;00C7EA|A2E3C8  |      ;
-	jmp.W CODE_009BC4                    ;00C7ED|4CC49B  |009BC4;
+	jmp.W DMA_CopyParamsAndExecute                    ;00C7ED|4CC49B  |009BC4;
 ;      |        |      ;
 ;      |        |      ;
 CODE_00C7F0:
@@ -8958,7 +8958,7 @@ CODE_00C7F8:
 	jsr.W CODE_00CBEC                    ;00C804|20ECCB  |00CBEC;
 	rep #$30                             ;00C807|C230    |      ;
 	ldx.W #$c922                         ;00C809|A222C9  |      ;
-	jsr.W CODE_009BC4                    ;00C80C|20C49B  |009BC4;
+	jsr.W DMA_CopyParamsAndExecute                    ;00C80C|20C49B  |009BC4;
 	phb                                  ;00C80F|8B      |      ;
 	ldx.W #$016f                         ;00C810|A26F01  |      ;
 	ldy.W #$0e04                         ;00C813|A0040E  |      ;
@@ -8977,7 +8977,7 @@ CODE_00C7F8:
 	mvn $7f,$7f                          ;00C83A|547F7F  |      ;
 	plb                                  ;00C83D|AB      |      ;
 	ldx.W #$c8e3                         ;00C83E|A2E3C8  |      ;
-	jsr.W CODE_009BC4                    ;00C841|20C49B  |009BC4;
+	jsr.W DMA_CopyParamsAndExecute                    ;00C841|20C49B  |009BC4;
 	lda.W #$0600                         ;00C844|A90006  |      ;
 	sta.B $01                            ;00C847|8501    |000001;
 	sta.B $05                            ;00C849|8505    |000005;
@@ -9026,7 +9026,7 @@ CODE_00C88D:
 ;      |        |      ;
 CODE_00C89D:
 	phx                                  ;00C89D|DA      |      ;
-	jsr.W CODE_009BC4                    ;00C89E|20C49B  |009BC4;
+	jsr.W DMA_CopyParamsAndExecute                    ;00C89E|20C49B  |009BC4;
 	plx                                  ;00C8A1|FA      |      ;
 	inx                                  ;00C8A2|E8      |      ;
 	inx                                  ;00C8A3|E8      |      ;
@@ -9036,7 +9036,7 @@ CODE_00C89D:
 	mvn $00,$00                          ;00C8AB|540000  |      ;
 	jsr.W CODE_00CAB9                    ;00C8AE|20B9CA  |00CAB9;
 	ldx.W #$c8e3                         ;00C8B1|A2E3C8  |      ;
-	jmp.W CODE_009BC4                    ;00C8B4|4CC49B  |009BC4;
+	jmp.W DMA_CopyParamsAndExecute                    ;00C8B4|4CC49B  |009BC4;
 ;      |        |      ;
 	ldx.W #$c8f2                         ;00C8B7|A2F2C8  |      ;
 	bra CODE_00C8C9                      ;00C8BA|800D    |00C8C9;
@@ -9051,7 +9051,7 @@ CODE_00C89D:
 ;      |        |      ;
 CODE_00C8C9:
 	phx                                  ;00C8C9|DA      |      ;
-	jsr.W CODE_009BC4                    ;00C8CA|20C49B  |009BC4;
+	jsr.W DMA_CopyParamsAndExecute                    ;00C8CA|20C49B  |009BC4;
 	plx                                  ;00C8CD|FA      |      ;
 	inx                                  ;00C8CE|E8      |      ;
 	inx                                  ;00C8CF|E8      |      ;
@@ -9062,7 +9062,7 @@ CODE_00C8D4:
 	jsl.L CODE_0C8000                    ;00C8D4|2200800C|0C8000;
 	pha                                  ;00C8D8|48      |      ;
 	phx                                  ;00C8D9|DA      |      ;
-	jsr.W CODE_009BC4                    ;00C8DA|20C49B  |009BC4;
+	jsr.W DMA_CopyParamsAndExecute                    ;00C8DA|20C49B  |009BC4;
 	plx                                  ;00C8DD|FA      |      ;
 	pla                                  ;00C8DE|68      |      ;
 	dec a;00C8DF|3A      |      ;
@@ -9081,7 +9081,7 @@ CODE_00C92B:
 	sta.B $98                            ;00C92E|8598    |000098;
 	lda.W #$038c                         ;00C930|A98C03  |      ;
 	sta.B $9c                            ;00C933|859C    |00009C;
-	jsl.L CODE_0096B3                    ;00C935|22B39600|0096B3;
+	jsl.L Math_Multiply16x16                    ;00C935|22B39600|0096B3;
 	lda.B $9e                            ;00C939|A59E    |00009E;
 	clc                                  ;00C93B|18      |      ;
 	adc.W #$0000                         ;00C93C|690000  |      ;
@@ -9224,7 +9224,7 @@ CODE_00CA02:
 	bne CODE_00CA02                      ;00CA0A|D0F6    |00CA02;
 	lda.W #$fff0                         ;00CA0C|A9F0FF  |      ;
 	sta.B $8e                            ;00CA0F|858E    |00008E;
-	jmp.W CODE_00981B                    ;00CA11|4C1B98  |00981B;
+	jmp.W Stack_RestoreRegisters                    ;00CA11|4C1B98  |00981B;
 ;      |        |      ;
 ;      |        |      ;
 CODE_00CA14:
@@ -9319,7 +9319,7 @@ CODE_00CAAC:
 	sta.B $64                            ;00CAAC|8564    |000064;
 	lda.W #$fff0                         ;00CAAE|A9F0FF  |      ;
 	sta.B $8e                            ;00CAB1|858E    |00008E;
-	jmp.W CODE_00981B                    ;00CAB3|4C1B98  |00981B;
+	jmp.W Stack_RestoreRegisters                    ;00CAB3|4C1B98  |00981B;
 ;      |        |      ;
 	lda.B $64                            ;00CAB6|A564    |000064;
 	rts                                  ;00CAB8|60      |      ;
@@ -9394,7 +9394,7 @@ CODE_00CB11:
 	trb.W $00da                          ;00CB43|1CDA00  |0000DA;
 	lda.B #$08                           ;00CB46|A908    |      ;
 	trb.W $00d4                          ;00CB48|1CD400  |0000D4;
-	jmp.W CODE_00981B                    ;00CB4B|4C1B98  |00981B;
+	jmp.W Stack_RestoreRegisters                    ;00CB4B|4C1B98  |00981B;
 ;      |        |      ;
 ;      |        |      ;
 CODE_00CB4E:
@@ -9410,7 +9410,7 @@ CODE_00CB4E:
 	trb.W $00db                          ;00CB6B|1CDB00  |0000DB;
 	lda.B #$08                           ;00CB6E|A908    |      ;
 	trb.W $00d4                          ;00CB70|1CD400  |0000D4;
-	jmp.W CODE_00981B                    ;00CB73|4C1B98  |00981B;
+	jmp.W Stack_RestoreRegisters                    ;00CB73|4C1B98  |00981B;
 ;      |        |      ;
 ;      |        |      ;
 CODE_00CB76:
@@ -9424,7 +9424,7 @@ CODE_00CB79:
 	sta.W SNES_COLDATA                   ;00CB85|8D3221  |002132;
 	ldx.W #$0000                         ;00CB88|A20000  |      ;
 	stx.W SNES_CGSWSEL                   ;00CB8B|8E3021  |002130;
-	jmp.W CODE_00981B                    ;00CB8E|4C1B98  |00981B;
+	jmp.W Stack_RestoreRegisters                    ;00CB8E|4C1B98  |00981B;
 ;      |        |      ;
 ;      |        |      ;
 CODE_00CB91:
@@ -10048,10 +10048,10 @@ CODE_00D02C:
 	lda.B #$08                           ;00D033|A908    |      ;
 	tsb.W $00da                          ;00D035|0CDA00  |0000DA;
 	jsl.L CODE_0C8000                    ;00D038|2200800C|0C8000;
-	jsl.L CODE_0096A0                    ;00D03C|22A09600|0096A0;
+	jsl.L NMI_WaitForVBlank                    ;00D03C|22A09600|0096A0;
 	pei.B ($17)                          ;00D040|D417    |000017;
 	ldx.W #$d077                         ;00D042|A277D0  |      ;
-	jsr.W CODE_009BC4                    ;00D045|20C49B  |009BC4;
+	jsr.W DMA_CopyParamsAndExecute                    ;00D045|20C49B  |009BC4;
 	plx                                  ;00D048|FA      |      ;
 	stx.B $17                            ;00D049|8617    |000017;
 ;      |        |      ;
@@ -10110,7 +10110,7 @@ CODE_00D0AA:
 ;      |        |      ;
 CODE_00D0DA:
 	ldx.W #$d1a5                         ;00D0DA|A2A5D1  |      ;
-	jsr.W CODE_009BC4                    ;00D0DD|20C49B  |009BC4;
+	jsr.W DMA_CopyParamsAndExecute                    ;00D0DD|20C49B  |009BC4;
 	lda.W $1090                          ;00D0E0|AD9010  |001090;
 	ora.W #$ff00                         ;00D0E3|0900FF  |      ;
 	tax                                  ;00D0E6|AA      |      ;
@@ -10145,7 +10145,7 @@ CODE_00D113:
 	lda.W #$0010                         ;00D11D|A91000  |      ;
 	tsb.W $00d6                          ;00D120|0CD600  |0000D6;
 	jsl.L CODE_0C8000                    ;00D123|2200800C|0C8000;
-	jsl.L CODE_0096A0                    ;00D127|22A09600|0096A0;
+	jsl.L NMI_WaitForVBlank                    ;00D127|22A09600|0096A0;
 	lda.W #$0010                         ;00D12B|A91000  |      ;
 	trb.W $00da                          ;00D12E|1CDA00  |0000DA;
 	jsl.L CODE_0192A2                    ;00D131|22A29201|0192A2;
@@ -10160,7 +10160,7 @@ CODE_00D113:
 ;      |        |      ;
 CODE_00D13C:
 	ldx.W #$d186                         ;00D13C|A286D1  |      ;
-	jsr.W CODE_009BC4                    ;00D13F|20C49B  |009BC4;
+	jsr.W DMA_CopyParamsAndExecute                    ;00D13F|20C49B  |009BC4;
 	lda.B $9e                            ;00D142|A59E    |00009E;
 	beq CODE_00D0DA                      ;00D144|F094    |00D0DA;
 	db $a9,$10,$00,$1c,$da,$00,$22,$00,$80,$0c,$e2,$30,$9c,$30,$21,$a9;00D146|        |      ;
@@ -10315,24 +10315,24 @@ CODE_00D2A6:
 	trb.W $1020                          ;00D2C7|1C2010  |001020;
 	jsr.W CODE_00DAA5                    ;00D2CA|20A5DA  |00DAA5;
 	ldx.W #$d3f9                         ;00D2CD|A2F9D3  |      ;
-	jsr.W CODE_009BC4                    ;00D2D0|20C49B  |009BC4;
+	jsr.W DMA_CopyParamsAndExecute                    ;00D2D0|20C49B  |009BC4;
 ;      |        |      ;
 CODE_00D2D3:
 	sep #$20                             ;00D2D3|E220    |      ;
 	rep #$10                             ;00D2D5|C210    |      ;
 	ldx.W #$d3f0                         ;00D2D7|A2F0D3  |      ;
-	jsr.W CODE_009BC4                    ;00D2DA|20C49B  |009BC4;
+	jsr.W DMA_CopyParamsAndExecute                    ;00D2DA|20C49B  |009BC4;
 	ldx.W #$d3f6                         ;00D2DD|A2F6D3  |      ;
-	jsr.W CODE_009BC4                    ;00D2E0|20C49B  |009BC4;
+	jsr.W DMA_CopyParamsAndExecute                    ;00D2E0|20C49B  |009BC4;
 	ldx.W #$fff0                         ;00D2E3|A2F0FF  |      ;
 	stx.B $8e                            ;00D2E6|868E    |00008E;
 ;      |        |      ;
 CODE_00D2E8:
 	ldx.W #$d3f3                         ;00D2E8|A2F3D3  |      ;
-	jsr.W CODE_009BC4                    ;00D2EB|20C49B  |009BC4;
+	jsr.W DMA_CopyParamsAndExecute                    ;00D2EB|20C49B  |009BC4;
 ;      |        |      ;
 CODE_00D2EE:
-	jsl.L CODE_0096A0                    ;00D2EE|22A09600|0096A0;
+	jsl.L NMI_WaitForVBlank                    ;00D2EE|22A09600|0096A0;
 	ldx.B $07                            ;00D2F2|A607    |000007;
 	stx.B $15                            ;00D2F4|8615    |000015;
 	lda.B $16                            ;00D2F6|A516    |000016;
@@ -10364,7 +10364,7 @@ CODE_00D319:
 CODE_00D321:
 	jsr.W CODE_00D397                    ;00D321|2097D3  |00D397;
 	ldx.W #$d3ed                         ;00D324|A2EDD3  |      ;
-	jsr.W CODE_009BC4                    ;00D327|20C49B  |009BC4;
+	jsr.W DMA_CopyParamsAndExecute                    ;00D327|20C49B  |009BC4;
 	rep #$30                             ;00D32A|C230    |      ;
 	stz.B $8e                            ;00D32C|648E    |00008E;
 	ply                                  ;00D32E|7A      |      ;
@@ -10528,17 +10528,17 @@ CODE_00D433:
 CODE_00D444:
 	jsr.W CODE_00D538                    ;00D444|2038D5  |00D538;
 	ldx.W #$d576                         ;00D447|A276D5  |      ;
-	jsr.W CODE_009BC4                    ;00D44A|20C49B  |009BC4;
+	jsr.W DMA_CopyParamsAndExecute                    ;00D44A|20C49B  |009BC4;
 	ldx.W #$d57c                         ;00D44D|A27CD5  |      ;
-	jsr.W CODE_009BC4                    ;00D450|20C49B  |009BC4;
+	jsr.W DMA_CopyParamsAndExecute                    ;00D450|20C49B  |009BC4;
 	jsr.W CODE_00D3FC                    ;00D453|20FCD3  |00D3FC;
 ;      |        |      ;
 CODE_00D456:
 	ldx.W #$d579                         ;00D456|A279D5  |      ;
-	jsr.W CODE_009BC4                    ;00D459|20C49B  |009BC4;
+	jsr.W DMA_CopyParamsAndExecute                    ;00D459|20C49B  |009BC4;
 ;      |        |      ;
 CODE_00D45C:
-	jsl.L CODE_0096A0                    ;00D45C|22A09600|0096A0;
+	jsl.L NMI_WaitForVBlank                    ;00D45C|22A09600|0096A0;
 	ldx.B $07                            ;00D460|A607    |000007;
 	stx.B $15                            ;00D462|8615    |000015;
 	beq CODE_00D45C                      ;00D464|F0F6    |00D45C;
@@ -10735,17 +10735,17 @@ CODE_00D598:
 ;      |        |      ;
 CODE_00D5A4:
 	ldx.W #$d639                         ;00D5A4|A239D6  |      ;
-	jsr.W CODE_009BC4                    ;00D5A7|20C49B  |009BC4;
+	jsr.W DMA_CopyParamsAndExecute                    ;00D5A7|20C49B  |009BC4;
 	ldx.W #$d636                         ;00D5AA|A236D6  |      ;
-	jsr.W CODE_009BC4                    ;00D5AD|20C49B  |009BC4;
+	jsr.W DMA_CopyParamsAndExecute                    ;00D5AD|20C49B  |009BC4;
 	jsr.W CODE_00D3FC                    ;00D5B0|20FCD3  |00D3FC;
 ;      |        |      ;
 CODE_00D5B3:
 	ldx.W #$d63c                         ;00D5B3|A23CD6  |      ;
-	jsr.W CODE_009BC4                    ;00D5B6|20C49B  |009BC4;
+	jsr.W DMA_CopyParamsAndExecute                    ;00D5B6|20C49B  |009BC4;
 ;      |        |      ;
 CODE_00D5B9:
-	jsl.L CODE_0096A0                    ;00D5B9|22A09600|0096A0;
+	jsl.L NMI_WaitForVBlank                    ;00D5B9|22A09600|0096A0;
 	ldx.B $07                            ;00D5BD|A607    |000007;
 	stx.B $15                            ;00D5BF|8615    |000015;
 	beq CODE_00D5B9                      ;00D5C1|F0F6    |00D5B9;
@@ -10859,19 +10859,19 @@ CODE_00D676:
 ;      |        |      ;
 CODE_00D682:
 	ldx.W #$d71c                         ;00D682|A21CD7  |      ;
-	jsr.W CODE_009BC4                    ;00D685|20C49B  |009BC4;
+	jsr.W DMA_CopyParamsAndExecute                    ;00D685|20C49B  |009BC4;
 	ldx.W #$d719                         ;00D688|A219D7  |      ;
-	jsr.W CODE_009BC4                    ;00D68B|20C49B  |009BC4;
+	jsr.W DMA_CopyParamsAndExecute                    ;00D68B|20C49B  |009BC4;
 ;      |        |      ;
 CODE_00D68E:
 	jsr.W CODE_00D3FC                    ;00D68E|20FCD3  |00D3FC;
 ;      |        |      ;
 CODE_00D691:
 	ldx.W #$d71f                         ;00D691|A21FD7  |      ;
-	jsr.W CODE_009BC4                    ;00D694|20C49B  |009BC4;
+	jsr.W DMA_CopyParamsAndExecute                    ;00D694|20C49B  |009BC4;
 ;      |        |      ;
 CODE_00D697:
-	jsl.L CODE_0096A0                    ;00D697|22A09600|0096A0;
+	jsl.L NMI_WaitForVBlank                    ;00D697|22A09600|0096A0;
 	ldx.B $07                            ;00D69B|A607    |000007;
 	stx.B $15                            ;00D69D|8615    |000015;
 	beq CODE_00D697                      ;00D69F|F0F6    |00D697;
@@ -10952,7 +10952,7 @@ CODE_00D722:
 	pei.B ($01)                          ;00D722|D401    |000001;
 	pei.B ($03)                          ;00D724|D403    |000003;
 	ldx.W #$da56                         ;00D726|A256DA  |      ;
-	jsr.W CODE_009BC4                    ;00D729|20C49B  |009BC4;
+	jsr.W DMA_CopyParamsAndExecute                    ;00D729|20C49B  |009BC4;
 	ldx.W #$0403                         ;00D72C|A20304  |      ;
 	stx.B $03                            ;00D72F|8603    |000003;
 	jsr.W CODE_00D3FC                    ;00D731|20FCD3  |00D3FC;
@@ -10972,7 +10972,7 @@ CODE_00D74A:
 	sta.W SNES_WRMPYA                    ;00D74C|8D0242  |004202;
 	lda.L $7e365e,x                      ;00D74F|BF5E367E|7E365E;
 	beq CODE_00D7B9                      ;00D753|F064    |00D7B9;
-	jsl.L CODE_00971E                    ;00D755|221E9700|00971E;
+	jsl.L Math_SetMultiplier                    ;00D755|221E9700|00971E;
 	bmi CODE_00D7A5                      ;00D759|304A    |00D7A5;
 	ldy.W SNES_RDMPYL                    ;00D75B|AC1642  |004216;
 	cmp.B #$02                           ;00D75E|C902    |      ;
@@ -11111,13 +11111,13 @@ CODE_00D861:
 ;      |        |      ;
 CODE_00D864:
 	ldx.W #$da59                         ;00D864|A259DA  |      ;
-	jsr.W CODE_009BC4                    ;00D867|20C49B  |009BC4;
+	jsr.W DMA_CopyParamsAndExecute                    ;00D867|20C49B  |009BC4;
 	ldx.B $07                            ;00D86A|A607    |000007;
 	cpx.B $15                            ;00D86C|E415    |000015;
 	bne CODE_00D876                      ;00D86E|D006    |00D876;
 ;      |        |      ;
 CODE_00D870:
-	jsl.L CODE_0096A0                    ;00D870|22A09600|0096A0;
+	jsl.L NMI_WaitForVBlank                    ;00D870|22A09600|0096A0;
 	ldx.B $07                            ;00D874|A607    |000007;
 ;      |        |      ;
 CODE_00D876:
@@ -11161,11 +11161,11 @@ CODE_00D8AA:
 	beq CODE_00D8C0                      ;00D8B0|F00E    |00D8C0;
 	bit.B #$01                           ;00D8B2|8901    |      ;
 	bne CODE_00D8BA                      ;00D8B4|D004    |00D8BA;
-	jsl.L CODE_0096A0                    ;00D8B6|22A09600|0096A0;
+	jsl.L NMI_WaitForVBlank                    ;00D8B6|22A09600|0096A0;
 ;      |        |      ;
 CODE_00D8BA:
 	ldx.W #$da59                         ;00D8BA|A259DA  |      ;
-	jsr.W CODE_009BC4                    ;00D8BD|20C49B  |009BC4;
+	jsr.W DMA_CopyParamsAndExecute                    ;00D8BD|20C49B  |009BC4;
 ;      |        |      ;
 CODE_00D8C0:
 	ldx.W #$0000                         ;00D8C0|A20000  |      ;
@@ -11202,7 +11202,7 @@ CODE_00D8EA:
 	sta.W $1051,y                        ;00D8EA|995110  |001051;
 	sta.L $7e365e,x                      ;00D8ED|9F5E367E|7E365E;
 	ldx.W #$d3f9                         ;00D8F1|A2F9D3  |      ;
-	jsr.W CODE_009BC4                    ;00D8F4|20C49B  |009BC4;
+	jsr.W DMA_CopyParamsAndExecute                    ;00D8F4|20C49B  |009BC4;
 	plx                                  ;00D8F7|FA      |      ;
 	stx.B $03                            ;00D8F8|8603    |000003;
 	plx                                  ;00D8FA|FA      |      ;
@@ -11629,7 +11629,7 @@ CODE_00DB82:
 	phd                                  ;00DB82|0B      |      ;
 	pea.W $0ea6                          ;00DB83|F4A60E  |000EA6;
 	pld                                  ;00DB86|2B      |      ;
-	jsl.L CODE_00974E                    ;00DB87|224E9700|00974E;
+	jsl.L Bitfield_SetBits                    ;00DB87|224E9700|00974E;
 	pld                                  ;00DB8B|2B      |      ;
 	bra CODE_00DBD6                      ;00DB8C|8048    |00DBD6;
 ;      |        |      ;
@@ -11639,7 +11639,7 @@ CODE_00DB8E:
 	phd                                  ;00DB90|0B      |      ;
 	pea.W $1038                          ;00DB91|F43810  |001038;
 	pld                                  ;00DB94|2B      |      ;
-	jsl.L CODE_00974E                    ;00DB95|224E9700|00974E;
+	jsl.L Bitfield_SetBits                    ;00DB95|224E9700|00974E;
 	pld                                  ;00DB99|2B      |      ;
 	bra CODE_00DBD6                      ;00DB9A|803A    |00DBD6;
 ;      |        |      ;
@@ -11655,7 +11655,7 @@ CODE_00DBA1:
 	phd                                  ;00DBA4|0B      |      ;
 	pea.W $1032                          ;00DBA5|F43210  |001032;
 	pld                                  ;00DBA8|2B      |      ;
-	jsl.L CODE_00974E                    ;00DBA9|224E9700|00974E;
+	jsl.L Bitfield_SetBits                    ;00DBA9|224E9700|00974E;
 	pld                                  ;00DBAD|2B      |      ;
 	pla                                  ;00DBAE|68      |      ;
 	sta.W $1031                          ;00DBAF|8D3110  |001031;
@@ -11672,7 +11672,7 @@ CODE_00DBBE:
 	phd                                  ;00DBC1|0B      |      ;
 	pea.W $1035                          ;00DBC2|F43510  |001035;
 	pld                                  ;00DBC5|2B      |      ;
-	jsl.L CODE_00974E                    ;00DBC6|224E9700|00974E;
+	jsl.L Bitfield_SetBits                    ;00DBC6|224E9700|00974E;
 	pld                                  ;00DBCA|2B      |      ;
 	pla                                  ;00DBCB|68      |      ;
 	ldy.B #$00                           ;00DBCC|A000    |      ;
@@ -11950,7 +11950,7 @@ CODE_00DE0F:
 	lda.W UNREACH_00E552,x               ;00DE47|BD52E5  |00E552;
 	sta.W SNES_WRMPYA                    ;00DE4A|8D0242  |004202;
 	lda.B $0b                            ;00DE4D|A50B    |001FA1;
-	jsl.L CODE_00971E                    ;00DE4F|221E9700|00971E;
+	jsl.L Math_SetMultiplier                    ;00DE4F|221E9700|00971E;
 	rep #$30                             ;00DE53|C230    |      ;
 	clc                                  ;00DE55|18      |      ;
 	lda.W $00b6                          ;00DE56|ADB600  |0000B6;
@@ -12083,7 +12083,7 @@ CODE_00DF43:
 	lda.B $56                            ;00DF4B|A556    |0000B4;
 	sta.W SNES_WRMPYA                    ;00DF4D|8D0242  |004202;
 	lda.B $55                            ;00DF50|A555    |0000B3;
-	jsl.L CODE_00971E                    ;00DF52|221E9700|00971E;
+	jsl.L Math_SetMultiplier                    ;00DF52|221E9700|00971E;
 	rep #$30                             ;00DF56|C230    |      ;
 	clc                                  ;00DF58|18      |      ;
 	lda.B $5c                            ;00DF59|A55C    |0000BA;
@@ -12093,7 +12093,7 @@ CODE_00DF43:
 	lda.W SNES_RDMPYL                    ;00DF62|AD1642  |004216;
 	pea.W $007f                          ;00DF65|F47F00  |00007F;
 	plb                                  ;00DF68|AB      |      ;
-	jsr.W CODE_009998                    ;00DF69|209899  |009998;
+	jsr.W Memory_Fill                    ;00DF69|209899  |009998;
 	plb                                  ;00DF6C|AB      |      ;
 	clc                                  ;00DF6D|18      |      ;
 	lda.B $5c                            ;00DF6E|A55C    |0000BA;
@@ -12103,7 +12103,7 @@ CODE_00DF43:
 	lda.W SNES_RDMPYL                    ;00DF77|AD1642  |004216;
 	pea.W $007f                          ;00DF7A|F47F00  |00007F;
 	plb                                  ;00DF7D|AB      |      ;
-	jsr.W CODE_009998                    ;00DF7E|209899  |009998;
+	jsr.W Memory_Fill                    ;00DF7E|209899  |009998;
 	plb                                  ;00DF81|AB      |      ;
 	clc                                  ;00DF82|18      |      ;
 	lda.W SNES_RDMPYL                    ;00DF83|AD1642  |004216;
@@ -12345,7 +12345,7 @@ CODE_00E0D5:
 	bne CODE_00E119                      ;00E0F6|D021    |00E119;
 ;      |        |      ;
 CODE_00E0F8:
-	jsl.L CODE_0096A0                    ;00E0F8|22A09600|0096A0;
+	jsl.L NMI_WaitForVBlank                    ;00E0F8|22A09600|0096A0;
 	lda.W #$0020                         ;00E0FC|A92000  |      ;
 	and.W $00dd                          ;00E0FF|2DDD00  |0000DD;
 	bne CODE_00E119                      ;00E102|D015    |00E119;
@@ -12830,14 +12830,14 @@ CODE_00E694:
 	lda.B $6b                            ;00E69E|A56B    |0000C9;
 	sta.W SNES_WRMPYA                    ;00E6A0|8D0242  |004202;
 	lda.B $56                            ;00E6A3|A556    |0000B4;
-	jsl.L CODE_00971E                    ;00E6A5|221E9700|00971E;
+	jsl.L Math_SetMultiplier                    ;00E6A5|221E9700|00971E;
 	rep #$30                             ;00E6A9|C230    |      ;
 	lda.W SNES_RDMPYL                    ;00E6AB|AD1642  |004216;
 	sta.B $3e                            ;00E6AE|853E    |00009C;
 	lda.B $68                            ;00E6B0|A568    |0000C6;
 	sta.B $3a                            ;00E6B2|853A    |000098;
 	stz.B $3c                            ;00E6B4|643C    |00009A;
-	jsl.L CODE_0096E4                    ;00E6B6|22E49600|0096E4;
+	jsl.L Math_Divide32by16                    ;00E6B6|22E49600|0096E4;
 	tsc                                  ;00E6BA|3B      |      ;
 	sec                                  ;00E6BB|38      |      ;
 	sbc.W #$0012                         ;00E6BC|E91200  |      ;
@@ -12906,7 +12906,7 @@ CODE_00E721:
 	bne CODE_00E721                      ;00E737|D0E8    |00E721;
 	ldx.B $0f                            ;00E739|A60F    |001F88;
 	lda.B $05                            ;00E73B|A505    |001F7E;
-	jsr.W CODE_00985D                    ;00E73D|205D98  |00985D;
+	jsr.W Memory_CopyLarge                    ;00E73D|205D98  |00985D;
 	plb                                  ;00E740|AB      |      ;
 	stx.B $0f                            ;00E741|860F    |001F88;
 	jsr.W CODE_00E5C8                    ;00E743|20C8E5  |00E5C8;
@@ -13145,7 +13145,7 @@ CODE_00EB62:
 	lda.B $5a                            ;00EB64|A55A    |0000B8;
 	sta.W SNES_WRMPYA                    ;00EB66|8D0242  |004202;
 	lda.B $56                            ;00EB69|A556    |0000B4;
-	jsl.L CODE_00971E                    ;00EB6B|221E9700|00971E;
+	jsl.L Math_SetMultiplier                    ;00EB6B|221E9700|00971E;
 	rep #$30                             ;00EB6F|C230    |      ;
 	lda.B $58                            ;00EB71|A558    |0000B6;
 	and.W #$fff8                         ;00EB73|29F8FF  |      ;
@@ -13159,7 +13159,7 @@ CODE_00EB62:
 	lda.W #$00ff                         ;00EB81|A9FF00  |      ;
 	pea.W $007f                          ;00EB84|F47F00  |00007F;
 	plb                                  ;00EB87|AB      |      ;
-	jsr.W CODE_0099BD                    ;00EB88|20BD99  |0099BD;
+	jsr.W Memory_Fill_64Bytes                    ;00EB88|20BD99  |0099BD;
 	plb                                  ;00EB8B|AB      |      ;
 	rts                                  ;00EB8C|60      |      ;
 ;      |        |      ;
@@ -13168,7 +13168,7 @@ CODE_00EB62:
 	lda.W #$0750                         ;00EB93|A95007  |      ;
 	pea.W $007f                          ;00EB96|F47F00  |00007F;
 	plb                                  ;00EB99|AB      |      ;
-	jsr.W CODE_009998                    ;00EB9A|209899  |009998;
+	jsr.W Memory_Fill                    ;00EB9A|209899  |009998;
 	plb                                  ;00EB9D|AB      |      ;
 	rts                                  ;00EB9E|60      |      ;
 ;      |        |      ;
@@ -13177,7 +13177,7 @@ CODE_00EB62:
 	lda.W #$0750                         ;00EBA5|A95007  |      ;
 	pea.W $007f                          ;00EBA8|F47F00  |00007F;
 	plb                                  ;00EBAB|AB      |      ;
-	jsr.W CODE_009998                    ;00EBAC|209899  |009998;
+	jsr.W Memory_Fill                    ;00EBAC|209899  |009998;
 	plb                                  ;00EBAF|AB      |      ;
 	rts                                  ;00EBB0|60      |      ;
 ;      |        |      ;
@@ -13653,7 +13653,7 @@ CODE_00EF61:
 CODE_00F05A:
 	tay                                  ;00F05A|A8      |      ;
 	lda.W #$0000                         ;00F05B|A90000  |      ;
-	jsr.W CODE_009A05                    ;00F05E|20059A  |009A05;
+	jsr.W Memory_Fill_14Bytes                    ;00F05E|20059A  |009A05;
 	tya                                  ;00F061|98      |      ;
 	adc.W #$0034                         ;00F062|693400  |      ;
 	dex                                  ;00F065|CA      |      ;
@@ -13667,7 +13667,7 @@ CODE_00F05A:
 	sta.W $2ea0                          ;00F071|8DA02E  |7F2EA0;
 	lda.W #$8000                         ;00F074|A90080  |      ;
 	ldy.W #$2ea2                         ;00F077|A0A22E  |      ;
-	jsr.W CODE_009A02                    ;00F07A|20029A  |009A02;
+	jsr.W Memory_Fill_16Bytes                    ;00F07A|20029A  |009A02;
 	plb                                  ;00F07D|AB      |      ;
 	pea.W $0014                          ;00F07E|F41400  |000014;
 	pea.W $4e14                          ;00F081|F4144E  |004E14;
