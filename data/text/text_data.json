@@ -1,0 +1,5878 @@
+{
+  "version": "1.0.0",
+  "game": "Final Fantasy Mystic Quest",
+  "extraction_date": null,
+  "total_strings": 924,
+  "tables": {
+    "item_names": {
+      "count": 232,
+      "config": {
+        "address": 323584,
+        "count": 256,
+        "max_length": 12
+      },
+      "strings": [
+        {
+          "id": 0,
+          "text": "[WAIT][WAIT][WAIT]\n\n##[NAME][ITEM]###",
+          "address": "$04F000",
+          "length": 12
+        },
+        {
+          "id": 1,
+          "text": "#[CLEAR][CLEAR][CLEAR]\n#_##",
+          "address": "$04F00C",
+          "length": 10
+        },
+        {
+          "id": 2,
+          "text": "#####Vl####F",
+          "address": "$04F018",
+          "length": 12
+        },
+        {
+          "id": 3,
+          "text": "F",
+          "address": "$04F024",
+          "length": 2
+        },
+        {
+          "id": 5,
+          "text": "#",
+          "address": "$04F03C",
+          "length": 2
+        },
+        {
+          "id": 6,
+          "text": "#########'Wl",
+          "address": "$04F048",
+          "length": 12
+        },
+        {
+          "id": 7,
+          "text": "e######F##t",
+          "address": "$04F054",
+          "length": 12
+        },
+        {
+          "id": 8,
+          "text": "_#########",
+          "address": "$04F060",
+          "length": 12
+        },
+        {
+          "id": 9,
+          "text": "########y##",
+          "address": "$04F06C",
+          "length": 12
+        },
+        {
+          "id": 10,
+          "text": "&#Vi8#######",
+          "address": "$04F078",
+          "length": 12
+        },
+        {
+          "id": 11,
+          "text": "########G",
+          "address": "$04F084",
+          "length": 12
+        },
+        {
+          "id": 12,
+          "text": "G##99#######",
+          "address": "$04F090",
+          "length": 12
+        },
+        {
+          "id": 13,
+          "text": "###m9######",
+          "address": "$04F09C",
+          "length": 12
+        },
+        {
+          "id": 14,
+          "text": "######S#####",
+          "address": "$04F0A8",
+          "length": 12
+        },
+        {
+          "id": 15,
+          "text": "#r#######FD#",
+          "address": "$04F0B4",
+          "length": 12
+        },
+        {
+          "id": 16,
+          "text": "####5#######",
+          "address": "$04F0C0",
+          "length": 12
+        },
+        {
+          "id": 17,
+          "text": "###########",
+          "address": "$04F0CC",
+          "length": 12
+        },
+        {
+          "id": 18,
+          "text": "###UP#######",
+          "address": "$04F0D8",
+          "length": 12
+        },
+        {
+          "id": 19,
+          "text": "###t#F##k",
+          "address": "$04F0E4",
+          "length": 12
+        },
+        {
+          "id": 20,
+          "text": "l###########",
+          "address": "$04F0F0",
+          "length": 12
+        },
+        {
+          "id": 21,
+          "text": "#J#####t####",
+          "address": "$04F0FC",
+          "length": 12
+        },
+        {
+          "id": 22,
+          "text": "#########Zd#",
+          "address": "$04F108",
+          "length": 12
+        },
+        {
+          "id": 23,
+          "text": "##########",
+          "address": "$04F114",
+          "length": 12
+        },
+        {
+          "id": 24,
+          "text": "#d##k##e",
+          "address": "$04F120",
+          "length": 12
+        },
+        {
+          "id": 25,
+          "text": "##[NAME]###",
+          "address": "$04F12C",
+          "length": 9
+        },
+        {
+          "id": 26,
+          "text": "#T######",
+          "address": "$04F138",
+          "length": 12
+        },
+        {
+          "id": 27,
+          "text": "######",
+          "address": "$04F144",
+          "length": 9
+        },
+        {
+          "id": 28,
+          "text": "#kl#####x###",
+          "address": "$04F150",
+          "length": 12
+        },
+        {
+          "id": 29,
+          "text": "###qCi######",
+          "address": "$04F15C",
+          "length": 12
+        },
+        {
+          "id": 30,
+          "text": "########",
+          "address": "$04F168",
+          "length": 12
+        },
+        {
+          "id": 31,
+          "text": "#########bh#",
+          "address": "$04F174",
+          "length": 12
+        },
+        {
+          "id": 32,
+          "text": "###l#i#####e",
+          "address": "$04F180",
+          "length": 12
+        },
+        {
+          "id": 33,
+          "text": "lm####d#T##",
+          "address": "$04F18C",
+          "length": 12
+        },
+        {
+          "id": 34,
+          "text": "#_##########",
+          "address": "$04F198",
+          "length": 12
+        },
+        {
+          "id": 35,
+          "text": "[CLEAR]#########",
+          "address": "$04F1A4",
+          "length": 12
+        },
+        {
+          "id": 36,
+          "text": "##########",
+          "address": "$04F1B0",
+          "length": 12
+        },
+        {
+          "id": 37,
+          "text": "#Vl##&##l###",
+          "address": "$04F1BC",
+          "length": 12
+        },
+        {
+          "id": 38,
+          "text": "########T###",
+          "address": "$04F1C8",
+          "length": 12
+        },
+        {
+          "id": 39,
+          "text": "######d##",
+          "address": "$04F1D4",
+          "length": 10
+        },
+        {
+          "id": 40,
+          "text": "##########C#",
+          "address": "$04F1E0",
+          "length": 12
+        },
+        {
+          "id": 41,
+          "text": "C",
+          "address": "$04F1EC",
+          "length": 2
+        },
+        {
+          "id": 42,
+          "text": "[CLEAR][CLEAR][WAIT]\n\n",
+          "address": "$04F1F8",
+          "length": 6
+        },
+        {
+          "id": 43,
+          "text": "P",
+          "address": "$04F204",
+          "length": 2
+        },
+        {
+          "id": 44,
+          "text": "####E#######",
+          "address": "$04F210",
+          "length": 12
+        },
+        {
+          "id": 45,
+          "text": "#",
+          "address": "$04F21C",
+          "length": 2
+        },
+        {
+          "id": 46,
+          "text": "7#####[WAIT]####P",
+          "address": "$04F228",
+          "length": 12
+        },
+        {
+          "id": 47,
+          "text": "V#8#######",
+          "address": "$04F234",
+          "length": 12
+        },
+        {
+          "id": 48,
+          "text": "#knp##E###e",
+          "address": "$04F240",
+          "length": 12
+        },
+        {
+          "id": 49,
+          "text": "O###t####0",
+          "address": "$04F24C",
+          "length": 12
+        },
+        {
+          "id": 50,
+          "text": "############",
+          "address": "$04F258",
+          "length": 12
+        },
+        {
+          "id": 51,
+          "text": "##########C#",
+          "address": "$04F264",
+          "length": 12
+        },
+        {
+          "id": 52,
+          "text": "A#Z#Ytg#A#9#",
+          "address": "$04F270",
+          "length": 12
+        },
+        {
+          "id": 53,
+          "text": "9FFlllFFF##y",
+          "address": "$04F27C",
+          "length": 12
+        },
+        {
+          "id": 54,
+          "text": "#U##-#w##7#3",
+          "address": "$04F288",
+          "length": 12
+        },
+        {
+          "id": 55,
+          "text": "##########k#",
+          "address": "$04F294",
+          "length": 12
+        },
+        {
+          "id": 56,
+          "text": "#######[NAME][NAME][ITEM][ITEM]#",
+          "address": "$04F2A0",
+          "length": 12
+        },
+        {
+          "id": 57,
+          "text": "#'#####_#aih",
+          "address": "$04F2AC",
+          "length": 12
+        },
+        {
+          "id": 58,
+          "text": "h###[NAME]F####n#",
+          "address": "$04F2B8",
+          "length": 12
+        },
+        {
+          "id": 59,
+          "text": "mpt#########",
+          "address": "$04F2C4",
+          "length": 12
+        },
+        {
+          "id": 60,
+          "text": "#u#AA###oii#",
+          "address": "$04F2D0",
+          "length": 12
+        },
+        {
+          "id": 61,
+          "text": "########h",
+          "address": "$04F2DC",
+          "length": 12
+        },
+        {
+          "id": 62,
+          "text": "t##[NAME]####k\n##",
+          "address": "$04F2E8",
+          "length": 12
+        },
+        {
+          "id": 63,
+          "text": "##\n[CLEAR]q##",
+          "address": "$04F2F4",
+          "length": 8
+        },
+        {
+          "id": 64,
+          "text": "####i######",
+          "address": "$04F300",
+          "length": 12
+        },
+        {
+          "id": 65,
+          "text": "#",
+          "address": "$04F30C",
+          "length": 2
+        },
+        {
+          "id": 66,
+          "text": "############",
+          "address": "$04F318",
+          "length": 12
+        },
+        {
+          "id": 67,
+          "text": "#F#######B##",
+          "address": "$04F324",
+          "length": 12
+        },
+        {
+          "id": 68,
+          "text": "#xbxbD&x#v#",
+          "address": "$04F330",
+          "length": 12
+        },
+        {
+          "id": 69,
+          "text": "u###########",
+          "address": "$04F33C",
+          "length": 12
+        },
+        {
+          "id": 70,
+          "text": "############",
+          "address": "$04F348",
+          "length": 12
+        },
+        {
+          "id": 71,
+          "text": "############",
+          "address": "$04F354",
+          "length": 12
+        },
+        {
+          "id": 72,
+          "text": "#####s#####",
+          "address": "$04F360",
+          "length": 12
+        },
+        {
+          "id": 73,
+          "text": "####[CLEAR]#####",
+          "address": "$04F36C",
+          "length": 12
+        },
+        {
+          "id": 74,
+          "text": "#########p#",
+          "address": "$04F378",
+          "length": 12
+        },
+        {
+          "id": 75,
+          "text": "#####m",
+          "address": "$04F384",
+          "length": 9
+        },
+        {
+          "id": 76,
+          "text": "###u#",
+          "address": "$04F390",
+          "length": 6
+        },
+        {
+          "id": 77,
+          "text": "####m",
+          "address": "$04F39C",
+          "length": 6
+        },
+        {
+          "id": 78,
+          "text": "#####pin#m##",
+          "address": "$04F3A8",
+          "length": 12
+        },
+        {
+          "id": 79,
+          "text": "#######mm#",
+          "address": "$04F3B4",
+          "length": 12
+        },
+        {
+          "id": 80,
+          "text": "G##W#0#0####",
+          "address": "$04F3C0",
+          "length": 12
+        },
+        {
+          "id": 81,
+          "text": "#m##########",
+          "address": "$04F3CC",
+          "length": 12
+        },
+        {
+          "id": 82,
+          "text": "######[ITEM][CLEAR][CLEAR]\n\n",
+          "address": "$04F3D8",
+          "length": 12
+        },
+        {
+          "id": 84,
+          "text": "############",
+          "address": "$04F3F0",
+          "length": 12
+        },
+        {
+          "id": 85,
+          "text": "############",
+          "address": "$04F3FC",
+          "length": 12
+        },
+        {
+          "id": 86,
+          "text": "####lI#lF##",
+          "address": "$04F408",
+          "length": 12
+        },
+        {
+          "id": 87,
+          "text": "######k###",
+          "address": "$04F414",
+          "length": 12
+        },
+        {
+          "id": 88,
+          "text": "#########[CLEAR]",
+          "address": "$04F420",
+          "length": 12
+        },
+        {
+          "id": 89,
+          "text": "[CLEAR]#######[CLEAR]##",
+          "address": "$04F42C",
+          "length": 12
+        },
+        {
+          "id": 90,
+          "text": "###ddp#",
+          "address": "$04F438",
+          "length": 12
+        },
+        {
+          "id": 91,
+          "text": "#",
+          "address": "$04F444",
+          "length": 2
+        },
+        {
+          "id": 92,
+          "text": "####U###G##",
+          "address": "$04F450",
+          "length": 12
+        },
+        {
+          "id": 93,
+          "text": "##[CLEAR]###m####",
+          "address": "$04F45C",
+          "length": 12
+        },
+        {
+          "id": 94,
+          "text": "##########Z#",
+          "address": "$04F468",
+          "length": 12
+        },
+        {
+          "id": 95,
+          "text": "#########[NAME]#s",
+          "address": "$04F474",
+          "length": 12
+        },
+        {
+          "id": 96,
+          "text": "#[CLEAR]##########",
+          "address": "$04F480",
+          "length": 12
+        },
+        {
+          "id": 97,
+          "text": "##_[CLEAR]\n\n_#####",
+          "address": "$04F48C",
+          "length": 12
+        },
+        {
+          "id": 98,
+          "text": "#########",
+          "address": "$04F498",
+          "length": 10
+        },
+        {
+          "id": 100,
+          "text": "#nn[CLEAR][CLEAR]#######",
+          "address": "$04F4B0",
+          "length": 12
+        },
+        {
+          "id": 101,
+          "text": "###n[CLEAR][ITEM]######",
+          "address": "$04F4BC",
+          "length": 12
+        },
+        {
+          "id": 102,
+          "text": "####_####y#[NAME]",
+          "address": "$04F4C8",
+          "length": 12
+        },
+        {
+          "id": 103,
+          "text": "#########",
+          "address": "$04F4D4",
+          "length": 12
+        },
+        {
+          "id": 104,
+          "text": "#VIso_[NAME]#[NAME]###",
+          "address": "$04F4E0",
+          "length": 12
+        },
+        {
+          "id": 105,
+          "text": "########",
+          "address": "$04F4EC",
+          "length": 12
+        },
+        {
+          "id": 106,
+          "text": "########",
+          "address": "$04F4F8",
+          "length": 12
+        },
+        {
+          "id": 107,
+          "text": "##m####",
+          "address": "$04F504",
+          "length": 12
+        },
+        {
+          "id": 108,
+          "text": "#p######",
+          "address": "$04F510",
+          "length": 12
+        },
+        {
+          "id": 109,
+          "text": "#########",
+          "address": "$04F51C",
+          "length": 12
+        },
+        {
+          "id": 110,
+          "text": "#W#GGmm",
+          "address": "$04F528",
+          "length": 8
+        },
+        {
+          "id": 114,
+          "text": "pYzH#H####",
+          "address": "$04F558",
+          "length": 12
+        },
+        {
+          "id": 115,
+          "text": "###",
+          "address": "$04F564",
+          "length": 4
+        },
+        {
+          "id": 116,
+          "text": "#####WW##",
+          "address": "$04F570",
+          "length": 12
+        },
+        {
+          "id": 117,
+          "text": "##\n",
+          "address": "$04F57C",
+          "length": 4
+        },
+        {
+          "id": 118,
+          "text": "O#######m#m#",
+          "address": "$04F588",
+          "length": 12
+        },
+        {
+          "id": 119,
+          "text": "########",
+          "address": "$04F594",
+          "length": 12
+        },
+        {
+          "id": 120,
+          "text": "#########l#l",
+          "address": "$04F5A0",
+          "length": 12
+        },
+        {
+          "id": 121,
+          "text": "#[ITEM]",
+          "address": "$04F5AC",
+          "length": 12
+        },
+        {
+          "id": 122,
+          "text": "[NAME][NAME][NAME]_##l",
+          "address": "$04F5B8",
+          "length": 12
+        },
+        {
+          "id": 123,
+          "text": "#",
+          "address": "$04F5C4",
+          "length": 10
+        },
+        {
+          "id": 124,
+          "text": "#####m#m#m#m",
+          "address": "$04F5D0",
+          "length": 12
+        },
+        {
+          "id": 125,
+          "text": "#",
+          "address": "$04F5DC",
+          "length": 2
+        },
+        {
+          "id": 126,
+          "text": "#####[CLEAR][CLEAR]\n\n\n\n[CLEAR]",
+          "address": "$04F5E8",
+          "length": 12
+        },
+        {
+          "id": 127,
+          "text": "[WAIT]0###[WAIT]\n\n[CLEAR]###",
+          "address": "$04F5F4",
+          "length": 12
+        },
+        {
+          "id": 128,
+          "text": "i####[NAME]K#####",
+          "address": "$04F600",
+          "length": 12
+        },
+        {
+          "id": 129,
+          "text": "###8####k",
+          "address": "$04F60C",
+          "length": 12
+        },
+        {
+          "id": 130,
+          "text": "######[CLEAR][CLEAR]",
+          "address": "$04F618",
+          "length": 10
+        },
+        {
+          "id": 132,
+          "text": "##m###'#####",
+          "address": "$04F630",
+          "length": 12
+        },
+        {
+          "id": 133,
+          "text": "#####l#l",
+          "address": "$04F63C",
+          "length": 12
+        },
+        {
+          "id": 134,
+          "text": "#l####n####",
+          "address": "$04F648",
+          "length": 12
+        },
+        {
+          "id": 135,
+          "text": "###Cu###",
+          "address": "$04F654",
+          "length": 12
+        },
+        {
+          "id": 136,
+          "text": "########0###",
+          "address": "$04F660",
+          "length": 12
+        },
+        {
+          "id": 137,
+          "text": "#########",
+          "address": "$04F66C",
+          "length": 10
+        },
+        {
+          "id": 139,
+          "text": "[CLEAR]",
+          "address": "$04F684",
+          "length": 2
+        },
+        {
+          "id": 140,
+          "text": "###########",
+          "address": "$04F690",
+          "length": 12
+        },
+        {
+          "id": 141,
+          "text": "#######C##",
+          "address": "$04F69C",
+          "length": 12
+        },
+        {
+          "id": 142,
+          "text": "##########",
+          "address": "$04F6A8",
+          "length": 12
+        },
+        {
+          "id": 143,
+          "text": "######",
+          "address": "$04F6B4",
+          "length": 10
+        },
+        {
+          "id": 146,
+          "text": "########\n",
+          "address": "$04F6D8",
+          "length": 12
+        },
+        {
+          "id": 147,
+          "text": "\n_####\nfl#",
+          "address": "$04F6E4",
+          "length": 12
+        },
+        {
+          "id": 148,
+          "text": "######",
+          "address": "$04F6F0",
+          "length": 12
+        },
+        {
+          "id": 149,
+          "text": "##m######",
+          "address": "$04F6FC",
+          "length": 12
+        },
+        {
+          "id": 150,
+          "text": "#GG####",
+          "address": "$04F708",
+          "length": 8
+        },
+        {
+          "id": 151,
+          "text": "####m#",
+          "address": "$04F714",
+          "length": 7
+        },
+        {
+          "id": 152,
+          "text": "7#####[WAIT]#####",
+          "address": "$04F720",
+          "length": 12
+        },
+        {
+          "id": 153,
+          "text": "##8#######",
+          "address": "$04F72C",
+          "length": 12
+        },
+        {
+          "id": 154,
+          "text": "#W#u###E###e",
+          "address": "$04F738",
+          "length": 12
+        },
+        {
+          "id": 155,
+          "text": "O##0u###",
+          "address": "$04F744",
+          "length": 10
+        },
+        {
+          "id": 157,
+          "text": "#",
+          "address": "$04F75C",
+          "length": 2
+        },
+        {
+          "id": 158,
+          "text": "#######[NAME][NAME][ITEM][ITEM]#",
+          "address": "$04F768",
+          "length": 12
+        },
+        {
+          "id": 159,
+          "text": "#######_#w#d",
+          "address": "$04F774",
+          "length": 12
+        },
+        {
+          "id": 160,
+          "text": "j#g#####n#",
+          "address": "$04F780",
+          "length": 12
+        },
+        {
+          "id": 161,
+          "text": "m#ps########",
+          "address": "$04F78C",
+          "length": 12
+        },
+        {
+          "id": 162,
+          "text": "############",
+          "address": "$04F798",
+          "length": 12
+        },
+        {
+          "id": 163,
+          "text": "############",
+          "address": "$04F7A4",
+          "length": 12
+        },
+        {
+          "id": 164,
+          "text": "##########7#",
+          "address": "$04F7B0",
+          "length": 12
+        },
+        {
+          "id": 165,
+          "text": "##########",
+          "address": "$04F7BC",
+          "length": 12
+        },
+        {
+          "id": 166,
+          "text": "####li##e###",
+          "address": "$04F7C8",
+          "length": 12
+        },
+        {
+          "id": 167,
+          "text": "######d###",
+          "address": "$04F7D4",
+          "length": 12
+        },
+        {
+          "id": 168,
+          "text": "#nt########[CLEAR]",
+          "address": "$04F7E0",
+          "length": 12
+        },
+        {
+          "id": 169,
+          "text": "[CLEAR][WAIT]######[CLEAR]###",
+          "address": "$04F7EC",
+          "length": 12
+        },
+        {
+          "id": 170,
+          "text": "S######",
+          "address": "$04F7F8",
+          "length": 12
+        },
+        {
+          "id": 171,
+          "text": "######",
+          "address": "$04F804",
+          "length": 10
+        },
+        {
+          "id": 173,
+          "text": "#",
+          "address": "$04F81C",
+          "length": 2
+        },
+        {
+          "id": 174,
+          "text": "[CLEAR][CLEAR][WAIT]\n\n",
+          "address": "$04F828",
+          "length": 6
+        },
+        {
+          "id": 175,
+          "text": "#",
+          "address": "$04F834",
+          "length": 2
+        },
+        {
+          "id": 177,
+          "text": "#",
+          "address": "$04F84C",
+          "length": 2
+        },
+        {
+          "id": 178,
+          "text": "############",
+          "address": "$04F858",
+          "length": 12
+        },
+        {
+          "id": 179,
+          "text": "########m##",
+          "address": "$04F864",
+          "length": 12
+        },
+        {
+          "id": 180,
+          "text": "#########4##",
+          "address": "$04F870",
+          "length": 12
+        },
+        {
+          "id": 181,
+          "text": "#m########j#",
+          "address": "$04F87C",
+          "length": 12
+        },
+        {
+          "id": 182,
+          "text": "#######[NAME][NAME][ITEM][ITEM]#",
+          "address": "$04F888",
+          "length": 12
+        },
+        {
+          "id": 183,
+          "text": "#######_#q#R",
+          "address": "$04F894",
+          "length": 12
+        },
+        {
+          "id": 184,
+          "text": "h#a#######",
+          "address": "$04F8A0",
+          "length": 12
+        },
+        {
+          "id": 185,
+          "text": "##ty####x#h",
+          "address": "$04F8AC",
+          "length": 12
+        },
+        {
+          "id": 186,
+          "text": "t#b####9U###",
+          "address": "$04F8B8",
+          "length": 12
+        },
+        {
+          "id": 187,
+          "text": "#t[CLEAR]_q##",
+          "address": "$04F8C4",
+          "length": 8
+        },
+        {
+          "id": 188,
+          "text": "####Q#######",
+          "address": "$04F8D0",
+          "length": 12
+        },
+        {
+          "id": 189,
+          "text": "#",
+          "address": "$04F8DC",
+          "length": 2
+        },
+        {
+          "id": 191,
+          "text": "m",
+          "address": "$04F8F4",
+          "length": 2
+        },
+        {
+          "id": 192,
+          "text": "#wkwk#C#u#u#",
+          "address": "$04F900",
+          "length": 12
+        },
+        {
+          "id": 193,
+          "text": "u###########",
+          "address": "$04F90C",
+          "length": 12
+        },
+        {
+          "id": 194,
+          "text": "############",
+          "address": "$04F918",
+          "length": 12
+        },
+        {
+          "id": 195,
+          "text": "############",
+          "address": "$04F924",
+          "length": 12
+        },
+        {
+          "id": 196,
+          "text": "###s#####m",
+          "address": "$04F930",
+          "length": 12
+        },
+        {
+          "id": 197,
+          "text": "#####[CLEAR]######",
+          "address": "$04F93C",
+          "length": 12
+        },
+        {
+          "id": 198,
+          "text": "############",
+          "address": "$04F948",
+          "length": 12
+        },
+        {
+          "id": 199,
+          "text": "F#########",
+          "address": "$04F954",
+          "length": 12
+        },
+        {
+          "id": 200,
+          "text": "###u#\nM##k#",
+          "address": "$04F960",
+          "length": 12
+        },
+        {
+          "id": 201,
+          "text": "####m",
+          "address": "$04F96C",
+          "length": 6
+        },
+        {
+          "id": 202,
+          "text": "####x#r#u##",
+          "address": "$04F978",
+          "length": 12
+        },
+        {
+          "id": 203,
+          "text": "#",
+          "address": "$04F984",
+          "length": 2
+        },
+        {
+          "id": 204,
+          "text": "0##O###u###[NAME]",
+          "address": "$04F990",
+          "length": 12
+        },
+        {
+          "id": 205,
+          "text": "##########u#",
+          "address": "$04F99C",
+          "length": 12
+        },
+        {
+          "id": 206,
+          "text": "############",
+          "address": "$04F9A8",
+          "length": 12
+        },
+        {
+          "id": 207,
+          "text": "############",
+          "address": "$04F9B4",
+          "length": 12
+        },
+        {
+          "id": 208,
+          "text": "#####E#8##",
+          "address": "$04F9C0",
+          "length": 12
+        },
+        {
+          "id": 209,
+          "text": "######",
+          "address": "$04F9CC",
+          "length": 7
+        },
+        {
+          "id": 210,
+          "text": "###ll#####",
+          "address": "$04F9D8",
+          "length": 12
+        },
+        {
+          "id": 211,
+          "text": "#########Wde",
+          "address": "$04F9E4",
+          "length": 12
+        },
+        {
+          "id": 212,
+          "text": "###ll##p#",
+          "address": "$04F9F0",
+          "length": 12
+        },
+        {
+          "id": 213,
+          "text": "###W###",
+          "address": "$04F9FC",
+          "length": 8
+        },
+        {
+          "id": 214,
+          "text": "#####U###G##",
+          "address": "$04FA08",
+          "length": 12
+        },
+        {
+          "id": 215,
+          "text": "##[CLEAR]###m#####",
+          "address": "$04FA14",
+          "length": 12
+        },
+        {
+          "id": 216,
+          "text": "#77####p#il#",
+          "address": "$04FA20",
+          "length": 12
+        },
+        {
+          "id": 217,
+          "text": "#######m",
+          "address": "$04FA2C",
+          "length": 9
+        },
+        {
+          "id": 218,
+          "text": "#######Yw###",
+          "address": "$04FA38",
+          "length": 12
+        },
+        {
+          "id": 219,
+          "text": "#[NAME]_[CLEAR]\n\n_#####",
+          "address": "$04FA44",
+          "length": 12
+        },
+        {
+          "id": 220,
+          "text": "#########",
+          "address": "$04FA50",
+          "length": 10
+        },
+        {
+          "id": 222,
+          "text": "#ts#########",
+          "address": "$04FA68",
+          "length": 12
+        },
+        {
+          "id": 223,
+          "text": "###t#######m",
+          "address": "$04FA74",
+          "length": 12
+        },
+        {
+          "id": 224,
+          "text": "##[CLEAR]####-#y##",
+          "address": "$04FA80",
+          "length": 12
+        },
+        {
+          "id": 225,
+          "text": "######\n#",
+          "address": "$04FA8C",
+          "length": 12
+        },
+        {
+          "id": 226,
+          "text": "####",
+          "address": "$04FA98",
+          "length": 6
+        },
+        {
+          "id": 227,
+          "text": "#",
+          "address": "$04FAA4",
+          "length": 2
+        },
+        {
+          "id": 228,
+          "text": "###WWmm",
+          "address": "$04FAB0",
+          "length": 8
+        },
+        {
+          "id": 230,
+          "text": "####WW##",
+          "address": "$04FAC8",
+          "length": 12
+        },
+        {
+          "id": 231,
+          "text": "##\n",
+          "address": "$04FAD4",
+          "length": 4
+        },
+        {
+          "id": 232,
+          "text": "S#s#####",
+          "address": "$04FAE0",
+          "length": 12
+        },
+        {
+          "id": 233,
+          "text": "#########",
+          "address": "$04FAEC",
+          "length": 12
+        },
+        {
+          "id": 234,
+          "text": "#########l#l",
+          "address": "$04FAF8",
+          "length": 12
+        },
+        {
+          "id": 235,
+          "text": "####",
+          "address": "$04FB04",
+          "length": 12
+        },
+        {
+          "id": 236,
+          "text": "#####Xlbh-##",
+          "address": "$04FB10",
+          "length": 12
+        },
+        {
+          "id": 237,
+          "text": "###mm####m",
+          "address": "$04FB1C",
+          "length": 12
+        },
+        {
+          "id": 238,
+          "text": "#mm####mmmmG",
+          "address": "$04FB28",
+          "length": 12
+        },
+        {
+          "id": 239,
+          "text": "G#mm#m###j#C",
+          "address": "$04FB34",
+          "length": 12
+        },
+        {
+          "id": 240,
+          "text": "############",
+          "address": "$04FB40",
+          "length": 12
+        },
+        {
+          "id": 241,
+          "text": "###########T",
+          "address": "$04FB4C",
+          "length": 12
+        },
+        {
+          "id": 242,
+          "text": "#T#########",
+          "address": "$04FB58",
+          "length": 12
+        },
+        {
+          "id": 243,
+          "text": "#####",
+          "address": "$04FB64",
+          "length": 6
+        },
+        {
+          "id": 244,
+          "text": "###########G",
+          "address": "$04FB70",
+          "length": 12
+        },
+        {
+          "id": 245,
+          "text": "#########df#",
+          "address": "$04FB7C",
+          "length": 12
+        },
+        {
+          "id": 246,
+          "text": "######",
+          "address": "$04FB88",
+          "length": 12
+        },
+        {
+          "id": 247,
+          "text": "##m###",
+          "address": "$04FB94",
+          "length": 10
+        }
+      ]
+    },
+    "weapon_names": {
+      "count": 57,
+      "config": {
+        "address": 325632,
+        "count": 64,
+        "max_length": 12
+      },
+      "strings": [
+        {
+          "id": 0,
+          "text": "######",
+          "address": "$04F800",
+          "length": 12
+        },
+        {
+          "id": 2,
+          "text": "[NAME]####",
+          "address": "$04F818",
+          "length": 6
+        },
+        {
+          "id": 3,
+          "text": "#",
+          "address": "$04F824",
+          "length": 2
+        },
+        {
+          "id": 4,
+          "text": "#####",
+          "address": "$04F830",
+          "length": 6
+        },
+        {
+          "id": 5,
+          "text": "#",
+          "address": "$04F83C",
+          "length": 2
+        },
+        {
+          "id": 6,
+          "text": "#####",
+          "address": "$04F848",
+          "length": 6
+        },
+        {
+          "id": 7,
+          "text": "############",
+          "address": "$04F854",
+          "length": 12
+        },
+        {
+          "id": 8,
+          "text": "############",
+          "address": "$04F860",
+          "length": 12
+        },
+        {
+          "id": 9,
+          "text": "m##########",
+          "address": "$04F86C",
+          "length": 12
+        },
+        {
+          "id": 10,
+          "text": "#4###m######",
+          "address": "$04F878",
+          "length": 12
+        },
+        {
+          "id": 11,
+          "text": "##j########[NAME]",
+          "address": "$04F884",
+          "length": 12
+        },
+        {
+          "id": 12,
+          "text": "[NAME][ITEM][ITEM]########_",
+          "address": "$04F890",
+          "length": 12
+        },
+        {
+          "id": 13,
+          "text": "#q#Rh#a###",
+          "address": "$04F89C",
+          "length": 12
+        },
+        {
+          "id": 14,
+          "text": "######ty####",
+          "address": "$04F8A8",
+          "length": 12
+        },
+        {
+          "id": 15,
+          "text": "x#ht#b####9",
+          "address": "$04F8B4",
+          "length": 12
+        },
+        {
+          "id": 16,
+          "text": "U####t[CLEAR]_q##",
+          "address": "$04F8C0",
+          "length": 12
+        },
+        {
+          "id": 17,
+          "text": "#",
+          "address": "$04F8CC",
+          "length": 2
+        },
+        {
+          "id": 18,
+          "text": "#####",
+          "address": "$04F8D8",
+          "length": 6
+        },
+        {
+          "id": 21,
+          "text": "mA###wkwk#C#",
+          "address": "$04F8FC",
+          "length": 12
+        },
+        {
+          "id": 22,
+          "text": "u#u#u#######",
+          "address": "$04F908",
+          "length": 12
+        },
+        {
+          "id": 23,
+          "text": "############",
+          "address": "$04F914",
+          "length": 12
+        },
+        {
+          "id": 24,
+          "text": "############",
+          "address": "$04F920",
+          "length": 12
+        },
+        {
+          "id": 25,
+          "text": "#######s###",
+          "address": "$04F92C",
+          "length": 12
+        },
+        {
+          "id": 26,
+          "text": "##m#####[CLEAR]##",
+          "address": "$04F938",
+          "length": 12
+        },
+        {
+          "id": 27,
+          "text": "############",
+          "address": "$04F944",
+          "length": 12
+        },
+        {
+          "id": 28,
+          "text": "####F#####",
+          "address": "$04F950",
+          "length": 12
+        },
+        {
+          "id": 29,
+          "text": "#######u#\nM",
+          "address": "$04F95C",
+          "length": 12
+        },
+        {
+          "id": 30,
+          "text": "##k#####m",
+          "address": "$04F968",
+          "length": 10
+        },
+        {
+          "id": 31,
+          "text": "########x#r",
+          "address": "$04F974",
+          "length": 12
+        },
+        {
+          "id": 32,
+          "text": "#u###",
+          "address": "$04F980",
+          "length": 6
+        },
+        {
+          "id": 33,
+          "text": "##G#0##O###u",
+          "address": "$04F98C",
+          "length": 12
+        },
+        {
+          "id": 34,
+          "text": "###[NAME]########",
+          "address": "$04F998",
+          "length": 12
+        },
+        {
+          "id": 35,
+          "text": "##u#########",
+          "address": "$04F9A4",
+          "length": 12
+        },
+        {
+          "id": 36,
+          "text": "############",
+          "address": "$04F9B0",
+          "length": 12
+        },
+        {
+          "id": 37,
+          "text": "#########E#",
+          "address": "$04F9BC",
+          "length": 12
+        },
+        {
+          "id": 38,
+          "text": "8########",
+          "address": "$04F9C8",
+          "length": 11
+        },
+        {
+          "id": 39,
+          "text": "#'#####ll#",
+          "address": "$04F9D4",
+          "length": 12
+        },
+        {
+          "id": 40,
+          "text": "############",
+          "address": "$04F9E0",
+          "length": 12
+        },
+        {
+          "id": 41,
+          "text": "#Wde###ll##",
+          "address": "$04F9EC",
+          "length": 12
+        },
+        {
+          "id": 42,
+          "text": "p####W###",
+          "address": "$04F9F8",
+          "length": 12
+        },
+        {
+          "id": 43,
+          "text": "m##D#####U##",
+          "address": "$04FA04",
+          "length": 12
+        },
+        {
+          "id": 44,
+          "text": "#G####[CLEAR]###m#",
+          "address": "$04FA10",
+          "length": 12
+        },
+        {
+          "id": 45,
+          "text": "#####77####p",
+          "address": "$04FA1C",
+          "length": 12
+        },
+        {
+          "id": 46,
+          "text": "#il########m",
+          "address": "$04FA28",
+          "length": 12
+        },
+        {
+          "id": 48,
+          "text": "w####[NAME]_[CLEAR]\n\n_#",
+          "address": "$04FA40",
+          "length": 12
+        },
+        {
+          "id": 49,
+          "text": "############",
+          "address": "$04FA4C",
+          "length": 12
+        },
+        {
+          "id": 50,
+          "text": "#",
+          "address": "$04FA58",
+          "length": 2
+        },
+        {
+          "id": 52,
+          "text": "#######t####",
+          "address": "$04FA70",
+          "length": 12
+        },
+        {
+          "id": 53,
+          "text": "###m##[CLEAR]####-",
+          "address": "$04FA7C",
+          "length": 12
+        },
+        {
+          "id": 54,
+          "text": "#y#######",
+          "address": "$04FA88",
+          "length": 12
+        },
+        {
+          "id": 55,
+          "text": "#\n#####",
+          "address": "$04FA94",
+          "length": 10
+        },
+        {
+          "id": 56,
+          "text": "###",
+          "address": "$04FAA0",
+          "length": 6
+        },
+        {
+          "id": 57,
+          "text": "######WWmm",
+          "address": "$04FAAC",
+          "length": 12
+        },
+        {
+          "id": 60,
+          "text": "W####\n",
+          "address": "$04FAD0",
+          "length": 8
+        },
+        {
+          "id": 61,
+          "text": "####S#s####",
+          "address": "$04FADC",
+          "length": 12
+        },
+        {
+          "id": 62,
+          "text": "#######",
+          "address": "$04FAE8",
+          "length": 12
+        },
+        {
+          "id": 63,
+          "text": "###########",
+          "address": "$04FAF4",
+          "length": 12
+        }
+      ]
+    },
+    "armor_names": {
+      "count": 20,
+      "config": {
+        "address": 326656,
+        "count": 64,
+        "max_length": 12
+      },
+      "strings": [
+        {
+          "id": 12,
+          "text": "\n##Q#Q#Q#Q#",
+          "address": "$04FC90",
+          "length": 12
+        },
+        {
+          "id": 18,
+          "text": "[NAME]#[ITEM]#C#Kx##C",
+          "address": "$04FCD8",
+          "length": 12
+        },
+        {
+          "id": 20,
+          "text": "##m########m",
+          "address": "$04FCF0",
+          "length": 12
+        },
+        {
+          "id": 22,
+          "text": "[CLEAR]#########[CLEAR][WAIT]",
+          "address": "$04FD08",
+          "length": 12
+        },
+        {
+          "id": 25,
+          "text": "#",
+          "address": "$04FD2C",
+          "length": 10
+        },
+        {
+          "id": 27,
+          "text": "#",
+          "address": "$04FD44",
+          "length": 10
+        },
+        {
+          "id": 28,
+          "text": "m",
+          "address": "$04FD50",
+          "length": 2
+        },
+        {
+          "id": 31,
+          "text": "[CLEAR]",
+          "address": "$04FD74",
+          "length": 2
+        },
+        {
+          "id": 33,
+          "text": "#",
+          "address": "$04FD8C",
+          "length": 2
+        },
+        {
+          "id": 35,
+          "text": "#",
+          "address": "$04FDA4",
+          "length": 2
+        },
+        {
+          "id": 36,
+          "text": "##########",
+          "address": "$04FDB0",
+          "length": 12
+        },
+        {
+          "id": 38,
+          "text": "###",
+          "address": "$04FDC8",
+          "length": 12
+        },
+        {
+          "id": 39,
+          "text": "#",
+          "address": "$04FDD4",
+          "length": 2
+        },
+        {
+          "id": 40,
+          "text": "####",
+          "address": "$04FDE0",
+          "length": 5
+        },
+        {
+          "id": 42,
+          "text": "##########",
+          "address": "$04FDF8",
+          "length": 12
+        },
+        {
+          "id": 44,
+          "text": "#####",
+          "address": "$04FE10",
+          "length": 12
+        },
+        {
+          "id": 45,
+          "text": "#",
+          "address": "$04FE1C",
+          "length": 2
+        },
+        {
+          "id": 60,
+          "text": "#n##########",
+          "address": "$04FED0",
+          "length": 12
+        },
+        {
+          "id": 61,
+          "text": "#",
+          "address": "$04FEDC",
+          "length": 2
+        },
+        {
+          "id": 62,
+          "text": "#n###",
+          "address": "$04FEE8",
+          "length": 7
+        }
+      ]
+    },
+    "accessory_names": {
+      "count": 24,
+      "config": {
+        "address": 326912,
+        "count": 64,
+        "max_length": 12
+      },
+      "strings": [
+        {
+          "id": 0,
+          "text": "#",
+          "address": "$04FD00",
+          "length": 2
+        },
+        {
+          "id": 1,
+          "text": "######[CLEAR][WAIT]",
+          "address": "$04FD0C",
+          "length": 9
+        },
+        {
+          "id": 2,
+          "text": "##[CLEAR]",
+          "address": "$04FD18",
+          "length": 6
+        },
+        {
+          "id": 7,
+          "text": "#",
+          "address": "$04FD54",
+          "length": 2
+        },
+        {
+          "id": 8,
+          "text": "#####",
+          "address": "$04FD60",
+          "length": 6
+        },
+        {
+          "id": 12,
+          "text": "#####",
+          "address": "$04FD90",
+          "length": 6
+        },
+        {
+          "id": 14,
+          "text": "######",
+          "address": "$04FDA8",
+          "length": 7
+        },
+        {
+          "id": 15,
+          "text": "#######",
+          "address": "$04FDB4",
+          "length": 9
+        },
+        {
+          "id": 17,
+          "text": "###",
+          "address": "$04FDCC",
+          "length": 10
+        },
+        {
+          "id": 21,
+          "text": "#######",
+          "address": "$04FDFC",
+          "length": 9
+        },
+        {
+          "id": 23,
+          "text": "#####",
+          "address": "$04FE14",
+          "length": 10
+        },
+        {
+          "id": 30,
+          "text": "##",
+          "address": "$04FE68",
+          "length": 3
+        },
+        {
+          "id": 32,
+          "text": "######",
+          "address": "$04FE80",
+          "length": 7
+        },
+        {
+          "id": 36,
+          "text": "###[WAIT]##",
+          "address": "$04FEB0",
+          "length": 7
+        },
+        {
+          "id": 39,
+          "text": "#########",
+          "address": "$04FED4",
+          "length": 10
+        },
+        {
+          "id": 40,
+          "text": "__###n#n#n#",
+          "address": "$04FEE0",
+          "length": 12
+        },
+        {
+          "id": 41,
+          "text": "##",
+          "address": "$04FEEC",
+          "length": 3
+        },
+        {
+          "id": 43,
+          "text": "###n####",
+          "address": "$04FF04",
+          "length": 9
+        },
+        {
+          "id": 44,
+          "text": "###",
+          "address": "$04FF10",
+          "length": 4
+        },
+        {
+          "id": 46,
+          "text": "\n#",
+          "address": "$04FF28",
+          "length": 3
+        },
+        {
+          "id": 49,
+          "text": "##[NAME]#[WAIT]#[NAME]##",
+          "address": "$04FF4C",
+          "length": 10
+        },
+        {
+          "id": 51,
+          "text": "[NAME]#[NAME]###",
+          "address": "$04FF64",
+          "length": 7
+        },
+        {
+          "id": 54,
+          "text": "####",
+          "address": "$04FF88",
+          "length": 5
+        },
+        {
+          "id": 56,
+          "text": "##",
+          "address": "$04FFA0",
+          "length": 3
+        }
+      ]
+    },
+    "spell_names": {
+      "count": 32,
+      "config": {
+        "address": 327168,
+        "count": 64,
+        "max_length": 12
+      },
+      "strings": [
+        {
+          "id": 0,
+          "text": "####",
+          "address": "$04FE00",
+          "length": 5
+        },
+        {
+          "id": 2,
+          "text": "###",
+          "address": "$04FE18",
+          "length": 6
+        },
+        {
+          "id": 5,
+          "text": "##",
+          "address": "$04FE3C",
+          "length": 3
+        },
+        {
+          "id": 11,
+          "text": "##",
+          "address": "$04FE84",
+          "length": 3
+        },
+        {
+          "id": 15,
+          "text": "##",
+          "address": "$04FEB4",
+          "length": 3
+        },
+        {
+          "id": 18,
+          "text": "#####",
+          "address": "$04FED8",
+          "length": 6
+        },
+        {
+          "id": 19,
+          "text": "#n#n#n###",
+          "address": "$04FEE4",
+          "length": 11
+        },
+        {
+          "id": 22,
+          "text": "####",
+          "address": "$04FF08",
+          "length": 5
+        },
+        {
+          "id": 26,
+          "text": "#",
+          "address": "$04FF38",
+          "length": 2
+        },
+        {
+          "id": 28,
+          "text": "[WAIT]#[NAME]##",
+          "address": "$04FF50",
+          "length": 6
+        },
+        {
+          "id": 30,
+          "text": "##",
+          "address": "$04FF68",
+          "length": 3
+        },
+        {
+          "id": 35,
+          "text": "#",
+          "address": "$04FFA4",
+          "length": 12
+        },
+        {
+          "id": 43,
+          "text": "#",
+          "address": "$050004",
+          "length": 2
+        },
+        {
+          "id": 44,
+          "text": "###0",
+          "address": "$050010",
+          "length": 5
+        },
+        {
+          "id": 45,
+          "text": "#",
+          "address": "$05001C",
+          "length": 3
+        },
+        {
+          "id": 46,
+          "text": "####",
+          "address": "$050028",
+          "length": 6
+        },
+        {
+          "id": 47,
+          "text": "#",
+          "address": "$050034",
+          "length": 4
+        },
+        {
+          "id": 48,
+          "text": "##[CLEAR]#",
+          "address": "$050040",
+          "length": 5
+        },
+        {
+          "id": 49,
+          "text": "#k#",
+          "address": "$05004C",
+          "length": 4
+        },
+        {
+          "id": 50,
+          "text": "#########",
+          "address": "$050058",
+          "length": 11
+        },
+        {
+          "id": 51,
+          "text": "#####",
+          "address": "$050064",
+          "length": 6
+        },
+        {
+          "id": 52,
+          "text": "######",
+          "address": "$050070",
+          "length": 8
+        },
+        {
+          "id": 53,
+          "text": "#&###",
+          "address": "$05007C",
+          "length": 6
+        },
+        {
+          "id": 54,
+          "text": "##",
+          "address": "$050088",
+          "length": 4
+        },
+        {
+          "id": 56,
+          "text": "d##",
+          "address": "$0500A0",
+          "length": 6
+        },
+        {
+          "id": 57,
+          "text": "##",
+          "address": "$0500AC",
+          "length": 4
+        },
+        {
+          "id": 58,
+          "text": "#",
+          "address": "$0500B8",
+          "length": 2
+        },
+        {
+          "id": 59,
+          "text": "[CLEAR]#######",
+          "address": "$0500C4",
+          "length": 12
+        },
+        {
+          "id": 60,
+          "text": "#\n###",
+          "address": "$0500D0",
+          "length": 8
+        },
+        {
+          "id": 61,
+          "text": "##",
+          "address": "$0500DC",
+          "length": 6
+        },
+        {
+          "id": 62,
+          "text": "k##s##",
+          "address": "$0500E8",
+          "length": 8
+        },
+        {
+          "id": 63,
+          "text": "###",
+          "address": "$0500F4",
+          "length": 5
+        }
+      ]
+    },
+    "monster_names": {
+      "count": 202,
+      "config": {
+        "address": 327680,
+        "count": 256,
+        "max_length": 16
+      },
+      "strings": [
+        {
+          "id": 1,
+          "text": "###0",
+          "address": "$050010",
+          "length": 5
+        },
+        {
+          "id": 2,
+          "text": "l#",
+          "address": "$050020",
+          "length": 4
+        },
+        {
+          "id": 3,
+          "text": "#####",
+          "address": "$050030",
+          "length": 8
+        },
+        {
+          "id": 4,
+          "text": "##[CLEAR]#",
+          "address": "$050040",
+          "length": 5
+        },
+        {
+          "id": 5,
+          "text": "####d########",
+          "address": "$050050",
+          "length": 16
+        },
+        {
+          "id": 6,
+          "text": "##",
+          "address": "$050060",
+          "length": 3
+        },
+        {
+          "id": 7,
+          "text": "######",
+          "address": "$050070",
+          "length": 8
+        },
+        {
+          "id": 8,
+          "text": "#",
+          "address": "$050080",
+          "length": 2
+        },
+        {
+          "id": 9,
+          "text": "#[CLEAR]#y",
+          "address": "$050090",
+          "length": 5
+        },
+        {
+          "id": 10,
+          "text": "d##",
+          "address": "$0500A0",
+          "length": 6
+        },
+        {
+          "id": 11,
+          "text": "[CLEAR]F#\nt#",
+          "address": "$0500B0",
+          "length": 10
+        },
+        {
+          "id": 12,
+          "text": "##",
+          "address": "$0500C0",
+          "length": 4
+        },
+        {
+          "id": 13,
+          "text": "#\n###",
+          "address": "$0500D0",
+          "length": 8
+        },
+        {
+          "id": 14,
+          "text": "#",
+          "address": "$0500E0",
+          "length": 2
+        },
+        {
+          "id": 15,
+          "text": "######",
+          "address": "$0500F0",
+          "length": 9
+        },
+        {
+          "id": 16,
+          "text": "##",
+          "address": "$050100",
+          "length": 3
+        },
+        {
+          "id": 17,
+          "text": "####",
+          "address": "$050110",
+          "length": 5
+        },
+        {
+          "id": 18,
+          "text": "###",
+          "address": "$050120",
+          "length": 9
+        },
+        {
+          "id": 21,
+          "text": "###",
+          "address": "$050150",
+          "length": 9
+        },
+        {
+          "id": 22,
+          "text": "#############",
+          "address": "$050160",
+          "length": 16
+        },
+        {
+          "id": 23,
+          "text": "####",
+          "address": "$050170",
+          "length": 5
+        },
+        {
+          "id": 24,
+          "text": "############",
+          "address": "$050180",
+          "length": 16
+        },
+        {
+          "id": 25,
+          "text": "##########",
+          "address": "$050190",
+          "length": 16
+        },
+        {
+          "id": 26,
+          "text": "#####[CLEAR]##",
+          "address": "$0501A0",
+          "length": 9
+        },
+        {
+          "id": 27,
+          "text": "#########",
+          "address": "$0501B0",
+          "length": 14
+        },
+        {
+          "id": 28,
+          "text": "###[CLEAR][CLEAR]m#_",
+          "address": "$0501C0",
+          "length": 9
+        },
+        {
+          "id": 29,
+          "text": "###",
+          "address": "$0501D0",
+          "length": 4
+        },
+        {
+          "id": 30,
+          "text": "#########",
+          "address": "$0501E0",
+          "length": 16
+        },
+        {
+          "id": 31,
+          "text": "#",
+          "address": "$0501F0",
+          "length": 2
+        },
+        {
+          "id": 32,
+          "text": "###o#",
+          "address": "$050200",
+          "length": 7
+        },
+        {
+          "id": 33,
+          "text": "######l##",
+          "address": "$050210",
+          "length": 16
+        },
+        {
+          "id": 34,
+          "text": "#####",
+          "address": "$050220",
+          "length": 6
+        },
+        {
+          "id": 36,
+          "text": "######v##",
+          "address": "$050240",
+          "length": 11
+        },
+        {
+          "id": 37,
+          "text": "#####m",
+          "address": "$050250",
+          "length": 10
+        },
+        {
+          "id": 38,
+          "text": "######m###",
+          "address": "$050260",
+          "length": 16
+        },
+        {
+          "id": 39,
+          "text": "#####[CLEAR]z#######",
+          "address": "$050270",
+          "length": 16
+        },
+        {
+          "id": 41,
+          "text": "m",
+          "address": "$050290",
+          "length": 2
+        },
+        {
+          "id": 42,
+          "text": "#",
+          "address": "$0502A0",
+          "length": 3
+        },
+        {
+          "id": 43,
+          "text": "#######nF##",
+          "address": "$0502B0",
+          "length": 16
+        },
+        {
+          "id": 44,
+          "text": "####m",
+          "address": "$0502C0",
+          "length": 7
+        },
+        {
+          "id": 45,
+          "text": "###t##",
+          "address": "$0502D0",
+          "length": 16
+        },
+        {
+          "id": 46,
+          "text": "##p####[CLEAR]##\nF#",
+          "address": "$0502E0",
+          "length": 16
+        },
+        {
+          "id": 47,
+          "text": "##\n#####",
+          "address": "$0502F0",
+          "length": 11
+        },
+        {
+          "id": 48,
+          "text": "#\n####m#",
+          "address": "$050300",
+          "length": 9
+        },
+        {
+          "id": 49,
+          "text": "#",
+          "address": "$050310",
+          "length": 2
+        },
+        {
+          "id": 50,
+          "text": "##[NAME]#",
+          "address": "$050320",
+          "length": 6
+        },
+        {
+          "id": 54,
+          "text": "#",
+          "address": "$050360",
+          "length": 2
+        },
+        {
+          "id": 55,
+          "text": "##m_",
+          "address": "$050370",
+          "length": 5
+        },
+        {
+          "id": 59,
+          "text": "#d###",
+          "address": "$0503B0",
+          "length": 6
+        },
+        {
+          "id": 60,
+          "text": "##",
+          "address": "$0503C0",
+          "length": 3
+        },
+        {
+          "id": 61,
+          "text": "y#",
+          "address": "$0503D0",
+          "length": 3
+        },
+        {
+          "id": 63,
+          "text": "#",
+          "address": "$0503F0",
+          "length": 3
+        },
+        {
+          "id": 71,
+          "text": "####t##",
+          "address": "$050470",
+          "length": 8
+        },
+        {
+          "id": 79,
+          "text": "#m",
+          "address": "$0504F0",
+          "length": 3
+        },
+        {
+          "id": 86,
+          "text": "_[CLEAR]um####\n",
+          "address": "$050560",
+          "length": 11
+        },
+        {
+          "id": 88,
+          "text": "######",
+          "address": "$050580",
+          "length": 7
+        },
+        {
+          "id": 89,
+          "text": "#####0##",
+          "address": "$050590",
+          "length": 16
+        },
+        {
+          "id": 90,
+          "text": "##",
+          "address": "$0505A0",
+          "length": 16
+        },
+        {
+          "id": 91,
+          "text": "##",
+          "address": "$0505B0",
+          "length": 3
+        },
+        {
+          "id": 92,
+          "text": "###nF#####",
+          "address": "$0505C0",
+          "length": 16
+        },
+        {
+          "id": 93,
+          "text": "#m##",
+          "address": "$0505D0",
+          "length": 6
+        },
+        {
+          "id": 94,
+          "text": "#######",
+          "address": "$0505E0",
+          "length": 16
+        },
+        {
+          "id": 95,
+          "text": "####[CLEAR]##\nF####",
+          "address": "$0505F0",
+          "length": 16
+        },
+        {
+          "id": 96,
+          "text": "####t####m###",
+          "address": "$050600",
+          "length": 16
+        },
+        {
+          "id": 97,
+          "text": "m###\n0",
+          "address": "$050610",
+          "length": 9
+        },
+        {
+          "id": 101,
+          "text": "h0###W##",
+          "address": "$050650",
+          "length": 9
+        },
+        {
+          "id": 102,
+          "text": "#####e[CLEAR]p#######I",
+          "address": "$050660",
+          "length": 16
+        },
+        {
+          "id": 103,
+          "text": "##t##########[CLEAR]",
+          "address": "$050670",
+          "length": 16
+        },
+        {
+          "id": 104,
+          "text": "#[ITEM]#[ITEM]#[ITEM]z_\n####",
+          "address": "$050680",
+          "length": 16
+        },
+        {
+          "id": 105,
+          "text": "######",
+          "address": "$050690",
+          "length": 7
+        },
+        {
+          "id": 106,
+          "text": "###",
+          "address": "$0506A0",
+          "length": 4
+        },
+        {
+          "id": 107,
+          "text": "\n\n\n\n########\n\n#q",
+          "address": "$0506B0",
+          "length": 16
+        },
+        {
+          "id": 108,
+          "text": "###[ITEM]##b4hP######",
+          "address": "$0506C0",
+          "length": 16
+        },
+        {
+          "id": 109,
+          "text": "###########x##F",
+          "address": "$0506D0",
+          "length": 16
+        },
+        {
+          "id": 110,
+          "text": "M#####8#####np##",
+          "address": "$0506E0",
+          "length": 16
+        },
+        {
+          "id": 111,
+          "text": "n###[CLEAR]#[CLEAR]",
+          "address": "$0506F0",
+          "length": 8
+        },
+        {
+          "id": 112,
+          "text": "##d##t##_######",
+          "address": "$050700",
+          "length": 16
+        },
+        {
+          "id": 113,
+          "text": "#v#nCKC[NAME]########",
+          "address": "$050710",
+          "length": 16
+        },
+        {
+          "id": 114,
+          "text": "##m#G######0##eu",
+          "address": "$050720",
+          "length": 16
+        },
+        {
+          "id": 115,
+          "text": "m#######[CLEAR][CLEAR]_#####",
+          "address": "$050730",
+          "length": 16
+        },
+        {
+          "id": 116,
+          "text": "########[CLEAR][NAME]######",
+          "address": "$050740",
+          "length": 16
+        },
+        {
+          "id": 117,
+          "text": "####z###########",
+          "address": "$050750",
+          "length": 16
+        },
+        {
+          "id": 118,
+          "text": "[WAIT]\n\n\n[CLEAR]###ya#PD###",
+          "address": "$050760",
+          "length": 16
+        },
+        {
+          "id": 119,
+          "text": "###########k####",
+          "address": "$050770",
+          "length": 16
+        },
+        {
+          "id": 120,
+          "text": "W###########m[CLEAR]m[CLEAR]",
+          "address": "$050780",
+          "length": 16
+        },
+        {
+          "id": 121,
+          "text": "###########",
+          "address": "$050790",
+          "length": 12
+        },
+        {
+          "id": 122,
+          "text": "#[NAME]#[NAME]########",
+          "address": "$0507A0",
+          "length": 16
+        },
+        {
+          "id": 123,
+          "text": "#",
+          "address": "$0507B0",
+          "length": 2
+        },
+        {
+          "id": 124,
+          "text": "FFD#########",
+          "address": "$0507C0",
+          "length": 16
+        },
+        {
+          "id": 125,
+          "text": "#########qs###\n",
+          "address": "$0507D0",
+          "length": 16
+        },
+        {
+          "id": 126,
+          "text": "####G#nn##_#####",
+          "address": "$0507E0",
+          "length": 16
+        },
+        {
+          "id": 127,
+          "text": "###n#[NAME]####q#S&yh",
+          "address": "$0507F0",
+          "length": 16
+        },
+        {
+          "id": 128,
+          "text": "################",
+          "address": "$050800",
+          "length": 16
+        },
+        {
+          "id": 129,
+          "text": "################",
+          "address": "$050810",
+          "length": 16
+        },
+        {
+          "id": 130,
+          "text": "###e####m#mm####",
+          "address": "$050820",
+          "length": 16
+        },
+        {
+          "id": 131,
+          "text": "###C#C##########",
+          "address": "$050830",
+          "length": 16
+        },
+        {
+          "id": 132,
+          "text": "#_#_############",
+          "address": "$050840",
+          "length": 16
+        },
+        {
+          "id": 133,
+          "text": "#####[ITEM]#[ITEM]####",
+          "address": "$050850",
+          "length": 16
+        },
+        {
+          "id": 134,
+          "text": "###[NAME]###[NAME]##y####",
+          "address": "$050860",
+          "length": 16
+        },
+        {
+          "id": 135,
+          "text": "#####[CLEAR][WAIT]\n\n\n\n[CLEAR][CLEAR]_#",
+          "address": "$050870",
+          "length": 16
+        },
+        {
+          "id": 136,
+          "text": "\n##[WAIT]\n\n[WAIT][NAME]",
+          "address": "$050880",
+          "length": 9
+        },
+        {
+          "id": 137,
+          "text": "##mm####",
+          "address": "$050890",
+          "length": 9
+        },
+        {
+          "id": 138,
+          "text": "################",
+          "address": "$0508A0",
+          "length": 16
+        },
+        {
+          "id": 139,
+          "text": "##############Wl",
+          "address": "$0508B0",
+          "length": 16
+        },
+        {
+          "id": 140,
+          "text": "##E########mF##",
+          "address": "$0508C0",
+          "length": 16
+        },
+        {
+          "id": 141,
+          "text": "#######1T#####x#",
+          "address": "$0508D0",
+          "length": 16
+        },
+        {
+          "id": 142,
+          "text": "################",
+          "address": "$0508E0",
+          "length": 16
+        },
+        {
+          "id": 143,
+          "text": "######[WAIT]#########",
+          "address": "$0508F0",
+          "length": 16
+        },
+        {
+          "id": 144,
+          "text": "########CC######",
+          "address": "$050900",
+          "length": 16
+        },
+        {
+          "id": 145,
+          "text": "####l##[NAME]so####",
+          "address": "$050910",
+          "length": 16
+        },
+        {
+          "id": 146,
+          "text": "###_###########F",
+          "address": "$050920",
+          "length": 16
+        },
+        {
+          "id": 147,
+          "text": "######edJlp'###",
+          "address": "$050930",
+          "length": 16
+        },
+        {
+          "id": 148,
+          "text": "###GGonn########",
+          "address": "$050940",
+          "length": 16
+        },
+        {
+          "id": 149,
+          "text": "#######[NAME][WAIT][WAIT]\n\n\n##",
+          "address": "$050950",
+          "length": 16
+        },
+        {
+          "id": 150,
+          "text": "################",
+          "address": "$050960",
+          "length": 16
+        },
+        {
+          "id": 151,
+          "text": "##########hpdtlp",
+          "address": "$050970",
+          "length": 16
+        },
+        {
+          "id": 152,
+          "text": "t###llNt#pl###",
+          "address": "$050980",
+          "length": 16
+        },
+        {
+          "id": 153,
+          "text": "#o##i#k#######",
+          "address": "$050990",
+          "length": 16
+        },
+        {
+          "id": 154,
+          "text": "#l######[WAIT]#[WAIT]##",
+          "address": "$0509A0",
+          "length": 14
+        },
+        {
+          "id": 155,
+          "text": "####[NAME]####",
+          "address": "$0509B0",
+          "length": 15
+        },
+        {
+          "id": 156,
+          "text": "######&N##p#el",
+          "address": "$0509C0",
+          "length": 16
+        },
+        {
+          "id": 157,
+          "text": "##p#Gl######t#",
+          "address": "$0509D0",
+          "length": 16
+        },
+        {
+          "id": 158,
+          "text": "#l########f##p",
+          "address": "$0509E0",
+          "length": 16
+        },
+        {
+          "id": 159,
+          "text": "################",
+          "address": "$0509F0",
+          "length": 16
+        },
+        {
+          "id": 160,
+          "text": "nmpppt##&#######",
+          "address": "$050A00",
+          "length": 16
+        },
+        {
+          "id": 161,
+          "text": "################",
+          "address": "$050A10",
+          "length": 16
+        },
+        {
+          "id": 162,
+          "text": "####__##########",
+          "address": "$050A20",
+          "length": 16
+        },
+        {
+          "id": 163,
+          "text": "################",
+          "address": "$050A30",
+          "length": 16
+        },
+        {
+          "id": 164,
+          "text": "pp##############",
+          "address": "$050A40",
+          "length": 16
+        },
+        {
+          "id": 165,
+          "text": "##F#kc#######",
+          "address": "$050A50",
+          "length": 16
+        },
+        {
+          "id": 166,
+          "text": "##F######[CLEAR]##l#l#",
+          "address": "$050A60",
+          "length": 16
+        },
+        {
+          "id": 167,
+          "text": "######",
+          "address": "$050A70",
+          "length": 9
+        },
+        {
+          "id": 168,
+          "text": "######h#8#######",
+          "address": "$050A80",
+          "length": 16
+        },
+        {
+          "id": 169,
+          "text": "##############",
+          "address": "$050A90",
+          "length": 16
+        },
+        {
+          "id": 170,
+          "text": "###############[CLEAR]",
+          "address": "$050AA0",
+          "length": 16
+        },
+        {
+          "id": 171,
+          "text": "##ooK##8#u######",
+          "address": "$050AB0",
+          "length": 16
+        },
+        {
+          "id": 172,
+          "text": "#######q########",
+          "address": "$050AC0",
+          "length": 16
+        },
+        {
+          "id": 174,
+          "text": "##############",
+          "address": "$050AE0",
+          "length": 16
+        },
+        {
+          "id": 175,
+          "text": "###########MI##",
+          "address": "$050AF0",
+          "length": 16
+        },
+        {
+          "id": 176,
+          "text": "#######f###",
+          "address": "$050B00",
+          "length": 16
+        },
+        {
+          "id": 177,
+          "text": "#j#####el##",
+          "address": "$050B10",
+          "length": 13
+        },
+        {
+          "id": 178,
+          "text": "#A####d#d#h",
+          "address": "$050B20",
+          "length": 16
+        },
+        {
+          "id": 180,
+          "text": "####g###7#####",
+          "address": "$050B40",
+          "length": 16
+        },
+        {
+          "id": 181,
+          "text": "#F#####lg##B3w#",
+          "address": "$050B50",
+          "length": 16
+        },
+        {
+          "id": 182,
+          "text": "ww##########",
+          "address": "$050B60",
+          "length": 16
+        },
+        {
+          "id": 183,
+          "text": "####D#####E8",
+          "address": "$050B70",
+          "length": 16
+        },
+        {
+          "id": 184,
+          "text": "qs###F",
+          "address": "$050B80",
+          "length": 9
+        },
+        {
+          "id": 185,
+          "text": "########",
+          "address": "$050B90",
+          "length": 9
+        },
+        {
+          "id": 186,
+          "text": "######__\n\n\n\n",
+          "address": "$050BA0",
+          "length": 13
+        },
+        {
+          "id": 187,
+          "text": "####\n\n",
+          "address": "$050BB0",
+          "length": 7
+        },
+        {
+          "id": 188,
+          "text": "[CLEAR][WAIT][CLEAR][WAIT][WAIT][WAIT]_[NAME]",
+          "address": "$050BC0",
+          "length": 9
+        },
+        {
+          "id": 189,
+          "text": "_[NAME][NAME][ITEM]############",
+          "address": "$050BD0",
+          "length": 16
+        },
+        {
+          "id": 190,
+          "text": "#_###########[CLEAR][WAIT]",
+          "address": "$050BE0",
+          "length": 16
+        },
+        {
+          "id": 195,
+          "text": "####CFGG##el####",
+          "address": "$050C30",
+          "length": 16
+        },
+        {
+          "id": 196,
+          "text": "####l#####hZ##[ITEM]#",
+          "address": "$050C40",
+          "length": 16
+        },
+        {
+          "id": 197,
+          "text": "5Dxx##########h#",
+          "address": "$050C50",
+          "length": 16
+        },
+        {
+          "id": 198,
+          "text": "####3FOe####8Fce",
+          "address": "$050C60",
+          "length": 16
+        },
+        {
+          "id": 199,
+          "text": "##tFj##########",
+          "address": "$050C70",
+          "length": 16
+        },
+        {
+          "id": 200,
+          "text": "##A####k########",
+          "address": "$050C80",
+          "length": 16
+        },
+        {
+          "id": 204,
+          "text": "&#htd#lpt######",
+          "address": "$050CC0",
+          "length": 16
+        },
+        {
+          "id": 205,
+          "text": "Nt#pl###########",
+          "address": "$050CD0",
+          "length": 16
+        },
+        {
+          "id": 206,
+          "text": "###############",
+          "address": "$050CE0",
+          "length": 16
+        },
+        {
+          "id": 207,
+          "text": "##########n##ek",
+          "address": "$050CF0",
+          "length": 16
+        },
+        {
+          "id": 208,
+          "text": "##JNGl###kplplp",
+          "address": "$050D00",
+          "length": 16
+        },
+        {
+          "id": 209,
+          "text": "tt#kll#######p",
+          "address": "$050D10",
+          "length": 16
+        },
+        {
+          "id": 210,
+          "text": "######m#m#m#####",
+          "address": "$050D20",
+          "length": 16
+        },
+        {
+          "id": 211,
+          "text": "mmmmmm##",
+          "address": "$050D30",
+          "length": 9
+        },
+        {
+          "id": 212,
+          "text": "########",
+          "address": "$050D40",
+          "length": 9
+        },
+        {
+          "id": 213,
+          "text": "########pp######",
+          "address": "$050D50",
+          "length": 16
+        },
+        {
+          "id": 214,
+          "text": "########",
+          "address": "$050D60",
+          "length": 9
+        },
+        {
+          "id": 215,
+          "text": "#u######",
+          "address": "$050D70",
+          "length": 9
+        },
+        {
+          "id": 218,
+          "text": "####m###",
+          "address": "$050DA0",
+          "length": 9
+        },
+        {
+          "id": 221,
+          "text": "####X#Y#[CLEAR]#######",
+          "address": "$050DD0",
+          "length": 16
+        },
+        {
+          "id": 222,
+          "text": "t###C####e######",
+          "address": "$050DE0",
+          "length": 16
+        },
+        {
+          "id": 225,
+          "text": "[CLEAR][CLEAR]#C#####l####",
+          "address": "$050E10",
+          "length": 16
+        },
+        {
+          "id": 226,
+          "text": "##m#",
+          "address": "$050E20",
+          "length": 5
+        },
+        {
+          "id": 227,
+          "text": "####[WAIT][WAIT]\n#m####s##",
+          "address": "$050E30",
+          "length": 16
+        },
+        {
+          "id": 228,
+          "text": "\n\n\n\n[CLEAR][WAIT][CLEAR][WAIT][CLEAR][WAIT][CLEAR][WAIT][CLEAR][WAIT][CLEAR][WAIT]",
+          "address": "$050E40",
+          "length": 16
+        },
+        {
+          "id": 229,
+          "text": "\n\n[CLEAR][CLEAR][CLEAR][CLEAR][CLEAR][CLEAR]I#######",
+          "address": "$050E50",
+          "length": 16
+        },
+        {
+          "id": 230,
+          "text": "#RJ##[CLEAR]Z[CLEAR]CCC#####",
+          "address": "$050E60",
+          "length": 16
+        },
+        {
+          "id": 231,
+          "text": "########msmqmm##",
+          "address": "$050E70",
+          "length": 16
+        },
+        {
+          "id": 232,
+          "text": "################",
+          "address": "$050E80",
+          "length": 16
+        },
+        {
+          "id": 233,
+          "text": "######t",
+          "address": "$050E90",
+          "length": 8
+        },
+        {
+          "id": 234,
+          "text": "####",
+          "address": "$050EA0",
+          "length": 5
+        },
+        {
+          "id": 235,
+          "text": "###\n#######",
+          "address": "$050EB0",
+          "length": 16
+        },
+        {
+          "id": 236,
+          "text": "##\n##",
+          "address": "$050EC0",
+          "length": 6
+        },
+        {
+          "id": 239,
+          "text": "###[NAME][CLEAR][WAIT][CLEAR][WAIT]####[NAME][WAIT][WAIT]",
+          "address": "$050EF0",
+          "length": 16
+        },
+        {
+          "id": 240,
+          "text": "###o[CLEAR][CLEAR][CLEAR][CLEAR][CLEAR][CLEAR]##[CLEAR]#p#",
+          "address": "$050F00",
+          "length": 16
+        },
+        {
+          "id": 241,
+          "text": "y########",
+          "address": "$050F10",
+          "length": 10
+        },
+        {
+          "id": 242,
+          "text": "[CLEAR]###_##",
+          "address": "$050F20",
+          "length": 8
+        },
+        {
+          "id": 244,
+          "text": "#####[CLEAR]######",
+          "address": "$050F40",
+          "length": 16
+        },
+        {
+          "id": 245,
+          "text": "##F###########",
+          "address": "$050F50",
+          "length": 16
+        },
+        {
+          "id": 246,
+          "text": "#me#kptt#kll",
+          "address": "$050F60",
+          "length": 16
+        },
+        {
+          "id": 247,
+          "text": "#####p####G###",
+          "address": "$050F70",
+          "length": 16
+        },
+        {
+          "id": 248,
+          "text": "##m##########m##",
+          "address": "$050F80",
+          "length": 16
+        },
+        {
+          "id": 249,
+          "text": "\n\n\n\n__##########",
+          "address": "$050F90",
+          "length": 16
+        },
+        {
+          "id": 250,
+          "text": "\n\n##########nH#'",
+          "address": "$050FA0",
+          "length": 16
+        },
+        {
+          "id": 251,
+          "text": "#'########E#####",
+          "address": "$050FB0",
+          "length": 16
+        },
+        {
+          "id": 252,
+          "text": "#",
+          "address": "$050FC0",
+          "length": 2
+        },
+        {
+          "id": 253,
+          "text": "###[CLEAR][WAIT]######",
+          "address": "$050FD0",
+          "length": 16
+        },
+        {
+          "id": 254,
+          "text": "#7############",
+          "address": "$050FE0",
+          "length": 16
+        },
+        {
+          "id": 255,
+          "text": "#####h#8#######",
+          "address": "$050FF0",
+          "length": 16
+        }
+      ]
+    },
+    "location_names": {
+      "count": 112,
+      "config": {
+        "address": 331776,
+        "count": 128,
+        "max_length": 20
+      },
+      "strings": [
+        {
+          "id": 0,
+          "text": "############UU######",
+          "address": "$051000",
+          "length": 20
+        },
+        {
+          "id": 1,
+          "text": "###j###########",
+          "address": "$051014",
+          "length": 20
+        },
+        {
+          "id": 2,
+          "text": "el##",
+          "address": "$051028",
+          "length": 5
+        },
+        {
+          "id": 5,
+          "text": "###",
+          "address": "$051064",
+          "length": 4
+        },
+        {
+          "id": 8,
+          "text": "#####[CLEAR][CLEAR]",
+          "address": "$0510A0",
+          "length": 9
+        },
+        {
+          "id": 9,
+          "text": "######D###l#[NAME]",
+          "address": "$0510B4",
+          "length": 15
+        },
+        {
+          "id": 11,
+          "text": "##[CLEAR]",
+          "address": "$0510DC",
+          "length": 4
+        },
+        {
+          "id": 14,
+          "text": "##[CLEAR][CLEAR]#######[CLEAR]#####",
+          "address": "$051118",
+          "length": 20
+        },
+        {
+          "id": 15,
+          "text": "#s#l####",
+          "address": "$05112C",
+          "length": 13
+        },
+        {
+          "id": 16,
+          "text": "##x######m3#'#####\n",
+          "address": "$051140",
+          "length": 20
+        },
+        {
+          "id": 19,
+          "text": "####",
+          "address": "$05117C",
+          "length": 5
+        },
+        {
+          "id": 20,
+          "text": "[CLEAR][CLEAR]mmG#######[CLEAR]mG#R",
+          "address": "$051190",
+          "length": 20
+        },
+        {
+          "id": 21,
+          "text": "##[CLEAR]#C##n####R######",
+          "address": "$0511A4",
+          "length": 20
+        },
+        {
+          "id": 22,
+          "text": "##V#####",
+          "address": "$0511B8",
+          "length": 13
+        },
+        {
+          "id": 24,
+          "text": "#_################",
+          "address": "$0511E0",
+          "length": 20
+        },
+        {
+          "id": 25,
+          "text": "####################",
+          "address": "$0511F4",
+          "length": 20
+        },
+        {
+          "id": 26,
+          "text": "########_[WAIT][CLEAR]\n\n\n[CLEAR]#####",
+          "address": "$051208",
+          "length": 20
+        },
+        {
+          "id": 27,
+          "text": "#################[NAME]##",
+          "address": "$05121C",
+          "length": 20
+        },
+        {
+          "id": 28,
+          "text": "##2E####x###y###2##",
+          "address": "$051230",
+          "length": 20
+        },
+        {
+          "id": 29,
+          "text": "#",
+          "address": "$051244",
+          "length": 2
+        },
+        {
+          "id": 30,
+          "text": "#####[NAME][WAIT]\n###t#######",
+          "address": "$051258",
+          "length": 20
+        },
+        {
+          "id": 31,
+          "text": "#kT-#m",
+          "address": "$05126C",
+          "length": 7
+        },
+        {
+          "id": 32,
+          "text": "#######&#",
+          "address": "$051280",
+          "length": 11
+        },
+        {
+          "id": 33,
+          "text": "###el######2K#8####",
+          "address": "$051294",
+          "length": 20
+        },
+        {
+          "id": 34,
+          "text": "##8#######U#j####F##",
+          "address": "$0512A8",
+          "length": 20
+        },
+        {
+          "id": 35,
+          "text": "#[NAME]##########-#s#####",
+          "address": "$0512BC",
+          "length": 20
+        },
+        {
+          "id": 36,
+          "text": "###o#####i#######-",
+          "address": "$0512D0",
+          "length": 20
+        },
+        {
+          "id": 37,
+          "text": "####G0#k####ll#6###",
+          "address": "$0512E4",
+          "length": 20
+        },
+        {
+          "id": 38,
+          "text": "####x###m####n\n\n#j##",
+          "address": "$0512F8",
+          "length": 20
+        },
+        {
+          "id": 39,
+          "text": "############[CLEAR]#######",
+          "address": "$05130C",
+          "length": 20
+        },
+        {
+          "id": 40,
+          "text": "z#####&######T##y##",
+          "address": "$051320",
+          "length": 20
+        },
+        {
+          "id": 41,
+          "text": "###L#######lV####b#",
+          "address": "$051334",
+          "length": 20
+        },
+        {
+          "id": 42,
+          "text": "#######LYj##########",
+          "address": "$051348",
+          "length": 20
+        },
+        {
+          "id": 43,
+          "text": "Z###m######q######'#",
+          "address": "$05135C",
+          "length": 20
+        },
+        {
+          "id": 44,
+          "text": "J#J###y#############",
+          "address": "$051370",
+          "length": 20
+        },
+        {
+          "id": 45,
+          "text": "##jjbj####v######pp#",
+          "address": "$051384",
+          "length": 20
+        },
+        {
+          "id": 46,
+          "text": "Ml##############q###",
+          "address": "$051398",
+          "length": 20
+        },
+        {
+          "id": 47,
+          "text": "#####z#Dx###tt##d###",
+          "address": "$0513AC",
+          "length": 20
+        },
+        {
+          "id": 48,
+          "text": "[CLEAR][CLEAR]######J########",
+          "address": "$0513C0",
+          "length": 20
+        },
+        {
+          "id": 49,
+          "text": "#######0####l#l##'",
+          "address": "$0513D4",
+          "length": 20
+        },
+        {
+          "id": 50,
+          "text": "#tlnF#n#####m###k###",
+          "address": "$0513E8",
+          "length": 20
+        },
+        {
+          "id": 51,
+          "text": "####F##########[WAIT][CLEAR]\n##",
+          "address": "$0513FC",
+          "length": 20
+        },
+        {
+          "id": 52,
+          "text": "#t##########[NAME]###",
+          "address": "$051410",
+          "length": 20
+        },
+        {
+          "id": 53,
+          "text": "###u####D#l####wx",
+          "address": "$051424",
+          "length": 20
+        },
+        {
+          "id": 54,
+          "text": "###C#S#####2#######",
+          "address": "$051438",
+          "length": 20
+        },
+        {
+          "id": 55,
+          "text": "###F#_######c#######",
+          "address": "$05144C",
+          "length": 20
+        },
+        {
+          "id": 56,
+          "text": "######",
+          "address": "$051460",
+          "length": 7
+        },
+        {
+          "id": 57,
+          "text": "##7###Zi######[CLEAR]\nm##",
+          "address": "$051474",
+          "length": 20
+        },
+        {
+          "id": 58,
+          "text": "####ii####p###q#",
+          "address": "$051488",
+          "length": 20
+        },
+        {
+          "id": 59,
+          "text": "##",
+          "address": "$05149C",
+          "length": 3
+        },
+        {
+          "id": 60,
+          "text": "p#",
+          "address": "$0514B0",
+          "length": 3
+        },
+        {
+          "id": 61,
+          "text": "p#",
+          "address": "$0514C4",
+          "length": 7
+        },
+        {
+          "id": 62,
+          "text": "####[CLEAR]######",
+          "address": "$0514D8",
+          "length": 20
+        },
+        {
+          "id": 63,
+          "text": "######",
+          "address": "$0514EC",
+          "length": 11
+        },
+        {
+          "id": 64,
+          "text": "################",
+          "address": "$051500",
+          "length": 20
+        },
+        {
+          "id": 65,
+          "text": "#####j######[WAIT]#####s#",
+          "address": "$051514",
+          "length": 20
+        },
+        {
+          "id": 66,
+          "text": "[CLEAR]###m##",
+          "address": "$051528",
+          "length": 8
+        },
+        {
+          "id": 67,
+          "text": "#####y####",
+          "address": "$05153C",
+          "length": 11
+        },
+        {
+          "id": 68,
+          "text": "V##d##r######",
+          "address": "$051550",
+          "length": 15
+        },
+        {
+          "id": 69,
+          "text": "y###",
+          "address": "$051564",
+          "length": 5
+        },
+        {
+          "id": 70,
+          "text": "j####h####T#7##5##",
+          "address": "$051578",
+          "length": 19
+        },
+        {
+          "id": 71,
+          "text": "###",
+          "address": "$05158C",
+          "length": 4
+        },
+        {
+          "id": 73,
+          "text": "yZF#",
+          "address": "$0515B4",
+          "length": 5
+        },
+        {
+          "id": 74,
+          "text": "####t##",
+          "address": "$0515C8",
+          "length": 9
+        },
+        {
+          "id": 75,
+          "text": "id######",
+          "address": "$0515DC",
+          "length": 13
+        },
+        {
+          "id": 76,
+          "text": "##Y##########j##",
+          "address": "$0515F0",
+          "length": 17
+        },
+        {
+          "id": 77,
+          "text": "m########z####v##l#",
+          "address": "$051604",
+          "length": 20
+        },
+        {
+          "id": 79,
+          "text": "###",
+          "address": "$05162C",
+          "length": 5
+        },
+        {
+          "id": 80,
+          "text": "########",
+          "address": "$051640",
+          "length": 9
+        },
+        {
+          "id": 81,
+          "text": "\n\n\n\n[WAIT][CLEAR][WAIT][CLEAR][ITEM]#[CLEAR][CLEAR]",
+          "address": "$051654",
+          "length": 13
+        },
+        {
+          "id": 82,
+          "text": "###k###h#S##########",
+          "address": "$051668",
+          "length": 20
+        },
+        {
+          "id": 83,
+          "text": "#mm#\n\n",
+          "address": "$05167C",
+          "length": 7
+        },
+        {
+          "id": 85,
+          "text": "#####[NAME][WAIT]\n",
+          "address": "$0516A4",
+          "length": 9
+        },
+        {
+          "id": 86,
+          "text": "###mG#0#",
+          "address": "$0516B8",
+          "length": 9
+        },
+        {
+          "id": 87,
+          "text": "##Z#i##########ZG###",
+          "address": "$0516CC",
+          "length": 20
+        },
+        {
+          "id": 88,
+          "text": "###################",
+          "address": "$0516E0",
+          "length": 20
+        },
+        {
+          "id": 89,
+          "text": "######O#u##C########",
+          "address": "$0516F4",
+          "length": 20
+        },
+        {
+          "id": 90,
+          "text": "0u##_\n[CLEAR]#",
+          "address": "$051708",
+          "length": 9
+        },
+        {
+          "id": 91,
+          "text": "####",
+          "address": "$05171C",
+          "length": 5
+        },
+        {
+          "id": 92,
+          "text": "[CLEAR][CLEAR]#[ITEM]####",
+          "address": "$051730",
+          "length": 9
+        },
+        {
+          "id": 93,
+          "text": "__####-####F",
+          "address": "$051744",
+          "length": 13
+        },
+        {
+          "id": 94,
+          "text": "###t########kT-#m",
+          "address": "$051758",
+          "length": 19
+        },
+        {
+          "id": 95,
+          "text": "###[NAME]##6#######x###",
+          "address": "$05176C",
+          "length": 20
+        },
+        {
+          "id": 96,
+          "text": "#####n\n\n",
+          "address": "$051780",
+          "length": 9
+        },
+        {
+          "id": 97,
+          "text": "####",
+          "address": "$051794",
+          "length": 5
+        },
+        {
+          "id": 98,
+          "text": "##FF####",
+          "address": "$0517A8",
+          "length": 9
+        },
+        {
+          "id": 99,
+          "text": "##########oo########",
+          "address": "$0517BC",
+          "length": 20
+        },
+        {
+          "id": 101,
+          "text": "####",
+          "address": "$0517E4",
+          "length": 5
+        },
+        {
+          "id": 103,
+          "text": "##################F9",
+          "address": "$05180C",
+          "length": 20
+        },
+        {
+          "id": 104,
+          "text": "#t#########[WAIT][WAIT]##",
+          "address": "$051820",
+          "length": 20
+        },
+        {
+          "id": 105,
+          "text": "###9##s_###S#FV",
+          "address": "$051834",
+          "length": 20
+        },
+        {
+          "id": 106,
+          "text": "PPPPff#############z",
+          "address": "$051848",
+          "length": 20
+        },
+        {
+          "id": 107,
+          "text": "#####G#G#W#0#0#0####",
+          "address": "$05185C",
+          "length": 20
+        },
+        {
+          "id": 108,
+          "text": "GGW000##",
+          "address": "$051870",
+          "length": 9
+        },
+        {
+          "id": 109,
+          "text": "####",
+          "address": "$051884",
+          "length": 5
+        },
+        {
+          "id": 110,
+          "text": "###G###########F#t#",
+          "address": "$051898",
+          "length": 20
+        },
+        {
+          "id": 111,
+          "text": "#######",
+          "address": "$0518AC",
+          "length": 8
+        },
+        {
+          "id": 112,
+          "text": "###H#######[CLEAR]#[WAIT]##l#",
+          "address": "$0518C0",
+          "length": 20
+        },
+        {
+          "id": 113,
+          "text": "############&####Wl",
+          "address": "$0518D4",
+          "length": 20
+        },
+        {
+          "id": 114,
+          "text": "########u#u#u#y####",
+          "address": "$0518E8",
+          "length": 20
+        },
+        {
+          "id": 115,
+          "text": "####uuuy####",
+          "address": "$0518FC",
+          "length": 13
+        },
+        {
+          "id": 117,
+          "text": "_#\n\n\n\n\n\n[CLEAR][CLEAR]\n\n##_\n\n\n[CLEAR]\n",
+          "address": "$051924",
+          "length": 20
+        },
+        {
+          "id": 118,
+          "text": "xt####&#[CLEAR]##8##F#####",
+          "address": "$051938",
+          "length": 20
+        },
+        {
+          "id": 119,
+          "text": "#####t#####l#####m#",
+          "address": "$05194C",
+          "length": 20
+        },
+        {
+          "id": 120,
+          "text": "#####[CLEAR]##m#",
+          "address": "$051960",
+          "length": 20
+        },
+        {
+          "id": 121,
+          "text": "####",
+          "address": "$051974",
+          "length": 5
+        },
+        {
+          "id": 122,
+          "text": "#######[CLEAR]###[CLEAR]###",
+          "address": "$051988",
+          "length": 20
+        },
+        {
+          "id": 123,
+          "text": "##ml########ll####",
+          "address": "$05199C",
+          "length": 20
+        },
+        {
+          "id": 124,
+          "text": "#6#2#Z####S###F09Di#",
+          "address": "$0519B0",
+          "length": 20
+        },
+        {
+          "id": 125,
+          "text": "###m#############m#",
+          "address": "$0519C4",
+          "length": 20
+        },
+        {
+          "id": 126,
+          "text": "mm#####m\n\n[CLEAR][WAIT][WAIT][WAIT][WAIT][WAIT][WAIT][WAIT][WAIT][WAIT]",
+          "address": "$0519D8",
+          "length": 20
+        },
+        {
+          "id": 127,
+          "text": "[CLEAR][WAIT]\n\n\n[CLEAR][CLEAR][CLEAR][CLEAR][CLEAR][CLEAR]\n\n\n\n\n\n\n##",
+          "address": "$0519EC",
+          "length": 20
+        }
+      ]
+    },
+    "dialog": {
+      "count": 245,
+      "config": {
+        "pointer_table": 54838,
+        "count": 256,
+        "bank": 3,
+        "max_length": 512
+      },
+      "strings": [
+        {
+          "id": 0,
+          "text": "-##m###o#T##9",
+          "address": "$00FF54",
+          "pointer": "$7F54",
+          "length": 14
+        },
+        {
+          "id": 1,
+          "text": "############################################o#T##v######G#",
+          "address": "$00A27F",
+          "pointer": "$A27F",
+          "length": 60
+        },
+        {
+          "id": 2,
+          "text": "##o#UD####T############P##############P####################rC[ITEM]#P##P#P##[ITEM]##P################P#################xP##############P####################rC[ITEM]#P##P#P##############P###[ITEM]P##P#P##[ITEM]##P",
+          "address": "$00C488",
+          "pointer": "$C488",
+          "length": 188
+        },
+        {
+          "id": 3,
+          "text": "#############################################################################################o#P#L#C##C##CS#CV#P[WAIT]###P##a#P##3#####g####o#C##P#",
+          "address": "$0080A0",
+          "pointer": "$00A0",
+          "length": 144
+        },
+        {
+          "id": 4,
+          "text": "b",
+          "address": "$00A960",
+          "pointer": "$A960",
+          "length": 2
+        },
+        {
+          "id": 5,
+          "text": "P#L#C##C##CS#CV#P[WAIT]###P##a#P##3#####g####o#C##P#",
+          "address": "$0080FF",
+          "pointer": "$00FF",
+          "length": 49
+        },
+        {
+          "id": 6,
+          "text": "-##m###o#T##9",
+          "address": "$00FF54",
+          "pointer": "$7F54",
+          "length": 14
+        },
+        {
+          "id": 7,
+          "text": "############################################o#T##v######G#",
+          "address": "$00A27F",
+          "pointer": "$A27F",
+          "length": 60
+        },
+        {
+          "id": 8,
+          "text": "##L#T#########L#T########T#########L#T########T#########L#P##[ITEM]####################################o#P#\n#_#o#P#\n#################o#P####O######8######8######8########P##Tg###P_#P####P_#P###G#",
+          "address": "$00D000",
+          "pointer": "$5000",
+          "length": 191
+        },
+        {
+          "id": 9,
+          "text": "######o#T###[WAIT]#T###[CLEAR]#T##o##",
+          "address": "$0088A0",
+          "pointer": "$88A0",
+          "length": 28
+        },
+        {
+          "id": 11,
+          "text": "##############################################################################################################################o#P#L#C##C##CS#CV#P[WAIT]###P##a#P##3#####g####o#C##P#",
+          "address": "$00807F",
+          "pointer": "$007F",
+          "length": 177
+        },
+        {
+          "id": 12,
+          "text": "-##m###o#T##9",
+          "address": "$00FF54",
+          "pointer": "$7F54",
+          "length": 14
+        },
+        {
+          "id": 13,
+          "text": "############################################o#T##v######G#",
+          "address": "$00A27F",
+          "pointer": "$A27F",
+          "length": 60
+        },
+        {
+          "id": 14,
+          "text": "##L#T#########L#T########T#########L#T########T#########L#P##[ITEM]####################################o#P#\n#_#o#P#\n#################o#P####O######8######8######8########P##Tg###P_#P####P_#P###G#",
+          "address": "$00D000",
+          "pointer": "$5000",
+          "length": 191
+        },
+        {
+          "id": 15,
+          "text": "######o#T###[WAIT]#T###[CLEAR]#T##o##",
+          "address": "$0088A0",
+          "pointer": "$88A0",
+          "length": 28
+        },
+        {
+          "id": 17,
+          "text": "P#L#C##C##CS#CV#P[WAIT]###P##a#P##3#####g####o#C##P#",
+          "address": "$0080FF",
+          "pointer": "$00FF",
+          "length": 49
+        },
+        {
+          "id": 18,
+          "text": "-##m###o#T##9",
+          "address": "$00FF54",
+          "pointer": "$7F54",
+          "length": 14
+        },
+        {
+          "id": 19,
+          "text": "R\n####l#R\n########o##########################o####T##v[CLEAR]#[CLEAR]C####o#U##b",
+          "address": "$00AB7F",
+          "pointer": "$AB7F",
+          "length": 69
+        },
+        {
+          "id": 20,
+          "text": "#b###",
+          "address": "$00A0E2",
+          "pointer": "$20E2",
+          "length": 6
+        },
+        {
+          "id": 21,
+          "text": "#U########U########",
+          "address": "$0090C2",
+          "pointer": "$10C2",
+          "length": 20
+        },
+        {
+          "id": 22,
+          "text": "############",
+          "address": "$00F320",
+          "pointer": "$F320",
+          "length": 13
+        },
+        {
+          "id": 23,
+          "text": "#m####[CLEAR]5",
+          "address": "$00A98D",
+          "pointer": "$A98D",
+          "length": 9
+        },
+        {
+          "id": 24,
+          "text": "###Q##o#T#########T#########o#T#####QC##P",
+          "address": "$008D06",
+          "pointer": "$8D06",
+          "length": 42
+        },
+        {
+          "id": 25,
+          "text": "T####",
+          "address": "$009A46",
+          "pointer": "$1A46",
+          "length": 6
+        },
+        {
+          "id": 26,
+          "text": "############",
+          "address": "$00F320",
+          "pointer": "$F320",
+          "length": 13
+        },
+        {
+          "id": 27,
+          "text": "###",
+          "address": "$00AD8D",
+          "pointer": "$AD8D",
+          "length": 4
+        },
+        {
+          "id": 28,
+          "text": "#####99[WAIT]#9###9_#9##P#####P##o#I#",
+          "address": "$00992B",
+          "pointer": "$192B",
+          "length": 33
+        },
+        {
+          "id": 29,
+          "text": "P\n####DYT#######O######o##GT###",
+          "address": "$00B330",
+          "pointer": "$3330",
+          "length": 33
+        },
+        {
+          "id": 30,
+          "text": "_##X######P###X######P###X######P###X############G#",
+          "address": "$00D920",
+          "pointer": "$D920",
+          "length": 52
+        },
+        {
+          "id": 31,
+          "text": "#T##D##T##D##U##T##D##T##D#####o####T##v[WAIT]##P",
+          "address": "$00CE82",
+          "pointer": "$CE82",
+          "length": 45
+        },
+        {
+          "id": 32,
+          "text": "#####99[WAIT]#9###9_#9##P#####P##o#I#",
+          "address": "$00992B",
+          "pointer": "$192B",
+          "length": 33
+        },
+        {
+          "id": 33,
+          "text": "#I",
+          "address": "$00F8D0",
+          "pointer": "$F8D0",
+          "length": 3
+        },
+        {
+          "id": 34,
+          "text": "#b###",
+          "address": "$00AD8B",
+          "pointer": "$AD8B",
+          "length": 6
+        },
+        {
+          "id": 35,
+          "text": "####99[WAIT]#9###9_#9##P#####P##o#I#",
+          "address": "$00992C",
+          "pointer": "$192C",
+          "length": 32
+        },
+        {
+          "id": 36,
+          "text": "#T####",
+          "address": "$00D18D",
+          "pointer": "$518D",
+          "length": 7
+        },
+        {
+          "id": 37,
+          "text": "o#o#o##q#Fq###q##q###o#TD####TE######u###o#P##3#G[NAME]",
+          "address": "$00C21A",
+          "pointer": "$C21A",
+          "length": 51
+        },
+        {
+          "id": 38,
+          "text": "#####T######P",
+          "address": "$00A230",
+          "pointer": "$A230",
+          "length": 14
+        },
+        {
+          "id": 39,
+          "text": "###T###",
+          "address": "$00C000",
+          "pointer": "$4000",
+          "length": 9
+        },
+        {
+          "id": 40,
+          "text": "######o#T###[WAIT]#T###[CLEAR]#T##o##",
+          "address": "$0088A0",
+          "pointer": "$88A0",
+          "length": 28
+        },
+        {
+          "id": 42,
+          "text": "##############################################################################################################################o#P#L#C##C##CS#CV#P[WAIT]###P##a#P##3#####g####o#C##P#",
+          "address": "$00807F",
+          "pointer": "$007F",
+          "length": 177
+        },
+        {
+          "id": 43,
+          "text": "-##m###o#T##9",
+          "address": "$00FF54",
+          "pointer": "$7F54",
+          "length": 14
+        },
+        {
+          "id": 44,
+          "text": "############################################o#T##v######G#",
+          "address": "$00A27F",
+          "pointer": "$A27F",
+          "length": 60
+        },
+        {
+          "id": 45,
+          "text": "#########E#####T#############TE#########P##_######z4###T####[ITEM]#0#P##Tg###",
+          "address": "$00E000",
+          "pointer": "$6000",
+          "length": 73
+        },
+        {
+          "id": 46,
+          "text": "######o#T###[WAIT]#T###[CLEAR]#T##o##",
+          "address": "$0088A0",
+          "pointer": "$88A0",
+          "length": 28
+        },
+        {
+          "id": 48,
+          "text": "P#L#C##C##CS#CV#P[WAIT]###P##a#P##3#####g####o#C##P#",
+          "address": "$0080FF",
+          "pointer": "$00FF",
+          "length": 49
+        },
+        {
+          "id": 49,
+          "text": "-##m###o#T##9",
+          "address": "$00FF54",
+          "pointer": "$7F54",
+          "length": 14
+        },
+        {
+          "id": 50,
+          "text": "R\n####l#R\n########o##########################o####T##v[CLEAR]#[CLEAR]C####o#U##b",
+          "address": "$00AB7F",
+          "pointer": "$AB7F",
+          "length": 69
+        },
+        {
+          "id": 51,
+          "text": "#b###",
+          "address": "$00A0E2",
+          "pointer": "$20E2",
+          "length": 6
+        },
+        {
+          "id": 52,
+          "text": "#U########U########",
+          "address": "$0090C2",
+          "pointer": "$10C2",
+          "length": 20
+        },
+        {
+          "id": 53,
+          "text": "Q#c#I",
+          "address": "$0086A9",
+          "pointer": "$06A9",
+          "length": 6
+        },
+        {
+          "id": 54,
+          "text": "tf#e###P####R###R#####-##o#U#######0Uj##n#Ul##p#G#",
+          "address": "$00C68D",
+          "pointer": "$468D",
+          "length": 51
+        },
+        {
+          "id": 55,
+          "text": "#P#P",
+          "address": "$00A81A",
+          "pointer": "$281A",
+          "length": 5
+        },
+        {
+          "id": 56,
+          "text": "########P###[ITEM]#################",
+          "address": "$00FA7A",
+          "pointer": "$FA7A",
+          "length": 31
+        },
+        {
+          "id": 57,
+          "text": "###[CLEAR]#T######_########P##j######o####I",
+          "address": "$00DA60",
+          "pointer": "$DA60",
+          "length": 38
+        },
+        {
+          "id": 58,
+          "text": "##D[NAME]#D##L#D\n#D[ITEM]####D##D##P#9",
+          "address": "$00A208",
+          "pointer": "$A208",
+          "length": 29
+        },
+        {
+          "id": 59,
+          "text": "#############_####[ITEM]##########################################################################################################################################################################################################################################o#P#L#C##C##CS#CV#P[WAIT]###P##a#P##3#####g####o#C##P#",
+          "address": "$008000",
+          "pointer": "$0000",
+          "length": 304
+        },
+        {
+          "id": 60,
+          "text": "#b###",
+          "address": "$00A0E2",
+          "pointer": "$20E2",
+          "length": 6
+        },
+        {
+          "id": 61,
+          "text": "#U########U########",
+          "address": "$0090C2",
+          "pointer": "$10C2",
+          "length": 20
+        },
+        {
+          "id": 62,
+          "text": "####P#",
+          "address": "$00FC48",
+          "pointer": "$FC48",
+          "length": 7
+        },
+        {
+          "id": 63,
+          "text": "'######G6",
+          "address": "$00D6CB",
+          "pointer": "$D6CB",
+          "length": 10
+        },
+        {
+          "id": 64,
+          "text": "##y########o###'0#P\n###G[CLEAR]",
+          "address": "$00BA68",
+          "pointer": "$3A68",
+          "length": 26
+        },
+        {
+          "id": 65,
+          "text": "#I",
+          "address": "$00F8D0",
+          "pointer": "$F8D0",
+          "length": 3
+        },
+        {
+          "id": 66,
+          "text": "T##9##T##9####uuuuT###z##0[NAME]#######m#",
+          "address": "$00FA28",
+          "pointer": "$FA28",
+          "length": 37
+        },
+        {
+          "id": 67,
+          "text": "###[CLEAR]#T######_########P##j######o####I",
+          "address": "$00DA60",
+          "pointer": "$DA60",
+          "length": 38
+        },
+        {
+          "id": 68,
+          "text": "##D[NAME]#D##L#D\n#D[ITEM]####D##D##P#9",
+          "address": "$00A208",
+          "pointer": "$A208",
+          "length": 29
+        },
+        {
+          "id": 69,
+          "text": "###########_####[ITEM]##########################################################################################################################################################################################################################################o#P#L#C##C##CS#CV#P[WAIT]###P##a#P##3#####g####o#C##P#",
+          "address": "$008002",
+          "pointer": "$0002",
+          "length": 302
+        },
+        {
+          "id": 70,
+          "text": "########T#####IQ##o#j",
+          "address": "$00EA80",
+          "pointer": "$EA80",
+          "length": 22
+        },
+        {
+          "id": 71,
+          "text": "#[CLEAR]#P",
+          "address": "$0088DA",
+          "pointer": "$08DA",
+          "length": 5
+        },
+        {
+          "id": 73,
+          "text": "#############_####[ITEM]##########################################################################################################################################################################################################################################o#P#L#C##C##CS#CV#P[WAIT]###P##a#P##3#####g####o#C##P#",
+          "address": "$008000",
+          "pointer": "$8000",
+          "length": 304
+        },
+        {
+          "id": 74,
+          "text": "###",
+          "address": "$00D1E3",
+          "pointer": "$D1E3",
+          "length": 4
+        },
+        {
+          "id": 75,
+          "text": "o#T1#v##_I[NAME]",
+          "address": "$00D0D6",
+          "pointer": "$D0D6",
+          "length": 12
+        },
+        {
+          "id": 76,
+          "text": "##U##P2D####yP##Tg###o#P[CLEAR]###P[CLEAR]#######o#P\n###C########T####X######P[NAME]###P[WAIT]###U##j#####j###########T#####U####w####P",
+          "address": "$00D982",
+          "pointer": "$D982",
+          "length": 114
+        },
+        {
+          "id": 77,
+          "text": "#########################################o#T##v######G#",
+          "address": "$00A282",
+          "pointer": "$2282",
+          "length": 57
+        },
+        {
+          "id": 78,
+          "text": "9[WAIT]",
+          "address": "$0096A0",
+          "pointer": "$96A0",
+          "length": 3
+        },
+        {
+          "id": 79,
+          "text": "#########E#####T#############TE#########P##_######z4###T####[ITEM]#0#P##Tg###",
+          "address": "$00E000",
+          "pointer": "$6000",
+          "length": 73
+        },
+        {
+          "id": 80,
+          "text": "#b###",
+          "address": "$00A0E2",
+          "pointer": "$20E2",
+          "length": 6
+        },
+        {
+          "id": 81,
+          "text": "#U########U########",
+          "address": "$0090C2",
+          "pointer": "$10C2",
+          "length": 20
+        },
+        {
+          "id": 82,
+          "text": "q#W#q#m#r###r###r###r##y#T####[CLEAR]#\n##I",
+          "address": "$0083A9",
+          "pointer": "$03A9",
+          "length": 37
+        },
+        {
+          "id": 83,
+          "text": "####T#######Q#########-#####P#####P#Q#######Q#######Q#######Q####P",
+          "address": "$00E28D",
+          "pointer": "$E28D",
+          "length": 67
+        },
+        {
+          "id": 84,
+          "text": "####################################################################################################################################################################################################################################o#P#L#C##C##CS#CV#P[WAIT]###P##a#P##3#####g####o#C##P#",
+          "address": "$008019",
+          "pointer": "$8019",
+          "length": 279
+        },
+        {
+          "id": 85,
+          "text": "P##TgCW#########[WAIT]B",
+          "address": "$00E207",
+          "pointer": "$E207",
+          "length": 19
+        },
+        {
+          "id": 86,
+          "text": "#q#Fq###q##q###o#TD####TE######u###o#P##3#G[NAME]",
+          "address": "$00C220",
+          "pointer": "$C220",
+          "length": 45
+        },
+        {
+          "id": 87,
+          "text": "#CT####T#########T##########o#T#########",
+          "address": "$009C10",
+          "pointer": "$9C10",
+          "length": 41
+        },
+        {
+          "id": 88,
+          "text": "#####",
+          "address": "$0099E2",
+          "pointer": "$19E2",
+          "length": 6
+        },
+        {
+          "id": 89,
+          "text": "##P#Q#######Q#######Q#######Q####P",
+          "address": "$00E2AD",
+          "pointer": "$E2AD",
+          "length": 35
+        },
+        {
+          "id": 90,
+          "text": "##",
+          "address": "$00A019",
+          "pointer": "$2019",
+          "length": 3
+        },
+        {
+          "id": 91,
+          "text": "######P##",
+          "address": "$00B1EB",
+          "pointer": "$B1EB",
+          "length": 10
+        },
+        {
+          "id": 92,
+          "text": "IQ##o#j",
+          "address": "$00EA8E",
+          "pointer": "$EA8E",
+          "length": 8
+        },
+        {
+          "id": 93,
+          "text": "#########o#T#####QC##P",
+          "address": "$008D19",
+          "pointer": "$8D19",
+          "length": 23
+        },
+        {
+          "id": 95,
+          "text": "##w######",
+          "address": "$00FDBD",
+          "pointer": "$7DBD",
+          "length": 10
+        },
+        {
+          "id": 96,
+          "text": "########o#T#####QC##P",
+          "address": "$008D1A",
+          "pointer": "$8D1A",
+          "length": 22
+        },
+        {
+          "id": 97,
+          "text": "###99[WAIT]#9###9_#9##P#####P##o#I#",
+          "address": "$00992D",
+          "pointer": "$192D",
+          "length": 31
+        },
+        {
+          "id": 98,
+          "text": "uum#",
+          "address": "$00FEBD",
+          "pointer": "$7EBD",
+          "length": 5
+        },
+        {
+          "id": 99,
+          "text": "##D####yU##T###0D#######y#U####g#####-###w#####j#########U##T##D####yU##T##D####y########o###'0#P\n###G[CLEAR]",
+          "address": "$00BA1A",
+          "pointer": "$3A1A",
+          "length": 104
+        },
+        {
+          "id": 100,
+          "text": "-#o#T###T#######b######o##",
+          "address": "$00AE8D",
+          "pointer": "$2E8D",
+          "length": 27
+        },
+        {
+          "id": 101,
+          "text": "##",
+          "address": "$00A019",
+          "pointer": "$2019",
+          "length": 3
+        },
+        {
+          "id": 102,
+          "text": "###o#P",
+          "address": "$00880C",
+          "pointer": "$880C",
+          "length": 7
+        },
+        {
+          "id": 103,
+          "text": "##############################################################o#P#L#C##C##CS#CV#P[WAIT]###P##a#P##3#####g####o#C##P#",
+          "address": "$0080BF",
+          "pointer": "$00BF",
+          "length": 113
+        },
+        {
+          "id": 104,
+          "text": "##P####I#",
+          "address": "$00FF80",
+          "pointer": "$7F80",
+          "length": 10
+        },
+        {
+          "id": 105,
+          "text": "P",
+          "address": "$009F1A",
+          "pointer": "$9F1A",
+          "length": 2
+        },
+        {
+          "id": 106,
+          "text": "#############_####[ITEM]##########################################################################################################################################################################################################################################o#P#L#C##C##CS#CV#P[WAIT]###P##a#P##3#####g####o#C##P#",
+          "address": "$008000",
+          "pointer": "$8000",
+          "length": 304
+        },
+        {
+          "id": 107,
+          "text": "#####",
+          "address": "$008D7F",
+          "pointer": "$8D7F",
+          "length": 6
+        },
+        {
+          "id": 108,
+          "text": "T#########",
+          "address": "$0099D6",
+          "pointer": "$19D6",
+          "length": 11
+        },
+        {
+          "id": 109,
+          "text": "##G#rI##P#",
+          "address": "$0081A9",
+          "pointer": "$01A9",
+          "length": 11
+        },
+        {
+          "id": 110,
+          "text": "b",
+          "address": "$00CB8D",
+          "pointer": "$4B8D",
+          "length": 2
+        },
+        {
+          "id": 111,
+          "text": "########T##########o#T#########",
+          "address": "$009C19",
+          "pointer": "$9C19",
+          "length": 32
+        },
+        {
+          "id": 112,
+          "text": "#D##D##D##D##D##D##D##D####9[CLEAR]#9####9##9####9[CLEAR]#9####9##9#####7CT###[CLEAR]##AT#######C##P",
+          "address": "$009951",
+          "pointer": "$1951",
+          "length": 83
+        },
+        {
+          "id": 113,
+          "text": "##",
+          "address": "$00C9AD",
+          "pointer": "$C9AD",
+          "length": 3
+        },
+        {
+          "id": 114,
+          "text": "#########o#T#####QC##P",
+          "address": "$008D19",
+          "pointer": "$8D19",
+          "length": 23
+        },
+        {
+          "id": 115,
+          "text": "##########o#T#########",
+          "address": "$0099CA",
+          "pointer": "$19CA",
+          "length": 23
+        },
+        {
+          "id": 116,
+          "text": "####################################################################################o#P#L#C##C##CS#CV#P[WAIT]###P##a#P##3#####g####o#C##P#",
+          "address": "$0080A9",
+          "pointer": "$00A9",
+          "length": 135
+        },
+        {
+          "id": 117,
+          "text": "####5#G#",
+          "address": "$00ADEB",
+          "pointer": "$ADEB",
+          "length": 9
+        },
+        {
+          "id": 118,
+          "text": "T#########",
+          "address": "$0099D6",
+          "pointer": "$19D6",
+          "length": 11
+        },
+        {
+          "id": 119,
+          "text": "#E#0#j###j###P#D##T####[CLEAR]####0D####yP",
+          "address": "$00BFAA",
+          "pointer": "$BFAA",
+          "length": 37
+        },
+        {
+          "id": 120,
+          "text": "#T########P[CLEAR]######T####[CLEAR]########o#T###",
+          "address": "$00D0F4",
+          "pointer": "$D0F4",
+          "length": 41
+        },
+        {
+          "id": 121,
+          "text": "#####",
+          "address": "$008D7F",
+          "pointer": "$8D7F",
+          "length": 6
+        },
+        {
+          "id": 122,
+          "text": "T##########o#T#########",
+          "address": "$0099C9",
+          "pointer": "$19C9",
+          "length": 24
+        },
+        {
+          "id": 123,
+          "text": "oLpLpLpLp#o#o#o#o#o#o#o##q#Fq###q##q###o#TD####TE######u###o#P##3#G[NAME]",
+          "address": "$00C208",
+          "pointer": "$C208",
+          "length": 69
+        },
+        {
+          "id": 124,
+          "text": "##RTS##\n#####[CLEAR]#S###[WAIT]#[ITEM]##0###MI##J##o#-#########o#T#",
+          "address": "$008A30",
+          "pointer": "$8A30",
+          "length": 52
+        },
+        {
+          "id": 125,
+          "text": "###########yyyy#y",
+          "address": "$008A0A",
+          "pointer": "$0A0A",
+          "length": 19
+        },
+        {
+          "id": 126,
+          "text": "#E#0#j###j###P#D##T####[CLEAR]####0D####yP",
+          "address": "$00BFAA",
+          "pointer": "$BFAA",
+          "length": 37
+        },
+        {
+          "id": 127,
+          "text": "####P",
+          "address": "$00CEF4",
+          "pointer": "$CEF4",
+          "length": 6
+        },
+        {
+          "id": 128,
+          "text": "#####",
+          "address": "$008D7F",
+          "pointer": "$8D7F",
+          "length": 6
+        },
+        {
+          "id": 129,
+          "text": "####T##########o#T#########",
+          "address": "$0099C5",
+          "pointer": "$19C5",
+          "length": 28
+        },
+        {
+          "id": 131,
+          "text": "##_###I#",
+          "address": "$00FFCE",
+          "pointer": "$7FCE",
+          "length": 9
+        },
+        {
+          "id": 132,
+          "text": "######t#####qP####G#",
+          "address": "$00C78D",
+          "pointer": "$C78D",
+          "length": 21
+        },
+        {
+          "id": 133,
+          "text": "##P#P",
+          "address": "$00A819",
+          "pointer": "$2819",
+          "length": 6
+        },
+        {
+          "id": 134,
+          "text": "##T##F#r#######P[ITEM]######P##P############P",
+          "address": "$00D320",
+          "pointer": "$D320",
+          "length": 41
+        },
+        {
+          "id": 135,
+          "text": "[CLEAR]########U###",
+          "address": "$00A096",
+          "pointer": "$2096",
+          "length": 14
+        },
+        {
+          "id": 136,
+          "text": "#o#T",
+          "address": "$009058",
+          "pointer": "$9058",
+          "length": 5
+        },
+        {
+          "id": 137,
+          "text": "##P#Q#######Q#######Q#######Q####P",
+          "address": "$00E2AD",
+          "pointer": "$E2AD",
+          "length": 35
+        },
+        {
+          "id": 138,
+          "text": "T#########L#T########T#########L#P##[ITEM]####################################o#P#\n#_#o#P#\n#################o#P####O######8######8######8########P##Tg###P_#P####P_#P###G#",
+          "address": "$00D019",
+          "pointer": "$D019",
+          "length": 166
+        },
+        {
+          "id": 139,
+          "text": "#P#9",
+          "address": "$00A220",
+          "pointer": "$A220",
+          "length": 5
+        },
+        {
+          "id": 140,
+          "text": "#############_####[ITEM]##########################################################################################################################################################################################################################################o#P#L#C##C##CS#CV#P[WAIT]###P##a#P##3#####g####o#C##P#",
+          "address": "$008000",
+          "pointer": "$0000",
+          "length": 304
+        },
+        {
+          "id": 141,
+          "text": "vjvjvjLpLpLpLp#j#j#j#j&j#j#k##q0[CLEAR]#Fq###q0[CLEAR]##q###o##E#0#i#####i#######u###o##E#0#######j###########G[NAME]",
+          "address": "$00BDAD",
+          "pointer": "$BDAD",
+          "length": 101
+        },
+        {
+          "id": 142,
+          "text": "####",
+          "address": "$009A19",
+          "pointer": "$1A19",
+          "length": 5
+        },
+        {
+          "id": 143,
+          "text": "T##v_##P####I[NAME]",
+          "address": "$00FF18",
+          "pointer": "$7F18",
+          "length": 15
+        },
+        {
+          "id": 144,
+          "text": "#[NAME]#[ITEM]#_#[ITEM]#######I[WAIT]",
+          "address": "$0096CB",
+          "pointer": "$96CB",
+          "length": 18
+        },
+        {
+          "id": 145,
+          "text": "########o##M[WAIT]K[NAME]P#",
+          "address": "$00A901",
+          "pointer": "$2901",
+          "length": 18
+        },
+        {
+          "id": 146,
+          "text": "###o#T#####QC##P",
+          "address": "$008D1F",
+          "pointer": "$8D1F",
+          "length": 17
+        },
+        {
+          "id": 147,
+          "text": "[ITEM]#T#########T##########o#T#########",
+          "address": "$0099BD",
+          "pointer": "$19BD",
+          "length": 36
+        },
+        {
+          "id": 148,
+          "text": "0#j###j###P#D##T####[CLEAR]####0D####yP",
+          "address": "$00BFAD",
+          "pointer": "$BFAD",
+          "length": 34
+        },
+        {
+          "id": 149,
+          "text": "l##",
+          "address": "$009819",
+          "pointer": "$1819",
+          "length": 4
+        },
+        {
+          "id": 150,
+          "text": "#",
+          "address": "$00CC7F",
+          "pointer": "$CC7F",
+          "length": 2
+        },
+        {
+          "id": 151,
+          "text": "I##P#",
+          "address": "$008196",
+          "pointer": "$0196",
+          "length": 6
+        },
+        {
+          "id": 152,
+          "text": "\n#[ITEM]##P[WAIT]#[WAIT]#P\n#[CLEAR]#C",
+          "address": "$008F29",
+          "pointer": "$0F29",
+          "length": 17
+        },
+        {
+          "id": 153,
+          "text": "#######T###0D####y###D#####o##E#0#j###j###P#D##T####[CLEAR]####0D####yP",
+          "address": "$00BF8D",
+          "pointer": "$BF8D",
+          "length": 66
+        },
+        {
+          "id": 154,
+          "text": "####################################################################################################################################################################################################################################o#P#L#C##C##CS#CV#P[WAIT]###P##a#P##3#####g####o#C##P#",
+          "address": "$008019",
+          "pointer": "$8019",
+          "length": 279
+        },
+        {
+          "id": 155,
+          "text": "D##P#9",
+          "address": "$00A21E",
+          "pointer": "$A21E",
+          "length": 7
+        },
+        {
+          "id": 156,
+          "text": "#############_####[ITEM]##########################################################################################################################################################################################################################################o#P#L#C##C##CS#CV#P[WAIT]###P##a#P##3#####g####o#C##P#",
+          "address": "$008000",
+          "pointer": "$0000",
+          "length": 304
+        },
+        {
+          "id": 157,
+          "text": "vjvjvjLpLpLpLp#j#j#j#j&j#j#k##q0[CLEAR]#Fq###q0[CLEAR]##q###o##E#0#i#####i#######u###o##E#0#######j###########G[NAME]",
+          "address": "$00BDAD",
+          "pointer": "$BDAD",
+          "length": 101
+        },
+        {
+          "id": 158,
+          "text": "l##",
+          "address": "$009819",
+          "pointer": "$1819",
+          "length": 4
+        },
+        {
+          "id": 159,
+          "text": "b######[CLEAR]######b",
+          "address": "$00CB7F",
+          "pointer": "$CB7F",
+          "length": 16
+        },
+        {
+          "id": 160,
+          "text": "I##P#",
+          "address": "$008196",
+          "pointer": "$0196",
+          "length": 6
+        },
+        {
+          "id": 161,
+          "text": "#o##",
+          "address": "$009F29",
+          "pointer": "$1F29",
+          "length": 6
+        },
+        {
+          "id": 162,
+          "text": "#j####",
+          "address": "$00BD8D",
+          "pointer": "$BD8D",
+          "length": 7
+        },
+        {
+          "id": 163,
+          "text": "[CLEAR]##R###TP",
+          "address": "$00AD19",
+          "pointer": "$AD19",
+          "length": 10
+        },
+        {
+          "id": 164,
+          "text": "T#########T##########o#T#########",
+          "address": "$0099BF",
+          "pointer": "$19BF",
+          "length": 34
+        },
+        {
+          "id": 166,
+          "text": "#",
+          "address": "$00CC7F",
+          "pointer": "$CC7F",
+          "length": 2
+        },
+        {
+          "id": 167,
+          "text": "I##P#",
+          "address": "$008196",
+          "pointer": "$0196",
+          "length": 6
+        },
+        {
+          "id": 168,
+          "text": "\n#[ITEM]##P[WAIT]#[WAIT]#P\n#[CLEAR]#C",
+          "address": "$008F29",
+          "pointer": "$0F29",
+          "length": 17
+        },
+        {
+          "id": 169,
+          "text": "#######T###0D####y###D#####o##E#0#j###j###P#D##T####[CLEAR]####0D####yP",
+          "address": "$00BF8D",
+          "pointer": "$BF8D",
+          "length": 66
+        },
+        {
+          "id": 170,
+          "text": "##",
+          "address": "$00A019",
+          "pointer": "$2019",
+          "length": 3
+        },
+        {
+          "id": 171,
+          "text": "###o#Tl##[WAIT]#P##[CLEAR]#P",
+          "address": "$0088CD",
+          "pointer": "$88CD",
+          "length": 18
+        },
+        {
+          "id": 172,
+          "text": "###T##v[CLEAR]#[CLEAR]C####o#U##b",
+          "address": "$00ABAE",
+          "pointer": "$2BAE",
+          "length": 22
+        },
+        {
+          "id": 173,
+          "text": "#Q##TS###[CLEAR]#S####I\n",
+          "address": "$008E19",
+          "pointer": "$8E19",
+          "length": 20
+        },
+        {
+          "id": 174,
+          "text": "##D##D##D####9[CLEAR]#9####9##9####9[CLEAR]#9####9##9#####7CT###[CLEAR]##AT#######C##P",
+          "address": "$00995F",
+          "pointer": "$195F",
+          "length": 69
+        },
+        {
+          "id": 175,
+          "text": "#[WAIT]####P####C##T####0v####WW#T####XW#U##-U##-T####X###########T#########rT####X0##cX#########o#U##-U##-#",
+          "address": "$00B0C2",
+          "pointer": "$30C2",
+          "length": 106
+        },
+        {
+          "id": 176,
+          "text": "#####x#0[CLEAR]###T#####[NAME]###[CLEAR]#[ITEM]T####P[CLEAR]###G",
+          "address": "$00EAAF",
+          "pointer": "$EAAF",
+          "length": 37
+        },
+        {
+          "id": 177,
+          "text": "########o#P#L#C##C##CS#CV#P[WAIT]###P##a#P##3#####g####o#C##P#",
+          "address": "$0080F5",
+          "pointer": "$00F5",
+          "length": 59
+        },
+        {
+          "id": 178,
+          "text": "####w#C##C##T#####P[WAIT]###P####P##Tg##3#####U##T##D##C####y#w###U##T##D##j######D##P##TgU##T#####P###wC##C##P\n####w###3Ta####a#U##T#####P###wU##PW###D##j#########D##C####yU##PY###D##P[WAIT]#####yT######F#U##j#########U##T##D##C####yU##T##D##P[WAIT]#####y##U##T##D##T##D##U##T##D##T##D#####o####T##v[WAIT]##P",
+          "address": "$00CD8D",
+          "pointer": "$4D8D",
+          "length": 290
+        },
+        {
+          "id": 180,
+          "text": "#q#Fq###q##q###o#TD####TE######u###o#P##3#G[NAME]",
+          "address": "$00C220",
+          "pointer": "$C220",
+          "length": 45
+        },
+        {
+          "id": 181,
+          "text": "L#D\n#D[ITEM]####D##D##P#9",
+          "address": "$00A210",
+          "pointer": "$A210",
+          "length": 21
+        },
+        {
+          "id": 182,
+          "text": "###o######o#M[NAME]i#Mj#MQL#v#",
+          "address": "$00A11F",
+          "pointer": "$A11F",
+          "length": 26
+        },
+        {
+          "id": 183,
+          "text": "#L[WAIT]####",
+          "address": "$00868E",
+          "pointer": "$068E",
+          "length": 9
+        },
+        {
+          "id": 184,
+          "text": "####o##M[WAIT]K[NAME]P#",
+          "address": "$00A905",
+          "pointer": "$A905",
+          "length": 14
+        },
+        {
+          "id": 185,
+          "text": "##o#T#########T#########o#T#####QC##P",
+          "address": "$008D0A",
+          "pointer": "$8D0A",
+          "length": 38
+        },
+        {
+          "id": 186,
+          "text": "[WAIT]#I",
+          "address": "$008505",
+          "pointer": "$0505",
+          "length": 4
+        },
+        {
+          "id": 187,
+          "text": "########T####T############W####T####T####v[CLEAR]#[NAME]P##[NAME]T####W###",
+          "address": "$0094A9",
+          "pointer": "$14A9",
+          "length": 59
+        },
+        {
+          "id": 188,
+          "text": "[WAIT]#\n#[WAIT]##o######I",
+          "address": "$00A68D",
+          "pointer": "$268D",
+          "length": 16
+        },
+        {
+          "id": 189,
+          "text": "[CLEAR]##R###TP",
+          "address": "$00AD19",
+          "pointer": "$AD19",
+          "length": 10
+        },
+        {
+          "id": 190,
+          "text": "P##P######99[WAIT]#9###9_#9##P#####P##o#I#",
+          "address": "$009926",
+          "pointer": "$1926",
+          "length": 38
+        },
+        {
+          "id": 191,
+          "text": "#p##r##r#P[CLEAR]",
+          "address": "$008FC9",
+          "pointer": "$0FC9",
+          "length": 12
+        },
+        {
+          "id": 192,
+          "text": "##[CLEAR]#T##o##",
+          "address": "$0088B0",
+          "pointer": "$08B0",
+          "length": 12
+        },
+        {
+          "id": 193,
+          "text": "##C##C####",
+          "address": "$0085C9",
+          "pointer": "$05C9",
+          "length": 11
+        },
+        {
+          "id": 194,
+          "text": "##[CLEAR]#T##o##",
+          "address": "$0088B0",
+          "pointer": "$08B0",
+          "length": 12
+        },
+        {
+          "id": 195,
+          "text": "P[CLEAR]",
+          "address": "$00B9A9",
+          "pointer": "$39A9",
+          "length": 3
+        },
+        {
+          "id": 196,
+          "text": "\n#",
+          "address": "$008680",
+          "pointer": "$0680",
+          "length": 4
+        },
+        {
+          "id": 197,
+          "text": "####T###",
+          "address": "$00B7A9",
+          "pointer": "$37A9",
+          "length": 10
+        },
+        {
+          "id": 198,
+          "text": "####C#####T1####U#####P###\n##1T##v##[NAME]##A",
+          "address": "$008280",
+          "pointer": "$0280",
+          "length": 41
+        },
+        {
+          "id": 199,
+          "text": "###j#d####P######c#########o#T######T######P",
+          "address": "$00B6A9",
+          "pointer": "$36A9",
+          "length": 45
+        },
+        {
+          "id": 200,
+          "text": "######x#0[CLEAR]###T#####[NAME]###[CLEAR]#[ITEM]T####P[CLEAR]###G",
+          "address": "$00EAAE",
+          "pointer": "$EAAE",
+          "length": 38
+        },
+        {
+          "id": 201,
+          "text": "##",
+          "address": "$00A019",
+          "pointer": "$2019",
+          "length": 3
+        },
+        {
+          "id": 202,
+          "text": "#-#o#-#",
+          "address": "$00CACF",
+          "pointer": "$CACF",
+          "length": 9
+        },
+        {
+          "id": 203,
+          "text": "#############################################################################################################################o#P#L#C##C##CS#CV#P[WAIT]###P##a#P##3#####g####o#C##P#",
+          "address": "$008080",
+          "pointer": "$0080",
+          "length": 176
+        },
+        {
+          "id": 204,
+          "text": "##3#####U##T##D##C####y#w###U##T##D##j######D##P##TgU##T#####P###wC##C##P\n####w###3Ta####a#U##T#####P###wU##PW###D##j#########D##C####yU##PY###D##P[WAIT]#####yT######F#U##j#########U##T##D##C####yU##T##D##P[WAIT]#####y##U##T##D##T##D##U##T##D##T##D#####o####T##v[WAIT]##P",
+          "address": "$00CDAE",
+          "pointer": "$4DAE",
+          "length": 257
+        },
+        {
+          "id": 205,
+          "text": "E",
+          "address": "$00BF19",
+          "pointer": "$BF19",
+          "length": 2
+        },
+        {
+          "id": 206,
+          "text": "#I########Co#P####P###7",
+          "address": "$00F5F2",
+          "pointer": "$F5F2",
+          "length": 24
+        },
+        {
+          "id": 207,
+          "text": "####G##I#",
+          "address": "$00E800",
+          "pointer": "$E800",
+          "length": 10
+        },
+        {
+          "id": 208,
+          "text": "##T####_###I#",
+          "address": "$00FFC9",
+          "pointer": "$FFC9",
+          "length": 14
+        },
+        {
+          "id": 209,
+          "text": "#-###o#P",
+          "address": "$00AFF0",
+          "pointer": "$2FF0",
+          "length": 9
+        },
+        {
+          "id": 210,
+          "text": "####################################################o#P#L#C##C##CS#CV#P[WAIT]###P##a#P##3#####g####o#C##P#",
+          "address": "$0080C9",
+          "pointer": "$80C9",
+          "length": 103
+        },
+        {
+          "id": 212,
+          "text": "##o####Ql####r#l####t###6##0Tj####",
+          "address": "$00C98D",
+          "pointer": "$498D",
+          "length": 35
+        },
+        {
+          "id": 213,
+          "text": "o#P##\n#L_#Rj",
+          "address": "$00A919",
+          "pointer": "$A919",
+          "length": 13
+        },
+        {
+          "id": 214,
+          "text": "o#T#########T#########o#T#####QC##P",
+          "address": "$008D0C",
+          "pointer": "$8D0C",
+          "length": 36
+        },
+        {
+          "id": 215,
+          "text": "#",
+          "address": "$00994A",
+          "pointer": "$194A",
+          "length": 2
+        },
+        {
+          "id": 216,
+          "text": "##########R###-###U##V##V######o#P",
+          "address": "$00AEDA",
+          "pointer": "$AEDA",
+          "length": 35
+        },
+        {
+          "id": 217,
+          "text": "#####",
+          "address": "$0099EA",
+          "pointer": "$19EA",
+          "length": 6
+        },
+        {
+          "id": 218,
+          "text": "###P#\n#C[WAIT]####C##C####",
+          "address": "$0085BD",
+          "pointer": "$85BD",
+          "length": 23
+        },
+        {
+          "id": 219,
+          "text": "########o#T#####QC##P",
+          "address": "$008D1A",
+          "pointer": "$8D1A",
+          "length": 22
+        },
+        {
+          "id": 220,
+          "text": "###99[WAIT]#9###9_#9##P#####P##o#I#",
+          "address": "$00992D",
+          "pointer": "$192D",
+          "length": 31
+        },
+        {
+          "id": 221,
+          "text": "####",
+          "address": "$0087BD",
+          "pointer": "$87BD",
+          "length": 6
+        },
+        {
+          "id": 222,
+          "text": "########o#T#####QC##P",
+          "address": "$008D1A",
+          "pointer": "$8D1A",
+          "length": 22
+        },
+        {
+          "id": 223,
+          "text": "##99[WAIT]#9###9_#9##P#####P##o#I#",
+          "address": "$00992E",
+          "pointer": "$192E",
+          "length": 30
+        },
+        {
+          "id": 224,
+          "text": "##a####[CLEAR]##HP",
+          "address": "$00A0FA",
+          "pointer": "$20FA",
+          "length": 13
+        },
+        {
+          "id": 225,
+          "text": "#o#T####FT###",
+          "address": "$009681",
+          "pointer": "$9681",
+          "length": 15
+        },
+        {
+          "id": 226,
+          "text": "##F#r##########P[ITEM]###P##q#####tP##q#I###\n[ITEM]T#####",
+          "address": "$00D580",
+          "pointer": "$D580",
+          "length": 48
+        },
+        {
+          "id": 227,
+          "text": "#z##0[NAME]####O#######",
+          "address": "$00F2BF",
+          "pointer": "$F2BF",
+          "length": 19
+        },
+        {
+          "id": 228,
+          "text": "########o#P#L#C##C##CS#CV#P[WAIT]###P##a#P##3#####g####o#C##P#",
+          "address": "$0080F5",
+          "pointer": "$00F5",
+          "length": 59
+        },
+        {
+          "id": 230,
+          "text": "I#",
+          "address": "$009949",
+          "pointer": "$1949",
+          "length": 3
+        },
+        {
+          "id": 231,
+          "text": "##j#####U##j#####j#####U##j#####j#####U##j#####j#####G#",
+          "address": "$00DD20",
+          "pointer": "$DD20",
+          "length": 56
+        },
+        {
+          "id": 232,
+          "text": "###############################################################################################o#P#L#C##C##CS#CV#P[WAIT]###P##a#P##3#####g####o#C##P#",
+          "address": "$00809E",
+          "pointer": "$809E",
+          "length": 146
+        },
+        {
+          "id": 233,
+          "text": "####",
+          "address": "$008EC8",
+          "pointer": "$8EC8",
+          "length": 5
+        },
+        {
+          "id": 234,
+          "text": "[WAIT]#D_#D##D##D##D##D##D##D##D####9[CLEAR]#9####9##9####9[CLEAR]#9####9##9#####7CT###[CLEAR]##AT#######C##P",
+          "address": "$00994D",
+          "pointer": "$194D",
+          "length": 87
+        },
+        {
+          "id": 235,
+          "text": "###L#T########T#########L#P##[ITEM]####################################o#P#\n#_#o#P#\n#################o#P####O######8######8######8########P##Tg###P_#P####P_#P###G#",
+          "address": "$00D020",
+          "pointer": "$D020",
+          "length": 159
+        },
+        {
+          "id": 236,
+          "text": "#",
+          "address": "$00AD82",
+          "pointer": "$AD82",
+          "length": 2
+        },
+        {
+          "id": 237,
+          "text": "P##P######99[WAIT]#9###9_#9##P#####P##o#I#",
+          "address": "$009926",
+          "pointer": "$1926",
+          "length": 38
+        },
+        {
+          "id": 238,
+          "text": "##T#############o#####I",
+          "address": "$008BC9",
+          "pointer": "$0BC9",
+          "length": 24
+        },
+        {
+          "id": 239,
+          "text": "###",
+          "address": "$0085D0",
+          "pointer": "$05D0",
+          "length": 4
+        },
+        {
+          "id": 240,
+          "text": "##o#T##v######G#",
+          "address": "$00A2A9",
+          "pointer": "$22A9",
+          "length": 18
+        },
+        {
+          "id": 241,
+          "text": "TP",
+          "address": "$00AD20",
+          "pointer": "$AD20",
+          "length": 3
+        },
+        {
+          "id": 242,
+          "text": "#s######w#######P",
+          "address": "$00CEBA",
+          "pointer": "$CEBA",
+          "length": 18
+        },
+        {
+          "id": 243,
+          "text": "P##P######99[WAIT]#9###9_#9##P#####P##o#I#",
+          "address": "$009926",
+          "pointer": "$1926",
+          "length": 38
+        },
+        {
+          "id": 244,
+          "text": "Ql####r#l####t#8Q##l####v###-##o#I###\n[ITEM]T###",
+          "address": "$009110",
+          "pointer": "$9110",
+          "length": 44
+        },
+        {
+          "id": 245,
+          "text": "##0#######0##z##z#9##u####pP##RGq#I",
+          "address": "$00E7AD",
+          "pointer": "$E7AD",
+          "length": 36
+        },
+        {
+          "id": 246,
+          "text": "#########o#T#####QC##P",
+          "address": "$008D19",
+          "pointer": "$8D19",
+          "length": 23
+        },
+        {
+          "id": 247,
+          "text": "#####99[WAIT]#9###9_#9##P#####P##o#I#",
+          "address": "$00992B",
+          "pointer": "$192B",
+          "length": 33
+        },
+        {
+          "id": 248,
+          "text": "l#0\n######o#P",
+          "address": "$00AC9C",
+          "pointer": "$2C9C",
+          "length": 14
+        },
+        {
+          "id": 249,
+          "text": "##",
+          "address": "$00A019",
+          "pointer": "$2019",
+          "length": 3
+        },
+        {
+          "id": 250,
+          "text": "###o#-######T###",
+          "address": "$008AE5",
+          "pointer": "$8AE5",
+          "length": 18
+        },
+        {
+          "id": 251,
+          "text": "#C###############2##Q#TW##[NAME]##Y\n####",
+          "address": "$00E260",
+          "pointer": "$E260",
+          "length": 36
+        },
+        {
+          "id": 252,
+          "text": "#q#Fq###q##q###o#TD####TE######u###o#P##3#G[NAME]",
+          "address": "$00C220",
+          "pointer": "$C220",
+          "length": 45
+        },
+        {
+          "id": 253,
+          "text": "##R####P###",
+          "address": "$00A010",
+          "pointer": "$2010",
+          "length": 12
+        },
+        {
+          "id": 254,
+          "text": "###o#P####",
+          "address": "$008B76",
+          "pointer": "$8B76",
+          "length": 11
+        },
+        {
+          "id": 255,
+          "text": "#########'#####S##P",
+          "address": "$00F220",
+          "pointer": "$7220",
+          "length": 20
+        }
+      ]
+    }
+  }
+}

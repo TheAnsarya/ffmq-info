@@ -1,0 +1,76 @@
+================================================================================
+ Final Fantasy Mystic Quest - Text Statistics
+================================================================================
+
+Total Strings:     924
+Total Bytes:       18,418
+Total Tables:      8
+
+Control Code Usage:
+--------------------------------------------------------------------------------
+  NEWLINE   :   166
+  WAIT      :   124
+  CLEAR     :   207
+  NAME      :    79
+  ITEM      :    56
+
+Table Statistics:
+--------------------------------------------------------------------------------
+
+item_names:
+  Count:       232
+  Total size:   2480 bytes
+  Avg length:   10.7 bytes
+  Min length:    2 bytes
+  Max length:   12 bytes
+
+weapon_names:
+  Count:        57
+  Total size:    599 bytes
+  Avg length:   10.5 bytes
+  Min length:    2 bytes
+  Max length:   12 bytes
+
+armor_names:
+  Count:        20
+  Total size:    154 bytes
+  Avg length:    7.7 bytes
+  Min length:    2 bytes
+  Max length:   12 bytes
+
+accessory_names:
+  Count:        24
+  Total size:    159 bytes
+  Avg length:    6.6 bytes
+  Min length:    2 bytes
+  Max length:   12 bytes
+
+spell_names:
+  Count:        32
+  Total size:    180 bytes
+  Avg length:    5.6 bytes
+  Min length:    2 bytes
+  Max length:   12 bytes
+
+monster_names:
+  Count:       202
+  Total size:   2538 bytes
+  Avg length:   12.6 bytes
+  Min length:    2 bytes
+  Max length:   16 bytes
+
+location_names:
+  Count:       112
+  Total size:   1720 bytes
+  Avg length:   15.4 bytes
+  Min length:    2 bytes
+  Max length:   20 bytes
+
+dialog:
+  Count:       245
+  Total size:  10588 bytes
+  Avg length:   43.2 bytes
+  Min length:    2 bytes
+  Max length:  304 bytes
+
+================================================================================
