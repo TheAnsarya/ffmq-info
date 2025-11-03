@@ -1,0 +1,599 @@
+=Main=
+
+{{Todo | Document all menu data structures, UI layouts, window systems, and text rendering}}
+
+[[Final Fantasy: Mystic Quest/ROM map]]
+
+==Menu System Overview==
+
+Final Fantasy: Mystic Quest uses a window-based menu system with:
+* '''Main Menu:''' Item, Magic, Status, Config
+* '''Battle Menu:''' Attack, Magic, Item, Run
+* '''Shop Menu:''' Buy, Sell, Exit
+* '''Dialog Windows:''' NPC conversations, narration
+
+==Menu Window Format==
+
+===Window Data Structure===
+
+Each menu window is defined by:
+
+{| class="wikitable"
+! Offset !! Size !! Description
+|-
+| $00 || byte || Window ID
+|-
+| $01 || byte || X position (in tiles)
+|-
+| $02 || byte || Y position (in tiles)
+|-
+| $03 || byte || Width (in tiles)
+|-
+| $04 || byte || Height (in tiles)
+|-
+| $05 || byte || Border style
+|-
+| $06-$07 || word || Background palette
+|-
+| $08-$09 || word || Text palette
+|-
+| $0a || byte || Window flags
+|-
+| $0b || byte || Reserved
+|}
+
+===Window Border Styles===
+
+{| class="wikitable"
+! Style ID !! Description !! Used In
+|-
+| $00 || Plain || Simple single-line border
+|-
+| $01 || Ornate || Fancy double-line border
+|-
+| $02 || Rounded || Rounded corners
+|-
+| $03 || Battle || Battle menu style
+|-
+| $04 || Dialog || NPC dialog box
+|-
+| $05 || Status || Status screen border
+|-
+|}
+
+===Window Flags===
+
+{| class="wikitable"
+! Bit !! Flag !! Description
+|-
+| 0 || Visible || Window is rendered
+|-
+| 1 || Has Cursor || Shows selection cursor
+|-
+| 2 || Auto-close || Closes after selection
+|-
+| 3 || Scrollable || Can scroll content
+|-
+| 4 || Transparent || Semi-transparent background
+|-
+| 5 || Centered || Auto-center on screen
+|-
+| 6 || Modal || Blocks other input
+|-
+| 7 || Animated || Has open/close animation
+|}
+
+==Menu Palette Data==
+
+ROM offset: '''$038200''' (unheadered)
+
+Each palette is 16 colors (32 bytes):
+
+{| class="wikitable"
+! Palette !! Description !! Color 0 !! Color 1 !! Color 2 !! Color 3
+|-
+| 0 || Main Menu || Black || White || Light Gray || Dark Gray
+|-
+| 1 || Battle Menu || Dark Blue || Yellow || White || Light Blue
+|-
+| 2 || Item Menu || Dark Green || Light Green || White || Yellow
+|-
+| 3 || Magic Menu || Dark Purple || Light Purple || White || Pink
+|-
+| 4 || Status Screen || Dark Brown || Tan || White || Gold
+|-
+| 5 || Dialog Box || Blue || White || Light Blue || Yellow
+|-
+| 6 || Shop Menu || Dark Red || Light Red || White || Gold
+|-
+| 7 || Config Menu || Black || Green || White || Light Green
+|-
+|}
+
+==Main Menu==
+
+===Main Menu Structure===
+
+{| class="wikitable"
+! ROM Offset !! Data !! Description
+|-
+| $070000 || Window layout || Menu window positions
+|-
+| $070010 || Option list || Item, Magic, Status, Config
+|-
+| $070020 || Cursor data || Cursor position and graphics
+|-
+| $070030 || Icon data || Menu option icons
+|}
+
+===Main Menu Options===
+
+{| class="wikitable"
+! Option !! Icon ID !! Description !! Submenu
+|-
+| Item || $00 || Use/view items || Item list
+|-
+| Magic || $01 || Cast magic || Magic list
+|-
+| Status || $02 || View character stats || Status screen
+|-
+| Config || $03 || Game settings || Config options
+|}
+
+==Item Menu==
+
+===Item List Format===
+
+{| class="wikitable"
+! Offset !! Size !! Description
+|-
+| $00 || byte || Item ID
+|-
+| $01 || byte || Item count
+|-
+| $02 || byte || Icon ID
+|-
+| $03 || byte || Name pointer (low)
+|-
+| $04 || byte || Name pointer (high)
+|-
+| $05 || byte || Item flags
+|-
+|}
+
+===Item Icon IDs===
+
+{| class="wikitable"
+! Icon ID !! Item Type !! Description
+|-
+| $a0 || Cure Potion || Green bottle
+|-
+| $a1 || Heal Potion || Blue bottle
+|-
+| $a2 || Seed || Yellow seed
+|-
+| $a3 || Refresher || Purple bottle
+|-
+| $a4 || Crest || Crystal icon
+|-
+| $a5 || Key Item || Unique item icon
+|}
+
+==Magic Menu==
+
+===Magic List Format===
+
+{| class="wikitable"
+! Offset !! Size !! Description
+|-
+| $00 || byte || Spell ID
+|-
+| $01 || byte || MP cost
+|-
+| $02 || byte || Icon ID
+|-
+| $03 || byte || Spell type (White/Black/Wizard)
+|-
+| $04-$05 || word || Name pointer
+|-
+| $06 || byte || Spell flags
+|-
+|}
+
+===Magic Categories===
+
+{| class="wikitable"
+! Category !! Color !! Spells
+|-
+| White Magic || White || Cure, Heal, Life, Exit
+|-
+| Black Magic || Black || Fire, Blizzard, Thunder, Quake
+|-
+| Wizard Magic || Purple || Aero, White, Meteor, Flare
+|}
+
+===Magic Icon IDs===
+
+{| class="wikitable"
+! Icon ID !! Spell Type !! Description
+|-
+| $a6 || White Magic || Cross/plus icon
+|-
+| $a7 || Black Magic || Flame icon
+|-
+| $a8 || Wizard Magic || Star icon
+|}
+
+==Status Screen==
+
+ROM offset: '''$072000''' (unheadered)
+
+===Status Display Layout===
+
+{| class="wikitable"
+! Element !! X !! Y !! Width !! Description
+|-
+| Character Name || 2 || 2 || 8 || Name text
+|-
+| Portrait || 12 || 2 || 8×8 || Character face
+|-
+| Level || 2 || 4 || 6 || "Lv 99"
+|-
+| HP Bar || 2 || 6 || 16 || Current/Max HP
+|-
+| MP Bars || 2 || 8 || 16 || White/Black/Wizard MP
+|-
+| Stats || 2 || 12 || 12 || Attack, Defense, Speed, Magic
+|-
+| Equipment || 2 || 18 || 12 || Weapon, Armor, Shield
+|-
+| Experience || 2 || 24 || 10 || Current XP / To Next Level
+|}
+
+===HP/MP Bar Graphics===
+
+{| class="wikitable"
+! Bar Type !! Color !! Segments !! Max Value
+|-
+| HP (Figure) || Green → Yellow → Red || 20 || 65535
+|-
+| HP (Scale) || Green → Yellow → Red || 20 || 1640 display
+|-
+| White MP || White || 10 || 99
+|-
+| Black MP || Black || 10 || 99
+|-
+| Wizard MP || Purple || 10 || 99
+|}
+
+HP bar color changes:
+* Green: 100%-51% HP
+* Yellow: 50%-21% HP
+* Red: 20%-1% HP
+
+==Battle Menu==
+
+===Battle Menu Layout===
+
+{| class="wikitable"
+! ROM Offset !! Data !! Description
+|-
+| $074000 || Window layout || Battle menu window
+|-
+| $074010 || Option list || Attack, Magic, Item, Run
+|-
+| $074020 || Target selection || Enemy targeting cursor
+|}
+
+===Battle Menu Options===
+
+{| class="wikitable"
+! Option !! Icon ID !! Description
+|-
+| Attack || $b0 || Physical attack with equipped weapon
+|-
+| Magic || $b1 || Cast spell from learned magic
+|-
+| Item || $b2 || Use item from inventory
+|-
+| Run || $b3 || Attempt to flee battle
+|}
+
+===Battle Status Display===
+
+{| class="wikitable"
+! Element !! X !! Y !! Description
+|-
+| Character Name || 2 || 20 || Current character's turn
+|-
+| HP Bar || 2 || 22 || Current/Max HP display
+|-
+| MP Indicators || 10 || 22 || White/Black/Wizard MP counts
+|-
+| Status Icons || 2 || 24 || Poison, Sleep, etc. icons
+|}
+
+==Shop Menu==
+
+===Shop Window Layout===
+
+{| class="wikitable"
+! Window !! X !! Y !! Width !! Height !! Description
+|-
+| Shop Options || 2 || 2 || 10 || 6 || Buy, Sell, Exit
+|-
+| Item List || 2 || 10 || 12 || 14 || Items for sale
+|-
+| Item Description || 16 || 10 || 12 || 6 || Selected item info
+|-
+| Gold Display || 16 || 18 || 12 || 4 || Current gold
+|-
+| Quantity Input || 8 || 22 || 8 || 4 || Buy/sell amount
+|}
+
+===Shop Item Entry===
+
+{| class="wikitable"
+! Offset !! Size !! Description
+|-
+| $00 || byte || Item ID
+|-
+| $01-$02 || word || Buy price
+|-
+| $03-$04 || word || Sell price
+|-
+| $05 || byte || Stock quantity (255 = infinite)
+|-
+|}
+
+==Dialog System==
+
+===Dialog Window Format===
+
+{| class="wikitable"
+! Offset !! Size !! Description
+|-
+| $00 || byte || Window type (top/bottom/center)
+|-
+| $01 || byte || NPC portrait ID (if applicable)
+|-
+| $02-$03 || word || Text pointer
+|-
+| $04 || byte || Text speed
+|-
+| $05 || byte || Auto-advance flag
+|-
+|}
+
+===Dialog Control Codes===
+
+{| class="wikitable"
+! Code !! Description
+|-
+| $00 || End of text
+|-
+| $01 || New line
+|-
+| $02 || Wait for button press
+|-
+| $03 || Clear window
+|-
+| $04 || Show portrait
+|-
+| $05 || Play sound effect
+|-
+| $06 || Pause (delay)
+|-
+| $07 || Character name insert
+|-
+| $08 || Item name insert
+|-
+| $09 || Number insert
+|-
+| $0a || Color change
+|}
+
+==Text Rendering==
+
+===Font Tile Data===
+
+ROM offset: '''$058000''' (unheadered)
+
+Font uses 2BPP format (4 colors per character).
+
+===Character Width Table===
+
+{| class="wikitable"
+! Char !! Width !! Char !! Width !! Char !! Width
+|-
+| A-M || 6px || N-Z || 6px || 0-9 || 6px
+|-
+| a-m || 5px || n-z || 5px || . || 2px
+|-
+| , || 2px || ! || 2px || ? || 6px
+|}
+
+===Variable-Width Font Rendering===
+
+Text is rendered with variable width using a width table:
+
+```
+For each character:
+  1. Read character code from text data
+  2. Look up width in width table
+  3. Draw character at current X position
+  4. Advance X by character width + 1px spacing
+```
+
+==Config Menu==
+
+===Config Options===
+
+{| class="wikitable"
+! Option !! Values !! Description
+|-
+| Message Speed || 1-8 || Text display speed
+|-
+| Battle Speed || Slow/Normal/Fast || Battle animation speed
+|-
+| Life Indicator || Scale/Figure || HP display mode
+|-
+| Window Color || 0-15 || Menu window background
+|-
+| Sound || Mono/Stereo || Audio output mode
+|}
+
+===Window Color Table===
+
+ROM offset: '''$038400''' (unheadered)
+
+16 predefined window color schemes:
+
+{| class="wikitable"
+! ID !! Name !! Background Color !! Border Color
+|-
+| 0 || Blue || $18c0 (dark blue) || $7fff (white)
+|-
+| 1 || Red || $001c (dark red) || $7fff (white)
+|-
+| 2 || Green || $0380 (dark green) || $7fff (white)
+|-
+| 3 || Purple || $4018 (dark purple) || $7fff (white)
+|-
+| 4 || Black || $0000 (black) || $7fff (white)
+|-
+|}
+
+{{Todo | Document all 16 window color schemes}}
+
+==Cursor Graphics==
+
+===Cursor Sprite Data===
+
+{| class="wikitable"
+! Cursor Type !! Tiles !! Animation Frames !! Description
+|-
+| Menu Cursor || 1 || 4 || Pointing hand
+|-
+| Battle Target || 2 || 2 || Flashing arrow
+|-
+| Shop Cursor || 1 || 4 || Gold coin
+|-
+| Text Cursor || 1 || 2 || Blinking triangle
+|}
+
+===Cursor Animation===
+
+```
+Frame 0: 10 ticks
+Frame 1: 10 ticks
+Frame 2: 10 ticks
+Frame 3: 10 ticks
+Loop back to Frame 0
+```
+
+==Number Display==
+
+===Damage Number Rendering===
+
+Battle damage numbers are rendered using special font:
+
+{| class="wikitable"
+! Number Type !! Color !! Size !! Duration
+|-
+| Physical Damage || White || 8×8 || 60 frames
+|-
+| Magic Damage || Yellow || 8×8 || 60 frames
+|-
+| Critical Hit || Red || 12×12 || 90 frames
+|-
+| Healing || Green || 8×8 || 60 frames
+|-
+| Miss || Gray || 8×8 || 45 frames
+|}
+
+===Number Bounce Animation===
+
+```
+Frame 0-10: Rise (Y -= 2 per frame)
+Frame 11-20: Peak (Y constant)
+Frame 21-40: Fall (Y += 1 per frame)
+Frame 41-60: Fade out (alpha decrease)
+```
+
+==Special UI Elements==
+
+===Experience Bar===
+
+Displayed after battle victories:
+
+{| class="wikitable"
+! Element !! Description
+|-
+| Bar background || Gray bar
+|-
+| Fill color || Blue
+|-
+| Fill speed || 2% per frame
+|-
+| Level up flash || Gold flash when full
+|}
+
+===Gold Counter===
+
+Gold display with animation:
+
+{| class="wikitable"
+! Element !! Description
+|-
+| Current gold || White text
+|-
+| Gained gold || Yellow text (fades to white)
+|-
+| Count-up speed || 10 gold per frame
+|-
+| Max display || 9,999,999
+|}
+
+==Menu Sound Effects==
+
+{| class="wikitable"
+! Action !! Sound ID !! Description
+|-
+| Cursor Move || $10 || Soft beep
+|-
+| Selection || $11 || Confirm beep
+|-
+| Cancel || $12 || Error beep
+|-
+| Menu Open || $13 || Swoosh sound
+|-
+| Menu Close || $14 || Swoosh sound
+|-
+| Item Use || $15 || Item sound
+|-
+| Purchase || $16 || Cash register
+|-
+|}
+
+==Notes==
+
+* Menu system uses tile-based rendering
+* Window borders are drawn using 3×3 tile patterns
+* All menus support controller and button input
+* Dialog text supports multiple languages (English, French, German, Japanese)
+* Maximum window dimensions: 32×28 tiles (screen resolution 256×224)
+* Cursor input delay: 8 frames between repeated inputs
+* Menu fade-in/out: 15 frames transition
+
+{{Todo | Document menu scripting system}}
+{{Todo | Map all menu graphics tiles}}
+
+=Related=
+
+* [[Final Fantasy: Mystic Quest/Graphics]] - Menu graphics and font data
+* [[Final Fantasy: Mystic Quest/Text]] - Dialog text and control codes
+* [[Final Fantasy: Mystic Quest/ROM map]] - Complete ROM structure
+* [[Final Fantasy: Mystic Quest (SNES)/Values/Window_Colors]] - Window color reference
+
+{{Internal Data}}

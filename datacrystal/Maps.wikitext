@@ -1,0 +1,567 @@
+=Main=
+
+{{Todo | Document all map data structures, tileset formats, collision data, event triggers, and location pointers}}
+
+[[Final Fantasy: Mystic Quest/ROM map]]
+
+==Map Data Overview==
+
+Final Fantasy: Mystic Quest uses a tile-based map system with:
+* '''Tilemap Data:''' 2D array of tile IDs
+* '''Tile Properties:''' Collision, passability, events
+* '''Event Triggers:''' NPCs, chests, doors, battles
+* '''Location Pointers:''' ROM offsets for each map
+
+==Map Pointer Table==
+
+ROM offset: '''$03b218''' (unheadered)
+
+Each map has a 2-byte pointer to its data:
+
+{| class="wikitable"
+! Map ID !! Pointer !! Description
+|-
+| $00 || $03b300 || Hill of Destiny (starting area)
+|-
+| $01 || $03b800 || Foresta (town)
+|-
+| $02 || $03be00 || Foresta (overworld)
+|-
+| $03 || $03c400 || Aquaria (town)
+|-
+| $04 || $03ca00 || Aquaria (overworld)
+|-
+| $05 || $03d000 || Fireburg (town)
+|-
+| $06 || $03d600 || Fireburg (overworld)
+|-
+| $07 || $03dc00 || Windia (town)
+|-
+| $08 || $03e200 || Windia (overworld)
+|}
+
+{{Todo | Add all 57 map pointers}}
+
+==Map Data Structure==
+
+Each map data block contains:
+
+{| class="wikitable"
+! Offset !! Size !! Description
+|-
+| $00-$01 || word || Map width (in tiles)
+|-
+| $02-$03 || word || Map height (in tiles)
+|-
+| $04 || byte || Tileset ID
+|-
+| $05 || byte || Palette set ID
+|-
+| $06 || byte || Music track ID
+|-
+| $07 || byte || Battle background ID
+|-
+| $08-$09 || word || Tile properties pointer
+|-
+| $0a-$0b || word || Event data pointer
+|-
+| $0c-$0d || word || NPC data pointer
+|-
+| $0e-$0f || word || Chest data pointer
+|-
+| $10-$11 || word || Door/transition data pointer
+|-
+| $12-$13 || word || Tilemap data pointer
+|-
+|}
+
+==Tilemap Data Format==
+
+Tilemap is stored as a 2D array of tile IDs.
+
+===Tilemap Entry Format===
+
+Each tile is '''2 bytes''' (word):
+
+{| class="wikitable"
+! Bits !! Description
+|-
+| 9-0 || Tile ID (0-1023)
+|-
+| 11-10 || Palette index (0-3)
+|-
+| 12 || Flip horizontally
+|-
+| 13 || Flip vertically
+|-
+| 14 || Priority (background/foreground)
+|-
+| 15 || Reserved
+|}
+
+'''Example:'''
+```
+Tile Word: $2145
+Tile ID: $145 (bits 0-9)
+Palette: 0 (bits 10-11)
+H-flip: 1 (bit 12)
+V-flip: 0 (bit 13)
+Priority: 0 (bit 14)
+```
+
+==Tile Properties==
+
+ROM offset: '''$032b00''' (unheadered)
+
+Each tile has a property byte defining collision and behavior:
+
+{| class="wikitable"
+! Bit !! Property !! Description
+|-
+| 0 || Solid || Blocks player movement
+|-
+| 1 || Water || Drowning hazard (requires Aquaria Crest)
+|-
+| 2 || Door || Transition to different map
+|-
+| 3 || Climbable || Stairs, ladders
+|-
+| 4 || Damage || Lava, spikes (deal damage per step)
+|-
+| 5 || Ice || Slippery movement (slide in direction)
+|-
+| 6 || Trigger || Event trigger on step
+|-
+| 7 || Priority || Background layer priority
+|}
+
+===Common Property Values===
+
+{| class="wikitable"
+! Value !! Description
+|-
+| $00 || Passable ground
+|-
+| $01 || Wall/solid obstacle
+|-
+| $02 || Water tile (requires crest)
+|-
+| $04 || Door tile
+|-
+| $08 || Stairs
+|-
+| $10 || Lava (1 HP damage per step)
+|-
+| $20 || Ice (slippery)
+|-
+| $40 || Event trigger
+|-
+| $81 || Solid wall with priority
+|}
+
+==Event Data==
+
+Event data defines interactive objects, NPCs, and triggers.
+
+===Event Entry Format===
+
+Each event is '''8 bytes:'''
+
+{| class="wikitable"
+! Offset !! Size !! Description
+|-
+| $00 || byte || Event type
+|-
+| $01 || byte || X coordinate
+|-
+| $02 || byte || Y coordinate
+|-
+| $03 || byte || Trigger condition
+|-
+| $04-$05 || word || Event script pointer
+|-
+| $06 || byte || Event flags
+|-
+| $07 || byte || Reserved
+|}
+
+===Event Type Values===
+
+{| class="wikitable"
+! Value !! Type !! Description
+|-
+| $00 || None || Empty event slot
+|-
+| $01 || NPC || Talking NPC character
+|-
+| $02 || Chest || Treasure chest
+|-
+| $03 || Door || Map transition
+|-
+| $04 || Item || Pickup item on ground
+|-
+| $05 || Battle || Forced battle encounter
+|-
+| $06 || Boss || Boss battle trigger
+|-
+| $07 || Script || Custom event script
+|-
+| $08 || Cutscene || Story cutscene trigger
+|-
+|}
+
+===Trigger Condition Values===
+
+{| class="wikitable"
+! Value !! Trigger !! Description
+|-
+| $00 || Always || Event always active
+|-
+| $01 || On Touch || Trigger when player steps on tile
+|-
+| $02 || On Talk || Trigger when player presses A button
+|-
+| $03 || Once || Trigger once, then disappear
+|-
+| $04 || Flag Set || Trigger if game flag is set
+|-
+| $05 || Flag Clear || Trigger if game flag is cleared
+|-
+| $06 || Item Held || Trigger if player has item
+|-
+| $07 || Quest Stage || Trigger at specific quest stage
+|}
+
+==NPC Data==
+
+NPC data defines character sprites on maps.
+
+===NPC Entry Format===
+
+Each NPC is '''12 bytes:'''
+
+{| class="wikitable"
+! Offset !! Size !! Description
+|-
+| $00 || byte || NPC sprite ID
+|-
+| $01 || byte || X position
+|-
+| $02 || byte || Y position
+|-
+| $03 || byte || Facing direction
+|-
+| $04 || byte || Movement pattern
+|-
+| $05 || byte || Dialog pointer (low)
+|-
+| $06 || byte || Dialog pointer (mid)
+|-
+| $07 || byte || Dialog pointer (high)
+|-
+| $08 || byte || NPC flags
+|-
+| $09-$0b || 3 bytes || Reserved
+|}
+
+===NPC Sprite IDs===
+
+{| class="wikitable"
+! ID !! Sprite !! Description
+|-
+| $00 || Old Man || Generic elder NPC
+|-
+| $01 || Woman || Generic female NPC
+|-
+| $02 || Man || Generic male NPC
+|-
+| $03 || Child || Kid NPC
+|-
+| $04 || Soldier || Guard/knight NPC
+|-
+| $05 || Merchant || Shop keeper
+|-
+| $06 || Kaeli || Companion character
+|-
+| $07 || Tristam || Companion character
+|-
+| $08 || Phoebe || Companion character
+|-
+| $09 || Reuben || Companion character
+|-
+| $0a || Old Man (sage) || Wise NPC
+|-
+|}
+
+{{Todo | Add all NPC sprite IDs}}
+
+===Movement Pattern Values===
+
+{| class="wikitable"
+! Value !! Pattern !! Description
+|-
+| $00 || Stationary || Doesn't move
+|-
+| $01 || Random Walk || Moves randomly
+|-
+| $02 || Patrol H || Patrols horizontally
+|-
+| $03 || Patrol V || Patrols vertically
+|-
+| $04 || Patrol Box || Patrols in rectangle
+|-
+| $05 || Follow Path || Follows scripted path
+|-
+| $06 || Face Player || Always faces player
+|-
+| $07 || Custom || Custom movement script
+|}
+
+==Chest Data==
+
+Chest data defines treasure locations and contents.
+
+===Chest Entry Format===
+
+Each chest is '''6 bytes:'''
+
+{| class="wikitable"
+! Offset !! Size !! Description
+|-
+| $00 || byte || X position
+|-
+| $01 || byte || Y position
+|-
+| $02 || byte || Chest type (normal, magic, boss)
+|-
+| $03 || byte || Contents type (item, weapon, armor, magic)
+|-
+| $04 || byte || Contents ID
+|-
+| $05 || byte || Chest flag ID (for tracking opened chests)
+|}
+
+===Chest Type Values===
+
+{| class="wikitable"
+! Value !! Type !! Description
+|-
+| $00 || Normal || Standard chest
+|-
+| $01 || Magic || Sparkly magic chest
+|-
+| $02 || Boss || Post-boss chest
+|-
+| $03 || Hidden || Invisible until revealed
+|}
+
+===Contents Type Values===
+
+{| class="wikitable"
+! Value !! Type
+|-
+| $00 || Gold
+|-
+| $01 || Item
+|-
+| $02 || Weapon
+|-
+| $03 || Armor
+|-
+| $04 || Magic spell
+|-
+| $05 || Crest
+|}
+
+==Door/Transition Data==
+
+Door data defines map transitions and teleports.
+
+===Door Entry Format===
+
+Each door is '''10 bytes:'''
+
+{| class="wikitable"
+! Offset !! Size !! Description
+|-
+| $00 || byte || Source X position
+|-
+| $01 || byte || Source Y position
+|-
+| $02 || byte || Destination map ID
+|-
+| $03 || byte || Destination X position
+|-
+| $04 || byte || Destination Y position
+|-
+| $05 || byte || Destination facing direction
+|-
+| $06 || byte || Transition type
+|-
+| $07 || byte || Door flags
+|-
+| $08-$09 || word || Reserved
+|}
+
+===Transition Type Values===
+
+{| class="wikitable"
+! Value !! Type !! Description
+|-
+| $00 || Door || Standard door entry
+|-
+| $01 || Stairs Down || Descending stairs
+|-
+| $02 || Stairs Up || Ascending stairs
+|-
+| $03 || Teleport || Instant teleport
+|-
+| $04 || Cave Entry || Enter cave
+|-
+| $05 || Cave Exit || Exit cave
+|-
+| $06 || Building Entry || Enter building
+|-
+| $07 || Building Exit || Exit building
+|}
+
+==Map List==
+
+===Overworld Maps===
+
+{| class="wikitable"
+! Map ID !! Name !! Width !! Height !! Tileset !! ROM Offset
+|-
+| $02 || Foresta Region || 64 || 64 || $00 || $03be00
+|-
+| $04 || Aquaria Region || 64 || 64 || $01 || $03ca00
+|-
+| $06 || Fireburg Region || 64 || 64 || $02 || $03d600
+|-
+| $08 || Windia Region || 64 || 64 || $03 || $03e200
+|}
+
+===Town Maps===
+
+{| class="wikitable"
+! Map ID !! Name !! Width !! Height !! Tileset !! ROM Offset
+|-
+| $00 || Hill of Destiny || 32 || 32 || $04 || $03b300
+|-
+| $01 || Foresta (town) || 40 || 32 || $05 || $03b800
+|-
+| $03 || Aquaria (town) || 40 || 32 || $06 || $03c400
+|-
+| $05 || Fireburg (town) || 40 || 32 || $07 || $03d000
+|-
+| $07 || Windia (town) || 40 || 32 || $08 || $03dc00
+|-
+|}
+
+===Dungeon Maps===
+
+{| class="wikitable"
+! Map ID !! Name !! Width !! Height !! Floors !! ROM Offset
+|-
+| $09 || Bone Dungeon || 32 || 32 || 3 || $03e800
+|-
+| $0c || Focus Tower || 24 || 48 || 5 || $03f400
+|-
+| $11 || Ice Pyramid || 32 || 32 || 4 || $040000
+|-
+| $15 || Lava Dome || 32 || 32 || 3 || $040c00
+|-
+| $18 || Pazuzu's Tower || 24 || 64 || 6 || $041800
+|-
+| $1e || Doom Castle || 48 || 48 || 8 || $042400
+|}
+
+{{Todo | Add all 57 maps with complete data}}
+
+==Special Map Features==
+
+===Battlefield Maps===
+
+Battlefields are special map areas with reduced enemy spawn rates:
+
+{| class="wikitable"
+! Battlefield !! Map ID !! X !! Y !! Rounds !! Reward
+|-
+| #01 || $02 || 32 || 28 || 10 || 200 EXP
+|-
+| #02 || $02 || 45 || 18 || 10 || 300 EXP
+|-
+| #20 || $08 || 50 || 40 || 10 || 2700 EXP
+|}
+
+{{Todo | Document all 20 battlefields}}
+
+===Boss Arenas===
+
+Boss battles take place in special arena maps:
+
+{| class="wikitable"
+! Boss !! Map ID !! Arena Name !! Background
+|-
+| Flamerus Rex || $1a || Volcano Summit || Lava
+|-
+| Ice Golem || $16 || Frozen Chamber || Ice
+|-
+| Pazuzu || $1f || Sky Tower Peak || Clouds
+|-
+| Dark King || $24 || Dark Void || Black
+|}
+
+==Map Tile Animations==
+
+Some maps have animated tiles using palette cycling:
+
+===Animated Tile Types===
+
+{| class="wikitable"
+! Animation !! Tile Range !! Speed !! Maps
+|-
+| Flowing Water || $80-$87 || 8 frames || Aquaria, waterfalls
+|-
+| Bubbling Lava || $90-$97 || 4 frames || Fireburg, Lava Dome
+|-
+| Flickering Torches || $a0-$a3 || 10 frames || Dungeons
+|-
+| Waterfall || $88-$8f || 6 frames || Falls Basin
+|-
+| Sparkles || $b0-$b7 || 12 frames || Focus Tower
+|}
+
+==Map Scripts==
+
+Maps can have associated event scripts for cutscenes and triggers.
+
+===Script Entry Point===
+
+Each map has an optional script pointer at offset $14-$15 in map header.
+
+===Script Opcodes===
+
+{{Todo | Document event scripting opcodes}}
+
+==Notes==
+
+* Total maps: 57 (including all dungeons, towns, overworld areas)
+* Map pointer table at ROM $03b218
+* Tile properties at ROM $032b00
+* Maximum map size: 64×64 tiles (4096 tiles)
+* Event limit per map: 64 events
+* NPC limit per map: 32 NPCs
+* Chest limit per map: 16 chests
+* Door limit per map: 32 doors
+
+{{Todo | Create map viewing/editing tools}}
+{{Todo | Document all dungeon floor connections}}
+
+=Related=
+
+* [[Final Fantasy: Mystic Quest/Graphics]] - Tileset graphics data
+* [[Final Fantasy: Mystic Quest/Values]] - Map ID reference table
+* [[Final Fantasy: Mystic Quest/ROM map]] - Complete ROM structure
+
+{{Internal Data}}

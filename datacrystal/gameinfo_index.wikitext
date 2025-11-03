@@ -1,0 +1,36 @@
+{{subpage}}
+
+=GameInfo import index=
+
+This file lists the GameInfo repository locations discovered for "Final Fantasy Mystic Quest (SNES)" and provides a plan for importing the raw wikitext pages, Diz/ASM exports, labels, and image assets into this repository under `datacrystal/`.
+
+==Canonical policy==
+* Canonical ROM: v1.1 — all imported pages must be adjusted to reference ROM v1.1 addresses.
+* Hex format: always use lowercase with a leading `$` (example: `$1a2b`).
+* Addresses shown in the wiki must be ROM addresses (not file offsets).
+
+==Discovered GameInfo source paths==
+The following top-level paths in TheAnsarya/GameInfo were located and should be imported (initial discovery only):
+
+* Files/Diz/ffmq/ — many bank_XX.asm exports (per-revision/export directories, and combined exports)
+* Files/Diz/ffmq - combined/ — combined Diz/labels/defines and bank exports
+* Wiki/Final Fantasy Mystic Quest (SNES)/ — many wikitext pages, including:
+  - Main.wikitext
+  - Values.wikitext
+  - Values - Window Colors.wikitext
+  - RAM map.wikitext
+  - Other Values/TBL subpages
+* Files/Images (referenced by wiki pages) — title gifs, screenshots, and other assets referenced from wiki pages (download these into datacrystal/assets/)
+
+==Import plan / next steps==
+1. Create `datacrystal/gameinfo_raw/` and copy selected wikitext files there to preserve original content (source attribution).
+2. Create `datacrystal/assets/` and download image files used by GameInfo pages; preserve filenames.
+3. Create working datacrystal pages (under `datacrystal/`) that reference local assets and update addresses to ROM v1.1. Start with: `Main.wikitext` (verify), `Values.wikitext`, `TBL.wikitext`, `RAM_map.wikitext`, `ROM_map.wikitext`, `Enemy_Stats.wikitext`, `Attack_Data.wikitext`, `Graphics_Format.wikitext`.
+4. For every TODO found in imported pages, create a corresponding GitHub issue (or add to in-repo issues backlog if GH API/CLI can't be used from here). Link issue numbers in the in-repo TODO.
+5. Run project formatters and commit imports in small batches.
+
+==Notes==
+* I will import pages in batches and update the todo list and session logs for each batch.
+* If you want me to proceed with downloading images and creating GitHub issues automatically, confirm GH access or I will create local issue placeholders and link them in the repo.
+
+-- Index created on 2025-11-03 — import discovery completed (partial)

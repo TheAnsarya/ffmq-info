@@ -1,0 +1,597 @@
+=Main=
+
+{{Todo | Document all graphics formats, tile structures, sprite data, palettes, and compression}}
+
+[[Final Fantasy: Mystic Quest/ROM map]]
+
+==Graphics Data Overview==
+
+Final Fantasy: Mystic Quest uses multiple graphics formats:
+* '''4BPP''' (4 bits per pixel, 16 colors) - Character sprites, menu graphics, fonts
+* '''3BPP''' (3 bits per pixel, 8 colors) - Enemy sprites, some backgrounds
+* '''2BPP''' (2 bits per pixel, 4 colors) - Simple backgrounds, UI elements
+
+All graphics data is stored uncompressed in the ROM.
+
+==Tile Format==
+
+===4BPP Tile Format===
+
+Each 8×8 tile is '''32 bytes''' (4 bitplanes × 8 bytes):
+
+{| class="wikitable"
+! Offset !! Bitplane !! Description
+|-
+| $00-$07 || Bitplane 0 || Bits 0 of each pixel row
+|-
+| $08-$0f || Bitplane 1 || Bits 1 of each pixel row
+|-
+| $10-$17 || Bitplane 2 || Bits 2 of each pixel row (background layer)
+|-
+| $18-$1f || Bitplane 3 || Bits 3 of each pixel row (foreground layer)
+|}
+
+'''Pixel Value Calculation:'''
+```
+For each pixel (x, y):
+  bit0 = (bitplane0[y] >> (7-x)) & 1
+  bit1 = (bitplane1[y] >> (7-x)) & 1
+  bit2 = (bitplane2[y] >> (7-x)) & 1
+  bit3 = (bitplane3[y] >> (7-x)) & 1
+  palette_index = (bit3 << 3) | (bit2 << 2) | (bit1 << 1) | bit0
+```
+
+Pixel values range from $0-$f (16 colors per palette).
+
+===3BPP Tile Format===
+
+Each 8×8 tile is '''24 bytes''' (3 bitplanes × 8 bytes):
+
+{| class="wikitable"
+! Offset !! Bitplane !! Description
+|-
+| $00-$07 || Bitplane 0 || Bits 0 of each pixel row
+|-
+| $08-$0f || Bitplane 1 || Bits 1 of each pixel row
+|-
+| $10-$17 || Bitplane 2 || Bits 2 of each pixel row
+|}
+
+Pixel values range from $0-$7 (8 colors per palette).
+
+Used primarily for enemy sprites to save ROM space.
+
+===2BPP Tile Format===
+
+Each 8×8 tile is '''16 bytes''' (2 bitplanes × 8 bytes):
+
+{| class="wikitable"
+! Offset !! Bitplane !! Description
+|-
+| $00-$07 || Bitplane 0 || Bits 0 of each pixel row
+|-
+| $08-$0f || Bitplane 1 || Bits 1 of each pixel row
+|}
+
+Pixel values range from $0-$3 (4 colors per palette).
+
+Used for simple UI elements and some background tiles.
+
+==Character Sprites==
+
+Character sprites (Benjamin, companions) use '''4BPP format'''.
+
+===Character Sprite Structure===
+
+{| class="wikitable"
+! ROM Offset !! Size !! Description
+|-
+| $020000 || $4000 || Benjamin sprite tiles (walking, attacking, magic)
+|-
+| $024000 || $2000 || Kaeli sprite tiles
+|-
+| $026000 || $2000 || Tristam sprite tiles
+|-
+| $028000 || $2000 || Phoebe sprite tiles
+|-
+| $02a000 || $2000 || Reuben sprite tiles
+|-
+|}
+
+===Character Animation Frames===
+
+Each character has multiple animation sets:
+
+{| class="wikitable"
+! Animation !! Frames !! Tiles per Frame !! Description
+|-
+| Walking Down || 4 || 6 || Front-facing walk cycle
+|-
+| Walking Up || 4 || 6 || Back-facing walk cycle
+|-
+| Walking Left || 4 || 6 || Left-facing walk cycle
+|-
+| Walking Right || 4 || 6 || Right-facing walk cycle
+|-
+| Standing || 1 || 6 || Idle pose
+|-
+| Attacking || 8 || 8 || Weapon swing animation
+|-
+| Casting Magic || 6 || 8 || Spell-casting pose
+|-
+| Victory || 4 || 6 || Battle victory pose
+|-
+| Hurt || 2 || 6 || Taking damage pose
+|-
+| KO || 1 || 6 || Knocked out pose
+|-
+|}
+
+{{Todo | Document complete character sprite tile maps}}
+
+==Enemy Sprites==
+
+Enemy sprites use '''3BPP format''' (8 colors).
+
+===Enemy Sprite Data===
+
+{| class="wikitable"
+! ROM Offset !! Size !! Enemy !! Description
+|-
+| $030000 || $0600 || Goblin || Basic enemy sprite
+|-
+| $030600 || $0800 || Mad Plant || Plant-type enemy
+|-
+| $030e00 || $0a00 || Brownie || Humanoid sprite
+|-
+| $031800 || $0400 || Bee || Small flying sprite
+|-
+| $031c00 || $0c00 || Mushroom || Large enemy sprite
+|-
+|}
+
+{{Todo | Map all 120+ enemy sprite locations}}
+
+===Enemy Sprite Format===
+
+Each enemy sprite consists of:
+* '''Tile Data:''' Variable size, 3BPP format
+* '''Palette Assignment:''' 1 byte specifying which of 8 palettes to use
+* '''Width/Height:''' Sprite dimensions in tiles
+* '''Animation Frames:''' Number of frames for idle/attack animations
+
+===Boss Sprite Data===
+
+Boss enemies use larger sprite allocations:
+
+{| class="wikitable"
+! ROM Offset !! Size !! Boss !! Dimensions
+|-
+| $038000 || $2000 || Flamerus Rex || 8×8 tiles (phase 1-4)
+|-
+| $03a000 || $1800 || Ice Golem || 6×6 tiles
+|-
+| $03b800 || $2400 || Pazuzu || 10×10 tiles
+|-
+|}
+
+{{Todo | Document all boss sprite data and phase transitions}}
+
+==Background Graphics==
+
+===Tile Properties Data===
+
+ROM offset: '''$032b00''' (unheadered)
+
+Each tile has a property byte:
+
+{| class="wikitable"
+! Bit !! Property
+|-
+| 0 || Solid (collision)
+|-
+| 1 || Water (drowning hazard)
+|-
+| 2 || Door/transition
+|-
+| 3 || Climbable (stairs, ladders)
+|-
+| 4 || Damage tile (lava, spikes)
+|-
+| 5 || Ice (slippery movement)
+|-
+| 6 || Trigger event
+|-
+| 7 || Background layer priority
+|}
+
+===Background Tile Sets===
+
+{| class="wikitable"
+! ROM Offset !! Size !! Tileset !! Used In
+|-
+| $040000 || $4000 || Foresta || Forest areas, Hill of Destiny
+|-
+| $044000 || $4000 || Aquaria || Waterfall areas, ice caves
+|-
+| $048000 || $4000 || Fireburg || Lava areas, volcano
+|-
+| $04c000 || $4000 || Windia || Sky areas, mountain peaks
+|-
+| $050000 || $4000 || Dungeon Common || Shared dungeon tiles
+|-
+|}
+
+{{Todo | Document complete background tile mappings}}
+
+==Palette Data==
+
+===Palette Format===
+
+SNES uses 15-bit BGR555 color format:
+* 5 bits Red (0-31)
+* 5 bits Green (0-31)
+* 5 bits Blue (0-31)
+
+Each color is stored as a '''word''' (2 bytes, little-endian):
+```
+Byte 0: gggrrrrr
+Byte 1: 0bbbbbgg
+
+r = red bits
+g = green bits  
+b = blue bits
+```
+
+Color value calculation:
+```
+Color = (Blue << 10) | (Green << 5) | Red
+```
+
+===Character Palette Data===
+
+ROM offset: '''$034084''' (unheadered)
+
+{| class="wikitable"
+! Palette !! Colors !! Description
+|-
+| 0 || 16 || Benjamin (normal)
+|-
+| 1 || 16 || Kaeli (forest green)
+|-
+| 2 || 16 || Tristam (blue armor)
+|-
+| 3 || 16 || Phoebe (red outfit)
+|-
+| 4 || 16 || Reuben (yellow/gold)
+|-
+| 5 || 16 || Benjamin (underwater)
+|-
+| 6 || 16 || Benjamin (poison status)
+|-
+| 7 || 16 || Benjamin (petrify status)
+|-
+|}
+
+===Enemy Palette Data===
+
+Enemy palettes are 8 colors each (3BPP):
+
+{| class="wikitable"
+! Palette !! Description
+|-
+| 0 || Green enemies (goblins, plants)
+|-
+| 1 || Blue enemies (water creatures)
+|-
+| 2 || Red enemies (fire creatures)
+|-
+| 3 || Brown enemies (earth creatures)
+|-
+| 4 || Purple enemies (magic creatures)
+|-
+| 5 || Gray enemies (metal/stone)
+|-
+| 6 || Yellow enemies (electric)
+|-
+| 7 || Boss-specific palettes
+|}
+
+===Menu Palette Data===
+
+ROM offset: '''$038200''' (unheadered)
+
+{| class="wikitable"
+! Palette !! Colors !! Description
+|-
+| 0 || 16 || Main menu text
+|-
+| 1 || 16 || Battle menu
+|-
+| 2 || 16 || Item menu
+|-
+| 3 || 16 || Magic menu
+|-
+| 4 || 16 || Status screen
+|-
+| 5 || 16 || Dialog boxes
+|-
+| 6 || 16 || Window borders
+|-
+| 7 || 16 || HP/MP bars
+|-
+|}
+
+==Font Graphics==
+
+===Font Tile Data===
+
+ROM offset: '''$058000''' (unheadered)
+
+Font uses '''2BPP format''' (4 colors):
+
+{| class="wikitable"
+! Character Range !! Tiles !! Description
+|-
+| $20-$7e || 95 tiles || ASCII printable characters
+|-
+| $80-$9f || 32 tiles || Extended characters (European)
+|-
+| $a0-$df || 64 tiles || Item/menu icons
+|-
+| $e0-$ff || 32 tiles || Special symbols
+|-
+|}
+
+Each character is 8×8 pixels (1 tile).
+
+===Font Palette===
+
+{| class="wikitable"
+! Color Index !! RGB !! Description
+|-
+| 0 || Transparent || Background (not drawn)
+|-
+| 1 || White ($7fff) || Main text color
+|-
+| 2 || Gray ($52aa) || Shadow/outline
+|-
+| 3 || Black ($0000) || Border
+|}
+
+==Battle Graphics==
+
+===Battle Background Data===
+
+{| class="wikitable"
+! ROM Offset !! Size !! Background !! Used In
+|-
+| $060000 || $2000 || Forest || Foresta region battles
+|-
+| $062000 || $2000 || Desert || Hill of Destiny, sand areas
+|-
+| $064000 || $2000 || Water || Aquaria region battles
+|-
+| $066000 || $2000 || Lava || Fireburg region battles
+|-
+| $068000 || $2000 || Sky || Windia region battles
+|-
+| $06a000 || $2000 || Dark Void || Boss battle backgrounds
+|-
+|}
+
+===Battle UI Elements===
+
+{| class="wikitable"
+! Element !! ROM Offset !! Size !! Format
+|-
+| HP/MP bars || $06c000 || $0400 || 2BPP
+|-
+| Damage numbers || $06c400 || $0200 || 2BPP
+|-
+| Status icons || $06c600 || $0300 || 2BPP
+|-
+| Menu cursor || $06c900 || $0100 || 2BPP
+|-
+| Attack effects || $06ca00 || $1000 || 4BPP
+|-
+|}
+
+==Sprite OAM Data==
+
+===OAM Entry Format===
+
+Each sprite Object Attribute Memory (OAM) entry is 4 bytes:
+
+{| class="wikitable"
+! Byte !! Bits !! Description
+|-
+| 0 || 7-0 || X position (low 8 bits)
+|-
+| 1 || 7-0 || Y position (8 bits)
+|-
+| 2 || 7-0 || Tile number (starting tile)
+|-
+| 3 || 7 || X position (high bit, bit 8)
+|-
+| 3 || 6 || Sprite size (0=small, 1=large)
+|-
+| 3 || 5-4 || Priority (0-3, higher = in front)
+|-
+| 3 || 3-1 || Palette (0-7)
+|-
+| 3 || 0 || Flip horizontally
+|-
+|}
+
+Extended OAM byte:
+{| class="wikitable"
+! Bit !! Description
+|-
+| 1 || Flip vertically
+|-
+| 0 || X position bit 9 (for > 256 pixel X)
+|}
+
+===Sprite Size Modes===
+
+{| class="wikitable"
+! Mode !! Small Size !! Large Size
+|-
+| 0 || 8×8 || 16×16
+|-
+| 1 || 8×8 || 32×32
+|-
+| 2 || 8×8 || 64×64
+|-
+| 3 || 16×16 || 32×32
+|-
+| 4 || 16×16 || 64×64
+|-
+| 5 || 32×32 || 64×64
+|}
+
+FFMQ primarily uses mode 0 and 3.
+
+==Animation Data==
+
+===Animation Frame Table Format===
+
+{| class="wikitable"
+! Offset !! Size !! Description
+|-
+| $00 || byte || Number of frames in animation
+|-
+| $01 || byte || Animation speed (frames per update)
+|-
+| $02 || byte || Loop type (0=once, 1=loop, 2=ping-pong)
+|-
+| $03 || byte || Reserved
+|-
+| $04+ || variable || Frame data entries
+|}
+
+===Frame Data Entry===
+
+Each frame entry is 8 bytes:
+
+{| class="wikitable"
+! Offset !! Size !! Description
+|-
+| $00-$01 || word || Tile data pointer (ROM offset)
+|-
+| $02 || byte || Palette index
+|-
+| $03 || byte || Sprite width (in tiles)
+|-
+| $04 || byte || Sprite height (in tiles)
+|-
+| $05 || byte || X offset (signed)
+|-
+| $06 || byte || Y offset (signed)
+|-
+| $07 || byte || Frame duration (in game ticks)
+|}
+
+{{Todo | Document complete animation tables for all characters and enemies}}
+
+==Special Effects==
+
+===Magic Effect Animations===
+
+{| class="wikitable"
+! Effect !! ROM Offset !! Frames !! Format !! Description
+|-
+| Fire || $070000 || 16 || 4BPP || Flame burst
+|-
+| Ice || $070800 || 16 || 4BPP || Ice crystals
+|-
+| Thunder || $071000 || 18 || 4BPP || Lightning bolts
+|-
+| Quake || $071900 || 20 || 4BPP || Ground shaking
+|-
+| Heal || $072100 || 14 || 4BPP || Green glow
+|-
+| Status || $072e00 || 10 || 4BPP || Stars/sparkles
+|-
+|}
+
+===Battle Transition Effects===
+
+{| class="wikitable"
+! Effect !! ROM Offset !! Description
+|-
+| Spiral || $074000 || Battle entry spiral
+|-
+| Fade || $074400 || Victory fade-out
+|-
+| Flash || $074600 || Damage flash
+|-
+| Shake || $074800 || Screen shake data
+|-
+|}
+
+==Map Graphics==
+
+===Map Tile Data===
+
+Each map uses tileset graphics:
+
+{| class="wikitable"
+! Map Type !! Tileset Offset !! Tile Count !! Format
+|-
+| Overworld || $080000 || 512 tiles || 4BPP
+|-
+| Town || $088000 || 256 tiles || 4BPP
+|-
+| Dungeon || $08c000 || 384 tiles || 4BPP
+|-
+| Building Interior || $092000 || 192 tiles || 4BPP
+|-
+|}
+
+===Map Palette Cycling===
+
+Some maps use palette cycling for animated effects:
+
+{| class="wikitable"
+! Effect !! Palette Range !! Speed !! Description
+|-
+| Water || $03-$06 || 8 frames || Flowing water animation
+|-
+| Lava || $04-$07 || 4 frames || Bubbling lava
+|-
+| Waterfall || $05-$08 || 6 frames || Falling water
+|-
+| Torches || $0e-$0f || 10 frames || Flickering flames
+|-
+|}
+
+{{Todo | Document palette cycling scripts and timing}}
+
+==Compression==
+
+Final Fantasy: Mystic Quest uses '''no compression''' for graphics data. All tiles are stored uncompressed in the ROM.
+
+This simplifies graphics hacking but increases ROM space usage.
+
+==Graphics Hacking Notes==
+
+* All graphics are uncompressed - direct tile replacement possible
+* 4BPP character sprites at $020000-$02ffff
+* 3BPP enemy sprites at $030000-$037fff
+* Palettes at $034084 (characters), $038200 (menus)
+* Font at $058000 (2BPP format)
+* OAM sprite limit: 128 sprites per frame
+* Tile VRAM limit: 512 tiles (4BPP), 1024 tiles (2BPP)
+
+{{Todo | Create tools for graphics extraction and insertion}}
+{{Todo | Document sprite metasprite tables}}
+
+=Related=
+
+* [[Final Fantasy: Mystic Quest/Enemies]] - Enemy sprite data references
+* [[Final Fantasy: Mystic Quest/Attacks]] - Attack animation data
+* [[Final Fantasy: Mystic Quest/ROM map]] - Complete ROM structure
+
+{{Internal Data}}

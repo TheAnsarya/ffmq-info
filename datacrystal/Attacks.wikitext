@@ -1,0 +1,470 @@
+=Main=
+
+{{Todo | Document all attack data, damage formulas, animations, and status effects}}
+
+[[Final Fantasy: Mystic Quest/ROM map]]
+
+==Attack Data Structure==
+
+Each attack entry is stored at ROM offset '''$014678''' (unheadered). Attack data is '''variable length''' depending on attack complexity.
+
+===Basic Attack Format===
+
+{| class="wikitable"
+! Offset !! Size !! Description
+|-
+| $00 || byte || Attack ID
+|-
+| $01 || byte || Attack Type (physical, magical, special)
+|-
+| $02 || byte || Base Power
+|-
+| $03 || byte || Accuracy
+|-
+| $04 || byte || Critical Hit Rate
+|-
+| $05 || byte || Element Type
+|-
+| $06 || byte || Target Type (single, all, random, self)
+|-
+| $07 || byte || Status Effect ID
+|-
+| $08 || byte || Status Effect Chance (0-255)
+|-
+| $09 || byte || Animation ID
+|-
+| $0a || byte || Sound Effect ID
+|-
+| $0b-$0c || word || Special Flags
+|-
+| $0d-$0f || 3 bytes || Additional properties
+|}
+
+===Attack Type Values ($01)===
+
+{| class="wikitable"
+! Value !! Type !! Description
+|-
+| $00 || Physical || Uses Attack stat, ignores Magic Defense
+|-
+| $01 || Magical || Uses Magic stat, ignores Defense
+|-
+| $02 || Special || Fixed damage or unique calculation
+|-
+| $03 || Healing || Restores HP/MP
+|-
+| $04 || Status || Applies status effects only
+|-
+| $05 || Mixed || Uses both Attack and Magic stats
+|-
+| $06 || True || Ignores all defenses
+|-
+| $07 || Proportional || Damage based on max HP percentage
+|}
+
+===Element Type Values ($05)===
+
+{| class="wikitable"
+! Value !! Element
+|-
+| $00 || Non-elemental
+|-
+| $01 || Fire
+|-
+| $02 || Ice/Blizzard
+|-
+| $03 || Thunder/Lightning
+|-
+| $04 || Earth/Quake
+|-
+| $05 || Wind/Aero
+|-
+| $06 || Holy/White
+|-
+| $07 || Dark/Black
+|-
+| $08 || Poison
+|-
+| $09 || Neutral (can't be resisted)
+|}
+
+===Target Type Values ($06)===
+
+{| class="wikitable"
+! Value !! Target
+|-
+| $00 || Single enemy (manual select)
+|-
+| $01 || All enemies
+|-
+| $02 || Random enemy (1 target)
+|-
+| $03 || Random enemies (2-3 targets)
+|-
+| $04 || Self (caster)
+|-
+| $05 || All allies
+|-
+| $06 || Single ally (manual select)
+|-
+| $07 || Random ally
+|-
+| $08 || All combatants (enemies + allies)
+|-
+| $09 || Opposite side (if enemy casts, hits all allies)
+|}
+
+===Special Flags ($0b-$0c)===
+
+{| class="wikitable"
+! Bit !! Flag
+|-
+| 0 || Ignores Reflect
+|-
+| 1 || Can't be evaded
+|-
+| 2 || Pierces Defense
+|-
+| 3 || Multi-hit attack
+|-
+| 4 || Drains HP
+|-
+| 5 || Drains MP
+|-
+| 6 || Causes counter-attack
+|-
+| 7 || Can miss (even with 100% accuracy)
+|-
+| 8 || Critical hit guaranteed
+|-
+| 9 || Shows damage as "????"
+|-
+| 10 || Instant death effect
+|-
+| 11 || Fractional damage (½, ¼, etc.)
+|-
+| 12 || Revive fallen ally
+|-
+| 13 || Remove status effects
+|-
+| 14 || Delayed effect (poison, regen)
+|-
+| 15 || Special animation flag
+|}
+
+==Player Attacks==
+
+===Weapon Attacks===
+
+{| class="wikitable"
+! ID !! Name !! Type !! Power !! Accuracy !! Element !! Special !! ROM Offset
+|-
+| $00 || Steel Sword || Physical || 10 || 95 || None || None || $014678
+|-
+| $01 || Knight Sword || Physical || 18 || 95 || None || None || $014686
+|-
+| $02 || Excalibur || Physical || 32 || 98 || Holy || Critical +10% || $014694
+|-
+| $03 || Axe || Physical || 12 || 90 || None || Tree-cutting || $0146a2
+|-
+| $04 || Battle Axe || Physical || 20 || 90 || None || Tree-cutting || $0146b0
+|-
+| $05 || Giant's Axe || Physical || 35 || 92 || Earth || Tree-cutting || $0146be
+|-
+| $06 || Cat Claw || Physical || 8 || 98 || None || 2-4 hits || $0146cc
+|-
+| $07 || Charm Claw || Physical || 22 || 98 || Wind || 2-4 hits || $0146da
+|-
+| $08 || Dragon Claw || Physical || 40 || 99 || Fire || 2-4 hits || $0146e8
+|-
+| $09 || Bomb || Special || 25 || 100 || Fire || Consumes ammo || $0146f6
+|-
+| $0a || Jumbo Bomb || Special || 45 || 100 || Fire || Consumes ammo || $014704
+|-
+| $0b || Mega Grenade || Special || 80 || 100 || Fire || Consumes ammo || $014712
+|}
+
+{{Todo | Add all weapon attacks with complete stats}}
+
+===Magic Attacks - White Magic===
+
+{| class="wikitable"
+! ID !! Name !! Type !! Power !! MP Cost !! Target !! Effect !! ROM Offset
+|-
+| $10 || Cure || Healing || 30 || 4 || Single ally || Restore HP || $014720
+|-
+| $11 || Heal || Healing || 80 || 8 || Single ally || Restore HP || $01472e
+|-
+| $12 || Life || Healing || -- || 12 || Single ally || Revive (50% HP) || $01473c
+|-
+| $13 || Exit || Special || -- || 1 || Party || Escape dungeon || $01474a
+|}
+
+===Magic Attacks - Black Magic===
+
+{| class="wikitable"
+! ID !! Name !! Type !! Power !! MP Cost !! Element !! Target !! ROM Offset
+|-
+| $14 || Fire || Magical || 20 || 3 || Fire || Single || $014758
+|-
+| $15 || Blizzard || Magical || 25 || 4 || Ice || Single || $014766
+|-
+| $16 || Aero || Magical || 30 || 5 || Wind || Single || $014774
+|-
+| $17 || Quake || Magical || 35 || 7 || Earth || All enemies || $014782
+|}
+
+===Magic Attacks - Wizard Magic===
+
+{| class="wikitable"
+! ID !! Name !! Type !! Power !! MP Cost !! Element !! Target !! ROM Offset
+|-
+| $18 || Thunder || Magical || 40 || 6 || Lightning || Single || $014790
+|-
+| $19 || White || Magical || 50 || 10 || Holy || All enemies || $01479e
+|-
+| $1a || Meteor || Magical || 70 || 12 || Non-elem || Random × 5 || $0147ac
+|-
+| $1b || Flare || Magical || 100 || 15 || Fire || All enemies || $0147ba
+|}
+
+==Enemy Attacks==
+
+===Basic Enemy Attacks===
+
+{| class="wikitable"
+! ID !! Name !! Type !! Power !! Accuracy !! Element !! Status !! ROM Offset !! Used By
+|-
+| $20 || Bite || Physical || 5 || 90 || None || None || $0147c8 || Goblin, Mad Plant
+|-
+| $21 || Claw || Physical || 8 || 92 || None || None || $0147d6 || Brownie, Stheno
+|-
+| $22 || Sting || Physical || 6 || 95 || None || Poison 30% || $0147e4 || Bee, Wasp
+|-
+| $23 || Tackle || Physical || 10 || 88 || None || None || $0147f2 || Minotaur
+|-
+| $24 || Spore || Special || 0 || 100 || None || Sleep 50% || $014800 || Mushroom
+|-
+|}
+
+{{Todo | Add all 200+ enemy attacks}}
+
+===Boss Attacks===
+
+{| class="wikitable"
+! ID !! Name !! Type !! Power !! Accuracy !! Element !! Status !! ROM Offset !! Used By
+|-
+| $80 || Flame Wave || Magical || 35 || 100 || Fire || None || $014808 || Flamerus Rex
+|-
+| $81 || Ice Breath || Magical || 40 || 100 || Ice || Paralysis 20% || $014816 || Ice Golem
+|-
+| $82 || Thunder Storm || Magical || 60 || 100 || Lightning || None || $014824 || Pazuzu
+|-
+| $83 || Dark Flare || Magical || 120 || 100 || Dark || None || $014832 || Dark King
+|-
+|}
+
+{{Todo | Document all boss-specific attacks}}
+
+==Damage Calculation Formulas==
+
+===Physical Damage Formula===
+
+```
+Base Damage = (Attacker Attack × Attack Power) / (Target Defense)
+Variance = Random(0-15) - Random(0-15)  // ±15 variance
+Final Damage = Base Damage + Variance
+```
+
+Critical Hit:
+```
+Critical Damage = Base Damage × 2
+```
+
+===Magical Damage Formula===
+
+```
+Base Damage = (Attacker Magic × Spell Power) / (Target Magic Defense)
+Elemental Modifier:
+  - Weakness: × 2.0
+  - Resistance: × 0.5
+  - Absorption: × -1.0 (heals target)
+  - Immunity: × 0.0
+Final Damage = Base Damage × Elemental Modifier
+```
+
+===Special Damage Formulas===
+
+'''Proportional Damage''' (e.g., Gravity):
+```
+Damage = Target Current HP × (Attack Power / 256)
+```
+
+'''Fixed Damage''' (e.g., certain boss attacks):
+```
+Damage = Attack Power (ignores all stats and defenses)
+```
+
+'''Drain Attacks''':
+```
+Damage = Normal damage calculation
+Attacker HP += Damage dealt
+```
+
+===Healing Formula===
+
+```
+HP Restored = Spell Power + (Caster Magic / 4)
+Cannot exceed target's Max HP
+```
+
+==Status Effects==
+
+===Status Effect IDs===
+
+{| class="wikitable"
+! ID !! Status !! Duration !! Effect
+|-
+| $00 || None || -- || No status change
+|-
+| $01 || Poison || Battle || Lose 1/16 Max HP per turn
+|-
+| $02 || Paralysis || 1-3 turns || Cannot act
+|-
+| $03 || Petrify || Battle || Cannot act, removed on damage
+|-
+| $04 || Confusion || 2-4 turns || Attacks random targets
+|-
+| $05 || Sleep || Until hit || Cannot act, wakes on damage
+|-
+| $06 || Silence || Battle || Cannot cast magic
+|-
+| $07 || Blind || Battle || Accuracy -50%
+|-
+| $08 || Fatal || Instant || Instant death (0 HP)
+|-
+| $09 || Regen || Battle || Restore 1/16 Max HP per turn
+|-
+| $0a || Haste || Battle || Speed × 1.5
+|-
+| $0b || Slow || Battle || Speed × 0.5
+|-
+| $0c || Reflect || Battle || Reflects magic attacks
+|-
+|}
+
+===Status Effect Chance Calculation===
+
+```
+if (Random(0-255) < Status Chance)
+  if (Target has immunity)
+    Status fails
+  else if (Target has resistance)
+    if (Random(0-255) < 128)  // 50% chance with resistance
+      Apply status
+    endif
+  else
+    Apply status
+  endif
+endif
+```
+
+==Attack Animations==
+
+===Animation ID Table===
+
+{| class="wikitable"
+! ID !! Animation !! Frames !! Duration (60fps)
+|-
+| $00 || Sword Slash || 8 || 15 frames
+|-
+| $01 || Axe Swing || 10 || 18 frames
+|-
+| $02 || Claw Swipe || 6 || 12 frames
+|-
+| $03 || Bomb Explosion || 12 || 24 frames
+|-
+| $04 || Fire Spell || 16 || 30 frames
+|-
+| $05 || Ice Spell || 16 || 30 frames
+|-
+| $06 || Thunder Spell || 18 || 36 frames
+|-
+| $07 || Quake Spell || 20 || 40 frames
+|-
+| $08 || Healing Glow || 14 || 28 frames
+|-
+| $09 || Status Effect || 10 || 20 frames
+|-
+|}
+
+{{Todo | Document animation sprite data and palette cycling}}
+
+==Sound Effects==
+
+===Sound Effect ID Table===
+
+{| class="wikitable"
+! ID !! Sound Effect !! Used For
+|-
+| $00 || Sword Hit || Physical weapons
+|-
+| $01 || Explosion || Bombs, fire magic
+|-
+| $02 || Ice Shatter || Ice magic
+|-
+| $03 || Thunder Crack || Lightning magic
+|-
+| $04 || Healing Chime || Cure, Heal, Life
+|-
+| $05 || Status Inflict || Status effect applied
+|-
+| $06 || Miss || Attack evaded/missed
+|-
+| $07 || Critical Hit || Critical damage sound
+|-
+|}
+
+{{Todo | Map sound effect IDs to SPC sound data}}
+
+==Multi-Hit Attacks==
+
+Claw weapons (Cat Claw, Charm Claw, Dragon Claw) perform 2-4 hits per attack.
+
+===Multi-Hit Calculation===
+
+```
+Number of Hits = Random(2-4)
+For each hit:
+  Calculate damage normally
+  Display damage number
+  Add to total damage
+End
+Apply total damage to target
+```
+
+Each hit can miss independently based on accuracy calculation.
+
+==Notes==
+
+* Attack data table starts at ROM $014678 (unheadered)
+* Attack entries are variable length (basic attacks ~16 bytes, complex attacks up to 32 bytes)
+* Total attacks: ~250 including player weapons, magic, and enemy attacks
+* Damage variance creates ±15 HP variation in damage output
+* Critical hit rate is modified by weapon type and attacker Speed stat
+* Status effect success rate is affected by target's status resistance and Magic Defense
+* Multi-hit attacks calculate each hit separately for damage variance
+* Boss attacks often have custom formulas not covered by standard calculations
+
+{{Todo | Extract complete attack data for all 250+ attacks}}
+{{Todo | Document boss-specific attack formulas}}
+{{Todo | Map animation data to graphics ROM locations}}
+
+=Related=
+
+* [[Final Fantasy: Mystic Quest/Enemies]] - Enemy stats and battle AI
+* [[Final Fantasy: Mystic Quest/Graphics]] - Animation sprite data
+* [[Final Fantasy: Mystic Quest/ROM map]] - Complete ROM structure
+* [[Final Fantasy: Mystic Quest/Values]] - Item and weapon IDs
+
+{{Internal Data}}

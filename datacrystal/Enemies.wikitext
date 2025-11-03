@@ -1,0 +1,353 @@
+=Main=
+
+{{Todo | Document all enemy stats, attack patterns, battle AI, and sprite data}}
+
+[[Final Fantasy: Mystic Quest/ROM map]]
+
+==Enemy Stats Structure==
+
+Each enemy entry is '''74 bytes ($4a)''' starting at ROM offset '''$014275''' (unheadered).
+
+===Enemy Stats Table Format===
+
+{| class="wikitable"
+! Offset !! Size !! Description
+|-
+| $00-$01 || word || Max HP (little-endian)
+|-
+| $02 || byte || Level
+|-
+| $03 || byte || Attack Power
+|-
+| $04 || byte || Defense
+|-
+| $05 || byte || Speed
+|-
+| $06 || byte || Magic Power
+|-
+| $07 || byte || Accuracy
+|-
+| $08 || byte || Evasion
+|-
+| $09 || byte || Magic Defense
+|-
+| $0a || byte || EXP reward (low byte)
+|-
+| $0b || byte || EXP reward (mid byte)
+|-
+| $0c || byte || EXP reward (high byte)
+|-
+| $0d || byte || Gold reward (low byte)
+|-
+| $0e || byte || Gold reward (mid byte)
+|-
+| $0f || byte || Gold reward (high byte)
+|-
+| $10 || byte || Elemental weaknesses bitflags
+|-
+| $11 || byte || Elemental resistances bitflags
+|-
+| $12 || byte || Status immunities bitflags
+|-
+| $13 || byte || Status vulnerabilities bitflags
+|-
+| $14-$1f || 12 bytes || Attack pattern data (attack IDs and probabilities)
+|-
+| $20-$2f || 16 bytes || Battle AI script pointers/data
+|-
+| $30-$39 || 10 bytes || Sprite/graphics data pointers
+|-
+| $3a-$49 || 16 bytes || Additional enemy properties (behavior flags, counter-attacks, etc.)
+|}
+
+===Elemental Weakness/Resistance Flags ($10, $11)===
+
+{| class="wikitable"
+! Bit !! Element
+|-
+| 0 || Fire
+|-
+| 1 || Ice/Blizzard
+|-
+| 2 || Thunder/Lightning
+|-
+| 3 || Earth/Quake
+|-
+| 4 || Wind/Aero
+|-
+| 5 || Holy/White
+|-
+| 6 || Dark/Black
+|-
+| 7 || Non-elemental
+|}
+
+===Status Effect Flags ($12, $13)===
+
+{| class="wikitable"
+! Bit !! Status
+|-
+| 0 || Poison
+|-
+| 1 || Paralysis
+|-
+| 2 || Petrify
+|-
+| 3 || Confusion
+|-
+| 4 || Sleep
+|-
+| 5 || Silence
+|-
+| 6 || Blind
+|-
+| 7 || Fatal (instant death)
+|}
+
+==Enemy List==
+
+===World Map Enemies===
+
+{| class="wikitable"
+! ID !! Name !! HP !! Level !! Attack !! Defense !! Speed !! Magic !! EXP !! Gold !! ROM Offset
+|-
+| $00 || Goblin || 10 || 1 || 5 || 2 || 3 || 1 || 2 || 5 || $014275
+|-
+| $01 || Mad Plant || 15 || 2 || 6 || 3 || 2 || 2 || 3 || 8 || $0142bf
+|-
+| $02 || Brownie || 20 || 3 || 7 || 4 || 4 || 3 || 5 || 12 || $014309
+|-
+| $03 || Bee || 12 || 2 || 8 || 2 || 6 || 1 || 3 || 7 || $014353
+|-
+| $04 || Mushroom || 25 || 4 || 9 || 5 || 3 || 4 || 8 || 15 || $01439d
+|-
+|}
+
+{{Todo | Add all remaining enemies (120+ total enemies including bosses)}}
+
+===Hill of Destiny Enemies===
+
+{| class="wikitable"
+! ID !! Name !! HP !! Level !! Attack !! Defense !! Speed !! Magic !! EXP !! Gold !! ROM Offset
+|-
+| $05 || Minotaur || 50 || 5 || 12 || 8 || 5 || 5 || 15 || 25 || $0143e7
+|-
+| $06 || Stheno || 35 || 4 || 10 || 6 || 4 || 6 || 12 || 20 || $014431
+|-
+|}
+
+===Foresta Enemies===
+
+{{Todo | Document Foresta region enemies}}
+
+===Aquaria Enemies===
+
+{{Todo | Document Aquaria region enemies}}
+
+===Fireburg Enemies===
+
+{{Todo | Document Fireburg region enemies}}
+
+===Windia Enemies===
+
+{{Todo | Document Windia region enemies}}
+
+===Boss Enemy Data===
+
+{| class="wikitable"
+! ID !! Name !! HP !! Level !! Attack !! Defense !! Speed !! Magic !! EXP !! Gold !! ROM Offset !! Notes
+|-
+| $?? || Flamerus Rex || 4000 || ?? || ?? || ?? || ?? || ?? || 5000 || 2000 || $01???? || Four-phase battle
+|-
+| $?? || Ice Golem || 3500 || ?? || ?? || ?? || ?? || ?? || 4500 || 1800 || $01???? || Two-phase battle
+|-
+| $?? || Pazuzu || 9999 || ?? || ?? || ?? || ?? || ?? || 9999 || 9999 || $01???? || Final boss
+|-
+|}
+
+{{Todo | Add all boss enemy data with complete stats}}
+
+==Attack Patterns==
+
+Enemy attack patterns are stored as sequences of attack IDs with probability weights.
+
+===Attack Pattern Format===
+
+Each enemy has up to 6 attack pattern slots ($14-$1f, 12 bytes total):
+
+{| class="wikitable"
+! Offset !! Size !! Description
+|-
+| $14-$15 || word || Attack ID 1 (attack index + probability weight)
+|-
+| $16-$17 || word || Attack ID 2
+|-
+| $18-$19 || word || Attack ID 3
+|-
+| $1a-$1b || word || Attack ID 4
+|-
+| $1c-$1d || word || Attack ID 5
+|-
+| $1e-$1f || word || Attack ID 6
+|}
+
+The probability weight determines how often an enemy uses each attack. Higher values = more frequent use.
+
+{{Todo | Document attack ID reference table and probability calculations}}
+
+==Battle AI Scripts==
+
+Enemy battle AI is controlled by scripted behavior patterns stored at $20-$2f in each enemy entry.
+
+===AI Script Format===
+
+{| class="wikitable"
+! Offset !! Size !! Description
+|-
+| $20-$21 || word || AI script pointer (ROM address)
+|-
+| $22 || byte || AI trigger condition (HP threshold, turn count, etc.)
+|-
+| $23 || byte || AI behavior flags
+|-
+| $24-$2f || 12 bytes || AI script parameters and conditional logic
+|}
+
+===AI Behavior Flags ($23)===
+
+{| class="wikitable"
+! Bit !! Behavior
+|-
+| 0 || Counter-attack enabled
+|-
+| 1 || Transform/phase change
+|-
+| 2 || Summon reinforcements
+|-
+| 3 || HP-based behavior change
+|-
+| 4 || Status-based behavior
+|-
+| 5 || Targeting priority (player vs companion)
+|-
+| 6 || Special attack pattern
+|-
+| 7 || Boss-specific behavior
+|}
+
+{{Todo | Document AI script opcodes and behavior patterns}}
+
+==Graphics Data==
+
+Enemy sprites use 3BPP (3 bits per pixel, 8 colors) format.
+
+===Sprite Data Format===
+
+{| class="wikitable"
+! Offset !! Size !! Description
+|-
+| $30-$31 || word || Sprite tile data pointer (ROM address)
+|-
+| $32-$33 || word || Sprite palette pointer (ROM address)
+|-
+| $34 || byte || Sprite width (in tiles)
+|-
+| $35 || byte || Sprite height (in tiles)
+|-
+| $36-$37 || word || Animation frame data pointer
+|-
+| $38 || byte || Number of animation frames
+|-
+| $39 || byte || Animation speed/delay
+|}
+
+===3BPP Tile Format===
+
+Each 8×8 tile is stored as 3 bitplanes (24 bytes total):
+* Bitplane 0: 8 bytes (bits 0 of each pixel)
+* Bitplane 1: 8 bytes (bits 1 of each pixel)
+* Bitplane 2: 8 bytes (bits 2 of each pixel)
+
+Pixel values range from $0-$7 (8 colors per palette).
+
+{{Todo | Document sprite compression format and palette assignments}}
+
+==Additional Properties==
+
+The final 16 bytes ($3a-$49) contain various enemy-specific properties:
+
+{| class="wikitable"
+! Offset !! Size !! Description
+|-
+| $3a || byte || Battle background ID
+|-
+| $3b || byte || Battle music track ID
+|-
+| $3c || byte || Victory fanfare override
+|-
+| $3d || byte || Enemy size/scale
+|-
+| $3e || byte || Battle position (X coordinate)
+|-
+| $3f || byte || Battle position (Y coordinate)
+|-
+| $40 || byte || Item drop ID
+|-
+| $41 || byte || Item drop rate (probability)
+|-
+| $42-$43 || word || Special ability flags
+|-
+| $44-$49 || 6 bytes || Reserved/unknown
+|}
+
+===Special Ability Flags ($42-$43)===
+
+{| class="wikitable"
+! Bit !! Ability
+|-
+| 0 || Can't be scanned with Libra
+|-
+| 1 || Immune to instant death
+|-
+| 2 || Immune to petrify
+|-
+| 3 || Can't be run from
+|-
+| 4 || Multi-part enemy
+|-
+| 5 || Regenerates HP
+|-
+| 6 || Absorbs elemental damage
+|-
+| 7 || Reflects magic
+|-
+| 8 || Counter-attacks physical
+|-
+| 9 || Counter-attacks magic
+|-
+| 10 || Changes form on death
+|-
+| 11 || Revives after death
+|-
+| 12-15 || Reserved
+|}
+
+==Notes==
+
+* Total enemy count: Approximately 120-130 unique enemies including bosses
+* Enemy stats table starts at ROM $014275 (unheadered)
+* Each enemy entry is exactly 74 bytes ($4a)
+* Boss enemies often have multi-phase behavior with separate stat entries for each phase
+* Some enemies have special scripted behaviors that override normal battle AI
+
+{{Todo | Extract complete enemy stats from ROM for all 120+ enemies}}
+{{Todo | Document boss-specific multi-phase battle mechanics}}
+{{Todo | Map all enemy sprite graphics to ROM offsets}}
+
+=Related=
+
+* [[Final Fantasy: Mystic Quest/Attacks]] - Attack data and damage formulas
+* [[Final Fantasy: Mystic Quest/Graphics]] - Graphics formats and tile structures
+* [[Final Fantasy: Mystic Quest/ROM map]] - Complete ROM structure
+
+{{Internal Data}}
