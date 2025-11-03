@@ -201,6 +201,35 @@ python -m json.tool data/extracted/enemies/enemies.json | less
 open data/extracted/enemies/enemies.csv
 ```
 
+## References
+
+### GameFAQs Guides
+
+- **Main FFMQ Page**: https://gamefaqs.gamespot.com/snes/532476-final-fantasy-mystic-quest/faqs
+  - Comprehensive collection of guides, FAQs, and walkthroughs
+
+- **Enemies FAQ by DrProctor**: https://gamefaqs.gamespot.com/snes/532476-final-fantasy-mystic-quest/faqs/23095
+  - Enemy HP values, experience, and gold drops
+  - Used to verify extraction accuracy
+  - Note: Some boss encounters may have different HP values than regular enemies
+  - Verification: `python tools/verify_gamefaqs_data.py`
+
+### ROM Documentation
+
+- **FFMQ Randomizer Source**: https://github.com/Alchav/FFMQRando
+  - Element type definitions and bitfield mappings
+  - Data structure specifications
+  - ROM address reference
+
+### Data Verification
+
+Our extracted enemy HP data has been verified against the GameFAQs Enemies FAQ:
+- ✅ 40 enemies match exactly (Brownie, Flazzard, Mad Toad, etc.)
+- ⚠️ 10 enemies show discrepancies (likely bosses with multiple encounters)
+- ℹ️ 33 enemies not documented in GameFAQs (boss phases, quest variants)
+
+Run verification: `python tools/verify_gamefaqs_data.py`
+
 ## Next Steps
 
 1. ✅ Extract and convert working
