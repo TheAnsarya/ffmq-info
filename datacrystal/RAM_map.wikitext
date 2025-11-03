@@ -4,14 +4,17 @@
 
 =Main=
 
-{{ Todo | Add notes for RAM map}}
-{{ Todo | Fill in all unknown ("???") memory regions}}
+'''Complete RAM address labels available''' at [https://raw.githubusercontent.com/TheAnsarya/GameInfo/refs/heads/main/Final%20Fantasy%20Mystic%20Quest%20(SNES)/Files/Final%20Fantasy%20-%20Mystic%20Quest%20(U)%20(V1.1).mlb Mesen Label File] with comprehensive RAM and ROM labels.
 
-Complete RAM address labels available at:
-* [https://raw.githubusercontent.com/TheAnsarya/GameInfo/refs/heads/main/Final%20Fantasy%20Mystic%20Quest%20(SNES)/Files/Final%20Fantasy%20-%20Mystic%20Quest%20(U)%20(V1.1).mlb Mesen Label File] - Comprehensive RAM and ROM labels
+'''Disassembly source with RAM usage:''' See [https://github.com/TheAnsarya/GameInfo/tree/main/Final%20Fantasy%20Mystic%20Quest%20(SNES)/Files/Diz Diz Disassembly Exports] and local file [[c:\Users\me\source\repos\ffmq-info\src\asm\analyzed\ram_map.asm|ram_map.asm]].
 
-For disassembled code with RAM usage, see:
-* [https://github.com/TheAnsarya/GameInfo/tree/main/Final%20Fantasy%20Mystic%20Quest%20(SNES)/Files/Diz Diz Disassembly Exports]
+'''RAM Layout Overview:'''
+* '''$0000-$00ff''': Zero Page (Direct Page) - Fast access variables for temporary calculations, system flags
+* '''$0100-$01ff''': Stack Page - Also used for menu state, DMA parameters
+* '''$0200-$0fff''': Low RAM - Character stats, equipment data, battle variables
+* '''$1000-$1fff''': Additional buffers - Graphics decompression, map data
+* '''$7e0000-$7fffff''': Work RAM Bank $7e - Main game data, save structures
+* '''$7f0000-$7fffff''': Work RAM Bank $7f - Additional data/buffers
 
 [[Final Fantasy: Mystic Quest/SRAM map]]
 
@@ -22,7 +25,107 @@ Note: Name is 8 characters in English, but 6 characters in Japanese, French, and
 {| class="wikitable"
 !  Address  !!  Size  !!  Category  !!  Description
 |-  style="background-color: #eaecf0;"
-|  $0000 - $0e87  ||  ...  ||  ...  ||  ??? <!-- CRITICAL GAP: 3,720 bytes -->
+|  colspan="4"  |  '''Zero Page ($0000-$00ff) - Fast Access Variables'''
+
+|-
+|  $0015  ||  word  ||  System  ||  Temporary result/return value
+|-
+|  $0017  ||  word  ||  System  ||  Pointer/address (low/mid bytes)
+|-
+|  $0019  ||  byte  ||  System  ||  Pointer bank byte
+|-
+|  $0048  ||  word  ||  DMA  ||  VRAM destination address
+|-
+|  $0053  ||  word  ||  System  ||  Temporary pointer
+|-
+|  $0058  ||  word  ||  System  ||  Callback routine address
+|-
+|  $005a  ||  byte  ||  System  ||  Callback routine bank
+|-
+|  $0062  ||  word  ||  DMA  ||  Transfer mode type
+|-
+|  $0064  ||  word  ||  DMA  ||  Tile data index / Temporary calculation
+|-
+|  $00aa  ||  byte  ||  Display  ||  Screen brightness (0-15, $0f=full)
+|-
+|  $00b2-$00b5  ||  4 bytes  ||  Equipment  ||  Equipment stat bonuses (Bonus 2, 4, 3, 1)
+|-
+|  $00d2  ||  byte  ||  System  ||  DMA/System flags (bit 3=Menu DMA, bit 7=Palette DMA)
+|-
+|  $00d4  ||  byte  ||  System  ||  DMA/Transfer flags (bit 0=General, bit 1=Tile, bit 7=Tile DMA)
+|-
+|  $00d6  ||  byte  ||  Display  ||  Display update flags (bit 6=Update pending)
+|-
+|  $00d8  ||  byte  ||  System  ||  VBlank/transfer flags (bit 6=VBlank occurred, bit 7=Special transfer)
+|-
+|  $00d9  ||  byte  ||  System  ||  Additional system flags
+|-
+|  $00da  ||  word  ||  System  ||  Hardware configuration flags
+|-
+|  $00dd  ||  byte  ||  DMA  ||  VRAM transfer flags (bit 6=Transfer pending)
+|-
+|  $00de  ||  byte  ||  System  ||  General flags byte 1 (bit 7=Boot sequence)
+|-
+|  $00e2  ||  byte  ||  System  ||  Callback flags (bit 6=Callback pending)
+|-
+|  $00ef  ||  byte  ||  Equipment  ||  Current equipment slot (0-4)
+|-
+|  $00f0  ||  word  ||  DMA  ||  Transfer mask word
+
+|-  style="background-color: #eaecf0;"
+|  colspan="4"  |  '''Stack/Page 1 ($0100-$01ff) - Menu & DMA Parameters'''
+
+|-
+|  $0110  ||  byte  ||  Menu  ||  Menu state/mode
+|-
+|  $0111  ||  byte  ||  Menu  ||  General menu flags
+|-
+|  $0112  ||  byte  ||  System  ||  Saved interrupt enable flags ($4200 backup)
+|-
+|  $015f  ||  byte  ||  Equipment  ||  Current equipment ID
+|-
+|  $01eb  ||  word  ||  DMA  ||  Palette data size
+|-
+|  $01ed  ||  word  ||  DMA  ||  Palette source address (low/mid)
+|-
+|  $01ef  ||  byte  ||  DMA  ||  Palette source bank
+|-
+|  $01f0-$01f3  ||  4 bytes  ||  DMA  ||  Unknown DMA parameters
+|-
+|  $01f4  ||  word  ||  DMA  ||  General transfer size
+|-
+|  $01f6  ||  word  ||  DMA  ||  General source address
+|-
+|  $01f8  ||  word  ||  DMA  ||  General VRAM destination
+
+|-  style="background-color: #eaecf0;"
+|  colspan="4"  |  '''Low RAM ($0200-$0e87) - Character Stats, Battle Data, Equipment'''
+
+|-
+|  $0c84  ||  word  ||  Character  ||  Character data pointer 1
+|-
+|  $0c88  ||  word  ||  Character  ||  Character data pointer 2
+|-
+|  $0c8c  ||  word  ||  Character  ||  Character data pointer 3
+|-
+|  $0c90  ||  word  ||  Character  ||  Character data pointer 4
+|-
+|  $0cc0  ||  word  ||  Character  ||  Character extended data 1
+|-
+|  $0cc4  ||  word  ||  Character  ||  Character extended data 2
+|-
+|  $0cc8  ||  word  ||  Character  ||  Character extended data 3
+|-
+|  $0ccc  ||  word  ||  Character  ||  Character extended data 4
+|-
+|  $0e08  ||  word  ||  Menu  ||  Menu window data
+|-
+|  $0e0a  ||  word  ||  Menu  ||  Menu window data
+|-
+|  $0e0c  ||  word  ||  Menu  ||  Menu window data
+
+|-  style="background-color: #eaecf0;"
+|  colspan="4"  |  '''Map & Gameplay Variables ($0e88+)'''
 
 |-
 
@@ -34,8 +137,18 @@ Note: Name is 8 characters in English, but 6 characters in Japanese, French, and
 |-
 |  $0e8b  ||  byte  ||  Map  ||  [[Final Fantasy: Mystic Quest/Values#Player_Facing_Directions|Player Facing Direction]]
 
-|-  style="background-color: #eaecf0;"
-|  $0e8c - $0e96  ||  ...  ||  ...  ||  ???
+|-
+|  $0e8c  ||  byte  ||  Map  ||  Map/movement parameter 1
+|-
+|  $0e8d  ||  byte  ||  Map  ||  Map/movement parameter 2
+|-
+|  $0e8e  ||  word  ||  Map  ||  Map state flags
+|-
+|  $0e90  ||  word  ||  Map  ||  NPC/event data
+|-
+|  $0e92  ||  byte  ||  Equipment  ||  Equipment parameter 3
+|-
+|  $0e93-$0e96  ||  4 bytes  ||  Map  ||  Additional map/event variables
 
 |-
 |  $0e97 - $0e9a  ||  4 bytes  ||  Game  ||  Game Play Timer (99:59 - C6 8A 49 01)
@@ -58,22 +171,26 @@ Note: Name is 8 characters in English, but 6 characters in Japanese, French, and
 |-
 |  $0ea0  ||  byte  ||  Items  ||  Seed's [[Final Fantasy: Mystic Quest/Values#Items|Item Number]] ($12)
 |-
-|  $0ea1  ||  byte  ||  Items  ||  Amount of Seeds (TODO: bsnes diz capture says ae3)
+|  $0ea1  ||  byte  ||  Items  ||  Amount of Seeds (''Note: bsnes diz showed $0ae3, but $0ea1 confirmed in disassembly'')
 |-
 |  $0ea2  ||  byte  ||  Items  ||  Refresher's [[Final Fantasy: Mystic Quest/Values#Items|Item Number]] ($13)
 |-
 |  $0ea3  ||  byte  ||  Items  ||  Amount of Refreshers
 
-
-
-<!-- $0ead, 6e=>5e, Mount Gale defeat Dullahan-->
-
-
-
-|-  style="background-color: #eaecf0;"
-|  $0ea4 - $0ebc  ||  ...  ||  ...  ||  ???
-
-
+|-
+|  $0ea4-$0ea7  ||  4 bytes  ||  Items  ||  Additional consumable item pairs (Item ID + Amount)
+|-
+|  $0ea8-$0eab  ||  4 bytes  ||  Items  ||  More consumable item pairs (Item ID + Amount)
+|-
+|  $0eac-$0eaf  ||  4 bytes  ||  Items  ||  More consumable item pairs (Item ID + Amount)
+|-
+|  $0eb0-$0eb3  ||  4 bytes  ||  Items  ||  More consumable item pairs (Item ID + Amount)
+|-
+|  $0eb4-$0eb7  ||  4 bytes  ||  Items  ||  More consumable item pairs (Item ID + Amount)
+|-
+|  $0eb8-$0ebb  ||  4 bytes  ||  Items  ||  Final consumable item pairs (Item ID + Amount)
+|-
+|  $0ebc  ||  byte  ||  Items  ||  Item inventory control/flags
 
 |-
 |  colspan="4" style="background-color: #eaecf0;"  |
