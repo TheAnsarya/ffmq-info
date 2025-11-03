@@ -1,0 +1,201 @@
+{
+  "metadata": {
+    "game": "Final Fantasy Mystic Quest",
+    "version": "1.0.0",
+    "description": "Complete element type definitions for FFMQ. Element types are 16-bit bitfield values used in enemy resistances/weaknesses, attack properties, and spell effects.",
+    "source": "FFMQ Randomizer (FFMQRLib/Enemies.cs ElementsType enum) + ROM analysis"
+  },
+  "element_types": [
+    {
+      "id": 0,
+      "name": "Silence",
+      "bit_value": "0x0001",
+      "bit_position": 0,
+      "category": "status_effect",
+      "description": "Prevents the target from casting magic spells. Affects magic ability usage.",
+      "color": "purple",
+      "icon": "🤐"
+    },
+    {
+      "id": 1,
+      "name": "Blind",
+      "bit_value": "0x0002",
+      "bit_position": 1,
+      "category": "status_effect",
+      "description": "Reduces the target's accuracy, making physical attacks more likely to miss.",
+      "color": "gray",
+      "icon": "😵"
+    },
+    {
+      "id": 2,
+      "name": "Poison",
+      "bit_value": "0x0004",
+      "bit_position": 2,
+      "category": "status_effect",
+      "description": "Deals continuous HP damage over time. Target takes damage at regular intervals.",
+      "color": "green",
+      "icon": "☠️"
+    },
+    {
+      "id": 3,
+      "name": "Confusion",
+      "bit_value": "0x0008",
+      "bit_position": 3,
+      "category": "status_effect",
+      "description": "Target acts randomly and may attack allies or use incorrect actions.",
+      "color": "yellow",
+      "icon": "😵‍💫"
+    },
+    {
+      "id": 4,
+      "name": "Sleep",
+      "bit_value": "0x0010",
+      "bit_position": 4,
+      "category": "status_effect",
+      "description": "Target cannot act until awakened. Taking damage typically removes sleep.",
+      "color": "blue",
+      "icon": "😴"
+    },
+    {
+      "id": 5,
+      "name": "Paralysis",
+      "bit_value": "0x0020",
+      "bit_position": 5,
+      "category": "status_effect",
+      "description": "Target is immobilized and cannot take any actions for the duration.",
+      "color": "yellow",
+      "icon": "⚡"
+    },
+    {
+      "id": 6,
+      "name": "Stone",
+      "bit_value": "0x0040",
+      "bit_position": 6,
+      "category": "status_effect",
+      "description": "Target is petrified. In battle, this usually means instant defeat.",
+      "color": "gray",
+      "icon": "🗿"
+    },
+    {
+      "id": 7,
+      "name": "Doom",
+      "bit_value": "0x0080",
+      "bit_position": 7,
+      "category": "status_effect",
+      "description": "Target will be KO'd after a countdown expires. Typically irreversible.",
+      "color": "black",
+      "icon": "💀"
+    },
+    {
+      "id": 8,
+      "name": "Projectile",
+      "bit_value": "0x0100",
+      "bit_position": 8,
+      "category": "damage_type",
+      "description": "Damage from projectile-based attacks (arrows, thrown weapons, etc.).",
+      "color": "brown",
+      "icon": "🏹"
+    },
+    {
+      "id": 9,
+      "name": "Bomb",
+      "bit_value": "0x0200",
+      "bit_position": 9,
+      "category": "damage_type",
+      "description": "Explosive damage type. Often associated with bomb enemies or explosive attacks.",
+      "color": "orange",
+      "icon": "💣"
+    },
+    {
+      "id": 10,
+      "name": "Axe",
+      "bit_value": "0x0400",
+      "bit_position": 10,
+      "category": "damage_type",
+      "description": "Damage from axe weapons. Some enemies are resistant or weak to axe-type attacks.",
+      "color": "silver",
+      "icon": "🪓"
+    },
+    {
+      "id": 11,
+      "name": "Zombie",
+      "bit_value": "0x0800",
+      "bit_position": 11,
+      "category": "damage_type",
+      "description": "Undead/zombie type. Reverses resistance logic (resistant to healing, weak to life magic).",
+      "color": "darkgreen",
+      "icon": "🧟"
+    },
+    {
+      "id": 12,
+      "name": "Air",
+      "bit_value": "0x1000",
+      "bit_position": 12,
+      "category": "element",
+      "description": "Wind/Air elemental damage. One of the four primary elements aligned with crystals.",
+      "color": "lightblue",
+      "icon": "💨"
+    },
+    {
+      "id": 13,
+      "name": "Fire",
+      "bit_value": "0x2000",
+      "bit_position": 13,
+      "category": "element",
+      "description": "Fire elemental damage. One of the four primary elements aligned with crystals.",
+      "color": "red",
+      "icon": "🔥"
+    },
+    {
+      "id": 14,
+      "name": "Water",
+      "bit_value": "0x4000",
+      "bit_position": 14,
+      "category": "element",
+      "description": "Water/Ice elemental damage. One of the four primary elements aligned with crystals.",
+      "color": "blue",
+      "icon": "💧"
+    },
+    {
+      "id": 15,
+      "name": "Earth",
+      "bit_value": "0x8000",
+      "bit_position": 15,
+      "category": "element",
+      "description": "Earth/Ground elemental damage. One of the four primary elements aligned with crystals.",
+      "color": "brown",
+      "icon": "⛰️"
+    }
+  ],
+  "usage_notes": {
+    "enemy_resistances": "When an enemy has a resistance bit set, damage from that element type is halved. EXCEPTION: Zombie type reverses this - healing becomes harmful, life magic becomes effective.",
+    "enemy_weaknesses": "When an enemy has a weakness bit set, damage from that element type is doubled. This makes battles significantly easier if you exploit weaknesses.",
+    "attack_properties": "Attacks and spells can have multiple element type bits set. For example, an attack might be both Fire element AND inflict Poison status.",
+    "spell_effects": "White magic typically has no element type (pure healing). Black magic often has elemental properties (Fire, Water, Air, Earth). Wizard magic may combine multiple elements.",
+    "bitfield_usage": "Element types are stored as 16-bit values. Multiple types can be combined using bitwise OR. Example: 0x2004 = Fire (0x2000) + Poison (0x0004).",
+    "resistance_weakness_interaction": "If an enemy is BOTH resistant AND weak to the same element (unusual but possible), the effects typically cancel out to normal damage."
+  },
+  "examples": {
+    "salamander_resistances": {
+      "value": "0x2000",
+      "elements": ["Fire"],
+      "description": "Salamander is resistant to Fire attacks - fire damage is halved"
+    },
+    "freeze_crab_weaknesses": {
+      "value": "0x2000",
+      "elements": ["Fire"],
+      "description": "Freeze Crab is weak to Fire attacks - fire damage is doubled"
+    },
+    "zombie_type": {
+      "value": "0x0800",
+      "elements": ["Zombie"],
+      "description": "Undead enemies with Zombie type reverse healing - Cure damages them, Life magic is effective"
+    },
+    "multi_element_attack": {
+      "value": "0x3004",
+      "elements": ["Fire", "Air", "Poison"],
+      "bit_breakdown": "0x2000 (Fire) | 0x1000 (Air) | 0x0004 (Poison)",
+      "description": "An attack that deals Fire and Air elemental damage while also potentially inflicting Poison status"
+    }
+  }
+}

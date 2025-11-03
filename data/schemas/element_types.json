@@ -1,0 +1,107 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "FFMQ Element Types Schema",
+  "description": "Comprehensive element type definitions for Final Fantasy Mystic Quest. Element types are represented as bitfield values used in enemy resistances/weaknesses, attack properties, and spell effects.",
+  "version": "1.0.0",
+  "definitions": {
+    "element_type": {
+      "type": "object",
+      "required": ["id", "name", "bit_value", "category", "description"],
+      "properties": {
+        "id": {
+          "type": "integer",
+          "description": "Unique identifier for this element type"
+        },
+        "name": {
+          "type": "string",
+          "description": "Display name of the element type"
+        },
+        "bit_value": {
+          "type": "string",
+          "pattern": "^0x[0-9A-Fa-f]{4}$",
+          "description": "16-bit bitfield value (hex format)"
+        },
+        "bit_position": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 15,
+          "description": "Bit position (0-15) in the element bitfield"
+        },
+        "category": {
+          "type": "string",
+          "enum": ["status_effect", "damage_type", "element"],
+          "description": "Category of this element type"
+        },
+        "description": {
+          "type": "string",
+          "description": "Detailed description of this element type's effect"
+        },
+        "color": {
+          "type": "string",
+          "description": "Associated color (for visualization)"
+        },
+        "icon": {
+          "type": "string",
+          "description": "Icon or symbol representing this element"
+        }
+      }
+    }
+  },
+  "type": "object",
+  "required": ["metadata", "element_types"],
+  "properties": {
+    "metadata": {
+      "type": "object",
+      "required": ["game", "version", "description"],
+      "properties": {
+        "game": {
+          "type": "string",
+          "const": "Final Fantasy Mystic Quest"
+        },
+        "version": {
+          "type": "string",
+          "description": "Schema version"
+        },
+        "description": {
+          "type": "string",
+          "description": "Overview of element type system"
+        },
+        "source": {
+          "type": "string",
+          "description": "Data source reference (FFMQ Randomizer, ROM analysis, etc.)"
+        }
+      }
+    },
+    "element_types": {
+      "type": "array",
+      "description": "Complete list of all element types in FFMQ",
+      "items": {
+        "$ref": "#/definitions/element_type"
+      },
+      "minItems": 16,
+      "maxItems": 16
+    },
+    "usage_notes": {
+      "type": "object",
+      "description": "Notes on how element types are used in game data",
+      "properties": {
+        "enemy_resistances": {
+          "type": "string",
+          "description": "How resistances work (halves damage, reverses for Zombie)"
+        },
+        "enemy_weaknesses": {
+          "type": "string",
+          "description": "How weaknesses work (doubles damage)"
+        },
+        "attack_properties": {
+          "type": "string",
+          "description": "How attacks use element types"
+        },
+        "spell_effects": {
+          "type": "string",
+          "description": "How spells apply element types"
+        }
+      }
+    }
+  }
+}
