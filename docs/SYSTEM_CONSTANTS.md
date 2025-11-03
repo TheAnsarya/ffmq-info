@@ -187,6 +187,49 @@ LDX #WORD_0000          ; Clear X register
 
 ---
 
+### Phase 2: Game-Specific Constants ✅ COMPLETE
+**Date**: November 2, 2025  
+**Files Modified**: `src/asm/banks/labels.asm`
+
+**Added Constants** (68 total):
+- Character/Party limits: 3 constants (MAX_LEVEL, MAX_PARTY_SIZE, NUM_CHARACTERS)
+- Stat limits: 3 constants (MAX_HP, MAX_MP, MAX_STAT_VALUE)
+- Direction constants: 5 constants (DIR_UP through DIR_RIGHT, NUM_DIRECTIONS)
+- Magic types: 4 constants (MAGIC_TYPE_WHITE through NUM_MAGIC_TYPES)
+- Item types: 7 constants (ITEM_TYPE_WEAPON through ITEM_TYPE_KEY)
+- Screen/Display: 3 constants (SCREEN_WIDTH_TILES, SCREEN_HEIGHT_TILES, TILE_SIZE_PIXELS)
+- Graphics: 4 constants (BYTES_PER_TILE_*, COLORS_PER_PALETTE, BYTES_PER_COLOR)
+- Battle system: 2 constants (MAX_ENEMIES, NUM_BATTLE_ACTIONS)
+- Menu system: 2 constants (MAX_MENU_ITEMS, MAX_INVENTORY_SIZE)
+- Elements/Status: 2 constants (NUM_ELEMENTS, NUM_STATUS_EFFECTS)
+- Crystal flags: 5 constants (CRYSTAL_EARTH through ALL_CRYSTALS)
+- Text/Dialog: 4 constants (TEXT_CHAR_*, MAX_NAME_LENGTH)
+- Counter limits: 2 constants (COUNTER_MAX_8BIT, COUNTER_MAX_16BIT)
+
+**Build Verification**: ✅ 100% ROM match maintained  
+**SHA256**: `F71817F55FEBD32FD1DCE617A326A77B6B062DD0D4058ECD289F64AF1B7A1D05`
+
+**Usage Examples**:
+```asm
+; Character stats
+LDA #MAX_LEVEL              ; Load maximum level (41)
+CMP #MAX_PARTY_SIZE         ; Check party size limit
+
+; Direction handling
+LDA #DIR_UP                 ; Face up
+CMP #NUM_DIRECTIONS         ; Validate direction
+
+; Graphics operations
+LDX #BYTES_PER_TILE_4BPP   ; Load 4bpp tile size (32 bytes)
+LDA #COLORS_PER_PALETTE     ; 16 colors per palette
+
+; Crystal flags
+LDA #CRYSTAL_EARTH | CRYSTAL_FIRE   ; Earth and Fire crystals
+CMP #ALL_CRYSTALS           ; Check if all 4 obtained
+```
+
+---
+
 ### Phase 2: Game-Specific Constants (PLANNED)
 
 **Future Enhancements**:

@@ -248,3 +248,79 @@
 	WORD_0000 = $0000                    ;      |        |      ; Zero word
 	WORD_FFFF = $ffff                    ;      |        |      ; All bits set ($FFFF)
 	WORD_8000 = $8000                    ;      |        |      ; High bit set ($8000)
+
+; ===============================================================================
+; GAME-SPECIFIC CONSTANTS
+; ===============================================================================
+; Character and party limits
+	MAX_LEVEL = 41                       ;      |        |      ; Maximum player level (decimal 41)
+	MAX_PARTY_SIZE = $02                 ;      |        |      ; Maximum party size (2 characters)
+	NUM_CHARACTERS = $04                 ;      |        |      ; Total playable characters (4)
+	
+; Character stats limits
+	MAX_HP = 999                         ;      |        |      ; Maximum HP (decimal 999)
+	MAX_MP = 99                          ;      |        |      ; Maximum MP per type (decimal 99)
+	MAX_STAT_VALUE = 255                 ;      |        |      ; Maximum stat value (decimal 255)
+	
+; Direction constants
+	DIR_UP = $00                         ;      |        |      ; Facing up
+	DIR_DOWN = $01                       ;      |        |      ; Facing down
+	DIR_LEFT = $02                       ;      |        |      ; Facing left
+	DIR_RIGHT = $03                      ;      |        |      ; Facing right
+	NUM_DIRECTIONS = $04                 ;      |        |      ; Total directions
+	
+; Magic type constants
+	MAGIC_TYPE_WHITE = $00               ;      |        |      ; White magic
+	MAGIC_TYPE_BLACK = $01               ;      |        |      ; Black magic
+	MAGIC_TYPE_WIZARD = $02              ;      |        |      ; Wizard magic
+	NUM_MAGIC_TYPES = $03                ;      |        |      ; Total magic types
+	
+; Item type constants
+	ITEM_TYPE_WEAPON = $01               ;      |        |      ; Weapon item
+	ITEM_TYPE_ARMOR = $02                ;      |        |      ; Armor item
+	ITEM_TYPE_SHIELD = $03               ;      |        |      ; Shield item
+	ITEM_TYPE_HELMET = $04               ;      |        |      ; Helmet item
+	ITEM_TYPE_ACCESSORY = $05            ;      |        |      ; Accessory item
+	ITEM_TYPE_CONSUMABLE = $06           ;      |        |      ; Consumable item
+	ITEM_TYPE_KEY = $07                  ;      |        |      ; Key item
+	
+; Screen/display constants
+	SCREEN_WIDTH_TILES = $20             ;      |        |      ; Screen width (32 tiles)
+	SCREEN_HEIGHT_TILES = $1c            ;      |        |      ; Screen height (28 tiles)
+	TILE_SIZE_PIXELS = $08               ;      |        |      ; Tile size (8x8 pixels)
+	
+; Graphics constants
+	BYTES_PER_TILE_2BPP = $10            ;      |        |      ; 16 bytes per 2bpp tile
+	BYTES_PER_TILE_4BPP = $20            ;      |        |      ; 32 bytes per 4bpp tile
+	COLORS_PER_PALETTE = $10             ;      |        |      ; 16 colors per palette
+	BYTES_PER_COLOR = $02                ;      |        |      ; 2 bytes per SNES color (15-bit BGR)
+	
+; Battle constants
+	MAX_ENEMIES = $08                    ;      |        |      ; Maximum enemies per battle (8)
+	NUM_BATTLE_ACTIONS = $08             ;      |        |      ; Number of battle actions per character
+	
+; Menu constants
+	MAX_MENU_ITEMS = $14                 ;      |        |      ; Maximum menu items (20)
+	MAX_INVENTORY_SIZE = $20             ;      |        |      ; Maximum inventory slots (32)
+	
+; Element/Status constants
+	NUM_ELEMENTS = $04                   ;      |        |      ; Number of elements (4: Earth, Fire, Water, Wind)
+	NUM_STATUS_EFFECTS = $08             ;      |        |      ; Number of status effects (8)
+	
+; Crystal constants
+	CRYSTAL_EARTH = $01                  ;      |        |      ; Earth crystal bit flag
+	CRYSTAL_WATER = $02                  ;      |        |      ; Water crystal bit flag
+	CRYSTAL_FIRE = $04                   ;      |        |      ; Fire crystal bit flag
+	CRYSTAL_WIND = $08                   ;      |        |      ; Wind crystal bit flag
+	ALL_CRYSTALS = $0f                   ;      |        |      ; All crystals obtained ($01 | $02 | $04 | $08)
+	
+; Text/Dialog constants
+	TEXT_CHAR_NEWLINE = $01              ;      |        |      ; Newline character code
+	TEXT_CHAR_END = $00                  ;      |        |      ; End of text marker
+	TEXT_CHAR_SPACE = $20                ;      |        |      ; Space character
+	MAX_NAME_LENGTH = $08                ;      |        |      ; Maximum name length (8 characters)
+	
+; Common counter limits
+	COUNTER_MAX_8BIT = $ff               ;      |        |      ; Maximum 8-bit counter value (255)
+	COUNTER_MAX_16BIT = $ffff            ;      |        |      ; Maximum 16-bit counter value (65535)
+
