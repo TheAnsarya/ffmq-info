@@ -30,18 +30,18 @@ def run_command(cmd, description):
     """Run a command and return success status."""
     print(f"[INFO] {description}...")
     result = subprocess.run(cmd, shell=True, capture_output=True, text=True)
-    
+
     if result.returncode != 0:
         print(f"[ERROR] {description} failed!")
         print(result.stderr)
         return False
-    
+
     return True
 
 def main():
     """Main entry point."""
     import argparse
-    
+
     parser = argparse.ArgumentParser(
         description='Build ROM and compare with original',
         formatter_class=argparse.RawDescriptionHelpFormatter,
@@ -55,22 +55,22 @@ This tool:
 This helps you verify that your modifications are working correctly.
         """
     )
-    
+
     parser.add_argument('--verbose', '-v', action='store_true',
                        help='Show detailed differences')
     parser.add_argument('--keep-temp', '-k', action='store_true',
                        help='Keep temporary backup file')
-    
+
     args = parser.parse_args()
-    
+
     print("=" * 80)
     print("Build and Compare Tool")
     print("=" * 80)
     print()
-    
+
     rom_path = Path("build/ffmq-rebuilt.sfc")
     backup_path = Path("build/ffmq-rebuilt.sfc.backup")
-    
+
     # Step 1: Backup current ROM
     if rom_path.exists():
         print("[INFO] Backing up current ROM...")
@@ -79,9 +79,9 @@ This helps you verify that your modifications are working correctly.
     else:
         print("[INFO] No existing ROM to backup")
         backup_path = None
-    
+
     print()
-    
+
     # Step 2: Convert data (if JSON changed)
     print("[INFO] Converting battle data to ASM...")
     result = subprocess.run(
@@ -89,29 +89,29 @@ This helps you verify that your modifications are working correctly.
         capture_output=True,
         text=True
     )
-    
+
     if result.returncode != 0:
         print("[ERROR] Data conversion failed!")
         print(result.stderr)
         return 1
-    
+
     print("[OK] Data conversion complete")
     print()
-    
+
     # Step 3: Build ROM
     if not run_command("pwsh -File build.ps1", "Building ROM"):
         return 1
-    
+
     print("[OK] ROM build complete")
     print()
-    
+
     # Step 4: Compare
     if backup_path and backup_path.exists():
         print("=" * 80)
         print("Comparing with Previous Build")
         print("=" * 80)
         print()
-        
+
         compare_cmd = [
             sys.executable,
             "tools/compare_roms.py",
@@ -119,12 +119,12 @@ This helps you verify that your modifications are working correctly.
             str(rom_path),
             "--regions"
         ]
-        
+
         if args.verbose:
             compare_cmd.append("--verbose")
-        
+
         result = subprocess.run(compare_cmd)
-        
+
         # Clean up backup unless --keep-temp
         if not args.keep_temp:
             print()
@@ -136,7 +136,7 @@ This helps you verify that your modifications are working correctly.
     else:
         print("[INFO] No previous build to compare with")
         print("       This appears to be a fresh build")
-    
+
     print()
     print("=" * 80)
     print("[SUCCESS] Build and compare complete!")
@@ -147,7 +147,7 @@ This helps you verify that your modifications are working correctly.
     print()
     print("Test it:")
     print(f"  mesen {rom_path}")
-    
+
     return 0
 
 if __name__ == '__main__':

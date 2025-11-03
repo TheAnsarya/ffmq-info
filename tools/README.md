@@ -1,12 +1,364 @@
-# FFMQ Disassembly Tools
+# FFMQ Tools Directory
 
-This directory contains automation tools for the FFMQ disassembly project.
+This directory contains tools for ROM hacking, modding, and disassembly.
 
 ## Table of Contents
 
-1. [Address Scanner](#address-scanner) - Scan and catalog all raw memory addresses
-2. [ROM Data Catalog](#rom-data-catalog) - Catalog all DATA8/DATA16/ADDR labels
-3. [Label Application Tool](#label-application-tool) - Apply labels to assembly files
+### Battle Data Modding Tools
+1. [Enemy Editor GUI](#enemy-editor-gui) - Visual enemy editor ⭐
+2. [Enemy Stats Viewer](#enemy-stats-viewer) - Quick command-line stats viewer
+3. [ROM Comparison](#rom-comparison) - Compare ROM differences
+4. [Build & Compare](#build--compare) - Automated build workflow
+5. [Test Suite](#test-suite) - Master test runner
+6. [Data Pipeline](#data-pipeline) - Extract, convert, integrate battle data
+
+### Disassembly Tools
+7. [Address Scanner](#address-scanner) - Scan and catalog all raw memory addresses
+8. [ROM Data Catalog](#rom-data-catalog) - Catalog all DATA8/DATA16/ADDR labels
+9. [Label Application Tool](#label-application-tool) - Apply labels to assembly files
+
+---
+
+## Battle Data Modding Tools
+
+Complete toolkit for editing enemy stats, attacks, and battle data in FFMQ.
+
+### Enemy Editor GUI
+
+**File:** `enemy_editor_gui.py`  
+**Launcher:** `enemy_editor.bat` (Windows) / `enemy_editor.sh` (Linux/Mac)  
+**Documentation:** `docs/ENEMY_EDITOR_GUIDE.md`
+
+#### Purpose
+
+Visual GUI for editing all 83 enemies in Final Fantasy Mystic Quest with real-time validation, undo/redo support, and built-in testing.
+
+#### Features
+
+✅ **Visual editing** - Browse all enemies with search and filtering  
+✅ **Intuitive controls** - Sliders and spinboxes for all stats  
+✅ **Element editor** - Visual selection for resistances/weaknesses  
+✅ **Undo/redo** - Full undo history (Ctrl+Z/Ctrl+Y)  
+✅ **GameFAQs validation** - Verify accuracy against community data  
+✅ **Pipeline testing** - Test data extraction and conversion  
+✅ **Export options** - Save JSON or generate ASM directly
+
+#### Quick Start
+
+```bash
+# Windows
+enemy_editor.bat
+
+# Linux/Mac
+./enemy_editor.sh
+
+# Or directly
+python tools/enemy_editor_gui.py
+```
+
+#### Workflow
+
+1. **Browse** - Select enemy from list or search by name
+2. **Edit** - Modify stats using sliders/spinboxes
+3. **Save** - Click "Save Enemy" or press Ctrl+S
+4. **Export** - Generate JSON (Ctrl+E) for ROM building
+5. **Test** - Verify with built-in GameFAQs check
+
+---
+
+### Enemy Stats Viewer
+
+**File:** `view_enemy.py`
+
+#### Purpose
+
+Command-line tool for quickly viewing enemy stats without opening the GUI.
+
+#### Quick Start
+
+```bash
+# View specific enemy
+python tools/view_enemy.py Brownie
+
+# View by ID
+python tools/view_enemy.py 0
+
+# List all enemies
+python tools/view_enemy.py --list
+
+# Search for enemies
+python tools/view_enemy.py --search slime
+
+# Brief output (basic stats only)
+python tools/view_enemy.py Brownie --brief
+```
+
+#### Output Example
+
+```
+Enemy #000: Brownie
+BASIC STATS:
+  HP:              50
+  Attack:           3
+  Defense:          1
+  Speed:            3
+  Magic:            1
+LEVEL & REWARDS:
+  Level:            1
+  XP Multiplier:   22
+  GP Multiplier:    1
+RESISTANCES: None
+WEAKNESSES: None
+```
+
+---
+
+### ROM Comparison
+
+**File:** `compare_roms.py`
+
+#### Purpose
+
+Compare two SNES ROM files byte-by-byte with region identification and detailed difference reporting.
+
+#### Features
+
+✅ **Byte comparison** - Find all differences between ROMs  
+✅ **Region mapping** - Identify changed sections (Enemy Stats, Attack Data, etc.)  
+✅ **Hex dumps** - View exact byte differences  
+✅ **Statistics** - Count and percentage of changes  
+✅ **Grouping** - Group consecutive byte differences
+
+#### Quick Start
+
+```bash
+# Basic comparison
+python tools/compare_roms.py original.sfc modified.sfc
+
+# Show hex dumps of differences
+python tools/compare_roms.py rom1.sfc rom2.sfc --verbose
+
+# Group by known regions
+python tools/compare_roms.py rom1.sfc rom2.sfc --regions
+
+# Full analysis
+python tools/compare_roms.py rom1.sfc rom2.sfc --verbose --regions
+```
+
+#### Known Regions
+
+- Enemy Stats Data (`$014275-$01469F`)
+- Enemy Levels Data (`$01417C-$0141FC`)
+- Attack Data (`$014678-$014776`)
+- Text Data
+- Graphics Data
+
+---
+
+### Build & Compare
+
+**File:** `build_and_compare.py`
+
+#### Purpose
+
+Automated workflow tool that builds a modified ROM and compares it with the previous build to show what changed.
+
+#### Workflow
+
+1. **Backup** - Creates `.backup` of current ROM
+2. **Convert** - Runs JSON → ASM conversion
+3. **Build** - Executes build script
+4. **Compare** - Shows differences vs backup
+5. **Cleanup** - Optionally removes backup
+
+#### Quick Start
+
+```bash
+# Build and compare
+python tools/build_and_compare.py
+
+# Show detailed differences
+python tools/build_and_compare.py --verbose
+
+# Keep backup file
+python tools/build_and_compare.py --keep-temp
+```
+
+#### Output Example
+
+```
+[INFO] Creating backup: build/ffmq-rebuilt.sfc.backup
+[INFO] Converting battle data...
+[OK] Conversion complete
+[INFO] Building ROM...
+[OK] Build complete
+[INFO] Comparing ROMs...
+[OK] Found 127 bytes different (0.02%)
+[INFO] Differences by region:
+  - Enemy Stats: 127 bytes changed
+```
+
+---
+
+### Test Suite
+
+**File:** `run_all_tests.py`
+
+#### Purpose
+
+Master test suite runner for validating the complete battle data pipeline.
+
+#### Test Categories
+
+**Pipeline Tests** (`--category pipeline`)
+- Enemy data extraction
+- JSON modification
+- JSON → ASM conversion
+- Complete round-trip workflow
+
+**GameFAQs Verification** (`--category gamefaqs`)
+- Community data validation
+- HP value accuracy
+- Cross-reference with DrProctor's guide
+
+**Build Integration** (`--category build`)
+- ROM data verification
+- Address mapping validation
+- All 83 enemies present in ROM
+
+#### Quick Start
+
+```bash
+# Run all tests
+python tools/run_all_tests.py
+
+# Run specific category
+python tools/run_all_tests.py --category pipeline
+python tools/run_all_tests.py --category gamefaqs
+python tools/run_all_tests.py --category build
+
+# Verbose output
+python tools/run_all_tests.py --verbose
+```
+
+#### Output Example
+
+```
+Running test category: all
+✓ Pipeline End-to-End Tests PASSED (REQUIRED)
+✓ GameFAQs Data Verification PASSED (OPTIONAL)
+✓ Build Integration Verification PASSED (REQUIRED)
+
+All 3 test suites passing!
+```
+
+---
+
+### Data Pipeline
+
+Complete workflow for extracting, converting, and integrating battle data.
+
+#### Extraction Tools
+
+**Location:** `tools/extraction/`
+
+```bash
+# Extract enemy stats
+python tools/extraction/extract_enemies.py roms/your-rom.sfc
+
+# Extract attack data
+python tools/extraction/extract_attacks.py roms/your-rom.sfc
+
+# Extract enemy-attack links
+python tools/extraction/extract_enemy_attack_links.py roms/your-rom.sfc
+```
+
+**Output:** JSON files in `data/extracted/`
+
+#### Conversion Tools
+
+**Location:** `tools/conversion/`
+
+```bash
+# Convert all data (recommended)
+python tools/conversion/convert_all.py
+
+# Or convert individually
+python tools/conversion/convert_enemies.py
+python tools/conversion/convert_attacks.py
+python tools/conversion/convert_enemy_attack_links.py
+```
+
+**Output:** Assembly files in `data/converted/`
+
+#### Verification Tools
+
+```bash
+# Test complete pipeline
+python tools/test_pipeline.py
+
+# Verify GameFAQs accuracy
+python tools/verify_gamefaqs_data.py
+
+# Verify ROM integration
+python tools/verify_build_integration.py
+```
+
+---
+
+## Complete Modding Workflow
+
+### Quick Start (3 Steps)
+
+```bash
+# 1. Edit enemies
+enemy_editor.bat
+
+# 2. Build ROM
+pwsh -File build.ps1
+
+# 3. Test in emulator
+mesen build/ffmq-rebuilt.sfc
+```
+
+### Development Workflow
+
+```bash
+# 1. Extract data from ROM
+python tools/extraction/extract_enemies.py roms/ffmq.sfc
+
+# 2. Modify JSON
+# (edit data/extracted/enemies/enemies.json)
+
+# 3. Convert to ASM
+python tools/conversion/convert_all.py
+
+# 4. Test pipeline
+python tools/test_pipeline.py
+
+# 5. Build and compare
+python tools/build_and_compare.py --verbose
+
+# 6. Run all tests
+python tools/run_all_tests.py
+```
+
+### Tool Quick Reference
+
+| Tool | Command | Purpose |
+|------|---------|---------|
+| Enemy Editor | `enemy_editor.bat` | Visual enemy editing |
+| Stats Viewer | `python tools/view_enemy.py Brownie` | Quick stats lookup |
+| Test Suite | `python tools/run_all_tests.py` | Run all tests |
+| Build & Compare | `python tools/build_and_compare.py` | Automated build workflow |
+| ROM Compare | `python tools/compare_roms.py rom1.sfc rom2.sfc` | Compare ROMs |
+| Convert All | `python tools/conversion/convert_all.py` | JSON → ASM |
+
+---
+
+## Disassembly Tools
+
+Tools for analyzing and labeling the FFMQ disassembly.
 
 ---
 
