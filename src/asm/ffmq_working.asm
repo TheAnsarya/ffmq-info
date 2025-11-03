@@ -92,18 +92,28 @@ MainEntryPoint:
 ; These sections are commented out but ready to enable when we want to use
 ; our extracted and potentially modified data instead of original ROM data
 
+; --- Battle Data (ENABLED - Enemy stats, attacks, levels) ---
+; Battle data now uses extracted & modifiable JSON data converted to ASM
+pushpc
+org $02BC78  ; Attack data (Bank $02, $BC78)
+incsrc "../../data/converted/attacks/attacks_data.asm"
+pullpc
+
+pushpc
+org $02C17C  ; Enemy level data (Bank $02, $C17C)
+incsrc "../../data/converted/enemies/enemies_level.asm"
+pullpc
+
+pushpc
+org $02C275  ; Enemy stats data (Bank $02, $C275)
+incsrc "../../data/converted/enemies/enemies_stats.asm"
+pullpc
+
 ; --- Weapon Names ---
 ; pushpc
 ; org $0642a0  ; Weapon names location in ROM
 ; ; Replace with extracted data (allows easy editing via text files)
 ; incsrc "../../assets/data/weapon_names.asm"
-; pullpc
-
-; --- Enemy Data ---
-; pushpc
-; org $04f800  ; Enemy data location (approximate - needs verification)
-; ; Replace with extracted enemy stats (allows balance modifications)
-; incsrc "../../assets/data/enemies.asm"
 ; pullpc
 
 ; --- Item Data ---

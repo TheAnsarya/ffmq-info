@@ -10,8 +10,9 @@
 ; To rebuild this file:
 ;   python tools/conversion/convert_enemies.py
 ;==============================================================================
-
-org $C17C
+; NOTE: No ORG directive - this file is included inline in bank_02.asm
+;       The assembler's current address is already set correctly
+;==============================================================================
 
 enemy_level_table:
 

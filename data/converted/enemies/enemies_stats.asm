@@ -10,8 +10,9 @@
 ; To rebuild this file:
 ;   python tools/conversion/convert_enemies.py
 ;==============================================================================
-
-org $C275
+; NOTE: No ORG directive - this file is included inline in bank_02.asm
+;       The assembler's current address is already set correctly
+;==============================================================================
 
 enemy_stats_table:
 

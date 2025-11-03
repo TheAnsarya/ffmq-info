@@ -10,8 +10,9 @@
 ; To rebuild this file:
 ;   python tools/conversion/convert_attacks.py
 ;==============================================================================
-
-org $BC78
+; NOTE: No ORG directive - this file is included inline in bank_02.asm
+;       The assembler's current address is already set correctly
+;==============================================================================
 
 attack_data_table:
 
