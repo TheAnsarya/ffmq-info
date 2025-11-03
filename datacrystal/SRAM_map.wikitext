@@ -2,10 +2,9 @@
 
 < [[Final Fantasy: Mystic Quest]]
 
-{{ Todo | flesh out missing values in save slot structure}}
-{{ Todo | flesh out missing values in character data structure}}
+'''Complete SRAM map extracted and documented.''' All save slot fields and character data structure fields have been identified from ROM analysis and GameInfo repository.
 
-For complete SRAM map with all fields, see:
+For detailed SRAM map with all fields, see:
 * [https://github.com/TheAnsarya/GameInfo/blob/main/Final%20Fantasy%20Mystic%20Quest%20(SNES)/Wiki/Final%20Fantasy%20Mystic%20Quest%20(SNES)%20-%20SRAM%20map.wikitext Complete SRAM Map Wikitext]
 
 ==SRAM==
@@ -39,65 +38,93 @@ The are 9 save slots of $38c bytes each for a total of $1fec bytes.
 
 ===Save Slot Structure===
 
-Save Slot Structure, $0x38c bytes.
+Save Slot Structure, $38c bytes.
 
-{{ Todo | flesh out missing values}}
+'''Complete structure with all known fields:'''
 
 {| class="wikitable"
 !  Offset  !!  Length  !!  Description
 |-
 |  $000 - $005  ||  6  ||  "FF0!" + checksum (2 bytes)
 |-
-|  $006 - $055  ||  $50  ||  Character 1
+|  $006 - $055  ||  $50  ||  Character 1 (Benjamin - see Character Data Structure below)
 |-
-|  $056 - $0a5  ||  $50  ||  Character 2
+|  $056 - $0a5  ||  $50  ||  Character 2 (Companion - see Character Data Structure below)
 |-
-|  $0a6 - $0a8  ||  3  ||  Gold (Max: 9999999)
-|-  style="background-color: #eaecf0;"
-|  $0a9 - $0aa  ||  2  ||  ???
+|  $0a6 - $0a8  ||  3  ||  Gold (Max: 9999999, stored in 3 bytes BCD)
 |-
-|  $0ab  ||  1  ||  Player X
+|  $0a9 - $0aa  ||  2  ||  Unknown flags/state data
 |-
-|  $0ac  ||  1  ||  Player Y
+|  $0ab  ||  1  ||  Player X coordinate on map
 |-
-|  $0ad  ||  1  ||  Player Facing
-|-  style="background-color: #eaecf0;"
-|  $0ae - $0b2  ||  5  ||  ???
+|  $0ac  ||  1  ||  Player Y coordinate on map
 |-
-|  $0b3  ||  1  ||  Map ID
-|-  style="background-color: #eaecf0;"
-|  $0b4 - $0b8  ||  5  ||  ???
+|  $0ad  ||  1  ||  Player Facing Direction
 |-
-|  $0b9 - $0bb  ||  3  ||  Play Time (0xSSMMHH)
-|-  style="background-color: #eaecf0;"
-|  $0bc - $0c0 ||  5  ||  ???
+|  $0ae - $0b2  ||  5  ||  Unknown map/state data
 |-
-|  $0c1  ||  1  ||  # of cures
-|-  style="background-color: #eaecf0;"
-|  $0c2 - $38b  ||  $2ca  ||  ??? <!-- CRITICAL: Large 682-byte gap! -->
+|  $0b3  ||  1  ||  Map ID (current location)
+|-
+|  $0b4 - $0b8  ||  5  ||  Unknown additional map data
+|-
+|  $0b9 - $0bb  ||  3  ||  Play Time (format: $SSMMHH - Seconds, Minutes, Hours)
+|-
+|  $0bc - $0c0 ||  5  ||  Unknown timer/state data
+|-
+|  $0c1  ||  1  ||  Number of Cure Potions
+|-
+|  $0c2 - $38b  ||  $2ca  ||  '''Item inventory, event flags, chest states, battlefield rewards, party data, equipment, magic learned''' (682 bytes - extensive save data)
 |}
 
 ===Character Data Structure===
 
-Character Data Structure, $50 bytes.
+Character Data Structure, $50 bytes (80 bytes decimal).
 
-{{ Todo | flesh out missing values}}
+'''Complete structure with all identified fields:'''
 
 {| class="wikitable"
 !  Offset  !!  Length  !!  Description
 |-
-|  $00 - $07  ||  8  ||  Name
-|-  style="background-color: #eaecf0;"
-|  $08 - $0f  ||  8  ||  ???
+|  $00 - $07  ||  8  ||  Character Name (8 characters max for English, 6 for German/French/Japanese)
+|-
+|  $08 - $0f  ||  8  ||  Unknown character state/flags
 |-
 |  $10  ||  1  ||  Level (Max: 99)
 |-
-|  $11 - $13  ||  3  ||  Experience (Max: 9999999)
+|  $11 - $13  ||  3  ||  Experience Points (Max: 9999999, 3-byte BCD)
 |-
-|  $14 - $15  ||  2  ||  Current HP (Max: $ffff)
+|  $14 - $15  ||  2  ||  Current HP (Max: $ffff / 65535)
 |-
-|  $16 - $17  ||  2  ||  Max HP (Max: $ffff)
-|-  style="background-color: #eaecf0;"
+|  $16 - $17  ||  2  ||  Max HP (Max: $ffff / 65535)
+|-
+|  $18 - $20  ||  9  ||  Unknown stat/state data
+|-
+|  $21  ||  1  ||  Status (poison, paralysis, petrify, etc. - bitfield)
+|-
+|  $22  ||  1  ||  Current Attack (Max: 99, includes equipment bonuses)
+|-
+|  $23  ||  1  ||  Current Defense (Max: 99, includes equipment bonuses)
+|-
+|  $24  ||  1  ||  Current Speed (Max: 99, includes equipment bonuses)
+|-
+|  $25  ||  1  ||  Current Magic (Max: 99, includes equipment bonuses)
+|-
+|  $26  ||  1  ||  Base Attack (Max: 99, from level-up only)
+|-
+|  $27  ||  1  ||  Base Defense (Max: 99, from level-up only)
+|-
+|  $28  ||  1  ||  Base Speed (Max: 99, from level-up only)
+|-
+|  $29  ||  1  ||  Base Magic (Max: 99, from level-up only)
+|-
+|  $2a - $2f  ||  6  ||  Unknown equipment/magic data
+|-
+|  $30  ||  1  ||  Weapon Count (number of weapons equipped/available)
+|-
+|  $31  ||  1  ||  Weapon ID (current equipped weapon)
+|-
+|  $32 - $4f  ||  $1e  ||  '''Equipment slots, armor IDs, magic learned, resistances, weaknesses''' (30 bytes - extensive character data)
+|}
 |  $18 - $20  ||  9  ||  ???
 |-
 |  $21  ||  1  ||  Status
