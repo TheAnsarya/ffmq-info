@@ -34,7 +34,15 @@ This applies to:
 
 ==Control Codes==
 
-[TODO: Add control codes]
+See [[Final Fantasy: Mystic Quest/Text/Complex_Text|Complex Text]] for complete documentation of DTE encoding and control codes.
+
+==Subpages==
+
+* [[Final Fantasy: Mystic Quest/TBL/English|English]] - US and European text tables
+* [[Final Fantasy: Mystic Quest/TBL/French|French]] - French text table with accented characters
+* [[Final Fantasy: Mystic Quest/TBL/German|German]] - German text table with umlauts
+* [[Final Fantasy: Mystic Quest/TBL/Japanese|Japanese]] - Japanese hiragana/katakana tables
+* [[Final Fantasy: Mystic Quest/Text/Complex_Text|Complex Text]] - DTE and control codes
 
 =Links=
 

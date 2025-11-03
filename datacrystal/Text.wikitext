@@ -1,0 +1,71 @@
+{{text}}
+
+=Text System=
+
+This page documents the text encoding and dialog system used in Final Fantasy: Mystic Quest.
+
+==Overview==
+
+Final Fantasy: Mystic Quest uses a sophisticated text compression system based on:
+* '''DTE (Dual Tile Encoding)''' - Common phrases compressed into single bytes
+* '''Simple character tables''' - Direct 1:1 character mappings
+* '''Control codes''' - Special functions for textbox positioning, character names, etc.
+* '''Language variants''' - Each region has customized text tables
+
+==Text Encoding==
+
+The text system loads character tables into VRAM during gameplay:
+* '''English versions''': VRAM $6300-$6fff
+* '''Other versions''': VRAM $6200-$6fff
+
+Text is stored in ROM using a combination of:
+* Literal characters from the simple table ($90-$dd for English)
+* DTE compressed phrases ($3d-$7e)
+* Control codes for formatting and special functions ($01-$36)
+* Space/newline character ($ff)
+
+==DTE Compression==
+
+DTE (Dual Tile Encoding) compresses common letter combinations and words into single bytes, achieving approximately 30% space savings. For example:
+
+* '''Without DTE''': "The crystal is going to help you!" = 39 bytes
+* '''With DTE''': Same text using DTE codes = ~27 bytes
+
+See [[Final Fantasy: Mystic Quest/Text/Complex_Text|Complex Text]] for the complete DTE table and compression details.
+
+==Language Variants==
+
+Each regional version has a customized text table optimized for that language:
+
+* '''[[Final Fantasy: Mystic Quest/TBL/English|English]]''' - US and European versions with English DTE phrases
+* '''[[Final Fantasy: Mystic Quest/TBL/French|French]]''' - Includes accented characters (é, è, ê, ç, etc.) and French DTE
+* '''[[Final Fantasy: Mystic Quest/TBL/German|German]]''' - Includes umlauts (ä, ö, ü) and ß with German DTE
+* '''[[Final Fantasy: Mystic Quest/TBL/Japanese|Japanese]]''' - Uses hiragana/katakana instead of DTE compression
+
+==Dialog System==
+
+Dialog uses control codes for:
+* '''Textbox positioning''' - Above or below characters ($1a/$1b codes)
+* '''Variable text''' - Character names ($1d), item names ($1e), location names ($1f)
+* '''Player interaction''' - Wait for button press ($30), display player's name ($35)
+* '''Character actions''' - Movement and action sequences ($36)
+
+See [[Final Fantasy: Mystic Quest/Notes/Script_Analysis|Script Analysis]] for dialog examples and encoding patterns.
+
+==Subpages==
+
+* [[Final Fantasy: Mystic Quest/Text/Complex_Text|Complex Text]] - Complete DTE table and control codes
+* [[Final Fantasy: Mystic Quest/Notes/Script_Analysis|Script Analysis]] - Dialog system analysis
+
+==Related Pages==
+
+* [[Final Fantasy: Mystic Quest/TBL|TBL]] - Text table documentation for all language variants
+* [[Final Fantasy: Mystic Quest/ROM_map|ROM Map]] - Text data ROM locations
+
+=Links=
+
+<br/>
+
+{{Internal Data}}
+
+[[Category:Final Fantasy: Mystic Quest]]

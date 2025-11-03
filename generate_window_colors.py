@@ -46,28 +46,28 @@ for b in range(9):
             r5 = r * 4  # Map 0-8 to 0-32 (use multiples of 4)
             g5 = g * 4
             b5 = b * 4
-            
+
             # BGR555 format: 0bbbbbgggggrrrrr
             value = (b5 << 10) | (g5 << 5) | r5
-            
+
             # Split into two bytes
             byte_9c = value & 0xFF
             byte_9d = (value >> 8) & 0x7F
-            
+
             # Convert to RGB hex for CSS
             r8 = (r5 * 255) // 31
             g8 = (g5 * 255) // 31
             b8 = (b5 * 255) // 31
             hex_color = f'#{r8:02x}{g8:02x}{b8:02x}'
-            
+
             # Determine text color (black or white) based on brightness
             brightness = (r8 + g8 + b8) // 3
             text_color = '#ffffff' if brightness < 128 else '#000000'
-            
+
             # Format bits
             bits_9c = f'{byte_9c:08b}'
             bits_9d = f'{byte_9d:08b}'
-            
+
             # Add row
             output += f"""
 |-

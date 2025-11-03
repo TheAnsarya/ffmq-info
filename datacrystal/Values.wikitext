@@ -2,6 +2,10 @@
 
 =Values=
 
+==Subpages==
+
+* [[Final Fantasy: Mystic Quest/Values/Window_Colors|Window Colors]] - Complete BGR555 color palette (729 entries)
+
 ==Items==
 
 {| class="wikitable sortable"

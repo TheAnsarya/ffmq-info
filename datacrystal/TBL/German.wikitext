@@ -72,13 +72,13 @@ The complex table uses DTE optimized for German language patterns:
 | || || || Krista || Regenbogen || || || || || || || || || || er || ch
 |-
 ! style="background-color: #ffffdd;" | 4x
-| en || er  || || ch  || || || || || || || || ich || || || n  || 
+| en || er  || || ch  || || || || || || || || ich || || || n  ||
 |-
 ! style="background-color: #ffffdd;" | 5x
 | r  || || t  || || || || || || || || en  || || || ein || || in
 |-
 ! style="background-color: #ffffdd;" | 6x
-| e  || || || || || || || || || || || || de || || ei || 
+| e  || || || || || || || || || || || || de || || ei ||
 |-
 ! style="background-color: #ffffdd;" | 7x
 | st  || || || || || ist || || || der || || || || Ich  || || ||

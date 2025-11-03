@@ -103,13 +103,13 @@ The complex table uses DTE optimized for French language patterns:
 | || || || Crista || Arc-en-ciel || || e  || || s  || || || || || || es || on
 |-
 ! style="background-color: #ffffdd;" | 4x
-| t  || || le || || || er || || || || || || ai || || || || est 
+| t  || || le || || || er || || || || || || ai || || || || est
 |-
 ! style="background-color: #ffffdd;" | 5x
-| en || || || || || || || || || || || ou || || || || 
+| en || || || || || || || || || || || ou || || || ||
 |-
 ! style="background-color: #ffffdd;" | 6x
-| || || || || || || || || || || || || || || || 
+| || || || || || || || || || || || || || || ||
 |-
 ! style="background-color: #ffffdd;" | 7x
 | || || || || || || || || || || || || || || ||

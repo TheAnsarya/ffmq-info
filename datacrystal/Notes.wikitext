@@ -4,6 +4,11 @@
 
 This page contains research notes and findings about Final Fantasy: Mystic Quest (SNES).
 
+==Subpages==
+
+* [[Final Fantasy: Mystic Quest/Notes/Dungeon_Events|Dungeon Event Notes]] - Raw event tracking data for dungeon progression
+* [[Final Fantasy: Mystic Quest/Notes/Script_Analysis|Script Analysis]] - Dialog system and text encoding analysis
+
 ==ROM Version==
 
 All documentation uses '''ROM v1.1''' addresses unless otherwise noted. The v1.0 ROM has different addresses for some data.

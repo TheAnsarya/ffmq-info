@@ -75,7 +75,7 @@ The Japanese version uses a text table loaded into VRAM at '''$6200-$6fff'''. Un
 | む || め || も || や || ゆ || よ || ら || り || る || れ || ろ || わ || を || ん || ぱ || ぴ
 |-
 ! style="background-color: #ffdddd;" | bx
-| ぷ || ぺ || ぽ || ゃ || ゅ || ょ || っ || ぁ || ぃ || ぅ || ぇ || ぉ || ー || || || 
+| ぷ || ぺ || ぽ || ゃ || ゅ || ょ || っ || ぁ || ぃ || ぅ || ぇ || ぉ || ー || || ||
 |}
 
 Romaji equivalents:
