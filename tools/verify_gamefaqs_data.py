@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# -*- coding: utf-8 -*-
 """
 Verify extracted enemy data against GameFAQs enemy guide.
 Reference: https://gamefaqs.gamespot.com/snes/532476-final-fantasy-mystic-quest/faqs/23095
@@ -6,6 +7,13 @@ Reference: https://gamefaqs.gamespot.com/snes/532476-final-fantasy-mystic-quest/
 
 import json
 import os
+import sys
+import io
+
+# Fix Windows console encoding
+if sys.platform == 'win32':
+    sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8', errors='replace')
+    sys.stderr = io.TextIOWrapper(sys.stderr.buffer, encoding='utf-8', errors='replace')
 
 # GameFAQs enemy HP data (from DrProctor's Enemies FAQ v1.2)
 GAMEFAQS_ENEMY_HP = {

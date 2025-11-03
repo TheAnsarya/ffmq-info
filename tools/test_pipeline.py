@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# -*- coding: utf-8 -*-
 """
 End-to-end test of the battle data pipeline.
 
@@ -13,6 +14,13 @@ This validates the round-trip conversion without requiring a full ROM rebuild.
 
 import json
 import os
+import sys
+import io
+
+# Fix Windows console encoding
+if sys.platform == 'win32':
+    sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8', errors='replace')
+    sys.stderr = io.TextIOWrapper(sys.stderr.buffer, encoding='utf-8', errors='replace')
 import sys
 import subprocess
 import tempfile
@@ -32,14 +40,14 @@ def test_extraction():
     )
 
     if result.returncode != 0:
-        print("✗ FAILED: Extraction failed")
+        print("[ERROR] FAILED: Extraction failed")
         print(result.stderr)
         return False
 
     # Check JSON exists
     json_path = "data/extracted/enemies/enemies.json"
     if not os.path.exists(json_path):
-        print("✗ FAILED: enemies.json not created")
+        print("[ERROR] FAILED: enemies.json not created")
         return False
 
     # Load and validate JSON
@@ -47,22 +55,22 @@ def test_extraction():
         data = json.load(f)
 
     if 'enemies' not in data or 'metadata' not in data:
-        print("✗ FAILED: JSON missing required fields")
+        print("[ERROR] FAILED: JSON missing required fields")
         return False
 
     enemy_count = len(data['enemies'])
     if enemy_count != 83:
-        print(f"✗ FAILED: Expected 83 enemies, got {enemy_count}")
+        print(f"[ERROR] FAILED: Expected 83 enemies, got {enemy_count}")
         return False
 
     # Check Brownie (enemy 0) has correct HP
     brownie = data['enemies'][0]
     if brownie['name'] != 'Brownie' or brownie['hp'] != 50:
-        print(f"✗ FAILED: Brownie data incorrect: {brownie}")
+        print(f"[ERROR] FAILED: Brownie data incorrect: {brownie}")
         return False
 
-    print(f"✓ PASSED: Extracted {enemy_count} enemies")
-    print(f"✓ PASSED: Brownie HP = {brownie['hp']} (expected 50)")
+    print(f"[OK] PASSED: Extracted {enemy_count} enemies")
+    print(f"[OK] PASSED: Brownie HP = {brownie['hp']} (expected 50)")
     return True
 
 def test_json_modification():
@@ -97,10 +105,10 @@ def test_json_modification():
 
         new_hp = modified['enemies'][0]['hp']
         if new_hp != 100:
-            print(f"✗ FAILED: Modification not saved (HP = {new_hp})")
+            print(f"[ERROR] FAILED: Modification not saved (HP = {new_hp})")
             return False
 
-        print(f"✓ PASSED: Modified Brownie HP: {old_hp} → {new_hp}")
+        print(f"[OK] PASSED: Modified Brownie HP: {old_hp} → {new_hp}")
         return True
 
     finally:
@@ -123,7 +131,7 @@ def test_conversion():
     )
 
     if result.returncode != 0:
-        print("✗ FAILED: Conversion failed")
+        print("[ERROR] FAILED: Conversion failed")
         print(result.stderr)
         return False
 
@@ -137,7 +145,7 @@ def test_conversion():
 
     for file_path in expected_files:
         if not os.path.exists(file_path):
-            print(f"✗ FAILED: {file_path} not created")
+            print(f"[ERROR] FAILED: {file_path} not created")
             return False
 
     # Validate enemies_stats.asm content
@@ -147,22 +155,22 @@ def test_conversion():
 
     # Check for Brownie data
     if "Enemy 000: Brownie" not in content:
-        print("✗ FAILED: Brownie comment not in ASM")
+        print("[ERROR] FAILED: Brownie comment not in ASM")
         return False
 
     # Check for HP value ($0032 = 50 decimal)
     if "dw $0032" not in content:
-        print("✗ FAILED: Brownie HP value ($0032) not in ASM")
+        print("[ERROR] FAILED: Brownie HP value ($0032) not in ASM")
         return False
 
-    # Check for org directive
-    if "org $C275" not in content:
-        print("✗ FAILED: Missing org directive")
+    # Check for note about inline inclusion (we removed org directives)
+    if "inline" not in content.lower():
+        print("[ERROR] FAILED: Missing inline inclusion note")
         return False
 
-    print("✓ PASSED: All ASM files generated")
-    print("✓ PASSED: enemies_stats.asm contains Brownie data")
-    print("✓ PASSED: ASM has correct org directive ($C275)")
+    print("[OK] PASSED: All ASM files generated")
+    print("[OK] PASSED: enemies_stats.asm contains Brownie data")
+    print("[OK] PASSED: ASM configured for inline inclusion (no org directive)")
     return True
 
 def test_complete_pipeline():
@@ -198,7 +206,7 @@ def test_complete_pipeline():
         )
 
         if result.returncode != 0:
-            print("✗ FAILED: Conversion failed")
+            print("[ERROR] FAILED: Conversion failed")
             return False
 
         # 3. Verify ASM has new value
@@ -208,7 +216,7 @@ def test_complete_pipeline():
 
         # $03E7 = 999 decimal
         if "dw $03E7" not in content:
-            print("✗ FAILED: Modified HP ($03E7 = 999) not in ASM")
+            print("[ERROR] FAILED: Modified HP ($03E7 = 999) not in ASM")
             # Find what HP value is actually there
             for line in content.split('\n'):
                 if "Enemy 000: Brownie" in line:
@@ -217,8 +225,8 @@ def test_complete_pipeline():
                     print(f"  {content.split(chr(10))[idx:idx+5]}")
             return False
 
-        print("✓ PASSED: Complete pipeline working!")
-        print("✓ PASSED: Modified HP value reflected in ASM")
+        print("[OK] PASSED: Complete pipeline working!")
+        print("[OK] PASSED: Modified HP value reflected in ASM")
         return True
 
     finally:
@@ -234,9 +242,9 @@ def test_complete_pipeline():
 def main():
     """Run all tests."""
     print()
-    print("╔" + "=" * 78 + "╗")
-    print("║" + "  FFMQ Battle Data Pipeline - End-to-End Test Suite".ljust(78) + "║")
-    print("╚" + "=" * 78 + "╝")
+    print("=" * 80)
+    print("  FFMQ Battle Data Pipeline - End-to-End Test Suite")
+    print("=" * 80)
     print()
 
     tests = [
@@ -252,7 +260,7 @@ def main():
             passed = test_func()
             results.append((name, passed))
         except Exception as e:
-            print(f"✗ ERROR: {e}")
+            print(f"[ERROR] ERROR: {e}")
             results.append((name, False))
 
     # Summary
@@ -262,7 +270,7 @@ def main():
     print("=" * 80)
 
     for name, passed in results:
-        status = "✓ PASS" if passed else "✗ FAIL"
+        status = "[OK] PASS" if passed else "[ERROR] FAIL"
         print(f"{status}  {name}")
 
     passed_count = sum(1 for _, p in results if p)
@@ -273,11 +281,11 @@ def main():
 
     if passed_count == total_count:
         print()
-        print("🎉 ALL TESTS PASSED! Battle data pipeline is fully functional!")
+        print("[SUCCESS] ALL TESTS PASSED! Battle data pipeline is fully functional!")
         return 0
     else:
         print()
-        print("⚠️  Some tests failed. Please review the output above.")
+        print("[WARNING] Some tests failed. Please review the output above.")
         return 1
 
 if __name__ == '__main__':
