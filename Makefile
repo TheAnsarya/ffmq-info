@@ -37,7 +37,8 @@ MAIN_ASM = $(ASM_DIR)/main.s
         text-extract text-rebuild text-pipeline \
         maps-extract maps-rebuild maps-pipeline \
         overworld-extract effects-extract \
-        extract-all-phase3 rebuild-all-phase3 full-pipeline
+        extract-all-phase3 rebuild-all-phase3 full-pipeline \
+        extract-data convert-data data-pipeline
 
 # Default target
 all: rom
@@ -259,6 +260,34 @@ pipeline: extract-bank06 generate-asm verify-bank06
 	@echo "=========================================="
 	@echo "Data pipeline complete!"
 	@echo "=========================================="
+
+# ============================================
+# Battle Data Extraction & Conversion Pipeline
+# ============================================
+
+# Extract all battle data from ROM to JSON
+extract-data:
+	@echo "Extracting battle data from ROM..."
+	$(PYTHON) $(TOOLS_DIR)/extraction/extract_enemies.py
+	@echo "Enemy data extracted!"
+	@echo "Note: Attack data and attack links already extracted"
+
+# Convert all JSON data to ASM
+convert-data:
+	@echo "Converting JSON data to ASM..."
+	$(PYTHON) $(TOOLS_DIR)/conversion/convert_all.py
+
+# Full data pipeline: extract -> convert
+data-pipeline: extract-data convert-data
+	@echo ""
+	@echo "=========================================="
+	@echo "Battle data pipeline complete!"
+	@echo "=========================================="
+	@echo "Generated ASM files:"
+	@echo "  - data/converted/enemies/enemies_stats.asm"
+	@echo "  - data/converted/enemies/enemies_level.asm"
+	@echo "  - data/converted/attacks/attacks_data.asm"
+	@echo "  - data/converted/attacks/enemy_attack_links.asm"
 
 # ============================================
 # Graphics Build Integration Pipeline

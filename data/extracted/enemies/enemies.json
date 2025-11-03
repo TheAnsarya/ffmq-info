@@ -1,7 +1,21 @@
 {
   "metadata": {
     "game": "FFMQ",
-    "count": 83
+    "count": 83,
+    "description": "Enemy stats from Bank $02, ROM $C275 (14 bytes per enemy)",
+    "structure": {
+      "bytes_0_1": "HP (16-bit little-endian)",
+      "byte_2": "Attack",
+      "byte_3": "Defense",
+      "byte_4": "Speed",
+      "byte_5": "Magic",
+      "bytes_6_7": "Resistances (16-bit bitfield)",
+      "byte_8": "Magic Defense",
+      "byte_9": "Magic Evade",
+      "byte_10": "Accuracy",
+      "byte_11": "Evade",
+      "bytes_12_13": "Weaknesses (16-bit bitfield)"
+    }
   },
   "enemies": [
     {
@@ -19,8 +33,10 @@
       "level": 1,
       "xp_mult": 22,
       "gp_mult": 1,
-      "resistances": [],
-      "weaknesses": []
+      "resistances": 0,
+      "weaknesses": 0,
+      "resistances_decoded": [],
+      "weaknesses_decoded": []
     },
     {
       "id": 1,
@@ -37,8 +53,10 @@
       "level": 6,
       "xp_mult": 39,
       "gp_mult": 1,
-      "resistances": [],
-      "weaknesses": []
+      "resistances": 0,
+      "weaknesses": 0,
+      "resistances_decoded": [],
+      "weaknesses_decoded": []
     },
     {
       "id": 2,
@@ -55,9 +73,11 @@
       "level": 16,
       "xp_mult": 98,
       "gp_mult": 4,
-      "resistances": [],
-      "weaknesses": [
-        "Water"
+      "resistances": 0,
+      "weaknesses": 64,
+      "resistances_decoded": [],
+      "weaknesses_decoded": [
+        "Stone"
       ]
     },
     {
@@ -75,9 +95,11 @@
       "level": 2,
       "xp_mult": 19,
       "gp_mult": 1,
-      "resistances": [],
-      "weaknesses": [
-        "Axe"
+      "resistances": 0,
+      "weaknesses": 4,
+      "resistances_decoded": [],
+      "weaknesses_decoded": [
+        "Poison"
       ]
     },
     {
@@ -95,13 +117,15 @@
       "level": 15,
       "xp_mult": 86,
       "gp_mult": 3,
-      "resistances": [
+      "resistances": 9216,
+      "weaknesses": 36,
+      "resistances_decoded": [
         "Axe",
         "Fire"
       ],
-      "weaknesses": [
-        "Axe",
-        "Fire"
+      "weaknesses_decoded": [
+        "Poison",
+        "Paralysis"
       ]
     },
     {
@@ -119,13 +143,15 @@
       "level": 1,
       "xp_mult": 149,
       "gp_mult": 5,
-      "resistances": [
+      "resistances": 9216,
+      "weaknesses": 36,
+      "resistances_decoded": [
         "Axe",
         "Fire"
       ],
-      "weaknesses": [
-        "Axe",
-        "Fire"
+      "weaknesses_decoded": [
+        "Poison",
+        "Paralysis"
       ]
     },
     {
@@ -143,9 +169,11 @@
       "level": 1,
       "xp_mult": 24,
       "gp_mult": 1,
-      "resistances": [],
-      "weaknesses": [
-        "Bomb"
+      "resistances": 0,
+      "weaknesses": 2,
+      "resistances_decoded": [],
+      "weaknesses_decoded": [
+        "Blind"
       ]
     },
     {
@@ -163,9 +191,11 @@
       "level": 14,
       "xp_mult": 81,
       "gp_mult": 3,
-      "resistances": [],
-      "weaknesses": [
-        "Bomb"
+      "resistances": 0,
+      "weaknesses": 2,
+      "resistances_decoded": [],
+      "weaknesses_decoded": [
+        "Blind"
       ]
     },
     {
@@ -183,14 +213,17 @@
       "level": 25,
       "xp_mult": 180,
       "gp_mult": 6,
-      "resistances": [
+      "resistances": 46080,
+      "weaknesses": 1026,
+      "resistances_decoded": [
         "Axe",
         "Air",
         "Fire",
         "Earth"
       ],
-      "weaknesses": [
-        "Bomb"
+      "weaknesses_decoded": [
+        "Blind",
+        "Axe"
       ]
     },
     {
@@ -208,10 +241,12 @@
       "level": 2,
       "xp_mult": 21,
       "gp_mult": 1,
-      "resistances": [
+      "resistances": 1024,
+      "weaknesses": 0,
+      "resistances_decoded": [
         "Axe"
       ],
-      "weaknesses": []
+      "weaknesses_decoded": []
     },
     {
       "id": 10,
@@ -228,10 +263,12 @@
       "level": 6,
       "xp_mult": 38,
       "gp_mult": 1,
-      "resistances": [
+      "resistances": 8192,
+      "weaknesses": 0,
+      "resistances_decoded": [
         "Fire"
       ],
-      "weaknesses": []
+      "weaknesses_decoded": []
     },
     {
       "id": 11,
@@ -248,11 +285,14 @@
       "level": 24,
       "xp_mult": 160,
       "gp_mult": 6,
-      "resistances": [
+      "resistances": 24576,
+      "weaknesses": 16448,
+      "resistances_decoded": [
         "Fire",
         "Water"
       ],
-      "weaknesses": [
+      "weaknesses_decoded": [
+        "Stone",
         "Water"
       ]
     },
@@ -271,8 +311,10 @@
       "level": 3,
       "xp_mult": 27,
       "gp_mult": 1,
-      "resistances": [],
-      "weaknesses": []
+      "resistances": 0,
+      "weaknesses": 0,
+      "resistances_decoded": [],
+      "weaknesses_decoded": []
     },
     {
       "id": 13,
@@ -289,12 +331,14 @@
       "level": 15,
       "xp_mult": 87,
       "gp_mult": 3,
-      "resistances": [
+      "resistances": 1056,
+      "weaknesses": 64,
+      "resistances_decoded": [
         "Paralysis",
         "Axe"
       ],
-      "weaknesses": [
-        "Water"
+      "weaknesses_decoded": [
+        "Stone"
       ]
     },
     {
@@ -312,12 +356,14 @@
       "level": 21,
       "xp_mult": 137,
       "gp_mult": 5,
-      "resistances": [
+      "resistances": 1056,
+      "weaknesses": 64,
+      "resistances_decoded": [
         "Paralysis",
         "Axe"
       ],
-      "weaknesses": [
-        "Water"
+      "weaknesses_decoded": [
+        "Stone"
       ]
     },
     {
@@ -335,10 +381,12 @@
       "level": 4,
       "xp_mult": 33,
       "gp_mult": 1,
-      "resistances": [],
-      "weaknesses": [
-        "Axe",
-        "Earth"
+      "resistances": 0,
+      "weaknesses": 132,
+      "resistances_decoded": [],
+      "weaknesses_decoded": [
+        "Poison",
+        "Doom"
       ]
     },
     {
@@ -356,10 +404,12 @@
       "level": 8,
       "xp_mult": 48,
       "gp_mult": 2,
-      "resistances": [],
-      "weaknesses": [
-        "Axe",
-        "Earth"
+      "resistances": 0,
+      "weaknesses": 132,
+      "resistances_decoded": [],
+      "weaknesses_decoded": [
+        "Poison",
+        "Doom"
       ]
     },
     {
@@ -377,13 +427,16 @@
       "level": 24,
       "xp_mult": 168,
       "gp_mult": 6,
-      "resistances": [
+      "resistances": 32,
+      "weaknesses": 660,
+      "resistances_decoded": [
         "Paralysis"
       ],
-      "weaknesses": [
-        "Axe",
-        "Air",
-        "Earth"
+      "weaknesses_decoded": [
+        "Poison",
+        "Sleep",
+        "Doom",
+        "Bomb"
       ]
     },
     {
@@ -401,12 +454,14 @@
       "level": 4,
       "xp_mult": 31,
       "gp_mult": 1,
-      "resistances": [
+      "resistances": 32768,
+      "weaknesses": 136,
+      "resistances_decoded": [
         "Earth"
       ],
-      "weaknesses": [
-        "Zombie",
-        "Earth"
+      "weaknesses_decoded": [
+        "Confusion",
+        "Doom"
       ]
     },
     {
@@ -424,12 +479,14 @@
       "level": 17,
       "xp_mult": 105,
       "gp_mult": 4,
-      "resistances": [
+      "resistances": 32768,
+      "weaknesses": 72,
+      "resistances_decoded": [
         "Earth"
       ],
-      "weaknesses": [
-        "Zombie",
-        "Water"
+      "weaknesses_decoded": [
+        "Confusion",
+        "Stone"
       ]
     },
     {
@@ -447,13 +504,15 @@
       "level": 25,
       "xp_mult": 171,
       "gp_mult": 6,
-      "resistances": [
+      "resistances": 32768,
+      "weaknesses": 25,
+      "resistances_decoded": [
         "Earth"
       ],
-      "weaknesses": [
-        "Projectile",
-        "Zombie",
-        "Air"
+      "weaknesses_decoded": [
+        "Silence",
+        "Confusion",
+        "Sleep"
       ]
     },
     {
@@ -471,11 +530,13 @@
       "level": 3,
       "xp_mult": 32,
       "gp_mult": 1,
-      "resistances": [
+      "resistances": 128,
+      "weaknesses": 1,
+      "resistances_decoded": [
         "Doom"
       ],
-      "weaknesses": [
-        "Projectile"
+      "weaknesses_decoded": [
+        "Silence"
       ]
     },
     {
@@ -493,11 +554,13 @@
       "level": 9,
       "xp_mult": 51,
       "gp_mult": 2,
-      "resistances": [
+      "resistances": 128,
+      "weaknesses": 1,
+      "resistances_decoded": [
         "Doom"
       ],
-      "weaknesses": [
-        "Projectile"
+      "weaknesses_decoded": [
+        "Silence"
       ]
     },
     {
@@ -515,12 +578,14 @@
       "level": 27,
       "xp_mult": 196,
       "gp_mult": 6,
-      "resistances": [
+      "resistances": 128,
+      "weaknesses": 17,
+      "resistances_decoded": [
         "Doom"
       ],
-      "weaknesses": [
-        "Projectile",
-        "Air"
+      "weaknesses_decoded": [
+        "Silence",
+        "Sleep"
       ]
     },
     {
@@ -538,16 +603,19 @@
       "level": 16,
       "xp_mult": 108,
       "gp_mult": 4,
-      "resistances": [
+      "resistances": 46080,
+      "weaknesses": 8280,
+      "resistances_decoded": [
         "Axe",
         "Air",
         "Fire",
         "Earth"
       ],
-      "weaknesses": [
-        "Zombie",
-        "Air",
-        "Water"
+      "weaknesses_decoded": [
+        "Confusion",
+        "Sleep",
+        "Stone",
+        "Fire"
       ]
     },
     {
@@ -565,16 +633,19 @@
       "level": 22,
       "xp_mult": 153,
       "gp_mult": 5,
-      "resistances": [
+      "resistances": 46080,
+      "weaknesses": 8280,
+      "resistances_decoded": [
         "Axe",
         "Air",
         "Fire",
         "Earth"
       ],
-      "weaknesses": [
-        "Zombie",
-        "Air",
-        "Water"
+      "weaknesses_decoded": [
+        "Confusion",
+        "Sleep",
+        "Stone",
+        "Fire"
       ]
     },
     {
@@ -592,12 +663,15 @@
       "level": 10,
       "xp_mult": 56,
       "gp_mult": 2,
-      "resistances": [
+      "resistances": 10240,
+      "weaknesses": 2080,
+      "resistances_decoded": [
         "Zombie",
         "Fire"
       ],
-      "weaknesses": [
-        "Fire"
+      "weaknesses_decoded": [
+        "Paralysis",
+        "Zombie"
       ]
     },
     {
@@ -615,13 +689,16 @@
       "level": 26,
       "xp_mult": 192,
       "gp_mult": 6,
-      "resistances": [
+      "resistances": 10304,
+      "weaknesses": 2080,
+      "resistances_decoded": [
         "Stone",
         "Zombie",
         "Fire"
       ],
-      "weaknesses": [
-        "Fire"
+      "weaknesses_decoded": [
+        "Paralysis",
+        "Zombie"
       ]
     },
     {
@@ -639,13 +716,15 @@
       "level": 19,
       "xp_mult": 132,
       "gp_mult": 4,
-      "resistances": [
+      "resistances": 4608,
+      "weaknesses": 80,
+      "resistances_decoded": [
         "Bomb",
         "Air"
       ],
-      "weaknesses": [
-        "Air",
-        "Water"
+      "weaknesses_decoded": [
+        "Sleep",
+        "Stone"
       ]
     },
     {
@@ -663,13 +742,15 @@
       "level": 30,
       "xp_mult": 225,
       "gp_mult": 7,
-      "resistances": [
+      "resistances": 4608,
+      "weaknesses": 80,
+      "resistances_decoded": [
         "Bomb",
         "Air"
       ],
-      "weaknesses": [
-        "Air",
-        "Water"
+      "weaknesses_decoded": [
+        "Sleep",
+        "Stone"
       ]
     },
     {
@@ -687,11 +768,13 @@
       "level": 12,
       "xp_mult": 67,
       "gp_mult": 3,
-      "resistances": [
+      "resistances": 2176,
+      "weaknesses": 0,
+      "resistances_decoded": [
         "Doom",
         "Zombie"
       ],
-      "weaknesses": []
+      "weaknesses_decoded": []
     },
     {
       "id": 31,
@@ -708,14 +791,16 @@
       "level": 28,
       "xp_mult": 204,
       "gp_mult": 7,
-      "resistances": [
+      "resistances": 18592,
+      "weaknesses": 64,
+      "resistances_decoded": [
         "Paralysis",
         "Doom",
         "Zombie",
         "Water"
       ],
-      "weaknesses": [
-        "Water"
+      "weaknesses_decoded": [
+        "Stone"
       ]
     },
     {
@@ -733,11 +818,13 @@
       "level": 8,
       "xp_mult": 41,
       "gp_mult": 2,
-      "resistances": [
+      "resistances": 6144,
+      "weaknesses": 0,
+      "resistances_decoded": [
         "Zombie",
         "Air"
       ],
-      "weaknesses": []
+      "weaknesses_decoded": []
     },
     {
       "id": 33,
@@ -754,14 +841,16 @@
       "level": 18,
       "xp_mult": 110,
       "gp_mult": 4,
-      "resistances": [
+      "resistances": 6176,
+      "weaknesses": 80,
+      "resistances_decoded": [
         "Paralysis",
         "Zombie",
         "Air"
       ],
-      "weaknesses": [
-        "Air",
-        "Water"
+      "weaknesses_decoded": [
+        "Sleep",
+        "Stone"
       ]
     },
     {
@@ -779,12 +868,15 @@
       "level": 11,
       "xp_mult": 55,
       "gp_mult": 2,
-      "resistances": [
+      "resistances": 16512,
+      "weaknesses": 32769,
+      "resistances_decoded": [
         "Doom",
         "Water"
       ],
-      "weaknesses": [
-        "Projectile"
+      "weaknesses_decoded": [
+        "Silence",
+        "Earth"
       ]
     },
     {
@@ -802,13 +894,16 @@
       "level": 19,
       "xp_mult": 124,
       "gp_mult": 4,
-      "resistances": [
+      "resistances": 160,
+      "weaknesses": 529,
+      "resistances_decoded": [
         "Paralysis",
         "Doom"
       ],
-      "weaknesses": [
-        "Projectile",
-        "Air"
+      "weaknesses_decoded": [
+        "Silence",
+        "Sleep",
+        "Bomb"
       ]
     },
     {
@@ -826,13 +921,16 @@
       "level": 17,
       "xp_mult": 110,
       "gp_mult": 4,
-      "resistances": [
+      "resistances": 32960,
+      "weaknesses": 4104,
+      "resistances_decoded": [
         "Stone",
         "Doom",
         "Earth"
       ],
-      "weaknesses": [
-        "Zombie"
+      "weaknesses_decoded": [
+        "Confusion",
+        "Air"
       ]
     },
     {
@@ -850,14 +948,17 @@
       "level": 22,
       "xp_mult": 151,
       "gp_mult": 5,
-      "resistances": [
+      "resistances": 32960,
+      "weaknesses": 4121,
+      "resistances_decoded": [
         "Stone",
         "Doom",
         "Earth"
       ],
-      "weaknesses": [
-        "Projectile",
-        "Zombie",
+      "weaknesses_decoded": [
+        "Silence",
+        "Confusion",
+        "Sleep",
         "Air"
       ]
     },
@@ -876,13 +977,15 @@
       "level": 12,
       "xp_mult": 64,
       "gp_mult": 3,
-      "resistances": [
+      "resistances": 2048,
+      "weaknesses": 82,
+      "resistances_decoded": [
         "Zombie"
       ],
-      "weaknesses": [
-        "Bomb",
-        "Air",
-        "Water"
+      "weaknesses_decoded": [
+        "Blind",
+        "Sleep",
+        "Stone"
       ]
     },
     {
@@ -900,11 +1003,14 @@
       "level": 27,
       "xp_mult": 192,
       "gp_mult": 6,
-      "resistances": [
+      "resistances": 2048,
+      "weaknesses": 1026,
+      "resistances_decoded": [
         "Zombie"
       ],
-      "weaknesses": [
-        "Bomb"
+      "weaknesses_decoded": [
+        "Blind",
+        "Axe"
       ]
     },
     {
@@ -922,9 +1028,11 @@
       "level": 20,
       "xp_mult": 127,
       "gp_mult": 5,
-      "resistances": [],
-      "weaknesses": [
-        "Fire"
+      "resistances": 0,
+      "weaknesses": 32,
+      "resistances_decoded": [],
+      "weaknesses_decoded": [
+        "Paralysis"
       ]
     },
     {
@@ -942,12 +1050,14 @@
       "level": 26,
       "xp_mult": 187,
       "gp_mult": 6,
-      "resistances": [
+      "resistances": 256,
+      "weaknesses": 17,
+      "resistances_decoded": [
         "Projectile"
       ],
-      "weaknesses": [
-        "Projectile",
-        "Air"
+      "weaknesses_decoded": [
+        "Silence",
+        "Sleep"
       ]
     },
     {
@@ -965,11 +1075,13 @@
       "level": 11,
       "xp_mult": 62,
       "gp_mult": 2,
-      "resistances": [
+      "resistances": 128,
+      "weaknesses": 32,
+      "resistances_decoded": [
         "Doom"
       ],
-      "weaknesses": [
-        "Fire"
+      "weaknesses_decoded": [
+        "Paralysis"
       ]
     },
     {
@@ -987,12 +1099,14 @@
       "level": 28,
       "xp_mult": 209,
       "gp_mult": 7,
-      "resistances": [
+      "resistances": 128,
+      "weaknesses": 17,
+      "resistances_decoded": [
         "Doom"
       ],
-      "weaknesses": [
-        "Projectile",
-        "Air"
+      "weaknesses_decoded": [
+        "Silence",
+        "Sleep"
       ]
     },
     {
@@ -1010,13 +1124,15 @@
       "level": 9,
       "xp_mult": 48,
       "gp_mult": 2,
-      "resistances": [
+      "resistances": 8192,
+      "weaknesses": 84,
+      "resistances_decoded": [
         "Fire"
       ],
-      "weaknesses": [
-        "Axe",
-        "Air",
-        "Water"
+      "weaknesses_decoded": [
+        "Poison",
+        "Sleep",
+        "Stone"
       ]
     },
     {
@@ -1034,13 +1150,15 @@
       "level": 21,
       "xp_mult": 140,
       "gp_mult": 5,
-      "resistances": [
+      "resistances": 8224,
+      "weaknesses": 132,
+      "resistances_decoded": [
         "Paralysis",
         "Fire"
       ],
-      "weaknesses": [
-        "Axe",
-        "Earth"
+      "weaknesses_decoded": [
+        "Poison",
+        "Doom"
       ]
     },
     {
@@ -1058,11 +1176,13 @@
       "level": 7,
       "xp_mult": 43,
       "gp_mult": 1,
-      "resistances": [
+      "resistances": 1024,
+      "weaknesses": 32,
+      "resistances_decoded": [
         "Axe"
       ],
-      "weaknesses": [
-        "Fire"
+      "weaknesses_decoded": [
+        "Paralysis"
       ]
     },
     {
@@ -1080,11 +1200,13 @@
       "level": 23,
       "xp_mult": 153,
       "gp_mult": 5,
-      "resistances": [
+      "resistances": 1024,
+      "weaknesses": 32,
+      "resistances_decoded": [
         "Axe"
       ],
-      "weaknesses": [
-        "Fire"
+      "weaknesses_decoded": [
+        "Paralysis"
       ]
     },
     {
@@ -1102,11 +1224,13 @@
       "level": 18,
       "xp_mult": 118,
       "gp_mult": 4,
-      "resistances": [
+      "resistances": 2048,
+      "weaknesses": 64,
+      "resistances_decoded": [
         "Zombie"
       ],
-      "weaknesses": [
-        "Water"
+      "weaknesses_decoded": [
+        "Stone"
       ]
     },
     {
@@ -1124,12 +1248,15 @@
       "level": 30,
       "xp_mult": 225,
       "gp_mult": 7,
-      "resistances": [
+      "resistances": 18432,
+      "weaknesses": 32800,
+      "resistances_decoded": [
         "Zombie",
         "Water"
       ],
-      "weaknesses": [
-        "Fire"
+      "weaknesses_decoded": [
+        "Paralysis",
+        "Earth"
       ]
     },
     {
@@ -1147,12 +1274,14 @@
       "level": 7,
       "xp_mult": 45,
       "gp_mult": 1,
-      "resistances": [
+      "resistances": 8704,
+      "weaknesses": 32,
+      "resistances_decoded": [
         "Bomb",
         "Fire"
       ],
-      "weaknesses": [
-        "Fire"
+      "weaknesses_decoded": [
+        "Paralysis"
       ]
     },
     {
@@ -1170,12 +1299,14 @@
       "level": 14,
       "xp_mult": 84,
       "gp_mult": 3,
-      "resistances": [
+      "resistances": 9216,
+      "weaknesses": 64,
+      "resistances_decoded": [
         "Axe",
         "Fire"
       ],
-      "weaknesses": [
-        "Water"
+      "weaknesses_decoded": [
+        "Stone"
       ]
     },
     {
@@ -1193,13 +1324,15 @@
       "level": 10,
       "xp_mult": 50,
       "gp_mult": 2,
-      "resistances": [
+      "resistances": 6144,
+      "weaknesses": 80,
+      "resistances_decoded": [
         "Zombie",
         "Air"
       ],
-      "weaknesses": [
-        "Air",
-        "Water"
+      "weaknesses_decoded": [
+        "Sleep",
+        "Stone"
       ]
     },
     {
@@ -1217,13 +1350,15 @@
       "level": 29,
       "xp_mult": 209,
       "gp_mult": 7,
-      "resistances": [
+      "resistances": 6144,
+      "weaknesses": 80,
+      "resistances_decoded": [
         "Zombie",
         "Air"
       ],
-      "weaknesses": [
-        "Air",
-        "Water"
+      "weaknesses_decoded": [
+        "Sleep",
+        "Stone"
       ]
     },
     {
@@ -1241,13 +1376,16 @@
       "level": 20,
       "xp_mult": 134,
       "gp_mult": 5,
-      "resistances": [
+      "resistances": 384,
+      "weaknesses": 273,
+      "resistances_decoded": [
         "Doom",
         "Projectile"
       ],
-      "weaknesses": [
-        "Projectile",
-        "Air"
+      "weaknesses_decoded": [
+        "Silence",
+        "Sleep",
+        "Projectile"
       ]
     },
     {
@@ -1265,14 +1403,17 @@
       "level": 29,
       "xp_mult": 223,
       "gp_mult": 7,
-      "resistances": [
+      "resistances": 448,
+      "weaknesses": 273,
+      "resistances_decoded": [
         "Stone",
         "Doom",
         "Projectile"
       ],
-      "weaknesses": [
-        "Projectile",
-        "Air"
+      "weaknesses_decoded": [
+        "Silence",
+        "Sleep",
+        "Projectile"
       ]
     },
     {
@@ -1290,8 +1431,10 @@
       "level": 5,
       "xp_mult": 38,
       "gp_mult": 1,
-      "resistances": [],
-      "weaknesses": []
+      "resistances": 0,
+      "weaknesses": 0,
+      "resistances_decoded": [],
+      "weaknesses_decoded": []
     },
     {
       "id": 57,
@@ -1308,9 +1451,11 @@
       "level": 5,
       "xp_mult": 40,
       "gp_mult": 1,
-      "resistances": [],
-      "weaknesses": [
-        "Zombie"
+      "resistances": 0,
+      "weaknesses": 8,
+      "resistances_decoded": [],
+      "weaknesses_decoded": [
+        "Confusion"
       ]
     },
     {
@@ -1328,12 +1473,14 @@
       "level": 13,
       "xp_mult": 77,
       "gp_mult": 3,
-      "resistances": [
+      "resistances": 80,
+      "weaknesses": 32,
+      "resistances_decoded": [
         "Sleep",
         "Stone"
       ],
-      "weaknesses": [
-        "Fire"
+      "weaknesses_decoded": [
+        "Paralysis"
       ]
     },
     {
@@ -1351,9 +1498,12 @@
       "level": 13,
       "xp_mult": 79,
       "gp_mult": 3,
-      "resistances": [],
-      "weaknesses": [
-        "Axe"
+      "resistances": 0,
+      "weaknesses": 2052,
+      "resistances_decoded": [],
+      "weaknesses_decoded": [
+        "Poison",
+        "Zombie"
       ]
     },
     {
@@ -1371,13 +1521,15 @@
       "level": 21,
       "xp_mult": 140,
       "gp_mult": 5,
-      "resistances": [
+      "resistances": 3104,
+      "weaknesses": 64,
+      "resistances_decoded": [
         "Paralysis",
         "Axe",
         "Zombie"
       ],
-      "weaknesses": [
-        "Water"
+      "weaknesses_decoded": [
+        "Stone"
       ]
     },
     {
@@ -1395,12 +1547,15 @@
       "level": 21,
       "xp_mult": 144,
       "gp_mult": 5,
-      "resistances": [
+      "resistances": 25600,
+      "weaknesses": 32896,
+      "resistances_decoded": [
         "Axe",
         "Fire",
         "Water"
       ],
-      "weaknesses": [
+      "weaknesses_decoded": [
+        "Doom",
         "Earth"
       ]
     },
@@ -1419,7 +1574,9 @@
       "level": 29,
       "xp_mult": 228,
       "gp_mult": 7,
-      "resistances": [
+      "resistances": 59168,
+      "weaknesses": 16401,
+      "resistances_decoded": [
         "Paralysis",
         "Projectile",
         "Bomb",
@@ -1428,9 +1585,10 @@
         "Water",
         "Earth"
       ],
-      "weaknesses": [
-        "Projectile",
-        "Air"
+      "weaknesses_decoded": [
+        "Silence",
+        "Sleep",
+        "Water"
       ]
     },
     {
@@ -1448,13 +1606,15 @@
       "level": 29,
       "xp_mult": 218,
       "gp_mult": 7,
-      "resistances": [
+      "resistances": 12288,
+      "weaknesses": 80,
+      "resistances_decoded": [
         "Air",
         "Fire"
       ],
-      "weaknesses": [
-        "Air",
-        "Water"
+      "weaknesses_decoded": [
+        "Sleep",
+        "Stone"
       ]
     },
     {
@@ -1472,9 +1632,11 @@
       "level": 32,
       "xp_mult": 253,
       "gp_mult": 0,
-      "resistances": [],
-      "weaknesses": [
-        "Zombie"
+      "resistances": 0,
+      "weaknesses": 8,
+      "resistances_decoded": [],
+      "weaknesses_decoded": [
+        "Confusion"
       ]
     },
     {
@@ -1492,7 +1654,9 @@
       "level": 32,
       "xp_mult": 254,
       "gp_mult": 0,
-      "resistances": [
+      "resistances": 62624,
+      "weaknesses": 0,
+      "resistances_decoded": [
         "Paralysis",
         "Doom",
         "Axe",
@@ -1501,7 +1665,7 @@
         "Water",
         "Earth"
       ],
-      "weaknesses": []
+      "weaknesses_decoded": []
     },
     {
       "id": 66,
@@ -1518,8 +1682,10 @@
       "level": 1,
       "xp_mult": 28,
       "gp_mult": 1,
-      "resistances": [],
-      "weaknesses": []
+      "resistances": 0,
+      "weaknesses": 0,
+      "resistances_decoded": [],
+      "weaknesses_decoded": []
     },
     {
       "id": 67,
@@ -1536,8 +1702,10 @@
       "level": 3,
       "xp_mult": 34,
       "gp_mult": 10,
-      "resistances": [],
-      "weaknesses": []
+      "resistances": 0,
+      "weaknesses": 0,
+      "resistances_decoded": [],
+      "weaknesses_decoded": []
     },
     {
       "id": 68,
@@ -1554,14 +1722,16 @@
       "level": 11,
       "xp_mult": 73,
       "gp_mult": 2,
-      "resistances": [
+      "resistances": 61568,
+      "weaknesses": 0,
+      "resistances_decoded": [
         "Doom",
         "Air",
         "Fire",
         "Water",
         "Earth"
       ],
-      "weaknesses": []
+      "weaknesses_decoded": []
     },
     {
       "id": 69,
@@ -1578,15 +1748,17 @@
       "level": 11,
       "xp_mult": 78,
       "gp_mult": 2,
-      "resistances": [
+      "resistances": 62464,
+      "weaknesses": 4,
+      "resistances_decoded": [
         "Axe",
         "Air",
         "Fire",
         "Water",
         "Earth"
       ],
-      "weaknesses": [
-        "Axe"
+      "weaknesses_decoded": [
+        "Poison"
       ]
     },
     {
@@ -1604,7 +1776,9 @@
       "level": 20,
       "xp_mult": 168,
       "gp_mult": 5,
-      "resistances": [
+      "resistances": 61728,
+      "weaknesses": 512,
+      "resistances_decoded": [
         "Paralysis",
         "Projectile",
         "Air",
@@ -1612,7 +1786,9 @@
         "Water",
         "Earth"
       ],
-      "weaknesses": []
+      "weaknesses_decoded": [
+        "Bomb"
+      ]
     },
     {
       "id": 71,
@@ -1629,7 +1805,9 @@
       "level": 20,
       "xp_mult": 170,
       "gp_mult": 5,
-      "resistances": [
+      "resistances": 62800,
+      "weaknesses": 0,
+      "resistances_decoded": [
         "Sleep",
         "Stone",
         "Projectile",
@@ -1639,7 +1817,7 @@
         "Water",
         "Earth"
       ],
-      "weaknesses": []
+      "weaknesses_decoded": []
     },
     {
       "id": 72,
@@ -1656,7 +1834,9 @@
       "level": 27,
       "xp_mult": 243,
       "gp_mult": 6,
-      "resistances": [
+      "resistances": 63008,
+      "weaknesses": 16912,
+      "resistances_decoded": [
         "Paralysis",
         "Bomb",
         "Axe",
@@ -1665,8 +1845,10 @@
         "Water",
         "Earth"
       ],
-      "weaknesses": [
-        "Air"
+      "weaknesses_decoded": [
+        "Sleep",
+        "Bomb",
+        "Water"
       ]
     },
     {
@@ -1684,12 +1866,16 @@
       "level": 28,
       "xp_mult": 250,
       "gp_mult": 7,
-      "resistances": [
+      "resistances": 49184,
+      "weaknesses": 512,
+      "resistances_decoded": [
         "Paralysis",
         "Water",
         "Earth"
       ],
-      "weaknesses": []
+      "weaknesses_decoded": [
+        "Bomb"
+      ]
     },
     {
       "id": 74,
@@ -1706,14 +1892,16 @@
       "level": 10,
       "xp_mult": 40,
       "gp_mult": 0,
-      "resistances": [
+      "resistances": 58368,
+      "weaknesses": 8,
+      "resistances_decoded": [
         "Axe",
         "Fire",
         "Water",
         "Earth"
       ],
-      "weaknesses": [
-        "Zombie"
+      "weaknesses_decoded": [
+        "Confusion"
       ]
     },
     {
@@ -1731,7 +1919,9 @@
       "level": 16,
       "xp_mult": 82,
       "gp_mult": 0,
-      "resistances": [
+      "resistances": 64704,
+      "weaknesses": 32,
+      "resistances_decoded": [
         "Stone",
         "Doom",
         "Axe",
@@ -1741,8 +1931,8 @@
         "Water",
         "Earth"
       ],
-      "weaknesses": [
-        "Fire"
+      "weaknesses_decoded": [
+        "Paralysis"
       ]
     },
     {
@@ -1760,7 +1950,9 @@
       "level": 27,
       "xp_mult": 143,
       "gp_mult": 0,
-      "resistances": [
+      "resistances": 64800,
+      "weaknesses": 0,
+      "resistances_decoded": [
         "Paralysis",
         "Projectile",
         "Axe",
@@ -1770,7 +1962,7 @@
         "Water",
         "Earth"
       ],
-      "weaknesses": []
+      "weaknesses_decoded": []
     },
     {
       "id": 77,
@@ -1787,7 +1979,9 @@
       "level": 34,
       "xp_mult": 200,
       "gp_mult": 0,
-      "resistances": [
+      "resistances": 64544,
+      "weaknesses": 80,
+      "resistances_decoded": [
         "Paralysis",
         "Axe",
         "Zombie",
@@ -1796,9 +1990,9 @@
         "Water",
         "Earth"
       ],
-      "weaknesses": [
-        "Air",
-        "Water"
+      "weaknesses_decoded": [
+        "Sleep",
+        "Stone"
       ]
     },
     {
@@ -1816,7 +2010,9 @@
       "level": 35,
       "xp_mult": 206,
       "gp_mult": 0,
-      "resistances": [
+      "resistances": 65152,
+      "weaknesses": 17,
+      "resistances_decoded": [
         "Doom",
         "Bomb",
         "Axe",
@@ -1826,9 +2022,9 @@
         "Water",
         "Earth"
       ],
-      "weaknesses": [
-        "Projectile",
-        "Air"
+      "weaknesses_decoded": [
+        "Silence",
+        "Sleep"
       ]
     },
     {
@@ -1846,7 +2042,9 @@
       "level": 36,
       "xp_mult": 250,
       "gp_mult": 0,
-      "resistances": [
+      "resistances": 65152,
+      "weaknesses": 17,
+      "resistances_decoded": [
         "Doom",
         "Bomb",
         "Axe",
@@ -1856,9 +2054,9 @@
         "Water",
         "Earth"
       ],
-      "weaknesses": [
-        "Projectile",
-        "Air"
+      "weaknesses_decoded": [
+        "Silence",
+        "Sleep"
       ]
     },
     {
@@ -1876,7 +2074,9 @@
       "level": 40,
       "xp_mult": 0,
       "gp_mult": 0,
-      "resistances": [
+      "resistances": 65488,
+      "weaknesses": 0,
+      "resistances_decoded": [
         "Sleep",
         "Stone",
         "Doom",
@@ -1889,7 +2089,7 @@
         "Water",
         "Earth"
       ],
-      "weaknesses": []
+      "weaknesses_decoded": []
     },
     {
       "id": 81,
@@ -1906,15 +2106,17 @@
       "level": 1,
       "xp_mult": 0,
       "gp_mult": 0,
-      "resistances": [
+      "resistances": 49312,
+      "weaknesses": 80,
+      "resistances_decoded": [
         "Paralysis",
         "Doom",
         "Water",
         "Earth"
       ],
-      "weaknesses": [
-        "Air",
-        "Water"
+      "weaknesses_decoded": [
+        "Sleep",
+        "Stone"
       ]
     },
     {
@@ -1932,15 +2134,17 @@
       "level": 1,
       "xp_mult": 0,
       "gp_mult": 0,
-      "resistances": [
+      "resistances": 49312,
+      "weaknesses": 80,
+      "resistances_decoded": [
         "Paralysis",
         "Doom",
         "Water",
         "Earth"
       ],
-      "weaknesses": [
-        "Air",
-        "Water"
+      "weaknesses_decoded": [
+        "Sleep",
+        "Stone"
       ]
     }
   ]
