@@ -4,9 +4,7 @@
 
 =Main=
 
-{{ Todo | Expand ROM map with complete data structures from disassembly}}
-
-Addresses are all SNES addresses, not file addresses.
+Addresses are all SNES addresses, not file addresses. All data extracted from the [https://github.com/TheAnsarya/ffmq-info ffmq-info disassembly project].
 
 For complete disassembled source code, see:
 * [https://github.com/TheAnsarya/ffmq-info GitHub Repository - FFMQ Disassembly]
@@ -18,8 +16,6 @@ For complete disassembled source code, see:
 {{rommap}}
 
 =Main=
-
-{{ Todo | Add notes for ROM map}}
 
 All offsets are using a V1.1 (U) version of the ROM without a header.
 
@@ -185,6 +181,74 @@ Samples from within the SPC sequence (not listed on the sample index):
 * 0A - Saw waveform (Synth Bass)
 * 0B - Sine waveform (Flute)
 * 0C-3F - Nothing
+
+===Text Data===
+
+See [[Final Fantasy: Mystic Quest/Text|Text System]] and [[Final Fantasy: Mystic Quest/TBL|Text Tables]] for complete documentation.
+
+====Text Statistics====
+
+Based on extracted text data from ROM v1.1:
+
+{| class="wikitable"
+! Category !! Count !! Total Size !! Avg Length !! Min !! Max
+|-
+| '''Item Names''' || 232 || 2,480 bytes || 10.7 bytes || 2 || 12
+|-
+| '''Weapon Names''' || 57 || 599 bytes || 10.5 bytes || 2 || 12
+|-
+| '''Armor Names''' || 20 || 154 bytes || 7.7 bytes || 2 || 12
+|-
+| '''Accessory Names''' || 24 || 159 bytes || 6.6 bytes || 2 || 12
+|-
+| '''Spell Names''' || 32 || 180 bytes || 5.6 bytes || 2 || 12
+|-
+| '''Monster Names''' || 202 || 2,538 bytes || 12.6 bytes || 2 || 16
+|-
+| '''Location Names''' || 112 || 1,720 bytes || 15.4 bytes || 2 || 20
+|-
+| '''Dialog Strings''' || 245 || 10,588 bytes || 43.2 bytes || 2 || 304
+|-
+| colspan="2" | '''Total''' || '''18,418 bytes''' || colspan="3" | '''924 strings across 8 tables'''
+|}
+
+====Control Code Usage====
+
+{| class="wikitable"
+! Code !! Function !! Usage Count
+|-
+| NEWLINE ($01) || Line break || 166
+|-
+| WAIT ($30) || Wait for button || 124
+|-
+| CLEAR || Clear textbox || 207
+|-
+| NAME ($1d/$35) || Character/player name || 79
+|-
+| ITEM ($1e) || Item name insertion || 56
+|}
+
+====Text Table Addresses====
+
+{| class="wikitable"
+! Table !! ROM Address !! VRAM Address !! Notes
+|-
+| Item Names || $04f000 || — || 232 entries
+|-
+| Weapon Names || (inline) || — || 57 entries
+|-
+| Monster Names || (inline) || — || 202 entries
+|-
+| Location Names || (inline) || — || 112 entries
+|-
+| Dialog Strings || $088000+ || — || 245 entries
+|-
+| Character Table || — || $6300-$6fff || English versions
+|-
+| Character Table || — || $6200-$6fff || French/German/Japanese
+|}
+
+See [[Final Fantasy: Mystic Quest/TBL/English|English]], [[Final Fantasy: Mystic Quest/TBL/French|French]], [[Final Fantasy: Mystic Quest/TBL/German|German]], and [[Final Fantasy: Mystic Quest/TBL/Japanese|Japanese]] text tables for complete character mappings.
 
 =Modding Tools & Scripts=
 
