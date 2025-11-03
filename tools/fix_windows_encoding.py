@@ -8,14 +8,14 @@ def fix_script(script_path):
     """Remove emojis and fix encoding issues in a Python script."""
     with open(script_path, 'r', encoding='utf-8') as f:
         content = f.read()
-    
+
     # Add encoding declaration if not present
     if '# -*- coding: utf-8 -*-' not in content:
         content = content.replace(
             '#!/usr/bin/env python3\n',
             '#!/usr/bin/env python3\n# -*- coding: utf-8 -*-\n'
         )
-    
+
     # Add Windows console fix if not present
     if 'if sys.platform ==' not in content:
         content = content.replace(
@@ -29,7 +29,7 @@ if sys.platform == 'win32':
     sys.stderr = io.TextIOWrapper(sys.stderr.buffer, encoding='utf-8', errors='replace')
 '''
         )
-    
+
     # Replace emojis with text
     replacements = {
         '📂': '[INFO]',
@@ -41,13 +41,13 @@ if sys.platform == 'win32':
         '📁': '[INFO]',
         '📄': '[INFO]',
     }
-    
+
     for emoji, text in replacements.items():
         content = content.replace(emoji, text)
-    
+
     with open(script_path, 'w', encoding='utf-8') as f:
         f.write(content)
-    
+
     print(f"Fixed: {script_path}")
 
 # Fix all conversion scripts

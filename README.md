@@ -187,6 +187,32 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for complete formatting guidelines.
 3. Add new macros to `src/include/ffmq_macros.inc`
 4. Build and test: `make rom && make test`
 
+### Modifying Enemy Data (NEW! GUI Editor Available)
+**Quick Start:**
+```bash
+# Windows
+enemy_editor.bat
+
+# Linux/Mac
+./enemy_editor.sh
+```
+
+**Features:**
+- ✨ Visual editing of all 83 enemies
+- 📊 Edit HP, Attack, Defense, Speed, and all stats
+- 🔥 Visual element resistance/weakness selection
+- 💾 One-click save and export to ASM
+- ✅ GameFAQs data verification built-in
+- ⚡ Real-time preview with sliders
+
+**See:** [Enemy Editor Guide](docs/ENEMY_EDITOR_GUIDE.md) for complete tutorial
+
+**Alternative (Command Line):**
+1. Extract enemy data: `python tools/extraction/extract_enemies.py`
+2. Edit `data/extracted/enemies/enemies.json`
+3. Convert to ASM: `python tools/conversion/convert_all.py`
+4. Build ROM with modified data
+
 ### Modifying Graphics
 1. Extract original graphics: `make extract-assets`
 2. Edit graphics files in `assets/graphics/`
@@ -208,10 +234,12 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for complete formatting guidelines.
 **Getting Started:**
 - **[BUILD_GUIDE.md](docs/BUILD_GUIDE.md)** ⭐ - Comprehensive build instructions and troubleshooting
 - **[MODDING_GUIDE.md](docs/MODDING_GUIDE.md)** ⭐ - Complete guide to creating game modifications
+- **[ENEMY_EDITOR_GUIDE.md](docs/ENEMY_EDITOR_GUIDE.md)** ✨ NEW! - Visual enemy stats editor (GUI)
 - **[CONTRIBUTING.md](CONTRIBUTING.md)** ⭐ - How to contribute to the project
 
 **Technical Reference:**
 - **[Integration Complete](docs/integration-complete.md)** - Complete integration summary (300 lines)
+- **[Battle Data Pipeline](docs/BATTLE_DATA_PIPELINE.md)** - Enemy/attack data extraction & conversion
 - **[Source Code README](src/asm/README.md)** - Source organization and structure
 - **[Graphics Format](docs/graphics-format.md)** - SNES graphics format (600 lines)
 - **[Data Formats](docs/data_formats.md)** - Game data structures and formats

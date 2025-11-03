@@ -494,6 +494,7 @@ yes, 57
 continue doing whatever you want to do to make everything awesome!
 fix the exrtraction tool problems you found, then complete the insertion/re-convertion tools and pipeline so that build use the extracted-converted-then reconverted  data files instead of the binary data directly extracted from the rom (or `db` commands in the code); fix the whole build pipeline (see if guthub issues apply)
 add `https://gamefaqs.gamespot.com/snes/532476-final-fantasy-mystic-quest/faqs` to the references materials in the documentation and use is it as a reference to guides containg information about the game so you know if enemy HP points or elemental resistances match as well as names, etc. ; and then continue working on making this project the awesomest it can be!
+Build the GUI editor for visual enemy stat editing
 
 
 
