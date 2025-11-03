@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# -*- coding: utf-8 -*-
 """
 Master Data Conversion Script
 ==============================
@@ -22,8 +23,14 @@ Date: 2025-11-02
 """
 
 import sys
+import io
 import subprocess
 from pathlib import Path
+
+# Fix Windows console encoding issues
+if sys.platform == 'win32':
+    sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8', errors='replace')
+    sys.stderr = io.TextIOWrapper(sys.stderr.buffer, encoding='utf-8', errors='replace')
 
 
 def run_converter(script_name: str) -> int:
@@ -45,7 +52,7 @@ def run_converter(script_name: str) -> int:
     result = subprocess.run([sys.executable, str(script_path)])
 
     if result.returncode != 0:
-        print(f"\n❌ Error: {script_name} failed with exit code {result.returncode}")
+        print(f"\n[ERROR] {script_name} failed with exit code {result.returncode}")
         return result.returncode
 
     return 0
@@ -76,21 +83,21 @@ def main():
         if result != 0:
             print()
             print("="*80)
-            print("❌ Conversion Failed")
+            print("[FAILED] Conversion Failed")
             print("="*80)
             return result
 
     # Success!
     print()
     print("="*80)
-    print("✨ All Conversions Complete!")
+    print("[SUCCESS] All Conversions Complete!")
     print("="*80)
     print()
     print("Generated ASM files:")
-    print("  • data/converted/enemies/enemies_stats.asm")
-    print("  • data/converted/enemies/enemies_level.asm")
-    print("  • data/converted/attacks/attacks_data.asm")
-    print("  • data/converted/attacks/enemy_attack_links.asm")
+    print("  - data/converted/enemies/enemies_stats.asm")
+    print("  - data/converted/enemies/enemies_level.asm")
+    print("  - data/converted/attacks/attacks_data.asm")
+    print("  - data/converted/attacks/enemy_attack_links.asm")
     print()
     print("Next steps:")
     print("  1. Build ROM with: make build-from-data")

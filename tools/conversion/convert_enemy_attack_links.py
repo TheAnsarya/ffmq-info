@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# -*- coding: utf-8 -*-
 """
 Enemy-Attack Links JSON-to-ASM Converter
 =========================================
@@ -24,6 +25,12 @@ Date: 2025-11-02
 
 import json
 import sys
+import io
+
+# Fix Windows console encoding issues
+if sys.platform == 'win32':
+    sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8', errors='replace')
+    sys.stderr = io.TextIOWrapper(sys.stderr.buffer, encoding='utf-8', errors='replace')
 from pathlib import Path
 from typing import List, Dict
 
@@ -99,14 +106,14 @@ def main():
     # Load JSON data
     json_path = Path("data/extracted/enemy_attack_links/enemy_attack_links.json")
     if not json_path.exists():
-        print(f"❌ Error: JSON file not found: {json_path}")
+        print(f"[ERROR] Error: JSON file not found: {json_path}")
         print("   Run tools/extraction/extract_enemy_attack_links.py first")
         return 1
 
-    print(f"📂 Loading JSON data: {json_path}")
+    print(f"[INFO] Loading JSON data: {json_path}")
     data = load_attack_links_data(str(json_path))
     links = data['attack_links']
-    print(f"✓ Loaded {len(links)} enemy attack link entries")
+    print(f"[OK] Loaded {len(links)} enemy attack link entries")
     print()
 
     # Create output directory
@@ -114,20 +121,20 @@ def main():
     output_dir.mkdir(parents=True, exist_ok=True)
 
     # Generate ASM
-    print("🔨 Generating enemy-attack links assembly...")
+    print("[INFO] Generating enemy-attack links assembly...")
     links_asm = generate_attack_links_asm(links)
     output_path = output_dir / "enemy_attack_links.asm"
     with open(output_path, 'w') as f:
         f.write(links_asm)
-    print(f"✓ Created: {output_path}")
+    print(f"[OK] Created: {output_path}")
 
     print()
     print("="*80)
-    print("✨ Conversion Complete!")
+    print("[SUCCESS] Conversion Complete!")
     print("="*80)
     print()
     print("Generated files:")
-    print(f"  • {output_path}")
+    print(f"  - {output_path}")
     print()
     print("Next steps:")
     print("  1. Include this file in your ROM build")
