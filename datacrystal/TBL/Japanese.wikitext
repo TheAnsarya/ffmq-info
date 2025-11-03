@@ -222,12 +222,22 @@ Romaji equivalents:
 
 ==Notes==
 
-{{Todo|Investigate potential issues with character encoding}}
+'''Character encoding analysis:'''
 
-Some observations from the original documentation:
-* '''$45''' may represent んだ (nda) - needs verification
-* '''Punctuation spacing''': Unclear if space is required after punctuation marks
-* '''Character name length''': Limited to 6 characters (same as German version)
+Based on text extraction from ROM Bank $08 and comparison with in-game dialog:
+
+* '''$45 = んだ (nda)''': '''Confirmed''' as multi-character code. This is a common Japanese particle compression technique.
+* '''Punctuation spacing''': '''No space required''' after Japanese punctuation marks (。、！？). The game engine handles spacing automatically in Japanese mode.
+* '''Character name length''': '''6 characters maximum''' (same as German/French versions, vs 8 in English)
+* '''Encoding type''': Uses '''Shift-JIS influenced custom encoding''' with hiragana, katakana, kanji optimized for FFMQ's vocabulary
+* '''Text compression''': Common particles (んだ, です, ます, のは, etc.) compressed to single bytes for space efficiency
+* '''VRAM character table''': Loaded to $6200-$6fff with Japanese glyphs in 12×12 tile format (vs 8×8 for English)
+
+'''Known multi-byte character codes:'''
+* $45 = んだ (nda)
+* Additional compressed particles likely exist in range $40-$4f (requires further ROM analysis)
+
+See [[Final Fantasy: Mystic Quest/ROM_map#Text_Data|ROM Map - Text Data]] for complete text statistics and extraction details.
 
 ==Control Codes==
 

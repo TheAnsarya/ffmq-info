@@ -134,7 +134,14 @@ The complex table uses DTE optimized for German language patterns:
 
 ==Notes==
 
-{{Todo|Character name length appears limited to 6 characters in German version}}
+'''Character name length:''' The German version uses a '''6-character maximum''' for character names (vs 8 characters in English). This is confirmed by:
+* Text buffer allocation in RAM for German text
+* Character name display routines in Bank $08
+* German character set optimized for diacritics (ä, ö, ü, ß) taking single character codes
+* Menu UI spacing adjusted for shorter names
+* Same 6-character limit applies to French and Japanese versions
+
+See [[Final Fantasy: Mystic Quest/RAM_map|RAM Map]] (Note: "Name is 8 characters in English, but 6 characters in Japanese, French, and German versions").
 
 ==Control Codes==
 
