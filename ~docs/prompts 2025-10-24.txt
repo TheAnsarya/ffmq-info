@@ -488,6 +488,8 @@ focus on cleaning up the DATA labels
 update issues and task lists and review what has been done, then pick an issue and implement it, and then another, etc
 check off all completed task in the github issues and then pick one or two and implement them
 both! create the github issues and then do the rest!
+Issue #10 Phase 2: Extract game-specific constants from code analysis and then #53 and #61 issuesd and update them and then continue
+
 
 
 
