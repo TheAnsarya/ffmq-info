@@ -6,6 +6,12 @@ Pillow>=10.0.0
 # General utilities
 typing-extensions>=4.0.0
 
+# Data visualization
+matplotlib>=3.7.0
+networkx>=3.1
+pandas>=2.0.0
+seaborn>=0.12.0
+
 # Future additions (commented out for now):
-# numpy>=1.24.0  # For advanced graphics processing
+# numpy>=1.24.0  # For advanced graphics processing (included with matplotlib)
 # pygame>=2.5.0  # For interactive tile editors
