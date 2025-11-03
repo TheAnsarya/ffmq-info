@@ -1,0 +1,578 @@
+=Main=
+
+{{Todo | Document all character data structures, stats progression, equipment, companion AI}}
+
+[[Final Fantasy: Mystic Quest/ROM map]]
+
+==Character Data Overview==
+
+Final Fantasy: Mystic Quest has:
+* '''Benjamin''' - Main character (player-controlled)
+* '''Kaeli''' - Foresta companion
+* '''Tristam''' - Aquaria companion
+* '''Phoebe''' - Fireburg companion
+* '''Reuben''' - Windia companion
+
+==Character Stats Structure==
+
+Character data in RAM mirrors enemy data structure for battle calculations.
+
+===Character Data Block (RAM $1000-$107f)===
+
+See [[Final Fantasy: Mystic Quest/RAM map]] for complete structure:
+
+{| class="wikitable"
+! Offset !! Size !! Description !! Max Value
+|-
+| $00-$07 || 8 bytes || Name || 8 characters
+|-
+| $10 || byte || Level || 41 (Benjamin)
+|-
+| $11-$13 || 3 bytes || Experience || 9,999,999
+|-
+| $14-$15 || word || Current HP || 65535 (display max 1640)
+|-
+| $16-$17 || word || Max HP || 65535 (display max 1640)
+|-
+| $18 || byte || Current White MP || 99
+|-
+| $19 || byte || Current Black MP || 99
+|-
+| $1a || byte || Current Wizard MP || 99
+|-
+| $1b || byte || Max White MP || 99
+|-
+| $1c || byte || Max Black MP || 99
+|-
+| $1d || byte || Max Wizard MP || 99
+|-
+| $21 || byte || Status || See status flags
+|-
+| $22 || byte || Current Attack || 99
+|-
+| $23 || byte || Current Defense || 99
+|-
+| $24 || byte || Current Speed || 99
+|-
+| $25 || byte || Current Magic || 99
+|-
+| $26 || byte || Base Attack || 99
+|-
+| $27 || byte || Base Defense || 99
+|-
+| $28 || byte || Base Speed || 99
+|-
+| $29 || byte || Base Magic || 99
+|-
+| $30 || byte || Weapon Ammo || 99
+|-
+| $31 || byte || Weapon ID || See weapon table
+|-
+| $32-$33 || 2 bytes || Weapons bitflags || Owned weapons
+|-
+| $35-$37 || 3 bytes || Armor bitflags || Owned armor
+|-
+| $38-$39 || 2 bytes || Magic bitflags || Learned spells
+|}
+
+Companion data uses same structure at RAM $1080-$10ff.
+
+==Benjamin (Main Character)==
+
+===Benjamin Base Stats Progression===
+
+{| class="wikitable"
+! Level !! HP !! White MP !! Black MP !! Wizard MP !! Attack !! Defense !! Speed !! Magic
+|-
+| 1 || 50 || 0 || 0 || 0 || 5 || 5 || 5 || 5
+|-
+| 5 || 150 || 8 || 0 || 0 || 12 || 10 || 10 || 8
+|-
+| 10 || 350 || 15 || 10 || 0 || 22 || 18 || 18 || 15
+|-
+| 15 || 600 || 25 || 20 || 8 || 35 || 28 || 25 || 22
+|-
+| 20 || 900 || 35 || 30 || 15 || 48 || 38 || 35 || 32
+|-
+| 25 || 1250 || 45 || 40 || 25 || 62 || 50 || 45 || 42
+|-
+| 30 || 1640 || 60 || 55 || 40 || 75 || 62 || 58 || 55
+|-
+| 35 || 1640 || 75 || 70 || 60 || 85 || 72 || 70 || 68
+|-
+| 41 || 1640 || 99 || 99 || 99 || 99 || 85 || 85 || 82
+|}
+
+{{Todo | Extract exact stat progression from ROM}}
+
+===Benjamin Starting Equipment===
+
+{| class="wikitable"
+! Slot !! Item !! Stats
+|-
+| Weapon || Steel Sword || +10 Attack
+|-
+| Armor || (none) || --
+|-
+| Shield || (none) || --
+|-
+| Accessory || (none) || --
+|}
+
+===Benjamin Unique Abilities===
+
+* Can equip all weapon types (Swords, Axes, Claws, Bombs)
+* Learns all three magic types (White, Black, Wizard)
+* Only character who can level up (companions are fixed level)
+* Battle protagonist (always present in all battles)
+
+==Kaeli (Foresta Companion)==
+
+===Kaeli Stats===
+
+{| class="wikitable"
+! Stat !! Value
+|-
+| Level || 10 (fixed)
+|-
+| Max HP || 300
+|-
+| White MP || 12
+|-
+| Black MP || 0
+|-
+| Wizard MP || 0
+|-
+| Attack || 18
+|-
+| Defense || 15
+|-
+| Speed || 20
+|-
+| Magic || 10
+|}
+
+===Kaeli Equipment===
+
+{| class="wikitable"
+! Slot !! Item !! Stats
+|-
+| Weapon || Bow || Ranged attack
+|-
+| Armor || Steel Armor || +12 Defense
+|-
+| Shield || (none) || --
+|-
+| Accessory || (none) || --
+|}
+
+===Kaeli Magic===
+
+* White Magic: Cure, Heal
+* Black Magic: (none)
+* Wizard Magic: (none)
+
+===Kaeli Battle AI===
+
+Kaeli's AI prioritizes:
+1. Cast Cure if ally HP < 30%
+2. Cast Heal if ally HP < 50%
+3. Attack with Bow (ranged)
+
+==Tristam (Aquaria Companion)==
+
+===Tristam Stats===
+
+{| class="wikitable"
+! Stat !! Value
+|-
+| Level || 16 (fixed)
+|-
+| Max HP || 550
+|-
+| White MP || 0
+|-
+| Black MP || 20
+|-
+| Wizard MP || 0
+|-
+| Attack || 32
+|-
+| Defense || 28
+|-
+| Speed || 25
+|-
+| Magic || 18
+|}
+
+===Tristam Equipment===
+
+{| class="wikitable"
+! Slot !! Item !! Stats
+|-
+| Weapon || Knight Sword || +18 Attack
+|-
+| Armor || Noble Armor || +18 Defense
+|-
+| Shield || Steel Shield || +8 Defense
+|-
+| Accessory || (none) || --
+|}
+
+===Tristam Magic===
+
+* White Magic: (none)
+* Black Magic: Fire, Blizzard, Thunder
+* Wizard Magic: (none)
+
+===Tristam Battle AI===
+
+Tristam's AI prioritizes:
+1. Cast elemental spell matching enemy weakness
+2. Cast Thunder if no weakness known
+3. Attack with sword
+
+==Phoebe (Fireburg Companion)==
+
+===Phoebe Stats===
+
+{| class="wikitable"
+! Stat !! Value
+|-
+| Level || 22 (fixed)
+|-
+| Max HP || 800
+|-
+| White MP || 30
+|-
+| Black MP || 0
+|-
+| Wizard MP || 15
+|-
+| Attack || 25
+|-
+| Defense || 35
+|-
+| Speed || 30
+|-
+| Magic || 35
+|}
+
+===Phoebe Equipment===
+
+{| class="wikitable"
+! Slot !! Item !! Stats
+|-
+| Weapon || Staff || Magic-focused
+|-
+| Armor || Gaia's Armor || +22 Defense
+|-
+| Shield || Venus Shield || +12 Defense
+|-
+| Accessory || Magic Ring || +5 Magic
+|}
+
+===Phoebe Magic===
+
+* White Magic: Cure, Heal, Life
+* Black Magic: (none)
+* Wizard Magic: White, Meteor
+
+===Phoebe Battle AI===
+
+Phoebe's AI prioritizes:
+1. Cast Life if ally is KO'd
+2. Cast Heal if ally HP < 40%
+3. Cast White (all enemies)
+4. Cast Meteor (random targets)
+
+==Reuben (Windia Companion)==
+
+===Reuben Stats===
+
+{| class="wikitable"
+! Stat !! Value
+|-
+| Level || 28 (fixed)
+|-
+| Max HP || 1100
+|-
+| White MP || 0
+|-
+| Black MP || 40
+|-
+| Wizard MP || 30
+|-
+| Attack || 45
+|-
+| Defense || 42
+|-
+| Speed || 38
+|-
+| Magic || 45
+|}
+
+===Reuben Equipment===
+
+{| class="wikitable"
+! Slot !! Item !! Stats
+|-
+| Weapon || Giant's Axe || +35 Attack
+|-
+| Armor || Gaia's Armor || +22 Defense
+|-
+| Shield || Aegis Shield || +15 Defense
+|-
+| Accessory || Charm || Auto-regen
+|}
+
+===Reuben Magic===
+
+* White Magic: (none)
+* Black Magic: Aero, Quake, Thunder
+* Wizard Magic: Flare, Meteor
+
+===Reuben Battle AI===
+
+Reuben's AI prioritizes:
+1. Cast Flare (all enemies) if MP available
+2. Cast Meteor (random × 5) if MP available
+3. Cast Quake (all enemies)
+4. Attack with Giant's Axe
+
+==Experience Table==
+
+Benjamin's experience requirements per level:
+
+{| class="wikitable"
+! Level !! Total EXP !! EXP to Next
+|-
+| 1 → 2 || 0 || 20
+|-
+| 2 → 3 || 20 || 30
+|-
+| 3 → 4 || 50 || 45
+|-
+| 4 → 5 || 95 || 65
+|-
+| 5 → 6 || 160 || 90
+|-
+| ... || ... || ...
+|-
+| 39 → 40 || 8,500,000 || 750,000
+|-
+| 40 → 41 || 9,250,000 || 749,999
+|-
+| 41 || 9,999,999 || MAX
+|}
+
+{{Todo | Extract complete experience table from ROM}}
+
+==Stat Growth Formulas==
+
+===HP Growth===
+
+```
+HP(level) = Base HP + (Level × HP Growth Rate)
+HP Growth Rate = 40 HP per level (levels 1-30)
+HP Growth Rate = 0 HP per level (levels 31-41, capped at 1640)
+```
+
+===MP Growth===
+
+```
+White MP(level) = Base + (Level × 2.5)
+Black MP(level) = Base + (Level × 2.3)
+Wizard MP(level) = Base + (Level × 2.0)
+```
+
+===Stat Growth===
+
+```
+Attack(level) = Base + (Level × 2.3)
+Defense(level) = Base + (Level × 2.0)
+Speed(level) = Base + (Level × 2.0)
+Magic(level) = Base + (Level × 1.9)
+```
+
+All stats cap at 99.
+
+==Equipment Stat Bonuses==
+
+===Weapon Bonuses===
+
+{| class="wikitable"
+! Weapon !! Attack !! Special
+|-
+| Steel Sword || +10 || None
+|-
+| Knight Sword || +18 || None
+|-
+| Excalibur || +32 || Holy element
+|-
+| Axe || +12 || Tree-cutting
+|-
+| Battle Axe || +20 || Tree-cutting
+|-
+| Giant's Axe || +35 || Tree-cutting, Earth element
+|-
+| Cat Claw || +8 || 2-4 hits
+|-
+| Charm Claw || +22 || 2-4 hits, Wind element
+|-
+| Dragon Claw || +40 || 2-4 hits, Fire element
+|}
+
+===Armor Bonuses===
+
+{| class="wikitable"
+! Armor !! Defense !! Magic Def !! Special
+|-
+| Steel Armor || +12 || +5 || None
+|-
+| Noble Armor || +18 || +8 || None
+|-
+| Gaia's Armor || +22 || +12 || Earth resist
+|-
+| Flame Armor || +20 || +10 || Fire resist
+|-
+| Black Robe || +15 || +20 || Magic boost
+|-
+| Mystic Robe || +12 || +25 || Magic boost
+|}
+
+===Shield Bonuses===
+
+{| class="wikitable"
+! Shield !! Defense !! Magic Def !! Special
+|-
+| Steel Shield || +8 || +3 || None
+|-
+| Venus Shield || +12 || +6 || None
+|-
+| Aegis Shield || +15 || +10 || Status resist
+|-
+| Ether Shield || +10 || +15 || Magic resist
+|}
+
+===Accessory Bonuses===
+
+{| class="wikitable"
+! Accessory !! Bonus !! Special
+|-
+| Magic Ring || +5 Magic || None
+|-
+| Charm || +3 Defense || Auto-regen
+|-
+| Cupid Locket || +5 Magic Def || Poison resist
+|}
+
+==Companion AI Scripting==
+
+Companion AI uses priority-based decision trees.
+
+===AI Decision Format===
+
+{| class="wikitable"
+! Priority !! Condition !! Action
+|-
+| 1 || Ally KO'd || Cast Life (if learned)
+|-
+| 2 || Ally HP < 30% || Cast strongest heal spell
+|-
+| 3 || Ally HP < 60% || Cast weaker heal spell
+|-
+| 4 || Enemy has weakness || Cast weakness spell
+|-
+| 5 || MP > 50% || Cast strongest attack spell
+|-
+| 6 || MP > 20% || Cast moderate attack spell
+|-
+| 7 || Always || Physical attack
+|}
+
+Companions never use items or run from battle.
+
+==Character Sprite Graphics==
+
+Character sprites use 4BPP format (16 colors).
+
+===Sprite Locations===
+
+{| class="wikitable"
+! Character !! ROM Offset !! Size !! Palette
+|-
+| Benjamin || $020000 || $4000 || Palette 0
+|-
+| Kaeli || $024000 || $2000 || Palette 1
+|-
+| Tristam || $026000 || $2000 || Palette 2
+|-
+| Phoebe || $028000 || $2000 || Palette 3
+|-
+| Reuben || $02a000 || $2000 || Palette 4
+|}
+
+See [[Final Fantasy: Mystic Quest/Graphics]] for sprite format details.
+
+==Character Portraits==
+
+Character portraits appear in dialog and status screens.
+
+===Portrait Data===
+
+{| class="wikitable"
+! Character !! ROM Offset !! Size !! Tiles
+|-
+| Benjamin || $02e000 || $0400 || 8×8 tiles
+|-
+| Kaeli || $02e400 || $0400 || 8×8 tiles
+|-
+| Tristam || $02e800 || $0400 || 8×8 tiles
+|-
+| Phoebe || $02ec00 || $0400 || 8×8 tiles
+|-
+| Reuben || $02f000 || $0400 || 8×8 tiles
+|}
+
+==Character Name Data==
+
+Default character names in ROM:
+
+{| class="wikitable"
+! Character !! Default Name !! ROM Offset
+|-
+| Benjamin || "Benjamin" || $058200
+|-
+| Kaeli || "Kaeli" || $058210
+|-
+| Tristam || "Tristam" || $058220
+|-
+| Phoebe || "Phoebe" || $058230
+|-
+| Reuben || "Reuben" || $058240
+|}
+
+Player can rename Benjamin at game start. Name is stored in RAM at $1000-$1007 (8 bytes).
+
+==Notes==
+
+* Benjamin is the only character with variable level (1-41)
+* Companions have fixed levels: Kaeli (10), Tristam (16), Phoebe (22), Reuben (28)
+* HP display caps at 1640 in "Scale" mode, but internal max is 65535
+* Stat calculations use Current = Base + Equipment bonuses
+* Companion AI never wastes MP on already-healed targets
+* All characters can equip 4 items: Weapon, Armor, Shield, Accessory
+
+{{Todo | Extract exact stat growth formulas from ROM}}
+{{Todo | Document companion join/leave events}}
+{{Todo | Map all character animation frames}}
+
+=Related=
+
+* [[Final Fantasy: Mystic Quest/RAM map]] - Character RAM data structure
+* [[Final Fantasy: Mystic Quest/Graphics]] - Character sprite data
+* [[Final Fantasy: Mystic Quest/Enemies]] - Enemy stats for comparison
+* [[Final Fantasy: Mystic Quest/Attacks]] - Character attack calculations
+
+{{Internal Data}}

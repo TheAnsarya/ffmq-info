@@ -1,0 +1,553 @@
+=Main=
+
+{{Todo | Document all sound/music data, SPC format, BRR samples, sequence data, sound effects}}
+
+[[Final Fantasy: Mystic Quest/ROM map]]
+
+==Sound System Overview==
+
+Final Fantasy: Mystic Quest uses the SNES SPC700 sound processor with:
+* '''BRR Sample Format''' - Compressed audio samples
+* '''SPC Sequence Data''' - Music note sequences and control codes
+* '''19 Instruments''' - Sample-based instruments
+* '''21+ Music Tracks''' - Battle, overworld, dungeon themes
+* '''Sound Effects''' - Battle sounds, menu beeps, ambient effects
+
+==SPC Sound Data Locations==
+
+===Pointers and Indexes===
+
+{| class="wikitable"
+! ROM Offset !! Data !! Description
+|-
+| $06bdae || SPC pointers || Pointers to SPC sequences ($03 bytes each)
+|-
+| $06bdff || BRR pointers || Pointers to BRR sample data
+|-
+| $06bea1 || Instrument indexes || Sample indexes for 19 instruments
+|-
+| $06c201 || BRR samples || Compressed audio sample data
+|-
+| $0750fd || SPC sequences || Music sequence data starts
+|}
+
+All offsets are unheadered.
+
+==BRR Sample Format==
+
+BRR (Bit Rate Reduction) is the SNES audio compression format.
+
+===BRR Block Format===
+
+Each BRR block is '''9 bytes''':
+
+{| class="wikitable"
+! Byte !! Bits !! Description
+|-
+| 0 || 7-6 || Filter type (0-3)
+|-
+| 0 || 5-4 || Shift amount (0-12)
+|-
+| 0 || 3 || Reserved
+|-
+| 0 || 2 || Loop flag
+|-
+| 0 || 1 || End flag
+|-
+| 0 || 0 || Reserved
+|-
+| 1-8 || 8 bytes || Compressed sample data (16 nibbles = 16 samples)
+|}
+
+Each nibble (4 bits) represents one sample after decompression.
+
+===BRR Decompression===
+
+```
+For each nibble:
+  1. Extract 4-bit signed sample
+  2. Apply shift: sample <<= shift_amount
+  3. Apply filter based on previous samples
+  4. Output 16-bit PCM sample
+```
+
+Filter types:
+* Filter 0: No filtering (direct)
+* Filter 1: Previous sample × 15/16
+* Filter 2: Previous sample × 61/32 - second previous × 15/16
+* Filter 3: Previous sample × 115/64 - second previous × 13/16
+
+==Instrument Sample Data==
+
+19 instruments are defined in the game.
+
+===Instrument List===
+
+{| class="wikitable"
+! ID !! Name !! BRR Offset !! Loop Point !! Description
+|-
+| $00 || Nothing || -- || -- || Silent (no sample)
+|-
+| $01 || Guitar || $06c201 || Yes || Acoustic guitar strum
+|-
+| $02 || Kick Drum || $06c420 || No || Bass drum hit
+|-
+| $03 || Brass Section || $06c580 || Yes || Trumpet/trombone ensemble
+|-
+| $04 || Distortion Guitar || $06c8e0 || Yes || Electric guitar with distortion
+|-
+| $05 || Synth Bass || $06cc40 || Yes || Electronic bass sound
+|-
+| $06 || Snare Drum || $06cd20 || No || Snare drum hit
+|-
+| $07 || Flute || $06ce00 || Yes || Soft flute tone
+|-
+| $08 || Organ || $06d180 || Yes || Hammond-style organ
+|-
+| $09 || Strings || $06d500 || Yes || Violin/viola section
+|-
+| $0a || Trumpet || $06d880 || Yes || Solo trumpet
+|-
+| $0b || Xylophone || $06dc00 || No || Pitched percussion
+|-
+| $0c || Timpani || $06de40 || No || Orchestral bass drum
+|-
+| $0d || High Hat || $06df00 || No || Cymbal hit
+|-
+| $0e || Tom Tom || $06dfc0 || No || Mid-range drum
+|-
+| $0f || Crash Cymbal || $06e080 || No || Cymbal crash
+|-
+| $10 || Choir || $06e240 || Yes || Vocal "ahh" sound
+|-
+| $11 || Chime || $06e5c0 || Yes || Bell-like sound
+|-
+| $12 || Synth Lead || $06e900 || Yes || Electronic lead
+|}
+
+==SPC Sequence Format==
+
+Music is stored as sequences of note events and control codes.
+
+===Note Events ($00-$bf)===
+
+{| class="wikitable"
+! Value Range !! Description
+|-
+| $00-$0c || Play note C (octaves 0-6+)
+|-
+| $0d-$19 || Play note C# (octaves 0-6+)
+|-
+| $1a-$26 || Play note D (octaves 0-6+)
+|-
+| $27-$33 || Play note D# (octaves 0-6+)
+|-
+| $34-$40 || Play note E (octaves 0-6+)
+|-
+| $41-$4d || Play note F (octaves 0-6+)
+|-
+| $4e-$5a || Play note F# (octaves 0-6+)
+|-
+| $5b-$67 || Play note G (octaves 0-6+)
+|-
+| $68-$74 || Play note G# (octaves 0-6+)
+|-
+| $75-$81 || Play note A (octaves 0-6+)
+|-
+| $82-$8e || Play note A# (octaves 0-6+)
+|-
+| $8f-$9b || Play note B (octaves 0-6+)
+|-
+| $9c-$bf || Reserved/extended notes
+|}
+
+Note value formula:
+```
+Note Value = (Octave × 13) + Semitone
+Where:
+  C=0, C#=1, D=2, D#=3, E=4, F=5, F#=6, G=7, G#=8, A=9, A#=10, B=11, Rest=12
+```
+
+===Control Codes ($d2-$ff)===
+
+{| class="wikitable"
+! Code !! Parameters !! Description
+|-
+| $d2 || xx || Set instrument volume to xx (0-255)
+|-
+| $d3 || xx || Pan channel left (0-127)
+|-
+| $d4 || xx || Pan channel right (0-127)
+|-
+| $d5 || xx yy || Set ADSR envelope (attack/decay/sustain/release)
+|-
+| $d6 || xx || Set gain value
+|-
+| $d7 || ss tt dd || Vibrato: speed, time, depth
+|-
+| $d8 || xx || Tremolo depth
+|-
+| $d9 || xx || Set detune amount
+|-
+| $da || -- || Tie note (continue previous note)
+|-
+| $db || -- || Rest (silence)
+|-
+| $dc || xx || Set note length multiplier
+|-
+| $dd || xx || Transpose up xx semitones
+|-
+| $de || xx || Transpose down xx semitones
+|-
+| $df || xx yy || Portamento: speed, target note
+|-
+| $e0 || xx || Set echo volume
+|-
+| $e1 || xx || Set echo feedback
+|-
+| $e2 || xx || Set echo delay
+|-
+| $e3 || xx || Enable/disable echo
+|-
+| $e4 || xx || Pitch bend (signed offset)
+|-
+| $e5 || xx || Set default note length (in ticks)
+|-
+| $e6 || xx yy || Loop start: repeat count, offset
+|-
+| $e7 || -- || Loop end (return to loop start)
+|-
+| $e8 || xx || Jump to offset xx
+|-
+| $e9 || xx || Call subroutine at offset xx
+|-
+| $ea || xx || Change instrument to ID xx
+|-
+| $eb || -- || Return from subroutine
+|-
+| $ec || xx || Conditional jump if flag set
+|-
+| $ed || xx || Set flag
+|-
+| $ee || xx || Clear flag
+|-
+| $ef || xx yy || Set master volume: left, right
+|-
+| $f0 || xx || Noise frequency (for noise channel)
+|-
+| $f1 || xx || Noise enable/disable
+|-
+| $f2 || -- || End of track/voice
+|-
+| $f3 || xx || Change tempo to xx (BPM-related)
+|-
+| $f4 || xx || Tempo fade to xx
+|-
+| $f5 || xx || Set reverb level to xx
+|-
+| $f6 || xx || Reverb type selection
+|-
+| $f7 || -- || Sync marker (wait for other channels)
+|-
+| $f8 || xx || Set global SPC volume to xx
+|-
+| $f9 || xx || Global fade in/out
+|-
+| $fa || xx yy zz || Special effect: type, param1, param2
+|-
+| $fb || -- || Pause all channels
+|-
+| $fc || -- || Resume all channels
+|-
+| $fd || xx || Set master transpose
+|-
+| $fe || -- || Reset all channel settings
+|-
+| $ff || -- || End sequence/song
+|}
+
+==Music Track List==
+
+===Track Table===
+
+{| class="wikitable"
+! ID !! Track Name !! ROM Offset !! Description
+|-
+| $00 || Silence || $0750fd || Empty/silent track
+|-
+| $01 || Battle 1 || $078573 || Regular enemy battle theme
+|-
+| $02 || Battle 2 || $078b68 || Mid-boss battle theme
+|-
+| $03 || Battle 3 || $079320 || Final boss battle theme
+|-
+| $04 || Victory! || $079b73 || Battle victory fanfare
+|-
+| $05 || World || $079e0a || Overworld exploration theme
+|-
+| $06 || Fossil Labyrinth || $079f87 || Bone Dungeon theme
+|-
+| $07 || Dungeon of Ice || $07a4c2 || Ice Pyramid theme
+|-
+| $08 || Lava Dome || $07a9fd || Fireburg dungeon theme
+|-
+| $09 || Doom Castle || $07af38 || Final dungeon theme
+|-
+| $0a || Hill of Destiny || $07b473 || Starting area theme
+|-
+| $0b || Foresta || $07b9ae || Forest town theme
+|-
+| $0c || Aquaria || $07bee9 || Water town theme
+|-
+| $0d || Fireburg || $07c424 || Fire town theme
+|-
+| $0e || Windia || $07c95f || Wind town theme
+|-
+| $0f || Tower || $07ce9a || Focus Tower theme
+|-
+| $10 || Tristam's Theme || $07d3d5 || Tristam character theme
+|-
+| $11 || Mystic Quest || $07d910 || Title screen theme
+|-
+| $12 || Dark King || $07de4b || Dark King battle theme
+|-
+| $13 || Game Over || $07e386 || Game over screen
+|-
+| $14 || Ending || $07e8c1 || Ending credits theme
+|}
+
+{{Todo | Add all music track offsets}}
+
+==Sound Effect List==
+
+Sound effects are stored as short SPC sequences or single samples.
+
+===Common Sound Effects===
+
+{| class="wikitable"
+! ID !! Effect Name !! Description
+|-
+| $00 || Menu Cursor || Soft beep for cursor movement
+|-
+| $01 || Menu Select || Confirmation beep
+|-
+| $02 || Menu Cancel || Error/cancel beep
+|-
+| $03 || Menu Open || Swoosh sound
+|-
+| $04 || Menu Close || Swoosh sound
+|-
+| $10 || Sword Hit || Physical weapon impact
+|-
+| $11 || Explosion || Bomb detonation
+|-
+| $12 || Fire Magic || Flame burst
+|-
+| $13 || Ice Magic || Ice shatter
+|-
+| $14 || Thunder Magic || Lightning crack
+|-
+| $15 || Heal Magic || Healing chime
+|-
+| $16 || Status Effect || Stars/sparkles
+|-
+| $20 || Chest Open || Treasure chest opening
+|-
+| $21 || Item Get || Item acquisition jingle
+|-
+| $22 || Door Open || Door/transition sound
+|-
+| $23 || Level Up || Level up fanfare
+|-
+| $24 || Crest Get || Crystal crest acquisition
+|-
+| $30 || Enemy Hit || Enemy taking damage
+|-
+| $31 || Enemy Death || Enemy defeated
+|-
+| $32 || Boss Roar || Boss intro roar
+|-
+| $40 || Footstep || Walking sound
+|-
+| $41 || Jump || Jumping sound
+|-
+| $42 || Splash || Water splash
+|-
+|}
+
+{{Todo | Map all sound effect IDs and locations}}
+
+==SPC700 Technical Details==
+
+===SPC700 Processor===
+
+* 8-bit processor running at 1.024 MHz
+* 8 audio channels (voices)
+* 64 KB addressable RAM
+* Hardware echo/reverb effects
+* ADSR envelope control
+
+===Channel Assignment===
+
+{| class="wikitable"
+! Channel !! Typical Use
+|-
+| 0 || Melody (lead instrument)
+|-
+| 1 || Harmony (support melody)
+|-
+| 2 || Bass line
+|-
+| 3 || Chords/accompaniment
+|-
+| 4 || Drums/percussion
+|-
+| 5 || Sound effects
+|-
+| 6 || Additional melody/harmony
+|-
+| 7 || Ambient/effects
+|}
+
+Music tracks can use different channel assignments.
+
+==Echo/Reverb System==
+
+Echo creates spacious reverb effects.
+
+===Echo Parameters===
+
+{| class="wikitable"
+! Parameter !! Range !! Description
+|-
+| Echo Volume L || 0-127 || Left echo volume
+|-
+| Echo Volume R || 0-127 || Right echo volume
+|-
+| Echo Feedback || 0-127 || Echo decay rate
+|-
+| Echo Delay || 0-15 || Echo buffer size (time)
+|-
+| FIR Filter || 8 coefficients || Echo frequency response
+|}
+
+===FIR Filter Coefficients===
+
+The 8-tap FIR filter shapes the echo's frequency response:
+
+```
+C0, C1, C2, C3, C4, C5, C6, C7 = filter coefficients
+Each coefficient is signed 8-bit (-128 to +127)
+```
+
+Common filter presets used in FFMQ:
+* Cave reverb: Long decay, mid-frequency emphasis
+* Hall reverb: Shorter decay, balanced frequencies
+* Room reverb: Short decay, high-frequency roll-off
+
+==ADSR Envelope==
+
+ADSR controls how notes fade in and out.
+
+===ADSR Format===
+
+{| class="wikitable"
+! Phase !! Parameter !! Description
+|-
+| Attack || 4 bits || How fast volume rises (0=instant, 15=very slow)
+|-
+| Decay || 3 bits || How fast volume falls to sustain level
+|-
+| Sustain || 3 bits || Volume level to hold while note plays
+|-
+| Release || 5 bits || How fast volume falls when note ends
+|}
+
+ADSR byte format:
+```
+Byte 1 [ADSR1]: ?DDD AAAA
+Byte 2 [ADSR2]: SSSL RRRR
+
+A = Attack rate
+D = Decay rate
+S = Sustain level
+L = Sustain release flag
+R = Release rate
+```
+
+==Gain Mode==
+
+Alternative to ADSR for simpler volume control.
+
+===Gain Values===
+
+{| class="wikitable"
+! Mode !! Value Range !! Description
+|-
+| Direct || $00-$7f || Set volume directly (0-127)
+|-
+| Linear Inc || $80-$9f || Linear volume increase
+|-
+| Bent Inc || $a0-$bf || Exponential volume increase
+|-
+| Linear Dec || $c0-$df || Linear volume decrease
+|-
+| Exponential Dec || $e0-$ff || Exponential volume decrease
+|}
+
+==Sample Pitch==
+
+Sample playback pitch is controlled by a 14-bit value.
+
+===Pitch Calculation===
+
+```
+Pitch = (Sample Rate / 32000) × 4096
+
+Example:
+  For middle C (261.63 Hz) using 16kHz sample:
+  Pitch = (16000 / 32000) × 4096 = 2048 = $0800
+```
+
+Pitch range: $0000-$3fff (0-16383)
+
+==Music Composition Notes==
+
+* Most tracks use 4-6 of the 8 available channels
+* Percussion typically assigned to channels 4-5
+* Battle music has faster tempo than exploration music
+* Boss battle themes use all 8 channels for fuller sound
+* Dungeon themes often feature echo effects for atmosphere
+
+==Sound Programming Tools==
+
+{{Todo | Document tools for SPC extraction and editing}}
+
+Suggested tools:
+* SPC Player - Listen to extracted SPC files
+* BRR Tools - Convert WAV ↔ BRR format
+* Sequence Editor - Edit note sequences
+* SNES APU Debugger - Analyze real-time sound
+
+==Notes==
+
+* All music data is uncompressed in ROM
+* BRR compression typically achieves 4:1 ratio vs. raw PCM
+* Maximum BRR sample size: ~64KB per sample
+* Echo buffer size affects available RAM for samples
+* Total sample data size: Approximately 100KB in ROM
+* 21+ music tracks total (including variations)
+* Sound effects can interrupt music on channels 5-7
+* Some tracks have multiple variations (intro/loop)
+
+{{Todo | Extract all music tracks to SPC files}}
+{{Todo | Create BRR sample library}}
+{{Todo | Document echo FIR filter coefficients per track}}
+
+=Related=
+
+* [[Final Fantasy: Mystic Quest/ROM map]] - Sound data ROM locations
+* [[Final Fantasy: Mystic Quest/Attacks]] - Attack sound effect references
+* [[SNES APU]] - General SNES audio hardware documentation
+
+{{Internal Data}}
