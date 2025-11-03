@@ -1,0 +1,43 @@
+{{TBL}}
+
+=Text Table=
+
+==English==
+
+This applies to:
+* Final Fantasy - Mystic Quest (U) (V1.0) [!]
+* Final Fantasy - Mystic Quest (U) (V1.1)
+* Mystic Quest Legend (E)
+
+[[Final Fantasy: Mystic Quest (SNES)/TBL/English|English]]
+
+==French==
+
+This applies to:
+* Mystic Quest Legend (F)
+
+[[Final Fantasy: Mystic Quest (SNES)/TBL/French|French]]
+
+==German==
+
+This applies to:
+* Mystic Quest Legend (G) [!]
+
+[[Final Fantasy: Mystic Quest (SNES)/TBL/German|German]]
+
+==Japanese==
+
+This applies to:
+* Final Fantasy USA - Mystic Quest (J) [!]
+
+[[Final Fantasy: Mystic Quest (SNES)/TBL/Japanese|Japanese]]
+
+==Control Codes==
+
+[TODO: Add control codes]
+
+=Links=
+
+<br/>
+
+{{Internal Data}}

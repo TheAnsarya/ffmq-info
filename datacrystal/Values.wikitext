@@ -1,0 +1,372 @@
+{{subpage}}
+
+=Values=
+
+==Items==
+
+{| class="wikitable sortable"
+|-
+!  Value  !!  Category  !!  Description
+|-
+|  style="text-align: center;"  |  $00  ||  Quest Item  ||  Elixir
+|-
+|  style="text-align: center;"  |  $01  ||  Quest Item  ||  Tree Wither
+|-
+|  style="text-align: center;"  |  $02  ||  Quest Item  ||  Wakewater
+|-
+|  style="text-align: center;"  |  $03  ||  Quest Item  ||  Venus Key
+|-
+|  style="text-align: center;"  |  $04  ||  Quest Item  ||  Multi-Key
+|-
+|  style="text-align: center;"  |  $05  ||  Quest Item  ||  Mask
+|-
+|  style="text-align: center;"  |  $06  ||  Quest Item  ||  Magic Mirror
+|-
+|  style="text-align: center;"  |  $07  ||  Quest Item  ||  Thunder Rock
+|-
+|  style="text-align: center;"  |  $08  ||  Quest Item  ||  Captain Cap
+|-
+|  style="text-align: center;"  |  $09  ||  Quest Item  ||  Libra Crest
+|-
+|  style="text-align: center;"  |  $0a  ||  Quest Item  ||  Gemini Crest
+|-
+|  style="text-align: center;"  |  $0b  ||  Quest Item  ||  Mobius Crest
+|-
+|  style="text-align: center;"  |  $0c  ||  Quest Item  ||  Sand Coin
+|-
+|  style="text-align: center;"  |  $0d  ||  Quest Item  ||  River Coin
+|-
+|  style="text-align: center;"  |  $0e  ||  Quest Item  ||  Sun Coin
+|-
+|  style="text-align: center;"  |  $0f  ||  Quest Item  ||  Sky Coin
+|-
+|  colspan="3"  |
+|-
+|  style="text-align: center;"  |  $10  ||  Item  ||  Cure Potion
+|-
+|  style="text-align: center;"  |  $11  ||  Item  ||  Heal Potion
+|-
+|  style="text-align: center;"  |  $12  ||  Item  ||  Seed
+|-
+|  style="text-align: center;"  |  $13  ||  Item  ||  Refresher
+|-
+|  style="text-align: center;"  |  $14  ||  Magic  ||  White - Exit
+|-
+|  style="text-align: center;"  |  $15  ||  Magic  ||  White - Cure
+|-
+|  style="text-align: center;"  |  $16  ||  Magic  ||  White - Heal
+|-
+|  style="text-align: center;"  |  $17  ||  Magic  ||  White - Life
+|-
+|  style="text-align: center;"  |  $18  ||  Magic  ||  Black - Quake
+|-
+|  style="text-align: center;"  |  $19  ||  Magic  ||  Black - Blizzard
+|-
+|  style="text-align: center;"  |  $1a  ||  Magic  ||  Black - Fire
+|-
+|  style="text-align: center;"  |  $1b  ||  Magic  ||  Black - Aero
+|-
+|  style="text-align: center;"  |  $1c  ||  Magic  ||  Wizard - Thunder
+|-
+|  style="text-align: center;"  |  $1d  ||  Magic  ||  Wizard - White
+|-
+|  style="text-align: center;"  |  $1e  ||  Magic  ||  Wizard - Meteor
+|-
+|  style="text-align: center;"  |  $1f  ||  Magic  ||  Wizard - Flare
+|-
+|  colspan="3"  |
+|-
+|  style="text-align: center;"  |  $20  ||  Weapons  ||  Steel Sword
+|-
+|  style="text-align: center;"  |  $21  ||  Weapons  ||  Knight Sword
+|-
+|  style="text-align: center;"  |  $22  ||  Weapons  ||  Excalibur
+|-
+|  style="text-align: center;"  |  $23  ||  Weapons  ||  Axe
+|-
+|  style="text-align: center;"  |  $24  ||  Weapons  ||  Battle Axe
+|-
+|  style="text-align: center;"  |  $25  ||  Weapons  ||  Giant's Axe
+|-
+|  style="text-align: center;"  |  $26  ||  Weapons  ||  Cat Claw
+|-
+|  style="text-align: center;"  |  $27  ||  Weapons  ||  Charm Claw
+|-
+|  style="text-align: center;"  |  $28  ||  Weapons  ||  Dragon Claw
+|-
+|  style="text-align: center;"  |  $29  ||  Weapons  ||  Bomb
+|-
+|  style="text-align: center;"  |  $2a  ||  Weapons  ||  Jumbo Bomb
+|-
+|  style="text-align: center;"  |  $2b  ||  Weapons  ||  Mega Grenade
+|-
+|  style="text-align: center;"  |  $2c  ||  Weapons  ||  Morning Star
+|-
+|  style="text-align: center;"  |  $2d  ||  Weapons  ||  Bow of Grace
+|-
+|  style="text-align: center;"  |  $2e  ||  Weapons  ||  Ninja Star
+|-
+|  style="text-align: center;"  |  $2f  ||  Armor  ||  Steel Helm
+|-
+|  colspan="3"  |
+|-
+|  style="text-align: center;"  |  $30  ||  Armor  ||  Moon Helm
+|-
+|  style="text-align: center;"  |  $31  ||  Armor  ||  Apollo Helm
+|-
+|  style="text-align: center;"  |  $32  ||  Armor  ||  Steel Armor
+|-
+|  style="text-align: center;"  |  $33  ||  Armor  ||  Noble Armor
+|-
+|  style="text-align: center;"  |  $34  ||  Armor  ||  Gaia's Armor
+|-
+|  style="text-align: center;"  |  $35  ||  Armor  ||  Relica Armor
+|-
+|  style="text-align: center;"  |  $36  ||  Armor  ||  Mystic Robe
+|-
+|  style="text-align: center;"  |  $37  ||  Armor  ||  Flame Armor
+|-
+|  style="text-align: center;"  |  $38  ||  Armor  ||  Black Robe
+|-
+|  style="text-align: center;"  |  $39  ||  Armor  ||  Steel Shield
+|-
+|  style="text-align: center;"  |  $3a  ||  Armor  ||  Venus Shield
+|-
+|  style="text-align: center;"  |  $3b  ||  Armor  ||  Aegis Shield
+|-
+|  style="text-align: center;"  |  $3c  ||  Armor  ||  Ether Shield
+|-
+|  style="text-align: center;"  |  $3d  ||  Armor  ||  Charm
+|-
+|  style="text-align: center;"  |  $3e  ||  Armor  ||  Magic Ring
+|-
+|  style="text-align: center;"  |  $3f  ||  Armor  ||  Cupid Locket
+|-
+|  colspan="3"  |
+|-
+|  style="text-align: center;"  |  $ff  ||  Item  ||  No Item
+|}
+
+==Maps==
+
+{| class="wikitable sortable"
+|-
+!  Value  !!  Worldmap X  !!  Worldmap Y  !!  Description
+|-
+|  style="text-align: center;"  |  $00  ||  style="text-align: center;"  |  $...  ||  style="text-align: center;"  |  $...  ||
+|-
+|  style="text-align: center;"  |  $01  ||  style="text-align: center;"  |  $0e  ||  style="text-align: center;"  |  $23  ||  Battlefield #1 - North of Level Forest
+|-
+|  style="text-align: center;"  |  $02  ||  style="text-align: center;"  |  $08  ||  style="text-align: center;"  |  $1f  ||  Battlefield #2 - West of Sand Temple
+|-
+|  style="text-align: center;"  |  $03  ||  style="text-align: center;"  |  $16  ||  style="text-align: center;"  |  $1f  ||  Battlefield #3 - East of Sand Temple
+|-
+|  style="text-align: center;"  |  $04  ||  style="text-align: center;"  |  $22  ||  style="text-align: center;"  |  $19  ||  Battlefield #4 - North-East of Focus Tower
+|-
+|  style="text-align: center;"  |  $05  ||  style="text-align: center;"  |  $29  ||  style="text-align: center;"  |  $13  ||  Battlefield #5 - East of Libra Temple
+|-
+|  style="text-align: center;"  |  $06  ||  style="text-align: center;"  |  $2e  ||  style="text-align: center;"  |  $15  ||  Battlefield #6 - South of Aquaria
+|-
+|  style="text-align: center;"  |  $07  ||  style="text-align: center;"  |  $37  ||  style="text-align: center;"  |  $0f  ||  Battlefield #7 - East of Aquaria
+|-
+|  style="text-align: center;"  |  $08  ||  style="text-align: center;"  |  $33  ||  style="text-align: center;"  |  $0d  ||  Battlefield #8 - West of Wintry Cave
+|-
+|  style="text-align: center;"  |  $09  ||  style="text-align: center;"  |  $2d  ||  style="text-align: center;"  |  $09  ||  Battlefield #9 - North of Falls Basin
+|-
+|  style="text-align: center;"  |  $0a  ||  style="text-align: center;"  |  $24  ||  style="text-align: center;"  |  $10  ||  Battlefield #10 - North of Libra Temple
+|-
+|  style="text-align: center;"  |  $0b  ||  style="text-align: center;"  |  $1f  ||  style="text-align: center;"  |  $10  ||  Battlefield #11 - North of Wintry Temple
+|-
+|  style="text-align: center;"  |  $0c  ||  style="text-align: center;"  |  $1a  ||  style="text-align: center;"  |  $17  ||  Battlefield #12 - North of Focus Tower #4
+|-
+|  style="text-align: center;"  |  $0d  ||  style="text-align: center;"  |  $1a  ||  style="text-align: center;"  |  $13  ||  Battlefield #13 - North of Battlefield #12
+|-
+|  style="text-align: center;"  |  $0e  ||  style="text-align: center;"  |  $1a  ||  style="text-align: center;"  |  $0e  ||  Battlefield #14 - East of Fireburg
+|-
+|  style="text-align: center;"  |  $0f  ||  style="text-align: center;"  |  $0f  ||  style="text-align: center;"  |  $0c  ||  Battlefield #15 - West of Fireburg
+|-
+|  colspan="4"  |
+|-
+|  style="text-align: center;"  |  $10  ||  style="text-align: center;"  |  $09  ||  style="text-align: center;"  |  $0c  ||  Battlefield #16 - South of Mine
+|-
+|  style="text-align: center;"  |  $11  ||  style="text-align: center;"  |  $10  ||  style="text-align: center;"  |  $08  ||  Battlefield #17 - West of Volcano
+|-
+|  style="text-align: center;"  |  $12  ||  style="text-align: center;"  |  $1f  ||  style="text-align: center;"  |  $0a  ||  Battlefield #18 - East of Lava Dome
+|-
+|  style="text-align: center;"  |  $13  ||  style="text-align: center;"  |  $2e  ||  style="text-align: center;"  |  $29  ||  Battlefield #19 - East of Kaidge Temple
+|-
+|  style="text-align: center;"  |  $14  ||  style="text-align: center;"  |  $33  ||  style="text-align: center;"  |  $28  ||  Battlefield #20 - South of Windia
+|-
+|  style="text-align: center;"  |  $15  ||  style="text-align: center;"  |  $19  ||  style="text-align: center;"  |  $2a  ||  Hill of Destiny
+|-
+|  style="text-align: center;"  |  $16  ||  style="text-align: center;"  |  $0e  ||  style="text-align: center;"  |  $28  ||  Level Forest
+|-
+|  style="text-align: center;"  |  $17  ||  style="text-align: center;"  |  $12  ||  style="text-align: center;"  |  $26  ||  Foresta
+|-
+|  style="text-align: center;"  |  $18  ||  style="text-align: center;"  |  $0e  ||  style="text-align: center;"  |  $1e  ||  Sand Temple
+|-
+|  style="text-align: center;"  |  $19  ||  style="text-align: center;"  |  $0e  ||  style="text-align: center;"  |  $1a  ||  Bone Dungeon
+|-
+|  style="text-align: center;"  |  $1a  ||  style="text-align: center;"  |  $1c  ||  style="text-align: center;"  |  $21  ||  Focus Tower - Entrance #1
+|-
+|  style="text-align: center;"  |  $1b  ||  style="text-align: center;"  |  $1f  ||  style="text-align: center;"  |  $1d  ||  Focus Tower - Entrance #2
+|-
+|  style="text-align: center;"  |  $1c  ||  style="text-align: center;"  |  $24  ||  style="text-align: center;"  |  $13  ||  Libra Temple
+|-
+|  style="text-align: center;"  |  $1d  ||  style="text-align: center;"  |  $30  ||  style="text-align: center;"  |  $11  ||  Aquaria
+|-
+|  style="text-align: center;"  |  $1e  ||  style="text-align: center;"  |  $37  ||  style="text-align: center;"  |  $0b  ||  Wintry Cave
+|-
+|  style="text-align: center;"  |  $1f  ||  style="text-align: center;"  |  $28  ||  style="text-align: center;"  |  $18  ||  Life Temple
+|-
+|  colspan="4"  |
+|-
+|  style="text-align: center;"  |  $20  ||  style="text-align: center;"  |  $2d  ||  style="text-align: center;"  |  $0e  ||  Falls Basin
+|-
+|  style="text-align: center;"  |  $21  ||  style="text-align: center;"  |  $2d  ||  style="text-align: center;"  |  $06  ||  Ice Pyramid
+|-
+|  style="text-align: center;"  |  $22  ||  style="text-align: center;"  |  $34  ||  style="text-align: center;"  |  $18  ||  Spencer's Place
+|-
+|  style="text-align: center;"  |  $23  ||  style="text-align: center;"  |  $1f  ||  style="text-align: center;"  |  $15  ||  Wintry Temple
+|-
+|  style="text-align: center;"  |  $24  ||  style="text-align: center;"  |  $1f  ||  style="text-align: center;"  |  $1b  ||  Focus Tower - Entrance #3
+|-
+|  style="text-align: center;"  |  $25  ||  style="text-align: center;"  |  $1c  ||  style="text-align: center;"  |  $1b  ||  Focus Tower - Entrance #4
+|-
+|  style="text-align: center;"  |  $26  ||  style="text-align: center;"  |  $15  ||  style="text-align: center;"  |  $0c  ||  Fireburg
+|-
+|  style="text-align: center;"  |  $27  ||  style="text-align: center;"  |  $09  ||  style="text-align: center;"  |  $08  ||  Mine
+|-
+|  style="text-align: center;"  |  $28  ||  style="text-align: center;"  |  $0f  ||  style="text-align: center;"  |  $10  ||  Sealed Temple
+|-
+|  style="text-align: center;"  |  $29  ||  style="text-align: center;"  |  $18  ||  style="text-align: center;"  |  $08  ||  Volcano
+|-
+|  style="text-align: center;"  |  $2a  ||  style="text-align: center;"  |  $19  ||  style="text-align: center;"  |  $05  ||  Lava Dome
+|-
+|  style="text-align: center;"  |  $2b  ||  style="text-align: center;"  |  $1d  ||  style="text-align: center;"  |  $1e  ||  Focus Tower - Entrance #5
+|-
+|  style="text-align: center;"  |  $2c  ||  style="text-align: center;"  |  $1f  ||  style="text-align: center;"  |  $1f  ||  Rope Bridge
+|-
+|  style="text-align: center;"  |  $2d  ||  style="text-align: center;"  |  $26  ||  style="text-align: center;"  |  $1f  ||  Alive Forest
+|-
+|  style="text-align: center;"  |  $2e  ||  style="text-align: center;"  |  $28  ||  style="text-align: center;"  |  $27  ||  Giant Tree
+|-
+|  style="text-align: center;"  |  $2f  ||  style="text-align: center;"  |  $28  ||  style="text-align: center;"  |  $29  ||  Kaidge Temple
+|-
+|  colspan="4"  |
+|-
+|  style="text-align: center;"  |  $30  ||  style="text-align: center;"  |  $35  ||  style="text-align: center;"  |  $23  ||  Windia
+|-
+|  style="text-align: center;"  |  $31  ||  style="text-align: center;"  |  $3b  ||  style="text-align: center;"  |  $28  ||  Windhole Temple
+|-
+|  style="text-align: center;"  |  $32  ||  style="text-align: center;"  |  $3c  ||  style="text-align: center;"  |  $24  ||  Mount Gale
+|-
+|  style="text-align: center;"  |  $33  ||  style="text-align: center;"  |  $35  ||  style="text-align: center;"  |  $1e  ||  Pazuzu's Tower
+|-
+|  style="text-align: center;"  |  $34  ||  style="text-align: center;" colspan="2"  |  (no world map)  ||  Mac's Ship (Ship Dock)
+|-
+|  style="text-align: center;"  |  $35  ||  style="text-align: center;"  |  $1c  ||  style="text-align: center;"  |  $27  ||  Focus Tower - Entrance #6 (From Mac's Ship) - Doom Castle
+|-
+|  style="text-align: center;"  |  $36  ||  style="text-align: center;"  |  $...  ||  style="text-align: center;"  |  $...  ||
+|-
+|  style="text-align: center;"  |  $37  ||  style="text-align: center;"  |  $...  ||  style="text-align: center;"  |  $...  ||  After you beat the Dark King?
+|-
+|  style="text-align: center;"  |  $38  ||  style="text-align: center;"  |  $1c  ||  style="text-align: center;"  |  $28  ||  Mac's Ship (at Focus Tower entrance)
+|}
+
+==Message Speed==
+
+{| class="wikitable"
+!  Value  !!  Description
+|-
+|  style="text-align: center;"  |  $00  ||  1
+|-
+|  style="text-align: center;"  |  $01  ||  2
+|-
+|  style="text-align: center;"  |  $02  ||  3
+|-
+|  style="text-align: center;"  |  $03  ||  4
+|-
+|  style="text-align: center;"  |  $04  ||  5
+|-
+|  style="text-align: center;"  |  $05  ||  6
+|-
+|  style="text-align: center;"  |  $06  ||  7
+|}
+
+==Player Facing Directions==
+
+{| class="wikitable"
+!  Value  !!  Description
+|-
+|  style="text-align: center;"  |  $00  ||  Up
+|-
+|  style="text-align: center;"  |  $01  ||  Right
+|-
+|  style="text-align: center;"  |  $02  ||  Down
+|-
+|  style="text-align: center;"  |  $03  ||  Left
+|}
+
+==Weapons==
+
+{| class="wikitable"
+!  Value  !!  Description
+|-
+|  style="text-align: center;"  |  $20  ||  Steel Sword
+|-
+|  style="text-align: center;"  |  $21  ||  Knight Sword
+|-
+|  style="text-align: center;"  |  $22  ||  Excalibur
+|-
+|  style="text-align: center;"  |  $23  ||  Axe
+|-
+|  style="text-align: center;"  |  $24  ||  Battle Axe
+|-
+|  style="text-align: center;"  |  $25  ||  Giant's Axe
+|-
+|  style="text-align: center;"  |  $26  ||  Cat Claw
+|-
+|  style="text-align: center;"  |  $27  ||  Charm Claw
+|-
+|  style="text-align: center;"  |  $28  ||  Dragon Claw
+|-
+|  style="text-align: center;"  |  $29  ||  Bomb
+|-
+|  style="text-align: center;"  |  $2a  ||  Jumbo Bomb
+|-
+|  style="text-align: center;"  |  $2b  ||  Mega Grenade
+|}
+
+==Window Colors==
+
+[[Final Fantasy: Mystic Quest (SNES)/Values/Window_Colors|Window Colors]]
+
+==Status==
+
+{| class="wikitable sortable"
+|-
+!  Bitfield  !!  Value  !!  Description
+|-
+|  %0000_0001  ||  $01  ||  Poison
+|-
+|  %0000_0010  ||  $02  ||  Dark / Blind
+|-
+|  %0000_0100  ||  $04  ||  Mute / Silence
+|-
+|  %0000_1000  ||  $08  ||  Confuse
+|-
+|  %0001_0000  ||  $10  ||  Sleep
+|-
+|  %0010_0000  ||  $20  ||  Paralyze
+|-
+|  %0100_0000  ||  $40  ||  Fatal
+|-
+|  %1000_0000  ||  $80  ||  Petrify / Stone
+|}
+
+=Links=
+
+<br/>
+
+{{Internal Data}}

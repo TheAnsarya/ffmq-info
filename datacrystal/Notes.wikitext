@@ -1,0 +1,34 @@
+{{notes}}
+
+=Main=
+
+This page contains research notes and findings about Final Fantasy: Mystic Quest (SNES).
+
+==ROM Version==
+
+All documentation uses '''ROM v1.1''' addresses unless otherwise noted. The v1.0 ROM has different addresses for some data.
+
+Known ROM versions:
+* v1.0 - Original release
+* v1.1 - Updated release (used in this documentation)
+
+==Graphics Notes==
+
+[TODO: Add graphics format notes]
+
+==Music/SPC Notes==
+
+[TODO: Add music/SPC format notes]
+
+==Battle System Notes==
+
+[TODO: Add battle system notes]
+
+==Map Format Notes==
+
+[TODO: Add map format notes]
+
+=Related=
+<br>
+
+{{Internal Data}}

@@ -53,7 +53,7 @@ Note: Name is 8 characters in English, but 6 characters in Japanese, French, and
 |  $0e9f  ||  byte  ||  Items  ||  Amount of Heal Potions
 
 |-
-|  colspan="4" style="background-color: #eaecf0;"  |  
+|  colspan="4" style="background-color: #eaecf0;"  |
 
 |-
 |  $0ea0  ||  byte  ||  Items  ||  Seed's [[Final Fantasy: Mystic Quest/Values#Items|Item Number]] ($12)
@@ -76,10 +76,10 @@ Note: Name is 8 characters in English, but 6 characters in Japanese, French, and
 
 
 |-
-|  colspan="4" style="background-color: #eaecf0;"  |  
+|  colspan="4" style="background-color: #eaecf0;"  |
 <!-- All: $a0 (1 means chest is available, 0 means chest is gone
 1 means battlefield reward has been taken, 0 means it's available) -->
-|-  
+|-
 |  $0ebd # 0000_0001  ||  bit  ||  Chests  ||  Bone Dungeon (19, 34, 23) - Steel Shield
 |-
 |  $0ebd # 0000_0010  ||  bit  ||  Chests  ||  Foresta (, , ) - Magic - Cure

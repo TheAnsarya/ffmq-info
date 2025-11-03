@@ -10,9 +10,9 @@
 |country = USA
 |video = NTSC
 |romspeed = 200ns (SlowROM)
-|revision = 1.0
-|checksum = Good 0x4CDE
-|crc32 = 6B19A2C6
+|revision = 1.1
+|checksum = Good 0x28E7
+|crc32 = 2C52C792
 |game = Final Fantasy Mystic Quest
 }}
 

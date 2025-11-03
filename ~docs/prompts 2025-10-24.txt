@@ -498,6 +498,31 @@ Build the GUI editor for visual enemy stat editing
 Move on to build system integration so your mods get into the ROM
 continue doing whatever you want to do to make everything awesome!
 make a `datacrystal` folder, and then download all of the wikicode from pages from `https://datacrystal.tcrf.net/wiki/Final_Fantasy:_Mystic_Quest` and it's sub-folders and sub-pages, etc, into the folder as `*.wikitext files` and then develop a full complex plan with todo files to update those wikitext files to fully document and describe the ROM and all of its code, data, and structures, including links to the github repository and the asset files and extraction/reinsertion scripts; for reference most of the current datacrystal files for FFMQ are currently in my repos at `https://github.com/TheAnsarya/GameInfo/tree/main/Final%20Fantasy%20Mystic%20Quest%20(SNES)` which is mine so you have full access to it.
+some of the current datacrystal pages refer to the `1.0` ROM which is INCORRECT! Use the `1.1` ROM and correct any addresses based on our disassembly of `1.1`, although most of the pages should be using 1.1 already. Always use lowercase hexadecimal values and in wiklitext documentation `$` is used to precede the hex value so use `$6a` not `0x6a` or something. Make sure to include all the current wikitext files from th `GameInfo` guthub project. Now create guthub issues based on the todo list and then begin implmentation.
+
+&&&&&&&&&&&&&&&&&&&&&&&&&&
+🎯 Next Steps
+Immediate (Week 1-2):
+Download remaining wikitext (TBL, Notes)
+Complete battle data documentation ($014275-$014776)
+Start filling RAM map gaps
+
+Short Term (Week 3-4):
+4. Complete RAM map documentation
+5. Create Values subpage
+6. Finish SRAM gaps
+
+Medium Term (Month 2):
+7. Graphics/music documentation
+8. Subpage organization
+9. Visual diagrams
+&&&&&&&&&&&&&&&&&&&&&&&&&&
+
+always run formatting rules for most files (especially asm/py/json/cs/md/ps1/etc) (tabs!) before commiting to git; timestamp the chat; keep session/chat logs up to date; create guthub issues based on the todo list if they don't exist and then begin implmentation of the datacrystal wikitext documentation making sure the addresses match our disassembly (BUT BEWARE: the documented wiki address are not file addresses, they are ROM addresses, always use rom addresses in the wiki code)
+timestamp the chat in VSCode chat for every response; you're so slow now, speed up! ; there are more than 3 files in GameInfo, get the rest of them and the image assets etc. and document the structure ; follow the github issues and the todo lists and make new todos and issues as you find them, always update these resources ; continue updating all the datacrystal documentation (make any pages/subpages that you need for that process) - (always use rom addresses in the wiki code)
+
+
+
 
 
 
