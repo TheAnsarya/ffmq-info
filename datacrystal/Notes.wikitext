@@ -19,19 +19,230 @@ Known ROM versions:
 
 ==Graphics Notes==
 
-[TODO: Add graphics format notes]
+===Format Summary===
+
+FFMQ uses three different bitplane formats for graphics data:
+
+* '''4BPP''' (4 bits per pixel, 16 colors) - Character sprites, menu graphics, fonts
+  * Storage: 32 bytes per 8×8 tile
+  * 4 bitplanes × 8 bytes each
+  * Used for: Benjamin, companions, NPCs, menu elements
+  * ROM locations: $062c4c-$0638eb (Characters/NPCs/Symbols)
+
+* '''3BPP''' (3 bits per pixel, 8 colors) - Enemy sprites, some backgrounds
+  * Storage: 24 bytes per 8×8 tile
+  * 3 bitplanes × 8 bytes each
+  * Used for: All enemy graphics, town/dungeon tiles
+  * ROM locations: $050818 (enemy graphics start), $028e80-$02f480 (tiles)
+
+* '''2BPP''' (2 bits per pixel, 4 colors) - Simple backgrounds, UI elements
+  * Storage: 16 bytes per 8×8 tile
+  * 2 bitplanes × 8 bytes each
+  * Used for: Simple UI elements, some background layers
+
+===Palette Format===
+
+All palettes use SNES BGR555 format:
+* 15-bit color: 5 bits Red, 5 bits Green, 5 bits Blue
+* Range: $0000-$7fff
+* Split across two bytes: $9c (lower 8 bits), $9d (upper 7 bits)
+* See [[Final Fantasy: Mystic Quest/Values/Window_Colors|Window Colors]] for complete palette
+
+===Sprite Data===
+
+Enemy sprites use 3BPP format with metadata:
+* Sprite definitions: Data structure defines tile layouts, palettes, OAM configurations
+* Animation frames: Multiple sprite states per enemy
+* Palette cycling: Some enemies use palette rotation for animation effects
+* Extracted data: [https://github.com/TheAnsarya/ffmq-info/tree/main/data/extracted/sprites data/extracted/sprites/]
+
+See [[Final Fantasy: Mystic Quest/ROM_map/Graphics|Graphics]] for complete format documentation.
 
 ==Music/SPC Notes==
 
-[TODO: Add music/SPC format notes]
+===Audio Architecture===
+
+FFMQ uses the S-SMP (SPC700) sound processor with custom sequence format:
+
+* '''BRR Format''' - Bit Rate Reduction (compressed audio samples)
+  * 9 bytes per block (1 header byte + 8 sample bytes)
+  * 4 filter types for compression
+  * Loop points defined in header flags
+  * Sample data starts at ROM $6c201
+
+* '''Instruments''' - 19 instruments total
+  * Sample indexes: $6bea1-$6c1e1
+  * Waveforms: Triangle, square, saw, sine
+  * ADSR envelopes configurable per instrument
+  * Volume, pan, and pitch per channel
+
+* '''SPC Sequences''' - 21 music tracks
+  * Sequence data starts at ROM $750fd
+  * Track pointers at $6bdae ($0x03 per pointer)
+  * Tempo control via $f3 command
+  * Reverb/echo system via $f5 command
+
+===Note Encoding===
+
+Notes encoded as MIDI-style values:
+* $00-$0d: C notes (different octaves)
+* $0e-$1b: C# notes
+* $1c-$29: D notes
+* ... (continues through B#)
+* $c0-$ce: Rest/pause values
+
+===Control Commands===
+
+{| class="wikitable"
+! Command !! Function
+|-
+| $d2 xx || Set instrument volume
+|-
+| $d4 xx || Pan channel ($00=right, $64=center, $ff=left)
+|-
+| $d7 ss tt dd || Vibrato (speed, time, depth)
+|-
+| $e4 xx || Change pitch
+|-
+| $e5 xx || Note length
+|-
+| $ea xx || Change instrument
+|-
+| $f3 xx || Change tempo
+|-
+| $f5 xx || Set reverb
+|-
+| $f8 xx || Set global SPC volume
+|-
+| $f2 || End of channel
+|-
+| $ff || End of sequence
+|}
+
+See [[Final Fantasy: Mystic Quest/ROM_map/Sound|Sound]] for complete SPC documentation.
 
 ==Battle System Notes==
 
-[TODO: Add battle system notes]
+===Enemy Data Structure===
+
+Each enemy is 74 bytes ($4a) stored at ROM $014275:
+
+{| class="wikitable"
+! Offset !! Size !! Field
+|-
+| $00-$01 || word || HP (little-endian)
+|-
+| $02 || byte || Attack
+|-
+| $03 || byte || Defense
+|-
+| $04 || byte || Speed
+|-
+| $05 || byte || Magic
+|-
+| $06-$07 || word || Resistances (bitfield)
+|-
+| $08 || byte || Magic Defense
+|-
+| $09 || byte || Magic Evade
+|-
+| $0a || byte || Accuracy
+|-
+| $0b || byte || Evade
+|-
+| $0c-$0d || word || Weaknesses (bitfield)
+|-
+| ... || ... || (Additional fields - see [[Final Fantasy: Mystic Quest/ROM_map/Enemies|Enemies]])
+|}
+
+Total: 83 enemies
+
+===Attack Data Structure===
+
+Attack entries are 7 bytes each at ROM $013c78:
+
+{| class="wikitable"
+! Offset !! Field !! Description
+|-
+| $00 || unknown1 || Flags/properties
+|-
+| $01 || unknown2 || Additional flags
+|-
+| $02 || power || Base damage/power
+|-
+| $03 || attack_type || Determines damage calculation
+|-
+| $04 || attack_sound || Sound effect ID
+|-
+| $05 || unknown3 || More flags
+|-
+| $06 || attack_target_animation || Animation ID for target
+|}
+
+Total: 169 attack actions
+
+Extracted data: [https://github.com/TheAnsarya/ffmq-info/blob/main/data/extracted/attacks/attacks.json attacks.json]
+
+===Damage Formula===
+
+Based on disassembly analysis:
+* Physical attacks: `(Attack × AttackPower / Defense) × Random(224-255) / 256`
+* Magical attacks: `(Magic × AttackPower / MagicDefense) × Random(224-255) / 256`
+* Critical hits: Damage × 2
+* Elemental weakness: Damage × 1.5
+* Elemental resistance: Damage × 0.5
+
+See [[Final Fantasy: Mystic Quest/ROM_map/Attacks|Attacks]] for complete documentation.
 
 ==Map Format Notes==
 
-[TODO: Add map format notes]
+===Map Structure===
+
+FFMQ has 57 maps total with the following structure:
+
+====Map Data Format====
+
+{| class="wikitable"
+! Component !! Description
+|-
+| Map Pointers || 2-byte pointers at ROM $03b218
+|-
+| Tilemap Data || RLE-compressed tile indices
+|-
+| Tile Properties || Collision, trigger, and behavior flags at $032b00
+|-
+| Event Scripts || NPC dialogs, chest contents, triggers
+|-
+| Palette Assignment || Per-map palette selection at $034084
+|}
+
+====Tile Properties ($032b00)====
+
+Each tile has properties defining:
+* '''Walkability''' - Can character move through tile
+* '''Collision''' - Solid/passable
+* '''Special behaviors''' - Conveyor belt movement, damage floors
+* '''Triggers''' - Event activation zones
+* '''Layer priority''' - Sprite behind/in front of tile
+
+====Map Events====
+
+Events include:
+* '''NPCs''' - Dialog, movement patterns, sprites
+* '''Chests''' - Item contents, already-opened flags
+* '''Doors''' - Destination map + entrance coordinates
+* '''Triggers''' - Zone-based event activation
+* '''Enemy formations''' - Battle encounter data
+
+====Compression====
+
+Tilemaps use RLE (Run-Length Encoding):
+* Format: Count byte + Tile index byte
+* Reduces map data size by ~40-60%
+* Decompressed to RAM during map load
+* See Bank $07 disassembly for decompression routine
+
+See [[Final Fantasy: Mystic Quest/ROM_map/Maps|Maps]] for complete map data.
 
 =Related=
 <br>
