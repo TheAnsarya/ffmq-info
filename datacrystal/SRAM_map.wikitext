@@ -1,0 +1,134 @@
+{{srammap}}
+
+< [[Final Fantasy: Mystic Quest]]
+
+{{ Todo | flesh out missing values in save slot structure}}
+{{ Todo | flesh out missing values in character data structure}}
+
+For complete SRAM map with all fields, see:
+* [https://github.com/TheAnsarya/GameInfo/blob/main/Final%20Fantasy%20Mystic%20Quest%20(SNES)/Wiki/Final%20Fantasy%20Mystic%20Quest%20(SNES)%20-%20SRAM%20map.wikitext Complete SRAM Map Wikitext]
+
+==SRAM==
+
+The are 9 save slots of $38c bytes each for a total of $1fec bytes.
+
+{| class="wikitable"
+|-
+!  Address  !!  Description
+|-
+|  $0000 - $038b  ||  Save Slot 1A
+|-
+|  $038c - $0717  ||  Save Slot 2A
+|-
+|  $0718 - $0aa3  ||  Save Slot 3A
+|-
+|  $0aa4 - $0e2f  ||  Save Slot 1B
+|-
+|  $0e30 - $11bb  ||  Save Slot 2B
+|-
+|  $11bc - $154a  ||  Save Slot 3B
+|-
+|  $154b - $18d3  ||  Save Slot 1C
+|-
+|  $18d4 - $1c5f  ||  Save Slot 2C
+|-
+|  $1c60 - $1feb  ||  Save Slot 3C
+|-  style="background-color: #eaecf0;"
+|  $1fec - $1fff  ||  $14 unknown bytes
+|}
+
+===Save Slot Structure===
+
+Save Slot Structure, $0x38c bytes.
+
+{{ Todo | flesh out missing values}}
+
+{| class="wikitable"
+!  Offset  !!  Length  !!  Description
+|-
+|  $000 - $005  ||  6  ||  "FF0!" + checksum (2 bytes)
+|-
+|  $006 - $055  ||  $50  ||  Character 1
+|-
+|  $056 - $0a5  ||  $50  ||  Character 2
+|-
+|  $0a6 - $0a8  ||  3  ||  Gold (Max: 9999999)
+|-  style="background-color: #eaecf0;"
+|  $0a9 - $0aa  ||  2  ||  ???
+|-
+|  $0ab  ||  1  ||  Player X
+|-
+|  $0ac  ||  1  ||  Player Y
+|-
+|  $0ad  ||  1  ||  Player Facing
+|-  style="background-color: #eaecf0;"
+|  $0ae - $0b2  ||  5  ||  ???
+|-
+|  $0b3  ||  1  ||  Map ID
+|-  style="background-color: #eaecf0;"
+|  $0b4 - $0b8  ||  5  ||  ???
+|-
+|  $0b9 - $0bb  ||  3  ||  Play Time (0xSSMMHH)
+|-  style="background-color: #eaecf0;"
+|  $0bc - $0c0 ||  5  ||  ???
+|-
+|  $0c1  ||  1  ||  # of cures
+|-  style="background-color: #eaecf0;"
+|  $0c2 - $38b  ||  $2ca  ||  ??? <!-- CRITICAL: Large 682-byte gap! -->
+|}
+
+===Character Data Structure===
+
+Character Data Structure, $50 bytes.
+
+{{ Todo | flesh out missing values}}
+
+{| class="wikitable"
+!  Offset  !!  Length  !!  Description
+|-
+|  $00 - $07  ||  8  ||  Name
+|-  style="background-color: #eaecf0;"
+|  $08 - $0f  ||  8  ||  ???
+|-
+|  $10  ||  1  ||  Level (Max: 99)
+|-
+|  $11 - $13  ||  3  ||  Experience (Max: 9999999)
+|-
+|  $14 - $15  ||  2  ||  Current HP (Max: $ffff)
+|-
+|  $16 - $17  ||  2  ||  Max HP (Max: $ffff)
+|-  style="background-color: #eaecf0;"
+|  $18 - $20  ||  9  ||  ???
+|-
+|  $21  ||  1  ||  Status
+|-
+|  $22  ||  1  ||  Current Attack  (Max: 99)
+|-
+|  $23  ||  1  ||  Current Defense (Max: 99)
+|-
+|  $24  ||  1  ||  Current Speed   (Max: 99)
+|-
+|  $25  ||  1  ||  Current Magic   (Max: 99)
+|-
+|  $26  ||  1  ||  Base Attack  (Max: 99)
+|-
+|  $27  ||  1  ||  Base Defense (Max: 99)
+|-
+|  $28  ||  1  ||  Base Speed   (Max: 99)
+|-
+|  $29  ||  1  ||  Base Magic   (Max: 99)
+|-
+|  $30  ||  1  ||  Weapon Count
+|-
+|  $31  ||  1  ||  Weapon ID
+|-  style="background-color: #eaecf0;"
+|  $32 - $4f  ||  $1e  ||  ??? <!-- CRITICAL: 30-byte gap -->
+|}
+
+=Related=
+<br>
+
+{{Internal Data}}
+
+[[Category:SRAM maps]]
+[[Category:To do]]

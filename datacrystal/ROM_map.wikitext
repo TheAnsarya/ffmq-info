@@ -1,0 +1,210 @@
+{{rommap}}
+
+< [[Final Fantasy: Mystic Quest]]
+
+=Main=
+
+{{ Todo | Expand ROM map with complete data structures from disassembly}}
+
+Addresses are all SNES addresses, not file addresses.
+
+For complete disassembled source code, see:
+* [https://github.com/TheAnsarya/ffmq-info GitHub Repository - FFMQ Disassembly]
+* [https://github.com/TheAnsarya/ffmq-info/tree/main/src/asm Source Assembly Files]
+* [https://github.com/TheAnsarya/ffmq-info/tree/main/data Battle Data (JSON/ASM)]
+
+==Unheadered ROM only==
+
+All offsets are using a V1.0 (U) version of the ROM without a header.
+
+===Level/Map Data===
+* 032B00 - Tile Properties (solid, walkable, moves characters, etc..)
+* 034084 - Location Palette assignments (First Location: Level Forest)
+* 038200 - Menu Palettes
+* 03B218 - 2 byte pointers to Locations (First Location: Level Forest)
+
+===Battle Data===
+* '''014275-01469F''' - [https://github.com/TheAnsarya/ffmq-info/blob/main/data/extracted/enemies/enemies.json Enemy Stats Data] (83 enemies, $4A bytes each)
+  * Offset in file: $014275
+  * Structure: HP (2), Attack (1), Defense (1), Speed (1), Magic (1), Level (1), XP Mult (1), GP Mult (1), and more
+  * See: [https://github.com/TheAnsarya/ffmq-info/blob/main/tools/extraction/extract_enemies.py Extraction Script]
+* '''01417C-0141FC''' - [https://github.com/TheAnsarya/ffmq-info/blob/main/data/extracted/enemies/enemies.json Enemy Level Data] (83 enemies, 2 bytes each)
+* '''014678-014776''' - [https://github.com/TheAnsarya/ffmq-info/blob/main/data/extracted/attacks/attacks.json Attack Data]
+  * See: [https://github.com/TheAnsarya/ffmq-info/blob/main/tools/extraction/extract_attacks.py Attack Extraction Script]
+* 01572B - Enemy Formation Positions (Behemoth position on screen - Each enemy = 1 byte)
+* 010715 - Animation frame data (damage animation frames)
+* 010B06 - Targetting data (sword is first item)
+* 010BF2 - Weapon stats and effects data
+* 010F4A - Weapon effects data (additional)
+
+===Graphics Data===
+* 062C4C-0638EB - Characters, NPCs, and Symbols/Menu (4BPP)
+* 0212C0-0281FF - Borders (FC-NES x8 Pattern using 3BPP)
+* 028E80-02F480 - Town and Dungeon Tiles (3BPP)
+* 0341C1-037DC0 - Spells and other Animations (3BPP / FC-NES x16 Pattern)
+* 00050818 - Enemy graphics start (3BPP SNES format)
+* 00056800 - Dragon enemy graphics (3BPP SNES)
+* 03DFC4-03ED43 - FIREBURG overworld tiles (3BPP)
+* 00065bc4 - Battle Backgrounds (3BPP)
+* 026720 - Chest Graphics
+
+===Palette Data===
+* 03DC06 - Chest Palette
+* 03DA26 - Main Hero Palette
+* 00024c20 - "What?" animation hand frame
+
+===Music/SPC Data===
+* 6BDAE - Pointers to SPCs ($0x03 each)
+* 6BDFF - Pointers to BRRs
+* 6BEA1-6C1E1 - Instrument sample indexes
+* 6C201 - BRR sample data
+* 750FD - SPC sequence data (start)
+
+====SPC Sequences====
+* 750FD - Silence
+* 78573 - Battle 1
+* 78B68 - Battle 2
+* 79320 - Battle 3
+* 79B73 - Victory!
+* 79E0A - World
+* 79F87 - Fossil Labryrinth
+* 7A29A - Dungeon of Ice
+* 7A84E - Lava Dome
+* 7AE4E - Mountain Range of Whirlwinds
+* 7B20B - Dungeon and Waterfall
+* 7B504 - Middle Tower
+* 7B779 - Last Castle
+* 7BF2E - Beautiful Forest
+* 7C2F8 - Shrine of Light
+* 7C743 - City of Earth ~ Foresta
+* 7CC41 - City of Ice ~ Aquaria
+* 7D151 - City of Fire ~ Faeria
+* 7DA03 - City of Wind ~ Windaria
+* 7DF42 - Rock 'n' Roll
+* 7E410 - Rock Theme
+* 7E810 - Fanfare of Friendship
+* 7E8C2 - Mystic Ballad
+* 7EAAB - Hill of Fate
+* 7EEDD - Mystic Quest
+* 7F473 - Ending
+* 7FBD3 - The Crystal
+
+====SPC Note Commands====
+* 00-0D - Play note, C
+* 0E-1B - Play note, C#
+* 1C-29 - Play note, D
+* 2A-37 - Play note, D#
+* 38-45 - Play note, E
+* 46-53 - Play note, F
+* 54-61 - Play note, F#
+* 62-6F - Play note, G
+* 70-7D - Play note, G#
+* 7E-8B - Play note, A
+* 8C-99 - Play note, A#
+* 9A-A7 - Play note, B
+* A8-BF - Play note, B#
+* C0-CE - rest
+
+====SPC Control Commands====
+* D2 xx - set instrument volume to xx
+* D3 xx - ???
+* D4 xx - pan channel left or right [$00 = Right, $64 = middle, $FF = Left] (reverse stereo)
+* D7 ss tt dd - Vibrato: ss = speed, tt = time until vibrato, dd = depth
+* E0 - Vibrato off?
+* E1 - ???
+* E2 - ???
+* E3 - ???
+* E4 xx - change pitch to xx
+* E5 xx - length of next note is xx
+* EA xx - change instrument to xx
+* F0 xx yy - ???
+* F1 - ???
+* F2 - end of channel
+* F3 xx - change tempo to xx
+* F4 - ???
+* F5 xx - set reverb to xx
+* F6 - ???
+* F7 xx yy - ???
+* F8 xx - set global SPC volume to xx
+* FF - end of sequence?
+
+====Sample Index List====
+Sample Index list from: 6BEA1-6C1E1
+
+* 00 - Nothing
+* 01 - Guitar
+* 02 - Kick Drum
+* 03 - Brass Section
+* 04 - Distortion Guitar
+* 05 - Synth Bass
+* 06 - Flute 1
+* 07 - Hihat
+* 08 - Flute 2
+* 09 - Rock Organ
+* 0A - Electric Bass
+* 0B - Snare Drum (loop)
+* 0C - Strings
+* 0D - Conga Drum
+* 0E - Trumpet
+* 0F - Xylophone
+* 10 - Cymbal Crash
+* 11 - Timpani
+* 12 - Wood Block
+
+====Internal SPC Samples====
+Samples from within the SPC sequence (not listed on the sample index):
+
+* 00 - Triangle waveform
+* 01 - Triangle waveform (Synth Church Organ)
+* 02 - Square waveform (not Square as in Squaresoft)
+* 03 - Saw waveform (Overdrive)
+* 04 - Saw waveform (Synth Trumpet)
+* 05 - Square waveform (Overdrive)
+* 06 - Saw waveform?
+* 07 - Triangle waveform (Bell)
+* 08 - Triangle waveform (Overdrive)
+* 09 - Saw waveform (Overdrive)
+* 0A - Saw waveform (Synth Bass)
+* 0B - Sine waveform (Flute)
+* 0C-3F - Nothing
+
+=Modding Tools & Scripts=
+
+The ffmq-info repository provides complete tools for extracting, modifying, and reinserting data:
+
+==Extraction Scripts==
+* [https://github.com/TheAnsarya/ffmq-info/blob/main/tools/extraction/extract_enemies.py Extract Enemy Stats] - PC offset $014275
+* [https://github.com/TheAnsarya/ffmq-info/blob/main/tools/extraction/extract_attacks.py Extract Attack Data] - PC offset $014678
+* [https://github.com/TheAnsarya/ffmq-info/blob/main/tools/extraction/extract_enemy_attack_links.py Extract Enemy-Attack Links]
+
+==Conversion Scripts==
+* [https://github.com/TheAnsarya/ffmq-info/blob/main/tools/conversion/convert_enemies.py Convert Enemies (JSON → ASM)]
+* [https://github.com/TheAnsarya/ffmq-info/blob/main/tools/conversion/convert_attacks.py Convert Attacks (JSON → ASM)]
+* [https://github.com/TheAnsarya/ffmq-info/blob/main/tools/conversion/convert_all.py Convert All Battle Data]
+
+==Editing Tools==
+* [https://github.com/TheAnsarya/ffmq-info/blob/main/tools/enemy_editor_gui.py Visual Enemy Editor GUI] - Edit all 83 enemies with real-time validation
+* [https://github.com/TheAnsarya/ffmq-info/blob/main/tools/view_enemy.py Command-Line Enemy Viewer] - Quick stats lookup
+
+==Verification Tools==
+* [https://github.com/TheAnsarya/ffmq-info/blob/main/tools/run_all_tests.py Master Test Suite]
+* [https://github.com/TheAnsarya/ffmq-info/blob/main/tools/test_pipeline.py Pipeline Tests]
+* [https://github.com/TheAnsarya/ffmq-info/blob/main/tools/verify_build_integration.py Build Integration Verification]
+* [https://github.com/TheAnsarya/ffmq-info/blob/main/tools/verify_gamefaqs_data.py GameFAQs Data Validation]
+
+==Build Tools==
+* [https://github.com/TheAnsarya/ffmq-info/blob/main/build.ps1 Build Script] - Assembles modified ROM
+* [https://github.com/TheAnsarya/ffmq-info/blob/main/tools/compare_roms.py ROM Comparison Tool]
+* [https://github.com/TheAnsarya/ffmq-info/blob/main/tools/build_and_compare.py Automated Build & Compare]
+
+=Documentation=
+
+* [https://github.com/TheAnsarya/ffmq-info/blob/main/README.md Project README]
+* [https://github.com/TheAnsarya/ffmq-info/blob/main/MODDING_QUICK_REFERENCE.md Modding Quick Reference] - Complete modding guide
+* [https://github.com/TheAnsarya/ffmq-info/blob/main/docs/ENEMY_EDITOR_GUIDE.md Enemy Editor Guide]
+* [https://github.com/TheAnsarya/ffmq-info/blob/main/docs/BATTLE_DATA_PIPELINE.md Battle Data Pipeline Documentation]
+* [https://github.com/TheAnsarya/ffmq-info/blob/main/tools/README.md Tools Documentation]
+
+{{Internal Data}}
+
+[[Category:ROM maps]]

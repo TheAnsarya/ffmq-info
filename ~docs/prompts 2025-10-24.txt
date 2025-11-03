@@ -497,6 +497,7 @@ add `https://gamefaqs.gamespot.com/snes/532476-final-fantasy-mystic-quest/faqs` 
 Build the GUI editor for visual enemy stat editing
 Move on to build system integration so your mods get into the ROM
 continue doing whatever you want to do to make everything awesome!
+make a `datacrystal` folder, and then download all of the wikicode from pages from `https://datacrystal.tcrf.net/wiki/Final_Fantasy:_Mystic_Quest` and it's sub-folders and sub-pages, etc, into the folder as `*.wikitext files` and then develop a full complex plan with todo files to update those wikitext files to fully document and describe the ROM and all of its code, data, and structures, including links to the github repository and the asset files and extraction/reinsertion scripts; for reference most of the current datacrystal files for FFMQ are currently in my repos at `https://github.com/TheAnsarya/GameInfo/tree/main/Final%20Fantasy%20Mystic%20Quest%20(SNES)` which is mine so you have full access to it.
 
 
 
@@ -537,10 +538,6 @@ create documentation that describes the entire hero or enemy or map data structu
 
 make sure you are updating the chat log/session log and then aggressively and greedily continue these import cycles and don't stop until all banks are done
 
-
-
-
-make a `datacrystal` folder, and then download all of the pages from `` and it's sub-folders and sub-pages, etc, into the folder as `*.wikitext files` and then develop a full complex plan with todo files to update those wikitext files to fully document and describe the ROM and all of its code, data, and structures, including links to the github repository and the asset files and extraction/reinsertion scripts
 
 
 

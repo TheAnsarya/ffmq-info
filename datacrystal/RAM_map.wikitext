@@ -1,0 +1,147 @@
+{{rammap}}
+
+< [[Final Fantasy: Mystic Quest]]
+
+=Main=
+
+{{ Todo | Add notes for RAM map}}
+{{ Todo | Fill in all unknown ("???") memory regions}}
+
+Complete RAM address labels available at:
+* [https://raw.githubusercontent.com/TheAnsarya/GameInfo/refs/heads/main/Final%20Fantasy%20Mystic%20Quest%20(SNES)/Files/Final%20Fantasy%20-%20Mystic%20Quest%20(U)%20(V1.1).mlb Mesen Label File] - Comprehensive RAM and ROM labels
+
+For disassembled code with RAM usage, see:
+* [https://github.com/TheAnsarya/GameInfo/tree/main/Final%20Fantasy%20Mystic%20Quest%20(SNES)/Files/Diz Diz Disassembly Exports]
+
+[[Final Fantasy: Mystic Quest/SRAM map]]
+
+==RAM Map==
+
+Note: Name is 8 characters in English, but 6 characters in Japanese, French, and German versions.
+
+{| class="wikitable"
+!  Address  !!  Size  !!  Category  !!  Description
+|-  style="background-color: #eaecf0;"
+|  $0000 - $0e87  ||  ...  ||  ...  ||  ??? <!-- CRITICAL GAP: 3,720 bytes -->
+
+|-
+
+|  $0e88  ||  byte  ||  Map  ||  [[Final Fantasy: Mystic Quest/Values#Maps|Map ID]]
+|-
+|  $0e89  ||  byte  ||  Map  ||  Player X coordinate on map
+|-
+|  $0e8a  ||  byte  ||  Map  ||  Player Y coordinate on map
+|-
+|  $0e8b  ||  byte  ||  Map  ||  [[Final Fantasy: Mystic Quest/Values#Player_Facing_Directions|Player Facing Direction]]
+
+|-  style="background-color: #eaecf0;"
+|  $0e8c - $0e96  ||  ...  ||  ...  ||  ???
+
+|-
+|  $0e97 - $0e9a  ||  4 bytes  ||  Game  ||  Game Play Timer (99:59 - C6 8A 49 01)
+|-
+|  $0e9b  ||  byte  ||  Settings  ||  [[Final Fantasy: Mystic Quest/Values#Message_Speed|Message Speed]]
+|-
+|  $0e9c - $0e9d  ||  word  ||  Settings  ||  [[Final Fantasy: Mystic Quest (SNES)/Values/Window_Colors|Window Color]]
+|-
+|  $0e9e  ||  byte  ||  Items  ||  Cure Potion's [[Final Fantasy: Mystic Quest/Values#Items|Item Number]] ($10)
+|-
+|  $0e9f  ||  byte  ||  Items  ||  Amount of Cure Potions
+|-
+|  $0e9e  ||  byte  ||  Items  ||  Heal Potion's [[Final Fantasy: Mystic Quest/Values#Items|Item Number]] ($11)
+|-
+|  $0e9f  ||  byte  ||  Items  ||  Amount of Heal Potions
+
+|-
+|  colspan="4" style="background-color: #eaecf0;"  |  
+
+|-
+|  $0ea0  ||  byte  ||  Items  ||  Seed's [[Final Fantasy: Mystic Quest/Values#Items|Item Number]] ($12)
+|-
+|  $0ea1  ||  byte  ||  Items  ||  Amount of Seeds (TODO: bsnes diz capture says ae3)
+|-
+|  $0ea2  ||  byte  ||  Items  ||  Refresher's [[Final Fantasy: Mystic Quest/Values#Items|Item Number]] ($13)
+|-
+|  $0ea3  ||  byte  ||  Items  ||  Amount of Refreshers
+
+
+
+<!-- $0ead, 6e=>5e, Mount Gale defeat Dullahan-->
+
+
+
+|-  style="background-color: #eaecf0;"
+|  $0ea4 - $0ebc  ||  ...  ||  ...  ||  ???
+
+
+
+|-
+|  colspan="4" style="background-color: #eaecf0;"  |  
+<!-- All: $a0 (1 means chest is available, 0 means chest is gone
+1 means battlefield reward has been taken, 0 means it's available) -->
+|-  
+|  $0ebd # 0000_0001  ||  bit  ||  Chests  ||  Bone Dungeon (19, 34, 23) - Steel Shield
+|-
+|  $0ebd # 0000_0010  ||  bit  ||  Chests  ||  Foresta (, , ) - Magic - Cure
+|-
+|  $0ebd # 0000_0100  ||  bit  ||  Chests  ||  Focus Tower (24, 35, 24) - Armor - Venus Shield
+|-
+|  $0ebd # 0000_1000  ||  bit  ||  Chests  ||  Focus Tower (1a, 2c, 30) - Magic - Fire
+|-
+|  $0ebd # 0001_0000  ||  bit  ||  Chests  ||  Focus Tower (24, 28, 2e) - Magic - Blizzard
+|-  style="background-color: #eaecf0;"
+|  $0ebd # 0010_0000  ||  bit  ||  Chests  ||  ...
+|-
+|  $0ebd # 0100_0000  ||  bit  ||  Chests  ||  Focus Tower (1b, 1e, 28) - Magic - Aero
+|-
+|  $0ebd # 1000_0000  ||  bit  ||  Battlefield Reward  ||  Battlefield #20 Reward - 2700 EXP
+
+|-
+|  colspan="4" style="background-color: #eaecf0;"  |  <!-- All: $00 (1 means chest is available, 0 means chest is gone) -->
+|-
+|  $0ebe # 0000_0001  ||  bit  ||  Chests  ||  Ice Pyramid (21, 34, 1e) - River Coin
+|-
+|  $0ebe # 0000_0010  ||  bit  ||  Chests  ||  Ice Pyramid (21, 36, 1b) - Magic Mirror
+|-
+|  $0ebe # 0000_0100  ||  bit  ||  Chests  ||  Ice Pyramid (21, 38, 08) - Noble Armor
+|-
+|  $0ebe # 0000_1000  ||  bit  ||  Chests  ||  Ice Pyramid (21, 32, 10) - Knight Sword
+|-
+|  $0ebe # 0001_0000  ||  bit  ||  Chests  ||  Falls Basin (20, 0e, 0a) - Magic - Heal
+|-
+|  $0ebe # 0010_0000  ||  bit  ||  Chests  ||  Wintry Cave (1e, 0d, 1b) - Libra Crest
+|-
+|  $0ebe # 0100_0000  ||  bit  ||  Chests  ||  Bone Dungeon (19, 24, 11) - Sand Coin
+|-
+|  $0ebe # 1000_0000  ||  bit  ||  Chests  ||  Bone Dungeon (19, 3b, 17) - Magic - Quake
+
+|-
+|  colspan="4" style="background-color: #eaecf0;"  |  <!-- All: $e0 (1 means chest is available, 0 means chest is gone) -->
+|-
+|  $0ebf # 0000_0001  ||  bit  ||  Chests  ||  Giant Tree (2d, 3b, 2b) - Magic Meteor
+|-
+|  $0ebf # 0000_0010  ||  bit  ||  Chests  ||  Alive Forest (2d, 1b, 3a) - Giant's Axe
+|-
+|  $0ebf # 0000_0100  ||  bit  ||  Chests  ||  Lava Dome (2a, 0c, 20) - Sun Coin
+|-
+|  $0ebf # 0000_1000  ||  bit  ||  Chests  ||  Lava Dome (2a, 08, 04) - Moon Helm
+|-
+|  $0ebf # 0001_0000  ||  bit  ||  Chests  ||  Volcano (29, 24, 0e) - Mask
+|-
+|  $0ebf # 0010_0000  ||  bit  ||  Chests  ||  Volcano (29, 12, 0a) - Magic - White
+|-
+|  $0ebf # 0100_0000  ||  bit  ||  Chests  ||  Mine (27, 14, 2e) - Charm Claw
+|-
+|  $0ebf # 1000_0000  ||  bit  ||  Chests  ||  Spencer's Place (22, 12, 04) - Mobius Crest
+
+|}
+
+NOTE: RAM map continues with extensive player/companion data structures, battlefield counters, equipment bitfields, and magic spell flags. See the [https://github.com/TheAnsarya/GameInfo/blob/main/Final%20Fantasy%20Mystic%20Quest%20(SNES)/Wiki/Final%20Fantasy%20Mystic%20Quest%20(SNES)%20-%20RAM%20map.wikitext complete RAM map wikitext] for full details.
+
+=Related=
+<br>
+
+{{Internal Data}}
+
+[[Category:RAM maps]]
+[[Category:To do]]

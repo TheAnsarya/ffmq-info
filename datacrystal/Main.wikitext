@@ -1,0 +1,92 @@
+{{game
+|name = Final Fantasy: Mystic Quest
+|company = Square
+|header = None
+|bank = LoROM
+|interleaved = No
+|sram = 8 KiB
+|type = Normal + Batt
+|rom = 512 KiB
+|country = USA
+|video = NTSC
+|romspeed = 200ns (SlowROM)
+|revision = 1.0
+|checksum = Good 0x4CDE
+|crc32 = 6B19A2C6
+|game = Final Fantasy Mystic Quest
+}}
+
+=Sub-pages=
+
+{{namespaces}}
+{{subpage|ROM map}}
+{{subpage|RAM map}}
+{{subpage|Text table}}
+{{subpage|Notes}}
+{{subpage|SRAM map}}
+{{subpage|Values}}
+
+=Utilities=
+
+* [https://www.romhack.ing/utilities/369/ Mystic Quest Multi Editor], coded by JCE3000GT. This utility edits characters, monsters, items and more.
+* [http://www.jce3000gt.com/spc_editor.php SPC Editor], coded by JCE3000GT. This utility allows the user to edit the instrument sample indexes in various games, including Mystic Quest.
+
+=Hacks=
+
+* [http://www.jce3000gt.com/mqht.php Mystic Quest HardType], created by JCE3000GT. So far this beta version allows the player to play the hardtype hack up until you beat the Flamerus Rex and get the first crystal. The hack is designed to keep the story and characters intact while increasing the game's difficulty. There are also some extra things like new music which spice up the game as well.
+
+=Translations=
+
+* [https://www.romhack.ing/trans/1172/ FF:MQ Retranslation] - DarknessSavior has started a retranslation of Final Fantasy: Mystic Quest.
+
+=Miscellaneous=
+
+* You can check the chip version in your SNES by pressing Start and Select at the same time when on the menu screen.
+
+=Known Dumps=
+
+These are the roms as they are listed in GoodSNES.
+
+{| class="wikitable"
+!  Filename  !!  Size  !!  Hashes
+|-
+|  Final Fantasy - Mystic Quest (U) (V1.0) [!]  ||  $8,0000 (524,288)  ||  CRC32: 6b19a2c6<br>MD5: da08f0559fade06f37d5fdf1b6a6d92e<br>SHA1: 787c535aaca7b57f6b85fc02ceef106f7fe5ea59
+|-
+|  Final Fantasy - Mystic Quest (U) (V1.1)  ||  $8,0000 (524,288)  ||  CRC32: 2c52c792<br>MD5: f7faeae5a847c098d677070920769ca2<br>SHA1: 6be74b73b736bc6027c0e92619874da7c498bed0
+|-
+|  Final Fantasy USA - Mystic Quest (J) [!]  ||  $8,0000 (524,288)  ||  CRC32: 1da17f0c<br>MD5: 5164060bd3350d7a6325ec8ae80bba54<br>SHA1: ffc05a65ef43fa5c56c9930af1af527509c1ae05
+|-
+|  Mystic Quest Legend (E) [!]  ||  $8,0000 (524,288)  ||  CRC32: 45a7328f<br>MD5: 92461cd3f1a72b8beb32ebab98057b76<br>SHA1: 3d3ec05a11d808600752c89895f04d5213e532b6
+|-
+|  Mystic Quest Legend (F)  ||  $8,0000 (524,288)  ||  CRC32: f997debc<br>MD5: a5356b9bad50d4a9191bc1fe50316b5b<br>SHA1: 6c2bcb3be5ad46cc96fd35b50446931fc046a167
+|-
+|  Mystic Quest Legend (G) [!]  ||  $8,0000 (524,288)  ||  CRC32: f21760df<br>MD5: 10cfe4f746a8bf3dd54c1e61c67f61d1<br>SHA1: bd190854c0f725160ed6f6b0669e3cdd2308ccca
+|}
+
+=External links=
+
+* [https://gamefaqs.gamespot.com/snes/532476-final-fantasy-mystic-quest/faqs GameFAQs] - Guides and FAQs
+* [https://mikesrpgcenter.com/ffmq/index.html Mike's RPG Center] - Maps and tables and info
+* [https://raw.githubusercontent.com/TheAnsarya/GameInfo/refs/heads/main/Final%20Fantasy%20Mystic%20Quest%20(SNES)/Files/Final%20Fantasy%20-%20Mystic%20Quest%20(U)%20(V1.1).mlb Mesen label file] - Lots of RAM and ROM and code labels
+* [https://github.com/TheAnsarya/ffmq-info GitHub Repository] - Complete disassembly, modding tools, and documentation
+
+=Related Links=
+
+{{Final Fantasy series}}
+
+[[Category:Pages missing developer references]]
+[[Category:Games developed by Square]]
+[[Category:Pages missing publisher references]]
+[[Category:Games published by Squaresoft]]
+[[Category:Games published by Square]]
+[[Category:Games published by Nintendo]]
+[[Category:SNES games]]
+[[Category:Pages missing date references]]
+[[Category:Games released in 1992]]
+[[Category:Games released in October]]
+[[Category:Games released on October 5]]
+[[Category:Pages with TCRF links]]
+[[Category:SNES games of 8 KiB SRAM size]]
+[[Category:SNES games of 512 KiB ROM size]]
+[[Category:SNES games of 200ns (SlowROM) ROM speed]]
+[[Category:Final Fantasy series]]
