@@ -1,0 +1,257 @@
+=TBL - Japanese=
+
+{{Back|Final Fantasy: Mystic Quest/TBL}}
+
+This page documents the Japanese text table used in Final Fantasy USA: Mystic Quest (Japanese version).
+
+==Overview==
+
+The Japanese version uses a text table loaded into VRAM at '''$6200-$6fff'''. Unlike the Western versions which use DTE compression, the Japanese version uses direct kana character mappings:
+* '''Hiragana''' ($4b-$5e, $80-$b1): Basic hiragana characters with dakuten/handakuten variants
+* '''Katakana''' ($60-$7d, $b8-$ef): Basic katakana characters with dakuten/handakuten variants
+* '''Numbers and punctuation''' ($f0-$fc): 0-9, !, ?, …
+* '''Space character''': $ff
+
+==Hiragana Table==
+
+{| class="wikitable" style="text-align: center;"
+! colspan="17" style="background-color: #ffcccc;" | Hiragana Dakuten/Handakuten Variants ($4b-$5e)
+|-
+! style="background-color: #ffdddd;" | Code !! Character !! Romaji
+|-
+| $4b || が || ga
+|-
+| $4c || ぎ || gi
+|-
+| $4d || ぐ || gu
+|-
+| $4e || げ || ge
+|-
+| $4f || ご || go
+|-
+| $50 || ざ || za
+|-
+| $51 || じ || ji
+|-
+| $52 || ず || zu
+|-
+| $53 || ぜ || ze
+|-
+| $54 || ぞ || zo
+|-
+| $55 || だ || da
+|-
+| $56 || ぢ || di (ji)
+|-
+| $57 || づ || du (zu)
+|-
+| $58 || で || de
+|-
+| $59 || ど || do
+|-
+| $5a || ば || ba
+|-
+| $5b || び || bi
+|-
+| $5c || ぶ || bu
+|-
+| $5d || べ || be
+|-
+| $5e || ぼ || bo
+|}
+
+{| class="wikitable" style="text-align: center;"
+! colspan="17" style="background-color: #ffcccc;" | Hiragana Basic Kana ($80-$b1)
+|-
+! style="background-color: #ffdddd;" | !! style="background-color: #ffdddd;" | x0 !! style="background-color: #ffdddd;" | x1 !! style="background-color: #ffdddd;" | x2 !! style="background-color: #ffdddd;" | x3 !! style="background-color: #ffdddd;" | x4 !! style="background-color: #ffdddd;" | x5 !! style="background-color: #ffdddd;" | x6 !! style="background-color: #ffdddd;" | x7 !! style="background-color: #ffdddd;" | x8 !! style="background-color: #ffdddd;" | x9 !! style="background-color: #ffdddd;" | xa !! style="background-color: #ffdddd;" | xb !! style="background-color: #ffdddd;" | xc !! style="background-color: #ffdddd;" | xd !! style="background-color: #ffdddd;" | xe !! style="background-color: #ffdddd;" | xf
+|-
+! style="background-color: #ffdddd;" | 8x
+| あ || い || う || え || お || か || き || く || け || こ || さ || し || す || せ || そ || た
+|-
+! style="background-color: #ffdddd;" | 9x
+| ち || つ || て || と || な || に || ぬ || ね || の || は || ひ || ふ || へ || ほ || ま || み
+|-
+! style="background-color: #ffdddd;" | ax
+| む || め || も || や || ゆ || よ || ら || り || る || れ || ろ || わ || を || ん || ぱ || ぴ
+|-
+! style="background-color: #ffdddd;" | bx
+| ぷ || ぺ || ぽ || ゃ || ゅ || ょ || っ || ぁ || ぃ || ぅ || ぇ || ぉ || ー || || || 
+|}
+
+Romaji equivalents:
+* '''a-row''': あ(a) い(i) う(u) え(e) お(o)
+* '''ka-row''': か(ka) き(ki) く(ku) け(ke) こ(ko)
+* '''sa-row''': さ(sa) し(shi) す(su) せ(se) そ(so)
+* '''ta-row''': た(ta) ち(chi) つ(tsu) て(te) と(to)
+* '''na-row''': な(na) に(ni) ぬ(nu) ね(ne) の(no)
+* '''ha-row''': は(ha) ひ(hi) ふ(fu) へ(he) ほ(ho)
+* '''ma-row''': ま(ma) み(mi) む(mu) め(me) も(mo)
+* '''ya-row''': や(ya) ゆ(yu) よ(yo)
+* '''ra-row''': ら(ra) り(ri) る(ru) れ(re) ろ(ro)
+* '''wa-row''': わ(wa) を(wo) ん(n)
+* '''pa-row''': ぱ(pa) ぴ(pi) ぷ(pu) ぺ(pe) ぽ(po)
+* '''Small kana''': ゃ(ya) ゅ(yu) ょ(yo) っ(tsu) ぁ(a) ぃ(i) ぅ(u) ぇ(e) ぉ(o)
+* '''Long vowel mark''': ー
+
+==Katakana Table==
+
+{| class="wikitable" style="text-align: center;"
+! colspan="17" style="background-color: #ccccff;" | Katakana Dakuten/Handakuten Variants ($60-$7d)
+|-
+! style="background-color: #ddddff;" | Code !! Character !! Romaji
+|-
+| $60 || ヴ || vu
+|-
+| $61 || ガ || ga
+|-
+| $62 || ギ || gi
+|-
+| $63 || グ || gu
+|-
+| $64 || ゲ || ge
+|-
+| $65 || ゴ || go
+|-
+| $66 || ザ || za
+|-
+| $67 || ジ || ji
+|-
+| $68 || ズ || zu
+|-
+| $69 || ゼ || ze
+|-
+| $6a || ゾ || zo
+|-
+| $6b || ダ || da
+|-
+| $6c || ヂ || di (ji)
+|-
+| $6d || ヅ || du (zu)
+|-
+| $6e || デ || de
+|-
+| $6f || ド || do
+|-
+| $70 || バ || ba
+|-
+| $71 || ビ || bi
+|-
+| $72 || ブ || bu
+|-
+| $73 || ベ || be
+|-
+| $74 || ボ || bo
+|-
+| $75 || パ || pa
+|-
+| $76 || ピ || pi
+|-
+| $77 || プ || pu
+|-
+| $78 || ペ || pe
+|-
+| $79 || ポ || po
+|}
+
+{| class="wikitable" style="text-align: center;"
+! colspan="17" style="background-color: #ccccff;" | Katakana Basic Kana ($b8-$ef)
+|-
+! style="background-color: #ddddff;" | !! style="background-color: #ddddff;" | x0 !! style="background-color: #ddddff;" | x1 !! style="background-color: #ddddff;" | x2 !! style="background-color: #ddddff;" | x3 !! style="background-color: #ddddff;" | x4 !! style="background-color: #ddddff;" | x5 !! style="background-color: #ddddff;" | x6 !! style="background-color: #ddddff;" | x7 !! style="background-color: #ddddff;" | x8 !! style="background-color: #ddddff;" | x9 !! style="background-color: #ddddff;" | xa !! style="background-color: #ddddff;" | xb !! style="background-color: #ddddff;" | xc !! style="background-color: #ddddff;" | xd !! style="background-color: #ddddff;" | xe !! style="background-color: #ddddff;" | xf
+|-
+! style="background-color: #ddddff;" | bx
+| || || || || || || || || ア || イ || ウ || エ || オ || カ || キ || ク
+|-
+! style="background-color: #ddddff;" | cx
+| ケ || コ || サ || シ || ス || セ || ソ || タ || チ || ツ || テ || ト || ナ || ニ || ヌ || ネ
+|-
+! style="background-color: #ddddff;" | dx
+| ノ || ハ || ヒ || フ || ヘ || ホ || マ || ミ || ム || メ || モ || ヤ || ユ || ヨ || ラ || リ
+|-
+! style="background-color: #ddddff;" | ex
+| ル || レ || ロ || ワ || ヲ || ン || ャ || ュ || ョ || ッ || ァ || ィ || ゥ || ェ || ォ || ー
+|}
+
+Romaji equivalents:
+* '''a-row''': ア(a) イ(i) ウ(u) エ(e) オ(o)
+* '''ka-row''': カ(ka) キ(ki) ク(ku) ケ(ke) コ(ko)
+* '''sa-row''': サ(sa) シ(shi) ス(su) セ(se) ソ(so)
+* '''ta-row''': タ(ta) チ(chi) ツ(tsu) テ(te) ト(to)
+* '''na-row''': ナ(na) ニ(ni) ヌ(nu) ネ(ne) ノ(no)
+* '''ha-row''': ハ(ha) ヒ(hi) フ(fu) ヘ(he) ホ(ho)
+* '''ma-row''': マ(ma) ミ(mi) ム(mu) メ(me) モ(mo)
+* '''ya-row''': ヤ(ya) ユ(yu) ヨ(yo)
+* '''ra-row''': ラ(ra) リ(ri) ル(ru) レ(re) ロ(ro)
+* '''wa-row''': ワ(wa) ヲ(wo) ン(n)
+* '''Small kana''': ャ(ya) ュ(yu) ョ(yo) ッ(tsu) ァ(a) ィ(i) ゥ(u) ェ(e) ォ(o)
+* '''Long vowel mark''': ー
+* '''Special''': ヴ(vu) - used for foreign words
+
+==Numbers and Punctuation==
+
+{| class="wikitable"
+! Code !! Character !! Description
+|-
+| $f0 || 0 || Zero
+|-
+| $f1 || 1 || One
+|-
+| $f2 || 2 || Two
+|-
+| $f3 || 3 || Three
+|-
+| $f4 || 4 || Four
+|-
+| $f5 || 5 || Five
+|-
+| $f6 || 6 || Six
+|-
+| $f7 || 7 || Seven
+|-
+| $f8 || 8 || Eight
+|-
+| $f9 || 9 || Nine
+|-
+| $fa || ! || Exclamation mark
+|-
+| $fb || ? || Question mark
+|-
+| $fc || … || Ellipsis (three dots)
+|-
+| $ff || (space) || Space character
+|}
+
+==Notes==
+
+{{Todo|Investigate potential issues with character encoding}}
+
+Some observations from the original documentation:
+* '''$45''' may represent んだ (nda) - needs verification
+* '''Punctuation spacing''': Unclear if space is required after punctuation marks
+* '''Character name length''': Limited to 6 characters (same as German version)
+
+==Control Codes==
+
+Japanese version uses the same control code system as Western versions - see [[Final Fantasy: Mystic Quest/TBL/English|English TBL]].
+
+==RAM Location==
+
+VRAM address: '''$6200-$6fff'''
+
+==Download==
+
+* [https://raw.githubusercontent.com/TheAnsarya/GameInfo/main/Final%20Fantasy%20Mystic%20Quest%20(SNES)/Files/FFUSA%20MQ%20(J)%20-%20Japanese.tbl Japanese.tbl]
+
+==Version==
+
+This table applies to:
+* '''Final Fantasy USA: Mystic Quest (J)''' - Japanese release
+
+==See Also==
+
+* [[Final Fantasy: Mystic Quest/TBL|Text Tables Overview]]
+* [[Final Fantasy: Mystic Quest/Text/Complex_Text|Complex Text Documentation]]
+* [[Final Fantasy: Mystic Quest/TBL/English|English TBL]]
+* [[Final Fantasy: Mystic Quest/TBL/French|French TBL]]
+* [[Final Fantasy: Mystic Quest/TBL/German|German TBL]]
+
+[[Category:Final Fantasy: Mystic Quest]]

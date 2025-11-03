@@ -1,0 +1,256 @@
+=Complex Text=
+
+{{Back|Final Fantasy: Mystic Quest/TBL}}
+
+This page documents the complex text encoding system used in Final Fantasy: Mystic Quest, including DTE (Dual Tile Encoding) entries and control codes.
+
+==Overview==
+
+The game uses a sophisticated text compression system that combines:
+* '''Simple character mappings''' ($90-$dd) for direct alphanumeric characters
+* '''DTE (Dual Tile Encoding)''' ($3d-$7e) for common letter combinations and words
+* '''Control codes''' ($01-$36) for textbox positioning, character names, and special functions
+* '''Terminator''' ($ff) for spaces and newlines
+
+==Control Codes==
+
+{| class="wikitable"
+! Code !! Function !! Description
+|-
+| $01 || Newline || Starts a new line of text
+|-
+| $03 || Asterisk || Inserts * character
+|-
+| $06 || Underscore || Inserts _ character
+|-
+| $1a $xx || Textbox position (below) || $1a $00 = textbox below hero
+|-
+| $1b $xx || Textbox position (above) || $1b $81 = textbox above NPC
+|-
+| $1d || Character name || Inserts current character's name
+|-
+| $1e || Item name || Inserts item name from context
+|-
+| $1f || Location name || Inserts location name from context
+|-
+| $30 || Wait for button || Pauses text until player presses button
+|-
+| $35 || Player's name || Inserts Benjamin's name (or custom name)
+|-
+| $36 || Movement/action || Triggers character movement or action sequence
+|-
+| $ff || Space/newline || Context-dependent: space character or line break
+|}
+
+==DTE (Dual Tile Encoding) Table==
+
+DTE entries compress common letter pairs and words into single bytes, saving ROM space and improving text compression.
+
+{| class="wikitable"
+! Code !! Text !! Usage !! Example Words
+|-
+| colspan="4" | '''Common Two-Letter Combinations'''
+|-
+| $3d || Crystal || Special || "Crystal"
+|-
+| $3e || Rainbow Road || Special || "Rainbow Road"
+|-
+| $3f || th || Very common || "the", "this", "that", "with"
+|-
+| $40 || e  || e + space || "the ", "are ", "were "
+|-
+| $41 || the  || the + space || Most common word
+|-
+| $42 || t  || t + space || "that ", "it ", "not "
+|-
+| $43 || ou || Vowel pair || "you", "out", "about"
+|-
+| $44 || you || Complete word || "you", "your"
+|-
+| $45 || s  || s + space || "is ", "has ", "was "
+|-
+| $46 || to  || to + space || "to ", "into "
+|-
+| $47 || in || Common pair || "in", "into", "king"
+|-
+| $48 || ing  || ing + space || "going ", "doing "
+|-
+| $49 || er || r-sound || "never", "after", "power"
+|-
+| $4a || re || r-sound || "are", "were", "here"
+|-
+| $4b || an || Common pair || "an", "and", "can"
+|-
+| $4c || he || Common pair || "he", "the", "here"
+|-
+| $4d || ly || Suffix || "only", "really", "finally"
+|-
+| $4e || en || Common pair || "when", "been", "then"
+|-
+| $4f || ar || Common pair || "are", "start", "dark"
+|-
+| colspan="4" | '''Common Words and Phrases'''
+|-
+| $50 || or || Word || "or", "for", "world"
+|-
+| $51 || ed || Suffix || "needed", "used", "helped"
+|-
+| $52 || ng || Suffix || "ring", "long", "going"
+|-
+| $53 || is || Word || "is", "this", "his"
+|-
+| $54 || on || Word/suffix || "on", "second", "weapon"
+|-
+| $55 || es || Suffix || "goes", "uses", "places"
+|-
+| $56 || at || Common pair || "at", "that", "great"
+|-
+| $57 || ha || Common pair || "has", "what", "that"
+|-
+| $58 || ve || Common pair || "have", "never", "give"
+|-
+| $59 || it || Word || "it", "with", "white"
+|-
+| $5a || al || Common pair || "all", "also", "already"
+|-
+| $5b || T || Capital T || "The", "To", "This"
+|-
+| $5c || be || Common pair || "be", "been", "before"
+|-
+| $5d || hi || Common pair || "his", "this", "white"
+|-
+| $5e || ea || Vowel pair || "earth", "great", "really"
+|-
+| $5f || is  || is + space || "is "
+|-
+| colspan="4" | '''Location and Character References'''
+|-
+| $60 || B || Capital B || "Benjamin", "Button"
+|-
+| $61 || wa || Common pair || "was", "want", "water"
+|-
+| $62 || st || Common pair || "start", "first", "must"
+|-
+| $63 || ll || Double L || "all", "will", "still"
+|-
+| $64 || le || Common pair || "people", "little", "able"
+|-
+| $65 || wh || Question words || "what", "when", "where"
+|-
+| $66 || ow || Common pair || "now", "know", "power"
+|-
+| $67 || a  || a + space || "a ", "area "
+|-
+| $68 || I || Capital I || "I", "I'm", "I'll"
+|-
+| $69 || gh || Silent pair || "right", "might", "fight"
+|-
+| $6a || of || Word || "of"
+|-
+| $6b || ui || Vowel pair || "quick", "quite"
+|-
+| $6c || as || Common pair || "as", "has", "was"
+|-
+| $6d || om || Common pair || "from", "come", "some"
+|-
+| $6e || nd || Common pair || "and", "end", "friend"
+|-
+| $6f || ! || Exclamation || End of excited dialog
+|-
+| colspan="4" | '''Advanced Compressions'''
+|-
+| $70 || el || Common pair || "help", "spell", "level"
+|-
+| $71 || se || Common pair || "use", "see", "those"
+|-
+| $72 || nt || Common pair || "want", "into", "went"
+|-
+| $73 || ro || Common pair || "from", "around", "hero"
+|-
+| $74 || ur || Common pair || "your", "turn", "sure"
+|-
+| $75 || ld || Common pair || "old", "world", "told"
+|-
+| $76 || ay || Common pair || "may", "say", "away"
+|-
+| $77 || ne || Common pair || "one", "done", "gone"
+|-
+| $78 || go || Word || "go", "going", "good"
+|-
+| $79 || ri || Common pair || "right", "friend", "bring"
+|-
+| $7a || me || Word || "me", "come", "some"
+|-
+| $7b || no || Word || "no", "now", "know"
+|-
+| $7c || ca || Common pair || "can", "came", "call"
+|-
+| $7d || so || Word || "so", "some", "also"
+|-
+| $7e || fo || Common pair || "for", "found", "before"
+|}
+
+==Simple Character Table==
+
+Standard alphanumeric characters occupy $90-$dd:
+
+{| class="wikitable"
+! Range !! Characters
+|-
+| $90-$99 || 0 1 2 3 4 5 6 7 8 9
+|-
+| $9a-$9f || (Punctuation and special)
+|-
+| $a0-$b9 || A B C D E F G H I J K L M N O P Q R S T U V W X Y Z
+|-
+| $ba-$d3 || a b c d e f g h i j k l m n o p q r s t u v w x y z
+|-
+| $d4-$dd || (Additional punctuation)
+|-
+| $ff || Space character (or newline in some contexts)
+|}
+
+See [[Final Fantasy: Mystic Quest/TBL/English|English TBL]] for the complete mapping grid.
+
+==Text Compression Examples==
+
+Original text:
+```
+"The crystal is going to help you!"
+```
+
+Without DTE (39 bytes):
+```
+$9A $a7 $a4 $ff $a2 $b6 $b9 $b7 $b5 $a0 $a3 $ff $a8 $b7 $ff $a6 $ae $a8 $ad $a6 $ff $b5 $ae $ff $a7 $a4 $a3 $af $ff $b9 $ae $b6 $6f
+```
+
+With DTE (27 bytes):
+```
+$5b $40 $3d $ff $53 $ff $48 $46 $ha $40 $44 $6f
+```
+
+Compression ratio: ~31% space savings
+
+==RAM Location==
+
+The text table is loaded into VRAM during gameplay:
+* '''English versions''': $6300-$6fff
+* '''Other versions''': $6200-$6fff
+
+The table can be viewed in Mesen2's RAM viewer to see the actual character tiles.
+
+==Language Variants==
+
+Each language version has its own DTE table optimized for that language:
+* [[Final Fantasy: Mystic Quest/TBL/English|English]] - Optimized for English text patterns
+* [[Final Fantasy: Mystic Quest/TBL/French|French]] - Includes accented characters and French DTE phrases
+* [[Final Fantasy: Mystic Quest/TBL/German|German]] - Includes umlauts and German DTE phrases
+* [[Final Fantasy: Mystic Quest/TBL/Japanese|Japanese]] - Uses hiragana/katakana instead of DTE
+
+==See Also==
+
+* [[Final Fantasy: Mystic Quest/TBL|Text Tables]]
+* [[Final Fantasy: Mystic Quest/Notes/Script_Analysis|Script Analysis]]
+* [[Final Fantasy: Mystic Quest/ROM map|ROM Map]]
+
+[[Category:Final Fantasy: Mystic Quest]]

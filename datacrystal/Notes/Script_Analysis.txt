@@ -1,0 +1,190 @@
+=Script Analysis=
+
+{{Back|Final Fantasy: Mystic Quest/ROM map}}
+
+This page contains raw script data analysis, documenting text encoding and dialog system implementation.
+
+==Script Start Location==
+
+CPU address: $03f7e5
+PRG address: $01f7e5
+
+==Sample Script Data==
+
+```
+2A 0B 27 00 20 00 20 EE FE 4F 01 10 50 50 51 0B
+27 00 20 20 50 20 51 0B 27 00 20 00 54 FF FF 1A
+00 8C 35 76 A8 AB AB A0 A6 32 4C A3 43 AF A0 B1
+B4 FA 01 92 A0 AF B1 43 B3 A8 9D 01 63 66 6A 9A
+A8 AB 6D B2 C6 FB 1B 81 82 A4 36 3B A3 B1 5D 36
+B5 A0 01 B2 AE AC A1 3F B1 FA 01 8F A0 B1 B3 35
+B2 FA 08 D9 84 2A 2B 25 50 50 0B 27 00 20 60 50
+10 51 10 50 10 51 00 20 FF FF 1A
+```
+
+==Dialog Example 1: "My village is gone!!"==
+
+Location: $01f830
+
+Raw data:
+```
+0001F830 1A 00 A6 59:C9 BC BF BF|B4 BA 40 5F:BA 54 B8 CE
+0001F840 6F B0 57 42:54 FF 5E C5|3F FF 5F BA:C2 48 54 CF
+```
+
+Decoded text:
+```
+{textbox below Hero}My village is gone!!{newline}
+What on earth is going on?
+```
+
+Byte breakdown:
+```
+1A 00            {textbox below Hero}
+A6 59 C9 BC BF BF B4 BA 40 5F BA 54 B8 CE
+M  y  _  v  i  l  l  a  g  e  _  is _  g  on e
+6F               !
+B0 57 42 54 FF   !{newline}W  ha t  _  on
+5E C5 3F FF      _  ea r  th _
+5F BA C2 48 54 CF    is _  g  o  ing _  on ?
+```
+
+==Dialog Example 2: Old Man at Sinking Building==
+
+Location: $01f850
+
+Raw data:
+```
+0001F850 1B 81 5B 5F:C3 BF B4 B6|40 5F BA C2:48 46 C6 47
+0001F860 7D 4F 59 C6:B8 B6 54 B7|6F A5 B8 C7:4E B6 BF BC
+0001F870 C0 B5 FF C8:6B C4 C8 BC|B6 BE CE
+```
+
+Decoded text:
+```
+{textbox above old man}This place is going to sink any second!{newline}
+Let's climb up quick!
+```
+
+Byte breakdown:
+```
+1B 81            {textbox above old man}
+5B 5F C3 BF B4 B6 40 5F BA C2 48 46 C6 47
+T  hi s  _  p  l  a  ce _  is _  g  o  ing _  to _
+
+7D 4F 59 C6 B8 B6 54 B7 6F
+s  ink _  a  ny _  s  ec on d  !
+
+A5 B8 C7 4E B6 BF BC C0 B5 FF C8 6B C4
+{newline}L  et 's _  c  l  im b  _  up _  q  ui ck !
+```
+
+Following action sequence:
+```
+0001F87B            :           |         36:2A 2B 25 50
+0001F880 50 0B 27 00:20 60 50 10|51 10 50 10:51 00 20 FF
+0001F890 FF
+```
+
+==Dialog Example 3: B Button Tutorial==
+
+Location: $01f891
+
+Raw data:
+```
+0001F891    1A 81 A9:C5 60 45 41|D4 9B D4 FF:9B C8 C7 C7
+0001F8A0 54 4D 4F 4C:BD C8 C0 6B|B4 B6 C5 C2:C6 C6 CE
+```
+
+Decoded text:
+```
+{textbox above old man}Press the "B" Button, and jump across!
+```
+
+Following action sequence:
+```
+0001F8Af          :           |           :         36
+0001F8B0 05 01 00 80:2A E1 54 0B|27 00 20 0B:27 01 25 2C
+0001F8C0 25 10 44 40:51 30 50 00|44 32 46 90:56 30 50 14
+0001F8D0 25 0B 26 FF:FF
+```
+
+==Control Code Reference==
+
+Based on these examples:
+
+{| class="wikitable"
+! Code !! Description !! Example
+|-
+| $1a $00 || Textbox below hero || Village dialog
+|-
+| $1b $81 || Textbox above old man || Sinking building, B button tutorial
+|-
+| $ff || Newline || Separates dialog lines
+|-
+| $6f || ! (exclamation) || "gone!!", "second!", "quick!"
+|-
+| $ce || ? (question mark) || "going on?"
+|-
+| $36 || Action/movement command || Follows dialog blocks
+|-
+| $ff $ff || End of dialog/action || Terminates sequences
+|}
+
+==Character Encoding Patterns==
+
+Common characters observed:
+* Lowercase vowels: a=$b4, e=$b8, i=$bc, o=$c2, u=$c8
+* Lowercase consonants: b=$b5, c=$b6, d=$b7, g=$ba, h=$c3, j=$bd, k=$be, l=$bf, m=$c0, n=$c1, p=$c4, q=$c5, r=$c6, s=$c7, t=$c9, v=$cb, w=$57, x=$cc, y=$59, z=$ce
+* Uppercase: B=$45, L=$A5, M=$A6, P=$A9, T=$5B, W=$B0
+* Punctuation: space=$40/$5F, !=$6f, ?=$ce
+* DTE (Dual Tile Encoding): th=$5E, on=$54, is=$5F $ba/$ba, ing=$C6 $48, er=$C5, ea=$C5 $3F, ou=$7D, ui=$6B, ly=$4D
+
+==Observed DTE Patterns==
+
+{| class="wikitable"
+! Bytes !! Decoded !! Example Context
+|-
+| $54 || on || "going on", "second"
+|-
+| $5e || th || "earth"
+|-
+| $5f $ba || is || "is gone", "is going"
+|-
+| $c5 $3f || ea || "earth"
+|-
+| $c6 $48 || ing || "going", "sinking"
+|-
+| $6b || ui || "quick"
+|-
+| $7d || ou || "Button"
+|-
+| $4d || ly || (not shown in examples)
+|-
+| $c5 || er/re || "Press"
+|-
+| $c7 || ss || "Press", "across"
+|}
+
+==Text Table Mapping==
+
+See [[Final Fantasy: Mystic Quest/TBL|TBL]] pages for complete character mappings:
+* [[Final Fantasy: Mystic Quest/TBL/English|English]]
+* [[Final Fantasy: Mystic Quest/TBL/French|French]]
+* [[Final Fantasy: Mystic Quest/TBL/German|German]]
+* [[Final Fantasy: Mystic Quest/TBL/Japanese|Japanese]]
+
+==Address Range Notes==
+
+Based on location markers:
+* Script data starts at PRG $01f7e5 (CPU $03f7e5)
+* Dialog examples found in $01f830-$01f8d0 range
+* Action sequences follow dialog blocks
+* Typical pattern: textbox code ($1a/$1b) → position byte → text data → $ff (newline) → more text → action code ($36) → action data → $ff $ff (end)
+
+==See Also==
+
+* [[Final Fantasy: Mystic Quest/ROM map]]
+* [[Final Fantasy: Mystic Quest/Text|Text system]]
+* [[Final Fantasy: Mystic Quest/TBL|Text tables]]
+* [[Final Fantasy: Mystic Quest/Values|Values]]

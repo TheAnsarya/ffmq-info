@@ -1,0 +1,165 @@
+=TBL - German=
+
+{{Back|Final Fantasy: Mystic Quest/TBL}}
+
+This page documents the German text table used in Final Fantasy: Mystic Quest Legend (German version).
+
+==Overview==
+
+The German version (Mystic Quest Legend) uses a text table loaded into VRAM at '''$6200-$6fff'''. The table consists of:
+* '''Simple table''' ($80-$dd): Direct character mappings including German umlauts and ß
+* '''Complex table''' ($3d-$7e): DTE for common German phrases and letter combinations
+* '''Space character''': $ff
+
+==Simple Table==
+
+The simple table provides direct 1:1 character mappings with German-specific characters:
+
+{| class="wikitable" style="text-align: center;"
+! colspan="17" style="background-color: #ccccff;" | Simple Character Table ($80-$dd)
+|-
+! style="background-color: #ddddff;" | !! style="background-color: #ddddff;" | x0 !! style="background-color: #ddddff;" | x1 !! style="background-color: #ddddff;" | x2 !! style="background-color: #ddddff;" | x3 !! style="background-color: #ddddff;" | x4 !! style="background-color: #ddddff;" | x5 !! style="background-color: #ddddff;" | x6 !! style="background-color: #ddddff;" | x7 !! style="background-color: #ddddff;" | x8 !! style="background-color: #ddddff;" | x9 !! style="background-color: #ddddff;" | xa !! style="background-color: #ddddff;" | xb !! style="background-color: #ddddff;" | xc !! style="background-color: #ddddff;" | xd !! style="background-color: #ddddff;" | xe !! style="background-color: #ddddff;" | xf
+|-
+! style="background-color: #ddddff;" | 8x
+| 0 || 1 || 2 || 3 || 4 || 5 || 6 || 7 || 8 || 9 || || || || || ||
+|-
+! style="background-color: #ddddff;" | 9x
+| || || || || || || || || || || A || B || C || D || E || F
+|-
+! style="background-color: #ddddff;" | ax
+| G || H || I || J || K || L || M || N || O || P || Q || R || S || T || U || V
+|-
+! style="background-color: #ddddff;" | bx
+| W || X || Y || Z || a || b || c || d || e || f || g || h || i || j || k || l
+|-
+! style="background-color: #ddddff;" | cx
+| m || n || o || p || q || r || s || t || u || v || w || x || y || z || Ä || Ö
+|-
+! style="background-color: #ddddff;" | dx
+| Ü || ä || ö || ü || ß || . || , || ! || ? || ' || - || || || || ||
+|}
+
+===German Special Characters===
+
+{| class="wikitable"
+! Code !! Character !! Name
+|-
+| $c0 || Ä || A umlaut (uppercase)
+|-
+| $c1 || Ö || O umlaut (uppercase)
+|-
+| $c2 || Ü || U umlaut (uppercase)
+|-
+| $c3 || ä || a umlaut (lowercase)
+|-
+| $c4 || ö || o umlaut (lowercase)
+|-
+| $c5 || ü || u umlaut (lowercase)
+|-
+| $c6 || ß || Eszett (sharp S)
+|}
+
+==Complex Table (DTE)==
+
+The complex table uses DTE optimized for German language patterns:
+
+{| class="wikitable" style="text-align: center;"
+! colspan="17" style="background-color: #ffffcc;" | Complex/DTE Table ($3d-$7e)
+|-
+! style="background-color: #ffffdd;" | !! style="background-color: #ffffdd;" | x0 !! style="background-color: #ffffdd;" | x1 !! style="background-color: #ffffdd;" | x2 !! style="background-color: #ffffdd;" | x3 !! style="background-color: #ffffdd;" | x4 !! style="background-color: #ffffdd;" | x5 !! style="background-color: #ffffdd;" | x6 !! style="background-color: #ffffdd;" | x7 !! style="background-color: #ffffdd;" | x8 !! style="background-color: #ffffdd;" | x9 !! style="background-color: #ffffdd;" | xa !! style="background-color: #ffffdd;" | xb !! style="background-color: #ffffdd;" | xc !! style="background-color: #ffffdd;" | xd !! style="background-color: #ffffdd;" | xe !! style="background-color: #ffffdd;" | xf
+|-
+! style="background-color: #ffffdd;" | 3x
+| || || || Krista || Regenbogen || || || || || || || || || || er || ch
+|-
+! style="background-color: #ffffdd;" | 4x
+| en || er  || || ch  || || || || || || || || ich || || || n  || 
+|-
+! style="background-color: #ffffdd;" | 5x
+| r  || || t  || || || || || || || || en  || || || ein || || in
+|-
+! style="background-color: #ffffdd;" | 6x
+| e  || || || || || || || || || || || || de || || ei || 
+|-
+! style="background-color: #ffffdd;" | 7x
+| st  || || || || || ist || || || der || || || || Ich  || || ||
+|}
+
+===Common German DTE Phrases===
+
+{| class="wikitable"
+! Code !! Text !! Usage
+|-
+| $3d || Krista || Character name "Benjamin" → "Krista" in German
+|-
+| $3e || Regenbogen || "Rainbow" (literally "Regenbogen")
+|-
+| $48 || er || Very common ending in German
+|-
+| $49 || ch || Common consonant pair
+|-
+| $4a || en || Common ending (plural nouns, infinitive verbs)
+|-
+| $4b || er  || er + space
+|-
+| $4d || ch  || ch + space
+|-
+| $4f || ich || "I" (first person pronoun)
+|-
+| $52 || n  || n + space
+|-
+| $54 || r  || r + space
+|-
+| $56 || t  || t + space
+|-
+| $5e || en  || en + space
+|-
+| $61 || ein || "a/an" (indefinite article)
+|-
+| $63 || in || Common preposition "in"
+|-
+| $64 || e  || e + space
+|-
+| $70 || de || Common prefix/word part
+|-
+| $72 || ei || Common vowel pair
+|-
+| $74 || st  || st + space
+|-
+| $79 || ist || Verb "is"
+|-
+| $7c || der || Definite article "the" (masculine nominative)
+|-
+| $80 || Ich  || "I" + space (capitalized, sentence start)
+|}
+
+==Notes==
+
+{{Todo|Character name length appears limited to 6 characters in German version}}
+
+==Control Codes==
+
+Same control codes as English version - see [[Final Fantasy: Mystic Quest/TBL/English|English TBL]].
+
+==RAM Location==
+
+VRAM address: '''$6200-$6fff'''
+
+==Download==
+
+* [https://raw.githubusercontent.com/TheAnsarya/GameInfo/main/Final%20Fantasy%20Mystic%20Quest%20(SNES)/Files/MQL%20(G)%20-%20German%20Simple.tbl German Simple.tbl]
+* [https://raw.githubusercontent.com/TheAnsarya/GameInfo/main/Final%20Fantasy%20Mystic%20Quest%20(SNES)/Files/MQL%20(G)%20-%20German%20Complex.tbl German Complex.tbl]
+
+==Version==
+
+This table applies to:
+* '''Mystic Quest Legend (G)''' - German PAL release
+
+==See Also==
+
+* [[Final Fantasy: Mystic Quest/TBL|Text Tables Overview]]
+* [[Final Fantasy: Mystic Quest/Text/Complex_Text|Complex Text Documentation]]
+* [[Final Fantasy: Mystic Quest/TBL/English|English TBL]]
+* [[Final Fantasy: Mystic Quest/TBL/French|French TBL]]
+* [[Final Fantasy: Mystic Quest/TBL/Japanese|Japanese TBL]]
+
+[[Category:Final Fantasy: Mystic Quest]]

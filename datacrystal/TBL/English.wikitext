@@ -1,0 +1,133 @@
+=TBL - English=
+
+{{Back|Final Fantasy: Mystic Quest/TBL}}
+
+This page documents the English text table used in Final Fantasy: Mystic Quest (US v1.0, v1.1, and European versions).
+
+==Overview==
+
+The English versions use a text table loaded into VRAM at '''$6300-$6fff'''. The table consists of:
+* '''Simple table''' ($90-$dd): Direct character mappings for alphanumerics and basic punctuation
+* '''Complex table''' ($3d-$7e): DTE (Dual Tile Encoding) for common phrases and letter combinations
+* '''Control codes''' ($01-$36): Special functions like textbox positioning and character names
+* '''Space character''': $ff
+
+==Simple Table==
+
+The simple table provides direct 1:1 character mappings:
+
+{| class="wikitable" style="text-align: center;"
+! colspan="17" style="background-color: #ccccff;" | Simple Character Table ($90-$dd)
+|-
+! style="background-color: #ddddff;" | !! style="background-color: #ddddff;" | x0 !! style="background-color: #ddddff;" | x1 !! style="background-color: #ddddff;" | x2 !! style="background-color: #ddddff;" | x3 !! style="background-color: #ddddff;" | x4 !! style="background-color: #ddddff;" | x5 !! style="background-color: #ddddff;" | x6 !! style="background-color: #ddddff;" | x7 !! style="background-color: #ddddff;" | x8 !! style="background-color: #ddddff;" | x9 !! style="background-color: #ddddff;" | xa !! style="background-color: #ddddff;" | xb !! style="background-color: #ddddff;" | xc !! style="background-color: #ddddff;" | xd !! style="background-color: #ddddff;" | xe !! style="background-color: #ddddff;" | xf
+|-
+! style="background-color: #ddddff;" | 9x
+| 0 || 1 || 2 || 3 || 4 || 5 || 6 || 7 || 8 || 9 || || || || || ||
+|-
+! style="background-color: #ddddff;" | ax
+| A || B || C || D || E || F || G || H || I || J || K || L || M || N || O || P
+|-
+! style="background-color: #ddddff;" | bx
+| Q || R || S || T || U || V || W || X || Y || Z || a || b || c || d || e || f
+|-
+! style="background-color: #ddddff;" | cx
+| g || h || i || j || k || l || m || n || o || p || q || r || s || t || u || v
+|-
+! style="background-color: #ddddff;" | dx
+| w || x || y || z || . || , || ! || ? || ' || - || || || || ||
+|}
+
+Specific mappings:
+* '''Numbers''': $90-$99 = 0-9
+* '''Uppercase''': $a0-$b9 = A-Z
+* '''Lowercase''': $ba-$d3 = a-z
+* '''Punctuation''': $d4=. $d5=, $d6=! $d7=? $d8=' $d9=-
+* '''Space''': $ff
+
+==Complex Table (DTE)==
+
+The complex table uses DTE (Dual Tile Encoding) to compress common phrases into single bytes:
+
+{| class="wikitable" style="text-align: center;"
+! colspan="17" style="background-color: #ffffcc;" | Complex/DTE Table ($3d-$7e)
+|-
+! style="background-color: #ffffdd;" | !! style="background-color: #ffffdd;" | x0 !! style="background-color: #ffffdd;" | x1 !! style="background-color: #ffffdd;" | x2 !! style="background-color: #ffffdd;" | x3 !! style="background-color: #ffffdd;" | x4 !! style="background-color: #ffffdd;" | x5 !! style="background-color: #ffffdd;" | x6 !! style="background-color: #ffffdd;" | x7 !! style="background-color: #ffffdd;" | x8 !! style="background-color: #ffffdd;" | x9 !! style="background-color: #ffffdd;" | xa !! style="background-color: #ffffdd;" | xb !! style="background-color: #ffffdd;" | xc !! style="background-color: #ffffdd;" | xd !! style="background-color: #ffffdd;" | xe !! style="background-color: #ffffdd;" | xf
+|-
+! style="background-color: #ffffdd;" | 3x
+| || || || Crystal || Rainbow Road || th || e  || the  || t  || ou || you || s  || to  || in || ing  || er
+|-
+! style="background-color: #ffffdd;" | 4x
+| re || an || he || ly || en || ar || or || ed || ng || is || on || es || at || ha || ve || it
+|-
+! style="background-color: #ffffdd;" | 5x
+| al || T || be || hi || ea || is  || B || wa || st || ll || le || wh || ow || a  || I || gh
+|-
+! style="background-color: #ffffdd;" | 6x
+| of || ui || as || om || nd || ! || el || se || nt || ro || ur || ld || ay || ne || go || ri
+|-
+! style="background-color: #ffffdd;" | 7x
+| me || no || ca || so || fo || || || || || || || || || || ||
+|}
+
+Note: Empty cells represent unused DTE slots or special control codes.
+
+==Control Codes==
+
+{| class="wikitable" style="text-align: center;"
+! colspan="17" style="background-color: #ffcccc;" | Control Codes ($01-$36)
+|-
+! Code !! Function !! Description
+|-
+| style="background-color: #ffdddd;" | $01 || Newline || Starts a new line of text
+|-
+| style="background-color: #ffdddd;" | $03 || * || Asterisk character
+|-
+| style="background-color: #ffdddd;" | $06 || _ || Underscore character
+|-
+| style="background-color: #ffdddd;" | $1a $xx || Textbox (below) || Textbox positioned below character
+|-
+| style="background-color: #ffdddd;" | $1b $xx || Textbox (above) || Textbox positioned above character
+|-
+| style="background-color: #ffdddd;" | $1d || Character name || Inserts current character's name
+|-
+| style="background-color: #ffdddd;" | $1e || Item name || Inserts item name
+|-
+| style="background-color: #ffdddd;" | $1f || Location name || Inserts location name
+|-
+| style="background-color: #ffdddd;" | $30 || Wait for button || Pauses text until button press
+|-
+| style="background-color: #ffdddd;" | $35 || Player's name || Inserts Benjamin's name
+|-
+| style="background-color: #ffdddd;" | $36 || Movement/action || Triggers character action sequence
+|}
+
+==RAM Location==
+
+VRAM address: '''$6300-$6fff'''
+
+The text table is loaded during gameplay and can be viewed in emulator RAM viewers like Mesen2.
+
+[[File:FFMQ_Text_Table_RAM.png|thumb|400px|Text table as seen in Mesen2 RAM viewer at $6300]]
+
+==Download==
+
+* [https://raw.githubusercontent.com/TheAnsarya/GameInfo/main/Final%20Fantasy%20Mystic%20Quest%20(SNES)/Files/FFMQ%20-%20English%20Simple.tbl English Simple.tbl]
+* [https://raw.githubusercontent.com/TheAnsarya/GameInfo/main/Final%20Fantasy%20Mystic%20Quest%20(SNES)/Files/FFMQ%20-%20English%20Complex.tbl English Complex.tbl]
+
+==Versions==
+
+This table applies to:
+* '''US v1.0''' - Initial US release
+* '''US v1.1''' - Revised US release
+* '''European''' - PAL release (English language)
+
+==See Also==
+
+* [[Final Fantasy: Mystic Quest/TBL|Text Tables Overview]]
+* [[Final Fantasy: Mystic Quest/Text/Complex_Text|Complex Text Documentation]]
+* [[Final Fantasy: Mystic Quest/Notes/Script_Analysis|Script Analysis]]
+* [[Final Fantasy: Mystic Quest/TBL/French|French TBL]]
+* [[Final Fantasy: Mystic Quest/TBL/German|German TBL]]
+* [[Final Fantasy: Mystic Quest/TBL/Japanese|Japanese TBL]]
+
+[[Category:Final Fantasy: Mystic Quest]]

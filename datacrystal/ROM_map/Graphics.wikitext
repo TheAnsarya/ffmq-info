@@ -239,7 +239,7 @@ Byte 0: gggrrrrr
 Byte 1: 0bbbbbgg
 
 r = red bits
-g = green bits  
+g = green bits
 b = blue bits
 ```
 

@@ -1,0 +1,389 @@
+=Dungeon Event Notes=
+
+{{Back|Final Fantasy: Mystic Quest/ROM map}}
+
+This page contains raw event tracking data for dungeon progression, documenting memory address changes as the player progresses through dungeons and triggers events.
+
+==Data Format==
+
+The notes track byte changes in ROM addresses (ea6-ebc range for events, ebd-ec0 for chests, ec1-ff7 for various game state flags) as dungeon events are triggered.
+
+Format: `address - old_value => new_value` with contextual notes about the trigger.
+
+==Pazuzu's Tower Event Sequence==
+
+===Initial State===
+```
+00 00 00 00 20 43 00 00 32 22 18 00 00 00 00 00
+00 4F 05 00 00 00 00 6E E7 1B
+00 02 00 51 10 63
+11 63 12 61 13 63 FE 6E F0 43 FB 4F 70 6E 15 8A
+FE 3D 42 9C
+4F 27 FF 41 00 00 07 FF FF A0 00 80
+78 40 00 20 F2 00 00 08 00 00 00 00 00 00 00
+00
+```
+
+===Floor 1 - Talk to Norma (33,34,14)===
+* eaf: 8e => 8f => 8d
+
+===Floor 1 - Talk to Pazuzu (33,2f-30,07)===
+* eb0: fe => 7e => 3e => 1e => 0e => 06 => 02 => 00
+* Dialog: "I was waiting for you, little beasts!"
+* eb0: 00 => 08
+
+===Floor 5 - Talk to Pazuzu (33,0f-10,27)===
+* eb0: 08 => 00 => 40
+
+===Floor 6 - Flip switch (33,30,2c)===
+* eb1: 35 => 75
+
+===Floor 4 - Flip switch (33,2b,07)===
+* eb1: 75 => f5
+
+===Floor 2 - Flip switch (33,15,07)===
+* eb0: 40 => 41
+
+===Floor 2 - Talk to Pazuzu (33,0f-10,07)===
+* eb0: 41 => 41 (same)
+* eb0: 41 => 01 => 21
+
+===Floor 3 - Talk to Pazuzu (33,0f-10,07)===
+* Dialog: "Playtime's over!\nPrepare to meet your doom!"
+* (Battle Pazuzu)
+* ea9: 43 => 03
+* ec4: f2 => f6
+* ec6: 80 => 90 (elevator goes up to F7)
+* ec6: 90 => 80 (wind/green crystal appears)
+* ea8: f0 => f4
+* eb0: 21 => 20
+* eb1: f5 => 75
+* eb1: 75 => 35
+* eb0: 20 => 00
+
+===Open chest===
+* ea7: 6e => 6f
+* ec0: 18 => 08
+
+===Cast exit===
+* ec6: 80 => 80
+* Zero out: ec8 to ee7, f28 to f47
+
+==Windia Events==
+
+===Talk to Otto===
+* eb5: 27 => a7
+* eb4: 4f => 4e
+* eb5: a7 => e7
+* eb8: 00 => 80
+
+==Fireburg Events==
+
+===Talk to Arion===
+* ea6: fe => ff
+* Dialog: "Received Thunder Rock!"
+
+===Leave Fireburg===
+* Zero out: ec8 to f17, f28 to f47
+
+==Windia - Rainbow Bridge==
+
+===Talk to Otto (after Fireburg)===
+* eb7: 41 => c1
+* ec3: 20 => 28
+* Rainbow bridge now goes to Spencer's Place
+
+==Spencer's Place Events==
+
+===Walk in===
+* ea8: f4 => fc
+* ec7: 00 => 02
+* (Reuben blows up passage)
+* ec6: 80 => 90
+* eb1: 35 => 15
+* eb2: 42 => 42 (same)
+* eb2: 42 => 4a
+* ec6: 90 => 80
+* ec7: 02 => 00
+
+===Get to chest (22, 12, 05)===
+* ea7: 6f => 7f
+* (Get Gemini Crest)
+
+==Windia - Kaeli Events==
+
+===Talk to Otto (30, 09, 13)===
+
+===Talk to Kaeli (30, 02, 18)===
+* eaf: 7f => ff
+* Dialog: "Received Captain Cap"
+* eb2: 4a => 48
+* eab: 4f => 6f
+
+===North house (30, 27, 17) → Ship Dock===
+
+==Mac's Ship Events==
+
+===Talk to Captain Mac (34, 10, 3a)===
+* eb3: 9c => dc => 5c
+* eb5: e7 => 67
+* (Reuben falls down)
+* ec1: 41 => 61
+* (Back at Ship's Dock: 34, 0f, 0b)
+* eb7: c1 => c0 => c2
+* eb8: 80 => 00
+
+===Windia Inn - Phoebe Joins (30, 32, 15)===
+* (Reuben leaves, Phoebe joins)
+* eb7: c2 => c0
+* eb5: 67 => 27 => 37
+
+===Back to Inn (30, 1d, 36)===
+* Dialog: "real enemy is dark king" speech
+* eb2: 48 => 49
+* ec3: 28 => 2c
+
+===Use the wheel (34, 10, 30)===
+* ec6: 80 => 90 (ship sails)
+* eb2: 49 =(r08)> 41
+* ec6: 90 =(s10)> 90
+* eb2: 41 =(s04)> 45
+* (Back to ship map)
+* ec6: 90 =(r10)> 80
+
+===Leave ship===
+* ec6: 80 => 80
+* (38, 1c, 28) Mac's Ship (at Focus Tower entrance)
+* (35, 1c, 27) Focus Tower - Entrance #6 (From Mac's Ship)
+* (Inside at: 35, 13, 2b)
+
+==Focus Tower Events==
+
+===Chest (35, 22, 27)===
+* ebd: a0 => 80
+
+===Fight bone dude (35, 17-18, 17)===
+* ea9: 03 =(s20)> 23
+* ea9: 23 =(r02)> 21
+* (Bone dude blows up)
+
+===Door progression===
+* [door: 35,18,13 => 35, 33, 2d] (Focus Tower, 1B)
+* [door: 35,33,31 => 35,10,1d] (Focus Tower, 1F)
+
+===Use Sky Coin (35, 10, 18)===
+* ead: 5e =(s01)> 5f
+* eae: 15 =(10)> 05
+* Dialog: "It opened!"
+
+===Doom Castle doors===
+* [door: 35,10,18 => 35,3b,1d] (Doom Castle)
+* [door: 35,3b,15 => 35,17,2a] (Doom Castle, 4F)
+
+==Doom Castle Events==
+
+===Attack Stone Golem (35, 19, 06)===
+* (Beat 'em)
+* ea9: 21 =(s10)> 31
+* ea9: 31 =(r01)> 30
+* (Stone Golem blows up)
+
+===Attack Twinhead Wyvern trio (35, 17-18, 0b)===
+* Iflyte, Twinhead Wyvern, Stheno
+
+Enemy data at $1100:
+```
+A2 B9 BF CC C7 B8 03 03 03 03 03 03 03 03 03 03
+15 FF FF FF 94 02 94 02 FF FF FF FF FF FF FF FF
+80 00 32 31 32 2D 32 31 32 2D FF FF FF FF 00 00
+FF FF FF FF FF FF FF FF FF FF 20 0C 20 0C 33 33
+38 38 FF FF 14 14 14 14 0A 08 00 00 32 31 32 2D
+FF FF FF 8C 05 FF 40 05 68 82 84 42 45 AC FF FF
+3C 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+
+AD CA BC C1 BB B8 B4 B7 06 B0 CC C9 B8 C5 C1 03
+22 FF FF FF 98 3A 98 3A FF FF FF FF FF FF FF FF
+80 00 EB 5A 6C FA EB 5A 6C FA FF FF FF FF 00 80
+FF FF FF FF FF FF FF FF FF FF 20 FC 20 FC 96 5D
+5A 5A FF FF 13 0F 0F 0F 89 09 09 09 EB 5A 6C FA
+FF FF FF C8 00 FF 50 0F D7 9A 9F 4E 76 8D FF FF
+4D 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+
+AC C7 BB B8 C1 C2 03 03 03 03 03 03 03 03 03 03
+15 FF FF FF 76 02 76 02 FF FF FF FF FF FF FF FF
+80 00 2F 30 33 2B 2F 30 33 2B FF FF FF FF 80 00
+FF FF FF FF FF FF FF FF FF FF 00 64 00 64 38 36
+35 33 FF FF 14 14 14 14 0A 08 00 00 2F 30 33 2B
+FF FF FF 90 05 FF 80 05 BD A7 B5 98 52 96 FF FF
+3D 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+```
+
+===Floor 5 - Lava Area===
+* ea9: 30 =(s08)> 38
+* eaa: fb =(r80)> 7b
+* [door: 35,17,28 => 35,3b,0d] (Doom Castle - stairs)
+* [door: 35,3b,05 => 35,18,29] (Doom Castle, 6F)
+
+===Tower Area - Cerberus Battle===
+
+Cerberus ($9c) - HP: $03a7
+Shadow ($ac)
+
+Enemy data at $1280:
+```
+9C B8 C5 B5 B8 C5 C8 C6 03 03 03 03 03 03 03 03
+1E FF FF FF A7 03 A7 03 FF FF FF FF FF FF FF FF
+80 00 46 47 48 40 46 47 48 40 FF FF FF FF 80 00
+FF FF FF FF FF FF FF FF FF FF 00 48 00 48 4C 48
+4A 46 FF FF 14 14 14 14 0A 08 00 00 46 47 48 40
+FF FF FF E1 07 FF 20 05 B8 B5 80 95 56 FF FF FF
+31 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+```
+
+(Note: Two Cerberus entries)
+
+Shadow enemy data:
+```
+AC BB B4 B7 C2 CA 03 03 03 03 03 03 03 03 03 03
+1E FF FF FF 9D 03 9D 03 FF FF FF FF FF FF FF FF
+80 00 46 43 4E 38 46 43 4E 38 FF FF FF FF 00 00
+FF FF FF FF FF FF FF FF FF FF 00 12 00 12 4E 5A
+46 5C FF FF 14 14 14 14 0A 08 00 00 46 43 4E 38
+FF FF FF E1 07 FF 50 05 41 48 B1 C2 93 C1 FF FF
+1D 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+```
+
+===Kill Pazuzu equivalent (35,17-18, 14/13)===
+
+Flamerus Rex enemy data:
+```
+9C BB BC C0 B8 C5 B4 03 03 03 03 03 03 03 03 03
+1D FF FF FF 66 03 66 03 FF FF FF FF FF FF FF FF
+80 00 41 42 45 3A 41 42 45 3A FF FF FF FF 40 00
+FF FF FF FF FF FF FF FF FF FF 20 E7 20 E7 47 46
+45 43 FF FF 14 14 14 14 0A 08 00 00 41 42 45 3A
+FF FF FF E4 07 FF 11 05 4E 80 8D C3 B4 94 FF FF
+3E 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+```
+
+Dualhead Hydra enemy data:
+```
+B3 C8 BB 03 03 03 03 03 03 03 03 03 03 03 03 03
+24 FF FF FF 20 4E 20 4E FF FF FF FF FF FF FF FF
+80 00 F0 5F 64 62 F0 5F 64 62 FF FF FF FF 00 80
+FF FF FF FF FF FF FF FF FF FF 80 FE 80 FE B4 5A
+5D 5B FF FF 14 14 14 14 0A 08 00 00 F0 5F 64 62
+FF FF FF FA 00 FF 11 05 D8 D9 DA 93 C8 C9 FF FF
+4F 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+```
+
+Skullrus Rex enemy data:
+```
+AD BB B4 C1 B4 C7 C2 C6 03 03 03 03 03 03 03 03
+1D FF FF FF 84 03 84 03 FF FF FF FF FF FF FF FF
+80 00 43 44 44 39 43 44 44 39 FF FF FF FF 00 00
+FF FF FF FF FF FF FF FF FF FF 00 30 00 30 43 42
+46 41 FF FF 14 14 0A 0A 0A 08 00 00 43 44 44 39
+FF FF FF DA 07 FF 50 07 7E 91 43 93 B2 FF FF 49
+3F 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+```
+
+(Chimera, Zhu, Thanatos)
+
+* ea9: 38 =(s04)> 3c
+* eaa: 7b =(r40)> 3b
+* (Zhu blows up)
+
+===Crystal Power room===
+* [door: 35,3b,3d => 35,0f,18]
+* Dialog: "entrust with our power"
+* eaf: 8d =(s40)> cd
+* eab: 6f =(r40)> 2f
+* [door: 35,0f-10,05 => 35,0e,1a]
+
+===Talk to Dark King (@ 35,0e,0f)===
+* Dialog: "Ages ago I started that rumor!"
+* ec4: f6 =(s08)> fe
+
+Dark King enemy data:
+```
+9D B4 C5 BE 06 A4 BC C1 BA 03 03 03 03 03 03 03
+28 FF FF FF 40 9C 40 9C FF FF FF FF FF FF FF FF
+80 00 32 78 56 4B 32 78 56 4B FF FF FF FF 00 80
+FF FF FF FF FF FF FF FF FF FF D0 FF D0 FF A0 46
+61 50 FF FF 2D 23 0A 0A 00 00 00 00 32 78 56 4B
+FF FF FF 00 00 FF 00 00 CA 53 52 A9 FF FF FF FF
+50 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+```
+
+===Beat Dark King===
+* Dialog: "Go, and enjoy"
+* ec6: 80 =(s08)> 88
+* Dialog: "Thank you!"
+* ec6: 88 =(s10)> 98
+* eb2: 45 =(r04)> 41
+* ec6: 98 =(r20)> 98 (ship goes back to dock)
+* eb2: 41 =(s08)> 49 (Windia)
+* eb4: 4e =(s20)> 6e (Foresta)
+* (Aquaria, Fireburg events)
+* eb8: 00 =(r80)> 00 (Reuben leaves)
+* ec6: 98 =(r20)> 98 (Ship's dock)
+
+==Memory Map Summary==
+
+Battlefields (fd4-fe7):
+```
+0A 0A 0A 0A 0A 0A 0A 0A 0A 0A 0A 0A 0A 0A 0A 0A 0A 0A 0A 0A
+```
+
+Events (ea6-ebc):
+```
+00 00 83 C3 C4 40 8F A0 FA 22 FE 2A B2 A1 20 08
+00 79 7F FF F8 00 00
+```
+
+Chests (ebd-ec0):
+```
+7F DF FF FD
+```
+
+Stuff (ec1-ec5):
+```
+92 00 13 02 00
+```
+
+==Hill of Destiny - Behemoth==
+
+Enemy data at $1100-$117f:
+```
+9B B8 BB B8 C0 C2 C7 BB 03 03 03 03 03 03 03 03
+01 FF FF FF 50 00 50 00 FF FF FF FF FF FF FF FF
+80 00 01 19 0C 01 01 19 0C 01 FF FF FF FF 00 80
+FF FF FF FF FF FF FF FF FF FF 00 00 00 00 01 01
+05 01 FF FF 2D 23 0A 0A 00 00 00 00 01 19 0C 01
+FF FF FF 1C 01 FF 00 00 7C FF FF FF FF FF FF FF
+42 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+```
+
+Dialog: "Seems I was right!"
+
+Memory changes:
+* e91: 00 =((a=400c)0B815F 8D 91 0E STA $0E91)> 0c
+* e8d: 00 =(01C078 9C 8D 0E STZ $0E8D)> 00 (×10)
+
+==See Also==
+
+* [[Final Fantasy: Mystic Quest/ROM map]]
+* [[Final Fantasy: Mystic Quest/ROM map/Enemies|Enemies]]
+* [[Final Fantasy: Mystic Quest/Maps|Maps]]
+* [[Final Fantasy: Mystic Quest/RAM map|RAM map]]

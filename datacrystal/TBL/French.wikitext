@@ -1,0 +1,176 @@
+=TBL - French=
+
+{{Back|Final Fantasy: Mystic Quest/TBL}}
+
+This page documents the French text table used in Final Fantasy: Mystic Quest Legend (French version).
+
+==Overview==
+
+The French version (Mystic Quest Legend) uses a text table loaded into VRAM at '''$6200-$6fff'''. The table consists of:
+* '''Simple table''' ($80-$dd): Direct character mappings including French accented characters
+* '''Complex table''' ($3d-$7e): DTE for common French phrases and letter combinations
+* '''Graphics tiles''' ($d0-$dc): Special tiles for magic labels
+* '''Space character''': $ff
+
+==Simple Table==
+
+The simple table provides direct 1:1 character mappings with French-specific characters:
+
+{| class="wikitable" style="text-align: center;"
+! colspan="17" style="background-color: #ccccff;" | Simple Character Table ($80-$dd)
+|-
+! style="background-color: #ddddff;" | !! style="background-color: #ddddff;" | x0 !! style="background-color: #ddddff;" | x1 !! style="background-color: #ddddff;" | x2 !! style="background-color: #ddddff;" | x3 !! style="background-color: #ddddff;" | x4 !! style="background-color: #ddddff;" | x5 !! style="background-color: #ddddff;" | x6 !! style="background-color: #ddddff;" | x7 !! style="background-color: #ddddff;" | x8 !! style="background-color: #ddddff;" | x9 !! style="background-color: #ddddff;" | xa !! style="background-color: #ddddff;" | xb !! style="background-color: #ddddff;" | xc !! style="background-color: #ddddff;" | xd !! style="background-color: #ddddff;" | xe !! style="background-color: #ddddff;" | xf
+|-
+! style="background-color: #ddddff;" | 8x
+| 0 || 1 || 2 || 3 || 4 || 5 || 6 || 7 || 8 || 9 || || || || || ||
+|-
+! style="background-color: #ddddff;" | 9x
+| || || || || || || || || || || A || B || C || D || E || F
+|-
+! style="background-color: #ddddff;" | ax
+| G || H || I || J || K || L || M || N || O || P || Q || R || S || T || U || V
+|-
+! style="background-color: #ddddff;" | bx
+| W || X || Y || Z || a || b || c || d || e || f || g || h || i || j || k || l
+|-
+! style="background-color: #ddddff;" | cx
+| m || n || o || p || q || r || s || t || u || v || w || x || y || z || Ç || à
+|-
+! style="background-color: #ddddff;" | dx
+| â || ô || ç || è || é || ê || ë || î || ï || ù || û || ü || [[File:BLCHE.png]] || [[File:NOIRE.png]] || [[File:SORC.png]] || [[File:REST.png]]
+|}
+
+===French Accented Characters===
+
+{| class="wikitable"
+! Code !! Character !! Name
+|-
+| $c0 || Ç || C cedilla (uppercase)
+|-
+| $c1 || à || a grave
+|-
+| $c2 || â || a circumflex
+|-
+| $c3 || ô || o circumflex
+|-
+| $c4 || ç || c cedilla (lowercase)
+|-
+| $c5 || è || e grave
+|-
+| $c6 || é || e acute
+|-
+| $c7 || ê || e circumflex
+|-
+| $c8 || ë || e diaeresis
+|-
+| $c9 || î || i circumflex
+|-
+| $ca || ï || i diaeresis
+|-
+| $cb || ù || u grave
+|-
+| $cc || û || u circumflex
+|-
+| $cd || ü || u diaeresis
+|}
+
+===Graphics Tiles (Magic Labels)===
+
+{| class="wikitable" style="background-color: #ccffcc;"
+! Code !! Graphic !! Label !! English Equivalent
+|-
+| style="background-color: #ddffdd;" | $d0 || [[File:BLCHE.png|32px]] || BLCHE || White Magic
+|-
+| style="background-color: #ddffdd;" | $d1 || [[File:NOIRE.png|32px]] || NOIRE || Black Magic
+|-
+| style="background-color: #ddffdd;" | $d2 || [[File:SORC.png|32px]] || SORC || Wizard Magic
+|-
+| style="background-color: #ddffdd;" | $dc || [[File:REST.png|32px]] || REST || ???? (Unknown)
+|}
+
+These are special graphic tiles used in the magic menu to label spell types.
+
+==Complex Table (DTE)==
+
+The complex table uses DTE optimized for French language patterns:
+
+{| class="wikitable" style="text-align: center;"
+! colspan="17" style="background-color: #ffffcc;" | Complex/DTE Table ($3d-$7e)
+|-
+! style="background-color: #ffffdd;" | !! style="background-color: #ffffdd;" | x0 !! style="background-color: #ffffdd;" | x1 !! style="background-color: #ffffdd;" | x2 !! style="background-color: #ffffdd;" | x3 !! style="background-color: #ffffdd;" | x4 !! style="background-color: #ffffdd;" | x5 !! style="background-color: #ffffdd;" | x6 !! style="background-color: #ffffdd;" | x7 !! style="background-color: #ffffdd;" | x8 !! style="background-color: #ffffdd;" | x9 !! style="background-color: #ffffdd;" | xa !! style="background-color: #ffffdd;" | xb !! style="background-color: #ffffdd;" | xc !! style="background-color: #ffffdd;" | xd !! style="background-color: #ffffdd;" | xe !! style="background-color: #ffffdd;" | xf
+|-
+! style="background-color: #ffffdd;" | 3x
+| || || || Crista || Arc-en-ciel || || e  || || s  || || || || || || es || on
+|-
+! style="background-color: #ffffdd;" | 4x
+| t  || || le || || || er || || || || || || ai || || || || est 
+|-
+! style="background-color: #ffffdd;" | 5x
+| en || || || || || || || || || || || ou || || || || 
+|-
+! style="background-color: #ffffdd;" | 6x
+| || || || || || || || || || || || || || || || 
+|-
+! style="background-color: #ffffdd;" | 7x
+| || || || || || || || || || || || || || || ||
+|}
+
+===Common French DTE Phrases===
+
+{| class="wikitable"
+! Code !! Text !! Usage
+|-
+| $3d || Crista || Character name "Benjamin" → "Crista" in French
+|-
+| $3e || Arc-en-ciel || "Rainbow" (literally "Arc-en-ciel" = rainbow)
+|-
+| $40 || e  || e + space (very common in French)
+|-
+| $42 || s  || s + space
+|-
+| $48 || es || Common plural ending
+|-
+| $49 || on || Common ending/word
+|-
+| $4a || t  || t + space
+|-
+| $4c || le || Definite article "the"
+|-
+| $4f || er || Infinitive verb ending
+|-
+| $4e || ai || First person past tense
+|-
+| $50 || est  || Verb "is" + space
+|-
+| $54 || en || Common preposition "in"
+|-
+| $5f || ou || Common word "or/where"
+|}
+
+==Control Codes==
+
+Same control codes as English version - see [[Final Fantasy: Mystic Quest/TBL/English|English TBL]].
+
+==RAM Location==
+
+VRAM address: '''$6200-$6fff'''
+
+==Download==
+
+* [https://raw.githubusercontent.com/TheAnsarya/GameInfo/main/Final%20Fantasy%20Mystic%20Quest%20(SNES)/Files/MQL%20(F)%20-%20French%20Simple.tbl French Simple.tbl]
+* [https://raw.githubusercontent.com/TheAnsarya/GameInfo/main/Final%20Fantasy%20Mystic%20Quest%20(SNES)/Files/MQL%20(F)%20-%20French%20Complex.tbl French Complex.tbl]
+
+==Version==
+
+This table applies to:
+* '''Mystic Quest Legend (F)''' - French PAL release
+
+==See Also==
+
+* [[Final Fantasy: Mystic Quest/TBL|Text Tables Overview]]
+* [[Final Fantasy: Mystic Quest/Text/Complex_Text|Complex Text Documentation]]
+* [[Final Fantasy: Mystic Quest/TBL/English|English TBL]]
+* [[Final Fantasy: Mystic Quest/TBL/German|German TBL]]
+* [[Final Fantasy: Mystic Quest/TBL/Japanese|Japanese TBL]]
+
+[[Category:Final Fantasy: Mystic Quest]]
