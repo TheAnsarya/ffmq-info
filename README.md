@@ -1,11 +1,46 @@
 # Final Fantasy Mystic Quest - SNES Disassembly & ROM Hack Project
 
+> **🚀 Quick Start:** Want to mod enemies? See [MODDING_QUICK_REFERENCE.md](MODDING_QUICK_REFERENCE.md) for a 3-step guide!
+
 > **🤖 Automatic Logging Active:** Just run `.\start-tracking.ps1` once and all your work is logged automatically!  
 > No manual logging needed - the system tracks everything for you in the background.
 
 > **📊 Project Management:** All issues and tasks are tracked in [GitHub Project #3](https://github.com/users/TheAnsarya/projects/3)
 
-A comprehensive disassembly and development environment for Final Fantasy Mystic Quest (SNES) using modern tools and practices.
+A comprehensive disassembly and ROM modding environment for Final Fantasy Mystic Quest (SNES) with a complete battle data editing pipeline.
+
+## ✨ What's New - Complete Battle Data Modding Pipeline!
+
+**You can now visually edit enemies and build modified ROMs!**
+
+```bash
+# 1. Edit enemies visually
+enemy_editor.bat
+
+# 2. Build modified ROM
+pwsh -File build.ps1
+
+# 3. Test in emulator
+mesen build/ffmq-rebuilt.sfc
+```
+
+**See [MODDING_QUICK_REFERENCE.md](MODDING_QUICK_REFERENCE.md) for complete guide!**
+
+Features:
+- ✅ Visual GUI editor for all 83 enemies
+- ✅ Edit HP, Attack, Defense, Speed, Magic, and all stats
+- ✅ Visual element resistance/weakness selection (16 elements)
+- ✅ Search, filter, undo/redo support
+- ✅ JSON-based workflow for batch modifications
+- ✅ Automatic build integration (your edits appear in ROM!)
+- ✅ Comprehensive test suite (all tests passing)
+- ✅ GameFAQs data verification
+
+Documentation:
+- [MODDING_QUICK_REFERENCE.md](MODDING_QUICK_REFERENCE.md) - Quick start guide
+- [ENEMY_EDITOR_GUIDE.md](docs/ENEMY_EDITOR_GUIDE.md) - Detailed GUI guide
+- [BATTLE_DATA_PIPELINE.md](docs/BATTLE_DATA_PIPELINE.md) - Technical details
+- [BUILD_INTEGRATION_COMPLETE.md](BUILD_INTEGRATION_COMPLETE.md) - Build system docs
 
 ## Project Overview
 
