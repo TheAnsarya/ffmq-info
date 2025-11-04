@@ -1,5 +1,49 @@
 ﻿# FFMQ Disassembly Progress Report
 
+## November 4, 2025 - 🎨 UI GRAPHICS EXTRACTION & CONTINUED PROGRESS
+
+**Generated**: November 4, 2025 00:45 UTC  
+**Session Type**: UI Graphics Extraction, Issue #35 Progress, Tool Development
+
+---
+
+### 🎉 UI GRAPHICS EXTRACTION COMPLETE!
+
+**New Tool Created:**
+- ✅ **tools/extraction/extract_ui_graphics.py** - Complete UI graphics extractor
+
+**UI Elements Extracted (238 tiles, 179 files):**
+- ✅ Window borders: 32 tiles (2BPP) - Corners, edges, fill patterns
+- ✅ Cursor sprites: 4 tiles (2BPP) - Animation frames
+- ✅ Menu icons: 16 tiles (4BPP) - Item/Magic/Equipment icons
+- ✅ Status symbols: 8 tiles (4BPP) - HP/MP/Status effect icons  
+- ✅ Number font: 10 tiles (2BPP) - Digits 0-9 for stats/gold
+- ✅ Dialog box: 12 tiles (2BPP) - Speech bubble corners/edges
+- ✅ Shop tiles: 24 tiles (4BPP) - Gold coin, buy/sell icons
+- ✅ Config tiles: 16 tiles (4BPP) - Sound/window color preview
+- ✅ Battle menu: 20 tiles (4BPP) - Attack/Magic/Item/Run graphics
+- ✅ Latin font: 96 tiles (2BPP) - ASCII $20-$7f characters
+
+**Files Generated:**
+- 10 sprite sheets (PNG)
+- 159 individual tiles (PNG)
+- 10 metadata files (JSON)
+- 1 summary file (JSON)
+- **Output directory**: data/extracted/ui/
+
+**ROM Locations Used:**
+- Based on documentation from datacrystal/ROM_map/Menus.wikitext
+- $012600-$013c00: UI graphics elements
+- $058000: Latin font data
+
+**Issue #35 Progress:**
+- ✅ UI Graphics: 100% COMPLETE (all 6 checkboxes)
+- ⏳ Environmental Graphics: Remaining (terrain tilesets, animated tiles, backgrounds, Mode 7)
+
+**Commit:** 309b9e2 - UI Graphics extraction (164 files, 568 insertions)
+
+---
+
 ## November 4, 2025 - 📊 EXTRACTION TOOLS VERIFICATION & ISSUE CLEANUP
 
 **Generated**: November 4, 2025 00:15 UTC  
