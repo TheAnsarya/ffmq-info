@@ -6643,7 +6643,7 @@ Graphics_CommandDispatch:
 	and.W				   #$00ff
 	dec					 a
 	cmp.B				   $9e
-	bcc					 UNREACH_00A2FF
+	bcc					 Graphics_CommandDispatch_IndexPath
 	lda.B				   $9e
 	asl					 a
 	adc.B				   $17
@@ -6653,21 +6653,18 @@ Graphics_CommandDispatch:
 RTS_Label:
 
 ; ------------------------------------------------------------------------------
-; UNREACHABLE CODE ANALYSIS
+; Graphics Command Dispatch - Index Path
 ; ------------------------------------------------------------------------------
-; Label: UNREACH_00A2FF
-; Category: 🟢 Table-Driven Reachable (Alternate path in dispatcher)
 ; Purpose: Increment index and adjust graphics stream pointer
-; Reachability: REACHABLE via conditional branch at line 6627 (bcc)
-; Analysis: Alternate path in graphics command dispatcher
+; Reachability: Reachable via conditional branch (bcc at line 6646)
+; Analysis: Alternate path in graphics command dispatcher when index < threshold
 ;   - Increments accumulator (index++)
-;   - Multiplies by 2 and adds to stream pointer
-;   - Advances graphics data stream position
-; Verified: Reachable when command index < threshold ($9e)
-; Notes: This is NOT unreachable - it's a table indexing path
-;        Should be renamed to Graphics_CommandDispatch_IndexPath
+;   - Multiplies by 2 for word-aligned table access
+;   - Adds to stream pointer to advance position
+; Technical: Originally labeled UNREACH_00A2FF, but analysis shows it's reachable
+;   via the graphics command dispatcher's table-driven logic
 ; ------------------------------------------------------------------------------
-UNREACH_00A2FF:
+Graphics_CommandDispatch_IndexPath:
 	inc a                                ;00A2FF|1A      |      ; Increment index
 	asl a                                ;00A300|0A      |      ; Multiply by 2 (word table)
 	adc.B $17                            ;00A301|6517    |000017; Add to stream pointer
@@ -12306,8 +12303,23 @@ TitleScreen_Init_ScrollLoop:
 	sta.W				   $015f	 ; Clear $015f
 	bra					 CharName_UpdateDisplay ; Jump to menu display
 
+; ------------------------------------------------------------------------------
+; UNREACHABLE CODE ANALYSIS
+; ------------------------------------------------------------------------------
+; Label: UNREACH_00BA6D
+; Category: 🟡 Conditionally Reachable (Error sound handler)
+; Purpose: Play error sound when character name is invalid
+; Reachability: REACHABLE via multiple conditional branches (beq)
+; Analysis: Error feedback for character naming
+;   - Called when name is full (can't add more characters)
+;   - Called when name is empty (can't confirm empty name)
+;   - Calls Sprite_SetMode2C to play error sound/animation
+; Verified: Reachable when user tries invalid naming operation
+; Notes: This is NOT unreachable - it's error feedback
+;        Should be renamed to CharName_ErrorSound
+; ------------------------------------------------------------------------------
 UNREACH_00BA6D:
-	db											 $20,$12,$b9 ; JSR Sprite_SetMode2C
+	jsr.W Sprite_SetMode2C               ;00BA6D|2012B9  |00B912; Play error sound
 
 ;-------------------------------------------------------------------------------
 ; CharName_InputLoop: Character name entry input loop
@@ -12358,9 +12370,33 @@ CharName_InputLoop:
 	jsr.W				   CODE_009BC4 ; Update menu
 	bra					 CharName_InputLoop ; Loop
 
+; ------------------------------------------------------------------------------
+; UNREACHABLE CODE ANALYSIS
+; ------------------------------------------------------------------------------
+; Label: UNREACH_00BAC2
+; Category: 🟡 Conditionally Reachable (Character delete handler)
+; Purpose: Delete last character from name being entered
+; Reachability: REACHABLE via conditional branch (bne above)
+; Analysis: Backspace/delete handler for character naming
+;   - Loads Y with character count ($00cc)
+;   - If zero (empty name), skips deletion
+;   - Decrements character count
+;   - Stores updated count
+;   - Switches to 8-bit accumulator
+;   - Loads sound effect #$03 (delete sound)
+;   - Branches to play sound
+; Verified: Reachable when user presses delete button
+; Notes: This is NOT unreachable - it's the delete key handler
+;        Should be renamed to CharName_DeleteCharacter
+; ------------------------------------------------------------------------------
 UNREACH_00BAC2:
-	db											 $ac,$cc,$00,$f0,$a6,$88,$8c,$cc,$00,$e2,$20,$a9,$03,$80,$e3
-; LDY $00cc; BEQ skip; DEY; STY $00cc; SEP #$20; LDA #$03; BRA sound
+	ldy.W $00cc                          ;00BAC2|AC CC00  |0000CC; Load character count
+	beq $+$a6                            ;00BAC5|F0A6    |00BA6D; If empty, error sound
+	dey                                  ;00BAC7|88      |      ; Decrement count
+	sty.W $00cc                          ;00BAC8|8CCC00  |0000CC; Store new count
+	sep #$20                             ;00BACB|E220    |      ; 8-bit accumulator
+	lda.B #$03                           ;00BACD|A903    |      ; Load delete sound effect
+	bra $+$e3                            ;00BACF|80E3    |00BAB4; Play sound
 
 CharName_InputLoop_Confirm:
 	lda.W				   $00cc	 ; Load character count
@@ -12797,8 +12833,21 @@ Menu_Handler:
 	sta.B				   $8e	   ; Store in $8e
 	bra					 Menu_Handler_Process ; Continue
 
+; ------------------------------------------------------------------------------
+; UNREACHABLE CODE ANALYSIS
+; ------------------------------------------------------------------------------
+; Label: UNREACH_00BDCA
+; Category: 🔴 Truly Unreachable (Dead Code)
+; Purpose: Play error sound via Sprite_SetMode2C
+; Reachability: No known call sites or branches to this address
+; Analysis: Orphaned error sound call
+;   - Calls Sprite_SetMode2C (error sound/animation)
+;   - No branches or calls leading to this address
+; Verified: NOT reachable in normal gameplay
+; Notes: May be removed error handler or debug code
+; ------------------------------------------------------------------------------
 UNREACH_00BDCA:
-	db											 $20,$12,$b9 ; JSR Sprite_SetMode2C
+	jsr.W Sprite_SetMode2C               ;00BDCA|2012B9  |00B912; Play error sound
 
 Menu_Handler_Loop:
 	lda.W				   #$ccb0	; Button mask
