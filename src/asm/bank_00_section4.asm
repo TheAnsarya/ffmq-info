@@ -108,9 +108,27 @@ Sprite_ConvertDigit:
 	sta.W				   $0000,x   ; Store tens digit tile
 	bra					 CODE_008D20 ; Done
 
+; ------------------------------------------------------------------------------
+; UNREACHABLE CODE ANALYSIS
+; ------------------------------------------------------------------------------
+; Label: UNREACH_008D06
+; Category: 🔴 Truly Unreachable (Dead Code)
+; Purpose: Writes $45 to consecutive memory locations indexed by X
+; Reachability: No known call sites or branches to this address
+; Analysis: Memory initialization routine - writes 16-bit value $45XX
+;   - Uses XBA to swap accumulators (8-bit/16-bit context)
+;   - Writes to $0000,X and $0001,X (likely indexed table)
+;   - Branches forward 17 bytes after completion
+; Verified: NOT reachable in normal gameplay
+; Notes: May be debug initialization or removed feature
+; ------------------------------------------------------------------------------
 UNREACH_008D06:
 ; No tens digit (position < 10)
-	db											 $a9,$45,$9d,$00,$00,$eb,$9d,$01,$00,$80,$0f ; Unreachable code segment
+	lda.B #$45                           ;008D06|A945    |      ; Load immediate $45
+	sta.W $0000,X                        ;008D08|9D0000  |000000; Store to $0000 indexed by X
+	xba                                  ;008D0B|EB      |      ; Exchange B and A accumulators
+	sta.W $0001,X                        ;008D0C|9D0100  |000001; Store to $0001 indexed by X
+	bra $+$11                            ;008D0F|800F    |008D20; Branch forward 17 bytes
 
 Sprite_StandardDisplay:
 ; Standard character sprite display
@@ -225,8 +243,24 @@ Map_PositionToVRAMAddress:
 	tax							   ; Transfer to X
 	rts							   ; Return
 
+; ------------------------------------------------------------------------------
+; UNREACHABLE CODE ANALYSIS
+; ------------------------------------------------------------------------------
+; Label: UNREACH_008D93
+; Category: 🟡 Conditionally Reachable (Error Handler)
+; Purpose: Error return - sets X to $FFFF and returns
+; Reachability: REACHABLE via conditional branch at line 239 (beq)
+; Analysis: Error handler for invalid tile position ($FF)
+;   - Sets X register to $FFFF (invalid VRAM address marker)
+;   - Returns immediately
+;   - Triggered when Map_PositionToVRAMAddress receives $FF input
+; Verified: Reachable when invalid tile position passed as parameter
+; Notes: Should be renamed to something like Map_InvalidPositionReturn
+;        This is NOT truly unreachable - it's an error path
+; ------------------------------------------------------------------------------
 UNREACH_008D93:
-	db											 $a2,$ff,$ff,$60 ; Unreachable: LDX #$ffff, RTS
+	ldx.W #$ffff                         ;008D93|A2FFFF  |      ; Load X with $FFFF (error marker)
+	rts                                  ;008D96|60      |      ; Return from subroutine
 
 ; ===========================================================================
 ; Get Adjacent Tile Information

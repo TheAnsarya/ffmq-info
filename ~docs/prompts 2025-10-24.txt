@@ -525,6 +525,17 @@ no! I don't mean timestamp the logs, I mean show a timestamps in the VSCode Chat
 get all of the `wikitext` files and image files and other files from the sub folders from `https://github.com/TheAnsarya/GameInfo/tree/main/Final%20Fantasy%20Mystic%20Quest%20(SNES)` and then continue updating the datacrystal wiki documentation using our disassembly as reference and updating GH issues and todo lists as we go, making sure to organize the pages into groups and subpages
 continue datacrystal documentation, as much as you can, multiple issues and sessions without asking me to continue for 4 hours, just continue working, show timestamps on VSCode chat window
 continue!
+⏳ Continue disassembly work on ROM banks $03, $08-$0A
+make sure the guthub issues are updated, then pick a remaining one and work on it
+extraction tools (#61, #53)
+Continue graphics work (#35 UI graphics - we have 65 tiles, need fonts/icons/gauges/tilesets)
+Update PROGRESS_REPORT, update session/chat logs, Complete issue #35 , continue
+1
+option #2, then option #1
+
+create a GH (github) issue for dissembling and documenting all the "unreachable" code in the `asm` files, many of which have `UNREACH_*` style labels and consist of `db` commands that are really code. These are mostly just code lines not reached in the `diz` file which is incomplete. Disassemble them and update the `asm` files and add comments that these code areas have not been verified as reachable in normal play and add some documentation file(s) of what the "unreach" sections are and explain them. This is so we get closer to a "real" 100% code. We do not want SNES code that should be disassembled isn't.
+
+
 
 
 

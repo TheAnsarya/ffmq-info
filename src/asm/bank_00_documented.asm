@@ -4155,9 +4155,20 @@ Tilemap_RefreshLayer0:
 	bra					 Tilemap_TransferData ; → Continue to transfer
 
 ;-------------------------------------------------------------------------------
+; UNREACHABLE CODE ANALYSIS
+; ------------------------------------------------------------------------------
+; Label: UNREACH_008C81
+; Category: 🔴 Truly Unreachable (Dead Code)
+; Purpose: Function epilogue (PLP + RTS)
+; Reachability: No known call sites or branches to this address
+; Analysis: Orphaned function exit code, likely remnant from code refactoring
+; Verified: NOT reachable in normal gameplay
+; Notes: May be leftover from development or removed function
+; ------------------------------------------------------------------------------
 
 UNREACH_008C81:
-	db											 $28,$60	 ; Unreachable code: PLP, RTS
+	plp                                  ;008C81|28      |      ; Pull processor status
+	rts                                  ;008C82|60      |      ; Return from subroutine
 
 ;-------------------------------------------------------------------------------
 
