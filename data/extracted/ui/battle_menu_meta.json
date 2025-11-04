@@ -1,0 +1,11 @@
+{
+  "name": "battle_menu",
+  "rom_offset": "$013c00",
+  "tile_count": 20,
+  "bits_per_pixel": 4,
+  "description": "Attack/Magic/Item/Run graphics",
+  "tile_size": "8\u00d78 pixels",
+  "width_tiles": 16,
+  "height_tiles": 2,
+  "total_pixels": "128\u00d716"
+}

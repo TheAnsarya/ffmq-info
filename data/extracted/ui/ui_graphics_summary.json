@@ -1,0 +1,124 @@
+{
+  "rom_file": "Final Fantasy - Mystic Quest (U) (V1.1).sfc",
+  "extraction_date": "November 4, 2025",
+  "total_elements": 10,
+  "elements": [
+    {
+      "name": "window_borders",
+      "rom_offset": "$012600",
+      "tile_count": 32,
+      "bits_per_pixel": 2,
+      "description": "Window border tiles (corners, edges, fill)",
+      "tile_size": "8\u00d78 pixels",
+      "width_tiles": 16,
+      "height_tiles": 2,
+      "total_pixels": "128\u00d716"
+    },
+    {
+      "name": "cursor_sprite",
+      "rom_offset": "$012800",
+      "tile_count": 4,
+      "bits_per_pixel": 2,
+      "description": "Cursor sprite (4 animation frames)",
+      "tile_size": "8\u00d78 pixels",
+      "width_tiles": 4,
+      "height_tiles": 1,
+      "total_pixels": "32\u00d78"
+    },
+    {
+      "name": "menu_icons",
+      "rom_offset": "$012c00",
+      "tile_count": 16,
+      "bits_per_pixel": 4,
+      "description": "Item/Magic/Equipment icons",
+      "tile_size": "8\u00d78 pixels",
+      "width_tiles": 16,
+      "height_tiles": 1,
+      "total_pixels": "128\u00d78"
+    },
+    {
+      "name": "status_symbols",
+      "rom_offset": "$012e00",
+      "tile_count": 8,
+      "bits_per_pixel": 4,
+      "description": "HP/MP/Status effect icons",
+      "tile_size": "8\u00d78 pixels",
+      "width_tiles": 8,
+      "height_tiles": 1,
+      "total_pixels": "64\u00d78"
+    },
+    {
+      "name": "number_font",
+      "rom_offset": "$013000",
+      "tile_count": 10,
+      "bits_per_pixel": 2,
+      "description": "Digits 0-9 for stats/gold",
+      "tile_size": "8\u00d78 pixels",
+      "width_tiles": 10,
+      "height_tiles": 1,
+      "total_pixels": "80\u00d78"
+    },
+    {
+      "name": "dialog_box",
+      "rom_offset": "$013200",
+      "tile_count": 12,
+      "bits_per_pixel": 2,
+      "description": "Speech bubble corners/edges",
+      "tile_size": "8\u00d78 pixels",
+      "width_tiles": 12,
+      "height_tiles": 1,
+      "total_pixels": "96\u00d78"
+    },
+    {
+      "name": "shop_tiles",
+      "rom_offset": "$013400",
+      "tile_count": 24,
+      "bits_per_pixel": 4,
+      "description": "Gold coin, buy/sell icons",
+      "tile_size": "8\u00d78 pixels",
+      "width_tiles": 16,
+      "height_tiles": 2,
+      "total_pixels": "128\u00d716"
+    },
+    {
+      "name": "config_tiles",
+      "rom_offset": "$013800",
+      "tile_count": 16,
+      "bits_per_pixel": 4,
+      "description": "Sound/window color preview",
+      "tile_size": "8\u00d78 pixels",
+      "width_tiles": 16,
+      "height_tiles": 1,
+      "total_pixels": "128\u00d78"
+    },
+    {
+      "name": "battle_menu",
+      "rom_offset": "$013c00",
+      "tile_count": 20,
+      "bits_per_pixel": 4,
+      "description": "Attack/Magic/Item/Run graphics",
+      "tile_size": "8\u00d78 pixels",
+      "width_tiles": 16,
+      "height_tiles": 2,
+      "total_pixels": "128\u00d716"
+    },
+    {
+      "name": "font_latin",
+      "rom_offset": "$058000",
+      "tile_count": 96,
+      "bits_per_pixel": 2,
+      "description": "ASCII $20-$7f font",
+      "tile_size": "8\u00d78 pixels",
+      "width_tiles": 16,
+      "height_tiles": 6,
+      "total_pixels": "128\u00d748"
+    }
+  ],
+  "notes": [
+    "All UI graphics extracted from documented ROM locations",
+    "See datacrystal/ROM_map/Menus.wikitext for complete documentation",
+    "Palettes are default/placeholder - actual game uses dynamic palettes",
+    "Font graphics include Latin ASCII $20-$7f (96 characters)",
+    "Icon and symbol graphics use 4BPP for multi-color display"
+  ]
+}

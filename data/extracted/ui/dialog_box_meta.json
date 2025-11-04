@@ -1,0 +1,11 @@
+{
+  "name": "dialog_box",
+  "rom_offset": "$013200",
+  "tile_count": 12,
+  "bits_per_pixel": 2,
+  "description": "Speech bubble corners/edges",
+  "tile_size": "8\u00d78 pixels",
+  "width_tiles": 12,
+  "height_tiles": 1,
+  "total_pixels": "96\u00d78"
+}

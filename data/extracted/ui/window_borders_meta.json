@@ -1,0 +1,11 @@
+{
+  "name": "window_borders",
+  "rom_offset": "$012600",
+  "tile_count": 32,
+  "bits_per_pixel": 2,
+  "description": "Window border tiles (corners, edges, fill)",
+  "tile_size": "8\u00d78 pixels",
+  "width_tiles": 16,
+  "height_tiles": 2,
+  "total_pixels": "128\u00d716"
+}

@@ -1,0 +1,11 @@
+{
+  "name": "number_font",
+  "rom_offset": "$013000",
+  "tile_count": 10,
+  "bits_per_pixel": 2,
+  "description": "Digits 0-9 for stats/gold",
+  "tile_size": "8\u00d78 pixels",
+  "width_tiles": 10,
+  "height_tiles": 1,
+  "total_pixels": "80\u00d78"
+}

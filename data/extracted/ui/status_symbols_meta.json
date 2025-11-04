@@ -1,0 +1,11 @@
+{
+  "name": "status_symbols",
+  "rom_offset": "$012e00",
+  "tile_count": 8,
+  "bits_per_pixel": 4,
+  "description": "HP/MP/Status effect icons",
+  "tile_size": "8\u00d78 pixels",
+  "width_tiles": 8,
+  "height_tiles": 1,
+  "total_pixels": "64\u00d78"
+}

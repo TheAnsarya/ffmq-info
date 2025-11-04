@@ -1,0 +1,11 @@
+{
+  "name": "cursor_sprite",
+  "rom_offset": "$012800",
+  "tile_count": 4,
+  "bits_per_pixel": 2,
+  "description": "Cursor sprite (4 animation frames)",
+  "tile_size": "8\u00d78 pixels",
+  "width_tiles": 4,
+  "height_tiles": 1,
+  "total_pixels": "32\u00d78"
+}

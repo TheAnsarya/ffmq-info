@@ -1,0 +1,11 @@
+{
+  "name": "font_latin",
+  "rom_offset": "$058000",
+  "tile_count": 96,
+  "bits_per_pixel": 2,
+  "description": "ASCII $20-$7f font",
+  "tile_size": "8\u00d78 pixels",
+  "width_tiles": 16,
+  "height_tiles": 6,
+  "total_pixels": "128\u00d748"
+}
