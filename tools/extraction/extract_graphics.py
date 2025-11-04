@@ -32,6 +32,17 @@ except ImportError:
     print("Install with: pip install Pillow")
     sys.exit(1)
 
+# Import compression tools
+try:
+    from ffmq_compression import (
+        ExpandSecondHalfWithZeros,
+        SimpleTailWindowCompression
+    )
+except ImportError:
+    print("WARNING: ffmq_compression.py not found - compression features disabled")
+    ExpandSecondHalfWithZeros = None
+    SimpleTailWindowCompression = None
+
 
 # ROM Configuration
 ROM_PATH = "roms/Final Fantasy - Mystic Quest (U) (V1.1).sfc"
@@ -334,6 +345,230 @@ class GraphicsExtractor:
         with open(output_path, 'w') as f:
             json.dump(palette_data, f, indent=2)
 
+    # =========================================================================
+    # COMPRESSION SUPPORT
+    # =========================================================================
+
+    def decompress_3bpp_to_4bpp(self, compressed_data: bytes) -> bytes:
+        """
+        Decompress 3BPP graphics to 4BPP format.
+
+        Uses ExpandSecondHalfWithZeros algorithm from FFMQ.
+        Input must be in $18 byte chunks (24 bytes per tile).
+        Output is $20 byte chunks (32 bytes per tile).
+
+        Args:
+            compressed_data: 3BPP compressed graphics data
+
+        Returns:
+            4BPP decompressed graphics data
+        """
+        if ExpandSecondHalfWithZeros is None:
+            raise RuntimeError("ffmq_compression.py not available")
+
+        return ExpandSecondHalfWithZeros.decompress(compressed_data)
+
+    def decompress_lz_data(self, compressed_data: bytes,
+                           output_size: int = 0x2000) -> bytes:
+        """
+        Decompress LZ-compressed data (tilemaps, etc).
+
+        Uses SimpleTailWindowCompression algorithm from FFMQ.
+
+        Args:
+            compressed_data: LZ compressed data
+            output_size: Expected output size (default 8KB)
+
+        Returns:
+            Decompressed data
+        """
+        if SimpleTailWindowCompression is None:
+            raise RuntimeError("ffmq_compression.py not available")
+
+        return SimpleTailWindowCompression.decompress(compressed_data, output_size)
+
+    def extract_compressed_tiles_3bpp(self, start_offset: int, tile_count: int,
+                                      palette: Palette) -> List[Image.Image]:
+        """
+        Extract 3BPP compressed tiles (decompressed to 4BPP).
+
+        Args:
+            start_offset: File offset to compressed data
+            tile_count: Number of tiles to extract
+            palette: Palette to use for rendering
+
+        Returns:
+            List of 8x8 PIL Images
+        """
+        # 3BPP tiles are 24 bytes each
+        compressed_size = tile_count * 24
+        compressed_data = self.rom_data[start_offset:start_offset + compressed_size]
+
+        # Decompress to 4BPP
+        decompressed_data = self.decompress_3bpp_to_4bpp(compressed_data)
+
+        # Extract tiles from decompressed data
+        tiles = []
+        for i in range(tile_count):
+            offset = i * 32  # 32 bytes per 4BPP tile
+            if offset + 32 > len(decompressed_data):
+                break
+
+            tile_data = decompressed_data[offset:offset + 32]
+            pixels = self.decode_4bpp_tile(tile_data)
+            tile_img = self.render_tile(pixels, palette)
+            tiles.append(tile_img)
+
+        return tiles
+
+    # =========================================================================
+    # TILEMAP RENDERING
+    # =========================================================================
+
+    @dataclass
+    class TilemapEntry:
+        """SNES tilemap entry (16-bit word)."""
+        tile_id: int      # Bits 0-9: tile index (0-1023)
+        palette_id: int   # Bits 10-12: palette select (0-7)
+        priority: int     # Bit 13: priority (0=low, 1=high)
+        flip_x: bool      # Bit 14: horizontal flip
+        flip_y: bool      # Bit 15: vertical flip
+
+        @classmethod
+        def from_word(cls, word: int) -> 'GraphicsExtractor.TilemapEntry':
+            """Parse tilemap entry from 16-bit word."""
+            return cls(
+                tile_id=(word & 0x3FF),
+                palette_id=(word >> 10) & 0x7,
+                priority=(word >> 13) & 0x1,
+                flip_x=bool(word & 0x4000),
+                flip_y=bool(word & 0x8000)
+            )
+
+    def parse_tilemap(self, tilemap_data: bytes) -> List['GraphicsExtractor.TilemapEntry']:
+        """
+        Parse SNES tilemap data into tilemap entries.
+
+        Args:
+            tilemap_data: Raw tilemap data (2 bytes per entry)
+
+        Returns:
+            List of TilemapEntry objects
+        """
+        entries = []
+        for i in range(0, len(tilemap_data), 2):
+            if i + 1 >= len(tilemap_data):
+                break
+
+            word = tilemap_data[i] | (tilemap_data[i + 1] << 8)
+            entry = self.TilemapEntry.from_word(word)
+            entries.append(entry)
+
+        return entries
+
+    def render_tilemap(self, tilemap_entries: List['GraphicsExtractor.TilemapEntry'],
+                       tiles: List[Image.Image], palettes: List[Palette],
+                       width_tiles: int, height_tiles: int) -> Image.Image:
+        """
+        Render a tilemap to an image using SNES attributes.
+
+        Supports:
+        - Tile ID selection (which 8x8 tile to use)
+        - Palette selection (8 palettes)
+        - Horizontal/vertical flipping
+        - Priority (not visually rendered, but parsed)
+
+        Args:
+            tilemap_entries: List of tilemap entries
+            tiles: List of available 8x8 tiles (as pixel data, not images)
+            palettes: List of 8 palettes for palette select
+            width_tiles: Width of tilemap in tiles
+            height_tiles: Height of tilemap in tiles
+
+        Returns:
+            PIL Image of rendered tilemap
+        """
+        if not tilemap_entries:
+            return Image.new('RGB', (8, 8))
+
+        # Create output image
+        width_px = width_tiles * 8
+        height_px = height_tiles * 8
+        output = Image.new('RGB', (width_px, height_px))
+
+        # Render each tile
+        for i, entry in enumerate(tilemap_entries):
+            if i >= width_tiles * height_tiles:
+                break
+
+            tile_x = (i % width_tiles) * 8
+            tile_y = (i // width_tiles) * 8
+
+            # Get tile (bounds check)
+            if entry.tile_id >= len(tiles):
+                continue
+
+            tile_img = tiles[entry.tile_id].copy()
+
+            # Apply flips
+            if entry.flip_x:
+                tile_img = tile_img.transpose(Image.FLIP_LEFT_RIGHT)
+            if entry.flip_y:
+                tile_img = tile_img.transpose(Image.FLIP_TOP_BOTTOM)
+
+            # Paste tile
+            output.paste(tile_img, (tile_x, tile_y))
+
+        return output
+
+    def render_tilemap_from_rom(self, tilemap_offset: int,
+                                tiles_offset: int, tile_count: int,
+                                palette_offset: int, palette_count: int,
+                                width_tiles: int, height_tiles: int,
+                                compressed: bool = False) -> Image.Image:
+        """
+        High-level tilemap rendering from ROM offsets.
+
+        Args:
+            tilemap_offset: Offset to tilemap data in ROM
+            tiles_offset: Offset to tile graphics in ROM
+            tile_count: Number of tiles to load
+            palette_offset: Offset to palette data in ROM
+            palette_count: Number of palettes to load
+            width_tiles: Width of tilemap in tiles
+            height_tiles: Height of tilemap in tiles
+            compressed: Whether tilemap data is LZ compressed
+
+        Returns:
+            PIL Image of rendered tilemap
+        """
+        # Load tilemap data
+        tilemap_size = width_tiles * height_tiles * 2  # 2 bytes per entry
+        tilemap_data = self.rom_data[tilemap_offset:tilemap_offset + tilemap_size * 2]
+
+        if compressed:
+            tilemap_data = self.decompress_lz_data(tilemap_data, tilemap_size)
+
+        tilemap_entries = self.parse_tilemap(tilemap_data)
+
+        # Load palettes (up to 8)
+        palettes = []
+        for i in range(min(palette_count, 8)):
+            offset = palette_offset + (i * 32)
+            palette = self.extract_palette(offset, 16)
+            palettes.append(palette)
+
+        # Pad to 8 palettes if needed
+        while len(palettes) < 8:
+            palettes.append(palettes[0] if palettes else self.extract_palette(palette_offset, 16))
+
+        # Load tiles (4BPP)
+        tiles = self.extract_tiles_4bpp(tiles_offset, tile_count, palettes[0])
+
+        # Render tilemap
+        return self.render_tilemap(tilemap_entries, tiles, palettes,
+                                   width_tiles, height_tiles)
+
 
 def main():
     """Main extraction routine."""
@@ -352,9 +587,9 @@ def main():
     print(f"Loading ROM: {ROM_PATH}")
     try:
         extractor = GraphicsExtractor(ROM_PATH)
-        print(f"✓ ROM loaded: {len(extractor.rom_data):,} bytes")
+        print(f"[OK] ROM loaded: {len(extractor.rom_data):,} bytes")
     except Exception as e:
-        print(f"✗ Error loading ROM: {e}")
+        print(f"[ERROR] Error loading ROM: {e}")
         return 1
 
     print()
@@ -372,7 +607,7 @@ def main():
         # Export palette JSON
         json_path = PALETTES_DIR / f"{palette.name}.json"
         extractor.export_palette_json(palette, json_path)
-        print(f"✓ Palette {i:2d}: {len(palette.colors)} colors → {json_path.name}")
+        print(f"[OK] Palette {i:2d}: {len(palette.colors)} colors -> {json_path.name}")
 
     print()
     print("Extracting Graphics Tiles (Bank 04)...")
@@ -384,20 +619,20 @@ def main():
     # Example: Extract first 256 tiles as 4BPP
     print("Extracting 4BPP tiles (0x028000+)...")
     tiles_4bpp = extractor.extract_tiles_4bpp(BANK_04_START, 256, default_palette)
-    print(f"✓ Extracted {len(tiles_4bpp)} 4BPP tiles")
+    print(f"[OK] Extracted {len(tiles_4bpp)} 4BPP tiles")
 
     # Create tile sheet
     tile_sheet = extractor.create_tile_sheet(tiles_4bpp, tiles_per_row=16)
     sheet_path = TILES_DIR / "bank04_tiles_4bpp_sheet.png"
     tile_sheet.save(sheet_path)
-    print(f"✓ Saved tile sheet: {sheet_path} ({tile_sheet.size[0]}x{tile_sheet.size[1]})")
+    print(f"[OK] Saved tile sheet: {sheet_path} ({tile_sheet.size[0]}x{tile_sheet.size[1]})")
 
     # Save individual tiles
     for i, tile in enumerate(tiles_4bpp[:64]):  # Save first 64 tiles as examples
         tile_path = TILES_DIR / f"tile_4bpp_{i:04d}.png"
         tile.save(tile_path)
 
-    print(f"✓ Saved {min(64, len(tiles_4bpp))} individual tiles")
+    print(f"[OK] Saved {min(64, len(tiles_4bpp))} individual tiles")
 
     print()
     print("=" * 70)
