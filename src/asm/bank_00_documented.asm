@@ -6603,8 +6603,28 @@ Graphics_Setup4:
 ; reference disassembly and documented here to preserve call/stack conventions
 ; and comments.
 
+; ------------------------------------------------------------------------------
+; UNREACHABLE CODE ANALYSIS
+; ------------------------------------------------------------------------------
+; Label: UNREACH_00A2D4
+; Category: 🔴 Truly Unreachable (Dead Code)
+; Purpose: Initialize variables $9e and $a0 to $FFFF, then pull and return
+; Reachability: No known call sites or branches to this address
+; Analysis: Initialization stub - sets two variables and returns
+;   - Sets X to $FFFF
+;   - Stores X to $9e (at Direct Page)
+;   - Stores X to $a0 (at Direct Page)
+;   - Pulls accumulator from stack
+;   - Returns
+; Verified: NOT reachable in normal gameplay
+; Notes: May be debug initialization or removed initialization routine
+; ------------------------------------------------------------------------------
 UNREACH_00A2D4:
-	db											 $a2,$ff,$ff,$86,$9e,$86,$a0,$fa,$60
+	ldx.W #$ffff                         ;00A2D4|A2FFFF  |      ; Load X with $FFFF
+	stx.B $9e                            ;00A2D7|869E    |00009E; Store to $9e
+	stx.B $a0                            ;00A2D9|86A0    |0000A0; Store to $a0
+	pla                                  ;00A2DB|FA      |      ; Pull accumulator
+	rts                                  ;00A2DC|60      |      ; Return
 
 DATA8_00a2dd:
 	db											 $10
@@ -6632,8 +6652,27 @@ Graphics_CommandDispatch:
 	sta.B				   $17
 RTS_Label:
 
+; ------------------------------------------------------------------------------
+; UNREACHABLE CODE ANALYSIS
+; ------------------------------------------------------------------------------
+; Label: UNREACH_00A2FF
+; Category: 🟢 Table-Driven Reachable (Alternate path in dispatcher)
+; Purpose: Increment index and adjust graphics stream pointer
+; Reachability: REACHABLE via conditional branch at line 6627 (bcc)
+; Analysis: Alternate path in graphics command dispatcher
+;   - Increments accumulator (index++)
+;   - Multiplies by 2 and adds to stream pointer
+;   - Advances graphics data stream position
+; Verified: Reachable when command index < threshold ($9e)
+; Notes: This is NOT unreachable - it's a table indexing path
+;        Should be renamed to Graphics_CommandDispatch_IndexPath
+; ------------------------------------------------------------------------------
 UNREACH_00A2FF:
-	db											 $1a,$0a,$65,$17,$85,$17,$60
+	inc a                                ;00A2FF|1A      |      ; Increment index
+	asl a                                ;00A300|0A      |      ; Multiply by 2 (word table)
+	adc.B $17                            ;00A301|6517    |000017; Add to stream pointer
+	sta.B $17                            ;00A303|8517    |000017; Update stream pointer
+	rts                                  ;00A305|60      |      ; Return
 
 Graphics_ConditionalDispatch:
 	lda.B				   [$17]
@@ -9067,17 +9106,36 @@ Sprite_DrawDispatch:
 	db											 $60		 ; Extra RTS
 
 ;-------------------------------------------------------------------------------
-; UNREACH_00AAF7 - Sprite drawing dispatch table
-;-------------------------------------------------------------------------------
+; UNREACHABLE CODE ANALYSIS
+; ------------------------------------------------------------------------------
+; Label: UNREACH_00AAF7
+; Category: 🟢 Table-Driven Reachable (Sprite dispatch table)
+; Purpose: Sprite/window drawing dispatch table with 2-byte header
+; Reachability: Likely REACHABLE via indexed access (header + table lookup)
+; Analysis: Jump table for sprite and window rendering routines
+;   - Bytes $F6 $AA: Table header/signature (possibly entry count or flags)
+;   - 7 function pointers for different sprite/window types:
+;     $00: Draw filled sprite
+;     $01: Draw window border
+;     $02: Draw window frame
+;     $03: Draw item icon
+;     $04: Draw spell icon
+;     $05: Draw top border
+;     $06: Draw filled box
+; Verified: Table structure suggests indirect addressing
+; Notes: Should be renamed to Sprite_DrawDispatchTable
+;        Header bytes may indicate 7 entries or table format
+; ------------------------------------------------------------------------------
 UNREACH_00AAF7:
-	db											 $f6,$aa	 ; Unreachable data
-	dw											 Sprite_DrawFilled ; $00
-	dw											 Sprite_DrawWindowBorder ; $01
-	dw											 Window_DrawFrame ; $02
-	dw											 Window_DrawItemIcon ; $03
-	dw											 Window_DrawSpellIcon ; $04
-	dw											 Window_DrawTopBorder ; $05
-	dw											 Window_DrawFilledBox ; $06
+	db $f6,$aa                           ;00AAF7|        |      ; Table header (entry count or flags)
+	dw Sprite_DrawFilled                 ;00AAF9|        |      ; $00: Draw filled sprite
+	dw Sprite_DrawWindowBorder           ;00AAFB|        |      ; $01: Draw window border
+	dw Window_DrawFrame                  ;00AAFD|        |      ; $02: Draw window frame
+	dw Window_DrawItemIcon               ;00AAFF|        |      ; $03: Draw item icon
+	dw Window_DrawSpellIcon              ;00AB01|        |      ; $04: Draw spell icon
+	dw Window_DrawTopBorder              ;00AB03|        |      ; $05: Draw top border
+	dw Window_DrawFilledBox              ;00AB05|        |      ; $06: Draw filled box
+;-------------------------------------------------------------------------------
 
 ;-------------------------------------------------------------------------------
 ; Sprite_DrawFilled - Draw filled rectangle (tile $fe)
@@ -11116,8 +11174,23 @@ System_CheckModeJump:
 	beq					 UNREACH_00B4BB ; If clear, jump to alternate
 	jmp.W				   CODE_00A8C0 ; Jump to routine A
 
+; ------------------------------------------------------------------------------
+; UNREACHABLE CODE ANALYSIS
+; ------------------------------------------------------------------------------
+; Label: UNREACH_00B4BB
+; Category: 🟡 Conditionally Reachable (Alternate path)
+; Purpose: Load $00FF and jump to CODE_009DC9 (likely fade/graphics routine)
+; Reachability: REACHABLE via conditional branch at previous line (beq)
+; Analysis: Alternate execution path when bit 5 of $00da is clear
+;   - Loads A with $00FF (16-bit)
+;   - Jumps to CODE_009DC9 (graphics fade/transition routine)
+; Verified: Reachable when system mode flag (bit 5 of $da) is cleared
+; Notes: This is NOT unreachable - it's a conditional path
+;        Should be renamed to System_AlternateModeJump
+; ------------------------------------------------------------------------------
 UNREACH_00B4BB:
-	db											 $a9,$ff,$00,$4c,$c9,$9d ; LDA #$00ff; JMP CODE_009DC9
+	lda.W #$00ff                         ;00B4BB|A9FF00  |      ; Load A with $00FF
+	jmp.W CODE_009DC9                    ;00B4BE|4CC99D  |009DC9; Jump to graphics routine
 
 ;-------------------------------------------------------------------------------
 ; Text_ClearModeSetNew: Clear text mode bits and set new mode
@@ -11344,10 +11417,29 @@ Sprite_SetupCharacter_CheckLocation:
 	bcc					 Sprite_SetupCharacter_Continue ; If yes, continue
 	cmp.B				   #$7b	  ; >= $7b?
 	bcs					 Sprite_SetupCharacter_Continue ; If yes, continue
-	db											 $80,$07	 ; BRA Sprite_SetupCharacter_AdjustX (unconditional)
+	bra Sprite_SetupCharacter_AdjustX    ;00B5C0|8007    |00B5C9; Branch to adjust X
 
+; ------------------------------------------------------------------------------
+; UNREACHABLE CODE ANALYSIS
+; ------------------------------------------------------------------------------
+; Label: UNREACH_00B5C2
+; Category: 🟡 Conditionally Reachable (Y position adjustment)
+; Purpose: Adjust Y position by adding 4
+; Reachability: REACHABLE via conditional branch (beq at previous section)
+; Analysis: Y coordinate adjustment for sprite at location $6B
+;   - Clears carry flag
+;   - Loads Y position from $23
+;   - Adds 4 pixels
+;   - Stores back to $23
+; Verified: Reachable when sprite location == $6B
+; Notes: This is NOT unreachable - it's a special case handler
+;        Should be renamed to Sprite_AdjustYPosition_Location6B
+; ------------------------------------------------------------------------------
 UNREACH_00B5C2:
-	db											 $18,$a5,$23,$69,$04,$85,$23 ; CLC; LDA $23; ADC #$04; STA $23
+	clc                                  ;00B5C2|18      |      ; Clear carry
+	lda.B $23                            ;00B5C3|A523    |000023; Load Y position
+	adc.B #$04                           ;00B5C5|6904    |      ; Add 4
+	sta.B $23                            ;00B5C7|8523    |000023; Store Y position
 
 Sprite_SetupCharacter_AdjustX:
 	clc							   ; Clear carry
@@ -11390,10 +11482,28 @@ Sprite_SetupCharacter_StoreMode:
 	bcc					 UNREACH_00B607 ; If yes, clamp to $08
 	cmp.B				   #$a9	  ; >= $a9?
 	bcc					 Sprite_SetupCharacter_CheckX ; If no, in range
-	db											 $a9,$a8,$85,$23,$80,$04 ; LDA #$a8; STA $23; BRA Sprite_SetupCharacter_CheckX
+	lda.B #$a8                           ;00B601|A9A8    |      ; Clamp to $A8
+	sta.B $23                            ;00B603|8523    |000023; Store Y position
+	bra Sprite_SetupCharacter_CheckX     ;00B605|8004    |00B60B; Continue
 
+; ------------------------------------------------------------------------------
+; UNREACHABLE CODE ANALYSIS
+; ------------------------------------------------------------------------------
+; Label: UNREACH_00B607
+; Category: 🟡 Conditionally Reachable (Y position clamping)
+; Purpose: Clamp Y position to minimum value $08
+; Reachability: REACHABLE via conditional branch (bcc above)
+; Analysis: Lower bound clamping for sprite Y coordinate
+;   - Loads A with $08 (minimum Y position)
+;   - Stores to $23 (Y position variable)
+; Verified: Reachable when Y position < $08
+; Notes: This is NOT unreachable - it's a boundary check
+;        Paired with upper clamp at $A8 above
+;        Should be renamed to Sprite_ClampYMin
+; ------------------------------------------------------------------------------
 UNREACH_00B607:
-	db											 $a9,$08,$85,$23 ; LDA #$08; STA $23
+	lda.B #$08                           ;00B607|A908    |      ; Clamp to $08 (minimum)
+	sta.B $23                            ;00B609|8523    |000023; Store Y position
 
 Sprite_SetupCharacter_CheckX:
 	clc							   ; Clear carry
@@ -11639,8 +11749,23 @@ Menu_InputHandler:
 	sta.W				   $0162	 ; Wrap to max
 	bra					 Menu_UpdateDisplay ; Update menu
 
+; ------------------------------------------------------------------------------
+; UNREACHABLE CODE ANALYSIS
+; ------------------------------------------------------------------------------
+; Label: UNREACH_00B76B
+; Category: 🔴 Truly Unreachable (Dead Code)
+; Purpose: Increment menu cursor and branch to input handler
+; Reachability: No known call sites or branches to this address
+; Analysis: Orphaned menu cursor increment code
+;   - Increments $0162 (cursor position)
+;   - Branches to Menu_InputHandler
+; Verified: NOT reachable in normal gameplay
+; Notes: Similar to Menu_InputHandler_Down but without bounds checking
+;        Likely removed or replaced alternate path
+; ------------------------------------------------------------------------------
 UNREACH_00B76B:
-	db											 $ee,$62,$01,$80,$be ; INC $0162; BRA Menu_InputHandler
+	inc.W $0162                          ;00B76B|EE6201  |000162; Increment cursor position
+	bra Menu_InputHandler                ;00B76E|80BE    |00B72E; Branch to input handler
 
 Menu_InputHandler_Down:
 	sep					 #$20		; 8-bit accumulator
@@ -11664,9 +11789,45 @@ Menu_UpdateDisplay:
 	jsr.W				   CODE_009BC4 ; Update menu display
 	bra					 Menu_InputHandler ; Read input again
 
+; ------------------------------------------------------------------------------
+; UNREACHABLE CODE ANALYSIS
+; ------------------------------------------------------------------------------
+; Label: UNREACH_00B797
+; Category: 🟡 Conditionally Reachable (Y button handler - jump by 10)
+; Purpose: Handle Y button press to jump cursor by 10 positions
+; Reachability: Likely REACHABLE via button handler dispatch
+; Analysis: Cursor jump handler (used in long menus)
+;   - Switches to 8-bit accumulator
+;   - Sets carry for subtraction
+;   - Loads cursor position ($0162)
+;   - If zero, handles wrap
+;   - Subtracts 10 ($0A) from cursor
+;   - If result negative, wraps to bottom
+;   - Tests wrap flag (bit 2 of $95)
+;   - If wrap disabled, clamps to max ($0163)
+; Verified: May be reachable via Y button press in menus
+; Notes: Should be renamed to Menu_InputHandler_YButton_JumpUp
+;        Allows quick navigation in long item/spell lists
+; ------------------------------------------------------------------------------
 UNREACH_00B797:
-	db											 $e2,$20,$38,$ad,$62,$01,$f0,$08,$e9,$0a,$b0,$0d,$a9,$00,$80,$09
-	db											 $a5,$95,$29,$04,$f0,$81,$ad,$63,$01,$8d,$62,$01,$80,$d8
+	sep #$20                             ;00B797|E220    |      ; 8-bit accumulator
+	sec                                  ;00B799|38      |      ; Set carry for subtraction
+	lda.W $0162                          ;00B79A|AD6201  |000162; Load cursor position
+	beq UNREACH_00B7B5                   ;00B79D|F008    |00B7A7; If zero, handle wrap
+	sbc.B #$0a                           ;00B79F|E90A    |      ; Subtract 10
+	bcs Menu_InputHandler_YButton_Store  ;00B7A1|B00D    |00B7B0; If >= 0, store
+	lda.B #$00                           ;00B7A3|A900    |      ; Clamp to 0
+	bra Menu_InputHandler_YButton_Check  ;00B7A5|8009    |00B7B0; Check wrap flag
+
+UNREACH_00B7B5:
+	lda.B $95                            ;00B7A7|A595    |000095; Load wrap flags
+	and.B #$04                           ;00B7A9|2904    |      ; Test bit 2 (wrap down)
+	beq Menu_InputHandler                ;00B7AB|F081    |00B72E; If no wrap, read input
+	lda.W $0163                          ;00B7AD|AD6301  |000163; Load max position
+Menu_InputHandler_YButton_Store:
+	sta.W $0162                          ;00B7B0|8D6201  |000162; Store new cursor position
+	bra Menu_UpdateDisplay               ;00B7B3|80D8    |00B78D; Update display
+Menu_InputHandler_YButton_Check:
 ; Cursor movement by 10 (Y button handler)
 
 UNREACH_00B7B5:
@@ -12029,14 +12190,65 @@ Game_Initialize_Loop:
 	lda.W				   $010e	 ; Load save slot index
 	jmp.W				   CODE_00CA63 ; Load game
 
+; ------------------------------------------------------------------------------
+; UNREACHABLE CODE ANALYSIS
+; ------------------------------------------------------------------------------
+; Label: UNREACH_00B9D5
+; Category: 🟡 Conditionally Reachable (New game handler)
+; Purpose: Handle new game selection (save slot < 0)
+; Reachability: REACHABLE via conditional branch (bmi above)
+; Analysis: New game initialization path
+;   - Calls Sprite_SetMode2D to update sprite display
+;   - Jumps to TitleScreen_Init to start new game
+; Verified: Reachable when save slot index is negative (new game selected)
+; Notes: This is NOT unreachable - it's the new game path
+;        Should be renamed to Game_StartNew
+; ------------------------------------------------------------------------------
 UNREACH_00B9D5:
-	db											 $20,$08,$b9,$4c,$1a,$ba ; JSR Sprite_SetMode2D; JMP TitleScreen_Init
+	jsr.W Sprite_SetMode2D               ;00B9D5|2008B9  |00B908; Update sprite mode
+	jmp.W TitleScreen_Init               ;00B9D8|4C1ABA  |00BA1A; Start new game
 
+; ------------------------------------------------------------------------------
+; UNREACHABLE CODE ANALYSIS
+; ------------------------------------------------------------------------------
+; Label: UNREACH_00B9DB
+; Category: 🟡 Conditionally Reachable (Empty save slot handler)
+; Purpose: Handle selection of empty save slot
+; Reachability: REACHABLE via conditional branch (beq above)
+; Analysis: Empty slot selection path
+;   - Calls Sprite_SetMode2C to update sprite display
+;   - Branches forward to skip normal load game logic
+; Verified: Reachable when save slot data is empty (flag = 0)
+; Notes: This is NOT unreachable - it's the empty slot path
+;        Should be renamed to Game_HandleEmptySlot
+; ------------------------------------------------------------------------------
 UNREACH_00B9DB:
-	db											 $20,$12,$b9,$80,$c0 ; JSR Sprite_SetMode2C; BRA (skip)
+	jsr.W Sprite_SetMode2C               ;00B9DB|2012B9  |00B912; Update sprite mode
+	bra $+$c2                            ;00B9DE|80C0    |00B9A0; Skip load game logic
 
+; ------------------------------------------------------------------------------
+; UNREACHABLE CODE ANALYSIS
+; ------------------------------------------------------------------------------
+; Label: UNREACH_00B9E0
+; Category: 🟡 Conditionally Reachable (Button press handler)
+; Purpose: Handle non-B button press during title screen
+; Reachability: REACHABLE via conditional branch (bne above at Game_Initialize_Loop)
+; Analysis: Alternate button handler (likely A button or Start)
+;   - Stores button state to $05
+;   - Calls sprite update routine
+;   - Switches to 8-bit index registers
+;   - Loads $EC and stores to $7F56D8 and $7F56DA (video registers?)
+; Verified: Reachable when buttons other than B are pressed
+; Notes: This is NOT unreachable - it's an alternate input path
+;        Should be renamed to Game_HandleAlternateButton
+; ------------------------------------------------------------------------------
 UNREACH_00B9E0:
-	db											 $86,$05,$20,$1c,$b9,$e2,$30,$a9,$ec,$8f,$d8,$56,$7f,$8f,$da,$56
+	stx.B $05                            ;00B9E0|8605    |000005; Store button state
+	jsr.W $B91C                          ;00B9E2|201CB9  |00B91C; Call sprite routine
+	sep #$10                             ;00B9E5|E230    |      ; 8-bit index registers
+	lda.W #$00ec                         ;00B9E7|A9EC    |      ; Load $EC
+	sta.L $7f56d8                        ;00B9EA|8FD8567F|7F56D8; Store to video register
+	sta.L $7f56da                        ;00B9EE|8FDA567F|7F56DA; Store to video register
 	db											 $7f,$8f,$dc,$56,$7f,$8f,$de,$56,$7f,$a5,$06,$0a,$aa,$a9,$e0,$9f
 	db											 $d8,$56,$7f,$a9,$08,$0c,$d4,$00,$22,$00,$80,$0c,$a9,$08,$1c,$d4
 	db											 $00,$4c,$a0,$b9
