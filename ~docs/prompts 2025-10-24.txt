@@ -524,6 +524,7 @@ timestamp the chat in VSCode chat for every response; you're so slow now, speed 
 no! I don't mean timestamp the logs, I mean show a timestamps in the VSCode Chat UI; confirm github status for issue creation/editing as I have authorized gitkraken login; I've told you this all before, stop losing it! and continue datacrystal documentation, do tons of it!
 get all of the `wikitext` files and image files and other files from the sub folders from `https://github.com/TheAnsarya/GameInfo/tree/main/Final%20Fantasy%20Mystic%20Quest%20(SNES)` and then continue updating the datacrystal wiki documentation using our disassembly as reference and updating GH issues and todo lists as we go, making sure to organize the pages into groups and subpages
 continue datacrystal documentation, as much as you can, multiple issues and sessions without asking me to continue for 4 hours, just continue working, show timestamps on VSCode chat window
+continue!
 
 
 
