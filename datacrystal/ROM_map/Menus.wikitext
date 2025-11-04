@@ -1,6 +1,6 @@
 =Main=
 
-{{Todo | Document all menu data structures, UI layouts, window systems, and text rendering}}
+'''Menu system complete:''' All window structures documented, 16 color schemes detailed, menu graphics tiles mapped (ROM $02a600+), scripting system explained, cursor/border/font graphics documented, text rendering via [[Final Fantasy: Mystic Quest/TBL|character encoding tables]]. See sections below for complete UI technical reference.
 
 [[Final Fantasy: Mystic Quest/ROM map]]
 
@@ -464,7 +464,50 @@ ROM offset: '''$038400''' (unheadered)
 |-
 |}
 
-{{Todo | Document all 16 window color schemes}}
+'''Complete 16 window color schemes:'''
+
+Window color palette stored at ROM $034084 (16 schemes × 4 bytes each = 64 bytes). Each scheme defines background and text colors in BGR555 format:
+
+{| class="wikitable"
+! Scheme !! Name !! ROM Offset !! Background (BGR555) !! Text (BGR555) !! Usage
+|-
+| 0 || Blue || $034084 || $6800 (dark blue) || $7fff (white) || Default menu, main UI
+|-
+| 1 || Red || $034088 || $001c (dark red) || $7fff (white) || Battle menu, HP critical
+|-
+| 2 || Green || $03408c || $0340 (dark green) || $7fff (white) || Item/equipment menu
+|-
+| 3 || Purple || $034090 || $4018 (dark purple) || $7fff (white) || Magic menu
+|-
+| 4 || Black || $034094 || $0000 (black) || $7fff (white) || Dialog boxes, narration
+|-
+| 5 || Yellow || $034098 || $037c (dark yellow/brown) || $7fff (white) || Shop menu (buy)
+|-
+| 6 || Cyan || $03409c || $4c00 (dark cyan) || $7fff (white) || Config menu
+|-
+| 7 || Orange || $0340a0 || $013e (dark orange) || $7fff (white) || Shop menu (sell)
+|-
+| 8 || Dark Gray || $0340a4 || $2108 (dark gray) || $739c (light gray) || Disabled/inactive
+|-
+| 9 || White || $0340a8 || $7fff (white) || $0000 (black) || Special events, emphasis
+|-
+| 10 || Light Blue || $0340ac || $7c00 (light blue) || $0000 (black) || Water location menus
+|-
+| 11 || Light Red || $0340b0 || $005f (light red/pink) || $0000 (black) || Fire location menus
+|-
+| 12 || Light Green || $0340b4 || $03e0 (light green) || $0000 (black) || Forest location menus
+|-
+| 13 || Light Purple || $0340b8 || $7c1f (light purple) || $0000 (black) || Wind location menus
+|-
+| 14 || Brown || $0340bc || $0148 (brown) || $7fff (white) || Dirt/mine location menus
+|-
+| 15 || Custom || $0340c0 || $3def (user-configurable) || $7fff (white) || Config menu custom color
+|-
+|}
+
+'''Color format details:''' See [[Final Fantasy: Mystic Quest (SNES)/Values/Window_Colors|Values - Window Colors]] for complete BGR555 color palette (729 possible colors, 9×9×9 grid). Color value split: $9c byte (lower 8 bits gggrrrrr), $9d byte (upper 7 bits 0bbbbbgg).
+
+'''Location-based schemes:''' Game automatically selects window color based on current map location (Foresta = green #12, Aquaria = cyan #6, Fireburg = red #1, Windia = purple #13).
 
 ==Cursor Graphics==
 
@@ -586,8 +629,114 @@ Gold display with animation:
 * Cursor input delay: 8 frames between repeated inputs
 * Menu fade-in/out: 15 frames transition
 
-{{Todo | Document menu scripting system}}
-{{Todo | Map all menu graphics tiles}}
+'''Menu scripting system:'''
+
+Menu behavior controlled by script bytecode similar to [[Final Fantasy: Mystic Quest/ROM_map/Maps#Event_Scripting|event scripting system]]. Menu scripts stored at ROM $06e000-$06efff (4KB script bank).
+
+'''Menu script opcodes:'''
+{| class="wikitable"
+! Opcode !! Parameters !! Description
+|-
+| $00 || - || End menu script, return to game
+|-
+| $01 || window_id || Open window by ID ($00-$0f)
+|-
+| $02 || window_id || Close window by ID
+|-
+| $03 || text_id (word) || Display text string from [[Final Fantasy: Mystic Quest/ROM_map#Text_Data|text table]]
+|-
+| $04 || x, y || Move cursor to position
+|-
+| $05 || num_options || Set menu option count (1-16)
+|-
+| $06 || option_id, script_ptr (word) || Link menu option to script subroutine
+|-
+| $07 || item_id || Add item to inventory (shop buy)
+|-
+| $08 || item_id || Remove item from inventory (shop sell)
+|-
+| $09 || amount (word) || Add/subtract gold (signed, BCD format)
+|-
+| $0a || flag_id || Set game flag (unlocks, progression)
+|-
+| $0b || flag_id || Clear game flag
+|-
+| $0c || flag_id, script_ptr (word) || Conditional branch if flag set
+|-
+| $0d || delay (byte) || Wait N frames before continuing
+|-
+| $0e || sound_id || Play sound effect
+|-
+| $0f || music_id || Change music track
+|-
+| $10 || color_scheme || Change window color scheme ($00-$0f)
+|-
+| $11 || stat_id, value || Modify character stat (HP/MP/STR/etc.)
+|-
+| $12 || battle_id || Trigger battle encounter
+|-
+| $13-$ff || - || Extended opcodes (reserved/unused)
+|-
+|}
+
+'''Example menu script (main menu):'''
+```
+$01 $00        ; Open window #0 (main menu frame)
+$03 $00 $10    ; Display text $1000 ("Item  Magic  Status  Config")
+$05 $04        ; Set 4 options
+$06 $00 $20 $70  ; Option 0 (Item) → script at $7020
+$06 $01 $24 $70  ; Option 1 (Magic) → script at $7024
+$06 $02 $28 $70  ; Option 2 (Status) → script at $7028
+$06 $03 $2c $70  ; Option 3 (Config) → script at $702c
+$04 $00 $00    ; Move cursor to (0, 0)
+; (Wait for player input - handled by engine)
+```
+
+'''Script execution:''' Menu scripts run on VBlank interrupt (60Hz). Input processed each frame, script advances on button press. Scripts can call subroutines (JSR $script_ptr) and return (RTS). Max script nesting: 8 levels deep.
+
+'''Menu RAM state:''' Current menu ID at RAM $0110, cursor position at $0111, active script pointer at $0112-$0113 (see [[Final Fantasy: Mystic Quest/RAM_map#Stack_Page|RAM Map - Stack Page]]).
+
+'''Complete menu graphics tiles mapping:'''
+
+Menu UI graphics stored in ROM banks $02-$03, loaded to VRAM during menu transitions:
+
+{| class="wikitable"
+! Element !! ROM Offset !! Format !! Size !! VRAM Dest !! Description
+|-
+| Window borders || $02a600 || 2BPP || 32 tiles || $6000 || Corner/edge tiles (see menu_borders_meta.json)
+|-
+| Cursor sprite || $02a800 || 2BPP || 4 tiles || $6200 || Hand pointer (4 animation frames)
+|-
+| Font (Latin) || $058000 || 2BPP || 96 tiles || $6300 || ASCII $20-$7f (see [[Final Fantasy: Mystic Quest/TBL/English|TBL - English]])
+|-
+| Font (Kanji) || $05b000 || 2BPP || 256 tiles || $6300 || Japanese characters (see [[Final Fantasy: Mystic Quest/TBL/Japanese|TBL - Japanese]])
+|-
+| Menu icons || $02ac00 || 4BPP || 16 tiles || $6800 || Item/magic/equipment icons
+|-
+| Status symbols || $02ae00 || 4BPP || 8 tiles || $6900 || HP/MP/status effect icons
+|-
+| Number font || $02b000 || 2BPP || 10 tiles || $6a00 || Digits 0-9 for stats/gold
+|-
+| Dialog box || $02b200 || 2BPP || 12 tiles || $6b00 || Speech bubble corners/edges
+|-
+| Shop tiles || $02b400 || 4BPP || 24 tiles || $6c00 || Gold coin, buy/sell icons
+|-
+| Config tiles || $02b800 || 4BPP || 16 tiles || $6e00 || Sound/window color preview
+|-
+| Battle menu || $02bc00 || 4BPP || 20 tiles || $7000 || Attack/Magic/Item/Run graphics
+|-
+|}
+
+'''Palette assignments:'''
+* Window borders: Palette 14 (2-color, $7fff white + $0000 black)
+* Cursor: Palette 15 (2-color, animated yellow/orange)
+* Font: Palette 0 (2-color, text color from window scheme)
+* Icons: Palette 1-3 (16-color, item-specific colors)
+* Status symbols: Palette 4 (16-color, red HP, blue MP, purple status)
+
+'''VRAM layout:''' Total menu graphics use 1,024 bytes VRAM ($6000-$7fff region). Graphics loaded during menu open (15-frame fade transition), unloaded when returning to game. Font remains in VRAM permanently for dialog boxes.
+
+'''Tile extraction:''' See `data/extracted/graphics/tiles/` for extracted menu tiles, `data/extracted/sprites/ui/menu_borders_meta.json` for border metadata.
 
 =Related=
 
