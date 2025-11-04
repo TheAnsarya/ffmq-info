@@ -534,6 +534,9 @@ Update PROGRESS_REPORT, update session/chat logs, Complete issue #35 , continue
 option #2, then option #1
 
 create a GH (github) issue for dissembling and documenting all the "unreachable" code in the `asm` files, many of which have `UNREACH_*` style labels and consist of `db` commands that are really code. These are mostly just code lines not reached in the `diz` file which is incomplete. Disassemble them and update the `asm` files and add comments that these code areas have not been verified as reachable in normal play and add some documentation file(s) of what the "unreach" sections are and explain them. This is so we get closer to a "real" 100% code. We do not want SNES code that should be disassembled isn't.
+work that new issue, issue #67
+No, you didn't disassemble all the code after `UNREACH_*` labels, you left them with `db` commands instead of the disassembled code with comments and documentation. Disassemble those sections!
+I see comments like: `Should be renamed to Graphics_CommandDispatch_IndexPath`, rename all the `UNREACH_*` labels and update code/comments/documentation/visualizations and have normal comments for that code but do mention unreachability etc ;;; then continue doing more work on issue #67 and then other issues
 
 
 

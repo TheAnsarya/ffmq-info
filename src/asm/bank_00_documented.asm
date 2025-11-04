@@ -12965,26 +12965,51 @@ Menu_PartySelection_Init:
 	stz.B				   $02	   ; Clear option high
 	lda.L				   $7e3664   ; Load last selection
 	beq					 Menu_PartySelection_Start ; Branch if zero
-	bmi					 UNREACH_00BEC0 ; Branch if negative
+	bmi					 Menu_PartySelection_BattleCheck ; Branch if negative
 	lda.W				   $1090	 ; Check companion status again
 	bmi					 Menu_PartySelection_Start ; Branch if no companion
 	inc.B				   $01	   ; Select second option
 	bra					 Menu_PartySelection_Start ; Continue
 
-UNREACH_00BEC0:
-	db											 $ad,$e0,$04,$29,$20,$d0,$0d,$80,$07 ; Unreachable data
+; ------------------------------------------------------------------------------
+; Menu Party Selection - Battle Mode Check
+; ------------------------------------------------------------------------------
+; Purpose: Check if in battle mode and skip if bit 5 of $04e0 is set
+; Reachability: Reachable via conditional branch (bmi above)
+; Analysis: Battle mode alternate path in party selection
+;   - Loads $04e0 (battle flags)
+;   - Tests bit 5 ($20)
+;   - If set, skips to Menu_PartySelection_GetOption
+;   - Otherwise continues to next check
+; Technical: Originally labeled UNREACH_00BEC0
+; ------------------------------------------------------------------------------
+Menu_PartySelection_BattleCheck:
+	lda.W $04e0                          ;00BEC0|ADE004  |0004E0; Load battle flags
+	and.B #$20                           ;00BEC3|2920    |      ; Test bit 5 (battle mode)
+	bne Menu_PartySelection_GetOption    ;00BEC5|D00D    |00BED4; If set, get option directly
+	bra Menu_PartySelection_Start        ;00BEC7|8007    |00BED0; Otherwise continue
 
 Menu_PartySelection_Start:
 	lda.W				   $04e0	 ; Load parameter
 	and.B				   #$10	  ; Check bit 4
-	beq					 UNREACH_00BED4 ; Branch if clear
+	beq					 Menu_PartySelection_DefaultOption ; Branch if clear
 
 Menu_PartySelection_GetOption:
 	lda.B				   $01	   ; Load current option
 	bra					 Menu_PartySelection_Update ; Continue
 
-UNREACH_00BED4:
-	db											 $a9,$80	 ; Unreachable data
+; ------------------------------------------------------------------------------
+; Menu Party Selection - Default Option Handler
+; ------------------------------------------------------------------------------
+; Purpose: Set default option to $80 (cancel/back)
+; Reachability: Reachable via conditional branch (beq above)
+; Analysis: Sets default menu option when bit 4 of $04e0 is clear
+;   - Loads $80 (cancel code)
+;   - Implicit fall-through to Menu_PartySelection_Update
+; Technical: Originally labeled UNREACH_00BED4
+; ------------------------------------------------------------------------------
+Menu_PartySelection_DefaultOption:
+	lda.B #$80                           ;00BED4|A980    |      ; Load cancel option ($80)
 
 Menu_PartySelection_Update:
 	ldx.B				   $14	   ; Load previous result
