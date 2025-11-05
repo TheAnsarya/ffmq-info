@@ -1,7 +1,7 @@
 # Label Rename Mapping
 
 **Purpose**: Track all UNREACH_* label renames for systematic refactoring  
-**Status**: Planning Phase  
+**Status**: Phase 2 Complete - All Reachable Labels Renamed  
 **Last Updated**: November 4, 2025
 
 ---
@@ -30,18 +30,23 @@ This document tracks the renaming of all `UNREACH_*` labels to descriptive names
 
 | Old Label | New Label | Status | Category | Line | References |
 |-----------|-----------|--------|----------|------|------------|
-| `UNREACH_008D93` | `Map_InvalidPositionReturn` | ⏳ Pending | 🟡 Conditional | 4463 | beq at line 4455 |
+| `UNREACH_008D93` | `Map_InvalidPositionReturn` | ✅ Renamed | 🟡 Conditional | 4463 | beq at line 4455 |
 | `UNREACH_00A2FF` | `Graphics_CommandDispatch_IndexPath` | ✅ Renamed | 🟢 Table-Driven | 6670 | bcc at line 6646 |
-| `UNREACH_00AAF7` | `Sprite_DrawDispatchTable` | ⏳ Pending | 🟢 Table-Driven | 9129 | jsr (label,x) at 9099 |
-| `UNREACH_00B4BB` | `System_AlternateModeJump` | ⏳ Pending | 🟡 Conditional | 11191 | beq at line 11174 |
-| `UNREACH_00B5C2` | `Sprite_AdjustYPosition_Location6B` | ⏳ Pending | 🟡 Conditional | 11438 | beq at line 11415 |
-| `UNREACH_00B607` | `Sprite_ClampYMin` | ⏳ Pending | 🟡 Conditional | 11504 | bcc at line 11482 |
-| `UNREACH_00B797` | `Menu_InputHandler_YButton_JumpUp` | ⏳ Pending | 🟡 Conditional | 11812 | bne at line 11737 |
-| `UNREACH_00B9D5` | `Game_StartNew` | ⏳ Pending | 🟡 Conditional | 12207 | bmi at line 12184 |
-| `UNREACH_00B9DB` | `Game_HandleEmptySlot` | ⏳ Pending | 🟡 Conditional | 12225 | beq at line 12188 |
-| `UNREACH_00B9E0` | `Game_HandleAlternateButton` | ⏳ Pending | 🟡 Conditional | 12245 | bne at line 12174 |
-| `UNREACH_00BA6D` | `CharName_ErrorSound` | ⏳ Pending | 🟡 Conditional | 12324 | 2× beq (lines 12358, 12406) |
-| `UNREACH_00BAC2` | `CharName_DeleteCharacter` | ⏳ Pending | 🟡 Conditional | 12395 | bne at line 12349 |
+| `UNREACH_00AAF7` | `Sprite_DrawDispatchTable` | ✅ Renamed | 🟢 Table-Driven | 9129 | jsr (label,x) at 9099 |
+| `UNREACH_00B4BB` | `System_AlternateModeJump` | ✅ Renamed | 🟡 Conditional | 11191 | beq at line 11174 |
+| `UNREACH_00B5C2` | `Sprite_AdjustYPosition_Location6B` | ✅ Renamed | 🟡 Conditional | 11438 | beq at line 11415 |
+| `UNREACH_00B607` | `Sprite_ClampYMin` | ✅ Renamed | 🟡 Conditional | 11504 | bcc at line 11482 |
+| `UNREACH_00B797` | `Menu_InputHandler_YButton_JumpUp` | ✅ Renamed | 🟡 Conditional | 11812 | bne at line 11737 |
+| `UNREACH_00B9D5` | `Game_StartNew` | ✅ Renamed | 🟡 Conditional | 12207 | bmi at line 12184 |
+| `UNREACH_00B9DB` | `Game_HandleEmptySlot` | ✅ Renamed | 🟡 Conditional | 12225 | beq at line 12188 |
+| `UNREACH_00B9E0` | `Game_HandleAlternateButton` | ✅ Renamed | 🟡 Conditional | 12245 | bne at line 12174 |
+| `UNREACH_00BA6D` | `CharName_ErrorSound` | ✅ Renamed | 🟡 Conditional | 12324 | 2× beq (lines 12358, 12406) |
+| `UNREACH_00BAC2` | `CharName_DeleteCharacter` | ✅ Renamed | 🟡 Conditional | 12395 | bne at line 12349 |
+
+**Bonus Disassembly:**
+| Old Label | New Label | Status | Category | File | Notes |
+|-----------|-----------|--------|----------|------|-------|
+| `UNREACH_00B7B5` | `Menu_InputHandler_XButton_JumpDown` | ✅ Disassembled | 🟡 Conditional | bank_00 | Was db bytes, now proper opcodes |
 
 ### Dead Code (Keep UNREACH Prefix)
 
@@ -74,6 +79,26 @@ This document tracks the renaming of all `UNREACH_*` labels to descriptive names
 
 ---
 
+## Bank $01 Renames
+
+### Completed Renames
+
+| Old Label | New Label | Status | Category | Notes |
+|-----------|-----------|--------|----------|-------|
+| `UNREACH_01AC7D` | `Battle_CharacterSystemJumpTable` | ✅ Renamed | 🟢 Table-Driven | 38 function pointers decoded |
+| `UNREACH_01B53F` | `BattleAI_SpecialCase` | ✅ Renamed | 🟡 Conditional | 6 bytes disassembled |
+| `UNREACH_01F407` | `Battle_AnimationModeTable` | ✅ Renamed | 🟢 Table-Driven | Data table, 8 values |
+
+### Dead Code (Keep UNREACH Prefix)
+
+| Old Label | Status | Notes |
+|-----------|--------|-------|
+| `UNREACH_01EF3B` | ❌ Keep | No references found |
+
+**Bank $01 Summary**: 3/4 sections reachable (75%), all processed
+
+---
+
 ## Cross-Bank References
 
 | Label | Bank | New Name | Notes |
@@ -84,23 +109,29 @@ This document tracks the renaming of all `UNREACH_*` labels to descriptive names
 
 ## Rename Strategy
 
-### Phase 1: Documentation Update (Current)
+### Phase 1: Documentation Update
 1. ✅ Create this mapping document
-2. ⏳ Complete analysis of all remaining UNREACH sections
-3. ⏳ Verify reachability of undetermined sections
-4. ⏳ Assign descriptive names to all reachable code
+2. ✅ Complete analysis of Bank $00 reachable sections
+3. ✅ Assign descriptive names to all reachable code
+4. ✅ Complete Bank $01 analysis
 
-### Phase 2: Systematic Renaming
-1. Rename labels in source files (bank_00_documented.asm, etc.)
-2. Update all references to renamed labels
+### Phase 2: Systematic Renaming (COMPLETE)
+1. ✅ Rename labels in source files (bank_00_documented.asm, bank_01_documented.asm)
+2. ✅ Update all references to renamed labels
 3. Update analysis comments to remove "Should be renamed" notes
 4. Update catalog documentation
 
 ### Phase 3: Verification
-1. Test ROM build after renames
-2. Verify byte-perfect assembly
-3. Update documentation with final names
-4. Commit changes
+1. ⏳ Test ROM build after renames
+2. ⏳ Verify byte-perfect assembly
+3. ⏳ Update catalog documentation
+4. ⏳ Commit changes
+
+**Overall Progress**: 
+- Bank $00: 12/12 reachable labels renamed (100%)
+- Bank $01: 3/3 reachable labels renamed (100%)
+- Total: 15 labels successfully renamed
+- Additional: 1 section disassembled from db bytes
 
 ---
 
