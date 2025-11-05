@@ -10,6 +10,14 @@ roms/
 # Extracted graphics (binary PNG assets, regenerated from ROM)
 data/extracted/graphics/tiles/*.png
 data/extracted/graphics/sprites/*.png
+data/extracted/graphics/sprites/
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
 
 # Backup and temporary files
 **/*.bak
