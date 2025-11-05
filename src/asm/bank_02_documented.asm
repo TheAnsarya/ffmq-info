@@ -4744,7 +4744,7 @@ Stack_ContextManager:
 	sep					 #$30		;02D224|E230    |      ; Set 8-bit mode for A,X,Y
 	lda.B				   $02	   ;02D226|A502    |000A02;
 	cmp.B				   #$50	  ;02D228|C950    |      ;
-	beq					 UNREACH_02D269 ;02D22A|F03D    |02D269;
+	beq					 Graphics_DataSetup ;02D22A|F03D    |02D269;
 	stz.B				   $ec	   ;02D22C|64EC    |000AEC; Clear entity counter
 	ldy.B				   #$00	  ;02D22E|A000    |      ; Initialize Y register
 
@@ -4790,24 +4790,95 @@ Stack_WaitLoop:
 	pla							   ;02D267|68      |      ; Restore accumulator
 	rtl							   ;02D268|6B      |      ; Return from long call
 
-; Unreachable Code Section
-; Advanced data processing and complex memory operations
-UNREACH_02D269:
-	db											 $20,$60,$ea,$a9,$20,$9f,$80,$c3,$7e,$a9,$00,$9f,$60,$c3,$7e,$a9 ;02D269
-	db											 $c5,$9f,$40,$c2,$7e,$a0,$00,$20,$60,$ea,$b9,$e2,$d2,$9f,$40,$c4 ;02D279
-	db											 $7e,$c8,$b9,$e2,$d2,$9f,$60,$c4,$7e,$c8,$a9,$00,$9f,$80,$c4,$7e ;02D289
-	db											 $9f,$60,$c3,$7e,$b9,$e2,$d2,$9f,$a0,$c4,$7e,$c8,$b9,$e2,$d2,$9f ;02D299
-	db											 $c0,$c4,$7e,$c8,$a9,$21,$9f,$80,$c3,$7e,$a9,$c5,$9f,$40,$c2,$7e ;02D2A9
-	db											 $c0,$20,$d0,$c3,$08,$c2,$30,$a2,$74,$db,$a0,$c0,$c1,$a9,$0f,$00 ;02D2B9
-	db											 $8b,$54,$7e,$07,$ab,$a2,$50,$88,$a0,$e0,$c1,$a9,$0f,$00,$8b,$54 ;02D2C9
-	db											 $7e,$05,$ab,$e6,$e5,$28,$82,$73,$ff,$03,$a0,$b0,$20,$03,$b0,$30 ;02D2D9
-	db											 $55,$02,$50,$a0,$50,$00,$80,$80,$20,$01,$20,$10,$30,$02,$40,$e0 ;02D2E9
-	db											 $40,$00,$20,$70,$60,$01,$40,$20,$70,$ae,$9e,$d0,$8e,$58,$11,$ae ;02D2F9
-	db											 $a0,$d0,$8e,$5a,$11,$ae,$a2,$d0,$8e,$5c,$11,$ae,$aa,$d0,$8e,$44 ;02D309
-	db											 $11,$ae,$ac,$d0,$8e,$46,$11,$ae,$ae,$d0,$8e,$48,$11,$ae,$b0,$d0 ;02D319
-	db											 $8e,$4a,$11,$60,$ae,$a4,$d0,$8e,$58,$11,$ae,$a6,$d0,$8e,$5a,$11 ;02D329
-	db											 $ae,$a8,$d0,$8e,$5c,$11,$ae,$b2,$d0,$8e,$44,$11,$ae,$b4,$d0,$8e ;02D339
-	db											 $46,$11,$ae,$b6,$d0,$8e,$48,$11,$ae,$b8,$d0,$8e,$4a,$11,$60 ;02D349
+;-------------------------------------------------------------------------------
+; Graphics Data Setup
+;-------------------------------------------------------------------------------
+; Purpose: Initialize graphics data and VRAM pointers
+; Reachability: Reachable via beq when frame counter condition met
+; Analysis: Sets up complex graphics data structures in VRAM
+; Technical: Originally labeled UNREACH_02D269
+;-------------------------------------------------------------------------------
+Graphics_DataSetup:
+    jsr.W CODE_02EA60                    ;02D269|2060EA  |02EA60
+    lda.B #$20                           ;02D26C|A920    |
+    sta.L $7EC380,X                      ;02D26E|9F80C37E|7EC380
+    lda.B #$00                           ;02D272|A900    |
+    sta.L $7EC360,X                      ;02D274|9F60C37E|7EC360
+    lda.B #$c5                           ;02D278|A9C5    |
+    sta.L $7EC240,X                      ;02D27A|9F40C27E|7EC240
+    ldy.W #$0000                         ;02D27E|A00000  |
+    jsr.W CODE_02EA60                    ;02D281|2060EA  |02EA60
+    lda.W Graphics_DataSetup.data,Y      ;02D284|B9E2D2  |02D2E2
+    sta.L $7EC440,X                      ;02D287|9F40C47E|7EC440
+    iny                                  ;02D28B|C8      |
+    lda.W Graphics_DataSetup.data,Y      ;02D28C|B9E2D2  |02D2E2
+    sta.L $7EC460,X                      ;02D28F|9F60C47E|7EC460
+    iny                                  ;02D293|C8      |
+    lda.B #$00                           ;02D294|A900    |
+    sta.L $7EC480,X                      ;02D296|9F80C47E|7EC480
+    sta.L $7EC360,X                      ;02D29A|9F60C37E|7EC360
+    lda.W Graphics_DataSetup.data,Y      ;02D29E|B9E2D2  |02D2E2
+    sta.L $7EC4A0,X                      ;02D2A1|9FA0C47E|7EC4A0
+    iny                                  ;02D2A5|C8      |
+    lda.W Graphics_DataSetup.data,Y      ;02D2A6|B9E2D2  |02D2E2
+    sta.L $7EC4C0,X                      ;02D2A9|9FC0C47E|7EC4C0
+    iny                                  ;02D2AD|C8      |
+    lda.B #$21                           ;02D2AE|A921    |
+    sta.L $7EC380,X                      ;02D2B0|9F80C37E|7EC380
+    lda.B #$c5                           ;02D2B4|A9C5    |
+    sta.L $7EC240,X                      ;02D2B6|9F40C27E|7EC240
+    cpy.W #$0020                         ;02D2BA|C02000  |
+    bne Graphics_DataSetup               ;02D2BD|D0C3    |02D269
+    php                                  ;02D2BF|08      |
+    rep #$30                             ;02D2C0|C230    |
+    ldx.W #$DB74                         ;02D2C2|A274DB  |
+    ldy.W #$C1C0                         ;02D2C5|A0C0C1  |
+    lda.W #$000F                         ;02D2C8|A90F00  |
+    mvn $7E,$07                          ;02D2CB|547E07  |
+    plp                                  ;02D2CE|AB      |
+    ldx.W #$8850                         ;02D2CF|A25088  |
+    ldy.W #$C1E0                         ;02D2D2|A0E0C1  |
+    lda.W #$000F                         ;02D2D5|A90F00  |
+    mvn $7E,$05                          ;02D2D8|547E05  |
+    inc.B $E5                            ;02D2DB|E6E5    |
+    plp                                  ;02D2DD|28      |
+    brl CODE_02D673                      ;02D2DE|8273FF  |02D673
+.data:
+    db $03,$a0,$b0,$20,$03,$b0,$30       ;02D2E2|        |
+    db $55,$02,$50,$a0,$50,$00,$80,$80,$20,$01,$20,$10,$30,$02,$40,$e0 ;02D2E9|        |
+    db $40,$00,$20,$70,$60,$01,$40,$20,$70                              ;02D2F9|        |
+Graphics_DataSetup.data2:
+    ldx.W $D09E                          ;02D302|AE9ED0  |
+    stx.W $1158                          ;02D305|8E5811  |
+    ldx.W $D0A0                          ;02D308|AEA0D0  |
+    stx.W $115A                          ;02D30B|8E5A11  |
+    ldx.W $D0A2                          ;02D30E|AEA2D0  |
+    stx.W $115C                          ;02D311|8E5C11  |
+    ldx.W $D0AA                          ;02D314|AEAAD0  |
+    stx.W $1144                          ;02D317|8E4411  |
+    ldx.W $D0AC                          ;02D31A|AEACD0  |
+    stx.W $1146                          ;02D31D|8E4611  |
+    ldx.W $D0AE                          ;02D320|AEAED0  |
+    stx.W $1148                          ;02D323|8E4811  |
+    ldx.W $D0B0                          ;02D326|AEB0D0  |
+    stx.W $114A                          ;02D329|8E4A11  |
+    rts                                  ;02D32C|60      |
+Graphics_DataSetup.data3:
+    ldx.W $D0A4                          ;02D32D|AEA4D0  |
+    stx.W $1158                          ;02D330|8E5811  |
+    ldx.W $D0A6                          ;02D333|AEA6D0  |
+    stx.W $115A                          ;02D336|8E5A11  |
+    ldx.W $D0A8                          ;02D339|AEA8D0  |
+    stx.W $115C                          ;02D33C|8E5C11  |
+    ldx.W $D0B2                          ;02D33F|AEB2D0  |
+    stx.W $1144                          ;02D342|8E4411  |
+    ldx.W $D0B4                          ;02D345|AEB4D0  |
+    stx.W $1146                          ;02D348|8E4611  |
+    ldx.W $D0B6                          ;02D34B|AEB6D0  |
+    stx.W $1148                          ;02D34E|8E4811  |
+    ldx.W $D0B8                          ;02D351|AEB8D0  |
+    stx.W $114A                          ;02D354|8E4A11  |
+    rts                                  ;02D357|60      |
 
 ; Memory Initialization Engine
 ; High-performance memory clearing and setup operations
@@ -5622,7 +5693,7 @@ Entity_GraphicsCoordinator:
 	phb							   ;02D837|8B      |      ; Save current bank
 	lda.L				   DATA8_098464,x ;02D838|BF648409|098464; Load special flag
 	cmp.B				   #$ff	  ;02D83C|C9FF    |      ; Check for special value
-	beq					 UNREACH_02D89B ;02D83E|F05B    |02D89B; Branch to special handling
+	beq					 Entity_ValueAdjuster ;02D83E|F05B    |02D89B; Branch to special handling
 
 ; Advanced Graphics Block Transfer System
 	pha							   ;02D840|48      |      ; Save graphics parameter
@@ -5686,10 +5757,27 @@ Entity_GraphicsCoordinator:
 	plx							   ;02D899|FA      |      ; Restore X register
 	rts							   ;02D89A|60      |      ; Return
 
-; Unreachable Special Case Handler
-UNREACH_02D89B:
-	db											 $e2,$30,$a6,$83,$b5,$07,$c9,$03,$d0,$01,$3a,$18,$69,$29,$48,$a9 ;02D89B
-	db											 $28,$48,$80,$97 ;02D8AB
+;-------------------------------------------------------------------------------
+; Entity Value Adjuster
+;-------------------------------------------------------------------------------
+; Purpose: Adjust entity value based on comparison and add offset
+; Reachability: Reachable via beq when entity comparison condition met
+; Analysis: Decrements value if type = 3, adds $29 offset, pushes parameters
+; Technical: Originally labeled UNREACH_02D89B
+;-------------------------------------------------------------------------------
+Entity_ValueAdjuster:
+    sep #$30                             ;02D89B|E230    |
+    ldx.B $83                            ;02D89D|A683    |000083
+    lda.B $07,X                          ;02D89F|B507    |000007
+    cmp.B #$03                           ;02D8A1|C903    |
+    bne +                                ;02D8A3|D001    |02D8A6
+    dec                                  ;02D8A5|3A      |
++   clc                                  ;02D8A6|18      |
+    adc.B #$29                           ;02D8A7|6929    |
+    pha                                  ;02D8A9|48      |
+    lda.B #$28                           ;02D8AA|A928    |
+    pha                                  ;02D8AC|48      |
+    bra Entity_ParameterProcessor        ;02D8AD|8097    |02D8AF
 
 ; Entity Parameter Processing Engine
 ; Advanced entity parameter lookup and processing
@@ -6177,13 +6265,20 @@ State_BlockTransfer:
 
 ; Advanced Sprite Rendering System
 	lda.B				   $9c	   ;02DBB4|A59C    |000A9C; Load rendering mode
-	beq					 UNREACH_02DBBD ;02DBB6|F005    |02DBBD; Branch if disabled
+	beq					 Sprite_RendererAlternate ;02DBB6|F005    |02DBBD; Branch if disabled
 	jsr.W				   CODE_02DCDD ;02DBB8|20DDDC  |02DCDD; Call sprite renderer
 	bra					 Object_ManagementEngine ;02DBBB|8003    |02DBC0; Continue processing
 
-; Unreachable Alternate Renderer Path
-UNREACH_02DBBD:
-	db											 $20,$30,$dd ;02DBBD; Alternate renderer call
+;-------------------------------------------------------------------------------
+; Sprite Renderer Alternate
+;-------------------------------------------------------------------------------
+; Purpose: Alternate sprite rendering path
+; Reachability: Reachable via beq when rendering disabled
+; Analysis: Calls alternate sprite renderer CODE_02DD30
+; Technical: Originally labeled UNREACH_02DBBD
+;-------------------------------------------------------------------------------
+Sprite_RendererAlternate:
+    jsr.W CODE_02DD30                    ;02DBBD|2030DD  |02DD30
 
 ; Advanced Object Management Engine
 Object_ManagementEngine:
@@ -6292,7 +6387,7 @@ Object_ManagementEngine:
 	lda.W				   $10a0	 ;02DC69|ADA010  |0210A0; Load special flags
 	and.B				   #$0f	  ;02DC6C|290F    |      ; Mask lower bits
 	tay							   ;02DC6E|A8      |      ; Transfer to index
-	lda.W				   UNREACH_02DCD4,y ;02DC6F|B9D4DC  |02DCD4; Load tile from table
+	lda.W				   Tile_MappingTable,y ;02DC6F|B9D4DC  |02DCD4; Load tile from table
 	pha							   ;02DC72|48      |      ; Save tile number
 
 ; Secondary Object Graphics Setup
@@ -6359,12 +6454,18 @@ Object_ManagementEngine:
 DATA8_02dcc4:
 	db											 $0c,$10,$02,$02,$12,$10,$02,$02,$0f,$10,$02,$02,$ff,$ff,$02,$02 ;02DCC4
 
-; Special Tile Mapping Table
-; Tile numbers for special object types
-UNREACH_02DCD4:
-	db											 $1c		 ;02DCD4; Base tile
-	db											 $34,$4c,$64,$7c,$34,$4c ;02DCD5; Special tiles 1-6
-	db											 $64,$7c	 ;02DCDB; Special tiles 7-8
+;-------------------------------------------------------------------------------
+; Tile Mapping Table
+;-------------------------------------------------------------------------------
+; Purpose: Special tile numbers for object type mapping
+; Reachability: Reachable via indexed load from sprite renderer
+; Analysis: Data table containing base and special tile mappings
+; Technical: Originally labeled UNREACH_02DCD4
+;-------------------------------------------------------------------------------
+Tile_MappingTable:
+	db $1c        ;02DCD4; Base tile
+	db $34,$4c,$64,$7c,$34,$4c ;02DCD5; Special tiles 1-6
+	db $64,$7c    ;02DCDB; Special tiles 7-8
 
 ; Advanced Sprite Rendering and Processing Engine
 ; Complex sprite system with multi-layer processing
@@ -6474,7 +6575,7 @@ Sprite_InitEngine:
 	phy							   ;02DF3F|5A      |      ; Save Y register
 	php							   ;02DF40|08      |      ; Save processor status
 	tax							   ;02DF41|AA      |      ; Transfer parameter to X
-	lda.W				   UNREACH_02DF5B,x ;02DF42|BD5BDF  |02DF5B; Load sprite parameter
+	lda.W				   Sprite_ParameterTable,x ;02DF42|BD5BDF  |02DF5B; Load sprite parameter
 	sta.W				   $0aee	 ;02DF45|8DEE0A  |020AEE; Store sprite configuration
 	pea.W				   DATA8_02df53 ;02DF48|F453DF  |02DF53; Push configuration table
 	jsl.L				   CODE_0097BE ;02DF4B|22BE9700|0097BE; Call sprite initializer
@@ -6488,19 +6589,26 @@ DATA8_02df53:
 	db											 $7f,$df,$80,$df,$81,$df ;02DF53; Sprite configuration entries
 	db											 $80,$df	 ;02DF59; Additional configuration
 
+;-------------------------------------------------------------------------------
 ; Sprite Parameter Table
-UNREACH_02DF5B:
-	db											 $03		 ;02DF5B; Base sprite parameter
-	db											 $00,$00,$01,$00,$00,$00,$00 ;02DF5C; Extended parameters 1-7
-	db											 $00,$00,$00,$00 ;02DF63; Extended parameters 8-11
-	db											 $00,$00	 ;02DF67; Extended parameters 12-13
-	db											 $00,$00	 ;02DF69; Extended parameters 14-15
-	db											 $00,$01	 ;02DF6B; Extended parameters 16-17
-	db											 $00		 ;02DF6D; Extended parameter 18
-	db											 $01,$00,$00,$00,$00 ;02DF6E; Extended parameters 19-23
-	db											 $00		 ;02DF73; Extended parameter 24
-	db											 $02		 ;02DF74; Extended parameter 25
-	db											 $00		 ;02DF75; Extended parameter 26
+;-------------------------------------------------------------------------------
+; Purpose: Base and extended sprite parameters for rendering
+; Reachability: Reachable via indexed load from sprite processing
+; Analysis: 26-byte parameter table for sprite configuration
+; Technical: Originally labeled UNREACH_02DF5B
+;-------------------------------------------------------------------------------
+Sprite_ParameterTable:
+	db $03        ;02DF5B; Base sprite parameter
+	db $00,$00,$01,$00,$00,$00,$00 ;02DF5C; Extended parameters 1-7
+	db $00,$00,$00,$00 ;02DF63; Extended parameters 8-11
+	db $00,$00    ;02DF67; Extended parameters 12-13
+	db $00,$00    ;02DF69; Extended parameters 14-15
+	db $00,$01    ;02DF6B; Extended parameters 16-17
+	db $00        ;02DF6D; Extended parameter 18
+	db $01,$00,$00,$00,$00 ;02DF6E; Extended parameters 19-23
+	db $00        ;02DF73; Extended parameter 24
+	db $02        ;02DF74; Extended parameter 25
+	db $00        ;02DF75; Extended parameter 26
 	db											 $00,$00,$00 ;02DF76; Extended parameters 27-29
 	db											 $00,$00	 ;02DF79; Extended parameters 30-31
 	db											 $00		 ;02DF7B; Extended parameter 32
@@ -7566,7 +7674,7 @@ CODE_02EA72:
 CODE_02EA7F:
 	jsr.W				   CODE_02EA9F ;02EA7F|209FEA  |02EA9F;  Validate entity configuration
 	cmp.B				   #$80	  ;02EA82|C980    |      ;  Check if validation critical
-	bpl					 UNREACH_02EA9C ;02EA84|1016    |02EA9C;  Branch if critical validation error
+	bpl					 Validation_CriticalError ;02EA84|1016    |02EA9C;  Branch if critical validation error
 	pha							   ;02EA86|48      |      ;  Preserve validation result
 
 ; Entity Validation Processing Loop
@@ -7586,8 +7694,17 @@ CODE_02EA87:
 	rts							   ;02EA9B|60      |      ;  Return with validation complete
 
 ; Critical Validation Error Handler
-UNREACH_02EA9C:
-	db											 $a9,$ff,$60 ;02EA9C|        |      ;  Return with critical error flag
+;-------------------------------------------------------------------------------
+; Validation Critical Error
+;-------------------------------------------------------------------------------
+; Purpose: Return error flag when validation reaches critical limit
+; Reachability: Reachable via bpl when validation index >= $80
+; Analysis: Sets error flag ($FF) and returns to validation loop
+; Technical: Originally labeled UNREACH_02EA9C
+;-------------------------------------------------------------------------------
+Validation_CriticalError:
+    lda.B #$ff                           ;02EA9C|A9FF    |
+    rts                                  ;02EA9E|60      |
 
 ; ------------------------------------------------------------------------------
 ; Sophisticated Entity Configuration Validation System
@@ -7611,7 +7728,7 @@ CODE_02EAA2:
 	pla							   ;02EAB1|68      |      ;  Restore validation index
 	inc					 a;02EAB2|1A      |      ;  Increment to next validation
 	cmp.B				   #$80	  ;02EAB3|C980    |      ;  Check if all validations complete
-	bpl					 UNREACH_02EAC6 ;02EAB5|100F    |02EAC6;  Branch if critical validation limit
+	bpl					 Validation_LimitExceeded ;02EAB5|100F    |02EAC6;  Branch if critical validation limit
 	dey							   ;02EAB7|88      |      ;  Decrement validation counter
 	bne					 CODE_02EAA2 ;02EAB8|D0E8    |02EAA2;  Continue validation loop
 	sec							   ;02EABA|38      |      ;  Set carry for successful validation
@@ -7627,9 +7744,17 @@ CODE_02EABF:
 	inc					 a;02EAC3|1A      |      ;  Increment validation index
 	bra					 CODE_02EAA2 ;02EAC4|80DC    |02EAA2;  Continue validation loop
 
-; Critical Validation Limit Handler
-UNREACH_02EAC6:
-	db											 $a9,$ff,$80,$f3 ;02EAC6|        |      ;  Return with critical error
+;-------------------------------------------------------------------------------
+; Validation Limit Exceeded
+;-------------------------------------------------------------------------------
+; Purpose: Handle validation limit error and branch back to caller
+; Reachability: Reachable via bpl when validation limit exceeded
+; Analysis: Sets error flag and branches to caller with error state
+; Technical: Originally labeled UNREACH_02EAC6
+;-------------------------------------------------------------------------------
+Validation_LimitExceeded:
+    lda.B #$ff                           ;02EAC6|A9FF    |
+    bra CODE_02EABB                      ;02EAC8|80F3    |02EABB
 
 ; ------------------------------------------------------------------------------
 ; Advanced Entity Bit Processing and Validation Engine
