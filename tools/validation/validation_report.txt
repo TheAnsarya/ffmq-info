@@ -1,0 +1,85 @@
+================================================================================
+FFMQ DATA VALIDATION REPORT
+Cross-validation against FFMQ Randomizer
+================================================================================
+
+SUMMARY: 8/11 tests passed (72.7%)
+
+📊 SPELLS: 0/3 passed
+--------------------------------------------------
+❌ FAIL Spell Count
+     Expected: 12
+     Actual:   16
+     Details:  Expected 12 spells (0x00-0x0B), found 16
+
+❌ FAIL Spell ID Range
+     Expected: IDs 0-11 (0x00-0x0B)
+     Actual:   Missing: set(), Extra: {12, 13, 14, 15}
+     Details:  All spell IDs should be in range 0x00-0x0B
+
+❌ FAIL Spell Names
+     Expected: Names match randomizer
+     Actual:   12 mismatches
+     Details:  Name mismatches: ID 0: expected 'Exit', got 'Fire'; ID 1: expected 'Cure', got 'Blizzard'; ID 2: expected 'Heal', got 'Thunder'; ID 3: expected 'Life', got 'Aero'; ID 4: expected 'Quake', got 'Cure'; ID 5: expected 'Blizzard', got 'Life'; ID 6: expected 'Fire', got 'Heal'; ID 7: expected 'Aero', got 'Esuna'; ID 8: expected 'Thunder', got 'Quake'; ID 9: expected 'White', got 'Flare'; ID 10: expected 'Meteor', got 'White'; ID 11: expected 'Flare', got 'Meteor'
+
+📊 ENEMIES: 3/3 passed
+--------------------------------------------------
+✅ PASS Enemy Metadata Count
+     Expected: 83
+     Actual:   83
+     Details:  Metadata reports 83 enemies, randomizer expects 83
+
+✅ PASS Enemy Actual Count
+     Expected: 83
+     Actual:   83
+     Details:  Found 83 enemy entries, randomizer expects 83
+
+✅ PASS Enemy Structure Fields
+     Expected: All enemy stat fields present
+     Actual:   Missing: []
+     Details:  Enemy structure validation: 0 missing concepts
+
+📊 ATTACKS: 2/2 passed
+--------------------------------------------------
+✅ PASS Attack Metadata Count
+     Expected: 169
+     Actual:   169
+     Details:  Metadata reports 169 attacks, randomizer expects 169
+
+✅ PASS Attack Actual Count
+     Expected: 169
+     Actual:   169
+     Details:  Found 169 attack entries, randomizer expects 169
+
+📊 ELEMENTS: 1/1 passed
+--------------------------------------------------
+✅ PASS Bitfield Analysis
+     Expected: Element bitfields found and parsed
+     Actual:   Found 4 bitfields
+     Details:  Element bitfield validation: 4 bitfields analyzed
+
+📊 POWER: 2/2 passed
+--------------------------------------------------
+✅ PASS Spell Power Range
+     Expected: Powers in reasonable range (1-100)
+     Actual:   Min: 9, Max: 96
+     Details:  Spell power range validation: 9-96
+
+✅ PASS Attack Power Range
+     Expected: Powers in reasonable range (0-255)
+     Actual:   Min: 0, Max: 250
+     Details:  Attack power range validation: 0-250
+
+🔧 RECOMMENDATIONS:
+--------------------------------------------------
+• Verify extraction completeness: Spell Count
+• Extract missing data: Spell ID Range
+• Update name mapping: Spell Names
+
+📚 REFERENCE:
+--------------------------------------------------
+• FFMQ Randomizer: https://github.com/wildham0/FFMQRando
+• Spell IDs: EnumsFlags.cs SpellFlags enum (0x00-0x0B)
+• Enemy data: Enemies.cs Enemy class (83 enemies)
+• Attack data: BattleSimulator.cs (169 attacks)
+• Element types: Enemies.cs ElementsType enum

@@ -1,0 +1,28 @@
+{
+  "status": "success",
+  "message": "ROMs are identical - build system produces perfect output",
+  "assessment": "excellent",
+  "original_rom": {
+    "path": "C:\\Users\\me\\source\\repos\\ffmq-info\\roms\\Final Fantasy - Mystic Quest (U) (V1.1).sfc",
+    "size": 524288,
+    "md5": "F7FAEAE5A847C098D677070920769CA2",
+    "sha1": "6BE74B73B736BC6027C0E92619874DA7C498BED0",
+    "sha256": "F71817F55FEBD32FD1DCE617A326A77B6B062DD0D4058ECD289F64AF1B7A1D05"
+  },
+  "rebuilt_rom": {
+    "path": "C:\\Users\\me\\source\\repos\\ffmq-info\\roms\\ffmq_rebuilt.sfc",
+    "size": 524288,
+    "md5": "F7FAEAE5A847C098D677070920769CA2",
+    "sha1": "6BE74B73B736BC6027C0E92619874DA7C498BED0",
+    "sha256": "F71817F55FEBD32FD1DCE617A326A77B6B062DD0D4058ECD289F64AF1B7A1D05"
+  },
+  "comparison": {
+    "identical": true,
+    "size_match": true,
+    "checksum_match": true,
+    "total_differences": 0,
+    "different_regions_count": 0,
+    "different_regions": []
+  },
+  "build_system_ok": true
+}

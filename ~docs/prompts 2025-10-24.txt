@@ -537,9 +537,27 @@ create a GH (github) issue for dissembling and documenting all the "unreachable"
 work that new issue, issue #67
 No, you didn't disassemble all the code after `UNREACH_*` labels, you left them with `db` commands instead of the disassembled code with comments and documentation. Disassemble those sections!
 I see comments like: `Should be renamed to Graphics_CommandDispatch_IndexPath`, rename all the `UNREACH_*` labels and update code/comments/documentation/visualizations and have normal comments for that code but do mention unreachability etc ;;; then continue doing more work on issue #67 and then other issues
+1 and then 2 and then 4
+continue
+continue
+1. Start Bank $02, 3. ROM Build Test, 2. Complete Bank $01
+yes, all three, then continue with more banks and work
+yes
+#directives: between an instruction and its parameters should only be a single space. instructions should only be one tab indented per indention level. Don't use spaces to indent anything (use tabs). For every routine, include comments like the ones on the "UNREACH" code blocks (with Purpose/Reachability/Analysis/Technical or whatever sections seem appropriate (remove stupid documentation)) as well as including what routines or interupts calls the routine. all hexadecimal should be in lowercase. all asm instructions should be lowercase. #instructions: make an issue and todo list to handle these directives and clean up, format, and document all of the `asm` in disassembly source code and use a new branch to implement the issue (new branchs for issue work should be standard, just merge them back into `master` as the work is done.
+update the session/chat logs! commit your changes! add the issue! you didn't add the issue to GH! And then implement the issue, format all of the asm files
+continue fixing issue #68, do as much as you can
+hey, why is the selected line `	lda.w $04e0	 ; Load parameter	and.b #$10	  ; Check bit 4	beq Menu_PartySelection_DefaultOption ; Branch if clear` looking like it used to be several lines? I think you turned several lines of code into one line of comment! tthis is a disaster, fix it!
+Well, try the whole thing again
+Try to debug the scripts (could take significant time)?
+you've stalled? try again but don't freeze
+did the script changes all make it into the commit? Is the bug fixed? continue working
+analyze the project and identify work that needs to be done, create todo lists and github issues for this work, and then begin working through those issues
 
 
 
+
+
+I don't know how many times I have to say it: TABS NOT SPACES ALWAYS AND FOREVER IN EVERY FILE. Your python files are the worst offenders that need to be converted to use tabs not spaces, but there are others. Make sure you format every file and always use tabs/crlf/utf-8
 
 
 
