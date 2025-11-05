@@ -2985,7 +2985,7 @@ System_Flag40_Validate:
 	bne					 System_Flag40_Process ; Branch to flag processing if valid
 	lda.B				   $8d	   ; Load system index
 	cmp.B				   #$02	  ; Check for minimum system index
-	bcs					 UNREACH_029DC8 ; Branch to unreachable processing if sufficient
+	bcs					 System_ComplexProcessing ;029DC6|B000    |029DC8
 	lda.B				   $dc	   ; Load system control flags
 	phd							   ; Push direct page register
 	jsr.W				   CODE_028F2F ; Switch to system processing context
@@ -2995,11 +2995,33 @@ System_Flag40_Validate:
 	stx.B				   $77	   ; Store cleared result
 	rts							   ; Return from flag processing
 
-;Unreachable complex system processing
-UNREACH_029DC8:
-	db											 $0b,$20,$2f,$8f,$a9,$80,$85,$21,$2b,$a9,$00,$eb,$a5,$8d,$3a,$3a
-	db											 $aa,$a9,$ff,$9d,$02,$0a,$a9,$00,$8d,$05,$05,$a2,$00,$00,$86,$77
-	db											 $60
+;-------------------------------------------------------------------------------
+; System Complex Processing
+;-------------------------------------------------------------------------------
+; Purpose: Complex system processing for high index values
+; Reachability: Reachable via bcs when $8d >= $02
+; Analysis: System context switching with flag manipulation
+; Technical: Originally labeled UNREACH_029DC8
+;-------------------------------------------------------------------------------
+System_ComplexProcessing:
+	pha                                  ;029DC8|0B      |
+	jsr.W CODE_028F2F                    ;029DC9|202F8F  |028F2F
+	lda.B #$80                           ;029DCC|A980    |
+	sta.B $21                            ;029DCE|8521    |000021
+	plp                                  ;029DD0|2B      |
+	lda.B #$00                           ;029DD1|A900    |
+	xba                                  ;029DD3|EB      |
+	lda.B $8d                            ;029DD4|A58D    |00008D
+	dec                                  ;029DD6|3A      |
+	dec                                  ;029DD7|3A      |
+	tax                                  ;029DD8|AA      |
+	lda.B #$ff                           ;029DD9|A9FF    |
+	sta.W $0a02,X                        ;029DDB|9D020A  |000A02
+	lda.B #$00                           ;029DDE|A900    |
+	sta.W $0505                          ;029DE0|8D0505  |000505
+	ldx.W #$0000                         ;029DE3|A20000  |
+	stx.B $77                            ;029DE6|8677    |000077
+	rts                                  ;029DE8|60      |
 
 ;System flag $40 handler with complex processing
 System_Flag40_Process:
@@ -3132,7 +3154,7 @@ Controller_MenuMode:
 	rep					 #$10		;02A2BE|C210    |      ; 16-bit index
 	lda.B				   $d0	   ;02A2C0|A5D0    |0004D0; Check idle counter
 	dec					 a;02A2C2|3A      |      ; Decrement idle time
-	beq					 UNREACH_02A32E ;02A2C3|F069    |02A32E; Branch to idle handler
+	beq					 Idle_StateHandler ;02A2C3|F069    |02A32E
 	rts							   ;02A2C5|60      |      ; Return if no input
 ;      |        |      ;
 ;      |        |      ;
@@ -3214,14 +3236,45 @@ Controller_ProcessSecondary:
 ;      |        |      ;
 ;      |        |      ;
 
-; Idle State Handler (Unreachable Code Section)
-; Complex idle processing for power management
-UNREACH_02A32E:
-	db											 $e2,$20,$c2,$10,$a9,$65,$8d,$a8,$00,$22,$83,$97,$00,$ad,$a0,$10 ;02A32E|        |      ;
-	db											 $29,$0f,$3a,$aa,$bd,$6b,$a3,$cd,$a9,$00,$90,$01,$60,$ad,$2f,$10 ;02A33E|        |      ;
-	db											 $29,$02,$f0,$0b,$a9,$11,$8d,$d0,$10,$a9,$30,$0c,$20,$10,$60,$ad ;02A34E|        |      ;
-	db											 $2f,$10,$29,$02,$d0,$01,$60,$a9,$01,$8d,$d0,$10,$60,$5a,$50,$46 ;02A35E|        |022910;
-	db											 $3c,$5a,$50,$46,$3c ;02A36E|        |00505A;
+;-------------------------------------------------------------------------------
+; Idle State Handler
+;-------------------------------------------------------------------------------
+; Purpose: Complex idle state processing with power management
+; Reachability: Reachable via beq when idle counter decrements to zero
+; Analysis: Sound processing, idle state validation, display mode control
+; Technical: Originally labeled UNREACH_02A32E (75 bytes)
+;-------------------------------------------------------------------------------
+Idle_StateHandler:
+	sep #$20                             ;02A32E|E220    |
+	rep #$10                             ;02A330|C210    |
+	lda.B #$65                           ;02A332|A965    |
+	sta.W $00a8                          ;02A334|8DA800  |0000A8
+	jsl.L CODE_009783                    ;02A337|22839700|009783
+	lda.W $10a0                          ;02A33B|ADA010  |0110A0
+	and.B #$0f                           ;02A33E|290F    |
+	dec                                  ;02A340|3A      |
+	tax                                  ;02A341|AA      |
+	lda.W Idle_StateHandler.data,X       ;02A342|BD6BA3  |02A36B
+	cmp.W $00a9                          ;02A345|CDA900  |0000A9
+	bcc +                                ;02A348|9001    |02A34B
+	rts                                  ;02A34A|60      |
++	lda.W $102f                          ;02A34B|AD2F10  |01102F
+	and.B #$02                           ;02A34E|2902    |
+	beq +                                ;02A350|F00B    |02A35D
+	lda.B #$11                           ;02A352|A911    |
+	sta.W $10d0                          ;02A354|8DD010  |0110D0
+	lda.B #$30                           ;02A357|A930    |
+	tsb.W $1020                          ;02A359|0C2010  |011020
+	rts                                  ;02A35C|60      |
++	lda.W $102f                          ;02A35D|AD2F10  |01102F
+	and.B #$02                           ;02A360|2902    |
+	bne +                                ;02A362|D001    |02A365
+	rts                                  ;02A364|60      |
++	lda.B #$01                           ;02A365|A901    |
+	sta.W $10d0                          ;02A367|8DD010  |0110D0
+	rts                                  ;02A36A|60      |
+.data:
+	db $5a,$50,$46,$3c,$5a,$50,$46,$3c  ;02A36B|        |
 ;      |        |      ;
 
 ;----------------------------------------------------------------------------
@@ -3899,14 +3952,21 @@ System_ErrorRecovery:
 	rep					 #$10		;02A924|C210    |      ; 16-bit index
 	xba							   ;02A926|EB      |      ; Swap bytes for testing
 	and.B				   #$04	  ;02A927|2904    |      ; Test error bit
-	bne					 UNREACH_02A92C ;02A929|D001    |02A92C; Branch to error handler
+	bne					 Controller_ErrorHandler ;02A929|D001    |02A92C
 	rts							   ;02A92B|60      |      ; Return success
 ;      |        |      ;
 ;      |        |      ;
 
-; Unreachable Error Handler
-UNREACH_02A92C:
-	db											 $4c,$81,$a8 ;02A92C|        |02A881; JMP CODE_02A881
+;-------------------------------------------------------------------------------
+; Controller Error Handler
+;-------------------------------------------------------------------------------
+; Purpose: Handle controller error condition
+; Reachability: Reachable via bne when error bit set (2 references)
+; Analysis: Jumps to error recovery routine
+; Technical: Originally labeled UNREACH_02A92C
+;-------------------------------------------------------------------------------
+Controller_ErrorHandler:
+	jmp.W CODE_02A881                    ;02A92C|4C81A8  |02A881
 ;      |        |      ;
 
 ; Advanced Controller Error Recovery Loop
@@ -3928,7 +3988,7 @@ Controller_PollLoop:
 	bne					 Controller_RetryCheck ;02A940|D005    |02A947; Continue if button pressed
 	xba							   ;02A942|EB      |      ; Swap back to config
 	and.B				   #$04	  ;02A943|2904    |      ; Test config error bit
-	bne					 UNREACH_02A92C ;02A945|D0E5    |02A92C; Jump to error handler
+	bne					 Controller_ErrorHandler ;02A945|D0E5    |02A92C
 ;      |        |      ;
 
 ; Retry Counter Management
