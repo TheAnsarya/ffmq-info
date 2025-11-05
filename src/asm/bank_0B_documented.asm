@@ -479,7 +479,7 @@ BattleSprite_SearchNext:	; Continue search
 ;
 ; Uses two lookup tables:
 ;   DATA8_0B8140: Battle type → graphics address low byte
-;   UNREACH_0B8144: Battle phase → graphics address high byte
+;   Battle_GfxAddressHigh: Battle phase → graphics address high byte
 ;
 ; Combines both lookups to create complete 24-bit pointer:
 ;   Bank $07 always (stored in $0505)
@@ -494,7 +494,7 @@ BattleGfx_LoadByTypeAndPhase:
 	sta.W				   $0507	 ; Store to pointer low byte
 	lda.W				   $193f	 ; Load battle phase index
 	tax							   ; Transfer to X for second lookup
-	lda.L				   UNREACH_0B8144,x ; Load graphics address high byte from table
+	lda.L				   Battle_GfxAddressHigh,x ; Load graphics address high byte from table
 	sta.W				   $0506	 ; Store to pointer high byte
 	lda.B				   #$07	  ; Bank $07 (graphics/sound bank)
 	sta.W				   $0505	 ; Store to pointer bank byte
@@ -506,7 +506,15 @@ DATA8_0b8140:
 	db											 $88		 ; Type 2: $XX88
 	db											 $85		 ; Type 3: $XX85
 
-UNREACH_0B8144:
+;-------------------------------------------------------------------------------
+; Graphics Address High Byte Table
+;-------------------------------------------------------------------------------
+; Purpose: Battle phase graphics address high bytes
+; Reachability: Reachable via indexed load from battle graphics loader
+; Analysis: 5-byte table mapping phase (0-4) to graphics bank
+; Technical: Originally labeled UNREACH_0B8144
+;-------------------------------------------------------------------------------
+Battle_GfxAddressHigh:
 	db											 $0f		 ; Phase 0: $0fXX
 	db											 $2f,$4f,$6f,$8f ; Phases 1-4: $2fXX, $4fXX, $6fXX, $8fXX
 
@@ -1243,7 +1251,7 @@ DATA8_0b84e2:
 ;
 ; Process:
 ;   1. Extract bits 4-7 from $1918 (enemy graphics mode)
-;   2. Lookup tile stride from UNREACH_0B8540 table
+;   2. Lookup tile stride from Battle_TileStride table
 ;   3. Calculate tile data pointer from enemy ID ($1910 bits 0-5)
 ;   4. Multiply by 3, lookup in DATA8_0B8735 table
 ;   5. Setup DMA parameters for graphics transfer
@@ -1256,7 +1264,7 @@ BattleEnemy_SetupTileData:
 	lsr					 a; Now value is 0-15 (index × 2)
 	lsr					 a
 	tax							   ; Transfer to X for lookup
-	lda.L				   UNREACH_0B8540,x ; Load tile stride (16-bit value)
+	lda.L				   Battle_TileStride,x ; Load tile stride (16-bit value)
 	sta.W				   $1924	 ; Store to tile stride variable
 
 	sep					 #$20		; Set A to 8-bit
@@ -1282,8 +1290,15 @@ BattleEnemy_SetupTileData:
 	jsl.L				   BattleGfx_DecompressLoad ; Call graphics loading routine
 	rtl							   ; Return
 
-; Tile stride lookup table (16 entries × 2 bytes)
-UNREACH_0B8540:
+;-------------------------------------------------------------------------------
+; Tile Stride Lookup Table
+;-------------------------------------------------------------------------------
+; Purpose: Tile stride values for different rendering modes
+; Reachability: Reachable via indexed load from tile rendering system
+; Analysis: 32-byte table (16 modes × 2 bytes per entry)
+; Technical: Originally labeled UNREACH_0B8540
+;-------------------------------------------------------------------------------
+Battle_TileStride:
 	db											 $10,$10,$20,$10,$30,$10,$40,$10 ; Modes 0-3
 	db											 $10,$20,$20,$20,$30,$20,$40,$20 ; Modes 4-7
 	db											 $10,$30,$20,$30,$30,$30,$40,$30 ; Modes 8-11
@@ -1392,7 +1407,7 @@ BattleLayer_TypeHandlerReturn:
 ; - DATA8_0B844F-8452: Background graphics config (18 types × 4 bytes)
 ; - DATA8_0B8497: Layer scroll/animation (18 configs × 4 bytes)
 ; - DATA8_0B84DF-E2: Layer blending/priority configs
-; - UNREACH_0B8540: Tile stride lookup (16 modes × 2 bytes)
+; - Battle_TileStride: Tile stride lookup (16 modes × 2 bytes)
 ; - DATA8_0B856C: Background handler jump table (8 entries)
 ;
 ; Hardware Registers Used:
@@ -3144,7 +3159,7 @@ CODE_0B9304:
 ; Output: WRAM $7ec180 populated with 16 bytes battlefield graphics
 ;         from Bank $07 offset table
 ;
-; Battlefield Types (from UNREACH_0B9385 table):
+; Battlefield Types (from Battlefield_GfxPointers table):
 ;   0: $07d824  1: $07d874  2: $07d864  3: $07d854
 ;   4: $07d844  5: $07d874  6: $07d864  7: $07d854
 ;   8: $07d844  9: (unreachable beyond this)
@@ -3164,7 +3179,7 @@ CODE_0B935F:
 	and.W				   #$000f	;0B936B Isolate low 4 bits (battlefield ID)
 	asl					 a;0B936E × 2 (word table)
 	tay							   ;0B936F Y = table offset
-	lda.W				   UNREACH_0B9385,y ;0B9370 Get Bank $07 source address
+	lda.W				   Battlefield_GfxPointers,y ;0B9370 Get Bank $07 source address
 	tax							   ;0B9373 X = source pointer
 
 ; Setup destination and transfer
@@ -3189,7 +3204,7 @@ CODE_0B935F:
 ; Note: Some entries repeat ($d874, $d864, $d854, $d844) suggesting
 ; multiple battle types share same background graphics.
 ; ==============================================================================
-UNREACH_0B9385:
+Battlefield_GfxPointers:
 	db											 $24,$d8	 ;0B9385 Type 0: $07d824
 	db											 $74,$d8,$64,$d8,$54,$d8,$44,$d8,$74,$d8,$64,$d8 ;0B9387 Types 1-6
 	db											 $54,$d8,$44,$d8,$8b,$0b,$08,$4b,$ab,$f4,$00,$0b,$2b,$e2,$20,$c2 ;0B9393 Types 7-8 + code start
