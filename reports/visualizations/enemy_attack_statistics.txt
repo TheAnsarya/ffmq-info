@@ -1,0 +1,78 @@
+FFMQ Enemy-Attack Network Statistics
+==================================================
+
+Total Enemies: 83
+Total Attacks: 169
+
+Enemies by Attack Count:
+--------------------------------------------------
+6 attacks: 1 enemies
+  - Enemy_57
+
+5 attacks: 10 enemies
+  - Enemy_5
+  - Enemy_14
+  - Enemy_45
+  - Enemy_56
+  - Enemy_59
+  ... and 5 more
+
+4 attacks: 20 enemies
+  - Enemy_4
+  - Enemy_8
+  - Enemy_17
+  - Enemy_20
+  - Enemy_23
+  ... and 15 more
+
+3 attacks: 26 enemies
+  - Enemy_1
+  - Enemy_2
+  - Enemy_11
+  - Enemy_13
+  - Enemy_16
+  ... and 21 more
+
+2 attacks: 18 enemies
+  - Enemy_0
+  - Enemy_3
+  - Enemy_6
+  - Enemy_7
+  - Enemy_10
+  ... and 13 more
+
+1 attacks: 6 enemies
+  - Enemy_9
+  - Enemy_38
+  - Enemy_42
+  - Enemy_64
+  - Enemy_66
+  ... and 1 more
+
+0 attacks: 2 enemies
+  - Enemy_81
+  - Enemy_82
+
+
+Most Used Attacks (Top 20):
+--------------------------------------------------
+1. Attack 128 - Used by 7 enemies (Power: 60)
+2. Attack 78 - Used by 6 enemies (Power: 250)
+3. Attack 141 - Used by 6 enemies (Power: 100)
+4. Attack 160 - Used by 6 enemies (Power: 0)
+5. Attack 67 - Used by 5 enemies (Power: 140)
+6. Attack 96 - Used by 5 enemies (Power: 75)
+7. Attack 97 - Used by 5 enemies (Power: 75)
+8. Attack 118 - Used by 5 enemies (Power: 10)
+9. Attack 164 - Used by 5 enemies (Power: 235)
+10. Attack 76 - Used by 4 enemies (Power: 70)
+11. Attack 80 - Used by 4 enemies (Power: 100)
+12. Attack 83 - Used by 4 enemies (Power: 200)
+13. Attack 85 - Used by 4 enemies (Power: 70)
+14. Attack 112 - Used by 4 enemies (Power: 0)
+15. Attack 145 - Used by 4 enemies (Power: 120)
+16. Attack 147 - Used by 4 enemies (Power: 80)
+17. Attack 148 - Used by 4 enemies (Power: 70)
+18. Attack 159 - Used by 4 enemies (Power: 0)
+19. Attack 162 - Used by 4 enemies (Power: 135)
+20. Attack 165 - Used by 4 enemies (Power: 180)

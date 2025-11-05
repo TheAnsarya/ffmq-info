@@ -1,0 +1,58 @@
+FFMQ Element Type Statistics
+============================================================
+
+Total Enemies: 83
+
+Element Resistance Distribution:
+------------------------------------------------------------
+Fire        :  29 enemies ( 34.9%) █████████████████
+Axe         :  25 enemies ( 30.1%) ███████████████
+Earth       :  25 enemies ( 30.1%) ███████████████
+Air         :  22 enemies ( 26.5%) █████████████
+Water       :  22 enemies ( 26.5%) █████████████
+Doom        :  21 enemies ( 25.3%) ████████████
+Zombie      :  19 enemies ( 22.9%) ███████████
+Paralysis   :  17 enemies ( 20.5%) ██████████
+Stone       :   8 enemies (  9.6%) ████
+Projectile  :   8 enemies (  9.6%) ████
+Bomb        :   8 enemies (  9.6%) ████
+Sleep       :   3 enemies (  3.6%) █
+Silence     :   0 enemies (  0.0%) 
+Blind       :   0 enemies (  0.0%) 
+Poison      :   0 enemies (  0.0%) 
+Confusion   :   0 enemies (  0.0%) 
+
+Element Weakness Distribution:
+------------------------------------------------------------
+Sleep       :  26 enemies ( 31.3%) ███████████████
+Stone       :  22 enemies ( 26.5%) █████████████
+Silence     :  14 enemies ( 16.9%) ████████
+Paralysis   :  12 enemies ( 14.5%) ███████
+Poison      :  10 enemies ( 12.0%) ██████
+Confusion   :  10 enemies ( 12.0%) ██████
+Doom        :   6 enemies (  7.2%) ███
+Blind       :   5 enemies (  6.0%) ███
+Bomb        :   5 enemies (  6.0%) ███
+Zombie      :   3 enemies (  3.6%) █
+Water       :   3 enemies (  3.6%) █
+Earth       :   3 enemies (  3.6%) █
+Projectile  :   2 enemies (  2.4%) █
+Axe         :   2 enemies (  2.4%) █
+Air         :   2 enemies (  2.4%) █
+Fire        :   2 enemies (  2.4%) █
+
+Most Common Resistances:
+------------------------------------------------------------
+1. Fire: 29 enemies
+2. Axe: 25 enemies
+3. Earth: 25 enemies
+4. Air: 22 enemies
+5. Water: 22 enemies
+
+Most Common Weaknesses:
+------------------------------------------------------------
+1. Sleep: 26 enemies
+2. Stone: 22 enemies
+3. Silence: 14 enemies
+4. Paralysis: 12 enemies
+5. Poison: 10 enemies

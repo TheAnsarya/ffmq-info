@@ -1,0 +1,38 @@
+FFMQ Enemy Element Resistances/Weaknesses Heatmap
+====================================================================================================
+
+Legend: R=Resistant, W=Weak, .=Normal
+
+  ID | Enemy Name          | Sil Bld Psn Cnf Slp Par Stn Doo Prj Bom Axe Zmb Air Fir Wat Ear
+----------------------------------------------------------------------------------------------------
+   0 | Enemy_0              |  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  . 
+   1 | Enemy_1              |  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  . 
+   2 | Enemy_2              |  .  .  .  .  .  .  W  .  .  .  .  .  .  .  .  . 
+   3 | Enemy_3              |  .  .  W  .  .  .  .  .  .  .  .  .  .  .  .  . 
+   4 | Enemy_4              |  .  .  W  .  .  W  .  .  .  .  R  .  .  R  .  . 
+   5 | Enemy_5              |  .  .  W  .  .  W  .  .  .  .  R  .  .  R  .  . 
+   6 | Enemy_6              |  .  W  .  .  .  .  .  .  .  .  .  .  .  .  .  . 
+   7 | Enemy_7              |  .  W  .  .  .  .  .  .  .  .  .  .  .  .  .  . 
+   8 | Enemy_8              |  .  W  .  .  .  .  .  .  .  .  R  .  R  R  .  R 
+   9 | Enemy_9              |  .  .  .  .  .  .  .  .  .  .  R  .  .  .  .  . 
+  10 | Enemy_10             |  .  .  .  .  .  .  .  .  .  .  .  .  .  R  .  . 
+  11 | Enemy_11             |  .  .  .  .  .  .  W  .  .  .  .  .  .  R  R  . 
+  12 | Enemy_12             |  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  . 
+  13 | Enemy_13             |  .  .  .  .  .  R  W  .  .  .  R  .  .  .  .  . 
+  14 | Enemy_14             |  .  .  .  .  .  R  W  .  .  .  R  .  .  .  .  . 
+  15 | Enemy_15             |  .  .  W  .  .  .  .  W  .  .  .  .  .  .  .  . 
+  16 | Enemy_16             |  .  .  W  .  .  .  .  W  .  .  .  .  .  .  .  . 
+  17 | Enemy_17             |  .  .  W  .  W  R  .  W  .  W  .  .  .  .  .  . 
+  18 | Enemy_18             |  .  .  .  W  .  .  .  W  .  .  .  .  .  .  .  R 
+  19 | Enemy_19             |  .  .  .  W  .  .  W  .  .  .  .  .  .  .  .  R 
+  20 | Enemy_20             |  W  .  .  W  W  .  .  .  .  .  .  .  .  .  .  R 
+  21 | Enemy_21             |  W  .  .  .  .  .  .  R  .  .  .  .  .  .  .  . 
+  22 | Enemy_22             |  W  .  .  .  .  .  .  R  .  .  .  .  .  .  .  . 
+  23 | Enemy_23             |  W  .  .  .  W  .  .  R  .  .  .  .  .  .  .  . 
+  24 | Enemy_24             |  .  .  .  W  W  .  W  .  .  .  R  .  R  R  .  R 
+  25 | Enemy_25             |  .  .  .  W  W  .  W  .  .  .  R  .  R  R  .  R 
+  26 | Enemy_26             |  .  .  .  .  .  W  .  .  .  .  .  R  .  R  .  . 
+  27 | Enemy_27             |  .  .  .  .  .  W  R  .  .  .  .  R  .  R  .  . 
+  28 | Enemy_28             |  .  .  .  .  W  .  W  .  .  R  .  .  R  .  .  . 
+  29 | Enemy_29             |  .  .  .  .  W  .  W  .  .  R  .  .  R  .  .  . 
+... and 53 more enemies

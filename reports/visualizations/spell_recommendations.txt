@@ -1,0 +1,190 @@
+FFMQ Spell Effectiveness Recommendations
+================================================================================
+
+Shows which spells are most effective against each enemy
+
+
+Enemy_0 (ID: 0, HP: 50)
+------------------------------------------------------------
+  ✓  Normal: Exit, Cure, Heal, Life, Quake, Blizzard, Fire, Aero, Thunder, White, Meteor, Flare
+
+Enemy_1 (ID: 1, HP: 160)
+------------------------------------------------------------
+  ✓  Normal: Exit, Cure, Heal, Life, Quake, Blizzard, Fire, Aero, Thunder, White, Meteor, Flare
+
+Enemy_2 (ID: 2, HP: 480)
+------------------------------------------------------------
+  ✓  Normal: Exit, Cure, Heal, Life, Quake, Blizzard, Fire, Aero, Thunder, White, Meteor, Flare
+  Weak to: Stone
+
+Enemy_3 (ID: 3, HP: 60)
+------------------------------------------------------------
+  ✓  Normal: Exit, Cure, Heal, Life, Quake, Blizzard, Fire, Aero, Thunder, White, Meteor, Flare
+  Weak to: Poison
+
+Enemy_4 (ID: 4, HP: 460)
+------------------------------------------------------------
+  ✓  Normal: Exit, Cure, Heal, Life, Quake, Blizzard, Aero, Thunder, White, Meteor
+  ✗  Not effective: Fire, Flare
+  Resists: Axe, Fire
+  Weak to: Poison, Paralysis
+
+Enemy_5 (ID: 5, HP: 710)
+------------------------------------------------------------
+  ✓  Normal: Exit, Cure, Heal, Life, Quake, Blizzard, Aero, Thunder, White, Meteor
+  ✗  Not effective: Fire, Flare
+  Resists: Axe, Fire
+  Weak to: Poison, Paralysis
+
+Enemy_6 (ID: 6, HP: 55)
+------------------------------------------------------------
+  ✓  Normal: Exit, Cure, Heal, Life, Quake, Blizzard, Fire, Aero, Thunder, White, Meteor, Flare
+  Weak to: Blind
+
+Enemy_7 (ID: 7, HP: 420)
+------------------------------------------------------------
+  ✓  Normal: Exit, Cure, Heal, Life, Quake, Blizzard, Fire, Aero, Thunder, White, Meteor, Flare
+  Weak to: Blind
+
+Enemy_8 (ID: 8, HP: 750)
+------------------------------------------------------------
+  ✓  Normal: Cure, Blizzard, White
+  ✗  Not effective: Exit, Heal, Life, Quake, Fire, Aero, Thunder, Meteor, Flare
+  Resists: Axe, Air, Fire, Earth
+  Weak to: Blind, Axe
+
+Enemy_9 (ID: 9, HP: 70)
+------------------------------------------------------------
+  ✓  Normal: Exit, Cure, Heal, Life, Quake, Blizzard, Fire, Aero, Thunder, White, Meteor, Flare
+  Resists: Axe
+
+Enemy_10 (ID: 10, HP: 180)
+------------------------------------------------------------
+  ✓  Normal: Exit, Cure, Heal, Life, Quake, Blizzard, Aero, Thunder, White, Meteor
+  ✗  Not effective: Fire, Flare
+  Resists: Fire
+
+Enemy_11 (ID: 11, HP: 740)
+------------------------------------------------------------
+  ⭐ SUPER EFFECTIVE: Cure, Blizzard, Thunder, White
+  ✓  Normal: Exit, Heal, Life, Quake, Aero, Meteor
+  ✗  Not effective: Fire, Flare
+  Resists: Fire, Water
+  Weak to: Stone, Water
+
+Enemy_12 (ID: 12, HP: 90)
+------------------------------------------------------------
+  ✓  Normal: Exit, Cure, Heal, Life, Quake, Blizzard, Fire, Aero, Thunder, White, Meteor, Flare
+
+Enemy_13 (ID: 13, HP: 450)
+------------------------------------------------------------
+  ✓  Normal: Exit, Cure, Heal, Life, Quake, Blizzard, Fire, Aero, Thunder, White, Meteor, Flare
+  Resists: Paralysis, Axe
+  Weak to: Stone
+
+Enemy_14 (ID: 14, HP: 640)
+------------------------------------------------------------
+  ✓  Normal: Exit, Cure, Heal, Life, Quake, Blizzard, Fire, Aero, Thunder, White, Meteor, Flare
+  Resists: Paralysis, Axe
+  Weak to: Stone
+
+Enemy_15 (ID: 15, HP: 140)
+------------------------------------------------------------
+  ✓  Normal: Exit, Cure, Heal, Life, Quake, Blizzard, Fire, Aero, Thunder, White, Meteor, Flare
+  Weak to: Poison, Doom
+
+Enemy_16 (ID: 16, HP: 265)
+------------------------------------------------------------
+  ✓  Normal: Exit, Cure, Heal, Life, Quake, Blizzard, Fire, Aero, Thunder, White, Meteor, Flare
+  Weak to: Poison, Doom
+
+Enemy_17 (ID: 17, HP: 745)
+------------------------------------------------------------
+  ✓  Normal: Exit, Cure, Heal, Life, Quake, Blizzard, Fire, Aero, Thunder, White, Meteor, Flare
+  Resists: Paralysis
+  Weak to: Poison, Sleep, Doom, Bomb
+
+Enemy_18 (ID: 18, HP: 120)
+------------------------------------------------------------
+  ✓  Normal: Cure, Heal, Blizzard, Fire, Aero, Thunder, White, Flare
+  ✗  Not effective: Exit, Life, Quake, Meteor
+  Resists: Earth
+  Weak to: Confusion, Doom
+
+Enemy_19 (ID: 19, HP: 510)
+------------------------------------------------------------
+  ✓  Normal: Cure, Heal, Blizzard, Fire, Aero, Thunder, White, Flare
+  ✗  Not effective: Exit, Life, Quake, Meteor
+  Resists: Earth
+  Weak to: Confusion, Stone
+
+Enemy_20 (ID: 20, HP: 750)
+------------------------------------------------------------
+  ✓  Normal: Cure, Heal, Blizzard, Fire, Aero, Thunder, White, Flare
+  ✗  Not effective: Exit, Life, Quake, Meteor
+  Resists: Earth
+  Weak to: Silence, Confusion, Sleep
+
+Enemy_21 (ID: 21, HP: 100)
+------------------------------------------------------------
+  ✓  Normal: Exit, Cure, Heal, Life, Quake, Blizzard, Fire, Aero, Thunder, White, Meteor, Flare
+  Resists: Doom
+  Weak to: Silence
+
+Enemy_22 (ID: 22, HP: 260)
+------------------------------------------------------------
+  ✓  Normal: Exit, Cure, Heal, Life, Quake, Blizzard, Fire, Aero, Thunder, White, Meteor, Flare
+  Resists: Doom
+  Weak to: Silence
+
+Enemy_23 (ID: 23, HP: 825)
+------------------------------------------------------------
+  ✓  Normal: Exit, Cure, Heal, Life, Quake, Blizzard, Fire, Aero, Thunder, White, Meteor, Flare
+  Resists: Doom
+  Weak to: Silence, Sleep
+
+Enemy_24 (ID: 24, HP: 500)
+------------------------------------------------------------
+  ⭐ SUPER EFFECTIVE: Fire, Flare
+  ✓  Normal: Cure, Blizzard, White
+  ✗  Not effective: Exit, Heal, Life, Quake, Aero, Thunder, Meteor
+  Resists: Axe, Air, Fire, Earth
+  Weak to: Confusion, Sleep, Stone, Fire
+
+Enemy_25 (ID: 25, HP: 685)
+------------------------------------------------------------
+  ⭐ SUPER EFFECTIVE: Fire, Flare
+  ✓  Normal: Cure, Blizzard, White
+  ✗  Not effective: Exit, Heal, Life, Quake, Aero, Thunder, Meteor
+  Resists: Axe, Air, Fire, Earth
+  Weak to: Confusion, Sleep, Stone, Fire
+
+Enemy_26 (ID: 26, HP: 280)
+------------------------------------------------------------
+  ✓  Normal: Exit, Cure, Heal, Life, Quake, Blizzard, Aero, Thunder, White, Meteor
+  ✗  Not effective: Fire, Flare
+  Resists: Zombie, Fire
+  Weak to: Paralysis, Zombie
+
+Enemy_27 (ID: 27, HP: 765)
+------------------------------------------------------------
+  ✓  Normal: Exit, Cure, Heal, Life, Quake, Blizzard, Aero, Thunder, White, Meteor
+  ✗  Not effective: Fire, Flare
+  Resists: Stone, Zombie, Fire
+  Weak to: Paralysis, Zombie
+
+Enemy_28 (ID: 28, HP: 580)
+------------------------------------------------------------
+  ✓  Normal: Exit, Cure, Life, Quake, Blizzard, Fire, White, Meteor, Flare
+  ✗  Not effective: Heal, Aero, Thunder
+  Resists: Bomb, Air
+  Weak to: Sleep, Stone
+
+Enemy_29 (ID: 29, HP: 925)
+------------------------------------------------------------
+  ✓  Normal: Exit, Cure, Life, Quake, Blizzard, Fire, White, Meteor, Flare
+  ✗  Not effective: Heal, Aero, Thunder
+  Resists: Bomb, Air
+  Weak to: Sleep, Stone
+
+... and 53 more enemies

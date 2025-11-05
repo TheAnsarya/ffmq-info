@@ -1,0 +1,29 @@
+FFMQ Spell Effectiveness Statistics
+================================================================================
+
+Total Enemies: 83
+
+Spell Effectiveness Distribution:
+--------------------------------------------------------------------------------
+Spell        | Super Effective    | Normal             | Not Effective     
+--------------------------------------------------------------------------------
+Exit         |   3 (  3.6%)       |  55 ( 66.3%)       |  25 ( 30.1%)
+Cure         |   3 (  3.6%)       |  61 ( 73.5%)       |  19 ( 22.9%)
+Heal         |   2 (  2.4%)       |  59 ( 71.1%)       |  22 ( 26.5%)
+Life         |   3 (  3.6%)       |  55 ( 66.3%)       |  25 ( 30.1%)
+Quake        |   3 (  3.6%)       |  55 ( 66.3%)       |  25 ( 30.1%)
+Blizzard     |   3 (  3.6%)       |  61 ( 73.5%)       |  19 ( 22.9%)
+Fire         |   2 (  2.4%)       |  54 ( 65.1%)       |  27 ( 32.5%)
+Aero         |   2 (  2.4%)       |  59 ( 71.1%)       |  22 ( 26.5%)
+Thunder      |   5 (  6.0%)       |  49 ( 59.0%)       |  29 ( 34.9%)
+White        |   3 (  3.6%)       |  61 ( 73.5%)       |  19 ( 22.9%)
+Meteor       |   3 (  3.6%)       |  55 ( 66.3%)       |  25 ( 30.1%)
+Flare        |   2 (  2.4%)       |  54 ( 65.1%)       |  27 ( 32.5%)
+
+Best General Purpose Spells (Most Normal/Strong):
+--------------------------------------------------------------------------------
+1. Cure: Effective against 64 enemies (77.1%)
+2. Blizzard: Effective against 64 enemies (77.1%)
+3. White: Effective against 64 enemies (77.1%)
+4. Heal: Effective against 61 enemies (73.5%)
+5. Aero: Effective against 61 enemies (73.5%)
