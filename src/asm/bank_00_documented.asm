@@ -13550,8 +13550,16 @@ Menu_BattleSettings:
 	sta.B				   $8e	   ; Store in $8e
 	bra					 Menu_BattleSettings_InputLoop ; Jump to input loop
 
+;-------------------------------------------------------------------------------
+; Menu Battle Settings - Error Sound
+;-------------------------------------------------------------------------------
+; Purpose: Play error sound for invalid battle setting operations
+; Reachability: Dead code (no references found)
+; Analysis: Orphaned error sound handler
+; Technical: Originally labeled UNREACH_00C1EB
+;-------------------------------------------------------------------------------
 UNREACH_00C1EB:
-	db											 $20,$12,$b9 ; JSR Sprite_SetMode2C
+	jsr.W Sprite_SetMode2C               ;00C1EB|2012B9  |00B912; Play error sound
 
 Menu_BattleSettings_InputLoop:
 	rep					 #$30		; 16-bit A/X/Y
@@ -13559,7 +13567,7 @@ Menu_BattleSettings_InputLoop:
 	jsr.W				   Input_PollWithToggle ; Poll input
 	bne					 Menu_BattleSettings_Process ; If button pressed, process
 	bit.W				   #$4000	; Test Y button
-	bne					 UNREACH_00C20E ; If pressed, branch
+	bne					 Menu_BattleSettings_YButton ; If pressed, branch
 	bit.W				   #$8000	; Test A button
 	beq					 Menu_BattleSettings_InputLoop ; If not pressed, loop
 	jsr.W				   Anim_SetMode10 ; Set animation mode $10
@@ -13568,8 +13576,19 @@ Menu_BattleSettings_InputLoop:
 	trb.W				   $00d6	 ; Clear bit 5 of $d6
 RTS_Label:
 
-UNREACH_00C20E:
-	db											 $e2,$20,$ad,$90,$10,$30,$d6,$4c,$d9,$c2
+;-------------------------------------------------------------------------------
+; Menu Battle Settings - Y Button Handler
+;-------------------------------------------------------------------------------
+; Purpose: Handle Y button press in battle settings menu
+; Reachability: Reachable via conditional branch (bne above)
+; Analysis: Checks companion status and branches to settings submenu
+; Technical: Originally labeled UNREACH_00C20E
+;-------------------------------------------------------------------------------
+Menu_BattleSettings_YButton:
+	sep #$20                             ;00C20E|E220    |      ; 8-bit accumulator
+	lda.W $1090                          ;00C210|AD9010  |011090; Load companion status
+	bmi Menu_BattleSettings_InputLoop    ;00C213|30D6    |00C1EB; If negative, loop
+	jmp.W CODE_00C2D9                    ;00C215|4CD9C2  |00C2D9; Jump to submenu
 
 Menu_BattleSettings_Process:
 	txa							   ; Transfer button state
@@ -14314,7 +14333,7 @@ WRAM_SetupSprites_Loop:
 	lda.B				   #$00	  ;00C772|A900    |      ;
 	xba							   ;00C774|EB      |      ;
 	dec					 a;00C775|3A      |      ;
-	beq					 UNREACH_00C784 ;00C776|F00C    |00C784;
+	beq					 WRAM_SetupSprites_IncrementY2 ;00C776|F00C    |00C784;
 	phx							   ;00C778|DA      |      ;
 	asl					 a;00C779|0A      |      ;
 	dec					 a;00C77A|3A      |      ;
@@ -14325,8 +14344,17 @@ WRAM_SetupSprites_Loop:
 	plx							   ;00C781|FA      |      ;
 	bra					 WRAM_SetupSprites_Continue ;00C782|8002    |00C786;
 
-UNREACH_00C784:
-	db											 $c8,$c8	 ;00C784|        |      ;
+;-------------------------------------------------------------------------------
+; WRAM Setup Sprites - Increment Y by 2
+;-------------------------------------------------------------------------------
+; Purpose: Increment Y register twice for sprite setup
+; Reachability: Reachable via conditional branch (beq above)
+; Analysis: Simple Y increment handler
+; Technical: Originally labeled UNREACH_00C784
+;-------------------------------------------------------------------------------
+WRAM_SetupSprites_IncrementY2:
+	iny                                  ;00C784|C8      |      ; Increment Y
+	iny                                  ;00C785|C8      |      ; Increment Y again
 
 WRAM_SetupSprites_Continue:
 	inx							   ;00C786|E8      |      ;
@@ -14643,12 +14671,21 @@ SaveData_Processor:
 	jsr.W				   CODE_00C94F ;00C9BC|204FC9  |00C94F;
 	jsr.W				   CODE_00C95C ;00C9BF|205CC9  |00C95C;
 	cmp.B				   $12	   ;00C9C2|C512    |000012;
-	bne					 UNREACH_00C9CB ;00C9C4|D005    |00C9CB;
+	bne					 SaveData_ChecksumMismatch ;00C9C4|D005    |00C9CB;
 	jsr.W				   Checksum_Validator ;00C9C6|207DC9  |00C97D;
 	beq					 SaveData_RestoreRegisters ;00C9C9|F003    |00C9CE;
 
-UNREACH_00C9CB:
-	db											 $68,$80,$c7 ;00C9CB|        |      ;
+;-------------------------------------------------------------------------------
+; Save Data - Checksum Mismatch Handler
+;-------------------------------------------------------------------------------
+; Purpose: Handle save data checksum mismatch
+; Reachability: Reachable via conditional branch (bne above)
+; Analysis: Pulls accumulator and branches with carry set
+; Technical: Originally labeled UNREACH_00C9CB
+;-------------------------------------------------------------------------------
+SaveData_ChecksumMismatch:
+	pla                                  ;00C9CB|68      |      ; Pull accumulator
+	bra SaveData_ReturnCarrySet          ;00C9CC|80C7    |00C995; Branch with carry
 
 SaveData_RestoreRegisters:
 	pla							   ;00C9CE|68      |      ;
