@@ -618,45 +618,45 @@ def main():
 
     # Extract tiles with MULTIPLE palettes to show actual in-game appearance
     tile_count = 256
-    
+
     # For each palette, extract tiles and save separately
     for pal_idx in range(8):  # SNES sprites use palettes 0-7
         palette = palettes[pal_idx]
         print(f"Rendering tiles with Palette {pal_idx}...")
-        
+
         # Extract 4BPP tiles
         tiles_4bpp = extractor.extract_tiles_4bpp(BANK_04_START, tile_count, palette)
-        
+
         # Create tile sheet for this palette
         tile_sheet = extractor.create_tile_sheet(tiles_4bpp, tiles_per_row=16)
         sheet_path = TILES_DIR / f"bank04_tiles_palette{pal_idx:02d}_sheet.png"
         tile_sheet.save(sheet_path)
         print(f"  [OK] Saved tile sheet with Palette {pal_idx}: {sheet_path.name}")
-    
+
     print()
     print("Creating Comparison Sheet (All 8 Palettes)...")
     print("-" * 70)
-    
+
     # Create a comparison image showing the SAME tiles with ALL 8 palettes
     # This helps identify which palette each sprite/tile actually uses in-game
     num_sample_tiles = 64  # Show first 64 tiles
     tiles_per_row = 8
-    
+
     # Create comparison sheet: 8 rows (one per palette) × 8 columns (tiles)
     comparison_width = tiles_per_row * 8
     comparison_height = 8 * 8  # 8 palettes
     comparison = Image.new('RGB', (comparison_width, comparison_height))
-    
+
     for pal_idx in range(8):
         palette = palettes[pal_idx]
         tiles = extractor.extract_tiles_4bpp(BANK_04_START, num_sample_tiles, palette)
-        
+
         for tile_idx in range(tiles_per_row):
             if tile_idx < len(tiles):
                 x = tile_idx * 8
                 y = pal_idx * 8
                 comparison.paste(tiles[tile_idx], (x, y))
-    
+
     comparison_path = TILES_DIR / "tile_palette_comparison.png"
     comparison.save(comparison_path)
     print(f"[OK] Saved palette comparison: {comparison_path.name}")
@@ -667,11 +667,11 @@ def main():
     print("Saving Individual Tiles (Palette 0 - for reference)...")
     default_palette = palettes[0]
     tiles_4bpp = extractor.extract_tiles_4bpp(BANK_04_START, tile_count, default_palette)
-    
+
     for i, tile in enumerate(tiles_4bpp[:64]):  # Save first 64 tiles
         tile_path = TILES_DIR / f"tile_4bpp_{i:04d}.png"
         tile.save(tile_path)
-    
+
     print(f"[OK] Saved {min(64, len(tiles_4bpp))} individual tiles (palette 0)")
 
     print()

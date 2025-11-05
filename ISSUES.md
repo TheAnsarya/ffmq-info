@@ -88,6 +88,52 @@
 
 ## 🎨 MEDIUM PRIORITY ISSUES
 
+### Issue #70: Verify Sprite Extraction Against Game Output
+**Priority**: LOW  
+**Effort**: 8-12 hours  
+**Status**: 🔄 IN PROGRESS - Extraction Complete, Verification Pending
+
+**Description**: Current sprite assembly uses guessed tile arrangements that don't match actual game graphics. Need to verify extracted sprites against actual VRAM and update definitions.
+
+**Current State**:
+- ✅ Multi-palette tile extraction working correctly
+- ✅ Extracted character sprites from verified ROM addresses
+- ✅ Benjamin: 512 tiles, others: 256 tiles each
+- ❌ Sprite tile arrangements are guessed, not verified
+
+**Verification Process**:
+1. ✅ Extract raw tiles from correct ROM addresses (DONE)
+2. ⏳ Compare with game screenshots/VRAM viewer
+3. ⏳ Identify actual sprite tile arrangements (not [0,1,16,17])
+4. ⏳ Parse metasprite tables at ROM $062c4c for real layouts
+5. ⏳ Update assemble_sprites.py with verified data
+6. ⏳ Expand to all 83 enemies + NPCs + UI elements
+
+**Files**:
+- `tools/extraction/analyze_vram.py` - Extract tiles from verified ROM addresses
+- `tools/extraction/assemble_sprites.py` - Needs update with real tile arrangements
+- `data/extracted/graphics/vram_analysis/*_tiles.png` - Raw extracted tiles
+
+**Blocking Items**:
+- Manual visual inspection required (AI cannot do this)
+- Need emulator with VRAM viewer for verification
+- Metasprite table parsing needed for accurate layouts
+
+**Deliverables**:
+- [ ] Verified sprite definitions with correct tile indices
+- [ ] Comparison screenshots (extracted vs actual game)
+- [ ] Documentation of sprite organization patterns
+- [ ] All 83 enemies extracted and verified
+- [ ] Animation frame support
+
+**Next Actions** (when prioritized):
+1. Run FFMQ in emulator with VRAM viewer
+2. Capture actual sprite layouts
+3. Map tile indices to sprite poses
+4. Update sprite definitions with real data
+
+---
+
 ### Issue #5: Create RAM Map Documentation
 **Priority**: MEDIUM  
 **Effort**: 4-6 hours  
@@ -222,18 +268,20 @@ This task focuses on **system/technical constants** used in the actual code.
 
 ## 📊 ISSUE STATISTICS
 
-**Total Issues**: 10  
+**Total Issues**: 11  
 **High Priority**: 0 (all completed!)  
 **Medium Priority**: 0 (all completed!)  
-**Low Priority**: 3  
+**Low Priority**: 4 (Issue #70 added)  
 **Completed**: 8 (Issues #1, #2, #5, #6, #7, #10)  
 **Skipped**: 2 (Issues #3, #4 - not needed)  
+**In Progress**: 1 (Issue #70 - sprites)  
 **Remaining**: 2 (Issues #8, #9 - optional enhancements)
 
 **Status Breakdown**:
 - 🟢 Complete: 8 (Issues #1, #2, #5, #6, #7, #10)
 - ❌ Skipped: 2 (Issues #3, #4 - files already formatted)
-- 🔴 TODO: 2 (Issues #8, #9 - optional future work)
+- � In Progress: 1 (Issue #70 - sprite verification)
+- �🔴 TODO: 2 (Issues #8, #9 - optional future work)
 
 **Current Status**: 🎉 **ALL HIGH, MEDIUM, & QUALITY ISSUES COMPLETE!**  
 **Latest Achievement**: ✅ Issue #10 Complete - Added 121 constants (both phases)

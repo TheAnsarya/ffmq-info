@@ -257,7 +257,7 @@ class SpriteAssembler:
         with open(output_path, 'w') as f:
             json.dump(metadata, f, indent=2)
 
-    def create_sprite_sheet(self, sprites: List[SpriteLayout], 
+    def create_sprite_sheet(self, sprites: List[SpriteLayout],
                            sprites_per_row: int = 4) -> Image.Image:
         """
         Create a sprite sheet showing multiple sprites.
@@ -287,10 +287,10 @@ class SpriteAssembler:
         # Assemble and paste each sprite
         for i, layout in enumerate(sprites):
             sprite = self.assemble_sprite(layout)
-            
+
             x = (i % sprites_per_row) * max_width
             y = (i // sprites_per_row) * max_height
-            
+
             sheet.paste(sprite, (x, y))
 
         return sheet

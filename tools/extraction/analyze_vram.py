@@ -97,43 +97,43 @@ CHARACTER_PORTRAIT_ADDRESSES = {
 }
 
 
-def analyze_sprite_region(extractor: GraphicsExtractor, name: str, 
+def analyze_sprite_region(extractor: GraphicsExtractor, name: str,
                          config: dict, output_dir: Path):
     """
     Analyze a sprite region and extract all tiles with correct palette.
-    
+
     This creates a tile sheet showing ALL tiles in the region so we can
     visually identify the actual sprite arrangements.
     """
     rom_offset = config["rom_offset"]
     size = config["size"]
     palette_idx = config["palette"]
-    
+
     # Calculate number of 4BPP tiles (32 bytes each)
     num_tiles = size // 32
-    
+
     print(f"\nAnalyzing: {name}")
     print(f"  ROM Offset: 0x{rom_offset:06X}")
     print(f"  Size: {size} bytes ({num_tiles} tiles)")
     print(f"  Palette: {palette_idx}")
-    
+
     # Load correct palette
     BANK_05_START = 0x030000
     palette_offset = BANK_05_START + (palette_idx * 32)
     palette = extractor.extract_palette(palette_offset, 16)
-    
+
     # Extract all tiles in this region
     tiles = extractor.extract_tiles_4bpp(rom_offset, num_tiles, palette)
-    
+
     # Create tile sheet (16 tiles per row)
     tile_sheet = extractor.create_tile_sheet(tiles, tiles_per_row=16)
-    
+
     # Save
     output_path = output_dir / f"{name}_tiles.png"
     tile_sheet.save(output_path)
     print(f"  ✓ Saved: {output_path.name}")
     print(f"    Size: {tile_sheet.size[0]}×{tile_sheet.size[1]} pixels")
-    
+
     return tiles, palette
 
 
@@ -142,28 +142,28 @@ def create_sprite_comparison_grid(tiles_by_character: dict, output_dir: Path):
     Create a comparison grid showing all characters side-by-side.
     """
     print("\nCreating character comparison grid...")
-    
+
     # Find max tiles across all characters
     max_tiles = max(len(tiles) for tiles in tiles_by_character.values())
-    
+
     # Create grid: one row per character, 16 tiles wide
     char_names = list(tiles_by_character.keys())
     num_chars = len(char_names)
     tiles_per_row = 16
-    
+
     grid_width = tiles_per_row * 8
     grid_height = num_chars * 8
-    
+
     grid = Image.new('RGB', (grid_width, grid_height))
-    
+
     for char_idx, char_name in enumerate(char_names):
         tiles = tiles_by_character[char_name]
         y_offset = char_idx * 8
-        
+
         for tile_idx in range(min(tiles_per_row, len(tiles))):
             x_offset = tile_idx * 8
             grid.paste(tiles[tile_idx], (x_offset, y_offset))
-    
+
     output_path = output_dir / "character_comparison_grid.png"
     grid.save(output_path)
     print(f"  ✓ Saved: {output_path.name}")
@@ -174,44 +174,44 @@ def main():
     ROM_PATH = "roms/Final Fantasy - Mystic Quest (U) (V1.1).sfc"
     OUTPUT_DIR = Path("data/extracted/graphics/vram_analysis")
     OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
-    
+
     print("=" * 70)
     print("FFMQ VRAM Analyzer - Actual Sprite Extraction")
     print("=" * 70)
     print(f"\nUsing verified ROM addresses from datacrystal documentation")
     print(f"Output: {OUTPUT_DIR}")
-    
+
     # Initialize extractor
     extractor = GraphicsExtractor(ROM_PATH)
     print(f"\n[OK] ROM loaded: {len(extractor.rom_data):,} bytes")
-    
+
     # Analyze character sprites
     print("\n" + "=" * 70)
     print("CHARACTER SPRITES (Walking/Battle)")
     print("=" * 70)
-    
+
     character_tiles = {}
     for char_name, config in CHARACTER_SPRITE_ADDRESSES.items():
         tiles, palette = analyze_sprite_region(
             extractor, char_name, config, OUTPUT_DIR
         )
         character_tiles[char_name] = tiles
-    
+
     # Create comparison grid
     create_sprite_comparison_grid(character_tiles, OUTPUT_DIR)
-    
+
     # Analyze portraits
     print("\n" + "=" * 70)
     print("CHARACTER PORTRAITS (Overworld)")
     print("=" * 70)
-    
+
     portrait_tiles = {}
     for portrait_name, config in CHARACTER_PORTRAIT_ADDRESSES.items():
         tiles, palette = analyze_sprite_region(
             extractor, portrait_name, config, OUTPUT_DIR
         )
         portrait_tiles[portrait_name] = tiles
-    
+
     print("\n" + "=" * 70)
     print("Analysis Complete!")
     print("=" * 70)
@@ -226,7 +226,7 @@ def main():
     print(f"  - Walking animations = 4 directions × 2-3 frames each")
     print(f"  - Battle poses = standing, attacking, magic, damaged, victory")
     print(f"  - Tile arrangements are NOT sequential [0,1,16,17]!")
-    
+
     return 0
 
 
