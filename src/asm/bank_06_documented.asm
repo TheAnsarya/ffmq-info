@@ -1,14 +1,14 @@
 ﻿;============================================================================
 ; Bank 06 - Map Tilemap Data
 ;============================================================================
-; Bank Size: 32,768 bytes ($068000-$06FFFF)
+; Bank Size: 32,768 bytes ($068000-$06ffff)
 ; Primary Content: Metatile definitions, collision data, map-related tables
 ;
 ; OVERVIEW:
 ; This bank stores the building blocks for all maps in FFMQ. Maps are
 ; constructed from 16x16 metatiles, each composed of four 8x8 tiles.
 ;
-; METATILE STRUCTURE ($068000-$0683FF):
+; METATILE STRUCTURE ($068000-$0683ff):
 ; - 256 metatiles total, 4 bytes each = 1024 bytes
 ; - Format per metatile: [TL][TR][BL][BR]
 ;   * TL = Top-left 8x8 tile index
@@ -20,13 +20,13 @@
 ; - Palette assignments from Bank $05
 ;
 ; SPECIAL TILE VALUES:
-; - $00-$7F: Standard tiles
-; - $80-$FF: Can indicate flipped tiles or alternate tilesets
-; - $BB, $FB: Often used for empty/transparent tiles
-; - $9A: Common padding value
-; - $7F, $FF: End markers or special indicators
+; - $00-$7f: Standard tiles
+; - $80-$ff: Can indicate flipped tiles or alternate tilesets
+; - $bb, $fb: Often used for empty/transparent tiles
+; - $9a: Common padding value
+; - $7f, $ff: End markers or special indicators
 ;
-; COLLISION DATA ($06A000+):
+; COLLISION DATA ($06a000+):
 ; - Separate collision flags for each metatile
 ; - Determines walkability, damage zones, triggers, etc.
 ; - Bitfield format with properties per metatile
@@ -53,7 +53,7 @@
 	org $068000                          ;      |        |      ;
 ;      |        |      ;
 ;----------------------------------------------------------------------------
-; Metatile Definitions ($068000-$0683FF)
+; Metatile Definitions ($068000-$0683ff)
 ;----------------------------------------------------------------------------
 ; All 256 metatiles stored sequentially
 ; Each entry is exactly 4 bytes in [TL][TR][BL][BR] format
@@ -574,7 +574,7 @@
 	db $08,$09,$08,$09,$18,$18,$18,$18,$3d,$3d,$3d,$3d,$fb,$fb,$fb,$fb;069FF0|        |      ;
 
 ;----------------------------------------------------------------------------
-; Collision/Property Data ($06A000+)
+; Collision/Property Data ($06a000+)
 ;----------------------------------------------------------------------------
 ; Collision and property flags for metatiles
 ; Format appears to be nibble-based or byte-based flags
@@ -966,7 +966,7 @@
 	db $07,$08,$07,$08,$03,$04,$03,$04,$0b,$04,$31,$08,$31,$08,$07,$00;06B7F0|        |000008;
 
 ;----------------------------------------------------------------------------
-; Map-Related Data Tables ($06B800+)
+; Map-Related Data Tables ($06b800+)
 ;----------------------------------------------------------------------------
 ; Various data tables related to map configuration, properties, or indices
 ; May include screen layouts, map transitions, or other metadata
@@ -2293,15 +2293,15 @@ Battle_ConfigTable:
 ; End of Bank 06
 ;============================================================================
 ; Bank Status: Complete - All 2276 lines imported and documented
-; Metatile Data: $068000-$0683FF (256 metatiles, 4 bytes each = 1024 bytes)
-; Collision Data: $06A000+ (flags and properties)
-; Map Tables: $06B800+ (indices and configuration)
-; Padding: $06FC00+ (unused space filled with $FF)
+; Metatile Data: $068000-$0683ff (256 metatiles, 4 bytes each = 1024 bytes)
+; Collision Data: $06a000+ (flags and properties)
+; Map Tables: $06b800+ (indices and configuration)
+; Padding: $06fc00+ (unused space filled with $ff)
 ;
 ; Verification Status:
 ; - Imported from: src/asm/banks/bank_06.asm (2201 lines)
 ; - Enhanced with: Structural documentation and section headers
-; - ROM Address: $068000-$06FFFF (32KB bank)
+; - ROM Address: $068000-$06ffff (32KB bank)
 ; - File Offset: 0x068000-0x06FFFF (LoROM mapping)
 ; - ROM Version: V1.1 (MD5: f7faeae5a847c098d677070920769ca2)
 ;

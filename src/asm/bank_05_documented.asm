@@ -1,7 +1,7 @@
 ﻿;============================================================================
 ; Bank 05 - Palette Data
 ;============================================================================
-; Bank Size: 32,768 bytes ($058000-$05FFFF)
+; Bank Size: 32,768 bytes ($058000-$05ffff)
 ; Primary Content: Color palettes for all graphics in RGB555 format
 ;
 ; OVERVIEW:
@@ -16,7 +16,7 @@
 ; - Bits 0-4: Red channel (0-31, 5 bits)
 ; - Bits 5-9: Green channel (0-31, 5 bits)
 ; - Bits 10-14: Blue channel (0-31, 5 bits)
-; - Bit 15: Unused (always 0)
+; - bit 15: Unused (always 0)
 ;
 ; BYTE ORDER (Little-Endian):
 ; - Byte 0 (LOW): gggrrrrr (bits 0-7)
@@ -24,10 +24,10 @@
 ;
 ; COLOR EXAMPLES:
 ; - $0000 = Black/Transparent (R:0 G:0 B:0)
-; - $7FFF = White (R:31 G:31 B:31)
-; - $001F = Pure Red (R:31 G:0 B:0)
-; - $03E0 = Pure Green (R:0 G:31 B:0)
-; - $7C00 = Pure Blue (R:0 G:0 B:31)
+; - $7fff = White (R:31 G:31 B:31)
+; - $001f = Pure Red (R:31 G:0 B:0)
+; - $03e0 = Pure Green (R:0 G:31 B:0)
+; - $7c00 = Pure Blue (R:0 G:0 B:31)
 ;
 ; RGB555 TO RGB888 CONVERSION:
 ; To display on modern systems, convert 5-bit channels to 8-bit:
@@ -2355,14 +2355,14 @@ DEAD_05F9FA:
 ; End of Bank 05
 ;============================================================================
 ; Bank Status: Complete - All 2337 lines imported and documented
-; Palette Data: $058000-$05FFFF (32KB of RGB555 color data)
+; Palette Data: $058000-$05ffff (32KB of RGB555 color data)
 ; Format: SNES RGB555 (2 bytes per color, little-endian)
-; Padding: $05F000+ (unused space filled with $FF)
+; Padding: $05f000+ (unused space filled with $ff)
 ;
 ; Verification Status:
 ; - Imported from: src/asm/banks/bank_05.asm (2259 lines)
 ; - Enhanced with: Structural documentation and RGB555 format explanations
-; - ROM Address: $058000-$05FFFF (32KB bank)
+; - ROM Address: $058000-$05ffff (32KB bank)
 ; - File Offset: 0x030000-0x037FFF (LoROM mapping)
 ; - ROM Version: V1.1 (MD5: f7faeae5a847c098d677070920769ca2)
 ;

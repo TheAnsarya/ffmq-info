@@ -1,7 +1,7 @@
 ﻿;============================================================================
 ; Bank 04 - Graphics/CHR Data
 ;============================================================================
-; Bank Size: 32,768 bytes ($048000-$04FFFF)
+; Bank Size: 32,768 bytes ($048000-$04ffff)
 ; Primary Content: Graphics tiles (CHR data), sprite patterns, battle animations
 ;
 ; OVERVIEW:
@@ -2146,14 +2146,14 @@ DATA8_04ca20:
 ; End of Bank 04
 ;============================================================================
 ; Bank Status: Complete - All 2144 lines imported and documented
-; Graphics Data: $048000-$04FFFF (32KB of CHR/tile data)
+; Graphics Data: $048000-$04ffff (32KB of CHR/tile data)
 ; Format: SNES planar bitmap (2BPP/4BPP tiles)
-; Padding: $04F000+ (unused space filled with $FF)
+; Padding: $04f000+ (unused space filled with $ff)
 ;
 ; Verification Status:
 ; - Imported from: src/asm/banks/bank_04.asm (2073 lines)
 ; - Enhanced with: Structural documentation and format explanations
-; - ROM Address: $048000-$04FFFF (32KB bank)
+; - ROM Address: $048000-$04ffff (32KB bank)
 ; - File Offset: 0x028000-0x02FFFF (LoROM mapping)
 ; - ROM Version: V1.1 (MD5: f7faeae5a847c098d677070920769ca2)
 ;

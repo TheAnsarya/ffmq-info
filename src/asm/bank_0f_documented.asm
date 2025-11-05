@@ -36,8 +36,8 @@
 ;    - Header byte (byte 0):
 ;      * Bits 7-4: Range/shift (0-12, volume scaling)
 ;      * Bits 3-2: Filter type (0-3, prediction algorithm)
-;      * Bit 1: Loop flag (1 = loop back to loop point)
-;      * Bit 0: End flag (1 = last block of sample)
+;      * bit 1: Loop flag (1 = loop back to loop point)
+;      * bit 0: End flag (1 = last block of sample)
 ;    - Data bytes (bytes 1-8): Compressed 4-bit samples (2 per byte)
 ;    - Compression ratio: ~3.56:1 vs 16-bit PCM
 ;    - Sample rate: Typically 16-32 KHz for instruments

@@ -2950,7 +2950,7 @@
 ; Address Range: $0edd90-$0ee3d0
 ; Extended APU/Sound Data (SPC700 Audio Driver - B-Tier Separator Dominance Zone)
 
-; MAJOR PATTERN: B-TIER ($ba/$b6) AND A-TIER ($aa/$9a) SEPARATOR ALTERNATION
+; MAJOR PATTERN: B-TIER ($ba/$b6) and A-TIER ($aa/$9a) SEPARATOR ALTERNATION
 
 ; Lines 1501-1563: $ba/$b6 separator DOMINANCE (63 lines!)
 ; Pattern: Dense $c0-$f4 envelopes, low numerics (0x0-0x5), structured data
@@ -3231,7 +3231,7 @@
 ; Address Range: $0eea10-$0ef050
 ; Extended APU/Sound Data (SPC700 Audio Driver - A/B-Tier Mixed Zone)
 
-; MAJOR PATTERN: A-TIER ($a6/$a2) AND B-TIER ($b6/$b2/$ba) SEPARATOR MIXING
+; MAJOR PATTERN: A-TIER ($a6/$a2) and B-TIER ($b6/$b2/$ba) SEPARATOR MIXING
 
 ; Lines 1701-1800: DENSE A/B-TIER SEPARATOR PATTERN (100 lines)
 ; Most complex separator mixing pattern in entire bank!
