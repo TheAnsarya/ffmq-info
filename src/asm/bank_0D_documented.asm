@@ -638,7 +638,7 @@ CODE_0D8147:
 	cmp.B				   #$03	  ;0D816A|C903    |      ; Command $03 = play SFX
 	beq					 CODE_0D8183 ;0D816C|F015    |0D8183; Handle SFX play
 	cmp.B				   #$70	  ;0D816E|C970    |      ; Commands $70+ = advanced
-	bcs					 UNREACH_0D8175 ;0D8170|B003    |0D8175; Handle advanced commands
+	bcs					 Sound_AdvancedCommandHandler ;0D8170|B003    |0D8175; Handle advanced commands
 
 ; ------------------------------------------------------------------------------
 ; System command handler (commands $80-$ff)
@@ -646,11 +646,16 @@ CODE_0D8147:
 CODE_0D8172:
 	jmp.W				   CODE_0D85BA ;0D8172|4CBA85  |0D85BA; Jump to system handler
 
-; ------------------------------------------------------------------------------
-; Advanced command handler (commands $70-$7f)
-; ------------------------------------------------------------------------------
-UNREACH_0D8175:
-	db											 $4c,$0e,$86 ;0D8175|        |0D860E; Jump to advanced handler
+;-------------------------------------------------------------------------------
+; Sound Advanced Command Handler
+;-------------------------------------------------------------------------------
+; Purpose: Jump to advanced sound command handler
+; Reachability: Reachable via bcs when command >= $70
+; Analysis: JMP to extended command processor at $0D860E
+; Technical: Originally labeled UNREACH_0D8175
+;-------------------------------------------------------------------------------
+Sound_AdvancedCommandHandler:
+	jmp.W CODE_0D860E                    ;0D8175|4C0E86  |0D860E
 
 ; ------------------------------------------------------------------------------
 ; CODE_0D8178: Exit Routine
@@ -825,11 +830,11 @@ CODE_0D822C:
 ; Uses hardware multiply result (track# × 3) as table index
 ; ------------------------------------------------------------------------------
 	ldx.W				   SNES_RDMPYL ;0D8231|AE1642  |004216; Get multiply result
-	lda.L				   UNREACH_0DBDAE,x ;0D8234|BFAEBD0D|0DBDAE; Load data ptr low
+	lda.L				   Sound_DataPtrLow,x ;0D8234|BFAEBD0D|0DBDAE; Load data ptr low
 	sta.B				   $14	   ;0D8238|8514    |000614; Store to DP
-	lda.L				   UNREACH_0DBDAF,x ;0D823A|BFAFBD0D|0DBDAF; Load data ptr mid
+	lda.L				   Sound_DataPtrMid,x ;0D823A|BFAFBD0D|0DBDAF; Load data ptr mid
 	sta.B				   $15	   ;0D823E|8515    |000615; Store to DP
-	lda.L				   UNREACH_0DBDB0,x ;0D8240|BFB0BD0D|0DBDB0; Load data ptr bank
+	lda.L				   Sound_DataPtrBank,x ;0D8240|BFB0BD0D|0DBDB0; Load data ptr bank
 	sta.B				   $16	   ;0D8244|8516    |000616; Store to DP
 
 ; ------------------------------------------------------------------------------
@@ -956,7 +961,7 @@ CODE_0D82A1:
 ; Handles pattern assignment to audio channels
 ; ==============================================================================
 CODE_0D82C0:
-	lda.L				   UNREACH_0DBEA1,x ;0D82C0|BFA1BE0D|0DBEA1; Load pattern table entry
+	lda.L				   Sound_PatternAssignment,x ;0D82C0|BFA1BE0D|0DBEA1; Load pattern table entry
 	sta.B				   ($14)	 ;0D82C4|9214    |000614; Store to buffer 1
 	inc.B				   $14	   ;0D82C6|E614    |000614; Advance pointer
 	inc.B				   $14	   ;0D82C8|E614    |000614; (2 bytes per entry)
@@ -1842,15 +1847,17 @@ DATA8_0d9d78:	db					   $cc,$03,$02,$00,$00,$00,$00,$00,$00,$00,$00,$aa,$21,$f0,
 ; ... [3,200+ bytes of $ff padding omitted - continues through 0DBDA7] ...
 	db											 $ff,$ff,$ff,$ff,$ff,$ff ;0DBDA8| Padding end |
 
-; ===========================================================================
-; UNREACHABLE DATA - Post-Padding Lookup Tables
-; ===========================================================================
-; These tables appear after the $ff padding, possibly leftover from development
-; or used by dynamic code/data loading mechanisms.
-
-UNREACH_0DBDAE:	db						 $0d		 ;0DBDAE| Unknown table entry |
-UNREACH_0DBDAF:	db						 $85		 ;0DBDAF|        |
-UNREACH_0DBDB0:	db						 $0e		 ;0DBDB0| More entries |
+;-------------------------------------------------------------------------------
+; Sound Data Pointer Tables
+;-------------------------------------------------------------------------------
+; Purpose: 24-bit pointer tables for sound/music data
+; Reachability: Reachable via indexed loads from sound engine
+; Analysis: Three sequential single-byte tables forming 24-bit pointers
+; Technical: Originally labeled UNREACH_0DBDAE/AF/B0
+;-------------------------------------------------------------------------------
+Sound_DataPtrLow:	db						 $0d		 ;0DBDAE| Pointer low bytes |
+Sound_DataPtrMid:	db						 $85		 ;0DBDAF| Pointer mid bytes |
+Sound_DataPtrBank:	db						 $0e		 ;0DBDB0| Pointer bank bytes |
 	db											 $73,$85,$0e,$69,$8b,$0e ;0DBDB1|        |
 	db											 $21,$93,$0e ;0DBDB7| Pattern: 2-byte pairs |
 	db											 $74,$9b,$0e,$0b,$9e,$0e,$88,$9f,$0e,$9b,$a2,$0e,$4f,$a8,$0e,$4f ;0DBDBA|        |
@@ -1906,13 +1913,21 @@ DATA8_0dbe7d:	db					   $ff,$cb,$ff,$dc,$ff,$e0,$ff,$e0,$9f,$40,$8f,$84,$ff,$18,
 	db											 $ff,$b2,$ff,$e0 ;0DBE9D| ADSR values 16-17 |
 
 ; ===========================================================================
-; UNREACH_0DBEA1 - Channel Pattern Assignment Tables
+; Channel Pattern Assignment Tables
 ; ===========================================================================
 ; Maps music patterns to 8 SPC700 hardware voices.
 ; Each row: 16 entries (one per virtual channel).
 ; Zero-padded entries = unused channels for this track.
 
-UNREACH_0DBEA1:	db						 $00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00 ;0DBEA1| Pattern map 0 (empty) |
+;-------------------------------------------------------------------------------
+; Sound Pattern Assignment Table
+;-------------------------------------------------------------------------------
+; Purpose: Channel pattern assignment for music tracks
+; Reachability: Reachable via indexed load from sound engine
+; Analysis: 16-byte rows mapping patterns to 8 hardware voices
+; Technical: Originally labeled UNREACH_0DBEA1
+;-------------------------------------------------------------------------------
+Sound_PatternAssignment:	db						 $00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00 ;0DBEA1| Pattern map 0 (empty) |
 	db											 $00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00 ;0DBEB1| Pattern map 1 (empty) |
 	db											 $02,$00,$0b,$00,$07,$00,$0d,$00,$11,$00,$10,$00,$0a,$00,$0e,$00 ;0DBEC1| Pattern map 2 (8 channels) |
 	db											 $04,$00,$01,$00,$03,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00 ;0DBED1|        |
