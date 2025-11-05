@@ -1773,7 +1773,7 @@ Entity_ProcessByMode:
 	cmp.B				   #$0f	  ; Check for mode $0f (standard processing)
 	beq					 Entity_ProcessMode0F ; Branch to standard handler
 	cmp.B				   #$10	  ; Check for mode $10 (enhanced processing)
-	beq					 UNREACH_0293E5 ; Branch to enhanced handler
+	beq					 Entity_ProcessMode10_Enhanced ;029776|F06D    |0293E5
 	cmp.B				   #$11	  ; Check for mode $11 (advanced processing)
 	beq					 Entity_ProcessMode11 ; Branch to advanced handler
 	jsr.W				   Entity_ProcessDefault ; Execute default entity processing
@@ -1785,9 +1785,18 @@ Entity_ProcessMode0F:
 	jsr.W				   Entity_ProcessStandardMode ; Execute standard entity processing
 	bra					 Entity_ProcessFinalize ; Continue to finalization
 
-;Enhanced entity processing mode ($10) - unreachable in normal execution
-UNREACH_0293E5:
-	db											 $20,$da,$9a,$80,$03 ; Enhanced processing routine (unreachable)
+;-------------------------------------------------------------------------------
+; Entity Processing - Enhanced Mode Handler
+;-------------------------------------------------------------------------------
+; Purpose: Handle entity processing mode $10 (enhanced)
+; Reachability: Reachable via beq branch when mode = $10
+; Analysis: Calls entity processing routine then branches forward
+; Technical: Originally labeled UNREACH_0293E5
+;-------------------------------------------------------------------------------
+Entity_ProcessMode10_Enhanced:
+	jsr.W CODE_029ADA                    ;0293E5|20DA9A  |0299DA
+	bra +                                ;0293E8|8003    |0293ED
++
 
 ;Advanced entity processing mode ($11)
 ;Implements complex entity processing with extended capabilities
@@ -2032,19 +2041,53 @@ Memory_Complete:
 	lda.B				   $10	   ; Load system validation flag
 	pld							   ; Restore direct page
 	cmp.B				   $00	   ; Compare with reference value
-	beq					 UNREACH_029572 ; Branch to unreachable validation
-	bcc					 UNREACH_029572 ; Branch if validation passes
+	beq					 Memory_ValidationSequence ;02956A|F006    |029572
+	bcc					 Memory_ValidationSequence ;02956C|9004    |029572
 	rts							   ; Return if validation fails
 
-;Unreachable memory validation sequence
-UNREACH_029572:
-; Complex memory validation and error recovery sequence
-	db											 $a4,$77,$84,$a0,$20,$8c,$95,$0b,$20,$22,$8f,$20,$c7,$95,$2b,$20
-	db											 $de,$95,$20,$c8,$a0,$a6,$a0,$86,$77,$60,$08,$8c,$98,$00,$a9,$65
-	db											 $8d,$a8,$00,$22,$83,$97,$00,$ad,$a9,$00,$8d,$9c,$00,$9c,$9d,$00
-	db											 $22,$b3,$96,$00,$ae,$9e,$00,$8e,$98,$00,$ae,$a0,$00,$8e,$9a,$00
-	db											 $a9,$64,$8d,$9c,$00,$9c,$9d,$00,$22,$e4,$96,$00,$c2,$30,$ad,$9e
-	db											 $00,$85,$77,$28,$60
+;-------------------------------------------------------------------------------
+; Memory Validation Sequence
+;-------------------------------------------------------------------------------
+; Purpose: Complex memory validation and error recovery
+; Reachability: Reachable via beq/bcc branches (memory validation path)
+; Analysis: 96-byte sequence for system memory validation
+; Technical: Originally labeled UNREACH_029572
+;-------------------------------------------------------------------------------
+Memory_ValidationSequence:
+	ldy.B $77                            ;029572|A477    |000077
+	sty.B $a0                            ;029574|84A0    |0000A0
+	jsr.W CODE_02958C                    ;029576|208C95  |02958C
+	pha                                  ;029579|0B      |
+	jsr.W CODE_028F22                    ;02957A|20228F  |028F22
+	jsr.W CODE_0295C7                    ;02957D|20C795  |0295C7
+	plp                                  ;029580|2B      |
+	jsr.W CODE_0295DE                    ;029581|20DE95  |0295DE
+	jsr.W CODE_02A0C8                    ;029584|20C8A0  |02A0C8
+	ldx.B $a0                            ;029587|A6A0    |0000A0
+	stx.B $77                            ;029589|8677    |000077
+	rts                                  ;02958B|60      |
+	php                                  ;02958C|08      |
+	stz.W $0098                          ;02958D|9C9800  |000098
+	lda.B #$65                           ;029590|A965    |
+	sta.W $00a8                          ;029592|8DA800  |0000A8
+	jsl.L CODE_009783                    ;029595|22839700|009783
+	lda.W $00a9                          ;029599|ADA900  |0000A9
+	sta.W $009c                          ;02959C|8D9C00  |00009C
+	stz.W $009d                          ;02959F|9C9D00  |00009D
+	jsl.L CODE_0096B3                    ;0295A2|22B39600|0096B3
+	ldx.W $009e                          ;0295A6|AE9E00  |00009E
+	stx.W $0098                          ;0295A9|8E9800  |000098
+	ldx.W $00a0                          ;0295AC|AEA000  |0000A0
+	stx.W $009a                          ;0295AF|8E9A00  |00009A
+	lda.B #$64                           ;0295B2|A964    |
+	sta.W $009c                          ;0295B4|8D9C00  |00009C
+	stz.W $009d                          ;0295B7|9C9D00  |00009D
+	jsl.L CODE_0096E4                    ;0295BA|22E49600|0096E4
+	rep #$30                             ;0295BE|C230    |
+	lda.W $009e                          ;0295C0|AD9E00  |00009E
+	sta.B $77                            ;0295C3|8577    |000077
+	plp                                  ;0295C5|28      |
+	rts                                  ;0295C6|60      |
 
 ;Advanced bounds checking with 16-bit arithmetic
 ;Implements sophisticated boundary validation using 16-bit calculations
@@ -2596,12 +2639,25 @@ DATA8_029ba0:
 Input_Special:
 	lda.B				   $db	   ; Load input validation flags
 	cmp.B				   #$08	  ; Check for special condition $08
-	beq					 UNREACH_029BB7 ; Branch to unreachable special processing
+	beq					 Input_Special_Condition08 ;029B40|F015    |029BB7
 	rts							   ; Return if no special processing needed
 
-;Unreachable special input processing
-UNREACH_029BB7:
-	db											 $a5,$38,$c9,$20,$f0,$01,$60,$a2,$00,$00,$86,$77,$60
+;-------------------------------------------------------------------------------
+; Input Special - Condition $08 Handler
+;-------------------------------------------------------------------------------
+; Purpose: Handle special input condition $08
+; Reachability: Reachable via beq when $db = $08
+; Analysis: Checks $38 for value $20, initializes $77 if true
+; Technical: Originally labeled UNREACH_029BB7
+;-------------------------------------------------------------------------------
+Input_Special_Condition08:
+	lda.B $38                            ;029BB7|A538    |000038
+	cmp.B #$20                           ;029BB9|C920    |
+	beq +                                ;029BBB|F001    |029BBE
+	rts                                  ;029BBD|60      |
++	ldx.W #$0000                         ;029BBE|A20000  |
+	stx.B $77                            ;029BC1|8677    |000077
+	rts                                  ;029BC3|60      |
 
 ;Input processing finalization with controller validation
 ;Finalizes input processing and validates controller state
@@ -2667,13 +2723,27 @@ Input_AltPattern:
 	jsr.W				   System_ValidateEnhanced ; Execute input validation
 	and.B				   #$50	  ; Test validated input pattern
 	cmp.B				   #$50	  ; Verify pattern consistency
-	beq					 UNREACH_029C1F ; Branch to unreachable processing if consistent
+	beq					 Input_Pattern_Enhanced ;029C1D|F000    |029C1F
 	rts							   ; Return if pattern inconsistent
 
-;Unreachable enhanced pattern processing
-UNREACH_029C1F:
-	db											 $c2,$30,$46,$77,$e2,$20,$c2,$10,$20,$e1,$9b,$a2,$7b,$d3,$20,$3d
-	db											 $88,$80,$63
+;-------------------------------------------------------------------------------
+; Input Pattern - Enhanced Handler
+;-------------------------------------------------------------------------------
+; Purpose: Handle enhanced input pattern $50
+; Reachability: Reachable via beq when pattern = $50
+; Analysis: 16-bit operations with input reduction
+; Technical: Originally labeled UNREACH_029C1F
+;-------------------------------------------------------------------------------
+Input_Pattern_Enhanced:
+	rep #$30                             ;029C1F|C230    |
+	lsr.B $77                            ;029C21|4677    |000077
+	sep #$20                             ;029C23|E220    |
+	rep #$10                             ;029C25|C210    |
+	jsr.W CODE_029BE1                    ;029C27|20E19B  |029BE1
+	ldx.W #$d37b                         ;029C2A|A27BD3  |
+	jsr.W CODE_02883D                    ;029C2D|203D88  |02883D
+	bra +                                ;029C30|8063    |029C95
++
 
 ;Standard input processing with reduction and flag management
 ;Processes standard input with mathematical reduction and flag management
@@ -2703,16 +2773,41 @@ Input_Flag40:
 Input_Flag20:
 	lda.B				   $db	   ; Load input validation flags
 	and.B				   #$20	  ; Test for input flag $20
-	beq					 UNREACH_029C67 ; Branch to unreachable processing if not set
+	beq					 Input_Flag10_Check ;029C65|F000    |029C67
 	ldx.W				   #$d372	; Load handler for flag $20
 	jsr.W				   CODE_02883D ; Execute flag $20 handler
 	bra					 Input_ProcessDone ; Branch to processing completion
 
-;Unreachable input flag processing
-UNREACH_029C67:
-	db											 $a5,$db,$29,$10,$f0,$08,$a2,$77,$d3,$20,$3d,$88,$80,$20,$a5,$8d
-	db											 $c9,$02,$b0,$1d,$a5,$db,$29,$06,$f0,$08,$a2,$86,$d3,$20,$3d,$88
-	db											 $80,$0c,$a5,$db,$29,$01,$f0,$09,$a2,$8c,$d3,$20,$3d,$88
+;-------------------------------------------------------------------------------
+; Input Flag - Alternate Flags Handler
+;-------------------------------------------------------------------------------
+; Purpose: Handle input flags $10, $06, and $01
+; Reachability: Reachable via beq when flag $20 not set
+; Analysis: Sequential flag checking with different handlers
+; Technical: Originally labeled UNREACH_029C67
+;-------------------------------------------------------------------------------
+Input_Flag10_Check:
+	lda.B $db                            ;029C67|A5DB    |0000DB
+	and.B #$10                           ;029C69|2910    |
+	beq +                                ;029C6B|F008    |029C75
+	ldx.W #$d377                         ;029C6D|A277D3  |
+	jsr.W CODE_02883D                    ;029C70|203D88  |02883D
+	bra ++                               ;029C73|8020    |029C95
++	lda.B $8d                            ;029C75|A58D    |00008D
+	cmp.B #$02                           ;029C77|C902    |
+	bcs ++                               ;029C79|B01D    |029C98
+	lda.B $db                            ;029C7B|A5DB    |0000DB
+	and.B #$06                           ;029C7D|2906    |
+	beq +                                ;029C7F|F008    |029C89
+	ldx.W #$d386                         ;029C81|A286D3  |
+	jsr.W CODE_02883D                    ;029C84|203D88  |02883D
+	bra ++                               ;029C87|800C    |029C95
++	lda.B $db                            ;029C89|A5DB    |0000DB
+	and.B #$01                           ;029C8B|2901    |
+	beq ++                               ;029C8D|F009    |029C98
+	ldx.W #$d38c                         ;029C8F|A28CD3  |
+	jsr.W CODE_02883D                    ;029C92|203D88  |02883D
+++
 
 ;Input processing completion with system finalization
 ;Completes input processing and finalizes all input-related systems
