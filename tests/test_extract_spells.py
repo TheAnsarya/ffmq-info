@@ -164,14 +164,14 @@ class TestSpellMapping(unittest.TestCase):
 				# Check randomizer ID is valid
 				self.assertIn(spell_data['randomizer_id'], range(12),
 					f"Randomizer ID {spell_data['randomizer_id']} should be 0-11")
-	
+
 	def test_no_duplicate_mappings(self):
 		"""Test that no two randomizer IDs map to same spell"""
 		if self.mapping:
 			spells_array = self.mapping.get('spells', [])
 			our_ids = [spell['our_id'] for spell in spells_array]
 			unique_ids = set(our_ids)
-			
+
 			self.assertEqual(len(our_ids), len(unique_ids),
 				"Mapping contains duplicate spell IDs")
 

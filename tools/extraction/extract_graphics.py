@@ -596,7 +596,7 @@ def main():
     print("Extracting Palettes (Bank 05)...")
     print("-" * 70)
 
-    # Extract first 16 palettes (example)
+    # Extract first 16 palettes (8 BG + 8 sprite palettes in SNES)
     palettes = []
     for i in range(16):
         offset = BANK_05_START + (i * 32)  # 32 bytes per palette (16 colors)
@@ -610,44 +610,93 @@ def main():
         print(f"[OK] Palette {i:2d}: {len(palette.colors)} colors -> {json_path.name}")
 
     print()
-    print("Extracting Graphics Tiles (Bank 04)...")
+    print("Extracting Graphics Tiles with Multiple Palettes...")
     print("-" * 70)
+    print("NOTE: SNES sprites can use palettes 0-7 via OAM attributes.")
+    print("      Generating tile sheets with first 8 palettes for comparison.")
+    print()
 
-    # Extract sample tile sets with first palette
+    # Extract tiles with MULTIPLE palettes to show actual in-game appearance
+    tile_count = 256
+    
+    # For each palette, extract tiles and save separately
+    for pal_idx in range(8):  # SNES sprites use palettes 0-7
+        palette = palettes[pal_idx]
+        print(f"Rendering tiles with Palette {pal_idx}...")
+        
+        # Extract 4BPP tiles
+        tiles_4bpp = extractor.extract_tiles_4bpp(BANK_04_START, tile_count, palette)
+        
+        # Create tile sheet for this palette
+        tile_sheet = extractor.create_tile_sheet(tiles_4bpp, tiles_per_row=16)
+        sheet_path = TILES_DIR / f"bank04_tiles_palette{pal_idx:02d}_sheet.png"
+        tile_sheet.save(sheet_path)
+        print(f"  [OK] Saved tile sheet with Palette {pal_idx}: {sheet_path.name}")
+    
+    print()
+    print("Creating Comparison Sheet (All 8 Palettes)...")
+    print("-" * 70)
+    
+    # Create a comparison image showing the SAME tiles with ALL 8 palettes
+    # This helps identify which palette each sprite/tile actually uses in-game
+    num_sample_tiles = 64  # Show first 64 tiles
+    tiles_per_row = 8
+    
+    # Create comparison sheet: 8 rows (one per palette) × 8 columns (tiles)
+    comparison_width = tiles_per_row * 8
+    comparison_height = 8 * 8  # 8 palettes
+    comparison = Image.new('RGB', (comparison_width, comparison_height))
+    
+    for pal_idx in range(8):
+        palette = palettes[pal_idx]
+        tiles = extractor.extract_tiles_4bpp(BANK_04_START, num_sample_tiles, palette)
+        
+        for tile_idx in range(tiles_per_row):
+            if tile_idx < len(tiles):
+                x = tile_idx * 8
+                y = pal_idx * 8
+                comparison.paste(tiles[tile_idx], (x, y))
+    
+    comparison_path = TILES_DIR / "tile_palette_comparison.png"
+    comparison.save(comparison_path)
+    print(f"[OK] Saved palette comparison: {comparison_path.name}")
+    print(f"     This shows tiles 0-7 rendered with each of the 8 palettes.")
+    print()
+
+    # Save individual tiles with default palette for backwards compatibility
+    print("Saving Individual Tiles (Palette 0 - for reference)...")
     default_palette = palettes[0]
-
-    # Example: Extract first 256 tiles as 4BPP
-    print("Extracting 4BPP tiles (0x028000+)...")
-    tiles_4bpp = extractor.extract_tiles_4bpp(BANK_04_START, 256, default_palette)
-    print(f"[OK] Extracted {len(tiles_4bpp)} 4BPP tiles")
-
-    # Create tile sheet
-    tile_sheet = extractor.create_tile_sheet(tiles_4bpp, tiles_per_row=16)
-    sheet_path = TILES_DIR / "bank04_tiles_4bpp_sheet.png"
-    tile_sheet.save(sheet_path)
-    print(f"[OK] Saved tile sheet: {sheet_path} ({tile_sheet.size[0]}x{tile_sheet.size[1]})")
-
-    # Save individual tiles
-    for i, tile in enumerate(tiles_4bpp[:64]):  # Save first 64 tiles as examples
+    tiles_4bpp = extractor.extract_tiles_4bpp(BANK_04_START, tile_count, default_palette)
+    
+    for i, tile in enumerate(tiles_4bpp[:64]):  # Save first 64 tiles
         tile_path = TILES_DIR / f"tile_4bpp_{i:04d}.png"
         tile.save(tile_path)
-
-    print(f"[OK] Saved {min(64, len(tiles_4bpp))} individual tiles")
+    
+    print(f"[OK] Saved {min(64, len(tiles_4bpp))} individual tiles (palette 0)")
 
     print()
     print("=" * 70)
     print("Extraction Complete!")
     print("=" * 70)
     print(f"Output directory: {OUTPUT_DIR}")
-    print(f"  - Palettes: {PALETTES_DIR}")
+    print(f"  - Palettes: {PALETTES_DIR} (16 palettes extracted)")
     print(f"  - Tiles: {TILES_DIR}")
-    print(f"  - Sprites: {SPRITES_DIR}")
+    print(f"    • bank04_tiles_palette00-07_sheet.png (8 palette versions)")
+    print(f"    • tile_palette_comparison.png (side-by-side comparison)")
+    print(f"    • tile_4bpp_NNNN.png (individual tiles, palette 0)")
+    print(f"  - Sprites: {SPRITES_DIR} (for future sprite assembly)")
+    print()
+    print("How to Use Multi-Palette Output:")
+    print("  1. Compare tile sheets (palette00-07_sheet.png) with game screenshots")
+    print("  2. Identify which palette makes graphics look correct")
+    print("  3. For sprites: palette usually set via OAM attribute byte")
+    print("     - Example: $d2 attribute = palette 6, $9c = palette 3")
+    print("  4. Use tile_palette_comparison.png to quickly see palette variations")
     print()
     print("Next steps:")
-    print("  - Review extracted palettes in JSON format")
-    print("  - Examine tile sheets to identify sprite boundaries")
-    print("  - Use different palettes to render different sprite sets")
-    print("  - Document tile ranges for specific graphics (enemies, UI, etc.)")
+    print("  - Compare extracted tiles with emulator VRAM viewer")
+    print("  - Document which tiles use which palettes (OAM metadata)")
+    print("  - Create sprite definitions mapping tiles → palettes")
 
     return 0
 

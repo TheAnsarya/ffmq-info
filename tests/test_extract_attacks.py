@@ -72,15 +72,15 @@ class TestAttackExtraction(unittest.TestCase):
 		"""Test that attack_type bytes are valid (0-255)"""
 		for attack in self.attacks:
 			attack_type = attack['attack_type']
-			
+
 			self.assertIsInstance(attack_type, int,
 				f"Attack {attack['id']} attack_type should be integer")
-			
+
 			self.assertGreaterEqual(attack_type, 0,
 				f"Attack {attack['id']} attack_type should be >= 0")
 			self.assertLessEqual(attack_type, 255,
 				f"Attack {attack['id']} attack_type should be <= 255")
-	
+
 	def test_unique_ids(self):
 		"""Test that attack IDs are unique"""
 		attack_ids = [a['id'] for a in self.attacks]

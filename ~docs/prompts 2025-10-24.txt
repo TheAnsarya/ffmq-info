@@ -552,12 +552,14 @@ Try to debug the scripts (could take significant time)?
 you've stalled? try again but don't freeze
 did the script changes all make it into the commit? Is the bug fixed? continue working
 analyze the project and identify work that needs to be done, create todo lists and github issues for this work, and then begin working through those issues
-
-
-
-
-
 I don't know how many times I have to say it: TABS NOT SPACES ALWAYS AND FOREVER IN EVERY FILE. Your python files are the worst offenders that need to be converted to use tabs not spaces, but there are others. Make sure you format every file and always use tabs/crlf/utf-8
+create a commit and then, I don't know how many times I have to say it: TABS NOT SPACES ALWAYS AND FOREVER IN EVERY FILE. Your python files are the worst offenders that need to be converted to use tabs not spaces, but there are others. Make sure you format every file and always use tabs/crlf/utf-8
+use claude 4.5
+pick some issues/todos and implement them.
+pick some issues/todos and implement them.
+Commit all this work with a descriptive message; Test one of the example mods to verify everything works; Create text modding and advanced tutorials to complete Todo #5; continue
+continue and update issues as you go. if you create new work, make an issue for it
+as always make an issue and then implement it: extracted graphics do not look like the real graphics, look at the actual displayed graphics for the game (the internet has lots of it, or run the emulator and look at the VRAM and graphics state and outputted graphics and then match that during the extraction/re-insertion process
 
 
 
@@ -565,6 +567,13 @@ I don't know how many times I have to say it: TABS NOT SPACES ALWAYS AND FOREVER
 
 
 
+
+
+
+
+
+
+clean up the `bak` and `temp` files and other trash; organize all the documention files (`md` files mostly) and organize the scripts (`tools` folder `py` files mostly) and organize everything else; split documentation into sub-documents when it seems appropriate; update all the documentation  for the scripts and everything; clean up the project and organize it;
 
 
 

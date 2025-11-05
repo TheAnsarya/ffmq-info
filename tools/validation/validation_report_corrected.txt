@@ -8,60 +8,60 @@ SUMMARY: 10/10 tests passed (100.0%)
 📊 SPELLS: 4/4 passed
 --------------------------------------------------
 ✅ PASS Total Spell Effects Count
-     Expected: 16
-     Actual:   16
-     Details:  Total spell effects in our extraction: 16
+	 Expected: 16
+	 Actual:	 16
+	 Details:	Total spell effects in our extraction: 16
 
 ✅ PASS Learnable Spells Mapped
-     Expected: 12
-     Actual:   12
-     Details:  Successfully mapped 12/12 randomizer learnable spells
+	 Expected: 12
+	 Actual:	 12
+	 Details:	Successfully mapped 12/12 randomizer learnable spells
 
 ✅ PASS Spell Mapping Integrity
-     Expected: All mapped spells match
-     Actual:   0 issues
-     Details:  All spell mappings valid
+	 Expected: All mapped spells match
+	 Actual:	 0 issues
+	 Details:	All spell mappings valid
 
 ✅ PASS Learnable Spell Power Values
-     Expected: Powers in reasonable ranges
-     Actual:   0 issues
-     Details:  All spell powers reasonable
+	 Expected: Powers in reasonable ranges
+	 Actual:	 0 issues
+	 Details:	All spell powers reasonable
 
 📊 ENEMIES: 3/3 passed
 --------------------------------------------------
 ✅ PASS Enemy Metadata Count
-     Expected: 83
-     Actual:   83
-     Details:  Metadata reports 83 enemies, randomizer expects 83
+	 Expected: 83
+	 Actual:	 83
+	 Details:	Metadata reports 83 enemies, randomizer expects 83
 
 ✅ PASS Enemy Actual Count
-     Expected: 83
-     Actual:   83
-     Details:  Found 83 enemy entries, randomizer expects 83
+	 Expected: 83
+	 Actual:	 83
+	 Details:	Found 83 enemy entries, randomizer expects 83
 
 ✅ PASS Enemy Structure Fields
-     Expected: All enemy stat fields present
-     Actual:   Missing: []
-     Details:  Enemy structure validation: 0 missing concepts
+	 Expected: All enemy stat fields present
+	 Actual:	 Missing: []
+	 Details:	Enemy structure validation: 0 missing concepts
 
 📊 ATTACKS: 2/2 passed
 --------------------------------------------------
 ✅ PASS Attack Metadata Count
-     Expected: 169
-     Actual:   169
-     Details:  Metadata reports 169 attacks, randomizer expects 169
+	 Expected: 169
+	 Actual:	 169
+	 Details:	Metadata reports 169 attacks, randomizer expects 169
 
 ✅ PASS Attack Actual Count
-     Expected: 169
-     Actual:   169
-     Details:  Found 169 attack entries, randomizer expects 169
+	 Expected: 169
+	 Actual:	 169
+	 Details:	Found 169 attack entries, randomizer expects 169
 
 📊 ELEMENTS: 1/1 passed
 --------------------------------------------------
 ✅ PASS Bitfield Analysis
-     Expected: Element bitfields found and parsed
-     Actual:   Found 11 bitfields
-     Details:  Element bitfield validation: 11 bitfields analyzed successfully
+	 Expected: Element bitfields found and parsed
+	 Actual:	 Found 11 bitfields
+	 Details:	Element bitfield validation: 11 bitfields analyzed successfully
 
 🔍 KEY FINDINGS:
 --------------------------------------------------
