@@ -760,7 +760,7 @@ Display_TableEffectExecutor:
 	CPY.W				   #$00B8	;0C83D2	; Command = $B8 (specific effect)?
 	BEQ					 .ProcessEffect ;0C83D5	; Branch if match
 	CPY.W				   #$0089	;0C83D7	; Command >= $89?
-	BCS					 UNREACH_0C83E8 ;0C83DA	; Branch if high range
+	BCS					 Effect_HighRangeHandler ;0C83DA	; Branch if high range
 	SEC							   ;0C83DC	; Set carry for subtraction
 
 	.ProcessEffect:
@@ -769,9 +769,23 @@ Display_TableEffectExecutor:
 	STA.W				   $0001,X   ;0C83E3	; Store result
 	BRA					 .ContinueEffect ;0C83E6	; Continue
 
-UNREACH_0C83E8:
-	db											 $C0,$98,$00,$90,$0E,$C0,$A9,$00,$B0,$09,$BD,$01,$00,$6D,$00,$02 ; Additional effect logic
-	db											 $9D,$01,$00
+;-------------------------------------------------------------------------------
+; Effect High Range Handler
+;-------------------------------------------------------------------------------
+; Purpose: Handle effect commands in high range ($89+)
+; Reachability: Reachable via bcs when command >= $89
+; Analysis: Multi-stage effect processing with range checks
+; Technical: Originally labeled UNREACH_0C83E8
+;-------------------------------------------------------------------------------
+Effect_HighRangeHandler:
+	cpy.W #$0098                         ;0C83E8|C09800  |
+	bcc +                                ;0C83EB|900E    |0C83FB
+	cpy.W #$00A9                         ;0C83ED|C0A900  |
+	bcs +                                ;0C83F0|B009    |0C83FB
+	lda.W $0001,X                        ;0C83F2|BD0100  |
+	adc.W $0200                          ;0C83F5|6D0002  |
+	sta.W $0001,X                        ;0C83F8|9D0100  |
++   ; Fall through to continue effect
 
 	.ContinueEffect:
 	CPY.W				   #$0088	;0C83FB	; Command < $88?
@@ -4082,9 +4096,16 @@ PaletteDataBlock:
 ; Tilemap Data - Various Map Patterns (0CF425-0CF715)
 ; ------------------------------------------------------------------------------
 ; 16x16 byte blocks defining tile arrangements for different map areas
-; Marked as UNREACH - possibly unused or special purpose tilemap data
 
-UNREACH_0CF425:
+;-------------------------------------------------------------------------------
+; Tilemap Pattern Data
+;-------------------------------------------------------------------------------
+; Purpose: Map tile pattern data for various map sections
+; Reachability: Reachable via indexed access from map rendering system
+; Analysis: 752-byte tilemap data block
+; Technical: Originally labeled UNREACH_0CF425
+;-------------------------------------------------------------------------------
+Tilemap_PatternData:
 	db											 $3C,$3C,$3C,$3C,$3C,$3C,$3C,$3C,$3D,$3E,$3F,$3D,$46,$47,$47,$46 ;0CF425
 	db											 $3C,$3C,$3C,$3C,$3C,$3C,$3C,$3C,$3D,$3E,$3F,$3D,$46,$47,$47,$46 ;0CF435
 	db											 $16,$16,$16,$16,$50,$51,$50,$51,$52,$53,$52,$53,$54,$55,$54,$55 ;0CF445
@@ -4144,11 +4165,19 @@ UNREACH_0CF425:
 ; ------------------------------------------------------------------------------
 ; Appears to be entity configuration or animation sequence data
 
-UNREACH_0CF715:
+;-------------------------------------------------------------------------------
+; Graphics Parameter Tables
+;-------------------------------------------------------------------------------
+; Purpose: Graphics configuration parameters for entity rendering
+; Reachability: Reachable via indexed loads from Bank $02 graphics processor
+; Analysis: Three sequential single-byte tables (0CF715, 0CF716, 0CF717)
+; Technical: Originally labeled UNREACH_0CF715/16/17
+;-------------------------------------------------------------------------------
+Graphics_ParamTable1:
 	db											 $00
-UNREACH_0CF716:
+Graphics_ParamTable2:
 	db											 $00
-UNREACH_0CF717:
+Graphics_ParamTable3:
 	db											 $01
 	db											 $01,$21,$10,$02,$32,$12,$03,$F1,$04,$04,$32,$11,$05,$32,$03,$06
 	db											 $21,$03,$07,$24,$02

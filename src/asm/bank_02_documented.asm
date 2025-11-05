@@ -6693,10 +6693,10 @@ Graphics_DataProcessor:
 	sta.W				   $0a9d	 ;02E009|8D9D0A  |020A9D; Store graphics offset
 	sep					 #$20		;02E00C|E220    |      ; 8-bit accumulator
 	rep					 #$10		;02E00E|C210    |      ; 16-bit index
-	lda.L				   UNREACH_0CF716,x ;02E010|BF16F70C|0CF716; Load graphics parameter 2
+	lda.L				   Graphics_ParamTable2,x ;02E010|BF16F70C|0CF716; Load graphics parameter 2
 	sta.W				   $0a9f	 ;02E014|8D9F0A  |020A9F; Store graphics flag
 	dec					 a;02E017|3A      |      ; Decrement parameter
-	lda.L				   UNREACH_0CF717,x ;02E018|BF17F70C|0CF717; Load graphics parameter 3
+	lda.L				   Graphics_ParamTable3,x ;02E018|BF17F70C|0CF717; Load graphics parameter 3
 	sta.W				   $0aa0	 ;02E01C|8DA00A  |020AA0; Store graphics mode
 	plp							   ;02E01F|28      |      ; Restore processor status
 	rts							   ;02E020|60      |      ; Return to caller
