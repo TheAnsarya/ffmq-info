@@ -7,6 +7,10 @@ pull-assets-from-rom/obj
 *.sfc
 roms/
 
+# Extracted graphics (binary PNG assets, regenerated from ROM)
+data/extracted/graphics/tiles/*.png
+data/extracted/graphics/sprites/*.png
+
 # Backup and temporary files
 **/*.bak
 **/*.pre_format_backup
