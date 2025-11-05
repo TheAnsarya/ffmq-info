@@ -4452,15 +4452,22 @@ Tilemap_CalcRowAddress:
 ; ===========================================================================
 
 	cmp.B				   #$ff	  ; Check if invalid position
-	beq					 UNREACH_008D93 ; If $ff → Return $ffff
+	beq					 Map_InvalidPositionReturn ; If $ff → Return $ffff
 
 	jsr.W				   CODE_008C1B ; Calculate tilemap address
 	tax							   ; X = calculated address
 	rts							   ; Return
 
 ;-------------------------------------------------------------------------------
-
-UNREACH_008D93:
+; Map - Invalid Position Return
+;-------------------------------------------------------------------------------
+; Purpose: Return invalid address marker for out-of-bounds map positions
+; Reachability: Reachable via conditional branch (beq above)
+; Analysis: When position is $ff (invalid), returns $ffff as error marker
+;   - Used by map coordinate helpers to signal invalid tile positions
+; Technical: Originally labeled UNREACH_008D93
+;-------------------------------------------------------------------------------
+Map_InvalidPositionReturn:
 	ldx.W				   #$ffff	; X = invalid address marker
 	rts							   ; Return
 
@@ -9093,7 +9100,7 @@ Sprite_DrawDispatch:
 	and.W				   #$00ff
 	pha							   ; Save bank
 	plb							   ; Set data bank
-	jsr.W				   (UNREACH_00AAF7,x) ; Dispatch to sprite routine
+	jsr.W				   (Sprite_DrawDispatchTable,x) ; Dispatch to sprite routine
 	plb							   ; Restore data bank
 	jsr.W				   CODE_00B4A7 ; Cleanup drawing context
 	pla							   ; Restore $25
@@ -9103,27 +9110,16 @@ Sprite_DrawDispatch:
 	db											 $60		 ; Extra RTS
 
 ;-------------------------------------------------------------------------------
-; UNREACHABLE CODE ANALYSIS
-; ------------------------------------------------------------------------------
-; Label: UNREACH_00AAF7
-; Category: 🟢 Table-Driven Reachable (Sprite dispatch table)
+; Sprite Draw Dispatch Table
+;-------------------------------------------------------------------------------
 ; Purpose: Sprite/window drawing dispatch table with 2-byte header
-; Reachability: Likely REACHABLE via indexed access (header + table lookup)
+; Reachability: Reachable via indexed jump (jsr above)
 ; Analysis: Jump table for sprite and window rendering routines
 ;   - Bytes $F6 $AA: Table header/signature (possibly entry count or flags)
-;   - 7 function pointers for different sprite/window types:
-;     $00: Draw filled sprite
-;     $01: Draw window border
-;     $02: Draw window frame
-;     $03: Draw item icon
-;     $04: Draw spell icon
-;     $05: Draw top border
-;     $06: Draw filled box
-; Verified: Table structure suggests indirect addressing
-; Notes: Should be renamed to Sprite_DrawDispatchTable
-;        Header bytes may indicate 7 entries or table format
-; ------------------------------------------------------------------------------
-UNREACH_00AAF7:
+;   - 7 function pointers for different sprite/window types
+; Technical: Originally labeled UNREACH_00AAF7
+;-------------------------------------------------------------------------------
+Sprite_DrawDispatchTable:
 	db $f6,$aa                           ;00AAF7|        |      ; Table header (entry count or flags)
 	dw Sprite_DrawFilled                 ;00AAF9|        |      ; $00: Draw filled sprite
 	dw Sprite_DrawWindowBorder           ;00AAFB|        |      ; $01: Draw window border
@@ -11168,24 +11164,20 @@ RTS_Label:
 System_CheckModeJump:
 	lda.W				   #$0020	; Bit 5 mask
 	and.W				   $00da	 ; Test bit 5 of $da
-	beq					 UNREACH_00B4BB ; If clear, jump to alternate
+	beq					 System_AlternateModeJump ; If clear, jump to alternate
 	jmp.W				   CODE_00A8C0 ; Jump to routine A
 
-; ------------------------------------------------------------------------------
-; UNREACHABLE CODE ANALYSIS
-; ------------------------------------------------------------------------------
-; Label: UNREACH_00B4BB
-; Category: 🟡 Conditionally Reachable (Alternate path)
+;-------------------------------------------------------------------------------
+; System - Alternate Mode Jump
+;-------------------------------------------------------------------------------
 ; Purpose: Load $00FF and jump to CODE_009DC9 (likely fade/graphics routine)
-; Reachability: REACHABLE via conditional branch at previous line (beq)
+; Reachability: Reachable via conditional branch (beq above)
 ; Analysis: Alternate execution path when bit 5 of $00da is clear
 ;   - Loads A with $00FF (16-bit)
 ;   - Jumps to CODE_009DC9 (graphics fade/transition routine)
-; Verified: Reachable when system mode flag (bit 5 of $da) is cleared
-; Notes: This is NOT unreachable - it's a conditional path
-;        Should be renamed to System_AlternateModeJump
-; ------------------------------------------------------------------------------
-UNREACH_00B4BB:
+; Technical: Originally labeled UNREACH_00B4BB
+;-------------------------------------------------------------------------------
+System_AlternateModeJump:
 	lda.W #$00ff                         ;00B4BB|A9FF00  |      ; Load A with $00FF
 	jmp.W CODE_009DC9                    ;00B4BE|4CC99D  |009DC9; Jump to graphics routine
 
@@ -11409,30 +11401,23 @@ Sprite_SetupCharacter_CheckLocation:
 	cmp.B				   #$4e	  ; Location $4e?
 	beq					 Sprite_SetupCharacter_AdjustX ; If yes, adjust X position
 	cmp.B				   #$6b	  ; Location $6b?
-	beq					 UNREACH_00B5C2 ; If yes, adjust Y position
+	beq					 Sprite_AdjustYPosition_Location6B ; If yes, adjust Y position
 	cmp.B				   #$77	  ; < $77?
 	bcc					 Sprite_SetupCharacter_Continue ; If yes, continue
 	cmp.B				   #$7b	  ; >= $7b?
 	bcs					 Sprite_SetupCharacter_Continue ; If yes, continue
 	bra Sprite_SetupCharacter_AdjustX    ;00B5C0|8007    |00B5C9; Branch to adjust X
 
-; ------------------------------------------------------------------------------
-; UNREACHABLE CODE ANALYSIS
-; ------------------------------------------------------------------------------
-; Label: UNREACH_00B5C2
-; Category: 🟡 Conditionally Reachable (Y position adjustment)
+;-------------------------------------------------------------------------------
+; Sprite - Adjust Y Position for Location $6B
+;-------------------------------------------------------------------------------
 ; Purpose: Adjust Y position by adding 4
-; Reachability: REACHABLE via conditional branch (beq at previous section)
+; Reachability: Reachable via conditional branch (beq above)
 ; Analysis: Y coordinate adjustment for sprite at location $6B
-;   - Clears carry flag
-;   - Loads Y position from $23
-;   - Adds 4 pixels
-;   - Stores back to $23
-; Verified: Reachable when sprite location == $6B
-; Notes: This is NOT unreachable - it's a special case handler
-;        Should be renamed to Sprite_AdjustYPosition_Location6B
-; ------------------------------------------------------------------------------
-UNREACH_00B5C2:
+;   - Clears carry flag, loads Y position from $23, adds 4 pixels, stores back
+; Technical: Originally labeled UNREACH_00B5C2
+;-------------------------------------------------------------------------------
+Sprite_AdjustYPosition_Location6B:
 	clc                                  ;00B5C2|18      |      ; Clear carry
 	lda.B $23                            ;00B5C3|A523    |000023; Load Y position
 	adc.B #$04                           ;00B5C5|6904    |      ; Add 4
@@ -11476,29 +11461,23 @@ Sprite_SetupCharacter_StoreMode:
 	sta.B				   $24	   ; Store final sprite mode
 	lda.B				   $23	   ; Load Y position
 	cmp.B				   #$08	  ; < $08?
-	bcc					 UNREACH_00B607 ; If yes, clamp to $08
+	bcc					 Sprite_ClampYMin ; If yes, clamp to $08
 	cmp.B				   #$a9	  ; >= $a9?
 	bcc					 Sprite_SetupCharacter_CheckX ; If no, in range
 	lda.B #$a8                           ;00B601|A9A8    |      ; Clamp to $A8
 	sta.B $23                            ;00B603|8523    |000023; Store Y position
 	bra Sprite_SetupCharacter_CheckX     ;00B605|8004    |00B60B; Continue
 
-; ------------------------------------------------------------------------------
-; UNREACHABLE CODE ANALYSIS
-; ------------------------------------------------------------------------------
-; Label: UNREACH_00B607
-; Category: 🟡 Conditionally Reachable (Y position clamping)
+;-------------------------------------------------------------------------------
+; Sprite - Clamp Y to Minimum
+;-------------------------------------------------------------------------------
 ; Purpose: Clamp Y position to minimum value $08
-; Reachability: REACHABLE via conditional branch (bcc above)
+; Reachability: Reachable via conditional branch (bcc above)
 ; Analysis: Lower bound clamping for sprite Y coordinate
-;   - Loads A with $08 (minimum Y position)
-;   - Stores to $23 (Y position variable)
-; Verified: Reachable when Y position < $08
-; Notes: This is NOT unreachable - it's a boundary check
-;        Paired with upper clamp at $A8 above
-;        Should be renamed to Sprite_ClampYMin
-; ------------------------------------------------------------------------------
-UNREACH_00B607:
+;   - Loads A with $08 (minimum Y position), stores to $23
+; Technical: Originally labeled UNREACH_00B607
+;-------------------------------------------------------------------------------
+Sprite_ClampYMin:
 	lda.B #$08                           ;00B607|A908    |      ; Clamp to $08 (minimum)
 	sta.B $23                            ;00B609|8523    |000023; Store Y position
 
