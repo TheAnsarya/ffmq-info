@@ -1067,4 +1067,303 @@ See `docs/TOOLS.md` for detailed tool documentation.
 
 ---
 
+## C Struct Definitions
+
+For use in C/C++ tools and editors. These struct definitions match the ROM data layouts exactly.
+
+### Character Data Structure
+
+```c
+// Character data structure (32 bytes)
+// ROM Location: Bank $0C @ $8000
+typedef struct {
+    uint8_t  character_id;        // 0x00: Character ID (0-3)
+    uint8_t  name_ptr_lo;         // 0x01: Name string pointer (low)
+    uint8_t  name_ptr_hi;         // 0x02: Name string pointer (high)
+    uint8_t  starting_level;      // 0x03: Starting level (1-41)
+    uint16_t starting_hp;         // 0x04: Starting HP (little-endian)
+    uint16_t max_hp;              // 0x06: Maximum HP
+    uint8_t  white_magic;         // 0x08: White magic power
+    uint8_t  black_magic;         // 0x09: Black magic power
+    uint8_t  wizard_magic;        // 0x0A: Wizard magic power
+    uint8_t  speed;               // 0x0B: Speed stat
+    uint8_t  strength;            // 0x0C: Strength
+    uint8_t  defense;             // 0x0D: Defense
+    uint8_t  hp_growth;           // 0x0E: HP gain per level
+    uint8_t  wm_growth;           // 0x0F: White magic growth
+    uint8_t  bm_growth;           // 0x10: Black magic growth
+    uint8_t  wiz_growth;          // 0x11: Wizard magic growth
+    uint8_t  speed_growth;        // 0x12: Speed growth
+    uint8_t  str_growth;          // 0x13: Strength growth
+    uint8_t  def_growth;          // 0x14: Defense growth
+    uint8_t  equipment_flags;     // 0x15: Equipment slot flags
+    uint8_t  magic_flags;         // 0x16: Available magic types
+    uint8_t  starting_weapon;     // 0x17: Starting weapon ID
+    uint8_t  starting_armor;      // 0x18: Starting armor ID
+    uint8_t  starting_accessory;  // 0x19: Starting accessory ID
+    uint8_t  reserved[6];         // 0x1A-0x1F: Unused/padding
+} CharacterData;
+```
+
+### Enemy Data Structure
+
+```c
+// Enemy data structure (14 bytes)
+// ROM Location: Bank $02 @ $C275 (PC offset $014275)
+typedef struct {
+    uint16_t max_hp;              // 0x00: Max HP (little-endian)
+    uint8_t  attack;              // 0x02: Attack power
+    uint8_t  defense;             // 0x03: Defense
+    uint8_t  speed;               // 0x04: Speed
+    uint8_t  magic;               // 0x05: Magic power
+    uint16_t resistances;         // 0x06: Element resistances (bitfield)
+    uint8_t  magic_defense;       // 0x08: Magic defense
+    uint8_t  magic_evade;         // 0x09: Magic evade
+    uint8_t  accuracy;            // 0x0A: Physical accuracy
+    uint8_t  evade;               // 0x0B: Physical evade
+    uint16_t weaknesses;          // 0x0C: Element weaknesses (bitfield)
+} EnemyStats;
+
+// Element bitfield flags (resistances and weaknesses)
+#define ELEM_FIRE       0x0001
+#define ELEM_ICE        0x0002
+#define ELEM_THUNDER    0x0004
+#define ELEM_EARTH      0x0008
+#define ELEM_AIR        0x0010
+#define ELEM_WATER      0x0020
+#define ELEM_POISON     0x0040
+#define ELEM_BOMB       0x0080
+#define ELEM_AXE        0x0100
+#define ELEM_SWORD      0x0200
+#define ELEM_DARK       0x0400
+#define ELEM_STONE      0x0800
+#define ELEM_CONFUSION  0x1000
+#define ELEM_SLEEP      0x2000
+#define ELEM_PARALYZE   0x4000
+#define ELEM_DOOM       0x8000
+```
+
+### Item Data Structure
+
+```c
+// Item data structure (16 bytes)
+// ROM Location: Bank $04 @ varies by item type
+typedef struct {
+    uint8_t  item_id;             // 0x00: Item ID (0-255)
+    uint8_t  item_type;           // 0x01: Type (0=consumable, 1=weapon, etc.)
+    uint8_t  name_ptr_lo;         // 0x02: Name string pointer (low)
+    uint8_t  name_ptr_hi;         // 0x03: Name string pointer (high)
+    uint8_t  description_ptr_lo;  // 0x04: Description pointer (low)
+    uint8_t  description_ptr_hi;  // 0x05: Description pointer (high)
+    uint8_t  icon_id;             // 0x06: Icon graphic ID
+    uint8_t  power;               // 0x07: Attack/defense bonus
+    uint8_t  element;             // 0x08: Elemental affinity
+    uint8_t  special_effect;      // 0x09: Special effect ID
+    uint16_t buy_price;           // 0x0A: Shop buy price (little-endian)
+    uint16_t sell_price;          // 0x0C: Shop sell price
+    uint8_t  equip_flags;         // 0x0E: Who can equip (bitfield)
+    uint8_t  reserved;            // 0x0F: Unused/padding
+} ItemData;
+
+// Item types
+#define ITEM_TYPE_CONSUMABLE  0
+#define ITEM_TYPE_WEAPON      1
+#define ITEM_TYPE_ARMOR       2
+#define ITEM_TYPE_ACCESSORY   3
+#define ITEM_TYPE_KEY_ITEM    4
+```
+
+### Attack Data Structure
+
+```c
+// Attack/spell data structure (varies)
+// ROM Location: Bank $02 @ $4678
+typedef struct {
+    uint8_t  attack_id;           // 0x00: Attack ID
+    uint8_t  power;               // 0x01: Base power
+    uint8_t  element;             // 0x02: Elemental type
+    uint8_t  targeting;           // 0x03: Target selection
+    uint8_t  animation_id;        // 0x04: Animation to play
+    uint8_t  hit_formula;         // 0x05: Hit rate formula ID
+    uint8_t  damage_formula;      // 0x06: Damage formula ID
+    uint8_t  special_effects;     // 0x07: Status effects bitfield
+} AttackData;
+```
+
+### Graphics Data Structures
+
+```c
+// Tileset header (8 bytes)
+typedef struct {
+    uint16_t tile_data_offset;    // 0x00: Offset to tile data
+    uint16_t tile_count;          // 0x02: Number of tiles
+    uint8_t  bits_per_pixel;      // 0x04: 2, 4, or 8 BPP
+    uint8_t  compression;         // 0x05: 0=none, 1=RLE, 2=LZ
+    uint16_t palette_offset;      // 0x06: Offset to palette data
+} TilesetHeader;
+
+// Palette entry (2 bytes, RGB555 format)
+typedef struct {
+    uint16_t color;               // RGB555: xBBBBBGGGGGRRRRR
+} PaletteColor;
+
+// Helper macros for RGB555
+#define RGB555(r,g,b) (((b)<<10) | ((g)<<5) | (r))
+#define GET_RED(c)    ((c) & 0x1F)
+#define GET_GREEN(c)  (((c) >> 5) & 0x1F)
+#define GET_BLUE(c)   (((c) >> 10) & 0x1F)
+```
+
+### Map Data Structures
+
+```c
+// Map header (32 bytes)
+typedef struct {
+    uint8_t  map_id;              // 0x00: Map ID (0-19)
+    uint8_t  width;               // 0x01: Map width in tiles
+    uint8_t  height;              // 0x02: Map height in tiles
+    uint8_t  tileset_id;          // 0x03: Tileset to use
+    uint8_t  music_id;            // 0x04: Background music track
+    uint8_t  palette_id;          // 0x05: Palette set ID
+    uint16_t tilemap_offset;      // 0x06: Offset to tilemap data
+    uint16_t collision_offset;    // 0x08: Offset to collision data
+    uint16_t event_offset;        // 0x0A: Offset to event data
+    uint8_t  layers;              // 0x0C: Number of layers (1-3)
+    uint8_t  flags;               // 0x0D: Map flags
+    uint8_t  reserved[18];        // 0x0E-0x1F: Unused/padding
+} MapHeader;
+
+// Tile properties (1 byte per tile)
+typedef struct {
+    uint8_t walkable : 1;         // Bit 0: Can walk on tile
+    uint8_t water : 1;            // Bit 1: Water tile
+    uint8_t damage : 1;           // Bit 2: Damage tile (lava)
+    uint8_t ice : 1;              // Bit 3: Slippery (ice)
+    uint8_t trigger : 1;          // Bit 4: Event trigger zone
+    uint8_t npc_block : 1;        // Bit 5: NPC blocking
+    uint8_t reserved : 2;         // Bits 6-7: Unused
+} TileProperties;
+```
+
+### Save Data Structure
+
+```c
+// Save slot structure (0x38C bytes)
+// SRAM Location: 3 copies at $0000, $038C, $0718
+typedef struct {
+    uint16_t checksum;            // 0x000: Save data checksum
+    uint8_t  marker[4];           // 0x002: "FF0!" marker
+    uint8_t  save_slot;           // 0x006: Save slot number (0-2)
+    uint8_t  play_time_hours;     // 0x007: Play time (hours)
+    uint8_t  play_time_minutes;   // 0x008: Play time (minutes)
+    uint8_t  play_time_seconds;   // 0x009: Play time (seconds)
+    
+    // Character data (4 × 80 bytes = 320 bytes)
+    struct {
+        uint8_t  name[8];         // Character name
+        uint8_t  level;           // Current level
+        uint16_t current_hp;      // Current HP
+        uint16_t max_hp;          // Maximum HP
+        uint8_t  stats[10];       // Various stats
+        uint8_t  equipment[4];    // Equipped items
+        uint8_t  magic[16];       // Known spells
+        uint8_t  reserved[39];    // Padding
+    } characters[4];
+    
+    // Inventory (256 bytes)
+    uint8_t inventory[256];       // Item IDs (0xFF = empty)
+    
+    // Progress flags (varies)
+    uint8_t progress_flags[64];   // Event flags, chests opened, etc.
+    
+    // Padding to 0x38C bytes
+    uint8_t reserved[24];
+} SaveData;
+```
+
+### Text Encoding
+
+```c
+// DTE (Dual Tile Encoding) table entry
+typedef struct {
+    uint8_t char1;                // First character
+    uint8_t char2;                // Second character
+} DTEEntry;
+
+// Text control codes
+#define TEXT_END           0x00   // End of string
+#define TEXT_NEWLINE       0x01   // Newline
+#define TEXT_WAIT          0x02   // Wait for button
+#define TEXT_CLEAR         0x03   // Clear text box
+#define TEXT_COLOR_START   0x10   // Color codes 0x10-0x1F
+#define TEXT_CHAR_START    0x20   // Character codes 0x20+
+```
+
+---
+
+## Usage Examples
+
+### Reading Enemy Data in C
+
+```c
+#include <stdio.h>
+#include <stdint.h>
+
+// Read enemy data from ROM
+EnemyStats* read_enemy(FILE* rom, uint8_t enemy_id) {
+    static EnemyStats enemy;
+    
+    // Enemy data starts at PC offset 0x014275
+    fseek(rom, 0x014275 + (enemy_id * sizeof(EnemyStats)), SEEK_SET);
+    fread(&enemy, sizeof(EnemyStats), 1, rom);
+    
+    return &enemy;
+}
+
+// Check if enemy has fire weakness
+int has_fire_weakness(EnemyStats* enemy) {
+    return (enemy->weaknesses & ELEM_FIRE) != 0;
+}
+
+// Print enemy stats
+void print_enemy_stats(EnemyStats* enemy, const char* name) {
+    printf("Enemy: %s\n", name);
+    printf("  HP:      %d\n", enemy->max_hp);
+    printf("  Attack:  %d\n", enemy->attack);
+    printf("  Defense: %d\n", enemy->defense);
+    printf("  Speed:   %d\n", enemy->speed);
+    
+    if (has_fire_weakness(enemy)) {
+        printf("  Weak to: Fire\n");
+    }
+}
+```
+
+### Converting RGB555 Colors
+
+```c
+// Convert RGB555 to RGB888 for display
+typedef struct {
+    uint8_t r, g, b;
+} RGB888;
+
+RGB888 rgb555_to_rgb888(uint16_t color) {
+    RGB888 result;
+    
+    // Extract 5-bit components
+    uint8_t r5 = GET_RED(color);
+    uint8_t g5 = GET_GREEN(color);
+    uint8_t b5 = GET_BLUE(color);
+    
+    // Scale to 8-bit (multiply by 255/31 ≈ 8.2258)
+    result.r = (r5 * 255) / 31;
+    result.g = (g5 * 255) / 31;
+    result.b = (b5 * 255) / 31;
+    
+    return result;
+}
+```
+
+---
+
 *This document is updated as data structures are discovered and extraction progresses.*
