@@ -824,19 +824,19 @@ DATA8_098464:
 ;
 ; ============================================================================
 
-DATA8_098460:
+DATA8_098460_1:
 	db											 $f5		 ;098460 Pointer LOW byte
 
-DATA8_098461:
+DATA8_098461_1:
 	db											 $85		 ;098461 Pointer MID byte
 
-DATA8_098462:
+DATA8_098462_1:
 	db											 $09		 ;098462 Pointer HIGH byte (Bank $09)
 
-DATA8_098463:
+DATA8_098463_1:
 	db											 $04		 ;098463 Entry count (4 colors)
 
-DATA8_098464:
+DATA8_098464_1:
 ; Palette Pointer Table Entries
 ; Format: [24-bit address][count][flags] repeated
 ;

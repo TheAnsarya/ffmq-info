@@ -284,7 +284,7 @@ CODE_0D8004:
 ; ------------------------------------------------------------------------------
 ; DATA8_0D8008: Module Count/Header
 ; ------------------------------------------------------------------------------
-DATA8_0d8008:
+DATA8_0d8008_1:
 	db											 $87		 ;0D8008|        |      ; Module count/header byte
 
 ; ------------------------------------------------------------------------------
@@ -293,7 +293,7 @@ DATA8_0d8008:
 ; Points to start of each SPC700 driver module in this bank
 ; These are 16-bit addresses offset from bank start ($0d8000)
 ; ------------------------------------------------------------------------------
-DATA8_0d8009:
+DATA8_0d8009_1:
 	db											 $86,$ac,$a1,$78,$9d,$46,$a1,$78,$a1,$92,$a1 ;0D8009|        |      ; Module pointers
 
 ; ------------------------------------------------------------------------------
@@ -302,9 +302,9 @@ DATA8_0d8009:
 ; Each pair defines: [size_low, size_high] for corresponding module
 ; Used to calculate transfer length during upload
 ; ------------------------------------------------------------------------------
-DATA8_0d8014:
+DATA8_0d8014_1:
 	db											 $00		 ;0D8014|        |      ; Module 0 size (low)
-DATA8_0d8015:
+DATA8_0d8015_1:
 	db											 $02,$00,$2c,$00,$48,$00,$1b,$80,$1a,$00,$1a ;0D8015|        |      ; Module sizes/addresses
 	db											 $ae,$bd,$ff,$bd,$35,$be,$7d,$be,$59,$be,$a1,$be ;0D8020|        |00FFBD; Continue module table
 
@@ -327,7 +327,7 @@ DATA8_0d8015:
 ;   4. Use handshake protocol to sync with SPC700
 ;   5. Start execution at $0200 in SPC700 RAM
 ; ------------------------------------------------------------------------------
-SPC_InitMain:
+SPC_InitMain_1:
 	phb							   ;0D802C|8B      |      ; Push data bank
 	phd							   ;0D802D|0B      |      ; Push direct page
 	php							   ;0D802E|08      |      ; Push processor status
@@ -389,7 +389,7 @@ SPC_InitMain:
 ;   5. Wait for SPC700 to echo handshake
 ;   6. Transfer data bytes with incrementing handshake
 ; ------------------------------------------------------------------------------
-SPC_WaitReady:
+SPC_WaitReady_1:
 	cpx.W				   SNES_APUIO0 ;0D8077|EC4021  |002140; Wait for SPC700 ready
 	bne					 SPC_WaitReady ;0D807A|D0FB    |0D8077; Loop until $bbaa confirmed
 
@@ -410,7 +410,7 @@ SPC_WaitReady:
 ; Wait for SPC700 to acknowledge handshake
 ; SPC700 IPL will echo handshake byte back to APUIO0 when ready
 ; ------------------------------------------------------------------------------
-SPC_WaitAck:
+SPC_WaitAck_1:
 	cmp.W				   SNES_APUIO0 ;0D8097|CD4021  |002140; Wait for echo
 	bne					 SPC_WaitAck ;0D809A|D0FB    |0D8097; Loop until handshake confirmed
 
@@ -421,7 +421,7 @@ SPC_WaitAck:
 ; Uses indirect addressing to read module data from ROM
 ; Handshake increments each transfer to sync CPU/SPC700
 ; ==============================================================================
-SPC_TransferBlock:
+SPC_TransferBlock_1:
 	lda.B				   #$00	  ;0D809C|A900    |      ; Clear high byte
 	xba							   ;0D809E|EB      |      ; Swap to B accumulator
 
@@ -457,7 +457,7 @@ SPC_TransferBlock:
 ; Transfers module data byte-by-byte with handshake protocol
 ; Each byte requires handshake increment to confirm transfer
 ; ------------------------------------------------------------------------------
-SPC_TransferLoop:
+SPC_TransferLoop_1:
 	lda.B				   [$14],y   ;0D80C1|B714    |000614; Read data byte from module
 	sta.W				   SNES_APUIO1 ;0D80C3|8D4121  |002141; Send to APUIO1 (data port)
 	xba							   ;0D80C6|EB      |      ; Get handshake byte from B
@@ -466,7 +466,7 @@ SPC_TransferLoop:
 ; ------------------------------------------------------------------------------
 ; Wait for SPC700 to echo handshake (confirms byte received)
 ; ------------------------------------------------------------------------------
-SPC_WaitTransfer:
+SPC_WaitTransfer_1:
 	cmp.W				   SNES_APUIO0 ;0D80CA|CD4021  |002140; Wait for echo
 	bne					 SPC_WaitTransfer ;0D80CD|D0FB    |0D80CA; Loop until confirmed
 

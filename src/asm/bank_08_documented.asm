@@ -255,7 +255,7 @@ DATA8_088330:
 ; Format: Variable-length entries (2-6 bytes each)
 ; ------------------------------------------------------------
 
-DATA8_088000:
+DATA8_088000_1:
 ; Pointer Entry 0: Main story dialogue
 	db											 $2d,$03,$f1,$00
 ; $2d,$03 = Pointer to text at $08832d (bank-relative)
@@ -366,7 +366,7 @@ DATA8_088000:
 ; Each string terminated by $f0 (END_STRING marker)
 ; ------------------------------------------------------------
 
-DATA8_088330:
+DATA8_088330_1:
 ; Text String: "Hello, traveler..." (EXAMPLE DECODE)
 	db											 $26,$07,$07,$07
 ; Using simple.tbl character mapping:

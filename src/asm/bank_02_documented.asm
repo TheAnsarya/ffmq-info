@@ -5832,7 +5832,7 @@ DATA8_02d8bf:
 
 ; Advanced Graphics Processing Coordination Engine
 ; Complex graphics processing with sophisticated calculation systems
-Graphics_DataProcessor:
+Graphics_DataProcessor_1:
 	php							   ;02D910|08      |      ; Save processor status
 	phb							   ;02D911|8B      |      ; Save data bank
 	phk							   ;02D912|4B      |      ; Push program bank
@@ -6674,7 +6674,7 @@ Memory_ClearEngine:
 
 ; Advanced Graphics Data Processing Engine
 ; Complex graphics data transformation with multi-bank coordination
-Graphics_DataProcessor:
+Graphics_DataProcessor_2:
 	php							   ;02DFE8|08      |      ; Save processor status
 	sep					 #$20		;02DFE9|E220    |      ; 8-bit accumulator
 	rep					 #$10		;02DFEB|C210    |      ; 16-bit index
@@ -6703,7 +6703,7 @@ Graphics_DataProcessor:
 
 ; Advanced Graphics Data Processing Engine
 ; Complex graphics data transformation with mathematical operations
-Graphics_DataProcessor:
+Graphics_DataProcessor_3:
 	php							   ;02E021|08      |      ; Save processor status
 	rep					 #$30		;02E022|C230    |      ; 16-bit mode
 	ldx.W				   #$e04f	;02E024|A24FE0  |      ; Graphics configuration table
@@ -7256,7 +7256,7 @@ Thread_ValidationLoop:
 ; Thread State Validation and Cleanup Loop
 Thread_CleanupLoop:
 ; Thread State Validation and Cleanup Loop
-Thread_CleanupLoop:
+Thread_CleanupLoop_1:
 	plx							   ;02E857|FA      |      ;  Restore thread ID from stack
 	bmi					 Thread_Deactivate ;02E858|3005    |02E85F;  Branch if invalid thread ID
 	pla							   ;02E85A|68      |      ;  Restore thread state

@@ -210,7 +210,7 @@ BattleSprite_AnimationExit:
 ;   - Called during battle initialization
 ;   - Pointer format: 24-bit address (bank:address)
 
-BattleGfx_SetupByType:
+BattleGfx_SetupByType_1:
 	lda.W				   $0e8b	 ; Load battle type index
 	beq					 BattleGfx_Type0 ; Type 0: Branch to first handler
 	dec					 a; Decrement for type comparison
@@ -225,28 +225,28 @@ BattleGfx_SetupByType:
 	sta.W				   $0506	 ; Store to pointer high
 	bra					 BattleGfx_CommonSetup ; Jump to common bank setup
 
-BattleGfx_Type0:	; Type 0 handler
+BattleGfx_Type0_1:	; Type 0 handler
 	lda.B				   #$a1	  ; Graphics address low byte
 	sta.W				   $0507	 ; Store to pointer low
 	lda.B				   #$1f	  ; Graphics address high byte
 	sta.W				   $0506	 ; Store to pointer high
 	bra					 BattleGfx_CommonSetup ; Jump to common bank setup
 
-BattleGfx_Type1:	; Type 1 handler
+BattleGfx_Type1_1:	; Type 1 handler
 	lda.B				   #$b6	  ; Graphics address low byte
 	sta.W				   $0507	 ; Store to pointer low
 	lda.B				   #$1b	  ; Graphics address high byte
 	sta.W				   $0506	 ; Store to pointer high
 	bra					 BattleGfx_CommonSetup ; Jump to common bank setup
 
-BattleGfx_Type2:	; Type 2 handler
+BattleGfx_Type2_1:	; Type 2 handler
 	lda.B				   #$5f	  ; Graphics address low byte
 	sta.W				   $0507	 ; Store to pointer low
 	lda.B				   #$1f	  ; Graphics address high byte
 	sta.W				   $0506	 ; Store to pointer high
 ; Fall through to BattleGfx_CommonSetup
 
-BattleGfx_CommonSetup:	; Common bank setup
+BattleGfx_CommonSetup_1:	; Common bank setup
 	lda.B				   #$0a	  ; Bank $0a (graphics data bank)
 	sta.W				   $0505	 ; Store to pointer bank byte
 	rtl							   ; Return to caller (long return)
@@ -316,7 +316,7 @@ BattleGfx_CommonSetup:	; Common bank setup
 	plx							   ; Restore sprite index
 	jsl.L				   CODE_01AE86 ; Call sprite rendering (Bank $01)
 
-BattleSprite_UpdateOAM:	; OAM Data Update Routine
+BattleSprite_UpdateOAM_1:	; OAM Data Update Routine
 	rep					 #$30		; Set A/X/Y to 16-bit mode
 	lda.W				   $192d	 ; Load OAM slot index
 	and.W				   #$00ff	; Mask to 8-bit value
@@ -338,7 +338,7 @@ BattleSprite_UpdateOAM:	; OAM Data Update Routine
 	lda.W				   $1a79,x   ; Load sprite attributes
 	sta.W				   $0c0e,y   ; Store to OAM attributes
 
-BattleSprite_AnimationExit:	; Exit routine
+BattleSprite_AnimationExit_1:	; Exit routine
 	ply							   ; Restore Y register
 	plx							   ; Restore X register
 	plb							   ; Restore data bank
@@ -1613,7 +1613,7 @@ BattleGfx_DecompressToWRAM:
 
 	ldy.W				   $0000,x   ; Load data size from source
 	inx							   ; Skip size bytes
-INX_Label:
+INX_Label_1:
 
 BattleGfx_WRAMUploadLoop:	; Upload loop
 	lda.W				   $0000,x   ; Load control byte
@@ -1631,7 +1631,7 @@ BattleGfx_WRAMUploadLoop:	; Upload loop
 	tay							   ; Transfer to Y (skip count)
 	iny							   ; Add 3 to skip count (?)
 INY_Label:
-INY_Label:
+INY_Label_1:
 	pla							   ; Restore control byte
 	and.B				   #$7f	  ; Mask to repeat count (bits 0-6)
 
@@ -2520,7 +2520,7 @@ BattleAnim_SpinFrame0:
 	sta.W				   $0c12,y   ; Store to sprite slot
 	lda.B				   #$d2	  ; Tile ID $d2
 	sta.W				   $0c16,y   ; Store to next sprite
-RTS_Label:
+
 
 ; Frame 1: Tiles $b9, $b9 (same tile both)
 BattleAnim_SpinFrame1:
@@ -2528,7 +2528,7 @@ BattleAnim_SpinFrame1:
 	sta.W				   $0c12,y
 	lda.B				   #$b9
 	sta.W				   $0c16,y
-RTS_Label:
+
 
 ; Frame 2: Tiles $ba, $b9
 BattleAnim_SpinFrame2:
@@ -2536,7 +2536,7 @@ BattleAnim_SpinFrame2:
 	sta.W				   $0c12,y
 	lda.B				   #$b9
 	sta.W				   $0c16,y
-RTS_Label:
+
 
 ; Frame 3: Tiles $d2, $ba
 BattleAnim_SpinFrame3:
@@ -2544,7 +2544,7 @@ BattleAnim_SpinFrame3:
 	sta.W				   $0c12,y
 	lda.B				   #$ba
 	sta.W				   $0c16,y
-RTS_Label:
+
 
 ; -----------------------------------------------------------------------------
 ; Animation Handler 4 (Changed State): Large Multi-Sprite Setup
@@ -2625,7 +2625,7 @@ BattleAnim_4FrameTileCycle:
 	and.B				   #$03	  ; Mask to 0-3 (4 frames)
 	pea.W				   DATA8_0b9113 ; Push tile pattern table
 	jsl.L				   CODE_0097BE ; Call dispatcher
-RTS_Label:
+
 
 DATA8_0b9113:	; 4-frame tile pattern handlers
 	db											 $1b,$91	 ; Frame 0: $0b911b
@@ -2641,7 +2641,7 @@ BattleAnim_TileFrame0:
 	sta.W				   $0c16,y
 	inc					 a
 	sta.W				   $0c1a,y
-RTS_Label:
+
 
 ; Frame 1: Mixed pattern $d2, $d2, $d2, $ae, $af
 BattleAnim_TileFrame1:
@@ -2653,7 +2653,7 @@ BattleAnim_TileFrame1:
 	sta.W				   $0c1e,y
 	inc					 a
 	sta.W				   $0c22,y
-RTS_Label:
+
 
 ; Frame 2: Pattern $d2, $d2, $ad, $b0, $b1
 BattleAnim_TileFrame2:
@@ -2668,7 +2668,7 @@ BattleAnim_TileFrame2:
 	sta.W				   $0c2a,y
 	inc					 a
 	sta.W				   $0c2e,y
-RTS_Label:
+
 
 ; Frame 3: All $d2 tiles (blank/transition)
 BattleAnim_TileFrame3:
@@ -2676,7 +2676,7 @@ BattleAnim_TileFrame3:
 	sta.W				   $0c26,y
 	sta.W				   $0c2a,y
 	sta.W				   $0c2e,y
-RTS_Label:
+
 
 ; -----------------------------------------------------------------------------
 ; Animation Handler 5 (Changed State): Enemy Attack Animation
@@ -2729,7 +2729,7 @@ BattleAnim_AttackSetup:
 
 	ply							   ; Restore Y
 	plx							   ; Restore X
-RTS_Label:
+
 
 ; -----------------------------------------------------------------------------
 ; Animation Handler 5 (Same State): Attack Motion Animation
@@ -2751,7 +2751,7 @@ TAY_Label:
 	and.B				   #$03	  ; Mask to 4 frames
 	pea.W				   DATA8_0b91d0 ; Push motion table
 	jsl.L				   CODE_0097BE ; Dispatch
-RTS_Label:
+
 
 DATA8_0b91d0:	; Attack motion frames
 	db											 $d8,$91	 ; Frame 0: Neutral
@@ -2764,27 +2764,27 @@ BattleAnim_AttackNeutral:	; Frame 0: Both $d2 (neutral)
 	lda.B				   #$d2
 	sta.W				   $0c12,y
 	sta.W				   $0c16,y
-RTS_Label:
+
 
 BattleAnim_AttackForward:	; Frame 1: $b4, $d2 (forward start)
 	lda.B				   #$b4
 	sta.W				   $0c12,y
 	lda.B				   #$d2
 	sta.W				   $0c16,y
-RTS_Label:
+
 
 BattleAnim_AttackMaxForward:	; Frame 2: Both $b4 (max forward)
 	lda.B				   #$b4
 	sta.W				   $0c12,y
 	sta.W				   $0c16,y
-RTS_Label:
+
 
 BattleAnim_AttackRetreat:	; Frame 3: $d2, $b4 (retreat)
 	lda.B				   #$d2
 	sta.W				   $0c12,y
 	lda.B				   #$b4
 	sta.W				   $0c16,y
-RTS_Label:
+
 
 ; -----------------------------------------------------------------------------
 ; Animation Handler 6 (Changed State): Wing Flap Animation Setup
@@ -2796,7 +2796,7 @@ BattleAnim_WingFlapSetup:
 	lda.B				   #$04	  ; A high = $04
 	xba							   ; Swap
 	lda.L				   $7ec320,x ; Load sprite base
-CLC_Label:
+
 	adc.B				   #$09	  ; Add offset
 	jsl.L				   CODE_0B92D6 ; Calculate
 
@@ -2817,7 +2817,7 @@ SEC_Label:
 	sbc.B				   #$08	  ; Move left
 	sta.W				   $0c10,y   ; Left wing X
 	sta.W				   $0c14,y
-CLC_Label:
+
 	adc.B				   #$17	  ; Move right 23 pixels
 	sta.W				   $0c18,y   ; Right wing X
 	sta.W				   $0c1c,y
@@ -2826,7 +2826,7 @@ CLC_Label:
 	lda.W				   $0c01,y   ; Load base Y
 	sta.W				   $0c11,y   ; Top row Y
 	sta.W				   $0c19,y
-CLC_Label:
+
 	adc.B				   #$08	  ; Bottom row
 	sta.W				   $0c15,y
 	sta.W				   $0c1d,y
@@ -2836,7 +2836,7 @@ CLC_Label:
 	ora.B				   #$40	  ; Set horizontal flip
 	sta.W				   $0c1b,y
 	sta.W				   $0c1f,y
-RTS_Label:
+
 
 ; -----------------------------------------------------------------------------
 ; Animation Handler 6 (Same State): Wing Oscillation
@@ -2847,7 +2847,7 @@ BattleAnim_WingOscillation:
 	lda.L				   $7ec260,x ; Load sprite slot
 	asl					 a
 	asl					 a
-TAY_Label:
+TAY_Label_1:
 
 	lda.L				   $7ec360,x ; Load frame counter
 	and.B				   #$01	  ; Check if odd/even frame
@@ -2865,7 +2865,7 @@ TAY_Label:
 	dec					 a
 	sta.W				   $0c18,y
 	sta.W				   $0c1c,y
-RTS_Label:
+
 
 BattleAnim_WingsOutward:	; Even frames: Wings move outward
 	lda.W				   $0c10,y   ; Load left wing X

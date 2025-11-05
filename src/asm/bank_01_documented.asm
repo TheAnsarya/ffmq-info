@@ -299,12 +299,12 @@ Battle_DecompressGraphics_Loop:
 	jsr.W				   Battle_DecompressTile ; Decompress one tile
 
 	lda.B				   $00	   ; Get destination offset
-CLC_Label:
+
 	adc.W				   #$0018	; Add $18 (24 bytes per compressed tile)
 	sta.B				   $00	   ; Update destination
 
 	lda.B				   $02	   ; Get source offset
-CLC_Label:
+
 	adc.W				   #$0020	; Add $20 (32 bytes per decompressed tile)
 	sta.B				   $02	   ; Update source
 
@@ -332,7 +332,7 @@ Battle_DecompressTile:
 
 ; Calculate source address
 	lda.W				   $192b	 ; Get base offset from direct page
-CLC_Label:
+
 	adc.W				   #$ca20	; Add base address ($04ca20)
 	tax							   ; X = source address
 
@@ -2132,7 +2132,7 @@ BattleChar_AttributeController:
 ; Clears all audio memory buffers for battle sound effects
 ; ==============================================================================
 
-BattleAudio_ClearMemoryBuffers:
+BattleAudio_ClearMemoryBuffers_1:
 	rep					 #$30		;01A267|C230    |      ;
 	lda.W				   #$0000	;01A269|A90000  |      ;
 	sta.L				   $7fced8   ;01A26C|8FD8CE7F|7FCED8;
@@ -2161,7 +2161,7 @@ BattleAudio_ClearMemoryBuffers:
 ; Complex sound channel management with battle coordination and timing
 ; ==============================================================================
 
-BattleAudio_ProcessPrimaryChannel:
+BattleAudio_ProcessPrimaryChannel_1:
 	phb							   ;01A2A6|8B      |      ;
 	php							   ;01A2A7|08      |      ;
 	phd							   ;01A2A8|0B      |      ;
@@ -2268,7 +2268,7 @@ BattleAudio_ProcessPrimaryChannel:
 ; Alternate sound channel processing for complex multi-layer audio
 ; ==============================================================================
 
-BattleAudio_ProcessSecondaryChannel:
+BattleAudio_ProcessSecondaryChannel_1:
 	phb							   ;01A34B|8B      |      ;
 	php							   ;01A34C|08      |      ;
 	phd							   ;01A34D|0B      |      ;
@@ -2375,7 +2375,7 @@ BattleAudio_ProcessSecondaryChannel:
 ; Coordinates all sprite animation and graphics updates during battle
 ; ==============================================================================
 
-BattleAnimation_MainController:
+BattleAnimation_MainController_1:
 	php							   ;01A3F0|08      |      ;
 	phb							   ;01A3F1|8B      |      ;
 	rep					 #$30		;01A3F2|C230    |      ;
@@ -2395,7 +2395,7 @@ BattleAnimation_MainController:
 ; Enhanced animation processing with additional graphics coordination
 ; ==============================================================================
 
-BattleAnimation_ExtendedHandler:
+BattleAnimation_ExtendedHandler_1:
 	php							   ;01A404|08      |      ;
 	phb							   ;01A405|8B      |      ;
 	rep					 #$30		;01A406|C230    |      ;
@@ -2419,7 +2419,7 @@ BattleAnimation_ExtendedHandler:
 ; Major graphics loading system with memory initialization and data transfer
 ; ==============================================================================
 
-BattleGraphics_PreparationSystem:
+BattleGraphics_PreparationSystem_1:
 	rep					 #$30		;01A423|C230    |      ;
 	phd							   ;01A425|0B      |      ;
 	pea.W				   $192b	 ;01A426|F42B19  |01192B;
@@ -2450,7 +2450,7 @@ BattleGraphics_PreparationSystem:
 ; Processes character graphics and transfers to VRAM with complex addressing
 ; ==============================================================================
 
-BattleGraphics_VRAMAllocator:
+BattleGraphics_VRAMAllocator_1:
 	lda.L				   DATA8_0b88fc,x ;01A45A|BFFC880B|0B88FC;
 	and.W				   #$00ff	;01A45E|29FF00  |      ;
 	asl					 a;01A461|0A      |      ;
@@ -2493,7 +2493,7 @@ BattleGraphics_VRAMAllocator:
 ; Large-scale graphics processing with dual memory bank coordination
 ; ==============================================================================
 
-BattleGraphics_TileUploader:
+BattleGraphics_TileUploader_1:
 	rep					 #$30		;01A495|C230    |      ;
 	lda.W				   #$0002	;01A497|A90200  |      ;
 	sta.B				   $16	   ;01A49A|8516    |001941;
@@ -2503,7 +2503,7 @@ BattleGraphics_TileUploader:
 ; Processes 4x 16-byte blocks in parallel with complex bank switching
 ; ==============================================================================
 
-BattleGraphics_LayerProcessor:
+BattleGraphics_LayerProcessor_1:
 	lda.W				   $0000,y   ;01A49C|B90000  |040000;
 	sta.L				   $7f0000,x ;01A49F|9F00007F|7F0000;
 	lda.W				   $0002,y   ;01A4A3|B90200  |040002;
@@ -2532,7 +2532,7 @@ BattleGraphics_LayerProcessor:
 ; Single-byte transfer loop with automatic format conversion
 ; ==============================================================================
 
-BattleGraphics_PaletteLoader:
+BattleGraphics_PaletteLoader_1:
 	lda.W				   $0000,y   ;01A4D0|B90000  |040000;
 	sta.L				   $7f0000,x ;01A4D3|9F00007F|7F0000;
 	lda.B				   #$00	  ;01A4D7|A900    |      ;
@@ -2552,14 +2552,14 @@ BattleGraphics_PaletteLoader:
 ; Complex sprite data processing with 16-tile character animation
 ; ==============================================================================
 
-BattleGraphics_TilemapBuilder:
+BattleGraphics_TilemapBuilder_1:
 	sep					 #$20		;01A4EB|E220    |      ;
 	rep					 #$10		;01A4ED|C210    |      ;
 	lda.B				   #$80	  ;01A4EF|A980    |      ;
 	sta.B				   $0e	   ;01A4F1|850E    |001939;
 	ldy.W				   #$0008	;01A4F3|A00800  |      ;
 
-BattleGraphics_ScrollManager:
+BattleGraphics_ScrollManager_1:
 	lda.B				   #$00	  ;01A4F6|A900    |      ;
 	xba							   ;01A4F8|EB      |      ;
 	lda.B				   $0a	   ;01A4F9|A50A    |001935;
@@ -2577,7 +2577,7 @@ BattleGraphics_ScrollManager:
 ; Processes individual sprite bits with complex masking and animation
 ; ==============================================================================
 
-BattleSprite_OAMBuilder:
+BattleSprite_OAMBuilder_1:
 	phy							   ;01A50C|5A      |      ;
 	lda.B				   $0d	   ;01A50D|A50D    |001938;
 	and.B				   $0e	   ;01A50F|250E    |001939;
@@ -2595,7 +2595,7 @@ BattleSprite_OAMBuilder:
 	lda.L				   DATA8_0b88fc,x ;01A525|BFFC880B|0B88FC;
 	jsr.W				   CODE_01A865 ;01A529|2065A8  |01A865;
 
-BattleGraphics_EffectRenderer:
+BattleGraphics_EffectRenderer_1:
 	sep					 #$20		;01A52C|E220    |      ;
 	rep					 #$10		;01A52E|C210    |      ;
 	inc.B				   $0c	   ;01A530|E60C    |001937;
@@ -2621,7 +2621,7 @@ BattleGraphics_EffectRenderer:
 ; Completes character processing with special effect integration
 ; ==============================================================================
 
-BattleSprite_PositionCalculator:
+BattleSprite_PositionCalculator_1:
 	rep					 #$30		;01A550|C230    |      ;
 	lda.W				   #$000b	;01A552|A90B00  |      ;
 	clc							   ;01A555|18      |      ;
@@ -2637,7 +2637,7 @@ BattleSprite_PositionCalculator:
 	bne					 CODE_01A571 ;01A56C|D003    |01A571;
 	jsr.W				   CODE_01A5AA ;01A56E|20AAA5  |01A5AA;
 
-BattleBackground_UpdateEngine:
+BattleBackground_UpdateEngine_1:
 	bra					 CODE_01A5A8 ;01A571|8035    |01A5A8;
 
 ; ==============================================================================
@@ -2645,7 +2645,7 @@ BattleBackground_UpdateEngine:
 ; Handles normal character display without special effects
 ; ==============================================================================
 
-BattleBackground_TileProcessor:
+BattleBackground_TileProcessor_1:
 	ldx.W				   #$ada0	;01A573|A2A0AD  |      ;
 	stx.B				   $02	   ;01A576|8602    |00192D;
 	lda.B				   #$04	  ;01A578|A904    |      ;
@@ -2667,7 +2667,7 @@ BattleBackground_TileProcessor:
 ; Coordinates 96 transfer operations with memory management
 ; ==============================================================================
 
-BattleSprite_AttributeManager:
+BattleSprite_AttributeManager_1:
 	jsr.W				   CODE_01A901 ;01A592|2001A9  |01A901;
 	lda.B				   $02	   ;01A595|A502    |00192D;
 	clc							   ;01A597|18      |      ;
@@ -2680,7 +2680,7 @@ BattleSprite_AttributeManager:
 	dey							   ;01A5A5|88      |      ;
 	bne					 CODE_01A592 ;01A5A6|D0EA    |01A592;
 
-BattleBackground_PatternLoader:
+BattleBackground_PatternLoader_1:
 	pld							   ;01A5A8|2B      |      ;
 	rts							   ;01A5A9|60      |      ;
 
@@ -2689,7 +2689,7 @@ BattleBackground_PatternLoader:
 ; Extended graphics processing for special battle effects
 ; ==============================================================================
 
-BattleBackground_ColorManager:
+BattleBackground_ColorManager_1:
 	php							   ;01A5AA|08      |      ;
 	phd							   ;01A5AB|0B      |      ;
 	pea.W				   $192b	 ;01A5AC|F42B19  |00192B;
@@ -2710,7 +2710,7 @@ BattleBackground_ColorManager:
 ; Larger transfer cycle for complex special effects
 ; ==============================================================================
 
-BattleSprite_PriorityHandler:
+BattleSprite_PriorityHandler_1:
 	jsr.W				   CODE_01A901 ;01A5C7|2001A9  |01A901;
 	lda.B				   $02	   ;01A5CA|A502    |00192D;
 	clc							   ;01A5CC|18      |      ;
@@ -2731,7 +2731,7 @@ BattleSprite_PriorityHandler:
 ; Complex addressing tables for multi-bank graphics coordination
 ; ==============================================================================
 
-DATA8_01a5e0:
+DATA8_01a5e0_1:
 	db											 $00,$02,$80,$02,$00,$03,$80,$03,$00,$04,$00,$06,$00,$0e,$00,$16 ; 01A5E0
 	db											 $00,$08,$80,$08,$00,$09,$80,$09,$00,$0a,$80,$0a,$00,$0b,$80,$0b ; 01A5F0
 	db											 $00,$0c	 ; 01A600
@@ -2750,10 +2750,10 @@ DATA8_01a5e0:
 ; Sprite positioning and attribute data for battle system
 ; ==============================================================================
 
-DATA8_01a63a:
+DATA8_01a63a_1:
 	db											 $80,$00	 ; 01A63A
 
-DATA8_01a63c:
+DATA8_01a63c_1:
 	db											 $08,$02,$90,$00,$09,$02,$a0,$00,$0a,$02,$b0,$00,$0b,$02,$e0,$00 ; 01A63C
 	db											 $0e,$02,$f0,$00,$0f,$02,$00,$01,$10,$02,$10,$01,$11,$02,$20,$01 ; 01A64C
 	db											 $12,$02,$30,$01,$13,$02,$40,$01,$14,$02,$50,$01,$15,$02,$60,$01 ; 01A65C
@@ -2766,7 +2766,7 @@ DATA8_01a63c:
 ; Sets up sprite management system with memory allocation and coordination
 ; ==============================================================================
 
-BattleSprite_GraphicsProcessor:
+BattleSprite_GraphicsProcessor_1:
 	sep					 #$20		;01A692|E220    |      ;
 	rep					 #$10		;01A694|C210    |      ;
 	phd							   ;01A696|0B      |      ;
@@ -2787,7 +2787,7 @@ BattleSprite_GraphicsProcessor:
 ; Processes all active sprites with validation and coordinate processing
 ; ==============================================================================
 
-BattleSprite_TransformEngine:
+BattleSprite_TransformEngine_1:
 	sep					 #$20		;01A6B2|E220    |      ;
 	rep					 #$10		;01A6B4|C210    |      ;
 	inc.W				   $193b	 ;01A6B6|EE3B19  |00193B;
@@ -2809,7 +2809,7 @@ BattleSprite_TransformEngine:
 	sta.W				   $1939	 ;01A6DC|8D3919  |001939;
 	bra					 CODE_01A6B2 ;01A6DF|80D1    |01A6B2;
 
-BattleSprite_ScaleProcessor:
+BattleSprite_ScaleProcessor_1:
 	sep					 #$20		;01A6E1|E220    |      ;
 	rep					 #$10		;01A6E3|C210    |      ;
 	lda.W				   $1935	 ;01A6E5|AD3519  |001935;
@@ -2818,7 +2818,7 @@ BattleSprite_ScaleProcessor:
 	sta.W				   $1935	 ;01A6EB|8D3519  |001935;
 	bra					 CODE_01A6B2 ;01A6EE|80C2    |01A6B2;
 
-BattleSprite_RotationHandler:
+BattleSprite_RotationHandler_1:
 	pld							   ;01A6F0|2B      |      ;
 	rts							   ;01A6F1|60      |      ;
 ; ==============================================================================
