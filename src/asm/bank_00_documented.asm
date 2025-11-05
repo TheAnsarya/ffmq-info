@@ -11708,9 +11708,9 @@ Menu_InputHandler:
 	bit.W				   #$0080	; Test B button (bit 7)
 	bne					 Shop_SubtractGold ; If pressed, update gold
 	bit.W				   #$0800	; Test X button (bit 11)
-	bne					 UNREACH_00B7B5 ; If pressed, jump ahead
+	bne					 Menu_InputHandler_XButton_JumpDown ; If pressed, jump ahead
 	bit.W				   #$0400	; Test Y button (bit 10)
-	bne					 UNREACH_00B797 ; If pressed, move by 10
+	bne					 Menu_InputHandler_YButton_JumpUp ; If pressed, move by 10
 	bit.W				   #$0100	; Test Start (bit 8)
 	bne					 Menu_InputHandler_Down ; If pressed, increment cursor
 	bit.W				   #$0200	; Test Select (bit 9)
@@ -11765,37 +11765,28 @@ Menu_UpdateDisplay:
 	jsr.W				   CODE_009BC4 ; Update menu display
 	bra					 Menu_InputHandler ; Read input again
 
-; ------------------------------------------------------------------------------
-; UNREACHABLE CODE ANALYSIS
-; ------------------------------------------------------------------------------
-; Label: UNREACH_00B797
-; Category: 🟡 Conditionally Reachable (Y button handler - jump by 10)
-; Purpose: Handle Y button press to jump cursor by 10 positions
-; Reachability: Likely REACHABLE via button handler dispatch
-; Analysis: Cursor jump handler (used in long menus)
+;-------------------------------------------------------------------------------
+; Menu - Input Handler - Y Button Jump Up
+;-------------------------------------------------------------------------------
+; Purpose: Handle Y button press to jump cursor up by 10 positions
+; Reachability: Reachable via button handler dispatch (bne above)
+; Analysis: Cursor jump handler for quick navigation in long menus
 ;   - Switches to 8-bit accumulator
-;   - Sets carry for subtraction
-;   - Loads cursor position ($0162)
-;   - If zero, handles wrap
-;   - Subtracts 10 ($0A) from cursor
-;   - If result negative, wraps to bottom
-;   - Tests wrap flag (bit 2 of $95)
-;   - If wrap disabled, clamps to max ($0163)
-; Verified: May be reachable via Y button press in menus
-; Notes: Should be renamed to Menu_InputHandler_YButton_JumpUp
-;        Allows quick navigation in long item/spell lists
-; ------------------------------------------------------------------------------
-UNREACH_00B797:
+;   - Subtracts 10 from cursor position
+;   - Handles wrap-around if enabled
+; Technical: Originally labeled UNREACH_00B797
+;-------------------------------------------------------------------------------
+Menu_InputHandler_YButton_JumpUp:
 	sep #$20                             ;00B797|E220    |      ; 8-bit accumulator
 	sec                                  ;00B799|38      |      ; Set carry for subtraction
 	lda.W $0162                          ;00B79A|AD6201  |000162; Load cursor position
-	beq UNREACH_00B7B5                   ;00B79D|F008    |00B7A7; If zero, handle wrap
+	beq Menu_InputHandler_YButton_Wrap   ;00B79D|F008    |00B7A7; If zero, handle wrap
 	sbc.B #$0a                           ;00B79F|E90A    |      ; Subtract 10
 	bcs Menu_InputHandler_YButton_Store  ;00B7A1|B00D    |00B7B0; If >= 0, store
 	lda.B #$00                           ;00B7A3|A900    |      ; Clamp to 0
 	bra Menu_InputHandler_YButton_Check  ;00B7A5|8009    |00B7B0; Check wrap flag
 
-UNREACH_00B7B5:
+Menu_InputHandler_YButton_Wrap:
 	lda.B $95                            ;00B7A7|A595    |000095; Load wrap flags
 	and.B #$04                           ;00B7A9|2904    |      ; Test bit 2 (wrap down)
 	beq Menu_InputHandler                ;00B7AB|F081    |00B72E; If no wrap, read input
@@ -11804,13 +11795,38 @@ Menu_InputHandler_YButton_Store:
 	sta.W $0162                          ;00B7B0|8D6201  |000162; Store new cursor position
 	bra Menu_UpdateDisplay               ;00B7B3|80D8    |00B78D; Update display
 Menu_InputHandler_YButton_Check:
-; Cursor movement by 10 (Y button handler)
+; Continue to X button handler
 
-UNREACH_00B7B5:
-	db											 $e2,$20,$ad,$62,$01,$cd,$63,$01,$f0,$13,$18,$69,$0a,$8d,$62,$01
-	db											 $ad,$63,$01,$cd,$62,$01,$b0,$c0,$8d,$62,$01,$80,$bb,$a5,$95,$29
-	db											 $08,$f0,$bd,$9c,$62,$01,$80,$b0
-; Cursor movement by 10 (X button handler)
+;-------------------------------------------------------------------------------
+; Menu - Input Handler - X Button Jump Down
+;-------------------------------------------------------------------------------
+; Purpose: Handle X button press to jump cursor down by 10 positions
+; Reachability: Reachable via button handler dispatch (bne above)
+; Analysis: Cursor jump handler (opposite of Y button)
+;   - Loads and compares cursor to max
+;   - If at max, handles wrap-around
+;   - Otherwise adds 10 to cursor position
+; Technical: Originally labeled UNREACH_00B7B5 (second occurrence)
+;-------------------------------------------------------------------------------
+Menu_InputHandler_XButton_JumpDown:
+	sep #$20                             ;00B7B5|E220    |      ; 8-bit accumulator
+	lda.W $0162                          ;00B7B7|AD6201  |000162; Load cursor position
+	cmp.W $0163                          ;00B7BA|CD6301  |000163; Compare to max
+	beq Menu_InputHandler_XButton_Wrap   ;00B7BD|F013    |00B7D2; If at max, handle wrap
+	clc                                  ;00B7BF|18      |      ; Clear carry
+	adc.B #$0a                           ;00B7C0|690A    |      ; Add 10
+	sta.W $0162                          ;00B7C2|8D6201  |000162; Store cursor position
+	lda.W $0163                          ;00B7C5|AD6301  |000163; Load max position
+	cmp.W $0162                          ;00B7C8|CD6201  |000162; Compare to cursor
+	bcs Menu_UpdateDisplay               ;00B7CB|B0C0    |00B78D; If max >= cursor, update
+	sta.W $0162                          ;00B7CD|8D6201  |000162; Clamp to max
+	bra Menu_UpdateDisplay               ;00B7D0|80BB    |00B78D; Update display
+Menu_InputHandler_XButton_Wrap:
+	lda.B $95                            ;00B7D2|A595    |000095; Load wrap flags
+	and.B #$08                           ;00B7D4|2908    |      ; Test bit 3 (wrap up)
+	beq Menu_InputHandler                ;00B7D6|F0BD    |00B72E; If no wrap, read input
+	stz.W $0162                          ;00B7D8|9C6201  |000162; Wrap to 0
+	bra Menu_UpdateDisplay               ;00B7DB|80B0    |00B78D; Update display
 
 ;-------------------------------------------------------------------------------
 ; DATA at $b7dd: Menu configuration data
@@ -12147,7 +12163,7 @@ Game_Initialize_Loop:
 	rep					 #$30		; 16-bit A/X/Y
 	lda.W				   #$0c80	; Button mask
 	jsr.W				   Input_PollWithToggle ; Poll input
-	bne					 UNREACH_00B9E0 ; If button pressed, branch
+	bne					 Game_HandleAlternateButton ; If button pressed, branch
 	bit.W				   #$0080	; Test B button
 	beq					 Game_Initialize_Loop ; If not pressed, loop
 	sep					 #$20		; 8-bit accumulator
@@ -12157,68 +12173,54 @@ Game_Initialize_Loop:
 	and.W				   #$00ff	; Mask to 8 bits
 	dec					 a; Decrement (0-based index)
 	sta.W				   $010e	 ; Store save slot index
-	bmi					 UNREACH_00B9D5 ; If negative (new game), branch
+	bmi					 Game_StartNew ; If negative (new game), branch
 	jsr.W				   CODE_00C92B ; Get save slot address
 	tax							   ; X = save address
 	lda.L				   $700000,x ; Load save data validity flag
-	beq					 UNREACH_00B9DB ; If empty, branch
+	beq					 Game_HandleEmptySlot ; If empty, branch
 	jsr.W				   Sprite_SetMode2D ; Set sprite mode $2d
 	lda.W				   $010e	 ; Load save slot index
 	jmp.W				   CODE_00CA63 ; Load game
 
-; ------------------------------------------------------------------------------
-; UNREACHABLE CODE ANALYSIS
-; ------------------------------------------------------------------------------
-; Label: UNREACH_00B9D5
-; Category: 🟡 Conditionally Reachable (New game handler)
+;-------------------------------------------------------------------------------
+; Game - Start New
+;-------------------------------------------------------------------------------
 ; Purpose: Handle new game selection (save slot < 0)
-; Reachability: REACHABLE via conditional branch (bmi above)
+; Reachability: Reachable via conditional branch (bmi above)
 ; Analysis: New game initialization path
 ;   - Calls Sprite_SetMode2D to update sprite display
 ;   - Jumps to TitleScreen_Init to start new game
-; Verified: Reachable when save slot index is negative (new game selected)
-; Notes: This is NOT unreachable - it's the new game path
-;        Should be renamed to Game_StartNew
-; ------------------------------------------------------------------------------
-UNREACH_00B9D5:
+; Technical: Originally labeled UNREACH_00B9D5
+;-------------------------------------------------------------------------------
+Game_StartNew:
 	jsr.W Sprite_SetMode2D               ;00B9D5|2008B9  |00B908; Update sprite mode
 	jmp.W TitleScreen_Init               ;00B9D8|4C1ABA  |00BA1A; Start new game
 
-; ------------------------------------------------------------------------------
-; UNREACHABLE CODE ANALYSIS
-; ------------------------------------------------------------------------------
-; Label: UNREACH_00B9DB
-; Category: 🟡 Conditionally Reachable (Empty save slot handler)
+;-------------------------------------------------------------------------------
+; Game - Handle Empty Slot
+;-------------------------------------------------------------------------------
 ; Purpose: Handle selection of empty save slot
-; Reachability: REACHABLE via conditional branch (beq above)
+; Reachability: Reachable via conditional branch (beq above)
 ; Analysis: Empty slot selection path
 ;   - Calls Sprite_SetMode2C to update sprite display
 ;   - Branches forward to skip normal load game logic
-; Verified: Reachable when save slot data is empty (flag = 0)
-; Notes: This is NOT unreachable - it's the empty slot path
-;        Should be renamed to Game_HandleEmptySlot
-; ------------------------------------------------------------------------------
-UNREACH_00B9DB:
+; Technical: Originally labeled UNREACH_00B9DB
+;-------------------------------------------------------------------------------
+Game_HandleEmptySlot:
 	jsr.W Sprite_SetMode2C               ;00B9DB|2012B9  |00B912; Update sprite mode
 	bra $+$c2                            ;00B9DE|80C0    |00B9A0; Skip load game logic
 
-; ------------------------------------------------------------------------------
-; UNREACHABLE CODE ANALYSIS
-; ------------------------------------------------------------------------------
-; Label: UNREACH_00B9E0
-; Category: 🟡 Conditionally Reachable (Button press handler)
+;-------------------------------------------------------------------------------
+; Game - Handle Alternate Button
+;-------------------------------------------------------------------------------
 ; Purpose: Handle non-B button press during title screen
-; Reachability: REACHABLE via conditional branch (bne above at Game_Initialize_Loop)
+; Reachability: Reachable via conditional branch (bne at Game_Initialize_Loop)
 ; Analysis: Alternate button handler (likely A button or Start)
 ;   - Stores button state to $05
-;   - Calls sprite update routine
-;   - Switches to 8-bit index registers
-;   - Loads $EC and stores to $7F56D8 and $7F56DA (video registers?)
-; Verified: Reachable when buttons other than B are pressed
-; Notes: This is NOT unreachable - it's an alternate input path
-;        Should be renamed to Game_HandleAlternateButton
-; ------------------------------------------------------------------------------
-UNREACH_00B9E0:
+;   - Calls sprite update routine and configures video registers
+; Technical: Originally labeled UNREACH_00B9E0
+;-------------------------------------------------------------------------------
+Game_HandleAlternateButton:
 	stx.B $05                            ;00B9E0|8605    |000005; Store button state
 	jsr.W $B91C                          ;00B9E2|201CB9  |00B91C; Call sprite routine
 	sep #$10                             ;00B9E5|E230    |      ; 8-bit index registers
@@ -12282,22 +12284,17 @@ TitleScreen_Init_ScrollLoop:
 	sta.W				   $015f	 ; Clear $015f
 	bra					 CharName_UpdateDisplay ; Jump to menu display
 
-; ------------------------------------------------------------------------------
-; UNREACHABLE CODE ANALYSIS
-; ------------------------------------------------------------------------------
-; Label: UNREACH_00BA6D
-; Category: 🟡 Conditionally Reachable (Error sound handler)
-; Purpose: Play error sound when character name is invalid
-; Reachability: REACHABLE via multiple conditional branches (beq)
+;-------------------------------------------------------------------------------
+; CharName - Error Sound
+;-------------------------------------------------------------------------------
+; Purpose: Play error sound when character name operation is invalid
+; Reachability: Reachable via multiple conditional branches (beq)
 ; Analysis: Error feedback for character naming
 ;   - Called when name is full (can't add more characters)
 ;   - Called when name is empty (can't confirm empty name)
-;   - Calls Sprite_SetMode2C to play error sound/animation
-; Verified: Reachable when user tries invalid naming operation
-; Notes: This is NOT unreachable - it's error feedback
-;        Should be renamed to CharName_ErrorSound
-; ------------------------------------------------------------------------------
-UNREACH_00BA6D:
+; Technical: Originally labeled UNREACH_00BA6D
+;-------------------------------------------------------------------------------
+CharName_ErrorSound:
 	jsr.W Sprite_SetMode2C               ;00BA6D|2012B9  |00B912; Play error sound
 
 ;-------------------------------------------------------------------------------
@@ -12322,7 +12319,7 @@ CharName_InputLoop:
 	bit.W				   #$1000	; Test L button
 	bne					 CharName_InputLoop_Confirm ; If pressed, confirm
 	bit.W				   #$8000	; Test A button
-	bne					 UNREACH_00BAC2 ; If pressed, delete char
+	bne					 CharName_DeleteCharacter ; If pressed, delete char
 	bit.W				   #$0080	; Test B button
 	beq					 CharName_InputLoop ; If not pressed, loop
 	lda.B				   $01	   ; Load cursor position
@@ -12331,7 +12328,7 @@ CharName_InputLoop:
 	sep					 #$30		; 8-bit A/X/Y
 	ldy.W				   $00cc	 ; Load character count
 	cpy.B				   #$08	  ; Check if 8 chars entered
-	beq					 UNREACH_00BA6D ; If full, error sound
+	beq					 CharName_ErrorSound ; If full, error sound
 	lda.B				   $06	   ; Load selected character (row)
 	sta.W				   SNES_WRMPYA ; Set multiplicand
 	lda.B				   #$1a	  ; Load 26 (chars per row)
@@ -12349,28 +12346,19 @@ CharName_InputLoop:
 	jsr.W				   CODE_009BC4 ; Update menu
 	bra					 CharName_InputLoop ; Loop
 
-; ------------------------------------------------------------------------------
-; UNREACHABLE CODE ANALYSIS
-; ------------------------------------------------------------------------------
-; Label: UNREACH_00BAC2
-; Category: 🟡 Conditionally Reachable (Character delete handler)
+;-------------------------------------------------------------------------------
+; CharName - Delete Character
+;-------------------------------------------------------------------------------
 ; Purpose: Delete last character from name being entered
-; Reachability: REACHABLE via conditional branch (bne above)
+; Reachability: Reachable via conditional branch (bne above)
 ; Analysis: Backspace/delete handler for character naming
-;   - Loads Y with character count ($00cc)
-;   - If zero (empty name), skips deletion
-;   - Decrements character count
-;   - Stores updated count
-;   - Switches to 8-bit accumulator
-;   - Loads sound effect #$03 (delete sound)
-;   - Branches to play sound
-; Verified: Reachable when user presses delete button
-; Notes: This is NOT unreachable - it's the delete key handler
-;        Should be renamed to CharName_DeleteCharacter
-; ------------------------------------------------------------------------------
-UNREACH_00BAC2:
+;   - If count is zero (empty name), plays error sound
+;   - Otherwise decrements character count and plays delete sound
+; Technical: Originally labeled UNREACH_00BAC2
+;-------------------------------------------------------------------------------
+CharName_DeleteCharacter:
 	ldy.W $00cc                          ;00BAC2|AC CC00  |0000CC; Load character count
-	beq $+$a6                            ;00BAC5|F0A6    |00BA6D; If empty, error sound
+	beq CharName_ErrorSound              ;00BAC5|F0A6    |00BA6D; If empty, error sound
 	dey                                  ;00BAC7|88      |      ; Decrement count
 	sty.W $00cc                          ;00BAC8|8CCC00  |0000CC; Store new count
 	sep #$20                             ;00BACB|E220    |      ; 8-bit accumulator
@@ -12379,7 +12367,7 @@ UNREACH_00BAC2:
 
 CharName_InputLoop_Confirm:
 	lda.W				   $00cc	 ; Load character count
-	beq					 UNREACH_00BA6D ; If empty, error
+	beq					 CharName_ErrorSound ; If empty, error
 	jmp.W				   Sprite_SetMode2D ; Set sprite mode $2d and return
 
 CharName_InputLoop_Process:
