@@ -1,0 +1,221 @@
+# ==============================================================================
+# FFMQ ROM Build and Validation CI/CD Pipeline
+# ==============================================================================
+# This workflow builds and validates the ROM on every push and pull request.
+# Ensures ROM assembles correctly and passes all validation checks.
+# ==============================================================================
+
+name: Build ROM
+
+on:
+  push:
+    branches: [ main, develop ]
+    paths:
+      - 'src/asm/**'
+      - 'build.ps1'
+      - '.github/workflows/build-rom.yml'
+  pull_request:
+    branches: [ main, develop ]
+    paths:
+      - 'src/asm/**'
+      - 'build.ps1'
+
+jobs:
+  # ==============================================================================
+  # Dry Run Job - Quick validation without building
+  # ==============================================================================
+  dry-run:
+    name: 🔍 Dry Run Validation
+    runs-on: windows-latest
+    
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+        
+      - name: 🔍 Run dry-run check
+        shell: pwsh
+        run: |
+          Write-Host "Running dry-run validation..." -ForegroundColor Cyan
+          .\build.ps1 -DryRun
+          
+      - name: 📊 Report dry-run results
+        if: success()
+        run: echo "✅ Dry-run validation passed"
+
+  # ==============================================================================
+  # Build Job - Assemble ROM and validate
+  # ==============================================================================
+  build:
+    name: 🔨 Build and Validate ROM
+    runs-on: windows-latest
+    needs: dry-run
+    
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+        
+      - name: 🔧 Setup Asar
+        shell: pwsh
+        run: |
+          Write-Host "Downloading Asar assembler..." -ForegroundColor Cyan
+          
+          # Download Asar 1.81 (latest stable)
+          $asarUrl = "https://github.com/RPGHacker/asar/releases/download/v1.81/asar181.zip"
+          Invoke-WebRequest -Uri $asarUrl -OutFile "asar.zip"
+          
+          # Extract to tools directory
+          Expand-Archive -Path "asar.zip" -DestinationPath "tools/asar" -Force
+          
+          # Verify installation
+          if (Test-Path "tools/asar/asar.exe") {
+            Write-Host "✓ Asar installed successfully" -ForegroundColor Green
+          } else {
+            Write-Error "Failed to install Asar"
+            exit 1
+          }
+          
+      - name: 🔨 Build ROM
+        shell: pwsh
+        run: |
+          Write-Host "Building ROM..." -ForegroundColor Cyan
+          .\build.ps1 -Verbose
+          
+      - name: ✅ Validate ROM
+        shell: pwsh
+        run: |
+          Write-Host "Validating ROM structure..." -ForegroundColor Cyan
+          .\build.ps1 -ValidateROM
+          
+      - name: 📊 Build Statistics
+        shell: pwsh
+        run: |
+          Write-Host ""
+          Write-Host "Build Statistics:" -ForegroundColor Cyan
+          Write-Host "=================" -ForegroundColor Cyan
+          
+          $romPath = "build/ffmq-rebuilt.sfc"
+          if (Test-Path $romPath) {
+            $romInfo = Get-Item $romPath
+            Write-Host "ROM Size: $($romInfo.Length) bytes"
+            Write-Host "Built: $($romInfo.LastWriteTime)"
+            
+            # Calculate SHA256
+            $hash = Get-FileHash $romPath -Algorithm SHA256
+            Write-Host "SHA256: $($hash.Hash)"
+          }
+          
+      - name: 📦 Upload ROM artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ffmq-rebuilt-rom
+          path: build/ffmq-rebuilt.sfc
+          retention-days: 30
+          
+      - name: 📦 Upload symbol file
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: symbol-file
+          path: build/symbols.sym
+          retention-days: 30
+          if-no-files-found: ignore
+
+  # ==============================================================================
+  # Documentation Check Job
+  # ==============================================================================
+  docs-check:
+    name: 📚 Documentation Coverage
+    runs-on: windows-latest
+    
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+        
+      - name: 🐍 Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          
+      - name: 📦 Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          if (Test-Path requirements.txt) { pip install -r requirements.txt }
+          
+      - name: 📊 Run documentation coverage analysis
+        shell: pwsh
+        run: |
+          Write-Host "Analyzing documentation coverage..." -ForegroundColor Cyan
+          python tools/analyze_doc_coverage.py
+          
+      - name: 📤 Upload coverage report
+        uses: actions/upload-artifact@v4
+        with:
+          name: doc-coverage-report
+          path: reports/documentation_coverage.json
+          retention-days: 30
+
+  # ==============================================================================
+  # Report Job - Aggregate results
+  # ==============================================================================
+  report:
+    name: 📋 Build Report
+    runs-on: windows-latest
+    needs: [build, docs-check]
+    if: always()
+    
+    steps:
+      - name: 📥 Download artifacts
+        uses: actions/download-artifact@v4
+        
+      - name: 📊 Generate summary
+        shell: pwsh
+        run: |
+          Write-Host ""
+          Write-Host "═══════════════════════════════════════" -ForegroundColor Cyan
+          Write-Host "FFMQ BUILD PIPELINE SUMMARY" -ForegroundColor Cyan
+          Write-Host "═══════════════════════════════════════" -ForegroundColor Cyan
+          Write-Host ""
+          
+          # Check if ROM was built
+          if (Test-Path "ffmq-rebuilt-rom/ffmq-rebuilt.sfc") {
+            Write-Host "✅ ROM Build: SUCCESS" -ForegroundColor Green
+            $size = (Get-Item "ffmq-rebuilt-rom/ffmq-rebuilt.sfc").Length
+            Write-Host "   Size: $size bytes" -ForegroundColor White
+          } else {
+            Write-Host "❌ ROM Build: FAILED" -ForegroundColor Red
+          }
+          
+          # Check documentation coverage
+          if (Test-Path "doc-coverage-report/documentation_coverage.json") {
+            Write-Host "✅ Documentation Check: COMPLETE" -ForegroundColor Green
+            $coverage = Get-Content "doc-coverage-report/documentation_coverage.json" | ConvertFrom-Json
+            Write-Host "   Documented functions: $($coverage.statistics.documented_functions)/$($coverage.statistics.total_functions)" -ForegroundColor White
+          } else {
+            Write-Host "⚠️  Documentation Check: INCOMPLETE" -ForegroundColor Yellow
+          }
+          
+          Write-Host ""
+          Write-Host "Build artifacts available for download above ⬆️" -ForegroundColor Cyan
+          Write-Host ""
+
+# ==============================================================================
+# Workflow Notes
+# ==============================================================================
+# This workflow provides:
+# 
+# 1. Dry-run validation (fast, no assembly)
+# 2. Full ROM build with validation
+# 3. Documentation coverage checking
+# 4. Build artifact retention (30 days)
+# 5. Comprehensive summary report
+#
+# Artifacts available after build:
+# - ffmq-rebuilt.sfc (assembled ROM)
+# - symbols.sym (debugging symbols)
+# - documentation_coverage.json (coverage report)
+#
+# To use in your project:
+# 1. Ensure Asar is available or modify setup step
+# 2. Update branch names if needed
+# 3. Adjust retention days as desired
+# ==============================================================================

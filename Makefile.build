@@ -1,0 +1,237 @@
+# ==============================================================================
+# Final Fantasy Mystic Quest ROM Build Makefile
+# ==============================================================================
+# This Makefile provides common build targets for the FFMQ disassembly project.
+# Uses PowerShell scripts for cross-platform compatibility.
+# ==============================================================================
+
+.PHONY: all build clean test symbols dry-run validate help dev watch docs coverage
+
+# Default target
+all: clean build symbols validate
+
+# ==============================================================================
+# Build Targets
+# ==============================================================================
+
+# Standard build
+build:
+	@echo "🔨 Building ROM..."
+	@pwsh -File build.ps1
+
+# Build with symbols
+symbols:
+	@echo "🔨 Building ROM with symbols..."
+	@pwsh -File build.ps1 -Symbols
+
+# Verbose build
+verbose:
+	@echo "🔨 Building ROM (verbose mode)..."
+	@pwsh -File build.ps1 -Verbose
+
+# Parallel build (faster for multi-bank projects)
+parallel:
+	@echo "🔨 Building ROM with parallel processing..."
+	@pwsh -File build.ps1 -Parallel
+
+# Development build (verbose + symbols)
+dev: clean
+	@echo "🔨 Development build (verbose + symbols)..."
+	@pwsh -File build.ps1 -Verbose -Symbols
+
+# Watch mode (rebuild on file changes)
+watch:
+	@echo "👀 Watching for file changes..."
+	@echo "Press Ctrl+C to stop"
+	@pwsh -Command "while ($$true) { \
+		$$hash = Get-FileHash src/asm/*.asm | Out-String; \
+		if ($$hash -ne $$lastHash) { \
+			Write-Host '🔄 Changes detected, rebuilding...' -ForegroundColor Cyan; \
+			.\build.ps1; \
+			$$lastHash = $$hash; \
+		}; \
+		Start-Sleep -Seconds 2; \
+	}"
+
+# ==============================================================================
+# Testing and Validation
+# ==============================================================================
+
+# Dry run (preview build without assembling)
+dry-run:
+	@echo "🔍 Dry run - preview build configuration..."
+	@pwsh -File build.ps1 -DryRun
+
+# Validate ROM
+validate: build
+	@echo "✅ Validating ROM..."
+	@pwsh -File build.ps1 -ValidateROM
+
+# Run verification tests
+test: build
+	@echo "🧪 Running verification tests..."
+	@pwsh -File verify-build.ps1
+
+# Quick validation (dry-run + validate)
+check: dry-run validate
+
+# ==============================================================================
+# Maintenance Targets
+# ==============================================================================
+
+# Clean build artifacts
+clean:
+	@echo "🧹 Cleaning build directory..."
+	@pwsh -File build.ps1 -Clean
+
+# Deep clean (remove all generated files)
+distclean: clean
+	@echo "🧹 Deep clean - removing all generated files..."
+	@pwsh -Command "Remove-Item -Path build/* -Recurse -Force -ErrorAction SilentlyContinue"
+	@pwsh -Command "Remove-Item -Path reports/*.json -Force -ErrorAction SilentlyContinue"
+	@pwsh -Command "Remove-Item -Path temp_*.asm -Force -ErrorAction SilentlyContinue"
+	@echo "✓ Deep clean complete"
+
+# ==============================================================================
+# Documentation Targets
+# ==============================================================================
+
+# Generate documentation coverage report
+docs:
+	@echo "📚 Analyzing documentation coverage..."
+	@python tools/analyze_doc_coverage.py
+
+# Check documentation coverage
+doc-coverage: docs
+	@echo "📊 Documentation coverage report generated"
+	@echo "See: reports/documentation_coverage.json"
+
+# Update chat log
+log:
+	@echo "📝 Updating session log..."
+	@pwsh -File update.ps1
+
+# ==============================================================================
+# Git Workflow Targets
+# ==============================================================================
+
+# Quick commit (for rapid iteration)
+commit:
+	@pwsh -Command "$$msg = Read-Host 'Commit message'; \
+		if ($$msg) { \
+			git add .; \
+			git commit -m \"$$msg\"; \
+			Write-Host '✓ Committed' -ForegroundColor Green; \
+		}"
+
+# Commit and push
+push: commit
+	@echo "🚀 Pushing to remote..."
+	@git push
+	@echo "✓ Pushed to remote"
+
+# ==============================================================================
+# Development Workflow
+# ==============================================================================
+
+# Full rebuild workflow (clean + build + validate + docs)
+full: clean build symbols validate docs
+	@echo ""
+	@echo "✨ Full build workflow complete!" 
+	@echo ""
+	@echo "Next steps:"
+	@echo "  • Test ROM: make test"
+	@echo "  • View coverage: make doc-coverage"
+	@echo "  • Commit changes: make commit"
+
+# Quick development cycle
+quick: build test
+	@echo "✨ Quick build complete!"
+
+# Release build (clean + optimized + validated)
+release: clean parallel validate
+	@echo ""
+	@echo "🎉 Release build complete!"
+	@echo ""
+	@echo "Build artifacts:"
+	@echo "  • ROM: build/ffmq-rebuilt.sfc"
+	@echo "  • Hash: see build output above"
+	@echo ""
+	@echo "Validation: All checks passed ✓"
+
+# ==============================================================================
+# Analysis Targets
+# ==============================================================================
+
+# Show build statistics
+stats:
+	@echo "📊 Build Statistics"
+	@echo "==================="
+	@echo ""
+	@pwsh -Command "$$asmFiles = Get-ChildItem -Path src/asm -Filter *.asm -Recurse; \
+		$$totalLines = ($$asmFiles | Get-Content | Measure-Object -Line).Lines; \
+		Write-Host 'ASM Files:' $$asmFiles.Count; \
+		Write-Host 'Total Lines:' $$totalLines; \
+		Write-Host 'Build Size:' (Get-Item build/ffmq-rebuilt.sfc -ErrorAction SilentlyContinue).Length 'bytes'"
+
+# Compare with original ROM
+compare: build
+	@echo "🔍 Comparing with original ROM..."
+	@pwsh -Command "if (Test-Path 'roms/FFMQ.sfc') { \
+		$$orig = Get-FileHash 'roms/FFMQ.sfc' -Algorithm SHA256; \
+		$$new = Get-FileHash 'build/ffmq-rebuilt.sfc' -Algorithm SHA256; \
+		if ($$orig.Hash -eq $$new.Hash) { \
+			Write-Host '✓ ROM matches original!' -ForegroundColor Green; \
+		} else { \
+			Write-Host '✗ ROM differs from original' -ForegroundColor Yellow; \
+			Write-Host 'Original: ' $$orig.Hash; \
+			Write-Host 'Built:    ' $$new.Hash; \
+		} \
+	} else { \
+		Write-Host '⚠ Original ROM not found at roms/FFMQ.sfc' -ForegroundColor Yellow; \
+	}"
+
+# ==============================================================================
+# Help Target
+# ==============================================================================
+
+help:
+	@echo "FFMQ ROM Build System"
+	@echo "===================="
+	@echo ""
+	@echo "Build Targets:"
+	@echo "  make build      - Build ROM"
+	@echo "  make symbols    - Build with symbol file"
+	@echo "  make verbose    - Build with verbose output"
+	@echo "  make parallel   - Build with parallel processing"
+	@echo "  make dev        - Development build (verbose + symbols)"
+	@echo "  make watch      - Watch for changes and rebuild"
+	@echo ""
+	@echo "Testing Targets:"
+	@echo "  make dry-run    - Preview build without assembling"
+	@echo "  make validate   - Validate ROM structure"
+	@echo "  make test       - Run verification tests"
+	@echo "  make check      - Quick validation (dry-run + validate)"
+	@echo ""
+	@echo "Maintenance:"
+	@echo "  make clean      - Remove build artifacts"
+	@echo "  make distclean  - Deep clean all generated files"
+	@echo ""
+	@echo "Documentation:"
+	@echo "  make docs       - Generate documentation coverage report"
+	@echo "  make log        - Update session log"
+	@echo ""
+	@echo "Workflows:"
+	@echo "  make full       - Full workflow (clean + build + validate + docs)"
+	@echo "  make quick      - Quick build + test"
+	@echo "  make release    - Optimized release build"
+	@echo ""
+	@echo "Analysis:"
+	@echo "  make stats      - Show build statistics"
+	@echo "  make compare    - Compare with original ROM"
+	@echo ""
+	@echo "Git:"
+	@echo "  make commit     - Quick commit"
+	@echo "  make push       - Commit and push"
+	@echo ""
+	@echo "Default target: make all (clean + build + symbols + validate)"
