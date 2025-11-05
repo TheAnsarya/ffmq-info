@@ -1,129 +1,129 @@
 {
-  "description": "Mapping between our extracted spells and FFMQ Randomizer learnable spells",
-  "randomizer_source": "https://github.com/wildham0/FFMQRando",
-  "total_randomizer_spells": 12,
-  "total_our_spells": 16,
-  "matched_spells": 12,
-  "spells": [
-    {
-      "randomizer_id": 0,
-      "randomizer_name": "Exit",
-      "our_id": 12,
-      "our_name": "Exit",
-      "power": 19,
-      "mp_cost": 12,
-      "element": "Earth",
-      "address": "$060F7E"
-    },
-    {
-      "randomizer_id": 1,
-      "randomizer_name": "Cure",
-      "our_id": 4,
-      "our_name": "Cure",
-      "power": 26,
-      "mp_cost": 11,
-      "element": "Water",
-      "address": "$060F4E"
-    },
-    {
-      "randomizer_id": 2,
-      "randomizer_name": "Heal",
-      "our_id": 6,
-      "our_name": "Heal",
-      "power": 40,
-      "mp_cost": 6,
-      "element": "Wind",
-      "address": "$060F5A"
-    },
-    {
-      "randomizer_id": 3,
-      "randomizer_name": "Life",
-      "our_id": 5,
-      "our_name": "Life",
-      "power": 73,
-      "mp_cost": 2,
-      "element": "Earth",
-      "address": "$060F54"
-    },
-    {
-      "randomizer_id": 4,
-      "randomizer_name": "Quake",
-      "our_id": 8,
-      "our_name": "Quake",
-      "power": 47,
-      "mp_cost": 2,
-      "element": "Unknown",
-      "address": "$060F66"
-    },
-    {
-      "randomizer_id": 5,
-      "randomizer_name": "Blizzard",
-      "our_id": 1,
-      "our_name": "Blizzard",
-      "power": 9,
-      "mp_cost": 2,
-      "element": "Fire",
-      "address": "$060F3C"
-    },
-    {
-      "randomizer_id": 6,
-      "randomizer_name": "Fire",
-      "our_id": 0,
-      "our_name": "Fire",
-      "power": 11,
-      "mp_cost": 2,
-      "element": "Fire",
-      "address": "$060F36"
-    },
-    {
-      "randomizer_id": 7,
-      "randomizer_name": "Aero",
-      "our_id": 3,
-      "our_name": "Aero",
-      "power": 15,
-      "mp_cost": 11,
-      "element": "Unknown",
-      "address": "$060F48"
-    },
-    {
-      "randomizer_id": 8,
-      "randomizer_name": "Thunder",
-      "our_id": 2,
-      "our_name": "Thunder",
-      "power": 14,
-      "mp_cost": 14,
-      "element": "Wind",
-      "address": "$060F42"
-    },
-    {
-      "randomizer_id": 9,
-      "randomizer_name": "White",
-      "our_id": 10,
-      "our_name": "White",
-      "power": 55,
-      "mp_cost": 5,
-      "element": "Water",
-      "address": "$060F72"
-    },
-    {
-      "randomizer_id": 10,
-      "randomizer_name": "Meteor",
-      "our_id": 11,
-      "our_name": "Meteor",
-      "power": 96,
-      "mp_cost": 20,
-      "element": "Earth",
-      "address": "$060F78"
-    },
-    {
-      "randomizer_id": 11,
-      "randomizer_name": "Flare",
-      "our_id": 9,
-      "our_name": "Flare",
-      "power": 87,
-      "mp_cost": 5,
-      "element": "Fire",
-      "address": "$060F6C"
-    }
-  ]
+	"description": "Mapping between our extracted spells and FFMQ Randomizer learnable spells",
+	"randomizer_source": "https://github.com/wildham0/FFMQRando",
+	"total_randomizer_spells": 12,
+	"total_our_spells": 16,
+	"matched_spells": 12,
+	"spells": [
+		{
+			"randomizer_id": 0,
+			"randomizer_name": "Exit",
+			"our_id": 12,
+			"our_name": "Exit",
+			"power": 19,
+			"mp_cost": 12,
+			"element": "Earth",
+			"address": "$060F7E"
+		},
+		{
+			"randomizer_id": 1,
+			"randomizer_name": "Cure",
+			"our_id": 4,
+			"our_name": "Cure",
+			"power": 26,
+			"mp_cost": 11,
+			"element": "Water",
+			"address": "$060F4E"
+		},
+		{
+			"randomizer_id": 2,
+			"randomizer_name": "Heal",
+			"our_id": 6,
+			"our_name": "Heal",
+			"power": 40,
+			"mp_cost": 6,
+			"element": "Wind",
+			"address": "$060F5A"
+		},
+		{
+			"randomizer_id": 3,
+			"randomizer_name": "Life",
+			"our_id": 5,
+			"our_name": "Life",
+			"power": 73,
+			"mp_cost": 2,
+			"element": "Earth",
+			"address": "$060F54"
+		},
+		{
+			"randomizer_id": 4,
+			"randomizer_name": "Quake",
+			"our_id": 8,
+			"our_name": "Quake",
+			"power": 47,
+			"mp_cost": 2,
+			"element": "Unknown",
+			"address": "$060F66"
+		},
+		{
+			"randomizer_id": 5,
+			"randomizer_name": "Blizzard",
+			"our_id": 1,
+			"our_name": "Blizzard",
+			"power": 9,
+			"mp_cost": 2,
+			"element": "Fire",
+			"address": "$060F3C"
+		},
+		{
+			"randomizer_id": 6,
+			"randomizer_name": "Fire",
+			"our_id": 0,
+			"our_name": "Fire",
+			"power": 11,
+			"mp_cost": 2,
+			"element": "Fire",
+			"address": "$060F36"
+		},
+		{
+			"randomizer_id": 7,
+			"randomizer_name": "Aero",
+			"our_id": 3,
+			"our_name": "Aero",
+			"power": 15,
+			"mp_cost": 11,
+			"element": "Unknown",
+			"address": "$060F48"
+		},
+		{
+			"randomizer_id": 8,
+			"randomizer_name": "Thunder",
+			"our_id": 2,
+			"our_name": "Thunder",
+			"power": 14,
+			"mp_cost": 14,
+			"element": "Wind",
+			"address": "$060F42"
+		},
+		{
+			"randomizer_id": 9,
+			"randomizer_name": "White",
+			"our_id": 10,
+			"our_name": "White",
+			"power": 55,
+			"mp_cost": 5,
+			"element": "Water",
+			"address": "$060F72"
+		},
+		{
+			"randomizer_id": 10,
+			"randomizer_name": "Meteor",
+			"our_id": 11,
+			"our_name": "Meteor",
+			"power": 96,
+			"mp_cost": 20,
+			"element": "Earth",
+			"address": "$060F78"
+		},
+		{
+			"randomizer_id": 11,
+			"randomizer_name": "Flare",
+			"our_id": 9,
+			"our_name": "Flare",
+			"power": 87,
+			"mp_cost": 5,
+			"element": "Fire",
+			"address": "$060F6C"
+		}
+	]
 }
