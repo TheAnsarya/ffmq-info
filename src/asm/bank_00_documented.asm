@@ -13202,13 +13202,21 @@ Menu_Item_Discard_UpdateDisplay:
 	jsr.W				   CODE_009BC4 ; Update menu
 	bra					 Menu_Item_Discard_Display ; Loop
 
-UNREACH_00BFD5:
-	db											 $4c,$5a,$bf ; JMP Menu_Item_Discard_Input
+;-------------------------------------------------------------------------------
+; Menu Item - Discard Cancel Handler
+;-------------------------------------------------------------------------------
+; Purpose: Handle item discard cancellation
+; Reachability: Reachable via conditional branch (bne - 2 references)
+; Analysis: Jumps back to item discard input loop
+; Technical: Originally labeled UNREACH_00BFD5
+;-------------------------------------------------------------------------------
+Menu_Item_Discard_Cancel:
+	jmp Menu_Item_Discard_Input          ;00BFD5|4C5ABF  |00BF5A; Jump to input loop
 
 Menu_Item_Discard_Armor:
 	jsr.W				   Menu_Item_ConfirmDiscard ; Confirm discard
 	bcc					 Menu_Item_Discard_Armor_Execute ; If confirmed, proceed
-	bne					 UNREACH_00BFD5 ; If cancelled, loop
+	bne					 Menu_Item_Discard_Cancel ; If cancelled, loop
 	lda.W				   #$0080	; Load $80
 
 Menu_Item_Discard_Armor_Execute:
@@ -13222,7 +13230,7 @@ Menu_Item_Discard_Armor_Execute:
 Menu_Item_Discard_Consumable:
 	jsr.W				   Menu_Item_ConfirmDiscard ; Confirm discard
 	bcc					 Menu_Item_Discard_Consumable_Execute ; If confirmed, proceed
-	bne					 UNREACH_00BFD5 ; If cancelled, loop
+	bne					 Menu_Item_Discard_Cancel ; If cancelled, loop
 	lda.W				   #$0080	; Load $80
 
 Menu_Item_Discard_Consumable_Execute:
@@ -13276,8 +13284,16 @@ Menu_Spell_Equip:
 	stx.B				   $8e	   ; Store in $8e
 	bra					 Menu_Spell_DisplayMenu ; Jump to menu display
 
-UNREACH_00C044:
-	db											 $20,$12,$b9 ; JSR Sprite_SetMode2C
+;-------------------------------------------------------------------------------
+; Menu Spell - Error Sound
+;-------------------------------------------------------------------------------
+; Purpose: Play error sound for invalid spell operations
+; Reachability: Reachable via conditional branches (3 references)
+; Analysis: Plays error feedback sound via Sprite_SetMode2C
+; Technical: Originally labeled UNREACH_00C044
+;-------------------------------------------------------------------------------
+Menu_Spell_ErrorSound:
+	jsr.W Sprite_SetMode2C               ;00C044|2012B9  |00B912; Play error sound
 
 Menu_Spell_ProcessInput:
 	lda.W				   #$cfb0	; Button mask
@@ -13292,49 +13308,80 @@ Menu_Spell_ProcessInput:
 	ldx.W				   #$c1d6	; Menu data
 	jmp.W				   CODE_009BC4 ; Update menu and return
 
-UNREACH_00C064:
-	db											 $ad,$91,$0e,$29,$7f,$00,$c9,$07,$00,$90,$d5,$20,$b1,$c1,$f0,$d3
-	db											 $de,$18,$10,$e2,$20,$a9,$14,$8d,$3a,$04,$22,$e0,$8a,$02,$ad,$df
-	db											 $04,$8d,$05,$05,$a9,$14,$4c,$f4,$bc
+;-------------------------------------------------------------------------------
+; Menu Spell - Spell Slot 0 Handler
+;-------------------------------------------------------------------------------
+; Purpose: Handle special case for spell slot 0
+; Reachability: Reachable via conditional branch (beq above)
+; Analysis: Validates spell slot 0 usage
+;   - Checks spell ID range, if >= 7 loops back
+;   - Calls confirm routine, if cancelled loops
+;   - Otherwise processes spell use
+; Technical: Originally labeled UNREACH_00C064
+;-------------------------------------------------------------------------------
+Menu_Spell_Slot0Handler:
+	lda.W $0e91                          ;00C064|AD910E  |010E91; Load spell ID
+	and.W #$007f                         ;00C067|297F00  |      ; Mask to 7 bits
+	cmp.W #$0007                         ;00C06A|C90700  |      ; Check if >= 7
+	bcc Menu_Spell_ProcessInput          ;00C06D|90D5    |00C044; If < 7, loop
+	jsr.W CODE_00C1B1                    ;00C06F|20B1C1  |00C1B1; Confirm spell use
+	beq Menu_Spell_ProcessInput          ;00C072|F0D3    |00C047; If cancelled, loop
+	dec.W $1018,x                        ;00C074|DE1810  |011018; Decrement MP
+	sep #$20                             ;00C077|E220    |      ; 8-bit accumulator
+	lda.B #$14                           ;00C079|A914    |      ; Load spell effect ID
+	sta.W $043a                          ;00C07B|8D3A04  |01043A; Store effect
+	jsl.L CODE_028AE0                    ;00C07E|22E08A02|028AE0; Call effect handler
+	lda.W $04df                          ;00C082|ADDF04  |0104DF; Load character ID
+	sta.W $0505                          ;00C085|8D0505  |010505; Store for update
+	lda.B #$14                           ;00C088|A914    |      ; Load menu ID
+	jmp.W CODE_00BCF4                    ;00C08A|4CF4BC  |00BCF4; Jump to menu handler
 
 Menu_Spell_DisplayMenu:
 	ldx.W				   #$c1d3	; Menu data
 	jsr.W				   CODE_009BC4 ; Update menu
 	bra					 Menu_Spell_ProcessInput ; Loop
 
-UNREACH_00C095:
-	db											 $4c,$44,$c0 ; JMP UNREACH_00C044
+;-------------------------------------------------------------------------------
+; Menu Spell - Invalid Spell Jump
+;-------------------------------------------------------------------------------
+; Purpose: Jump to error handler for invalid spell conditions
+; Reachability: Reachable via conditional branches (2 references)
+; Analysis: Jumps to Menu_Spell_ErrorSound
+; Technical: Originally labeled UNREACH_00C095
+;-------------------------------------------------------------------------------
+Menu_Spell_InvalidSpellJump:
+	jmp Menu_Spell_ErrorSound            ;00C095|4C44C0  |00C044; Jump to error
 
 Menu_Spell_Cancel:
 	lda.B				   $01	   ; Load character selection
 	and.W				   #$00ff	; Mask to 8 bits
 	beq					 Menu_Spell_ValidateSlot ; If character 0, branch
 	cmp.W				   #$0003	; Check if character 3
-	bne					 UNREACH_00C044 ; If not, error
+	bne					 Menu_Spell_ErrorSound ; If not, error
 	lda.W				   $1090	 ; Load companion data
 	and.W				   #$00ff	; Mask to 8 bits
 	cmp.W				   #$00ff	; Check if no companion
-	beq					 UNREACH_00C044 ; If none, error
+	beq					 Menu_Spell_ErrorSound ; If none, error
 	lda.W				   #$0080	; Load $80 (companion offset)
 
 Menu_Spell_ValidateSlot:
 	tax							   ; X = character offset
 	lda.W				   $1021,x   ; Load status flags
 	and.W				   #$00f9	; Mask out certain flags
-	bne					 UNREACH_00C044 ; If flagged, error
+	bne					 Menu_Spell_ErrorSound ; If flagged, error
 	lda.W				   #$0007	; Load 7 (max spell slot -1)
 	sec							   ; Set carry
 	sbc.B				   $02	   ; Subtract selection
 	and.W				   #$00ff	; Mask to 8 bits
 	jsr.W				   CODE_0097F2 ; Get bit mask
 	and.W				   $1038,x   ; Test spell equipped
-	beq					 UNREACH_00C095 ; If not equipped, error
+	beq					 Menu_Spell_InvalidSpellJump ; If not equipped, error
 	lda.W				   $1018,x   ; Load current MP
 	and.W				   #$00ff	; Mask to 8 bits
-	beq					 UNREACH_00C095 ; If no MP, error
+	beq					 Menu_Spell_InvalidSpellJump ; If no MP, error
 	lda.B				   $02	   ; Load spell slot
 	and.W				   #$00ff	; Mask to 8 bits
-	beq					 UNREACH_00C064 ; If slot 0, special case
+	beq					 Menu_Spell_Slot0Handler ; If slot 0, special case
 	cmp.W				   #$0002	; Check if slot 2
 	bcc					 CODE_00C13B ; If slot 1, HP healing
 	beq					 CODE_00C11F ; If slot 2, cure/status
