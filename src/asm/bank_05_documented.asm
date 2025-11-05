@@ -2095,8 +2095,16 @@ DATA8_05f72d:
 	db $30,$52,$09,$a9                   ;05F914|        |05F968;
 	db $1d,$1b,$28,$82                   ;05F918|        |      ;
 	db $30,$52,$17,$a7                   ;05F91C|        |05F970;
-;      |        |      ;
-UNREACH_05F920:
+;-------------------------------------------------------------------------------
+; DEAD CODE - Orphaned Data Table
+;-------------------------------------------------------------------------------
+; Purpose: Unknown (appears to be pointer/offset table)
+; Reachability: DEAD CODE - No references found
+; Analysis: 218 bytes of data, looks like 16-bit offsets/pointers
+; Technical: Originally labeled UNREACH_05F920
+; Classification: Cut content or development artifact
+;-------------------------------------------------------------------------------
+DEAD_05F920:
 	db $00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00;05F920|        |      ;
 	db $00,$00,$09,$00,$1b,$00,$30,$00,$42,$00;05F92E|        |      ;
 	db $4e,$00                           ;05F938|        |004E00;
@@ -2127,8 +2135,16 @@ UNREACH_05F920:
 ;      |        |      ;
 DATA8_05f9f8:
 	db $18,$13                           ;05F9F8|        |      ;
-;      |        |      ;
-UNREACH_05F9FA:
+;-------------------------------------------------------------------------------
+; DEAD CODE - Single Orphaned Byte
+;-------------------------------------------------------------------------------
+; Purpose: Unknown (possibly padding or truncated data)
+; Reachability: DEAD CODE - No references found
+; Analysis: Single zero byte between data tables
+; Technical: Originally labeled UNREACH_05F9FA
+; Classification: Padding or orphaned data
+;-------------------------------------------------------------------------------
+DEAD_05F9FA:
 	db $00                               ;05F9FA|        |      ;
 	db $1b,$27,$01                       ;05F9FB|        |      ;
 	db $13,$2b,$01                       ;05F9FE|        |00002B;

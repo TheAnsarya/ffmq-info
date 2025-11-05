@@ -2508,8 +2508,16 @@ DATA8_07f011:
 	db											 $f9,$05,$7d,$ff,$34,$7b,$7c,$f9,$03,$7d,$ff,$35,$7e,$f9,$03,$7d ;07F7A8|        |      ;
 	db											 $ff,$35,$7e,$f9,$03,$7d,$ff,$35,$7e ;07F7B8|        |      ;
 	db											 $7d,$ff	 ;07F7C1|        |0035FF;
-;      |        |      ;
-UNREACH_07F7C3:
+;-------------------------------------------------------------------------------
+; DEAD CODE - Orphaned Data Table
+;-------------------------------------------------------------------------------
+; Purpose: Unknown data table (possibly graphics/sprite data)
+; Reachability: DEAD CODE - No references found
+; Analysis: 126 bytes of structured data followed by $FF padding
+; Technical: Originally labeled UNREACH_07F7C3
+; Classification: Cut content or development artifact
+;-------------------------------------------------------------------------------
+DEAD_07F7C3:
 	db											 $35,$7e,$0e,$23,$08,$1f,$16,$1f,$22,$19,$29,$13,$2e,$15,$37,$0f ;07F7C3|        |00007E;
 	db											 $33,$0d,$2d,$09,$24,$10,$1f,$10,$1a,$17,$1a,$13,$1a,$0e,$0f,$0c ;07F7D3|        |00000D;
 	db											 $09,$0c,$10,$08,$1f,$0a,$2e,$29,$33,$28 ;07F7E3|        |      ;

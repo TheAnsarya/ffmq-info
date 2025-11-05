@@ -2191,11 +2191,27 @@ DATA8_06bf17:
 	db $00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00;06FB91|        |      ;
 	db $00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00;06FBA1|        |      ;
 	db $00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00;06FBB1|        |      ;
-;      |        |      ;
-UNREACH_06FBC1:
+;-------------------------------------------------------------------------------
+; DEAD CODE - Padding Bytes
+;-------------------------------------------------------------------------------
+; Purpose: Padding between data sections
+; Reachability: DEAD CODE - No references found
+; Analysis: 2 zero bytes padding
+; Technical: Originally labeled UNREACH_06FBC1
+; Classification: Padding/alignment
+;-------------------------------------------------------------------------------
+DEAD_06FBC1:
 	db $00,$00                           ;06FBC1|        |      ;
-;      |        |      ;
-UNREACH_06FBC3:
+;-------------------------------------------------------------------------------
+; Data Table - Enemy/Battle Configuration
+;-------------------------------------------------------------------------------
+; Purpose: Battle parameter configuration table
+; Reachability: Reachable via indexed load (no direct branch needed for data)
+; Analysis: Structured data for battle system configuration
+; Technical: Originally labeled UNREACH_06FBC3 (but is valid data)
+; Classification: Data table (reachable via indexing)
+;-------------------------------------------------------------------------------
+Battle_ConfigTable:
 	db $12,$10                           ;06FBC3|        |000010;
 	db $03,$00,$12,$10                   ;06FBC5|        |      ;
 	db $03,$00,$13,$10,$1a,$00,$10,$10,$1a,$00,$11,$11,$31,$00,$14,$14;06FBC9|        |000000;
