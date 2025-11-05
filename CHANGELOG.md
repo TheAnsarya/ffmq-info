@@ -1,8 +1,18 @@
 ﻿# Changelog - FFMQ Reverse Engineering Project
 
-## [Unreleased] - 2025-11-04 - Modding Toolkit & Testing Framework 🎮
+## [Unreleased] - 2025-11-04 - Modding Toolkit & Graphics Extraction 🎮🎨
 
 ### 🎯 Major Features
+
+**Multi-Palette Graphics Extraction** ✨ NEW!
+- Fixed graphics extraction to match actual displayed graphics (Issue #70)
+- Extracts 16 palettes from ROM Bank 05 (RGB555 format)
+- Renders tiles with ALL 8 palettes (0-7) for accurate color matching
+- Generates comparison sheets showing palette variations
+- Palette data exported as JSON for editing
+- Comprehensive 800+ line extraction guide (GRAPHICS_EXTRACTION_GUIDE.md)
+- Explains SNES 4BPP format, OAM attributes, and palette selection
+- Tools: `tools/extraction/extract_graphics.py` (updated)
 
 **Comprehensive Modding Tutorial System**
 - Created complete tutorial series (5 guides, 4,248 lines)
@@ -37,14 +47,18 @@
 
 **Community Documentation**
 - FAQ.md - Comprehensive Q&A covering all aspects
+- ROADMAP.md - Quarterly project roadmap through 2026
 - Improved tutorials with step-by-step examples
 - Troubleshooting guides
 - Contributing guidelines
 
 ### 📊 Statistics
 
-- **33 complete code examples** across all tutorials
+- **800+ lines** of graphics extraction documentation
+- **33 complete code examples** across modding tutorials
 - **36 unit tests** ensuring data integrity
+- **16 palettes extracted** (512 bytes total)
+- **8 tile sheets** per extraction (one per palette)
 - **~51,000 bytes** of tutorial documentation
 - **3 visualization tools** for data analysis
 - **4 example mods** ready to use
