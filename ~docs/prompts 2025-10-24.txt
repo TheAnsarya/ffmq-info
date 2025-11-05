@@ -560,11 +560,44 @@ pick some issues/todos and implement them.
 Commit all this work with a descriptive message; Test one of the example mods to verify everything works; Create text modding and advanced tutorials to complete Todo #5; continue
 continue and update issues as you go. if you create new work, make an issue for it
 as always make an issue and then implement it: extracted graphics do not look like the real graphics, look at the actual displayed graphics for the game (the internet has lots of it, or run the emulator and look at the VRAM and graphics state and outputted graphics and then match that during the extraction/re-insertion process
+you keep leaving files open in the IDE with a "not saved" status, stop doing that, make sure to close everything you futz with and to commit everything that's been changed; now continue with our current work and get all graphics in the pipeline with correct colors and structure so that enemies look like enemies on screen, etc; continue!
+you keep leaving files open in the IDE with a "not saved" status, stop doing that, make sure to close everything you futz with and to commit everything that's been changed; thos graphics look nothing like what is displayed on screen; start with #1 `Verify sprites against game screenshots`, and then do the rest::: Adjust tile layouts if sprites don't look perfect, Extract OAM metadata from ROM for accurate layouts (currently using educated guesses), Expand sprite library (83 enemies total + NPCs + UI), Add animation frames (multiple poses per character), Implement sprite re-insertion (PNG → ROM for modding)
+you keep leaving files open in the IDE with a "not saved" status, stop doing that, make sure to close everything you futz with and to commit everything that's been changed; make sure we have github issues for this "fix graphics extract to match actual output" and then set this work as low priority and set it aside for now. Then pick another issue or set of todos and fix them.
+do issues #47 and then #45 and then #51
 
 
 
 
 
+
+update the `issues.md` documentation using the actual github issues list for this project; then continue doing development work
+
+
+
+
+
+
+
+
+
+
+
+
+
+&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
+The solution is to either:
+Option A: Extract sprite metadata (which tiles use which palettes) and render accordingly
+Option B: Create a palette-aware extractor that uses tilemap/OAM data
+Option C: Generate output with ALL possible palettes (create 8 versions of each tile)
+&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
+ Next Steps (Optional Enhancements)
+Verify sprites against game screenshots
+Adjust tile layouts if sprites don't look perfect
+Extract OAM metadata from ROM for accurate layouts (currently using educated guesses)
+Expand sprite library (83 enemies total + NPCs + UI)
+Add animation frames (multiple poses per character)
+Implement sprite re-insertion (PNG → ROM for modding)
+&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
 
 
 
