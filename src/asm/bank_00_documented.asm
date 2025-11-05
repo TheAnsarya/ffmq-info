@@ -11720,28 +11720,23 @@ Menu_InputHandler:
 	bpl					 Menu_UpdateDisplay ; If >= 0, update menu
 	lda.B				   $95	   ; Load wrapping flags
 	and.B				   #$02	  ; Test bit 1 (wrap down)
-	beq					 UNREACH_00B76B ; If no wrap, increment back
+	beq					 Menu_InputHandler_SelectNoWrap ;00B721|F048    |00B76B
 	lda.W				   $0163	 ; Load max position
 	sta.W				   $0162	 ; Wrap to max
 	bra					 Menu_UpdateDisplay ; Update menu
 
-; ------------------------------------------------------------------------------
-; UNREACHABLE CODE ANALYSIS
-; ------------------------------------------------------------------------------
-; Label: UNREACH_00B76B
-; Category: 🔴 Truly Unreachable (Dead Code)
-; Purpose: Increment menu cursor and branch to input handler
-; Reachability: No known call sites or branches to this address
-; Analysis: Orphaned menu cursor increment code
-;   - Increments $0162 (cursor position)
-;   - Branches to Menu_InputHandler
-; Verified: NOT reachable in normal gameplay
-; Notes: Similar to Menu_InputHandler_Down but without bounds checking
-;        Likely removed or replaced alternate path
-; ------------------------------------------------------------------------------
-UNREACH_00B76B:
-	inc.W $0162                          ;00B76B|EE6201  |000162; Increment cursor position
-	bra Menu_InputHandler                ;00B76E|80BE    |00B72E; Branch to input handler
+;-------------------------------------------------------------------------------
+; Menu Input - Select No-Wrap Handler
+;-------------------------------------------------------------------------------
+; Purpose: Handle Select button when no wrap-down is allowed
+; Reachability: Reachable via beq branch (line 11723)
+; Analysis: When Select is pressed and wrap-down flag is clear
+;           Increments cursor back to original position
+; Technical: Originally labeled UNREACH_00B76B
+;-------------------------------------------------------------------------------
+Menu_InputHandler_SelectNoWrap:
+	inc.W $0162                          ;00B76B|EE6201  |000162
+	bra Menu_InputHandler                ;00B76E|80BE    |00B72E
 
 Menu_InputHandler_Down:
 	sep					 #$20		; 8-bit accumulator
@@ -12800,21 +12795,18 @@ Menu_Handler:
 	sta.B				   $8e	   ; Store in $8e
 	bra					 Menu_Handler_Process ; Continue
 
-; ------------------------------------------------------------------------------
-; UNREACHABLE CODE ANALYSIS
-; ------------------------------------------------------------------------------
-; Label: UNREACH_00BDCA
-; Category: 🔴 Truly Unreachable (Dead Code)
-; Purpose: Play error sound via Sprite_SetMode2C
-; Reachability: No known call sites or branches to this address
-; Analysis: Orphaned error sound call
-;   - Calls Sprite_SetMode2C (error sound/animation)
-;   - No branches or calls leading to this address
-; Verified: NOT reachable in normal gameplay
-; Notes: May be removed error handler or debug code
-; ------------------------------------------------------------------------------
+;-------------------------------------------------------------------------------
+; DEAD CODE - Menu Error Handler (Orphaned)
+;-------------------------------------------------------------------------------
+; Purpose: Orphaned error sound call
+; Reachability: DEAD CODE - No branches or calls to this address
+; Analysis: jsr.W Sprite_SetMode2C (error sound)
+;           Likely removed error handler or debug code
+; Technical: Originally labeled UNREACH_00BDCA
+; Status: Preserved for historical reference
+;-------------------------------------------------------------------------------
 UNREACH_00BDCA:
-	jsr.W Sprite_SetMode2C               ;00BDCA|2012B9  |00B912; Play error sound
+	jsr.W Sprite_SetMode2C               ;00BDCA|2012B9  |00B912
 
 Menu_Handler_Loop:
 	lda.W				   #$ccb0	; Button mask
@@ -13033,8 +13025,18 @@ Menu_OptionSelection_Cancel:
 	sta.B				   $01	   ; Store in $01
 RTS_Label:
 
+;-------------------------------------------------------------------------------
+; DEAD CODE - Menu Configuration Data (Orphaned)
+;-------------------------------------------------------------------------------
+; Purpose: Orphaned menu configuration or handler
+; Reachability: DEAD CODE - No branches or calls to this address
+; Analysis: LDA #$0001, TRB $00d8, RTS
+;           Clears bit 0 in $00d8 and returns
+; Technical: Originally labeled UNREACH_00BEBB
+; Status: Preserved for historical reference
+;-------------------------------------------------------------------------------
 UNREACH_00BEBB:
-	db											 $a9,$01,$00,$1c,$d8,$00,$60 ; LDA #$0001; TRB $00d8; RTS
+	db											 $a9,$01,$00,$1c,$d8,$00,$60
 
 SystemData_Config8:
 	db											 $d8,$00,$03,$c2,$00,$03,$f5,$00,$03
@@ -13045,8 +13047,18 @@ SystemData_Config9:
 LOOSE_OP_00BECE:
 	db											 $9c,$10,$01,$9c,$12,$01,$60 ; STZ $0110; STZ $0112; RTS
 
+;-------------------------------------------------------------------------------
+; DEAD CODE - Long Call Handler (Orphaned)
+;-------------------------------------------------------------------------------
+; Purpose: Orphaned long call to Bank $0C
+; Reachability: DEAD CODE - No branches or calls to this address
+; Analysis: PHA, JSL CODE_0C8000 (more code follows)
+;           Pushes accumulator and calls Bank $0C code
+; Technical: Originally labeled UNREACH_00BED5
+; Status: Preserved for historical reference
+;-------------------------------------------------------------------------------
 UNREACH_00BED5:
-	db											 $48,$22,$00,$80,$0c ; PHA; JSL CODE_0C8000; (more code)
+	db											 $48,$22,$00,$80,$0c
 
 Menu_OptionSelection_UpdateDisplay:
 	stx.W				   $015f	 ; Store input state
@@ -13055,10 +13067,19 @@ Menu_OptionSelection_UpdateDisplay:
 	jsr.W				   CODE_009BC4 ; Update menu
 	bra					 Menu_OptionSelection ; Loop
 
+;-------------------------------------------------------------------------------
+; DEAD CODE - Menu Polling Handler (Orphaned)
+;-------------------------------------------------------------------------------
+; Purpose: Orphaned menu polling/input handler
+; Reachability: DEAD CODE - No branches or calls to this address
+; Analysis: LDA #$ccb0, JSL CODE_00B930 (menu polling)
+;           Complex multi-byte sequence (25 bytes total)
+; Technical: Originally labeled UNREACH_00BEE5
+; Status: Preserved for historical reference
+;-------------------------------------------------------------------------------
 UNREACH_00BEE5:
 	db											 $a9,$b0,$cc,$22,$30,$b9,$00,$f0,$f1,$89,$80,$00,$f0,$03,$4c,$cc
 	db											 $be,$20,$12,$b9,$a9,$ff,$00,$85,$01,$60
-; LDA #$ccb0; JSL CODE_00B930; (menu polling code)
 
 ;-------------------------------------------------------------------------------
 ; Menu_MultiOption: Complex menu update routine
@@ -13088,9 +13109,18 @@ Menu_MultiOption_Loop:
 	stz.B				   $8e	   ; Clear $8e
 RTS_Label:
 
+;-------------------------------------------------------------------------------
+; DEAD CODE - Menu Cleanup Handler (Orphaned)
+;-------------------------------------------------------------------------------
+; Purpose: Orphaned menu cleanup/return handler
+; Reachability: DEAD CODE - No branches or calls to this address
+; Analysis: JSR Anim_SetMode10, LDA #$ffff, STA $01, STZ $8e, RTS
+;           Sets animation mode, loads $ffff, stores to $01, clears $8e
+; Technical: Originally labeled UNREACH_00BF1B
+; Status: Preserved for historical reference
+;-------------------------------------------------------------------------------
 UNREACH_00BF1B:
 	db											 $20,$1c,$b9,$a9,$ff,$ff,$85,$01,$9c,$8e,$00,$60
-; JSR Anim_SetMode10; LDA #$ffff; STA $01; STZ $8e; RTS
 
 SystemData_Config10:
 	db											 $00		 ; Padding
