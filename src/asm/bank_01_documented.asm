@@ -3727,21 +3727,30 @@ BattleChar_DispatchOperation:
 	and.W				   #$00ff	;01AC74|29FF00  |      ;
 	asl					 a;01AC77|0A      |      ;
 	tax							   ;01AC78|AA      |      ;
-	jsr.W				   (UNREACH_01AC7D,x) ;01AC79|FC7DAC  |01AC7D;
+	jsr.W				   (Battle_CharacterSystemJumpTable,x) ;01AC79|FC7DAC  |01AC7D;
 	rts							   ;01AC7C|60      |      ;
 
-; ==============================================================================
-; Character System Jump Table
-; Jump table for various character-based operations
-; ==============================================================================
-
-UNREACH_01AC7D:
-	db											 $15,$f6,$4a,$f8,$17,$b8,$29,$b8,$a5,$c3,$a5,$c3,$a5,$c3,$7d,$da ; 01AC7D
-	db											 $d6,$d6,$a5,$c3,$a5,$c3,$a5,$c3,$a5,$c3,$a5,$c3,$e1,$d6,$a5,$c3 ; 01AC8D
-	db											 $a5,$c3,$a5,$c3,$4a,$b8,$2d,$d8,$c6,$b8,$a5,$d9,$dc,$b8,$a5,$c3 ; 01AC9D
-	db											 $95,$d9,$3b,$dc,$a5,$c3,$36,$f9,$0a,$f7,$e5,$b8,$0d,$b9,$35,$b9 ; 01ACAD
-	db											 $5d,$b9,$22,$da,$85,$b9,$94,$b9,$a3,$b9,$b2,$b9,$1b,$d9,$86,$f6 ; 01ACBD
-	db											 $ce,$f7,$a5,$c3,$46,$f6,$c1,$b9,$71,$ba,$95,$f5,$d5,$f5 ; 01ACCD
+;-------------------------------------------------------------------------------
+; Battle - Character System Jump Table
+;-------------------------------------------------------------------------------
+; Purpose: Jump table for various character-based battle operations
+; Reachability: Reachable via indexed jump (jsr above)
+; Analysis: Contains 38 function pointers for character system operations
+; Technical: Originally labeled UNREACH_01AC7D
+;-------------------------------------------------------------------------------
+Battle_CharacterSystemJumpTable:
+	dw $F615, $F84A, $B817, $B829 ; 00-03: Character operations
+	dw $C3A5, $C3A5, $C3A5, $DA7D ; 04-07: Repeated handler + special
+	dw $D6D6, $C3A5, $C3A5, $C3A5 ; 08-0B: Special + repeated handler
+	dw $C3A5, $C3A5, $D6E1, $C3A5 ; 0C-0F: Repeated handler + special
+	dw $C3A5, $C3A5, $B84A, $D82D ; 10-13: Handlers
+	dw $B8C6, $D9A5, $B8DC, $C3A5 ; 14-17: Handlers
+	dw $D995, $DC3B, $C3A5, $F936 ; 18-1B: Handlers
+	dw $F70A, $B8E5, $B90D, $B935 ; 1C-1F: Handlers
+	dw $B95D, $DA22, $B985, $B994 ; 20-23: Handlers
+	dw $B9A3, $B9B2, $D91B, $F686 ; 24-27: Handlers
+	dw $F7CE, $C3A5, $F646, $B9C1 ; 28-2B: Handlers
+	dw $BA71, $F595, $F5D5         ; 2C-2E: Handlers
 
 ; ==============================================================================
 ; Special Battle System Handler
@@ -4982,7 +4991,7 @@ BattleAI_ExecuteStrategy:
 	beq					 CODE_01B528 ;01B510|F016    |01B528;
 	ldy.W				   $19ee	 ;01B512|ACEE19  |0119EE;
 	cpy.W				   #$2500	;01B515|C00025  |      ;
-	beq					 UNREACH_01B53F ;01B518|F025    |01B53F;
+	beq					 BattleAI_SpecialCase ;01B518|F025    |01B53F;
 
 BattleAI_UpdatePriority:
 	inx							   ;01B51A|E8      |      ;
@@ -5016,8 +5025,17 @@ BattleAI_FinalizeChoice:
 	sta.W				   $1913	 ;01B53A|8D1319  |011913;
 	bra					 CODE_01B51A ;01B53D|80DB    |01B51A;
 
-UNREACH_01B53F:
-	db											 $22,$4c,$b2,$01,$80,$d5 ;01B53F
+;-------------------------------------------------------------------------------
+; Battle AI - Special Case Handler
+;-------------------------------------------------------------------------------
+; Purpose: Handle special battle AI case with subroutine call
+; Reachability: Reachable via conditional branch (beq above)
+; Analysis: Calls external battle routine and branches back
+; Technical: Originally labeled UNREACH_01B53F
+;-------------------------------------------------------------------------------
+BattleAI_SpecialCase:
+	jsl.L CODE_01B24C                    ;01B53F|224CB201|01B24C; Call battle routine
+	bra CODE_01B51A                      ;01B543|80D5    |01B51A; Branch back
 
 ; ==============================================================================
 ; Advanced Effect Processing Engine
@@ -7445,7 +7463,7 @@ animation_setup:
 	sta.W				   $1993	 ; Store graphics state
 	lda.W				   DATA8_01f400,x ; Load animation data
 	sta.W				   $19d7	 ; Store animation parameter
-	lda.W				   UNREACH_01F407,x ; Load animation mode
+	lda.W				   Battle_AnimationModeTable,x ; Load animation mode
 	sta.W				   $1928	 ; Store animation mode
 	jmp.W				   CODE_01EAB0 ; Jump to animation processor
 ; Advanced Battle Processing and Memory Management Systems for FFMQ Bank $01
@@ -8499,7 +8517,15 @@ DATA8_01f400:
 	db											 $00
 	db											 $02
 
-UNREACH_01F407:
+;-------------------------------------------------------------------------------
+; Battle - Animation Mode Table
+;-------------------------------------------------------------------------------
+; Purpose: Animation mode lookup table
+; Reachability: Reachable via indexed access (lda above)
+; Analysis: Data table with 8 animation mode values
+; Technical: Originally labeled UNREACH_01F407
+;-------------------------------------------------------------------------------
+Battle_AnimationModeTable:
 	db											 $02
 	db											 $01,$01,$01,$01
 	db											 $02
