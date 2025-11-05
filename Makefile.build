@@ -137,7 +137,7 @@ push: commit
 # Full rebuild workflow (clean + build + validate + docs)
 full: clean build symbols validate docs
 	@echo ""
-	@echo "✨ Full build workflow complete!" 
+	@echo "✨ Full build workflow complete!"
 	@echo ""
 	@echo "Next steps:"
 	@echo "  • Test ROM: make test"

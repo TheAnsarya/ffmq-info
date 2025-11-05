@@ -27,20 +27,70 @@ jobs:
   dry-run:
     name: 🔍 Dry Run Validation
     runs-on: windows-latest
-    
+
     steps:
       - name: 📥 Checkout code
         uses: actions/checkout@v4
-        
+
       - name: 🔍 Run dry-run check
         shell: pwsh
         run: |
           Write-Host "Running dry-run validation..." -ForegroundColor Cyan
           .\build.ps1 -DryRun
-          
+
       - name: 📊 Report dry-run results
         if: success()
         run: echo "✅ Dry-run validation passed"
+
+  # ==============================================================================
+  # ASM Syntax Check Job - Validate ASM files before building
+  # ==============================================================================
+  asm-check:
+    name: 📝 ASM Syntax Check
+    runs-on: windows-latest
+
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+
+      - name: 🔍 Check ASM file syntax
+        shell: pwsh
+        run: |
+          Write-Host "Checking ASM file syntax..." -ForegroundColor Cyan
+
+          $asmFiles = Get-ChildItem -Path "src/asm" -Filter "*.asm" -Recurse
+          $errorCount = 0
+          $warningCount = 0
+
+          foreach ($file in $asmFiles) {
+            # Basic syntax checks
+            $content = Get-Content $file.FullName -Raw
+
+            # Check for common issues
+            if ($content -match '\t ') {
+              Write-Host "⚠️  Mixed tabs/spaces in $($file.Name)" -ForegroundColor Yellow
+              $warningCount++
+            }
+
+            # Check for unmatched brackets
+            $openBrackets = ($content.ToCharArray() | Where-Object { $_ -eq '[' }).Count
+            $closeBrackets = ($content.ToCharArray() | Where-Object { $_ -eq ']' }).Count
+            if ($openBrackets -ne $closeBrackets) {
+              Write-Host "❌ Unmatched brackets in $($file.Name)" -ForegroundColor Red
+              $errorCount++
+            }
+          }
+
+          Write-Host ""
+          Write-Host "Checked $($asmFiles.Count) ASM files" -ForegroundColor Cyan
+          if ($errorCount -gt 0) {
+            Write-Host "❌ Found $errorCount errors" -ForegroundColor Red
+            exit 1
+          } elseif ($warningCount -gt 0) {
+            Write-Host "⚠️  Found $warningCount warnings" -ForegroundColor Yellow
+          } else {
+            Write-Host "✅ All syntax checks passed" -ForegroundColor Green
+          }
 
   # ==============================================================================
   # Build Job - Assemble ROM and validate
@@ -48,24 +98,36 @@ jobs:
   build:
     name: 🔨 Build and Validate ROM
     runs-on: windows-latest
-    needs: dry-run
-    
+    needs: [dry-run, asm-check]
+
     steps:
       - name: 📥 Checkout code
         uses: actions/checkout@v4
-        
-      - name: 🔧 Setup Asar
+        with:
+          fetch-depth: 0  # Full history for comparison
+
+      - name: � Cache Asar
+        id: cache-asar
+        uses: actions/cache@v4
+        with:
+          path: tools/asar
+          key: asar-1.81-${{ runner.os }}
+          restore-keys: |
+            asar-1.81-
+
+      - name: �🔧 Setup Asar
+        if: steps.cache-asar.outputs.cache-hit != 'true'
         shell: pwsh
         run: |
           Write-Host "Downloading Asar assembler..." -ForegroundColor Cyan
-          
+
           # Download Asar 1.81 (latest stable)
           $asarUrl = "https://github.com/RPGHacker/asar/releases/download/v1.81/asar181.zip"
           Invoke-WebRequest -Uri $asarUrl -OutFile "asar.zip"
-          
+
           # Extract to tools directory
           Expand-Archive -Path "asar.zip" -DestinationPath "tools/asar" -Force
-          
+
           # Verify installation
           if (Test-Path "tools/asar/asar.exe") {
             Write-Host "✓ Asar installed successfully" -ForegroundColor Green
@@ -73,44 +135,97 @@ jobs:
             Write-Error "Failed to install Asar"
             exit 1
           }
-          
+
+      - name: ✅ Verify Asar (from cache or fresh)
+        shell: pwsh
+        run: |
+          if (Test-Path "tools/asar/asar.exe") {
+            Write-Host "✓ Asar available" -ForegroundColor Green
+            & "tools/asar/asar.exe" --version
+          } else {
+            Write-Error "Asar not found"
+            exit 1
+          }
+
       - name: 🔨 Build ROM
         shell: pwsh
         run: |
           Write-Host "Building ROM..." -ForegroundColor Cyan
+          $startTime = Get-Date
           .\build.ps1 -Verbose
-          
+          $endTime = Get-Date
+          $duration = $endTime - $startTime
+          Write-Host "Build completed in $($duration.TotalSeconds) seconds" -ForegroundColor Green
+          echo "BUILD_TIME=$($duration.TotalSeconds)" >> $env:GITHUB_ENV
+
       - name: ✅ Validate ROM
         shell: pwsh
         run: |
           Write-Host "Validating ROM structure..." -ForegroundColor Cyan
           .\build.ps1 -ValidateROM
-          
+
       - name: 📊 Build Statistics
         shell: pwsh
         run: |
           Write-Host ""
           Write-Host "Build Statistics:" -ForegroundColor Cyan
           Write-Host "=================" -ForegroundColor Cyan
-          
+          Write-Host "Build Time: $env:BUILD_TIME seconds"
+
           $romPath = "build/ffmq-rebuilt.sfc"
           if (Test-Path $romPath) {
             $romInfo = Get-Item $romPath
             Write-Host "ROM Size: $($romInfo.Length) bytes"
             Write-Host "Built: $($romInfo.LastWriteTime)"
-            
+
             # Calculate SHA256
             $hash = Get-FileHash $romPath -Algorithm SHA256
             Write-Host "SHA256: $($hash.Hash)"
+
+            # Save hash for comparison
+            echo "ROM_HASH=$($hash.Hash)" >> $env:GITHUB_ENV
           }
-          
+
+      - name: 🔍 Compare with Baseline (if available)
+        shell: pwsh
+        continue-on-error: true
+        run: |
+          Write-Host ""
+          Write-Host "ROM Comparison:" -ForegroundColor Cyan
+          Write-Host "===============" -ForegroundColor Cyan
+
+          # Check if baseline ROM exists
+          if (Test-Path "roms/FFMQ.sfc") {
+            $baseline = Get-FileHash "roms/FFMQ.sfc" -Algorithm SHA256
+            $rebuilt = Get-FileHash "build/ffmq-rebuilt.sfc" -Algorithm SHA256
+
+            if ($baseline.Hash -eq $rebuilt.Hash) {
+              Write-Host "✅ ROM matches baseline (byte-perfect)" -ForegroundColor Green
+              echo "ROM_MATCH=true" >> $env:GITHUB_ENV
+            } else {
+              Write-Host "⚠️  ROM differs from baseline" -ForegroundColor Yellow
+              Write-Host "Baseline: $($baseline.Hash)"
+              Write-Host "Rebuilt:  $($rebuilt.Hash)"
+              echo "ROM_MATCH=false" >> $env:GITHUB_ENV
+
+              # Show size difference
+              $baseSize = (Get-Item "roms/FFMQ.sfc").Length
+              $rebuiltSize = (Get-Item "build/ffmq-rebuilt.sfc").Length
+              $sizeDiff = $rebuiltSize - $baseSize
+              Write-Host "Size difference: $sizeDiff bytes"
+            }
+          } else {
+            Write-Host "⚠️  Baseline ROM not available for comparison" -ForegroundColor Yellow
+            echo "ROM_MATCH=unknown" >> $env:GITHUB_ENV
+          }
+
       - name: 📦 Upload ROM artifact
         uses: actions/upload-artifact@v4
         with:
           name: ffmq-rebuilt-rom
           path: build/ffmq-rebuilt.sfc
           retention-days: 30
-          
+
       - name: 📦 Upload symbol file
         if: always()
         uses: actions/upload-artifact@v4
@@ -126,27 +241,29 @@ jobs:
   docs-check:
     name: 📚 Documentation Coverage
     runs-on: windows-latest
-    
+
     steps:
       - name: 📥 Checkout code
         uses: actions/checkout@v4
-        
+
       - name: 🐍 Setup Python
         uses: actions/setup-python@v5
         with:
           python-version: '3.11'
-          
+          cache: 'pip'
+          cache-dependency-path: requirements.txt
+
       - name: 📦 Install dependencies
         run: |
           python -m pip install --upgrade pip
           if (Test-Path requirements.txt) { pip install -r requirements.txt }
-          
+
       - name: 📊 Run documentation coverage analysis
         shell: pwsh
         run: |
           Write-Host "Analyzing documentation coverage..." -ForegroundColor Cyan
           python tools/analyze_doc_coverage.py
-          
+
       - name: 📤 Upload coverage report
         uses: actions/upload-artifact@v4
         with:
@@ -162,11 +279,11 @@ jobs:
     runs-on: windows-latest
     needs: [build, docs-check]
     if: always()
-    
+
     steps:
       - name: 📥 Download artifacts
         uses: actions/download-artifact@v4
-        
+
       - name: 📊 Generate summary
         shell: pwsh
         run: |
@@ -175,25 +292,31 @@ jobs:
           Write-Host "FFMQ BUILD PIPELINE SUMMARY" -ForegroundColor Cyan
           Write-Host "═══════════════════════════════════════" -ForegroundColor Cyan
           Write-Host ""
-          
+
           # Check if ROM was built
           if (Test-Path "ffmq-rebuilt-rom/ffmq-rebuilt.sfc") {
             Write-Host "✅ ROM Build: SUCCESS" -ForegroundColor Green
             $size = (Get-Item "ffmq-rebuilt-rom/ffmq-rebuilt.sfc").Length
             Write-Host "   Size: $size bytes" -ForegroundColor White
+
+            # Show build stats if available
+            $hash = Get-FileHash "ffmq-rebuilt-rom/ffmq-rebuilt.sfc" -Algorithm SHA256
+            Write-Host "   SHA256: $($hash.Hash.Substring(0, 16))..." -ForegroundColor White
           } else {
             Write-Host "❌ ROM Build: FAILED" -ForegroundColor Red
           }
-          
+
           # Check documentation coverage
           if (Test-Path "doc-coverage-report/documentation_coverage.json") {
             Write-Host "✅ Documentation Check: COMPLETE" -ForegroundColor Green
             $coverage = Get-Content "doc-coverage-report/documentation_coverage.json" | ConvertFrom-Json
             Write-Host "   Documented functions: $($coverage.statistics.documented_functions)/$($coverage.statistics.total_functions)" -ForegroundColor White
+            $percentage = [math]::Round(($coverage.statistics.documented_functions / $coverage.statistics.total_functions) * 100, 1)
+            Write-Host "   Coverage: $percentage%" -ForegroundColor White
           } else {
             Write-Host "⚠️  Documentation Check: INCOMPLETE" -ForegroundColor Yellow
           }
-          
+
           Write-Host ""
           Write-Host "Build artifacts available for download above ⬆️" -ForegroundColor Cyan
           Write-Host ""
@@ -202,7 +325,7 @@ jobs:
 # Workflow Notes
 # ==============================================================================
 # This workflow provides:
-# 
+#
 # 1. Dry-run validation (fast, no assembly)
 # 2. Full ROM build with validation
 # 3. Documentation coverage checking

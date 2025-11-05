@@ -564,13 +564,15 @@ you keep leaving files open in the IDE with a "not saved" status, stop doing tha
 you keep leaving files open in the IDE with a "not saved" status, stop doing that, make sure to close everything you futz with and to commit everything that's been changed; thos graphics look nothing like what is displayed on screen; start with #1 `Verify sprites against game screenshots`, and then do the rest::: Adjust tile layouts if sprites don't look perfect, Extract OAM metadata from ROM for accurate layouts (currently using educated guesses), Expand sprite library (83 enemies total + NPCs + UI), Add animation frames (multiple poses per character), Implement sprite re-insertion (PNG → ROM for modding)
 you keep leaving files open in the IDE with a "not saved" status, stop doing that, make sure to close everything you futz with and to commit everything that's been changed; make sure we have github issues for this "fix graphics extract to match actual output" and then set this work as low priority and set it aside for now. Then pick another issue or set of todos and fix them.
 do issues #47 and then #45 and then #51
+update the `issues.md` documentation using the actual github issues list for this project; then continue doing development work: it looks like you added github actions, are you using that for anything? add a github issue to the project for github actions with a todo list, and implement it.
+looks like you stalled? try again and continue
 
 
 
 
 
 
-update the `issues.md` documentation using the actual github issues list for this project; then continue doing development work
+
 
 
 
