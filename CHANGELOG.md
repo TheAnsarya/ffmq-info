@@ -4,15 +4,22 @@
 
 ### 🎯 Major Features
 
-**Multi-Palette Graphics Extraction** ✨ NEW!
-- Fixed graphics extraction to match actual displayed graphics (Issue #70)
-- Extracts 16 palettes from ROM Bank 05 (RGB555 format)
-- Renders tiles with ALL 8 palettes (0-7) for accurate color matching
-- Generates comparison sheets showing palette variations
-- Palette data exported as JSON for editing
-- Comprehensive 800+ line extraction guide (GRAPHICS_EXTRACTION_GUIDE.md)
-- Explains SNES 4BPP format, OAM attributes, and palette selection
-- Tools: `tools/extraction/extract_graphics.py` (updated)
+**Complete Graphics Extraction Pipeline** ✨ NEW!
+- **Multi-Palette Tile Extraction** (Issue #70 - RESOLVED)
+  * Extracts 16 palettes from ROM Bank 05 (RGB555 format)
+  * Renders tiles with ALL 8 palettes (0-7) for accurate color matching
+  * Generates comparison sheets showing palette variations
+  * Palette data exported as JSON for editing
+  * Comprehensive 800+ line extraction guide (GRAPHICS_EXTRACTION_GUIDE.md)
+  * Tool: `tools/extraction/extract_graphics.py` (updated)
+
+- **Sprite Assembly System** ✨ NEW!
+  * Assembles recognizable sprites from tiles + palettes + layouts
+  * Character sprites: Benjamin, Kaeli, Phoebe, Reuben (16×16 px)
+  * Enemy sprites: Brown Bear, Behemoth (32×32 px)
+  * Automatic sprite sheets and metadata export
+  * Tool: `tools/extraction/assemble_sprites.py` (new)
+  * Complete guide: `tools/extraction/README.md`
 
 **Comprehensive Modding Tutorial System**
 - Created complete tutorial series (5 guides, 4,248 lines)
@@ -54,6 +61,7 @@
 
 ### 📊 Statistics
 
+- **6 sprites assembled** (4 characters, 2 enemies)
 - **800+ lines** of graphics extraction documentation
 - **33 complete code examples** across modding tutorials
 - **36 unit tests** ensuring data integrity
