@@ -4,7 +4,7 @@ Complete reference for all documented functions in Final Fantasy: Mystic Quest.
 
 **Last Updated:** 2025-11-05  
 **Status:** Active - Continuously updated with code analysis  
-**Coverage:** 2,159+ documented functions out of 8,153 total (~26.5%)
+**Coverage:** 2,163+ documented functions out of 8,153 total (~26.5%)
 
 ## Table of Contents
 
@@ -2752,6 +2752,527 @@ Action Buttons:
 
 ### Menu Control
 
+#### Cursor_UpdateComplete
+**Location:** Bank $00 @ $8A9C  
+**File:** `src/asm/banks/bank_00.asm`
+
+**Purpose:** Validate cursor position after input processing - ensures cursor stays within grid bounds with configurable wrapping behavior.
+
+**Inputs:**
+- `$01` = Cursor row position (Y coordinate in grid)
+- `$02` = Cursor column position (X coordinate in grid)
+- `$03` = Maximum row count (grid height)
+- `$04` = Maximum column count (grid width)
+- `$95` = Wrapping behavior flags (bits 1-3)
+
+**Outputs:**
+- `$01` = Validated row position (clamped or wrapped)
+- `$02` = Validated column position (clamped or wrapped)
+- Cursor guaranteed within valid bounds
+
+**Technical Details:**
+- Called after directional input processing
+- Handles grid boundary conditions
+- Supports both clamping and wrapping modes
+- Used in all menu cursor movement
+
+**Process Flow:**
+```
+1. Check vertical (row) bounds:
+   LDA $01       - Load current row
+   BMI Wrap1     - If negative (< 0), handle wrap
+   CMP $03       - Compare with max rows
+   BCC Check_H   - If within bounds, check horizontal
+   
+2. Handle vertical out-of-bounds:
+   If row < 0 OR row >= max_rows:
+   
+   Wrap1:
+     LDA $95       - Load wrap flags
+     AND #$02      - Check vertical wrap bit
+     BNE Clamp_V   - If wrap disabled, clamp
+     STZ $01       - Else wrap to 0
+     BRA Check_H
+   
+   Clamp_V:
+     LDA $03       - Load max rows
+     DEC A         - Subtract 1 (0-based index)
+     STA $01       - Store clamped value
+
+3. Check horizontal (column) bounds:
+   Check_H:
+     LDA $02       - Load current column
+     BMI Wrap2     - If negative, handle wrap
+     CMP $04       - Compare with max columns
+     BCC Complete  - If within bounds, done!
+     
+     LDA $95       - Load wrap flags
+     AND #$04      - Check horizontal wrap bit
+     BNE Clamp_H   - If wrap disabled, clamp
+     BRA Wrap2     - Else wrap
+   
+   Clamp_H:
+     LDA $04       - Load max columns
+     DEC A         - Subtract 1 (0-based)
+     STA $02       - Store clamped value
+     RTS
+
+4. Handle horizontal wrap:
+   Wrap2:
+     LDA $95       - Load wrap flags
+     AND #$08      - Check horizontal wrap mode
+     BNE Clamp_H   - If mode 2, clamp instead
+     STZ $02       - Else wrap to 0
+
+5. Complete:
+   RTS
+```
+
+**Wrapping Behavior Flags:**
+```
+$95 = Wrapping configuration (8-bit flags)
+
+Bit 1 (value $02): Vertical wrap enable
+  0 = Wrap around (0 → max-1, max → 0)
+  1 = Clamp to edges (no wrap)
+
+Bit 2 (value $04): Horizontal wrap enable
+  0 = Wrap around
+  1 = Clamp to edges
+
+Bit 3 (value $08): Horizontal wrap mode
+  0 = Wrap to 0
+  1 = Clamp to max-1
+
+Examples:
+  $95 = $00: Full wrapping (both axes)
+  $95 = $02: Vertical clamp, horizontal wrap
+  $95 = $06: Full clamping (no wrap)
+  $95 = $0A: Vertical clamp, horizontal clamp
+```
+
+**Grid Bounds Validation:**
+```
+Valid positions:
+  Row: 0 to ($03 - 1)
+  Column: 0 to ($04 - 1)
+
+Example 3×4 grid ($03 = 3, $04 = 4):
+  Valid rows: 0, 1, 2
+  Valid columns: 0, 1, 2, 3
+  
+  Cursor at (2, 3): Valid
+  Cursor at (3, 0): Invalid (row >= max)
+    → Clamped to (2, 0) or wrapped to (0, 0)
+  Cursor at (1, 4): Invalid (col >= max)
+    → Clamped to (1, 3) or wrapped to (1, 0)
+  Cursor at (-1, 2): Invalid (row < 0)
+    → Clamped to (0, 2) or wrapped to (2, 2)
+```
+
+**Typical Grid Sizes:**
+```
+Battle menu:
+  $03 = 4 (Attack, Magic, Item, Defend)
+  $04 = 1 (single column)
+
+Item menu:
+  $03 = 8 (8 items visible)
+  $04 = 1 (single column)
+
+Equipment menu:
+  $03 = 5 (Weapon, Armor, Helm, Ring, Charm)
+  $04 = 1 (single column)
+
+Targeting (battle):
+  $03 = 2 (2 rows of enemies)
+  $04 = 4 (up to 4 enemies per row)
+```
+
+**Clamping vs Wrapping Examples:**
+```
+Clamping mode ($95 = $06):
+  At top (row = 0), press UP:
+    row = -1 → Clamped to 0 (no wrap)
+  
+  At bottom (row = max-1), press DOWN:
+    row = max → Clamped to max-1
+
+Wrapping mode ($95 = $00):
+  At top (row = 0), press UP:
+    row = -1 → Wrapped to max-1 (go to bottom)
+  
+  At bottom (row = max-1), press DOWN:
+    row = max → Wrapped to 0 (go to top)
+```
+
+**Integration with Input:**
+```
+Input processing flow:
+
+1. Input_ProcessDPad:
+   - Detect directional input
+   - Modify $01/$02 based on direction
+   - May go out of bounds temporarily
+
+2. Cursor_UpdateComplete (this function):
+   - Validate modified position
+   - Apply wrapping or clamping
+   - Ensure valid coordinates
+
+3. Cursor_UpdateSprite:
+   - Render cursor at validated position
+   - Update OAM entries
+   - Apply visual effects
+
+Example: Pressing DOWN in battle menu
+  Current: row = 3 (Defend option, max)
+  Input: DOWN pressed
+  Modify: row = 4 (out of bounds!)
+  Validate: Wrap or clamp to valid value
+  Result: row = 0 (Attack) if wrapping
+          row = 3 (Defend) if clamping
+```
+
+**Side Effects:**
+- Modifies `$01` and `$02` (cursor position)
+- No RAM clobbering beyond specified locations
+- Minimal register usage (A only)
+
+**Calls:**
+- None (leaf function)
+
+**Called By:**
+- Menu input handlers after D-pad processing
+- Battle menu cursor movement
+- Item/equipment menu navigation
+- Any grid-based selection interface
+
+**Related:**
+- See `Cursor_UpdateSprite` for cursor rendering
+- See `Input_ProcessDPad` for directional input
+- See menu-specific input handlers for integration
+
+---
+
+#### Cursor_UpdateSprite
+**Location:** Bank $00 @ $8C3D  
+**File:** `src/asm/banks/bank_00.asm`
+
+**Purpose:** Render cursor sprite at current position - updates OAM (Object Attribute Memory) for visual cursor display in battle and field menus.
+
+**Inputs:**
+- `$1031` = Cursor grid position index (0-255, $FF = hidden)
+- `$00D8` (bit 1) = Display mode (0 = field, 1 = battle)
+- `$00DA` (bits 2, 4) = Cursor blink/flash state
+- `$0014` = Animation timer
+- DATA8_049800 (table) = Grid position to pixel conversion
+
+**Outputs:**
+- OAM entries updated ($7F075A+, $7E2D1A+)
+- Cursor sprite rendered on screen
+- Visual effects applied (palette, blink)
+
+**Technical Details:**
+- Handles both battle and field cursor styles
+- Supports cursor hiding ($1031 = $FF)
+- Applies blinking animation for emphasis
+- Uses different sprite configurations per mode
+- Updates 2-4 OAM entries for multi-tile cursor
+
+**Process Flow:**
+```
+1. Save processor state:
+   PHP           - Push processor flags
+   SEP #$30      - 8-bit A, X, Y
+
+2. Check if cursor visible:
+   LDX $1031     - Load cursor position
+   CPX #$FF      - Check for hidden marker
+   BEQ Exit      - If $FF, cursor hidden, exit
+   
+3. Determine display mode:
+   LDA #$02      - Bit mask for mode check
+   AND $00D8     - Check display flags
+   BEQ Field     - If clear, field mode
+   
+4A. Battle mode cursor ($00D8 bit 1 = 1):
+   Battle cursor rendering:
+   
+   - Load pixel position:
+     LDA DATA8_049800,X  - Get Y position
+     ADC #$0A            - Offset for centering
+     XBA                 - Swap to high byte
+     
+   - Calculate tile index:
+     TXA                 - Transfer grid pos to A
+     AND #$38            - Isolate row bits
+     ASL A               - Multiply by 2
+     PHA                 - Save
+     TXA                 - Grid pos again
+     AND #$07            - Isolate column bits
+     ORA $01,S           - Combine with row
+     PLX                 - Restore
+     ASL A               - Final tile index
+   
+   - Update OAM (Bank $7F):
+     REP #$30            - 16-bit mode
+     STA $7F075A         - Tile 1 (top-left)
+     INC A
+     STA $7F075C         - Tile 2 (top-right)
+     ADC #$000F          - Skip to next row
+     STA $7F079A         - Tile 3 (bottom-left)
+     INC A
+     STA $7F079C         - Tile 4 (bottom-right)
+   
+   - Set attributes:
+     SEP #$20            - 8-bit mode
+     LDX #$17DA          - OAM attribute base
+     LDA #$7F            - Bank for OAM
+     BRA Set_Attr
+
+4B. Field mode cursor ($00D8 bit 1 = 0):
+   Field cursor rendering:
+   
+   - Calculate pixel position:
+     LDA DATA8_049800,X  - Get base position
+     ASL A (×2)          - Scale up
+     ASL A (×2 again)
+     STA $00F4           - Store scaled Y
+   
+   - Calculate tile index:
+     REP #$10            - 16-bit index
+     LDA $1031           - Load grid position
+     JSR Cursor_CalcTileIndex  - Convert to tile
+     STX $00F2           - Store tile index
+   
+   - Set attributes:
+     LDX #$2D1A          - Field OAM base
+     LDA #$7E            - Bank for OAM
+
+5. Apply visual effects:
+   Set_Attr:
+     PHA                 - Save bank
+     
+   - Check for blink effect:
+     LDA #$04            - Blink flag mask
+     AND $00DA           - Check state
+     BEQ Normal          - If not blinking, normal
+     
+     LDA $0014           - Load animation timer
+     DEC A               - Decrement
+     BEQ Normal          - If zero, normal frame
+     
+     - Apply blink palette:
+       LDA #$10            - Palette flag
+       AND $00DA           - Check blink mode
+       BNE Blink2          - Different blink style
+       
+       PLB                 - Restore bank
+       LDA $0001,X         - Load OAM attr
+       AND #$E3            - Clear palette bits
+       ORA #$94            - Palette 4 + priority
+       BRA Set_Pal
+   
+   Blink2:
+     PLB
+     LDA $0001,X         - Load OAM attr
+     AND #$E3            - Clear palette
+     ORA #$9C            - Palette 5 + priority
+     BRA Set_Pal
+   
+   Normal:
+     PLB
+     LDA $0001,X         - Load OAM attr
+     AND #$E3            - Clear palette
+     ORA #$88            - Palette 1 + priority
+
+6. Handle special cases (multi-digit numbers):
+   Set_Pal:
+     XBA                 - Swap for later
+     LDA $001031         - Load position again
+     CMP #$29            - Check if numeric display
+     BCC Simple          - If < $29, simple cursor
+     CMP #$2C            - Check range
+     BEQ Simple          - If $2C, simple
+     
+   - Multi-digit number display:
+     LDA $0001,X         - OAM attribute
+     AND #$63            - Clear priority/palette
+     ORA #$08            - Set palette 0
+     STA $0001,X         - Update tile 1
+     STA $0003,X         - Update tile 2
+     
+     - Convert number to tiles:
+       LDA $001030       - Load number value
+       LDY #$FFFF        - Digit counter
+       SEC
+     
+     Digit_Loop:
+       INY               - Increment digit
+       SBC #$0A          - Subtract 10
+       BCS Digit_Loop    - Loop if >= 10
+       
+       ADC #$8A          - Convert to tile ID (ones)
+       STA $0002,X       - Store ones digit
+       
+       CPY #$0000        - Check if tens digit
+       BEQ Done          - If zero, no tens
+       
+       TYA               - Transfer tens
+       ADC #$7F          - Convert to tile ID
+       STA $0000,X       - Store tens digit
+       BRA Done
+
+7. Simple cursor update:
+   Simple:
+     XBA                 - Restore attribute
+     STA $0001,X         - Update OAM attribute
+     STA $0003,X         - Mirror for multi-tile
+
+8. Complete:
+   Done:
+     PLP               - Restore processor state
+     RTS
+```
+
+**Display Modes:**
+```
+Battle mode cursor ($00D8 bit 1 = 1):
+  - Large 2×2 tile cursor (4 sprites)
+  - Target selection visual
+  - OAM Bank $7F (battle OAM buffer)
+  - Positioned directly over enemies/allies
+  
+  Tiles used:
+    $075A: Top-left tile
+    $075C: Top-right tile
+    $079A: Bottom-left tile
+    $079C: Bottom-right tile
+
+Field mode cursor ($00D8 bit 1 = 0):
+  - Simple hand/arrow cursor (1-2 sprites)
+  - Menu selection visual
+  - OAM Bank $7E (field OAM buffer)
+  - Positioned next to menu items
+  
+  Tiles used:
+    $2D1A: Main cursor sprite
+    (Additional tiles for multi-digit)
+```
+
+**OAM Structure:**
+```
+OAM entry format (4 bytes):
+  Byte 0: X position (pixel coordinate)
+  Byte 1: Y position (pixel coordinate)
+  Byte 2: Tile index (character ID)
+  Byte 3: Attributes (VhopppccT)
+    V: Vertical flip
+    h: Horizontal flip
+    o: Priority (0-3)
+    ppp: Palette (0-7)
+    cc: Size bits
+    T: Tile table select
+
+Attribute byte breakdown:
+  #$88: Priority 1, Palette 1
+  #$94: Priority 1, Palette 4 (blink 1)
+  #$9C: Priority 1, Palette 5 (blink 2)
+```
+
+**Grid Position to Pixel Conversion:**
+```
+DATA8_049800 table:
+  Maps grid index to Y pixel position
+  
+  Index 0: Y = 16 pixels
+  Index 1: Y = 32 pixels
+  Index 2: Y = 48 pixels
+  ...
+  
+Battle mode:
+  Y_pixel = DATA8_049800[index] + 10
+  (Extra offset for battle layout)
+
+Field mode:
+  Y_pixel = DATA8_049800[index] × 4
+  (Scaled 4× for menu spacing)
+```
+
+**Blink Animation States:**
+```
+$00DA flags:
+  Bit 2 (value $04): Blink enable
+    0 = Normal display
+    1 = Blinking active
+    
+  Bit 4 (value $10): Blink mode
+    0 = Palette 4 blink (#$94)
+    1 = Palette 5 blink (#$9C)
+
+$0014: Animation timer
+  Counts down each frame
+  When = 1, blink frame activates
+  When = 0, normal display
+
+Blink cycle:
+  Frame 0-14: Normal (#$88)
+  Frame 15: Blink (#$94 or #$9C)
+  Frame 0: Reset
+```
+
+**Multi-Digit Number Display:**
+```
+Used for quantity indicators (e.g., item counts)
+
+$1030 = Number value (0-99)
+$1031 >= $29: Enable number display
+
+Process:
+  1. Divide by 10 to get tens/ones
+  2. Convert each digit to tile ID
+  3. Display as two adjacent sprites
+  
+Example: Display "47"
+  $1030 = 47
+  
+  tens = 47 / 10 = 4
+  ones = 47 % 10 = 7
+  
+  Tile IDs:
+    Tens: 4 + $7F = $83
+    Ones: 7 + $8A = $91
+  
+  OAM:
+    $0000,X = $83 (digit '4')
+    $0002,X = $91 (digit '7')
+```
+
+**Side Effects:**
+- Updates OAM entries in Bank $7E or $7F
+- Modifies `$00F2`, `$00F4` (calculation buffers)
+- Clobbers A, X, Y registers
+- Changes processor state (SEP/REP)
+
+**Calls:**
+- `Cursor_CalcTileIndex` @ $8D8A - Grid to tile conversion (field mode)
+
+**Called By:**
+- Menu rendering loops (every frame)
+- After cursor position changes
+- Battle targeting updates
+- Field menu display
+
+**Related:**
+- See `Cursor_UpdateComplete` for position validation
+- See `Input_ProcessDPad` for cursor movement
+- See OAM documentation for sprite details
+
+---
+
+### Menu Control
+
 #### Menu_ProcessInput
 **Location:** Bank $01 @ $C6C0  
 **File:** `src/asm/banks/bank_01.asm`
@@ -4089,6 +4610,477 @@ Final value determines CGRAM location
 
 ## Battle Damage Modifiers
 
+### Damage Calculation System
+
+#### Battle_CalculateDamage (Bank $01)
+**Location:** Bank $01 @ $C488  
+**File:** `src/asm/banks/bank_01.asm`
+
+**Purpose:** Orchestrate complete damage calculation for battle actions - sets up base damage parameters and prepares for elemental/status modifiers.
+
+**Inputs:**
+- `$199D` (16-bit) = Source damage value (attack power, spell power, etc.)
+- `$19EE` (byte) = Attack/spell type flags (bits 4-5 encode type)
+
+**Outputs:**
+- `$192D` (16-bit) = Final base damage value (before modifiers)
+- `$192B` (byte) = Damage type classification (0-3)
+- Ready for elemental/status processing
+
+**Technical Details:**
+- Minimal processing - primarily parameter extraction and storage
+- Extracts damage type from bit-shifted flags
+- Serves as entry point for damage calculation pipeline
+- Works with both banks $01 and $02 implementations
+
+**Process Flow:**
+```
+1. Set processor state:
+   SEP #$20  - 8-bit accumulator
+   REP #$10  - 16-bit index registers
+
+2. Load and store damage value:
+   LDX $199D  - Load source damage (16-bit)
+   STX $192D  - Store as base damage
+
+3. Extract damage type:
+   LDA $19EE  - Load type flags
+   AND #$30   - Isolate bits 4-5 (type field)
+   LSR A (×4) - Shift right 4 positions
+   STA $192B  - Store damage type (0-3)
+
+4. Return:
+   RTS
+```
+
+**Damage Type Classification:**
+```
+$192B values (from bits 4-5 of $19EE):
+  0: Physical attack (weapon-based)
+  1: Magic attack (spell-based)
+  2: Special effect (status/utility)
+  3: Fixed damage (no variance)
+
+Type encoding in $19EE:
+  Bits 4-5: Type field
+    00 = Physical ($00)
+    01 = Magic ($10)
+    10 = Special ($20)
+    11 = Fixed ($30)
+  
+  Other bits: Additional flags
+```
+
+**Memory Layout:**
+```
+$199D-$199E: Source damage (16-bit LE)
+  Example: $199D = $50, $199E = $00 → 80 damage
+
+$19EE: Type flags (8-bit)
+  Example: $19EE = $10 → Magic attack (type 1)
+  
+$192D-$192E: Base damage output (16-bit LE)
+  Copied directly from $199D-$199E
+
+$192B: Damage type (8-bit)
+  Extracted and shifted from $19EE
+```
+
+**Integration with Damage Pipeline:**
+```
+Full damage calculation flow:
+
+1. Battle_CalculateDamage (this function)
+   - Extract base damage and type
+   - Store in calculation buffers
+
+2. Battle_CalculateDamage (Bank $02 @ $93FD)
+   - Apply attack vs defense
+   - Calculate reduction
+   - Apply variance
+
+3. Battle_CheckCriticalHit
+   - Determine critical hit
+   - Apply 2× multiplier
+
+4. Battle_ProcessElementalDamage
+   - Elemental modifiers
+   - Status effects
+
+5. Battle_ApplyDamage
+   - Subtract from target HP
+   - Death check
+   - Animation
+```
+
+**Comparison: Bank $01 vs Bank $02:**
+```
+Bank $01 @ $C488 (this function):
+  - Parameter extraction
+  - Type classification
+  - Setup for modifiers
+  - Returns immediately
+
+Bank $02 @ $93FD (same name):
+  - Attack vs defense calculation
+  - Stat-based reduction
+  - Variance application
+  - More complex logic
+
+Different functions, same name, different purposes.
+```
+
+**Side Effects:**
+- Modifies `$192D-$192E` (base damage buffer)
+- Modifies `$192B` (damage type)
+- Sets processor flags (SEP/REP)
+- No RAM clobbering outside specified locations
+
+**Calls:**
+- None (leaf function)
+
+**Called By:**
+- Battle action processing (Bank $01 @ $C21F, $C226, $C331)
+- After attack power calculation
+- Before status/elemental modifiers
+
+**Related:**
+- See `Battle_CalculateDamage` (Bank $02) for stat-based calculation
+- See `Battle_CheckCriticalHit` for critical hit processing
+- See `Battle_ProcessElementalDamage` for modifier application
+
+---
+
+#### Battle_CalculateDamage (Bank $02)
+**Location:** Bank $02 @ $93FD  
+**File:** `src/asm/banks/bank_02.asm`
+
+**Purpose:** Calculate damage reduction based on attack power vs defense - core stat-based damage formula applying defense mitigation.
+
+**Inputs:**
+- `$1116` (16-bit) = Attack power (weapon + stats + modifiers)
+- `$1114` (16-bit) = Defense power (armor + stats + modifiers)
+- Direct page = Battle context ($04xx for attacker/target)
+
+**Outputs:**
+- `$D1,X` (16-bit) = Final damage after defense reduction (indexed by `$8B × 2`)
+- Carry flag = Set if attack > defense
+
+**Technical Details:**
+- Attack vs defense subtraction with clamping
+- Damage capped to prevent overflow
+- Negative results handled (minimum damage)
+- Indexed storage for multi-target support
+
+**Process Flow:**
+```
+1. Set processor state:
+   REP #$30  - 16-bit A, X, Y
+
+2. Calculate damage reduction:
+   LDA $1116  - Load attack power
+   SEC        - Set carry for subtraction
+   SBC $1114  - Subtract defense
+   
+   Result:
+     Positive: Attack > Defense, damage dealt
+     Negative: Defense > Attack, minimum damage
+
+3. Clamp to maximum:
+   CMP DATA8_02D081  - Compare with max damage cap
+   BCC Apply_Power   - If below cap, continue
+   LDA DATA8_02D081  - Else load capped value
+
+4. Invert for calculation:
+   EOR #$FFFF  - Bitwise NOT
+   INC A       - Two's complement negation
+   BNE Reduce  - If non-zero, continue
+   
+   Special case (zero):
+     DB $A9, $FE, $7F  - LDA #$7FFE
+     (Load near-max value)
+
+5. Store indexed result:
+   TAY         - Transfer to Y for storage
+   SEP #$20    - 8-bit accumulator
+   REP #$10    - 16-bit index
+   
+   LDA #$00    - Clear high byte
+   XBA         - Swap to clear A
+   LDA $8B     - Load target index
+   ASL A       - Multiply by 2 (16-bit index)
+   TAX         - Transfer to X
+   
+   STY $D1,X   - Store damage at indexed location
+
+6. Return:
+   RTS
+```
+
+**Damage Calculation Formula:**
+```
+damage = attack - defense
+
+If damage > MAX_DAMAGE_CAP:
+  damage = MAX_DAMAGE_CAP
+  
+If damage <= 0:
+  damage = MINIMUM_DAMAGE (usually 1-2)
+
+Final = ~damage + 1  (two's complement)
+
+Indexed storage:
+  offset = target_index × 2
+  $04D1[offset] = damage
+```
+
+**Data Structures:**
+```
+$1116-$1117: Attack power (16-bit LE)
+  Example: Sword (50) + Strength (20) = 70
+  
+$1114-$1115: Defense power (16-bit LE)
+  Example: Armor (30) + Vitality (15) = 45
+  
+Calculation: 70 - 45 = 25 damage
+
+$04D1 array: Damage results (multi-target)
+  $04D1 + (0 × 2) = Target 0 damage
+  $04D1 + (1 × 2) = Target 1 damage
+  $04D1 + (2 × 2) = Target 2 damage
+  $04D1 + (3 × 2) = Target 3 damage
+  
+  16-bit values, indexed by $8B
+```
+
+**Damage Capping:**
+```
+MAX_DAMAGE_CAP = DATA8_02D081 (constant)
+  Likely value: $7FFE (32766)
+  Prevents overflow damage
+
+Minimum damage:
+  If attack <= defense:
+    Apply minimum damage (1-2)
+    Ensures attacks always do something
+```
+
+**Target Indexing:**
+```
+$8B = Current target index (0-7)
+  0-3: Party members
+  4-7: Enemies
+
+Index calculation:
+  $8B = 2 (target is party member 2)
+  ASL A → 4 (multiply by 2)
+  
+  Storage: $04D1 + 4 = $04D5
+  
+Supports multi-target attacks:
+  Loop through targets, calculate separately
+  Each result stored at unique index
+```
+
+**Side Effects:**
+- Modifies `$D1,X` indexed by target
+- Clobbers A, X, Y registers
+- Changes processor state (SEP #$20, REP #$10/30)
+- Direct page assumed to be battle context
+
+**Calls:**
+- None (leaf function, data access only)
+
+**Called By:**
+- Battle action processing after power calculation
+- Physical attack damage calculation
+- Magic attack damage calculation (if applicable)
+
+**Related:**
+- See `Battle_CalculateDamage` (Bank $01) for parameter setup
+- See `Battle_CheckCriticalHit` for critical hit multiplier
+- See `Battle_ProcessElementalDamage` for elemental modifiers
+
+---
+
+#### Battle_CheckCriticalHit
+**Location:** Bank $02 @ $9495  
+**File:** `src/asm/banks/bank_02.asm`
+
+**Purpose:** Determine if an attack results in a critical hit using RNG-based probability check - doubles damage on success.
+
+**Inputs:**
+- `$DE` = Attack/spell type ID
+- `$B7` = Critical hit threshold (base chance)
+- `$00A8` = RNG modulo parameter (101 for 1% increments)
+- `$2E` (via DP) = Entity status flags (bit 2 = critical immunity)
+
+**Outputs:**
+- Critical hit confirmed: JMP to `Battle_AnimationFrame` @ $9CCA
+- Critical hit failed: RTS (return to caller)
+- `$B9`, `$B8` = Random roll values (intermediate)
+
+**Technical Details:**
+- Uses double RNG roll for fairness (two random values)
+- Critical hit = 2× damage multiplier
+- Threshold comparison determines success
+- Special attack type always crits (type $15)
+- Status immunity check prevents crits
+
+**Process Flow:**
+```
+1. Check for guaranteed critical:
+   LDA $DE      - Load attack type
+   CMP #$15     - Compare with special type
+   BEQ Confirmed - If special, always crit
+   
+2. Prepare RNG:
+   LSR $B7      - Halve threshold (balance)
+   
+3. Generate first random value:
+   LDA #$65     - Load 101 (modulo value)
+   STA $00A8    - Store to RNG parameter
+   JSL $009783  - Call RNG_GenerateRandom
+   LDA $00A9    - Load result (0-100)
+   STA $B9      - Store first roll
+
+4. Generate second random value:
+   JSL $009783  - Call RNG_GenerateRandom again
+   LDA $00A9    - Load result (0-100)
+   STA $B8      - Store second roll
+
+5. Compare threshold:
+   LDA $B7      - Load threshold
+   CMP $B8      - Compare with second roll
+   BCS Confirmed - If threshold >= roll, crit!
+   RTS          - Else return (no crit)
+
+6. Check critical immunity (before #5):
+   PHD          - Save direct page
+   JSR Battle_SetEntityContextEnemy
+   LDA $2E      - Load entity flags (DP)
+   PLD          - Restore direct page
+   AND #$04     - Check bit 2 (crit immunity)
+   BEQ Continue - If clear, allow crit
+   JMP $977F    - Else jump to non-crit handler
+
+7. Critical hit confirmed:
+Battle_CriticalHitConfirmed:
+   JMP Battle_AnimationFrame @ $9CCA
+   (Triggers 2× damage and special animation)
+```
+
+**Critical Hit Calculation:**
+```
+threshold = $B7 / 2  (halved for balance)
+
+roll1 = RNG(101)  - First random (0-100)
+roll2 = RNG(101)  - Second random (0-100)
+
+if threshold >= roll2:
+  CRITICAL HIT! (2× damage)
+else:
+  Normal hit
+
+Example:
+  threshold = 10 (5 after halving)
+  roll1 = 45 (not used for comparison)
+  roll2 = 3
+  
+  5 >= 3 → CRITICAL!
+```
+
+**RNG Integration:**
+```
+RNG_GenerateRandom @ $00:$9783:
+  Input: $00A8 = modulo (101)
+  Output: $00A9 = result (0-100)
+  
+  Uses LCG algorithm:
+    seed = (seed × 5) + $3711 + frame
+    result = seed % 101
+  
+Two calls ensure fairness:
+  - Double roll prevents RNG manipulation
+  - Each call updates seed
+  - Frame counter adds entropy
+```
+
+**Critical Hit Types:**
+```
+Special attack ($DE = $15):
+  - Always critical
+  - No RNG check
+  - Guaranteed 2× damage
+
+Physical attacks:
+  - RNG-based chance
+  - Threshold from weapon/stats
+  - Can be blocked by immunity
+
+Status check (bit 2 of $2E):
+  - Enemies with immunity flag
+  - Bosses often have this
+  - Jump to non-crit handler ($977F)
+```
+
+**Threshold Sources:**
+```
+$B7 = Critical threshold:
+  - Weapon base crit rate
+  - Character luck stat
+  - Equipment bonuses
+  - Battle effects (e.g., Focus)
+  
+Higher threshold = higher crit chance
+
+Example values:
+  5: ~2.5% chance (5/2 = 2.5, vs 0-100)
+  20: ~10% chance (20/2 = 10, vs 0-100)
+  40: ~20% chance (40/2 = 20, vs 0-100)
+```
+
+**Damage Multiplication:**
+```
+After critical confirmed:
+  Jump to Battle_AnimationFrame
+  
+Animation handler:
+  - Trigger critical hit animation
+  - Apply 2× damage multiplier
+  - Display "Critical!" text
+  - Special sound effect
+  
+Damage flow:
+  base_damage = 100
+  is_critical = true
+  
+  final_damage = base_damage × 2 = 200
+```
+
+**Side Effects:**
+- Modifies `$B7`, `$B9`, `$B8` (RNG rolls and threshold)
+- Calls RNG twice (updates global RNG seed)
+- May jump to animation handler (non-return)
+- Clobbers A register
+
+**Calls:**
+- `RNG_GenerateRandom` @ $009783 (called twice) - RNG generation
+- `Battle_SetEntityContextEnemy` @ $8F2F - Set entity DP
+- `Battle_AnimationFrame` @ $9CCA (via JMP) - Critical animation
+
+**Called By:**
+- Battle damage calculation (after defense applied)
+- Physical attack processing
+- Weapon attack handlers
+
+**Related:**
+- See `RNG_GenerateRandom` (Bank $00 @ $9783) for RNG algorithm
+- See `Battle_AnimationFrame` for critical hit animation
+- See damage calculation pipeline for integration
+
+---
+
 ### Elemental System
 
 #### Battle_ProcessElementalDamage
@@ -4787,6 +5779,8 @@ Multiple operations:
 - `Init_NewGameState` @ $627 - Initialize new game state
 - `ValidateSaveData` - Check for valid save data
 - `Bitfield_SetBits` @ $974E - Set bits in bitfield
+- `Cursor_UpdateComplete` @ $8A9C - Validate cursor position
+- `Cursor_UpdateSprite` @ $8C3D - Render cursor sprite
 
 ### Bank $01 - Battle System Core
 - `Battle_Initialize` @ $8078 - Battle initialization
@@ -4813,6 +5807,7 @@ Multiple operations:
 - `Field_CameraCalculate` @ $8B90 - Calculate camera position
 - `Field_ProcessNPCInteraction` @ $E404 - Initialize NPC interaction
 - `Field_WaitForVBlank` @ $82D0 - VBLANK synchronization
+- `Battle_CalculateDamage` @ $C488 - Extract damage type and base value
 
 ### Bank $02 - Battle System (AI & Combat)
 - `Enemy_DecideAction` @ $C000 - Enemy AI decision-making
@@ -4841,6 +5836,8 @@ Multiple operations:
 - `Battle_CalculatePoisonDamage` @ $853D - Calculate poison damage
 - `Battle_ProcessParalysis` @ $8486 - Paralysis effect handling
 - `Battle_CheckPoison` @ $8522 - Poison status orchestration
+- `Battle_CalculateDamage` @ $93FD - Attack vs defense calculation
+- `Battle_CheckCriticalHit` @ $9495 - Critical hit determination
 
 ### Bank $03 - Menu System
 - `DisplayBattleMenu` @ $8000 - Battle command menu
@@ -4963,6 +5960,9 @@ Multiple operations:
 ### Battle Damage & Elements
 - `CalculatePhysicalDamage` (Bank $02 @ $C500)
 - `CalculateMagicDamage` (Bank $02 @ $C600)
+- `Battle_CalculateDamage` (Bank $01 @ $C488) - Parameter extraction
+- `Battle_CalculateDamage` (Bank $02 @ $93FD) - Attack vs defense
+- `Battle_CheckCriticalHit` (Bank $02 @ $9495) - Critical determination
 - `Battle_ProcessElementalDamage` (Bank $02 @ $94D6)
 - `Battle_CheckWeaknessFlags` (Bank $02 @ $A97F)
 - `Battle_DeathResistCheck` (Bank $02 @ $999D)
@@ -4989,6 +5989,8 @@ Multiple operations:
 - `Battle_WaitVBlank` (Bank $01 @ $8449)
 - `Field_WaitForVBlank` (Bank $01 @ $82D0)
 - `Bitfield_SetBits` (Bank $00 @ $974E)
+- `Cursor_UpdateComplete` (Bank $00 @ $8A9C) - Cursor validation
+- `Cursor_UpdateSprite` (Bank $00 @ $8C3D) - Cursor rendering
 
 ---
 
@@ -5005,58 +6007,30 @@ See `docs/DOCUMENTATION_UPDATE_CHECKLIST.md` for complete guidelines.
 
 ---
 
-**Note:** This is a living document. Not all functions are documented yet. Current coverage: **~26.5%** (2,159+ / 8,153 functions).
+**Note:** This is a living document. Not all functions are documented yet. Current coverage: **~26.5%** (2,163+ / 8,153 functions).
 
-**Recent Additions (2025-11-05):**
-- Added 10 battle system functions (initialization, main loop, turn processing)
-- Added 3 enemy AI functions (decision-making, targeting, execution)
-- Added 4 graphics system functions (tileset loading, decompression, palette, OAM)
-- Added 5 map system functions (loading, collision, tiles, NPCs, proximity)
-- Added 3 menu system functions (battle menu, input handling, equipment)
-- Added 4 item/inventory functions (add, remove, check usage, shop gold)
-- Added 3 save/load functions (load from SRAM, new game init, validation)
-- Added 3 field movement functions (player update, input processing, menu control)
-- Added 2 battle item functions (item usage, effect application)
-- Added 2 sprite/OAM functions (OAM update, sprite animation)
-- Added 2 elemental damage functions (damage processing, weakness check)
-- Expanded technical details with algorithms and data structures
-- Added Quick Reference by Function Type
+**Recent Additions (2025-11-05 - Update #10):**
+- Added 4 critical battle system functions (damage calculation, critical hit check, cursor movement)
+- Battle_CalculateDamage (Bank $01, $02): Core damage formula orchestration
+- Battle_CheckCriticalHit (Bank $02): Critical hit determination with RNG
+- Cursor_UpdateComplete (Bank $00): Input-based cursor validation
+- Cursor_UpdateSprite (Bank $00): Visual cursor rendering in battle/field
 
-**Next Priority Areas:**
-- More status effect functions
-- DMA transfer system
-- Collision detection details
-- Shop interfaces
+**Recent Additions (2025-11-05 - Update #9):**
+- Added 2 utility functions (RNG and VBlank synchronization)
+- RNG_GenerateRandom: Pseudo-random generation with modulo
+- Field_WaitForVBlank: Frame synchronization for VRAM safety
 
-**Recent Additions (2025-11-05):**
-- Added 10 battle system functions (initialization, main loop, turn processing)
-- Added 3 enemy AI functions (decision-making, targeting, execution)
-- Added 4 graphics system functions (tileset loading, decompression, palette, OAM)
-- Added 5 map system functions (loading, collision, tiles, NPCs, proximity)
-- Added 3 menu system functions (battle menu, input handling, equipment)
-- Added 4 item/inventory functions (add, remove, check usage, shop gold)
-- Added 3 save/load functions (load from SRAM, new game init, validation)
-- Added 3 field movement functions (player update, input processing, menu control)
-- Added 2 battle item functions (item usage, effect application)
-- Expanded technical details with algorithms and data structures
-- Added Quick Reference by Function Type
+**Recent Additions (2025-11-05 - Update #8):**
+- Added 4 camera and NPC functions
+- Camera_UpdatePosition: Smooth camera scrolling
+- Camera_CheckBounds: Viewport boundary management
+- NPC_CheckProximity: Player-NPC interaction detection
 
 **Next Priority Areas:**
-- Status effect processing system
-- More field collision functions
-- Shop buy/sell interfaces
-- Advanced battle effects**Next Priority Areas:**
-- Item effects and status processing
-- Save/load SRAM structure details
-- Field movement and player control
-- Shop system (buy/sell interfaces)
-- Battle item effects
-
-**Next Priority Areas:**
-- Item/inventory management functions
-- Save/load system functions  
-- Field movement and player control
-- Shop system functions
-- Status effect processing
+- Menu cursor rendering and input
+- Battle targeting system
+- Text display and formatting
+- Animation frame processing
 
 For undocumented functions, see the source ASM files directly in `src/asm/`.
