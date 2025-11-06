@@ -4,7 +4,7 @@ Complete reference for all documented functions in Final Fantasy: Mystic Quest.
 
 **Last Updated:** 2025-11-05  
 **Status:** Active - Continuously updated with code analysis  
-**Coverage:** 2,145+ documented functions out of 8,153 total (~26.3%)
+**Coverage:** 2,149+ documented functions out of 8,153 total (~26.4%)
 
 ## Table of Contents
 
@@ -29,6 +29,7 @@ Complete reference for all documented functions in Final Fantasy: Mystic Quest.
 - [Field Movement & Control Functions](#field-movement--control-functions)
   - [Player Control](#player-control)
   - [Menu Control](#menu-control)
+  - [Collision Detection](#collision-detection)
 - [Battle Item & Effect Functions](#battle-item--effect-functions)
   - [Item Usage in Battle](#item-usage-in-battle)
 - [Sprite & Graphics Functions](#sprite--graphics-functions)
@@ -2378,6 +2379,295 @@ $05, $FB, $04, $FC, $03, $FD, $02, $FE, $01, $FF, $00
 
 ---
 
+### Collision Detection
+
+#### Field_EntityCollision
+**Location:** Bank $01 @ $8DF3  
+**File:** `src/asm/banks/bank_01.asm`
+
+**Purpose:** Check for entity-to-entity collision and wait for collision processing to complete.
+
+**Inputs:**
+- `$1A46` = Collision processing flag
+
+**Outputs:**
+- Collision check complete
+- `$1A46` cleared when done
+
+**Technical Details:**
+- Simple busy-wait loop that polls `$1A46`
+- Used to synchronize collision processing with main game loop
+- Preserves all processor flags and registers
+
+**Process Flow:**
+```asm
+1. PHP                    ; Save processor status
+2. SEP #$20, REP #$10    ; Set 8-bit A, 16-bit index
+3. Loop:
+   a. LDA $1A46          ; Load collision flag
+   b. BNE Loop           ; If non-zero, keep waiting
+4. PLP                   ; Restore processor status
+5. RTS                   ; Return
+```
+
+**Collision Flag ($1A46):**
+- `$00` = Collision processing complete
+- `$01` = Entity collision in progress
+- `$02` = Menu collision mode (from Menu_ProcessInput)
+- Other values = Active collision processing
+
+**Side Effects:**
+- None (read-only, preserves all state)
+
+**Called By:**
+- `Field_UpdatePlayer` - Main player update loop
+- `Menu_ProcessInput` - Menu scrolling collision
+- Field movement routines
+
+**Related:**
+- See `Field_CheckEntityCollision` for actual collision logic
+- See `Field_TileCollisionCheck` for tile-based collision
+- See `Field_PlayerCollision` for player-specific handling
+
+---
+
+#### Field_CheckTileCollision
+**Location:** Bank $01 @ $9038  
+**File:** `src/asm/banks/bank_01.asm`
+
+**Purpose:** Check if a specific tile position is collidable by looking up collision flags in map data.
+
+**Inputs:**
+- `A` (low byte) = Tile index to check
+- `X` = Tile offset (preserved)
+
+**Outputs:**
+- `A` (low byte) = Collision flags (bits 0-2)
+- `A` (high byte) = Original tile index
+- `X` = Unchanged (preserved)
+
+**Technical Details:**
+- Accesses collision data table at `$7FF274 + tile_index`
+- Returns 3-bit collision value (0-7)
+- Uses XBA to preserve tile index in high byte
+- Fully reentrant with state preservation
+
+**Process Flow:**
+```asm
+1. PHX                    ; Save X register
+2. PHP                    ; Save processor status
+3. SEP #$20, REP #$10    ; 8-bit A, 16-bit index
+4. XBA, PHA              ; Swap and save A high byte
+5. XBA                   ; Restore A low byte
+6. REP #$30              ; 16-bit mode
+7. AND #$00FF            ; Mask to tile index
+8. TAX                   ; Use as index
+9. LDA $7FF274,X         ; Load collision flags
+10. AND #$0007           ; Extract bits 0-2
+11. SEP #$20             ; Back to 8-bit
+12. REP #$10             ; Keep index 16-bit
+13. XBA                  ; Put flags in low byte
+14. PLA, XBA             ; Restore original tile in high
+15. PLP, PLX             ; Restore all state
+16. RTS
+```
+
+**Collision Data Table ($7FF274):**
+```
+Base address in Bank $7F (WRAM)
+Each byte contains collision info:
+  Bits 0-2: Collision type (0-7)
+    0 = Walkable
+    1 = Blocked (wall/obstacle)
+    2 = Water (requires Aqua Boots)
+    3 = Lava (requires Lava Armor)
+    4 = Ice (slippery movement)
+    5 = Spikes (damage tile)
+    6 = Pit (fall damage)
+    7 = Special (script trigger)
+  Bits 3-7: Additional flags (tile properties)
+```
+
+**Side Effects:**
+- None (read-only operation)
+- All registers preserved except A
+- Stack balanced
+
+**Called By:**
+- `Field_TileCollisionLoop` - Bulk tile checking
+- `Field_PlayerMovement` - Player movement validation
+- Map transition logic
+
+**Related:**
+- See `Field_TileCollisionLoop` for coordinate processing
+- See `Field_CheckEntityCollision` for entity collision
+- See Map System documentation for tile structure
+
+---
+
+#### Field_TileCollisionLoop
+**Location:** Bank $01 @ $9058  
+**File:** `src/asm/banks/bank_01.asm`
+
+**Purpose:** Convert pixel coordinates to tile coordinates for collision checking.
+
+**Inputs:**
+- `$1900` = X position (16-bit)
+- `$1902` = Y position (16-bit)
+
+**Outputs:**
+- `$19BD` = Tile X coordinate (0-31)
+- `$19BF` = Tile Y coordinate (0-15)
+
+**Technical Details:**
+- Divides pixel positions by 16 to get tile coordinates
+- Uses bitwise operations (LSR) instead of division
+- Handles map wrapping for Y coordinate
+- Optimized for SNES tile grid (16×16 pixels per tile)
+
+**Process Flow:**
+```asm
+1. PHP                    ; Save status
+2. REP #$30              ; 16-bit mode
+
+3. Process X coordinate:
+   LDA $1900             ; Load X position
+   AND #$01F0            ; Mask bits 4-8 (16-496 range)
+   LSR × 4               ; Divide by 16 (shift right 4 bits)
+   STA $19BD             ; Store tile X (0-31)
+
+4. Process Y coordinate:
+   LDA $1902             ; Load Y position
+   AND #$00F0            ; Mask bits 4-7 (16-240 range)
+   LSR × 4               ; Divide by 16
+   INC A                 ; Add 1 for camera offset
+   AND #$000F            ; Wrap to 0-15 (vertical wrap)
+   STA $19BF             ; Store tile Y
+
+5. PLP                   ; Restore status
+6. RTS
+```
+
+**Coordinate Masking:**
+```
+X position ($1900):
+  Raw pixel value: 0-511
+  AND #$01F0:  Keep bits 4-8 only
+  Result range: 0-496 (aligned to 16)
+  After LSR×4: 0-31 tiles
+
+Y position ($1902):
+  Raw pixel value: 0-255  
+  AND #$00F0:  Keep bits 4-7 only
+  Result range: 0-240 (aligned to 16)
+  After LSR×4: 0-15 tiles
+  After INC+AND: Wrapped to 0-15
+```
+
+**FFMQ Map Structure:**
+- Maps are 32 tiles wide (512 pixels)
+- Maps are 16 tiles tall (256 pixels)
+- Each tile is 16×16 pixels
+- Vertical wrapping enabled (AND #$0F)
+- Horizontal handled separately
+
+**Side Effects:**
+- Modifies `$19BD` (tile X)
+- Modifies `$19BF` (tile Y)
+
+**Called By:**
+- Collision detection routines
+- Movement validation
+- Tile property lookups
+
+**Related:**
+- See `Field_CheckTileCollision` for using these coordinates
+- See `Field_TileCollisionCheck` for direction-based checking
+- See Map System for tile layout
+
+---
+
+#### Field_CheckEntityCollision
+**Location:** Bank $01 @ $90DD  
+**File:** `src/asm/banks/bank_01.asm`
+
+**Purpose:** Check collision properties for a specific entity based on map collision data.
+
+**Inputs:**
+- `A` (low byte) = Entity offset/index
+- `$19B5` = Base collision table address (16-bit)
+
+**Outputs:**
+- `A` = Collision flags for the entity
+- `X` = Preserved
+
+**Technical Details:**
+- Looks up collision data from Bank $07 @ $B013
+- Adds entity offset to base collision table address
+- Returns single byte of collision properties
+- Zero-extends the 8-bit index to 16-bit for addressing
+
+**Process Flow:**
+```asm
+1. PHX                    ; Save X register
+2. PHP                    ; Save processor status
+3. REP #$30              ; 16-bit mode
+
+4. PHA                   ; Save A
+5. AND #$00FF            ; Zero-extend to 16-bit
+6. CLC
+7. ADC $19B5             ; Add base collision address
+8. TAX                   ; Use as index
+9. PLA                   ; Restore original A
+
+10. SEP #$20             ; 8-bit A
+11. REP #$10             ; 16-bit index
+12. LDA $07B013,X        ; Load collision flags from Bank $07
+
+13. PLP                  ; Restore status
+14. PLX                  ; Restore X
+15. RTS
+```
+
+**Collision Table Structure ($07:B013):**
+```
+Bank $07, offset $B013
+Variable-length table indexed by:
+  base_address ($19B5) + entity_offset (A)
+
+Each byte contains entity collision properties:
+  Bit 0: Solid (blocks movement)
+  Bit 1: NPC interaction enabled
+  Bit 2: Trigger event on contact
+  Bit 3: Enemy encounter zone
+  Bit 4: Damage on contact
+  Bit 5: Push/pull interaction
+  Bit 6: Special collision (stairs, doors)
+  Bit 7: Reserved
+```
+
+**Base Address Usage ($19B5):**
+- Points to current map's collision table
+- Set during map loading
+- Different for each map/area
+- Allows per-map collision customization
+
+**Side Effects:**
+- None (read-only)
+- All registers preserved except A
+
+**Called By:**
+- Entity movement validation
+- NPC interaction checks
+- Event trigger detection
+
+**Related:**
+- See `Field_EntityCollisionLoop` for processing multiple entities
+- See `Field_CheckTileCollision` for tile-based collision
+- See Map Loading for collision table setup
+
+---
+
 ## Battle Item & Effect Functions
 
 ### Item Usage in Battle
@@ -3179,6 +3469,10 @@ return (seed >> 16) & 0xFF
 - `Field_NPCDirection` @ $8F50 - NPC facing update
 - `Field_NPCMovement` @ $8F2E - NPC position update
 - `Field_NPCAnimate` @ $8F6F - NPC animation advance
+- `Field_EntityCollision` @ $8DF3 - Entity collision waiting
+- `Field_CheckTileCollision` @ $9038 - Tile collision lookup
+- `Field_TileCollisionLoop` @ $9058 - Coordinate to tile conversion
+- `Field_CheckEntityCollision` @ $90DD - Entity collision lookup
 
 ### Bank $02 - Battle System (AI & Combat)
 - `Enemy_DecideAction` @ $C000 - Enemy AI decision-making
@@ -3290,6 +3584,10 @@ return (seed >> 16) & 0xFF
 - `Field_NPCDirection` (Bank $01 @ $8F50)
 - `Field_NPCMovement` (Bank $01 @ $8F2E)
 - `Field_NPCAnimate` (Bank $01 @ $8F6F)
+- `Field_EntityCollision` (Bank $01 @ $8DF3)
+- `Field_CheckTileCollision` (Bank $01 @ $9038)
+- `Field_TileCollisionLoop` (Bank $01 @ $9058)
+- `Field_CheckEntityCollision` (Bank $01 @ $90DD)
 
 ### Battle Items & Effects
 - `Battle_UseItem` (Bank $02 @ $926D)
@@ -3353,7 +3651,7 @@ See `docs/DOCUMENTATION_UPDATE_CHECKLIST.md` for complete guidelines.
 
 ---
 
-**Note:** This is a living document. Not all functions are documented yet. Current coverage: **~26.3%** (2,145+ / 8,153 functions).
+**Note:** This is a living document. Not all functions are documented yet. Current coverage: **~26.4%** (2,149+ / 8,153 functions).
 
 **Recent Additions (2025-11-05):**
 - Added 10 battle system functions (initialization, main loop, turn processing)
