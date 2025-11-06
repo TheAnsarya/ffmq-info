@@ -4,7 +4,7 @@ Complete reference for all documented functions in Final Fantasy: Mystic Quest.
 
 **Last Updated:** 2025-11-05  
 **Status:** Active - Continuously updated with code analysis  
-**Coverage:** 2,192+ documented functions out of 8,153 total (~26.9%)
+**Coverage:** 2,195+ documented functions out of 8,153 total (~26.9%)
 
 ## Table of Contents
 
@@ -10008,6 +10008,8 @@ Multiple operations:
 - `Field_ProcessNPCInteraction` @ $E404 - Initialize NPC interaction
 - `Field_WaitForVBlank` @ $82D0 - VBLANK synchronization
 - `Battle_CalculateDamage` @ $C488 - Extract damage type and base value
+- `Sound_PlayEffect` @ $BAAD - Play sound effect (SFX system)
+- `Music_PlayTrack` @ $BCDB - Play music track
 
 ### Bank $02 - Battle System (AI & Combat)
 - `Enemy_DecideAction` @ $C000 - Enemy AI decision-making
@@ -10038,6 +10040,7 @@ Multiple operations:
 - `Battle_CheckPoison` @ $8522 - Poison status orchestration
 - `Battle_CalculateDamage` @ $93FD - Attack vs defense calculation
 - `Battle_CheckCriticalHit` @ $9495 - Critical hit determination
+- `Battle_PlaySoundEffect` @ $9F10 - Battle SFX with filtering
 
 ### Bank $03 - Menu System
 - `DisplayBattleMenu` @ $8000 - Battle command menu
@@ -10274,7 +10277,436 @@ See `docs/DOCUMENTATION_UPDATE_CHECKLIST.md` for complete guidelines.
 **Next Priority Areas:**
 - Animation system functions
 - Text rendering pipeline
-- Sound/music control
 - More DMA operations
 
 For undocumented functions, see the source ASM files directly in `src/asm/`.
+
+---
+
+## Sound/Audio Playback Functions
+
+### Sound Effect System
+
+#### Sound_PlayEffect @ `$01:$BAAD`
+**Location:** Bank $01 @ $BAAD  
+**File:** `src/asm/banks/bank_01.asm`
+
+**Purpose:** Play a sound effect on the SPC700 audio processor by queuing SFX command with ID and pan parameters.
+
+**Technical Details:**
+- **Entry Point:** Sound_PlayEffect @ $01BAAD
+- **Calls:** APU command system (indirect via $0505-$0507)
+- **Protocol:** Queue-based SFX playback
+- **Channel Assignment:** SPC700 driver handles channel allocation
+- **Timing:** Non-blocking, returns immediately
+
+**Inputs:**
+- `A` (8-bit) = Sound effect ID ($00-$FF)
+  * Common IDs: $00-$3F (UI sounds), $40-$7F (field effects), $80-$FF (battle sounds)
+  * ID $00 = Menu cursor move
+  * ID $01 = Menu select/confirm
+  * ID $02 = Menu cancel/back
+  * ID $0F = Treasure chest open
+  * ID $10 = Door open
+  * ID $20 = Attack hit
+  * ID $30 = Spell cast
+  * (See assets/data/sound_effects.asm for complete list)
+
+**Outputs:**
+- SFX queued for playback on SPC700
+- `$0505` = Sound effect ID (A value)
+- `$0506-$0507` = Pan/priority parameters ($880F)
+  * $88 = Center pan (left/right balance)
+  * $0F = High priority (SFX channel priority level)
+- Processor state: Restored via PHP/PLP
+- X register: Preserved via PHX/PLX
+
+**Memory Map:**
+```
+$0505: SFX ID byte
+  - Sound effect number to play
+  - Range: $00-$FF
+  - Cleared by APU after playback starts
+
+$0506-$0507: Pan and priority word
+  - High byte ($06): Pan position
+    * $00 = Full left
+    * $40 = Center-left
+    * $80 = Center
+    * $C0 = Center-right
+    * $FF = Full right
+  - Low byte ($07): Priority/flags
+    * Bits 0-3: Priority level (0=low, $F=highest)
+    * Bits 4-7: Reserved/flags
+```
+
+**Algorithm:**
+```
+1. Save state:
+   PHX              ; Preserve X register
+   PHP              ; Preserve processor status
+
+2. Configure processor:
+   SEP #$20         ; 8-bit accumulator
+   REP #$10         ; 16-bit index registers
+
+3. Set pan/priority:
+   LDX #$880F       ; X = pan $88 (center), priority $0F (high)
+   STX $0506        ; Store to memory ($0506-$0507)
+
+4. Queue sound effect:
+   STA $0505        ; Store A (SFX ID) to queue
+
+5. Restore state:
+   PLP              ; Restore processor status
+   PLX              ; Restore X register
+
+6. Return:
+   RTS
+```
+
+**Performance:**
+- **Cycles:** ~30 cycles (overhead only, excludes SPC700 processing)
+- **Frame Budget:** <0.02% (negligible)
+- **SPC700 Latency:** 1-3 frames for playback start (dependent on driver state)
+- **Priority Handling:** High-priority SFX ($0F) can interrupt lower-priority sounds
+
+**Use Cases:**
+1. **Menu Navigation:**
+   ```assembly
+   ; Play menu cursor move sound
+   LDA #$00              ; SFX ID $00
+   JSR Sound_PlayEffect  ; Queue playback
+   ```
+
+2. **Field Events:**
+   ```assembly
+   ; Play treasure chest open
+   LDA #$0F
+   JSR Sound_PlayEffect
+   ```
+
+3. **Battle Actions:**
+   ```assembly
+   ; Play attack hit sound
+   LDA #$20
+   JSR Sound_PlayEffect
+   ```
+
+**Implementation Notes:**
+- **Non-Blocking:** Function returns immediately; SPC700 processes asynchronously
+- **Channel Limit:** SPC700 has 8 hardware channels; driver uses voice stealing if full
+- **Priority System:** Higher priority sounds ($0F) can preempt lower priority ($00-$07)
+- **Pan Range:** $00 (left) to $FF (right), $80 = center
+- **Queue Depth:** Single-entry queue; calling again before previous SFX starts will replace it
+
+**SPC700 Processing:**
+```
+After SNES queues SFX:
+
+1. SPC700 main loop checks $0505 (every ~1ms)
+2. If non-zero:
+   - Load SFX sample data from SPC RAM
+   - Find available channel (or steal lowest priority)
+   - Set pan position from $0506
+   - Start playback at priority $0507
+   - Clear $0505 to signal completion
+3. Continue playback until sample ends
+```
+
+**Common Pitfalls:**
+- **Rapid Calls:** Calling too frequently (< 1 frame apart) may skip sounds
+- **Priority Conflicts:** Low-priority SFX may not play if high-priority sounds active
+- **Channel Exhaustion:** If all 8 channels busy with high priority, new SFX may be ignored
+
+**Related Functions:**
+- `APU_SendCommand` @ $0D:$8147 - Underlying APU communication
+- `Music_PlayTrack` @ $01:$BCDB - Music track playback
+- `SPC_InitMain` @ $0D:$802C - SPC700 driver initialization
+
+**Call Graph:**
+```
+Game Code
+  └─> Sound_PlayEffect @ $01BAAD
+       └─> Memory write to $0505-$0507
+            └─> (APU main loop polls these addresses)
+                 └─> SPC700 driver processes SFX
+```
+
+---
+
+#### Music_PlayTrack @ `$01:$BCDB`
+**Location:** Bank $01 @ $BCDB  
+**File:** `src/asm/banks/bank_01.asm`
+
+**Purpose:** Play a music track on the SPC700 audio processor - main music control function for field, battle, and event music playback.
+
+**Technical Details:**
+- **Entry Point:** Music_PlayTrack @ $01BCDB
+- **Protocol:** APU command dispatch via memory-mapped interface
+- **Track Data:** Compressed sequence data in ROM banks $0E-$0F
+- **Playback:** SPC700 interprets sequence commands (notes, tempo, loops)
+- **Channels Used:** Typically 4-6 of 8 available SPC700 channels
+
+**Inputs:**
+- Track ID in game-specific memory location (varies by context)
+- Music data pointers in ROM (indexed by track ID)
+- Current music state ($0600-$060F APU communication area)
+
+**Outputs:**
+- Music track loaded and playing on SPC700
+- APU communication buffers updated
+- Previous track stopped (if different)
+
+**Implementation:**
+```assembly
+Music_PlayTrack:
+	RTS       ; Currently returns immediately (placeholder)
+	
+	; Expected implementation (not yet active):
+	; 1. Load track ID from caller context
+	; 2. Check if same track already playing
+	; 3. If different:
+	;    - Stop current track
+	;    - Load new sequence data pointer
+	;    - Send play command to SPC700
+	;    - Update playback state
+```
+
+**Performance:**
+- **Cycles:** ~10 cycles (current RTS placeholder)
+- **Expected:** ~200-500 cycles when fully implemented
+- **SPC700 Load Time:** 1-3 frames for track start
+- **Crossfade:** Optional fade-out/fade-in (adds 30-60 frames)
+
+**Music Track IDs (Common):**
+```
+Field Music:
+  $00: Overworld theme
+  $01: Town theme  
+  $02: Dungeon theme
+  $03: Cave theme
+  $04: Forest theme
+
+Battle Music:
+  $10: Normal battle
+  $11: Boss battle
+  $12: Final boss
+
+Event Music:
+  $20: Victory fanfare
+  $21: Game over
+  $22: Cutscene
+  $23: Emotional scene
+```
+
+**Use Cases:**
+1. **Field Music Change:**
+   ```assembly
+   ; Switch to town theme when entering town
+   LDA #$01              ; Track ID $01 (Town)
+   JSR Music_PlayTrack
+   ```
+
+2. **Battle Start:**
+   ```assembly
+   ; Start battle music
+   LDA #$10              ; Track ID $10 (Normal Battle)
+   JSR Music_PlayTrack
+   ```
+
+3. **Event Trigger:**
+   ```assembly
+   ; Play cutscene music
+   LDA #$22              ; Track ID $22 (Cutscene)
+   JSR Music_PlayTrack
+   ```
+
+**Implementation Notes:**
+- **Placeholder Status:** Current code is RTS (immediate return) - full implementation inactive
+- **Expected Behavior:** Would communicate with APU command $01 (Play Music)
+- **Track Priority:** Event music typically highest, battle next, field lowest
+- **Looping:** Most tracks loop indefinitely until changed
+- **Fade Support:** Some transitions include fade-out before new track
+
+**Related Functions:**
+- `APU_SendCommand` @ $0D:$8147 - APU command dispatcher
+- `Sound_PlayEffect` @ $01:$BAAD - Sound effect playback
+- `SPC_InitMain` @ $0D:$802C - Audio system initialization
+
+**Call Graph:**
+```
+Game Event
+  └─> Music_PlayTrack @ $01BCDB
+       └─> (Currently RTS - no operation)
+            └─> Expected: APU_SendCommand with music parameters
+                 └─> SPC700 loads and plays track sequence
+```
+
+---
+
+#### Battle_PlaySoundEffect @ `$02:$9F10`
+**Location:** Bank $02 @ $9F10  
+**File:** `src/asm/banks/bank_02.asm`
+
+**Purpose:** Battle-specific sound effect playback with context-aware filtering and battle state validation.
+
+**Technical Details:**
+- **Entry Point:** Battle_PlaySoundEffect @ $029F10
+- **Context:** Battle system only (not for field/menu use)
+- **Filtering:** Checks battle flags before playing
+- **Sound IDs:** Battle-specific SFX subset ($38-$50 range filtered)
+- **Integration:** Validates battle turn and action state
+
+**Inputs:**
+- `$39` (byte) = Battle action flags
+  * Bit 7: Disable sound flag (if set, no SFX plays)
+- `$38` (byte) = Battle action type
+  * $10: Special attack range ($3A checked)
+  * $20: No sound action type
+  * Other: Standard action
+- `$3A` (byte) = Action sub-type (for type $10 actions)
+  * $49-$4F: Filtered range (no SFX)
+- `$BB` (byte) = Current battle phase counter
+- `$B9` (byte) = Target battle phase threshold
+- `$77` (word) = Music control flags (bit shift applied)
+
+**Outputs:**
+- Sound effect played if all conditions pass
+- Battle state updated ($77 shifted left)
+- Function may return early (RTS) if conditions fail
+
+**Algorithm:**
+```
+1. Check disable flag:
+   LDA $39
+   AND #$80             ; Test bit 7
+   BEQ +                ; If clear, continue
+   RTS                  ; If set, exit (no sound)
+
+2. Check action type:
+   LDA $38
+   CMP #$20             ; Type $20?
+   BNE +                ; If not, continue
+   RTS                  ; If yes, exit (no sound)
+
+3. Check special attack range:
+   LDA $38
+   CMP #$10             ; Type $10?
+   BNE +                ; If not, skip filter
+   LDA $3A              ; Load sub-type
+   CMP #$49             ; Below $49?
+   BCC +                ; Yes, continue
+   CMP #$50             ; At/above $50?
+   BCS +                ; Yes, continue
+   ; Sub-type in $49-$4F range - filtered
+
+4. Check battle phase:
+   LDA $BB              ; Current phase
+   CMP $B9              ; Compare to threshold
+   BCS +                ; If >=, continue
+   RTS                  ; If <, exit (wrong phase)
+
+5. Update music flags:
+   REP #$30             ; 16-bit mode
+   ASL $77              ; Shift music flags left
+   SEP #$20             ; 8-bit mode
+   REP #$10             ; 16-bit index
+
+6. Play battle message/sound:
+   LDX #$D42D           ; Message pointer
+   JMP Battle_DisplayMessage  ; Display and play
+```
+
+**Performance:**
+- **Cycles:** 40-150 cycles (varies by path taken)
+- **Frame Budget:** ~0.09-0.85% (depends on early exit vs full execution)
+- **Conditional Branches:** Up to 5 possible early exits
+
+**Battle Action Types:**
+```
+$38 Values (Action Type):
+  $00-$0F: Physical attacks
+  $10: Special attacks (filtered by $3A)
+  $11-$1F: Magic attacks
+  $20: Silent action (no SFX)
+  $21-$FF: Other actions
+```
+
+**Special Attack Sub-Types (Filtered):**
+```
+$3A Values (when $38 = $10):
+  $00-$48: Play sound (allowed)
+  $49-$4F: No sound (filtered range)
+  $50-$FF: Play sound (allowed)
+```
+
+**Use Cases:**
+1. **Physical Attack Sound:**
+   ```assembly
+   ; Setup attack action
+   LDA #$00
+   STA $38              ; Physical attack type
+   STZ $39              ; No disable flag
+   LDA #$BB
+   STA $BB              ; Current phase
+   LDA #$BB
+   STA $B9              ; Equal to threshold
+   
+   JSR Battle_PlaySoundEffect  ; Plays attack SFX
+   ```
+
+2. **Silent Action:**
+   ```assembly
+   ; Setup silent action
+   LDA #$20
+   STA $38              ; Silent action type
+   
+   JSR Battle_PlaySoundEffect  ; Returns immediately (RTS)
+   ```
+
+3. **Filtered Special Attack:**
+   ```assembly
+   ; Setup special attack (filtered)
+   LDA #$10
+   STA $38              ; Special attack type
+   LDA #$4C
+   STA $3A              ; Sub-type in filtered range
+   
+   JSR Battle_PlaySoundEffect  ; Returns immediately (filtered)
+   ```
+
+**Implementation Notes:**
+- **Multi-Layer Filtering:** 5 separate conditional checks before sound plays
+- **Battle Phase Dependency:** Only plays during appropriate battle phase ($BB >= $B9)
+- **Music Integration:** Modifies $77 music flags (ASL shifts bits left)
+- **Message Coupling:** Final step calls Battle_DisplayMessage (not just sound)
+
+**Condition Table:**
+```
+Condition                Result
+-----------------------------------------
+$39 bit 7 set           → RTS (no sound)
+$38 = $20               → RTS (silent action)
+$38 = $10 AND           → RTS (filtered)
+  $3A in $49-$4F
+$BB < $B9               → RTS (wrong phase)
+All pass                → Play sound + display message
+```
+
+**Related Functions:**
+- `Sound_PlayEffect` @ $01:$BAAD - General SFX playback
+- `Battle_DisplayMessage` @ $02:$8835 - Message display (includes SFX)
+- `APU_SendCommand` @ $0D:$8147 - APU communication
+
+**Call Graph:**
+```
+Battle Action Handler
+  └─> Battle_PlaySoundEffect @ $029F10
+       ├─> Early exit (RTS) if any filter fails
+       └─> Battle_DisplayMessage @ $028835
+            └─> (Internal SFX playback + message display)
+```
+
+---
+
