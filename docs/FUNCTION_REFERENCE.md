@@ -15531,6 +15531,18 @@ Multiple operations:
 ### Bank $07 - Graphics System
 - `LoadTileset` @ $8000 - Load tileset into VRAM
 - `DecompressGraphics` @ $8234 - Decompress graphics (RLE/LZ77)
+- `Animation_ControllerMain` @ $9030 - Animation script processor with frame sequencing
+- `Animation_ExitController` @ $9050 - Clean exit from animation controller
+- `Animation_LoadFrameData` @ $9053 - Initialize frame data tracking
+- `Animation_ProcessFrameSequence` @ $905C - Frame-by-frame animation sequencer
+- `Animation_AdvanceSequence` @ $9092 - Advance to next frame in sequence
+- `Animation_FindSequenceEnd` @ $90AD - Locate sequence terminator ($FF marker)
+- `Animation_IncrementAndSelect` @ $90E7 - Increment frame counter & select graphics
+- `Animation_CopyGraphicsLoop` @ $9118 - Copy 32-byte graphics data blocks
+- `Animation_ScrollPixelsRight` @ $9133 - Shift pixel data right (×1.5 scaling)
+- `Animation_MultiplyPixels` @ $915C - Multiply pixel values (×3 scaling)
+- `Animation_ShiftFrameBufferLeft` @ $917B - Rotate frame buffer left (8-frame history)
+- `Animation_ShiftFrameBufferRight` @ $91D0 - Rotate frame buffer right (8-frame history)
 
 ### Bank $08 - Text Engine
 - `PrintText` @ $9000 - Text rendering
@@ -16191,6 +16203,506 @@ Battle Action Handler
 **Compression Format:** Command byte (low nibble = literal count 0-15, high nibble = lookback count 0-15), lookback offset byte, data array.
 
 **Performance:** ~50-150 cycles per command, 40-60% compression ratio.
+
+---
+
+## Animation System Functions (Bank $07)
+
+#### Animation_ControllerMain @ `$07:$9030` (COMPREHENSIVE)
+**Location:** Bank $07 @ $9030
+
+**Purpose:** Master animation controller that orchestrates sprite animation sequences through script-based frame management. Processes animation scripts from Bank $0C ROM ($0CD500), managing frame timing, counter increments, and buffer operations across multiple animation layers ($7FCEC8-CED7). Uses jump table dispatch for animation command handlers.
+
+**Inputs:**
+- `$19AB` = Animation system enable flag
+  * `$00` = System active, process animation
+  * `$FF` = System disabled, exit immediately
+- `$19D8` (Direct page = $1953) = Script pointer to Bank $0C ROM table
+- Bank $0C ROM @ `$0CD500+` = Animation script commands:
+  * Byte 0: Layer index (0-14, `$FF` = end marker)
+  * Byte 1: Command index (0-4) → jump table @ $0790BB
+  * Byte 2+: Command-specific parameters
+
+**Outputs:**
+- `$7FCEC8-CED7` (16 bytes) = Layer state array (8 layers × 2 bytes):
+  * Offset +0: Current frame count for each layer
+  * Used for tracking animation progress per layer
+- `$7FCDC8-CDE7` (32 bytes) = Animation frame buffer (8 layers × 4 bytes)
+- Updated animation graphics in VRAM via buffer operations
+
+**Algorithm:**
+```
+Main Controller Loop:
+1. Check enable flag ($19AB)
+   - If $FF: Exit immediately
+   - If $00: Continue processing
+
+2. Setup direct page ($1953) and read script pointer ($19D8)
+3. Read first layer byte from Bank $0C ROM
+   - If $FF: Exit (sequence complete)
+   - Else: Continue to layer processing
+
+4. Layer Processing Loop (14 layers max):
+   a. Load layer index → $0A (temp storage)
+   b. Clear layer offsets ($04 = buffer, $06 = state)
+   
+   c. Frame Sequence Iterator:
+      - Read script command @ current pointer
+      - If $FF: Advance to next layer
+      - Compare with $7FCEC8[layer]: current frame count
+      - If script < count: Skip to find next command
+      - If script >= count: Execute command via jump table
+      
+   d. Execute Command (jump table @ $0790BB):
+      - Command 0 ($90C5): Increment & select graphics
+      - Command 1 ($912A): Scroll pixels right
+      - Command 2 ($9153): Multiply pixels
+      - Command 3 ($9174): Shift buffer left
+      - Command 4 ($91C9): Shift buffer right
+      
+   e. Advance to next layer:
+      - Increment state offset by 2
+      - Increment buffer offset by $20 (32 bytes)
+      - If layer < 14: Continue loop
+      - If layer = 14: Return to step 3
+
+5. Exit and restore processor state
+```
+
+**Technical Details:**
+
+**Direct Page Context:**
+- Temporarily sets DP to $1953 for optimized memory access
+- Enables single-byte addressing for script variables
+- Offset $02 ($1955) = Script pointer (updated during iteration)
+- Offset $0A ($195D) = Current layer index
+
+**Script Processing Architecture:**
+- Multi-layer system: 8 concurrent animation layers
+- Each layer has independent frame counter and buffer
+- Script commands stored as ROM tables in Bank $0C
+- Layer index 0-13 (14 total), $FF terminates sequence
+
+**Jump Table Commands ($0790BB):**
+```
+Index | Address | Function
+------+---------+------------------------------------------
+  0   | $90C5   | Increment frame counter & load graphics
+  1   | $912A   | Scroll pixels right (×1.5 scaling)
+  2   | $9153   | Multiply pixel values (×3)
+  3   | $9174   | Shift frame buffer left
+  4   | $91C9   | Shift frame buffer right
+```
+
+**Memory Architecture:**
+```
+$7FCEC8-CED7 (16 bytes): Layer State
+Offset  | Purpose
+--------+------------------------------------------
++$00-01 | Layer 0 frame count
++$02-03 | Layer 1 frame count
++$04-05 | Layer 2 frame count
++$06-07 | Layer 3 frame count
++$08-09 | Layer 4 frame count
++$0A-0B | Layer 5 frame count
++$0C-0D | Layer 6 frame count
++$0E-0F | Layer 7 frame count
+
+$7FCDC8-CDE7 (32 bytes): Frame Buffer
+Offset  | Purpose
+--------+------------------------------------------
++$00-03 | Layer 0 frame data (4 bytes)
++$04-07 | Layer 1 frame data
+...
++$1C-1F | Layer 7 frame data
+
+$7FD274+ (ROM mirror): Source graphics
+- 32-byte aligned blocks
+- Pre-scaled sprite data
+```
+
+**Process Flow:**
+
+1. **System Check (3-5 cycles)**
+   - Load `$19AB` enable flag
+   - Compare with `$FF` (disabled)
+   - Branch to exit if match
+
+2. **Setup Direct Page (8-12 cycles)**
+   - Push current DP and status flags
+   - Load $1953 into DP for script context
+   - Set 8-bit A, 16-bit X/Y modes
+
+3. **Script Pointer Load (10-15 cycles)**
+   - Read `$19D8` → X register
+   - Load first byte from `$0CD500,X`
+   - Check for `$FF` terminator
+
+4. **Layer Loop (14 iterations max, ~120-180 cycles/iteration)**
+   - Clear offsets: `$04 = $00`, `$06 = $00`
+   - Enter frame sequence processor
+
+5. **Frame Sequence Processing (~80-150 cycles/command)**
+   - Load script byte at current pointer
+   - Compare with layer frame count
+   - Skip or execute based on comparison
+   - Advance pointer after execution
+
+6. **Command Execution (variable, 50-850 cycles)**
+   - Jump through table @ $0790BB
+   - Execute animation command
+   - Update frame buffer and/or state
+
+7. **Layer Advance (12-18 cycles)**
+   - Add 2 to state offset ($06)
+   - Add $20 (32) to buffer offset ($04)
+   - Check if layer < 14, loop or exit
+
+8. **Exit and Restore (5-8 cycles)**
+   - Pop status flags
+   - Pop direct page
+   - Return to caller (RTL)
+
+**Performance Analysis:**
+
+**Best Case (Early Exit):**
+- System disabled ($19AB = $FF)
+- Execution: ~15 cycles
+- Path: Check flag → Exit
+
+**Typical Case (Single Layer, 1 Command):**
+- Setup: ~30 cycles
+- Layer loop: ~120 cycles
+- Command execution: ~200 cycles (average)
+- Exit: ~8 cycles
+- **Total: ~358 cycles**
+
+**Worst Case (14 Layers, Multiple Commands):**
+- Setup: ~30 cycles
+- 14 layers × ~180 cycles = ~2,520 cycles
+- Command executions: ~200 cycles × 20 commands = ~4,000 cycles
+- Exit: ~8 cycles
+- **Total: ~6,558 cycles**
+
+**Average Case Estimate:**
+- 8 active layers
+- 2 commands per layer average
+- Setup + (8 × 150) + (16 × 200) + exit
+- **Total: ~4,438 cycles (~2.2 scanlines @ 3.58 MHz)**
+
+**Script Format Example:**
+```
+Bank $0C ROM @ $0CD500:
+Byte | Value | Meaning
+-----+-------+--------------------------------------
+  0  | $00   | Layer 0
+  1  | $02   | Command 2 (multiply pixels)
+  2  | $03   | Parameter: max count = 3
+  3  | $05   | Graphics index = 5
+  4  | $01   | Layer 1
+  5  | $00   | Command 0 (increment & select)
+  6  | $07   | Parameter: max count = 7
+  7  | $0A   | Graphics index = 10
+  8  | $FF   | End marker
+```
+
+**Use Cases:**
+
+1. **Battle Sprite Animation:**
+   - Enemy attack sequences
+   - Character spell casting
+   - Status effect visuals
+   - Multi-frame attack animations
+
+2. **Field Animation:**
+   - NPC idle animations
+   - Environmental effects (water, fire)
+   - Chest opening sequences
+   - Door/gate transitions
+
+3. **UI Animation:**
+   - Menu cursor blinking
+   - Item selection effects
+   - Transition effects
+   - Window animations
+
+4. **Cutscene Animation:**
+   - Character dialogue gestures
+   - Synchronized multi-sprite scenes
+   - Special event sequences
+   - Mode 7 overlay effects
+
+**Error Handling:**
+- **Missing Terminator:** Will loop through all 14 layers then exit
+- **Invalid Command Index:** Jump table may crash if index > 4
+- **Buffer Overflow:** No bounds checking on ROM reads
+- **Corrupted Script Pointer:** May read garbage data and execute random commands
+
+**Related Functions:**
+- `Animation_ExitController` ($07:$9050) - Clean exit path
+- `Animation_ProcessFrameSequence` ($07:$905C) - Frame iterator
+- `Animation_IncrementAndSelect` ($07:$90E7) - Command 0 handler
+- `Animation_CopyGraphicsLoop` ($07:$9118) - Graphics data transfer
+- `Animation_ScrollPixelsRight` ($07:$9133) - Command 1 handler
+- `Animation_MultiplyPixels` ($07:$915C) - Command 2 handler
+- `Animation_ShiftFrameBufferLeft` ($07:$917B) - Command 3 handler
+- `Animation_ShiftFrameBufferRight` ($07:$91D0) - Command 4 handler
+
+**Implementation Notes:**
+- Uses Direct Page manipulation for performance optimization
+- Assumes Bank $0C ROM scripts are well-formed
+- No safety checks on command indices or buffer bounds
+- Frame buffers persist across calls (stateful animation)
+- Layer state increments independently per command execution
+
+---
+
+#### Animation_ExitController @ `$07:$9050`
+**Location:** Bank $07 @ $9050
+
+**Purpose:** Clean exit point for animation controller - restores processor state and returns.
+
+**Process:**
+1. Pop processor status flags (8/16-bit modes)
+2. Pop direct page register (restore DP)
+3. Return to caller (RTL - long return)
+
+**Performance:** ~5 cycles
+
+---
+
+#### Animation_LoadFrameData @ `$07:$9053`
+**Location:** Bank $07 @ $9053
+
+**Purpose:** Initialize frame data tracking by loading layer index and clearing offset counters.
+
+**Inputs:**
+- `$0A` = Layer index (0-13)
+
+**Outputs:**
+- `$04` = Buffer offset (initialized to $0000)
+- `$06` = State offset (initialized to $0000)
+
+**Process:**
+1. Store layer index in `$0A`
+2. Load `$0000` → X register
+3. Store X → `$04` (buffer offset)
+4. Store X → `$06` (state offset)
+
+**Performance:** ~12 cycles
+
+---
+
+#### Animation_ProcessFrameSequence @ `$07:$905C`
+**Location:** Bank $07 @ $905C
+
+**Purpose:** Frame-by-frame animation sequencer that compares script commands with layer frame counts and dispatches commands when frame count matches.
+
+**Inputs:**
+- `$02` = Script pointer (offset into Bank $0C ROM)
+- `$06` = Layer state offset (0, 2, 4, ..., 14)
+- Bank $0C ROM @ `$0CD500+X` = Script command bytes
+
+**Outputs:**
+- Updates `$02` with advanced script pointer
+- Executes animation commands via jump table when frame matches
+
+**Process:**
+1. Load script byte from `$0CD500,X`
+2. If `$FF`: Jump to Animation_AdvanceSequence
+3. Push X, load layer state byte `$7FCEC8[state_offset]`
+4. Compare script byte with state byte
+5. If script >= state: Jump to Animation_AdvanceSequence  
+6. Clear accumulator, load next byte (command index)
+7. Multiply by 2 (ASL), jump through table @ `$0790BB`
+
+**Performance:** ~80-150 cycles per command
+
+---
+
+#### Animation_AdvanceSequence @ `$07:$9092`
+**Location:** Bank $07 @ $9092
+
+**Purpose:** Advance to next layer in animation sequence by incrementing state/buffer offsets and checking loop termination.
+
+**Inputs:**
+- `$06` = Current state offset
+- `$04` = Current buffer offset
+
+**Outputs:**
+- `$06` += 2 (next layer state)
+- `$04` += $20 (32 bytes, next buffer block)
+- Loops back to ProcessFrameSequence or exits if all layers processed
+
+**Process:**
+1. Set 16-bit mode
+2. Compare `$06` with $000E (14 layers × 2 bytes = 28, but checks at 14)
+3. If equal: Exit controller
+4. Increment `$06` by 2
+5. Add $20 to `$04`
+6. Load script pointer from `$02`, jump to FindSequenceEnd
+
+**Performance:** ~25-35 cycles
+
+---
+
+#### Animation_FindSequenceEnd @ `$07:$90AD`
+**Location:** Bank $07 @ $90AD
+
+**Purpose:** Locate the `$FF` terminator marker in animation script to advance to next sequence.
+
+**Inputs:**
+- X = Current script pointer offset
+
+**Outputs:**
+- X = Updated pointer (past `$FF` terminator)
+- `$02` = Stored pointer for next iteration
+
+**Process:**
+1. Load byte from `$0CD500,X`
+2. Increment X
+3. Compare with `$FF`
+4. If not equal: Loop back to step 1
+5. Store X → `$02`
+6. Jump back to ProcessFrameSequence
+
+**Performance:** ~15-40 cycles (depends on distance to `$FF`)
+
+---
+
+#### Animation_IncrementAndSelect @ `$07:$90E7`
+**Location:** Bank $07 @ $90E7
+
+**Purpose:** Increment layer frame counter with wraparound and load graphics data from ROM to frame buffer.
+
+**Inputs:**
+- `$02` = Script pointer
+- `$06` = Layer state offset
+- Script bytes: [max_count, graphics_index]
+
+**Outputs:**
+- `$7FCEC9[state_offset]` = Incremented frame counter (wraps to 0 at max)
+- Frame buffer updated with 32-byte graphics block from `$7FD274`
+
+**Process:**
+1. Load max count from script, increment by 1
+2. Compare with current frame counter, wrap if >= max
+3. Store new counter
+4. Calculate graphics offset: counter × script_index
+5. Load 32-byte graphics block from `$7FD274 + (offset × $20)`
+6. Copy to frame buffer @ `$7FCDC8 + buffer_offset`
+
+**Performance:** ~450-850 cycles (includes 32-byte copy loop)
+
+---
+
+#### Animation_CopyGraphicsLoop @ `$07:$9118`
+**Location:** Bank $07 @ $9118
+
+**Purpose:** High-speed 32-byte graphics data transfer from ROM to WRAM frame buffer using unrolled loop.
+
+**Inputs:**
+- X = Source ROM offset (`$7FD274 + offset`)
+- Y = Dest WRAM offset (`$7FCDC8 + buffer_offset`)
+- Bank $7F active
+
+**Outputs:**
+- 32 bytes copied from ROM mirror to frame buffer
+
+**Process:**
+1. Push loop counter ($10 = 16 words)
+2. Load word from `$7FD274,X`, store to `$0000,Y` (WRAM bank $7F)
+3. Increment X, Y by 2
+4. Decrement counter, loop until 0
+5. Restore bank register
+
+**Performance:** ~360 cycles (16 iterations × ~22 cycles)
+
+---
+
+#### Animation_ScrollPixelsRight @ `$07:$9133`
+**Location:** Bank $07 @ $9133
+
+**Purpose:** Shift pixel data right with special ×1.5 scaling algorithm - multiplies values by 1.5 using bit manipulation.
+
+**Inputs:**
+- `$04` = Buffer offset
+
+**Outputs:**
+- `$7FCDC8[buffer_offset]` to `[buffer_offset + $1F]` modified (32 bytes)
+
+**Process:**
+1. Loop through 32 bytes in frame buffer
+2. For each byte: Skip if $00 or $FF
+3. Apply formula: `result = (value & $01) × $80 + (value >> 1) + ((value & $01) × $80 >> 1)`
+4. Store result back to buffer
+
+**Performance:** ~640-960 cycles (32 bytes × ~20-30 cycles each)
+
+---
+
+#### Animation_MultiplyPixels @ `$07:$915C`
+**Location:** Bank $07 @ $915C
+
+**Purpose:** Multiply pixel values by 3 using efficient add-shift algorithm: `result = value × 2 + value`.
+
+**Inputs:**
+- `$04` = Buffer offset
+
+**Outputs:**
+- `$7FCDC8[buffer_offset]` to `[buffer_offset + $1F]` modified (32 bytes)
+
+**Process:**
+1. Loop through 32 bytes in frame buffer
+2. For each byte: Skip if $00 or $FF
+3. Calculate: `temp = value << 1` (multiply by 2)
+4. Add: `result = temp + value` (total = ×3)
+5. Store result back to buffer
+
+**Performance:** ~480-720 cycles (32 bytes × ~15-22 cycles each)
+
+---
+
+#### Animation_ShiftFrameBufferLeft @ `$07:$917B`
+**Location:** Bank $07 @ $917B
+
+**Purpose:** Rotate 8-frame history buffer left (oldest frame discarded, newest moves to end) - implements circular buffer for animation trails.
+
+**Inputs:**
+- `$04` = Base buffer offset
+- Frame buffer organized as 8 frames × 2 bytes (16 bytes total × 2 copies)
+
+**Outputs:**
+- Frame buffer rotated: Frame[0]=Frame[1], Frame[1]=Frame[2], ..., Frame[6]=Frame[7], Frame[7]=saved
+
+**Process:**
+1. Loop twice (2 copies of 8-frame buffer)
+2. For each copy: Save Frame[0], shift all frames left by 1 slot
+3. Write saved frame to Frame[7] position
+4. Advance to next 16-byte block
+
+**Performance:** ~720-960 cycles (2 iterations × 7 shifts × ~50-70 cycles)
+
+---
+
+#### Animation_ShiftFrameBufferRight @ `$07:$91D0`
+**Location:** Bank $07 @ $91D0
+
+**Purpose:** Rotate 8-frame history buffer right (newest frame discarded, oldest moves to front) - reverse of left shift.
+
+**Inputs:**
+- `$04` = Base buffer offset
+
+**Outputs:**
+- Frame buffer rotated: Frame[7]=Frame[6], Frame[6]=Frame[5], ..., Frame[1]=Frame[0], Frame[0]=saved
+
+**Process:**
+1. Loop twice (2 copies of 8-frame buffer)
+2. For each copy: Save Frame[7], shift all frames right by 1 slot
+3. Write saved frame to Frame[0] position
+4. Advance to next 16-byte block
+
+**Performance:** ~720-960 cycles (2 iterations × 7 shifts × ~50-70 cycles)
 
 ---
 
