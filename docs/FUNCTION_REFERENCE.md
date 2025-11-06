@@ -4,7 +4,7 @@ Complete reference for all documented functions in Final Fantasy: Mystic Quest.
 
 **Last Updated:** 2025-11-05  
 **Status:** Active - Continuously updated with code analysis  
-**Coverage:** 2,195+ documented functions out of 8,153 total (~26.9%)
+**Coverage:** 2,197+ documented functions out of 8,153 total (~26.9%)
 
 ## Table of Contents
 
@@ -10707,6 +10707,41 @@ Battle Action Handler
        └─> Battle_DisplayMessage @ $028835
             └─> (Internal SFX playback + message display)
 ```
+
+---
+
+## Data Decompression Functions
+
+### Graphics Decompression
+
+#### DecompressTiles @ `$0B:$8669`
+**Location:** Bank $0B @ $8669
+
+**Purpose:** Decompress graphics tiles from ROM to WRAM using custom compression with literal and lookback modes.
+
+**Inputs:**
+- `$0900-$0902` = Source ROM pointer (address + bank)
+- `$0903-$0905` = Dest WRAM pointer (address + bank)
+
+**Compression Format:** Command byte (low nibble = literal count 0-15, high nibble = lookback count 0-15), lookback offset byte, data array.
+
+**Performance:** ~50-150 cycles per command, 40-60% compression ratio.
+
+---
+
+## Memory Utility Functions
+
+#### Memory_Copy64Bytes @ `$00:$9891`
+**Location:** Bank $00 @ $9891
+
+**Purpose:** Ultra-fast 64-byte block copy using unrolled loop - 3× faster than traditional loop.
+
+**Inputs:**
+- `X` = Source offset, `Y` = Dest offset
+
+**Performance:** ~512 cycles (vs ~1,600 for loop), 32 unrolled LDA/STA pairs.
+
+**Use Cases:** Entity data copy, save buffer copy.
 
 ---
 
