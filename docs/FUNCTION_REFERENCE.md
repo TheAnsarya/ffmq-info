@@ -4,7 +4,7 @@ Complete reference for all documented functions in Final Fantasy: Mystic Quest.
 
 **Last Updated:** 2025-11-05  
 **Status:** Active - Continuously updated with code analysis  
-**Coverage:** 2,179+ documented functions out of 8,153 total (~26.7%)
+**Coverage:** 2,182+ documented functions out of 8,153 total (~26.8%)
 
 ## Table of Contents
 
@@ -6957,6 +6957,313 @@ Common Issues:
 
 ---
 
+### OAM & Sprite Management
+
+#### Display_SetupNMIOAMTransfer
+**Location:** Bank $0C @ $8910  
+**File:** `src/asm/bank_0C_documented.asm`
+
+**Purpose:** Configure NMI handler to automatically perform OAM (sprite) DMA transfer during every VBLANK period.
+
+**Inputs:**
+- None (uses hardcoded NMI handler configuration)
+
+**Outputs:**
+- $005A = $0C (NMI handler bank)
+- $0058 = $8929 (NMI handler address pointer)
+- $00E2 |= $40 (NMI control flag set - enable OAM transfer)
+
+**Side Effects:**
+- Modifies NMI handler vectors ($005A, $0058)
+- Sets bit 6 of $00E2 (NMI OAM transfer enable flag)
+- Waits for one VBLANK period
+- Modifies data bank register (sets to $0C, no restore)
+
+**Algorithm:**
+
+**Phase 1: Setup Data Bank**
+```
+1. PHK (push current program bank $0C)
+2. PLB (set data bank = $0C)
+3. SEP #$20 (ensure 8-bit accumulator mode)
+```
+
+**Phase 2: Configure NMI Handler Pointer**
+```
+NMI handler address: $0C:$8929 (embedded OAM DMA routine)
+
+Store handler location:
+1. A = $0C → $005A (handler bank)
+2. X = $8929 → $0058 (handler address low/high)
+
+NMI flow when enabled:
+- Hardware interrupt triggers NMI vector
+- NMI dispatcher checks $00E2 flags
+- If bit 6 set: JSL [$005A]:[$0058]
+- Executes embedded DMA routine at $0C:$8929
+- Returns via RTL
+```
+
+**Phase 3: Enable NMI OAM Transfer Flag**
+```
+TSB (Test and Set Bits) operation:
+- A = $40 (bit 6 mask)
+- TSB $00E2 (atomic test-and-set)
+  
+Result: $00E2 |= $40 (bit 6 = 1)
+
+Effect: NMI handler will now call OAM DMA routine
+        every VBLANK (60 times per second)
+```
+
+**Phase 4: Synchronize with VBLANK**
+```
+JSL CODE_0C8000 (Wait for VBLANK)
+
+Purpose: Ensures handler activates on clean frame
+         Prevents mid-frame sprite corruption
+         First transfer happens next VBLANK
+```
+
+**NMI OAM DMA Routine ($0C:$8929):**
+```asm
+; Executed automatically during VBLANK when bit 6 of $00E2 set
+; Transfers 544 bytes from $0C00 (sprite buffer) to OAM
+
+NMI_OAMTransfer:
+    LDX #$0000          ; OAM address = 0
+    STX SNES_OAMADDL    ; Set OAM write address ($2102)
+    
+    LDX #$0400          ; DMA mode: CPU→PPU, auto-increment
+    STX SNES_DMA5PARAM  ; Configure DMA5 ($4350)
+    
+    LDX #$0C00          ; Source = $00:0C00 (sprite buffer)
+    STX SNES_DMA5ADDRL  ; Set DMA5 source address ($4352)
+    
+    LDA #$00            ; Source bank = $00
+    STA SNES_DMA5ADDRH  ; Set DMA5 source bank ($4354)
+    
+    LDX #$0220          ; Transfer size = 544 bytes
+    STX SNES_DMA5CNTL   ; Set DMA5 byte count ($4355)
+    
+    LDA #$20            ; Enable DMA channel 5 (bit 5)
+    STA SNES_MDMAEN     ; Start DMA transfer ($420B)
+    
+    RTL                 ; Return from NMI
+```
+
+**OAM Buffer Structure ($0C00-$0E1F):**
+```
+Sprite Table (512 bytes): $0C00-$0DFF
+- 128 sprites × 4 bytes each
+- Format per sprite:
+  Offset +0: X position (0-255, wraps at 256)
+  Offset +1: Y position (0-255, wraps at 240)
+  Offset +2: Tile number (0-255)
+  Offset +3: Attributes
+    Bit 7-5: Priority (0-3, higher = front)
+    Bit 4-2: Palette (0-7)
+    Bit 1:   Horizontal flip
+    Bit 0:   Vertical flip
+
+High Table (32 bytes): $0E00-$0E1F
+- 128 sprites × 2 bits each (packed 4 per byte)
+- Format per entry (2 bits):
+  Bit 1: X position bit 8 (extends range to 512)
+  Bit 0: Size toggle (depends on OBJSEL register)
+
+Total OAM transfer: 544 bytes (512 + 32)
+```
+
+**Performance:**
+```
+Setup time:     ~40 cycles (register configuration)
+VBLANK wait:    Variable (~16,700 cycles typical)
+Total setup:    ~16,740 cycles (~0.94ms @ 1.79 MHz)
+
+Per-frame cost (once enabled):
+- NMI overhead:   ~20 cycles (dispatcher check)
+- DMA transfer:   ~5,440 cycles (544 bytes × ~10 cycles/byte)
+- Total per NMI:  ~5,460 cycles (~0.31ms, ~3% of frame)
+
+Advantage over CPU copy:
+- CPU copy: 544 bytes × ~30 cycles = ~16,320 cycles
+- DMA: ~5,440 cycles
+- Speedup: ~3× faster, frees CPU for other work
+```
+
+**Register Usage:**
+```
+Entry:  Any state
+Work:   A=8-bit (bank number, flag mask)
+        X=16-bit (handler address)
+        DB=$0C (set by function)
+Exit:   A=undefined
+        X=undefined
+        DB=$0C (not restored - caller beware!)
+```
+
+**Calls:**
+- CODE_0C8000 - Wait for VBLANK
+
+**Called By:**
+- Mode 7 rotation sequences
+- Battle initialization
+- Screen transitions
+- Any system requiring automatic sprite updates
+
+**Related:**
+- Display_DirectOAMDMATransfer - Immediate (non-NMI) OAM transfer
+- See SNES Dev Manual - OAM format ($2102-$2104)
+- See SNES Dev Manual - DMA channels ($4300-$437F)
+
+---
+
+#### Display_DirectOAMDMATransfer
+**Location:** Bank $0C @ $8948  
+**File:** `src/asm/bank_0C_documented.asm`
+
+**Purpose:** Immediately perform OAM sprite DMA transfer (non-NMI version). Used for initial sprite setup or forced updates outside VBLANK.
+
+**Inputs:**
+- Sprite data in buffer $00:0C00-$0E1F (544 bytes)
+
+**Outputs:**
+- OAM updated with buffer contents (128 sprites + high table)
+
+**Side Effects:**
+- Modifies $2102-$2103 (OAM address)
+- Modifies $4350-$4357 (DMA5 registers)
+- Modifies $420B (DMA enable - triggers DMA)
+- Halts CPU during DMA transfer (~5,440 cycles)
+- Sets data bank to $0C
+
+**Algorithm:**
+```
+1. SEP #$20 - Ensure 8-bit mode
+2. Set OAM address to 0 ($2102)
+3. Configure DMA5:
+   - Mode: $0400 (write to $2104)
+   - Source: $00:0C00 (sprite buffer)
+   - Size: $0220 (544 bytes)
+4. Trigger DMA ($420B = $20)
+5. Restore data bank
+```
+
+**Performance:**
+```
+DMA transfer:   ~5,440 cycles (544 bytes)
+Total:          ~5,510 cycles (~0.31ms)
+
+vs CPU copy:    ~16,320 cycles
+Speedup:        ~3× faster
+```
+
+**Register Usage:**
+```
+Entry:  Any state
+Work:   A=8-bit, X=16-bit
+Exit:   DB=$0C
+```
+
+**Related:**
+- Display_SetupNMIOAMTransfer - Automatic NMI version
+
+---
+
+#### Display_AnimatedVerticalScroll
+**Location:** Bank $0C @ $8872  
+**File:** `src/asm/bank_0C_documented.asm`
+
+**Purpose:** Create smooth animated vertical scrolling effect with variable speed ranges and synchronized tile pattern updates.
+
+**Inputs:**
+- DATA8_0C88B0: 14-entry tile pattern table
+
+**Outputs:**
+- Completes full scroll animation from -9 to ~$00
+- Updates BG1 vertical scroll register ($210E)
+- Draws animated 3×3 tile patterns
+
+**Side Effects:**
+- Modifies $210E (BG1 vertical scroll)
+- Modifies VRAM (3×3 tile patterns)
+- Waits for VBLANK every frame (~16,700 cycles)
+
+**Algorithm:**
+
+**Phase 1: Initialization**
+```
+A = $F7 (-9 pixels, starting position)
+X = $0000 (animation table index)
+```
+
+**Phase 2: Main Loop (per frame)**
+```
+1. Wait for VBLANK
+2. Update scroll: A → $210E
+3. Load tile pattern from table
+4. Draw 3×3 pattern to VRAM
+5. Check table wrap (14 entries)
+6. Calculate next scroll position
+```
+
+**Phase 3: Variable Speed Scrolling**
+```
+Range 1 (A < $39):  -6 pixels/frame (fast)
+Range 2 ($39-$59):  -4 pixels/frame (medium)
+Range 3 ($59-$79):  -2 pixels/frame (slow)
+Range 4 ($79+):     -1 pixel/frame (slowest)
+
+Exit: When A wraps negative (<$00)
+Total: ~120-140 frames (~2.0-2.3 seconds)
+```
+
+**Animation Table (DATA8_0C88B0):**
+```
+14 tile patterns:
+$11, $15, $15, $11, $11, $19, $19, $19,
+$1D, $51, $51, $55, $55, $11
+
+Cycle: 14 frames @ 60 FPS = 0.23 seconds per loop
+Repeats: ~8-10 times during full scroll
+```
+
+**Performance:**
+```
+Per-frame:      ~16,890 cycles (~9.4ms)
+VBLANK wait:    ~16,700 cycles (dominant)
+Scroll update:  ~30 cycles
+Tile draw:      ~100 cycles
+Speed calc:     ~45 cycles
+
+Full animation: ~184 frames (~3.1 seconds)
+```
+
+**Register Usage:**
+```
+Entry:  Any state
+Work:   A=8-bit (scroll, patterns)
+        X=16-bit (table index)
+Exit:   DB=$0C
+```
+
+**Calls:**
+- CODE_0C8000 - Wait for VBLANK
+- CODE_0C88EB - Draw 3×3 tile pattern
+
+**Called By:**
+- Title screen introduction
+- Credits scrolling
+- Chapter transitions
+- Cutscene backgrounds
+
+**Related:**
+- DATA8_0C88B0 - Tile pattern table
+- CODE_0C88EB - 3×3 tile drawing
+
+---
+
 ### Music Playback
 
 #### PlayMusic
@@ -8100,6 +8407,9 @@ Multiple operations:
 - `Display_Mode7TilemapSetup` @ $87ED - Mode 7 tilemap fill & HDMA setup
 - `Display_Mode7MatrixInit` @ $88BE - Mode 7 matrix initialization
 - `Display_Mode7RotationSequence` @ $896F - Animated rotation effect
+- `Display_AnimatedVerticalScroll` @ $8872 - Variable-speed scroll animation
+- `Display_SetupNMIOAMTransfer` @ $8910 - NMI OAM DMA configuration
+- `Display_DirectOAMDMATransfer` @ $8948 - Immediate OAM DMA transfer
 - See `src/asm/bank_0C_documented.asm` for Mode 7 functions
 
 ### Bank $0D - Sound/APU
@@ -8137,6 +8447,9 @@ Multiple operations:
 - `Display_Mode7TilemapSetup` (Bank $0C @ $87ED) - Mode 7 tilemap & HDMA
 - `Display_Mode7MatrixInit` (Bank $0C @ $88BE) - Mode 7 matrix setup
 - `Display_Mode7RotationSequence` (Bank $0C @ $896F) - Rotation animation
+- `Display_SetupNMIOAMTransfer` (Bank $0C @ $8910) - NMI OAM DMA setup
+- `Display_DirectOAMDMATransfer` (Bank $0C @ $8948) - Direct OAM transfer
+- `Display_AnimatedVerticalScroll` (Bank $0C @ $8872) - Scroll animation
 
 ### Map & World
 - `LoadMap` (Bank $06 @ $A000)
