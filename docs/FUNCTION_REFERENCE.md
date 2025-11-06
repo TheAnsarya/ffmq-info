@@ -3527,6 +3527,441 @@ Bit State Array:
 
 ---
 
+#### Thread_MainProcessingLoop (COMPLEX)
+**Location:** Bank $02 @ $EB7E  
+**File:** `src/asm/bank_02_documented.asm`
+
+**Purpose:** Main thread processing loop with command parsing and execution management.
+
+**Inputs:**
+- `X` (word) = Command buffer pointer in Bank $0B
+- Thread configuration in $0A8A-$0ACF range
+
+**Outputs:**
+- Thread commands processed
+- Command pointer advanced
+- Thread state updated
+
+**Algorithm:**
+```
+Loop:
+  1. Load command from $0B:0000,X
+  2. Check bit 7 (extended command flag)
+  3. If set:
+     - Mask to 6 bits (command ID)
+     - Check bit 6 (extension flag)
+     - If extension: clear mode bit 1
+     - Else: standard processing
+  4. Else (standard command):
+     - Extract bits 5-6 (command flags)
+     - Shift right by 2
+     - Set flags in operation mode ($0A90)
+  5. Mask command data to 5 bits
+  6. Store to $0AD0
+  7. Execute processing step (CODE_02EBEB)
+  8. Validate thread state consistency
+  9. Decrement counter ($0ACE)
+ 10. Loop until counter = 0
+```
+
+**Command Format:**
+```
+Bit 7: Extended command (1) / Standard (0)
+Bit 6: Extension flag (requires additional processing)
+Bits 5-6 (standard): Command flags
+Bits 0-5: Command data
+```
+
+**Technical Details:**
+- **Command types:**
+  * Extended (bit 7=1): 6-bit command ID (0-63)
+  * Standard (bit 7=0): 5-bit command data + 2-bit flags
+- **Operation modes:**
+  * Bit 0: Processing flag
+  * Bit 1: Extension clear flag  
+  * Bits 2-3: Command flags from bits 5-6
+- **Processing counter:** $0ACE (56 iterations)
+- **Validation check:** Compares bit 3 of $0ACB with $0ACD
+- **Auto-correction:** Adds $08 to $0ACB if validation mismatch
+
+**Process Flow:**
+1. **Initialize processing:**
+   - LDY #$0001 (processing flag)
+   - LDA #$02 → $0A90 (operation mode)
+   - LDA #$00, XBA (clear high byte)
+
+2. **Load and parse command:**
+   - LDA $0B:0000,X
+   - BIT #$80 (test extended flag)
+   - If clear: branch to standard processing
+
+3. **Extended command:**
+   - AND #$3F (mask to command ID)
+   - TAY (save command)
+   - LDA $0B:0000,X (reload)
+   - INX (advance pointer)
+   - BIT #$40 (test extension flag)
+   - If clear: branch to standard path
+   - LDA #$02, TRB $0A90 (clear mode bit 1)
+   - Branch to data processing
+
+4. **Standard command:**
+   - LDA $0B:0000,X
+   - AND #$60 (extract flags)
+   - LSR A ÷4 (shift right twice)
+   - TSB $0A90 (set flags in mode)
+   - LDA $0B:0000,X (reload)
+   - INX (advance pointer)
+
+5. **Store command data:**
+   - AND #$1F (mask to 5 bits)
+   - STA $0AD0
+
+6. **Processing loop:**
+   - JSR CODE_02EBEB (execute step)
+   - LDA $0ACB, AND #$08 (get validation bit)
+   - CMP $0ACD (check consistency)
+   - If equal: skip correction
+   - Else: LDA $0ACB, CLC, ADC #$08, STA $0ACB
+
+7. **Counter management:**
+   - DEC $0ACE (decrement counter)
+   - If zero: exit processing
+   - DEY (decrement loop counter)
+   - If not zero: loop to step 6
+   - Else: jump to step 1 (new cycle)
+
+8. **Cleanup:**
+   - PLP, PLY, PLX, PLB, PLA
+   - RTS
+
+**Performance:**
+- Command parse: ~85 cycles
+- Per iteration: ~180 cycles + CODE_02EBEB time
+- 56 iterations: ~10,000-15,000 cycles total (~3-4ms)
+
+**Use Cases:**
+- Battle thread command execution
+- Multi-threaded sprite processing
+- Real-time entity updates
+- Complex state machine execution
+
+---
+
+#### Thread_CoordCalculate
+**Location:** Bank $02 @ $EBD2  
+**File:** `src/asm/bank_02_documented.asm`
+
+**Purpose:** Calculate coordinate offset with precision handling for thread positioning.
+
+**Inputs:**
+- `A` (byte) = Coordinate value (0-255)
+
+**Outputs:**
+- `Y` (word) = Coordinate offset (×4)
+- `A` (byte) = Precision-adjusted coordinate
+
+**Algorithm:**
+```
+If coord < $80:  # Low range (0-127)
+  offset = (coord × 4)
+  precision = (coord & $1F) × 4 + $10
+Else:  # High range (128-255)
+  offset = ((coord - $80) × 4)
+  precision = coord >> 1 with carry
+```
+
+**Process:**
+1. Save P, A
+2. SEP #$20, REP #$10
+3. CMP #$80
+4. If < $80:
+   - ASL A ×4 → Y
+   - Restore A, AND #$1F, ASL A ×4
+   - CLC, ADC #$10
+5. Else:
+   - SEC, SBC #$80, ASL A ×4 → Y
+   - Restore A, SEC, ROR A
+6. PLP, RTS
+
+**Performance:** ~55 cycles
+
+---
+
+#### Memory_ClearWRAMBlock
+**Location:** Bank $02 @ $EBF3  
+**File:** `src/asm/bank_02_documented.asm`
+
+**Purpose:** Clear 4KB WRAM block and copy coordination data from Bank $02.
+
+**Inputs:** None
+
+**Outputs:**
+- WRAM $7E:C000-CFFF cleared to $00
+- WRAM $7E:C000 marked with $FF
+- Bank $02:$0B00-0CFF → $7E:C200-C3FF
+
+**Process:**
+1. Save P, B
+2. REP #$30, push $7E00, PLB (set bank $7E)
+3. SEP #$20, REP #$10
+4. LDX #$C000, LDY #$1000, LDA #$00
+5. Loop: STA $0000,X, INX, DEY, until Y=0
+6. STA $7EC000 = $FF (validation marker)
+7. REP #$30
+8. MVN $7E,$02: source=$0B00, dest=$C200, size=$0200
+9. PLB, PLP, RTS
+
+**Performance:** ~13,000 cycles (~3.7ms for 4KB clear + 512-byte copy)
+
+---
+
+#### Thread_ProcessCommand
+**Location:** Bank $02 @ $EC27  
+**File:** `src/asm/bank_02_documented.asm`
+
+**Purpose:** Process thread command with priority handling and dispatch.
+
+**Inputs:**
+- `A` (byte) = Thread command (0-255)
+
+**Outputs:** Command dispatched to handler
+
+**Process:**
+1. Save A, X, Y, P
+2. SEP #$20, REP #$10
+3. CMP #$C0 (check high priority)
+4. If < $C0:
+   - ASL A → X (word index)
+   - JMP (DATA8_02EC60,X) (dispatch table)
+5. Else:
+   - AND #$3F (mask thread ID)
+   - ORA #$80 (set priority flag) → X
+   - Branch to CODE_02EC4A
+6. Cleanup: PLP, PLY, PLX, PLA, RTS
+
+**Performance:** ~65 cycles + handler time
+
+---
+
+#### Thread_InitEnvironment
+**Location:** Bank $02 @ $EC45  
+**File:** `src/asm/bank_02_documented.asm`
+
+**Purpose:** Initialize thread processing environment.
+
+**Inputs:** None
+
+**Outputs:**
+- `$0A8B` = $02 (environment mode)
+
+**Process:**
+1. LDA #$02
+2. STA $0A8B
+3. RTS
+
+**Performance:** ~18 cycles
+
+---
+
+#### Thread_ManageExecutionTime
+**Location:** Bank $02 @ $EC4A  
+**File:** `src/asm/bank_02_documented.asm`
+
+**Purpose:** Manage thread execution time with nibble-based calculation.
+
+**Inputs:**
+- `$0ACB` (byte) = Thread execution time
+
+**Outputs:**
+- `$0ACB` (byte) = Updated execution time
+- `$0ACC` (byte) = Execution time offset
+
+**Algorithm:**
+```
+high_nibble = (execution_time & $F0) ÷ 4
+low_nibble = execution_time & $0F
+updated_time = low_nibble + high_nibble
+```
+
+**Process:**
+1. LDA $0ACB, AND #$F0
+2. LSR A ÷4 → $0ACC
+3. LDA $0ACB, AND #$0F
+4. CLC, ADC $0ACC → $0ACB
+5. RTS
+
+**Performance:** ~45 cycles
+
+---
+
+#### Sprite_CoordinateMultiBank (COMPLEX)
+**Location:** Bank $02 @ $EC68  
+**File:** `src/asm/bank_02_documented.asm`
+
+**Purpose:** Advanced sprite coordination with multi-bank synchronization loop.
+
+**Inputs:**
+- WRAM Bank $7E coordination area
+
+**Outputs:**
+- Sprite coordination at $7E:C440 initialized
+- 8 sprites synchronized
+- Synchronization markers set
+
+**Algorithm:**
+```
+For i = 0 to 7:
+  state = WRAM[$7EC440 + i]
+  If (state & $C0) == $C0:  # Fully synchronized
+    WRAM[$7EC450 + i] = $FF  # Mark complete
+  Else:
+    state |= $40  # Set sync in progress
+    WRAM[$7EC440 + i] = state
+  Next i
+```
+
+**Technical Details:**
+- **Synchronization states:**
+  * $00-$3F: Not synchronized
+  * $40-$7F: Sync in progress
+  * $80-$BF: Partial sync
+  * $C0-$FF: Fully synchronized
+- **Markers:** $FF stored at offset +$10 when complete
+- **Loop count:** 8 sprites maximum
+- **Bank switching:** Operates in WRAM bank $7E
+
+**Process Flow:**
+1. **Save state:**
+   - PHB, PHX, PHY, PHP
+   - SEP #$20, REP #$10
+
+2. **Setup WRAM bank:**
+   - LDA #$7E, PHA, PLB
+   - LDX #$C440 (coord base)
+
+3. **Initialize coordination:**
+   - LDA #$01 → $0000,X (enable)
+   - LDA #$80 → $0001,X (active)
+
+4. **Synchronization loop:**
+   - LDY #$0008 (8 sprites)
+   - Load $0000,X (state)
+   - AND #$C0 (mask sync bits)
+   - CMP #$C0 (check full sync)
+   - If equal:
+     * LDA #$FF → $0010,X (marker)
+     * INX, DEY
+   - Else:
+     * ORA #$40 (set in-progress)
+     * STA $0000,X
+     * INX, DEY
+   - Loop while Y≠0
+
+5. **Cleanup:**
+   - PLB, PLP, PLY, PLX
+   - RTS
+
+**Performance:** 
+- Per sprite: ~45 cycles
+- 8 sprites: ~360 cycles total
+
+**Synchronization Protocol:**
+| State | Bits 7-6 | Meaning |
+|-------|----------|---------|
+| $00-$3F | 00 | Uninitialized |
+| $40-$7F | 01 | In progress |
+| $80-$BF | 10 | Partial sync |
+| $C0-$FF | 11 | Complete |
+
+**Use Cases:**
+- Battle sprite synchronization
+- Multi-entity coordination
+- Cross-bank sprite state management
+- Real-time sprite updates
+
+---
+
+#### Validation_ErrorRecovery (COMPLEX)
+**Location:** Bank $02 @ $ECA5  
+**File:** `src/asm/bank_02_documented.asm`
+
+**Purpose:** Sophisticated validation system with error detection and recovery.
+
+**Inputs:**
+- `A` (byte) = Validation code (0-255, $FF = critical)
+- `$0ACA` (byte) = Validation state to test
+- `$0ACD` (byte) = Validation accumulator
+
+**Outputs:**
+- `$0ACD` updated with error flags
+- Validation loop executed 4 times
+
+**Algorithm:**
+```
+If validation_code == $FF:
+  # Critical error path
+  Jump to critical handler
+Else:
+  mask = DATA8_02ECE0[validation_code]
+  For i = 0 to 3:
+    If (mask & validation_state):
+      error_flag |= $01  # Set error bit
+    Loop 4 times
+```
+
+**Technical Details:**
+- **Validation masks:** Loaded from DATA8_02ECE0 table
+- **Error accumulation:** TSB (test and set bit) used for atomic flag setting
+- **Loop iterations:** Fixed at 4
+- **Critical path:** Immediate branch if A=$FF
+
+**Process Flow:**
+1. **Save state:**
+   - PHA, PHX, PHY, PHP
+   - SEP #$20, REP #$10
+
+2. **Critical check:**
+   - CMP #$FF
+   - If equal: branch to CODE_02ECD5
+
+3. **Standard validation:**
+   - TAX (validation code → X)
+   - LDA DATA8_02ECE0,X (load mask)
+   - STA $0AD1 (save mask)
+   - LDY #$0004 (loop counter)
+
+4. **Validation loop:**
+   - LDA $0AD1 (load mask)
+   - BIT $0ACA (test against validation state)
+   - If zero: validation passed
+     * Continue to next iteration
+   - Else: validation failed
+     * LDA #$01
+     * TSB $0ACD (set error flag)
+   - DEY
+   - If Y≠0: loop
+   - Else: continue
+
+5. **Completion:**
+   (Function continues with completion handler)
+
+**Performance:**
+- Critical path: ~30 cycles
+- Standard path: ~180 cycles (4 iterations)
+
+**Error Flags:**
+- Bit 0 ($01): Validation failure detected
+- Accumulates across multiple calls
+
+**Use Cases:**
+- Entity state validation
+- Configuration integrity checking
+- Error detection in battle processing
+- Recovery from invalid states
+
+---
+
 ## Text System Functions
 
 ### Tileset Management
