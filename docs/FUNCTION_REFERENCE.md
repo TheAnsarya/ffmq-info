@@ -15590,6 +15590,16 @@ Multiple operations:
 - `Sound_LoadNewTrack` @ $81ED - Upload new track data to SPC700
 - `Sound_TransferTrackData` @ $826B - Transfer track data blocks
 - `Sound_ProcessPatternTable` @ $82C0 - Pattern assignment to channels
+- `Sound_AllocateChannel` @ $8340 - Find free channel and allocate memory
+- `Sound_ReallocateMemory` @ $835C - Free old patterns and reorganize RAM
+- `Sound_FindFreePattern` @ $836C - Search for free pattern buffer slot
+- `Sound_SwapPattern` @ $8387 - Swap old pattern with new in SPC700 RAM
+- `Sound_PerformSwap` @ $83B1 - Execute pattern swap with handshake
+- `Sound_UploadSFX` @ $840E - Upload sound effect to SPC700
+- `Sound_FindSFXChannel` @ $841B - Locate free channel for SFX playback
+- `Sound_TransferSFX` @ $843F - Transfer SFX data blocks to SPC700
+- `Sound_SFXByteLoop` @ $849B - SFX byte transfer with handshake
+- `Sound_ManageChannelPatterns` @ $84DD - Update active pattern buffers
 
 ---
 
@@ -16783,6 +16793,299 @@ Warm Start (driver already loaded):
 4. Continue until all 16 entries processed
 
 **Performance:** ~3,000-5,000 cycles (16 entries × ~200-300 cycles each)
+
+---
+
+#### Sound_AllocateChannel @ `$0D:$8340`
+**Location:** Bank $0D @ $8340
+
+**Purpose:** Find first free audio channel and verify that new audio data fits in available SPC700 RAM (limit $D200). If RAM full, triggers reallocation.
+
+**Inputs:**
+- `$0628-$0647` (32 bytes) = Channel status buffer (16 channels × 2 bytes)
+- `$0648-$0667` (32 bytes) = Channel RAM address buffer
+- `$0617-$0618` = Size of new data to allocate
+
+**Outputs:**
+- X = Free channel index (0, 2, 4, ..., 30)
+- Jump to reallocation ($835C) if RAM full
+- Jump to upload ($840E) if allocation successful
+
+**Process:**
+1. Start at channel 0 (X=$0000)
+2. Check channel status buffer ($0628,X)
+3. If $00: Channel free, check RAM space
+4. Load current RAM position ($0648,X)
+5. Add new data size ($0617)
+6. If overflow (carry set) OR >= $D200: Trigger reallocation
+7. If fits: Proceed to upload at $840E
+
+**Performance:** ~40-80 cycles (search) + reallocation if needed
+
+---
+
+#### Sound_ReallocateMemory @ `$0D:$835C`
+**Location:** Bank $0D @ $835C
+
+**Purpose:** SPC700 RAM is full - evict old patterns and compact memory to make space for new audio data. Finds last active channel and reorganizes pattern buffers.
+
+**Inputs:**
+- `$0686-$06A5` (32 bytes) = Channel active flags
+- `$0688-$06A7` (32 bytes) = Pattern buffer 1
+- Pattern buffers full or RAM at $D200 limit
+
+**Outputs:**
+- `$0624` = Last used channel index
+- Pattern buffers reorganized
+- Memory freed for new data
+- Jump to pattern swap ($8387) or cleanup ($840E)
+
+**Process:**
+1. Start from last channel (X=$001E, channel 15)
+2. Search backwards for last active channel ($0686,X != 0)
+3. Store last active → $0624
+4. Search pattern buffer ($0688) for free slots
+5. If found free slot before last active: Proceed to swap
+6. If all occupied: Clear channels from current position
+7. Continue to memory cleanup
+
+**Performance:** ~200-500 cycles (varies by channel count)
+
+---
+
+#### Sound_FindFreePattern @ `$0D:$836C`
+**Location:** Bank $0D @ $836C
+
+**Purpose:** Search pattern buffer for free slot to assign new pattern data. Used during memory reallocation to find eviction targets.
+
+**Inputs:**
+- `$0688-$06A7` = Pattern buffer (16 entries × 2 bytes)
+- `$0624` = Last used channel limit
+
+**Outputs:**
+- X = Free pattern slot index (if found)
+- Comparison with $0624 determines if swap needed
+
+**Process:**
+1. Start at pattern 0 (X=$0000)
+2. Check pattern buffer entry ($0688,X)
+3. If $00: Found free slot, return
+4. Increment X by 2 (next entry)
+5. Loop until X==$0020 (16 entries)
+6. Compare final X with last used ($0624)
+7. Branch to appropriate handler
+
+**Performance:** ~120-250 cycles (depends on free slot position)
+
+---
+
+#### Sound_SwapPattern @ `$0D:$8387`
+**Location:** Bank $0D @ $8387
+
+**Purpose:** Initiate pattern swap operation - sends swap command to SPC700 and prepares for pattern replacement. Manages channel reassignments during memory reorganization.
+
+**Inputs:**
+- Pattern buffers identified for swapping
+- `$0624` = Last used channel
+- Y, X = Pattern slot indices
+
+**Outputs:**
+- APUIO1 = $07 (swap command sent to SPC700)
+- `$0610` = Handshake counter (initialized to $00)
+- Pattern search initiated
+
+**Process:**
+1. Send command $07 → APUIO1 (pattern swap)
+2. Clear handshake counter ($0610 = $00)
+3. Set Y = $0000 (channel search index)
+4. Search pattern buffer ($0688,Y) for occupied slots
+5. If empty: Found swap target
+6. If occupied at limit: Jump to cleanup
+7. Continue searching until swap candidates found
+
+**Performance:** ~150-300 cycles (search + command send)
+
+---
+
+#### Sound_PerformSwap @ `$0D:$83B1`
+**Location:** Bank $0D @ $83B1
+
+**Purpose:** Execute pattern swap by clearing old channel, updating pointers, and sending swap parameters to SPC700 via APUIO ports with handshake protocol.
+
+**Inputs:**
+- X = Old pattern slot to evict
+- Y = New pattern slot to assign
+- `$0610` = Current handshake value
+- `$0648-$0667` = RAM address buffers
+- `$0668-$0687` = Pattern size buffers
+
+**Outputs:**
+- Old channel/pattern cleared
+- New channel assigned
+- Swap parameters sent to SPC700 (old address, new address, size)
+- Handshake incremented 3 times
+
+**Process:**
+1. Clear old channel status ($0628,X = $00)
+2. Clear old pattern buffer ($0688,X = $00)
+3. Assign new channel ($0628,Y = new pattern)
+4. Send old RAM address → APUIO2/3, handshake → APUIO0
+5. Wait for SPC700 echo, increment handshake
+6. Send new RAM address → APUIO2/3, handshake → APUIO0
+7. Wait for echo, increment handshake
+8. Send pattern size → APUIO2/3, calculate end address
+9. Store size and end address in new slot
+10. Send handshake → APUIO0, wait for echo
+11. Increment handshake, continue to next swap
+
+**Performance:** ~600-900 cycles per swap (3 handshake rounds × ~200-300 cycles)
+
+---
+
+#### Sound_UploadSFX @ `$0D:$840E`
+**Location:** Bank $0D @ $840E
+
+**Purpose:** Upload sound effect data to SPC700 for playback. Finds free channel, sets destination address, and prepares for SFX data transfer.
+
+**Inputs:**
+- `$0628-$0647` = Channel status buffer
+- `$0648-$0667` = Channel RAM addresses
+- SFX data ready in buffer
+
+**Outputs:**
+- APUIO1 = $03 (SFX upload command)
+- APUIO2/3 = Destination address in SPC700 RAM
+- `$0624` = Assigned channel index
+- `$0610` = Handshake ($01)
+- Ready to transfer SFX data
+
+**Process:**
+1. Set multiplier: $03 → WRMPYA (for table lookup)
+2. Send command $03 → APUIO1 (SFX upload)
+3. Search for free channel (X=0, loop until $0628,X == $00)
+4. Store channel index → $0624
+5. Load RAM address ($0648,X) → APUIO2
+6. Load RAM address high ($0649,X) → APUIO3
+7. Send handshake $00 → APUIO0, wait for echo
+8. Increment handshake to $01
+9. Proceed to SFX transfer loop
+
+**Performance:** ~200-400 cycles (channel search + setup)
+
+---
+
+#### Sound_FindSFXChannel @ `$0D:$841B`
+**Location:** Bank $0D @ $841B
+
+**Purpose:** Locate next free audio channel for sound effect playback. Simple sequential search through channel status buffer.
+
+**Inputs:**
+- `$0628-$0647` = Channel status buffer
+
+**Outputs:**
+- X = Free channel index (0, 2, 4, ..., 30)
+- Channel ready for SFX assignment
+
+**Process:**
+1. Check channel status: LDA $0628,X
+2. If $00: Channel free, use it (BEQ)
+3. If occupied: INX, INX (next channel)
+4. Loop until free channel found
+
+**Performance:** ~30-100 cycles (depends on first free channel position)
+
+---
+
+#### Sound_TransferSFX @ `$0D:$843F`
+**Location:** Bank $0D @ $843F
+
+**Purpose:** Transfer sound effect data blocks from ROM to SPC700 RAM. Processes each SFX entry in buffer sequentially using table lookup.
+
+**Inputs:**
+- `$06C8-$06E7` = SFX buffer (16 entries × 2 bytes)
+- `$0624` = Current channel index
+- SFX data tables @ `$0DBDFF` (pointers)
+- Hardware multiply for table indexing
+
+**Outputs:**
+- SFX data uploaded to SPC700 RAM
+- Channel assigned and sized
+- Pattern buffers updated
+
+**Process:**
+1. Check SFX buffer entry ($06C8,X)
+2. If $00: All SFX processed, jump to $84DD (done)
+3. If valid: Assign to channel ($0628,Y)
+4. Convert SFX number to 0-based, multiply by 3 (table entry size)
+5. Use hardware multiply: (SFX# - 1) × 3 → table index
+6. Look up 24-bit pointer in table ($DBDFF + index)
+7. Call transfer helper ($85FA) to send data
+8. Read SFX size from first 2 bytes
+9. Store size → $0668,X
+10. Calculate end address: base + size → $064A,X
+11. Update channel index, continue with next SFX
+
+**Performance:** ~500-800 cycles per SFX (setup + table lookup, not including transfer)
+
+---
+
+#### Sound_SFXByteLoop @ `$0D:$849B`
+**Location:** Bank $0D @ $849B
+
+**Purpose:** Transfer SFX data bytes (3 per iteration) to SPC700 APUIO ports with handshake synchronization. Optimized for sound effect format.
+
+**Inputs:**
+- [$14] = 24-bit ROM pointer to SFX data
+- X = Byte count (data size)
+- Y = Current ROM offset
+- `$0610` = Handshake value
+- `$0616` = Bank byte (updated on page cross)
+
+**Outputs:**
+- All SFX data bytes transferred to SPC700
+- Handshake incremented (skip $00)
+- Pointer advanced through ROM data
+
+**Process:**
+1. Read byte 1 from ROM → APUIO1
+2. Increment Y, check for page boundary ($8000 wrap)
+3. If wrapped: Increment bank ($16), reset Y to $8000
+4. Read byte 2 from ROM → APUIO2
+5. Increment Y, check wrap
+6. Read byte 3 from ROM → APUIO3
+7. Increment Y, check wrap
+8. Send handshake ($0610) → APUIO0
+9. Wait for SPC700 echo (compare loop)
+10. Increment handshake, skip $00 if needed
+11. Decrement X by 3 (byte count)
+12. Loop if X > 0
+
+**Performance:** ~150-180 cycles per 3-byte block, ~50-60 cycles per byte
+
+---
+
+#### Sound_ManageChannelPatterns @ `$0D:$84DD`
+**Location:** Bank $0D @ $84DD
+
+**Purpose:** Final stage of audio processing - manages active patterns and channel assignments for ongoing playback. Updates pattern buffers after all uploads complete.
+
+**Inputs:**
+- `$06A8-$06C7` = Pattern buffer entries
+- All SFX/music data uploaded
+
+**Outputs:**
+- Pattern buffers updated for playback
+- Channels configured
+- System ready for audio processing
+
+**Process:**
+1. Check pattern buffer ($06A8)
+2. If $00: No patterns active, jump to exit ($85AD)
+3. If has patterns: Continue to pattern management
+4. Update channel assignments
+5. Prepare for next frame's audio processing
+
+**Performance:** ~50-100 cycles (buffer check + branch)
 
 ---
 
