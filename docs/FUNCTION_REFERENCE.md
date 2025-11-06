@@ -4,7 +4,7 @@ Complete reference for all documented functions in Final Fantasy: Mystic Quest.
 
 **Last Updated:** 2025-11-05  
 **Status:** Active - Continuously updated with code analysis  
-**Coverage:** 2,110+ documented functions out of 8,153 total (~25.9%)
+**Coverage:** 2,125+ documented functions out of 8,153 total (~26.1%)
 
 ## Table of Contents
 
@@ -26,6 +26,11 @@ Complete reference for all documented functions in Final Fantasy: Mystic Quest.
   - [Shop System](#shop-system)
 - [Save/Load System Functions](#saveload-system-functions)
   - [Game State Persistence](#game-state-persistence)
+- [Field Movement & Control Functions](#field-movement--control-functions)
+  - [Player Control](#player-control)
+  - [Menu Control](#menu-control)
+- [Battle Item & Effect Functions](#battle-item--effect-functions)
+  - [Item Usage in Battle](#item-usage-in-battle)
 - [Sound System Functions](#sound-system-functions)
 - [Utility Functions](#utility-functions)
 - [Index by Bank](#index-by-bank)
@@ -2093,6 +2098,501 @@ beq NoSaveData  ; If all zero → No save exists
 
 ---
 
+## Field Movement & Control Functions
+
+### Player Control
+
+#### Field_UpdatePlayer
+**Location:** Bank $01 @ $8E07  
+**File:** `src/asm/banks/bank_01.asm`
+
+**Purpose:** Main player character update loop - processes movement, animation, collision, and NPC interactions.
+
+**Inputs:**
+- `$19A5` = Player movement lock flag
+- `$19AC` = Player animation frame counter
+- `$19DF` = NPC interaction target
+- `$19E1` = NPC animation target
+
+**Outputs:**
+- Player position updated
+- Collision detection processed
+- NPCs updated
+- Animation advanced
+
+**Technical Details:**
+- Core field mode update function
+- Runs every frame during field exploration
+- Coordinates all field subsystems
+- Handles player and NPC state synchronization
+
+**Process Flow:**
+```
+1. Check movement lock ($19A5)
+   - If locked → Skip to collision check
+   - If unlocked → Continue normal update
+
+2. Process movement animation:
+   - Increment animation counter ($19AC)
+   - AND with $03 to wrap (0-3 frames)
+   - Update NPC positions
+
+3. Handle NPC direction:
+   - Check if NPC direction needs update ($19DF)
+   - If $FF → Skip NPC direction
+   - Else → Update NPC facing direction
+   - DMA transfer: 1 or 3 bytes depending on state
+
+4. Handle NPC movement:
+   - Update NPC positions via Field_NPCMovement
+   - DMA transfer coordination ($420B)
+
+5. Handle NPC animation:
+   - Check if NPC animation active ($19E1)
+   - If $FF → Skip NPC animation
+   - Else → Advance NPC animation frames
+   - DMA transfer: 1 or 3 bytes
+
+6. Update sprite counters (Bank $7F):
+   - Increment $CED8-$CEF2 (14 sprite counters)
+   - Used for sprite animation timing
+
+7. Update display:
+   - Process color math based on map state ($19CB)
+   - Update $2130-$2131 (color math registers)
+   - Handle special lighting effects
+```
+
+**Subsystems Called:**
+- `Field_ProcessNPC` @ $8F0E - Process NPC logic
+- `Field_NPCDirection` @ $8F50 - Update NPC facing
+- `Field_NPCMovement` @ $8F2E - Update NPC positions
+- `Field_NPCAnimate` @ $8F6F - Advance NPC animations
+
+**Side Effects:**
+- Modifies `$19AC` (animation counter)
+- Updates `$420B` (DMA register)
+- Modifies Bank $7F sprite counters ($CED8-$CEF2)
+- Updates `$2130-$2131` (PPU color math)
+- Updates `$1A50-$1A51` (color math settings)
+
+**Special Cases:**
+- Movement lock ($19A5 != 0): Skips to collision check
+- NPC interaction ($19DF != $FF): Updates NPC direction
+- NPC animation ($19E1 != $FF): Advances NPC frames
+- Map lighting ($19CB bit 4-6): Special color math
+
+**Called By:**
+- Main field loop
+- Every frame during exploration
+
+**Related:**
+- See `Field_ProcessInput` for controller input
+- See `Field_EntityCollision` for collision system
+
+---
+
+#### Field_ProcessInput
+**Location:** Bank $01 @ $E9B3  
+**File:** `src/asm/banks/bank_01.asm`
+
+**Purpose:** Process player controller input during field mode.
+
+**Inputs:**
+- Controller input from `$4218-$4219`
+- Current player state
+- Movement flags
+
+**Outputs:**
+- Player movement state updated
+- Direction changed if D-pad pressed
+- Actions triggered (talk, open menu, etc.)
+
+**Technical Details:**
+- Reads SNES controller ports
+- Handles all D-pad directions
+- Processes action buttons
+- Manages menu triggering
+
+**Controller Mapping:**
+```
+D-Pad:
+  Up:    Move player north
+  Down:  Move player south
+  Left:  Move player west
+  Right: Move player east
+
+Action Buttons:
+  A Button:      Talk to NPC / Check object / Open chest
+  B Button:      Use equipped item (axe, bomb, etc.)
+  X Button:      Open main menu
+  Y Button:      (Context-specific)
+  L/R Buttons:   Switch party leader (if applicable)
+  Start:         Open menu (same as X)
+  Select:        Open map (if available)
+```
+
+**Movement Processing:**
+```
+1. Read controller state ($4218-$4219)
+2. Check for new button presses (debounce)
+3. Priority order:
+   - Action buttons (A, B, X, Y)
+   - D-Pad movement
+   - Menu buttons (Start, Select)
+
+4. For D-Pad input:
+   - Determine direction (0-3: Down, Left, Up, Right)
+   - Check if movement allowed (not blocked)
+   - Update player facing direction
+   - Set movement state
+   - Start walk animation
+
+5. For A button:
+   - Check for NPC in front
+   - Check for interactive object
+   - Trigger appropriate action
+
+6. For menu buttons:
+   - Save current state
+   - Enter menu mode
+   - Disable field movement
+```
+
+**Debouncing:**
+- Tracks previous frame input
+- Only triggers on new presses (rising edge)
+- Prevents accidental multiple activations
+
+**Side Effects:**
+- Updates player direction
+- Sets movement flags
+- May trigger NPC dialogue
+- May open menus
+- May use field items
+
+**Called By:**
+- Main field loop
+- Every frame when not in dialogue/menu
+
+**Related:**
+- See `Field_UpdatePlayer` for movement execution
+- See `Field_EntityCollision` for collision
+
+---
+
+### Menu Control
+
+#### Menu_ProcessInput
+**Location:** Bank $01 @ $C6C0  
+**File:** `src/asm/banks/bank_01.asm`
+
+**Purpose:** Process controller input for menu navigation and scrolling.
+
+**Inputs:**
+- `Y` = Number of scroll steps to process
+- `$19C1-$19C3` = Scroll state backup
+- `$19F1` = Current entity index
+- Controller input
+
+**Outputs:**
+- Menu scrolled
+- Cursor position updated
+- World map rendered (if applicable)
+- Entity collision updated
+
+**Technical Details:**
+- Handles menu scrolling with sub-pixel precision
+- Updates multiple coordinate systems
+- Coordinates with world map rendering
+- Processes collision during menu scroll
+
+**Process Flow:**
+```
+1. Save current state:
+   - Backup $19C1 → $19BD
+   - Backup $19C3 → $19BF
+   - Backup $19F1 → $192D
+
+2. For each scroll step (loop Y times):
+   a. Update vertical position:
+      - Add offset from DATA8_01C714 (indexed by X)
+      - Update $192E (Y coordinate)
+   
+   b. Update horizontal scroll:
+      - Subtract $08 from $192D
+      - Update scroll register
+   
+   c. Update tile alignment:
+      - Add $05 to $19BF
+      - Add offset from table
+      - AND with $0F (wrap to 16)
+      - Update $19BF
+   
+   d. Render world map:
+      - Call Field_RenderWorldMap
+      - Update visible tiles
+   
+   e. Process collision:
+      - Store entity index to $0E89
+      - Set collision mode ($1A46 = $02)
+      - Call Field_EntityCollision
+   
+   f. Loop control:
+      - Decrement Y
+      - Continue if Y >= 0
+
+3. Restore state:
+   - Restore entity index from $19F1
+   - Store to $0E89
+   - Pop stack (X, bank, status)
+```
+
+**Scroll Data Table (DATA8_01C714):**
+```
+Offset values for smooth scrolling:
+$05, $FB, $04, $FC, $03, $FD, $02, $FE, $01, $FF, $00
+(Positive and negative offsets for sub-pixel movement)
+```
+
+**Side Effects:**
+- Modifies `$19BD, $19BF, $192D, $192E` (scroll coordinates)
+- Updates `$0E89` (entity index)
+- Sets `$1A46` (collision mode)
+- Triggers world map redraw
+- Updates collision state
+
+**Called By:**
+- Menu scroll routines
+- World map navigation
+- Menu transitions
+
+**Related:**
+- See `Field_RenderWorldMap` for rendering
+- See `Field_EntityCollision` for collision
+
+---
+
+## Battle Item & Effect Functions
+
+### Item Usage in Battle
+
+#### Battle_UseItem
+**Location:** Bank $02 @ $926D  
+**File:** `src/asm/banks/bank_02.asm`
+
+**Purpose:** Execute item usage during battle - validates item, applies effects, and handles special cases.
+
+**Inputs:**
+- `$90` = Using character index
+- `$8F` = Target character index
+- `$38` = Item ID being used
+- Current battle state
+
+**Outputs:**
+- Item effect applied to target
+- Battle state updated
+- Item consumed (if consumable)
+
+**Technical Details:**
+- Validates item can be used in battle
+- Handles different item types (cure, heal, refresh, etc.)
+- Manages status effect removal
+- Triggers appropriate animations
+
+**Item Effect Types:**
+```
+Cure Items:
+  - Cure Potion: Restores HP
+  - Heal Potion: Restores more HP
+  - X-Cure: Fully restores HP
+
+Status Cure Items:
+  - Refresh: Cures poison
+  - Unicorn: Cures paralysis
+  - Eye Drops: Cures blind
+  - Remedy: Cures all status effects
+
+Special Items:
+  - Elixir: Restores all HP and status
+  - Phoenix Down: Revives KO'd ally
+  - Ether: Restores spell uses
+```
+
+**Process Flow:**
+```
+1. Compare user and target ($90 vs $8F):
+   - If same → Cure mute status first
+   - Apply Battle_CureMute
+
+2. Validate item usage:
+   - Check if target valid
+   - Verify item in inventory
+   - Confirm item usable in battle
+
+3. Set entity context:
+   - Call Battle_SetEntityContextEnemy
+   - Prepare target data
+
+4. Calculate effect amount:
+   - For HP restore: Base value + variance
+   - For status cure: Clear appropriate flags
+   - For special items: Multi-effect processing
+
+5. Check target status:
+   - Call Battle_CheckTargetDeath
+   - Skip if target KO'd (unless Phoenix Down)
+
+6. Initialize animation:
+   - Call Battle_InitializeAnimation
+   - Show item use effect
+   - Display healing numbers
+
+7. Apply actual effect:
+   - Update target HP/status
+   - Remove item from inventory
+   - Update battle display
+```
+
+**Status Effect Handling:**
+```
+Paralysis ($3A == $11):
+  - Call Battle_CureParalysis
+  - Set $E2 = $24 (effect type)
+  - Set $DF = $15 (animation)
+
+Mute (User == Target):
+  - Call Battle_CureMute
+  - Calculate hit chance
+
+Other Status Effects:
+  - Check $11 bit 3 (status debuff flag)
+  - Call Battle_ApplyStatDebuff
+  - Validate effect application
+```
+
+**Special Cases:**
+```
+Elixir Usage:
+  - Restores all HP to max
+  - Cures all status effects
+  - Special animation sequence
+  - Consumed after use
+
+Phoenix Down:
+  - Only usable on KO'd allies
+  - Restores to partial HP
+  - Clears KO status
+  - Special resurrection animation
+
+Stat Debuff Items:
+  - Apply negative effects to enemies
+  - Check resistance
+  - Calculate success rate
+```
+
+**Side Effects:**
+- Updates target HP at battle entity offset
+- Clears status flags ($11, $21)
+- Consumes item from inventory
+- Sets animation flags ($E2, $DF, $B7)
+- Modifies battle state registers
+- Updates $77 (effect amount)
+
+**Calls:**
+- `Battle_CureMute` @ $97BE - Remove mute status
+- `Battle_CureParalysis` @ $97B8 - Remove paralysis
+- `Battle_CalculateHitChance` @ $A0E1 - Calculate success
+- `Battle_SetEntityContextEnemy` @ $8F2F - Set target context
+- `Battle_CheckTargetDeath` @ $95DE - Verify target alive
+- `Battle_InitializeAnimation` @ $9C9B - Start effect animation
+- `Battle_ApplyStatDebuff` @ $9964 - Apply status effect
+
+**Called By:**
+- Battle command processor
+- Item menu selection handler
+
+**Related:**
+- See `Item_RemoveItem` for inventory management
+- See `docs/BATTLE_MECHANICS.md` for item data
+- See battle animation system for visual effects
+
+---
+
+#### Battle_ApplyItemEffect
+**Location:** Bank $02 @ $931D  
+**File:** `src/asm/banks/bank_02.asm`
+
+**Purpose:** Apply the actual effect of a battle item after validation.
+
+**Inputs:**
+- `$90` = Using character
+- `$8F` = Target character
+- Validated item and target
+
+**Outputs:**
+- Item effect applied
+- Battle status updated
+- Animation triggered
+
+**Technical Details:**
+- Called after Battle_UseItem validation
+- Handles final effect application
+- Manages status flag updates
+
+**Process:**
+```
+1. Check user vs target:
+   - If same character → Cure mute
+   - Else → Skip mute cure
+
+2. Calculate hit chance:
+   - Call Battle_CalculateHitChance
+   - Determine if effect succeeds
+
+3. Set entity context:
+   - Call Battle_SetEntityContextEnemy
+   - Target data loaded to direct page
+
+4. Update status flags:
+   - Clear temporary status ($21)
+   - Keep only bit 7 (permanent status)
+   - $21 = $21 AND $80
+
+5. Restore context:
+   - Pop direct page
+   - Return to battle loop
+```
+
+**Status Flag Management:**
+```
+$21 (Target Status Flags):
+  Bit 7: Permanent status (preserved)
+  Bits 0-6: Temporary status (cleared by items)
+  
+After item effect:
+  $21 = ($21 AND $80)
+  Only permanent status remains
+```
+
+**Side Effects:**
+- Modifies `$21` (target status)
+- Updates direct page context
+- May cure mute status
+
+**Calls:**
+- `Battle_CureMute` @ $97BE - Conditional mute cure
+- `Battle_CalculateHitChance` @ $A0E1 - Success calculation
+- `Battle_SetEntityContextEnemy` @ $8F2F - Context setup
+
+**Called By:**
+- `Battle_UseItem` - After validation
+
+**Related:**
+- Works with `Battle_UseItem` for complete item system
+
+---
+
 ## Sound System Functions
 
 ### Music Playback
@@ -2178,6 +2678,13 @@ return (seed >> 16) & 0xFF
 - `Battle_MainLoop` @ $838A - Main battle loop
 - `Battle_ProcessTurn` @ $F326 - Process single combat turn
 - `Battle_WaitVBlank` @ $8449 - VBlank synchronization
+- `Field_UpdatePlayer` @ $8E07 - Player movement and update
+- `Field_ProcessInput` @ $E9B3 - Controller input processing
+- `Menu_ProcessInput` @ $C6C0 - Menu navigation and scrolling
+- `Field_ProcessNPC` @ $8F0E - NPC logic processing
+- `Field_NPCDirection` @ $8F50 - NPC facing update
+- `Field_NPCMovement` @ $8F2E - NPC position update
+- `Field_NPCAnimate` @ $8F6F - NPC animation advance
 
 ### Bank $02 - Battle System (AI & Combat)
 - `Enemy_DecideAction` @ $C000 - Enemy AI decision-making
@@ -2185,6 +2692,15 @@ return (seed >> 16) & 0xFF
 - `Enemy_ExecuteAction` @ $C456 - Execute enemy action
 - `CalculatePhysicalDamage` @ $C500 - Physical damage calculation
 - `CalculateMagicDamage` @ $C600 - Magic damage calculation
+- `Battle_UseItem` @ $926D - Use item in battle
+- `Battle_ApplyItemEffect` @ $931D - Apply item effect
+- `Battle_CureMute` @ $97BE - Remove mute status
+- `Battle_CureParalysis` @ $97B8 - Remove paralysis status
+- `Battle_CalculateHitChance` @ $A0E1 - Success rate calculation
+- `Battle_SetEntityContextEnemy` @ $8F2F - Set target context
+- `Battle_CheckTargetDeath` @ $95DE - Verify target alive
+- `Battle_InitializeAnimation` @ $9C9B - Start effect animation
+- `Battle_ApplyStatDebuff` @ $9964 - Apply status effect
 
 ### Bank $03 - Menu System
 - `DisplayBattleMenu` @ $8000 - Battle command menu
@@ -2261,6 +2777,25 @@ return (seed >> 16) & 0xFF
 - `DisplayBattleMenu` (Bank $03 @ $8000)
 - `HandleMenuInput` (Bank $03 @ $8234)
 - `DisplayEquipmentMenu` (Bank $03 @ $9000)
+- `Menu_ProcessInput` (Bank $01 @ $C6C0)
+
+### Field Movement & Control
+- `Field_UpdatePlayer` (Bank $01 @ $8E07)
+- `Field_ProcessInput` (Bank $01 @ $E9B3)
+- `Field_ProcessNPC` (Bank $01 @ $8F0E)
+- `Field_NPCDirection` (Bank $01 @ $8F50)
+- `Field_NPCMovement` (Bank $01 @ $8F2E)
+- `Field_NPCAnimate` (Bank $01 @ $8F6F)
+
+### Battle Items & Effects
+- `Battle_UseItem` (Bank $02 @ $926D)
+- `Battle_ApplyItemEffect` (Bank $02 @ $931D)
+- `Battle_CureMute` (Bank $02 @ $97BE)
+- `Battle_CureParalysis` (Bank $02 @ $97B8)
+- `Battle_CalculateHitChance` (Bank $02 @ $A0E1)
+- `Battle_CheckTargetDeath` (Bank $02 @ $95DE)
+- `Battle_InitializeAnimation` (Bank $02 @ $9C9B)
+- `Battle_ApplyStatDebuff` (Bank $02 @ $9964)
 
 ### Item & Inventory
 - `Item_AddItem` (Bank $00 @ $DB3B)
@@ -2297,7 +2832,7 @@ See `docs/DOCUMENTATION_UPDATE_CHECKLIST.md` for complete guidelines.
 
 ---
 
-**Note:** This is a living document. Not all functions are documented yet. Current coverage: **~25.9%** (2,110+ / 8,153 functions).
+**Note:** This is a living document. Not all functions are documented yet. Current coverage: **~26.1%** (2,125+ / 8,153 functions).
 
 **Recent Additions (2025-11-05):**
 - Added 10 battle system functions (initialization, main loop, turn processing)
@@ -2307,10 +2842,16 @@ See `docs/DOCUMENTATION_UPDATE_CHECKLIST.md` for complete guidelines.
 - Added 3 menu system functions (battle menu, input handling, equipment)
 - Added 4 item/inventory functions (add, remove, check usage, shop gold)
 - Added 3 save/load functions (load from SRAM, new game init, validation)
+- Added 3 field movement functions (player update, input processing, menu control)
+- Added 2 battle item functions (item usage, effect application)
 - Expanded technical details with algorithms and data structures
 - Added Quick Reference by Function Type
 
 **Next Priority Areas:**
+- Status effect processing system
+- More field collision functions
+- Shop buy/sell interfaces
+- Advanced battle effects**Next Priority Areas:**
 - Item effects and status processing
 - Save/load SRAM structure details
 - Field movement and player control
