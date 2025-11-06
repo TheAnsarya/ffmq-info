@@ -2722,6 +2722,313 @@ Next
 
 ---
 
+### System Coordination Functions
+
+#### System_TimingCoordUpdate
+**Location:** Bank $02 @ $E6B4  
+**File:** `src/asm/bank_02_documented.asm`
+
+**Purpose:** Update system timing counters and call external coordination handler.
+
+**Inputs:**
+- `$020AB0` (word) = System timer high
+- `$020AAE` (word) = System timer low
+- DATA8_02E5A0 (word) = Timing constant
+
+**Outputs:**
+- System timers updated
+- External coordination called
+
+**Process:**
+1. REP #$20 (16-bit mode)
+2. Load $020AB0, add $020AAE → $020AAE
+3. Load $020AB0, add DATA8_02E5A0 → $020AB0
+4. JSL CODE_0C8000 (external coordination)
+5. SEP #$20 (8-bit mode)
+6. Clear $020110 bit 7 (system flag)
+7. Branch to processing loop
+
+**Performance:** ~120 cycles + external call time
+
+**Called By:** Real-time processing loop, system coordinator
+
+---
+
+#### Memory_MultiThreadInit
+**Location:** Bank $02 @ $E6ED  
+**File:** `src/asm/bank_02_documented.asm`
+
+**Purpose:** Initialize multi-threaded memory management engine with large block operations.
+
+**Inputs:** None
+
+**Outputs:**
+- Direct page set to $0A00
+- Thread variables cleared
+- 8KB memory block at $7E:7800 zeroed
+
+**Technical Details:**
+- Uses MVN (block move) for fast memory clear
+- Initializes thread counters and state flags
+- Sets up PPU configuration for memory operations
+- Waits for thread synchronization
+
+**Process:**
+1. Save P, D registers
+2. Set direct page to $0A00
+3. Clear thread variables ($0AC8-$0AE8)
+4. Set $022101 = $43 (VRAM config), $020AB7 = $FF
+5. Block move: $0AB7→$0AB8, size $000D
+6. Clear $7E:7800 with MVN: $7800→$7801, size $1FFF (8KB)
+7. Set thread counter $0AE4 = 3
+8. Wait loop: Check $0AE4 until 0
+9. Restore D, P registers
+
+**Performance:** ~3,500 cycles (8KB clear via MVN is ~16,000 cycles = ~4.5ms)
+
+**Use Cases:** System initialization, battle start, memory reset
+
+---
+
+#### System_StateReset
+**Location:** Bank $02 @ $E8B5  
+**File:** `src/asm/bank_02_documented.asm`
+
+**Purpose:** Reset all system thread configurations to $FF.
+
+**Inputs:** None
+
+**Outputs:** Thread configurations $020AB2-$020AB6 cleared
+
+**Process:**
+1. LDA #$FF
+2. STA $020AB2 (thread config 0)
+3. STA $020AB3 (thread config 1)
+4. STA $020AB4 (thread config 2)
+5. STA $020AB5 (thread config 3)
+6. STA $020AB6 (thread config 4)
+7. Restore P, D, B, Y, X, A
+8. RTL
+
+**Performance:** ~85 cycles
+
+**Called By:** System shutdown, state synchronization handler
+
+---
+
+#### Entity_ConfigCrossBank
+**Location:** Bank $02 @ $E8CD  
+**File:** `src/asm/bank_02_documented.asm`
+
+**Purpose:** Configure entity with cross-bank data loading from ROM Bank $06.
+
+**Inputs:**
+- `A` (byte) = Entity ID (0-255)
+- `Y` (word) = Configuration index
+- `X` (word) = Entity buffer offset
+
+**Outputs:**
+- Entity configuration loaded to $7E:C3C0+X
+- Extended config to $020AB7+Y
+
+**Technical Details:**
+- Loads base config from UNREACH_06FBC1 (Bank $06 ROM)
+- Loads extended config from UNREACH_06FBC3
+- Stores to entity buffers in WRAM $7E bank
+- Initializes entity state and timing
+
+**Process:**
+1. Save P, A, X, Y
+2. REP #$30 (16-bit mode)
+3. Mask entity ID to 8-bit, multiply by 4 (entity size)
+4. TAX (entity table offset)
+5. Multiply config index Y by 2
+6. Load UNREACH_06FBC1,X → save to stack
+7. Load UNREACH_06FBC3,X → $020AB7,Y
+8. Load entity index from stack → X
+9. Restore base config → $7EC3C0,X
+10. XBA, store extended → $7EC3E0,X
+11. Clear $7EC400,X and $7EC420,X (state/timing)
+12. Restore Y, X, A, P
+
+**Performance:** ~180 cycles + ROM access time
+
+**Use Cases:** Enemy loading, character initialization, entity spawning
+
+---
+
+#### Validation_CrossReference
+**Location:** Bank $02 @ $E905  
+**File:** `src/asm/bank_02_documented.asm`
+
+**Purpose:** Validate configuration by checking cross-references with other entities.
+
+**Inputs:**
+- `A` (byte) = Validation target ID
+- `X` (byte) = Current entity index
+
+**Outputs:**
+- `A` (byte) = Validation result count (0 = no matches)
+
+**Technical Details:**
+- Loops through 5 thread configurations
+- Compares each against validation target
+- Skips self-comparison
+- Calls CODE_02E930 for each match found
+
+**Process:**
+1. SEP #$20, SEP #$10 (8-bit mode)
+2. Save A (duplicate), X, Y
+3. LDX #$04 (loop counter)
+4. Clear validation result on stack
+5. Loop (CODE_02E913):
+   - Compare loop index with current entity
+   - If same: skip
+   - Load $0AB2,X (reference config)
+   - If $FF: skip (invalid)
+   - Compare with validation target
+   - If match: Call CODE_02E930, increment result
+   - DEX, continue until X < 0
+6. Restore Y, X, A, result
+7. RTS (A = validation count)
+
+**Performance:** ~250 cycles (if no matches), +180 cycles per match
+
+**Use Cases:** Entity conflict detection, resource validation, state checking
+
+---
+
+#### CrossRef_ProcessMatch
+**Location:** Bank $02 @ $E930  
+**File:** `src/asm/bank_02_documented.asm`
+
+**Purpose:** Process cross-reference match by transferring state between entities.
+
+**Inputs:**
+- `A` (byte) = Source entity index
+- `X` (byte) = Source entity index (duplicate)
+- Stack contains target entity index
+
+**Outputs:**
+- Target entity receives source entity's priority, memory, and state
+
+**Technical Details:**
+- Transfers 3 values: priority ($7EC300), memory ($7EC2C0), state ($7EC320)
+- Clears synchronization flag ($7EC2E0)
+- Preserves all registers
+
+**Process:**
+1. Save P, A, X, Y
+2. SEP #$20, SEP #$10
+3. Transfer source index to Y
+4. Load source entity ID from $0AC1,Y → X
+5. Load and save: $7EC320,X (state), $7EC2C0,X (memory), $7EC300,X (priority)
+6. Load target index from stack → Y
+7. Load target entity ID from $0AC1,Y → X
+8. Restore and transfer: priority→$7EC300,X, memory→$7EC2C0,X, state→$7EC320,X
+9. Clear $7EC2E0,X (sync flag)
+10. Restore Y, X, A, P
+
+**Performance:** ~220 cycles
+
+---
+
+#### Thread_AllocatePriority
+**Location:** Bank $02 @ $E969  
+**File:** `src/asm/bank_02_documented.asm`
+
+**Purpose:** Allocate thread priority using bit-mask allocation system.
+
+**Inputs:**
+- `$0AC9` (byte) = Priority allocation bitmap
+
+**Outputs:**
+- `A` (byte) = Allocated priority value (0-7, or $FF if none available)
+- `$0AC9` updated with allocated bit set
+
+**Technical Details:**
+- Tests bits 0-7 in order (priority 7→0)
+- Uses TSB (test and set bit) for atomic allocation
+- Returns priority from lookup table DATA8_02E98A
+- Priority order: 7, 6, 5, 4, 3, 0, 1, 2
+
+**Process:**
+1. Save X, Y, P
+2. SEP #$20, SEP #$10
+3. LDX #$00 (index)
+4. LDY #$08 (bit counter)
+5. LDA #$01 (test bit)
+6. TSB $0AC9 (test and set)
+7. If zero: found free bit → jump to assignment
+8. Else: ASL A (next bit), INX, DEY, loop
+9. If all bits taken: LDA #$FF
+10. Assignment: Load DATA8_02E98A,X
+11. Restore P, Y, X
+
+**Performance:** ~85 cycles (if first priority free), +15 cycles per busy slot
+
+**Priority Table:** [7, 6, 5, 4, 3, 0, 1, 2]
+
+---
+
+#### Graphics_MemoryCoord
+**Location:** Bank $02 @ $E992  
+**File:** `src/asm/bank_02_documented.asm`
+
+**Purpose:** Coordinate graphics processing with memory management.
+
+**Inputs:**
+- `A` (byte) = Graphics ID
+
+**Outputs:** Graphics processing coordinated
+
+**Technical Details:**
+- Saves processor state twice (PHP duplicate)
+- Switches to 16-bit mode
+- Masks graphics ID to 8-bit
+
+**Process:**
+1. Save P, A, X, Y
+2. Save P again (duplicate)
+3. REP #$20, REP #$10 (16-bit)
+4. AND #$00FF (mask ID)
+5. Continue graphics processing...
+
+**Performance:** ~45 cycles (entry only)
+
+**Called By:** Graphics loader, sprite coordinator
+
+---
+
+#### Validation_Loop_CrossRefCheck
+**Location:** Bank $02 @ $E913  
+**File:** `src/asm/bank_02_documented.asm`
+
+**Purpose:** Inner loop for cross-reference validation (part of Validation_CrossReference).
+
+**Inputs:**
+- `X` (byte) = Loop counter (4→0)
+- Stack contains validation target
+
+**Outputs:** Cross-reference match processed if found
+
+**Process:**
+1. Transfer X to A
+2. Compare with stack[1] (current entity)
+3. If equal: skip to CODE_02E92B (self-check)
+4. Load $0AB2,X (reference config)
+5. Compare with $FF (invalid check)
+6. If $FF: jump to CODE_02E922 (next iteration)
+7. Compare with stack[3] (validation target)
+8. If equal: jump to CODE_02E925 (process match)
+9. CODE_02E922: DEX, branch to CODE_02E913 (continue loop)
+
+**Performance:** ~35 cycles per iteration
+
+**Called By:** Validation_CrossReference
+
+---
+
 ## Text System Functions
 
 ### Tileset Management
