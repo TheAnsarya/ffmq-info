@@ -4,7 +4,7 @@ Complete reference for all documented functions in Final Fantasy: Mystic Quest.
 
 **Last Updated:** 2025-11-05  
 **Status:** Active - Continuously updated with code analysis  
-**Coverage:** 2,167+ documented functions out of 8,153 total (~26.6%)
+**Coverage:** 2,170+ documented functions out of 8,153 total (~26.6%)
 
 ## Table of Contents
 
@@ -923,6 +923,48 @@ Bit 3: Sprite 1 size flag
 
 **Related:**
 - See `docs/GRAPHICS_SYSTEM.md` for OAM details
+
+---
+
+### Palette Loading
+
+#### Palette_Load8Colors
+**Location:** Bank $00 @ ~$A14B  
+**File:** `src/asm/bank_00_documented.asm`
+
+**Purpose:** Fast 8-color palette load to CGRAM using unrolled loop.
+
+**Inputs:**
+- `A` (8-bit) = CGRAM starting address (0-255)
+- `X` (16-bit) = Source offset in DATA8_078000
+- Data Bank = $07, Direct Page = $2100
+
+**Outputs:**
+- 8 colors (16 bytes) loaded into CGRAM
+
+**Technical Details:**
+- Unrolled 16-byte write (~144 cycles)
+- RGB555 format (2 bytes per color)
+- Auto-increment CGRAM address
+- Used for text palettes, UI elements
+
+**Process:**
+```asm
+STA $2121          ; Set CGRAM address
+LDA DATA8_078000,X ; Color byte 0
+STA $2122          ; Write to CGRAM
+... (repeat for 16 bytes total)
+RTS
+```
+
+**Use Cases:**
+- Text rendering (dialogue colors)
+- UI elements (cursor, menus)
+- Small sprite palettes (≤8 colors)
+
+**Performance:** ~18 cycles per color, ~3% of VBLANK budget
+
+**Called By:** Graphics_InitFieldMenu (4× for menu setup)
 
 ---
 
@@ -6371,6 +6413,7 @@ Multiple operations:
 - `Memory_Copy32Bytes` @ $A24A - Fast 32-byte block copy
 - `Memory_CopyToRAM` @ $A89B - MVN copy Bank $00 → $7E
 - `Memory_CopyFromRAM` @ $A8AB - MVN copy Bank $7E → $00
+- `Palette_Load8Colors` @ $A14B - Fast 8-color palette load
 
 ### Bank $01 - Battle System Core
 - `Battle_Initialize` @ $8078 - Battle initialization
