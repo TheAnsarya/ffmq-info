@@ -1938,6 +1938,289 @@ Clear HDMA parameters:
 
 ---
 
+#### Battle_Initialize
+**Location:** Bank $01 @ $8272  
+**File:** `src/asm/bank_01_documented.asm`
+
+**Purpose:** Initialize battle system and start main battle loop.
+
+**Inputs:**
+- `$010E91` (byte) = Battle music ID
+- `$010E89` (word) = Battle background ID
+- `$000E88` (byte) = Battle type flag
+
+**Outputs:** Battle system fully initialized and running
+
+**Technical Details:**
+- Sets CPU mode (8-bit A, 16-bit index)
+- Initializes stack pointer to $FFFF
+- Clears battle state flags
+- Loads music/graphics
+- Enters battle main loop
+
+**Process:**
+1. Set CPU modes (SEP #$20, REP #$10)
+2. Initialize registers: X=$FFFF (stack), $011A48=$8000
+3. Clear battle timer ($01192A=0)
+4. Call CODE_018C5B (graphics init)
+5. Load music ID from $010E91 → $0119F0
+6. Load background ID from $010E89 → $0119F1
+7. Set battle active flag ($010110=$80)
+8. Call CODE_01914D (battle setup)
+9. Check battle type ($000E88), if $15 call CODE_009A60
+10. Enter battle main loop at CODE_0182A9
+
+**Performance:** ~2,500 cycles initialization + ongoing loop
+
+**Called By:** Battle trigger from field, enemy encounter handler
+
+---
+
+#### Battle_MainLoop
+**Location:** Bank $01 @ $82A9  
+**File:** `src/asm/bank_01_documented.asm`
+
+**Purpose:** Main battle processing loop - runs every frame during battle.
+
+**Inputs:**
+- `$0119F7` (byte) = Frame counter
+- `$0119B0` (byte) = Special battle flag
+
+**Outputs:** Battle state updated each frame
+
+**Technical Details:**
+- Infinite loop until battle ends
+- Processes 60 times per second (NTSC)
+- Calls battle AI, animations, input handling
+- Waits for VBlank synchronization
+
+**Process:**
+1. INC $0119F7 (increment frame counter)
+2. STZ $0119F8 (clear frame done flag)
+3. JSR CODE_01E9B3 (process battle logic)
+4. JSR CODE_0182F2 (dispatch handler)
+5. Check $0119B0, if set call CODE_01B24C
+6. Check $0119F8 (frame done), if not set loop to step 1
+7. JSR CODE_01AB5D (sync handler)
+8. JSR CODE_01A081 (VBlank wait)
+9. Jump back to step 1
+
+**Performance:** ~16.67ms per iteration (one frame)
+
+**Use Cases:** Active during all battle sequences
+
+---
+
+#### Battle_ConditionalProcess
+**Location:** Bank $01 @ $82BE  
+**File:** `src/asm/bank_01_documented.asm`
+
+**Purpose:** Process battle only if frame is not complete.
+
+**Inputs:**
+- `$0119F8` (byte) = Frame completion flag
+
+**Outputs:** Continues to main loop or exits
+
+**Technical Details:**
+- Checks if current frame processing is done
+- If $0119F8 ≠ 0, frame complete → skip to next frame
+- If $0119F8 = 0, continue processing
+
+**Process:**
+1. LDA $0119F8
+2. BNE CODE_0182A9 (if ≠0, jump to main loop)
+3. Continue to sync/VBlank wait
+
+**Performance:** ~15 cycles (branch taken), ~25 cycles (fall-through)
+
+---
+
+#### Battle_WaitLoop
+**Location:** Bank $01 @ $82C9  
+**File:** `src/asm/bank_01_documented.asm`
+
+**Purpose:** Busy-wait until frame counter is cleared (VBlank sync).
+
+**Inputs:**
+- `$0119F7` (byte) = Frame counter
+
+**Outputs:** Waits until $0119F7 = 0
+
+**Technical Details:**
+- Infinite loop checking frame counter
+- Cleared by VBlank handler
+- Ensures frame timing synchronization
+
+**Process:**
+```
+Loop:
+  LDA $0119F7
+  BNE Loop  ; Wait until 0
+  BRA CODE_0182A9  ; Continue to main loop
+```
+
+**Performance:** Variable (depends on VBlank timing, ~0-16ms)
+
+**Use Cases:** Frame synchronization, prevent battle from running faster than 60 FPS
+
+---
+
+#### Battle_SaveState
+**Location:** Bank $01 @ $82D0  
+**File:** `src/asm/bank_01_documented.asm`
+
+**Purpose:** Save processor state (P, X, Y registers) before interrupt handling.
+
+**Inputs:** Current CPU state
+
+**Outputs:** State saved on stack
+
+**Technical Details:**
+- Pushes P (processor status), X, Y to stack
+- Sets 8-bit A, 16-bit index modes
+- Prepares for interrupt service routine
+
+**Process:**
+1. PHP (push processor status)
+2. PHX (push X register)
+3. PHY (push Y register)
+4. SEP #$20 (8-bit A)
+5. REP #$10 (16-bit index)
+6. BRA CODE_0182E3 (jump to handler)
+
+**Performance:** ~30 cycles
+
+**Called By:** NMI/IRQ handlers, battle interrupt routines
+
+---
+
+#### Battle_SaveStateExtended
+**Location:** Bank $01 @ $82D9  
+**File:** `src/asm/bank_01_documented.asm`
+
+**Purpose:** Extended state save with additional processing call.
+
+**Inputs:** Current CPU state
+
+**Outputs:** State saved + CODE_01AB5D executed
+
+**Technical Details:**
+- Same as Battle_SaveState but calls CODE_01AB5D first
+- Additional sync/processing before handler
+
+**Process:**
+1. PHP, PHX, PHY (save state)
+2. SEP #$20, REP #$10 (set modes)
+3. JSR CODE_01AB5D (sync handler)
+4. Continue to CODE_0182E3
+
+**Performance:** ~180 cycles (including CODE_01AB5D)
+
+---
+
+#### Battle_VBlankWaitAndRestore
+**Location:** Bank $01 @ $82E6  
+**File:** `src/asm/bank_01_documented.asm`
+
+**Purpose:** Wait for VBlank and restore processor state.
+
+**Inputs:**
+- `$0119F7` (byte) = Frame counter
+- Saved state on stack
+
+**Outputs:** CPU state restored
+
+**Technical Details:**
+- Waits for frame counter = 0
+- Increments frame counter
+- Restores P, X, Y from stack
+
+**Process:**
+1. Wait loop: LDA $0119F7, BNE (loop until 0)
+2. INC $0119F7 (increment for next frame)
+3. PLY (restore Y)
+4. PLX (restore X)
+5. PLP (restore processor status)
+6. RTS (return)
+
+**Performance:** Variable wait + ~20 cycles restore
+
+---
+
+#### Battle_JumpTableDispatch
+**Location:** Bank $01 @ $82F2  
+**File:** `src/asm/bank_01_documented.asm`
+
+**Purpose:** Dispatch to function via jump table based on accumulator value.
+
+**Inputs:**
+- `A` (byte) = Jump table index (0-N)
+
+**Outputs:** Jumps to indexed function
+
+**Technical Details:**
+- Converts byte index to word offset (×2)
+- Indirect jump through DATA8_0182FE table
+- Common pattern for state machine dispatch
+
+**Process:**
+1. REP #$20 (16-bit A)
+2. AND #$00FF (mask to byte)
+3. ASL A (multiply by 2 for word table)
+4. TAX (index in X)
+5. SEP #$20 (8-bit A)
+6. JMP (DATA8_0182FE,X) (indirect jump)
+
+**Performance:** ~35 cycles + target function time
+
+**Use Cases:** Battle state machine, menu handler dispatch, AI routine selection
+
+---
+
+#### BattleSprite_CalculatePositionWithClipping
+**Location:** Bank $01 @ $A0E5  
+**File:** `src/asm/bank_01_documented.asm`
+
+**Purpose:** Calculate sprite screen position with boundary clipping for battle characters.
+
+**Inputs:**
+- `$00-$01` (word) = Camera X offset
+- `$02-$03` (word) = Camera Y offset
+- `$23,X` (word) = Sprite X position
+- `$25,X` (word) = Sprite Y position
+- `$1E,X` (byte) = Sprite flags (bit 3 = off-screen)
+- `$0119B4` (byte) = Screen flip flags
+
+**Outputs:**
+- `$0A` (word) = Final screen X coordinate
+- `$0C` (word) = Final screen Y coordinate
+- Sprite hidden if off-screen
+
+**Technical Details:**
+- Subtracts camera offset from sprite position
+- Masks to 10-bit coordinates ($03FF)
+- Checks visibility flags (bit 3)
+- Handles signed offsets for sprite origin
+- Clips to screen boundaries ($00-$F8 X, $00-$E8 Y)
+
+**Process:**
+1. Calculate X: ($23,X - $00) & $03FF → $23,X
+2. Calculate Y: ($25,X - $02) & $03FF → $25,X
+3. Check sprite flags: $1E,X XOR $0119B4
+4. If bit 3 set: Jump to BattleSprite_HideOffScreen
+5. Add sprite origin offset to X coordinate → $0A
+6. Add sprite origin offset to Y coordinate → $0C
+7. Check Y boundary: if $0C >= $E8 and < $3F8, continue
+8. Check X boundary: if $0A in valid range, setup OAM
+9. Handle edge cases (left/right clipping)
+
+**Performance:** ~150-250 cycles (depends on clipping)
+
+**Use Cases:** Battle sprite rendering, character positioning, camera scrolling
+
+---
+
 ## Text System Functions
 
 ### Tileset Management
