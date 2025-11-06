@@ -4,7 +4,7 @@ Complete reference for all documented functions in Final Fantasy: Mystic Quest.
 
 **Last Updated:** 2025-11-05  
 **Status:** Active - Continuously updated with code analysis  
-**Coverage:** 2,157+ documented functions out of 8,153 total (~26.5%)
+**Coverage:** 2,159+ documented functions out of 8,153 total (~26.5%)
 
 ## Table of Contents
 
@@ -4416,10 +4416,365 @@ return (seed >> 16) & 0xFF
 
 ---
 
+#### RNG_GenerateRandom
+**Location:** Bank $00 @ $9783  
+**File:** `src/asm/banks/bank_00.asm`
+
+**Purpose:** Generate pseudo-random number with optional modulo operation for bounded ranges.
+
+**Inputs:**
+- `$A8` (Direct Page $4A) = Modulo divisor (0 = no modulo, returns full 8-bit)
+- `$701FFE` = RNG seed (3 bytes in WRAM)
+- `$0E96` = Frame counter (entropy source)
+
+**Outputs:**
+- `A` (Direct Page $4B at $A9) = Random number (0 to modulo-1, or 0-255 if no modulo)
+- `$701FFE` = Updated RNG seed
+
+**Technical Details:**
+- Uses Linear Congruential Generator (LCG) algorithm
+- Formula: `seed = (seed × 5 + seed × 1 + $3711 + frame_counter)`
+- Utilizes hardware division for modulo operation ($4204-$4216)
+- Preserves processor state (PHP/PLP, PHD/PLD)
+
+**Process Flow:**
+```asm
+1. Save state:
+   PHP                       ; Save processor status
+   PHD                       ; Save direct page
+   REP #$30                  ; 16-bit mode
+   PHA                       ; Save A
+
+2. Set direct page:
+   LDA #$005E
+   TCD                       ; Set DP to $005E
+
+3. Load and update seed:
+   LDA $701FFE               ; Load 16-bit seed from WRAM
+   ASL A                     ; seed × 2
+   ASL A                     ; seed × 4
+   ADC $701FFE               ; seed × 4 + seed = seed × 5
+   ADC #$3711                ; Add constant
+   ADC $0E96                 ; Add frame counter (entropy)
+   STA $701FFE               ; Store new seed
+
+4. Extract random byte:
+   SEP #$20                  ; 8-bit A
+   XBA                       ; Swap bytes (get high byte)
+   STA $4B                   ; Store to result ($00A9)
+   STA SNES_WRDIVL ($4204)   ; Setup for division
+   STZ SNES_WRDIVH ($4205)   ; High byte = 0
+
+5. Apply modulo (if requested):
+   LDA $4A                   ; Load modulo value
+   BEQ ModuloFinish          ; If 0, skip modulo
+   JSL Math_SetDivisor       ; Set $4206 divisor
+   LDA SNES_RDMPYL ($4216)   ; Read remainder
+   STA $4B                   ; Store modulo result
+
+6. Restore and return:
+ModuloFinish:
+   REP #$30                  ; 16-bit mode
+   PLA                       ; Restore A
+   PLD                       ; Restore DP
+   PLP                       ; Restore status
+   RTL
+```
+
+**RNG Algorithm Details:**
+```
+Seed Update Formula:
+  new_seed = (old_seed × 5) + $3711 + frame_counter
+  
+Multiplication breakdown:
+  seed × 5 = (seed << 2) + seed
+  
+Components:
+  ASL A (×2)
+  ASL A (×4)
+  ADC original (×4 + ×1 = ×5)
+  
+Entropy sources:
+  $3711: Magic constant for period
+  $0E96: Frame counter (changes every frame)
+  
+Period: ~65,536 before repeat (16-bit seed)
+```
+
+**Modulo Operation:**
+```
+Hardware division registers (SNES math unit):
+  $4204-4205 (WRDIVL/H): 16-bit dividend
+  $4206 (WRDIVB): 8-bit divisor
+  $4214-4215 (RDDIVL/H): 16-bit quotient
+  $4216-4217 (RDMPYL/H): 16-bit remainder
+
+For modulo N:
+  Input: random_byte (0-255)
+  Divisor: N
+  Result: remainder (0 to N-1)
+  
+Example for dice roll (1-6):
+  Set $4A = 6
+  Result = (random_byte % 6) → 0-5
+  Add 1 in caller → 1-6
+```
+
+**Direct Page Usage:**
+```
+Set DP to $005E for access to:
+  $A8 ($4A): Modulo input
+  $A9 ($4B): Random output
+  
+DP offset calculation:
+  Actual address = DP + offset
+  $005E + $4A = $00A8
+  $005E + $4B = $00A9
+```
+
+**Seed Storage ($701FFE):**
+```
+Location: WRAM Bank $70, offset $1FFE
+Size: 3 bytes (24-bit for better period)
+Access: Long addressing (LDA.L)
+Initialized: At game boot with timer value
+Persistent: Across battles/menus
+```
+
+**Use Cases:**
+```
+Battle variance:
+  RNG_GenerateRandom with modulo = damage_range
+  Apply to base damage
+
+Item drops:
+  RNG_GenerateRandom with modulo = 100
+  Compare to drop_rate percentage
+
+Enemy AI:
+  RNG_GenerateRandom with modulo = action_count
+  Select AI action
+
+Treasure chests:
+  RNG_GenerateRandom with modulo = item_pool_size
+  Select reward item
+```
+
+**Side Effects:**
+- Modifies `$701FFE` (RNG seed - 16-bit)
+- Modifies `$00A9` ($4B) (random result)
+- Uses `$4204-$4206` (division registers)
+- Reads `$0E96` (frame counter)
+- Temporarily changes direct page to $005E
+
+**Calls:**
+- `Math_SetDivisor` @ $009726 (JSL) - Set hardware divisor
+
+**Called By:**
+- Battle damage calculation
+- Enemy AI decision making
+- Item drop determination
+- Random encounters
+- Treasure generation
+- Variance calculations
+
+**Related:**
+- See `Random` @ $8456 for simpler 8-bit RNG
+- See hardware math unit documentation for division
+- See entropy sources for randomness quality
+
+---
+
+### Frame Synchronization
+
+#### Field_WaitForVBlank
+**Location:** Bank $01 @ $82D0  
+**File:** `src/asm/banks/bank_01.asm`
+
+**Purpose:** Synchronize code execution with VBLANK interval for safe VRAM/OAM updates.
+
+**Inputs:**
+- `$19F7` = Frame synchronization flag
+
+**Outputs:**
+- Execution paused until next VBLANK
+- `$19F7` = Set to 1 after wait
+
+**Technical Details:**
+- Busy-wait loop polling frame flag
+- NMI handler clears `$19F7` each VBLANK
+- This function waits for clear, then sets to 1
+- Preserves all processor state (PHP/PLP, PHX/PHY)
+- Safe for VRAM/OAM/palette updates after return
+
+**Process Flow:**
+```asm
+1. Save state:
+   PHP                       ; Save processor status
+   PHX                       ; Save X register
+   PHY                       ; Save Y register
+
+2. Set processor modes:
+   SEP #$20                  ; 8-bit A
+   REP #$10                  ; 16-bit index
+   BRA Field_ProcessFrame    ; Skip to wait loop
+
+Field_ProcessFrame:
+   JSR NPC_AIIdle            ; Process NPC idle AI
+
+Field_FrameWaitLoop:
+   LDA $19F7                 ; Load frame flag
+   BNE Field_FrameWaitLoop   ; Loop while non-zero
+
+3. Flag frame processed:
+   INC $19F7                 ; Set flag to 1
+
+4. Restore and return:
+   PLY                       ; Restore Y
+   PLX                       ; Restore X
+   PLP                       ; Restore status
+   RTS
+```
+
+**Frame Synchronization System:**
+```
+NMI Handler (every VBLANK):
+  1. STZ $19F7                ; Clear flag
+  2. [VRAM/OAM transfers]
+  3. RTI
+
+Field/Battle code:
+  1. Prepare graphics data
+  2. JSR Field_WaitForVBlank  ; Wait here
+  3. [Data transferred during VBLANK]
+  4. Continue execution
+
+Timing:
+  NTSC: 60 Hz (16.67ms per frame)
+  PAL: 50 Hz (20ms per frame)
+  
+VBLANK duration:
+  ~4.5 scanlines (depends on mode)
+  Enough for ~2KB VRAM transfer
+```
+
+**Frame Flag States ($19F7):**
+```
+$00: VBLANK occurred, safe to wait
+$01: Code claimed this frame
+NMI sets to $00 each VBLANK
+
+Prevents double-processing:
+  Frame N:
+    NMI sets $19F7 = $00
+    Code waits for $00
+    Code sets $19F7 = $01
+    Code executes
+    
+  Frame N+1:
+    NMI sets $19F7 = $00
+    [cycle repeats]
+```
+
+**NPC AI Integration:**
+```
+Field_ProcessFrame calls NPC_AIIdle:
+  - Updates NPC animations
+  - Processes idle movements
+  - Checks player proximity
+  - Non-blocking updates
+  
+Why before wait:
+  - Utilizes CPU time during wait
+  - Keeps NPCs animated
+  - Distributes workload
+```
+
+**VRAM Safety:**
+```
+Unsafe operations (outside VBLANK):
+  - VRAM writes ($2118-$2119)
+  - OAM writes ($2104)
+  - Palette writes ($2122)
+  - Tilemap updates
+  → May cause visual glitches
+
+Safe after Field_WaitForVBlank:
+  ✓ All VRAM operations
+  ✓ OAM updates
+  ✓ Palette changes
+  ✓ PPU register writes
+```
+
+**Comparison: Field_WaitForVBlank vs Field_UpdateAndWait:**
+```
+Field_WaitForVBlank @ $82D0:
+  - Simple VBLANK wait
+  - No camera update
+  - For basic sync
+  
+Field_UpdateAndWait @ $82D9:
+  - Calls Camera_UpdatePosition first
+  - Then waits for VBLANK
+  - For field movement/scrolling
+  
+Both share code path:
+  Field_UpdateAndWait:
+    JSR Camera_UpdatePosition
+    → Field_ProcessFrame (same as WaitForVBlank)
+```
+
+**Usage Patterns:**
+```
+Menu updates:
+  JSR Field_WaitForVBlank
+  JSR UpdateMenuGraphics
+
+Sprite updates:
+  JSR Field_WaitForVBlank
+  JSR UpdateOAM
+
+Tilemap changes:
+  JSR Field_WaitForVBlank
+  JSR WriteTilemap
+
+Multiple operations:
+  JSR Field_WaitForVBlank
+  JSR UpdatePalette
+  JSR UpdateTilemap
+  JSR UpdateOAM
+  ; All safe in same VBLANK
+```
+
+**Side Effects:**
+- Blocks execution until VBLANK
+- Sets `$19F7` = 1
+- Calls `NPC_AIIdle` @ $A081
+- Preserves all registers (PHP/PLP, PHX/PHY)
+
+**Calls:**
+- `NPC_AIIdle` @ $01:$A081 (JSR) - Process NPC idle state
+
+**Called By:**
+- Map event processing
+- Field rendering
+- Menu updates
+- Graphics transfers
+- Called 20+ times throughout Bank $01
+
+**Related:**
+- See `Field_UpdateAndWait` @ $82D9 for camera-aware variant
+- See NMI handler for flag clearing
+- See VRAM transfer routines
+- See frame timing documentation
+
+---
+
 ## Index by Bank
 
 ### Bank $00 - System/Core
 - `Random` @ $8456 - Random number generator
+- `RNG_GenerateRandom` @ $9783 - RNG with modulo operation
 - `InitializeSystem` @ $8000 - System initialization
 - `NMI_Handler` @ $FFE0 - NMI interrupt handler
 - `UpdateOAM` @ $9234 - Update sprite OAM
@@ -4457,6 +4812,7 @@ return (seed >> 16) & 0xFF
 - `Field_CameraUpdate` @ $8B83 - Enable camera scrolling
 - `Field_CameraCalculate` @ $8B90 - Calculate camera position
 - `Field_ProcessNPCInteraction` @ $E404 - Initialize NPC interaction
+- `Field_WaitForVBlank` @ $82D0 - VBLANK synchronization
 
 ### Bank $02 - Battle System (AI & Combat)
 - `Enemy_DecideAction` @ $C000 - Enemy AI decision-making
@@ -4629,7 +4985,9 @@ return (seed >> 16) & 0xFF
 
 ### Utilities
 - `Random` (Bank $00 @ $8456)
+- `RNG_GenerateRandom` (Bank $00 @ $9783)
 - `Battle_WaitVBlank` (Bank $01 @ $8449)
+- `Field_WaitForVBlank` (Bank $01 @ $82D0)
 - `Bitfield_SetBits` (Bank $00 @ $974E)
 
 ---
@@ -4647,7 +5005,7 @@ See `docs/DOCUMENTATION_UPDATE_CHECKLIST.md` for complete guidelines.
 
 ---
 
-**Note:** This is a living document. Not all functions are documented yet. Current coverage: **~26.5%** (2,157+ / 8,153 functions).
+**Note:** This is a living document. Not all functions are documented yet. Current coverage: **~26.5%** (2,159+ / 8,153 functions).
 
 **Recent Additions (2025-11-05):**
 - Added 10 battle system functions (initialization, main loop, turn processing)
