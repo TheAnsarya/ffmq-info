@@ -4,7 +4,7 @@ Complete reference for all documented functions in Final Fantasy: Mystic Quest.
 
 **Last Updated:** 2025-11-05  
 **Status:** Active - Continuously updated with code analysis  
-**Coverage:** 2,100+ documented functions out of 8,153 total (~25.8%)
+**Coverage:** 2,110+ documented functions out of 8,153 total (~25.9%)
 
 ## Table of Contents
 
@@ -21,6 +21,11 @@ Complete reference for all documented functions in Final Fantasy: Mystic Quest.
 - [Menu System Functions](#menu-system-functions)
   - [Battle Menu](#battle-menu)
   - [Equipment Menu](#equipment-menu)
+- [Item & Inventory System Functions](#item--inventory-system-functions)
+  - [Item Management](#item-management)
+  - [Shop System](#shop-system)
+- [Save/Load System Functions](#saveload-system-functions)
+  - [Game State Persistence](#game-state-persistence)
 - [Sound System Functions](#sound-system-functions)
 - [Utility Functions](#utility-functions)
 - [Index by Bank](#index-by-bank)
@@ -1617,6 +1622,477 @@ Magic:   20 → 20 (---)  [White if no change]
 
 ---
 
+## Item & Inventory System Functions
+
+### Item Management
+
+#### Item_AddItem
+**Location:** Bank $00 @ $DB3B  
+**File:** `src/asm/banks/bank_00.asm`
+
+**Purpose:** Add an item to the player's inventory. Handles all item types (key items, consumables, weapons, etc.).
+
+**Inputs:**
+- `A` = Item ID (0-255)
+
+**Outputs:**
+- Item added to appropriate storage
+- Inventory display updated
+
+**Technical Details:**
+- Item IDs are categorized by range
+- Different handling for each item type
+- Automatically manages inventory space
+- Updates display counters
+- Sets flags for new items
+
+**Item ID Ranges:**
+```
+$00-$0F: Key Items (stored as bitflags in $0EA6+)
+  - Mask, Crest, etc.
+  - Uses bitfield storage (1 bit per item)
+  
+$10-$13: Party Member HP Items (Kaeli, etc.)
+  - Special items that increase max HP
+  - Stored at $1030, $10B0
+  - Max value: 99 (0x63)
+  
+$14-$1F: Magic Items (stored as bitflags in $1038+)
+  - Spell books, magic abilities
+  - Bitfield storage
+  
+$20-$2E: Consumable Items (Cure, Heal, Refresh, etc.)
+  - Stored at $1031-$1034
+  - Bitfield + counter system
+  - Special handling for Elixir ($26)
+  
+$2F-$DC: Weapons and Equipment
+  - Stored as bitflags in $1035+
+  - Used with equipment menu
+  
+$DD: Kaeli HP increase (special case)
+$DE+: Other special items
+```
+
+**Side Effects:**
+- Updates inventory bitfields
+- Updates item count displays
+- Sets `$00D4` bit 4 (inventory changed flag)
+- May trigger menu refresh
+- Plays item acquisition sound
+
+**Algorithm:**
+```
+1. Compare item ID to ranges:
+   If $00-$0F → Add key item (bitfield)
+   If $10-$13 → Add party member HP item
+   If $14-$1F → Add magic item (bitfield)
+   If $20-$2E → Add consumable item
+   If $2F-$DC → Add weapon/equipment (bitfield)
+   If $DD → Special Kaeli HP
+   Else → Other special items
+
+2. For bitfield items:
+   - Calculate bit position
+   - Set appropriate bit in storage
+   - Update display
+
+3. For counted items:
+   - Increment counter
+   - Check max (usually 99)
+   - Update count display
+   - Set changed flag
+
+4. Special cases (Elixir):
+   - Clear bit $02 of $10B2
+   - Set bit $04 of $10B3
+   - Store $2D to $10B1
+   - Update display at Y=$50
+```
+
+**Calls:**
+- `Bitfield_SetBits` @ Bank $00 - Set bitfield flags
+- `Menu_DisplayItemCount` @ $9111 - Update item count display
+
+**Called By:**
+- Treasure chest system
+- Shop purchase
+- NPC item gifts
+- Battle reward system
+
+**Related:**
+- See `Item_RemoveItem` for removing items
+- See `docs/ITEM_SYSTEM.md` for complete item data
+
+---
+
+#### Item_RemoveItem
+**Location:** Bank $00 @ $DBF8  
+**File:** `src/asm/banks/bank_00.asm`
+
+**Purpose:** Remove an item from the player's inventory.
+
+**Inputs:**
+- `A` = Item ID to remove
+
+**Outputs:**
+- `A` = $FF if item was removed successfully
+- Item removed from inventory
+
+**Technical Details:**
+- Primarily for consumable items
+- Decrements item count
+- Updates character stats for consumables
+
+**Side Effects:**
+- Decrements item counter at `$0E9F,X`
+- Updates inventory display
+- May trigger menu refresh
+
+**Algorithm:**
+```
+1. Get character stats for item
+2. Check if count > 0
+3. If yes:
+     Decrement count at $0E9F,X
+     Return $FF (success)
+   Else:
+     Return with no change
+```
+
+**Calls:**
+- `Item_GetCharacterStats` @ Bank $00 - Get item stats
+
+**Called By:**
+- Item use in battle
+- Item use in field
+- Shop sell system
+- Equipment changes
+
+---
+
+#### Item_CanUseItem
+**Location:** Bank $00 @ $DC3A  
+**File:** `src/asm/banks/bank_00.asm`
+
+**Purpose:** Check if an item can be used in current context.
+
+**Inputs:**
+- `A` = Item ID
+
+**Outputs:**
+- Carry flag: Set if item can be used, clear if not
+- `A` = Item type/category
+
+**Technical Details:**
+- Checks item type
+- Validates context (battle vs field)
+- Checks requirements
+
+**Validation Rules:**
+```
+Battle Context:
+- Consumables: Always usable
+- Weapons/Equipment: Not usable
+- Key Items: Situation-specific
+
+Field Context:
+- Consumables: Usable on party
+- Key Items: Situation-specific
+- Weapons/Equipment: Only via equipment menu
+```
+
+**Called By:**
+- Battle item command
+- Field item menu
+- Shop system
+
+---
+
+### Shop System
+
+#### Shop_SubtractGold
+**Location:** Bank $00 @ (inferred from documented code)  
+**File:** `src/asm/bank_00_documented.asm`
+
+**Purpose:** Subtract gold from player's current amount during shop transactions.
+
+**Inputs:**
+- Gold amount to subtract (from transaction)
+- Current character gold amount
+
+**Outputs:**
+- Updated gold amount
+
+**Technical Details:**
+- Handles two different gold storage locations
+- Validates sufficient funds
+- Updates display
+
+**Storage Locations:**
+```
+Primary:   Character-specific gold storage
+Alternate: Secondary storage (special cases)
+```
+
+**Side Effects:**
+- Updates gold amount in memory
+- Updates shop display
+- May trigger "not enough gold" message
+
+**Called By:**
+- Shop buy item
+- Inn payment
+- Other transaction systems
+
+**Related:**
+- Shop dialogue system in Bank $03
+- Price calculation functions
+
+---
+
+## Save/Load System Functions
+
+### Game State Persistence
+
+#### Load_GameFromSRAM
+**Location:** Bank $00 @ $713 (hex offset in bank)  
+**File:** `src/asm/bank_00_documented.asm`
+
+**Purpose:** Restore saved game data from SRAM (battery-backed save RAM).
+
+**Inputs:**
+- SRAM contains valid save data
+
+**Outputs:**
+- All game state restored to WRAM
+- Save slot selected
+
+**Technical Details:**
+- Uses SNES SRAM mapping
+- Supports multiple save slots (0, 1, 2)
+- Block memory transfer via MVN instruction
+- Validates save slot number
+
+**SRAM Memory Map:**
+```
+Bank $70-$77 ($700000-$77FFFF):
+  Battery-backed save RAM
+  
+Key SRAM Locations:
+  $700000: Save slot 0 marker
+  $70038C: Save slot 1 marker  
+  $700718: Save slot 2 marker
+  
+Each slot stores:
+  - Character stats and levels
+  - Inventory and equipment
+  - Progress flags and story state
+  - Map position and party data
+  - Play time and other metadata
+```
+
+**Process:**
+```
+1. Set 16-bit mode (REP #$30)
+
+2. Copy Save Data Block 1:
+   Source:      $0C:A9C2 (ROM data)
+   Destination: $00:1010 (WRAM)
+   Size:        $40 bytes (64 bytes)
+   Method:      MVN $00,$0C
+
+3. Copy Save Data Block 2:
+   Source:      $0C:0E9E (ROM data)
+   Destination: $00:1050 (WRAM)
+   Size:        $0A bytes (10 bytes)
+   Method:      MVN $00,$0C
+
+4. Set save slot marker:
+   $0FE7 = $02 (active save indicator)
+
+5. Determine active save slot:
+   Read $7E3668 (save slot number: 0, 1, or 2)
+   If >= 2, reset to 0
+   Increment and store back to $7E3668
+
+6. Load slot-specific data from table
+
+7. Restore character positions, inventory, flags
+
+8. Initialize display with saved state
+```
+
+**MVN Instruction Details:**
+```asm
+MVN (Block Move Negative):
+  Format: MVN srcbank,dstbank
+  
+  X = source address (16-bit)
+  Y = destination address (16-bit)
+  A = length - 1 (16-bit)
+  
+  Auto-increments X and Y
+  Auto-decrements A
+  Continues until A = $FFFF
+  
+  Example:
+    LDX #$A9C2        ; Source = $0CA9C2
+    LDY #$1010        ; Dest   = $001010
+    LDA #$003F        ; Length = $40 bytes
+    MVN $00,$0C       ; Copy from bank $0C to $00
+```
+
+**Side Effects:**
+- Overwrites WRAM with save data
+- Updates `$0FE7` (save slot marker)
+- Updates `$7E3668` (active slot number)
+- Modifies registers (A, X, Y)
+
+**Called By:**
+- Title screen "Continue" option
+- Boot sequence if continue flag set
+
+**Related:**
+- See `Init_NewGameState` for new game initialization
+- See save data validation routines
+
+---
+
+#### Init_NewGameState
+**Location:** Bank $00 @ $627 (hex offset in bank)  
+**File:** `src/asm/bank_00_documented.asm`
+
+**Purpose:** Initialize all game state for a new game.
+
+**Inputs:**
+- None (new game start)
+
+**Outputs:**
+- Fresh game state in WRAM
+- Default character stats
+- Starting inventory
+- Initial map position
+
+**Technical Details:**
+- Sets all default values
+- Clears progress flags
+- Initializes party members
+- Sets starting location
+
+**Default Values:**
+```
+Characters:
+  - Starting level: 1
+  - Starting HP: Character-specific defaults
+  - Starting equipment: Basic gear
+  - Magic: None initially
+
+Inventory:
+  - Empty consumable slots
+  - No key items
+  - No weapons/equipment collected
+
+Progress:
+  - All story flags cleared
+  - No dungeons completed
+  - Starting town position
+
+Map:
+  - Starting location: Hill of Destiny
+  - Party: Benjamin only
+  - Time: 0:00:00
+```
+
+**Process:**
+```
+1. Clear all WRAM game state ($1000-$1FFF)
+
+2. Set default character stats:
+   - Benjamin: Level 1, base stats
+   - Other party slots: Empty
+
+3. Initialize inventory:
+   - Clear all item bitfields
+   - Set consumable counts to 0
+   - Clear equipment flags
+
+4. Set starting position:
+   - Map ID: Starting location
+   - X/Y coordinates: Spawn point
+   - Facing direction: Down
+
+5. Initialize flags:
+   - Clear all progress flags
+   - Set "new game" marker
+   - Reset event counters
+
+6. Set starting equipment:
+   - Benjamin: Steel Sword, Leather Armor
+   - Other slots: Empty
+
+7. Initialize timers:
+   - Play time: 0
+   - Step counter: 0
+```
+
+**Side Effects:**
+- Clears WRAM game state area
+- Sets all default values
+- Initializes display state
+
+**Called By:**
+- Boot sequence when no save data exists
+- "New Game" selection from title
+
+**Related:**
+- See `Load_GameFromSRAM` for loading saved games
+
+---
+
+#### ValidateSaveData
+**Location:** Boot sequence  
+**File:** `src/asm/bank_00_documented.asm`
+
+**Purpose:** Check if valid save data exists in SRAM before loading.
+
+**Inputs:**
+- SRAM contents
+
+**Outputs:**
+- Zero flag: Set if no valid save data, clear if save exists
+
+**Technical Details:**
+- Checks three SRAM marker bytes
+- Uses OR operation to detect any non-zero values
+- Fast validation without full checksum
+
+**Validation Logic:**
+```asm
+lda.l $700000   ; A = SRAM slot 0 marker
+ora.l $70038C   ; OR with slot 1 marker
+ora.l $700718   ; OR with slot 2 marker
+beq NoSaveData  ; If all zero → No save exists
+
+; If non-zero → At least one save slot has data
+```
+
+**Marker Bytes:**
+- If all three bytes are $00: No save data
+- If any byte is non-zero: Save data exists
+- Does NOT validate save data integrity (no checksum here)
+- Full validation done during load
+
+**Called By:**
+- Boot sequence
+- Title screen initialization
+
+**Related:**
+- Used before `Load_GameFromSRAM`
+- Determines "Continue" option availability
+
+---
+
 ## Sound System Functions
 
 ### Music Playback
@@ -1683,6 +2159,15 @@ return (seed >> 16) & 0xFF
 - `InitializeSystem` @ $8000 - System initialization
 - `NMI_Handler` @ $FFE0 - NMI interrupt handler
 - `UpdateOAM` @ $9234 - Update sprite OAM
+- `Item_AddItem` @ $DB3B - Add item to inventory
+- `Item_RemoveItem` @ $DBF8 - Remove item from inventory
+- `Item_CanUseItem` @ $DC3A - Check if item can be used
+- `Item_GetCharacterStats` - Get character stats for item
+- `Shop_SubtractGold` - Subtract gold for purchases
+- `Load_GameFromSRAM` @ $713 - Load saved game from SRAM
+- `Init_NewGameState` @ $627 - Initialize new game state
+- `ValidateSaveData` - Check for valid save data
+- `Bitfield_SetBits` @ $974E - Set bits in bitfield
 
 ### Bank $01 - Battle System Core
 - `Battle_Initialize` @ $8078 - Battle initialization
@@ -1777,6 +2262,17 @@ return (seed >> 16) & 0xFF
 - `HandleMenuInput` (Bank $03 @ $8234)
 - `DisplayEquipmentMenu` (Bank $03 @ $9000)
 
+### Item & Inventory
+- `Item_AddItem` (Bank $00 @ $DB3B)
+- `Item_RemoveItem` (Bank $00 @ $DBF8)
+- `Item_CanUseItem` (Bank $00 @ $DC3A)
+- `Shop_SubtractGold` (Bank $00)
+
+### Save/Load
+- `Load_GameFromSRAM` (Bank $00 @ $713)
+- `Init_NewGameState` (Bank $00 @ $627)
+- `ValidateSaveData` (Bank $00)
+
 ### Text & UI
 - `PrintText` (Bank $08 @ $9000)
 - `DecompressText` (Bank $08 @ $9234)
@@ -1784,6 +2280,7 @@ return (seed >> 16) & 0xFF
 ### Utilities
 - `Random` (Bank $00 @ $8456)
 - `Battle_WaitVBlank` (Bank $01 @ $8449)
+- `Bitfield_SetBits` (Bank $00 @ $974E)
 
 ---
 
@@ -1800,7 +2297,7 @@ See `docs/DOCUMENTATION_UPDATE_CHECKLIST.md` for complete guidelines.
 
 ---
 
-**Note:** This is a living document. Not all functions are documented yet. Current coverage: **~25.8%** (2,100+ / 8,153 functions).
+**Note:** This is a living document. Not all functions are documented yet. Current coverage: **~25.9%** (2,110+ / 8,153 functions).
 
 **Recent Additions (2025-11-05):**
 - Added 10 battle system functions (initialization, main loop, turn processing)
@@ -1808,8 +2305,17 @@ See `docs/DOCUMENTATION_UPDATE_CHECKLIST.md` for complete guidelines.
 - Added 4 graphics system functions (tileset loading, decompression, palette, OAM)
 - Added 5 map system functions (loading, collision, tiles, NPCs, proximity)
 - Added 3 menu system functions (battle menu, input handling, equipment)
+- Added 4 item/inventory functions (add, remove, check usage, shop gold)
+- Added 3 save/load functions (load from SRAM, new game init, validation)
 - Expanded technical details with algorithms and data structures
 - Added Quick Reference by Function Type
+
+**Next Priority Areas:**
+- Item effects and status processing
+- Save/load SRAM structure details
+- Field movement and player control
+- Shop system (buy/sell interfaces)
+- Battle item effects
 
 **Next Priority Areas:**
 - Item/inventory management functions
