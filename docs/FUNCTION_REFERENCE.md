@@ -4,7 +4,7 @@ Complete reference for all documented functions in Final Fantasy: Mystic Quest.
 
 **Last Updated:** 2025-11-05  
 **Status:** Active - Continuously updated with code analysis  
-**Coverage:** 2,163+ documented functions out of 8,153 total (~26.5%)
+**Coverage:** 2,167+ documented functions out of 8,153 total (~26.6%)
 
 ## Table of Contents
 
@@ -5579,6 +5579,592 @@ Treasure chests:
 
 ### Frame Synchronization
 
+### Memory Management
+
+#### Memory_Copy64Bytes
+**Location:** Bank $00 @ $A216 (approximately)  
+**File:** `src/asm/bank_00_documented.asm`
+
+**Purpose:** Fast block memory copy for exactly 64 bytes - unrolled loop for maximum speed.
+
+**Inputs:**
+- `X` (16-bit) = Source address offset
+- `Y` (16-bit) = Destination address offset
+- Processor mode: REP #$30 (16-bit A, X, Y assumed)
+
+**Outputs:**
+- 64 bytes copied from source to destination
+- Falls through to Memory_Copy32Bytes to complete remaining 32 bytes
+
+**Technical Details:**
+- Unrolled loop (no branching overhead)
+- Copies 16-bit words (32 word transfers = 64 bytes)
+- Falls through to copy additional 32 bytes (total 96 bytes capability)
+- Optimized for speed over code size
+- Used for OAM buffer copies, sprite data transfers
+
+**Process Flow:**
+```asm
+Copy words at offsets (descending):
+  $3E/$3C (bytes 62-63, 60-61)
+  $3A/$38 (bytes 58-59, 56-57)
+  $36/$34 (bytes 54-55, 52-53)
+  $32/$30 (bytes 50-51, 48-49)
+  $2E/$2C (bytes 46-47, 44-45)
+  $2A/$28 (bytes 42-43, 40-41)
+  $26/$24 (bytes 38-39, 36-37)
+  $22/$20 (bytes 34-35, 32-33)
+
+Fall through to Memory_Copy32Bytes:
+  $1E-$00 (bytes 30-31 down to 0-1)
+```
+
+**Copy Pattern:**
+```
+For each word (2 bytes):
+  LDA $xxxx,X    ; Load word from source + offset
+  STA $xxxx,Y    ; Store word to dest + offset
+  
+16 word copies:
+  64 bytes total transferred
+  
+Fall-through design:
+  No RTS after $20 copy
+  Continues to Memory_Copy32Bytes
+  Total capability: 96 bytes (64 + 32)
+```
+
+**Performance Characteristics:**
+```
+Unrolled loop benefits:
+  - No branch overhead
+  - No loop counter decrement
+  - No conditional checks
+  - Fixed 64-byte size
+
+Cycle count (approximate):
+  LDA abs,X: 4-5 cycles
+  STA abs,Y: 5 cycles
+  Per word: ~9-10 cycles
+  
+  16 words × 10 = ~160 cycles for 64 bytes
+  Plus 32-byte fall-through = ~80 cycles
+  
+  Total: ~240 cycles for 96 bytes
+  (~2.5 cycles per byte - very fast!)
+```
+
+**Common Use Cases:**
+```
+OAM buffer copy (128 sprites × 4 bytes = 512 bytes):
+  Multiple 64-byte calls
+  Fast sprite table updates
+  
+Tilemap buffer:
+  Copy 64-byte screen rows
+  VRAM preparation
+  
+Entity data:
+  Copy character stats (64 bytes)
+  Copy enemy data structures
+  
+Graphics buffer:
+  Sprite frame data
+  Pattern table blocks
+```
+
+**Memory Layout Example:**
+```
+Source buffer (Bank $7E):
+  X = $3000 (base address)
+  
+  $303E-$303F: Bytes 62-63
+  $303C-$303D: Bytes 60-61
+  ...
+  $3000-$3001: Bytes 0-1
+
+Destination buffer (Bank $7E):
+  Y = $4000 (base address)
+  
+  $403E-$403F: Bytes 62-63 (copied)
+  $403C-$403D: Bytes 60-61 (copied)
+  ...
+  $4000-$4001: Bytes 0-1 (copied)
+```
+
+**Comparison to MVN Instruction:**
+```
+MVN (Block Move Negative):
+  Flexible size (any byte count)
+  Slower setup (3-byte instruction)
+  ~7 cycles per byte
+  Better for variable sizes
+
+Memory_Copy64Bytes:
+  Fixed 64-byte size
+  No setup overhead
+  ~2.5 cycles per byte
+  Better for fixed sizes
+
+Use unrolled when:
+  - Size is always 64 bytes
+  - Speed is critical
+  - Code size not a concern
+```
+
+**Side Effects:**
+- Modifies 64 bytes at destination address
+- Clobbers A register (final value = last word copied)
+- Falls through to Memory_Copy32Bytes (copies 32 more bytes)
+- X, Y preserved (not modified)
+
+**Calls:**
+- None (falls through to Memory_Copy32Bytes)
+
+**Called By:**
+- OAM update routines
+- Sprite buffer copying
+- Entity data transfers
+- Tilemap updates
+
+**Related:**
+- See `Memory_Copy32Bytes` for 32-byte variant
+- See `Memory_CopyToRAM` for flexible MVN-based copy
+- See `Memory_CopyFromRAM` for reverse copy
+
+---
+
+#### Memory_Copy32Bytes
+**Location:** Bank $00 @ $A24A (approximately)  
+**File:** `src/asm/bank_00_documented.asm`
+
+**Purpose:** Fast block memory copy for exactly 32 bytes - unrolled loop continuation from 64-byte copy.
+
+**Inputs:**
+- `X` (16-bit) = Source address offset
+- `Y` (16-bit) = Destination address offset
+- Processor mode: REP #$30 (16-bit A, X, Y assumed)
+
+**Outputs:**
+- 32 bytes copied from source to destination
+- Returns to caller (RTS)
+
+**Technical Details:**
+- Unrolled loop (16 word transfers = 32 bytes)
+- Can be called independently or as fall-through from Memory_Copy64Bytes
+- Copies offsets $1E down to $00 (bytes 30-31 to 0-1)
+- Returns after completion (RTS)
+
+**Process Flow:**
+```asm
+Copy words at offsets (descending):
+  $1E/$1C (bytes 30-31, 28-29)
+  $1A/$18 (bytes 26-27, 24-25)
+  $16/$14 (bytes 22-23, 20-21)
+  $12/$10 (bytes 18-19, 16-17)
+  $0E/$0C (bytes 14-15, 12-13)
+  $0A/$08 (bytes 10-11, 8-9)
+  $06/$04 (bytes 6-7, 4-5)
+  $02/$00 (bytes 2-3, 0-1)
+
+Complete:
+  RTS - Return to caller
+```
+
+**Copy Pattern:**
+```
+For each word (2 bytes):
+  LDA $xxxx,X    ; Load word from source + offset
+  STA $xxxx,Y    ; Store word to dest + offset
+  
+16 word copies:
+  32 bytes total transferred
+  
+Independent use:
+  Can be called directly for 32-byte copies
+  
+Fall-through use:
+  Completes Memory_Copy64Bytes
+  Total 96 bytes when combined
+```
+
+**Performance:**
+```
+Cycle count (approximate):
+  16 words × ~10 cycles = ~160 cycles
+  RTS: 6 cycles
+  Total: ~166 cycles for 32 bytes
+  (~5.2 cycles per byte)
+  
+Comparison:
+  MVN: ~7 cycles per byte
+  Unrolled: ~5.2 cycles per byte
+  Speed gain: ~25% faster
+```
+
+**Use Cases:**
+```
+Standalone 32-byte copies:
+  - Character name (8 chars × 2 bytes + padding)
+  - Palette row (16 colors × 2 bytes)
+  - Partial sprite data
+  - Small entity structures
+
+Combined with 64-byte copy:
+  - Total 96-byte blocks
+  - Extended entity data
+  - Larger sprite frames
+```
+
+**Side Effects:**
+- Modifies 32 bytes at destination address
+- Clobbers A register
+- X, Y preserved
+- Returns to caller (RTS)
+
+**Calls:**
+- None (leaf function)
+
+**Called By:**
+- Memory_Copy64Bytes (fall-through)
+- Direct calls for 32-byte transfers
+- Entity management
+- Buffer operations
+
+**Related:**
+- See `Memory_Copy64Bytes` for larger block copy
+- See `Memory_CopyToRAM` for MVN-based variable copy
+
+---
+
+#### Memory_CopyToRAM
+**Location:** Bank $00 @ $A89B (approximately)  
+**File:** `src/asm/bank_00_documented.asm`
+
+**Purpose:** Flexible block memory copy using MVN (Move Negative) instruction - copies from Bank $00 to Bank $7E with pointer tracking.
+
+**Inputs:**
+- `[$17]` (indirect) = Destination offset in Bank $7E (16-bit)
+- `[$17+2]` (indirect) = Byte count (8-bit)
+- `$7E3367` = Current source pointer in Bank $7E (updated continuously)
+
+**Outputs:**
+- Data copied from Bank $00 to Bank $7E
+- `$7E3367` = Updated source pointer (advanced by byte count)
+- `[$17]` pointer advanced by 4 bytes (dest + count consumed)
+
+**Technical Details:**
+- Uses MVN instruction for flexible variable-length copies
+- Tracks cumulative pointer in $7E3367 (buffer position)
+- Overflow protection (checks against $35D9 limit)
+- Automatically handles bank switching (Bank $00 ↔ Bank $7E)
+
+**Process Flow:**
+```asm
+1. Load destination offset:
+   LDA [$17]         ; Get dest offset (16-bit)
+   INC $17 (×2)      ; Advance pointer
+   TAX               ; X = destination offset
+
+2. Load source pointer:
+   LDA $7E3367       ; Get current buffer position
+   TAY               ; Y = source in Bank $7E
+
+3. Load byte count:
+   LDA [$17]         ; Get count (8-bit in 16-bit)
+   INC $17           ; Advance pointer
+   AND #$00FF        ; Isolate low byte
+   DEC A             ; Count-1 for MVN
+
+4. Execute block move:
+   PHB               ; Save data bank
+   MVN $7E,$00       ; Move Y(Bank$00) → X(Bank$7E), A+1 bytes
+   PLB               ; Restore data bank
+   
+   Note: MVN updates Y (source end position)
+
+5. Check for overflow:
+   TYA               ; Transfer end pointer to A
+   CMP #$35D9        ; Check against buffer limit
+   BCC Update        ; If below, safe to update
+   JMP Overflow      ; Else handle overflow
+
+6. Update pointer:
+Update:
+   STA $7E3367       ; Store new pointer position
+   (Continue execution)
+```
+
+**MVN Instruction Details:**
+```
+MVN syntax: MVN dest_bank, src_bank
+
+Operation:
+  while (A >= 0):
+    [X in dest_bank] = [Y in src_bank]
+    X++
+    Y++
+    A--
+  
+Inputs:
+  A = byte_count - 1
+  X = destination address
+  Y = source address
+  
+Outputs:
+  A = $FFFF (decremented to -1)
+  X = dest + count
+  Y = src + count
+```
+
+**Buffer Pointer Management:**
+```
+$7E3367 = Cumulative buffer position
+
+Initial state:
+  $7E3367 = $3000 (example start)
+
+After copy 1 (50 bytes):
+  $7E3367 = $3032
+
+After copy 2 (30 bytes):
+  $7E3367 = $3050
+
+Overflow check:
+  If $7E3367 >= $35D9:
+    Buffer full! Jump to overflow handler
+    Reset pointer or flush buffer
+```
+
+**Overflow Handling:**
+```
+Limit: $35D9 (13785 bytes from base)
+
+When exceeded:
+  JMP CODE_009D1F (overflow handler)
+  
+Overflow handler likely:
+  - Flushes buffer to VRAM
+  - Resets $7E3367 to base
+  - Resumes operation
+  
+Prevents buffer overrun
+```
+
+**Use Cases:**
+```
+Dynamic graphics loading:
+  - Copy sprite data to RAM buffer
+  - Queue for VRAM transfer
+  - Track position for next copy
+
+Decompression output:
+  - Write decompressed data to buffer
+  - Auto-advance pointer
+  - Check for buffer full
+
+Tilemap assembly:
+  - Build screen in RAM
+  - Piece-by-piece construction
+  - Single VRAM transfer when complete
+
+Text rendering:
+  - Layout text in buffer
+  - Combine multiple strings
+  - Transfer during VBLANK
+```
+
+**Comparison to Unrolled Loops:**
+```
+MVN-based (this function):
+  + Flexible size (any byte count)
+  + Automatic pointer management
+  + Overflow protection
+  - Slower (~7 cycles/byte)
+  - Setup overhead
+
+Unrolled (64/32-byte):
+  + Faster (~2.5-5 cycles/byte)
+  + No overflow risk (fixed size)
+  - Fixed size only
+  - No pointer tracking
+  - Larger code size
+
+Use MVN when:
+  - Size varies
+  - Pointer tracking needed
+  - Overflow protection required
+```
+
+**Side Effects:**
+- Modifies destination buffer in Bank $7E
+- Updates `$7E3367` (source pointer)
+- Advances `[$17]` pointer by 4 bytes
+- Clobbers A, X, Y registers
+- May jump to overflow handler (non-return)
+
+**Calls:**
+- None (MVN is hardware instruction)
+- May call overflow handler @ $9D1F
+
+**Called By:**
+- Graphics decompression routines
+- Tilemap construction
+- Text rendering
+- Dynamic buffer management
+
+**Related:**
+- See `Memory_CopyFromRAM` for reverse copy (Bank $7E → Bank $00)
+- See `Memory_Copy64Bytes` for fixed-size fast copy
+- See buffer management documentation
+
+---
+
+#### Memory_CopyFromRAM
+**Location:** Bank $00 @ $A8AB (approximately)  
+**File:** `src/asm/bank_00_documented.asm`
+
+**Purpose:** Reverse block memory copy using MVN - copies from Bank $7E back to Bank $00 with automatic pointer adjustment.
+
+**Inputs:**
+- `[$17]` (indirect) = Destination address in Bank $00 (16-bit)
+- `[$17+2]` (indirect) = Byte count (8-bit)
+- `$7E3367` = Current source pointer in Bank $7E (decremented by copy)
+
+**Outputs:**
+- Data copied from Bank $7E to Bank $00
+- `$7E3367` = Updated source pointer (decreased by byte count)
+- `[$17]` pointer advanced by 3 bytes (dest + count consumed)
+
+**Technical Details:**
+- Reverse of Memory_CopyToRAM (Bank $7E → Bank $00)
+- Decrements buffer pointer instead of incrementing
+- Uses MVN for flexible variable-length copies
+- No overflow check (reading backwards from buffer)
+
+**Process Flow:**
+```asm
+1. Load destination:
+   LDA [$17]         ; Get dest in Bank $00
+   INC $17 (×2)      ; Advance pointer
+   TAY               ; Y = destination
+
+2. Load byte count:
+   LDA [$17]         ; Get count (8-bit)
+   INC $17           ; Advance pointer
+   AND #$00FF        ; Isolate low byte
+   PHA               ; Save count
+
+3. Adjust source pointer:
+   EOR #$FFFF        ; Bitwise NOT (negate)
+   ADC $7E3367       ; Subtract count from pointer
+   STA $7E3367       ; Update pointer (moved backward)
+   TAX               ; X = new source position
+
+4. Execute block move:
+   PLA               ; Restore count
+   DEC A             ; Count-1 for MVN
+   MVN $00,$7E       ; Move X(Bank$7E) → Y(Bank$00)
+   
+   (No bank save/restore - different flow)
+```
+
+**Pointer Arithmetic:**
+```
+Decrement calculation:
+  new_ptr = old_ptr - count
+
+Implementation:
+  count_negated = ~count (bitwise NOT)
+  new_ptr = old_ptr + count_negated
+  
+Example:
+  old_ptr = $3050
+  count = 30 ($1E)
+  
+  ~count = $FFE1 (two's complement -30)
+  new_ptr = $3050 + $FFE1 = $3031
+  
+  Check: $3050 - 30 = $3031 ✓
+```
+
+**Buffer Traversal:**
+```
+Forward copy (ToRAM):
+  $7E3367 starts at $3000
+  After 50 bytes: $3032
+  After 30 more: $3050
+  Pointer grows →
+
+Reverse copy (FromRAM):
+  $7E3367 at $3050
+  Copy 30 bytes: $3031
+  Copy 20 bytes: $301D
+  Pointer shrinks ←
+
+Use pattern:
+  1. Build buffer forward (ToRAM)
+  2. Process/modify in place
+  3. Read back backward (FromRAM)
+```
+
+**Use Cases:**
+```
+Buffer readback:
+  - Copy processed data back to ROM bank
+  - Retrieve decompressed graphics
+  - Read back modified tilesets
+
+Double buffering:
+  - Write to buffer (ToRAM)
+  - Process data
+  - Read back results (FromRAM)
+
+Temporary storage:
+  - Save state to buffer
+  - Modify working data
+  - Restore from buffer
+```
+
+**MVN Direction:**
+```
+Forward (ToRAM):
+  MVN $7E,$00
+  Source: Bank $00 (ROM/fixed data)
+  Dest: Bank $7E (RAM buffer)
+  Pointer increases
+
+Backward (FromRAM):
+  MVN $00,$7E
+  Source: Bank $7E (RAM buffer)
+  Dest: Bank $00 (processed location)
+  Pointer decreases
+```
+
+**Side Effects:**
+- Modifies destination in Bank $00
+- Updates `$7E3367` (decrements by count)
+- Advances `[$17]` pointer by 3 bytes
+- Clobbers A, X, Y registers
+- No overflow protection (reading from buffer)
+
+**Calls:**
+- None (MVN is hardware instruction)
+
+**Called By:**
+- Graphics processing completion
+- Buffer flush routines
+- Data retrieval functions
+
+**Related:**
+- See `Memory_CopyToRAM` for forward copy (Bank $00 → Bank $7E)
+- See buffer pointer management documentation
+- See MVN instruction details
+
+---
+
+### Frame Synchronization
+
 #### Field_WaitForVBlank
 **Location:** Bank $01 @ $82D0  
 **File:** `src/asm/banks/bank_01.asm`
@@ -5781,6 +6367,10 @@ Multiple operations:
 - `Bitfield_SetBits` @ $974E - Set bits in bitfield
 - `Cursor_UpdateComplete` @ $8A9C - Validate cursor position
 - `Cursor_UpdateSprite` @ $8C3D - Render cursor sprite
+- `Memory_Copy64Bytes` @ $A216 - Fast 64-byte block copy
+- `Memory_Copy32Bytes` @ $A24A - Fast 32-byte block copy
+- `Memory_CopyToRAM` @ $A89B - MVN copy Bank $00 → $7E
+- `Memory_CopyFromRAM` @ $A8AB - MVN copy Bank $7E → $00
 
 ### Bank $01 - Battle System Core
 - `Battle_Initialize` @ $8078 - Battle initialization
@@ -5991,6 +6581,10 @@ Multiple operations:
 - `Bitfield_SetBits` (Bank $00 @ $974E)
 - `Cursor_UpdateComplete` (Bank $00 @ $8A9C) - Cursor validation
 - `Cursor_UpdateSprite` (Bank $00 @ $8C3D) - Cursor rendering
+- `Memory_Copy64Bytes` (Bank $00 @ $A216) - Fast 64-byte copy
+- `Memory_Copy32Bytes` (Bank $00 @ $A24A) - Fast 32-byte copy
+- `Memory_CopyToRAM` (Bank $00 @ $A89B) - MVN to RAM
+- `Memory_CopyFromRAM` (Bank $00 @ $A8AB) - MVN from RAM
 
 ---
 
@@ -6007,7 +6601,14 @@ See `docs/DOCUMENTATION_UPDATE_CHECKLIST.md` for complete guidelines.
 
 ---
 
-**Note:** This is a living document. Not all functions are documented yet. Current coverage: **~26.5%** (2,163+ / 8,153 functions).
+**Note:** This is a living document. Not all functions are documented yet. Current coverage: **~26.6%** (2,167+ / 8,153 functions).
+
+**Recent Additions (2025-11-05 - Update #11):**
+- Added 4 memory management functions (block copy and MVN-based transfers)
+- Memory_Copy64Bytes: Fast 64-byte unrolled copy (~2.5 cycles/byte)
+- Memory_Copy32Bytes: Fast 32-byte unrolled copy (fall-through capable)
+- Memory_CopyToRAM: Flexible MVN copy with overflow protection
+- Memory_CopyFromRAM: Reverse MVN copy with pointer tracking
 
 **Recent Additions (2025-11-05 - Update #10):**
 - Added 4 critical battle system functions (damage calculation, critical hit check, cursor movement)
@@ -6021,16 +6622,10 @@ See `docs/DOCUMENTATION_UPDATE_CHECKLIST.md` for complete guidelines.
 - RNG_GenerateRandom: Pseudo-random generation with modulo
 - Field_WaitForVBlank: Frame synchronization for VRAM safety
 
-**Recent Additions (2025-11-05 - Update #8):**
-- Added 4 camera and NPC functions
-- Camera_UpdatePosition: Smooth camera scrolling
-- Camera_CheckBounds: Viewport boundary management
-- NPC_CheckProximity: Player-NPC interaction detection
-
 **Next Priority Areas:**
-- Menu cursor rendering and input
-- Battle targeting system
-- Text display and formatting
-- Animation frame processing
+- Animation system functions
+- Text rendering pipeline
+- Sound/music control
+- More DMA operations
 
 For undocumented functions, see the source ASM files directly in `src/asm/`.
