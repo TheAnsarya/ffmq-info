@@ -4,7 +4,7 @@ Complete reference for all documented functions in Final Fantasy: Mystic Quest.
 
 **Last Updated:** 2025-11-05  
 **Status:** Active - Continuously updated with code analysis  
-**Coverage:** 2,090+ documented functions out of 8,153 total (~25.6%)
+**Coverage:** 2,100+ documented functions out of 8,153 total (~25.8%)
 
 ## Table of Contents
 
@@ -16,9 +16,15 @@ Complete reference for all documented functions in Final Fantasy: Mystic Quest.
   - [Tileset Loading and Management](#tileset-loading-and-management)
 - [Text System Functions](#text-system-functions)
 - [Map System Functions](#map-system-functions)
+  - [Map Loading and Management](#map-loading-and-management)
+  - [NPC Management](#npc-management)
+- [Menu System Functions](#menu-system-functions)
+  - [Battle Menu](#battle-menu)
+  - [Equipment Menu](#equipment-menu)
 - [Sound System Functions](#sound-system-functions)
 - [Utility Functions](#utility-functions)
 - [Index by Bank](#index-by-bank)
+- [Quick Reference by Function Type](#quick-reference-by-function-type)
 
 ---
 
@@ -1163,6 +1169,454 @@ Bits 6-7: Reserved
 
 ---
 
+## Map System Functions
+
+### Map Loading and Management
+
+#### LoadMap
+**Location:** Bank $06 @ $A000  
+**File:** `src/asm/bank_06_documented.asm`
+
+**Purpose:** Load a map from ROM and initialize map state.
+
+**Inputs:**
+- `A` = Map ID (0-255)
+
+**Outputs:**
+- Map fully loaded and ready for rendering
+- Player positioned at entry point
+
+**Technical Details:**
+- Loads map header from ROM
+- Decompresses map data
+- Loads tileset graphics
+- Initializes NPCs and objects
+- Sets up collision data
+- Positions player at spawn point
+
+**Map Header Structure (ROM):**
+```
+Offset  Size  Description
+------  ----  -----------
+$00     2     Map data pointer
+$02     1     Tileset ID
+$03     1     Palette ID
+$04     1     Music track
+$05     1     Map width (tiles)
+$06     1     Map height (tiles)
+$07     2     Collision data pointer
+$09     2     NPC data pointer
+$0B     2     Object data pointer
+$0D     2     Event script pointer
+$0F     1     Flags (weather, darkness, etc.)
+```
+
+**Side Effects:**
+- Loads graphics into VRAM
+- Updates map state in RAM ($7E2000-$7E3FFF)
+- Initializes NPCs in RAM ($7E4000-$7E4FFF)
+- Sets up collision map
+- Changes background music
+- Modifies player position
+
+**Calls:**
+- `LoadTileset` - Load map tileset
+- `LoadPalette` - Load map palette
+- `DecompressMapData` - Decompress map tiles
+- `LoadCollisionData` - Load collision map
+- `InitializeNPCs` - Set up NPCs
+- `PlayMusic` - Start map music
+
+**Called By:**
+- Map transition routine
+- Teleport/warp functions
+- Game initialization
+
+**Related:**
+- See `docs/MAP_SYSTEM.md` for map format details
+- See `docs/DATA_STRUCTURES.md` for MapHeader structure
+
+#### CheckCollision
+**Location:** Bank $06 @ $B234  
+**File:** `src/asm/bank_06_documented.asm`
+
+**Purpose:** Check if a tile position is walkable or blocked.
+
+**Inputs:**
+- `X` = X tile coordinate (0-255)
+- `Y` = Y tile coordinate (0-255)
+
+**Outputs:**
+- Carry flag: Set if blocked, clear if walkable
+- `A` = Collision type byte
+
+**Collision Types:**
+```
+$00 = Walkable
+$01 = Blocked (wall/obstacle)
+$02 = Water (requires float stone)
+$03 = Lava (requires lava charm)
+$04 = Spike floor (damages player)
+$05 = Ice (slippery movement)
+$06 = Stairs/ladder
+$07 = Door/entrance
+$08 = Warp tile
+$09 = Battle trigger zone
+$0A = Treasure chest
+$0B = NPC blocking
+$0C-$FF = Special collision handlers
+```
+
+**Technical Details:**
+- Reads collision byte from collision map
+- Checks player's items for special terrain (float stone, etc.)
+- Handles special collision logic
+- Updates movement flags
+
+**Side Effects:**
+- May modify movement direction flags
+- May trigger random encounters (battle zones)
+- May initiate map transitions (warps)
+
+**Algorithm:**
+```
+1. Calculate collision map offset: (Y × map_width) + X
+2. Read collision byte from map
+3. Check for special items/abilities
+4. Return collision result
+```
+
+**Called By:**
+- Movement input handler
+- NPC pathfinding
+- Event placement validation
+
+**Related:**
+- See `docs/MAP_SYSTEM.md` for collision details
+
+#### GetTileProperties
+**Location:** Bank $06 @ $B456  
+**File:** `src/asm/bank_06_documented.asm`
+
+**Purpose:** Get extended properties for a map tile.
+
+**Inputs:**
+- `X` = X tile coordinate
+- `Y` = Y tile coordinate
+
+**Outputs:**
+- `A` = Tile properties byte
+- `$00` = Tile ID
+- `$01` = Collision type
+- `$02` = Special flags
+
+**Tile Properties Flags:**
+```
+Bit 0: Animated tile
+Bit 1: Damage zone
+Bit 2: Battle zone
+Bit 3: Water tile
+Bit 4: Require specific item
+Bit 5: Hidden passage
+Bit 6: Event trigger
+Bit 7: Special script
+```
+
+**Side Effects:**
+- None (read-only)
+
+**Called By:**
+- Rendering system (for animated tiles)
+- Event system (for triggers)
+- Movement system (for special handling)
+
+**Related:**
+- Called by `CheckCollision` for extended checks
+
+### NPC Management
+
+#### UpdateNPCs
+**Location:** Bank $06 @ $C000  
+**File:** `src/asm/bank_06_documented.asm`
+
+**Purpose:** Update all NPCs on current map (movement, animation, AI).
+
+**Inputs:**
+- None (uses NPC data in RAM)
+
+**Outputs:**
+- All NPCs updated
+
+**Technical Details:**
+- Updates up to 16 NPCs per map
+- Processes NPC movement patterns
+- Updates sprite animations
+- Checks for player interaction
+- Handles NPC AI scripts
+
+**NPC Movement Patterns:**
+```
+$00 = Stationary (faces player when approached)
+$01 = Random walk (4 directions)
+$02 = Horizontal patrol (left-right)
+$03 = Vertical patrol (up-down)
+$04 = Circle pattern
+$05 = Follow path (scripted waypoints)
+$06 = Chase player (hostile)
+$07 = Flee from player
+$08 = Custom script
+```
+
+**Side Effects:**
+- Updates NPC positions in RAM
+- Updates NPC sprite OAM
+- May trigger dialogue if player interacts
+- Modifies `$7E4000-$7E4FFF` (NPC state)
+
+**Algorithm:**
+```
+for each active NPC (max 16):
+    1. Update animation frame
+    2. Process movement pattern
+    3. Check collision with map
+    4. Update sprite position
+    5. Check for player interaction
+    6. Execute AI script if any
+```
+
+**Calls:**
+- `CheckCollision` - Validate NPC movement
+- `UpdateNPCAnimation` - Update sprite frame
+- `CheckPlayerProximity` - Detect interaction
+
+**Called By:**
+- Main game loop (field mode)
+
+**Related:**
+- See `docs/NPC_SYSTEM.md` for NPC data structure
+
+#### CheckPlayerProximity
+**Location:** Bank $06 @ $C234  
+**File:** `src/asm/bank_06_documented.asm`
+
+**Purpose:** Check if player is near an NPC for interaction.
+
+**Inputs:**
+- `A` = NPC index (0-15)
+
+**Outputs:**
+- Carry flag: Set if player is adjacent
+- `X` = Distance X (signed)
+- `Y` = Distance Y (signed)
+
+**Technical Details:**
+- Calculates Manhattan distance
+- Checks if player is within 1 tile (adjacent)
+- Accounts for NPC facing direction
+
+**Interaction Distance:**
+```
+Adjacent tiles (distance = 1):
+  [N]     North
+[W][P][E] West-Player-East
+  [S]     South
+```
+
+**Side Effects:**
+- None (read-only check)
+
+**Algorithm:**
+```
+1. Get player position (tile coordinates)
+2. Get NPC position (tile coordinates)
+3. Calculate dx = player.x - npc.x
+4. Calculate dy = player.y - npc.y
+5. If abs(dx) + abs(dy) == 1: Set carry
+```
+
+**Called By:**
+- `UpdateNPCs` - Check for interactions
+- Event system - Trigger dialogue
+- Quest system - Check objectives
+
+**Related:**
+- Used for dialogue triggers
+
+---
+
+## Menu System Functions
+
+### Battle Menu
+
+#### DisplayBattleMenu
+**Location:** Bank $03 @ $8000  
+**File:** `src/asm/bank_03_documented.asm`
+
+**Purpose:** Display and handle battle command menu.
+
+**Inputs:**
+- `A` = Character index (0-3)
+
+**Outputs:**
+- Selected command in action queue
+- Menu closed
+
+**Battle Commands:**
+```
+0: Attack  - Physical attack
+1: Defend  - Reduce damage taken
+2: Magic   - Spell menu
+3: Item    - Item menu
+4: Run     - Attempt to flee
+```
+
+**Technical Details:**
+- Displays command window
+- Highlights available commands
+- Processes input
+- Validates command availability (magic requires MP, etc.)
+- Updates cursor position
+
+**Side Effects:**
+- Updates menu graphics in VRAM
+- Modifies OAM for cursor sprite
+- Updates battle state flags
+- Sets selected command in RAM
+
+**Calls:**
+- `RenderMenuWindow` - Draw menu background
+- `PrintMenuText` - Display command names
+- `HandleMenuInput` - Process controller
+- `ValidateCommand` - Check if command available
+
+**Called By:**
+- `Battle_ProcessTurn` when player turn starts
+
+**Related:**
+- See `docs/MENU_SYSTEM.md` for menu structure
+
+#### HandleMenuInput
+**Location:** Bank $03 @ $8234  
+**File:** `src/asm/bank_03_documented.asm`
+
+**Purpose:** Process controller input for menu navigation.
+
+**Inputs:**
+- `$00` = Current menu state
+- Controller input from hardware
+
+**Outputs:**
+- `A` = Selected menu option (or $FF if cancelled)
+- Carry flag: Set if selection confirmed
+
+**Technical Details:**
+- Reads controller port
+- Handles D-pad navigation
+- Processes A button (confirm) and B button (cancel)
+- Updates cursor position
+- Plays sound effects
+- Handles menu wrapping
+
+**Controller Mapping:**
+```
+D-Pad Up:    Move cursor up
+D-Pad Down:  Move cursor down
+D-Pad Left:  Move cursor left (if multi-column)
+D-Pad Right: Move cursor right (if multi-column)
+A Button:    Confirm selection
+B Button:    Cancel/back
+Start:       Pause menu (field mode only)
+```
+
+**Side Effects:**
+- Updates cursor sprite position
+- Plays menu sound effects
+- Modifies `$01` (cursor position)
+
+**Algorithm:**
+```
+1. Read controller input ($4218-$4219)
+2. Check for new button presses (debounce)
+3. If D-pad pressed:
+     Update cursor position
+     Wrap if at boundary
+     Play cursor sound
+4. If A button pressed:
+     Validate selection
+     Play confirm sound
+     Return selection
+5. If B button pressed:
+     Play cancel sound
+     Return $FF
+```
+
+**Called By:**
+- All menu functions (battle, equipment, items, etc.)
+
+**Related:**
+- See `docs/INPUT_SYSTEM.md` for controller details
+
+### Equipment Menu
+
+#### DisplayEquipmentMenu
+**Location:** Bank $03 @ $9000  
+**File:** `src/asm/bank_03_documented.asm`
+
+**Purpose:** Display character equipment screen with stat comparisons.
+
+**Inputs:**
+- `A` = Character index (0-3)
+
+**Outputs:**
+- Equipment changes saved
+- Stats updated
+
+**Technical Details:**
+- Displays current equipment
+- Shows available equipment in inventory
+- Calculates stat changes when changing equipment
+- Highlights stat improvements (green) and decreases (red)
+- Handles equipment restrictions (character-specific)
+
+**Equipment Slots:**
+```
+0: Weapon   - Affects Attack
+1: Armor    - Affects Defense
+2: Helmet   - Affects Defense/Magic Defense
+3: Shield   - Affects Defense/Evasion
+4: Accessory - Special effects
+```
+
+**Stat Display:**
+```
+Current → New
+Attack:  50 → 65 (+15)  [Green if increase]
+Defense: 30 → 28 (-2)   [Red if decrease]
+Magic:   20 → 20 (---)  [White if no change]
+```
+
+**Side Effects:**
+- Updates character equipment in SRAM
+- Recalculates character stats
+- Updates menu graphics
+- Modifies inventory flags
+
+**Calls:**
+- `GetCharacterStats` - Current stats
+- `CalculateEquipmentStats` - Projected stats
+- `RenderStatComparison` - Show stat changes
+- `SaveEquipmentChange` - Apply changes
+
+**Called By:**
+- Main menu system
+- Shop equipment purchase
+- Treasure chest equipment
+
+**Related:**
+- See `docs/EQUIPMENT_SYSTEM.md` for equipment data
+
+---
+
 ## Sound System Functions
 
 ### Music Playback
@@ -1247,12 +1701,26 @@ return (seed >> 16) & 0xFF
 - `CalculatePhysicalDamage` @ $C500 - Physical damage calculation
 - `CalculateMagicDamage` @ $C600 - Magic damage calculation
 
+### Bank $03 - Menu System
+- `DisplayBattleMenu` @ $8000 - Battle command menu
+- `HandleMenuInput` @ $8234 - Menu input processing
+- `DisplayEquipmentMenu` @ $9000 - Equipment screen
+- `GetCharacterStats` - Character stat calculation
+- `CalculateEquipmentStats` - Equipment stat preview
+- `SaveEquipmentChange` - Apply equipment changes
+
 ### Bank $05 - Graphics/Palette
 - `LoadPalette` @ $A000 - Load color palette into CGRAM
 
 ### Bank $06 - Map System
-- `LoadMap` @ $A000 - Map loading
+- `LoadMap` @ $A000 - Map loading and initialization
 - `CheckCollision` @ $B234 - Collision detection
+- `GetTileProperties` @ $B456 - Tile property lookup
+- `UpdateNPCs` @ $C000 - NPC update loop
+- `CheckPlayerProximity` @ $C234 - Player-NPC distance check
+- `DecompressMapData` - Map data decompression
+- `LoadCollisionData` - Collision map loading
+- `InitializeNPCs` - NPC initialization
 
 ### Bank $07 - Graphics System
 - `LoadTileset` @ $8000 - Load tileset into VRAM
@@ -1297,6 +1765,18 @@ return (seed >> 16) & 0xFF
 - `Battle_LoadGraphics` (Bank $01 @ $8244)
 - `UpdateOAM` (Bank $00 @ $9234)
 
+### Map & World
+- `LoadMap` (Bank $06 @ $A000)
+- `CheckCollision` (Bank $06 @ $B234)
+- `GetTileProperties` (Bank $06 @ $B456)
+- `UpdateNPCs` (Bank $06 @ $C000)
+- `CheckPlayerProximity` (Bank $06 @ $C234)
+
+### Menu & UI
+- `DisplayBattleMenu` (Bank $03 @ $8000)
+- `HandleMenuInput` (Bank $03 @ $8234)
+- `DisplayEquipmentMenu` (Bank $03 @ $9000)
+
 ### Text & UI
 - `PrintText` (Bank $08 @ $9000)
 - `DecompressText` (Bank $08 @ $9234)
@@ -1320,19 +1800,22 @@ See `docs/DOCUMENTATION_UPDATE_CHECKLIST.md` for complete guidelines.
 
 ---
 
-**Note:** This is a living document. Not all functions are documented yet. Current coverage: **~25.6%** (2,090+ / 8,153 functions).
+**Note:** This is a living document. Not all functions are documented yet. Current coverage: **~25.8%** (2,100+ / 8,153 functions).
 
 **Recent Additions (2025-11-05):**
 - Added 10 battle system functions (initialization, main loop, turn processing)
 - Added 3 enemy AI functions (decision-making, targeting, execution)
 - Added 4 graphics system functions (tileset loading, decompression, palette, OAM)
+- Added 5 map system functions (loading, collision, tiles, NPCs, proximity)
+- Added 3 menu system functions (battle menu, input handling, equipment)
 - Expanded technical details with algorithms and data structures
 - Added Quick Reference by Function Type
 
 **Next Priority Areas:**
-- Map system functions (collision, loading, NPCs)
 - Item/inventory management functions
-- Menu system functions
-- Save/load system functions
+- Save/load system functions  
+- Field movement and player control
+- Shop system functions
+- Status effect processing
 
 For undocumented functions, see the source ASM files directly in `src/asm/`.
