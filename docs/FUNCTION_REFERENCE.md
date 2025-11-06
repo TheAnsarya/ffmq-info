@@ -4,7 +4,7 @@ Complete reference for all documented functions in Final Fantasy: Mystic Quest.
 
 **Last Updated:** 2025-11-05  
 **Status:** Active - Continuously updated with code analysis  
-**Coverage:** 2,182+ documented functions out of 8,153 total (~26.8%)
+**Coverage:** 2,185+ documented functions out of 8,153 total (~26.8%)
 
 ## Table of Contents
 
@@ -7264,6 +7264,569 @@ Exit:   DB=$0C
 
 ---
 
+### Palette Management
+
+#### Display_PaletteLoadSetup
+**Location:** Bank $0C @ $81DA  
+**File:** `src/asm/bank_0C_documented.asm`
+
+**Purpose:** Prepare palette data for DMA transfer during VBLANK. Sets up NMI handler to execute embedded palette DMA routine.
+
+**Inputs:**
+- Palette data in Bank $07 @ $D934, $D974 (source ROM data)
+
+**Outputs:**
+- $005A = $0C (DMA handler bank)
+- $0058 = $81EF (DMA handler address - embedded routine)
+- $00E2 |= $40 (VBLANK DMA pending flag)
+
+**Side Effects:**
+- Modifies NMI handler vectors ($005A, $0058)
+- Sets bit 6 of $00E2 (NMI will execute palette DMA)
+- Waits for one VBLANK period
+- Palette DMA executes during next VBLANK
+
+**Algorithm:**
+
+**Phase 1: Configure NMI Handler**
+```
+Setup palette DMA callback:
+1. A = $0C → $005A (handler bank)
+2. X = $81EF → $0058 (handler address)
+   
+Handler location: $0C:$81EF (embedded DMA routine)
+Purpose: Transfers 160 bytes of palette data to CGRAM
+```
+
+**Phase 2: Set VBLANK DMA Flag**
+```
+TSB (Test and Set Bits):
+- A = $40 (bit 6)
+- TSB $00E2 (atomic test-and-set)
+
+Result: $00E2 |= $40
+Effect: NMI handler will call palette DMA next VBLANK
+```
+
+**Phase 3: Synchronize**
+```
+JSL Display_WaitVBlank (CODE_0C8000)
+
+Purpose: Wait for current frame to complete
+         Palette DMA executes during next VBLANK
+         Ensures clean palette transition
+```
+
+**Embedded Palette DMA Routine ($0C:$81EF):**
+```asm
+; Executed during VBLANK when $00E2 bit 6 set
+; Transfers 160 bytes total (10 × 16-byte chunks)
+
+PaletteDMA_Routine:
+    ; Configure DMA0 for CGRAM transfer
+    LDX #$2200          ; DMA mode: A→B, increment
+    STX $4300           ; DMA0 parameters
+    
+    LDA #$07            ; Source bank = $07
+    STA $4304           ; DMA0 source bank
+    
+    ; Transfer sequence (10 calls × 16 bytes each)
+    LDA #$10            ; CGRAM address = $10
+    LDY #$D974          ; Source: Bank $07:D974
+    JSR Display_PaletteDMATransfer  ; 16 bytes
+    
+    LDY #$D934          ; Source: Bank $07:D934
+    JSR Display_PaletteDMATransfer  ; 16 bytes
+    JSR Display_PaletteDMATransfer  ; 16 bytes (auto-increment)
+    JSR Display_PaletteDMATransfer  ; 16 bytes
+    JSR Display_PaletteDMATransfer  ; 16 bytes
+    
+    LDA #$B0            ; CGRAM address = $B0
+    JSR Display_PaletteDMATransfer  ; 16 bytes
+    
+    LDY #$D934          ; Reset source
+    JSR Display_PaletteDMATransfer  ; 16 bytes
+    JSR Display_PaletteDMATransfer  ; 16 bytes
+    JSR Display_PaletteDMATransfer  ; 16 bytes
+    JSR Display_PaletteDMATransfer  ; 16 bytes
+    
+    RTL                 ; Return from NMI
+```
+
+**Palette Transfer Map:**
+```
+Transfer 1: CGRAM $10-$1F ← Bank $07:D974-D983 (16 bytes)
+Transfer 2: CGRAM $20-$2F ← Bank $07:D934-D943 (16 bytes)
+Transfer 3: CGRAM $30-$3F ← Bank $07:D944-D953 (16 bytes)
+Transfer 4: CGRAM $40-$4F ← Bank $07:D954-D963 (16 bytes)
+Transfer 5: CGRAM $50-$5F ← Bank $07:D964-D973 (16 bytes)
+Transfer 6: CGRAM $B0-$BF ← Bank $07:D974-D983 (16 bytes)
+Transfer 7: CGRAM $C0-$CF ← Bank $07:D934-D943 (16 bytes)
+Transfer 8: CGRAM $D0-$DF ← Bank $07:D944-D953 (16 bytes)
+Transfer 9: CGRAM $E0-$EF ← Bank $07:D954-D963 (16 bytes)
+Transfer 10: CGRAM $F0-$FF ← Bank $07:D964-D973 (16 bytes)
+
+Total: 160 bytes (80 colors)
+CGRAM ranges: $10-$5F (80 bytes) + $B0-$FF (80 bytes)
+```
+
+**CGRAM Color Organization:**
+```
+SNES CGRAM: 512 bytes (256 colors × 2 bytes per color)
+
+Palette structure (16-color palettes):
+- Palette 0: $00-$1F (BG, usually transparent)
+- Palette 1: $20-$3F (BG/Sprite palette 0)
+- Palette 2: $40-$5F (BG/Sprite palette 1)
+- Palette 3: $60-$7F (BG/Sprite palette 2)
+- Palette 4: $80-$9F (BG/Sprite palette 3)
+- Palette 5: $A0-$BF (BG/Sprite palette 4)
+- Palette 6: $C0-$DF (BG/Sprite palette 5)
+- Palette 7: $E0-$FF (BG/Sprite palette 6)
+
+This function loads:
+- Palettes 1-2 (partial): $10-$5F (skips color 0 of each)
+- Palettes 5-7 (partial): $B0-$FF (skips color 0 of palette 5)
+
+Skipped colors (0, $60-$AF): Likely background or reserved
+```
+
+**Performance:**
+```
+Setup time:     ~50 cycles (register configuration)
+VBLANK wait:    Variable (~16,700 cycles typical)
+Total setup:    ~16,750 cycles (~0.94ms)
+
+Palette DMA (during VBLANK):
+- 10 transfers × 16 bytes = 160 bytes
+- Per transfer: ~160 cycles (DMA + overhead)
+- Total DMA: ~1,600 cycles (~0.09ms)
+- VBLANK budget: ~30,000 cycles available
+- Utilization: ~5% of VBLANK period
+
+Advantage:
+- DMA is ~3× faster than CPU writes
+- Non-blocking (executes during VBLANK)
+- Multiple palettes updated atomically
+```
+
+**Register Usage:**
+```
+Entry:  Any state
+Work:   A=8-bit (bank, flag mask)
+        X=16-bit (handler address)
+Exit:   A=undefined
+        X=undefined
+```
+
+**Calls:**
+- Display_WaitVBlank (CODE_0C8000) - Frame synchronization
+
+**Called By:**
+- Screen initialization (Display_MainScreenSetup)
+- Battle transitions
+- Map area changes
+- Cutscene palette swaps
+
+**Related:**
+- Display_PaletteDMATransfer - Single 16-byte transfer
+- Display_ColorAdditionSetup - Color math effects
+- See SNES Dev Manual - CGRAM ($2121-$2122)
+
+---
+
+#### Display_PaletteDMATransfer
+**Location:** Bank $0C @ $8224  
+**File:** `src/asm/bank_0C_documented.asm`
+
+**Purpose:** Transfer single 16-byte palette chunk (8 colors) to CGRAM via DMA. Auto-increments addresses for sequential calls.
+
+**Inputs:**
+- `A` = CGRAM address (palette index $00-$FF)
+- `Y` = Source address in Bank $07 (palette data)
+- DMA0 configured (bank $07, mode $22)
+
+**Outputs:**
+- `A` += $10 (next CGRAM address)
+- `Y` += $10 (next source address)
+- 16 bytes transferred to CGRAM
+
+**Side Effects:**
+- Modifies $2121 (CGRAM address)
+- Modifies $4302-$4303 (DMA0 source address)
+- Modifies $4305-$4306 (DMA0 byte count)
+- Modifies $420B (triggers DMA)
+- Halts CPU during DMA (~160 cycles)
+
+**Algorithm:**
+
+**Phase 1: Set CGRAM Address**
+```
+PHA                 ; Save CGRAM address
+STA $2121           ; Set CGRAM write address
+                    ; Subsequent DMA writes go here
+```
+
+**Phase 2: Configure DMA0 Source**
+```
+STY $4302           ; DMA0 source address (low/high)
+                    ; Points to Bank $07:YYYY
+                    
+Note: Bank already set to $07 by caller
+      DMA mode $22 already configured:
+      - Destination: $2122 (CGDATA)
+      - Transfer: CPU → PPU
+      - Auto-increment source
+```
+
+**Phase 3: Set Transfer Size**
+```
+LDX #$0010          ; 16 bytes (8 colors × 2 bytes/color)
+STX $4305           ; DMA0 byte count
+```
+
+**Phase 4: Execute DMA**
+```
+LDA #$01            ; Enable DMA channel 0
+STA $420B           ; Start DMA transfer
+                    
+DMA execution:
+1. CPU halts (~160 cycles total)
+2. DMA reads 16 bytes from Bank $07:Y
+3. DMA writes to $2122 (CGDATA)
+4. CGRAM address auto-increments
+5. CPU resumes
+```
+
+**Phase 5: Auto-Increment Addresses**
+```
+REP #$30            ; 16-bit mode
+TYA                 ; Load source address
+ADC #$0010          ; Add 16 bytes
+TAY                 ; Update source for next call
+SEP #$20            ; 8-bit mode
+
+PLA                 ; Restore CGRAM address
+ADC #$10            ; Add 16 colors ($10 in CGRAM)
+                    ; Ready for next transfer
+RTS
+```
+
+**SNES Color Format (15-bit BGR):**
+```
+Each color: 2 bytes (16-bit word)
+Format: 0BBBBBGGGGGRRRRR
+
+Bit layout:
+15:   Unused (always 0)
+14-10: Blue  (0-31, 5 bits)
+9-5:   Green (0-31, 5 bits)
+4-0:   Red   (0-31, 5 bits)
+
+Example colors:
+$0000 = Black   (%0000000000000000)
+$7FFF = White   (%0111111111111111)
+$001F = Red     (%0000000000011111)
+$03E0 = Green   (%0000001111100000)
+$7C00 = Blue    (%0111110000000000)
+
+16 bytes = 8 colors (one half-palette)
+```
+
+**Transfer Pattern Example:**
+```
+Call 1: A=$10, Y=$D934
+- CGRAM $10-$1F ← Bank $07:D934-D943
+- Output: A=$20, Y=$D944
+
+Call 2: (Auto-incremented from Call 1)
+- CGRAM $20-$2F ← Bank $07:D944-D953
+- Output: A=$30, Y=$D954
+
+Sequential calls naturally progress through:
+- Source data (ROM palette table)
+- Destination (CGRAM color slots)
+
+No manual address calculation needed!
+```
+
+**Performance:**
+```
+Address setup:    ~30 cycles (register writes)
+DMA execution:    ~160 cycles (16 bytes × ~10 cycles/byte)
+Increment calc:   ~25 cycles (16-bit arithmetic)
+Total:            ~215 cycles (~0.012ms @ 1.79 MHz)
+
+vs CPU copy:
+- CPU: 16 bytes × 2 writes × ~10 cycles = ~320 cycles
+- DMA: ~160 cycles
+- Speedup: ~2× faster
+
+Typical usage: 10 sequential calls
+- Total: ~2,150 cycles (~0.12ms)
+- Fits comfortably in VBLANK (~30,000 cycles available)
+```
+
+**Usage Pattern:**
+```asm
+; Typical call sequence in palette DMA routine
+
+; Setup (once)
+LDX #$2200      ; DMA mode
+STX $4300
+LDA #$07        ; Source bank
+STA $4304
+
+; Transfer multiple palettes
+LDA #$10        ; Start at CGRAM $10
+LDY #$D934      ; Source address
+
+JSR Display_PaletteDMATransfer  ; $10-$1F ← D934-D943
+JSR Display_PaletteDMATransfer  ; $20-$2F ← D944-D953
+JSR Display_PaletteDMATransfer  ; $30-$3F ← D954-D963
+; A and Y auto-increment each call
+; No manual address updates needed
+```
+
+**Register Usage:**
+```
+Entry:  A=8-bit (CGRAM address)
+        Y=16-bit (source address in Bank $07)
+        X=any
+Work:   A=8/16-bit (address arithmetic)
+        X=16-bit (byte count)
+        Y=16-bit (address tracking)
+Exit:   A=8-bit (next CGRAM address)
+        Y=16-bit (next source address)
+```
+
+**Calls:**
+- None (direct DMA execution)
+
+**Called By:**
+- Display_PaletteLoadSetup embedded routine ($0C:$81EF)
+- Any palette DMA sequence
+
+**Related:**
+- Display_PaletteLoadSetup - Setup and orchestration
+- See SNES Dev Manual - CGRAM ($2121-$2122)
+- See SNES Dev Manual - DMA ($4300-$4306, $420B)
+
+---
+
+#### Display_ColorAdditionSetup
+**Location:** Bank $0C @ $81CB  
+**File:** `src/asm/bank_0C_documented.asm`
+
+**Purpose:** Enable color addition (color math) for brightness/darkness screen effects. Used for lightning flashes, battle transitions, darkness spells.
+
+**Inputs:**
+- None (uses hardcoded configuration)
+
+**Outputs:**
+- $2130-$2131 (CGSWSEL/CGADSUB) = $7002 (color math enabled)
+- $2132 (COLDATA) = $E0 (fixed color: black/dark)
+- $212C-$212D (TM/TS) = $0110 (layer configuration)
+
+**Side Effects:**
+- Modifies color math registers (affects all on-screen graphics)
+- Modifies main/sub screen layer enables
+- Visual effect: Darkening or brightening of entire screen
+
+**Algorithm:**
+
+**Phase 1: Configure Color Window**
+```
+LDX #$7002          ; Color math configuration
+STX $2130           ; Write to CGSWSEL/CGADSUB
+
+Register breakdown:
+$2130 (CGSWSEL) = $70:
+  Bit 7-6: Clip mode (11 = clip to inside/outside)
+  Bit 5-4: Window 2 enable (11 = enable for color math)
+  Bit 3-2: Window 1 enable (00 = disable)
+  Bit 1-0: Screen window enable (00 = main screen)
+
+$2131 (CGADSUB) = $02:
+  Bit 7: Math mode (0 = add, 1 = subtract)
+  Bit 6: Half color math (0 = full intensity)
+  Bit 5: Enable BG4 (0 = disabled)
+  Bit 4: Enable BG3 (0 = disabled)
+  Bit 3: Enable BG2 (0 = disabled)
+  Bit 2: Enable BG1 (0 = disabled)
+  Bit 1: Enable OBJ (1 = enabled - sprites affected)
+  Bit 0: Enable backdrop (0 = disabled)
+
+Effect: Color math enabled for sprites only
+```
+
+**Phase 2: Set Fixed Color**
+```
+LDA #$E0            ; Fixed color value
+STA $2132           ; COLDATA register
+
+COLDATA format ($2132):
+  Bit 7: Blue channel enable  (1 = enabled)
+  Bit 6: Green channel enable (1 = enabled)
+  Bit 5: Red channel enable   (1 = enabled)
+  Bit 4-0: Intensity (0-31)
+
+$E0 breakdown:
+  Bits 7-5: %111 = All RGB channels enabled
+  Bits 4-0: %00000 = Intensity 0 (black)
+
+Result: Add/subtract black color
+        With intensity 0 = darkening effect
+        Higher values = brightening
+```
+
+**Phase 3: Configure Screen Layers**
+```
+LDX #$0110          ; Layer enable mask
+STX $212C           ; TM/TS registers
+
+$212C (TM - Main Screen) = $01:
+  Bit 4: OBJ enabled (0)
+  Bit 3: BG4 enabled (0)
+  Bit 2: BG3 enabled (0)
+  Bit 1: BG2 enabled (0)
+  Bit 0: BG1 enabled (1)
+  
+  Effect: Only BG1 visible on main screen
+
+$212D (TS - Sub Screen) = $10:
+  Bit 4: OBJ enabled (1)
+  Bit 3: BG4 enabled (0)
+  Bit 2: BG3 enabled (0)
+  Bit 1: BG2 enabled (0)
+  Bit 0: BG1 enabled (0)
+  
+  Effect: Only sprites visible on sub screen
+```
+
+**Color Math Operation:**
+```
+Formula: Output = Main ± Fixed
+
+Main screen color: From BG1 layer
+Sub screen color: From sprite layer
+Fixed color: $E0 (black, all channels)
+
+With $E0 (intensity 0):
+- Addition mode: Output = Main + 0 = Main (no change)
+- Subtraction mode: Output = Main - 0 = Main (no change)
+
+To create darkening effect:
+- Change $2132 to higher value (e.g., $FF)
+- Or flip bit 7 of $2131 (switch to subtraction)
+
+To create brightening effect:
+- Keep addition mode
+- Increase intensity in $2132
+```
+
+**Brightness/Darkness Examples:**
+```
+Full Brightness (White Flash):
+$2132 = $FF  ; All channels, intensity 31
+$2131 = $02  ; Addition mode
+Effect: Screen + white = brightened
+
+Medium Brightness:
+$2132 = $EF  ; All channels, intensity 15
+$2131 = $02  ; Addition mode
+Effect: Screen + medium gray = lighter
+
+Darkness:
+$2132 = $FF  ; All channels, intensity 31
+$2131 = $82  ; Subtraction mode (bit 7 set)
+Effect: Screen - white = darkened
+
+Gradual Fade:
+Loop: $2132 = $E0 → $EF → $FF (fade in)
+      $2132 = $FF → $EF → $E0 (fade out)
+Update each frame for smooth transition
+```
+
+**Common Use Cases:**
+```
+Lightning Flash:
+1. Normal screen ($2132 = $E0, add mode)
+2. Flash peak ($2132 = $FF, add mode) - 1 frame
+3. Return to normal - immediate or fade
+
+Battle Darkness Spell:
+1. Normal screen
+2. Fade to dark: $2132 = $E0 → $FF (subtract mode)
+3. Hold darkness for duration
+4. Fade back: $2132 = $FF → $E0
+
+Screen Transition:
+1. Fade out: Brightness decrease (subtract mode)
+2. Change graphics during black
+3. Fade in: Brightness increase (add mode)
+```
+
+**Performance:**
+```
+Setup time:     ~40 cycles (register writes)
+Per-frame cost: 0 cycles (hardware color math)
+Visual latency: Immediate (next scanline)
+
+Hardware operation:
+- PPU performs color math per pixel
+- No CPU cost after setup
+- Can change $2132 value each frame for fades
+- ~2-3 cycles per register write for updates
+```
+
+**Register Usage:**
+```
+Entry:  Any state
+Work:   A=8-bit (register values)
+        X=16-bit (word writes)
+Exit:   A=undefined
+        X=undefined
+```
+
+**Calls:**
+- None
+
+**Called By:**
+- Battle effect system
+- Screen transition handlers
+- Weather effects (lightning)
+- Spell animations (darkness, flash)
+- Cutscene dramatic effects
+
+**Related:**
+- Display_ColorMathDisable - Disable color math
+- See SNES Dev Manual - Color Math ($2130-$2132)
+- See SNES Dev Manual - Screen Layers ($212C-$212D)
+
+**Technical Notes:**
+```
+Color Math Limitations:
+- Main + Sub screen blending only
+- 15-bit color (5 bits per channel)
+- Half-intensity mode available (bit 6 of $2131)
+- Backdrop color can be included (bit 0 of $2131)
+
+Performance Tips:
+- Setup once, update $2132 only for fades
+- Use half-intensity ($2131 bit 6) for subtle effects
+- Disable when not needed (call Display_ColorMathDisable)
+- Can affect transparency effects
+
+Common Pitfalls:
+- Forgetting to disable after effect
+- Wrong layer configuration (black screen)
+- Intensity too high (washed out colors)
+- Not waiting for VBLANK (tearing on updates)
+```
+
+---
+
 ### Music Playback
 
 #### PlayMusic
@@ -8410,6 +8973,9 @@ Multiple operations:
 - `Display_AnimatedVerticalScroll` @ $8872 - Variable-speed scroll animation
 - `Display_SetupNMIOAMTransfer` @ $8910 - NMI OAM DMA configuration
 - `Display_DirectOAMDMATransfer` @ $8948 - Immediate OAM DMA transfer
+- `Display_PaletteLoadSetup` @ $81DA - Palette DMA setup
+- `Display_PaletteDMATransfer` @ $8224 - Single palette chunk transfer
+- `Display_ColorAdditionSetup` @ $81CB - Color math effects
 - See `src/asm/bank_0C_documented.asm` for Mode 7 functions
 
 ### Bank $0D - Sound/APU
