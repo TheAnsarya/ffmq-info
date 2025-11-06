@@ -4,7 +4,7 @@ Complete reference for all documented functions in Final Fantasy: Mystic Quest.
 
 **Last Updated:** 2025-11-05  
 **Status:** Active - Continuously updated with code analysis  
-**Coverage:** 2,125+ documented functions out of 8,153 total (~26.1%)
+**Coverage:** 2,145+ documented functions out of 8,153 total (~26.3%)
 
 ## Table of Contents
 
@@ -31,6 +31,11 @@ Complete reference for all documented functions in Final Fantasy: Mystic Quest.
   - [Menu Control](#menu-control)
 - [Battle Item & Effect Functions](#battle-item--effect-functions)
   - [Item Usage in Battle](#item-usage-in-battle)
+- [Sprite & Graphics Functions](#sprite--graphics-functions)
+  - [OAM Management](#oam-management)
+  - [Sprite Animation](#sprite-animation)
+- [Battle Damage Modifiers](#battle-damage-modifiers)
+  - [Elemental System](#elemental-system)
 - [Sound System Functions](#sound-system-functions)
 - [Utility Functions](#utility-functions)
 - [Index by Bank](#index-by-bank)
@@ -2593,6 +2598,495 @@ After item effect:
 
 ---
 
+## Sprite & Graphics Functions
+
+### OAM Management
+
+#### BattleSprite_UpdateOAM
+**Location:** Bank $0B @ $8077  
+**File:** `src/asm/bank_0B_documented.asm`
+
+**Purpose:** Update Object Attribute Memory (OAM) for battle sprites - copies sprite data from RAM to OAM mirror for display.
+
+**Inputs:**
+- `$192D` = OAM table index (sprite slot 0-127)
+- `$1A73,X` = Sprite X position (16-bit)
+- `$1A75,X` = Sprite Y position (16-bit)
+- `$1A77,X` = Sprite tile index (character number)
+- `$1A79,X` = Sprite attributes (palette, flip, priority)
+- `X` = Sprite data index
+
+**Outputs:**
+- OAM mirror updated at `$0C02+`
+- Sprite ready for VBLANK DMA transfer
+
+**Technical Details:**
+- OAM (Object Attribute Memory) controls sprite display
+- Mirror buffer updated during logic, transferred during VBLANK
+- Each OAM entry is 4 words (8 bytes)
+- Uses indexed addressing for sprite slots
+
+**OAM Entry Structure:**
+```
+Word 0 ($0C02,Y): X Position (9 bits, bit 8 in high table)
+Word 1 ($0C06,Y): Y Position (8 bits)
+Word 2 ($0C0A,Y): Tile Index (character number)
+Word 3 ($0C0E,Y): Attributes byte
+  Bit 0-2: Palette number (0-7)
+  Bit 3-4: Priority (0-3, 0=highest)
+  Bit 5: Reserved
+  Bit 6: X flip
+  Bit 7: Y flip
+```
+
+**Process Flow:**
+```
+1. Load OAM table index from $192D
+2. Mask to 8-bit value
+3. Multiply by 4 (ASL twice):
+   - Each OAM entry is 4 words
+   - Index * 4 = byte offset
+
+4. Look up base OAM address:
+   - Read from DATA8_01A63A,X (Bank $01 table)
+   - Table contains pre-calculated OAM offsets
+   - Result in Y = destination address
+
+5. Copy sprite data to OAM mirror:
+   - $1A73,X → $0C02,Y (X position)
+   - $1A75,X → $0C06,Y (Y position)
+   - $1A77,X → $0C0A,Y (Tile index)
+   - $1A79,X → $0C0E,Y (Attributes)
+
+6. Exit (restore registers and return)
+```
+
+**OAM Address Table (DATA8_01A63A):**
+```
+Pre-calculated offsets for 128 sprite slots
+Each entry points to:
+  Slot 0:  $0C02 (offset $00)
+  Slot 1:  $0C0A (offset $08)
+  Slot 2:  $0C12 (offset $10)
+  ...
+  Slot 127: Last OAM entry
+```
+
+**Side Effects:**
+- Updates OAM mirror at `$0C02-$0CFF` range
+- Does NOT directly write to PPU
+- Actual transfer happens during VBLANK via DMA
+
+**Register Usage:**
+```
+Entry: 16-bit mode (REP #$30)
+A: OAM index calculations
+X: Sprite data index (preserved via PHX/PLX)
+Y: OAM destination address
+```
+
+**Called By:**
+- Battle sprite animation system
+- Every frame for active battle sprites
+- Sprite movement/animation routines
+
+**Related:**
+- See VBLANK DMA transfer routines for OAM upload
+- See `$2102-$2104` (OAMADDL/OAMDATA) for PPU registers
+- See sprite animation system for frame updates
+
+---
+
+### Sprite Animation
+
+#### BattleSprite_Animate
+**Location:** Bank $0B @ $803F  
+**File:** `src/asm/bank_0B_documented.asm`
+
+**Purpose:** Update sprite animation state and render animation frames.
+
+**Inputs:**
+- `$192B` = Sprite index (or $FFFF if no sprite)
+- `$1A80,X` = Sprite attribute flags
+- `$1A82,X` = Animation frame index
+
+**Outputs:**
+- Sprite animation advanced
+- OAM data updated
+- Graphics rendered
+
+**Technical Details:**
+- Called during VBLANK
+- Manages sprite state transitions
+- Coordinates with frame data tables
+- Updates both logic and display
+
+**Process Flow:**
+```
+1. Save processor state (PHP/PHB/PHX/PHY)
+2. Set CPU modes:
+   - SEP #$20 (8-bit A)
+   - REP #$10 (16-bit X/Y)
+3. Set data bank to $0B (PHK/PLB)
+
+4. Call animation state setup:
+   - JSR CODE_0B80D9
+   - Prepares animation tables
+
+5. Check sprite validity:
+   - Load sprite index from $192B
+   - Compare with $FFFF
+   - Exit if no sprite active
+
+6. Update sprite attributes:
+   - Load current attributes ($1A80,X)
+   - AND with $CF (clear palette bits 4-5)
+   - OR with $10 (set palette 1)
+   - Store back to $1A80,X
+
+7. Load animation frame data:
+   - Get frame index from $1A82,X
+   - Multiply by 2 (word table)
+   - Look up in DATA8_00FDCA (Bank $00)
+   - Add $08 offset for alignment
+   - Result in Y = frame data pointer
+
+8. Render sprite:
+   - JSL CODE_01AE86 (Bank $01)
+   - Sprite rendering routine
+   - Processes frame data
+   - Updates graphics buffers
+
+9. Update OAM:
+   - Call BattleSprite_UpdateOAM
+   - Copy data to OAM mirror
+   - Prepare for VBLANK transfer
+
+10. Restore state and return
+```
+
+**Animation Frame Table:**
+```
+Location: DATA8_00FDCA (Bank $00)
+Format: Word table (16-bit pointers)
+  Index 0: Frame 0 data address
+  Index 1: Frame 1 data address
+  ...
+  
+Frame Data Structure:
+  +$00: Frame header
+  +$08: Sprite data start (offset added)
+  Data contains:
+    - Tile patterns
+    - Palette info
+    - Position offsets
+```
+
+**Palette Management:**
+```
+Default: Clear bits 4-5 (AND $CF)
+Set: OR with $10 (palette 1)
+
+Palette Bits in Attributes:
+  Bits 0-2: Primary palette (0-7)
+  Bits 4-5: Extended palette flags
+  
+Final value determines CGRAM location
+```
+
+**Side Effects:**
+- Modifies `$1A80,X` (sprite attributes)
+- Updates animation state
+- Calls rendering subsystems
+- Updates OAM mirror
+- Changes data bank register
+
+**Calls:**
+- `CODE_0B80D9` - Animation state setup
+- `CODE_01AE86` @ Bank $01 - Sprite rendering
+- `BattleSprite_UpdateOAM` - OAM update
+
+**Called By:**
+- Battle main loop
+- VBLANK handler
+- Sprite effect system
+
+**Related:**
+- See frame data tables in Bank $00
+- See sprite rendering in Bank $01
+
+---
+
+## Battle Damage Modifiers
+
+### Elemental System
+
+#### Battle_ProcessElementalDamage
+**Location:** Bank $02 @ $94D6  
+**File:** `src/asm/banks/bank_02.asm`
+
+**Purpose:** Process elemental damage modifiers - applies weakness, resistance, absorption, and nullification.
+
+**Inputs:**
+- `$77` = Base damage value (16-bit)
+- `$BA` = Elemental multiplier (1-4)
+- `$DE` = Attack/spell type
+- `$11` = Target status/resistance flags
+- `$21` = Target elemental flags
+
+**Outputs:**
+- `$77` = Modified damage value
+- Elemental effects applied
+- Status effects triggered
+
+**Technical Details:**
+- Handles all elemental interactions
+- Supports multiple element types
+- Manages special cases (absorb, nullify)
+- Integrates with status system
+
+**Elemental Types:**
+```
+Fire:    Weakness vs Ice, Weak vs Water
+Ice:     Weakness vs Fire
+Thunder: Weakness vs Earth
+Water:   Weakness vs Fire
+Earth:   Weakness vs Thunder
+Wind:    Special interactions
+Light:   Holy damage
+Dark:    Shadow damage
+```
+
+**Process Flow:**
+```
+1. Check for death resistance:
+   - JSR Battle_DeathResistCheck
+   - Instant death immunity check
+
+2. Determine spell/attack type:
+   - Load $DE (attack type)
+   - Compare with $17 (spell threshold)
+   - Branch to appropriate handler
+
+3. For spells ($DE >= $17):
+   - JSR Battle_MuteApplied
+   - Check if mute prevents casting
+   - Skip to bonus if muted
+
+4. For physical ($DE < $17):
+   - JSR Battle_ProcessMuteSpell
+   - Different mute handling
+
+5. Apply elemental multiplier:
+   - REP #$20 (16-bit mode)
+   - Load multiplier from $BA
+   - Load base damage from $77
+   - Loop: Add damage × multiplier times
+     LDX $BA
+     Loop:
+       DEX
+       BEQ Done
+       CLC
+       ADC $77
+       BRA Loop
+   - Store result back to $77
+
+6. Special attack handling:
+   - Check if $DE == $16
+   - If yes: Keep full damage
+   - If no: Halve damage (LSR A)
+
+7. Apply weakness/resistance:
+   - Check target flags ($11, $21)
+   - Call weakness detection
+   - Call resistance detection
+   - Call absorption detection
+   - Call nullification detection
+
+8. Final processing:
+   - JSR Battle_ReflectSpell (check reflect)
+   - JMP Battle_ProcessPetrifySpell (petrify)
+```
+
+**Elemental Multiplier System:**
+```
+$BA = Multiplier value (1-4)
+
+Value 1: Normal damage (×1)
+Value 2: Weakness (×2)
+Value 3: Greater weakness (×3)
+Value 4: Critical weakness (×4)
+
+Damage calculation:
+  result = base_damage × multiplier
+  
+Implementation:
+  Start with base_damage
+  Add base_damage (multiplier - 1) times
+```
+
+**Special Cases:**
+```
+Absorb ($11 bit 3 set):
+  - Damage becomes healing
+  - Convert to HP restoration
+  - Check target max HP
+  - Display healing number
+
+Nullify (resistance flags):
+  - Damage reduced to 0
+  - Display "Miss" or "No effect"
+  - No status effects applied
+
+Reflect (reflect flag set):
+  - Spell bounces back to caster
+  - Recalculate with new target
+  - Apply to original caster
+```
+
+**Side Effects:**
+- Modifies `$77` (damage value)
+- May trigger status effects
+- Updates battle state
+- Calls multiple subsystems
+
+**Calls:**
+- `Battle_DeathResistCheck` @ $999D - Death immunity
+- `Battle_MuteApplied` @ $9B34 - Mute check (spells)
+- `Battle_ProcessMuteSpell` @ $9B28 - Mute check (physical)
+- `Battle_CurePoison` @ $97B2 - Poison status handling
+- `Battle_ReflectSpell` @ $9BED - Spell reflection
+- `Battle_ProcessPetrifySpell` @ $99DA - Petrification
+
+**Called By:**
+- Damage calculation system
+- After base damage determined
+- Before final damage application
+
+**Related:**
+- See `Battle_CheckWeaknessFlags` for weakness detection
+- See elemental data tables for element definitions
+
+---
+
+#### Battle_CheckWeaknessFlags
+**Location:** Bank $02 @ $A97F  
+**File:** `src/asm/banks/bank_02.asm`
+
+**Purpose:** Check target's elemental weakness flags and apply appropriate damage modifiers.
+
+**Inputs:**
+- `$21` = Target elemental resistance/weakness flags
+- Target entity data (via direct page)
+
+**Outputs:**
+- `$51` = Weakness flag ($81 normal, $80 double weakness)
+- Weakness detection complete
+
+**Technical Details:**
+- Examines elemental affinity flags
+- Determines weakness level
+- Sets multiplier flags
+- Part of damage calculation chain
+
+**Weakness Flag Structure:**
+```
+$21 (Target Elemental Flags):
+  Bit 0: Fire weakness
+  Bit 1: Ice weakness
+  Bit 2: Thunder weakness
+  Bit 3: Absorb flag (special)
+  Bit 4: Water weakness
+  Bit 5: Earth weakness
+  Bit 6: Wind weakness
+  Bit 7: Reserved
+
+$51 (Weakness Result):
+  $81 = Normal weakness (×2 damage)
+  $80 = Critical weakness (×4 damage)
+```
+
+**Process Flow:**
+```
+1. Save direct page (PHD)
+2. Set entity context:
+   - JSR Battle_SetEntityContextParty
+   - Load target data to direct page
+
+3. Set default weakness flag:
+   - LDA #$81
+   - STA $51
+   - Assume normal weakness
+
+4. Check for absorb flag:
+   - LDA $21
+   - AND #$08 (bit 3)
+   - BEQ WeaknessFound
+   - If bit 3 set → Absorb element
+
+5. If absorb flag set:
+   - LDA #$02
+   - STA $00A8 (function parameter)
+   - JSL CODE_009783 (element check)
+   - LDA $00A9 (result)
+   - BEQ WeaknessFound
+   - If match: Absorb applies
+
+6. If absorb matches:
+   - LDA #$80
+   - STA $51
+   - Set critical weakness flag
+
+7. Restore and return:
+   - PLD (restore direct page)
+   - RTS
+```
+
+**Weakness Levels:**
+```
+Normal Weakness ($51 = $81):
+  - Standard elemental weakness
+  - Damage ×2
+  - Common for opposed elements
+
+Critical Weakness ($51 = $80):
+  - Enhanced weakness
+  - Damage ×4
+  - Rare, usually scripted encounters
+```
+
+**Elemental Relationships:**
+```
+Fire weak to: Ice, Water
+Ice weak to: Fire
+Thunder weak to: Earth
+Earth weak to: Thunder
+Water weak to: Thunder
+Wind: Variable
+
+Special: Some enemies weak to specific elements
+```
+
+**Side Effects:**
+- Modifies `$51` (weakness flag)
+- Changes direct page context
+- Calls element checking routine
+- Updates `$00A8-$00A9` (function parameters)
+
+**Calls:**
+- `Battle_SetEntityContextParty` @ $8F22 - Set target context
+- `CODE_009783` @ Bank $00 - Element checking routine
+
+**Called By:**
+- `Battle_ProcessElementalDamage` - During damage calculation
+- Elemental attack processing
+
+**Related:**
+- See `Battle_ProcessWeakness` for weakness application
+- See `Battle_ApplyWeaknessMultiplier` for final multiplier
+
+---
+
 ## Sound System Functions
 
 ### Music Playback
@@ -2701,6 +3195,14 @@ return (seed >> 16) & 0xFF
 - `Battle_CheckTargetDeath` @ $95DE - Verify target alive
 - `Battle_InitializeAnimation` @ $9C9B - Start effect animation
 - `Battle_ApplyStatDebuff` @ $9964 - Apply status effect
+- `Battle_ProcessElementalDamage` @ $94D6 - Elemental damage system
+- `Battle_CheckWeaknessFlags` @ $A97F - Weakness detection
+- `Battle_DeathResistCheck` @ $999D - Death immunity check
+- `Battle_ProcessMuteSpell` @ $9B28 - Mute check (physical)
+- `Battle_MuteApplied` @ $9B34 - Mute check (spells)
+- `Battle_CurePoison` @ $97B2 - Poison status handling
+- `Battle_ReflectSpell` @ $9BED - Spell reflection
+- `Battle_ProcessPetrifySpell` @ $99DA - Petrification
 
 ### Bank $03 - Menu System
 - `DisplayBattleMenu` @ $8000 - Battle command menu
@@ -2732,6 +3234,8 @@ return (seed >> 16) & 0xFF
 - `DecompressText` @ $9234 - Text decompression (DTE)
 
 ### Bank $0B - Battle Graphics
+- `BattleSprite_UpdateOAM` @ $8077 - Update sprite OAM data
+- `BattleSprite_Animate` @ $803F - Sprite animation system
 - See `src/asm/bank_0B_documented.asm` for battle-specific graphics
 
 ### Bank $0C - Mode 7/World Map
@@ -2797,6 +3301,23 @@ return (seed >> 16) & 0xFF
 - `Battle_InitializeAnimation` (Bank $02 @ $9C9B)
 - `Battle_ApplyStatDebuff` (Bank $02 @ $9964)
 
+### Sprite & Graphics
+- `BattleSprite_UpdateOAM` (Bank $0B @ $8077)
+- `BattleSprite_Animate` (Bank $0B @ $803F)
+- `LoadTileset` (Bank $07 @ $8000)
+- `LoadPalette` (Bank $05 @ $A000)
+- `DecompressGraphics` (Bank $07 @ $8234)
+- `Battle_LoadGraphics` (Bank $01 @ $8244)
+- `UpdateOAM` (Bank $00 @ $9234)
+
+### Battle Damage & Elements
+- `CalculatePhysicalDamage` (Bank $02 @ $C500)
+- `CalculateMagicDamage` (Bank $02 @ $C600)
+- `Battle_ProcessElementalDamage` (Bank $02 @ $94D6)
+- `Battle_CheckWeaknessFlags` (Bank $02 @ $A97F)
+- `Battle_DeathResistCheck` (Bank $02 @ $999D)
+- `Battle_ReflectSpell` (Bank $02 @ $9BED)
+
 ### Item & Inventory
 - `Item_AddItem` (Bank $00 @ $DB3B)
 - `Item_RemoveItem` (Bank $00 @ $DBF8)
@@ -2832,7 +3353,28 @@ See `docs/DOCUMENTATION_UPDATE_CHECKLIST.md` for complete guidelines.
 
 ---
 
-**Note:** This is a living document. Not all functions are documented yet. Current coverage: **~26.1%** (2,125+ / 8,153 functions).
+**Note:** This is a living document. Not all functions are documented yet. Current coverage: **~26.3%** (2,145+ / 8,153 functions).
+
+**Recent Additions (2025-11-05):**
+- Added 10 battle system functions (initialization, main loop, turn processing)
+- Added 3 enemy AI functions (decision-making, targeting, execution)
+- Added 4 graphics system functions (tileset loading, decompression, palette, OAM)
+- Added 5 map system functions (loading, collision, tiles, NPCs, proximity)
+- Added 3 menu system functions (battle menu, input handling, equipment)
+- Added 4 item/inventory functions (add, remove, check usage, shop gold)
+- Added 3 save/load functions (load from SRAM, new game init, validation)
+- Added 3 field movement functions (player update, input processing, menu control)
+- Added 2 battle item functions (item usage, effect application)
+- Added 2 sprite/OAM functions (OAM update, sprite animation)
+- Added 2 elemental damage functions (damage processing, weakness check)
+- Expanded technical details with algorithms and data structures
+- Added Quick Reference by Function Type
+
+**Next Priority Areas:**
+- More status effect functions
+- DMA transfer system
+- Collision detection details
+- Shop interfaces
 
 **Recent Additions (2025-11-05):**
 - Added 10 battle system functions (initialization, main loop, turn processing)
