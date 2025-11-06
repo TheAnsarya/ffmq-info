@@ -2221,6 +2221,301 @@ Loop:
 
 ---
 
+#### BattleSprite_SetupMultiSpriteOAM
+**Location:** Bank $01 @ $A140  
+**File:** `src/asm/bank_01_documented.asm`
+
+**Purpose:** Configure OAM (Object Attribute Memory) for 4-sprite (16x16 tile) character display with boundary clipping.
+
+**Inputs:**
+- `$0A` (word) = Sprite X coordinate
+- `$0C` (word) = Sprite Y coordinate
+- `X` = OAM offset (sprite table index)
+- `Y` = OAM high table offset
+
+**Outputs:** 
+- OAM entries configured at $010C00+X (4 sprites)
+- OAM high bits at $010C00+Y
+
+**Technical Details:**
+- Handles large sprites (2×2 tile arrangement)
+- Tests boundary conditions for edge clipping
+- X range: $F8-$100 (right edge), $3F0-$3F8 (left edge)
+- Y range: $E8-$400 valid
+- Uses separate handlers for edge cases
+
+**Process:**
+1. Check X coordinate:
+   - If < $F8: StandardSetup
+   - If $F8-$FF: SetupRightEdgeClip
+   - If $100-$3EF: HideSprite (off-screen)
+   - If $3F0-$3F7: SetupLeftEdgeClip
+   - If $3F8-$3FF: StandardSetup
+   - If >= $400: FullVisible
+2. Setup 4 sprites (top-left, top-right, bottom-left, bottom-right)
+3. Configure positions and tile numbers
+4. Set OAM high bits for size/priority
+
+**Performance:** ~180-280 cycles (depends on clipping path)
+
+**Called By:** Battle sprite renderer, character animation system
+
+---
+
+#### BattleSprite_HideOffScreen
+**Location:** Bank $01 @ $A186  
+**File:** `src/asm/bank_01_documented.asm`
+
+**Purpose:** Hide sprites that are completely off-screen by setting Y=$E0.
+
+**Inputs:**
+- `X` = OAM offset
+- `Y` = OAM high table offset
+
+**Outputs:** 4 sprites hidden in OAM
+
+**Technical Details:**
+- Sets all 4 sprite entries to Y=$E0, X=$80 (off-screen position)
+- OAM high bits = $55 (normal size, low priority)
+- Sprites invisible but still in OAM table
+
+**Process:**
+1. Load $E080 (Y=$E0, X=$80)
+2. Write to $010C00,X (sprite 0)
+3. Write to $010C04,X (sprite 1)
+4. Write to $010C08,X (sprite 2)
+5. Write to $010C0C,X (sprite 3)
+6. Write $55 to high table at Y
+
+**Performance:** ~50 cycles
+
+**Use Cases:** Character off-screen, invisible enemies, menu transitions
+
+---
+
+#### BattleSprite_SetupRightEdgeClip
+**Location:** Bank $01 @ $A1A8  
+**File:** `src/asm/bank_01_documented.asm`
+
+**Purpose:** Configure sprites partially visible on right edge of screen.
+
+**Inputs:**
+- `$0A` (word) = X coordinate ($F8-$FF range)
+- `$0C` (word) = Y coordinate
+- `X` = OAM offset
+
+**Outputs:** Left 2 sprites visible, right 2 sprites hidden
+
+**Technical Details:**
+- Shows left column (top-left, bottom-left sprites)
+- Hides right column (set X=$80 for off-screen)
+- Handles 8-pixel clipping at screen boundary
+
+**Process:**
+1. Set sprite 0 (top-left): X from $0A, Y from $0C
+2. Set sprite 2 (bottom-left): X from $0A, Y = $0C + 8
+3. Set sprite 1 (top-right): X=$80 (hidden)
+4. Set sprite 3 (bottom-right): X=$80 (hidden)
+5. Configure Y positions for visible sprites
+
+**Performance:** ~90 cycles
+
+**Use Cases:** Character exiting screen right, scrolling transitions
+
+---
+
+#### BattleSprite_SetupLeftEdgeClip
+**Location:** Bank $01 @ $A1D3  
+**File:** `src/asm/bank_01_documented.asm`
+
+**Purpose:** Configure sprites partially visible on left edge of screen.
+
+**Inputs:**
+- `$0A` (word) = X coordinate ($3F0-$3F7 range)
+- `$0C` (word) = Y coordinate
+- `X` = OAM offset
+
+**Outputs:** Right 2 sprites visible, left 2 sprites at edge
+
+**Technical Details:**
+- Shows right column of character sprite
+- Wraps X coordinate (subtract $400 to get screen position)
+- Left column partially visible or clipped
+
+**Process:**
+1. Calculate wrapped X: $0A - $400 → effective X
+2. Set sprite 1 (top-right): X = wrapped + 8, Y from $0C
+3. Set sprite 3 (bottom-right): X = wrapped + 8, Y = $0C + 8
+4. Set sprite 0 (top-left): X = wrapped (may be off-screen)
+5. Set sprite 2 (bottom-left): X = wrapped
+
+**Performance:** ~95 cycles
+
+---
+
+#### BattleSprite_SetupFullVisible
+**Location:** Bank $01 @ $A1FF  
+**File:** `src/asm/bank_01_documented.asm`
+
+**Purpose:** Standard 4-sprite setup for fully visible character (no clipping).
+
+**Inputs:**
+- `$0A` (word) = X coordinate
+- `$0C` (word) = Y coordinate
+- `X` = OAM offset
+
+**Outputs:** All 4 sprites configured and visible
+
+**Technical Details:**
+- 2×2 tile arrangement (16×16 pixels)
+- Top-left: (X, Y)
+- Top-right: (X+8, Y)
+- Bottom-left: (X, Y+8)
+- Bottom-right: (X+8, Y+8)
+
+**Process:**
+1. Sprite 0: X=$0A, Y=$0C
+2. Sprite 1: X=$0A+8, Y=$0C
+3. Sprite 2: X=$0A, Y=$0C+8
+4. Sprite 3: X=$0A+8, Y=$0C+8
+5. Set high table bits for size
+
+**Performance:** ~70 cycles
+
+**Use Cases:** Normal battle character display, center-screen sprites
+
+---
+
+#### Battle_ProcessAITurn
+**Location:** Bank $01 @ $832D  
+**File:** `src/asm/bank_01_documented.asm`
+
+**Purpose:** Process enemy AI turn logic and decision-making.
+
+**Inputs:**
+- `$0119A5` (byte) = AI state flags
+- Battle state variables
+
+**Outputs:** AI action selected and queued
+
+**Technical Details:**
+- Called from jump table dispatcher
+- Checks AI state before processing
+- Saves/restores bank register
+- Returns via RTL (long return)
+
+**Process:**
+1. Check $0119A5 (AI state)
+2. If zero: Call CODE_018A2D (AI decision routine)
+3. Restore bank register
+4. RTL (return to caller)
+
+**Performance:** ~150-800 cycles (depends on AI complexity)
+
+**Called By:** Battle_JumpTableDispatch, enemy turn handler
+
+---
+
+#### Battle_UpdateAnimations
+**Location:** Bank $01 @ $8330  
+**File:** `src/asm/bank_01_documented.asm`
+
+**Purpose:** Update battle animations and sprite effects.
+
+**Inputs:**
+- `$0119A5` (byte) = Animation state flags
+- `$011A46` (byte) = Animation handler index
+
+**Outputs:** Battle animations advanced one frame
+
+**Technical Details:**
+- Saves processor state (PHP, PHB)
+- Checks animation state ($0119A5 bit 7)
+- Dispatches to animation handler via jump table
+- Clears handler index after execution
+
+**Process:**
+1. PHP, PHB (save state)
+2. PHK, PLB (set data bank)
+3. SEP #$20, REP #$10 (set modes)
+4. Check $0119A5 bit 7
+5. If negative: skip animations (PLB, PLP, RTL)
+6. Call CODE_018E07 (animation setup)
+7. Call CODE_01973A (sprite update)
+8. Load $011A46 (handler index)
+9. ASL A (×2 for word table)
+10. JSR via DATA8_01835B table
+11. Clear $011A46
+12. PLB, PLP, RTL
+
+**Performance:** ~200-1,500 cycles (varies by animation)
+
+**Use Cases:** Spell effects, attack animations, damage numbers
+
+---
+
+#### Field_ProcessMode7Transfer
+**Location:** Bank $01 @ $836D  
+**File:** `src/asm/bank_01_documented.asm`
+
+**Purpose:** Process 8 DMA transfers for Mode 7 tilemap data using table-driven configuration.
+
+**Inputs:**
+- DATA8_01839F (table) = 8 sets of 4-byte DMA parameters
+  * Byte 0: CGRAM address
+  * Bytes 1-2: Source address (Bank $7F)
+  * Byte 3: Transfer size
+
+**Outputs:** Mode 7 tilemap data transferred to CGRAM
+
+**Technical Details:**
+- Loops through 8 table entries (32 bytes total)
+- Each transfer: $7F:source → CGRAM
+- DMA mode $0022 (word transfer)
+- Channel 0 used for all transfers
+
+**Process (CODE_018372 loop):**
+```
+For X = 0 to 28 step 4:
+  LDA DATA8_01839F,X → STA $2121 (CGRAM address)
+  LDY #$0022 → STY $4300 (DMA mode)
+  LDY DATA8_0183A0,X → STY $4302 (source addr)
+  LDA #$7F → STA $4304 (source bank)
+  LDA DATA8_0183A2,X → STA $4305 (size)
+  LDA #$01 → STA $420B (trigger DMA)
+  INX ×4 (next entry)
+Next
+```
+
+**Performance:** ~1,200 cycles (8 transfers × 150 cycles)
+
+**Use Cases:** Mode 7 world map entry, overworld tilemap initialization
+
+---
+
+#### Battle_CheckDMACountdown
+**Location:** Bank $01 @ $83BF  
+**File:** `src/asm/bank_01_documented.asm`
+
+**Purpose:** Check DMA transfer countdown and decrement.
+
+**Inputs:**
+- `$011A4C` (byte) = DMA countdown value
+
+**Outputs:**
+- `A` = Decremented countdown value
+- Calls CODE_0183CC to initialize DMA
+
+**Process:**
+1. JSR CODE_0183CC (DMA init)
+2. LDA $011A4C (load countdown)
+3. DEC A (decrement)
+4. Continue processing
+
+**Performance:** ~160 cycles (includes CODE_0183CC call)
+
+---
+
 ## Text System Functions
 
 ### Tileset Management
