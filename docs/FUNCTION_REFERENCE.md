@@ -4,7 +4,7 @@ Complete reference for all documented functions in Final Fantasy: Mystic Quest.
 
 **Last Updated:** 2025-11-05  
 **Status:** Active - Continuously updated with code analysis  
-**Coverage:** 2,153+ documented functions out of 8,153 total (~26.4%)
+**Coverage:** 2,157+ documented functions out of 8,153 total (~26.5%)
 
 ## Table of Contents
 
@@ -18,6 +18,7 @@ Complete reference for all documented functions in Final Fantasy: Mystic Quest.
 - [Map System Functions](#map-system-functions)
   - [Map Loading and Management](#map-loading-and-management)
   - [NPC Management](#npc-management)
+  - [Camera System](#camera-system)
 - [Menu System Functions](#menu-system-functions)
   - [Battle Menu](#battle-menu)
   - [Equipment Menu](#equipment-menu)
@@ -1458,6 +1459,467 @@ Adjacent tiles (distance = 1):
 
 **Related:**
 - Used for dialogue triggers
+
+---
+
+### Camera System
+
+#### Field_CameraScroll
+**Location:** Bank $01 @ $8B76  
+**File:** `src/asm/banks/bank_01.asm`
+
+**Purpose:** Disable camera scrolling by clearing scroll enable flags.
+
+**Inputs:**
+- None
+
+**Outputs:**
+- `$008E` = Modified (bits 4-5 cleared)
+- Camera scrolling disabled
+
+**Technical Details:**
+- Uses TRB (Test and Reset Bits) instruction
+- Clears bits 4-5 of camera control flags
+- Atomic operation (PHP/PLP for safety)
+- Preserves all other processor state
+
+**Process Flow:**
+```asm
+1. PHP                    ; Save processor status
+2. SEP #$20              ; 8-bit A mode
+3. REP #$30              ; 16-bit index mode
+4. LDA #$4030            ; Bits 4-5 mask
+5. TRB $008E             ; Test and Reset Bits
+   - Tests if bits are set
+   - Clears bits 4-5
+   - Sets Z flag if bits were clear
+6. PLP                   ; Restore status
+7. RTS
+```
+
+**Camera Control Flags ($008E):**
+```
+Bit 0-3: Camera mode
+  $00: Free camera
+  $01: Follow player
+  $02: Cutscene mode
+  $03: Fixed position
+
+Bit 4: X-axis scroll enable
+  0: X scrolling disabled
+  1: X scrolling enabled
+
+Bit 5: Y-axis scroll enable
+  0: Y scrolling disabled
+  1: Y scrolling enabled
+
+Bit 6-7: Reserved
+```
+
+**TRB Operation:**
+```
+TRB (Test and Reset Bits):
+  Before: $008E = %01110101 (bits 4-5 set)
+  Mask:   #$4030 = %01000000 00110000
+  After:  $008E = %00100101 (bits 4-5 cleared)
+  Z flag: Clear (bits were set)
+```
+
+**Use Cases:**
+- Entering dialogue (lock camera)
+- Menu transitions (prevent scroll)
+- Cutscene start (fixed position)
+- Battle transitions (freeze field)
+
+**Side Effects:**
+- Modifies `$008E` (camera flags)
+- May affect scroll behavior immediately
+- Preserves all registers
+
+**Called By:**
+- Dialogue system initialization
+- Menu open routines
+- Cutscene triggers
+- Battle transition
+
+**Related:**
+- See `Field_CameraUpdate` for enabling scroll
+- See `Field_CameraCalculate` for scroll calculations
+- See `Field_UpdateCamera` for camera positioning
+
+---
+
+#### Field_CameraUpdate
+**Location:** Bank $01 @ $8B83  
+**File:** `src/asm/banks/bank_01.asm`
+
+**Purpose:** Enable camera scrolling by setting scroll enable flags.
+
+**Inputs:**
+- None
+
+**Outputs:**
+- `$008E` = Modified (bits 4-5 set)
+- Camera scrolling enabled
+
+**Technical Details:**
+- Uses TSB (Test and Set Bits) instruction
+- Sets bits 4-5 of camera control flags
+- Counterpart to `Field_CameraScroll` (disable)
+- Atomic operation with state preservation
+
+**Process Flow:**
+```asm
+1. PHP                    ; Save processor status
+2. SEP #$20              ; 8-bit A mode
+3. REP #$30              ; 16-bit index mode
+4. LDA #$4030            ; Bits 4-5 mask
+5. TSB $008E             ; Test and Set Bits
+   - Tests if bits are set
+   - Sets bits 4-5
+   - Sets Z flag if bits were clear
+6. PLP                   ; Restore status
+7. RTS
+```
+
+**TSB Operation:**
+```
+TSB (Test and Set Bits):
+  Before: $008E = %00100101 (bits 4-5 clear)
+  Mask:   #$4030 = %01000000 00110000
+  After:  $008E = %01110101 (bits 4-5 set)
+  Z flag: Set (bits were clear)
+```
+
+**Bit Mask ($4030):**
+```
+Binary: 0100 0000 0011 0000
+Bit 4: X-axis scroll (hex $0010)
+Bit 5: Y-axis scroll (hex $0020)
+Combined: $4030
+
+OR operation for both axes
+```
+
+**Camera Re-enable Sequence:**
+```
+Typical usage:
+  1. Field_CameraScroll (disable)
+  2. [Dialogue/menu/cutscene]
+  3. Field_CameraUpdate (enable)
+  4. Field_CameraCalculate (resume)
+```
+
+**Use Cases:**
+- Exiting dialogue (unlock camera)
+- Menu close (resume scroll)
+- Cutscene end (restore control)
+- Battle return to field
+
+**Side Effects:**
+- Modifies `$008E` (camera flags)
+- Camera may snap/jump if position changed
+- Preserves all registers
+
+**Calls:**
+- None (simple flag set)
+
+**Called By:**
+- Dialogue close routines
+- Menu close handlers
+- Cutscene end triggers
+- Battle exit
+
+**Related:**
+- See `Field_CameraScroll` for disabling scroll
+- See `Field_CameraCalculate` for position calculation
+- See camera control documentation
+
+---
+
+#### Field_CameraCalculate
+**Location:** Bank $01 @ $8B90  
+**File:** `src/asm/banks/bank_01.asm`
+
+**Purpose:** Calculate camera position based on player position with screen edge clamping.
+
+**Inputs:**
+- `$1914` = Player X position (pixel coordinates)
+- `$1917` = Map scroll flags
+- `$19E8` = Entity index
+- `$1A7F,X` = Entity flags
+- `$19B5` = Base address
+
+**Outputs:**
+- `$192B` = Calculated camera X offset (0-31 tiles)
+- `$0A9C` = Final clamped position
+
+**Technical Details:**
+- Converts pixel positions to tile coordinates
+- Handles screen edge cases (prevent off-screen)
+- Uses bitfield checking for special cases
+- Clamps camera to valid scroll range
+
+**Process Flow:**
+```
+1. Initialize registers:
+   SEP #$20              ; 8-bit A
+   REP #$10              ; 16-bit index
+   LDA #$00
+   XBA                   ; Clear high byte
+
+2. Extract tile position:
+   LDA $1914             ; Player X position
+   AND #$1F              ; Mask to 0-31 tiles
+   STA $192B             ; Store tile coordinate
+
+3. Check scroll threshold:
+   CMP #$14              ; Compare with 20
+   BCC CameraClampX      ; If < 20, clamp directly
+
+4. Check map scroll flags:
+   LDA $1917             ; Load scroll flags
+   ROL × 3               ; Rotate bits 0-2 to positions 3-5
+   AND #$03              ; Mask to 0-3
+   INC A                 ; Add 1 for bitfield index
+
+5. Call bitfield check:
+   JSL $009776           ; Check if scroll allowed
+   BEQ CameraClamp       ; If bit clear, use base position
+
+6. Add scroll offset:
+   LDA $192B
+   CLC
+   ADC #$08              ; Add 8-tile offset
+   → CameraClampCheck
+
+7. Store result:
+   STA $0A9C             ; Final clamped position
+   RTS
+```
+
+**Scroll Regions:**
+```
+Player X position determines camera behavior:
+  
+  Tiles 0-19 ($00-$13):
+    Direct mapping (no offset)
+    Camera = Player tile position
+  
+  Tiles 20-31 ($14-$1F):
+    Scroll threshold reached
+    Check map scroll flags
+    If allowed: Camera = Position + 8
+    If blocked: Camera = Base position
+```
+
+**Map Scroll Flags ($1917):**
+```
+Bits 0-2: Scroll permissions
+  Rotated 3 times → bits 3-5
+  AND #$03 → extract 2 bits
+  INC → bitfield index (1-4)
+
+Bitfield lookup @ $009776:
+  Returns: 0 = scroll blocked
+           1 = scroll allowed
+```
+
+**Entity Edge Check:**
+```
+If scroll check fails:
+  LDX $19E8             ; Entity index
+  LDA $1A7F,X           ; Entity flags
+  BIT #$20              ; Check bit 5 (edge flag)
+  BEQ CameraClamp       ; If clear, use base
+  
+  If set (at edge):
+    LDA $192B
+    INC A               ; Add 1 to position
+    → CameraClampCheck
+```
+
+**Clamping Logic:**
+```
+Three paths to final position:
+
+Path 1 (Base):
+  Position = $192B (no modification)
+
+Path 2 (Scrolled):
+  Position = $192B + 8 (standard scroll)
+
+Path 3 (Edge):
+  Position = $192B + 1 (edge adjust)
+
+All stored to $0A9C
+```
+
+**Coordinate System:**
+```
+Pixel coords ($1914): 0-511 (9-bit)
+Tile coords ($192B): 0-31 (5-bit)
+Conversion: pixel >> 4 (divide by 16)
+
+Screen display: 16 tiles wide
+Scroll range: 0-15 tiles offset
+Total map: 32 tiles wide
+```
+
+**Side Effects:**
+- Modifies `$192B` (intermediate position)
+- Sets `$0A9C` (final camera position)
+- Calls external bitfield routine
+
+**Calls:**
+- `CODE_009776` (JSL) - Bitfield check routine
+
+**Called By:**
+- Main camera update loop
+- Scroll processing
+- Screen transition handlers
+
+**Related:**
+- See `Field_CameraScroll` for disabling
+- See `Field_CameraUpdate` for enabling
+- See `Field_CameraClampY` for Y-axis equivalent
+
+---
+
+#### Field_ProcessNPCInteraction
+**Location:** Bank $01 @ $E404  
+**File:** `src/asm/banks/bank_01.asm`
+
+**Purpose:** Initialize NPC interaction state and prepare sprite display for dialogue.
+
+**Inputs:**
+- `$1A54` = Current interaction mode flags
+- `$0CD0-$0CDC` = Source sprite data (8 bytes × 4 slots)
+
+**Outputs:**
+- `$0E06` = Cleared (interaction counter reset)
+- `$0C60-$0C6E` = NPC sprite data copied (16 bytes)
+- `$0C62, $0C66, $0C6A, $0C6E` = Tile indices set
+
+**Technical Details:**
+- Sets up 4 sprite slots for NPC dialogue portrait
+- Copies sprite OAM data from source to display slots
+- Assigns sequential tile indices starting at $70
+- Uses 16-bit mode for efficient data transfer
+
+**Process Flow:**
+```
+1. Reset interaction state:
+   STZ $0E06                ; Clear counter
+
+2. Build sprite mode byte:
+   LDA #$0C                 ; Base mode
+   ORA $1A54                ; Combine with flags
+   XBA                      ; Move to high byte
+
+3. Set base tile index:
+   LDA #$70                 ; Starting tile
+
+4. Save processor state:
+   PHP                      ; Save status
+
+5. Switch to 16-bit mode:
+   REP #$30                 ; A and X/Y 16-bit
+
+6. Assign tile indices:
+   STA $0C62                ; Slot 0: Tile $70
+   INC A
+   STA $0C66                ; Slot 1: Tile $71
+   INC A
+   STA $0C6A                ; Slot 2: Tile $72
+   INC A
+   STA $0C6E                ; Slot 3: Tile $73
+
+7. Copy sprite data (4 × 16-bit transfers):
+   LDA $0CD0 → STA $0C60   ; Slot 0 position
+   LDA $0CD4 → STA $0C64   ; Slot 1 position
+   LDA $0CD8 → STA $0C68   ; Slot 2 position
+   LDA $0CDC → STA $0C6C   ; Slot 3 position
+
+8. Restore state:
+   PLP                      ; Restore status
+   RTS
+```
+
+**Sprite Slot Structure:**
+```
+Each slot: 4 words (8 bytes)
+  
+Slot 0 ($0C60-$0C63):
+  $0C60: X position (word)
+  $0C62: Tile index ($70)
+  
+Slot 1 ($0C64-$0C67):
+  $0C64: X position (word)
+  $0C66: Tile index ($71)
+  
+Slot 2 ($0C68-$0C6B):
+  $0C68: X position (word)
+  $0C6A: Tile index ($72)
+  
+Slot 3 ($0C6C-$0C6F):
+  $0C6C: X position (word)
+  $0C6E: Tile index ($73)
+```
+
+**Tile Layout (Dialogue Portrait):**
+```
+NPC face sprite uses 4 tiles:
+  
+  [Tile $70][Tile $71]  ← Top row
+  [Tile $72][Tile $73]  ← Bottom row
+  
+  Each tile: 8×8 pixels
+  Total portrait: 16×16 pixels
+```
+
+**Interaction Mode Flags ($1A54):**
+```
+Bit 0: Dialogue active
+Bit 1: Shop mode
+Bit 2: Cutscene mode
+Bit 3: Inn interaction
+Bits 4-7: Reserved
+
+Combined with #$0C (base) via ORA
+Stored in high byte via XBA
+```
+
+**Source Data ($0CD0-$0CDC):**
+```
+$0CD0: NPC sprite X (slot 0)
+$0CD4: NPC sprite X (slot 1)
+$0CD8: NPC sprite X (slot 2)
+$0CDC: NPC sprite X (slot 3)
+
+Copied verbatim to destination
+Position data preserved from entity
+```
+
+**Side Effects:**
+- Clears `$0E06` (interaction counter)
+- Overwrites `$0C60-$0C6F` (16 bytes OAM data)
+- Assigns tile indices $70-$73
+- Preserves all registers (PHP/PLP)
+
+**Calls:**
+- None (direct register operations)
+
+**Called By:**
+- NPC interaction trigger routine
+- Dialogue initialization
+- Called 3 times in interaction sequence
+
+**Related:**
+- See `Field_CheckInteractionRange` for range checking
+- See `Field_ValidateInteraction` for validation
+- See `Field_TriggerNPCDialog` for dialogue trigger
+- See OAM documentation for sprite structure
 
 ---
 
@@ -3991,6 +4453,10 @@ return (seed >> 16) & 0xFF
 - `Field_CheckTileCollision` @ $9038 - Tile collision lookup
 - `Field_TileCollisionLoop` @ $9058 - Coordinate to tile conversion
 - `Field_CheckEntityCollision` @ $90DD - Entity collision lookup
+- `Field_CameraScroll` @ $8B76 - Disable camera scrolling
+- `Field_CameraUpdate` @ $8B83 - Enable camera scrolling
+- `Field_CameraCalculate` @ $8B90 - Calculate camera position
+- `Field_ProcessNPCInteraction` @ $E404 - Initialize NPC interaction
 
 ### Bank $02 - Battle System (AI & Combat)
 - `Enemy_DecideAction` @ $C000 - Enemy AI decision-making
@@ -4092,6 +4558,10 @@ return (seed >> 16) & 0xFF
 - `GetTileProperties` (Bank $06 @ $B456)
 - `UpdateNPCs` (Bank $06 @ $C000)
 - `CheckPlayerProximity` (Bank $06 @ $C234)
+- `Field_CameraScroll` (Bank $01 @ $8B76)
+- `Field_CameraUpdate` (Bank $01 @ $8B83)
+- `Field_CameraCalculate` (Bank $01 @ $8B90)
+- `Field_ProcessNPCInteraction` (Bank $01 @ $E404)
 
 ### Menu & UI
 - `DisplayBattleMenu` (Bank $03 @ $8000)
@@ -4177,7 +4647,7 @@ See `docs/DOCUMENTATION_UPDATE_CHECKLIST.md` for complete guidelines.
 
 ---
 
-**Note:** This is a living document. Not all functions are documented yet. Current coverage: **~26.4%** (2,153+ / 8,153 functions).
+**Note:** This is a living document. Not all functions are documented yet. Current coverage: **~26.5%** (2,157+ / 8,153 functions).
 
 **Recent Additions (2025-11-05):**
 - Added 10 battle system functions (initialization, main loop, turn processing)
