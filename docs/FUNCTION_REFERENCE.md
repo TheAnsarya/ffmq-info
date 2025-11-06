@@ -1667,6 +1667,277 @@ Exit:
 
 ---
 
+### DMA Transfer Utilities
+
+#### Battle_DMATransfer_Type1
+**Location:** Bank $01 @ $83CC  
+**File:** `src/asm/bank_01_documented.asm`
+
+**Purpose:** Configure and execute DMA Channel 0 transfer for battle graphics from WRAM to VRAM (Type 1 pattern).
+
+**Inputs:**
+- `$011A0B,X` (word) = Transfer size (byte count)
+- `$011A03,X` (word) = Source address in WRAM
+- `$0119FB,X` (word) = VRAM destination address
+- `$0119FA` (byte) = VRAM address high byte
+- `X` = Channel index (0-7, × 2 for word table)
+
+**Outputs:**
+- Data transferred to VRAM via DMA Channel 0
+
+**Technical Details:**
+- Loops through up to 4 channels (X=0,2,4,6)
+- Configures DMA mode $01 (word transfer, auto-increment)
+- Source bank: $00 (WRAM)
+- Destination: VRAM $2118 (VMDATAL/H)
+- Transfers complete when size = 0
+
+**Process:**
+1. Check transfer size at `$011A0B,X`
+2. If zero, exit (no transfer needed)
+3. Setup DMA Channel 0: Mode=$0118, Dest=$2118, Source=$011A03,X, Bank=$00, Size=$011A0B,X
+4. Set VRAM address from `$0119FB,X`
+5. Execute DMA (write $01 to $420B)
+6. Advance X by 2, repeat for next channel
+
+**Performance:** ~150 cycles per transfer + DMA time (~3 cycles/byte)
+
+**Side Effects:** Modifies VRAM, DMA Channel 0 registers, VRAM address pointer
+
+**Calls:** None (direct hardware access)
+
+**Called By:** Battle graphics initialization, sprite loading routines
+
+---
+
+#### Battle_DMATransfer_Type2  
+**Location:** Bank $01 @ $8401  
+**File:** `src/asm/bank_01_documented.asm`
+
+**Purpose:** Similar to Type1 but uses different source/size address offsets (Type 2 pattern).
+
+**Inputs:**
+- `$011A24,X` (word) = Transfer size
+- `$011A1C,X` (word) = Source address
+- `$011A14,X` (word) = VRAM destination
+- `$011A13` (byte) = VRAM address high byte
+
+**Outputs:** Data transferred to VRAM
+
+**Technical Details:** Identical DMA configuration to Type1, different RAM addresses
+
+**Performance:** ~150 cycles + DMA time
+
+**Called By:** Battle special effects, secondary graphics loading
+
+---
+
+#### Battle_ClearWRAMBuffer
+**Location:** Bank $01 @ $8436  
+**File:** `src/asm/bank_01_documented.asm`
+
+**Purpose:** Clear 8KB WRAM buffer ($7F:D274-$F274) using DMA Channel 0.
+
+**Inputs:** None (hardcoded addresses)
+
+**Outputs:** WRAM $7F:D274-$F274 filled with zeros
+
+**Technical Details:**
+- VRAM increment mode: $80 (word mode)
+- DMA source: $0118 (fixed source, fills with same value)
+- DMA dest bank: $7F
+- DMA size: $2000 bytes (8KB)
+- Fast clear: ~6,000 cycles (~1.7ms)
+
+**Process:**
+1. Set VRAM address to $0000
+2. Configure DMA: Mode=$1800, Source=$0118, Dest=$7FD274, Size=$2000
+3. Execute DMA
+4. Buffer cleared to $00
+
+**Use Cases:** Battle initialization, clear sprite buffers before loading new graphics
+
+**Performance:** 1.7ms (0.1% of frame)
+
+---
+
+#### Graphics_DMATransferPalette
+**Location:** Bank $01 @ $845E  
+**File:** `src/asm/bank_01_documented.asm`
+
+**Purpose:** Transfer 128 bytes (64 colors) from WRAM $7F:C588 to CGRAM using 8 DMA operations.
+
+**Inputs:** 
+- Source: $7F:C588-C5FF (128 bytes palette data)
+- `A` = Starting CGRAM address (0-255)
+
+**Outputs:** 128 bytes transferred to CGRAM
+
+**Technical Details:**
+- Processes in 8 chunks of 16 bytes each
+- CGRAM address auto-increments: $00, $10, $20... $70
+- Each chunk: DMA $10 bytes to CGRAM $2122
+- Loop increments source by $10, CGRAM address by $10
+
+**Process (CODE_018463):**
+```
+For i = 0 to 7:
+  Set CGRAM address = A + (i × $10)
+  DMA $10 bytes from $7FC588 + (i × $10) to CGRAM
+  Increment source pointer by $10
+  Increment CGRAM address by $10
+```
+
+**Performance:** ~1,200 cycles total (~8 chunks × 150 cycles)
+
+**Use Cases:** Load battle palettes, update colors during effects
+
+---
+
+#### Battle_ClearSpriteBuffer
+**Location:** Bank $01 @ $8493  
+**File:** `src/asm/bank_01_documented.asm`
+
+**Purpose:** Clear sprite buffer in WRAM $7F:0000-2DFF (11.5KB) using DMA.
+
+**Inputs:** None
+
+**Outputs:** WRAM $7F:0000-2DFF zeroed
+
+**Technical Details:**
+- VRAM address: $6900
+- DMA source: Fixed $0118 (zero source)
+- Destination: $7F:0000
+- Size: $2E00 bytes (11,776 bytes)
+
+**Performance:** ~9,000 cycles (~2.5ms)
+
+**Use Cases:** Battle start, clear all sprite data before enemy/character loading
+
+---
+
+#### Graphics_LoadCharacterSprites
+**Location:** Bank $01 @ $84B9  
+**File:** `src/asm/bank_01_documented.asm`
+
+**Purpose:** Load character sprite graphics from WRAM to VRAM.
+
+**Inputs:**
+- Source: $7F:4000-4BFF (3KB character sprites)
+- Destination: VRAM $6100
+
+**Outputs:** 3KB transferred to VRAM
+
+**Technical Details:**
+- VRAM increment: $80 (word mode)
+- DMA mode: $1800
+- Size: $0C00 bytes (3072 bytes)
+
+**Performance:** ~3,100 cycles (~870μs)
+
+**Use Cases:** Load Benjamin/companion sprites during battle init
+
+---
+
+#### Graphics_LoadUITilemap
+**Location:** Bank $01 @ $84E1  
+**File:** `src/asm/bank_01_documented.asm`
+
+**Purpose:** Load two UI tilemaps to VRAM for battle interface.
+
+**Inputs:**
+- Tilemap 1: ROM $0C:C400-C5BF (448 bytes) → VRAM $0420
+- Tilemap 2: ROM $00:0E04-0E1F (28 bytes) → VRAM $0102
+
+**Outputs:** UI tilemaps loaded to VRAM
+
+**Technical Details:**
+- Two separate DMA transfers
+- First: $01C0 bytes to VRAM $0420
+- Second: $001C bytes to VRAM $0102
+- ROM banks: $0C and $00
+
+**Performance:** ~500 cycles total
+
+**Use Cases:** Battle menu initialization, status display setup
+
+---
+
+#### Field_VRAMCopy_Mode7Tilemap
+**Location:** Bank $01 @ $836D  
+**File:** `src/asm/bank_01_documented.asm`
+
+**Purpose:** Copy Mode 7 tilemap data to VRAM for world map rendering.
+
+**Inputs:**
+- Source data table at DATA8_01839F (8 sets of transfer params)
+- Each set: CGRAM address, source pointer, size
+
+**Outputs:** Mode 7 tilemap loaded to VRAM
+
+**Technical Details:**
+- Processes 8 DMA transfers from table
+- Each transfer configured from 4-byte table entry:
+  * Byte 0: CGRAM address
+  * Bytes 1-2: Source address in Bank $7F
+  * Byte 3: Transfer size
+
+**Process (CODE_018372):**
+```
+For X = 0 to 32 (step 4):
+  Load CGRAM address from table[X]
+  Load source address from table[X+1,X+2]
+  Load size from table[X+3]
+  Execute DMA: $7F:source → CGRAM
+  Next X
+```
+
+**Performance:** ~1,200 cycles (8 transfers × 150 cycles)
+
+**Use Cases:** Mode 7 world map entry, overworld tilemap updates
+
+---
+
+#### Battle_InitDMAChannels
+**Location:** Bank $01 @ $8568  
+**File:** `src/asm/bank_01_documented.asm`
+
+**Purpose:** Initialize DMA channel parameters for battle system.
+
+**Inputs:**
+- Battle active flag at $010110
+
+**Outputs:** 
+- DMA parameters set at $01080D-$010811
+
+**Technical Details:**
+- Checks if battle active (bit 7 of $010110)
+- If inactive: Sets Mode 7 DMA params ($0100, $0400, $80)
+- If active: Sets battle DMA params ($7AC8, $F9A8, $0F)
+- Initializes HDMA registers at $01212A-$012130
+
+**Process:**
+```
+If battle inactive:
+  $01080D = $0100 (DMA address)
+  $01080F = $0400 (DMA size)
+  $010811 = $80 (DMA mode)
+Else:
+  $01080D = $7AC8
+  $01080F = $F9A8  
+  $010811 = $0F
+
+Clear HDMA parameters:
+  $01212A = $0000
+  $01212E-$012130 = various init values
+```
+
+**Performance:** ~80 cycles
+
+**Use Cases:** Battle initialization, Mode 7 setup, DMA system configuration
+
+---
+
 ## Text System Functions
 
 ### Tileset Management
