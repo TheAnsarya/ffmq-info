@@ -2516,6 +2516,212 @@ Next
 
 ---
 
+#### Battle_VBlankHandler
+**Location:** Bank $01 @ $82E3  
+**File:** `src/asm/bank_01_documented.asm`
+
+**Purpose:** Simple VBlank handler wrapper - calls CODE_01A081.
+
+**Inputs:** None
+
+**Outputs:** VBlank processing completed
+
+**Process:**
+1. JSR CODE_01A081 (VBlank handler)
+2. RTS (return)
+
+**Performance:** ~Variable (depends on CODE_01A081)
+
+**Called By:** Battle_SaveState, Battle_SaveStateExtended, NMI handler
+
+---
+
+#### Battle_AnimationReturn
+**Location:** Bank $01 @ $8358  
+**File:** `src/asm/bank_01_documented.asm`
+
+**Purpose:** Restore state and return from animation handler.
+
+**Inputs:** Saved state on stack
+
+**Outputs:** Bank and processor status restored
+
+**Process:**
+1. PLB (restore data bank)
+2. PLP (restore processor status)
+3. RTL (long return)
+
+**Performance:** ~15 cycles
+
+**Called By:** Battle_UpdateAnimations (early exit path)
+
+---
+
+#### Battle_DMALoop_Type1
+**Location:** Bank $01 @ $8372  
+**File:** `src/asm/bank_01_documented.asm`
+
+**Purpose:** Inner loop for table-driven DMA transfers (documented as part of Field_ProcessMode7Transfer).
+
+**Inputs:**
+- `X` = Table offset (0, 4, 8... 28)
+- DATA8_01839F table entries
+
+**Outputs:** Single DMA transfer executed
+
+**Process:**
+1. Load CGRAM address from table
+2. Configure DMA mode $0022
+3. Load source address and size
+4. Trigger DMA channel 0
+5. Increment X by 4
+
+**Performance:** ~150 cycles per transfer
+
+**Called By:** Field_ProcessMode7Transfer (CODE_01836D)
+
+---
+
+#### Battle_DMAReturn
+**Location:** Bank $01 @ $83CB  
+**File:** `src/asm/bank_01_documented.asm`
+
+**Purpose:** Return from DMA initialization routine.
+
+**Inputs:** None
+
+**Outputs:** None
+
+**Process:**
+1. RTS (return to caller)
+
+**Performance:** ~6 cycles
+
+**Called By:** Battle_CheckDMACountdown
+
+---
+
+#### Battle_DMALoopExit
+**Location:** Bank $01 @ $8400  
+**File:** `src/asm/bank_01_documented.asm`
+
+**Purpose:** Exit point for DMA transfer loop when size = 0.
+
+**Inputs:** None
+
+**Outputs:** Loop terminated
+
+**Process:**
+1. RTS (return)
+
+**Performance:** ~6 cycles
+
+**Called By:** Battle_DMATransfer_Type1 (CODE_0183CF)
+
+---
+
+#### Battle_VRAMSetup
+**Location:** Bank $01 @ $8435  
+**File:** `src/asm/bank_01_documented.asm`
+
+**Purpose:** Setup VRAM address increment mode before DMA transfer.
+
+**Inputs:** None
+
+**Outputs:** VRAM configured for word-mode increment
+
+**Process:**
+1. Set $2115 = $80 (VRAM increment mode: word)
+2. Continue to Battle_ClearWRAMBuffer
+
+**Performance:** ~12 cycles
+
+**Called By:** Battle graphics initialization
+
+---
+
+#### Battle_HDMADispatch
+**Location:** Bank $01 @ $8547  
+**File:** `src/asm/bank_01_documented.asm`
+
+**Purpose:** Dispatch to HDMA handler based on $011A45 flags.
+
+**Inputs:**
+- `$011A45` (byte) = HDMA mode flags (bits 0-1)
+
+**Outputs:** HDMA handler called
+
+**Technical Details:**
+- Clears accumulator high byte (XBA)
+- Loads $011A45 and masks to bits 0-1
+- Multiplies by 2 for word table index
+- Indirect jump through DATA8_018557
+
+**Process:**
+1. LDA #$00, XBA (clear high byte)
+2. LDA $011A45
+3. AND #$03 (mask to 2 bits)
+4. ASL A (×2 for word offset)
+5. TAX (index in X)
+6. JSR (DATA8_018557,X) (indirect jump)
+
+**Performance:** ~45 cycles + handler time
+
+**Called By:** Battle graphics handler, HDMA setup
+
+---
+
+#### Battle_HDMAExit
+**Location:** Bank $01 @ $8554  
+**File:** `src/asm/bank_01_documented.asm`
+
+**Purpose:** Restore state and exit from HDMA handler.
+
+**Inputs:** Saved state on stack
+
+**Outputs:** Bank and status restored
+
+**Process:**
+1. PLB (restore bank)
+2. PLP (restore status)
+3. RTL (long return)
+
+**Performance:** ~15 cycles
+
+---
+
+#### Battle_SetupHDMARegisters
+**Location:** Bank $01 @ $858C  
+**File:** `src/asm/bank_01_documented.asm`
+
+**Purpose:** Initialize HDMA registers for battle effects (color math, windows).
+
+**Inputs:**
+- `$011A50` (byte) = HDMA configuration flags
+
+**Outputs:** HDMA registers configured
+
+**Technical Details:**
+- Sets up window masking ($2126-$2129)
+- Configures color math ($2123-$2125)
+- Initializes HDMA table pointers ($212A-$2130)
+- Sets battle flags ($010809, $010801)
+
+**Process:**
+1. Clear HDMA table address ($01212A = $0000)
+2. Clear window 2 positions ($01212E-$01212F = 0)
+3. Set window 1: left=$FF, right=$FF, top=$FF, bottom=$FF
+4. Set color math registers ($012123-$012125 = $22)
+5. Load $011A50, AND #$0F, OR #$50 → $012130
+6. Set flags: $010809=$81, $010801=$FF
+7. Continue initialization
+
+**Performance:** ~180 cycles
+
+**Use Cases:** Battle entry, color math setup, HDMA initialization for screen effects
+
+---
+
 ## Text System Functions
 
 ### Tileset Management
