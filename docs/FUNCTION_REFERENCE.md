@@ -4,7 +4,7 @@ Complete reference for all documented functions in Final Fantasy: Mystic Quest.
 
 **Last Updated:** 2025-11-05  
 **Status:** Active - Continuously updated with code analysis  
-**Coverage:** 2,149+ documented functions out of 8,153 total (~26.4%)
+**Coverage:** 2,153+ documented functions out of 8,153 total (~26.4%)
 
 ## Table of Contents
 
@@ -32,6 +32,7 @@ Complete reference for all documented functions in Final Fantasy: Mystic Quest.
   - [Collision Detection](#collision-detection)
 - [Battle Item & Effect Functions](#battle-item--effect-functions)
   - [Item Usage in Battle](#item-usage-in-battle)
+  - [Status Effect Processing](#status-effect-processing)
 - [Sprite & Graphics Functions](#sprite--graphics-functions)
   - [OAM Management](#oam-management)
   - [Sprite Animation](#sprite-animation)
@@ -2888,6 +2889,523 @@ After item effect:
 
 ---
 
+### Status Effect Processing
+
+#### Battle_ProcessPoison
+**Location:** Bank $02 @ $8532  
+**File:** `src/asm/banks/bank_02.asm`
+
+**Purpose:** Process poison status for battle entity - loads entity context and returns status flags.
+
+**Inputs:**
+- `$8D` = Entity index (slot in battle)
+- Direct page assumed to be battle context
+
+**Outputs:**
+- `A` (low byte) = Entity status flags (from `$10`)
+- `A` (high byte) = Poison flags (from `$21`)
+- Direct page context modified
+
+**Technical Details:**
+- Sets up entity context for poison checking
+- Returns combined status information in A register
+- Uses XBA (exchange bytes) for efficient 16-bit result
+- Context established via direct page remapping
+
+**Process Flow:**
+```asm
+1. PHD                           ; Save current direct page
+2. JSR Battle_SetEntityContextEnemy ; Set DP to entity's data
+   - Maps direct page to entity memory
+   - Entity offset = $8D (input)
+3. LDA $21                       ; Load poison status flags
+4. XBA                           ; Swap to high byte
+5. LDA $10                       ; Load general status flags
+6. PLD                           ; Restore original direct page
+7. RTS                           ; Return with A = [poison|status]
+```
+
+**Entity Status Structure ($10-$21):**
+```
+$10 (General Status):
+  Bit 0: Alive/Dead
+  Bit 1: Active in battle
+  Bit 2: Target available
+  Bit 3: Can act this turn
+  Bit 4-7: Other status flags
+
+$21 (Poison/Special Status):
+  Bits 0-5: Poison level/type
+  Bit 6: Poison active
+  Bit 7: Permanent status flag
+```
+
+**Return Value Analysis:**
+```
+Combined A register (16-bit):
+  High byte ($21): Poison status
+  Low byte ($10): General status
+  
+Example values:
+  $C001: Poison active ($C0) + alive ($01)
+  $0001: No poison ($00) + alive ($01)  
+  $8000: Permanent status, dead
+```
+
+**Side Effects:**
+- Temporarily modifies direct page
+- Preserves all other registers
+- Read-only operation on entity data
+
+**Calls:**
+- `Battle_SetEntityContextEnemy` @ $8F2F - Map DP to entity
+
+**Called By:**
+- `Battle_CalculatePoisonDamage` - Before damage calc
+- `Battle_CheckPoison` - Status verification
+- Confusion targeting logic
+
+**Related:**
+- See `Battle_CalculatePoisonDamage` for damage application
+- See `Battle_SetEntityContextEnemy` for context setup
+- See `Battle_CheckPoison` for status checking
+
+---
+
+#### Battle_CalculatePoisonDamage
+**Location:** Bank $02 @ $853D  
+**File:** `src/asm/banks/bank_02.asm`
+
+**Purpose:** Calculate poison damage amount and determine if damage should be applied to entity.
+
+**Inputs:**
+- `$8B` = Damage calculation mode
+  - `< $02`: Normal poison damage
+  - `>= $02`: Skip poison (other status)
+- `$DC` = Additional status flags
+- `$3A` = Special condition value
+
+**Outputs:**
+- `$77` = Calculated damage amount (16-bit)
+- Carry flag = Damage should be applied
+- Zero flag = Special condition met
+
+**Technical Details:**
+- Early exits if not poison damage mode
+- Checks multiple status conditions
+- Always zeros $77 damage accumulator first
+- Uses comparison to determine damage application
+
+**Process Flow:**
+```
+1. Initialize damage:
+   LDX #$0000
+   STX $77                ; Zero damage accumulator
+
+2. Check damage mode:
+   LDA $8B
+   CMP #$02               ; Mode 2+ = not poison
+   BCS ApplyDamage        ; C=1: Skip to apply
+
+3. Check immunity flags:
+   LDA $DC
+   AND #$C0               ; Check bits 6-7 (immunity)
+   BNE SkipPoison         ; If set, no poison damage
+
+4. Check special condition:
+   LDA $3A
+   CMP #$11               ; Special value check
+   BEQ SkipPoison         ; If $11, skip
+
+5. ApplyDamage:
+   PHD                    ; Save DP
+   JSR SetEntityContext   ; Load entity data
+   LDA $21                ; Get poison severity
+   XBA
+   LDA $10                ; Get status
+   PLD                    ; Restore DP
+   INC A                  ; Increment for check
+   BNE PoisonComplete     ; If not zero, continue
+
+6. PoisonComplete:
+   XBA                    ; Get poison byte
+   AND #$C0               ; Check severity bits
+   BEQ SkipPoison         ; If no severity, skip
+   RTS                    ; Else return (apply damage)
+
+7. SkipPoison:
+   ; Fall through to sleep processing
+```
+
+**Poison Immunity ($DC flags):**
+```
+Bit 6: Temporary poison immunity
+Bit 7: Permanent poison immunity
+
+AND #$C0: Check both
+  $C0: Full immunity
+  $80: Permanent immunity  
+  $40: Temporary immunity
+  $00: No immunity (vulnerable)
+```
+
+**Poison Severity ($21 bits 6-7):**
+```
+Poison level extracted via AND #$C0:
+  $00: No poison active
+  $40: Light poison (1 damage per turn)
+  $80: Medium poison (2-4 damage per turn)
+  $C0: Heavy poison (5-8 damage per turn)
+```
+
+**Special Condition ($3A):**
+```
+Value $11: Special bypass condition
+  - Certain battle states
+  - Temporary invulnerability
+  - Story-based immunity
+  
+If $3A == $11: Skip poison entirely
+```
+
+**Flow Control:**
+```
+Mode Check ($8B):
+  < $02: Poison damage mode → Continue checks
+  >= $02: Other status mode → Jump to apply
+
+Immunity Check ($DC):
+  AND #$C0 != $00: Immune → Skip to sleep
+  AND #$C0 == $00: Vulnerable → Continue
+
+Special Check ($3A):
+  == $11: Special state → Skip to sleep
+  != $11: Normal state → Apply damage
+
+Final Check (return value):
+  XBA, AND #$C0 == $00: No severity → Skip
+  XBA, AND #$C0 != $00: Has severity → Apply (RTS)
+```
+
+**Side Effects:**
+- Sets `$77` = $0000 (damage accumulator)
+- May load entity context (modifies DP temporarily)
+
+**Calls:**
+- `Battle_SetEntityContextEnemy` @ $8F2F - Load entity data
+
+**Called By:**
+- `Battle_TargetFound` - During target processing loop
+- Status effect processing routines
+
+**Related:**
+- See `Battle_ProcessPoison` for entity status loading
+- See `Battle_ApplyPoisonDamage` for actual damage application
+- See `Battle_ProcessSleep` for next status in chain
+
+---
+
+#### Battle_ProcessParalysis  
+**Location:** Bank $02 @ $8486  
+**File:** `src/asm/banks/bank_02.asm`
+
+**Purpose:** Handle paralysis status effect - check if entity can act and process paralysis duration/cure.
+
+**Inputs:**
+- `$11` = Entity action flags
+- `$38` = Current status effect type
+- `$3A` = Status duration/intensity value
+- `$8D` = Current entity slot index
+- `$90` = Entity comparison value
+
+**Outputs:**
+- `$8D` = Updated entity index (if paralyzed)
+- `$8E` = Paralysis duration value
+- `$DE` = Animation/effect type
+- Jump to wake probability calculation if paralyzed
+
+**Technical Details:**
+- Checks action flag bit 0 (can act?)
+- Processes different paralysis types by status value
+- Handles both timed and conditional paralysis
+- May trigger special paralysis animations
+
+**Process Flow:**
+```
+1. Check if entity can act:
+   LDA $11
+   AND #$01                ; Bit 0: Can act this turn?
+   BEQ CheckConfusion      ; If clear, skip paralysis
+
+2. Check status type ($38):
+   If $38 == $10:          ; Standard paralysis
+     Check duration ($3A):
+       If $3A >= $49 AND $3A < $50:
+         ; Mid-duration paralysis
+         Load animation data:
+           LDX #$D2E4
+           JSR $8835        ; Display paralysis effect
+           LDX #$D46E  
+           JSR $8835        ; Update status display
+         Copy $8E → $8D
+         Return
+         
+   If $38 == $20:          ; Triggered paralysis
+     Skip (fallthrough)
+
+3. CheckConfusion:
+   ; Fall through to confusion processing
+```
+
+**Paralysis Types ($38 values):**
+```
+$10: Standard Paralysis
+  - Cannot act for N turns
+  - Duration tracked in $3A
+  - Range check: $49-$4F (7 turn window)
+  - Animation: Paralysis icon ($D2E4)
+
+$20: Triggered Paralysis
+  - Conditional on battle state
+  - No duration tracking
+  - Skips animation
+  - Immediate processing
+
+Other: Non-paralysis status
+  - Fall through to confusion check
+```
+
+**Duration Ranges ($3A):**
+```
+$3A value meanings:
+  $00-$48: No paralysis / expired
+  $49-$4F: Active paralysis (7 turns max)
+  $50+: Special/permanent paralysis
+  
+Duration check:
+  CMP #$49: Below = expired
+  BCC Skip
+  CMP #$50: Above = special
+  BCS Skip
+  
+  Valid range: $49 ≤ $3A < $50
+```
+
+**Animation References:**
+```
+LDX #$D2E4:
+  - Points to paralysis icon tile data
+  - Yellow/blue zigzag effect
+  - Displayed over entity sprite
+
+LDX #$D46E:
+  - Status bar update data
+  - Shows "PARA" text
+  - Updates battle UI
+```
+
+**Entity Tracking:**
+```
+$8D (Current entity slot):
+  - Input: Entity being checked
+  - Output: Paralyzed entity (if applicable)
+  - Copied from $8E after animation
+
+$90 (Comparison entity):
+  - Used for turn order
+  - Compared with $8D
+  - Affects turn processing
+```
+
+**Side Effects:**
+- Modifies `$8D` (entity index) if paralyzed
+- Sets `$8E` (temporary storage)
+- Sets `$DE` (animation type)
+- Calls animation display routines
+- May modify `$8F` (entity comparison)
+
+**Calls:**
+- `$8835` (JSR) - Display animation (2 calls)
+  - First: Paralysis effect
+  - Second: Status UI update
+
+**Called By:**
+- `Battle_ProcessPetrify` - After petrification check
+- Status effect processing chain
+
+**Related:**
+- See `Battle_CheckParalysis` for paralysis flag check
+- See `Battle_WakeProbability` for cure chance
+- See `Battle_CureParalysis` @ $97B8 for removal
+
+---
+
+#### Battle_CheckPoison
+**Location:** Bank $02 @ $8522  
+**File:** `src/asm/banks/bank_02.asm`
+
+**Purpose:** Central poison status processing - handles status animation, mute checking, and display refresh after poison damage.
+
+**Inputs:**
+- Battle state with poison applied
+- All entity status flags updated
+- Poison damage already calculated
+
+**Outputs:**
+- Status animation played
+- Mute status checked
+- Battle display refreshed  
+- UI updated
+
+**Technical Details:**
+- Orchestrates multiple status effect subsystems
+- Long calls to different banks for animations/display
+- Ensures proper sequencing of status updates
+- Final cleanup before returning to battle loop
+
+**Process Flow:**
+```
+1. Process status animation:
+   JSL Battle_ProcessStatusAnimation ; Bank $02:$ED05
+   - Displays poison bubble effect
+   - Updates sprite OAM
+   - Plays status sound effect
+
+2. Check and handle mute:
+   JSR Battle_CheckMute             ; Bank $02:$8600
+   - Verifies mute status
+   - Updates action availability
+   - May cure if item used
+
+3. Refresh battle display:
+   JSL Battle_RefreshBattleDisplay  ; Bank $02:$D149
+   - Redraws HP/status bars
+   - Updates entity sprites
+   - Clears dirty flags
+
+4. Update UI subsystem:
+   JSL CODE_009B02                  ; Bank $00:$9B02
+   - Final UI polish
+   - Menu state sync
+   - Input handling prep
+
+5. Return to battle loop:
+   RTS
+```
+
+**Subsystem Call Chain:**
+```
+Battle_CheckPoison (Bank $02) calls:
+
+1. Battle_ProcessStatusAnimation @ $02:$ED05
+   Location: Bank $02 @ $ED05
+   Purpose: Poison bubble animation
+   - Loads animation frame data
+   - Updates sprite palette (green tint)
+   - Triggers OAM update
+   - Plays bubbling sound effect
+
+2. Battle_CheckMute @ $02:$8600
+   Location: Bank $02 @ $8600
+   Purpose: Verify mute status
+   - Checks $11 bit 2 (mute flag)
+   - Updates action menu
+   - Disables spells if muted
+
+3. Battle_RefreshBattleDisplay @ $02:$D149
+   Location: Bank $02 @ $D149
+   Purpose: Redraw all battle elements
+   - HP bar updates
+   - Status icon refresh
+   - Sprite position correction
+   - Background tile updates
+
+4. CODE_009B02 @ $00:$9B02
+   Location: Bank $00 @ $9B02
+   Purpose: Final UI synchronization
+   - Menu cursor position
+   - Input buffer clear
+   - Frame timing adjustment
+```
+
+**Animation Sequence ($02:$ED05):**
+```
+Poison animation frames (60 FPS):
+  Frame 0-3:   Small bubble rises
+  Frame 4-7:   Medium bubble
+  Frame 8-11:  Large bubble pops
+  Frame 12-15: Damage number display
+  
+Palette effect:
+  Entity palette OR #$02 (green tint)
+  Duration: 16 frames
+  Restore: Original palette
+```
+
+**Mute Check Logic ($02:$8600):**
+```
+LDA $11           ; Load action flags
+AND #$04          ; Bit 2 = Mute status
+BEQ NotMuted      ; If clear, can use magic
+  
+; If muted:
+  LDA #$00
+  STA $ActionMenu  ; Disable magic commands
+  ; Update menu display
+NotMuted:
+  RTS
+```
+
+**Display Refresh ($02:$D149):**
+```
+Updates (in order):
+  1. HP bar position ($0C00 VRAM)
+  2. Status icons ($0D00 VRAM)
+  3. Entity sprites (OAM)
+  4. Background tiles (if needed)
+  5. Color palettes (if changed)
+  
+DMA transfers queued:
+  - HP bar graphics (32 bytes)
+  - Status icons (16 bytes)
+  - OAM data (544 bytes)
+```
+
+**UI Sync ($00:$9B02):**
+```
+Final tasks:
+  - Clear $19A5 (input buffer)
+  - Reset $19AC (animation counter)
+  - Update $420B (DMA trigger)
+  - Prepare for next frame
+```
+
+**Side Effects:**
+- Triggers multiple DMA transfers
+- Modifies VRAM data
+- Updates OAM (Object Attribute Memory)
+- Changes sprite palettes temporarily
+- Clears input buffers
+- Resets animation counters
+
+**Calls:**
+- `Battle_ProcessStatusAnimation` @ $02:$ED05 (JSL)
+- `Battle_CheckMute` @ $02:$8600 (JSR)
+- `Battle_RefreshBattleDisplay` @ $02:$D149 (JSL)
+- `CODE_009B02` @ $00:$9B02 (JSL)
+
+**Called By:**
+- Poison damage application routines
+- Status effect processing loop
+- End of turn status updates
+
+**Related:**
+- See `Battle_ProcessPoison` for entity status loading
+- See `Battle_CalculatePoisonDamage` for damage calculation  
+- See `Battle_ApplyPoisonDamage` for damage application
+
+---
+
 ## Sprite & Graphics Functions
 
 ### OAM Management
@@ -3497,6 +4015,10 @@ return (seed >> 16) & 0xFF
 - `Battle_CurePoison` @ $97B2 - Poison status handling
 - `Battle_ReflectSpell` @ $9BED - Spell reflection
 - `Battle_ProcessPetrifySpell` @ $99DA - Petrification
+- `Battle_ProcessPoison` @ $8532 - Load poison entity status
+- `Battle_CalculatePoisonDamage` @ $853D - Calculate poison damage
+- `Battle_ProcessParalysis` @ $8486 - Paralysis effect handling
+- `Battle_CheckPoison` @ $8522 - Poison status orchestration
 
 ### Bank $03 - Menu System
 - `DisplayBattleMenu` @ $8000 - Battle command menu
@@ -3598,6 +4120,10 @@ return (seed >> 16) & 0xFF
 - `Battle_CheckTargetDeath` (Bank $02 @ $95DE)
 - `Battle_InitializeAnimation` (Bank $02 @ $9C9B)
 - `Battle_ApplyStatDebuff` (Bank $02 @ $9964)
+- `Battle_ProcessPoison` (Bank $02 @ $8532)
+- `Battle_CalculatePoisonDamage` (Bank $02 @ $853D)
+- `Battle_ProcessParalysis` (Bank $02 @ $8486)
+- `Battle_CheckPoison` (Bank $02 @ $8522)
 
 ### Sprite & Graphics
 - `BattleSprite_UpdateOAM` (Bank $0B @ $8077)
@@ -3651,7 +4177,7 @@ See `docs/DOCUMENTATION_UPDATE_CHECKLIST.md` for complete guidelines.
 
 ---
 
-**Note:** This is a living document. Not all functions are documented yet. Current coverage: **~26.4%** (2,149+ / 8,153 functions).
+**Note:** This is a living document. Not all functions are documented yet. Current coverage: **~26.4%** (2,153+ / 8,153 functions).
 
 **Recent Additions (2025-11-05):**
 - Added 10 battle system functions (initialization, main loop, turn processing)
