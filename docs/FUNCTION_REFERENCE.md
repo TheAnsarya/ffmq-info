@@ -4,7 +4,7 @@ Complete reference for all documented functions in Final Fantasy: Mystic Quest.
 
 **Last Updated:** 2025-11-05  
 **Status:** Active - Continuously updated with code analysis  
-**Coverage:** 2,170+ documented functions out of 8,153 total (~26.6%)
+**Coverage:** 2,173+ documented functions out of 8,153 total (~26.7%)
 
 ## Table of Contents
 
@@ -5393,6 +5393,623 @@ Special: Some enemies weak to specific elements
 
 ## Sound System Functions
 
+### SPC700 Initialization
+
+#### SPC_InitMain
+**Location:** Bank $0D @ $802C  
+**File:** `src/asm/bank_0D_documented.asm`
+
+**Purpose:** Upload SPC700 sound driver to audio processor and initialize audio system - foundational routine for all FFMQ audio functionality.
+
+**Inputs:**
+- None (reads driver data from Bank $0D tables)
+- DATA8_0D8008: Module count/header
+- DATA8_0D8009: Module pointer table
+- DATA8_0D8014-8015: Module size table
+
+**Outputs:**
+- SPC700 loaded with sound driver at $0200+ in SPC RAM
+- SPC700 executing audio driver code
+- APU ports ready for music/SFX commands
+- `$0648` = Driver checksum (warm start detection)
+- `$06F8` = Driver validation flag
+
+**Technical Details:**
+- **Protocol:** IPL (Initial Program Loader) handshake
+- **APU Ports:** $2140-$2143 for bidirectional communication
+- **Upload Target:** SPC700 RAM starting at $0200
+- **Driver Size:** Multiple modules, ~4-6KB total
+- **Timing:** ~200ms upload time (first boot)
+- **Warm Start:** Detects existing driver, skips reload
+
+**Process Flow:**
+```
+1. Save CPU state (PHB/PHD/PHP/registers)
+2. Set data bank = $00, direct page = $0600
+
+3. Check for SPC700 IPL ready signal:
+   - Read $2140/$2141 (APUIO0/1)
+   - Wait for $BBAA signature from SPC700 IPL ROM
+   - If found → SPC700 ready for upload
+
+4. Warm start detection:
+   - Check $06F8 for checksum
+   - Compare with $0648
+   - If valid + $0600 = $F0 → Driver already loaded
+   - Send reset command ($08 to $2141)
+   - Skip full upload (saves ~200ms)
+
+5. IPL handshake protocol:
+   - Send module address to $2142/$2143 (16-bit)
+   - Send command $01 to $2141 (upload mode)
+   - Send $CC to $2140 (initial handshake)
+   - Wait for SPC700 to echo $CC back
+   - Handshake confirmed → Ready for data
+
+6. Transfer each module:
+   - Read module pointer from table
+   - Read module size (first 2 bytes)
+   - Loop through all bytes:
+     * Send byte to $2141
+     * Increment handshake ($CC→$CD→$CE...)
+     * Send handshake to $2140
+     * Wait for echo confirmation
+   - Handshake wraps $00→$FF→$00 for sync
+
+7. Start execution:
+   - All modules uploaded
+   - Send start address $0200 to $2142/$2143
+   - Send $00 to $2141 (run command)
+   - SPC700 begins driver execution
+
+8. Restore CPU state and return
+```
+
+**IPL Handshake Details:**
+```
+Main CPU (65816)          SPC700 (IPL)
+─────────────────         ─────────────
+Write $CC → $2140    →    Read $2140
+                     ←    Write $CC → $2140 (echo)
+Read $2140 = $CC     ←    
+Write byte → $2141   →    Read $2141 (data)
+Write $CD → $2140    →    Read $2140 (sync)
+                     ←    Write $CD → $2140 (echo)
+Read $2140 = $CD     ←    
+Write byte → $2141   →    [repeat for all bytes]
+Write $CE → $2140    →    
+...                  ...
+```
+
+**Module Upload Format:**
+```
+Each module in ROM:
+  Offset +0: Size low byte
+  Offset +1: Size high byte
+  Offset +2 onward: Driver code/data
+
+Module table entries:
+  DATA8_0D8008: Module count (varies)
+  DATA8_0D8009+: Pointers to modules (16-bit offsets)
+  DATA8_0D8014+: Load addresses (SPC700 RAM)
+
+Example:
+  Module 0: $0286 bytes at $0D8686 → SPC $0200
+  Module 1: $00AC bytes at $0D890E → SPC $0486
+  (etc. for remaining modules)
+```
+
+**Warm Start Optimization:**
+```
+Check sequence:
+  1. LDA $06F8 (checksum stored)
+  2. BEQ → Not loaded, full upload
+  3. CMP $0648
+  4. BNE → Mismatch, full upload
+  5. LDA #$F0
+  6. CMP $0600
+  7. BNE → Not ready, full upload
+  8. All checks pass → Send reset command only
+
+Reset command (warm start):
+  $08 → $2141  ; Reset opcode
+  $00 → $2140  ; Execute
+  Wait for confirmation
+  Driver resets, skips ~200ms upload
+```
+
+**SPC700 RAM Layout (Post-Upload):**
+```
+$0000-$00EF  : Zero page (driver variables)
+$00F0-$00FF  : IPL ROM area (preserved)
+$0100-$01FF  : Stack
+$0200-$04FF  : Sound driver code (~768 bytes)
+$0500-$07FF  : Driver data tables
+$0800-$0FFF  : Music sequence buffer
+$1000-$5FFF  : Sample data (BRR format)
+$6000-$BFFF  : Additional samples
+$C000-$EFFF  : Echo buffer (reverb)
+$F000-$FFFF  : Driver extensions / work RAM
+```
+
+**Side Effects:**
+- Writes to $2140-$2143 (APU I/O ports) - hundreds of writes
+- Modifies direct page $0600-$06FF (work RAM)
+- Updates $0648 (checksum storage)
+- Updates $06F8 (validation flag)
+- Changes data bank to $00
+- Changes direct page to $0600
+- Takes ~200ms first boot, ~10ms warm start
+- Enables SPC700 audio interrupts
+- Resets all 8 DSP voices
+
+**Register Usage:**
+```
+Entry:  Any state (preserved via stack)
+Work:   A=8-bit data/commands
+        X=16-bit module offsets
+        Y=16-bit byte offsets
+        DP=$14-$16 = 24-bit ROM pointer
+        DP=$10-$11 = Module size counter
+Exit:   All registers restored (PLY/PLX/PLA)
+```
+
+**Calls:**
+- (None - self-contained upload routine)
+
+**Called By:**
+- Game initialization (startup)
+- Post-reset initialization
+- Audio system restart (rare)
+
+**Related:**
+- See `CODE_0D8147` - APU command handler (music/SFX playback)
+- See `docs/SOUND_SYSTEM.md` - Complete audio architecture
+- See Bank $0F - Music/sample data
+- See SPC700 IPL ROM documentation
+
+---
+
+### Audio Command Processing
+
+#### APU_SendCommand
+**Location:** Bank $0D @ $8147  
+**File:** `src/asm/bank_0D_documented.asm`
+
+**Purpose:** Send commands to initialized SPC700 driver for music playback, sound effects, volume control, and audio system management.
+
+**Inputs:**
+- `$0600` = Command byte (see command table below)
+- `$0601` = Track/SFX ID (for commands $01/$03)
+- `$0602-$0603` = Parameter word (varies by command)
+- Additional parameters at $0604+ (command-specific)
+
+**Outputs:**
+- Command executed on SPC700
+- `$0600` = $00 (cleared after processing)
+- `$0605` = Current track ID (updated for $01)
+- Audio playback state changed per command
+
+**Technical Details:**
+- **Entry Points:** CODE_0D8147 (main), CODE_0D8004 (wrapper)
+- **Protocol:** Polling-based communication via APU ports
+- **Latency:** ~1-3 frames for command acknowledgment
+- **Capacity:** 256 possible commands ($00-$FF)
+
+**Command Types:**
+```
+$00       : NOP - No operation (immediate return)
+$01       : Load/play music track
+$03       : Play sound effect (SFX)
+$70-$7F   : Advanced commands (volume, pitch, tempo)
+$80-$EF   : System commands (reserved/extended)
+$F0-$FF   : System commands (reset, mute, stop)
+```
+
+**Command $01 - Load/Play Music:**
+```
+Inputs:
+  $0601 = Track ID (0-29, varies by game)
+  $0602-$0603 = Music data pointer (16-bit, optional)
+  
+Process:
+  1. Check if same track already playing ($0605)
+  2. If different or params changed:
+     - Transfer music sequence data to SPC700
+     - Set up playback parameters
+     - Start music sequencer
+  3. Update $0605 with new track ID
+  
+SPC700 Side:
+  - Receives track data via $2141-$2143
+  - Loads patterns, instruments, tempo
+  - Starts 8-channel sequencer
+  - Begins playback immediately
+```
+
+**Command $03 - Play Sound Effect:**
+```
+Inputs:
+  $0601 = SFX ID (0-127 typical range)
+  $0602 = Priority (0-15, higher = interrupt music)
+  $0603 = Volume (0-255, $FF = full)
+  
+Process:
+  1. Check SFX priority vs current playback
+  2. Allocate free voice or steal lowest priority
+  3. Transfer sample data if not cached
+  4. Trigger one-shot or looped playback
+  
+Voice Allocation:
+  - Channels 5-7 typically reserved for SFX
+  - Music channels 0-4 can be stolen (high priority)
+  - Voice stealing uses priority + age algorithm
+```
+
+**Advanced Commands ($70+):**
+```
+$70 : Set master volume (0-255)
+$71 : Set music volume (0-255)
+$72 : Set SFX volume (0-255)
+$73 : Fade out music (duration in frames)
+$74 : Fade in music (duration in frames)
+$75 : Set tempo (50-200%, 100 = normal)
+$76 : Set pitch shift (-12 to +12 semitones)
+$77 : Enable/disable echo/reverb
+$78 : Set echo parameters (delay, feedback, volume)
+$79-$7F : Reserved/game-specific
+```
+
+**System Commands ($F0+):**
+```
+$F0 : Stop all audio (immediate silence)
+$F1 : Pause music (resume with $F2)
+$F2 : Resume paused music
+$F3 : Reset SPC700 (soft reset, no driver reload)
+$F4 : Mute all channels
+$F5 : Unmute all channels
+$F6-$FF : Reserved/extended functions
+```
+
+**Process Flow:**
+```
+1. Save CPU state (PHB/PHD/PHP/registers)
+2. Set data bank = $00, direct page = $0600
+
+3. Read command byte from $0600
+4. Clear $0600 (mark command processed)
+5. If $00 → Return immediately (NOP)
+
+6. Dispatch based on command value:
+   - $01 or $03 → CODE_0D8183 (music/SFX)
+   - $80+ → CODE_0D8172 (system commands)
+   - $70+ → CODE_0D8175 (advanced commands)
+   - Other → Return (unsupported)
+
+7. Execute command handler:
+   - Music/SFX: Transfer data via APU ports
+   - Volume: Send parameter to SPC700
+   - System: Send control byte sequence
+
+8. Wait for SPC700 acknowledgment (poll $2140)
+9. Restore CPU state and return
+```
+
+**Music Load Optimization:**
+```
+Same track check:
+  LDA $0601      ; New track ID
+  CMP $0605      ; Current track ID
+  BNE LoadNew    ; Different → Full load
+  
+  LDX $0602      ; Check parameters
+  STX $0606
+  CPX $0608      ; Compare with current
+  BNE LoadNew    ; Changed → Reload
+  
+  RTS            ; Same track+params → Skip (already playing)
+
+LoadNew:
+  ; Full music load sequence
+  ; Transfer ~1-4KB of sequence data
+  ; Takes ~10-50ms depending on track size
+```
+
+**APU Communication Pattern:**
+```
+Send Command:
+  1. Write command to $2140
+  2. Write param1 to $2141
+  3. Write param2 to $2142
+  4. Write param3 to $2143
+  5. Poll $2140 until SPC700 echoes command
+
+Wait Acknowledgment:
+  Loop:
+    LDA $2140
+    CMP <expected>
+    BNE Loop
+  ; Confirmed → Continue
+
+Data Transfer (for music/SFX):
+  For each byte:
+    Write byte → $2141
+    Increment handshake → $2140
+    Wait for echo
+  ; Full track uploaded
+```
+
+**Side Effects:**
+- Writes to $2140-$2143 (APU I/O ports) - variable count
+- Modifies direct page $0600-$060F (command buffer)
+- Updates $0605 (current track ID)
+- Updates $0606-$0609 (parameter cache)
+- Changes data bank to $00
+- Changes direct page to $0600
+- Timing varies: NOP ~10 cycles, Music load ~10-50ms
+- May interrupt currently playing audio
+- SFX can steal music channels (high priority)
+
+**Register Usage:**
+```
+Entry:  Any state (preserved via stack)
+Work:   A=8-bit commands/data
+        X=16-bit pointers/parameters
+        Y=16-bit loop counters
+        DP=$00-$0F = Command parameters
+Exit:   All registers restored
+```
+
+**Calls:**
+- CODE_0D8183 - Music/SFX loader
+- CODE_0D8172 - System command handler
+- CODE_0D8175 - Advanced command handler
+- CODE_0D85BA - Extended system handler
+- CODE_0D860E - Extended advanced handler
+
+**Called By:**
+- Battle system (damage SFX, victory music)
+- Field system (walking SFX, interaction sounds)
+- Menu system (cursor, select sounds)
+- Cutscenes (music changes, dramatic SFX)
+- Event scripts (scripted audio cues)
+
+**Related:**
+- See `SPC_InitMain` - Driver initialization
+- See `docs/SOUND_SYSTEM.md` - Audio architecture
+- See Bank $0F - Music and sample data
+
+---
+
+### Sprite Animation
+
+#### Display_WaitVBlankAndUpdate
+**Location:** Bank $0C @ $85DB  
+**File:** `src/asm/bank_0C_documented.asm`
+
+**Purpose:** Primary VBLANK synchronization with sprite animation update - performance-critical routine called hundreds of times per second to coordinate frame timing and animate sprite tiles.
+
+**Inputs:**
+- `$0E97` = Animation timer (frame counter)
+- `$0202-$020B` = Sprite frame indices (5 sprites, word each)
+- `$020C` = Sprite loop counter (internal)
+- `$020E` = Sprite index (internal)
+- DATA8_0C8659 = Animation frame table (14 frames)
+
+**Outputs:**
+- VBLANK synchronized (safe for VRAM/OAM updates)
+- Sprite tiles updated in OAM buffer ($0C80+)
+- Animation frames advanced (every 4 game frames)
+- `$0CC2-$0CCE` = Updated sprite tile numbers
+- `$0C94+` = Updated sprite pattern data
+
+**Technical Details:**
+- **Timing:** Called every game frame (~16.67ms NTSC, 20ms PAL)
+- **Animation:** Updates every 4 frames (4:1 ratio, ~15 FPS sprite animation)
+- **Sprites:** Handles 5 animated sprites simultaneously
+- **Frames:** 14-frame animation cycle (wraps at frame 14)
+- **Tiles:** Alternates between tile pairs ($4C/$4E, $48, $6C/$6E)
+
+**Process Flow:**
+```
+1. Set data bank = current bank (PHK/PLB)
+2. Save X register
+
+3. Calculate animated tile numbers:
+   - Read $0E97 (animation timer)
+   - AND #$04 (test bit 2 = every 4 frames)
+   - LSR (shift to bit 1)
+   - ADC #$4C (base tile $4C or $4E)
+   - Store to $0CC2, $0CCA (sprites 1, 2)
+   - EOR #$02 (toggle $4C↔$4E)
+   - Store to $0CC6, $0CCE (sprites 3, 4)
+
+4. Setup sprite update loop:
+   - Loop counter = 5 sprites
+   - Sprite index = 0
+
+5. For each sprite (loop 5 times):
+   a) Calculate OAM pointer:
+      - Index * 2 + $0C80 → Y (OAM buffer address)
+   
+   b) Advance animation frame:
+      - Load current frame from $0202,X
+      - Increment frame
+      - If frame >= 14 → Wrap to 0
+      - Store new frame back to $0202,X
+   
+   c) Update sprite tile:
+      - Use frame as index into DATA8_0C8659
+      - Load tile number from table
+      - Store to OAM buffer ($0002,Y)
+   
+   d) Update sprite patterns (conditional):
+      - If tile = $44:
+        * Use pattern $6C for position 1
+        * Use pattern $6E for position 2
+      - Else:
+        * Use pattern $48 for both positions
+      - Calculate pattern pointer (index*4 + $0C94)
+      - Store patterns to OAM buffer
+   
+   e) Loop housekeeping:
+      - Increment sprite index by 2 (word addressing)
+      - Decrement loop counter
+      - Branch if not done
+
+6. Update PPU registers (JSR CODE_0C8910)
+7. Restore X register and return
+```
+
+**Animation Frame Table:**
+```
+DATA8_0C8659 (14 frames):
+  Frame  0: Tile $00
+  Frame  1: Tile $04
+  Frame  2: Tile $04
+  Frame  3: Tile $00
+  Frame  4: Tile $00
+  Frame  5: Tile $08
+  Frame  6: Tile $08
+  Frame  7: Tile $08
+  Frame  8: Tile $0C
+  Frame  9: Tile $40
+  Frame 10: Tile $40
+  Frame 11: Tile $44  ← Special (triggers $6C/$6E patterns)
+  Frame 12: Tile $44
+  Frame 13: Tile $00
+
+14-frame cycle = ~933ms per loop at 15 FPS
+```
+
+**Tile Pattern Logic:**
+```
+Tile $44 Check:
+  CMP #$44
+  PHP              ; Save result
+  ; ... (calculate pattern pointer)
+  PLP              ; Restore result
+  BEQ UseTile6C    ; Branch if tile was $44
+  
+  ; Default case (tile != $44):
+  Pattern1 = $48
+  Pattern2 = $48
+  
+  ; Special case (tile == $44):
+UseTile6C:
+  Pattern1 = $6C
+  Pattern2 = $6E
+  
+Sprite Pattern Addresses:
+  Base = $0C94 + (sprite_index * 4)
+  +$00: [header byte]
+  +$02: Pattern 1 tile
+  +$06: Pattern 2 tile
+```
+
+**Animation Timing:**
+```
+Frame Counter ($0E97):
+  Increments every game frame
+  Animation check: Bit 2 (every 4 frames)
+  
+  Frame    $0E97    Bit 2    Update?
+  ─────    ─────    ─────    ───────
+    0      $00       0         No
+    1      $01       0         No
+    2      $02       0         No
+    3      $03       0         No
+    4      $04       1        Yes  ← Tile $4C
+    5      $05       1        Yes
+    6      $06       1        Yes
+    7      $07       1        Yes
+    8      $08       0         No  ← Tile $4E
+    
+  Result: Tile alternates every 4 frames
+  Sprite frame advances every 4 frames
+  Effective sprite animation: 15 FPS (60÷4)
+```
+
+**OAM Buffer Layout:**
+```
+Base: $0C80 (OAM mirror in WRAM)
+
+Sprite 0: $0C80-$0C83 (4 bytes)
+  +$00: X position
+  +$01: Y position
+  +$02: Tile number  ← Updated by this function
+  +$03: Attributes
+
+Sprite 1: $0C82-$0C85
+Sprite 2: $0C84-$0C87
+Sprite 3: $0C86-$0C89
+Sprite 4: $0C88-$0C8B
+
+Pattern buffer: $0C94+ (4 bytes per sprite)
+  Sprite 0: $0C94-$0C97
+  Sprite 1: $0C98-$0C9B
+  Sprite 2: $0C9C-$0C9F
+  Sprite 3: $0CA0-$0CA3
+  Sprite 4: $0CA4-$0CA7
+```
+
+**Performance Analysis:**
+```
+Per-frame cost (all 5 sprites):
+  Setup:           ~40 cycles
+  Loop iteration:  ~120 cycles per sprite
+  Total loop:      ~600 cycles (5 sprites)
+  PPU update:      ~50 cycles
+  Total:           ~690 cycles per frame
+  
+  Percentage of frame: 690 / 178,000 ≈ 0.4% (NTSC, 3.58 MHz)
+  
+Animation update (every 4th frame):
+  Adds ~100 cycles for tile calculations
+  Total: ~790 cycles
+  Still only ~0.44% of frame budget
+```
+
+**Side Effects:**
+- Modifies `$0CC2` (sprite 1 tile number)
+- Modifies `$0CCA` (sprite 2 tile number)
+- Modifies `$0CC6` (sprite 3 tile number)
+- Modifies `$0CCE` (sprite 4 tile number)
+- Updates `$0202-$020B` (all 5 sprite frame indices)
+- Writes to OAM buffer $0C80-$0C8B (sprite tiles)
+- Writes to pattern buffer $0C94+ (sprite patterns)
+- Changes data bank to current bank ($0C)
+- Calls CODE_0C8910 (PPU register update)
+- Safe for VBLANK usage (enables VRAM/OAM transfers)
+
+**Register Usage:**
+```
+Entry:  Any A/X/Y state
+Work:   A=8/16-bit (tile data, counters)
+        X=16-bit (sprite indices, loop)
+        Y=16-bit (OAM buffer pointers)
+Exit:   A=preserved (via REP)
+        X=restored (via PLX)
+        Y=modified (internal use)
+```
+
+**Calls:**
+- CODE_0C8910 - Update PPU registers
+
+**Called By:**
+- Main game loop (every frame)
+- VBLANK handler (synchronization point)
+- Field update routine
+- Battle display routine
+- Menu rendering system
+
+**Related:**
+- See `Display_SpriteOAMDataCopy` @ $0C:$8767 - Bulk OAM copy
+- See `docs/GRAPHICS_SYSTEM.md` - Sprite architecture
+- See DATA8_0C8659 - Animation frame table
+
+---
+
 ### Music Playback
 
 #### PlayMusic
@@ -6507,9 +7124,12 @@ Multiple operations:
 - See `src/asm/bank_0B_documented.asm` for battle-specific graphics
 
 ### Bank $0C - Mode 7/World Map
+- `Display_WaitVBlankAndUpdate` @ $85DB - VBLANK sync + sprite animation
 - See `src/asm/bank_0C_documented.asm` for Mode 7 functions
 
 ### Bank $0D - Sound/APU
+- `SPC_InitMain` @ $802C - SPC700 driver upload & initialization
+- `APU_SendCommand` @ $8147 - Music/SFX command dispatcher
 - `PlayMusic` @ $8000 - Music playback (SPC700)
 
 ---
@@ -6616,6 +7236,11 @@ Multiple operations:
 - `PrintText` (Bank $08 @ $9000)
 - `DecompressText` (Bank $08 @ $9234)
 
+### Sound & Animation
+- `SPC_InitMain` (Bank $0D @ $802C) - SPC700 driver upload
+- `APU_SendCommand` (Bank $0D @ $8147) - Music/SFX commands
+- `Display_WaitVBlankAndUpdate` (Bank $0C @ $85DB) - VBLANK sync + sprite animation
+
 ### Utilities
 - `Random` (Bank $00 @ $8456)
 - `RNG_GenerateRandom` (Bank $00 @ $9783)
@@ -6644,7 +7269,17 @@ See `docs/DOCUMENTATION_UPDATE_CHECKLIST.md` for complete guidelines.
 
 ---
 
-**Note:** This is a living document. Not all functions are documented yet. Current coverage: **~26.6%** (2,167+ / 8,153 functions).
+**Note:** This is a living document. Not all functions are documented yet. Current coverage: **~26.7%** (2,173+ / 8,153 functions).
+
+**Recent Additions (2025-11-05 - Update #13):**
+- Added 3 critical sound & animation functions
+- SPC_InitMain: Complete SPC700 driver upload with IPL handshake protocol
+- APU_SendCommand: Music/SFX command dispatcher with full command table
+- Display_WaitVBlankAndUpdate: VBLANK sync + 5-sprite animation system (14 frames)
+
+**Recent Additions (2025-11-05 - Update #12):**
+- Added 1 graphics system function (palette loading)
+- Palette_Load8Colors: Fast 8-color CGRAM load for UI/text
 
 **Recent Additions (2025-11-05 - Update #11):**
 - Added 4 memory management functions (block copy and MVN-based transfers)
