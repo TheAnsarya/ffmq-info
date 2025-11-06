@@ -4,7 +4,7 @@ Complete reference for all documented functions in Final Fantasy: Mystic Quest.
 
 **Last Updated:** 2025-11-05  
 **Status:** Active - Continuously updated with code analysis  
-**Coverage:** 2,197+ documented functions out of 8,153 total (~26.9%)
+**Coverage:** 2,200+ documented functions out of 8,153 total (~27.0%)
 
 ## Table of Contents
 
@@ -6007,6 +6007,895 @@ Exit:   A=preserved (via REP)
 - See `Display_SpriteOAMDataCopy` @ $0C:$8767 - Bulk OAM copy
 - See `docs/GRAPHICS_SYSTEM.md` - Sprite architecture
 - See DATA8_0C8659 - Animation frame table
+
+---
+
+#### BattleSprite_InitAnimationState
+**Location:** Bank $0B @ $80D9  
+**File:** `src/asm/bank_0B_documented.asm`
+
+**Purpose:** Initialize battle sprite animation state before rendering - sets up frame counter and sprite index for animation calculation subsystem.
+
+**Inputs:**
+- `$009E` = Global frame counter (increments every VBLANK)
+
+**Outputs:**
+- `$192C` = Animation counter (copy of $009E)
+- `$192B` = Sprite index (set to $02 - sprite slot 2)
+- Calls CODE_018BD1 @ Bank $01 (animation frame calculator)
+
+**Technical Details:**
+- **Sprite Slot:** Hard-coded to slot #2 (primary battle sprite)
+- **Frame Sync:** Copies game frame counter to local animation state
+- **Delegation:** Calls external calculator for frame index computation
+- **Short Return:** Uses RTS (not RTL) - called via JSR
+
+**Process Flow:**
+```asm
+1. Load global frame counter:
+   LDA $009E             ; Load 8-bit frame counter
+
+2. Store to animation state:
+   STA $192C             ; Copy to local animation counter
+                         ; Used by subsequent animation logic
+
+3. Set sprite index:
+   LDA #$02              ; Sprite slot 2 (primary battle sprite)
+   STA $192B             ; Store sprite index
+                         ; $FFFF = no sprite active
+                         ; $00-$15 = valid sprite slots (0-21)
+
+4. Calculate animation frame:
+   JSL CODE_018BD1       ; Call frame calculator @ Bank $01
+                         ; Input: $192C (frame counter)
+                         ; Output: Frame index for sprite
+
+5. Return:
+   RTS                   ; Short return (JSR caller)
+```
+
+**Animation State Variables:**
+```
+$192C - Animation Counter:
+  Purpose: Local copy of frame counter
+  Range: $00-$FF (wraps at 256)
+  Update: Every VBLANK via this function
+  Usage: Timing reference for frame calculations
+  
+$192B - Sprite Index:
+  Purpose: Active sprite slot identifier
+  Values:
+    $FFFF = No sprite active (skip rendering)
+    $00-$15 = Valid sprite slots (0-21 decimal)
+    $02 = Primary battle sprite (default)
+  Usage: Indexed access to sprite table @ $1A72
+  
+Sprite Table Structure (@ $1A72):
+  Entry size: $1A bytes (26 bytes per sprite)
+  Slots: 22 total ($00-$15)
+  Offsets per sprite:
+    +$00: Active flag ($FF = inactive)
+    +$0B: Sprite data offset
+    +$19: Sprite ID
+  Access: Base + (index × $1A) + offset
+```
+
+**Frame Counter Synchronization:**
+```
+$009E (Global Frame Counter):
+  Increments: Every VBLANK (60 Hz NTSC, 50 Hz PAL)
+  Range: $00-$FF (8-bit, wraps)
+  Usage: Master timing for all animations
+  
+Synchronization Flow:
+  VBLANK → $009E++ → This function → $192C = $009E
+  
+  Frame    $009E    $192C    Action
+  ─────    ─────    ─────    ──────
+    0      $00      $00      Initialize
+    1      $01      $01      Advance 1
+    4      $04      $04      Advance 4 (sprite update)
+   16      $10      $10      Advance 16
+  255      $FF      $FF      Max value
+  256      $00      $00      Wrap to 0
+  
+Why copy instead of using $009E directly?
+  - Isolation: Battle state independent of global frame
+  - Snapshots: Freeze frame at specific moments
+  - Debugging: Easier to track battle-specific timing
+  - Rollback: Can restore previous frame state
+```
+
+**CODE_018BD1 Frame Calculator:**
+```
+Called from this function to compute:
+  - Which animation frame to display
+  - Frame index into sprite data tables
+  - Timing for frame transitions
+  
+Expected behavior:
+  Input: $192C (frame counter)
+  Process: Modulo or lookup operation
+  Output: Frame index (stored somewhere in $1900-$19FF range)
+  
+Example for 14-frame animation:
+  frame_index = ($192C % 14)
+  Result: 0-13 cycling through animation
+  
+Could also handle:
+  - Frame delays (skip frames)
+  - Animation speed scaling
+  - Keyframe selection
+```
+
+**Sprite Slot Hardcoding:**
+```
+LDA #$02  ; Why always sprite slot 2?
+
+Possible reasons:
+1. Reserved slots:
+   - Slot 0: Background effects
+   - Slot 1: Player character
+   - Slot 2: Enemy/battle sprite ← This function
+   - Slots 3-21: Additional effects, allies
+
+2. Battle system convention:
+   - Slot 2 designated for current battle target
+   - Simplifies rendering pipeline
+   - Other slots used for multi-enemy battles
+
+3. Compatibility:
+   - Legacy code structure
+   - Fixed slot simplifies sprite table access
+   - No dynamic allocation needed
+```
+
+**Performance:**
+```
+Instruction breakdown:
+  LDA $009E      5 cycles (absolute)
+  STA $192C      5 cycles (absolute)
+  LDA #$02       2 cycles (immediate)
+  STA $192B      5 cycles (absolute)
+  JSL ...      8 cycles (call overhead)
+  RTS           6 cycles
+  
+  Subtotal: ~31 cycles (before external call)
+  CODE_018BD1: Unknown (likely 50-150 cycles)
+  
+  Total estimate: ~80-180 cycles
+  Percentage: ~0.05% of 16.7ms frame (NTSC)
+```
+
+**Call Graph:**
+```
+BattleSprite_AnimationHandler @ $0B:$803F
+  ↓
+BattleSprite_InitAnimationState @ $0B:$80D9  ← THIS FUNCTION
+  ↓
+CODE_018BD1 @ $01:$8BD1 (animation frame calculator)
+  ↓
+(Returns to $0B:$803F)
+  ↓
+Sprite rendering & OAM update
+```
+
+**Side Effects:**
+- Modifies `$192C` (animation counter)
+- Modifies `$192B` (sprite index)
+- Calls external function CODE_018BD1 (may modify other state)
+- **Does NOT modify processor modes** (caller handles REP/SEP)
+
+**Register Usage:**
+```
+Entry:  A=8-bit (SEP #$20 expected from caller)
+Work:   A=8-bit (data loads/stores)
+Exit:   A=8-bit (unchanged mode)
+        X, Y: Preserved (not touched)
+```
+
+**Called By:**
+- BattleSprite_AnimationHandler @ $0B:$803F
+- Battle sprite update system (via JSR)
+
+**Related:**
+- See `BattleSprite_AnimationHandler` @ $0B:$803F - Main animation loop
+- See `CODE_018BD1` @ $01:$8BD1 - Frame calculator
+- See `docs/SPRITE_SYSTEM.md` - Sprite slot allocation
+
+---
+
+#### AnimateWorldSprites
+**Location:** Bank $0C @ $85DB  
+**File:** `src/asm/banks/bank_0C.asm`
+
+**Purpose:** Update animated sprite tiles for world map display - advances 14-frame animation cycles for 5 simultaneous sprites with alternating tile patterns.
+
+**Inputs:**
+- `$0E97` = Global animation timer (frame counter)
+- `$0202-$020B` = Sprite frame indices (5 words)
+- DATA8_0C8659 = Animation frame table (14 entries)
+
+**Outputs:**
+- `$0CC2`, `$0CCA` = Updated tile numbers (sprites 1, 2)
+- `$0CC6`, `$0CCE` = Updated tile numbers (sprites 3, 4)  
+- `$0202-$020B` = Advanced frame indices (incremented, wrapped at 14)
+- OAM buffer `$0C80+` = Updated sprite tiles and patterns
+- PPU registers updated (via TransferOAMToVRAM call)
+
+**Technical Details:**
+- **Animation Frames:** 14-frame cycle per sprite
+- **Sprite Count:** 5 sprites (simultaneous animation)
+- **Update Frequency:** Every 4 game frames (~15 FPS at 60 Hz)
+- **Tile Alternation:** $4C/$4E base tiles toggle every 4 frames
+- **Special Tiles:** Frame 11-12 ($44) triggers alternate patterns ($6C/$6E vs $48)
+
+**Process Flow:**
+```asm
+1. Set data bank:
+   PHK                   ; Push program bank ($0C)
+   PLB                   ; Pull to data bank
+   PHX                   ; Save X register
+
+2. Calculate animated tile numbers:
+   LDA $0E97             ; Load global animation timer
+   AND #$04              ; Isolate bit 2 (every 4 frames)
+   LSR A                 ; Shift to bit 1 ($00 or $02)
+   ADC #$4C              ; Base tile $4C or $4E
+   STA $0CC2             ; Store to sprite 1 tile
+   STA $0CCA             ; Store to sprite 2 tile
+   EOR #$02              ; Toggle $4C ↔ $4E
+   STA $0CC6             ; Store to sprite 3 tile
+   STA $0CCE             ; Store to sprite 4 tile
+
+3. Setup animation loop:
+   REP #$30              ; 16-bit mode
+   LDA #$0005            ; Loop count = 5 sprites
+   STA $020C             ; Store loop counter
+   STZ $020E             ; Sprite index = 0
+
+4. For each sprite (5 iterations):
+   
+   a) Calculate OAM buffer pointer:
+      LDA $020E          ; Load sprite index (0, 2, 4, 6, 8)
+      ASL A              ; Index * 2 (word addressing)
+      ADC #$0C80         ; Base + offset = OAM buffer address
+      TAY                ; Y = OAM pointer
+   
+   b) Advance animation frame:
+      LDX $020E          ; Load sprite index
+      LDA $0202,X        ; Load current frame (0-13)
+      INC A              ; Next frame
+      CMP #$000E         ; Frame >= 14?
+      BNE NotWrapped     ; Skip if < 14
+      LDA #$0000         ; Wrap to frame 0
+   NotWrapped:
+      STA $0202,X        ; Store new frame index
+   
+   c) Update sprite tile:
+      TAX                ; X = frame index
+      SEP #$20           ; 8-bit A
+      LDA DATA8_0C8659,X ; Load tile number from table
+      STA ($0002),Y      ; Store to OAM buffer (tile offset)
+   
+   d) Check for special tile:
+      CMP #$44           ; Is tile $44?
+      PHP                ; Save comparison result
+      
+   e) Calculate pattern buffer pointer:
+      REP #$30           ; 16-bit mode
+      LDA $020E          ; Load sprite index
+      ASL A              ; Index * 2
+      ASL A              ; Index * 4 (4 bytes per sprite)
+      ADC #$0C94         ; Base + offset = pattern buffer address
+      TAY                ; Y = pattern pointer
+      
+   f) Apply tile patterns:
+      PLP                ; Restore tile comparison
+      BEQ UseTile44      ; Branch if tile was $44
+      
+      ; Default pattern ($48 for both):
+      LDA #$0048         ; Pattern tile $48
+      STA ($0002),Y      ; Store pattern 1
+      STA ($0006),Y      ; Store pattern 2
+      BRA NextSprite
+      
+UseTile44:
+      ; Special pattern ($6C/$6E):
+      LDA #$006C         ; Pattern tile $6C
+      STA ($0002),Y      ; Store pattern 1
+      LDA #$006E         ; Pattern tile $6E
+      STA ($0006),Y      ; Store pattern 2
+   
+   g) Loop housekeeping:
+NextSprite:
+      REP #$30           ; 16-bit mode
+      INC $020E          ; Sprite index += 2 (word)
+      INC $020E
+      DEC $020C          ; Loop counter--
+      BNE LoopStart      ; Continue if not zero
+
+5. Transfer to VRAM:
+   JSR TransferOAMToVRAM  ; Update PPU registers
+   PLX                    ; Restore X
+   RTS                    ; Return
+```
+
+**Animation Frame Table:**
+```
+DATA8_0C8659 (14 frames):
+Offset  Tile    Notes
+──────  ────    ─────
+  $00   $00     Frame 0
+  $01   $04     Frame 1
+  $02   $04     Frame 2 (repeat)
+  $03   $00     Frame 3
+  $04   $00     Frame 4 (repeat)
+  $05   $08     Frame 5
+  $06   $08     Frame 6 (repeat)
+  $07   $08     Frame 7 (triple)
+  $08   $0C     Frame 8
+  $09   $40     Frame 9
+  $0A   $40     Frame 10 (repeat)
+  $0B   $44     Frame 11 ← SPECIAL (triggers $6C/$6E patterns)
+  $0C   $44     Frame 12 (special repeat)
+  $0D   $00     Frame 13 (back to start)
+
+14-frame cycle @ 15 FPS = 933ms per full animation
+```
+
+**Tile Alternation Logic:**
+```
+Global timer ($0E97) drives tile selection:
+
+Bit 2 toggles every 4 frames:
+Frame   $0E97   AND #$04   LSR   ADC #$4C   Result
+─────   ─────   ────────   ───   ────────   ──────
+  0     $00     $00        $00   $4C        Tile $4C
+  1     $01     $00        $00   $4C        Tile $4C
+  2     $02     $00        $00   $4C        Tile $4C
+  3     $03     $00        $00   $4C        Tile $4C
+  4     $04     $04        $02   $4E        Tile $4E  ← Toggle
+  5     $05     $04        $02   $4E        Tile $4E
+  6     $06     $04        $02   $4E        Tile $4E
+  7     $07     $04        $02   $4E        Tile $4E
+  8     $08     $00        $00   $4C        Tile $4C  ← Toggle
+  
+EOR #$02 inverts toggle for sprites 3-4:
+  If sprites 1-2 = $4C → sprites 3-4 = $4E
+  If sprites 1-2 = $4E → sprites 3-4 = $4C
+  
+Result: Alternating checkerboard pattern
+```
+
+**Sprite Pattern System:**
+```
+Two pattern modes based on frame tile:
+
+Mode 1 (Default - tile ≠ $44):
+  Pattern 1: $48
+  Pattern 2: $48
+  Usage: Most animation frames
+  Visual: Consistent tile appearance
+
+Mode 2 (Special - tile == $44):
+  Pattern 1: $6C
+  Pattern 2: $6E
+  Usage: Frames 11-12 only
+  Visual: Special effect (crystal glow, water shimmer)
+  
+Pattern buffer layout (@ $0C94):
+  Sprite 0: $0C94-$0C97 (4 bytes)
+    +$00: Header/flags
+    +$02: Pattern 1 tile  ← Updated here
+    +$06: Pattern 2 tile  ← Updated here
+  Sprite 1: $0C98-$0C9B
+  Sprite 2: $0C9C-$0C9F
+  Sprite 3: $0CA0-$0CA3
+  Sprite 4: $0CA4-$0CA7
+```
+
+**OAM Buffer Structure:**
+```
+Base: $0C80 (WRAM OAM mirror)
+
+Sprite entry (4 bytes each):
+  +$00: X position (8-bit)
+  +$01: Y position (8-bit)
+  +$02: Tile number  ← Updated by this function
+  +$03: Attributes (palette, priority, flip)
+
+5 sprites occupy $0C80-$0C8B (20 bytes)
+
+Addressing calculation:
+  Sprite index = 0, 2, 4, 6, 8 (word increment)
+  Pointer = ($0C80 + index * 2)
+  Tile offset = +$02 from base
+  
+Example:
+  Sprite 0: Tile @ $0C82 ($0C80 + 0*2 + 2)
+  Sprite 1: Tile @ $0C84 ($0C80 + 1*2 + 2)
+  Sprite 2: Tile @ $0C86 ($0C80 + 2*2 + 2)
+```
+
+**Frame Index Management:**
+```
+$0202-$020B storage (5 words):
+  $0202: Sprite 0 frame (word)
+  $0204: Sprite 1 frame
+  $0206: Sprite 2 frame
+  $0208: Sprite 3 frame
+  $020A: Sprite 4 frame
+
+Increment with wrap:
+  frame = ($0202,X + 1) % 14
+  
+  Frame   Next    Wrap?
+  ─────   ────    ─────
+    0      1       No
+    12     13      No
+    13     0       Yes  ← Wrap to 0
+    
+Wraparound ensures continuous loop:
+  0 → 1 → 2 → ... → 13 → 0 → 1 → ...
+```
+
+**Performance Analysis:**
+```
+Per-call breakdown:
+  Setup:              ~50 cycles (tile calculation, loop init)
+  Per sprite:         ~120 cycles (5 iterations)
+    Frame advance:    ~30 cycles
+    Tile lookup:      ~20 cycles
+    Pattern update:   ~50 cycles (conditional branch)
+    Loop overhead:    ~20 cycles
+  Total loop:         ~600 cycles (5 sprites)
+  TransferOAMToVRAM:  ~100 cycles
+  Total:              ~750 cycles
+  
+Percentage of frame:  750 / 178,000 ≈ 0.42% (NTSC, 3.58 MHz)
+
+Called every 4 frames:
+  Effective cost:     ~188 cycles per frame average
+  Average load:       ~0.11% of frame budget
+```
+
+**Side Effects:**
+- Modifies `$0CC2`, `$0CCA`, `$0CC6`, `$0CCE` (tile numbers)
+- Increments `$0202-$020B` (all 5 sprite frame indices)
+- Writes to OAM buffer `$0C80-$0C8B` (sprite tiles)
+- Writes to pattern buffer `$0C94-$0CA7` (sprite patterns)
+- Changes data bank to $0C
+- Preserves X register (via PHX/PLX)
+
+**Register Usage:**
+```
+Entry:  Any A/X/Y mode
+Setup:  A/X/Y = 16-bit (REP #$30)
+Work:   A = 8/16-bit (context-dependent)
+        X = 16-bit (indices, frame lookups)
+        Y = 16-bit (OAM/pattern pointers)
+Exit:   X = restored (via PLX)
+        A/Y = modified
+```
+
+**Calls:**
+- TransferOAMToVRAM @ $0C:$8910 - VRAM DMA transfer
+
+**Called By:**
+- Main game loop (world map rendering)
+- ProcessAnimationScript @ $0C:$825A (animation sequencer)
+- Field update routines
+- Menu background animations
+
+**Related:**
+- See `Display_WaitVBlankAndUpdate` @ $0C:$85DB - Alternate name/entry point
+- See `ProcessAnimationScript` @ $0C:$825A - Script-driven animation
+- See DATA8_0C8659 - Animation frame table (14 frames)
+
+---
+
+#### ProcessAnimationScript
+**Location:** Bank $0C @ $825A  
+**File:** `src/asm/banks/bank_0C.asm`
+
+**Purpose:** Execute bytecode animation script for world map sequences - interprets opcode commands to control sprite animation, Mode 7 effects, screen fades, and timing for cutscenes and transitions.
+
+**Inputs:**
+- `X` = Script pointer (current instruction address in Bank $0C)
+- Animation script data @ Bank $0C (opcodes and parameters)
+- `$015F` = Parameter storage (opcode low 3 bits)
+- `$0160` = Mode 7 configuration flags
+- `$0161` = Screen offset data
+- `$0200` = Animation speed/delay
+- `$0C82` = Wait completion flag
+
+**Outputs:**
+- Animation state updated (sprites advanced, effects applied)
+- `X` = Updated script pointer (next instruction)
+- Screen effects active (fades, zoom, Mode 7 rotation)
+- Returns to caller when script completes
+
+**Technical Details:**
+- **Script Format:** Bytecode opcodes + inline parameters
+- **Execution Model:** Interpret-and-advance (not stack-based)
+- **Control Flow:** Conditional branches, loops, waits
+- **Effects:** Sprite animation, color math, Mode 7, DMA
+- **Initialization:** InitWorldMapSprites @ $0C:$8241 sets X=$8671
+
+**Opcode Encoding:**
+```
+Byte value determines operation:
+
+$00:        End / Wait Complete (RTS when $0C82 = 0)
+$01:        Next Frame (advance 1 frame)
+$02:        Repeat Frame (repeat $3B times with delay)
+$03:        Jump to Complex Effect ($8460 - rotation)
+$04:        Fade Effect (4-iteration color pulse)
+$05:        Special Zoom ($8421 - zoom out)
+$06-$07:    Reserved
+$08-$3F:    Mode 7 Configuration (bits 0-2 = parameter)
+$40-$7F:    Screen Offset Type 4 (configure display position)
+$80-$BF:    Screen Offset Type 8 (dual-buffer update)
+$C0-$FF:    Screen Offset Type C (triple-buffer update)
+
+Parameter extraction:
+  Low 3 bits (AND $07) → $015F (sub-parameter)
+  High 5 bits (AND $F8) → opcode class
+```
+
+**Process Flow:**
+```asm
+ProcessAnimationScript:
+1. Read opcode:
+   LDA ($0000),X         ; Load opcode byte
+   INX                   ; Advance script pointer
+
+2. Decode opcode range:
+   CMP #$01              ; Opcode < $01?
+   BCC EndWaitComplete   ; Branch if $00 (wait/end)
+   BEQ NextFrame         ; Branch if $01 (next frame)
+   
+   CMP #$03              ; Opcode < $03?
+   BCC RepeatFrame       ; Branch if $02 (repeat)
+   BEQ JumpRotation      ; Branch if $03 (complex effect)
+   
+   CMP #$05              ; Opcode == $05?
+   BEQ SpecialZoom       ; Branch if yes (zoom)
+   BCS DecodeComplex     ; Branch if $06+ (complex opcodes)
+
+3. Execute opcode handler:
+   (See individual opcode descriptions below)
+
+4. Loop back:
+   BRA ProcessAnimationScript  ; Repeat (most opcodes)
+   RTS                         ; Exit (opcode $00 when done)
+```
+
+**Opcode Handlers:**
+
+**$00 - End/Wait Complete:**
+```asm
+Animation_WaitComplete:
+  JSR AnimateWorldSprites   ; Update sprites
+  LDA $0C82                 ; Check completion flag
+  BNE Animation_WaitComplete; Loop until $0C82 = 0
+  RTS                       ; Return to caller
+
+Purpose: Hold until external signal
+Usage: Wait for DMA completion, user input, timer
+Flag: $0C82 cleared by interrupt handler
+```
+
+**$01 - Next Frame:**
+```asm
+Animation_NextFrame:
+  JSR AnimateWorldSprites   ; Advance 1 animation frame
+  BRA ProcessAnimationScript; Continue script
+
+Purpose: Single-step animation
+Usage: Smooth transitions, precise timing
+Cost: ~750 cycles + script overhead
+```
+
+**$02 - Repeat Frame:**
+```asm
+Animation_RepeatFrame:
+  LDA #$3B                  ; Count = 59 frames
+  
+RepeatFrameLoop:
+  PHA                       ; Save counter
+  JSR AnimateWorldSprites   ; Update sprites
+  PLA                       ; Restore counter
+  DEC A                     ; Decrement
+  BNE RepeatFrameLoop       ; Loop if not zero
+  
+  BRA ProcessAnimationScript; Continue script
+
+Purpose: Hold frame with animation
+Duration: 59 frames ≈ 983ms (NTSC)
+Usage: Pauses, dramatic holds
+```
+
+**$03 - Jump to Complex Rotation:**
+```asm
+Animation_JumpToEffect:
+  JMP Animation_ComplexRotation  ; @ $0C:$8460
+
+Purpose: Mode 7 rotation effect
+Target: Complex multi-register setup
+Usage: World map rotation, perspective shifts
+Note: Does NOT return to script (separate flow)
+```
+
+**$04 - Fade Effect:**
+```asm
+Animation_FadeLoop:
+  LDY #$0004                ; 4 iterations
+  
+.Loop:
+  PHY                       ; Save counter
+  
+  LDA #$3F                  ; White fade
+  STA SNES_COLDATA ($2132)  ; Color math control
+  JSR AnimateWorldSprites   ; Update (white)
+  
+  LDA #$E0                  ; Black fade
+  STA SNES_COLDATA ($2132)  ; Color math control
+  JSR AnimateWorldSprites   ; Update (black)
+  
+  PLY                       ; Restore counter
+  DEY                       ; Decrement
+  BNE .Loop                 ; Repeat 4 times
+  
+  BRA ProcessAnimationScript; Continue
+
+Purpose: Flashing fade effect
+Duration: 8 frame updates (4 white + 4 black)
+Usage: Screen transitions, impact effects
+Color $3F: RGB = 11111 (white additive)
+Color $E0: RGB = 00000 (black subtractive)
+```
+
+**$05 - Special Zoom:**
+```asm
+Animation_SpecialZoom:
+  JMP Animation_ZoomOut      ; @ $0C:$8421
+
+Purpose: Zoom out effect (Mode 7)
+Target: Scaling and perspective calculation
+Usage: World map zoom, battle transitions
+Note: Separate handler (may not return)
+```
+
+**$08-$3F - Mode 7 Configuration:**
+```asm
+ProcessOpcode_ConfigureMode7:
+  ; Extract parameter:
+  ; Opcode $08: parameter = 0
+  ; Opcode $09: parameter = 1
+  ; ... opcode $0F: parameter = 7
+  
+  PHA                       ; Save opcode
+  AND #$07                  ; Extract low 3 bits
+  STA $015F                 ; Store parameter
+  PLA                       ; Restore opcode
+  AND #$F8                  ; Mask to class
+  
+  CMP #$08                  ; Mode 7 setup?
+  BNE Animation_FlashEffect ; Branch if not
+  
+  LDA $015F                 ; Load parameter
+  BEQ DisableMode7          ; If 0, disable
+  
+EnableMode7:
+  ; Setup Mode 7 for sprite (parameter 1-7):
+  REP #$30                  ; 16-bit mode
+  LDA $015F                 ; Load parameter
+  ASL A                     ; Parameter * 4
+  ASL A
+  PHA                       ; Save
+  
+  ADC #$0C80                ; Base + offset = sprite buffer
+  TAY                       ; Y = sprite pointer
+  LDA $0C80                 ; Load reference sprite data
+  STA ($0000),Y             ; Copy to target sprite
+  
+  PLA                       ; Restore offset
+  ASL A                     ; Offset * 2 (8 bytes total)
+  ADC #$0C94                ; Pattern buffer base
+  TAY                       ; Y = pattern pointer
+  
+  ; Copy pattern data:
+  LDA $0C94                 ; Load pattern 1
+  STA ($0000),Y             ; Store
+  LDA $0C98                 ; Load pattern 2
+  STA ($0004),Y             ; Store
+  
+  ; Calculate Mode 7 mask:
+  LDY $015F                 ; Sprite index
+  LDA #$0003                ; Base mask
+  (Continues in Mode7_CalculateMask...)
+
+DisableMode7:
+  REP #$30                  ; 16-bit mode
+  LDA #$3C03                ; Disable bits
+  TRB $0E08                 ; Clear in flags
+  LDA #$0002                ; Enable bits
+  TSB $0E08                 ; Set in flags
+  SEP #$20                  ; 8-bit A
+  JMP ProcessAnimationScript
+
+Purpose: Configure Mode 7 sprite effects
+Parameter: Sprite index (0 = disable, 1-7 = enable)
+Effects: Matrix calculation, sprite copying
+```
+
+**$40-$7F - Screen Offset Type 4:**
+```asm
+ProcessOpcode_Type4:
+  SBC #$30                  ; Normalize to range
+  LSR A                     ; Divide by 8
+  LSR A
+  LSR A
+  STA $0200                 ; Store animation speed/delay
+  JMP ProcessAnimationScript
+
+Purpose: Set animation timing
+Parameter: (opcode - $30) / 8
+Range: 0-7 (animation delay values)
+Usage: Control frame rate, slow-motion effects
+```
+
+**$80-$BF - Screen Offset Type 8:**
+```asm
+ProcessOpcode_Type8:
+  STA $0161                 ; Store base offset
+  
+  REP #$30                  ; 16-bit mode
+  LDA $015F                 ; Load parameter
+  ASL A                     ; Parameter * 4
+  ASL A
+  PHA                       ; Save offset
+  
+  ; Update sprite buffer:
+  ADC #$0C80                ; Sprite base + offset
+  JSR ApplyScreenOffset     ; Apply offset to sprite
+  
+  REP #$30                  ; 16-bit mode
+  PLA                       ; Restore offset
+  ASL A                     ; Offset * 8 (pattern buffer)
+  ADC #$0C94                ; Pattern base
+  JSR ApplyScreenOffset     ; Apply to pattern 1
+  
+  REP #$30                  ; 16-bit mode
+  TYA                       ; Load Y (current pointer)
+  CLC
+  ADC #$0004                ; Advance 4 bytes
+  JSR ApplyScreenOffset     ; Apply to pattern 2
+  
+  JMP ProcessAnimationScript
+
+Purpose: Dual-buffer screen offset
+Parameter: Sprite/pattern index
+Effects: Sprite position, pattern alignment
+```
+
+**$C0-$FF - Screen Offset Type C:**
+```asm
+ProcessOpcode_TypeC:
+  SBC #$40                  ; Normalize offset
+  STA $0161                 ; Store offset value
+  
+  REP #$30                  ; 16-bit mode
+  LDA $015F                 ; Load parameter
+  ASL A                     ; Parameter * 4
+  ASL A
+  ADC #$0CBC                ; Base + offset = buffer address
+  JSR ApplyScreenOffset     ; Apply offset
+  
+  BRA ProcessAnimationScript
+
+Purpose: Triple-buffer offset (extended)
+Parameter: Buffer index
+Usage: Complex multi-layer effects
+Buffer: $0CBC base (separate from sprite buffer)
+```
+
+**Animation Script Example:**
+```
+Script @ $0C:$8671:
+  $00        ; Initialize (possible NOP or data)
+  $01        ; Next frame
+  $02        ; Repeat 59 frames
+  $04        ; Fade effect (4 iterations)
+  $08        ; Mode 7: Disable
+  $0F        ; Mode 7: Enable sprite 7
+  $42        ; Type 4: Animation speed = 2
+  $88        ; Type 8: Dual offset, param 0
+  $C5        ; Type C: Triple offset, param 5
+  $03        ; Jump to rotation effect
+  $00        ; End (wait completion)
+
+Execution flow:
+  Initialize → Frame → Hold 59 → Fade →
+  Mode7 off → Mode7 on → Speed=2 → Offsets →
+  Rotation effect → Wait → Done
+```
+
+**Helper Functions:**
+```
+ApplyScreenOffset @ $0C:$83CB:
+  Purpose: Apply offset value to screen buffer
+  Input: A = buffer address, $0161 = offset value
+  Output: Buffer updated with offset
+  Usage: Called by Type 8 and Type C opcodes
+
+TransferOAMToVRAM @ $0C:$8910:
+  Purpose: DMA OAM data to PPU
+  Called by: AnimateWorldSprites (within script flow)
+```
+
+**Performance:**
+```
+Per opcode:
+  Simple ($00-$05):    ~50-100 cycles
+  Mode 7 ($08-$3F):    ~200-500 cycles
+  Offsets ($40-$FF):   ~150-300 cycles
+  
+Script overhead:
+  Opcode fetch:        ~8 cycles
+  Decode:              ~20-40 cycles
+  Total per opcode:    ~80-600 cycles
+  
+AnimateWorldSprites call:
+  Per invocation:      ~750 cycles
+  Called 1-4 times per opcode (fade = 8 times)
+
+Full script execution:
+  10-20 opcodes typical
+  Duration: 1-3 seconds real-time
+  CPU cost: ~10,000-50,000 cycles total
+```
+
+**Side Effects:**
+- Modifies `X` (script pointer advances)
+- Updates `$015F`, `$0160`, `$0161` (parameters)
+- Updates `$0200` (animation speed)
+- Calls AnimateWorldSprites (modifies sprite state)
+- Writes to SNES_COLDATA ($2132 - color math)
+- Modifies `$0E08` (Mode 7 flags)
+- Writes to sprite buffers $0C80+, $0C94+, $0CBC+
+- May jump to external effects (rotation, zoom)
+
+**Register Usage:**
+```
+Entry:  X = script pointer
+        A = 8-bit (opcode fetch)
+Work:   A = 8/16-bit (context-dependent)
+        X = script pointer (advances)
+        Y = buffer pointers (offsets, sprites)
+Exit:   X = next instruction
+        A/Y = modified per opcode
+```
+
+**Calls:**
+- AnimateWorldSprites @ $0C:$85DB - Sprite animation
+- ApplyScreenOffset @ $0C:$83CB - Buffer updates
+- Animation_ComplexRotation @ $0C:$8460 - Mode 7 effect
+- Animation_ZoomOut @ $0C:$8421 - Zoom effect
+
+**Called By:**
+- InitWorldMapSprites @ $0C:$8241 (initializes X=$8671)
+- World map cutscene system
+- Battle transition sequences
+- Title screen animations
+
+**Related:**
+- See `AnimateWorldSprites` @ $0C:$85DB - Frame updates
+- See `InitWorldMapSprites` @ $0C:$8241 - Script initialization
+- See `Animation_ComplexRotation` @ $0C:$8460 - Mode 7 rotation
+- See `Animation_ZoomOut` @ $0C:$8421 - Zoom effect
 
 ---
 
