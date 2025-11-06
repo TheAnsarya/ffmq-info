@@ -4,7 +4,7 @@ Complete reference for all documented functions in Final Fantasy: Mystic Quest.
 
 **Last Updated:** 2025-11-05  
 **Status:** Active - Continuously updated with code analysis  
-**Coverage:** 2,173+ documented functions out of 8,153 total (~26.7%)
+**Coverage:** 2,175+ documented functions out of 8,153 total (~26.7%)
 
 ## Table of Contents
 
@@ -6010,6 +6010,323 @@ Exit:   A=preserved (via REP)
 
 ---
 
+### DMA Transfer Operations
+
+#### Graphics_TransferBattleMode
+**Location:** Bank $00 @ Section 2 (exact address TBD)  
+**File:** `src/asm/bank_00_section2.asm`
+
+**Purpose:** Upload battle graphics to VRAM using DMA during battle transitions - transfers character tiles and tilemap data for battle screen rendering.
+
+**Inputs:**
+- Source data at $7F0480 (character graphics, 640 bytes)
+- Source data at $7E2040 (tilemap data, 2816 bytes)
+
+**Outputs:**
+- VRAM $4400: Character tile data (640 bytes)
+- VRAM $5820: Tilemap data (2816 bytes)
+- `$00D2` bit 6 set (graphics updated flag)
+- OAM data transferred
+
+**Technical Details:**
+- **DMA Channel:** Channel 5 ($43xx registers)
+- **Transfer Mode:** Word write ($1801 = 2-byte sequential)
+- **VRAM Access:** Auto-increment after $2119 write
+- **Total Transfer:** 3,456 bytes (640 + 2816)
+
+**Process Flow:**
+```
+1. Setup VRAM address:
+   - Set VRAM write address to $4400
+   - VMADDL = $4400 (character data destination)
+
+2. Configure DMA Channel 5:
+   - Mode $1801: Word write, increment source
+   - Destination: $2118/$2119 (VMDATAL/VMDATAH)
+   - Auto-increment enabled
+
+3. Transfer character graphics:
+   - Source: $7F0480 (WRAM bank $7F)
+   - Size: $0280 bytes (640 bytes = 20 tiles × 32 bytes)
+   - Execute DMA transfer (write $20 to $420B)
+   - ~640 CPU cycles (DMA overhead)
+
+4. Transfer tilemap data:
+   - Set VRAM address to $5820
+   - Source: $7E2040 (WRAM bank $7E)
+   - Size: $0B00 bytes (2816 bytes)
+   - Execute DMA transfer
+   - ~2816 CPU cycles (DMA overhead)
+
+5. Update status flags:
+   - Set bit 6 of $00D2 (graphics ready)
+   - Call CODE_008543 (OAM transfer)
+   - Return via RTL
+```
+
+**DMA Register Configuration:**
+```
+DMA Channel 5 Registers ($4350-$4357):
+  $4350 (DMAP5):   $01 = 2-byte write mode
+  $4351 (BBAD5):   $18 = VRAM data port
+  $4352-$4353 (A1T5L/H): Source address (low/high)
+  $4354 (A1B5):    Source bank ($7E or $7F)
+  $4355-$4356 (DAS5L/H): Transfer size in bytes
+  
+Trigger:
+  $420B (MDMAEN):  $20 = Enable channel 5
+```
+
+**Character Tile Layout:**
+```
+VRAM $4400 (20 tiles, 4bpp format):
+  Each tile: 32 bytes (8×8 pixels, 4 bits per pixel)
+  Total: 640 bytes = 20 tiles
+  
+  Tile arrangement:
+    $4400-$441F: Tile 0 (32 bytes)
+    $4420-$443F: Tile 1
+    ...
+    $45E0-$45FF: Tile 19
+    
+  Used for: Battle UI elements, character sprites
+```
+
+**Tilemap Layout:**
+```
+VRAM $5820 (2816 bytes = 1408 words):
+  Format: 16-bit tilemap entries
+  Each entry: [vhopppcc cccccccc]
+    v = vertical flip
+    h = horizontal flip
+    o = priority
+    ppp = palette (0-7)
+    cccccccccc = tile number (0-1023)
+    
+  Dimensions: ~44×32 tiles (screen layout)
+  Used for: Battle background, UI windows
+```
+
+**Performance Analysis:**
+```
+DMA Transfer Time (8-bit bus):
+  Character data: 640 bytes × ~1 cycle = ~640 cycles
+  Tilemap data:   2816 bytes × ~1 cycle = ~2816 cycles
+  Setup overhead: ~100 cycles (register writes)
+  Total:          ~3,556 cycles
+  
+  Percentage of frame: 3,556 / 178,000 ≈ 2.0% (NTSC)
+  
+  Compared to CPU copy (LDA/STA):
+    CPU: ~3,456 × 8 = ~27,648 cycles (14× slower)
+    DMA wins by factor of ~8 (SNES DMA efficiency)
+```
+
+**Side Effects:**
+- Writes to VRAM $4400-$467F (640 bytes)
+- Writes to VRAM $5820-$631F (2816 bytes)
+- Modifies $00D2 (status flags)
+- Triggers DMA (halts CPU for ~3,556 cycles)
+- Calls CODE_008543 (OAM transfer subroutine)
+- Changes VRAM address pointer ($2116/$2117)
+
+**Register Usage:**
+```
+Entry:  Any state
+Work:   A=8-bit (DMA config, banks)
+        X=16-bit (addresses, sizes)
+Exit:   Undefined (not preserved)
+```
+
+**Calls:**
+- CODE_008543 - OAM data transfer
+
+**Called By:**
+- Battle initialization routine
+- Graphics_UpdateFieldMode (conditional branch)
+- Screen transition handler
+
+**Related:**
+- See `Graphics_UpdateFieldMode` - Field graphics update
+- See `docs/GRAPHICS_SYSTEM.md` - VRAM layout
+- See DMA technical details in SNES documentation
+
+---
+
+### Graphics Loading
+
+#### Graphics_UpdateFieldMode
+**Location:** Bank $00 @ Section 2 (exact address TBD)  
+**File:** `src/asm/bank_00_section2.asm`
+
+**Purpose:** Update field/map graphics during gameplay with conditional DMA transfers based on game state flags.
+
+**Inputs:**
+- `$00DA` bit 4 = Battle mode flag
+- `$00D6` bit 7 = Tilemap update flag
+- `$00D6` bit 5 = Display update flag
+- `$0042` = Current VRAM base address (16-bit)
+- Source data at $7F0040, $7F1040 (character tiles)
+- Source data at $7E2040 (tilemap, if flag set)
+
+**Outputs:**
+- VRAM at $0042: First tile section (1984 bytes)
+- VRAM at $0042+$1000: Second tile section (1984 bytes)
+- VRAM $5820: Tilemap (4032 bytes, conditional)
+- `$00D4` bits 3-6 set (conditional display update)
+- OAM data transferred
+
+**Technical Details:**
+- **DMA Channel:** Channel 5
+- **Transfer Mode:** Word write ($1801)
+- **VRAM Increment:** Vertical mode ($80 to VMAINC)
+- **Conditional Paths:** Battle/field mode branching
+
+**Process Flow:**
+```
+1. Setup VRAM increment mode:
+   - Write $80 to VMAINC
+   - Increments after $2119 write (VMDATAH)
+
+2. Check battle mode flag:
+   - Test $00DA bit 4
+   - If set → Branch to Graphics_TransferBattleMode
+   - Else → Continue with field graphics
+
+3. Transfer first tile section:
+   - VRAM address from $0042 variable
+   - Source: $7F0040
+   - Size: $07C0 bytes (1984 bytes)
+   - DMA channel 5 transfer
+
+4. Calculate second section address:
+   - REP #$30 (16-bit mode)
+   - Add $1000 to VRAM address
+   - Set new VRAM destination
+
+5. Transfer second tile section:
+   - Source: $7F1040
+   - Size: $07C0 bytes (1984 bytes)
+   - DMA channel 5 transfer
+
+6. Check tilemap update flag ($00D6 bit 7):
+   - If clear → Skip to OAM transfer
+   - If set → Transfer tilemap data
+     * VRAM $5820
+     * Source: $7E2040
+     * Size: $0FC0 bytes (4032 bytes)
+     * DMA channel 5 transfer
+     * RTL immediately after
+
+7. Fallback path (no tilemap):
+   - Call CODE_008543 (OAM transfer)
+   - Check $00D6 bit 5
+   - If set → Set $00D4 bits 3-6 ($78 TSB)
+   - RTL
+```
+
+**Tile Section Layout:**
+```
+Variable VRAM address at $0042:
+  Section 1: $0042 + $0000
+    Source: $7F0040
+    Size: 1984 bytes (62 tiles × 32 bytes)
+    
+  Section 2: $0042 + $1000
+    Source: $7F1040
+    Size: 1984 bytes (62 tiles × 32 bytes)
+    
+  Total: 3968 bytes = 124 tiles (4bpp)
+  
+  Used for: Field character tiles, map tiles
+```
+
+**Conditional Tilemap Transfer:**
+```
+If $00D6 bit 7 set:
+  VRAM $5820: Tilemap data
+  Source: $7E2040
+  Size: 4032 bytes (2016 words)
+  
+  Tilemap dimensions: ~63×32 entries
+  Format: 16-bit tile index + attributes
+  
+  Used for: Map layout changes, screen scrolling
+```
+
+**Performance Analysis:**
+```
+Minimum path (no tilemap):
+  Section 1: 1984 bytes × ~1 cycle = ~1984 cycles
+  Section 2: 1984 bytes × ~1 cycle = ~1984 cycles
+  Overhead:  ~150 cycles
+  Total:     ~4,118 cycles (~2.3% of frame, NTSC)
+
+Maximum path (with tilemap):
+  Sections:  ~3,968 cycles (tiles)
+  Tilemap:   4032 bytes × ~1 cycle = ~4032 cycles
+  Overhead:  ~200 cycles
+  Total:     ~8,200 cycles (~4.6% of frame, NTSC)
+  
+Battle mode branch:
+  Redirects to Graphics_TransferBattleMode
+  ~3,556 cycles (see separate function)
+```
+
+**Flag Logic:**
+```
+$00DA bit 4 (Battle mode):
+  0 = Field graphics (this function continues)
+  1 = Battle graphics (branch to battle transfer)
+
+$00D6 bit 7 (Tilemap update):
+  0 = Skip tilemap transfer, call OAM transfer
+  1 = Transfer tilemap, RTL immediately
+
+$00D6 bit 5 (Display update):
+  0 = Normal exit (RTL)
+  1 = Set $00D4 bits 3-6, then RTL
+
+Result determination:
+  Battle mode → Always branch out
+  Field + tilemap → Transfer 8200 cycles, early exit
+  Field + no tilemap → Transfer 4118 cycles, OAM call
+```
+
+**Side Effects:**
+- Writes to VRAM at variable address ($0042)
+- Writes to VRAM at variable address +$1000
+- Writes to VRAM $5820 (conditional, 4032 bytes)
+- Modifies $00D4 (conditional flag set)
+- Triggers DMA (halts CPU, variable duration)
+- Calls CODE_008543 (conditional OAM transfer)
+- Changes VRAM address pointer ($2116/$2117)
+- Changes VMAINC mode ($2115)
+
+**Register Usage:**
+```
+Entry:  Any state
+Work:   A=8-bit (flags, DMA config)
+        X=16-bit (addresses, sizes)
+Exit:   Undefined (not preserved)
+```
+
+**Calls:**
+- Graphics_TransferBattleMode (conditional branch)
+- CODE_008543 - OAM transfer (conditional)
+
+**Called By:**
+- Main game loop (field mode)
+- Map scroll handler
+- Screen transition manager
+
+**Related:**
+- See `Graphics_TransferBattleMode` - Battle graphics
+- See `docs/GRAPHICS_SYSTEM.md` - VRAM organization
+- See `docs/MAP_SYSTEM.md` - Field rendering
+
+---
+
 ### Music Playback
 
 #### PlayMusic
@@ -7031,6 +7348,8 @@ Multiple operations:
 - `Memory_CopyToRAM` @ $A89B - MVN copy Bank $00 → $7E
 - `Memory_CopyFromRAM` @ $A8AB - MVN copy Bank $7E → $00
 - `Palette_Load8Colors` @ $A14B - Fast 8-color palette load
+- `Graphics_TransferBattleMode` @ Section 2 - DMA battle graphics upload
+- `Graphics_UpdateFieldMode` @ Section 2 - Conditional field graphics DMA
 
 ### Bank $01 - Battle System Core
 - `Battle_Initialize` @ $8078 - Battle initialization
@@ -7157,6 +7476,8 @@ Multiple operations:
 - `DecompressGraphics` (Bank $07 @ $8234)
 - `Battle_LoadGraphics` (Bank $01 @ $8244)
 - `UpdateOAM` (Bank $00 @ $9234)
+- `Graphics_TransferBattleMode` (Bank $00 @ Section 2) - DMA battle graphics
+- `Graphics_UpdateFieldMode` (Bank $00 @ Section 2) - DMA field graphics
 
 ### Map & World
 - `LoadMap` (Bank $06 @ $A000)
@@ -7269,7 +7590,12 @@ See `docs/DOCUMENTATION_UPDATE_CHECKLIST.md` for complete guidelines.
 
 ---
 
-**Note:** This is a living document. Not all functions are documented yet. Current coverage: **~26.7%** (2,173+ / 8,153 functions).
+**Note:** This is a living document. Not all functions are documented yet. Current coverage: **~26.7%** (2,175+ / 8,153 functions).
+
+**Recent Additions (2025-11-05 - Update #14):**
+- Added 2 DMA graphics transfer functions
+- Graphics_TransferBattleMode: Battle graphics upload via DMA (3,456 bytes, ~2% frame)
+- Graphics_UpdateFieldMode: Conditional field graphics with state-based branching
 
 **Recent Additions (2025-11-05 - Update #13):**
 - Added 3 critical sound & animation functions
@@ -7280,19 +7606,6 @@ See `docs/DOCUMENTATION_UPDATE_CHECKLIST.md` for complete guidelines.
 **Recent Additions (2025-11-05 - Update #12):**
 - Added 1 graphics system function (palette loading)
 - Palette_Load8Colors: Fast 8-color CGRAM load for UI/text
-
-**Recent Additions (2025-11-05 - Update #11):**
-- Added 4 memory management functions (block copy and MVN-based transfers)
-- Memory_Copy64Bytes: Fast 64-byte unrolled copy (~2.5 cycles/byte)
-- Memory_Copy32Bytes: Fast 32-byte unrolled copy (fall-through capable)
-- Memory_CopyToRAM: Flexible MVN copy with overflow protection
-- Memory_CopyFromRAM: Reverse MVN copy with pointer tracking
-
-**Recent Additions (2025-11-05 - Update #10):**
-- Added 4 critical battle system functions (damage calculation, critical hit check, cursor movement)
-- Battle_CalculateDamage (Bank $01, $02): Core damage formula orchestration
-- Battle_CheckCriticalHit (Bank $02): Critical hit determination with RNG
-- Cursor_UpdateComplete (Bank $00): Input-based cursor validation
 - Cursor_UpdateSprite (Bank $00): Visual cursor rendering in battle/field
 
 **Recent Additions (2025-11-05 - Update #9):**
