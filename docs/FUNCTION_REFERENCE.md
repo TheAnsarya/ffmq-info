@@ -4,7 +4,7 @@ Complete reference for all documented functions in Final Fantasy: Mystic Quest.
 
 **Last Updated:** 2025-11-05  
 **Status:** Active - Continuously updated with code analysis  
-**Coverage:** 2,175+ documented functions out of 8,153 total (~26.7%)
+**Coverage:** 2,176+ documented functions out of 8,153 total (~26.7%)
 
 ## Table of Contents
 
@@ -7139,6 +7139,28 @@ Backward (FromRAM):
 
 ---
 
+### Bitfield Manipulation
+
+#### Bit_FindFirstSet
+**Location:** Bank $00 @ ~$9932  
+**File:** `src/asm/bank_00_documented.asm`
+
+**Purpose:** Find position of first set bit in 16-bit value.
+
+**Inputs:**
+- `A` (16-bit) = Value to test
+
+**Outputs:**
+- `A` (16-bit) = Bit position (0-15)
+
+**Technical Details:**
+- Right-shift algorithm, ~22-127 cycles
+- **Warning:** Infinite loop if $0000
+
+**Use Cases:** Priority detection, flag iteration
+
+---
+
 ### Frame Synchronization
 
 #### Field_WaitForVBlank
@@ -7350,6 +7372,7 @@ Multiple operations:
 - `Palette_Load8Colors` @ $A14B - Fast 8-color palette load
 - `Graphics_TransferBattleMode` @ Section 2 - DMA battle graphics upload
 - `Graphics_UpdateFieldMode` @ Section 2 - Conditional field graphics DMA
+- `Bit_FindFirstSet` @ $9932 - Find first set bit position
 
 ### Bank $01 - Battle System Core
 - `Battle_Initialize` @ $8078 - Battle initialization
@@ -7565,6 +7588,7 @@ Multiple operations:
 ### Utilities
 - `Random` (Bank $00 @ $8456)
 - `RNG_GenerateRandom` (Bank $00 @ $9783)
+- `Bit_FindFirstSet` (Bank $00 @ $9932) - Find first set bit
 - `Battle_WaitVBlank` (Bank $01 @ $8449)
 - `Field_WaitForVBlank` (Bank $01 @ $82D0)
 - `Bitfield_SetBits` (Bank $00 @ $974E)
