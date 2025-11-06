@@ -4,7 +4,7 @@ Complete reference for all documented functions in Final Fantasy: Mystic Quest.
 
 **Last Updated:** 2025-11-05  
 **Status:** Active - Continuously updated with code analysis  
-**Coverage:** 2,176+ documented functions out of 8,153 total (~26.7%)
+**Coverage:** 2,179+ documented functions out of 8,153 total (~26.7%)
 
 ## Table of Contents
 
@@ -6327,6 +6327,636 @@ Exit:   Undefined (not preserved)
 
 ---
 
+### Mode 7 Graphics & Rotation
+
+#### Display_Mode7TilemapSetup
+**Location:** Bank $0C @ $87ED  
+**File:** `src/asm/bank_0C_documented.asm`
+
+**Purpose:** Initialize Mode 7 tilemap with block fill pattern and setup HDMA for perspective effects.
+
+**Inputs:**
+- None (uses hardcoded configuration)
+
+**Outputs:**
+- VRAM $4000+ filled with tilemap pattern
+- HDMA channels 1 & 2 configured for Mode 7 scrolling
+- $0111 = $06 (HDMA enable flags)
+
+**Side Effects:**
+- Fills 30 rows × 128 columns in VRAM ($4000+)
+- Writes 10 bytes to $7F0000-$7F0009 (HDMA table header)
+- Modifies $4204-$4206 (multiply/divide registers)
+- Configures $4310-$4317 (DMA channel 1)
+- Configures $4320-$4327 (DMA channel 2)
+- Modifies data bank register
+
+**Algorithm:**
+
+**Phase 1: Tilemap Fill (30 rows × 128 columns)**
+```
+1. Set data bank = $0C
+2. Call CODE_009994 with:
+   - VRAM start: $4000
+   - Row count: 30 ($1E)
+   - Fill pattern: $C0
+3. Pattern fills each row with value $C0
+4. Result: 3,840 tiles ($1E × $80 = $0F00)
+```
+
+**Phase 2: Mode 7 Calculation Table Setup**
+```
+For Y = $82 to $E7 (102 values, Y coordinate range):
+  1. A = Y × 2 → $4205 (multiply register)
+  2. Call CODE_009726 (hardware multiply routine)
+  3. Read quotient from $4214 (divide result)
+  4. Store to $7F0010+offset (Mode 7 calculation buffer)
+  5. Increment X offset by 2 (word table)
+  6. Increment Y
+  
+Result: 102 words at $7F0010-$7F00D9
+Purpose: Perspective scaling lookup table
+```
+
+**Phase 3: HDMA Channel Configuration**
+```
+Transfer HDMA table header:
+- Source: Bank $0C @ $886B (10 bytes)
+- Destination: $7F0000-$7F0009
+- Data: [Header][Control bytes]
+
+Configure HDMA Channel 1 (Horizontal scroll):
+- $4310 = $42 (Transfer mode: 2 bytes)
+- $4311 = $1B (Destination: $211B = M7HOFS)
+- $4312 = $0000 (Source address: $7F0000)
+- $4314 = $7F (Source bank)
+- $4317 = $7F (Indirect bank)
+
+Configure HDMA Channel 2 (Vertical scroll):
+- $4320 = $42 (Transfer mode: 2 bytes)
+- $4321 = $1E (Destination: $211E = M7VOFS)
+- $4322 = $0000 (Source address: $7F0000)
+- $4324 = $7F (Source bank)
+- $4327 = $7F (Indirect bank)
+
+Enable channels:
+- $0111 = $06 (Enable channels 1 & 2)
+```
+
+**HDMA Table Format (DATA8_0C886B):**
+```
+Offset  Value   Meaning
++$00    $FF     Scanline count (255 lines)
++$01    $10     Scroll low byte
++$02    $00     Scroll high byte
++$03    $D1     Scanline count (209 lines)
++$04    $0E     Scroll low byte
++$05    $01     Scroll high byte
++$06    $00     End marker
+
+Effect: First 255 lines → scroll $0010
+        Next 209 lines → scroll $01D1
+        Creates perspective depth illusion
+```
+
+**Performance:**
+```
+Tilemap fill:   ~3,840 tiles × 2 bytes = 7,680 bytes
+Calculation:    102 multiply operations
+HDMA setup:     10-byte block move + register writes
+Total time:     ~50,000 cycles (~2.8ms @ 1.79 MHz)
+Per-frame cost: 0 (HDMA runs automatically during scanout)
+```
+
+**Mode 7 HDMA Perspective Effect:**
+```
+This creates the classic SNES "pseudo-3D" effect:
+- Each scanline gets different scroll offset
+- Top of screen: Small offset → far distance
+- Bottom of screen: Large offset → near distance
+- Updates automatically via HDMA (no CPU cost per frame)
+- Used for world map rotation, race tracks, flying scenes
+```
+
+**Register Usage:**
+```
+Entry:  Any state
+Work:   A=8-bit (values, loop control)
+        X=16-bit (addresses, counters)
+        Y=16-bit (loop counter, row index)
+        DB=varies ($0C → $7F)
+Exit:   A=8-bit (accumulator size preserved)
+        DB=$0C (restored)
+```
+
+**Calls:**
+- CODE_009994 - Tilemap fill routine
+- CODE_009726 - Hardware multiply routine
+
+**Called By:**
+- World map initialization
+- Mode 7 screen setup
+- Title screen rotation setup
+- Flying sequence initialization
+
+**Related:**
+- Display_Mode7MatrixInit - Sets transformation matrix
+- Display_Mode7RotationSequence - Animated rotation
+- See SNES Dev Manual - Mode 7 Background Mode
+
+---
+
+#### Display_Mode7MatrixInit
+**Location:** Bank $0C @ $88BE  
+**File:** `src/asm/bank_0C_documented.asm`
+
+**Purpose:** Initialize Mode 7 affine transformation matrix to identity (no rotation/scale) and set center point.
+
+**Inputs:**
+- None (uses hardcoded configuration)
+
+**Outputs:**
+- Mode 7 matrix = Identity (no transform)
+- M7X/M7Y center = ($0118, $0084) = (280, 132)
+- BG1 scroll = (4, -8)
+- $2115 (VMAINC) = 0 (increment by 1)
+
+**Side Effects:**
+- Modifies $211B-$211E (Mode 7 matrix registers)
+- Modifies $211F-$2120 (Mode 7 center point)
+- Modifies $210D-$210E (BG1 scroll)
+- Modifies $2115 (VRAM increment mode)
+- Modifies data bank register
+- Returns A = $11 (base tile pattern)
+
+**Algorithm:**
+
+**Phase 1: Setup & VBLANK Wait**
+```
+1. Set data bank = $0C
+2. CLC (prepare for calculations)
+3. A = $84 (center Y coordinate)
+4. Wait for VBLANK (jsl CODE_0C8000)
+5. Set VMAINC = 0 (VRAM increment by 1 word)
+```
+
+**Phase 2: Mode 7 Center Point**
+```
+M7X (horizontal center):
+- $211F (M7X low) = $00
+- $211F (M7X high) = $00
+- Result: M7X = $0000 (but note write sequence)
+
+M7Y (vertical center):
+- $2120 (M7Y low) = $18
+- $2120 (M7Y high) = $01
+- Result: M7Y = $0118 (280 pixels)
+
+Note: Registers written twice for 16-bit value
+      First write = low byte, second = high byte
+```
+
+**Phase 3: Identity Matrix Setup**
+```
+Set transformation matrix to identity:
+┌         ┐
+│ 1   0   │  =  ┌               ┐
+│ 0   1   │     │ $0100  $0000  │
+└         ┘     │ $0000  $0100  │
+                └               ┘
+
+M7A (A parameter): Not set (assumes $0100 from caller)
+M7B (B parameter): $0000
+M7C (C parameter): $0000
+M7D (D parameter): Not set (assumes $0100 from caller)
+
+Register writes:
+- $211C (M7B) low  = $00
+- $211C (M7B) high = $00 → M7B = $0000
+- $211D (M7C) low  = $00
+- $211D (M7C) high = $00 → M7C = $0000
+
+Identity matrix effect:
+- No rotation (angle = 0°)
+- No scaling (scale = 1.0)
+- Direct 1:1 pixel mapping
+```
+
+**Phase 4: Initial Scroll Offset**
+```
+BG1 Horizontal Offset:
+- $210D (BG1HOFS) low  = $04 (4 pixels right)
+- $210D (BG1HOFS) high = $00
+- Result: H-scroll = +4 pixels
+
+BG1 Vertical Offset:
+- $210E (BG1VOFS) low  = $F8 (-8 pixels up)
+- $210E (BG1VOFS) high = $00
+- Result: V-scroll = -8 pixels (negative wrap)
+
+Effect: Slight offset from origin
+        H=+4 shifts view right 4 pixels
+        V=-8 shifts view up 8 pixels
+```
+
+**Phase 5: Return Base Tile**
+```
+A = $11 (base tile pattern number)
+Return to caller
+```
+
+**Mode 7 Matrix Mathematics:**
+```
+Identity matrix formula:
+[ X' ]   [ 1  0 ] [ X - Xc ]   [ Xc ]
+[ Y' ] = [ 0  1 ] [ Y - Yc ] + [ Yc ]
+
+Simplifies to:
+X' = X (no change)
+Y' = Y (no change)
+
+For rotation by angle θ:
+[ X' ]   [ cos(θ)  -sin(θ) ] [ X - Xc ]   [ Xc ]
+[ Y' ] = [ sin(θ)   cos(θ) ] [ Y - Yc ] + [ Yc ]
+
+SNES register mapping:
+M7A = A parameter (cos θ in $00-$FF format)
+M7B = B parameter (-sin θ)
+M7C = C parameter (sin θ)
+M7D = D parameter (cos θ)
+M7X = Center X (280 pixels)
+M7Y = Center Y (132 pixels)
+```
+
+**Center Point Calculation:**
+```
+X center = $0118 = 280 pixels
+Y center = $0084 = 132 pixels
+
+Screen size: 256×224 (NTSC) or 256×239 (PAL)
+Center offset: Slightly right of screen center
+               280 - 128 = 152 pixels right
+               132 - 112 = 20 pixels down
+
+Purpose: Centers rotation around specific map point
+         Not screen center, but game world center
+```
+
+**Performance:**
+```
+VBLANK wait:    Variable (~16,700 cycles typical)
+Register writes: ~80 cycles (8 writes × ~10 cycles)
+Total:          ~16,780 cycles (~0.9ms)
+Critical path:  Must execute during VBLANK
+```
+
+**Register Usage:**
+```
+Entry:  Any state
+Work:   A=8-bit (register values)
+        DB=$0C
+Exit:   A=$11 (base tile pattern)
+        DB=$0C (preserved)
+```
+
+**Calls:**
+- CODE_0C8000 - Wait for VBLANK
+
+**Called By:**
+- World map mode initialization
+- Battle background setup (Mode 7 battles)
+- Title screen initialization
+- Flying sequence start
+
+**Related:**
+- Display_Mode7TilemapSetup - Tilemap and HDMA setup
+- Display_Mode7RotationSequence - Rotation animation
+- CODE_0C8A78 - Mode 7 matrix update routine
+- See SNES Dev Manual - Mode 7 Registers ($211B-$2120)
+
+**Technical Notes:**
+```
+Mode 7 Limitations:
+- Single background layer only
+- No transparency (except color 0)
+- 128×128 tile maximum (1024×1024 pixels)
+- No horizontal/vertical flip (must use matrix)
+- Center point limited to signed 13-bit range
+
+Common Uses in FFMQ:
+- World map rotation (airship flight)
+- Battle backgrounds (some bosses)
+- Title screen effects
+- Special cutscenes
+```
+
+---
+
+#### Display_Mode7RotationSequence
+**Location:** Bank $0C @ $896F  
+**File:** `src/asm/bank_0C_documented.asm`
+
+**Purpose:** Perform animated Mode 7 rotation effect with smooth matrix interpolation, sprite positioning, and color fade effects.
+
+**Inputs:**
+- Sine/cosine tables at $8B86 and $8B96 (rotation angles)
+- $0C00+ sprite buffer (12 sprites)
+- Mode 7 matrix must be initialized
+
+**Outputs:**
+- Completes full rotation animation sequence
+- Updates sprite positions (12 sprites)
+- Performs 8-step brightness fade
+- Enables NMI OAM transfer
+- Disables color math on exit
+
+**Side Effects:**
+- Modifies $210E (BG1 vertical scroll)
+- Modifies $4202+ (hardware multiply registers)
+- Modifies $211B-$211E (Mode 7 matrix)
+- Modifies $0062-$0063 (sprite position state)
+- Modifies $2130-$2132 (color math registers)
+- Modifies $005A/$0058 (NMI handler pointer)
+- Modifies $00E2 (NMI control flags)
+- Modifies $0505 (effect state flag)
+- Modifies $0C04+ (sprite brightness values)
+- Updates OAM via DMA (544 bytes)
+
+**Algorithm:**
+
+**Phase 1: Initial Setup**
+```
+1. BG1 vertical scroll = $D4 (-44 pixels)
+   - Low byte:  $D4 → $210E
+   - High byte: $FF → $210E (sign extend negative)
+   
+2. Load table pointers:
+   - X = $8B86 (sine/cosine table 1)
+   - Y = $8B96 (rotation angle table)
+```
+
+**Phase 2: Main Rotation Loop**
+```
+For each rotation angle in table at $8B96:
+  1. Load angle from table: A = [$0000,Y]
+  2. If angle = 0: Exit to post-rotation fade
+  3. Save table pointer (PHY)
+  4. Wait for VBLANK (jsl CODE_0C8000)
+  5. Update Mode 7 matrix (jsr CODE_0C8A78):
+     - Reads sine/cosine from table
+     - Writes to $211B-$211E (M7A-M7D)
+     - Uses $4202 hardware multiply
+  6. Restore table pointer (PLY)
+  
+  7. Calculate dynamic vertical scroll:
+     - A = Y - $AB (table offset to pixel offset)
+     - A = A × 2 (multiply by 2)
+     - Write to $210E (BG1VOFS low)
+     - If A = 0: High byte = $00
+     - If A ≠ 0: High byte = $FF (negative scroll)
+  
+  8. Increment Y (next angle)
+  9. Loop back to step 1
+
+Effect: Smooth rotation over ~20-40 frames
+        Scroll adjusts to keep content centered
+        Frame-synchronized via VBLANK
+```
+
+**Phase 3: Post-Rotation Fade (30 frames)**
+```
+Loop counter = 30 frames:
+  1. Wait for VBLANK
+  2. Update Mode 7 matrix (jsr CODE_0C8A76)
+  3. Decrement counter
+  4. Repeat 30 times
+
+Purpose: Hold final rotation state
+         Smooth transition before sprite animation
+```
+
+**Phase 4: Sprite Position Animation**
+```
+Initialize:
+- $0062 = $0101 (X/Y start position)
+
+Main sprite loop (until X=$0C):
+  1. Load position: Y = $0062
+  2. Update sprite coordinates (jsr CODE_0C8A3F)
+  3. Increment X: $0062++
+  4. Increment Y: $0063++
+  
+  5. Repeat update (staggered):
+     - Second sprite update with incremented position
+     - $0062++ and $0063++ again
+  
+  6. Check if X = $0C:
+     - If yes: Branch to table sync wait
+     - If no: Third sprite update, continue loop
+
+Pattern: 3 sprite updates per iteration
+         X increments: $01 → $02 → $03 ... → $0C
+         Y increments in parallel
+         Creates diagonal motion from ($01,$01) to ($0C,?)
+```
+
+**Phase 5: Table Synchronization Wait**
+```
+Loop until table index = $8B66:
+  1. Wait for VBLANK
+  2. Update Mode 7 matrix (jsr CODE_0C8A76)
+  3. Check X register: X = $8B66?
+  4. Loop if not synced
+
+Then hold stable for additional frames:
+  (Same loop, ensures stable state before fade)
+
+Purpose: Synchronize rotation table wrap-around
+         Ensure smooth transition to fade sequence
+```
+
+**Phase 6: Color Math Setup**
+```
+Setup NMI OAM transfer:
+- Call Display_SetupNMIOAMTransfer
+- $005A = $0C (NMI handler bank)
+- $0058 = $8929 (NMI handler address)
+- $00E2 |= $40 (enable OAM transfer flag)
+
+Color math configuration:
+- $0505 = $30 (effect state flag)
+- $2130/$2131 = $2100 (color window mode)
+- $2132 = $FF (fixed color: maximum brightness white)
+```
+
+**Phase 7: Brightness Fade-In (8 steps)**
+```
+For brightness level = 8 down to 1:
+  1. Save brightness level (PHA)
+  2. Load sprite count: Y = $000C (12 sprites)
+  3. Load buffer pointer: X = $0C04
+  
+  4. Per-sprite brightness loop (12 sprites):
+     - Decrement brightness: [$0000,X]--
+     - Advance pointer: X += 4 (sprite structure size)
+     - Decrement counter: Y--
+     - Repeat for all 12 sprites
+  
+  5. Setup NMI OAM transfer (updates sprite buffer)
+  6. Wait for VBLANK (makes changes visible)
+  
+  7. Calculate color math value:
+     - Load brightness from stack (without popping)
+     - Decrement: brightness--
+     - Multiply by 4: brightness × 4
+     - OR with $E0: brightness | $E0 (red channel mask)
+     - Write to $2132 (COLDATA - fixed color add/sub)
+  
+  8. Restore brightness (PLA)
+  9. Decrement loop counter
+  10. Repeat for all 8 levels
+
+Brightness progression:
+Level 8: Color=$E0+(7×4)=$FC (very bright)
+Level 7: Color=$E0+(6×4)=$F8
+Level 6: Color=$E0+(5×4)=$F4
+...
+Level 1: Color=$E0+(0×4)=$E0 (base level)
+
+Effect: 8-frame fade from bright to normal
+        Affects all on-screen graphics via color math
+        Synchronized with sprite brightness decrease
+```
+
+**Phase 8: Cleanup**
+```
+Disable color math:
+- $2131 (CGADSUB) = $00 (no color add/subtract)
+
+Return to caller
+```
+
+**Rotation Table Format:**
+```
+Table at $8B96: Sequence of angle values
+- Values represent rotation angle (0-255 = 0-360°)
+- Value $00 = end marker (exit rotation loop)
+- Typical sequence: gradual angle progression
+  Example: $10, $20, $30, ..., $F0, $00
+
+Sine/Cosine tables at $8B86:
+- Pre-calculated trigonometry values
+- Format: 256-entry tables (one full rotation)
+- Used by CODE_0C8A78 to calculate matrix
+```
+
+**Sprite Structure (12 sprites at $0C04+):**
+```
+Each sprite: 4 bytes
+Offset +0: X coordinate
+Offset +1: Y coordinate (brightness modified here)
+Offset +2: Tile number
+Offset +3: Attributes (palette, priority, flip)
+
+Total size: 12 sprites × 4 bytes = 48 bytes
+Modified: Only offset +1 during fade (brightness)
+```
+
+**Performance:**
+```
+Phase 2 (rotation): ~20-40 frames × ~20,000 cycles/frame
+Phase 3 (fade):     30 frames × ~20,000 cycles/frame
+Phase 4 (sprites):  Variable (~10-20 frames)
+Phase 5 (sync):     Variable (~5-10 frames)
+Phase 7 (bright):   8 frames × ~25,000 cycles/frame
+
+Total duration: ~60-100 frames (~1.0-1.7 seconds @ 60 FPS)
+Per-frame cost: ~20,000-25,000 cycles (11-14% CPU)
+```
+
+**Color Math Effect:**
+```
+COLDATA register ($2132) format:
+Bit 7-6: Unused
+Bit 5:   Blue channel enable ($20)
+Bit 4:   Green channel enable ($10)
+Bit 3:   Red channel enable ($08)
+Bit 2-0: Color intensity (0-31)
+
+Value $E0 = %11100000:
+- Red enabled ($20)
+- Green enabled ($40)
+- Blue enabled ($80)
+- Intensity = 0 (from lower bits)
+
+During fade:
+- Intensity increases: 0 → 28 (7×4)
+- Creates white fade effect
+- Affects all BG layers and sprites (if enabled)
+```
+
+**Register Usage:**
+```
+Entry:  A=any, X=any, Y=any
+Work:   A=8/16-bit (varies, multi-purpose)
+        X=16-bit (table pointers, buffer addresses)
+        Y=16-bit (table pointers, loop counters)
+        DB=$0C (set by function)
+Exit:   A=undefined
+        X=undefined
+        Y=undefined
+        DB=$0C
+```
+
+**Calls:**
+- CODE_0C8000 - Wait for VBLANK
+- CODE_0C8A78 - Update Mode 7 matrix with multiply
+- CODE_0C8A76 - Update Mode 7 matrix (alternate)
+- CODE_0C8A3F - Calculate sprite screen position
+- Display_SetupNMIOAMTransfer - Enable NMI OAM DMA
+
+**Called By:**
+- Title screen rotation sequence
+- World map entrance (airship takeoff)
+- Battle intro effects (Mode 7 backgrounds)
+- Special cutscenes (dramatic reveals)
+
+**Related:**
+- Display_Mode7TilemapSetup - Initialize tilemap and HDMA
+- Display_Mode7MatrixInit - Set identity matrix
+- Display_SetupNMIOAMTransfer - OAM DMA configuration
+- See SNES Dev Manual - Mode 7 rotation/scaling
+- See SNES Dev Manual - Color math ($2130-$2132)
+
+**Technical Notes:**
+```
+Rotation Smoothness:
+- Frame-synchronized updates (60 FPS)
+- Hardware multiply for fast matrix calculation
+- Pre-calculated sine/cosine tables (no runtime trig)
+- Typical rotation: ~1-2 seconds full sequence
+
+Sprite Fade Integration:
+- Brightness values directly modify OAM data
+- 8-step fade matches color math fade
+- NMI transfer ensures tear-free updates
+- Synchronized with VBLANK for smooth effect
+
+Performance Optimization:
+- Hardware multiply ($4202) instead of software
+- Pre-calculated trig tables (ROM lookup)
+- DMA for OAM transfer (much faster than CPU)
+- HDMA for scroll (no CPU cost per scanline)
+
+Common Issues:
+- Table pointer wrap-around (sync wait required)
+- Color math must be disabled after fade
+- NMI handler must be set before sprite updates
+- VBLANK timing critical (skipped frames = jerky rotation)
+```
+
+---
+
 ### Music Playback
 
 #### PlayMusic
@@ -7467,6 +8097,9 @@ Multiple operations:
 
 ### Bank $0C - Mode 7/World Map
 - `Display_WaitVBlankAndUpdate` @ $85DB - VBLANK sync + sprite animation
+- `Display_Mode7TilemapSetup` @ $87ED - Mode 7 tilemap fill & HDMA setup
+- `Display_Mode7MatrixInit` @ $88BE - Mode 7 matrix initialization
+- `Display_Mode7RotationSequence` @ $896F - Animated rotation effect
 - See `src/asm/bank_0C_documented.asm` for Mode 7 functions
 
 ### Bank $0D - Sound/APU
@@ -7501,6 +8134,9 @@ Multiple operations:
 - `UpdateOAM` (Bank $00 @ $9234)
 - `Graphics_TransferBattleMode` (Bank $00 @ Section 2) - DMA battle graphics
 - `Graphics_UpdateFieldMode` (Bank $00 @ Section 2) - DMA field graphics
+- `Display_Mode7TilemapSetup` (Bank $0C @ $87ED) - Mode 7 tilemap & HDMA
+- `Display_Mode7MatrixInit` (Bank $0C @ $88BE) - Mode 7 matrix setup
+- `Display_Mode7RotationSequence` (Bank $0C @ $896F) - Rotation animation
 
 ### Map & World
 - `LoadMap` (Bank $06 @ $A000)
