@@ -566,6 +566,8 @@ you keep leaving files open in the IDE with a "not saved" status, stop doing tha
 do issues #47 and then #45 and then #51
 update the `issues.md` documentation using the actual github issues list for this project; then continue doing development work: it looks like you added github actions, are you using that for anything? add a github issue to the project for github actions with a todo list, and implement it.
 looks like you stalled? try again and continue
+--- vscode died
+work on github issue #45
 
 
 
