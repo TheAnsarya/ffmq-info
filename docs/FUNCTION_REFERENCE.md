@@ -17720,3 +17720,392 @@ Byte | Value | Meaning
 
 ---
 
+### Entity_ProcessBitValidation @ $ 2:EACA
+
+**Purpose:** Complex bit processing with sprite configuration and coordinate-based bit manipulation.
+
+**Inputs:**
+- A = Entity ID (0-255)
+- Stack contains coordinate data
+
+**Outputs:**
+- Sprite configured at $ C00-0C03 base + (entity_id × 4)
+- Bit state updated in $ E00 array
+
+**Process:**
+1. Enable sprite: $ C03,x = $ 1
+2. Set priority: $ C02,x = $FE
+3. Configure base: $ C00,x = $FF
+4. Mark active: $ C01,x = $C0
+5. Calculate bit offset: entity_id ÷ 4 = byte index, entity_id mod 4 = bit position
+6. Load bit mask from table (01,04,10,40)
+7. XOR mask with current state at $ E00,x
+
+**Bit Masks:** $ 1, $ 4, $10, $40 (for positions 0-3 in byte)
+
+**Use Cases:** Entity sprite activation, bit-based state tracking
+
+---
+
+### Entity_BitValidationAlt @ $ 2:EB14
+
+**Purpose:** Alternative bit validation using different bit mask table (02,08,20,80).
+
+**Inputs:**
+- A = Entity data (shifted right by 2)
+
+**Outputs:**
+- Validation state updated in $ E00 array
+
+**Process:**
+1. Shift entity data right twice (÷4)
+2. Load validation data from stack, mask to 2 bits
+3. Use as index into DATA8_02EB2C table
+4. XOR validation mask with $ E00 state
+
+**Validation Masks:** $ 2, $ 8, $20, $80 (alternate bit positions)
+
+**Difference from EACA:** Uses different bit positions for separate validation tracking
+
+---
+
+### Memory_AllocateSlot @ $ 2:EB30
+
+**Purpose:** Priority-based memory slot allocation from 4-slot pool using TSB.
+
+**Inputs:**
+- $C8 = Slot availability bitmap (4 bits)
+
+**Outputs:**
+- A = Slot configuration from table (00,08,80,88) or $FF if full
+
+**Process:**
+1. Loop 4 times checking $C8 bits
+2. TSB (test-and-set) on bit 0
+3. If clear: Return config from DATA8_02EB51,x
+4. If set: Shift left, test next bit
+5. Return $FF if all 4 slots busy
+
+**Slot Configs:** $ 0, $ 8, $80, $88 (base addresses or flags)
+
+**Performance:** Best 15 cycles, worst 60 cycles
+
+---
+
+### Thread_ProcessMultiBank @ $ 2:EB55
+
+**Purpose:** Sophisticated multi-bank thread processor with command parsing and state management.
+
+**Inputs:**
+- X = Thread command pointer (Bank $ B)
+- $CA = Thread execution time
+- $CB = Thread state flags
+
+**Outputs:**
+- Thread commands executed
+- $CE = Processing counter (starts at $38)
+
+**Process:**
+1. Set data bank to $ B (thread command area)
+2. Initialize: $8A=06 (mode), $8D=7E (WRAM), $CE=38 (counter)
+3. Extract validation bit from $CB (bit 3)
+4. Calculate coordinate offset via CODE_02EBD2
+5. Main loop:
+   - Read command from Bank $ B
+   - Parse bit 7 (extended command flag)
+   - Parse bits 6-5 (command flags)
+   - Mask bits 4-0 (command data)
+   - Execute via CODE_02EBEB
+   - Check validation consistency
+   - Decrement $CE counter
+6. Loop until counter reaches 0
+
+**Command Format:**
+`
+Bit 7: Extended command flag
+Bit 6: Extension bit  
+Bits 5: Reserved
+Bits 4-0: Command data (0-31)
+`
+
+**Processing Budget:** 56 iterations (38 hex = 56 decimal)
+
+---
+
+### Coordinate_CalculatePrecise @ $ 2:EBD2
+
+**Purpose:** Precision coordinate calculation with high/low range handling.
+
+**Inputs:**
+- A = Raw coordinate value (0-255)
+
+**Outputs:**
+- Y = Coordinate offset (×4 scaled)
+- A = Precision-adjusted coordinate
+
+**Process:**
+- If A < $80 (low range):
+  1. Multiply by 4 → Y offset
+  2. Mask to 5 bits precision
+  3. Double twice (×4 precision scale)
+  4. Add $10 offset
+- If A >= $80 (high range):
+  1. Subtract $80 offset
+  2. Multiply by 4 → Y offset
+  3. Set carry flag in result (ROR)
+
+**Precision:** 5-bit fractional part (1/32 pixel precision)
+
+**Use Cases:** Sub-pixel positioning, smooth scrolling, animation interpolation
+
+---
+
+### Memory_ClearWRAMBlock @ $ 2:EBF3
+
+**Purpose:** Clear 4KB WRAM block with validation marker and cross-bank coordination.
+
+**Inputs:**
+- None (operates on fixed WRAM range)
+
+**Outputs:**
+- $7EC000-$7ECFFF cleared to $ 0
+- $7EC000 = $FF (validation marker)
+- $7EC200-$7EC3FF filled with Bank $ 2 data from $ B00
+
+**Process:**
+1. Set data bank to $7E (WRAM)
+2. Clear loop: X=$C000, Y=$1000 (4096 bytes)
+3. Write $FF validation marker at $7EC000
+4. MVN transfer: Bank $ 2:$ B00 → Bank $7E:$C200 (512 bytes)
+
+**Performance:** ~32,000 cycles (4KB clear) + ~4,000 cycles (MVN)
+
+**Use Cases:** Entity table initialization, buffer reset, game state clear
+
+---
+
+### Thread_ProcessCommand @ $ 2:EC27
+
+**Purpose:** Thread command dispatcher with priority handling and jump table execution.
+
+**Inputs:**
+- A = Thread command ID (0-255)
+
+**Outputs:**
+- Command executed via handler table or high-priority path
+
+**Process:**
+- If A < $C0 (standard priority):
+  1. Multiply command × 2 (table index)
+  2. Jump indirect through DATA8_02EC60 table
+- If A >= $C0 (high priority):
+  1. Mask to 6 bits (command ID 0-63)
+  2. Set bit 7 (high priority flag)
+  3. Continue to specialized handler
+
+**Handler Table:** Located at $ 2:EC60 (up to 96 standard command handlers)
+
+**Priority Levels:** Standard (0-BF), High (C0-FF)
+
+---
+
+### Thread_InitEnvironment @ $ 2:EC45
+
+**Purpose:** Initialize thread processing environment with mode setup.
+
+**Outputs:**
+- $8B = $ 2 (environment mode)
+
+**Process:** Single-byte store, returns immediately
+
+**Use Cases:** Called before thread batch processing to set environment state
+
+---
+
+### Sprite_CoordinateMultiBank @ $ 2:EC68
+
+**Purpose:** Multi-bank sprite coordination with 8-element synchronization.
+
+**Inputs:**
+- None (operates on fixed WRAM range)
+
+**Outputs:**
+- $7EC440+ sprites coordinated and synchronized
+- $7EC450+ synchronization markers set to $FF
+
+**Process:**
+1. Set data bank to $7E (WRAM)
+2. Enable sprite at $C440: state[0]=$ 1, state[1]=$80
+3. Loop 8 times checking sprites:
+   - Load state, check bits 7-6
+   - If both set ($C0): Mark synced ($FF at offset+$10)
+   - If not: Set bit 6 (sync in progress)
+4. Continue until all 8 sprites synchronized
+
+**Performance:** ~200-400 cycles depending on sync states
+
+---
+
+### Validation_WithErrorRecovery @ $ 2:ECA5
+
+**Purpose:** Advanced validation with error detection, recovery, and critical error handling.
+
+**Inputs:**
+- A = Validation code (0-255 or $FF for critical)
+
+**Outputs:**
+- $CE = Error result ($FF critical, $FE recoverable, other = success)
+- $CD = Validation state (bit 0=error, bit 1=success)
+
+**Process:**
+- If A = $FF: Return $FF (critical error, no recovery)
+- Else:
+  1. Load validation mask from DATA8_02ECE0,x
+  2. Loop 4 times:
+     - BIT test mask against $CA
+     - If fail: Set bit 0 in $CD (TSB)
+     - If pass: Set bit 1 in $CD
+  3. Check $CD bit 0: If set, return $FE (recoverable)
+  4. Else return success
+
+**Validation Masks:** 16-entry table with single bits (01,02,04,08...) and patterns (03,06,0C...)
+
+**Error Levels:** Critical ($FF), Recoverable ($FE), Success (other)
+
+---
+
+### Entity_ProcessRealTimeStates @ $ 2:ECF0
+
+**Purpose:** Real-time processing of 32 entity states with priority flagging.
+
+**Inputs:**
+- None (processes all 32 entities)
+
+**Outputs:**
+- $7EC500+ entity states updated
+- $7EC520 = $C0 (synchronization complete marker)
+
+**Process:**
+1. Set data bank to $7E (WRAM)
+2. Loop through 32 entities at $C500:
+   - Load state, check bit 7 (active flag)
+   - If inactive: Skip to next
+   - If active and state < $10: Increment state
+   - If active and state >= $10: Set bit 6 (high priority flag)
+3. Store sync marker $C0 at $C520
+
+**Performance:** ~1,000-2,000 cycles (32 entities × ~30-60 cycles each)
+
+**Use Cases:** Per-frame entity updates, priority escalation, state machines
+
+---
+
+### Bit_ManipulateComplex @ $ 2:ED2C
+
+**Purpose:** Complex bit manipulation with configurable operations (XOR/and) using lookup tables.
+
+**Inputs:**
+- A = Config index (0-255)
+
+**Outputs:**
+- $CA (thread state) modified per config
+
+**Process:**
+1. Config index × 8 → table offset (8 bytes per config)
+2. Load from DATA8_02ED5C+offset:
+   - $D2 = Manipulation mask
+   - $D3 = Validation mask
+   - $D4 = Operation flags
+3. Check $D4 bit 6 (overflow flag):
+   - If clear: $CA XOR $D2
+   - If set: $CA and $D2
+4. Store result to $CA
+
+**Config Tables:** 3 parallel tables (masks, validation, flags) with 8-byte patterns
+
+**Operations:** XOR (default), and (if V flag set)
+
+---
+
+### Entity_ProcessStatePriority @ $ 2:EE5D
+
+**Purpose:** Process 5 entities with threshold-based priority and multi-pass state increments.
+
+**Inputs:**
+- A = Initial state value
+- $ AD7 = Processing counter
+
+**Outputs:**
+- $ AD1-0AD5 entity states incremented based on thresholds
+- $ AD7 counter updated
+
+**Process:**
+For each of 5 entities:
+1. Load threshold from DATA8_02EE87 (10 bytes, 2 per entity)
+2. If counter inactive and A < threshold: Increment counter
+3. While A >= threshold:
+   - Increment entity state at $ AD1,x
+   - Subtract threshold from A
+   - Repeat until A < threshold
+4. Move to next entity
+
+**Thresholds:** $10, $27, $E8, $ 3, $64, $ 0, $ A, $ 0, $ 1, $ 0
+
+**Use Cases:** Experience distribution, damage spreading, resource allocation
+
+---
+
+### DMA_TransferWithSync @ $ 2:EE91
+
+**Purpose:** Dual DMA transfers with synchronization flags and wait loops.
+
+**Inputs:**
+- None (transfers from fixed ROM locations)
+
+**Outputs:**
+- $7EC200-C20F filled from Bank $ 2:$EEC7
+- $7EC220-C22F filled from Bank $ 2:$EED7
+- $E6, $E5 synchronization flags managed
+
+**Process:**
+1. Increment $E6, wait for it to become 0 (external sync)
+2. MVN transfer #1: 16 bytes → $7EC200
+3. MVN transfer #2: 16 bytes → $7EC220  
+4. Increment $E5, wait for it to become 0 (external sync)
+
+**Data Transferred:** Configuration data (PPU registers, palette values)
+
+**Synchronization:** External NMI/IRQ handlers clear $E6/$E5
+
+**Performance:** ~300 cycles + wait time
+
+---
+
+### Graphics_ProcessElements @ $ 2:EEE7
+
+**Purpose:** Process 4 graphics elements with external handler dispatch.
+
+**Inputs:**
+- $ AE2 = Graphics processing enable flag
+- $ AE3-0AE6 = Element states (4 bytes)
+
+**Outputs:**
+- Graphics elements processed via external handlers
+
+**Process:**
+1. Set program bank as data bank
+2. Set direct page to $ A00
+3. Check $ AE2: If zero, skip processing
+4. Call CODE_02F0C0 (graphics init)
+5. Loop 4 times (X=0 to 3):
+   - Load $E3,x (element state)
+   - If zero: Skip to next
+   - If non-zero: JSL to CODE_0097BE with handler table address
+6. Return when all 4 processed
+
+**Handler Table:** DATA8_02EF0E contains 8 addresses (4 elements × 2 bytes)
+
+**External Integration:** Calls Bank $ 0 graphics processor
+
+---
+
