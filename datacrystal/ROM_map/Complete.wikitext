@@ -1,0 +1,296 @@
+{{subpage|Final Fantasy: Mystic Quest/ROM map}}
+< [[Final Fantasy: Mystic Quest/ROM_map|ROM map]]
+
+=Complete ROM Map (All Banks)=
+
+'''Comprehensive memory map''' covering the entire 512KB ROM ($000000-$07FFFF). All addresses are SNES format (not PC/file offsets).
+
+'''ROM Version:''' Final Fantasy: Mystic Quest V1.1 (U) unheadered
+* CRC32: $2c52c792
+* MD5: $f7faeae5a847c098d677070920769ca2  
+* SHA1: $6be74b73b736bc6027c0e92619874da7c498bed0
+
+'''Table Usage:'''
+* Click column headers to sort
+* All sizes in bytes (decimal)
+* SNES addresses format: $XXXXXX
+* Type: Code, Data, Graphics, Text, Music, Mixed
+
+==Complete Address Table==
+
+{| class="wikitable sortable"
+! Start || End || Size || Bank || Type || Category || Description || Source Link
+|-
+| $008000 || $0082FF || 768 || $00 || Code || Engine || Boot sequence, hardware initialization, ROM header || [https://github.com/TheAnsarya/ffmq-info/blob/main/src/asm/bank_00_documented.asm#L1 bank_00]
+|-
+| $008300 || $008FFF || 3,328 || $00 || Code || Engine || Main game loop, state machine, frame processing || [https://github.com/TheAnsarya/ffmq-info/blob/main/src/asm/bank_00_documented.asm bank_00]
+|-
+| $009000 || $009FFF || 4,096 || $00 || Code || Graphics || DMA handlers (OAM, VRAM, palette transfers) || [https://github.com/TheAnsarya/ffmq-info/blob/main/src/asm/bank_00_documented.asm bank_00]
+|-
+| $00A000 || $00AFFF || 4,096 || $00 || Code || Input || Controller input, menu navigation, cursor control || [https://github.com/TheAnsarya/ffmq-info/blob/main/src/asm/bank_00_documented.asm bank_00]
+|-
+| $00B000 || $00BFFF || 4,096 || $00 || Code || Graphics || Screen setup, transitions, fade effects || [https://github.com/TheAnsarya/ffmq-info/blob/main/src/asm/bank_00_documented.asm bank_00]
+|-
+| $00C000 || $00CFFF || 4,096 || $00 || Code || SRAM || Save/load system, SRAM operations, checksum || [https://github.com/TheAnsarya/ffmq-info/blob/main/src/asm/bank_00_documented.asm bank_00]
+|-
+| $00D000 || $00DFFF || 4,096 || $00 || Code || Math || Multiplication, division, utilities || [https://github.com/TheAnsarya/ffmq-info/blob/main/src/asm/bank_00_documented.asm bank_00]
+|-
+| $00E000 || $00FFFF || 8,192 || $00 || Code || Interrupt || NMI/IRQ handlers, VBlank processing || [https://github.com/TheAnsarya/ffmq-info/blob/main/src/asm/bank_00_documented.asm bank_00]
+|-
+| $010715 || $010B05 || 1,008 || $01 || Data || Battle || Animation frame data (damage animations) || [https://github.com/TheAnsarya/ffmq-info/blob/main/src/asm/bank_01_documented.asm bank_01]
+|-
+| $010B06 || $010BF1 || 236 || $01 || Data || Battle || Targeting data (sword is first item) || [https://github.com/TheAnsarya/ffmq-info/blob/main/src/asm/bank_01_documented.asm bank_01]
+|-
+| $010BF2 || $010F49 || 856 || $01 || Data || Battle || Weapon stats and effects data || [https://github.com/TheAnsarya/ffmq-info/blob/main/src/asm/bank_01_documented.asm bank_01]
+|-
+| $010F4A || $011000 || 182 || $01 || Data || Battle || Weapon effects (additional) || [https://github.com/TheAnsarya/ffmq-info/blob/main/src/asm/bank_01_documented.asm bank_01]
+|-
+| $01417C || $0141FC || 129 || $01 || Data || Battle || Enemy level data (83 enemies × 2 bytes) || [[Final Fantasy: Mystic Quest/ROM_map/Enemies|Enemies]]
+|-
+| $014275 || $01469F || 2,603 || $01 || Data || Battle || Enemy stats (83 enemies × 74 bytes) || [[Final Fantasy: Mystic Quest/ROM_map/Enemies|Enemies]]
+|-
+| $014678 || $014776 || 255 || $01 || Data || Battle || Attack data and damage formulas || [[Final Fantasy: Mystic Quest/ROM_map/Attacks|Attacks]]
+|-
+| $01572B || $015800 || 213 || $01 || Data || Battle || Enemy formation positions (screen X/Y) || [https://github.com/TheAnsarya/ffmq-info/blob/main/src/asm/bank_01_documented.asm bank_01]
+|-
+| $018000 || $01FFFF || 32,768 || $01 || Mixed || Battle || Battle system code, AI, calculations || [https://github.com/TheAnsarya/ffmq-info/blob/main/src/asm/bank_01_documented.asm bank_01]
+|-
+| $028000 || $02FFFF || 32,768 || $02 || Code || System || System management, threading, validation || [https://github.com/TheAnsarya/ffmq-info/blob/main/src/asm/bank_02_documented.asm bank_02]
+|-
+| $032B00 || $034083 || 5,508 || $03 || Data || Map || Tile properties (walkable, solid, effects) || [[Final Fantasy: Mystic Quest/ROM_map/Maps|Maps]]
+|-
+| $034084 || $0381FF || 1,532 || $03 || Data || Graphics || Location palette assignments (First: Level Forest) || [https://github.com/TheAnsarya/ffmq-info/blob/main/src/asm/bank_03_documented.asm bank_03]
+|-
+| $038200 || $03B217 || 12,312 || $03 || Data || Menu || Menu palettes and window system data || [[Final Fantasy: Mystic Quest/ROM_map/Menus|Menus]]
+|-
+| $03B218 || $03B300 || 232 || $03 || Data || Map || Location pointer table (2-byte entries, 116 locations) || [[Final Fantasy: Mystic Quest/ROM_map/Maps|Maps]]
+|-
+| $03DFC4 || $03ED43 || 3,456 || $03 || Graphics || Map || Fireburg overworld tiles (3BPP) || [[Final Fantasy: Mystic Quest/ROM_map/Graphics|Graphics]]
+|-
+| $04F000 || $04F800 || 2,048 || $04 || Text || Items || Item names (232 entries) || [[Final Fantasy: Mystic Quest/Text|Text]]
+|-
+| $048000 || $04EFFF || 28,672 || $04 || Data || Items || Weapon/armor/accessory data, text tables || [https://github.com/TheAnsarya/ffmq-info/blob/main/src/asm/bank_04_documented.asm bank_04]
+|-
+| $050818 || $058000 || 30,696 || $05 || Graphics || Enemy || Enemy graphics start (3BPP SNES format) || [[Final Fantasy: Mystic Quest/ROM_map/Graphics|Graphics]]
+|-
+| $056800 || $05FFFF || 38,912 || $05 || Graphics || Enemy || Dragon enemy graphics, boss sprites (3BPP) || [[Final Fantasy: Mystic Quest/ROM_map/Graphics|Graphics]]
+|-
+| $062C4C || $0638EB || 3,232 || $06 || Graphics || Character || Characters, NPCs, menu symbols (4BPP) || [[Final Fantasy: Mystic Quest/ROM_map/Graphics|Graphics]]
+|-
+| $026720 || $026800 || 224 || $06 || Graphics || Item || Chest graphics (4BPP) || [[Final Fantasy: Mystic Quest/ROM_map/Graphics|Graphics]]
+|-
+| $0212C0 || $0281FF || 24,128 || $06 || Graphics || UI || Window borders (FC-NES ×8 pattern, 3BPP) || [[Final Fantasy: Mystic Quest/ROM_map/Menus|Menus]]
+|-
+| $028E80 || $02F480 || 26,112 || $06 || Graphics || Map || Town and dungeon tiles (3BPP) || [[Final Fantasy: Mystic Quest/ROM_map/Maps|Maps]]
+|-
+| $068000 || $06FFFF || 32,768 || $06 || Graphics || Map || Character/NPC graphics, tiles (4BPP) || [https://github.com/TheAnsarya/ffmq-info/blob/main/src/asm/bank_06_documented.asm bank_06]
+|-
+| $078000 || $07FFFF || 32,768 || $07 || Mixed || Animation || Animation system code + music sequences || [https://github.com/TheAnsarya/ffmq-info/blob/main/src/asm/bank_07_documented.asm bank_07]
+|-
+| $0750FD || $075100 || 3 || $07 || Music || Audio || Silence track || [[Final Fantasy: Mystic Quest/ROM_map/Sound|Sound]]
+|-
+| $078573 || $078B67 || 1,525 || $07 || Music || Audio || Battle 1 theme || [[Final Fantasy: Mystic Quest/ROM_map/Sound|Sound]]
+|-
+| $078B68 || $07931F || 1,976 || $07 || Music || Audio || Battle 2 theme || [[Final Fantasy: Mystic Quest/ROM_map/Sound|Sound]]
+|-
+| $079320 || $079B72 || 2,131 || $07 || Music || Audio || Battle 3 theme || [[Final Fantasy: Mystic Quest/ROM_map/Sound|Sound]]
+|-
+| $079B73 || $079E09 || 663 || $07 || Music || Audio || Victory fanfare || [[Final Fantasy: Mystic Quest/ROM_map/Sound|Sound]]
+|-
+| $079E0A || $079F86 || 381 || $07 || Music || Audio || Overworld theme || [[Final Fantasy: Mystic Quest/ROM_map/Sound|Sound]]
+|-
+| $079F87 || $07A299 || 787 || $07 || Music || Audio || Fossil Labyrinth || [[Final Fantasy: Mystic Quest/ROM_map/Sound|Sound]]
+|-
+| $07A29A || $07A84D || 1,460 || $07 || Music || Audio || Dungeon of Ice || [[Final Fantasy: Mystic Quest/ROM_map/Sound|Sound]]
+|-
+| $07A84E || $07AE4D || 1,536 || $07 || Music || Audio || Lava Dome || [[Final Fantasy: Mystic Quest/ROM_map/Sound|Sound]]
+|-
+| $07AE4E || $07B20A || 957 || $07 || Music || Audio || Mountain Range of Whirlwinds || [[Final Fantasy: Mystic Quest/ROM_map/Sound|Sound]]
+|-
+| $07B20B || $07B503 || 761 || $07 || Music || Audio || Dungeon and Waterfall || [[Final Fantasy: Mystic Quest/ROM_map/Sound|Sound]]
+|-
+| $07B504 || $07B778 || 629 || $07 || Music || Audio || Middle Tower || [[Final Fantasy: Mystic Quest/ROM_map/Sound|Sound]]
+|-
+| $07B779 || $07BF2D || 1,973 || $07 || Music || Audio || Last Castle || [[Final Fantasy: Mystic Quest/ROM_map/Sound|Sound]]
+|-
+| $07BF2E || $07C2F7 || 970 || $07 || Music || Audio || Beautiful Forest || [[Final Fantasy: Mystic Quest/ROM_map/Sound|Sound]]
+|-
+| $07C2F8 || $07C742 || 1,099 || $07 || Music || Audio || Shrine of Light || [[Final Fantasy: Mystic Quest/ROM_map/Sound|Sound]]
+|-
+| $07C743 || $07CC40 || 1,278 || $07 || Music || Audio || City of Earth - Foresta || [[Final Fantasy: Mystic Quest/ROM_map/Sound|Sound]]
+|-
+| $07CC41 || $07D150 || 1,296 || $07 || Music || Audio || City of Ice - Aquaria || [[Final Fantasy: Mystic Quest/ROM_map/Sound|Sound]]
+|-
+| $07D151 || $07DA02 || 2,226 || $07 || Music || Audio || City of Fire - Fireburg || [[Final Fantasy: Mystic Quest/ROM_map/Sound|Sound]]
+|-
+| $07DA03 || $07DF41 || 1,343 || $07 || Music || Audio || City of Wind - Windia || [[Final Fantasy: Mystic Quest/ROM_map/Sound|Sound]]
+|-
+| $07DF42 || $07E40F || 1,230 || $07 || Music || Audio || Rock 'n' Roll || [[Final Fantasy: Mystic Quest/ROM_map/Sound|Sound]]
+|-
+| $07E410 || $07E80F || 1,024 || $07 || Music || Audio || Rock Theme || [[Final Fantasy: Mystic Quest/ROM_map/Sound|Sound]]
+|-
+| $07E810 || $07E8C1 || 178 || $07 || Music || Audio || Fanfare of Friendship || [[Final Fantasy: Mystic Quest/ROM_map/Sound|Sound]]
+|-
+| $07E8C2 || $07EAAA || 489 || $07 || Music || Audio || Mystic Ballad || [[Final Fantasy: Mystic Quest/ROM_map/Sound|Sound]]
+|-
+| $07EAAB || $07EEDC || 1,074 || $07 || Music || Audio || Hill of Fate || [[Final Fantasy: Mystic Quest/ROM_map/Sound|Sound]]
+|-
+| $07EEDD || $07F472 || 1,430 || $07 || Music || Audio || Mystic Quest theme || [[Final Fantasy: Mystic Quest/ROM_map/Sound|Sound]]
+|-
+| $07F473 || $07FBD2 || 1,888 || $07 || Music || Audio || Ending theme || [[Final Fantasy: Mystic Quest/ROM_map/Sound|Sound]]
+|-
+| $07FBD3 || $07FFFF || 1,069 || $07 || Music || Audio || The Crystal || [[Final Fantasy: Mystic Quest/ROM_map/Sound|Sound]]
+|-
+| $088000 || $08FFFF || 32,768 || $08 || Text || Dialog || Dialog strings (245 entries), script data || [[Final Fantasy: Mystic Quest/Text|Text]]
+|-
+| $0341C1 || $037DC0 || 15,360 || $09 || Graphics || Spell || Spells and animations (3BPP, FC-NES ×16 pattern) || [[Final Fantasy: Mystic Quest/ROM_map/Graphics|Graphics]]
+|-
+| $098000 || $09FFFF || 32,768 || $09 || Graphics || Spell || Additional spell graphics, battle effects || [https://github.com/TheAnsarya/ffmq-info/blob/main/src/asm/bank_09_documented.asm bank_09]
+|-
+| $065BC4 || $0A0000 || 42,044 || $0A || Graphics || Battle || Battle backgrounds (3BPP) || [[Final Fantasy: Mystic Quest/ROM_map/Graphics|Graphics]]
+|-
+| $0A8000 || $0AFFFF || 32,768 || $0A || Graphics || Enemy || Enemy graphics (continued), battle backgrounds || [https://github.com/TheAnsarya/ffmq-info/blob/main/src/asm/bank_0A_documented.asm bank_0A]
+|-
+| $0B8000 || $0BFFFF || 32,768 || $0B || Graphics || Menu || Menu graphics, UI elements, window tiles || [https://github.com/TheAnsarya/ffmq-info/blob/main/src/asm/bank_0B_documented.asm bank_0B]
+|-
+| $0C8000 || $0CFFFF || 32,768 || $0C || Mixed || Animation || Animation command scripts, frame sequences || [https://github.com/TheAnsarya/ffmq-info/blob/main/src/asm/bank_0C_documented.asm bank_0C]
+|-
+| $0D8000 || $0D8007 || 8 || $0D || Code || Audio || SPC700 driver header || [https://github.com/TheAnsarya/ffmq-info/blob/main/src/asm/bank_0D_documented.asm bank_0D]
+|-
+| $0D8008 || $0D8020 || 24 || $0D || Data || Audio || Module metadata table (6 modules) || [https://github.com/TheAnsarya/ffmq-info/blob/main/src/asm/bank_0D_documented.asm bank_0D]
+|-
+| $0D8021 || $0D87FF || 2,015 || $0D || Code || Audio || SPC700 IPL upload driver (cold/warm start) || [[Final Fantasy: Mystic Quest/ROM_map/Sound|Sound]]
+|-
+| $0D8800 || $0DFFFF || 30,720 || $0D || Mixed || Audio || Audio driver code, music, BRR samples || [https://github.com/TheAnsarya/ffmq-info/blob/main/src/asm/bank_0D_documented.asm bank_0D]
+|-
+| $06BDAE || $06BDB0 || 3 || $0D || Data || Audio || Pointers to SPCs ($0x03 each) || [[Final Fantasy: Mystic Quest/ROM_map/Sound|Sound]]
+|-
+| $06BDFF || $06BE00 || 1 || $0D || Data || Audio || Pointers to BRRs || [[Final Fantasy: Mystic Quest/ROM_map/Sound|Sound]]
+|-
+| $06BEA1 || $06C1E1 || 833 || $0D || Data || Audio || Instrument sample indexes (19 instruments) || [[Final Fantasy: Mystic Quest/ROM_map/Sound|Sound]]
+|-
+| $06C201 || $06FFFF || 16,127 || $0D || Music || Audio || BRR sample data (compressed audio) || [[Final Fantasy: Mystic Quest/ROM_map/Sound|Sound]]
+|-
+| $0E8000 || $0EFFFF || 32,768 || $0E || Graphics || Mixed || Additional graphics, compressed data || [https://github.com/TheAnsarya/ffmq-info/blob/main/src/asm/bank_0E_documented.asm bank_0E]
+|-
+| $0F8000 || $0FFFFF || 32,768 || $0F || Data || Map || Overworld map data, level tiles || [https://github.com/TheAnsarya/ffmq-info/blob/main/src/asm/bank_0F_documented.asm bank_0F]
+|-
+| $00024C20 || $00024C30 || 16 || Varies || Graphics || Animation || "What?" animation hand frame || [https://github.com/TheAnsarya/ffmq-info/blob/main/src/asm bank]
+|-
+| $03DA26 || $03DA40 || 26 || $03 || Data || Graphics || Main hero palette (Benjamin colors) || [[Final Fantasy: Mystic Quest/ROM_map/Graphics|Graphics]]
+|-
+| $03DC06 || $03DC20 || 26 || $03 || Data || Graphics || Chest palette (treasure box colors) || [[Final Fantasy: Mystic Quest/ROM_map/Graphics|Graphics]]
+|}
+
+==Summary Statistics==
+
+{| class="wikitable"
+! Category !! Total Size !! Percentage
+|-
+| '''Code (Executable)''' || ~130KB || ~25%
+|-
+| '''Graphics Data''' || ~230KB || ~45%
+|-
+| '''Music/Audio''' || ~60KB || ~12%
+|-
+| '''Text/Dialog''' || ~20KB || ~4%
+|-
+| '''Battle Data''' || ~15KB || ~3%
+|-
+| '''Map Data''' || ~30KB || ~6%
+|-
+| '''Other Data''' || ~27KB || ~5%
+|-
+| '''Total ROM''' || '''512KB''' || '''100%'''
+|}
+
+==Memory Usage by Category==
+
+'''Executable Code Banks:'''
+* Bank $00 (Engine): ~22KB code
+* Bank $01 (Battle): ~16KB code
+* Bank $02 (System): ~26KB code
+* Bank $07 (Animation): ~10KB code
+* Bank $0D (Audio Driver): ~13KB code
+* '''Total Code: ~130KB''' (~25% of ROM)
+
+'''Graphics Data Banks:'''
+* Banks $05-$06 (Characters/Enemies): 64KB
+* Bank $09 (Spell Effects): 32KB
+* Banks $0A-$0B (Battle BG/Menus): 64KB
+* Bank $0E (Additional): 32KB
+* Scattered in other banks: ~38KB
+* '''Total Graphics: ~230KB''' (~45% of ROM)
+
+'''Audio Data Banks:'''
+* Bank $0D (Driver + Music + Samples): 32KB
+* Bank $07 (Music Sequences): ~24KB
+* BRR Samples: ~16KB
+* '''Total Audio: ~60KB''' (~12% of ROM)
+
+==Documentation Status==
+
+'''Fully Mapped:'''
+* ✅ Bank $0D - SPC700 Audio Driver (100%)
+* ✅ Enemy stats structure (100%)
+* ✅ Attack data format (100%)
+* ✅ Music track addresses (100%)
+
+'''Partially Mapped:'''
+* ⚠️ Banks $00-$02 - Engine/Battle/System (~30%)
+* ⚠️ Banks $03-$04 - Map/Item data (~40%)
+* ⚠️ Bank $07 - Animation system (~35%)
+
+'''Needs Documentation:'''
+* ❌ Banks $08 - Dialog strings (structure known, detailed mapping needed)
+* ❌ Banks $0E-$0F - Graphics/Map data (minimal documentation)
+
+'''Overall Coverage:''' ~65% of ROM mapped in detail
+
+==Navigation==
+
+'''By System:'''
+* [[Final Fantasy: Mystic Quest/ROM_map/Code|Code Organization]] - Bank-by-bank code breakdown
+* [[Final Fantasy: Mystic Quest/ROM_map/Enemies|Enemy Data]] - Enemy stats and graphics
+* [[Final Fantasy: Mystic Quest/ROM_map/Attacks|Attack Data]] - Damage formulas and effects
+* [[Final Fantasy: Mystic Quest/ROM_map/Graphics|Graphics Data]] - Tile formats and compression
+* [[Final Fantasy: Mystic Quest/ROM_map/Maps|Map Data]] - 57 maps, tilemap format
+* [[Final Fantasy: Mystic Quest/ROM_map/Menus|Menu Data]] - Window system, borders
+* [[Final Fantasy: Mystic Quest/ROM_map/Sound|Sound Data]] - SPC700 driver, music, BRR
+* [[Final Fantasy: Mystic Quest/ROM_map/Characters|Character Data]] - Benjamin, companions
+
+'''By Data Type:'''
+* Executable Code: Banks $00, $01, $02, $07, $0D
+* Graphics: Banks $05, $06, $09, $0A, $0B, $0E
+* Music/Audio: Bank $0D, $07
+* Text: Banks $04, $08
+* Maps: Banks $03, $0F
+
+==GitHub Integration==
+
+'''Source Code:'''
+* [https://github.com/TheAnsarya/ffmq-info Complete Repository]
+* [https://github.com/TheAnsarya/ffmq-info/tree/main/src/asm Assembly Source Files]
+* [https://github.com/TheAnsarya/ffmq-info/blob/main/docs/FUNCTION_REFERENCE.md Function Reference] (2,303 documented functions)
+
+'''Data Files:'''
+* [https://github.com/TheAnsarya/ffmq-info/tree/main/data/extracted Extracted Data] (JSON format)
+* [https://github.com/TheAnsarya/ffmq-info/tree/main/data/converted Converted Data] (ASM format)
+
+'''Tools:'''
+* [https://github.com/TheAnsarya/ffmq-info/tree/main/tools Extraction/Conversion Scripts]
+* [https://github.com/TheAnsarya/ffmq-info/blob/main/tools/enemy_editor_gui.py Visual Enemy Editor]
+* [https://github.com/TheAnsarya/ffmq-info/blob/main/MODDING_QUICK_REFERENCE.md Complete Modding Guide]
+
+==Notes==
+
+* All addresses are '''SNES format''' ($XXXXXX), not PC file offsets
+* PC offset = SNES address & $7FFFFF (for LoROM mapping)
+* Some data spans multiple banks (e.g., enemy graphics in $05 and $0A)
+* Bank $0D is the only bank with 100% code documentation
+* Total documented functions: 2,303 of 8,153 (28.2%)
+
+{{Internal Data}}
+
+[[Category:Final Fantasy: Mystic Quest]]
+[[Category:ROM maps]]
