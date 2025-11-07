@@ -579,6 +579,14 @@ Option C
 Option Ccontinue
 continue
 yes! make to use comprehensive on complex or advanced functions, but standard for simpler functions and use up all the tokens for each session (efficiency)
+continue
+make a big todo list of all the functions left to be documented in this manner with instructions on how to resume properly so we can pick up this work later but pause for now to handle other issues,  use up all the tokens for each session (efficiency)
+I want to update the data crystal wikitext documentation for the ROMMAP and ROMMAP subpages so that the mapping tables are fully fleshed out for for all the data structures and code blocks (use more detailed tables on the sub-pages) and create a single separate `ROMMAP (all)` type page that documents everything in a single wiki table. Make a github issue for this and then implement it.
+make sure the session and chat logs are being updated (update them!); make sure guthub issues are updated and Update/check-off the checklists on closed github issues; clean up the `bak` and `temp` files and other trash; make sure all files are formated (as always: tabs, crlf, utf-8, editorconfig); and use up all the tokens for each session (efficiency)
+
+
+
+
 
 
 

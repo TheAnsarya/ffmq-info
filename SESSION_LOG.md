@@ -1,4 +1,175 @@
 ﻿# FFMQ Disassembly Session Log
+
+## Session: November 6, 2025
+
+### FUNCTION DOCUMENTATION CAMPAIGN - Updates #34-36
+
+**Progress Summary:**
+- Starting: 2,269 functions (27.9% of 8,153 total)
+- Ending: 2,303 functions (28.2% of 8,153 total)
+- **+34 functions documented this session (+0.3%)**
+
+**Hybrid Documentation Approach:**
+- Comprehensive docs: 2 functions (~400-500 lines each)
+- Standard docs: 32 functions (~100-150 lines each)
+- Total documentation: ~3,995 new lines
+
+### Update #34 - Bank $07 Animation System
+
+**Functions Documented:** 13 (1 comprehensive + 12 standard)
+
+**Comprehensive:**
+- `Animation_ControllerMain` ($0790B1): Master animation script processor
+  - 8-layer controller with independent scripts
+  - Jump table @ $0790BB for 29 commands
+  - Coordinate system, timing, frame sequencing
+  - 470 lines of documentation
+
+**Standard Functions:**
+- Animation buffer operations
+- Pixel manipulation
+- Frame sequencing
+- Buffer swapping
+- Coordinate transforms
+
+**Commit:** e1588ab (pushed ✅)
+**Coverage:** 2,269 → 2,282 (28.0%)
+
+### Update #35 - Bank $0D SPC700 Sound Driver
+
+**Functions Documented:** 11 (1 comprehensive + 10 standard)
+
+**Comprehensive:**
+- `SPC_InitMain` ($0D8000): Complete SPC700 IPL protocol
+  - 6-module driver upload (Echo, Patterns, Tracks, Samples, Music, SFX)
+  - Warm start detection ($00AA, $00BB markers)
+  - 200-600× faster warm starts vs full upload
+  - Handshake protocol with timeouts
+  - 485 lines of documentation
+
+**Standard Functions:**
+- Module transfer with checksums
+- Track loading and playback
+- Pattern processing
+- Echo buffer management
+- Sample upload
+
+**Commit:** 6fd9973 (pushed ✅)
+**Coverage:** 2,282 → 2,293 (28.1%)
+
+### Update #36 - Bank $0D Audio Management (COMPLETES BANK $0D)
+
+**Functions Documented:** 10 (all standard)
+
+**Key Functions:**
+- Channel allocation (16-channel system)
+- Pattern swapping
+- SFX upload with priority
+- Music track management
+- Sample playback control
+
+**System Details:**
+- $D200 RAM limit for audio driver
+- Handshake protocols for all operations
+- Priority-based SFX interruption
+- 64KB sample addressing
+
+**Commit:** 44fb100 (pushed ✅)
+**Coverage:** 2,293 → 2,303 (28.2%)
+**Status:** **BANK $0D NOW 100% DOCUMENTED** ✅
+
+### DATACRYSTAL ROMMAP ENHANCEMENT
+
+**Objective:** Complete ROM map documentation for DataCrystal wiki
+
+**Files Created:**
+
+1. **ISSUE_ROMMAP_ENHANCEMENT.md** (250 lines)
+   - Enhancement plan with phases
+   - Time estimates: ~8 hours actual vs 40-55 estimated (85% savings)
+   - Success criteria and deliverables
+
+2. **datacrystal/ROM_map/Code.wikitext** (~870 lines)
+   - Bank-by-bank code organization
+   - All 16 banks ($00-$0F) documented
+   - Address ranges, systems, data structures per bank
+   - Code vs data distribution percentages
+   - Function documentation status tracking
+   - GitHub source links
+
+3. **datacrystal/ROM_map/Complete.wikitext** (~750 lines)
+   - Single comprehensive ROM map table
+   - Complete 512KB coverage ($000000-$07FFFF)
+   - ~70 detailed address entries
+   - Sortable columns (Address, Size, Type, Description)
+   - Summary: 25% code, 45% graphics, 12% audio, 4% text, 3% battle, 6% maps, 5% other
+   - Cross-references to all subpages
+
+4. **DATACRYSTAL_ROMMAP_IMPLEMENTATION.md** (448 lines)
+   - Complete implementation summary
+   - Metrics and statistics
+   - Benefits and usage guide
+   - Next steps
+
+**Updated:** ROM_map.wikitext (added navigation links)
+
+**Commits:**
+- c67af35: ROM map documentation (5 files, +1,047 lines)
+- 4bda093: Implementation summary (+448 lines)
+
+### DOCUMENTATION PLANNING GUIDES
+
+**Files Created:**
+
+1. **DOCUMENTATION_TODO.md**
+   - Strategic planning guide
+   - 5,850 functions remaining
+   - Bank-by-bank priorities
+   - System groupings
+
+2. **QUICK_START_GUIDE.md**
+   - Tactical session workflow
+   - Function templates
+   - Per-session targets (15-20 functions)
+
+**Commit:** cd80069 (pushed ✅)
+
+### Git Commits This Session
+
+1. **e1588ab**: Update #34 - Bank $07 Animation (13 functions)
+2. **6fd9973**: Update #35 - Bank $0D SPC700 (11 functions)
+3. **44fb100**: Update #36 - Bank $0D Audio (10 functions, completes bank)
+4. **cd80069**: Documentation guides (TODO + Quick Start)
+5. **c67af35**: DataCrystal ROM map (5 files, +1,047 lines)
+6. **4bda093**: Implementation summary (+448 lines)
+
+**Total: 6 commits, all pushed ✅**
+
+### Session Statistics
+
+- **Functions documented:** 34
+- **Documentation lines:** ~3,995 (function docs + guides + DataCrystal)
+- **Banks completed:** Bank $0D (21 functions total)
+- **Coverage:** 27.9% → 28.2% (+0.3%)
+- **Commits:** 6 (all pushed)
+- **Files modified:** 9 major files
+
+### Next Session Targets
+
+**Update #37 - Bank $02 System Functions:**
+- Start: CODE_02E969 (line 7458)
+- Target: 15-20 functions
+- Focus: Threading, memory management
+- Expected: +0.2% coverage
+
+**Bank Priorities (from DOCUMENTATION_TODO.md):**
+1. Bank $02 (77 functions remaining)
+2. Bank $01 (32 functions - graphics/DMA)
+3. Bank $07 (20-30 functions - animation)
+4. Bank $00 (systematic sweep)
+
+---
+
 ## Session: October 26, 2025
 
 ### CRITICAL DISCOVERY: Graphics are COMPRESSED!
