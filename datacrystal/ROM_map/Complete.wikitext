@@ -7,7 +7,7 @@
 
 '''ROM Version:''' Final Fantasy: Mystic Quest V1.1 (U) unheadered
 * CRC32: $2c52c792
-* MD5: $f7faeae5a847c098d677070920769ca2  
+* MD5: $f7faeae5a847c098d677070920769ca2
 * SHA1: $6be74b73b736bc6027c0e92619874da7c498bed0
 
 '''Table Usage:'''

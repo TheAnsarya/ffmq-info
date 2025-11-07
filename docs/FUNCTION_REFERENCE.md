@@ -17605,3 +17605,118 @@ Byte | Value | Meaning
 
 ---
 
+## Update #37 - Bank $ 2 Priority and Entity Management
+
+### Priority_AllocateDynamic @ $ 2:E969
+
+**Purpose:** Dynamic priority allocation using test-and-set bits with priority level table lookup.
+
+**Inputs:**
+- $C9 = Priority allocation bitmap (8 bits for 8 levels)
+
+**Outputs:**
+- A = Allocated priority level (0-7) or $FF if all busy
+
+**Process:**
+1. Test bit 0 of $C9, set if clear (TSB instruction)
+2. If was clear: Return priority 7 (highest)
+3. If was set: Shift left, test next bit
+4. Continue through all 8 bits
+5. Return priority from DATA8_02E98A table or $FF
+
+**Priority Table:** 07,06,05,04,03,00,01,02 (non-sequential for optimization)
+
+---
+
+### Graphics_ProcessCoordinated @ $ 2:E992
+
+**Purpose:** Coordinated graphics processing with dual-pattern transfer using MVN cross-bank moves.
+
+**Inputs:**
+- A = Graphics ID (0-255)
+- X = Configuration index
+
+**Outputs:**
+- Graphics patterns transferred to WRAM buffer $7E:C140+
+
+**Process:**
+1. Graphics ID × 32 → buffer offset ($C140 base)
+2. Load config from $ AB7,x → pattern ID
+3. Pattern ID × 16 + $82C0 → Bank 09 source
+4. MVN transfer 16 bytes (Bank 09 → Bank 7E)
+5. Check secondary pattern at $ AB8,x
+6. If present (not $FF): Transfer secondary pattern
+7. Increment $E5 processing counter
+
+**Performance:** ~150-200 cycles per pattern, ~300-400 total if dual
+
+---
+
+### Entity_AllocateAdvanced @ $ 2:E9F7
+
+**Purpose:** Advanced entity allocation with full initialization (position, priority, validation).
+
+**Inputs:**
+- Stack+3 = Entity type
+- Stack+4 = Configuration flags
+
+**Outputs:**
+- X = Allocated entity slot (0-31) or $FF
+- Entity initialized at $7EC240+
+
+**Process:**
+1. Call CODE_02EA60 to find free slot
+2. Zero init: $7EC300 (priority), $7EC2E0 (sync), $7EC380 (validation)
+3. Set $7EC2C0 = $FF (uninitialized marker)
+4. Calculate position from type table at $ A25-28:
+   - X = (width/2 - 4 + base_x) × 8
+   - Y = (height - 8 + base_y) × 8
+   - Apply +4 Y adjustment if config < 2
+5. Store positions to $7EC280 (X), $7EC2A0 (Y)
+6. Validate config (CODE_02EA7F)
+7. Process bit validation (CODE_02EB14)
+8. Mark active: $7EC240 = $C0
+
+---
+
+### Entity_FindFreeSlot @ $ 2:EA60
+
+**Purpose:** Scan 32 entity slots for first available (bit 7 clear in status byte).
+
+**Outputs:**
+- X = Free slot index (0-31) or $FF if none
+
+**Process:**
+1. Loop 32 times checking $7EC240,x
+2. Return first slot with bit 7 = 0 (available)
+3. Clear sync ($7EC2E0) and validation ($7EC360) on found slot
+
+**Performance:** Best case 20 cycles (slot 0 free), worst 640 cycles (all busy)
+
+---
+
+### Entity_ValidateConfiguration @ $ 2:EA7F
+
+**Purpose:** Multi-pass validation with external validation routine calls.
+
+**Inputs:**
+- Y = Validation iteration count
+- Entity slot in X
+
+**Outputs:**
+- A = Validation result code
+
+**Process:**
+1. Call CODE_02EA9F for initial validation
+2. If result >= $80: Return $FF (critical error)
+3. Loop Y times:
+   - Call CODE_02EACA (bit validation)
+   - Set direct page to $ B00
+   - JSL to CODE_00974E (external validator)
+   - Increment validation counter
+4. Return final validation result
+
+**Error Handling:** Returns $FF if any validation fails critically
+
+---
+

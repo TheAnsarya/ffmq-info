@@ -44,7 +44,7 @@ Complete breakdown of all 16 ROM banks ($00-$0F) showing code organization, majo
 |-
 | $0F || $0F8000-$0FFFFF || 32KB || Map/level data, overworld tiles || [https://github.com/TheAnsarya/ffmq-info/blob/main/src/asm/bank_0F_documented.asm bank_0F]
 |-
-| colspan="2" | '''Total ROM Size''' || '''512KB''' || '''16 banks × 32KB''' || 
+| colspan="2" | '''Total ROM Size''' || '''512KB''' || '''16 banks × 32KB''' ||
 |}
 
 ==Detailed Bank Breakdown==
