@@ -18593,3 +18593,75 @@ Standard menu processing. Saves direct page. Calls CODE_028F22 controller state.
 **Bank:** $02 | **Category:** Sound Integration | **Range:** $02:A682-A69C
 Sound active menu processing. Saves direct page. Calls CODE_028F22 system state. Reads $38 state byte 1 to high byte, $39 state byte 2 to low byte. Sets 16-bit mode. Sets X to $FFFF index marker. Restores direct page. Shifts left 4× (multiplies by 16). Sets 8-bit accumulator, 16-bit index. Stores to $A8 high calculation. Swaps bytes. Stores to $A7 low calculation. Continues to Sound_StateCalculation.
 
+## Idle_StateProcessor ($02:A332)
+**Bank:** $02 | **Category:** Idle Processing | **Range:** $02:A332-A36A
+Idle state with sound threshold. Sets $65 sound effect ID to $00A8. Calls CODE_009783 sound system. Reads $10A0, masks $0F, decrements to X. Reads Idle_StateHandler.data,X, compares with $00A9 sound result. If less, returns. Reads $102F, ANDs $02. If set: stores $11 to $10D0, TSBs $30 to $1020, returns. Reads $102F again, ANDs $02. If not set, returns. Stores $01 to $10D0. Returns. Includes 8-byte data table: $5A,$50,$46,$3C,$5A,$50,$46,$3C.
+
+## Controller_GameMode ($02:A373)
+**Bank:** $02 | **Category:** Game Input | **Range:** $02:A373-A383
+Game mode controller input. Sets $65 sound effect ID to $00A8. Calls CODE_009783 sound processing. Reads $00A9 sound result. Compares $32 threshold. If below, continues Controller_MultiSetup. Returns if sound busy.
+
+## Controller_MultiSetup ($02:A384)
+**Bank:** $02 | **Category:** Multi-Controller Setup | **Range:** $02:A384-A398
+Multi-controller setup. Saves $8B current game state. Loads $04C8 controller buffer pointer to $92. Sets $02 controller mode 2 to $8B game state, $04 for 4-controller mode to $8C controller count. Calls Controller_ReadAll. Restores game state from stack to $8B.
+
+## Controller_MultiValidate ($02:A39A)
+**Bank:** $02 | **Category:** Input Validation | **Range:** $02:A39A-A3A8
+Multi-controller input validation. Sets 16-bit mode. Reads $C8 controller 3, ORs with $CA controller 4, ORs with $CC additional input. If non-zero, branches Controller_MultiDetected. Sets 8-bit accumulator, 16-bit index. Returns if no input.
+
+## Controller_MultiDetected ($02:A3A9)
+**Bank:** $02 | **Category:** Input Detection | **Range:** $02:A3A9-A3C2
+Extended controller input detection. Sets 8-bit accumulator, 16-bit index. Sets $FF active input flag to $D0. Sets 16-bit mode. Reads $C8, ORs $CA, ORs $CC, ANDs $0060 shoulder buttons. If zero, branches Controller_MultiStandard. Calls Controller_ShoulderHandler. Jumps Controller_DirectionHandler.
+
+## Controller_MultiStandard ($02:A3C4)
+**Bank:** $02 | **Category:** Standard Buttons | **Range:** $02:A3C4-A3DD
+Standard button processing. Reads $C8, ORs $CA, ORs $CC, ANDs $0010 action button. If zero, branches Controller_MultiAlt. Jumps Controller_ActionHandler. Alternative path: reads $C8, ORs $CA, ORs $CC, ANDs $0027 secondary buttons. If non-zero, calls Controller_ShoulderHandler, jumps Controller_DirectionHandler. Returns.
+
+## Controller_ShoulderHandler ($02:A3E4)
+**Bank:** $02 | **Category:** Priority Resolution | **Range:** $02:A3E4-A40B
+Extended controller priority resolution. Sets $0002 initial priority to $CE, $0003 comparison base to $A0. Reads $C8 controller 3 to $A2. Compares with $CA controller 4. If C3 >= C4, branches Controller_UpdatePriority. Otherwise loads $A0 base to $CE priority, $CA controller 4 to $A2. Updates priority: increments $A0 comparison value. Compares $A2 current highest with $CC additional input. If less, loads $A0 updated value to $CE final priority. Returns.
+
+## Controller_ReadAll ($02:A40C)
+**Bank:** $02 | **Category:** Controller Reader | **Range:** $02:A40C-A46A
+Universal controller input reader. Loads $92 controller buffer pointer to X. Read loop: sets 16-bit mode, clears $0000,X buffer entry. Sets 8-bit accumulator, 16-bit index. Saves direct page. Calls CODE_028F22 controller hardware reader. Checks $10 controller presence, increments. If zero (no controller), skips to CODE_02A441. Reads $21 button state, ANDs $C0 shoulder buttons. If shoulders pressed, branches CODE_02A430. Reads $2F trigger state, ANDs $02 trigger bit, stores to $0000,X. Checks config: reads $2E controller config, ANDs $02 configuration bit. If set, uses $7F partial mask, else $FF full mask. ANDs mask with $21 buttons, stores to $0001,X. Processes data: sets 16-bit mode, loads $0000,X controller data, calls Controller_ButtonMapping, stores processed to $0000,X. Sets 8-bit accumulator, 16-bit index. Checks $048B game mode, compares $02. If less, branches next controller. Applies $FE clear bit 0 mask, ANDs with $0001,X, stores result. Advances X twice (2 bytes/entry). Restores direct page. Increments $8B controller index. Compares $8C controller count with $8B current index. If more controllers, loops to Controller_ReadLoop. Returns when done.
+
+## Controller_ButtonMapping ($02:A46B)
+**Bank:** $02 | **Category:** Button Mapping | **Range:** $02:A46B-A488
+Button mapping with bit manipulation. Saves input twice. Masks $000A specific bits. Shifts left 3× (multiplies by 8). Stores to $04A0 shifted value. Restores input. Masks $0F00 high nibble. Shifts right 8× (divides by 256). ORs with $04A0 shifted value. Stores to $04A0 combined result. Restores original input. Continues to Controller_InputProcessor.
+
+## System_ComplexProcessing ($02:9DC8)
+**Bank:** $02 | **Category:** System Processing | **Range:** $02:9DC8-9DE8
+Complex system processing for high index values. Saves A. Calls CODE_028F2F context switch. Sets $80 to $21 system register. Restores P. Clears high byte, loads $8D system index, decrements twice to X. Sets $FF to $0A02,X state array. Clears $0505 system register. Sets $0000 to $77 (word). Returns. Originally unreachable, now accessible via $8D >= $02 condition.
+
+## DATA8_02a272-02a289 (System Initialization Tables)
+**Bank:** $02 | **Category:** Data Tables | **Range:** $02:A272-A28B
+System initialization: $07 (1 byte). Configuration parameters: $17,$27,$37,$47,$57 (5 bytes). State default: $00 (1 byte). Audio waveform pattern (19 bytes): $00,$08,$21,$52,$4A,$F7,$5E,$9C,$73,$9C,$73,$F7,$5E,$52,$4A,$08,$21,$00,$00. Sound synthesis parameters.
+
+## Controller_GameLoop ($02:A28C)
+**Bank:** $02 | **Category:** Game Loop | **Range:** $02:A28C-A29A
+Primary game loop controller. Sets direct page $0400. Sets 8-bit accumulator, 16-bit index. Reads $17 system interrupt flag, ANDs $80 high bit for pause state. If not paused, continues Controller_InputProcess. Returns if paused.
+
+## Controller_InputProcess ($02:A29B)
+**Bank:** $02 | **Category:** Input State Machine | **Range:** $02:A29B-A2A5
+Input state machine processor. Clears $D0 status flag. Reads $8B game state mode. Compares $01 for mode 1 (menu/interface). If equal, branches Controller_MenuMode. Otherwise jumps Controller_GameMode game mode handler.
+
+## Controller_MenuMode ($02:A2A6)
+**Bank:** $02 | **Category:** Menu Processing | **Range:** $02:A2A6-A2C5
+Menu interface controller. Loads $04C4 controller data pointer to $92. Resets $8B game state to $00. Sets $01 controller count to $8C. Calls Controller_ReadAll. Sets 16-bit mode. Reads $C4 controller 1 state, ORs with $C6 controller 2. If non-zero, branches Controller_MenuInputDetected. Sets 8-bit accumulator, 16-bit index. Reads $D0 idle counter, decrements. If zero, branches Idle_StateHandler. Returns if no input.
+
+## Controller_MenuInputDetected ($02:A2C6)
+**Bank:** $02 | **Category:** Input Detection | **Range:** $02:A2C6-A2DF
+Input detected processing. Sets 8-bit accumulator, 16-bit index. Sets $FF active input flag to $D0. Sets $01 input processing mode to $8B game state. Clears $CE direction state. Sets 16-bit mode. Reads $C4 controller 1. Tests $0100 special button. If set, jumps Controller_SpecialButton. Otherwise continues Controller_CheckDirection.
+
+## Controller_CheckDirection ($02:A2E0)
+**Bank:** $02 | **Category:** Direction Processing | **Range:** $02:A2E0-A2E7
+Standard input direction processing. Masks $00E0 direction bits. If zero (no direction), branches Controller_ButtonCheck. Otherwise jumps Controller_DirectionHandler directional input processor.
+
+## Controller_ButtonCheck ($02:A2E8)
+**Bank:** $02 | **Category:** Button Analysis | **Range:** $02:A2E8-A315
+Button press analysis. Reads $C6 controller 2, ORs with $C4 controller 1, ANDs $0010 action button. If zero, branches Controller_AltButtonCheck. Reads $C6 controller 2, ANDs with $C4 controller 1, ANDs $0010 action button verification. If zero, branches Controller_CheckPrecedence. Reads $10A5 timing parameter, compares $0032 threshold. If below, branches Controller_CheckPrecedence. Sets $0080 rapid-fire mode to $CE. Continues Controller_ActionProcess. Check precedence: reads $C6 controller 2, compares with $C4 controller 1. If C2 < C1, continues Controller_ActionProcess. Sets 8-bit accumulator, 16-bit index. Increments $CE controller flag. Jumps Controller_ActionHandler.
+
+## Controller_AltButtonCheck ($02:A318)
+**Bank:** $02 | **Category:** Alternative Buttons | **Range:** $02:A318-A32C
+Alternative button processing. Reads $C6 controller 2, ORs with $C4 controller 1, ANDs $0027 secondary buttons. Reads $C6 controller 2, compares with $C4 controller 1. If C2 < C1, branches Controller_ProcessSecondary. Sets 8-bit accumulator, 16-bit index. Increments $CE controller flag. Jumps Controller_DirectionHandler input handler.
+
