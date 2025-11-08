@@ -18189,3 +18189,79 @@ Multi-threaded memory management with block operations. Sets direct page $0A00. 
 **Bank:** $02 | **Category:** Thread Validation | **Range:** $02:E7CD-E890
 Advanced thread validation and processing engine. [See Thread_MultiProcessor doc above - same function]
 
+## Graphics_SegmentProcessor ($02:E06C)
+**Bank:** $02 | **Category:** Graphics Processing | **Range:** $02:E06C-E094
+Graphics segment processing with multiplication. Loads data from DATA8_0cef85,x (Bank $0C), stores to $4202 multiplier, loads $18 (24) constant. Calls CODE_00971E multiplication. Reads result from $4216, adds $D785 offset, stores to $0A8B. Calls CODE_02E1C3 graphics renderer. Decrements Y counter, loops until zero.
+
+## Graphics_BufferManager ($02:E095)
+**Bank:** $02 | **Category:** Graphics Management | **Range:** $02:E095-E0DA
+Dual-buffer graphics manager with MVN block moves. Sets direct page $0A00. First buffer: calculates $00C0+$C040 dest, loads $0AA0, shifts left 4x (multiply 16), adds $F285, MVN $0C→$7E size $0F. Second buffer: calculates $00E0+$C040 dest, loads $0A9F, masks $F0, adds $F285, MVN $0C→$7E size $0F. Both transfers copy graphics data from Bank $0C to WRAM buffers.
+
+## Math_CalculationEngine ($02:E4A5)
+**Bank:** $02 | **Category:** Mathematical Processing | **Range:** $02:E4A5-E4EA
+Mathematical calculation loop with boundary checking. Stores result to $91. Pushes $00 base, increments $92 counter. Switches to 16-bit, pops value, adds $0100 offset, pushes result. Compares against $0400 boundary. Loops back to CODE_02E4A5 if not equal. On completion, cleans stack and returns via RTL.
+
+## Graphics_MultiProcessor ($02:E4EB)
+**Bank:** $02 | **Category:** Graphics Coordination | **Range:** $02:E4EB-E522
+Multi-bank graphics processor with coordinate handling. Loads $0A91 (X-coord) and $0A92 (Y-coord), masks to 8-bit, transfers to X/Y regs. Calls CODE_02E523 graphics calculation. Loads $96 multiplier to $4202, multiplies by $06, calls CODE_00971E. Reads result from $4216 to X. Loads $93 bank ID, XBA swap, loads DATA8_0cef89,x (Bank $0C). Calls CODE_02E536 processor. RTL return.
+
+## Coord_TransformEngine ($02:E523)
+**Bank:** $02 | **Category:** Coordinate Transformation | **Range:** $02:E523-E535
+Sophisticated coordinate calculation via bit shifts. Transfers Y to A. Shifts left 1 (×2), increments (+1), shifts left 5 more times (total ×64 with offset). Adds stack parameter twice. Final shift. Transfers result to Y. Fast integer math without hardware multiplier.
+
+## Graphics_PatternEngine ($02:E536)
+**Bank:** $02 | **Category:** Pattern Processing | **Range:** $02:E536-E59F
+Complex pattern transformation with bit manipulation. Shifts $0A94 flag twice (×4). Pushes pattern data and $0000 counter. Loop processes 4 patterns: shifts pattern bit, XBA swaps, adds carry, shifts left 4x (×16), adds stack param, multiple XBA operations. Masks $FF00, adds $012D offset, adds $0A94 counter (incremented each iteration). Stores to $7EB800/7EB801 buffers via long addressing. After 2 patterns, adds $003E to Y offset. Continues until 4 patterns complete.
+
+## Sprite_GridRenderer ($02:DD09)
+**Bank:** $02 | **Category:** Sprite Rendering | **Range:** $02:DD09-DD2F
+16×14 sprite grid renderer. Stores X to $91, Y to $92. Sets processing mode $94=$10. Masks sprite flags $9F to lower 4 bits, stores to $96. Calls CODE_02E4EB sprite renderer. Increments X until $10 (16), resets X, increments Y until $0E (14). Total 224 sprites (16×14 grid). Sets completion flag bit $02 at $E3. Calls CODE_02E095 finalizer.
+
+## Sprite_InitEngine ($02:DF3E)
+**Bank:** $02 | **Category:** Sprite Initialization | **Range:** $02:DF3E-DF52
+Sprite system initializer with parameter table. Transfers input to X, loads from Sprite_ParameterTable,x, stores to $0AEE config. Pushes DATA8_02df53 table address, calls CODE_0097BE (Bank $00) initializer via JSL.
+
+## Sprite_ParameterTable ($02:DF5B)
+**Bank:** $02 | **Category:** Data Table | **Range:** $02:DF5B-DF7F
+36-byte sprite parameter table. First byte $03 (base), followed by 35 extended parameters. Values mostly $00 with occasional $01/$02. Ends with RTS instructions.
+
+## Graphics_BufferInit ($02:DF81)
+**Bank:** $02 | **Category:** Graphics Initialization | **Range:** $02:DF81-DFBD
+Triple-buffer graphics initialization. Clears $7EC660, MVN $7EC660→$7EC661 size $01BC (445 bytes) for primary buffer. MVN $02DFC6→$7EC640 size $06 (7 bytes) for secondary buffer. MVN $02DFBE→$4320 size $07 (8 bytes) for DMA config. Sets DMA enable bit $04 at $0111.
+
+## Memory_ClearEngine ($02:DFCD)
+**Bank:** $02 | **Category:** Memory Management | **Range:** $02:DFCD-DFE7
+Fast memory clear via MVN. Clears $7EC240 to $00. MVN $7EC240→$7EC241 size $1E (30 bytes). Efficient block-clear pattern.
+
+## Graphics_DataProcessor_2 ($02:DFE8)
+**Bank:** $02 | **Category:** Graphics Processing | **Range:** $02:DFE8-E020
+Graphics mode processor with multiplication. Loads $0A9C to multiplier $4202, multiplies by $03, calls CODE_00971E. Uses result as index to UNREACH_0CF715,x (Bank $0C). Masks to 8-bit, shifts left 4x (×16), stores to $0A9D offset. Loads Graphics_ParamTable2,x to $0A9F, decrements. Loads Graphics_ParamTable3,x to $0AA0.
+
+## Graphics_DataProcessor_3 ($02:E021)
+**Bank:** $02 | **Category:** Graphics Processing | **Range:** $02:E021-E04E
+Graphics data extractor with loop. MVN $02E04F→$0A8A size $06 (7 bytes) for config. Loads Y=$0010 (16 iterations), X=$0A9D base address. Loop: loads UNREACH_0CF425,x (Bank $0C), increments X, calls CODE_02E056 processor, decrements Y until zero. Loads $0A9F flags, masks $0F, calls CODE_02E056 for special processing.
+
+## Graphics_CalcEngine ($02:E056)
+**Bank:** $02 | **Category:** Graphics Calculation | **Range:** $02:E056-E06C
+Graphics calculation with hardware multiply. Stores input to $4202, multiplies by $06, calls CODE_00971E. Loads result from $4216 to X. Sets Y=$0004 for 4-segment processing.
+
+## State_ConfigEngine ($02:DB98)
+**Bank:** $02 | **Category:** State Management | **Range:** $02:DB98-DBC3
+State configuration with conditional block transfer. Sets dest Y=$0A25, default source X=$DCC4. Loads $1090 config flag, checks if $FF. If special mode, changes source to $DCCC. MVN $02→$02 size $07 (8 bytes). Calls sprite renderer CODE_02DCDD or alternate CODE_02DD30 based on $9C mode. Calls CODE_02EA60 object allocator, stores result to $0ADE. Clears $0AF4 processing flag.
+
+## Object_CreationEngine ($02:DBCB)
+**Bank:** $02 | **Category:** Object Management | **Range:** $02:DBCB-DC35
+Primary object creation with graphics setup. Clears $7EC320/7EC400/7EC340 states. Sets $7EC240=$81 (active flag). Calls CODE_02EA7F with Y=$0C parameter, stores result to $7EC260. Multiplies by 4, sets direct page $0C00. Configures 4-tile sprite: base tile $1C (incremented for each), attributes $30 for all four. Calculates positions: X from $0A25 (×8), Y from $0A26 (×8-1). Second sprites offset by +8 pixels. Stores tile config to $7EC480. Clears $0AF5 flag.
+
+## Object_SecondaryCreator ($02:DC35)
+**Bank:** $02 | **Category:** Object Management | **Range:** $02:DC35-DCB7
+Secondary object with special tile mapping. Calls CODE_02EA60 allocator, sets type $7EC320=$02. Stores index to $0ADF. Clears $7EC400/7EC340 states. Sets $7EC240=$81 flags. Calls CODE_02EA7F with Y=$0C, stores to $7EC260. Adds $18 offset to graphics, stores to $0AE9. Multiplies by 4. Loads $10A0 special flags, masks $0F, uses as index to Tile_MappingTable for base tile. Configures 4-tile sprite (incremented tiles), attributes $34. Positions from $0A29/0A2A (×8). Stores config to $7EC480. Calls CODE_0B935F coordinator. Increments $F8 counter. RTL return.
+
+## Tile_MappingTable ($02:DCD4)
+**Bank:** $02 | **Category:** Data Table | **Range:** $02:DCD4-DCDB
+9-byte tile mapping table. Base $1C, special tiles $34/$4C/$64/$7C (repeated pattern).
+
+## Sprite_RenderEngine ($02:DCDD)
+**Bank:** $02 | **Category:** Sprite Rendering | **Range:** $02:DCDD-DD09
+Multi-stage sprite rendering system. Calls CODE_02DF3E initializer, CODE_02DFE8 loader, CODE_02E021 coordinator. Sets system flag bit $20 at $E3. Clears sprite counter $98. Sets limit $99=$06. Loads base $0A9D to $9A. Loop: stores to $97, calls CODE_02E48C processor, adds $04, compares to $10 (16 sprite max), loops. Sets Y=$04, X=$00 for grid rendering.
+
