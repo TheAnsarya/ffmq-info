@@ -5,6 +5,19 @@
 
 This is the master index for all project documentation. Files have been organized into logical categories for easy navigation.
 
+## 📖 Essential Starting Points
+
+**New to the project?**
+1. **[PROJECT_OVERVIEW.md](PROJECT_OVERVIEW.md)** ⭐ - Comprehensive project overview
+2. **[README.md](../README.md)** - Main project README
+3. **[Quick Start Guide](guides/QUICK_START_GUIDE.md)** - Get started quickly
+4. **[CONTRIBUTING.md](../CONTRIBUTING.md)** - How to contribute
+
+**Looking for something specific?**
+- Use the Table of Contents below
+- Search this file (Ctrl+F)
+- Check category folders directly
+
 ## 📖 Table of Contents
 
 - [Quick Start](#quick-start)

@@ -264,12 +264,15 @@ enemy_editor.bat
 
 📚 **[Complete Documentation Index](docs/INDEX.md)** - Master index for all project documentation!
 
+🎯 **[Project Overview](docs/PROJECT_OVERVIEW.md)** ⭐ - Comprehensive project guide covering everything!
+
 ### Quick Links by Role
 
 **New Users:**
-1. [Quick Start Guide](docs/guides/QUICK_START_GUIDE.md) - Get started fast
-2. [Build Quick Start](docs/guides/BUILD_QUICK_START.md) - Build your first ROM
-3. [FAQ](docs/guides/FAQ.md) - Common questions answered
+1. [Project Overview](docs/PROJECT_OVERVIEW.md) ⭐ - Complete introduction
+2. [Quick Start Guide](docs/guides/QUICK_START_GUIDE.md) - Get started fast
+3. [Build Quick Start](docs/guides/BUILD_QUICK_START.md) - Build your first ROM
+4. [FAQ](docs/guides/FAQ.md) - Common questions answered
 
 **Modders:**
 1. [Modding Quick Reference](docs/guides/MODDING_QUICK_REFERENCE.md) ⭐ - 3-step modding guide
