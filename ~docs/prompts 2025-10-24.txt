@@ -597,6 +597,7 @@ format all the new code with `editorconfig` and using tabs/crlf/utf-8 (editorcon
 &&&&&&&&&&&& ------ update the session/chat logs! commit your changes! run formatting on the files, I am tired of seeing spaces instead of tabs, use tabs! 
 those missing punction marks are in the table, just the complex one: `https://github.com/TheAnsarya/GameInfo/blob/main/Final%20Fantasy%20Mystic%20Quest%20(SNES)/Files/Final%20Fantasy%20Mystic%20Quest%20(SNES)%20-%20Complex.tbl` so use that then resume work as before
 close all open files; update the session/chat logs; run formatting on the files, I am tired of seeing spaces instead of tabs, use tabs; git commit and push; is pygame not installed? why not? install any needed dependancies! add editing for the multi-character encoding data to the editor so you can edit the "the " entry etc and hopefully auto-generation of the table for multi-char entries from the current dialog text; and do other stuff to make it awesome and finsih up any leftover work; then implement the changes to make it awesome for as long as you can and use up all the tokens for each session
+add in map editing for the dungeon maps including the monsters and editing the enemy sets and then editing the enemies/monsters; and add spell editing, item editing, music editing, etc; implement the changes to make it awesome for as long as you can and use up all the tokens for each session
 
 
 
