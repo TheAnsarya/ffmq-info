@@ -18109,3 +18109,83 @@ For each of 5 entities:
 
 ---
 
+## Entity_MovementProcessor ($02:F6F4)
+**Bank:** $02 | **Category:** Entity Management - Movement | **Range:** $02:F6F4-F707
+Simple entity movement with X-coordinate update. Adds movement vector from $7EC420,x to X-coordinate at $7EC280,x. Clears animation state $7EC380,x. No collision detection or boundary checking.
+
+## Window_ProcessingEnable ($02:F708)
+**Bank:** $02 | **Category:** Graphics - Window Management | **Range:** $02:F708-F720
+Enables Window 1 and configures color window control. Sets $212D=$01, $2132=$00, $2130=$02, $2131=$50. Color subtraction mode for sprites within window. Clears entity state $7EC380,x.
+
+## Window_ProcessingReset ($02:F721)
+**Bank:** $02 | **Category:** Graphics - Window Management | **Range:** $02:F721-F735
+Disables windows and restores defaults. Sets $212D=$00, $2130=$00, $2131=$00, $2132=$E0. Cleanup after window effects.
+
+## Entity_AnimationProcessor ($02:FDAA)
+**Bank:** $02 | **Category:** Entity Animation | **Range:** $02:FDAA-FDBC
+Comprehensive animation with cross-bank coordination. Loads state from $7EC380,x, pushes DATA8_02f62c, calls CODE_0097BE (Bank $00), then CODE_02F483 local update. Full register preservation.
+
+## Entity_AnimationStreamlined ($02:FDBD)
+**Bank:** $02 | **Category:** Entity Animation | **Range:** $02:FDBD-FDCA
+Optimized animation without local updates. Same cross-bank call but skips CODE_02F483. No PHP/PLP. Faster for simple animations.
+
+## Entity_InitValidator ($02:FE0F)
+**Bank:** $02 | **Category:** Entity Initialization | **Range:** $02:FE0F-FE37
+Entity validation and initialization with boundary checking. Sets direct page to $0A00. Validates entity parameter against $C8 boundary. Calls CODE_02EB55 for initialization. Sets priority level $03 at $0AE4. RTL cross-bank return.
+
+## Entity_GraphicsCreator ($02:FE38)
+**Bank:** $02 | **Category:** Entity Creation | **Range:** $02:FE38-FE82
+Complete entity creation with graphics initialization. Preserves/restores X-coordinate and graphics state on stack. Calls CODE_02EA60 (coordinate processing), CODE_02EA9F (type init), CODE_00974E (cross-bank graphics). Initializes $7EC2E0, $7EC360, $7EC380 to $00. Sets status $84 at $7EC240,x. RTL return.
+
+## Entity_Cleanup ($02:FE83)
+**Bank:** $02 | **Category:** Entity Management | **Range:** $02:FE83-FEAA
+Entity cleanup and sprite deactivation. Clears $7EC340, $7EC360, $7EC380. Calls Entity_Deactivator with sprite type from $7EC260,x. Cross-bank cleanup via CODE_009754 with direct page $0B00.
+
+## Entity_Deactivator ($02:FEAB)
+**Bank:** $02 | **Category:** Entity Management | **Range:** $02:FEAB-FEC9
+Sprite deactivation via bit manipulation. Divides entity type by 4 for byte index, masks lower 2 bits for bit position. Updates $0E00 activation flags using DATA8_02feca masks and DATA8_02fece patterns.
+
+## State_SyncEngine ($02:E892)
+**Bank:** $02 | **Category:** System State Management | **Range:** $02:E892-E8CC
+System state synchronization with cross-bank coordination. Checks state at $048B, loads thread ID from $0ADE, sends sync command $02 to thread via $7EC400. Waits in loop until sync completes. Copies synchronized data from $0AF6 to $0AF4. Resets thread configurations $0AB2-$0AB6 to $FF. RTL return.
+
+## Entity_ConfigureAdvanced ($02:E8CD)
+**Bank:** $02 | **Category:** Entity Configuration | **Range:** $02:E8CD-E904
+Complex entity configuration with cross-bank data management. 16-bit mode, multiplies entity ID by 4 for indexing. Loads config from UNREACH_06FBC1/06FBC3 in Bank $06. Stores to $0AB7 table and entity buffers $7EC3C0/$7EC3E0. Initializes $7EC400 and $7EC420 to $0000.
+
+## Validation_CrossReference ($02:E905)
+**Bank:** $02 | **Category:** Validation Systems | **Range:** $02:E905-E92F
+Advanced validation with cross-reference checking. Loops through 5 references at $00B2, compares each against validation target. Skips self-validation and invalid refs ($FF). Calls CODE_02E930 on match, increments result. Returns validation count in accumulator.
+
+## CrossRef_StateSync ($02:E930)
+**Bank:** $02 | **Category:** State Synchronization | **Range:** $02:E930-E968
+Cross-reference state synchronization between entities. Loads source entity ID from $00C1,y, reads state/memory/priority from $7EC320/$7EC2C0/$7EC300. Transfers all three to target entity at same addresses. Clears target sync flag $7EC2E0 to $00.
+
+## Thread_MultiProcessor ($02:E7CD)
+**Bank:** $02 | **Category:** Thread Management | **Range:** $02:E7CD-E890
+Multi-thread processor handling 5 concurrent threads. Sets direct page $0A00, initializes counters. Main loop processes thread states from $0AB2-$0AB6. Validates thread activity via bit $80, calculates priority (divide by 8), checks execution time against $C8 critical threshold. Calls CODE_02E905 validation and CODE_02EB55 execution. Manages thread cleanup and deactivation sequence.
+
+## Priority_ThreadAllocator ($02:E969)
+**Bank:** $02 | **Category:** Thread Priority Management | **Range:** $02:E969-E992
+Dynamic thread priority allocation and management. [Starting documented in previous Update #37]
+
+## System_Coordinator ($02:E5AC)
+**Bank:** $02 | **Category:** System Coordination | **Range:** $02:E5AC-E5E4
+Multi-system coordination engine with real-time processing. Preserves all registers (A/B/X/Y/P). Sets data bank to current via PHK/PLB. Loads system increment from DATA8_02e5a8 to $0AAE, step from DATA8_02e5aa to $0AB0. Calls CODE_02E60F initialization. Sets bit $80 at $0110. Clears PPU registers $212C/$212D/$2106/$2121/$2122 (2x). RTL return.
+
+## PPU_InitEngine ($02:E60F)
+**Bank:** $02 | **Category:** PPU Configuration | **Range:** $02:E60F-E66D
+Comprehensive PPU initialization with advanced configuration. Calls CODE_0C8000 (Bank $0C). Sets window masks $2127/$2129 to $FF. Clears window positions $2126/$2128. Clears window mask registers $212E/$212F/$212A/$212B. Sets BG/OBJ window masks $2123/$2124/$2125 to $22. Sets color math $2130 to $40. DMA config: source $E6E8, dest $4310, size 4 bytes via MVN. Initializes $0AAA=$81, $0AA2=$FF, $0AA3=$00, $0AAB=$FF, $0AAC/$0AAD=$00, $0AA1=$80. Calls CODE_0C8000 with flag $02, sets bit at $0111.
+
+## RealTime_ProcessLoop ($02:E670)
+**Bank:** $02 | **Category:** Real-Time Processing | **Range:** $02:E670-E6E7
+Sophisticated real-time loop with state management. Checks $0AAF bit $80 for shutdown. Subtracts $1E threshold, sets minimum $01 if needed. Stores to $0AA1. Copies state to $0AA5/$0AA8. Inverts (XOR $FF) to $0AA6/$0AA9. Calculates complement $80-value to $0AA4/$0AA7. Threshold check $0AA1 vs $0A: if above, shifts $0AAF left, masks $F0, ORs $07, writes to mosaic $2106. Updates timers at $0AB0/$0AAE with increments. Calls CODE_0C8000. Clears bit $80 at $0110. Loops continuously. Shutdown path: clears bit $02 at $0111, clears $2123/$2124/$2125/$2130.
+
+## Memory_ThreadManager ($02:E6ED)
+**Bank:** $02 | **Category:** Memory Management | **Range:** $02:E6ED-E744
+Multi-threaded memory management with block operations. Sets direct page $0A00. Clears variables $C8/$C9/$E6/$E5/$E4/$E3/$E7/$E8. Sets OAM config $2101=$43. Fills $0AB7=$FF. Block clear: MVN $0AB7→$0AB8, size $0D. Large WRAM clear: $7E7800=$0000, then MVN $7E7800→$7E7801, size $1FFE (8KB). Sets thread counter $E4=$03. Spin-waits until $E4=0 for thread sync completion.
+
+## Thread_ValidationEngine ($02:E7CD)
+**Bank:** $02 | **Category:** Thread Validation | **Range:** $02:E7CD-E890
+Advanced thread validation and processing engine. [See Thread_MultiProcessor doc above - same function]
+

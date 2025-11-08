@@ -600,6 +600,7 @@ that seemed to happen too quick, don't waste my tokens per session, continue the
 
 
 
+
 &&&&&&&&&&&&&&&&&&&&&&&&&&&&&
 The solution is to either:
 Option A: Extract sprite metadata (which tiles use which palettes) and render accordingly
@@ -622,8 +623,6 @@ Implement sprite re-insertion (PNG → ROM for modding)
 
 
 
-clean up the `bak` and `temp` files and other trash; organize all the documention files (`md` files mostly) and organize the scripts (`tools` folder `py` files mostly) and organize everything else; split documentation into sub-documents when it seems appropriate; update all the documentation  for the scripts and everything; clean up the project and organize it;
-
 
 
 
@@ -633,62 +632,17 @@ merge issue branches back into `master` when the issue is closed and everything 
 
 run formating for all recent files (tabs!) and then
 
-
-
-
-
-
-
-
-
-
 create documentation that describes the entire hero or enemy or map data structures or tiles or music and how to update them easily through the transitory files like - the extraction tools extract the hero graphics and animations and palettes to json and png (using the right palettes) files that cna be edited - then the build tools convert those png/json/pal files back into the data structures for the insertion build process.
-
-
-
-
-
-
-
-
-
-
-
 
 make sure you are updating the chat log/session log and then aggressively and greedily continue these import cycles and don't stop until all banks are done
 
-
-
-
-
-
-
-
-
-
-
-
-
-
 document, update the chat log, and commit the code changes at the end of every code change, c'mon!
-
-
-
 
 fix label issues and other build issues, build and compare to reference ROM file, make sure you are updating the session summary/chat log, continue systematically,
 
 make sure we are using `Final Fantasy - Mystic Quest (U) (V1.1).sfc` as the reference rom, what rom file does diztinguish say we are using? what file is our documentation and source code using? and then continue systematically
 
-
-
-
 find all the `Next steps` and todos and fill out the code
-
-
-
-
-
-
 
 update editorconfig so python scripts use tabs (4) (and utf-8, crlf) instead of spaces and then update all python scripts to the correct formatting.
 
@@ -696,10 +650,8 @@ Discord channels about SNES development include invites of: `https://discord.gg/
 
 ---
 
-
-
-
-
-
 create a github project for making an `FFMQ Editor UI` where the project and all issues and tasks and milestones are associated with the `ffmq-info` repository; make a massive amount of issues and child issues and sub-children issues and todo lists for the ffmq-editor-ui for an eventual game editor for `Final Fantasy Mystic Quest` using our complete disassembly and resource and graphics and data extraction and schemas, planning for a bunch of different data and graphics editors, and UI for _editing_ and viewing maps (overworld, dungeon, town), not affecting the original files, but a new set of files that can then be used for building a new rom; you need a big UI for easy graphics, palette, data, monster groups, spells, event commands (moving the characters around and text) dialog, etc; UI easily interacts with backend to initiate  extractions, data, and building a new rom. Expand this big style, and organize the github issues and projects and kanban boards for easy development.
+
+
+clean up the `bak` and `temp` files and other trash; organize all the documention files (`md` files mostly) and organize the scripts (`tools` folder `py` files mostly) and organize everything else; split documentation into sub-documents when it seems appropriate; update all the documentation  for the scripts and everything; clean up the project and organize it;
 
