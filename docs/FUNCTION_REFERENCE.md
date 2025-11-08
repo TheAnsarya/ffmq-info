@@ -18485,3 +18485,111 @@ Sound integration with graphics sync. Sets $10 to $7EC580,X sound parameter, $03
 **Bank:** $02 | **Category:** Pattern Management | **Range:** $02:AC32-AC3E
 Graphics pattern index management. Reads $7EC460,X pattern index, masks $03, stores. If zero, branches Graphics_PatternZero. Returns with pattern set. Pattern validation and selection.
 
+## System_CommandProcessor ($02:A950)
+**Bank:** $02 | **Category:** System Command Processing | **Range:** $02:A950-A97F
+Command processing with error validation. Saves direct page. Calls CODE_028F22 system state reader. Reads $50 command param 1 to $0438, $52 param 2 to $043A. Restores direct page. Calls CODE_028B0F command processor. Reads $E0 error state, masks $03. Compares $02 for critical error, branches System_ErrorHandler. Compares $01 for warning, branches System_WarningHandler. Sets $02 sound test ID to $00A8, calls CODE_009783 sound system. Reads $00A9 sound result, branches System_ErrorHandler if zero. Warning handler jumps CODE_02A497 response.
+
+## System_ErrorHandler ($02:A97F)
+**Bank:** $02 | **Category:** Error Processing | **Range:** $02:A97F-A9A0
+Error state and button handler. Saves direct page. Calls CODE_028F22 controller state. Sets $81 default state to $51. Reads $21 button state, ANDs $08 for select button. If pressed: sets $02 sound effect to $00A8, calls CODE_009783 sound system, reads $00A9 result. If sound ready, sets $80 alternate state to $51. Restores direct page. Returns.
+
+## Game_StateHandler ($02:A9A1)
+**Bank:** $02 | **Category:** Game State Management | **Range:** $02:A9A1-A9B0
+Game state dispatcher with interrupt detection. Reads $17 interrupt flag, ANDs $80. If interrupt set: reads $3B state parameter, compares $4A threshold. If above, jumps Math_ProcessingSystem. Standard processing: reads $11 system flag, ANDs $08. If set, saves direct page, calls CODE_028F22 state reader, continues to sound wait loop. Otherwise continues Game_NormalBranch.
+
+## Sound_WaitLoop ($02:A9BA)
+**Bank:** $02 | **Category:** Sound Coordination | **Range:** $02:A9BA-A9CF
+Sound system wait coordination. Sets $06 sound channel ID to $00A8. Calls CODE_009783 sound system. Clears high byte, swaps, reads $00A9 sound result to X. Reads $58,X sound state array, increments. If zero (sound busy), loops. Otherwise jumps Game_Priority_Handler. Sound synchronization loop.
+
+## Game_NormalBranch ($02:A9D2)
+**Bank:** $02 | **Category:** Normal Processing | **Range:** $02:A9D2-A9EB
+Normal game processing branch. Reads $B5 system mode. If set, branches Sound_PriorityProcess. Sets X to $0007 loop counter. Saves direct page. Calls CODE_028F22 state reader. State validation loop: reads $44,X state array, ANDs $80. If set, reads $58,X corresponding value, increments, branches Game_Priority_Handler. Decrements X, loops if positive. Restores direct page. Falls through to Sound_PriorityProcess.
+
+## Sound_PriorityProcess ($02:A9EC)
+**Bank:** $02 | **Category:** Sound Priority | **Range:** $02:A9EC-AA2D
+Sound priority management. Sets $65 sound effect ID to $00A8. Calls CODE_009783 sound system. Reads $00A9 result to $A0. Saves direct page. Calls CODE_028F22 state reader. Sets X to $0007. Priority loop: reads $44,X state value. If zero, adjusts priority. Compares with $04A0. If less, adjusts priority. Reads $58,X value, increments. If zero, adjusts priority. Otherwise continues Game_Priority_Handler. Priority adjustment: reads $04A0, subtracts $44,X via SEC/SBC, stores to $04A0. Decrements X, loops if positive. Restores direct page. Branches back to Sound_PriorityProcess.
+
+## Game_Priority_Handler ($02:AA0F)
+**Bank:** $02 | **Category:** Priority Command | **Range:** $02:AA0F-AA2D
+Priority command handler. Decrements A, stores to $52 result and $043A system memory. Sets $10 command type to $50 and $0438 system memory. Restores direct page. Continues Game_CommandProcess.
+
+## Game_CommandProcess ($02:AA2E)
+**Bank:** $02 | **Category:** Command Processing | **Range:** $02:AA2E-AA59
+Command processing with state updates. Calls CODE_028B0F command processor. Reads $E0 error state, masks $03. Compares $02 for critical error, branches Game_ErrorState. Compares $01 for warning, branches Game_WarningState. Warning state: reads $A0, ANDs $01, stores to $39. Error state: sets $80 error flag to $39. Final update: saves direct page, calls CODE_028F22 state reader, reads $0439 final state to $51. Restores direct page. Returns.
+
+## Math_ProcessingSystem ($02:AA5A)
+**Bank:** $02 | **Category:** Mathematical Processing | **Range:** $02:AA5A-AA78
+Mathematical parameter processing. Reads $ED parameter, masks $03 (2 bits), stores to $7EC460,X. If zero, branches Math_ZeroValue. Returns if non-zero. ZeroValue: reads $7EC440,X coordinate, increments, masks $03, stores. If zero, sets $0A to $0505 system register. Returns. Bit manipulation and coordinate calculations.
+
+## Sound_StateCalculation ($02:A684)
+**Bank:** $02 | **Category:** Sound Calculation | **Range:** $02:A684-A6AC
+Sound calculation with state processing. Saves direct page. Calls CODE_028F22 system state. Loads $0408 sound value, shifts right. Adds $0409 value, stores to $A7 low calculation. Sets $08 sound ID to $00A8. Calls CODE_009783 sound system. Reads $00A9 sound state to $A9 local copy. Continues to Sound_ProcessLoop.
+
+## Sound_ProcessLoop ($02:A6AC)
+**Bank:** $02 | **Category:** Sound Loop | **Range:** $02:A6AC-A6C4
+Sound state processing loop. Reads $A9 sound state, saves. Increments, masks $07 (8 states), stores new state. Restores original to X. Saves direct page. Pushes $04A7 calculation address. Loads new direct page. Calls CODE_00975A calculation system. Restores direct page. Increments A, decrements (tests zero). If zero, loops to Sound_ProcessLoop. Otherwise jumps CODE_02A8C6 completion handler.
+
+## Controller_MultiCoord ($02:A6C7)
+**Bank:** $02 | **Category:** Multi-Controller | **Range:** $02:A6C7-A71A
+Multi-controller coordination with priority sorting. Sets $02 priority base to $A4. Sets $0403 controller indices to $A5. Reads $1121 controller 1 extended. If negative, uses extended, else reads $1110 standard. Stores to $A7. Repeats for controller 2: $11A1/$1190 to $A8. Controller 3: $1221/$1210 to $A9. Sets Y to $0003 loop counter, X to $0001 comparison index. Priority sort algorithm: compares $A7,X with $A8,X. If out of order, swaps data values and swaps priority indices via stack. Toggles X index via XOR $0001. Decrements Y, loops if positive. Sets Y to $04A4 data pointer. Loads $B3 controller count to X. Continues Controller_ValidateLoop.
+
+## Controller_ValidateLoop ($02:A725)
+**Bank:** $02 | **Category:** Controller Validation | **Range:** $02:A725-A743
+Controller validation loop. Reads $0000,Y controller data to $8D. Reads $75 system parameter. Saves direct page. Pushes $0F18 validation address. Loads validation page. Calls CODE_00975A validation system. Restores direct page. Increments A, decrements (tests result). If zero (validation failed), increments Y, decrements X, loops to Controller_ValidateLoop if not zero. Otherwise jumps CODE_02A85E completion. If validation passed, saves direct page, calls CODE_028F2F controller details reader, reads $56 controller status. Restores direct page. Branches Controller_ProcessActive if not zero.
+
+## Controller_ProcessActive ($02:A74A)
+**Bank:** $02 | **Category:** Active Controller | **Range:** $02:A74A-A789
+Active controller processing. Stores controller status to $A7. Clears $38 system flag, $10D0 command register. Reads $10B1 system parameter to $3A and $10D2 command type. Calls CODE_028B0F system state processor. Reads $DB processing result, ANDs with $A7 controller status, masks $07 direction bits. If zero, branches CODE_02A78A. Reads $3A parameter, compares $2D and $2E special values, branches Controller_ParamSpecial. Special param: reads $10B0 system state. If zero, branches Controller_DirectionHandler. Clears $10D0 command. Reads $E0 error state, ANDs $02. If set, stores $81 error flag to $10D1, returns. Otherwise stores $8D processed value to $10D1 parameter, returns success.
+
+## System_StateRecovery ($02:A917)
+**Bank:** $02 | **Category:** State Recovery | **Range:** $02:A917-A91D
+System state recovery. Restores direct page. Increments A, decrements (tests validation). If non-zero, branches System_ErrorRecovery. Restores X index from stack. Returns with failure.
+
+## System_ErrorRecovery ($02:A91E)
+**Bank:** $02 | **Category:** Error Recovery | **Range:** $02:A91E-A92B
+Error recovery state machine. Restores X index from stack. Sets 16-bit mode. Transfers X to A. Sets 8-bit accumulator, 16-bit index. Swaps bytes, ANDs $04 error bit. If set, branches Controller_ErrorHandler. Returns success.
+
+## Controller_ErrorHandler ($02:A92C)
+**Bank:** $02 | **Category:** Error Handler | **Range:** $02:A92C-A92E
+Controller error handler. Jumps CODE_02A881 error recovery routine. Originally unreachable, now accessible via error condition.
+
+## Controller_ErrorRecovery ($02:A92F)
+**Bank:** $02 | **Category:** Controller Recovery | **Range:** $02:A92F-A94F
+Controller error recovery loop with polling. Restores direct page. Sets $02 retry counter to $8D. Poll loop: saves direct page, calls CODE_028F2F controller state reader. Reads $2E controller config to high byte, $21 button state to low byte. Restores direct page. ANDs $80 high bit for error. If set, continues retry check. Otherwise swaps config byte, ANDs $04 error bit. If set, branches Controller_ErrorHandler. Retry check: increments $8D counter, compares $05 max retries. If below, loops to Controller_PollLoop. Returns after max retries.
+
+## Controller_InputProcessor ($02:A480)
+**Bank:** $02 | **Category:** Input Processing | **Range:** $02:A480-A496
+Input data processor with bit manipulation. Saves A. Shifts right, shifts right, shifts right (divides by 8). Masks $1F (5 bits). Stores to $04A0. Restores original input. Masks $F000 upper nibble. Shifts right 7 times (divides by 128). ORs with $04A0 final combination. Returns processed value. Complex bit field extraction.
+
+## Controller_ResponseTime ($02:A497)
+**Bank:** $02 | **Category:** Response Analysis | **Range:** $02:A497-A500
+Controller response time measurement. Sets 16-bit mode. Initializes $0002 measurement to $A0 and $8D counter. Saves direct page. Response loop: calls CODE_028F2F controller state reader. Checks $21 button state, ANDs $0080 specific button. If released, exits loop. Increments $04A0 measurement and $048D counter, continues loop. Loads $14 timing value to $04A2 timing reference. Timing optimize loop: increments $048D counter. Compares $0005 limit to $048D. If limit reached, exits. Calls CODE_028F2F controller reader. Checks $21 button state, ANDs $0080. If pressed, continues optimization. Compares $14 current timing to $04A2 reference. If not improved, continues. Stores new best time to $04A2. Loads $048D counter to $04A0 optimal value, continues optimization. Timing result: sets 8-bit accumulator, 16-bit index. Calls CODE_028F22 final controller state. Checks $21 button, ANDs $08 specific bit. If not set, loads $04A0 optimal value. Otherwise sets $05 sound effect ID to $00A8, calls CODE_009783 sound system, reads $00A9 sound result. Stores final result to $51. Restores direct page. Returns.
+
+## Menu_AdvancedState ($02:A5CF)
+**Bank:** $02 | **Category:** Menu State | **Range:** $02:A5CF-A5FD
+Advanced menu state processing. Saves direct page. Calls CODE_028F22 controller state. Reads $18 system state to high byte, $38 controller config to low byte. Restores direct page. ANDs $40 special button bit. If not pressed, branches Menu_AltPath. Swaps bytes. If zero, branches Menu_AltPath. Sets $20 command ID to $10D0, $15 command type to $10D2. Reads $CE controller state, ANDs $80 high bit. If set, branches Menu_ExtendedState. Stores $CE state to $10D1 parameter. Returns. Extended state: stores $CE to $10D1 parameter and $39 system register. Returns.
+
+## Menu_AltPath ($02:A5FE)
+**Bank:** $02 | **Category:** Menu Input | **Range:** $02:A5FE-A61F
+Alternative menu input path. Sets $10 test value. Calls CODE_00DA65 system validation. Increments A, decrements (tests zero). If zero, branches Menu_StateResolution. Sets $30 alternate command to $10D0, $10 alternate type to $10D2. Reads $CE controller state. Compares $80 threshold. If different, stores to $10D1 final parameter and $39 system register. Returns.
+
+## Menu_StateResolution ($02:A620)
+**Bank:** $02 | **Category:** State Resolution | **Range:** $02:A620-A636
+Menu state resolution. Reads $8B game state. Compares $02 mode 2. If greater/equal, branches Menu_ButtonMask. Sets $EF button mask, continues Menu_ApplyMask.
+
+## Menu_ApplyMask ($02:A638)
+**Bank:** $02 | **Category:** Button Masking | **Range:** $02:A638-A645
+Universal button masking system. ANDs mask with $C8 controller 3, stores masked result. ANDs with $CA controller 4, stores. ANDs with $CC additional input, stores. Jumps Controller_MultiValidate input handler.
+
+## Menu_MainHandler ($02:A647)
+**Bank:** $02 | **Category:** Menu Handler | **Range:** $02:A647-A654
+Menu main handler. Sets 8-bit accumulator, 16-bit index. Reads $8B game state. Compares $02 for menu mode. If less, branches Menu_StandardPath. Otherwise jumps CODE_02A9A1 advanced handler.
+
+## Menu_StandardPath ($02:A654)
+**Bank:** $02 | **Category:** Standard Menu | **Range:** $02:A654-A682
+Standard menu processing. Saves direct page. Calls CODE_028F22 controller state. Reads $21 button state. Restores direct page. ANDs $08 select button. If not pressed, branches Menu_NoSelect. Saves direct page. Calls CODE_028F22 full controller state. Reads $38 state flags, masks $0F low nibble, ORs with $39 state, stores to $04A0 combined state. Restores direct page. Reads $A0 state. If zero, jumps CODE_02A881 standard handler. Sets $02 sound effect ID to $00A8. Calls CODE_009783 sound system. Reads $00A9 sound result. If zero, jumps CODE_02A881. Otherwise continues Menu_SoundActive.
+
+## Menu_SoundActive ($02:A682)
+**Bank:** $02 | **Category:** Sound Integration | **Range:** $02:A682-A69C
+Sound active menu processing. Saves direct page. Calls CODE_028F22 system state. Reads $38 state byte 1 to high byte, $39 state byte 2 to low byte. Sets 16-bit mode. Sets X to $FFFF index marker. Restores direct page. Shifts left 4× (multiplies by 16). Sets 8-bit accumulator, 16-bit index. Stores to $A8 high calculation. Swaps bytes. Stores to $A7 low calculation. Continues to Sound_StateCalculation.
+
