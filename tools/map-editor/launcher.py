@@ -62,6 +62,21 @@ TOOLS = {
 		'description': 'Run the tab formatter on all Python files',
 		'args': []
 	},
+	'validator': {
+		'script': 'utils/dialog_validator.py',
+		'description': 'Validate dialog database integrity',
+		'args': []
+	},
+	'exporter': {
+		'script': 'utils/dialog_exporter.py',
+		'description': 'Export dialogs to various formats (CSV, JSON, XML, etc.)',
+		'args': []
+	},
+	'diff': {
+		'script': 'utils/dialog_diff.py',
+		'description': 'Compare and merge dialog databases',
+		'args': []
+	},
 }
 
 
@@ -79,12 +94,12 @@ def list_tools():
 	print_banner()
 	print("Available tools:")
 	print()
-	
+
 	max_name_len = max(len(name) for name in TOOLS.keys())
-	
+
 	for name, info in sorted(TOOLS.items()):
 		print(f"  {name:<{max_name_len}}  -  {info['description']}")
-	
+
 	print()
 	print("Usage: python launcher.py <tool-name>")
 	print("Example: python launcher.py suite")
@@ -98,24 +113,24 @@ def run_tool(tool_name: str, extra_args: list = None):
 		print()
 		list_tools()
 		return 1
-	
+
 	tool = TOOLS[tool_name]
 	script_path = Path(__file__).parent / tool['script']
-	
+
 	if not script_path.exists():
 		print(f"Error: Tool script not found: {script_path}")
 		return 1
-	
+
 	# Build command
 	cmd = [sys.executable, str(script_path)]
 	cmd.extend(tool['args'])
 	if extra_args:
 		cmd.extend(extra_args)
-	
+
 	print(f"Launching {tool['description']}...")
 	print(f"Command: {' '.join(cmd)}")
 	print()
-	
+
 	# Run the tool
 	try:
 		result = subprocess.run(cmd)
@@ -137,17 +152,17 @@ def main():
 Available tools:
 """ + "\n".join(f"  {name:15} - {info['description']}" for name, info in sorted(TOOLS.items()))
 	)
-	
+
 	parser.add_argument('tool', nargs='?', help='Tool to launch')
 	parser.add_argument('args', nargs='*', help='Additional arguments to pass to the tool')
 	parser.add_argument('--list', '-l', action='store_true', help='List all available tools')
-	
+
 	args = parser.parse_args()
-	
+
 	if args.list or not args.tool:
 		list_tools()
 		return 0
-	
+
 	return run_tool(args.tool, args.args)
 
 
