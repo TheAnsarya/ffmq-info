@@ -18309,3 +18309,59 @@ Graphics calculation configuration. Base values $D96C, thresholds $D96E, offsets
 **Bank:** $02 | **Category:** Data Processing | **Range:** $02:D994-DA17
 Multi-stage data processing with bit manipulation. Sets bank $0A. Loads $83 state, shifts left 3× (×8), adds $0A39 base to Y. Stores $69 graphics data at Y+$00. Stores $6B graphics data at Y+$18. Adds $79 calculation value sequentially: Y+$1A, Y+$1C, Y+$1E (4-value sequence). Loads DATA8_0a8000,x bytes. Processes 8 bits per byte: shifts left, XBA swap, adds carry. Decrements $79 count, loops. Final: multiplies result by $18 via $4202/$4203. Adds Y+$00 base to $4216 result. Stores to Y+$02. Increments Y by 2. Counter loop 0-2, exits at 3. Complex bit-packing and calculation system.
 
+## Coord_CalculateComplex ($02:D6E6)
+**Bank:** $02 | **Category:** Coordinate Calculation | **Range:** $02:D6E6-D72A
+Complex position calculation with multiple transformations. Stores result to $17. Loads $00 base, triples it (add 3×), subtracts 3. Adds stack value, transfers to X. Loads $18 height, divides by 2, pushes. Loads DATA8_02d72b,x position data, subtracts half-height, stores to $16. Calls Coord_PositionProcessor. 16-bit mode: loads $17, masks 8-bit, shifts left 5× (×32). 8-bit: adds $16. XBA swaps, adds carry. XBA back. Shifts left 1×. Adds $A800 base, stores to $72 final address.
+
+## DATA8_02d72b (Position Data Table)
+**Bank:** $02 | **Category:** Data Table | **Range:** $02:D72B-D733
+9-byte position offset table. Values: $10,$00,$00,$0B,$15,$00,$06,$10,$1A. Used by coordinate calculation for position lookups.
+
+## Coord_PositionProcessor ($02:D734)
+**Bank:** $02 | **Category:** Coordinate Processing | **Range:** $02:D734-D779
+Position processor with height-based lookup. Loads $83 state, shifts left 2× (×4), adds $0A2D base to Y. MVN $0A16→Y size $03 (4 bytes). Loads $18 height parameter. Searches DATA8_02d77a height table (word values), increments X by 2 per iteration. On match, divides X by 2 (word to byte), stores to $22,X via $83 state index. Loads $02 current state, checks if $50 (special). Special processing: loads $07, checks non-zero, loads $2D, adds $08, stores $2D, sets $2F=$0C.
+
+## DATA8_02d77a (Height Table)
+**Bank:** $02 | **Category:** Data Table | **Range:** $02:D77A-D784
+10-byte height value table (5 words). Values: $06,$06,$08,$08,$0A (repeated 3×),$08,$1C,$0A. Used for height-based position lookups.
+
+## State_BankManager ($02:D784)
+**Bank:** $02 | **Category:** State Management | **Range:** $02:D784-D7D2
+State processing with threshold search and multiplication. Searches DATA8_02d7d3 table (9-byte records). Compares threshold vs $20 state. On match, increments X (skip threshold), adds $D7D3 base, MVN to $0A15 dest, size $07 (8 bytes). Loads $20 state to $4202, multiplies by $05, calls CODE_00971E. Loads result, reads DATA8_098462,x from Bank $09, stores to $15.
+
+## DATA8_02d7d3 (State Data Table)
+**Bank:** $02 | **Category:** Data Table | **Range:** $02:D7D3-D809
+58-byte state configuration table with 9-byte records. Format: threshold byte + 8 data bytes. Thresholds: $37,$3F,$41,$49,$4F,$50,$FF. Each record contains coordinates, sizes, and indices. Complex state machine configuration.
+
+## Entity_GraphicsCoordinator ($02:D80A)
+**Bank:** $02 | **Category:** Entity/Graphics Coordination | **Range:** $02:D80A-D890
+Multi-bank graphics transfer engine. Loads $02,X entity state to $20. Multiplies by $05 via $4202/$4203, calls CODE_00971E. Uses result as index to DATA8_098460-098464 (Bank $09): loads to $69/$6A/$6B. Checks special flag $098464,x for $FF, branches to Entity_ValueAdjuster. Otherwise: loads $098463,x offset. Calculates state index ×64 + $C040 as dest Y. First transfer: offset ×16 + $8000 as source X, MVN Bank $09→$7E size $0F (16 bytes). Second transfer: Y+$10 dest, param ×16 + $8000 source, MVN size $0F (16 bytes). Dual-buffer graphics system with bank $09 data.
+
+## Graphics_DataLoader ($02:D597)
+**Bank:** $02 | **Category:** Graphics Data Loading | **Range:** $02:D597-D5BA
+Graphics data loader with bit mask generation. Loads DATA8_0a8000,x to $6D (data 1). Loads DATA8_0a830c,x to $6E (data 2). Generates mask: $FF - data1 AND data2 → $6F. Calculates data1 AND data2 → $6E. Sophisticated bit manipulation for graphics processing.
+
+## Graphics_SetupEngine ($02:D5BB)
+**Bank:** $02 | **Category:** Graphics Setup | **Range:** $02:D5BB-D626
+Tile-based graphics setup with WRAM writes. Sets bank $7E to $2183. Loads $83 state index ×2, reads DATA8_02d627,x tile data to $74. Calls CODE_02D6D0 position calc. Loads Y position to $72. Tile write loop: sets $2181 WRAM addr, writes tile low byte to $2180, ORs high byte with $20 attributes, writes to $2180. Decrements width X, checks height $7F. On row end: adds $0040 (64) to Y for next row, resets height. Increments tile $74, loops.
+
+## DATA8_02d627 (Tile Data Table)
+**Bank:** $02 | **Category:** Data Table | **Range:** $02:D627-D62C
+6-byte tile index table. Values: $01,$00,$65,$00,$C9,$00. Word values: $0001,$0065,$00C9. Base tiles for graphics setup.
+
+## Memory_TileUpdate ($02:D62D)
+**Bank:** $02 | **Category:** Memory Management | **Range:** $02:D62D-D66E
+Memory tile update with row calculation. Increments Y position. Sets bank $7E. Loads $83 state ×2, shifts $6E graphics left, adds carry, shifts left 2× (×4). Writes to $2181, ORs $2180 existing with calculation and $20, writes updated. Decrements $80 counter. On zero: resets $80 to $18 height, calculates 33 - height ×2 for row offset. On non-zero: sets increment $02. Adds to $72 memory base.
+
+## Graphics_SetPixel ($02:D66F)
+**Bank:** $02 | **Category:** Graphics Processing | **Range:** $02:D66F-D6B2
+Dual-phase graphics pixel transfer. Sets bank $7E, loads $70 offset to $2181. Loads $15 graphics bank, sets as data bank. Loop 1: transfers 16 bytes from ($69) pointer to $2180, increments $69. Loop 2: transfers 8 bytes with zero-byte interleaving (byte, $00, byte, $00...), increments $69. Complex pixel format with spacing.
+
+## Graphics_AltPixel ($02:D6B3)
+**Bank:** $02 | **Category:** Memory Management | **Range:** $02:D6B3-D6CF
+Fast WRAM clear via direct PPU access. Sets direct page $2100. Clears $2183 (bank 0). Loads $0A70 to $2181 address. Loads $20 (32) count. Loop: writes $00 to $2180, decrements, loops. Optimized memory clear using SNES registers.
+
+## Coord_CalculationEngine ($02:D6D0)
+**Bank:** $02 | **Category:** Coordinate Calculation | **Range:** $02:D6D0-D6E6
+Position calculation with conditional adjustment. Loads $83 state index. Calculates 13 - $19 position + 1. Loads $0A0A,x flags. If zero, stores result to $17. If non-zero, checks $0A07,x alternate flags. If zero, decrements result. Stores to $17. Coordinate adjustment based on state flags.
+
