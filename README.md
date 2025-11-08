@@ -281,10 +281,11 @@ enemy_editor.bat
 4. [Graphics Quick Start](docs/graphics-quickstart.md) - Graphics modding
 
 **Developers:**
-1. [Contributing](CONTRIBUTING.md) ⭐ - How to contribute
-2. [Build Guide](docs/guides/BUILD_GUIDE.md) - Comprehensive build system
-3. [Architecture](docs/ARCHITECTURE.md) - Project architecture
-4. [Function Reference](docs/FUNCTION_REFERENCE.md) - Complete code reference (18K+ lines)
+1. [Developer Onboarding](docs/DEVELOPER_ONBOARDING.md) ⭐ - 0 to productive in 60 minutes!
+2. [Contributing](CONTRIBUTING.md) ⭐ - How to contribute
+3. [Build Guide](docs/guides/BUILD_GUIDE.md) - Comprehensive build system
+4. [Architecture](docs/ARCHITECTURE.md) - Project architecture
+5. [Function Reference](docs/FUNCTION_REFERENCE.md) - Complete code reference (18K+ lines)
 
 **Researchers:**
 1. [Bank Classification](docs/technical/BANK_CLASSIFICATION.md) - ROM structure

@@ -57,6 +57,12 @@ This is the master index for all project documentation. Files have been organize
 
 Comprehensive guides for users and developers.
 
+### Developer Guides
+- **[DEVELOPER_ONBOARDING.md](DEVELOPER_ONBOARDING.md)** ⭐ - Complete onboarding for new developers (0 to productive in 60 minutes)
+- **[LOGGING-QUICK-REF.md](guides/LOGGING-QUICK-REF.md)** - Project logging system reference
+- **[graphics-quickstart.md](graphics-quickstart.md)** - Graphics tools quick start
+- **[TEXT_EDITING.md](TEXT_EDITING.md)** - Text editing guide
+
 ### User Guides
 - **[BUILD_GUIDE.md](guides/BUILD_GUIDE.md)** - Complete build system guide with troubleshooting
 - **[BUILD_QUICK_START.md](guides/BUILD_QUICK_START.md)** - Fast-track build instructions
