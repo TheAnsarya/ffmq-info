@@ -18365,3 +18365,123 @@ Fast WRAM clear via direct PPU access. Sets direct page $2100. Clears $2183 (ban
 **Bank:** $02 | **Category:** Coordinate Calculation | **Range:** $02:D6D0-D6E6
 Position calculation with conditional adjustment. Loads $83 state index. Calculates 13 - $19 position + 1. Loads $0A0A,x flags. If zero, stores result to $17. If non-zero, checks $0A07,x alternate flags. If zero, decrements result. Stores to $17. Coordinate adjustment based on state flags.
 
+## Graphics_StateValidator ($02:D3FF)
+**Bank:** $02 | **Category:** Graphics State Management | **Range:** $02:D3FF-D485
+Complex graphics validation and processing engine. Checks $1D/$1E/$1F graphics flags. If all zero, exits. Special mode: checks $0D for $50, stores $40 to $0505, sets $1E/$1F to $01. Standard mode: stores $3F to $0505, sets bank $7E. Triple-nested loop: Y main (0-16), X (0-3), inner row (100 rows), column (16 columns). Calls Graphics_PixelProcessor for each pixel. Row advancement +$0020. Completion sets $FF to $02/$0D state. VBlank sync via $E3 flag.
+
+## Graphics_PixelProcessor ($02:D489)
+**Bank:** $02 | **Category:** Graphics Processing | **Range:** $02:D489-D4B2
+Advanced pixel manipulation with dual bit masking. Saves X/Y/A/P. Masks A to 8-bit, adds stack value $03,S, masks to 4-bit for X index. Loads graphics data via [$85],Y, applies DATA8_02d3ed,x bit mask, stores result. Loads offset +$0010 data, applies same mask, stores. Restores P/A/Y/X. Returns. Sophisticated graphics bit operations.
+
+## State_ValidationEngine ($02:D4F7)
+**Bank:** $02 | **Category:** State Processing | **Range:** $02:D4F7-D58E
+State processing pipeline with bank switching. Sets program bank, checks $20 state parameter. If $FF (invalid), exits. Calls CODE_02D784 state processor, CODE_02D5BB graphics setup, CODE_02D6D0 calculation. Stores $1A calculated width to $81, $18 height to $80. Complex offset calculation: $83 state ×2, adds to base $3800 with DATA8_02d58f offset, stores to $70. Graphics data retrieval: $83 ×4 + $21 parameter ×2 as X index, loads $39,X/$51,X graphics pointers to $69/$6B. Calls Graphics_RenderLoop.
+
+## Graphics_RenderLoop ($02:D54B)
+**Bank:** $02 | **Category:** Graphics Rendering | **Range:** $02:D54B-D58B
+Main graphics rendering loop with pixel processing. Calls Graphics_DataLoader setup. Sets $7F pixel count to $08. Pixel loop: shifts $6D graphics data left, if carry calls Graphics_SetPixel, shifts $6F data left. If not carry on first shift but carry on second, calls Graphics_AltPixel. Advances memory offset +$0020 (32 bytes), calls Memory_TileUpdate. Decrements $81 width, exits if zero. Decrements $7F pixel counter, continues pixel loop. On pixel count zero: increments $6B graphics row, continues render loop.
+
+## Entity_ProcessingLoop ($02:D230)
+**Bank:** $02 | **Category:** Entity Management | **Range:** $02:D230-D268
+Entity initialization loop with sound integration. Calls CODE_02EA60 entity processor. Stores $1C to $7EC380,X entity data, Y+$02 to $7EC3A0,X offset, $C5 to $7EC240,X flags. Increments Y, checks limit $03, loops. Sound integration: $18 parameter 1, $0C parameter 2, calls CODE_0B92D6 sound engine. Calls CODE_02DA18 processing. Increments $E6 state counter, waits for zero. Restores P/D/B/Y/X/A, returns long.
+
+## Graphics_DataSetup ($02:D269)
+**Bank:** $02 | **Category:** Graphics Setup | **Range:** $02:D269-D357
+VRAM graphics data initialization. Calls CODE_02EA60, stores $20 to $7EC380,X, $00 to $7EC360,X, $C5 to $7EC240,X. Y loop (0-32): loads Graphics_DataSetup.data,Y to $7EC440,X/$7EC460,X/$7EC4A0,X/$7EC4C0,X. Stores $21 to $7EC380,X, loops. MVN transfer 1: $07DB74 to $7EC1C0 (16 bytes). MVN transfer 2: $058850 to $7EC1E0 (16 bytes). Increments $E5, branches CODE_02D673. Includes 32-byte data table and two data transfer sections copying $D09E-D0B8 ranges to $1144-115C.
+
+## Memory_InitEngine ($02:D358)
+**Bank:** $02 | **Category:** Memory Management | **Range:** $02:D358-D388
+High-speed memory clearing. Clears $7EA800 to $00. MVN block move: $7EA800 to $7EA801 (4094 bytes) within bank $7E. Sets bank $7E to $8D, offset $3800 to $8E, count $04 to $90. Calls CODE_02E1C3 memory setup. Restores B/P. Returns. Efficient memory initialization using MVN instruction.
+
+## GameState_ProcessingEngine ($02:D389)
+**Bank:** $02 | **Category:** Game State Management | **Range:** $02:D389-D3E6
+Complex state validation and transition engine. Clears $83/$1D/$1E/$1F/$7B. If $01 flag set, increments $EA. State loop: loads $02,X current state to $20, compares with $0D,X target. If equal, validates. If $FF special state: loads $0D,X target, stores to $02,X current, calls CODE_02D784 state change, loads $0A1C to $07,X, increments $1D,X flag. Validation: compares $10,X reference with $07,X current. If not equal, sets error flag $FF, increments $7B error counter. Calls CODE_02D4F7 state processor, compares with $07,X, loops if not equal. Stores $02,X to $0D,X, $07,X to $10,X. Increments $83 index, checks against $00 limit, loops. Stores $04B3 final state to $13. Returns.
+
+## DATA8_02d3e7 (State Offset Table)
+**Bank:** $02 | **Category:** Data Table | **Range:** $02:D3E7-D3EC
+6-byte state offset table. Values: $20,$38,$A0,$44,$20,$51. Memory offsets for state processing.
+
+## DATA8_02d3ed (Bit Mask Table)
+**Bank:** $02 | **Category:** Data Table | **Range:** $02:D3ED-D3FC
+16-byte bit mask table. Values: $7F,$7F,$FB,$FB,$DF,$DF,$BF,$BF,$FD,$FD,$EF,$EF,$FE,$FE,$F7,$F7. Graphics bit manipulation masks.
+
+## Graphics_PatternSelect ($02:AC32)
+**Bank:** $02 | **Category:** Graphics Processing | **Range:** $02:AC32-AC52
+Pattern selection with system reset. Checks $7EC440,X graphics pattern. If zero, branches Graphics_PatternZero. If non-zero, increments pattern, masks $03, stores, returns. PatternZero branch: loads $7EC440,X, increments, masks $03, stores. If zero, triggers reset: stores $0A to $0505 system reset command. Returns.
+
+## DATA8_02ac53 (Graphics Pattern Table)
+**Bank:** $02 | **Category:** Data Table | **Range:** $02:AC53-AC92
+64-byte progressive graphics pattern table. Ascending: $00,$03,$09,$0C...$60 (peak). Plateau: $60 repeated 8 times. Descending: $60,$5D,$5D...$24. End marker $24. Pattern progression for graphics transformations.
+
+## DATA8_02ac93-02ac9f (Graphics Configuration Tables)
+**Bank:** $02 | **Category:** Data Tables | **Range:** $02:AC93-ACA2
+Configuration: $03,$03,$03,$03 (4 bytes). Direction vectors: $00,$04,$0C,$08 (4 bytes). Boundary limits: $F0,$F0,$F0,$F0 (4 bytes). Extended boundaries: $F0,$F0,$F0,$F0 (4 bytes). Graphics system constants.
+
+## Graphics_ProcessingEngine ($02:ACA3)
+**Bank:** $02 | **Category:** Graphics Engine | **Range:** $02:ACA3-ACB7
+Graphics state dispatcher. Sets 16-bit mode. Loads $7EC360,X graphics parameter to Y. Reads Graphics_StateJumpTable,Y entry, calls CODE_009783 graphics engine. Returns. Jump table contains 5 handler addresses: $02AE61,$02AEB3,$02AEDF,$02AF08,$02AFA2.
+
+## Graphics_CommandInit ($02:ACC1)
+**Bank:** $02 | **Category:** Graphics Initialization | **Range:** $02:ACC1-AD13
+Graphics command initialization. Stores $FE to $7EC340,X mode. Reads $7EC240,X state, ANDs $BF, stores. Sets command: $02 to $F0, $0A to $00, calls CODE_02FE0F with $D7 command. Reads $0417 status, masks $03. If $03, sets $67 code, else $60. Stores code to $7EC280,X. Sets $2C to $7EC2A0,X, $03 to $7EC300,X, $06 to $7EC480,X, $01 to $7EC360,X state. ORs $40 to $7EC240,X control. Returns.
+
+## Color_ChannelProcessor ($02:AD14)
+**Bank:** $02 | **Category:** Color Processing | **Range:** $02:AD14-AD32
+Color channel management with state progression. Reads $7EC480,X channel, decrements, stores. If zero, resets to $06, reads $7EC2E0,X state, compares $04 maximum. If not max, increments state. Returns. Color channel cycle with state progression.
+
+## Color_ModeProcessor ($02:AD33)
+**Bank:** $02 | **Category:** Color Processing | **Range:** $02:AD33-AD3E
+Color mode configuration. Sets $02 to $7EC360,X mode, $19 to $0505 system parameter. Returns. Simple mode setup.
+
+## Graphics_DataProcessor ($02:AD3F)
+**Bank:** $02 | **Category:** Graphics Processing | **Range:** $02:AD3F-AD6C
+Graphics data transformation with threshold. Reads $7EC2A0,X, shifts left 4× (×16). Compares $80 threshold. If above, sets $03 to $7EC360,X overflow state, $80 maximum value. Stores processed value to $7EC2A0,X. If $048D system state set, reads $7EC280,X, shifts left 2×, stores. Returns.
+
+## Buffer_MemoryCoordinator ($02:AD6D)
+**Bank:** $02 | **Category:** Memory Management | **Range:** $02:AD6D-ADD7
+Buffer memory coordination. Reads $7EC380,X buffer address to $04A7, $7EC320,X control to $04A5, masks $7EC240,X state $BF, stores $14 buffer size to $7EC340,X, clears $7EC380,X, sets $08 to $04A4 buffer parameter. Calls CODE_02FE38 buffer processor. Restores $04A7 to $7EC380,X. Checks $048D state: if set, stores $94 active, else $64 inactive to $7EC280,X. Sets $88 to $7EC2A0,X control, $03 to $7EC300,X mode, restores $04A5 to $7EC320,X, sets $04 to $7EC360,X processing mode, ORs $40 to $7EC240,X. Returns.
+
+## Stack_ContextManager ($02:D220)
+**Bank:** $02 | **Category:** Stack Management | **Range:** $02:D220-D22E
+Stack context and memory mode manager. Checks $7E. If zero, branches Stack_StateManagement. Sets 8-bit mode. Checks $02 for $50, branches Graphics_DataSetup if equal. Clears $EC entity counter, initializes Y register to $00. Stack and entity initialization.
+
+## DATA8_02aa79 (Mathematical Transformation Table)
+**Bank:** $02 | **Category:** Data Table | **Range:** $02:AA79-AAB8
+64-byte mathematical transformation sequence. Ascending: $00,$03,$09,$0C...$60. Plateau: $60 repeated 8 times. Descending: $60,$5D,$5D...$24. End marker $24. Progressive pattern for calculations.
+
+## DATA8_02aab9-02aac5 (System Configuration Tables)
+**Bank:** $02 | **Category:** Data Tables | **Range:** $02:AAB9-AAC8
+System configuration: $03,$03,$03,$03 (4 bytes). Coordinate offsets: $00,$04,$0C,$08 (4 bytes). Boundary limits: $F0,$F0,$F0,$F0 (4 bytes). Extended boundaries: $F0,$F0,$F0,$F0 (4 bytes). System constants.
+
+## Graphics_MemoryCoord ($02:AAC9)
+**Bank:** $02 | **Category:** Graphics Memory | **Range:** $02:AAC9-AAD9
+Graphics memory coordination. Sets 16-bit mode. Clears A, swaps bytes. Loads $7EC360,X graphics parameter. Calls CODE_009783 extended graphics. Returns. Graphics state table at $02:AADA contains 5 jump targets.
+
+## Graphics_CommandInterpreter ($02:AAE4)
+**Bank:** $02 | **Category:** Graphics Commands | **Range:** $02:AAE4-AB36
+Graphics command system. Stores $FE to $7EC340,X mode. Masks $7EC240,X with $BF. Sets command: $02 to $F0, $0A to $00, calls CODE_02FE0F with $D7 ID. Reads $0417 status, masks $03. If $03, sets $67 code, else $60. Stores to $7EC280,X. Configures: $2C to $7EC2A0,X, $03 to $7EC300,X, $06 to $7EC480,X, $01 to $7EC360,X. ORs $40 to $7EC240,X. Returns.
+
+## Graphics_ChannelManager ($02:AB37)
+**Bank:** $02 | **Category:** Channel Management | **Range:** $02:AB37-AB56
+Graphics channel cycle. Reads $7EC480,X channel, decrements, stores. If zero, resets to $06, reads $7EC2E0,X state, compares $04 limit. If below limit, increments state. Returns. Channel cycling with state progression.
+
+## Graphics_SetChannelMode ($02:AB57)
+**Bank:** $02 | **Category:** Channel Configuration | **Range:** $02:AB57-AB62
+Channel mode setup. Sets $02 to $7EC360,X mode, $19 to $0505 system parameter. Returns. Simple mode configuration.
+
+## Graphics_ChannelStateProcessor ($02:AB63)
+**Bank:** $02 | **Category:** State Processing | **Range:** $02:AB63-AB90
+Channel state processing with threshold. Reads $7EC2A0,X config, shifts left 4× (×16). Compares $80 threshold. If above, sets $03 to $7EC360,X overflow, $80 maximum value. Stores processed to $7EC2A0,X. If $048D system state set, reads $7EC280,X channel data, shifts left 2×, stores. Returns.
+
+## Graphics_MemoryCoordinator ($02:AB91)
+**Bank:** $02 | **Category:** Memory Coordination | **Range:** $02:AB91-ABFB
+Graphics buffer coordination. Reads $7EC380,X buffer to $04A7, $7EC320,X control to $04A5. Masks $7EC240,X with $BF. Sets $14 buffer size to $7EC340,X, clears $7EC380,X, sets $08 to $04A4. Calls CODE_02FE38 buffer processor. Restores $04A7 to $7EC380,X. Checks $048D: if set, stores $94 active, else $64 inactive to $7EC280,X. Sets $88 to $7EC2A0,X, $03 to $7EC300,X, restores $04A5 to $7EC320,X, sets $04 to $7EC360,X, ORs $40 to $7EC240,X. Returns.
+
+## Sound_GraphicsIntegration ($02:ABFB)
+**Bank:** $02 | **Category:** Sound System | **Range:** $02:ABFB-AC2F
+Sound integration with graphics sync. Sets $10 to $7EC580,X sound parameter, $03 to $00A8 sound channel. Calls CODE_009783 sound system. Reads $00A9 result, adds $02, XORs $FF, shifts left, stores to $7EC5A0,X. Sets $07 to $00A8 sound effect, calls CODE_009783. Subtracts $00A9 from $03, stores to $7EC5C0,X. Decrements $04A4 buffer counter, continues Graphics_ChannelManager+$02 loop if not zero. Returns when complete.
+
+## Graphics_PatternManager ($02:AC32)
+**Bank:** $02 | **Category:** Pattern Management | **Range:** $02:AC32-AC3E
+Graphics pattern index management. Reads $7EC460,X pattern index, masks $03, stores. If zero, branches Graphics_PatternZero. Returns with pattern set. Pattern validation and selection.
+
