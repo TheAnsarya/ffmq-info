@@ -1,27 +1,94 @@
-# FFMQ Map Editor
+# FFMQ Map Editor & Game Data Tools
 
-A comprehensive pygame-based map editor for Final Fantasy Mystic Quest, supporting overworld, dungeon, and town maps.
+A comprehensive suite of pygame-based editors and tools for Final Fantasy Mystic Quest ROM hacking.
 
-## Features
+## 🎮 Editor Suite
 
-### Core Editing
+### Map Editor
 - **Multi-layer editing** - Edit ground (BG1), upper (BG2), and event (BG3) layers independently
 - **Multiple tools** - Pencil, bucket fill, eraser, rectangle, line, select, and eyedropper
 - **Undo/Redo** - Full undo/redo support for all operations (up to 100 steps)
 - **Zoom** - Zoom in/out from 25% to 400% with mouse wheel or keyboard
-- **Grid** - Toggle-able grid overlay for precise placement
-
-### Map Management
-- **Create new maps** - Custom dimensions (up to 256x256 tiles)
-- **Load/Save maps** - Import from and export to FFMQ ROM format
-- **Map properties** - Edit map type, tileset, music, encounter rate, etc.
-
-### UI Features
 - **Tileset panel** - Browse and select tiles from current tileset (256 tiles)
-- **Layer panel** - Control layer visibility and lock/unlock layers
-- **Properties panel** - View and edit map and tile properties
-- **Toolbar** - Quick access to tools and common operations
-- **Responsive design** - Resizable window with adaptive UI
+
+### Game Editor (`game_editor.py`) - NEW!
+- **Unified 8-tab interface** - Maps, Dialogs, Enemies, Spells, Items, Dungeons, Events, Settings
+- **Database integration** - Edit all game data from one application
+- **Keyboard shortcuts** - Ctrl+S save, Ctrl+1-8 tab switching, F1 stats toggle
+- **Export/Import** - JSON/CSV export for all data systems
+
+### Enemy Editor (`ui/enemy_editor.py`) - NEW!
+- **Visual editing** - 1200×800 window with enemy list + editor panel
+- **Stat controls** - Numeric inputs with +/- buttons for HP, attack, defense, magic, speed
+- **Resistance bars** - Drag visual sliders for elemental resistances (0-255)
+- **Flag checkboxes** - Boss, undead, flying, regenerating, etc.
+- **Difficulty calculation** - Real-time difficulty rating
+- **Load from ROM** - 256 enemies at 0x0D0000
+
+### Formation Editor (`ui/formation_editor.py`) - NEW!
+- **Drag-and-drop** - Position up to 6 enemies on battle screen
+- **Grid snapping** - 16px grid for precise placement
+- **Visual preview** - See formation layout in real-time
+- **Enemy selection** - Browse and add enemies from database
+
+### Dialog Editor (integrated)
+- **Text editing** - Edit all game dialog and NPC conversations
+- **Multi-character encoding** - Edit "the ", "you", etc. sequences
+- **Flow visualization** - See dialog branching and connections
+- **Batch operations** - Find/replace across all dialogs
+
+## 🗂️ Database Systems
+
+### Enemy System (~1,560 lines)
+- **256 enemies** × 256 bytes each (64KB total at 0x0D0000)
+- **Complete stats** - HP, attack, defense, magic, speed, accuracy, evasion
+- **9 resistances** - Fire, water, earth, wind, holy, dark, poison, status, physical
+- **AI scripts** - 8 behavior types with HP-threshold actions
+- **Item drops** - Up to 3 items with rarity (always/common/uncommon/rare)
+- **12 flags** - Boss, undead, flying, aquatic, humanoid, mechanical, dragon, etc.
+
+### Spell System (~750 lines)
+- **128 spells** × 64 bytes each (8KB total at 0x0E0000)
+- **8 damage formulas** - Fixed, magic-based, level-based, HP%, MP-based, pierce, hybrid, random
+- **8 elements** - None, fire, water, earth, wind, holy, dark, poison
+- **8 targeting modes** - Single enemy, all enemies, single ally, all allies, self, etc.
+- **13 status effects** - Poison, sleep, paralysis, confusion, silence, blind, etc.
+- **Spell progression** - Auto-generate Fire→Fira→Firaga tiers
+
+### Item System (~600 lines)
+- **256 items** × 32 bytes each (8KB total at 0x0F0000)
+- **8 item types** - Consumable, weapon, armor, helmet, accessory, key item, coin, book
+- **Equipment stats** - Attack, defense, magic, speed, HP/MP bonuses
+- **Character restrictions** - Benjamin, Kaeli, Phoebe, Reuben, Tristam
+- **9 flags** - Usable in battle/field, consumable, cursed, rare, two-handed, etc.
+
+### Dungeon System (~470 lines)
+- **Enemy formations** - Up to 6 enemies with precise positioning
+- **Encounter tables** - Weighted random selection
+- **Encounter zones** - Normal, high rate, boss area, safe zone
+- **Terrain types** - Overworld, cave, dungeon, tower, forest, water, mountain, castle
+
+## 🛠️ Utilities
+
+### Validator (`validator.py`) - NEW!
+- **Data validation** - Check all enemies, spells, items for errors
+- **Range checking** - HP (0-65535), stats (0-255), levels (1-99)
+- **Balance analysis** - HP scaling, MP efficiency, price/stat ratios
+- **Error reporting** - ERROR/WARNING/INFO severity levels
+- **Export reports** - Generate text reports of validation results
+
+### Comparator (`comparator.py`) - NEW!
+- **ROM comparison** - Compare original vs modified ROM files
+- **Track changes** - See all stat, name, flag changes
+- **CSV export** - Export changes to spreadsheet
+- **Summary statistics** - Total changes, affected entities
+- **Detailed reports** - Group changes by category and entity
+
+### Dialog CLI (`dialog_cli.py`) - NEW!
+- **Command-line** - Batch dialog operations
+- **Import/Export** - Convert dialogs to/from JSON
+- **Search** - Find dialog by text
+- **Batch editing** - Find/replace across all dialogs
 
 ## Installation
 
