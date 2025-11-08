@@ -18741,3 +18741,55 @@ Enhanced input validation with system coordination. Loads $D2EF validation syste
 **Bank:** $02 | **Category:** Complex State | **Range:** $02:9BEC-9C3C
 Complex input state management. Calls System_ValidateEnhanced input state validation. ANDs with $DB input validation flags. If non-zero, branches Input_ComplexProcess. Jumps Input_StandardComplete standard processing. ComplexProcess: reads $DB, ANDs $08 flag. If not set, branches Input_AltPattern. Otherwise complex processing sequence executes. AltPattern: reads $DB, ANDs $50 pattern, compares $50. If not equal, branches Input_Reduction. Calls System_ValidateEnhanced validation. ANDs $50 validated pattern, compares $50. If equal, branches Input_Pattern_Enhanced. Returns if inconsistent. Pattern_Enhanced: sets 16-bit mode, shifts $77 right, sets 8-bit accumulator, 16-bit index. Calls CODE_029BE1. Loads $D37B handler to X, calls CODE_02883D. Continues to Input_Reduction. Originally unreachable.
 
+## Graphics_InitSystem ($02:9771)
+**Bank:** $02 | **Category:** Graphics Init | **Range:** $02:9771-9793
+Graphics system initialization. Calls CODE_0297B8 graphics base system. Sets $14 graphics processing mode to $0505. Saves direct page for context switch. Calls CODE_028F2F graphics context. Reads $21 graphics state flags, ANDs $C0. If set (graphics not ready), branches Graphics_InitDone. Reads $1B X coordinate source to $18 destination, $1C Y source to $19 destination, $1D Z source to $1A destination. Restores direct page. Returns.
+
+## Graphics_CoordScale ($02:9798)
+**Bank:** $02 | **Category:** Coordinate Scaling | **Range:** $02:9798-97E0
+Coordinate scaling with 16-bit precision. Reads $90 graphics processing index. Compares with $8F graphics boundary. If equal, calls CODE_029797 graphics validation. Sets 16-bit mode. Reads $DD scaling factor, masks $00FF to 8-bit. Shifts left 3× (multiplies by 8). Stores to $77 scaled value. Sets 8-bit accumulator, 16-bit index. Reads $3A graphics mode. Compares $D0 for mode $D0. If not equal, branches Graphics_ProcessComplete. Complex coordinate transformation for mode $D0 executes. ProcessComplete: calls CODE_02999D validate graphics state, CODE_0299DA update graphics data, CODE_029BED finalize graphics state. Jumps CODE_029CCA graphics completion.
+
+## Entity_UpdateCalculations ($02:97E1)
+**Bank:** $02 | **Category:** Mathematical Division | **Range:** $02:97E1-980F
+Mathematical division with hardware acceleration. Loads $77 dividend low to $4204 hardware division register, $78 dividend high to $4205 hardware division register high. Reads $39 division mode. Compares $80 for mode $80, branches Math_DivMode80. Compares $81 for mode $81, branches Math_DivMode81. Returns if no division. DivMode80: calls Math_DivGetParam, continues Math_DivExecute. DivMode81: reads $B3 division parameter. DivExecute: calls CODE_009726 hardware division, loads $4214 division result to $77. Returns.
+
+## Math_DivGetParam ($02:9810)
+**Bank:** $02 | **Category:** Division Parameters | **Range:** $02:9810-9822
+Division parameter calculation. Reads $1021 system state 1, ANDs $C0 state flags. If set, branches Math_DivParam1. Reads $10A1 system state 2, ANDs $C0 state flags. If set, branches Math_DivParam1. Returns $02 default parameter. DivParam1: returns $01 alternative parameter.
+
+## System_AudioIntegration ($02:9823)
+**Bank:** $02 | **Category:** Audio Integration | **Range:** $02:9823-982E
+Audio system integration. Loads $D2E4 audio system address to X, calls CODE_028835 audio system call. Loads $D4FE audio finalization address to X. Jumps CODE_028835 audio finalization.
+
+## System_GraphicsIntegration ($02:982F)
+**Bank:** $02 | **Category:** Graphics Integration | **Range:** $02:982F-983A
+Graphics system integration. Loads $D2E4 graphics system address to X, calls CODE_028835 graphics system call. Loads $D507 graphics finalization address to X. Jumps CODE_028835 graphics finalization.
+
+## System_ErrorMax ($02:9847)
+**Bank:** $02 | **Category:** Error Handling | **Range:** $02:9847-984C
+Error handling with maximum value assignment. Loads $7FFF maximum value (32767) to $77 error indicator. Returns. Sets error condition to indicate system failure.
+
+## Entity_Synchronize ($02:9856)
+**Bank:** $02 | **Category:** Multi-System Coordination | **Range:** $02:9856-9864
+Multi-system coordination. Loads $D3D7 subsystem 1 address to X, calls CODE_028835. Loads $D3EC subsystem 2 address to X, calls CODE_028835. Calls CODE_02A22B coordination function 1, calls CODE_02A22B coordination function 2. Jumps CODE_02A0E1 coordination finalization.
+
+## Entity_Handler1-4 ($02:9865-988D)
+**Bank:** $02 | **Category:** Specialized Handlers | **Range:** $02:9865-988D
+Specialized entity handlers. Handler1: loads $D43B handler 1 to X, jumps CODE_028835. Handler2: loads $D443 handler 2 to X, jumps CODE_028835. InitBaseGraphics: loads $D316 base system to X, jumps CODE_028835. ValidateBoundaryAlt: loads $D2F5 validation handler to X, jumps CODE_028835. Handler3: loads $D478 handler 3 to X, jumps CODE_028835. Handler4: loads $D484 handler 4 to X, jumps CODE_028835.
+
+## Coord_Extended ($02:9A83)
+**Bank:** $02 | **Category:** Coordinate Processing | **Range:** $02:9A83-9A8A
+Extended coordinate processing with validation. Calls CODE_029A8B base coordinate processing. Sets 16-bit mode. Loads $77 calculated coordinate value. Branches CODE_029A9A coordinate finalization.
+
+## Entity_ProcessStandardMode ($02:9A8B)
+**Bank:** $02 | **Category:** Entity Positioning | **Range:** $02:9A8B-9AC7
+Advanced entity positioning. Clears high byte. Reads $12 X coordinate base. Adds $DD coordinate offset via CLC/ADC. Swaps bytes, rotates left for extended precision, swaps back. Sets 16-bit mode. Stores to $77 base calculation. Calls Entity_ValidateCoordSystem validation. Divides by 2, by 4, by 8, by 16 (total ÷16). Calls Entity_ProcessCoordinates. Adds to $77 base via CLC/ADC. Multiplies by 2 (shifts left). Stores to $77 final coordinate. Sets 8-bit accumulator, 16-bit index. Returns.
+
+## Entity_ValidateCoordSystem ($02:9AC8)
+**Bank:** $02 | **Category:** Coordinate Validation | **Range:** $02:9AC8-9ACF
+Coordinate system validation. Saves direct page. Calls CODE_028F22 coordinate validation context switch. Reads $16 Y coordinate boundary. Restores direct page. Returns validated coordinate.
+
+## Entity_ProcessDefault ($02:9AD0)
+**Bank:** $02 | **Category:** Default Processing | **Range:** $02:9AD0-9AD9
+Enhanced entity processing. Clears high byte. Reads $12 entity X coordinate. Adds $DD entity offset via CLC/ADC. Swaps bytes, rotates left for precision, swaps back. Sets 16-bit mode. Stores to $77 entity calculation base. Continues to Entity_ProcessAdvanced.
+
