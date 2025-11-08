@@ -27,7 +27,7 @@ class TranslationEntry:
 	reviewer: str = ""
 	notes: str = ""
 	timestamp: str = field(default_factory=lambda: datetime.now().isoformat())
-	
+
 	# Validation
 	fits_limit: bool = True
 	encoding_valid: bool = True
@@ -46,52 +46,52 @@ class GlossaryEntry:
 
 class TranslationMemory:
 	"""Stores and suggests previously translated phrases"""
-	
+
 	def __init__(self):
 		self.memory: Dict[str, str] = {}  # source -> target
 		self.usage_count: Dict[str, int] = {}  # Track usage frequency
-	
+
 	def add(self, source: str, target: str):
 		"""Add a translation to memory"""
 		# Normalize
 		source_norm = source.lower().strip()
-		
+
 		self.memory[source_norm] = target
 		self.usage_count[source_norm] = self.usage_count.get(source_norm, 0) + 1
-	
+
 	def get(self, source: str) -> Optional[str]:
 		"""Get translation from memory"""
 		source_norm = source.lower().strip()
 		return self.memory.get(source_norm)
-	
+
 	def find_similar(self, source: str, max_results: int = 5) -> List[Tuple[str, str, float]]:
 		"""
 		Find similar phrases in translation memory
-		
+
 		Returns:
 			List of (source, target, similarity_score) tuples
 		"""
 		source_norm = source.lower().strip()
 		source_words = set(source_norm.split())
-		
+
 		results = []
-		
+
 		for mem_source, mem_target in self.memory.items():
 			mem_words = set(mem_source.split())
-			
+
 			# Calculate Jaccard similarity
 			intersection = len(source_words & mem_words)
 			union = len(source_words | mem_words)
 			similarity = intersection / union if union > 0 else 0.0
-			
+
 			if similarity > 0.3:  # Threshold
 				results.append((mem_source, mem_target, similarity))
-		
+
 		# Sort by similarity
 		results.sort(key=lambda x: x[2], reverse=True)
-		
+
 		return results[:max_results]
-	
+
 	def get_most_used(self, n: int = 10) -> List[Tuple[str, str, int]]:
 		"""Get most frequently used translations"""
 		sorted_by_usage = sorted(
@@ -104,43 +104,43 @@ class TranslationMemory:
 
 class TranslationGlossary:
 	"""Manages consistent terminology for translation"""
-	
+
 	def __init__(self):
 		self.entries: List[GlossaryEntry] = []
 		self.categories = set()
-	
+
 	def add_entry(self, entry: GlossaryEntry):
 		"""Add glossary entry"""
 		self.entries.append(entry)
 		self.categories.add(entry.category)
-	
+
 	def find_term(self, text: str) -> List[GlossaryEntry]:
 		"""Find glossary entries that appear in text"""
 		text_lower = text.lower()
 		matches = []
-		
+
 		for entry in self.entries:
 			if entry.source_term.lower() in text_lower:
 				matches.append(entry)
-		
+
 		return matches
-	
+
 	def get_by_category(self, category: str) -> List[GlossaryEntry]:
 		"""Get all entries in a category"""
 		return [e for e in self.entries if e.category == category]
-	
+
 	def validate_translation(self, original: str, translated: str) -> List[str]:
 		"""
 		Validate that translation uses correct glossary terms
-		
+
 		Returns:
 			List of warnings
 		"""
 		warnings = []
-		
+
 		# Find terms in original
 		original_terms = self.find_term(original)
-		
+
 		for term in original_terms:
 			if term.mandatory:
 				# Check if target term is in translation
@@ -148,17 +148,17 @@ class TranslationGlossary:
 					warnings.append(
 						f"Missing mandatory term: '{term.source_term}' should be translated as '{term.target_term}'"
 					)
-		
+
 		return warnings
-	
+
 	def export_to_csv(self, filepath: str):
 		"""Export glossary to CSV file"""
 		import csv
-		
+
 		with open(filepath, 'w', newline='', encoding='utf-8') as f:
 			writer = csv.writer(f)
 			writer.writerow(['Source', 'Target', 'Category', 'Mandatory', 'Notes'])
-			
+
 			for entry in sorted(self.entries, key=lambda e: (e.category, e.source_term)):
 				writer.writerow([
 					entry.source_term,
@@ -167,14 +167,14 @@ class TranslationGlossary:
 					'Yes' if entry.mandatory else 'No',
 					entry.notes
 				])
-	
+
 	def import_from_csv(self, filepath: str):
 		"""Import glossary from CSV file"""
 		import csv
-		
+
 		self.entries.clear()
 		self.categories.clear()
-		
+
 		with open(filepath, 'r', encoding='utf-8') as f:
 			reader = csv.DictReader(f)
 			for row in reader:
@@ -190,7 +190,7 @@ class TranslationGlossary:
 
 class TranslationProject:
 	"""Manages a complete translation project"""
-	
+
 	def __init__(self, name: str = "FFMQ Translation"):
 		self.name = name
 		self.translations: Dict[int, TranslationEntry] = {}
@@ -198,43 +198,43 @@ class TranslationProject:
 		self.glossary = TranslationGlossary()
 		self.source_language = "English"
 		self.target_language = "Unknown"
-	
+
 	def add_translation(self, entry: TranslationEntry):
 		"""Add or update a translation"""
 		self.translations[entry.dialog_id] = entry
-		
+
 		# Update translation memory with phrases
 		if entry.status in ["review", "approved"]:
 			# Extract sentences
 			import re
 			sentences = re.split(r'[.!?]+', entry.original_text)
 			translated_sentences = re.split(r'[.!?]+', entry.translated_text)
-			
+
 			for src, tgt in zip(sentences, translated_sentences):
 				src = src.strip()
 				tgt = tgt.strip()
 				if src and tgt:
 					self.memory.add(src, tgt)
-	
+
 	def get_progress(self) -> Dict[str, int]:
 		"""Get translation progress statistics"""
 		total = len(self.translations)
-		
+
 		status_counts = {
 			'draft': 0,
 			'review': 0,
 			'approved': 0,
 			'untranslated': 0
 		}
-		
+
 		for entry in self.translations.values():
 			if not entry.translated_text:
 				status_counts['untranslated'] += 1
 			else:
 				status_counts[entry.status] += 1
-		
+
 		percent_complete = (status_counts['approved'] / total * 100) if total > 0 else 0
-		
+
 		return {
 			'total': total,
 			'draft': status_counts['draft'],
@@ -243,14 +243,14 @@ class TranslationProject:
 			'untranslated': status_counts['untranslated'],
 			'percent_complete': percent_complete
 		}
-	
+
 	def get_next_untranslated(self) -> Optional[int]:
 		"""Get the next dialog ID that needs translation"""
 		for dialog_id, entry in sorted(self.translations.items()):
 			if not entry.translated_text:
 				return dialog_id
 		return None
-	
+
 	def save(self, filepath: str):
 		"""Save project to JSON file"""
 		data = {
@@ -285,19 +285,19 @@ class TranslationProject:
 				for e in self.glossary.entries
 			]
 		}
-		
+
 		with open(filepath, 'w', encoding='utf-8') as f:
 			json.dump(data, f, indent=2, ensure_ascii=False)
-	
+
 	def load(self, filepath: str):
 		"""Load project from JSON file"""
 		with open(filepath, 'r', encoding='utf-8') as f:
 			data = json.load(f)
-		
+
 		self.name = data.get('name', 'Translation Project')
 		self.source_language = data.get('source_language', 'English')
 		self.target_language = data.get('target_language', 'Unknown')
-		
+
 		# Load translations
 		self.translations.clear()
 		for t in data.get('translations', []):
@@ -315,12 +315,12 @@ class TranslationProject:
 				warnings=t.get('warnings', [])
 			)
 			self.translations[entry.dialog_id] = entry
-		
+
 		# Load memory
 		self.memory.memory.clear()
 		for src, tgt in data.get('memory', []):
 			self.memory.add(src, tgt)
-		
+
 		# Load glossary
 		self.glossary.entries.clear()
 		for g in data.get('glossary', []):
@@ -336,21 +336,21 @@ class TranslationProject:
 
 def demo_translation():
 	"""Demo the translation system"""
-	
+
 	# Create project
 	project = TranslationProject("FFMQ Spanish Translation")
 	project.source_language = "English"
 	project.target_language = "Spanish"
-	
+
 	# Add glossary terms
 	project.glossary.add_entry(GlossaryEntry(
 		"Crystal", "Cristal", "item", mandatory=True
 	))
 	project.glossary.add_entry(GlossaryEntry(
-		"Foresta", "Foresta", "place", mandatory=True, 
+		"Foresta", "Foresta", "place", mandatory=True,
 		notes="Keep original name"
 	))
-	
+
 	# Add translations
 	entry1 = TranslationEntry(
 		dialog_id=0x0001,
@@ -360,7 +360,7 @@ def demo_translation():
 		translator="Alice"
 	)
 	project.add_translation(entry1)
-	
+
 	entry2 = TranslationEntry(
 		dialog_id=0x0002,
 		original_text="The Crystal of Light is very powerful.",
@@ -369,26 +369,26 @@ def demo_translation():
 		translator="Bob"
 	)
 	project.add_translation(entry2)
-	
+
 	# Check progress
 	print("Translation Progress:")
 	progress = project.get_progress()
 	for key, value in progress.items():
 		print(f"  {key}: {value}")
-	
+
 	# Test translation memory
 	print("\nTranslation Memory Suggestions for 'The Crystal':")
 	suggestions = project.memory.find_similar("The Crystal")
 	for src, tgt, score in suggestions:
 		print(f"  '{src}' → '{tgt}' (similarity: {score:.2f})")
-	
+
 	# Test glossary validation
 	print("\nGlossary Validation:")
 	bad_translation = "The Gem of Light is powerful."
 	warnings = project.glossary.validate_translation(entry2.original_text, bad_translation)
 	for warning in warnings:
 		print(f"  ⚠ {warning}")
-	
+
 	# Save project
 	project.save("demo_translation.json")
 	print("\nProject saved to demo_translation.json")

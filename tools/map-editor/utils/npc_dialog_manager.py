@@ -22,29 +22,29 @@ class NPCDialog:
 	map_id: int
 	position: Tuple[int, int]  # (x, y) on map
 	name: str = "NPC"
-	
+
 	# Dialog IDs for different conditions
 	default_dialog_id: int = 0x0000
 	flag_dialogs: Dict[int, int] = field(default_factory=dict)  # flag_id -> dialog_id
 	item_dialogs: Dict[int, int] = field(default_factory=dict)  # item_id -> dialog_id
 	event_dialog_id: Optional[int] = None  # For special events
-	
+
 	# Behavior
 	repeatable: bool = True  # Can talk to NPC multiple times
 	auto_face_player: bool = True  # NPC faces player when talked to
 	trigger_distance: int = 1  # How close player must be (in tiles)
-	
+
 	# Metadata
 	notes: str = ""
-	
+
 	def get_active_dialog_id(self, flags: set, items: set) -> int:
 		"""
 		Get the dialog ID that should be shown based on current game state
-		
+
 		Args:
 			flags: Set of active flag IDs
 			items: Set of items in inventory
-		
+
 		Returns:
 			Dialog ID to show
 		"""
@@ -52,23 +52,23 @@ class NPCDialog:
 		for flag_id, dialog_id in self.flag_dialogs.items():
 			if flag_id in flags:
 				return dialog_id
-		
+
 		# Check item-based dialogs
 		for item_id, dialog_id in self.item_dialogs.items():
 			if item_id in items:
 				return dialog_id
-		
+
 		# Check event dialog
 		if self.event_dialog_id is not None:
 			return self.event_dialog_id
-		
+
 		# Default dialog
 		return self.default_dialog_id
 
 
 class NPCDialogManager:
 	"""Manages all NPC dialogs in the game"""
-	
+
 	def __init__(self, data_file: str = None):
 		"""
 		Args:
@@ -76,29 +76,29 @@ class NPCDialogManager:
 		"""
 		self.npc_dialogs: Dict[Tuple[int, int], NPCDialog] = {}  # (map_id, npc_id) -> NPCDialog
 		self.data_file = data_file
-		
+
 		if data_file and Path(data_file).exists():
 			self.load(data_file)
-	
+
 	def add_npc(self, npc: NPCDialog):
 		"""Add an NPC dialog configuration"""
 		key = (npc.map_id, npc.npc_id)
 		self.npc_dialogs[key] = npc
-	
+
 	def get_npc(self, map_id: int, npc_id: int) -> Optional[NPCDialog]:
 		"""Get NPC dialog configuration"""
 		return self.npc_dialogs.get((map_id, npc_id))
-	
+
 	def remove_npc(self, map_id: int, npc_id: int):
 		"""Remove NPC dialog configuration"""
 		key = (map_id, npc_id)
 		if key in self.npc_dialogs:
 			del self.npc_dialogs[key]
-	
+
 	def get_npcs_for_map(self, map_id: int) -> List[NPCDialog]:
 		"""Get all NPCs on a specific map"""
 		return [npc for (mid, _), npc in self.npc_dialogs.items() if mid == map_id]
-	
+
 	def get_npcs_with_dialog(self, dialog_id: int) -> List[NPCDialog]:
 		"""Find all NPCs that use a specific dialog ID"""
 		npcs = []
@@ -112,13 +112,13 @@ class NPCDialogManager:
 			elif npc.event_dialog_id == dialog_id:
 				npcs.append(npc)
 		return npcs
-	
+
 	def save(self, filepath: str = None):
 		"""Save NPC dialog mappings to JSON file"""
 		filepath = filepath or self.data_file
 		if not filepath:
 			raise ValueError("No filepath specified")
-		
+
 		data = {
 			"npcs": [
 				{
@@ -138,17 +138,17 @@ class NPCDialogManager:
 				for npc in self.npc_dialogs.values()
 			]
 		}
-		
+
 		with open(filepath, 'w', encoding='utf-8') as f:
 			json.dump(data, f, indent=2)
-	
+
 	def load(self, filepath: str):
 		"""Load NPC dialog mappings from JSON file"""
 		with open(filepath, 'r', encoding='utf-8') as f:
 			data = json.load(f)
-		
+
 		self.npc_dialogs.clear()
-		
+
 		for npc_data in data.get("npcs", []):
 			npc = NPCDialog(
 				npc_id=npc_data["npc_id"],
@@ -165,13 +165,13 @@ class NPCDialogManager:
 				notes=npc_data.get("notes", "")
 			)
 			self.add_npc(npc)
-		
+
 		self.data_file = filepath
 
 
 class NPCDialogPanel:
 	"""UI panel for editing NPC dialog configuration"""
-	
+
 	def __init__(self, rect: pygame.Rect):
 		"""
 		Args:
@@ -179,60 +179,60 @@ class NPCDialogPanel:
 		"""
 		self.rect = rect
 		self.npc: Optional[NPCDialog] = None
-		
+
 		# Colors
 		self.bg_color = (40, 40, 50)
 		self.text_color = (220, 220, 220)
 		self.text_dim_color = (140, 140, 150)
 		self.border_color = (60, 60, 70)
 		self.highlight_color = (70, 130, 180)
-		
+
 		# Scroll state
 		self.scroll_offset = 0
 		self.max_scroll = 0
-	
+
 	def set_npc(self, npc: Optional[NPCDialog]):
 		"""Set the NPC to edit"""
 		self.npc = npc
 		self.scroll_offset = 0
-	
+
 	def handle_event(self, event: pygame.event.Event) -> bool:
 		"""Handle events"""
 		if not self.npc:
 			return False
-		
+
 		if event.type == pygame.MOUSEWHEEL:
 			if self.rect.collidepoint(pygame.mouse.get_pos()):
 				self.scroll_offset -= event.y * 20
 				self.scroll_offset = max(0, min(self.scroll_offset, self.max_scroll))
 				return True
-		
+
 		return False
-	
+
 	def draw(self, surface: pygame.Surface, font: pygame.font.Font):
 		"""Draw the panel"""
 		# Background
 		pygame.draw.rect(surface, self.bg_color, self.rect)
 		pygame.draw.rect(surface, self.border_color, self.rect, 1)
-		
+
 		if not self.npc:
 			# No NPC selected
 			text = font.render("No NPC selected", True, self.text_dim_color)
 			text_rect = text.get_rect(center=self.rect.center)
 			surface.blit(text, text_rect)
 			return
-		
+
 		# Create clipping surface
 		content_surface = pygame.Surface((self.rect.width - 20, self.rect.height - 20))
 		content_surface.fill(self.bg_color)
-		
+
 		y = -self.scroll_offset
-		
+
 		# Title
 		title = font.render(f"NPC Dialog: {self.npc.name}", True, self.text_color)
 		content_surface.blit(title, (10, y))
 		y += 35
-		
+
 		# NPC Info
 		info_lines = [
 			f"Map ID: {self.npc.map_id}",
@@ -242,23 +242,23 @@ class NPCDialogPanel:
 			"Dialogs:",
 			f"  Default: 0x{self.npc.default_dialog_id:04X}",
 		]
-		
+
 		# Flag-based dialogs
 		if self.npc.flag_dialogs:
 			info_lines.append("  Flag-based:")
 			for flag_id, dialog_id in self.npc.flag_dialogs.items():
 				info_lines.append(f"    Flag {flag_id:04X} → Dialog {dialog_id:04X}")
-		
+
 		# Item-based dialogs
 		if self.npc.item_dialogs:
 			info_lines.append("  Item-based:")
 			for item_id, dialog_id in self.npc.item_dialogs.items():
 				info_lines.append(f"    Item {item_id:04X} → Dialog {dialog_id:04X}")
-		
+
 		# Event dialog
 		if self.npc.event_dialog_id is not None:
 			info_lines.append(f"  Event: 0x{self.npc.event_dialog_id:04X}")
-		
+
 		# Behavior
 		info_lines.extend([
 			"",
@@ -267,7 +267,7 @@ class NPCDialogPanel:
 			f"  Auto-face: {self.npc.auto_face_player}",
 			f"  Trigger distance: {self.npc.trigger_distance} tiles",
 		])
-		
+
 		# Notes
 		if self.npc.notes:
 			info_lines.extend([
@@ -275,19 +275,19 @@ class NPCDialogPanel:
 				"Notes:",
 				f"  {self.npc.notes}",
 			])
-		
+
 		# Draw all lines
 		for line in info_lines:
 			text = font.render(line, True, self.text_dim_color if line.startswith("  ") else self.text_color)
 			content_surface.blit(text, (10, y))
 			y += 25
-		
+
 		# Calculate max scroll
 		self.max_scroll = max(0, y - (self.rect.height - 20))
-		
+
 		# Blit content surface with clipping
 		surface.blit(content_surface, (self.rect.x + 10, self.rect.y + 10))
-		
+
 		# Draw scrollbar if needed
 		if self.max_scroll > 0:
 			scrollbar_height = max(20, (self.rect.height - 20) * (self.rect.height - 20) // y)
@@ -298,10 +298,10 @@ class NPCDialogPanel:
 
 def demo_npc_dialog_manager():
 	"""Demo the NPC dialog manager"""
-	
+
 	# Create manager
 	manager = NPCDialogManager()
-	
+
 	# Add some NPCs
 	npc1 = NPCDialog(
 		npc_id=1,
@@ -314,7 +314,7 @@ def demo_npc_dialog_manager():
 		notes="Gives info about the Crystal"
 	)
 	manager.add_npc(npc1)
-	
+
 	npc2 = NPCDialog(
 		npc_id=2,
 		map_id=0x01,
@@ -326,26 +326,26 @@ def demo_npc_dialog_manager():
 		notes="Sells items"
 	)
 	manager.add_npc(npc2)
-	
+
 	# Test getting active dialog
 	print("Testing NPC dialog selection:")
 	print(f"Old Man with no flags: 0x{npc1.get_active_dialog_id(set(), set()):04X}")
 	print(f"Old Man with flag 0x10: 0x{npc1.get_active_dialog_id({0x10}, set()):04X}")
 	print(f"Old Man with flag 0x20: 0x{npc1.get_active_dialog_id({0x20}, set()):04X}")
-	
+
 	# Test finding NPCs by dialog
 	print(f"\nNPCs using dialog 0x0001: {[n.name for n in manager.get_npcs_with_dialog(0x0001)]}")
 	print(f"NPCs using dialog 0x0002: {[n.name for n in manager.get_npcs_with_dialog(0x0002)]}")
-	
+
 	# Test save/load
 	test_file = "test_npc_dialogs.json"
 	manager.save(test_file)
 	print(f"\nSaved to {test_file}")
-	
+
 	# Load
 	manager2 = NPCDialogManager(test_file)
 	print(f"Loaded {len(manager2.npc_dialogs)} NPCs")
-	
+
 	for (map_id, npc_id), npc in manager2.npc_dialogs.items():
 		print(f"  {npc.name} (Map {map_id:02X}, NPC {npc_id:02X}): Dialog 0x{npc.default_dialog_id:04X}")
 
