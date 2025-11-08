@@ -18265,3 +18265,47 @@ Secondary object with special tile mapping. Calls CODE_02EA60 allocator, sets ty
 **Bank:** $02 | **Category:** Sprite Rendering | **Range:** $02:DCDD-DD09
 Multi-stage sprite rendering system. Calls CODE_02DF3E initializer, CODE_02DFE8 loader, CODE_02E021 coordinator. Sets system flag bit $20 at $E3. Clears sprite counter $98. Sets limit $99=$06. Loads base $0A9D to $9A. Loop: stores to $97, calls CODE_02E48C processor, adds $04, compares to $10 (16 sprite max), loops. Sets Y=$04, X=$00 for grid rendering.
 
+## Data_CoordinateProcessor ($02:D9D2)
+**Bank:** $02 | **Category:** Data Processing | **Range:** $02:D9D2-DA17
+Loop-based data coordinate processor. Counter loop 0-2. Pushes counter and Y position on stack. Processes data, increments counter, checks limit $03, branches to exit or continues loop. Pops registers, restores bank/processor state on completion.
+
+## Display_ColorManager ($02:DA18)
+**Bank:** $02 | **Category:** Display Management | **Range:** $02:DA18-DA7C
+Complex color fade system with dual-phase processing. Sets direct page $2100 (PPU). Clears $0A7E display flag. Sets main screen $212C=$1D, clears sub screen $212D. Clears color window $2130. Phase 1: color math $2131=$A1, loads DATA8_02da7d color table, writes to $2132, calls CODE_0C8000 timing 4x per color, loops until zero. Phase 2: main screen $212C=$1F, color math $2131=$22, loads same table, timing 5x per color. Clears $0A84 flag. Clears $2130/$2131/$2132. Sophisticated fade effect with timing synchronization.
+
+## DATA8_02da7d (Color Fade Table)
+**Bank:** $02 | **Category:** Data Table | **Range:** $02:DA7D-DA97
+28-byte color fade sequence. Sequence 1 (14 bytes): $F8→$E0 gradient plus $00 terminator. Sequence 2 (14 bytes): $81→$01 with alternating values, $FF/$01 pattern. Used by Display_ColorManager for dual-phase fade effects.
+
+## Display_StateInit ($02:DA98)
+**Bank:** $02 | **Category:** Display Initialization | **Range:** $02:DA98-DB98
+Comprehensive display/state initialization engine. Preserves all registers. Sets direct page $0A00. Calls CODE_02DFCD memory clear. Sets display flags $84/$7E=$FF. Clears frame counter $0AF0. Sets sprite limit $0110=$0F. Loads $04AF world state, shifts right 2x, increments, masks $03. If non-zero, sets $050B (state), $050C=$08, $050D=$0F, $050A=$03. Clears $E3 system flag, increments $E2 counter. Clears $0AF8 processing flag, increments $E6 sync flag. VBlank wait loop on $E6. Sets direct page $2100. BG configs: $2107=$42 (BG1), $2108=$4A (BG2). Clears scroll $210D/$210F (2x each). Buffer init: clears $7EC240, MVN $7EC240→$7EC241 size $03FE (1023 bytes). Pattern fills: $0C40=$FEFE, MVN size $01BE (447 bytes). Special: $0E04=$5555, MVN size $001A (27 bytes). Sets direct page $0B00, clears registers $00-$0E (8 regs). Loads $0A9C sprite mode, branches if zero. DMA setup: direct page $0B00, sets $33/$36=$81, clears $34/$35/$37/$38/$39, increments $37. MVN $02DB83→$4370 size $04. Sets DMA bit $80 at $0111. Clears $EA/$EB flags. Calls CODE_02E6ED sprite processor, CODE_02E0DB display coordinator. Loop clears state regs $0D-$12 with $FF.
+
+## Graphics_Finalizer ($02:D891)
+**Bank:** $02 | **Category:** Graphics Processing | **Range:** $02:D891-D89A
+Graphics processing completion wrapper. Calls Graphics_DataProcessor ($D910) then Data_Coordinator ($D994). Restores processor/bank state and X register.
+
+## Entity_ValueAdjuster ($02:D89B)
+**Bank:** $02 | **Category:** Entity Processing | **Range:** $02:D89B-D8AD
+Entity value adjustment with type checking. Loads entity type from $07,X. If type=$03, decrements value. Adds $29 offset. Pushes adjusted value and $28 parameter. Branches to Entity_ParameterProcessor.
+
+## Entity_ParameterProcessor ($02:D8AF)
+**Bank:** $02 | **Category:** Entity Management | **Range:** $02:D8AF-D8BE
+Entity parameter lookup engine. Loads $20 entity parameter as index X. Reads DATA8_02d8bf,x table. Stores result to $78. Fast table-based parameter mapping.
+
+## DATA8_02d8bf (Entity Parameter Table)
+**Bank:** $02 | **Category:** Data Table | **Range:** $02:D8BF-D90F
+82-byte entity parameter mapping table. Values $00-$24 with repetition patterns. Maps entity indices to parameter groups (0→0, 1-3→1, 4-6→2, etc.).
+
+## Graphics_DataProcessor_1 ($02:D910)
+**Bank:** $02 | **Category:** Graphics Processing | **Range:** $02:D910-D96B
+Complex graphics calculation with dual-stage multiplication. Calls Entity_ParameterProcessor. Searches DATA8_02d96e threshold table (10-byte records). Subtracts DATA8_02d96c base. First multiply: result × DATA8_02d972 via $4202/$4203 (stores to $0A79). 4 NOP waits. Second multiply: result × DATA8_02d974. 4 NOP waits. Adds DATA8_02d970 offset to $4216 result. Stores final to $6B. Sophisticated two-stage hardware multiply with table-driven parameters.
+
+## Graphics Calculation Tables ($02:D96C-D993)
+**Bank:** $02 | **Category:** Data Tables | **Range:** $02:D96C-D993
+Graphics calculation configuration. Base values $D96C, thresholds $D96E, offsets $D970, multiplier1 $D972 ($05), multiplier2 $D974 ($02). Parameter tables $D976-D993 with complex graphics configurations (24-byte blocks, values like $F0/$B0/$80, multipliers $08/$0D/$23).
+
+## Data_Coordinator ($02:D994)
+**Bank:** $02 | **Category:** Data Processing | **Range:** $02:D994-DA17
+Multi-stage data processing with bit manipulation. Sets bank $0A. Loads $83 state, shifts left 3× (×8), adds $0A39 base to Y. Stores $69 graphics data at Y+$00. Stores $6B graphics data at Y+$18. Adds $79 calculation value sequentially: Y+$1A, Y+$1C, Y+$1E (4-value sequence). Loads DATA8_0a8000,x bytes. Processes 8 bits per byte: shifts left, XBA swap, adds carry. Decrements $79 count, loops. Final: multiplies result by $18 via $4202/$4203. Adds Y+$00 base to $4216 result. Stores to Y+$02. Increments Y by 2. Counter loop 0-2, exits at 3. Complex bit-packing and calculation system.
+
