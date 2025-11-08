@@ -1,0 +1,13 @@
+digraph DialogFlow {
+  rankdir=TB;
+  node [shape=box, style=rounded];
+
+  n0001 [label="0001: Welcome to Foresta!...", style=filled, fillcolor=lightgreen];
+  n0002 [label="0002: The Crystal is in the temple...."];
+  n0003 [label="0003: You found the Crystal!...", style=filled, fillcolor=lightcoral];
+  n0004 [label="0004: You don't have the Crystal yet...", style=filled, fillcolor=lightcoral];
+
+  n0001 -> n0002 [label="First talk"];
+  n0002 -> n0003 [label="Has Crystal"];
+  n0002 -> n0004 [label="No Crystal"];
+}

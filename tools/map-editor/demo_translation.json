@@ -1,0 +1,63 @@
+{
+  "name": "FFMQ Spanish Translation",
+  "source_language": "English",
+  "target_language": "Spanish",
+  "translations": [
+    {
+      "dialog_id": 1,
+      "original_text": "Welcome to Foresta! The Crystal awaits.",
+      "translated_text": "¡Bienvenido a Foresta! El Cristal te espera.",
+      "status": "approved",
+      "translator": "Alice",
+      "reviewer": "",
+      "notes": "",
+      "timestamp": "2025-11-08T01:04:57.521710",
+      "fits_limit": true,
+      "encoding_valid": true,
+      "warnings": []
+    },
+    {
+      "dialog_id": 2,
+      "original_text": "The Crystal of Light is very powerful.",
+      "translated_text": "El Cristal de Luz es muy poderoso.",
+      "status": "review",
+      "translator": "Bob",
+      "reviewer": "",
+      "notes": "",
+      "timestamp": "2025-11-08T01:04:57.521800",
+      "fits_limit": true,
+      "encoding_valid": true,
+      "warnings": []
+    }
+  ],
+  "memory": [
+    [
+      "welcome to foresta",
+      "¡Bienvenido a Foresta"
+    ],
+    [
+      "the crystal awaits",
+      "El Cristal te espera"
+    ],
+    [
+      "the crystal of light is very powerful",
+      "El Cristal de Luz es muy poderoso"
+    ]
+  ],
+  "glossary": [
+    {
+      "source_term": "Crystal",
+      "target_term": "Cristal",
+      "category": "item",
+      "notes": "",
+      "mandatory": true
+    },
+    {
+      "source_term": "Foresta",
+      "target_term": "Foresta",
+      "category": "place",
+      "notes": "Keep original name",
+      "mandatory": true
+    }
+  ]
+}

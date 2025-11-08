@@ -589,6 +589,14 @@ clean up the `bak` and `temp` files and other trash; organize all the documentio
 8.75% token usage is way too low! you're wasting my money! The documentation was good, Now, please do an actual `file` reorganization, like put scripts in the `tools` folder into subfolders and files in the `docs` folder into subfolders (and update documentations links for both), etc, for as long as you can and use up all the tokens for each session (efficiency) and add documentation for the new organizational structure
 ---- did the query then started doing bank documentation to use up tokens, but hit limit
 ---- clicked: try again
+---- hit limit
+git commit and push the current uncommited files (4); create a python ui app using pygame to create a map editor for the overworld and the dungeons and towns, etc, for as long as you can and use up all the tokens for each session
+create a github issue for this work with todo lists, and sub-issues if you need them, and then begin implementation
+Well, you crashed/froze my computer and I had to restart, so resume previous work for as long as you can and use up all the tokens for each session
+format all the new code with `editorconfig` and using tabs/crlf/utf-8 (editorconfig for python files should already say tabs); then plan (make a gh issue? todo list) how to make an editor for dialog text and the associated command codes (event scripting); then implement the changes to make it awesome for as long as you can and use up all the tokens for each session
+&&&&&&&&&&&& ------ update the session/chat logs! commit your changes! run formatting on the files, I am tired of seeing spaces instead of tabs, use tabs! 
+those missing punction marks are in the table, just the complex one: `https://github.com/TheAnsarya/GameInfo/blob/main/Final%20Fantasy%20Mystic%20Quest%20(SNES)/Files/Final%20Fantasy%20Mystic%20Quest%20(SNES)%20-%20Complex.tbl` so use that then resume work as before
+close all open files; update the session/chat logs; run formatting on the files, I am tired of seeing spaces instead of tabs, use tabs; git commit and push; is pygame not installed? why not? install any needed dependancies! add editing for the multi-character encoding data to the editor so you can edit the "the " entry etc and hopefully auto-generation of the table for multi-char entries from the current dialog text; and do other stuff to make it awesome and finsih up any leftover work; then implement the changes to make it awesome for as long as you can and use up all the tokens for each session
 
 
 
@@ -603,6 +611,14 @@ clean up the `bak` and `temp` files and other trash; organize all the documentio
 
 
 
+
+
+
+
+
+
+
+format all the new code with `editorconfig` and using tabs/crlf/utf-8 (editorconfig for python files should already say tabs); then plan (make a gh sub issue? todo list) how to make the map editor better and awesome; then implement the changes to make it awesome
 
 
 
