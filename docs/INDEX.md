@@ -71,6 +71,7 @@ Comprehensive guides for users and developers.
 
 ### Modding Guides
 - **[MODDING_QUICK_REFERENCE.md](guides/MODDING_QUICK_REFERENCE.md)** - Quick modding reference
+- **[MODDING_TUTORIAL.md](MODDING_TUTORIAL.md)** ⭐ - Complete modding tutorial (beginner to advanced, 2-4 hours)
 - **[MODDING_GUIDE.md](MODDING_GUIDE.md)** - Comprehensive modding guide
 - **[ENEMY_EDITOR_GUIDE.md](ENEMY_EDITOR_GUIDE.md)** - Visual enemy editor guide
 

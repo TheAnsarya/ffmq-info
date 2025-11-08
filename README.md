@@ -276,9 +276,10 @@ enemy_editor.bat
 
 **Modders:**
 1. [Modding Quick Reference](docs/guides/MODDING_QUICK_REFERENCE.md) ⭐ - 3-step modding guide
-2. [Enemy Editor Guide](docs/ENEMY_EDITOR_GUIDE.md) ✨ NEW! - Visual enemy editor (GUI)
-3. [Battle Data Pipeline](docs/BATTLE_DATA_PIPELINE.md) - Data modification workflow
-4. [Graphics Quick Start](docs/graphics-quickstart.md) - Graphics modding
+2. [Complete Modding Tutorial](docs/MODDING_TUTORIAL.md) ⭐ - Beginner to advanced (2-4 hours)
+3. [Enemy Editor Guide](docs/ENEMY_EDITOR_GUIDE.md) ✨ NEW! - Visual enemy editor (GUI)
+4. [Battle Data Pipeline](docs/BATTLE_DATA_PIPELINE.md) - Data modification workflow
+5. [Graphics Quick Start](docs/graphics-quickstart.md) - Graphics modding
 
 **Developers:**
 1. [Developer Onboarding](docs/DEVELOPER_ONBOARDING.md) ⭐ - 0 to productive in 60 minutes!
