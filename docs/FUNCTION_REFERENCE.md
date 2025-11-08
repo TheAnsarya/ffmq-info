@@ -18665,3 +18665,79 @@ Button press analysis. Reads $C6 controller 2, ORs with $C4 controller 1, ANDs $
 **Bank:** $02 | **Category:** Alternative Buttons | **Range:** $02:A318-A32C
 Alternative button processing. Reads $C6 controller 2, ORs with $C4 controller 1, ANDs $0027 secondary buttons. Reads $C6 controller 2, compares with $C4 controller 1. If C2 < C1, branches Controller_ProcessSecondary. Sets 8-bit accumulator, 16-bit index. Increments $CE controller flag. Jumps Controller_DirectionHandler input handler.
 
+## Input_Reduction ($02:9C3D)
+**Bank:** $02 | **Category:** Input Processing | **Range:** $02:9C3D-9C95
+Input reduction with flag processing. Calls Input_EnhancedValidate. Sets 16-bit mode. Shifts $77 right (halves calculation). Sets 8-bit accumulator, 16-bit index. Reads $DB input validation flags, ANDs $80. If not set, branches Input_Flag40. Loads $D36A handler for flag $80 to X, calls CODE_02883D. Branches Input_ProcessDone. Flag40: reads $DB, ANDs $40. If not set, branches Input_Flag20. Loads $D36E handler for flag $40 to X, calls CODE_02883D. Branches Input_ProcessDone. Flag20: reads $DB, ANDs $20. If not set, branches Input_Flag10_Check. Loads $D372 handler for flag $20 to X, calls CODE_02883D. Continues Input_ProcessDone.
+
+## Input_Flag10_Check ($02:9C67)
+**Bank:** $02 | **Category:** Alternate Flags | **Range:** $02:9C67-9C98
+Alternate input flags handler. Reads $DB, ANDs $10 flag. If not set, checks alternate. Loads $D377 handler to X, calls CODE_02883D, branches completion. Alternate: reads $8D system index, compares $02. If >= $02, branches completion. Reads $DB, ANDs $06 flags. If set, loads $D386 handler to X, calls CODE_02883D, branches completion. Reads $DB, ANDs $01 flag. If set, loads $D38C handler to X, calls CODE_02883D. Continues to completion. Originally unreachable.
+
+## Input_ProcessDone ($02:9C95)
+**Bank:** $02 | **Category:** Input Completion | **Range:** $02:9C95-9C9A
+Input processing completion. Calls Input_Finalize. Continues Input_StandardComplete. Jumps CODE_029F10 main completion handler.
+
+## System_ValidateState ($02:9C9B)
+**Bank:** $02 | **Category:** State Validation | **Range:** $02:9C9B-9CB5
+System state validation. Calls CODE_029964 system validation check. Increments result. If zero, branches System_SpecialState. Otherwise complex validation sequence executes. Special state: saves direct page, calls CODE_028F2F context switch, clears $21 system state flag. Restores direct page. Returns.
+
+## System_Coordinate ($02:9CC5)
+**Bank:** $02 | **Category:** System Coordination | **Range:** $02:9CC5-9CD5
+System coordination with validation loops. Reads $11 system validation flag, ANDs $08 validation bit. If set, branches System_ProcessFlags. Calls CODE_029964 system validation. Increments result. If non-zero, branches System_ProcessFlags. Otherwise executes error recovery.
+
+## System_ProcessFlags ($02:9CD5)
+**Bank:** $02 | **Category:** Flag Processing | **Range:** $02:9CD5-9DC6
+System state management with conditional flags. Reads $DC system control flags, ANDs $01 flag $01. If not set, branches System_Flag02. Calls System_ValidateContext validation. ANDs $01 validated flag, ANDs with $DC control flags. If valid, branches System_Flag01_Process. Otherwise executes flag-specific processing. Flag01 process: calls Input_EnhancedValidate, loads $D3A0 handler to X, calls CODE_02883D, calls Input_Finalize. Flag02: reads $DC, ANDs $02. If not set, branches System_Flag04. Validates, ANDs $02, ANDs $DC. If valid, processes. Otherwise loads $02 flag ID, calls System_FlagError, branches System_Flag04. Flag02 process: calls Input_EnhancedValidate, loads $D3A7 handler, calls CODE_02883D, calls Input_Finalize. Flag04: reads $DC, ANDs $04. If not set, branches System_Flag08. Validates, processes or errors. Flag04 handler: $D3AC. Flag08: reads $DC, ANDs $08. Flag08 handler: $D3C1. Flag10: reads $DC, ANDs $10. Flag10 handler: $D3BB. Flag20: reads $DC, ANDs $20. Flag20 handler: $D3B2. Flag40: reads $DC, ANDs $40. If not set, returns. Validates flag $40, ANDs with $DC. If valid, branches System_Flag40_Process. Reads $8D system index, compares $02. If >= $02, branches System_ComplexProcessing. Saves direct page, calls CODE_028F2F context switch, stores $DC flags to $21 system register. Restores direct page. Clears $0000 to $77 result. Returns.
+
+## Entity_ProcessAdvanced ($02:9ADA)
+**Bank:** $02 | **Category:** Entity Processing | **Range:** $02:9ADA-9B0B
+Advanced entity processing with multiplication. Stores to $77 entity calculation base. Calls CODE_029AD2 coordinate validation. Divides by 2, by 4, by 8 (total ÷8). Calls CODE_029B02 entity coordinate processor. Clears carry, adds $77 calculation base, stores to $77 intermediate result. Divides by 2, adds to $77 (creates 1.5× multiplication), stores final entity coordinate. Sets 8-bit accumulator, 16-bit index. Returns. Complex coordinate scaling calculation.
+
+## Entity_ProcessCoordinates ($02:9B0B)
+**Bank:** $02 | **Category:** Coordinate Processing | **Range:** $02:9B0B-9B24
+Complex calculation with conditional branching. Saves calculation value. Sets 8-bit accumulator, 16-bit index. Reads $3B game state ID. Compares $44 special game state. If less, branches CODE_029B24 simple processing. Sets 16-bit mode. Restores calculation value. Stores to $0098 calculation register low. Clears $009A calculation register high. Loads $000A division constant (10) to $009C. Calls CODE_0096E4 hardware division. Loads $009E division result. Returns. Game state-dependent calculation with hardware division.
+
+## Entity_CalcSimple ($02:9B24)
+**Bank:** $02 | **Category:** Simple Calculation | **Range:** $02:9B24-9B27
+Simple calculation for basic game states. Sets 16-bit mode. Restores calculation value from stack. Returns original value unchanged.
+
+## Entity_CalcStandard ($02:9B28)
+**Bank:** $02 | **Category:** Standard Calculation | **Range:** $02:9B28-9B2E
+Standard entity calculation with halving. Calls CODE_029A4A base entity calculation. Continues Math_Halve16Bit.
+
+## Math_Halve16Bit ($02:9B2E)
+**Bank:** $02 | **Category:** Mathematical Operations | **Range:** $02:9B2E-9B37
+Mathematical reduction with 16-bit precision. Sets 16-bit mode. Shifts $77 right (divides by 2). Sets 8-bit accumulator, 16-bit index. Returns.
+
+## Entity_CalcEnhanced ($02:9B38)
+**Bank:** $02 | **Category:** Enhanced Calculation | **Range:** $02:9B38-9B3C
+Enhanced entity calculation. Calls CODE_029ADA enhanced entity processing. Branches Math_Halve16Bit mathematical reduction.
+
+## Input_ValidateMulti ($02:9B3D)
+**Bank:** $02 | **Category:** Input Validation | **Range:** $02:9B3D-9B56
+Multi-controller input validation. Reads $8D controller validation index. Compares $02 minimum controller count. If >= 2, continues Input_ProcessContext. Returns if insufficient. ProcessContext: saves direct page, calls CODE_028F2F context switch, reads $56 controller input state. Restores direct page. Stores to $74 input state. ANDs with $DB validation flags. If zero, branches Input_Special. Reads $DB, compares $50 specific input combination. If not equal, branches Input_StandardProcess. Reads $74 stored input, ANDs $50 pattern, compares $50. If equal, branches Input_Enhanced. Returns if pattern invalid.
+
+## Input_Enhanced ($02:9B57)
+**Bank:** $02 | **Category:** Enhanced Input | **Range:** $02:9B57-9B70
+Enhanced input processing. Sets 16-bit mode. Shifts $77 left (multiplies by 2). Sets 8-bit accumulator, 16-bit index. Loads $D2EF system handler 1 to X, calls CODE_02883D. Loads $D35A system handler 2 to X, calls CODE_02883D. Loads $D37B system handler 3 to X, calls CODE_02883D. Branches CODE_029BC4 processing finalization.
+
+## Input_StandardProcess ($02:9B71)
+**Bank:** $02 | **Category:** Standard Input | **Range:** $02:9B71-9B9F
+Standard input processing with iterative handlers. Loads $D2EF handler 1 to X, calls CODE_02883D. Loads $D35A handler 2 to X, calls CODE_02883D. Sets 16-bit mode. Shifts $77 left (multiplies by 2). Sets 8-bit accumulator, 16-bit index. Sets Y to $FFFE input bit scanner (-2). Reads $74 input state, ANDs with $DB validation flags. Scan loop: increments Y twice (+2), rotates A left to test next bit. If bit not set, continues scanning. Loads DATA8_029ba0,Y handler address to X, calls CODE_02883D. Branches Input_Finalize. Handler table: $6A,$D3,$6E,$D3,$72,$D3,$77,$D3,$C9,$D3,$CF,$D3,$D3,$D3,$8C,$D3 (16 bytes, 8 handlers).
+
+## Input_Special ($02:9BA0)
+**Bank:** $02 | **Category:** Special Input | **Range:** $02:9BA0-9BC3
+Special input processing. Reads $DB input validation flags. Compares $08 special condition. If equal, branches Input_Special_Condition08. Returns if no special processing. Condition08: reads $38, compares $20. If equal, clears $0000 to $77. Returns. Originally unreachable.
+
+## Input_Finalize ($02:9BC4)
+**Bank:** $02 | **Category:** Input Finalization | **Range:** $02:9BC4-9BE0
+Input processing finalization. Loads $D353 input finalization handler to X, calls CODE_02883D. Clears high byte. Reads $8D controller index. Compares $04 for controller 4. If equal, returns. Compares $02 minimum controller index. If >= 2, continues Controller_StoreData. Returns if insufficient. StoreData: decrements A twice (zero-based + array indexing). Transfers to X. Reads $75 controller data value to $BC,X controller data array. Returns.
+
+## Input_EnhancedValidate ($02:9BE1)
+**Bank:** $02 | **Category:** Input Validation | **Range:** $02:9BE1-9BEB
+Enhanced input validation with system coordination. Loads $D2EF validation system to X, calls CODE_02883D. Loads $D361 coordination system to X. Jumps CODE_02883D.
+
+## Input_ComplexState ($02:9BEC)
+**Bank:** $02 | **Category:** Complex State | **Range:** $02:9BEC-9C3C
+Complex input state management. Calls System_ValidateEnhanced input state validation. ANDs with $DB input validation flags. If non-zero, branches Input_ComplexProcess. Jumps Input_StandardComplete standard processing. ComplexProcess: reads $DB, ANDs $08 flag. If not set, branches Input_AltPattern. Otherwise complex processing sequence executes. AltPattern: reads $DB, ANDs $50 pattern, compares $50. If not equal, branches Input_Reduction. Calls System_ValidateEnhanced validation. ANDs $50 validated pattern, compares $50. If equal, branches Input_Pattern_Enhanced. Returns if inconsistent. Pattern_Enhanced: sets 16-bit mode, shifts $77 right, sets 8-bit accumulator, 16-bit index. Calls CODE_029BE1. Loads $D37B handler to X, calls CODE_02883D. Continues to Input_Reduction. Originally unreachable.
+
