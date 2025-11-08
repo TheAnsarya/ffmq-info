@@ -1,6 +1,15 @@
 # FFMQ Tools Directory
 
+> **📖 Complete Tool Documentation:** See [TOOLS_REFERENCE.md](../docs/TOOLS_REFERENCE.md) for comprehensive documentation of all 130+ Python and PowerShell tools.
+
 This directory contains tools for ROM hacking, modding, and disassembly.
+
+## Quick Links
+
+- **[Complete Tools Reference](../docs/TOOLS_REFERENCE.md)** - Full documentation of all tools
+- **[Enemy Editor Guide](../docs/ENEMY_EDITOR_GUIDE.md)** - Visual enemy editor tutorial
+- **[Battle Data Pipeline](../docs/BATTLE_DATA_PIPELINE.md)** - Battle data workflow
+- **[Graphics Quickstart](../docs/graphics-quickstart.md)** - Graphics tools guide
 
 ## Table of Contents
 

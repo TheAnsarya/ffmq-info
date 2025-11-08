@@ -1,6 +1,6 @@
 # Final Fantasy Mystic Quest - SNES Disassembly & ROM Hack Project
 
-> **🚀 Quick Start:** Want to mod enemies? See [MODDING_QUICK_REFERENCE.md](MODDING_QUICK_REFERENCE.md) for a 3-step guide!
+> **🚀 Quick Start:** Want to mod enemies? See [Modding Quick Reference](docs/guides/MODDING_QUICK_REFERENCE.md) for a 3-step guide!
 
 > **🤖 Automatic Logging Active:** Just run `.\start-tracking.ps1` once and all your work is logged automatically!  
 > No manual logging needed - the system tracks everything for you in the background.
@@ -24,7 +24,7 @@ pwsh -File build.ps1
 mesen build/ffmq-rebuilt.sfc
 ```
 
-**See [MODDING_QUICK_REFERENCE.md](MODDING_QUICK_REFERENCE.md) for complete guide!**
+**See [Modding Quick Reference](docs/guides/MODDING_QUICK_REFERENCE.md) for complete guide!**
 
 Features:
 - ✅ Visual GUI editor for all 83 enemies
@@ -37,10 +37,10 @@ Features:
 - ✅ GameFAQs data verification
 
 Documentation:
-- [MODDING_QUICK_REFERENCE.md](MODDING_QUICK_REFERENCE.md) - Quick start guide
-- [ENEMY_EDITOR_GUIDE.md](docs/ENEMY_EDITOR_GUIDE.md) - Detailed GUI guide
-- [BATTLE_DATA_PIPELINE.md](docs/BATTLE_DATA_PIPELINE.md) - Technical details
-- [BUILD_INTEGRATION_COMPLETE.md](BUILD_INTEGRATION_COMPLETE.md) - Build system docs
+- [Modding Quick Reference](docs/guides/MODDING_QUICK_REFERENCE.md) - Quick start guide
+- [Enemy Editor Guide](docs/ENEMY_EDITOR_GUIDE.md) - Detailed GUI guide
+- [Battle Data Pipeline](docs/BATTLE_DATA_PIPELINE.md) - Technical details
+- [Build Integration Complete](docs/historical/BUILD_INTEGRATION_COMPLETE.md) - Build system docs
 
 ## Project Overview
 
@@ -262,31 +262,43 @@ enemy_editor.bat
 
 ## Documentation
 
-📚 **[Complete Documentation Index](docs/README.md)** - Start here for organized access to all documentation!
+📚 **[Complete Documentation Index](docs/INDEX.md)** - Master index for all project documentation!
 
-### Quick Links
+### Quick Links by Role
 
-**Getting Started:**
-- **[BUILD_GUIDE.md](docs/BUILD_GUIDE.md)** ⭐ - Comprehensive build instructions and troubleshooting
-- **[MODDING_GUIDE.md](docs/MODDING_GUIDE.md)** ⭐ - Complete guide to creating game modifications
-- **[ENEMY_EDITOR_GUIDE.md](docs/ENEMY_EDITOR_GUIDE.md)** ✨ NEW! - Visual enemy stats editor (GUI)
-- **[CONTRIBUTING.md](CONTRIBUTING.md)** ⭐ - How to contribute to the project
+**New Users:**
+1. [Quick Start Guide](docs/guides/QUICK_START_GUIDE.md) - Get started fast
+2. [Build Quick Start](docs/guides/BUILD_QUICK_START.md) - Build your first ROM
+3. [FAQ](docs/guides/FAQ.md) - Common questions answered
 
-**Technical Reference:**
-- **[Integration Complete](docs/integration-complete.md)** - Complete integration summary (300 lines)
-- **[Battle Data Pipeline](docs/BATTLE_DATA_PIPELINE.md)** - Enemy/attack data extraction & conversion
-- **[Source Code README](src/asm/README.md)** - Source organization and structure
-- **[Graphics Format](docs/graphics-format.md)** - SNES graphics format (600 lines)
-- **[Data Formats](docs/data_formats.md)** - Game data structures and formats
+**Modders:**
+1. [Modding Quick Reference](docs/guides/MODDING_QUICK_REFERENCE.md) ⭐ - 3-step modding guide
+2. [Enemy Editor Guide](docs/ENEMY_EDITOR_GUIDE.md) ✨ NEW! - Visual enemy editor (GUI)
+3. [Battle Data Pipeline](docs/BATTLE_DATA_PIPELINE.md) - Data modification workflow
+4. [Graphics Quick Start](docs/graphics-quickstart.md) - Graphics modding
 
-**Tools & Build System:**
-- **[Build Instructions](docs/build-instructions.md)** - Quick build reference
-- **[Graphics Quick Start](docs/graphics-quickstart.md)** - Graphics tools guide (400 lines)
-- **[Testing Guide](docs/testing.md)** - Testing framework and procedures
+**Developers:**
+1. [Contributing](CONTRIBUTING.md) ⭐ - How to contribute
+2. [Build Guide](docs/guides/BUILD_GUIDE.md) - Comprehensive build system
+3. [Architecture](docs/ARCHITECTURE.md) - Project architecture
+4. [Function Reference](docs/FUNCTION_REFERENCE.md) - Complete code reference (18K+ lines)
 
-### All Documentation
+**Researchers:**
+1. [Bank Classification](docs/technical/BANK_CLASSIFICATION.md) - ROM structure
+2. [ROM Data Map](docs/ROM_DATA_MAP.md) - Complete ROM map
+3. [Battle System](docs/BATTLE_SYSTEM.md) - Battle mechanics
+4. [Technical Analysis](docs/technical/TECHNICAL_ANALYSIS_2025-11-06.md) - Latest analysis
 
-See **[docs/README.md](docs/README.md)** for the complete, categorized documentation index with recommended reading orders for contributors, modders, and researchers.
+### Documentation Categories
+
+- **[Guides](docs/guides/)** - User and developer guides (BUILD_GUIDE, QUICK_START, FAQ, etc.)
+- **[Technical](docs/technical/)** - ROM structure, data formats, system analysis
+- **[Status](docs/status/)** - Progress reports and project status
+- **[Project Management](docs/project-management/)** - TODO lists, roadmaps, issues
+- **[DataCrystal](docs/datacrystal/)** - DataCrystal wiki integration
+- **[Historical](docs/historical/)** - Session logs and completion reports
+
+See **[docs/INDEX.md](docs/INDEX.md)** for the complete, organized documentation index.
 
 ### Implementation Status
 
