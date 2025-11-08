@@ -585,6 +585,11 @@ I want to update the data crystal wikitext documentation for the ROMMAP and ROMM
 make sure the session and chat logs are being updated (update them!); make sure guthub issues are updated and Update/check-off the checklists on closed github issues; clean up the `bak` and `temp` files and other trash; make sure all files are formated (as always: tabs, crlf, utf-8, editorconfig); and use up all the tokens for each session (efficiency)
 you're hitting the length limit and wasting my credits, stop doing that, continue this task and then pick something else to do
 that seemed to happen too quick, don't waste my tokens per session, continue the work (there is an md we just made about this) and use up all the tokens for each session (efficiency)
+clean up the `bak` and `temp` files and other trash; organize all the documention files (`md` files mostly) and organize the scripts (`tools` folder `py` files mostly) and organize everything else; split documentation into sub-documents when it seems appropriate; update all the documentation  for the scripts and everything; clean up the project and organize it; and use up all the tokens for each session (efficiency)
+8.75% token usage is way too low! you're wasting my money! The documentation was good, Now, please do an actual `file` reorganization, like put scripts in the `tools` folder into subfolders and files in the `docs` folder into subfolders (and update documentations links for both), etc, for as long as you can and use up all the tokens for each session (efficiency) and add documentation for the new organizational structure
+---- did the query then started doing bank documentation to use up tokens, but hit limit
+---- clicked: try again
+
 
 
 
@@ -653,5 +658,5 @@ Discord channels about SNES development include invites of: `https://discord.gg/
 create a github project for making an `FFMQ Editor UI` where the project and all issues and tasks and milestones are associated with the `ffmq-info` repository; make a massive amount of issues and child issues and sub-children issues and todo lists for the ffmq-editor-ui for an eventual game editor for `Final Fantasy Mystic Quest` using our complete disassembly and resource and graphics and data extraction and schemas, planning for a bunch of different data and graphics editors, and UI for _editing_ and viewing maps (overworld, dungeon, town), not affecting the original files, but a new set of files that can then be used for building a new rom; you need a big UI for easy graphics, palette, data, monster groups, spells, event commands (moving the characters around and text) dialog, etc; UI easily interacts with backend to initiate  extractions, data, and building a new rom. Expand this big style, and organize the github issues and projects and kanban boards for easy development.
 
 
-clean up the `bak` and `temp` files and other trash; organize all the documention files (`md` files mostly) and organize the scripts (`tools` folder `py` files mostly) and organize everything else; split documentation into sub-documents when it seems appropriate; update all the documentation  for the scripts and everything; clean up the project and organize it;
+
 
