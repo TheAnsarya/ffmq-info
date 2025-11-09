@@ -49,7 +49,7 @@ class GeneratorParams:
     octaves: int = 1
     persistence: float = 0.5
     lacunarity: float = 2.0
-    
+
     def to_dict(self):
         return {
             'pattern_type': self.pattern_type.value,
@@ -66,48 +66,48 @@ class GeneratorParams:
 
 class PerlinNoise:
     """Perlin noise generator for natural patterns"""
-    
+
     def __init__(self, seed: int = 42):
         random.seed(seed)
         self.perm = list(range(256))
         random.shuffle(self.perm)
         self.perm *= 2
-    
+
     def fade(self, t: float) -> float:
         """Fade function for smooth interpolation"""
         return t * t * t * (t * (t * 6 - 15) + 10)
-    
+
     def lerp(self, t: float, a: float, b: float) -> float:
         """Linear interpolation"""
         return a + t * (b - a)
-    
+
     def grad(self, hash_val: int, x: float, y: float) -> float:
         """Gradient function"""
         h = hash_val & 15
         u = x if h < 8 else y
         v = y if h < 4 else (x if h in (12, 14) else 0)
         return (u if (h & 1) == 0 else -u) + (v if (h & 2) == 0 else -v)
-    
+
     def noise(self, x: float, y: float) -> float:
         """2D Perlin noise (-1 to 1)"""
         xi = int(math.floor(x)) & 255
         yi = int(math.floor(y)) & 255
         xf = x - math.floor(x)
         yf = y - math.floor(y)
-        
+
         u = self.fade(xf)
         v = self.fade(yf)
-        
+
         aa = self.perm[self.perm[xi] + yi]
         ab = self.perm[self.perm[xi] + yi + 1]
         ba = self.perm[self.perm[xi + 1] + yi]
         bb = self.perm[self.perm[xi + 1] + yi + 1]
-        
+
         x1 = self.lerp(u, self.grad(aa, xf, yf), self.grad(ba, xf - 1, yf))
         x2 = self.lerp(u, self.grad(ab, xf, yf - 1), self.grad(bb, xf - 1, yf - 1))
-        
+
         return self.lerp(v, x1, x2)
-    
+
     def octave_noise(self, x: float, y: float, octaves: int = 4,
                      persistence: float = 0.5, lacunarity: float = 2.0) -> float:
         """Multi-octave Perlin noise for detail"""
@@ -115,27 +115,27 @@ class PerlinNoise:
         frequency = 1
         amplitude = 1
         max_value = 0
-        
+
         for _ in range(octaves):
             total += self.noise(x * frequency, y * frequency) * amplitude
             max_value += amplitude
             amplitude *= persistence
             frequency *= lacunarity
-        
+
         return total / max_value
 
 
 class TilesetGenerator:
     """Generate procedural tilesets"""
-    
+
     def __init__(self, palette: List[Tuple[int, int, int]]):
         self.palette = palette  # RGB colors
         self.noise_gen = None
-        
+
     def generate_tile(self, params: GeneratorParams) -> List[List[int]]:
         """Generate 8x8 tile with given parameters"""
         self.noise_gen = PerlinNoise(params.seed)
-        
+
         # Generate base pattern
         if params.pattern_type == PatternType.NOISE:
             tile = self._generate_noise(params)
@@ -163,12 +163,12 @@ class TilesetGenerator:
             tile = self._generate_maze(params)
         else:
             tile = [[0] * 8 for _ in range(8)]
-        
+
         # Apply style effects
         tile = self._apply_style(tile, params)
-        
+
         return tile
-    
+
     def _generate_noise(self, params: GeneratorParams) -> List[List[int]]:
         """Random noise pattern"""
         random.seed(params.seed)
@@ -182,7 +182,7 @@ class TilesetGenerator:
                     row.append(params.colors[0] if params.colors else 0)
             tile.append(row)
         return tile
-    
+
     def _generate_gradient(self, params: GeneratorParams) -> List[List[int]]:
         """Linear gradient pattern"""
         tile = []
@@ -196,7 +196,7 @@ class TilesetGenerator:
                 row.append(params.colors[idx])
             tile.append(row)
         return tile
-    
+
     def _generate_checkerboard(self, params: GeneratorParams) -> List[List[int]]:
         """Checkerboard pattern"""
         tile = []
@@ -211,7 +211,7 @@ class TilesetGenerator:
                                else params.colors[0])
             tile.append(row)
         return tile
-    
+
     def _generate_stripes(self, params: GeneratorParams) -> List[List[int]]:
         """Horizontal or vertical stripes"""
         tile = []
@@ -227,7 +227,7 @@ class TilesetGenerator:
                                else params.colors[0])
             tile.append(row)
         return tile
-    
+
     def _generate_circles(self, params: GeneratorParams) -> List[List[int]]:
         """Concentric circles"""
         tile = []
@@ -240,7 +240,7 @@ class TilesetGenerator:
                 row.append(params.colors[ring])
             tile.append(row)
         return tile
-    
+
     def _generate_brick(self, params: GeneratorParams) -> List[List[int]]:
         """Brick wall pattern"""
         tile = []
@@ -258,7 +258,7 @@ class TilesetGenerator:
                     row.append(params.colors[0] if params.colors else 0)
             tile.append(row)
         return tile
-    
+
     def _generate_diagonal(self, params: GeneratorParams) -> List[List[int]]:
         """Diagonal stripes"""
         tile = []
@@ -273,7 +273,7 @@ class TilesetGenerator:
                                else params.colors[0])
             tile.append(row)
         return tile
-    
+
     def _generate_wave(self, params: GeneratorParams) -> List[List[int]]:
         """Sine wave pattern"""
         tile = []
@@ -288,12 +288,12 @@ class TilesetGenerator:
                     row.append(params.colors[0] if params.colors else 0)
             tile.append(row)
         return tile
-    
+
     def _generate_cellular(self, params: GeneratorParams) -> List[List[int]]:
         """Cellular automata pattern"""
         random.seed(params.seed)
         tile = [[random.choice([0, 1]) for _ in range(8)] for _ in range(8)]
-        
+
         # Run cellular automata
         for _ in range(3):
             new_tile = [[0] * 8 for _ in range(8)]
@@ -309,21 +309,21 @@ class TilesetGenerator:
                     else:
                         new_tile[y][x] = 1 if neighbors == 3 else 0
             tile = new_tile
-        
+
         # Map to colors
         for y in range(8):
             for x in range(8):
                 tile[y][x] = params.colors[1 if tile[y][x] else 0] if len(
                     params.colors) > 1 else params.colors[0]
-        
+
         return tile
-    
+
     def _generate_voronoi(self, params: GeneratorParams) -> List[List[int]]:
         """Voronoi diagram pattern"""
         random.seed(params.seed)
         points = [(random.randint(0, 7), random.randint(0, 7))
                   for _ in range(max(2, int(params.density * 8)))]
-        
+
         tile = []
         for y in range(8):
             row = []
@@ -333,7 +333,7 @@ class TilesetGenerator:
                 row.append(params.colors[idx])
             tile.append(row)
         return tile
-    
+
     def _generate_perlin(self, params: GeneratorParams) -> List[List[int]]:
         """Perlin noise pattern"""
         tile = []
@@ -350,15 +350,15 @@ class TilesetGenerator:
                 row.append(params.colors[idx])
             tile.append(row)
         return tile
-    
+
     def _generate_maze(self, params: GeneratorParams) -> List[List[int]]:
         """Maze pattern using recursive backtracking"""
         random.seed(params.seed)
-        
+
         # Simplified 4x4 maze
         maze = [[1] * 4 for _ in range(4)]
         visited = [[False] * 4 for _ in range(4)]
-        
+
         def carve(x, y):
             visited[y][x] = True
             maze[y][x] = 0
@@ -368,9 +368,9 @@ class TilesetGenerator:
                 nx, ny = x + dx, y + dy
                 if 0 <= nx < 4 and 0 <= ny < 4 and not visited[ny][nx]:
                     carve(nx, ny)
-        
+
         carve(0, 0)
-        
+
         # Scale to 8x8
         tile = []
         for y in range(8):
@@ -382,7 +382,7 @@ class TilesetGenerator:
                            else params.colors[0])
             tile.append(row)
         return tile
-    
+
     def _apply_style(self, tile: List[List[int]], params: GeneratorParams
                      ) -> List[List[int]]:
         """Apply visual style effects"""
@@ -395,7 +395,7 @@ class TilesetGenerator:
         elif params.style == TileStyle.EMBOSSED:
             return self._apply_emboss(tile, params.colors)
         return tile
-    
+
     def _apply_shading(self, tile: List[List[int]], colors: List[int]
                        ) -> List[List[int]]:
         """Add shading effect"""
@@ -407,7 +407,7 @@ class TilesetGenerator:
                     idx = colors.index(tile[y][x]) if tile[y][x] in colors else 0
                     result[y][x] = colors[min(len(colors) - 1, idx + 1)]
         return result
-    
+
     def _apply_dithering(self, tile: List[List[int]]) -> List[List[int]]:
         """Add dithering pattern"""
         result = [row[:] for row in tile]
@@ -416,13 +416,13 @@ class TilesetGenerator:
                 if (x + y) % 2 == 1:
                     result[y][x] = max(0, result[y][x] - 1)
         return result
-    
+
     def _apply_outline(self, tile: List[List[int]], colors: List[int]
                        ) -> List[List[int]]:
         """Add outline to distinct regions"""
         result = [row[:] for row in tile]
         outline_color = colors[-1] if colors else 0
-        
+
         for y in range(8):
             for x in range(8):
                 # Check neighbors
@@ -435,9 +435,9 @@ class TilesetGenerator:
                             break
                 if is_edge:
                     result[y][x] = outline_color
-        
+
         return result
-    
+
     def _apply_emboss(self, tile: List[List[int]], colors: List[int]
                       ) -> List[List[int]]:
         """Add emboss effect"""
@@ -448,7 +448,7 @@ class TilesetGenerator:
                     idx = colors.index(tile[y][x]) if tile[y][x] in colors else 0
                     result[y][x] = colors[min(len(colors) - 1, idx + 1)]
         return result
-    
+
     def generate_tileset(self, params_list: List[GeneratorParams], count: int = 16
                          ) -> List[List[List[int]]]:
         """Generate multiple tiles as a tileset"""
@@ -459,7 +459,7 @@ class TilesetGenerator:
             tile = self.generate_tile(params)
             tiles.append(tile)
         return tiles
-    
+
     def export_to_chr(self, tiles: List[List[List[int]]], filepath: str):
         """Export tiles to CHR format (SNES 4bpp)"""
         with open(filepath, 'wb') as f:
@@ -473,7 +473,7 @@ class TilesetGenerator:
                         bp0 |= ((color & 1) << (7 - x))
                         bp1 |= (((color >> 1) & 1) << (7 - x))
                     f.write(bytes([bp0, bp1]))
-                
+
                 for y in range(8):
                     # Bitplane 2-3
                     bp2, bp3 = 0, 0
@@ -487,16 +487,16 @@ class TilesetGenerator:
 def main():
     """Test tileset generator"""
     pygame.init()
-    
+
     # Create palette (simple grayscale)
     palette = [(i * 16, i * 16, i * 16) for i in range(16)]
-    
+
     generator = TilesetGenerator(palette)
-    
+
     # Test each pattern type
     pattern_types = list(PatternType)
     tiles = []
-    
+
     for i, pattern in enumerate(pattern_types):
         params = GeneratorParams(
             pattern_type=pattern,
@@ -510,11 +510,11 @@ def main():
         tile = generator.generate_tile(params)
         tiles.append(tile)
         print(f"Generated {pattern.value} tile")
-    
+
     # Export
     generator.export_to_chr(tiles, "generated_tileset.chr")
     print(f"Exported {len(tiles)} tiles to CHR format")
-    
+
     # Export params
     params_data = {
         'patterns': [

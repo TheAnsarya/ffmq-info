@@ -57,16 +57,16 @@ class CodeTemplate:
     parameters: List[str]
     code_template: str
     example: str
-    
+
     def generate(self, **kwargs) -> str:
         """Generate code from template"""
         code = self.code_template
-        
+
         # Substitute parameters
         for param, value in kwargs.items():
             placeholder = f"{{{param}}}"
             code = code.replace(placeholder, str(value))
-        
+
         return code
 
 
@@ -92,12 +92,12 @@ class OptimizationSuggestion:
 
 class CodeLibrary:
     """Library of code snippets and patterns"""
-    
+
     def __init__(self):
         self.snippets: List[CodeSnippet] = []
         self.templates: Dict[CodePattern, List[CodeTemplate]] = {}
         self._init_library()
-    
+
     def _init_library(self):
         """Initialize code library"""
         # Math snippets
@@ -108,7 +108,7 @@ class CodeLibrary:
             tags=["math", "multiplication", "optimization"],
             complexity="simple"
         ))
-        
+
         self.add_snippet(CodeSnippet(
             name="Divide by 2",
             description="Divide accumulator by 2 (fast)",
@@ -116,7 +116,7 @@ class CodeLibrary:
             tags=["math", "division", "optimization"],
             complexity="simple"
         ))
-        
+
         self.add_snippet(CodeSnippet(
             name="Multiply 8-bit",
             description="Multiply A by value in X (result in A)",
@@ -137,7 +137,7 @@ class CodeLibrary:
             tags=["math", "multiplication", "8bit"],
             complexity="moderate"
         ))
-        
+
         # Loop snippets
         self.add_snippet(CodeSnippet(
             name="Counted Loop",
@@ -152,7 +152,7 @@ class CodeLibrary:
             tags=["loop", "control"],
             complexity="simple"
         ))
-        
+
         self.add_snippet(CodeSnippet(
             name="Memory Copy",
             description="Copy N bytes from source to destination",
@@ -168,7 +168,7 @@ class CodeLibrary:
             tags=["memory", "copy", "loop"],
             complexity="moderate"
         ))
-        
+
         # Condition snippets
         self.add_snippet(CodeSnippet(
             name="Compare and Branch",
@@ -185,7 +185,7 @@ class CodeLibrary:
             tags=["condition", "branch", "compare"],
             complexity="simple"
         ))
-        
+
         # DMA snippet
         self.add_snippet(CodeSnippet(
             name="DMA Transfer",
@@ -211,10 +211,10 @@ class CodeLibrary:
             tags=["dma", "transfer", "graphics", "advanced"],
             complexity="complex"
         ))
-        
+
         # Initialize templates
         self._init_templates()
-    
+
     def _init_templates(self):
         """Initialize code templates"""
         # Variable set template
@@ -227,7 +227,7 @@ class CodeLibrary:
 STA {variable}  ; Set {variable} = {value}""",
             example="set HP to 100"
         ))
-        
+
         self.add_template(CodeTemplate(
             name="Set Variable (16-bit)",
             pattern=CodePattern.VARIABLE_SET,
@@ -239,7 +239,7 @@ STA {variable}
 SEP #$20       ; 8-bit A""",
             example="set MaxHP to 9999"
         ))
-        
+
         # Increment template
         self.add_template(CodeTemplate(
             name="Increment Variable",
@@ -249,7 +249,7 @@ SEP #$20       ; 8-bit A""",
             code_template="""INC {variable}  ; {variable}++""",
             example="increment counter"
         ))
-        
+
         # Condition template
         self.add_template(CodeTemplate(
             name="If Greater Than",
@@ -264,7 +264,7 @@ BCC .skip_{label}  ; Skip if less
 .skip_{label}:""",
             example="if level > 10"
         ))
-        
+
         # Loop template
         self.add_template(CodeTemplate(
             name="Counted Loop",
@@ -278,7 +278,7 @@ BCC .skip_{label}  ; Skip if less
     BNE .loop_{label}""",
             example="loop 8 times"
         ))
-        
+
         # Math add template
         self.add_template(CodeTemplate(
             name="Add to Variable",
@@ -291,7 +291,7 @@ ADC #{value}
 STA {variable}  ; {variable} += {value}""",
             example="add 10 to score"
         ))
-        
+
         # Bit set template
         self.add_template(CodeTemplate(
             name="Set Bit",
@@ -303,7 +303,7 @@ ORA #(1<<{bit})
 STA {variable}  ; Set bit {bit}""",
             example="set bit 3"
         ))
-        
+
         # Memory copy template
         self.add_template(CodeTemplate(
             name="Copy Memory Block",
@@ -319,22 +319,22 @@ STA {variable}  ; Set bit {bit}""",
     BNE .copy_loop""",
             example="copy 16 bytes from source to dest"
         ))
-    
+
     def add_snippet(self, snippet: CodeSnippet):
         """Add code snippet to library"""
         self.snippets.append(snippet)
-    
+
     def add_template(self, template: CodeTemplate):
         """Add code template"""
         if template.pattern not in self.templates:
             self.templates[template.pattern] = []
         self.templates[template.pattern].append(template)
-    
+
     def search_snippets(self, query: str) -> List[CodeSnippet]:
         """Search snippets by name, description, or tags"""
         query_lower = query.lower()
         results = []
-        
+
         for snippet in self.snippets:
             if query_lower in snippet.name.lower():
                 results.append(snippet)
@@ -342,9 +342,9 @@ STA {variable}  ; Set bit {bit}""",
                 results.append(snippet)
             elif any(query_lower in tag for tag in snippet.tags):
                 results.append(snippet)
-        
+
         return results
-    
+
     def get_template(self, pattern: CodePattern) -> Optional[CodeTemplate]:
         """Get first template for pattern"""
         templates = self.templates.get(pattern, [])
@@ -353,42 +353,42 @@ STA {variable}  ; Set bit {bit}""",
 
 class PseudocodeParser:
     """Parse pseudocode and generate assembly"""
-    
+
     def __init__(self, library: CodeLibrary):
         self.library = library
         self.label_counter = 0
-    
+
     def generate_label(self, prefix: str = "label") -> str:
         """Generate unique label"""
         self.label_counter += 1
         return f"{prefix}_{self.label_counter}"
-    
+
     def parse(self, pseudocode: str) -> str:
         """Parse pseudocode and generate assembly"""
         lines = pseudocode.strip().split('\n')
         assembly_lines = []
-        
+
         for line in lines:
             line = line.strip()
             if not line:
                 continue
-            
+
             asm = self._parse_line(line)
             if asm:
                 assembly_lines.append(asm)
-        
+
         return '\n'.join(assembly_lines)
-    
+
     def _parse_line(self, line: str) -> Optional[str]:
         """Parse single pseudocode line"""
         line_lower = line.lower()
-        
+
         # Set variable: "set X to Y"
         match = re.match(r'set\s+(\w+)\s+to\s+(.+)', line_lower)
         if match:
             var = match.group(1)
             value = match.group(2)
-            
+
             # Try to parse value as number
             try:
                 if value.startswith('0x'):
@@ -398,11 +398,11 @@ class PseudocodeParser:
                 value_str = f"${num_value:02X}"
             except:
                 value_str = value
-            
+
             template = self.library.get_template(CodePattern.VARIABLE_SET)
             if template:
                 return template.generate(variable=var, value=value_str)
-        
+
         # Increment: "increment X"
         match = re.match(r'increment\s+(\w+)', line_lower)
         if match:
@@ -410,23 +410,23 @@ class PseudocodeParser:
             template = self.library.get_template(CodePattern.VARIABLE_INC)
             if template:
                 return template.generate(variable=var)
-        
+
         # Add: "add X to Y"
         match = re.match(r'add\s+(.+)\s+to\s+(\w+)', line_lower)
         if match:
             value = match.group(1)
             var = match.group(2)
-            
+
             try:
                 num_value = int(value)
                 value_str = f"${num_value:02X}"
             except:
                 value_str = value
-            
+
             template = self.library.get_template(CodePattern.MATH_ADD)
             if template:
                 return template.generate(variable=var, value=value_str)
-        
+
         # Loop: "loop X times"
         match = re.match(r'loop\s+(\d+)\s+times', line_lower)
         if match:
@@ -435,41 +435,41 @@ class PseudocodeParser:
             template = self.library.get_template(CodePattern.LOOP_COUNTED)
             if template:
                 return template.generate(count=count, label=label)
-        
+
         # If condition: "if X > Y"
         match = re.match(r'if\s+(\w+)\s*>\s*(.+)', line_lower)
         if match:
             var = match.group(1)
             value = match.group(2).strip()
-            
+
             try:
                 num_value = int(value)
                 value_str = f"${num_value:02X}"
             except:
                 value_str = value
-            
+
             label = self.generate_label("cond")
             template = self.library.get_template(CodePattern.CONDITION_IF)
             if template:
                 return template.generate(variable=var, value=value_str, label=label)
-        
+
         # Call function: "call X"
         match = re.match(r'call\s+(\w+)', line_lower)
         if match:
             func = match.group(1)
             return f"JSR {func}"
-        
+
         # Return: "return"
         if line_lower == "return":
             return "RTS"
-        
+
         # Comment
         if line.startswith(';'):
             return line
-        
+
         # Unknown - return as comment
         return f"; TODO: {line}"
-    
+
     def parse_interactive(self):
         """Interactive pseudocode to assembly"""
         print("Pseudocode to Assembly Converter")
@@ -483,7 +483,7 @@ class PseudocodeParser:
         print("  if level > 10")
         print("  call UpdateSprite")
         print()
-        
+
         while True:
             print("\nEnter pseudocode:")
             lines = []
@@ -494,7 +494,7 @@ class PseudocodeParser:
                 if not line:
                     break
                 lines.append(line)
-            
+
             if lines:
                 pseudocode = '\n'.join(lines)
                 print("\nGenerated Assembly:")
@@ -505,44 +505,44 @@ class PseudocodeParser:
 
 class CodeOptimizer:
     """Analyze and optimize assembly code"""
-    
+
     def __init__(self):
         self.optimizations: List[Tuple[str, str, str, int]] = []
         self._init_optimizations()
-    
+
     def _init_optimizations(self):
         """Initialize optimization patterns"""
         # Pattern: (original, replacement, reason, cycles_saved)
         self.optimizations = [
             # Clear accumulator
-            (r'LDA #\$00', 'LDA #0\n; Or better: TDC (if DP=0)', 
+            (r'LDA #\$00', 'LDA #0\n; Or better: TDC (if DP=0)',
              'Use TDC to clear A (faster if DP is 0)', 1),
-            
+
             # Increment by loading
             (r'LDA (.+)\nCLC\nADC #\$01\nSTA \1', 'INC \\1',
              'Use INC instead of load-add-store', 2),
-            
+
             # Set/clear carry unnecessarily
             (r'CLC\nADC #\$00', '; Remove CLC+ADC #0 (no effect)',
              'Redundant operation', 3),
-            
+
             # Redundant transfers
             (r'TAX\nTXA', '; Remove TAX+TXA (no effect)',
              'Redundant transfer', 4),
-            
+
             # Branch optimization
             (r'BEQ (.+)\nJMP (.+)\n\1:', 'BNE \\2\n\\1:',
              'Invert branch condition to avoid JMP', 3),
         ]
-    
+
     def analyze(self, code: str) -> List[OptimizationSuggestion]:
         """Analyze code and suggest optimizations"""
         suggestions = []
         lines = code.split('\n')
-        
+
         for i, line in enumerate(lines):
             line = line.strip()
-            
+
             # Check for common inefficiencies
             if 'LDA' in line and 'STA' in lines[i + 1] if i + 1 < len(lines) else False:
                 # Check if loading and immediately storing to same place
@@ -557,7 +557,7 @@ class CodeOptimizer:
                             reason="Loading and storing same value",
                             cycles_saved=4
                         ))
-            
+
             # Check for multiple pushes/pulls
             if line.startswith('PHA') and i + 1 < len(lines) and lines[i + 1].strip().startswith('PLA'):
                 suggestions.append(OptimizationSuggestion(
@@ -567,7 +567,7 @@ class CodeOptimizer:
                     reason="Pushing and immediately pulling",
                     cycles_saved=7
                 ))
-        
+
         return suggestions
 
 
@@ -575,7 +575,7 @@ def main():
     """Test code generator"""
     # Create library
     library = CodeLibrary()
-    
+
     # Test snippet search
     print("Code Snippet Library")
     print("=" * 60)
@@ -585,13 +585,13 @@ def main():
         print(f"\n{snippet.name} ({snippet.complexity})")
         print(f"  {snippet.description}")
         print(f"  Tags: {', '.join(snippet.tags)}")
-    
+
     # Test pseudocode parsing
     print("\n\nPseudocode to Assembly")
     print("=" * 60)
-    
+
     parser = PseudocodeParser(library)
-    
+
     pseudocode = """
 set HP to 100
 set MP to 50
@@ -602,19 +602,19 @@ if level > 10
 call LevelUpRoutine
 return
     """.strip()
-    
+
     print("\nPseudocode:")
     print(pseudocode)
     print("\nGenerated Assembly:")
     print("-" * 60)
     print(parser.parse(pseudocode))
-    
+
     # Test optimizer
     print("\n\nCode Optimization")
     print("=" * 60)
-    
+
     optimizer = CodeOptimizer()
-    
+
     test_code = """
     LDA $1000
     STA $1000
@@ -622,7 +622,7 @@ return
     PLA
     LDA #$00
     """.strip()
-    
+
     print("\nOriginal Code:")
     print(test_code)
     print("\nOptimization Suggestions:")
@@ -631,7 +631,7 @@ return
         print(f"\nLine {suggestion.line_number}:")
         print(f"  Issue: {suggestion.reason}")
         print(f"  Cycles saved: {suggestion.cycles_saved}")
-    
+
     # Interactive mode
     print("\n\n")
     response = input("Start interactive mode? (y/n): ")

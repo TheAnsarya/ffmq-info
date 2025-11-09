@@ -43,7 +43,7 @@ class EncounterData:
     chance: int  # 0-100%
     min_level: int = 0
     max_level: int = 99
-    
+
     def to_dict(self):
         return {
             'formation_id': self.formation_id,
@@ -60,7 +60,7 @@ class MapTile:
     terrain: TerrainType
     walkable: bool = True
     encounter_rate: int = 0  # 0-100%
-    
+
     def to_dict(self):
         return {
             'tile_id': self.tile_id,
@@ -80,7 +80,7 @@ class MapConnection:
     target_x: int
     target_y: int
     connection_type: str = "normal"  # "normal", "stairs", "door", "warp"
-    
+
     def to_dict(self):
         return {
             'source_map': self.source_map,
@@ -104,12 +104,12 @@ class MapRegion:
     music_id: int = 0
     ambient_sound: Optional[int] = None
     weather: Optional[str] = None
-    
+
     def contains_point(self, x: int, y: int) -> bool:
         """Check if point is in region"""
         rx, ry, rw, rh = self.bounds
         return rx <= x < rx + rw and ry <= y < ry + rh
-    
+
     def to_dict(self):
         return {
             'region_id': self.region_id,
@@ -133,7 +133,7 @@ class WorldMap:
     tiles: List[List[MapTile]] = field(default_factory=list)
     regions: List[MapRegion] = field(default_factory=list)
     connections: List[MapConnection] = field(default_factory=list)
-    
+
     def __post_init__(self):
         """Initialize tile grid if empty"""
         if not self.tiles:
@@ -141,25 +141,25 @@ class WorldMap:
                 [MapTile(0, TerrainType.GRASS) for _ in range(self.width)]
                 for _ in range(self.height)
             ]
-    
+
     def get_tile(self, x: int, y: int) -> Optional[MapTile]:
         """Get tile at position"""
         if 0 <= x < self.width and 0 <= y < self.height:
             return self.tiles[y][x]
         return None
-    
+
     def set_tile(self, x: int, y: int, tile: MapTile):
         """Set tile at position"""
         if 0 <= x < self.width and 0 <= y < self.height:
             self.tiles[y][x] = tile
-    
+
     def get_region_at(self, x: int, y: int) -> Optional[MapRegion]:
         """Get region containing point"""
         for region in self.regions:
             if region.contains_point(x, y):
                 return region
         return None
-    
+
     def to_dict(self):
         return {
             'map_id': self.map_id,
@@ -174,7 +174,7 @@ class WorldMap:
 
 class MapRenderer:
     """Render world map to surface"""
-    
+
     TERRAIN_COLORS = {
         TerrainType.GRASS: (100, 200, 100),
         TerrainType.FOREST: (50, 150, 50),
@@ -189,10 +189,10 @@ class MapRenderer:
         TerrainType.DUNGEON: (120, 80, 120),
         TerrainType.BRIDGE: (180, 140, 100)
     }
-    
+
     def __init__(self, tile_size: int = 16):
         self.tile_size = tile_size
-        
+
     def render_map(self, world_map: WorldMap, surface: pygame.Surface,
                    offset_x: int = 0, offset_y: int = 0,
                    show_regions: bool = False, show_connections: bool = False):
@@ -202,7 +202,7 @@ class MapRenderer:
             for x in range(world_map.width):
                 tile = world_map.tiles[y][x]
                 color = self.TERRAIN_COLORS.get(tile.terrain, (128, 128, 128))
-                
+
                 rect = pygame.Rect(
                     offset_x + x * self.tile_size,
                     offset_y + y * self.tile_size,
@@ -210,11 +210,11 @@ class MapRenderer:
                     self.tile_size
                 )
                 pygame.draw.rect(surface, color, rect)
-                
+
                 # Unwalkable overlay
                 if not tile.walkable:
                     pygame.draw.rect(surface, (255, 0, 0, 128), rect, 1)
-        
+
         # Draw grid
         grid_color = (80, 80, 80)
         for x in range(0, world_map.width * self.tile_size + 1, self.tile_size):
@@ -229,7 +229,7 @@ class MapRenderer:
                 (offset_x, offset_y + y),
                 (offset_x + world_map.width * self.tile_size, offset_y + y)
             )
-        
+
         # Draw regions
         if show_regions:
             for region in world_map.regions:
@@ -241,12 +241,12 @@ class MapRenderer:
                     rh * self.tile_size
                 )
                 pygame.draw.rect(surface, (255, 255, 0), rect, 2)
-                
+
                 # Region name
                 font = pygame.font.Font(None, 16)
                 text = font.render(region.name, True, (255, 255, 0))
                 surface.blit(text, (rect.x + 5, rect.y + 5))
-        
+
         # Draw connections
         if show_connections:
             for conn in world_map.connections:
@@ -254,12 +254,12 @@ class MapRenderer:
                     x = offset_x + conn.source_x * self.tile_size + self.tile_size // 2
                     y = offset_y + conn.source_y * self.tile_size + self.tile_size // 2
                     pygame.draw.circle(surface, (255, 100, 255), (x, y), 8)
-    
+
     def world_to_screen(self, wx: int, wy: int, offset_x: int, offset_y: int
                         ) -> Tuple[int, int]:
         """Convert world coords to screen coords"""
         return (offset_x + wx * self.tile_size, offset_y + wy * self.tile_size)
-    
+
     def screen_to_world(self, sx: int, sy: int, offset_x: int, offset_y: int
                         ) -> Tuple[int, int]:
         """Convert screen coords to world coords"""
@@ -268,20 +268,20 @@ class MapRenderer:
 
 class WorldMapEditor:
     """Interactive world map editor"""
-    
+
     def __init__(self):
         pygame.init()
         self.screen = pygame.display.set_mode((1600, 900))
         pygame.display.set_caption("FFMQ World Map Editor")
         self.clock = pygame.time.Clock()
-        
+
         self.font = pygame.font.Font(None, 24)
         self.small_font = pygame.font.Font(None, 18)
-        
+
         # Create sample map
         self.world_map = self._create_sample_map()
         self.renderer = MapRenderer(tile_size=20)
-        
+
         # UI state
         self.camera_x = 0
         self.camera_y = 0
@@ -290,19 +290,19 @@ class WorldMapEditor:
         self.show_regions = True
         self.show_connections = True
         self.selected_region = None
-        
+
         # Drawing state
         self.is_drawing = False
         self.is_panning = False
         self.pan_start = (0, 0)
-        
+
         # Tools
         self.tool = "paint"  # "paint", "region", "connection"
-        
+
     def _create_sample_map(self) -> WorldMap:
         """Create sample world map"""
         world_map = WorldMap(0, "Overworld", 64, 48)
-        
+
         # Generate terrain
         for y in range(world_map.height):
             for x in range(world_map.width):
@@ -323,17 +323,17 @@ class WorldMapEditor:
                     # Grass
                     terrain = TerrainType.GRASS
                     walkable = True
-                
+
                 world_map.tiles[y][x] = MapTile(
                     0, terrain, walkable,
                     encounter_rate=30 if walkable else 0
                 )
-        
+
         # Add town
         for y in range(10, 15):
             for x in range(15, 20):
                 world_map.tiles[y][x] = MapTile(0, TerrainType.TOWN, True, 0)
-        
+
         # Add regions
         world_map.regions = [
             MapRegion(
@@ -359,135 +359,135 @@ class WorldMapEditor:
                 music_id=10
             )
         ]
-        
+
         # Add connections
         world_map.connections = [
             MapConnection(0, 17, 14, 1, 5, 5, "door")  # Town entrance
         ]
-        
+
         return world_map
-    
+
     def draw_toolbar(self):
         """Draw top toolbar"""
         toolbar_rect = pygame.Rect(0, 0, 1600, 40)
         pygame.draw.rect(self.screen, (50, 50, 50), toolbar_rect)
         pygame.draw.rect(self.screen, (200, 200, 200), toolbar_rect, 2)
-        
+
         x = 10
-        
+
         # Tool buttons
         tools = [
             ("Paint", "paint"),
             ("Region", "region"),
             ("Connection", "connection")
         ]
-        
+
         for label, tool in tools:
             color = (100, 150, 100) if self.tool == tool else (80, 80, 80)
             btn_rect = pygame.Rect(x, 5, 100, 30)
             pygame.draw.rect(self.screen, color, btn_rect)
             pygame.draw.rect(self.screen, (200, 200, 200), btn_rect, 2)
-            
+
             text = self.small_font.render(label, True, (255, 255, 255))
             text_rect = text.get_rect(center=btn_rect.center)
             self.screen.blit(text, text_rect)
-            
+
             x += 110
-        
+
         # Brush size
         x += 20
         text = self.small_font.render(f"Brush: {self.brush_size}",
                                        True, (255, 255, 255))
         self.screen.blit(text, (x, 10))
-        
+
         # Map name
         text = self.font.render(f"Map: {self.world_map.name}",
                                 True, (255, 255, 255))
         self.screen.blit(text, (1200, 8))
-    
+
     def draw_terrain_palette(self):
         """Draw terrain selector"""
         palette_rect = pygame.Rect(10, 50, 200, 800)
         pygame.draw.rect(self.screen, (40, 40, 40), palette_rect)
         pygame.draw.rect(self.screen, (200, 200, 200), palette_rect, 2)
-        
+
         # Title
         text = self.small_font.render("Terrain Types", True, (200, 200, 200))
         self.screen.blit(text, (20, 55))
-        
+
         y = 80
         for terrain in TerrainType:
             item_rect = pygame.Rect(20, y, 180, 35)
-            
+
             # Highlight selected
             if terrain == self.selected_terrain:
                 pygame.draw.rect(self.screen, (100, 100, 150), item_rect)
-            
+
             # Color swatch
             color = self.renderer.TERRAIN_COLORS.get(terrain, (128, 128, 128))
             swatch_rect = pygame.Rect(25, y + 5, 25, 25)
             pygame.draw.rect(self.screen, color, swatch_rect)
             pygame.draw.rect(self.screen, (255, 255, 255), swatch_rect, 1)
-            
+
             # Label
             text = self.small_font.render(terrain.name, True, (255, 255, 255))
             self.screen.blit(text, (55, y + 8))
-            
+
             y += 40
-    
+
     def draw_region_list(self):
         """Draw region list"""
         list_rect = pygame.Rect(1390, 50, 200, 400)
         pygame.draw.rect(self.screen, (40, 40, 40), list_rect)
         pygame.draw.rect(self.screen, (200, 200, 200), list_rect, 2)
-        
+
         # Title
         text = self.small_font.render("Regions", True, (200, 200, 200))
         self.screen.blit(text, (1400, 55))
-        
+
         y = 80
         for region in self.world_map.regions:
             item_rect = pygame.Rect(1400, y, 180, 50)
-            
+
             if region == self.selected_region:
                 pygame.draw.rect(self.screen, (100, 150, 100), item_rect)
-            
+
             # Region name
             text = self.small_font.render(region.name, True, (255, 255, 255))
             self.screen.blit(text, (1405, y + 5))
-            
+
             # Type
             type_text = region.region_type.value
             text = self.small_font.render(type_text, True, (200, 200, 200))
             self.screen.blit(text, (1405, y + 25))
-            
+
             y += 55
-    
+
     def draw_map_view(self):
         """Draw main map view"""
         view_rect = pygame.Rect(220, 50, 1160, 800)
         pygame.draw.rect(self.screen, (20, 20, 20), view_rect)
-        
+
         # Render map
         map_surface = pygame.Surface((
             self.world_map.width * self.renderer.tile_size,
             self.world_map.height * self.renderer.tile_size
         ))
-        
+
         self.renderer.render_map(
             self.world_map, map_surface, 0, 0,
             self.show_regions, self.show_connections
         )
-        
+
         # Blit visible portion
         self.screen.blit(map_surface, (220, 50), (
             self.camera_x, self.camera_y,
             view_rect.width, view_rect.height
         ))
-        
+
         # View border
         pygame.draw.rect(self.screen, (200, 200, 200), view_rect, 2)
-    
+
     def handle_map_click(self, screen_x: int, screen_y: int, button: int):
         """Handle click on map view"""
         # Convert to world coords
@@ -496,10 +496,10 @@ class WorldMapEditor:
             screen_y - 50 + self.camera_y,
             0, 0
         )
-        
+
         if not (0 <= wx < self.world_map.width and 0 <= wy < self.world_map.height):
             return
-        
+
         if self.tool == "paint":
             # Paint terrain
             for dy in range(-self.brush_size + 1, self.brush_size):
@@ -511,19 +511,19 @@ class WorldMapEditor:
                         )
                         tile = MapTile(0, self.selected_terrain, walkable, 30)
                         self.world_map.set_tile(tx, ty, tile)
-        
+
         elif self.tool == "region":
             # Select region
             region = self.world_map.get_region_at(wx, wy)
             self.selected_region = region
-    
+
     def handle_toolbar_click(self, pos: Tuple[int, int]):
         """Handle toolbar clicks"""
         x, y = pos
-        
+
         if y > 40:
             return
-        
+
         # Tool buttons
         if 10 <= x < 110:
             self.tool = "paint"
@@ -531,28 +531,28 @@ class WorldMapEditor:
             self.tool = "region"
         elif 230 <= x < 330:
             self.tool = "connection"
-    
+
     def handle_palette_click(self, pos: Tuple[int, int]):
         """Handle terrain palette clicks"""
         x, y = pos
-        
+
         if not (10 <= x <= 210 and 80 <= y <= 830):
             return
-        
+
         idx = (y - 80) // 40
         terrains = list(TerrainType)
         if 0 <= idx < len(terrains):
             self.selected_terrain = terrains[idx]
-    
+
     def run(self):
         """Main editor loop"""
         running = True
-        
+
         while running:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     running = False
-                
+
                 elif event.type == pygame.MOUSEBUTTONDOWN:
                     if event.button == 1:  # Left click
                         if 220 <= event.pos[0] <= 1380 and 50 <= event.pos[1] <= 850:
@@ -562,70 +562,70 @@ class WorldMapEditor:
                             self.handle_toolbar_click(event.pos)
                         elif 10 <= event.pos[0] <= 210:
                             self.handle_palette_click(event.pos)
-                    
+
                     elif event.button == 2:  # Middle click - pan
                         self.is_panning = True
                         self.pan_start = event.pos
-                    
+
                     elif event.button == 4:  # Scroll up
                         self.brush_size = min(5, self.brush_size + 1)
-                    
+
                     elif event.button == 5:  # Scroll down
                         self.brush_size = max(1, self.brush_size - 1)
-                
+
                 elif event.type == pygame.MOUSEBUTTONUP:
                     if event.button == 1:
                         self.is_drawing = False
                     elif event.button == 2:
                         self.is_panning = False
-                
+
                 elif event.type == pygame.MOUSEMOTION:
                     if self.is_drawing:
                         if 220 <= event.pos[0] <= 1380 and 50 <= event.pos[1] <= 850:
                             self.handle_map_click(event.pos[0], event.pos[1], 1)
-                    
+
                     if self.is_panning:
                         dx = event.pos[0] - self.pan_start[0]
                         dy = event.pos[1] - self.pan_start[1]
                         self.camera_x = max(0, self.camera_x - dx)
                         self.camera_y = max(0, self.camera_y - dy)
                         self.pan_start = event.pos
-                
+
                 elif event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_ESCAPE:
                         running = False
-                    
+
                     elif event.key == pygame.K_s and (
                             pygame.key.get_mods() & pygame.KMOD_CTRL):
                         self.save_map("world_map.json")
                         print("Map saved!")
-                    
+
                     elif event.key == pygame.K_r:
                         self.show_regions = not self.show_regions
-                    
+
                     elif event.key == pygame.K_c:
                         self.show_connections = not self.show_connections
-            
+
             # Draw
             self.screen.fill((30, 30, 30))
-            
+
             self.draw_toolbar()
             self.draw_terrain_palette()
             self.draw_map_view()
             self.draw_region_list()
-            
+
             # Instructions
             inst = self.small_font.render(
                 "R: Toggle Regions | C: Toggle Connections | Ctrl+S: Save | ESC: Quit",
                 True, (150, 150, 150)
             )
             self.screen.blit(inst, (220, 860))
-            
+
             pygame.display.flip()
             self.clock.tick(60)
-        
+
         pygame.quit()
-    
+
     def save_map(self, filepath: str):
         """Save world map"""
         with open(filepath, 'w') as f:
