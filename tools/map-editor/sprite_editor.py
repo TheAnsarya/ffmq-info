@@ -75,7 +75,7 @@ class SpriteCanvas:
 		self.sprite_size = sprite_size
 		# Clear positions that don't fit
 		width, height = self._get_dimensions()
-		self.tile_positions = [pos for pos in self.tile_positions 
+		self.tile_positions = [pos for pos in self.tile_positions
 								if pos.x < width // 8 and pos.y < height // 8]
 
 	def _get_dimensions(self) -> Tuple[int, int]:
@@ -93,14 +93,14 @@ class SpriteCanvas:
 	def add_tile(self, tile_id: int, grid_x: int, grid_y: int):
 		"""Add tile at grid position"""
 		# Remove existing tile at position
-		self.tile_positions = [pos for pos in self.tile_positions 
+		self.tile_positions = [pos for pos in self.tile_positions
 								if not (pos.x == grid_x and pos.y == grid_y)]
 		# Add new tile
 		self.tile_positions.append(TilePosition(tile_id, grid_x, grid_y))
 
 	def remove_tile(self, grid_x: int, grid_y: int):
 		"""Remove tile at grid position"""
-		self.tile_positions = [pos for pos in self.tile_positions 
+		self.tile_positions = [pos for pos in self.tile_positions
 								if not (pos.x == grid_x and pos.y == grid_y)]
 
 	def get_tile_at(self, grid_x: int, grid_y: int) -> Optional[int]:
@@ -135,7 +135,7 @@ class SpriteCanvas:
 
 		return False
 
-	def draw(self, surface: pygame.Surface, font: pygame.font.Font, tileset: Optional[Tileset], 
+	def draw(self, surface: pygame.Surface, font: pygame.font.Font, tileset: Optional[Tileset],
 			palette: Optional[Palette]):
 		"""Draw sprite canvas"""
 		width, height = self._get_dimensions()
@@ -260,7 +260,7 @@ class SpriteCompositionEditor:
 
 		# Size selection buttons
 		self.size_buttons: Dict[SpriteSize, Button] = {}
-		sizes = [SpriteSize.SIZE_8x8, SpriteSize.SIZE_16x16, SpriteSize.SIZE_24x24, 
+		sizes = [SpriteSize.SIZE_8x8, SpriteSize.SIZE_16x16, SpriteSize.SIZE_24x24,
 				SpriteSize.SIZE_32x32, SpriteSize.SIZE_16x32, SpriteSize.SIZE_32x64]
 		for i, size in enumerate(sizes):
 			btn = Button(700 + (i % 3) * 140, 80 + (i // 3) * 35, 130, 30, size.name.replace('SIZE_', ''))
@@ -437,7 +437,7 @@ class SpriteCompositionEditor:
 		self.screen.set_clip(clip_rect)
 
 		# Canvas section
-		canvas_title = self.font.render(f"Sprite Canvas - {self.current_sprite_size.name.replace('SIZE_', '')}", 
+		canvas_title = self.font.render(f"Sprite Canvas - {self.current_sprite_size.name.replace('SIZE_', '')}",
 										True, COLOR_TEXT)
 		self.screen.blit(canvas_title, (700, 120))
 
@@ -450,7 +450,7 @@ class SpriteCompositionEditor:
 		for size, button in self.size_buttons.items():
 			# Highlight current size
 			if size == self.current_sprite_size:
-				highlight_rect = pygame.Rect(button.rect.x - 2, button.rect.y - 2, 
+				highlight_rect = pygame.Rect(button.rect.x - 2, button.rect.y - 2,
 											button.rect.width + 4, button.rect.height + 4)
 				pygame.draw.rect(self.screen, COLOR_SELECTED, highlight_rect, 3)
 			button.draw(self.screen, self.font)

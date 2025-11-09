@@ -83,8 +83,8 @@ class DraggableSlider:
 		# Draw center line if needed (for pan slider)
 		if self.show_center:
 			center_x = self.rect.x + self.rect.width // 2
-			pygame.draw.line(surface, COLOR_TEXT, 
-							(center_x, self.rect.y), 
+			pygame.draw.line(surface, COLOR_TEXT,
+							(center_x, self.rect.y),
 							(center_x, self.rect.bottom), 2)
 
 		# Draw handle

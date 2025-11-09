@@ -44,11 +44,11 @@ class ColorSlider:
 			rel_x = mouse_pos[0] - self.rect.x
 			rel_x = max(0, min(rel_x, self.rect.width))
 			new_value = int((rel_x / self.rect.width) * 255)
-			
+
 			if new_value != self.value:
 				self.value = new_value
 				return new_value
-		
+
 		return None
 
 	def set_value(self, value: int):
@@ -66,7 +66,7 @@ class ColorSlider:
 		for i in range(self.rect.width):
 			ratio = i / self.rect.width
 			value = int(ratio * 255)
-			
+
 			# Create color based on channel
 			if self.channel == 'R':
 				color = (value, 0, 0)
@@ -74,7 +74,7 @@ class ColorSlider:
 				color = (0, value, 0)
 			else:  # 'B'
 				color = (0, 0, value)
-			
+
 			line_rect = pygame.Rect(self.rect.x + i, self.rect.y, 1, self.rect.height)
 			pygame.draw.rect(surface, color, line_rect)
 
@@ -82,7 +82,7 @@ class ColorSlider:
 		indicator_x = self.rect.x + int((self.value / 255) * self.rect.width)
 		indicator_height = self.rect.height + 6
 		indicator_rect = pygame.Rect(indicator_x - 3, self.rect.y - 3, 6, indicator_height)
-		
+
 		# Draw handle
 		pygame.draw.rect(surface, COLOR_SWATCH_BORDER, indicator_rect)
 		pygame.draw.rect(surface, COLOR_BORDER, indicator_rect, 2)
@@ -256,7 +256,7 @@ class InteractivePaletteEditor:
 		for event in pygame.event.get():
 			if event.type == pygame.QUIT:
 				self.running = False
-			
+
 			elif event.type == pygame.KEYDOWN:
 				if event.key == pygame.K_ESCAPE:
 					self.running = False
@@ -270,7 +270,7 @@ class InteractivePaletteEditor:
 					self.copy_color()
 				elif event.key == pygame.K_2:
 					self.paste_color()
-			
+
 			elif event.type == pygame.MOUSEBUTTONDOWN:
 				if event.button == 1:
 					mouse_clicked = True
@@ -325,7 +325,7 @@ class InteractivePaletteEditor:
 			title_text += f" - Palette {self.current_palette_id}: {self.current_palette.name}"
 		if self.modified:
 			title_text += " *"
-		
+
 		title = self.title_font.render(title_text, True, COLOR_TEXT)
 		self.screen.blit(title, (20, 20))
 
@@ -349,7 +349,7 @@ class InteractivePaletteEditor:
 			# Large preview swatch
 			color = self.current_palette.colors[self.selected_color_idx]
 			r, g, b = color.to_rgb888()
-			
+
 			preview_rect = pygame.Rect(preview_x, preview_y, preview_size, preview_size)
 			pygame.draw.rect(self.screen, (r, g, b), preview_rect)
 			pygame.draw.rect(self.screen, COLOR_SWATCH_BORDER, preview_rect, 3)
@@ -416,15 +416,15 @@ class InteractivePaletteEditor:
 def main():
 	"""Entry point"""
 	import sys
-	
+
 	editor = InteractivePaletteEditor()
-	
+
 	if len(sys.argv) > 1:
 		editor.load_rom(sys.argv[1])
 	else:
 		print("Usage: python interactive_palette_editor.py <rom_path>")
 		print("Starting editor without ROM...")
-	
+
 	editor.run()
 
 

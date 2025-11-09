@@ -600,6 +600,7 @@ close all open files; update the session/chat logs; run formatting on the files,
 finish what you were doing, and then add in map editing for the dungeon maps including the monsters and editing the enemy sets and then editing the enemies/monsters; and add spell editing, item editing, music editing, etc; implement the changes to make it awesome for as long as you can and use up all the tokens for each session
 finish what you were doing; update session/chat logs; make sure all the editors are reachable and working and add more data/graphics/map editing capability; implement the changes to make it awesome for as long as you can and use up all the tokens for each session
 close all open files; update the session/chat logs; run formatting on the files; git commit and push; add more data/graphics/map/sound editing capability; implement the changes to make it awesome for as long as you can and use up all the tokens for each session
+git commit and push; close all open files; update the session/chat logs; run formatting on the files; add more data/graphics/map/sound editing capability; implement the changes to make it awesome for as long as you can and use up all the tokens for each session, do not waste my money - use the entire token space; git commit and push;
 
 
 

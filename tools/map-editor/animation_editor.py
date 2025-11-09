@@ -44,7 +44,7 @@ class Button:
 		color = COLOR_BUTTON_HOVER if self.hovered else COLOR_BUTTON
 		pygame.draw.rect(surface, color, self.rect)
 		pygame.draw.rect(surface, COLOR_BORDER, self.rect, 1)
-		
+
 		text_surf = font.render(self.text, True, COLOR_TEXT)
 		text_rect = text_surf.get_rect(center=self.rect.center)
 		surface.blit(text_surf, text_rect)
@@ -129,17 +129,17 @@ class TileSelectorPanel:
 		if mouse_clicked:
 			rel_x = mouse_pos[0] - self.rect.x
 			rel_y = mouse_pos[1] - self.rect.y + self.scroll_offset
-			
+
 			tile_x = rel_x // (self.tile_display_size + 4)
 			tile_y = rel_y // (self.tile_display_size + 4)
-			
+
 			tile_id = tile_y * self.tiles_per_row + tile_x
-			
+
 			# Check if valid tile
 			if 0 <= tile_id < 256:  # Assuming character tileset
 				self.selected_tile_id = tile_id
 				return tile_id
-		
+
 		return None
 
 	def draw(self, surface: pygame.Surface, font: pygame.font.Font):
@@ -165,7 +165,7 @@ class TileSelectorPanel:
 		for i, tile in enumerate(tileset.tiles[:256]):
 			row = i // self.tiles_per_row
 			col = i % self.tiles_per_row
-			
+
 			x = self.rect.x + col * (self.tile_display_size + 4) + 2
 			y = y_offset + row * (self.tile_display_size + 4) + 2
 
@@ -229,11 +229,11 @@ class AnimationTimelinePanel:
 		if mouse_clicked:
 			rel_x = mouse_pos[0] - self.rect.x - 10
 			frame_idx = rel_x // (self.frame_width + 5)
-			
+
 			if 0 <= frame_idx < len(self.animation.frames):
 				self.selected_frame_idx = frame_idx
 				return frame_idx
-		
+
 		return None
 
 	def advance_playhead(self):
@@ -244,7 +244,7 @@ class AnimationTimelinePanel:
 
 		# Simple frame counter
 		self.playhead_position += 1
-		
+
 		# Calculate total frames
 		total_frames = sum(frame.duration for frame in self.animation.frames)
 		if total_frames > 0 and self.animation.loop:
@@ -260,7 +260,7 @@ class AnimationTimelinePanel:
 			frame_counter += frame.duration
 			if self.playhead_position < frame_counter:
 				return i
-		
+
 		return len(self.animation.frames) - 1 if self.animation.frames else 0
 
 	def draw(self, surface: pygame.Surface, font: pygame.font.Font, database: GraphicsDatabase, palette: Palette):
@@ -282,7 +282,7 @@ class AnimationTimelinePanel:
 		y_offset = self.rect.y + 30
 
 		tileset = database.tilesets.get(0) if database.tilesets else None
-		
+
 		for i, frame in enumerate(self.animation.frames):
 			frame_x = x_offset + i * (self.frame_width + 5)
 			frame_rect = pygame.Rect(frame_x, y_offset, self.frame_width, self.frame_width + 20)
@@ -307,8 +307,8 @@ class AnimationTimelinePanel:
 		# Draw playhead indicator
 		current_frame_idx = self.get_current_frame_idx()
 		playhead_x = x_offset + current_frame_idx * (self.frame_width + 5) + self.frame_width // 2
-		pygame.draw.line(surface, COLOR_PLAYHEAD, 
-						(playhead_x, y_offset - 5), 
+		pygame.draw.line(surface, COLOR_PLAYHEAD,
+						(playhead_x, y_offset - 5),
 						(playhead_x, y_offset + self.frame_width + 20), 3)
 
 	def _render_tile(self, tile: Tile, palette: Palette) -> Optional[pygame.Surface]:
@@ -337,7 +337,7 @@ class AnimationPreviewPanel:
 		"""Set animation to preview"""
 		self.animation = animation
 
-	def draw(self, surface: pygame.Surface, font: pygame.font.Font, database: GraphicsDatabase, 
+	def draw(self, surface: pygame.Surface, font: pygame.font.Font, database: GraphicsDatabase,
 			palette: Palette, current_frame_idx: int):
 		"""Draw animation preview"""
 		pygame.draw.rect(surface, COLOR_PANEL, self.rect)
@@ -353,7 +353,7 @@ class AnimationPreviewPanel:
 		# Get current frame
 		if 0 <= current_frame_idx < len(self.animation.frames):
 			frame = self.animation.frames[current_frame_idx]
-			
+
 			# Get tileset
 			tileset = database.tilesets.get(0) if database.tilesets else None
 			if tileset and 0 <= frame.sprite_id < len(tileset.tiles):
@@ -363,7 +363,7 @@ class AnimationPreviewPanel:
 					# Scale up for preview (16x)
 					preview_size = 128
 					tile_surf = pygame.transform.scale(tile_surf, (preview_size, preview_size))
-					
+
 					# Center in panel
 					preview_x = self.rect.centerx - preview_size // 2
 					preview_y = self.rect.centery - preview_size // 2
@@ -398,11 +398,11 @@ class AnimationEditor:
 		self.height = 900
 		self.screen = pygame.display.set_mode((self.width, self.height))
 		pygame.display.set_caption("FFMQ Animation Editor")
-		
+
 		self.clock = pygame.time.Clock()
 		self.font = pygame.font.Font(None, 20)
 		self.title_font = pygame.font.Font(None, 28)
-		
+
 		# Database
 		self.database = GraphicsDatabase()
 		self.rom_path = rom_path
@@ -411,27 +411,27 @@ class AnimationEditor:
 				self.database.load_from_rom(rom_path)
 			except Exception as e:
 				print(f"Error loading ROM: {e}")
-		
+
 		# Current state
 		self.animations: List[Animation] = []
 		self.current_animation: Optional[Animation] = None
 		self.current_palette = self.database.palettes.get(0) if self.database.palettes else None
-		
+
 		# Create test animation
 		self._create_test_animation()
-		
+
 		# UI Panels
 		self.tile_selector = TileSelectorPanel(10, 50, 350, 700, self.database)
 		self.tile_selector.set_palette(self.current_palette)
-		
+
 		self.timeline = AnimationTimelinePanel(370, 550, 1020, 150)
 		if self.current_animation:
 			self.timeline.set_animation(self.current_animation)
-		
+
 		self.preview = AnimationPreviewPanel(370, 50, 400, 480)
 		if self.current_animation:
 			self.preview.set_animation(self.current_animation)
-		
+
 		# Controls
 		self.add_frame_button = Button(780, 60, 120, 30, "Add Frame")
 		self.remove_frame_button = Button(910, 60, 120, 30, "Remove Frame")
@@ -439,10 +439,10 @@ class AnimationEditor:
 		self.stop_button = Button(1150, 60, 100, 30, "Stop")
 		self.new_anim_button = Button(780, 100, 150, 30, "New Animation")
 		self.save_button = Button(940, 100, 100, 30, "Save")
-		
+
 		# Frame duration slider
 		self.duration_slider = Slider(780, 150, 470, 25, 1, 120, 10, "Frame Duration")
-		
+
 		# State
 		self.playing = False
 		self.running = True
@@ -458,7 +458,7 @@ class AnimationEditor:
 		# Add some test frames
 		for i in range(4):
 			anim.add_frame(i, duration=15)
-		
+
 		self.animations.append(anim)
 		self.current_animation = anim
 
@@ -468,7 +468,7 @@ class AnimationEditor:
 		mouse_clicked = False
 		mouse_down = pygame.mouse.get_pressed()[0]
 		scroll = 0
-		
+
 		for event in pygame.event.get():
 			if event.type == pygame.QUIT:
 				self.running = False
@@ -487,32 +487,32 @@ class AnimationEditor:
 
 		# Update UI components
 		tile_id = self.tile_selector.update(mouse_pos, mouse_clicked, scroll)
-		
+
 		frame_idx = self.timeline.update(mouse_pos, mouse_clicked)
-		
+
 		# Update duration slider
 		if self.duration_slider.update(mouse_pos, mouse_down):
 			# Duration changed, update current frame if one is selected
 			if self.current_animation and 0 <= self.timeline.selected_frame_idx < len(self.current_animation.frames):
 				self.current_animation.frames[self.timeline.selected_frame_idx].duration = self.duration_slider.value
-		
+
 		# Update buttons
 		if self.add_frame_button.update(mouse_pos, mouse_clicked):
 			self.add_frame()
-		
+
 		if self.remove_frame_button.update(mouse_pos, mouse_clicked):
 			self.remove_frame()
-		
+
 		if self.play_button.update(mouse_pos, mouse_clicked):
 			self.playing = True
-		
+
 		if self.stop_button.update(mouse_pos, mouse_clicked):
 			self.playing = False
 			self.timeline.playhead_position = 0
-		
+
 		if self.new_anim_button.update(mouse_pos, mouse_clicked):
 			self.create_new_animation()
-		
+
 		if self.save_button.update(mouse_pos, mouse_clicked):
 			self.save_animation()
 
@@ -520,10 +520,10 @@ class AnimationEditor:
 		"""Add frame to current animation"""
 		if not self.current_animation:
 			return
-		
+
 		tile_id = self.tile_selector.selected_tile_id
 		duration = self.duration_slider.value
-		
+
 		self.current_animation.add_frame(tile_id, duration)
 		print(f"Added frame: tile {tile_id}, duration {duration}")
 
@@ -531,7 +531,7 @@ class AnimationEditor:
 		"""Remove selected frame from animation"""
 		if not self.current_animation:
 			return
-		
+
 		idx = self.timeline.selected_frame_idx
 		if 0 <= idx < len(self.current_animation.frames):
 			del self.current_animation.frames[idx]
@@ -557,7 +557,7 @@ class AnimationEditor:
 		"""Save animation data"""
 		if not self.current_animation:
 			return
-		
+
 		print(f"Saving animation: {self.current_animation.name}")
 		print(f"  Frames: {len(self.current_animation.frames)}")
 		print(f"  Total duration: {self.current_animation.get_total_duration()} frames")
@@ -571,18 +571,18 @@ class AnimationEditor:
 	def draw(self):
 		"""Draw everything"""
 		self.screen.fill(COLOR_BG)
-		
+
 		# Draw title
 		title = self.title_font.render("FFMQ Tile Animation Editor", True, COLOR_TEXT)
 		self.screen.blit(title, (10, 10))
-		
+
 		# Draw panels
 		self.tile_selector.draw(self.screen, self.font)
 		self.timeline.draw(self.screen, self.font, self.database, self.current_palette)
-		
+
 		current_frame_idx = self.timeline.get_current_frame_idx()
 		self.preview.draw(self.screen, self.font, self.database, self.current_palette, current_frame_idx)
-		
+
 		# Draw controls
 		self.add_frame_button.draw(self.screen, self.font)
 		self.remove_frame_button.draw(self.screen, self.font)
@@ -590,9 +590,9 @@ class AnimationEditor:
 		self.stop_button.draw(self.screen, self.font)
 		self.new_anim_button.draw(self.screen, self.font)
 		self.save_button.draw(self.screen, self.font)
-		
+
 		self.duration_slider.draw(self.screen, self.font)
-		
+
 		# Draw info
 		if self.current_animation:
 			info_y = 720
@@ -603,11 +603,11 @@ class AnimationEditor:
 				f"Loop: {'Yes' if self.current_animation.loop else 'No'}",
 				f"Playing: {'Yes' if self.playing else 'No'}",
 			]
-			
+
 			for i, text in enumerate(info_texts):
 				surf = self.font.render(text, True, COLOR_TEXT)
 				self.screen.blit(surf, (10, info_y + i * 25))
-		
+
 		# Draw instructions
 		instructions = [
 			"Space: Play/Pause",
@@ -618,7 +618,7 @@ class AnimationEditor:
 		for i, text in enumerate(instructions):
 			surf = self.font.render(text, True, (150, 150, 150))
 			self.screen.blit(surf, (10, inst_y + i * 20))
-		
+
 		pygame.display.flip()
 
 	def run(self):
@@ -628,7 +628,7 @@ class AnimationEditor:
 			self.update()
 			self.draw()
 			self.clock.tick(60)
-		
+
 		pygame.quit()
 
 

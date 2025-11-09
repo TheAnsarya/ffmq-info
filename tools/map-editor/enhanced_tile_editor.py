@@ -45,7 +45,7 @@ class TileClipboard:
 		"""Copy a region from tile"""
 		min_x, max_x = min(x1, x2), max(x1, x2)
 		min_y, max_y = min(y1, y2), max(y1, y2)
-		
+
 		self.tile_data = []
 		for y in range(min_y, max_y + 1):
 			row = []
@@ -61,7 +61,7 @@ class TileClipboard:
 		"""Paste clipboard region to tile at position"""
 		if not self.has_data:
 			return
-		
+
 		for y, row in enumerate(self.tile_data):
 			for x, color_idx in enumerate(row):
 				px, py = start_x + x, start_y + y
@@ -504,7 +504,7 @@ class EnhancedTileEditor:
 		for tool, button in self.tool_buttons.items():
 			# Highlight current tool
 			if tool == self.current_tool:
-				highlight = pygame.Rect(button.rect.x - 2, button.rect.y - 2, 
+				highlight = pygame.Rect(button.rect.x - 2, button.rect.y - 2,
 									   button.rect.width + 4, button.rect.height + 4)
 				pygame.draw.rect(self.screen, COLOR_SELECTED, highlight, 3)
 			button.draw(self.screen, self.font)

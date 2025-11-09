@@ -164,11 +164,11 @@ class EventPalette:
 		y_offset = self.rect.y + 40
 		for i, event_type in enumerate(self.event_types):
 			item_rect = pygame.Rect(self.rect.x + 5, y_offset, self.rect.width - 10, 30)
-			
+
 			# Background
 			if event_type == self.selected_type:
 				pygame.draw.rect(surface, COLOR_SELECTED, item_rect)
-			
+
 			pygame.draw.rect(surface, COLOR_BORDER, item_rect, 1)
 
 			# Color indicator
@@ -274,9 +274,9 @@ class MapCanvas:
 				screen_x = self.rect.x + x * self.tile_size - self.scroll_x
 				screen_y = self.rect.y + y * self.tile_size - self.scroll_y
 
-				if (self.rect.left <= screen_x < self.rect.right and 
+				if (self.rect.left <= screen_x < self.rect.right and
 					self.rect.top <= screen_y < self.rect.bottom):
-					
+
 					cell_rect = pygame.Rect(screen_x, screen_y, self.tile_size, self.tile_size)
 					pygame.draw.rect(surface, COLOR_GRID, cell_rect, 1)
 
@@ -285,15 +285,15 @@ class MapCanvas:
 			screen_x = self.rect.x + event.x * self.tile_size - self.scroll_x
 			screen_y = self.rect.y + event.y * self.tile_size - self.scroll_y
 
-			if (self.rect.left <= screen_x < self.rect.right and 
+			if (self.rect.left <= screen_x < self.rect.right and
 				self.rect.top <= screen_y < self.rect.bottom):
-				
-				event_rect = pygame.Rect(screen_x + 2, screen_y + 2, 
+
+				event_rect = pygame.Rect(screen_x + 2, screen_y + 2,
 										self.tile_size - 4, self.tile_size - 4)
-				
+
 				# Event color
 				pygame.draw.rect(surface, event.get_color(), event_rect)
-				
+
 				# Selection border
 				if event == self.selected_event:
 					pygame.draw.rect(surface, COLOR_SELECTED, event_rect, 3)
@@ -417,7 +417,7 @@ class MapEventEditor:
 		selected_type = self.event_palette.update(mouse_pos, mouse_clicked)
 
 		# Update map canvas
-		selected_event = self.map_canvas.update(mouse_pos, mouse_clicked, mouse_right, 
+		selected_event = self.map_canvas.update(mouse_pos, mouse_clicked, mouse_right,
 											   self.event_palette.selected_type)
 		if selected_event:
 			self.property_panel.set_event(selected_event)
@@ -463,7 +463,7 @@ class MapEventEditor:
 				'warp_x': event.warp_x,
 				'warp_y': event.warp_y,
 			})
-		
+
 		json_str = json.dumps(events_data, indent=2)
 		print("Exported events:")
 		print(json_str)
@@ -509,7 +509,7 @@ class MapEventEditor:
 
 		inst_title = self.font.render("Instructions", True, COLOR_TEXT)
 		self.screen.blit(inst_title, (inst_x, inst_y))
-		
+
 		for i, text in enumerate(instructions[1:]):
 			inst_surf = self.small_font.render(text, True, (180, 185, 190))
 			self.screen.blit(inst_surf, (inst_x + 5, inst_y + 30 + i * 18))
