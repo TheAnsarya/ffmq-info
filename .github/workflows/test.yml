@@ -1,0 +1,85 @@
+name: FFMQ Info CI
+
+on:
+  push:
+    branches: [ main, master, develop ]
+  pull_request:
+    branches: [ main, master, develop ]
+
+jobs:
+  test:
+    name: Run Tests
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+      
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+      
+      - name: Run basic text extraction tests
+        run: |
+          python -m pytest tests/test_text_extraction.py::TestCSVOutput -v
+        continue-on-error: false
+      
+      - name: Run spell extraction tests
+        run: |
+          python tests/test_extract_spells.py
+        continue-on-error: true
+      
+      - name: Run enemy extraction tests
+        run: |
+          python tests/test_extract_enemies.py
+        continue-on-error: true
+  
+  lint:
+    name: Code Quality
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      
+      - name: Install linting tools
+        run: |
+          python -m pip install --upgrade pip
+          pip install pylint flake8
+      
+      - name: Run flake8
+        run: |
+          flake8 tools/ --count --select=E9,F63,F7,F82 --show-source --statistics
+        continue-on-error: true
+      
+      - name: Run pylint on text tools
+        run: |
+          pylint tools/text/ tools/extraction/ --disable=all --enable=E,F
+        continue-on-error: true
+  
+  build-docs:
+    name: Check Documentation
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Check required docs exist
+        run: |
+          test -f README.md
+          test -f CHANGELOG.md
+          test -f docs/CONTROL_CODES.md
+          echo "✓ All required documentation files exist"
