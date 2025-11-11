@@ -133,9 +133,96 @@ def cmd_search(args):
 				import re
 				text_clean = re.sub(r'<[0-9A-F]{2}>', '', dialog.text)
 				text_clean = re.sub(r'\[[A-Z:]+\]', '', text_clean)
-				text_clean = re.sub(r'\s+', ' ', text_clean).strip()
-				print(f"  {text_clean[:100]}")
-				print()
+			text_clean = re.sub(r'\s+', ' ', text_clean).strip()
+			print(f"  {text_clean[:100]}")
+			print()
+
+
+def cmd_edit(args):
+	"""Edit a dialog"""
+	# Get ROM path
+	rom_path = get_rom_path(args)
+	db = DialogDatabase(rom_path)
+	db.extract_all_dialogs()
+
+	dialog_id = int(args.id, 16)
+
+	if dialog_id not in db.dialogs:
+		print(f"Error: Dialog 0x{dialog_id:04X} not found")
+		return 1
+
+	dialog = db.dialogs[dialog_id]
+
+	# Show current text
+	print(f"Editing Dialog 0x{dialog_id:04X}")
+	print("-" * 70)
+	print("Current text:")
+	print(dialog.text)
+	print("-" * 70)
+
+	# Get new text
+	if args.text:
+		# Text provided on command line
+		new_text = args.text
+	else:
+		# Interactive mode
+		print("\nEnter new text (use [TAG] for control codes, empty line to cancel):")
+		lines = []
+		while True:
+			try:
+				line = input()
+				if not line:
+					if not lines:
+						print("Edit cancelled")
+						return 0
+					break
+				lines.append(line)
+			except (EOFError, KeyboardInterrupt):
+				print("\nEdit cancelled")
+				return 0
+
+		new_text = '\n'.join(lines)
+
+	# Validate new text
+	is_valid, messages = db.dialog_text.validate(new_text)
+
+	if messages:
+		print("\nValidation:")
+		for msg in messages:
+			print(f"  {msg}")
+
+	if not is_valid:
+		print("\nValidation failed - not saving")
+		return 1
+
+	# Show preview of encoded bytes
+	encoded = db.dialog_text.encode(new_text)
+	print(f"\nEncoded to {len(encoded)} bytes (original: {dialog.length} bytes)")
+
+	# Confirm
+	if not args.yes:
+		response = input("\nSave changes? [y/N]: ")
+		if response.lower() != 'y':
+			print("Edit cancelled")
+			return 0
+
+	# Update dialog
+	success = db.update_dialog(dialog_id, new_text)
+
+	if success:
+		# Save ROM
+		output_path = args.output or rom_path
+		if db.save_rom(Path(output_path)):
+			print(f"\n✓ Dialog updated and saved to {output_path}")
+			return 0
+		else:
+			print(f"\n✗ Failed to save ROM")
+			return 1
+	else:
+		print(f"\n✗ Failed to update dialog")
+		return 1
+
+
 def cmd_validate(args):
 	"""Validate dialog database"""
 	db = DialogDatabase()
@@ -171,25 +258,62 @@ def cmd_validate(args):
 
 def cmd_export(args):
 	"""Export dialog database"""
-	db = DialogDatabase()
-	exporter = DialogExporter(db)
+	import json
+	
+	# Get ROM path
+	rom_path = get_rom_path(args)
+	db = DialogDatabase(rom_path)
+	db.extract_all_dialogs()
 
-	format_map = {
-		'csv': exporter.export_to_csv,
-		'json': exporter.export_to_json,
-		'tsv': exporter.export_to_tsv,
-		'txt': exporter.export_to_txt,
-		'xml': exporter.export_to_xml
-	}
+	print(f"Exporting {len(db.dialogs)} dialogs to {args.output}...")
 
-	if args.format not in format_map:
-		print(f"Error: Unknown format '{args.format}'")
-		print(f"Available formats: {', '.join(format_map.keys())}")
+	if args.format == 'json':
+		# Export as JSON
+		data = {
+			'dialogs': [entry.to_dict() for entry in db.dialogs.values()],
+			'count': len(db.dialogs),
+			'rom': str(rom_path.name)
+		}
+		
+		with open(args.output, 'w', encoding='utf-8') as f:
+			json.dump(data, f, indent=2, ensure_ascii=False)
+		
+		print(f"✓ Exported to {args.output}")
+	
+	elif args.format == 'txt':
+		# Export as plain text
+		with open(args.output, 'w', encoding='utf-8') as f:
+			for dialog_id, entry in sorted(db.dialogs.items()):
+				f.write(f"Dialog 0x{dialog_id:04X}\n")
+				f.write("=" * 70 + "\n")
+				f.write(entry.text + "\n")
+				f.write("\n")
+		
+		print(f"✓ Exported to {args.output}")
+	
+	elif args.format == 'csv':
+		# Export as CSV
+		import csv
+		
+		with open(args.output, 'w', newline='', encoding='utf-8') as f:
+			writer = csv.writer(f)
+			writer.writerow(['ID', 'Pointer', 'Address', 'Length', 'Text'])
+			
+			for dialog_id, entry in sorted(db.dialogs.items()):
+				writer.writerow([
+					f"0x{dialog_id:04X}",
+					f"0x{entry.pointer:06X}",
+					f"0x{entry.address:06X}",
+					entry.length,
+					entry.text
+				])
+		
+		print(f"✓ Exported to {args.output}")
+	
+	else:
+		print(f"Error: Format '{args.format}' not yet implemented")
+		print("Available formats: json, txt, csv")
 		return 1
-
-	print(f"Exporting to {args.output}...")
-	format_map[args.format](args.output, include_metadata=not args.no_metadata)
-	print(f"✓ Exported {len(db.dialogs)} dialogs")
 
 
 def cmd_import(args):
@@ -341,6 +465,14 @@ def main():
 	search_parser.add_argument('-m', '--max-results', type=int, default=50, help='Max results')
 	search_parser.add_argument('-v', '--verbose', action='store_true', help='Show full text')
 	search_parser.set_defaults(func=cmd_search)
+
+	# Edit command
+	edit_parser = subparsers.add_parser('edit', help='Edit a dialog')
+	edit_parser.add_argument('id', help='Dialog ID (hex, e.g., 0x0016)')
+	edit_parser.add_argument('-t', '--text', help='New text (interactive if not specified)')
+	edit_parser.add_argument('-o', '--output', help='Output ROM file (default: overwrite input)')
+	edit_parser.add_argument('-y', '--yes', action='store_true', help='Skip confirmation')
+	edit_parser.set_defaults(func=cmd_edit)
 
 	# Validate command
 	validate_parser = subparsers.add_parser('validate', help='Validate dialog database')

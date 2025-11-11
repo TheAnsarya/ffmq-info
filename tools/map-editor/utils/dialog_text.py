@@ -125,24 +125,48 @@ class CharacterTable:
 						if char_str == '_':
 							char_str = ' '
 
-						# Parse embedded control codes like {newline} or {08}
-						char_str = self._parse_embedded_codes(char_str)
+					# Parse embedded control codes like {newline} or {08}
+					char_str = self._parse_embedded_codes(char_str)
 
-						# Store in appropriate mapping
-						self.byte_to_char[hex_val] = char_str
+					# Store in byte_to_char mapping (always update for decoding)
+					self.byte_to_char[hex_val] = char_str
 
-						# For encoding, prioritize longer strings (greedy matching)
-						if len(char_str) > 1:
+					# For encoding, only use FIRST occurrence (prefer earlier entries)
+					# This way duplicates like 0x44="you" and 0x55="you" will use 0x44
+					if len(char_str) > 1:
+						# Multi-character DTE sequence
+						if char_str not in self.multi_char_to_byte:
 							self.multi_char_to_byte[char_str] = hex_val
-						else:
+					else:
+						# Single character
+						if char_str not in self.char_to_byte:
 							self.char_to_byte[char_str] = hex_val
 
 			self.loaded = True
+			
+			# Build reverse mapping for control codes (for encoding)
+			self._build_control_code_mapping()
+			
 			return True
 		except Exception as e:
 			print(f"Error loading character table: {e}")
 			self._create_default_mapping()
 			return False
+	
+	def _build_control_code_mapping(self):
+		"""Build reverse mapping for control codes like [PARA] -> 0x30"""
+		global CONTROL_STRINGS
+		
+		# Start with base control codes
+		control_map = {v: k for k, v in CONTROL_NAMES.items()}
+		
+		# Add all control codes from loaded table
+		for byte_val, char_str in self.byte_to_char.items():
+			# Check if it's a control code tag like [PARA], [CRYSTAL], etc.
+			if char_str.startswith('[') and char_str.endswith(']'):
+				control_map[char_str] = byte_val
+		
+		CONTROL_STRINGS = control_map
 
 	def _parse_embedded_codes(self, text: str) -> str:
 		"""
