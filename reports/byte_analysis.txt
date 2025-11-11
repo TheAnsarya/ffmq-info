@@ -1,0 +1,390 @@
+Loaded ROM: Final Fantasy - Mystic Quest (U) (V1.1).sfc (524288 bytes)
+[OK] Loaded ROM: Final Fantasy - Mystic Quest (U) (V1.1).sfc
+[OK] Loaded character table: 77 single + 149 DTE
+Extracting dialogs from ROM...
+Extracted 117 dialogs
+[OK] Extracted 117 dialogs
+
+======================================================================
+ROM BYTE-LEVEL DIALOG ANALYSIS
+======================================================================
+
+======================================================================
+Analyzing Dialog 0x00
+======================================================================
+  [WARN]  Dialog 00 not found
+
+======================================================================
+Analyzing Dialog 0x21
+======================================================================
+Expected: Go to the Focus Tower.
+ROM bytes (302): 250b26ffff1a81a5c2c27dc2c96a3f4bb8735bb4c74e411f014d54b64041bb5ec5425a41b05cbfb7d2309ac1ffc2bf4ca9c5c2c3bbb8b659c6b4ccc64dd45b40c9bcbf4094ffcabc4a655e4941a9584b4d4f4cb7bcc9bcb74041b05cbf4cb5b8bb474c94ffb7c25cc6739a4270c7bcc04041a4c152ffcabc4ab4c3c35ec5d5015b40a9c5c2c3bbb8b6595745c158ffb66940c7c5c8b8d23094ff7c4b455767bfc2b6be6841b7c25c455a411f01ff4f4c60b6b4c3687741beb8ccc6735bb8ccd1c540b7c5b4474841bf52ffb9c569ff4194ff3d455a419eb4c53f4d4f4c41b05cbf4c5f7bb657c2c6d2ffff5b40c3b8c2c3bf40b4c5407bb760c34bb4c740c1b8685abb76c3d230354d54bf5955b64fffc6b467413d454f4c41b05cbfb7d2362a3059a056424630541044ffff1a00
+
+Current decode: [P25][UNK_0B][P26][TEXTBOX_BELOW][C81]LoosoovofthaneroTatenthe [CRYSTAL]
+lyonce the heart althe Wbeld.[PARA]AnolheProphecitsaysly"Te vile 4wirewheaerthe Pveanlyarhedivide the Wbelhebehinhe4dobesroAt eltime the Knngwireappear."
+Te Prophecithas nvecghe true.[PARA]4caans haa lockIthe dobes althe [CRYSTAL]
+arheBcapInethe keysroTey're draining the lngfrghthe 4Crystals althe Earthlyarhethe Wbelheis nochaos.Te people are nodBpanate neIalhayp.[PARA][P35]lyonlitescarsaa the Crystals arhethe Wbeld.[PAGE][P2A][PARA]itGatt to [PARA]on[P10]you[TEXTBOX_BELOW]
+
+Byte frequency:
+  0xFF:  17x  ->  
+  0x41:  15x  ->  the 
+  0x40:  12x  ->  e 
+  0xC2:  11x  ->  o
+  0xC5:  10x  ->  r
+  0xBF:  10x  ->  l
+  0xB8:   9x  ->  e
+  0xB4:   9x  ->  a
+  0xC3:   9x  ->  p
+  0xB6:   8x  ->  c
+
+Expected character frequency:
+  'o':   4x
+  ' ':   4x
+  't':   3x
+  'e':   2x
+  'g':   1x
+  'h':   1x
+  'f':   1x
+  'c':   1x
+  'u':   1x
+  's':   1x
+
+Attempting byte-to-character alignment...
+
+Potential single-byte mappings:
+  0x01 (3x) -> 't' (currently: 
+)
+  0x1A (2x) -> 'e' (currently: [TEXTBOX_BELOW])
+  0x1F (2x) -> 'e' (currently: [CRYSTAL])
+  0x3D (2x) -> 'e' (currently: Crystal)
+  0x3F (2x) -> 'e' (currently: th)
+  0x42 (3x) -> 't' (currently: t )
+  0x47 (2x) -> 'e' (currently: in)
+  0x4A (2x) -> 'e' (currently: re)
+  0x4B (4x) -> 'o' (currently: an)
+  0x4B (4x) -> ' ' (currently: an)
+  0x52 (2x) -> 'e' (currently: ng)
+  0x54 (3x) -> 't' (currently: on)
+  0x57 (3x) -> 't' (currently: ha)
+  0x58 (2x) -> 'e' (currently: ve)
+  0x59 (4x) -> 'o' (currently: it)
+  0x59 (4x) -> ' ' (currently: it)
+  0x5A (4x) -> 'o' (currently: al)
+  0x5A (4x) -> ' ' (currently: al)
+  0x5E (3x) -> 't' (currently: ea)
+  0x60 (2x) -> 'e' (currently: B)
+  0x67 (2x) -> 'e' (currently: a )
+  0x68 (3x) -> 't' (currently: I)
+  0x69 (2x) -> 'e' (currently: gh)
+  0x73 (3x) -> 't' (currently: ro)
+  0x7B (2x) -> 'e' (currently: no)
+  0x94 (4x) -> 'o' (currently: 4)
+  0x94 (4x) -> ' ' (currently: 4)
+  0x9A (2x) -> 'e' (currently: A)
+  0xA9 (3x) -> 't' (currently: P)
+  0xB0 (4x) -> 'o' (currently: W)
+  0xB0 (4x) -> ' ' (currently: W)
+  0xBE (2x) -> 'e' (currently: k)
+  0xC1 (4x) -> 'o' (currently: n)
+  0xC1 (4x) -> ' ' (currently: n)
+  0xC7 (4x) -> 'o' (currently: t)
+  0xC7 (4x) -> ' ' (currently: t)
+  0xC9 (3x) -> 't' (currently: v)
+  0xCA (2x) -> 'e' (currently: w)
+  0xCC (3x) -> 't' (currently: y)
+
+======================================================================
+Analyzing Dialog 0x59
+======================================================================
+Expected: For years Mac's been studying a Prophecy that speaks of a Knight who'll save the world from the Dark King.
+ROM bytes (258): 4c70c1b4c040b5b8b95cb8ce1b329f5cffcc5ec545a6b4b64eb5b856ff65c8b7cc4878a9c5c2c3bbb8b6ccd2ffffa8c1ffbb5f6359b56cffb9c569ffb7c248c66940c5605ec5b6bb4d41bfb4be40b7c5bc68c86b4f4cbb5fc6bbbc6b56b768c86b54ff78c5c2b67dbfb8b7bab8d2ff362c30551a329bc8423fb4c74ec172c3c5c2b5bfb8c073a2b9ffca40b7bcbaffb9c569ffbb4bb84dcab8d14ab540b4b5bf4046c55eb6bbff41c6bbbcc3d2309ac1cc63cc4dbb4bb84e78beb8cc735b40c6bbbc764c5fbbbcb7b756ff7b411f01d20d5f010301621a329b594163cc4d1f114eb5b856ff57c948c6694065c554baff5ec53fc4c8b4be60ffbfb4c776ccd2ffff00
+
+Current decode: heelname befbee![TEXTBOX_ABOVE][P32]Fbeyears Macenbeatwhudying goProphecy.Onhis llitbasfrghdoing sghe rBearchlythe lake driIuuiarhehis shiuiatdIuuiongorocsoledge.[PAGE][P2C][PARA]es[TEXTBOX_BELOW][P32]But thatennntproblemroIfwe digfrghhanelywe'rebe able to reachthe ship.[PARA]AnyllylyhaneengokeyroTe shiayheis hiddatnothe [CRYSTAL]
+.[UNK_0D:5F]
+[ASTERISK]
+st[TEXTBOX_BELOW][P32]Bitthe llyly[CRYSTAL][P11]enbeathaving sghe whrongearthquakBlatayy.
+
+Byte frequency:
+  0xFF:  19x  ->  
+  0xB8:  12x  ->  e
+  0xC5:  12x  ->  r
+  0xBB:  11x  ->  h
+  0x40:   8x  ->  e 
+  0xCC:   8x  ->  y
+  0xB7:   8x  ->  d
+  0xB4:   7x  ->  a
+  0xB5:   7x  ->  b
+  0xBC:   6x  ->  i
+
+Expected character frequency:
+  ' ':  19x
+  'e':   8x
+  'a':   8x
+  'o':   6x
+  'r':   6x
+  's':   6x
+  't':   6x
+  'h':   6x
+  'n':   4x
+  'k':   4x
+
+Attempting byte-to-character alignment...
+
+Potential single-byte mappings:
+  0x01 (3x) -> 'f' (currently: 
+)
+  0x01 (3x) -> 'y' (currently: 
+)
+  0x01 (3x) -> 'd' (currently: 
+)
+  0x01 (3x) -> 'i' (currently: 
+)
+  0x01 (3x) -> 'g' (currently: 
+)
+  0x01 (3x) -> 'p' (currently: 
+)
+  0x01 (3x) -> 'l' (currently: 
+)
+  0x1A (2x) -> 'm' (currently: [TEXTBOX_BELOW])
+  0x1A (2x) -> 'c' (currently: [TEXTBOX_BELOW])
+  0x1A (2x) -> ''' (currently: [TEXTBOX_BELOW])
+  0x1A (2x) -> 'w' (currently: [TEXTBOX_BELOW])
+  0x1F (2x) -> 'm' (currently: [CRYSTAL])
+  0x1F (2x) -> 'c' (currently: [CRYSTAL])
+  0x1F (2x) -> ''' (currently: [CRYSTAL])
+  0x1F (2x) -> 'w' (currently: [CRYSTAL])
+  0x30 (2x) -> 'm' (currently: [PARA])
+  0x30 (2x) -> 'c' (currently: [PARA])
+  0x30 (2x) -> ''' (currently: [PARA])
+  0x30 (2x) -> 'w' (currently: [PARA])
+  0x32 (3x) -> 'f' (currently: [P32])
+  0x32 (3x) -> 'y' (currently: [P32])
+  0x32 (3x) -> 'd' (currently: [P32])
+  0x32 (3x) -> 'i' (currently: [P32])
+  0x32 (3x) -> 'g' (currently: [P32])
+  0x32 (3x) -> 'p' (currently: [P32])
+  0x32 (3x) -> 'l' (currently: [P32])
+  0x3F (2x) -> 'm' (currently: th)
+  0x3F (2x) -> 'c' (currently: th)
+  0x3F (2x) -> ''' (currently: th)
+  0x3F (2x) -> 'w' (currently: th)
+  0x40 (8x) -> 'e' (currently: e )
+  0x40 (8x) -> 'a' (currently: e )
+  0x41 (4x) -> 'n' (currently: the )
+  0x41 (4x) -> 'k' (currently: the )
+  0x48 (3x) -> 'f' (currently: ing )
+  0x48 (3x) -> 'y' (currently: ing )
+  0x48 (3x) -> 'd' (currently: ing )
+  0x48 (3x) -> 'i' (currently: ing )
+  0x48 (3x) -> 'g' (currently: ing )
+  0x48 (3x) -> 'p' (currently: ing )
+  0x48 (3x) -> 'l' (currently: ing )
+  0x4B (2x) -> 'm' (currently: an)
+  0x4B (2x) -> 'c' (currently: an)
+  0x4B (2x) -> ''' (currently: an)
+  0x4B (2x) -> 'w' (currently: an)
+  0x4C (3x) -> 'f' (currently: he)
+  0x4C (3x) -> 'y' (currently: he)
+  0x4C (3x) -> 'd' (currently: he)
+  0x4C (3x) -> 'i' (currently: he)
+  0x4C (3x) -> 'g' (currently: he)
+  0x4C (3x) -> 'p' (currently: he)
+  0x4C (3x) -> 'l' (currently: he)
+  0x4D (4x) -> 'n' (currently: ly)
+  0x4D (4x) -> 'k' (currently: ly)
+  0x4E (4x) -> 'n' (currently: en)
+  0x4E (4x) -> 'k' (currently: en)
+  0x54 (2x) -> 'm' (currently: on)
+  0x54 (2x) -> 'c' (currently: on)
+  0x54 (2x) -> ''' (currently: on)
+  0x54 (2x) -> 'w' (currently: on)
+  0x56 (4x) -> 'n' (currently: at)
+  0x56 (4x) -> 'k' (currently: at)
+  0x59 (2x) -> 'm' (currently: it)
+  0x59 (2x) -> 'c' (currently: it)
+  0x59 (2x) -> ''' (currently: it)
+  0x59 (2x) -> 'w' (currently: it)
+  0x5C (2x) -> 'm' (currently: be)
+  0x5C (2x) -> 'c' (currently: be)
+  0x5C (2x) -> ''' (currently: be)
+  0x5C (2x) -> 'w' (currently: be)
+  0x5E (4x) -> 'n' (currently: ea)
+  0x5E (4x) -> 'k' (currently: ea)
+  0x5F (4x) -> 'n' (currently: is )
+  0x5F (4x) -> 'k' (currently: is )
+  0x60 (2x) -> 'm' (currently: B)
+  0x60 (2x) -> 'c' (currently: B)
+  0x60 (2x) -> ''' (currently: B)
+  0x60 (2x) -> 'w' (currently: B)
+  0x63 (3x) -> 'f' (currently: ll)
+  0x63 (3x) -> 'y' (currently: ll)
+  0x63 (3x) -> 'd' (currently: ll)
+  0x63 (3x) -> 'i' (currently: ll)
+  0x63 (3x) -> 'g' (currently: ll)
+  0x63 (3x) -> 'p' (currently: ll)
+  0x63 (3x) -> 'l' (currently: ll)
+  0x65 (2x) -> 'm' (currently: wh)
+  0x65 (2x) -> 'c' (currently: wh)
+  0x65 (2x) -> ''' (currently: wh)
+  0x65 (2x) -> 'w' (currently: wh)
+  0x68 (2x) -> 'm' (currently: I)
+  0x68 (2x) -> 'c' (currently: I)
+  0x68 (2x) -> ''' (currently: I)
+  0x68 (2x) -> 'w' (currently: I)
+  0x69 (4x) -> 'n' (currently: gh)
+  0x69 (4x) -> 'k' (currently: gh)
+  0x6B (3x) -> 'f' (currently: ui)
+  0x6B (3x) -> 'y' (currently: ui)
+  0x6B (3x) -> 'd' (currently: ui)
+  0x6B (3x) -> 'i' (currently: ui)
+  0x6B (3x) -> 'g' (currently: ui)
+  0x6B (3x) -> 'p' (currently: ui)
+  0x6B (3x) -> 'l' (currently: ui)
+  0x73 (2x) -> 'm' (currently: ro)
+  0x73 (2x) -> 'c' (currently: ro)
+  0x73 (2x) -> ''' (currently: ro)
+  0x73 (2x) -> 'w' (currently: ro)
+  0x76 (2x) -> 'm' (currently: ay)
+  0x76 (2x) -> 'c' (currently: ay)
+  0x76 (2x) -> ''' (currently: ay)
+  0x76 (2x) -> 'w' (currently: ay)
+  0x78 (3x) -> 'f' (currently: go)
+  0x78 (3x) -> 'y' (currently: go)
+  0x78 (3x) -> 'd' (currently: go)
+  0x78 (3x) -> 'i' (currently: go)
+  0x78 (3x) -> 'g' (currently: go)
+  0x78 (3x) -> 'p' (currently: go)
+  0x78 (3x) -> 'l' (currently: go)
+  0x9B (2x) -> 'm' (currently: B)
+  0x9B (2x) -> 'c' (currently: B)
+  0x9B (2x) -> ''' (currently: B)
+  0x9B (2x) -> 'w' (currently: B)
+  0xB7 (8x) -> 'e' (currently: d)
+  0xB7 (8x) -> 'a' (currently: d)
+  0xB9 (4x) -> 'n' (currently: f)
+  0xB9 (4x) -> 'k' (currently: f)
+  0xBA (3x) -> 'f' (currently: g)
+  0xBA (3x) -> 'y' (currently: g)
+  0xBA (3x) -> 'd' (currently: g)
+  0xBA (3x) -> 'i' (currently: g)
+  0xBA (3x) -> 'p' (currently: g)
+  0xBA (3x) -> 'l' (currently: g)
+  0xBC (6x) -> 'o' (currently: i)
+  0xBC (6x) -> 'r' (currently: i)
+  0xBC (6x) -> 's' (currently: i)
+  0xBC (6x) -> 't' (currently: i)
+  0xBC (6x) -> 'h' (currently: i)
+  0xBE (3x) -> 'f' (currently: k)
+  0xBE (3x) -> 'y' (currently: k)
+  0xBE (3x) -> 'd' (currently: k)
+  0xBE (3x) -> 'i' (currently: k)
+  0xBE (3x) -> 'g' (currently: k)
+  0xBE (3x) -> 'p' (currently: k)
+  0xBE (3x) -> 'l' (currently: k)
+  0xC0 (2x) -> 'c' (currently: m)
+  0xC0 (2x) -> ''' (currently: m)
+  0xC0 (2x) -> 'w' (currently: m)
+  0xC1 (4x) -> 'k' (currently: n)
+  0xC2 (4x) -> 'n' (currently: o)
+  0xC2 (4x) -> 'k' (currently: o)
+  0xC3 (3x) -> 'f' (currently: p)
+  0xC3 (3x) -> 'y' (currently: p)
+  0xC3 (3x) -> 'd' (currently: p)
+  0xC3 (3x) -> 'i' (currently: p)
+  0xC3 (3x) -> 'g' (currently: p)
+  0xC3 (3x) -> 'l' (currently: p)
+  0xC7 (2x) -> 'm' (currently: t)
+  0xC7 (2x) -> 'c' (currently: t)
+  0xC7 (2x) -> ''' (currently: t)
+  0xC7 (2x) -> 'w' (currently: t)
+  0xCA (2x) -> 'm' (currently: w)
+  0xCA (2x) -> 'c' (currently: w)
+  0xCA (2x) -> ''' (currently: w)
+  0xCC (8x) -> 'e' (currently: y)
+  0xCC (8x) -> 'a' (currently: y)
+  0xFF (19x) -> ' ' (currently: )
+
+======================================================================
+SUMMARY
+======================================================================
+
+Top 20 bytes overall:
+  0xFF:   36x  ->    (suggest: ' ')
+  0xC5:   22x  ->  r
+  0xB8:   21x  ->  e
+  0x40:   20x  ->  e   (suggest: 'a')
+  0xB4:   16x  ->  a
+  0x41:   15x  ->  the   (suggest: 'k')
+  0xC2:   11x  ->  o  (suggest: 'k')
+  0xBB:   11x  ->  h
+  0xBF:   10x  ->  l
+  0xC3:    9x  ->  p  (suggest: 'l')
+  0xB6:    8x  ->  c
+  0xCC:    8x  ->  y  (suggest: 'a')
+  0xB7:    8x  ->  d  (suggest: 'a')
+  0xB5:    7x  ->  b
+  0xBC:    6x  ->  i  (suggest: 'h')
+
+Deduced 57 potential mapping corrections:
+  0x01: 
+ -> 'l'
+  0x1A: [TEXTBOX_BELOW] -> 'w'
+  0x1F: [CRYSTAL] -> 'w'
+  0x30: [PARA] -> 'w'
+  0x32: [P32] -> 'l'
+  0x3D: Crystal -> 'e'
+  0x3F: th -> 'w'
+  0x40: e  -> 'a'
+  0x41: the  -> 'k'
+  0x42: t  -> 't'
+  0x47: in -> 'e'
+  0x48: ing  -> 'l'
+  0x4A: re -> 'e'
+  0x4B: an -> 'w'
+  0x4C: he -> 'l'
+  0x4D: ly -> 'k'
+  0x4E: en -> 'k'
+  0x52: ng -> 'e'
+  0x54: on -> 'w'
+  0x56: at -> 'k'
+  0x57: ha -> 't'
+  0x58: ve -> 'e'
+  0x59: it -> 'w'
+  0x5A: al -> ' '
+  0x5C: be -> 'w'
+  0x5E: ea -> 'k'
+  0x5F: is  -> 'k'
+  0x60: B -> 'w'
+  0x63: ll -> 'l'
+  0x65: wh -> 'w'
+  0x67: a  -> 'e'
+  0x68: I -> 'w'
+  0x69: gh -> 'k'
+  0x6B: ui -> 'l'
+  0x73: ro -> 'w'
+  0x76: ay -> 'w'
+  0x78: go -> 'l'
+  0x7B: no -> 'e'
+  0x94: 4 -> ' '
+  0x9A: A -> 'e'
+  0x9B: B -> 'w'
+  0xA9: P -> 't'
+  0xB0: W -> ' '
+  0xB7: d -> 'a'
+  0xB9: f -> 'k'
+  0xBA: g -> 'l'
+  0xBC: i -> 'h'
+  0xBE: k -> 'l'
+  0xC0: m -> 'w'
+  0xC1: n -> 'k'
+  0xC2: o -> 'k'
+  0xC3: p -> 'l'
+  0xC7: t -> 'w'
+  0xC9: v -> 't'
+  0xCA: w -> '''
+  0xCC: y -> 'a'
+  0xFF:  -> ' '
+
+Generating corrected complex.tbl...
+  (Would write to C:\Users\me\source\repos\ffmq-info\complex_corrected.tbl)
+  Manual correction required - see deduced mappings above
