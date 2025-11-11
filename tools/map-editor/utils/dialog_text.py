@@ -107,7 +107,8 @@ class CharacterTable:
 		try:
 			with open(self.tbl_path, 'r', encoding='utf-8') as f:
 				for line in f:
-					line = line.strip()
+					# Only strip newlines and leading whitespace, preserve trailing spaces in values
+					line = line.rstrip('\r\n').lstrip()
 					if not line or line.startswith('#'):
 						continue
 

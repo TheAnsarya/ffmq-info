@@ -172,17 +172,17 @@ class TextExtractor:
 
 		# Use DialogDatabase which already handles everything
 		db = DialogDatabase(self.rom_path)
+		db.extract_all_dialogs()
 
 		dialogs = []
-		for i in range(db.get_count()):
-			entry = db.get_dialog(i)
+		for dialog_id, entry in sorted(db.dialogs.items()):
 			if entry and entry.text:
 				dialogs.append({
-					'id': i,
+					'id': dialog_id,
 					'text': entry.text,
-					'address': f"${entry.pc_address:06X}",
-					'pointer': f"${entry.snes_pointer:04X}",
-					'length': entry.byte_length
+					'address': f"${entry.address:06X}",
+					'pointer': f"${entry.pointer:04X}",
+					'length': entry.length
 				})
 
 		print(f"  ✓ Extracted {len(dialogs)} dialogs")
