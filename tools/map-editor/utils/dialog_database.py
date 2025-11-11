@@ -10,7 +10,7 @@ from pathlib import Path
 import struct
 import json
 
-from dialog_text import DialogText, CharacterTable, ControlCode
+from .dialog_text import DialogText, CharacterTable, ControlCode
 
 
 @dataclass
