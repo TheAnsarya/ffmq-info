@@ -19,12 +19,12 @@ if entry:
 	print(f"Raw bytes: {' '.join(f'{b:02X}' for b in entry.raw_bytes)}")
 	print(f"Text: {entry.text!r}")
 	print(f"\nExpected: Something with 's beautiful as ever!'")
-	
+
 	# Decode specific bytes manually
 	from utils.dialog_text import CharacterTable, DialogText
 	table = CharacterTable(Path('complex.tbl'))
 	dt = DialogText(table)
-	
+
 	# Specific sequence: should be "s beautiful as ever!"
 	# Let's decode the bytes
 	decoded_manual = dt.decode(bytes(entry.raw_bytes))

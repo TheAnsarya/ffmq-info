@@ -21,7 +21,7 @@ with open('roms/Final Fantasy - Mystic Quest (U) (V1.1).sfc', 'rb') as f:
 		pc_addr = 0x018000 + ptr
 
 	print(f"PC address: ${pc_addr:06X}")
-	
+
 	f.seek(pc_addr)
 	data = f.read(20)
 	print(f"Bytes: {' '.join(f'{b:02X}' for b in data)}")
