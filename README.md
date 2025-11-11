@@ -9,7 +9,49 @@
 
 A comprehensive disassembly and ROM modding environment for Final Fantasy Mystic Quest (SNES) with a complete battle data editing pipeline.
 
-## ✨ What's New - Complete Battle Data Modding Pipeline!
+## ✨ What's New
+
+### 🆕 Complete Dialog & Text Editing System!
+
+**Full-featured CLI tool for editing ALL game text with proper DTE compression!**
+
+```bash
+# Edit any dialog interactively
+python tools/map-editor/dialog_cli.py edit 5
+
+# Search dialogs
+python tools/map-editor/dialog_cli.py search "Crystal"
+
+# Export all dialogs to JSON
+python tools/map-editor/dialog_cli.py export dialogs.json
+
+# Import edited dialogs
+python tools/map-editor/dialog_cli.py import dialogs.json
+
+# Extract ALL game text (items, monsters, locations, dialogs)
+python tools/extraction/extract_all_text.py roms/FFMQ.sfc
+
+# Import edited text back to ROM
+python tools/import/import_all_text.py data/text/text_data.json roms/FFMQ_modified.sfc
+```
+
+**Dialog System Features:**
+- ✅ **116 dialogs** fully editable with DTE compression (57.9% space savings!)
+- ✅ **15 CLI commands:** list, show, search, edit, export, import, stats, validate, backup, restore, replace, extract, compare, reformat, batch
+- ✅ **77 control codes** mapped: [PARA], [PAGE], [WAIT], [CLEAR], [NAME], [ITEM], etc.
+- ✅ **Complete text extraction:** Items, weapons, armor, accessories, spells, monsters, locations, dialogs
+- ✅ **Auto-fix validation:** Removes double spaces, trims whitespace, normalizes control codes
+- ✅ **Overflow detection:** Simulates dialog boxes, detects text overflow, suggests fixes
+- ✅ **Compression optimizer:** Analyzes DTE usage, suggests improvements
+- ✅ **Integration tests:** 5 comprehensive workflow tests
+- ✅ **100% test pass rate** (where ROM available)
+
+**Documentation:**
+- [Dialog Commands Reference](docs/DIALOG_COMMANDS.md) - Complete control code catalog
+- [Command Reference](tools/map-editor/COMMAND_REFERENCE.md) - All 15 CLI commands
+- [Dialog System README](tools/map-editor/README.md) - Full technical guide
+
+### 🎮 Complete Battle Data Modding Pipeline!
 
 **You can now visually edit enemies and build modified ROMs!**
 
@@ -24,9 +66,7 @@ pwsh -File build.ps1
 mesen build/ffmq-rebuilt.sfc
 ```
 
-**See [Modding Quick Reference](docs/guides/MODDING_QUICK_REFERENCE.md) for complete guide!**
-
-Features:
+**Enemy Editor Features:**
 - ✅ Visual GUI editor for all 83 enemies
 - ✅ Edit HP, Attack, Defense, Speed, Magic, and all stats
 - ✅ Visual element resistance/weakness selection (16 elements)
@@ -36,7 +76,7 @@ Features:
 - ✅ Comprehensive test suite (all tests passing)
 - ✅ GameFAQs data verification
 
-Documentation:
+**Documentation:**
 - [Modding Quick Reference](docs/guides/MODDING_QUICK_REFERENCE.md) - Quick start guide
 - [Enemy Editor Guide](docs/ENEMY_EDITOR_GUIDE.md) - Detailed GUI guide
 - [Battle Data Pipeline](docs/BATTLE_DATA_PIPELINE.md) - Technical details
@@ -175,6 +215,201 @@ python tools/convert_graphics.py to-png input.bin output.png --format 4bpp
 # Convert back to SNES format
 python tools/convert_graphics.py to-snes input.png output.bin --format 4bpp
 ```
+
+### 4. Test ROM
+```bash
+# Test in MesenS emulator (if installed)
+mesen build/ffmq-rebuilt.sfc
+```
+
+## Complete Tools Reference
+
+### 🎨 Graphics Tools
+
+**Extract and convert SNES graphics to/from PNG**
+
+```bash
+# Extract all graphics from ROM
+python tools/extract_graphics_v2.py roms/FFMQ.sfc
+
+# Convert individual graphics to PNG
+python tools/convert_graphics.py to-png input.bin output.png --format 4bpp
+
+# Convert PNG back to SNES format
+python tools/convert_graphics.py to-snes input.png output.bin --format 4bpp
+```
+
+**Tools:**
+- `tools/snes_graphics.py` - Core SNES tile/palette codec (450 lines)
+- `tools/convert_graphics.py` - PNG conversion (440 lines)
+- `tools/extract_graphics_v2.py` - ROM extraction (370 lines)
+
+**Formats Supported:** 2bpp, 3bpp, 4bpp, 8bpp | **Compression:** None, RLE, LZ77
+
+### 💬 Dialog & Text Tools
+
+**Complete dialog editing system with DTE compression**
+
+```bash
+# Dialog CLI (15 commands)
+cd tools/map-editor
+python dialog_cli.py list                    # List all dialogs
+python dialog_cli.py show 5                  # Show dialog #5
+python dialog_cli.py search "Crystal"        # Search for text
+python dialog_cli.py edit 5                  # Edit dialog interactively
+python dialog_cli.py export dialogs.json     # Export to JSON
+python dialog_cli.py import dialogs.json     # Import from JSON
+python dialog_cli.py stats                   # Show statistics
+python dialog_cli.py validate --fix          # Validate and auto-fix
+python dialog_cli.py backup                  # Create backup
+python dialog_cli.py restore backup_*.sfc    # Restore backup
+python dialog_cli.py replace "old" "new"     # Batch replace
+python dialog_cli.py compare rom1.sfc rom2.sfc  # Compare dialogs
+python dialog_cli.py reformat --operations "trim,normalize"  # Format text
+python dialog_cli.py batch commands.txt      # Batch operations
+
+# Extract ALL game text (items, monsters, locations, dialogs)
+cd tools/extraction
+python extract_all_text.py roms/FFMQ.sfc --output-dir ../../data/text
+
+# Import edited text back to ROM
+cd tools/import
+python import_all_text.py ../../data/text/text_data.json roms/FFMQ_modified.sfc
+
+# Analysis tools
+cd tools/map-editor
+python compression_optimizer.py              # Analyze DTE compression
+python text_overflow_detector.py             # Detect dialog overflow
+```
+
+**Dialog System Specs:**
+- **116 dialogs** with full DTE compression (57.9% savings)
+- **77 control codes:** [PARA], [PAGE], [WAIT], [CLEAR], [NAME], [ITEM], etc.
+- **Dialog box:** 32 chars/line, 3 lines/page, 4 max pages
+- **Proportional font** with character width simulation
+
+**Tools:**
+- `tools/map-editor/dialog_cli.py` - 15-command CLI (1,325 lines)
+- `tools/map-editor/utils/dialog_text.py` - Text codec (698 lines)
+- `tools/map-editor/utils/dialog_database.py` - Dialog storage (750 lines)
+- `tools/extraction/extract_all_text.py` - Full text extraction (445 lines)
+- `tools/import/import_all_text.py` - Text import (325 lines)
+- `tools/map-editor/compression_optimizer.py` - DTE analysis (280 lines)
+- `tools/map-editor/text_overflow_detector.py` - Overflow detection (360 lines)
+
+**Documentation:**
+- [Dialog Commands Reference](docs/DIALOG_COMMANDS.md) - Control code catalog
+- [Command Reference](tools/map-editor/COMMAND_REFERENCE.md) - All CLI commands
+- [Dialog System README](tools/map-editor/README.md) - Complete guide
+
+### ⚔️ Battle Data Tools
+
+**Visual enemy editor with JSON workflow**
+
+```bash
+# GUI enemy editor
+enemy_editor.bat
+
+# Or use Python directly
+cd tools/map-editor
+python enemy_editor.py
+
+# Extract enemy data to JSON
+python extract_enemy_data.py roms/FFMQ.sfc data/enemies.json
+
+# Import edited enemy data
+python import_enemy_data.py data/enemies.json roms/FFMQ_modified.sfc
+```
+
+**Enemy Editor Features:**
+- Edit all 83 enemies visually
+- HP, Attack, Defense, Speed, Magic, GP, EXP
+- 16 element resistances/weaknesses
+- Search, filter, undo/redo
+- Automatic build integration
+
+**Tools:**
+- `tools/map-editor/enemy_editor.py` - Visual GUI editor
+- `tools/map-editor/extract_enemy_data.py` - Enemy extraction
+- `tools/map-editor/import_enemy_data.py` - Enemy import
+
+**Documentation:**
+- [Enemy Editor Guide](docs/ENEMY_EDITOR_GUIDE.md)
+- [Battle Data Pipeline](docs/BATTLE_DATA_PIPELINE.md)
+
+### 🔨 Development Tools
+
+**Code formatting and utilities**
+
+```powershell
+# Format assembly files
+.\tools\format_asm.ps1 -Path src\asm\bank_00.asm
+
+# Convert Python files to tabs
+python tools/dev/convert_to_tabs.py
+
+# Track file changes
+.\track.ps1
+
+# Start automatic logging
+.\start-tracking.ps1
+```
+
+**Tools:**
+- `tools/format_asm.ps1` - ASM code formatter
+- `tools/dev/convert_to_tabs.py` - Python tab converter
+- `track.ps1` - File change tracker
+- `log.ps1` - Automatic chat logger
+
+### 📊 Analysis Tools
+
+**ROM analysis and statistics**
+
+```bash
+# Text statistics
+python tools/extraction/extract_all_text.py roms/FFMQ.sfc
+# Creates text_statistics.txt with compression metrics
+
+# Dialog statistics
+cd tools/map-editor
+python dialog_cli.py stats
+
+# DTE compression analysis
+python compression_optimizer.py
+
+# Dialog overflow detection
+python text_overflow_detector.py
+```
+
+**Output:**
+- Character frequency analysis
+- DTE compression ratios
+- Control code usage
+- Overflow warnings
+- Optimization suggestions
+
+### 🧪 Testing Tools
+
+**Comprehensive test suites**
+
+```bash
+# Dialog system tests
+cd tools/map-editor
+python -m pytest test_import.py              # Import tests
+python -m pytest test_integration.py         # Integration tests
+
+# Enemy editor tests
+python -m pytest tests/test_enemy_editor.py
+
+# Run all tests
+python -m pytest
+```
+
+**Test Coverage:**
+- Unit tests for core modules
+- Integration tests for workflows
+- ROM validation tests
+- Encoding/decoding tests
 
 ### 4. Test ROM
 ```bash
