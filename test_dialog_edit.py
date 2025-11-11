@@ -49,29 +49,29 @@ print(f"Encoded to {len(encoded)} bytes")
 is_valid, messages = db.dialog_text.validate(new_text)
 print(f"\nValidation: {'✓ Valid' if is_valid else '✗ Invalid'}")
 for msg in messages:
-    print(f"  {msg}")
+	print(f"  {msg}")
 
 if not is_valid:
-    print("\nStopping - validation failed")
-    sys.exit(1)
+	print("\nStopping - validation failed")
+	sys.exit(1)
 
 # Update dialog
 print("\nUpdating dialog...")
 success = db.update_dialog(dialog_id, new_text)
 
 if not success:
-    print("✗ Update failed")
-    sys.exit(1)
+	print("✗ Update failed")
+	sys.exit(1)
 
 print("✓ Update successful")
 
 # Save ROM
 print("\nSaving ROM...")
 if db.save_rom(test_rom):
-    print(f"✓ Saved to {test_rom}")
+	print(f"✓ Saved to {test_rom}")
 else:
-    print("✗ Save failed")
-    sys.exit(1)
+	print("✗ Save failed")
+	sys.exit(1)
 
 # Verify by re-reading
 print("\nVerifying changes...")
@@ -85,12 +85,12 @@ print(dialog_after.text)
 print("-" * 70)
 
 if dialog_after.text.replace('[END]', '') == new_text.replace('[END]', ''):
-    print("\n✓ Verification successful - dialog updated correctly!")
+	print("\n✓ Verification successful - dialog updated correctly!")
 else:
-    print("\n✗ Verification failed - text doesn't match")
-    print(f"Expected: {new_text}")
-    print(f"Got: {dialog_after.text}")
-    sys.exit(1)
+	print("\n✗ Verification failed - text doesn't match")
+	print(f"Expected: {new_text}")
+	print(f"Got: {dialog_after.text}")
+	sys.exit(1)
 
 # Cleanup
 print(f"\nTest complete. Test ROM: {test_rom}")

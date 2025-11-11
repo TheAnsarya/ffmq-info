@@ -1,7 +1,7 @@
 import json
 
 with open('data/extracted/enemies/enemies.json') as f:
-    data = json.load(f)
+	data = json.load(f)
 
 brownie = data['enemies'][0]
 print(f"Brownie HP in JSON: {brownie['hp']} (0x{brownie['hp']:04X})")
@@ -13,10 +13,10 @@ print(f"Expected bytes: {brownie['hp'] & 0xFF:02X} {(brownie['hp'] >> 8) & 0xFF:
 pc_offset = 0x014275
 
 with open('build/ffmq-rebuilt.sfc', 'rb') as f:
-    f.seek(pc_offset)
-    data = f.read(14)
-    print(f"\nFirst 14 bytes at PC offset 0x{pc_offset:06X} (SNES $02:$C275):")
-    print(' '.join(f'{b:02X}' for b in data))
+	f.seek(pc_offset)
+	data = f.read(14)
+	print(f"\nFirst 14 bytes at PC offset 0x{pc_offset:06X} (SNES $02:$C275):")
+	print(' '.join(f'{b:02X}' for b in data))
 
-    hp_rom = data[0] | (data[1] << 8)
-    print(f"\nHP from ROM: {hp_rom}")
+	hp_rom = data[0] | (data[1] << 8)
+	print(f"\nHP from ROM: {hp_rom}")

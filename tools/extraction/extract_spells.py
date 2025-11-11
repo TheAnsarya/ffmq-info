@@ -6,7 +6,7 @@ Extracts spell stats, power, effects, and targeting
 ROM Address: $060F36 (Bank $0C, near item data)
 Structure: 6 bytes per spell, 16 entries
 Note: MP cost is always 1 (not stored in table)
-      Spell type derived from ID (White: 0-3, Black: 4-7, Wizard: 8-10)
+	  Spell type derived from ID (White: 0-3, Black: 4-7, Wizard: 8-10)
 """
 
 import sys

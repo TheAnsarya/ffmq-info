@@ -1,8 +1,228 @@
 # GitHub Issues to Create
 
+## Priority: CRITICAL
+
+### Issue 0: Format all Python code with tabs per .editorconfig
+**Title:** Convert all Python files from spaces to tabs
+
+**Labels:** `maintenance`, `code-quality`, `critical`
+
+**Description:**
+The project's `.editorconfig` requires tabs for indentation, but many Python files currently use spaces. This causes inconsistency and violates project standards.
+
+**Files Affected:**
+- All files in `tools/**/*.py`
+- All files in `tests/**/*.py`
+- Root directory `*.py` files
+- Total: ~50+ Python files
+
+**Implementation:**
+Create automated conversion script: `tools/format/convert_to_tabs.py`
+- Convert leading spaces to tabs (4 spaces = 1 tab)
+- Preserve mixed indentation where needed
+- Verify with pylint/flake8 after conversion
+
+**Acceptance Criteria:**
+- [ ] All Python files use tabs for indentation
+- [ ] Code still runs correctly
+- [ ] No syntax errors introduced
+- [ ] Passes linting checks
+
+**Labels:** maintenance, code-quality, critical
+**Milestone:** v1.1.0
+
+---
+
+### Issue 1: Fix DTE table by reverse-engineering from ROM
+**Title:** Reverse-engineer correct DTE byte→string mappings from ROM
+
+**Labels:** `bug`, `text-system`, `critical`, `blocker`
+
+**Description:**
+Dialog extraction currently produces garbled output because the DTE (Dual-Tile Encoding) byte→string mappings in `complex.tbl` don't match the actual ROM data.
+
+**Current State:**
+- ✅ Dialog extraction infrastructure working (extracts 117 dialogs)
+- ✅ DTE table matches DataCrystal documentation
+- ✅ Added trailing spaces to DTE sequences (0x40="e ", 0x41="the ", etc.)
+- ❌ Output is still garbled (e.g., "Loosoovofthanero" instead of "Look someone")
+
+**Root Cause:**
+The DTE mappings in `complex.tbl` don't match what's actually in the ROM. Either:
+1. DataCrystal documentation is incomplete/incorrect
+2. ROM version differences (U v1.1 vs documented version)
+3. DTE table location or format is different than expected
+
+**Proposed Solution:**
+Reverse-engineer the correct DTE table from ROM by analyzing known dialogs:
+
+1. Find reference dialogs with known English text (opening sequence, common phrases)
+2. Analyze ROM bytes for known text
+3. Compare bytes to expected characters
+4. Deduce DTE byte→string mappings
+5. Build empirical DTE table from verified mappings
+6. Validate with multiple dialogs
+
+**Example Analysis:**
+Dialog should be: "For years Mac..."
+ROM bytes: `9F 5C FF ...`
+Current decode: "Fbe " (wrong)
+Expected: "For " (F + or + space)
+→ 0x5C should be "or" but complex.tbl says "be"
+
+**Acceptance Criteria:**
+- [ ] All 117 dialogs extract with readable English text
+- [ ] No garbled output
+- [ ] Validated against known script dumps
+- [ ] Round-trip encoding/decoding successful
+- [ ] Documented DTE reverse-engineering process
+
+**Labels:** bug, text-system, critical, blocker
+**Milestone:** v1.1.0
+
+---
+
+### Issue 2: Create text re-insertion tool for ROM modding
+**Title:** Build tool to write edited text back to ROM
+
+**Labels:** `feature`, `text-system`, `high-priority`, `tooling`
+
+**Description:**
+Create a production-ready tool for writing edited text back to the ROM, enabling translation and modding workflows.
+
+**Current State:**
+- ✅ Simple text extraction working (595 entries)
+- ✅ Dialog extraction infrastructure complete
+- ❌ No tool to write text back to ROM
+
+**Requirements:**
+
+**Simple Text Re-insertion:**
+- Load edited CSV files
+- Validate text length (must fit in fixed-length fields)
+- Encode using simple.tbl
+- Write to correct ROM addresses
+- Create ROM backup before modifications
+
+**Dialog Text Re-insertion** (after DTE fix):
+- Load edited dialog CSV/JSON
+- Validate text with control codes
+- Encode using complex.tbl (with DTE compression)
+- Update pointer table if dialog length changes
+- Manage free space in bank $03
+- Write modified data to ROM
+
+**Features:**
+1. **Validation:**
+   - Check text length limits
+   - Verify control codes are valid
+   - Test character table coverage
+   - Detect special characters not in table
+
+2. **Safety:**
+   - Automatic ROM backup (.bak)
+   - Checksum verification
+   - Dry-run mode (show changes without writing)
+   - Diff output (show what changed)
+
+3. **Free Space Management:**
+   - Track used/free space in dialog bank
+   - Auto-relocate dialogs if needed
+   - Defragment dialog data
+   - Report space usage statistics
+
+4. **Batch Operations:**
+   - Import all CSV files at once
+   - Export/import JSON for full project
+   - Merge changes from multiple editors
+
+**Command-Line Interface:**
+```bash
+# Simple text re-insertion
+python tools/text/reinsert_simple_text.py rom.sfc data/text_fixed --output modified.sfc
+
+# Dialog re-insertion  
+python tools/text/reinsert_dialog_text.py rom.sfc data/text_fixed/dialog.csv --output modified.sfc
+
+# Dry run (show changes without writing)
+python tools/text/reinsert_simple_text.py rom.sfc data/text_fixed --dry-run
+
+# Full project import
+python tools/text/reinsert_all_text.py rom.sfc data/text_fixed --output modified.sfc
+```
+
+**Acceptance Criteria:**
+- [ ] Successfully writes simple text to ROM
+- [ ] Modified ROM boots and displays text correctly
+- [ ] Length validation prevents overflows
+- [ ] Backup creation works
+- [ ] Comprehensive error messages
+- [ ] Dialog re-insertion (after DTE fixed)
+
+**Labels:** feature, text-system, high-priority, tooling
+**Milestone:** v1.2.0
+
+---
+
+### Issue 3: Research and document dialog control code functions
+**Title:** Map all dialog control codes to actual game functions
+
+**Labels:** `enhancement`, `text-system`, `research`, `documentation`
+
+**Description:**
+The complex text system uses 69 control codes (0x00-0x3B, 0x80-0x8F) for dialog box control, character names, events, and special functions. Currently, only 11 codes are confirmed with known functions.
+
+**Known Control Codes (11/69):**
+```
+0x00 = END (string terminator)
+0x01 = NEWLINE (line break)
+0x02 = WAIT (wait for button press)
+0x03 = ASTERISK (display * character)
+0x04 = NAME (insert character name)
+0x05 = ITEM (insert item name)
+0x1A = TEXTBOX_BELOW (position dialog box below character)
+0x1B = TEXTBOX_ABOVE (position dialog box above character)
+0x23 = CLEAR (clear dialog box)
+0x30 = PARA (paragraph break)
+0x36 = PAGE (new page/dialog box)
+```
+
+**Unknown Control Codes (58/69):**
+```
+0x06-0x0F: Unknown basic commands
+0x10-0x22: Event parameters (possibly)
+0x24-0x2C: Unknown parameters
+0x31-0x35: Unknown
+0x37-0x3B: Unknown
+0x80-0x8F: Extended multi-byte commands
+```
+
+**Research Methods:**
+1. **ROM Code Analysis:** Disassemble dialog engine code in banks $00/$03/$08
+2. **Dialog Context Analysis:** Examine dialogs using each code, look for patterns
+3. **Frequency Analysis:** Count usage across all dialogs
+4. **Community Resources:** Check TCRF, DataCrystal, ROM hacking forums
+
+**Suspected Functions:**
+- **Shop/Menu:** 0x0C-0x0F possibly shop menus, inn, yes/no prompts
+- **Character Movement:** 0x10-0x2C likely event parameters for NPC movement
+- **Text Formatting:** 0x07-0x09 possibly text speed (slow/normal/fast)
+- **Extended Commands:** 0x80-0x8F multi-byte commands with parameters
+
+**Acceptance Criteria:**
+- [ ] All 69 control codes documented with functions
+- [ ] Code execution traced in ROM
+- [ ] Dialog editor can insert codes with proper parameters
+- [ ] Comprehensive reference documentation (DIALOG_COMMANDS.md)
+
+**Labels:** enhancement, text-system, research, documentation
+**Milestone:** v1.3.0
+
+---
+
 ## Priority: High
 
-### Issue 1: GUI Dialog Preview Tool
+### Issue 4: GUI Dialog Preview Tool
 **Title:** Create GUI preview tool for dialog visualization
 
 **Description:**

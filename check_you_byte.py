@@ -14,19 +14,19 @@ db.extract_all_dialogs()
 
 # Find dialogs containing "you" and check their raw bytes
 for dialog_id in [0x21, 0x39, 0x3E]:
-    if dialog_id not in db.dialogs:
-        continue
+	if dialog_id not in db.dialogs:
+		continue
 
-    dialog = db.dialogs[dialog_id]
+	dialog = db.dialogs[dialog_id]
 
-    # Find "you" in text
-    if 'you' in dialog.text.lower():
-        print(f"\nDialog 0x{dialog_id:02X}:")
-        print(f"  Text snippet: {dialog.text[:100]}")
-        print(f"  Raw bytes: {' '.join(f'{b:02X}' for b in dialog.raw_bytes[:30])}")
+	# Find "you" in text
+	if 'you' in dialog.text.lower():
+		print(f"\nDialog 0x{dialog_id:02X}:")
+		print(f"  Text snippet: {dialog.text[:100]}")
+		print(f"  Raw bytes: {' '.join(f'{b:02X}' for b in dialog.raw_bytes[:30])}")
 
-        # Look for 0x44 or 0x55 in raw bytes
-        if 0x44 in dialog.raw_bytes:
-            print(f"  Contains 0x44")
-        if 0x55 in dialog.raw_bytes:
-            print(f"  Contains 0x55")
+		# Look for 0x44 or 0x55 in raw bytes
+		if 0x44 in dialog.raw_bytes:
+			print(f"  Contains 0x44")
+		if 0x55 in dialog.raw_bytes:
+			print(f"  Contains 0x55")

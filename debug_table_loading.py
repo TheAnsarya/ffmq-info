@@ -26,7 +26,7 @@ print(f"  'you' → {table.multi_char_to_byte.get('you', 'NOT FOUND')}")
 # Check duplicates
 you_bytes = []
 for byte, char in table.byte_to_char.items():
-    if char == "you":
-        you_bytes.append(f"0x{byte:02X}")
+	if char == "you":
+		you_bytes.append(f"0x{byte:02X}")
 
 print(f"\nBytes that decode to 'you': {', '.join(you_bytes)}")
