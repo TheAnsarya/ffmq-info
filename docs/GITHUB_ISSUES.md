@@ -334,6 +334,153 @@ Automated testing for all tools and features.
 
 ---
 
+### Issue 11: Complete DTE Table Reverse Engineering
+**Title:** Complete DTE compression table with all 116 sequences
+
+**Description:**
+The DTE (Dual Tile Encoding) compression system uses 116 multi-character sequences (bytes 0x3D-0x7E) to compress dialog text. Critical infrastructure bug has been fixed (trailing space preservation), but only 4 sequences have been verified from ROM.
+
+**Verified Sequences:**
+- 0x45 = "s "
+- 0x49 = "l "
+- 0x4B = "er"
+- 0x5E = "ea"
+
+**Goals:**
+1. Reverse-engineer all 116 sequences from ROM bytes
+2. Verify mappings against known dialog text
+3. Update `complex.tbl` with correct byte→string mappings
+4. Test encoding/decoding round-trip for all dialogs
+
+**Approach:**
+- Use `check_rom_bytes.py` to extract dialog bytes for known text
+- Work backwards: known text → bytes → build verified mapping table
+- Cross-reference with DataCrystal wiki (but verify, don't trust blindly)
+- Alternative: Find authoritative .tbl file from TCRF/romhacking.net
+
+**Acceptance Criteria:**
+- [ ] All 116 DTE sequences verified from ROM
+- [ ] complex.tbl updated with correct mappings
+- [ ] Round-trip test passing for all dialogs
+- [ ] Documentation of verification process
+
+**Labels:** critical, dialog-system, reverse-engineering
+**Milestone:** v2.0.0
+
+---
+
+### Issue 12: Research Dialog Command Functions
+**Title:** Map all 69 control codes to their actual game functions
+
+**Description:**
+ROM analysis identified 69 unique control codes used in dialogs. Current status:
+- **11 confirmed:** END, NEWLINE, WAIT, NAME, ITEM, SPACE, TEXTBOX_BELOW, TEXTBOX_ABOVE, CLEAR, PARA, PAGE
+- **39 event parameters:** P10-P3B range (function unknown)
+- **14 extended commands:** EXT_80-EXT_8F (multi-byte, function unknown)
+- **5 unknown:** UNK_0B-UNK_0F (including 0x0C which is NOT green text)
+
+**High-priority commands to identify:**
+1. Shop menu trigger
+2. Inn menu trigger  
+3. Yes/No prompt command
+4. Character movement/positioning commands
+5. Character animation triggers
+
+**Research Methods:**
+1. Analyze ROM code in banks $00 (text rendering), $03 (script engine), $08 (dialog data)
+2. Find command dispatch tables in disassembly
+3. Trace command execution in emulator debugger
+4. Cross-reference DataCrystal documentation
+5. Analyze command context in dialogs (pattern analysis already done)
+
+**Files:**
+- `reports/dialog_command_analysis.md` - Frequency and pattern analysis
+- `docs/DIALOG_COMMAND_MAPPING.md` - Detailed command contexts
+- `tools/analysis/analyze_dialog_commands.py` - Analysis tool
+
+**Acceptance Criteria:**
+- [ ] All event parameters (P10-P3B) documented
+- [ ] Extended commands (EXT_80-EXT_8F) documented
+- [ ] Menu trigger commands identified
+- [ ] Movement/positioning commands identified
+- [ ] Updated DIALOG_COMMANDS.md with findings
+
+**Labels:** critical, dialog-system, reverse-engineering
+**Milestone:** v2.0.0
+
+---
+
+### Issue 13: Identify Menu System Commands
+**Title:** Find and document shop/inn/yes-no menu trigger commands
+
+**Description:**
+Dialog text contains commands to:
+1. Open shop menu
+2. Open inn menu
+3. Display yes/no prompts
+4. Trigger other menu systems
+
+**Current candidates from analysis:**
+- Event parameters (P10-P3B range) likely include menu triggers
+- Extended commands (EXT_80-EXT_8F) may control menu state
+- Multi-byte commands may specify menu type and parameters
+
+**Research approach:**
+1. Find shop/inn dialogs in ROM
+2. Analyze bytes used in these specific dialogs
+3. Compare with regular dialogs to identify unique commands
+4. Test in emulator to confirm menu triggers
+5. Document parameters (item IDs, prices, etc.)
+
+**Acceptance Criteria:**
+- [ ] Shop menu trigger identified
+- [ ] Inn menu trigger identified
+- [ ] Yes/No prompt identified
+- [ ] Menu parameters documented
+- [ ] Test cases for each menu type
+
+**Labels:** enhancement, dialog-system, reverse-engineering
+**Milestone:** v2.1.0
+
+---
+
+### Issue 14: Dialog Positioning and Movement
+**Title:** Implement and document dialog box positioning/movement commands
+
+**Description:**
+**Confirmed from DataCrystal:**
+- 0x1A: Position textbox below characters
+- 0x1B: Position textbox above characters
+
+**Needs Investigation:**
+- Character movement commands (0x36 may trigger movement)
+- X/Y coordinate parameters for positioning
+- Character animation triggers during dialog
+- Screen scrolling during events
+
+**Bank $03 analysis shows:**
+- Text box configuration with X/Y coordinates in ASM
+- Movement patterns linked to dialog events
+- Multi-byte positioning commands
+
+**Goals:**
+1. Document exact function of positioning commands
+2. Implement positioning in dialog editor
+3. Test positioning with actual ROM
+4. Create visual editor for dialog box placement
+
+**Acceptance Criteria:**
+- [ ] All positioning commands documented
+- [ ] Movement commands identified
+- [ ] Dialog editor supports positioning
+- [ ] Visual preview of box placement
+- [ ] Test ROM patches verify functionality
+
+**Labels:** enhancement, dialog-system, editor
+**Milestone:** v2.2.0
+
+---
+
 ## How to Create Issues
 
 For each issue above:
