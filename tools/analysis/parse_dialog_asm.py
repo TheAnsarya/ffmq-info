@@ -9,7 +9,7 @@ from pathlib import Path
 import re
 from collections import Counter, defaultdict
 
-ASM_PATH = Path(__file__).parent.parent / 'assets' / 'text' / 'dialog.asm'
+ASM_PATH = Path(__file__).parent.parent.parent / 'assets' / 'text' / 'dialog.asm'
 OUT_PATH = Path(__file__).parent.parent.parent / 'reports' / 'dialog_asm_analysis.md'
 
 CONTROL_RANGES = list(range(0x00, 0x3D)) + list(range(0x80, 0x90))
