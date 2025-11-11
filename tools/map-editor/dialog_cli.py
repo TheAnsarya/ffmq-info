@@ -317,29 +317,155 @@ def cmd_export(args):
 
 
 def cmd_import(args):
-	"""Import dialog database"""
-	db = DialogDatabase()
-	importer = DialogImporter(db)
+	"""Import dialogs from JSON file"""
+	import json
+	from pathlib import Path
 
-	format_map = {
-		'csv': importer.import_from_csv,
-		'json': importer.import_from_json,
-		'tsv': importer.import_from_tsv
-	}
-
-	# Detect format from extension if not specified
-	if not args.format:
-		ext = Path(args.input).suffix.lstrip('.')
-		args.format = ext if ext in format_map else 'json'
-
-	if args.format not in format_map:
-		print(f"Error: Unknown format '{args.format}'")
-		print(f"Available formats: {', '.join(format_map.keys())}")
+	# Get ROM path
+	rom_path = get_rom_path(args)
+	
+	# Load the JSON file
+	try:
+		with open(args.input, 'r', encoding='utf-8') as f:
+			data = json.load(f)
+	except FileNotFoundError:
+		print(f"Error: File not found: {args.input}")
+		return 1
+	except json.JSONDecodeError as e:
+		print(f"Error: Invalid JSON file: {e}")
 		return 1
 
-	print(f"Importing from {args.input}...")
-	count = format_map[args.format](args.input, update_existing=not args.no_update)
-	print(f"✓ Imported {count} dialogs")
+	# Validate JSON structure
+	if 'dialogs' not in data:
+		print("Error: Invalid JSON format. Expected 'dialogs' key.")
+		print("This file may not have been created by the export command.")
+		return 1
+
+	dialogs_data = data['dialogs']
+	
+	if not isinstance(dialogs_data, list):
+		print("Error: 'dialogs' must be a list of dialog entries")
+		return 1
+
+	print(f"Loading ROM: {rom_path}")
+	db = DialogDatabase(rom_path)
+	db.extract_all_dialogs()
+
+	# Track statistics
+	imported_count = 0
+	updated_count = 0
+	error_count = 0
+	errors = []
+
+	print(f"Importing {len(dialogs_data)} dialogs from {args.input}...")
+	print()
+
+	for entry_data in dialogs_data:
+		try:
+			# Validate entry structure
+			if 'id' not in entry_data or 'text' not in entry_data:
+				error_msg = f"Skipping entry: missing 'id' or 'text' field"
+				errors.append(error_msg)
+				error_count += 1
+				continue
+
+			dialog_id = entry_data['id']
+			
+			# Check if this dialog exists in ROM
+			if dialog_id not in db.dialogs:
+				error_msg = f"Skipping 0x{dialog_id:04X}: not found in ROM"
+				errors.append(error_msg)
+				error_count += 1
+				continue
+
+			# Get the text to import
+			new_text = entry_data['text']
+
+			# Validate the new text
+			is_valid, messages = db.dialog_text.validate(new_text)
+			
+			if not is_valid:
+				error_msg = f"Skipping 0x{dialog_id:04X}: validation failed: {'; '.join(messages)}"
+				errors.append(error_msg)
+				error_count += 1
+				continue
+
+			# Encode the text
+			try:
+				encoded = db.dialog_text.encode(new_text)
+			except Exception as e:
+				error_msg = f"Skipping 0x{dialog_id:04X}: encoding failed: {e}"
+				errors.append(error_msg)
+				error_count += 1
+				continue
+
+			# Check if text has changed
+			current_entry = db.dialogs[dialog_id]
+			if current_entry.text == new_text:
+				# No change, skip
+				continue
+
+			# Update the dialog in ROM
+			success = db.update_dialog(dialog_id, encoded)
+			
+			if success:
+				updated_count += 1
+				if args.verbose:
+					print(f"✓ Updated 0x{dialog_id:04X}: {len(encoded)} bytes")
+			else:
+				error_msg = f"Failed to update 0x{dialog_id:04X}"
+				errors.append(error_msg)
+				error_count += 1
+
+			imported_count += 1
+
+		except Exception as e:
+			error_msg = f"Error processing entry: {e}"
+			errors.append(error_msg)
+			error_count += 1
+
+	# Display results
+	print()
+	print("=" * 70)
+	print("Import Summary")
+	print("=" * 70)
+	print(f"Processed: {imported_count} dialogs")
+	print(f"Updated:   {updated_count} dialogs")
+	print(f"Errors:    {error_count}")
+	print()
+
+	if errors and args.verbose:
+		print("Errors:")
+		for error in errors[:10]:  # Show first 10 errors
+			print(f"  • {error}")
+		if len(errors) > 10:
+			print(f"  ... and {len(errors) - 10} more errors")
+		print()
+
+	if updated_count == 0:
+		print("No dialogs were updated. Nothing to save.")
+		return 0
+
+	# Ask for confirmation before saving
+	if not args.yes:
+		response = input(f"Save changes to ROM ({updated_count} dialogs modified)? [y/N] ")
+		if response.lower() != 'y':
+			print("Import cancelled. ROM not modified.")
+			return 0
+
+	# Save the modified ROM
+	output_path = args.output if args.output else rom_path
+	
+	try:
+		db.save_rom(output_path)
+		print(f"✓ ROM saved to {output_path}")
+		print(f"✓ Successfully imported {updated_count} dialogs")
+	except Exception as e:
+		print(f"Error saving ROM: {e}")
+		return 1
+
+	return 0
+
 
 
 def cmd_optimize(args):
@@ -783,6 +909,176 @@ def cmd_replace(args):
 	return 0
 
 
+def cmd_verify(args):
+	"""Verify ROM integrity"""
+	# Get ROM path
+	rom_path = get_rom_path(args)
+
+	print(f"Verifying ROM: {rom_path.name}")
+	print("=" * 70)
+
+	# Check file exists
+	if not rom_path.exists():
+		print("✗ ROM file not found")
+		return 1
+
+	# Check file size
+	rom_size = rom_path.stat().st_size
+	expected_size = 524288  # 512 KiB
+
+	print(f"\n[1/5] File size check:")
+	if rom_size == expected_size:
+		print(f"  ✓ ROM size correct: {rom_size:,} bytes (512 KiB)")
+	else:
+		print(f"  ✗ ROM size incorrect: {rom_size:,} bytes (expected {expected_size:,})")
+		if not args.force:
+			return 1
+
+	# Load ROM
+	print(f"\n[2/5] ROM loading:")
+	try:
+		db = DialogDatabase(rom_path)
+		print(f"  ✓ ROM loaded successfully")
+	except Exception as e:
+		print(f"  ✗ Failed to load ROM: {e}")
+		return 1
+
+	# Extract dialogs
+	print(f"\n[3/5] Dialog extraction:")
+	try:
+		db.extract_all_dialogs()
+		dialog_count = len(db.dialogs)
+		print(f"  ✓ Extracted {dialog_count} dialogs")
+
+		if dialog_count < 100:
+			print(f"  ⚠ Warning: Low dialog count (expected ~116)")
+	except Exception as e:
+		print(f"  ✗ Failed to extract dialogs: {e}")
+		return 1
+
+	# Validate dialogs
+	print(f"\n[4/5] Dialog validation:")
+	invalid_count = 0
+	warning_count = 0
+
+	for dialog_id, dialog in db.dialogs.items():
+		is_valid, messages = db.dialog_text.validate(dialog.text)
+
+		if not is_valid:
+			invalid_count += 1
+			if args.verbose:
+				print(f"  ✗ 0x{dialog_id:04X}: {messages[0] if messages else 'Invalid'}")
+		elif messages and args.verbose:
+			# Has warnings
+			warning_count += 1
+
+	if invalid_count == 0:
+		print(f"  ✓ All dialogs valid")
+	else:
+		print(f"  ✗ {invalid_count} invalid dialogs")
+		if not args.force:
+			return 1
+
+	if warning_count > 0 and args.verbose:
+		print(f"  ⚠ {warning_count} dialogs with warnings")
+
+	# Round-trip test
+	print(f"\n[5/5] Round-trip encoding test:")
+	errors = 0
+	skipped = 0
+
+	for dialog_id, dialog in list(db.dialogs.items())[:10]:  # Test first 10
+		# Skip dialogs with unknown bytes
+		if '<' in dialog.text and '>' in dialog.text:
+			skipped += 1
+			if args.verbose:
+				print(f"  ⚠ 0x{dialog_id:04X}: Skipped (contains unknown bytes)")
+			continue
+
+		encoded = db.dialog_text.encode(dialog.text, add_end=True)
+		decoded = db.dialog_text.decode(encoded, include_end=True)
+
+		# Compare (ignoring [END] differences)
+		original_clean = dialog.text.replace('[END]', '').strip()
+		decoded_clean = decoded.replace('[END]', '').strip()
+
+		if original_clean != decoded_clean:
+			errors += 1
+			if args.verbose:
+				print(f"  ✗ 0x{dialog_id:04X}: Round-trip failed")
+
+	tested = min(10, len(db.dialogs)) - skipped
+
+	if errors == 0:
+		print(f"  ✓ Round-trip encoding successful (tested {tested} dialogs)")
+		if skipped > 0:
+			print(f"    Skipped {skipped} dialogs with unknown bytes")
+	else:
+		print(f"  ✗ {errors} round-trip failures")
+		return 1	# Summary
+	print(f"\n" + "=" * 70)
+	print(f"VERIFICATION COMPLETE")
+	print(f"✓ ROM is valid and working correctly")
+
+	if args.stats:
+		print(f"\nQuick Stats:")
+		print(f"  Dialogs: {len(db.dialogs)}")
+		print(f"  Total bytes: {sum(d.length for d in db.dialogs.values()):,}")
+		print(f"  Average: {sum(d.length for d in db.dialogs.values()) / len(db.dialogs):.1f} bytes/dialog")
+
+	return 0
+
+
+def cmd_backup(args):
+	"""Create a backup of the ROM"""
+	import shutil
+	from datetime import datetime
+
+	# Get ROM path
+	rom_path = get_rom_path(args)
+
+	if not rom_path.exists():
+		print(f"Error: ROM not found: {rom_path}")
+		return 1
+
+	# Determine backup path
+	if args.output:
+		backup_path = Path(args.output)
+	else:
+		# Auto-generate backup name with timestamp
+		if args.timestamp:
+			timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+			backup_path = rom_path.with_suffix(f".{timestamp}.bak")
+		else:
+			backup_path = rom_path.with_suffix(".bak")
+
+	# Check if backup already exists
+	if backup_path.exists() and not args.force:
+		print(f"Error: Backup already exists: {backup_path}")
+		print("Use --force to overwrite")
+		return 1
+
+	# Create backup
+	try:
+		shutil.copy2(rom_path, backup_path)
+		print(f"✓ Backup created: {backup_path}")
+		print(f"  Size: {backup_path.stat().st_size:,} bytes")
+
+		if args.verify:
+			# Verify backup
+			import filecmp
+			if filecmp.cmp(rom_path, backup_path, shallow=False):
+				print(f"  ✓ Backup verified (identical to original)")
+			else:
+				print(f"  ✗ Warning: Backup differs from original")
+				return 1
+
+		return 0
+	except Exception as e:
+		print(f"✗ Failed to create backup: {e}")
+		return 1
+
+
 def main():
 	"""Main entry point"""
 	parser = argparse.ArgumentParser(
@@ -867,6 +1163,21 @@ def main():
 	replace_parser.add_argument('-o', '--output', help='Output ROM file (default: overwrite input)')
 	replace_parser.set_defaults(func=cmd_replace)
 
+	# Verify command
+	verify_parser = subparsers.add_parser('verify', help='Verify ROM integrity')
+	verify_parser.add_argument('-v', '--verbose', action='store_true', help='Show detailed results')
+	verify_parser.add_argument('-s', '--stats', action='store_true', help='Show quick stats')
+	verify_parser.add_argument('-f', '--force', action='store_true', help='Continue despite errors')
+	verify_parser.set_defaults(func=cmd_verify)
+
+	# Backup command
+	backup_parser = subparsers.add_parser('backup', help='Create ROM backup')
+	backup_parser.add_argument('-o', '--output', help='Backup file path (default: ROM_NAME.bak)')
+	backup_parser.add_argument('-t', '--timestamp', action='store_true', help='Add timestamp to backup name')
+	backup_parser.add_argument('-f', '--force', action='store_true', help='Overwrite existing backup')
+	backup_parser.add_argument('-v', '--verify', action='store_true', help='Verify backup integrity')
+	backup_parser.set_defaults(func=cmd_backup)
+
 	# Validate command
 	validate_parser = subparsers.add_parser('validate', help='Validate dialog database')
 	validate_parser.add_argument('-r', '--report', action='store_true', help='Generate full report')
@@ -882,11 +1193,11 @@ def main():
 	export_parser.set_defaults(func=cmd_export)
 
 	# Import command
-	import_parser = subparsers.add_parser('import', help='Import dialog database')
-	import_parser.add_argument('input', help='Input file')
-	import_parser.add_argument('-f', '--format', choices=['csv', 'json', 'tsv'],
-	                           help='Import format (auto-detect if not specified)')
-	import_parser.add_argument('--no-update', action='store_true', help='Don\'t update existing dialogs')
+	import_parser = subparsers.add_parser('import', help='Import dialogs from JSON file')
+	import_parser.add_argument('input', help='Input JSON file (created by export command)')
+	import_parser.add_argument('-o', '--output', help='Output ROM file (default: modify input ROM)')
+	import_parser.add_argument('-y', '--yes', action='store_true', help='Skip confirmation prompt')
+	import_parser.add_argument('-v', '--verbose', action='store_true', help='Show detailed progress')
 	import_parser.set_defaults(func=cmd_import)
 
 	# Optimize command

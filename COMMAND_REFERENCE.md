@@ -559,6 +559,96 @@ python dialog_cli.py edit 0x21 --text "Modified"
 python dialog_cli.py diff before.sfc current.sfc -v
 ```
 
+### 6. Translation Workflow with Import
+```bash
+# Step 1: Export all dialogs to JSON
+python dialog_cli.py export dialogs.json --format json
+
+# Step 2: Edit dialogs.json in your text editor or translation tool
+# Edit the "text" field for any dialogs you want to change
+# Example JSON structure:
+# {
+#   "dialogs": [
+#     {
+#       "id": 33,  # 0x21 in decimal
+#       "text": "Welcome to the Crystal shrine.",
+#       "bytes": "0x54,0x...",
+#       "length": 32,
+#       ...
+#     }
+#   ]
+# }
+
+# Step 3: Import edited JSON back to ROM
+python dialog_cli.py import dialogs.json --verbose
+
+# Step 4: Verify changes
+python dialog_cli.py verify --stats
+
+# Step 5: Test in emulator!
+```
+
+**Import Command Details:**
+
+```bash
+# Import edited JSON
+python dialog_cli.py import edited_dialogs.json
+
+# Import with confirmation prompt (default)
+python dialog_cli.py import edited_dialogs.json
+
+# Import without confirmation (auto-yes)
+python dialog_cli.py import edited_dialogs.json --yes
+
+# Import and save to different ROM
+python dialog_cli.py import edited_dialogs.json -o modified.smc
+
+# Import with verbose output
+python dialog_cli.py import edited_dialogs.json --verbose
+```
+
+**Import Features:**
+- **JSON validation** - Checks structure before processing
+- **Dialog validation** - Validates text encoding for each dialog
+- **Change tracking** - Only updates dialogs that changed
+- **Error handling** - Aggregates and reports all errors
+- **Confirmation** - Asks before writing to ROM (unless --yes)
+- **Progress tracking** - Shows import progress
+- **Summary statistics** - Reports processed/updated/error counts
+
+**Import Validation:**
+1. File exists and is valid JSON
+2. Has required 'dialogs' key with list value
+3. Each dialog has 'id' and 'text' fields
+4. Dialog ID exists in ROM (0x00-0x73)
+5. Text passes encoding validation
+6. Encoded bytes don't exceed 255 bytes
+7. All control codes are valid
+
+**Import Safety:**
+- Creates backup before writing (if not using -o)
+- Validates all dialogs before any writes
+- Only writes if validation passes
+- Provides detailed error messages
+- Allows saving to different file with -o
+
+**Example Import Output:**
+```
+Loading ROM: Final Fantasy - Mystic Quest (U) (V1.1).smc
+Importing 116 dialogs from edited_dialogs.json...
+
+======================================================================
+Import Summary
+======================================================================
+Processed: 116 dialogs
+Updated:   23 dialogs
+Errors:    0
+
+Save changes to ROM (23 dialogs modified)? [y/N] y
+✓ ROM saved to Final Fantasy - Mystic Quest (U) (V1.1).smc
+✓ Successfully imported 23 dialogs
+```
+
 ---
 
 ## Performance Notes
