@@ -1,0 +1,34 @@
+#!/bin/bash
+# FFMQ Task Runner - Shell Wrapper
+# Provides easy access to Makefile tasks
+
+MAKEFILE="Makefile.dialog"
+
+if [ ! -f "$MAKEFILE" ]; then
+	echo "ERROR: $MAKEFILE not found"
+	exit 1
+fi
+
+# If no arguments, show help
+if [ $# -eq 0 ]; then
+	make -f "$MAKEFILE" help
+	exit 0
+fi
+
+TASK=$1
+ARG=$2
+
+# Handle commands with arguments
+case "$TASK" in
+	edit|show|search)
+		if [ -z "$ARG" ]; then
+			echo "ERROR: $TASK requires an argument"
+			echo "Usage: ffmq $TASK <value>"
+			exit 1
+		fi
+		make -f "$MAKEFILE" "dialog-$TASK-$ARG"
+		;;
+	*)
+		make -f "$MAKEFILE" "$TASK"
+		;;
+esac
