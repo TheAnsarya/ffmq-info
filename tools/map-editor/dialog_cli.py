@@ -224,36 +224,118 @@ def cmd_edit(args):
 
 
 def cmd_validate(args):
-	"""Validate dialog database"""
-	db = DialogDatabase()
+	"""Validate all dialogs with optional auto-fix"""
+	import re
 
-	# Character table (simplified for now)
-	char_table = {i: chr(i) for i in range(128)}
+	# Get ROM path
+	rom_path = get_rom_path(args)
+	db = DialogDatabase(rom_path)
+	db.extract_all_dialogs()
 
-	validator = DialogValidator(db, char_table)
-	issues = validator.validate_all()
+	print(f"Validating {len(db.dialogs)} dialogs...")
+	print()
 
-	if args.report:
-		# Full report
-		print(validator.generate_report())
+	valid_count = 0
+	invalid_count = 0
+	fixed_count = 0
+	issues = []
+	fixes = []
+
+	for dialog_id, entry in sorted(db.dialogs.items()):
+		text = entry.text
+
+		# Validate
+		is_valid, messages = db.dialog_text.validate(text)
+
+		if not is_valid:
+			invalid_count += 1
+			issues.append((dialog_id, messages))
+
+			if args.verbose:
+				print(f"✗ Dialog 0x{dialog_id:04X}:")
+				for msg in messages:
+					print(f"    {msg}")
+
+		else:
+			# Check for fixable issues
+			fixable_issues = []
+			fixed_text = text
+
+			# Fix 1: Remove double spaces
+			if '  ' in fixed_text:
+				fixed_text = re.sub(r' +', ' ', fixed_text)
+				fixable_issues.append("removed double spaces")
+
+			# Fix 2: Trim whitespace
+			trimmed = fixed_text.strip()
+			if trimmed != fixed_text:
+				fixed_text = trimmed
+				fixable_issues.append("trimmed whitespace")
+
+			# Fix 3: Normalize line breaks around control codes
+			fixed_text = re.sub(r'\s*\[PARA\]\s*', '[PARA]', fixed_text)
+			fixed_text = re.sub(r'\s*\[PAGE\]\s*', '[PAGE]', fixed_text)
+
+			if fixable_issues and fixed_text != text:
+				if args.fix:
+					# Apply fixes
+					try:
+						success = db.update_dialog(dialog_id, fixed_text)
+						if success:
+							fixed_count += 1
+							fixes.append((dialog_id, fixable_issues, text, fixed_text))
+
+							if args.verbose:
+								print(f"✓ Fixed Dialog 0x{dialog_id:04X}: {', '.join(fixable_issues)}")
+						else:
+							if args.verbose:
+								print(f"✗ Failed to fix Dialog 0x{dialog_id:04X}")
+					except Exception as e:
+						if args.verbose:
+							print(f"✗ Failed to fix Dialog 0x{dialog_id:04X}: {e}")
+				else:
+					# Just report
+					if args.verbose:
+						print(f"⚠ Dialog 0x{dialog_id:04X} has fixable issues: {', '.join(fixable_issues)}")
+			else:
+				valid_count += 1	# Print summary
+	print()
+	print("=" * 70)
+	print("Validation Summary")
+	print("=" * 70)
+	print(f"Valid dialogs:   {valid_count}")
+	print(f"Invalid dialogs: {invalid_count}")
+
+	if args.fix:
+		print(f"Fixed dialogs:   {fixed_count}")
 	else:
-		# Summary
-		stats = validator.get_issues_by_severity()
-		print(f"Validation complete:")
-		print(f"  Errors:   {len(stats['error'])}")
-		print(f"  Warnings: {len(stats['warning'])}")
-		print(f"  Info:     {len(stats['info'])}")
+		print(f"Fixable issues:  {fixed_count}")
 
-		if args.verbose and issues:
-			print("\nIssues:")
-			for issue in issues[:20]:  # Show first 20
-				severity_marker = {
-					'error': '✗',
-					'warning': '⚠',
-					'info': 'ℹ'
-				}.get(issue.severity, '•')
+	print()
 
-				print(f"  {severity_marker} 0x{issue.dialog_id:04X}: {issue.message}")
+	if invalid_count > 0 and not args.verbose:
+		print(f"✗ {invalid_count} dialogs have validation errors")
+		print("Run with --verbose to see details")
+		print()
+
+	if fixed_count > 0 and not args.fix:
+		print(f"⚠ {fixed_count} dialogs have fixable issues")
+		print("Run with --fix to automatically fix them")
+		print()
+
+	if args.fix and fixed_count > 0:
+		# Save the ROM
+		if not args.yes:
+			response = input(f"Save fixes to ROM ({fixed_count} dialogs modified)? [y/N] ")
+			if response.lower() != 'y':
+				print("Fixes not saved.")
+				return 0
+
+		db.save_rom(rom_path)
+		print(f"✓ Saved {fixed_count} fixes to ROM")
+		print()
+
+	return 0 if invalid_count == 0 else 1
 
 
 def cmd_export(args):
@@ -323,7 +405,7 @@ def cmd_import(args):
 
 	# Get ROM path
 	rom_path = get_rom_path(args)
-	
+
 	# Load the JSON file
 	try:
 		with open(args.input, 'r', encoding='utf-8') as f:
@@ -342,7 +424,7 @@ def cmd_import(args):
 		return 1
 
 	dialogs_data = data['dialogs']
-	
+
 	if not isinstance(dialogs_data, list):
 		print("Error: 'dialogs' must be a list of dialog entries")
 		return 1
@@ -370,7 +452,7 @@ def cmd_import(args):
 				continue
 
 			dialog_id = entry_data['id']
-			
+
 			# Check if this dialog exists in ROM
 			if dialog_id not in db.dialogs:
 				error_msg = f"Skipping 0x{dialog_id:04X}: not found in ROM"
@@ -383,7 +465,7 @@ def cmd_import(args):
 
 			# Validate the new text
 			is_valid, messages = db.dialog_text.validate(new_text)
-			
+
 			if not is_valid:
 				error_msg = f"Skipping 0x{dialog_id:04X}: validation failed: {'; '.join(messages)}"
 				errors.append(error_msg)
@@ -407,7 +489,7 @@ def cmd_import(args):
 
 			# Update the dialog in ROM
 			success = db.update_dialog(dialog_id, encoded)
-			
+
 			if success:
 				updated_count += 1
 				if args.verbose:
@@ -455,7 +537,7 @@ def cmd_import(args):
 
 	# Save the modified ROM
 	output_path = args.output if args.output else rom_path
-	
+
 	try:
 		db.save_rom(output_path)
 		print(f"✓ ROM saved to {output_path}")
@@ -1179,9 +1261,10 @@ def main():
 	backup_parser.set_defaults(func=cmd_backup)
 
 	# Validate command
-	validate_parser = subparsers.add_parser('validate', help='Validate dialog database')
-	validate_parser.add_argument('-r', '--report', action='store_true', help='Generate full report')
-	validate_parser.add_argument('-v', '--verbose', action='store_true', help='Show issues')
+	validate_parser = subparsers.add_parser('validate', help='Validate dialog database with optional auto-fix')
+	validate_parser.add_argument('--fix', action='store_true', help='Automatically fix common issues')
+	validate_parser.add_argument('-y', '--yes', action='store_true', help='Skip confirmation when fixing')
+	validate_parser.add_argument('-v', '--verbose', action='store_true', help='Show detailed validation results')
 	validate_parser.set_defaults(func=cmd_validate)
 
 	# Export command
