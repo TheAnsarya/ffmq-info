@@ -1,0 +1,547 @@
+Dialog 0x0001
+======================================================================
+ [ITEM][PAGE][NORMAL][NORMAL][NORMAL][NORMAL][NORMAL][SLOW]
+
+Dialog 0x0002
+======================================================================
+y[CLEAR][CLEAR]
+
+Dialog 0x0004
+======================================================================
+[WAIT]
+
+Dialog 0x0007
+======================================================================
+ [ITEM][PAGE][NORMAL][NORMAL][NORMAL][NORMAL][NORMAL][SLOW]
+
+Dialog 0x0009
+======================================================================
+[SLOW][NORMAL][C82][C81][WHITE]?[C88][P10][P1D]
+
+Dialog 0x000D
+======================================================================
+ [ITEM][PAGE][NORMAL][NORMAL][NORMAL][NORMAL][NORMAL][SLOW]
+
+Dialog 0x000F
+======================================================================
+[SLOW][NORMAL][C82][C81][WHITE]?[C88][P10][P1D]
+
+Dialog 0x0010
+======================================================================
+[CLEAR]
+
+Dialog 0x0013
+======================================================================
+6[P10][ITEM][P37][P13][CLEAR][ITEM] [NAME][C8D]R[ITEM]<3B>
+
+Dialog 0x0016
+======================================================================
+sbeautifulasever!
+
+Dialog 0x0017
+======================================================================
+
+[SOUND:B4]
+
+Dialog 0x001A
+======================================================================
+sbeautifulasever!
+
+Dialog 0x001B
+======================================================================
+[WAIT][P12][P25]
+
+Dialog 0x001E
+======================================================================
+savingusandthetrees!
+
+Dialog 0x001F
+======================================================================
+[P38][P2A][ITEM][P27][NAME][P2A]
+
+Dialog 0x0021
+======================================================================
+[P25][YELLOW][P26][P1A][C81]Lookoverthere.
+That'sthe[CRYSTAL]
+,oncetheheartoftheWorld.[PARA]AnoldProphecysays,"Thevile4willstealthePower,anddividetheWorldbehind4doors.
+AtthattimetheKnightwillappear."
+TheProphecyhasnowcometrue.[PARA]4monstershavelockedthedoorsofthe[CRYSTAL]
+andescapedwiththekeys.
+They'redrainingthelightfromthe4CrystalsoftheEarth,andtheWorldisinchaos.Thepeopleareindesperateneedofhelp.[PARA][P35],onlyyoucansavetheCrystalsandtheWorld.[PAGE][P2A][PARA]yGentto[PARA]on[P10]you[P1A]
+
+Dialog 0x0022
+======================================================================
+t[P13][WAIT][P12][P25]
+
+Dialog 0x0025
+======================================================================
+toto
+
+Dialog 0x0026
+======================================================================
+[ITEM]%[UNK_0F]is
+[ITEM]'t[P11]is
+[P14][CLEAR][YELLOW]
+
+Dialog 0x0028
+======================================================================
+[SLOW][NORMAL][C82][C81][WHITE]?[C88][P10][P1D]
+
+Dialog 0x002C
+======================================================================
+ [ITEM][PAGE][NORMAL][NORMAL][NORMAL][NORMAL][NORMAL][SLOW]
+
+Dialog 0x002E
+======================================================================
+[SLOW][NORMAL][C82][C81][WHITE]?[C88][P10][P1D]
+
+Dialog 0x002F
+======================================================================
+[CLEAR]
+
+Dialog 0x0032
+======================================================================
+6[P10][ITEM][P37][P13][CLEAR][ITEM] [NAME][C8D]R[ITEM]<3B>
+
+Dialog 0x0038
+======================================================================
+eKnight![P1B]
+
+Dialog 0x0039
+======================================================================
+ake[P1D]
+anywheredangerous![PAGE][P2C][P11]you[P1A][P15]Listen,Mom...[PAGE][P2B][FD][P2C][P21]you[UNK_0F][C8B][UNK_0E][ITEM]monst
+[NORMAL]&[P2C]
+s[P1A][P15]Hey!
+That[P1E]
+looksawful![PARA]Howmuchthetreesmustbesuffering!
+OK,youwin.[PAGE][P2A][P11]ou[P21]etheyou[ITEM][P27]sto[P20]e[P20]ou[P11]you[P1A][P15]Don'tworry,Mom.[PAGE][P2C][P21]t[ITEM][P13][FD][UNK_0E]&[P2C]theto[P2C][P20]you[ITEM][E6]
+[NORMAL]Th[C85][P2B]{08}{8a}{87}[CLEAR]wa[P2B]ack
+
+Dialog 0x003A
+======================================================================
+[P12][P38][GREEN][GREEN][CLEAR][UNK_0E]
+
+Dialog 0x003E
+======================================================================
+[ITEM][YELLOW]to[ED][FC]Iwaswaitingforyou,littlebeasts![ITEM]<24>
+
+Dialog 0x003F
+======================================================================
+u[F5],[F5][E3][F5]j[F7]m[F7]z[F7]-[F7][E7][F7][E7][F7][NAME][ITEM][E4]n[UNK_0E][CLEAR][WHITE][P2B][UNK_0E][P2C]{05}{1d}E{00}{04}
+
+Dialog 0x0041
+======================================================================
+[P25][YELLOW][P26][P1A][C81]Lookoverthere.
+That'sthe[CRYSTAL]
+,oncetheheartoftheWorld.[PARA]AnoldProphecysays,"Thevile4willstealthePower,anddividetheWorldbehind4doors.
+AtthattimetheKnightwillappear."
+TheProphecyhasnowcometrue.[PARA]4monstershavelockedthedoorsofthe[CRYSTAL]
+andescapedwiththekeys.
+They'redrainingthelightfromthe4CrystalsoftheEarth,andtheWorldisinchaos.Thepeopleareindesperateneedofhelp.[PARA][P35],onlyyoucansavetheCrystalsandtheWorld.[PAGE][P2A][PARA]yGentto[PARA]on[P10]you[P1A]
+
+Dialog 0x0042
+======================================================================
+cy...[PAGE][P2A][P27][P27]<17>[P26]...to[P20]you[PARA]s[P20]on
+
+Dialog 0x0043
+======================================================================
+ake[P1D]
+anywheredangerous![PAGE][P2C][P11]you[P1A][P15]Listen,Mom...[PAGE][P2B][FD][P2C][P21]you[UNK_0F][C8B][UNK_0E][ITEM]monst
+[NORMAL]&[P2C]
+s[P1A][P15]Hey!
+That[P1E]
+looksawful![PARA]Howmuchthetreesmustbesuffering!
+OK,youwin.[PAGE][P2A][P11]ou[P21]etheyou[ITEM][P27]sto[P20]e[P20]ou[P11]you[P1A][P15]Don'tworry,Mom.[PAGE][P2C][P21]t[ITEM][P13][FD][UNK_0E]&[P2C]theto[P2C][P20]you[ITEM][E6]
+[NORMAL]Th[C85][P2B]{08}{8a}{87}[CLEAR]wa[P2B]ack
+
+Dialog 0x0044
+======================================================================
+[P12][P38][GREEN][GREEN][CLEAR][UNK_0E]
+
+Dialog 0x0046
+======================================================================
+ell,IguessI'llheadbackto[CRYSTAL][FAST].[P2B][C80]
+
+Dialog 0x0049
+======================================================================
+[GREEN]
+
+Dialog 0x004A
+======================================================================
+[P2A][P33]to[P10]of[C83]you[P32]you[PARA]you[WAIT]s...you"s[P1A]esI'msurprisedyoumadeitherewithsuchabadwound!
+Offtobedwithyou.[PAGE]{08}{08}{8a}{87}{81}[P2A][P33]you{05}{1d}E{00}{04}on[CLEAR]t[C83]you[P12]ou<22>you[P20]onZyou[P13]twaououto[P32]you[P10]on[P1A]es[P35],youneedtohearMac'snews.
+You'renotgoingtolikeit...[PAGE][P2A][P12]outto[ITEM][E6][SLOW][NORMAL]Th[C85][P2B]'t[P2B]om[CLEAR]p
+
+Dialog 0x004B
+======================================================================
+on[P1A][C8E]Iseeaswitchinthestatue,butcan'treachit.[PARA]Let'spushitwithsomething...[PAGE][P2A]men[P10]{05}{1e}E{00}{04}eto
+
+Dialog 0x004C
+======================================================================
+band,Mac,forgothis[P1E][NORMAL]![PARA]Ihopenothinghappens...[CLEAR]<18>
+
+Dialog 0x0053
+======================================================================
+acfoundit.[PAGE][P2C][PARA]you[P1A]
+
+Dialog 0x0054
+======================================================================
+<24>
+
+Dialog 0x0055
+======================================================================
+ehasmelted!
+Howdidithappen?[P1B]
+
+Dialog 0x0057
+======================================================================
+,Crystal[ITEM]<3A>{08}{8a}{87}
+[P10]es
+[ITEM]anis
+[ITEM],[SOUND:05]to{08}{8a}{87}
+[ITEM]R[P11][P10][PARA]C[ITEM]<3B>
+
+Dialog 0x0059
+======================================================================
+dthatnamebefore![P1B][P32]ForyearsMac'sbeenstudyingaProphecy.Onhiswaybackfromdoingsomeresearch,thelakedriedupandhisshipendeduponarockledge.[PAGE][P2C][PARA]you[P1A][P32]Butthat'snoproblem.
+Ifwedigfromhere,we'llbeabletoreachtheship.[PARA]Anyway,here'sakey.
+Theshieldishiddeninthe[CRYSTAL]
+.[SOUND:5F]
+[CLEAR]
+{08}{8a}{87}[P1A][P32]Bytheway,[CRYSTAL][P11]'sbeenhavingsomestrongearthquakeslately.
+
+Dialog 0x005B
+======================================================================
+[UNK_0F]<90>[P10][ITEM][FAST][F7]X[GREEN]<28>
+
+Dialog 0x005C
+======================================================================
+to[CRYSTAL][FAST].[P2B][C80]
+
+Dialog 0x0060
+======================================================================
+[ITEM][FC][C80]<24>[C8D][ITEM][FD][C81]<28>[C8D][FAST][ED]B
+
+Dialog 0x0066
+======================================================================
+[SOUND:C2]
+
+Dialog 0x006A
+======================================================================
+[GREEN]
+
+Dialog 0x006B
+======================================================================
+ust[ITEM]eI
+
+Dialog 0x006F
+======================================================================
+[ITEM]anis
+[ITEM],[SOUND:05]to{08}{8a}{87}
+[ITEM]R[P11][P10][PARA]C[ITEM]<3B>
+
+Dialog 0x0071
+======================================================================
+
+{05}{1d}E{00}{04}{05}{1d}E{00}{04}[P20]...[P10]ight[PARA]...[P10]{05}{1d}E{00}{04}[C80]...[P10]{05}{1d}E{00}{04}[PARA]...ight
+[PARA]ight
+you[P1A]
+
+Dialog 0x0075
+======================================================================
+[P2C][P13][WAIT]
+
+Dialog 0x0077
+======================================================================
+utamonsterinthe[CRYSTAL][YELLOW]stolethe[P1E][FAST]whichWarpsusfromthe[CRYSTAL][NORMAL]tothe[CRYSTAL][GREEN].[PAGE][P2C]Wyou[P1A]
+
+Dialog 0x0078
+======================================================================
+'treachit.[PARA]Let'spushitwithsomething...[PAGE][P2A]men[P10]{05}{1e}E{00}{04}eto
+
+Dialog 0x0079
+======================================================================
+ust[ITEM]eI
+
+Dialog 0x007B
+======================================================================
+tousea[P1E][P2A].[SOUND:5F]
+[P2A][WAIT]{08}{8a}{87}[P2A]<16>etoto
+
+Dialog 0x007C
+======================================================================
+k
+
+Dialog 0x007E
+======================================================================
+utamonsterinthe[CRYSTAL][YELLOW]stolethe[P1E][FAST]whichWarpsusfromthe[CRYSTAL][NORMAL]tothe[CRYSTAL][GREEN].[PAGE][P2C]Wyou[P1A]
+
+Dialog 0x007F
+======================================================================
+[FA]![P2C][P38]
+
+
+Dialog 0x0080
+======================================================================
+ust[ITEM]eI
+
+Dialog 0x0082
+======================================================================
+[P32]to[P12]the<16>[P27][C82]you[PARA]you{05}{1d}E{00}{04}on[P32]you.s[P1A]HI'mokay.IguessIhaven'trecoveredfromthatfalloffthebridge.[P1B]
+
+Dialog 0x0084
+======================================================================
+manI,theCrystalofLight,haveguidedyou.[PARA]Evilcan'tthriveifyoukeephopealive,useyourcourage,andrespectyourWorld.
+Abrightfutureawaitsyounow.
+Go,andenjoyalltheWorldhastooffer.[P1B]
+
+Dialog 0x0086
+======================================================================
+[NAME][ITEM],[GREEN][ITEM]ou[P20]n[GREEN][GREEN]<3A>
+
+Dialog 0x0088
+======================================================================
+[P21][GREEN][NORMAL]d[C8F]<2D>[P38][P10][UNK_0F]
+
+
+Dialog 0x0089
+======================================================================
+dthatnamebefore![P1B][P32]ForyearsMac'sbeenstudyingaProphecy.Onhiswaybackfromdoingsomeresearch,thelakedriedupandhisshipendeduponarockledge.[PAGE][P2C][PARA]you[P1A][P32]Butthat'snoproblem.
+Ifwedigfromhere,we'llbeabletoreachtheship.[PARA]Anyway,here'sakey.
+Theshieldishiddeninthe[CRYSTAL]
+.[SOUND:5F]
+[CLEAR]
+{08}{8a}{87}[P1A][P32]Bytheway,[CRYSTAL][P11]'sbeenhavingsomestrongearthquakeslately.
+
+Dialog 0x008A
+======================================================================
+[YELLOW][CLEAR],[P2A][P12][P27][P1C] 
+
+Dialog 0x008B
+======================================================================
+[GREEN]is
+
+
+Dialog 0x008D
+======================================================================
+Well,heregoes...[PAGE][P2A]Gyou[P20]you[P1A][C85]Watchthis![PAGE][P2A]
+
+Dialog 0x0090
+======================================================================
+<29>
+
+Dialog 0x0092
+======================================================================
+[ITEM][FD][C81]<28>[C8D][FAST][ED]B
+
+Dialog 0x0094
+======================================================================
+monsterinthe[CRYSTAL][YELLOW]stolethe[P1E][FAST]whichWarpsusfromthe[CRYSTAL][NORMAL]tothe[CRYSTAL][GREEN].[PAGE][P2C]Wyou[P1A]
+
+Dialog 0x0096
+======================================================================
+oingtomissyou,too.[PARA]Farewell![PAGE][P2A]e{05}{1d}E{00}{04}[P20]oneetheeGon[PARA]{05}{1d}E{00}{04}Won[P10]{05}{1d}E{00}{04}{05}{1e}E{00}{04}
+ [E0]youGonZ[E1]{05}{1d}E{00}{04}
+[FAST][P20]4[GREEN][GREEN]
+ [P13][NORMAL]
+
+Dialog 0x0099
+======================================================================
+tilweget[P1E][WAIT]fromtheSpringofLife.Butamonsterinthe[CRYSTAL][YELLOW]stolethe[P1E][FAST]whichWarpsusfromthe[CRYSTAL][NORMAL]tothe[CRYSTAL][GREEN].[PAGE][P2C]Wyou[P1A]
+
+Dialog 0x009A
+======================================================================
+<24>
+
+Dialog 0x009B
+======================================================================
+<2E>
+
+Dialog 0x009D
+======================================================================
+Well,heregoes...[PAGE][P2A]Gyou[P20]you[P1A][C85]Watchthis![PAGE][P2A]
+
+Dialog 0x009F
+======================================================================
+itupwhileyou'reyoung![PAGE][P2A][P10]{05}{1d}E{00}{04}[P12]you<34>you[PARA]on[P1A]UIthinkI'vehadalltheadventureIcanstand![PAGE][P2C][P10]on[P1A]WHowabouttakingmealong?
+You'llneedanexperttreasurehunter![PAGE][P2A]<31>to[P11]e[P11]the[P21]you
+s{08}{08}{8a}{87}{81}[P1A]TYoudon'tknowwhatyou'resaying,Grandpa![PAGE][P2A][P10]{05}{1d}E{00}{04}[P10]you<31>you[P10]on[P1A]TYou'llbebackinnotime.
+SeetheWorldforme![PAGE][P2C][PARA]on[P1A]SWe'regoingtomissyou.[PAGE][P2A]{05}{1d}E{00}{04}you[P20]{05}{1d}E{00}{04}[P20]on[CLEAR]you[NORMAL]you[ITEM]you[FAST]you[WAIT]you[NAME]you
+
+Dialog 0x00A2
+======================================================================
+[P10][ITEM][GREEN][FAST][P37]k[P2A][PARA]to
+
+Dialog 0x00A3
+======================================================================
+[NORMAL][NORMAL][NORMAL][NORMAL][NORMAL][NORMAL][NORMAL][NORMAL][P15][P12][CRYSTAL]<19>[ITEM][C8B][NORMAL]<29>K[ITEM][C8C]<19>[P35]<16>[F6]<3C>[ITEM]
+
+Dialog 0x00A6
+======================================================================
+oingtomissyou,too.[PARA]Farewell![PAGE][P2A]e{05}{1d}E{00}{04}[P20]oneetheeGon[PARA]{05}{1d}E{00}{04}Won[P10]{05}{1d}E{00}{04}{05}{1e}E{00}{04}
+ [E0]youGonZ[E1]{05}{1d}E{00}{04}
+[FAST][P20]4[GREEN][GREEN]
+ [P13][NORMAL]
+
+Dialog 0x00A9
+======================================================================
+tilweget[P1E][WAIT]fromtheSpringofLife.Butamonsterinthe[CRYSTAL][YELLOW]stolethe[P1E][FAST]whichWarpsusfromthe[CRYSTAL][NORMAL]tothe[CRYSTAL][GREEN].[PAGE][P2C]Wyou[P1A]
+
+Dialog 0x00AB
+======================================================================
+F[C81][ITEM][EB][ITEM]
+
+Dialog 0x00AD
+======================================================================
+[SLOW]
+
+Dialog 0x00B3
+======================================================================
+ppen?[P1B]
+
+Dialog 0x00B5
+======================================================================
+[NORMAL][SOUND:A1][UNK_0F][P14]
+
+Dialog 0x00B6
+======================================================================
+[UNK_0F]G[UNK_0E][NORMAL]<39>H[UNK_0F]I[UNK_0E][NORMAL]<39>H[UNK_0F]K[UNK_0E][NORMAL]<39>H[ITEM]CrystaltoH[CLEAR][WHITE]ThI[YELLOW]tH[P11]ea
+
+Dialog 0x00B8
+======================================================================
+[SOUND:B4]
+
+Dialog 0x00B9
+======================================================================
+[CLEAR]<17>[NAME][NORMAL]l[C8B][GREEN][WAIT][UNK_0E]you[ITEM][P32][ITEM][E5][ITEM]
+
+Dialog 0x00BD
+======================================================================
+[NORMAL][NORMAL][NORMAL][NORMAL][NORMAL][NORMAL][NORMAL][NORMAL][P15][P12][CRYSTAL]<19>[ITEM][C8B][NORMAL]<29>K[ITEM][C8C]<19>[P35]<16>[F6]<3C>[ITEM]
+
+Dialog 0x00C8
+======================================================================
+[F4]
+
+
+Dialog 0x00CA
+======================================================================
+{05}{1e}E{00}{04}eight[GREEN]
+ <18>[NORMAL]
+
+Dialog 0x00CD
+======================================================================
+[P2A][PARA]to[P10]ing[PARA]you[P10]on[P1A]
+
+Dialog 0x00CE
+======================================================================
+![P1B]
+
+Dialog 0x00CF
+======================================================================
+blemifwehada[P1E][P2B],butonlyDad'sfriendcanusethem.<31>Where'stheguy'shouse?[P32]Inthistown,buthe'sshuthimselfin.<31>We'llpayhimavisitanyway.
+Comeon![PAGE][P2A][P11]outheto[ITEM][E6][NAME][NORMAL]Th[C85][P2B]is[CLEAR]es[P2B]z[P2B]s
+
+Dialog 0x00D0
+======================================================================
+
+
+[WAIT][CLEAR][CLEAR][WAIT]
+
+[WAIT][CLEAR][WAIT][CLEAR]
+
+Dialog 0x00D6
+======================================================================
+[NAME][NORMAL]l[C8B][GREEN][WAIT][UNK_0E]you[ITEM][P32][ITEM][E5][ITEM]
+
+Dialog 0x00D8
+======================================================================
+<17>[NAME]<17>on<17>of[ITEM][P35]<16>[ITEM][P32]
+
+Dialog 0x00DA
+======================================================================
+ed<18>[UNK_0F]u
+
+Dialog 0x00DB
+======================================================================
+[ITEM][FC][C80]<24>[C8D][ITEM][FD][C81]<28>[C8D][FAST][ED]B
+
+Dialog 0x00DD
+======================================================================
+[ITEM][WAIT]Ya[CLEAR][FAST]…B
+
+Dialog 0x00DE
+======================================================================
+[ITEM][FC][C80]<24>[C8D][ITEM][FD][C81]<28>[C8D][FAST][ED]B
+
+Dialog 0x00E1
+======================================================================
+[CLEAR]
+[FAST][E7]s
+
+Dialog 0x00E2
+======================================================================
+P.<22>[ITEM]es
+
+Dialog 0x00E3
+======================================================================
+onthe[CRYSTAL]<17>,andsayhellotoArion!
+
+Dialog 0x00E5
+======================================================================
+
+[P12]wa
+<29>er[PARA]<17>er[ITEM][P1D]c
+
+Dialog 0x00E7
+======================================================================
+
+Whendowego?[PAGE][P2A][P20]...[P20]ight[P20]ouesyou
+
+Dialog 0x00E8
+======================================================================
+[P1E][P14][FE][ITEM]s{08}{8a}{87}
+[P12][P1A]
+
+Dialog 0x00E9
+======================================================================
+<3A>[NAME]
+[GREEN]I
+
+Dialog 0x00EC
+======================================================================
+f
+
+Dialog 0x00F1
+======================================================================
+[NORMAL][P15][P12][CRYSTAL]<19>[ITEM][C8B][NORMAL]<29>K[ITEM][C8C]<19>[P35]<16>[F6]<3C>[ITEM]
+
+Dialog 0x00F2
+======================================================================
+[NAME][CLEAR][FE][P2A][P33]you<18>[P25][P21][P25]ea[SLOW] [P2A][P25][UNK_0F]
+{08}{08}{8a}{87}{81}[P20]you[P2B][FE][P1A]
+
+Dialog 0x00F4
+======================================================================
+[WAIT][ITEM][GREEN][P10][P13]<2F>[P11]ea
+
+Dialog 0x00F5
+======================================================================
+[P1B]<3A>Ican'tdealwiththatnow.
+I'vegottohelpDad.<31>Well,whydon'tyouletmehelpyou![P32]He'sstuckbehindaboulder.[PARA]There'dbenoproblemifwehada[P1E][P2B],butonlyDad'sfriendcanusethem.<31>Where'stheguy'shouse?[P32]Inthistown,buthe'sshuthimselfin.<31>We'llpayhimavisitanyway.
+Comeon![PAGE][P2A][P11]outheto[ITEM][E6][NAME][NORMAL]Th[C85][P2B]is[CLEAR]es[P2B]z[P2B]s
+
+Dialog 0x00FA
+======================================================================
+[C8A][ITEM]e<34>
+
+Dialog 0x00FB
+======================================================================
+owner![PAGE][P2C]Wyou[P1A][P32]AshieldusedbyaKnightindaysgoneby.
+CaptainMacfoundit.[PAGE][P2C][PARA]you[P1A]
+
+Dialog 0x00FE
+======================================================================
+[C8D][NORMAL][EE][C85][ITEM][P1E]E
+
