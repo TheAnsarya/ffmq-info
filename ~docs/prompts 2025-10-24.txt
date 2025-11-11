@@ -635,8 +635,30 @@ Run the gh script locally to create GitHub issues (you run it, or I can prepare 
 
 do all of that in order after creating a git commit and pushing it;
 do all of that in order after creating a git commit and pushing it; Run the assembly parser & produce reports/dialog_asm_analysis.md now (recommended); continue
+the dialog translation includes commands, like: show dialog at a specific place on a specific character, move a character around, shake the screen, change maps, etc, so some bytes are from 1 to 4 text characters and some bytes are event commands with 1 to several bytes afterwards representing the command parameters; read and analyze the source code! it has the answer!;
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+turn of all ci/cd and github actions and workflows and turn that shit off, we don't need it, comment it out
 
 
 
