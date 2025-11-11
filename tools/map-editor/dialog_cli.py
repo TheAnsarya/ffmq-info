@@ -259,7 +259,7 @@ def cmd_validate(args):
 def cmd_export(args):
 	"""Export dialog database"""
 	import json
-	
+
 	# Get ROM path
 	rom_path = get_rom_path(args)
 	db = DialogDatabase(rom_path)
@@ -274,12 +274,12 @@ def cmd_export(args):
 			'count': len(db.dialogs),
 			'rom': str(rom_path.name)
 		}
-		
+
 		with open(args.output, 'w', encoding='utf-8') as f:
 			json.dump(data, f, indent=2, ensure_ascii=False)
-		
+
 		print(f"✓ Exported to {args.output}")
-	
+
 	elif args.format == 'txt':
 		# Export as plain text
 		with open(args.output, 'w', encoding='utf-8') as f:
@@ -288,17 +288,17 @@ def cmd_export(args):
 				f.write("=" * 70 + "\n")
 				f.write(entry.text + "\n")
 				f.write("\n")
-		
+
 		print(f"✓ Exported to {args.output}")
-	
+
 	elif args.format == 'csv':
 		# Export as CSV
 		import csv
-		
+
 		with open(args.output, 'w', newline='', encoding='utf-8') as f:
 			writer = csv.writer(f)
 			writer.writerow(['ID', 'Pointer', 'Address', 'Length', 'Text'])
-			
+
 			for dialog_id, entry in sorted(db.dialogs.items()):
 				writer.writerow([
 					f"0x{dialog_id:04X}",
@@ -307,9 +307,9 @@ def cmd_export(args):
 					entry.length,
 					entry.text
 				])
-		
+
 		print(f"✓ Exported to {args.output}")
-	
+
 	else:
 		print(f"Error: Format '{args.format}' not yet implemented")
 		print("Available formats: json, txt, csv")
@@ -428,8 +428,156 @@ def cmd_batch(args):
 		if errors and args.verbose:
 			for dialog_id, issues in sorted(errors.items())[:20]:
 				print(f"\n0x{dialog_id:04X}:")
-				for issue in issues:
-					print(f"  • {issue}")
+			for issue in issues:
+				print(f"  • {issue}")
+
+
+def cmd_stats(args):
+	"""Show ROM statistics"""
+	# Get ROM path
+	rom_path = get_rom_path(args)
+	db = DialogDatabase(rom_path)
+	db.extract_all_dialogs()
+
+	print("=" * 70)
+	print("FFMQ DIALOG DATABASE STATISTICS")
+	print("=" * 70)
+
+	# Basic stats
+	total_dialogs = len(db.dialogs)
+	total_bytes = sum(d.length for d in db.dialogs.values())
+	avg_bytes = total_bytes / total_dialogs if total_dialogs > 0 else 0
+
+	print(f"\nDialog Count:")
+	print(f"  Total dialogs: {total_dialogs}")
+	print(f"  Total bytes: {total_bytes:,}")
+	print(f"  Average bytes per dialog: {avg_bytes:.1f}")
+
+	# Size distribution
+	sizes = [d.length for d in db.dialogs.values()]
+	min_size = min(sizes) if sizes else 0
+	max_size = max(sizes) if sizes else 0
+
+	print(f"\nSize Range:")
+	print(f"  Smallest dialog: {min_size} bytes")
+	print(f"  Largest dialog: {max_size} bytes")
+
+	# Find smallest and largest
+	smallest = min(db.dialogs.items(), key=lambda x: x[1].length) if db.dialogs else None
+	largest = max(db.dialogs.items(), key=lambda x: x[1].length) if db.dialogs else None
+
+	if smallest:
+		print(f"  Smallest: 0x{smallest[0]:04X} ({smallest[1].length} bytes)")
+		if args.verbose:
+			print(f"    {smallest[1].text[:60]}...")
+
+	if largest:
+		print(f"  Largest: 0x{largest[0]:04X} ({largest[1].length} bytes)")
+		if args.verbose:
+			preview = largest[1].text[:60].replace('\n', ' ')
+			print(f"    {preview}...")
+
+	# Control code usage
+	print(f"\nControl Code Usage:")
+	control_counts = {}
+
+	for dialog in db.dialogs.values():
+		# Count control codes in text
+		import re
+		codes = re.findall(r'\[([A-Z0-9_]+)\]', dialog.text)
+		for code in codes:
+			control_counts[code] = control_counts.get(code, 0) + 1
+
+	# Top 10 control codes
+	top_codes = sorted(control_counts.items(), key=lambda x: x[1], reverse=True)[:10]
+	for code, count in top_codes:
+		print(f"  [{code:12}]: {count:3} occurrences")
+
+	# Text analysis
+	if args.verbose:
+		print(f"\nText Analysis:")
+		total_chars = sum(len(d.text) for d in db.dialogs.values())
+		print(f"  Total characters: {total_chars:,}")
+		print(f"  Compression ratio: {(1 - total_bytes / total_chars) * 100:.1f}%")
+
+		# Count unique words
+		all_text = ' '.join(d.text for d in db.dialogs.values())
+		words = re.findall(r'\b[a-zA-Z]+\b', all_text.lower())
+		unique_words = len(set(words))
+		print(f"  Unique words: {unique_words:,}")
+
+	print()
+
+
+def cmd_find(args):
+	"""Simple find command - just lists matching dialog IDs"""
+	# Get ROM path
+	rom_path = get_rom_path(args)
+	db = DialogDatabase(rom_path)
+	db.extract_all_dialogs()
+
+	search_text = args.text.lower() if args.ignore_case else args.text
+	matches = []
+
+	for dialog_id, dialog in db.dialogs.items():
+		dialog_text = dialog.text.lower() if args.ignore_case else dialog.text
+		if search_text in dialog_text:
+			matches.append(dialog_id)
+
+	if args.count_only:
+		print(f"{len(matches)} dialogs found")
+	else:
+		if matches:
+			print(f"Found {len(matches)} dialogs containing '{args.text}':")
+			# Print in columns
+			ids_per_line = 8
+			for i in range(0, len(matches), ids_per_line):
+				line_ids = matches[i:i+ids_per_line]
+				print("  " + "  ".join(f"0x{id:04X}" for id in line_ids))
+		else:
+			print(f"No dialogs found containing '{args.text}'")
+
+
+def cmd_count(args):
+	"""Count characters/bytes/words in dialogs"""
+	# Get ROM path
+	rom_path = get_rom_path(args)
+	db = DialogDatabase(rom_path)
+	db.extract_all_dialogs()
+
+	if args.id:
+		# Count specific dialog
+		dialog_id = int(args.id, 16)
+		if dialog_id not in db.dialogs:
+			print(f"Error: Dialog 0x{dialog_id:04X} not found")
+			return 1
+
+		dialog = db.dialogs[dialog_id]
+		encoded = db.dialog_text.encode(dialog.text)
+
+		print(f"Dialog 0x{dialog_id:04X}:")
+		print(f"  Characters: {len(dialog.text)}")
+		print(f"  Bytes: {len(encoded)}")
+		print(f"  Compression: {(1 - len(encoded) / len(dialog.text)) * 100:.1f}%")
+
+		# Count words
+		import re
+		words = re.findall(r'\b[a-zA-Z]+\b', dialog.text)
+		print(f"  Words: {len(words)}")
+
+		# Count control codes
+		codes = re.findall(r'\[([A-Z0-9_]+)\]', dialog.text)
+		print(f"  Control codes: {len(codes)}")
+
+	else:
+		# Count all dialogs
+		total_chars = sum(len(d.text) for d in db.dialogs.values())
+		total_bytes = sum(len(db.dialog_text.encode(d.text)) for d in db.dialogs.values())
+
+		print("All dialogs:")
+		print(f"  Total characters: {total_chars:,}")
+		print(f"  Total bytes: {total_bytes:,}")
+		print(f"  Compression: {(1 - total_bytes / total_chars) * 100:.1f}%")
 
 
 def main():
@@ -473,6 +621,23 @@ def main():
 	edit_parser.add_argument('-o', '--output', help='Output ROM file (default: overwrite input)')
 	edit_parser.add_argument('-y', '--yes', action='store_true', help='Skip confirmation')
 	edit_parser.set_defaults(func=cmd_edit)
+
+	# Stats command
+	stats_parser = subparsers.add_parser('stats', help='Show ROM statistics')
+	stats_parser.add_argument('-v', '--verbose', action='store_true', help='Show detailed analysis')
+	stats_parser.set_defaults(func=cmd_stats)
+
+	# Find command (simpler than search)
+	find_parser = subparsers.add_parser('find', help='Find dialogs containing text')
+	find_parser.add_argument('text', help='Text to find')
+	find_parser.add_argument('-i', '--ignore-case', action='store_true', help='Ignore case')
+	find_parser.add_argument('-c', '--count-only', action='store_true', help='Show count only')
+	find_parser.set_defaults(func=cmd_find)
+
+	# Count command
+	count_parser = subparsers.add_parser('count', help='Count characters/bytes/words')
+	count_parser.add_argument('id', nargs='?', help='Dialog ID (optional, counts all if omitted)')
+	count_parser.set_defaults(func=cmd_count)
 
 	# Validate command
 	validate_parser = subparsers.add_parser('validate', help='Validate dialog database')
