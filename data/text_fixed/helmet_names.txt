@@ -1,0 +1,17 @@
+HELMET NAMES
+======================================================================
+Extracted: 2025-11-11T16:06:48.725442
+Address: $064354
+Count: 10 entries
+======================================================================
+
+[  0] SteelHelm
+[  1] MoonHelm
+[  2] ApolloHelm
+[  3] SteelArmor
+[  4] NobleArmor
+[  5] Gaia'sArmor
+[  6] RelicaArmor
+[  7] MysticRobe
+[  8] FlameArmor
+[  9] BlackRobe

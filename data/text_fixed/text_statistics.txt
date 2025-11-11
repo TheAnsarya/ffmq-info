@@ -1,0 +1,128 @@
+FINAL FANTASY MYSTIC QUEST - TEXT STATISTICS
+======================================================================
+
+OVERVIEW
+----------------------------------------------------------------------
+Total strings:        825
+Total bytes:          12,056
+Total characters:     35,360
+Compression ratio:    34.10%
+Space saved:          23,304 bytes
+
+TABLE COUNTS
+----------------------------------------------------------------------
+item_names             232 strings
+weapon_names            57 strings
+armor_names             20 strings
+accessory_names         24 strings
+spell_names             32 strings
+monster_names          232 strings
+location_names         112 strings
+dialog                 116 strings
+
+TOP 30 CHARACTERS
+----------------------------------------------------------------------
+ 1. E     :  1538 occurrences
+ 2. F     :  1432 occurrences
+ 3. <     :  1374 occurrences
+ 4. >     :  1374 occurrences
+ 5. P     :  1243 occurrences
+ 6. A     :  1205 occurrences
+ 7. C     :  1090 occurrences
+ 8. 0     :  1008 occurrences
+ 9. 8     :   816 occurrences
+10. 1     :   790 occurrences
+11. e     :   783 occurrences
+12. L     :   755 occurrences
+13. R     :   752 occurrences
+14. 2     :   694 occurrences
+15. o     :   669 occurrences
+16. ' '   :   587 occurrences
+17. t     :   545 occurrences
+18. N     :   543 occurrences
+19. T     :   539 occurrences
+20. h     :   505 occurrences
+21. a     :   486 occurrences
+22. n     :   385 occurrences
+23. W     :   371 occurrences
+24. 3     :   371 occurrences
+25. I     :   369 occurrences
+26. 7     :   368 occurrences
+27. l     :   367 occurrences
+28. M     :   357 occurrences
+29. O     :   354 occurrences
+30. S     :   352 occurrences
+
+CONTROL CODE USAGE
+----------------------------------------------------------------------
+[CLEAR]         :   199 occurrences
+[P20]           :   173 occurrences
+[C80]           :   154 occurrences
+[CRYSTAL]       :   144 occurrences
+[P10]           :   144 occurrences
+[NORMAL]        :   129 occurrences
+[ITEM]          :   126 occurrences
+[PARA]          :   120 occurrences
+[SLOW]          :   114 occurrences
+[UNK_0F]        :   112 occurrences
+[E0]            :   111 occurrences
+[FE]            :   106 occurrences
+[FC]            :   105 occurrences
+[UNK_0E]        :    90 occurrences
+[WAIT]          :    83 occurrences
+[NAME]          :    83 occurrences
+[GREEN]         :    83 occurrences
+[F7]            :    74 occurrences
+[FD]            :    69 occurrences
+[PAGE]          :    69 occurrences
+[P1A]           :    66 occurrences
+[WHITE]         :    54 occurrences
+[E7]            :    52 occurrences
+[FA]            :    52 occurrences
+[YELLOW]        :    51 occurrences
+[P1E]           :    49 occurrences
+[P1C]           :    48 occurrences
+[P11]           :    43 occurrences
+[C85]           :    42 occurrences
+[P2A]           :    40 occurrences
+[P38]           :    39 occurrences
+[P2C]           :    39 occurrences
+[C81]           :    38 occurrences
+[FAST]          :    37 occurrences
+[P21]           :    36 occurrences
+[C8D]           :    34 occurrences
+[P2B]           :    34 occurrences
+[C8F]           :    33 occurrences
+[C83]           :    30 occurrences
+[F6]            :    29 occurrences
+[EE]            :    28 occurrences
+[P12]           :    28 occurrences
+[F4]            :    28 occurrences
+[E1]            :    25 occurrences
+[P27]           :    25 occurrences
+[P14]           :    25 occurrences
+[P32]           :    24 occurrences
+[P33]           :    23 occurrences
+[P13]           :    23 occurrences
+[C82]           :    22 occurrences
+[E6]            :    20 occurrences
+[P35]           :    19 occurrences
+[P1B]           :    19 occurrences
+[C8E]           :    19 occurrences
+[F5]            :    18 occurrences
+[P25]           :    18 occurrences
+[P15]           :    18 occurrences
+[P1D]           :    17 occurrences
+[ED]            :    17 occurrences
+[C88]           :    17 occurrences
+[E3]            :    16 occurrences
+[P37]           :    16 occurrences
+[C8C]           :    16 occurrences
+[C8B]           :    15 occurrences
+[E4]            :    15 occurrences
+[P26]           :    14 occurrences
+[C8A]           :    14 occurrences
+[E5]            :    10 occurrences
+[EB]            :     8 occurrences
+[SOUND]         :     3 occurrences
+

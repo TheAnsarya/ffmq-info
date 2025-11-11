@@ -1,0 +1,64 @@
+WEAPON NAMES
+======================================================================
+Extracted: 2025-11-11T16:06:48.725442
+Address: $0642A0
+Count: 57 entries
+======================================================================
+
+[  0] SteelSword
+[  1] KnightSword
+[  2] Excalibur
+[  3] Axe
+[  4] BattleAxe
+[  5] Giant'sAxe
+[  6] CatClaw
+[  7] CharmClaw
+[  8] DragonClaw
+[  9] Bomb
+[ 10] JumboBomb
+[ 11] MegaGrenade
+[ 12] MorningStar
+[ 13] BowofGrace
+[ 14] NinjaStar
+[ 15] SteelHelm
+[ 16] MoonHelm
+[ 17] ApolloHelm
+[ 18] SteelArmor
+[ 19] NobleArmor
+[ 20] Gaia'sArmor
+[ 21] RelicaArmor
+[ 22] MysticRobe
+[ 23] FlameArmor
+[ 24] BlackRobe
+[ 25] SteelShield
+[ 26] VenusShield
+[ 27] AegisShield
+[ 28] EtherShield
+[ 29] Charm
+[ 30] MagicRing
+[ 31] CupidLocket
+[ 32] Sword
+[ 33] Scimitar
+[ 34] DragonCut
+[ 35] Rapier
+[ 36] Axe
+[ 37] Beam
+[ 38] BoneMissile
+[ 39] Bow&Arrow
+[ 40] BlowDart
+[ 41] Cure
+[ 42] Heal
+[ 43] Quake
+[ 44] Blizzard
+[ 45] Fire
+[ 46] Thunder
+[ 47] Reflectant
+[ 48] Electrapulse
+[ 49] PowerDrain
+[ 50] Spark
+[ 51] IronNail
+[ 52] Scream
+[ 53] Quicksand
+[ 54] DoomGaze
+[ 55] DoomPowder
+[ 56] Cure

@@ -1,0 +1,150 @@
+LOCATION_NAMES
+======================================================================
+Extracted: 2025-11-11T15:02:32.352236
+Count: 112 entries
+======================================================================
+
+[000] Rainbow Road[FC][CRYSTAL][CRYSTAL][C8F][C8F]arar<F9>ld<E8><EC>UU[PAGE][P26][P33][CLEAR][P1B][P13]
+[001] [FD]<F2><FB>jthth[CRYSTAL]en[CRYSTAL]CrystalRainbow RoadCrystalRainbow Roada <7F>
+[002] el??
+[005] he[CLEAR]<F9>
+[008] [F7]<7F>fo[UNK_0F][UNK_0F][CLEAR][CLEAR]
+[009] [C8A][F7]le<FB><3B>[FC]D[FE]![E7]l<19>[NAME]
+[011] <18>[UNK_0E][CLEAR]
+[014] [UNK_0F][UNK_0F][CLEAR][CLEAR][UNK_0F][UNK_0F]<F0><E8>fo[P1D][UNK_0F][CLEAR][UNK_0F][C8F]<F0>[E1][FE]
+[015] [P38]s<FB>l[FD]<DF>[FE]<7F>
+[016] [P2C]<EC>x<3B><E2>[P1E]go<87>thm3<EC>'[EE],<EF>[P1C][SLOW]
+[019] "[FC]"<EC>
+[020] [CLEAR][CLEAR]mmG[E0]orelnoin[P38][UNK_0F][CLEAR]mGorR
+[021] <7F>[FE][CLEAR]<7F>C[CRYSTAL][E1]n[P38][PARA][UNK_0F][UNK_0E]Rfo[C83][E0][FE]th[UNK_0F]
+[022] <FB>[FE]V<F9><7F><87>[FE][FE]
+[024] <86> [SLOW][UNK_0F][CRYSTAL][FD][FA][E0][E5][FE]wh[FE]wh[FE]om[FE]<F9>[FE]
+[025] ":to in[C80]e e e e e <E8>go<E2>[P1A][F6][UNK_0E]<F1>[SOUND:E3][CRYSTAL]
+[026] [E7][CRYSTAL]?th[SOUND:FD]<39><F9> [WAIT][CLEAR]
+
+
+[CLEAR][SLOW]ndayldri
+[027] <3A>Crystal[P1D][P1E][UNK_0E][UNK_0F][SLOW][SLOW]ththnenoto ou[P20][P10][NORMAL][NAME]Rainbow Roadou
+[028] [UNK_0E][UNK_0E]2Eascaen[FE]x<39><31>?y<F3><F1>[UNK_0E]2[E4][UNK_0E]
+[029] [SLOW]
+[030] ing [P25][P13]<19><F8>[NAME][WAIT]
+thth[E0]t<F8>[C8F]<F0>[E3][FC]<F9>fo
+[031] hikT-thm
+[032] [C8F]<7F>[CRYSTAL][FE]<3A>[FD][P35]&<7F>
+[033] <F8>…<F8>el<7F>ro[ED]<F3>[E6]<F9>2King 8<17>[P20]e [C80]
+[034] <F3><F3>8<F8>ndfouine[F7]<EF>U<DF>j[FE][FA][FD][FC]Farwa
+[035] [C83][NAME][NORMAL][P10][E1][E1][UNK_0E][UNK_0E]Rainbow RoadRainbow Roadofay-[E6]s[FE]ow[FE]fo[FE]
+[036] [CRYSTAL][FE]<F2>o[C82]t to [P26]<F8>iTno[FD][FD][E7]:<EA>-
+[037] ."[ED]:<EF>G<90>hek[C8F]<86>[C83][C82]ll<7F>6[F7]<F9><F9>
+[038] Rainbow RoadRainbow Road[F5]<FB>x[F7][P33]?mB<18>[UNK_0E][F7]n
+
+lyj[P1B]<FB>
+[039] <3B><FB>ne[F7][P1A][P1D][F7]<F8>[ED]<DE><F3>![CLEAR][SLOW][SLOW][UNK_0F]<F8><F0>he[CLEAR]
+[040] z[FA]ld[F6]<39>[FA]&[FC][F5][F6]<3A>[EB][P27]T[F7]<84>y[FC]<F0>
+[041] <F8>[P2C][P26]L[P33]<DF><2E><EF>[P1C]<DF>TlV!be:[E4]b<EF>
+[042] [P21][P33]th[UNK_0F][CRYSTAL]<34>leLYj…<DF>▶<DF>[E6][E7]<18><F8><EF>[CRYSTAL]
+[043] Z<7F>?[F6]m[E0][E0]<F8>[CRYSTAL][UNK_0F][P32]q[F4]<FB><E8>[F7]<F0><EF>'<EF>
+[044] J<DF>J<DF><86>[FE]y[FC][P20]e e [C80][C80][C80][C81][C83]is <DF><DE><DE>
+[045] <EF><EF>jjbjwhsowhsov<F9><39><3A>thllllpp<87>
+[046] Ml!<7F>beis is is [P2B][P2B][P35][P37][P35][PAGE]esayqinInd
+[047] Crystal[P38][P38]ve[P35]z[E5]Dx<FB>ro<F3>tt<DF><DF>dri/Rainbow Road
+[048] [CLEAR][CLEAR]<87>ar<7F>[P20][P10][FC]J<F0>?<F8>[E7][FE]<F1><7F>[FC]
+[049] <7F>[F7][P20]el[C88]to [P21]<90>[FC][P33]so[F7]luila !'
+[050] <F9>tlnF[E0]n[FE]ur[P2A][P26]e m[C80][C81][C81]k<EF>[FD];
+[051] [FD][E6][F6][C8B]F[E3][FD][C83]<F9>[SLOW][C83]<7F><2E>onle[WAIT][CLEAR]
+[C81][C81]
+[052] tht[UNK_0F]<F3>[CRYSTAL][E7]<7F>[C8F][CRYSTAL][FD][FC]<EF>[NAME][UNK_0E][P11]st
+[053] <84>[FAST]thu<F1><F1><86><86>D[FD]l[FA]<FB><EA>[EB]wx
+[054] [C8F][FE][C8E]CcaShereme[C8A][FA]2<F2>[P14][F4][P27][E7]<2F><EF>
+[055] en![CRYSTAL]F<86> [UNK_0E][GREEN][CRYSTAL][CRYSTAL]<3A>sec[F7][FA]<FB><3B><3B>omso
+[056] eafo<7F><7F>llll
+[057] <2F><DF>7<EF>?<F3>Zi[FE]thth[NORMAL][UNK_0F][SLOW][CLEAR]
+m<F0>th
+[058] Rainbow Road[FE]…<F8>ii[EE][EE][F7][F7]pth[P1E][NORMAL]q[F6]
+[059] <FB><7F>
+[060] pth
+[061] p[FC]
+[062] <F0><F0>el[UNK_0F][CLEAR]th<F0>[C8C][C8F][P1E][P1E]
+[063] [F7][F7]<FB><FB>[CRYSTAL][CRYSTAL]
+[064] thth<7F><7F><3C>[FC],<F0>Igo[F4][FC][GREEN][GREEN][FD]<3C>
+[065] [P10][C88][F4][GREEN]lyj[P1B]<FB><3B><FB>se[F7][WAIT]Crystal.[FD]%[E7]s<7F>
+[066] [CLEAR][SLOW][SLOW][FAST]m,e
+[067] [FD][P12][FA][P1D]<84>y[FC]<F0><F8><28>
+[068] Var[FC]d<DF><24>r[P21][P33]th[UNK_0F][CRYSTAL][P14]
+[069] y<DF>;[E7]
+[070] j<EA>[P37][FA]youh[F7]<EC>[EB]caT<DE>7[FE]nd5[P20][PARA]
+[071] [P20][C80]<84>
+[073] yZFll
+[074] [P2B]:[C8F]ldt[FC][EB]
+[075] id[FC][F7][F7][FD][F7]th
+[076] [ED]ntYarso[C8F][C83]so[F7]<E8><FB>[E4][FE]j[E4][E7]
+[077] m[E0]<3C>B[ED][P33][CLEAR][FE]foz[F5][C8E][P27]▶vfoRainbow Roadl<7F>
+[079] th<F0><F0>
+[080] [P38][P38]<34><3C>[P1A][P1E]Crystalth
+[081] [WAIT][CLEAR][WAIT][CLEAR][ITEM][SLOW][CLEAR][CLEAR]
+[082] arso[F7]k<F2>is leh<FB>S[FD]ea[EE]is [E7]<7F>er<84>[PARA]B
+[083] Bmm[E0]
+[085] ."<E9><DE>[E4]<18>[NAME][WAIT]
+[086] [C80][C80]e mGB<90><F0>
+[087] <7F>eaZ<DF>i?the wa[P38][PARA][UNK_0F][UNK_0E]<2F>TeaZGeath[UNK_0F]
+[088] [EB][F4][EB][F6]wh<FB>st[FD]om[FE]<F8>":to in[C83]the e e
+[089] e e <E8>goorelO[P38]u<18>"Cfo[F6]th?[SOUND:FD]<39><F9>
+[090] <90>u<E8>le 
+[CLEAR][SLOW]
+[091] ththldno
+[092] [CLEAR][CLEAR][SLOW][ITEM][GREEN][YELLOW]<F9>[F7]
+[093] [P1C][CRYSTAL][E1]<EF>-[E7][P37]?a F
+[094] thth[E0]t<F8>[UNK_0F]<F0>[E3][FC]<F9>fohikT-thm
+[095] [C80]B<18>[NAME]a !6[F7]<F9><F9>Rainbow RoadRainbow Road[F5]<FB>x[F7][P33]?
+[096] [P20]B<18>[UNK_0E][F7]n
+[097] [P12][P12][P11][P11]
+[098] eais FF[C8F][C8F]ouou
+[099] …ve[F4]ur[FA]me<F9><F9><F1><F1>oo[C80]Bgoheto <87>[UNK_0F]th
+[101] [P38]gogo<F8>
+[103] [P33]Rainbow Road[CRYSTAL][CRYSTAL][CRYSTAL][CRYSTAL][CRYSTAL][P33]<2F><2F>[P33][CRYSTAL]e e <7F>th<3B><17>F9
+[104] !tllBvegoth[P35][F7]<F9>[F5][WAIT][WAIT][FE][FC]
+[105] ▶<E8><F9>9ro[E3]s [P1A][P1E][FC]S<EF>FV
+[106] PPPPffomsoldsonefo!<7F>[FA]<FB><F9><F9><F9>z
+[107] [F5][F7]?<FB>BGBGorWel<90>el<90>el<90>[PARA],<28>…
+[108] GGW<90><90><90>,…
+[109] [P38][PARA]beas
+[110] <F8><F0><F0>Gllou[E7]in[UNK_0F]th<DF>[CRYSTAL]<7F>[FC]<F8>F[CRYSTAL]t[C85]
+[111] <F1>wa[FC]<18><7F>[SLOW][CRYSTAL]
+[112] <F9><F8>[E3]H[C8F]<87><3C>[P1C][FD][E5][F7][CLEAR]<E2>[WAIT][YELLOW][FAST]l<7F>
+[113] [FE][FE][F7]<F2><F3>[FE]om<EC>!▶<DF>[FC]&I!<F8>[F7]Wl
+[114] <F3><DF><DF><EF><EF><7F><7F>[P38]u[P38]u[P38]u<3C>yfo[C8A]no<89>
+[115] <F9>[NORMAL]<EC>[P1C]uuuy[C8E][C8F][UNK_0F][P1B]
+[117] [SLOW]
+
+
+
+
+
+[CLEAR][CLEAR]
+
+<7F><18> 
+
+
+[CLEAR]
+[118] xtB<F3>it[E5]&[E7][CLEAR][P1E]wa8[FA][FE]F[UNK_0F]<F3>het [C80]
+[119] [E1][SLOW]<F1>?[C8F]t<87>[E0][C80]<7F>e lth<EF>e [E0][C80]m[C80]
+[120] <F0><F8>[E1][E0]th[CLEAR]<3C><F8>m[E0]
+[121] [SLOW][SLOW]<7F><7F>
+[122] [CRYSTAL][CRYSTAL][P13][P11]<EF><EF>[FE][CLEAR]<F3><F0>[CRYSTAL][CLEAR]el![E0]
+[123] [E0]<DF>ml[C81][FE]<87>go[UNK_0F]<F0>[UNK_0F]<F0>ll[FE]<F8><F0><F0>
+[124] ay6nt2isZ<F1>[P21]<E8>[P20]SB?e F<90>9DiRainbow Road
+[125] th<7F><7F>me e e B[P20]B[P20]B[P20][E0][P20][E0][P20]me
+[126] mm[E0][E0][E0][E0][E0]m
+
+[CLEAR][WAIT][WAIT][WAIT][WAIT][WAIT][WAIT][WAIT][WAIT][WAIT]
+[127] [CLEAR][WAIT]
+
+
+[CLEAR][CLEAR][CLEAR][CLEAR][CLEAR][CLEAR]
+
+
+
+
+
+
+thth

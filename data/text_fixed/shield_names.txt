@@ -1,0 +1,17 @@
+SHIELD NAMES
+======================================================================
+Extracted: 2025-11-11T16:06:48.725442
+Address: $0643CC
+Count: 10 entries
+======================================================================
+
+[  0] SteelShield
+[  1] VenusShield
+[  2] AegisShield
+[  3] EtherShield
+[  4] Charm
+[  5] MagicRing
+[  6] CupidLocket
+[  7] Sword
+[  8] Scimitar
+[  9] DragonCut

@@ -1,0 +1,238 @@
+ITEM NAMES
+======================================================================
+Extracted: 2025-11-11T16:06:48.725442
+Address: $064120
+Count: 231 entries
+======================================================================
+
+[  0] Elixir
+[  1] TreeWither
+[  2] Wakewater
+[  3] VenusKey
+[  4] Multi-Key
+[  5] Mask
+[  6] MagicMirror
+[  7] ThunderRock
+[  8] CaptainCap
+[  9] LibraCrest
+[ 10] GeminiCrest
+[ 11] MobiusCrest
+[ 12] SandCoin
+[ 13] RiverCoin
+[ 14] SunCoin
+[ 15] SkyCoin
+[ 16] CurePotion
+[ 17] HealPotion
+[ 18] Seed
+[ 19] Refresher
+[ 20] Exit
+[ 21] Cure
+[ 22] Heal
+[ 23] Life
+[ 24] Quake
+[ 25] Blizzard
+[ 26] Fire
+[ 27] Aero
+[ 28] Thunder
+[ 29] White
+[ 30] Meteor
+[ 31] Flare
+[ 32] SteelSword
+[ 33] KnightSword
+[ 34] Excalibur
+[ 35] Axe
+[ 36] BattleAxe
+[ 37] Giant'sAxe
+[ 38] CatClaw
+[ 39] CharmClaw
+[ 40] DragonClaw
+[ 41] Bomb
+[ 42] JumboBomb
+[ 43] MegaGrenade
+[ 44] MorningStar
+[ 45] BowofGrace
+[ 46] NinjaStar
+[ 47] SteelHelm
+[ 48] MoonHelm
+[ 49] ApolloHelm
+[ 50] SteelArmor
+[ 51] NobleArmor
+[ 52] Gaia'sArmor
+[ 53] RelicaArmor
+[ 54] MysticRobe
+[ 55] FlameArmor
+[ 56] BlackRobe
+[ 57] SteelShield
+[ 58] VenusShield
+[ 59] AegisShield
+[ 60] EtherShield
+[ 61] Charm
+[ 62] MagicRing
+[ 63] CupidLocket
+[ 64] Sword
+[ 65] Scimitar
+[ 66] DragonCut
+[ 67] Rapier
+[ 68] Axe
+[ 69] Beam
+[ 70] BoneMissile
+[ 71] Bow&Arrow
+[ 72] BlowDart
+[ 73] Cure
+[ 74] Heal
+[ 75] Quake
+[ 76] Blizzard
+[ 77] Fire
+[ 78] Thunder
+[ 79] Reflectant
+[ 80] Electrapulse
+[ 81] PowerDrain
+[ 82] Spark
+[ 83] IronNail
+[ 84] Scream
+[ 85] Quicksand
+[ 86] DoomGaze
+[ 87] DoomPowder
+[ 88] Cure
+[ 89] FireBreath
+[ 90] Punch
+[ 91] Kick
+[ 92] Uppercut
+[ 93] Stab
+[ 94] HeadButt
+[ 95] BodySlam
+[ 96] Scrunch
+[ 97] FullNelson
+[ 98] NeckChoke
+[ 99] Dash
+[100] Roundhouse
+[101] ChokeUp
+[102] StompStomp
+[103] MegaPunch
+[104] Bearhug
+[105] AxeBomber
+[106] Piledriver
+[107] SkyAttack
+[108] Wraparound
+[109] Dive
+[110] Attatch
+[111] Mucus
+[112] Claw
+[113] Fang
+[114] Beak
+[115] Sting
+[116] Tail
+[117] Psudopod
+[118] Bite
+[119] HydroAcid
+[120] Branch
+[121] Fin
+[122] Scissor
+[123] WhipTongue
+[124] Horn
+[125] GiantBlade
+[126] Headoomerang
+[127] ChewOff
+[128] Quake
+[129] Flame
+[130] FlameSweep
+[131] Fireball
+[132] FlamePillar
+[133] Heatwave
+[134] Watergun
+[135] Coldness
+[136] IcyFoam
+[137] IceBlock
+[138] Snowstorm
+[139] Whirlwater
+[140] IceBreath
+[141] Tornado
+[142] Typhoon
+[143] Hurricane
+[144] Thunder
+[145] ThunderBeam
+[146] CorrodeGas
+[147] DoomDance
+[148] SonicBoom
+[149] Bark
+[150] Screechvoice
+[151] Para-needle
+[152] Para-claw
+[153] Para-snake
+[154] Para-breath
+[155] PoisonSting
+[156] PoisonThorn
+[157] RottenMucus
+[158] PoisonSnake
+[159] Poisonbreath
+[160] Blinder
+[161] Blackness
+[162] StoneBeak
+[163] Gaze
+[164] Stare
+[165] SpookyLaugh
+[166] Riddle
+[167] BadBreath
+[168] BodyOdor
+[169] Para-stare
+[170] PoisonFluid
+[171] PoisonFlour
+[172] Hypno-sleep
+[173] Lullaby
+[174] SleepLure
+[175] SleepPowder
+[176] BlindFlash
+[177] Smokescreen
+[178] Muffle
+[179] SilenceSong
+[180] StoneGas
+[181] StoneGaze
+[182] DoubleSword
+[183] DoubleHit
+[184] TripleFang
+[185] DoubleKick
+[186] TwinShears
+[187] ThreeHeads
+[188] 6Psudopods
+[189] SnakeHead
+[190] Drain
+[191] Dissolve
+[192] SuckerStick
+[193] Selfdestruct
+[194] Multiply
+[195] ParaGas
+[196] RipEarth
+[197] StoneBlock
+[198] Windstorm
+[199] TwinFang
+[200] Psychshield
+[201] Psychshield
+[202] DarkCane
+[203] DarkSaber
+[204] IceSword
+[205] FireSword
+[206] MirrorSword
+[207] QuakeAxe
+[208] CureArrow
+[209] Lazer
+[210] SpiderKids
+[211] SilverWeb
+[212] GoldenWeb
+[213] MegaFlare
+[214] MegaWhite
+[215] FireBreath
+[216] SkyAttack
+[217] Piledriver
+[218] Hurricane
+[219] Heatwave
+[221] Explosive
+[222] Arrow
+[223] NinjaStar
+[224] Brownie
+[225] Mintmint
+[226] Red
+[227] Cap
+[228] Mad_Plant
+[229] Plant_Ma
+[230] nLive
+[231] Oak

@@ -1,0 +1,27 @@
+ARMOR NAMES
+======================================================================
+Extracted: 2025-11-11T16:06:48.725442
+Address: $064378
+Count: 20 entries
+======================================================================
+
+[  0] SteelArmor
+[  1] NobleArmor
+[  2] Gaia'sArmor
+[  3] RelicaArmor
+[  4] MysticRobe
+[  5] FlameArmor
+[  6] BlackRobe
+[  7] SteelShield
+[  8] VenusShield
+[  9] AegisShield
+[ 10] EtherShield
+[ 11] Charm
+[ 12] MagicRing
+[ 13] CupidLocket
+[ 14] Sword
+[ 15] Scimitar
+[ 16] DragonCut
+[ 17] Rapier
+[ 18] Axe
+[ 19] Beam

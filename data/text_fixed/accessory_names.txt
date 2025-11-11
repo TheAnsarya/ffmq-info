@@ -1,0 +1,31 @@
+ACCESSORY NAMES
+======================================================================
+Extracted: 2025-11-11T16:06:48.725442
+Address: $0643FC
+Count: 24 entries
+======================================================================
+
+[  0] Charm
+[  1] MagicRing
+[  2] CupidLocket
+[  3] Sword
+[  4] Scimitar
+[  5] DragonCut
+[  6] Rapier
+[  7] Axe
+[  8] Beam
+[  9] BoneMissile
+[ 10] Bow&Arrow
+[ 11] BlowDart
+[ 12] Cure
+[ 13] Heal
+[ 14] Quake
+[ 15] Blizzard
+[ 16] Fire
+[ 17] Thunder
+[ 18] Reflectant
+[ 19] Electrapulse
+[ 20] PowerDrain
+[ 21] Spark
+[ 22] IronNail
+[ 23] Scream
