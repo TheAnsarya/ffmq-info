@@ -574,7 +574,8 @@ The `simple.tbl` is **100% correct** for item/spell/monster names.
 
 ## References
 
-- **TCRF Wiki**: https://datacrystal.tcrf.net/wiki/Final_Fantasy:_Mystic_Quest/TBL
+- **DataCrystal / TCRF mirror**: https://datacrystal.tcrf.net/wiki/Final_Fantasy:_Mystic_Quest/TBL
+- **TCRF (additional reference)**: https://tcrf.net/Final_Fantasy:_Mystic_Quest
 - **Dialog Database**: `tools/map-editor/utils/dialog_database.py`
 - **Text Extractor**: `tools/extraction/extract_text.py`
 - **Character Tables**: `simple.tbl`, `complex.tbl`
