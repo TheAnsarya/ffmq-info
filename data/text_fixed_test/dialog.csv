@@ -1,0 +1,177 @@
+ID,Text,Address,Pointer,Length
+1,[SPACE][ITEM][PAGE][NORMAL][NORMAL][NORMAL][NORMAL][NORMAL][SLOW],$01A27F,$A27F,10
+2,y[CLEAR][ASTERISK],$01C488,$C488,4
+4,[WAIT],$01A960,$A960,2
+7,[SPACE][ITEM][PAGE][NORMAL][NORMAL][NORMAL][NORMAL][NORMAL][SLOW],$01A27F,$A27F,10
+9,[SLOW][NORMAL][C82][C81][DELAY]?[C88][P10][P1D],$0188A0,$88A0,10
+13,[SPACE][ITEM][PAGE][NORMAL][NORMAL][NORMAL][NORMAL][NORMAL][SLOW],$01A27F,$A27F,10
+15,[SLOW][NORMAL][C82][C81][DELAY]?[C88][P10][P1D],$0188A0,$88A0,10
+16,[CLEAR],$01A9C4,$A9C4,2
+19,6[P10][ITEM][P37][P13][ASTERISK][ITEM][SPACE][NAME][C8D]R[ITEM][P3B],$01AB7F,$AB7F,14
+22,s beautifueras evan!,$01F320,$F320,16
+23,"
+[UNK_0D:B4]",$01A98D,$A98D,4
+26,s beautifueras evan!,$01F320,$F320,16
+27,[WAIT][P12][P25],$01AD8D,$AD8D,4
+30,saving us arhethe treB!,$01D920,$D920,16
+31,[P38][P2A][ITEM][P27][NAME][P2A],$01CE82,$CE82,9
+33,"[P25][UNK_0B][P26][TEXTBOX_BELOW][C81]LoosoovofthaneroTatenthe [CRYSTAL]
+lyonce the heart althe Wbeld.[PARA]AnolheProphecitsaysly""Te vile 4wirewheaerthe Pveanlyarhedivide the Wbelhebehinhe4dobesroAt eltime the Knngwireappear.""
+Te Prophecithas nvecghe true.[PARA]4caans haa lockIthe dobes althe [CRYSTAL]
+arheBcapInethe keysroTey're draining the lngfrghthe 4Crystals althe Earthlyarhethe Wbelheis nochaos.Te people are nodBpanate neIalhayp.[PARA][P35]lyonlitescarsaa the Crystals arhethe Wbeld.[PAGE][P2A][PARA]itGatt to [PARA]on[P10]you[TEXTBOX_BELOW]",$01F8D0,$F8D0,302
+34,t [P13][WAIT][P12][P25],$01AD8B,$AD8B,6
+37,to to ,$01C21A,$C21A,3
+38,"[ITEM]%[UNK_0F]is 
+[ITEM]fo[P11]is 
+[P14][ASTERISK][UNK_0B]",$01A230,$A230,14
+40,[SLOW][NORMAL][C82][C81][DELAY]?[C88][P10][P1D],$0188A0,$88A0,10
+44,[SPACE][ITEM][PAGE][NORMAL][NORMAL][NORMAL][NORMAL][NORMAL][SLOW],$01A27F,$A27F,10
+46,[SLOW][NORMAL][C82][C81][DELAY]?[C88][P10][P1D],$0188A0,$88A0,10
+47,[CLEAR],$01A9C4,$A9C4,2
+50,6[P10][ITEM][P37][P13][ASTERISK][ITEM][SPACE][NAME][C8D]R[ITEM][P3B],$01AB7F,$AB7F,14
+56,e Knng![TEXTBOX_ABOVE],$01FA7A,$FA7A,7
+57,"ake [P1D]
+arywhane darganous![PAGE][P2C][P11]you[TEXTBOX_BELOW][P15]LiwhatlyMghis[PAGE][P2B][FD][P2C][P21]you[UNK_0F][C8B][UNK_0E][ITEM]ca
+[NORMAL]&[P2C]
+s [TEXTBOX_BELOW][P15]Hey!Tat [P1E]
+looks awful![PARA]Hvemuchthe treBmombe suffaning!OKlyeswin.[PAGE][P2A][P11]ou[P21]e the you[ITEM][P27]s to [P20]e [P20]ou[P11]you[TEXTBOX_BELOW][P15]DonfowberylyMgh.[PAGE][P2C][P21]t [ITEM][P13][FD][UNK_0E]&[P2C]the to [P2C][P20]you[ITEM][E6]
+[NORMAL]T[C85][P2B]st[CLEAR]ll[P2B]as",$01DA60,$DA60,168
+58,[P12][P38][UNK_0C][UNK_0C][ASTERISK][UNK_0E],$01A208,$A208,7
+62,[ITEM][UNK_0B]to [ED][FC]owlls lliting fbeyoulylittle beawhs![ITEM][P24],$01FC48,$FC48,31
+63,"u[F5],[F5][E3][F5]j[F7]m[F7]z[F7]-[F7][E7][F7][E7][F7][NAME][ITEM][E4]n[UNK_0E][CLEAR][DELAY][P2B][UNK_0E][P2C]or",$01D6CB,$D6CB,31
+65,"[P25][UNK_0B][P26][TEXTBOX_BELOW][C81]LoosoovofthaneroTatenthe [CRYSTAL]
+lyonce the heart althe Wbeld.[PARA]AnolheProphecitsaysly""Te vile 4wirewheaerthe Pveanlyarhedivide the Wbelhebehinhe4dobesroAt eltime the Knngwireappear.""
+Te Prophecithas nvecghe true.[PARA]4caans haa lockIthe dobes althe [CRYSTAL]
+arheBcapInethe keysroTey're draining the lngfrghthe 4Crystals althe Earthlyarhethe Wbelheis nochaos.Te people are nodBpanate neIalhayp.[PARA][P35]lyonlitescarsaa the Crystals arhethe Wbeld.[PAGE][P2A][PARA]itGatt to [PARA]on[P10]you[TEXTBOX_BELOW]",$01F8D0,$F8D0,302
+66,cyis[PAGE][P2A][P27][P27][P17][P26]isto [P20]you[PARA]s [P20]on,$01FA28,$FA28,18
+67,"ake [P1D]
+arywhane darganous![PAGE][P2C][P11]you[TEXTBOX_BELOW][P15]LiwhatlyMghis[PAGE][P2B][FD][P2C][P21]you[UNK_0F][C8B][UNK_0E][ITEM]ca
+[NORMAL]&[P2C]
+s [TEXTBOX_BELOW][P15]Hey!Tat [P1E]
+looks awful![PARA]Hvemuchthe treBmombe suffaning!OKlyeswin.[PAGE][P2A][P11]ou[P21]e the you[ITEM][P27]s to [P20]e [P20]ou[P11]you[TEXTBOX_BELOW][P15]DonfowberylyMgh.[PAGE][P2C][P21]t [ITEM][P13][FD][UNK_0E]&[P2C]the to [P2C][P20]you[ITEM][E6]
+[NORMAL]T[C85][P2B]st[CLEAR]ll[P2B]as",$01DA60,$DA60,168
+68,[P12][P38][UNK_0C][UNK_0C][ASTERISK][UNK_0E],$01A208,$A208,7
+70,ayllyowguBs hiheahebasto [CRYSTAL][FAST].[P2B][C80],$01EA80,$EA80,22
+73,[UNK_0C],$018000,$8000,2
+74,"[P2A][P33]to [P10]al[C83]you[P32]you[PARA]es[WAIT]s isyou""s [TEXTBOX_BELOW]BldsurprisIesmede it hane nesuchgobahewound!Offto bIneyou.[PAGE]wa[P2A][P33]youoron[CLEAR]t [C83]you[P12]ou[P22]you[P20]onZyou[P13]t llououto [P32]you[P10]on[TEXTBOX_BELOW]B[P35]lyesneIto hearMacennewsroYou're not going to like itis[PAGE][P2A][P12]out to [ITEM][E6][SLOW][NORMAL]T[C85][P2B]fo[P2B]gh[CLEAR]ui",$01D1E3,$D1E3,157
+75,on[TEXTBOX_BELOW][C8E]owsee goswitchnothe whatuelybut carforeachit.[PARA]Letenpushit nesghethingis[PAGE][P2A]mat[P10]ede to ,$01D0D6,$D0D6,68
+76,bardlyMaclyfbegot his [P1E][NORMAL]![PARA]owhope nothing happatsis[CLEAR][P18],$01D982,$D982,37
+83,acfounheit.[PAGE][P2C][PARA]es[TEXTBOX_BELOW],$01E28D,$E28D,16
+84,[P24],$018019,$8019,2
+85,e has mayted!Hvediheit happat?[TEXTBOX_ABOVE],$01E207,$E207,24
+87,"lyCrystal[ITEM][P3A]st
+[P10]B
+[ITEM]aris 
+[ITEM]ly[UNK_0D:05]to st
+[ITEM]R[P11][P10][PARA]C[ITEM][P3B]",$019C10,$9C10,29
+89,"heelname befbee![TEXTBOX_ABOVE][P32]Fbeyears Macenbeatwhudying goProphecy.Onhis llitbasfrghdoing sghe rBearchlythe lake driIuuiarhehis shiuiatdIuuiongorocsoledge.[PAGE][P2C][PARA]es[TEXTBOX_BELOW][P32]But thatennntproblemroIfwe digfrghhanelywe'rebe able to reachthe ship.[PARA]AnyllylyhaneengokeyroTe shiayheis hiddatnothe [CRYSTAL]
+.[UNK_0D:5F]
+[ASTERISK]
+st[TEXTBOX_BELOW][P32]Bitthe llyly[CRYSTAL][P11]enbeathaving sghe whrongearthquakBlatayy.",$01E2AD,$E2AD,258
+91,[UNK_0F]<90>[P10][ITEM][FAST][F7]X[UNK_0C][P28],$01B1EB,$B1EB,11
+92,to [CRYSTAL][FAST].[P2B][C80],$01EA8E,$EA8E,8
+96,[ITEM][FC][C80][P24][C8D][ITEM][FD][C81][P28][C8D][FAST][ED]B,$018D1A,$8D1A,14
+102,[UNK_0D:C2],$01880C,$880C,3
+106,[UNK_0C],$018000,$8000,2
+107,om[ITEM]e ow,$018D7F,$8D7F,5
+111,"[ITEM]aris 
+[ITEM]ly[UNK_0D:05]to st
+[ITEM]R[P11][P10][PARA]C[ITEM][P3B]",$019C19,$9C19,20
+113,"
+oror[P20]is[P10]ng[PARA]is[P10]or[C80]is[P10]or[PARA]isng
+[PARA]ng
+you[TEXTBOX_BELOW]",$01C9AD,$C9AD,27
+117,[P2C][P13][WAIT],$01ADEB,$ADEB,4
+119,ut gocaofnothe [CRYSTAL][UNK_0B]whole the [P1E][FAST]whichWarps us frghthe [CRYSTAL][NORMAL]to the [CRYSTAL][UNK_0C].[PAGE][P2C]Wes[TEXTBOX_BELOW],$01BFAA,$BFAA,50
+120,foreachit.[PARA]Letenpushit nesghethingis[PAGE][P2A]mat[P10]ede to ,$01D0F4,$D0F4,38
+121,om[ITEM]e ow,$018D7F,$8D7F,5
+123,"to use go[P1E][P2A].[UNK_0D:5F]
+[P2A][WAIT]st[P2A][P16]e to to ",$01C208,$C208,21
+124,k,$018A30,$8A30,2
+126,ut gocaofnothe [CRYSTAL][UNK_0B]whole the [P1E][FAST]whichWarps us frghthe [CRYSTAL][NORMAL]to the [CRYSTAL][UNK_0C].[PAGE][P2C]Wes[TEXTBOX_BELOW],$01BFAA,$BFAA,50
+127,"[FA]![P2C][P38]
+",$01CEF4,$CEF4,6
+128,om[ITEM]e ow,$018D7F,$8D7F,5
+130,[P32]to [P12]the [P16][P27][C82]you[PARA]esoron[P32]you.s [TEXTBOX_BELOW]Hldokay.owguBs owhavatforecovanIfrghelfareoffthe bridge.[TEXTBOX_ABOVE],$01F6BF,$F6BF,67
+132,menIlythe CrystalalLnglyhaa guidIyou.[PARA]Eviercarfothria ifeskeeuihope alivelyuse yourcouragelyarherBpect yourWbeldroAbrngfuture allits esnveroGolyarheatjoitarethe Wbelhehas to offan.[TEXTBOX_ABOVE],$01C78D,$C78D,127
+134,[NAME][ITEM]ly[UNK_0C][ITEM]ou[P20]n[UNK_0C][UNK_0C][P3A],$01D320,$D320,12
+136,"[P21][UNK_0C][NORMAL]d[C8F]<2D>[P38][P10][UNK_0F]
+",$019058,$9058,11
+137,"heelname befbee![TEXTBOX_ABOVE][P32]Fbeyears Macenbeatwhudying goProphecy.Onhis llitbasfrghdoing sghe rBearchlythe lake driIuuiarhehis shiuiatdIuuiongorocsoledge.[PAGE][P2C][PARA]es[TEXTBOX_BELOW][P32]But thatennntproblemroIfwe digfrghhanelywe'rebe able to reachthe ship.[PARA]AnyllylyhaneengokeyroTe shiayheis hiddatnothe [CRYSTAL]
+.[UNK_0D:5F]
+[ASTERISK]
+st[TEXTBOX_BELOW][P32]Bitthe llyly[CRYSTAL][P11]enbeathaving sghe whrongearthquakBlatayy.",$01E2AD,$E2AD,258
+138,"[UNK_0B][CLEAR],[P2A][P12][P27][P1C][SPACE]",$01D019,$D019,11
+139,"[UNK_0C]is 
+",$01A220,$A220,4
+141,Wayllyhane goBis[PAGE][P2A]Ges[P20]you[TEXTBOX_BELOW][C85]Watchthis![PAGE][P2A],$01BDAD,$BDAD,34
+144,[P29],$0196CB,$96CB,2
+146,[ITEM][FD][C81][P28][C8D][FAST][ED]B,$018D1F,$8D1F,9
+148,caofnothe [CRYSTAL][UNK_0B]whole the [P1E][FAST]whichWarps us frghthe [CRYSTAL][NORMAL]to the [CRYSTAL][UNK_0C].[PAGE][P2C]Wes[TEXTBOX_BELOW],$01BFAD,$BFAD,47
+150,"oing to miss youlytoo.[PARA]Farewayl![PAGE][P2A]e or[P20]one e the e Gon[PARA]orWon[P10]ored
+[SPACE][E0]esGonZ[E1]or
+[FAST][P20]4[UNK_0C][UNK_0C]
+[SPACE][P13][NORMAL]",$01CC7F,$CC7F,64
+153,tierwe get [P1E][WAIT]frghthe Spring alLife.But gocaofnothe [CRYSTAL][UNK_0B]whole the [P1E][FAST]whichWarps us frghthe [CRYSTAL][NORMAL]to the [CRYSTAL][UNK_0C].[PAGE][P2C]Wes[TEXTBOX_BELOW],$01BF8D,$BF8D,79
+154,[P24],$018019,$8019,2
+155,<2E>,$01A21E,$A21E,2
+157,Wayllyhane goBis[PAGE][P2A]Ges[P20]you[TEXTBOX_BELOW][C85]Watchthis![PAGE][P2A],$01BDAD,$BDAD,34
+159,"it uuiwhile you're young![PAGE][P2A][P10]or[P12]you[P34]you[PARA]on[TEXTBOX_BELOW]UowthinsoI'a hahearethe advatture owcarwhard![PAGE][P2C][P10]on[TEXTBOX_BELOW]WHveabout taking me along?
+You'reneIarexpant treasure huntan![PAGE][P2A][P31]to [P11]e [P11]the [P21]you
+s wa[TEXTBOX_BELOW]TYoudonfoknvewhat you're sayinglyGrardpa![PAGE][P2A][P10]or[P10]you[P31]you[P10]on[TEXTBOX_BELOW]TYou'rebe basnonnttimeroSee the Wbelhefbeme![PAGE][P2C][PARA]on[TEXTBOX_BELOW]SWe're going to miss you.[PAGE][P2A]oryou[P20]or[P20]on[ASTERISK]you[NORMAL]you[ITEM]you[FAST]you[WAIT]you[NAME]you",$01CB7F,$CB7F,245
+162,[P10][ITEM][UNK_0C][FAST][P37]k[P2A][PARA]to ,$01BD8D,$BD8D,10
+163,[NORMAL][NORMAL][NORMAL][NORMAL][NORMAL][NORMAL][NORMAL][NORMAL][P15][P12][CRYSTAL]<19>[ITEM][C8B][NORMAL][P29]K[ITEM]<8C><19>[P35][P16][F6]<3C>[ITEM],$01AD19,$AD19,26
+166,"oing to miss youlytoo.[PARA]Farewayl![PAGE][P2A]e or[P20]one e the e Gon[PARA]orWon[P10]ored
+[SPACE][E0]esGonZ[E1]or
+[FAST][P20]4[UNK_0C][UNK_0C]
+[SPACE][P13][NORMAL]",$01CC7F,$CC7F,64
+169,tierwe get [P1E][WAIT]frghthe Spring alLife.But gocaofnothe [CRYSTAL][UNK_0B]whole the [P1E][FAST]whichWarps us frghthe [CRYSTAL][NORMAL]to the [CRYSTAL][UNK_0C].[PAGE][P2C]Wes[TEXTBOX_BELOW],$01BF8D,$BF8D,79
+171,F[C81][ITEM][EB][ITEM],$0188CD,$88CD,6
+173,[SLOW],$018E19,$8E19,2
+179,ppat?[TEXTBOX_ABOVE],$01E219,$E219,6
+181,[NORMAL][UNK_0D:A1][UNK_0F][P14],$01A210,$A210,6
+182,[UNK_0F]G[UNK_0E][NORMAL]<39>H[UNK_0F]I[UNK_0E][NORMAL]<39>H[UNK_0F]K[UNK_0E][NORMAL]<39>H[ITEM]Crystalto H[ASTERISK][DELAY]TI[UNK_0B]t H[P11]ea,$01A11F,$A11F,33
+184,[UNK_0D:B4],$01A905,$A905,3
+185,[ASTERISK][P17][NAME][NORMAL]er[C8B][UNK_0C][WAIT][UNK_0E]es[ITEM][P32][ITEM][E5][ITEM],$018D0A,$8D0A,16
+189,[NORMAL][NORMAL][NORMAL][NORMAL][NORMAL][NORMAL][NORMAL][NORMAL][P15][P12][CRYSTAL]<19>[ITEM][C8B][NORMAL][P29]K[ITEM]<8C><19>[P35][P16][F6]<3C>[ITEM],$01AD19,$AD19,26
+200,"[F4]
+",$01EAAE,$EAAE,3
+202,"ede ng[UNK_0C]
+[SPACE][P18][NORMAL]",$01CACF,$CACF,11
+205,[P2A][PARA]to [P10]ing [PARA]you[P10]on[TEXTBOX_BELOW],$01BF19,$BF19,15
+206,![TEXTBOX_ABOVE],$01F5F2,$F5F2,3
+207,blemifwe hahego[P1E][P2B]lybut onlitDadenfriathecaruse them.[P31]Whaneenthe guyenhouse?[P32]Inthis tvenlybut heenshut himsayfin.[P31]We'repaithimgovisit aryllyroCghe on![PAGE][P2A][P11]outhe to [ITEM][E6][NAME][NORMAL]T[C85][P2B]is [CLEAR]B[P2B]z[P2B]s,$01E800,$E800,137
+208,"
+
+[WAIT][ASTERISK][ASTERISK][WAIT]
+
+[WAIT][ASTERISK][WAIT][ASTERISK]",$01FFC9,$FFC9,68
+214,[NAME][NORMAL]er[C8B][UNK_0C][WAIT][UNK_0E]es[ITEM][P32][ITEM][E5][ITEM],$018D0C,$8D0C,14
+216,[P17][NAME][P17]on[P17]al[ITEM][P35][P16][ITEM][P32],$01AEDA,$AEDA,12
+218,I[P18][UNK_0F]u,$0185BD,$85BD,5
+219,[ITEM][FC][C80][P24][C8D][ITEM][FD][C81][P28][C8D][FAST][ED]B,$018D1A,$8D1A,14
+221,[ITEM][WAIT]Ya[ASTERISK][FAST]…B,$0187BD,$87BD,9
+222,[ITEM][FC][C80][P24][C8D][ITEM][FD][C81][P28][C8D][FAST][ED]B,$018D1A,$8D1A,14
+225,"[ASTERISK]
+[FAST][E7]s",$019681,$9681,6
+226,P.[P22][ITEM]B,$01D580,$D580,6
+227,onthe [CRYSTAL][P17]lyarhesaithaylntto Arion!,$01F2BF,$F2BF,23
+229,"
+[P12]ll
+[P29]of[PARA][P17]of[ITEM][P1D]c",$018DE8,$8DE8,13
+231,"
+Whatdntwe go?[PAGE][P2A][P20]is[P20]ng[P20]ouByou",$01DD20,$DD20,23
+232,"[P1E][P14][FE][ITEM]s st
+[P12][TEXTBOX_BELOW]",$01809E,$809E,10
+233,"[P3A][NAME]
+[UNK_0C]ow",$018EC8,$8EC8,6
+235,[SPACE],$01D020,$D020,4
+236,f,$01AD82,$AD82,2
+241,[NORMAL][P15][P12][CRYSTAL]<19>[ITEM][C8B][NORMAL][P29]K[ITEM]<8C><19>[P35][P16][F6]<3C>[ITEM],$01AD20,$AD20,19
+242,"[NAME][CLEAR][FE][P2A][P33]you[P18][P25][P21][P25]ea[SLOW][SPACE][P2A][P25][UNK_0F]
+wa[P20]you[P2B][FE][TEXTBOX_BELOW]",$01CEBA,$CEBA,28
+244,[WAIT][ITEM][UNK_0C][P10][P13]<2F>[P11]ea,$019110,$9110,9
+245,[TEXTBOX_ABOVE][P3A]owcarfodeaerneelnveroI'a got to hayuiDad.[P31]Wayllywhitdonfoeslet me hayuiyou![P32]Heenwhucsobehinhegobouldan.[PARA]Tane'hebe nntproblemifwe hahego[P1E][P2B]lybut onlitDadenfriathecaruse them.[P31]Whaneenthe guyenhouse?[P32]Inthis tvenlybut heenshut himsayfin.[P31]We'repaithimgovisit aryllyroCghe on![PAGE][P2A][P11]outhe to [ITEM][E6][NAME][NORMAL]T[C85][P2B]is [CLEAR]B[P2B]z[P2B]s,$01E7AD,$E7AD,220
+250,[C8A][ITEM]e [P34],$018AE5,$8AE5,5
+251,venan![PAGE][P2C]Wes[TEXTBOX_BELOW][P32]AshiayheusIbitgoKnngnodays gone byroCaptanoMacfounheit.[PAGE][P2C][PARA]es[TEXTBOX_BELOW],$01E260,$E260,61
+254,[C8D][NORMAL][EE][C85][ITEM][P1E]E,$018B76,$8B76,8

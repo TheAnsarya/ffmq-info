@@ -1,0 +1,5156 @@
+{
+  "version": "2.0.0",
+  "game": "Final Fantasy Mystic Quest",
+  "extraction_date": "2025-11-11T15:02:32.352236",
+  "rom_file": "Final Fantasy - Mystic Quest (U) (V1.1).sfc",
+  "total_strings": 825,
+  "tables": {
+    "item_names": {
+      "count": 232,
+      "config": {
+        "address": 323584,
+        "count": 256,
+        "max_length": 12
+      },
+      "strings": [
+        {
+          "id": 0,
+          "text": "[WAIT][WAIT][WAIT]\n\n[SLOW][SLOW][NAME][ITEM]ououst",
+          "address": "$04F000",
+          "length": 12
+        },
+        {
+          "id": 1,
+          "text": "st[CLEAR][CLEAR][CLEAR]\n[SLOW] t ll",
+          "address": "$04F00C",
+          "length": 10
+        },
+        {
+          "id": 2,
+          "text": "[C80]e e elelVl\"<DF><7F><7F>F",
+          "address": "$04F018",
+          "length": 12
+        },
+        {
+          "id": 3,
+          "text": "F",
+          "address": "$04F024",
+          "length": 2
+        },
+        {
+          "id": 5,
+          "text": "I",
+          "address": "$04F03C",
+          "length": 2
+        },
+        {
+          "id": 6,
+          "text": "fo<2F><39><EF><F8>ha<DF><F8><F8>'Wl",
+          "address": "$04F048",
+          "length": 12
+        },
+        {
+          "id": 7,
+          "text": "eisar<2F><EF>a [E7]F<7F><7F>t",
+          "address": "$04F054",
+          "length": 12
+        },
+        {
+          "id": 8,
+          "text": "<F8><F9>▶%[E0][E1]<F9>[C81]in",
+          "address": "$04F060",
+          "length": 12
+        },
+        {
+          "id": 9,
+          "text": "ri[C81][FE][FE]<E2>[P1E][FE][FE]y\"is",
+          "address": "$04F06C",
+          "length": 12
+        },
+        {
+          "id": 10,
+          "text": "&<FB>Vi8[C8F]<87>[C83][C81]<7F>st<7F>",
+          "address": "$04F078",
+          "length": 12
+        },
+        {
+          "id": 11,
+          "text": "[P1E]<EC>a el<7F><7F>[E0][E0]G",
+          "address": "$04F084",
+          "length": 12
+        },
+        {
+          "id": 12,
+          "text": "Ge e 99[F6]ne[E7][E7][C8B][SOUND:FD]",
+          "address": "$04F090",
+          "length": 12
+        },
+        {
+          "id": 13,
+          "text": "[P1D][E0]Bm9[EE][CRYSTAL]<F9>[FE][FE]so",
+          "address": "$04F09C",
+          "length": 12
+        },
+        {
+          "id": 14,
+          "text": "[FD]<DE><DE>roro<EC>Sththfoth<FB>",
+          "address": "$04F0A8",
+          "length": 12
+        },
+        {
+          "id": 15,
+          "text": "thr<3B>[P33][FC][F7][E7][E3][E1]FD[E7]",
+          "address": "$04F0B4",
+          "length": 12
+        },
+        {
+          "id": 16,
+          "text": "[E7]<3B><3A>ld5caas<DE>;Rainbow Road[FE][UNK_0F]",
+          "address": "$04F0C0",
+          "length": 12
+        },
+        {
+          "id": 17,
+          "text": "[FE][FE]<DF>[UNK_0F]<87>[E3]<F3><F9><F9><39>[E6]",
+          "address": "$04F0CC",
+          "length": 12
+        },
+        {
+          "id": 18,
+          "text": "ow▶beUPRainbow Road[PAGE]nouica<7F><F0>",
+          "address": "$04F0D8",
+          "length": 12
+        },
+        {
+          "id": 19,
+          "text": "<FB><F0>[E1]t?F<7F><7F>k",
+          "address": "$04F0E4",
+          "length": 12
+        },
+        {
+          "id": 20,
+          "text": "lititen![P37][P35][FD][FD]ca[FC]<DF>",
+          "address": "$04F0F0",
+          "length": 12
+        },
+        {
+          "id": 21,
+          "text": "[FC]J▶[EE]th<EF>[E6]t<87>[FD]th[F6]",
+          "address": "$04F0FC",
+          "length": 12
+        },
+        {
+          "id": 22,
+          "text": "[F7]<F9><39>[P27][P27]<F2>[P12]<F0><F3>Zd<16>",
+          "address": "$04F108",
+          "length": 12
+        },
+        {
+          "id": 23,
+          "text": "<16>[E0]<EC>[E7]<F9>[FD][FC]go[E7]no",
+          "address": "$04F114",
+          "length": 12
+        },
+        {
+          "id": 24,
+          "text": "[FA]d!<FB>k[FA]<7F>e",
+          "address": "$04F120",
+          "length": 12
+        },
+        {
+          "id": 25,
+          "text": "[P1C]<FB>[NAME]ntme<3A>",
+          "address": "$04F12C",
+          "length": 9
+        },
+        {
+          "id": 26,
+          "text": "is Trois [FD]<DF>fo[P1D]",
+          "address": "$04F138",
+          "length": 12
+        },
+        {
+          "id": 27,
+          "text": "[P38]<DF>[P20]eneabe",
+          "address": "$04F144",
+          "length": 9
+        },
+        {
+          "id": 28,
+          "text": "<EC>kl[E6][E7]rean[YELLOW]x?<EF>!",
+          "address": "$04F150",
+          "length": 12
+        },
+        {
+          "id": 29,
+          "text": "nd[SLOW][P37]qCi<3C><18><F8>[SOUND:0D][SOUND]",
+          "address": "$04F15C",
+          "length": 12
+        },
+        {
+          "id": 30,
+          "text": "[SOUND:1D][SOUND:1F][UNK_0F]th[UNK_0F][CRYSTAL]",
+          "address": "$04F168",
+          "length": 12
+        },
+        {
+          "id": 31,
+          "text": "Crystal<FB><FB><FB>[FD][FD][F6][F6]:bhea",
+          "address": "$04F174",
+          "length": 12
+        },
+        {
+          "id": 32,
+          "text": "<DE>B[E0]lthi[P37][FC][F7]ca<7F>e",
+          "address": "$04F180",
+          "length": 12
+        },
+        {
+          "id": 33,
+          "text": "lmwa<7F><7F>ned<7F>T%me",
+          "address": "$04F18C",
+          "length": 12
+        },
+        {
+          "id": 34,
+          "text": "no [SLOW][FD][FC]Crystal<EC>th[EE]<3B>[FE][CRYSTAL]",
+          "address": "$04F198",
+          "length": 12
+        },
+        {
+          "id": 35,
+          "text": "[CLEAR]<86>[FE][FE][EE]<EC>[FA]<F8><EF>▶",
+          "address": "$04F1A4",
+          "length": 12
+        },
+        {
+          "id": 36,
+          "text": "<DF>[FC][F7]fo<7F>!ui[F7][F6]<7F>",
+          "address": "$04F1B0",
+          "length": 12
+        },
+        {
+          "id": 37,
+          "text": "<7F>Vl:<DF>&ndell[CRYSTAL][F7][P1A]",
+          "address": "$04F1BC",
+          "length": 12
+        },
+        {
+          "id": 38,
+          "text": "[FA]Rainbow Road[FE]Rainbow Road[EE][F7][F7][ED]T<FB><FB><F3>",
+          "address": "$04F1C8",
+          "length": 12
+        },
+        {
+          "id": 39,
+          "text": "<F3>[F5][FD]<FB>[EB]<FB>d[SOUND:FD]",
+          "address": "$04F1D4",
+          "length": 10
+        },
+        {
+          "id": 40,
+          "text": "[P20][P20][P20]elorroisldon[EE]C[EE]",
+          "address": "$04F1E0",
+          "length": 12
+        },
+        {
+          "id": 41,
+          "text": "C",
+          "address": "$04F1EC",
+          "length": 2
+        },
+        {
+          "id": 42,
+          "text": "[CLEAR][CLEAR][WAIT]",
+          "address": "$04F1F8",
+          "length": 6
+        },
+        {
+          "id": 43,
+          "text": "P",
+          "address": "$04F204",
+          "length": 2
+        },
+        {
+          "id": 44,
+          "text": "[C83][FD]soowE[E4][FC][P1A][P1A]<F0><F0>or",
+          "address": "$04F210",
+          "length": 12
+        },
+        {
+          "id": 45,
+          "text": "ve",
+          "address": "$04F21C",
+          "length": 2
+        },
+        {
+          "id": 46,
+          "text": "7ndndIing ro[WAIT][C8C][GREEN]ououP",
+          "address": "$04F228",
+          "length": 12
+        },
+        {
+          "id": 47,
+          "text": "V[UNK_0F]8<F1>[F7][FC],[C83][C83]so",
+          "address": "$04F234",
+          "length": 12
+        },
+        {
+          "id": 48,
+          "text": "foknp<7F><7F>E[P12][FD][C85]e",
+          "address": "$04F240",
+          "length": 12
+        },
+        {
+          "id": 49,
+          "text": "O[C83][FC][C80]tfo<7F><F8><F8><90>",
+          "address": "$04F24C",
+          "length": 12
+        },
+        {
+          "id": 50,
+          "text": "elB[E0][C80][C80]<F0><F0>,,[PARA][P10]el",
+          "address": "$04F258",
+          "length": 12
+        },
+        {
+          "id": 51,
+          "text": "[PARA]<F8>[PARA][E0][C80]<F0>[PARA]<F0><F0>[E6]C[E6]",
+          "address": "$04F264",
+          "length": 12
+        },
+        {
+          "id": 52,
+          "text": "A?Z?Ytg[E7]A[E7]9[E7]",
+          "address": "$04F270",
+          "length": 12
+        },
+        {
+          "id": 53,
+          "text": "9FFlllFFF▶ley",
+          "address": "$04F27C",
+          "length": 12
+        },
+        {
+          "id": 54,
+          "text": "[F4]U.[P26]-[PAGE]w<16><EA>7gh3",
+          "address": "$04F288",
+          "length": 12
+        },
+        {
+          "id": 55,
+          "text": "om[E4][F4]<F2>[FA][FA][FA]<F9>[FD][FA]kca",
+          "address": "$04F294",
+          "length": 12
+        },
+        {
+          "id": 56,
+          "text": "as[P1E][P1A][UNK_0E][WHITE][UNK_0E][GREEN][NAME][NAME][ITEM][ITEM][SOUND]",
+          "address": "$04F2A0",
+          "length": 12
+        },
+        {
+          "id": 57,
+          "text": "[FAST]'<7F>[P1B][YELLOW][UNK_0F][SLOW] [UNK_0E]aih",
+          "address": "$04F2AC",
+          "length": 12
+        },
+        {
+          "id": 58,
+          "text": "h?<84><7F>[NAME]F[C8F][C8C][C88]ernhe",
+          "address": "$04F2B8",
+          "length": 12
+        },
+        {
+          "id": 59,
+          "text": "mpt[FC][FC]<7F><7F>Rainbow Roadth[P21][P20]ll",
+          "address": "$04F2C4",
+          "length": 12
+        },
+        {
+          "id": 60,
+          "text": "ouu[C88]AAfome!oiiso",
+          "address": "$04F2D0",
+          "length": 12
+        },
+        {
+          "id": 61,
+          "text": "the [F7][E7]<87>th<7F><DE>[FE]h",
+          "address": "$04F2DC",
+          "length": 12
+        },
+        {
+          "id": 62,
+          "text": "t[C8F][F7][NAME]th[NORMAL]<7F>[C81]k\n[FE][P11]",
+          "address": "$04F2E8",
+          "length": 12
+        },
+        {
+          "id": 63,
+          "text": "[FE]!\n[CLEAR]q[C80]e",
+          "address": "$04F2F4",
+          "length": 8
+        },
+        {
+          "id": 64,
+          "text": "[C80]<F0><F0>hei<F2>[WHITE]<F1>[SOUND:F9][SLOW]",
+          "address": "$04F300",
+          "length": 12
+        },
+        {
+          "id": 65,
+          "text": "[SLOW]",
+          "address": "$04F30C",
+          "length": 2
+        },
+        {
+          "id": 66,
+          "text": "<89>neing roheroherohe<3B><24><39>",
+          "address": "$04F318",
+          "length": 12
+        },
+        {
+          "id": 67,
+          "text": "[P26]F[C8F]arararar[P27][P27]Bwh[C8B]",
+          "address": "$04F324",
+          "length": 12
+        },
+        {
+          "id": 68,
+          "text": "ldxbxbD&x<E9>v<E8>",
+          "address": "$04F330",
+          "length": 12
+        },
+        {
+          "id": 69,
+          "text": "u[FD][FD][FD][FD][FD]<FB><F9><F8>[WHITE][YELLOW][CRYSTAL]",
+          "address": "$04F33C",
+          "length": 12
+        },
+        {
+          "id": 70,
+          "text": "[CRYSTAL][P1C][CRYSTAL]<2F>th[P27]th[PARA]thththth",
+          "address": "$04F348",
+          "length": 12
+        },
+        {
+          "id": 71,
+          "text": "th[GREEN][CRYSTAL]<18>[P2C][P27][P20][P33]th[FC]<F8>[GREEN]",
+          "address": "$04F354",
+          "length": 12
+        },
+        {
+          "id": 72,
+          "text": "<F8>[F4][FC][F6][FC]s[FE][SLOW]<FB><FB><7F>",
+          "address": "$04F360",
+          "length": 12
+        },
+        {
+          "id": 73,
+          "text": "[UNK_0F]a [E7][C83][CLEAR]<86>[FD]<FB>[C83][E7]",
+          "address": "$04F36C",
+          "length": 12
+        },
+        {
+          "id": 74,
+          "text": "[SLOW][YELLOW][YELLOW]a a [C8B][C8B]<3C>thp[FC]",
+          "address": "$04F378",
+          "length": 12
+        },
+        {
+          "id": 75,
+          "text": "[FE][FA][F6][FC][FC]m",
+          "address": "$04F384",
+          "length": 9
+        },
+        {
+          "id": 76,
+          "text": "[FD][E4]<FB>u[F7]",
+          "address": "$04F390",
+          "length": 6
+        },
+        {
+          "id": 77,
+          "text": "[FD][NORMAL][P10][P20]m",
+          "address": "$04F39C",
+          "length": 6
+        },
+        {
+          "id": 78,
+          "text": "<F1>in<F8><87><F8>pinRainbow Roadmth[E1]",
+          "address": "$04F3A8",
+          "length": 12
+        },
+        {
+          "id": 79,
+          "text": "[CRYSTAL][CRYSTAL]<31>go<F8>[FC][FE]mmB",
+          "address": "$04F3B4",
+          "length": 12
+        },
+        {
+          "id": 80,
+          "text": "G[P20][E0]Wor<90>el<90>elgo<F8>[C88]",
+          "address": "$04F3C0",
+          "length": 12
+        },
+        {
+          "id": 81,
+          "text": "<F8>m[E0][E0]elelel<F8>[C88]<19><16>[P1D]",
+          "address": "$04F3CC",
+          "length": 12
+        },
+        {
+          "id": 82,
+          "text": "[P13][UNK_0F][FAST][UNK_0F][FAST][SLOW][ITEM][CLEAR][CLEAR]",
+          "address": "$04F3D8",
+          "length": 12
+        },
+        {
+          "id": 84,
+          "text": "<24>[PAGE][P26][P37][P25][PAGE][P25]hinoala ll",
+          "address": "$04F3F0",
+          "length": 12
+        },
+        {
+          "id": 85,
+          "text": "fo<F8><3C>Rainbow RoadCrystal<3C>itout [PARA]tha",
+          "address": "$04F3FC",
+          "length": 12
+        },
+        {
+          "id": 86,
+          "text": "<7F>le<7F>[E3]lIrolF<7F><7F>",
+          "address": "$04F408",
+          "length": 12
+        },
+        {
+          "id": 87,
+          "text": "<87>[P37]!as<EF>[F6]kcath[EE]",
+          "address": "$04F414",
+          "length": 12
+        },
+        {
+          "id": 88,
+          "text": "[FE]<19>[FC][F7][F7]<EF><EF>[C82][C82][CLEAR]",
+          "address": "$04F420",
+          "length": 12
+        },
+        {
+          "id": 89,
+          "text": "[CLEAR][FA][E5]<18>[E0][P38]![C83][CLEAR]<F0>[E0]",
+          "address": "$04F42C",
+          "length": 12
+        },
+        {
+          "id": 90,
+          "text": "<F0>is is ddp[PARA]",
+          "address": "$04F438",
+          "length": 12
+        },
+        {
+          "id": 91,
+          "text": "th",
+          "address": "$04F444",
+          "length": 2
+        },
+        {
+          "id": 92,
+          "text": "[FC][UNK_0F]ld<FB>U%<E2>%G<DF>,",
+          "address": "$04F450",
+          "length": 12
+        },
+        {
+          "id": 93,
+          "text": "<EF>[UNK_0F][CLEAR][UNK_0F]se[C8C]m[C80][C80]<F2>[UNK_0F]",
+          "address": "$04F45C",
+          "length": 12
+        },
+        {
+          "id": 94,
+          "text": "<87><7F>a [P38]th<F9>[EE][E5]<DE>!Z<F2>",
+          "address": "$04F468",
+          "length": 12
+        },
+        {
+          "id": 95,
+          "text": "?[FE][FC][FE]<F8><F8>[FC]<F2>en[NAME][F4]s",
+          "address": "$04F474",
+          "length": 12
+        },
+        {
+          "id": 96,
+          "text": "[FA][CLEAR][FD]<F1>[UNK_0F][E1][CRYSTAL][C82]me<16>[F6]ca",
+          "address": "$04F480",
+          "length": 12
+        },
+        {
+          "id": 97,
+          "text": "[FC][GREEN] [CLEAR]\n\n [UNK_0E][P1C][P33]Rainbow Road[P13]",
+          "address": "$04F48C",
+          "length": 12
+        },
+        {
+          "id": 98,
+          "text": "[CRYSTAL][CRYSTAL][CRYSTAL][UNK_0F][UNK_0F][UNK_0F][FAST][SLOW][SLOW]",
+          "address": "$04F498",
+          "length": 10
+        },
+        {
+          "id": 100,
+          "text": "[PARA]nn[CLEAR][CLEAR][SLOW][SLOW][GREEN][UNK_0F][P1B][P1C]ay",
+          "address": "$04F4B0",
+          "length": 12
+        },
+        {
+          "id": 101,
+          "text": "ri[FC]<F0>n[CLEAR][ITEM][NORMAL][P10]B[CRYSTAL][P1C]B",
+          "address": "$04F4BC",
+          "length": 12
+        },
+        {
+          "id": 102,
+          "text": "B[C83][C81][UNK_0E] <FB><FB>[FA]<3A>y<3C>[NAME]",
+          "address": "$04F4C8",
+          "length": 12
+        },
+        {
+          "id": 103,
+          "text": "[FC][CRYSTAL]<7F>[FC][SOUND:07][SLOW][F7][F7]",
+          "address": "$04F4D4",
+          "length": 12
+        },
+        {
+          "id": 104,
+          "text": "arVIso [NAME][SOUND:04]<19>[NORMAL][P1D]",
+          "address": "$04F4E0",
+          "length": 12
+        },
+        {
+          "id": 105,
+          "text": "[GREEN]<F8><DF>th<FB><F0><EF>[E0]",
+          "address": "$04F4EC",
+          "length": 12
+        },
+        {
+          "id": 106,
+          "text": "[FC]th[F7][P27][P1C][CLEAR][P21]<EF>",
+          "address": "$04F4F8",
+          "length": 12
+        },
+        {
+          "id": 107,
+          "text": "[P21]e m[E0]<F8>ouar",
+          "address": "$04F504",
+          "length": 12
+        },
+        {
+          "id": 108,
+          "text": "<F3>p<7F>ou[FC]<84>[FE][WHITE]",
+          "address": "$04F510",
+          "length": 12
+        },
+        {
+          "id": 109,
+          "text": "[SOUND:7E]fofo[FE][FE][FC][FC]go",
+          "address": "$04F51C",
+          "length": 12
+        },
+        {
+          "id": 110,
+          "text": "goW<F0>GGmm",
+          "address": "$04F528",
+          "length": 8
+        },
+        {
+          "id": 114,
+          "text": "pYzH<DF>H<DF>[C83][C8E][F5]",
+          "address": "$04F558",
+          "length": 12
+        },
+        {
+          "id": 115,
+          "text": "[FE][C80][C80]",
+          "address": "$04F564",
+          "length": 4
+        },
+        {
+          "id": 116,
+          "text": "[UNK_0F][FC][FC][E0][E0]WW!<EF>",
+          "address": "$04F570",
+          "length": 12
+        },
+        {
+          "id": 117,
+          "text": "th[SLOW]",
+          "address": "$04F57C",
+          "length": 4
+        },
+        {
+          "id": 118,
+          "text": "Oelelorore e [E1]m[E1]m[E1]",
+          "address": "$04F588",
+          "length": 12
+        },
+        {
+          "id": 119,
+          "text": "[E0]<FB>[F7]<EF><EF><EF>[P21]<EF>",
+          "address": "$04F594",
+          "length": 12
+        },
+        {
+          "id": 120,
+          "text": "the <DF>the <DF>the <DF>the <DF>[C80]l[C80]l",
+          "address": "$04F5A0",
+          "length": 12
+        },
+        {
+          "id": 121,
+          "text": "[C80][ITEM]",
+          "address": "$04F5AC",
+          "length": 12
+        },
+        {
+          "id": 122,
+          "text": "[NAME][NAME][NAME] [C82][C82]l",
+          "address": "$04F5B8",
+          "length": 12
+        },
+        {
+          "id": 123,
+          "text": "[C82]",
+          "address": "$04F5C4",
+          "length": 10
+        },
+        {
+          "id": 124,
+          "text": "[C80][C80][C80][C80][C80]me me me m",
+          "address": "$04F5D0",
+          "length": 12
+        },
+        {
+          "id": 125,
+          "text": "e",
+          "address": "$04F5DC",
+          "length": 2
+        },
+        {
+          "id": 126,
+          "text": "<7F>[PAGE][P37][SOUND:0D][CLEAR][CLEAR]\n\n\n\n[CLEAR]",
+          "address": "$04F5E8",
+          "length": 12
+        },
+        {
+          "id": 127,
+          "text": "[WAIT]<90>ing <3C>[UNK_0E][WAIT]\n\n[CLEAR]<DF>thhe",
+          "address": "$04F5F4",
+          "length": 12
+        },
+        {
+          "id": 128,
+          "text": "i[NORMAL]I[GREEN]<24>[NAME]K<86>[C82]<22><22>en",
+          "address": "$04F600",
+          "length": 12
+        },
+        {
+          "id": 129,
+          "text": "t [UNK_0F][GREEN]8▶befo<DE>k",
+          "address": "$04F60C",
+          "length": 12
+        },
+        {
+          "id": 130,
+          "text": "<7F><7F><7F><7F>[SLOW][SLOW][CLEAR][CLEAR]",
+          "address": "$04F618",
+          "length": 10
+        },
+        {
+          "id": 132,
+          "text": "[C80]<DF>m<EF>[E0]<DF>'[UNK_0F][YELLOW][UNK_0E][UNK_0E][YELLOW]",
+          "address": "$04F630",
+          "length": 12
+        },
+        {
+          "id": 133,
+          "text": "[YELLOW]<DF>[UNK_0F][SOUND:0C]l[C83]l",
+          "address": "$04F63C",
+          "length": 12
+        },
+        {
+          "id": 134,
+          "text": "[C81]l[C81]<DF>[C81]<EF>n[E3][FD][F7][P38]",
+          "address": "$04F648",
+          "length": 12
+        },
+        {
+          "id": 135,
+          "text": "th<7F>Rainbow RoadCu[E0][P20][E0]",
+          "address": "$04F654",
+          "length": 12
+        },
+        {
+          "id": 136,
+          "text": "[P20][E0][P20][E0][P20]<F0>[P10]<F0><90><F0>,<F0>",
+          "address": "$04F660",
+          "length": 12
+        },
+        {
+          "id": 137,
+          "text": "<F0>[E0][E0][E0][E0]<F0><F0>el[PARA]",
+          "address": "$04F66C",
+          "length": 10
+        },
+        {
+          "id": 139,
+          "text": "[CLEAR]",
+          "address": "$04F684",
+          "length": 2
+        },
+        {
+          "id": 140,
+          "text": "[FAST]fofo[C8D]<F3>[NORMAL][F7]ve[E7]it[E6]",
+          "address": "$04F690",
+          "length": 12
+        },
+        {
+          "id": 141,
+          "text": "[SLOW][UNK_0E]<7F><F3>[F7][E7][E7]C<84>[P38]",
+          "address": "$04F69C",
+          "length": 12
+        },
+        {
+          "id": 142,
+          "text": "[NORMAL][PARA][P10]el[P10]B[P20][E3][CLEAR]<7F>",
+          "address": "$04F6A8",
+          "length": 12
+        },
+        {
+          "id": 143,
+          "text": "ca<F8><F0><F0>[E0][E3]",
+          "address": "$04F6B4",
+          "length": 10
+        },
+        {
+          "id": 146,
+          "text": "[SLOW][NORMAL][NORMAL][FAST][NORMAL][GREEN][UNK_0F][FC]",
+          "address": "$04F6D8",
+          "length": 12
+        },
+        {
+          "id": 147,
+          "text": "[SLOW][UNK_0F][UNK_0E][UNK_0F]\nflne",
+          "address": "$04F6E4",
+          "length": 12
+        },
+        {
+          "id": 148,
+          "text": "<7F>th<DF><7F>,el",
+          "address": "$04F6F0",
+          "length": 12
+        },
+        {
+          "id": 149,
+          "text": "e [C80]m<F0><7F>el[E0][E0][E0]",
+          "address": "$04F6FC",
+          "length": 12
+        },
+        {
+          "id": 150,
+          "text": "[E0]GGe e [C80][C80]",
+          "address": "$04F708",
+          "length": 8
+        },
+        {
+          "id": 151,
+          "text": "[E0][P20][P20]Bm[C80]",
+          "address": "$04F714",
+          "length": 7
+        },
+        {
+          "id": 152,
+          "text": "7ndndIing ro[WAIT][C8C][GREEN][CLEAR][CLEAR]wh",
+          "address": "$04F720",
+          "length": 12
+        },
+        {
+          "id": 153,
+          "text": "in[UNK_0F]8<F1>[F7][FC]<F8>[C80][C80]el",
+          "address": "$04F72C",
+          "length": 12
+        },
+        {
+          "id": 154,
+          "text": "elW,u<F8>sosoE[P12][FD][C85]e",
+          "address": "$04F738",
+          "length": 12
+        },
+        {
+          "id": 155,
+          "text": "O[C80]<F0><90>u[FD]fo<7F>",
+          "address": "$04F744",
+          "length": 10
+        },
+        {
+          "id": 157,
+          "text": "[PARA]",
+          "address": "$04F75C",
+          "length": 2
+        },
+        {
+          "id": 158,
+          "text": "nd[P1E][P1E][UNK_0E][WHITE][UNK_0E][GREEN][NAME][NAME][ITEM][ITEM][SOUND]",
+          "address": "$04F768",
+          "length": 12
+        },
+        {
+          "id": 159,
+          "text": "[FAST]\"ri[CRYSTAL][YELLOW][UNK_0F][SLOW] [UNK_0E]w[C8E]d",
+          "address": "$04F774",
+          "length": 12
+        },
+        {
+          "id": 160,
+          "text": "j<EF>g<84>[C8F][C8C][C88]ernhe",
+          "address": "$04F780",
+          "length": 12
+        },
+        {
+          "id": 161,
+          "text": "m<F1>ps[FC]<7F><7F>Rainbow Roadth[WHITE][YELLOW][CRYSTAL]",
+          "address": "$04F78C",
+          "length": 12
+        },
+        {
+          "id": 162,
+          "text": "[CRYSTAL][P1C][CRYSTAL]<2F>th[P27]th[PARA]th[CRYSTAL][CRYSTAL][UNK_0E]",
+          "address": "$04F798",
+          "length": 12
+        },
+        {
+          "id": 163,
+          "text": "[UNK_0F][GREEN][CRYSTAL]<18>[P2C][P27][P20][P13][UNK_0F][P38]<DF><2E>",
+          "address": "$04F7A4",
+          "length": 12
+        },
+        {
+          "id": 164,
+          "text": "<F1><17><F8>[UNK_0F]<F8>[E7][FC]<FB>[P1E][UNK_0E]7[E1]",
+          "address": "$04F7B0",
+          "length": 12
+        },
+        {
+          "id": 165,
+          "text": "[CRYSTAL][CRYSTAL]<31><18>[NORMAL][E4][FA][SOUND:09]<17>",
+          "address": "$04F7BC",
+          "length": 12
+        },
+        {
+          "id": 166,
+          "text": "[CRYSTAL]ll<7F><EF>li[FC]vee[C8F]ca<7F>",
+          "address": "$04F7C8",
+          "length": 12
+        },
+        {
+          "id": 167,
+          "text": "<87>[UNK_0E]<17>B[E0][E3]d<7F>[CRYSTAL][FE]",
+          "address": "$04F7D4",
+          "length": 12
+        },
+        {
+          "id": 168,
+          "text": "[FE]nt<3C>thne[P37]?ar[C82][C82][CLEAR]",
+          "address": "$04F7E0",
+          "length": 12
+        },
+        {
+          "id": 169,
+          "text": "[CLEAR][WAIT][FD]go[E0]<F8>?[C83][CLEAR]Crystal[P1C][FD]",
+          "address": "$04F7EC",
+          "length": 12
+        },
+        {
+          "id": 170,
+          "text": "SeaeaRainbow RoadRainbow Road<7F><7F>",
+          "address": "$04F7F8",
+          "length": 12
+        },
+        {
+          "id": 171,
+          "text": "<FB><FB>[FD][FD][FE][FE]",
+          "address": "$04F804",
+          "length": 10
+        },
+        {
+          "id": 173,
+          "text": "[GREEN]",
+          "address": "$04F81C",
+          "length": 2
+        },
+        {
+          "id": 174,
+          "text": "[CLEAR][CLEAR][WAIT]",
+          "address": "$04F828",
+          "length": 6
+        },
+        {
+          "id": 175,
+          "text": "[C81]",
+          "address": "$04F834",
+          "length": 2
+        },
+        {
+          "id": 177,
+          "text": "<3C>",
+          "address": "$04F84C",
+          "length": 2
+        },
+        {
+          "id": 178,
+          "text": "[P1A][CRYSTAL][P13][CRYSTAL][P12]<17>[P1A]<17>[P1A][P27]<39>[E7]",
+          "address": "$04F858",
+          "length": 12
+        },
+        {
+          "id": 179,
+          "text": "<F9>[CRYSTAL][CRYSTAL][CRYSTAL][CRYSTAL][CRYSTAL][CRYSTAL]thme [E0]",
+          "address": "$04F864",
+          "length": 12
+        },
+        {
+          "id": 180,
+          "text": "[E0],<F0><28><F8><28><F8><28><F8>4ca[C8A]",
+          "address": "$04F870",
+          "length": 12
+        },
+        {
+          "id": 181,
+          "text": "fom[E0]<F0><F8><F8><F8>[FC][FE]<F9>jfo",
+          "address": "$04F87C",
+          "length": 12
+        },
+        {
+          "id": 182,
+          "text": "nd[P1E][P1A][UNK_0E][WHITE][UNK_0E][GREEN][NAME][NAME][ITEM][ITEM][UNK_0E]",
+          "address": "$04F888",
+          "length": 12
+        },
+        {
+          "id": 183,
+          "text": "[YELLOW]\"so[P1B][YELLOW][UNK_0F][SLOW] [GREEN]q[C8C]R",
+          "address": "$04F894",
+          "length": 12
+        },
+        {
+          "id": 184,
+          "text": "h[F7]a[C80][C8F][C8C][C88]<29>[E1][FC]",
+          "address": "$04F8A0",
+          "length": 12
+        },
+        {
+          "id": 185,
+          "text": "<F0><F3>ty<F8><7F><7F>[P1E]x<FB>h",
+          "address": "$04F8AC",
+          "length": 12
+        },
+        {
+          "id": 186,
+          "text": "t<EC>b<34>[CRYSTAL]<28>is 9Ued[EE]it",
+          "address": "$04F8B8",
+          "length": 12
+        },
+        {
+          "id": 187,
+          "text": "[FE]t[CLEAR] q[C80]e",
+          "address": "$04F8C4",
+          "length": 8
+        },
+        {
+          "id": 188,
+          "text": "<F0>[GREEN]<EC>ngQ<F9>[P25][F5][P1B][FD][YELLOW]<F8>",
+          "address": "$04F8D0",
+          "length": 12
+        },
+        {
+          "id": 189,
+          "text": "[UNK_0E]",
+          "address": "$04F8DC",
+          "length": 2
+        },
+        {
+          "id": 191,
+          "text": "m",
+          "address": "$04F8F4",
+          "length": 2
+        },
+        {
+          "id": 192,
+          "text": "fowkwk[FC]C…u<E8>u<E8>",
+          "address": "$04F900",
+          "length": 12
+        },
+        {
+          "id": 193,
+          "text": "u[FE][FE][FE][FE][FC]<F8><F8><F8>[CRYSTAL][CRYSTAL][P1C]",
+          "address": "$04F90C",
+          "length": 12
+        },
+        {
+          "id": 194,
+          "text": "[CRYSTAL]<2F>th[P27]th[PARA]th[CRYSTAL][CRYSTAL][CRYSTAL][CRYSTAL]th",
+          "address": "$04F918",
+          "length": 12
+        },
+        {
+          "id": 195,
+          "text": "th[CRYSTAL]<18>[P2C][P27][P20][P13][P1E][P20][GREEN]<F8>[F4]",
+          "address": "$04F924",
+          "length": 12
+        },
+        {
+          "id": 196,
+          "text": "[FC][F6][FC]s[FE][SLOW][FA]<FB>[FC]m",
+          "address": "$04F930",
+          "length": 12
+        },
+        {
+          "id": 197,
+          "text": "<DF>[UNK_0F]a [E7][C83][CLEAR]<87><7F><7F><F9>[C81]<F9>",
+          "address": "$04F93C",
+          "length": 12
+        },
+        {
+          "id": 198,
+          "text": "<19>[SOUND:0D]nene[E7][E7][EE]??ar▶",
+          "address": "$04F948",
+          "length": 12
+        },
+        {
+          "id": 199,
+          "text": "F[E7]<F3>[FA][FC]go<E8><3A>[FD]<F2>",
+          "address": "$04F954",
+          "length": 12
+        },
+        {
+          "id": 200,
+          "text": "[FD][E4]<FB>u[F7]\nM<DE>enk[P1E]",
+          "address": "$04F960",
+          "length": 12
+        },
+        {
+          "id": 201,
+          "text": "[FE][NORMAL][P10][P20]m",
+          "address": "$04F96C",
+          "length": 6
+        },
+        {
+          "id": 202,
+          "text": "<87><F8>ne<F8>x[FC]r[FE]u[F7]le",
+          "address": "$04F978",
+          "length": 12
+        },
+        {
+          "id": 203,
+          "text": "no",
+          "address": "$04F984",
+          "length": 2
+        },
+        {
+          "id": 204,
+          "text": "<90>[PARA],Oing [C88]gougo<3C>[F4][NAME]",
+          "address": "$04F990",
+          "length": 12
+        },
+        {
+          "id": 205,
+          "text": "[F4]B[PARA][P10]<18>[NORMAL][NORMAL][GREEN][GREEN]<E8>u[P2C]",
+          "address": "$04F99C",
+          "length": 12
+        },
+        {
+          "id": 206,
+          "text": "<24>[PAGE][P26][P37][P25][PAGE][P25]hinoala wa",
+          "address": "$04F9A8",
+          "length": 12
+        },
+        {
+          "id": 207,
+          "text": "<7F><F8><3C>Rainbow RoadCrystal<3C>itt e [P33]thom",
+          "address": "$04F9B4",
+          "length": 12
+        },
+        {
+          "id": 208,
+          "text": "roita [E7]<DF>Egh8<F8>a",
+          "address": "$04F9C0",
+          "length": 12
+        },
+        {
+          "id": 209,
+          "text": "[E3][P20]e e [C80][C80]",
+          "address": "$04F9CC",
+          "length": 7
+        },
+        {
+          "id": 210,
+          "text": "[F5][E0][E0]llis is [C82][C82][UNK_0F]",
+          "address": "$04F9D8",
+          "length": 12
+        },
+        {
+          "id": 211,
+          "text": "[UNK_0F]ndis esis B<DF>[C83][UNK_0F]Wde",
+          "address": "$04F9E4",
+          "length": 12
+        },
+        {
+          "id": 212,
+          "text": "thB!llnenep[PARA]",
+          "address": "$04F9F0",
+          "length": 12
+        },
+        {
+          "id": 213,
+          "text": "th…,WB<F8>?",
+          "address": "$04F9FC",
+          "length": 8
+        },
+        {
+          "id": 214,
+          "text": "[ED]<2F><DF>ld<FB>U%<E2>%G<DF>,",
+          "address": "$04FA08",
+          "length": 12
+        },
+        {
+          "id": 215,
+          "text": "<EF>[UNK_0F][CLEAR][UNK_0F]se[C8C]m[C80][C80]rocath",
+          "address": "$04FA14",
+          "length": 12
+        },
+        {
+          "id": 216,
+          "text": "th77uias[FC]<F3>p<DF>il[C83]",
+          "address": "$04FA20",
+          "length": 12
+        },
+        {
+          "id": 217,
+          "text": "[FC][C80]!<F8><F0>[E0][E0]m",
+          "address": "$04FA2C",
+          "length": 9
+        },
+        {
+          "id": 218,
+          "text": "[FA][YELLOW][F5][C85]noer[F7]Yw;[PAGE]me",
+          "address": "$04FA38",
+          "length": 12
+        },
+        {
+          "id": 219,
+          "text": "[FA][NAME] [CLEAR]\n\n [UNK_0E][P1E][PARA]th[P12]",
+          "address": "$04FA44",
+          "length": 12
+        },
+        {
+          "id": 220,
+          "text": "[P1E][CRYSTAL][CRYSTAL][UNK_0F][UNK_0F][UNK_0F][FAST][SLOW][SLOW]",
+          "address": "$04FA50",
+          "length": 10
+        },
+        {
+          "id": 222,
+          "text": "<31>ts[SLOW][SLOW][GREEN][UNK_0F]<18>[CRYSTAL][P13][P1C]ow",
+          "address": "$04FA68",
+          "length": 12
+        },
+        {
+          "id": 223,
+          "text": "rica<F1>t[SLOW][NORMAL][P10][P10]B<7F>cam",
+          "address": "$04FA74",
+          "length": 12
+        },
+        {
+          "id": 224,
+          "text": "[C80][SLOW][CLEAR][FC]<EC>[P33]<F3>-<3A>y<3C>[GREEN]",
+          "address": "$04FA80",
+          "length": 12
+        },
+        {
+          "id": 225,
+          "text": "[FC]<7F>[P1C][SOUND:07][SLOW]\n[UNK_0F]",
+          "address": "$04FA8C",
+          "length": 12
+        },
+        {
+          "id": 226,
+          "text": "<F8><F8><7F><7F>",
+          "address": "$04FA98",
+          "length": 6
+        },
+        {
+          "id": 227,
+          "text": "[SOUND:00]",
+          "address": "$04FAA4",
+          "length": 2
+        },
+        {
+          "id": 228,
+          "text": "ur[NORMAL]<E8>WWmm",
+          "address": "$04FAB0",
+          "length": 8
+        },
+        {
+          "id": 230,
+          "text": "[E7][SLOW]<F8><F8>WW!<EF>",
+          "address": "$04FAC8",
+          "length": 12
+        },
+        {
+          "id": 231,
+          "text": "th[SLOW]",
+          "address": "$04FAD4",
+          "length": 4
+        },
+        {
+          "id": 232,
+          "text": "S!s[P1E][UNK_0E]th[CRYSTAL]<7F>",
+          "address": "$04FAE0",
+          "length": 12
+        },
+        {
+          "id": 233,
+          "text": "<FB><FB>so[FD][FE][FE]<EF>[P21]<EF>",
+          "address": "$04FAEC",
+          "length": 12
+        },
+        {
+          "id": 234,
+          "text": "the <DF>the <DF>the <DF>the <DF>[C80]l[C81]l",
+          "address": "$04FAF8",
+          "length": 12
+        },
+        {
+          "id": 235,
+          "text": "[C83][FE][GREEN][F7]",
+          "address": "$04FB04",
+          "length": 12
+        },
+        {
+          "id": 236,
+          "text": "[P14]<EF><2F>\"is Xlbh-%al",
+          "address": "$04FB10",
+          "length": 12
+        },
+        {
+          "id": 237,
+          "text": "%<F3>[E0]mm[P20][P20][C80][C80]m",
+          "address": "$04FB1C",
+          "length": 12
+        },
+        {
+          "id": 238,
+          "text": "e mm[C80][C80]e e mmmmG",
+          "address": "$04FB28",
+          "length": 12
+        },
+        {
+          "id": 239,
+          "text": "G[C80]mm[C80]me e Bj<86>C",
+          "address": "$04FB34",
+          "length": 12
+        },
+        {
+          "id": 240,
+          "text": "[C8F]▶<DF>[F6][F7]\"\"[FAST][FAST][WHITE][WHITE][YELLOW]",
+          "address": "$04FB40",
+          "length": 12
+        },
+        {
+          "id": 241,
+          "text": "[YELLOW][FC]<F8><F8>[FC]<DE>[UNK_0F][SOUND:0C][P2A][ED]T",
+          "address": "$04FB4C",
+          "length": 12
+        },
+        {
+          "id": 242,
+          "text": "ndTndom[EE]so[FE]<F8><F2>[FD][P37]",
+          "address": "$04FB58",
+          "length": 12
+        },
+        {
+          "id": 243,
+          "text": "[P38][P10][P10][P10][P10]",
+          "address": "$04FB64",
+          "length": 6
+        },
+        {
+          "id": 244,
+          "text": "[E0]B[E0]B[E0]B[E0]B[E0][P20][E0]G",
+          "address": "$04FB70",
+          "length": 12
+        },
+        {
+          "id": 245,
+          "text": "[E0]B[P20][P20][P20][P20][P20][P20][P20]df<7F>",
+          "address": "$04FB7C",
+          "length": 12
+        },
+        {
+          "id": 246,
+          "text": "neth<DF><7F>,el",
+          "address": "$04FB88",
+          "length": 12
+        },
+        {
+          "id": 247,
+          "text": "e [C80]m<F0><7F>el",
+          "address": "$04FB94",
+          "length": 10
+        }
+      ]
+    },
+    "weapon_names": {
+      "count": 57,
+      "config": {
+        "address": 325632,
+        "count": 64,
+        "max_length": 12
+      },
+      "strings": [
+        {
+          "id": 0,
+          "text": "<FB><FB>[FD][FD][FE][FE]",
+          "address": "$04F800",
+          "length": 12
+        },
+        {
+          "id": 2,
+          "text": "[NAME][UNK_0E][GREEN][UNK_0E][GREEN]",
+          "address": "$04F818",
+          "length": 6
+        },
+        {
+          "id": 3,
+          "text": "[UNK_0F]",
+          "address": "$04F824",
+          "length": 2
+        },
+        {
+          "id": 4,
+          "text": "[C80][C80][C80][C81][C81]",
+          "address": "$04F830",
+          "length": 6
+        },
+        {
+          "id": 5,
+          "text": "[C81]",
+          "address": "$04F83C",
+          "length": 2
+        },
+        {
+          "id": 6,
+          "text": ",[PARA][P10]ca<3C>",
+          "address": "$04F848",
+          "length": 6
+        },
+        {
+          "id": 7,
+          "text": "[FC]<16>[P1C]<16>[P1A][CRYSTAL][P13][CRYSTAL][P12]<17>[P1A]<17>",
+          "address": "$04F854",
+          "length": 12
+        },
+        {
+          "id": 8,
+          "text": "[P1A][P27]<39>[E7]<F9>[CRYSTAL][CRYSTAL][CRYSTAL][CRYSTAL][CRYSTAL][CRYSTAL]th",
+          "address": "$04F860",
+          "length": 12
+        },
+        {
+          "id": 9,
+          "text": "me [E0][E0],<F0><28><F8><28><F8><28>",
+          "address": "$04F86C",
+          "length": 12
+        },
+        {
+          "id": 10,
+          "text": "<F8>4ca[C8A]fom[E0]<F0><F8><F8><F8>[FC]",
+          "address": "$04F878",
+          "length": 12
+        },
+        {
+          "id": 11,
+          "text": "[FE]<F9>jfond[P1E][P1A][UNK_0E][WHITE][UNK_0E][GREEN][NAME]",
+          "address": "$04F884",
+          "length": 12
+        },
+        {
+          "id": 12,
+          "text": "[NAME][ITEM][ITEM][UNK_0E][YELLOW]\"so[P1B][YELLOW][UNK_0F][SLOW]",
+          "address": "$04F890",
+          "length": 12
+        },
+        {
+          "id": 13,
+          "text": "[GREEN]q[C8C]Rh[F7]a[C80][C8F][C8C]",
+          "address": "$04F89C",
+          "length": 12
+        },
+        {
+          "id": 14,
+          "text": "[C88]<29>[E1][FC]<F0><F3>ty<F8><7F><7F>[P1E]",
+          "address": "$04F8A8",
+          "length": 12
+        },
+        {
+          "id": 15,
+          "text": "x<FB>ht<EC>b<34>[CRYSTAL]<28>is 9",
+          "address": "$04F8B4",
+          "length": 12
+        },
+        {
+          "id": 16,
+          "text": "Ued[EE]it[FE]t[CLEAR] q[C80]e",
+          "address": "$04F8C0",
+          "length": 12
+        },
+        {
+          "id": 17,
+          "text": "[NORMAL]",
+          "address": "$04F8CC",
+          "length": 2
+        },
+        {
+          "id": 18,
+          "text": "[P1B][FD][YELLOW]<F8>[UNK_0E]",
+          "address": "$04F8D8",
+          "length": 6
+        },
+        {
+          "id": 21,
+          "text": "mAnd[C8A]fowkwk[FC]C…",
+          "address": "$04F8FC",
+          "length": 12
+        },
+        {
+          "id": 22,
+          "text": "u<E8>u<E8>u[FE][FE][FE][FE][FC]<F8><F8>",
+          "address": "$04F908",
+          "length": 12
+        },
+        {
+          "id": 23,
+          "text": "<F8>[CRYSTAL][CRYSTAL][P1C][CRYSTAL]<2F>th[P27]th[PARA]th[CRYSTAL]",
+          "address": "$04F914",
+          "length": 12
+        },
+        {
+          "id": 24,
+          "text": "[CRYSTAL][CRYSTAL][CRYSTAL]thth[CRYSTAL]<18>[P2C][P27][P20][P13][P1E]",
+          "address": "$04F920",
+          "length": 12
+        },
+        {
+          "id": 25,
+          "text": "[P20][GREEN]<F8>[F4][FC][F6][FC]s[FE][SLOW][FA]",
+          "address": "$04F92C",
+          "length": 12
+        },
+        {
+          "id": 26,
+          "text": "<FB>[FC]m<DF>[UNK_0F]a [E7][C83][CLEAR]<87><7F>",
+          "address": "$04F938",
+          "length": 12
+        },
+        {
+          "id": 27,
+          "text": "<7F><F9>[C81]<F9><19>[SOUND:0D]nene[E7][E7][EE]",
+          "address": "$04F944",
+          "length": 12
+        },
+        {
+          "id": 28,
+          "text": "??ar▶F[E7]<F3>[FA][FC]go",
+          "address": "$04F950",
+          "length": 12
+        },
+        {
+          "id": 29,
+          "text": "<E8><3A>[FD]<F2>[FD][E4]<FB>u[F7]\nM",
+          "address": "$04F95C",
+          "length": 12
+        },
+        {
+          "id": 30,
+          "text": "<DE>enk[P1E][FE][NORMAL][P10][P20]m",
+          "address": "$04F968",
+          "length": 10
+        },
+        {
+          "id": 31,
+          "text": "[SLOW][PARA]?[C80]<87><F8>ne<F8>x[FC]r",
+          "address": "$04F974",
+          "length": 12
+        },
+        {
+          "id": 32,
+          "text": "[FE]u[F7]leno",
+          "address": "$04F980",
+          "length": 6
+        },
+        {
+          "id": 33,
+          "text": "[C80][P20]Gor<90>[PARA],Oing [C88]gou",
+          "address": "$04F98C",
+          "length": 12
+        },
+        {
+          "id": 34,
+          "text": "go<3C>[F4][NAME][F4]B[PARA][P10]<18>[NORMAL][NORMAL][GREEN]",
+          "address": "$04F998",
+          "length": 12
+        },
+        {
+          "id": 35,
+          "text": "[GREEN]<E8>u[P2C]<24>[PAGE][P26][P37][P25][PAGE][P25]hi",
+          "address": "$04F9A4",
+          "length": 12
+        },
+        {
+          "id": 36,
+          "text": "noala wa<7F><F8><3C>Rainbow RoadCrystal<3C>itt",
+          "address": "$04F9B0",
+          "length": 12
+        },
+        {
+          "id": 37,
+          "text": "e [P33]thomroita [E7]<DF>Egh",
+          "address": "$04F9BC",
+          "length": 12
+        },
+        {
+          "id": 38,
+          "text": "8<F8>a [E3][P20]e e [C80][C80]",
+          "address": "$04F9C8",
+          "length": 11
+        },
+        {
+          "id": 39,
+          "text": "[CRYSTAL]'![E1][F5][E0][E0]llis",
+          "address": "$04F9D4",
+          "length": 12
+        },
+        {
+          "id": 40,
+          "text": "is [C82][C82][UNK_0F][UNK_0F]ndis esis B<DF>[C83]",
+          "address": "$04F9E0",
+          "length": 12
+        },
+        {
+          "id": 41,
+          "text": "[UNK_0F]WdethB!llnene",
+          "address": "$04F9EC",
+          "length": 12
+        },
+        {
+          "id": 42,
+          "text": "p[PARA]th…,WB<F8>?",
+          "address": "$04F9F8",
+          "length": 12
+        },
+        {
+          "id": 43,
+          "text": "mui<FB>D[ED]<2F><DF>ld<FB>U%<E2>",
+          "address": "$04FA04",
+          "length": 12
+        },
+        {
+          "id": 44,
+          "text": "%G<DF>,<EF>[UNK_0F][CLEAR][UNK_0F]se[C8C]m[C80]",
+          "address": "$04FA10",
+          "length": 12
+        },
+        {
+          "id": 45,
+          "text": "[C80]rocathth77uias[FC]<F3>p",
+          "address": "$04FA1C",
+          "length": 12
+        },
+        {
+          "id": 46,
+          "text": "<DF>il[C83][FC][C80]!<F8><F0>[E0][E0]m",
+          "address": "$04FA28",
+          "length": 12
+        },
+        {
+          "id": 48,
+          "text": "w;[PAGE]me[FA][NAME] [CLEAR]\n\n [UNK_0E]",
+          "address": "$04FA40",
+          "length": 12
+        },
+        {
+          "id": 49,
+          "text": "[P1E][PARA]th[P12][P1E][CRYSTAL][CRYSTAL][UNK_0F][UNK_0F][UNK_0F][FAST][SLOW]",
+          "address": "$04FA4C",
+          "length": 12
+        },
+        {
+          "id": 50,
+          "text": "[SLOW]",
+          "address": "$04FA58",
+          "length": 2
+        },
+        {
+          "id": 52,
+          "text": "[CRYSTAL][P13][P1C]owrica<F1>t[SLOW][NORMAL][P10][P10]",
+          "address": "$04FA70",
+          "length": 12
+        },
+        {
+          "id": 53,
+          "text": "B<7F>cam[C80][SLOW][CLEAR][FC]<EC>[P33]<F3>-",
+          "address": "$04FA7C",
+          "length": 12
+        },
+        {
+          "id": 54,
+          "text": "<3A>y<3C>[GREEN][FC]<7F>[P1C][SOUND:07]",
+          "address": "$04FA88",
+          "length": 12
+        },
+        {
+          "id": 55,
+          "text": "[SLOW]\n[UNK_0F]<F8><F8><7F><7F>",
+          "address": "$04FA94",
+          "length": 10
+        },
+        {
+          "id": 56,
+          "text": "[FE][WHITE][SOUND:00]",
+          "address": "$04FAA0",
+          "length": 6
+        },
+        {
+          "id": 57,
+          "text": "[F4][FC]leur[NORMAL]<E8>WWmm",
+          "address": "$04FAAC",
+          "length": 12
+        },
+        {
+          "id": 60,
+          "text": "W!<EF>th[SLOW]",
+          "address": "$04FAD0",
+          "length": 8
+        },
+        {
+          "id": 61,
+          "text": "[UNK_0F]Crystal[P1C][ED]S!s[P1E][UNK_0E]th[CRYSTAL]",
+          "address": "$04FADC",
+          "length": 12
+        },
+        {
+          "id": 62,
+          "text": "<7F><FB><FB>so[FD][FE][FE]",
+          "address": "$04FAE8",
+          "length": 12
+        },
+        {
+          "id": 63,
+          "text": "<EF>[P21]<EF>the <DF>the <DF>the <DF>the <DF>",
+          "address": "$04FAF4",
+          "length": 12
+        }
+      ]
+    },
+    "armor_names": {
+      "count": 20,
+      "config": {
+        "address": 326656,
+        "count": 64,
+        "max_length": 12
+      },
+      "strings": [
+        {
+          "id": 12,
+          "text": "[C80]uiQesQesQesQes",
+          "address": "$04FC90",
+          "length": 12
+        },
+        {
+          "id": 18,
+          "text": "[NAME][FA][ITEM]t CanKx<24>t C",
+          "address": "$04FCD8",
+          "length": 12
+        },
+        {
+          "id": 20,
+          "text": "[C80][P20]m[P20][C80]e [C80]e [C80][P20][C80]m",
+          "address": "$04FCF0",
+          "length": 12
+        },
+        {
+          "id": 22,
+          "text": "[CLEAR]e [CRYSTAL][C80]th[C80]the [CRYSTAL][P10][CLEAR][WAIT]",
+          "address": "$04FD08",
+          "length": 12
+        },
+        {
+          "id": 25,
+          "text": "<7F>",
+          "address": "$04FD2C",
+          "length": 10
+        },
+        {
+          "id": 27,
+          "text": "[FE]",
+          "address": "$04FD44",
+          "length": 10
+        },
+        {
+          "id": 28,
+          "text": "m",
+          "address": "$04FD50",
+          "length": 2
+        },
+        {
+          "id": 31,
+          "text": "[CLEAR]",
+          "address": "$04FD74",
+          "length": 2
+        },
+        {
+          "id": 33,
+          "text": "[SLOW]",
+          "address": "$04FD8C",
+          "length": 2
+        },
+        {
+          "id": 35,
+          "text": "[SLOW]",
+          "address": "$04FDA4",
+          "length": 2
+        },
+        {
+          "id": 36,
+          "text": "[SLOW]<7F>th<7F><7F><7F>thth[SLOW][SLOW]",
+          "address": "$04FDB0",
+          "length": 12
+        },
+        {
+          "id": 38,
+          "text": "?[UNK_0F][UNK_0F]",
+          "address": "$04FDC8",
+          "length": 12
+        },
+        {
+          "id": 39,
+          "text": "[SLOW]",
+          "address": "$04FDD4",
+          "length": 2
+        },
+        {
+          "id": 40,
+          "text": "[P1C]<3C>[P10][PARA]",
+          "address": "$04FDE0",
+          "length": 5
+        },
+        {
+          "id": 42,
+          "text": "[SLOW]<7F>thowow<7F>thth[SLOW][SLOW]",
+          "address": "$04FDF8",
+          "length": 12
+        },
+        {
+          "id": 44,
+          "text": "<F3>owow<F0><F0>",
+          "address": "$04FE10",
+          "length": 12
+        },
+        {
+          "id": 45,
+          "text": "[E0]",
+          "address": "$04FE1C",
+          "length": 2
+        },
+        {
+          "id": 60,
+          "text": "Rainbow Roadnfo<F9>fori[UNK_0E][P32][P1C]le[P38][EE]",
+          "address": "$04FED0",
+          "length": 12
+        },
+        {
+          "id": 61,
+          "text": "el",
+          "address": "$04FEDC",
+          "length": 2
+        },
+        {
+          "id": 62,
+          "text": "fonfocafo",
+          "address": "$04FEE8",
+          "length": 7
+        }
+      ]
+    },
+    "accessory_names": {
+      "count": 24,
+      "config": {
+        "address": 326912,
+        "count": 64,
+        "max_length": 12
+      },
+      "strings": [
+        {
+          "id": 0,
+          "text": "e",
+          "address": "$04FD00",
+          "length": 2
+        },
+        {
+          "id": 1,
+          "text": "th[C80]the [CRYSTAL][P10][CLEAR][WAIT]",
+          "address": "$04FD0C",
+          "length": 9
+        },
+        {
+          "id": 2,
+          "text": "<7F>[CRYSTAL][CLEAR]",
+          "address": "$04FD18",
+          "length": 6
+        },
+        {
+          "id": 7,
+          "text": "[FC]",
+          "address": "$04FD54",
+          "length": 2
+        },
+        {
+          "id": 8,
+          "text": "[FE][FE][FC]<F0>[C80]",
+          "address": "$04FD60",
+          "length": 6
+        },
+        {
+          "id": 12,
+          "text": "[UNK_0F][CRYSTAL][CRYSTAL]thth",
+          "address": "$04FD90",
+          "length": 6
+        },
+        {
+          "id": 14,
+          "text": "[CRYSTAL]thth<7F><7F>[SLOW]",
+          "address": "$04FDA8",
+          "length": 7
+        },
+        {
+          "id": 15,
+          "text": "<7F><7F><7F>thth[SLOW][SLOW]",
+          "address": "$04FDB4",
+          "length": 9
+        },
+        {
+          "id": 17,
+          "text": "[UNK_0F][UNK_0F][SLOW]",
+          "address": "$04FDCC",
+          "length": 10
+        },
+        {
+          "id": 21,
+          "text": "owow<7F>thth[SLOW][SLOW]",
+          "address": "$04FDFC",
+          "length": 9
+        },
+        {
+          "id": 23,
+          "text": "owow<F0><F0>[E0]",
+          "address": "$04FE14",
+          "length": 10
+        },
+        {
+          "id": 30,
+          "text": "BB",
+          "address": "$04FE68",
+          "length": 3
+        },
+        {
+          "id": 32,
+          "text": "owle[GREEN]<18><18><18>",
+          "address": "$04FE80",
+          "length": 7
+        },
+        {
+          "id": 36,
+          "text": "<3C>owst[WAIT][UNK_0E][C82]",
+          "address": "$04FEB0",
+          "length": 7
+        },
+        {
+          "id": 39,
+          "text": "fori[UNK_0E][P32][P1C]le[P38][EE]el",
+          "address": "$04FED4",
+          "length": 10
+        },
+        {
+          "id": 40,
+          "text": "[GREEN]<18>[P10]nfonfonfo",
+          "address": "$04FEE0",
+          "length": 12
+        },
+        {
+          "id": 41,
+          "text": "cafo",
+          "address": "$04FEEC",
+          "length": 3
+        },
+        {
+          "id": 43,
+          "text": "[GREEN]ow<18>nfo[FE]caca",
+          "address": "$04FF04",
+          "length": 9
+        },
+        {
+          "id": 44,
+          "text": "[GREEN]<18>Rainbow Road",
+          "address": "$04FF10",
+          "length": 4
+        },
+        {
+          "id": 46,
+          "text": "[NORMAL]",
+          "address": "$04FF28",
+          "length": 3
+        },
+        {
+          "id": 49,
+          "text": "[NORMAL][UNK_0E][NAME][SLOW][WAIT][UNK_0E][NAME][P1C][NORMAL]",
+          "address": "$04FF4C",
+          "length": 10
+        },
+        {
+          "id": 51,
+          "text": "[NAME][UNK_0E][NAME][P1C][NORMAL][NORMAL]",
+          "address": "$04FF64",
+          "length": 7
+        },
+        {
+          "id": 54,
+          "text": "fofo<3C><18>",
+          "address": "$04FF88",
+          "length": 5
+        },
+        {
+          "id": 56,
+          "text": "[C81][C81]",
+          "address": "$04FFA0",
+          "length": 3
+        }
+      ]
+    },
+    "spell_names": {
+      "count": 32,
+      "config": {
+        "address": 327168,
+        "count": 64,
+        "max_length": 12
+      },
+      "strings": [
+        {
+          "id": 0,
+          "text": "thth[SLOW][SLOW]",
+          "address": "$04FE00",
+          "length": 5
+        },
+        {
+          "id": 2,
+          "text": "<F0><F0>[E0]",
+          "address": "$04FE18",
+          "length": 6
+        },
+        {
+          "id": 5,
+          "text": "t [C8D]",
+          "address": "$04FE3C",
+          "length": 3
+        },
+        {
+          "id": 11,
+          "text": "<18><18>",
+          "address": "$04FE84",
+          "length": 3
+        },
+        {
+          "id": 15,
+          "text": "[UNK_0E][C82]",
+          "address": "$04FEB4",
+          "length": 3
+        },
+        {
+          "id": 18,
+          "text": "[P1C]le[P38][EE]el",
+          "address": "$04FED8",
+          "length": 6
+        },
+        {
+          "id": 19,
+          "text": "[P10]nfonfonfocafo",
+          "address": "$04FEE4",
+          "length": 11
+        },
+        {
+          "id": 22,
+          "text": "fo[FE]caca",
+          "address": "$04FF08",
+          "length": 5
+        },
+        {
+          "id": 26,
+          "text": "e",
+          "address": "$04FF38",
+          "length": 2
+        },
+        {
+          "id": 28,
+          "text": "[WAIT][UNK_0E][NAME][P1C][NORMAL]",
+          "address": "$04FF50",
+          "length": 6
+        },
+        {
+          "id": 30,
+          "text": "[NORMAL][NORMAL]",
+          "address": "$04FF68",
+          "length": 3
+        },
+        {
+          "id": 35,
+          "text": "<18>",
+          "address": "$04FFA4",
+          "length": 12
+        },
+        {
+          "id": 43,
+          "text": "[E0]",
+          "address": "$050004",
+          "length": 2
+        },
+        {
+          "id": 44,
+          "text": "[E7]<DF>so<90>",
+          "address": "$050010",
+          "length": 5
+        },
+        {
+          "id": 45,
+          "text": "<F0>",
+          "address": "$05001C",
+          "length": 3
+        },
+        {
+          "id": 46,
+          "text": "ri[F7]<DE><F0>",
+          "address": "$050028",
+          "length": 6
+        },
+        {
+          "id": 47,
+          "text": "<F0>",
+          "address": "$050034",
+          "length": 4
+        },
+        {
+          "id": 48,
+          "text": "[E0][P20][CLEAR]?",
+          "address": "$050040",
+          "length": 5
+        },
+        {
+          "id": 49,
+          "text": "<EF>k[P38]",
+          "address": "$05004C",
+          "length": 4
+        },
+        {
+          "id": 50,
+          "text": "gh[E0][CRYSTAL]?so<F0><18>[E1]<86>",
+          "address": "$050058",
+          "length": 11
+        },
+        {
+          "id": 51,
+          "text": "no?th<F9><F0>",
+          "address": "$050064",
+          "length": 6
+        },
+        {
+          "id": 52,
+          "text": "<DF><7F>[E0][F7],e",
+          "address": "$050070",
+          "length": 8
+        },
+        {
+          "id": 53,
+          "text": "[E0]&[E7][P10]e",
+          "address": "$05007C",
+          "length": 6
+        },
+        {
+          "id": 54,
+          "text": "<DE>go",
+          "address": "$050088",
+          "length": 4
+        },
+        {
+          "id": 56,
+          "text": "dri[E0]",
+          "address": "$0500A0",
+          "length": 6
+        },
+        {
+          "id": 57,
+          "text": "[FD][E0]",
+          "address": "$0500AC",
+          "length": 4
+        },
+        {
+          "id": 58,
+          "text": "<F0>",
+          "address": "$0500B8",
+          "length": 2
+        },
+        {
+          "id": 59,
+          "text": "[CLEAR][P1E]?<F0><F0>[PARA][E3]th",
+          "address": "$0500C4",
+          "length": 12
+        },
+        {
+          "id": 60,
+          "text": "<F0>\n<EF>[FD][E0]",
+          "address": "$0500D0",
+          "length": 8
+        },
+        {
+          "id": 61,
+          "text": "<39><F0>",
+          "address": "$0500DC",
+          "length": 6
+        },
+        {
+          "id": 62,
+          "text": "k[PARA][C83]s[C8E]<18>",
+          "address": "$0500E8",
+          "length": 8
+        },
+        {
+          "id": 63,
+          "text": "fofoth",
+          "address": "$0500F4",
+          "length": 5
+        }
+      ]
+    },
+    "monster_names": {
+      "count": 232,
+      "config": {
+        "address": 20480,
+        "count": 256,
+        "max_length": 16
+      },
+      "strings": [
+        {
+          "id": 1,
+          "text": "o[P10][F4]",
+          "address": "$005010",
+          "length": 4
+        },
+        {
+          "id": 2,
+          "text": "[P20][P2C],[C80][CLEAR][P20]ng,R[P2B]<28>uiP[NORMAL]<2D>-",
+          "address": "$005020",
+          "length": 16
+        },
+        {
+          "id": 4,
+          "text": "\"<17>Ine,[P20]qB[FA]<86><17>P[CLEAR][C85]<19>he",
+          "address": "$005040",
+          "length": 16
+        },
+        {
+          "id": 5,
+          "text": "ldDP[P10][GREEN]&",
+          "address": "$005050",
+          "length": 7
+        },
+        {
+          "id": 6,
+          "text": "<17>Ime,[P20]qB[FA]<86><17>P[CLEAR][C85]<19>[P20]ld",
+          "address": "$005060",
+          "length": 16
+        },
+        {
+          "id": 7,
+          "text": "DIso,heqBhaU[CLEAR][C85]V[CLEAR]'V[CLEAR]",
+          "address": "$005070",
+          "length": 16
+        },
+        {
+          "id": 8,
+          "text": "[NORMAL][C8B][YELLOW]o[PARA]ing -alP",
+          "address": "$005080",
+          "length": 10
+        },
+        {
+          "id": 9,
+          "text": "-",
+          "address": "$005090",
+          "length": 2
+        },
+        {
+          "id": 10,
+          "text": "<E2>[P20]T<90>[P10][P10][CLEAR][C8D]H[P10]P[C8D]L<19>P",
+          "address": "$0050A0",
+          "length": 16
+        },
+        {
+          "id": 11,
+          "text": "[P10][P1C];",
+          "address": "$0050B0",
+          "length": 4
+        },
+        {
+          "id": 12,
+          "text": "ll[PAGE]fo[P20]<89>'[C8F]ll[PAGE]foo[PARA]Peses[C8D]",
+          "address": "$0050C0",
+          "length": 16
+        },
+        {
+          "id": 13,
+          "text": "[WAIT][UNK_0E][NORMAL][YELLOW]<22>S[E5][WAIT][P2B]<28>IL'[P20]qB",
+          "address": "$0050D0",
+          "length": 16
+        },
+        {
+          "id": 14,
+          "text": "T<90>[P10][FAST]",
+          "address": "$0050E0",
+          "length": 5
+        },
+        {
+          "id": 15,
+          "text": "<F0>[NORMAL]Pm",
+          "address": "$0050F0",
+          "length": 5
+        },
+        {
+          "id": 16,
+          "text": "[P1C]H[P10]T[P14][P10],[CLEAR][EE][P14][P10]T4[P10],[CLEAR]",
+          "address": "$005100",
+          "length": 16
+        },
+        {
+          "id": 17,
+          "text": "[EE]4[P10]<22>et",
+          "address": "$005110",
+          "length": 7
+        },
+        {
+          "id": 18,
+          "text": "[GREEN];",
+          "address": "$005120",
+          "length": 3
+        },
+        {
+          "id": 20,
+          "text": "qBLE<F0>4P[P10]",
+          "address": "$005140",
+          "length": 9
+        },
+        {
+          "id": 21,
+          "text": "<E2>[PARA]C[PARA][P21]Pd[C8D]<31>[P21]Pm[C8D][P32][P21]G",
+          "address": "$005150",
+          "length": 16
+        },
+        {
+          "id": 22,
+          "text": "[UNK_0F]<22>",
+          "address": "$005160",
+          "length": 3
+        },
+        {
+          "id": 23,
+          "text": "[GREEN][P1A][C88][C8D][P32][P21][C8C][P10]\n,[E6]C",
+          "address": "$005170",
+          "length": 13
+        },
+        {
+          "id": 24,
+          "text": "[C8D]",
+          "address": "$005180",
+          "length": 2
+        },
+        {
+          "id": 25,
+          "text": "[WAIT]BP",
+          "address": "$005190",
+          "length": 4
+        },
+        {
+          "id": 26,
+          "text": "<34>",
+          "address": "$0051A0",
+          "length": 2
+        },
+        {
+          "id": 27,
+          "text": "U<17>",
+          "address": "$0051B0",
+          "length": 3
+        },
+        {
+          "id": 28,
+          "text": "<16>I",
+          "address": "$0051C0",
+          "length": 3
+        },
+        {
+          "id": 29,
+          "text": "<86><18><86><18>I",
+          "address": "$0051D0",
+          "length": 6
+        },
+        {
+          "id": 30,
+          "text": "<18><86><18><86><18><86><18>[NORMAL][C8B][YELLOW]<22>",
+          "address": "$0051E0",
+          "length": 12
+        },
+        {
+          "id": 31,
+          "text": "<28><22>",
+          "address": "$0051F0",
+          "length": 3
+        },
+        {
+          "id": 33,
+          "text": "<22><DF>[C8D]",
+          "address": "$005210",
+          "length": 4
+        },
+        {
+          "id": 34,
+          "text": "<22>",
+          "address": "$005220",
+          "length": 2
+        },
+        {
+          "id": 35,
+          "text": "an.G[SLOW]orP[GREEN]",
+          "address": "$005230",
+          "length": 8
+        },
+        {
+          "id": 39,
+          "text": "[UNK_0E][C8D]<22>[P21]P[P1D][C8D][P21][P21]TC[UNK_0E][C8D]<22>[P21]T",
+          "address": "$005270",
+          "length": 16
+        },
+        {
+          "id": 40,
+          "text": "D[UNK_0E][C8D]<22>[P21]Pe [P1C][P11]\nC[UNK_0E][P21]C[UNK_0E][P21]",
+          "address": "$005280",
+          "length": 16
+        },
+        {
+          "id": 41,
+          "text": "B<E2>[PARA]Pe [P1C][P11]\nT[P11]\n[C8D][GREEN]t BL",
+          "address": "$005290",
+          "length": 16
+        },
+        {
+          "id": 42,
+          "text": "E[C8F][UNK_0E]or<7F>B[NORMAL][C8B][YELLOW]anRo[PARA]ing -al",
+          "address": "$0052A0",
+          "length": 16
+        },
+        {
+          "id": 43,
+          "text": "P",
+          "address": "$0052B0",
+          "length": 2
+        },
+        {
+          "id": 44,
+          "text": "[WAIT][C85][ITEM]le Pe [P1C][P20][P10][P20]L-I<F9>\"",
+          "address": "$0052C0",
+          "length": 16
+        },
+        {
+          "id": 45,
+          "text": "[P20]qB<E2>[P20]o[P10]I<F0>\"[P20]qBI[F6]\"",
+          "address": "$0052D0",
+          "length": 16
+        },
+        {
+          "id": 46,
+          "text": "[P20]qBI<F0><86>[C8E]I<F3>\"[P20]qB<22>G",
+          "address": "$0052E0",
+          "length": 16
+        },
+        {
+          "id": 47,
+          "text": "6",
+          "address": "$0052F0",
+          "length": 2
+        },
+        {
+          "id": 48,
+          "text": ",[ITEM][P20]<F1>?[C80][E7]L\n[C8F]it[PAGE]fo<F0>[PAGE]<3A>",
+          "address": "$005300",
+          "length": 16
+        },
+        {
+          "id": 49,
+          "text": "<F0>[SLOW]I",
+          "address": "$005310",
+          "length": 4
+        },
+        {
+          "id": 50,
+          "text": "[P10][P20]7\"I[ED]\"[P20]qBo[PARA]le[C8E]me[FA]",
+          "address": "$005320",
+          "length": 16
+        },
+        {
+          "id": 51,
+          "text": "I[P2B]R<28>ui[FA]<86>[CLEAR][FA]<86>\n<86>[ITEM]L<16><29>",
+          "address": "$005330",
+          "length": 16
+        },
+        {
+          "id": 52,
+          "text": "[C80],<90>[C80]▶[P20][NORMAL]fle[C8E]le[C8F]\"\n\"[CLEAR]",
+          "address": "$005340",
+          "length": 16
+        },
+        {
+          "id": 53,
+          "text": "le[P14]T[P21][P10]<29><F8>,[FAST][P20]<24>\"L<16><29>[C80]",
+          "address": "$005350",
+          "length": 16
+        },
+        {
+          "id": 54,
+          "text": ",\"[E6][P14]T<90>[P10][P1A]<F0>xTH[P10]<29><F8>,",
+          "address": "$005360",
+          "length": 16
+        },
+        {
+          "id": 55,
+          "text": "qTG[P10]<29>[C80],j[P20]<24>\"L<16><29>[C80]<F0>",
+          "address": "$005370",
+          "length": 16
+        },
+        {
+          "id": 56,
+          "text": "aT[P21][P10]<29><F8>,TTor[P10]v[PARA],nT",
+          "address": "$005380",
+          "length": 16
+        },
+        {
+          "id": 57,
+          "text": "ng[P10][P20]<3B>&[C80]fP[PARA][P1C][P20][P10][P1C]G[P10]T",
+          "address": "$005390",
+          "length": 16
+        },
+        {
+          "id": 58,
+          "text": "or[P10]<3A>,[ITEM]P[P20][GREEN][P20][P10]T,[P10]<3A>,[ITEM]",
+          "address": "$0053A0",
+          "length": 16
+        },
+        {
+          "id": 59,
+          "text": "P[PARA][GREEN]G[P10]Tor[P10]v[P11],[WHITE]P[PARA][P1C]G",
+          "address": "$0053B0",
+          "length": 16
+        },
+        {
+          "id": 60,
+          "text": "[P10]P[P20][GREEN]G[P10]T,[P10]v[P11],[ITEM]P[PARA][GREEN]",
+          "address": "$0053C0",
+          "length": 16
+        },
+        {
+          "id": 61,
+          "text": "[P20][P10]Tor[P10]v[PARA], Tng[P10][P20]<3B>&T",
+          "address": "$0053D0",
+          "length": 16
+        },
+        {
+          "id": 62,
+          "text": ",[P10]v[PARA], T.[P10][P20]<3B>&B:G[CLEAR]",
+          "address": "$0053E0",
+          "length": 16
+        },
+        {
+          "id": 63,
+          "text": "meW[CLEAR]XW[CLEAR]▶V[CLEAR]<90>G[CLEAR][NORMAL]o[P20]<E2>",
+          "address": "$0053F0",
+          "length": 16
+        },
+        {
+          "id": 64,
+          "text": "[P10]M[P14]<F0>[SOUND:A9]",
+          "address": "$005400",
+          "length": 7
+        },
+        {
+          "id": 65,
+          "text": "[C80][YELLOW]Pe",
+          "address": "$005410",
+          "length": 5
+        },
+        {
+          "id": 66,
+          "text": "[C85][C8E]<28>BI[WAIT][WAIT]<86>[CLEAR]I",
+          "address": "$005420",
+          "length": 11
+        },
+        {
+          "id": 67,
+          "text": "I[ITEM]",
+          "address": "$005430",
+          "length": 3
+        },
+        {
+          "id": 68,
+          "text": "[NAME][GREEN]-",
+          "address": "$005440",
+          "length": 4
+        },
+        {
+          "id": 69,
+          "text": "[P20]qB[P20][FC]\"Iri.\"[P20]qB<22>G6",
+          "address": "$005450",
+          "length": 16
+        },
+        {
+          "id": 70,
+          "text": "M[SLOW]<86>[P15]<F0>[F6]L<16><89>[C80],le<89>[UNK_0F],[E6]",
+          "address": "$005460",
+          "length": 16
+        },
+        {
+          "id": 71,
+          "text": "L[P15]<89>[C80],[ITEM][P20]<F1>?[C80][E1][P20][NORMAL]fle[C8E]",
+          "address": "$005470",
+          "length": 16
+        },
+        {
+          "id": 72,
+          "text": "le[C8F][P20]ly.\"L[WAIT][WHITE][ITEM]\n<F0>onv[WAIT]<90>[P33]",
+          "address": "$005480",
+          "length": 16
+        },
+        {
+          "id": 73,
+          "text": "<F0><24>P[NAME][C8D][E0][NAME][P20]<22>:L<16><89>[C80],[P14]",
+          "address": "$005490",
+          "length": 16
+        },
+        {
+          "id": 74,
+          "text": "I",
+          "address": "$0054A0",
+          "length": 2
+        },
+        {
+          "id": 75,
+          "text": "[P38][P2A][C80]en[C80][C8E][P20][C85].\"L<16><89>[C80],[F5]P",
+          "address": "$0054B0",
+          "length": 16
+        },
+        {
+          "id": 76,
+          "text": "[PARA][C80]th[P20]ll;L<16><89>[C80],<E8>P[P20][C80][P32]",
+          "address": "$0054C0",
+          "length": 16
+        },
+        {
+          "id": 77,
+          "text": "[P20][P1C]fle[C8E]le[C8F][P20][P38].\"P[NAME][P1C]-",
+          "address": "$0054D0",
+          "length": 15
+        },
+        {
+          "id": 78,
+          "text": "I",
+          "address": "$0054E0",
+          "length": 2
+        },
+        {
+          "id": 79,
+          "text": "/",
+          "address": "$0054F0",
+          "length": 2
+        },
+        {
+          "id": 80,
+          "text": "P",
+          "address": "$005500",
+          "length": 2
+        },
+        {
+          "id": 81,
+          "text": "[P10][C80]mj<31>[P10]v<F0><18>[C8D]<3A>[NAME]ing -<22>",
+          "address": "$005510",
+          "length": 16
+        },
+        {
+          "id": 82,
+          "text": "[E0][C8A][WAIT][FA]Iv<29><90>[UNK_0E]v[P2C]<F0>[WHITE]j[PARA][P10]",
+          "address": "$005520",
+          "length": 16
+        },
+        {
+          "id": 83,
+          "text": ",[ITEM]P[C81][C8D][E0][NAME]BI",
+          "address": "$005530",
+          "length": 10
+        },
+        {
+          "id": 84,
+          "text": "[ITEM]",
+          "address": "$005540",
+          "length": 2
+        },
+        {
+          "id": 85,
+          "text": "L[P14]<F0>[CLEAR]I[ITEM]",
+          "address": "$005550",
+          "length": 7
+        },
+        {
+          "id": 86,
+          "text": "[P12]Fal[PAGE]foP",
+          "address": "$005560",
+          "length": 7
+        },
+        {
+          "id": 87,
+          "text": "[PAGE]foB<E2>[P20]B[F4]W[CLEAR][P2A]X[CLEAR]▶V[CLEAR][P10]",
+          "address": "$005570",
+          "length": 16
+        },
+        {
+          "id": 88,
+          "text": "I[CLEAR]<89>I[CLEAR]\"\n\"[CLEAR]I[NAME]\n<86>[CLEAR]I",
+          "address": "$005580",
+          "length": 16
+        },
+        {
+          "id": 90,
+          "text": "[C85][ITEM]<E2>[P20]I<39>;[P20]qBI[PAGE];[P20]qB",
+          "address": "$0055A0",
+          "length": 16
+        },
+        {
+          "id": 91,
+          "text": "[P20][FC]\"I<3C>;[P20]qB<22>G6",
+          "address": "$0055B0",
+          "length": 13
+        },
+        {
+          "id": 92,
+          "text": "[P15]<F0>[F6]L<16><89>[C80],an<89>[CLEAR],[E6]L[P15]<89>",
+          "address": "$0055C0",
+          "length": 16
+        },
+        {
+          "id": 93,
+          "text": "[C80],[ITEM][P20]<F1>?[C80][E1][P20]th;I",
+          "address": "$0055D0",
+          "length": 13
+        },
+        {
+          "id": 94,
+          "text": "L[P14]<F0>[CLEAR]I[C80]",
+          "address": "$0055E0",
+          "length": 7
+        },
+        {
+          "id": 95,
+          "text": "v",
+          "address": "$0055F0",
+          "length": 2
+        },
+        {
+          "id": 96,
+          "text": "[NAME]-[P20]<22>:[FA]L<16><89>[C80],8jng[P10][P20]",
+          "address": "$005600",
+          "length": 16
+        },
+        {
+          "id": 97,
+          "text": "<F8>&[C80][CLEAR][P20][P1C]fI",
+          "address": "$005610",
+          "length": 9
+        },
+        {
+          "id": 98,
+          "text": "I[ITEM]",
+          "address": "$005620",
+          "length": 3
+        },
+        {
+          "id": 99,
+          "text": "[FA]<86>\n<86>[ITEM]B▶V[CLEAR]<16>H[CLEAR]IH[CLEAR]I",
+          "address": "$005630",
+          "length": 16
+        },
+        {
+          "id": 101,
+          "text": "fo<F0>[SOUND:9F]be[PAGE]fo<E2>[P20]P",
+          "address": "$005650",
+          "length": 11
+        },
+        {
+          "id": 102,
+          "text": "<E2>[P20]B\"\n\"[CLEAR]I[NAME][CLEAR]<86>[CLEAR]I",
+          "address": "$005660",
+          "length": 14
+        },
+        {
+          "id": 103,
+          "text": "[P14]<F0>[CLEAR]I[ITEM]",
+          "address": "$005670",
+          "length": 6
+        },
+        {
+          "id": 104,
+          "text": "<E2>[P20]I[P1C]:[P20]qBI<19>:[P20]qB[P20][FC]",
+          "address": "$005680",
+          "length": 16
+        },
+        {
+          "id": 105,
+          "text": "\"I[CRYSTAL]:[P20]qB<22>G6",
+          "address": "$005690",
+          "length": 11
+        },
+        {
+          "id": 106,
+          "text": "[F6]L<16><89>[C80],or<89>[UNK_0F],[E6]L[P15]<89>[C80],",
+          "address": "$0056A0",
+          "length": 16
+        },
+        {
+          "id": 107,
+          "text": "[ITEM][P20]<F1>?[C80][E1][P20]th;I",
+          "address": "$0056B0",
+          "length": 11
+        },
+        {
+          "id": 108,
+          "text": "<F0>[CLEAR]I[C80]",
+          "address": "$0056C0",
+          "length": 5
+        },
+        {
+          "id": 109,
+          "text": "j[P20]<3A>▶[P1A],[F5][P20][NORMAL]fjng[P10][P20]<16>▶",
+          "address": "$0056D0",
+          "length": 16
+        },
+        {
+          "id": 110,
+          "text": "jng[P10][C8D]<3A>[NAME]-<22>[E0][C8A][WAIT][P20]<22>:[FA]L",
+          "address": "$0056E0",
+          "length": 16
+        },
+        {
+          "id": 111,
+          "text": "<16><89>[C80],[C8D][C80][CLEAR][P20][P1C]fI",
+          "address": "$0056F0",
+          "length": 12
+        },
+        {
+          "id": 112,
+          "text": "[P14]<F0>[CLEAR]I[ITEM]",
+          "address": "$005700",
+          "length": 6
+        },
+        {
+          "id": 113,
+          "text": "[FA]<86>[CLEAR][FA]<86>\n<86>[ITEM]B▶V[CLEAR][P10]I[CLEAR]<89>",
+          "address": "$005710",
+          "length": 16
+        },
+        {
+          "id": 114,
+          "text": "I[CLEAR]\"\n\"[CLEAR]Iat-[P20]qBI[CLEAR][NAME]<86>",
+          "address": "$005720",
+          "length": 16
+        },
+        {
+          "id": 115,
+          "text": "[CLEAR][P20][FC]\"o[PARA]P",
+          "address": "$005730",
+          "length": 8
+        },
+        {
+          "id": 116,
+          "text": "<86>[ITEM]<E8>L[P14]<F0>[CLEAR]I[ITEM]",
+          "address": "$005740",
+          "length": 10
+        },
+        {
+          "id": 117,
+          "text": "ea[PAGE]fo<F0>le<22>[P1E]7",
+          "address": "$005750",
+          "length": 9
+        },
+        {
+          "id": 118,
+          "text": "<90>[P26]T[E0][NAME]<89>\n<F0>orf[P10][P10][PARA]anf[P21]",
+          "address": "$005760",
+          "length": 16
+        },
+        {
+          "id": 119,
+          "text": "[P10]<89>m,youo[PARA]lea[PAGE]fo<29>[SLOW]",
+          "address": "$005770",
+          "length": 14
+        },
+        {
+          "id": 120,
+          "text": "[FAST]",
+          "address": "$005780",
+          "length": 2
+        },
+        {
+          "id": 121,
+          "text": "[P10][P10][PARA][P25]o[PARA]lea[PAGE]fo<29>[SLOW]",
+          "address": "$005790",
+          "length": 13
+        },
+        {
+          "id": 122,
+          "text": "Q<E2>[P20][C80]ha<89>\n<F0>[FAST]T[E0][NAME]<89>[WAIT],er",
+          "address": "$0057A0",
+          "length": 16
+        },
+        {
+          "id": 123,
+          "text": "[C80][SLOW]T[E0][NAME]<89>[NORMAL],[P13]T[E0][NAME]<89>[C80],[P11]",
+          "address": "$0057B0",
+          "length": 16
+        },
+        {
+          "id": 124,
+          "text": "T[E0][NAME]<89>[NAME]<F0>[ITEM]I",
+          "address": "$0057C0",
+          "length": 9
+        },
+        {
+          "id": 125,
+          "text": "[P2B]T[E0][NAME]<89>\n<F0>[P21]I",
+          "address": "$0057D0",
+          "length": 10
+        },
+        {
+          "id": 126,
+          "text": "[SLOW]T[P21][P11]<29>m<F0>[UNK_0F]<E8>T<90>[P11][P1A]<F0>[SLOW]T",
+          "address": "$0057E0",
+          "length": 16
+        },
+        {
+          "id": 127,
+          "text": "H[P11]<29>m<F0>\n<E8>[C80][CLEAR]I",
+          "address": "$0057F0",
+          "length": 11
+        },
+        {
+          "id": 128,
+          "text": "u,wa<86>[ITEM][C80]hiP[NAME]<2D>[E0][NAME],YP[NORMAL]",
+          "address": "$005800",
+          "length": 16
+        },
+        {
+          "id": 129,
+          "text": "<2D>[E0][NAME]<F0>TP[CLEAR][C80]<3C>L[WAIT]v[CLEAR]<F0>s v",
+          "address": "$005810",
+          "length": 16
+        },
+        {
+          "id": 130,
+          "text": "<F0>[E4]W<E9>P\n<2D>[E0][NAME]<F0>&P\n[C80][P25]",
+          "address": "$005820",
+          "length": 16
+        },
+        {
+          "id": 131,
+          "text": "L[WAIT]<F0>[PARA]v[WAIT]<90>[P14]<F0>[YELLOW]P[NAME]<2D>[E0][NAME]<F0>",
+          "address": "$005830",
+          "length": 16
+        },
+        {
+          "id": 132,
+          "text": "[NAME]P[WAIT][C80][P10]P\n<2D>[E0][NAME],[C85]P[WAIT]<2D>[E0]",
+          "address": "$005840",
+          "length": 16
+        },
+        {
+          "id": 133,
+          "text": "[NAME]<F0>[P1D]P",
+          "address": "$005850",
+          "length": 5
+        },
+        {
+          "id": 134,
+          "text": "[CLEAR][P20][C8E]/Iit-[P20]qBM[SLOW][E4][P15],",
+          "address": "$005860",
+          "length": 16
+        },
+        {
+          "id": 135,
+          "text": "<22>G6",
+          "address": "$005870",
+          "length": 4
+        },
+        {
+          "id": 136,
+          "text": "<89>[WAIT],…<89>\n,/<89>[NORMAL],K<89>[NAME],<89>",
+          "address": "$005880",
+          "length": 16
+        },
+        {
+          "id": 137,
+          "text": "L[P15]<89>[C80],[P11][P20]<F1>?T7[UNK_0E]<29>\n,,",
+          "address": "$005890",
+          "length": 16
+        },
+        {
+          "id": 138,
+          "text": "[C80]o[P20][P1C]f[C80][CLEAR][P20][NORMAL]fT7[UNK_0E]<3A><89>[WAIT]",
+          "address": "$0058A0",
+          "length": 16
+        },
+        {
+          "id": 139,
+          "text": "<F0>[UNK_0E]<89>\n,[NAME]<22>G6",
+          "address": "$0058B0",
+          "length": 10
+        },
+        {
+          "id": 140,
+          "text": "I",
+          "address": "$0058C0",
+          "length": 2
+        },
+        {
+          "id": 141,
+          "text": "L[WAIT]<F0>[P14]v[WAIT]<90>[WHITE]<F0>[NAME]P[C80][C80][GREEN]L",
+          "address": "$0058D0",
+          "length": 16
+        },
+        {
+          "id": 142,
+          "text": "[C80][NORMAL]L\ngh[WAIT][C80][WAIT]P[C81]9ed[P10]Fea[PAGE]",
+          "address": "$0058E0",
+          "length": 16
+        },
+        {
+          "id": 143,
+          "text": "foI<F9>\"[P20]qB[FA]<86>[CLEAR][FA]<86>\n<86>[ITEM]B",
+          "address": "$0058F0",
+          "length": 16
+        },
+        {
+          "id": 144,
+          "text": "L[WAIT]<F0>ing v[WAIT]<F0>!Wt <E2>[PARA]L\n[WHITE][WHITE]",
+          "address": "$005900",
+          "length": 16
+        },
+        {
+          "id": 145,
+          "text": "Qj<2D>[WHITE]o[P10]<3A><F0>[P11]z<2D>[WHITE]<F0>youz<31>",
+          "address": "$005910",
+          "length": 16
+        },
+        {
+          "id": 146,
+          "text": "[WHITE]<F0>[P2A]z[P35][WHITE],[EE][C80][WHITE]L5<29>[WAIT]<F0>[P1C]",
+          "address": "$005920",
+          "length": 16
+        },
+        {
+          "id": 147,
+          "text": "P<18>[C80]<E2>I[WAIT]",
+          "address": "$005930",
+          "length": 7
+        },
+        {
+          "id": 148,
+          "text": "<29>m<F0>[ITEM]T[P35][WHITE][C80]z[C8A][C85]\nBI",
+          "address": "$005940",
+          "length": 16
+        },
+        {
+          "id": 149,
+          "text": "T<90>[P11][P1A]<F0>[SLOW]TH[P11]<29>m<F0><EC>T<31>[WHITE]",
+          "address": "$005950",
+          "length": 16
+        },
+        {
+          "id": 150,
+          "text": "[C80]nI",
+          "address": "$005960",
+          "length": 4
+        },
+        {
+          "id": 151,
+          "text": "<F0>:T<2D>[WHITE][C80]NT<90>[P10][P1A]<F0>?L\n,",
+          "address": "$005970",
+          "length": 16
+        },
+        {
+          "id": 152,
+          "text": "L5<29>[WAIT]<F0>rL\ner\n[C85]\nBL[WAIT]",
+          "address": "$005980",
+          "length": 16
+        },
+        {
+          "id": 153,
+          "text": "<F0>rev[WAIT]<F0>seWyou<E2>[PARA]L\n[WHITE][WHITE]Qj",
+          "address": "$005990",
+          "length": 16
+        },
+        {
+          "id": 154,
+          "text": "<2D>[WHITE]o[P10][P1A]v<18><F0>[P11]z<2D>[WHITE]<F0>youz<31>",
+          "address": "$0059A0",
+          "length": 16
+        },
+        {
+          "id": 155,
+          "text": "[WHITE]<F0>[P2A]z[P35][WHITE],<EC>[C80][WHITE]L5<29>\n<F0>[P1C]",
+          "address": "$0059B0",
+          "length": 16
+        },
+        {
+          "id": 156,
+          "text": "P",
+          "address": "$0059C0",
+          "length": 2
+        },
+        {
+          "id": 157,
+          "text": "<29>m<F0>[ITEM]T[P35][WHITE][C80]x[C8A][C85]\nBI",
+          "address": "$0059D0",
+          "length": 16
+        },
+        {
+          "id": 158,
+          "text": "T<90>[P11][P1A]<F0>[SLOW]TH[P11]<29>m<F0><EC>T<31>[WHITE]",
+          "address": "$0059E0",
+          "length": 16
+        },
+        {
+          "id": 159,
+          "text": "[C80]nI",
+          "address": "$0059F0",
+          "length": 4
+        },
+        {
+          "id": 160,
+          "text": "<F0>:T<2D>[WHITE][C80]NT<90>[P10][P1A]<F0>?L\n<F0>",
+          "address": "$005A00",
+          "length": 16
+        },
+        {
+          "id": 161,
+          "text": "L5<29>\n<F0>rL\ner\n[C85]\nBv",
+          "address": "$005A10",
+          "length": 16
+        },
+        {
+          "id": 162,
+          "text": "<90>[P33]<F0>[SOUND:C9][CLEAR]<F0><2D>T<90>[P10][P10]<28>le\n[C80]",
+          "address": "$005A20",
+          "length": 16
+        },
+        {
+          "id": 163,
+          "text": "<24>o[PARA]L",
+          "address": "$005A30",
+          "length": 5
+        },
+        {
+          "id": 164,
+          "text": "[SLOW]f[P21][P11]<89>m<F0>[SOUND:A5]\n[P1A]v[CLEAR]<90>[WAIT]P",
+          "address": "$005A40",
+          "length": 16
+        },
+        {
+          "id": 166,
+          "text": "-",
+          "address": "$005A60",
+          "length": 2
+        },
+        {
+          "id": 167,
+          "text": "I",
+          "address": "$005A70",
+          "length": 2
+        },
+        {
+          "id": 169,
+          "text": "jF[UNK_0E][C80][UNK_0E],[SLOW]T[PARA][P10]I2[C80][ITEM]TW",
+          "address": "$005A90",
+          "length": 16
+        },
+        {
+          "id": 170,
+          "text": "[P10]I[P12]<28>ui[NORMAL]<E2>[PARA]ITF[UNK_0E],[CLEAR][C8E]",
+          "address": "$005AA0",
+          "length": 16
+        },
+        {
+          "id": 171,
+          "text": "E[UNK_0E]TH[UNK_0E],[CLEAR][C8E]G[UNK_0E]TJ[UNK_0E],[CLEAR][C8E]",
+          "address": "$005AB0",
+          "length": 16
+        },
+        {
+          "id": 172,
+          "text": "I[UNK_0E]TL[UNK_0E],[CLEAR][C8E]K[UNK_0E]<28>B<E2>[P20]!ow",
+          "address": "$005AC0",
+          "length": 16
+        },
+        {
+          "id": 173,
+          "text": "LEv[P10]<90>[P2A]v[P14]<90>[P1C]v%<90><22><F0>",
+          "address": "$005AD0",
+          "length": 16
+        },
+        {
+          "id": 174,
+          "text": "[YELLOW]TW[P10][P20][ITEM]&[C8D]W[P10][C80][P15]T[PARA][P10][P20]",
+          "address": "$005AE0",
+          "length": 16
+        },
+        {
+          "id": 175,
+          "text": "[ITEM]&[C8D][PARA][P10][C80][WHITE]<22>wh-",
+          "address": "$005AF0",
+          "length": 11
+        },
+        {
+          "id": 176,
+          "text": "[UNK_0E][EE]ow\nBvll<90>[YELLOW]Cow\nP[C80][P1C]wh",
+          "address": "$005B00",
+          "length": 16
+        },
+        {
+          "id": 177,
+          "text": "PllBomow\nvle<90>[GREEN]<E9>llerom",
+          "address": "$005B10",
+          "length": 16
+        },
+        {
+          "id": 178,
+          "text": "ow\n[C8D]ow\nPllBLE<22>wh-",
+          "address": "$005B20",
+          "length": 14
+        },
+        {
+          "id": 180,
+          "text": "<E2>[PARA]v[P10]<90><3C>v[P14]<90>[P26]v[P20]<90>e v<2F>",
+          "address": "$005B40",
+          "length": 16
+        },
+        {
+          "id": 181,
+          "text": "<90>rev%<90>I,[GREEN]T[PARA][P10]vllWne[EE]",
+          "address": "$005B50",
+          "length": 16
+        },
+        {
+          "id": 182,
+          "text": "[PARA][P10][C80]ntTW[P10]vllWui[EE]W[P10][C80]ow",
+          "address": "$005B60",
+          "length": 16
+        },
+        {
+          "id": 183,
+          "text": "O<22>wh-",
+          "address": "$005B70",
+          "length": 5
+        },
+        {
+          "id": 184,
+          "text": "[C80]on[YELLOW][F4]M[UNK_0E][P2B]<22>en7",
+          "address": "$005B80",
+          "length": 11
+        },
+        {
+          "id": 185,
+          "text": "[YELLOW][F4][P38][P10][P2B]<22>en7",
+          "address": "$005B90",
+          "length": 9
+        },
+        {
+          "id": 186,
+          "text": "<3B>[P38]<E9>[P20][YELLOW][F4][P32][P10][P2B]<22>en7",
+          "address": "$005BA0",
+          "length": 13
+        },
+        {
+          "id": 187,
+          "text": "<31>[P10]G",
+          "address": "$005BB0",
+          "length": 4
+        },
+        {
+          "id": 188,
+          "text": "<2E>[YELLOW][F4][P35][P10][P2B]<22>en7",
+          "address": "$005BC0",
+          "length": 10
+        },
+        {
+          "id": 189,
+          "text": "1P[NAME][GREEN]\"",
+          "address": "$005BD0",
+          "length": 6
+        },
+        {
+          "id": 190,
+          "text": "Y[P10]P[NAME][GREEN]Z[P10]P<2D>[C8D]X[P10]Gor[P20][P11]",
+          "address": "$005BE0",
+          "length": 16
+        },
+        {
+          "id": 191,
+          "text": "1I[C80]T[P20]<F8>&ui[NORMAL]o[PARA]-al<E2>[PARA]O",
+          "address": "$005BF0",
+          "length": 16
+        },
+        {
+          "id": 192,
+          "text": "<22>wh-",
+          "address": "$005C00",
+          "length": 4
+        },
+        {
+          "id": 193,
+          "text": "o[PARA]me[FA]<28>B[NORMAL]o[PARA]-al<E2>[PARA][P38]<E9>[P14]",
+          "address": "$005C10",
+          "length": 16
+        },
+        {
+          "id": 194,
+          "text": "rereU[P14]",
+          "address": "$005C20",
+          "length": 5
+        },
+        {
+          "id": 195,
+          "text": "[CLEAR][FE]<18>[P10]o[PARA]me[FA]<28>B[NORMAL]o[PARA]-al<E2>",
+          "address": "$005C30",
+          "length": 16
+        },
+        {
+          "id": 196,
+          "text": "[PARA][P38]<E9>[P14]rereU[P14]",
+          "address": "$005C40",
+          "length": 9
+        },
+        {
+          "id": 197,
+          "text": "[P10]<F0>[ITEM]<DE><18>[P10]Po[PARA]me[FA]<28>B[NORMAL][YELLOW]",
+          "address": "$005C50",
+          "length": 16
+        },
+        {
+          "id": 198,
+          "text": "o[PARA]Pea",
+          "address": "$005C60",
+          "length": 5
+        },
+        {
+          "id": 199,
+          "text": "ndLes<29>",
+          "address": "$005C70",
+          "length": 6
+        },
+        {
+          "id": 201,
+          "text": "D<3C>[P20]j<3A>",
+          "address": "$005C90",
+          "length": 6
+        },
+        {
+          "id": 204,
+          "text": "j[PARA]",
+          "address": "$005CC0",
+          "length": 3
+        },
+        {
+          "id": 205,
+          "text": "<2E>[P20]j[P2C]",
+          "address": "$005CD0",
+          "length": 5
+        },
+        {
+          "id": 207,
+          "text": "er",
+          "address": "$005CF0",
+          "length": 3
+        },
+        {
+          "id": 208,
+          "text": "<22>",
+          "address": "$005D00",
+          "length": 2
+        },
+        {
+          "id": 209,
+          "text": "[P20]j[P1E]",
+          "address": "$005D10",
+          "length": 4
+        },
+        {
+          "id": 210,
+          "text": "D[P1C][P20]j[P1A]",
+          "address": "$005D20",
+          "length": 6
+        },
+        {
+          "id": 213,
+          "text": "j[P10]",
+          "address": "$005D50",
+          "length": 3
+        },
+        {
+          "id": 214,
+          "text": "[UNK_0E][P20]j[GREEN]",
+          "address": "$005D60",
+          "length": 5
+        },
+        {
+          "id": 216,
+          "text": "er",
+          "address": "$005D80",
+          "length": 3
+        },
+        {
+          "id": 217,
+          "text": "[WAIT]",
+          "address": "$005D90",
+          "length": 2
+        },
+        {
+          "id": 218,
+          "text": "[P20][C8A]whatQ[C88]<F0>[CLEAR]asy",
+          "address": "$005DA0",
+          "length": 11
+        },
+        {
+          "id": 219,
+          "text": "[P2B]<28>B8%[C8F]%<86>%so%ur%ui%st",
+          "address": "$005DB0",
+          "length": 16
+        },
+        {
+          "id": 220,
+          "text": "%it%or%in%Rainbow Road%[P35]%[P2C]%[CLEAR]%[P1A]",
+          "address": "$005DC0",
+          "length": 16
+        },
+        {
+          "id": 221,
+          "text": "%[P11]%[NORMAL]%▶[F6]▶[ED]▶[E4]▶&▶.",
+          "address": "$005DD0",
+          "length": 16
+        },
+        {
+          "id": 222,
+          "text": "▶v▶m▶d▶U▶L▶C▶3▶[C8A]",
+          "address": "$005DE0",
+          "length": 16
+        },
+        {
+          "id": 223,
+          "text": "▶[C81]▶[C81]▶[NORMAL][YELLOW]o[PARA][F4]ea",
+          "address": "$005DF0",
+          "length": 12
+        },
+        {
+          "id": 224,
+          "text": "be[C85]velealrst<F0>[CLEAR][P20]ou<DF>[P2B]<28>B[YELLOW]",
+          "address": "$005E00",
+          "length": 16
+        },
+        {
+          "id": 225,
+          "text": "[P20]th[E0][WHITE][WHITE]Q<3B>[P38]<E9><16>",
+          "address": "$005E10",
+          "length": 11
+        },
+        {
+          "id": 226,
+          "text": "[C85][YELLOW]jar[E5]Orere<29>[FE][UNK_0F][C85][SOUND:98]<29>[SLOW]",
+          "address": "$005E20",
+          "length": 16
+        },
+        {
+          "id": 228,
+          "text": "<29>[UNK_0F]",
+          "address": "$005E40",
+          "length": 3
+        },
+        {
+          "id": 229,
+          "text": "[P1E]7",
+          "address": "$005E50",
+          "length": 3
+        },
+        {
+          "id": 230,
+          "text": "gh[NORMAL]",
+          "address": "$005E60",
+          "length": 3
+        },
+        {
+          "id": 231,
+          "text": "[WHITE]Qj[P15]<DF>[C85][SLOW]er[C85][ITEM]<E2>[P20]M[P11]",
+          "address": "$005E70",
+          "length": 16
+        },
+        {
+          "id": 232,
+          "text": "j[SOUND:DF]M[UNK_0F]<F0>[NAME]rew,[FC][C85][FAST][C85][WHITE]o",
+          "address": "$005E80",
+          "length": 16
+        },
+        {
+          "id": 233,
+          "text": "[PARA][F4]<7F>",
+          "address": "$005E90",
+          "length": 4
+        },
+        {
+          "id": 235,
+          "text": "<18>gh<16>",
+          "address": "$005EB0",
+          "length": 4
+        },
+        {
+          "id": 237,
+          "text": "reow\nreow\nreow\nreow\n[C85][CLEAR][P25][SLOW]",
+          "address": "$005ED0",
+          "length": 16
+        },
+        {
+          "id": 238,
+          "text": "<19>",
+          "address": "$005EE0",
+          "length": 2
+        },
+        {
+          "id": 239,
+          "text": "[C80][SOUND:0A][WHITE][WHITE][WHITE][WHITE][WHITE][WHITE]<19>",
+          "address": "$005EF0",
+          "length": 11
+        },
+        {
+          "id": 240,
+          "text": "8wh[YELLOW]O[C8A]ghe",
+          "address": "$005F00",
+          "length": 8
+        },
+        {
+          "id": 241,
+          "text": "[E0]<F0><F8>[FC][FE]<7F><7F>thth[CRYSTAL][CRYSTAL][UNK_0F][UNK_0F][SLOW]",
+          "address": "$005F10",
+          "length": 16
+        },
+        {
+          "id": 242,
+          "text": "[SLOW][CLEAR][CLEAR]\n\n<F2><DE><F3><DE>[F4]<DE>[F5]<DE>[F6]<DE>[F7]",
+          "address": "$005F20",
+          "length": 16
+        },
+        {
+          "id": 243,
+          "text": "<DE><F8><DE><F9><DE>/<DE>;<DE>\"<DE>,<DE>z<DE>w",
+          "address": "$005F30",
+          "length": 16
+        },
+        {
+          "id": 244,
+          "text": "<DE>t<DE>[NORMAL][YELLOW]<E2>[P20][F4]ea",
+          "address": "$005F40",
+          "length": 10
+        },
+        {
+          "id": 245,
+          "text": "Les<22>[P1E]7",
+          "address": "$005F50",
+          "length": 6
+        },
+        {
+          "id": 247,
+          "text": "gh",
+          "address": "$005F70",
+          "length": 2
+        },
+        {
+          "id": 248,
+          "text": "9R<18>T<16>t whbe[C85]eaLatwhbe[C85]B",
+          "address": "$005F80",
+          "length": 16
+        },
+        {
+          "id": 249,
+          "text": "[P2B]<28>B[NORMAL][YELLOW]o[PARA]<3B>[P38]<E9>[P12]",
+          "address": "$005F90",
+          "length": 12
+        },
+        {
+          "id": 250,
+          "text": "[C85][CLEAR]L[P1E][C85][ITEM]L[P20][C85]\nL<18>[C85][SOUND:A5][P1A]",
+          "address": "$005FA0",
+          "length": 16
+        },
+        {
+          "id": 251,
+          "text": "[C85][UNK_0F][P20]k<DF><3B><18>gh[P12]",
+          "address": "$005FB0",
+          "length": 10
+        },
+        {
+          "id": 253,
+          "text": "[P20][FA]<DF>[P38]L[SOUND:E5][SLOW]<F0>[P11]OL[CLEAR]ing <18>wh",
+          "address": "$005FD0",
+          "length": 16
+        },
+        {
+          "id": 254,
+          "text": "[SLOW][C85][CLEAR]<84>[SLOW][P20][FA]<DF>I[C85][CLEAR]L[SOUND:0A][WHITE][WHITE]",
+          "address": "$005FE0",
+          "length": 16
+        },
+        {
+          "id": 255,
+          "text": "wh[CLEAR][C85][CLEAR]s[UNK_0F],wRBM[SLOW]lng9",
+          "address": "$005FF0",
+          "length": 16
+        }
+      ]
+    },
+    "location_names": {
+      "count": 112,
+      "config": {
+        "address": 331776,
+        "count": 128,
+        "max_length": 20
+      },
+      "strings": [
+        {
+          "id": 0,
+          "text": "Rainbow Road[FC][CRYSTAL][CRYSTAL][C8F][C8F]arar<F9>ld<E8><EC>UU[PAGE][P26][P33][CLEAR][P1B][P13]",
+          "address": "$051000",
+          "length": 20
+        },
+        {
+          "id": 1,
+          "text": "[FD]<F2><FB>jthth[CRYSTAL]en[CRYSTAL]CrystalRainbow RoadCrystalRainbow Roada <7F>",
+          "address": "$051014",
+          "length": 20
+        },
+        {
+          "id": 2,
+          "text": "el??",
+          "address": "$051028",
+          "length": 5
+        },
+        {
+          "id": 5,
+          "text": "he[CLEAR]<F9>",
+          "address": "$051064",
+          "length": 4
+        },
+        {
+          "id": 8,
+          "text": "[F7]<7F>fo[UNK_0F][UNK_0F][CLEAR][CLEAR]",
+          "address": "$0510A0",
+          "length": 9
+        },
+        {
+          "id": 9,
+          "text": "[C8A][F7]le<FB><3B>[FC]D[FE]![E7]l<19>[NAME]",
+          "address": "$0510B4",
+          "length": 15
+        },
+        {
+          "id": 11,
+          "text": "<18>[UNK_0E][CLEAR]",
+          "address": "$0510DC",
+          "length": 4
+        },
+        {
+          "id": 14,
+          "text": "[UNK_0F][UNK_0F][CLEAR][CLEAR][UNK_0F][UNK_0F]<F0><E8>fo[P1D][UNK_0F][CLEAR][UNK_0F][C8F]<F0>[E1][FE]",
+          "address": "$051118",
+          "length": 20
+        },
+        {
+          "id": 15,
+          "text": "[P38]s<FB>l[FD]<DF>[FE]<7F>",
+          "address": "$05112C",
+          "length": 13
+        },
+        {
+          "id": 16,
+          "text": "[P2C]<EC>x<3B><E2>[P1E]go<87>thm3<EC>'[EE],<EF>[P1C][SLOW]",
+          "address": "$051140",
+          "length": 20
+        },
+        {
+          "id": 19,
+          "text": "\"[FC]\"<EC>",
+          "address": "$05117C",
+          "length": 5
+        },
+        {
+          "id": 20,
+          "text": "[CLEAR][CLEAR]mmG[E0]orelnoin[P38][UNK_0F][CLEAR]mGorR",
+          "address": "$051190",
+          "length": 20
+        },
+        {
+          "id": 21,
+          "text": "<7F>[FE][CLEAR]<7F>C[CRYSTAL][E1]n[P38][PARA][UNK_0F][UNK_0E]Rfo[C83][E0][FE]th[UNK_0F]",
+          "address": "$0511A4",
+          "length": 20
+        },
+        {
+          "id": 22,
+          "text": "<FB>[FE]V<F9><7F><87>[FE][FE]",
+          "address": "$0511B8",
+          "length": 13
+        },
+        {
+          "id": 24,
+          "text": "<86> [SLOW][UNK_0F][CRYSTAL][FD][FA][E0][E5][FE]wh[FE]wh[FE]om[FE]<F9>[FE]",
+          "address": "$0511E0",
+          "length": 20
+        },
+        {
+          "id": 25,
+          "text": "\":to in[C80]e e e e e <E8>go<E2>[P1A][F6][UNK_0E]<F1>[SOUND:E3][CRYSTAL]",
+          "address": "$0511F4",
+          "length": 20
+        },
+        {
+          "id": 26,
+          "text": "[E7][CRYSTAL]?th[SOUND:FD]<39><F9> [WAIT][CLEAR]\n\n\n[CLEAR][SLOW]ndayldri",
+          "address": "$051208",
+          "length": 20
+        },
+        {
+          "id": 27,
+          "text": "<3A>Crystal[P1D][P1E][UNK_0E][UNK_0F][SLOW][SLOW]ththnenoto ou[P20][P10][NORMAL][NAME]Rainbow Roadou",
+          "address": "$05121C",
+          "length": 20
+        },
+        {
+          "id": 28,
+          "text": "[UNK_0E][UNK_0E]2Eascaen[FE]x<39><31>?y<F3><F1>[UNK_0E]2[E4][UNK_0E]",
+          "address": "$051230",
+          "length": 20
+        },
+        {
+          "id": 29,
+          "text": "[SLOW]",
+          "address": "$051244",
+          "length": 2
+        },
+        {
+          "id": 30,
+          "text": "ing [P25][P13]<19><F8>[NAME][WAIT]\nthth[E0]t<F8>[C8F]<F0>[E3][FC]<F9>fo",
+          "address": "$051258",
+          "length": 20
+        },
+        {
+          "id": 31,
+          "text": "hikT-thm",
+          "address": "$05126C",
+          "length": 7
+        },
+        {
+          "id": 32,
+          "text": "[C8F]<7F>[CRYSTAL][FE]<3A>[FD][P35]&<7F>",
+          "address": "$051280",
+          "length": 11
+        },
+        {
+          "id": 33,
+          "text": "<F8>…<F8>el<7F>ro[ED]<F3>[E6]<F9>2King 8<17>[P20]e [C80]",
+          "address": "$051294",
+          "length": 20
+        },
+        {
+          "id": 34,
+          "text": "<F3><F3>8<F8>ndfouine[F7]<EF>U<DF>j[FE][FA][FD][FC]Farwa",
+          "address": "$0512A8",
+          "length": 20
+        },
+        {
+          "id": 35,
+          "text": "[C83][NAME][NORMAL][P10][E1][E1][UNK_0E][UNK_0E]Rainbow RoadRainbow Roadofay-[E6]s[FE]ow[FE]fo[FE]",
+          "address": "$0512BC",
+          "length": 20
+        },
+        {
+          "id": 36,
+          "text": "[CRYSTAL][FE]<F2>o[C82]t to [P26]<F8>iTno[FD][FD][E7]:<EA>-",
+          "address": "$0512D0",
+          "length": 20
+        },
+        {
+          "id": 37,
+          "text": ".\"[ED]:<EF>G<90>hek[C8F]<86>[C83][C82]ll<7F>6[F7]<F9><F9>",
+          "address": "$0512E4",
+          "length": 20
+        },
+        {
+          "id": 38,
+          "text": "Rainbow RoadRainbow Road[F5]<FB>x[F7][P33]?mB<18>[UNK_0E][F7]n\n\nlyj[P1B]<FB>",
+          "address": "$0512F8",
+          "length": 20
+        },
+        {
+          "id": 39,
+          "text": "<3B><FB>ne[F7][P1A][P1D][F7]<F8>[ED]<DE><F3>![CLEAR][SLOW][SLOW][UNK_0F]<F8><F0>he[CLEAR]",
+          "address": "$05130C",
+          "length": 20
+        },
+        {
+          "id": 40,
+          "text": "z[FA]ld[F6]<39>[FA]&[FC][F5][F6]<3A>[EB][P27]T[F7]<84>y[FC]<F0>",
+          "address": "$051320",
+          "length": 20
+        },
+        {
+          "id": 41,
+          "text": "<F8>[P2C][P26]L[P33]<DF><2E><EF>[P1C]<DF>TlV!be:[E4]b<EF>",
+          "address": "$051334",
+          "length": 20
+        },
+        {
+          "id": 42,
+          "text": "[P21][P33]th[UNK_0F][CRYSTAL]<34>leLYj…<DF>▶<DF>[E6][E7]<18><F8><EF>[CRYSTAL]",
+          "address": "$051348",
+          "length": 20
+        },
+        {
+          "id": 43,
+          "text": "Z<7F>?[F6]m[E0][E0]<F8>[CRYSTAL][UNK_0F][P32]q[F4]<FB><E8>[F7]<F0><EF>'<EF>",
+          "address": "$05135C",
+          "length": 20
+        },
+        {
+          "id": 44,
+          "text": "J<DF>J<DF><86>[FE]y[FC][P20]e e [C80][C80][C80][C81][C83]is <DF><DE><DE>",
+          "address": "$051370",
+          "length": 20
+        },
+        {
+          "id": 45,
+          "text": "<EF><EF>jjbjwhsowhsov<F9><39><3A>thllllpp<87>",
+          "address": "$051384",
+          "length": 20
+        },
+        {
+          "id": 46,
+          "text": "Ml!<7F>beis is is [P2B][P2B][P35][P37][P35][PAGE]esayqinInd",
+          "address": "$051398",
+          "length": 20
+        },
+        {
+          "id": 47,
+          "text": "Crystal[P38][P38]ve[P35]z[E5]Dx<FB>ro<F3>tt<DF><DF>dri/Rainbow Road",
+          "address": "$0513AC",
+          "length": 20
+        },
+        {
+          "id": 48,
+          "text": "[CLEAR][CLEAR]<87>ar<7F>[P20][P10][FC]J<F0>?<F8>[E7][FE]<F1><7F>[FC]",
+          "address": "$0513C0",
+          "length": 20
+        },
+        {
+          "id": 49,
+          "text": "<7F>[F7][P20]el[C88]to [P21]<90>[FC][P33]so[F7]luila !'",
+          "address": "$0513D4",
+          "length": 20
+        },
+        {
+          "id": 50,
+          "text": "<F9>tlnF[E0]n[FE]ur[P2A][P26]e m[C80][C81][C81]k<EF>[FD];",
+          "address": "$0513E8",
+          "length": 20
+        },
+        {
+          "id": 51,
+          "text": "[FD][E6][F6][C8B]F[E3][FD][C83]<F9>[SLOW][C83]<7F><2E>onle[WAIT][CLEAR]\n[C81][C81]",
+          "address": "$0513FC",
+          "length": 20
+        },
+        {
+          "id": 52,
+          "text": "tht[UNK_0F]<F3>[CRYSTAL][E7]<7F>[C8F][CRYSTAL][FD][FC]<EF>[NAME][UNK_0E][P11]st",
+          "address": "$051410",
+          "length": 20
+        },
+        {
+          "id": 53,
+          "text": "<84>[FAST]thu<F1><F1><86><86>D[FD]l[FA]<FB><EA>[EB]wx",
+          "address": "$051424",
+          "length": 20
+        },
+        {
+          "id": 54,
+          "text": "[C8F][FE][C8E]CcaShereme[C8A][FA]2<F2>[P14][F4][P27][E7]<2F><EF>",
+          "address": "$051438",
+          "length": 20
+        },
+        {
+          "id": 55,
+          "text": "en![CRYSTAL]F<86> [UNK_0E][GREEN][CRYSTAL][CRYSTAL]<3A>sec[F7][FA]<FB><3B><3B>omso",
+          "address": "$05144C",
+          "length": 20
+        },
+        {
+          "id": 56,
+          "text": "eafo<7F><7F>llll",
+          "address": "$051460",
+          "length": 7
+        },
+        {
+          "id": 57,
+          "text": "<2F><DF>7<EF>?<F3>Zi[FE]thth[NORMAL][UNK_0F][SLOW][CLEAR]\nm<F0>th",
+          "address": "$051474",
+          "length": 20
+        },
+        {
+          "id": 58,
+          "text": "Rainbow Road[FE]…<F8>ii[EE][EE][F7][F7]pth[P1E][NORMAL]q[F6]",
+          "address": "$051488",
+          "length": 20
+        },
+        {
+          "id": 59,
+          "text": "<FB><7F>",
+          "address": "$05149C",
+          "length": 3
+        },
+        {
+          "id": 60,
+          "text": "pth",
+          "address": "$0514B0",
+          "length": 3
+        },
+        {
+          "id": 61,
+          "text": "p[FC]",
+          "address": "$0514C4",
+          "length": 7
+        },
+        {
+          "id": 62,
+          "text": "<F0><F0>el[UNK_0F][CLEAR]th<F0>[C8C][C8F][P1E][P1E]",
+          "address": "$0514D8",
+          "length": 20
+        },
+        {
+          "id": 63,
+          "text": "[F7][F7]<FB><FB>[CRYSTAL][CRYSTAL]",
+          "address": "$0514EC",
+          "length": 11
+        },
+        {
+          "id": 64,
+          "text": "thth<7F><7F><3C>[FC],<F0>Igo[F4][FC][GREEN][GREEN][FD]<3C>",
+          "address": "$051500",
+          "length": 20
+        },
+        {
+          "id": 65,
+          "text": "[P10][C88][F4][GREEN]lyj[P1B]<FB><3B><FB>se[F7][WAIT]Crystal.[FD]%[E7]s<7F>",
+          "address": "$051514",
+          "length": 20
+        },
+        {
+          "id": 66,
+          "text": "[CLEAR][SLOW][SLOW][FAST]m,e",
+          "address": "$051528",
+          "length": 8
+        },
+        {
+          "id": 67,
+          "text": "[FD][P12][FA][P1D]<84>y[FC]<F0><F8><28>",
+          "address": "$05153C",
+          "length": 11
+        },
+        {
+          "id": 68,
+          "text": "Var[FC]d<DF><24>r[P21][P33]th[UNK_0F][CRYSTAL][P14]",
+          "address": "$051550",
+          "length": 15
+        },
+        {
+          "id": 69,
+          "text": "y<DF>;[E7]",
+          "address": "$051564",
+          "length": 5
+        },
+        {
+          "id": 70,
+          "text": "j<EA>[P37][FA]youh[F7]<EC>[EB]caT<DE>7[FE]nd5[P20][PARA]",
+          "address": "$051578",
+          "length": 19
+        },
+        {
+          "id": 71,
+          "text": "[P20][C80]<84>",
+          "address": "$05158C",
+          "length": 4
+        },
+        {
+          "id": 73,
+          "text": "yZFll",
+          "address": "$0515B4",
+          "length": 5
+        },
+        {
+          "id": 74,
+          "text": "[P2B]:[C8F]ldt[FC][EB]",
+          "address": "$0515C8",
+          "length": 9
+        },
+        {
+          "id": 75,
+          "text": "id[FC][F7][F7][FD][F7]th",
+          "address": "$0515DC",
+          "length": 13
+        },
+        {
+          "id": 76,
+          "text": "[ED]ntYarso[C8F][C83]so[F7]<E8><FB>[E4][FE]j[E4][E7]",
+          "address": "$0515F0",
+          "length": 17
+        },
+        {
+          "id": 77,
+          "text": "m[E0]<3C>B[ED][P33][CLEAR][FE]foz[F5][C8E][P27]▶vfoRainbow Roadl<7F>",
+          "address": "$051604",
+          "length": 20
+        },
+        {
+          "id": 79,
+          "text": "th<F0><F0>",
+          "address": "$05162C",
+          "length": 5
+        },
+        {
+          "id": 80,
+          "text": "[P38][P38]<34><3C>[P1A][P1E]Crystalth",
+          "address": "$051640",
+          "length": 9
+        },
+        {
+          "id": 81,
+          "text": "[WAIT][CLEAR][WAIT][CLEAR][ITEM][SLOW][CLEAR][CLEAR]",
+          "address": "$051654",
+          "length": 13
+        },
+        {
+          "id": 82,
+          "text": "arso[F7]k<F2>is leh<FB>S[FD]ea[EE]is [E7]<7F>er<84>[PARA]B",
+          "address": "$051668",
+          "length": 20
+        },
+        {
+          "id": 83,
+          "text": "Bmm[E0]",
+          "address": "$05167C",
+          "length": 7
+        },
+        {
+          "id": 85,
+          "text": ".\"<E9><DE>[E4]<18>[NAME][WAIT]",
+          "address": "$0516A4",
+          "length": 9
+        },
+        {
+          "id": 86,
+          "text": "[C80][C80]e mGB<90><F0>",
+          "address": "$0516B8",
+          "length": 9
+        },
+        {
+          "id": 87,
+          "text": "<7F>eaZ<DF>i?the wa[P38][PARA][UNK_0F][UNK_0E]<2F>TeaZGeath[UNK_0F]",
+          "address": "$0516CC",
+          "length": 20
+        },
+        {
+          "id": 88,
+          "text": "[EB][F4][EB][F6]wh<FB>st[FD]om[FE]<F8>\":to in[C83]the e e",
+          "address": "$0516E0",
+          "length": 20
+        },
+        {
+          "id": 89,
+          "text": "e e <E8>goorelO[P38]u<18>\"Cfo[F6]th?[SOUND:FD]<39><F9>",
+          "address": "$0516F4",
+          "length": 20
+        },
+        {
+          "id": 90,
+          "text": "<90>u<E8>le \n[CLEAR][SLOW]",
+          "address": "$051708",
+          "length": 9
+        },
+        {
+          "id": 91,
+          "text": "ththldno",
+          "address": "$05171C",
+          "length": 5
+        },
+        {
+          "id": 92,
+          "text": "[CLEAR][CLEAR][SLOW][ITEM][GREEN][YELLOW]<F9>[F7]",
+          "address": "$051730",
+          "length": 9
+        },
+        {
+          "id": 93,
+          "text": "[P1C][CRYSTAL][E1]<EF>-[E7][P37]?a F",
+          "address": "$051744",
+          "length": 13
+        },
+        {
+          "id": 94,
+          "text": "thth[E0]t<F8>[UNK_0F]<F0>[E3][FC]<F9>fohikT-thm",
+          "address": "$051758",
+          "length": 19
+        },
+        {
+          "id": 95,
+          "text": "[C80]B<18>[NAME]a !6[F7]<F9><F9>Rainbow RoadRainbow Road[F5]<FB>x[F7][P33]?",
+          "address": "$05176C",
+          "length": 20
+        },
+        {
+          "id": 96,
+          "text": "[P20]B<18>[UNK_0E][F7]n",
+          "address": "$051780",
+          "length": 9
+        },
+        {
+          "id": 97,
+          "text": "[P12][P12][P11][P11]",
+          "address": "$051794",
+          "length": 5
+        },
+        {
+          "id": 98,
+          "text": "eais FF[C8F][C8F]ouou",
+          "address": "$0517A8",
+          "length": 9
+        },
+        {
+          "id": 99,
+          "text": "…ve[F4]ur[FA]me<F9><F9><F1><F1>oo[C80]Bgoheto <87>[UNK_0F]th",
+          "address": "$0517BC",
+          "length": 20
+        },
+        {
+          "id": 101,
+          "text": "[P38]gogo<F8>",
+          "address": "$0517E4",
+          "length": 5
+        },
+        {
+          "id": 103,
+          "text": "[P33]Rainbow Road[CRYSTAL][CRYSTAL][CRYSTAL][CRYSTAL][CRYSTAL][P33]<2F><2F>[P33][CRYSTAL]e e <7F>th<3B><17>F9",
+          "address": "$05180C",
+          "length": 20
+        },
+        {
+          "id": 104,
+          "text": "!tllBvegoth[P35][F7]<F9>[F5][WAIT][WAIT][FE][FC]",
+          "address": "$051820",
+          "length": 20
+        },
+        {
+          "id": 105,
+          "text": "▶<E8><F9>9ro[E3]s [P1A][P1E][FC]S<EF>FV",
+          "address": "$051834",
+          "length": 20
+        },
+        {
+          "id": 106,
+          "text": "PPPPffomsoldsonefo!<7F>[FA]<FB><F9><F9><F9>z",
+          "address": "$051848",
+          "length": 20
+        },
+        {
+          "id": 107,
+          "text": "[F5][F7]?<FB>BGBGorWel<90>el<90>el<90>[PARA],<28>…",
+          "address": "$05185C",
+          "length": 20
+        },
+        {
+          "id": 108,
+          "text": "GGW<90><90><90>,…",
+          "address": "$051870",
+          "length": 9
+        },
+        {
+          "id": 109,
+          "text": "[P38][PARA]beas",
+          "address": "$051884",
+          "length": 5
+        },
+        {
+          "id": 110,
+          "text": "<F8><F0><F0>Gllou[E7]in[UNK_0F]th<DF>[CRYSTAL]<7F>[FC]<F8>F[CRYSTAL]t[C85]",
+          "address": "$051898",
+          "length": 20
+        },
+        {
+          "id": 111,
+          "text": "<F1>wa[FC]<18><7F>[SLOW][CRYSTAL]",
+          "address": "$0518AC",
+          "length": 8
+        },
+        {
+          "id": 112,
+          "text": "<F9><F8>[E3]H[C8F]<87><3C>[P1C][FD][E5][F7][CLEAR]<E2>[WAIT][YELLOW][FAST]l<7F>",
+          "address": "$0518C0",
+          "length": 20
+        },
+        {
+          "id": 113,
+          "text": "[FE][FE][F7]<F2><F3>[FE]om<EC>!▶<DF>[FC]&I!<F8>[F7]Wl",
+          "address": "$0518D4",
+          "length": 20
+        },
+        {
+          "id": 114,
+          "text": "<F3><DF><DF><EF><EF><7F><7F>[P38]u[P38]u[P38]u<3C>yfo[C8A]no<89>",
+          "address": "$0518E8",
+          "length": 20
+        },
+        {
+          "id": 115,
+          "text": "<F9>[NORMAL]<EC>[P1C]uuuy[C8E][C8F][UNK_0F][P1B]",
+          "address": "$0518FC",
+          "length": 13
+        },
+        {
+          "id": 117,
+          "text": "[SLOW]\n\n\n\n\n\n[CLEAR][CLEAR]\n\n<7F><18> \n\n\n[CLEAR]",
+          "address": "$051924",
+          "length": 20
+        },
+        {
+          "id": 118,
+          "text": "xtB<F3>it[E5]&[E7][CLEAR][P1E]wa8[FA][FE]F[UNK_0F]<F3>het [C80]",
+          "address": "$051938",
+          "length": 20
+        },
+        {
+          "id": 119,
+          "text": "[E1][SLOW]<F1>?[C8F]t<87>[E0][C80]<7F>e lth<EF>e [E0][C80]m[C80]",
+          "address": "$05194C",
+          "length": 20
+        },
+        {
+          "id": 120,
+          "text": "<F0><F8>[E1][E0]th[CLEAR]<3C><F8>m[E0]",
+          "address": "$051960",
+          "length": 20
+        },
+        {
+          "id": 121,
+          "text": "[SLOW][SLOW]<7F><7F>",
+          "address": "$051974",
+          "length": 5
+        },
+        {
+          "id": 122,
+          "text": "[CRYSTAL][CRYSTAL][P13][P11]<EF><EF>[FE][CLEAR]<F3><F0>[CRYSTAL][CLEAR]el![E0]",
+          "address": "$051988",
+          "length": 20
+        },
+        {
+          "id": 123,
+          "text": "[E0]<DF>ml[C81][FE]<87>go[UNK_0F]<F0>[UNK_0F]<F0>ll[FE]<F8><F0><F0>",
+          "address": "$05199C",
+          "length": 20
+        },
+        {
+          "id": 124,
+          "text": "ay6nt2isZ<F1>[P21]<E8>[P20]SB?e F<90>9DiRainbow Road",
+          "address": "$0519B0",
+          "length": 20
+        },
+        {
+          "id": 125,
+          "text": "th<7F><7F>me e e B[P20]B[P20]B[P20][E0][P20][E0][P20]me",
+          "address": "$0519C4",
+          "length": 20
+        },
+        {
+          "id": 126,
+          "text": "mm[E0][E0][E0][E0][E0]m\n\n[CLEAR][WAIT][WAIT][WAIT][WAIT][WAIT][WAIT][WAIT][WAIT][WAIT]",
+          "address": "$0519D8",
+          "length": 20
+        },
+        {
+          "id": 127,
+          "text": "[CLEAR][WAIT]\n\n\n[CLEAR][CLEAR][CLEAR][CLEAR][CLEAR][CLEAR]\n\n\n\n\n\n\nthth",
+          "address": "$0519EC",
+          "length": 20
+        }
+      ]
+    },
+    "dialog": {
+      "count": 116,
+      "config": {
+        "pointer_table": 54838,
+        "count": 256,
+        "bank": 3,
+        "max_length": 512
+      },
+      "strings": [
+        {
+          "id": 1,
+          "text": " [ITEM][PAGE][NORMAL][NORMAL][NORMAL][NORMAL][NORMAL][SLOW]",
+          "address": "$01A27F",
+          "pointer": "$A27F",
+          "length": 10
+        },
+        {
+          "id": 2,
+          "text": "y[CLEAR][CLEAR]",
+          "address": "$01C488",
+          "pointer": "$C488",
+          "length": 4
+        },
+        {
+          "id": 4,
+          "text": "[WAIT]",
+          "address": "$01A960",
+          "pointer": "$A960",
+          "length": 2
+        },
+        {
+          "id": 7,
+          "text": " [ITEM][PAGE][NORMAL][NORMAL][NORMAL][NORMAL][NORMAL][SLOW]",
+          "address": "$01A27F",
+          "pointer": "$A27F",
+          "length": 10
+        },
+        {
+          "id": 9,
+          "text": "[SLOW][NORMAL][C82][C81][WHITE]?[C88][P10][P1D]",
+          "address": "$0188A0",
+          "pointer": "$88A0",
+          "length": 10
+        },
+        {
+          "id": 13,
+          "text": " [ITEM][PAGE][NORMAL][NORMAL][NORMAL][NORMAL][NORMAL][SLOW]",
+          "address": "$01A27F",
+          "pointer": "$A27F",
+          "length": 10
+        },
+        {
+          "id": 15,
+          "text": "[SLOW][NORMAL][C82][C81][WHITE]?[C88][P10][P1D]",
+          "address": "$0188A0",
+          "pointer": "$88A0",
+          "length": 10
+        },
+        {
+          "id": 16,
+          "text": "[CLEAR]",
+          "address": "$01A9C4",
+          "pointer": "$A9C4",
+          "length": 2
+        },
+        {
+          "id": 19,
+          "text": "6[P10][ITEM][P37][P13][CLEAR][ITEM] [NAME][C8D]R[ITEM]<3B>",
+          "address": "$01AB7F",
+          "pointer": "$AB7F",
+          "length": 14
+        },
+        {
+          "id": 22,
+          "text": "s beautifueras evan!",
+          "address": "$01F320",
+          "pointer": "$F320",
+          "length": 16
+        },
+        {
+          "id": 23,
+          "text": "\n[SOUND:B4]",
+          "address": "$01A98D",
+          "pointer": "$A98D",
+          "length": 4
+        },
+        {
+          "id": 26,
+          "text": "s beautifueras evan!",
+          "address": "$01F320",
+          "pointer": "$F320",
+          "length": 16
+        },
+        {
+          "id": 27,
+          "text": "[WAIT][P12][P25]",
+          "address": "$01AD8D",
+          "pointer": "$AD8D",
+          "length": 4
+        },
+        {
+          "id": 30,
+          "text": "saving us arhethe treB!",
+          "address": "$01D920",
+          "pointer": "$D920",
+          "length": 16
+        },
+        {
+          "id": 31,
+          "text": "[P38][P2A][ITEM][P27][NAME][P2A]",
+          "address": "$01CE82",
+          "pointer": "$CE82",
+          "length": 9
+        },
+        {
+          "id": 33,
+          "text": "[P25][YELLOW][P26][P1A][C81]LoosoovofthaneroTatenthe [CRYSTAL]\nlyonce the heart althe Wbeld.[PARA]AnolheProphecitsaysly\"Te vile 4wirewheaerthe Pveanlyarhedivide the Wbelhebehinhe4dobesroAt eltime the Knngwireappear.\"\nTe Prophecithas nvecghe true.[PARA]4caans haa lockIthe dobes althe [CRYSTAL]\narheBcapInethe keysroTey're draining the lngfrghthe 4Crystals althe Earthlyarhethe Wbelheis nochaos.Te people are nodBpanate neIalhayp.[PARA][P35]lyonlitescarsaa the Crystals arhethe Wbeld.[PAGE][P2A][PARA]itGatt to [PARA]on[P10]you[P1A]",
+          "address": "$01F8D0",
+          "pointer": "$F8D0",
+          "length": 302
+        },
+        {
+          "id": 34,
+          "text": "t [P13][WAIT][P12][P25]",
+          "address": "$01AD8B",
+          "pointer": "$AD8B",
+          "length": 6
+        },
+        {
+          "id": 37,
+          "text": "to to ",
+          "address": "$01C21A",
+          "pointer": "$C21A",
+          "length": 3
+        },
+        {
+          "id": 38,
+          "text": "[ITEM]%[UNK_0F]is \n[ITEM]fo[P11]is \n[P14][CLEAR][YELLOW]",
+          "address": "$01A230",
+          "pointer": "$A230",
+          "length": 14
+        },
+        {
+          "id": 40,
+          "text": "[SLOW][NORMAL][C82][C81][WHITE]?[C88][P10][P1D]",
+          "address": "$0188A0",
+          "pointer": "$88A0",
+          "length": 10
+        },
+        {
+          "id": 44,
+          "text": " [ITEM][PAGE][NORMAL][NORMAL][NORMAL][NORMAL][NORMAL][SLOW]",
+          "address": "$01A27F",
+          "pointer": "$A27F",
+          "length": 10
+        },
+        {
+          "id": 46,
+          "text": "[SLOW][NORMAL][C82][C81][WHITE]?[C88][P10][P1D]",
+          "address": "$0188A0",
+          "pointer": "$88A0",
+          "length": 10
+        },
+        {
+          "id": 47,
+          "text": "[CLEAR]",
+          "address": "$01A9C4",
+          "pointer": "$A9C4",
+          "length": 2
+        },
+        {
+          "id": 50,
+          "text": "6[P10][ITEM][P37][P13][CLEAR][ITEM] [NAME][C8D]R[ITEM]<3B>",
+          "address": "$01AB7F",
+          "pointer": "$AB7F",
+          "length": 14
+        },
+        {
+          "id": 56,
+          "text": "e Knng![P1B]",
+          "address": "$01FA7A",
+          "pointer": "$FA7A",
+          "length": 7
+        },
+        {
+          "id": 57,
+          "text": "ake [P1D]\narywhane darganous![PAGE][P2C][P11]you[P1A][P15]LiwhatlyMghis[PAGE][P2B][FD][P2C][P21]you[UNK_0F][C8B][UNK_0E][ITEM]ca\n[NORMAL]&[P2C]\ns [P1A][P15]Hey!Tat [P1E]\nlooks awful![PARA]Hvemuchthe treBmombe suffaning!OKlyeswin.[PAGE][P2A][P11]ou[P21]e the you[ITEM][P27]s to [P20]e [P20]ou[P11]you[P1A][P15]DonfowberylyMgh.[PAGE][P2C][P21]t [ITEM][P13][FD][UNK_0E]&[P2C]the to [P2C][P20]you[ITEM][E6]\n[NORMAL]T[C85][P2B]st[CLEAR]ll[P2B]as",
+          "address": "$01DA60",
+          "pointer": "$DA60",
+          "length": 168
+        },
+        {
+          "id": 58,
+          "text": "[P12][P38][GREEN][GREEN][CLEAR][UNK_0E]",
+          "address": "$01A208",
+          "pointer": "$A208",
+          "length": 7
+        },
+        {
+          "id": 62,
+          "text": "[ITEM][YELLOW]to [ED][FC]owlls lliting fbeyoulylittle beawhs![ITEM]<24>",
+          "address": "$01FC48",
+          "pointer": "$FC48",
+          "length": 31
+        },
+        {
+          "id": 63,
+          "text": "u[F5],[F5][E3][F5]j[F7]m[F7]z[F7]-[F7][E7][F7][E7][F7][NAME][ITEM][E4]n[UNK_0E][CLEAR][WHITE][P2B][UNK_0E][P2C]or",
+          "address": "$01D6CB",
+          "pointer": "$D6CB",
+          "length": 31
+        },
+        {
+          "id": 65,
+          "text": "[P25][YELLOW][P26][P1A][C81]LoosoovofthaneroTatenthe [CRYSTAL]\nlyonce the heart althe Wbeld.[PARA]AnolheProphecitsaysly\"Te vile 4wirewheaerthe Pveanlyarhedivide the Wbelhebehinhe4dobesroAt eltime the Knngwireappear.\"\nTe Prophecithas nvecghe true.[PARA]4caans haa lockIthe dobes althe [CRYSTAL]\narheBcapInethe keysroTey're draining the lngfrghthe 4Crystals althe Earthlyarhethe Wbelheis nochaos.Te people are nodBpanate neIalhayp.[PARA][P35]lyonlitescarsaa the Crystals arhethe Wbeld.[PAGE][P2A][PARA]itGatt to [PARA]on[P10]you[P1A]",
+          "address": "$01F8D0",
+          "pointer": "$F8D0",
+          "length": 302
+        },
+        {
+          "id": 66,
+          "text": "cyis[PAGE][P2A][P27][P27]<17>[P26]isto [P20]you[PARA]s [P20]on",
+          "address": "$01FA28",
+          "pointer": "$FA28",
+          "length": 18
+        },
+        {
+          "id": 67,
+          "text": "ake [P1D]\narywhane darganous![PAGE][P2C][P11]you[P1A][P15]LiwhatlyMghis[PAGE][P2B][FD][P2C][P21]you[UNK_0F][C8B][UNK_0E][ITEM]ca\n[NORMAL]&[P2C]\ns [P1A][P15]Hey!Tat [P1E]\nlooks awful![PARA]Hvemuchthe treBmombe suffaning!OKlyeswin.[PAGE][P2A][P11]ou[P21]e the you[ITEM][P27]s to [P20]e [P20]ou[P11]you[P1A][P15]DonfowberylyMgh.[PAGE][P2C][P21]t [ITEM][P13][FD][UNK_0E]&[P2C]the to [P2C][P20]you[ITEM][E6]\n[NORMAL]T[C85][P2B]st[CLEAR]ll[P2B]as",
+          "address": "$01DA60",
+          "pointer": "$DA60",
+          "length": 168
+        },
+        {
+          "id": 68,
+          "text": "[P12][P38][GREEN][GREEN][CLEAR][UNK_0E]",
+          "address": "$01A208",
+          "pointer": "$A208",
+          "length": 7
+        },
+        {
+          "id": 70,
+          "text": "ayllyowguBs hiheahebasto [CRYSTAL][FAST].[P2B][C80]",
+          "address": "$01EA80",
+          "pointer": "$EA80",
+          "length": 22
+        },
+        {
+          "id": 73,
+          "text": "[GREEN]",
+          "address": "$018000",
+          "pointer": "$8000",
+          "length": 2
+        },
+        {
+          "id": 74,
+          "text": "[P2A][P33]to [P10]al[C83]you[P32]you[PARA]es[WAIT]s isyou\"s [P1A]BldsurprisIesmede it hane nesuchgobahewound!Offto bIneyou.[PAGE]wa[P2A][P33]youoron[CLEAR]t [C83]you[P12]ou<22>you[P20]onZyou[P13]t llououto [P32]you[P10]on[P1A]B[P35]lyesneIto hearMacennewsroYou're not going to like itis[PAGE][P2A][P12]out to [ITEM][E6][SLOW][NORMAL]T[C85][P2B]fo[P2B]gh[CLEAR]ui",
+          "address": "$01D1E3",
+          "pointer": "$D1E3",
+          "length": 157
+        },
+        {
+          "id": 75,
+          "text": "on[P1A][C8E]owsee goswitchnothe whatuelybut carforeachit.[PARA]Letenpushit nesghethingis[PAGE][P2A]mat[P10]ede to ",
+          "address": "$01D0D6",
+          "pointer": "$D0D6",
+          "length": 68
+        },
+        {
+          "id": 76,
+          "text": "bardlyMaclyfbegot his [P1E][NORMAL]![PARA]owhope nothing happatsis[CLEAR]<18>",
+          "address": "$01D982",
+          "pointer": "$D982",
+          "length": 37
+        },
+        {
+          "id": 83,
+          "text": "acfounheit.[PAGE][P2C][PARA]es[P1A]",
+          "address": "$01E28D",
+          "pointer": "$E28D",
+          "length": 16
+        },
+        {
+          "id": 84,
+          "text": "<24>",
+          "address": "$018019",
+          "pointer": "$8019",
+          "length": 2
+        },
+        {
+          "id": 85,
+          "text": "e has mayted!Hvediheit happat?[P1B]",
+          "address": "$01E207",
+          "pointer": "$E207",
+          "length": 24
+        },
+        {
+          "id": 87,
+          "text": "lyCrystal[ITEM]<3A>st\n[P10]B\n[ITEM]aris \n[ITEM]ly[SOUND:05]to st\n[ITEM]R[P11][P10][PARA]C[ITEM]<3B>",
+          "address": "$019C10",
+          "pointer": "$9C10",
+          "length": 29
+        },
+        {
+          "id": 89,
+          "text": "heelname befbee![P1B][P32]Fbeyears Macenbeatwhudying goProphecy.Onhis llitbasfrghdoing sghe rBearchlythe lake driIuuiarhehis shiuiatdIuuiongorocsoledge.[PAGE][P2C][PARA]es[P1A][P32]But thatennntproblemroIfwe digfrghhanelywe'rebe able to reachthe ship.[PARA]AnyllylyhaneengokeyroTe shiayheis hiddatnothe [CRYSTAL]\n.[SOUND:5F]\n[CLEAR]\nst[P1A][P32]Bitthe llyly[CRYSTAL][P11]enbeathaving sghe whrongearthquakBlatayy.",
+          "address": "$01E2AD",
+          "pointer": "$E2AD",
+          "length": 258
+        },
+        {
+          "id": 91,
+          "text": "[UNK_0F]<90>[P10][ITEM][FAST][F7]X[GREEN]<28>",
+          "address": "$01B1EB",
+          "pointer": "$B1EB",
+          "length": 11
+        },
+        {
+          "id": 92,
+          "text": "to [CRYSTAL][FAST].[P2B][C80]",
+          "address": "$01EA8E",
+          "pointer": "$EA8E",
+          "length": 8
+        },
+        {
+          "id": 96,
+          "text": "[ITEM][FC][C80]<24>[C8D][ITEM][FD][C81]<28>[C8D][FAST][ED]B",
+          "address": "$018D1A",
+          "pointer": "$8D1A",
+          "length": 14
+        },
+        {
+          "id": 102,
+          "text": "[SOUND:C2]",
+          "address": "$01880C",
+          "pointer": "$880C",
+          "length": 3
+        },
+        {
+          "id": 106,
+          "text": "[GREEN]",
+          "address": "$018000",
+          "pointer": "$8000",
+          "length": 2
+        },
+        {
+          "id": 107,
+          "text": "om[ITEM]e ow",
+          "address": "$018D7F",
+          "pointer": "$8D7F",
+          "length": 5
+        },
+        {
+          "id": 111,
+          "text": "[ITEM]aris \n[ITEM]ly[SOUND:05]to st\n[ITEM]R[P11][P10][PARA]C[ITEM]<3B>",
+          "address": "$019C19",
+          "pointer": "$9C19",
+          "length": 20
+        },
+        {
+          "id": 113,
+          "text": "\noror[P20]is[P10]ng[PARA]is[P10]or[C80]is[P10]or[PARA]isng\n[PARA]ng\nyou[P1A]",
+          "address": "$01C9AD",
+          "pointer": "$C9AD",
+          "length": 27
+        },
+        {
+          "id": 117,
+          "text": "[P2C][P13][WAIT]",
+          "address": "$01ADEB",
+          "pointer": "$ADEB",
+          "length": 4
+        },
+        {
+          "id": 119,
+          "text": "ut gocaofnothe [CRYSTAL][YELLOW]whole the [P1E][FAST]whichWarps us frghthe [CRYSTAL][NORMAL]to the [CRYSTAL][GREEN].[PAGE][P2C]Wes[P1A]",
+          "address": "$01BFAA",
+          "pointer": "$BFAA",
+          "length": 50
+        },
+        {
+          "id": 120,
+          "text": "foreachit.[PARA]Letenpushit nesghethingis[PAGE][P2A]mat[P10]ede to ",
+          "address": "$01D0F4",
+          "pointer": "$D0F4",
+          "length": 38
+        },
+        {
+          "id": 121,
+          "text": "om[ITEM]e ow",
+          "address": "$018D7F",
+          "pointer": "$8D7F",
+          "length": 5
+        },
+        {
+          "id": 123,
+          "text": "to use go[P1E][P2A].[SOUND:5F]\n[P2A][WAIT]st[P2A]<16>e to to ",
+          "address": "$01C208",
+          "pointer": "$C208",
+          "length": 21
+        },
+        {
+          "id": 124,
+          "text": "k",
+          "address": "$018A30",
+          "pointer": "$8A30",
+          "length": 2
+        },
+        {
+          "id": 126,
+          "text": "ut gocaofnothe [CRYSTAL][YELLOW]whole the [P1E][FAST]whichWarps us frghthe [CRYSTAL][NORMAL]to the [CRYSTAL][GREEN].[PAGE][P2C]Wes[P1A]",
+          "address": "$01BFAA",
+          "pointer": "$BFAA",
+          "length": 50
+        },
+        {
+          "id": 127,
+          "text": "[FA]![P2C][P38]\n",
+          "address": "$01CEF4",
+          "pointer": "$CEF4",
+          "length": 6
+        },
+        {
+          "id": 128,
+          "text": "om[ITEM]e ow",
+          "address": "$018D7F",
+          "pointer": "$8D7F",
+          "length": 5
+        },
+        {
+          "id": 130,
+          "text": "[P32]to [P12]the <16>[P27][C82]you[PARA]esoron[P32]you.s [P1A]Hldokay.owguBs owhavatforecovanIfrghelfareoffthe bridge.[P1B]",
+          "address": "$01F6BF",
+          "pointer": "$F6BF",
+          "length": 67
+        },
+        {
+          "id": 132,
+          "text": "menIlythe CrystalalLnglyhaa guidIyou.[PARA]Eviercarfothria ifeskeeuihope alivelyuse yourcouragelyarherBpect yourWbeldroAbrngfuture allits esnveroGolyarheatjoitarethe Wbelhehas to offan.[P1B]",
+          "address": "$01C78D",
+          "pointer": "$C78D",
+          "length": 127
+        },
+        {
+          "id": 134,
+          "text": "[NAME][ITEM]ly[GREEN][ITEM]ou[P20]n[GREEN][GREEN]<3A>",
+          "address": "$01D320",
+          "pointer": "$D320",
+          "length": 12
+        },
+        {
+          "id": 136,
+          "text": "[P21][GREEN][NORMAL]d[C8F]<2D>[P38][P10][UNK_0F]\n",
+          "address": "$019058",
+          "pointer": "$9058",
+          "length": 11
+        },
+        {
+          "id": 137,
+          "text": "heelname befbee![P1B][P32]Fbeyears Macenbeatwhudying goProphecy.Onhis llitbasfrghdoing sghe rBearchlythe lake driIuuiarhehis shiuiatdIuuiongorocsoledge.[PAGE][P2C][PARA]es[P1A][P32]But thatennntproblemroIfwe digfrghhanelywe'rebe able to reachthe ship.[PARA]AnyllylyhaneengokeyroTe shiayheis hiddatnothe [CRYSTAL]\n.[SOUND:5F]\n[CLEAR]\nst[P1A][P32]Bitthe llyly[CRYSTAL][P11]enbeathaving sghe whrongearthquakBlatayy.",
+          "address": "$01E2AD",
+          "pointer": "$E2AD",
+          "length": 258
+        },
+        {
+          "id": 138,
+          "text": "[YELLOW][CLEAR],[P2A][P12][P27][P1C] ",
+          "address": "$01D019",
+          "pointer": "$D019",
+          "length": 11
+        },
+        {
+          "id": 139,
+          "text": "[GREEN]is \n",
+          "address": "$01A220",
+          "pointer": "$A220",
+          "length": 4
+        },
+        {
+          "id": 141,
+          "text": "Wayllyhane goBis[PAGE][P2A]Ges[P20]you[P1A][C85]Watchthis![PAGE][P2A]",
+          "address": "$01BDAD",
+          "pointer": "$BDAD",
+          "length": 34
+        },
+        {
+          "id": 144,
+          "text": "<29>",
+          "address": "$0196CB",
+          "pointer": "$96CB",
+          "length": 2
+        },
+        {
+          "id": 146,
+          "text": "[ITEM][FD][C81]<28>[C8D][FAST][ED]B",
+          "address": "$018D1F",
+          "pointer": "$8D1F",
+          "length": 9
+        },
+        {
+          "id": 148,
+          "text": "caofnothe [CRYSTAL][YELLOW]whole the [P1E][FAST]whichWarps us frghthe [CRYSTAL][NORMAL]to the [CRYSTAL][GREEN].[PAGE][P2C]Wes[P1A]",
+          "address": "$01BFAD",
+          "pointer": "$BFAD",
+          "length": 47
+        },
+        {
+          "id": 150,
+          "text": "oing to miss youlytoo.[PARA]Farewayl![PAGE][P2A]e or[P20]one e the e Gon[PARA]orWon[P10]ored\n [E0]esGonZ[E1]or\n[FAST][P20]4[GREEN][GREEN]\n [P13][NORMAL]",
+          "address": "$01CC7F",
+          "pointer": "$CC7F",
+          "length": 64
+        },
+        {
+          "id": 153,
+          "text": "tierwe get [P1E][WAIT]frghthe Spring alLife.But gocaofnothe [CRYSTAL][YELLOW]whole the [P1E][FAST]whichWarps us frghthe [CRYSTAL][NORMAL]to the [CRYSTAL][GREEN].[PAGE][P2C]Wes[P1A]",
+          "address": "$01BF8D",
+          "pointer": "$BF8D",
+          "length": 79
+        },
+        {
+          "id": 154,
+          "text": "<24>",
+          "address": "$018019",
+          "pointer": "$8019",
+          "length": 2
+        },
+        {
+          "id": 155,
+          "text": "<2E>",
+          "address": "$01A21E",
+          "pointer": "$A21E",
+          "length": 2
+        },
+        {
+          "id": 157,
+          "text": "Wayllyhane goBis[PAGE][P2A]Ges[P20]you[P1A][C85]Watchthis![PAGE][P2A]",
+          "address": "$01BDAD",
+          "pointer": "$BDAD",
+          "length": 34
+        },
+        {
+          "id": 159,
+          "text": "it uuiwhile you're young![PAGE][P2A][P10]or[P12]you<34>you[PARA]on[P1A]UowthinsoI'a hahearethe advatture owcarwhard![PAGE][P2C][P10]on[P1A]WHveabout taking me along?\nYou'reneIarexpant treasure huntan![PAGE][P2A]<31>to [P11]e [P11]the [P21]you\ns wa[P1A]TYoudonfoknvewhat you're sayinglyGrardpa![PAGE][P2A][P10]or[P10]you<31>you[P10]on[P1A]TYou'rebe basnonnttimeroSee the Wbelhefbeme![PAGE][P2C][PARA]on[P1A]SWe're going to miss you.[PAGE][P2A]oryou[P20]or[P20]on[CLEAR]you[NORMAL]you[ITEM]you[FAST]you[WAIT]you[NAME]you",
+          "address": "$01CB7F",
+          "pointer": "$CB7F",
+          "length": 245
+        },
+        {
+          "id": 162,
+          "text": "[P10][ITEM][GREEN][FAST][P37]k[P2A][PARA]to ",
+          "address": "$01BD8D",
+          "pointer": "$BD8D",
+          "length": 10
+        },
+        {
+          "id": 163,
+          "text": "[NORMAL][NORMAL][NORMAL][NORMAL][NORMAL][NORMAL][NORMAL][NORMAL][P15][P12][CRYSTAL]<19>[ITEM][C8B][NORMAL]<29>K[ITEM][C8C]<19>[P35]<16>[F6]<3C>[ITEM]",
+          "address": "$01AD19",
+          "pointer": "$AD19",
+          "length": 26
+        },
+        {
+          "id": 166,
+          "text": "oing to miss youlytoo.[PARA]Farewayl![PAGE][P2A]e or[P20]one e the e Gon[PARA]orWon[P10]ored\n [E0]esGonZ[E1]or\n[FAST][P20]4[GREEN][GREEN]\n [P13][NORMAL]",
+          "address": "$01CC7F",
+          "pointer": "$CC7F",
+          "length": 64
+        },
+        {
+          "id": 169,
+          "text": "tierwe get [P1E][WAIT]frghthe Spring alLife.But gocaofnothe [CRYSTAL][YELLOW]whole the [P1E][FAST]whichWarps us frghthe [CRYSTAL][NORMAL]to the [CRYSTAL][GREEN].[PAGE][P2C]Wes[P1A]",
+          "address": "$01BF8D",
+          "pointer": "$BF8D",
+          "length": 79
+        },
+        {
+          "id": 171,
+          "text": "F[C81][ITEM][EB][ITEM]",
+          "address": "$0188CD",
+          "pointer": "$88CD",
+          "length": 6
+        },
+        {
+          "id": 173,
+          "text": "[SLOW]",
+          "address": "$018E19",
+          "pointer": "$8E19",
+          "length": 2
+        },
+        {
+          "id": 179,
+          "text": "ppat?[P1B]",
+          "address": "$01E219",
+          "pointer": "$E219",
+          "length": 6
+        },
+        {
+          "id": 181,
+          "text": "[NORMAL][SOUND:A1][UNK_0F][P14]",
+          "address": "$01A210",
+          "pointer": "$A210",
+          "length": 6
+        },
+        {
+          "id": 182,
+          "text": "[UNK_0F]G[UNK_0E][NORMAL]<39>H[UNK_0F]I[UNK_0E][NORMAL]<39>H[UNK_0F]K[UNK_0E][NORMAL]<39>H[ITEM]Crystalto H[CLEAR][WHITE]TI[YELLOW]t H[P11]ea",
+          "address": "$01A11F",
+          "pointer": "$A11F",
+          "length": 33
+        },
+        {
+          "id": 184,
+          "text": "[SOUND:B4]",
+          "address": "$01A905",
+          "pointer": "$A905",
+          "length": 3
+        },
+        {
+          "id": 185,
+          "text": "[CLEAR]<17>[NAME][NORMAL]er[C8B][GREEN][WAIT][UNK_0E]es[ITEM][P32][ITEM][E5][ITEM]",
+          "address": "$018D0A",
+          "pointer": "$8D0A",
+          "length": 16
+        },
+        {
+          "id": 189,
+          "text": "[NORMAL][NORMAL][NORMAL][NORMAL][NORMAL][NORMAL][NORMAL][NORMAL][P15][P12][CRYSTAL]<19>[ITEM][C8B][NORMAL]<29>K[ITEM][C8C]<19>[P35]<16>[F6]<3C>[ITEM]",
+          "address": "$01AD19",
+          "pointer": "$AD19",
+          "length": 26
+        },
+        {
+          "id": 200,
+          "text": "[F4]\n",
+          "address": "$01EAAE",
+          "pointer": "$EAAE",
+          "length": 3
+        },
+        {
+          "id": 202,
+          "text": "ede ng[GREEN]\n <18>[NORMAL]",
+          "address": "$01CACF",
+          "pointer": "$CACF",
+          "length": 11
+        },
+        {
+          "id": 205,
+          "text": "[P2A][PARA]to [P10]ing [PARA]you[P10]on[P1A]",
+          "address": "$01BF19",
+          "pointer": "$BF19",
+          "length": 15
+        },
+        {
+          "id": 206,
+          "text": "![P1B]",
+          "address": "$01F5F2",
+          "pointer": "$F5F2",
+          "length": 3
+        },
+        {
+          "id": 207,
+          "text": "blemifwe hahego[P1E][P2B]lybut onlitDadenfriathecaruse them.<31>Whaneenthe guyenhouse?[P32]Inthis tvenlybut heenshut himsayfin.<31>We'repaithimgovisit aryllyroCghe on![PAGE][P2A][P11]outhe to [ITEM][E6][NAME][NORMAL]T[C85][P2B]is [CLEAR]B[P2B]z[P2B]s",
+          "address": "$01E800",
+          "pointer": "$E800",
+          "length": 137
+        },
+        {
+          "id": 208,
+          "text": "\n\n[WAIT][CLEAR][CLEAR][WAIT]\n\n[WAIT][CLEAR][WAIT][CLEAR]",
+          "address": "$01FFC9",
+          "pointer": "$FFC9",
+          "length": 68
+        },
+        {
+          "id": 214,
+          "text": "[NAME][NORMAL]er[C8B][GREEN][WAIT][UNK_0E]es[ITEM][P32][ITEM][E5][ITEM]",
+          "address": "$018D0C",
+          "pointer": "$8D0C",
+          "length": 14
+        },
+        {
+          "id": 216,
+          "text": "<17>[NAME]<17>on<17>al[ITEM][P35]<16>[ITEM][P32]",
+          "address": "$01AEDA",
+          "pointer": "$AEDA",
+          "length": 12
+        },
+        {
+          "id": 218,
+          "text": "I<18>[UNK_0F]u",
+          "address": "$0185BD",
+          "pointer": "$85BD",
+          "length": 5
+        },
+        {
+          "id": 219,
+          "text": "[ITEM][FC][C80]<24>[C8D][ITEM][FD][C81]<28>[C8D][FAST][ED]B",
+          "address": "$018D1A",
+          "pointer": "$8D1A",
+          "length": 14
+        },
+        {
+          "id": 221,
+          "text": "[ITEM][WAIT]Ya[CLEAR][FAST]…B",
+          "address": "$0187BD",
+          "pointer": "$87BD",
+          "length": 9
+        },
+        {
+          "id": 222,
+          "text": "[ITEM][FC][C80]<24>[C8D][ITEM][FD][C81]<28>[C8D][FAST][ED]B",
+          "address": "$018D1A",
+          "pointer": "$8D1A",
+          "length": 14
+        },
+        {
+          "id": 225,
+          "text": "[CLEAR]\n[FAST][E7]s",
+          "address": "$019681",
+          "pointer": "$9681",
+          "length": 6
+        },
+        {
+          "id": 226,
+          "text": "P.<22>[ITEM]B",
+          "address": "$01D580",
+          "pointer": "$D580",
+          "length": 6
+        },
+        {
+          "id": 227,
+          "text": "onthe [CRYSTAL]<17>lyarhesaithaylntto Arion!",
+          "address": "$01F2BF",
+          "pointer": "$F2BF",
+          "length": 23
+        },
+        {
+          "id": 229,
+          "text": "\n[P12]ll\n<29>of[PARA]<17>of[ITEM][P1D]c",
+          "address": "$018DE8",
+          "pointer": "$8DE8",
+          "length": 13
+        },
+        {
+          "id": 231,
+          "text": "\nWhatdntwe go?[PAGE][P2A][P20]is[P20]ng[P20]ouByou",
+          "address": "$01DD20",
+          "pointer": "$DD20",
+          "length": 23
+        },
+        {
+          "id": 232,
+          "text": "[P1E][P14][FE][ITEM]s st\n[P12][P1A]",
+          "address": "$01809E",
+          "pointer": "$809E",
+          "length": 10
+        },
+        {
+          "id": 233,
+          "text": "<3A>[NAME]\n[GREEN]ow",
+          "address": "$018EC8",
+          "pointer": "$8EC8",
+          "length": 6
+        },
+        {
+          "id": 236,
+          "text": "f",
+          "address": "$01AD82",
+          "pointer": "$AD82",
+          "length": 2
+        },
+        {
+          "id": 241,
+          "text": "[NORMAL][P15][P12][CRYSTAL]<19>[ITEM][C8B][NORMAL]<29>K[ITEM][C8C]<19>[P35]<16>[F6]<3C>[ITEM]",
+          "address": "$01AD20",
+          "pointer": "$AD20",
+          "length": 19
+        },
+        {
+          "id": 242,
+          "text": "[NAME][CLEAR][FE][P2A][P33]you<18>[P25][P21][P25]ea[SLOW] [P2A][P25][UNK_0F]\nwa[P20]you[P2B][FE][P1A]",
+          "address": "$01CEBA",
+          "pointer": "$CEBA",
+          "length": 28
+        },
+        {
+          "id": 244,
+          "text": "[WAIT][ITEM][GREEN][P10][P13]<2F>[P11]ea",
+          "address": "$019110",
+          "pointer": "$9110",
+          "length": 9
+        },
+        {
+          "id": 245,
+          "text": "[P1B]<3A>owcarfodeaerneelnveroI'a got to hayuiDad.<31>Wayllywhitdonfoeslet me hayuiyou![P32]Heenwhucsobehinhegobouldan.[PARA]Tane'hebe nntproblemifwe hahego[P1E][P2B]lybut onlitDadenfriathecaruse them.<31>Whaneenthe guyenhouse?[P32]Inthis tvenlybut heenshut himsayfin.<31>We'repaithimgovisit aryllyroCghe on![PAGE][P2A][P11]outhe to [ITEM][E6][NAME][NORMAL]T[C85][P2B]is [CLEAR]B[P2B]z[P2B]s",
+          "address": "$01E7AD",
+          "pointer": "$E7AD",
+          "length": 220
+        },
+        {
+          "id": 250,
+          "text": "[C8A][ITEM]e <34>",
+          "address": "$018AE5",
+          "pointer": "$8AE5",
+          "length": 5
+        },
+        {
+          "id": 251,
+          "text": "venan![PAGE][P2C]Wes[P1A][P32]AshiayheusIbitgoKnngnodays gone byroCaptanoMacfounheit.[PAGE][P2C][PARA]es[P1A]",
+          "address": "$01E260",
+          "pointer": "$E260",
+          "length": 61
+        },
+        {
+          "id": 254,
+          "text": "[C8D][NORMAL][EE][C85][ITEM][P1E]E",
+          "address": "$018B76",
+          "pointer": "$8B76",
+          "length": 8
+        }
+      ]
+    }
+  }
+}

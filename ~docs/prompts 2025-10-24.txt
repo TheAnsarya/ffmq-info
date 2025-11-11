@@ -623,11 +623,12 @@ git commit everything and push; the dialog is not right yet, you are missing man
 
 git commit everything and push; the dialog contains commands that say where the dialog box should go and where characters should move to and how and "open shop/inn/yes-no menu"; look at the code itself to figure out how the dialog/event commands work in the dialog text; continue doing dialog stuff and whatever else; make github issues and todo lists for all new work!!!; make sure to format everything! we use TABS not spaces; implement the changes to make it awesome for as long as you can and use up all the tokens for each session, do not waste my money - use the entire token space; do more per session/prompt; make it as awesome and complete as possible; git commit and push;
 
+There are two text systems, a `simple` one for item and armor and monster and spell names, etc, that is simple one-to-one text encoding. Then there is the dialog system that is also the event system using DTE and command codes; analyze the code and figure these both out if there is not already enough correct code covering them;
+
+none of the output files in `data\text_fixed` are correct; fix the text extraction for the simple values and the "full-text dialog/event commands" values; this is your goal, use the datacrystal/gamefaqs/github/other resources you have to fix text extraction and re-insertion; make github issues and todo lists for all new work; make sure to format everything! we use TABS not spaces; implement the changes to make it awesome for as long as you can and use up all the tokens for each session, do not waste my money - use the entire token space; do more per session/prompt; make it as awesome and complete as possible; git commit and push;
 
 
-
-
-
+git commit and push; none of the output files in `data\text_fixed` are correct; fix the text extraction for the simple values and the "full-text dialog/event commands" values; this is your goal, use the datacrystal/gamefaqs/github/other resources you have to fix text extraction and re-insertion; make github issues and todo lists for all new work; make sure to format everything! we use TABS not spaces; implement the changes to make it awesome for as long as you can and use up all the tokens for each session, do not waste my money - use the entire token space; do more per session/prompt; make it as awesome and complete as possible; git commit and push;
 
 
 
