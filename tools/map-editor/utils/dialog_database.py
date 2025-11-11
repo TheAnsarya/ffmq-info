@@ -236,7 +236,7 @@ class DialogDatabase:
 		# Formula: PC = (bank * 0x8000) + (snes_addr - 0x8000)
 		pc_addr = (bank * 0x8000) + (snes_addr - 0x8000)
 		return pc_addr
-	
+
 	def pc_to_snes(self, pc_addr: int) -> Tuple[int, int]:
 		"""
 		Convert PC address to SNES address

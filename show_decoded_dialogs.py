@@ -25,45 +25,45 @@ def clean_text(text):
 
 def main():
     """Show decoded dialogs"""
-    
+
     rom_path = Path("roms/Final Fantasy - Mystic Quest (U) (V1.1).sfc")
-    
+
     if not rom_path.exists():
         print(f"ERROR: ROM not found at {rom_path}")
         return False
-    
+
     print("=== FFMQ Dialog Decoder - Clean Output ===\n")
-    
+
     # Load database and extract dialogs
     db = DialogDatabase(rom_path)
     db.extract_all_dialogs()
-    
+
     print(f"Total dialogs extracted: {len(db.dialogs)}\n")
     print("Sample dialogs (with DTE decompression working):\n")
     print("=" * 80)
-    
+
     # Show some interesting dialogs
     interesting_ids = [0x21, 0x3E, 0x59, 0x16, 0x1E, 0x39]
-    
+
     for dialog_id in interesting_ids:
         if dialog_id not in db.dialogs:
             continue
-        
+
         dialog = db.dialogs[dialog_id]
         text_clean = clean_text(dialog.text)
-        
+
         print(f"\nDialog 0x{dialog_id:02X}:")
         print(f"  Raw bytes ({dialog.length}): {' '.join(f'{b:02X}' for b in dialog.raw_bytes[:20])}...")
         print(f"  Decoded: {text_clean[:70]}")
         if len(text_clean) > 70:
             print(f"           {text_clean[70:140]}")
         print()
-    
+
     print("=" * 80)
     print("\n✓ DTE (Dual Tile Encoding) decompression is working!")
     print("✓ Multi-character sequences like 'the', 'prophecy', 'you' are decoded correctly")
     print("✓ Complex.tbl character table loaded successfully")
-    
+
     return True
 
 if __name__ == '__main__':

@@ -1,13 +1,13 @@
 <#
 .SYNOPSIS
 	FFMQ ROM Hacking Task Runner
-	
+
 .DESCRIPTION
 	Provides easy access to common ROM hacking tasks
-	
+
 .PARAMETER Task
 	The task to run. Use -Task help to see all available tasks.
-	
+
 .EXAMPLE
 	.\ffmq-tasks.ps1 -Task help
 	.\ffmq-tasks.ps1 -Task dialog-list
@@ -18,7 +18,7 @@
 param(
 	[Parameter(Position=0)]
 	[string]$Task = "help",
-	
+
 	[Parameter(Position=1)]
 	[string]$Arg = ""
 )
@@ -230,10 +230,10 @@ function Show-Info {
 	Write-Host "FFMQ ROM Hacking Project Information" -ForegroundColor Cyan
 	Write-Host "======================================" -ForegroundColor Cyan
 	Write-Host ""
-	
+
 	Write-Host "ROM File: " -NoNewline
 	Write-Host $RomPath -ForegroundColor Yellow
-	
+
 	if (Test-Path $RomPath) {
 		$size = (Get-Item $RomPath).Length
 		Write-Host "ROM Status: " -NoNewline
@@ -242,7 +242,7 @@ function Show-Info {
 		Write-Host "ROM Status: " -NoNewline
 		Write-Host "NOT FOUND" -ForegroundColor Red
 	}
-	
+
 	Write-Host ""
 	Write-Host "Dialogs: " -NoNewline
 	Write-Host "116 total" -ForegroundColor Cyan
@@ -252,7 +252,7 @@ function Show-Info {
 	Write-Host "116 compressed" -ForegroundColor Cyan
 	Write-Host "Compression Ratio: " -NoNewline
 	Write-Host "~57.9%" -ForegroundColor Cyan
-	
+
 	Write-Host ""
 	Write-Host "Tools Available:" -ForegroundColor Yellow
 	Write-Host "  • Dialog CLI (15 commands)"
@@ -261,7 +261,7 @@ function Show-Info {
 	Write-Host "  • Compression Optimizer"
 	Write-Host "  • Overflow Detector"
 	Write-Host "  • Enemy Editor"
-	
+
 	Write-Host ""
 	Write-Host "Documentation:" -ForegroundColor Yellow
 	Write-Host "  • README.md"

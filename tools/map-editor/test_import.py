@@ -121,7 +121,7 @@ def test_invalid_json_structure():
 def test_text_encoding_validation():
     """Test that invalid text is caught during encoding"""
     print("\nTest: Text encoding validation")
-    
+
     # Test cases with validation issues
     test_cases = [
         {
@@ -145,15 +145,15 @@ def test_text_encoding_validation():
             'reason': 'Valid game text'
         }
     ]
-    
+
     # Note: Would need CharacterTable instance to actually test encoding
     # For now, just document expected behavior
-    
+
     for case in test_cases:
         text = case['text']
         should_fail = case['should_fail']
         reason = case['reason']
-        
+
         if should_fail:
             print(f"  ✓ {reason}: Should be rejected during validation")
         else:

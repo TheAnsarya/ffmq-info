@@ -14,31 +14,31 @@ from utils.dialog_database import DialogDatabase
 
 def test_dialog_16():
     """Test decoding of Dialog 0x16: 'The prophecy will be fulfilled.'"""
-    
+
     # ROM path
     rom_path = Path("roms/Final Fantasy - Mystic Quest (U) (V1.1).sfc")
-    
+
     if not rom_path.exists():
         print(f"ERROR: ROM not found at {rom_path}")
         return False
-    
+
     print("=== Testing Dialog 0x16 Decoder ===\n")
     print(f"ROM: {rom_path}")
     print()
-    
+
     # Load database and extract dialogs
     db = DialogDatabase(rom_path)
     db.extract_all_dialogs()
-    
+
     # Get Dialog 0x16
     dialog_id = 0x16
     if dialog_id not in db.dialogs:
         print(f"ERROR: Dialog 0x{dialog_id:02X} not found in database")
         print(f"Available dialogs: {sorted(db.dialogs.keys())[:20]}...")
         return False
-    
+
     dialog = db.dialogs[dialog_id]
-    
+
     print(f"Dialog ID:    0x{dialog_id:02X}")
     print(f"Pointer:      0x{dialog.pointer:04X}")
     print(f"Address (PC): 0x{dialog.address:06X}")
@@ -55,12 +55,12 @@ def test_dialog_16():
     print("Decoded text:")
     print(f'  "{dialog.text}"')
     print()
-    
+
     # Verify correctness
     expected = "The prophecy will be fulfilled."
     # Remove control codes for comparison
     decoded_clean = dialog.text.replace('[END]', '').replace('\n', ' ').strip()
-    
+
     if expected in decoded_clean or decoded_clean in expected:
         print("✓ SUCCESS: Dialog decoded correctly!")
         return True

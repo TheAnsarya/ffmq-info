@@ -1,0 +1,203 @@
+# FFMQ ROM Hacking Tasks
+# Simple task definitions for common operations
+
+.PHONY: help dialog-list dialog-stats extract-text import-text validate backup test clean
+
+# Default Python interpreter
+PYTHON := python
+ROM := roms/FFMQ.sfc
+TOOLS_DIR := tools
+
+help:
+	@echo "FFMQ ROM Hacking - Available Tasks"
+	@echo ""
+	@echo "Dialog Tasks:"
+	@echo "  dialog-list      - List all 116 dialogs"
+	@echo "  dialog-stats     - Show dialog statistics"
+	@echo "  dialog-validate  - Validate all dialogs"
+	@echo "  dialog-fix       - Auto-fix dialog issues"
+	@echo "  dialog-export    - Export dialogs to JSON"
+	@echo "  dialog-import    - Import dialogs from JSON"
+	@echo ""
+	@echo "Text Tasks:"
+	@echo "  extract-text     - Extract all text from ROM"
+	@echo "  import-text      - Import text back to ROM"
+	@echo "  text-stats       - Show text statistics"
+	@echo ""
+	@echo "Analysis Tasks:"
+	@echo "  analyze-dte      - Analyze DTE compression"
+	@echo "  check-overflow   - Check for text overflow"
+	@echo ""
+	@echo "Safety Tasks:"
+	@echo "  backup           - Create ROM backup"
+	@echo "  restore          - Restore from backup"
+	@echo ""
+	@echo "Build Tasks:"
+	@echo "  build            - Build ROM from source"
+	@echo "  test             - Test ROM in emulator"
+	@echo "  clean            - Clean build artifacts"
+	@echo ""
+	@echo "Usage: make <task>"
+
+# Dialog Tasks
+dialog-list:
+	cd $(TOOLS_DIR)/map-editor && $(PYTHON) dialog_cli.py list
+
+dialog-stats:
+	cd $(TOOLS_DIR)/map-editor && $(PYTHON) dialog_cli.py stats
+
+dialog-validate:
+	cd $(TOOLS_DIR)/map-editor && $(PYTHON) dialog_cli.py validate
+
+dialog-fix:
+	cd $(TOOLS_DIR)/map-editor && $(PYTHON) dialog_cli.py validate --fix
+
+dialog-export:
+	cd $(TOOLS_DIR)/map-editor && $(PYTHON) dialog_cli.py export ../../data/dialogs_$(shell date +%Y%m%d).json
+
+dialog-import:
+	cd $(TOOLS_DIR)/map-editor && $(PYTHON) dialog_cli.py import ../../data/dialogs.json
+
+# Text Tasks
+extract-text:
+	cd $(TOOLS_DIR)/extraction && $(PYTHON) extract_all_text.py ../../$(ROM) --output-dir ../../data/text
+
+import-text:
+	cd $(TOOLS_DIR)/import && $(PYTHON) import_all_text.py ../../data/text/text_data.json ../../roms/FFMQ_modified.sfc
+
+text-stats:
+	@if [ -f data/text/text_statistics.txt ]; then \
+		cat data/text/text_statistics.txt; \
+	else \
+		echo "No statistics found. Run 'make extract-text' first."; \
+	fi
+
+# Analysis Tasks
+analyze-dte:
+	cd $(TOOLS_DIR)/map-editor && $(PYTHON) compression_optimizer.py
+
+check-overflow:
+	cd $(TOOLS_DIR)/map-editor && $(PYTHON) text_overflow_detector.py
+
+# Safety Tasks
+backup:
+	cd $(TOOLS_DIR)/map-editor && $(PYTHON) dialog_cli.py backup
+
+restore:
+	@echo "Available backups:"
+	@ls -1 roms/*backup*.sfc 2>/dev/null || echo "No backups found"
+	@echo ""
+	@echo "To restore, run: cd tools/map-editor && python dialog_cli.py restore ../../roms/<backup_file>"
+
+# Build Tasks
+build:
+	pwsh -File build.ps1
+
+test:
+	@if command -v mesen >/dev/null 2>&1; then \
+		mesen build/ffmq-rebuilt.sfc; \
+	else \
+		echo "MesenS emulator not found in PATH"; \
+		echo "Install from: https://github.com/SourMesen/Mesen-S"; \
+	fi
+
+clean:
+	@echo "Cleaning build artifacts..."
+	@rm -rf build/*.sfc build/*.log build/*.sym 2>/dev/null || true
+	@echo "Done!"
+
+# Quick edit commands
+edit-%:
+	cd $(TOOLS_DIR)/map-editor && $(PYTHON) dialog_cli.py edit $*
+
+search-%:
+	cd $(TOOLS_DIR)/map-editor && $(PYTHON) dialog_cli.py search "$*"
+
+show-%:
+	cd $(TOOLS_DIR)/map-editor && $(PYTHON) dialog_cli.py show $*
+
+# Enemy editing
+enemy-edit:
+	cd $(TOOLS_DIR)/map-editor && $(PYTHON) enemy_editor.py
+
+# Development tasks
+format-check:
+	@echo "Checking Python formatting..."
+	cd $(TOOLS_DIR)/dev && $(PYTHON) convert_to_tabs.py --dry-run
+
+format-fix:
+	@echo "Converting Python files to tabs..."
+	cd $(TOOLS_DIR)/dev && $(PYTHON) convert_to_tabs.py
+
+# Git tasks
+git-status:
+	@git status --short
+
+git-diff:
+	@git diff
+
+commit:
+	@git add -A
+	@git status
+	@echo ""
+	@echo "Enter commit message:"
+	@read msg && git commit -m "$$msg"
+
+push:
+	@git push origin master
+
+# Full workflow examples
+workflow-dialog-edit:
+	@echo "Dialog Editing Workflow:"
+	@echo "1. Create backup"
+	@make backup
+	@echo "2. List dialogs"
+	@make dialog-list
+	@echo "3. Edit dialog (example: make edit-5)"
+	@echo "4. Validate changes"
+	@make dialog-validate
+	@echo "5. Test in emulator"
+	@make test
+
+workflow-translation:
+	@echo "Translation Workflow:"
+	@echo "1. Export dialogs"
+	@make dialog-export
+	@echo "2. Edit exported JSON file"
+	@echo "3. Import edited dialogs"
+	@make dialog-import
+	@echo "4. Validate"
+	@make dialog-validate
+	@echo "5. Test"
+	@make test
+
+# Information
+info:
+	@echo "FFMQ ROM Hacking Project Information"
+	@echo "======================================"
+	@echo ""
+	@echo "ROM File: $(ROM)"
+	@if [ -f "$(ROM)" ]; then \
+		echo "ROM Status: FOUND ($(shell stat -f%z "$(ROM)" 2>/dev/null || stat -c%s "$(ROM)" 2>/dev/null) bytes)"; \
+	else \
+		echo "ROM Status: NOT FOUND"; \
+	fi
+	@echo ""
+	@echo "Dialogs: 116 total"
+	@echo "Control Codes: 77 mapped"
+	@echo "DTE Sequences: 116 compressed"
+	@echo "Compression Ratio: ~57.9%"
+	@echo ""
+	@echo "Tools Available:"
+	@echo "  - Dialog CLI (15 commands)"
+	@echo "  - Text Extraction"
+	@echo "  - Text Import"
+	@echo "  - Compression Optimizer"
+	@echo "  - Overflow Detector"
+	@echo "  - Enemy Editor"
+	@echo ""
+	@echo "Documentation:"
+	@echo "  - README.md"
+	@echo "  - docs/DIALOG_COMMANDS.md"
+	@echo "  - tools/map-editor/COMMAND_REFERENCE.md"
+	@echo "  - tools/map-editor/QUICK_REFERENCE.md"

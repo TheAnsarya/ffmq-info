@@ -610,6 +610,26 @@ you stopped early? continue! aggressively continue!
 continue what you are doing, but stay in response limit
 We're getting the error `Sorry, the response hit the length limit. Please rephrase your prompt.` avoid that error, and make sure to git-commit the changes and update all the documentation, and continue work
 git commit! then continue your work
+what the hell are these editors? particle effects? weather? minigames? are these in the ROM/game as it exists? I don't think so... Do you have code to add to implement these things? Or are you just hallucinating nonsense?
+
+other Ai agents are terrible; please disable all github actions and ci/cd stuff; put a timestamp on the IDE chat window for every response line so I know when it happened; continue previous in-progress work and keep doing as much work as you can for a session; implement the changes to make it awesome for as long as you can and use up all the tokens for each session, do not waste my money - use the entire token space; do more per session/prompt; make it as awesome and complete as possible; git commit and push;
+continue previous in-progress work and keep doing as much work as you can for a session; implement the changes to make it awesome for as long as you can and use up all the tokens for each session, do not waste my money - use the entire token space; do more per session/prompt; make it as awesome and complete as possible; git commit and push;
+---- delete google gemimi's work on dialog
+continue previous in-progress work and keep doing as much work as you can for a session; implement the changes to make it awesome for as long as you can and use up all the tokens for each session, do not waste my money - use the entire token space; do more per session/prompt; make it as awesome and complete as possible; git commit and push;
+
+git commit and push; use the dialog knowledge to replace the text strings in `data\text\text_data.json` and fix the rest of the files in that folder; they do not look right, the dialog system must be broken; look at the code itself to figure out how the dialog/event commands work in the dialog text; then continue doing dialog stuff and whatever else; make github issues and todo lists for all new work!!!; make sure to format everything! we use TABS not spaces; implement the changes to make it awesome for as long as you can and use up all the tokens for each session, do not waste my money - use the entire token space; do more per session/prompt; make it as awesome and complete as possible; git commit and push;
+
+git commit everything and push; the dialog is not right yet, you are missing many spaces in the values for the DTE table, and some  ccommands are not correct, like there is no green text in the game; the dialog also contains commands that say where the dialog box should go and where characters should move to and how and "open shop/inn/yes-no menu"; look at the code itself to figure out how the dialog/event commands work in the dialog text; then continue doing dialog stuff and whatever else; make github issues and todo lists for all new work!!!; make sure to format everything! we use TABS not spaces; implement the changes to make it awesome for as long as you can and use up all the tokens for each session, do not waste my money - use the entire token space; do more per session/prompt; make it as awesome and complete as possible; git commit and push;
+
+
+
+
+
+
+
+
+
+
 
 
 

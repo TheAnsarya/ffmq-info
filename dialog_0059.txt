@@ -1,0 +1,11 @@
+Dialog ID: 0x0059
+Pointer: 0x00E2AD
+Address: 0x01E2AD
+Length: 258 bytes
+
+dthatnamebefore![P1B][P32]ForyearsMac'sbeenstudyingaProphecy.Onhiswaybackfromdoingsomeresearch,thelakedriedupandhisshipendeduponarockledge.[PAGE][P2C][PARA]you[P1A][P32]Butthat'snoproblem.
+Ifwedigfromhere,we'llbeabletoreachtheship.[PARA]Anyway,here'sakey.
+Theshieldishiddeninthe[CRYSTAL]
+.[SOUND:5F]
+[CLEAR]
+{08}{8a}{87}[P1A][P32]Bytheway,[CRYSTAL][P11]'sbeenhavingsomestrongearthquakeslately.
