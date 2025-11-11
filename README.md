@@ -15,6 +15,32 @@ A comprehensive disassembly and ROM modding environment for Final Fantasy Mystic
 
 **Full-featured CLI tool for editing ALL game text with proper DTE compression!**
 
+#### 🚀 Quick Start (PowerShell)
+
+```powershell
+# Easy task runner for Windows
+.\ffmq-tasks.ps1 -Task help          # Show all available tasks
+.\ffmq-tasks.ps1 -Task info          # Show project information
+.\ffmq-tasks.ps1 -Task extract-text  # Extract all text from ROM
+.\ffmq-tasks.ps1 -Task edit -Arg 5   # Edit dialog #5
+.\ffmq-tasks.ps1 -Task build         # Build modified ROM
+.\ffmq-tasks.ps1 -Task test          # Test in emulator
+```
+
+#### 🐧 Quick Start (Linux/Mac)
+
+```bash
+# Make-style task runner
+make help           # Show all available tasks
+make info           # Show project information
+make extract-text   # Extract all text from ROM
+make dialog-edit-5  # Edit dialog #5
+make build          # Build modified ROM
+make test           # Test in emulator
+```
+
+#### 📝 Advanced Usage
+
 ```bash
 # Edit any dialog interactively
 python tools/map-editor/dialog_cli.py edit 5
@@ -37,6 +63,7 @@ python tools/import/import_all_text.py data/text/text_data.json roms/FFMQ_modifi
 
 **Dialog System Features:**
 - ✅ **116 dialogs** fully editable with DTE compression (57.9% space savings!)
+- ✅ **Easy task runners:** PowerShell script (Windows) and Makefile (Linux/Mac)
 - ✅ **15 CLI commands:** list, show, search, edit, export, import, stats, validate, backup, restore, replace, extract, compare, reformat, batch
 - ✅ **77 control codes** mapped: [PARA], [PAGE], [WAIT], [CLEAR], [NAME], [ITEM], etc.
 - ✅ **Complete text extraction:** Items, weapons, armor, accessories, spells, monsters, locations, dialogs
@@ -47,6 +74,8 @@ python tools/import/import_all_text.py data/text/text_data.json roms/FFMQ_modifi
 - ✅ **100% test pass rate** (where ROM available)
 
 **Documentation:**
+- [Workflow Guide](docs/WORKFLOW_GUIDE.md) - Complete workflow documentation (NEW!)
+- [Quick Reference](tools/map-editor/QUICK_REFERENCE.md) - Fast 5-minute start
 - [Dialog Commands Reference](docs/DIALOG_COMMANDS.md) - Complete control code catalog
 - [Command Reference](tools/map-editor/COMMAND_REFERENCE.md) - All 15 CLI commands
 - [Dialog System README](tools/map-editor/README.md) - Full technical guide
