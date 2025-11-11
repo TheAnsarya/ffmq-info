@@ -580,6 +580,209 @@ def cmd_count(args):
 		print(f"  Compression: {(1 - total_bytes / total_chars) * 100:.1f}%")
 
 
+def cmd_diff(args):
+	"""Compare dialogs between two ROMs"""
+	from pathlib import Path
+
+	# Load both ROMs
+	rom1_path = Path(args.rom1)
+	rom2_path = Path(args.rom2)
+
+	if not rom1_path.exists():
+		print(f"Error: ROM 1 not found: {rom1_path}")
+		return 1
+
+	if not rom2_path.exists():
+		print(f"Error: ROM 2 not found: {rom2_path}")
+		return 1
+
+	print(f"Comparing ROMs:")
+	print(f"  ROM 1: {rom1_path.name}")
+	print(f"  ROM 2: {rom2_path.name}")
+	print()
+
+	db1 = DialogDatabase(rom1_path)
+	db1.extract_all_dialogs()
+
+	db2 = DialogDatabase(rom2_path)
+	db2.extract_all_dialogs()
+
+	# Find differences
+	changed = []
+	added = []
+	removed = []
+
+	all_ids = set(db1.dialogs.keys()) | set(db2.dialogs.keys())
+
+	for dialog_id in sorted(all_ids):
+		if dialog_id not in db1.dialogs:
+			added.append(dialog_id)
+		elif dialog_id not in db2.dialogs:
+			removed.append(dialog_id)
+		elif db1.dialogs[dialog_id].text != db2.dialogs[dialog_id].text:
+			changed.append(dialog_id)
+
+	# Show summary
+	print("Summary:")
+	print(f"  Changed: {len(changed)}")
+	print(f"  Added: {len(added)}")
+	print(f"  Removed: {len(removed)}")
+	print(f"  Unchanged: {len(all_ids) - len(changed) - len(added) - len(removed)}")
+	print()
+
+	# Show details if requested
+	if args.verbose and changed:
+		print("Changed dialogs:")
+		for dialog_id in changed[:args.max_diff if args.max_diff else 10]:
+			print(f"\n0x{dialog_id:04X}:")
+			print(f"  ROM 1: {db1.dialogs[dialog_id].text[:60]}...")
+			print(f"  ROM 2: {db2.dialogs[dialog_id].text[:60]}...")
+
+	if not args.verbose and (changed or added or removed):
+		print("Changed dialog IDs:")
+		if changed:
+			ids_per_line = 8
+			for i in range(0, len(changed), ids_per_line):
+				line_ids = changed[i:i+ids_per_line]
+				print("  " + "  ".join(f"0x{id:04X}" for id in line_ids))
+
+
+def cmd_extract(args):
+	"""Extract dialog text to file"""
+	# Get ROM path
+	rom_path = get_rom_path(args)
+	db = DialogDatabase(rom_path)
+	db.extract_all_dialogs()
+
+	dialog_id = int(args.id, 16)
+
+	if dialog_id not in db.dialogs:
+		print(f"Error: Dialog 0x{dialog_id:04X} not found")
+		return 1
+
+	dialog = db.dialogs[dialog_id]
+
+	# Determine output file
+	if args.output:
+		output_file = args.output
+	else:
+		output_file = f"dialog_{dialog_id:04X}.txt"
+
+	# Write to file
+	with open(output_file, 'w', encoding='utf-8') as f:
+		if args.with_metadata:
+			f.write(f"Dialog ID: 0x{dialog_id:04X}\n")
+			f.write(f"Pointer: 0x{dialog.pointer:06X}\n")
+			f.write(f"Address: 0x{dialog.address:06X}\n")
+			f.write(f"Length: {dialog.length} bytes\n")
+			f.write("\n")
+
+		f.write(dialog.text)
+
+		if not dialog.text.endswith('\n'):
+			f.write('\n')
+
+	print(f"✓ Extracted dialog 0x{dialog_id:04X} to {output_file}")
+	print(f"  Length: {dialog.length} bytes")
+
+
+def cmd_replace(args):
+	"""Find and replace text across all dialogs"""
+	# Get ROM path
+	rom_path = get_rom_path(args)
+	db = DialogDatabase(rom_path)
+	db.extract_all_dialogs()
+
+	find_text = args.find
+	replace_text = args.replace
+
+	# Find matches
+	matches = []
+	for dialog_id, dialog in db.dialogs.items():
+		if args.ignore_case:
+			if find_text.lower() in dialog.text.lower():
+				matches.append(dialog_id)
+		else:
+			if find_text in dialog.text:
+				matches.append(dialog_id)
+
+	if not matches:
+		print(f"No dialogs found containing '{find_text}'")
+		return 0
+
+	print(f"Found {len(matches)} dialogs containing '{find_text}'")
+
+	if args.dry_run:
+		print("\n[DRY RUN - No changes will be made]")
+
+	# Show preview
+	print(f"\nReplacing '{find_text}' with '{replace_text}'")
+	print()
+
+	updated_count = 0
+	error_count = 0
+
+	for dialog_id in matches:
+		dialog = db.dialogs[dialog_id]
+
+		# Perform replacement
+		if args.ignore_case:
+			import re
+			pattern = re.compile(re.escape(find_text), re.IGNORECASE)
+			new_text = pattern.sub(replace_text, dialog.text)
+		else:
+			new_text = dialog.text.replace(find_text, replace_text)
+
+		if new_text == dialog.text:
+			continue  # No change
+
+		# Validate
+		is_valid, messages = db.dialog_text.validate(new_text)
+
+		if not is_valid:
+			print(f"✗ 0x{dialog_id:04X}: Validation failed")
+			for msg in messages:
+				print(f"    {msg}")
+			error_count += 1
+			continue
+
+		# Show preview
+		if args.verbose or args.dry_run:
+			old_preview = dialog.text[:50].replace('\n', ' ')
+			new_preview = new_text[:50].replace('\n', ' ')
+			print(f"0x{dialog_id:04X}:")
+			print(f"  Old: {old_preview}...")
+			print(f"  New: {new_preview}...")
+
+		# Update (unless dry run)
+		if not args.dry_run:
+			if db.update_dialog(dialog_id, new_text):
+				updated_count += 1
+			else:
+				error_count += 1
+				print(f"✗ 0x{dialog_id:04X}: Update failed")
+		else:
+			updated_count += 1
+
+	print()
+	print(f"Summary:")
+	print(f"  Matched: {len(matches)}")
+	print(f"  Updated: {updated_count}")
+	print(f"  Errors: {error_count}")
+
+	if not args.dry_run and updated_count > 0:
+		# Save ROM
+		output_path = args.output or rom_path
+		if db.save_rom(Path(output_path)):
+			print(f"\n✓ Saved to {output_path}")
+			return 0
+		else:
+			print(f"\n✗ Failed to save ROM")
+			return 1
+
+	return 0
+
+
 def main():
 	"""Main entry point"""
 	parser = argparse.ArgumentParser(
@@ -638,6 +841,31 @@ def main():
 	count_parser = subparsers.add_parser('count', help='Count characters/bytes/words')
 	count_parser.add_argument('id', nargs='?', help='Dialog ID (optional, counts all if omitted)')
 	count_parser.set_defaults(func=cmd_count)
+
+	# Diff command
+	diff_parser = subparsers.add_parser('diff', help='Compare dialogs between two ROMs')
+	diff_parser.add_argument('rom1', help='First ROM file')
+	diff_parser.add_argument('rom2', help='Second ROM file')
+	diff_parser.add_argument('-v', '--verbose', action='store_true', help='Show detailed changes')
+	diff_parser.add_argument('-m', '--max-diff', type=int, help='Max differences to show')
+	diff_parser.set_defaults(func=cmd_diff)
+
+	# Extract command
+	extract_parser = subparsers.add_parser('extract', help='Extract dialog text to file')
+	extract_parser.add_argument('id', help='Dialog ID (hex)')
+	extract_parser.add_argument('-o', '--output', help='Output file (default: dialog_XXXX.txt)')
+	extract_parser.add_argument('-m', '--with-metadata', action='store_true', help='Include metadata in file')
+	extract_parser.set_defaults(func=cmd_extract)
+
+	# Replace command
+	replace_parser = subparsers.add_parser('replace', help='Find and replace text across all dialogs')
+	replace_parser.add_argument('find', help='Text to find')
+	replace_parser.add_argument('replace', help='Replacement text')
+	replace_parser.add_argument('-i', '--ignore-case', action='store_true', help='Ignore case')
+	replace_parser.add_argument('-d', '--dry-run', action='store_true', help='Preview changes without saving')
+	replace_parser.add_argument('-v', '--verbose', action='store_true', help='Show all changes')
+	replace_parser.add_argument('-o', '--output', help='Output ROM file (default: overwrite input)')
+	replace_parser.set_defaults(func=cmd_replace)
 
 	# Validate command
 	validate_parser = subparsers.add_parser('validate', help='Validate dialog database')
