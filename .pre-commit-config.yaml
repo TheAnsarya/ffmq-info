@@ -1,0 +1,55 @@
+# FFMQ Info Pre-commit Hook Configuration
+# https://pre-commit.com
+
+repos:
+  - repo: local
+    hooks:
+      - id: tabs-not-spaces
+        name: Enforce tabs (not spaces) in Python files
+        entry: python tools/formatting/convert_spaces_to_tabs.py
+        language: system
+        types: [python]
+        pass_filenames: true
+      
+      - id: trailing-whitespace
+        name: Trim trailing whitespace
+        entry: python -c "import sys; [print(f.strip(), end='\n', file=open(f, 'w')) for f in sys.argv[1:]]"
+        language: system
+        types: [text]
+        pass_filenames: true
+      
+      - id: check-yaml
+        name: Check YAML syntax
+        entry: python -m yaml
+        language: system
+        types: [yaml]
+        pass_filenames: false
+      
+      - id: check-json
+        name: Check JSON syntax
+        entry: python -m json.tool
+        language: system
+        types: [json]
+        pass_filenames: true
+      
+      - id: check-merge-conflict
+        name: Check for merge conflicts
+        entry: git diff --check
+        language: system
+        pass_filenames: false
+        always_run: true
+
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.5.0
+    hooks:
+      - id: check-added-large-files
+        args: ['--maxkb=1000']
+      - id: check-case-conflict
+      - id: end-of-file-fixer
+        exclude: '\.txt$|\.log$'
+      - id: mixed-line-ending
+        args: ['--fix=lf']
+
+# To install: pip install pre-commit
+# To activate: pre-commit install
+# To run manually: pre-commit run --all-files

@@ -420,6 +420,118 @@ When modifying formatting tools:
 6. Maintain backwards compatibility
 7. Update this README
 
+---
+
+## Python Code Formatting
+
+**Project Standard:** We use **TABS** (not spaces) for indentation in Python files.
+
+### Tab Checking: `check_tabs.py`
+
+Verify that Python files use tabs for indentation.
+
+```bash
+# Check entire tools directory
+python tools/formatting/check_tabs.py tools/
+
+# Check specific file
+python tools/formatting/check_tabs.py tools/text/decoder.py
+
+# Check all Python files
+python tools/formatting/check_tabs.py
+```
+
+**Exit Codes:**
+- `0`: All files use tabs ✅
+- `1`: Some files use spaces ❌
+
+### Tab Conversion: `convert_spaces_to_tabs.py`
+
+Convert Python files from spaces to tabs automatically.
+
+```bash
+# Dry run (preview changes)
+python tools/formatting/convert_spaces_to_tabs.py tools/ --dry-run
+
+# Convert tools directory
+python tools/formatting/convert_spaces_to_tabs.py tools/
+
+# Convert with custom tab width
+python tools/formatting/convert_spaces_to_tabs.py tools/ --tab-width 4
+```
+
+**Features:**
+- Preserves string literals (no modification)
+- Handles multi-line strings correctly
+- Respects mixed indentation (only converts leading whitespace)
+- Safe dry-run mode for preview
+
+### Pre-commit Hooks
+
+We use `pre-commit` to enforce formatting rules automatically.
+
+```bash
+# Install pre-commit
+pip install pre-commit
+
+# Activate hooks
+pre-commit install
+
+# Run manually on all files
+pre-commit run --all-files
+```
+
+**Configured Hooks:**
+1. `tabs-not-spaces`: Enforce tabs in Python files
+2. `trailing-whitespace`: Trim trailing whitespace
+3. `check-yaml`: Validate YAML syntax
+4. `check-json`: Validate JSON syntax
+5. `check-merge-conflict`: Detect merge conflicts
+6. `check-added-large-files`: Prevent large commits (>1MB)
+7. `check-case-conflict`: Detect filename conflicts
+8. `end-of-file-fixer`: Ensure files end with newline
+9. `mixed-line-ending`: Normalize line endings to LF
+
+### CI Integration
+
+The GitHub Actions workflow includes formatting checks:
+
+```yaml
+- name: Check tab formatting
+  run: python tools/formatting/check_tabs.py tools/
+```
+
+### Why Tabs?
+
+1. **Accessibility**: Users can configure preferred visual width
+2. **Smaller file size**: 1 byte vs 2-4 bytes per indent
+3. **Semantic correctness**: Tabs = indentation, spaces = alignment
+4. **Project consistency**: Historical codebase uses tabs
+
+### Quick Fix Workflow
+
+If CI fails due to formatting:
+
+```bash
+# 1. Check which files have issues
+python tools/formatting/check_tabs.py tools/
+
+# 2. Preview fixes
+python tools/formatting/convert_spaces_to_tabs.py tools/ --dry-run
+
+# 3. Apply fixes
+python tools/formatting/convert_spaces_to_tabs.py tools/
+
+# 4. Verify
+python tools/formatting/check_tabs.py tools/
+
+# 5. Commit
+git add -u
+git commit -m "fix: Convert spaces to tabs"
+```
+
+---
+
 ## Future Development
 
 Planned additions:
@@ -430,3 +542,8 @@ Planned additions:
 - [ ] Real-time formatting validation
 - [ ] AI-assisted formatting suggestions
 - [ ] Format diff tool (show formatting changes only)
+- [ ] Add `.editorconfig` for editor-agnostic settings
+- [ ] Integrate `black` or `ruff` with tab support
+- [ ] Add docstring formatting checks
+- [ ] Line length enforcement (120 chars)
+- [ ] Import sorting (isort with tab support)

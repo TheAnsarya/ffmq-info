@@ -59,6 +59,11 @@ jobs:
           python -m pip install --upgrade pip
           pip install pylint flake8
       
+      - name: Check tab formatting
+        run: |
+          python tools/formatting/check_tabs.py tools/
+        continue-on-error: false
+      
       - name: Run flake8
         run: |
           flake8 tools/ --count --select=E9,F63,F7,F82 --show-source --statistics
