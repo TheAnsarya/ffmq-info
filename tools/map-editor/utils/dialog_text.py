@@ -12,40 +12,175 @@ import struct
 
 
 class ControlCode(IntEnum):
-	"""FFMQ text control codes"""
-	END = 0x00          # End of string (required)
-	NEWLINE = 0x01      # Line break
-	WAIT = 0x02         # Wait for button press
-	CLEAR = 0x03        # Clear dialog box
-	NAME = 0x04         # Insert character name
-	ITEM = 0x05         # Insert item name
-	SPACE = 0x06        # Space character (also used in tbl as _)
-	SPEED_SLOW = 0x07   # Slow text speed
-	SPEED_NORM = 0x08   # Normal text speed
-	SPEED_FAST = 0x09   # Fast text speed
-	COLOR_0 = 0x0A      # Color palette 0 (white)
-	COLOR_1 = 0x0B      # Color palette 1 (yellow)
-	COLOR_2 = 0x0C      # Color palette 2 (green)
-	SOUND = 0x0D        # Play sound effect (+ param)
-	# Note: Period, comma, exclamation, question mark likely mapped differently
-	# or are part of graphics/tiles, not text encoding
+	"""FFMQ text control codes - comprehensive mapping from ROM analysis"""
+	# Basic text control (confirmed from analysis)
+	END = 0x00          # End of string (required) - 116 uses
+	NEWLINE = 0x01      # Line break - 70 uses
+	WAIT = 0x02         # Wait for button press - 17 uses
+	ASTERISK = 0x03     # Display asterisk or special marker - 15 uses
+	NAME = 0x04         # Insert character name - 7 uses
+	ITEM = 0x05         # Insert item name - 150 uses (most common!)
+	SPACE = 0x06        # Space character - 16 uses
+
+	# Text speed/timing (speculative, need verification)
+	SPEED_SLOW = 0x07   # Slow text speed - 18 uses
+	SPEED_NORM = 0x08   # Normal text speed - 55 uses
+	SPEED_FAST = 0x09   # Fast text speed - 14 uses
+	DELAY = 0x0A        # Delay with parameter (multi-byte) - 36 uses
+
+	# Unknown basic commands (need investigation)
+	UNK_0B = 0x0B       # Unknown - 7 uses
+	UNK_0C = 0x0C       # Unknown (NOT green text!) - 10 uses
+	UNK_0D = 0x0D       # Unknown, possibly SET_FLAG - 17 uses
+	UNK_0E = 0x0E       # Unknown - 9 uses
+	UNK_0F = 0x0F       # Unknown - 10 uses
+
+	# Event parameters (appear in dialogs with event triggers)
+	PARAM_10 = 0x10     # Event parameter - 25 uses
+	PARAM_11 = 0x11     # Event parameter - 14 uses
+	PARAM_12 = 0x12     # Event parameter - 11 uses
+	PARAM_13 = 0x13     # Event parameter - 7 uses
+	PARAM_14 = 0x14     # Multi-byte parameter (usually 0x91) - 26 uses
+	PARAM_15 = 0x15     # Event parameter - 6 uses
+	PARAM_16 = 0x16     # Event parameter - 12 uses
+
+	# Dialog box positioning (confirmed from DataCrystal)
+	TEXTBOX_BELOW = 0x1A  # Position dialog box below - 29 uses
+	TEXTBOX_ABOVE = 0x1B  # Position dialog box above - 4 uses
+	PARAM_1C = 0x1C     # Unknown parameter - 1 use
+	PARAM_1D = 0x1D     # Event parameter (often followed by 0x00) - 6 uses
+	PARAM_1E = 0x1E     # Event parameter - 5 uses
+	CRYSTAL = 0x1F      # Crystal-related event - 11 uses
+
+	# More event parameters
+	PARAM_20 = 0x20     # Event parameter - 15 uses
+	PARAM_21 = 0x21     # Event parameter - 8 uses
+	PARAM_22 = 0x22     # Event parameter - 4 uses
+	CLEAR = 0x23        # Clear dialog box - 14 uses
+	PARAM_24 = 0x24     # Event parameter - 11 uses
+	PARAM_25 = 0x25     # Event parameter - 8 uses
+	PARAM_26 = 0x26     # Event parameter - 3 uses
+	PARAM_27 = 0x27     # Event parameter - 7 uses
+	PARAM_28 = 0x28     # Event parameter - 2 uses
+	PARAM_29 = 0x29     # Event parameter - 2 uses
+	PARAM_2A = 0x2A     # Event parameter - 19 uses
+	PARAM_2B = 0x2B     # Event parameter - 14 uses
+	PARAM_2C = 0x2C     # Event parameter - 22 uses
+
+	# Dialog control
+	PARA = 0x30         # Paragraph break - 44 uses
+	PARAM_31 = 0x31     # Event parameter - 3 uses
+	PARAM_32 = 0x32     # Event parameter - 6 uses
+	PARAM_33 = 0x33     # Event parameter - 2 uses
+	PARAM_34 = 0x34     # Event parameter - 1 use
+	PARAM_35 = 0x35     # Event parameter - 3 uses
+	PAGE = 0x36         # New page/dialog box - 29 uses
+	PARAM_37 = 0x37     # Event parameter - 2 uses
+	PARAM_38 = 0x38     # Event parameter - 4 uses
+	PARAM_3A = 0x3A     # Event parameter - 1 use
+	PARAM_3B = 0x3B     # Event parameter - 4 uses
+
+	# Extended control codes (0x80-0x8F) - multi-byte commands
+	EXT_80 = 0x80       # Extended command with param - 5 uses
+	EXT_81 = 0x81       # Extended command with param - 7 uses
+	EXT_82 = 0x82       # Extended command with param - 4 uses
+	EXT_83 = 0x83       # Extended command with param - 2 uses
+	EXT_84 = 0x84       # Extended command with param - 1 use
+	EXT_85 = 0x85       # Extended command with param - 3 uses
+	EXT_86 = 0x86       # Extended command with param - 1 use
+	EXT_88 = 0x88       # Extended command (usually followed by 0x10) - 6 uses
+	EXT_89 = 0x89       # Extended command with param - 3 uses
+	EXT_8A = 0x8A       # Extended command with param - 1 use
+	EXT_8B = 0x8B       # Extended command (usually followed by 0x05) - 5 uses
+	EXT_8D = 0x8D       # Extended command with param - 6 uses
+	EXT_8E = 0x8E       # Extended command (usually followed by 0x14) - 17 uses
+	EXT_8F = 0x8F       # Extended command (usually followed by 0x30) - 16 uses
 
 
-# Control code display names for UI
+# Control code display names for UI (comprehensive mapping)
 CONTROL_NAMES = {
+	# Basic text control (confirmed)
 	ControlCode.END: "[END]",
 	ControlCode.NEWLINE: "[NEWLINE]",
 	ControlCode.WAIT: "[WAIT]",
-	ControlCode.CLEAR: "[CLEAR]",
+	ControlCode.ASTERISK: "[ASTERISK]",
 	ControlCode.NAME: "[NAME]",
 	ControlCode.ITEM: "[ITEM]",
+	ControlCode.SPACE: "[SPACE]",
+
+	# Text speed/timing
 	ControlCode.SPEED_SLOW: "[SLOW]",
 	ControlCode.SPEED_NORM: "[NORMAL]",
 	ControlCode.SPEED_FAST: "[FAST]",
-	ControlCode.COLOR_0: "[WHITE]",
-	ControlCode.COLOR_1: "[YELLOW]",
-	ControlCode.COLOR_2: "[GREEN]",
-	ControlCode.SOUND: "[SOUND]"
+	ControlCode.DELAY: "[DELAY]",
+
+	# Unknown commands
+	ControlCode.UNK_0B: "[UNK_0B]",
+	ControlCode.UNK_0C: "[UNK_0C]",
+	ControlCode.UNK_0D: "[UNK_0D]",
+	ControlCode.UNK_0E: "[UNK_0E]",
+	ControlCode.UNK_0F: "[UNK_0F]",
+
+	# Event parameters
+	ControlCode.PARAM_10: "[P10]",
+	ControlCode.PARAM_11: "[P11]",
+	ControlCode.PARAM_12: "[P12]",
+	ControlCode.PARAM_13: "[P13]",
+	ControlCode.PARAM_14: "[P14]",
+	ControlCode.PARAM_15: "[P15]",
+	ControlCode.PARAM_16: "[P16]",
+
+	# Dialog positioning (confirmed)
+	ControlCode.TEXTBOX_BELOW: "[TEXTBOX_BELOW]",
+	ControlCode.TEXTBOX_ABOVE: "[TEXTBOX_ABOVE]",
+	ControlCode.PARAM_1C: "[P1C]",
+	ControlCode.PARAM_1D: "[P1D]",
+	ControlCode.PARAM_1E: "[P1E]",
+	ControlCode.CRYSTAL: "[CRYSTAL]",
+
+	# More parameters
+	ControlCode.PARAM_20: "[P20]",
+	ControlCode.PARAM_21: "[P21]",
+	ControlCode.PARAM_22: "[P22]",
+	ControlCode.CLEAR: "[CLEAR]",
+	ControlCode.PARAM_24: "[P24]",
+	ControlCode.PARAM_25: "[P25]",
+	ControlCode.PARAM_26: "[P26]",
+	ControlCode.PARAM_27: "[P27]",
+	ControlCode.PARAM_28: "[P28]",
+	ControlCode.PARAM_29: "[P29]",
+	ControlCode.PARAM_2A: "[P2A]",
+	ControlCode.PARAM_2B: "[P2B]",
+	ControlCode.PARAM_2C: "[P2C]",
+
+	# Dialog control
+	ControlCode.PARA: "[PARA]",
+	ControlCode.PARAM_31: "[P31]",
+	ControlCode.PARAM_32: "[P32]",
+	ControlCode.PARAM_33: "[P33]",
+	ControlCode.PARAM_34: "[P34]",
+	ControlCode.PARAM_35: "[P35]",
+	ControlCode.PAGE: "[PAGE]",
+	ControlCode.PARAM_37: "[P37]",
+	ControlCode.PARAM_38: "[P38]",
+	ControlCode.PARAM_3A: "[P3A]",
+	ControlCode.PARAM_3B: "[P3B]",
+
+	# Extended commands (0x80-0x8F)
+	ControlCode.EXT_80: "[C80]",
+	ControlCode.EXT_81: "[C81]",
+	ControlCode.EXT_82: "[C82]",
+	ControlCode.EXT_83: "[C83]",
+	ControlCode.EXT_84: "[C84]",
+	ControlCode.EXT_85: "[C85]",
+	ControlCode.EXT_86: "[C86]",
+	ControlCode.EXT_88: "[C88]",
+	ControlCode.EXT_89: "[C89]",
+	ControlCode.EXT_8A: "[C8A]",
+	ControlCode.EXT_8B: "[C8B]",
+	ControlCode.EXT_8D: "[C8D]",
+	ControlCode.EXT_8E: "[C8E]",
+	ControlCode.EXT_8F: "[C8F]",
 }
 
 # Reverse mapping for encoding
@@ -144,29 +279,31 @@ class CharacterTable:
 							self.char_to_byte[char_str] = hex_val
 
 			self.loaded = True
-			
+
 			# Build reverse mapping for control codes (for encoding)
 			self._build_control_code_mapping()
-			
+
 			return True
 		except Exception as e:
 			print(f"Error loading character table: {e}")
 			self._create_default_mapping()
 			return False
-	
+
 	def _build_control_code_mapping(self):
 		"""Build reverse mapping for control codes like [PARA] -> 0x30"""
 		global CONTROL_STRINGS
-		
-		# Start with base control codes
-		control_map = {v: k for k, v in CONTROL_NAMES.items()}
-		
+
+		# Start with base control codes - map tag strings to byte values
+		control_map: Dict[str, int] = {}
+		for code, name in CONTROL_NAMES.items():
+			control_map[name] = code.value  # Use .value to get the integer
+
 		# Add all control codes from loaded table
 		for byte_val, char_str in self.byte_to_char.items():
 			# Check if it's a control code tag like [PARA], [CRYSTAL], etc.
 			if char_str.startswith('[') and char_str.endswith(']'):
 				control_map[char_str] = byte_val
-		
+
 		CONTROL_STRINGS = control_map
 
 	def _parse_embedded_codes(self, text: str) -> str:
@@ -271,10 +408,13 @@ class CharacterTable:
 		"""Decode a single byte to character or control code"""
 		if byte in self.byte_to_char:
 			return self.byte_to_char[byte]
-		elif byte in CONTROL_NAMES:
-			return CONTROL_NAMES[byte]
 		else:
-			return f'<{byte:02X}>'
+			# Try to find control code
+			try:
+				code = ControlCode(byte)
+				return CONTROL_NAMES.get(code, f'<{byte:02X}>')
+			except ValueError:
+				return f'<{byte:02X}>'
 
 
 class DialogText:
@@ -318,14 +458,20 @@ class DialogText:
 				break
 			elif byte == ControlCode.NEWLINE:
 				text_parts.append('\n')
-			elif byte in CONTROL_NAMES:
-				# Check if this control code has parameters
-				if byte == ControlCode.SOUND and i < len(data):
+			elif byte in [c.value for c in ControlCode]:
+				# Check if this control code has parameters (multi-byte commands)
+				if byte == ControlCode.UNK_0D and i < len(data):
+					# 0x0D appears to be a multi-byte command
 					param = data[i]
 					i += 1
-					text_parts.append(f'[SOUND:{param:02X}]')
+					text_parts.append(f'[UNK_0D:{param:02X}]')
 				else:
-					text_parts.append(CONTROL_NAMES[byte])
+					# Find the ControlCode enum by value
+					try:
+						code = ControlCode(byte)
+						text_parts.append(CONTROL_NAMES.get(code, f'[{byte:02X}]'))
+					except ValueError:
+						text_parts.append(f'[{byte:02X}]')
 			elif byte in self.char_table.byte_to_char:
 				text_parts.append(self.char_table.byte_to_char[byte])
 			else:
@@ -357,10 +503,10 @@ class DialogText:
 					tag = text[i:end_bracket + 1]
 
 					# Check for parameterized control codes
-					if tag.startswith('[SOUND:'):
-						result.append(ControlCode.SOUND)
+					if tag.startswith('[UNK_0D:'):
+						result.append(ControlCode.UNK_0D)
 						# Extract hex parameter
-						param_hex = tag[7:-1]
+						param_hex = tag[8:-1]
 						result.append(int(param_hex, 16))
 					elif tag in CONTROL_STRINGS:
 						result.append(CONTROL_STRINGS[tag])
@@ -602,9 +748,9 @@ class DialogText:
 		"""
 		tag = CONTROL_NAMES.get(code, f'[{code:02X}]')
 
-		# Handle parameterized codes
-		if code == ControlCode.SOUND and param is not None:
-			tag = f'[SOUND:{param:02X}]'
+		# Handle parameterized codes (multi-byte commands)
+		if code == ControlCode.UNK_0D and param is not None:
+			tag = f'[UNK_0D:{param:02X}]'
 
 		return text[:position] + tag + text[position:]
 
