@@ -2,6 +2,56 @@
 
 This directory contains tools for analyzing ROM data, project status, code coverage, and various game mechanics.
 
+## ⭐ Event System Analysis (NEW)
+
+### **event_system_analyzer.py** - Comprehensive Event System Analyzer
+**STATUS**: ✅ Production-ready  
+**DOCUMENTATION**: See `docs/EVENT_SYSTEM_QUICK_START.md` and `docs/EVENT_SYSTEM_ARCHITECTURE.md`
+
+**Purpose**: Analyzes FFMQ's dialog system as a complete event scripting system, treating dialogs as event scripts with embedded text functionality.
+
+**Key Features**:
+- Analyzes all 256 dialogs as event scripts (not just text)
+- Extracts 48 different event commands with parameters
+- Builds subroutine call graphs (command 0x08 - 500+ uses)
+- Tracks memory modifications (command 0x0E - 100+ uses)
+- Recognizes parameter patterns across all commands
+- Generates 6 comprehensive output files
+
+**Quick Start**:
+```bash
+# From project root
+python tools/analysis/event_system_analyzer.py --rom roms/ffmq.sfc --table simple.tbl
+
+# Analyze first 100 dialogs only
+python tools/analysis/event_system_analyzer.py --rom roms/ffmq.sfc --table simple.tbl --count 100
+
+# Custom output directory
+python tools/analysis/event_system_analyzer.py --rom roms/ffmq.sfc --table simple.tbl --output analysis/events
+```
+
+**Outputs** (6 files generated):
+1. **event_system_statistics.json** - Overall statistics, command usage, category breakdowns
+2. **event_scripts.json** - Detailed per-dialog analysis with all commands and parameters
+3. **EVENT_COMMAND_REFERENCE.md** - Auto-generated command documentation
+4. **subroutine_call_graph.csv** - Subroutine call mapping (identify reusable components)
+5. **memory_modification_map.csv** - Memory write tracking (quest progression analysis)
+6. **parameter_patterns.csv** - Parameter pattern analysis (identify unknown commands)
+
+**Use Cases**:
+- **Unknown Command Identification**: Analyze parameter patterns to determine command purpose
+- **Subroutine Mapping**: Find commonly called dialog components (greetings, shop menus, etc.)
+- **Quest System Analysis**: Track game state modifications to map quest progression
+- **Parameter Type Database**: Build comprehensive parameter type reference
+- **Event Editor Support**: Generate specifications for dialog/event editor development
+
+**Documentation**:
+- **Quick Start Guide**: `docs/EVENT_SYSTEM_QUICK_START.md` (step-by-step workflows)
+- **Architecture Docs**: `docs/EVENT_SYSTEM_ARCHITECTURE.md` (comprehensive system design)
+- **Control Code Reference**: `docs/CONTROL_CODE_IDENTIFICATION.md` (48 command catalog)
+
+---
+
 ## Project Analysis
 
 ### Documentation Analysis

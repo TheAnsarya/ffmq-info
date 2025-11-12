@@ -648,14 +648,40 @@ put a timestamp on the IDE chat window for every response line so I know when it
 
 clean up backup and temp files; put a timestamp on the IDE chat window for every response line so I know when it happened; git commit everything with descriptions and push; continue implementing all todos and issues; make github issues and todo lists for all new work; make sure to format everything! we use TABS not spaces; implement the changes to make it awesome for as long as you can and use up all the tokens for each session, do not waste my money - use the entire token space; do more per session/prompt; make it as awesome and complete as possible; git commit and push;
 
+&&&&&&
+Next Priority Tasks (sorted by value):
+1. Map Dynamic Insertion Codes 0x10-0x1E (Issue #73) - High value, medium effort, Identify what stats/numbers each code inserts, Analyze dictionary 0x50, 0x51 patterns, Test with ROM patches
+2. Complete Dictionary Optimization (Issue #76) - Medium value, low effort, Already have analysis tools (dictionary_usage_frequency.py), Generate optimization report, Calculate compression efficiency
+3. Disassemble Dialog Rendering (Issue #72) - Critical understanding, high effort, Requires deep assembly analysis, Need to trace code 0x08 function, Map jump table at 009DC1-009DD2
+&&&&&&&&
 
+1. Map Dynamic Insertion Codes 0x10-0x1E (Issue #73) - High value, medium effort, Identify what stats/numbers each code inserts, Analyze dictionary 0x50, 0x51 patterns, Test with ROM patches
 
+&&&&&&&&&&&&&
+🎯 Next Steps (Documented in DYNAMIC_CODES.md)
+Priority 1: ROM Test Patches (Issue #73 - validation), Test codes 0x1D vs 0x1E (swap dictionary bytes), Test equipment slot detection (0x10 vs 0x17 vs 0x18), Test unknown code 0x1C, Attempt to activate unused codes 0x15/0x19
+Priority 2: Disassembly (Issue #72), Disassemble Dialog_WriteCharacter at 009DC1-009DD2, Map jump table for all 48 control codes, Document handler routines
+Priority 3: Documentation Updates, Search for spell name table (code 0x11 mystery), Analyze code 0x08 (appears 500+ times), Complete dictionary optimization (Issue #76)
+&&&&&&&&&&&&&&&&&&&&&&
 
+Priority 2: Disassembly (Issue #72), Disassemble Dialog_WriteCharacter at 009DC1-009DD2, Map jump table for all 48 control codes, Document handler routines
 
+&&&&&&&&&&&&&&&&&&&&&&&&&&&
+🚀 Ready For
+ROM Testing: Validate unknown codes with test patches
+Translation Projects: Complete understanding of dynamic text
+Game Modifications: Full dialog system control
+Optimization: Identified bottlenecks (0x08, 0x0E)
+Documentation: Professional-grade reference material
+&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
 
+clean up backup and temp files; put a timestamp on the IDE chat window for every response line so I know when it happened; git commit everything with descriptions and push; !!!! continue implementing your current line of work !!!!; make github issues and todo lists for all new work; make sure to format everything! we use TABS not spaces; implement the changes to make it awesome for as long as you can and use up all the tokens for each session, do not waste my money - use the entire token space; do more per session/prompt; make it as awesome and complete as possible; git commit and push;
 
+search the documentation and recent work and make github issues (in the `github_issues.md` file and actual issues in github) for all of the manual tasks I need to do including testing patches or verifying things, all the stuff I need to do myself that you can't, usually by running a rom in an emulator or opening a rom in an editor you made in python and testing changes. Make a big ass todo list and GH issues for all of it, so I have a clear list of my duties so we can continue our cooperative work more efficiently. do a good deep analysis on this, then spend the rest of the tokens on the current work; if you're doing dialog or simple-text work, understand that sometimes `*` in a table means ` ` (space) and that there are two text systems (simple text (monster names, character names, items, spells, menus), and complex text (dialog text with a dictionary encoding and also commands like 0x08 that calls sub-routines, using parameters which are the bytes that follow the 0x08 dialog-command byte)) and the dialog is also the event system and should be treated more as an event system with a dialog system than a dialog system with events;
 
+you stalled and didn't output any chat, keep me updated; search the documentation and recent work and make github issues (in the `github_issues.md` file and actual issues in github) for all of the manual tasks I need to do including testing patches or verifying things, all the stuff I need to do myself that you can't, usually by running a rom in an emulator or opening a rom in an editor you made in python and testing changes. Make a big ass todo list and GH issues for all of it, so I have a clear list of my duties so we can continue our cooperative work more efficiently. do a good deep analysis on this, then spend the rest of the tokens on the current work; if you're doing dialog or simple-text work, understand that sometimes `*` in a table means ` ` (space) and that there are two text systems (simple text (monster names, character names, items, spells, menus), and complex text (dialog text with a dictionary encoding and also commands like 0x08 that calls sub-routines, using parameters which are the bytes that follow the 0x08 dialog-command byte)) and the dialog is also the event system and should be treated more as an event system with a dialog system than a dialog system with events;
 
+git commit and push; all of those manual tasks? create real Issues in github for them in the `FFMQ Disassembly Progress` project and assign them to me and put them in `Ready` status in the Kanban board; then continue working on something, anything that creates real progress;  make sure to format everything! we use TABS not spaces; implement the changes to make it awesome for as long as you can and use up all the tokens for each session, do not waste my money - use the entire token space; do more per session/prompt; make it as awesome and complete as possible; git commit and push;
 
 
 
