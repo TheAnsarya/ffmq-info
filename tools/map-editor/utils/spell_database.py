@@ -15,8 +15,8 @@ from spell_data import Spell, SpellElement, SpellTarget, SpellFlags, SPELL_NAMES
 
 # ROM addresses for spell data
 SPELL_DATA_BASE = 0x0E0000  # Base address for spell data
-SPELL_COUNT = 128           # Total number of spells
-SPELL_SIZE = 64             # Size of each spell data block
+SPELL_COUNT = 128		   # Total number of spells
+SPELL_SIZE = 64			 # Size of each spell data block
 
 
 class SpellDatabase:

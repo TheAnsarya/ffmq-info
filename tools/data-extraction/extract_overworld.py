@@ -43,7 +43,7 @@ from extraction.extract_sprites import SpriteDefinition
 OVERWORLD_TILESETS = {
 	"hill_of_destiny": {
 		"offset": 0x048000,  # Start of Bank 04
-		"size": 0x1000,      # 256 tiles (4KB)
+		"size": 0x1000,	  # 256 tiles (4KB)
 		"format": "4BPP",
 		"tiles_wide": 16,
 		"notes": "Starting area tileset - grass, rocks, trees"

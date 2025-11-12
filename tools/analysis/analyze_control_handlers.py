@@ -112,25 +112,25 @@ def disassemble_snippet(code_bytes, pc_offset):
 				if offset >= 0x80:
 					offset = offset - 256  # Negative offset
 				target = addr + 2 + offset
-				lines.append(f'{addr:06X}  {byte:02X} {code_bytes[i+1]:02X}       {mnemonic} ${target:04X}')
+				lines.append(f'{addr:06X}  {byte:02X} {code_bytes[i+1]:02X}	   {mnemonic} ${target:04X}')
 				i += 2
 				continue
 			
 			# For JSR/JMP, show target address
 			elif byte in [0x20, 0x4C] and i + 2 < len(code_bytes):
 				target = struct.unpack('<H', code_bytes[i+1:i+3])[0]
-				lines.append(f'{addr:06X}  {byte:02X} {code_bytes[i+1]:02X} {code_bytes[i+2]:02X}    {mnemonic} ${target:04X}')
+				lines.append(f'{addr:06X}  {byte:02X} {code_bytes[i+1]:02X} {code_bytes[i+2]:02X}	{mnemonic} ${target:04X}')
 				i += 3
 				continue
 			
 			# For immediate/absolute addressing
 			elif i + 1 < len(code_bytes):
-				lines.append(f'{addr:06X}  {byte:02X} {code_bytes[i+1]:02X}       {mnemonic}')
+				lines.append(f'{addr:06X}  {byte:02X} {code_bytes[i+1]:02X}	   {mnemonic}')
 				i += 2
 				continue
 		
 		# Unknown - just show hex
-		lines.append(f'{addr:06X}  {byte:02X}           ???')
+		lines.append(f'{addr:06X}  {byte:02X}		   ???')
 		i += 1
 	
 	return '\n'.join(lines)

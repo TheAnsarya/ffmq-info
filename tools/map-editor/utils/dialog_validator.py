@@ -291,7 +291,7 @@ class DialogValidator:
 		lines.append(f"Total Issues: {len(self.issues)}")
 		lines.append(f"  Errors:   {len(by_severity['error'])}")
 		lines.append(f"  Warnings: {len(by_severity['warning'])}")
-		lines.append(f"  Info:     {len(by_severity['info'])}")
+		lines.append(f"  Info:	 {len(by_severity['info'])}")
 		lines.append("")
 
 		# Issues by category

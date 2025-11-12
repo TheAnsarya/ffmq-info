@@ -66,19 +66,19 @@ UI_GRAPHICS = {
 
 # Default palettes for 2BPP and 4BPP graphics
 PALETTE_2BPP = [
-	(0, 0, 0, 0),        # Color 0: Transparent
+	(0, 0, 0, 0),		# Color 0: Transparent
 	(255, 255, 255, 255), # Color 1: White
 	(192, 192, 192, 255), # Color 2: Light gray
 	(128, 128, 128, 255), # Color 3: Dark gray
 ]
 
 PALETTE_4BPP = [
-	(0, 0, 0, 0),        # Color 0: Transparent
+	(0, 0, 0, 0),		# Color 0: Transparent
 	(255, 255, 255, 255), # Color 1: White
-	(0, 0, 0, 255),      # Color 2: Black
-	(255, 0, 0, 255),    # Color 3: Red
-	(0, 255, 0, 255),    # Color 4: Green
-	(0, 0, 255, 255),    # Color 5: Blue
+	(0, 0, 0, 255),	  # Color 2: Black
+	(255, 0, 0, 255),	# Color 3: Red
+	(0, 255, 0, 255),	# Color 4: Green
+	(0, 0, 255, 255),	# Color 5: Blue
 	(255, 255, 0, 255),  # Color 6: Yellow
 	(255, 0, 255, 255),  # Color 7: Magenta
 	(0, 255, 255, 255),  # Color 8: Cyan
@@ -146,7 +146,7 @@ class UIGraphicsExtractor:
 		
 		pixels = []
 		for row in range(8):
-			bp0 = tile_data[row]      # Bitplane 0
+			bp0 = tile_data[row]	  # Bitplane 0
 			bp1 = tile_data[row + 8]   # Bitplane 1
 			
 			for bit in range(7, -1, -1):  # Left to right

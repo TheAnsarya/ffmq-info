@@ -91,7 +91,7 @@ for i in range(83):
 					'xp_mult': l[1],
 					'gp_mult': l[2],
 					'resistances': resist,  # Store as integer, will decode later
-					'weaknesses': weak})    # Store as integer, will decode later
+					'weaknesses': weak})	# Store as integer, will decode later
 
 Path("data/extracted/enemies").mkdir(parents=True, exist_ok=True)
 

@@ -194,7 +194,7 @@ class ROMBuilder:
 		else:
 			print(f"❌ ROM hash mismatch!")
 			print(f"   Expected: {self.EXPECTED_ROM_HASH}")
-			print(f"   Got:      {rom_hash}")
+			print(f"   Got:	  {rom_hash}")
 			return False
 	
 	def update_cache(self) -> bool:
@@ -314,9 +314,9 @@ def main():
 		formatter_class=argparse.RawDescriptionHelpFormatter,
 		epilog="""
 Examples:
-  python build_rom.py              # Incremental build (build if needed)
-  python build_rom.py --force      # Force rebuild
-  python build_rom.py --clean      # Clean and rebuild
+  python build_rom.py			  # Incremental build (build if needed)
+  python build_rom.py --force	  # Force rebuild
+  python build_rom.py --clean	  # Clean and rebuild
   python build_rom.py --no-verify  # Skip ROM verification
 		"""
 	)

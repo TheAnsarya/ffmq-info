@@ -12,30 +12,30 @@ import struct
 
 # ROM addresses for music data
 MUSIC_TABLE_BASE = 0x0D8000  # Music track pointers
-SFX_TABLE_BASE = 0x0DA000    # Sound effect pointers
+SFX_TABLE_BASE = 0x0DA000	# Sound effect pointers
 SAMPLE_TABLE_BASE = 0x0DC000  # Sample/instrument data
-SPC_DATA_BASE = 0x0E0000     # SPC700 driver code
+SPC_DATA_BASE = 0x0E0000	 # SPC700 driver code
 
 
 class MusicType(Enum):
 	"""Types of music tracks"""
-	FIELD = 0      # Overworld/field music
-	BATTLE = 1     # Battle music
-	TOWN = 2       # Town music
-	DUNGEON = 3    # Dungeon music
-	BOSS = 4       # Boss battle music
-	EVENT = 5      # Event/cutscene music
-	FANFARE = 6    # Victory/fanfare
+	FIELD = 0	  # Overworld/field music
+	BATTLE = 1	 # Battle music
+	TOWN = 2	   # Town music
+	DUNGEON = 3	# Dungeon music
+	BOSS = 4	   # Boss battle music
+	EVENT = 5	  # Event/cutscene music
+	FANFARE = 6	# Victory/fanfare
 
 
 class SoundEffectType(Enum):
 	"""Types of sound effects"""
-	MENU = 0       # Menu sounds
-	ATTACK = 1     # Attack sounds
-	SPELL = 2      # Spell/magic sounds
-	ITEM = 3       # Item use sounds
+	MENU = 0	   # Menu sounds
+	ATTACK = 1	 # Attack sounds
+	SPELL = 2	  # Spell/magic sounds
+	ITEM = 3	   # Item use sounds
 	FOOTSTEP = 4   # Movement sounds
-	AMBIENT = 5    # Background/ambient sounds
+	AMBIENT = 5	# Background/ambient sounds
 
 
 @dataclass
@@ -47,9 +47,9 @@ class MusicTrack:
 	tempo: int = 120  # BPM
 	volume: int = 127  # 0-127
 	loop_start: int = 0  # Loop point in ticks
-	loop_end: int = 0    # Loop end point
+	loop_end: int = 0	# Loop end point
 	data_offset: int = 0  # ROM offset to track data
-	data_size: int = 0    # Size of track data in bytes
+	data_size: int = 0	# Size of track data in bytes
 	
 	# Channel settings
 	channels_used: int = 0xFF  # Bitmask of active channels (8 channels)
@@ -113,8 +113,8 @@ class SoundEffect:
 	sfx_type: SoundEffectType = SoundEffectType.MENU
 	priority: int = 64  # 0-127, higher = more important
 	volume: int = 127   # 0-127
-	pitch: int = 64     # 0-127, 64 = normal
-	pan: int = 64       # 0-127, 64 = center
+	pitch: int = 64	 # 0-127, 64 = normal
+	pan: int = 64	   # 0-127, 64 = center
 	data_offset: int = 0
 	data_size: int = 0
 	

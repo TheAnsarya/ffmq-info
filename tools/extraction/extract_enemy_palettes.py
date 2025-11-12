@@ -120,13 +120,13 @@ class EnemyPaletteExtractor:
 		"""Get descriptive name for color slot."""
 		names = [
 			'transparent',  # 0
-			'primary',      # 1
-			'secondary',    # 2
-			'shadow',       # 3
-			'dark',         # 4
-			'accent',       # 5
-			'highlight',    # 6
-			'outline'       # 7
+			'primary',	  # 1
+			'secondary',	# 2
+			'shadow',	   # 3
+			'dark',		 # 4
+			'accent',	   # 5
+			'highlight',	# 6
+			'outline'	   # 7
 		]
 		return names[index] if index < len(names) else f"color_{index}"
 

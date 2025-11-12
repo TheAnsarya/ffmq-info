@@ -69,9 +69,9 @@ class EnemyAttackNetworkVisualizer:
 		lines = []
 		lines.append('<?xml version="1.0" encoding="UTF-8"?>')
 		lines.append('<graphml xmlns="http://graphml.graphdrawing.org/xmlns"')
-		lines.append('         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"')
-		lines.append('         xsi:schemaLocation="http://graphml.graphdrawing.org/xmlns')
-		lines.append('         http://graphml.graphdrawing.org/xmlns/1.0/graphml.xsd">')
+		lines.append('		 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"')
+		lines.append('		 xsi:schemaLocation="http://graphml.graphdrawing.org/xmlns')
+		lines.append('		 http://graphml.graphdrawing.org/xmlns/1.0/graphml.xsd">')
 		lines.append('')
 		lines.append('  <!-- Node attributes -->')
 		lines.append('  <key id="type" for="node" attr.name="type" attr.type="string"/>')
@@ -83,35 +83,35 @@ class EnemyAttackNetworkVisualizer:
 		lines.append('')
 
 		# Add enemy nodes
-		lines.append('    <!-- Enemy nodes -->')
+		lines.append('	<!-- Enemy nodes -->')
 		for enemy_id, enemy in self.enemies.items():
 			enemy_name = enemy.get('enemy_name', f'Enemy_{enemy_id}')
 			hp = enemy.get('hp', 0)
-			lines.append(f'    <node id="enemy_{enemy_id}">')
-			lines.append(f'      <data key="type">enemy</data>')
-			lines.append(f'      <data key="name">{enemy_name}</data>')
-			lines.append(f'      <data key="hp">{hp}</data>')
-			lines.append(f'    </node>')
+			lines.append(f'	<node id="enemy_{enemy_id}">')
+			lines.append(f'	  <data key="type">enemy</data>')
+			lines.append(f'	  <data key="name">{enemy_name}</data>')
+			lines.append(f'	  <data key="hp">{hp}</data>')
+			lines.append(f'	</node>')
 		lines.append('')
 
 		# Add attack nodes
-		lines.append('    <!-- Attack nodes -->')
+		lines.append('	<!-- Attack nodes -->')
 		for attack_id, attack in self.attacks.items():
 			power = attack.get('power', 0)
-			lines.append(f'    <node id="attack_{attack_id}">')
-			lines.append(f'      <data key="type">attack</data>')
-			lines.append(f'      <data key="name">Attack_{attack_id}</data>')
-			lines.append(f'      <data key="power">{power}</data>')
-			lines.append(f'    </node>')
+			lines.append(f'	<node id="attack_{attack_id}">')
+			lines.append(f'	  <data key="type">attack</data>')
+			lines.append(f'	  <data key="name">Attack_{attack_id}</data>')
+			lines.append(f'	  <data key="power">{power}</data>')
+			lines.append(f'	</node>')
 		lines.append('')
 
 		# Add edges (enemy -> attack relationships)
-		lines.append('    <!-- Enemy-Attack edges -->')
+		lines.append('	<!-- Enemy-Attack edges -->')
 		edge_count = 0
 		for enemy_id in self.enemies.keys():
 			attacks = self.get_enemy_attacks(enemy_id)
 			for attack_id in attacks:
-				lines.append(f'    <edge id="e{edge_count}" source="enemy_{enemy_id}" target="attack_{attack_id}"/>')
+				lines.append(f'	<edge id="e{edge_count}" source="enemy_{enemy_id}" target="attack_{attack_id}"/>')
 				edge_count += 1
 
 		lines.append('')

@@ -15,8 +15,8 @@ from item_data import Item, ItemType, ItemFlags, EquipRestriction, ITEM_NAMES
 
 # ROM addresses for item data
 ITEM_DATA_BASE = 0x0F0000  # Base address for item data
-ITEM_COUNT = 256           # Total number of items
-ITEM_SIZE = 32             # Size of each item data block
+ITEM_COUNT = 256		   # Total number of items
+ITEM_SIZE = 32			 # Size of each item data block
 
 
 class ItemDatabase:

@@ -91,11 +91,11 @@ class RGB555Color:
 @dataclass
 class PaletteEntry:
 	"""Single palette entry from pointer table"""
-	index: int          # Entry index in table
-	address: int        # 24-bit ROM address (bank included)
-	bank: int          # SNES bank number ($09/$0a/$0b)
+	index: int		  # Entry index in table
+	address: int		# 24-bit ROM address (bank included)
+	bank: int		  # SNES bank number ($09/$0a/$0b)
 	color_count: int   # Number of colors (0 = full palette = 16)
-	flags: int         # Special flags ($00 standard, $03/$12 special)
+	flags: int		 # Special flags ($00 standard, $03/$12 special)
 	colors: List[RGB555Color]
 
 	@property
@@ -522,7 +522,7 @@ def main():
 	print(f"Total Colors: {sum(e.actual_color_count for e in entries)}")
 	print(f"\nOutput Directory: {output_base}/")
 	print(f"  - swatches/ : PNG color swatch images")
-	print(f"  - json/     : JSON palette data files")
+	print(f"  - json/	 : JSON palette data files")
 	print("\nUse these assets for:")
 	print("  - ROM hacking / modding")
 	print("  - Palette editors")

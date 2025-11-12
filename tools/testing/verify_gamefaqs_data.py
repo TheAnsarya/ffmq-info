@@ -155,10 +155,10 @@ def verify_enemy_data():
 	print()
 	print("=" * 80)
 	print(f"Results:")
-	print(f"  Matches:    {matches:3d} enemies")
+	print(f"  Matches:	{matches:3d} enemies")
 	print(f"  Mismatches: {mismatches:3d} enemies")
-	print(f"  Missing:    {missing:3d} enemies (not in GameFAQs reference)")
-	print(f"  Total:      {len(enemies):3d} enemies extracted")
+	print(f"  Missing:	{missing:3d} enemies (not in GameFAQs reference)")
+	print(f"  Total:	  {len(enemies):3d} enemies extracted")
 	print("=" * 80)
 
 	if mismatches == 0:

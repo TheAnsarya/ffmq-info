@@ -144,9 +144,9 @@ def print_verification_report(results: list[dict]):
 			print(f"  Mismatches: {len(result['mismatches'])}")
 			print("  First 5 mismatches:")
 			for i, mismatch in enumerate(result['mismatches'][:5]):
-				print(f"    [{i+1}] Offset {mismatch['offset']}")
-				print(f"        Original:    {mismatch['original']}")
-				print(f"        Regenerated: {mismatch['regenerated']}")
+				print(f"	[{i+1}] Offset {mismatch['offset']}")
+				print(f"		Original:	{mismatch['original']}")
+				print(f"		Regenerated: {mismatch['regenerated']}")
 		print()
 	
 	print("="*80)

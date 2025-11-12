@@ -188,9 +188,9 @@ def run_all_tests(category=None, verbose=False):
 			print_error(f"{status:8} {test['name']:40} {required}")
 
 	print()
-	print(f"Total Tests:    {total}")
-	print(f"Passed:         {passed_count}")
-	print(f"Failed:         {failed_count}")
+	print(f"Total Tests:	{total}")
+	print(f"Passed:		 {passed_count}")
+	print(f"Failed:		 {failed_count}")
 	print(f"Required Failed: {required_failed}")
 	print()
 
@@ -222,12 +222,12 @@ def main():
 Test Categories:
   pipeline  - End-to-end pipeline tests (extraction, conversion, modification)
   gamefaqs  - GameFAQs data verification (community validation)
-  build     - Build integration tests (ROM verification)
+  build	 - Build integration tests (ROM verification)
 
 Examples:
-  python tools/run_all_tests.py                    # Run all tests
+  python tools/run_all_tests.py					# Run all tests
   python tools/run_all_tests.py --category pipeline # Run pipeline tests only
-  python tools/run_all_tests.py --verbose          # Show full output
+  python tools/run_all_tests.py --verbose		  # Show full output
 		"""
 	)
 

@@ -428,11 +428,11 @@ class GraphicsExtractor:
 	@dataclass
 	class TilemapEntry:
 		"""SNES tilemap entry (16-bit word)."""
-		tile_id: int      # Bits 0-9: tile index (0-1023)
+		tile_id: int	  # Bits 0-9: tile index (0-1023)
 		palette_id: int   # Bits 10-12: palette select (0-7)
-		priority: int     # Bit 13: priority (0=low, 1=high)
-		flip_x: bool      # Bit 14: horizontal flip
-		flip_y: bool      # Bit 15: vertical flip
+		priority: int	 # Bit 13: priority (0=low, 1=high)
+		flip_x: bool	  # Bit 14: horizontal flip
+		flip_y: bool	  # Bit 15: vertical flip
 
 		@classmethod
 		def from_word(cls, word: int) -> 'GraphicsExtractor.TilemapEntry':
@@ -613,7 +613,7 @@ def main():
 	print("Extracting Graphics Tiles with Multiple Palettes...")
 	print("-" * 70)
 	print("NOTE: SNES sprites can use palettes 0-7 via OAM attributes.")
-	print("      Generating tile sheets with first 8 palettes for comparison.")
+	print("	  Generating tile sheets with first 8 palettes for comparison.")
 	print()
 
 	# Extract tiles with MULTIPLE palettes to show actual in-game appearance
@@ -660,7 +660,7 @@ def main():
 	comparison_path = TILES_DIR / "tile_palette_comparison.png"
 	comparison.save(comparison_path)
 	print(f"[OK] Saved palette comparison: {comparison_path.name}")
-	print(f"     This shows tiles 0-7 rendered with each of the 8 palettes.")
+	print(f"	 This shows tiles 0-7 rendered with each of the 8 palettes.")
 	print()
 
 	# Save individual tiles with default palette for backwards compatibility
@@ -681,16 +681,16 @@ def main():
 	print(f"Output directory: {OUTPUT_DIR}")
 	print(f"  - Palettes: {PALETTES_DIR} (16 palettes extracted)")
 	print(f"  - Tiles: {TILES_DIR}")
-	print(f"    • bank04_tiles_palette00-07_sheet.png (8 palette versions)")
-	print(f"    • tile_palette_comparison.png (side-by-side comparison)")
-	print(f"    • tile_4bpp_NNNN.png (individual tiles, palette 0)")
+	print(f"	• bank04_tiles_palette00-07_sheet.png (8 palette versions)")
+	print(f"	• tile_palette_comparison.png (side-by-side comparison)")
+	print(f"	• tile_4bpp_NNNN.png (individual tiles, palette 0)")
 	print(f"  - Sprites: {SPRITES_DIR} (for future sprite assembly)")
 	print()
 	print("How to Use Multi-Palette Output:")
 	print("  1. Compare tile sheets (palette00-07_sheet.png) with game screenshots")
 	print("  2. Identify which palette makes graphics look correct")
 	print("  3. For sprites: palette usually set via OAM attribute byte")
-	print("     - Example: $d2 attribute = palette 6, $9c = palette 3")
+	print("	 - Example: $d2 attribute = palette 6, $9c = palette 3")
 	print("  4. Use tile_palette_comparison.png to quickly see palette variations")
 	print()
 	print("Next steps:")

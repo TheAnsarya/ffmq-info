@@ -120,19 +120,19 @@ class FFMQROMConfig:
 			
 			# Get file size
 			size = os.path.getsize(filepath)
-			print(f"    Size: {size} bytes ({size / 1024:.1f} KB)")
+			print(f"	Size: {size} bytes ({size / 1024:.1f} KB)")
 			
 			# Try to identify the ROM
 			rom_id = self.identify_rom(filepath)
 			if rom_id:
-				print(f"    Identified as: {rom_id}")
-				print(f"    Notes: {self.known_roms[rom_id]['notes']}")
+				print(f"	Identified as: {rom_id}")
+				print(f"	Notes: {self.known_roms[rom_id]['notes']}")
 			else:
-				print("    Unknown ROM (calculating checksums...)")
+				print("	Unknown ROM (calculating checksums...)")
 				checksums = self.calculate_checksums(filepath)
-				print(f"    MD5: {checksums.get('md5', 'error')}")
-				print(f"    SHA1: {checksums.get('sha1', 'error')}")
-				print(f"    CRC32: {checksums.get('crc32', 'error')}")
+				print(f"	MD5: {checksums.get('md5', 'error')}")
+				print(f"	SHA1: {checksums.get('sha1', 'error')}")
+				print(f"	CRC32: {checksums.get('crc32', 'error')}")
 		
 		return True
 	

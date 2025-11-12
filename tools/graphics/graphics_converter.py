@@ -1,4 +1,4 @@
-﻿#!/usr/bin/env python3
+#!/usr/bin/env python3
 """
 FFMQ Graphics Converter
 Converts SNES 4bpp/8bpp tile data to PNG images

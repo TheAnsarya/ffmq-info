@@ -45,17 +45,17 @@ class FFMQPaletteExtractor:
 		# Main gameplay palettes
 		'character_palettes': {
 			'address': 0x07a000,  # Character sprite palettes
-			'count': 8,           # 8 different character palette sets
-			'colors_per': 16,     # 16 colors per palette
+			'count': 8,		   # 8 different character palette sets
+			'colors_per': 16,	 # 16 colors per palette
 		},
 		'enemy_palettes': {
 			'address': 0x07a100,  # Enemy sprite palettes
-			'count': 16,          # Multiple enemy palettes
+			'count': 16,		  # Multiple enemy palettes
 			'colors_per': 16,
 		},
 		'bg_palettes': {
 			'address': 0x07a300,  # Background tile palettes
-			'count': 8,           # Multiple BG palettes
+			'count': 8,		   # Multiple BG palettes
 			'colors_per': 16,
 		},
 		# Battle palettes
@@ -148,9 +148,9 @@ class FFMQPaletteExtractor:
 			self._save_palette_png(palettes, png_path)
 			
 			print(f"  ✓ Extracted {len(palettes)} palettes")
-			print(f"    Binary: {bin_path}")
-			print(f"    JSON:   {json_path}")
-			print(f"    Preview: {png_path}")
+			print(f"	Binary: {bin_path}")
+			print(f"	JSON:   {json_path}")
+			print(f"	Preview: {png_path}")
 		
 		return all_palettes
 	

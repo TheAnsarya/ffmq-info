@@ -252,24 +252,24 @@ def main():
 	
 	print(f"\n  HIGH confidence: {len(high)}")
 	for label, (new_name, reason, _) in sorted(high.items())[:10]:
-		print(f"    {label} -> {new_name}")
-		print(f"      {reason}")
+		print(f"	{label} -> {new_name}")
+		print(f"	  {reason}")
 	if len(high) > 10:
-		print(f"    ... and {len(high) - 10} more")
+		print(f"	... and {len(high) - 10} more")
 	
 	print(f"\n  MEDIUM confidence: {len(medium)}")
 	for label, (new_name, reason, _) in sorted(medium.items())[:10]:
-		print(f"    {label} -> {new_name}")
-		print(f"      {reason}")
+		print(f"	{label} -> {new_name}")
+		print(f"	  {reason}")
 	if len(medium) > 10:
-		print(f"    ... and {len(medium) - 10} more")
+		print(f"	... and {len(medium) - 10} more")
 	
 	print(f"\n  LOW confidence: {len(low)}")
 	for label, (new_name, reason, _) in sorted(low.items())[:10]:
-		print(f"    {label} -> {new_name}")
-		print(f"      {reason}")
+		print(f"	{label} -> {new_name}")
+		print(f"	  {reason}")
 	if len(low) > 10:
-		print(f"    ... and {len(low) - 10} more")
+		print(f"	... and {len(low) - 10} more")
 	
 	# Step 4: Apply renames
 	print("\n[4/5] Applying renames...")

@@ -187,7 +187,7 @@ class ROMIntegrityChecker:
 		hashes = self.calculate_hashes()
 
 		print(f"  SHA256: {hashes['sha256']}")
-		print(f"  MD5:    {hashes['md5']}")
+		print(f"  MD5:	{hashes['md5']}")
 		print(f"  SHA1:   {hashes['sha1']}")
 		print()
 
@@ -207,12 +207,12 @@ class ROMIntegrityChecker:
 		header = self.read_header_info()
 		if header:
 			print("ROM Header Information:")
-			print(f"  Title:       {header['title']}")
-			print(f"  Map Mode:    {header['map_mode_name']}")
-			print(f"  ROM Size:    {header['rom_size_kb']} KB")
+			print(f"  Title:	   {header['title']}")
+			print(f"  Map Mode:	{header['map_mode_name']}")
+			print(f"  ROM Size:	{header['rom_size_kb']} KB")
 			print(f"  SRAM Size:   {header['sram_size_kb']} KB")
-			print(f"  Country:     ${header['country']:02X}")
-			print(f"  Version:     1.{header['version']}")
+			print(f"  Country:	 ${header['country']:02X}")
+			print(f"  Version:	 1.{header['version']}")
 			print()
 
 		# Verify checksum

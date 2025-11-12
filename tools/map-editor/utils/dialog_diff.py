@@ -163,12 +163,12 @@ class DialogDiffer:
 		# Statistics
 		stats = self.get_statistics()
 		lines.append(f"Total Dialogs: {stats['total']}")
-		lines.append(f"  Added:    {stats['added']}")
+		lines.append(f"  Added:	{stats['added']}")
 		lines.append(f"  Removed:  {stats['removed']}")
 		lines.append(f"  Modified: {stats['modified']}")
 		lines.append(f"  Unchanged: {stats['unchanged']}")
 		lines.append("")
-		lines.append(f"Text Changes:     {stats['text_changed']}")
+		lines.append(f"Text Changes:	 {stats['text_changed']}")
 		lines.append(f"Metadata Changes: {stats['metadata_changed']}")
 		lines.append("")
 		
@@ -191,7 +191,7 @@ class DialogDiffer:
 			
 			for diff in by_type[ChangeType.ADDED]:
 				lines.append(f"\n[+] Dialog 0x{diff.dialog_id:04X}")
-				lines.append(f"    Text: {diff.new_dialog.text}")
+				lines.append(f"	Text: {diff.new_dialog.text}")
 		
 		# Removed dialogs
 		if by_type[ChangeType.REMOVED]:
@@ -202,7 +202,7 @@ class DialogDiffer:
 			
 			for diff in by_type[ChangeType.REMOVED]:
 				lines.append(f"\n[-] Dialog 0x{diff.dialog_id:04X}")
-				lines.append(f"    Text: {diff.old_dialog.text}")
+				lines.append(f"	Text: {diff.old_dialog.text}")
 		
 		# Modified dialogs
 		if by_type[ChangeType.MODIFIED]:
@@ -214,7 +214,7 @@ class DialogDiffer:
 			for diff in by_type[ChangeType.MODIFIED]:
 				lines.append(f"\n[M] Dialog 0x{diff.dialog_id:04X}")
 				for change in diff.changes:
-					lines.append(f"    • {change}")
+					lines.append(f"	• {change}")
 		
 		# Unchanged (optional)
 		if include_unchanged and by_type[ChangeType.UNCHANGED]:

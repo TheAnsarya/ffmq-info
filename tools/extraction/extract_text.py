@@ -66,12 +66,12 @@ class TextExtractor:
 	}
 	
 	# Text control codes
-	CTRL_END = 0x00      # End of string
+	CTRL_END = 0x00	  # End of string
 	CTRL_NEWLINE = 0x01  # Newline
-	CTRL_WAIT = 0x02     # Wait for button
-	CTRL_CLEAR = 0x03    # Clear dialog box
-	CTRL_NAME = 0x04     # Insert character name
-	CTRL_ITEM = 0x05     # Insert item name
+	CTRL_WAIT = 0x02	 # Wait for button
+	CTRL_CLEAR = 0x03	# Clear dialog box
+	CTRL_NAME = 0x04	 # Insert character name
+	CTRL_ITEM = 0x05	 # Insert item name
 	
 	def __init__(self, rom_path: str, tbl_path: Optional[str] = None):
 		"""Initialize with ROM and character table"""
@@ -498,9 +498,9 @@ class TextExtractor:
 			f.write(" Final Fantasy Mystic Quest - Text Statistics\n")
 			f.write("="*80 + "\n\n")
 			
-			f.write(f"Total Strings:     {stats['total_strings']:,}\n")
-			f.write(f"Total Bytes:       {stats['total_bytes']:,}\n")
-			f.write(f"Total Tables:      {len(stats['tables'])}\n")
+			f.write(f"Total Strings:	 {stats['total_strings']:,}\n")
+			f.write(f"Total Bytes:	   {stats['total_bytes']:,}\n")
+			f.write(f"Total Tables:	  {len(stats['tables'])}\n")
 			f.write("\n")
 			
 			f.write("Control Code Usage:\n")
@@ -513,7 +513,7 @@ class TextExtractor:
 			f.write("-"*80 + "\n")
 			for table_name, table_stats in stats['tables'].items():
 				f.write(f"\n{table_name}:\n")
-				f.write(f"  Count:      {table_stats['count']:4d}\n")
+				f.write(f"  Count:	  {table_stats['count']:4d}\n")
 				f.write(f"  Total size: {table_stats['total_length']:6d} bytes\n")
 				f.write(f"  Avg length: {table_stats['avg_length']:6.1f} bytes\n")
 				f.write(f"  Min length: {table_stats['min_length']:4d} bytes\n")
@@ -531,9 +531,9 @@ def main():
 		print("Usage: extract_text.py <rom_file> <output_dir> [options]")
 		print("\nExtracts all text and dialog from FFMQ ROM")
 		print("\nOptions:")
-		print("  --tbl <file>      Character table file (default: simple.tbl)")
-		print("  --format <fmt>    Output formats: txt,asm,json,csv,po,all (default: all)")
-		print("  --stats           Generate statistics report")
+		print("  --tbl <file>	  Character table file (default: simple.tbl)")
+		print("  --format <fmt>	Output formats: txt,asm,json,csv,po,all (default: all)")
+		print("  --stats		   Generate statistics report")
 		print("\nOutputs:")
 		print("  - Text files (.txt) - Human-readable format")
 		print("  - Assembly files (.asm) - Re-assemblable source")

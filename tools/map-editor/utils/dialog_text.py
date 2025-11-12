@@ -14,87 +14,87 @@ import struct
 class ControlCode(IntEnum):
 	"""FFMQ text control codes - comprehensive mapping from ROM analysis"""
 	# Basic text control (confirmed from analysis)
-	END = 0x00          # End of string (required) - 116 uses
-	NEWLINE = 0x01      # Line break - 70 uses
-	WAIT = 0x02         # Wait for button press - 17 uses
-	ASTERISK = 0x03     # Display asterisk or special marker - 15 uses
-	NAME = 0x04         # Insert character name - 7 uses
-	ITEM = 0x05         # Insert item name - 150 uses (most common!)
-	SPACE = 0x06        # Space character - 16 uses
+	END = 0x00		  # End of string (required) - 116 uses
+	NEWLINE = 0x01	  # Line break - 70 uses
+	WAIT = 0x02		 # Wait for button press - 17 uses
+	ASTERISK = 0x03	 # Display asterisk or special marker - 15 uses
+	NAME = 0x04		 # Insert character name - 7 uses
+	ITEM = 0x05		 # Insert item name - 150 uses (most common!)
+	SPACE = 0x06		# Space character - 16 uses
 
 	# Text speed/timing (speculative, need verification)
 	SPEED_SLOW = 0x07   # Slow text speed - 18 uses
 	SPEED_NORM = 0x08   # Normal text speed - 55 uses
 	SPEED_FAST = 0x09   # Fast text speed - 14 uses
-	DELAY = 0x0A        # Delay with parameter (multi-byte) - 36 uses
+	DELAY = 0x0A		# Delay with parameter (multi-byte) - 36 uses
 
 	# Unknown basic commands (need investigation)
-	UNK_0B = 0x0B       # Unknown - 7 uses
-	UNK_0C = 0x0C       # Unknown (NOT green text!) - 10 uses
-	UNK_0D = 0x0D       # Unknown, possibly SET_FLAG - 17 uses
-	UNK_0E = 0x0E       # Unknown - 9 uses
-	UNK_0F = 0x0F       # Unknown - 10 uses
+	UNK_0B = 0x0B	   # Unknown - 7 uses
+	UNK_0C = 0x0C	   # Unknown (NOT green text!) - 10 uses
+	UNK_0D = 0x0D	   # Unknown, possibly SET_FLAG - 17 uses
+	UNK_0E = 0x0E	   # Unknown - 9 uses
+	UNK_0F = 0x0F	   # Unknown - 10 uses
 
 	# Event parameters (appear in dialogs with event triggers)
-	PARAM_10 = 0x10     # Event parameter - 25 uses
-	PARAM_11 = 0x11     # Event parameter - 14 uses
-	PARAM_12 = 0x12     # Event parameter - 11 uses
-	PARAM_13 = 0x13     # Event parameter - 7 uses
-	PARAM_14 = 0x14     # Multi-byte parameter (usually 0x91) - 26 uses
-	PARAM_15 = 0x15     # Event parameter - 6 uses
-	PARAM_16 = 0x16     # Event parameter - 12 uses
+	PARAM_10 = 0x10	 # Event parameter - 25 uses
+	PARAM_11 = 0x11	 # Event parameter - 14 uses
+	PARAM_12 = 0x12	 # Event parameter - 11 uses
+	PARAM_13 = 0x13	 # Event parameter - 7 uses
+	PARAM_14 = 0x14	 # Multi-byte parameter (usually 0x91) - 26 uses
+	PARAM_15 = 0x15	 # Event parameter - 6 uses
+	PARAM_16 = 0x16	 # Event parameter - 12 uses
 
 	# Dialog box positioning (confirmed from DataCrystal)
 	TEXTBOX_BELOW = 0x1A  # Position dialog box below - 29 uses
 	TEXTBOX_ABOVE = 0x1B  # Position dialog box above - 4 uses
-	PARAM_1C = 0x1C     # Unknown parameter - 1 use
-	PARAM_1D = 0x1D     # Event parameter (often followed by 0x00) - 6 uses
-	PARAM_1E = 0x1E     # Event parameter - 5 uses
-	CRYSTAL = 0x1F      # Crystal-related event - 11 uses
+	PARAM_1C = 0x1C	 # Unknown parameter - 1 use
+	PARAM_1D = 0x1D	 # Event parameter (often followed by 0x00) - 6 uses
+	PARAM_1E = 0x1E	 # Event parameter - 5 uses
+	CRYSTAL = 0x1F	  # Crystal-related event - 11 uses
 
 	# More event parameters
-	PARAM_20 = 0x20     # Event parameter - 15 uses
-	PARAM_21 = 0x21     # Event parameter - 8 uses
-	PARAM_22 = 0x22     # Event parameter - 4 uses
-	CLEAR = 0x23        # Clear dialog box - 14 uses
-	PARAM_24 = 0x24     # Event parameter - 11 uses
-	PARAM_25 = 0x25     # Event parameter - 8 uses
-	PARAM_26 = 0x26     # Event parameter - 3 uses
-	PARAM_27 = 0x27     # Event parameter - 7 uses
-	PARAM_28 = 0x28     # Event parameter - 2 uses
-	PARAM_29 = 0x29     # Event parameter - 2 uses
-	PARAM_2A = 0x2A     # Event parameter - 19 uses
-	PARAM_2B = 0x2B     # Event parameter - 14 uses
-	PARAM_2C = 0x2C     # Event parameter - 22 uses
+	PARAM_20 = 0x20	 # Event parameter - 15 uses
+	PARAM_21 = 0x21	 # Event parameter - 8 uses
+	PARAM_22 = 0x22	 # Event parameter - 4 uses
+	CLEAR = 0x23		# Clear dialog box - 14 uses
+	PARAM_24 = 0x24	 # Event parameter - 11 uses
+	PARAM_25 = 0x25	 # Event parameter - 8 uses
+	PARAM_26 = 0x26	 # Event parameter - 3 uses
+	PARAM_27 = 0x27	 # Event parameter - 7 uses
+	PARAM_28 = 0x28	 # Event parameter - 2 uses
+	PARAM_29 = 0x29	 # Event parameter - 2 uses
+	PARAM_2A = 0x2A	 # Event parameter - 19 uses
+	PARAM_2B = 0x2B	 # Event parameter - 14 uses
+	PARAM_2C = 0x2C	 # Event parameter - 22 uses
 
 	# Dialog control
-	PARA = 0x30         # Paragraph break - 44 uses
-	PARAM_31 = 0x31     # Event parameter - 3 uses
-	PARAM_32 = 0x32     # Event parameter - 6 uses
-	PARAM_33 = 0x33     # Event parameter - 2 uses
-	PARAM_34 = 0x34     # Event parameter - 1 use
-	PARAM_35 = 0x35     # Event parameter - 3 uses
-	PAGE = 0x36         # New page/dialog box - 29 uses
-	PARAM_37 = 0x37     # Event parameter - 2 uses
-	PARAM_38 = 0x38     # Event parameter - 4 uses
-	PARAM_3A = 0x3A     # Event parameter - 1 use
-	PARAM_3B = 0x3B     # Event parameter - 4 uses
+	PARA = 0x30		 # Paragraph break - 44 uses
+	PARAM_31 = 0x31	 # Event parameter - 3 uses
+	PARAM_32 = 0x32	 # Event parameter - 6 uses
+	PARAM_33 = 0x33	 # Event parameter - 2 uses
+	PARAM_34 = 0x34	 # Event parameter - 1 use
+	PARAM_35 = 0x35	 # Event parameter - 3 uses
+	PAGE = 0x36		 # New page/dialog box - 29 uses
+	PARAM_37 = 0x37	 # Event parameter - 2 uses
+	PARAM_38 = 0x38	 # Event parameter - 4 uses
+	PARAM_3A = 0x3A	 # Event parameter - 1 use
+	PARAM_3B = 0x3B	 # Event parameter - 4 uses
 
 	# Extended control codes (0x80-0x8F) - multi-byte commands
-	EXT_80 = 0x80       # Extended command with param - 5 uses
-	EXT_81 = 0x81       # Extended command with param - 7 uses
-	EXT_82 = 0x82       # Extended command with param - 4 uses
-	EXT_83 = 0x83       # Extended command with param - 2 uses
-	EXT_84 = 0x84       # Extended command with param - 1 use
-	EXT_85 = 0x85       # Extended command with param - 3 uses
-	EXT_86 = 0x86       # Extended command with param - 1 use
-	EXT_88 = 0x88       # Extended command (usually followed by 0x10) - 6 uses
-	EXT_89 = 0x89       # Extended command with param - 3 uses
-	EXT_8A = 0x8A       # Extended command with param - 1 use
-	EXT_8B = 0x8B       # Extended command (usually followed by 0x05) - 5 uses
-	EXT_8D = 0x8D       # Extended command with param - 6 uses
-	EXT_8E = 0x8E       # Extended command (usually followed by 0x14) - 17 uses
-	EXT_8F = 0x8F       # Extended command (usually followed by 0x30) - 16 uses
+	EXT_80 = 0x80	   # Extended command with param - 5 uses
+	EXT_81 = 0x81	   # Extended command with param - 7 uses
+	EXT_82 = 0x82	   # Extended command with param - 4 uses
+	EXT_83 = 0x83	   # Extended command with param - 2 uses
+	EXT_84 = 0x84	   # Extended command with param - 1 use
+	EXT_85 = 0x85	   # Extended command with param - 3 uses
+	EXT_86 = 0x86	   # Extended command with param - 1 use
+	EXT_88 = 0x88	   # Extended command (usually followed by 0x10) - 6 uses
+	EXT_89 = 0x89	   # Extended command with param - 3 uses
+	EXT_8A = 0x8A	   # Extended command with param - 1 use
+	EXT_8B = 0x8B	   # Extended command (usually followed by 0x05) - 5 uses
+	EXT_8D = 0x8D	   # Extended command with param - 6 uses
+	EXT_8E = 0x8E	   # Extended command (usually followed by 0x14) - 17 uses
+	EXT_8F = 0x8F	   # Extended command (usually followed by 0x30) - 16 uses
 
 
 # Control code display names for UI (comprehensive mapping)
@@ -190,12 +190,12 @@ CONTROL_STRINGS = {v: k for k, v in CONTROL_NAMES.items()}
 @dataclass
 class DialogMetrics:
 	"""Metrics for a dialog string"""
-	byte_count: int              # Total bytes (including control codes)
-	char_count: int              # Visible characters only
-	line_count: int              # Number of lines
-	estimated_time: float        # Estimated display time in seconds
+	byte_count: int			  # Total bytes (including control codes)
+	char_count: int			  # Visible characters only
+	line_count: int			  # Number of lines
+	estimated_time: float		# Estimated display time in seconds
 	control_codes: Dict[str, int]  # Count of each control code used
-	max_line_length: int         # Longest line in characters
+	max_line_length: int		 # Longest line in characters
 	warnings: List[str] = field(default_factory=list)  # Validation warnings
 
 	def __str__(self) -> str:
@@ -421,9 +421,9 @@ class DialogText:
 	"""Handles FFMQ dialog text encoding and decoding"""
 
 	# Dialog limits
-	MAX_DIALOG_LENGTH = 512      # Maximum bytes per dialog
-	MAX_LINE_LENGTH = 32         # Maximum characters per line (approximate)
-	CHARS_PER_SECOND = 8.0       # Average text display speed
+	MAX_DIALOG_LENGTH = 512	  # Maximum bytes per dialog
+	MAX_LINE_LENGTH = 32		 # Maximum characters per line (approximate)
+	CHARS_PER_SECOND = 8.0	   # Average text display speed
 
 	def __init__(self, char_table: Optional[CharacterTable] = None):
 		"""
@@ -824,7 +824,7 @@ if __name__ == '__main__':
 	if metrics.warnings:
 		print("  Warnings:")
 		for warning in metrics.warnings:
-			print(f"    - {warning}")
+			print(f"	- {warning}")
 	print()
 
 	# Validate

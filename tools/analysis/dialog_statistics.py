@@ -67,12 +67,12 @@ def analyze_dialog_sizes(rom_path):
 	max_size = max(sizes)
 	median_size = sorted(sizes)[len(sizes) // 2]
 	
-	print(f"Total Dialogs:    {len(sizes)}")
-	print(f"Total Size:       {total_size:,} bytes ({total_size/1024:.1f} KB)")
-	print(f"Average Size:     {avg_size:.1f} bytes")
-	print(f"Median Size:      {median_size} bytes")
-	print(f"Min Size:         {min_size} bytes (Dialog #{sizes.index(min_size)})")
-	print(f"Max Size:         {max_size} bytes (Dialog #{sizes.index(max_size)})")
+	print(f"Total Dialogs:	{len(sizes)}")
+	print(f"Total Size:	   {total_size:,} bytes ({total_size/1024:.1f} KB)")
+	print(f"Average Size:	 {avg_size:.1f} bytes")
+	print(f"Median Size:	  {median_size} bytes")
+	print(f"Min Size:		 {min_size} bytes (Dialog #{sizes.index(min_size)})")
+	print(f"Max Size:		 {max_size} bytes (Dialog #{sizes.index(max_size)})")
 	
 	# Size distribution
 	print("\nSize Distribution:")

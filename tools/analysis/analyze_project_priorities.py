@@ -1,4 +1,4 @@
-﻿#!/usr/bin/env python3
+#!/usr/bin/env python3
 """
 FFMQ Project Analysis and Work Plan Generator
 Analyze current project state and identify priority work items

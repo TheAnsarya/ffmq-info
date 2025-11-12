@@ -133,13 +133,13 @@ class ROMComparator:
 			self.built_data = bytearray(f.read())
 			
 		print(f"Loaded original ROM: {len(self.original_data)} bytes")
-		print(f"Loaded built ROM:    {len(self.built_data)} bytes")
+		print(f"Loaded built ROM:	{len(self.built_data)} bytes")
 		
 		# Check size mismatch
 		if len(self.original_data) != len(self.built_data):
 			print(f"\nWARNING: ROM sizes differ!")
 			print(f"  Original: {len(self.original_data)} bytes")
-			print(f"  Built:    {len(self.built_data)} bytes")
+			print(f"  Built:	{len(self.built_data)} bytes")
 			print(f"  Difference: {abs(len(self.original_data) - len(self.built_data))} bytes")
 			
 		return True
@@ -252,12 +252,12 @@ class ROMComparator:
 			f.write("=" * 80 + "\n\n")
 			
 			f.write(f"Original ROM: {self.original_path}\n")
-			f.write(f"Built ROM:    {self.built_path}\n\n")
+			f.write(f"Built ROM:	{self.built_path}\n\n")
 			
 			# Overall stats
 			f.write("Overall Statistics:\n")
 			f.write("-" * 80 + "\n")
-			f.write(f"Total Bytes:      {self.stats['total_bytes']:>10,}\n")
+			f.write(f"Total Bytes:	  {self.stats['total_bytes']:>10,}\n")
 			f.write(f"Matching Bytes:   {self.stats['matching_bytes']:>10,}\n")
 			f.write(f"Differing Bytes:  {self.stats['differing_bytes']:>10,}\n")
 			f.write(f"Match Percentage: {self.stats['match_percentage']:>10.2f}%\n\n")
@@ -517,7 +517,7 @@ def main():
 	print(f"Match Percentage: {stats['match_percentage']:.2f}%")
 	print(f"Matching Bytes:   {stats['matching_bytes']:,} / {stats['total_bytes']:,}")
 	print(f"Differing Bytes:  {stats['differing_bytes']:,}")
-	print(f"Diff Blocks:      {len(comparator.diff_blocks)}")
+	print(f"Diff Blocks:	  {len(comparator.diff_blocks)}")
 	
 	print(f"\n{'=' * 80}")
 	print("Generating reports...")

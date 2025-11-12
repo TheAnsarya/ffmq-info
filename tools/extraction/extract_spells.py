@@ -84,7 +84,7 @@ class SpellExtractor:
 	SPELL_TYPES = {
 		0: 'White', 1: 'White', 2: 'White', 3: 'White',  # 0-3: White Magic
 		4: 'Black', 5: 'Black', 6: 'Black', 7: 'Black',  # 4-7: Black Magic
-		8: 'Wizard', 9: 'Wizard', 10: 'Wizard',          # 8-10: Wizard Magic
+		8: 'Wizard', 9: 'Wizard', 10: 'Wizard',		  # 8-10: Wizard Magic
 	}
 
 	def __init__(self, rom_path: str):
@@ -130,12 +130,12 @@ class SpellExtractor:
 
 		# Parse spell data structure (found via ROM scanning and user feedback)
 		# Offset  Size  Field
-		# +$00    1     Base power (verified correct)
-		# +$01    1     Unknown - possibly level/tier requirement (values 1-20)
-		# +$02    1     Unknown - NOT element (verified incorrect by testing)
-		# +$03    1     Enemy type flags - "strong against" bitfield
-		# +$04    1     Enemy type flags - possibly target type or range
-		# +$05    1     Enemy type flags - possibly "weak against" or secondary flags
+		# +$00	1	 Base power (verified correct)
+		# +$01	1	 Unknown - possibly level/tier requirement (values 1-20)
+		# +$02	1	 Unknown - NOT element (verified incorrect by testing)
+		# +$03	1	 Enemy type flags - "strong against" bitfield
+		# +$04	1	 Enemy type flags - possibly target type or range
+		# +$05	1	 Enemy type flags - possibly "weak against" or secondary flags
 
 		byte3_raw = self.read_byte(base_addr + 3)
 		byte4_raw = self.read_byte(base_addr + 4)
@@ -152,7 +152,7 @@ class SpellExtractor:
 			'byte4': byte4_raw,
 			'byte5': byte5_raw,
 			'strong_against': self.decode_enemy_type_flags(byte3_raw),  # Decoded enemy type flags
-			'target_type': self.decode_enemy_type_flags(byte4_raw),     # Decoded target/range flags
+			'target_type': self.decode_enemy_type_flags(byte4_raw),	 # Decoded target/range flags
 			'special_flags': self.decode_enemy_type_flags(byte5_raw),   # Decoded special/weak flags
 			'address': f"${base_addr:06X}"
 		}
@@ -298,7 +298,7 @@ def main():
 		print("Usage: extract_spells.py <rom_file> <output_dir> [--format json,csv]")
 		print("\nExtracts spell data from FFMQ ROM")
 		print("\nOptions:")
-		print("  --format <fmt>    Output formats: json,csv,all (default: all)")
+		print("  --format <fmt>	Output formats: json,csv,all (default: all)")
 		print("\nNote: Spell data addresses are approximate and need verification")
 		sys.exit(1)
 

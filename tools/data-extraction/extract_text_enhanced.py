@@ -150,22 +150,22 @@ class FFMQTextExtractorEnhanced:
 		table[0x5E] = '~'
 
 		# FFMQ-specific control codes
-		table[0xF0] = '[CHOICE]'      # Dialogue choice
-		table[0xF1] = '[PLAYER]'      # Player name
-		table[0xF2] = '[NUMBER]'      # Number display
-		table[0xF3] = '[ITEM]'        # Item name
-		table[0xF4] = '[SPELL]'       # Spell name
-		table[0xF5] = '[ENEMY]'       # Enemy name
-		table[0xF6] = '[PAUSE]'       # Pause for input
-		table[0xF7] = '[WAIT]'        # Wait/delay
-		table[0xF8] = '[SPEED]'       # Text speed change
-		table[0xF9] = '[COLOR]'       # Color change
-		table[0xFA] = '[PORTRAIT]'    # Character portrait
-		table[0xFB] = '[WINDOW]'      # Window control
-		table[0xFC] = '[CLEAR]'       # Clear text
-		table[0xFD] = '[PAGE]'        # Page break
-		table[0xFE] = '[NEWLINE]'     # Line break
-		table[0xFF] = '[END]'         # End of string
+		table[0xF0] = '[CHOICE]'	  # Dialogue choice
+		table[0xF1] = '[PLAYER]'	  # Player name
+		table[0xF2] = '[NUMBER]'	  # Number display
+		table[0xF3] = '[ITEM]'		# Item name
+		table[0xF4] = '[SPELL]'	   # Spell name
+		table[0xF5] = '[ENEMY]'	   # Enemy name
+		table[0xF6] = '[PAUSE]'	   # Pause for input
+		table[0xF7] = '[WAIT]'		# Wait/delay
+		table[0xF8] = '[SPEED]'	   # Text speed change
+		table[0xF9] = '[COLOR]'	   # Color change
+		table[0xFA] = '[PORTRAIT]'	# Character portrait
+		table[0xFB] = '[WINDOW]'	  # Window control
+		table[0xFC] = '[CLEAR]'	   # Clear text
+		table[0xFD] = '[PAGE]'		# Page break
+		table[0xFE] = '[NEWLINE]'	 # Line break
+		table[0xFF] = '[END]'		 # End of string
 
 		return table
 

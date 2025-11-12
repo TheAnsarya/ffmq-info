@@ -345,7 +345,7 @@ class ROMValidator:
 		print(f"Total Issues: {len(self.issues)}")
 		print(f"  Errors:   {len(errors)}")
 		print(f"  Warnings: {len(warnings)}")
-		print(f"  Info:     {len(info)}")
+		print(f"  Info:	 {len(info)}")
 		print()
 		
 		# Print errors
@@ -416,7 +416,7 @@ class ROMValidator:
 			f.write(f"Total Issues: {len(self.issues)}\n")
 			f.write(f"  Errors:   {len(errors)}\n")
 			f.write(f"  Warnings: {len(warnings)}\n")
-			f.write(f"  Info:     {len(info)}\n\n")
+			f.write(f"  Info:	 {len(info)}\n\n")
 			
 			# All issues
 			for issue in self.issues:

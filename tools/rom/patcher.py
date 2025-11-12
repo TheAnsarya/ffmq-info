@@ -13,9 +13,9 @@ import json
 
 class PatchFormat(Enum):
 	"""Patch file formats"""
-	IPS = "ips"    # International Patching System
-	UPS = "ups"    # Universal Patching System
-	BPS = "bps"    # Beat Patching System
+	IPS = "ips"	# International Patching System
+	UPS = "ups"	# Universal Patching System
+	BPS = "bps"	# Beat Patching System
 	CUSTOM = "custom"
 
 

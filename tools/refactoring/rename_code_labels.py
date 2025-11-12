@@ -302,11 +302,11 @@ def main():
 	
 	print("\n" + "=" * 80)
 	print("Analysis complete!\n")
-	print(f"Total labels found:     {renamer.stats['total_labels']}")
-	print(f"Labels to rename:       {renamer.stats['renamed']}")
-	print(f"  - Functions:          {renamer.stats['functions']}")
-	print(f"  - Loop labels:        {renamer.stats['loop_labels']}")
-	print(f"  - Branch targets:     {renamer.stats['branch_targets']}")
+	print(f"Total labels found:	 {renamer.stats['total_labels']}")
+	print(f"Labels to rename:	   {renamer.stats['renamed']}")
+	print(f"  - Functions:		  {renamer.stats['functions']}")
+	print(f"  - Loop labels:		{renamer.stats['loop_labels']}")
+	print(f"  - Branch targets:	 {renamer.stats['branch_targets']}")
 	print("=" * 80)
 	
 	# Save rename map

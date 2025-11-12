@@ -13,11 +13,11 @@ import json
 class CompressionType(Enum):
 	"""Compression algorithm types"""
 	NONE = 0
-	RLE = 1          # Run-Length Encoding
-	LZSS = 2         # Lempel-Ziv-Storer-Szymanski
-	LZ77 = 3         # LZ77 variant
-	HUFFMAN = 4      # Huffman coding
-	DELTA = 5        # Delta encoding
+	RLE = 1		  # Run-Length Encoding
+	LZSS = 2		 # Lempel-Ziv-Storer-Szymanski
+	LZ77 = 3		 # LZ77 variant
+	HUFFMAN = 4	  # Huffman coding
+	DELTA = 5		# Delta encoding
 	BIT_PACKING = 6  # Bit-level packing
 
 

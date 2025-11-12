@@ -183,7 +183,7 @@ class FFMQTextTool:
 		print(f"{'='*80}")
 		print(f"✅ Passed: {passed}")
 		print(f"❌ Failed: {failed}")
-		print(f"Total:    {passed + failed}")
+		print(f"Total:	{passed + failed}")
 		print(f"Success:  {passed * 100 / (passed + failed):.1f}%")
 		
 		return failed == 0
@@ -215,16 +215,16 @@ class FFMQTextTool:
 		compression_ratio = total_compressed_length / total_text_length if total_text_length > 0 else 0
 		
 		print("Dialog Statistics:")
-		print(f"  Total dialogs:        117")
-		print(f"  Total text length:    {total_text_length:,} characters")
-		print(f"  Total compressed:     {total_compressed_length:,} bytes")
-		print(f"  Compression ratio:    {compression_ratio:.2f} ({compression_ratio * 100:.1f}%)")
-		print(f"  Space saved:          {total_text_length - total_compressed_length:,} bytes")
+		print(f"  Total dialogs:		117")
+		print(f"  Total text length:	{total_text_length:,} characters")
+		print(f"  Total compressed:	 {total_compressed_length:,} bytes")
+		print(f"  Compression ratio:	{compression_ratio:.2f} ({compression_ratio * 100:.1f}%)")
+		print(f"  Space saved:		  {total_text_length - total_compressed_length:,} bytes")
 		
 		# Analyze dictionary
 		print(f"\nDictionary Statistics:")
 		print(f"  Dictionary entries:   80")
-		print(f"  Entry range:          0x30-0x7F")
+		print(f"  Entry range:		  0x30-0x7F")
 		
 		# Count dictionary usage
 		dict_usage = {i: 0 for i in range(0x30, 0x80)}
@@ -238,7 +238,7 @@ class FFMQTextTool:
 		print(f"\n  Most used dictionary entries:")
 		for byte_val, count in most_used:
 			entry_text = extractor.dictionary.get(byte_val, '???')[:20]
-			print(f"    0x{byte_val:02X} ({count:4}×): {entry_text}")
+			print(f"	0x{byte_val:02X} ({count:4}×): {entry_text}")
 		
 		return True
 	
@@ -290,22 +290,22 @@ def main():
 		epilog="""
 Examples:
   Extract all dialogs to JSON:
-    python ffmq_text_tool.py extract-complex roms/ffmq.sfc data/dialogs.json
+	python ffmq_text_tool.py extract-complex roms/ffmq.sfc data/dialogs.json
 
   Extract dialogs to TSV (spreadsheet-friendly):
-    python ffmq_text_tool.py extract-complex roms/ffmq.sfc data/dialogs.tsv --format tsv
+	python ffmq_text_tool.py extract-complex roms/ffmq.sfc data/dialogs.tsv --format tsv
 
   Insert modified dialogs:
-    python ffmq_text_tool.py insert-complex roms/ffmq.sfc data/dialogs_edited.json roms/ffmq_modified.sfc
+	python ffmq_text_tool.py insert-complex roms/ffmq.sfc data/dialogs_edited.json roms/ffmq_modified.sfc
 
   Validate text integrity:
-    python ffmq_text_tool.py validate roms/ffmq.sfc data/dialogs.json
+	python ffmq_text_tool.py validate roms/ffmq.sfc data/dialogs.json
 
   Analyze ROM text:
-    python ffmq_text_tool.py analyze roms/ffmq.sfc
+	python ffmq_text_tool.py analyze roms/ffmq.sfc
 
   Batch processing:
-    python ffmq_text_tool.py batch scripts/text_operations.txt
+	python ffmq_text_tool.py batch scripts/text_operations.txt
 		"""
 	)
 	

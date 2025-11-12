@@ -218,15 +218,15 @@ class ProjectStatusDashboard:
 		report.append("")
 		report.append(" Statistics:")
 		report.append(f"   JSON files:   {data_status['stats']['json_files']}")
-		report.append(f"   CSV files:    {data_status['stats']['csv_files']}")
-		report.append(f"   Schemas:      {data_status['stats']['schemas']}")
+		report.append(f"   CSV files:	{data_status['stats']['csv_files']}")
+		report.append(f"   Schemas:	  {data_status['stats']['schemas']}")
 		report.append("")
 
 		# Graphics Extraction Status
 		report.append("🎨 GRAPHICS EXTRACTION")
 		report.append("-" * 80)
 		graphics_status = self.scan_graphics_extraction()
-		report.append(f" Palettes:     {graphics_status['palettes']} JSON files")
+		report.append(f" Palettes:	 {graphics_status['palettes']} JSON files")
 		report.append(f" PNG graphics: {graphics_status['png_files']} files")
 		report.append("")
 
@@ -235,14 +235,14 @@ class ProjectStatusDashboard:
 		report.append("-" * 80)
 		doc_status = self.scan_documentation()
 		report.append(f" Markdown docs: {doc_status['md_files']}")
-		report.append(f" Total size:    {doc_status['size_kb']:.1f} KB")
+		report.append(f" Total size:	{doc_status['size_kb']:.1f} KB")
 		report.append("")
 
 		# Tools Status
 		report.append("🔧 TOOLS")
 		report.append("-" * 80)
 		tools_status = self.scan_tools()
-		report.append(f" Python tools:     {tools_status['python_tools']}")
+		report.append(f" Python tools:	 {tools_status['python_tools']}")
 		report.append(f" PowerShell tools: {tools_status['powershell_tools']}")
 		report.append(f" Extraction tools: {tools_status['extraction_tools']}")
 		report.append("")
@@ -251,8 +251,8 @@ class ProjectStatusDashboard:
 		report.append("💻 ASSEMBLY SOURCE")
 		report.append("-" * 80)
 		asm_status = self.scan_assembly_files()
-		report.append(f" ASM files:        {asm_status['total_asm_files']}")
-		report.append(f" Total lines:      {asm_status['total_lines']:,}")
+		report.append(f" ASM files:		{asm_status['total_asm_files']}")
+		report.append(f" Total lines:	  {asm_status['total_lines']:,}")
 		report.append(f" Banks documented: {asm_status['banks_documented']}")
 		report.append("")
 
@@ -263,9 +263,9 @@ class ProjectStatusDashboard:
 		can_build_icon = "✅" if build_status['can_build'] else "❌"
 		rom_exists_icon = "✅" if build_status['rom_exists'] else "❌"
 		report.append(f" {can_build_icon} Build system: {', '.join(build_status['build_scripts']) if build_status['build_scripts'] else 'Not available'}")
-		report.append(f" {rom_exists_icon} Built ROM:    {'Available' if build_status['rom_exists'] else 'Not found'}")
+		report.append(f" {rom_exists_icon} Built ROM:	{'Available' if build_status['rom_exists'] else 'Not found'}")
 		if build_status['rom_exists']:
-			report.append(f"    ROM size:     {build_status['rom_size']:,} bytes ({build_status['rom_size'] / 1024:.1f} KB)")
+			report.append(f"	ROM size:	 {build_status['rom_size']:,} bytes ({build_status['rom_size'] / 1024:.1f} KB)")
 		report.append("")
 
 		report.append("=" * 80)

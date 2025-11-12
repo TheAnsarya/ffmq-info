@@ -471,14 +471,14 @@ if __name__ == '__main__':
 	
 	# Example bytecode (hypothetical)
 	example_bytecode = bytearray([
-		0x00, 0x2D,              # SHOW_DIALOG(45)
-		0x01, 0x01, 0x02,        # CHOICE_2(1, 2)
+		0x00, 0x2D,			  # SHOW_DIALOG(45)
+		0x01, 0x01, 0x02,		# CHOICE_2(1, 2)
 		0x13, 0x0A, 0x20, 0x00,  # IF_FLAG(10, @0020)
-		0x30, 0x05, 0x01,        # GIVE_ITEM(5, 1)
-		0x20, 0x0A,              # SET_FLAG(10)
-		0x10, 0x00, 0x00,        # JUMP(@0000)
-		0x00, 0x2E,              # SHOW_DIALOG(46)
-		0xFF                     # END_SCRIPT
+		0x30, 0x05, 0x01,		# GIVE_ITEM(5, 1)
+		0x20, 0x0A,			  # SET_FLAG(10)
+		0x10, 0x00, 0x00,		# JUMP(@0000)
+		0x00, 0x2E,			  # SHOW_DIALOG(46)
+		0xFF					 # END_SCRIPT
 	])
 	
 	# Parse

@@ -15,12 +15,12 @@ Features:
 - Associate palettes with graphics sets
 
 Usage:
-	python palette_manager.py list                              # List all palettes
-	python palette_manager.py extract <id> [--format FORMAT]    # Extract specific palette
-	python palette_manager.py extract-all [--format FORMAT]     # Extract all palettes
-	python palette_manager.py preview <id>                      # Preview palette
-	python palette_manager.py book                              # Generate HTML palette book
-	python palette_manager.py swap <pal1> <pal2> <gfx>          # Preview palette swap
+	python palette_manager.py list							  # List all palettes
+	python palette_manager.py extract <id> [--format FORMAT]	# Extract specific palette
+	python palette_manager.py extract-all [--format FORMAT]	 # Extract all palettes
+	python palette_manager.py preview <id>					  # Preview palette
+	python palette_manager.py book							  # Generate HTML palette book
+	python palette_manager.py swap <pal1> <pal2> <gfx>		  # Preview palette swap
 
 Author: AI-assisted disassembly project
 Date: November 1, 2025
@@ -478,29 +478,29 @@ class PaletteManager:
 			categories[cat].append(pal)
 
 		for category, pals in categories.items():
-			html += f"\n    <h2>{category} Palettes ({len(pals)})</h2>\n"
-			html += '    <div class="palette-grid">\n'
+			html += f"\n	<h2>{category} Palettes ({len(pals)})</h2>\n"
+			html += '	<div class="palette-grid">\n'
 
 			for pal in pals:
 				name = pal.name or f"Palette {pal.palette_id:03d}"
-				html += f'        <div class="palette-card">\n'
-				html += f'            <div class="palette-header">{name}</div>\n'
-				html += f'            <div class="palette-info">\n'
-				html += f'                ID: {pal.palette_id} | Address: {pal.snes_address} | '
+				html += f'		<div class="palette-card">\n'
+				html += f'			<div class="palette-header">{name}</div>\n'
+				html += f'			<div class="palette-info">\n'
+				html += f'				ID: {pal.palette_id} | Address: {pal.snes_address} | '
 				html += f'Colors: {pal.color_count}\n'
-				html += f'            </div>\n'
-				html += '            <div class="color-swatches">\n'
+				html += f'			</div>\n'
+				html += '			<div class="color-swatches">\n'
 
 				for color in pal.colors:
 					hex_color = color.hex_string
-					html += f'                <div class="color-swatch" '
+					html += f'				<div class="color-swatch" '
 					html += f'style="background:{hex_color}" '
 					html += f'data-hex="{hex_color}"></div>\n'
 
-				html += '            </div>\n'
-				html += '        </div>\n'
+				html += '			</div>\n'
+				html += '		</div>\n'
 
-			html += '    </div>\n'
+			html += '	</div>\n'
 
 		html += """
 </body>

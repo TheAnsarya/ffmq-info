@@ -53,7 +53,7 @@ def check_file_tabs(file_path: Path) -> Tuple[bool, int]:
 			continue
 		
 		# Check for leading spaces (4+ spaces likely indentation)
-		if line.startswith('    '):
+		if line.startswith('	'):
 			lines_with_spaces += 1
 	
 	uses_tabs = lines_with_spaces == 0

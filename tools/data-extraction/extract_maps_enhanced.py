@@ -64,7 +64,7 @@ class FFMQMapExtractor:
 
 	# SNES ROM addresses for map data
 	MAP_HEADER_BASE = 0x0E8000  # Map headers start
-	MAP_DATA_BASE = 0x0F0000    # Map tile data start
+	MAP_DATA_BASE = 0x0F0000	# Map tile data start
 	MAP_EVENT_BASE = 0x0F8000   # Event data start
 
 	# Map definitions (ID, Name, Size, Addresses)
@@ -224,11 +224,11 @@ class FFMQMapExtractor:
 				tile_word = self.read_word(data_addr + ((y * width + x) * 2))
 
 				# Extract tile ID and properties
-				tile_id = tile_word & 0x3FF      # Bits 0-9: tile index
+				tile_id = tile_word & 0x3FF	  # Bits 0-9: tile index
 				palette = (tile_word >> 10) & 0x7  # Bits 10-12: palette
 				priority = (tile_word >> 13) & 0x1  # Bit 13: priority
-				flip_x = (tile_word >> 14) & 0x1    # Bit 14: horizontal flip
-				flip_y = (tile_word >> 15) & 0x1    # Bit 15: vertical flip
+				flip_x = (tile_word >> 14) & 0x1	# Bit 14: horizontal flip
+				flip_y = (tile_word >> 15) & 0x1	# Bit 15: vertical flip
 
 				# For TMX, we'll use GID format
 				gid = tile_id + 1  # TMX uses 1-based indexing

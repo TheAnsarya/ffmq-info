@@ -99,23 +99,23 @@ def suggest_dte_spaces(words: List[str]) -> Dict[str, str]:
 	
 	# Common endings that should have trailing spaces
 	space_endings = {
-		"s": "s ",      # plurals, "years", "Mac's"
-		"d": "d ",      # past tense, "dried", "ended", "hidden"
-		"g": "g ",      # -ing words, "studying", "doing"
-		"t": "t ",      # "that", "But"
-		"e": "e ",      # "some", "able", "lake"
-		"y": "y ",      # "Anyway", "key"
-		"k": "k ",      # "back", "rock"
-		"n": "n ",      # "been", "from"
-		"h": "h ",      # "reach", "research"
-		"m": "m ",      # "from", "problem"
+		"s": "s ",	  # plurals, "years", "Mac's"
+		"d": "d ",	  # past tense, "dried", "ended", "hidden"
+		"g": "g ",	  # -ing words, "studying", "doing"
+		"t": "t ",	  # "that", "But"
+		"e": "e ",	  # "some", "able", "lake"
+		"y": "y ",	  # "Anyway", "key"
+		"k": "k ",	  # "back", "rock"
+		"n": "n ",	  # "been", "from"
+		"h": "h ",	  # "reach", "research"
+		"m": "m ",	  # "from", "problem"
 	}
 	
 	# Common word fragments that should have leading spaces
 	space_prefixes = {
 		"the": " the",  # Almost always preceded by space
-		"a": " a",      # Article
-		"to": " to",    # Preposition
+		"a": " a",	  # Article
+		"to": " to",	# Preposition
 		"from": " from",
 		"for": " for",
 	}

@@ -59,7 +59,7 @@ class SNESInstrument:
 	sample_loop_offset: int = 0
 	pitch_multiplier: float = 1.0
 	volume: int = 127  # 0-127
-	pan: int = 64      # 0-127 (64 = center)
+	pan: int = 64	  # 0-127 (64 = center)
 	
 	def to_dict(self):
 		return {
@@ -83,11 +83,11 @@ class SNESInstrument:
 @dataclass
 class MIDINote:
 	"""MIDI note event"""
-	time: int        # Ticks from start
-	channel: int     # MIDI channel 0-15
-	note: int        # MIDI note 0-127
-	velocity: int    # 0-127
-	duration: int    # Ticks
+	time: int		# Ticks from start
+	channel: int	 # MIDI channel 0-15
+	note: int		# MIDI note 0-127
+	velocity: int	# 0-127
+	duration: int	# Ticks
 	
 	def to_snes_pitch(self) -> int:
 		"""Convert MIDI note to SNES pitch value"""

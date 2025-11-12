@@ -297,12 +297,12 @@ def test_dialog_modification():
 		if extracted_modified == modified_dialog:
 			print(f"✅ PASS: Modification verified")
 			print(f"   Expected: {modified_dialog}")
-			print(f"   Got:      {extracted_modified}")
+			print(f"   Got:	  {extracted_modified}")
 			return True
 		else:
 			print(f"❌ FAIL: Modification not applied correctly!")
 			print(f"   Expected: {modified_dialog}")
-			print(f"   Got:      {extracted_modified}")
+			print(f"   Got:	  {extracted_modified}")
 			return False
 		
 	except Exception as e:
@@ -366,8 +366,8 @@ def test_dictionary_compression():
 				print(f"   ✅ PASS: Round-trip successful")
 			else:
 				print(f"   ❌ FAIL: Round-trip failed!")
-				print(f"      Expected: {text}")
-				print(f"      Got:      {decoded}")
+				print(f"	  Expected: {text}")
+				print(f"	  Got:	  {decoded}")
 				all_passed = False
 		
 		return all_passed

@@ -19,13 +19,13 @@ class FFMQGraphicsExtractor:
 		
 		# Graphics locations in ROM (SNES addresses)
 		self.graphics_locations = {
-			'font': (0x80000, 0x2000),          # Font graphics
-			'sprites': (0x85000, 0x8000),       # Character sprites  
-			'tiles': (0x90000, 0x10000),        # Background tiles
-			'portraits': (0xa0000, 0x8000),     # Character portraits
+			'font': (0x80000, 0x2000),		  # Font graphics
+			'sprites': (0x85000, 0x8000),	   # Character sprites  
+			'tiles': (0x90000, 0x10000),		# Background tiles
+			'portraits': (0xa0000, 0x8000),	 # Character portraits
 			'ui_elements': (0xa8000, 0x4000),   # UI graphics
-			'enemies': (0xac000, 0x8000),       # Enemy sprites
-			'effects': (0xb4000, 0x4000),       # Special effects
+			'enemies': (0xac000, 0x8000),	   # Enemy sprites
+			'effects': (0xb4000, 0x4000),	   # Special effects
 		}
 		
 	def load_rom(self) -> bool:

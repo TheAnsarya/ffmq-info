@@ -21,7 +21,7 @@ ROM_PATH = Path("roms/Final Fantasy - Mystic Quest (U) (V1.1).sfc")
 ATTACK_LINKS_BANK = 0x02
 ATTACK_LINKS_ROM = 0xC6FF
 ENTRY_COUNT = 82  # One less than 83 enemies (no link for last enemy?)
-ENTRY_SIZE = 9    # bytes per entry
+ENTRY_SIZE = 9	# bytes per entry
 
 # Output paths
 OUTPUT_DIR = Path("data/extracted/enemy_attack_links")

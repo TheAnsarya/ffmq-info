@@ -60,14 +60,14 @@ class TestCharacterTable(unittest.TestCase):
 		"""Test special character encoding from complex.tbl"""
 		# These are in complex.tbl with specific byte values
 		specials = {
-			' ': 0x06,    # Space
-			'!': 0xCE,    # Exclamation
-			'?': 0xCF,    # Question
-			',': 0xD0,    # Comma
-			"'": 0xD1,    # Apostrophe
-			'.': 0xD2,    # Period
-			'-': 0xDA,    # Dash
-			'&': 0xDB,    # Ampersand
+			' ': 0x06,	# Space
+			'!': 0xCE,	# Exclamation
+			'?': 0xCF,	# Question
+			',': 0xD0,	# Comma
+			"'": 0xD1,	# Apostrophe
+			'.': 0xD2,	# Period
+			'-': 0xDA,	# Dash
+			'&': 0xDB,	# Ampersand
 		}
 
 		for char, expected_byte in specials.items():
@@ -290,9 +290,9 @@ class TestEventScript(unittest.TestCase):
 	def test_parse_simple_script(self):
 		"""Test parsing simple event script"""
 		bytecode = bytearray([
-			0x00, 0x2D,          # SHOW_DIALOG(45)
-			0x20, 0x0A,          # SET_FLAG(10)
-			0xFF                 # END_SCRIPT
+			0x00, 0x2D,		  # SHOW_DIALOG(45)
+			0x20, 0x0A,		  # SET_FLAG(10)
+			0xFF				 # END_SCRIPT
 		])
 
 		script = self.engine.parse_bytecode(bytecode, start_address=0x10000)
@@ -307,8 +307,8 @@ class TestEventScript(unittest.TestCase):
 		"""Test parsing script with branches"""
 		bytecode = bytearray([
 			0x13, 0x0A, 0x10, 0x00,  # IF_FLAG(10, @0x0010)
-			0x00, 0x01,              # SHOW_DIALOG(1)
-			0xFF                     # END_SCRIPT
+			0x00, 0x01,			  # SHOW_DIALOG(1)
+			0xFF					 # END_SCRIPT
 		])
 
 		script = self.engine.parse_bytecode(bytecode)
@@ -347,11 +347,11 @@ class TestEventScript(unittest.TestCase):
 	def test_script_variable_tracking(self):
 		"""Test that script tracks variables used"""
 		bytecode = bytearray([
-			0x00, 0x2D,              # SHOW_DIALOG(45)
-			0x20, 0x0A,              # SET_FLAG(10)
+			0x00, 0x2D,			  # SHOW_DIALOG(45)
+			0x20, 0x0A,			  # SET_FLAG(10)
 			0x13, 0x0B, 0x10, 0x00,  # IF_FLAG(11, @0x0010)
-			0x30, 0x05, 0x01,        # GIVE_ITEM(5, 1)
-			0xFF                     # END_SCRIPT
+			0x30, 0x05, 0x01,		# GIVE_ITEM(5, 1)
+			0xFF					 # END_SCRIPT
 		])
 
 		script = self.engine.parse_bytecode(bytecode)
@@ -366,7 +366,7 @@ class TestEventScript(unittest.TestCase):
 		"""Test script disassembly"""
 		bytecode = bytearray([
 			0x00, 0x2D,  # SHOW_DIALOG(45)
-			0xFF         # END_SCRIPT
+			0xFF		 # END_SCRIPT
 		])
 
 		script = self.engine.parse_bytecode(bytecode, start_address=0x10000)
@@ -430,7 +430,7 @@ class TestIntegration(unittest.TestCase):
 		bytecode = bytearray([
 			0x00, 0x01,  # SHOW_DIALOG(1)
 			0x00, 0x02,  # SHOW_DIALOG(2)
-			0xFF         # END_SCRIPT
+			0xFF		 # END_SCRIPT
 		])
 
 		script = engine.parse_bytecode(bytecode)

@@ -229,8 +229,8 @@ def main():
 	print("\nCollision Flags:")
 	print(f"  Passable tiles: {passable:3d} ({100*passable/len(collision_data):.1f}%)")
 	print(f"  Blocked tiles:  {blocked:3d} ({100*blocked/len(collision_data):.1f}%)")
-	print(f"  Water tiles:    {water:3d} ({100*water/len(collision_data):.1f}%)")
-	print(f"  Lava tiles:     {lava:3d} ({100*lava/len(collision_data):.1f}%)")
+	print(f"  Water tiles:	{water:3d} ({100*water/len(collision_data):.1f}%)")
+	print(f"  Lava tiles:	 {lava:3d} ({100*lava/len(collision_data):.1f}%)")
 	print(f"  Trigger tiles:  {trigger:3d} ({100*trigger/len(collision_data):.1f}%)")
 	
 	print("\nDone!")

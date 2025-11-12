@@ -256,7 +256,7 @@ class ROMComparator:
 				
 				print(f"\n  0x{entity_id:02X} '{name}':")
 				for change in entity_changes:
-					print(f"    {change.field}: {change.old_value} → {change.new_value}")
+					print(f"	{change.field}: {change.old_value} → {change.new_value}")
 			
 			print()
 		

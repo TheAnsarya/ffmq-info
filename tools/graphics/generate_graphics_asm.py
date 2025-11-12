@@ -145,13 +145,13 @@ class GraphicsASMGenerator:
 		summary = self.load_import_summary(category)
 
 		if not summary:
-			print(f"    ⚠️  No import summary found")
+			print(f"	⚠️  No import summary found")
 			return None
 
 		sprites = summary.get('sprites', [])
 
 		if not sprites:
-			print(f"    ℹ️  No sprites to include")
+			print(f"	ℹ️  No sprites to include")
 			return None
 
 		# Generate ASM content
@@ -162,8 +162,8 @@ class GraphicsASMGenerator:
 		with open(output_path, 'w') as f:
 			f.write(asm_content)
 
-		print(f"    ✓ Generated {len(sprites)} sprite includes")
-		print(f"    📄 {output_path}")
+		print(f"	✓ Generated {len(sprites)} sprite includes")
+		print(f"	📄 {output_path}")
 
 		return output_path
 
@@ -297,9 +297,9 @@ class GraphicsASMGenerator:
 		if overlaps:
 			print(f"  ❌ Found {len(overlaps)} address overlaps:")
 			for current, next_range in overlaps[:5]:  # Show first 5
-				print(f"     {current['name']} (${current['start']:06X}-${current['end']:06X})")
-				print(f"     overlaps with")
-				print(f"     {next_range['name']} (${next_range['start']:06X}-${next_range['end']:06X})")
+				print(f"	 {current['name']} (${current['start']:06X}-${current['end']:06X})")
+				print(f"	 overlaps with")
+				print(f"	 {next_range['name']} (${next_range['start']:06X}-${next_range['end']:06X})")
 			return False
 
 		print(f"  ✓ All {len(address_ranges)} address ranges valid (no overlaps)")

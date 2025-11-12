@@ -108,13 +108,13 @@ class DialogExporter:
 				f.write(f"Dialog ID: 0x{dialog_id:04X}\n")
 				f.write(f"Pointer:   0x{dialog.pointer:06X}\n")
 				f.write(f"Address:   0x{dialog.address:06X}\n")
-				f.write(f"Length:    {dialog.length} bytes\n")
+				f.write(f"Length:	{dialog.length} bytes\n")
 
 				if dialog.tags:
-					f.write(f"Tags:      {', '.join(sorted(dialog.tags))}\n")
+					f.write(f"Tags:	  {', '.join(sorted(dialog.tags))}\n")
 
 				if dialog.notes:
-					f.write(f"Notes:     {dialog.notes}\n")
+					f.write(f"Notes:	 {dialog.notes}\n")
 
 				f.write("\n")
 				f.write(dialog.text)

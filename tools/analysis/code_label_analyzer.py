@@ -92,9 +92,9 @@ class CodeLabelAnalyzer:
 		lines.append("📊 SUMMARY")
 		lines.append("─"*80)
 		lines.append(f"  Total Unique CODE Labels: {len(total_unique_labels):,}")
-		lines.append(f"  Total Usage Count:        {total_usage_count:,}")
+		lines.append(f"  Total Usage Count:		{total_usage_count:,}")
 		lines.append(f"  Files with CODE Labels:   {files_with_labels}")
-		lines.append(f"  Banks Represented:        {len(labels_by_bank)}")
+		lines.append(f"  Banks Represented:		{len(labels_by_bank)}")
 		lines.append("")
 
 		# Bank breakdown
@@ -118,8 +118,8 @@ class CodeLabelAnalyzer:
 			label_count = file_data['count']
 			usage_count = sum(file_data['usage'].values())
 			lines.append(f"\n  {file_path}")
-			lines.append(f"    Unique labels: {label_count:,}")
-			lines.append(f"    Total usage:   {usage_count:,}")
+			lines.append(f"	Unique labels: {label_count:,}")
+			lines.append(f"	Total usage:   {usage_count:,}")
 
 			# Show top labels if there are many
 			if label_count > 10:
@@ -127,9 +127,9 @@ class CodeLabelAnalyzer:
 				top_labels = sorted(file_data['usage'].items(),
 								   key=lambda x: x[1],
 								   reverse=True)[:5]
-				lines.append("    Top labels:")
+				lines.append("	Top labels:")
 				for label, count in top_labels:
-					lines.append(f"      {label}: {count} uses")
+					lines.append(f"	  {label}: {count} uses")
 
 		lines.append("")
 		lines.append("="*80)

@@ -190,7 +190,7 @@ class MusicDatabase:
 
 		# Version
 		spc_header[35] = 0x1E  # Has ID666 tag
-		spc_header[36] = 30    # Version minor
+		spc_header[36] = 30	# Version minor
 
 		# SPC700 registers (initial state)
 		spc_header[37:43] = b'\x00' * 6  # PC, A, X, Y, PSW, SP

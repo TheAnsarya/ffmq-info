@@ -223,8 +223,8 @@ class TextImporter:
 		print(f"Tables updated:  {self.stats['tables_updated']}")
 		print(f"Strings updated: {self.stats['strings_updated']}")
 		print(f"Bytes written:   {self.stats['bytes_written']:,}")
-		print(f"Errors:          {len(self.errors)}")
-		print(f"Warnings:        {len(self.warnings)}")
+		print(f"Errors:		  {len(self.errors)}")
+		print(f"Warnings:		{len(self.warnings)}")
 
 		if self.errors:
 			print("\n❌ ERRORS:")

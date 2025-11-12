@@ -546,7 +546,7 @@ class HexEditorUI:
 		self.screen.blit(title, (x, y - 35))
 
 		# Column headers
-		header = f"Offset    "
+		header = f"Offset	"
 		for i in range(self.bytes_per_row):
 			header += f"{i:02X} "
 		header += " ASCII"

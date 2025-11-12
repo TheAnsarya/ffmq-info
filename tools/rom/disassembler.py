@@ -100,7 +100,7 @@ class Instruction:
 			parts.append(f"{self.label}:")
 
 		# Add instruction
-		line = f"    {self.opcode.mnemonic:<8}"
+		line = f"	{self.opcode.mnemonic:<8}"
 
 		# Add operand formatting
 		if self.operand is not None:
@@ -614,8 +614,8 @@ def main():
 
 	# Add some test code at bank 0, offset 0x8000 (PC offset 0x0000)
 	code = [
-		0x18,        # CLC
-		0xFB,        # XCE
+		0x18,		# CLC
+		0xFB,		# XCE
 		0xC2, 0x30,  # REP #$30
 		0xA9, 0x00, 0x80,  # LDA #$8000
 		0x8D, 0x00, 0x21,  # STA $2100
@@ -624,7 +624,7 @@ def main():
 
 		# Subroutine at $8020
 		0xA9, 0x0F, 0x00,  # LDA #$000F
-		0x60,        # RTS
+		0x60,		# RTS
 	]
 
 	test_rom[0:len(code)] = code

@@ -1,4 +1,4 @@
-﻿#!/usr/bin/env python3
+#!/usr/bin/env python3
 """
 FFMQ Disassembly Progress Tracker
 
@@ -329,9 +329,9 @@ class DisassemblyTracker:
 				'missing': '❌'
 			}.get(bank.status, '❓')
 
-			print(f"${bank.bank_hex}    {status_color} {bank.status:<12} "
-			      f"{bank.line_count:<8} {bank.estimated_completion:>5.1f}%      "
-			      f"{bank.notes}")
+			print(f"${bank.bank_hex}	{status_color} {bank.status:<12} "
+				  f"{bank.line_count:<8} {bank.estimated_completion:>5.1f}%	  "
+				  f"{bank.notes}")
 
 		print("─" * 70)
 		print()

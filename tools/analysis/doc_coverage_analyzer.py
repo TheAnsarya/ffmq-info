@@ -185,9 +185,9 @@ class DocumentationCoverageAnalyzer:
 			if data['covered']:
 				lines.append(f"  {system_name}: {data['count']} doc(s)")
 				for doc in data['docs'][:3]:  # Show first 3
-					lines.append(f"    - {doc}")
+					lines.append(f"	- {doc}")
 				if len(data['docs']) > 3:
-					lines.append(f"    ... and {len(data['docs']) - 3} more")
+					lines.append(f"	... and {len(data['docs']) - 3} more")
 		lines.append("")
 
 		# Undocumented systems
@@ -205,7 +205,7 @@ class DocumentationCoverageAnalyzer:
 			lines.append("─"*80)
 			lines.append(f"  Found {len(undocumented_banks)} bank(s) with no documentation:")
 			for bank in undocumented_banks:
-				lines.append(f"    Bank ${bank}")
+				lines.append(f"	Bank ${bank}")
 			lines.append("")
 
 		# Document freshness
@@ -222,7 +222,7 @@ class DocumentationCoverageAnalyzer:
 			lines.append(f"  Found {len(stale_docs)} stale document(s):")
 			for doc_name, data in stale_docs[:10]:  # Show top 10 oldest
 				lines.append(f"  {doc_name}")
-				lines.append(f"    Last modified: {data['modified']} ({data['age_days']} days ago)")
+				lines.append(f"	Last modified: {data['modified']} ({data['age_days']} days ago)")
 			if len(stale_docs) > 10:
 				lines.append(f"  ... and {len(stale_docs) - 10} more")
 			lines.append("")
@@ -248,7 +248,7 @@ class DocumentationCoverageAnalyzer:
 		if undocumented:
 			lines.append("  Priority: Document the following systems:")
 			for system in undocumented[:5]:
-				lines.append(f"    - {system}")
+				lines.append(f"	- {system}")
 
 		if undocumented_banks:
 			lines.append(f"  Priority: Document {len(undocumented_banks)} bank(s) with ASM files")

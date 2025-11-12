@@ -261,7 +261,7 @@ class ComplexTextInserter:
 			return True
 		else:
 			print(f"❌ Dialog 0x{dialog_num:02X}: Round-trip FAILED")
-			print(f"  Original:     {original_text[:60]}...")
+			print(f"  Original:	 {original_text[:60]}...")
 			print(f"  Decompressed: {decompressed[:60]}...")
 			return False
 	

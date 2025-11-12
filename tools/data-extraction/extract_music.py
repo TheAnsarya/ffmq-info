@@ -19,11 +19,11 @@ class FFMQMusicExtractor:
 		
 		# Music/sound locations in ROM (estimated)
 		self.music_locations = {
-			'spc_driver': (0xc8000, 0x2000),       # SPC-700 driver code
-			'sample_table': (0xca000, 0x1000),     # Sample pointer table
+			'spc_driver': (0xc8000, 0x2000),	   # SPC-700 driver code
+			'sample_table': (0xca000, 0x1000),	 # Sample pointer table
 			'instrument_data': (0xcb000, 0x2000),  # Instrument definitions
-			'sequence_data': (0xcd000, 0x8000),    # Music sequences
-			'sample_data': (0xd5000, 0x10000),     # Audio samples
+			'sequence_data': (0xcd000, 0x8000),	# Music sequences
+			'sample_data': (0xd5000, 0x10000),	 # Audio samples
 		}
 		
 		# Known music track info (from game analysis)
@@ -243,10 +243,10 @@ class FFMQMusicExtractor:
 		output_file.write("  Commands found:\n")
 		for i, byte in enumerate(data[:16]):
 			if byte in commands:
-				output_file.write(f"    ${i:02X}: ${byte:02X} - {commands[byte]}\n")
+				output_file.write(f"	${i:02X}: ${byte:02X} - {commands[byte]}\n")
 			elif 0x00 <= byte <= 0x7f:  # Potential note data
 				note = byte & 0x7f
-				output_file.write(f"    ${i:02X}: ${byte:02X} - Note {note}\n")
+				output_file.write(f"	${i:02X}: ${byte:02X} - Note {note}\n")
 	
 	def extract_sample_data(self) -> bool:
 		"""Extract audio sample data"""

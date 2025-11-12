@@ -36,9 +36,9 @@ class DialogBoxSimulator:
 	"""Simulates FFMQ dialog box layout"""
 
 	# Dialog box dimensions (estimated from game)
-	CHARS_PER_LINE = 32      # Maximum characters per line
-	LINES_PER_PAGE = 3       # Lines per dialog box
-	MAX_PAGES = 4            # Maximum pages per dialog
+	CHARS_PER_LINE = 32	  # Maximum characters per line
+	LINES_PER_PAGE = 3	   # Lines per dialog box
+	MAX_PAGES = 4			# Maximum pages per dialog
 
 	# Character widths (proportional font approximation)
 	# Most chars are 8px, some are narrower (.,!i) or wider (WMm@)
@@ -259,8 +259,8 @@ class TextOverflowDetector:
 
 		print("Dialog Box Specifications:")
 		print(f"  Characters per line: {self.simulator.CHARS_PER_LINE}")
-		print(f"  Lines per page:      {self.simulator.LINES_PER_PAGE}")
-		print(f"  Max pages:           {self.simulator.MAX_PAGES}")
+		print(f"  Lines per page:	  {self.simulator.LINES_PER_PAGE}")
+		print(f"  Max pages:		   {self.simulator.MAX_PAGES}")
 		print()
 
 		# Analyze all dialogs

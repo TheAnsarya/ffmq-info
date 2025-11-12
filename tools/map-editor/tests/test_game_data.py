@@ -98,13 +98,13 @@ class TestEnemyData(unittest.TestCase):
 	def test_weakness_detection(self):
 		"""Test weakness/resistance detection"""
 		resistances = ResistanceData(
-			fire=255,      # Weak
-			water=64,      # Resistant
-			earth=0,       # Immune
-			wind=128,      # Normal
-			holy=200,      # Weak
-			dark=32,       # Resistant
-			poison=0,      # Immune
+			fire=255,	  # Weak
+			water=64,	  # Resistant
+			earth=0,	   # Immune
+			wind=128,	  # Normal
+			holy=200,	  # Weak
+			dark=32,	   # Resistant
+			poison=0,	  # Immune
 			status=128,
 			physical=128
 		)

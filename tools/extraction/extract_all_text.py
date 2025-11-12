@@ -32,10 +32,10 @@ from utils.dialog_database import DialogDatabase
 @dataclass
 class TextTableConfig:
 	"""Configuration for a text table in ROM"""
-	address: int        # PC address in ROM
-	count: int          # Number of entries
-	max_length: int     # Maximum bytes per entry
-	name: str           # Table name
+	address: int		# PC address in ROM
+	count: int		  # Number of entries
+	max_length: int	 # Maximum bytes per entry
+	name: str		   # Table name
 
 
 class TextExtractor:
@@ -346,11 +346,11 @@ class TextExtractor:
 
 			f.write("OVERVIEW\n")
 			f.write("-"*70 + "\n")
-			f.write(f"Total strings:        {stats['total_strings']}\n")
-			f.write(f"Total bytes:          {stats['total_bytes']:,}\n")
-			f.write(f"Total characters:     {stats['total_characters']:,}\n")
-			f.write(f"Compression ratio:    {stats['compression_ratio']:.2%}\n")
-			f.write(f"Space saved:          {stats['total_characters'] - stats['total_bytes']:,} bytes\n")
+			f.write(f"Total strings:		{stats['total_strings']}\n")
+			f.write(f"Total bytes:		  {stats['total_bytes']:,}\n")
+			f.write(f"Total characters:	 {stats['total_characters']:,}\n")
+			f.write(f"Compression ratio:	{stats['compression_ratio']:.2%}\n")
+			f.write(f"Space saved:		  {stats['total_characters'] - stats['total_bytes']:,} bytes\n")
 			f.write("\n")
 
 			f.write("TABLE COUNTS\n")

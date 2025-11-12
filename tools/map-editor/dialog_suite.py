@@ -424,8 +424,8 @@ class DialogSuiteApp:
 		status_rect = pygame.Rect(0, self.height - status_height, self.width, status_height)
 		pygame.draw.rect(self.screen, (20, 20, 30), status_rect)
 		pygame.draw.line(self.screen, (60, 60, 70),
-		                 (0, self.height - status_height),
-		                 (self.width, self.height - status_height))
+						 (0, self.height - status_height),
+						 (self.width, self.height - status_height))
 
 		# Active tab
 		active_tab = self.tabbed_panel.tab_bar.get_active_tab()

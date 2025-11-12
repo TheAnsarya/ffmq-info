@@ -122,16 +122,16 @@ class CodeLibrary:
 			description="Multiply A by value in X (result in A)",
 			code="""
 ; Multiply A * X → A (8-bit)
-	STA $00        ; Store multiplicand
-	STX $01        ; Store multiplier
-	LDA #0         ; Clear accumulator
-	LDX $01        ; Load counter
-	BEQ .done      ; Skip if X=0
+	STA $00		; Store multiplicand
+	STX $01		; Store multiplier
+	LDA #0		 ; Clear accumulator
+	LDX $01		; Load counter
+	BEQ .done	  ; Skip if X=0
 .loop:
 	CLC
-	ADC $00        ; Add multiplicand
+	ADC $00		; Add multiplicand
 	DEX
-	BNE .loop      ; Loop until done
+	BNE .loop	  ; Loop until done
 .done:
 			""".strip(),
 			tags=["math", "multiplication", "8bit"],
@@ -143,11 +143,11 @@ class CodeLibrary:
 			name="Counted Loop",
 			description="Loop N times using X register",
 			code="""
-	LDX #COUNT     ; Load loop counter
+	LDX #COUNT	 ; Load loop counter
 .loop:
 	; Loop body here
 	DEX
-	BNE .loop      ; Loop while X != 0
+	BNE .loop	  ; Loop while X != 0
 			""".strip(),
 			tags=["loop", "control"],
 			complexity="simple"
@@ -157,12 +157,12 @@ class CodeLibrary:
 			name="Memory Copy",
 			description="Copy N bytes from source to destination",
 			code="""
-	LDX #0         ; Initialize index
+	LDX #0		 ; Initialize index
 .loop:
 	LDA SOURCE,X   ; Read byte
-	STA DEST,X     ; Write byte
+	STA DEST,X	 ; Write byte
 	INX
-	CPX #COUNT     ; Check if done
+	CPX #COUNT	 ; Check if done
 	BNE .loop
 			""".strip(),
 			tags=["memory", "copy", "loop"],
@@ -174,7 +174,7 @@ class CodeLibrary:
 			name="Compare and Branch",
 			description="If A >= value, branch to label",
 			code="""
-	CMP #VALUE     ; Compare with value
+	CMP #VALUE	 ; Compare with value
 	BCS .greater   ; Branch if >= (carry set)
 	; Less than code here
 	BRA .done
@@ -192,21 +192,21 @@ class CodeLibrary:
 			description="Setup and execute DMA transfer",
 			code="""
 	LDA #%00000001 ; DMA mode (1 register, 2 addresses)
-	STA $4300      ; DMA control
-	LDA #$18       ; Destination: VRAM data ($2118)
-	STA $4301      ; DMA destination
+	STA $4300	  ; DMA control
+	LDA #$18	   ; Destination: VRAM data ($2118)
+	STA $4301	  ; DMA destination
 	LDA #<SOURCE   ; Source address low
 	STA $4302
 	LDA #>SOURCE   ; Source address high
 	STA $4303
 	LDA #^SOURCE   ; Source bank
 	STA $4304
-	LDA #<SIZE     ; Transfer size low
+	LDA #<SIZE	 ; Transfer size low
 	STA $4305
-	LDA #>SIZE     ; Transfer size high
+	LDA #>SIZE	 ; Transfer size high
 	STA $4306
-	LDA #$01       ; Enable DMA channel 0
-	STA $420B      ; Start transfer
+	LDA #$01	   ; Enable DMA channel 0
+	STA $420B	  ; Start transfer
 			""".strip(),
 			tags=["dma", "transfer", "graphics", "advanced"],
 			complexity="complex"
@@ -233,10 +233,10 @@ STA {variable}  ; Set {variable} = {value}""",
 			pattern=CodePattern.VARIABLE_SET,
 			description="Set a 16-bit variable",
 			parameters=["variable", "value"],
-			code_template="""REP #$20       ; 16-bit A
+			code_template="""REP #$20	   ; 16-bit A
 LDA #{value}
 STA {variable}
-SEP #$20       ; 8-bit A""",
+SEP #$20	   ; 8-bit A""",
 			example="set MaxHP to 9999"
 		))
 

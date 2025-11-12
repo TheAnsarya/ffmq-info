@@ -54,13 +54,13 @@ def convert_bank_section(bank_num: int, start_line: int, end_line: int, input_fi
 			# Detect patterns and add basic comments
 			if re.search(r'\b(JSR|JSL)\b', line):
 				if 'TODO' not in line:
-					line = line.rstrip() + "    ; Call subroutine\n"
+					line = line.rstrip() + "	; Call subroutine\n"
 			elif re.search(r'\b(RTS|RTL)\b', line):
 				if 'TODO' not in line:
-					line = line.rstrip() + "    ; Return\n"
+					line = line.rstrip() + "	; Return\n"
 			elif re.search(r'\bSTA\b.*SNES', line):
 				if 'TODO' not in line:
-					line = line.rstrip() + "    ; Write to PPU register\n"
+					line = line.rstrip() + "	; Write to PPU register\n"
 			
 			documented_lines.append(line)
 		

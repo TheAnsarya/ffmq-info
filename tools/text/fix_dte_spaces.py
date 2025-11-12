@@ -33,14 +33,14 @@ def fix_complex_tbl():
 	
 	# DTE codes that need trailing spaces (from DataCrystal docs)
 	dte_with_spaces = {
-		'40': 'e ',      # e + space
-		'41': 'the ',    # the + space
-		'42': 't ',      # t + space
-		'45': 's ',      # s + space
-		'46': 'to ',     # to + space
-		'48': 'ing ',    # ing + space
-		'5F': 'is ',     # is + space (duplicate of 53, but with space)
-		'67': 'a ',      # a + space
+		'40': 'e ',	  # e + space
+		'41': 'the ',	# the + space
+		'42': 't ',	  # t + space
+		'45': 's ',	  # s + space
+		'46': 'to ',	 # to + space
+		'48': 'ing ',	# ing + space
+		'5F': 'is ',	 # is + space (duplicate of 53, but with space)
+		'67': 'a ',	  # a + space
 	}
 	
 	# Process lines

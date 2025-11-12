@@ -83,7 +83,7 @@ def main():
 	
 	# Focus on unknown control codes
 	unknown_codes = [0x08, 0x0E, 0x0B, 0x0C, 0x0D, 0x0F, 0x10, 0x12, 0x13, 0x14,
-	                 0x1A, 0x1B, 0x1C, 0x1D, 0x1E, 0x20, 0x21, 0x24, 0x26, 0x27, 0x28]
+					 0x1A, 0x1B, 0x1C, 0x1D, 0x1E, 0x20, 0x21, 0x24, 0x26, 0x27, 0x28]
 	
 	print("\n" + "="*80)
 	print("UNKNOWN CONTROL CODES")
@@ -101,10 +101,10 @@ def main():
 				# Find where the code is in the context
 				code_idx = next(j for j, b in enumerate(context) if b == code)
 				ctx_str = format_context(context, code_idx)
-				print(f"    Dialog 0x{dialog_num:02X} pos {pos:3d}: {ctx_str}")
+				print(f"	Dialog 0x{dialog_num:02X} pos {pos:3d}: {ctx_str}")
 			
 			if len(occurrences) > 5:
-				print(f"    ... and {len(occurrences) - 5} more")
+				print(f"	... and {len(occurrences) - 5} more")
 			
 			# Analyze patterns
 			# Check what typically comes after this code
@@ -120,11 +120,11 @@ def main():
 				print(f"  Most common following bytes:")
 				for byte, count in top_next:
 					if byte < 0x30:
-						print(f"    CMD:0x{byte:02X} ({count} times)")
+						print(f"	CMD:0x{byte:02X} ({count} times)")
 					elif byte < 0x80:
-						print(f"    DICT:0x{byte:02X} ({count} times)")
+						print(f"	DICT:0x{byte:02X} ({count} times)")
 					else:
-						print(f"    CHAR:0x{byte:02X} ({count} times)")
+						print(f"	CHAR:0x{byte:02X} ({count} times)")
 	
 	# Check assembly for jump table
 	print("\n" + "="*80)
@@ -163,7 +163,7 @@ def main():
 			for dialog_num, pos, context in occurrences:
 				code_idx = next(j for j, b in enumerate(context) if b == code)
 				ctx_str = format_context(context, code_idx)
-				f.write(f"    Dialog 0x{dialog_num:02X} pos {pos:3d}: {ctx_str}\n")
+				f.write(f"	Dialog 0x{dialog_num:02X} pos {pos:3d}: {ctx_str}\n")
 			f.write("\n")
 	
 	print(f"\nDetailed report saved to: {report_path}")

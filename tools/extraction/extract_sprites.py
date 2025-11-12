@@ -440,7 +440,7 @@ def main():
 	print("  5. Create comprehensive sprite catalog")
 	print()
 	print("Note: Sprite offsets are estimates based on typical SNES RPG")
-	print("      organization. Verify with ROM inspection and disassembly.")
+	print("	  organization. Verify with ROM inspection and disassembly.")
 
 	return 0
 

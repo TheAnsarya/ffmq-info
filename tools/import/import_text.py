@@ -349,10 +349,10 @@ class FFMQTextImporter:
 		print("\n" + "=" * 80)
 		print("IMPORT SUMMARY")
 		print("=" * 80)
-		print(f"Total entries:    {self.stats['total_entries']}")
-		print(f"Imported:         {self.stats['imported']}")
-		print(f"Skipped:          {self.stats['skipped']}")
-		print(f"Errors:           {self.stats['errors']}")
+		print(f"Total entries:	{self.stats['total_entries']}")
+		print(f"Imported:		 {self.stats['imported']}")
+		print(f"Skipped:		  {self.stats['skipped']}")
+		print(f"Errors:		   {self.stats['errors']}")
 
 		if self.stats['warnings']:
 			print("\nWarnings:")

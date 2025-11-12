@@ -103,7 +103,7 @@ def main():
 	for byte_val in unknown_bytes:
 		count = byte_usage[byte_val]
 		current = char_table.get(byte_val, 'NOT_IN_TABLE')
-		print(f"    0x{byte_val:02X}: Used {count:3d} times, currently: '{current}'")
+		print(f"	0x{byte_val:02X}: Used {count:3d} times, currently: '{current}'")
 	
 	# Check for patterns
 	print("\n" + "="*80)
@@ -139,7 +139,7 @@ def main():
 					else:
 						context_str.append(f'[0x{b:02X}]')
 				
-				print(f"    Dict 0x{idx:02X}: {''.join(context_str)}")
+				print(f"	Dict 0x{idx:02X}: {''.join(context_str)}")
 				examples_shown += 1
 				if examples_shown >= 3:
 					break
@@ -157,9 +157,9 @@ def main():
 	
 	for range_name, bytes_in_range in ranges.items():
 		print(f"\n  {range_name}:")
-		print(f"    Count: {len(bytes_in_range)} different bytes used")
+		print(f"	Count: {len(bytes_in_range)} different bytes used")
 		if bytes_in_range:
-			print(f"    Range: 0x{min(bytes_in_range):02X} - 0x{max(bytes_in_range):02X}")
+			print(f"	Range: 0x{min(bytes_in_range):02X} - 0x{max(bytes_in_range):02X}")
 	
 	# Check FFMQ's actual font data (if we can find it)
 	print("\n" + "="*80)
@@ -190,7 +190,7 @@ def main():
 			ratio = ascii_count / len(region) if region else 0
 			
 			if ratio > 0.3:  # More than 30% ASCII
-				print(f"    {name} (0x{start:06X}-0x{end:06X}): {ratio*100:.1f}% ASCII-like")
+				print(f"	{name} (0x{start:06X}-0x{end:06X}): {ratio*100:.1f}% ASCII-like")
 	
 	# Save detailed report
 	report_path = Path(__file__).parent.parent.parent / 'reports' / 'unknown_characters.txt'
@@ -210,7 +210,7 @@ def main():
 			f.write("  Examples:\n")
 			for idx, data in dict_entries:
 				if byte_val in data:
-					f.write(f"    Dictionary entry 0x{idx:02X}: {data.hex()}\n")
+					f.write(f"	Dictionary entry 0x{idx:02X}: {data.hex()}\n")
 	
 	print(f"\n  Detailed report saved to: {report_path}")
 	

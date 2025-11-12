@@ -14,14 +14,14 @@ class ROMHandler:
 
 	# ROM memory map addresses (LoROM format)
 	MAP_HEADER_BASE = 0x028000  # Map header table
-	MAP_DATA_BASE = 0x030000    # Compressed map data
+	MAP_DATA_BASE = 0x030000	# Compressed map data
 	COLLISION_BASE = 0x038000   # Collision data
-	TILESET_BASE = 0x080000     # Tileset graphics
-	PALETTE_BASE = 0x0C0000     # Palette data
+	TILESET_BASE = 0x080000	 # Tileset graphics
+	PALETTE_BASE = 0x0C0000	 # Palette data
 
 	# Constants
-	HEADER_SIZE = 32            # Bytes per map header
-	MAX_MAPS = 128              # Maximum number of maps
+	HEADER_SIZE = 32			# Bytes per map header
+	MAX_MAPS = 128			  # Maximum number of maps
 
 	def __init__(self, rom_path: Optional[str] = None):
 		"""Initialize ROM handler"""
@@ -251,7 +251,7 @@ class ROMHandler:
 		for y in range(height):
 			for x in range(width):
 				uncompressed.append(data[y, x])  # Tile ID
-				uncompressed.append(0x00)         # Attributes
+				uncompressed.append(0x00)		 # Attributes
 
 		# Compress
 		try:

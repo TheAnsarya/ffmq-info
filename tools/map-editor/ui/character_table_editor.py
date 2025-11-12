@@ -103,7 +103,7 @@ class TextInput:
 		bg_color = COLOR_PANEL if self.active else COLOR_BG
 		pygame.draw.rect(surface, bg_color, self.rect)
 		pygame.draw.rect(surface, COLOR_BORDER if not self.active else COLOR_HIGHLIGHT, 
-		                 self.rect, 2)
+						 self.rect, 2)
 		
 		# Text or placeholder
 		display_text = self.text if self.text else self.placeholder

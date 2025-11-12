@@ -42,7 +42,7 @@ def fix_duplicate_labels(filepath, dry_run=False):
 	changes = 0
 	
 	for label, line_nums in sorted(duplicates.items()):
-		print(f"    {label}: {len(line_nums)} occurrences at lines {line_nums[:5]}...")
+		print(f"	{label}: {len(line_nums)} occurrences at lines {line_nums[:5]}...")
 		
 		# Strategy: For simple labels like RTS_Label, PHP_Label, etc., make them local
 		# by converting to anonymous labels
@@ -66,7 +66,7 @@ def fix_duplicate_labels(filepath, dry_run=False):
 				if new_line != old_line:
 					lines[line_num] = new_line
 					changes += 1
-					print(f"      Line {line_num}: {label} → {new_label}")
+					print(f"	  Line {line_num}: {label} → {new_label}")
 	
 	if not dry_run and changes > 0:
 		with open(filepath, 'w', encoding='utf-8', newline='\n') as f:

@@ -131,13 +131,13 @@ def main():
 	for i, (code_label, new_name) in enumerate(sorted(rename_map.items())[:20]):
 		refs = label_info[code_label]
 		example_comment = next((c for f, l, t, c in refs if c), "")
-		print(f"    {code_label} -> {new_name}")
+		print(f"	{code_label} -> {new_name}")
 		if example_comment:
 			example_short = example_comment[:60] + "..." if len(example_comment) > 60 else example_comment
-			print(f"      From: {example_short}")
+			print(f"	  From: {example_short}")
 	
 	if len(rename_map) > 20:
-		print(f"    ... and {len(rename_map) - 20} more")
+		print(f"	... and {len(rename_map) - 20} more")
 	
 	# Step 3: Apply renames
 	print("\n[3/4] Applying renames...")

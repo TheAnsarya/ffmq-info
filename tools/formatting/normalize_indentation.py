@@ -9,8 +9,8 @@ Usage:
 	python tools/normalize_indentation.py [--dry-run] [--bank XX] [--tab-width 4]
 
 Options:
-	--dry-run       Show what would be changed without modifying files
-	--bank XX       Process only a specific bank (e.g., --bank 00)
+	--dry-run	   Show what would be changed without modifying files
+	--bank XX	   Process only a specific bank (e.g., --bank 00)
 	--tab-width N   Number of spaces per tab level (default: 4)
 """
 
@@ -106,9 +106,9 @@ def process_file(filepath: Path, dry_run: bool = False, tab_width: int = 4) -> d
 		else:
 			print(f"  [DRY RUN] Would modify: {total_changes} lines")
 
-		print(f"     - Lines changed: {stats['lines_changed']}")
-		print(f"     - Tabs added: {stats['tabs_added']}")
-		print(f"     - Spaces removed: {stats['spaces_removed']}")
+		print(f"	 - Lines changed: {stats['lines_changed']}")
+		print(f"	 - Tabs added: {stats['tabs_added']}")
+		print(f"	 - Spaces removed: {stats['spaces_removed']}")
 	else:
 		print(f"  [OK] No changes needed")
 

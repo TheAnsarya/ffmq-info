@@ -76,7 +76,7 @@ class DocCoverageAnalyzer:
 		print(f"  ✓ Found {len(md_files)} markdown files")
 		print(f"  ✓ Top 5 largest docs:")
 		for path, size in sorted_docs[:5]:
-			print(f"    - {path}: {size:,} bytes")
+			print(f"	- {path}: {size:,} bytes")
 		print()
 	
 	def analyze_asm_documentation(self):
@@ -164,7 +164,7 @@ class DocCoverageAnalyzer:
 		if self.stats["outdated_docs"]:
 			print(f"  ⚠ Found {len(self.stats['outdated_docs'])} potentially outdated docs (>90 days old)")
 			for doc in self.stats["outdated_docs"][:5]:
-				print(f"    - {doc['file']}: {doc['days_old']} days old")
+				print(f"	- {doc['file']}: {doc['days_old']} days old")
 		else:
 			print(f"  ✓ No obviously outdated documentation found")
 		print()
@@ -198,7 +198,7 @@ class DocCoverageAnalyzer:
 		if self.stats["missing_docs"]:
 			print(f"  ⚠ Missing {len(self.stats['missing_docs'])} expected documentation files:")
 			for missing in self.stats["missing_docs"]:
-				print(f"    - {missing}")
+				print(f"	- {missing}")
 		else:
 			print(f"  ✓ All expected documentation files exist")
 		print()

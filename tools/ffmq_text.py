@@ -176,17 +176,17 @@ def cmd_info(args):
 	
 	print("\n## Tools Available")
 	print("-"*80)
-	print("  extract-simple     - Extract simple text system")
-	print("  extract-complex    - Extract dialog system")
-	print("  insert-simple      - Insert modified simple text")
-	print("  insert-complex     - Insert modified dialogs")
-	print("  validate           - Validate text systems")
-	print("  analyze-dict       - Analyze dictionary compression")
+	print("  extract-simple	 - Extract simple text system")
+	print("  extract-complex	- Extract dialog system")
+	print("  insert-simple	  - Insert modified simple text")
+	print("  insert-complex	 - Insert modified dialogs")
+	print("  validate		   - Validate text systems")
+	print("  analyze-dict	   - Analyze dictionary compression")
 	print("  analyze-controls   - Analyze control code usage")
-	print("  analyze-chars      - Analyze character mappings")
-	print("  batch-extract      - Extract all text systems")
-	print("  batch-analyze      - Run all analysis tools")
-	print("  info               - Show this information")
+	print("  analyze-chars	  - Analyze character mappings")
+	print("  batch-extract	  - Extract all text systems")
+	print("  batch-analyze	  - Run all analysis tools")
+	print("  info			   - Show this information")
 	
 	return 0
 

@@ -488,22 +488,22 @@ class PaletteLibraryTool:
 
 		# Hero palette
 		hero_colors = [
-			Color(0, 0, 0),        # Transparent
+			Color(0, 0, 0),		# Transparent
 			Color(248, 208, 176),  # Skin highlight
 			Color(216, 160, 120),  # Skin base
 			Color(168, 120, 88),   # Skin shadow
-			Color(200, 80, 40),    # Hair highlight
-			Color(160, 48, 16),    # Hair base
-			Color(120, 32, 8),     # Hair shadow
+			Color(200, 80, 40),	# Hair highlight
+			Color(160, 48, 16),	# Hair base
+			Color(120, 32, 8),	 # Hair shadow
 			Color(248, 248, 248),  # Armor highlight
 			Color(200, 200, 200),  # Armor base
 			Color(144, 144, 152),  # Armor shadow
-			Color(80, 80, 88),     # Armor dark
+			Color(80, 80, 88),	 # Armor dark
 			Color(248, 200, 80),   # Gold highlight
 			Color(216, 152, 32),   # Gold base
 			Color(168, 104, 16),   # Gold shadow
-			Color(40, 40, 48),     # Outline
-			Color(0, 0, 0),        # Black
+			Color(40, 40, 48),	 # Outline
+			Color(0, 0, 0),		# Black
 		]
 		palettes.append(Palette(0, "Hero", hero_colors, "Character", ["main", "player"]))
 
@@ -511,19 +511,19 @@ class PaletteLibraryTool:
 		forest_colors = [
 			Color(0, 0, 0),
 			Color(144, 224, 120),  # Light green
-			Color(96, 184, 80),    # Green
-			Color(56, 136, 48),    # Dark green
-			Color(32, 88, 32),     # Very dark green
+			Color(96, 184, 80),	# Green
+			Color(56, 136, 48),	# Dark green
+			Color(32, 88, 32),	 # Very dark green
 			Color(168, 136, 80),   # Tree trunk light
-			Color(120, 88, 56),    # Tree trunk
-			Color(80, 56, 32),     # Tree trunk dark
+			Color(120, 88, 56),	# Tree trunk
+			Color(80, 56, 32),	 # Tree trunk dark
 			Color(248, 248, 168),  # Light yellow
 			Color(216, 200, 104),  # Yellow
 			Color(184, 152, 64),   # Dark yellow
 			Color(136, 184, 248),  # Sky blue
 			Color(88, 136, 200),   # Blue
-			Color(56, 88, 144),    # Dark blue
-			Color(48, 48, 56),     # Outline
+			Color(56, 88, 144),	# Dark blue
+			Color(48, 48, 56),	 # Outline
 			Color(0, 0, 0),
 		]
 		palettes.append(Palette(1, "Forest", forest_colors, "Environment", ["nature", "overworld"]))
@@ -535,16 +535,16 @@ class PaletteLibraryTool:
 			Color(255, 248, 120),  # Yellow
 			Color(255, 200, 64),   # Orange
 			Color(255, 128, 32),   # Red-orange
-			Color(224, 64, 16),    # Red
-			Color(168, 32, 8),     # Dark red
-			Color(96, 16, 8),      # Very dark red
+			Color(224, 64, 16),	# Red
+			Color(168, 32, 8),	 # Dark red
+			Color(96, 16, 8),	  # Very dark red
 			Color(248, 208, 144),  # Light gray
 			Color(184, 152, 120),  # Gray
-			Color(120, 96, 80),    # Dark gray
-			Color(64, 48, 40),     # Very dark gray
+			Color(120, 96, 80),	# Dark gray
+			Color(64, 48, 40),	 # Very dark gray
 			Color(255, 160, 96),   # Pink
-			Color(200, 96, 56),    # Brown-red
-			Color(40, 32, 32),     # Outline
+			Color(200, 96, 56),	# Brown-red
+			Color(40, 32, 32),	 # Outline
 			Color(0, 0, 0),
 		]
 		palettes.append(Palette(2, "Fire Temple", fire_colors, "Environment", ["fire", "dungeon"]))
@@ -557,15 +557,15 @@ class PaletteLibraryTool:
 			Color(104, 168, 232),  # Blue
 			Color(64, 136, 208),   # Medium blue
 			Color(32, 104, 176),   # Dark blue
-			Color(16, 72, 136),    # Very dark blue
-			Color(8, 40, 88),      # Deepest blue
+			Color(16, 72, 136),	# Very dark blue
+			Color(8, 40, 88),	  # Deepest blue
 			Color(176, 216, 192),  # Light cyan
 			Color(120, 184, 160),  # Cyan
 			Color(80, 144, 128),   # Dark cyan
 			Color(248, 248, 248),  # White foam
 			Color(216, 224, 232),  # Light gray
 			Color(152, 176, 192),  # Gray
-			Color(48, 56, 72),     # Outline
+			Color(48, 56, 72),	 # Outline
 			Color(0, 0, 0),
 		]
 		palettes.append(Palette(3, "Water Temple", water_colors, "Environment", ["water", "dungeon"]))
@@ -578,15 +578,15 @@ class PaletteLibraryTool:
 			Color(192, 192, 176),  # Bone base
 			Color(152, 152, 144),  # Bone shadow
 			Color(104, 104, 96),   # Bone dark
-			Color(72, 72, 64),     # Bone very dark
-			Color(224, 64, 64),    # Red eyes
-			Color(176, 32, 32),    # Dark red eyes
-			Color(144, 96, 64),    # Rust highlight
-			Color(104, 64, 40),    # Rust
-			Color(64, 40, 24),     # Rust shadow
+			Color(72, 72, 64),	 # Bone very dark
+			Color(224, 64, 64),	# Red eyes
+			Color(176, 32, 32),	# Dark red eyes
+			Color(144, 96, 64),	# Rust highlight
+			Color(104, 64, 40),	# Rust
+			Color(64, 40, 24),	 # Rust shadow
 			Color(120, 88, 120),   # Purple
-			Color(80, 56, 80),     # Dark purple
-			Color(40, 40, 48),     # Outline
+			Color(80, 56, 80),	 # Dark purple
+			Color(40, 40, 48),	 # Outline
 			Color(0, 0, 0),
 		]
 		palettes.append(Palette(4, "Skeleton Enemy", skeleton_colors, "Enemy", ["undead", "monster"]))
@@ -597,17 +597,17 @@ class PaletteLibraryTool:
 			Color(200, 248, 120),  # Slime highlight
 			Color(152, 216, 80),   # Slime light
 			Color(104, 184, 48),   # Slime base
-			Color(64, 144, 32),    # Slime shadow
-			Color(40, 104, 24),    # Slime dark
-			Color(24, 64, 16),     # Slime very dark
+			Color(64, 144, 32),	# Slime shadow
+			Color(40, 104, 24),	# Slime dark
+			Color(24, 64, 16),	 # Slime very dark
 			Color(248, 248, 200),  # Shine highlight
 			Color(216, 216, 160),  # Shine
 			Color(255, 200, 200),  # Pink highlight
 			Color(224, 152, 152),  # Pink
 			Color(96, 216, 248),   # Cyan eye
 			Color(48, 168, 200),   # Eye shadow
-			Color(32, 88, 32),     # Dark green
-			Color(32, 48, 32),     # Outline
+			Color(32, 88, 32),	 # Dark green
+			Color(32, 48, 32),	 # Outline
 			Color(0, 0, 0),
 		]
 		palettes.append(Palette(5, "Slime Enemy", slime_colors, "Enemy", ["slime", "monster"]))
@@ -618,17 +618,17 @@ class PaletteLibraryTool:
 			Color(248, 224, 192),  # Building light
 			Color(216, 184, 144),  # Building base
 			Color(176, 144, 104),  # Building shadow
-			Color(128, 96, 64),    # Building dark
-			Color(224, 88, 72),    # Roof light
-			Color(184, 56, 48),    # Roof
-			Color(136, 32, 32),    # Roof dark
+			Color(128, 96, 64),	# Building dark
+			Color(224, 88, 72),	# Roof light
+			Color(184, 56, 48),	# Roof
+			Color(136, 32, 32),	# Roof dark
 			Color(168, 200, 248),  # Window light
 			Color(104, 152, 216),  # Window
 			Color(64, 104, 168),   # Window dark
 			Color(144, 192, 104),  # Grass
-			Color(96, 144, 72),    # Grass dark
+			Color(96, 144, 72),	# Grass dark
 			Color(184, 168, 120),  # Path
-			Color(48, 48, 56),     # Outline
+			Color(48, 48, 56),	 # Outline
 			Color(0, 0, 0),
 		]
 		palettes.append(Palette(6, "Town Buildings", town_colors, "Environment", ["town", "building"]))
@@ -640,16 +640,16 @@ class PaletteLibraryTool:
 			Color(216, 216, 216),  # Light gray
 			Color(176, 176, 176),  # Gray
 			Color(136, 136, 136),  # Dark gray
-			Color(96, 96, 96),     # Very dark gray
-			Color(56, 56, 56),     # Almost black
+			Color(96, 96, 96),	 # Very dark gray
+			Color(56, 56, 56),	 # Almost black
 			Color(248, 216, 120),  # Gold highlight
 			Color(216, 168, 64),   # Gold
 			Color(168, 120, 32),   # Gold shadow
 			Color(104, 168, 248),  # Blue highlight
 			Color(64, 128, 216),   # Blue
-			Color(32, 88, 168),    # Blue shadow
+			Color(32, 88, 168),	# Blue shadow
 			Color(120, 200, 104),  # Green
-			Color(40, 40, 48),     # Outline
+			Color(40, 40, 48),	 # Outline
 			Color(0, 0, 0),
 		]
 		palettes.append(Palette(7, "UI/Menu", ui_colors, "UI", ["interface", "menu"]))

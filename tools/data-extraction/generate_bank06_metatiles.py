@@ -13,7 +13,7 @@ def generate_metatile_asm(metatile_data: dict) -> str:
 	desc = metatile_data['description']
 	tid = metatile_data['id']
 	
-	return f"                       db ${tiles['top_left']:02X},${tiles['top_right']:02X},${tiles['bottom_left']:02X},${tiles['bottom_right']:02X}  ; Metatile ${tid:02X}: {desc}"
+	return f"					   db ${tiles['top_left']:02X},${tiles['top_right']:02X},${tiles['bottom_left']:02X},${tiles['bottom_right']:02X}  ; Metatile ${tid:02X}: {desc}"
 
 
 def main():

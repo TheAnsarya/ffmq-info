@@ -89,13 +89,13 @@ class ControlCodeAnalyzer:
 			
 			# Show unique dialogs using this code
 			unique_dialogs = set(occ[0] for occ in occurrences)
-			print(f"     In dialogs: {sorted(unique_dialogs)}")
+			print(f"	 In dialogs: {sorted(unique_dialogs)}")
 			
 			# Show first 3 contexts
-			print(f"     Sample contexts:")
+			print(f"	 Sample contexts:")
 			for dialog_id, pos, context in occurrences[:3]:
 				hex_str = " ".join([f"{b:02X}" for b in context])
-				print(f"       Dialog 0x{dialog_id:02X} pos {pos:3d}: {hex_str}")
+				print(f"	   Dialog 0x{dialog_id:02X} pos {pos:3d}: {hex_str}")
 	
 	def analyze_parameter_patterns(self):
 		"""Analyze what bytes follow each control code to determine parameter count"""
@@ -134,7 +134,7 @@ class ControlCodeAnalyzer:
 			print(f"  Byte after 0x{code:02X}:")
 			for byte_val, count in sorted(following_bytes.items(), key=lambda x: -x[1])[:5]:
 				byte_type = self._classify_byte(byte_val)
-				print(f"    0x{byte_val:02X} ({byte_type}): {count} times")
+				print(f"	0x{byte_val:02X} ({byte_type}): {count} times")
 			
 			# Try to determine parameter count
 			param_count = self._estimate_param_count(code, following_patterns)

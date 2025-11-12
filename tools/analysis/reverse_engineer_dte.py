@@ -177,7 +177,7 @@ class DTEReverseEngineer:
 										
 										if next_char == expected_next:
 											# Found DTE match!
-											print(f"    → DTE: 0x{byte:02X} = '{dte_text}'")
+											print(f"	→ DTE: 0x{byte:02X} = '{dte_text}'")
 											findings[byte] = dte_text
 											text_pos += dte_len
 											byte_pos += 1
@@ -222,7 +222,7 @@ class DTEReverseEngineer:
 					if all_findings[byte] != text:
 						print(f"\nWARNING: Conflicting DTE for 0x{byte:02X}:")
 						print(f"  Previous: '{all_findings[byte]}'")
-						print(f"  New:      '{text}'")
+						print(f"  New:	  '{text}'")
 				else:
 					all_findings[byte] = text
 		

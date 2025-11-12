@@ -99,14 +99,14 @@ class MemoryRegion:
 	def get_color(self) -> Tuple[int, int, int]:
 		"""Get color for visualization"""
 		colors = {
-			RegionType.CODE: (100, 200, 100),      # Green
-			RegionType.DATA: (100, 150, 255),      # Blue
-			RegionType.TEXT: (255, 200, 100),      # Orange
+			RegionType.CODE: (100, 200, 100),	  # Green
+			RegionType.DATA: (100, 150, 255),	  # Blue
+			RegionType.TEXT: (255, 200, 100),	  # Orange
 			RegionType.GRAPHICS: (200, 100, 200),  # Purple
-			RegionType.MUSIC: (255, 150, 150),     # Pink
-			RegionType.EMPTY: (80, 80, 80),        # Dark gray
-			RegionType.HEADER: (255, 255, 100),    # Yellow
-			RegionType.VECTOR: (255, 100, 100),    # Red
+			RegionType.MUSIC: (255, 150, 150),	 # Pink
+			RegionType.EMPTY: (80, 80, 80),		# Dark gray
+			RegionType.HEADER: (255, 255, 100),	# Yellow
+			RegionType.VECTOR: (255, 100, 100),	# Red
 		}
 		return colors.get(self.region_type, (128, 128, 128))
 
@@ -733,11 +733,11 @@ def main():
 	header_offset = 0xFFB0
 	test_rom[header_offset:header_offset + 21] = b'TEST ROM FFMQ HACK\x00\x00\x00'
 	test_rom[header_offset + 0x15] = 0x20  # LoROM
-	test_rom[header_offset + 0x17] = 9     # 512KB
-	test_rom[header_offset + 0x18] = 3     # 8KB SRAM
-	test_rom[header_offset + 0x19] = 1     # USA
+	test_rom[header_offset + 0x17] = 9	 # 512KB
+	test_rom[header_offset + 0x18] = 3	 # 8KB SRAM
+	test_rom[header_offset + 0x19] = 1	 # USA
 	test_rom[header_offset + 0x1A] = 0x33  # Developer
-	test_rom[header_offset + 0x1B] = 1     # Version 1
+	test_rom[header_offset + 0x1B] = 1	 # Version 1
 
 	# Calculate checksum
 	checksum = sum(test_rom) & 0xFFFF

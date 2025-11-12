@@ -147,7 +147,7 @@ def test_graphics_pipeline(full_test: bool = False):
 			asm_files = list(asm_dir.glob('*.asm'))
 			print(f"  • {len(asm_files)} ASM files in src/asm/graphics/")
 			for asm_file in sorted(asm_files):
-				print(f"    - {asm_file.name}")
+				print(f"	- {asm_file.name}")
 
 		# Check manifest
 		manifest = project_root / 'build' / 'graphics_manifest.json'

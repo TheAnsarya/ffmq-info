@@ -26,9 +26,9 @@ class FFMQCompression:
 	"""Handles FFMQ map compression and decompression"""
 	
 	# Command types (based on high bits)
-	CMD_LITERAL = 0x00      # Copy literal bytes
-	CMD_RLE = 0x80          # Run-length encoding
-	CMD_PATTERN = 0xC0      # Repeating pattern
+	CMD_LITERAL = 0x00	  # Copy literal bytes
+	CMD_RLE = 0x80		  # Run-length encoding
+	CMD_PATTERN = 0xC0	  # Repeating pattern
 	
 	@staticmethod
 	def decompress_map(compressed_data: bytes) -> bytes:

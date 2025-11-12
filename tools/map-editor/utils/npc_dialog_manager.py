@@ -247,13 +247,13 @@ class NPCDialogPanel:
 		if self.npc.flag_dialogs:
 			info_lines.append("  Flag-based:")
 			for flag_id, dialog_id in self.npc.flag_dialogs.items():
-				info_lines.append(f"    Flag {flag_id:04X} → Dialog {dialog_id:04X}")
+				info_lines.append(f"	Flag {flag_id:04X} → Dialog {dialog_id:04X}")
 
 		# Item-based dialogs
 		if self.npc.item_dialogs:
 			info_lines.append("  Item-based:")
 			for item_id, dialog_id in self.npc.item_dialogs.items():
-				info_lines.append(f"    Item {item_id:04X} → Dialog {dialog_id:04X}")
+				info_lines.append(f"	Item {item_id:04X} → Dialog {dialog_id:04X}")
 
 		# Event dialog
 		if self.npc.event_dialog_id is not None:

@@ -1,0 +1,33 @@
+Code,Count,Dialogs,Coverage_Pct,Description,Status
+0x00,117,117,100.0,End of text / Null terminator,Confirmed
+0x01,153,44,37.6,Newline,Confirmed
+0x02,36,17,14.5,Pause / Wait for input,Confirmed
+0x03,23,17,14.5,Portrait command / NPC ID,Confirmed
+0x04,6,6,5.1,Speed 0 (instant),Confirmed
+0x05,74,52,44.4,Speed 1 (fast),Confirmed
+0x06,16,13,11.1,Speed 2 (normal),Confirmed
+0x07,4,4,3.4,Speed 3? (slowest),Suspected
+0x08,28,20,17.1,"CRITICAL - Unknown (500+ occurrences, 90% coverage)",Critical Unknown
+0x09,32,18,15.4,Speed 5? (custom),Suspected
+0x0A,33,20,17.1,Unknown - rare,Suspected
+0x0B,27,26,22.2,Unknown - rare,Suspected
+0x0C,13,11,9.4,Unknown - rare,Suspected
+0x0D,8,7,6.0,Unknown - rare,Suspected
+0x0E,9,9,7.7,Frequent unknown (100+ occurrences),Critical Unknown
+0x0F,18,15,12.8,Unknown - rare,Suspected
+0x10,47,29,24.8,Dynamic insertion? (item),Suspected
+0x11,27,15,12.8,Dynamic insertion? (spell),Suspected
+0x12,13,11,9.4,Dynamic insertion? (monster),Suspected
+0x13,17,17,14.5,Dynamic insertion? (character),Suspected
+0x14,8,8,6.8,Dynamic insertion? (location),Suspected
+0x15,0,0,0.0,Dynamic insertion? (number),Suspected
+0x16,11,6,5.1,Dynamic insertion? (object),Suspected
+0x17,1,1,0.9,Dynamic insertion? (weapon),Suspected
+0x18,18,16,13.7,Dynamic insertion? (armor),Suspected
+0x19,0,0,0.0,Dynamic insertion? (accessory),Suspected
+0x1A,24,22,18.8,Position Y (vertical positioning),Confirmed
+0x1B,7,7,6.0,Position X (horizontal positioning),Confirmed
+0x1C,3,3,2.6,Unknown positioning?,Suspected
+0x1D,6,6,5.1,Unknown positioning?,Suspected
+0x1E,5,5,4.3,Unknown positioning?,Suspected
+0x1F,2,1,0.9,Crystal (battle item reference),Confirmed

@@ -51,11 +51,11 @@ class DialogSearchEngine:
 		self.max_results = 100
 	
 	def search(self, 
-	          dialogs: Dict[int, any],  # dialog_id -> DialogEntry
-	          query: str,
-	          mode: SearchMode = SearchMode.TEXT,
-	          npc_filter: Optional[List[int]] = None,
-	          map_filter: Optional[List[int]] = None) -> List[SearchResult]:
+			  dialogs: Dict[int, any],  # dialog_id -> DialogEntry
+			  query: str,
+			  mode: SearchMode = SearchMode.TEXT,
+			  npc_filter: Optional[List[int]] = None,
+			  map_filter: Optional[List[int]] = None) -> List[SearchResult]:
 		"""
 		Search dialogs with various filters
 		
@@ -270,8 +270,8 @@ class DialogSearchEngine:
 		return before + "[" + matched + "]" + after
 	
 	def search_by_length(self, dialogs: Dict[int, any], 
-	                     min_length: Optional[int] = None,
-	                     max_length: Optional[int] = None) -> List[int]:
+						 min_length: Optional[int] = None,
+						 max_length: Optional[int] = None) -> List[int]:
 		"""
 		Search dialogs by length
 		
@@ -298,8 +298,8 @@ class DialogSearchEngine:
 		return results
 	
 	def search_by_control_codes(self, dialogs: Dict[int, any], 
-	                            has_codes: Optional[List[str]] = None,
-	                            missing_codes: Optional[List[str]] = None) -> List[int]:
+								has_codes: Optional[List[str]] = None,
+								missing_codes: Optional[List[str]] = None) -> List[int]:
 		"""
 		Search dialogs by presence or absence of control codes
 		

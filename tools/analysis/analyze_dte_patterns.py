@@ -126,7 +126,7 @@ def analyze_patterns(dte_data: Dict) -> None:
 	# Pattern groups
 	patterns = {
 		"Likely ' the'": [],  # preceded by space, contains 'the'
-		"Likely 'er'": [],    # preceded by consonants, common ending
+		"Likely 'er'": [],	# preceded by consonants, common ending
 		"Likely 'in' or 'on'": [],  # common prepositions
 		"Likely word with space": [],  # followed by space
 	}

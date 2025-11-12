@@ -127,7 +127,7 @@ class ElementMatrixVisualizer:
 		}
 		
 		element_names = [name for _, name in sorted(self.ELEMENTS.items())]
-		header = "  ID | Enemy Name          | " + " ".join(element_abbrev[name] for name in element_names)
+		header = "  ID | Enemy Name		  | " + " ".join(element_abbrev[name] for name in element_names)
 		lines.append(header)
 		lines.append("-" * 100)
 		

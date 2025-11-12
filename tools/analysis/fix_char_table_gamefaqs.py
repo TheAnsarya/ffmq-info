@@ -12,13 +12,13 @@ Date: 2025-11-12
 # Corrected character mappings based on GameFAQs script analysis
 CORRECTIONS = {
 	# Control codes (0x00-0x2F)
-	0x00: '[END]',      # String terminator
+	0x00: '[END]',	  # String terminator
 	0x01: '{newline}',  # Line break
-	0x02: '[WAIT]',     # Wait for button
-	0x03: '*',          # Asterisk
-	0x04: '[NAME]',     # Insert character name
-	0x05: '[ITEM]',     # Insert item name
-	0x06: '_',          # Space/underscore
+	0x02: '[WAIT]',	 # Wait for button
+	0x03: '*',		  # Asterisk
+	0x04: '[NAME]',	 # Insert character name
+	0x05: '[ITEM]',	 # Insert item name
+	0x06: '_',		  # Space/underscore
 	
 	# Dictionary compression range 0x30-0x7F is handled separately
 	
@@ -41,26 +41,26 @@ CORRECTIONS = {
 	0xCC: 'y', 0xCD: 'z',
 	
 	# Punctuation and special characters
-	0x80: '~',     # Tilde
-	0x81: '…',     # Ellipsis
-	0x83: 'é',     # e acute
-	0x84: 'è',     # e grave  
-	0x87: 'à',     # a grave
-	0x8A: 'ü',     # u umlaut
-	0x8B: 'ö',     # o umlaut
-	0x8C: 'ä',     # a umlaut
-	0xCE: "'",     # Apostrophe
-	0xD0: '.',     # Period
-	0xD1: "'",     # Right single quote
-	0xD2: ',',     # Comma
-	0xDA: '-',     # Hyphen/dash
-	0xDB: '&',     # Ampersand
-	0xDC: ':',     # Colon
-	0xDE: ';',     # Semicolon
-	0xE7: '"',     # Quote
-	0xEB: '?',     # Question mark
-	0xF7: '!',     # Exclamation mark
-	0xFF: ' ',     # Space
+	0x80: '~',	 # Tilde
+	0x81: '…',	 # Ellipsis
+	0x83: 'é',	 # e acute
+	0x84: 'è',	 # e grave  
+	0x87: 'à',	 # a grave
+	0x8A: 'ü',	 # u umlaut
+	0x8B: 'ö',	 # o umlaut
+	0x8C: 'ä',	 # a umlaut
+	0xCE: "'",	 # Apostrophe
+	0xD0: '.',	 # Period
+	0xD1: "'",	 # Right single quote
+	0xD2: ',',	 # Comma
+	0xDA: '-',	 # Hyphen/dash
+	0xDB: '&',	 # Ampersand
+	0xDC: ':',	 # Colon
+	0xDE: ';',	 # Semicolon
+	0xE7: '"',	 # Quote
+	0xEB: '?',	 # Question mark
+	0xF7: '!',	 # Exclamation mark
+	0xFF: ' ',	 # Space
 }
 
 def update_character_table(table_path='simple.tbl'):
@@ -115,7 +115,7 @@ def update_character_table(table_path='simple.tbl'):
 	print(f"\nStatistics:")
 	print(f"  Known characters:   {known}")
 	print(f"  Unknown characters: {unknown}")
-	print(f"  Coverage:           {coverage:.1f}%")
+	print(f"  Coverage:		   {coverage:.1f}%")
 
 def main():
 	"""Main entry point."""

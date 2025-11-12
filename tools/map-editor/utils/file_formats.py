@@ -317,7 +317,7 @@ class TiledFormat(MapFileFormat):
 			# Tileset reference
 			tmx.append(f'  <tileset firstgid="1" name="tileset_{tileset_id}" '
 					  f'tilewidth="16" tileheight="16" tilecount="256">')
-			tmx.append(f'    <image source="tileset_{tileset_id}.png" '
+			tmx.append(f'	<image source="tileset_{tileset_id}.png" '
 					  f'width="128" height="128"/>')
 			tmx.append('  </tileset>')
 
@@ -332,7 +332,7 @@ class TiledFormat(MapFileFormat):
 				layer_display_name = ['Ground', 'Upper', 'Events'][layer_idx]
 				tmx.append(f'  <layer name="{layer_display_name}" '
 						  f'width="{width}" height="{height}">')
-				tmx.append('    <data encoding="csv">')
+				tmx.append('	<data encoding="csv">')
 
 				# Write tile data as CSV
 				for y in range(height):
@@ -340,10 +340,10 @@ class TiledFormat(MapFileFormat):
 					for x in range(width):
 						tile_id = int(layer_data[y, x])
 						row.append(str(tile_id + 1))  # +1 for Tiled GID
-					tmx.append('      ' + ','.join(row) +
+					tmx.append('	  ' + ','.join(row) +
 							  (',' if y < height - 1 else ''))
 
-				tmx.append('    </data>')
+				tmx.append('	</data>')
 				tmx.append('  </layer>')
 
 			tmx.append('</map>')

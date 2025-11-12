@@ -40,8 +40,8 @@ class EnemyFormation:
 	enemy_ids: List[int] = field(default_factory=list)  # Up to 6 enemies
 	positions: List[Tuple[int, int]] = field(default_factory=list)  # Enemy positions
 	is_boss: bool = False
-	surprise_rate: int = 0        # Chance of surprise attack (0-100)
-	preemptive_rate: int = 0      # Chance of preemptive strike (0-100)
+	surprise_rate: int = 0		# Chance of surprise attack (0-100)
+	preemptive_rate: int = 0	  # Chance of preemptive strike (0-100)
 	can_escape: bool = True
 	
 	# Rewards
@@ -49,8 +49,8 @@ class EnemyFormation:
 	bonus_gold: int = 0
 	
 	# Visual
-	background_id: int = 0        # Battle background
-	music_id: int = 0             # Battle music
+	background_id: int = 0		# Battle background
+	music_id: int = 0			 # Battle music
 	
 	def to_bytes(self) -> bytes:
 		"""Serialize formation to ROM format"""
@@ -167,9 +167,9 @@ class EncounterTable:
 	"""Encounter table for a dungeon area"""
 	table_id: int = 0
 	formations: List[int] = field(default_factory=list)  # Formation IDs
-	weights: List[int] = field(default_factory=list)     # Encounter weights
-	base_rate: int = 16          # Base encounter rate (steps between battles)
-	rate_variance: int = 8       # Variance in encounter rate
+	weights: List[int] = field(default_factory=list)	 # Encounter weights
+	base_rate: int = 16		  # Base encounter rate (steps between battles)
+	rate_variance: int = 8	   # Variance in encounter rate
 	
 	def to_bytes(self) -> bytes:
 		"""Serialize encounter table"""
@@ -279,7 +279,7 @@ class DungeonZone:
 	
 	# Modifiers
 	encounter_rate_modifier: float = 1.0  # Multiplier for encounter rate
-	escape_rate_modifier: float = 1.0    # Multiplier for escape chance
+	escape_rate_modifier: float = 1.0	# Multiplier for escape chance
 	
 	def contains_point(self, x: int, y: int) -> bool:
 		"""Check if point is in zone"""

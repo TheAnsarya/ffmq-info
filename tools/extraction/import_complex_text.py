@@ -231,7 +231,7 @@ def insert_dialogs_into_rom(rom_path: str, dialogs: Dict[int, str], output_path:
 		
 		if len(encoded) > original_size:
 			print(f"  WARNING: Dialog 0x{dialog_id:02X} is too large! " +
-			      f"({len(encoded)} bytes vs {original_size} bytes available)")
+				  f"({len(encoded)} bytes vs {original_size} bytes available)")
 	
 	print(f"\nOriginal total size: {total_original_size} bytes")
 	print(f"New total size: {total_new_size} bytes")

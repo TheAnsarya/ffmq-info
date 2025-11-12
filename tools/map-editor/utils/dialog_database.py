@@ -16,16 +16,16 @@ from .dialog_text import DialogText, CharacterTable, ControlCode
 @dataclass
 class DialogEntry:
 	"""Represents a single dialog entry in the ROM"""
-	id: int                           # Dialog ID (index in pointer table)
-	text: str                         # Decoded text with control codes
-	raw_bytes: bytearray              # Original ROM bytes
-	pointer: int                      # Pointer value (SNES address)
-	address: int                      # Actual ROM address (PC)
-	length: int                       # Length in bytes
+	id: int						   # Dialog ID (index in pointer table)
+	text: str						 # Decoded text with control codes
+	raw_bytes: bytearray			  # Original ROM bytes
+	pointer: int					  # Pointer value (SNES address)
+	address: int					  # Actual ROM address (PC)
+	length: int					   # Length in bytes
 	references: List[str] = field(default_factory=list)  # NPCs/events using this
-	tags: Set[str] = field(default_factory=set)          # User tags
-	notes: str = ""                   # User notes
-	modified: bool = False            # Has been edited
+	tags: Set[str] = field(default_factory=set)		  # User tags
+	notes: str = ""				   # User notes
+	modified: bool = False			# Has been edited
 
 	def __str__(self) -> str:
 		"""String representation"""
@@ -75,11 +75,11 @@ class DialogDatabase:
 	"""Manages all dialog entries and ROM operations"""
 
 	# ROM offsets (PC addresses)
-	POINTER_TABLE_ADDR = 0x00D636    # Dialog pointer table
-	DIALOG_BANK = 0x03               # Dialog stored in bank $03
-	DIALOG_DATA_START = 0x018000     # Bank $03 start (PC)
-	DIALOG_DATA_END = 0x01FFFF       # Bank $03 end (PC)
-	MAX_DIALOGS = 256                # Maximum dialog entries
+	POINTER_TABLE_ADDR = 0x00D636	# Dialog pointer table
+	DIALOG_BANK = 0x03			   # Dialog stored in bank $03
+	DIALOG_DATA_START = 0x018000	 # Bank $03 start (PC)
+	DIALOG_DATA_END = 0x01FFFF	   # Bank $03 end (PC)
+	MAX_DIALOGS = 256				# Maximum dialog entries
 
 	def __init__(self, rom_path: Optional[Path] = None):
 		"""

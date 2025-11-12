@@ -9,8 +9,8 @@ Usage:
 	python tools/normalize_spacing.py [--dry-run] [--bank XX]
 
 Options:
-	--dry-run    Show what would be changed without modifying files
-	--bank XX    Process only a specific bank (e.g., --bank 00)
+	--dry-run	Show what would be changed without modifying files
+	--bank XX	Process only a specific bank (e.g., --bank 00)
 """
 
 import re
@@ -126,9 +126,9 @@ def process_file(filepath: Path, dry_run: bool = False) -> dict:
 		else:
 			print(f"  [DRY RUN] Would modify: {total_changes} lines")
 
-		print(f"     - Instruction spacing: {stats['instruction_spacing']}")
-		print(f"     - Trailing whitespace: {stats['trailing_whitespace']}")
-		print(f"     - Operator spacing: {stats['operator_spacing']}")
+		print(f"	 - Instruction spacing: {stats['instruction_spacing']}")
+		print(f"	 - Trailing whitespace: {stats['trailing_whitespace']}")
+		print(f"	 - Operator spacing: {stats['operator_spacing']}")
 	else:
 		print(f"  [OK] No changes needed")
 

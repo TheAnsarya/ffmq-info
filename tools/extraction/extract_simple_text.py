@@ -14,14 +14,14 @@ Extracts:
 	- Monster names (256 entries, 16 bytes each)
 
 ROM Addresses from source code (.asm files):
-	Items:       $064120 (PC: 0x064120)
-	Spells:      $064210 (PC: 0x064210)
-	Weapons:     $0642A0 (PC: 0x0642A0)
-	Helmets:     $064354 (PC: 0x064354)
-	Armor:       $064378 (PC: 0x064378)
-	Shields:     $0643CC (PC: 0x0643CC)
+	Items:	   $064120 (PC: 0x064120)
+	Spells:	  $064210 (PC: 0x064210)
+	Weapons:	 $0642A0 (PC: 0x0642A0)
+	Helmets:	 $064354 (PC: 0x064354)
+	Armor:	   $064378 (PC: 0x064378)
+	Shields:	 $0643CC (PC: 0x0643CC)
 	Accessories: $0643FC (PC: 0x0643FC)
-	Monsters:    $064BA0 (PC: 0x064BA0)
+	Monsters:	$064BA0 (PC: 0x064BA0)
 
 Usage:
 	python extract_simple_text.py <rom_path> [--output-dir data/text_fixed]
@@ -43,9 +43,9 @@ from text.simple_text_decoder import SimpleTextDecoder
 @dataclass
 class TextTableConfig:
 	"""Configuration for a text table in ROM"""
-	name: str           # Table name (e.g., "item_names")
-	address: int        # PC address in ROM
-	count: int          # Number of entries
+	name: str		   # Table name (e.g., "item_names")
+	address: int		# PC address in ROM
+	count: int		  # Number of entries
 	entry_length: int   # Bytes per entry
 
 
@@ -98,8 +98,8 @@ class SimpleTextExtractor:
 			List of dicts with: id, text, address, length
 		"""
 		print(f"\n  Extracting {config.name}...")
-		print(f"    Address: ${config.address:06X}")
-		print(f"    Entries: {config.count} x {config.entry_length} bytes")
+		print(f"	Address: ${config.address:06X}")
+		print(f"	Entries: {config.count} x {config.entry_length} bytes")
 		
 		entries = self.decoder.decode_table(
 			self.rom_data,
@@ -108,15 +108,15 @@ class SimpleTextExtractor:
 			config.entry_length
 		)
 		
-		print(f"    ✓ Found {len(entries)} non-empty entries")
+		print(f"	✓ Found {len(entries)} non-empty entries")
 		
 		# Show first 5 as sample
 		if entries:
-			print(f"    Sample: {entries[0]['text']}")
+			print(f"	Sample: {entries[0]['text']}")
 			if len(entries) > 1:
-				print(f"            {entries[1]['text']}")
+				print(f"			{entries[1]['text']}")
 			if len(entries) > 2:
-				print(f"            {entries[2]['text']}")
+				print(f"			{entries[2]['text']}")
 		
 		return entries
 	

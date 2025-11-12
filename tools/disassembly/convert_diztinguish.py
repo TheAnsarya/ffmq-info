@@ -8,8 +8,8 @@ Preserves labels and data
 
 Input format (Diztinguish):
 	CODE_008000:
-					   CLC                                  ;008000|18      |      ;
-					   XCE                                  ;008001|FB      |      ;
+					   CLC								  ;008000|18	  |	  ;
+					   XCE								  ;008001|FB	  |	  ;
 
 Output format (asar):
 CODE_008000:
@@ -51,7 +51,7 @@ def convert_line(line: str) -> str:
 		return f'org ${addr}\n'
 	
 	# Match instruction lines (indented)
-	# Format: "                       INSTRUCTION                      ;ADDRESS|BYTES|      ;"
+	# Format: "					   INSTRUCTION					  ;ADDRESS|BYTES|	  ;"
 	inst_match = re.match(r'^\s+([A-Z]+(?:\.[BWL])?)\s+(.+?)\s*;[0-9A-F]+\|', line)
 	if inst_match:
 		instruction = inst_match.group(1)
@@ -66,37 +66,37 @@ def convert_line(line: str) -> str:
 		# $XX → direct page or absolute
 		# [$XX] → indirect
 		
-		return f'    {instruction} {operand}\n'
+		return f'	{instruction} {operand}\n'
 	
 	# Match simple instructions with no operands
 	inst_simple = re.match(r'^\s+([A-Z]+)\s*;[0-9A-F]+\|', line)
 	if inst_simple:
 		instruction = inst_simple.group(1)
-		return f'    {instruction}\n'
+		return f'	{instruction}\n'
 	
 	# Match db/dw directives
 	db_match = re.match(r'^\s+db\s+(.+?)\s*;[0-9A-F]+\|', line)
 	if db_match:
 		data = db_match.group(1).strip()
-		return f'    db {data}\n'
+		return f'	db {data}\n'
 	
 	dw_match = re.match(r'^\s+dw\s+(.+?)\s*;[0-9A-F]+\|', line)
 	if dw_match:
 		data = dw_match.group(1).strip()
-		return f'    dw {data}\n'
+		return f'	dw {data}\n'
 	
 	# Match comment lines
 	comment_match = re.match(r'^\s*;(.+)$', line)
 	if comment_match:
 		comment = comment_match.group(1)
-		return f'    ;{comment}\n'
+		return f'	;{comment}\n'
 	
 	# Match blank lines
 	if line.strip() == '':
 		return '\n'
 	
 	# Unknown format - return as comment
-	return f'    ; UNKNOWN FORMAT: {line.strip()}\n'
+	return f'	; UNKNOWN FORMAT: {line.strip()}\n'
 
 def convert_file(input_file: Path):
 	"""Convert entire file"""
@@ -112,8 +112,8 @@ def convert_file(input_file: Path):
 				converted = convert_line(line)
 				print(converted, end='')
 			except Exception as e:
-				print(f'    ; ERROR LINE {line_num}: {e}', file=sys.stderr)
-				print(f'    ; {line.strip()}', end='\n')
+				print(f'	; ERROR LINE {line_num}: {e}', file=sys.stderr)
+				print(f'	; {line.strip()}', end='\n')
 
 def main():
 	if len(sys.argv) < 2:

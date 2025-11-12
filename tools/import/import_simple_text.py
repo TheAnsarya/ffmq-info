@@ -170,8 +170,8 @@ class SimpleTextImporter:
 		if self.dry_run:
 			current_text, _ = self.decoder.decode(bytes(current), entry.expected_length)
 			print(f"  Entry {entry.id:3d} @ ${entry.address:06X}:")
-			print(f"    OLD: {current_text}")
-			print(f"    NEW: {entry.text}")
+			print(f"	OLD: {current_text}")
+			print(f"	NEW: {entry.text}")
 		else:
 			# Write to ROM
 			self.rom_data[entry.address:entry.address + entry.expected_length] = encoded
@@ -205,9 +205,9 @@ class SimpleTextImporter:
 		if self.errors:
 			print(f"  ⚠️  {len(self.errors)} errors:")
 			for error in self.errors[:5]:  # Show first 5 errors
-				print(f"    - {error}")
+				print(f"	- {error}")
 			if len(self.errors) > 5:
-				print(f"    ... and {len(self.errors) - 5} more")
+				print(f"	... and {len(self.errors) - 5} more")
 			self.errors.clear()
 		
 		return success_count > 0

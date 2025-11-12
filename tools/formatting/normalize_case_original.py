@@ -9,8 +9,8 @@ Usage:
 	python tools/normalize_case.py [--dry-run] [--bank XX]
 
 Options:
-	--dry-run    Show what would be changed without modifying files
-	--bank XX    Process only a specific bank (e.g., --bank 00)
+	--dry-run	Show what would be changed without modifying files
+	--bank XX	Process only a specific bank (e.g., --bank 00)
 """
 
 import re
@@ -110,9 +110,9 @@ def process_file(filepath: Path, dry_run: bool = False) -> dict:
 		else:
 			print(f"  [DRY RUN] Would modify: {total_changes} changes")
 
-		print(f"     - Hex values: {stats['hex']}")
-		print(f"     - Instructions: {stats['instructions']}")
-		print(f"     - Addressing modes: {stats['addressing_modes']}")
+		print(f"	 - Hex values: {stats['hex']}")
+		print(f"	 - Instructions: {stats['instructions']}")
+		print(f"	 - Addressing modes: {stats['addressing_modes']}")
 	else:
 		print(f"  [OK] No changes needed")
 

@@ -58,13 +58,13 @@ def add_elemental_weaknesses():
 
 			# Report
 			weakness_names = [name for name, val in ELEMENTS.items()
-			                  if enemy['weaknesses'] & val]
+							  if enemy['weaknesses'] & val]
 			print(f"  {enemy['name']:25} → Weak to: {', '.join(weakness_names)}")
 			modified_count += 1
 		else:
 			# Enemy already has weaknesses
 			weakness_names = [name for name, val in ELEMENTS.items()
-			                  if enemy['weaknesses'] & val]
+							  if enemy['weaknesses'] & val]
 			if weakness_names:
 				print(f"  {enemy['name']:25} (already weak to: {', '.join(weakness_names)})")
 

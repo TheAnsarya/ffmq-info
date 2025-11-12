@@ -14,8 +14,8 @@ from enemy_data import Enemy, EnemyFlags, ENEMY_NAMES
 
 # ROM addresses for enemy data (these are example addresses - adjust for actual ROM)
 ENEMY_DATA_BASE = 0x0D0000  # Base address for enemy stats
-ENEMY_COUNT = 256           # Total number of enemies in FFMQ
-ENEMY_SIZE = 256            # Size of each enemy data block
+ENEMY_COUNT = 256		   # Total number of enemies in FFMQ
+ENEMY_SIZE = 256			# Size of each enemy data block
 
 
 class EnemyDatabase:

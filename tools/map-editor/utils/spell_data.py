@@ -20,8 +20,8 @@ class SpellElement(IntEnum):
 	WIND = 4
 	HOLY = 5
 	DARK = 6
-	CURE = 7      # Healing
-	STATUS = 8    # Status effects
+	CURE = 7	  # Healing
+	STATUS = 8	# Status effects
 
 
 class SpellTarget(IntEnum):
@@ -39,15 +39,15 @@ class SpellTarget(IntEnum):
 class SpellFlags(IntFlag):
 	"""Spell behavior flags"""
 	NONE = 0
-	OFFENSIVE = 0x01        # Deals damage
-	HEALING = 0x02          # Restores HP/MP
-	STATUS_EFFECT = 0x04    # Applies status
-	REFLECTABLE = 0x08      # Can be reflected
-	BLOCKABLE = 0x10        # Can be blocked
+	OFFENSIVE = 0x01		# Deals damage
+	HEALING = 0x02		  # Restores HP/MP
+	STATUS_EFFECT = 0x04	# Applies status
+	REFLECTABLE = 0x08	  # Can be reflected
+	BLOCKABLE = 0x10		# Can be blocked
 	IGNORES_DEFENSE = 0x20  # Ignores magic defense
-	DRAINS_HP = 0x40        # Drains HP from target
-	DRAINS_MP = 0x80        # Drains MP from target
-	REVIVE = 0x100          # Revives KO'd ally
+	DRAINS_HP = 0x40		# Drains HP from target
+	DRAINS_MP = 0x80		# Drains MP from target
+	REVIVE = 0x100		  # Revives KO'd ally
 	REMOVE_STATUS = 0x200   # Removes status effects
 
 
@@ -71,26 +71,26 @@ class StatusEffect(IntFlag):
 
 class DamageFormula(IntEnum):
 	"""Damage calculation formulas"""
-	FIXED = 0               # Fixed damage
-	MAGIC_BASED = 1         # Based on caster's magic stat
-	LEVEL_BASED = 2         # Based on caster's level
-	HP_PERCENTAGE = 3       # Percentage of target's HP
-	MP_BASED = 4            # Based on caster's MP
-	DEFENSE_PIERCE = 5      # Ignores defense
-	HYBRID = 6              # Physical + Magic
-	RANDOM = 7              # Random damage in range
+	FIXED = 0			   # Fixed damage
+	MAGIC_BASED = 1		 # Based on caster's magic stat
+	LEVEL_BASED = 2		 # Based on caster's level
+	HP_PERCENTAGE = 3	   # Percentage of target's HP
+	MP_BASED = 4			# Based on caster's MP
+	DEFENSE_PIERCE = 5	  # Ignores defense
+	HYBRID = 6			  # Physical + Magic
+	RANDOM = 7			  # Random damage in range
 
 
 @dataclass
 class AnimationData:
 	"""Spell animation data"""
-	animation_id: int = 0       # Animation sprite ID
-	palette_id: int = 0         # Palette for animation
-	duration: int = 60          # Duration in frames
-	sound_effect: int = 0       # Sound effect ID
+	animation_id: int = 0	   # Animation sprite ID
+	palette_id: int = 0		 # Palette for animation
+	duration: int = 60		  # Duration in frames
+	sound_effect: int = 0	   # Sound effect ID
 	screen_flash: bool = False  # Screen flash effect
 	shake_screen: bool = False  # Screen shake effect
-	projectile: bool = False    # Projectile-based
+	projectile: bool = False	# Projectile-based
 	
 	def to_bytes(self) -> bytes:
 		"""Convert to ROM bytes"""
@@ -126,8 +126,8 @@ class Spell:
 	name: str = "New Spell"
 	
 	# Costs
-	mp_cost: int = 0            # MP cost to cast
-	level_required: int = 1     # Minimum level to learn
+	mp_cost: int = 0			# MP cost to cast
+	level_required: int = 1	 # Minimum level to learn
 	
 	# Targeting and element
 	element: SpellElement = SpellElement.NONE
@@ -138,18 +138,18 @@ class Spell:
 	
 	# Damage/healing
 	damage_formula: DamageFormula = DamageFormula.MAGIC_BASED
-	base_power: int = 0         # Base damage/healing amount
-	power_variance: int = 0     # Random variance (±)
-	multiplier: float = 1.0     # Damage multiplier
+	base_power: int = 0		 # Base damage/healing amount
+	power_variance: int = 0	 # Random variance (±)
+	multiplier: float = 1.0	 # Damage multiplier
 	
 	# Status effects
 	status_effects: StatusEffect = StatusEffect.NONE
-	status_chance: int = 100    # Chance to apply status (0-100%)
-	status_duration: int = 3    # Duration in turns
+	status_chance: int = 100	# Chance to apply status (0-100%)
+	status_duration: int = 3	# Duration in turns
 	
 	# Accuracy and critical
-	accuracy: int = 100         # Hit chance (0-100%)
-	critical_rate: int = 0      # Critical hit rate (0-100%)
+	accuracy: int = 100		 # Hit chance (0-100%)
+	critical_rate: int = 0	  # Critical hit rate (0-100%)
 	
 	# Animation
 	animation: AnimationData = field(default_factory=AnimationData)

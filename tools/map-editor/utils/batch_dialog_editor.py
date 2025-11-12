@@ -38,14 +38,14 @@ class BatchDialogEditor:
 		self.max_undo = 50
 
 	def find_and_replace(self,
-	                     dialogs: Dict[int, any],
-	                     find: str,
-	                     replace: str,
-	                     dialog_ids: Optional[List[int]] = None,
-	                     case_sensitive: bool = False,
-	                     use_regex: bool = False,
-	                     whole_words: bool = False,
-	                     dry_run: bool = False) -> BatchEditOperation:
+						 dialogs: Dict[int, any],
+						 find: str,
+						 replace: str,
+						 dialog_ids: Optional[List[int]] = None,
+						 case_sensitive: bool = False,
+						 use_regex: bool = False,
+						 whole_words: bool = False,
+						 dry_run: bool = False) -> BatchEditOperation:
 		"""
 		Find and replace text across dialogs
 
@@ -90,7 +90,7 @@ class BatchDialogEditor:
 		else:
 			if whole_words:
 				pattern = re.compile(r'\b' + re.escape(find) + r'\b',
-				                    flags=0 if case_sensitive else re.IGNORECASE)
+									flags=0 if case_sensitive else re.IGNORECASE)
 			else:
 				pattern = find if case_sensitive else find.lower()
 
@@ -128,11 +128,11 @@ class BatchDialogEditor:
 		return operation
 
 	def batch_insert_control_code(self,
-	                              dialogs: Dict[int, any],
-	                              position: str,  # start, end, before:text, after:text
-	                              control_code: str,
-	                              dialog_ids: Optional[List[int]] = None,
-	                              dry_run: bool = False) -> BatchEditOperation:
+								  dialogs: Dict[int, any],
+								  position: str,  # start, end, before:text, after:text
+								  control_code: str,
+								  dialog_ids: Optional[List[int]] = None,
+								  dry_run: bool = False) -> BatchEditOperation:
 		"""
 		Insert a control code at specified position in multiple dialogs
 
@@ -194,10 +194,10 @@ class BatchDialogEditor:
 		return operation
 
 	def batch_remove_control_code(self,
-	                              dialogs: Dict[int, any],
-	                              control_code: str,
-	                              dialog_ids: Optional[List[int]] = None,
-	                              dry_run: bool = False) -> BatchEditOperation:
+								  dialogs: Dict[int, any],
+								  control_code: str,
+								  dialog_ids: Optional[List[int]] = None,
+								  dry_run: bool = False) -> BatchEditOperation:
 		"""
 		Remove a control code from multiple dialogs
 
@@ -221,10 +221,10 @@ class BatchDialogEditor:
 		)
 
 	def batch_reformat(self,
-	                  dialogs: Dict[int, any],
-	                  operations: List[str],  # normalize_whitespace, remove_trailing_spaces, etc.
-	                  dialog_ids: Optional[List[int]] = None,
-	                  dry_run: bool = False) -> BatchEditOperation:
+					  dialogs: Dict[int, any],
+					  operations: List[str],  # normalize_whitespace, remove_trailing_spaces, etc.
+					  dialog_ids: Optional[List[int]] = None,
+					  dry_run: bool = False) -> BatchEditOperation:
 		"""
 		Apply formatting operations to multiple dialogs
 

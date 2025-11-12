@@ -19,13 +19,13 @@ Features:
 - Integration with asar assembler
 
 Usage:
-	python build_integration.py --extract-all     # Extract everything
-	python build_integration.py --rebuild-all     # Rebuild all changes
-	python build_integration.py --full            # Full rebuild
-	python build_integration.py --validate        # Validate all data
-	python build_integration.py --graphics        # Graphics only
-	python build_integration.py --text            # Text only
-	python build_integration.py --maps            # Maps only
+	python build_integration.py --extract-all	 # Extract everything
+	python build_integration.py --rebuild-all	 # Rebuild all changes
+	python build_integration.py --full			# Full rebuild
+	python build_integration.py --validate		# Validate all data
+	python build_integration.py --graphics		# Graphics only
+	python build_integration.py --text			# Text only
+	python build_integration.py --maps			# Maps only
 
 Author: FFMQ Modding Project
 Date: 2025-11-02 (Phase 3 Enhanced)
@@ -193,7 +193,7 @@ class BuildIntegration:
 
 		print(f"  Found {len(modified)} modified files:")
 		for path in sorted(modified):
-			print(f"    • {path.relative_to(self.project_root)}")
+			print(f"	• {path.relative_to(self.project_root)}")
 
 		# Group by category
 		categories = {}
@@ -266,18 +266,18 @@ class BuildIntegration:
 			)
 
 			if result.returncode != 0:
-				print(f"    ❌ Failed: {result.stderr}")
+				print(f"	❌ Failed: {result.stderr}")
 				return False
 
 			# Print output
 			for line in result.stdout.strip().split('\n'):
 				if line.strip():
-					print(f"    {line}")
+					print(f"	{line}")
 
 			return True
 
 		except Exception as e:
-			print(f"    ❌ Error: {e}")
+			print(f"	❌ Error: {e}")
 			return False
 
 	def validate_graphics(self) -> bool:
@@ -315,16 +315,16 @@ class BuildIntegration:
 		if errors:
 			print(f"\n  ❌ Found {len(errors)} errors:")
 			for error in errors[:10]:  # Show first 10
-				print(f"     • {error}")
+				print(f"	 • {error}")
 			if len(errors) > 10:
-				print(f"     ... and {len(errors) - 10} more")
+				print(f"	 ... and {len(errors) - 10} more")
 
 		if warnings:
 			print(f"\n  ⚠️  Found {len(warnings)} warnings:")
 			for warning in warnings[:10]:  # Show first 10
-				print(f"     • {warning}")
+				print(f"	 • {warning}")
 			if len(warnings) > 10:
-				print(f"     ... and {len(warnings) - 10} more")
+				print(f"	 ... and {len(warnings) - 10} more")
 
 		if not errors and not warnings:
 			print("  ✓ All graphics validated successfully")
@@ -760,12 +760,12 @@ def main():
 					args.rebuild_maps, args.extract_overworld, args.extract_effects]):
 			parser.print_help()
 			print("\nExamples:")
-			print("  python build_integration.py --pipeline          # Full workflow")
-			print("  python build_integration.py --extract-all       # Extract everything")
-			print("  python build_integration.py --rebuild-all       # Rebuild changes")
-			print("  python build_integration.py --graphics          # Graphics only")
-			print("  python build_integration.py --text              # Text only")
-			print("  python build_integration.py --maps              # Maps only")
+			print("  python build_integration.py --pipeline		  # Full workflow")
+			print("  python build_integration.py --extract-all	   # Extract everything")
+			print("  python build_integration.py --rebuild-all	   # Rebuild changes")
+			print("  python build_integration.py --graphics		  # Graphics only")
+			print("  python build_integration.py --text			  # Text only")
+			print("  python build_integration.py --maps			  # Maps only")
 			return 1
 
 	return 0 if success else 1

@@ -94,7 +94,7 @@ def generate_enemy_stats_asm(enemies: List[Dict]) -> str:
 	asm_lines.append(";   python tools/conversion/convert_enemies.py")
 	asm_lines.append(";==============================================================================")
 	asm_lines.append("; NOTE: No ORG directive - this file is included inline in bank_02.asm")
-	asm_lines.append(";       The assembler's current address is already set correctly")
+	asm_lines.append(";	   The assembler's current address is already set correctly")
 	asm_lines.append(";==============================================================================")
 	asm_lines.append("")
 	asm_lines.append("enemy_stats_table:")
@@ -112,29 +112,29 @@ def generate_enemy_stats_asm(enemies: List[Dict]) -> str:
 		hp = enemy['hp']
 		hp_lo = hp & 0xFF
 		hp_hi = (hp >> 8) & 0xFF
-		asm_lines.append(f"  dw ${hp:04X}           ; HP: {hp}")
+		asm_lines.append(f"  dw ${hp:04X}		   ; HP: {hp}")
 
 		# Bytes 2-5: Stats
-		asm_lines.append(f"  db ${enemy['attack']:02X}             ; Attack: {enemy['attack']}")
-		asm_lines.append(f"  db ${enemy['defense']:02X}             ; Defense: {enemy['defense']}")
-		asm_lines.append(f"  db ${enemy['speed']:02X}             ; Speed: {enemy['speed']}")
-		asm_lines.append(f"  db ${enemy['magic']:02X}             ; Magic: {enemy['magic']}")
+		asm_lines.append(f"  db ${enemy['attack']:02X}			 ; Attack: {enemy['attack']}")
+		asm_lines.append(f"  db ${enemy['defense']:02X}			 ; Defense: {enemy['defense']}")
+		asm_lines.append(f"  db ${enemy['speed']:02X}			 ; Speed: {enemy['speed']}")
+		asm_lines.append(f"  db ${enemy['magic']:02X}			 ; Magic: {enemy['magic']}")
 
 		# Bytes 6-7: Resistances (16-bit bitfield)
 		resist = enemy['resistances']
 		resist_names = ', '.join(enemy['resistances_decoded']) if enemy['resistances_decoded'] else 'None'
-		asm_lines.append(f"  dw ${resist:04X}           ; Resistances: {resist_names}")
+		asm_lines.append(f"  dw ${resist:04X}		   ; Resistances: {resist_names}")
 
 		# Bytes 8-11: More stats
-		asm_lines.append(f"  db ${enemy['magic_defense']:02X}             ; Magic Defense: {enemy['magic_defense']}")
-		asm_lines.append(f"  db ${enemy['magic_evade']:02X}             ; Magic Evade: {enemy['magic_evade']}")
-		asm_lines.append(f"  db ${enemy['accuracy']:02X}             ; Accuracy: {enemy['accuracy']}")
-		asm_lines.append(f"  db ${enemy['evade']:02X}             ; Evade: {enemy['evade']}")
+		asm_lines.append(f"  db ${enemy['magic_defense']:02X}			 ; Magic Defense: {enemy['magic_defense']}")
+		asm_lines.append(f"  db ${enemy['magic_evade']:02X}			 ; Magic Evade: {enemy['magic_evade']}")
+		asm_lines.append(f"  db ${enemy['accuracy']:02X}			 ; Accuracy: {enemy['accuracy']}")
+		asm_lines.append(f"  db ${enemy['evade']:02X}			 ; Evade: {enemy['evade']}")
 
 		# Bytes 12-13: Weaknesses (16-bit bitfield)
 		weak = enemy['weaknesses']
 		weak_names = ', '.join(enemy['weaknesses_decoded']) if enemy['weaknesses_decoded'] else 'None'
-		asm_lines.append(f"  dw ${weak:04X}           ; Weaknesses: {weak_names}")
+		asm_lines.append(f"  dw ${weak:04X}		   ; Weaknesses: {weak_names}")
 
 		asm_lines.append("")
 
@@ -167,7 +167,7 @@ def generate_enemy_level_asm(enemies: List[Dict]) -> str:
 	asm_lines.append(";   python tools/conversion/convert_enemies.py")
 	asm_lines.append(";==============================================================================")
 	asm_lines.append("; NOTE: No ORG directive - this file is included inline in bank_02.asm")
-	asm_lines.append(";       The assembler's current address is already set correctly")
+	asm_lines.append(";	   The assembler's current address is already set correctly")
 	asm_lines.append(";==============================================================================")
 	asm_lines.append("")
 	asm_lines.append("enemy_level_table:")
@@ -180,9 +180,9 @@ def generate_enemy_level_asm(enemies: List[Dict]) -> str:
 
 		asm_lines.append(f"; Enemy {enemy_id:03d}: {name}")
 		asm_lines.append(f"enemy_{enemy_id:03d}_level:")
-		asm_lines.append(f"  db ${enemy['level']:02X}             ; Level: {enemy['level']}")
-		asm_lines.append(f"  db ${enemy['xp_mult']:02X}             ; XP Multiplier: {enemy['xp_mult']}")
-		asm_lines.append(f"  db ${enemy['gp_mult']:02X}             ; GP Multiplier: {enemy['gp_mult']}")
+		asm_lines.append(f"  db ${enemy['level']:02X}			 ; Level: {enemy['level']}")
+		asm_lines.append(f"  db ${enemy['xp_mult']:02X}			 ; XP Multiplier: {enemy['xp_mult']}")
+		asm_lines.append(f"  db ${enemy['gp_mult']:02X}			 ; GP Multiplier: {enemy['gp_mult']}")
 		asm_lines.append("")
 
 	return "\n".join(asm_lines)

@@ -105,7 +105,7 @@ class Metatile:
 		if label:
 			asm += f"{label}:\n"
 		
-		asm += f"    db ${self.top_left:02X},${self.top_right:02X},${self.bottom_left:02X},${self.bottom_right:02X}"
+		asm += f"	db ${self.top_left:02X},${self.top_right:02X},${self.bottom_left:02X},${self.bottom_right:02X}"
 		
 		# Add descriptive comment
 		if self.metatile_id is not None:
@@ -210,7 +210,7 @@ class CollisionData:
 			properties.append("trigger")
 		
 		props_str = ", ".join(properties)
-		return f"    db ${self.flags:02X}  ; Tile ${self.tile_id:02X}: {props_str}"
+		return f"	db ${self.flags:02X}  ; Tile ${self.tile_id:02X}: {props_str}"
 	
 	def to_dict(self) -> Dict[str, Any]:
 		"""Export to dictionary."""
@@ -267,7 +267,7 @@ class TextPointer:
 		"""Generate ASM pointer."""
 		low = self.address & 0xff
 		high = (self.address >> 8) & 0xff
-		return f"    db ${low:02X},${high:02X}  ; Msg ${self.message_id:02X}: ${self.address:04X}"
+		return f"	db ${low:02X},${high:02X}  ; Msg ${self.message_id:02X}: ${self.address:04X}"
 	
 	def to_dict(self) -> Dict[str, Any]:
 		"""Export to dictionary."""
@@ -354,7 +354,7 @@ class DialogString:
 		lines = []
 		for i in range(0, len(hex_bytes), 16):
 			chunk = ",".join(hex_bytes[i:i+16])
-			line = f"    db {chunk}"
+			line = f"	db {chunk}"
 			
 			# Add text comment on first line
 			if i == 0 and self.text:
@@ -363,7 +363,7 @@ class DialogString:
 			lines.append(line)
 		
 		# Add null terminator
-		lines.append(f"    db $00  ; End of message ${self.message_id:02X}")
+		lines.append(f"	db $00  ; End of message ${self.message_id:02X}")
 		
 		return "\n".join(lines)
 	
@@ -401,7 +401,7 @@ class PaletteEntry:
 		Bit 0-4:   Red (0-31)
 		Bit 5-9:   Green (0-31)
 		Bit 10-14: Blue (0-31)
-		Bit 15:    Unused
+		Bit 15:	Unused
 	
 	SNES RGB555: 0BBBBBGG GGGRRRRR (little-endian)
 	"""
@@ -440,7 +440,7 @@ class PaletteEntry:
 	def to_asm(self) -> str:
 		"""Generate ASM with RGB values in comment."""
 		data = self.to_bytes()
-		return f"    db ${data[0]:02X},${data[1]:02X}  ; RGB({self.red:2d},{self.green:2d},{self.blue:2d})"
+		return f"	db ${data[0]:02X},${data[1]:02X}  ; RGB({self.red:2d},{self.green:2d},{self.blue:2d})"
 	
 	def to_dict(self) -> Dict[str, Any]:
 		"""Export to dictionary."""

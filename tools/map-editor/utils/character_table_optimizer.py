@@ -102,9 +102,9 @@ class CharacterTableOptimizer:
 			# - Sequence length (prefer common words/phrases)
 			priority_score = (
 				total_byte_savings * 10.0 +  # Byte savings is most important
-				frequency * 5.0 +              # Frequency matters
-				avg_compression * 2.0 +        # Compression ratio
-				(len(sequence) * 0.5)          # Slight preference for longer sequences
+				frequency * 5.0 +			  # Frequency matters
+				avg_compression * 2.0 +		# Compression ratio
+				(len(sequence) * 0.5)		  # Slight preference for longer sequences
 			)
 			
 			candidate = CompressionCandidate(
@@ -174,7 +174,7 @@ class CharacterTableOptimizer:
 		
 		# Filter by minimum frequency
 		common_words = [(word, count) for word, count in word_counts.items() 
-		                if count >= min_frequency]
+						if count >= min_frequency]
 		
 		# Sort by frequency
 		common_words.sort(key=lambda x: x[1], reverse=True)
@@ -205,7 +205,7 @@ class CharacterTableOptimizer:
 		
 		# Filter by minimum frequency
 		common_phrases = [(phrase, count) for phrase, count in phrase_counts.items() 
-		                  if count >= min_frequency]
+						  if count >= min_frequency]
 		
 		# Sort by frequency
 		common_phrases.sort(key=lambda x: x[1], reverse=True)
@@ -314,7 +314,7 @@ class CharacterTableOptimizer:
 				display_seq = candidate.sequence.replace('\n', '\\n').replace('\t', '\\t')
 				
 				f.write(f"{i:<6} {display_seq:<25} {candidate.frequency:<8} "
-				        f"{candidate.byte_savings:<10} {candidate.priority_score:<10.2f}\n")
+						f"{candidate.byte_savings:<10} {candidate.priority_score:<10.2f}\n")
 			
 			f.write("-" * 80 + "\n")
 
@@ -380,15 +380,15 @@ def demo_optimizer():
 	print("\n\nCompression evaluation:")
 	print("-" * 80)
 	stats = optimizer.evaluate_compression(sample_dialogs, table)
-	print(f"  Original size:     {stats['original_bytes']} bytes")
+	print(f"  Original size:	 {stats['original_bytes']} bytes")
 	print(f"  Compressed size:   {stats['compressed_bytes']} bytes")
-	print(f"  Bytes saved:       {stats['bytes_saved']} bytes")
+	print(f"  Bytes saved:	   {stats['bytes_saved']} bytes")
 	print(f"  Compression ratio: {stats['compression_ratio']:.2f}x")
-	print(f"  Percent saved:     {stats['percent_saved']:.1f}%")
+	print(f"  Percent saved:	 {stats['percent_saved']:.1f}%")
 	print(f"\n  Most used sequences:")
 	for seq, count in stats['most_used'][:10]:
 		display_seq = seq.replace(' ', '·')
-		print(f"    \"{display_seq}\" used {count} times")
+		print(f"	\"{display_seq}\" used {count} times")
 
 
 if __name__ == '__main__':

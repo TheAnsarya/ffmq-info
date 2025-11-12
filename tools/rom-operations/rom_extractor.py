@@ -1,4 +1,4 @@
-﻿#!/usr/bin/env python3
+#!/usr/bin/env python3
 """
 FFMQ ROM Data Extractor
 Extracts binary data from Final Fantasy Mystic Quest ROM banks

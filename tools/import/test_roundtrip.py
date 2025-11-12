@@ -79,7 +79,7 @@ def run_roundtrip_test(rom_path: Path) -> bool:
 		
 		print(f"  ✓ Modified first 5 entries")
 		for i in range(5):
-			print(f"    {original_data[i]['Text']} → {modified_data[i]['Text']}")
+			print(f"	{original_data[i]['Text']} → {modified_data[i]['Text']}")
 		
 		# Step 3: Import to temporary ROM copy
 		print("\n[3] Importing modified text to ROM...")
@@ -142,8 +142,8 @@ def run_roundtrip_test(rom_path: Path) -> bool:
 			actual = reimported_data[i]['Text']
 			if expected != actual:
 				print(f"  ❌ FAILED: Modification not applied to entry {i}")
-				print(f"    Expected: {expected}")
-				print(f"    Actual: {actual}")
+				print(f"	Expected: {expected}")
+				print(f"	Actual: {actual}")
 				return False
 		
 		print("  ✓ All modifications preserved!")

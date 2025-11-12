@@ -120,7 +120,7 @@ class ROMDiff:
 
 		# Indicator
 		indicator = '   ' * (offset - start) + ' ^^'
-		lines.append(f"        {indicator}")
+		lines.append(f"		{indicator}")
 
 		return '\n'.join(lines)
 
@@ -182,7 +182,7 @@ class ROMDiff:
 		for i, (start, end, count) in enumerate(regions, 1):
 			print(f"  Region {i}: ${start:06X}-${end:06X} " +
 				  f"({self.format_lorom_address(start)} to {self.format_lorom_address(end)})")
-			print(f"           {count} byte(s) differ")
+			print(f"		   {count} byte(s) differ")
 
 			if verbose and count <= 16:
 				# Show first few bytes of small regions
@@ -190,7 +190,7 @@ class ROMDiff:
 					idx = next((i for i, (o, _, _) in enumerate(diffs) if o == offset), None)
 					if idx is not None:
 						_, b1, b2 = diffs[idx]
-						print(f"             ${offset:06X}: ${b1:02X} → ${b2:02X}")
+						print(f"			 ${offset:06X}: ${b1:02X} → ${b2:02X}")
 			print()
 
 		if verbose and total_diffs <= 20:

@@ -17,8 +17,8 @@ class DictionaryExtractor:
 	"""Extract and decode FFMQ dialog dictionary"""
 	
 	DICT_ADDR = 0x01BA35  # PC address of dictionary table
-	DICT_ENTRIES = 80     # Entries for 0x30-0x7F
-	DICT_BASE = 0x30      # First dictionary byte
+	DICT_ENTRIES = 80	 # Entries for 0x30-0x7F
+	DICT_BASE = 0x30	  # First dictionary byte
 	
 	# Control codes (< 0x30)
 	CONTROLS = {
@@ -129,7 +129,7 @@ class DictionaryExtractor:
 			hex_str = ' '.join(f'{b:02X}' for b in raw_bytes)
 			
 			print(f"0x{byte_val:02X}: {decoded}")
-			print(f"       Raw: [{len(raw_bytes)}] {hex_str}")
+			print(f"	   Raw: [{len(raw_bytes)}] {hex_str}")
 			print()
 	
 	def export_complex_tbl(self, output_path: str = 'complex_extracted.tbl'):

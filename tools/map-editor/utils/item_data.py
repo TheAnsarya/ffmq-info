@@ -67,9 +67,9 @@ class StatusEffect(IntFlag):
 @dataclass
 class ItemEffect:
 	"""Item use effect"""
-	effect_type: int = 0      # 0=heal HP, 1=heal MP, 2=cure status, 3=damage, 4=buff
-	power: int = 0            # Effect strength
-	target: int = 0           # 0=single, 1=all allies, 2=all enemies
+	effect_type: int = 0	  # 0=heal HP, 1=heal MP, 2=cure status, 3=damage, 4=buff
+	power: int = 0			# Effect strength
+	target: int = 0		   # 0=single, 1=all allies, 2=all enemies
 	status_mask: StatusEffect = StatusEffect.NONE
 	
 	def to_bytes(self) -> bytes:
@@ -143,14 +143,14 @@ class Item:
 	sell_price: int = 0
 	
 	# Stack limits
-	max_stack: int = 1        # Maximum stack size (1 = non-stackable)
+	max_stack: int = 1		# Maximum stack size (1 = non-stackable)
 	
 	# Graphics
-	icon_id: int = 0          # Item icon sprite ID
-	palette_id: int = 0       # Palette for icon
+	icon_id: int = 0		  # Item icon sprite ID
+	palette_id: int = 0	   # Palette for icon
 	
 	# Special properties
-	element: int = 0          # Elemental affinity (for weapons)
+	element: int = 0		  # Elemental affinity (for weapons)
 	special_effect_id: int = 0  # Special effect ID (e.g., critical boost)
 	
 	# Metadata

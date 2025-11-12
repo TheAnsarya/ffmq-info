@@ -11,7 +11,7 @@ This runs in the background and automatically logs:
 
 Usage:
 	python tools/auto_tracker.py start   # Start background tracking
-	python tools/auto_tracker.py stop    # Stop background tracking
+	python tools/auto_tracker.py stop	# Stop background tracking
 	python tools/auto_tracker.py status  # Check if running
 """
 
@@ -236,7 +236,7 @@ class AutoTracker:
 		Continuously monitors files and auto-logs changes.
 		"""
 		print("╔═══════════════════════════════════════════════════╗")
-		print("║  FFMQ Automatic Activity Tracker - RUNNING       ║")
+		print("║  FFMQ Automatic Activity Tracker - RUNNING	   ║")
 		print("╚═══════════════════════════════════════════════════╝")
 		print()
 		print(f"Monitoring directories: {len(self.watch_dirs)}")

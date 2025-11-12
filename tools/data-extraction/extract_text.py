@@ -40,13 +40,13 @@ class FFMQTextExtractor:
 		
 		# Text section locations in ROM (estimated)
 		self.text_locations = {
-			'main_dialogue': (0xb0000, 0x8000),     # Main story dialogue
-			'item_names': (0xb8000, 0x1000),       # Item names
-			'spell_names': (0xb9000, 0x800),       # Spell names
+			'main_dialogue': (0xb0000, 0x8000),	 # Main story dialogue
+			'item_names': (0xb8000, 0x1000),	   # Item names
+			'spell_names': (0xb9000, 0x800),	   # Spell names
 			'character_names': (0xb9800, 0x400),   # Character names
-			'location_names': (0xba000, 0x800),    # Location names
-			'menu_text': (0xbb000, 0x1000),        # Menu text
-			'battle_text': (0xbc000, 0x1000),      # Battle messages
+			'location_names': (0xba000, 0x800),	# Location names
+			'menu_text': (0xbb000, 0x1000),		# Menu text
+			'battle_text': (0xbc000, 0x1000),	  # Battle messages
 		}
 	
 	def load_rom(self) -> bool:

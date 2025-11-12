@@ -78,15 +78,15 @@ def cmd_show(args):
 	dialog = db.dialogs[dialog_id]
 
 	print(f"Dialog ID:  0x{dialog_id:04X}")
-	print(f"Pointer:    0x{dialog.pointer:06X}")
-	print(f"Address:    0x{dialog.address:06X}")
-	print(f"Length:     {dialog.length} bytes")
+	print(f"Pointer:	0x{dialog.pointer:06X}")
+	print(f"Address:	0x{dialog.address:06X}")
+	print(f"Length:	 {dialog.length} bytes")
 
 	if dialog.tags:
-		print(f"Tags:       {', '.join(sorted(dialog.tags))}")
+		print(f"Tags:	   {', '.join(sorted(dialog.tags))}")
 
 	if dialog.notes:
-		print(f"Notes:      {dialog.notes}")
+		print(f"Notes:	  {dialog.notes}")
 
 	print()
 	print("Text:")
@@ -254,7 +254,7 @@ def cmd_validate(args):
 			if args.verbose:
 				print(f"✗ Dialog 0x{dialog_id:04X}:")
 				for msg in messages:
-					print(f"    {msg}")
+					print(f"	{msg}")
 
 		else:
 			# Check for fixable issues
@@ -513,7 +513,7 @@ def cmd_import(args):
 	print("=" * 70)
 	print(f"Processed: {imported_count} dialogs")
 	print(f"Updated:   {updated_count} dialogs")
-	print(f"Errors:    {error_count}")
+	print(f"Errors:	{error_count}")
 	print()
 
 	if errors and args.verbose:
@@ -677,13 +677,13 @@ def cmd_stats(args):
 	if smallest:
 		print(f"  Smallest: 0x{smallest[0]:04X} ({smallest[1].length} bytes)")
 		if args.verbose:
-			print(f"    {smallest[1].text[:60]}...")
+			print(f"	{smallest[1].text[:60]}...")
 
 	if largest:
 		print(f"  Largest: 0x{largest[0]:04X} ({largest[1].length} bytes)")
 		if args.verbose:
 			preview = largest[1].text[:60].replace('\n', ' ')
-			print(f"    {preview}...")
+			print(f"	{preview}...")
 
 	# Control code usage
 	print(f"\nControl Code Usage:")
@@ -950,7 +950,7 @@ def cmd_replace(args):
 		if not is_valid:
 			print(f"✗ 0x{dialog_id:04X}: Validation failed")
 			for msg in messages:
-				print(f"    {msg}")
+				print(f"	{msg}")
 			error_count += 1
 			continue
 
@@ -1094,7 +1094,7 @@ def cmd_verify(args):
 	if errors == 0:
 		print(f"  ✓ Round-trip encoding successful (tested {tested} dialogs)")
 		if skipped > 0:
-			print(f"    Skipped {skipped} dialogs with unknown bytes")
+			print(f"	Skipped {skipped} dialogs with unknown bytes")
 	else:
 		print(f"  ✗ {errors} round-trip failures")
 		return 1	# Summary
@@ -1271,7 +1271,7 @@ def main():
 	export_parser = subparsers.add_parser('export', help='Export dialog database')
 	export_parser.add_argument('output', help='Output file')
 	export_parser.add_argument('-f', '--format', choices=['csv', 'json', 'tsv', 'txt', 'xml'],
-	                           default='json', help='Export format')
+							   default='json', help='Export format')
 	export_parser.add_argument('--no-metadata', action='store_true', help='Exclude metadata')
 	export_parser.set_defaults(func=cmd_export)
 
@@ -1286,17 +1286,17 @@ def main():
 	# Optimize command
 	optimize_parser = subparsers.add_parser('optimize', help='Optimize character table')
 	optimize_parser.add_argument('-m', '--min-frequency', type=int, default=3,
-	                             help='Minimum frequency for candidates')
+								 help='Minimum frequency for candidates')
 	optimize_parser.add_argument('-t', '--top', type=int, default=20,
-	                             help='Number of top candidates to show')
+								 help='Number of top candidates to show')
 	optimize_parser.add_argument('--no-evaluation', action='store_true',
-	                             help='Skip compression evaluation')
+								 help='Skip compression evaluation')
 	optimize_parser.set_defaults(func=cmd_optimize)
 
 	# Batch command
 	batch_parser = subparsers.add_parser('batch', help='Batch operations')
 	batch_parser.add_argument('operation', choices=['replace', 'reformat', 'errors'],
-	                          help='Batch operation')
+							  help='Batch operation')
 	batch_parser.add_argument('--find', help='Text to find (for replace)')
 	batch_parser.add_argument('--replace', help='Replacement text (for replace)')
 	batch_parser.add_argument('--operations', help='Reformat operations (comma-separated)')

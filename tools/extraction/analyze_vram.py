@@ -132,7 +132,7 @@ def analyze_sprite_region(extractor: GraphicsExtractor, name: str,
 	output_path = output_dir / f"{name}_tiles.png"
 	tile_sheet.save(output_path)
 	print(f"  ✓ Saved: {output_path.name}")
-	print(f"    Size: {tile_sheet.size[0]}×{tile_sheet.size[1]} pixels")
+	print(f"	Size: {tile_sheet.size[0]}×{tile_sheet.size[1]} pixels")
 
 	return tiles, palette
 
@@ -167,7 +167,7 @@ def create_sprite_comparison_grid(tiles_by_character: dict, output_dir: Path):
 	output_path = output_dir / "character_comparison_grid.png"
 	grid.save(output_path)
 	print(f"  ✓ Saved: {output_path.name}")
-	print(f"    Layout: {num_chars} characters × {tiles_per_row} tiles each")
+	print(f"	Layout: {num_chars} characters × {tiles_per_row} tiles each")
 
 
 def main():

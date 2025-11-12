@@ -333,12 +333,12 @@ This report catalogs all extracted graphics assets from Final Fantasy: Mystic Qu
 
 ```
 assets/graphics/
-├── palettes/          # Extracted color palettes
-├── tiles/             # Tile graphics (backgrounds, tilesets)
-├── sprites/           # Character and enemy sprites
-├── ui/                # User interface graphics
-├── backgrounds/       # Background images
-└── fonts/             # Font/text graphics
+├── palettes/		  # Extracted color palettes
+├── tiles/			 # Tile graphics (backgrounds, tilesets)
+├── sprites/		   # Character and enemy sprites
+├── ui/				# User interface graphics
+├── backgrounds/	   # Background images
+└── fonts/			 # Font/text graphics
 ```
 
 ## Extraction Tools
@@ -504,56 +504,56 @@ Areas of the ROM that may contain graphics data but haven't been extracted yet:
 		stats = self.generate_statistics()
 
 		# Statistics cards
-		html += '    <div class="stats">\n'
-		html += f'        <div class="stat-card"><div class="stat-value">{stats["total_assets"]}</div><div class="stat-label">Total Assets</div></div>\n'
-		html += f'        <div class="stat-card"><div class="stat-value">{stats["image_assets"]}</div><div class="stat-label">Image Files</div></div>\n'
-		html += f'        <div class="stat-card"><div class="stat-value">{stats["binary_assets"]}</div><div class="stat-label">Binary Files</div></div>\n'
-		html += f'        <div class="stat-card"><div class="stat-value">{stats["total_size_mb"]:.1f} MB</div><div class="stat-label">Total Size</div></div>\n'
-		html += '    </div>\n'
+		html += '	<div class="stats">\n'
+		html += f'		<div class="stat-card"><div class="stat-value">{stats["total_assets"]}</div><div class="stat-label">Total Assets</div></div>\n'
+		html += f'		<div class="stat-card"><div class="stat-value">{stats["image_assets"]}</div><div class="stat-label">Image Files</div></div>\n'
+		html += f'		<div class="stat-card"><div class="stat-value">{stats["binary_assets"]}</div><div class="stat-label">Binary Files</div></div>\n'
+		html += f'		<div class="stat-card"><div class="stat-value">{stats["total_size_mb"]:.1f} MB</div><div class="stat-label">Total Size</div></div>\n'
+		html += '	</div>\n'
 
 		# Asset categories
 		for cat_name, cat_assets in sorted(self.categories.items()):
 			if not cat_assets:
 				continue
 
-			html += f'\n    <h2>{cat_name.title()} ({len(cat_assets)} assets)</h2>\n'
-			html += '    <div class="asset-grid">\n'
+			html += f'\n	<h2>{cat_name.title()} ({len(cat_assets)} assets)</h2>\n'
+			html += '	<div class="asset-grid">\n'
 
 			for asset in sorted(cat_assets, key=lambda a: a.filename):
-				html += '        <div class="asset-card">\n'
+				html += '		<div class="asset-card">\n'
 
 				# Thumbnail
 				if asset.file_type in ['png', 'bmp', 'gif', 'jpg']:
 					# Relative path from reports/ to assets/
 					rel_path = f"../{asset.filepath}"
-					html += f'            <div class="asset-thumbnail"><img src="{rel_path}" alt="{asset.filename}"></div>\n'
+					html += f'			<div class="asset-thumbnail"><img src="{rel_path}" alt="{asset.filename}"></div>\n'
 				else:
-					html += '            <div class="asset-thumbnail binary">\n'
-					html += f'                <span style="color:#858585">{asset.file_type.upper()}</span>\n'
-					html += '            </div>\n'
+					html += '			<div class="asset-thumbnail binary">\n'
+					html += f'				<span style="color:#858585">{asset.file_type.upper()}</span>\n'
+					html += '			</div>\n'
 
 				# Info
-				html += f'            <div class="asset-name">{asset.filename}</div>\n'
-				html += '            <div class="asset-info">\n'
+				html += f'			<div class="asset-name">{asset.filename}</div>\n'
+				html += '			<div class="asset-info">\n'
 
 				if asset.dimensions:
-					html += f'                <div>📏 {asset.dimensions[0]}x{asset.dimensions[1]} pixels</div>\n'
+					html += f'				<div>📏 {asset.dimensions[0]}x{asset.dimensions[1]} pixels</div>\n'
 
 				size_kb = asset.size_bytes / 1024
-				html += f'                <div>💾 {size_kb:.1f} KB</div>\n'
+				html += f'				<div>💾 {size_kb:.1f} KB</div>\n'
 
 				if asset.rom_bank:
-					html += f'                <div>🏦 Bank {asset.rom_bank}</div>\n'
+					html += f'				<div>🏦 Bank {asset.rom_bank}</div>\n'
 
 				if asset.description:
-					html += f'                <div>📝 {asset.description}</div>\n'
+					html += f'				<div>📝 {asset.description}</div>\n'
 
-				html += f'                <div><span class="tag category">{cat_name}</span><span class="tag">{asset.file_type.upper()}</span></div>\n'
+				html += f'				<div><span class="tag category">{cat_name}</span><span class="tag">{asset.file_type.upper()}</span></div>\n'
 
-				html += '            </div>\n'
-				html += '        </div>\n'
+				html += '			</div>\n'
+				html += '		</div>\n'
 
-			html += '    </div>\n'
+			html += '	</div>\n'
 
 		html += """
 </body>

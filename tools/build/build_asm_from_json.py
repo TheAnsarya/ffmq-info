@@ -58,7 +58,7 @@ def generate_metatile_asm(metatiles_json: List[Dict], set_name: str, start_addr:
 		# Add comment separator every 8 metatiles
 		if metatile.metatile_id is not None and metatile.metatile_id % 8 == 0:
 			asm_lines.append("")
-			asm_lines.append(f"    ; Metatiles ${metatile.metatile_id:02X}-${min(metatile.metatile_id + 7, len(metatiles_json)-1):02X}")
+			asm_lines.append(f"	; Metatiles ${metatile.metatile_id:02X}-${min(metatile.metatile_id + 7, len(metatiles_json)-1):02X}")
 		
 		asm_lines.append(metatile.to_asm())
 	
@@ -105,7 +105,7 @@ def generate_collision_asm(collision_json: List[Dict], start_addr: str) -> str:
 			hex_vals.append(f"${collision.flags:02X}")
 		
 		# Format as db statement
-		asm_line = "    db " + ",".join(hex_vals)
+		asm_line = "	db " + ",".join(hex_vals)
 		
 		# Add comment for first tile in line
 		first_coll = CollisionData.from_dict(chunk[0])
@@ -156,7 +156,7 @@ def build_bank06_asm(json_path: str, output_path: str):
 	asm_lines.append(f"; Total Collision Entries: {data.get('total_collision_entries', 0)}")
 	asm_lines.append("; " + "="*76)
 	asm_lines.append("")
-	asm_lines.append("                   ORG $068000")
+	asm_lines.append("				   ORG $068000")
 	asm_lines.append("")
 	
 	# Generate metatile sets

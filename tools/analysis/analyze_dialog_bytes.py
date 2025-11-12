@@ -211,7 +211,7 @@ class DialogByteAnalyzer:
 				print(f"  0x{byte:02X}: {current} -> '{char}'")
 		else:
 			print("\n  [WARN]  Unable to deduce mappings automatically")
-			print("    Manual ROM analysis required")
+			print("	Manual ROM analysis required")
 	
 	def generate_corrected_table(self) -> None:
 		"""Generate corrected complex.tbl file"""

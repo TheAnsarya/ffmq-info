@@ -43,14 +43,14 @@ class EnemyFlags(IntFlag):
 
 class AIBehavior(IntEnum):
 	"""Enemy AI behavior patterns"""
-	NORMAL = 0          # Standard attack pattern
-	AGGRESSIVE = 1      # Attacks more frequently
-	DEFENSIVE = 2       # Uses defensive spells
-	SUPPORT = 3         # Buffs allies
-	HEALER = 4          # Heals allies
-	RANDOM = 5          # Random actions
-	SCRIPTED = 6        # Follows script
-	CONDITIONAL = 7     # HP-based behavior changes
+	NORMAL = 0		  # Standard attack pattern
+	AGGRESSIVE = 1	  # Attacks more frequently
+	DEFENSIVE = 2	   # Uses defensive spells
+	SUPPORT = 3		 # Buffs allies
+	HEALER = 4		  # Heals allies
+	RANDOM = 5		  # Random actions
+	SCRIPTED = 6		# Follows script
+	CONDITIONAL = 7	 # HP-based behavior changes
 
 
 class DropType(IntEnum):
@@ -65,15 +65,15 @@ class DropType(IntEnum):
 @dataclass
 class ResistanceData:
 	"""Enemy elemental resistances"""
-	fire: int = 100        # Percentage (0-255, 100=normal, 0=immune, 200=2x damage)
+	fire: int = 100		# Percentage (0-255, 100=normal, 0=immune, 200=2x damage)
 	water: int = 100
 	earth: int = 100
 	wind: int = 100
 	holy: int = 100
 	dark: int = 100
 	poison: int = 100
-	physical: int = 100    # Physical damage resistance
-	magical: int = 100     # Magic damage resistance
+	physical: int = 100	# Physical damage resistance
+	magical: int = 100	 # Magic damage resistance
 	
 	def to_bytes(self) -> bytes:
 		"""Convert to ROM bytes"""
@@ -97,10 +97,10 @@ class ResistanceData:
 @dataclass
 class ItemDrop:
 	"""Enemy item drop data"""
-	item_id: int = 0          # Item ID
-	drop_rate: int = 0        # Drop rate (0-255, 128=50%)
+	item_id: int = 0		  # Item ID
+	drop_rate: int = 0		# Drop rate (0-255, 128=50%)
 	drop_type: DropType = DropType.NONE
-	rare: bool = False        # Rare drop flag
+	rare: bool = False		# Rare drop flag
 	
 	def to_bytes(self) -> bytes:
 		"""Convert to ROM bytes"""
@@ -122,11 +122,11 @@ class ItemDrop:
 @dataclass
 class AIAction:
 	"""Single AI action/spell"""
-	action_type: int = 0      # 0=attack, 1=spell, 2=special
-	target_id: int = 0        # Spell/ability ID
-	condition: int = 0        # HP threshold or condition
-	priority: int = 0         # Action priority (0-255)
-	probability: int = 100    # Chance to use (0-100%)
+	action_type: int = 0	  # 0=attack, 1=spell, 2=special
+	target_id: int = 0		# Spell/ability ID
+	condition: int = 0		# HP threshold or condition
+	priority: int = 0		 # Action priority (0-255)
+	probability: int = 100	# Chance to use (0-100%)
 	
 	def to_bytes(self) -> bytes:
 		"""Convert to ROM bytes"""
@@ -240,13 +240,13 @@ class AIScript:
 @dataclass
 class SpriteInfo:
 	"""Enemy sprite/graphics information"""
-	sprite_id: int = 0           # Sprite sheet ID
-	palette_id: int = 0          # Palette ID
-	tile_offset: int = 0         # Tile offset in VRAM
-	width: int = 16              # Width in pixels
-	height: int = 16             # Height in pixels
-	animation_frames: int = 1    # Number of animation frames
-	animation_speed: int = 8     # Frames between animation updates
+	sprite_id: int = 0		   # Sprite sheet ID
+	palette_id: int = 0		  # Palette ID
+	tile_offset: int = 0		 # Tile offset in VRAM
+	width: int = 16			  # Width in pixels
+	height: int = 16			 # Height in pixels
+	animation_frames: int = 1	# Number of animation frames
+	animation_speed: int = 8	 # Frames between animation updates
 	
 	def to_bytes(self) -> bytes:
 		"""Convert to ROM bytes"""
@@ -274,18 +274,18 @@ class SpriteInfo:
 @dataclass
 class EnemyStats:
 	"""Enemy battle statistics"""
-	hp: int = 100                # Hit points
-	attack: int = 10             # Physical attack power
-	defense: int = 10            # Physical defense
-	magic: int = 10              # Magic power
-	magic_defense: int = 10      # Magic defense
-	speed: int = 10              # Speed/agility
-	evade: int = 0               # Evade percentage (0-100)
-	critical: int = 5            # Critical hit rate (0-100)
+	hp: int = 100				# Hit points
+	attack: int = 10			 # Physical attack power
+	defense: int = 10			# Physical defense
+	magic: int = 10			  # Magic power
+	magic_defense: int = 10	  # Magic defense
+	speed: int = 10			  # Speed/agility
+	evade: int = 0			   # Evade percentage (0-100)
+	critical: int = 5			# Critical hit rate (0-100)
 	
 	# Experience/money rewards
-	exp: int = 10                # Experience points
-	gold: int = 10               # Gold reward
+	exp: int = 10				# Experience points
+	gold: int = 10			   # Gold reward
 	
 	def to_bytes(self) -> bytes:
 		"""Convert to ROM bytes"""
@@ -333,8 +333,8 @@ class Enemy:
 	sprite: SpriteInfo = field(default_factory=SpriteInfo)
 	
 	# ROM addresses
-	address: int = 0             # Base address in ROM
-	pointer: int = 0             # SNES pointer
+	address: int = 0			 # Base address in ROM
+	pointer: int = 0			 # SNES pointer
 	
 	# Editor metadata
 	modified: bool = False

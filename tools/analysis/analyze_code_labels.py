@@ -203,7 +203,7 @@ class CodeLabelAnalyzer:
 				if info['context']['comments_before']:
 					report_lines.append("  Comments before:")
 					for comment in info['context']['comments_before'][-3:]:
-						report_lines.append(f"    {comment}")
+						report_lines.append(f"	{comment}")
 						
 				if info['context']['operations']:
 					ops_str = ', '.join(info['context']['operations'][:5])
@@ -286,9 +286,9 @@ class CodeLabelAnalyzer:
 			
 			if dry_run:
 				for old, new in renames[:5]:
-					print(f"    {old} -> {new}")
+					print(f"	{old} -> {new}")
 				if len(renames) > 5:
-					print(f"    ... and {len(renames) - 5} more")
+					print(f"	... and {len(renames) - 5} more")
 			else:
 				self.apply_renames_to_file(filepath, renames)
 				

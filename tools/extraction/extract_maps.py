@@ -298,9 +298,9 @@ class MapExtractor:
 		lines.append("="*80)
 		lines.append("")
 
-		lines.append(f"Maps:       {len(map_data.get('maps', []))} total")
-		lines.append(f"NPCs:       {len(map_data.get('npcs', []))} total")
-		lines.append(f"Chests:     {len(map_data.get('chests', []))} total")
+		lines.append(f"Maps:	   {len(map_data.get('maps', []))} total")
+		lines.append(f"NPCs:	   {len(map_data.get('npcs', []))} total")
+		lines.append(f"Chests:	 {len(map_data.get('chests', []))} total")
 		lines.append(f"Encounters: {len(map_data.get('encounters', []))} encounter zones")
 		lines.append("")
 
@@ -327,7 +327,7 @@ def main():
 		print("Usage: extract_maps.py <rom_file> <output_dir> [--format json,csv]")
 		print("\nExtracts map data, NPCs, chests, and encounters from FFMQ ROM")
 		print("\nOptions:")
-		print("  --format <fmt>    Output formats: json,csv,all (default: all)")
+		print("  --format <fmt>	Output formats: json,csv,all (default: all)")
 		print("\nNote: Map data addresses are approximate and need verification")
 		sys.exit(1)
 
@@ -346,7 +346,7 @@ def main():
 	print("="*80)
 	print()
 	print("⚠️  Note: Map data addresses are approximate and need verification")
-	print("         Extracted data may need manual validation")
+	print("		 Extracted data may need manual validation")
 	print()
 
 	# Extract map data

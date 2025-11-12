@@ -34,7 +34,7 @@ def boost_spell_power():
 
 	# Define damage spells to boost
 	damage_spells = ['Fire', 'Blizzard', 'Thunder', 'Aero', 'Quake',
-	                 'Flare', 'Meteor', 'White']
+					 'Flare', 'Meteor', 'White']
 
 	print(f"\n⚡ Boosting spell power by 50%...\n")
 
@@ -50,7 +50,7 @@ def boost_spell_power():
 
 			# Show change
 			print(f"  {spell['name']:12} Power: {old_power:3d} → {spell['power']:3d}  "
-			      f"MP: {old_mp:2d} → {spell['mp_cost']:2d}")
+				  f"MP: {old_mp:2d} → {spell['mp_cost']:2d}")
 			boosted_count += 1
 
 	# Save modified data

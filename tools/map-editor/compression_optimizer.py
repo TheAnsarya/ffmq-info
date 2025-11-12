@@ -175,9 +175,9 @@ class CompressionOptimizer:
 		stats = self.analyze_current_table()
 
 		print(f"Total DTE sequences in table: {stats['total_dte_sequences']}")
-		print(f"Used sequences:               {stats['used_sequences']}")
-		print(f"Unused sequences:             {len(stats['unused_sequences'])}")
-		print(f"Total bytes saved:            {stats['total_benefit']}")
+		print(f"Used sequences:			   {stats['used_sequences']}")
+		print(f"Unused sequences:			 {len(stats['unused_sequences'])}")
+		print(f"Total bytes saved:			{stats['total_benefit']}")
 		print()
 
 		if stats['unused_sequences']:

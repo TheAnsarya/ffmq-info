@@ -56,7 +56,7 @@ def dump_dialogs(rom_path: str, count: int = 10):
 		for i, byte in enumerate(dialog_bytes):
 			if i > 0 and i % 16 == 0:
 				print()
-				print(f"         {' ' * 17}", end='')
+				print(f"		 {' ' * 17}", end='')
 			
 			print(f"{byte:02X} ", end='')
 		

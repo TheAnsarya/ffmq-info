@@ -19,11 +19,11 @@ sys.path.insert(0, str(Path(__file__).parent.parent))
 class EnemySpritePointer:
 	"""Enemy sprite pointer entry (5 bytes)."""
 	enemy_id: int
-	address: int        # 16-bit address in bank
-	bank: int           # ROM bank number
-	flags: int          # Sprite type/size flags
-	padding: int        # Always 0x00
-	rom_offset: int     # Calculated file offset
+	address: int		# 16-bit address in bank
+	bank: int		   # ROM bank number
+	flags: int		  # Sprite type/size flags
+	padding: int		# Always 0x00
+	rom_offset: int	 # Calculated file offset
 
 
 class EnemySpriteTableExtractor:
@@ -184,8 +184,8 @@ class EnemySpriteTableExtractor:
 				offset_first_seen[ptr.rom_offset] = ptr.enemy_id
 				shared = "Unique"
 
-			print(f"{ptr.enemy_id:<4} {name:<20} 0x{ptr.rom_offset:06X}    "
-				  f"${ptr.bank:02X}    {ptr.flags:<6} {shared}")
+			print(f"{ptr.enemy_id:<4} {name:<20} 0x{ptr.rom_offset:06X}	"
+				  f"${ptr.bank:02X}	{ptr.flags:<6} {shared}")
 
 	def print_analysis(self, analysis: Dict):
 		"""Print sprite size analysis."""
