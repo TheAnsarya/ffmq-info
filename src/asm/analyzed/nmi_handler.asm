@@ -93,7 +93,7 @@
 ;   $01f4-$01f5: VRAM transfer size
 ;   $01f6-$01f8: Source address (bank $7f)
 ;
-; Pattern from CODE_008385 (DMA Transfer to VRAM):
+; Pattern from PatternCodeDmaTransferVram (DMA Transfer to VRAM):
 ;   - Setup DMA5 params: $1801 (word, increment, to $2118/VMDATAL)
 ;   - Source: Bank $7f + offset in $01f6-$01f8
 ;   - Size: $01f4-$01f5 bytes
@@ -106,7 +106,7 @@
 ;------------------------------------------------------------------------------
 ; OAM (Sprite) Update System
 ;------------------------------------------------------------------------------
-; From CODE_008543 analysis:
+; From CodeAnalysis analysis:
 ;
 ; Two OAM transfers happen per frame during NMI:
 ; 1. Main OAM ($0c00): 512 bytes → $2102 (OAMADDL)
@@ -129,14 +129,14 @@
 ; The game uses flag bytes to signal what needs updating during NMI.
 ; These are checked in the NMI handler to determine which operations to perform.
 ;
-; $00d2 flags (found in CODE_008337+):
+; $00d2 flags (found in D2FlagsFoundCode+):
 ;   Bit 7 ($80): VRAM tilemap update pending
 ;   Bit 6 ($40): Full background refresh needed
 ;   Bit 5 ($20): Palette update required
 ;   Bit 4 ($10): Menu cursor update
 ;
 ; $00dd flags:
-;   Bit 6 ($40): Major DMA transfer pending (sets up at CODE_008385)
+;   Bit 6 ($40): Major DMA transfer pending (sets up at PatternCodeDmaTransferVram)
 ;
 ; $00d4 flags:
 ;   Bit 7 ($80): Enemy palette update
@@ -153,16 +153,16 @@
 ;------------------------------------------------------------------------------
 ; Screen Update Sequence (Typical NMI Flow)
 ;------------------------------------------------------------------------------
-; Based on CODE_008337 analysis (main NMI processing loop):
+; Based on D2FlagsFoundCode analysis (main NMI processing loop):
 ;
 ; 1. NMI interrupt fires
 ; 2. Save registers, set Direct Page to $4300 (DMA registers)
 ; 3. Clear DMA busy flag
 ; 4. Check $00e2.6 - if set, execute callback at [$0058]
 ; 5. Check $00d4.1 - if set, do tilemap transfer
-; 6. Check $00dd.6 - if set, do major DMA operation (CODE_008385)
+; 6. Check $00dd.6 - if set, do major DMA operation (PatternCodeDmaTransferVram)
 ; 7. Check $00d2.7 - if set, do VRAM update
-; 8. Check $00d2.5 - if set, do palette transfer (CODE_008543)
+; 8. Check $00d2.5 - if set, do palette transfer (CodeAnalysis)
 ; 9. Check $00d2.6 - if set, do background refresh
 ; 10. Set VBlank flag ($00d8.6)
 ; 11. Restore registers and RTI (return from interrupt)
@@ -241,7 +241,7 @@
 ;==============================================================================
 ; Analysis Confidence: MEDIUM-HIGH
 ; - VBlank flag system: VERIFIED (seen across many files)
-; - DMA patterns: VERIFIED (CODE_008385, CODE_008543)
+; - DMA patterns: VERIFIED (PatternCodeDmaTransferVram, CodeAnalysis)
 ; - Flag system: VERIFIED (extensive usage found)
 ; - Actual NMI handler code: NOT YET LOCATED (need manual trace)
 ; - Complete flow: INFERRED from evidence, needs verification

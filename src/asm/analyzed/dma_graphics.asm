@@ -11,7 +11,7 @@
 ; ============================================================================
 ; Hardware Initialize - Disable Screen and Interrupts
 ; ============================================================================
-; Address: $008247 (Original: CODE_008247)
+; Address: $008247 (Original: AddressOriginalCode)
 ; Called during boot sequence to safely initialize hardware
 ; ============================================================================
 InitializeHardware:
@@ -24,7 +24,7 @@ InitializeHardware:
 ; ============================================================================
 ; DMA Transfer to VRAM - Mode 5 Channel
 ; ============================================================================
-; Address: $008385 (Original: CODE_008385)
+; Address: $008385 (Original: PatternCodeDmaTransferVram)
 ; Performs DMA transfer from RAM to VRAM using channel 5
 ; Uses parameters stored in RAM to configure the transfer
 ; ============================================================================
@@ -59,7 +59,7 @@ DMA_TransferToVRAM_Ch5:
 ; ============================================================================
 ; DMA Transfer for Palette Data
 ; ============================================================================
-; Address: $0083a8 (Original: CODE_0083A8)
+; Address: $0083a8 (Original: AddressA8OriginalCode)
 ; Transfers palette data to CGRAM using DMA channel 5
 ; ============================================================================
 DMA_TransferPalette:
@@ -101,7 +101,7 @@ DMA_TransferPalette:
 ; ============================================================================
 ; DMA Transfer for Tile Data
 ; ============================================================================
-; Address: $0083e8 (Original: CODE_0083E8)
+; Address: $0083e8 (Original: AddressE8OriginalCode)
 ; Transfers tile graphics data to VRAM
 ; ============================================================================
 DMA_TransferTileData:
@@ -148,12 +148,12 @@ DMA_TransferTileData:
 	sta.W SNES_VMADDL               ; Set VRAM address
 	ldx.W #$f0c1                    ; Special transfer data
 	ldy.W #$0004                    ; Size parameter
-	jmp.W CODE_008DDF               ; Execute special transfer
+	jmp.W ExecuteSpecialTransfer               ; Execute special transfer
 
 ; ============================================================================
 ; Helper: Setup Tile Transfer Parameters
 ; ============================================================================
-; Address: $008504 (Original: CODE_008504)
+; Address: $008504 (Original: TransferPaletteSet)
 ; Input: A = mode, X = tile index
 ; Sets up DMA parameters for tile data transfer
 ; ============================================================================
@@ -166,7 +166,7 @@ SetupTileTransfer:
 ; ============================================================================
 ; Helper: Execute Standard Transfer
 ; ============================================================================
-; Address: $008520 (Original: CODE_008520)
+; Address: $008520 (Original: TransferTilemapRegion)
 ; Executes a standard DMA transfer to VRAM
 ; ============================================================================
 ExecuteStandardTransfer:

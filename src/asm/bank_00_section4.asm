@@ -106,7 +106,7 @@ Sprite_ConvertDigit:
 	tya							   ; Get tens count
 	adc.B				   #$7f	  ; Add tile offset for tens
 	sta.W				   $0000,x   ; Store tens digit tile
-	bra					 CODE_008D20 ; Done
+	bra					 Done ; Done
 
 ; ------------------------------------------------------------------------------
 ; UNREACHABLE CODE ANALYSIS

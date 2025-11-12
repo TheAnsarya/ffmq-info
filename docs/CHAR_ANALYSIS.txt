@@ -1,0 +1,58 @@
+# Analyzing unknown bytes from dictionary
+# Based on context and patterns in the extracted text
+
+# Current unknowns and their likely values:
+# 0x80 - appears in entry 0x7F (garbage entry)
+# 0x81 - appears in entry 0x61  
+# 0x83 - appears after CMD:08 commands
+# 0x84 - appears after CMD:08 commands and letters
+# 0x87, 0x8A, 0x8B, 0x8C - appear in entry 0x7F and 0x62 (seem like garbage)
+# 0xCE - appears before newline and dictionary refs
+# 0xD0 - entry 0x4D shows "D0 FF" - likely a letter + space
+# 0xD2 - appears multiple times, in entry 0x53 as "D2 D2 D2" (repeating char)
+# 0xDC, 0xDE, 0xEB - appear in entry 0x7F
+# 0xE7, 0xF7 - appear after CMD:08
+
+# Let's look at the font tilemap pattern:
+# 90-99 = 0-9
+# 9A-B3 = A-Z
+# B4-CD = a-z
+# D1 = '
+# DA = -
+# DB = &
+# FF = space
+
+# So the pattern for lower/upper case is clear
+# Missing characters are likely punctuation
+
+# Looking at common SNES character tables:
+80=@      # Special symbol
+81=!      # Exclamation  
+82=?      # Question mark
+83=(      # Left paren
+84=)      # Right paren
+85=[      # Left bracket
+86=]      # Right bracket
+87=:      # Colon
+88=;      # Semicolon
+89=.      # Period
+8A=,      # Comma
+8B=<      # Less than
+8C=>      # Greater than
+8D=/      # Slash
+8E=\      # Backslash
+8F=+      # Plus
+
+CE=.      # Period (alternate or specific use)
+CF=,      # Comma (alternate)
+D0=!      # Exclamation (alternate)
+D2=.      # Period (repeating pattern suggests ellipsis)
+D3=?      # Question (alternate)
+DC=.      # Period
+DD=,      # Comma
+DE=!      # Exclamation
+DF=?      # Question
+E0=:      # Colon
+E7='      # Apostrophe/quote
+EB=.      # Period
+F7="      # Quote mark

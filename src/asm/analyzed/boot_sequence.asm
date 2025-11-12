@@ -10,7 +10,7 @@
 
 ; Entry point after SNES reset vector
 ; This is the first code executed when the game starts
-BootEntry:	; Original: CODE_008000
+BootEntry:	; Original: Label_008000
 	clc                             ; Clear carry flag
 	xce                             ; Switch to native 65816 mode (not emulation)
 	jsr.W InitializeHardware        ; Initialize SNES hardware registers
@@ -24,13 +24,13 @@ BootEntry:	; Original: CODE_008000
 	bra ContinueBootSequence
 
 ; Alternative entry point (NMI/Reset handler?)
-AlternateEntry:	; Original: CODE_008016
+AlternateEntry:	; Original: Label_008016
 	jsr.W InitializeHardware
 	lda.B #$f0
 	sta.L $000600                   ; Set interrupt vector?
 	jsl.L InitializeInterrupts      ; Setup interrupts ($0d8004)
 
-ContinueBootSequence:	; Original: CODE_008023
+ContinueBootSequence:	; Original: Label_008023
 	rep #$30                        ; Set A and X/Y to 16-bit mode
 	ldx.W #$1fff                    ; Stack pointer = $1fff (top of RAM)
 	txs                             ; Transfer X to Stack pointer
@@ -46,7 +46,7 @@ ContinueBootSequence:	; Original: CODE_008023
 	bra SetupComplete
 
 ; Third entry point for warm boot
-WarmBootEntry:	; Original: CODE_00803A
+WarmBootEntry:	; Original: Label_00803A
 	jsr.W InitializeHardware
 	lda.B #$f0
 	sta.L $000600                   ; Interrupt vector
@@ -55,7 +55,7 @@ WarmBootEntry:	; Original: CODE_00803A
 	ldx.W #$1fff                    ; Reset stack
 	txs
 
-SetupComplete:	; Original: CODE_00804D
+SetupComplete:	; Original: Label_00804D
 	jsr.W ClearMemory               ; Clear RAM again
 	sep #$20                        ; 8-bit accumulator
 
@@ -71,7 +71,7 @@ SetupComplete:	; Original: CODE_00804D
 	lda.B #$01                      ; Enable channel 0
 	sta.W SNES_MDMAEN               ; Start DMA transfer
 
-SkipDMAFill:	; Original: CODE_00806E
+SkipDMAFill:	; Original: Label_00806E
 	jsl.L $00011f                   ; Call unknown routine (BIOS?)
 	rep #$30                        ; 16-bit mode
 	lda.W #$0000
@@ -105,14 +105,14 @@ SkipDMAFill:	; Original: CODE_00806E
 	jsl.L ContinueGame              ; Load continue data ($00b950)
 	bra EnterMainLoop
 
-LoadSaveData:	; Original: CODE_0080A8
+LoadSaveData:	; Original: Label_0080A8
 	jsr.W LoadSaveGameData
 	bra MainGameLoop
 
-StartNewGame:	; Original: CODE_0080AD
+StartNewGame:	; Original: Label_0080AD
 	jsr.W InitializeNewGame
 
-EnterMainLoop:	; Original: CODE_0080B0
+EnterMainLoop:	; Original: Load_0080B0
 ; Clear various flags
 	lda.B #$80
 	trb.W $00de                     ; Clear bit 7 of flags
@@ -131,7 +131,7 @@ EnterMainLoop:	; Original: CODE_0080B0
 	stz.W SNES_BG1VOFS              ; BG1 vertical scroll = 0
 	stz.W SNES_BG1VOFS              ; Write twice for 16-bit
 
-MainGameLoop:	; Original: CODE_0080DC
+MainGameLoop:	; Original: OriginalCode
 ; Main game loop continues...
 ; [Additional code would be analyzed here]
 
@@ -139,22 +139,22 @@ MainGameLoop:	; Original: CODE_0080DC
 ; Subroutines
 ; ============================================================================
 
-InitializeHardware:	; Original: CODE_008247
+InitializeHardware:	; Original: AddressOriginalCode
 ; Initialize all SNES hardware registers
 ; [Implementation at $008247 in bank_00.asm]
 	rts
 
-ClearMemory:	; Original: CODE_0081F0
+ClearMemory:	; Original: ClearRamAgainRedundant
 ; Clear work RAM ($7e0000-$7fffff)
 ; [Implementation at $0081f0 in bank_00.asm]
 	rts
 
-LoadSaveGameData:	; Original: CODE_008166
+LoadSaveGameData:	; Original: CallRoutine
 ; Load save game from SRAM
 ; [Implementation at $008166 in bank_00.asm]
 	rts
 
-InitializeNewGame:	; Original: CODE_008117
+InitializeNewGame:	; Original: NewGameInitialization
 ; Initialize new game state
 ; [Implementation at $008117 in bank_00.asm]
 	rts

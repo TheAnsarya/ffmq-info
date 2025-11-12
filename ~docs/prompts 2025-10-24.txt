@@ -636,7 +636,10 @@ Run the gh script locally to create GitHub issues (you run it, or I can prepare 
 do all of that in order after creating a git commit and pushing it;
 do all of that in order after creating a git commit and pushing it; Run the assembly parser & produce reports/dialog_asm_analysis.md now (recommended); continue
 the dialog translation includes commands, like: show dialog at a specific place on a specific character, move a character around, shake the screen, change maps, etc, so some bytes are from 1 to 4 text characters and some bytes are event commands with 1 to several bytes afterwards representing the command parameters; read and analyze the source code! it has the answer!;
-
+oh sorry, the dialog system is dictionary not dte, my bad, now fix the whole dialog system (event system too by continuing to look at the code, make extraction editing and reinsertion "just work" go go go! ; fix all the remaining issues;
+how many `CODE_*` style labels are left? I thought we replaced all of these with real names? fix them! ; and fix the dialog system; implement the changes to make it awesome for as long as you can and use up all the tokens for each session, do not waste my money - use the entire token space; do more per session/prompt; make it as awesome and complete as possible; git commit and push;
+Don't rename the `CODE_*` labels to `LABEL_*`, `RETURN_*` like `Label_0182F2`, rename using their actual real function, a descriptive name; and continue
+put a timestamp on the IDE chat window for every response line so I know when it happened; git commit everything with descriptions and push; continue; make github issues and todo lists for all new work; make sure to format everything! we use TABS not spaces; implement the changes to make it awesome for as long as you can and use up all the tokens for each session, do not waste my money - use the entire token space; do more per session/prompt; make it as awesome and complete as possible; git commit and push;
 
 
 

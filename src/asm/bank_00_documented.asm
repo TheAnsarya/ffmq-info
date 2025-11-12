@@ -78,22 +78,22 @@ lorom:
 ; External Bank Stubs (code in other banks)
 ;===============================================================================
 ; Bank $00 - Not yet imported
-	CODE_0096A0 = $0096a0
-	CODE_00985D = $00985d
-	CODE_00A375 = $00a375
-	CODE_00A3DE = $00a3de
-	CODE_00A3E5 = $00a3e5
-	CODE_00A3EC = $00a3ec
-	CODE_00A3F5 = $00a3fc
-	CODE_00A3FC = $00a3fc
-	CODE_00A51E = $00a51e
-; CODE_00A572 through CODE_00A597 now implemented
-; CODE_00A708 through CODE_00A83F now implemented
-; CODE_00A86E through CODE_00AACC now implemented (partial CODE_00A86E as db)
-; CODE_00AACF through CODE_00AFFE now implemented
-; CODE_00B000 through CODE_00B1A1 now implemented
-	CODE_00A78E = $00a78e             ; Referenced in jump table but not implemented as routine
-	CODE_00A86E = $00a86e             ; Partial implementation (raw bytecode placeholder)
+	WaitVblank = $0096a0
+	PerformMemoryCopy = $00985d
+	Sub_00A375 = $00a375
+	Sub_00A3DE = $00a3de
+	Sub_00A3E5 = $00a3e5
+	Sub_00A3EC = $00a3ec
+	B2 = $00a3fc
+	Sub_00A3FC = $00a3fc
+	Sub_00A51E = $00a51e
+; CodeThroughCodeNowImplemented through CodeThroughCodeNowImplemented2 now implemented
+; CodeThroughCodeNowImplemented3 through CodeExecuteExternalSubroutineViaLong now implemented
+; CodeThroughCodeNowImplementedPartial through CodeThroughCodeNowImplementedPartial2 now implemented (partial CodeThroughCodeNowImplementedPartial as db)
+; NextMoreDmaGraphicsRoutinesCode through CodeBitwiseTsbOperationsVariants now implemented
+; CodeThroughCodeNowImplemented4 through TestVariable now implemented
+	ReferencedJumpTableNotImplementedAs = $00a78e             ; Referenced in jump table but not implemented as routine
+	CodeThroughCodeNowImplementedPartial = $00a86e             ; Partial implementation (raw bytecode placeholder)
 ; All comparison tests now implemented below
 	Some_Graphics_Setup = $00b000
 	Some_Init_Routine = $00b100
@@ -104,40 +104,40 @@ lorom:
 	Some_Function_9319 = $009319
 	Some_Function_9A08 = $009a08
 	Some_Function_A236 = $00a236
-	CODE_009824 = $009824    ; BCD/Hex number formatting routine
-	CODE_008B69 = $008b69    ; Screen setup routine 1
-	CODE_008B88 = $008b88    ; Screen setup routine 2
-	CODE_00CBEC = $00cbec    ; Setup routine
-	CODE_00DA65 = $00da65    ; External data routine
-	CODE_00C795 = $00c795    ; External routine
-	CODE_00C7B8 = $00c7b8    ; External routine
-	CODE_00CA63 = $00ca63    ; External routine
-	CODE_00D080 = $00d080    ; External routine
-	CODE_00E055 = $00e055    ; External routine
-	CODE_00C92B = $00c92b    ; Get save slot address
-	CODE_00C4DB = $00c4db    ; External routine
-	CODE_00C7DE = $00c7de    ; Screen setup routine 1
-	CODE_00C7F0 = $00c7f0    ; Screen setup routine 2
-	CODE_00C78D = $00c78d    ; External routine
-	CODE_00CF3F = $00cf3f    ; Main routine
-	CODE_00DAA5 = $00daa5    ; External routine
-	CODE_00C9D3 = $00c9d3    ; Get save slot address
+	BcdHexNumberFormattingRoutine = $009824    ; BCD/Hex number formatting routine
+	ScreenSetupRoutine = $008b69    ; Screen setup routine 1
+	CallsLabelCodeScreenSetupRoutines = $008b88    ; Screen setup routine 2
+	SetupRoutine = $00cbec    ; Setup routine
+	ExternalDataRoutine = $00da65    ; External data routine
+	InitializePaletteSystem = $00c795    ; External routine
+	FinalSetupRoutine = $00c7b8    ; External routine
+	InitializeGraphicsComponent = $00ca63    ; External routine
+	CallHandler = $00d080    ; External routine
+	AlternateSyncHandler = $00e055    ; External routine
+	GetSaveSlotAddress = $00c92b    ; Get save slot address
+	CodeExternalRoutine = $00c4db    ; External routine
+	CodeCodeConditionalScreenSetup = $00c7de    ; Screen setup routine 1
+	ScreenSetupRoutine2 = $00c7f0    ; Screen setup routine 2
+	ExternalRoutine2 = $00c78d    ; External routine
+	MainRoutine = $00cf3f    ; Main routine
+	ExternalRoutine3 = $00daa5    ; External routine
+	GetSaveSlotAddress2 = $00c9d3    ; Get save slot address
 
 ; Other Banks
-	CODE_028AE0 = $028ae0    ; Bank $02 routine
+	BankRoutine = $028ae0    ; Bank $02 routine
 	DATA8_03ba35 = $03ba35   ; Bank $03 data
 	DATA8_03bb81 = $03bb81   ; Bank $03 data
 	DATA8_03a37c = $03a37c   ; Bank $03 character data
 	UNREACH_03D5E5 = $03d5e5 ; Bank $03 unreachable code
-	CODE_0C8000 = $0c8000    ; Bank $0c routine
-	CODE_0C8080 = $0c8080    ; Bank $0c routine
+	AddressC8000OriginalCode = $0c8000    ; Bank $0c routine
+	AddressC8080OriginalCode = $0c8080    ; Bank $0c routine
 	BankOC_Init = $0c8000    ; Bank $0c Init
-	CODE_0D8000 = $0d8000    ; Bank $0d routine
-	CODE_0D8004 = $0d8004    ; Bank $0d routine
+	Primary_APU_Upload_Entry_Point = $0d8000    ; Bank $0d routine
+	Secondary_APU_Command_Entry_Point = $0d8004    ; Bank $0d routine
 	Bank0D_Init_Variant = $0d8000    ; Bank $0d Init
-	CODE_018272 = $018272    ; Bank $01 routine
-	CODE_018A52 = $018a52    ; Bank $01 sprite initialization
-	CODE_01B24C = $01b24c    ; Bank $01 script initialization routine
+	Label_018272 = $018272    ; Bank $01 routine
+	BankSpriteInitialization = $018a52    ; Bank $01 sprite initialization
+	BankScriptInitializationRoutine = $01b24c    ; Bank $01 script initialization routine
 	Jump_To_Bank01 = $018000 ; Bank $01 jump target
 	DATA8_049800 = $049800   ; Bank $04 data
 	Load_Save_Game = $0e8000 ; Bank $0e save game
@@ -257,7 +257,7 @@ RESET_Handler:
 ; C=0 → E=0 → Native 65816 mode enabled!
 
 	jsr.w Init_Hardware ; Init_Hardware: Disable NMI, force blank, clear registers
-	jsl.l CODE_0D8000 ; Bank $0d initialization (sound driver, APU setup)
+	jsl.l Primary_APU_Upload_Entry_Point ; Bank $0d initialization (sound driver, APU setup)
 
 ; ---------------------------------------------------------------------------
 ; Initialize Save Game State Variables
@@ -288,7 +288,7 @@ Boot_Secondary:
 	sta.l $000600   ; Write $f0 to $000600 (low RAM mirror area)
 ; Purpose unclear - may trigger hardware behavior
 
-	jsl.l CODE_0D8004 ; Bank $0d alternate initialization routine
+	jsl.l Secondary_APU_Command_Entry_Point ; Bank $0d alternate initialization routine
 
 ;-------------------------------------------------------------------------------
 
@@ -305,7 +305,7 @@ Boot_Alternate:
 	lda.b #$f0	  ; A = $f0
 	sta.l $000600   ; Write $f0 to $000600
 
-	jsl.l CODE_0D8004 ; Bank $0d alternate init
+	jsl.l Secondary_APU_Command_Entry_Point ; Bank $0d alternate init
 
 	rep #$30		; Set 16-bit mode: A, X, Y
 	ldx.w #$1fff	; X = $1fff (stack pointer initial value)
@@ -343,7 +343,7 @@ Boot_SetupStack:
 	and.w $00da	 ; Test bit 6 of $00da
 	bne Boot_EnableNMI ; If bit 6 set → Skip display init, jump ahead
 
-	jsl.l CODE_0C8080 ; Bank $0c: Full display/PPU initialization
+	jsl.l AddressC8080OriginalCode ; Bank $0c: Full display/PPU initialization
 	bra Boot_SetupDMA ; → Continue to DMA setup
 
 ;-------------------------------------------------------------------------------
@@ -359,7 +359,7 @@ Boot_SetupDMA:
 ; used for specific initialization scenarios.
 ; ===========================================================================
 
-	jsr.w CODE_0081F0 ; Clear_RAM again (redundant?)
+	jsr.w ClearRamAgainRedundant ; Clear_RAM again (redundant?)
 
 	sep #$20		; 8-bit accumulator
 
@@ -421,8 +421,8 @@ Boot_EnableNMI:
 	lda.b #$0f	  ; A = $0f
 	sta.w $00aa	 ; [$00aa] = $0f (some game state variable)
 
-	jsl.l CODE_0C8000 ; Bank $0c: Wait for VBLANK
-	jsl.l CODE_0C8000 ; Bank $0c: Wait for VBLANK again
+	jsl.l AddressC8000OriginalCode ; Bank $0c: Wait for VBLANK
+	jsl.l AddressC8000OriginalCode ; Bank $0c: Wait for VBLANK again
 ; Double wait ensures PPU is stable
 
 ; ---------------------------------------------------------------------------
@@ -441,7 +441,7 @@ Boot_EnableNMI:
 	ora.l $700718   ; OR with SRAM byte 3
 	beq Init_NewGame ; If all zero → New game (no save data)
 
-	jsl.l CODE_00B950 ; Has save data → Show continue menu
+	jsl.l HasSaveDataShowContinueMenu ; Has save data → Show continue menu
 	bra Boot_FadeIn ; → Continue to fade-in
 
 ;-------------------------------------------------------------------------------
@@ -491,7 +491,7 @@ Boot_FadeIn:
 	trb.w $0111	 ; Test and Reset bits 5-7 of $0111
 ; Clear multiple configuration flags
 
-	jsl.l CODE_0C8000 ; Bank $0c: Wait for VBLANK
+	jsl.l AddressC8000OriginalCode ; Bank $0c: Wait for VBLANK
 ; Ensure PPU ready for register writes
 
 ; ---------------------------------------------------------------------------
@@ -524,8 +524,8 @@ Boot_FadeIn:
 	stz.w SNES_BG2VOFS ; $2110 = BG2 vertical scroll = 0 (low byte)
 	stz.w SNES_BG2VOFS ; $2110 = BG2 vertical scroll = 0 (high byte)
 
-	jsr.w CODE_00BD30 ; Additional graphics/fade setup
-	jsl.l CODE_0C8000 ; Bank $0c: Wait for VBLANK again
+	jsr.w AdditionalGraphicsFadeSetup ; Additional graphics/fade setup
+	jsl.l AddressC8000OriginalCode ; Bank $0c: Wait for VBLANK again
 ; Ensure all register writes complete
 
 ;-------------------------------------------------------------------------------
@@ -543,7 +543,7 @@ Boot_FinalInit:
 ;   - Jumps to main game loop in bank $01
 ; ===========================================================================
 
-	jsr.w CODE_009014 ; Initialize subsystem (graphics related?)
+	jsr.w InitializeSubsystemGraphicsRelated ; Initialize subsystem (graphics related?)
 
 ; ---------------------------------------------------------------------------
 ; Initialize Two System Components (Unknown Purpose)
@@ -562,11 +562,11 @@ Boot_FinalInit:
 ; Load Initial Data Table
 ; ---------------------------------------------------------------------------
 ; $81ed points to initialization data (see DATA8_0081ED below)
-; CODE_009BC4 likely loads/processes this data table
+; CodeLikelyLoadsProcessesThisData likely loads/processes this data table
 ; ---------------------------------------------------------------------------
 
 	ldx.w #$81ed	; X = $81ed (pointer to init data)
-	jsr.w CODE_009BC4 ; Load/process data table
+	jsr.w CodeLikelyLoadsProcessesThisData ; Load/process data table
 
 ; ---------------------------------------------------------------------------
 ; Configure State Flags
@@ -606,8 +606,8 @@ Boot_FinalInit:
 ; Final Setup Routines
 ; ---------------------------------------------------------------------------
 
-	jsl.l CODE_009B2F ; Final system initialization
-	jsr.w CODE_008230 ; Additional setup (see below)
+	jsl.l FinalSystemInitialization ; Final system initialization
+	jsr.w AdditionalSetupSeeBelow ; Additional setup (see below)
 
 ; ---------------------------------------------------------------------------
 ; JUMP TO MAIN GAME LOOP
@@ -617,7 +617,7 @@ Boot_FinalInit:
 ; This is the END of boot sequence - game starts running!
 ; ---------------------------------------------------------------------------
 
-	jml.l CODE_018272 ; → JUMP TO MAIN GAME ENGINE (Bank $01)
+	jml.l Label_018272 ; → JUMP TO MAIN GAME ENGINE (Bank $01)
 ; Boot sequence complete!
 
 ;===============================================================================
@@ -649,11 +649,11 @@ Init_NewGameState:
 	lda.w #$0000	; A = $0000
 	sta.l $7e31b5   ; Clear [$7e31b5] (game state variable)
 
-	jsr.w CODE_00BD64 ; Initialize graphics/display system
+	jsr.w InitializeGraphicsDisplaySystem ; Initialize graphics/display system
 
 	sep #$20		; 8-bit accumulator
 
-	jsl.l CODE_0C8000 ; Bank $0c: Wait for VBLANK
+	jsl.l AddressC8000OriginalCode ; Bank $0c: Wait for VBLANK
 
 ; ---------------------------------------------------------------------------
 ; Configure OAM (Sprite) DMA Transfer
@@ -699,9 +699,9 @@ Init_NewGameState:
 	lda.w #$ffff	; A = $ffff
 	sta.w $010e	 ; [$010e] = $ffff (state marker)
 
-	jsl.l CODE_00C795 ; Initialize subsystem
-	jsr.w CODE_00BA1A ; Initialize subsystem
-	jsl.l CODE_00C7B8 ; Initialize subsystem
+	jsl.l InitializePaletteSystem ; Initialize subsystem
+	jsr.w InitializeSubsystem ; Initialize subsystem
+	jsl.l FinalSetupRoutine ; Initialize subsystem
 
 	sep #$20		; 8-bit accumulator
 	rts ; Return to caller
@@ -780,7 +780,7 @@ Load_GameFromSRAM:
 
 	lda.l $7e3668   ; A = save slot number
 	cmp.b #$02	  ; Compare with 2
-	bcc CODE_00818E ; If < 2, skip ahead (valid slot 0 or 1)
+	bcc IfSkipAheadValidSlot ; If < 2, skip ahead (valid slot 0 or 1)
 
 	lda.b #$ff	  ; A = $ff (invalid slot, reset to -1)
 
@@ -852,7 +852,7 @@ Load_SaveSlotData:
 	ldx.w #$0e92	; X = $0e92
 	stx.b $17	   ; [$17] = $0e92 (store pointer)
 
-	jsr.w CODE_00A236 ; Process loaded save data
+	jsr.w ProcessLoadedSaveData ; Process loaded save data
 
 	sep #$20		; 8-bit accumulator
 
@@ -889,7 +889,7 @@ DATA8_0081db:
 	db $14, $33, $28, $05, $2c, $aa, $6a, $a9
 
 DATA8_0081ed:
-; Referenced by CODE_0080DC (at $008113)
+; Referenced by OriginalCode (at $008113)
 ; Initialization data table
 	db $ec, $a6, $03
 
@@ -974,7 +974,7 @@ Clear_WorkRAM:
 	ldx.w #$822d	; X = $822d (alternate table for existing save)
 
 Load_InitDataTable:
-	jmp.w CODE_009BC4 ; Load/process data table and return
+	jmp.w CodeLikelyLoadsProcessesThisData ; Load/process data table and return
 
 ;-------------------------------------------------------------------------------
 ; INITIALIZATION DATA TABLES
@@ -1008,7 +1008,7 @@ Boot_PostInit:
 
 	lda.w #$0170	; A = $0170 (parameter 1)
 	ldy.w #$3007	; Y = $3007 (parameter 2)
-	jsr.w CODE_009A08 ; Initialize with these parameters
+	jsr.w InitializeTheseParameters ; Initialize with these parameters
 
 	lda.w #$0098	; A = $0098
 	sta.w $31b5	 ; [$7e31b5] = $0098 (game state variable)
@@ -1053,7 +1053,7 @@ Init_Hardware:
 ;-------------------------------------------------------------------------------
 
 DATA8_008252:
-; Referenced by DMA setup at CODE_00804D
+; Referenced by DMA setup at Label_00804D
 ; 9 bytes of data
 	db $00
 	db $db, $80, $fd, $db, $80, $fd, $db, $80, $fd
@@ -1123,7 +1123,7 @@ Init_VBlankDMA:
 ; ---------------------------------------------------------------------------
 
 	ldx.w #$8334	; X = $8334 (pointer to init data table)
-	jsr.w CODE_009BC4 ; Load/process data table
+	jsr.w CodeLikelyLoadsProcessesThisData ; Load/process data table
 
 ; ---------------------------------------------------------------------------
 ; Initialize OAM DMA Parameters
@@ -1169,13 +1169,13 @@ Init_VBlankDMA:
 ; ---------------------------------------------------------------------------
 
 	lda.w #$0000	; A = $0000 (parameter)
-	jsr.w CODE_00CA63 ; Initialize graphics component 0
+	jsr.w InitializeGraphicsComponent ; Initialize graphics component 0
 
 	lda.w #$0001	; A = $0001 (parameter)
-	jsr.w CODE_00CA63 ; Initialize graphics component 1
+	jsr.w InitializeGraphicsComponent ; Initialize graphics component 1
 
 	lda.w #$0002	; A = $0002 (parameter)
-	jsr.w CODE_00CA63 ; Initialize graphics component 2
+	jsr.w InitializeGraphicsComponent ; Initialize graphics component 2
 
 ; ---------------------------------------------------------------------------
 ; Load Graphics Data from ROM to RAM
@@ -1214,9 +1214,9 @@ Init_VBlankDMA:
 ; Initialize Additional Systems
 ; ---------------------------------------------------------------------------
 
-	jsr.w CODE_008EC4 ; Initialize system
-	jsr.w CODE_008C3D ; Initialize system
-	jsr.w CODE_008D29 ; Initialize system
+	jsr.w InitializeSystem2 ; Initialize system
+	jsr.w InitializeSystem ; Initialize system
+	jsr.w ExternalRoutine ; Initialize system
 
 ; ---------------------------------------------------------------------------
 ; Set Direct Page to PPU Registers ($2100)
@@ -1245,7 +1245,7 @@ Init_VBlankDMA:
 
 	ldx.w #$99c0	; X = $99c0 (source address in bank $04)
 	ldy.w #$0004	; Y = $0004 (DMA parameters)
-	jsl.l CODE_008DDF ; Execute graphics upload via DMA
+	jsl.l ExecuteSpecialTransfer ; Execute graphics upload via DMA
 
 	plb ; Restore Data Bank
 	rtl ; Return
@@ -1337,7 +1337,7 @@ NMI_Handler:
 	trb.w $00d8	 ; Test and Reset bit 7 of $00d8
 ; Clear the flag (one-shot operation)
 
-	jmp.w CODE_0085B7 ; Execute battle graphics update
+	jmp.w ExecuteBattleGraphicsUpdate ; Execute battle graphics update
 
 ;-------------------------------------------------------------------------------
 
@@ -1350,23 +1350,23 @@ NMI_CheckMoreFlags:
 
 	lda.b #$c0	  ; A = $c0 (bits 6-7 mask)
 	and.w $00d2	 ; Test bits 6-7 of $00d2
-	bne CODE_0083A8 ; If any set → Execute DMA operations
+	bne AddressA8OriginalCode ; If any set → Execute DMA operations
 
 	lda.b #$10	  ; A = $10 (bit 4 mask)
 	and.w $00d2	 ; Test bit 4 of $00d2
 	bne NMI_SpecialDMA ; If set → Special operation
 
-	jmp.w CODE_008428 ; → Continue to additional handlers
+	jmp.w ContinueAdditionalHandlers ; → Continue to additional handlers
 
 ;-------------------------------------------------------------------------------
 
 NMI_SpecialDMA:
-	jmp.w CODE_00863D ; Execute special DMA operation
+	jmp.w ExecuteSpecialDmaOperation ; Execute special DMA operation
 
 ;-------------------------------------------------------------------------------
 
 NMI_TilemapDMA:
-	jmp.w CODE_0083E8 ; Execute tilemap DMA transfer
+	jmp.w AddressE8OriginalCode ; Execute tilemap DMA transfer
 
 ;-------------------------------------------------------------------------------
 
@@ -1586,7 +1586,7 @@ DMA_SpecialGraphics:
 
 	ldx.w #$f0c1	; X = $f0c1 (source address in bank $04)
 	ldy.w #$0004	; Y = $0004 (DMA parameters)
-	jmp.w CODE_008DDF ; Execute graphics DMA and return
+	jmp.w ExecuteSpecialTransfer ; Execute graphics DMA and return
 
 ;===============================================================================
 ; ADDITIONAL VRAM TRANSFER ROUTINES ($008428-$008576)
@@ -1702,11 +1702,11 @@ NMI_AlternateTransfer:
 
 	lda.b #$88	  ; A = $88 (palette address)
 	ldx.w $00f4	 ; X = [$00f4] (source offset 1)
-	jsr.w CODE_008504 ; Transfer palette set 1
+	jsr.w TransferPaletteSet ; Transfer palette set 1
 
 	lda.b #$98	  ; A = $98 (palette address)
 	ldx.w $00f7	 ; X = [$00f7] (source offset 2)
-	jsr.w CODE_008504 ; Transfer palette set 2
+	jsr.w TransferPaletteSet ; Transfer palette set 2
 
 ; ---------------------------------------------------------------------------
 ; Write Direct VRAM Data
@@ -1736,11 +1736,11 @@ NMI_AlternateTransfer:
 
 	ldx.w $00f2	 ; X = [$00f2] (tilemap 1 source)
 	lda.w #$6000	; A = $6000 (VRAM address 1)
-	jsr.w CODE_008520 ; Transfer tilemap region 1
+	jsr.w TransferTilemapRegion ; Transfer tilemap region 1
 
 	ldx.w $00f5	 ; X = [$00f5] (tilemap 2 source)
 	lda.w #$6040	; A = $6040 (VRAM address 2)
-	jsr.w CODE_008520 ; Transfer tilemap region 2
+	jsr.w TransferTilemapRegion ; Transfer tilemap region 2
 
 	sep #$20		; 8-bit accumulator
 
@@ -1750,7 +1750,7 @@ NMI_AlternateTransfer:
 
 	lda.b #$10	  ; A = $10 (bit 4 mask)
 	and.w $00da	 ; Test bit 4 of $00da
-	bne CODE_0084F8 ; If set → Skip menu graphics transfer
+	bne IfSetSkipMenuGraphicsTransfer ; If set → Skip menu graphics transfer
 
 ; ---------------------------------------------------------------------------
 ; Menu Graphics Transfer
@@ -1778,11 +1778,11 @@ NMI_AlternateTransfer:
 
 	ldx.w #$c708	; X = $c708 (default source 1)
 	cmp.b #$26	  ; Compare Y with $26
-	bcc CODE_0084EB ; If Y < $26 → Use source 1
+	bcc IfYUseSource ; If Y < $26 → Use source 1
 
 	ldx.w #$c908	; X = $c908 (source 2)
 	cmp.b #$29	  ; Compare Y with $29
-	bcc CODE_0084EB ; If Y < $29 → Use source 2
+	bcc IfYUseSource ; If Y < $29 → Use source 2
 
 	ldx.w #$ca48	; X = $ca48 (source 3)
 ; Y >= $29 → Use source 3
@@ -1882,7 +1882,7 @@ DMA_StandardTilemap:
 	phx ; Save X (source address)
 
 	ldy.w #$0002	; Y = $0002 (DMA parameters)
-	jsl.l CODE_008DDF ; Execute first tilemap transfer
+	jsl.l ExecuteSpecialTransfer ; Execute first tilemap transfer
 
 	pla ; A = saved X (restore source address)
 	clc ; Clear carry
@@ -1890,7 +1890,7 @@ DMA_StandardTilemap:
 	tax ; X = new source address
 
 	ldy.w #$0002	; Y = $0002 (DMA parameters)
-	jsl.l CODE_008DDF ; Execute second tilemap transfer
+	jsl.l ExecuteSpecialTransfer ; Execute second tilemap transfer
 ; (VRAM address auto-increments)
 
 	plb ; Restore Data Bank
@@ -2009,7 +2009,7 @@ DMA_BattleGraphics:
 	trb.w $0111	 ; Test and Reset bits 5-7 of $0111
 ; Clear multiple state flags
 
-	jsl.l CODE_0C8000 ; Bank $0c: Wait for VBLANK
+	jsl.l AddressC8000OriginalCode ; Bank $0c: Wait for VBLANK
 
 ; ---------------------------------------------------------------------------
 ; Configure Color Math (Fade Effect)
@@ -2559,7 +2559,7 @@ DMA_Init_Data:
 ; More data continues...
 
 ;===============================================================================
-; Graphics Update - Field Mode (continued from CODE_008577)
+; Graphics Update - Field Mode (continued from GraphicsUpdateFieldModeContinuedCode)
 ;===============================================================================
 
 DMA_FieldGraphicsUpdate:
@@ -2571,7 +2571,7 @@ DMA_FieldGraphicsUpdate:
 	lda.b #$10	  ; Check bit 4 of display flags
 	and.w $00da	 ; Test against display status
 	beq +		   ; If clear, continue to field graphics
-	jmp CODE_008577 ; Otherwise do battle graphics transfer
+	jmp GraphicsUpdateFieldModeContinuedCode ; Otherwise do battle graphics transfer
 	+
 ; Field mode graphics update
 	ldx.w $0042	 ; Get current VRAM address from variable
@@ -2691,7 +2691,7 @@ DMA_SpecialVRAMHandler:
 
 	ldx.w #$99c0	; X = $99c0 (source in bank $04)
 	ldy.w #$0004	; Y = $0004 (DMA parameters)
-	jsl.l CODE_008DDF ; Execute tilemap DMA transfer
+	jsl.l ExecuteSpecialTransfer ; Execute tilemap DMA transfer
 
 	plb ; Restore Data Bank
 
@@ -2845,11 +2845,11 @@ DMA_UpdateAllCharacters:
 
 	ldx.w #$9a20	; X = $9a20 (source in bank $04)
 	ldy.w #$0004	; Y = $0004 (DMA parameters)
-	jsl.l CODE_008DDF ; Transfer tilemap part 1
+	jsl.l ExecuteSpecialTransfer ; Transfer tilemap part 1
 
 	ldx.w #$cd20	; X = $cd20 (source for second part)
 	ldy.w #$0004	; Y = $0004 (DMA parameters)
-	jsl.l CODE_008DDF ; Transfer tilemap part 2
+	jsl.l ExecuteSpecialTransfer ; Transfer tilemap part 2
 
 ; ---------------------------------------------------------------------------
 ; Transfer Character 1 Graphics
@@ -2902,7 +2902,7 @@ DMA_UpdateAllCharacters:
 
 	ldy.w $0109	 ; Y = [$0109] (character 2 data pointer)
 	ldx.w #$00e0	; X = $00e0 (CGRAM address = palette $e)
-	jsr.w CODE_00876C ; Transfer character palette
+	jsr.w TransferCharacterPalette ; Transfer character palette
 
 ; ---------------------------------------------------------------------------
 ; Transfer Character 3 Palette
@@ -2910,7 +2910,7 @@ DMA_UpdateAllCharacters:
 
 	ldy.w $010b	 ; Y = [$010b] (character 3 data pointer)
 	ldx.w #$00f0	; X = $00f0 (CGRAM address = palette $f)
-	jsr.w CODE_00876C ; Transfer character palette
+	jsr.w TransferCharacterPalette ; Transfer character palette
 
 	rtl ; Return
 
@@ -2943,7 +2943,7 @@ DMA_CharacterGraphics:
 	lda.l $000000,x ; A = [X+0] (graphics part 1 pointer)
 	tax ; X = graphics part 1 pointer
 	ldy.w #$0004	; Y = $0004 (DMA parameters)
-	jsl.l CODE_008DDF ; Execute DMA transfer
+	jsl.l ExecuteSpecialTransfer ; Execute DMA transfer
 
 ; ---------------------------------------------------------------------------
 ; Transfer Graphics Part 2
@@ -2954,7 +2954,7 @@ DMA_CharacterGraphics:
 	lda.l $000002,x ; A = [X+2] (graphics part 2 pointer)
 	tax ; X = graphics part 2 pointer
 	ldy.w #$0004	; Y = $0004 (DMA parameters)
-	jsl.l CODE_008DDF ; Execute DMA transfer
+	jsl.l ExecuteSpecialTransfer ; Execute DMA transfer
 ; (VRAM address auto-increments from part 1)
 
 	rts ; Return
@@ -3012,7 +3012,7 @@ DMA_PaletteToCGRAM:
 ; ADDITIONAL VBLANK OPERATIONS ($008784-$008965)
 ;===============================================================================
 
-; Data table referenced by CODE_008784
+; Data table referenced by DataTableReferencedCode
 DATA8_008960:
 	db $3c		 ; Tile $3c
 
@@ -3113,7 +3113,7 @@ GameLoop_NormalUpdate:
 ; Handles incremental tilemap updates and controller input.
 ; ===========================================================================
 
-	jsr.w CODE_008BFD ; Update tilemap changes (scrolling, etc.)
+	jsr.w Store_008BFD ; Update tilemap changes (scrolling, etc.)
 
 ; ---------------------------------------------------------------------------
 ; Check Menu Mode Flag ($00da bit 4)
@@ -3148,11 +3148,11 @@ GameLoop_ProcessInput:
 ; ---------------------------------------------------------------------------
 ; Determine Input Handler
 ; ---------------------------------------------------------------------------
-; CODE_009730 returns handler index in A based on game state
+; CodeReturnsHandlerIndexBasedGame returns handler index in A based on game state
 ; Handler table at Input_HandlerTable dispatches to appropriate routine
 ; ---------------------------------------------------------------------------
 
-	jsl.l CODE_009730 ; Get input handler index for current mode
+	jsl.l CodeReturnsHandlerIndexBasedGame ; Get input handler index for current mode
 
 	sep #$30		; 8-bit A, X, Y
 
@@ -3174,8 +3174,8 @@ GameLoop_UpdateState:
 
 	rep #$30		; 16-bit A, X, Y
 
-	jsr.w CODE_009342 ; Update sprite animations
-	jsr.w CODE_009264 ; Update game state and logic
+	jsr.w UpdateSpriteAnimations ; Update sprite animations
+	jsr.w UpdateGameStateLogic ; Update game state and logic
 
 	rtl ; Return to NMI handler continuation
 
@@ -3381,7 +3381,7 @@ Input_HandlerTable:
 ; Input Handler Jump Table
 ; ===========================================================================
 ; Table of 16-bit addresses for different input handler routines.
-; Indexed by value returned from CODE_009730 (game mode).
+; Indexed by value returned from CodeReturnsHandlerIndexBasedGame (game mode).
 ;
 ; Handler addresses are stored as 16-bit little-endian values.
 ; jsr (table,X) performs indirect jump to selected handler.
@@ -3550,13 +3550,13 @@ Input_ButtonA_ToggleStatus:
 	lda.b #$40	  ; A = $40 (bit 6)
 	tsb.w $00d4	 ; Set bit 6 of $00d4 (update needed)
 
-	jsr.w CODE_00B908 ; Update character display
+	jsr.w NormalPositionCallB908 ; Update character display
 	bra Input_ButtonA_Exit ; → Exit
 
 ;-------------------------------------------------------------------------------
 
 Input_ButtonA_Alternate:
-	jsr.w CODE_00B912 ; Alternate character update routine
+	jsr.w AlternateCharacterUpdateRoutine ; Alternate character update routine
 
 Input_ButtonA_Exit:
 	rts ; Return
@@ -3582,12 +3582,12 @@ Menu_CheckCharPosition:
 	lda.w $1033	 ; A = [$1033] (Y position)
 	bne Menu_CheckCharPosition_Normal ; If not $00 → Jump to B908
 
-	jmp.w CODE_00B912 ; Special position → Call B912
+	jmp.w AlternateCharacterUpdateRoutine ; Special position → Call B912
 
 ;-------------------------------------------------------------------------------
 
 Menu_CheckCharPosition_Normal:
-	jmp.w CODE_00B908 ; Normal position → Call B908
+	jmp.w NormalPositionCallB908 ; Normal position → Call B908
 
 ;-------------------------------------------------------------------------------
 
@@ -3639,15 +3639,15 @@ Menu_NavCharUp_FindNext:
 	and.b #$03	  ; A = A & $03 (wrap 0-3)
 
 	pha ; Save character index
-	jsr.w CODE_008DA8 ; Check if character is valid
+	jsr.w CheckIfCharacterIsValid ; Check if character is valid
 	pla ; Restore character index
 
 	cpy.b #$ff	  ; Check if character invalid (Y = $ff)
 	beq Menu_NavCharUp_FindNext ; If invalid → Try next character
 
 ; Valid character found
-	jsr.w CODE_008B21 ; Update character display
-	jsr.w CODE_008C3D ; Refresh graphics
+	jsr.w UpdateCharacterDisplay ; Update character display
+	jsr.w InitializeSystem ; Refresh graphics
 
 Menu_NavCharUp_Exit:
 	rts ; Return
@@ -3690,13 +3690,13 @@ Menu_NavCharDown_FindPrev:
 	and.b #$03	  ; A = A & $03 (wrap 0-3)
 
 	pha ; Save index
-	jsr.w CODE_008DA8 ; Check if character valid
+	jsr.w CheckIfCharacterIsValid ; Check if character valid
 	pla ; Restore index
 
 	cpy.b #$ff	  ; Check if invalid
 	beq Menu_NavCharDown_FindPrev ; If invalid → Try previous
 
-	jsr.w CODE_008B21 ; Update character display
+	jsr.w UpdateCharacterDisplay ; Update character display
 	jsr.w Tilemap_RefreshLayer0 ; Refresh graphics
 
 Menu_NavCharDown_Exit:
@@ -3722,7 +3722,7 @@ Menu_UpdateCharDisplayPos:
 
 	ldx.w #$3709	; X = $3709 (default tilemap 1)
 	cpy.w #$0023	; Compare Y with $23
-	bcc CODE_008B3E ; If Y < $23 → Use tilemap 1
+	bcc IfYUseTilemap ; If Y < $23 → Use tilemap 1
 
 	ldx.w #$3719	; X = $3719 (tilemap 2)
 	cpy.w #$0026	; Compare Y with $26
@@ -3887,7 +3887,7 @@ Input_SpecialMode:
 	and.w #$fff0	; A = A & $fff0 (clear bits 0-3, D-pad)
 	beq Input_ProcessButtons ; If zero → No buttons pressed
 
-	jmp.w CODE_0092F0 ; → Special button handler
+	jmp.w SpecialMenuProcessing ; → Special button handler
 
 ;-------------------------------------------------------------------------------
 
@@ -3912,7 +3912,7 @@ Input_AlternateNormal:
 	and.w #$fff0	; Mask D-pad
 	beq Input_ProcessButtons ; If zero → No buttons
 
-	jmp.w CODE_0092F6 ; → Alternate button handler
+	jmp.w AnotherSpecialHandler ; → Alternate button handler
 
 ;-------------------------------------------------------------------------------
 
@@ -4259,10 +4259,10 @@ Tilemap_ApplyAttributes:
 
 	lda.l $001031   ; A = Y position
 	cmp.b #$29	  ; Compare with $29
-	bcc CODE_008D11 ; If Y < $29 → Use simple tile display
+	bcc IfYUseSimpleTileDisplay ; If Y < $29 → Use simple tile display
 
 	cmp.b #$2c	  ; Compare with $2c
-	beq CODE_008D11 ; If Y = $2c → Use simple tile display
+	beq IfYUseSimpleTileDisplay ; If Y = $2c → Use simple tile display
 
 ; ---------------------------------------------------------------------------
 ; Two-Digit Number Display
@@ -4365,7 +4365,7 @@ Tilemap_RefreshLayer1:
 
 	lda.b #$02	  ; A = $02 (bit 1 mask)
 	and.w $00d8	 ; Test bit 1 of $00d8
-	beq CODE_008D6C ; If clear → Field mode
+	beq IfClearFieldMode ; If clear → Field mode
 
 ; ---------------------------------------------------------------------------
 ; Battle Mode Layer Update
@@ -4442,7 +4442,7 @@ Tilemap_CalcRowAddress:
 ; ===========================================================================
 ; Tilemap Address Calculation Wrapper
 ; ===========================================================================
-; Calls CODE_008C1B if position is valid
+; Calls CallsCodeIfPositionIsValid if position is valid
 ;
 ; Parameters:
 ;   A = Position value
@@ -4454,7 +4454,7 @@ Tilemap_CalcRowAddress:
 	cmp.b #$ff	  ; Check if invalid position
 	beq Map_InvalidPositionReturn ; If $ff → Return $ffff
 
-	jsr.w CODE_008C1B ; Calculate tilemap address
+	jsr.w CallsCodeIfPositionIsValid ; Calculate tilemap address
 	tax ; X = calculated address
 	rts ; Return
 
@@ -4694,7 +4694,7 @@ VRAM_DirectWriteLarge_InnerLoop:
 	ply ; Restore Y counter
 	dey ; Decrement tile group counter
 	beq +		   ; Exit if done
-	jmp CODE_008DE8 ; Loop if more groups remain
+	jmp LoopIfMoreGroupsRemain ; Loop if more groups remain
 	+
 	pld ; Restore Direct Page
 	plp ; Restore processor status
@@ -4796,7 +4796,7 @@ Graphics_InitFieldMenuMode:
 ; TECHNICAL NOTES:
 ; - Uses DMA Channel 5 for bulk VRAM transfer ($1000 bytes)
 ; - Loads tiles to VRAM $3000-$3fff
-; - Loads additional tiles to VRAM $2000-$2fff via CODE_008DDF
+; - Loads additional tiles to VRAM $2000-$2fff via ExecuteSpecialTransfer
 ; - Sets up multiple palette entries in CGRAM
 ; - Direct Page = $2100 throughout for PPU access
 ;
@@ -5051,7 +5051,7 @@ Status_InitDisplay:
 	and.b #$e0	  ; Mask bits 7-5
 	beq Skip_Status_Group1 ; If clear, skip first group
 
-	jsl.l CODE_009730 ; Calculate status icon offset
+	jsl.l CodeReturnsHandlerIndexBasedGame ; Calculate status icon offset
 	eor.b #$ff	  ; Invert
 	sec ; Set carry
 	adc.b #$27	  ; Add offset $27
@@ -5064,7 +5064,7 @@ Skip_Status_Group1:
 	and.b #$1c	  ; Mask bits 4-2
 	beq Skip_Status_Group2 ; If clear, skip second group
 
-	jsl.l CODE_009730 ; Calculate status icon offset
+	jsl.l CodeReturnsHandlerIndexBasedGame ; Calculate status icon offset
 	eor.b #$ff	  ; Invert
 	sec ; Set carry
 	adc.b #$27	  ; Add offset $27
@@ -5083,12 +5083,12 @@ Skip_Status_Group2:
 
 ; Embedded jsl instruction as data
 Skip_Status_Group2_bytes:
-	db $22,$30,$97,$00 ; jsl CODE_009730
+	db $22,$30,$97,$00 ; jsl CodeReturnsHandlerIndexBasedGame
 	db $18,$69,$08 ; CLC, adc #$08
 	db $80,$04	 ; bra +4
 
 Process_Status_Group3:
-	jsl.l CODE_009730 ; Calculate status icon offset
+	jsl.l CodeReturnsHandlerIndexBasedGame ; Calculate status icon offset
 	eor.b #$ff	  ; Invert
 	sec ; Set carry
 	adc.b #$2f	  ; Add offset $2f
@@ -5101,7 +5101,7 @@ Skip_Status_Group3:
 	and.b #$70	  ; Mask bits 6-4
 	beq Skip_Status_Group4 ; If clear, skip
 
-	jsl.l CODE_009730 ; Calculate status icon offset
+	jsl.l CodeReturnsHandlerIndexBasedGame ; Calculate status icon offset
 	eor.b #$ff	  ; Invert
 	sec ; Set carry
 	adc.b #$2f	  ; Add offset $2f
@@ -5140,7 +5140,7 @@ Status_RenderCharacter:
 
 	lda.b $31	   ; Get character slot
 	bmi Skip_Character ; If bit 7 set → invalid/dead character
-	jsr.w CODE_009111 ; Render base character icon
+	jsr.w RenderBaseCharacterIcon ; Render base character icon
 
 Skip_Character:
 ; Process status flags group 1 (bits 7-5 of $35)
@@ -5148,11 +5148,11 @@ Skip_Character:
 	and.b #$e0	  ; Mask bits 7-5
 	beq Skip_Status1 ; If clear, skip
 
-	jsl.l CODE_009730 ; Calculate icon offset
+	jsl.l CodeReturnsHandlerIndexBasedGame ; Calculate icon offset
 	eor.b #$ff	  ; Invert
 	sec ; Set carry
 	adc.b #$36	  ; Add offset $36
-	jsr.w CODE_009111 ; Render status icon
+	jsr.w RenderBaseCharacterIcon ; Render status icon
 
 Skip_Status1:
 ; Process status flags group 2 (bits 7-6 of $36 and bits 4-0 of $35)
@@ -5164,13 +5164,13 @@ Skip_Status1:
 	and.b #$1f	  ; Mask bits 4-0
 	beq Skip_Status2 ; If clear, skip
 
-	jsl.l CODE_009730 ; Calculate icon offset
+	jsl.l CodeReturnsHandlerIndexBasedGame ; Calculate icon offset
 	clc ; Clear carry
 	adc.b #$08	  ; Add offset $08
 	bra Continue_Status2 ; Continue processing
 
 Alternative_Status2:
-	db $22,$30,$97,$00 ; jsl CODE_009730
+	db $22,$30,$97,$00 ; jsl CodeReturnsHandlerIndexBasedGame
 
 Continue_Status2:
 	eor.b #$ff	  ; Invert
@@ -5184,7 +5184,7 @@ Skip_Status2:
 	and.b #$3c	  ; Mask bits 5-2
 	beq Skip_Status3 ; If clear, skip
 
-	jsl.l CODE_009730 ; Calculate icon offset
+	jsl.l CodeReturnsHandlerIndexBasedGame ; Calculate icon offset
 	eor.b #$ff	  ; Invert
 	sec ; Set carry
 	adc.b #$3e	  ; Add offset $3e
@@ -5200,13 +5200,13 @@ Skip_Status3:
 	and.b #$03	  ; Mask bits 1-0
 	beq Skip_Status4 ; If clear, skip
 
-	jsl.l CODE_009730 ; Calculate icon offset
+	jsl.l CodeReturnsHandlerIndexBasedGame ; Calculate icon offset
 	clc ; Clear carry
 	adc.b #$08	  ; Add offset $08
 	bra Continue_Status4 ; Continue
 
 Alternative_Status4:
-	db $22,$30,$97,$00 ; jsl CODE_009730
+	db $22,$30,$97,$00 ; jsl CodeReturnsHandlerIndexBasedGame
 
 Continue_Status4:
 	eor.b #$ff	  ; Invert
@@ -5228,7 +5228,7 @@ Status_RenderIcon:
 ;
 ; TECHNICAL NOTES:
 ; - Uses Direct Page $0400 for temporary calculations
-; - Calls CODE_028AE0 to process icon type
+; - Calls BankRoutine to process icon type
 ; - Icons $00-$2e: Simple single icons
 ; - Icons $2f-$46: Complex multi-part status displays
 ; - Buffer layout supports 4 different icon "layers" per slot
@@ -5249,7 +5249,7 @@ Status_RenderIcon:
 	pld ; Direct Page = $0400
 
 	sta.b $3a	   ; Save icon ID to $043a
-	jsl.l CODE_028AE0 ; Process icon type
+	jsl.l BankRoutine ; Process icon type
 
 	lda.b $3a	   ; Get icon ID
 	cmp.b #$2f	  ; Check if >= $2f
@@ -5403,8 +5403,8 @@ Skip_Flag4:
 ; Output: $2a-$2d, $3a-$3f, $2e updated with calculated stats
 ; Technical Details:
 ;   - Sets up Direct Page to $1000 or $1080 based on character selection
-;   - Processes 7 stats via CODE_009253 (summation across 5 buffers)
-;   - Processes 2 stats via CODE_009245 (OR across 4 buffers)
+;   - Processes 7 stats via ProcessesStatsViaCodeSummationAcross (summation across 5 buffers)
+;   - Processes 2 stats via ProcessesStatsViaCodeAcrossBuffers (OR across 4 buffers)
 ;   - Updates base stats ($22-$25) with deltas ($26-$29)
 ; Buffers accessed:
 ;   - $3669-$3678: Base buffer (16 bytes)
@@ -5431,32 +5431,32 @@ Char_CalcStats:
 	ldx.b #$50	  ; X = $50 (character 2 buffer offset)
 
 Setup_Done:
-; Calculate cumulative stats using CODE_009253 (ADC across 5 buffers)
-	jsr.w CODE_009253 ; Sum buffer values at X
+; Calculate cumulative stats using ProcessesStatsViaCodeSummationAcross (ADC across 5 buffers)
+	jsr.w ProcessesStatsViaCodeSummationAcross ; Sum buffer values at X
 	sta.b $2a	   ; Store stat 1
-	jsr.w CODE_009253 ; Sum next buffer values (X++)
+	jsr.w ProcessesStatsViaCodeSummationAcross ; Sum next buffer values (X++)
 	sta.b $2b	   ; Store stat 2
-	jsr.w CODE_009253 ; Sum next buffer values (X++)
+	jsr.w ProcessesStatsViaCodeSummationAcross ; Sum next buffer values (X++)
 	sta.b $2c	   ; Store stat 3
-	jsr.w CODE_009253 ; Sum next buffer values (X++)
+	jsr.w ProcessesStatsViaCodeSummationAcross ; Sum next buffer values (X++)
 	sta.b $2d	   ; Store stat 4
-	jsr.w CODE_009253 ; Sum next buffer values (X++)
+	jsr.w ProcessesStatsViaCodeSummationAcross ; Sum next buffer values (X++)
 	sta.b $41	   ; Store stat 5
-	jsr.w CODE_009253 ; Sum next buffer values (X++)
+	jsr.w ProcessesStatsViaCodeSummationAcross ; Sum next buffer values (X++)
 	sta.b $3e	   ; Store stat 6
-	jsr.w CODE_009253 ; Sum next buffer values (X++)
+	jsr.w ProcessesStatsViaCodeSummationAcross ; Sum next buffer values (X++)
 	sta.b $3f	   ; Store stat 7
 
-; Calculate bitwise OR stats using CODE_009245 (ORA across 4 buffers)
-	jsr.w CODE_009245 ; OR buffer values at X
+; Calculate bitwise OR stats using ProcessesStatsViaCodeAcrossBuffers (ORA across 4 buffers)
+	jsr.w ProcessesStatsViaCodeAcrossBuffers ; OR buffer values at X
 	sta.b $3a	   ; Store flags 1
-	jsr.w CODE_009245 ; OR next buffer values (X++)
+	jsr.w ProcessesStatsViaCodeAcrossBuffers ; OR next buffer values (X++)
 	sta.b $3b	   ; Store flags 2
 
 ; Process status effect bits (lower nibble only)
 	lda.b #$0f	  ; Mask for lower nibble
 	trb.b $2e	   ; Clear lower nibble in $2e
-	jsr.w CODE_009245 ; OR next buffer values (X++)
+	jsr.w ProcessesStatsViaCodeAcrossBuffers ; OR next buffer values (X++)
 	and.b #$0f	  ; Keep only lower nibble
 	tsb.b $2e	   ; Set bits in $2e
 
@@ -5533,7 +5533,7 @@ Stat_CalcSum:
 ;   - Checks bit 5 ($20) of $00d9 as update gate
 ;   - Only processes animations when bit is clear
 ;   - Sets bit after processing to prevent multiple updates per frame
-; Side Effects: May modify $00d9, calls CODE_009273
+; Side Effects: May modify $00d9, calls SideEffectsMayModifyD9Calls
 ; ===========================================================================
 
 Animation_CheckUpdate:
@@ -5590,7 +5590,7 @@ Animation_UpdateSystem:
 	stx.w $0602	 ; Store parameter to $0602
 	lda.b #$01	  ; Animation command = $01
 	sta.w $0600	 ; Store to animation command register
-	jsl.l CODE_0D8004 ; Call animation processor
+	jsl.l Secondary_APU_Command_Entry_Point ; Call animation processor
 	lda.b #$ff	  ; Mark slot as empty
 	sta.b $00	   ; Store to slot 1 type
 	ldx.b $03	   ; X = saved parameters
@@ -5606,7 +5606,7 @@ Check_Slot2:
 	stx.w $0602	 ; Store parameter to $0602
 	lda.b #$02	  ; Animation command = $02
 	sta.w $0600	 ; Store to animation command register
-	jsl.l CODE_0D8004 ; Call animation processor
+	jsl.l Secondary_APU_Command_Entry_Point ; Call animation processor
 	lda.b #$ff	  ; Mark slot as empty
 	sta.b $05	   ; Store to slot 2 type
 	ldx.b $08	   ; X = saved parameters
@@ -5633,7 +5633,7 @@ Execute_Slot3:
 	stx.w $0600	 ; Store to animation command
 	ldx.b $0c	   ; X = animation parameter (16-bit)
 	stx.w $0602	 ; Store parameter to $0602
-	jsl.l CODE_0D8004 ; Call animation processor
+	jsl.l Secondary_APU_Command_Entry_Point ; Call animation processor
 	stz.b $0a	   ; Clear slot 3 type ($00 = empty)
 
 Animation_Done:
@@ -5647,28 +5647,28 @@ Animation_Done:
 ; ===========================================================================
 ; Purpose: Setup graphics environment and jump to field mode code
 ; Technical Details:
-;   - Calls CODE_0092FC to prepare graphics state
-;   - Jumps to CODE_00803A for field mode initialization
+;   - Calls CallsCodePrepareGraphicsState to prepare graphics state
+;   - Jumps to Label_00803A for field mode initialization
 ; Side Effects: Modifies $00d6, NMITIMEN register, $00d2, $00db
 ; ===========================================================================
 
 Graphics_SetupFieldMode:
-	jsr.w CODE_0092FC ; Setup graphics state
-	jmp.w CODE_00803A ; Jump to field mode init
+	jsr.w CallsCodePrepareGraphicsState ; Setup graphics state
+	jmp.w Label_00803A ; Jump to field mode init
 
 ; ===========================================================================
 ; Graphics Mode Setup - Jump to Battle Mode Initialization
 ; ===========================================================================
 ; Purpose: Setup graphics environment and jump to battle mode code
 ; Technical Details:
-;   - Calls CODE_0092FC to prepare graphics state
-;   - Jumps to CODE_008016 for battle mode initialization
+;   - Calls CallsCodePrepareGraphicsState to prepare graphics state
+;   - Jumps to Label_008016 for battle mode initialization
 ; Side Effects: Modifies $00d6, NMITIMEN register, $00d2, $00db
 ; ===========================================================================
 
 Graphics_SetupBattleMode:
 	jsr.w Graphics_PrepareTransition ; Setup graphics state
-	jmp.w CODE_008016 ; Jump to battle mode init
+	jmp.w Label_008016 ; Jump to battle mode init
 
 ; ===========================================================================
 ; Graphics State Setup Routine
@@ -5678,7 +5678,7 @@ Graphics_SetupBattleMode:
 ;   - Sets bit 6 ($40) of $00d6 (graphics busy flag)
 ;   - Restores NMI/IRQ configuration from $0112
 ;   - Enables interrupts
-;   - Calls sprite processing routine CODE_00C7B8
+;   - Calls sprite processing routine FinalSetupRoutine
 ;   - Clears bit 3 ($08) of $00d2 (graphics ready flag)
 ;   - Clears bit 2 ($04) of $00db (animation gate)
 ; Registers Modified:
@@ -5693,7 +5693,7 @@ Graphics_PrepareTransition:
 	lda.w $0112	 ; Load NMI/IRQ configuration
 	sta.w SNES_NMITIMEN ; Store to NMITIMEN ($4200)
 	cli ; Enable interrupts
-	jsl.l CODE_00C7B8 ; Call sprite processing routine
+	jsl.l FinalSetupRoutine ; Call sprite processing routine
 	lda.b #$08	  ; bit 3 mask
 	trb.w $00d2	 ; Clear graphics ready flag
 	lda.b #$04	  ; bit 2 mask
@@ -5955,7 +5955,7 @@ Count_Bits:
 ; Input: A = bit mask, $00+DP = target address
 ; Output: Target memory has bits set, Z flag reflects test
 ; Technical Details:
-;   - Calls CODE_0097DA to calculate bit position
+;   - Calls CallsCodeCalculateBitPosition to calculate bit position
 ;   - Uses tsb instruction at Direct Page $00
 ; ===========================================================================
 
@@ -5971,7 +5971,7 @@ Bit_SetBits:
 ; Input: A = bit mask, $00+DP = target address
 ; Output: Target memory has bits cleared, Z flag reflects test
 ; Technical Details:
-;   - Calls CODE_0097DA to calculate bit position
+;   - Calls CallsCodeCalculateBitPosition to calculate bit position
 ;   - Uses trb instruction at Direct Page $00
 ; ===========================================================================
 
@@ -5987,7 +5987,7 @@ Bit_ClearBits:
 ; Input: A = bit mask, $00+DP = target address
 ; Output: A = result of and operation, Z/N flags set
 ; Technical Details:
-;   - Calls CODE_0097DA to calculate bit position
+;   - Calls CallsCodeCalculateBitPosition to calculate bit position
 ;   - Uses and instruction to test bits
 ; ===========================================================================
 
@@ -6400,7 +6400,7 @@ Memory_Fill2Words:
 ; Purpose: Jump table for partial block fills (0-63 bytes)
 ; Format: Table of addresses for each possible remainder count
 ; Technical Details:
-;   - Entry points into CODE_0099BD at various offsets
+;   - Entry points into EntryPointsIntoCodeVariousOffsets at various offsets
 ;   - Allows exact fill counts without conditional logic
 ; ===========================================================================
 
@@ -6449,7 +6449,7 @@ Graphics_LoadData:
 	sep #$20		; 8-bit A
 	lda.b #$03	  ; Bank $03
 	sta.b $19	   ; Store bank
-	jsr.w CODE_009D75 ; Process graphics data
+	jsr.w ProcessGraphicsData ; Process graphics data
 	rep #$30		; 16-bit A/X/Y
 	pla ; Restore A
 	pld ; Restore direct page
@@ -6469,7 +6469,7 @@ Graphics_ProcessMenuData:
 	rep #$30		; 16-bit A/X/Y
 	phx ; Save X
 	ldx.w #$9aff	; Data pointer
-	jsr.w CODE_009BC4 ; Process data
+	jsr.w CodeLikelyLoadsProcessesThisData ; Process data
 	plx ; Restore X
 	pld ; Restore direct page
 	plp ; Restore processor status
@@ -6485,8 +6485,8 @@ Graphics_InitDisplay:
 	phx ; Save X
 	pea.w $0000	 ; Push $0000
 	pld ; Direct Page = $0000
-	jsl.l CODE_0C8000 ; Call graphics handler
-	jsl.l CODE_0096A0 ; Wait for VBlank
+	jsl.l AddressC8000OriginalCode ; Call graphics handler
+	jsl.l WaitVblank ; Wait for VBlank
 	pei.b ($1d)	 ; Push [$1d]
 	lda.b $27	   ; Load parameter
 	pha ; Save it
@@ -6547,7 +6547,7 @@ Graphics_Setup3:
 
 Skip_Special:
 	jsr.w Graphics_SetupPointer ; Setup graphics again
-	jsr.w CODE_009D75 ; Process graphics data
+	jsr.w ProcessGraphicsData ; Process graphics data
 	jsr.w Graphics_PostProcess ; Post-process
 	ldx.w #$9ba0	; Cleanup pointer
 	jsr.w Graphics_ProcessData ; Process cleanup
@@ -6585,7 +6585,7 @@ Graphics_Setup4:
 	tax ; X = index
 	lda.l DATA8_03bb81,x ; Load pointer from table
 	sta.b $17	   ; Store graphics pointer
-	jsr.w CODE_009D75 ; Process graphics data
+	jsr.w ProcessGraphicsData ; Process graphics data
 	pld ; Restore direct page
 	plp ; Restore processor status
 	rtl ; Return long
@@ -6595,7 +6595,7 @@ Graphics_Setup4:
 ; ===========================================================================
 
 ; ---------------------------------------------------------------------------
-; CODE_009BC4: Process Graphics Data
+; CodeLikelyLoadsProcessesThisData: Process Graphics Data
 ; ---------------------------------------------------------------------------
 ; Purpose: Core graphics data processor - copies parameters and processes
 ; Input: X = data pointer in Bank $00
@@ -6699,7 +6699,7 @@ PLP_Label:
 	sta.b $17
 	sep #$20
 	lda.b $19
-	jsr.w CODE_009D75
+	jsr.w ProcessGraphicsData
 	sta.b $19
 	rep #$30
 
@@ -6709,7 +6709,7 @@ Graphics_ConditionalDispatch_Continue:
 
 ; ---------------------------------------------------------------------------
 ; More graphics command handlers (block)
-; Imported segment: CODE_00A342 .. CODE_00A576
+; Imported segment: ImportedSegmentCodeCode .. ImportedSegmentCodeCode2
 ; ---------------------------------------------------------------------------
 
 Graphics_InitDisplay_1:
@@ -6759,7 +6759,7 @@ TAX_Label:
 Graphics_CallSystem:
 	lda.w #$0080
 	tsb.w $00d8
-	jsl.l CODE_0C8000
+	jsl.l AddressC8000OriginalCode
 	lda.w #$0008
 	trb.w $00d4
 
@@ -6772,10 +6772,10 @@ Graphics_CheckDisplayReady:
 
 Graphics_FadeOut:
 	lda.w #$00ff
-	jmp.w CODE_009DC9
+	jmp.w CodeDirectTileWrite
 
 Graphics_WaitForEvent:
-	jsl.l CODE_0C8000
+	jsl.l AddressC8000OriginalCode
 	lda.w #$0020
 	and.w $00d0
 	bne Graphics_WaitForEvent_Alt
@@ -6784,7 +6784,7 @@ Graphics_WaitForEvent:
 	inc.b $17
 
 Graphics_WaitForEvent_Loop:
-	jsl.l CODE_0096A0
+	jsl.l WaitVblank
 	bit.b $94
 	beq Graphics_WaitForEvent_Loop
 
@@ -6795,15 +6795,15 @@ Graphics_WaitForEvent_Alt:
 	inc.b $17
 
 Graphics_WaitForEvent_AltLoop:
-	jsl.l CODE_0096A0
+	jsl.l WaitVblank
 	bit.b $07
 	beq Graphics_WaitForEvent_AltLoop
 
 
-; A series of conditional calls to CODE_00B1C3/CODE_00B1D6 etc.:
+; A series of conditional calls to SeriesOfConditionalCallsCodeCode/SimilarPatternsDifferentTestTypesCode etc.:
 
 Condition_CheckPartyMember:
-	jsr.w CODE_00B1C3
+	jsr.w SeriesOfConditionalCallsCodeCode
 	bcc Condition_Skip
 	beq Condition_Skip
 	bra Condition_Jump
@@ -6821,7 +6821,7 @@ Condition_Jump:
 
 
 Condition_CheckEventFlag:
-	jsr.w CODE_00B1D6
+	jsr.w SimilarPatternsDifferentTestTypesCode
 	bcc Condition_SkipJumpAddr
 	beq Condition_SkipJumpAddr
 	bra Condition_SetPointer
@@ -6836,18 +6836,18 @@ Condition_SetPointer:
 	sta.b $17
 
 
-; (blocks calling CODE_00B1E8, CODE_00B204, CODE_00B21D, CODE_00B22F etc.)
+; (blocks calling BlocksCallingCodeCodeCodeCode, CodeCodeCodeTestRoutines, PatternSetCodeVariants, BlocksCallingCodeCodeCodeCode2 etc.)
 
 ; Examples:
 Condition_CheckBattleFlag:
-	jsr.w CODE_00B1E8
+	jsr.w BlocksCallingCodeCodeCodeCode
 	bcs Condition_Skip
 	bra Condition_Jump
 
-; CODE_00A46D and CODE_00A472 removed - reuse Condition_Skip/Jump labels
+; CodeCodeRemovedReuseConditionSkip and CodeCodeRemovedReuseConditionSkip2 removed - reuse Condition_Skip/Jump labels
 
 Condition_CheckItem:
-	jsr.w CODE_00B204
+	jsr.w CodeCodeCodeTestRoutines
 	bcc Condition_SkipJumpAddr2
 	bra Condition_SetPointer2
 
@@ -6862,14 +6862,14 @@ Condition_SetPointer2:
 
 
 Condition_CheckCompanion:
-	jsr.w CODE_00B21D
+	jsr.w PatternSetCodeVariants
 	bcs Condition_Skip
 	bra Condition_Jump
 
-; CODE_00A4D9 and CODE_00A4DE removed - reuse Condition_Skip/Jump labels
+; CodeCodeRemovedReuseConditionSkip3 and CodeCodeRemovedReuseConditionSkip4 removed - reuse Condition_Skip/Jump labels
 
 Condition_CheckWeapon:
-	jsr.w CODE_00B22F
+	jsr.w BlocksCallingCodeCodeCodeCode2
 	bcc Condition_SkipJumpAddr3
 	bra Condition_SetPointer3
 
@@ -6919,11 +6919,11 @@ Condition_TestBitD0_Alt:
 PHD_Label_2:
 	pea.w $00d0
 PLD_Label_2:
-	jsl.l CODE_00975A
+	jsl.l TestFlagExternal
 PLD_Label_3:
 	inc a
 	dec a
-	jmp CODE_00A57D
+	jmp Sub_00A57D
 
 Condition_TestBitEA8:
 	lda.b [$17]
@@ -6933,7 +6933,7 @@ Condition_TestBitEA8:
 
 Condition_BranchOnZero:
 	bne Graphics_SetPointer
-	jmp CODE_00A597
+	jmp CodeThroughCodeNowImplemented2
 
 ; ---------------------------------------------------------------------------
 ; End of appended disassembly chunk
@@ -6942,7 +6942,7 @@ Condition_BranchOnZero:
 ; ===========================================================================
 ; Progress: ~7,244 lines documented (~51.6% of Bank $00)
 ; Sections completed (delta):
-; - Additional graphics command handlers (CODE_00A2E7..CODE_00A576)
+; - Additional graphics command handlers (AdditionalGraphicsCommandHandlersCodeCode..ImportedSegmentCodeCode2)
 ; - Stream parsing helpers and external command bridges
 ;
 ; Remaining: ~6,774 lines (battle system, command handlers, data tables)
@@ -6961,7 +6961,7 @@ Graphics_ProcessData:
 	pla ; Restore A
 	ply ; Restore Y
 	plp ; Restore processor status
-	jmp.w CODE_009D75 ; Jump to main graphics processor
+	jmp.w ProcessGraphicsData ; Jump to main graphics processor
 
 ; ---------------------------------------------------------------------------
 ; Clear Graphics Flag bit 2
@@ -7152,7 +7152,7 @@ Graphics_PushParams:
 
 	tya ; A = new stack pointer
 	cmp.w #$35d9	; Check if stack overflow
-	bcc CODE_009D18 ; Branch if OK
+	bcc BranchIfOk ; Branch if OK
 	jmp.w Graphics_StackOverflow ; Handle overflow (infinite loop)
 
 Graphics_UpdateStackPtr:
@@ -7160,7 +7160,7 @@ Graphics_UpdateStackPtr:
 	jmp.w Bit_SetBits_00E2 ; Clean stack and return
 
 Graphics_StackOverflow:
-	bra CODE_009D1F ; Infinite loop (stack overflow)
+	bra InfiniteLoopStackOverflow ; Infinite loop (stack overflow)
 
 ; ---------------------------------------------------------------------------
 ; Pop Graphics Parameters from Stack
@@ -7200,18 +7200,18 @@ Graphics_MemoryFillHelper:
 	stx.b $1a	   ; Store X to $1a
 	txy ; Y = X
 	tax ; X = A
-	jsr.w CODE_00B49E ; Call helper
+	jsr.w CallHelper ; Call helper
 	clc ; Clear carry
 	tya ; A = Y
 	adc.b $01,s	 ; Add saved Y
 	sta.b $1a	   ; Store to $1a
-	jsr.w CODE_00B4A7 ; Call helper
+	jsr.w CleanupDrawingContext ; Call helper
 	lda.b $1c	   ; Load $1c
 	and.w #$00ff	; Mask to byte
 	pha ; Push to stack
 	plb ; Pull to data bank
 	lda.b $02,s	 ; Load parameter
-	jsr.w CODE_009998 ; Call fill dispatcher
+	jsr.w CallFillDispatcher ; Call fill dispatcher
 	plb ; Restore data bank
 	pla ; Clean stack
 	rts ; Return
@@ -7267,7 +7267,7 @@ Graphics_ProcessStream_SyncLoop:
 	bra Graphics_ProcessStream_Cleanup ; Done
 
 Graphics_ProcessStream_AltSync:
-	jsr.w CODE_00E055 ; Alternate sync handler
+	jsr.w AlternateSyncHandler ; Alternate sync handler
 	bra Graphics_ProcessStream_Cleanup ; Done
 
 Graphics_ContinueSync:
@@ -7281,7 +7281,7 @@ Graphics_ProcessStream_Normal:
 
 	bit.w #$0080	; Test bit 7
 	bne Graphics_ProcessStream_Exit ; Exit if set
-	jsr.w CODE_00E055 ; Process special event
+	jsr.w AlternateSyncHandler ; Process special event
 	bra Graphics_ProcessStream_Normal ; Continue loop
 
 Graphics_ProcessStream_Exit:
@@ -7300,10 +7300,10 @@ Graphics_ReadDispatchCmd:
 	inc.b $17	   ; Advance pointer
 	and.w #$00ff	; Mask to byte
 	cmp.w #$0080	; Is it direct tile data?
-	bcc CODE_009DD2 ; No, dispatch to handler
+	bcc NoDispatchHandler ; No, dispatch to handler
 
 ; ---------------------------------------------------------------------------
-; CODE_009DC9 - Direct Tile Write
+; CodeDirectTileWrite - Direct Tile Write
 ; ---------------------------------------------------------------------------
 Graphics_WriteTileDirect:
 ; Direct tile write (values $80-$ff)
@@ -7358,7 +7358,7 @@ Graphics_IndexedDataFound:
 	lda.l DATA8_03ba35,x ; Load entry size
 	tyx ; X = data pointer
 	rep #$30		; 16-bit A/X/Y
-	jmp.w CODE_00A7F9 ; Process data block
+	jmp.w ProcessDataBlock ; Process data block
 
 ; ---------------------------------------------------------------------------
 ; Graphics Command Jump Table
@@ -7369,88 +7369,88 @@ Graphics_IndexedDataFound:
 DATA8_009e0e:
 ; Jump table entries
 DATA8_009e0e_handlers:
-	dw CODE_00A378 ; $00: Command handler
-	dw CODE_00A8C0 ; $01
-	dw CODE_00A8BD ; $02
-	dw CODE_00A39C ; $03
-	dw CODE_00B354 ; $04
-	dw CODE_00A37F ; $05
-	dw CODE_00B4B0 ; $06
-	dw CODE_00A708 ; $07
-	dw CODE_00A755 ; $08
-	dw CODE_00A83F ; $09
-	dw CODE_00A519 ; $0a
-	dw CODE_00A3F5 ; $0b
-	dw CODE_00A958 ; $0c
-	dw CODE_00A96C ; $0d
-	dw CODE_00A97D ; $0e
-	dw CODE_00AFD6 ; $0f
-	dw CODE_00AF9A ; $10
-	dw CODE_00AF6B ; $11
-	dw CODE_00AF70 ; $12
-	dw CODE_00B094 ; $13
-	dw CODE_00AFFE ; $14
-	dw CODE_00A0B7 ; $15
-	dw CODE_00B2F9 ; $16
-	dw CODE_00AEDA ; $17
-	dw CODE_00AACF ; $18
-	dw CODE_00A8D1 ; $19
-	dw CODE_00A168 ; $1a
-	dw CODE_00A17E ; $1b
-	dw CODE_00A15C ; $1c
-	dw CODE_00A13C ; $1d
-	dw CODE_00A0FE ; $1e
-	dw CODE_00A0C0 ; $1f
-	dw CODE_00A0DF ; $20
-	dw CODE_00B2F4 ; $21
-	dw CODE_00A150 ; $22
-	dw CODE_00AEA2 ; $23
-	dw CODE_00A11D ; $24
-	dw CODE_00A07D ; $25
-	dw CODE_00A089 ; $26
-	dw CODE_00A09D ; $27
-	dw CODE_00A0A9 ; $28
-	dw CODE_00AEB5 ; $29
-	dw CODE_00B379 ; $2a
-	dw CODE_00AEC7 ; $2b
-	dw CODE_00B355 ; $2c
-	dw CODE_00A074 ; $2d
-	dw CODE_00A563 ; $2e
-	dw CODE_00A06E ; $2f
+	dw CommandHandler ; $00: Command handler
+	dw CodePointerManipulationCoordinateCalculations ; $01
+	dw CodeCodePointerManipulationHelpers ; $02
+	dw Sub_00A39C ; $03
+	dw Sub_00B354 ; $04
+	dw Sub_00A37F ; $05
+	dw CodeCheckFlagExecuteRoutine ; $06
+	dw CodeThroughCodeNowImplemented3 ; $07
+	dw FlagTestingConditionalJumpsCodeCode ; $08
+	dw CodeExecuteExternalSubroutineViaLong ; $09
+	dw Sub_00A519 ; $0a
+	dw B2 ; $0b
+	dw CodeWriteBitValueAddress ; $0c
+	dw D4 ; $0d
+	dw CodeWriteBitValueBitValue ; $0e
+	dw F3 ; $0f
+	dw Sub_00AF9A ; $10
+	dw Sub_00AF6B ; $11
+	dw Sub_00AF70 ; $12
+	dw Sub_00B094 ; $13
+	dw CodeBitwiseTsbOperationsVariants ; $14
+	dw Sub_00A0B7 ; $15
+	dw Sub_00B2F9 ; $16
+	dw Sub_00AEDA ; $17
+	dw NextMoreDmaGraphicsRoutinesCode ; $18
+	dw CodeCalculatePointerCoordinatesPosition ; $19
+	dw Sub_00A168 ; $1a
+	dw B ; $1b
+	dw C ; $1c
+	dw D2 ; $1d
+	dw E ; $1e
+	dw F2 ; $1f
+	dw Sub_00A0DF ; $20
+	dw Sub_00B2F4 ; $21
+	dw Sub_00A150 ; $22
+	dw Sub_00AEA2 ; $23
+	dw Sub_00A11D ; $24
+	dw Sub_00A07D ; $25
+	dw Sub_00A089 ; $26
+	dw Sub_00A09D ; $27
+	dw Sub_00A0A9 ; $28
+	dw Sub_00AEB5 ; $29
+	dw Sub_00B379 ; $2a
+	dw B3 ; $2b
+	dw C3 ; $2c
+	dw D ; $2d
+	dw E2 ; $2e
+	dw F ; $2f
 
 ; ---------------------------------------------------------------------------
 ; Secondary Jump Table (for specific graphics operations)
 ; ---------------------------------------------------------------------------
 
 DATA8_009e6e:
-	dw CODE_00A342 ; $00
-	dw CODE_00A3AB ; $01
-	dw CODE_00A51E ; $02
-	dw CODE_00A52E ; $03
-	dw CODE_00A3D5 ; $04
-	dw CODE_00A3DE ; $05
-	dw CODE_00A3E5 ; $06
-	dw CODE_00A3EC ; $07
+	dw ImportedSegmentCodeCode ; $00
+	dw Sub_00A3AB ; $01
+	dw Sub_00A51E ; $02
+	dw Sub_00A52E ; $03
+	dw Sub_00A3D5 ; $04
+	dw Sub_00A3DE ; $05
+	dw Sub_00A3E5 ; $06
+	dw Sub_00A3EC ; $07
 	dw $0000	   ; $08: Unused
-	dw CODE_00A3FC ; $09
+	dw Sub_00A3FC ; $09
 	dw $0000	   ; $0a: Unused
-	dw CODE_00A572 ; $0b
-	dw CODE_00A581 ; $0c
-	dw CODE_00A586 ; $0d
-	dw CODE_00A744 ; $0e
+	dw CodeThroughCodeNowImplemented ; $0b
+	dw C2 ; $0c
+	dw D3 ; $0d
+	dw TakeJumpFar ; $0e
 	dw $0000, $0000 ; $0f-$10: Unused
-	dw CODE_00A718 ; $11
-	dw CODE_00A78E ; $12
-	dw CODE_00A79D ; $13
-	dw CODE_00A7AC ; $14
-	dw CODE_00A7B3 ; $15
+	dw Sub_00A718 ; $11
+	dw ReferencedJumpTableNotImplementedAs ; $12
+	dw Sub_00A79D ; $13
+	dw Sub_00A7AC ; $14
+	dw Sub_00A7B3 ; $15
 	dw $0000	   ; $16: Unused
-	dw CODE_00A86E ; $17
-	dw CODE_00A7EB ; $18
-	dw CODE_00A7DE ; $19
+	dw CodeThroughCodeNowImplementedPartial ; $17
+	dw Sub_00A7EB ; $18
+	dw CallsCodeTextDrawingRoutine ; $19
 	dw $0000, $0000, $0000 ; $1a-$1c: Unused
-	dw CODE_00A874 ; $1d
-	dw CODE_00A89B ; $1e
+	dw CodeCopyDataRamE3367Using ; $1d
+	dw CodeCopyDataRamE3367Back ; $1e
 	dw $0000	   ; $1f: Unused
 
 ; ===========================================================================
@@ -7555,7 +7555,7 @@ Cmd_StringLookup82BB:
 	stz.b $a0	   ; Clear high byte
 	lda.w #$0003	; Length = 3 bytes
 	ldx.w #$82bb	; Table pointer
-	jsr.w CODE_00A71C ; Process string
+	jsr.w ProcessString ; Process string
 	plx ; Restore $a0
 	stx.b $a0	   ; Store back
 	plx ; Restore $9e
@@ -7576,7 +7576,7 @@ Cmd_StringLookupA802:
 	stz.b $a0	   ; Clear high byte
 	lda.w #$0003	; Length = 3 bytes
 	ldx.w #$a802	; Table pointer
-	jsr.w CODE_00A71C ; Process string
+	jsr.w ProcessString ; Process string
 	plx ; Restore $a0
 	stx.b $a0	   ; Store back
 	plx ; Restore $9e
@@ -7597,7 +7597,7 @@ Cmd_StringLookup8383:
 	stz.b $a0	   ; Clear high byte
 	lda.w #$0003	; Length = 3 bytes
 	ldx.w #$8383	; Table pointer
-	jsr.w CODE_00A71C ; Process string
+	jsr.w ProcessString ; Process string
 	plx ; Restore $a0
 	stx.b $a0	   ; Store back
 	plx ; Restore $9e
@@ -7641,7 +7641,7 @@ Cmd_LookupA7F6:
 	stz.b $a0	   ; Clear high byte
 	lda.w #$0003	; Length = 3 bytes
 	ldx.w #$a7f6	; Table pointer
-	jmp.w CODE_00A71C ; Process and return
+	jmp.w ProcessString ; Process and return
 
 ; ---------------------------------------------------------------------------
 ; Command $22: Set Graphics Pointer to $aea7 Bank $03
@@ -7680,7 +7680,7 @@ Cmd_CharacterGraphics:
 	rep #$30		; 16-bit A/X/Y
 	lda.w #$0003	; Bank $03
 	ldx.w #$a831	; Table pointer
-	jmp.w CODE_00A71C ; Process character graphics
+	jmp.w ProcessString ; Process character graphics
 
 ; ---------------------------------------------------------------------------
 ; Command $1b: Indexed Monster Graphics
@@ -7695,7 +7695,7 @@ Cmd_MonsterGraphics:
 	rep #$30		; 16-bit A/X/Y
 	lda.w #$0003	; Bank $03
 	ldx.w #$a895	; Table pointer
-	jmp.w CODE_00A71C ; Process monster graphics
+	jmp.w ProcessString ; Process monster graphics
 
 ; ---------------------------------------------------------------------------
 ; Clear Address High Byte Handlers
@@ -7766,18 +7766,18 @@ Cmd_MemoryFill:
 	lda.b [$17]	 ; Read count
 	inc.b $17	   ; Advance stream
 	and.w #$00ff	; Mask to byte
-	jmp.w CODE_009998 ; Call fill dispatcher
+	jmp.w CallFillDispatcher ; Call fill dispatcher
 
 ; ---------------------------------------------------------------------------
 ; Graphics System Calls
 ; ---------------------------------------------------------------------------
 
 Cmd_CallGraphicsSys:
-	jsl.l CODE_0C8000 ; Call graphics system
+	jsl.l AddressC8000OriginalCode ; Call graphics system
 	rts ; Return
 
 Cmd_WaitVBlank:
-	jsl.l CODE_0096A0 ; Wait for VBlank
+	jsl.l WaitVblank ; Wait for VBlank
 	rts ; Return
 
 ; ---------------------------------------------------------------------------
@@ -7785,7 +7785,7 @@ Cmd_WaitVBlank:
 ; ---------------------------------------------------------------------------
 
 Cmd_CopyDisplayState:
-	jsr.w CODE_00A220 ; Prepare state
+	jsr.w PrepareState ; Prepare state
 	sep #$20		; 8-bit A
 	ldx.w $101b	 ; Load source X
 	stx.w $1018	 ; Copy to destination X
@@ -7842,7 +7842,7 @@ Cmd_CharacterDMATransfer:
 ; Calculate offset: slot * $50
 	sta.w SNES_WRMPYA ; Multiplicand = slot
 	lda.b #$50	  ; Multiplier = $50 (80 bytes)
-	jsl.l CODE_00971E ; Perform multiply
+	jsl.l PerformMultiply ; Perform multiply
 	rep #$30		; 16-bit A/X/Y
 
 ; Setup DMA transfer
@@ -7854,11 +7854,11 @@ Cmd_CharacterDMATransfer:
 	lda.w #$0050	; Transfer $50 bytes
 	pea.w $000c	 ; Push bank $0c
 	plb ; Pull to data bank
-	jsr.w CODE_00985D ; Perform memory copy
+	jsr.w PerformMemoryCopy ; Perform memory copy
 	plb ; Restore bank
 
 	plp ; Restore flags
-	bne CODE_00A273 ; Skip if flag was set
+	bne SkipIfFlagWasSet ; Skip if flag was set
 	lda.w #$0080	; bit 7 mask
 	trb.w $10a0	 ; Clear character flag
 
@@ -7872,7 +7872,7 @@ Cmd_CharDMATransfer_Done:
 Cmd_MultiCommandSeq:
 	lda.w #$0003	; Bank $03
 	ldx.w #$8457	; Pointer to data
-	jsr.w CODE_00A71C ; Process data
+	jsr.w ProcessString ; Process data
 	rep #$30		; 16-bit A/X/Y
 
 	lda.b [$17]	 ; Read parameters
@@ -7885,7 +7885,7 @@ Cmd_MultiCommandSeq:
 
 	ldx.b $17	   ; X = current pointer
 	lda.b $19	   ; A = current bank
-	jsl.l CODE_00D080 ; Call handler
+	jsl.l CallHandler ; Call handler
 	sta.b $19	   ; Update bank
 	stx.b $17	   ; Update pointer
 	rts ; Return
@@ -7900,7 +7900,7 @@ Cmd_WaitVBlankCount:
 	and.w #$00ff	; Mask to byte
 
 Cmd_WaitVBlankLoop:
-	jsl.l CODE_0096A0 ; Wait for VBlank
+	jsl.l WaitVblank ; Wait for VBlank
 	dec a; Decrement counter
 	bne Cmd_WaitVBlankLoop ; Loop until 0
 	rts ; Return
@@ -7984,22 +7984,22 @@ Cmd_TestItemJump_Check:
 	+	jmp Cmd_SkipJumpAddress                ; If set, skip jump (far)
 
 Cmd_TestVariable1:
-	jsr.w CODE_00B1A1 ; Test variable
+	jsr.w TestVariable ; Test variable
 	bne +		   ; If not zero, skip
 	jmp Condition_BranchOnZero ; Branch based on result (far)
 	+	rts
 
 Cmd_TestVariable2:
-	jsr.w CODE_00B1A1 ; Test variable (alternate)
+	jsr.w TestVariable ; Test variable (alternate)
 	beq Cmd_TestItemJump_Check ; Branch to alternate handler
 
 
-	jsr.w CODE_00B1B4 ; Test condition
+	jsr.w TestCondition ; Test condition
 	beq +		   ; If zero, skip
 	jmp Graphics_SetPointer ; If not zero, take jump (far)
 	+	jmp Cmd_SkipJumpAddress                ; If zero, skip jump (far)
 
-	jsr.w CODE_00B1B4 ; Test condition (alternate)
+	jsr.w TestCondition ; Test condition (alternate)
 	bne +		   ; If not zero, skip
 	jmp Graphics_SetPointer ; If zero, take jump (far)
 	+	rts
@@ -8011,55 +8011,55 @@ Cmd_SkipJumpAddress:
 
 ;===============================================================================
 ; More Conditional Branch Handlers
-; (Similar patterns for different test types: CODE_00B1C3, CODE_00B1D6, etc.)
+; (Similar patterns for different test types: SeriesOfConditionalCallsCodeCode, SimilarPatternsDifferentTestTypesCode, etc.)
 ;===============================================================================
 
-	jsr.w CODE_00B1C3 ; Test condition type 1
+	jsr.w SeriesOfConditionalCallsCodeCode ; Test condition type 1
 	bcs +		   ; If greater/equal, skip
 	bne +
-	jmp CODE_00A744 ; Take jump (far)
+	jmp TakeJumpFar ; Take jump (far)
 	+	inc.b $17                      ; Skip address
 	inc.b $17
 
 
-	jsr.w CODE_00B1C3
+	jsr.w SeriesOfConditionalCallsCodeCode
 	bcs +
-	jmp CODE_00A744
+	jmp TakeJumpFar
 	+	inc.b $17
 	inc.b $17
 
 
-	jsr.w CODE_00B1C3
+	jsr.w SeriesOfConditionalCallsCodeCode
 	bcc +
-	jmp CODE_00A744
+	jmp TakeJumpFar
 	+	inc.b $17
 	inc.b $17
 
 
-	jsr.w CODE_00B1C3
+	jsr.w SeriesOfConditionalCallsCodeCode
 	bcc +
 	bne +
-	jmp CODE_00A744
+	jmp TakeJumpFar
 	+	inc.b $17
 	inc.b $17
 
 
-	jsr.w CODE_00B1C3
+	jsr.w SeriesOfConditionalCallsCodeCode
 	beq +
-	jmp CODE_00A744
+	jmp TakeJumpFar
 	+	inc.b $17
 	inc.b $17
 
 
-	jsr.w CODE_00B1C3
+	jsr.w SeriesOfConditionalCallsCodeCode
 	beq +
-	jmp CODE_00A744
+	jmp TakeJumpFar
 	+	inc.b $17
 	inc.b $17
 
 
 ;===============================================================================
-; CODE_00A5C8 - Skip Jump Address Helper
+; CodeSkipJumpAddressHelper - Skip Jump Address Helper
 ;===============================================================================
 
 Cmd_SkipTwoBytes:
@@ -8077,55 +8077,55 @@ Cmd_LoadExecWithSwitch:
 	inc.b $17
 	tax ; Store address to X
 	lda.b $19	   ; Load current bank
-	jmp.w CODE_00A71C ; Jump to bank switcher
+	jmp.w ProcessString ; Jump to bank switcher
 
 ;===============================================================================
 ; Duplicate Conditional Handler Patterns (for different test functions)
-; These follow the same pattern as earlier but for CODE_00B1D6, CODE_00B1E8,
-; CODE_00B204, CODE_00B21D, and CODE_00B22F test routines
+; These follow the same pattern as earlier but for SimilarPatternsDifferentTestTypesCode, BlocksCallingCodeCodeCodeCode,
+; CodeCodeCodeTestRoutines, PatternSetCodeVariants, and BlocksCallingCodeCodeCodeCode2 test routines
 ;===============================================================================
 
-; Pattern set for CODE_00B1D6 (6 variants)
-	jsr.w CODE_00B1D6 ; Test type 2
+; Pattern set for SimilarPatternsDifferentTestTypesCode (6 variants)
+	jsr.w SimilarPatternsDifferentTestTypesCode ; Test type 2
 	bcs +
 	bne +
-	jmp CODE_00A744
+	jmp TakeJumpFar
 	+	inc.b $17
 	inc.b $17
 
 
-	jsr.w CODE_00B1D6
+	jsr.w SimilarPatternsDifferentTestTypesCode
 	bcs +
-	jmp CODE_00A744
+	jmp TakeJumpFar
 	+	inc.b $17
 	inc.b $17
 
 
-	jsr.w CODE_00B1D6
+	jsr.w SimilarPatternsDifferentTestTypesCode
 	bcc +
-	jmp CODE_00A744
+	jmp TakeJumpFar
 	+	inc.b $17
 	inc.b $17
 
 
-	jsr.w CODE_00B1D6
+	jsr.w SimilarPatternsDifferentTestTypesCode
 	bcc +
 	bne +
-	jmp CODE_00A744
+	jmp TakeJumpFar
 	+	inc.b $17
 	inc.b $17
 
 
-	jsr.w CODE_00B1D6
+	jsr.w SimilarPatternsDifferentTestTypesCode
 	beq +
-	jmp CODE_00A744
+	jmp TakeJumpFar
 	+	inc.b $17
 	inc.b $17
 
 
-	jsr.w CODE_00B1D6
+	jsr.w SimilarPatternsDifferentTestTypesCode
 	beq +
-	jmp CODE_00A744
+	jmp TakeJumpFar
 	+	inc.b $17
 	inc.b $17
 
@@ -8146,38 +8146,38 @@ Cmd_LoadExecWithSwitch:
 	inc.b $17
 
 
-	jsr.w CODE_00B1E8
+	jsr.w BlocksCallingCodeCodeCodeCode
 	bcs +
-	jmp CODE_00A744
+	jmp TakeJumpFar
 	+	inc.b $17
 	inc.b $17
 
 
-	jsr.w CODE_00B1E8
+	jsr.w BlocksCallingCodeCodeCodeCode
 	bcc +
-	jmp CODE_00A744
+	jmp TakeJumpFar
 	+	inc.b $17
 	inc.b $17
 
 
-	jsr.w CODE_00B1E8
+	jsr.w BlocksCallingCodeCodeCodeCode
 	bcc +
 	bne +
-	jmp CODE_00A744
+	jmp TakeJumpFar
 	+	inc.b $17
 	inc.b $17
 
 
-	jsr.w CODE_00B1E8
+	jsr.w BlocksCallingCodeCodeCodeCode
 	beq +
-	jmp CODE_00A744
+	jmp TakeJumpFar
 	+	inc.b $17
 	inc.b $17
 
 
-	jsr.w CODE_00B1E8
+	jsr.w BlocksCallingCodeCodeCodeCode
 	beq +
-	jmp CODE_00A744
+	jmp TakeJumpFar
 	+	inc.b $17
 	inc.b $17
 
@@ -8187,49 +8187,49 @@ Cmd_LoadExecWithSwitch:
 	inc.b $17
 TAX_Label_2:
 	lda.b $19
-	jmp.w CODE_00A71C
+	jmp.w ProcessString
 
-; Pattern set for CODE_00B204 (6 variants)
-	jsr.w CODE_00B204
+; Pattern set for CodeCodeCodeTestRoutines (6 variants)
+	jsr.w CodeCodeCodeTestRoutines
 	bcs +
 	bne +
-	jmp CODE_00A744
+	jmp TakeJumpFar
 	+	inc.b $17
 	inc.b $17
 
 
-	jsr.w CODE_00B204
+	jsr.w CodeCodeCodeTestRoutines
 	bcs +
-	jmp CODE_00A744
+	jmp TakeJumpFar
 	+	inc.b $17
 	inc.b $17
 
 
-	jsr.w CODE_00B204
+	jsr.w CodeCodeCodeTestRoutines
 	bcc +
-	jmp CODE_00A744
+	jmp TakeJumpFar
 	+	inc.b $17
 	inc.b $17
 
 
-	jsr.w CODE_00B204
+	jsr.w CodeCodeCodeTestRoutines
 	bcc +
 	bne +
-	jmp CODE_00A744
+	jmp TakeJumpFar
 	+	inc.b $17
 	inc.b $17
 
 
-	jsr.w CODE_00B204
+	jsr.w CodeCodeCodeTestRoutines
 	beq +
-	jmp CODE_00A744
+	jmp TakeJumpFar
 	+	inc.b $17
 	inc.b $17
 
 
-	jsr.w CODE_00B204
+	jsr.w CodeCodeCodeTestRoutines
 	beq +
-	jmp CODE_00A744
+	jmp TakeJumpFar
 	+	inc.b $17
 	inc.b $17
 
@@ -8239,49 +8239,49 @@ TAX_Label_2:
 	inc.b $17
 TAX_Label_3:
 	lda.b $19
-	jmp.w CODE_00A71C
+	jmp.w ProcessString
 
-; Pattern set for CODE_00B21D (6 variants)
-	jsr.w CODE_00B21D
+; Pattern set for PatternSetCodeVariants (6 variants)
+	jsr.w PatternSetCodeVariants
 	bcs +
 	bne +
-	jmp CODE_00A744
+	jmp TakeJumpFar
 	+	inc.b $17
 	inc.b $17
 
 
-	jsr.w CODE_00B21D
+	jsr.w PatternSetCodeVariants
 	bcs +
-	jmp CODE_00A744
+	jmp TakeJumpFar
 	+	inc.b $17
 	inc.b $17
 
 
-	jsr.w CODE_00B21D
+	jsr.w PatternSetCodeVariants
 	bcc +
-	jmp CODE_00A744
+	jmp TakeJumpFar
 	+	inc.b $17
 	inc.b $17
 
 
-	jsr.w CODE_00B21D
+	jsr.w PatternSetCodeVariants
 	bcc +
 	bne +
-	jmp CODE_00A744
+	jmp TakeJumpFar
 	+	inc.b $17
 	inc.b $17
 
 
-	jsr.w CODE_00B21D
+	jsr.w PatternSetCodeVariants
 	beq +
-	jmp CODE_00A744
+	jmp TakeJumpFar
 	+	inc.b $17
 	inc.b $17
 
 
-	jsr.w CODE_00B21D
+	jsr.w PatternSetCodeVariants
 	beq +
-	jmp CODE_00A744
+	jmp TakeJumpFar
 	+	inc.b $17
 	inc.b $17
 
@@ -8293,47 +8293,47 @@ TAX_Label_4:
 	lda.b $19
 	bra CODE_00A71C_alt1
 
-; Pattern set for CODE_00B22F (6 variants)
-	jsr.w CODE_00B22F
+; Pattern set for BlocksCallingCodeCodeCodeCode2 (6 variants)
+	jsr.w BlocksCallingCodeCodeCodeCode2
 	bcs +
 	bne +
-	jmp CODE_00A744
+	jmp TakeJumpFar
 	+	inc.b $17
 	inc.b $17
 
 
-	jsr.w CODE_00B22F
+	jsr.w BlocksCallingCodeCodeCodeCode2
 	bcs +
-	jmp CODE_00A744
+	jmp TakeJumpFar
 	+	inc.b $17
 	inc.b $17
 
 
-	jsr.w CODE_00B22F
+	jsr.w BlocksCallingCodeCodeCodeCode2
 	bcc +
-	jmp CODE_00A744
+	jmp TakeJumpFar
 	+	inc.b $17
 	inc.b $17
 
 
-	jsr.w CODE_00B22F
+	jsr.w BlocksCallingCodeCodeCodeCode2
 	bcc +
 	bne +
-	jmp CODE_00A744
+	jmp TakeJumpFar
 	+	inc.b $17
 	inc.b $17
 
 
-	jsr.w CODE_00B22F
+	jsr.w BlocksCallingCodeCodeCodeCode2
 	beq +
-	jmp CODE_00A744
+	jmp TakeJumpFar
 	+	inc.b $17
 	inc.b $17
 
 
-	jsr.w CODE_00B22F
+	jsr.w BlocksCallingCodeCodeCodeCode2
 	beq +
-	jmp CODE_00A744
+	jmp TakeJumpFar
 	+	inc.b $17
 	inc.b $17
 
@@ -8387,9 +8387,9 @@ Graphics_BankSwitch:
 	php ; Save flag state
 	lda.b #$08	  ; Load flag bit $08
 	trb.w $00db	 ; Clear flag
-	jsr.w CODE_009D75 ; Execute in new context (external)
+	jsr.w ProcessGraphicsData ; Execute in new context (external)
 	plp ; Restore flag state
-	beq CODE_00A73E ; If flag was clear, skip restore
+	beq IfFlagWasClearSkipRestore ; If flag was clear, skip restore
 	lda.b #$08	  ; Load flag bit
 	tsb.w $00db	 ; Restore flag to set state
 
@@ -8400,7 +8400,7 @@ Graphics_RestoreContext:
 	rts ; Return
 
 ;===============================================================================
-; CODE_00A744 - Load Address, Call Function, Execute Result
+; TakeJumpFar - Load Address, Call Function, Execute Result
 ;===============================================================================
 
 Graphics_LoadAddrExecute:
@@ -8422,10 +8422,10 @@ Graphics_LoadExec:
 	inc.b $17
 	tax ; Store to X
 	lda.b $19	   ; Load bank
-	bra CODE_00A71C ; Bank switch and execute
+	bra ProcessString ; Bank switch and execute
 
 ;===============================================================================
-; Flag Testing with Conditional Jumps to CODE_00A755 or CODE_00A7C6
+; Flag Testing with Conditional Jumps to FlagTestingConditionalJumpsCodeCode or IfClearSkip
 ;===============================================================================
 
 	lda.b [$17]	 ; Load flag index
@@ -8434,12 +8434,12 @@ Graphics_LoadExec:
 	phd ; Save direct page
 	pea.w $00d0	 ; Set DP to $d0
 PLD_Label_4:
-	jsl.l CODE_00975A ; Test flag (external)
+	jsl.l TestFlagExternal ; Test flag (external)
 	pld ; Restore DP
 	inc a; Test result (set Z flag)
 	dec a
-	bne CODE_00A755 ; If flag set, take jump
-	bra CODE_00A7C6 ; If clear, skip
+	bne FlagTestingConditionalJumpsCodeCode ; If flag set, take jump
+	bra IfClearSkip ; If clear, skip
 
 	lda.b [$17]	 ; Load flag index
 	inc.b $17
@@ -8447,44 +8447,44 @@ PLD_Label_4:
 	phd ; Save direct page
 	pea.w $00d0	 ; Set DP to $d0
 PLD_Label_5:
-	jsl.l CODE_00975A ; Test flag (external)
+	jsl.l TestFlagExternal ; Test flag (external)
 	pld ; Restore DP
 	inc a; Test result
 	dec a
-	beq CODE_00A755 ; If flag clear, take jump
+	beq FlagTestingConditionalJumpsCodeCode ; If flag clear, take jump
 	bra Condition_SkipJumpTarget ; If set, skip
 
 	lda.b [$17]	 ; Load item flag
 	inc.b $17
 	and.w #$00ff	; Mask to byte
-	jsl.l CODE_009776 ; Test item (external)
-	bne CODE_00A755 ; If set, jump
+	jsl.l CheckStatTypeModifier ; Test item (external)
+	bne FlagTestingConditionalJumpsCodeCode ; If set, jump
 	bra Condition_SkipJumpTarget ; If clear, skip
 
 Condition_TestItemNotZero:
 	lda.b [$17]	 ; Load item flag
 	inc.b $17
 	and.w #$00ff	; Mask to byte
-	jsl.l CODE_009776 ; Test item (external)
-	beq CODE_00A755 ; If clear, jump
+	jsl.l CheckStatTypeModifier ; Test item (external)
+	beq FlagTestingConditionalJumpsCodeCode ; If clear, jump
 	bra Condition_SkipJumpTarget ; If set, skip
 
 Condition_TestVarNotZero:
-	jsr.w CODE_00B1A1 ; Test variable
-	bne CODE_00A755 ; If not zero, jump
+	jsr.w TestVariable ; Test variable
+	bne FlagTestingConditionalJumpsCodeCode ; If not zero, jump
 	bra Condition_SkipJumpTarget ; If zero, skip
 
 Condition_TestVarZero:
-	jsr.w CODE_00B1A1 ; Test variable
-	beq CODE_00A755 ; If zero, jump
+	jsr.w TestVariable ; Test variable
+	beq FlagTestingConditionalJumpsCodeCode ; If zero, jump
 	bra Condition_SkipJumpTarget ; If not zero, skip
 
-	jsr.w CODE_00B1B4 ; Test condition
-	bne CODE_00A755 ; If not zero, jump
+	jsr.w TestCondition ; Test condition
+	bne FlagTestingConditionalJumpsCodeCode ; If not zero, jump
 	bra Condition_SkipJumpTarget ; If zero, skip
 
-	jsr.w CODE_00B1B4 ; Test condition
-	beq CODE_00A755 ; If zero, jump
+	jsr.w TestCondition ; Test condition
+	beq FlagTestingConditionalJumpsCodeCode ; If zero, jump
 
 Condition_SkipJumpTarget:
 	inc.b $17	   ; Skip jump address
@@ -8504,7 +8504,7 @@ Condition_SkipJumpTarget:
 	lda.b $a0	   ; Load saved bank
 	xba ; Swap back
 	rep #$30		; 16-bit A/X/Y
-	bra CODE_00A7F9 ; Execute subroutine
+	bra ProcessDataBlock ; Execute subroutine
 
 Graphics_ExecWithSavedPtr:
 	sep #$20		; 8-bit A
@@ -8513,7 +8513,7 @@ Graphics_ExecWithSavedPtr:
 	xba ; Build word
 	lda.b $3a	   ; Load parameter from $3a
 	rep #$30		; 16-bit A/X/Y
-	bra CODE_00A7F9 ; Execute
+	bra ProcessDataBlock ; Execute
 
 Graphics_LoadAndExecParam:
 	lda.b [$17]	 ; Load address
@@ -8525,7 +8525,7 @@ Graphics_LoadAndExecParam:
 	and.w #$00ff	; Mask to byte
 
 ;===============================================================================
-; CODE_00A7F9 - Execute Subroutine with Full Context Save
+; ProcessDataBlock - Execute Subroutine with Full Context Save
 ;
 ; Saves current execution state, switches to new address/bank with parameter,
 ; executes subroutine, then restores all state. Used for calling script
@@ -8558,9 +8558,9 @@ Graphics_ExecSubroutine:
 	php ; Save flag state
 	lda.w #$0008	; Load flag $08
 	tsb.w $00db	 ; Set flag
-	jsr.w CODE_009D75 ; Execute subroutine (external)
+	jsr.w ProcessGraphicsData ; Execute subroutine (external)
 	plp ; Restore flag state
-	bne CODE_00A833 ; If flag was set, keep it
+	bne IfFlagWasSetKeepIt ; If flag was set, keep it
 	lda.w #$0008	; Load flag $08
 	trb.w $00db	 ; Clear flag
 
@@ -8575,7 +8575,7 @@ Graphics_RestoreState:
 	rts ; Return
 
 ;===============================================================================
-; CODE_00A83F - Execute External Subroutine via Long Call
+; CodeExecuteExternalSubroutineViaLong - Execute External Subroutine via Long Call
 ;===============================================================================
 
 Graphics_ExecLongCall:
@@ -8618,12 +8618,12 @@ PLD_Label_6:
 ; Memory Manipulation and Data Transfer Routines
 ;===============================================================================
 
-; CODE_00A86E - Raw bytecode (not yet disassembled fully)
+; CodeThroughCodeNowImplementedPartial - Raw bytecode (not yet disassembled fully)
 ; Purpose: Unknown memory operation involving $9e and $a0
 	db $a4,$9e,$a5,$a0,$80,$d9
 
 ;-------------------------------------------------------------------------------
-; CODE_00A874 - Copy data to RAM $7e3367 using mvn
+; CodeCopyDataRamE3367Using - Copy data to RAM $7e3367 using mvn
 ; Purpose: Block memory move from Bank $00 to Bank $7e
 ; Entry: [$17] = destination offset,  [$17+2] = byte count
 ;-------------------------------------------------------------------------------
@@ -8644,14 +8644,14 @@ Memory_CopyToRAM:
 	tya ; Get end pointer
 	cmp.w #$35d9	; Check if exceeds buffer limit
 	bcc Memory_UpdatePointer ; If below limit, update pointer
-	db $4c,$1f,$9d ; jmp CODE_009D1F (buffer overflow handler)
+	db $4c,$1f,$9d ; jmp InfiniteLoopStackOverflow (buffer overflow handler)
 
 Memory_UpdatePointer:
 	sta.l $7e3367   ; Update pointer
 
 
 ;-------------------------------------------------------------------------------
-; CODE_00A89B - Copy data from RAM $7e3367 back to Bank $00
+; CodeCopyDataRamE3367Back - Copy data from RAM $7e3367 back to Bank $00
 ; Purpose: Reverse block move from Bank $7e to Bank $00
 ; Entry: [$17] = destination, [$17+2] = count
 ;-------------------------------------------------------------------------------
@@ -8675,7 +8675,7 @@ Memory_CopyFromRAM:
 
 
 ;-------------------------------------------------------------------------------
-; CODE_00A8BD/CODE_00A8C0 - Pointer manipulation helpers
+; CodeCodePointerManipulationHelpers/CodePointerManipulationCoordinateCalculations - Pointer manipulation helpers
 ;-------------------------------------------------------------------------------
 Pointer_AdjustBits:
 	jsr.w Pointer_CalcOffset
@@ -8692,7 +8692,7 @@ Pointer_CalcOffset:
 
 
 ;-------------------------------------------------------------------------------
-; CODE_00A8D1 - Calculate pointer from $25 (coordinates/position)
+; CodeCalculatePointerCoordinatesPosition - Calculate pointer from $25 (coordinates/position)
 ; Purpose: Convert position data to tilemap pointer
 ; Entry: $25 = position data, $3f/$40 = base pointers
 ; Exit: $1a = calculated pointer, $1b = bank/high byte
@@ -8714,10 +8714,10 @@ Pointer_FromPosition:
 
 
 ;-------------------------------------------------------------------------------
-; CODE_00A8EB-CODE_00A93E - DMA/MVN transfer routines
+; CodeCodeDmaMvnTransferRoutines-CodeCodeDmaMvnTransferRoutines2 - DMA/MVN transfer routines
 ; Purpose: Various block memory transfer operations
 ;-------------------------------------------------------------------------------
-	db $4c,$24,$98 ; jmp CODE_009824
+	db $4c,$24,$98 ; jmp BcdHexNumberFormattingRoutine
 
 DMA_TransferWithBank:
 	lda.b $18	   ; Load $18
@@ -8784,7 +8784,7 @@ DMA_TransferDone:
 
 
 ;-------------------------------------------------------------------------------
-; CODE_00A958 - Write 8-bit value to address
+; CodeWriteBitValueAddress - Write 8-bit value to address
 ; Purpose: [X] = 8-bit value from script
 ; Entry: [$17] = address, [$17+2] = 8-bit value
 ;-------------------------------------------------------------------------------
@@ -8801,7 +8801,7 @@ Script_Write8Bit:
 	rts ; (REP #$30 happens in caller)
 
 ;-------------------------------------------------------------------------------
-; CODE_00A96C - Write 16-bit value to address
+; D4 - Write 16-bit value to address
 ; Purpose: [X] = 16-bit value from script
 ; Entry: [$17] = address, [$17+2] = 16-bit value
 ;-------------------------------------------------------------------------------
@@ -8817,7 +8817,7 @@ Script_Write16Bit:
 
 
 ;-------------------------------------------------------------------------------
-; CODE_00A97D - Write 16-bit value + 8-bit value to address
+; CodeWriteBitValueBitValue - Write 16-bit value + 8-bit value to address
 ; Purpose: Write word then byte (3 bytes total)
 ; Entry: [$17] = address, [$17+2] = word, [$17+4] = byte
 ;-------------------------------------------------------------------------------
@@ -8831,7 +8831,7 @@ Script_Write24Bit:
 
 
 ;-------------------------------------------------------------------------------
-; CODE_00A98D/CODE_00A999 - Indirect pointer writes (using $9e)
+; CodeCodeIndirectPointerWritesUsing/CodeCodeIndirectPointerWritesUsing2 - Indirect pointer writes (using $9e)
 ; Purpose: Write to address pointed to by $9e/$9f
 ;-------------------------------------------------------------------------------
 Script_WriteIndirect8:
@@ -8850,14 +8850,14 @@ Script_WriteIndirect16:
 
 
 ;-------------------------------------------------------------------------------
-; CODE_00A9A2 - Complex indirect write sequence
+; CodeComplexIndirectWriteSequence - Complex indirect write sequence
 ;-------------------------------------------------------------------------------
 Script_WriteIndirectSeq:
 	db $20,$99,$a9,$e6,$9e,$e6,$9e,$20,$8d,$a9,$c2,$30,$c6,$9e,$c6,$9e
 	db $60
 
 ;-------------------------------------------------------------------------------
-; CODE_00A9B3 - Load value from indirect pointer
+; CodeLoadValueIndirectPointer - Load value from indirect pointer
 ; Purpose: Load 16-bit value from [$9e]
 ; Entry: [$17] = address to store result
 ; Exit: A = value from [$9e], X = address
@@ -8882,7 +8882,7 @@ Script_ReadIndirect16:
 
 
 ;-------------------------------------------------------------------------------
-; CODE_00A9CD - mvn transfer using $9e pointer
+; CodeMvnTransferUsingEPointer - mvn transfer using $9e pointer
 ; Purpose: Block move using indirect pointer as bank
 ;-------------------------------------------------------------------------------
 Script_TransferIndirect:
@@ -8898,7 +8898,7 @@ Script_TransferIndirect:
 	jmp.w $0030	 ; Execute mvn via $0030
 
 ;-------------------------------------------------------------------------------
-; CODE_00A9E3-CODE_00AA22 - Bank $7e write operations
+; CodeCodeBankEWriteOperations-CodeHelperLoadAddressBankBank - Bank $7e write operations
 ; Purpose: Write to Bank $7e addresses using special bank handling
 ;-------------------------------------------------------------------------------
 Script_WriteBanked8:
@@ -8929,7 +8929,7 @@ Script_WriteBanked24:
 	db $e6,$17,$29,$ff,$00,$e2,$20,$9d,$02,$00,$ab,$60
 
 ;-------------------------------------------------------------------------------
-; CODE_00AA22 - Helper: Load address and bank for Bank $7e operations
+; CodeHelperLoadAddressBankBank - Helper: Load address and bank for Bank $7e operations
 ; Entry: [$17] = address, [$17+2] = bank byte
 ; Exit: X = address, A = bank (low byte)
 ;-------------------------------------------------------------------------------
@@ -8944,7 +8944,7 @@ Script_LoadAddrBank:
 
 
 ;-------------------------------------------------------------------------------
-; CODE_00AA31-CODE_00AA67 - Text positioning and display helpers
+; CodeCodeTextPositioningDisplayHelpers-CodeCodeTextPositioningDisplayHelpers2 - Text positioning and display helpers
 ; Purpose: Calculate text window positions and sizes
 ;-------------------------------------------------------------------------------
 Text_CalcWindowPos:
@@ -8991,7 +8991,7 @@ Text_FinalizePos:
 
 
 ;-------------------------------------------------------------------------------
-; CODE_00AA68 - Repeat text operation
+; CodeRepeatTextOperation - Repeat text operation
 ; Purpose: Execute text display routine multiple times
 ; Entry: $1f = repeat count, $17 = operation pointer
 ;-------------------------------------------------------------------------------
@@ -9012,7 +9012,7 @@ Text_RepeatLoop:
 
 
 ;-------------------------------------------------------------------------------
-; CODE_00AA7C-CODE_00AACC - DMA transfer setup routines
+; CodeCodeDmaTransferSetupRoutines-CodeThroughCodeNowImplementedPartial2 - DMA transfer setup routines
 ; Purpose: Set up and execute DMA transfers to VRAM/tilemap
 ;-------------------------------------------------------------------------------
 DMA_SetupTilemap:
@@ -9023,7 +9023,7 @@ DMA_SetupTilemap:
 	lda.w #$2cfe	; Load tile value
 	ldx.b $3f	   ; Load X base
 	ldy.w #$1000	; Load Y base (large transfer)
-	jmp.w CODE_009D4B ; Execute DMA
+	jmp.w ExecuteDma ; Execute DMA
 
 DMA_SetupPositioned:
 	lda.b $40	   ; Load bank
@@ -9042,7 +9042,7 @@ DMA_SetupPositioned:
 	lsr a
 	tay ; Y = transfer size
 	lda.w #$2cfe	; Load tile value
-	jmp.w CODE_009D4B ; Execute DMA
+	jmp.w ExecuteDma ; Execute DMA
 
 DMA_SetupClear:
 	lda.b $40	   ; Load bank
@@ -9061,28 +9061,28 @@ TAX_Label_8:
 	lsr a
 TAY_Label_3:
 	lda.w #$2c00	; Different tile value (blank/clear)
-	jmp.w CODE_009D4B ; Execute DMA
+	jmp.w ExecuteDma ; Execute DMA
 
 ;===============================================================================
 ; Progress: ~8,900 lines documented (63.5% of Bank $00)
 ; Latest additions:
-; - CODE_00A86E-00A874: Memory block transfers to/from Bank $7e
-; - CODE_00A89B: Reverse block copy (Bank $7e → Bank $00)
-; - CODE_00A8C0-00A8D1: Pointer manipulation and coordinate calculations
-; - CODE_00A8EE-00A93E: DMA/MVN transfer helper routines
-; - CODE_00A958-00A97D: Direct memory write operations (8-bit, 16-bit, 24-bit)
-; - CODE_00A98D-00A999: Indirect pointer writes via $9e
-; - CODE_00A9B3-00A9CD: Indirect pointer reads and transfers
-; - CODE_00A9E3-00AA22: Bank $7e special write operations
-; - CODE_00AA31-00AA67: Text positioning and window calculations
-; - CODE_00AA68: Text operation repeat loop
-; - CODE_00AA7C-00AACC: DMA transfer setup for VRAM/tilemap operations
+; - CodeThroughCodeNowImplementedPartial-00A874: Memory block transfers to/from Bank $7e
+; - CodeCopyDataRamE3367Back: Reverse block copy (Bank $7e → Bank $00)
+; - CodePointerManipulationCoordinateCalculations-00A8D1: Pointer manipulation and coordinate calculations
+; - CodeDmaMvnTransferHelperRoutines-00A93E: DMA/MVN transfer helper routines
+; - CodeWriteBitValueAddress-00A97D: Direct memory write operations (8-bit, 16-bit, 24-bit)
+; - CodeCodeIndirectPointerWritesUsing-00A999: Indirect pointer writes via $9e
+; - CodeLoadValueIndirectPointer-00A9CD: Indirect pointer reads and transfers
+; - CodeCodeBankEWriteOperations-00AA22: Bank $7e special write operations
+; - CodeCodeTextPositioningDisplayHelpers-00AA67: Text positioning and window calculations
+; - CodeRepeatTextOperation: Text operation repeat loop
+; - CodeCodeDmaTransferSetupRoutines-00AACC: DMA transfer setup for VRAM/tilemap operations
 ;
-; Next: More DMA and graphics routines (CODE_00AACF onward)
+; Next: More DMA and graphics routines (NextMoreDmaGraphicsRoutinesCode onward)
 ;===============================================================================
 
 ;-------------------------------------------------------------------------------
-; CODE_00AACF - Indexed sprite/tile drawing dispatcher
+; NextMoreDmaGraphicsRoutinesCode - Indexed sprite/tile drawing dispatcher
 ; Purpose: Use sprite type index ($27) to dispatch to specific drawing routine
 ; Entry: $27 = sprite type index, $28 = position data
 ;-------------------------------------------------------------------------------
@@ -9094,18 +9094,18 @@ Sprite_DrawDispatch:
 	pei.b ($25)	 ; Save $25 to stack
 	lda.b $28	   ; Load position
 	sta.b $25	   ; Store as new $25
-	jsr.w CODE_00A8D1 ; Calculate tilemap pointer
-	jsr.w CODE_00B49E ; Prepare drawing context
+	jsr.w CodeCalculatePointerCoordinatesPosition ; Calculate tilemap pointer
+	jsr.w CallHelper ; Prepare drawing context
 	lda.b $1c	   ; Load bank byte
 	and.w #$00ff
 	pha ; Save bank
 	plb ; Set data bank
 	jsr.w (Sprite_DrawDispatchTable,x) ; Dispatch to sprite routine
 	plb ; Restore data bank
-	jsr.w CODE_00B4A7 ; Cleanup drawing context
+	jsr.w CleanupDrawingContext ; Cleanup drawing context
 	pla ; Restore $25
 	sta.b $25
-	jmp.w CODE_00A8D1 ; Recalculate pointer and return
+	jmp.w CodeCalculatePointerCoordinatesPosition ; Recalculate pointer and return
 
 	db $60		 ; Extra rts
 
@@ -9157,7 +9157,7 @@ Sprite_DrawWindowBorder:
 	lda.w #$4000	; Vertical flip bit
 	ora.b $1d	   ; Combine with tile flags
 	sta.b $64	   ; Store flip flags
-	jsr.w CODE_00B4A7 ; Setup drawing
+	jsr.w CleanupDrawingContext ; Setup drawing
 
 	lda.b $1a	   ; Load pointer
 	sbc.w #$0040	; Back up one row
@@ -9165,7 +9165,7 @@ Sprite_DrawWindowBorder:
 	lda.b $24	   ; Load flags
 	bit.w #$0008	; Test bit 3
 	beq Window_CalcBounds ; If clear, skip
-	jsr.w CODE_00A8D1 ; Recalculate pointer
+	jsr.w CodeCalculatePointerCoordinatesPosition ; Recalculate pointer
 	lda.w #$8000	; Horizontal flip bit
 	tsb.b $64	   ; Set in flags
 
@@ -9557,7 +9557,7 @@ Sprite_ClearOAM:
 
 Sprite_ClearLoop:
 	tax ; X = Y position
-	jsr.w CODE_009A05 ; Clear sprite entry
+	jsr.w ClearSpriteEntry ; Clear sprite entry
 	tya ; Get OAM pointer
 	sbc.w #$fff0	; Move back (-16 bytes)
 TAY_Label_5:
@@ -9714,7 +9714,7 @@ INY_Label_2:
 INY_Label_3:
 PLA_Label:
 	dec a
-	beq CODE_00AE9F
+	beq Sub_00AE9F
 	asl a
 	dec a
 	mvn $7e,$7e	 ; Block move
@@ -9730,7 +9730,7 @@ Cmd_CallGraphics8Bit:
 	lda.b [$17]	 ; Load parameter
 	inc.b $17
 	and.w #$00ff
-	jsl.l CODE_009760 ; Long call to graphics routine
+	jsl.l LongCallGraphicsRoutine ; Long call to graphics routine
 
 
 	db $a5,$9e,$22,$60,$97,$00,$60 ; Variant with $9e parameter
@@ -9745,7 +9745,7 @@ Cmd_CallGraphicsWithDP:
 	phd ; Save direct page
 	pea.w $00d0	 ; Set DP to $d0
 PLD_Label_7:
-	jsl.l CODE_00974E ; Call graphics routine
+	jsl.l CallGraphicsRoutine ; Call graphics routine
 	pld ; Restore DP
 
 
@@ -9756,7 +9756,7 @@ Cmd_CallSprite:
 	lda.b [$17]	 ; Load parameter
 	inc.b $17
 	and.w #$00ff
-	jsl.l CODE_00976B ; Call sprite routine
+	jsl.l CallSpriteRoutine ; Call sprite routine
 
 
 	db $a5,$9e,$22,$6b,$97,$00,$60 ; Variant with $9e
@@ -9771,7 +9771,7 @@ Cmd_CallGraphicsAlt:
 PHD_Label_3:
 	pea.w $00d0	 ; DP = $d0
 PLD_Label_8:
-	jsl.l CODE_009754 ; Graphics call
+	jsl.l GraphicsCall ; Graphics call
 PLD_Label_9:
 
 
@@ -9785,7 +9785,7 @@ PHD_Label_4:
 PHA_Label_1:
 	lda.b $9e	   ; From $9e
 PLD_Label_10:
-	jsl.l CODE_00974E
+	jsl.l CallGraphicsRoutine
 PLD_Label_11:
 
 
@@ -9798,7 +9798,7 @@ PHD_Label_5:
 PHA_Label_2:
 	lda.b $9e
 PLD_Label_12:
-	jsl.l CODE_009754
+	jsl.l GraphicsCall
 PLD_Label_13:
 
 
@@ -10148,19 +10148,19 @@ Math_SubApply:
 ; Math_Divide - Division (16-bit / 8-bit)
 ; Purpose: Divide $9e by accumulator
 ; Entry: A = divisor (8-bit)
-; Exit: $98 = quotient, $9a = remainder (via CODE_0096B3)
+; Exit: $98 = quotient, $9a = remainder (via ExitQuotientRemainderViaCode)
 ;-------------------------------------------------------------------------------
 Math_Divide:
 	sta.b $9c	   ; Store divisor
 	lda.b $9e	   ; Load dividend
 	sta.b $98	   ; Setup for division
-	jsl.l CODE_0096B3 ; Call division routine
+	jsl.l ExitQuotientRemainderViaCode ; Call division routine
 
 
 	lda.b [$17]	 ; Variant: divisor from script
 	inc.b $17
 	and.w #$00ff
-	bra CODE_00B0E6
+	bra CodeDivisionBit
 
 	db $a7,$17,$e6,$17,$e6,$17,$80,$e4 ; 16-bit divisor variant
 
@@ -10174,7 +10174,7 @@ Math_Divide:
 ; Math_Multiply8: Multiplication (16-bit × 8-bit)
 ; Purpose: Multiply $9e/$a0 by accumulator
 ; Entry: A = multiplier (8-bit)
-; Exit: Result in $98/$9a (via CODE_0096E4)
+; Exit: Result in $98/$9a (via ExitResultViaCode)
 ;-------------------------------------------------------------------------------
 Math_Multiply8:
 	sta.b $9c	   ; Store multiplier
@@ -10182,7 +10182,7 @@ Math_Multiply8:
 	sta.b $98
 	lda.b $a0	   ; Load multiplicand high
 	sta.b $9a
-	jsl.l CODE_0096E4 ; Call multiplication routine
+	jsl.l ExitResultViaCode ; Call multiplication routine
 
 
 ;-------------------------------------------------------------------------------
@@ -10235,7 +10235,7 @@ Math_FormatDecimal:
 	sta.b $9c	   ; Store base
 	ldx.w #$006d	; X = buffer pointer
 
-	jsl.l CODE_009824 ; Call BCD conversion
+	jsl.l BcdHexNumberFormattingRoutine ; Call BCD conversion
 	pla ; Restore $a0
 	sta.b $a0
 	pla ; Restore $9e
@@ -10253,7 +10253,7 @@ Math_FormatHex:
 	sta.b $9c
 	ldx.w #$006d	; Buffer pointer
 	sec ; Hex mode flag
-	jsl.l CODE_009824 ; Call hex conversion
+	jsl.l BcdHexNumberFormattingRoutine ; Call hex conversion
 PLA_Label_1:
 	sta.b $a0
 PLA_Label_2:
@@ -10261,7 +10261,7 @@ PLA_Label_2:
 
 
 ;-------------------------------------------------------------------------------
-; CODE_00B185 - Helper routines for loading test values
+; CodeHelperRoutinesLoadingTestValues - Helper routines for loading test values
 ;-------------------------------------------------------------------------------
 System_LoadFrom3A:
 	lda.b $3a	   ; Load from $3a
@@ -10305,7 +10305,7 @@ Test_CompareValue24:
 	sec ; Set carry for comparison
 	lda.b $a0	   ; Load high byte
 	sbc.b $62	   ; Subtract comparison high
-	bne CODE_00B1C2 ; If not equal, done
+	bne IfNotEqualDone ; If not equal, done
 	lda.b $9e	   ; Load low byte
 	sbc.b $64	   ; Subtract comparison low
 ; Z flag = equality result
@@ -10317,17 +10317,17 @@ Test_CompareDone:
 ;===============================================================================
 ; Progress: ~10,200 lines documented (72.8% of Bank $00)
 ; Latest additions:
-; - CODE_00AFFE-00B021: Bitwise and and tsb operations with variants
-; - CODE_00B04B-00B053: Bitwise XOR operations
-; - CODE_00B07E-00B094: 16-bit addition operations
-; - CODE_00B0B2-00B0BA: 16-bit subtraction operations
-; - CODE_00B0E6: Division (16÷8 bit)
-; - CODE_00B10C: Multiplication (16×8 bit)
-; - CODE_00B136: Random number result getter
-; - CODE_00B151: Decimal number formatting (BCD conversion)
-; - CODE_00B16B: Hexadecimal number formatting
-; - CODE_00B185-00B196: Value loading helper routines
-; - CODE_00B1A1: 24-bit comparison test
+; - CodeBitwiseTsbOperationsVariants-00B021: Bitwise and and tsb operations with variants
+; - CodeBitwiseXorOperations-00B053: Bitwise XOR operations
+; - CodeBitAdditionOperations-00B094: 16-bit addition operations
+; - CodeBitSubtractionOperations-00B0BA: 16-bit subtraction operations
+; - CodeDivisionBit: Division (16÷8 bit)
+; - CodeMultiplicationBit: Multiplication (16×8 bit)
+; - CodeRandomNumberResultGetter: Random number result getter
+; - CodeDecimalNumberFormattingBcdConversion: Decimal number formatting (BCD conversion)
+; - CodeHexadecimalNumberFormatting: Hexadecimal number formatting
+; - CodeHelperRoutinesLoadingTestValues-00B196: Value loading helper routines
+; - TestVariable: 24-bit comparison test
 ;
 ; Next: More comparison and test routines (Test_CompareDP onward)
 ;===============================================================================
@@ -10653,13 +10653,13 @@ Tilemap_IncrementTile:
 ; Entry: [$17] = 16-bit parameter
 ; Exit: $17 incremented by 2
 ;       Returns from external function
-; Calls: CODE_009DCB (external routine)
+; Calls: CallsCodeExternalRoutine (external routine)
 ;-------------------------------------------------------------------------------
 Cmd_CallExternal16:
 	lda.b [$17]	 ; Load 16-bit parameter
 	inc.b $17	   ; Advance script pointer
 	inc.b $17	   ; (2 bytes)
-	jmp.w CODE_009DCB ; Jump to external routine
+	jmp.w CallsCodeExternalRoutine ; Jump to external routine
 
 ;-------------------------------------------------------------------------------
 ; Cmd_CallExternal8: Jump to external routine with 8-bit parameter
@@ -10668,13 +10668,13 @@ Cmd_CallExternal16:
 ; Entry: [$17] = 8-bit parameter
 ; Exit: $17 incremented by 1
 ;       Returns from external function
-; Calls: CODE_009DC9 (external routine)
+; Calls: CodeDirectTileWrite (external routine)
 ;-------------------------------------------------------------------------------
 Cmd_CallExternal8:
 	lda.b [$17]	 ; Load 8-bit parameter
 	inc.b $17	   ; Advance script pointer
 	and.w #$00ff	; Mask to 8 bits
-	jmp.w CODE_009DC9 ; Jump to external routine
+	jmp.w CodeDirectTileWrite ; Jump to external routine
 
 ;-------------------------------------------------------------------------------
 ; Math_ShiftRight: Right shift $9e/$a0 by N bits
@@ -10767,8 +10767,8 @@ Script_NoOp:
 ; Exit: $17 incremented by 2
 ;       Script executed or registered
 ; Calls: Script_Execute_Handler (script execution handler)
-;       CODE_00A71C (external script registration)
-;       CODE_01B24C (script initialization)
+;       ProcessString (external script registration)
+;       BankScriptInitializationRoutine (script initialization)
 ; Notes: Handles both internal scripts (>= $8000) and external scripts (< $8000)
 ;-------------------------------------------------------------------------------
 Script_Execute:
@@ -10781,13 +10781,13 @@ Script_Execute_Handler:
 	bcc Script_Execute_External ; If < $8000, external script
 	tax ; X = script address
 	lda.w #$0003	; Script mode 3
-	jmp.w CODE_00A71C ; Register and execute script
+	jmp.w ProcessString ; Register and execute script
 
 Script_Execute_External:
 	pei.b ($17)	 ; Save current script pointer
 	pei.b ($18)	 ; (both bytes)
 	sta.w $19ee	 ; Store script address
-	jsl.l CODE_01B24C ; Initialize and run script
+	jsl.l BankScriptInitializationRoutine ; Initialize and run script
 	pla ; Restore script pointer
 	sta.b $18
 PLA_Label_3:
@@ -10823,11 +10823,11 @@ Script_ExecuteList_Done:
 ; Purpose: Apply random number transformation to $9e
 ; Entry: $9e = input value
 ; Exit: $9e = transformed value
-; Calls: CODE_009730 (external RNG transformation)
+; Calls: CodeReturnsHandlerIndexBasedGame (external RNG transformation)
 ;-------------------------------------------------------------------------------
 Math_RandomTransform:
 	lda.b $9e	   ; Load value
-	jsl.l CODE_009730 ; Apply RNG transformation
+	jsl.l CodeReturnsHandlerIndexBasedGame ; Apply RNG transformation
 	sta.b $9e	   ; Store result
 
 
@@ -11154,32 +11154,32 @@ Tilemap_UpdateMax_Done:
 
 
 ;-------------------------------------------------------------------------------
-; CODE_00B4B0: Check flag and execute routine
+; CodeCheckFlagExecuteRoutine: Check flag and execute routine
 ;
 ; Purpose: Check bit 5 of $da and branch to different routines
 ; Entry: $da = flag register
-; Exit: Jumps to CODE_00A8C0 if bit 5 set, CODE_009DC9 otherwise
+; Exit: Jumps to CodePointerManipulationCoordinateCalculations if bit 5 set, CodeDirectTileWrite otherwise
 ; Notes: bit 5 of $da appears to be a mode or state flag
 ;-------------------------------------------------------------------------------
 System_CheckModeJump:
 	lda.w #$0020	; bit 5 mask
 	and.w $00da	 ; Test bit 5 of $da
 	beq System_AlternateModeJump ; If clear, jump to alternate
-	jmp.w CODE_00A8C0 ; Jump to routine A
+	jmp.w CodePointerManipulationCoordinateCalculations ; Jump to routine A
 
 ;-------------------------------------------------------------------------------
 ; System - Alternate Mode Jump
 ;-------------------------------------------------------------------------------
-; Purpose: Load $00ff and jump to CODE_009DC9 (likely fade/graphics routine)
+; Purpose: Load $00ff and jump to CodeDirectTileWrite (likely fade/graphics routine)
 ; Reachability: Reachable via conditional branch (beq above)
 ; Analysis: Alternate execution path when bit 5 of $00da is clear
 ;   - Loads A with $00ff (16-bit)
-;   - Jumps to CODE_009DC9 (graphics fade/transition routine)
+;   - Jumps to CodeDirectTileWrite (graphics fade/transition routine)
 ; Technical: Originally labeled UNREACH_00B4BB
 ;-------------------------------------------------------------------------------
 System_AlternateModeJump:
 	lda.w #$00ff                         ;00B4BB|A9FF00  |      ; Load A with $00ff
-	jmp.w CODE_009DC9                    ;00B4BE|4CC99D  |009DC9; Jump to graphics routine
+	jmp.w CodeDirectTileWrite                    ;00B4BE|4CC99D  |009DC9; Jump to graphics routine
 
 ;-------------------------------------------------------------------------------
 ; Text_ClearModeSetNew: Clear text mode bits and set new mode
@@ -11209,7 +11209,7 @@ Text_ClearModeSetNew:
 ; Exit: $9e = random number result
 ;       $a0 = 0
 ;       $17 incremented by 1
-; Calls: CODE_009783 (RNG routine)
+; Calls: CallsCodeRngRoutine (RNG routine)
 ;-------------------------------------------------------------------------------
 Math_RNGSeed:
 	stz.b $9e	   ; Clear $9e
@@ -11219,7 +11219,7 @@ Math_RNGSeed:
 	and.w #$00ff	; Mask to 8 bits
 	sep #$20		; 8-bit accumulator
 	sta.w $00a8	 ; Store in RNG parameter location
-	jsl.l CODE_009783 ; Call RNG routine
+	jsl.l CallsCodeRngRoutine ; Call RNG routine
 	lda.w $00a9	 ; Load RNG result
 	sta.b $9e	   ; Store in $9e
 
@@ -11229,11 +11229,11 @@ Math_RNGSeed:
 ;
 ; Purpose: Call external routine with $9e as parameter
 ; Entry: $9e = parameter value
-; Calls: CODE_009DCB (external routine)
+; Calls: CallsCodeExternalRoutine (external routine)
 ;-------------------------------------------------------------------------------
 Cmd_CallExternal9E:
 	lda.b $9e	   ; Load parameter
-	jmp.w CODE_009DCB ; Jump to external routine
+	jmp.w CallsCodeExternalRoutine ; Jump to external routine
 
 ;-------------------------------------------------------------------------------
 ; Text_CalcCentering: Center text based on character count
@@ -11305,7 +11305,7 @@ Text_CalcCentering_UseFirst:
 	adc.b $25	   ; Add to base position
 	sta.b $25	   ; Store centered position
 	rep #$30		; 16-bit A/X/Y
-	jsr.w CODE_00A8D1 ; Call positioning routine
+	jsr.w CodeCalculatePointerCoordinatesPosition ; Call positioning routine
 
 
 ;-------------------------------------------------------------------------------
@@ -11314,12 +11314,12 @@ Text_CalcCentering_UseFirst:
 ; Purpose: Set $3a to $10 (16) and call text drawing routine
 ; Entry: (parameters set up by caller)
 ; Exit: Text drawing initiated
-; Calls: CODE_00A7DE (text drawing routine)
+; Calls: CallsCodeTextDrawingRoutine (text drawing routine)
 ;-------------------------------------------------------------------------------
 Text_SetCounter16:
 	lda.w #$0010	; Load 16
 	sta.b $3a	   ; Store in counter
-	jmp.w CODE_00A7DE ; Jump to text drawing
+	jmp.w CallsCodeTextDrawingRoutine ; Jump to text drawing
 
 ;-------------------------------------------------------------------------------
 ; Tilemap_WriteDynamic: Tilemap buffer manipulation (unclear function)
@@ -11353,7 +11353,7 @@ Tilemap_WriteDynamic:
 ;       $23 = sprite Y position (adjusted)
 ;       $24 = sprite display mode
 ;       $d0 bit 2 set/cleared based on location
-; Calls: CODE_018A52 (external sprite init)
+; Calls: BankSpriteInitialization (external sprite init)
 ; Notes: Complex location-based sprite positioning
 ;        Handles battle vs overworld sprite modes
 ;        Adjusts for screen centering and boundaries
@@ -11375,7 +11375,7 @@ Sprite_SetupCharacter:
 Sprite_SetupCharacter_Normal:
 	lda.b #$04	  ; bit 2 mask
 	trb.w $00d0	 ; Clear bit 2 of $d0
-	jsl.l CODE_018A52 ; Call external sprite init
+	jsl.l BankSpriteInitialization ; Call external sprite init
 	lda.b #$01	  ; bit 0 mask
 	and.w $00d9	 ; Test bit 0 of $d9
 	beq Sprite_SetupCharacter_CheckLocation ; If clear, skip
@@ -11593,15 +11593,15 @@ Sprite_SetupCharacter_Done:
 ; Exit: $62 = sprite mode
 ;       $64 = position offset
 ;       Sprite display initiated
-; Calls: CODE_008C1B (character data lookup)
-;        CODE_0C8000 (external sprite display)
+; Calls: CallsCodeIfPositionIsValid (character data lookup)
+;        AddressC8000OriginalCode (external sprite display)
 ; Notes: Special handling for character $de
 ;-------------------------------------------------------------------------------
 Sprite_DisplayCharacter:
 	lda.b $9e	   ; Load character index
 	cmp.w #$00de	; Check if $de (special)
 	beq Sprite_DisplayCharacter_Special ; If yes, special handling
-	jsr.w CODE_008C1B ; Look up character data
+	jsr.w CallsCodeIfPositionIsValid ; Look up character data
 	sta.b $62	   ; Store sprite mode
 	sep #$30		; 8-bit A/X/Y
 	ldx.b $9e	   ; X = character index
@@ -11613,7 +11613,7 @@ Sprite_DisplayCharacter_Do:
 	sta.b $64	   ; Store position offset
 	lda.b #$02	  ; bit 1 mask
 	tsb.w $00d4	 ; Set bit 1 of $d4
-	jsl.l CODE_0C8000 ; Call external sprite display
+	jsl.l AddressC8000OriginalCode ; Call external sprite display
 
 
 Sprite_DisplayCharacter_Special:
@@ -11626,15 +11626,15 @@ Sprite_DisplayCharacter_Special:
 ;-------------------------------------------------------------------------------
 ; Script_SavePointerExecute: Save script pointer and execute script
 ;
-; Purpose: Save current script pointer and execute CODE_00B78D
+; Purpose: Save current script pointer and execute PurposeSaveCurrentScriptPointerExecute
 ; Entry: $17/$18 = current script pointer
 ; Exit: Script pointer saved on stack
-;       CODE_00B78D executed
+;       PurposeSaveCurrentScriptPointerExecute executed
 ;-------------------------------------------------------------------------------
 Script_SavePointerExecute:
 	pei.b ($17)	 ; Save script pointer low
 	pei.b ($18)	 ; Save script pointer high
-	jmp.w CODE_00B78D ; Jump to script execution
+	jmp.w PurposeSaveCurrentScriptPointerExecute ; Jump to script execution
 
 ;-------------------------------------------------------------------------------
 ; Shop_SubtractGold: Update character gold amount
@@ -11658,7 +11658,7 @@ Shop_SubtractGold:
 	lda.w $015f	 ; Load character index
 	cmp.b #$dd	  ; Check if $dd (special)
 	beq Shop_SubtractGold_Alternate ; If yes, alternate storage
-	jsl.l CODE_00DA65 ; Call external routine
+	jsl.l ExternalDataRoutine ; Call external routine
 	clc ; Clear carry
 	adc.w $0162	 ; Add offset
 	sta.w $0e9f,x   ; Store at indexed location
@@ -11693,14 +11693,14 @@ Shop_SubtractGold_Done:
 ;        $95 = wrapping flags
 ; Exit: $0162 = updated cursor position
 ;       $17/$18 = script pointer (preserved or updated)
-; Calls: CODE_0096A0 (controller read)
-;        CODE_009BC4 (menu update)
+; Calls: WaitVblank (controller read)
+;        CodeLikelyLoadsProcessesThisData (menu update)
 ; Notes: Handles up/down navigation with wrapping
 ;        Checks button presses and updates cursor
 ;-------------------------------------------------------------------------------
 Menu_InputHandler:
 	rep #$30		; 16-bit A/X/Y
-	jsl.l CODE_0096A0 ; Read controller input
+	jsl.l WaitVblank ; Read controller input
 	lda.b $07	   ; Load button state
 	sta.b $15	   ; Store in temp
 	bit.w #$8000	; Test A button (bit 15)
@@ -11757,7 +11757,7 @@ Menu_InputHandler_NoWrapUp:
 Menu_UpdateDisplay:
 	rep #$30		; 16-bit A/X/Y
 	ldx.w #$b7dd	; Menu data pointer
-	jsr.w CODE_009BC4 ; Update menu display
+	jsr.w CodeLikelyLoadsProcessesThisData ; Update menu display
 	bra Menu_InputHandler ; Read input again
 
 ;-------------------------------------------------------------------------------
@@ -11828,7 +11828,7 @@ Menu_InputHandler_XButton_Wrap:
 ;
 ; Purpose: Menu display configuration
 ; Format: Unknown structure for menu system
-; Used by: CODE_009BC4 (menu update routine)
+; Used by: CodeLikelyLoadsProcessesThisData (menu update routine)
 ;-------------------------------------------------------------------------------
 MenuDisplayConfig:
 	db $2b,$8d,$03,$04,$00,$8f,$03,$00,$00,$01,$00,$08,$00,$09,$00,$42
@@ -11838,12 +11838,12 @@ MenuDisplayConfig:
 	db $30,$d9,$05,$31,$00,$42,$12,$00,$30,$7e,$07,$30,$7e
 
 ;-------------------------------------------------------------------------------
-; CODE_00B82A: IRQ handler (jitter fix - first variant)
+; CodeIrqHandlerJitterFixFirst: IRQ handler (jitter fix - first variant)
 ;
 ; Purpose: Interrupt handler for horizontal timing jitter correction
 ; Entry: Called by SNES IRQ interrupt
 ; Exit: NMI disabled
-;       Interrupt vector updated to CODE_00B86C
+;       Interrupt vector updated to InterruptVectorUpdatedCode
 ; Uses: SNES_NMITIMEN, SNES_SLHV, SNES_STAT78, SNES_OPVCT
 ; Notes: Samples vertical counter until jitter stabilizes
 ;        Uses $da bit 6 for jitter calculation toggle
@@ -11898,7 +11898,7 @@ IRQ_JitterFix_Skip:
 ;       NMI mode set
 ;       $d8 bit 6 set
 ;       Interrupt vector updated to IRQ_JitterFix2
-; Calls: CODE_008B69 (screen setup)
+; Calls: ScreenSetupRoutine (screen setup)
 ; Notes: Final stage of screen transition
 ;-------------------------------------------------------------------------------
 IRQ_ScreenOn:
@@ -11909,7 +11909,7 @@ IRQ_ScreenOn:
 	rep #$30		; 16-bit A/X/Y
 	phd ; Save direct page
 	phy ; Save Y
-	jsr.w CODE_008B69 ; Screen setup
+	jsr.w ScreenSetupRoutine ; Screen setup
 	sep #$20		; 8-bit accumulator
 	lda.b #$07	  ; V-IRQ timer low
 	sta.w SNES_VTIMEL ; Set V timer
@@ -11930,7 +11930,7 @@ IRQ_ScreenOn:
 ; Entry: Called by SNES IRQ interrupt
 ; Exit: NMI disabled
 ;       Interrupt vector updated to IRQ_ScreenOn2
-; Uses: Similar to CODE_00B82A but with different offset ($0f vs $9a)
+; Uses: Similar to CodeIrqHandlerJitterFixFirst but with different offset ($0f vs $9a)
 ; Notes: Second variant of jitter correction algorithm
 ;-------------------------------------------------------------------------------
 IRQ_JitterFix2:
@@ -11981,9 +11981,9 @@ IRQ_JitterFix2_Skip:
 ; Exit: Screen enabled ($0110 brightness)
 ;       NMI mode set
 ;       $d8 bit 5 set
-;       Interrupt vector updated to CODE_00B82A
-; Calls: CODE_008BA0, CODE_008B88 (screen setup routines)
-; Notes: Uses different screen setup sequence than CODE_00B86C
+;       Interrupt vector updated to CodeIrqHandlerJitterFixFirst
+; Calls: Label_008BA0, CallsLabelCodeScreenSetupRoutines (screen setup routines)
+; Notes: Uses different screen setup sequence than InterruptVectorUpdatedCode
 ;-------------------------------------------------------------------------------
 IRQ_ScreenOn2:
 	lda.w $0110	 ; Load brightness value
@@ -11991,9 +11991,9 @@ IRQ_ScreenOn2:
 	lda.b #$01	  ; NMI only mode
 	sta.w SNES_NMITIMEN ; Set interrupt mode
 	phd ; Save direct page
-	jsr.w CODE_008BA0 ; Screen setup routine 1
+	jsr.w Label_008BA0 ; Screen setup routine 1
 	phy ; Save Y
-	jsr.w CODE_008B88 ; Screen setup routine 2
+	jsr.w CallsLabelCodeScreenSetupRoutines ; Screen setup routine 2
 	sep #$20		; 8-bit accumulator
 	lda.b #$d8	  ; V-IRQ timer low
 	sta.w $4209	 ; Set V timer (direct address)
@@ -12075,20 +12075,20 @@ Anim_SetMode11:
 ; Input_PollWithToggle: Input polling loop with mode toggle
 ;
 ; Purpose: Poll controller input and toggle sprite mode on button press
-; Entry: $07 = controller input state (from CODE_0096A0)
+; Entry: $07 = controller input state (from WaitVblank)
 ;        $01 = current state
 ;        $05 = compare state
 ; Exit: A = button state
 ;       X = $01 value
 ;       Flags set based on comparison
 ;       $0505 may be updated (mode $2c)
-; Calls: CODE_0096A0 (controller read)
+; Calls: WaitVblank (controller read)
 ;        Sprite_SetMode2C (set sprite mode $2c)
 ; Notes: Loops until specific button condition met
 ;        XORs button state when no buttons pressed
 ;-------------------------------------------------------------------------------
 Input_PollWithToggle:
-	jsl.l CODE_0096A0 ; Read controller input
+	jsl.l WaitVblank ; Read controller input
 	bit.b $07	   ; Test button state
 	bne Input_PollWithToggle_Check ; If buttons pressed, check
 	eor.w #$ffff	; Invert button state
@@ -12114,9 +12114,9 @@ Input_PollWithToggle_Check:
 ; Purpose: Initialize game system and start main game loop
 ; Entry: Called at game start or reset
 ; Exit: Does not return (infinite game loop)
-; Calls: CODE_0C8000 (bank $0c init)
+; Calls: AddressC8000OriginalCode (bank $0c init)
 ;        System_Init (initialization)
-;        CODE_00CBEC (some setup)
+;        SetupRoutine (some setup)
 ; Notes: Sets up initial game state
 ;        Prepares for main game execution
 ;-------------------------------------------------------------------------------
@@ -12128,14 +12128,14 @@ Game_Initialize:
 	pea.w $5555	 ; Push $5555 (init marker?)
 	lda.w #$0080	; bit 7
 	tsb.w $00d6	 ; Set bit 7 of $d6
-	jsl.l CODE_0C8000 ; Call Bank $0c init
+	jsl.l AddressC8000OriginalCode ; Call Bank $0c init
 	jsr.w System_Init ; Initialization routine
 	stz.b $01	   ; Clear $01
 	sep #$20		; 8-bit accumulator
-	jsr.w CODE_00CBEC ; Setup routine
+	jsr.w SetupRoutine ; Setup routine
 	rep #$30		; 16-bit A/X/Y
 	ldx.w #$ba17	; Menu data pointer
-	jsr.w CODE_009BC4 ; Update menu
+	jsr.w CodeLikelyLoadsProcessesThisData ; Update menu
 	tsc ; Transfer stack to A
 	sta.w $0105	 ; Save stack pointer
 	lda.w #$0080	; bit 7
@@ -12150,7 +12150,7 @@ Game_Initialize:
 	sta.b $05	   ; Store in $05
 	pea.w LOOSE_OP_00BCF3 ; Push continue address
 	ldx.w #$ba14	; Menu data
-	jsr.w CODE_009BC4 ; Update menu
+	jsr.w CodeLikelyLoadsProcessesThisData ; Update menu
 	lda.w #$0f00	; Load $0f00
 	sta.b $8e	   ; Store in brightness?
 
@@ -12169,13 +12169,13 @@ Game_Initialize_Loop:
 	dec a; Decrement (0-based index)
 	sta.w $010e	 ; Store save slot index
 	bmi Game_StartNew ; If negative (new game), branch
-	jsr.w CODE_00C92B ; Get save slot address
+	jsr.w GetSaveSlotAddress ; Get save slot address
 	tax ; X = save address
 	lda.l $700000,x ; Load save data validity flag
 	beq Game_HandleEmptySlot ; If empty, branch
 	jsr.w Sprite_SetMode2D ; Set sprite mode $2d
 	lda.w $010e	 ; Load save slot index
-	jmp.w CODE_00CA63 ; Load game
+	jmp.w InitializeGraphicsComponent ; Load game
 
 ;-------------------------------------------------------------------------------
 ; Game - Start New
@@ -12237,22 +12237,22 @@ MenuConfig_TitleScreen:
 ; Entry: None
 ; Exit: Title screen initialized
 ;       $0111 bit 4 cleared/set for BG3 control
-; Calls: CODE_009A11 (graphics init)
-;        CODE_009BC4 (menu update)
-;        CODE_0C8000 (external init)
+; Calls: CallsCodeGraphicsInit (graphics init)
+;        CodeLikelyLoadsProcessesThisData (menu update)
+;        AddressC8000OriginalCode (external init)
 ; Notes: Sets up BG3 scrolling animation
 ;        Loads title screen palette from Bank $07
 ;-------------------------------------------------------------------------------
 TitleScreen_Init:
 	ldy.w #$1000	; Y = $1000 (destination)
 	lda.w #$0303	; Graphics mode $0303
-	jsr.w CODE_009A11 ; Initialize graphics
+	jsr.w CallsCodeGraphicsInit ; Initialize graphics
 	sep #$20		; 8-bit accumulator
 	ldx.w #$bae7	; Data pointer
-	jsr.w CODE_009BC4 ; Update menu
+	jsr.w CodeLikelyLoadsProcessesThisData ; Update menu
 	lda.b #$10	  ; bit 4 mask
 	trb.w $0111	 ; Clear bit 4 of $0111
-	jsl.l CODE_0C8000 ; External init call
+	jsl.l AddressC8000OriginalCode ; External init call
 	stz.w SNES_BG3VOFS ; Clear BG3 V-scroll low
 	stz.w SNES_BG3VOFS ; Clear BG3 V-scroll high
 	lda.b #$17	  ; Enable BG1+BG2+BG3+sprites
@@ -12260,7 +12260,7 @@ TitleScreen_Init:
 	lda.b #$00	  ; Start at Y=0
 
 TitleScreen_Init_ScrollLoop:
-	jsl.l CODE_0C8000 ; External call
+	jsl.l AddressC8000OriginalCode ; External call
 	sta.w SNES_BG3VOFS ; Set BG3 V-scroll low
 	stz.w SNES_BG3VOFS ; Clear BG3 V-scroll high
 	clc ; Clear carry
@@ -12302,7 +12302,7 @@ CharName_ErrorSound:
 ;       $1000-$1007 = entered name
 ; Calls: Input_PollWithToggle (input polling)
 ;        Sprite_SetMode2C, Anim_SetMode11 (sprite modes)
-;        CODE_009BC4 (menu update)
+;        CodeLikelyLoadsProcessesThisData (menu update)
 ; Notes: Supports character entry, deletion, confirmation
 ;        Max 8 characters per name
 ;-------------------------------------------------------------------------------
@@ -12327,7 +12327,7 @@ CharName_InputLoop:
 	lda.b $06	   ; Load selected character (row)
 	sta.w SNES_WRMPYA ; Set multiplicand
 	lda.b #$1a	  ; Load 26 (chars per row)
-	jsl.l CODE_00971E ; Multiply
+	jsl.l PerformMultiply ; Multiply
 	lda.b $05	   ; Load column
 	asl a; × 2
 	adc.w SNES_RDMPYL ; Add multiplication result
@@ -12338,7 +12338,7 @@ CharName_InputLoop:
 	sta.w $1000,y   ; Store in name buffer
 	jsr.w Anim_SetMode11 ; Set animation mode $11
 	ldx.w #$baed	; Menu data
-	jsr.w CODE_009BC4 ; Update menu
+	jsr.w CodeLikelyLoadsProcessesThisData ; Update menu
 	bra CharName_InputLoop ; Loop
 
 ;-------------------------------------------------------------------------------
@@ -12371,7 +12371,7 @@ CharName_InputLoop_Process:
 
 CharName_UpdateDisplay:
 	ldx.w #$baea	; Menu data
-	jsr.w CODE_009BC4 ; Update menu
+	jsr.w CodeLikelyLoadsProcessesThisData ; Update menu
 	bra CharName_InputLoop ; Loop
 
 MenuConfig_CharName1:
@@ -12417,7 +12417,7 @@ System_Init:
 	plb ; Set data bank to $07
 	ldx.w #$8030	; Source address
 	ldy.w #$0100	; Length (256 words)
-	jsl.l CODE_008E54 ; DMA transfer to VRAM
+	jsl.l DmaTransferVram ; DMA transfer to VRAM
 	plb ; Restore data bank
 	ldx.w #$1000	; VRAM address $1000
 	stx.b SNES_VMADDL-$2100 ; Set VRAM address
@@ -12425,7 +12425,7 @@ System_Init:
 	plb ; Set data bank to $04
 	ldx.w #$9840	; Source address
 	ldy.w #$0010	; Length (16 words)
-	jsl.l CODE_008DDF ; DMA transfer
+	jsl.l ExecuteSpecialTransfer ; DMA transfer
 	plb ; Restore data bank
 	ldx.w #$6080	; VRAM address $6080
 	stx.b SNES_VMADDL-$2100 ; Set VRAM address
@@ -12433,38 +12433,38 @@ System_Init:
 	plb ; Set data bank
 	ldx.w #$99c0	; Source address
 	ldy.w #$0004	; Length (4 words)
-	jsl.l CODE_008DDF ; DMA transfer
+	jsl.l ExecuteSpecialTransfer ; DMA transfer
 	plb ; Restore data bank
 	sep #$30		; 8-bit A/X/Y
 	pea.w $0007	 ; Bank $07
 	plb ; Set data bank
 	lda.b #$20	  ; Palette offset $20
 	ldx.b #$00	  ; Palette index 0
-	jsr.w CODE_008FB4 ; Load palette
+	jsr.w LoadPalette ; Load palette
 	lda.b #$30	  ; Palette offset $30
 	ldx.b #$08	  ; Palette index 8
-	jsr.w CODE_008FB4 ; Load palette
+	jsr.w LoadPalette ; Load palette
 	lda.b #$60	  ; Palette offset $60
 	ldx.b #$10	  ; Palette index 16
-	jsr.w CODE_008FB4 ; Load palette
+	jsr.w LoadPalette ; Load palette
 	lda.b #$70	  ; Palette offset $70
 	ldx.b #$18	  ; Palette index 24
-	jsr.w CODE_008FB4 ; Load palette
+	jsr.w LoadPalette ; Load palette
 	lda.b #$40	  ; Palette offset $40
 	ldx.b #$20	  ; Palette index 32
-	jsr.w CODE_008FB4 ; Load palette
+	jsr.w LoadPalette ; Load palette
 	lda.b #$50	  ; Palette offset $50
 	ldx.b #$28	  ; Palette index 40
-	jsr.w CODE_008FB4 ; Load palette
+	jsr.w LoadPalette ; Load palette
 	plb ; Restore data bank
 	ldx.b #$00	  ; Index 0
 	txa ; A = 0
 	pea.w $0007	 ; Bank $07
 	plb ; Set data bank
-	jsr.w CODE_00BC49 ; Load color data
+	jsr.w LoadColorData ; Load color data
 	ldx.b #$10	  ; Index 16
 	lda.b #$10	  ; Offset $10
-	jsr.w CODE_00BC49 ; Load color data
+	jsr.w LoadColorData ; Load color data
 	plb ; Restore data bank
 	lda.b #$80	  ; CGRAM address $80
 	sta.b SNES_CGADD-$2100 ; Set CGRAM address
@@ -12527,9 +12527,9 @@ System_Init:
 	lda.w #$0000	; Direct page = $0000
 	tcd ; Restore direct page
 	ldx.w #$c8e6	; Data pointer
-	jsr.w CODE_009BC4 ; Update menu
-	jsr.w CODE_00C4DB ; External routine
-	jsr.w CODE_00BD64 ; Clear memory routine
+	jsr.w CodeLikelyLoadsProcessesThisData ; Update menu
+	jsr.w CodeExternalRoutine ; External routine
+	jsr.w InitializeGraphicsDisplaySystem ; Clear memory routine
 	lda.w #$0200	; Load $0200
 	sta.w $01f0	 ; Store in $01f0
 	lda.w #$0020	; Load $0020
@@ -12538,7 +12538,7 @@ System_Init:
 	sta.b $03	   ; Store in $03
 	stz.b $05	   ; Clear $05
 	stz.b $01	   ; Clear $01
-	jmp.w CODE_00CF3F ; Jump to main routine
+	jmp.w MainRoutine ; Jump to main routine
 
 ;-------------------------------------------------------------------------------
 ; Palette_LoadColors: Load palette color data
@@ -12608,15 +12608,15 @@ Screen_SetUpdateFlag:
 ; Entry: $0e00 = state marker
 ; Exit: Screen reinitialized
 ;       Game state restored
-; Calls: CODE_00C7B8 (external routine)
+; Calls: FinalSetupRoutine (external routine)
 ;        System_Init (initialization)
-;        CODE_00C7DE or CODE_00C7F0 (conditional screen setup)
-;        CODE_009BC4 (menu update)
-;        CODE_00C795 (external routine)
+;        CodeCodeConditionalScreenSetup or ScreenSetupRoutine2 (conditional screen setup)
+;        CodeLikelyLoadsProcessesThisData (menu update)
+;        InitializePaletteSystem (external routine)
 ;        Menu_Handler (menu handler)
 ;        Memory_ClearBlock (clear memory)
-;        CODE_00C4DB (external routine)
-;        CODE_00CF3F (main routine)
+;        CodeExternalRoutine (external routine)
+;        MainRoutine (main routine)
 ; Notes: Handles screen transitions and state restoration
 ;-------------------------------------------------------------------------------
 Screen_TransitionReset:
@@ -12629,23 +12629,23 @@ Screen_TransitionReset:
 	lda.w $0e00	 ; Load state marker
 	pha ; Save on stack
 	stz.w $008e	 ; Clear $8e
-	jsl.l CODE_00C7B8 ; External routine
+	jsl.l FinalSetupRoutine ; External routine
 	jsr.w System_Init ; Initialize system
 	lda.w #$0001	; bit 0 mask
 	and.w $00d8	 ; Test bit 0 of $d8
 	bne Screen_TransitionReset_Alt ; If set, alternate path
-	jsr.w CODE_00C7DE ; Screen setup routine 1
+	jsr.w CodeCodeConditionalScreenSetup ; Screen setup routine 1
 	bra Screen_TransitionReset_Continue ; Continue
 
 Screen_TransitionReset_Alt:
-	jsr.w CODE_00C7F0 ; Screen setup routine 2
+	jsr.w ScreenSetupRoutine2 ; Screen setup routine 2
 
 Screen_TransitionReset_Continue:
 	ldx.w #$be80	; Data pointer
-	jsr.w CODE_009BC4 ; Update menu
+	jsr.w CodeLikelyLoadsProcessesThisData ; Update menu
 	lda.w #$0020	; bit 5 mask
 	tsb.w $00d2	 ; Set bit 5 of $d2
-	jsl.l CODE_00C795 ; External routine
+	jsl.l InitializePaletteSystem ; External routine
 	lda.w #$00a0	; Load $a0
 	sta.w $01f0	 ; Store in $01f0
 	lda.w #$000a	; Load $0a
@@ -12659,19 +12659,19 @@ Screen_TransitionReset_Continue:
 	rep #$30		; 16-bit A/X/Y
 	lda.w $0105	 ; Load stack pointer
 	tcs ; Restore stack
-	jsl.l CODE_00C7B8 ; External routine
+	jsl.l FinalSetupRoutine ; External routine
 	jsr.w Memory_ClearBlock ; Clear memory
 	ldx.w #$c8e9	; Data pointer
-	jsr.w CODE_009BC4 ; Update menu
-	jsl.l CODE_0C8000 ; External init
+	jsr.w CodeLikelyLoadsProcessesThisData ; Update menu
+	jsl.l AddressC8000OriginalCode ; External init
 	lda.w #$0040	; Load $40
 	sta.w $01f0	 ; Store in $01f0
 	lda.w #$0004	; Load $04
 	sta.w $01f2	 ; Store in $01f2
 	pla ; Restore state marker
 	sta.w $0e00	 ; Store back
-	jsr.w CODE_00C78D ; External routine
-	jsr.w CODE_008230 ; External routine
+	jsr.w ExternalRoutine2 ; External routine
+	jsr.w AdditionalSetupSeeBelow ; External routine
 	pld ; Restore direct page
 	plb ; Restore data bank
 	plp ; Restore processor status
@@ -12684,11 +12684,11 @@ Screen_TransitionReset_Continue:
 ; Entry: None
 ; Exit: Screen updated
 ; Calls: Screen_UpdateFull (screen update)
-;        CODE_00C795 (graphics routine)
+;        InitializePaletteSystem (graphics routine)
 ;-------------------------------------------------------------------------------
 Screen_UpdateAndGraphics:
 	jsr.w Screen_UpdateFull ; Screen update
-	jmp.w CODE_00C795 ; Graphics routine
+	jmp.w InitializePaletteSystem ; Graphics routine
 
 ;-------------------------------------------------------------------------------
 ; Screen_UpdateFull: Screen update and initialization
@@ -12708,13 +12708,13 @@ Screen_UpdateFull:
 	pea.w $0000	 ; Direct page = $0000
 	pld ; Set direct page
 	ldx.w #$bd61	; Data pointer
-	jsr.w CODE_009BC4 ; Update menu
-	jsl.l CODE_0C8000 ; External init
-	jsr.w CODE_008EC4 ; External routine
-	jsr.w CODE_008C3D ; External routine
-	jsr.w CODE_008D29 ; External routine
-	jsl.l CODE_009B2F ; External routine
-	jsr.w CODE_00A342 ; External routine
+	jsr.w CodeLikelyLoadsProcessesThisData ; Update menu
+	jsl.l AddressC8000OriginalCode ; External init
+	jsr.w InitializeSystem2 ; External routine
+	jsr.w InitializeSystem ; External routine
+	jsr.w ExternalRoutine ; External routine
+	jsl.l FinalSystemInitialization ; External routine
+	jsr.w ImportedSegmentCodeCode ; External routine
 	lda.b #$10	  ; bit 4 mask
 	tsb.w $00d6	 ; Set bit 4 of $d6
 	ldx.w #$fff0	; Load $fff0
@@ -12782,7 +12782,7 @@ SystemData_Config2:
 ; Exit: User selection processed
 ; Calls: Input_PollWithToggle (input polling)
 ;        Sprite_SetMode2C, Anim_SetMode10 (sprite modes)
-;        CODE_009BC4 (menu update)
+;        CodeLikelyLoadsProcessesThisData (menu update)
 ; Notes: Complex menu navigation system
 ;-------------------------------------------------------------------------------
 Menu_Handler:
@@ -12866,7 +12866,7 @@ Menu_Handler_Cancel:
 
 Menu_Handler_Update:
 	ldx.w #$be80	; Data pointer
-	jsr.w CODE_009BC4 ; Update menu
+	jsr.w CodeLikelyLoadsProcessesThisData ; Update menu
 	bra Menu_Handler_Loop ; Loop
 
 SystemData_Config3:
@@ -12895,7 +12895,7 @@ SystemData_Config7:
 ;        $1090 = companion status flags (negative if no companion)
 ; Exit: $14 = selected option or $ff
 ;       $7e3664 = selected option stored
-; Calls: Anim_SetMode10 (update sprite), CODE_009BC4 (show menu)
+; Calls: Anim_SetMode10 (update sprite), CodeLikelyLoadsProcessesThisData (show menu)
 ; Notes: Handles single-character vs two-character party
 ;        Saves/restores menu state on stack
 ;-------------------------------------------------------------------------------
@@ -12983,7 +12983,7 @@ Menu_PartySelection_Update:
 
 Menu_PartySelection_Show:
 	ldx.w #$bf48	; Menu data
-	jsr.w CODE_009BC4 ; Show menu
+	jsr.w CodeLikelyLoadsProcessesThisData ; Show menu
 	ldx.w #$fff0	; Position offset (-16)
 	stx.b $8e	   ; Set position
 
@@ -12996,7 +12996,7 @@ Menu_PartySelection_Show:
 ; Exit: $01 = selected option or $ff for cancel
 ; Calls: Input_PollWithToggle (input polling)
 ;        Sprite_SetMode2C, Anim_SetMode11, Anim_SetMode10 (sprite/animation modes)
-;        CODE_009BC4 (menu update)
+;        CodeLikelyLoadsProcessesThisData (menu update)
 ; Notes: Supports cursor wrapping, confirmation, cancellation
 ;-------------------------------------------------------------------------------
 Menu_OptionSelection:
@@ -13052,7 +13052,7 @@ LOOSE_OP_00BECE:
 ;-------------------------------------------------------------------------------
 ; Purpose: Orphaned long call to Bank $0c
 ; Reachability: DEAD CODE - No branches or calls to this address
-; Analysis: PHA, jsl CODE_0C8000 (more code follows)
+; Analysis: PHA, jsl AddressC8000OriginalCode (more code follows)
 ;           Pushes accumulator and calls Bank $0c code
 ; Technical: Originally labeled UNREACH_00BED5
 ; Status: Preserved for historical reference
@@ -13064,7 +13064,7 @@ Menu_OptionSelection_UpdateDisplay:
 	stx.w $015f	 ; Store input state
 	jsr.w Anim_SetMode10 ; Set animation mode $10
 	ldx.w #$be80	; Data pointer
-	jsr.w CODE_009BC4 ; Update menu
+	jsr.w CodeLikelyLoadsProcessesThisData ; Update menu
 	bra Menu_OptionSelection ; Loop
 
 ;-------------------------------------------------------------------------------
@@ -13072,7 +13072,7 @@ Menu_OptionSelection_UpdateDisplay:
 ;-------------------------------------------------------------------------------
 ; Purpose: Orphaned menu polling/input handler
 ; Reachability: DEAD CODE - No branches or calls to this address
-; Analysis: lda #$ccb0, jsl CODE_00B930 (menu polling)
+; Analysis: lda #$ccb0, jsl AnalysisLdaCcb0JslCodeMenu (menu polling)
 ;           Complex multi-byte sequence (25 bytes total)
 ; Technical: Originally labeled UNREACH_00BEE5
 ; Status: Preserved for historical reference
@@ -13088,7 +13088,7 @@ UNREACH_00BEE5:
 ; Entry: $01 = current option
 ;        $03 = menu data pointer
 ; Exit: Menu updated
-; Calls: CODE_009BC4 (menu update)
+; Calls: CodeLikelyLoadsProcessesThisData (menu update)
 ;        Input_PollWithToggle (input polling)
 ;        Anim_SetMode11 (animation mode)
 ; Notes: Handles multi-option menus with cursor navigation
@@ -13098,7 +13098,7 @@ Menu_MultiOption:
 	plb ; Set data bank
 	jsr.w Anim_SetMode11 ; Set animation mode $11
 	ldx.w #$becb	; Data pointer
-	jsr.w CODE_009BC4 ; Update menu
+	jsr.w CodeLikelyLoadsProcessesThisData ; Update menu
 
 Menu_MultiOption_Loop:
 	lda.w #$ccb0	; Button mask
@@ -13138,14 +13138,14 @@ Menu_MultiOption_Process:
 ;        $01, $03, $8e saved on stack
 ;        $14 = result code
 ; Exit: Restored state, A = result code
-; Calls: CODE_009BC4 (menu update)
+; Calls: CodeLikelyLoadsProcessesThisData (menu update)
 ; Notes: Cleanup routine for item management
 ;-------------------------------------------------------------------------------
 Menu_Item_CleanupReturn:
 	lda.b #$04	  ; bit 2 mask
 	trb.w $00da	 ; Clear bit 2 of $da
 	ldx.w #$bf48	; Menu data
-	jsr.w CODE_009BC4 ; Update menu
+	jsr.w CodeLikelyLoadsProcessesThisData ; Update menu
 	plx ; Restore X
 	stx.b $03	   ; Restore $03
 	plx ; Restore X
@@ -13160,7 +13160,7 @@ SystemData_Config11:
 	db $9b,$8f,$03 ; Menu configuration
 
 ;-------------------------------------------------------------------------------
-; Inventory Item Discard System (Menu_Item_Discard - CODE_00C012)
+; Inventory Item Discard System (Menu_Item_Discard - InventoryItemDiscardSystemMenuItem)
 ;-------------------------------------------------------------------------------
 Menu_Item_Discard:
 	lda.w #$0504	; Menu mode $0504
@@ -13183,11 +13183,11 @@ Menu_Item_Discard_Input:
 	jsr.w Anim_SetMode10 ; Set animation mode $10
 	stz.b $8e	   ; Clear $8e
 	ldx.w #$c032	; Menu data
-	jmp.w CODE_009BC4 ; Update menu and return
+	jmp.w CodeLikelyLoadsProcessesThisData ; Update menu and return
 
 Menu_Item_Discard_Display:
 	ldx.w #$c02f	; Menu data
-	jsr.w CODE_009BC4 ; Update menu
+	jsr.w CodeLikelyLoadsProcessesThisData ; Update menu
 	bra Menu_Item_Discard_Input ; Loop
 
 Menu_Item_Discard_Validate:
@@ -13227,9 +13227,9 @@ Menu_Item_Discard_UpdateDisplay:
 	lda.w $04df	 ; Load character ID
 	sta.w $0505	 ; Store in $0505
 	rep #$30		; 16-bit A/X/Y
-	jsr.w CODE_00DAA5 ; External routine
+	jsr.w ExternalRoutine3 ; External routine
 	ldx.w #$c035	; Menu data
-	jsr.w CODE_009BC4 ; Update menu
+	jsr.w CodeLikelyLoadsProcessesThisData ; Update menu
 	bra Menu_Item_Discard_Display ; Loop
 
 ;-------------------------------------------------------------------------------
@@ -13284,18 +13284,18 @@ Menu_Item_StoreHP:
 ; Purpose: Show confirmation dialog for discarding items
 ; Entry: A = item ID
 ; Exit: Carry clear if confirmed (A=1), carry set if cancelled
-; Calls: CODE_028AE0, CODE_00B908, CODE_00BE83
+; Calls: BankRoutine, NormalPositionCallB908, CallsCodeCodeCode
 ; Notes: Uses $04e0 for input tracking
 ;-------------------------------------------------------------------------------
 Menu_Item_ConfirmDiscard:
 	phx ; Save X
 	sep #$20		; 8-bit accumulator
 	sta.w $043a	 ; Store item ID
-	jsl.l CODE_028AE0 ; External routine
-	jsr.w CODE_00B908 ; Set sprite mode $2d
+	jsl.l BankRoutine ; External routine
+	jsr.w NormalPositionCallB908 ; Set sprite mode $2d
 	rep #$30		; 16-bit A/X/Y
 	lda.w #$0010	; Menu type $10
-	jsr.w CODE_00BE83 ; Show confirmation menu
+	jsr.w CallsCodeCodeCode ; Show confirmation menu
 	plx ; Restore X
 	and.w #$00ff	; Mask result
 	cmp.w #$0001	; Check if confirmed
@@ -13305,7 +13305,7 @@ SystemData_Config12:
 	db $e8,$8f,$03,$dd,$8f,$03,$8a,$8f,$03
 
 ;-------------------------------------------------------------------------------
-; Spell Equip/Unequip System (Menu_Spell_Equip - CODE_00C1D8)
+; Spell Equip/Unequip System (Menu_Spell_Equip - SpellEquipUnequipSystemMenuSpell)
 ;-------------------------------------------------------------------------------
 Menu_Spell_Equip:
 	lda.w #$0406	; Menu mode $0406
@@ -13336,7 +13336,7 @@ Menu_Spell_ProcessInput:
 	jsr.w Anim_SetMode10 ; Set animation mode $10
 	stz.b $8e	   ; Clear $8e
 	ldx.w #$c1d6	; Menu data
-	jmp.w CODE_009BC4 ; Update menu and return
+	jmp.w CodeLikelyLoadsProcessesThisData ; Update menu and return
 
 ;-------------------------------------------------------------------------------
 ; Menu Spell - Spell Slot 0 Handler
@@ -13354,21 +13354,21 @@ Menu_Spell_Slot0Handler:
 	and.w #$007f                         ;00C067|297F00  |      ; Mask to 7 bits
 	cmp.w #$0007                         ;00C06A|C90700  |      ; Check if >= 7
 	bcc Menu_Spell_ProcessInput          ;00C06D|90D5    |00C044; If < 7, loop
-	jsr.w CODE_00C1B1                    ;00C06F|20B1C1  |00C1B1; Confirm spell use
+	jsr.w ConfirmSpellUse                    ;00C06F|20B1C1  |00C1B1; Confirm spell use
 	beq Menu_Spell_ProcessInput          ;00C072|F0D3    |00C047; If cancelled, loop
 	dec.w $1018,x                        ;00C074|DE1810  |011018; Decrement MP
 	sep #$20                             ;00C077|E220    |      ; 8-bit accumulator
 	lda.b #$14                           ;00C079|A914    |      ; Load spell effect ID
 	sta.w $043a                          ;00C07B|8D3A04  |01043A; Store effect
-	jsl.l CODE_028AE0                    ;00C07E|22E08A02|028AE0; Call effect handler
+	jsl.l BankRoutine                    ;00C07E|22E08A02|028AE0; Call effect handler
 	lda.w $04df                          ;00C082|ADDF04  |0104DF; Load character ID
 	sta.w $0505                          ;00C085|8D0505  |010505; Store for update
 	lda.b #$14                           ;00C088|A914    |      ; Load menu ID
-	jmp.w CODE_00BCF4                    ;00C08A|4CF4BC  |00BCF4; Jump to menu handler
+	jmp.w JumpMenuHandler                    ;00C08A|4CF4BC  |00BCF4; Jump to menu handler
 
 Menu_Spell_DisplayMenu:
 	ldx.w #$c1d3	; Menu data
-	jsr.w CODE_009BC4 ; Update menu
+	jsr.w CodeLikelyLoadsProcessesThisData ; Update menu
 	bra Menu_Spell_ProcessInput ; Loop
 
 ;-------------------------------------------------------------------------------
@@ -13403,7 +13403,7 @@ Menu_Spell_ValidateSlot:
 	sec ; Set carry
 	sbc.b $02	   ; Subtract selection
 	and.w #$00ff	; Mask to 8 bits
-	jsr.w CODE_0097F2 ; Get bit mask
+	jsr.w GetBitMask ; Get bit mask
 	and.w $1038,x   ; Test spell equipped
 	beq Menu_Spell_InvalidSpellJump ; If not equipped, error
 	lda.w $1018,x   ; Load current MP
@@ -13413,10 +13413,10 @@ Menu_Spell_ValidateSlot:
 	and.w #$00ff	; Mask to 8 bits
 	beq Menu_Spell_Slot0Handler ; If slot 0, special case
 	cmp.w #$0002	; Check if slot 2
-	bcc CODE_00C13B ; If slot 1, HP healing
-	beq CODE_00C11F ; If slot 2, cure/status
-	jsr.w CODE_00C1B1 ; Confirm spell use
-	beq CODE_00C138 ; If cancelled, loop
+	bcc IfSlotHpHealing ; If slot 1, HP healing
+	beq IfSlotCureStatus ; If slot 2, cure/status
+	jsr.w ConfirmSpellUse ; Confirm spell use
+	beq IfCancelledLoop ; If cancelled, loop
 	cmp.w #$0001	; Check result
 	beq Menu_Spell_DecrementMP_Char0 ; If 1, branch
 	tax ; X = character offset
@@ -13443,7 +13443,7 @@ Menu_Spell_DecrementMP_Do:
 	sta.w $0505	 ; Store in $0505
 	rep #$30		; 16-bit A/X/Y
 	ldx.w #$c035	; Menu data
-	jsr.w CODE_009BC4 ; Update menu
+	jsr.w CodeLikelyLoadsProcessesThisData ; Update menu
 	jmp.w Menu_Spell_DisplayMenu ; Loop
 
 Menu_Spell_UseCure:
@@ -13467,8 +13467,8 @@ Menu_Spell_ReturnToInput:
 	jmp.w Menu_Spell_ProcessInput ; Loop
 
 Menu_Spell_UseHeal:
-	jsr.w CODE_00C1B1 ; Confirm spell use
-	beq CODE_00C138 ; If cancelled, loop
+	jsr.w ConfirmSpellUse ; Confirm spell use
+	beq IfCancelledLoop ; If cancelled, loop
 	pha ; Save character offset
 	lda.w $1025,x   ; Load spell power
 	and.w #$00ff	; Mask to 8 bits
@@ -13482,7 +13482,7 @@ Menu_Spell_UseHeal:
 	tay ; Y = recovery
 	lda.b $01,s	 ; Load character from stack
 	cmp.w #$0001	; Check if character 1
-	beq CODE_00C16F ; If yes, skip HP calc
+	beq IfYesSkipHpCalc ; If yes, skip HP calc
 	lda.w $1016	 ; Load max HP
 	jsr.w Menu_Spell_CalcPercent ; Calculate percentage
 	adc.w $1014	 ; Add current HP
@@ -13522,14 +13522,14 @@ Menu_Spell_HealComplete:
 ;-------------------------------------------------------------------------------
 Menu_Spell_CalcPercent:
 	sta.b $9c	   ; Store max HP
-	jsl.l CODE_0096B3 ; Multiply routine
+	jsl.l ExitQuotientRemainderViaCode ; Multiply routine
 	lda.b $9e	   ; Load result low
 	sta.b $98	   ; Store in $98
 	lda.b $a0	   ; Load result high
 	sta.b $9a	   ; Store in $9a
 	lda.w #$0064	; Divisor = 100
 	sta.b $9c	   ; Store divisor
-	jsl.l CODE_0096E4 ; Divide routine
+	jsl.l ExitResultViaCode ; Divide routine
 	lda.b $03,s	 ; Load character offset from stack
 	cmp.w #$0080	; Check if companion
 	bne Menu_Spell_ReturnPercent ; If not, skip
@@ -13546,7 +13546,7 @@ Menu_Spell_ReturnPercent:
 ; Purpose: Confirm spell usage and show dialog
 ; Entry: $02 = spell slot
 ; Exit: A = character offset (0 or $80), Z flag set if cancelled
-; Calls: CODE_028AE0, CODE_00B908, CODE_00BE83
+; Calls: BankRoutine, NormalPositionCallB908, CallsCodeCodeCode
 ;-------------------------------------------------------------------------------
 Menu_Spell_ConfirmUse:
 	phx ; Save X
@@ -13555,11 +13555,11 @@ Menu_Spell_ConfirmUse:
 	clc ; Clear carry
 	adc.b #$14	  ; Add $14 (spell offset)
 	sta.w $043a	 ; Store spell ID
-	jsl.l CODE_028AE0 ; External routine
-	jsr.w CODE_00B908 ; Set sprite mode $2d
+	jsl.l BankRoutine ; External routine
+	jsr.w NormalPositionCallB908 ; Set sprite mode $2d
 	lda.w $04e0	 ; Load input flags
 	rep #$30		; 16-bit A/X/Y
-	jsr.w CODE_00BE83 ; Show confirmation menu
+	jsr.w CallsCodeCodeCode ; Show confirmation menu
 	plx ; Restore X
 	and.w #$00ff	; Mask result
 	cmp.w #$00ff	; Check if cancelled
@@ -13569,7 +13569,7 @@ SystemData_Config13:
 	db $3a,$90,$03,$dd,$8f,$03
 
 ;-------------------------------------------------------------------------------
-; Battle Settings Menu (Menu_BattleSettings - CODE_00C348)
+; Battle Settings Menu (Menu_BattleSettings - BattleSettingsMenuMenuBattlesettingsCode)
 ;-------------------------------------------------------------------------------
 Menu_BattleSettings:
 	lda.w #$0020	; bit 5 mask
@@ -13618,7 +13618,7 @@ Menu_BattleSettings_YButton:
 	sep #$20                             ;00C20E|E220    |      ; 8-bit accumulator
 	lda.w $1090                          ;00C210|AD9010  |011090; Load companion status
 	bmi Menu_BattleSettings_InputLoop    ;00C213|30D6    |00C1EB; If negative, loop
-	jmp.w CODE_00C2D9                    ;00C215|4CD9C2  |00C2D9; Jump to submenu
+	jmp.w JumpSubmenu                    ;00C215|4CD9C2  |00C2D9; Jump to submenu
 
 Menu_BattleSettings_Process:
 	txa ; Transfer button state
@@ -13721,7 +13721,7 @@ Menu_BattleSettings_Refresh:
 	ldx.b $01	   ; Load current value
 	stx.b $05	   ; Store in $05
 	ldx.w #$c345	; Menu data
-	jsr.w CODE_009BC4 ; Update menu
+	jsr.w CodeLikelyLoadsProcessesThisData ; Update menu
 	jmp.w Menu_BattleSettings_InputLoop ; Loop
 
 Menu_BattleSettings_ToggleSetting:
@@ -13821,7 +13821,7 @@ Menu_SaveDelete:
 
 Menu_SaveDelete_InputLoop:
 	lda.w #$8c80	; Button mask
-	jsr.w CODE_00B930 ; Poll input
+	jsr.w AnalysisLdaCcb0JslCodeMenu ; Poll input
 	bne Menu_SaveDelete_UpdateCursor ; If button pressed, process
 	bit.w #$0080	; Test B button
 	bne Menu_SaveDelete_Confirm ; If pressed, cancel
@@ -13829,12 +13829,12 @@ Menu_SaveDelete_InputLoop:
 	beq Menu_SaveDelete_InputLoop ; If not pressed, loop
 
 Menu_SaveDelete_Exit:
-	jsr.w CODE_00B91C ; Set animation mode $10
+	jsr.w SetAnimationMode ; Set animation mode $10
 	stz.b $8e	   ; Clear $8e
 
 
 Menu_SaveDelete_Confirm:
-	jsr.w CODE_00B908 ; Set sprite mode $2d
+	jsr.w NormalPositionCallB908 ; Set sprite mode $2d
 	sep #$20		; 8-bit accumulator
 	lda.b $02	   ; Load save slot selection
 	inc a; +1 (1-based index)
@@ -13843,12 +13843,12 @@ Menu_SaveDelete_Confirm:
 	rep #$30		; 16-bit A/X/Y
 	and.w #$00ff	; Mask to 8 bits
 	sta.w $010e	 ; Store slot index
-	jsr.w CODE_00C9D3 ; Get save slot address
+	jsr.w GetSaveSlotAddress2 ; Get save slot address
 	lda.w #$0040	; bit 6 mask
 	tsb.w $00de	 ; Set bit 6 of $de
-	jsr.w CODE_00CF3F ; Clear save data
+	jsr.w MainRoutine ; Clear save data
 	ldx.w #$c3d8	; Menu data
-	jsr.w CODE_009BC4 ; Update menu
+	jsr.w CodeLikelyLoadsProcessesThisData ; Update menu
 	lda.b $9e	   ; Load result
 	bit.w #$8000	; Test bit 15
 	bne Menu_SaveDelete_Exit ; If set, return
@@ -13866,7 +13866,7 @@ Menu_SaveDelete_UpdateCursor:
 	cmp.b $06	   ; Compare with previous
 	beq Menu_SaveDelete_UpdateDisplay ; If same, skip update
 	sta.b $06	   ; Store new selection
-	jsr.w CODE_00B91C ; Update sprite
+	jsr.w SetAnimationMode ; Update sprite
 	lda.b $06	   ; Reload selection
 
 Menu_SaveDelete_UpdateDisplay:
@@ -13876,7 +13876,7 @@ Menu_SaveDelete_UpdateDisplay:
 	sta.l $7f56da,x ; Store to WRAM indexed
 	lda.b #$08	  ; bit 3 mask
 	tsb.w $00d4	 ; Set bit 3
-	jsl.l CODE_0C8000 ; Call external routine
+	jsl.l AddressC8000OriginalCode ; Call external routine
 	lda.b #$08	  ; bit 3 mask
 	trb.w $00d4	 ; Clear bit 3
 	rep #$30		; 16-bit A/X/Y
@@ -13897,17 +13897,17 @@ Menu_Scroll:
 
 Menu_Scroll_InputLoop:
 	lda.w #$cf30	; Button mask
-	jsr.w CODE_00B930 ; Poll input
+	jsr.w AnalysisLdaCcb0JslCodeMenu ; Poll input
 	bit.w #$0300	; Test Y/X buttons
 	bne Menu_Scroll_Process ; If pressed, process
 	bit.w #$0c00	; Test L/R buttons
 	bne Menu_Scroll_Display ; If pressed, refresh
 	bit.w #$8000	; Test A button
 	beq Menu_Scroll_InputLoop ; If not pressed, loop
-	jsr.w CODE_00B91C ; Update sprite
+	jsr.w SetAnimationMode ; Update sprite
 	stz.b $8e	   ; Clear position
 	ldx.w #$c444	; Menu data
-	jmp.w CODE_009BC4 ; Show menu
+	jmp.w CodeLikelyLoadsProcessesThisData ; Show menu
 
 Menu_Scroll_Process:
 	sep #$20		; 8-bit accumulator
@@ -13946,7 +13946,7 @@ Menu_Scroll_Update:
 
 Menu_Scroll_Display:
 	ldx.w #$c441	; Menu data
-	jsr.w CODE_009BC4 ; Update menu
+	jsr.w CodeLikelyLoadsProcessesThisData ; Update menu
 	bra Menu_Scroll_InputLoop ; Loop
 
 SystemData_Config17:
@@ -13967,17 +13967,17 @@ Menu_Scroll2:
 
 Menu_Scroll2_InputLoop:
 	lda.w #$cf30	; Button mask
-	jsr.w CODE_00B930 ; Poll input
+	jsr.w AnalysisLdaCcb0JslCodeMenu ; Poll input
 	bit.w #$0300	; Test Y/X buttons
 	bne Menu_Scroll2_Process ; If pressed, process
 	bit.w #$0c00	; Test L/R buttons
 	bne Menu_Scroll2_Display ; If pressed, refresh
 	bit.w #$8000	; Test A button
 	beq Menu_Scroll2_InputLoop ; If not pressed, loop
-	jsr.w CODE_00B91C ; Update sprite
+	jsr.w SetAnimationMode ; Update sprite
 	stz.b $8e	   ; Clear position
 	ldx.w #$c49f	; Menu data
-	jmp.w CODE_009BC4 ; Show menu
+	jmp.w CodeLikelyLoadsProcessesThisData ; Show menu
 
 Menu_Scroll2_Process:
 	sep #$20		; 8-bit accumulator
@@ -14004,7 +14004,7 @@ Menu_Scroll2_Update:
 
 Menu_Scroll2_Display:
 	ldx.w #$c49c	; Menu data
-	jsr.w CODE_009BC4 ; Update menu
+	jsr.w CodeLikelyLoadsProcessesThisData ; Update menu
 	bra Menu_Scroll2_InputLoop ; Loop
 
 SystemData_Config19:
@@ -14021,7 +14021,7 @@ Menu_WaitInput:
 	stx.b $8e	   ; Set position
 
 Menu_WaitInput_Loop:
-	jsl.l CODE_0096A0 ; Call external routine
+	jsl.l WaitVblank ; Call external routine
 	lda.w #$0080	; bit 7 mask
 	and.w $00d9	 ; Test flag
 	beq Menu_WaitInput_Poll ; If clear, continue
@@ -14033,30 +14033,30 @@ Menu_WaitInput_Poll:
 	beq Menu_WaitInput_Loop ; If no button, loop
 	and.w #$8000	; Test A button
 	bne Menu_WaitInput_Confirm ; If pressed, confirm
-	jsr.w CODE_00B912 ; Update sprite mode
+	jsr.w AlternateCharacterUpdateRoutine ; Update sprite mode
 	bra Menu_WaitInput_Loop ; Loop
 
 Menu_WaitInput_Confirm:
-	jsr.w CODE_00B91C ; Update sprite
+	jsr.w SetAnimationMode ; Update sprite
 	stz.b $8e	   ; Clear position
 
 
 SystemData_Config21:
 	db $d1,$9c,$03
 ;===============================================================================
-; WRAM Buffer Management & Screen Setup (CODE_00C4DB - CODE_00C7DD)
+; WRAM Buffer Management & Screen Setup (CodeExternalRoutine - WramBufferManagementScreenSetupCode)
 ;===============================================================================
 ; This section manages WRAM buffers at $7f5000-$7f5700 for battle menus
 ; and handles screen initialization for various game modes
 ;===============================================================================
 
-; CODE_00C4DB - already a stub, implementing now
+; CodeExternalRoutine - already a stub, implementing now
 WRAM_BattleMenu_Init:
 	jsr.w WRAM_ClearBuffer1 ; Clear WRAM buffer 1 ($7f5000)
 	jsr.w WRAM_ClearBuffer2 ; Clear WRAM buffer 2 ($7f51b7)
 	jsr.w WRAM_ClearBuffer3 ; Clear WRAM buffer 3 ($7f536e)
 	jsr.w WRAM_ClearBuffer4 ; Clear WRAM buffer 4 ($7f551e)
-	jsr.w WRAM_FillData ; Jump to CODE_00C5B5 (WRAM $7e3000)
+	jsr.w WRAM_FillData ; Jump to JumpCodeWramE3000 (WRAM $7e3000)
 	ldx.w #$c51b	; Source data pointer
 	ldy.w #$5000	; Dest: WRAM $7f5000
 	lda.w #$0006	; 7 bytes
@@ -14098,7 +14098,7 @@ WRAM_BattleMenu_FillSection:
 WRAM_BattleMenu_FillLoop:
 	sep #$20		; 8-bit accumulator
 	lda.b #$00	  ; Value 0
-	jsr.w CODE_0099EA ; Write to WRAM
+	jsr.w WriteWram ; Write to WRAM
 	rep #$30		; 16-bit A/X/Y
 	tya ; Y to A
 	adc.w #$0020	; Add $20 (32 bytes)
@@ -14309,19 +14309,19 @@ Battle_SetupSprites4:
 	jsr.w WRAM_ClearBuffer2 ;00C6E8|2076C5  |00C576;
 	ldx.w #$c73f	;00C6EB|A23FC7  |      ;
 	ldy.w #$527d	;00C6EE|A07D52  |      ;
-	jsr.w CODE_00C75B ;00C6F1|205BC7  |00C75B;
-	jsr.w CODE_00C5A0 ;00C6F4|20A0C5  |00C5A0;
+	jsr.w Sub_00C75B ;00C6F1|205BC7  |00C75B;
+	jsr.w Sub_00C5A0 ;00C6F4|20A0C5  |00C5A0;
 	ldx.w #$c744	;00C6F7|A244C7  |      ;
 	ldy.w #$55b4	;00C6FA|A0B455  |      ;
-	jsr.w CODE_00C75B ;00C6FD|205BC7  |00C75B;
+	jsr.w Sub_00C75B ;00C6FD|205BC7  |00C75B;
 	ldx.w #$55b4	;00C700|A2B455  |      ;
 	ldy.w #$0000	;00C703|A00000  |      ;
 	lda.l $000101   ;00C706|AF010100|000101;
-	jsr.w CODE_00C729 ;00C70A|2029C7  |00C729;
+	jsr.w Sub_00C729 ;00C70A|2029C7  |00C729;
 	ldx.w #$562c	;00C70D|A22C56  |      ;
 	ldy.w #$000c	;00C710|A00C00  |      ;
 	lda.l $000102   ;00C713|AF020100|000102;
-	jsr.w CODE_00C729 ;00C717|2029C7  |00C729;
+	jsr.w Sub_00C729 ;00C717|2029C7  |00C729;
 	ldx.w #$56a4	;00C71A|A2A456  |      ;
 	ldy.w #$0018	;00C71D|A01800  |      ;
 	lda.l $000103   ;00C720|AF030100|000103;
@@ -14415,7 +14415,7 @@ Screen_WaitForUpdate_Loop:
 	cmp.w $0110	 ;00C7A8|CD1001  |000110;
 	beq Screen_WaitForUpdate_Done ;00C7AB|F009    |00C7B6;
 	inc.w $0110	 ;00C7AD|EE1001  |000110;
-	jsl.l CODE_0C8000 ;00C7B0|2200800C|0C8000;
+	jsl.l AddressC8000OriginalCode ;00C7B0|2200800C|0C8000;
 	bra Screen_WaitForUpdate_Loop ;00C7B4|80F2    |00C7A8;
 
 Screen_WaitForUpdate_Done:
@@ -14433,7 +14433,7 @@ Screen_FadeOut_Loop:
 	beq Screen_FadeOut_Done ;00C7C3|F00A    |00C7CF;
 	dec a;00C7C5|3A      |      ;
 	sta.w $0110	 ;00C7C6|8D1001  |010110;
-	jsl.l CODE_0C8000 ;00C7C9|2200800C|0C8000;
+	jsl.l AddressC8000OriginalCode ;00C7C9|2200800C|0C8000;
 	bra Screen_FadeOut_Loop ;00C7CD|80F2    |00C7C1;
 
 Screen_FadeOut_Done:
@@ -14449,9 +14449,9 @@ Menu_Init_Battle:
 	jsr.w Screen_Setup2 ;00C7DE|2018C6  |00C618;
 	jsr.w WRAM_ClearBuffer3 ;00C7E1|208BC5  |00C58B;
 	ldx.w #$c8ec	;00C7E4|A2ECC8  |      ;
-	jsr.w CODE_009BC4 ;00C7E7|20C49B  |009BC4;
+	jsr.w CodeLikelyLoadsProcessesThisData ;00C7E7|20C49B  |009BC4;
 	ldx.w #$c8e3	;00C7EA|A2E3C8  |      ;
-	jmp.w CODE_009BC4 ;00C7ED|4CC49B  |009BC4;
+	jmp.w CodeLikelyLoadsProcessesThisData ;00C7ED|4CC49B  |009BC4;
 
 Menu_Init_Status:
 	lda.w $010d	 ;00C7F0|AD0D01  |00010D;
@@ -14464,10 +14464,10 @@ Menu_Init_Status_Continue:
 	sep #$20		;00C7FD|E220    |      ;
 	lda.b #$18	  ;00C7FF|A918    |      ;
 	sta.w $00ab	 ;00C801|8DAB00  |0000AB;
-	jsr.w CODE_00CBEC ;00C804|20ECCB  |00CBEC;
+	jsr.w SetupRoutine ;00C804|20ECCB  |00CBEC;
 	rep #$30		;00C807|C230    |      ;
 	ldx.w #$c922	;00C809|A222C9  |      ;
-	jsr.w CODE_009BC4 ;00C80C|20C49B  |009BC4;
+	jsr.w CodeLikelyLoadsProcessesThisData ;00C80C|20C49B  |009BC4;
 	phb ;00C80F|8B      |      ;
 	ldx.w #$016f	;00C810|A26F01  |      ;
 	ldy.w #$0e04	;00C813|A0040E  |      ;
@@ -14486,7 +14486,7 @@ Menu_Init_Status_Continue:
 	mvn $7f,$7f	 ;00C83A|547F7F  |      ;
 	plb ;00C83D|AB      |      ;
 	ldx.w #$c8e3	;00C83E|A2E3C8  |      ;
-	jsr.w CODE_009BC4 ;00C841|20C49B  |009BC4;
+	jsr.w CodeLikelyLoadsProcessesThisData ;00C841|20C49B  |009BC4;
 	lda.w #$0600	;00C844|A90006  |      ;
 	sta.b $01	   ;00C847|8501    |000001;
 	sta.b $05	   ;00C849|8505    |000005;
@@ -14543,7 +14543,7 @@ Menu_Init_LoadCharacter_Continue:
 
 Menu_Init_UpdateMenu:
 	phx ;00C89D|DA      |      ;
-	jsr.w CODE_009BC4 ;00C89E|20C49B  |009BC4;
+	jsr.w CodeLikelyLoadsProcessesThisData ;00C89E|20C49B  |009BC4;
 	plx ;00C8A1|FA      |      ;
 	inx ;00C8A2|E8      |      ;
 	inx ;00C8A3|E8      |      ;
@@ -14551,9 +14551,9 @@ Menu_Init_UpdateMenu:
 	ldy.w #$0017	;00C8A5|A01700  |      ;
 	lda.w #$0002	;00C8A8|A90200  |      ;
 	mvn $00,$00	 ;00C8AB|540000  |      ;
-	jsr.w CODE_00CAB9 ;00C8AE|20B9CA  |00CAB9;
+	jsr.w Sub_00CAB9 ;00C8AE|20B9CA  |00CAB9;
 	ldx.w #$c8e3	;00C8B1|A2E3C8  |      ;
-	jmp.w CODE_009BC4 ;00C8B4|4CC49B  |009BC4;
+	jmp.w CodeLikelyLoadsProcessesThisData ;00C8B4|4CC49B  |009BC4;
 
 ; Animation and screen effect handlers
 Screen_Effect1:
@@ -14573,7 +14573,7 @@ Screen_Effect4:
 
 Screen_EffectCommon:
 	phx ;00C8C9|DA      |      ;
-	jsr.w CODE_009BC4 ;00C8CA|20C49B  |009BC4;
+	jsr.w CodeLikelyLoadsProcessesThisData ;00C8CA|20C49B  |009BC4;
 	plx ;00C8CD|FA      |      ;
 	inx ;00C8CE|E8      |      ;
 	inx ;00C8CF|E8      |      ;
@@ -14581,10 +14581,10 @@ Screen_EffectCommon:
 	lda.w #$000c	;00C8D1|A90C00  |      ;
 
 Screen_EffectLoop:
-	jsl.l CODE_0C8000 ;00C8D4|2200800C|0C8000;
+	jsl.l AddressC8000OriginalCode ;00C8D4|2200800C|0C8000;
 	pha ;00C8D8|48      |      ;
 	phx ;00C8D9|DA      |      ;
-	jsr.w CODE_009BC4 ;00C8DA|20C49B  |009BC4;
+	jsr.w CodeLikelyLoadsProcessesThisData ;00C8DA|20C49B  |009BC4;
 	plx ;00C8DD|FA      |      ;
 	pla ;00C8DE|68      |      ;
 	dec a;00C8DF|3A      |      ;
@@ -14611,7 +14611,7 @@ Save_GetSlotAddress_Main:
 	sta.b $98	   ;00C92E|8598    |000098;
 	lda.w #$038c	;00C930|A98C03  |      ;
 	sta.b $9c	   ;00C933|859C    |00009C;
-	jsl.l CODE_0096B3 ;00C935|22B39600|0096B3;
+	jsl.l ExitQuotientRemainderViaCode ;00C935|22B39600|0096B3;
 	lda.b $9e	   ;00C939|A59E    |00009E;
 	clc ;00C93B|18      |      ;
 	adc.w #$0000	;00C93C|690000  |      ;
@@ -14686,9 +14686,9 @@ SaveData_Processor:
 	pha ;00C995|48      |      ;
 	ldx.w #$3000	;00C996|A20030  |      ;
 	stx.b $5f	   ;00C999|865F    |00005F;
-	jsr.w CODE_00C942 ;00C99B|2042C9  |00C942;
-	jsr.w CODE_00C95C ;00C99E|205CC9  |00C95C;
-	jsr.w CODE_00C92B ;00C9A1|202BC9  |00C92B;
+	jsr.w Sub_00C942 ;00C99B|2042C9  |00C942;
+	jsr.w Sub_00C95C ;00C99E|205CC9  |00C95C;
+	jsr.w GetSaveSlotAddress ;00C9A1|202BC9  |00C92B;
 	ldy.b $0b	   ;00C9A4|A40B    |00000B;
 	ldx.w #$000e	;00C9A6|A20E00  |      ;
 	lda.w #$0005	;00C9A9|A90500  |      ;
@@ -14698,8 +14698,8 @@ SaveData_Processor:
 	lda.w #$0385	;00C9B4|A98503  |      ;
 	mvn $70,$7f	 ;00C9B7|54707F  |      ;
 	lda.b $12	   ;00C9BA|A512    |000012;
-	jsr.w CODE_00C94F ;00C9BC|204FC9  |00C94F;
-	jsr.w CODE_00C95C ;00C9BF|205CC9  |00C95C;
+	jsr.w Sub_00C94F ;00C9BC|204FC9  |00C94F;
+	jsr.w Sub_00C95C ;00C9BF|205CC9  |00C95C;
 	cmp.b $12	   ;00C9C2|C512    |000012;
 	bne SaveData_ChecksumMismatch ;00C9C4|D005    |00C9CB;
 	jsr.w Checksum_Validator ;00C9C6|207DC9  |00C97D;
@@ -14757,7 +14757,7 @@ SaveData_ProcessMultiple:
 	bne SaveData_ProcessMultiple ;00CA0A|D0F6    |00CA02;
 	lda.w #$fff0	;00CA0C|A9F0FF  |      ;
 	sta.b $8e	   ;00CA0F|858E    |00008E;
-	jmp.w CODE_00981B ;00CA11|4C1B98  |00981B;
+	jmp.w Sub_00981B ;00CA11|4C1B98  |00981B;
 
 LoadData_ValidateChecksum:
 	phx ;00CA14|DA      |      ;
@@ -14766,7 +14766,7 @@ LoadData_ValidateChecksum:
 
 LoadData_RetryLoop:
 	lda.b $01,s	 ;00CA17|A301    |000001;
-	jsr.w CODE_00C92B ;00CA19|202BC9  |00C92B;
+	jsr.w GetSaveSlotAddress ;00CA19|202BC9  |00C92B;
 	clc ;00CA1C|18      |      ;
 	adc.w #$0006	;00CA1D|690600  |      ;
 	sta.b $5f	   ;00CA20|855F    |00005F;
@@ -14775,7 +14775,7 @@ LoadData_RetryLoop:
 	jsr.w Checksum_Validator ;00CA28|207DC9  |00C97D;
 	bne LoadData_InvalidChecksum ;00CA2B|D027    |00CA54;
 	lda.b $01,s	 ;00CA2D|A301    |000001;
-	jsr.w CODE_00C92B ;00CA2F|202BC9  |00C92B;
+	jsr.w GetSaveSlotAddress ;00CA2F|202BC9  |00C92B;
 	clc ;00CA32|18      |      ;
 	adc.w #$0006	;00CA33|690600  |      ;
 	tax ;00CA36|AA      |      ;
@@ -14785,7 +14785,7 @@ LoadData_RetryLoop:
 	lda.b $12	   ;00CA40|A512    |000012;
 	ldx.w #$3000	;00CA42|A20030  |      ;
 	stx.b $5f	   ;00CA45|865F    |00005F;
-	jsr.w CODE_00C942 ;00CA47|2042C9  |00C942;
+	jsr.w Sub_00C942 ;00CA47|2042C9  |00C942;
 	jsr.w Checksum_Calculator ;00CA4A|205CC9  |00C95C;
 	cmp.b $12	   ;00CA4D|C512    |000012;
 	bne LoadData_RetryLoop ;00CA4F|D0C6    |00CA17;
@@ -14794,7 +14794,7 @@ LoadData_RetryLoop:
 
 LoadData_InvalidChecksum:
 	lda.b $01,s	 ;00CA54|A301    |000001;
-	jsr.w CODE_00C92B ;00CA56|202BC9  |00C92B;
+	jsr.w GetSaveSlotAddress ;00CA56|202BC9  |00C92B;
 	lda.w #$0000	;00CA59|A90000  |      ;
 	sta.b [$0b]	 ;00CA5C|870B    |00000B;
 	sec ;00CA5E|38      |      ;
@@ -14848,7 +14848,7 @@ LoadData_Complete:
 	sta.b $64	   ;00CAAC|8564    |000064;
 	lda.w #$fff0	;00CAAE|A9F0FF  |      ;
 	sta.b $8e	   ;00CAB1|858E    |00008E;
-	jmp.w CODE_00981B ;00CAB3|4C1B98  |00981B;
+	jmp.w Sub_00981B ;00CAB3|4C1B98  |00981B;
 
 LOOSE_OP_00CAB5:
 	lda.b $64	   ;00CAB6|A564    |000064;
@@ -14896,14 +14896,14 @@ GameState_Flag1Set:
 GameState_Flag40Set:
 	lda.b #$40	  ;00CB07|A940    |      ;
 	trb.w $00db	 ;00CB09|1CDB00  |0000DB;
-	jsr.w CODE_00CCBD ;00CB0C|20BDCC  |00CCBD;
+	jsr.w Sub_00CCBD ;00CB0C|20BDCC  |00CCBD;
 	bra GameState_RestoreAndExit ;00CB0F|8068    |00CB79;
 ; ==============================================================================
-; Screen Color Management and Final Systems - CODE_00CB11+
+; Screen Color Management and Final Systems - ScreenColorManagementFinalSystemsCode+
 ; ==============================================================================
 
 GameState_FlagCheck2:
-	jsr.w CODE_00CD22 ;00CB11|2022CD  |00CD22;
+	jsr.w Sub_00CD22 ;00CB11|2022CD  |00CD22;
 	rep #$30		;00CB14|C230    |      ;
 	ldx.w #$016f	;00CB16|A26F01  |      ;
 	ldy.w #$0e04	;00CB19|A0040E  |      ;
@@ -14912,46 +14912,46 @@ GameState_FlagCheck2:
 	sep #$20		;00CB22|E220    |      ;
 	lda.b #$80	  ;00CB24|A980    |      ;
 	tsb.w $00de	 ;00CB26|0CDE00  |0000DE;
-	jsr.w CODE_00CD60 ;00CB29|2060CD  |00CD60;
-	jsr.w CODE_00CBC6 ;00CB2C|20C6CB  |00CBC6;
-	jsl.l CODE_0C8000 ;00CB2F|2200800C|0C8000;
+	jsr.w Sub_00CD60 ;00CB29|2060CD  |00CD60;
+	jsr.w Sub_00CBC6 ;00CB2C|20C6CB  |00CBC6;
+	jsl.l AddressC8000OriginalCode ;00CB2F|2200800C|0C8000;
 	lda.b #$e0	  ;00CB33|A9E0    |      ;
 	sta.l $7f56d8   ;00CB35|8FD8567F|7F56D8;
 	sta.l $7f56d8,x ;00CB39|9FD8567F|7F56D8;
-	jsl.l CODE_0C8000 ;00CB3D|2200800C|0C8000;
+	jsl.l AddressC8000OriginalCode ;00CB3D|2200800C|0C8000;
 	lda.b #$02	  ;00CB41|A902    |      ;
 	trb.w $00da	 ;00CB43|1CDA00  |0000DA;
 	lda.b #$08	  ;00CB46|A908    |      ;
 	trb.w $00d4	 ;00CB48|1CD400  |0000D4;
-	jmp.w CODE_00981B ;00CB4B|4C1B98  |00981B;
+	jmp.w Sub_00981B ;00CB4B|4C1B98  |00981B;
 
 GameState_Flag80Set:
-	jsr.w CODE_00CD22 ;00CB4E|2022CD  |00CD22;
-	jsr.w CODE_00CD60 ;00CB51|2060CD  |00CD60;
-	jsr.w CODE_00CC6E ;00CB54|206ECC  |00CC6E;
-	jsl.l CODE_0C8000 ;00CB57|2200800C|0C8000;
+	jsr.w Sub_00CD22 ;00CB4E|2022CD  |00CD22;
+	jsr.w Sub_00CD60 ;00CB51|2060CD  |00CD60;
+	jsr.w Sub_00CC6E ;00CB54|206ECC  |00CC6E;
+	jsl.l AddressC8000OriginalCode ;00CB57|2200800C|0C8000;
 	lda.b #$e0	  ;00CB5B|A9E0    |      ;
 	sta.l $7f56da   ;00CB5D|8FDA567F|7F56DA;
 	sta.l $7f56de   ;00CB61|8FDE567F|7F56DE;
-	jsl.l CODE_0C8000 ;00CB65|2200800C|0C8000;
+	jsl.l AddressC8000OriginalCode ;00CB65|2200800C|0C8000;
 	lda.b #$80	  ;00CB69|A980    |      ;
 	trb.w $00db	 ;00CB6B|1CDB00  |0000DB;
 	lda.b #$08	  ;00CB6E|A908    |      ;
 	trb.w $00d4	 ;00CB70|1CD400  |0000D4;
-	jmp.w CODE_00981B ;00CB73|4C1B98  |00981B;
+	jmp.w Sub_00981B ;00CB73|4C1B98  |00981B;
 
 GameState_FlagsComplete:
-	jsr.w CODE_00CD22 ;00CB76|2022CD  |00CD22;
+	jsr.w Sub_00CD22 ;00CB76|2022CD  |00CD22;
 
 GameState_RestoreAndExit:
-	jsr.w CODE_00CD60 ;00CB79|2060CD  |00CD60;
-	jsr.w CODE_00CD42 ;00CB7C|2042CD  |00CD42;
-	jsl.l CODE_0C8000 ;00CB7F|2200800C|0C8000;
+	jsr.w Sub_00CD60 ;00CB79|2060CD  |00CD60;
+	jsr.w Sub_00CD42 ;00CB7C|2042CD  |00CD42;
+	jsl.l AddressC8000OriginalCode ;00CB7F|2200800C|0C8000;
 	lda.b #$e0	  ;00CB83|A9E0    |      ;
 	sta.w SNES_COLDATA ;00CB85|8D3221  |002132;
 	ldx.w #$0000	;00CB88|A20000  |      ;
 	stx.w SNES_CGSWSEL ;00CB8B|8E3021  |002130;
-	jmp.w CODE_00981B ;00CB8E|4C1B98  |00981B;
+	jmp.w Sub_00981B ;00CB8E|4C1B98  |00981B;
 
 GameState_DataCopy:
 	rep #$30		;00CB91|C230    |      ;
@@ -14984,9 +14984,9 @@ Screen_FadeSetup:
 
 Screen_FadeLoop:
 	ldy.b $17	   ;00CBCB|A417    |000017;
-	jsr.w CODE_009D75 ;00CBCD|20759D  |009D75;
+	jsr.w ProcessGraphicsData ;00CBCD|20759D  |009D75;
 	sty.b $17	   ;00CBD0|8417    |000017;
-	jsl.l CODE_0C8000 ;00CBD2|2200800C|0C8000;
+	jsl.l AddressC8000OriginalCode ;00CBD2|2200800C|0C8000;
 	sta.l $7f56d8   ;00CBD6|8FD8567F|7F56D8;
 	sta.l $7f56d8,x ;00CBDA|9FD8567F|7F56D8;
 	dec a;00CBDE|3A      |      ;
@@ -14994,7 +14994,7 @@ Screen_FadeLoop:
 	cmp.b #$e1	  ;00CBE0|C9E1    |      ;
 	bne Screen_FadeLoop ;00CBE2|D0E7    |00CBCB;
 	ldy.b $17	   ;00CBE4|A417    |000017;
-	jsr.w CODE_009D75 ;00CBE6|20759D  |009D75;
+	jsr.w ProcessGraphicsData ;00CBE6|20759D  |009D75;
 	sty.b $17	   ;00CBE9|8417    |000017;
 	rts ;00CBEB|60      |      ;
 
@@ -15005,7 +15005,7 @@ Screen_BrightnessMax:
 	lda.b #$e0	  ;00CBF5|A9E0    |      ;
 	sta.l $7f56d8   ;00CBF7|8FD8567F|7F56D8;
 	sta.l $7f56d8,x ;00CBFB|9FD8567F|7F56D8;
-	jsl.l CODE_0C8000 ;00CBFF|2200800C|0C8000;
+	jsl.l AddressC8000OriginalCode ;00CBFF|2200800C|0C8000;
 	lda.b #$08	  ;00CC03|A908    |      ;
 	trb.w $00d4	 ;00CC05|1CD400  |0000D4;
 	rts ;00CC08|60      |      ;
@@ -15016,24 +15016,24 @@ Screen_ColorProcessor:
 	ldx.w #$0007	;00CC0E|A20700  |      ;
 
 Screen_ColorProcessLoop:
-	jsl.l CODE_0C8000 ;00CC11|2200800C|0C8000;
+	jsl.l AddressC8000OriginalCode ;00CC11|2200800C|0C8000;
 	lda.l $7f56d8   ;00CC15|AFD8567F|7F56D8;
-	jsr.w CODE_00CC5B ;00CC19|205BCC  |00CC5B;
+	jsr.w Sub_00CC5B ;00CC19|205BCC  |00CC5B;
 	sta.l $7f56d8   ;00CC1C|8FD8567F|7F56D8;
 	lda.l $7f56da   ;00CC20|AFDA567F|7F56DA;
-	jsr.w CODE_00CC5B ;00CC24|205BCC  |00CC5B;
+	jsr.w Sub_00CC5B ;00CC24|205BCC  |00CC5B;
 	sta.l $7f56da   ;00CC27|8FDA567F|7F56DA;
 	lda.l $7f56dc   ;00CC2B|AFDC567F|7F56DC;
-	jsr.w CODE_00CC5B ;00CC2F|205BCC  |00CC5B;
+	jsr.w Sub_00CC5B ;00CC2F|205BCC  |00CC5B;
 	sta.l $7f56dc   ;00CC32|8FDC567F|7F56DC;
 	lda.l $7f56de   ;00CC36|AFDE567F|7F56DE;
-	jsr.w CODE_00CC5B ;00CC3A|205BCC  |00CC5B;
+	jsr.w Sub_00CC5B ;00CC3A|205BCC  |00CC5B;
 	sta.l $7f56de   ;00CC3D|8FDE567F|7F56DE;
 	ldy.b $17	   ;00CC41|A417    |000017;
-	jsr.w CODE_009D75 ;00CC43|20759D  |009D75;
+	jsr.w ProcessGraphicsData ;00CC43|20759D  |009D75;
 	sty.b $17	   ;00CC46|8417    |000017;
 	dex ;00CC48|CA      |      ;
-	bne CODE_00CC11 ;00CC49|D0C6    |00CC11;
+	bne D0c6 ;00CC49|D0C6    |00CC11;
 	lda.b #$08	  ;00CC4B|A908    |      ;
 	trb.w $00d4	 ;00CC4D|1CD400  |0000D4;
 	lda.b #$20	  ;00CC50|A920    |      ;

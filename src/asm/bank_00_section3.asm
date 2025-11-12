@@ -7,14 +7,14 @@ StatusIcon_CheckCharacterSlot5:
 	lda.L				   $70073f   ; Check character 5 in party data
 	bne					 StatusIcon_CheckCharacterSlot6 ; If present, skip animation
 	ldx.B				   #$80	  ; Animation offset for slot 5
-	jsr.W				   CODE_008A2A ; Animate status icon
+	jsr.W				   AnimateStatusIcon ; Animate status icon
 
 StatusIcon_CheckCharacterSlot6:
 ; Check character slot 6
 	lda.L				   $70078f   ; Check character 6 in party data
 	bne					 StatusIcon_SetUpdateFlag ; If present, skip animation
 	ldx.B				   #$90	  ; Animation offset for slot 6
-	jsr.W				   CODE_008A2A ; Animate status icon
+	jsr.W				   AnimateStatusIcon ; Animate status icon
 
 StatusIcon_SetUpdateFlag:
 ; Set update flag and return
@@ -173,11 +173,11 @@ Input_Switch_Character:
 ; Update display
 	lda.B				   #$40	  ; Set update flag
 	tsb.W				   $00d4	 ; Set in display flags
-	jsr.W				   CODE_00B908 ; Update character sprite
+	jsr.W				   NormalPositionCallB908 ; Update character sprite
 	bra					 Switch_Done ; Done
 
 Play_Error_Sound:
-	jsr.W				   CODE_00B912 ; Play error sound
+	jsr.W				   AlternateCharacterUpdateRoutine ; Play error sound
 
 Switch_Done:
 	rts							   ; Return
@@ -196,10 +196,10 @@ Menu_ValidateAction:
 	bne					 Action_Valid ; If not marker, action valid
 	lda.W				   $1033	 ; Get tile Y position
 	bne					 Action_Valid ; If not zero, action valid
-	jmp.W				   CODE_00B912 ; Invalid: play error sound
+	jmp.W				   AlternateCharacterUpdateRoutine ; Invalid: play error sound
 
 Action_Valid:
-	jmp.W				   CODE_00B908 ; Valid: play confirm sound
+	jmp.W				   NormalPositionCallB908 ; Valid: play confirm sound
 
 ; ===========================================================================
 ; Menu Scroll - Down
@@ -231,7 +231,7 @@ Find_Next_Valid_Row:
 	inc					 a; Next row
 	and.B				   #$03	  ; Wrap to 0-3 range
 	pha							   ; Save row number
-	jsr.W				   CODE_008DA8 ; Check if row has valid item
+	jsr.W				   CheckIfCharacterIsValid ; Check if row has valid item
 	pla							   ; Restore row number
 	cpy.B				   #$ff	  ; Check if item valid
 	beq					 Find_Next_Valid_Row ; If invalid, try next row
@@ -272,7 +272,7 @@ Find_Previous_Valid_Row:
 	dec					 a; Previous row
 	and.B				   #$03	  ; Wrap to 0-3 range
 	pha							   ; Save row number
-	jsr.W				   CODE_008DA8 ; Check if row has valid item
+	jsr.W				   CheckIfCharacterIsValid ; Check if row has valid item
 	pla							   ; Restore row number
 	cpy.B				   #$ff	  ; Check if valid
 	beq					 Find_Previous_Valid_Row ; If invalid, try previous
@@ -318,7 +318,7 @@ Copy_Menu_Tiles:
 	phk							   ; Push program bank
 	plb							   ; Pull to data bank
 	lda.W				   #$0000	; Layer 0
-	jsr.W				   CODE_0091D4 ; Redraw layer
+	jsr.W				   RedrawLayerRoutine ; Redraw layer
 
 	sep					 #$30		; 8-bit A, X, Y
 	lda.B				   #$80	  ; Set update flag

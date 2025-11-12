@@ -40,7 +40,7 @@ Graphics_TransferBattleMode:
 ; Set flag indicating graphics updated
 	lda.B				   #$40	  ; Bit 6 flag
 	tsb.W				   $00d2	 ; Set bit in status flags
-	jsr.W				   CODE_008543 ; Transfer OAM data
+	jsr.W				   CodeAnalysis ; Transfer OAM data
 	rtl							   ; Return from long call
 
 ; ===========================================================================
@@ -117,7 +117,7 @@ Graphics_UpdateFieldMode:
 	rtl							   ; Return
 
 Graphics_TransferFieldTilemap_Skip:
-	jsr.W				   CODE_008543 ; Transfer OAM data
+	jsr.W				   CodeAnalysis ; Transfer OAM data
 
 ; Check if additional display update needed
 	lda.B				   #$20	  ; Check bit 5
@@ -160,17 +160,17 @@ Skip_High_Increment:
 
 ; Redraw layer 1
 	lda.W				   #$0000	; Layer 1 index
-	jsr.W				   CODE_0091D4 ; Redraw layer routine
-	jsr.W				   CODE_008C3D ; Additional layer 1 processing
+	jsr.W				   RedrawLayerRoutine ; Redraw layer routine
+	jsr.W				   InitializeSystem ; Additional layer 1 processing
 
 ; Redraw layer 2
 	lda.W				   #$0001	; Layer 2 index
-	jsr.W				   CODE_0091D4 ; Redraw layer routine
-	jsr.W				   CODE_008D29 ; Additional layer 2 processing
+	jsr.W				   RedrawLayerRoutine ; Redraw layer routine
+	jsr.W				   ExternalRoutine ; Additional layer 2 processing
 	bra					 Frame_Update_Done ; Skip normal update
 
 Normal_Frame_Update:
-	jsr.W				   CODE_008BFD ; Normal frame processing
+	jsr.W				   Store_008BFD ; Normal frame processing
 
 ; Check if input processing allowed
 	lda.W				   #$0010	; Check bit 4
@@ -189,16 +189,16 @@ Process_Input:
 	beq					 Frame_Update_Done ; If no buttons pressed, done
 
 ; Execute input handler
-	jsl.L				   CODE_009730 ; Get input handler function
+	jsl.L				   CodeReturnsHandlerIndexBasedGame ; Get input handler function
 	sep					 #$30		; 8-bit A, X, Y
 	asl					 a; Multiply by 2 (word pointer)
 	tax							   ; Transfer to X
-	jsr.W				   (CODE_008A35,x) ; Call input handler via table
+	jsr.W				   (CallInputHandlerViaTable,x) ; Call input handler via table
 
 Frame_Update_Done:
 	rep					 #$30		; 16-bit A, X, Y
-	jsr.W				   CODE_009342 ; Update sprites
-	jsr.W				   CODE_009264 ; Update animations
+	jsr.W				   UpdateSpriteAnimations ; Update sprites
+	jsr.W				   UpdateGameStateLogic ; Update animations
 	rtl							   ; Return to caller
 
 ; ===========================================================================

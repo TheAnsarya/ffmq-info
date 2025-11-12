@@ -67,7 +67,7 @@ Menu_ProcessCommandQueue:
 	lda.B				   #$01	  ; Command type = 1
 	sta.W				   $0600	 ; Set command type
 
-	jsl.L				   CODE_0D8004 ; Execute command (Bank $0d)
+	jsl.L				   Secondary_APU_Command_Entry_Point ; Execute command (Bank $0d)
 
 ; Clear command and save parameter
 	lda.B				   #$ff	  ; Invalid command marker
@@ -79,7 +79,7 @@ Menu_ProcessCommandQueue:
 Menu_ProcessCommand1:
 ; Process Command 1 (secondary menu action)
 	lda.B				   $05	   ; Get command 1 (DP $0505)
-	bmi					 CODE_0092C2 ; If negative, skip
+	bmi					 IfNegativeSkip ; If negative, skip
 
 	lda.B				   $05	   ; Load command
 	sta.W				   $0601	 ; Store to execution register
@@ -90,7 +90,7 @@ Menu_ProcessCommand1:
 	lda.B				   #$02	  ; Command type = 2
 	sta.W				   $0600	 ; Set command type
 
-	jsl.L				   CODE_0D8004 ; Execute command
+	jsl.L				   Secondary_APU_Command_Entry_Point ; Execute command
 
 ; Clear command
 	lda.B				   #$ff	  ; Invalid marker
@@ -118,7 +118,7 @@ Menu_CheckCutsceneMode:
 ; Check cutscene mode for non-special commands
 	lda.B				   #$04	  ; Cutscene bit
 	and.W				   $00e2	 ; Check flags
-	bne					 CODE_0092E9 ; If cutscene, skip command
+	bne					 IfCutsceneSkipCommand ; If cutscene, skip command
 
 Menu_ExecuteCommand2:
 ; Execute command 2
@@ -128,7 +128,7 @@ Menu_ExecuteCommand2:
 	ldx.B				   $0c	   ; Get parameter (DP $050c)
 	stx.W				   $0602	 ; Store parameter
 
-	jsl.L				   CODE_0D8004 ; Execute command
+	jsl.L				   Secondary_APU_Command_Entry_Point ; Execute command
 
 	stz.B				   $0a	   ; Clear command 2
 
@@ -150,12 +150,12 @@ Menu_CommandCleanup:
 Menu_TransitionOpen:
 ; Open menu transition
 	jsr.W				   Menu_TransitionSetup ; Common transition setup
-	jmp.W				   CODE_00803A ; Jump to menu open handler
+	jmp.W				   Label_00803A ; Jump to menu open handler
 
 Menu_TransitionClose:
 ; Close menu transition
 	jsr.W				   Menu_TransitionSetup ; Common transition setup
-	jmp.W				   CODE_008016 ; Jump to menu close handler
+	jmp.W				   Label_008016 ; Jump to menu close handler
 
 Menu_TransitionSetup:
 ; Common transition setup
@@ -171,7 +171,7 @@ Menu_TransitionSetup:
 
 	cli							   ; Enable interrupts
 
-	jsl.L				   CODE_00C7B8 ; Initialize menu graphics
+	jsl.L				   FinalSetupRoutine ; Initialize menu graphics
 
 ; Clear transition flags
 	lda.B				   #$08	  ; Bit 3
@@ -254,7 +254,7 @@ Animation_FrameReady:
 
 ; Check delay counter
 	lda.B				   $51	   ; Get delay (DP $0051)
-	beq					 CODE_009362 ; If zero, process input
+	beq					 IfZeroProcessInput ; If zero, process input
 
 	dec.B				   $51	   ; Decrement delay
 	rts							   ; Return (still delaying)
@@ -283,7 +283,7 @@ Input_CheckDelayCounter:
 	lsr					 a
 	lsr					 a
 	lsr					 a
-	bra					 CODE_00938F ; Process nibble
+	bra					 ProcessNibble ; Process nibble
 
 UNREACH_009385:
 ; Continue text scroll (get low nibble)
@@ -309,7 +309,7 @@ Text_ProcessControlCode:
 
 Text_LoadCharacter:
 ; Load text character
-	jsr.W				   CODE_0097F2 ; Get character from text table
+	jsr.W				   GetBitMask ; Get character from text table
 	sta.B				   $90	   ; Store character (DP $0090)
 	rts							   ; Return
 

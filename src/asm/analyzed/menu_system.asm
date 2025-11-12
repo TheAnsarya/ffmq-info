@@ -11,7 +11,7 @@
 ; ============================================================================
 ; VBlank Wait Routine
 ; ============================================================================
-; Address: $0c8000 (Original: CODE_0C8000)
+; Address: $0c8000 (Original: AddressC8000OriginalCode)
 ; This is THE most called routine in the entire game!
 ; Every screen update must wait for vertical blank to avoid visual glitches
 ; ============================================================================
@@ -43,7 +43,7 @@ WaitForVBlank:
 ; ============================================================================
 ; Equipment Window Display Routine
 ; ============================================================================
-; Address: $0c8013 (Original: CODE_0C8013)
+; Address: $0c8013 (Original: AddressC8013OriginalCode)
 ; Displays equipment information in battle/status screen
 ; Input: A = equipment slot index (0-4: weapon, armor, helm, shield, accessory)
 ; ============================================================================
@@ -93,7 +93,7 @@ DisplayEquipmentInfo:
 	stx.B $17                       ; Store pointer
 	lda.B #$03                      ; Bank $03
 	sta.B $19                       ; Store bank
-	jsl.L CODE_009D6B               ; Call rendering routine
+	jsl.L CallRenderingRoutine               ; Call rendering routine
 
 	rep #$30                        ; 16-bit mode
 	lda.B $15                       ; Get result
@@ -105,14 +105,14 @@ DisplayEquipmentInfo:
 ; ============================================================================
 ; Convert Stat Bonus to Display Value
 ; ============================================================================
-; Address: $0c8071 (Original: CODE_0C8071)
+; Address: $0c8071 (Original: AddressC8071OriginalCode)
 ; Converts equipment stat bonus to display format
 ; Input: A = stat value
 ; Output: A = display code (0=none, 1=normal, 2=enhanced)
 ; ============================================================================
 ConvertStatBonus:
 	beq .noBonus                    ; If 0, no bonus
-	jsl.L CODE_009776               ; Check stat type/modifier
+	jsl.L CheckStatTypeModifier               ; Check stat type/modifier
 	beq .normalBonus                ; If zero result, normal bonus
 	lda.B #$02                      ; Enhanced bonus indicator
 	bra .done
@@ -127,13 +127,13 @@ ConvertStatBonus:
 ; ============================================================================
 ; Menu System Initialization
 ; ============================================================================
-; Address: $0c8080 (Original: CODE_0C8080)
+; Address: $0c8080 (Original: AddressC8080OriginalCode)
 ; Called during boot to initialize the menu/status screen system
 ; This sets up the display mode, clears flags, and prepares UI
 ; ============================================================================
 MenuSystemInit:
 ; Initialize base system
-	jsl.L CODE_00825C               ; Hardware initialization
+	jsl.L HardwareInitialization               ; Hardware initialization
 
 ; Clear save data flag
 	lda.W #$0000
@@ -170,7 +170,7 @@ MenuSystemInit:
 	sta.B SNES_TM-$2100             ; $212c = Main screen layers
 
 ; Additional menu setup
-	jsr.W CODE_0C8D7B               ; Load menu graphics
+	jsr.W LoadMenuGraphics               ; Load menu graphics
 
 ; Enable interrupts
 	lda.W $0112                     ; Get saved interrupt flags
@@ -185,9 +185,9 @@ MenuSystemInit:
 	stz.W $0110                     ; Clear menu state
 
 ; Initialize subsystems
-	jsl.L CODE_00C795               ; Initialize palette system
-	jsr.W CODE_0C8BAD               ; Load menu fonts
-	jsr.W CODE_0C896F               ; Setup menu windows
+	jsl.L InitializePaletteSystem               ; Initialize palette system
+	jsr.W LoadMenuFonts               ; Load menu fonts
+	jsr.W SetupMenuWindows               ; Setup menu windows
 	jsl.L WaitForVBlank             ; Wait for safe update
 
 ; Switch to standard BG mode
@@ -208,15 +208,15 @@ MenuSystemInit:
 	sta.B SNES_TM-$2100             ; $212c = Main screen layers
 
 ; Render initial menu
-	jsr.W CODE_0C9037               ; Draw menu frame
-	jsr.W CODE_0C8103               ; Load menu content
+	jsr.W Complex_Graphics_Buffer_Initialization               ; Draw menu frame
+	jsr.W LoadMenuContent               ; Load menu content
 
 ; Finalize initialization
 	rep #$30                        ; 16-bit mode
 	lda.W #$0001
 	sta.L $7e3665                   ; Set menu initialized flag
 
-	jsl.L CODE_00C7B8               ; Final setup routine
+	jsl.L FinalSetupRoutine               ; Final setup routine
 
 ; Disable interrupts temporarily
 	sei                             ; Set interrupt disable
@@ -228,7 +228,7 @@ MenuSystemInit:
 ; ============================================================================
 ; Menu Content Loader
 ; ============================================================================
-; Address: $0c8103 (Original: CODE_0C8103)
+; Address: $0c8103 (Original: LoadMenuContent)
 ; Loads and displays menu content (character stats, items, etc)
 ; ============================================================================
 LoadMenuContent:
@@ -249,11 +249,11 @@ LoadMenuContent:
 	sta.B SNES_BGMODE-$2100         ; Set mode
 
 ; Load menu elements
-	jsr.W CODE_0C87ED               ; Load character portraits
-	jsr.W CODE_0C81DA               ; Load status values
-	jsr.W CODE_0C88BE               ; Load equipment icons
-	jsr.W CODE_0C8872               ; Load item list
-	jsr.W CODE_0C87E9               ; Update display
+	jsr.W LoadCharacterPortraits               ; Load character portraits
+	jsr.W LoadStatusValues               ; Load status values
+	jsr.W LoadEquipmentIcons               ; Load equipment icons
+	jsr.W LoadItemList               ; Load item list
+	jsr.W UpdateDisplay               ; Update display
 
 ; Clear display flag
 	lda.B #$40                      ; Bit 6
@@ -270,8 +270,8 @@ LoadMenuContent:
 	stz.B SNES_BG1VOFS-$2100        ; (write twice for 16-bit)
 
 ; Update menu elements
-	jsr.W CODE_0C8767               ; Render menu text
-	jsr.W CODE_0C8241               ; Update cursor
+	jsr.W RenderMenuText               ; Render menu text
+	jsr.W UpdateCursor               ; Update cursor
 
 	rts
 

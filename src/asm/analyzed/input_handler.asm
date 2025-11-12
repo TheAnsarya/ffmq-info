@@ -2,7 +2,7 @@
 ; Final Fantasy Mystic Quest - Input/Controller Handler Analysis
 ;==============================================================================
 ; Analyzes how the game reads and processes controller input
-; Location: Primarily bank_00.asm CODE_008BA0+
+; Location: Primarily bank_00.asm Label_008BA0+
 ;==============================================================================
 
 ;------------------------------------------------------------------------------
@@ -59,7 +59,7 @@
 ;   - Reset to 25 ($19) on auto-repeat
 
 ;------------------------------------------------------------------------------
-; Main Input Reading Routine (CODE_008BA0)
+; Main Input Reading Routine (Label_008BA0)
 ;------------------------------------------------------------------------------
 ; Called every frame to read controller and update input state
 ;
@@ -75,7 +75,7 @@
 ; 9. Store raw state in $0092
 ; 10. Clear injected input
 
-CODE_008BA0:	; Main input reading entry point
+Label_008BA0:	; Main input reading entry point
 	rep #$30                        ; 16-bit A/X/Y
 	lda #$0000
 	tcd                             ; Set direct page to $0000
@@ -107,7 +107,7 @@ CODE_008BA0:	; Main input reading entry point
 	lda SNES_CNTRL1L
 	and #$fff0                      ; Mask to button bits only
 	beq .ProcessInput
-	jmp CODE_0092F0                 ; Special menu processing
+	jmp SpecialMenuProcessing                 ; Special menu processing
 
 	.DialogInputMode:
 ; Check for auto-advance flag
@@ -123,7 +123,7 @@ CODE_008BA0:	; Main input reading entry point
 	lda SNES_CNTRL1L
 	and #$fff0
 	beq .ProcessInput
-	jmp CODE_0092F6                 ; Another special handler
+	jmp AnotherSpecialHandler                 ; Another special handler
 
 	.ProcessInput:
 ; Combine hardware + injected input
@@ -145,7 +145,7 @@ CODE_008BA0:	; Main input reading entry point
 	rts
 
 ;------------------------------------------------------------------------------
-; Input Processing Routine (CODE_008BFD)
+; Input Processing Routine (Store_008BFD)
 ;------------------------------------------------------------------------------
 ; Processes input with auto-repeat timing
 ; Called after reading hardware to generate final input for game logic
@@ -157,7 +157,7 @@ CODE_008BA0:	; Main input reading entry point
 ;
 ; Output: $07 = processed input for this frame
 
-CODE_008BFD:	; Process input with timing
+Store_008BFD:	; Process input with timing
 	stz $07                         ; Clear output
 
 ; Check for new button press
@@ -225,7 +225,7 @@ CODE_008BFD:	; Process input with timing
 ;
 ; $00d2.3 ($08): Menu input mode
 ;   - Changes input processing for menu navigation
-;   - Routes to CODE_0092F0 for special handling
+;   - Routes to SpecialMenuProcessing for special handling
 ;
 ; $00db.2 ($04): Dialog/text input mode
 ;   - Special processing for text boxes
@@ -238,12 +238,12 @@ CODE_008BFD:	; Process input with timing
 ;------------------------------------------------------------------------------
 ; Special Input Handlers
 ;------------------------------------------------------------------------------
-; CODE_0092F0: Menu-specific input handler
+; SpecialMenuProcessing: Menu-specific input handler
 ;   - Processes directional input for menu cursor
 ;   - Handles wrapping, boundaries
 ;   - Generates sound effects
 ;
-; CODE_0092F6: Dialog-specific input handler
+; AnotherSpecialHandler: Dialog-specific input handler
 ;   - Processes A/B for advancing text
 ;   - Handles text scroll timing
 ;   - Skip dialogue features
@@ -364,5 +364,5 @@ CODE_008BFD:	; Process input with timing
 ; Confidence: HIGH
 ; - Hardware register reading: VERIFIED (SNES_CNTRL1L usage confirmed)
 ; - State variables: VERIFIED ($92, $94, $96 usage documented)
-; - Auto-repeat logic: VERIFIED (timer behavior at CODE_008BFD)
+; - Auto-repeat logic: VERIFIED (timer behavior at Store_008BFD)
 ; - Flag system: VERIFIED (multiple context checks observed)

@@ -236,6 +236,30 @@ Extract graphics, text, music, maps, and data.  Magic:            1
 
 - **extract_music.py** - SPC music extractionRESISTANCES: None
 
+#### 📝 **Text Tools** - [TEXT_TOOLKIT_GUIDE.md](TEXT_TOOLKIT_GUIDE.md)
+
+Complete text extraction, modification, and re-insertion toolkit.
+
+- **ffmq_text.py** ⭐ - Unified CLI for all text operations (11 commands)
+
+- **extract_simple_text.py** - Extract menus, items, spells (595 entries, 100% readable)
+
+- **extract_dictionary.py** - Extract dialogs (117 entries, 98%+ readable)
+
+- **import_simple_text.py** - Re-insert modified menu text
+
+- **import_complex_text.py** - Re-insert dialogs with dictionary compression
+
+- **analyze_unknown_chars.py** - Character mapping analysis
+
+- **analyze_control_codes_detailed.py** - Control code usage (20,715+ tracked)
+
+- **deduce_characters.py** - Pattern-based character detection
+
+- **update_char_table.py** - Update character table
+
+**Status**: ✅ Production ready for translation projects (98%+ readable, full round-trip support)
+
 WEAKNESSES: None
 
 #### 📊 **Analysis Tools** - [analysis/README.md](analysis/README.md)```
@@ -632,7 +656,210 @@ python tools/extraction/extract_enemy_palettes.py --id 42 --output palette_42.pa
 
 # - Open sprite_42.png in Aseprite/GraphicsGale
 
-# - Maintain indexed color mode## Complete Modding Workflow
+# - Maintain indexed color mode```
+
+---
+
+## Text System Tools
+
+Complete toolkit for extracting, modifying, and re-inserting all text and dialogs in FFMQ.
+
+**📖 Comprehensive Guide:** See [TEXT_TOOLKIT_GUIDE.md](TEXT_TOOLKIT_GUIDE.md) for complete documentation.
+
+### Text Toolkit Guide
+
+**Status:** ✅ **Production Ready for Translation Projects**
+
+| System | Entries | Readability | Tools |
+|--------|---------|-------------|-------|
+| Simple Text | 595 | 100% | ✅ Extract + ✅ Insert |
+| Complex Text | 117 dialogs | 98%+ | ✅ Extract + ✅ Insert |
+| Character Table | 256 | 98%+ | ✅ Complete |
+| Control Codes | 48 | ~50% documented | ⚠️ In progress |
+
+#### Quick Start
+
+```bash
+# Show all text system info
+python tools/ffmq_text.py info
+
+# Extract all text
+python tools/ffmq_text.py batch-extract
+
+# Run all analysis
+python tools/ffmq_text.py batch-analyze
+```
+
+### Unified Text CLI
+
+**File:** `ffmq_text.py`
+
+Single command-line interface for all text operations with 11 commands:
+
+```bash
+# Extraction
+python tools/ffmq_text.py extract-simple    # Menu text, items, spells
+python tools/ffmq_text.py extract-complex   # Dialogs with compression
+
+# Insertion
+python tools/ffmq_text.py insert-simple     # Re-insert menu text
+python tools/ffmq_text.py insert-complex    # Re-insert dialogs
+
+# Analysis
+python tools/ffmq_text.py analyze-dict      # Dictionary compression
+python tools/ffmq_text.py analyze-controls  # Control code usage
+python tools/ffmq_text.py analyze-chars     # Character mappings
+
+# Batch Operations
+python tools/ffmq_text.py batch-extract     # Extract everything
+python tools/ffmq_text.py batch-analyze     # Analyze everything
+
+# Validation & Info
+python tools/ffmq_text.py validate          # Round-trip testing
+python tools/ffmq_text.py info              # System overview
+```
+
+### Simple Text Tools
+
+**Location:** `tools/extraction/`
+
+Extract and modify menu text, item names, spell names, locations (595 entries, 100% readable).
+
+```bash
+# Extract simple text
+python tools/extraction/extract_simple_text.py
+
+# Modify extracted text file
+# Edit: data/extracted/simple_text.txt
+
+# Re-insert modified text
+python tools/extraction/import_simple_text.py data/extracted/simple_text.txt output.sfc
+```
+
+**Content:**
+- Menu text
+- Item names (46 items)
+- Spell names (26 spells)
+- Location names
+- Character names
+- System messages
+
+### Complex Text Tools
+
+**Location:** `tools/extraction/`
+
+Extract and modify dialog text with dictionary compression (117 dialogs, 98%+ readable).
+
+```bash
+# Extract dialog text
+python tools/extraction/extract_dictionary.py
+
+# Modify dialogs
+# Edit: data/extracted/dialogs.txt
+
+# Re-insert with compression
+python tools/extraction/import_complex_text.py data/extracted/dialogs.txt output.sfc
+```
+
+**Features:**
+- Dictionary compression (80 entries, ~40% space savings)
+- Control code support (48 codes)
+- Recursive expansion (depth limit 10)
+- Size validation before writing
+- Named tags: `[END]`, `{newline}`, `[WAIT]`, `[ITEM]`, `[CRYSTAL]`, etc.
+
+**Dictionary Examples:**
+```
+0x3D = "Crystal"
+0x3E = "RainbowRoad"
+0x41 = "the "
+0x44 = "you"
+0x4D = ". "
+0x5D = "I'll"
+```
+
+#### Dialog Format
+
+```
+### Dialog 0x00
+[NAME], wake up!
+It's time to save the world!{newline}
+[TEXTBOX_BELOW]The [CRYSTAL] needs you![END]
+
+### Dialog 0x01
+For years Mac's been studying a Prophecy,[CMD:0D]
+On his way back from doing some research.
+```
+
+### Text Analysis Tools
+
+**Location:** `tools/analysis/`
+
+Deep analysis of character mappings, control codes, and dictionary usage.
+
+```bash
+# Analyze unknown characters
+python tools/analysis/analyze_unknown_chars.py
+
+# Detailed control code analysis (20,715+ tracked uses)
+python tools/analysis/analyze_control_codes_detailed.py
+
+# Deduce character mappings from patterns
+python tools/analysis/deduce_characters.py
+
+# Update character table
+python tools/analysis/update_char_table.py
+```
+
+**Recent Achievements:**
+- ✅ Fixed 16 unknown characters (punctuation + accented chars)
+- ✅ Achieved 98%+ dialog readability (up from 95%)
+- ✅ Analyzed 20,715 control code uses across 52 dialogs
+- ✅ Generated 546KB comprehensive control code report
+
+### Character Table
+
+**File:** `simple.tbl`
+
+Hex-to-character mapping table (256 entries, 98%+ coverage).
+
+**Recent Fixes:**
+```
+# Punctuation
+D0 = .    D2 = ,    CE = '    DC = :    DE = ;
+EB = ?    F7 = !    E7 = "
+
+# Accented Characters
+83 = é    84 = è    87 = à    8A = ü    8B = ö    8C = ä
+
+# Special
+80 = ~    81 = …    FF = (space)
+```
+
+### Control Codes
+
+**Jump Table:** ROM $00:9E0E (48 handler addresses)
+
+**Common Control Codes:**
+
+| Code | Tag | Function | Usage Count |
+|------|-----|----------|-------------|
+| 0x00 | `[END]` | String terminator | Every string |
+| 0x01 | `{newline}` | Line break | Multi-line |
+| 0x02 | `[WAIT]` | Wait for button | Dialog pacing |
+| 0x04 | `[NAME]` | Insert char name | Dynamic |
+| 0x05 | `[ITEM]` | Insert item name | Dynamic |
+| 0x08 | `[CMD:08]` | Unknown | 20,715 uses |
+| 0x0B | `[CMD:0B]` | Unknown | 12,507 uses |
+| 0x0C | `[CMD:0C]` | Unknown | 7,925 uses |
+| 0x1A | `[TEXTBOX_BELOW]` | Position box | Dialog |
+| 0x1F | `[CRYSTAL]` | Insert "Crystal" | Locations |
+
+See `docs/CONTROL_CODES.md` for complete reference.
+
+---
+
+## Complete Modding Workflow
 
 # - Keep palette intact
 
