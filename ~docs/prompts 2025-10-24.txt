@@ -646,6 +646,7 @@ The rom is located at `roms\Final Fantasy - Mystic Quest (U) (V1.1).sfc` use it!
 you are using `https://github.com/TheAnsarya/GameInfo/blob/main/Final%20Fantasy%20Mystic%20Quest%20(SNES)/Files/Final%20Fantasy%20Mystic%20Quest%20(SNES)%20-%20Complex.tbl` right?
 put a timestamp on the IDE chat window for every response line so I know when it happened; git commit everything with descriptions and push; continue implementing all todos and issues; make github issues and todo lists for all new work; make sure to format everything! we use TABS not spaces; implement the changes to make it awesome for as long as you can and use up all the tokens for each session, do not waste my money - use the entire token space; do more per session/prompt; make it as awesome and complete as possible; git commit and push;
 
+clean up backup and temp files; put a timestamp on the IDE chat window for every response line so I know when it happened; git commit everything with descriptions and push; continue implementing all todos and issues; make github issues and todo lists for all new work; make sure to format everything! we use TABS not spaces; implement the changes to make it awesome for as long as you can and use up all the tokens for each session, do not waste my money - use the entire token space; do more per session/prompt; make it as awesome and complete as possible; git commit and push;
 
 
 
