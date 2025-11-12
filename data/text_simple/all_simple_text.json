@@ -1,0 +1,4641 @@
+{
+  "version": "3.0.0",
+  "game": "Final Fantasy Mystic Quest",
+  "extraction_date": "2025-11-12T14:05:02.881789",
+  "rom_file": "Final Fantasy - Mystic Quest (U) (V1.1).sfc",
+  "decoder": "SimpleTextDecoder",
+  "character_table": "simple.tbl",
+  "total_entries": 760,
+  "tables": {
+    "item_names": {
+      "count": 231,
+      "address": "$064120",
+      "entry_length": 12,
+      "entries": [
+        {
+          "id": 0,
+          "text": "Elixir",
+          "address": 409888,
+          "length": 12
+        },
+        {
+          "id": 1,
+          "text": "TreeWither",
+          "address": 409900,
+          "length": 12
+        },
+        {
+          "id": 2,
+          "text": "Wakewater",
+          "address": 409912,
+          "length": 12
+        },
+        {
+          "id": 3,
+          "text": "VenusKey",
+          "address": 409924,
+          "length": 12
+        },
+        {
+          "id": 4,
+          "text": "Multi-Key",
+          "address": 409936,
+          "length": 12
+        },
+        {
+          "id": 5,
+          "text": "Mask",
+          "address": 409948,
+          "length": 12
+        },
+        {
+          "id": 6,
+          "text": "MagicMirror",
+          "address": 409960,
+          "length": 12
+        },
+        {
+          "id": 7,
+          "text": "ThunderRock",
+          "address": 409972,
+          "length": 12
+        },
+        {
+          "id": 8,
+          "text": "CaptainCap",
+          "address": 409984,
+          "length": 12
+        },
+        {
+          "id": 9,
+          "text": "LibraCrest",
+          "address": 409996,
+          "length": 12
+        },
+        {
+          "id": 10,
+          "text": "GeminiCrest",
+          "address": 410008,
+          "length": 12
+        },
+        {
+          "id": 11,
+          "text": "MobiusCrest",
+          "address": 410020,
+          "length": 12
+        },
+        {
+          "id": 12,
+          "text": "SandCoin",
+          "address": 410032,
+          "length": 12
+        },
+        {
+          "id": 13,
+          "text": "RiverCoin",
+          "address": 410044,
+          "length": 12
+        },
+        {
+          "id": 14,
+          "text": "SunCoin",
+          "address": 410056,
+          "length": 12
+        },
+        {
+          "id": 15,
+          "text": "SkyCoin",
+          "address": 410068,
+          "length": 12
+        },
+        {
+          "id": 16,
+          "text": "CurePotion",
+          "address": 410080,
+          "length": 12
+        },
+        {
+          "id": 17,
+          "text": "HealPotion",
+          "address": 410092,
+          "length": 12
+        },
+        {
+          "id": 18,
+          "text": "Seed",
+          "address": 410104,
+          "length": 12
+        },
+        {
+          "id": 19,
+          "text": "Refresher",
+          "address": 410116,
+          "length": 12
+        },
+        {
+          "id": 20,
+          "text": "Exit",
+          "address": 410128,
+          "length": 12
+        },
+        {
+          "id": 21,
+          "text": "Cure",
+          "address": 410140,
+          "length": 12
+        },
+        {
+          "id": 22,
+          "text": "Heal",
+          "address": 410152,
+          "length": 12
+        },
+        {
+          "id": 23,
+          "text": "Life",
+          "address": 410164,
+          "length": 12
+        },
+        {
+          "id": 24,
+          "text": "Quake",
+          "address": 410176,
+          "length": 12
+        },
+        {
+          "id": 25,
+          "text": "Blizzard",
+          "address": 410188,
+          "length": 12
+        },
+        {
+          "id": 26,
+          "text": "Fire",
+          "address": 410200,
+          "length": 12
+        },
+        {
+          "id": 27,
+          "text": "Aero",
+          "address": 410212,
+          "length": 12
+        },
+        {
+          "id": 28,
+          "text": "Thunder",
+          "address": 410224,
+          "length": 12
+        },
+        {
+          "id": 29,
+          "text": "White",
+          "address": 410236,
+          "length": 12
+        },
+        {
+          "id": 30,
+          "text": "Meteor",
+          "address": 410248,
+          "length": 12
+        },
+        {
+          "id": 31,
+          "text": "Flare",
+          "address": 410260,
+          "length": 12
+        },
+        {
+          "id": 32,
+          "text": "SteelSword",
+          "address": 410272,
+          "length": 12
+        },
+        {
+          "id": 33,
+          "text": "KnightSword",
+          "address": 410284,
+          "length": 12
+        },
+        {
+          "id": 34,
+          "text": "Excalibur",
+          "address": 410296,
+          "length": 12
+        },
+        {
+          "id": 35,
+          "text": "Axe",
+          "address": 410308,
+          "length": 12
+        },
+        {
+          "id": 36,
+          "text": "BattleAxe",
+          "address": 410320,
+          "length": 12
+        },
+        {
+          "id": 37,
+          "text": "Giant'sAxe",
+          "address": 410332,
+          "length": 12
+        },
+        {
+          "id": 38,
+          "text": "CatClaw",
+          "address": 410344,
+          "length": 12
+        },
+        {
+          "id": 39,
+          "text": "CharmClaw",
+          "address": 410356,
+          "length": 12
+        },
+        {
+          "id": 40,
+          "text": "DragonClaw",
+          "address": 410368,
+          "length": 12
+        },
+        {
+          "id": 41,
+          "text": "Bomb",
+          "address": 410380,
+          "length": 12
+        },
+        {
+          "id": 42,
+          "text": "JumboBomb",
+          "address": 410392,
+          "length": 12
+        },
+        {
+          "id": 43,
+          "text": "MegaGrenade",
+          "address": 410404,
+          "length": 12
+        },
+        {
+          "id": 44,
+          "text": "MorningStar",
+          "address": 410416,
+          "length": 12
+        },
+        {
+          "id": 45,
+          "text": "BowofGrace",
+          "address": 410428,
+          "length": 12
+        },
+        {
+          "id": 46,
+          "text": "NinjaStar",
+          "address": 410440,
+          "length": 12
+        },
+        {
+          "id": 47,
+          "text": "SteelHelm",
+          "address": 410452,
+          "length": 12
+        },
+        {
+          "id": 48,
+          "text": "MoonHelm",
+          "address": 410464,
+          "length": 12
+        },
+        {
+          "id": 49,
+          "text": "ApolloHelm",
+          "address": 410476,
+          "length": 12
+        },
+        {
+          "id": 50,
+          "text": "SteelArmor",
+          "address": 410488,
+          "length": 12
+        },
+        {
+          "id": 51,
+          "text": "NobleArmor",
+          "address": 410500,
+          "length": 12
+        },
+        {
+          "id": 52,
+          "text": "Gaia'sArmor",
+          "address": 410512,
+          "length": 12
+        },
+        {
+          "id": 53,
+          "text": "RelicaArmor",
+          "address": 410524,
+          "length": 12
+        },
+        {
+          "id": 54,
+          "text": "MysticRobe",
+          "address": 410536,
+          "length": 12
+        },
+        {
+          "id": 55,
+          "text": "FlameArmor",
+          "address": 410548,
+          "length": 12
+        },
+        {
+          "id": 56,
+          "text": "BlackRobe",
+          "address": 410560,
+          "length": 12
+        },
+        {
+          "id": 57,
+          "text": "SteelShield",
+          "address": 410572,
+          "length": 12
+        },
+        {
+          "id": 58,
+          "text": "VenusShield",
+          "address": 410584,
+          "length": 12
+        },
+        {
+          "id": 59,
+          "text": "AegisShield",
+          "address": 410596,
+          "length": 12
+        },
+        {
+          "id": 60,
+          "text": "EtherShield",
+          "address": 410608,
+          "length": 12
+        },
+        {
+          "id": 61,
+          "text": "Charm",
+          "address": 410620,
+          "length": 12
+        },
+        {
+          "id": 62,
+          "text": "MagicRing",
+          "address": 410632,
+          "length": 12
+        },
+        {
+          "id": 63,
+          "text": "CupidLocket",
+          "address": 410644,
+          "length": 12
+        },
+        {
+          "id": 64,
+          "text": "Sword",
+          "address": 410656,
+          "length": 12
+        },
+        {
+          "id": 65,
+          "text": "Scimitar",
+          "address": 410668,
+          "length": 12
+        },
+        {
+          "id": 66,
+          "text": "DragonCut",
+          "address": 410680,
+          "length": 12
+        },
+        {
+          "id": 67,
+          "text": "Rapier",
+          "address": 410692,
+          "length": 12
+        },
+        {
+          "id": 68,
+          "text": "Axe",
+          "address": 410704,
+          "length": 12
+        },
+        {
+          "id": 69,
+          "text": "Beam",
+          "address": 410716,
+          "length": 12
+        },
+        {
+          "id": 70,
+          "text": "BoneMissile",
+          "address": 410728,
+          "length": 12
+        },
+        {
+          "id": 71,
+          "text": "Bow&Arrow",
+          "address": 410740,
+          "length": 12
+        },
+        {
+          "id": 72,
+          "text": "BlowDart",
+          "address": 410752,
+          "length": 12
+        },
+        {
+          "id": 73,
+          "text": "Cure",
+          "address": 410764,
+          "length": 12
+        },
+        {
+          "id": 74,
+          "text": "Heal",
+          "address": 410776,
+          "length": 12
+        },
+        {
+          "id": 75,
+          "text": "Quake",
+          "address": 410788,
+          "length": 12
+        },
+        {
+          "id": 76,
+          "text": "Blizzard",
+          "address": 410800,
+          "length": 12
+        },
+        {
+          "id": 77,
+          "text": "Fire",
+          "address": 410812,
+          "length": 12
+        },
+        {
+          "id": 78,
+          "text": "Thunder",
+          "address": 410824,
+          "length": 12
+        },
+        {
+          "id": 79,
+          "text": "Reflectant",
+          "address": 410836,
+          "length": 12
+        },
+        {
+          "id": 80,
+          "text": "Electrapulse",
+          "address": 410848,
+          "length": 12
+        },
+        {
+          "id": 81,
+          "text": "PowerDrain",
+          "address": 410860,
+          "length": 12
+        },
+        {
+          "id": 82,
+          "text": "Spark",
+          "address": 410872,
+          "length": 12
+        },
+        {
+          "id": 83,
+          "text": "IronNail",
+          "address": 410884,
+          "length": 12
+        },
+        {
+          "id": 84,
+          "text": "Scream",
+          "address": 410896,
+          "length": 12
+        },
+        {
+          "id": 85,
+          "text": "Quicksand",
+          "address": 410908,
+          "length": 12
+        },
+        {
+          "id": 86,
+          "text": "DoomGaze",
+          "address": 410920,
+          "length": 12
+        },
+        {
+          "id": 87,
+          "text": "DoomPowder",
+          "address": 410932,
+          "length": 12
+        },
+        {
+          "id": 88,
+          "text": "Cure",
+          "address": 410944,
+          "length": 12
+        },
+        {
+          "id": 89,
+          "text": "FireBreath",
+          "address": 410956,
+          "length": 12
+        },
+        {
+          "id": 90,
+          "text": "Punch",
+          "address": 410968,
+          "length": 12
+        },
+        {
+          "id": 91,
+          "text": "Kick",
+          "address": 410980,
+          "length": 12
+        },
+        {
+          "id": 92,
+          "text": "Uppercut",
+          "address": 410992,
+          "length": 12
+        },
+        {
+          "id": 93,
+          "text": "Stab",
+          "address": 411004,
+          "length": 12
+        },
+        {
+          "id": 94,
+          "text": "HeadButt",
+          "address": 411016,
+          "length": 12
+        },
+        {
+          "id": 95,
+          "text": "BodySlam",
+          "address": 411028,
+          "length": 12
+        },
+        {
+          "id": 96,
+          "text": "Scrunch",
+          "address": 411040,
+          "length": 12
+        },
+        {
+          "id": 97,
+          "text": "FullNelson",
+          "address": 411052,
+          "length": 12
+        },
+        {
+          "id": 98,
+          "text": "NeckChoke",
+          "address": 411064,
+          "length": 12
+        },
+        {
+          "id": 99,
+          "text": "Dash",
+          "address": 411076,
+          "length": 12
+        },
+        {
+          "id": 100,
+          "text": "Roundhouse",
+          "address": 411088,
+          "length": 12
+        },
+        {
+          "id": 101,
+          "text": "ChokeUp",
+          "address": 411100,
+          "length": 12
+        },
+        {
+          "id": 102,
+          "text": "StompStomp",
+          "address": 411112,
+          "length": 12
+        },
+        {
+          "id": 103,
+          "text": "MegaPunch",
+          "address": 411124,
+          "length": 12
+        },
+        {
+          "id": 104,
+          "text": "Bearhug",
+          "address": 411136,
+          "length": 12
+        },
+        {
+          "id": 105,
+          "text": "AxeBomber",
+          "address": 411148,
+          "length": 12
+        },
+        {
+          "id": 106,
+          "text": "Piledriver",
+          "address": 411160,
+          "length": 12
+        },
+        {
+          "id": 107,
+          "text": "SkyAttack",
+          "address": 411172,
+          "length": 12
+        },
+        {
+          "id": 108,
+          "text": "Wraparound",
+          "address": 411184,
+          "length": 12
+        },
+        {
+          "id": 109,
+          "text": "Dive",
+          "address": 411196,
+          "length": 12
+        },
+        {
+          "id": 110,
+          "text": "Attatch",
+          "address": 411208,
+          "length": 12
+        },
+        {
+          "id": 111,
+          "text": "Mucus",
+          "address": 411220,
+          "length": 12
+        },
+        {
+          "id": 112,
+          "text": "Claw",
+          "address": 411232,
+          "length": 12
+        },
+        {
+          "id": 113,
+          "text": "Fang",
+          "address": 411244,
+          "length": 12
+        },
+        {
+          "id": 114,
+          "text": "Beak",
+          "address": 411256,
+          "length": 12
+        },
+        {
+          "id": 115,
+          "text": "Sting",
+          "address": 411268,
+          "length": 12
+        },
+        {
+          "id": 116,
+          "text": "Tail",
+          "address": 411280,
+          "length": 12
+        },
+        {
+          "id": 117,
+          "text": "Psudopod",
+          "address": 411292,
+          "length": 12
+        },
+        {
+          "id": 118,
+          "text": "Bite",
+          "address": 411304,
+          "length": 12
+        },
+        {
+          "id": 119,
+          "text": "HydroAcid",
+          "address": 411316,
+          "length": 12
+        },
+        {
+          "id": 120,
+          "text": "Branch",
+          "address": 411328,
+          "length": 12
+        },
+        {
+          "id": 121,
+          "text": "Fin",
+          "address": 411340,
+          "length": 12
+        },
+        {
+          "id": 122,
+          "text": "Scissor",
+          "address": 411352,
+          "length": 12
+        },
+        {
+          "id": 123,
+          "text": "WhipTongue",
+          "address": 411364,
+          "length": 12
+        },
+        {
+          "id": 124,
+          "text": "Horn",
+          "address": 411376,
+          "length": 12
+        },
+        {
+          "id": 125,
+          "text": "GiantBlade",
+          "address": 411388,
+          "length": 12
+        },
+        {
+          "id": 126,
+          "text": "Headoomerang",
+          "address": 411400,
+          "length": 12
+        },
+        {
+          "id": 127,
+          "text": "ChewOff",
+          "address": 411412,
+          "length": 12
+        },
+        {
+          "id": 128,
+          "text": "Quake",
+          "address": 411424,
+          "length": 12
+        },
+        {
+          "id": 129,
+          "text": "Flame",
+          "address": 411436,
+          "length": 12
+        },
+        {
+          "id": 130,
+          "text": "FlameSweep",
+          "address": 411448,
+          "length": 12
+        },
+        {
+          "id": 131,
+          "text": "Fireball",
+          "address": 411460,
+          "length": 12
+        },
+        {
+          "id": 132,
+          "text": "FlamePillar",
+          "address": 411472,
+          "length": 12
+        },
+        {
+          "id": 133,
+          "text": "Heatwave",
+          "address": 411484,
+          "length": 12
+        },
+        {
+          "id": 134,
+          "text": "Watergun",
+          "address": 411496,
+          "length": 12
+        },
+        {
+          "id": 135,
+          "text": "Coldness",
+          "address": 411508,
+          "length": 12
+        },
+        {
+          "id": 136,
+          "text": "IcyFoam",
+          "address": 411520,
+          "length": 12
+        },
+        {
+          "id": 137,
+          "text": "IceBlock",
+          "address": 411532,
+          "length": 12
+        },
+        {
+          "id": 138,
+          "text": "Snowstorm",
+          "address": 411544,
+          "length": 12
+        },
+        {
+          "id": 139,
+          "text": "Whirlwater",
+          "address": 411556,
+          "length": 12
+        },
+        {
+          "id": 140,
+          "text": "IceBreath",
+          "address": 411568,
+          "length": 12
+        },
+        {
+          "id": 141,
+          "text": "Tornado",
+          "address": 411580,
+          "length": 12
+        },
+        {
+          "id": 142,
+          "text": "Typhoon",
+          "address": 411592,
+          "length": 12
+        },
+        {
+          "id": 143,
+          "text": "Hurricane",
+          "address": 411604,
+          "length": 12
+        },
+        {
+          "id": 144,
+          "text": "Thunder",
+          "address": 411616,
+          "length": 12
+        },
+        {
+          "id": 145,
+          "text": "ThunderBeam",
+          "address": 411628,
+          "length": 12
+        },
+        {
+          "id": 146,
+          "text": "CorrodeGas",
+          "address": 411640,
+          "length": 12
+        },
+        {
+          "id": 147,
+          "text": "DoomDance",
+          "address": 411652,
+          "length": 12
+        },
+        {
+          "id": 148,
+          "text": "SonicBoom",
+          "address": 411664,
+          "length": 12
+        },
+        {
+          "id": 149,
+          "text": "Bark",
+          "address": 411676,
+          "length": 12
+        },
+        {
+          "id": 150,
+          "text": "Screechvoice",
+          "address": 411688,
+          "length": 12
+        },
+        {
+          "id": 151,
+          "text": "Para-needle",
+          "address": 411700,
+          "length": 12
+        },
+        {
+          "id": 152,
+          "text": "Para-claw",
+          "address": 411712,
+          "length": 12
+        },
+        {
+          "id": 153,
+          "text": "Para-snake",
+          "address": 411724,
+          "length": 12
+        },
+        {
+          "id": 154,
+          "text": "Para-breath",
+          "address": 411736,
+          "length": 12
+        },
+        {
+          "id": 155,
+          "text": "PoisonSting",
+          "address": 411748,
+          "length": 12
+        },
+        {
+          "id": 156,
+          "text": "PoisonThorn",
+          "address": 411760,
+          "length": 12
+        },
+        {
+          "id": 157,
+          "text": "RottenMucus",
+          "address": 411772,
+          "length": 12
+        },
+        {
+          "id": 158,
+          "text": "PoisonSnake",
+          "address": 411784,
+          "length": 12
+        },
+        {
+          "id": 159,
+          "text": "Poisonbreath",
+          "address": 411796,
+          "length": 12
+        },
+        {
+          "id": 160,
+          "text": "Blinder",
+          "address": 411808,
+          "length": 12
+        },
+        {
+          "id": 161,
+          "text": "Blackness",
+          "address": 411820,
+          "length": 12
+        },
+        {
+          "id": 162,
+          "text": "StoneBeak",
+          "address": 411832,
+          "length": 12
+        },
+        {
+          "id": 163,
+          "text": "Gaze",
+          "address": 411844,
+          "length": 12
+        },
+        {
+          "id": 164,
+          "text": "Stare",
+          "address": 411856,
+          "length": 12
+        },
+        {
+          "id": 165,
+          "text": "SpookyLaugh",
+          "address": 411868,
+          "length": 12
+        },
+        {
+          "id": 166,
+          "text": "Riddle",
+          "address": 411880,
+          "length": 12
+        },
+        {
+          "id": 167,
+          "text": "BadBreath",
+          "address": 411892,
+          "length": 12
+        },
+        {
+          "id": 168,
+          "text": "BodyOdor",
+          "address": 411904,
+          "length": 12
+        },
+        {
+          "id": 169,
+          "text": "Para-stare",
+          "address": 411916,
+          "length": 12
+        },
+        {
+          "id": 170,
+          "text": "PoisonFluid",
+          "address": 411928,
+          "length": 12
+        },
+        {
+          "id": 171,
+          "text": "PoisonFlour",
+          "address": 411940,
+          "length": 12
+        },
+        {
+          "id": 172,
+          "text": "Hypno-sleep",
+          "address": 411952,
+          "length": 12
+        },
+        {
+          "id": 173,
+          "text": "Lullaby",
+          "address": 411964,
+          "length": 12
+        },
+        {
+          "id": 174,
+          "text": "SleepLure",
+          "address": 411976,
+          "length": 12
+        },
+        {
+          "id": 175,
+          "text": "SleepPowder",
+          "address": 411988,
+          "length": 12
+        },
+        {
+          "id": 176,
+          "text": "BlindFlash",
+          "address": 412000,
+          "length": 12
+        },
+        {
+          "id": 177,
+          "text": "Smokescreen",
+          "address": 412012,
+          "length": 12
+        },
+        {
+          "id": 178,
+          "text": "Muffle",
+          "address": 412024,
+          "length": 12
+        },
+        {
+          "id": 179,
+          "text": "SilenceSong",
+          "address": 412036,
+          "length": 12
+        },
+        {
+          "id": 180,
+          "text": "StoneGas",
+          "address": 412048,
+          "length": 12
+        },
+        {
+          "id": 181,
+          "text": "StoneGaze",
+          "address": 412060,
+          "length": 12
+        },
+        {
+          "id": 182,
+          "text": "DoubleSword",
+          "address": 412072,
+          "length": 12
+        },
+        {
+          "id": 183,
+          "text": "DoubleHit",
+          "address": 412084,
+          "length": 12
+        },
+        {
+          "id": 184,
+          "text": "TripleFang",
+          "address": 412096,
+          "length": 12
+        },
+        {
+          "id": 185,
+          "text": "DoubleKick",
+          "address": 412108,
+          "length": 12
+        },
+        {
+          "id": 186,
+          "text": "TwinShears",
+          "address": 412120,
+          "length": 12
+        },
+        {
+          "id": 187,
+          "text": "ThreeHeads",
+          "address": 412132,
+          "length": 12
+        },
+        {
+          "id": 188,
+          "text": "6Psudopods",
+          "address": 412144,
+          "length": 12
+        },
+        {
+          "id": 189,
+          "text": "SnakeHead",
+          "address": 412156,
+          "length": 12
+        },
+        {
+          "id": 190,
+          "text": "Drain",
+          "address": 412168,
+          "length": 12
+        },
+        {
+          "id": 191,
+          "text": "Dissolve",
+          "address": 412180,
+          "length": 12
+        },
+        {
+          "id": 192,
+          "text": "SuckerStick",
+          "address": 412192,
+          "length": 12
+        },
+        {
+          "id": 193,
+          "text": "Selfdestruct",
+          "address": 412204,
+          "length": 12
+        },
+        {
+          "id": 194,
+          "text": "Multiply",
+          "address": 412216,
+          "length": 12
+        },
+        {
+          "id": 195,
+          "text": "ParaGas",
+          "address": 412228,
+          "length": 12
+        },
+        {
+          "id": 196,
+          "text": "RipEarth",
+          "address": 412240,
+          "length": 12
+        },
+        {
+          "id": 197,
+          "text": "StoneBlock",
+          "address": 412252,
+          "length": 12
+        },
+        {
+          "id": 198,
+          "text": "Windstorm",
+          "address": 412264,
+          "length": 12
+        },
+        {
+          "id": 199,
+          "text": "TwinFang",
+          "address": 412276,
+          "length": 12
+        },
+        {
+          "id": 200,
+          "text": "Psychshield",
+          "address": 412288,
+          "length": 12
+        },
+        {
+          "id": 201,
+          "text": "Psychshield",
+          "address": 412300,
+          "length": 12
+        },
+        {
+          "id": 202,
+          "text": "DarkCane",
+          "address": 412312,
+          "length": 12
+        },
+        {
+          "id": 203,
+          "text": "DarkSaber",
+          "address": 412324,
+          "length": 12
+        },
+        {
+          "id": 204,
+          "text": "IceSword",
+          "address": 412336,
+          "length": 12
+        },
+        {
+          "id": 205,
+          "text": "FireSword",
+          "address": 412348,
+          "length": 12
+        },
+        {
+          "id": 206,
+          "text": "MirrorSword",
+          "address": 412360,
+          "length": 12
+        },
+        {
+          "id": 207,
+          "text": "QuakeAxe",
+          "address": 412372,
+          "length": 12
+        },
+        {
+          "id": 208,
+          "text": "CureArrow",
+          "address": 412384,
+          "length": 12
+        },
+        {
+          "id": 209,
+          "text": "Lazer",
+          "address": 412396,
+          "length": 12
+        },
+        {
+          "id": 210,
+          "text": "SpiderKids",
+          "address": 412408,
+          "length": 12
+        },
+        {
+          "id": 211,
+          "text": "SilverWeb",
+          "address": 412420,
+          "length": 12
+        },
+        {
+          "id": 212,
+          "text": "GoldenWeb",
+          "address": 412432,
+          "length": 12
+        },
+        {
+          "id": 213,
+          "text": "MegaFlare",
+          "address": 412444,
+          "length": 12
+        },
+        {
+          "id": 214,
+          "text": "MegaWhite",
+          "address": 412456,
+          "length": 12
+        },
+        {
+          "id": 215,
+          "text": "FireBreath",
+          "address": 412468,
+          "length": 12
+        },
+        {
+          "id": 216,
+          "text": "SkyAttack",
+          "address": 412480,
+          "length": 12
+        },
+        {
+          "id": 217,
+          "text": "Piledriver",
+          "address": 412492,
+          "length": 12
+        },
+        {
+          "id": 218,
+          "text": "Hurricane",
+          "address": 412504,
+          "length": 12
+        },
+        {
+          "id": 219,
+          "text": "Heatwave",
+          "address": 412516,
+          "length": 12
+        },
+        {
+          "id": 221,
+          "text": "Explosive",
+          "address": 412540,
+          "length": 12
+        },
+        {
+          "id": 222,
+          "text": "Arrow",
+          "address": 412552,
+          "length": 12
+        },
+        {
+          "id": 223,
+          "text": "NinjaStar",
+          "address": 412564,
+          "length": 12
+        },
+        {
+          "id": 224,
+          "text": "Brownie",
+          "address": 412576,
+          "length": 12
+        },
+        {
+          "id": 225,
+          "text": "Mintmint",
+          "address": 412588,
+          "length": 12
+        },
+        {
+          "id": 226,
+          "text": "Red",
+          "address": 412600,
+          "length": 12
+        },
+        {
+          "id": 227,
+          "text": "Cap",
+          "address": 412612,
+          "length": 12
+        },
+        {
+          "id": 228,
+          "text": "Mad_Plant",
+          "address": 412624,
+          "length": 12
+        },
+        {
+          "id": 229,
+          "text": "Plant_Ma",
+          "address": 412636,
+          "length": 12
+        },
+        {
+          "id": 230,
+          "text": "nLive",
+          "address": 412648,
+          "length": 12
+        },
+        {
+          "id": 231,
+          "text": "Oak",
+          "address": 412660,
+          "length": 12
+        }
+      ]
+    },
+    "spell_names": {
+      "count": 32,
+      "address": "$064210",
+      "entry_length": 12,
+      "entries": [
+        {
+          "id": 0,
+          "text": "Exit",
+          "address": 410128,
+          "length": 12
+        },
+        {
+          "id": 1,
+          "text": "Cure",
+          "address": 410140,
+          "length": 12
+        },
+        {
+          "id": 2,
+          "text": "Heal",
+          "address": 410152,
+          "length": 12
+        },
+        {
+          "id": 3,
+          "text": "Life",
+          "address": 410164,
+          "length": 12
+        },
+        {
+          "id": 4,
+          "text": "Quake",
+          "address": 410176,
+          "length": 12
+        },
+        {
+          "id": 5,
+          "text": "Blizzard",
+          "address": 410188,
+          "length": 12
+        },
+        {
+          "id": 6,
+          "text": "Fire",
+          "address": 410200,
+          "length": 12
+        },
+        {
+          "id": 7,
+          "text": "Aero",
+          "address": 410212,
+          "length": 12
+        },
+        {
+          "id": 8,
+          "text": "Thunder",
+          "address": 410224,
+          "length": 12
+        },
+        {
+          "id": 9,
+          "text": "White",
+          "address": 410236,
+          "length": 12
+        },
+        {
+          "id": 10,
+          "text": "Meteor",
+          "address": 410248,
+          "length": 12
+        },
+        {
+          "id": 11,
+          "text": "Flare",
+          "address": 410260,
+          "length": 12
+        },
+        {
+          "id": 12,
+          "text": "SteelSword",
+          "address": 410272,
+          "length": 12
+        },
+        {
+          "id": 13,
+          "text": "KnightSword",
+          "address": 410284,
+          "length": 12
+        },
+        {
+          "id": 14,
+          "text": "Excalibur",
+          "address": 410296,
+          "length": 12
+        },
+        {
+          "id": 15,
+          "text": "Axe",
+          "address": 410308,
+          "length": 12
+        },
+        {
+          "id": 16,
+          "text": "BattleAxe",
+          "address": 410320,
+          "length": 12
+        },
+        {
+          "id": 17,
+          "text": "Giant'sAxe",
+          "address": 410332,
+          "length": 12
+        },
+        {
+          "id": 18,
+          "text": "CatClaw",
+          "address": 410344,
+          "length": 12
+        },
+        {
+          "id": 19,
+          "text": "CharmClaw",
+          "address": 410356,
+          "length": 12
+        },
+        {
+          "id": 20,
+          "text": "DragonClaw",
+          "address": 410368,
+          "length": 12
+        },
+        {
+          "id": 21,
+          "text": "Bomb",
+          "address": 410380,
+          "length": 12
+        },
+        {
+          "id": 22,
+          "text": "JumboBomb",
+          "address": 410392,
+          "length": 12
+        },
+        {
+          "id": 23,
+          "text": "MegaGrenade",
+          "address": 410404,
+          "length": 12
+        },
+        {
+          "id": 24,
+          "text": "MorningStar",
+          "address": 410416,
+          "length": 12
+        },
+        {
+          "id": 25,
+          "text": "BowofGrace",
+          "address": 410428,
+          "length": 12
+        },
+        {
+          "id": 26,
+          "text": "NinjaStar",
+          "address": 410440,
+          "length": 12
+        },
+        {
+          "id": 27,
+          "text": "SteelHelm",
+          "address": 410452,
+          "length": 12
+        },
+        {
+          "id": 28,
+          "text": "MoonHelm",
+          "address": 410464,
+          "length": 12
+        },
+        {
+          "id": 29,
+          "text": "ApolloHelm",
+          "address": 410476,
+          "length": 12
+        },
+        {
+          "id": 30,
+          "text": "SteelArmor",
+          "address": 410488,
+          "length": 12
+        },
+        {
+          "id": 31,
+          "text": "NobleArmor",
+          "address": 410500,
+          "length": 12
+        }
+      ]
+    },
+    "weapon_names": {
+      "count": 57,
+      "address": "$0642A0",
+      "entry_length": 12,
+      "entries": [
+        {
+          "id": 0,
+          "text": "SteelSword",
+          "address": 410272,
+          "length": 12
+        },
+        {
+          "id": 1,
+          "text": "KnightSword",
+          "address": 410284,
+          "length": 12
+        },
+        {
+          "id": 2,
+          "text": "Excalibur",
+          "address": 410296,
+          "length": 12
+        },
+        {
+          "id": 3,
+          "text": "Axe",
+          "address": 410308,
+          "length": 12
+        },
+        {
+          "id": 4,
+          "text": "BattleAxe",
+          "address": 410320,
+          "length": 12
+        },
+        {
+          "id": 5,
+          "text": "Giant'sAxe",
+          "address": 410332,
+          "length": 12
+        },
+        {
+          "id": 6,
+          "text": "CatClaw",
+          "address": 410344,
+          "length": 12
+        },
+        {
+          "id": 7,
+          "text": "CharmClaw",
+          "address": 410356,
+          "length": 12
+        },
+        {
+          "id": 8,
+          "text": "DragonClaw",
+          "address": 410368,
+          "length": 12
+        },
+        {
+          "id": 9,
+          "text": "Bomb",
+          "address": 410380,
+          "length": 12
+        },
+        {
+          "id": 10,
+          "text": "JumboBomb",
+          "address": 410392,
+          "length": 12
+        },
+        {
+          "id": 11,
+          "text": "MegaGrenade",
+          "address": 410404,
+          "length": 12
+        },
+        {
+          "id": 12,
+          "text": "MorningStar",
+          "address": 410416,
+          "length": 12
+        },
+        {
+          "id": 13,
+          "text": "BowofGrace",
+          "address": 410428,
+          "length": 12
+        },
+        {
+          "id": 14,
+          "text": "NinjaStar",
+          "address": 410440,
+          "length": 12
+        },
+        {
+          "id": 15,
+          "text": "SteelHelm",
+          "address": 410452,
+          "length": 12
+        },
+        {
+          "id": 16,
+          "text": "MoonHelm",
+          "address": 410464,
+          "length": 12
+        },
+        {
+          "id": 17,
+          "text": "ApolloHelm",
+          "address": 410476,
+          "length": 12
+        },
+        {
+          "id": 18,
+          "text": "SteelArmor",
+          "address": 410488,
+          "length": 12
+        },
+        {
+          "id": 19,
+          "text": "NobleArmor",
+          "address": 410500,
+          "length": 12
+        },
+        {
+          "id": 20,
+          "text": "Gaia'sArmor",
+          "address": 410512,
+          "length": 12
+        },
+        {
+          "id": 21,
+          "text": "RelicaArmor",
+          "address": 410524,
+          "length": 12
+        },
+        {
+          "id": 22,
+          "text": "MysticRobe",
+          "address": 410536,
+          "length": 12
+        },
+        {
+          "id": 23,
+          "text": "FlameArmor",
+          "address": 410548,
+          "length": 12
+        },
+        {
+          "id": 24,
+          "text": "BlackRobe",
+          "address": 410560,
+          "length": 12
+        },
+        {
+          "id": 25,
+          "text": "SteelShield",
+          "address": 410572,
+          "length": 12
+        },
+        {
+          "id": 26,
+          "text": "VenusShield",
+          "address": 410584,
+          "length": 12
+        },
+        {
+          "id": 27,
+          "text": "AegisShield",
+          "address": 410596,
+          "length": 12
+        },
+        {
+          "id": 28,
+          "text": "EtherShield",
+          "address": 410608,
+          "length": 12
+        },
+        {
+          "id": 29,
+          "text": "Charm",
+          "address": 410620,
+          "length": 12
+        },
+        {
+          "id": 30,
+          "text": "MagicRing",
+          "address": 410632,
+          "length": 12
+        },
+        {
+          "id": 31,
+          "text": "CupidLocket",
+          "address": 410644,
+          "length": 12
+        },
+        {
+          "id": 32,
+          "text": "Sword",
+          "address": 410656,
+          "length": 12
+        },
+        {
+          "id": 33,
+          "text": "Scimitar",
+          "address": 410668,
+          "length": 12
+        },
+        {
+          "id": 34,
+          "text": "DragonCut",
+          "address": 410680,
+          "length": 12
+        },
+        {
+          "id": 35,
+          "text": "Rapier",
+          "address": 410692,
+          "length": 12
+        },
+        {
+          "id": 36,
+          "text": "Axe",
+          "address": 410704,
+          "length": 12
+        },
+        {
+          "id": 37,
+          "text": "Beam",
+          "address": 410716,
+          "length": 12
+        },
+        {
+          "id": 38,
+          "text": "BoneMissile",
+          "address": 410728,
+          "length": 12
+        },
+        {
+          "id": 39,
+          "text": "Bow&Arrow",
+          "address": 410740,
+          "length": 12
+        },
+        {
+          "id": 40,
+          "text": "BlowDart",
+          "address": 410752,
+          "length": 12
+        },
+        {
+          "id": 41,
+          "text": "Cure",
+          "address": 410764,
+          "length": 12
+        },
+        {
+          "id": 42,
+          "text": "Heal",
+          "address": 410776,
+          "length": 12
+        },
+        {
+          "id": 43,
+          "text": "Quake",
+          "address": 410788,
+          "length": 12
+        },
+        {
+          "id": 44,
+          "text": "Blizzard",
+          "address": 410800,
+          "length": 12
+        },
+        {
+          "id": 45,
+          "text": "Fire",
+          "address": 410812,
+          "length": 12
+        },
+        {
+          "id": 46,
+          "text": "Thunder",
+          "address": 410824,
+          "length": 12
+        },
+        {
+          "id": 47,
+          "text": "Reflectant",
+          "address": 410836,
+          "length": 12
+        },
+        {
+          "id": 48,
+          "text": "Electrapulse",
+          "address": 410848,
+          "length": 12
+        },
+        {
+          "id": 49,
+          "text": "PowerDrain",
+          "address": 410860,
+          "length": 12
+        },
+        {
+          "id": 50,
+          "text": "Spark",
+          "address": 410872,
+          "length": 12
+        },
+        {
+          "id": 51,
+          "text": "IronNail",
+          "address": 410884,
+          "length": 12
+        },
+        {
+          "id": 52,
+          "text": "Scream",
+          "address": 410896,
+          "length": 12
+        },
+        {
+          "id": 53,
+          "text": "Quicksand",
+          "address": 410908,
+          "length": 12
+        },
+        {
+          "id": 54,
+          "text": "DoomGaze",
+          "address": 410920,
+          "length": 12
+        },
+        {
+          "id": 55,
+          "text": "DoomPowder",
+          "address": 410932,
+          "length": 12
+        },
+        {
+          "id": 56,
+          "text": "Cure",
+          "address": 410944,
+          "length": 12
+        }
+      ]
+    },
+    "helmet_names": {
+      "count": 10,
+      "address": "$064354",
+      "entry_length": 12,
+      "entries": [
+        {
+          "id": 0,
+          "text": "SteelHelm",
+          "address": 410452,
+          "length": 12
+        },
+        {
+          "id": 1,
+          "text": "MoonHelm",
+          "address": 410464,
+          "length": 12
+        },
+        {
+          "id": 2,
+          "text": "ApolloHelm",
+          "address": 410476,
+          "length": 12
+        },
+        {
+          "id": 3,
+          "text": "SteelArmor",
+          "address": 410488,
+          "length": 12
+        },
+        {
+          "id": 4,
+          "text": "NobleArmor",
+          "address": 410500,
+          "length": 12
+        },
+        {
+          "id": 5,
+          "text": "Gaia'sArmor",
+          "address": 410512,
+          "length": 12
+        },
+        {
+          "id": 6,
+          "text": "RelicaArmor",
+          "address": 410524,
+          "length": 12
+        },
+        {
+          "id": 7,
+          "text": "MysticRobe",
+          "address": 410536,
+          "length": 12
+        },
+        {
+          "id": 8,
+          "text": "FlameArmor",
+          "address": 410548,
+          "length": 12
+        },
+        {
+          "id": 9,
+          "text": "BlackRobe",
+          "address": 410560,
+          "length": 12
+        }
+      ]
+    },
+    "armor_names": {
+      "count": 20,
+      "address": "$064378",
+      "entry_length": 12,
+      "entries": [
+        {
+          "id": 0,
+          "text": "SteelArmor",
+          "address": 410488,
+          "length": 12
+        },
+        {
+          "id": 1,
+          "text": "NobleArmor",
+          "address": 410500,
+          "length": 12
+        },
+        {
+          "id": 2,
+          "text": "Gaia'sArmor",
+          "address": 410512,
+          "length": 12
+        },
+        {
+          "id": 3,
+          "text": "RelicaArmor",
+          "address": 410524,
+          "length": 12
+        },
+        {
+          "id": 4,
+          "text": "MysticRobe",
+          "address": 410536,
+          "length": 12
+        },
+        {
+          "id": 5,
+          "text": "FlameArmor",
+          "address": 410548,
+          "length": 12
+        },
+        {
+          "id": 6,
+          "text": "BlackRobe",
+          "address": 410560,
+          "length": 12
+        },
+        {
+          "id": 7,
+          "text": "SteelShield",
+          "address": 410572,
+          "length": 12
+        },
+        {
+          "id": 8,
+          "text": "VenusShield",
+          "address": 410584,
+          "length": 12
+        },
+        {
+          "id": 9,
+          "text": "AegisShield",
+          "address": 410596,
+          "length": 12
+        },
+        {
+          "id": 10,
+          "text": "EtherShield",
+          "address": 410608,
+          "length": 12
+        },
+        {
+          "id": 11,
+          "text": "Charm",
+          "address": 410620,
+          "length": 12
+        },
+        {
+          "id": 12,
+          "text": "MagicRing",
+          "address": 410632,
+          "length": 12
+        },
+        {
+          "id": 13,
+          "text": "CupidLocket",
+          "address": 410644,
+          "length": 12
+        },
+        {
+          "id": 14,
+          "text": "Sword",
+          "address": 410656,
+          "length": 12
+        },
+        {
+          "id": 15,
+          "text": "Scimitar",
+          "address": 410668,
+          "length": 12
+        },
+        {
+          "id": 16,
+          "text": "DragonCut",
+          "address": 410680,
+          "length": 12
+        },
+        {
+          "id": 17,
+          "text": "Rapier",
+          "address": 410692,
+          "length": 12
+        },
+        {
+          "id": 18,
+          "text": "Axe",
+          "address": 410704,
+          "length": 12
+        },
+        {
+          "id": 19,
+          "text": "Beam",
+          "address": 410716,
+          "length": 12
+        }
+      ]
+    },
+    "shield_names": {
+      "count": 10,
+      "address": "$0643CC",
+      "entry_length": 12,
+      "entries": [
+        {
+          "id": 0,
+          "text": "SteelShield",
+          "address": 410572,
+          "length": 12
+        },
+        {
+          "id": 1,
+          "text": "VenusShield",
+          "address": 410584,
+          "length": 12
+        },
+        {
+          "id": 2,
+          "text": "AegisShield",
+          "address": 410596,
+          "length": 12
+        },
+        {
+          "id": 3,
+          "text": "EtherShield",
+          "address": 410608,
+          "length": 12
+        },
+        {
+          "id": 4,
+          "text": "Charm",
+          "address": 410620,
+          "length": 12
+        },
+        {
+          "id": 5,
+          "text": "MagicRing",
+          "address": 410632,
+          "length": 12
+        },
+        {
+          "id": 6,
+          "text": "CupidLocket",
+          "address": 410644,
+          "length": 12
+        },
+        {
+          "id": 7,
+          "text": "Sword",
+          "address": 410656,
+          "length": 12
+        },
+        {
+          "id": 8,
+          "text": "Scimitar",
+          "address": 410668,
+          "length": 12
+        },
+        {
+          "id": 9,
+          "text": "DragonCut",
+          "address": 410680,
+          "length": 12
+        }
+      ]
+    },
+    "accessory_names": {
+      "count": 24,
+      "address": "$0643FC",
+      "entry_length": 12,
+      "entries": [
+        {
+          "id": 0,
+          "text": "Charm",
+          "address": 410620,
+          "length": 12
+        },
+        {
+          "id": 1,
+          "text": "MagicRing",
+          "address": 410632,
+          "length": 12
+        },
+        {
+          "id": 2,
+          "text": "CupidLocket",
+          "address": 410644,
+          "length": 12
+        },
+        {
+          "id": 3,
+          "text": "Sword",
+          "address": 410656,
+          "length": 12
+        },
+        {
+          "id": 4,
+          "text": "Scimitar",
+          "address": 410668,
+          "length": 12
+        },
+        {
+          "id": 5,
+          "text": "DragonCut",
+          "address": 410680,
+          "length": 12
+        },
+        {
+          "id": 6,
+          "text": "Rapier",
+          "address": 410692,
+          "length": 12
+        },
+        {
+          "id": 7,
+          "text": "Axe",
+          "address": 410704,
+          "length": 12
+        },
+        {
+          "id": 8,
+          "text": "Beam",
+          "address": 410716,
+          "length": 12
+        },
+        {
+          "id": 9,
+          "text": "BoneMissile",
+          "address": 410728,
+          "length": 12
+        },
+        {
+          "id": 10,
+          "text": "Bow&Arrow",
+          "address": 410740,
+          "length": 12
+        },
+        {
+          "id": 11,
+          "text": "BlowDart",
+          "address": 410752,
+          "length": 12
+        },
+        {
+          "id": 12,
+          "text": "Cure",
+          "address": 410764,
+          "length": 12
+        },
+        {
+          "id": 13,
+          "text": "Heal",
+          "address": 410776,
+          "length": 12
+        },
+        {
+          "id": 14,
+          "text": "Quake",
+          "address": 410788,
+          "length": 12
+        },
+        {
+          "id": 15,
+          "text": "Blizzard",
+          "address": 410800,
+          "length": 12
+        },
+        {
+          "id": 16,
+          "text": "Fire",
+          "address": 410812,
+          "length": 12
+        },
+        {
+          "id": 17,
+          "text": "Thunder",
+          "address": 410824,
+          "length": 12
+        },
+        {
+          "id": 18,
+          "text": "Reflectant",
+          "address": 410836,
+          "length": 12
+        },
+        {
+          "id": 19,
+          "text": "Electrapulse",
+          "address": 410848,
+          "length": 12
+        },
+        {
+          "id": 20,
+          "text": "PowerDrain",
+          "address": 410860,
+          "length": 12
+        },
+        {
+          "id": 21,
+          "text": "Spark",
+          "address": 410872,
+          "length": 12
+        },
+        {
+          "id": 22,
+          "text": "IronNail",
+          "address": 410884,
+          "length": 12
+        },
+        {
+          "id": 23,
+          "text": "Scream",
+          "address": 410896,
+          "length": 12
+        }
+      ]
+    },
+    "attack_names": {
+      "count": 128,
+      "address": "$064420",
+      "entry_length": 12,
+      "entries": [
+        {
+          "id": 0,
+          "text": "Sword",
+          "address": 410656,
+          "length": 12
+        },
+        {
+          "id": 1,
+          "text": "Scimitar",
+          "address": 410668,
+          "length": 12
+        },
+        {
+          "id": 2,
+          "text": "DragonCut",
+          "address": 410680,
+          "length": 12
+        },
+        {
+          "id": 3,
+          "text": "Rapier",
+          "address": 410692,
+          "length": 12
+        },
+        {
+          "id": 4,
+          "text": "Axe",
+          "address": 410704,
+          "length": 12
+        },
+        {
+          "id": 5,
+          "text": "Beam",
+          "address": 410716,
+          "length": 12
+        },
+        {
+          "id": 6,
+          "text": "BoneMissile",
+          "address": 410728,
+          "length": 12
+        },
+        {
+          "id": 7,
+          "text": "Bow&Arrow",
+          "address": 410740,
+          "length": 12
+        },
+        {
+          "id": 8,
+          "text": "BlowDart",
+          "address": 410752,
+          "length": 12
+        },
+        {
+          "id": 9,
+          "text": "Cure",
+          "address": 410764,
+          "length": 12
+        },
+        {
+          "id": 10,
+          "text": "Heal",
+          "address": 410776,
+          "length": 12
+        },
+        {
+          "id": 11,
+          "text": "Quake",
+          "address": 410788,
+          "length": 12
+        },
+        {
+          "id": 12,
+          "text": "Blizzard",
+          "address": 410800,
+          "length": 12
+        },
+        {
+          "id": 13,
+          "text": "Fire",
+          "address": 410812,
+          "length": 12
+        },
+        {
+          "id": 14,
+          "text": "Thunder",
+          "address": 410824,
+          "length": 12
+        },
+        {
+          "id": 15,
+          "text": "Reflectant",
+          "address": 410836,
+          "length": 12
+        },
+        {
+          "id": 16,
+          "text": "Electrapulse",
+          "address": 410848,
+          "length": 12
+        },
+        {
+          "id": 17,
+          "text": "PowerDrain",
+          "address": 410860,
+          "length": 12
+        },
+        {
+          "id": 18,
+          "text": "Spark",
+          "address": 410872,
+          "length": 12
+        },
+        {
+          "id": 19,
+          "text": "IronNail",
+          "address": 410884,
+          "length": 12
+        },
+        {
+          "id": 20,
+          "text": "Scream",
+          "address": 410896,
+          "length": 12
+        },
+        {
+          "id": 21,
+          "text": "Quicksand",
+          "address": 410908,
+          "length": 12
+        },
+        {
+          "id": 22,
+          "text": "DoomGaze",
+          "address": 410920,
+          "length": 12
+        },
+        {
+          "id": 23,
+          "text": "DoomPowder",
+          "address": 410932,
+          "length": 12
+        },
+        {
+          "id": 24,
+          "text": "Cure",
+          "address": 410944,
+          "length": 12
+        },
+        {
+          "id": 25,
+          "text": "FireBreath",
+          "address": 410956,
+          "length": 12
+        },
+        {
+          "id": 26,
+          "text": "Punch",
+          "address": 410968,
+          "length": 12
+        },
+        {
+          "id": 27,
+          "text": "Kick",
+          "address": 410980,
+          "length": 12
+        },
+        {
+          "id": 28,
+          "text": "Uppercut",
+          "address": 410992,
+          "length": 12
+        },
+        {
+          "id": 29,
+          "text": "Stab",
+          "address": 411004,
+          "length": 12
+        },
+        {
+          "id": 30,
+          "text": "HeadButt",
+          "address": 411016,
+          "length": 12
+        },
+        {
+          "id": 31,
+          "text": "BodySlam",
+          "address": 411028,
+          "length": 12
+        },
+        {
+          "id": 32,
+          "text": "Scrunch",
+          "address": 411040,
+          "length": 12
+        },
+        {
+          "id": 33,
+          "text": "FullNelson",
+          "address": 411052,
+          "length": 12
+        },
+        {
+          "id": 34,
+          "text": "NeckChoke",
+          "address": 411064,
+          "length": 12
+        },
+        {
+          "id": 35,
+          "text": "Dash",
+          "address": 411076,
+          "length": 12
+        },
+        {
+          "id": 36,
+          "text": "Roundhouse",
+          "address": 411088,
+          "length": 12
+        },
+        {
+          "id": 37,
+          "text": "ChokeUp",
+          "address": 411100,
+          "length": 12
+        },
+        {
+          "id": 38,
+          "text": "StompStomp",
+          "address": 411112,
+          "length": 12
+        },
+        {
+          "id": 39,
+          "text": "MegaPunch",
+          "address": 411124,
+          "length": 12
+        },
+        {
+          "id": 40,
+          "text": "Bearhug",
+          "address": 411136,
+          "length": 12
+        },
+        {
+          "id": 41,
+          "text": "AxeBomber",
+          "address": 411148,
+          "length": 12
+        },
+        {
+          "id": 42,
+          "text": "Piledriver",
+          "address": 411160,
+          "length": 12
+        },
+        {
+          "id": 43,
+          "text": "SkyAttack",
+          "address": 411172,
+          "length": 12
+        },
+        {
+          "id": 44,
+          "text": "Wraparound",
+          "address": 411184,
+          "length": 12
+        },
+        {
+          "id": 45,
+          "text": "Dive",
+          "address": 411196,
+          "length": 12
+        },
+        {
+          "id": 46,
+          "text": "Attatch",
+          "address": 411208,
+          "length": 12
+        },
+        {
+          "id": 47,
+          "text": "Mucus",
+          "address": 411220,
+          "length": 12
+        },
+        {
+          "id": 48,
+          "text": "Claw",
+          "address": 411232,
+          "length": 12
+        },
+        {
+          "id": 49,
+          "text": "Fang",
+          "address": 411244,
+          "length": 12
+        },
+        {
+          "id": 50,
+          "text": "Beak",
+          "address": 411256,
+          "length": 12
+        },
+        {
+          "id": 51,
+          "text": "Sting",
+          "address": 411268,
+          "length": 12
+        },
+        {
+          "id": 52,
+          "text": "Tail",
+          "address": 411280,
+          "length": 12
+        },
+        {
+          "id": 53,
+          "text": "Psudopod",
+          "address": 411292,
+          "length": 12
+        },
+        {
+          "id": 54,
+          "text": "Bite",
+          "address": 411304,
+          "length": 12
+        },
+        {
+          "id": 55,
+          "text": "HydroAcid",
+          "address": 411316,
+          "length": 12
+        },
+        {
+          "id": 56,
+          "text": "Branch",
+          "address": 411328,
+          "length": 12
+        },
+        {
+          "id": 57,
+          "text": "Fin",
+          "address": 411340,
+          "length": 12
+        },
+        {
+          "id": 58,
+          "text": "Scissor",
+          "address": 411352,
+          "length": 12
+        },
+        {
+          "id": 59,
+          "text": "WhipTongue",
+          "address": 411364,
+          "length": 12
+        },
+        {
+          "id": 60,
+          "text": "Horn",
+          "address": 411376,
+          "length": 12
+        },
+        {
+          "id": 61,
+          "text": "GiantBlade",
+          "address": 411388,
+          "length": 12
+        },
+        {
+          "id": 62,
+          "text": "Headoomerang",
+          "address": 411400,
+          "length": 12
+        },
+        {
+          "id": 63,
+          "text": "ChewOff",
+          "address": 411412,
+          "length": 12
+        },
+        {
+          "id": 64,
+          "text": "Quake",
+          "address": 411424,
+          "length": 12
+        },
+        {
+          "id": 65,
+          "text": "Flame",
+          "address": 411436,
+          "length": 12
+        },
+        {
+          "id": 66,
+          "text": "FlameSweep",
+          "address": 411448,
+          "length": 12
+        },
+        {
+          "id": 67,
+          "text": "Fireball",
+          "address": 411460,
+          "length": 12
+        },
+        {
+          "id": 68,
+          "text": "FlamePillar",
+          "address": 411472,
+          "length": 12
+        },
+        {
+          "id": 69,
+          "text": "Heatwave",
+          "address": 411484,
+          "length": 12
+        },
+        {
+          "id": 70,
+          "text": "Watergun",
+          "address": 411496,
+          "length": 12
+        },
+        {
+          "id": 71,
+          "text": "Coldness",
+          "address": 411508,
+          "length": 12
+        },
+        {
+          "id": 72,
+          "text": "IcyFoam",
+          "address": 411520,
+          "length": 12
+        },
+        {
+          "id": 73,
+          "text": "IceBlock",
+          "address": 411532,
+          "length": 12
+        },
+        {
+          "id": 74,
+          "text": "Snowstorm",
+          "address": 411544,
+          "length": 12
+        },
+        {
+          "id": 75,
+          "text": "Whirlwater",
+          "address": 411556,
+          "length": 12
+        },
+        {
+          "id": 76,
+          "text": "IceBreath",
+          "address": 411568,
+          "length": 12
+        },
+        {
+          "id": 77,
+          "text": "Tornado",
+          "address": 411580,
+          "length": 12
+        },
+        {
+          "id": 78,
+          "text": "Typhoon",
+          "address": 411592,
+          "length": 12
+        },
+        {
+          "id": 79,
+          "text": "Hurricane",
+          "address": 411604,
+          "length": 12
+        },
+        {
+          "id": 80,
+          "text": "Thunder",
+          "address": 411616,
+          "length": 12
+        },
+        {
+          "id": 81,
+          "text": "ThunderBeam",
+          "address": 411628,
+          "length": 12
+        },
+        {
+          "id": 82,
+          "text": "CorrodeGas",
+          "address": 411640,
+          "length": 12
+        },
+        {
+          "id": 83,
+          "text": "DoomDance",
+          "address": 411652,
+          "length": 12
+        },
+        {
+          "id": 84,
+          "text": "SonicBoom",
+          "address": 411664,
+          "length": 12
+        },
+        {
+          "id": 85,
+          "text": "Bark",
+          "address": 411676,
+          "length": 12
+        },
+        {
+          "id": 86,
+          "text": "Screechvoice",
+          "address": 411688,
+          "length": 12
+        },
+        {
+          "id": 87,
+          "text": "Para-needle",
+          "address": 411700,
+          "length": 12
+        },
+        {
+          "id": 88,
+          "text": "Para-claw",
+          "address": 411712,
+          "length": 12
+        },
+        {
+          "id": 89,
+          "text": "Para-snake",
+          "address": 411724,
+          "length": 12
+        },
+        {
+          "id": 90,
+          "text": "Para-breath",
+          "address": 411736,
+          "length": 12
+        },
+        {
+          "id": 91,
+          "text": "PoisonSting",
+          "address": 411748,
+          "length": 12
+        },
+        {
+          "id": 92,
+          "text": "PoisonThorn",
+          "address": 411760,
+          "length": 12
+        },
+        {
+          "id": 93,
+          "text": "RottenMucus",
+          "address": 411772,
+          "length": 12
+        },
+        {
+          "id": 94,
+          "text": "PoisonSnake",
+          "address": 411784,
+          "length": 12
+        },
+        {
+          "id": 95,
+          "text": "Poisonbreath",
+          "address": 411796,
+          "length": 12
+        },
+        {
+          "id": 96,
+          "text": "Blinder",
+          "address": 411808,
+          "length": 12
+        },
+        {
+          "id": 97,
+          "text": "Blackness",
+          "address": 411820,
+          "length": 12
+        },
+        {
+          "id": 98,
+          "text": "StoneBeak",
+          "address": 411832,
+          "length": 12
+        },
+        {
+          "id": 99,
+          "text": "Gaze",
+          "address": 411844,
+          "length": 12
+        },
+        {
+          "id": 100,
+          "text": "Stare",
+          "address": 411856,
+          "length": 12
+        },
+        {
+          "id": 101,
+          "text": "SpookyLaugh",
+          "address": 411868,
+          "length": 12
+        },
+        {
+          "id": 102,
+          "text": "Riddle",
+          "address": 411880,
+          "length": 12
+        },
+        {
+          "id": 103,
+          "text": "BadBreath",
+          "address": 411892,
+          "length": 12
+        },
+        {
+          "id": 104,
+          "text": "BodyOdor",
+          "address": 411904,
+          "length": 12
+        },
+        {
+          "id": 105,
+          "text": "Para-stare",
+          "address": 411916,
+          "length": 12
+        },
+        {
+          "id": 106,
+          "text": "PoisonFluid",
+          "address": 411928,
+          "length": 12
+        },
+        {
+          "id": 107,
+          "text": "PoisonFlour",
+          "address": 411940,
+          "length": 12
+        },
+        {
+          "id": 108,
+          "text": "Hypno-sleep",
+          "address": 411952,
+          "length": 12
+        },
+        {
+          "id": 109,
+          "text": "Lullaby",
+          "address": 411964,
+          "length": 12
+        },
+        {
+          "id": 110,
+          "text": "SleepLure",
+          "address": 411976,
+          "length": 12
+        },
+        {
+          "id": 111,
+          "text": "SleepPowder",
+          "address": 411988,
+          "length": 12
+        },
+        {
+          "id": 112,
+          "text": "BlindFlash",
+          "address": 412000,
+          "length": 12
+        },
+        {
+          "id": 113,
+          "text": "Smokescreen",
+          "address": 412012,
+          "length": 12
+        },
+        {
+          "id": 114,
+          "text": "Muffle",
+          "address": 412024,
+          "length": 12
+        },
+        {
+          "id": 115,
+          "text": "SilenceSong",
+          "address": 412036,
+          "length": 12
+        },
+        {
+          "id": 116,
+          "text": "StoneGas",
+          "address": 412048,
+          "length": 12
+        },
+        {
+          "id": 117,
+          "text": "StoneGaze",
+          "address": 412060,
+          "length": 12
+        },
+        {
+          "id": 118,
+          "text": "DoubleSword",
+          "address": 412072,
+          "length": 12
+        },
+        {
+          "id": 119,
+          "text": "DoubleHit",
+          "address": 412084,
+          "length": 12
+        },
+        {
+          "id": 120,
+          "text": "TripleFang",
+          "address": 412096,
+          "length": 12
+        },
+        {
+          "id": 121,
+          "text": "DoubleKick",
+          "address": 412108,
+          "length": 12
+        },
+        {
+          "id": 122,
+          "text": "TwinShears",
+          "address": 412120,
+          "length": 12
+        },
+        {
+          "id": 123,
+          "text": "ThreeHeads",
+          "address": 412132,
+          "length": 12
+        },
+        {
+          "id": 124,
+          "text": "6Psudopods",
+          "address": 412144,
+          "length": 12
+        },
+        {
+          "id": 125,
+          "text": "SnakeHead",
+          "address": 412156,
+          "length": 12
+        },
+        {
+          "id": 126,
+          "text": "Drain",
+          "address": 412168,
+          "length": 12
+        },
+        {
+          "id": 127,
+          "text": "Dissolve",
+          "address": 412180,
+          "length": 12
+        }
+      ]
+    },
+    "monster_names": {
+      "count": 211,
+      "address": "$064BA0",
+      "entry_length": 16,
+      "entries": [
+        {
+          "id": 0,
+          "text": "Brownie",
+          "address": 412576,
+          "length": 16
+        },
+        {
+          "id": 1,
+          "text": "Mintmint",
+          "address": 412592,
+          "length": 16
+        },
+        {
+          "id": 2,
+          "text": "RedCap",
+          "address": 412608,
+          "length": 16
+        },
+        {
+          "id": 3,
+          "text": "Mad_Plant",
+          "address": 412624,
+          "length": 16
+        },
+        {
+          "id": 4,
+          "text": "Plant_Man",
+          "address": 412640,
+          "length": 16
+        },
+        {
+          "id": 5,
+          "text": "LiveOak",
+          "address": 412656,
+          "length": 16
+        },
+        {
+          "id": 6,
+          "text": "Slime",
+          "address": 412672,
+          "length": 16
+        },
+        {
+          "id": 7,
+          "text": "Jelly",
+          "address": 412688,
+          "length": 16
+        },
+        {
+          "id": 8,
+          "text": "Ooze",
+          "address": 412704,
+          "length": 16
+        },
+        {
+          "id": 9,
+          "text": "Poison_Toad",
+          "address": 412720,
+          "length": 16
+        },
+        {
+          "id": 10,
+          "text": "Giant_Toad",
+          "address": 412736,
+          "length": 16
+        },
+        {
+          "id": 11,
+          "text": "Mad_Toad",
+          "address": 412752,
+          "length": 16
+        },
+        {
+          "id": 12,
+          "text": "Basilisk",
+          "address": 412768,
+          "length": 16
+        },
+        {
+          "id": 13,
+          "text": "Flazzard",
+          "address": 412784,
+          "length": 16
+        },
+        {
+          "id": 14,
+          "text": "Salamand",
+          "address": 412800,
+          "length": 16
+        },
+        {
+          "id": 15,
+          "text": "Sand_Worm",
+          "address": 412816,
+          "length": 16
+        },
+        {
+          "id": 16,
+          "text": "Land_Worm",
+          "address": 412832,
+          "length": 16
+        },
+        {
+          "id": 17,
+          "text": "Leech",
+          "address": 412848,
+          "length": 16
+        },
+        {
+          "id": 18,
+          "text": "Skeleton",
+          "address": 412864,
+          "length": 16
+        },
+        {
+          "id": 19,
+          "text": "RedBone",
+          "address": 412880,
+          "length": 16
+        },
+        {
+          "id": 20,
+          "text": "Skuldier",
+          "address": 412896,
+          "length": 16
+        },
+        {
+          "id": 21,
+          "text": "Roc",
+          "address": 412912,
+          "length": 16
+        },
+        {
+          "id": 22,
+          "text": "Sparna",
+          "address": 412928,
+          "length": 16
+        },
+        {
+          "id": 23,
+          "text": "Garuda",
+          "address": 412944,
+          "length": 16
+        },
+        {
+          "id": 24,
+          "text": "Zombie",
+          "address": 412960,
+          "length": 16
+        },
+        {
+          "id": 25,
+          "text": "Mummy",
+          "address": 412976,
+          "length": 16
+        },
+        {
+          "id": 26,
+          "text": "Desert_Hag",
+          "address": 412992,
+          "length": 16
+        },
+        {
+          "id": 27,
+          "text": "Water_Hag",
+          "address": 413008,
+          "length": 16
+        },
+        {
+          "id": 28,
+          "text": "Ninja",
+          "address": 413024,
+          "length": 16
+        },
+        {
+          "id": 29,
+          "text": "Shadow",
+          "address": 413040,
+          "length": 16
+        },
+        {
+          "id": 30,
+          "text": "Sphinx",
+          "address": 413056,
+          "length": 16
+        },
+        {
+          "id": 31,
+          "text": "Manticor",
+          "address": 413072,
+          "length": 16
+        },
+        {
+          "id": 32,
+          "text": "Centaur",
+          "address": 413088,
+          "length": 16
+        },
+        {
+          "id": 33,
+          "text": "Nitemare",
+          "address": 413104,
+          "length": 16
+        },
+        {
+          "id": 34,
+          "text": "Stoney_Roost",
+          "address": 413120,
+          "length": 16
+        },
+        {
+          "id": 35,
+          "text": "Hot_Wings",
+          "address": 413136,
+          "length": 16
+        },
+        {
+          "id": 36,
+          "text": "Ghost",
+          "address": 413152,
+          "length": 16
+        },
+        {
+          "id": 37,
+          "text": "Spector",
+          "address": 413168,
+          "length": 16
+        },
+        {
+          "id": 38,
+          "text": "Gather",
+          "address": 413184,
+          "length": 16
+        },
+        {
+          "id": 39,
+          "text": "Beholder",
+          "address": 413200,
+          "length": 16
+        },
+        {
+          "id": 40,
+          "text": "Fangpire",
+          "address": 413216,
+          "length": 16
+        },
+        {
+          "id": 41,
+          "text": "Vampire",
+          "address": 413232,
+          "length": 16
+        },
+        {
+          "id": 42,
+          "text": "Mage",
+          "address": 413248,
+          "length": 16
+        },
+        {
+          "id": 43,
+          "text": "Sorcerer",
+          "address": 413264,
+          "length": 16
+        },
+        {
+          "id": 44,
+          "text": "Land_Turtle",
+          "address": 413280,
+          "length": 16
+        },
+        {
+          "id": 45,
+          "text": "Adamant_Turtle",
+          "address": 413296,
+          "length": 16
+        },
+        {
+          "id": 46,
+          "text": "Scorpion",
+          "address": 413312,
+          "length": 16
+        },
+        {
+          "id": 47,
+          "text": "Snipion",
+          "address": 413328,
+          "length": 16
+        },
+        {
+          "id": 48,
+          "text": "Were_Wolf",
+          "address": 413344,
+          "length": 16
+        },
+        {
+          "id": 49,
+          "text": "Cerberus",
+          "address": 413360,
+          "length": 16
+        },
+        {
+          "id": 50,
+          "text": "Edgehog",
+          "address": 413376,
+          "length": 16
+        },
+        {
+          "id": 51,
+          "text": "Sting_Rat",
+          "address": 413392,
+          "length": 16
+        },
+        {
+          "id": 52,
+          "text": "Lamia",
+          "address": 413408,
+          "length": 16
+        },
+        {
+          "id": 53,
+          "text": "Naga",
+          "address": 413424,
+          "length": 16
+        },
+        {
+          "id": 54,
+          "text": "Avizzard",
+          "address": 413440,
+          "length": 16
+        },
+        {
+          "id": 55,
+          "text": "Gargoyle",
+          "address": 413456,
+          "length": 16
+        },
+        {
+          "id": 56,
+          "text": "Gorgon",
+          "address": 413472,
+          "length": 16
+        },
+        {
+          "id": 57,
+          "text": "Minotar_Zombie",
+          "address": 413488,
+          "length": 16
+        },
+        {
+          "id": 58,
+          "text": "Phanquid",
+          "address": 413504,
+          "length": 16
+        },
+        {
+          "id": 59,
+          "text": "Freezer_Crab",
+          "address": 413520,
+          "length": 16
+        },
+        {
+          "id": 60,
+          "text": "Iflyte",
+          "address": 413536,
+          "length": 16
+        },
+        {
+          "id": 61,
+          "text": "Stheno",
+          "address": 413552,
+          "length": 16
+        },
+        {
+          "id": 62,
+          "text": "Chimera",
+          "address": 413568,
+          "length": 16
+        },
+        {
+          "id": 63,
+          "text": "Thanatos",
+          "address": 413584,
+          "length": 16
+        },
+        {
+          "id": 64,
+          "text": "Skullrus_Rex",
+          "address": 413600,
+          "length": 16
+        },
+        {
+          "id": 65,
+          "text": "Stone_Golem",
+          "address": 413616,
+          "length": 16
+        },
+        {
+          "id": 66,
+          "text": "Behemoth",
+          "address": 413632,
+          "length": 16
+        },
+        {
+          "id": 67,
+          "text": "Minotaur",
+          "address": 413648,
+          "length": 16
+        },
+        {
+          "id": 68,
+          "text": "Squidite",
+          "address": 413664,
+          "length": 16
+        },
+        {
+          "id": 69,
+          "text": "Snow_Crab",
+          "address": 413680,
+          "length": 16
+        },
+        {
+          "id": 70,
+          "text": "Jinn",
+          "address": 413696,
+          "length": 16
+        },
+        {
+          "id": 71,
+          "text": "Medusa",
+          "address": 413712,
+          "length": 16
+        },
+        {
+          "id": 72,
+          "text": "Gidrah",
+          "address": 413728,
+          "length": 16
+        },
+        {
+          "id": 73,
+          "text": "Dullahan",
+          "address": 413744,
+          "length": 16
+        },
+        {
+          "id": 74,
+          "text": "Flamerus_Rex",
+          "address": 413760,
+          "length": 16
+        },
+        {
+          "id": 75,
+          "text": "Ice_Golem",
+          "address": 413776,
+          "length": 16
+        },
+        {
+          "id": 76,
+          "text": "Dualhead_Hydra",
+          "address": 413792,
+          "length": 16
+        },
+        {
+          "id": 77,
+          "text": "Twinhead_Wyvern",
+          "address": 413808,
+          "length": 16
+        },
+        {
+          "id": 78,
+          "text": "Pazuzu",
+          "address": 413824,
+          "length": 16
+        },
+        {
+          "id": 79,
+          "text": "Zuh",
+          "address": 413840,
+          "length": 16
+        },
+        {
+          "id": 80,
+          "text": "Dark_King",
+          "address": 413856,
+          "length": 16
+        },
+        {
+          "id": 81,
+          "text": "DemoPlay",
+          "address": 413872,
+          "length": 16
+        },
+        {
+          "id": 82,
+          "text": "{newline}",
+          "address": 413888,
+          "length": 2
+        },
+        {
+          "id": 85,
+          "text": "<4B>[NAME]",
+          "address": 413936,
+          "length": 3
+        },
+        {
+          "id": 86,
+          "text": "Kaeli",
+          "address": 413952,
+          "length": 16
+        },
+        {
+          "id": 88,
+          "text": "…",
+          "address": 413984,
+          "length": 2
+        },
+        {
+          "id": 90,
+          "text": "<4C><12><64>",
+          "address": 414016,
+          "length": 4
+        },
+        {
+          "id": 91,
+          "text": "Tristam",
+          "address": 414032,
+          "length": 16
+        },
+        {
+          "id": 92,
+          "text": "<07>",
+          "address": 414048,
+          "length": 2
+        },
+        {
+          "id": 93,
+          "text": "<82>",
+          "address": 414064,
+          "length": 2
+        },
+        {
+          "id": 94,
+          "text": "<63><2E>",
+          "address": 414080,
+          "length": 3
+        },
+        {
+          "id": 95,
+          "text": "<4E><18><64>",
+          "address": 414096,
+          "length": 4
+        },
+        {
+          "id": 96,
+          "text": "Phoebe",
+          "address": 414112,
+          "length": 16
+        },
+        {
+          "id": 97,
+          "text": "<0F>",
+          "address": 414128,
+          "length": 2
+        },
+        {
+          "id": 98,
+          "text": "é",
+          "address": 414144,
+          "length": 2
+        },
+        {
+          "id": 99,
+          "text": "<63><26>[WAIT]",
+          "address": 414160,
+          "length": 4
+        },
+        {
+          "id": 100,
+          "text": "<52><0F><1E><46>",
+          "address": 414176,
+          "length": 5
+        },
+        {
+          "id": 101,
+          "text": "Reuben",
+          "address": 414192,
+          "length": 16
+        },
+        {
+          "id": 102,
+          "text": "<17>",
+          "address": 414208,
+          "length": 2
+        },
+        {
+          "id": 103,
+          "text": "è",
+          "address": 414224,
+          "length": 2
+        },
+        {
+          "id": 105,
+          "text": "<56><14><64>",
+          "address": 414256,
+          "length": 4
+        },
+        {
+          "id": 106,
+          "text": "Kaeli",
+          "address": 414272,
+          "length": 16
+        },
+        {
+          "id": 107,
+          "text": "<1F>",
+          "address": 414288,
+          "length": 2
+        },
+        {
+          "id": 108,
+          "text": "<85>",
+          "address": 414304,
+          "length": 2
+        },
+        {
+          "id": 110,
+          "text": "<5A><17><41><23>",
+          "address": 414336,
+          "length": 5
+        },
+        {
+          "id": 111,
+          "text": "Tristam",
+          "address": 414352,
+          "length": 16
+        },
+        {
+          "id": 112,
+          "text": "<17>",
+          "address": 414368,
+          "length": 2
+        },
+        {
+          "id": 113,
+          "text": "<86>",
+          "address": 414384,
+          "length": 2
+        },
+        {
+          "id": 114,
+          "text": "<63><2E>",
+          "address": 414400,
+          "length": 3
+        },
+        {
+          "id": 115,
+          "text": "<56><19><64>",
+          "address": 414416,
+          "length": 4
+        },
+        {
+          "id": 116,
+          "text": "Phoebe",
+          "address": 414432,
+          "length": 16
+        },
+        {
+          "id": 117,
+          "text": "<22>",
+          "address": 414448,
+          "length": 2
+        },
+        {
+          "id": 118,
+          "text": "à",
+          "address": 414464,
+          "length": 2
+        },
+        {
+          "id": 119,
+          "text": "<63><2D>",
+          "address": 414480,
+          "length": 3
+        },
+        {
+          "id": 120,
+          "text": "<5C><21><28><3C>",
+          "address": 414496,
+          "length": 5
+        },
+        {
+          "id": 121,
+          "text": "Reuben",
+          "address": 414512,
+          "length": 16
+        },
+        {
+          "id": 122,
+          "text": "<1F>",
+          "address": 414528,
+          "length": 2
+        },
+        {
+          "id": 123,
+          "text": "<88>",
+          "address": 414544,
+          "length": 2
+        },
+        {
+          "id": 125,
+          "text": "<5A><14><41><23>",
+          "address": 414576,
+          "length": 5
+        },
+        {
+          "id": 129,
+          "text": "<20><08>",
+          "address": 414640,
+          "length": 3
+        },
+        {
+          "id": 130,
+          "text": "[WAIT]",
+          "address": 414656,
+          "length": 2
+        },
+        {
+          "id": 147,
+          "text": "<0A><0A><0A><0A><0A><0A><0A><0A><0A><0A><0A><0A><0A><0A><0A><0A>",
+          "address": 414928,
+          "length": 16
+        },
+        {
+          "id": 148,
+          "text": "<0A><0A><0A><0A>",
+          "address": 414944,
+          "length": 5
+        },
+        {
+          "id": 149,
+          "text": "<55>",
+          "address": 414960,
+          "length": 2
+        },
+        {
+          "id": 150,
+          "text": "6[NAME][NAME]_[NAME]",
+          "address": 414976,
+          "length": 15
+        },
+        {
+          "id": 151,
+          "text": "A9<EC>[WAIT]",
+          "address": 414992,
+          "length": 11
+        },
+        {
+          "id": 153,
+          "text": "[WAIT]<1E>[NAME]<1E>[NAME]<1E>[NAME]",
+          "address": 415024,
+          "length": 16
+        },
+        {
+          "id": 154,
+          "text": "<1E>[NAME]<62><0A>{newline}<0A>{newline}",
+          "address": 415040,
+          "length": 16
+        },
+        {
+          "id": 155,
+          "text": "<45><1E>[WAIT]<1E>[WAIT]",
+          "address": 415056,
+          "length": 16
+        },
+        {
+          "id": 156,
+          "text": "y[WAIT][WAIT][WAIT][WAIT][WAIT][WAIT][NAME]",
+          "address": 415072,
+          "length": 16
+        },
+        {
+          "id": 157,
+          "text": "<62><1E>{newline}<1E>{newline}",
+          "address": 415088,
+          "length": 16
+        },
+        {
+          "id": 158,
+          "text": "g<1E>{newline}<1E>{newline}",
+          "address": 415104,
+          "length": 16
+        },
+        {
+          "id": 159,
+          "text": "<67><77>[WAIT]",
+          "address": 415120,
+          "length": 6
+        },
+        {
+          "id": 160,
+          "text": "<68><78><68><78><68><78><78><78><78><78><78>[WAIT]",
+          "address": 415136,
+          "length": 14
+        },
+        {
+          "id": 161,
+          "text": "<69><69><69><69><69><69><69><69><69><79><69><79><69><79><79><79>",
+          "address": 415152,
+          "length": 16
+        },
+        {
+          "id": 162,
+          "text": "<79><79><79>[WAIT]",
+          "address": 415168,
+          "length": 6
+        },
+        {
+          "id": 163,
+          "text": "<6A><7A><6A><7A><6A><7A><7A><7A><7A><7A><7A>[WAIT]",
+          "address": 415184,
+          "length": 15
+        },
+        {
+          "id": 164,
+          "text": "<78><78><78><78><78><78><68><68><68><68><68><68><78><68><78><68>",
+          "address": 415200,
+          "length": 16
+        },
+        {
+          "id": 165,
+          "text": "<78><78><78>[WAIT]",
+          "address": 415216,
+          "length": 6
+        },
+        {
+          "id": 166,
+          "text": "<69><69><69><79><69><79><69><79><79><79>[WAIT]",
+          "address": 415232,
+          "length": 13
+        },
+        {
+          "id": 167,
+          "text": "<7A><7A><7A><7A><6A><6A><6A><6A><6A><6A><7A><6A><7A><6A><7A><7A>",
+          "address": 415248,
+          "length": 16
+        },
+        {
+          "id": 168,
+          "text": "<7A><7B><77>[WAIT][NAME][WAIT][NAME][WAIT]",
+          "address": 415264,
+          "length": 12
+        },
+        {
+          "id": 169,
+          "text": "[WAIT]",
+          "address": 415280,
+          "length": 2
+        },
+        {
+          "id": 170,
+          "text": "{newline}6<2B>{newline}[NAME]{newline}[NAME]<09>{newline}<08>",
+          "address": 415296,
+          "length": 16
+        },
+        {
+          "id": 171,
+          "text": "{newline}<07>{newline}_{newline}<77><0F>{newline}<0F>{newline}",
+          "address": 415312,
+          "length": 16
+        },
+        {
+          "id": 173,
+          "text": "[ITEM]",
+          "address": 415344,
+          "length": 2
+        },
+        {
+          "id": 175,
+          "text": "<6D>",
+          "address": 415376,
+          "length": 2
+        },
+        {
+          "id": 178,
+          "text": "<0A><0D><08><09><0A><0B><0C><0D><0E><0F><0E><0D><0C><0B><0A><09>",
+          "address": 415424,
+          "length": 16
+        },
+        {
+          "id": 179,
+          "text": "[NAME]<0E><10><11><12><13><14><15><16>",
+          "address": 415440,
+          "length": 16
+        },
+        {
+          "id": 180,
+          "text": "<17><17><16><15><14><13><12><11>_<0E><18>",
+          "address": 415456,
+          "length": 16
+        },
+        {
+          "id": 181,
+          "text": "<19><1A><1B><1C><1D><1E><1F><1F><1E><1D><1C><1B><1A><19>",
+          "address": 415472,
+          "length": 16
+        },
+        {
+          "id": 182,
+          "text": "[NAME]<0D><07>_[ITEM][NAME][WAIT]{newline}",
+          "address": 415488,
+          "length": 11
+        },
+        {
+          "id": 183,
+          "text": "_[NAME][ITEM]",
+          "address": 415504,
+          "length": 16
+        },
+        {
+          "id": 184,
+          "text": "<0C><0D><0E><0F><0E><0D>",
+          "address": 415520,
+          "length": 8
+        },
+        {
+          "id": 185,
+          "text": "<14>{newline}<21><31><14>{newline}<22><32>",
+          "address": 415536,
+          "length": 16
+        },
+        {
+          "id": 186,
+          "text": "<14>{newline}<24><34><14>{newline}<25><35><14>{newline}<26><36>",
+          "address": 415552,
+          "length": 16
+        },
+        {
+          "id": 187,
+          "text": "<14>{newline}<27><37><0E>",
+          "address": 415568,
+          "length": 7
+        },
+        {
+          "id": 188,
+          "text": "<2D><2B><0E><2A><2C><2E><2C>[NAME]",
+          "address": 415584,
+          "length": 16
+        },
+        {
+          "id": 189,
+          "text": "<0D><38><39><3A><3B><3C><3D><3E><3F><3E><3D><3C><3B><3A><39>",
+          "address": 415600,
+          "length": 16
+        },
+        {
+          "id": 190,
+          "text": "v<49>4è<0A><42>~PPTK",
+          "address": 415616,
+          "length": 16
+        },
+        {
+          "id": 191,
+          "text": "K5è<42><50><36><6B>b<56><52><5B><6A>T<48><08><12>",
+          "address": 415632,
+          "length": 16
+        },
+        {
+          "id": 192,
+          "text": "0<24><20><15>[NAME]<25><8D>~P<09><49><0A><2A>d<6D>&",
+          "address": 415648,
+          "length": 16
+        },
+        {
+          "id": 193,
+          "text": "<EA><52><56>c<D5><10>A<4A><4A>üQ~GI<33><41>",
+          "address": 415664,
+          "length": 16
+        },
+        {
+          "id": 194,
+          "text": "<D5>",
+          "address": 415680,
+          "length": 2
+        },
+        {
+          "id": 195,
+          "text": "OGY<42><56><14><14><10>0",
+          "address": 415696,
+          "length": 10
+        },
+        {
+          "id": 196,
+          "text": "P<EA><6F><F5><55><0E><F9><3C><F3><F8>t<E1><1F><07><FE><0F>",
+          "address": 415712,
+          "length": 16
+        },
+        {
+          "id": 197,
+          "text": "<F8><1C><F3><38>\"",
+          "address": 415728,
+          "length": 6
+        },
+        {
+          "id": 198,
+          "text": "<F3><78>\"<F1><8F>p<3E><0F><FC><3C><F3><78>t",
+          "address": 415744,
+          "length": 14
+        },
+        {
+          "id": 200,
+          "text": "\"<F1><8F>t<3E>",
+          "address": 415776,
+          "length": 6
+        },
+        {
+          "id": 201,
+          "text": "<1F>à<7E><0E><F9><1C><F3><78>\"<F1><8F>t<3E>",
+          "address": 415792,
+          "length": 14
+        },
+        {
+          "id": 203,
+          "text": "<25><D8><18><14><3C><5E><F8><61>s<89>A\"<43><28><39><E3>",
+          "address": 415824,
+          "length": 16
+        },
+        {
+          "id": 204,
+          "text": "<13><30><0A><0A><46><24><22>[NAME]3<2A>HcHs<0C>r",
+          "address": 415840,
+          "length": 16
+        },
+        {
+          "id": 205,
+          "text": "X<D9><6C><5E><5E><28><39>p<D3><08><6A>[WAIT]<52><2A><28>[ITEM]",
+          "address": 415856,
+          "length": 16
+        },
+        {
+          "id": 206,
+          "text": "0<2B>GZGs<2C>5T<D7><6F><5F><5F>UG<38>",
+          "address": 415872,
+          "length": 16
+        },
+        {
+          "id": 208,
+          "text": "<D6>PA<27><43><7F><F0>5<DF>Ikr<FC>ü<78><D5>",
+          "address": 415904,
+          "length": 16
+        },
+        {
+          "id": 209,
+          "text": "<71>Q<63><D4><47><F0>Kv3<27><4E><1C><39><FD><1E><17>",
+          "address": 415920,
+          "length": 16
+        },
+        {
+          "id": 210,
+          "text": "<1E>R<3E><57><7E>R<F8><13><F0><2B><E0><57>q<1F>\"x",
+          "address": 415936,
+          "length": 16
+        },
+        {
+          "id": 211,
+          "text": "3<25><4D>D<39>O<0F>1<1F>Q<3E><D5><FC>Q<F8>'",
+          "address": 415952,
+          "length": 16
+        },
+        {
+          "id": 212,
+          "text": "<F1><7F><F0>",
+          "address": 415968,
+          "length": 5
+        },
+        {
+          "id": 213,
+          "text": "<1C>J<3C><47><7E>ö<FA><53><F6><FD><1E>",
+          "address": 415984,
+          "length": 13
+        },
+        {
+          "id": 214,
+          "text": "3<27><4B><1F><FC><FB><FE><FD><FE><1D><1E><E1>",
+          "address": 416000,
+          "length": 14
+        },
+        {
+          "id": 215,
+          "text": "<3F><E3>:\"&<F8><FC><1C>",
+          "address": 416016,
+          "length": 9
+        },
+        {
+          "id": 216,
+          "text": "<77><F0><6F><60>F<FC>à<7B>th\"&<78><70><60>",
+          "address": 416032,
+          "length": 16
+        },
+        {
+          "id": 218,
+          "text": "V<F8><77><FC><7B>pé{newline}",
+          "address": 416064,
+          "length": 9
+        },
+        {
+          "id": 219,
+          "text": "<D7>t<39>{newline}<FE>",
+          "address": 416080,
+          "length": 6
+        },
+        {
+          "id": 221,
+          "text": "<7B><1E><DF>tt<10><08><0E><F9><20>~<20><38><CF><F0><7E>",
+          "address": 416112,
+          "length": 16
+        },
+        {
+          "id": 222,
+          "text": "Dn<1E><79><62><E3><F8><F8><F3><72><4A><8D>",
+          "address": 416128,
+          "length": 14
+        },
+        {
+          "id": 223,
+          "text": "~<1C><07><0C><30>v<F0>[WAIT]r<1F>F<39><5A><39><07><8F>",
+          "address": 416144,
+          "length": 16
+        },
+        {
+          "id": 224,
+          "text": "<2F><33><73>ue_<38><60>èm<50>ä<07>ö<77>v",
+          "address": 416160,
+          "length": 16
+        },
+        {
+          "id": 225,
+          "text": "<CF>\"<64>.<2C><2F><1F>\"<EE>~<86><31><29>",
+          "address": 416176,
+          "length": 14
+        },
+        {
+          "id": 226,
+          "text": "m<10><79>s",
+          "address": 416192,
+          "length": 6
+        },
+        {
+          "id": 227,
+          "text": "<6D>",
+          "address": 416208,
+          "length": 4
+        },
+        {
+          "id": 228,
+          "text": "2<6D><57><57><25><25>",
+          "address": 416224,
+          "length": 12
+        },
+        {
+          "id": 230,
+          "text": "<73><27>N<F8><F8><E3><1F><8E>ä<58><07>",
+          "address": 416256,
+          "length": 15
+        },
+        {
+          "id": 231,
+          "text": "<77><1C>C<75><75>",
+          "address": 416272,
+          "length": 7
+        },
+        {
+          "id": 232,
+          "text": "ü<7B><2F>_",
+          "address": 416288,
+          "length": 6
+        },
+        {
+          "id": 233,
+          "text": "<30><CF>",
+          "address": 416304,
+          "length": 4
+        },
+        {
+          "id": 234,
+          "text": "d[WAIT]<FD>",
+          "address": 416320,
+          "length": 4
+        },
+        {
+          "id": 236,
+          "text": "<20><DF>",
+          "address": 416352,
+          "length": 4
+        },
+        {
+          "id": 239,
+          "text": "<CF><38><DF>",
+          "address": 416400,
+          "length": 4
+        },
+        {
+          "id": 240,
+          "text": "\"<1C><EF>",
+          "address": 416416,
+          "length": 4
+        },
+        {
+          "id": 243,
+          "text": "<FD>",
+          "address": 416464,
+          "length": 2
+        },
+        {
+          "id": 245,
+          "text": "<7F><CF><3F><F4><0F>",
+          "address": 416496,
+          "length": 6
+        },
+        {
+          "id": 246,
+          "text": "<F8><88><77><8F><FA><07><75><8E>ö<FC><7B><FC>",
+          "address": 416512,
+          "length": 14
+        },
+        {
+          "id": 248,
+          "text": "'x<FC><37><F8>",
+          "address": 416544,
+          "length": 6
+        },
+        {
+          "id": 249,
+          "text": "<77><5D><E3>jp…<7F>W<7F>V<70>",
+          "address": 416560,
+          "length": 14
+        },
+        {
+          "id": 251,
+          "text": "<24><FD><42><FD><42>!!<FB><EF><DF>ll<EF><14><EF>",
+          "address": 416592,
+          "length": 16
+        },
+        {
+          "id": 252,
+          "text": "<14><1F><E2><FE>{newline}<FB><7C><FD><42><FE>…<FE>…<FB><FB><FD>",
+          "address": 416608,
+          "length": 16
+        },
+        {
+          "id": 253,
+          "text": "àl<7F><7F><FD><42><FD><42><FB><44>!<48><CF><33>",
+          "address": 416624,
+          "length": 16
+        },
+        {
+          "id": 254,
+          "text": "èl<48><DF><28>llll<FC><7B>!!<FE>…<FE>",
+          "address": 416640,
+          "length": 16
+        },
+        {
+          "id": 255,
+          "text": "…E<61><E0><1F>m<23><EF><14><EF><14><7F><7F>",
+          "address": 416656,
+          "length": 16
+        }
+      ]
+    },
+    "location_names": {
+      "count": 37,
+      "address": "$063ED0",
+      "entry_length": 16,
+      "entries": [
+        {
+          "id": 0,
+          "text": "World",
+          "address": 409296,
+          "length": 16
+        },
+        {
+          "id": 1,
+          "text": "FocusTower",
+          "address": 409312,
+          "length": 16
+        },
+        {
+          "id": 2,
+          "text": "HillofDestiny",
+          "address": 409328,
+          "length": 16
+        },
+        {
+          "id": 3,
+          "text": "LevelForest",
+          "address": 409344,
+          "length": 16
+        },
+        {
+          "id": 4,
+          "text": "Foresta",
+          "address": 409360,
+          "length": 16
+        },
+        {
+          "id": 5,
+          "text": "Kaeli'sHouse",
+          "address": 409376,
+          "length": 16
+        },
+        {
+          "id": 6,
+          "text": "SandTemple",
+          "address": 409392,
+          "length": 16
+        },
+        {
+          "id": 7,
+          "text": "BoneDungeon",
+          "address": 409408,
+          "length": 16
+        },
+        {
+          "id": 8,
+          "text": "LibraTemple",
+          "address": 409424,
+          "length": 16
+        },
+        {
+          "id": 9,
+          "text": "Aquaria",
+          "address": 409440,
+          "length": 16
+        },
+        {
+          "id": 10,
+          "text": "Phoebe'sHouse",
+          "address": 409456,
+          "length": 16
+        },
+        {
+          "id": 11,
+          "text": "WintryCave",
+          "address": 409472,
+          "length": 16
+        },
+        {
+          "id": 12,
+          "text": "LifeTemple",
+          "address": 409488,
+          "length": 16
+        },
+        {
+          "id": 13,
+          "text": "FallsBasin",
+          "address": 409504,
+          "length": 16
+        },
+        {
+          "id": 14,
+          "text": "IcePyramid",
+          "address": 409520,
+          "length": 16
+        },
+        {
+          "id": 15,
+          "text": "Spencer'sPlace",
+          "address": 409536,
+          "length": 16
+        },
+        {
+          "id": 16,
+          "text": "WintryTemple",
+          "address": 409552,
+          "length": 16
+        },
+        {
+          "id": 17,
+          "text": "Fireburg",
+          "address": 409568,
+          "length": 16
+        },
+        {
+          "id": 18,
+          "text": "Reuben'sHouse",
+          "address": 409584,
+          "length": 16
+        },
+        {
+          "id": 19,
+          "text": "Mine",
+          "address": 409600,
+          "length": 16
+        },
+        {
+          "id": 20,
+          "text": "SealedTemple",
+          "address": 409616,
+          "length": 16
+        },
+        {
+          "id": 21,
+          "text": "Volcano",
+          "address": 409632,
+          "length": 16
+        },
+        {
+          "id": 22,
+          "text": "LavaDome",
+          "address": 409648,
+          "length": 16
+        },
+        {
+          "id": 23,
+          "text": "RopeBridge",
+          "address": 409664,
+          "length": 16
+        },
+        {
+          "id": 24,
+          "text": "AliveForest",
+          "address": 409680,
+          "length": 16
+        },
+        {
+          "id": 25,
+          "text": "GiantTree",
+          "address": 409696,
+          "length": 16
+        },
+        {
+          "id": 26,
+          "text": "KaidgeTemple",
+          "address": 409712,
+          "length": 16
+        },
+        {
+          "id": 27,
+          "text": "WindholeTemple",
+          "address": 409728,
+          "length": 16
+        },
+        {
+          "id": 28,
+          "text": "MountGale",
+          "address": 409744,
+          "length": 16
+        },
+        {
+          "id": 29,
+          "text": "Windia",
+          "address": 409760,
+          "length": 16
+        },
+        {
+          "id": 30,
+          "text": "Otto'sHouse",
+          "address": 409776,
+          "length": 16
+        },
+        {
+          "id": 31,
+          "text": "Pazuzu'sTower",
+          "address": 409792,
+          "length": 16
+        },
+        {
+          "id": 32,
+          "text": "LightTemple",
+          "address": 409808,
+          "length": 16
+        },
+        {
+          "id": 33,
+          "text": "ShipDock",
+          "address": 409824,
+          "length": 16
+        },
+        {
+          "id": 34,
+          "text": "Deck",
+          "address": 409840,
+          "length": 16
+        },
+        {
+          "id": 35,
+          "text": "Mac'sShip",
+          "address": 409856,
+          "length": 16
+        },
+        {
+          "id": 36,
+          "text": "DoomCastle",
+          "address": 409872,
+          "length": 16
+        }
+      ]
+    }
+  }
+}

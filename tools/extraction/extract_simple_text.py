@@ -61,7 +61,9 @@ class SimpleTextExtractor:
 		TextTableConfig("armor_names", 0x064378, 20, 12),
 		TextTableConfig("shield_names", 0x0643CC, 10, 12),
 		TextTableConfig("accessory_names", 0x0643FC, 24, 12),
+		TextTableConfig("attack_names", 0x064420, 128, 12),  # Attack/ability names
 		TextTableConfig("monster_names", 0x064BA0, 256, 16),
+		TextTableConfig("location_names", 0x063ED0, 37, 16),  # Location/area names (37 valid entries)
 	]
 	
 	def __init__(self, rom_path: Path):

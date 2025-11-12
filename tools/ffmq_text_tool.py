@@ -44,6 +44,11 @@ try:
 except ImportError:
 	ComplexTextInserter = None
 
+try:
+	from extract_simple_text import SimpleTextExtractor
+except ImportError:
+	SimpleTextExtractor = None
+
 
 class FFMQTextTool:
 	"""Main text toolkit class."""
@@ -110,25 +115,46 @@ class FFMQTextTool:
 		
 		return True
 	
-	def extract_simple_strings(self, output_path: str):
+	def extract_simple_strings(self, output_path: str, format: str = 'json'):
 		"""Extract simple (non-compressed) strings like item names."""
 		print(f"{'='*80}")
 		print(f"EXTRACTING SIMPLE STRINGS")
 		print(f"{'='*80}\n")
 		
-		# TODO: Implement simple string extraction
-		# These are likely in different ROM locations
-		# Need to identify string tables for:
-		# - Item names
-		# - Character names
-		# - Location names
-		# - Menu text
-		# - etc.
+		if SimpleTextExtractor is None:
+			print("❌ Error: SimpleTextExtractor module not found")
+			return False
 		
-		print("⚠️  Simple string extraction not yet implemented")
-		print("   TODO: Identify simple string tables in ROM")
+		# Use the simple text extractor
+		extractor = SimpleTextExtractor(self.rom_path)
+		all_text = extractor.extract_all()
 		
-		return False
+		if not all_text:
+			print("❌ Failed to extract simple strings")
+			return False
+		
+		# Save based on format
+		output = Path(output_path)
+		
+		if format == 'json':
+			extractor.save_json(all_text, output)
+			print(f"✅ Extracted {all_text['total_entries']} strings to {output_path}")
+		
+		elif format == 'csv':
+			output_dir = output.parent / 'simple_strings'
+			extractor.save_csv(all_text, output_dir)
+			print(f"✅ Extracted {all_text['total_entries']} strings to {output_dir}/")
+		
+		elif format == 'txt':
+			output_dir = output.parent / 'simple_strings'
+			extractor.save_text(all_text, output_dir)
+			print(f"✅ Extracted {all_text['total_entries']} strings to {output_dir}/")
+		
+		else:
+			print(f"❌ Unknown format: {format}")
+			return False
+		
+		return True
 	
 	def insert_complex_dialogs(self, input_path: str, output_rom: str):
 		"""Insert modified dialogs into ROM."""
@@ -340,7 +366,7 @@ Examples:
 			print("❌ Error: Missing output file")
 			print("Usage: extract-simple <rom> <output.json>")
 			return 1
-		success = tool.extract_simple_strings(args.args[0])
+		success = tool.extract_simple_strings(args.args[0], args.format)
 	
 	elif args.action == 'insert-complex':
 		if len(args.args) < 2:

@@ -1,0 +1,39 @@
+SPELL NAMES
+======================================================================
+Extracted: 2025-11-12T14:05:02.881789
+Address: $064210
+Count: 32 entries
+======================================================================
+
+[  0] Exit
+[  1] Cure
+[  2] Heal
+[  3] Life
+[  4] Quake
+[  5] Blizzard
+[  6] Fire
+[  7] Aero
+[  8] Thunder
+[  9] White
+[ 10] Meteor
+[ 11] Flare
+[ 12] SteelSword
+[ 13] KnightSword
+[ 14] Excalibur
+[ 15] Axe
+[ 16] BattleAxe
+[ 17] Giant'sAxe
+[ 18] CatClaw
+[ 19] CharmClaw
+[ 20] DragonClaw
+[ 21] Bomb
+[ 22] JumboBomb
+[ 23] MegaGrenade
+[ 24] MorningStar
+[ 25] BowofGrace
+[ 26] NinjaStar
+[ 27] SteelHelm
+[ 28] MoonHelm
+[ 29] ApolloHelm
+[ 30] SteelArmor
+[ 31] NobleArmor

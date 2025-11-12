@@ -1,0 +1,135 @@
+ATTACK NAMES
+======================================================================
+Extracted: 2025-11-12T14:05:02.881789
+Address: $064420
+Count: 128 entries
+======================================================================
+
+[  0] Sword
+[  1] Scimitar
+[  2] DragonCut
+[  3] Rapier
+[  4] Axe
+[  5] Beam
+[  6] BoneMissile
+[  7] Bow&Arrow
+[  8] BlowDart
+[  9] Cure
+[ 10] Heal
+[ 11] Quake
+[ 12] Blizzard
+[ 13] Fire
+[ 14] Thunder
+[ 15] Reflectant
+[ 16] Electrapulse
+[ 17] PowerDrain
+[ 18] Spark
+[ 19] IronNail
+[ 20] Scream
+[ 21] Quicksand
+[ 22] DoomGaze
+[ 23] DoomPowder
+[ 24] Cure
+[ 25] FireBreath
+[ 26] Punch
+[ 27] Kick
+[ 28] Uppercut
+[ 29] Stab
+[ 30] HeadButt
+[ 31] BodySlam
+[ 32] Scrunch
+[ 33] FullNelson
+[ 34] NeckChoke
+[ 35] Dash
+[ 36] Roundhouse
+[ 37] ChokeUp
+[ 38] StompStomp
+[ 39] MegaPunch
+[ 40] Bearhug
+[ 41] AxeBomber
+[ 42] Piledriver
+[ 43] SkyAttack
+[ 44] Wraparound
+[ 45] Dive
+[ 46] Attatch
+[ 47] Mucus
+[ 48] Claw
+[ 49] Fang
+[ 50] Beak
+[ 51] Sting
+[ 52] Tail
+[ 53] Psudopod
+[ 54] Bite
+[ 55] HydroAcid
+[ 56] Branch
+[ 57] Fin
+[ 58] Scissor
+[ 59] WhipTongue
+[ 60] Horn
+[ 61] GiantBlade
+[ 62] Headoomerang
+[ 63] ChewOff
+[ 64] Quake
+[ 65] Flame
+[ 66] FlameSweep
+[ 67] Fireball
+[ 68] FlamePillar
+[ 69] Heatwave
+[ 70] Watergun
+[ 71] Coldness
+[ 72] IcyFoam
+[ 73] IceBlock
+[ 74] Snowstorm
+[ 75] Whirlwater
+[ 76] IceBreath
+[ 77] Tornado
+[ 78] Typhoon
+[ 79] Hurricane
+[ 80] Thunder
+[ 81] ThunderBeam
+[ 82] CorrodeGas
+[ 83] DoomDance
+[ 84] SonicBoom
+[ 85] Bark
+[ 86] Screechvoice
+[ 87] Para-needle
+[ 88] Para-claw
+[ 89] Para-snake
+[ 90] Para-breath
+[ 91] PoisonSting
+[ 92] PoisonThorn
+[ 93] RottenMucus
+[ 94] PoisonSnake
+[ 95] Poisonbreath
+[ 96] Blinder
+[ 97] Blackness
+[ 98] StoneBeak
+[ 99] Gaze
+[100] Stare
+[101] SpookyLaugh
+[102] Riddle
+[103] BadBreath
+[104] BodyOdor
+[105] Para-stare
+[106] PoisonFluid
+[107] PoisonFlour
+[108] Hypno-sleep
+[109] Lullaby
+[110] SleepLure
+[111] SleepPowder
+[112] BlindFlash
+[113] Smokescreen
+[114] Muffle
+[115] SilenceSong
+[116] StoneGas
+[117] StoneGaze
+[118] DoubleSword
+[119] DoubleHit
+[120] TripleFang
+[121] DoubleKick
+[122] TwinShears
+[123] ThreeHeads
+[124] 6Psudopods
+[125] SnakeHead
+[126] Drain
+[127] Dissolve

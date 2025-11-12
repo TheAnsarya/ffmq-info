@@ -1,0 +1,44 @@
+LOCATION NAMES
+======================================================================
+Extracted: 2025-11-12T14:05:02.881789
+Address: $063ED0
+Count: 37 entries
+======================================================================
+
+[  0] World
+[  1] FocusTower
+[  2] HillofDestiny
+[  3] LevelForest
+[  4] Foresta
+[  5] Kaeli'sHouse
+[  6] SandTemple
+[  7] BoneDungeon
+[  8] LibraTemple
+[  9] Aquaria
+[ 10] Phoebe'sHouse
+[ 11] WintryCave
+[ 12] LifeTemple
+[ 13] FallsBasin
+[ 14] IcePyramid
+[ 15] Spencer'sPlace
+[ 16] WintryTemple
+[ 17] Fireburg
+[ 18] Reuben'sHouse
+[ 19] Mine
+[ 20] SealedTemple
+[ 21] Volcano
+[ 22] LavaDome
+[ 23] RopeBridge
+[ 24] AliveForest
+[ 25] GiantTree
+[ 26] KaidgeTemple
+[ 27] WindholeTemple
+[ 28] MountGale
+[ 29] Windia
+[ 30] Otto'sHouse
+[ 31] Pazuzu'sTower
+[ 32] LightTemple
+[ 33] ShipDock
+[ 34] Deck
+[ 35] Mac'sShip
+[ 36] DoomCastle
