@@ -1,0 +1,58 @@
+FFMQ UNKNOWN CHARACTERS REPORT
+================================================================================
+
+Unknown bytes: 16
+
+0x80: Used 1 times, currently: '#'
+  Examples:
+    Dictionary entry 0x7F: bc76bc80bc8bbd4fbe0ebf27c0a7c028c1dec121c2c0c2ebc2bac3dcc38cc494c5
+0x81: Used 1 times, currently: '#'
+  Examples:
+    Dictionary entry 0x61: 086281
+0x83: Used 2 times, currently: '#'
+  Examples:
+    Dictionary entry 0x31: 08e783
+    Dictionary entry 0x32: 08f783
+0x84: Used 2 times, currently: '#'
+  Examples:
+    Dictionary entry 0x33: 08c284
+    Dictionary entry 0x36: 085784
+0x87: Used 1 times, currently: '#'
+  Examples:
+    Dictionary entry 0x62: 088a87
+0x8A: Used 1 times, currently: '#'
+  Examples:
+    Dictionary entry 0x62: 088a87
+0x8B: Used 1 times, currently: '#'
+  Examples:
+    Dictionary entry 0x7F: bc76bc80bc8bbd4fbe0ebf27c0a7c028c1dec121c2c0c2ebc2bac3dcc38cc494c5
+0x8C: Used 1 times, currently: '#'
+  Examples:
+    Dictionary entry 0x7F: bc76bc80bc8bbd4fbe0ebf27c0a7c028c1dec121c2c0c2ebc2bac3dcc38cc494c5
+0xCE: Used 2 times, currently: '#'
+  Examples:
+    Dictionary entry 0x6E: ce36
+    Dictionary entry 0x6F: ce01
+0xD0: Used 1 times, currently: '#'
+  Examples:
+    Dictionary entry 0x4D: d0ff
+0xD2: Used 5 times, currently: '#'
+  Examples:
+    Dictionary entry 0x53: d2d2d2
+    Dictionary entry 0x73: d201
+    Dictionary entry 0x74: d236
+0xDC: Used 1 times, currently: '#'
+  Examples:
+    Dictionary entry 0x7F: bc76bc80bc8bbd4fbe0ebf27c0a7c028c1dec121c2c0c2ebc2bac3dcc38cc494c5
+0xDE: Used 1 times, currently: '#'
+  Examples:
+    Dictionary entry 0x7F: bc76bc80bc8bbd4fbe0ebf27c0a7c028c1dec121c2c0c2ebc2bac3dcc38cc494c5
+0xE7: Used 1 times, currently: '#'
+  Examples:
+    Dictionary entry 0x31: 08e783
+0xEB: Used 1 times, currently: '#'
+  Examples:
+    Dictionary entry 0x7F: bc76bc80bc8bbd4fbe0ebf27c0a7c028c1dec121c2c0c2ebc2bac3dcc38cc494c5
+0xF7: Used 1 times, currently: '#'
+  Examples:
+    Dictionary entry 0x32: 08f783
