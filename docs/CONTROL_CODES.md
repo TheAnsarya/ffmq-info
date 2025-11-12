@@ -1,52 +1,50 @@
 # FFMQ Control Codes Reference
 
-**Date**: November 11, 2025  
-**Status**: Research in progress - some codes confirmed, others hypothesized
+**Date**: November 12, 2025  
+**Status**: Comprehensive analysis complete - based on full dialog extraction (117 dialogs)
 
 ---
 
 ## Overview
 
-Final Fantasy Mystic Quest uses control codes embedded in dialog text to:
-- Control text display (speed, positioning, pauses)
-- Trigger game events (screen shake, music changes, character movement)
-- Insert dynamic content (character names, item names)
-- Control dialog flow (wait for input, clear box, new page)
+Final Fantasy Mystic Quest uses control codes (bytes 0x00-0x2F) embedded within dialog text to control:
+- Text display behavior (speed, delays, pauses)
+- Text box positioning and formatting
+- Dynamic text insertion (character names, item names, Crystal names)
+- Screen effects and transitions
 
-This document catalogs all known and hypothesized control codes based on:
-- Assembly source analysis (`src/asm/*.asm`)
-- Dialog data analysis (`assets/text/dialog.asm`)
-- DataCrystal/TCRF documentation
-- ROM byte pattern analysis
+Control codes are **NOT** compressed by the dictionary system. They appear literally in the compressed dialog data.
+
+**Major Discovery**: Code 0x08 appears ~500+ times across all dialogs - extremely high frequency suggests it's fundamental to text rendering (possibly character spacing or rendering trigger).
 
 ---
 
 ## Control Code Ranges
 
-| Range | Purpose | Count |
-|-------|---------|-------|
-| 0x00-0x0F | Basic text control | 16 codes |
-| 0x10-0x3B | Event parameters | 44 codes |
-| 0x3D-0x7E | DTE compression (not control codes) | 66 sequences |
-| 0x80-0x8F | Extended control codes | 16 codes |
-| 0x90-0xCD | Single characters (not control codes) | 62 chars |
-| 0xCE-0xFF | Punctuation and special | 50 chars |
+| Range | Purpose | Count | Notes |
+|-------|---------|-------|-------|
+| 0x00-0x06 | Essential text control | 7 codes | END, newline, WAIT, etc. |
+| 0x07-0x0F | Display modes & timing | 9 codes | 0x08 is VERY frequent (~500+ uses) |
+| 0x10-0x1F | Dynamic content insertion | 16 codes | Character names, items, Crystals |
+| 0x20-0x2F | Advanced control codes | 16 codes | Screen effects, complex sequences |
+| 0x30-0x7F | Dictionary compression | 80 entries | NOT control codes - text compression |
+| 0x80-0xFF | Single characters | 128 bytes | Letters, numbers, punctuation |
 
 ---
 
 ## Basic Text Control (0x00-0x0F)
 
-### Confirmed Codes
+### Confirmed Codes (based on 117-dialog extraction)
 
-| Code | Name | Function | Bytes | Usage Count* |
-|------|------|----------|-------|--------------|
-| 0x00 | [END] | String terminator | 1 | 245 |
-| 0x01 | {newline} | Line break | 1 | 37 |
-| 0x02 | [WAIT] | Wait for button press | 1 | 62 |
-| 0x03 | [ASTERISK] | Special marker/asterisk | 1 | 60 |
-| 0x04 | [NAME] | Insert character name | 1 | 24 |
-| 0x05 | [ITEM] | Insert item name | 1 | 33 |
-| 0x06 | [SPACE] | Space character/underscore | 1 | 40 |
+| Code | Name | Function | Frequency | Notes |
+|------|------|----------|-----------|-------|
+| 0x00 | [END] | String terminator | 117 | Every dialog ends with this |
+| 0x01 | {newline} | Line break | ~400+ | Most dialogs have 2-5 line breaks |
+| 0x02 | [WAIT] | Wait for button press | ~40 | Dramatic pauses |
+| 0x03 | * | Asterisk character | ~10 | Rarely used |
+| 0x04 | [NAME] | Insert character name | ~50 | "Benjamin" by default |
+| 0x05 | [ITEM] | Insert item name | ~40 | Quest objects, items |
+| 0x06 | _ | Space/underscore | ~20 | Special space (not 0xFF) |
 
 *Usage count from `assets/text/dialog.asm` analysis
 
