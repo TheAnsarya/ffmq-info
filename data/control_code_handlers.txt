@@ -1,0 +1,52 @@
+# Control Code Handler Addresses
+
+```
+0x00: END                                 → 0x00A378
+0x01: NEWLINE                             → 0x00A8C0
+0x02: WAIT                                → 0x00A8BD
+0x03: ASTERISK / PORTRAIT                 → 0x00A39C
+0x04: NAME                                → 0x00B354
+0x05: ITEM                                → 0x00A37F
+0x06: SPACE                               → 0x00B4B0
+0x07: UNKNOWN_07                          → 0x00A708
+0x08: UNKNOWN_08 (CRITICAL - 500+ uses)   → 0x00A755
+0x09: UNKNOWN_09                          → 0x00A83F
+0x0A: UNKNOWN_0A                          → 0x00A519
+0x0B: UNKNOWN_0B                          → 0x00A3F5
+0x0C: UNKNOWN_0C                          → 0x00A958
+0x0D: UNKNOWN_0D                          → 0x00A96C
+0x0E: UNKNOWN_0E (FREQUENT - 100+ uses)   → 0x00A97D
+0x0F: UNKNOWN_0F                          → 0x00AFD6
+0x10: INSERT_ITEM_NAME                    → 0x00AF9A
+0x11: INSERT_SPELL_NAME                   → 0x00AF6B
+0x12: INSERT_MONSTER_NAME                 → 0x00AF70
+0x13: INSERT_CHARACTER_NAME               → 0x00B094
+0x14: INSERT_LOCATION_NAME                → 0x00AFFE
+0x15: INSERT_NUMBER? (UNUSED)             → 0x00A0B7
+0x16: INSERT_OBJECT_NAME                  → 0x00B2F9
+0x17: INSERT_WEAPON_NAME                  → 0x00AEDA
+0x18: INSERT_ARMOR_NAME                   → 0x00AACF
+0x19: INSERT_ACCESSORY? (UNUSED)          → 0x00A8D1
+0x1A: TEXTBOX_BELOW                       → 0x00A168
+0x1B: TEXTBOX_ABOVE                       → 0x00A17E
+0x1C: UNKNOWN_1C                          → 0x00A15C
+0x1D: FORMAT_ITEM_E1                      → 0x00A13C
+0x1E: FORMAT_ITEM_E2                      → 0x00A0FE
+0x1F: CRYSTAL                             → 0x00A0C0
+0x20: UNKNOWN_20                          → 0x00A0DF
+0x21: UNKNOWN_21                          → 0x00B2F4
+0x22: UNKNOWN_22                          → 0x00A150
+0x23: UNKNOWN_23                          → 0x00AEA2
+0x24: UNKNOWN_24                          → 0x00A11D
+0x25: UNKNOWN_25                          → 0x00A07D
+0x26: UNKNOWN_26                          → 0x00A089
+0x27: UNKNOWN_27                          → 0x00A09D
+0x28: UNKNOWN_28                          → 0x00A0A9
+0x29: UNKNOWN_29                          → 0x00AEB5
+0x2A: UNKNOWN_2A                          → 0x00B379
+0x2B: UNKNOWN_2B                          → 0x00AEC7
+0x2C: UNKNOWN_2C                          → 0x00B355
+0x2D: UNKNOWN_2D                          → 0x00A074
+0x2E: UNKNOWN_2E                          → 0x00A563
+0x2F: UNKNOWN_2F                          → 0x00A06E
+```
