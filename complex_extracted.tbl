@@ -95,12 +95,12 @@
 7F=ieli~iöjank[CMD:0E]l[CMD:27]mNm[CMD:28]n;n[CMD:21]omo?ogp:päq4r
 
 # Direct Characters (0x80-0xFF)
-00=#
-01=#
-02=#
+00=[END]
+01={newline}
+02=[WAIT]
 03=*
-04=#
-05=#
+04=[NAME]
+05=[ITEM]
 06=_
 07=#
 08=#

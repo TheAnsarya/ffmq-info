@@ -1,0 +1,143 @@
+Loaded ROM: Final Fantasy - Mystic Quest (U) (V1.1).sfc (524288 bytes)
+Loaded 82 character mappings
+Decoded 80 dictionary entries
+
+================================================================================
+EXTRACTING ALL DIALOGS
+================================================================================
+
+Dialog 0x00:
+[TEXTBOX_BELOW]#82Hepoisonedme...
+Justashed...did
+thet.t...trees![CMD:08]ha#84[CMD:2A]thatyou#80youthatyou[END]
+(Raw: FF FF 1A 82 A1 40 C3 C2 BC C6 54 68 C0 B8 53 01 A3 6D B4 45...)
+
+Dialog 0x01:
+[ITEM][CMD:08]#E7#83[ITEM][ITEM][CMD:18][END][CMD:10][CMD:08][TEXTBOX_BELOW][CMD:0C][CMD:0D][END]
+(Raw: 05 31 05 35 1A 0C 0D 00)
+
+Dialog 0x02:
+stemProgram
+Itikiti
+
+SoundProgram
+MinoruAkao
+
+MapGraphics
+PICASSOKABE
+
+MonsterGraphics
+Yuki'HM'Yasuda
+
+Animation
+ToshiyukiMomose
+
+MapCharacters
+M.Shimoji
+
+SoundComposer
+R.Sasai
+Y.Kawakami
+
+SpecialThanksTo:
+T.Fujii
+CarolMoriyama
+KatsA.Tayama
+H.Yukitake
+K.Adachi
+K.Kokubo
+H.Minaba
+K.Beloit
+C.Budd
+K.Kreider
+K.Kirchner
+V.Mayhew
+M.Ridley
+R.Silveira
+H.Suzuki
+N.Williams
+J.Yanagihara
+T.Nomura[END]
+(Raw: 65 B8 C0 FF A9 C5 C2 BA C5 B4 C0 01 A2 C7 BC BE BC C7 BC 01...)
+
+Dialog 0x03:
+[CMD:0B]-a[CMD:0F]X[CMD:10][ITEM] [CMD:2D]-a[CMD:11]es
+[CMD:13]X[ITEM][CMD:09]#DE#F5a[CMD:11]es
+[CMD:0A]#F5a[CMD:09]7#8D[END]
+(Raw: 0B FF DA B4 0F B1 10 05 06 2D DA B4 11 60 01 13 B1 05 09 DE...)
+
+Dialog 0x04:
+[CMD:22][CMD:08]#F7#83'[WAIT]P
+#85#8B[CMD:0B][CMD:20][CMD:22]#8FI[ASTERISK][END]
+(Raw: 22 32 D1 02 A9 01 85 8B 0B 20 22 8F A2 03 00)
+
+Dialog 0x05:
+T#F6[CMD:0A]#8D#F4[CMD:0A]#E2[CMD:20]P#8DY[CMD:0A]#8DZ[CMD:0A]#8Da[CMD:0A]#8Db[CMD:0A]#8Dc[CMD:0A][CMD:28][CMD:2B]Rma#FAedp[CMD:08]o[CMD:08][CMD:0E]Oing-of[CMD:29][END]
+(Raw: AD F6 0A 8D F4 0A E2 20 A9 FF 8D B2 0A 8D B3 0A 8D B4 0A 8D...)
+
+Dialog 0x06:
+to[CMD:23][CMD:12][CMD:23]ea[CMD:2B][ITEM][CMD:1D]E[END][NAME][CMD:23][WAIT][CMD:2B][CMD:07][CMD:23]z[END]
+(Raw: 46 FF FF 23 12 23 5E 2B 50 23 02 2B 07 23 CD 00)
+
+Dialog 0x07:
+Warpsusfromthe[CRYSTAL][CMD:08]tothe[CRYSTAL][CMD:0C].[CMD:08]ha#84[CMD:2C]Wyou[TEXTBOX_BELOW][END]
+(Raw: B0 B4 C5 C3 45 C8 45 B9 C5 69 FF 41 1F 08 FF 46 41 1F 0C D2...)
+
+Dialog 0x08:
+i
+
+SoundProgram
+MinoruAkao
+
+MapGraphics
+PICASSOKABE
+
+MonsterGraphics
+Yuki'HM'Yasuda
+
+Animation
+ToshiyukiMomose
+
+MapCharacters
+M.Shimoji
+
+SoundComposer
+R.Sasai
+Y.Kawakami
+
+SpecialThanksTo:
+T.Fujii
+CarolMoriyama
+KatsA.Tayama
+H.Yukitake
+K.Adachi
+K.Kokubo
+H.Minaba
+K.Beloit
+C.Budd
+K.Kreider
+K.Kirchner
+V.Mayhew
+M.Ridley
+R.Silveira
+H.Suzuki
+N.Williams
+J.Yanagihara
+T.Nomura[END]
+(Raw: BC 01 01 AC 43 C1 4C A9 C5 C2 BA C5 B4 C0 01 A6 47 5C C8 FF...)
+
+Dialog 0x09:
+Traceback (most recent call last):
+  File "C:\Users\me\source\repos\ffmq-info\tools\extraction\extract_all_dialogs.py", line 159, in <module>
+    extractor.run(table_path)
+    ~~~~~~~~~~~~~^^^^^^^^^^^^
+  File "C:\Users\me\source\repos\ffmq-info\tools\extraction\extract_all_dialogs.py", line 152, in run
+    self.extract_all()
+    ~~~~~~~~~~~~~~~~^^
+  File "C:\Users\me\source\repos\ffmq-info\tools\extraction\extract_all_dialogs.py", line 144, in extract_all
+    print(decoded)
+    ~~~~~^^^^^^^^^
+  File "C:\Program Files\Python314\Lib\encodings\cp1252.py", line 19, in encode
+    return codecs.charmap_encode(input,self.errors,encoding_table)[0]
+           ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+UnicodeEncodeError: 'charmap' codec can't encode character '\u25b6' in position 153: character maps to <undefined>

@@ -1,0 +1,280 @@
+Loaded ROM: Final Fantasy - Mystic Quest (U) (V1.1).sfc (524288 bytes)
+Loaded 256 character mappings from simple.tbl
+Extracted 80 raw dictionary entries
+
+Decoding dictionary entries...
+Decoded 80 dictionary entries
+
+================================================================================
+FFMQ DIALOG DICTIONARY (0x30-0x7F)
+================================================================================
+0x30: [CMD:08][CMD:0E]O
+       Raw: [3] 08 0E A8
+
+0x31: [CMD:08]"é
+       Raw: [3] 08 E7 83
+
+0x32: [CMD:08]!é
+       Raw: [3] 08 F7 83
+
+0x33: [CMD:08]oè
+       Raw: [3] 08 C2 84
+
+0x34: [CMD:0D]you[END][CMD:0D]to[END][END][END]
+       Raw: [10] 0D 44 00 FF FF 0D 46 00 00 00
+
+0x35: [ITEM][CMD:18][END][CMD:10][CMD:08]
+       Raw: [5] 05 18 00 10 08
+
+0x36: [CMD:08]haè
+       Raw: [3] 08 57 84
+
+0x37: [CMD:26][END][CMD:20]'t
+       Raw: [4] 26 00 20 7E
+
+0x38: [CMD:26][END][END]ieli~iöjank[CMD:0E]l[CMD:27]mNm[CMD:28]n;n[CMD:21]omo?ogp:päq4r
+       Raw: [4] 26 00 00 7F
+
+0x39: [CMD:26][END][CMD:10]ieli~iöjank[CMD:0E]l[CMD:27]mNm[CMD:28]n;n[CMD:21]omo?ogp:päq4r
+       Raw: [4] 26 00 10 7F
+
+0x3A: [CMD:26][END][END]ieli~iöjank[CMD:0E]l[CMD:27]mNm[CMD:28]n;n[CMD:21]omo?ogp:päq4r[CMD:24][END]{newline}[CMD:20][CMD:16][ITEM][CMD:08]!é
+       Raw: [8] 38 24 00 01 20 16 05 32
+
+0x3B: [CMD:26][END][CMD:10]ieli~iöjank[CMD:0E]l[CMD:27]mNm[CMD:28]n;n[CMD:21]omo?ogp:päq4r[CMD:24][END]{newline}[CMD:20][TEXTBOX_BELOW][ITEM][CMD:08]!é
+       Raw: [8] 39 24 00 01 20 1A 05 32
+
+0x3C: [CMD:10][CMD:1D][END][ITEM]es[END]{newline}[CMD:12]is{newline}
+       Raw: [10] 10 1D 00 05 60 00 01 12 5F 01
+
+0x3D: Crystal
+       Raw: [7] 9C C5 CC C6 C7 B4 BF
+
+0x3E: RainbowRoad
+       Raw: [10] AB B4 47 B5 58 FF AB C2 B4 B7
+
+0x3F: th
+       Raw: [2] C7 BB
+
+0x40: e
+       Raw: [2] B8 FF
+
+0x41: the
+       Raw: [4] C7 BB B8 FF
+
+0x42: t
+       Raw: [2] C7 FF
+
+0x43: ou
+       Raw: [2] C2 C8
+
+0x44: you
+       Raw: [3] CC C2 C8
+
+0x45: s
+       Raw: [2] C6 FF
+
+0x46: to
+       Raw: [3] C7 C2 FF
+
+0x47: in
+       Raw: [2] BC C1
+
+0x48: ing
+       Raw: [4] BC C1 BA FF
+
+0x49: l
+       Raw: [2] BF FF
+
+0x4A: ll
+       Raw: [3] BF BF FF
+
+0x4B: er
+       Raw: [2] B8 C5
+
+0x4C: d
+       Raw: [2] B7 FF
+
+0x4D: .
+       Raw: [2] D0 FF
+
+0x4E: 's
+       Raw: [3] D1 C6 FF
+
+0x4F: an
+       Raw: [2] B4 C1
+
+0x50: [ITEM][CMD:1D]E[END][NAME]
+       Raw: [5] 05 1D 9E 00 04
+
+0x51: [ITEM][CMD:1E]E[END][NAME]
+       Raw: [5] 05 1E 9E 00 04
+
+0x52: ight
+       Raw: [4] BC BA BB C7
+
+0x53: ,,,
+       Raw: [3] D2 D2 D2
+
+0x54: on
+       Raw: [2] C2 C1
+
+0x55: you
+       Raw: [2] 44 FF
+
+0x56: en
+       Raw: [2] B8 C1
+
+0x57: ha
+       Raw: [2] BB B4
+
+0x58: ow
+       Raw: [2] C2 CA
+
+0x59: y
+       Raw: [2] CC FF
+
+0x5A: of
+       Raw: [3] C2 B9 FF
+
+0x5B: Th
+       Raw: [2] AD BB
+
+0x5C: or
+       Raw: [2] C2 C5
+
+0x5D: I'll
+       Raw: [3] A2 D1 4A
+
+0x5E: ea
+       Raw: [2] B8 B4
+
+0x5F: is
+       Raw: [2] BC 45
+
+0x60: es
+       Raw: [2] B8 C6
+
+0x61: [CMD:08][CMD:08]üà…
+       Raw: [3] 08 62 81
+
+0x62: [CMD:08]üà
+       Raw: [3] 08 8A 87
+
+0x63: wa
+       Raw: [2] CA B4
+
+0x64: again
+       Raw: [4] B4 BA B4 47
+
+0x65: st
+       Raw: [2] C6 C7
+
+0x66: I
+       Raw: [2] A2 FF
+
+0x67: ve
+       Raw: [2] C9 40
+
+0x68: ed
+       Raw: [2] B8 4C
+
+0x69: om
+       Raw: [2] C2 C0
+
+0x6A: er
+       Raw: [2] 4B FF
+
+0x6B: p
+       Raw: [2] C3 FF
+
+0x6C: ack
+       Raw: [3] B4 B6 BE
+
+0x6D: ust
+       Raw: [3] C8 C6 42
+
+0x6E: '[CMD:08]haè
+       Raw: [2] CE 36
+
+0x6F: '{newline}
+       Raw: [2] CE 01
+
+0x70: that
+       Raw: [3] 3F B4 42
+
+0x71: prophecy
+       Raw: [8] C3 C5 C2 C3 BB B8 B6 CC
+
+0x72: o
+       Raw: [2] C2 FF
+
+0x73: ,{newline}
+       Raw: [2] D2 01
+
+0x74: ,[CMD:08]haè
+       Raw: [2] D2 36
+
+0x75: I'm
+       Raw: [4] A2 D1 C0 FF
+
+0x76: el
+       Raw: [2] B8 BF
+
+0x77: with
+       Raw: [4] CA BC 3F FF
+
+0x78: a
+       Raw: [2] B4 FF
+
+0x79: Spencer
+       Raw: [5] AC C3 56 B6 4B
+
+0x7A: ma
+       Raw: [2] C0 B4
+
+0x7B: in
+       Raw: [2] 47 FF
+
+0x7C: monst
+       Raw: [3] C0 54 65
+
+0x7D: k
+       Raw: [2] BE FF
+
+0x7E: 't
+       Raw: [2] D1 42
+
+0x7F: ieli~iöjank[CMD:0E]l[CMD:27]mNm[CMD:28]n;n[CMD:21]omo?ogp:päq4r
+       Raw: [33] BC 76 BC 80 BC 8B BD 4F BE 0E BF 27 C0 A7 C0 28 C1 DE C1 21 C2 C0 C2 EB C2 BA C3 DC C3 8C C4 94 C5
+
+
+Exported dictionary to complex_extracted.tbl
+
+================================================================================
+TESTING KNOWN DIALOGS
+================================================================================
+
+================================================================================
+DIALOG 0x59 TEST
+================================================================================
+Raw bytes: 4C 70 C1 B4 C0 40 B5 B8 B9 5C B8 CE 1B 32 9F 5C FF CC 5E C5 45 A6 B4 B6 4E B5 B8 56 FF 65 C8 B7 CC 48 78 A9 C5 C2 C3 BB B8 B6 CC D2 FF FF A8 C1 FF BB 5F 63 59 B5 6C FF B9 C5 69 FF B7 C2 48 C6
+
+Decoded:
+dthatnamebefore'[TEXTBOX_ABOVE][CMD:08]!éForyearsMac'sbeenstudyingaProphecy,Onhiswaybackfromdoingsomeresearch.thelakedriedupandhisshipendeduponarockledge,[CMD:08]haè[CMD:2C][CMD:08][CMD:0E]Oyou[TEXTBOX_BELOW][CMD:08]!éButthat'snoproblem,{newline}Ifwedigfromhere.we'llbeabletoreachtheship,[CMD:08][CMD:0E]OAnyway.here'sakey,{newline}Theshieldishiddeninthe[CRYSTAL]{newline},[CMD:0D]is{newline}[ASTERISK]{newline}[CMD:08]üà[TEXTBOX_BELOW][CMD:08]!éBytheway.[CRYSTAL][CMD:11]'sbeenhavingsomestrongearthquakeslately,[END]
+
+================================================================================
+DIALOG 0x00 TEST
+================================================================================
+Raw bytes: 46 41 46 42 46 43 46 FF FF 00
+
+Decoded:
+tothetottoouto[END]
+
+================================================================================
+DIALOG 0x21 TEST
+================================================================================
+Raw bytes: 25 0B 26 FF FF 1A 81 A5 C2 C2 7D C2 C9 6A 3F 4B B8 73 5B B4 C7 4E 41 1F 01 4D 54 B6 40 41 BB 5E C5 42 5A 41 B0 5C BF B7 D2 30 9A C1 FF C2 BF 4C A9 C5 C2 C3 BB B8 B6 59 C6 B4 CC C6 4D D4 5B 40
+
+Decoded:
+[CMD:25][CMD:0B][CMD:26][TEXTBOX_BELOW]…Lookoverthere,{newline}That'sthe[CRYSTAL]{newline}.oncetheheartoftheWorld,[CMD:08][CMD:0E]OAnoldProphecysays.#Thevile4willstealthePower.anddividetheWorldbehind4doors,{newline}AtthattimetheKnightwillappear#{newline}TheProphecyhasnowcometrue,[CMD:08][CMD:0E]O4monstershavelockedthedoorsofthe[CRYSTAL]{newline}andescapedwiththekeys,{newline}They'redrainingthelightfromthe4CrystalsoftheEarth.andtheWorldisinchaos,Thepeopleareindesperateneedofhelp,[CMD:08][CMD:0E]O[ITEM][CMD:18][END][CMD:10][CMD:08].onlyyoucansavetheCrystalsandtheWorld,[CMD:08]haè[CMD:2A][CMD:08][CMD:0E]OyGentto[CMD:08][CMD:0E]Oon[CMD:10]you[TEXTBOX_BELOW][END]

@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+ #!/usr/bin/env python3
 """
 FFMQ Dialog Decoder - Correct Version
 Based on assembly analysis of Dialog_WriteCharacter at 009DC1-009DD2
