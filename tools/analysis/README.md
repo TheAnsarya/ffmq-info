@@ -48,6 +48,117 @@ python tools/analysis/event_system_analyzer.py --rom roms/ffmq.sfc --table simpl
 **Documentation**:
 - **Quick Start Guide**: `docs/EVENT_SYSTEM_QUICK_START.md` (step-by-step workflows)
 - **Architecture Docs**: `docs/EVENT_SYSTEM_ARCHITECTURE.md` (comprehensive system design)
+
+---
+
+### **parameter_pattern_analyzer.py** - Parameter Pattern Analyzer ⚡ NEW
+**STATUS**: ✅ Production-ready  
+**LINES**: 1,028 (with TABS formatting)  
+**DOCUMENTATION**: See `docs/ROM_HACKING_TOOLCHAIN_GUIDE.md`
+
+**Purpose**: Automatically analyze parameter patterns for unknown event commands and generate hypotheses about their purpose.
+
+**Key Features**:
+- Statistical analysis (min, max, mean, median, mode, histogram)
+- Type detection (item IDs, spell IDs, memory addresses, ROM pointers, flag masks)
+- Hypothesis generation based on parameter patterns
+- Confidence scoring with evidence
+- Optional K-means clustering for pattern discovery (requires sklearn)
+- Game data cross-referencing (item IDs, spell IDs, character IDs, etc.)
+
+**Quick Start**:
+```bash
+# Analyze event system data (requires event_system_analyzer.py output)
+python tools/analysis/parameter_pattern_analyzer.py \
+	--input output/ \
+	--output docs/parameter_analysis
+
+# With advanced clustering (requires sklearn)
+python tools/analysis/parameter_pattern_analyzer.py \
+	--input output/ \
+	--output docs/parameter_analysis \
+	--cluster
+```
+
+**Outputs** (3 files generated):
+1. **parameter_analysis.json** - Statistical analysis per parameter position
+2. **command_hypotheses.json** - Auto-generated suggestions with confidence scores
+3. **PARAMETER_ANALYSIS_REPORT.md** - Comprehensive report with evidence
+
+**Example Output**:
+```json
+{
+	"UNK_07": {
+		"suggested_purpose": "Set item quantity in inventory",
+		"confidence": 0.85,
+		"evidence": [
+			"Param 0: Item ID range (0-255)",
+			"Param 1: Quantity (mode=1, max=99)",
+			"Param 2: Flag mask (power-of-2 values)"
+		],
+		"test_recommendations": [
+			"Test with known item ID (0x00 = Cure Potion)",
+			"Verify quantity parameter modifies inventory count"
+		]
+	}
+}
+```
+
+**Use Cases**:
+- Identify unknown command purposes from parameter patterns
+- Generate test ROM scenarios for command validation
+- Build comprehensive parameter type database
+- Support ROM hacking documentation efforts
+
+---
+
+### **character_encoding_verifier.py** - Character Encoding Verifier ⚡ NEW
+**STATUS**: ✅ Production-ready  
+**LINES**: 830 (with TABS formatting)  
+**DOCUMENTATION**: See `docs/ROM_HACKING_TOOLCHAIN_GUIDE.md`
+
+**Purpose**: Validate character table files (simple.tbl, complex.tbl) and ensure correct text encoding.
+
+**Key Features**:
+- Load and validate .tbl files
+- Round-trip encoding tests (text→bytes→text)
+- Duplicate mapping detection
+- Unmapped byte range identification
+- Space character special handling (0xFF vs '*')
+- DTE (Dual-Tile Encoding) compression analysis
+- ROM text sample cross-validation
+- Comprehensive Markdown reporting
+
+**Quick Start**:
+```bash
+# Verify simple.tbl only
+python tools/analysis/character_encoding_verifier.py \
+	--simple simple.tbl
+
+# Verify both tables with ROM cross-reference
+python tools/analysis/character_encoding_verifier.py \
+	--simple simple.tbl \
+	--complex complex.tbl \
+	--rom ffmq.sfc
+```
+
+**Outputs** (1 file generated):
+1. **CHARACTER_ENCODING_VERIFICATION.md** - Full validation report
+
+**Validation Checks**:
+- ✅ Duplicate mappings (multiple chars → same byte)
+- ✅ Missing reverse mappings (byte→char exists but char→byte doesn't)
+- ✅ Invalid format (malformed table entries)
+- ✅ Unmapped ranges (gaps in byte value coverage)
+- ✅ Round-trip tests (text encodes/decodes correctly)
+- ✅ Space character (0xFF vs '*' handling)
+- ✅ DTE conflicts (dual-tile encoding issues)
+
+**Use Cases**:
+- Validate character tables before ROM compilation
+- Ensure text encoding correctness
+- Identify encoding issues in translated ROMs
+- Generate encoding quality metrics
 - **Control Code Reference**: `docs/CONTROL_CODE_IDENTIFICATION.md` (48 command catalog)
 
 ---

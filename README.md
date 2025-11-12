@@ -80,6 +80,78 @@ python tools/import/import_all_text.py data/text/text_data.json roms/FFMQ_modifi
 - [Command Reference](tools/map-editor/COMMAND_REFERENCE.md) - All 15 CLI commands
 - [Dialog System README](tools/map-editor/README.md) - Full technical guide
 
+### 🔬 Advanced ROM Hacking Toolchain (NEW!)
+
+**Complete analysis, compilation, and decompilation suite for event scripts!**
+
+#### Analysis Tools (4 tools, 3,858 lines)
+
+```bash
+# Analyze event system patterns
+python tools/analysis/event_system_analyzer.py --rom ffmq.sfc --table simple.tbl
+
+# Auto-detect unknown command purposes
+python tools/analysis/parameter_pattern_analyzer.py --input output/ --output docs/
+
+# Validate character encoding tables
+python tools/analysis/character_encoding_verifier.py --simple simple.tbl --rom ffmq.sfc
+```
+
+**Toolchain Features:**
+- ✅ **Event System Analyzer** - Analyzes all 256 dialogs as event scripts (1,240 lines)
+- ✅ **Parameter Pattern Analyzer** - Auto-suggests unknown command meanings (1,028 lines)
+- ✅ **Character Encoding Verifier** - Validates .tbl files with round-trip tests (830 lines)
+- ✅ **Enhanced Dialog Compiler** - Full 48-command support with validation (620 lines)
+- ✅ **Event Script Decompiler** - ROM→human-readable conversion (760 lines)
+- ✅ **All tools use TABS formatting** (not spaces)
+- ✅ **Production-ready** with comprehensive error handling
+- ✅ **Complete documentation** in ROM_HACKING_TOOLCHAIN_GUIDE.md
+
+**Key Capabilities:**
+- **48 event commands** fully supported (0x00-0x2F)
+- **Parameter validation** with type checking and range validation
+- **Control flow analysis** (subroutine calls, branches, loops)
+- **Memory operation tracking** (quest flags, game state)
+- **Statistical analysis** with hypothesis generation
+- **Round-trip compilation** (text→ROM→text)
+- **Comprehensive reporting** (JSON, CSV, Markdown)
+
+**Example Workflow:**
+
+```bash
+# 1. Analyze existing ROM event scripts
+python tools/analysis/event_system_analyzer.py \
+	--rom ffmq.sfc --table simple.tbl --output analysis/
+
+# 2. Auto-detect unknown command meanings
+python tools/analysis/parameter_pattern_analyzer.py \
+	--input analysis/ --output docs/hypotheses/
+
+# 3. Decompile specific event script
+python tools/rom_hacking/event_script_decompiler.py \
+	--rom ffmq.sfc --table simple.tbl \
+	--offsets 0x8FA0,0x9000 --output decompiled.txt
+
+# 4. Edit decompiled script in text editor
+# (Modify decompiled.txt)
+
+# 5. Compile modified script back to ROM format
+python tools/rom_hacking/enhanced_dialog_compiler.py \
+	--script modified.txt --table simple.tbl \
+	--validate --output compiled.bin
+
+# 6. Verify character encoding
+python tools/analysis/character_encoding_verifier.py \
+	--simple simple.tbl --rom modified_ffmq.sfc
+```
+
+**Documentation:**
+- [ROM Hacking Toolchain Guide](docs/ROM_HACKING_TOOLCHAIN_GUIDE.md) - Complete workflow guide (NEW!)
+- [Event System Architecture](docs/EVENT_SYSTEM_ARCHITECTURE.md) - System design documentation
+- [Parameter Analysis Report](docs/PARAMETER_ANALYSIS_REPORT.md) - Command hypothesis generation
+- [Tools Analysis README](tools/analysis/README.md) - Analysis tools reference
+- [Tools ROM Hacking README](tools/rom_hacking/README.md) - Compilation/decompilation reference
+
 ### 🎮 Complete Battle Data Modding Pipeline!
 
 **You can now visually edit enemies and build modified ROMs!**
