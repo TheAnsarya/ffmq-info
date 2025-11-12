@@ -78,8 +78,8 @@ Advanced_Configuration_Validation:
 	sta.w $0514	 ; Store validated configuration
 
 Configuration_Validation_Complete:
-	jsr.w CODE_028C06 ; Execute advanced system coordination
-	jsl.l CODE_02DA98 ; Execute cross-bank system integration
+	jsr.w ExecuteAdvancedSystemCoordination ; Execute advanced system coordination
+	jsl.l ExecuteCrossBankSystemIntegration ; Execute cross-bank system integration
 	sep #$20		; Set 8-bit accumulator mode
 	rep #$10		; Set 16-bit index register mode
 	lda.b #$ff	  ; Set system initialization completion marker
@@ -224,10 +224,10 @@ Bank_02_Initialization_Complete:
 validate_entity_system:
 	lda.b #$ff	  ;02806B|A9FF    |      ; Initialize validation marker
 	sta.w $0a84	 ;02806D|8D840A  |020A84; Store validation state
-	jsl.l CODE_02D149 ;028070|2249D102|02D149; Call external validation routine
+	jsl.l SystemValidation ;028070|2249D102|02D149; Call external validation routine
 	sep #$20		;028074|E220    |      ; Set 8-bit accumulator
 	rep #$10		;028076|C210    |      ; Set 16-bit index registers
-	jsr.w CODE_028187 ;028078|208781  |028187; Execute internal validation
+	jsr.w ExecuteInternalValidation ;028078|208781  |028187; Execute internal validation
 	stz.b $b5	   ;02807B|64B5    |0004B5; Clear validation counter
 
 ;--------------------------------------------------------------------
@@ -272,11 +272,11 @@ process_control_flow:
 ; Critical for maintaining system stability
 
 enhanced_status_monitor:
-	jsl.l CODE_00D2A6 ;028096|22A6D200|00D2A6; Call external monitor
+	jsl.l CallExternalMonitor ;028096|22A6D200|00D2A6; Call external monitor
 	lda.w $1020	 ;02809A|AD2010  |021020; Read status register
 	and.b #$40	  ;02809D|2940    |      ; Mask specific bits
 	beq standard_flow_path ;02809F|F009    |0280AA; Branch if clear
-	jsr.w CODE_028219 ;0280A1|201982  |028219; Process special status
+	jsr.w ProcessSpecialStatus ;0280A1|201982  |028219; Process special status
 	inc a;0280A4|1A      |      ; Increment result
 	bne standard_flow_path ;0280A5|D003    |0280AA; Branch if non-zero
 	jmp.w special_flow_handler ;0280A7|4C5F81  |02815F; Jump to special handler
@@ -291,7 +291,7 @@ enhanced_status_monitor:
 ; Manages entity iteration and validation
 
 standard_flow_path:
-	jsr.w CODE_0282F9 ;0280AA|20F982  |0282F9; Execute standard processing
+	jsr.w ExecuteStandardProcessing ;0280AA|20F982  |0282F9; Execute standard processing
 	stz.b $89	   ;0280AD|6489    |000489; Clear entity counter
 
 ;--------------------------------------------------------------------
@@ -311,7 +311,7 @@ entity_processing_loop:
 	lda.b $7c,x	 ;0280B5|B57C    |00047C; Load entity data
 	sta.b $8b	   ;0280B7|858B    |00048B; Store current entity
 	phd ;0280B9|0B      |      ; Preserve direct page
-	jsr.w CODE_028F22 ;0280BA|20228F  |028F22; Process entity
+	jsr.w ProcessEntity ;0280BA|20228F  |028F22; Process entity
 	lda.b $21	   ;0280BD|A521    |001021; Check entity status
 	xba ;0280BF|EB      |      ; Exchange for analysis
 	lda.b $10	   ;0280C0|A510    |001010; Load secondary status
@@ -332,10 +332,10 @@ validate_entity_graphics:
 	xba ;0280C6|EB      |      ; Exchange for validation
 	and.b #$c0	  ;0280C7|29C0    |      ; Mask validation bits
 	bne entity_skip ;0280C9|D044    |02810F; Skip if invalid
-	jsr.w CODE_0283A8 ;0280CB|20A883  |0283A8; Execute validation
+	jsr.w ExecuteValidation ;0280CB|20A883  |0283A8; Execute validation
 	rep #$30		;0280CE|C230    |      ; Set 16-bit mode
 	phd ;0280D0|0B      |      ; Preserve direct page
-	jsr.w CODE_028F22 ;0280D1|20228F  |028F22; Process graphics
+	jsr.w ProcessEntity ;0280D1|20228F  |028F22; Process graphics
 
 ;--------------------------------------------------------------------
 ; Advanced Graphics State Management
@@ -380,7 +380,7 @@ finalize_graphics:
 	sta.b $51	   ;0280FF|8551    |001051; Reset state register 2
 	sta.b $52	   ;028101|8552    |001052; Reset state register 3
 	pld ;028103|2B      |      ; Restore direct page
-	jsr.w CODE_028725 ;028104|202587  |028725; Execute cleanup
+	jsr.w ExecuteCleanup ;028104|202587  |028725; Execute cleanup
 	lda.b $95	   ;028107|A595    |000495; Check cleanup status
 	bne special_condition_handler ;028109|D034    |02813F; Handle special condition
 	lda.b $94	   ;02810B|A594    |000494; Check secondary status
@@ -400,8 +400,8 @@ entity_skip:
 	lda.b $89	   ;028111|A589    |000489; Load counter
 	cmp.b $8a	   ;028113|C58A    |00048A; Compare with limit
 	bcc entity_processing_loop ;028115|9098    |0280AF; Continue loop if valid
-	jsr.w CODE_02886B ;028117|206B88  |02886B; Execute final processing
-	jsr.w CODE_028725 ;02811A|202587  |028725; Cleanup operations
+	jsr.w ExecuteFinalProcessing ;028117|206B88  |02886B; Execute final processing
+	jsr.w ExecuteCleanup ;02811A|202587  |028725; Cleanup operations
 	lda.b $95	   ;02811D|A595    |000495; Check final status
 	bne special_condition_handler ;02811F|D01E    |02813F; Handle special condition
 	lda.b $94	   ;028121|A594    |000494; Check secondary status
@@ -419,7 +419,7 @@ entity_skip:
 
 entity_state_reset_loop:
 	phd ;028127|0B      |      ; Preserve direct page
-	jsr.w CODE_028F22 ;028128|20228F  |028F22; Access entity
+	jsr.w ProcessEntity ;028128|20228F  |028F22; Access entity
 	lda.b $20	   ;02812B|A520    |001220; Load entity flags
 	and.b #$8f	  ;02812D|298F    |      ; Mask specific bits
 	sta.b $20	   ;02812F|8520    |001220; Store cleaned flags
@@ -442,15 +442,15 @@ entity_state_reset_loop:
 
 special_condition_handler:
 	lda.b #$7a	  ;02813F|A97A    |      ; Load audio command
-	jsl.l CODE_009776 ;028141|22769700|009776; Execute audio call
+	jsl.l ExecuteSpecialBitProcessing ;028141|22769700|009776; Execute audio call
 	bne audio_processed ;028145|D005    |02814C; Branch if processed
 	lda.b #$04	  ;028147|A904    |      ; Set audio state
 	sta.w $0500	 ;028149|8D0005  |020500; Store audio state
 
 audio_processed:
 	ldx.w #$d4f1	;02814C|A2F1D4  |      ; Load data pointer
-	jsr.w CODE_028835 ;02814F|203588  |028835; Process data
-	jsr.w CODE_028938 ;028152|203889  |028938; Execute handler
+	jsr.w ProcessData ;02814F|203588  |028835; Process data
+	jsr.w ExecuteHandler ;028152|203889  |028938; Execute handler
 	bra final_processing ;028155|800C    |028163; Continue to final
 
 ;--------------------------------------------------------------------
@@ -464,7 +464,7 @@ audio_processed:
 
 alternate_condition_handler:
 	ldx.w #$d4df	;028157|A2DFD4  |      ; Load alternate data
-	jsr.w CODE_028835 ;02815A|203588  |028835; Process alternate
+	jsr.w ProcessData ;02815A|203588  |028835; Process alternate
 	bra final_processing ;02815D|8004    |028163; Continue to final
 
 ;--------------------------------------------------------------------
@@ -490,7 +490,7 @@ special_flow_handler:
 ; Prepare for system exit or next cycle
 
 final_processing:
-	jsl.l CODE_02D132 ;028163|2232D102|02D132; External coordination
+	jsl.l ExternalCoordination ;028163|2232D102|02D132; External coordination
 	lda.b #$01	  ;028167|A901    |      ; Set coordination flag
 	sta.b $8b	   ;028169|858B    |00048B; Store flag
 
@@ -505,7 +505,7 @@ final_processing:
 
 system_finalization_loop:
 	phd ;02816B|0B      |      ; Preserve direct page
-	jsr.w CODE_028F22 ;02816C|20228F  |028F22; Access system
+	jsr.w ProcessEntity ;02816C|20228F  |028F22; Access system
 	ldx.w #$0003	;02816F|A20300  |      ; Set transfer count
 
 ;--------------------------------------------------------------------
@@ -579,14 +579,14 @@ advanced_math_processing:
 ; Coordinates with external calculation routines
 
 complex_calculation:
-	jsr.w CODE_02A647 ;02842F|2047A6  |02A647; Execute complex calc
+	jsr.w ExecuteComplexCalc ;02842F|2047A6  |02A647; Execute complex calc
 	lda.b $11	   ;028432|A511    |000411; Check calc status
 	and.b #$08	  ;028434|2908    |      ; Mask status bit
 	bne standard_math_operations ;028436|D00B    |028443; Branch if complete
 	lda.b $8b	   ;028438|A58B    |00048B; Preserve entity ID
 	pha ;02843A|48      |      ; Push to stack
 	php ;02843B|08      |      ; Preserve status
-	jsr.w CODE_02A28C ;02843C|208CA2  |02A28C; Additional processing
+	jsr.w AdditionalProcessing ;02843C|208CA2  |02A28C; Additional processing
 	plp ;02843F|28      |      ; Restore status
 	pla ;028440|68      |      ; Restore entity ID
 	sta.b $8b	   ;028441|858B    |00048B; Store entity ID
@@ -602,7 +602,7 @@ complex_calculation:
 
 standard_math_operations:
 	phd ;028443|0B      |      ; Preserve direct page
-	jsr.w CODE_028F22 ;028444|20228F  |028F22; Access calculation area
+	jsr.w ProcessEntity ;028444|20228F  |028F22; Access calculation area
 	lda.b $31	   ;028447|A531    |001031; Load calculation param 1
 	pha ;028449|48      |      ; Preserve on stack
 	lda.b $50	   ;02844A|A550    |001050; Load calculation param 2
@@ -713,8 +713,8 @@ entity_calc_processing:
 ; Manage calculation result validation
 
 advanced_calc_processing:
-	jsr.w CODE_028B0F ;0284B1|200F8B  |028B0F; Execute advanced calc
-	jsr.w CODE_028EC0 ;0284B4|20C08E  |028EC0; Process calc results
+	jsr.w ExecuteAdvancedCalc ;0284B1|200F8B  |028B0F; Execute advanced calc
+	jsr.w ProcessCalcResults ;0284B4|20C08E  |028EC0; Process calc results
 	lda.b $39	   ;0284B7|A539    |000439; Load calc parameter
 	bit.b #$80	  ;0284B9|8980    |      ; Test high bit
 	beq basic_calc_mode ;0284BB|F048    |028505; Branch to basic mode
@@ -768,7 +768,7 @@ entity_status_check:
 complex_entity_calc:
 	lda.b #$02	  ;0284DD|A902    |      ; Set complex mode
 	sta.b $8d	   ;0284DF|858D    |00048D; Store calc mode
-	jsr.w CODE_028532 ;0284E1|203285  |028532; Execute calc routine
+	jsr.w ExecuteCalcRoutine ;0284E1|203285  |028532; Execute calc routine
 	inc a;0284E4|1A      |      ; Increment result
 	beq calc_retry  ;0284E5|F007    |0284EE; Retry if zero
 	xba ;0284E7|EB      |      ; Exchange accumulator
@@ -787,7 +787,7 @@ complex_entity_calc:
 
 calc_retry:
 	inc.b $8d	   ;0284EE|E68D    |00048D; Increment calc mode
-	jsr.w CODE_028532 ;0284F0|203285  |028532; Retry calculation
+	jsr.w ExecuteCalcRoutine ;0284F0|203285  |028532; Retry calculation
 	inc a;0284F3|1A      |      ; Test result
 	beq calc_retry  ;0284F4|F0F8    |0284EE; Continue retry if zero
 	xba ;0284F6|EB      |      ; Exchange accumulator
@@ -860,7 +860,7 @@ calc_execution:
 ; Coordinate with calculation routines
 
 calc_loop:
-	jsr.w CODE_02853D ;028513|203D85  |02853D; Execute calculation step
+	jsr.w ExecuteCalculationStep ;028513|203D85  |02853D; Execute calculation step
 	inc.b $8f	   ;028516|E68F    |00048F; Increment iteration
 	lda.b $8f	   ;028518|A58F    |00048F; Load iteration count
 	sta.b $8d	   ;02851A|858D    |00048D; Update calc mode
@@ -878,10 +878,10 @@ calc_loop:
 ; Manage system state transitions
 
 final_calc_processing:
-	jsl.l CODE_02ED05 ;028522|2205ED02|02ED05; External coordination
-	jsr.w CODE_028600 ;028526|200086  |028600; Process results
-	jsl.l CODE_02D149 ;028529|2249D102|02D149; System validation
-	jsl.l CODE_009B02 ;02852D|22029B00|009B02; Final coordination
+	jsl.l ExternalCoordination2 ;028522|2205ED02|02ED05; External coordination
+	jsr.w ProcessResults ;028526|200086  |028600; Process results
+	jsl.l SystemValidation ;028529|2249D102|02D149; System validation
+	jsl.l ExecuteLongEnvironmentCall ;02852D|22029B00|009B02; Final coordination
 	rts ;028531|60      |      ; Return to caller
 
 ;====================================================================
@@ -926,7 +926,7 @@ entity_lifecycle_management:
 	rep #$10		;028753|C210    |      ; Set 16-bit index
 	phd ;028755|0B      |      ; Preserve direct page
 	stz.b $8b	   ;028756|648B    |00048B; Clear entity ID
-	jsr.w CODE_028F22 ;028758|20228F  |028F22; Access entity data
+	jsr.w ProcessEntity ;028758|20228F  |028F22; Access entity data
 	lda.b $10	   ;02875B|A510    |001010; Load entity base
 	sta.w $04a0	 ;02875D|8DA004  |0204A0; Store in temp area
 	inc a;028760|1A      |      ; Increment for test
@@ -948,7 +948,7 @@ entity_valid_range:
 	lda.b #$2a	  ;028769|A92A    |      ; Set entity marker
 	sta.w $0505	 ;02876B|8D0505  |020505; Store in system area
 	ldx.w #$d2d4	;02876E|A2D4D2  |      ; Load data pointer
-	jsr.w CODE_028835 ;028771|203588  |028835; Process entity data
+	jsr.w ProcessData ;028771|203588  |028835; Process entity data
 
 ;--------------------------------------------------------------------
 ; Advanced Graphics Processing and Coordinate Management
@@ -969,7 +969,7 @@ graphics_coordinate_processing:
 	sta.w $0098	 ;02877F|8D9800  |020098; Store for calculation
 	lda.b $14	   ;028782|A514    |001014; Load Y coordinate
 	sta.w $009c	 ;028784|8D9C00  |02009C; Store for calculation
-	jsl.l CODE_0096B3 ;028787|22B39600|0096B3; Execute calculation
+	jsl.l ExecuteCalculation ;028787|22B39600|0096B3; Execute calculation
 
 ;--------------------------------------------------------------------
 ; Graphics Calculation Result Processing
@@ -987,7 +987,7 @@ graphics_calc_results:
 	sta.w $009a	 ;028794|8D9A00  |02009A; Store processed Y
 	pla ;028797|68      |      ; Restore original coord
 	sta.w $009c	 ;028798|8D9C00  |02009C; Store for calculation
-	jsl.l CODE_0096E4 ;02879B|22E49600|0096E4; Execute final calc
+	jsl.l ExecuteFinalCalc ;02879B|22E49600|0096E4; Execute final calc
 	lda.w $009e	 ;02879F|AD9E00  |02009E; Load final result
 	sta.b $14	   ;0287A2|8514    |001014; Store final coordinate
 
@@ -1159,7 +1159,7 @@ final_entity_processing:
 	adc.b #$4b	  ;02882B|694B    |      ; Add base value
 	sta.b $40	   ;02882D|8540    |001040; Store calculation result
 	pld ;02882F|2B      |      ; Restore direct page
-	jsl.l CODE_009B02 ;028830|22029B00|009B02; External coordination
+	jsl.l ExecuteLongEnvironmentCall ;028830|22029B00|009B02; External coordination
 	rts ;028834|60      |      ; Return to caller
 
 ;--------------------------------------------------------------------
@@ -1173,7 +1173,7 @@ final_entity_processing:
 
 external_data_interface:
 	stx.w $0017	 ;028835|8E1700  |020017; Store data pointer
-	jsl.l CODE_00D009 ;028838|2209D000|00D009; Call external routine
+	jsl.l CallExternalRoutine ;028838|2209D000|00D009; Call external routine
 	rts ;02883C|60      |      ; Return to caller
 
 ;====================================================================
@@ -1423,7 +1423,7 @@ entity_data_increment:
 advanced_entity_processing:
 	sep #$20		;028BAB|E220    |      ; Set 8-bit accumulator
 	rep #$10		;028BAD|C210    |      ; Set 16-bit index
-	jsr.w CODE_028BE9 ;028BAF|20E98B  |028BE9; Execute data processing
+	jsr.w ExecuteDataProcessing2 ;028BAF|20E98B  |028BE9; Execute data processing
 	sta.b $e5	   ;028BB2|85E5    |0004E5; Store processing result
 	xba ;028BB4|EB      |      ; Exchange accumulator bytes
 	and.b #$f0	  ;028BB5|29F0    |      ; Mask high nibble
@@ -1477,7 +1477,7 @@ entity_data_bit_processing:
 ; Modifies: A, X, Y, all entity registers, calculation areas
 
 extended_entity_processing:
-	jsr.w CODE_028BE8 ;028BCB|20E88B  |028BE8; Execute data processing
+	jsr.w ExecuteDataProcessing ;028BCB|20E88B  |028BE8; Execute data processing
 	sta.b $e7	   ;028BCE|85E7    |0004E7; Store processing result
 	xba ;028BD0|EB      |      ; Exchange accumulator bytes
 	and.b #$f0	  ;028BD1|29F0    |      ; Mask high nibble
@@ -1497,7 +1497,7 @@ extended_entity_processing:
 ; Ensure data integrity through processing stages
 
 multi_stage_data_processing:
-	jsr.w CODE_028BE8 ;028BD9|20E88B  |028BE8; Execute second stage
+	jsr.w ExecuteDataProcessing ;028BD9|20E88B  |028BE8; Execute second stage
 	sta.b $e9	   ;028BDC|85E9    |0004E9; Store second result
 	xba ;028BDE|EB      |      ; Exchange accumulator
 	and.b #$f0	  ;028BDF|29F0    |      ; Mask high nibble
@@ -1589,7 +1589,7 @@ advanced_audio_processing:
 	rep #$10		;028C0C|C210    |      ; Set 16-bit index
 	lda.b #$65	  ;028C0E|A965    |      ; Load audio command
 	sta.w $00a8	 ;028C10|8DA800  |0200A8; Store audio parameter
-	jsl.l CODE_009783 ;028C13|22839700|009783; Execute audio call
+	jsl.l ExecuteAudioCall ;028C13|22839700|009783; Execute audio call
 
 ;--------------------------------------------------------------------
 ; Complex Data Validation System
@@ -1704,7 +1704,7 @@ validation_store:
 ; Prepare for next processing cycle
 
 validation_complete:
-	jmp.w CODE_028CC8 ;028C6E|4CC88C  |028CC8; Jump to coordination
+	jmp.w JumpCoordination ;028C6E|4CC88C  |028CC8; Jump to coordination
 
 ;====================================================================
 ; End of Bank $02 Cycle 6 - Complex Entity Processing and Extended Operations
@@ -1721,7 +1721,7 @@ validation_complete:
 ; This cycle implements sophisticated graphics management, entity transformation,
 ; and complex calculation systems with extensive error handling.
 
-;CODE_029399: Multi-stage entity initialization with graphics coordination
+;CodeMultiStageEntityInitializationGraphics: Multi-stage entity initialization with graphics coordination
 ;Advanced system initialization that coordinates entity processing with graphics subsystems
 ;Handles complex multi-bank coordination and state management
 Entity_InitWithGraphics:
@@ -1743,7 +1743,7 @@ Entity_ValidateBoundary:
 ;Main entity processing coordinator with state management
 ;Central processing hub that coordinates all entity operations
 Entity_ProcessMainLoop:
-	jsr.w CODE_02A0E1 ; Execute advanced entity processing
+	jsr.w ExecuteAdvancedEntityProcessing ; Execute advanced entity processing
 
 ;Entity mode dispatcher with specialized handlers
 ;Routes entities to appropriate processing based on mode flags
@@ -1751,11 +1751,11 @@ Entity_DispatchMode:
 	lda.b $38	   ; Load entity mode identifier
 	cmp.b #$30	  ; Check for special mode $30
 	bne Entity_ProcessStandard ; Branch to alternate processing
-	jmp.w CODE_029E79 ; Jump to specialized mode $30 handler
+	jmp.w JumpSpecializedModeHandler ; Jump to specialized mode $30 handler
 
 ;Default entity processing route
 Entity_ProcessStandard:
-	jmp.w CODE_029E1A ; Jump to standard entity processing
+	jmp.w JumpStandardEntityProcessing ; Jump to standard entity processing
 
 ;Entity synchronization with graphics system validation
 ;Ensures entity state remains synchronized with graphics processing
@@ -1767,8 +1767,8 @@ Entity_ProcessStandard:
 ;Advanced entity processing with mode-specific handlers
 ;Implements sophisticated entity processing with multiple specialized paths
 Entity_ProcessByMode:
-	jsr.w CODE_0297D9 ; Initialize entity processing environment
-	jsr.w CODE_02999D ; Execute entity state validation
+	jsr.w InitializeEntityProcessingEnvironment ; Initialize entity processing environment
+	jsr.w ExecuteEntityStateValidation ; Execute entity state validation
 	lda.b $de	   ; Load entity processing mode
 	cmp.b #$0f	  ; Check for mode $0f (standard processing)
 	beq Entity_ProcessMode0F ; Branch to standard handler
@@ -1794,7 +1794,7 @@ Entity_ProcessMode0F:
 ; Technical: Originally labeled UNREACH_0293E5
 ;-------------------------------------------------------------------------------
 Entity_ProcessMode10_Enhanced:
-	jsr.w CODE_029ADA                    ;0293E5|20DA9A  |0299DA
+	jsr.w ExecuteEnhancedEntityProcessing                    ;0293E5|20DA9A  |0299DA
 	bra +                                ;0293E8|8003    |0293ED
 +
 
@@ -1806,9 +1806,9 @@ Entity_ProcessMode11:
 ;Entity processing finalization with system updates
 ;Completes entity processing and updates all dependent systems
 Entity_ProcessFinalize:
-	jsr.w CODE_029BED ; Finalize entity state
+	jsr.w FinalizeEntityState ; Finalize entity state
 	jsr.w Entity_UpdateCalculations ; Update entity calculations
-	jsr.w CODE_0299DA ; Synchronize entity data
+	jsr.w SynchronizeEntityData ; Synchronize entity data
 	lda.b $3a	   ; Check for special entity condition
 	cmp.b #$8a	  ; Test for condition $8a
 	beq Entity_ProcessMathAdvanced ; Branch to special processing
@@ -1857,7 +1857,7 @@ Entity_StorePosition:
 ;Movement processing with health-based logic
 ;Implements movement processing that considers entity health status
 Entity_ProcessMovement:
-	jsr.w CODE_0297D9 ; Initialize movement processing
+	jsr.w InitializeEntityProcessingEnvironment ; Initialize movement processing
 	lda.b $b7	   ; Load current health value
 	cmp.b $b8	   ; Compare with maximum health
 	bcs Entity_HealthCheck ; Branch if health is adequate
@@ -1866,21 +1866,21 @@ Entity_ProcessMovement:
 ;Health-based entity processing with randomized values
 ;Processes entity behavior based on health status with random elements
 Entity_HealthCheck:
-	jsr.w CODE_02999D ; Validate entity state
-	jsr.w CODE_029B34 ; Execute health-based processing
-	jsr.w CODE_0299DA ; Update entity data
+	jsr.w ExecuteEntityStateValidation ; Validate entity state
+	jsr.w ExecuteHealthBasedProcessing ; Execute health-based processing
+	jsr.w SynchronizeEntityData ; Update entity data
 	lsr.b $b7	   ; Reduce health value for calculation
 	lda.b #$65	  ; Set random number seed
 	sta.w $00a8	 ; Store seed in random number generator
-	jsl.l CODE_009783 ; Generate random number
+	jsl.l ExecuteAudioCall ; Generate random number
 	lda.w $00a9	 ; Load generated random value
 	sta.b $b9	   ; Store random modifier
-	jsl.l CODE_009783 ; Generate second random number
+	jsl.l ExecuteAudioCall ; Generate second random number
 	lda.w $00a9	 ; Load second random value
 	sta.b $b8	   ; Store second random modifier
 	lda.b $b7	   ; Reload health value
 	cmp.b $b8	   ; Compare with random modifier
-	bcc CODE_029438 ; Branch to special processing if less
+	bcc BranchSpecialProcessingIfLess ; Branch to special processing if less
 	db $20,$ca,$9c,$4c,$9b,$9c ; Continue health-based processing
 
 ;Advanced battle processing with movement coordination
@@ -1888,25 +1888,25 @@ Entity_HealthCheck:
 	lda.b $90	   ; Load battle coordination index
 	cmp.b $8f	   ; Validate battle boundary
 	bne Battle_StateHandler ; Continue if valid
-	jsr.w CODE_029797 ; Execute battle synchronization
+	jsr.w ExecuteBattleSynchronization ; Execute battle synchronization
 
 ;Battle state processing with mode-specific logic
 ;Handles battle processing with specialized modes and state management
 Battle_StateHandler:
-	jsr.w CODE_0297D9 ; Initialize battle processing environment
+	jsr.w InitializeEntityProcessingEnvironment ; Initialize battle processing environment
 	lda.b $de	   ; Load battle processing mode
 	cmp.b #$15	  ; Check for battle mode $15
 	beq Battle_Mode15_Input ; Branch to mode $15 handler
-	jsr.w CODE_02999D ; Execute standard battle validation
-	jsr.w CODE_029B34 ; Process battle state
-	jsr.w CODE_029727 ; Update battle calculations
-	jsr.w CODE_0299DA ; Synchronize battle data
+	jsr.w ExecuteEntityStateValidation ; Execute standard battle validation
+	jsr.w ExecuteHealthBasedProcessing ; Process battle state
+	jsr.w UpdateBattleCalculations ; Update battle calculations
+	jsr.w SynchronizeEntityData ; Synchronize battle data
 
 ;Input processing with battle state integration
 ;Processes user input while maintaining battle state consistency
 Battle_Mode15_Input:
 	phd ; Push direct page register
-	jsr.w CODE_028F2F ; Switch to input processing context
+	jsr.w SwitchInputProcessingContext ; Switch to input processing context
 	lda.b $2e	   ; Load input state flags
 	pld ; Pull direct page register
 	and.b #$04	  ; Test for specific input flag
@@ -1922,10 +1922,10 @@ Battle_RandomCalc:
 	lsr.b $b7	   ; Prepare health for calculation
 	lda.b #$65	  ; Set calculation seed
 	sta.w $00a8	 ; Store in random number generator
-	jsl.l CODE_009783 ; Generate random number for calculation
+	jsl.l ExecuteAudioCall ; Generate random number for calculation
 	lda.w $00a9	 ; Load generated value
 	sta.b $b9	   ; Store calculation modifier
-	jsl.l CODE_009783 ; Generate second random number
+	jsl.l ExecuteAudioCall ; Generate second random number
 	lda.w $00a9	 ; Load second generated value
 	sta.b $b8	   ; Store second modifier
 	lda.b $b7	   ; Reload health value
@@ -1936,12 +1936,12 @@ Battle_RandomCalc:
 ;Battle completion processing
 ;Finalizes battle processing and updates all battle-related systems
 Battle_Complete:
-	jmp.w CODE_029CCA ; Jump to battle completion handler
+	jmp.w JumpBattleCompletionHandler ; Jump to battle completion handler
 
 ;Entity type validation with specialized processing
 ;Validates entity types and routes to appropriate specialized handlers
-	jsr.w CODE_029797 ; Execute entity type validation
-	jsr.w CODE_02997E ; Process entity type data
+	jsr.w ExecuteBattleSynchronization ; Execute entity type validation
+	jsr.w ProcessEntityTypeData ; Process entity type data
 	lda.b $ba	   ; Load entity type identifier
 	bne Entity_TypeSwitch ; Branch if entity type is valid
 	jmp.w System_ErrorMax ; Jump to invalid entity handler
@@ -1961,16 +1961,16 @@ Entity_Type2Plus:
 ;Entity processing finalization with level-based adjustments
 ;Completes entity processing with adjustments based on entity level
 Entity_LevelProcess:
-	jsr.w CODE_02999D ; Validate final entity state
+	jsr.w ExecuteEntityStateValidation ; Validate final entity state
 	lda.b $de	   ; Load entity level identifier
 	cmp.b #$17	  ; Check for high level ($17+)
 	bcc Entity_StdLevel ; Branch to standard level processing
-	jsr.w CODE_029B34 ; Execute high level processing
+	jsr.w ExecuteHealthBasedProcessing ; Execute high level processing
 	bra Math_MultiplyLoop ; Continue to calculation phase
 
 ;Standard level entity processing
 Entity_StdLevel:
-	jsr.w CODE_029B28 ; Execute standard level processing
+	jsr.w ExecuteStandardLevelProcessing ; Execute standard level processing
 
 ;Advanced mathematical processing with iterative multiplication
 ;Implements complex mathematical calculations for entity statistics
@@ -2005,25 +2005,25 @@ Math_MultDone:
 Math_FinalizeCalc:
 	sep #$20		; Return to 8-bit accumulator
 	rep #$10		; Keep 16-bit index registers
-	jsr.w CODE_029BED ; Finalize calculation state
-	jmp.w CODE_0299DA ; Update system with calculation results
+	jsr.w FinalizeEntityState ; Finalize calculation state
+	jmp.w SynchronizeEntityData ; Update system with calculation results
 
 ;Memory management with zero initialization
 ;Manages memory allocation and initializes data structures
 	lda.b $90	   ; Load memory management index
 	cmp.b $8f	   ; Validate memory boundary
 	bne Memory_InitProcess ; Continue if within bounds
-	jsr.w CODE_029797 ; Execute memory validation
+	jsr.w ExecuteBattleSynchronization ; Execute memory validation
 
 ;Memory processing with data structure initialization
 ;Processes memory allocation and initializes complex data structures
 Memory_InitProcess:
-	jsr.w CODE_0297D9 ; Initialize memory processing environment
-	jsr.w CODE_02999D ; Validate memory state
-	jsr.w CODE_029B34 ; Process memory allocation
+	jsr.w InitializeEntityProcessingEnvironment ; Initialize memory processing environment
+	jsr.w ExecuteEntityStateValidation ; Validate memory state
+	jsr.w ExecuteHealthBasedProcessing ; Process memory allocation
 	ldx.w #$0000	; Initialize counter to zero
 	stx.b $79	   ; Store zero initialization value
-	jsr.w CODE_029BED ; Finalize memory state
+	jsr.w FinalizeEntityState ; Finalize memory state
 	ldx.b $79	   ; Reload initialization counter
 	beq Memory_Complete ; Branch if no initialization needed
 ; Continue with complex initialization sequence
@@ -2035,9 +2035,9 @@ Memory_InitProcess:
 ;Memory processing completion with boundary validation
 ;Completes memory processing and validates all boundaries
 Memory_Complete:
-	jsr.w CODE_0299DA ; Update memory system
+	jsr.w SynchronizeEntityData ; Update memory system
 	phd ; Push direct page for context switch
-	jsr.w CODE_028F2F ; Switch to system validation context
+	jsr.w SwitchInputProcessingContext ; Switch to system validation context
 	lda.b $10	   ; Load system validation flag
 	pld ; Restore direct page
 	cmp.b $00	   ; Compare with reference value
@@ -2056,13 +2056,13 @@ Memory_Complete:
 Memory_ValidationSequence:
 	ldy.b $77                            ;029572|A477    |000077
 	sty.b $a0                            ;029574|84A0    |0000A0
-	jsr.w CODE_02958C                    ;029576|208C95  |02958C
+	jsr.w Sub_02958C                    ;029576|208C95  |02958C
 	pha ;029579|0B      |
-	jsr.w CODE_028F22                    ;02957A|20228F  |028F22
-	jsr.w CODE_0295C7                    ;02957D|20C795  |0295C7
+	jsr.w ProcessEntity                    ;02957A|20228F  |028F22
+	jsr.w Sub_0295C7                    ;02957D|20C795  |0295C7
 	plp ;029580|2B      |
-	jsr.w CODE_0295DE                    ;029581|20DE95  |0295DE
-	jsr.w CODE_02A0C8                    ;029584|20C8A0  |02A0C8
+	jsr.w Sub_0295DE                    ;029581|20DE95  |0295DE
+	jsr.w Sub_02A0C8                    ;029584|20C8A0  |02A0C8
 	ldx.b $a0                            ;029587|A6A0    |0000A0
 	stx.b $77                            ;029589|8677    |000077
 	rts ;02958B|60      |
@@ -2070,11 +2070,11 @@ Memory_ValidationSequence:
 	stz.w $0098                          ;02958D|9C9800  |000098
 	lda.b #$65                           ;029590|A965    |
 	sta.w $00a8                          ;029592|8DA800  |0000A8
-	jsl.l CODE_009783                    ;029595|22839700|009783
+	jsl.l ExecuteAudioCall                    ;029595|22839700|009783
 	lda.w $00a9                          ;029599|ADA900  |0000A9
 	sta.w $009c                          ;02959C|8D9C00  |00009C
 	stz.w $009d                          ;02959F|9C9D00  |00009D
-	jsl.l CODE_0096B3                    ;0295A2|22B39600|0096B3
+	jsl.l ExecuteCalculation                    ;0295A2|22B39600|0096B3
 	ldx.w $009e                          ;0295A6|AE9E00  |00009E
 	stx.w $0098                          ;0295A9|8E9800  |000098
 	ldx.w $00a0                          ;0295AC|AEA000  |0000A0
@@ -2082,7 +2082,7 @@ Memory_ValidationSequence:
 	lda.b #$64                           ;0295B2|A964    |
 	sta.w $009c                          ;0295B4|8D9C00  |00009C
 	stz.w $009d                          ;0295B7|9C9D00  |00009D
-	jsl.l CODE_0096E4                    ;0295BA|22E49600|0096E4
+	jsl.l ExecuteFinalCalc                    ;0295BA|22E49600|0096E4
 	rep #$30                             ;0295BE|C230    |
 	lda.w $009e                          ;0295C0|AD9E00  |00009E
 	sta.b $77                            ;0295C3|8577    |000077
@@ -2126,14 +2126,14 @@ Math_Negate16Bit:
 	lda.b $90	   ; Load positioning index
 	cmp.b $8f	   ; Validate positioning boundary
 	bne Coord_Transform ; Continue if within bounds
-	jsr.w CODE_029797 ; Execute positioning validation
+	jsr.w ExecuteBattleSynchronization ; Execute positioning validation
 
 ;Coordinate transformation with multi-system integration
 ;Transforms coordinates between different coordinate systems
 Coord_Transform:
-	jsr.w CODE_02999D ; Validate coordinate state
+	jsr.w ExecuteEntityStateValidation ; Validate coordinate state
 	phd ; Push direct page for context switch
-	jsr.w CODE_028F22 ; Switch to coordinate processing context
+	jsr.w ProcessEntity ; Switch to coordinate processing context
 	rep #$30		; Set 16-bit accumulator and index registers
 	lda.b $14	   ; Load X coordinate
 	sta.w $0479	 ; Store in coordinate buffer
@@ -2147,7 +2147,7 @@ Coord_Transform:
 	sta.b $77	   ; Store adjusted Y coordinate
 	sep #$20		; Return to 8-bit accumulator
 	rep #$10		; Keep 16-bit index registers
-	jsr.w CODE_0299DA ; Update coordinate system
+	jsr.w SynchronizeEntityData ; Update coordinate system
 	lda.b #$00	  ; Clear accumulator high byte
 	xba ; Exchange accumulator bytes
 	lda.b $8b	   ; Load coordinate index
@@ -2178,16 +2178,16 @@ Coord_Transform:
 
 ;Controller fallback processing
 Controller_Fallback:
-	jmp.w CODE_028FA8 ; Jump to controller fallback handler
+	jmp.w JumpControllerFallbackHandler ; Jump to controller fallback handler
 
 ;Advanced controller processing with health validation
 ;Processes controller input while validating entity health status
 Controller_Process:
-	jsr.w CODE_0297D9 ; Initialize controller processing
+	jsr.w InitializeEntityProcessingEnvironment ; Initialize controller processing
 	lda.b $b7	   ; Load current health
 	cmp.b $b8	   ; Compare with maximum health
 	bcs Controller_DataSwap ; Continue if health is adequate
-	jmp.w CODE_028FA8 ; Jump to low health handler
+	jmp.w JumpControllerFallbackHandler ; Jump to low health handler
 
 ;Controller data management with context preservation
 ;Manages controller data while preserving execution context
@@ -2197,14 +2197,14 @@ Controller_DataSwap:
 	lda.b $be	   ; Load target controller index
 	sta.b $8b	   ; Set as current controller
 	phd ; Push direct page
-	jsr.w CODE_028F22 ; Switch to controller context
+	jsr.w ProcessEntity ; Switch to controller context
 	phd ; Push controller context
 	ply ; Pull controller context to Y
 	pld ; Restore direct page
 	pla ; Pull original controller index
 	sta.b $8b	   ; Restore original controller
 	phd ; Push current direct page
-	jsr.w CODE_028F22 ; Switch back to original context
+	jsr.w ProcessEntity ; Switch back to original context
 	phd ; Push original context
 	plx ; Pull original context to X
 	pld ; Restore direct page
@@ -2241,17 +2241,17 @@ Controller_DataSwap:
 	sta.w $0a0a,x   ; Store controller data 2
 	pla ; Pull controller data 1
 	sta.w $0a02,x   ; Store controller data 1
-	jsl.l CODE_02D149 ; Execute controller update
+	jsl.l SystemValidation ; Execute controller update
 	ldx.w #$d411	; Load system update address
-	jmp.w CODE_028835 ; Jump to system update
+	jmp.w ProcessData ; Jump to system update
 
 ;Graphics initialization with coordinate system setup
 ;Initializes graphics processing and sets up coordinate systems
-	jsr.w CODE_0297B8 ; Initialize graphics base system
+	jsr.w InitializeGraphicsBaseSystem ; Initialize graphics base system
 	lda.b #$14	  ; Set graphics processing mode
 	sta.w $0505	 ; Store graphics mode
 	phd ; Push direct page for context switch
-	jsr.w CODE_028F2F ; Switch to graphics context
+	jsr.w SwitchInputProcessingContext ; Switch to graphics context
 	lda.b $21	   ; Load graphics state flags
 	and.b #$c0	  ; Test for graphics ready flags
 	bne Graphics_InitDone ; Branch if graphics not ready
@@ -2272,7 +2272,7 @@ Graphics_InitDone:
 	lda.b $90	   ; Load graphics processing index
 	cmp.b $8f	   ; Validate graphics boundary
 	bne Graphics_CoordScale ; Continue if within bounds
-	jsr.w CODE_029797 ; Execute graphics validation
+	jsr.w ExecuteBattleSynchronization ; Execute graphics validation
 
 ;Coordinate scaling with 16-bit precision
 ;Scales coordinates using 16-bit arithmetic for precision
@@ -2297,10 +2297,10 @@ Graphics_CoordScale:
 ;Graphics processing completion with system finalization
 ;Completes graphics processing and finalizes all graphics systems
 Graphics_ProcessComplete:
-	jsr.w CODE_02999D ; Validate graphics state
-	jsr.w CODE_0299DA ; Update graphics data
-	jsr.w CODE_029BED ; Finalize graphics state
-	jmp.w CODE_029CCA ; Jump to graphics completion
+	jsr.w ExecuteEntityStateValidation ; Validate graphics state
+	jsr.w SynchronizeEntityData ; Update graphics data
+	jsr.w FinalizeEntityState ; Finalize graphics state
+	jmp.w JumpBattleCompletionHandler ; Jump to graphics completion
 
 ;Mathematical division with hardware acceleration
 ;Implements division using hardware division registers for speed
@@ -2327,7 +2327,7 @@ Math_DivMode81:
 
 ;Division result processing
 Math_DivExecute:
-	jsl.l CODE_009726 ; Execute hardware division
+	jsl.l ExecuteHardwareDivision ; Execute hardware division
 	ldx.w $4214	 ; Load division result
 	stx.b $77	   ; Store division result
 	rts ; Return from division
@@ -2354,15 +2354,15 @@ Math_DivParam1:
 
 ;Audio system integration
 	ldx.w #$d2e4	; Load audio system address
-	jsr.w CODE_028835 ; Execute audio system call
+	jsr.w ProcessData ; Execute audio system call
 	ldx.w #$d4fe	; Load audio finalization address
-	jmp.w CODE_028835 ; Jump to audio finalization
+	jmp.w ProcessData ; Jump to audio finalization
 
 ;Graphics system integration
 	ldx.w #$d2e4	; Load graphics system address
-	jsr.w CODE_028835 ; Execute graphics system call
+	jsr.w ProcessData ; Execute graphics system call
 	ldx.w #$d507	; Load graphics finalization address
-	jmp.w CODE_028835 ; Jump to graphics finalization
+	jmp.w ProcessData ; Jump to graphics finalization
 
 ;Additional system integration points
 	db $a2,$58,$d4,$4c,$35,$88,$a2,$64,$d4,$4c,$35,$88
@@ -2381,40 +2381,40 @@ System_ErrorMax:
 ;Coordinates multiple subsystems for complex operations
 Entity_Synchronize:
 	ldx.w #$d3d7	; Load subsystem 1 address
-	jsr.w CODE_028835 ; Execute subsystem 1
+	jsr.w ProcessData ; Execute subsystem 1
 	ldx.w #$d3ec	; Load subsystem 2 address
-	jsr.w CODE_028835 ; Execute subsystem 2
-	jsr.w CODE_02A22B ; Execute coordination function 1
-	jsr.w CODE_02A22B ; Execute coordination function 2
-	jmp.w CODE_02A0E1 ; Jump to coordination finalization
+	jsr.w ProcessData ; Execute subsystem 2
+	jsr.w ExecuteCoordinationFunction ; Execute coordination function 1
+	jsr.w ExecuteCoordinationFunction ; Execute coordination function 2
+	jmp.w ExecuteAdvancedEntityProcessing ; Jump to coordination finalization
 
 ;Specialized system handlers for different processing modes
 Entity_Handler1:
 	ldx.w #$d43b	; Load specialized handler 1 address
-	jmp.w CODE_028835 ; Jump to specialized handler 1
+	jmp.w ProcessData ; Jump to specialized handler 1
 
 Entity_Handler2:
 	ldx.w #$d443	; Load specialized handler 2 address
-	jmp.w CODE_028835 ; Jump to specialized handler 2
+	jmp.w ProcessData ; Jump to specialized handler 2
 
 Entity_InitBaseGraphics:
 	ldx.w #$d316	; Load base system handler address
-	jmp.w CODE_028835 ; Jump to base system handler
+	jmp.w ProcessData ; Jump to base system handler
 
 Entity_ValidateBoundaryAlt:
 	ldx.w #$d2f5	; Load validation handler address
-	jmp.w CODE_028835 ; Jump to validation handler
+	jmp.w ProcessData ; Jump to validation handler
 
 ;Additional specialized handlers
 	db $a2,$be,$d4,$20,$3d,$88,$4c,$ca,$9b
 
 Entity_Handler3:
 	ldx.w #$d478	; Load handler 3 address
-	jmp.w CODE_028835 ; Jump to handler 3
+	jmp.w ProcessData ; Jump to handler 3
 
 Entity_Handler4:
 	ldx.w #$d484	; Load handler 4 address
-	jmp.w CODE_028835 ; Jump to handler 4
+	jmp.w ProcessData ; Jump to handler 4
 
 ;====================================================================
 ; End of Bank $02 Cycle 7 - Advanced Entity Processing & Graphics Management
@@ -2444,10 +2444,10 @@ Entity_Handler4:
 ;Extended coordinate processing with validation
 ;Processes coordinate data with extended validation and transformations
 Coord_Extended:
-	jsr.w CODE_029A8B ; Execute base coordinate processing
+	jsr.w ExecuteBaseCoordinateProcessing ; Execute base coordinate processing
 	rep #$30		; Set 16-bit accumulator and index registers
 	lda.b $77	   ; Load calculated coordinate value
-	bra CODE_029A9A ; Branch to coordinate finalization
+	bra BranchCoordinateFinalization ; Branch to coordinate finalization
 
 ;Advanced entity positioning with coordinate transformation
 ;Implements sophisticated entity positioning with coordinate system management
@@ -2480,7 +2480,7 @@ Entity_ProcessStandardMode:
 ;Validates coordinate systems with proper context management
 Entity_ValidateCoordSystem:
 	phd ; Push direct page register
-	jsr.w CODE_028F22 ; Switch to coordinate validation context
+	jsr.w ProcessEntity ; Switch to coordinate validation context
 	lda.b $16	   ; Load Y coordinate boundary
 	pld ; Restore direct page register
 	rts ; Return validated coordinate
@@ -2498,11 +2498,11 @@ Entity_ProcessDefault:
 	xba ; Exchange back
 	rep #$30		; Set 16-bit accumulator and index registers
 	sta.b $77	   ; Store entity calculation base
-	jsr.w CODE_029AD2 ; Execute coordinate validation
+	jsr.w ExecuteCoordinateValidation ; Execute coordinate validation
 	lsr a; Divide by 2
 	lsr a; Divide by 4
 	lsr a; Divide by 8 (total division by 8)
-	jsr.w CODE_029B02 ; Execute entity coordinate processing
+	jsr.w ExecuteEntityCoordinateProcessing ; Execute entity coordinate processing
 	clc ; Clear carry for addition
 	adc.b $77	   ; Add to calculation base
 	sta.b $77	   ; Store intermediate result
@@ -2522,14 +2522,14 @@ Entity_ProcessCoordinates:
 	rep #$10		; Keep 16-bit index registers
 	lda.b $3b	   ; Load game state identifier
 	cmp.b #$44	  ; Check for special game state $44
-	bcc CODE_029B24 ; Branch to simple processing if less
+	bcc BranchSimpleProcessingIfLess ; Branch to simple processing if less
 	rep #$30		; Set 16-bit accumulator and index registers
 	pla ; Pull calculation value from stack
 	sta.w $0098	 ; Store in calculation register low
 	stz.w $009a	 ; Clear calculation register high
 	lda.w #$000a	; Load division constant (10)
 	sta.w $009c	 ; Store division constant
-	jsl.l CODE_0096E4 ; Execute hardware division operation
+	jsl.l ExecuteFinalCalc ; Execute hardware division operation
 	lda.w $009e	 ; Load division result
 	rts ; Return calculated result
 
@@ -2542,7 +2542,7 @@ Entity_CalcSimple:
 ;Standard entity calculation with halving operation
 ;Implements standard entity calculations with value reduction
 Entity_CalcStandard:
-	jsr.w CODE_029A4A ; Execute base entity calculation
+	jsr.w ExecuteBaseEntityCalculation ; Execute base entity calculation
 
 ;Mathematical reduction with 16-bit precision
 ;Reduces calculated values using 16-bit arithmetic for precision
@@ -2556,7 +2556,7 @@ Math_Halve16Bit:
 ;Enhanced entity calculation with reduction
 ;Combines enhanced entity processing with mathematical reduction
 Entity_CalcEnhanced:
-	jsr.w CODE_029ADA ; Execute enhanced entity processing
+	jsr.w ExecuteEnhancedEntityProcessing ; Execute enhanced entity processing
 	bra Math_Halve16Bit ; Branch to mathematical reduction
 
 ;Multi-controller input validation with state management
@@ -2571,7 +2571,7 @@ Input_ValidateMulti:
 ;Processes controller input with proper context management
 Input_ProcessContext:
 	phd ; Push direct page register
-	jsr.w CODE_028F2F ; Switch to input processing context
+	jsr.w SwitchInputProcessingContext ; Switch to input processing context
 	lda.b $56	   ; Load controller input state
 	pld ; Restore direct page register
 	sta.b $74	   ; Store input state for processing
@@ -2594,20 +2594,20 @@ Input_Enhanced:
 	sep #$20		; Return to 8-bit accumulator
 	rep #$10		; Keep 16-bit index registers
 	ldx.w #$d2ef	; Load system handler 1 address
-	jsr.w CODE_02883D ; Execute system handler 1
+	jsr.w ExecuteSystemHandler ; Execute system handler 1
 	ldx.w #$d35a	; Load system handler 2 address
-	jsr.w CODE_02883D ; Execute system handler 2
+	jsr.w ExecuteSystemHandler ; Execute system handler 2
 	ldx.w #$d37b	; Load system handler 3 address
-	jsr.w CODE_02883D ; Execute system handler 3
-	bra CODE_029BC4 ; Branch to processing finalization
+	jsr.w ExecuteSystemHandler ; Execute system handler 3
+	bra BranchProcessingFinalization ; Branch to processing finalization
 
 ;Standard input processing with iterative handler calls
 ;Processes standard input with multiple iterative system handler calls
 Input_StandardProcess:
 	ldx.w #$d2ef	; Load system handler 1 address
-	jsr.w CODE_02883D ; Execute system handler 1
+	jsr.w ExecuteSystemHandler ; Execute system handler 1
 	ldx.w #$d35a	; Load system handler 2 address
-	jsr.w CODE_02883D ; Execute system handler 2
+	jsr.w ExecuteSystemHandler ; Execute system handler 2
 	rep #$30		; Set 16-bit accumulator and index registers
 	asl.b $77	   ; Multiply calculation by 2
 	sep #$20		; Return to 8-bit accumulator
@@ -2624,7 +2624,7 @@ Input_ScanLoop:
 	rol a; Rotate left to test next bit
 	bcc Input_ScanLoop ; Continue scanning if bit not set
 	ldx.w DATA8_029ba0,y ; Load handler address from table
-	jsr.w CODE_02883D ; Execute selected handler
+	jsr.w ExecuteSystemHandler ; Execute selected handler
 	bra Input_Finalize ; Branch to processing finalization
 
 ;Input handler dispatch table
@@ -2663,7 +2663,7 @@ Input_Special_Condition08:
 ;Finalizes input processing and validates controller state
 Input_Finalize:
 	ldx.w #$d353	; Load input finalization handler address
-	jsr.w CODE_02883D ; Execute input finalization handler
+	jsr.w ExecuteSystemHandler ; Execute input finalization handler
 	lda.b #$00	  ; Clear accumulator high byte
 	xba ; Exchange accumulator bytes
 	lda.b $8d	   ; Load controller index
@@ -2692,9 +2692,9 @@ Controller_StoreData:
 ;Validates input with coordination across multiple systems
 Input_EnhancedValidate:
 	ldx.w #$d2ef	; Load validation system address
-	jsr.w CODE_02883D ; Execute validation system
+	jsr.w ExecuteSystemHandler ; Execute validation system
 	ldx.w #$d361	; Load coordination system address
-	jmp.w CODE_02883D ; Jump to coordination system
+	jmp.w ExecuteSystemHandler ; Jump to coordination system
 
 ;Complex input state management with conditional processing
 ;Manages complex input states with multiple conditional processing paths
@@ -2739,9 +2739,9 @@ Input_Pattern_Enhanced:
 	lsr.b $77                            ;029C21|4677    |000077
 	sep #$20                             ;029C23|E220    |
 	rep #$10                             ;029C25|C210    |
-	jsr.w CODE_029BE1                    ;029C27|20E19B  |029BE1
+	jsr.w Sub_029BE1                    ;029C27|20E19B  |029BE1
 	ldx.w #$d37b                         ;029C2A|A27BD3  |
-	jsr.w CODE_02883D                    ;029C2D|203D88  |02883D
+	jsr.w ExecuteSystemHandler                    ;029C2D|203D88  |02883D
 	bra +                                ;029C30|8063    |029C95
 +
 
@@ -2757,7 +2757,7 @@ Input_Reduction:
 	and.b #$80	  ; Test for input flag $80
 	beq Input_Flag40 ; Branch to alternate handler if not set
 	ldx.w #$d36a	; Load handler for flag $80
-	jsr.w CODE_02883D ; Execute flag $80 handler
+	jsr.w ExecuteSystemHandler ; Execute flag $80 handler
 	bra Input_ProcessDone ; Branch to processing completion
 
 ;Input flag $40 processing
@@ -2766,7 +2766,7 @@ Input_Flag40:
 	and.b #$40	  ; Test for input flag $40
 	beq Input_Flag20 ; Branch to next flag test if not set
 	ldx.w #$d36e	; Load handler for flag $40
-	jsr.w CODE_02883D ; Execute flag $40 handler
+	jsr.w ExecuteSystemHandler ; Execute flag $40 handler
 	bra Input_ProcessDone ; Branch to processing completion
 
 ;Input flag $20 processing
@@ -2775,7 +2775,7 @@ Input_Flag20:
 	and.b #$20	  ; Test for input flag $20
 	beq Input_Flag10_Check ;029C65|F000    |029C67
 	ldx.w #$d372	; Load handler for flag $20
-	jsr.w CODE_02883D ; Execute flag $20 handler
+	jsr.w ExecuteSystemHandler ; Execute flag $20 handler
 	bra Input_ProcessDone ; Branch to processing completion
 
 ;-------------------------------------------------------------------------------
@@ -2791,7 +2791,7 @@ Input_Flag10_Check:
 	and.b #$10                           ;029C69|2910    |
 	beq +                                ;029C6B|F008    |029C75
 	ldx.w #$d377                         ;029C6D|A277D3  |
-	jsr.w CODE_02883D                    ;029C70|203D88  |02883D
+	jsr.w ExecuteSystemHandler                    ;029C70|203D88  |02883D
 	bra ++                               ;029C73|8020    |029C95
 +	lda.b $8d                            ;029C75|A58D    |00008D
 	cmp.b #$02                           ;029C77|C902    |
@@ -2800,13 +2800,13 @@ Input_Flag10_Check:
 	and.b #$06                           ;029C7D|2906    |
 	beq +                                ;029C7F|F008    |029C89
 	ldx.w #$d386                         ;029C81|A286D3  |
-	jsr.w CODE_02883D                    ;029C84|203D88  |02883D
+	jsr.w ExecuteSystemHandler                    ;029C84|203D88  |02883D
 	bra ++                               ;029C87|800C    |029C95
 +	lda.b $db                            ;029C89|A5DB    |0000DB
 	and.b #$01                           ;029C8B|2901    |
 	beq ++                               ;029C8D|F009    |029C98
 	ldx.w #$d38c                         ;029C8F|A28CD3  |
-	jsr.w CODE_02883D                    ;029C92|203D88  |02883D
+	jsr.w ExecuteSystemHandler                    ;029C92|203D88  |02883D
 ++
 
 ;Input processing completion with system finalization
@@ -2816,12 +2816,12 @@ Input_ProcessDone:
 
 ;Main input processing completion handler
 Input_StandardComplete:
-	jmp.w CODE_029F10 ; Jump to main completion handler
+	jmp.w JumpMainCompletionHandler ; Jump to main completion handler
 
 ;Advanced system validation with conditional processing
 ;Validates system state with conditional processing paths
 System_ValidateState:
-	jsr.w CODE_029964 ; Execute system validation check
+	jsr.w ExecuteSystemValidationCheck ; Execute system validation check
 	inc a; Increment validation result
 	beq System_SpecialState ; Branch to special processing if result is zero
 ; Complex system validation sequence
@@ -2832,7 +2832,7 @@ System_ValidateState:
 ;Handles special system states with context switching
 System_SpecialState:
 	phd ; Push direct page register
-	jsr.w CODE_028F2F ; Switch to system processing context
+	jsr.w SwitchInputProcessingContext ; Switch to system processing context
 	stz.b $21	   ; Clear system state flag
 	pld ; Restore direct page register
 	rts ; Return from special system processing
@@ -2846,7 +2846,7 @@ System_Coordinate:
 	lda.b $11	   ; Load system validation flag
 	and.b #$08	  ; Test for validation bit $08
 	bne System_ProcessFlags ; Branch to standard processing if bit set
-	jsr.w CODE_029964 ; Execute system validation
+	jsr.w ExecuteSystemValidationCheck ; Execute system validation
 	inc a; Increment validation result
 	bne System_ProcessFlags ; Branch to standard processing if result non-zero
 	db $4c,$f5,$9d ; Jump to error recovery processing
@@ -2867,7 +2867,7 @@ System_ProcessFlags:
 System_Flag01_Process:
 	jsr.w Input_EnhancedValidate ; Execute enhanced system validation
 	ldx.w #$d3a0	; Load flag $01 handler address
-	jsr.w CODE_02883D ; Execute flag $01 handler
+	jsr.w ExecuteSystemHandler ; Execute flag $01 handler
 	jsr.w Input_Finalize ; Execute processing finalization
 
 ;System flag $02 processing with validation and error handling
@@ -2887,7 +2887,7 @@ System_Flag02:
 System_Flag02_Process:
 	jsr.w Input_EnhancedValidate ; Execute enhanced system validation
 	ldx.w #$d3a7	; Load flag $02 handler address
-	jsr.w CODE_02883D ; Execute flag $02 handler
+	jsr.w ExecuteSystemHandler ; Execute flag $02 handler
 	jsr.w Input_Finalize ; Execute processing finalization
 
 ;System flag $04 processing with validation and error handling
@@ -2907,7 +2907,7 @@ System_Flag04:
 System_Flag04_Process:
 	jsr.w Input_EnhancedValidate ; Execute enhanced system validation
 	ldx.w #$d3ac	; Load flag $04 handler address
-	jsr.w CODE_02883D ; Execute flag $04 handler
+	jsr.w ExecuteSystemHandler ; Execute flag $04 handler
 	jsr.w Input_Finalize ; Execute processing finalization
 
 ;System flag $08 processing with validation and error handling
@@ -2927,7 +2927,7 @@ System_Flag08:
 System_Flag08_Process:
 	jsr.w Input_EnhancedValidate ; Execute enhanced system validation
 	ldx.w #$d3c1	; Load flag $08 handler address
-	jsr.w CODE_02883D ; Execute flag $08 handler
+	jsr.w ExecuteSystemHandler ; Execute flag $08 handler
 	jsr.w Input_Finalize ; Execute processing finalization
 
 ;System flag $10 processing with validation and error handling
@@ -2947,7 +2947,7 @@ System_Flag10:
 System_Flag10_Process:
 	jsr.w Input_EnhancedValidate ; Execute enhanced system validation
 	ldx.w #$d3bb	; Load flag $10 handler address
-	jsr.w CODE_02883D ; Execute flag $10 handler
+	jsr.w ExecuteSystemHandler ; Execute flag $10 handler
 	jsr.w Input_Finalize ; Execute processing finalization
 
 ;System flag $20 processing with validation and error handling
@@ -2967,7 +2967,7 @@ System_Flag20:
 System_Flag20_Process:
 	jsr.w Input_EnhancedValidate ; Execute enhanced system validation
 	ldx.w #$d3b2	; Load flag $20 handler address
-	jsr.w CODE_02883D ; Execute flag $20 handler
+	jsr.w ExecuteSystemHandler ; Execute flag $20 handler
 	jsr.w Input_Finalize ; Execute processing finalization
 
 ;System flag $40 processing with complex validation and error handling
@@ -2988,7 +2988,7 @@ System_Flag40_Validate:
 	bcs System_ComplexProcessing ;029DC6|B000    |029DC8
 	lda.b $dc	   ; Load system control flags
 	phd ; Push direct page register
-	jsr.w CODE_028F2F ; Switch to system processing context
+	jsr.w SwitchInputProcessingContext ; Switch to system processing context
 	sta.b $21	   ; Store flags in system register
 	pld ; Restore direct page register
 	ldx.w #$0000	; Clear result register
@@ -3005,7 +3005,7 @@ System_Flag40_Validate:
 ;-------------------------------------------------------------------------------
 System_ComplexProcessing:
 	pha ;029DC8|0B      |
-	jsr.w CODE_028F2F                    ;029DC9|202F8F  |028F2F
+	jsr.w SwitchInputProcessingContext                    ;029DC9|202F8F  |028F2F
 	lda.b #$80                           ;029DCC|A980    |
 	sta.b $21                            ;029DCE|8521    |000021
 	plp ;029DD0|2B      |
@@ -3027,7 +3027,7 @@ System_ComplexProcessing:
 System_Flag40_Process:
 	jsr.w Input_EnhancedValidate ; Execute enhanced system validation
 	ldx.w #$d398	; Load flag $40 handler address
-	jsr.w CODE_02883D ; Execute flag $40 handler
+	jsr.w ExecuteSystemHandler ; Execute flag $40 handler
 	jsr.w Input_Finalize ; Execute processing finalization
 	jmp.w System_Complete ; Jump to system completion
 
@@ -3035,7 +3035,7 @@ System_Flag40_Process:
 ;Handles system flag errors with proper context switching
 System_FlagError:
 	phd ; Push direct page register
-	jsr.w CODE_028F2F ; Switch to error handling context
+	jsr.w SwitchInputProcessingContext ; Switch to error handling context
 	tsb.b $21	   ; Set error flag in system register
 	pld ; Restore direct page register
 	rts ; Return from error handling
@@ -3045,7 +3045,7 @@ System_FlagError:
 System_Complete:
 	lda.b $dc	   ; Load system control flags
 	phd ; Push direct page register
-	jsr.w CODE_028F2F ; Switch to completion context
+	jsr.w SwitchInputProcessingContext ; Switch to completion context
 	trb.b $21	   ; Clear flags in system register
 	pld ; Restore direct page register
 	rts ; Return from system completion
@@ -3054,7 +3054,7 @@ System_Complete:
 ;Validates system state with proper context switching
 System_ValidateContext:
 	phd ; Push direct page register
-	jsr.w CODE_028F2F ; Switch to validation context
+	jsr.w SwitchInputProcessingContext ; Switch to validation context
 	lda.b $3d	   ; Load validation state
 	pld ; Restore direct page register
 	rts ; Return validation state
@@ -3063,7 +3063,7 @@ System_ValidateContext:
 ;Validates enhanced system state with extended context management
 System_ValidateEnhanced:
 	phd ; Push direct page register
-	jsr.w CODE_028F2F ; Switch to enhanced validation context
+	jsr.w SwitchInputProcessingContext ; Switch to enhanced validation context
 	lda.b $3c	   ; Load enhanced validation state
 	pld ; Restore direct page register
 	rts ; Return enhanced validation state
@@ -3249,7 +3249,7 @@ Idle_StateHandler:
 	rep #$10                             ;02A330|C210    |
 	lda.b #$65                           ;02A332|A965    |
 	sta.w $00a8                          ;02A334|8DA800  |0000A8
-	jsl.l CODE_009783                    ;02A337|22839700|009783
+	jsl.l ExecuteAudioCall                    ;02A337|22839700|009783
 	lda.w $10a0                          ;02A33B|ADA010  |0110A0
 	and.b #$0f                           ;02A33E|290F    |
 	dec ;02A340|3A      |
@@ -3284,7 +3284,7 @@ Idle_StateHandler:
 Controller_GameMode:
 	lda.b #$65	  ;02A373|A965    |      ; Load sound effect ID
 	sta.w $00a8	 ;02A375|8DA800  |0200A8; Store sound parameter
-	jsl.l CODE_009783 ;02A378|22839700|009783; Call sound processing
+	jsl.l ExecuteAudioCall ;02A378|22839700|009783; Call sound processing
 	lda.w $00a9	 ;02A37C|ADA900  |0200A9; Read sound result
 	cmp.b #$32	  ;02A37F|C932    |      ; Compare to threshold
 	bcc Controller_MultiSetup ; Continue if below threshold
@@ -3415,13 +3415,13 @@ Controller_ReadLoop:
 	sep #$20		;02A416|E220    |      ; 8-bit accumulator
 	rep #$10		;02A418|C210    |      ; 16-bit index
 	phd ;02A41A|0B      |      ; Push direct page
-	jsr.w CODE_028F22 ;02A41B|20228F  |028F22; Read controller hardware
+	jsr.w ProcessEntity ;02A41B|20228F  |028F22; Read controller hardware
 	lda.b $10	   ;02A41E|A510    |001210; Check controller presence
 	inc a;02A420|1A      |      ; Test for valid controller
-	beq CODE_02A441 ;02A421|F01E    |02A441; Skip if no controller
+	beq F01eSkipIfNoController ;02A421|F01E    |02A441; Skip if no controller
 	lda.b $21	   ;02A423|A521    |001221; Read button state
 	and.b #$c0	  ;02A425|29C0    |      ; Mask shoulder buttons
-	bne CODE_02A430 ;02A427|D007    |02A430; Branch if shoulders pressed
+	bne D007BranchIfShouldersPressed ;02A427|D007    |02A430; Branch if shoulders pressed
 	lda.b $2f	   ;02A429|A52F    |00112F; Read trigger state
 	and.b #$02	  ;02A42B|2902    |      ; Test trigger bit
 	sta.w $0000,x   ;02A42D|9D0000  |020000; Store trigger state
@@ -3525,7 +3525,7 @@ Controller_ResponseTime:
 
 ; Response Time Measurement Loop
 Controller_ResponseLoop:
-	jsr.w CODE_028F2F ;02A4A1|202F8F  |028F2F; Read controller state
+	jsr.w SwitchInputProcessingContext ;02A4A1|202F8F  |028F2F; Read controller state
 	lda.b $21	   ;02A4A4|A521    |001221; Check button state
 	and.w #$0080	;02A4A6|298000  |      ; Test specific button
 	beq Controller_ResponseEnd ; Exit loop if released
@@ -3546,7 +3546,7 @@ Controller_TimingOptimize:
 	lda.w #$0005	;02A4BB|A90500  |      ; Set loop limit
 	cmp.w $048d	 ;02A4BE|CD8D04  |02048D; Compare to counter
 	beq Controller_TimingResult ; Exit if limit reached
-	jsr.w CODE_028F2F ;02A4C3|202F8F  |028F2F; Read controller again
+	jsr.w SwitchInputProcessingContext ;02A4C3|202F8F  |028F2F; Read controller again
 	lda.b $21	   ;02A4C6|A521    |001221; Check button state
 	and.w #$0080	;02A4C8|298000  |      ; Test button
 	bne Controller_TimingOptimize ; Continue if pressed
@@ -3564,13 +3564,13 @@ Controller_TimingOptimize:
 Controller_TimingResult:
 	sep #$20		;02A4DF|E220    |      ; 8-bit accumulator
 	rep #$10		;02A4E1|C210    |      ; 16-bit index
-	jsr.w CODE_028F22 ;02A4E3|20228F  |028F22; Read final controller state
+	jsr.w ProcessEntity ;02A4E3|20228F  |028F22; Read final controller state
 	lda.b $21	   ;02A4E6|A521    |001221; Check button state
 	and.b #$08	  ;02A4E8|2908    |      ; Test specific bit
 	beq Controller_TimingStore ; Branch if not set
 	lda.b #$05	  ;02A4EC|A905    |      ; Set sound effect ID
 	sta.w $00a8	 ;02A4EE|8DA800  |0200A8; Store sound parameter
-	jsl.l CODE_009783 ;02A4F1|22839700|009783; Call sound system
+	jsl.l ExecuteAudioCall ;02A4F1|22839700|009783; Call sound system
 	lda.w $00a9	 ;02A4F5|ADA900  |0200A9; Get sound result
 	bra Controller_TimingFinalize ; Continue
 ;      |        |      ;
@@ -3603,7 +3603,7 @@ Controller_TimingFinalize:
 ;----------------------------------------------------------------------------
 Menu_AdvancedState:
 	phd ;02A5CF|0B      |      ; Push direct page
-	jsr.w CODE_028F22 ;02A5D0|20228F  |028F22; Read controller state
+	jsr.w ProcessEntity ;02A5D0|20228F  |028F22; Read controller state
 	lda.b $18	   ;02A5D3|A518    |001098; Read system state
 	xba ;02A5D5|EB      |      ; Swap bytes
 	lda.b $38	   ;02A5D6|A538    |0010B8; Read controller config
@@ -3637,7 +3637,7 @@ Menu_ExtendedState:
 ; Alternative Input Processing Path
 Menu_AltPath:
 	lda.b #$10	  ;02A5FE|A910    |      ; Set test value
-	jsl.l CODE_00DA65 ;02A600|2265DA00|00DA65; Call system validation
+	jsl.l CallSystemValidation ;02A600|2265DA00|00DA65; Call system validation
 	inc a;02A604|1A      |      ; Increment for test
 	dec a;02A605|3A      |      ; Decrement back
 	beq Menu_StateResolution ; Branch if zero
@@ -3693,20 +3693,20 @@ Menu_MainHandler:
 	lda.b $8b	   ;02A64B|A58B    |00048B; Read game state
 	cmp.b #$02	  ;02A64D|C902    |      ; Test for menu mode
 	bcc Menu_StandardPath ; Branch if less than
-	jmp.w CODE_02A9A1 ;02A651|4CA1A9  |02A9A1; Jump to advanced handler
+	jmp.w JumpAdvancedHandler ;02A651|4CA1A9  |02A9A1; Jump to advanced handler
 ;      |        |      ;
 ;      |        |      ;
 
 ; Standard Menu Processing Path
 Menu_StandardPath:
 	phd ;02A654|0B      |      ; Push direct page
-	jsr.w CODE_028F22 ;02A655|20228F  |028F22; Read controller state
+	jsr.w ProcessEntity ;02A655|20228F  |028F22; Read controller state
 	lda.b $21	   ;02A658|A521    |001021; Read button state
 	pld ;02A65A|2B      |      ; Restore direct page
 	and.b #$08	  ;02A65B|2908    |      ; Test select button
 	beq Menu_NoSelect ; Branch if not pressed
 	phd ;02A65F|0B      |      ; Push direct page
-	jsr.w CODE_028F22 ;02A660|20228F  |028F22; Read full controller state
+	jsr.w ProcessEntity ;02A660|20228F  |028F22; Read full controller state
 	lda.b $38	   ;02A663|A538    |001038; Read state flags
 	and.b #$0f	  ;02A665|290F    |      ; Mask low nibble
 	ora.b $39	   ;02A667|0539    |001039; Combine with state
@@ -3716,13 +3716,13 @@ Menu_StandardPath:
 	beq Menu_SelectNoState ; Branch if zero
 	lda.b #$02	  ;02A671|A902    |      ; Set sound effect ID
 	sta.w $00a8	 ;02A673|8DA800  |0200A8; Store sound parameter
-	jsl.l CODE_009783 ;02A676|22839700|009783; Call sound system
+	jsl.l ExecuteAudioCall ;02A676|22839700|009783; Call sound system
 	lda.w $00a9	 ;02A67A|ADA900  |0200A9; Read sound result
 	bne Menu_SoundActive ; Branch if sound active
 ;      |        |      ;
 
 Menu_SelectNoState:
-	jmp.w CODE_02A881 ;02A67F|4C81A8  |02A881; Jump to standard handler
+	jmp.w JumpStandardHandler ;02A67F|4C81A8  |02A881; Jump to standard handler
 ;      |        |      ;
 ;      |        |      ;
 
@@ -3732,7 +3732,7 @@ Menu_SelectNoState:
 ;----------------------------------------------------------------------------
 Menu_SoundActive:
 	phd ;02A682|0B      |      ; Push direct page
-	jsr.w CODE_028F22 ;02A683|20228F  |028F22; Read system state
+	jsr.w ProcessEntity ;02A683|20228F  |028F22; Read system state
 	lda.b $38	   ;02A686|A538    |001038; Read state byte 1
 	xba ;02A688|EB      |      ; Swap to high byte
 	lda.b $39	   ;02A689|A539    |001039; Read state byte 2
@@ -3750,7 +3750,7 @@ Menu_SoundActive:
 	sta.b $a7	   ;02A69C|85A7    |0004A7; Store low calculation
 	lda.b #$08	  ;02A69E|A908    |      ; Set sound ID
 	sta.w $00a8	 ;02A6A0|8DA800  |0200A8; Store sound parameter
-	jsl.l CODE_009783 ;02A6A3|22839700|009783; Call sound system
+	jsl.l ExecuteAudioCall ;02A6A3|22839700|009783; Call sound system
 	lda.w $00a9	 ;02A6A7|ADA900  |0200A9; Read sound state
 	sta.b $a9	   ;02A6AA|85A9    |0004A9; Store local copy
 ;      |        |      ;
@@ -3767,12 +3767,12 @@ Sound_ProcessLoop:
 	phd ;02A6B6|0B      |      ; Push direct page
 	pea.w $04a7	 ;02A6B7|F4A704  |0204A7; Push calculation address
 	pld ;02A6BA|2B      |      ; Load new direct page
-	jsl.l CODE_00975A ;02A6BB|225A9700|00975A; Call calculation system
+	jsl.l CallCalculationSystem ;02A6BB|225A9700|00975A; Call calculation system
 	pld ;02A6BF|2B      |      ; Restore direct page
 	inc a;02A6C0|1A      |      ; Test result
 	dec a;02A6C1|3A      |      ; Restore value
 	beq Sound_ProcessLoop ;02A6C2|F0E8    |02A6AC; Loop if zero
-	jmp.w CODE_02A8C6 ;02A6C4|4CC6A8  |02A8C6; Jump to completion handler
+	jmp.w JumpCompletionHandler ;02A6C4|4CC6A8  |02A8C6; Jump to completion handler
 ;      |        |      ;
 ;      |        |      ;
 
@@ -3853,13 +3853,13 @@ Controller_ValidateLoop:
 	phd ;02A72C|0B      |      ; Push direct page
 	pea.w $0f18	 ;02A72D|F4180F  |020F18; Push validation address
 	pld ;02A730|2B      |      ; Load validation page
-	jsl.l CODE_00975A ;02A731|225A9700|00975A; Call validation system
+	jsl.l CallCalculationSystem ;02A731|225A9700|00975A; Call validation system
 	pld ;02A735|2B      |      ; Restore direct page
 	inc a;02A736|1A      |      ; Test result
 	dec a;02A737|3A      |      ; Restore value
 	beq Controller_ValidateNext ;02A738|F009    |02A743; Skip if validation failed
 	phd ;02A73A|0B      |      ; Push direct page
-	jsr.w CODE_028F2F ;02A73B|202F8F  |028F2F; Read controller details
+	jsr.w SwitchInputProcessingContext ;02A73B|202F8F  |028F2F; Read controller details
 	lda.b $56	   ;02A73E|A556    |0011D6; Read controller status
 	pld ;02A740|2B      |      ; Restore direct page
 	bne Controller_ProcessActive ;02A741|D007    |02A74A; Branch if controller active
@@ -3869,7 +3869,7 @@ Controller_ValidateNext:
 	iny ;02A743|C8      |      ; Next controller
 	dex ;02A744|CA      |      ; Decrement counter
 	bne Controller_ValidateLoop ;02A745|D0DE    |02A725; Continue if more controllers
-	jmp.w CODE_02A85E ;02A747|4C5EA8  |02A85E; Jump to completion
+	jmp.w JumpCompletion ;02A747|4C5EA8  |02A85E; Jump to completion
 ;      |        |      ;
 ;      |        |      ;
 
@@ -3881,14 +3881,14 @@ Controller_ProcessActive:
 	lda.w $10b1	 ;02A751|ADB110  |0210B1; Read system parameter
 	sta.b $3a	   ;02A754|853A    |00043A; Store parameter
 	sta.w $10d2	 ;02A756|8DD210  |0210D2; Store in command type
-	jsr.w CODE_028B0F ;02A759|200F8B  |028B0F; Process system state
+	jsr.w ExecuteAdvancedCalc ;02A759|200F8B  |028B0F; Process system state
 	lda.b $db	   ;02A75C|A5DB    |0004DB; Read processing result
 	and.b $a7	   ;02A75E|25A7    |0004A7; Mask with controller status
 	and.b #$07	  ;02A760|2907    |      ; Mask to direction bits
-	beq CODE_02A78A ;02A762|F026    |02A78A; Branch if no direction
+	beq F026BranchIfNoDirection ;02A762|F026    |02A78A; Branch if no direction
 	lda.b $3a	   ;02A764|A53A    |00043A; Read parameter
 	cmp.b #$2d	  ;02A766|C92D    |      ; Compare to value
-	beq CODE_02A770 ;02A768|F006    |02A770; Branch if match
+	beq F006BranchIfMatch ;02A768|F006    |02A770; Branch if match
 	cmp.b #$2e	  ;02A76A|C92E    |      ; Compare to alternate
 	beq Controller_ParamSpecial ;02A76C|F002    |02A770; Branch if match
 	db $80,$05	 ;02A76E|        |02A775; bra instruction
@@ -3966,7 +3966,7 @@ System_ErrorRecovery:
 ; Technical: Originally labeled UNREACH_02A92C
 ;-------------------------------------------------------------------------------
 Controller_ErrorHandler:
-	jmp.w CODE_02A881                    ;02A92C|4C81A8  |02A881
+	jmp.w JumpStandardHandler                    ;02A92C|4C81A8  |02A881
 ;      |        |      ;
 
 ; Advanced Controller Error Recovery Loop
@@ -3979,7 +3979,7 @@ Controller_ErrorRecovery:
 ; Controller Polling and Error Detection Loop
 Controller_PollLoop:
 	phd ;02A934|0B      |      ; Push direct page
-	jsr.w CODE_028F2F ;02A935|202F8F  |028F2F; Read controller state
+	jsr.w SwitchInputProcessingContext ;02A935|202F8F  |028F2F; Read controller state
 	lda.b $2e	   ;02A938|A52E    |00122E; Read controller config
 	xba ;02A93A|EB      |      ; Swap to high byte
 	lda.b $21	   ;02A93B|A521    |001221; Read button state
@@ -4007,13 +4007,13 @@ Controller_RetryCheck:
 ;----------------------------------------------------------------------------
 System_CommandProcessor:
 	phd ;02A950|0B      |      ; Push direct page
-	jsr.w CODE_028F22 ;02A951|20228F  |028F22; Read system state
+	jsr.w ProcessEntity ;02A951|20228F  |028F22; Read system state
 	lda.b $50	   ;02A954|A550    |001050; Read command parameter 1
 	sta.w $0438	 ;02A956|8D3804  |020438; Store in system memory
 	lda.b $52	   ;02A959|A552    |001052; Read command parameter 2
 	sta.w $043a	 ;02A95B|8D3A04  |02043A; Store in system memory
 	pld ;02A95E|2B      |      ; Restore direct page
-	jsr.w CODE_028B0F ;02A95F|200F8B  |028B0F; Process command state
+	jsr.w ExecuteAdvancedCalc ;02A95F|200F8B  |028B0F; Process command state
 	lda.b $e0	   ;02A962|A5E0    |0004E0; Read error state
 	and.b #$03	  ;02A964|2903    |      ; Mask error bits
 	cmp.b #$02	  ;02A966|C902    |      ; Test for critical error
@@ -4022,21 +4022,21 @@ System_CommandProcessor:
 	beq System_WarningHandler ;02A96C|F00E    |02A97C; Branch to warning handler
 	lda.b #$02	  ;02A96E|A902    |      ; Set sound test ID
 	sta.w $00a8	 ;02A970|8DA800  |0200A8; Store sound parameter
-	jsl.l CODE_009783 ;02A973|22839700|009783; Call sound system
+	jsl.l ExecuteAudioCall ;02A973|22839700|009783; Call sound system
 	lda.w $00a9	 ;02A977|ADA900  |0200A9; Read sound result
 	beq System_ErrorHandler ;02A97A|F003    |02A97F; Branch if sound not ready
 ;      |        |      ;
 
 ; Warning State Handler
 System_WarningHandler:
-	jmp.w CODE_02A497 ;02A97C|4C97A4  |02A497; Jump to response handler
+	jmp.w JumpResponseHandler ;02A97C|4C97A4  |02A497; Jump to response handler
 ;      |        |      ;
 ;      |        |      ;
 
 ; Normal Processing State
 System_ErrorHandler:
 	phd ;02A97F|0B      |      ; Push direct page
-	jsr.w CODE_028F22 ;02A980|20228F  |028F22; Read controller state
+	jsr.w ProcessEntity ;02A980|20228F  |028F22; Read controller state
 	lda.b #$81	  ;02A983|A981    |      ; Set default state
 	sta.b $51	   ;02A985|8551    |001051; Store default state
 	lda.b $21	   ;02A987|A521    |001021; Read button state
@@ -4044,7 +4044,7 @@ System_ErrorHandler:
 	beq System_SelectDone ;02A98B|F012    |02A99F; Skip if not pressed
 	lda.b #$02	  ;02A98D|A902    |      ; Set sound effect ID
 	sta.w $00a8	 ;02A98F|8DA800  |0200A8; Store sound parameter
-	jsl.l CODE_009783 ;02A992|22839700|009783; Call sound system
+	jsl.l ExecuteAudioCall ;02A992|22839700|009783; Call sound system
 	lda.w $00a9	 ;02A996|ADA900  |0200A9; Read sound result
 	beq System_SelectDone ;02A999|F004    |02A99F; Skip if sound not ready
 	lda.b #$80	  ;02A99B|A980    |      ; Set alternate state
@@ -4078,14 +4078,14 @@ Game_StandardProcessing:
 	and.b #$08	  ;02A9B2|2908    |      ; Test system bit
 	beq Game_NormalBranch ; Branch to normal processing
 	phd ;02A9B6|0B      |      ; Push direct page
-	jsr.w CODE_028F22 ;02A9B7|20228F  |028F22; Read system state
+	jsr.w ProcessEntity ;02A9B7|20228F  |028F22; Read system state
 ;      |        |      ;
 
 ; Sound System Coordination Loop
 Sound_WaitLoop:
 	lda.b #$06	  ;02A9BA|A906    |      ; Set sound channel ID
 	sta.w $00a8	 ;02A9BC|8DA800  |0200A8; Store sound parameter
-	jsl.l CODE_009783 ;02A9BF|22839700|009783; Call sound system
+	jsl.l ExecuteAudioCall ;02A9BF|22839700|009783; Call sound system
 	lda.b #$00	  ;02A9C3|A900    |      ; Clear high byte
 	xba ;02A9C5|EB      |      ; Swap bytes
 	lda.w $00a9	 ;02A9C6|ADA900  |0200A9; Read sound result
@@ -4103,7 +4103,7 @@ Game_NormalBranch:
 	bne Sound_PriorityProcess ; Branch if mode set
 	ldx.w #$0007	;02A9D6|A20700  |      ; Set loop counter
 	phd ;02A9D9|0B      |      ; Push direct page
-	jsr.w CODE_028F22 ;02A9DA|20228F  |028F22; Read system state
+	jsr.w ProcessEntity ;02A9DA|20228F  |028F22; Read system state
 ;      |        |      ;
 
 ; System State Validation Loop
@@ -4127,11 +4127,11 @@ Game_StateNext:
 Sound_PriorityProcess:
 	lda.b #$65	  ;02A9EC|A965    |      ; Set sound effect ID
 	sta.w $00a8	 ;02A9EE|8DA800  |0200A8; Store sound parameter
-	jsl.l CODE_009783 ;02A9F1|22839700|009783; Call sound system
+	jsl.l ExecuteAudioCall ;02A9F1|22839700|009783; Call sound system
 	lda.w $00a9	 ;02A9F5|ADA900  |0200A9; Read sound result
 	sta.b $a0	   ;02A9F8|85A0    |0004A0; Store result
 	phd ;02A9FA|0B      |      ; Push direct page
-	jsr.w CODE_028F22 ;02A9FB|20228F  |028F22; Read system state
+	jsr.w ProcessEntity ;02A9FB|20228F  |028F22; Read system state
 	ldx.w #$0007	;02A9FE|A20700  |      ; Set loop counter
 ;      |        |      ;
 
@@ -4174,7 +4174,7 @@ Sound_PriorityAdjust:
 
 ; Final Command Processing
 Game_CommandProcess:
-	jsr.w CODE_028B0F ;02AA2E|200F8B  |028B0F; Process command
+	jsr.w ExecuteAdvancedCalc ;02AA2E|200F8B  |028B0F; Process command
 	lda.b $e0	   ;02AA31|A5E0    |0004E0; Read error state
 	and.b #$03	  ;02AA33|2903    |      ; Mask error bits
 	cmp.b #$02	  ;02AA35|C902    |      ; Test for critical error
@@ -4202,7 +4202,7 @@ Game_ErrorState:
 ; Final State Update
 Game_FinalUpdate:
 	phd ;02AA4F|0B      |      ; Push direct page
-	jsr.w CODE_028F22 ;02AA50|20228F  |028F22; Read system state
+	jsr.w ProcessEntity ;02AA50|20228F  |028F22; Read system state
 	lda.w $0439	 ;02AA53|AD3904  |020439; Read final state
 	sta.b $51	   ;02AA56|8551    |001251; Store in result register
 	pld ;02AA58|2B      |      ; Restore direct page
@@ -4292,7 +4292,7 @@ Graphics_MemoryCoord:
 	lda.w #$0000	;02AACD|A90000  |      ; Clear accumulator
 	xba ;02AAD0|EB      |      ; Swap bytes
 	lda.l $7ec360,x ;02AAD1|BF60C37E|7EC360; Read graphics parameter
-	jsl.l CODE_009783 ;02AAD5|22839700|009783; Call extended graphics routine
+	jsl.l ExecuteAudioCall ;02AAD5|22839700|009783; Call extended graphics routine
 	rts ;02AAD9|60      |      ; Return
 
 ; Graphics State Jump Table
@@ -4315,7 +4315,7 @@ Graphics_CommandInterpreter:
 	lda.b #$0a	  ;02AAF8|A90A    |      ; Set command parameter
 	sta.b $00	   ;02AAFA|8500    |000400; Store parameter
 	lda.b #$d7	  ;02AAFC|A9D7    |      ; Set graphics command ID
-	jsr.w CODE_02FE0F ;02AAFE|200FFE  |02FE0F; Call graphics processor
+	jsr.w CallGraphicsCommandProcessor ;02AAFE|200FFE  |02FE0F; Call graphics processor
 	lda.w $0417	 ;02AB01|AD1704  |020417; Read graphics status
 	and.b #$03	  ;02AB04|2903    |      ; Mask status bits
 	cmp.b #$03	  ;02AB06|C903    |      ; Compare to complete state
@@ -4424,7 +4424,7 @@ Graphics_MemoryCoordinator:
 	sta.l $7ec380,x ;02ABB1|9F80C37E|7EC380; Clear graphics buffer
 	lda.b #$08	  ;02ABB5|A908    |      ; Set buffer parameter
 	sta.w $04a4	 ;02ABB7|8DA404  |0204A4; Store buffer parameter
-	jsr.w CODE_02FE38 ;02ABBA|2038FE  |02FE38; Call buffer processor
+	jsr.w CallBufferProcessor ;02ABBA|2038FE  |02FE38; Call buffer processor
 	lda.w $04a7	 ;02ABBD|ADA704  |0204A7; Read working register
 	sta.l $7ec380,x ;02ABC0|9F80C37E|7EC380; Store in graphics buffer
 	lda.w $048d	 ;02ABC4|AD8D04  |02048D; Read system state
@@ -4457,7 +4457,7 @@ Graphics_StoreStateValue:
 	sta.l $7ec580,x ;02ABFD|9F80C57E|7EC580; Store sound parameter
 	lda.b #$03	  ;02AC01|A903    |      ; Set sound channel
 	sta.w $00a8	 ;02AC03|8DA800  |0200A8; Store sound channel
-	jsl.l CODE_009783 ;02AC06|22839700|009783; Call sound system
+	jsl.l ExecuteAudioCall ;02AC06|22839700|009783; Call sound system
 	lda.w $00a9	 ;02AC0A|ADA900  |0200A9; Read sound result
 	clc ;02AC0D|18      |      ; Clear carry
 	adc.b #$02	  ;02AC0E|6902    |      ; Add sound offset
@@ -4466,7 +4466,7 @@ Graphics_StoreStateValue:
 	sta.l $7ec5a0,x ;02AC13|9FA0C57E|7EC5A0; Store sound result
 	lda.b #$07	  ;02AC17|A907    |      ; Set sound effect
 	sta.w $00a8	 ;02AC19|8DA800  |0200A8; Store sound effect
-	jsl.l CODE_009783 ;02AC1C|22839700|009783; Call sound system
+	jsl.l ExecuteAudioCall ;02AC1C|22839700|009783; Call sound system
 	lda.b #$03	  ;02AC20|A903    |      ; Set sound mode
 	sbc.w $00a9	 ;02AC22|EDA900  |0200A9; Subtract sound result
 	sta.l $7ec5c0,x ;02AC25|9FC0C57E|7EC5C0; Store processed sound
@@ -4559,16 +4559,16 @@ Graphics_ProcessingEngine:
 	lda.l $7ec360,x ;02ACAB|BF60C37E|7EC360; Read graphics parameter
 	tay ;02ACAF|A8      |      ; Transfer to Y for indexing
 	lda.w Graphics_StateJumpTable,y ;02ACB0|B9B7AC  |02ACB7; Read jump table entry
-	jsl.l CODE_009783 ;02ACB3|22839700|009783; Call graphics engine
+	jsl.l ExecuteAudioCall ;02ACB3|22839700|009783; Call graphics engine
 	rts ;02ACB7|60      |      ; Return
 
 ; Graphics State Jump Table
 Graphics_StateJumpTable:
-	dw CODE_02AE61 ;02ACB7|        |02AE61; Graphics state 0 handler
-	dw CODE_02AEB3 ;02ACB9|        |02AEB3; Graphics state 1 handler
-	dw CODE_02AEDF ;02ACBB|        |02AEDF; Graphics state 2 handler
-	dw CODE_02AF08 ;02ACBD|        |02AF08; Graphics state 3 handler
-	dw CODE_02AFA2 ;02ACBF|        |02AFA2; Graphics state 4 handler
+	dw GraphicsStateHandler ;02ACB7|        |02AE61; Graphics state 0 handler
+	dw GraphicsStateHandler2 ;02ACB9|        |02AEB3; Graphics state 1 handler
+	dw GraphicsStateHandler3 ;02ACBB|        |02AEDF; Graphics state 2 handler
+	dw GraphicsStateHandler4 ;02ACBD|        |02AF08; Graphics state 3 handler
+	dw GraphicsStateHandler5 ;02ACBF|        |02AFA2; Graphics state 4 handler
 
 ;----------------------------------------------------------------------------
 ; Graphics Command Initialization System
@@ -4585,7 +4585,7 @@ Graphics_CommandInit:
 	lda.b #$0a	  ;02ACD5|A90A    |      ; Set command parameter
 	sta.b $00	   ;02ACD7|8500    |000400; Store parameter register
 	lda.b #$d7	  ;02ACD9|A9D7    |      ; Set graphics command ID
-	jsr.w CODE_02FE0F ;02ACDB|200FFE  |02FE0F; Call graphics command processor
+	jsr.w CallGraphicsCommandProcessor ;02ACDB|200FFE  |02FE0F; Call graphics command processor
 	lda.w $0417	 ;02ACDE|AD1704  |020417; Read command status
 	and.b #$03	  ;02ACE1|2903    |      ; Mask status bits
 	cmp.b #$03	  ;02ACE3|C903    |      ; Check for completion
@@ -4695,7 +4695,7 @@ Buffer_MemoryCoordinator:
 	sta.l $7ec380,x ;02AD8D|9F80C37E|7EC380; Clear buffer address
 	lda.b #$08	  ;02AD91|A908    |      ; Set buffer parameter
 	sta.w $04a4	 ;02AD93|8DA404  |0204A4; Store buffer parameter
-	jsr.w CODE_02FE38 ;02AD96|2038FE  |02FE38; Call buffer processor
+	jsr.w CallBufferProcessor ;02AD96|2038FE  |02FE38; Call buffer processor
 	lda.w $04a7	 ;02AD99|ADA704  |0204A7; Read working register
 	sta.l $7ec380,x ;02AD9C|9F80C37E|7EC380; Store in buffer address
 	lda.w $048d	 ;02ADA0|AD8D04  |02048D; Read system state
@@ -4751,7 +4751,7 @@ Stack_ContextManager:
 ; Entity Processing Loop
 ; Complex loop for entity initialization and processing
 Entity_ProcessingLoop:
-	jsr.w CODE_02EA60 ;02D230|2060EA  |02EA60; Call entity processing
+	jsr.w Label_02EA60 ;02D230|2060EA  |02EA60; Call entity processing
 	lda.b #$1c	  ;02D233|A91C    |      ;
 	sta.l $7ec380,x ;02D235|9F80C37E|7EC380; Store entity data
 	tya ;02D239|98      |      ;
@@ -4769,10 +4769,10 @@ Entity_ProcessingLoop:
 	lda.b #$18	  ;02D24C|A918    |      ; Sound parameter 1
 	xba ;02D24E|EB      |      ; Exchange bytes
 	lda.b #$0c	  ;02D24F|A90C    |      ; Sound parameter 2
-	jsl.l CODE_0B92D6 ;02D251|22D6920B|0B92D6; Call sound engine
+	jsl.l Label_0B92D6 ;02D251|22D6920B|0B92D6; Call sound engine
 	sep #$20		;02D255|E220    |      ; 8-bit accumulator
 	rep #$10		;02D257|C210    |      ; 16-bit index
-	jsr.w CODE_02DA18 ;02D259|2018DA  |02DA18; Call processing routine
+	jsr.w CallProcessingRoutine ;02D259|2018DA  |02DA18; Call processing routine
 
 ; System State Management
 ; Stack restoration and function return processing
@@ -4799,7 +4799,7 @@ Stack_WaitLoop:
 ; Technical: Originally labeled UNREACH_02D269
 ;-------------------------------------------------------------------------------
 Graphics_DataSetup:
-	jsr.w CODE_02EA60                    ;02D269|2060EA  |02EA60
+	jsr.w Label_02EA60                    ;02D269|2060EA  |02EA60
 	lda.b #$20                           ;02D26C|A920    |
 	sta.l $7ec380,X                      ;02D26E|9F80C37E|7EC380
 	lda.b #$00                           ;02D272|A900    |
@@ -4807,7 +4807,7 @@ Graphics_DataSetup:
 	lda.b #$c5                           ;02D278|A9C5    |
 	sta.l $7ec240,X                      ;02D27A|9F40C27E|7EC240
 	ldy.w #$0000                         ;02D27E|A00000  |
-	jsr.w CODE_02EA60                    ;02D281|2060EA  |02EA60
+	jsr.w Label_02EA60                    ;02D281|2060EA  |02EA60
 	lda.w Graphics_DataSetup.data,Y      ;02D284|B9E2D2  |02D2E2
 	sta.l $7ec440,X                      ;02D287|9F40C47E|7EC440
 	iny ;02D28B|C8      |
@@ -4842,7 +4842,7 @@ Graphics_DataSetup:
 	mvn $7e,$05                          ;02D2D8|547E05  |
 	inc.b $e5                            ;02D2DB|E6E5    |
 	plp ;02D2DD|28      |
-	brl CODE_02D673                      ;02D2DE|8273FF  |02D673
+	brl Sub_02D673                      ;02D2DE|8273FF  |02D673
 .data:
 	db $03,$a0,$b0,$20,$03,$b0,$30       ;02D2E2|        |
 	db $55,$02,$50,$a0,$50,$00,$80,$80,$20,$01,$20,$10,$30,$02,$40,$e0 ;02D2E9|        |
@@ -4905,7 +4905,7 @@ Memory_InitEngine:
 	stx.b $8e	   ;02D37C|868E    |000A8E; Store offset
 	lda.b #$04	  ;02D37E|A904    |      ; Block count
 	sta.b $90	   ;02D380|8590    |000A90; Store count
-	jsl.l CODE_02E1C3 ;02D382|22C3E102|02E1C3; Call memory setup
+	jsl.l CallMemorySetup ;02D382|22C3E102|02E1C3; Call memory setup
 	plb ;02D386|AB      |      ; Restore bank
 	plp ;02D387|28      |      ; Restore status
 	rts ;02D388|60      |      ; Return
@@ -4940,7 +4940,7 @@ GameState_ProcessLoop:
 	lda.b $0d,x	 ;02D3AA|B50D    |000A0D; Load target state
 	sta.b $20	   ;02D3AC|8520    |000A20; Store as current
 	sta.b $02,x	 ;02D3AE|9502    |000A02; Update current state
-	jsr.w CODE_02D784 ;02D3B0|2084D7  |02D784; Process state change
+	jsr.w ProcessStateChange ;02D3B0|2084D7  |02D784; Process state change
 	lda.w $0a1c	 ;02D3B3|AD1C0A  |020A1C; Load state data
 	sta.b $07,x	 ;02D3B6|9507    |000A07; Store state data
 	inc.b $1d,x	 ;02D3B8|F61D    |000A1D; Increment state flag
@@ -4966,7 +4966,7 @@ GameState_IncrementState:
 ; Handle state transitions and validation loops
 GameState_Transition:
 	sta.b $21	   ;02D3C7|8521    |000A21; Store processing state
-	jsr.w CODE_02D4F7 ;02D3C9|20F7D4  |02D4F7; Call state processor
+	jsr.w CallStateProcessor ;02D3C9|20F7D4  |02D4F7; Call state processor
 	cmp.b $07,x	 ;02D3CC|D507    |000A07; Compare result
 	bne GameState_IncrementState ;02D3CE|D0F6    |02D3C6; Loop if not equal
 	lda.b $02,x	 ;02D3D0|B502    |000A02; Load current state
@@ -5158,10 +5158,10 @@ State_ValidationEngine:
 
 ; Complex State Processing Pipeline
 State_ProcessPipeline:
-	jsr.w CODE_02D784 ;02D50A|2084D7  |02D784; Call state processor
-	jsr.w CODE_02D5BB ;02D50D|20BBD5  |02D5BB; Call graphics setup
+	jsr.w ProcessStateChange ;02D50A|2084D7  |02D784; Call state processor
+	jsr.w CallGraphicsSetup ;02D50D|20BBD5  |02D5BB; Call graphics setup
 	rep #$30		;02D510|C230    |      ; 16-bit mode
-	jsr.w CODE_02D6D0 ;02D512|20D0D6  |02D6D0; Call calculation engine
+	jsr.w CallCalculationEngine ;02D512|20D0D6  |02D6D0; Call calculation engine
 	lda.b $1a	   ;02D515|A51A    |000A1A; Load calculated width
 	sta.b $81	   ;02D517|8581    |000A81; Store width
 	sep #$20		;02D519|E220    |      ; 8-bit accumulator
@@ -5294,7 +5294,7 @@ Graphics_SetupEngine:
 	rep #$30		;02D5CF|C230    |      ; 16-bit mode
 	lda.w DATA8_02d627,x ;02D5D1|BD27D6  |02D627; Load tile data
 	sta.b $74	   ;02D5D4|8574    |000A74; Store tile data
-	jsr.w CODE_02D6D0 ;02D5D6|20D0D6  |02D6D0; Calculate positions
+	jsr.w CallCalculationEngine ;02D5D6|20D0D6  |02D6D0; Calculate positions
 	ldy.b $72	   ;02D5D9|A472    |000A72; Load Y position
 	sep #$20		;02D5DB|E220    |      ; 8-bit accumulator
 	rep #$10		;02D5DD|C210    |      ; 16-bit index
@@ -5647,7 +5647,7 @@ State_DataProcess:
 	lda.b $20	   ;02D7BB|A520    |000A20; Load state parameter
 	sta.w $4202	 ;02D7BD|8D0242  |024202; Set multiplicand
 	lda.b #$05	  ;02D7C0|A905    |      ; Set multiplier
-	jsl.l CODE_00971E ;02D7C2|221E9700|00971E; Call multiplication routine
+	jsl.l CallMultiplicationRoutine ;02D7C2|221E9700|00971E; Call multiplication routine
 	ldx.w $4216	 ;02D7C6|AE1642  |024216; Load multiplication result
 	lda.l DATA8_098462,x ;02D7C9|BF628409|098462; Load bank data
 	sta.b $15	   ;02D7CD|8515    |000A15; Store bank value
@@ -5680,7 +5680,7 @@ Entity_GraphicsCoordinator:
 	rep #$10		;02D817|C210    |      ; 16-bit index
 	sta.w $4202	 ;02D819|8D0242  |024202; Set multiplicand
 	lda.b #$05	  ;02D81C|A905    |      ; Set multiplier (5)
-	jsl.l CODE_00971E ;02D81E|221E9700|00971E; Call multiplication routine
+	jsl.l CallMultiplicationRoutine ;02D81E|221E9700|00971E; Call multiplication routine
 	ldx.w $4216	 ;02D822|AE1642  |024216; Load result address
 
 ; Multi-Bank Data Retrieval
@@ -6030,10 +6030,10 @@ Display_ColorLoop1:
 	beq Display_ColorPhase2 ;02DA32|F015    |02DA49; Exit if zero
 	inx ;02DA34|E8      |      ; Next color
 	sta.b SNES_COLDATA-$2100 ;02DA35|8532    |002132; Set color data
-	jsl.l CODE_0C8000 ;02DA37|2200800C|0C8000; Wait timing routine
-	jsl.l CODE_0C8000 ;02DA3B|2200800C|0C8000; Wait timing routine
-	jsl.l CODE_0C8000 ;02DA3F|2200800C|0C8000; Wait timing routine
-	jsl.l CODE_0C8000 ;02DA43|2200800C|0C8000; Wait timing routine
+	jsl.l CWaitTimingRoutine ;02DA37|2200800C|0C8000; Wait timing routine
+	jsl.l CWaitTimingRoutine ;02DA3B|2200800C|0C8000; Wait timing routine
+	jsl.l CWaitTimingRoutine ;02DA3F|2200800C|0C8000; Wait timing routine
+	jsl.l CWaitTimingRoutine ;02DA43|2200800C|0C8000; Wait timing routine
 	bra Display_ColorLoop1 ;02DA47|80E6    |02DA2F; Continue color loop
 
 ; Color Effect Processing Phase 2
@@ -6050,11 +6050,11 @@ Display_ColorLoop2:
 	beq Display_ProcessDone ;02DA57|F019    |02DA72; Exit if zero
 	inx ;02DA59|E8      |      ; Next color
 	sta.b SNES_COLDATA-$2100 ;02DA5A|8532    |002132; Set color data
-	jsl.l CODE_0C8000 ;02DA5C|2200800C|0C8000; Wait timing routine
-	jsl.l CODE_0C8000 ;02DA60|2200800C|0C8000; Wait timing routine
-	jsl.l CODE_0C8000 ;02DA64|2200800C|0C8000; Wait timing routine
-	jsl.l CODE_0C8000 ;02DA68|2200800C|0C8000; Wait timing routine
-	jsl.l CODE_0C8000 ;02DA6C|2200800C|0C8000; Wait timing routine
+	jsl.l CWaitTimingRoutine ;02DA5C|2200800C|0C8000; Wait timing routine
+	jsl.l CWaitTimingRoutine ;02DA60|2200800C|0C8000; Wait timing routine
+	jsl.l CWaitTimingRoutine ;02DA64|2200800C|0C8000; Wait timing routine
+	jsl.l CWaitTimingRoutine ;02DA68|2200800C|0C8000; Wait timing routine
+	jsl.l CWaitTimingRoutine ;02DA6C|2200800C|0C8000; Wait timing routine
 	bra Display_ColorLoop2 ;02DA70|80E2    |02DA54; Continue color loop
 
 ; Display Processing Completion
@@ -6097,7 +6097,7 @@ Display_StateInit:
 	rep #$10		;02DAA4|C210    |      ; 16-bit index
 	phk ;02DAA6|4B      |      ; Push program bank
 	plb ;02DAA7|AB      |      ; Set as data bank
-	jsr.w CODE_02DFCD ;02DAA8|20CDDF  |02DFCD; Call memory clearing routine
+	jsr.w CallMemoryClearingRoutine ;02DAA8|20CDDF  |02DFCD; Call memory clearing routine
 
 ; State Initialization Engine
 ; Advanced state flags and system parameters setup
@@ -6195,7 +6195,7 @@ Display_VBlankWait:
 ; Advanced Sprite Management System
 ; Complex sprite initialization and state management
 	lda.w $0a9c	 ;02DB49|AD9C0A  |020A9C; Load sprite mode flag
-	beq CODE_02DB88 ;02DB4C|F03A    |02DB88; Branch if no sprites
+	beq F03aBranchIfNoSprites ;02DB4C|F03A    |02DB88; Branch if no sprites
 
 ; DMA Configuration Engine
 ; Setup DMA for sprite data transfer
@@ -6236,8 +6236,8 @@ DATA8_02db83:
 
 ; Sprite Processing and Display Coordination Engine
 Sprite_ProcessCoord:
-	jsr.w CODE_02E6ED ;02DB88|20EDE6  |02E6ED; Call sprite processor
-	jsr.w CODE_02E0DB ;02DB8B|20DBE0  |02E0DB; Call display coordinator
+	jsr.w Label_02E6ED ;02DB88|20EDE6  |02E6ED; Call sprite processor
+	jsr.w CallDisplayCoordinator ;02DB8B|20DBE0  |02E0DB; Call display coordinator
 	ldx.w #$0005	;02DB8E|A20500  |      ; Initialize loop counter
 	lda.b #$ff	  ;02DB91|A9FF    |      ; Clear value
 
@@ -6245,7 +6245,7 @@ Sprite_ProcessCoord:
 State_RegClearLoop:
 	sta.b $0d,x	 ;02DB93|950D    |000A0D; Clear state register
 	dex ;02DB95|CA      |      ; Decrement counter
-	bpl CODE_02DB93 ;02DB96|10FB    |02DB93; Continue loop
+	bpl FbContinueLoop ;02DB96|10FB    |02DB93; Continue loop
 
 ; State Data Transfer and Configuration Engine
 	ldy.w #$0a25	;02DB98|A0250A  |      ; Destination address
@@ -6266,7 +6266,7 @@ State_BlockTransfer:
 ; Advanced Sprite Rendering System
 	lda.b $9c	   ;02DBB4|A59C    |000A9C; Load rendering mode
 	beq Sprite_RendererAlternate ;02DBB6|F005    |02DBBD; Branch if disabled
-	jsr.w CODE_02DCDD ;02DBB8|20DDDC  |02DCDD; Call sprite renderer
+	jsr.w CallSpriteRenderer ;02DBB8|20DDDC  |02DCDD; Call sprite renderer
 	bra Object_ManagementEngine ;02DBBB|8003    |02DBC0; Continue processing
 
 ;-------------------------------------------------------------------------------
@@ -6274,16 +6274,16 @@ State_BlockTransfer:
 ;-------------------------------------------------------------------------------
 ; Purpose: Alternate sprite rendering path
 ; Reachability: Reachable via beq when rendering disabled
-; Analysis: Calls alternate sprite renderer CODE_02DD30
+; Analysis: Calls alternate sprite renderer AnalysisCallsAlternateSpriteRendererCode
 ; Technical: Originally labeled UNREACH_02DBBD
 ;-------------------------------------------------------------------------------
 Sprite_RendererAlternate:
-	jsr.w CODE_02DD30                    ;02DBBD|2030DD  |02DD30
+	jsr.w AnalysisCallsAlternateSpriteRendererCode                    ;02DBBD|2030DD  |02DD30
 
 ; Advanced Object Management Engine
 Object_ManagementEngine:
 	sep #$30		;02DBC0|E230    |      ; 8-bit mode
-	jsr.w CODE_02EA60 ;02DBC2|2060EA  |02EA60; Call object allocator
+	jsr.w Label_02EA60 ;02DBC2|2060EA  |02EA60; Call object allocator
 	stx.w $0ade	 ;02DBC5|8EDE0A  |020ADE; Store primary object index
 	stz.w $0af4	 ;02DBC8|9CF40A  |020AF4; Clear processing flag
 
@@ -6296,7 +6296,7 @@ Object_ManagementEngine:
 	lda.b #$81	  ;02DBDB|A981    |      ; Set object flags
 	sta.l $7ec240,x ;02DBDD|9F40C27E|7EC240; Store object flags
 	ldy.b #$0c	  ;02DBE1|A00C    |      ; Parameter value
-	jsr.w CODE_02EA7F ;02DBE3|207FEA  |02EA7F; Call parameter processor
+	jsr.w Label_02EA7F ;02DBE3|207FEA  |02EA7F; Call parameter processor
 	sta.l $7ec260,x ;02DBE6|9F60C27E|7EC260; Store parameter result
 
 ; Primary Object Graphics Setup
@@ -6357,7 +6357,7 @@ Object_ManagementEngine:
 
 ; Secondary Object Management System
 	stz.w $0af5	 ;02DC35|9CF50A  |020AF5; Clear secondary flag
-	jsr.w CODE_02EA60 ;02DC38|2060EA  |02EA60; Call object allocator
+	jsr.w Label_02EA60 ;02DC38|2060EA  |02EA60; Call object allocator
 	lda.b #$02	  ;02DC3B|A902    |      ; Secondary object type
 	sta.l $7ec320,x ;02DC3D|9F20C37E|7EC320; Set object type
 	stx.w $0adf	 ;02DC41|8EDF0A  |020ADF; Store secondary object index
@@ -6369,7 +6369,7 @@ Object_ManagementEngine:
 	lda.b #$81	  ;02DC4E|A981    |      ; Set object flags
 	sta.l $7ec240,x ;02DC50|9F40C27E|7EC240; Store object flags
 	ldy.b #$0c	  ;02DC54|A00C    |      ; Parameter value
-	jsr.w CODE_02EA7F ;02DC56|207FEA  |02EA7F; Call parameter processor
+	jsr.w Label_02EA7F ;02DC56|207FEA  |02EA7F; Call parameter processor
 	sta.l $7ec260,x ;02DC59|9F60C27E|7EC260; Store parameter result
 
 ; Secondary Object Graphics Processing
@@ -6439,7 +6439,7 @@ Object_ManagementEngine:
 	sta.l $7ec480,x ;02DCB3|9F80C47E|7EC480; Store tile configuration
 
 ; Final System Coordination
-	jsl.l CODE_0B935F ;02DCB7|225F930B|0B935F; Call system coordinator
+	jsl.l Battle_Field_Background_Graphics_Loader ;02DCB7|225F930B|0B935F; Call system coordinator
 	inc.b $f8	   ;02DCBB|E6F8    |000AF8; Increment frame counter
 	plb ;02DCBD|AB      |      ; Restore data bank
 	plp ;02DCBE|28      |      ; Restore processor status
@@ -6472,9 +6472,9 @@ Tile_MappingTable:
 Sprite_RenderEngine:
 	php ;02DCDD|08      |      ; Save processor status
 	sep #$30		;02DCDE|E230    |      ; 8-bit mode
-	jsr.w CODE_02DF3E ;02DCE0|203EDF  |02DF3E; Call sprite initializer
-	jsr.w CODE_02DFE8 ;02DCE3|20E8DF  |02DFE8; Call sprite loader
-	jsr.w CODE_02E021 ;02DCE6|2021E0  |02E021; Call sprite coordinator
+	jsr.w CallSpriteInitializer2 ;02DCE0|203EDF  |02DF3E; Call sprite initializer
+	jsr.w CallSpriteLoader ;02DCE3|20E8DF  |02DFE8; Call sprite loader
+	jsr.w CallSpriteCoordinator ;02DCE6|2021E0  |02E021; Call sprite coordinator
 	lda.b #$20	  ;02DCE9|A920    |      ; Set sprite flag
 	tsb.b $e3	   ;02DCEB|04E3    |000AE3; Test and set system flag
 	stz.b $98	   ;02DCED|6498    |000A98; Clear sprite counter
@@ -6486,11 +6486,11 @@ Sprite_RenderEngine:
 ; Sprite Processing Loop Coordination
 Sprite_ProcessLoop:
 	sta.b $97	   ;02DCF8|8597    |000A97; Store current sprite
-	jsl.l CODE_02E48C ;02DCFA|228CE402|02E48C; Call sprite processor
+	jsl.l CallSpriteProcessor ;02DCFA|228CE402|02E48C; Call sprite processor
 	clc ;02DCFE|18      |      ; Clear carry
 	adc.b #$04	  ;02DCFF|6904    |      ; Next sprite (4 bytes each)
 	cmp.b #$10	  ;02DD01|C910    |      ; Check limit (16 sprites)
-	bne CODE_02DCF8 ;02DD03|D0F3    |02DCF8; Continue loop
+	bne D0f3ContinueLoop ;02DD03|D0F3    |02DCF8; Continue loop
 
 ; Sprite Grid Processing Engine
 	ldy.b #$04	  ;02DD05|A004    |      ; Start Y position
@@ -6505,19 +6505,19 @@ Sprite_GridLoop:
 	lda.b $9f	   ;02DD11|A59F    |000A9F; Load sprite flags
 	and.b #$0f	  ;02DD13|290F    |      ; Mask lower bits
 	sta.b $96	   ;02DD15|8596    |000A96; Store masked flags
-	jsl.l CODE_02E4EB ;02DD17|22EBE402|02E4EB; Call sprite renderer
+	jsl.l CallSpriteRenderer2 ;02DD17|22EBE402|02E4EB; Call sprite renderer
 	inx ;02DD1B|E8      |      ; Next X position
 	cpx.b #$10	  ;02DD1C|E010    |      ; Check X limit (16)
-	bne CODE_02DD09 ;02DD1E|D0E9    |02DD09; Continue X loop
+	bne D0e9ContinueXLoop ;02DD1E|D0E9    |02DD09; Continue X loop
 	ldx.b #$00	  ;02DD20|A200    |      ; Reset X position
 	iny ;02DD22|C8      |      ; Next Y position
 	cpy.b #$0e	  ;02DD23|C00E    |      ; Check Y limit (14)
-	bne CODE_02DD09 ;02DD25|D0E2    |02DD09; Continue Y loop
+	bne D0e9ContinueXLoop ;02DD25|D0E2    |02DD09; Continue Y loop
 
 ; Sprite Rendering Completion
 	lda.b #$02	  ;02DD27|A902    |      ; Set completion flag
 	tsb.b $e3	   ;02DD29|04E3    |000AE3; Test and set system flag
-	jsr.w CODE_02E095 ;02DD2B|2095E0  |02E095; Call sprite finalizer
+	jsr.w CallSpriteFinalizer ;02DD2B|2095E0  |02E095; Call sprite finalizer
 	plp ;02DD2E|28      |      ; Restore processor status
 	rts ;02DD2F|60      |      ; Return to caller
 
@@ -6578,7 +6578,7 @@ Sprite_InitEngine:
 	lda.w Sprite_ParameterTable,x ;02DF42|BD5BDF  |02DF5B; Load sprite parameter
 	sta.w $0aee	 ;02DF45|8DEE0A  |020AEE; Store sprite configuration
 	pea.w DATA8_02df53 ;02DF48|F453DF  |02DF53; Push configuration table
-	jsl.l CODE_0097BE ;02DF4B|22BE9700|0097BE; Call sprite initializer
+	jsl.l CallSpriteInitializer ;02DF4B|22BE9700|0097BE; Call sprite initializer
 	plp ;02DF4F|28      |      ; Restore processor status
 	ply ;02DF50|7A      |      ; Restore Y register
 	plx ;02DF51|FA      |      ; Restore X register
@@ -6681,7 +6681,7 @@ Graphics_DataProcessor_2:
 	lda.w $0a9c	 ;02DFED|AD9C0A  |020A9C; Load graphics mode
 	sta.w $4202	 ;02DFF0|8D0242  |024202; Set multiplicand
 	lda.b #$03	  ;02DFF3|A903    |      ; Set multiplier (3)
-	jsl.l CODE_00971E ;02DFF5|221E9700|00971E; Call multiplication routine
+	jsl.l CallMultiplicationRoutine ;02DFF5|221E9700|00971E; Call multiplication routine
 	ldx.w $4216	 ;02DFF9|AE1642  |024216; Load result index
 	rep #$30		;02DFFC|C230    |      ; 16-bit mode
 	lda.l UNREACH_0CF715,x ;02DFFE|BF15F70C|0CF715; Load graphics parameter 1
@@ -6720,12 +6720,12 @@ Graphics_DataProcessor_3:
 Graphics_DataLoop:
 	lda.l UNREACH_0CF425,x ;02E03A|BF25F40C|0CF425; Load graphics byte from bank $0c
 	inx ;02E03E|E8      |      ; Next graphics byte
-	jsr.w CODE_02E056 ;02E03F|2056E0  |02E056; Call graphics processor
+	jsr.w CallGraphicsProcessor ;02E03F|2056E0  |02E056; Call graphics processor
 	dey ;02E042|88      |      ; Decrement loop counter
 	bne Graphics_DataLoop ;02E043|D0F5    |02E03A; Continue processing loop
 	lda.w $0a9f	 ;02E045|AD9F0A  |020A9F; Load special graphics flag
 	and.b #$0f	  ;02E048|290F    |      ; Mask lower 4 bits
-	jsr.w CODE_02E056 ;02E04A|2056E0  |02E056; Process special graphics data
+	jsr.w CallGraphicsProcessor ;02E04A|2056E0  |02E056; Process special graphics data
 	plp ;02E04D|28      |      ; Restore processor status
 	rts ;02E04E|60      |      ; Return to caller
 
@@ -6744,7 +6744,7 @@ Graphics_CalcEngine:
 	rep #$10		;02E05B|C210    |      ; 16-bit index
 	sta.w $4202	 ;02E05D|8D0242  |024202; Set multiplicand
 	lda.b #$06	  ;02E060|A906    |      ; Set multiplier (6)
-	jsl.l CODE_00971E ;02E062|221E9700|00971E; Call multiplication routine
+	jsl.l CallMultiplicationRoutine ;02E062|221E9700|00971E; Call multiplication routine
 	ldx.w $4216	 ;02E066|AE1642  |024216; Load multiplication result
 	ldy.w #$0004	;02E069|A00400  |      ; Process 4 data segments
 
@@ -6756,13 +6756,13 @@ Graphics_SegmentLoop:
 	inx ;02E074|E8      |      ; Next data byte
 	sta.w $4202	 ;02E075|8D0242  |024202; Set new multiplicand
 	lda.b #$18	  ;02E078|A918    |      ; Set multiplier (24)
-	jsl.l CODE_00971E ;02E07A|221E9700|00971E; Call multiplication routine
+	jsl.l CallMultiplicationRoutine ;02E07A|221E9700|00971E; Call multiplication routine
 	rep #$30		;02E07E|C230    |      ; 16-bit mode
 	lda.w $4216	 ;02E080|AD1642  |024216; Load calculation result
 	clc ;02E083|18      |      ; Clear carry
 	adc.w #$d785	;02E084|6985D7  |      ; Add graphics base offset
 	sta.w $0a8b	 ;02E087|8D8B0A  |020A8B; Store graphics address
-	jsl.l CODE_02E1C3 ;02E08A|22C3E102|02E1C3; Call graphics renderer
+	jsl.l CallMemorySetup ;02E08A|22C3E102|02E1C3; Call graphics renderer
 	dey ;02E08E|88      |      ; Decrement segment counter
 	bne Graphics_SegmentLoop ;02E08F|D0DB    |02E06C; Continue segment processing
 	plp ;02E091|28      |      ; Restore processor status
@@ -6869,18 +6869,18 @@ Graphics_MultiProcessor:
 	lda.w $0a92	 ;02E4F8|AD920A  |020A92;  Load graphics Y coordinate
 	and.w #$00ff	;02E4FB|29FF00  |      ;  Mask to 8-bit coordinate
 	tay ;02E4FE|A8      |      ;  Transfer to Y index
-	jsr.w CODE_02E523 ;02E4FF|2023E5  |02E523;  Call graphics calculation routine
+	jsr.w CallGraphicsCalculationRoutine ;02E4FF|2023E5  |02E523;  Call graphics calculation routine
 	sep #$20		;02E502|E220    |      ;  8-bit accumulator mode
 	rep #$10		;02E504|C210    |      ;  16-bit index registers
 	lda.b $96	   ;02E506|A596    |000A96;  Load graphics multiplier
 	sta.w $4202	 ;02E508|8D0242  |024202;  Store to hardware multiplier
 	lda.b #$06	  ;02E50B|A906    |      ;  Load multiplication factor
-	jsl.l CODE_00971E ;02E50D|221E9700|00971E;  Call multiplication routine
+	jsl.l CallMultiplicationRoutine ;02E50D|221E9700|00971E;  Call multiplication routine
 	ldx.w $4216	 ;02E511|AE1642  |024216;  Load multiplication result
 	lda.b $93	   ;02E514|A593    |000A93;  Load graphics bank identifier
 	xba ;02E516|EB      |      ;  Exchange accumulator bytes
 	lda.l DATA8_0cef89,x ;02E517|BF89EF0C|0CEF89;  Load graphics data from table
-	jsr.w CODE_02E536 ;02E51B|2036E5  |02E536;  Process graphics data
+	jsr.w ProcessGraphicsData ;02E51B|2036E5  |02E536;  Process graphics data
 	plp ;02E51E|28      |      ;  Restore processor status
 	ply ;02E51F|7A      |      ;  Restore Y register
 	plx ;02E520|FA      |      ;  Restore X register
@@ -6960,9 +6960,9 @@ Pattern_ProcessLoop:
 	inc a;02E57C|1A      |      ;  Increment counter
 	sta.b $03,s	 ;02E57D|8303    |000003;  Store updated counter
 	cmp.b #$04	  ;02E57F|C904    |      ;  Check if 4 patterns processed
-	beq CODE_02E598 ;02E581|F015    |02E598;  Branch if complete
+	beq F015BranchIfComplete ;02E581|F015    |02E598;  Branch if complete
 	cmp.b #$02	  ;02E583|C902    |      ;  Check if 2 patterns processed
-	bne CODE_02E591 ;02E585|D00A    |02E591;  Branch if not 2
+	bne D00aBranchIfNot ;02E585|D00A    |02E591;  Branch if not 2
 
 ; Advanced Buffer Address Calculation
 	rep #$20		;02E587|C220    |      ;  16-bit accumulator mode
@@ -7023,7 +7023,7 @@ System_Coordinator:
 	sta.w $0ab0	 ;02E5BE|8DB00A  |020AB0;  Store to system variable
 	sep #$20		;02E5C1|E220    |      ;  8-bit accumulator mode
 	rep #$10		;02E5C3|C210    |      ;  16-bit index registers
-	jsr.w CODE_02E60F ;02E5C5|200FE6  |02E60F;  Call system initialization
+	jsr.w CallSystemInitialization ;02E5C5|200FE6  |02E60F;  Call system initialization
 	lda.b #$80	  ;02E5C8|A980    |      ;  Load system enable flag
 	tsb.w $0110	 ;02E5CA|0C1001  |020110;  Set system enable bit
 	stz.w $212c	 ;02E5CD|9C2C21  |02212C;  Clear main screen designation
@@ -7053,7 +7053,7 @@ System_Coordinator:
 ; Comprehensive system initialization with advanced PPU setup and coordination
 PPU_InitEngine:
 	php ;02E60F|08      |      ;  Preserve processor status
-	jsl.l CODE_0C8000 ;02E610|2200800C|0C8000;  Call external system routine
+	jsl.l CWaitTimingRoutine ;02E610|2200800C|0C8000;  Call external system routine
 	lda.b #$ff	  ;02E614|A9FF    |      ;  Load window mask value
 	sta.w $2127	 ;02E616|8D2721  |022127;  Set window 1 mask
 	sta.w $2129	 ;02E619|8D2921  |022129;  Set window 2 mask
@@ -7092,7 +7092,7 @@ PPU_InitEngine:
 
 ; Final System Coordination
 	lda.b #$02	  ;02E667|A902    |      ;  Load coordination flag
-	jsl.l CODE_0C8000 ;02E669|2200800C|0C8000;  Call coordination routine
+	jsl.l CWaitTimingRoutine ;02E669|2200800C|0C8000;  Call coordination routine
 	tsb.w $0111	 ;02E66D|0C1101  |020111;  Set coordination bit
 
 ; ------------------------------------------------------------------------------
@@ -7132,7 +7132,7 @@ RealTime_StoreCalc:
 ; Advanced State Validation and PPU Coordination
 	lda.w $0aa1	 ;02E6A2|ADA10A  |020AA1;  Load system value
 	cmp.b #$0a	  ;02E6A5|C90A    |      ;  Compare with threshold
-	bmi CODE_02E6B4 ;02E6A7|300B    |02E6B4;  Branch if below threshold
+	bmi Label_02E6B4 ;02E6A7|300B    |02E6B4;  Branch if below threshold
 	lda.w $0aaf	 ;02E6A9|ADAF0A  |020AAF;  Load system state
 	asl a;02E6AC|0A      |      ;  Shift left (multiply by 2)
 	and.b #$f0	  ;02E6AD|29F0    |      ;  Mask upper nibble
@@ -7140,7 +7140,7 @@ RealTime_StoreCalc:
 	sta.w $2106	 ;02E6B1|8D0621  |022106;  Set mosaic register
 
 ; System Timing and Coordination Update
-CODE_02E6B4:
+Label_02E6B4:
 	rep #$20		;02E6B4|C220    |      ;  16-bit accumulator mode
 	lda.w $0ab0	 ;02E6B6|ADB00A  |020AB0;  Load system timer
 	adc.w $0aae	 ;02E6B9|6DAE0A  |020AAE;  Add system increment
@@ -7148,7 +7148,7 @@ CODE_02E6B4:
 	lda.w $0ab0	 ;02E6BF|ADB00A  |020AB0;  Load system timer
 	adc.w DATA8_02e5a0 ;02E6C2|6DA0E5  |02E5A0;  Add timing constant
 	sta.w $0ab0	 ;02E6C5|8DB00A  |020AB0;  Store updated timer
-	jsl.l CODE_0C8000 ;02E6C8|2200800C|0C8000;  Call external coordination
+	jsl.l CWaitTimingRoutine ;02E6C8|2200800C|0C8000;  Call external coordination
 	sep #$20		;02E6CC|E220    |      ;  8-bit accumulator mode
 	lda.b #$80	  ;02E6CE|A980    |      ;  Load system flag
 	trb.w $0110	 ;02E6D0|1C1001  |020110;  Clear system flag
@@ -7172,7 +7172,7 @@ RealTime_Shutdown:
 ; Advanced Multi-Threaded Memory Management Engine
 ; ------------------------------------------------------------------------------
 ; Comprehensive memory management with multi-threading and error recovery
-CODE_02E6ED:
+Label_02E6ED:
 	php ;02E6ED|08      |      ;  Preserve processor status
 	phd ;02E6EE|0B      |      ;  Preserve direct page
 	pea.w $0a00	 ;02E6EF|F4000A  |020A00;  Set direct page to $0a00
@@ -7267,7 +7267,7 @@ Thread_CleanupLoop_1:
 Thread_Deactivate:
 	dey ;02E85F|88      |      ;  Decrement thread counter
 	bpl Thread_CleanupLoop ;02E860|10F5    |02E857;  Continue if more threads
-	jsl.l CODE_0096A0 ;02E862|22A09600|0096A0;  Call external thread manager
+	jsl.l CallExternalThreadManager ;02E862|22A09600|0096A0;  Call external thread manager
 	bra Thread_ReturnMain ;02E866|80AD    |02E815;  Return to main thread loop
 
 ; Active Thread Processing and State Management
@@ -7280,7 +7280,7 @@ Thread_ActiveProcess:
 	lda.l $7ec420,x ;02E871|BF20C47E|7EC420;  Load thread execution time
 	sta.b $ca	   ;02E875|85CA    |000ACA;  Store to working variable
 	cmp.b #$c8	  ;02E877|C9C8    |      ;  Check if execution time critical
-	bcc CODE_02E87D ;02E879|9002    |02E87D;  Branch if execution time normal
+	bcc BranchIfExecutionTimeNormal ;02E879|9002    |02E87D;  Branch if execution time normal
 	inc.b $cc	   ;02E87B|E6CC    |000ACC;  Set critical execution flag
 
 ; Thread Memory and State Coordination
@@ -7288,9 +7288,9 @@ Thread_MemoryCoord:
 	lda.l $7ec2c0,x ;02E87D|BFC0C27E|7EC2C0;  Load thread memory state
 	sta.b $cb	   ;02E881|85CB    |000ACB;  Store to working variable
 	lda.w $0ab2,y   ;02E883|B9B20A  |020AB2;  Load thread configuration
-	jsr.w CODE_02E905 ;02E886|2005E9  |02E905;  Validate thread configuration
+	jsr.w Label_02E905 ;02E886|2005E9  |02E905;  Validate thread configuration
 	bne Thread_Deactivate ;02E889|D0D4    |02E85F;  Branch if validation failed
-	jsr.w CODE_02EB55 ;02E88B|2055EB  |02EB55;  Execute thread processing
+	jsr.w Label_02EB55 ;02E88B|2055EB  |02EB55;  Execute thread processing
 	inc.b $e7	   ;02E88E|E6E7    |000AE7;  Increment thread counter
 	bra Thread_Deactivate ;02E890|80CD    |02E85F;  Continue thread processing
 
@@ -7301,7 +7301,7 @@ Thread_MemoryCoord:
 State_SyncEngine:
 	lda.w $048b	 ;02E892|AD8B04  |02048B;  Load system state
 	cmp.b #$02	  ;02E895|C902    |      ;  Check if state advanced
-	bpl CODE_02E8B5 ;02E897|101C    |02E8B5;  Branch if advanced state
+	bpl Load_02E8B5 ;02E897|101C    |02E8B5;  Branch if advanced state
 	tay ;02E899|A8      |      ;  Transfer state to Y
 	ldx.w $0ade,y   ;02E89A|BEDE0A  |020ADE;  Load state-specific thread ID
 	lda.b #$02	  ;02E89D|A902    |      ;  Load synchronization command
@@ -7318,7 +7318,7 @@ State_SyncWait:
 	sep #$20		;02E8B3|E220    |      ;  Return to 8-bit mode
 
 ; System State Reset and Initialization
-CODE_02E8B5:
+Load_02E8B5:
 	lda.b #$ff	  ;02E8B5|A9FF    |      ;  Load reset value
 	sta.w $0ab2	 ;02E8B7|8DB20A  |020AB2;  Reset thread configuration 0
 	sta.w $0ab3	 ;02E8BA|8DB30A  |020AB3;  Reset thread configuration 1
@@ -7337,7 +7337,7 @@ CODE_02E8B5:
 ; Advanced Entity Configuration and Cross-Bank Data Management
 ; ------------------------------------------------------------------------------
 ; Complex entity management with sophisticated cross-bank coordination
-CODE_02E8CD:
+Label_02E8CD:
 	php ;02E8CD|08      |      ;  Preserve processor status
 	rep #$30		;02E8CE|C230    |      ;  16-bit registers and indexes
 	pha ;02E8D0|48      |      ;  Preserve entity ID
@@ -7373,7 +7373,7 @@ CODE_02E8CD:
 ; Complex Validation Engine with Cross-Reference Checking
 ; ------------------------------------------------------------------------------
 ; Advanced validation system with sophisticated cross-reference validation
-CODE_02E905:
+Label_02E905:
 	sep #$20		;02E905|E220    |      ;  8-bit accumulator mode
 	sep #$10		;02E907|E210    |      ;  8-bit index registers
 	pha ;02E909|48      |      ;  Preserve validation target
@@ -7385,28 +7385,28 @@ CODE_02E905:
 	sta.b $04,s	 ;02E911|8304    |000004;  Store validation result to stack
 
 ; Validation Cross-Reference Loop
-CODE_02E913:
+Label_02E913:
 	txa ;02E913|8A      |      ;  Transfer loop counter to accumulator
 	cmp.b $01,s	 ;02E914|C301    |000001;  Compare with current validation index
-	beq CODE_02E92B ;02E916|F013    |02E92B;  Branch if same (skip self-validation)
+	beq Label_02E92B ;02E916|F013    |02E92B;  Branch if same (skip self-validation)
 	lda.b $b2,x	 ;02E918|B5B2    |000AB2;  Load reference configuration
 	cmp.b #$ff	  ;02E91A|C9FF    |      ;  Check if reference is valid
-	beq CODE_02E922 ;02E91C|F004    |02E922;  Branch if invalid reference
+	beq Label_02E922 ;02E91C|F004    |02E922;  Branch if invalid reference
 	cmp.b $03,s	 ;02E91E|C303    |000003;  Compare with validation target
-	beq CODE_02E925 ;02E920|F003    |02E925;  Branch if match found
+	beq Label_02E925 ;02E920|F003    |02E925;  Branch if match found
 
-CODE_02E922:
+Label_02E922:
 	dex ;02E922|CA      |      ;  Decrement loop counter
-	bra CODE_02E913 ;02E923|80EE    |02E913;  Continue validation loop
+	bra Label_02E913 ;02E923|80EE    |02E913;  Continue validation loop
 
 ; Cross-Reference Match Processing
-CODE_02E925:
-	jsr.w CODE_02E930 ;02E925|2030E9  |02E930;  Process cross-reference match
+Label_02E925:
+	jsr.w Label_02E930 ;02E925|2030E9  |02E930;  Process cross-reference match
 	inc a;02E928|1A      |      ;  Increment validation result
 	sta.b $04,s	 ;02E929|8304    |000004;  Store updated validation result
 
 ; Validation Completion and Cleanup
-CODE_02E92B:
+Label_02E92B:
 	ply ;02E92B|7A      |      ;  Restore Y register
 	plx ;02E92C|FA      |      ;  Restore X register
 	pla ;02E92D|68      |      ;  Restore validation target
@@ -7417,7 +7417,7 @@ CODE_02E92B:
 ; Advanced Cross-Reference Processing with State Synchronization
 ; ------------------------------------------------------------------------------
 ; Sophisticated cross-reference processing with state management and synchronization
-CODE_02E930:
+Label_02E930:
 	php ;02E930|08      |      ;  Preserve processor status
 	sep #$20		;02E931|E220    |      ;  8-bit accumulator mode
 	sep #$10		;02E933|E210    |      ;  8-bit index registers
@@ -7455,7 +7455,7 @@ CODE_02E930:
 ; Advanced Thread Priority Management and Allocation Engine
 ; ------------------------------------------------------------------------------
 ; Sophisticated thread priority system with dynamic allocation and management
-CODE_02E969:
+Label_02E969:
 	phx ;02E969|DA      |      ;  Preserve X register
 	phy ;02E96A|5A      |      ;  Preserve Y register
 	php ;02E96B|08      |      ;  Preserve processor status
@@ -7465,13 +7465,13 @@ CODE_02E969:
 	ldy.b #$08	  ;02E972|A008    |      ;  Load priority bit mask
 	lda.b #$01	  ;02E974|A901    |      ;  Load priority test bit
 	tsb.b $c9	   ;02E976|04C9    |000AC9;  Test and set priority bit
-	beq CODE_02E983 ;02E978|F009    |02E983;  Branch if bit was clear
+	beq Load_02E983 ;02E978|F009    |02E983;  Branch if bit was clear
 
 ; Priority Allocation Loop
 	db $0a,$e8,$88,$d0,$f7,$a9,$ff,$80,$03 ;02E97A|        |      ;  Priority search sequence
 
 ; Priority Assignment and Return
-CODE_02E983:
+Load_02E983:
 	lda.w DATA8_02e98a,x ;02E983|BD8AE9  |02E98A;  Load priority value from table
 	plp ;02E986|28      |      ;  Restore processor status
 	ply ;02E987|7A      |      ;  Restore Y register
@@ -7487,7 +7487,7 @@ DATA8_02e98a:
 ; Advanced Graphics and Memory Coordination Engine
 ; ------------------------------------------------------------------------------
 ; Complex graphics processing with sophisticated memory management and coordination
-CODE_02E992:
+Label_02E992:
 	php ;02E992|08      |      ;  Preserve processor status
 	sep #$20		;02E993|E220    |      ;  8-bit accumulator mode
 	sep #$10		;02E995|E210    |      ;  8-bit index registers
@@ -7530,7 +7530,7 @@ CODE_02E992:
 	sep #$20		;02E9CE|E220    |      ;  8-bit accumulator mode
 	lda.w $0ab8,x   ;02E9D0|BDB80A  |020AB8;  Load secondary pattern configuration
 	cmp.b #$ff	  ;02E9D3|C9FF    |      ;  Check if secondary pattern exists
-	beq CODE_02E9ED ;02E9D5|F016    |02E9ED;  Branch if no secondary pattern
+	beq Label_02E9ED ;02E9D5|F016    |02E9ED;  Branch if no secondary pattern
 	rep #$20		;02E9D7|C220    |      ;  16-bit accumulator mode
 	and.w #$00ff	;02E9D9|29FF00  |      ;  Mask to 8-bit
 	asl a;02E9DC|0A      |      ;  Multiply by 2
@@ -7546,7 +7546,7 @@ CODE_02E992:
 	plb ;02E9EC|AB      |      ;  Restore data bank
 
 ; Graphics Processing Completion
-CODE_02E9ED:
+Label_02E9ED:
 	sep #$20		;02E9ED|E220    |      ;  8-bit accumulator mode
 	inc.b $e5	   ;02E9EF|E6E5    |000AE5;  Increment graphics processing counter
 	plp ;02E9F1|28      |      ;  Restore processor status
@@ -7560,11 +7560,11 @@ CODE_02E9ED:
 ; Advanced Entity Allocation and Management Engine
 ; ------------------------------------------------------------------------------
 ; Sophisticated entity allocation with advanced management and validation
-CODE_02E9F7:
+Label_02E9F7:
 	phx ;02E9F7|DA      |      ;  Preserve X register
 	phy ;02E9F8|5A      |      ;  Preserve Y register
 	php ;02E9F9|08      |      ;  Preserve processor status
-	jsr.w CODE_02EA60 ;02E9FA|2060EA  |02EA60;  Call entity slot allocation
+	jsr.w Label_02EA60 ;02E9FA|2060EA  |02EA60;  Call entity slot allocation
 	lda.b #$00	  ;02E9FD|A900    |      ;  Load initialization value
 	sta.l $7ec300,x ;02E9FF|9F00C37E|7EC300;  Initialize entity priority
 	sta.l $7ec2e0,x ;02EA03|9FE0C27E|7EC2E0;  Initialize entity synchronization
@@ -7596,26 +7596,26 @@ CODE_02E9F7:
 	pha ;02EA33|48      |      ;  Preserve Y position
 	lda.b $04,s	 ;02EA34|A304    |000004;  Load entity configuration from stack
 	cmp.b #$02	  ;02EA36|C902    |      ;  Check if special configuration
-	bpl CODE_02EA41 ;02EA38|1007    |02EA41;  Branch if special configuration
+	bpl Label_02EA41 ;02EA38|1007    |02EA41;  Branch if special configuration
 	pla ;02EA3A|68      |      ;  Restore Y position
 	inc a;02EA3B|1A      |      ;  Add Y adjustment
 	inc a;02EA3C|1A      |      ;  Add Y adjustment
 	inc a;02EA3D|1A      |      ;  Add Y adjustment
 	inc a;02EA3E|1A      |      ;  Add Y adjustment (total +4)
-	bra CODE_02EA42 ;02EA3F|8001    |02EA42;  Continue processing
+	bra Label_02EA42 ;02EA3F|8001    |02EA42;  Continue processing
 
-CODE_02EA41:
+Label_02EA41:
 	pla ;02EA41|68      |      ;  Restore Y position (no adjustment)
 
 ; Entity Position Finalization
-CODE_02EA42:
+Label_02EA42:
 	asl a;02EA42|0A      |      ;  Multiply by 2
 	asl a;02EA43|0A      |      ;  Multiply by 4
 	asl a;02EA44|0A      |      ;  Multiply by 8 (final Y position)
 	sta.l $7ec2a0,x ;02EA45|9FA0C27E|7EC2A0;  Store entity Y position
 	ldy.b #$01	  ;02EA49|A001    |      ;  Load validation flag
-	jsr.w CODE_02EA7F ;02EA4B|207FEA  |02EA7F;  Validate entity configuration
-	jsr.w CODE_02EB14 ;02EA4E|2014EB  |02EB14;  Process entity bit validation
+	jsr.w Label_02EA7F ;02EA4B|207FEA  |02EA7F;  Validate entity configuration
+	jsr.w Label_02EB14 ;02EA4E|2014EB  |02EB14;  Process entity bit validation
 	sta.l $7ec260,x ;02EA51|9F60C27E|7EC260;  Store validation result
 	lda.b #$c0	  ;02EA55|A9C0    |      ;  Load entity active flag
 	sta.l $7ec240,x ;02EA57|9F40C27E|7EC240;  Mark entity as active
@@ -7643,23 +7643,23 @@ CODE_02EA42:
 ; Advanced Entity Slot Allocation and Priority Management Engine
 ; ------------------------------------------------------------------------------
 ; Sophisticated entity slot allocation with advanced priority and validation systems
-CODE_02EA60:
+Label_02EA60:
 	pha ;02EA60|48      |      ;  Preserve entity request
 	phy ;02EA61|5A      |      ;  Preserve Y register
 	ldy.b #$20	  ;02EA62|A020    |      ;  Load maximum entity slots (32)
 	ldx.b #$00	  ;02EA64|A200    |      ;  Initialize slot search index
 
 ; Entity Slot Search Loop with Validation
-CODE_02EA66:
+Load_02EA66:
 	lda.l $7ec240,x ;02EA66|BF40C27E|7EC240;  Check entity slot status
-	bpl CODE_02EA72 ;02EA6A|1006    |02EA72;  Branch if slot available (positive)
+	bpl Load_02EA72 ;02EA6A|1006    |02EA72;  Branch if slot available (positive)
 	inx ;02EA6C|E8      |      ;  Increment to next slot
 	dey ;02EA6D|88      |      ;  Decrement remaining slots
-	bne CODE_02EA66 ;02EA6E|D0F6    |02EA66;  Continue search if slots remaining
+	bne Load_02EA66 ;02EA6E|D0F6    |02EA66;  Continue search if slots remaining
 	db $a2,$ff	 ;02EA70|        |      ;  Load invalid slot marker
 
 ; Entity Slot Initialization and Validation
-CODE_02EA72:
+Load_02EA72:
 	lda.b #$00	  ;02EA72|A900    |      ;  Load initialization value
 	sta.l $7ec2e0,x ;02EA74|9FE0C27E|7EC2E0;  Clear entity synchronization state
 	sta.l $7ec360,x ;02EA78|9F60C37E|7EC360;  Clear entity validation flags
@@ -7671,25 +7671,25 @@ CODE_02EA72:
 ; Advanced Entity Validation and Configuration Engine
 ; ------------------------------------------------------------------------------
 ; Complex entity validation with sophisticated configuration and error handling
-CODE_02EA7F:
-	jsr.w CODE_02EA9F ;02EA7F|209FEA  |02EA9F;  Validate entity configuration
+Label_02EA7F:
+	jsr.w Label_02EA9F ;02EA7F|209FEA  |02EA9F;  Validate entity configuration
 	cmp.b #$80	  ;02EA82|C980    |      ;  Check if validation critical
 	bpl Validation_CriticalError ;02EA84|1016    |02EA9C;  Branch if critical validation error
 	pha ;02EA86|48      |      ;  Preserve validation result
 
 ; Entity Validation Processing Loop
-CODE_02EA87:
-	jsr.w CODE_02EACA ;02EA87|20CAEA  |02EACA;  Process entity bit validation
+Label_02EA87:
+	jsr.w Label_02EACA ;02EA87|20CAEA  |02EACA;  Process entity bit validation
 	pha ;02EA8A|48      |      ;  Preserve bit validation result
 	phd ;02EA8B|0B      |      ;  Preserve direct page
 	pea.w $0b00	 ;02EA8C|F4000B  |020B00;  Set direct page to $0b00
 	pld ;02EA8F|2B      |      ;  Load validation direct page
-	jsl.l CODE_00974E ;02EA90|224E9700|00974E;  Call external validation routine
+	jsl.l CallExternalValidationRoutine ;02EA90|224E9700|00974E;  Call external validation routine
 	pld ;02EA94|2B      |      ;  Restore direct page
 	pla ;02EA95|68      |      ;  Restore bit validation result
 	inc a;02EA96|1A      |      ;  Increment validation counter
 	dey ;02EA97|88      |      ;  Decrement validation loop counter
-	bne CODE_02EA87 ;02EA98|D0ED    |02EA87;  Continue validation if more iterations
+	bne Label_02EA87 ;02EA98|D0ED    |02EA87;  Continue validation if more iterations
 	pla ;02EA9A|68      |      ;  Restore validation result
 	rts ;02EA9B|60      |      ;  Return with validation complete
 
@@ -7710,39 +7710,39 @@ Validation_CriticalError:
 ; Sophisticated Entity Configuration Validation System
 ; ------------------------------------------------------------------------------
 ; Advanced validation system with multi-level configuration checking
-CODE_02EA9F:
+Label_02EA9F:
 	phy ;02EA9F|5A      |      ;  Preserve Y register
 	lda.b #$00	  ;02EAA0|A900    |      ;  Initialize validation index
 
 ; Configuration Validation Loop with External Dependencies
-CODE_02EAA2:
+Label_02EAA2:
 	pha ;02EAA2|48      |      ;  Preserve validation index
 	phd ;02EAA3|0B      |      ;  Preserve direct page
 	pea.w $0b00	 ;02EAA4|F4000B  |020B00;  Set direct page to $0b00
 	pld ;02EAA7|2B      |      ;  Load validation direct page
-	jsl.l CODE_00975A ;02EAA8|225A9700|00975A;  Call external configuration checker
+	jsl.l CallCalculationSystem ;02EAA8|225A9700|00975A;  Call external configuration checker
 	pld ;02EAAC|2B      |      ;  Restore direct page
 	inc a;02EAAD|1A      |      ;  Increment validation result
 	dec a;02EAAE|3A      |      ;  Decrement to check zero
-	bne CODE_02EABF ;02EAAF|D00E    |02EABF;  Branch if validation successful
+	bne Load_02EABF ;02EAAF|D00E    |02EABF;  Branch if validation successful
 	pla ;02EAB1|68      |      ;  Restore validation index
 	inc a;02EAB2|1A      |      ;  Increment to next validation
 	cmp.b #$80	  ;02EAB3|C980    |      ;  Check if all validations complete
 	bpl Validation_LimitExceeded ;02EAB5|100F    |02EAC6;  Branch if critical validation limit
 	dey ;02EAB7|88      |      ;  Decrement validation counter
-	bne CODE_02EAA2 ;02EAB8|D0E8    |02EAA2;  Continue validation loop
+	bne Label_02EAA2 ;02EAB8|D0E8    |02EAA2;  Continue validation loop
 	sec ;02EABA|38      |      ;  Set carry for successful validation
 	sbc.b $01,s	 ;02EABB|E301    |000001;  Calculate validation offset
 	ply ;02EABD|7A      |      ;  Restore Y register
 	rts ;02EABE|60      |      ;  Return with validation result
 
 ; Validation Success Handler
-CODE_02EABF:
+Load_02EABF:
 	lda.b $02,s	 ;02EABF|A302    |000002;  Load validation state from stack
 	tay ;02EAC1|A8      |      ;  Transfer to Y register
 	pla ;02EAC2|68      |      ;  Restore validation index
 	inc a;02EAC3|1A      |      ;  Increment validation index
-	bra CODE_02EAA2 ;02EAC4|80DC    |02EAA2;  Continue validation loop
+	bra Label_02EAA2 ;02EAC4|80DC    |02EAA2;  Continue validation loop
 
 ;-------------------------------------------------------------------------------
 ; Validation Limit Exceeded
@@ -7754,13 +7754,13 @@ CODE_02EABF:
 ;-------------------------------------------------------------------------------
 Validation_LimitExceeded:
 	lda.b #$ff                           ;02EAC6|A9FF    |
-	bra CODE_02EABB                      ;02EAC8|80F3    |02EABB
+	bra F3                      ;02EAC8|80F3    |02EABB
 
 ; ------------------------------------------------------------------------------
 ; Advanced Entity bit Processing and Validation Engine
 ; ------------------------------------------------------------------------------
 ; Complex bit processing with sophisticated validation and coordination systems
-CODE_02EACA:
+Label_02EACA:
 	pha ;02EACA|48      |      ;  Preserve entity ID
 	phx ;02EACB|DA      |      ;  Preserve X register
 	phy ;02EACC|5A      |      ;  Preserve Y register
@@ -7813,7 +7813,7 @@ DATA8_02eb10:
 ; Advanced bit Validation and Error Recovery Engine
 ; ------------------------------------------------------------------------------
 ; Sophisticated bit validation with error recovery and state management
-CODE_02EB14:
+Label_02EB14:
 	pha ;02EB14|48      |      ;  Preserve entity data
 	phx ;02EB15|DA      |      ;  Preserve X register
 	phy ;02EB16|5A      |      ;  Preserve Y register
@@ -7840,7 +7840,7 @@ DATA8_02eb2c:
 ; Advanced Memory Allocation and Slot Management Engine
 ; ------------------------------------------------------------------------------
 ; Sophisticated memory allocation with priority-based slot management
-CODE_02EB30:
+Label_02EB30:
 	php ;02EB30|08      |      ;  Preserve processor status
 	sep #$20		;02EB31|E220    |      ;  8-bit accumulator mode
 	sep #$10		;02EB33|E210    |      ;  8-bit index registers
@@ -7850,13 +7850,13 @@ CODE_02EB30:
 	ldx.b #$00	  ;02EB39|A200    |      ;  Initialize slot index
 	lda.b #$01	  ;02EB3B|A901    |      ;  Load slot test bit
 	tsb.b $c8	   ;02EB3D|04C8    |000AC8;  Test and set slot availability bit
-	beq CODE_02EB4A ;02EB3F|F009    |02EB4A;  Branch if slot was available
+	beq Load_02EB4A ;02EB3F|F009    |02EB4A;  Branch if slot was available
 
 ; Slot Search Loop with Priority Management
 	db $0a,$e8,$88,$d0,$f7,$a9,$ff,$80,$03 ;02EB41|        |      ;  Slot search and priority sequence
 
 ; Slot Allocation and Return
-CODE_02EB4A:
+Load_02EB4A:
 	lda.w DATA8_02eb51,x ;02EB4A|BD51EB  |02EB51;  Load slot configuration from table
 	ply ;02EB4D|7A      |      ;  Restore Y register
 	plx ;02EB4E|FA      |      ;  Restore X register
@@ -7872,7 +7872,7 @@ DATA8_02eb51:
 ; Advanced Thread Processing and Multi-Bank Coordination Engine
 ; ------------------------------------------------------------------------------
 ; Complex thread processing with sophisticated multi-bank coordination and validation
-CODE_02EB55:
+Label_02EB55:
 	pha ;02EB55|48      |      ;  Preserve thread control data
 	phb ;02EB56|8B      |      ;  Preserve data bank
 	phx ;02EB57|DA      |      ;  Preserve X register
@@ -7883,7 +7883,7 @@ CODE_02EB55:
 	lda.b #$0b	  ;02EB5E|A90B    |      ;  Load thread processing bank
 	pha ;02EB60|48      |      ;  Push bank to stack
 	plb ;02EB61|AB      |      ;  Set data bank to $0b
-	jsr.w CODE_02EC45 ;02EB62|2045EC  |02EC45;  Initialize thread processing environment
+	jsr.w Load_02EC45 ;02EB62|2045EC  |02EC45;  Initialize thread processing environment
 
 ; Thread Configuration and Setup
 	lda.b #$06	  ;02EB65|A906    |      ;  Load thread processing mode
@@ -7896,11 +7896,11 @@ CODE_02EB55:
 	and.b #$08	  ;02EB73|2908    |      ;  Mask thread validation bit
 	sta.b $cd	   ;02EB75|85CD    |000ACD;  Store validation state
 	lda.b $ca	   ;02EB77|A5CA    |000ACA;  Load thread execution time
-	jsr.w CODE_02EBD2 ;02EB79|20D2EB  |02EBD2;  Calculate thread coordinate offset
+	jsr.w Label_02EBD2 ;02EB79|20D2EB  |02EBD2;  Calculate thread coordinate offset
 	sty.b $cf	   ;02EB7C|84CF    |000ACF;  Store coordinate offset
 
 ; Main Thread Processing Loop
-CODE_02EB7E:
+Load_02EB7E:
 	ldy.w #$0001	;02EB7E|A00100  |      ;  Load thread processing flag
 	lda.b #$02	  ;02EB81|A902    |      ;  Load thread operation mode
 	sta.b $90	   ;02EB83|8590    |000A90;  Store operation mode
@@ -7908,19 +7908,19 @@ CODE_02EB7E:
 	xba ;02EB87|EB      |      ;  Exchange accumulator bytes
 	lda.w $0000,x   ;02EB88|BD0000  |0B0000;  Load thread command from bank $0b
 	bit.b #$80	  ;02EB8B|8980    |      ;  Test command high bit
-	beq CODE_02EBA0 ;02EB8D|F011    |02EBA0;  Branch if standard command
+	beq Load_02EBA0 ;02EB8D|F011    |02EBA0;  Branch if standard command
 	and.b #$3f	  ;02EB8F|293F    |      ;  Mask command to 6 bits
 	tay ;02EB91|A8      |      ;  Transfer command to Y
 	lda.w $0000,x   ;02EB92|BD0000  |0B0000;  Reload command data
 	inx ;02EB95|E8      |      ;  Increment command pointer
 	bit.b #$40	  ;02EB96|8940    |      ;  Test command extension bit
-	beq CODE_02EBA0 ;02EB98|F006    |02EBA0;  Branch if no extension
+	beq Load_02EBA0 ;02EB98|F006    |02EBA0;  Branch if no extension
 	lda.b #$02	  ;02EB9A|A902    |      ;  Load extension flag
 	trb.b $90	   ;02EB9C|1490    |000A90;  Clear extension bit from mode
-	bra CODE_02EBAD ;02EB9E|800D    |02EBAD;  Continue processing
+	bra Label_02EBAD ;02EB9E|800D    |02EBAD;  Continue processing
 
 ; Standard Command Processing
-CODE_02EBA0:
+Load_02EBA0:
 	lda.w $0000,x   ;02EBA0|BD0000  |0B0000;  Load command data
 	and.b #$60	  ;02EBA3|2960    |      ;  Mask command flags
 	lsr a;02EBA5|4A      |      ;  Shift flags right
@@ -7930,32 +7930,32 @@ CODE_02EBA0:
 	inx ;02EBAC|E8      |      ;  Increment command pointer
 
 ; Command Data Processing
-CODE_02EBAD:
+Label_02EBAD:
 	and.b #$1f	  ;02EBAD|291F    |      ;  Mask command data to 5 bits
 	sta.b $d0	   ;02EBAF|85D0    |000AD0;  Store command data
 
 ; Thread Processing Loop with State Management
-CODE_02EBB1:
-	jsr.w CODE_02EBEB ;02EBB1|20EBEB  |02EBEB;  Execute thread processing step
+Label_02EBB1:
+	jsr.w ExecuteThreadProcessingStep ;02EBB1|20EBEB  |02EBEB;  Execute thread processing step
 	lda.b $cb	   ;02EBB4|A5CB    |000ACB;  Load thread state
 	and.b #$08	  ;02EBB6|2908    |      ;  Mask validation bit
 	cmp.b $cd	   ;02EBB8|C5CD    |000ACD;  Compare with stored validation
-	beq CODE_02EBC3 ;02EBBA|F007    |02EBC3;  Branch if validation consistent
+	beq Label_02EBC3 ;02EBBA|F007    |02EBC3;  Branch if validation consistent
 	lda.b $cb	   ;02EBBC|A5CB    |000ACB;  Reload thread state
 	clc ;02EBBE|18      |      ;  Clear carry
 	adc.b #$08	  ;02EBBF|6908    |      ;  Add validation increment
 	sta.b $cb	   ;02EBC1|85CB    |000ACB;  Store updated state
 
 ; Thread Processing Counter Management
-CODE_02EBC3:
+Label_02EBC3:
 	dec.b $ce	   ;02EBC3|C6CE    |000ACE;  Decrement processing counter
-	beq CODE_02EBCC ;02EBC5|F005    |02EBCC;  Branch if processing complete
+	beq Label_02EBCC ;02EBC5|F005    |02EBCC;  Branch if processing complete
 	dey ;02EBC7|88      |      ;  Decrement loop counter
-	bne CODE_02EBB1 ;02EBC8|D0E7    |02EBB1;  Continue processing loop
-	bra CODE_02EB7E ;02EBCA|80B2    |02EB7E;  Start new processing cycle
+	bne Label_02EBB1 ;02EBC8|D0E7    |02EBB1;  Continue processing loop
+	bra Load_02EB7E ;02EBCA|80B2    |02EB7E;  Start new processing cycle
 
 ; Thread Processing Completion and Cleanup
-CODE_02EBCC:
+Label_02EBCC:
 	plp ;02EBCC|28      |      ;  Restore processor status
 	ply ;02EBCD|7A      |      ;  Restore Y register
 	plx ;02EBCE|FA      |      ;  Restore X register
@@ -7982,13 +7982,13 @@ CODE_02EBCC:
 ; Advanced Coordinate Calculation and Precision Handling Engine
 ; ------------------------------------------------------------------------------
 ; Sophisticated coordinate calculation with precision handling and validation
-CODE_02EBD2:
+Label_02EBD2:
 	php ;02EBD2|08      |      ;  Preserve processor status
 	sep #$20		;02EBD3|E220    |      ;  8-bit accumulator mode
 	rep #$10		;02EBD5|C210    |      ;  16-bit index registers
 	pha ;02EBD7|48      |      ;  Preserve coordinate input
 	cmp.b #$80	  ;02EBD8|C980    |      ;  Check if coordinate is high range
-	bpl CODE_02EBE8 ;02EBDA|100C    |02EBE8;  Branch if high coordinate
+	bpl Label_02EBE8 ;02EBDA|100C    |02EBE8;  Branch if high coordinate
 	asl a;02EBDC|0A      |      ;  Multiply by 2
 	asl a;02EBDD|0A      |      ;  Multiply by 4 (total 4x)
 	tay ;02EBDE|A8      |      ;  Transfer to Y offset
@@ -7998,10 +7998,10 @@ CODE_02EBD2:
 	asl a;02EBE3|0A      |      ;  Quadruple precision
 	clc ;02EBE4|18      |      ;  Clear carry for addition
 	adc.b #$10	  ;02EBE5|6910    |      ;  Add coordinate offset
-	bra CODE_02EBF1 ;02EBE7|8008    |02EBF1;  Continue processing
+	bra Label_02EBF1 ;02EBE7|8008    |02EBF1;  Continue processing
 
 ; High Coordinate Range Processing
-CODE_02EBE8:
+Label_02EBE8:
 	sec ;02EBE8|38      |      ;  Set carry for subtraction
 	sbc.b #$80	  ;02EBE9|E980    |      ;  Subtract high range offset
 	asl a;02EBEB|0A      |      ;  Multiply by 2
@@ -8012,7 +8012,7 @@ CODE_02EBE8:
 	ror a;02EBF0|6A      |      ;  Rotate right with carry
 
 ; Coordinate Processing Completion
-CODE_02EBF1:
+Label_02EBF1:
 	plp ;02EBF1|28      |      ;  Restore processor status
 	rts ;02EBF2|60      |      ;  Return with coordinate offset
 
@@ -8020,7 +8020,7 @@ CODE_02EBF1:
 ; Complex Memory Management and Cross-Bank Coordination Engine
 ; ------------------------------------------------------------------------------
 ; Advanced memory management with sophisticated cross-bank coordination
-CODE_02EBF3:
+Label_02EBF3:
 	php ;02EBF3|08      |      ;  Preserve processor status
 	phb ;02EBF4|8B      |      ;  Preserve data bank
 	rep #$30		;02EBF5|C230    |      ;  16-bit registers and indexes
@@ -8036,11 +8036,11 @@ CODE_02EBF3:
 	ldy.w #$1000	;02EC05|A00010  |      ;  Load block size (4KB)
 
 ; Memory Clearing Loop with Optimization
-CODE_02EC08:
+Store_02EC08:
 	sta.w $0000,x   ;02EC08|9D0000  |7E0000;  Clear memory location
 	inx ;02EC0B|E8      |      ;  Increment memory pointer
 	dey ;02EC0C|88      |      ;  Decrement block counter
-	bne CODE_02EC08 ;02EC0D|D0F9    |02EC08;  Continue clearing if more blocks
+	bne Store_02EC08 ;02EC0D|D0F9    |02EC08;  Continue clearing if more blocks
 	lda.b #$ff	  ;02EC0F|A9FF    |      ;  Load memory validation marker
 	sta.w $c000	 ;02EC11|8D00C0  |7EC000;  Store validation marker
 
@@ -8060,7 +8060,7 @@ CODE_02EC08:
 ; Advanced Thread Processing and Execution Time Management Engine
 ; ------------------------------------------------------------------------------
 ; Sophisticated thread processing with execution time management and validation
-CODE_02EC27:
+Label_02EC27:
 	pha ;02EC27|48      |      ;  Preserve thread command
 	phx ;02EC28|DA      |      ;  Preserve X register
 	phy ;02EC29|5A      |      ;  Preserve Y register
@@ -8068,21 +8068,21 @@ CODE_02EC27:
 	sep #$20		;02EC2B|E220    |      ;  8-bit accumulator mode
 	rep #$10		;02EC2D|C210    |      ;  16-bit index registers
 	cmp.b #$c0	  ;02EC2F|C9C0    |      ;  Check if high priority thread
-	bpl CODE_02EC3B ;02EC31|1008    |02EC3B;  Branch if high priority
+	bpl Label_02EC3B ;02EC31|1008    |02EC3B;  Branch if high priority
 	asl a;02EC33|0A      |      ;  Multiply by 2
 	tax ;02EC34|AA      |      ;  Transfer to X index
 	jmp.w (DATA8_02ec60,x) ;02EC35|7C60EC  |02EC60;  Jump to thread handler table
 	db $80,$07	 ;02EC38|        |02EC41;  Skip high priority handler
 
 ; High Priority Thread Processing
-CODE_02EC3B:
+Label_02EC3B:
 	and.b #$3f	  ;02EC3B|293F    |      ;  Mask to thread ID
 	ora.b #$80	  ;02EC3D|0980    |      ;  Set high priority flag
 	tax ;02EC3F|AA      |      ;  Transfer to X index
-	bra CODE_02EC4A ;02EC40|8008    |02EC4A;  Continue processing
+	bra Load_02EC4A ;02EC40|8008    |02EC4A;  Continue processing
 
 ; Thread Processing Completion
-CODE_02EC42:
+Label_02EC42:
 	plp ;02EC42|28      |      ;  Restore processor status
 	ply ;02EC43|7A      |      ;  Restore Y register
 	plx ;02EC44|FA      |      ;  Restore X register
@@ -8090,13 +8090,13 @@ CODE_02EC42:
 	rts ;02EC46|60      |      ;  Return from thread processing
 
 ; Thread Environment Initialization
-CODE_02EC45:
+Load_02EC45:
 	lda.b #$02	  ;02EC45|A902    |      ;  Load thread environment mode
 	sta.b $8b	   ;02EC47|858B    |000A8B;  Store environment mode
 	rts ;02EC49|60      |      ;  Return from initialization
 
 ; Thread Processing with Execution Time Management
-CODE_02EC4A:
+Load_02EC4A:
 	lda.b $cb	   ;02EC4A|A5CB    |000ACB;  Load thread execution time
 	and.b #$f0	  ;02EC4C|29F0    |      ;  Mask execution time high nibble
 	lsr a;02EC4E|4A      |      ;  Shift right
@@ -8111,16 +8111,16 @@ CODE_02EC4A:
 
 ; Thread Handler Lookup Table
 DATA8_02ec60:
-	dw CODE_02EC42 ;02EC60|        |      ;  Standard thread completion
-	dw CODE_02EC4A ;02EC62|        |      ;  Execution time management
-	dw CODE_02EC45 ;02EC64|        |      ;  Environment initialization
-	dw CODE_02EC42 ;02EC66|        |      ;  Standard completion
+	dw Label_02EC42 ;02EC60|        |      ;  Standard thread completion
+	dw Load_02EC4A ;02EC62|        |      ;  Execution time management
+	dw Load_02EC45 ;02EC64|        |      ;  Environment initialization
+	dw Label_02EC42 ;02EC66|        |      ;  Standard completion
 
 ; ------------------------------------------------------------------------------
 ; Advanced Sprite Coordination and Multi-Bank Synchronization Engine
 ; ------------------------------------------------------------------------------
 ; Complex sprite coordination with sophisticated multi-bank synchronization
-CODE_02EC68:
+Label_02EC68:
 	phb ;02EC68|8B      |      ;  Preserve data bank
 	phx ;02EC69|DA      |      ;  Preserve X register
 	phy ;02EC6A|5A      |      ;  Preserve Y register
@@ -8140,28 +8140,28 @@ CODE_02EC68:
 
 ; Multi-Bank Synchronization Loop
 	ldy.w #$0008	;02EC81|A00800  |      ;  Load synchronization counter
-CODE_02EC84:
+Load_02EC84:
 	lda.w $0000,x   ;02EC84|BD0000  |7E0000;  Load sprite coordination state
 	and.b #$c0	  ;02EC87|29C0    |      ;  Mask synchronization bits
 	cmp.b #$c0	  ;02EC89|C9C0    |      ;  Check if fully synchronized
-	beq CODE_02EC98 ;02EC8B|F00B    |02EC98;  Branch if synchronized
+	beq Load_02EC98 ;02EC8B|F00B    |02EC98;  Branch if synchronized
 	ora.b #$40	  ;02EC8D|0940    |      ;  Set synchronization in progress
 	sta.w $0000,x   ;02EC8F|9D0000  |7E0000;  Store synchronization state
 	inx ;02EC92|E8      |      ;  Increment sprite coordination index
 	dey ;02EC93|88      |      ;  Decrement synchronization counter
-	bne CODE_02EC84 ;02EC94|D0EE    |02EC84;  Continue synchronization loop
-	bra CODE_02ECA0 ;02EC96|8008    |02ECA0;  Complete synchronization
+	bne Load_02EC84 ;02EC94|D0EE    |02EC84;  Continue synchronization loop
+	bra Label_02ECA0 ;02EC96|8008    |02ECA0;  Complete synchronization
 
 ; Synchronization Complete Handler
-CODE_02EC98:
+Load_02EC98:
 	lda.b #$ff	  ;02EC98|A9FF    |      ;  Load synchronization complete flag
 	sta.w $0010,x   ;02EC9A|9D1000  |7E0010;  Store synchronization marker
 	inx ;02EC9D|E8      |      ;  Increment coordination pointer
 	dey ;02EC9E|88      |      ;  Decrement synchronization counter
-	bne CODE_02EC84 ;02EC9F|D0E3    |02EC84;  Continue synchronization if more
+	bne Load_02EC84 ;02EC9F|D0E3    |02EC84;  Continue synchronization if more
 
 ; Sprite Coordination Completion
-CODE_02ECA0:
+Label_02ECA0:
 	plb ;02ECA0|AB      |      ;  Restore data bank
 	plp ;02ECA1|28      |      ;  Restore processor status
 	ply ;02ECA2|7A      |      ;  Restore Y register
@@ -8172,7 +8172,7 @@ CODE_02ECA0:
 ; Sophisticated Validation Systems and Error Recovery Engine
 ; ------------------------------------------------------------------------------
 ; Advanced validation systems with comprehensive error recovery protocols
-CODE_02ECA5:
+Label_02ECA5:
 	pha ;02ECA5|48      |      ;  Preserve validation input
 	phx ;02ECA6|DA      |      ;  Preserve X register
 	phy ;02ECA7|5A      |      ;  Preserve Y register
@@ -8180,7 +8180,7 @@ CODE_02ECA5:
 	sep #$20		;02ECA9|E220    |      ;  8-bit accumulator mode
 	rep #$10		;02ECAB|C210    |      ;  16-bit index registers
 	cmp.b #$ff	  ;02ECAD|C9FF    |      ;  Check if critical validation
-	beq CODE_02ECD5 ;02ECAF|F024    |02ECD5;  Branch to critical error handler
+	beq Load_02ECD5 ;02ECAF|F024    |02ECD5;  Branch to critical error handler
 
 ; Standard Validation Processing
 	tax ;02ECB1|AA      |      ;  Transfer validation code to X
@@ -8189,40 +8189,40 @@ CODE_02ECA5:
 	ldy.w #$0004	;02ECB7|A00400  |      ;  Load validation loop counter
 
 ; Validation Loop with Error Detection
-CODE_02ECBA:
+Load_02ECBA:
 	lda.b $d1	   ;02ECBA|A5D1    |000AD1;  Load validation mask
 	bit.b $ca	   ;02ECBC|24CA    |000ACA;  Test validation state
-	beq CODE_02ECC8 ;02ECBE|F008    |02ECC8;  Branch if validation passed
+	beq Load_02ECC8 ;02ECBE|F008    |02ECC8;  Branch if validation passed
 	lda.b #$01	  ;02ECC0|A901    |      ;  Load validation error flag
 	tsb.b $cd	   ;02ECC2|04CD    |000ACD;  Set error flag in validation state
 	dey ;02ECC4|88      |      ;  Decrement validation counter
-	bne CODE_02ECBA ;02ECC5|D0F3    |02ECBA;  Continue validation loop
-	bra CODE_02ECD0 ;02ECC7|8007    |02ECD0;  Handle validation completion
+	bne Load_02ECBA ;02ECC5|D0F3    |02ECBA;  Continue validation loop
+	bra Load_02ECD0 ;02ECC7|8007    |02ECD0;  Handle validation completion
 
 ; Validation Success Handler
-CODE_02ECC8:
+Load_02ECC8:
 	lda.b #$02	  ;02ECC8|A902    |      ;  Load validation success flag
 	tsb.b $cd	   ;02ECCA|04CD    |000ACD;  Set success flag in validation state
 	dey ;02ECCC|88      |      ;  Decrement validation counter
-	bne CODE_02ECBA ;02ECCD|D0EB    |02ECBA;  Continue validation loop
+	bne Load_02ECBA ;02ECCD|D0EB    |02ECBA;  Continue validation loop
 
 ; Validation Completion and Recovery
-CODE_02ECD0:
+Load_02ECD0:
 	lda.b $cd	   ;02ECD0|A5CD    |000ACD;  Load validation state
 	bit.b #$01	  ;02ECD2|8901    |      ;  Test error flag
-	bne CODE_02ECD8 ;02ECD4|D002    |02ECD8;  Branch to error recovery
+	bne Load_02ECD8 ;02ECD4|D002    |02ECD8;  Branch to error recovery
 
 ; Critical Validation Error Handler
-CODE_02ECD5:
+Load_02ECD5:
 	lda.b #$ff	  ;02ECD5|A9FF    |      ;  Load critical error flag
-	bra CODE_02ECD9 ;02ECD7|8000    |02ECD9;  Skip to error completion
+	bra Store_02ECD9 ;02ECD7|8000    |02ECD9;  Skip to error completion
 
 ; Error Recovery Processing
-CODE_02ECD8:
+Load_02ECD8:
 	lda.b #$fe	  ;02ECD8|A9FE    |      ;  Load recoverable error flag
 
 ; Validation and Error Recovery Completion
-CODE_02ECD9:
+Store_02ECD9:
 	sta.b $ce	   ;02ECD9|85CE    |000ACE;  Store error result
 	plp ;02ECDB|28      |      ;  Restore processor status
 	ply ;02ECDC|7A      |      ;  Restore Y register
@@ -8239,7 +8239,7 @@ DATA8_02ece0:
 ; Real-Time Entity Processing and State Management Engine
 ; ------------------------------------------------------------------------------
 ; Advanced entity processing with sophisticated real-time state management
-CODE_02ECF0:
+Label_02ECF0:
 	phb ;02ECF0|8B      |      ;  Preserve data bank
 	pha ;02ECF1|48      |      ;  Preserve entity state
 	phx ;02ECF2|DA      |      ;  Preserve X register
@@ -8256,27 +8256,27 @@ CODE_02ECF0:
 	ldy.w #$0020	;02ED00|A02000  |      ;  Load entity count (32 entities)
 
 ; Entity State Processing Loop
-CODE_02ED03:
+Load_02ED03:
 	lda.w $0000,x   ;02ED03|BD0000  |7E0000;  Load entity state
 	bit.b #$80	  ;02ED06|8980    |      ;  Test entity active flag
-	beq CODE_02ED1A ;02ED08|F010    |02ED1A;  Skip if entity inactive
+	beq Label_02ED1A ;02ED08|F010    |02ED1A;  Skip if entity inactive
 	and.b #$7f	  ;02ED0A|297F    |      ;  Mask state bits
 	cmp.b #$10	  ;02ED0C|C910    |      ;  Check if high priority state
-	bpl CODE_02ED16 ;02ED0E|1006    |02ED16;  Branch for high priority processing
+	bpl Label_02ED16 ;02ED0E|1006    |02ED16;  Branch for high priority processing
 	inc a;02ED10|1A      |      ;  Increment state counter
 	sta.w $0000,x   ;02ED11|9D0000  |7E0000;  Store updated state
-	bra CODE_02ED1A ;02ED14|8004    |02ED1A;  Continue to next entity
+	bra Label_02ED1A ;02ED14|8004    |02ED1A;  Continue to next entity
 
 ; High Priority Entity State Processing
-CODE_02ED16:
+Label_02ED16:
 	ora.b #$40	  ;02ED16|0940    |      ;  Set high priority processing flag
 	sta.w $0000,x   ;02ED18|9D0000  |7E0000;  Store priority state
 
 ; Entity Processing Loop Control
-CODE_02ED1A:
+Label_02ED1A:
 	inx ;02ED1A|E8      |      ;  Increment entity state pointer
 	dey ;02ED1B|88      |      ;  Decrement entity counter
-	bne CODE_02ED03 ;02ED1C|D0E5    |02ED03;  Continue processing if more entities
+	bne Load_02ED03 ;02ED1C|D0E5    |02ED03;  Continue processing if more entities
 
 ; Real-Time State Synchronization
 	ldx.w #$c520	;02ED1E|A220C5  |      ;  Load entity synchronization base
@@ -8293,7 +8293,7 @@ CODE_02ED1A:
 ; Complex bit Manipulation and Validation Systems Engine
 ; ------------------------------------------------------------------------------
 ; Advanced bit manipulation with sophisticated validation and error detection
-CODE_02ED2C:
+Label_02ED2C:
 	pha ;02ED2C|48      |      ;  Preserve bit manipulation data
 	phx ;02ED2D|DA      |      ;  Preserve X register
 	phy ;02ED2E|5A      |      ;  Preserve Y register
@@ -8318,16 +8318,16 @@ CODE_02ED2C:
 ; Complex bit Operation Processing
 	lda.b $d2	   ;02ED4C|A5D2    |000AD2;  Load manipulation mask
 	bit.b $d4	   ;02ED4E|24D4    |000AD4;  Test operation flags
-	bvs CODE_02ED56 ;02ED50|7004    |02ED56;  Branch for complex operation
+	bvs Label_02ED56 ;02ED50|7004    |02ED56;  Branch for complex operation
 	eor.b $ca	   ;02ED52|45CA    |000ACA;  XOR with thread state
-	bra CODE_02ED58 ;02ED54|8002    |02ED58;  Continue processing
+	bra Store_02ED58 ;02ED54|8002    |02ED58;  Continue processing
 
 ; Complex bit Operation Handler
-CODE_02ED56:
+Label_02ED56:
 	and.b $ca	   ;02ED56|25CA    |000ACA;  and with thread state
 
 ; bit Manipulation Completion and Validation
-CODE_02ED58:
+Store_02ED58:
 	sta.b $ca	   ;02ED58|85CA    |000ACA;  Store updated thread state
 	plp ;02ED5A|28      |      ;  Restore processor status
 	ply ;02ED5B|7A      |      ;  Restore Y register
@@ -8361,45 +8361,45 @@ DATA8_02ed5e:
 ; Advanced Entity State Processing and Priority Management Engine
 ; ------------------------------------------------------------------------------
 ; Complex entity state processing with sophisticated priority management and validation
-CODE_02EE5D:
+Load_02EE5D:
 	ldx.b #$00	  ;02EE5D|A200    |      ;  Initialize entity index
 	txy ;02EE5F|9B      |      ;  Transfer index to Y register
 
 ; Entity State Processing Loop with Priority Management
-CODE_02EE60:
+Label_02EE60:
 	phx ;02EE60|DA      |      ;  Preserve entity index
 	ldx.w $0ad7	 ;02EE61|AED70A  |020AD7;  Load entity processing counter
-	bne CODE_02EE6B ;02EE64|D005    |02EE6B;  Branch if counter active
+	bne Label_02EE6B ;02EE64|D005    |02EE6B;  Branch if counter active
 	cmp.w DATA8_02ee87,y ;02EE66|D987EE  |02EE87;  Compare with priority threshold
-	bmi CODE_02EE6E ;02EE69|3003    |02EE6E;  Branch if below threshold
+	bmi Label_02EE6E ;02EE69|3003    |02EE6E;  Branch if below threshold
 
 ; Entity Processing Counter Management
-CODE_02EE6B:
+Label_02EE6B:
 	inc.w $0ad7	 ;02EE6B|EED70A  |020AD7;  Increment processing counter
 
 ; Entity Priority Processing
-CODE_02EE6E:
+Label_02EE6E:
 	plx ;02EE6E|FA      |      ;  Restore entity index
 
 ; Entity State Value Processing Loop
-CODE_02EE6F:
+Label_02EE6F:
 	cmp.w DATA8_02ee87,y ;02EE6F|D987EE  |02EE87;  Compare with processing threshold
-	bmi CODE_02EE7D ;02EE72|3009    |02EE7D;  Branch if below threshold
+	bmi Label_02EE7D ;02EE72|3009    |02EE7D;  Branch if below threshold
 	inc.w $0ad1,x   ;02EE74|FED10A  |020AD1;  Increment entity state counter
 	sec ;02EE77|38      |      ;  Set carry for subtraction
 	sbc.w DATA8_02ee87,y ;02EE78|F987EE  |02EE87;  Subtract processing threshold
-	bra CODE_02EE6F ;02EE7B|80F2    |02EE6F;  Continue processing loop
+	bra Label_02EE6F ;02EE7B|80F2    |02EE6F;  Continue processing loop
 
 ; Entity Processing Completion
-CODE_02EE7D:
+Label_02EE7D:
 	iny ;02EE7D|C8      |      ;  Increment threshold index
 	iny ;02EE7E|C8      |      ;  Increment again (2 bytes per threshold)
 	inx ;02EE7F|E8      |      ;  Increment entity index
 	cpx.b #$05	  ;02EE80|E005    |      ;  Check if all entities processed
-	bne CODE_02EE60 ;02EE82|D0DC    |02EE60;  Continue if more entities
+	bne Label_02EE60 ;02EE82|D0DC    |02EE60;  Continue if more entities
 
 ; Entity Processing Return
-CODE_02EE84:
+Label_02EE84:
 	ply ;02EE84|7A      |      ;  Restore Y register
 	plx ;02EE85|FA      |      ;  Restore X register
 	rts ;02EE86|60      |      ;  Return from entity processing
@@ -8412,7 +8412,7 @@ DATA8_02ee87:
 ; Sophisticated DMA Transfer Optimization and WRAM Management Engine
 ; ------------------------------------------------------------------------------
 ; Advanced DMA transfer optimization with comprehensive WRAM management
-CODE_02EE91:
+Label_02EE91:
 	phb ;02EE91|8B      |      ;  Preserve data bank
 	phx ;02EE92|DA      |      ;  Preserve X register
 	phy ;02EE93|5A      |      ;  Preserve Y register
@@ -8423,9 +8423,9 @@ CODE_02EE91:
 	inc.b $e6	   ;02EE9A|E6E6    |000AE6;  Increment DMA synchronization flag
 
 ; DMA Transfer Synchronization Loop
-CODE_02EE9C:
+Load_02EE9C:
 	lda.b $e6	   ;02EE9C|A5E6    |000AE6;  Load DMA synchronization flag
-	bne CODE_02EE9C ;02EE9E|D0FC    |02EE9C;  Wait for DMA synchronization complete
+	bne Load_02EE9C ;02EE9E|D0FC    |02EE9C;  Wait for DMA synchronization complete
 
 ; DMA Transfer Setup and Configuration
 	rep #$30		;02EEA0|C230    |      ;  16-bit registers and indexes
@@ -8441,9 +8441,9 @@ CODE_02EE9C:
 	inc.b $e5	   ;02EEBB|E6E5    |000AE5;  Increment secondary synchronization flag
 
 ; Secondary DMA Synchronization Loop
-CODE_02EEBD:
+Load_02EEBD:
 	lda.b $e5	   ;02EEBD|A5E5    |000AE5;  Load secondary synchronization flag
-	bne CODE_02EEBD ;02EEBF|D0FC    |02EEBD;  Wait for secondary synchronization
+	bne Load_02EEBD ;02EEBF|D0FC    |02EEBD;  Wait for secondary synchronization
 	plp ;02EEC1|28      |      ;  Restore processor status
 	pla ;02EEC2|68      |      ;  Restore accumulator
 	ply ;02EEC3|7A      |      ;  Restore Y register
@@ -8459,35 +8459,35 @@ CODE_02EEBD:
 ; Advanced Graphics and Palette Processing Engine
 ; ------------------------------------------------------------------------------
 ; Complex graphics processing with sophisticated palette management and validation
-CODE_02EEE7:
+Label_02EEE7:
 	phk ;02EEE7|4B      |      ;  Preserve program bank
 	plb ;02EEE8|AB      |      ;  Set data bank to program bank
 	pea.w $0a00	 ;02EEE9|F4000A  |020A00;  Set direct page to $0a00
 	pld ;02EEEC|2B      |      ;  Load direct page
 	sep #$30		;02EEED|E230    |      ;  8-bit accumulator and indexes
 	lda.w $0ae2	 ;02EEEF|ADE20A  |020AE2;  Load graphics processing flag
-	beq CODE_02EF0D ;02EEF2|F019    |02EF0D;  Skip if graphics processing disabled
-	jsr.w CODE_02F0C0 ;02EEF4|20C0F0  |02F0C0;  Initialize graphics processing
+	beq Return_02EF0D ;02EEF2|F019    |02EF0D;  Skip if graphics processing disabled
+	jsr.w InitializeGraphicsProcessing ;02EEF4|20C0F0  |02F0C0;  Initialize graphics processing
 	ldx.b #$00	  ;02EEF7|A200    |      ;  Initialize graphics index
 	ldy.b #$04	  ;02EEF9|A004    |      ;  Load graphics counter (4 elements)
 
 ; Graphics Element Processing Loop
-CODE_02EEFB:
+Load_02EEFB:
 	lda.b $e3,x	 ;02EEFB|B5E3    |000AE3;  Load graphics element state
-	bne CODE_02EF05 ;02EEFD|D006    |02EF05;  Branch if element active
+	bne Label_02EF05 ;02EEFD|D006    |02EF05;  Branch if element active
 	inx ;02EEFF|E8      |      ;  Increment graphics index
 	dey ;02EF00|88      |      ;  Decrement graphics counter
-	bne CODE_02EEFB ;02EF01|D0F8    |02EEFB;  Continue processing if more elements
-	bra CODE_02EF0D ;02EF03|8008    |02EF0D;  Complete graphics processing
+	bne Load_02EEFB ;02EF01|D0F8    |02EEFB;  Continue processing if more elements
+	bra Return_02EF0D ;02EF03|8008    |02EF0D;  Complete graphics processing
 
 ; Active Graphics Element Processing
-CODE_02EF05:
+Label_02EF05:
 	txa ;02EF05|8A      |      ;  Transfer graphics index to accumulator
 	pea.w DATA8_02ef0e ;02EF06|F40EEF  |02EF0E;  Push graphics handler table address
-	jsl.l CODE_0097BE ;02EF09|22BE9700|0097BE;  Call external graphics processor
+	jsl.l CallSpriteInitializer ;02EF09|22BE9700|0097BE;  Call external graphics processor
 
 ; Graphics Processing Completion
-CODE_02EF0D:
+Return_02EF0D:
 	rtl ;02EF0D|6B      |      ;  Return from graphics processing
 
 ; Graphics Handler Table
@@ -8498,7 +8498,7 @@ DATA8_02ef0e:
 ; Advanced DMA Configuration and Transfer Control Engine
 ; ------------------------------------------------------------------------------
 ; Sophisticated DMA configuration with advanced transfer control and validation
-CODE_02EF16:
+Label_02EF16:
 	phx ;02EF16|DA      |      ;  Preserve X register
 	phy ;02EF17|5A      |      ;  Preserve Y register
 	php ;02EF18|08      |      ;  Preserve processor status
@@ -8515,12 +8515,12 @@ CODE_02EF16:
 	sec ;02EF30|38      |      ;  Set carry for rotation
 
 ; DMA Channel Selection Loop
-CODE_02EF31:
+Label_02EF31:
 	inx ;02EF31|E8      |      ;  Increment channel index
 	inx ;02EF32|E8      |      ;  Increment again (2 bytes per channel)
 	rol a;02EF33|2A      |      ;  Rotate channel mask left
 	trb.b $e3	   ;02EF34|14E3    |000AE3;  Test and clear channel availability
-	beq CODE_02EF31 ;02EF36|F0F9    |02EF31;  Continue search if channel unavailable
+	beq Label_02EF31 ;02EF36|F0F9    |02EF31;  Continue search if channel unavailable
 
 ; DMA Transfer Configuration Setup
 	rep #$30		;02EF38|C230    |      ;  16-bit registers and indexes
@@ -8561,7 +8561,7 @@ DATA8_02ef7f:
 ; Advanced Secondary DMA Processing and Validation Engine
 ; ------------------------------------------------------------------------------
 ; Complex secondary DMA processing with sophisticated validation and error handling
-CODE_02EF8D:
+Label_02EF8D:
 	phx ;02EF8D|DA      |      ;  Preserve X register
 	phy ;02EF8E|5A      |      ;  Preserve Y register
 	php ;02EF8F|08      |      ;  Preserve processor status
@@ -8578,12 +8578,12 @@ CODE_02EF8D:
 	sec ;02EFA7|38      |      ;  Set carry for rotation
 
 ; Secondary DMA Channel Selection Loop
-CODE_02EFA8:
+Label_02EFA8:
 	inx ;02EFA8|E8      |      ;  Increment secondary channel index
 	inx ;02EFA9|E8      |      ;  Increment again (2 bytes per channel)
 	rol a;02EFAA|2A      |      ;  Rotate secondary channel mask left
 	trb.b $e4	   ;02EFAB|14E4    |000AE4;  Test and clear secondary availability
-	beq CODE_02EFA8 ;02EFAD|F0F9    |02EFA8;  Continue search if channel unavailable
+	beq Label_02EFA8 ;02EFAD|F0F9    |02EFA8;  Continue search if channel unavailable
 
 ; Secondary DMA Transfer Configuration
 	rep #$30		;02EFAF|C230    |      ;  16-bit registers and indexes
@@ -8603,12 +8603,12 @@ CODE_02EFA8:
 	rep #$20		;02EFCF|C220    |      ;  16-bit accumulator mode
 	txa ;02EFD1|8A      |      ;  Transfer channel index to accumulator
 	cmp.w #$0002	;02EFD2|C90200  |      ;  Check if channel 2 (validation channel)
-	bne CODE_02EFDB ;02EFD5|D004    |02EFDB;  Skip validation if not channel 2
+	bne Label_02EFDB ;02EFD5|D004    |02EFDB;  Skip validation if not channel 2
 	sep #$20		;02EFD7|E220    |      ;  8-bit accumulator mode
 	stz.b $e7	   ;02EFD9|64E7    |000AE7;  Clear validation flag
 
 ; Secondary DMA Processing Completion
-CODE_02EFDB:
+Label_02EFDB:
 	plp ;02EFDB|28      |      ;  Restore processor status
 	ply ;02EFDC|7A      |      ;  Restore Y register
 	plx ;02EFDD|FA      |      ;  Restore X register
@@ -8653,19 +8653,19 @@ DATA8_02f5bf:
 	db $fd,$f7,$df,$7f ;02F5BF|        |      ;  Color validation bit masks
 
 ; Color Processing Control and Validation
-CODE_02F5C3:
+Label_02F5C3:
 	php ;02F5C3|08      |      ;  Preserve processor status
 	sep #$30		;02F5C4|E230    |      ;  8-bit accumulator and indexes
 	lda.w $0ae2	 ;02F5C6|ADE20A  |020AE2;  Load color processing flag
-	beq CODE_02F5D9 ;02F5C9|F00E    |02F5D9;  Skip if color processing disabled
+	beq Label_02F5D9 ;02F5C9|F00E    |02F5D9;  Skip if color processing disabled
 	lda.w $0aee	 ;02F5CB|ADEE0A  |020AEE;  Load color validation state
 	cmp.b #$03	  ;02F5CE|C903    |      ;  Check if validation level sufficient
-	bpl CODE_02F5D9 ;02F5D0|1007    |02F5D9;  Skip if validation insufficient
+	bpl Label_02F5D9 ;02F5D0|1007    |02F5D9;  Skip if validation insufficient
 	pea.w DATA8_02f5db ;02F5D2|F4DBF5  |02F5DB;  Push color handler table address
-	jsl.l CODE_0097BE ;02F5D5|22BE9700|0097BE;  Call external color processor
+	jsl.l CallSpriteInitializer ;02F5D5|22BE9700|0097BE;  Call external color processor
 
 ; Color Processing Completion
-CODE_02F5D9:
+Label_02F5D9:
 	plp ;02F5D9|28      |      ;  Restore processor status
 	rts ;02F5DA|60      |      ;  Return from color processing
 
@@ -8682,7 +8682,7 @@ DATA8_02f5e2:
 	db $08		 ;02F5E2|        |      ;  Color processing increment
 
 ; Color Processing with Mathematical Operations
-CODE_02F5E3:
+Label_02F5E3:
 	php ;02F5E3|08      |      ;  Preserve processor status
 	lda.w $0aef	 ;02F5E4|ADEF0A  |020AEF;  Load color processing state
 	clc ;02F5E7|18      |      ;  Clear carry for addition
@@ -8692,45 +8692,45 @@ CODE_02F5E3:
 	sta.w $0aef	 ;02F5EE|8DEF0A  |020AEF;  Store updated color state
 	pla ;02F5F1|68      |      ;  Restore color result
 	and.b #$f0	  ;02F5F2|29F0    |      ;  Mask to high nibble
-	beq CODE_02F624 ;02F5F4|F02E    |02F624;  Skip if no overflow
+	beq Label_02F624 ;02F5F4|F02E    |02F624;  Skip if no overflow
 	ldx.b #$00	  ;02F5F6|A200    |      ;  Initialize color index
 	txy ;02F5F8|9B      |      ;  Transfer index to Y register
 
 ; Color Processing Loop with Threshold Management
-CODE_02F5F9:
+Label_02F5F9:
 	cpx.b #$52	  ;02F5F9|E052    |      ;  Check if reached color limit (82 colors)
-	bpl CODE_02F615 ;02F5FB|1018    |02F615;  Branch to extended processing
+	bpl Label_02F615 ;02F5FB|1018    |02F615;  Branch to extended processing
 	txa ;02F5FD|8A      |      ;  Transfer color index to accumulator
 	cmp.w DATA8_02f626,y ;02F5FE|D926F6  |02F626;  Compare with color threshold
-	bmi CODE_02F605 ;02F601|3002    |02F605;  Skip threshold update if below
+	bmi Load_02F605 ;02F601|3002    |02F605;  Skip threshold update if below
 	iny ;02F603|C8      |      ;  Increment threshold index
 	iny ;02F604|C8      |      ;  Increment again (2 bytes per threshold)
 
 ; Color Value Processing with WRAM Storage
-CODE_02F605:
+Load_02F605:
 	lda.l $7ec660,x ;02F605|BF60C67E|7EC660;  Load color value from WRAM
 	clc ;02F609|18      |      ;  Clear carry for addition
 	adc.w DATA8_02f627,y ;02F60A|7927F6  |02F627;  Add color adjustment value
 	sta.l $7ec660,x ;02F60D|9F60C67E|7EC660;  Store updated color value
 	inx ;02F611|E8      |      ;  Increment color index
 	inx ;02F612|E8      |      ;  Increment again (2 bytes per color)
-	bra CODE_02F5F9 ;02F613|80E4    |02F5F9;  Continue color processing loop
+	bra Label_02F5F9 ;02F613|80E4    |02F5F9;  Continue color processing loop
 
 ; Extended Color Processing for High Color Counts
-CODE_02F615:
+Label_02F615:
 	rep #$10		;02F615|C210    |      ;  16-bit index registers
 	lda.b $f1	   ;02F617|A5F1    |000AF1;  Load extended color value
 
 ; Extended Color Fill Loop
-CODE_02F619:
+Store_02F619:
 	sta.l $7ec660,x ;02F619|9F60C67E|7EC660;  Store extended color value
 	inx ;02F61D|E8      |      ;  Increment color index
 	inx ;02F61E|E8      |      ;  Increment again (2 bytes per color)
 	cpx.w #$01ae	;02F61F|E0AE01  |      ;  Check if reached maximum colors (430)
-	bne CODE_02F619 ;02F622|D0F5    |02F619;  Continue extended color fill
+	bne Store_02F619 ;02F622|D0F5    |02F619;  Continue extended color fill
 
 ; Color Processing Completion
-CODE_02F624:
+Label_02F624:
 	plp ;02F624|28      |      ;  Restore processor status
 	rts ;02F625|60      |      ;  Return from color processing
 
@@ -8766,10 +8766,10 @@ DATA8_02f62c:
 ; Sophisticated Entity Cleanup and Sprite Management Engine
 ; ------------------------------------------------------------------------------
 ; Advanced entity cleanup with comprehensive sprite management and validation
-CODE_02F670:
+Label_02F670:
 	php ;02F670|08      |      ;  Preserve processor status
 	lda.l $7ec240,x ;02F671|BF40C27E|7EC240;  Load entity state flags
-	bpl CODE_02F6C0 ;02F675|1049    |02F6C0;  Skip cleanup if entity inactive
+	bpl Label_02F6C0 ;02F675|1049    |02F6C0;  Skip cleanup if entity inactive
 	lda.b #$00	  ;02F677|A900    |      ;  Load cleanup initialization value
 	sta.l $7ec240,x ;02F679|9F40C27E|7EC240;  Clear entity state flags
 	lda.b #$ff	  ;02F67D|A9FF    |      ;  Load cleanup marker value
@@ -8779,12 +8779,12 @@ CODE_02F670:
 	sta.l $7ec3c0,x ;02F68B|9FC0C37E|7EC3C0;  Clear entity pointer low
 	sta.l $7ec3e0,x ;02F68F|9FE0C37E|7EC3E0;  Clear entity pointer high
 	lda.l $7ec260,x ;02F693|BF60C27E|7EC260;  Load entity sprite index
-	jsr.w CODE_02FEAB ;02F697|20ABFE  |02FEAB;  Call sprite cleanup routine
+	jsr.w CallSpriteCleanupRoutine ;02F697|20ABFE  |02FEAB;  Call sprite cleanup routine
 	pha ;02F69A|48      |      ;  Preserve sprite cleanup result
 	phd ;02F69B|0B      |      ;  Preserve direct page
 	pea.w $0b00	 ;02F69C|F4000B  |020B00;  Set direct page to $0b00
 	pld ;02F69F|2B      |      ;  Load cleanup direct page
-	jsl.l CODE_009754 ;02F6A0|22549700|009754;  Call external cleanup routine
+	jsl.l CallExternalCleanupRoutine ;02F6A0|22549700|009754;  Call external cleanup routine
 	pld ;02F6A4|2B      |      ;  Restore direct page
 	pla ;02F6A5|68      |      ;  Restore sprite cleanup result
 
@@ -8803,7 +8803,7 @@ CODE_02F670:
 	sta.w $0c03,y   ;02F6BD|99030C  |020C03;  Clear sprite attributes
 
 ; Entity Cleanup Completion
-CODE_02F6C0:
+Label_02F6C0:
 	plp ;02F6C0|28      |      ;  Restore processor status
 	rts ;02F6C1|60      |      ;  Return from entity cleanup
 
@@ -8811,11 +8811,11 @@ CODE_02F6C0:
 ; Advanced Color Mode Processing and Window Management Engine
 ; ------------------------------------------------------------------------------
 ; Sophisticated color mode processing with advanced window management
-CODE_02F6C2:
+Return_02F6C2:
 	rts ;02F6C2|60      |      ;  Return from color mode handler
 
 ; Color Mode Configuration A - High Intensity
-CODE_02F6C3:
+Load_02F6C3:
 	lda.b #$a2	  ;02F6C3|A9A2    |      ;  Load high intensity color mode
 	sta.w $2131	 ;02F6C5|8D3121  |022131;  Set color addition select register
 	lda.b #$e6	  ;02F6C8|A9E6    |      ;  Load intensity value
@@ -8825,7 +8825,7 @@ CODE_02F6C3:
 	rts ;02F6D3|60      |      ;  Return from color mode A
 
 ; Color Mode Configuration B - Standard
-CODE_02F6D4:
+Store_02F6D4:
 	stz.w $2131	 ;02F6D4|9C3121  |022131;  Clear color addition select
 	lda.b #$e0	  ;02F6D7|A9E0    |      ;  Load standard intensity value
 	sta.w $2132	 ;02F6D9|8D3221  |022132;  Set standard color data
@@ -8834,7 +8834,7 @@ CODE_02F6D4:
 	rts ;02F6E2|60      |      ;  Return from color mode B
 
 ; Color Mode Configuration C - Enhanced
-CODE_02F6E3:
+Load_02F6E3:
 	lda.b #$22	  ;02F6E3|A922    |      ;  Load enhanced color mode
 	sta.w $2131	 ;02F6E5|8D3121  |022131;  Set enhanced color addition
 	lda.b #$ed	  ;02F6E8|A9ED    |      ;  Load enhanced intensity value
@@ -8847,7 +8847,7 @@ CODE_02F6E3:
 ; Advanced Entity Movement and Coordinate Processing Engine
 ; ------------------------------------------------------------------------------
 ; Complex entity movement with sophisticated coordinate processing and validation
-CODE_02F6F4:
+Label_02F6F4:
 	clc ;02F6F4|18      |      ;  Clear carry for addition
 	lda.l $7ec420,x ;02F6F5|BF20C47E|7EC420;  Load entity movement vector
 	adc.l $7ec280,x ;02F6F9|7F80C27E|7EC280;  Add to entity X coordinate
@@ -8857,7 +8857,7 @@ CODE_02F6F4:
 	rts ;02F707|60      |      ;  Return from movement processing
 
 ; Advanced Window Processing and Mode Management
-CODE_02F708:
+Load_02F708:
 	lda.b #$01	  ;02F708|A901    |      ;  Load window enable flag
 	sta.w $212d	 ;02F70A|8D2D21  |02212D;  Enable window 1
 	stz.w $2132	 ;02F70D|9C3221  |022132;  Clear color data register
@@ -8870,7 +8870,7 @@ CODE_02F708:
 	rts ;02F720|60      |      ;  Return from window processing
 
 ; Window Processing Reset and Cleanup
-CODE_02F721:
+Store_02F721:
 	stz.w $212d	 ;02F721|9C2D21  |02212D;  Disable window 1
 	stz.w $2130	 ;02F724|9C3021  |022130;  Clear window control
 	stz.w $2131	 ;02F727|9C3121  |022131;  Clear color addition
@@ -8881,7 +8881,7 @@ CODE_02F721:
 	rts ;02F735|60      |      ;  Return from window reset
 
 ; Advanced Color Configuration with Entity Coordination
-CODE_02F736:
+Label_02F736:
 	db $a9,$62,$8d,$31,$21,$bf,$20,$c4,$7e,$8d,$32,$21,$a9,$00,$9f,$80 ;02F736|        |      ;  Color coordination data
 	db $c3,$7e,$60 ;02F746|        |00007E;  Color completion marker
 
@@ -8991,7 +8991,7 @@ Sprite_DefaultGraphics:
 	lda.l $7ec320,x ;02FB55|BF20C37E|7EC320; Load entity X-coordinate from memory
 	clc ;02FB59|18      |      ; Clear carry flag for addition
 	adc.b #$08	  ;02FB5A|6908    |      ; Add offset for sprite positioning
-	jsl.l CODE_0B92D6 ;02FB5C|22D6920B|0B92D6; Call cross-bank coordinate processing routine
+	jsl.l Label_0B92D6 ;02FB5C|22D6920B|0B92D6; Call cross-bank coordinate processing routine
 	rts ;02FB60|60      |      ; Return from coordinate calculation
 
 ; ============================================================================
@@ -9084,10 +9084,10 @@ Sprite_DefaultGraphics:
 	php ;02FDAB|08      |      ; Preserve processor status flags
 	lda.l $7ec380,x ;02FDAC|BF80C37E|7EC380; Load entity animation state from extended memory
 	pea.w DATA8_02f62c ;02FDB0|F42CF6  |02F62C; Push animation data table address
-	jsl.l CODE_0097BE ;02FDB3|22BE9700|0097BE; Call cross-bank animation processing routine
+	jsl.l CallSpriteInitializer ;02FDB3|22BE9700|0097BE; Call cross-bank animation processing routine
 	plp ;02FDB7|28      |      ; Restore processor status flags
 	plx ;02FDB8|FA      |      ; Restore X register (entity index)
-	jsr.w CODE_02F483 ;02FDB9|2083F4  |02F483; Call local animation update routine
+	jsr.w CallLocalAnimationUpdateRoutine ;02FDB9|2083F4  |02F483; Call local animation update routine
 	rts ;02FDBC|60      |      ; Return from animation processing
 
 ; ============================================================================
@@ -9097,7 +9097,7 @@ Sprite_DefaultGraphics:
 	phx ;02FDBD|DA      |      ; Preserve X register for entity management
 	lda.l $7ec380,x ;02FDBE|BF80C37E|7EC380; Load entity animation state from memory
 	pea.w DATA8_02f62c ;02FDC2|F42CF6  |02F62C; Push animation table reference
-	jsl.l CODE_0097BE ;02FDC5|22BE9700|0097BE; Call cross-bank animation coordinator
+	jsl.l CallSpriteInitializer ;02FDC5|22BE9700|0097BE; Call cross-bank animation coordinator
 	plx ;02FDC9|FA      |      ; Restore X register (entity index)
 	rts ;02FDCA|60      |      ; Return from streamlined processing
 
@@ -9131,7 +9131,7 @@ Entity_InitBoundary:
 	sta.b $cb	   ;02FE25|85CB    |000ACB; Store in direct page for fast access
 	lda.b #$00	  ;02FE27|A900    |      ; Clear accumulator for initialization
 	sta.l $7ec2e0,x ;02FE29|9FE0C27E|7EC2E0; Clear entity animation counter
-	jsr.w CODE_02EB55 ;02FE2D|2055EB  |02EB55; Call entity initialization routine
+	jsr.w Label_02EB55 ;02FE2D|2055EB  |02EB55; Call entity initialization routine
 	lda.b #$03	  ;02FE30|A903    |      ; Load entity processing priority level
 	sta.w $0ae4	 ;02FE32|8DE40A  |020AE4; Store priority in memory
 	plp ;02FE35|28      |      ; Restore processor status flags
@@ -9153,14 +9153,14 @@ Entity_GraphicsCreator:
 	pha ;02FE45|48      |      ; Push X-coordinate to stack for preservation
 	lda.l $7ec2c0,x ;02FE46|BFC0C27E|7EC2C0; Load entity graphics state from memory
 	pha ;02FE4A|48      |      ; Push graphics state to stack for preservation
-	jsr.w CODE_02EA60 ;02FE4B|2060EA  |02EA60; Call entity coordinate processing
+	jsr.w Label_02EA60 ;02FE4B|2060EA  |02EA60; Call entity coordinate processing
 	ldy.b #$01	  ;02FE4E|A001    |      ; Load entity type parameter
-	jsr.w CODE_02EA9F ;02FE50|209FEA  |02EA9F; Call entity type initialization
+	jsr.w Label_02EA9F ;02FE50|209FEA  |02EA9F; Call entity type initialization
 	sta.l $7ec260,x ;02FE53|9F60C27E|7EC260; Store entity type in memory
 	phd ;02FE57|0B      |      ; Preserve current direct page
 	pea.w $0b00	 ;02FE58|F4000B  |020B00; Set direct page to $0b00 for graphics operations
 	pld ;02FE5B|2B      |      ; Load graphics direct page
-	jsl.l CODE_00974E ;02FE5C|224E9700|00974E; Call cross-bank graphics initialization
+	jsl.l CallExternalValidationRoutine ;02FE5C|224E9700|00974E; Call cross-bank graphics initialization
 	pld ;02FE60|2B      |      ; Restore previous direct page
 	pla ;02FE61|68      |      ; Pull graphics state from stack
 	sta.l $7ec2c0,x ;02FE62|9FC0C27E|7EC2C0; Restore entity graphics state
@@ -9195,7 +9195,7 @@ Entity_Cleanup:
 	phd ;02FE9D|0B      |      ; Preserve direct page register
 	pea.w $0b00	 ;02FE9E|F4000B  |020B00; Set direct page for graphics operations
 	pld ;02FEA1|2B      |      ; Load graphics direct page
-	jsl.l CODE_009754 ;02FEA2|22549700|009754; Call cross-bank sprite deactivation
+	jsl.l CallExternalCleanupRoutine ;02FEA2|22549700|009754; Call cross-bank sprite deactivation
 	pld ;02FEA6|2B      |      ; Restore direct page register
 	plp ;02FEA7|28      |      ; Restore processor status flags
 	ply ;02FEA8|7A      |      ; Restore Y register

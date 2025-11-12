@@ -70,7 +70,7 @@ Event_SetupCommon:
 	adc.W #$0008                         ;0B806E|690800  |      ;
 	tay                                  ;0B8071|A8      |      ;
 	plx                                  ;0B8072|FA      |      ;
-	jsl.L CODE_01AE86                    ;0B8073|2286AE01|01AE86;
+	jsl.L CallAnimationLoader                    ;0B8073|2286AE01|01AE86;
 ;      |        |      ;
 BattleEvent_UpdateOAM:
 	rep #$30                             ;0B8077|C230    |      ;
@@ -122,7 +122,7 @@ BattleEvent_Return:
 	lda.L DATA8_00fdca,x                 ;0B80CD|BFCAFD00|00FDCA;
 	tay                                  ;0B80D1|A8      |      ;
 	plx                                  ;0B80D2|FA      |      ;
-	jsl.L CODE_01AE86                    ;0B80D3|2286AE01|01AE86;
+	jsl.L CallAnimationLoader                    ;0B80D3|2286AE01|01AE86;
 	bra BattleEvent_UpdateOAM                      ;0B80D7|809E    |0B8077;
 ;      |        |      ;
 ;      |        |      ;
@@ -131,7 +131,7 @@ BattleEvent_InitSearch:
 	sta.W $192c                          ;0B80DC|8D2C19  |00192C;
 	lda.B #$02                           ;0B80DF|A902    |      ;
 	sta.W $192b                          ;0B80E1|8D2B19  |00192B;
-	jsl.L CODE_018BD1                    ;0B80E4|22D18B01|018BD1;
+	jsl.L CallsCodeAnimationFrameCalculatorBank                    ;0B80E4|22D18B01|018BD1;
 	rts                                  ;0B80E8|60      |      ;
 ;      |        |      ;
 	phx                                  ;0B80E9|DA      |      ;
@@ -211,7 +211,7 @@ InitBattleGraphics:
 	sta.W $0e91                          ;0B815F|8D910E  |010E91;
 	bne LoadEnemyTileData                      ;0B8162|D041    |0B81A5;
 	lda.B #$f2                           ;0B8164|A9F2    |      ;
-	jsl.L CODE_00976B                    ;0B8166|226B9700|00976B;
+	jsl.L PlaySoundEffectBank                    ;0B8166|226B9700|00976B;
 	stz.W $1a5b                          ;0B816A|9C5B1A  |011A5B;
 	lda.W $0e88                          ;0B816D|AD880E  |010E88;
 	rep #$20                             ;0B8170|C220    |      ;
@@ -222,7 +222,7 @@ InitBattleGraphics:
 	sta.W $0e89                          ;0B817B|8D890E  |010E89;
 	sep #$20                             ;0B817E|E220    |      ;
 	lda.B #$f3                           ;0B8180|A9F3    |      ;
-	jsl.L CODE_009776                    ;0B8182|22769700|009776;
+	jsl.L ExecuteSpecialBitProcessing                    ;0B8182|22769700|009776;
 	bne LoadEnemyTileData                      ;0B8186|D01D    |0B81A5;
 	lda.B #$02                           ;0B8188|A902    |      ;
 	sta.W $0e8b                          ;0B818A|8D8B0E  |010E8B;
@@ -709,15 +709,15 @@ DATA8_0b856c:
 	stx.W $1a4a                          ;0B8582|8E4A1A  |011A4A;
 	ldx.W #$f6d1                         ;0B8585|A2D1F6  |      ;
 	lda.B #$03                           ;0B8588|A903    |      ;
-	jsl.L CODE_009776                    ;0B858A|22769700|009776;
+	jsl.L ExecuteSpecialBitProcessing                    ;0B858A|22769700|009776;
 	bne LoadMagicAnimData                      ;0B858E|D019    |0B85A9;
 	ldx.W #$f538                         ;0B8590|A238F5  |      ;
 	lda.B #$02                           ;0B8593|A902    |      ;
-	jsl.L CODE_009776                    ;0B8595|22769700|009776;
+	jsl.L ExecuteSpecialBitProcessing                    ;0B8595|22769700|009776;
 	bne LoadMagicAnimData                      ;0B8599|D00E    |0B85A9;
 	ldx.W #$f37c                         ;0B859B|A27CF3  |      ;
 	lda.B #$01                           ;0B859E|A901    |      ;
-	jsl.L CODE_009776                    ;0B85A0|22769700|009776;
+	jsl.L ExecuteSpecialBitProcessing                    ;0B85A0|22769700|009776;
 	bne LoadMagicAnimData                      ;0B85A4|D003    |0B85A9;
 	ldx.W #$f240                         ;0B85A6|A240F2  |      ;
 ;      |        |      ;
@@ -1201,13 +1201,13 @@ ProcessButtons_CheckFlags:
 	beq ProcessButtons_SameState                      ;0B8EC5|F00B    |0B8ED2;
 	sta.B $f4                            ;0B8EC7|85F4    |000AF4;
 	pea.W DATA8_0b8f15                   ;0B8EC9|F4158F  |0B8F15;
-	jsl.L CODE_0097BE                    ;0B8ECC|22BE9700|0097BE;
+	jsl.L CallSpriteInitializer                    ;0B8ECC|22BE9700|0097BE;
 	bra ProcessButtons_UpdateSecond                      ;0B8ED0|8007    |0B8ED9;
 ;      |        |      ;
 ;      |        |      ;
 ProcessButtons_SameState:
 	pea.W DATA8_0b8f03                   ;0B8ED2|F4038F  |0B8F03;
-	jsl.L CODE_0097BE                    ;0B8ED5|22BE9700|0097BE;
+	jsl.L CallSpriteInitializer                    ;0B8ED5|22BE9700|0097BE;
 ;      |        |      ;
 ProcessButtons_UpdateSecond:
 	ldx.W $0adf                          ;0B8ED9|AEDF0A  |0B0ADF;
@@ -1220,13 +1220,13 @@ ProcessButtons_UpdateSecond:
 	beq ProcessButtons_SameState2                      ;0B8EED|F00B    |0B8EFA;
 	sta.B $f5                            ;0B8EEF|85F5    |000AF5;
 	pea.W DATA8_0b8f15                   ;0B8EF1|F4158F  |0B8F15;
-	jsl.L CODE_0097BE                    ;0B8EF4|22BE9700|0097BE;
+	jsl.L CallSpriteInitializer                    ;0B8EF4|22BE9700|0097BE;
 	bra ProcessButtons_Return                      ;0B8EF8|8007    |0B8F01;
 ;      |        |      ;
 ;      |        |      ;
 ProcessButtons_SameState2:
 	pea.W DATA8_0b8f03                   ;0B8EFA|F4038F  |0B8F03;
-	jsl.L CODE_0097BE                    ;0B8EFD|22BE9700|0097BE;
+	jsl.L CallSpriteInitializer                    ;0B8EFD|22BE9700|0097BE;
 ;      |        |      ;
 ProcessButtons_Return:
 	plb                                  ;0B8F01|AB      |      ;
@@ -1330,7 +1330,7 @@ ProcessButtons_SetFlag:
 	lsr a;0B9054|4A      |      ;
 	and.B #$03                           ;0B9055|2903    |      ;
 	pea.W DATA8_0b905f                   ;0B9057|F45F90  |0B905F;
-	jsl.L CODE_0097BE                    ;0B905A|22BE9700|0097BE;
+	jsl.L CallSpriteInitializer                    ;0B905A|22BE9700|0097BE;
 	rts                                  ;0B905E|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
@@ -1417,7 +1417,7 @@ DATA8_0b905f:
 	lsr a;0B9108|4A      |      ;
 	and.B #$03                           ;0B9109|2903    |      ;
 	pea.W DATA8_0b9113                   ;0B910B|F41391  |0B9113;
-	jsl.L CODE_0097BE                    ;0B910E|22BE9700|0097BE;
+	jsl.L CallSpriteInitializer                    ;0B910E|22BE9700|0097BE;
 	rts                                  ;0B9112|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
@@ -1511,7 +1511,7 @@ DATA8_0b9113:
 	lsr a;0B91C5|4A      |      ;
 	and.B #$03                           ;0B91C6|2903    |      ;
 	pea.W DATA8_0b91d0                   ;0B91C8|F4D091  |0B91D0;
-	jsl.L CODE_0097BE                    ;0B91CB|22BE9700|0097BE;
+	jsl.L CallSpriteInitializer                    ;0B91CB|22BE9700|0097BE;
 	rts                                  ;0B91CF|60      |      ;
 ;      |        |      ;
 ;      |        |      ;

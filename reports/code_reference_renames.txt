@@ -1,0 +1,2141 @@
+CODE_* REFERENCE RENAME REPORT
+================================================================================
+
+Total labels renamed: 426
+Files modified: 12
+Total line replacements: 1293
+
+================================================================================
+RENAME MAPPINGS
+================================================================================
+
+CODE_0080DC -> SkipDifferentPath
+  References: 1
+  Comment: Skip to different path
+  Files: ffmq_full_disassembly.asm
+
+CODE_008117 -> NewGameInitialization
+  References: 1
+  Comment: New game initialization
+  Files: ffmq_full_disassembly.asm
+
+CODE_008166 -> CallRoutine
+  References: 1
+  Comment: Call routine
+  Files: ffmq_full_disassembly.asm
+
+CODE_0081F0 -> InitializeMoreHardwareDetailsTbd
+  References: 2
+  Comment: Initialize more hardware (details TBD)
+  Files: ffmq_full_disassembly.asm
+
+CODE_008230 -> Sub_008230
+  References: 2
+  Comment: 008110|203082  |008230;
+  Files: banks\bank_00.asm
+
+CODE_008247 -> InitializeHardwareRegisters
+  References: 4
+  Comment: 00803A|204782  |008247;
+  Files: ffmq_full_disassembly.asm, banks\bank_00.asm
+
+CODE_00825C -> CallInitializationHelper
+  References: 2
+  Comment: 0C8080	; Call initialization helper
+  Files: banks\bank_0C.asm, bank_0C_documented.asm
+
+CODE_008504 -> Sub_008504
+  References: 2
+  Comment: 008487|200485  |008504;
+  Files: banks\bank_00.asm
+
+CODE_008520 -> Sub_008520
+  References: 2
+  Comment: 0084B4|202085  |008520;
+  Files: banks\bank_00.asm
+
+CODE_008543 -> Sub_008543
+  References: 2
+  Comment: 0085B3|204385  |008543;
+  Files: banks\bank_00.asm
+
+CODE_00862D -> F01f
+  References: 1
+  Comment: 00860C|F01F    |00862D;
+  Files: banks\bank_00.asm
+
+CODE_0088C5 -> F00e
+  References: 1
+  Comment: 0088B5|F00E    |0088C5;
+  Files: banks\bank_00.asm
+
+CODE_008956 -> Sub_008956
+  References: 3
+  Comment: 008922|205689  |008956;
+  Files: banks\bank_00.asm
+
+CODE_008A63 -> Sub_008A63
+  References: 3
+  Comment: 008A57|800A    |008A63;
+  Files: banks\bank_00.asm
+
+CODE_008B69 -> Sub_008B69
+  References: 1
+  Comment: 00B87A|20698B  |008B69;
+  Files: banks\bank_00.asm
+
+CODE_008B88 -> Sub_008B88
+  References: 1
+  Comment: 00B8EA|20888B  |008B88;
+  Files: banks\bank_00.asm
+
+CODE_008C1B -> Sub_008C1B
+  References: 1
+  Comment: 00B6BA|201B8C  |008C1B;
+  Files: banks\bank_00.asm
+
+CODE_008C3D -> Sub_008C3D
+  References: 5
+  Comment: 008312|203D8C  |008C3D;
+  Files: banks\bank_00.asm
+
+CODE_008D29 -> Sub_008D29
+  References: 3
+  Comment: 008315|20298D  |008D29;
+  Files: banks\bank_00.asm
+
+CODE_008DA8 -> Sub_008DA8
+  References: 2
+  Comment: 008AE9|20A88D  |008DA8;
+  Files: banks\bank_00.asm
+
+CODE_008DDF -> UploadRoutine
+  References: 2
+  Comment: 0CA41E|22DF8D00|008DDF; Upload routine
+  Files: bank_0C_documented.asm
+
+CODE_008DE8 -> D097
+  References: 1
+  Comment: 008E4F|D097    |008DE8;
+  Files: banks\bank_00.asm
+
+CODE_0096A0 -> CallExternalThreadManager
+  References: 16
+  Comment: 01D6D1|22A09600|0096A0;
+  Files: bank_01_documented.asm, banks\bank_01.asm, bank_02_documented.asm, banks\bank_02.asm, banks\bank_02.backup_20251102_205802.asm
+
+CODE_0096B3 -> ExecuteCalculation
+  References: 12
+  Comment: 028787|22B39600|0096B3; Execute calculation
+  Files: banks\bank_02.asm, banks\bank_02.backup_20251102_205802.asm, bank_02_documented.asm
+
+CODE_0096E4 -> ExecuteFinalCalc
+  References: 13
+  Comment: 02879B|22E49600|0096E4; Execute final calc
+  Files: banks\bank_02.asm, banks\bank_02.backup_20251102_205802.asm, bank_02_documented.asm
+
+CODE_00971E -> CallMultiplicationRoutine
+  References: 24
+  Comment: 02D7C2|221E9700|00971E; Call multiplication routine
+  Files: banks\bank_0C.asm, bank_02_documented.asm, bank_0C_documented.asm, banks\bank_02.asm, banks\bank_02.backup_20251102_205802.asm
+
+CODE_009726 -> ExecuteHardwareDivision
+  References: 20
+  Comment: Execute hardware division
+  Files: banks\bank_0C.asm, bank_02_documented.asm, bank_0C_documented.asm, banks\bank_02.asm, banks\bank_02.backup_20251102_205802.asm
+
+CODE_00974E -> CallExternalValidationRoutine
+  References: 11
+  Comment: 02EA90|224E9700|00974E;  Call external validation routine
+  Files: banks\bank_02.asm, banks\bank_02.backup_20251102_205802.asm, banks\bank_01.asm, bank_02_documented.asm
+
+CODE_009754 -> CallExternalCleanupRoutine
+  References: 8
+  Comment: 02F6A0|22549700|009754;  Call external cleanup routine
+  Files: banks\bank_02.asm, banks\bank_02.backup_20251102_205802.asm, bank_02_documented.asm
+
+CODE_00975A -> CallCalculationSystem
+  References: 15
+  Comment: 02A6BB|225A9700|00975A; Call calculation system
+  Files: banks\bank_02.asm, banks\bank_02.backup_20251102_205802.asm, banks\bank_01.asm, bank_02_documented.asm
+
+CODE_009760 -> Sub_009760
+  References: 4
+  Comment: 01C30A|22609700|009760;
+  Files: banks\bank_02.backup_20251102_205802.asm, banks\bank_01.asm, banks\bank_02.asm
+
+CODE_00976B -> PlaySoundEffectBank
+  References: 7
+  Comment: Play sound effect (Bank $00)
+  Files: bank_0B_documented.asm, banks\bank_0B.asm, banks\bank_01.asm, banks\bank_02.asm, banks\bank_02.backup_20251102_205802.asm
+
+CODE_009776 -> ExecuteSpecialBitProcessing
+  References: 30
+  Comment: 01A568|22769700|009776;
+  Files: banks\bank_0C.asm, bank_0B_documented.asm, bank_01_documented.asm, banks\bank_0B.asm, banks\bank_01.asm ... and 4 more
+
+CODE_009783 -> ExecuteAudioCall
+  References: 75
+  Comment: 028C13|22839700|009783; Execute audio call
+  Files: banks\bank_02.asm, banks\bank_02.backup_20251102_205802.asm, banks\bank_01.asm, bank_02_documented.asm
+
+CODE_0097BE -> CallSpriteInitializer
+  References: 44
+  Comment: 02DF4B|22BE9700|0097BE; Call sprite initializer
+  Files: bank_0B_documented.asm, banks\bank_0B.asm, bank_02_documented.asm, banks\bank_02.asm, banks\bank_02.backup_20251102_205802.asm
+
+CODE_009994 -> CallTilemapFillRoutine
+  References: 4
+  Comment: 0C87FC	; Call tilemap fill routine
+  Files: banks\bank_0C.asm, bank_0C_documented.asm
+
+CODE_009A60 -> SpecialEnemyInitialization
+  References: 3
+  Comment: Special enemy initialization
+  Files: banks\bank_01.asm, bank_01_documented.asm
+
+CODE_009AEC -> Sub_009AEC
+  References: 1
+  Comment: 019264|22EC9A00|009AEC;
+  Files: banks\bank_01.asm
+
+CODE_009B02 -> ExecuteLongEnvironmentCall
+  References: 11
+  Comment: Execute long environment call
+  Files: bank_01_documented.asm, banks\bank_01.asm, bank_02_documented.asm, banks\bank_02.asm, banks\bank_02.backup_20251102_205802.asm
+
+CODE_009B45 -> Sub_009B45
+  References: 1
+  Comment: 01E13F|22459B00|009B45;
+  Files: banks\bank_01.asm
+
+CODE_009B59 -> Sub_009B59
+  References: 1
+  Comment: 01E0FC|22599B00|009B59;
+  Files: banks\bank_01.asm
+
+CODE_009BA4 -> Sub_009BA4
+  References: 1
+  Comment: 01B376|22A49B00|009BA4;
+  Files: banks\bank_01.asm
+
+CODE_009D6B -> CallDisplayRoutine
+  References: 2
+  Comment: 0C8065	; Call display routine
+  Files: banks\bank_0C.asm, bank_0C_documented.asm
+
+CODE_00B950 -> LoadSaveGame
+  References: 1
+  Comment: Load save game
+  Files: ffmq_full_disassembly.asm
+
+CODE_00BC9C -> Sub_00BC9C
+  References: 1
+  Comment: 019273|229CBC00|00BC9C;
+  Files: banks\bank_01.asm
+
+CODE_00BCA5 -> Sub_00BCA5
+  References: 1
+  Comment: 019283|22A5BC00|00BCA5;
+  Files: banks\bank_01.asm
+
+CODE_00BD2A -> Sub_00BD2A
+  References: 1
+  Comment: 01934A|222ABD00|00BD2A;
+  Files: banks\bank_01.asm
+
+CODE_00C795 -> CallMainGameLoopHandler
+  References: 2
+  Comment: 0C80C6	; Call main game loop handler
+  Files: banks\bank_0C.asm, bank_0C_documented.asm
+
+CODE_00C7B8 -> GameStateHandler
+  References: 2
+  Comment: 0C80F7	; Game state handler
+  Files: banks\bank_0C.asm, bank_0C_documented.asm
+
+CODE_00D009 -> CallExternalRoutine
+  References: 3
+  Comment: 028838|2209D000|00D009; Call external routine
+  Files: banks\bank_02.asm, banks\bank_02.backup_20251102_205802.asm, bank_02_documented.asm
+
+CODE_00D080 -> ExecuteSoundProcessingSystem
+  References: 3
+  Comment: Execute sound processing system
+  Files: banks\bank_01.asm, bank_01_documented.asm
+
+CODE_00D2A6 -> CallExternalMonitor
+  References: 3
+  Comment: 028096|22A6D200|00D2A6; Call external monitor
+  Files: banks\bank_02.asm, banks\bank_02.backup_20251102_205802.asm, bank_02_documented.asm
+
+CODE_00DA65 -> CallSystemValidation
+  References: 5
+  Comment: 02A600|2265DA00|00DA65; Call system validation
+  Files: banks\bank_02.asm, banks\bank_02.backup_20251102_205802.asm, bank_02_documented.asm
+
+CODE_00DBF4 -> Sub_00DBF4
+  References: 2
+  Comment: 028598|22F4DB00|00DBF4;
+  Files: banks\bank_02.backup_20251102_205802.asm, banks\bank_02.asm
+
+CODE_01825B -> D0ec
+  References: 1
+  Comment: 018351|D0EC    |01825B;
+  Files: bank_01_documented.asm
+
+CODE_018673 -> Sub_018673
+  References: 1
+  Comment: 01853E|207386  |018673;
+  Files: bank_01_documented.asm
+
+CODE_01880C -> Sub_01880C
+  References: 3
+  Comment: 01B611|200C88  |01880C;
+  Files: bank_01_documented.asm
+
+CODE_0188CD -> Sub_0188CD
+  References: 3
+  Comment: 01B65F|20CD88  |0188CD;
+  Files: bank_01_documented.asm
+
+CODE_018A2D -> Sub_018A2D
+  References: 1
+  Comment: 01832A|202D8A  |018A2D;
+  Files: bank_01_documented.asm
+
+CODE_018A52 -> Sub_018A52
+  References: 1
+  Comment: 00B583|22528A01|018A52;
+  Files: banks\bank_00.asm
+
+CODE_018AE5 -> ExecuteAdvancedBattleEngineState
+  References: 2
+  Comment: Execute advanced battle engine state
+  Files: bank_01_documented.asm
+
+CODE_018B76 -> InitializeGraphicsSubsystem
+  References: 3
+  Comment: Initialize graphics subsystem
+  Files: bank_01_documented.asm
+
+CODE_018B83 -> FinalizeBattleState
+  References: 3
+  Comment: Finalize battle state
+  Files: bank_01_documented.asm
+
+CODE_018BD1 -> CallsCodeAnimationFrameCalculatorBank
+  References: 3
+  Comment: Calls: CODE_018BD1 (animation frame calculator in Bank $01)
+  Files: banks\bank_0B.asm, bank_0B_documented.asm
+
+CODE_018C5B -> Sub_018C5B
+  References: 1
+  Comment: 018287|205B8C  |018C5B;
+  Files: bank_01_documented.asm
+
+CODE_018CB0 -> ExecuteGraphicsProcessing
+  References: 1
+  Comment: Execute graphics processing
+  Files: bank_01_documented.asm
+
+CODE_018DF3 -> Sub_018DF3
+  References: 15
+  Comment: 01AD7D|20F38D  |018DF3;
+  Files: bank_01_documented.asm
+
+CODE_018E07 -> Sub_018E07
+  References: 1
+  Comment: 018344|20078E  |018E07;
+  Files: bank_01_documented.asm
+
+CODE_019058 -> Sub_019058
+  References: 3
+  Comment: 01B642|205890  |019058;
+  Files: bank_01_documented.asm
+
+CODE_0190DD -> Sub_0190DD
+  References: 36
+  Comment: 01A6BC|20DD90  |0190DD;
+  Files: bank_01_documented.asm
+
+CODE_01914D -> UpdateBattleDisplay
+  References: 2
+  Comment: Update battle display
+  Files: bank_01_documented.asm
+
+CODE_019168 -> Sub_019168
+  References: 1
+  Comment: 01A951|206891  |019168;
+  Files: bank_01_documented.asm
+
+CODE_0192A2 -> Sub_0192A2
+  References: 1
+  Comment: 00D131|22A29201|0192A2;
+  Files: banks\bank_00.asm
+
+CODE_0192AC -> Sub_0192AC
+  References: 1
+  Comment: 01A957|20AC92  |0192AC;
+  Files: bank_01_documented.asm
+
+CODE_01935D -> Sub_01935D
+  References: 1
+  Comment: 01B994|205D93  |01935D;
+  Files: bank_01_documented.asm
+
+CODE_0194CD -> ExecuteSequenceInitialization
+  References: 2
+  Comment: Execute sequence initialization
+  Files: bank_01_documented.asm
+
+CODE_019681 -> Sub_019681
+  References: 1
+  Comment: 01D7F7|208196  |019681;
+  Files: bank_01_documented.asm
+
+CODE_0196D3 -> Sub_0196D3
+  References: 2
+  Comment: 01B63F|20D396  |0196D3;
+  Files: bank_01_documented.asm
+
+CODE_01973A -> Sub_01973A
+  References: 1
+  Comment: 018347|203A97  |01973A;
+  Files: bank_01_documented.asm
+
+CODE_0198B3 -> ExecuteAnimationSetup
+  References: 1
+  Comment: Execute animation setup
+  Files: bank_01_documented.asm
+
+CODE_01998C -> ProcessAnimationCoordinates
+  References: 1
+  Comment: Process animation coordinates
+  Files: bank_01_documented.asm
+
+CODE_019B2E -> ExecuteAnimationEngine
+  References: 1
+  Comment: Execute animation engine
+  Files: bank_01_documented.asm
+
+CODE_019EDD -> Sub_019EDD
+  References: 1
+  Comment: 01D804|20DD9E  |019EDD;
+  Files: bank_01_documented.asm
+
+CODE_01A081 -> ProcessStatusEffects
+  References: 3
+  Comment: Process status effects
+  Files: bank_01_documented.asm
+
+CODE_01A105 -> F003
+  References: 1
+  Comment: 01A100|F003    |01A105;
+  Files: bank_01_documented.asm
+
+CODE_01A10F -> Sub_01A10F
+  References: 1
+  Comment: 01A10A|1003    |01A10F;
+  Files: bank_01_documented.asm
+
+CODE_01A122 -> Sub_01A122
+  References: 1
+  Comment: 01A11D|1003    |01A122;
+  Files: bank_01_documented.asm
+
+CODE_01A140 -> Sub_01A140
+  References: 1
+  Comment: 01A139|9005    |01A140;
+  Files: bank_01_documented.asm
+
+CODE_01A15E -> B003
+  References: 2
+  Comment: 01A145|9017    |01A15E;
+  Files: bank_01_documented.asm
+
+CODE_01A186 -> Sub_01A186
+  References: 1
+  Comment: 01A102|4C86A1  |01A186;
+  Files: bank_01_documented.asm
+
+CODE_01A191 -> Sub_01A191
+  References: 2
+  Comment: 01A13E|9051    |01A191;
+  Files: bank_01_documented.asm
+
+CODE_01A1A8 -> C
+  References: 1
+  Comment: 01A14A|905C    |01A1A8;
+  Files: bank_01_documented.asm
+
+CODE_01A1D3 -> D
+  References: 1
+  Comment: 01A154|907D    |01A1D3;
+  Files: bank_01_documented.asm
+
+CODE_01A1FF -> Sub_01A1FF
+  References: 1
+  Comment: 01A15B|4CFFA1  |01A1FF;
+  Files: bank_01_documented.asm
+
+CODE_01A267 -> F02b
+  References: 1
+  Comment: 01A23A|F02B    |01A267;
+  Files: bank_01_documented.asm
+
+CODE_01A423 -> Sub_01A423
+  References: 4
+  Comment: 01A3FB|2023A4  |01A423;
+  Files: bank_01_documented.asm
+
+CODE_01A45A -> D0d6
+  References: 2
+  Comment: 01A482|D0D6    |01A45A;
+  Files: bank_01_documented.asm
+
+CODE_01A495 -> D0ab
+  References: 2
+  Comment: 01A4E8|D0AB    |01A495;
+  Files: bank_01_documented.asm
+
+CODE_01A49C -> D0d4
+  References: 2
+  Comment: 01A4C6|D0D4    |01A49C;
+  Files: bank_01_documented.asm
+
+CODE_01A4D0 -> D0ec2
+  References: 2
+  Comment: 01A4E2|D0EC    |01A4D0;
+  Files: bank_01_documented.asm
+
+CODE_01A4EB -> D0a4
+  References: 2
+  Comment: 01A545|D0A4    |01A4EB;
+  Files: bank_01_documented.asm
+
+CODE_01A4F6 -> A6
+  References: 2
+  Comment: 01A54E|80A6    |01A4F6;
+  Files: bank_01_documented.asm
+
+CODE_01A50C -> D0d1
+  References: 2
+  Comment: 01A539|D0D1    |01A50C;
+  Files: bank_01_documented.asm
+
+CODE_01A52C -> F019
+  References: 2
+  Comment: 01A511|F019    |01A52C;
+  Files: bank_01_documented.asm
+
+CODE_01A550 -> F00d
+  References: 2
+  Comment: 01A541|F00D    |01A550;
+  Files: bank_01_documented.asm
+
+CODE_01A571 -> D003
+  References: 2
+  Comment: 01A56C|D003    |01A571;
+  Files: bank_01_documented.asm
+
+CODE_01A573 -> F00d2
+  References: 2
+  Comment: 01A564|F00D    |01A573;
+  Files: bank_01_documented.asm
+
+CODE_01A592 -> D0ea
+  References: 2
+  Comment: 01A5A6|D0EA    |01A592;
+  Files: bank_01_documented.asm
+
+CODE_01A5A8 -> Sub_01A5A8
+  References: 2
+  Comment: 01A571|8035    |01A5A8;
+  Files: bank_01_documented.asm
+
+CODE_01A5AA -> Sub_01A5AA
+  References: 2
+  Comment: 01A56E|20AAA5  |01A5AA;
+  Files: bank_01_documented.asm
+
+CODE_01A5C7 -> D0ea2
+  References: 2
+  Comment: 01A5DB|D0EA    |01A5C7;
+  Files: bank_01_documented.asm
+
+CODE_01A692 -> Sub_01A692
+  References: 2
+  Comment: 01A412|2092A6  |01A692;
+  Files: bank_01_documented.asm
+
+CODE_01A6B2 -> D1
+  References: 4
+  Comment: 01A6DF|80D1    |01A6B2;
+  Files: bank_01_documented.asm
+
+CODE_01A6E1 -> B019
+  References: 2
+  Comment: 01A6C6|B019    |01A6E1;
+  Files: bank_01_documented.asm
+
+CODE_01A6F0 -> F02d
+  References: 2
+  Comment: 01A6C1|F02D    |01A6F0;
+  Files: bank_01_documented.asm
+
+CODE_01A6F2 -> Sub_01A6F2
+  References: 2
+  Comment: 01A6C3|20F2A6  |01A6F2;
+  Files: bank_01_documented.asm
+
+CODE_01A6FC -> Sub_01A6FC
+  References: 3
+  Comment: 01A6F8|9002    |01A6FC;
+  Files: bank_01_documented.asm
+
+CODE_01A74A -> F008
+  References: 1
+  Comment: 01A740|F008    |01A74A;
+  Files: bank_01_documented.asm
+
+CODE_01A74B -> Sub_01A74B
+  References: 1
+  Comment: 01A748|8001    |01A74B;
+  Files: bank_01_documented.asm
+
+CODE_01A804 -> F00a
+  References: 1
+  Comment: 01A7F8|F00A    |01A804;
+  Files: bank_01_documented.asm
+
+CODE_01A865 -> Sub_01A865
+  References: 2
+  Comment: 01A529|2065A8  |01A865;
+  Files: bank_01_documented.asm
+
+CODE_01A901 -> Sub_01A901
+  References: 4
+  Comment: 01A592|2001A9  |01A901;
+  Files: bank_01_documented.asm
+
+CODE_01A91F -> D0dd
+  References: 1
+  Comment: 01A940|D0DD    |01A91F;
+  Files: bank_01_documented.asm
+
+CODE_01A947 -> Sub_01A947
+  References: 2
+  Comment: 01A415|2047A9  |01A947;
+  Files: bank_01_documented.asm
+
+CODE_01A988 -> Sub_01A988
+  References: 1
+  Comment: 01A819|2088A9  |01A988;
+  Files: bank_01_documented.asm
+
+CODE_01A9EE -> Sub_01A9EE
+  References: 4
+  Comment: 01A3FE|20EEA9  |01A9EE;
+  Files: bank_01_documented.asm
+
+CODE_01AA3B -> Sub_01AA3B
+  References: 1
+  Comment: 01A827|203BAA  |01AA3B;
+  Files: bank_01_documented.asm
+
+CODE_01AB5D -> UpdateActorStates
+  References: 3
+  Comment: Update actor states
+  Files: bank_01_documented.asm
+
+CODE_01AE86 -> CallAnimationLoader
+  References: 7
+  Comment: 0B8073	; Call animation loader
+  Files: banks\bank_0B.asm, bank_0B_documented.asm
+
+CODE_01AE8A -> Sub_01AE8A
+  References: 5
+  Comment: 01AFDD|208AAE  |01AE8A;
+  Files: bank_01_documented.asm
+
+CODE_01AE9F -> Sub_01AE9F
+  References: 1
+  Comment: 01AE7D|9020    |01AE9F;
+  Files: bank_01_documented.asm
+
+CODE_01AEA0 -> Sub_01AEA0
+  References: 1
+  Comment: 01AE93|20A0AE  |01AEA0;
+  Files: bank_01_documented.asm
+
+CODE_01AEB3 -> Sub_01AEB3
+  References: 2
+  Comment: 01AE85|20B3AE  |01AEB3;
+  Files: bank_01_documented.asm
+
+CODE_01AEE7 -> Sub_01AEE7
+  References: 1
+  Comment: 01B933|20E7AE  |01AEE7;
+  Files: bank_01_documented.asm
+
+CODE_01AEF4 -> D0f1
+  References: 2
+  Comment: 01AF01|D0F1    |01AEF4;
+  Files: bank_01_documented.asm
+
+CODE_01AF25 -> F01e
+  References: 1
+  Comment: 01AF05|F01E    |01AF25;
+  Files: bank_01_documented.asm
+
+CODE_01AF56 -> Sub_01AF56
+  References: 2
+  Comment: 01A6A1|2056AF  |01AF56;
+  Files: bank_01_documented.asm
+
+CODE_01AFF0 -> Sub_01AFF0
+  References: 1
+  Comment: 01B941|20F0AF  |01AFF0;
+  Files: bank_01_documented.asm
+
+CODE_01B008 -> D2
+  References: 1
+  Comment: 01AFB9|904D    |01B008;
+  Files: bank_01_documented.asm
+
+CODE_01B078 -> Sub_01B078
+  References: 1
+  Comment: 01A6F5|2078B0  |01B078;
+  Files: bank_01_documented.asm
+
+CODE_01B119 -> Sub_01B119
+  References: 1
+  Comment: 01B76B|2019B1  |01B119;
+  Files: bank_01_documented.asm
+
+CODE_01B1EB -> GetBattleGraphicsIndex
+  References: 14
+  Comment: 01AFB6|20EBB1  |01B1EB;
+  Files: bank_01_documented.asm
+
+CODE_01B1F9 -> B008
+  References: 1
+  Comment: 01B1EF|B008    |01B1F9;
+  Files: bank_01_documented.asm
+
+CODE_01B2 -> ExecuteInactiveProcessing
+  References: 1
+  Comment: Execute inactive processing
+  Files: bank_01_documented.asm
+
+CODE_01B24C -> SpecialBattleProcessing
+  References: 10
+  Comment: Special battle processing
+  Files: bank_01_documented.asm, banks\bank_00.asm
+
+CODE_01B258 -> F030
+  References: 2
+  Comment: 01B226|F030    |01B258;
+  Files: bank_01_documented.asm
+
+CODE_01B2A3 -> F03c
+  References: 2
+  Comment: 01B265|F03C    |01B2A3;
+  Files: bank_01_documented.asm
+
+CODE_01B2F2 -> F040
+  References: 2
+  Comment: 01B2B0|F040    |01B2F2;
+  Files: bank_01_documented.asm
+
+CODE_01B2F3 -> F3b2
+  References: 1
+  Comment: 01B201|F3B2    |01B2F3;
+  Files: bank_01_documented.asm
+
+CODE_01B346 -> F045
+  References: 2
+  Comment: 01B2FF|F045    |01B346;
+  Files: bank_01_documented.asm
+
+CODE_01B347 -> B3
+  References: 1
+  Comment: 01B203|47B3    |01B347;
+  Files: bank_01_documented.asm
+
+CODE_01B37B -> Sub_01B37B
+  References: 12
+  Comment: 01B2F0|4C7BB3  |01B37B;
+  Files: bank_01_documented.asm
+
+CODE_01B399 -> F044
+  References: 2
+  Comment: 01B353|F044    |01B399;
+  Files: bank_01_documented.asm
+
+CODE_01B39A -> Ab3
+  References: 1
+  Comment: 01B205|9AB3    |01B39A;
+  Files: bank_01_documented.asm
+
+CODE_01B3EF -> F047
+  References: 2
+  Comment: 01B3A6|F047    |01B3EF;
+  Files: bank_01_documented.asm
+
+CODE_01B3F0 -> F0b3
+  References: 1
+  Comment: 01B207|F0B3    |01B3F0;
+  Files: bank_01_documented.asm
+
+CODE_01B443 -> B03c
+  References: 2
+  Comment: 01B3FC|F045    |01B443;
+  Files: bank_01_documented.asm
+
+CODE_01B444 -> B4
+  References: 1
+  Comment: 01B209|44B4    |01B444;
+  Files: bank_01_documented.asm
+
+CODE_01B497 -> F0452
+  References: 2
+  Comment: 01B450|F045    |01B497;
+  Files: bank_01_documented.asm
+
+CODE_01B4EE -> Cf
+  References: 1
+  Comment: 01B51D|80CF    |01B4EE;
+  Files: bank_01_documented.asm
+
+CODE_01B51A -> F2
+  References: 4
+  Comment: 01B4FA|F01E    |01B51A;
+  Files: bank_01_documented.asm
+
+CODE_01B51F -> F029
+  References: 1
+  Comment: 01B4F4|F029    |01B51F;
+  Files: bank_01_documented.asm
+
+CODE_01B520 -> F012
+  References: 1
+  Comment: 01B50C|F012    |01B520;
+  Files: bank_01_documented.asm
+
+CODE_01B528 -> F016
+  References: 1
+  Comment: 01B510|F016    |01B528;
+  Files: bank_01_documented.asm
+
+CODE_01B73C -> Sub_01B73C
+  References: 2
+  Comment: 01AF95|203CB7  |01B73C;
+  Files: bank_01_documented.asm
+
+CODE_01B7D8 -> Sub_01B7D8
+  References: 1
+  Comment: 01B796|20D8B7  |01B7D8;
+  Files: bank_01_documented.asm
+
+CODE_01BAAD -> ExecuteAudioProcessing
+  References: 3
+  Comment: 01D0A7|20ADBA  |01BAAD;
+  Files: bank_01_documented.asm
+
+CODE_01BC1B -> Sub_01BC1B
+  References: 1
+  Comment: 01AE9C|201BBC  |01BC1B;
+  Files: bank_01_documented.asm
+
+CODE_01BEB2 -> Sub_01BEB2
+  References: 8
+  Comment: 01ADBC|20B2BE  |01BEB2;
+  Files: bank_01_documented.asm
+
+CODE_01C450 -> ExecuteGraphicsProcessing2
+  References: 1
+  Comment: Execute graphics processing
+  Files: bank_01_documented.asm
+
+CODE_01C589 -> Sub_01C589
+  References: 1
+  Comment: 01AC03|2089C5  |01C589;
+  Files: bank_01_documented.asm
+
+CODE_01C6A1 -> FinalizeGraphicsSetup
+  References: 2
+  Comment: 01AF98|20A1C6  |01C6A1;
+  Files: bank_01_documented.asm
+
+CODE_01C71F -> ExecuteGraphicsProcessing3
+  References: 1
+  Comment: Execute graphics processing
+  Files: bank_01_documented.asm
+
+CODE_01C807 -> Sub_01C807
+  References: 1
+  Comment: 01B49F|2007C8  |01C807;
+  Files: bank_01_documented.asm
+
+CODE_01CACF -> ExecuteCharacterProcessing
+  References: 3
+  Comment: 01D7C9|20CFCA  |01CACF;
+  Files: bank_01_documented.asm
+
+CODE_01CAED -> ExecuteBattleStep
+  References: 2
+  Comment: 01AEF6|20EDCA  |01CAED;
+  Files: bank_01_documented.asm
+
+CODE_01CC81 -> Sub_01CC81
+  References: 1
+  Comment: 01B801|4C81CC  |01CC81;
+  Files: bank_01_documented.asm
+
+CODE_01CC82 -> JumpUnitProcessor
+  References: 5
+  Comment: 01AED4|2082CC  |01CC82;
+  Files: bank_01_documented.asm
+
+CODE_01CCE8 -> Sub_01CCE8
+  References: 2
+  Comment: 01AE55|4CE8CC  |01CCE8;
+  Files: bank_01_documented.asm
+
+CODE_01CECA -> Sub_01CECA
+  References: 1
+  Comment: 01B991|20CACE  |01CECA;
+  Files: bank_01_documented.asm
+
+CODE_01D0BB -> Sub_01D0BB
+  References: 1
+  Comment: 01ABFC|20BBD0  |01D0BB;
+  Files: bank_01_documented.asm
+
+CODE_01D0E5 -> D006
+  References: 1
+  Comment: 01D0DD|D006    |01D0E5;
+  Files: bank_01_documented.asm
+
+CODE_01D120 -> Sub_01D120
+  References: 2
+  Comment: 01AE7A|2020D1  |01D120;
+  Files: bank_01_documented.asm
+
+CODE_01D14E -> Sub_01D14E
+  References: 2
+  Comment: 01D133|204ED1  |01D14E;
+  Files: bank_01_documented.asm
+
+CODE_01D1E1 -> Sub_01D1E1
+  References: 1
+  Comment: 01D167|20E1D1  |01D1E1;
+  Files: bank_01_documented.asm
+
+CODE_01D1F4 -> Sub_01D1F4
+  References: 1
+  Comment: 01D16A|20F4D1  |01D1F4;
+  Files: bank_01_documented.asm
+
+CODE_01D20D -> Sub_01D20D
+  References: 1
+  Comment: 01D16D|200DD2  |01D20D;
+  Files: bank_01_documented.asm
+
+CODE_01D23C -> Sub_01D23C
+  References: 1
+  Comment: 01AD5A|203CD2  |01D23C;
+  Files: bank_01_documented.asm
+
+CODE_01D2DF -> Sub_01D2DF
+  References: 3
+  Comment: 01ADAD|20DFD2  |01D2DF;
+  Files: bank_01_documented.asm
+
+CODE_01D346 -> Sub_01D346
+  References: 1
+  Comment: 01D341|2046D3  |01D346;
+  Files: bank_01_documented.asm
+
+CODE_01D35D -> Sub_01D35D
+  References: 3
+  Comment: 01ADB0|205DD3  |01D35D;
+  Files: bank_01_documented.asm
+
+CODE_01D3A6 -> Sub_01D3A6
+  References: 1
+  Comment: 01ADB3|20A6D3  |01D3A6;
+  Files: bank_01_documented.asm
+
+CODE_01D3C2 -> Sub_01D3C2
+  References: 2
+  Comment: 01ADDB|20C2D3  |01D3C2;
+  Files: bank_01_documented.asm
+
+CODE_01D3CD -> Sub_01D3CD
+  References: 4
+  Comment: 01ADC8|20CDD3  |01D3CD;
+  Files: bank_01_documented.asm
+
+CODE_01D49B -> Sub_01D49B
+  References: 4
+  Comment: 01ADCD|209BD4  |01D49B;
+  Files: bank_01_documented.asm
+
+CODE_01D565 -> D0c7
+  References: 1
+  Comment: 01D59C|D0C7    |01D565;
+  Files: bank_01_documented.asm
+
+CODE_01D603 -> Sub_01D603
+  References: 3
+  Comment: 01D4C9|2003D6  |01D603;
+  Files: bank_01_documented.asm
+
+CODE_01D624 -> D0f7
+  References: 1
+  Comment: 01D62B|D0F7    |01D624;
+  Files: bank_01_documented.asm
+
+CODE_01D672 -> D0f8
+  References: 1
+  Comment: 01D678|D0F8    |01D672;
+  Files: bank_01_documented.asm
+
+CODE_01D681 -> F068
+  References: 1
+  Comment: 01D617|F068    |01D681;
+  Files: bank_01_documented.asm
+
+CODE_01D6A5 -> Sub_01D6A5
+  References: 1
+  Comment: 01D670|3033    |01D6A5;
+  Files: bank_01_documented.asm
+
+CODE_01D6A9 -> Sub_01D6A9
+  References: 6
+  Comment: 01B726|20A9D6  |01D6A9;
+  Files: bank_01_documented.asm
+
+CODE_01D96D -> ProcessFormationSetup
+  References: 2
+  Comment: Process formation setup
+  Files: bank_01_documented.asm
+
+CODE_01D987 -> ProcessFormation
+  References: 3
+  Comment: Process formation 1
+  Files: bank_01_documented.asm
+
+CODE_01D98F -> ExecuteFormationEngine
+  References: 1
+  Comment: Execute formation engine
+  Files: bank_01_documented.asm
+
+CODE_01DF65 -> LoadCharacterGraphicsData
+  References: 1
+  Comment: Load character graphics data
+  Files: bank_01_documented.asm
+
+CODE_01DF72 -> LoadGraphicsCoordinationData
+  References: 1
+  Comment: Load graphics coordination data
+  Files: bank_01_documented.asm
+
+CODE_01E1D3 -> Sub_01E1D3
+  References: 1
+  Comment: 01A7EF|20D3E1  |01E1D3;
+  Files: bank_01_documented.asm
+
+CODE_01E28B -> ExecuteGraphicsMemorySetup
+  References: 2
+  Comment: Execute graphics memory setup
+  Files: bank_01_documented.asm
+
+CODE_01E2CE -> InitializeGraphicsMemory
+  References: 2
+  Comment: Initialize graphics memory
+  Files: bank_01_documented.asm
+
+CODE_01E2F7 -> SetupGraphicsBuffers
+  References: 1
+  Comment: Setup graphics buffers
+  Files: bank_01_documented.asm
+
+CODE_01E339 -> ProcessAnimationData
+  References: 1
+  Comment: Process animation data
+  Files: bank_01_documented.asm
+
+CODE_01E372 -> ConfigureDmaChannels
+  References: 2
+  Comment: Configure DMA channels
+  Files: bank_01_documented.asm
+
+CODE_01E392 -> InitializeGraphicsState
+  References: 2
+  Comment: Initialize graphics state
+  Files: bank_01_documented.asm
+
+CODE_01E3AA -> SetupBattleCoordination
+  References: 2
+  Comment: Setup battle coordination
+  Files: bank_01_documented.asm
+
+CODE_01E4C0 -> ExecuteAnimationStep
+  References: 1
+  Comment: Execute animation step
+  Files: bank_01_documented.asm
+
+CODE_01E5E6 -> ExecuteAlternateStep
+  References: 2
+  Comment: Execute animation step
+  Files: bank_01_documented.asm
+
+CODE_01E78B -> BranchMainProcessingLoop
+  References: 3
+  Comment: Branch to main processing loop
+  Files: bank_01_documented.asm
+
+CODE_01E7C3 -> BranchIfCarryClearAlternateProcessing
+  References: 1
+  Comment: Branch if carry clear for alternate processing
+  Files: bank_01_documented.asm
+
+CODE_01E7F5 -> FinalizeVramOperations
+  References: 1
+  Comment: Finalize VRAM operations
+  Files: bank_01_documented.asm
+
+CODE_01E811 -> ExecuteFinalTransferSetup
+  References: 1
+  Comment: Execute final transfer setup
+  Files: bank_01_documented.asm
+
+CODE_01E899 -> ExecuteStandardMemoryTransfer
+  References: 1
+  Comment: Execute standard memory transfer
+  Files: bank_01_documented.asm
+
+CODE_01E8CD -> ExecuteAdvancedMemoryTransfer
+  References: 1
+  Comment: Execute advanced memory transfer
+  Files: bank_01_documented.asm
+
+CODE_01E90D -> ExecuteComplexMemoryTransfer
+  References: 7
+  Comment: Execute complex memory transfer
+  Files: bank_01_documented.asm
+
+CODE_01E930 -> ExecutePatternBitProcessing
+  References: 1
+  Comment: Execute pattern bit processing
+  Files: bank_01_documented.asm
+
+CODE_01E947 -> ExecuteGraphicsDataProcessing
+  References: 1
+  Comment: Execute graphics data processing
+  Files: bank_01_documented.asm
+
+CODE_01E9B3 -> ProcessBattleAi
+  References: 2
+  Comment: Process battle AI
+  Files: bank_01_documented.asm
+
+CODE_01E9EA -> JumpErrorHandler
+  References: 2
+  Comment: Jump to error handler
+  Files: bank_01_documented.asm
+
+CODE_01EA31 -> JumpAnimationProcessor
+  References: 1
+  Comment: Jump to animation processor
+  Files: bank_01_documented.asm
+
+CODE_01EA3E -> JumpAdvancedFlowProcessor
+  References: 1
+  Comment: Jump to advanced flow processor
+  Files: bank_01_documented.asm
+
+CODE_01EAB0 -> JumpAnimationProcessor2
+  References: 1
+  Comment: Jump to animation processor
+  Files: bank_01_documented.asm
+
+CODE_01EAD2 -> JumpCharacterProcessor
+  References: 1
+  Comment: Jump to character processor
+  Files: bank_01_documented.asm
+
+CODE_01EC3D -> ExecuteTriggerValidation
+  References: 1
+  Comment: Execute trigger validation
+  Files: bank_01_documented.asm
+
+CODE_01F52F -> ExecuteEnhancementProcessing
+  References: 1
+  Comment: Execute enhancement processing
+  Files: bank_01_documented.asm
+
+CODE_01FCC0 -> ExecuteGraphicsCompletionValidation
+  References: 1
+  Comment: Execute graphics completion validation
+  Files: bank_01_documented.asm
+
+CODE_01FF82 -> ExecuteGraphicsFinalization
+  References: 1
+  Comment: Execute graphics finalization
+  Files: bank_01_documented.asm
+
+CODE_01FFAC -> ExecuteCompletionValidation
+  References: 1
+  Comment: Execute completion validation
+  Files: bank_01_documented.asm
+
+CODE_028000 -> Sub_028000
+  References: 1
+  Comment: 00D1EA|22008002|028000;
+  Files: banks\bank_00.asm
+
+CODE_028187 -> ExecuteInternalValidation
+  References: 1
+  Comment: 028078|208781  |028187; Execute internal validation
+  Files: bank_02_documented.asm
+
+CODE_028219 -> ProcessSpecialStatus
+  References: 1
+  Comment: 0280A1|201982  |028219; Process special status
+  Files: bank_02_documented.asm
+
+CODE_0282F9 -> ExecuteStandardProcessing
+  References: 1
+  Comment: 0280AA|20F982  |0282F9; Execute standard processing
+  Files: bank_02_documented.asm
+
+CODE_0283A8 -> ExecuteValidation
+  References: 1
+  Comment: 0280CB|20A883  |0283A8; Execute validation
+  Files: bank_02_documented.asm
+
+CODE_028532 -> ExecuteCalcRoutine
+  References: 2
+  Comment: 0284E1|203285  |028532; Execute calc routine
+  Files: bank_02_documented.asm
+
+CODE_02853D -> ExecuteCalculationStep
+  References: 1
+  Comment: 028513|203D85  |02853D; Execute calculation step
+  Files: bank_02_documented.asm
+
+CODE_028600 -> ProcessResults
+  References: 1
+  Comment: 028526|200086  |028600; Process results
+  Files: bank_02_documented.asm
+
+CODE_028725 -> ExecuteCleanup
+  References: 2
+  Comment: 028104|202587  |028725; Execute cleanup
+  Files: bank_02_documented.asm
+
+CODE_028835 -> ProcessData
+  References: 16
+  Comment: 02814F|203588  |028835; Process data
+  Files: bank_02_documented.asm
+
+CODE_02883D -> ExecuteSystemHandler
+  References: 23
+  Comment: Execute system handler 1
+  Files: bank_02_documented.asm
+
+CODE_02886B -> ExecuteFinalProcessing
+  References: 1
+  Comment: 028117|206B88  |02886B; Execute final processing
+  Files: bank_02_documented.asm
+
+CODE_028938 -> ExecuteHandler
+  References: 1
+  Comment: 028152|203889  |028938; Execute handler
+  Files: bank_02_documented.asm
+
+CODE_028AE0 -> Sub_028AE0
+  References: 5
+  Comment: 009120|22E08A02|028AE0;
+  Files: banks\bank_00.asm
+
+CODE_028B0F -> ExecuteAdvancedCalc
+  References: 4
+  Comment: 0284B1|200F8B  |028B0F; Execute advanced calc
+  Files: bank_02_documented.asm
+
+CODE_028BE8 -> ExecuteDataProcessing
+  References: 2
+  Comment: 028BCB|20E88B  |028BE8; Execute data processing
+  Files: bank_02_documented.asm
+
+CODE_028BE9 -> ExecuteDataProcessing2
+  References: 1
+  Comment: 028BAF|20E98B  |028BE9; Execute data processing
+  Files: bank_02_documented.asm
+
+CODE_028C06 -> ExecuteAdvancedSystemCoordination
+  References: 1
+  Comment: Execute advanced system coordination
+  Files: bank_02_documented.asm
+
+CODE_028CC8 -> JumpCoordination
+  References: 1
+  Comment: 028C6E|4CC88C  |028CC8; Jump to coordination
+  Files: bank_02_documented.asm
+
+CODE_028EC0 -> ProcessCalcResults
+  References: 1
+  Comment: 0284B4|20C08E  |028EC0; Process calc results
+  Files: bank_02_documented.asm
+
+CODE_028F22 -> ProcessEntity
+  References: 23
+  Comment: 0280BA|20228F  |028F22; Process entity
+  Files: bank_02_documented.asm
+
+CODE_028F2F -> SwitchInputProcessingContext
+  References: 15
+  Comment: Switch to input processing context
+  Files: bank_02_documented.asm
+
+CODE_028FA8 -> JumpControllerFallbackHandler
+  References: 2
+  Comment: Jump to controller fallback handler
+  Files: bank_02_documented.asm
+
+CODE_029399 -> CodeMultiStageEntityInitializationGraphics
+  References: 1
+  Comment: CODE_029399: Multi-stage entity initialization with graphics coordination
+  Files: bank_02_documented.asm
+
+CODE_029438 -> BranchSpecialProcessingIfLess
+  References: 1
+  Comment: Branch to special processing if less
+  Files: bank_02_documented.asm
+
+CODE_02958C -> Sub_02958C
+  References: 1
+  Comment: 029576|208C95  |02958C
+  Files: bank_02_documented.asm
+
+CODE_0295C7 -> Sub_0295C7
+  References: 1
+  Comment: 02957D|20C795  |0295C7
+  Files: bank_02_documented.asm
+
+CODE_0295DE -> Sub_0295DE
+  References: 1
+  Comment: 029581|20DE95  |0295DE
+  Files: bank_02_documented.asm
+
+CODE_029727 -> UpdateBattleCalculations
+  References: 1
+  Comment: Update battle calculations
+  Files: bank_02_documented.asm
+
+CODE_029797 -> ExecuteBattleSynchronization
+  References: 5
+  Comment: Execute battle synchronization
+  Files: bank_02_documented.asm
+
+CODE_0297B8 -> InitializeGraphicsBaseSystem
+  References: 1
+  Comment: Initialize graphics base system
+  Files: bank_02_documented.asm
+
+CODE_0297D9 -> InitializeEntityProcessingEnvironment
+  References: 5
+  Comment: Initialize entity processing environment
+  Files: bank_02_documented.asm
+
+CODE_029964 -> ExecuteSystemValidationCheck
+  References: 2
+  Comment: Execute system validation check
+  Files: bank_02_documented.asm
+
+CODE_02997E -> ProcessEntityTypeData
+  References: 1
+  Comment: Process entity type data
+  Files: bank_02_documented.asm
+
+CODE_02999D -> ExecuteEntityStateValidation
+  References: 7
+  Comment: Execute entity state validation
+  Files: bank_02_documented.asm
+
+CODE_0299DA -> SynchronizeEntityData
+  References: 7
+  Comment: Synchronize entity data
+  Files: bank_02_documented.asm
+
+CODE_029A4A -> ExecuteBaseEntityCalculation
+  References: 1
+  Comment: Execute base entity calculation
+  Files: bank_02_documented.asm
+
+CODE_029A8B -> ExecuteBaseCoordinateProcessing
+  References: 1
+  Comment: Execute base coordinate processing
+  Files: bank_02_documented.asm
+
+CODE_029A9A -> BranchCoordinateFinalization
+  References: 1
+  Comment: Branch to coordinate finalization
+  Files: bank_02_documented.asm
+
+CODE_029AD2 -> ExecuteCoordinateValidation
+  References: 1
+  Comment: Execute coordinate validation
+  Files: bank_02_documented.asm
+
+CODE_029ADA -> ExecuteEnhancedEntityProcessing
+  References: 2
+  Comment: 0293E5|20DA9A  |0299DA
+  Files: bank_02_documented.asm
+
+CODE_029B02 -> ExecuteEntityCoordinateProcessing
+  References: 1
+  Comment: Execute entity coordinate processing
+  Files: bank_02_documented.asm
+
+CODE_029B24 -> BranchSimpleProcessingIfLess
+  References: 1
+  Comment: Branch to simple processing if less
+  Files: bank_02_documented.asm
+
+CODE_029B28 -> ExecuteStandardLevelProcessing
+  References: 1
+  Comment: Execute standard level processing
+  Files: bank_02_documented.asm
+
+CODE_029B34 -> ExecuteHealthBasedProcessing
+  References: 4
+  Comment: Execute health-based processing
+  Files: bank_02_documented.asm
+
+CODE_029BC4 -> BranchProcessingFinalization
+  References: 1
+  Comment: Branch to processing finalization
+  Files: bank_02_documented.asm
+
+CODE_029BE1 -> Sub_029BE1
+  References: 1
+  Comment: 029C27|20E19B  |029BE1
+  Files: bank_02_documented.asm
+
+CODE_029BED -> FinalizeEntityState
+  References: 4
+  Comment: Finalize entity state
+  Files: bank_02_documented.asm
+
+CODE_029CCA -> JumpBattleCompletionHandler
+  References: 2
+  Comment: Jump to battle completion handler
+  Files: bank_02_documented.asm
+
+CODE_029E1A -> JumpStandardEntityProcessing
+  References: 1
+  Comment: Jump to standard entity processing
+  Files: bank_02_documented.asm
+
+CODE_029E79 -> JumpSpecializedModeHandler
+  References: 1
+  Comment: Jump to specialized mode $30 handler
+  Files: bank_02_documented.asm
+
+CODE_029F10 -> JumpMainCompletionHandler
+  References: 1
+  Comment: Jump to main completion handler
+  Files: bank_02_documented.asm
+
+CODE_02A0C8 -> Sub_02A0C8
+  References: 1
+  Comment: 029584|20C8A0  |02A0C8
+  Files: bank_02_documented.asm
+
+CODE_02A0E1 -> ExecuteAdvancedEntityProcessing
+  References: 2
+  Comment: Execute advanced entity processing
+  Files: bank_02_documented.asm
+
+CODE_02A22B -> ExecuteCoordinationFunction
+  References: 2
+  Comment: Execute coordination function 1
+  Files: bank_02_documented.asm
+
+CODE_02A28C -> AdditionalProcessing
+  References: 1
+  Comment: 02843C|208CA2  |02A28C; Additional processing
+  Files: bank_02_documented.asm
+
+CODE_02A430 -> D007BranchIfShouldersPressed
+  References: 1
+  Comment: 02A427|D007    |02A430; Branch if shoulders pressed
+  Files: bank_02_documented.asm
+
+CODE_02A441 -> F01eSkipIfNoController
+  References: 1
+  Comment: 02A421|F01E    |02A441; Skip if no controller
+  Files: bank_02_documented.asm
+
+CODE_02A497 -> JumpResponseHandler
+  References: 1
+  Comment: 02A97C|4C97A4  |02A497; Jump to response handler
+  Files: bank_02_documented.asm
+
+CODE_02A647 -> ExecuteComplexCalc
+  References: 1
+  Comment: 02842F|2047A6  |02A647; Execute complex calc
+  Files: bank_02_documented.asm
+
+CODE_02A770 -> F006BranchIfMatch
+  References: 1
+  Comment: 02A768|F006    |02A770; Branch if match
+  Files: bank_02_documented.asm
+
+CODE_02A78A -> F026BranchIfNoDirection
+  References: 1
+  Comment: 02A762|F026    |02A78A; Branch if no direction
+  Files: bank_02_documented.asm
+
+CODE_02A85E -> JumpCompletion
+  References: 1
+  Comment: 02A747|4C5EA8  |02A85E; Jump to completion
+  Files: bank_02_documented.asm
+
+CODE_02A881 -> JumpStandardHandler
+  References: 2
+  Comment: 02A67F|4C81A8  |02A881; Jump to standard handler
+  Files: bank_02_documented.asm
+
+CODE_02A8C6 -> JumpCompletionHandler
+  References: 1
+  Comment: 02A6C4|4CC6A8  |02A8C6; Jump to completion handler
+  Files: bank_02_documented.asm
+
+CODE_02A9A1 -> JumpAdvancedHandler
+  References: 1
+  Comment: 02A651|4CA1A9  |02A9A1; Jump to advanced handler
+  Files: bank_02_documented.asm
+
+CODE_02AE61 -> GraphicsStateHandler
+  References: 1
+  Comment: 02ACB7|        |02AE61; Graphics state 0 handler
+  Files: bank_02_documented.asm
+
+CODE_02AEB3 -> GraphicsStateHandler2
+  References: 1
+  Comment: 02ACB9|        |02AEB3; Graphics state 1 handler
+  Files: bank_02_documented.asm
+
+CODE_02AEDF -> GraphicsStateHandler3
+  References: 1
+  Comment: 02ACBB|        |02AEDF; Graphics state 2 handler
+  Files: bank_02_documented.asm
+
+CODE_02AF08 -> GraphicsStateHandler4
+  References: 1
+  Comment: 02ACBD|        |02AF08; Graphics state 3 handler
+  Files: bank_02_documented.asm
+
+CODE_02AFA2 -> GraphicsStateHandler5
+  References: 1
+  Comment: 02ACBF|        |02AFA2; Graphics state 4 handler
+  Files: bank_02_documented.asm
+
+CODE_02D132 -> ExternalCoordination
+  References: 1
+  Comment: 028163|2232D102|02D132; External coordination
+  Files: bank_02_documented.asm
+
+CODE_02D149 -> SystemValidation
+  References: 3
+  Comment: 028070|2249D102|02D149; Call external validation routine
+  Files: bank_02_documented.asm
+
+CODE_02D4F7 -> CallStateProcessor
+  References: 1
+  Comment: 02D3C9|20F7D4  |02D4F7; Call state processor
+  Files: bank_02_documented.asm
+
+CODE_02D5BB -> CallGraphicsSetup
+  References: 1
+  Comment: 02D50D|20BBD5  |02D5BB; Call graphics setup
+  Files: bank_02_documented.asm
+
+CODE_02D673 -> Sub_02D673
+  References: 1
+  Comment: 02D2DE|8273FF  |02D673
+  Files: bank_02_documented.asm
+
+CODE_02D6D0 -> CallCalculationEngine
+  References: 2
+  Comment: 02D512|20D0D6  |02D6D0; Call calculation engine
+  Files: bank_02_documented.asm
+
+CODE_02D784 -> ProcessStateChange
+  References: 2
+  Comment: 02D3B0|2084D7  |02D784; Process state change
+  Files: bank_02_documented.asm
+
+CODE_02DA18 -> CallProcessingRoutine
+  References: 1
+  Comment: 02D259|2018DA  |02DA18; Call processing routine
+  Files: bank_02_documented.asm
+
+CODE_02DA98 -> ExecuteCrossBankSystemIntegration
+  References: 1
+  Comment: Execute cross-bank system integration
+  Files: bank_02_documented.asm
+
+CODE_02DB88 -> F03aBranchIfNoSprites
+  References: 1
+  Comment: 02DB4C|F03A    |02DB88; Branch if no sprites
+  Files: bank_02_documented.asm
+
+CODE_02DB93 -> FbContinueLoop
+  References: 1
+  Comment: 02DB96|10FB    |02DB93; Continue loop
+  Files: bank_02_documented.asm
+
+CODE_02DCDD -> CallSpriteRenderer
+  References: 1
+  Comment: 02DBB8|20DDDC  |02DCDD; Call sprite renderer
+  Files: bank_02_documented.asm
+
+CODE_02DCF8 -> D0f3ContinueLoop
+  References: 1
+  Comment: 02DD03|D0F3    |02DCF8; Continue loop
+  Files: bank_02_documented.asm
+
+CODE_02DD09 -> D0e9ContinueXLoop
+  References: 2
+  Comment: 02DD1E|D0E9    |02DD09; Continue X loop
+  Files: bank_02_documented.asm
+
+CODE_02DD30 -> AnalysisCallsAlternateSpriteRendererCode
+  References: 2
+  Comment: Analysis: Calls alternate sprite renderer CODE_02DD30
+  Files: bank_02_documented.asm
+
+CODE_02DF3E -> CallSpriteInitializer2
+  References: 1
+  Comment: 02DCE0|203EDF  |02DF3E; Call sprite initializer
+  Files: bank_02_documented.asm
+
+CODE_02DFCD -> CallMemoryClearingRoutine
+  References: 1
+  Comment: 02DAA8|20CDDF  |02DFCD; Call memory clearing routine
+  Files: bank_02_documented.asm
+
+CODE_02DFE8 -> CallSpriteLoader
+  References: 1
+  Comment: 02DCE3|20E8DF  |02DFE8; Call sprite loader
+  Files: bank_02_documented.asm
+
+CODE_02E021 -> CallSpriteCoordinator
+  References: 1
+  Comment: 02DCE6|2021E0  |02E021; Call sprite coordinator
+  Files: bank_02_documented.asm
+
+CODE_02E056 -> CallGraphicsProcessor
+  References: 2
+  Comment: 02E03F|2056E0  |02E056; Call graphics processor
+  Files: bank_02_documented.asm
+
+CODE_02E095 -> CallSpriteFinalizer
+  References: 1
+  Comment: 02DD2B|2095E0  |02E095; Call sprite finalizer
+  Files: bank_02_documented.asm
+
+CODE_02E0DB -> CallDisplayCoordinator
+  References: 1
+  Comment: 02DB8B|20DBE0  |02E0DB; Call display coordinator
+  Files: bank_02_documented.asm
+
+CODE_02E1C3 -> CallMemorySetup
+  References: 2
+  Comment: 02D382|22C3E102|02E1C3; Call memory setup
+  Files: bank_02_documented.asm
+
+CODE_02E48C -> CallSpriteProcessor
+  References: 1
+  Comment: 02DCFA|228CE402|02E48C; Call sprite processor
+  Files: bank_02_documented.asm
+
+CODE_02E4EB -> CallSpriteRenderer2
+  References: 1
+  Comment: 02DD17|22EBE402|02E4EB; Call sprite renderer
+  Files: bank_02_documented.asm
+
+CODE_02E523 -> CallGraphicsCalculationRoutine
+  References: 1
+  Comment: 02E4FF|2023E5  |02E523;  Call graphics calculation routine
+  Files: bank_02_documented.asm
+
+CODE_02E536 -> ProcessGraphicsData
+  References: 1
+  Comment: 02E51B|2036E5  |02E536;  Process graphics data
+  Files: bank_02_documented.asm
+
+CODE_02E591 -> D00aBranchIfNot
+  References: 1
+  Comment: 02E585|D00A    |02E591;  Branch if not 2
+  Files: bank_02_documented.asm
+
+CODE_02E598 -> F015BranchIfComplete
+  References: 1
+  Comment: 02E581|F015    |02E598;  Branch if complete
+  Files: bank_02_documented.asm
+
+CODE_02E5AC -> Sub_02E5AC
+  References: 1
+  Comment: 00D0D4|22ACE502|02E5AC;
+  Files: banks\bank_00.asm
+
+CODE_02E60F -> CallSystemInitialization
+  References: 1
+  Comment: 02E5C5|200FE6  |02E60F;  Call system initialization
+  Files: bank_02_documented.asm
+
+CODE_02E87D -> BranchIfExecutionTimeNormal
+  References: 1
+  Comment: 02E879|9002    |02E87D;  Branch if execution time normal
+  Files: bank_02_documented.asm
+
+CODE_02EABB -> F3
+  References: 1
+  Comment: 02EAC8|80F3    |02EABB
+  Files: bank_02_documented.asm
+
+CODE_02EBEB -> ExecuteThreadProcessingStep
+  References: 1
+  Comment: 02EBB1|20EBEB  |02EBEB;  Execute thread processing step
+  Files: bank_02_documented.asm
+
+CODE_02ED05 -> ExternalCoordination2
+  References: 1
+  Comment: 028522|2205ED02|02ED05; External coordination
+  Files: bank_02_documented.asm
+
+CODE_02F0C0 -> InitializeGraphicsProcessing
+  References: 1
+  Comment: 02EEF4|20C0F0  |02F0C0;  Initialize graphics processing
+  Files: bank_02_documented.asm
+
+CODE_02F483 -> CallLocalAnimationUpdateRoutine
+  References: 1
+  Comment: 02FDB9|2083F4  |02F483; Call local animation update routine
+  Files: bank_02_documented.asm
+
+CODE_02FE0F -> CallGraphicsCommandProcessor
+  References: 2
+  Comment: 02AAFE|200FFE  |02FE0F; Call graphics processor
+  Files: bank_02_documented.asm
+
+CODE_02FE38 -> CallBufferProcessor
+  References: 2
+  Comment: 02ABBA|2038FE  |02FE38; Call buffer processor
+  Files: bank_02_documented.asm
+
+CODE_02FEAB -> CallSpriteCleanupRoutine
+  References: 1
+  Comment: 02F697|20ABFE  |02FEAB;  Call sprite cleanup routine
+  Files: bank_02_documented.asm
+
+CODE_0B8000 -> CodeGraphicsSetupBasedBattleType
+  References: 5
+  Comment: - CODE_0B8000: Graphics setup based on battle type
+  Files: bank_0B_documented.asm, banks\bank_01.asm
+
+CODE_0B8039 -> AllTypesShareCommonSetupCode
+  References: 1
+  Comment: All types share common setup at CODE_0B8039:
+  Files: bank_0B_documented.asm
+
+CODE_0B803F -> CodeSpriteAnimationHandler
+  References: 1
+  Comment: - CODE_0B803F: Sprite animation handler
+  Files: bank_0B_documented.asm
+
+CODE_0B8077 -> CodeOamDataUpdateRoutine
+  References: 3
+  Comment: - CODE_0B8077: OAM data update routine
+  Files: bank_0B_documented.asm
+
+CODE_0B80A1 -> BranchIfInvalid
+  References: 3
+  Comment: 0B8052	; Branch if invalid
+  Files: bank_0B_documented.asm
+
+CODE_0B80D9 -> CallAnimationUpdate
+  References: 6
+  Comment: 0B8049	; Call animation update
+  Files: bank_0B_documented.asm
+
+CODE_0B8121 -> ExecuteLongGraphicsCall
+  References: 3
+  Comment: Execute long graphics call
+  Files: banks\bank_01.asm, bank_01_documented.asm
+
+CODE_0B8149 -> CodeBattleInitializationRoutine
+  References: 3
+  Comment: CODE_0B8149: Battle Initialization Routine
+  Files: bank_0B_documented.asm, banks\bank_01.asm
+
+CODE_0B81BC -> LoopUntilBytesCopied
+  References: 1
+  Comment: Loop until 7 bytes copied
+  Files: bank_0B_documented.asm
+
+CODE_0B8223 -> CodeBackgroundLayerInitializationMultiTable
+  References: 3
+  Comment: 8. CODE_0B8223: Background layer initialization (multi-table configuration)
+  Files: bank_0B_documented.asm, banks\bank_01.asm
+
+CODE_0B82AA -> B
+  References: 2
+  Comment: 0191C0|22AA820B|0B82AA;
+  Files: banks\bank_01.asm
+
+CODE_0B82CB -> CodeBattleStateFlagConfiguration
+  References: 1
+  Comment: 1. CODE_0B82CB: Battle state flag configuration
+  Files: bank_0B_documented.asm
+
+CODE_0B8338 -> CodeBattleMapTileLookupAnimation
+  References: 2
+  Comment: CODE_0B8338: Battle Map Tile Lookup and Animation Frame Calculation
+  Files: bank_0B_documented.asm
+
+CODE_0B836A -> CodeEnemyGraphicsDecompressionMvnBlock
+  References: 2
+  Comment: 3. CODE_0B836A: Enemy graphics decompression (MVN block transfers)
+  Files: bank_0B_documented.asm, banks\bank_01.asm
+
+CODE_0B8378 -> LoopNextBlock
+  References: 1
+  Comment: Loop for next block
+  Files: bank_0B_documented.asm
+
+CODE_0B83B8 -> CodeEnemyGraphicsDataTransfer
+  References: 3
+  Comment: CODE_0B83B8: Enemy Graphics Data Transfer
+  Files: bank_0B_documented.asm, banks\bank_01.asm
+
+CODE_0B83F2 -> CodeBackgroundTileTransferBytes
+  References: 2
+  Comment: 5. CODE_0B83F2: Background tile transfer (3×16 bytes)
+  Files: bank_0B_documented.asm, banks\bank_01.asm
+
+CODE_0B841D -> CodePpuRegisterConfigurationBattleGraphics
+  References: 4
+  Comment: CODE_0B841D: PPU Register Configuration for Battle Graphics
+  Files: bank_0B_documented.asm, banks\bank_01.asm
+
+CODE_0B84FB -> CodeEnemyTileDataSetup
+  References: 4
+  Comment: CODE_0B84FB: Enemy Tile Data Setup
+  Files: bank_0B_documented.asm, banks\bank_01.asm
+
+CODE_0B8560 -> CodeBackgroundLayerTypeDispatcher
+  References: 3
+  Comment: CODE_0B8560: Background Layer Type Dispatcher
+  Files: bank_0B_documented.asm, banks\bank_01.asm
+
+CODE_0B85A9 -> SkipIfLoaded
+  References: 2
+  Comment: Skip if loaded
+  Files: bank_0B_documented.asm
+
+CODE_0B85BE -> SkipSpecialSetupIfPositive
+  References: 1
+  Comment: Skip special setup if positive
+  Files: bank_0B_documented.asm
+
+CODE_0B8669 -> CodeGraphicsDataDecompressionRleStyle
+  References: 3
+  Comment: CODE_0B8669: Graphics Data Decompression (RLE-style)
+  Files: bank_0B_documented.asm
+
+CODE_0B86EA -> CodeWramGraphicsUploadViaPpu
+  References: 2
+  Comment: CODE_0B86EA: WRAM Graphics Upload via PPU Registers
+  Files: bank_0B_documented.asm
+
+CODE_0B87B9 -> LoadEnemyStatsBankB
+  References: 6
+  Comment: Load enemy stats from Bank $0b
+  Files: bank_0B_documented.asm, banks\bank_01.asm, bank_01_documented.asm
+
+CODE_0B8E91 -> CodeBattleAnimationStateHandler
+  References: 4
+  Comment: CODE_0B8E91: Battle Animation State Handler
+  Files: banks\bank_02.backup_20251102_205802.asm, bank_0B_documented.asm, banks\bank_02.asm
+
+CODE_0B927F -> CoverageCodeThroughMassiveDataTables
+  References: 1
+  Comment: Coverage: CODE_0B927F through massive data tables at 0BA2F5
+  Files: bank_0B_documented.asm
+
+CODE_0C8000 -> CWaitTimingRoutine
+  References: 107
+  Comment: 02DA37|2200800C|0C8000; Wait timing routine
+  Files: ffmq_full_disassembly.asm, banks\bank_01.asm, bank_02_documented.asm, bank_0C_documented.asm, banks\bank_02.asm ... and 2 more
+
+CODE_0C8013 -> ExecuteSequenceProcessing
+  References: 3
+  Comment: Execute sequence processing
+  Files: banks\bank_01.asm, bank_01_documented.asm, bank_0C_documented.asm
+
+CODE_0C8080 -> CodeScreenInitialization
+  References: 3
+  Comment: - CODE_0C8080: Screen initialization
+  Files: ffmq_full_disassembly.asm, banks\bank_00.asm, bank_0C_documented.asm
+
+CODE_0C8103 -> CallMainScreenInit
+  References: 2
+  Comment: 0C80EB	; Call main screen init
+  Files: bank_0C_documented.asm
+
+CODE_0C8142 -> CodeWindowEffectConfiguration
+  References: 1
+  Comment: CODE_0C8142 - Window Effect Configuration
+  Files: bank_0C_documented.asm
+
+CODE_0C8157 -> CodeVramAddressCalculationRoutine
+  References: 1
+  Comment: CODE_0C8157 - VRAM Address Calculation Routine
+  Files: bank_0C_documented.asm
+
+CODE_0C81A5 -> CodeVramPatternFillRoutine
+  References: 1
+  Comment: CODE_0C81A5 - VRAM Pattern Fill Routine
+  Files: bank_0C_documented.asm
+
+CODE_0C81C6 -> CodeColorMathDisableRoutine
+  References: 1
+  Comment: CODE_0C81C6 - Color Math Disable Routine
+  Files: bank_0C_documented.asm
+
+CODE_0C81CB -> CodeColorAdditionEffectSetup
+  References: 1
+  Comment: CODE_0C81CB - Color Addition Effect Setup
+  Files: bank_0C_documented.asm
+
+CODE_0C81DA -> CodePaletteDmaSetupRoutine
+  References: 1
+  Comment: CODE_0C81DA - Palette DMA Setup Routine
+  Files: bank_0C_documented.asm
+
+CODE_0C8224 -> CodeSinglePaletteDmaTransferBytes
+  References: 1
+  Comment: CODE_0C8224 - Single Palette DMA Transfer (16 bytes)
+  Files: bank_0C_documented.asm
+
+CODE_0C8241 -> CodeOamSpriteInitializationRoutine
+  References: 1
+  Comment: CODE_0C8241 - OAM/Sprite Initialization Routine
+  Files: bank_0C_documented.asm
+
+CODE_0C825A -> CodeVisualEffectScriptInterpreter
+  References: 7
+  Comment: CODE_0C825A - Visual Effect Script Interpreter
+  Files: bank_0C_documented.asm
+
+CODE_0C82CF -> BranchHighRangeHandler
+  References: 1
+  Comment: 0C82B9	; Branch to high-range handler
+  Files: bank_0C_documented.asm
+
+CODE_0C82F7 -> BranchMidRangeHandler
+  References: 1
+  Comment: 0C82B5	; Branch to mid-range handler
+  Files: bank_0C_documented.asm
+
+CODE_0C8302 -> BranchLowRangeHandler
+  References: 1
+  Comment: 0C82B1	; Branch to low-range handler
+  Files: bank_0C_documented.asm
+
+CODE_0C8377 -> BranchIfNotEqual
+  References: 1
+  Comment: 0C836F	; Branch if not equal
+  Files: bank_0C_documented.asm
+
+CODE_0C837D -> BranchIfNot
+  References: 1
+  Comment: 0C8304	; Branch if not $08
+  Files: bank_0C_documented.asm
+
+CODE_0C83B1 -> CodeFlashEffectSubroutine
+  References: 1
+  Comment: CODE_0C83B1 - Flash Effect Subroutine
+  Files: bank_0C_documented.asm
+
+CODE_0C83CB -> ExecuteTableEntry
+  References: 5
+  Comment: 0C82CA	; Execute table entry
+  Files: bank_0C_documented.asm
+
+CODE_0C8421 -> JumpSpecialEffectHandler
+  References: 2
+  Comment: 0C82A3	; Jump to special effect handler
+  Files: bank_0C_documented.asm
+
+CODE_0C8460 -> JumpPaletteLoader
+  References: 2
+  Comment: 0C82A0	; Jump to palette loader
+  Files: bank_0C_documented.asm
+
+CODE_0C849E -> ExecuteFadeStage
+  References: 3
+  Comment: 0C847F	; Execute fade stage 4
+  Files: bank_0C_documented.asm
+
+CODE_0C8575 -> ApplyScreen
+  References: 2
+  Comment: 0C8567	; Apply to screen
+  Files: bank_0C_documented.asm
+
+CODE_0C85DB -> WaitOneFrame
+  References: 17
+  Comment: 0C8278	; Wait one frame
+  Files: bank_0C_documented.asm
+
+CODE_0C8767 -> GraphicsStateFinalize
+  References: 1
+  Comment: 0C813B	; Graphics state finalize
+  Files: bank_0C_documented.asm
+
+CODE_0C87E9 -> FinalizeGraphicsState
+  References: 1
+  Comment: 0C8127	; Finalize graphics state
+  Files: bank_0C_documented.asm
+
+CODE_0C87ED -> ModeMatrixSetup
+  References: 1
+  Comment: 0C811B	; Mode 7 matrix setup
+  Files: bank_0C_documented.asm
+
+CODE_0C8872 -> BackgroundScrollingSetup
+  References: 1
+  Comment: 0C8124	; Background scrolling setup
+  Files: bank_0C_documented.asm
+
+CODE_0C88BE -> AdditionalGraphicsInit
+  References: 1
+  Comment: 0C8121	; Additional graphics init
+  Files: bank_0C_documented.asm
+
+CODE_0C88EB -> DrawTilePatternGrid
+  References: 1
+  Comment: 0C8887	; Draw tile pattern (3×3 grid)
+  Files: bank_0C_documented.asm
+
+CODE_0C8910 -> JumpWindowApplyRoutine
+  References: 5
+  Comment: 0C8154	; Jump to window apply routine
+  Files: bank_0C_documented.asm
+
+CODE_0C8948 -> PerformOamDmaTransfer
+  References: 1
+  Comment: 0C8DB0	; Perform OAM DMA transfer
+  Files: bank_0C_documented.asm
+
+CODE_0C896F -> BackgroundLayerSetup
+  References: 1
+  Comment: 0C80CD	; Background layer setup
+  Files: bank_0C_documented.asm
+
+CODE_0C8A3F -> UpdateSpriteCoordinates
+  References: 3
+  Comment: 0C89B3	; Update sprite coordinates
+  Files: bank_0C_documented.asm
+
+CODE_0C8A76 -> UpdateModeMatrix
+  References: 3
+  Comment: 0C89A2	; Update Mode 7 matrix
+  Files: bank_0C_documented.asm
+
+CODE_0C8A78 -> UpdateModeMatrixMultiply
+  References: 1
+  Comment: 0C8987	; Update Mode 7 matrix ($4202 multiply)
+  Files: bank_0C_documented.asm
+
+CODE_0C8B3C -> UpdateVerticalSpritePositions
+  References: 2
+  Comment: 0C8B26	; Update vertical sprite positions
+  Files: bank_0C_documented.asm
+
+CODE_0C8BAD -> GraphicsStateUpdate
+  References: 1
+  Comment: 0C80CA	; Graphics state update
+  Files: bank_0C_documented.asm
+
+CODE_0C8C37 -> UsedCodeEfficientlyFillVramTilemaps
+  References: 1
+  Comment: Used by CODE_0C8C37 to efficiently fill VRAM tilemaps.
+  Files: bank_0C_documented.asm
+
+CODE_0C8D7B -> CallGraphicsSetupRoutine
+  References: 1
+  Comment: 0C80B4	; Call graphics setup routine
+  Files: bank_0C_documented.asm
+
+CODE_0C8EA8 -> AdditionalTextLogoSetup
+  References: 2
+  Comment: 0C8E8F	; Additional text/logo setup
+  Files: bank_0C_documented.asm
+
+CODE_0C8F98 -> TransferPaletteViaDma
+  References: 4
+  Comment: 0C8D8F	; Transfer palette via DMA
+  Files: bank_0C_documented.asm
+
+CODE_0CA458 -> ExecuteSequence
+  References: 4
+  Comment: 0CA3CB|2058A4  |0CA458; Execute sequence
+  Files: bank_0C_documented.asm
+
+CODE_0D8249 -> ContinueTrackDataTransferCode
+  References: 1
+  Comment: Continue: Track Data Transfer (from CODE_0D8249)
+  Files: bank_0D_documented.asm
+
+CODE_0D84E6 -> D003IfHasPatterns
+  References: 1
+  Comment: 0D84E1|D003    |0D84E6; If has patterns
+  Files: bank_0D_documented.asm
+
+CODE_0D85BA -> JumpSystemHandler
+  References: 1
+  Comment: 0D8172|4CBA85  |0D85BA; Jump to system handler
+  Files: bank_0D_documented.asm
+
+CODE_0D85FA -> TransferDataRoutine
+  References: 3
+  Comment: 0D8246|20FA85  |0D85FA; Transfer data routine
+  Files: bank_0D_documented.asm
+
+CODE_0D860E -> Sub_0D860E
+  References: 1
+  Comment: 0D8175|4C0E86  |0D860E
+  Files: bank_0D_documented.asm
+
+CODE_0D8625 -> CallHelperRoutine
+  References: 1
+  Comment: 0D81ED|202586  |0D8625; Call helper routine
+  Files: bank_0D_documented.asm
+
+CODE_0D9B5C -> CodeAudioCommandProcessingRoutine
+  References: 1
+  Comment: CODE_0D9B5C - Audio Command Processing Routine
+  Files: bank_0D_documented.asm
+

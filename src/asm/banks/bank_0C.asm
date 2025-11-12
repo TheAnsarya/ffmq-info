@@ -52,7 +52,7 @@ LoadScriptParameter:
 	stx.B $17                            ;0C805F|8617    |000017;
 	lda.B #$03                           ;0C8061|A903    |      ;
 	sta.B $19                            ;0C8063|8519    |000019;
-	jsl.L CODE_009D6B                    ;0C8065|226B9D00|009D6B;
+	jsl.L CallDisplayRoutine                    ;0C8065|226B9D00|009D6B;
 	rep #$30                             ;0C8069|C230    |      ;
 	lda.B $15                            ;0C806B|A515    |000015;
 	plx                                  ;0C806D|FA      |      ;
@@ -63,7 +63,7 @@ LoadScriptParameter:
 ;      |        |      ;
 CheckScriptExecution:
 	beq Script_Return                      ;0C8071|F00C    |0C807F;
-	jsl.L CODE_009776                    ;0C8073|22769700|009776;
+	jsl.L ExecuteSpecialBitProcessing                    ;0C8073|22769700|009776;
 	beq Script_ReturnSuccess                      ;0C8077|F004    |0C807D;
 	lda.B #$02                           ;0C8079|A902    |      ;
 	bra Script_Return                      ;0C807B|8002    |0C807F;
@@ -77,7 +77,7 @@ Script_Return:
 ;      |        |      ;
 ;      |        |      ;
 InitWorldMapDisplay:
-	jsl.L CODE_00825C                    ;0C8080|225C8200|00825C;
+	jsl.L CallInitializationHelper                    ;0C8080|225C8200|00825C;
 	lda.W #$0000                         ;0C8084|A90000  |      ;
 	sta.L $7e3665                        ;0C8087|8F65367E|7E3665;
 	lda.W #$2100                         ;0C808B|A90021  |      ;
@@ -105,7 +105,7 @@ InitWorldMapDisplay:
 	lda.B #$0f                           ;0C80BE|A90F    |      ;
 	sta.W $00aa                          ;0C80C0|8DAA00  |0C00AA;
 	stz.W $0110                          ;0C80C3|9C1001  |0C0110;
-	jsl.L CODE_00C795                    ;0C80C6|2295C700|00C795;
+	jsl.L CallMainGameLoopHandler                    ;0C80C6|2295C700|00C795;
 	jsr.W InitializeWorldData                    ;0C80CA|20AD8B  |0C8BAD;
 	jsr.W ClearVRAMRegion                    ;0C80CD|206F89  |0C896F;
 	jsl.L WaitForVBlank                    ;0C80D0|2200800C|0C8000;
@@ -124,7 +124,7 @@ InitWorldMapDisplay:
 	rep #$30                             ;0C80EE|C230    |      ;
 	lda.W #$0001                         ;0C80F0|A90100  |      ;
 	sta.L $7e3665                        ;0C80F3|8F65367E|7E3665;
-	jsl.L CODE_00C7B8                    ;0C80F7|22B8C700|00C7B8;
+	jsl.L GameStateHandler                    ;0C80F7|22B8C700|00C7B8;
 	sei                                  ;0C80FB|78      |      ;
 	lda.W #$0008                         ;0C80FC|A90800  |      ;
 	trb.W $00d2                          ;0C80FF|1CD200  |0C00D2;
@@ -885,7 +885,7 @@ SetupMode7Registers:
 	ldx.W #$4000                         ;0C87F3|A20040  |      ;
 	ldy.W #$001e                         ;0C87F6|A01E00  |      ;
 	lda.W #$00c0                         ;0C87F9|A9C000  |      ;
-	jsl.L CODE_009994                    ;0C87FC|22949900|009994;
+	jsl.L CallTilemapFillRoutine                    ;0C87FC|22949900|009994;
 	plb                                  ;0C8800|AB      |      ;
 	sep #$20                             ;0C8801|E220    |      ;
 	stz.W $4204                          ;0C8803|9C0442  |0C4204;
@@ -897,7 +897,7 @@ Mode7_CalculateMatrix:
 	asl a;0C880D|0A      |      ;
 	sta.W $4205                          ;0C880E|8D0542  |0C4205;
 	lda.B #$20                           ;0C8811|A920    |      ;
-	jsl.L CODE_009726                    ;0C8813|22269700|009726;
+	jsl.L ExecuteHardwareDivision                    ;0C8813|22269700|009726;
 	rep #$30                             ;0C8817|C230    |      ;
 	lda.W $4214                          ;0C8819|AD1442  |0C4214;
 	sta.L $7f0010,x                      ;0C881C|9F10007F|7F0010;
@@ -1278,13 +1278,13 @@ VRAM_WriteData:
 	lda.W $0000,x                        ;0C8ACF|BD0000  |0C0000;
 ;      |        |      ;
 VRAM_SetupWrite:
-	jsl.L CODE_00971E                    ;0C8AD2|221E9700|00971E;
+	jsl.L CallMultiplicationRoutine                    ;0C8AD2|221E9700|00971E;
 	ldy.W $4216                          ;0C8AD6|AC1642  |0C4216;
 	sty.W $4204                          ;0C8AD9|8C0442  |0C4204;
 ;      |        |      ;
 VRAM_IncrementPointer:
 	lda.B #$30                           ;0C8ADC|A930    |      ;
-	jsl.L CODE_009726                    ;0C8ADE|22269700|009726;
+	jsl.L ExecuteHardwareDivision                    ;0C8ADE|22269700|009726;
 	ldy.W $4214                          ;0C8AE2|AC1442  |0C4214;
 	rts                                  ;0C8AE5|60      |      ;
 ;      |        |      ;
@@ -1955,7 +1955,7 @@ Mode7Matrix_ApplyRotation:
 	ldx.W #$0000                         ;0C9161|A20000  |      ;
 	ldy.W #$2000                         ;0C9164|A00020  |      ;
 	lda.W #$2000                         ;0C9167|A90020  |      ;
-	jsl.L CODE_009994                    ;0C916A|22949900|009994;
+	jsl.L CallTilemapFillRoutine                    ;0C916A|22949900|009994;
 	jsr.W Mode7Matrix_SetRegister3                    ;0C916E|20AF91  |0C91AF;
 	jsr.W Mode7Matrix_SetRegister0                    ;0C9171|209791  |0C9197;
 	jsr.W RotateTileData                    ;0C9174|204792  |0C9247;

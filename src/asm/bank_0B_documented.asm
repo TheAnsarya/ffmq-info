@@ -14,9 +14,9 @@
 ; - DMA transfer routines for graphics
 ;
 ; Key Routines:
-; - CODE_0B8000: Graphics setup based on battle type
-; - CODE_0B803F: Sprite animation handler
-; - CODE_0B8077: OAM data update routine
+; - CodeGraphicsSetupBasedBattleType: Graphics setup based on battle type
+; - CodeSpriteAnimationHandler: Sprite animation handler
+; - CodeOamDataUpdateRoutine: OAM data update routine
 ;
 ; Related Files:
 ; - Bank $09/$0a: Graphics data used by these routines
@@ -92,10 +92,10 @@ BattleSprite_AnimationHandler:
 	rep #$10		;0B8045	; 16-bit index
 	phk ;0B8047	; Push program bank
 	plb ;0B8048	; Pull to data bank
-	jsr.w CODE_0B80D9 ;0B8049	; Call animation update
+	jsr.w CallAnimationUpdate ;0B8049	; Call animation update
 	ldx.w $192b	 ;0B804C	; Load sprite index
 	cpx.w #$ffff	;0B804F	; Check for invalid
-	beq CODE_0B80A1 ;0B8052	; Branch if invalid
+	beq BranchIfInvalid ;0B8052	; Branch if invalid
 	lda.w $1a80,x   ;0B8054	; Load sprite flags
 	and.b #$cf	  ;0B8057	; Mask off animation bits
 	ora.b #$10	  ;0B8059	; Set animation active flag
@@ -111,7 +111,7 @@ BattleSprite_AnimationHandler:
 	adc.w #$0008	;0B806E	; Add offset
 	tay ;0B8071	; Transfer to Y
 	plx ;0B8072	; Restore sprite index
-	jsl.l CODE_01AE86 ;0B8073	; Call animation loader
+	jsl.l CallAnimationLoader ;0B8073	; Call animation loader
 
 ; ==============================================================================
 ; OAM Data Update Routine
@@ -149,7 +149,7 @@ BattleSprite_AnimationExit:
 ; ==============================================================================
 ; [Additional Battle Graphics Routines]
 ; ==============================================================================
-; The remaining code (CODE_0B80D9 onwards) includes:
+; The remaining code (CallAnimationUpdate onwards) includes:
 ; - Animation frame updates
 ; - Effect rendering routines
 ; - DMA transfer management
@@ -189,7 +189,7 @@ BattleSprite_AnimationExit:
 ; =============================================================================
 
 ; -----------------------------------------------------------------------------
-; CODE_0B8000: Battle Graphics Setup Dispatcher
+; CodeGraphicsSetupBasedBattleType: Battle Graphics Setup Dispatcher
 ; -----------------------------------------------------------------------------
 ; Purpose: Initialize graphics pointers based on battle encounter type
 ; Input: $0e8b = Battle type index (0-3)
@@ -201,7 +201,7 @@ BattleSprite_AnimationExit:
 ;   Type 2 → Pointers: Bank $0a, Addr $1f5f
 ;   Type 3 → Pointers: Bank $0a, Addr $1b4a
 ;
-; All types share common setup at CODE_0B8039:
+; All types share common setup at AllTypesShareCommonSetupCode:
 ;   - Sets bank to $0a (Bank $0a contains graphics data)
 ;   - Returns to caller via rtl
 ;
@@ -262,12 +262,12 @@ BattleGfx_CommonSetup_1:	; Common bank setup
 ;   1. Save processor state (flags, data bank, X, Y)
 ;   2. Set CPU modes (SEP #$20 = 8-bit A, rep #$10 = 16-bit X/Y)
 ;   3. Set data bank to current bank (PHK/PLB)
-;   4. Call subroutine CODE_0B80D9 (animation state setup)
+;   4. Call subroutine CallAnimationUpdate (animation state setup)
 ;   5. Check sprite index at $192b
 ;   6. If valid sprite:
 ;      - Update sprite attributes in $1a80 range
 ;      - Load animation frame data from tables
-;      - Call CODE_01AE86 (sprite rendering routine in Bank $01)
+;      - Call CallAnimationLoader (sprite rendering routine in Bank $01)
 ;      - Update OAM data at $0c02+ (Object Attribute Memory mirror)
 ;   7. Restore processor state and return
 ;
@@ -291,10 +291,10 @@ BattleGfx_CommonSetup_1:	; Common bank setup
 	rep #$10		; Set X/Y to 16-bit mode
 	phk ; Push program bank (Bank $0b)
 	plb ; Pull to data bank (set DB = $0b)
-	jsr.w CODE_0B80D9 ; Call animation state setup
+	jsr.w CallAnimationUpdate ; Call animation state setup
 	ldx.w $192b	 ; Load sprite index
 	cpx.w #$ffff	; Check if valid sprite ($ffff = none)
-	beq CODE_0B80A1 ; Exit if no sprite to update
+	beq BranchIfInvalid ; Exit if no sprite to update
 
 ; Update sprite attributes
 	lda.w $1a80,x   ; Load sprite attribute byte
@@ -314,7 +314,7 @@ BattleGfx_CommonSetup_1:	; Common bank setup
 	adc.w #$0008	; Add offset for sprite data
 	tay ; Transfer to Y (parameter for next call)
 	plx ; Restore sprite index
-	jsl.l CODE_01AE86 ; Call sprite rendering (Bank $01)
+	jsl.l CallAnimationLoader ; Call sprite rendering (Bank $01)
 
 BattleSprite_UpdateOAM_1:	; OAM Data Update Routine
 	rep #$30		; Set A/X/Y to 16-bit mode
@@ -355,7 +355,7 @@ BattleSprite_AnimationExit_1:	; Exit routine
 ; This routine mirrors the animation handler but:
 ;   - Clears priority/palette bits instead of setting them
 ;   - Used for sprite fade-out or background layering
-;   - Shares same OAM update code at CODE_0B8077
+;   - Shares same OAM update code at CodeOamDataUpdateRoutine
 
 	php ; Push processor status
 	phb ; Push data bank
@@ -363,10 +363,10 @@ BattleSprite_AnimationExit_1:	; Exit routine
 	phy ; Push Y register
 	sep #$20		; Set A to 8-bit mode
 	rep #$10		; Set X/Y to 16-bit mode
-	jsr.w CODE_0B80D9 ; Call animation state setup
+	jsr.w CallAnimationUpdate ; Call animation state setup
 	ldx.w $192b	 ; Load sprite index
 	cpx.w #$ffff	; Check if valid sprite
-	beq CODE_0B80A1 ; Exit if no sprite
+	beq BranchIfInvalid ; Exit if no sprite
 
 ; Clear sprite attributes (no priority bit set)
 	lda.w $1a80,x   ; Load sprite attribute byte
@@ -384,22 +384,22 @@ BattleSprite_AnimationExit_1:	; Exit routine
 	lda.l DATA8_00fdca,x ; Load frame data pointer
 	tay ; Transfer to Y (no +$0008 offset)
 	plx ; Restore sprite index
-	jsl.l CODE_01AE86 ; Call sprite rendering
-	bra CODE_0B8077 ; Jump to OAM update (shared code)
+	jsl.l CallAnimationLoader ; Call sprite rendering
+	bra CodeOamDataUpdateRoutine ; Jump to OAM update (shared code)
 
 ; -----------------------------------------------------------------------------
 ; Animation State Setup Subroutine
 ; -----------------------------------------------------------------------------
 ; Purpose: Initialize animation state variables
 ; Sets up: $192c (animation counter), $192b (sprite index = 2)
-; Calls: CODE_018BD1 (animation frame calculator in Bank $01)
+; Calls: CallsCodeAnimationFrameCalculatorBank (animation frame calculator in Bank $01)
 
 BattleSprite_InitAnimationState:
 	lda.w $009e	 ; Load frame counter
 	sta.w $192c	 ; Store to animation counter
 	lda.b #$02	  ; Sprite index = 2
 	sta.w $192b	 ; Store sprite index
-	jsl.l CODE_018BD1 ; Call animation frame calculator (Bank $01)
+	jsl.l CallsCodeAnimationFrameCalculatorBank ; Call animation frame calculator (Bank $01)
 	rts ; Return to caller (short return)
 
 ; -----------------------------------------------------------------------------
@@ -519,7 +519,7 @@ Battle_GfxAddressHigh:
 	db $2f,$4f,$6f,$8f ; Phases 1-4: $2fXX, $4fXX, $6fXX, $8fXX
 
 ; -----------------------------------------------------------------------------
-; CODE_0B8149: Battle Initialization Routine
+; CodeBattleInitializationRoutine: Battle Initialization Routine
 ; -----------------------------------------------------------------------------
 ; Purpose: Initialize battle state variables and load enemy data
 ; Sets up:
@@ -557,7 +557,7 @@ BattleInit_SetupEncounter:
 
 ; Standard formation loading
 	lda.b #$f2	  ; Sound effect ID ($f2 = battle start fanfare)
-	jsl.l CODE_00976B ; Play sound effect (Bank $00)
+	jsl.l PlaySoundEffectBank ; Play sound effect (Bank $00)
 	stz.w $1a5b	 ; Clear sprite animation index
 	lda.w $0e88	 ; Load formation type
 	rep #$20		; Set A to 16-bit mode
@@ -568,7 +568,7 @@ BattleInit_SetupEncounter:
 	sta.w $0e89	 ; Store to formation pointer
 	sep #$20		; Set A to 8-bit mode
 	lda.b #$f3	  ; Sound effect ID ($f3 = battle music start)
-	jsl.l CODE_009776 ; Play sound effect (Bank $00)
+	jsl.l ExecuteSpecialBitProcessing ; Play sound effect (Bank $00)
 	bne BattleInit_LoadEnemyData ; Branch if... (condition unclear, likely error check)
 
 ; Clear sprite data buffers
@@ -610,7 +610,7 @@ BattleInit_CopyEnemyStats:	; Copy enemy data loop (7 bytes)
 	inx ; Increment source
 	iny ; Increment destination
 	cpy.w #$0007	; Copied 7 bytes?
-	bne CODE_0B81BC ; Loop until 7 bytes copied
+	bne LoopUntilBytesCopied ; Loop until 7 bytes copied
 
 ; Calculate enemy HP multiplier (?)
 	lda.b #$0a	  ; Multiplier = 10
@@ -777,14 +777,14 @@ DATA8_0b82a0:
 ; Documentation ratio: ~88% (code requires inline analysis)
 ;
 ; Key Routines Documented:
-; 1. CODE_0B8000: Battle graphics setup (4 battle types)
+; 1. CodeGraphicsSetupBasedBattleType: Battle graphics setup (4 battle types)
 ; 2. Sprite animation handler (OAM updates, frame data loading)
 ; 3. Sprite deactivation routine (priority clearing)
-; 4. CODE_0B80D9: Animation state setup
+; 4. CallAnimationUpdate: Animation state setup
 ; 5. Sprite data search (linear search, 22 slots)
 ; 6. Battle type graphics loader (dual-table lookup)
-; 7. CODE_0B8149: Battle initialization (formations, sound, sprite clearing)
-; 8. CODE_0B8223: Background layer initialization (multi-table configuration)
+; 7. CodeBattleInitializationRoutine: Battle initialization (formations, sound, sprite clearing)
+; 8. CodeBackgroundLayerInitializationMultiTable: Background layer initialization (multi-table configuration)
 ;
 ; Technical Discoveries:
 ; - Battle system uses 4 types with different graphics pointers
@@ -796,8 +796,8 @@ DATA8_0b82a0:
 ; - Cross-bank calls to Banks $00 (sound), $01 (sprites), $07 (data)
 ;
 ; Cross-Bank Integration:
-; - Bank $00: Sound effects (CODE_00976B, CODE_009776), frame data (DATA8_00FDCA)
-; - Bank $01: Sprite rendering (CODE_01AE86), OAM tables (DATA8_01A63A)
+; - Bank $00: Sound effects (PlaySoundEffectBank, ExecuteSpecialBitProcessing), frame data (DATA8_00FDCA)
+; - Bank $01: Sprite rendering (CallAnimationLoader), OAM tables (DATA8_01A63A)
 ; - Bank $07: Enemy data (DATA8_07AF3B, DATA8_07B013, UNREACH_07F7C3)
 ; - Bank $0a: Graphics tile data (referenced by pointers at $0505-$0507)
 ; - Bank $0b: Enemy graphics pointers (DATA8_0B8892), layer config (multiple tables)
@@ -912,7 +912,7 @@ DATA8_0b8324:
 	db $10,$c0,$0c,$02,$04,$02,$00,$00,$00,$00
 
 ; -----------------------------------------------------------------------------
-; CODE_0B8338: Battle Map Tile Lookup and Animation Frame Calculation
+; CodeBattleMapTileLookupAnimation: Battle Map Tile Lookup and Animation Frame Calculation
 ; -----------------------------------------------------------------------------
 ; Purpose: Complex tile lookup with hardware multiply for map coordinates
 ; Uses: SNES hardware multiply registers ($4202/$4203/$4216)
@@ -1019,7 +1019,7 @@ EnemyGfx_DecompressLoop:	; Decompression loop (3 blocks)
 	inx ; Increment table index
 	inx ; (2 bytes per entry)
 	cpx.w #$0006	; Processed 3 blocks?
-	bne CODE_0B8378 ; Loop for next block
+	bne LoopNextBlock ; Loop for next block
 
 	plb ; Restore original data bank
 	rtl ; Return
@@ -1039,7 +1039,7 @@ DATA8_0b83b2:
 	db $00,$a8	 ; Block 2 source = $a800
 
 ; -----------------------------------------------------------------------------
-; CODE_0B83B8: Enemy Graphics Data Transfer
+; CodeEnemyGraphicsDataTransfer: Enemy Graphics Data Transfer
 ; -----------------------------------------------------------------------------
 ; Purpose: Copy 128 bytes of enemy sprite data from Bank $05 to WRAM $7f:C588
 ; Special case: Enemy ID $19 uses Bank $07 source instead
@@ -1119,7 +1119,7 @@ BattleBG_CopyTileData:
 	rtl ; Return
 
 ; -----------------------------------------------------------------------------
-; CODE_0B841D: PPU Register Configuration for Battle Graphics
+; CodePpuRegisterConfigurationBattleGraphics: PPU Register Configuration for Battle Graphics
 ; -----------------------------------------------------------------------------
 ; Purpose: Configure SNES PPU registers for battle screen rendering
 ; Sets: BG map addresses, layer blending, color math modes
@@ -1171,7 +1171,7 @@ BattlePPU_WriteColorMath:
 ; Background Graphics Configuration Tables
 ; -----------------------------------------------------------------------------
 ; Complex multi-table system for configuring battle backgrounds
-; Referenced by CODE_0B8223 (documented in Cycle 1)
+; Referenced by CodeBackgroundLayerInitializationMultiTable (documented in Cycle 1)
 
 DATA8_0b844f:
 	db $14		 ; Attribute byte for background type 0
@@ -1243,7 +1243,7 @@ DATA8_0b84e2:
 	db $01		 ; Config 6 (partial)
 
 ; -----------------------------------------------------------------------------
-; CODE_0B84FB: Enemy Tile Data Setup
+; CodeEnemyTileDataSetup: Enemy Tile Data Setup
 ; -----------------------------------------------------------------------------
 ; Purpose: Configure tile data parameters for enemy rendering
 ; Sets: $1924 (tile stride), $0900-$0906 (DMA parameters)
@@ -1305,7 +1305,7 @@ Battle_TileStride:
 	db $10,$40,$20,$40,$30,$40,$40,$40 ; Modes 12-15
 
 ; -----------------------------------------------------------------------------
-; CODE_0B8560: Background Layer Type Dispatcher
+; CodeBackgroundLayerTypeDispatcher: Background Layer Type Dispatcher
 ; -----------------------------------------------------------------------------
 ; Purpose: Jump table for different background layer rendering modes
 ; Input: $1a4c = Layer type index (0-7)
@@ -1337,7 +1337,7 @@ DATA8_0b856c:
 ; Special handling for negative $1a55 (special background flag)
 
 	lda.w $1a55	 ; Load background ID
-	bpl CODE_0B85BE ; Skip special setup if positive
+	bpl SkipSpecialSetupIfPositive ; Skip special setup if positive
 
 ; Special background setup
 	ldx.w #$1000	; Special flag value
@@ -1346,17 +1346,17 @@ DATA8_0b856c:
 ; Load music/sound based on available data
 	ldx.w #$f6d1	; Music pointer 1
 	lda.b #$03	  ; Music bank 3
-	jsl.l CODE_009776 ; Attempt to load music
-	bne CODE_0B85A9 ; Skip if loaded
+	jsl.l ExecuteSpecialBitProcessing ; Attempt to load music
+	bne SkipIfLoaded ; Skip if loaded
 
 	ldx.w #$f538	; Music pointer 2 (fallback)
 	lda.b #$02	  ; Music bank 2
-	jsl.l CODE_009776 ; Attempt to load music
-	bne CODE_0B85A9 ; Skip if loaded
+	jsl.l ExecuteSpecialBitProcessing ; Attempt to load music
+	bne SkipIfLoaded ; Skip if loaded
 
 	ldx.w #$f37c	; Music pointer 3 (fallback)
 	lda.b #$01	  ; Music bank 1
-	jsl.l CODE_009776 ; Attempt to load music
+	jsl.l ExecuteSpecialBitProcessing ; Attempt to load music
 	bne BattleGfx_SetupDMATransfer ; Skip if loaded
 
 	ldx.w #$f240	; Music pointer 4 (final fallback)
@@ -1382,14 +1382,14 @@ BattleLayer_TypeHandlerReturn:
 ; Documentation ratio: ~100% (lots of data tables included)
 ;
 ; Key Routines Documented:
-; 1. CODE_0B82CB: Battle state flag configuration
-; 2. CODE_0B8338: Map tile lookup with hardware multiply
-; 3. CODE_0B836A: Enemy graphics decompression (MVN block transfers)
-; 4. CODE_0B83B8: Enemy sprite data transfer (128 bytes)
-; 5. CODE_0B83F2: Background tile transfer (3×16 bytes)
-; 6. CODE_0B841D: PPU register configuration (battle graphics setup)
-; 7. CODE_0B84FB: Enemy tile data setup (DMA parameters)
-; 8. CODE_0B8560: Background layer type dispatcher (jump table)
+; 1. CodeBattleStateFlagConfiguration: Battle state flag configuration
+; 2. CodeBattleMapTileLookupAnimation: Map tile lookup with hardware multiply
+; 3. CodeEnemyGraphicsDecompressionMvnBlock: Enemy graphics decompression (MVN block transfers)
+; 4. CodeEnemyGraphicsDataTransfer: Enemy sprite data transfer (128 bytes)
+; 5. CodeBackgroundTileTransferBytes: Background tile transfer (3×16 bytes)
+; 6. CodePpuRegisterConfigurationBattleGraphics: PPU register configuration (battle graphics setup)
+; 7. CodeEnemyTileDataSetup: Enemy tile data setup (DMA parameters)
+; 8. CodeBackgroundLayerTypeDispatcher: Background layer type dispatcher (jump table)
 ;
 ; Technical Discoveries:
 ; - mvn (Move Negative) block transfer instruction used extensively
@@ -1422,7 +1422,7 @@ BattleLayer_TypeHandlerReturn:
 ; - Bank $05: Enemy sprite data ($8000 base, 128 bytes per sprite)
 ; - Bank $06: Compressed graphics ($8000, $a000, $a800 blocks)
 ; - Bank $07: Background tiles ($d824, $d834, $d984), music ($f240-F6D1)
-; - Bank $00: Sound loading (CODE_009776)
+; - Bank $00: Sound loading (ExecuteSpecialBitProcessing)
 ;
 ; Next Cycle: Lines 800-1200
 ; - Background rendering implementations
@@ -1449,7 +1449,7 @@ DATA8_0b865b:
 ; Values: -1 ($ff) indicates reverse scroll direction
 
 ; -----------------------------------------------------------------------------
-; CODE_0B8669: Graphics Data Decompression (RLE-style)
+; CodeGraphicsDataDecompressionRleStyle: Graphics Data Decompression (RLE-style)
 ; -----------------------------------------------------------------------------
 ; Purpose: Decompress graphics data from ROM to WRAM using custom format
 ; Input: $0900-$0906 = DMA parameters (set by caller)
@@ -1567,10 +1567,10 @@ BattleGfx_DecompressExit:	; Exit decompression
 	db $8b,$54,$7f,$00,$ab,$60 ; phb / mvn $7f,$00 / plb / rts (copy)
 
 ; -----------------------------------------------------------------------------
-; CODE_0B86EA: WRAM Graphics Upload via PPU Registers
+; CodeWramGraphicsUploadViaPpu: WRAM Graphics Upload via PPU Registers
 ; -----------------------------------------------------------------------------
 ; Purpose: Write graphics data to WRAM using SNES PPU WRAM registers
-; Input: Same DMA parameters as CODE_0B8669 ($0900-$0906)
+; Input: Same DMA parameters as CodeGraphicsDataDecompressionRleStyle ($0900-$0906)
 ; Method: Direct writes to $2180-$2183 (WRAM Data/Address registers)
 ;
 ; SNES WRAM Registers:
@@ -1658,7 +1658,7 @@ BattleGfx_WRAMContinue:
 ; -----------------------------------------------------------------------------
 ; Enemy Graphics Source Table
 ; -----------------------------------------------------------------------------
-; Referenced by CODE_0B84FB (documented in Cycle 2)
+; Referenced by CodeEnemyTileDataSetup (documented in Cycle 2)
 ; Format: 3 bytes per entry [addr_low] [addr_high] [bank]
 ; Indexed by (enemy_type × 3)
 
@@ -1715,7 +1715,7 @@ DATA8_0b8737:
 ; Banks $07 (entries 32-43) and $08 (entries 0-31) contain enemy sprite data
 
 ; -----------------------------------------------------------------------------
-; CODE_0B87B9: Battle OAM Clear Routine
+; LoadEnemyStatsBankB: Battle OAM Clear Routine
 ; -----------------------------------------------------------------------------
 ; Purpose: Initialize OAM (Object Attribute Memory) buffers with default values
 ; Clears: $0c40-$0dff (448 bytes) and $0e03-$0e1e (28 bytes)
@@ -2098,7 +2098,7 @@ DATA8_0b8cd9:
 ; Total: 43 × 10 = 430 bytes of extended enemy attributes
 
 ; -----------------------------------------------------------------------------
-; CODE_0B8E91: Battle Animation State Handler
+; CodeBattleAnimationStateHandler: Battle Animation State Handler
 ; -----------------------------------------------------------------------------
 ; Purpose: Update battle animation states and manage sprite transfers
 ; Called during V-blank to refresh battle graphics
@@ -2152,10 +2152,10 @@ BattleAnim_SkipTransfer:
 ; Documentation ratio: ~150% (extensive data tables documented)
 ;
 ; Key Routines Documented:
-; 1. CODE_0B8669: RLE graphics decompression (custom format)
-; 2. CODE_0B86EA: WRAM upload via PPU registers ($2180-$2183)
-; 3. CODE_0B87B9: OAM buffer initialization (clear 476 bytes)
-; 4. CODE_0B8E91: Battle animation state handler (V-blank updates)
+; 1. CodeGraphicsDataDecompressionRleStyle: RLE graphics decompression (custom format)
+; 2. CodeWramGraphicsUploadViaPpu: WRAM upload via PPU registers ($2180-$2183)
+; 3. LoadEnemyStatsBankB: OAM buffer initialization (clear 476 bytes)
+; 4. CodeBattleAnimationStateHandler: Battle animation state handler (V-blank updates)
 ;
 ; Major Data Tables:
 ; 1. DATA8_0B8735/37: Enemy graphics sources (44 entries, Banks $07/$08)
@@ -2219,12 +2219,12 @@ BattleAnim_CompareAndUpdate:	; Animation comparison/update path
 ; Animation frame changed - trigger update
 	sta.b $f4	   ; Store new cached frame value
 	pea.w DATA8_0b8f15 ; Push animation table pointer (changed state)
-	jsl.l CODE_0097BE ; Call animation dispatcher (Bank $00)
+	jsl.l CallSpriteInitializer ; Call animation dispatcher (Bank $00)
 	bra BattleAnim_UpdateSecondary ; Jump to next section
 
 BattleAnim_FrameUnchanged:	; Animation frame unchanged path
 	pea.w DATA8_0b8f03 ; Push animation table pointer (same state)
-	jsl.l CODE_0097BE ; Call animation dispatcher
+	jsl.l CallSpriteInitializer ; Call animation dispatcher
 ; Fall through to BattleAnim_UpdateSecondary
 
 BattleAnim_UpdateSecondary:	; Secondary animation counter update
@@ -2241,12 +2241,12 @@ BattleAnim_UpdateSecondary:	; Secondary animation counter update
 ; Secondary animation changed
 	sta.b $f5	   ; Store new cached value
 	pea.w DATA8_0b8f15 ; Push changed-state table
-	jsl.l CODE_0097BE ; Call dispatcher
+	jsl.l CallSpriteInitializer ; Call dispatcher
 	bra BattleAnim_Disabled ; Exit
 
 BattleAnim_SecondaryUnchanged:	; Secondary animation unchanged
 	pea.w DATA8_0b8f03 ; Push same-state table
-	jsl.l CODE_0097BE ; Call dispatcher
+	jsl.l CallSpriteInitializer ; Call dispatcher
 ; Fall through to exit
 
 BattleAnim_Disabled:
@@ -2311,7 +2311,7 @@ BattleAnim_BitFound:
 ; -----------------------------------------------------------------------------
 ; Purpose: Initialize new sprite animation state
 ; Sets: $7ec400,X = 0 (sprite type/state)
-; Calls: CODE_0B9304 (sprite positioning), CODE_0B935F (sprite setup)
+; Calls: Load_0B9304 (sprite positioning), Battle_Field_Background_Graphics_Loader (sprite setup)
 
 ; Entry at $0b8f33
 	lda.b #$00	  ; Sprite state = 0 (inactive/default)
@@ -2319,7 +2319,7 @@ BattleAnim_BitFound:
 	jsr.w BattleSprite_CalculateOAMPositions ; Calculate sprite OAM positions
 	cpx.b #$00	  ; Check if sprite index = 0
 	beq BattleAnim_SetStateFlag ; Skip setup if index 0
-	jsl.l CODE_0B935F ; Call extended sprite setup
+	jsl.l Battle_Field_Background_Graphics_Loader ; Call extended sprite setup
 
 BattleAnim_SetStateFlag:
 	lda.b #$80	  ; Set flag $80
@@ -2349,8 +2349,8 @@ BattleAnim_SetStateFlag:
 	lda.l $7ec320,x ; Load sprite base index
 	clc ; Clear carry
 	adc.b #$09	  ; Add offset 9
-	jsl.l CODE_0B92D6 ; Call position calculator
-	jsr.w CODE_0B9304 ; Calculate OAM positions
+	jsl.l Label_0B92D6 ; Call position calculator
+	jsr.w Load_0B9304 ; Calculate OAM positions
 
 ; Complex sprite positioning code (uses DP for OAM direct access)
 ; Updates sprites at offsets $00-$1f with calculated positions
@@ -2468,7 +2468,7 @@ BattleAnim_ExpandingSetup:
 	lda.l $7ec320,x ; Load sprite base index
 	clc ; Clear carry
 	adc.b #$09	  ; Add offset 9
-	jsl.l CODE_0B92D6 ; Call position calculator
+	jsl.l Label_0B92D6 ; Call position calculator
 	jsr.w BattleSprite_CalculateOAMPositions ; Calculate OAM positions
 
 ; Setup expanding sprite positions
@@ -2504,7 +2504,7 @@ BattleAnim_SpinningUpdate:
 	lsr a
 	and.b #$03	  ; Mask to 0-3 (4 frames)
 	pea.w DATA8_0b905f ; Push animation table pointer
-	jsl.l CODE_0097BE ; Call dispatcher
+	jsl.l CallSpriteInitializer ; Call dispatcher
 	rts ; Return
 
 DATA8_0b905f:	; Rotation frame handlers
@@ -2561,7 +2561,7 @@ BattleAnim_MultiSpriteSetup:
 	lda.l $7ec320,x ; Load sprite base index
 	clc ; Clear carry
 	adc.b #$09	  ; Add offset
-	jsl.l CODE_0B92D6 ; Calculate positions
+	jsl.l Label_0B92D6 ; Calculate positions
 	jsr.w BattleSprite_CalculateOAMPositions ; Setup OAM
 
 ; Position calculations for 8-sprite grid
@@ -2624,7 +2624,7 @@ BattleAnim_4FrameTileCycle:
 	lsr a
 	and.b #$03	  ; Mask to 0-3 (4 frames)
 	pea.w DATA8_0b9113 ; Push tile pattern table
-	jsl.l CODE_0097BE ; Call dispatcher
+	jsl.l CallSpriteInitializer ; Call dispatcher
 
 
 DATA8_0b9113:	; 4-frame tile pattern handlers
@@ -2693,7 +2693,7 @@ BattleAnim_AttackSetup:
 	lda.l $7ec320,x ; Load sprite base
 	clc ; Clear carry
 	adc.b #$09	  ; Add offset
-	jsl.l CODE_0B92D6 ; Calculate positions
+	jsl.l Label_0B92D6 ; Calculate positions
 	jsr.w BattleSprite_CalculateOAMPositions ; Setup OAM
 
 	lda.b #$04	  ; Sprite count = 4
@@ -2750,7 +2750,7 @@ TAY_Label:
 	lsr a
 	and.b #$03	  ; Mask to 4 frames
 	pea.w DATA8_0b91d0 ; Push motion table
-	jsl.l CODE_0097BE ; Dispatch
+	jsl.l CallSpriteInitializer ; Dispatch
 
 
 DATA8_0b91d0:	; Attack motion frames
@@ -2798,7 +2798,7 @@ BattleAnim_WingFlapSetup:
 	lda.l $7ec320,x ; Load sprite base
 
 	adc.b #$09	  ; Add offset
-	jsl.l CODE_0B92D6 ; Calculate
+	jsl.l Label_0B92D6 ; Calculate
 
 	lda.b #$04	  ; Sprite count = 4
 	sta.l $7ec400,x ; Store state
@@ -2901,7 +2901,7 @@ BattleAnim_WingsOutward:	; Even frames: Wings move outward
 ; - Sprite states at $7ec400,X (WRAM sprite type/behavior)
 ; - OAM buffer direct manipulation ($0c00-$0c2f range)
 ; - Direct page relocation for fast OAM access
-; - Jump table dispatch via CODE_0097BE
+; - Jump table dispatch via CallSpriteInitializer
 ; - bit masking for frame cycling (AND #$03 = 4 frames)
 ; - Position calculations with carry arithmetic
 ; - Horizontal flip via ora #$40 on attributes
@@ -2919,10 +2919,10 @@ BattleAnim_WingsOutward:	; Even frames: Wings move outward
 ; - Attack: Forward-moving sequence
 ;
 ; Cross-References:
-; - CODE_0097BE: Animation dispatcher (Bank $00)
-; - CODE_0B92D6: Position calculator (documented ahead)
-; - CODE_0B9304: OAM position setup (documented ahead)
-; - CODE_0B935F: Extended sprite setup (documented ahead)
+; - CallSpriteInitializer: Animation dispatcher (Bank $00)
+; - Label_0B92D6: Position calculator (documented ahead)
+; - Load_0B9304: OAM position setup (documented ahead)
+; - Battle_Field_Background_Graphics_Loader: Extended sprite setup (documented ahead)
 ; - $7ec260: Sprite slot index (WRAM)
 ; - $7ec320: Sprite base index (WRAM)
 ; - $7ec360: Animation frame counter (WRAM)
@@ -2931,14 +2931,14 @@ BattleAnim_WingsOutward:	; Even frames: Wings move outward
 ;
 ; Next Cycle: Lines 1600-2000
 ; - Complete animation handlers 6-8
-; - Position calculator CODE_0B92D6
-; - OAM setup CODE_0B9304
+; - Position calculator Label_0B92D6
+; - OAM setup Load_0B9304
 ; - Additional sprite management
 ; =============================================================================
 ; ==============================================================================
 ; BANK $0b CYCLE 5: BATTLE GRAPHICS & SPRITE EFFECTS (Lines 1600-2000)
 ; ==============================================================================
-; Coverage: CODE_0B927F through massive data tables at 0BA2F5
+; Coverage: CoverageCodeThroughMassiveDataTables through massive data tables at 0BA2F5
 ;
 ; This section contains:
 ; - Sprite position adjustment routines (OAM coordinate manipulation)
@@ -2980,7 +2980,7 @@ BattleAnim_WingsOutward:	; Even frames: Wings move outward
 ; Uses:   Y = OAM offset (from $7ec260,X × 4)
 ; ------------------------------------------------------------------------------
 	php ;0B9296 Preserve processor flags
-	jsr.w CODE_0B9304 ;0B9297 → Setup base tiles + attributes
+	jsr.w Load_0B9304 ;0B9297 → Setup base tiles + attributes
 	lda.b #$04	  ;0B929A Animation state = 4
 	sta.l $7ec400,x ;0B929C Store sprite animation state
 	lda.b #$0f	  ;0B92A0 High byte = palette $0f
@@ -2988,7 +2988,7 @@ BattleAnim_WingsOutward:	; Even frames: Wings move outward
 	lda.l $7ec320,x ;0B92A3 Get sprite X-position
 	clc ;0B92A7 Clear carry
 	adc.b #$08	  ;0B92A8 Offset X+8 pixels
-	jsl.l CODE_0B92D6 ;0B92AA → Upload 4×4 tile pattern to OAM
+	jsl.l Label_0B92D6 ;0B92AA → Upload 4×4 tile pattern to OAM
 	plp ;0B92AE Restore processor flags
 	rts ;0B92AF Return
 
@@ -3005,7 +3005,7 @@ BattleAnim_WingsOutward:	; Even frames: Wings move outward
 ; ------------------------------------------------------------------------------
 	phx ;0B92B1 Preserve X register
 	phy ;0B92B2 Preserve Y register
-	jsr.w CODE_0B9304 ;0B92B3 → Setup base tiles + attributes
+	jsr.w Load_0B9304 ;0B92B3 → Setup base tiles + attributes
 	lda.b #$04	  ;0B92B6 Animation state = 4
 	sta.l $7ec400,x ;0B92B8 Store sprite animation state
 	lda.l $7ec480,x ;0B92BC Get base tile index
@@ -3025,7 +3025,7 @@ BattleAnim_WingsOutward:	; Even frames: Wings move outward
 	rts ;0B92D5 (Dead code - unreachable)
 
 ; ==============================================================================
-; CODE_0B92D6: Graphics Tile Upload to WRAM OAM Buffer
+; Label_0B92D6: Graphics Tile Upload to WRAM OAM Buffer
 ; ==============================================================================
 ; Transfers 16 bytes (4×4 pattern) from Bank $09 graphics to WRAM $7e OAM buffer.
 ; Uses mvn (block move negative) for fast DMA-like transfer.
@@ -3046,7 +3046,7 @@ BattleAnim_WingsOutward:	; Even frames: Wings move outward
 ;         Y = Destination address (Bank $7e)
 ;         A = Byte count - 1 (MVN format)
 ; ==============================================================================
-CODE_0B92D6:
+Label_0B92D6:
 	phx ;0B92D6 Preserve X register
 	phy ;0B92D7 Preserve Y register
 	php ;0B92D8 Preserve processor flags
@@ -3087,7 +3087,7 @@ CODE_0B92D6:
 	rtl ;0B9303 Return long
 
 ; ==============================================================================
-; CODE_0B9304: Setup Base Sprite Tiles & Attributes
+; Load_0B9304: Setup Base Sprite Tiles & Attributes
 ; ==============================================================================
 ; Configures 4-tile sprite in OAM buffer with sequential tile indexes and
 ; standard attributes (palette $d2 = 11010010 binary).
@@ -3104,7 +3104,7 @@ CODE_0B92D6:
 ;   Bits 3-1: Palette = 010 (palette 2 → overall palette 6)
 ;   bit 0: Name table select = 0
 ; ==============================================================================
-CODE_0B9304:
+Load_0B9304:
 ; Get OAM buffer offset (slot × 4 bytes per sprite)
 	lda.l $7ec260,x ;0B9304 Get sprite slot number
 	asl a;0B9308 × 2
@@ -3150,7 +3150,7 @@ CODE_0B9304:
 	rts ;0B935E Return
 
 ; ==============================================================================
-; CODE_0B935F: Battle Field Background Graphics Loader
+; Battle_Field_Background_Graphics_Loader: Battle Field Background Graphics Loader
 ; ==============================================================================
 ; Loads battlefield background graphics to WRAM $7ec180 based on battle type
 ; stored in $10a0 (low 4 bits = battlefield ID 0-15).
@@ -3164,7 +3164,7 @@ CODE_0B9304:
 ;   4: $07d844  5: $07d874  6: $07d864  7: $07d854
 ;   8: $07d844  9: (unreachable beyond this)
 ; ==============================================================================
-CODE_0B935F:
+Battle_Field_Background_Graphics_Loader:
 	pha ;0B935F Preserve A register
 	phx ;0B9360 Preserve X register
 	phy ;0B9361 Preserve Y register
@@ -3460,8 +3460,8 @@ Battlefield_GfxPointers:
 ; - Organized by enemy type (indexes 0-52 from earlier tables)
 ;
 ; This data is uploaded to VRAM during battle via:
-; - CODE_0B92D6: Graphics tile upload routine
-; - CODE_0B935F: Battlefield background loader
+; - Label_0B92D6: Graphics tile upload routine
+; - Battle_Field_Background_Graphics_Loader: Battlefield background loader
 ; - Earlier sprite animation handlers documented in Cycles 1-5
 ; ==============================================================================
 
@@ -3554,7 +3554,7 @@ Battlefield_GfxPointers:
 ; Bank $0b Complete! Total size: 65536 bytes (64 KB)
 ;
 ; Bank $0b Summary:
-; - Battle graphics initialization routines (CODE_0B8000+)
+; - Battle graphics initialization routines (CodeGraphicsSetupBasedBattleType+)
 ; - Sprite animation handlers (4/8/16/32-frame cycles)
 ; - mvn block transfer graphics loaders
 ; - RLE decompression system (custom format)
@@ -3567,7 +3567,7 @@ Battlefield_GfxPointers:
 ; - ROM padding to bank boundary
 ;
 ; Cross-Bank References:
-; - Bank $00: CODE_0097BE animation dispatcher
+; - Bank $00: CallSpriteInitializer animation dispatcher
 ; - Bank $05/$06/$07/$08: Graphics source data
 ; - Bank $09: Tile pattern source ($82c0+)
 ; - Bank $07: Battlefield backgrounds ($d824+)

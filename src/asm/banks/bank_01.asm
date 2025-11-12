@@ -58,7 +58,7 @@
 	lda.W #$0008                         ;018136|A90800  |      ;
 	sta.W $1900                          ;018139|8D0019  |001900;
 	sta.W $1904                          ;01813C|8D0419  |001904;
-	jsl.L CODE_0B87B9                    ;01813F|22B9870B|0B87B9;
+	jsl.L LoadEnemyStatsBankB                    ;01813F|22B9870B|0B87B9;
 	sep #$20                             ;018143|E220    |      ;
 	rep #$10                             ;018145|C210    |      ;
 	stz.W $1a46                          ;018147|9C461A  |001A46;
@@ -243,7 +243,7 @@ Field_MainLoop:
 	lda.W $0e88                          ;01829E|AD880E  |000E88;
 	cmp.B #$15                           ;0182A1|C915    |      ;
 	bne Field_FrameLoop                      ;0182A3|D004    |0182A9;
-	jsl.L CODE_009A60                    ;0182A5|22609A00|009A60;
+	jsl.L SpecialEnemyInitialization                    ;0182A5|22609A00|009A60;
 ;      |        |      ;
 Field_FrameLoop:
 	inc.W $19f7                          ;0182A9|EEF719  |0119F7;
@@ -1064,7 +1064,7 @@ Field_HandleInput:
 	pla                                  ;018A41|68      |      ;
 	bit.B #$02                           ;018A42|8902    |      ;
 	bne Field_InputCheck                      ;018A44|D005    |018A4B;
-	jsl.L CODE_079030                    ;018A46|22309007|079030;
+	jsl.L Label_079030                    ;018A46|22309007|079030;
 	rts                                  ;018A4A|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
@@ -1280,7 +1280,7 @@ Field_CameraCalculate:
 	rol a;018BA8|2A      |      ;
 	and.B #$03                           ;018BA9|2903    |      ;
 	inc a;018BAB|1A      |      ;
-	jsl.L CODE_009776                    ;018BAC|22769700|009776;
+	jsl.L ExecuteSpecialBitProcessing                    ;018BAC|22769700|009776;
 	beq Field_CameraClamp                      ;018BB0|F008    |018BBA;
 	lda.W $192b                          ;018BB2|AD2B19  |01192B;
 	clc                                  ;018BB5|18      |      ;
@@ -1460,7 +1460,7 @@ Field_MapSetupEntity:
 	sta.W $198f                          ;018CB5|8D8F19  |01198F;
 	stz.W $1990                          ;018CB8|9C9019  |011990;
 	lda.B #$f5                           ;018CBB|A9F5    |      ;
-	jsl.L CODE_009776                    ;018CBD|22769700|009776;
+	jsl.L ExecuteSpecialBitProcessing                    ;018CBD|22769700|009776;
 	bne Field_MapSetupComplete                      ;018CC1|D005    |018CC8;
 	lda.W $19b4                          ;018CC3|ADB419  |0119B4;
 	bpl Field_LoadEntityData                      ;018CC6|1011    |018CD9;
@@ -2034,22 +2034,22 @@ Field_EntityCollisionEnd:
 ;      |        |      ;
 Field_LoadMap:
 	jsr.W Field_CameraScroll                    ;01914D|20768B  |018B76;
-	jsl.L CODE_0B8149                    ;019150|2249810B|0B8149;
+	jsl.L CodeBattleInitializationRoutine                    ;019150|2249810B|0B8149;
 	jsr.W Field_ProcessMapFlags                    ;019154|203AC8  |01C83A;
 	jsr.W Collision_ProcessEntity                    ;019157|2056AF  |01AF56;
-	jsl.L CODE_0B87B9                    ;01915A|22B9870B|0B87B9;
-	jsl.L CODE_0B836A                    ;01915E|226A830B|0B836A;
+	jsl.L LoadEnemyStatsBankB                    ;01915A|22B9870B|0B87B9;
+	jsl.L CodeEnemyGraphicsDecompressionMvnBlock                    ;01915E|226A830B|0B836A;
 	jsr.W Field_CopyCharacterGraphics                    ;019162|207CFD  |01FD7C;
-	jsl.L CODE_0B83B8                    ;019165|22B8830B|0B83B8;
-	jsl.L CODE_0B83F2                    ;019169|22F2830B|0B83F2;
+	jsl.L CodeEnemyGraphicsDataTransfer                    ;019165|22B8830B|0B83B8;
+	jsl.L CodeBackgroundTileTransferBytes                    ;019169|22F2830B|0B83F2;
 	jsr.W Field_LoadTilesets                    ;01916D|20DC81  |0181DC;
 	jsr.W Field_LoadFontGraphics                    ;019170|200CFE  |01FE0C;
-	jsl.L CODE_0B84FB                    ;019173|22FB840B|0B84FB;
+	jsl.L CodeEnemyTileDataSetup                    ;019173|22FB840B|0B84FB;
 	ldy.W $0e89                          ;019177|AC890E  |010E89;
 	jsr.W Field_NormalizeCoordinates                    ;01917A|2051FD  |01FD51;
 	sty.W $0e89                          ;01917D|8C890E  |010E89;
-	jsl.L CODE_0B8223                    ;019180|2223820B|0B8223;
-	jsl.L CODE_0B8560                    ;019184|2260850B|0B8560;
+	jsl.L CodeBackgroundLayerInitializationMultiTable                    ;019180|2223820B|0B8223;
+	jsl.L CodeBackgroundLayerTypeDispatcher                    ;019184|2260850B|0B8560;
 	jsr.W Menu_MoveCursorRight                    ;019188|2051C7  |01C751;
 	ldx.W #$0000                         ;01918B|A20000  |      ;
 	stx.W $1908                          ;01918E|8E0819  |011908;
@@ -2070,7 +2070,7 @@ Field_LoadMap:
 	jsr.W Camera_UpdatePosition                    ;0191B7|205DAB  |01AB5D;
 	jsr.W Camera_UpdatePosition                    ;0191BA|205DAB  |01AB5D;
 	jsr.W Field_QueueMapDMA                    ;0191BD|20A9C8  |01C8A9;
-	jsl.L CODE_0B82AA                    ;0191C0|22AA820B|0B82AA;
+	jsl.L B                    ;0191C0|22AA820B|0B82AA;
 	lda.W $1cc2                          ;0191C4|ADC21C  |011CC2;
 	beq Field_MapLoadStart                      ;0191C7|F010    |0191D9;
 	db $a2,$02,$02,$8e,$b2,$19,$a9,$20,$8d,$93,$19,$a9,$04,$8d,$29,$19;0191C9|        |      ;
@@ -2081,14 +2081,14 @@ Field_MapLoadStart:
 	jsr.W NPC_CheckInteraction                    ;0191DF|208BA0  |01A08B;
 ;      |        |      ;
 Field_MapDataLoad:
-	jsl.L CODE_0C8000                    ;0191E2|2200800C|0C8000;
+	jsl.L CWaitTimingRoutine                    ;0191E2|2200800C|0C8000;
 	lda.W $0110                          ;0191E6|AD1001  |010110;
 	bpl Field_MapDataLoad                      ;0191E9|10F7    |0191E2;
 	lda.W $0111                          ;0191EB|AD1101  |010111;
 	pha                                  ;0191EE|48      |      ;
 	stz.W $0111                          ;0191EF|9C1101  |010111;
 	stz.W $420c                          ;0191F2|9C0C42  |01420C;
-	jsl.L CODE_0B841D                    ;0191F5|221D840B|0B841D;
+	jsl.L CodePpuRegisterConfigurationBattleGraphics                    ;0191F5|221D840B|0B841D;
 	jsr.W Field_LoadMapTiles                    ;0191F9|203684  |018436;
 	jsr.W Field_LoadCharacterPalettes                    ;0191FC|205E84  |01845E;
 	jsr.W Field_CharPaletteNext                    ;0191FF|209384  |018493;
@@ -2122,7 +2122,7 @@ MapEvent_InitComplete:
 	sta.W $1a45                          ;019247|8D451A  |011A45;
 ;      |        |      ;
 MapEvent_WaitForFade:
-	jsl.L CODE_0C8000                    ;01924A|2200800C|0C8000;
+	jsl.L CWaitTimingRoutine                    ;01924A|2200800C|0C8000;
 	lda.W $1a45                          ;01924E|AD451A  |011A45;
 	bne MapEvent_WaitForFade                      ;019251|D0F7    |01924A;
 	ldx.W #$0000                         ;019253|A20000  |      ;
@@ -2131,7 +2131,7 @@ MapEvent_WaitForFade:
 	jsr.W Field_CameraUpdate                    ;01925C|20838B  |018B83;
 	lda.W $0e91                          ;01925F|AD910E  |010E91;
 	beq MapEvent_ReturnComplete                      ;019262|F004    |019268;
-	jsl.L CODE_009AEC                    ;019264|22EC9A00|009AEC;
+	jsl.L Sub_009AEC                    ;019264|22EC9A00|009AEC;
 ;      |        |      ;
 MapEvent_ReturnComplete:
 	rts                                  ;019268|60      |      ;
@@ -2140,14 +2140,14 @@ MapEvent_ReturnComplete:
 	sta.W $19a5                          ;01926B|8DA519  |0119A5;
 	lda.B #$11                           ;01926E|A911    |      ;
 	sta.W $050a                          ;019270|8D0A05  |01050A;
-	jsl.L CODE_00BC9C                    ;019273|229CBC00|00BC9C;
+	jsl.L Sub_00BC9C                    ;019273|229CBC00|00BC9C;
 	bra MapEvent_ProcessCommand                      ;019277|800E    |019287;
 ;      |        |      ;
 	lda.B #$ff                           ;019279|A9FF    |      ;
 	sta.W $19a5                          ;01927B|8DA519  |0119A5;
 	lda.B #$11                           ;01927E|A911    |      ;
 	sta.W $050a                          ;019280|8D0A05  |01050A;
-	jsl.L CODE_00BCA5                    ;019283|22A5BC00|00BCA5;
+	jsl.L Sub_00BCA5                    ;019283|22A5BC00|00BCA5;
 ;      |        |      ;
 MapEvent_ProcessCommand:
 	lda.W $0104                          ;019287|AD0401  |010104;
@@ -2185,7 +2185,7 @@ MapEvent_LoadNewMap:
 ;      |        |      ;
 MapEvent_SetupNewMap:
 	jsr.W Field_ProcessMapFlags                    ;0192D1|203AC8  |01C83A;
-	jsl.L CODE_0B87B9                    ;0192D4|22B9870B|0B87B9;
+	jsl.L LoadEnemyStatsBankB                    ;0192D4|22B9870B|0B87B9;
 	jsr.W Field_LoadFontGraphics                    ;0192D8|200CFE  |01FE0C;
 	php                                  ;0192DB|08      |      ;
 	jsr.W NPC_InitializeAll                    ;0192DC|20AF9F  |019FAF;
@@ -2198,7 +2198,7 @@ MapEvent_SetupNewMap:
 	stx.W $1900                          ;0192EF|8E0019  |011900;
 	ldx.W #$00f8                         ;0192F2|A2F800  |      ;
 	stx.W $1902                          ;0192F5|8E0219  |011902;
-	jsl.L CODE_0B82AA                    ;0192F8|22AA820B|0B82AA;
+	jsl.L B                    ;0192F8|22AA820B|0B82AA;
 	jsr.W Object_UpdateMain                    ;0192FC|20F0A3  |01A3F0;
 	jsr.W Field_ProcessMapGraphics                    ;0192FF|206BE7  |01E76B;
 	jsr.W Camera_UpdatePosition                    ;019302|205DAB  |01AB5D;
@@ -2210,14 +2210,14 @@ MapEvent_SetupNewMap:
 	jsr.W Field_QueueMapDMA                    ;019314|20A9C8  |01C8A9;
 ;      |        |      ;
 MapEvent_WaitForVBlank:
-	jsl.L CODE_0C8000                    ;019317|2200800C|0C8000;
+	jsl.L CWaitTimingRoutine                    ;019317|2200800C|0C8000;
 	lda.W $0110                          ;01931B|AD1001  |010110;
 	bpl MapEvent_WaitForVBlank                      ;01931E|10F7    |019317;
 	lda.W $0111                          ;019320|AD1101  |010111;
 	pha                                  ;019323|48      |      ;
 	stz.W $0111                          ;019324|9C1101  |010111;
 	stz.W $420c                          ;019327|9C0C42  |01420C;
-	jsl.L CODE_0B841D                    ;01932A|221D840B|0B841D;
+	jsl.L CodePpuRegisterConfigurationBattleGraphics                    ;01932A|221D840B|0B841D;
 	jsr.W Field_LoadMapTiles                    ;01932E|203684  |018436;
 	jsr.W Field_LoadCharacterPalettes                    ;019331|205E84  |01845E;
 	jsr.W Field_CharPaletteNext                    ;019334|209384  |018493;
@@ -2228,7 +2228,7 @@ MapEvent_WaitForVBlank:
 	jsr.W Field_UpdateSpriteFlags                    ;019343|207386  |018673;
 	pla                                  ;019346|68      |      ;
 	sta.W $0111                          ;019347|8D1101  |010111;
-	jsl.L CODE_00BD2A                    ;01934A|222ABD00|00BD2A;
+	jsl.L Sub_00BD2A                    ;01934A|222ABD00|00BD2A;
 	jsr.W Field_EntityCollisionLoop                    ;01934E|202B91  |01912B;
 	inc.W $19f7                          ;019351|EEF719  |0019F7;
 	jsr.W Field_WaitForVBlank                    ;019354|20D082  |0182D0;
@@ -2562,7 +2562,7 @@ Dialog_BeginDisplay:
 	sep #$20                             ;0195D9|E220    |      ;
 	rep #$10                             ;0195DB|C210    |      ;
 	jsr.W Field_CameraScroll                    ;0195DD|20768B  |018B76;
-	jsl.L CODE_0B8000                    ;0195E0|2200800B|0B8000;
+	jsl.L CodeGraphicsSetupBasedBattleType                    ;0195E0|2200800B|0B8000;
 	sep #$20                             ;0195E4|E220    |      ;
 	rep #$10                             ;0195E6|C210    |      ;
 	lda.B #$14                           ;0195E8|A914    |      ;
@@ -4619,7 +4619,7 @@ Object_CheckCompression:
 	bit.B #$01                           ;01A562|8901    |      ;
 	beq Object_UncompressedPath                      ;01A564|F00D    |01A573;
 	lda.B #$f2                           ;01A566|A9F2    |      ;
-	jsl.L CODE_009776                    ;01A568|22769700|009776;
+	jsl.L ExecuteSpecialBitProcessing                    ;01A568|22769700|009776;
 	bne Object_CompressedPath                      ;01A56C|D003    |01A571;
 	jsr.W Object_LoadCompressed                    ;01A56E|20AAA5  |01A5AA;
 ;      |        |      ;
@@ -5279,7 +5279,7 @@ Entity_ApplyCameraOffset:
 Entity_ClampToScreen:
 	lda.B #$08                           ;01AA64|A908    |      ;
 	sta.W $00a8                          ;01AA66|8DA800  |0000A8;
-	jsl.L CODE_009783                    ;01AA69|22839700|009783;
+	jsl.L ExecuteAudioCall                    ;01AA69|22839700|009783;
 	lda.W $00a9                          ;01AA6D|ADA900  |0000A9;
 	asl a;01AA70|0A      |      ;
 ;      |        |      ;
@@ -5647,7 +5647,7 @@ Camera_ScrollComplete:
 	cmp.B #$02                           ;01AD08|C902    |      ;
 	beq Camera_UpdateScroll                      ;01AD0A|F00E    |01AD1A;
 	stz.W $00a8                          ;01AD0C|9CA800  |0100A8;
-	jsl.L CODE_009783                    ;01AD0F|22839700|009783;
+	jsl.L ExecuteAudioCall                    ;01AD0F|22839700|009783;
 	lda.W $00a9                          ;01AD13|ADA900  |0100A9;
 	cmp.B #$f0                           ;01AD16|C9F0    |      ;
 	bcs Camera_ScrollEnd                      ;01AD18|B003    |01AD1D;
@@ -6163,7 +6163,7 @@ Trigger_CheckValid:
 	phd                                  ;01B098|0B      |      ;
 	pea.W $0ec8                          ;01B099|F4C80E  |000EC8;
 	pld                                  ;01B09C|2B      |      ;
-	jsl.L CODE_00975A                    ;01B09D|225A9700|00975A;
+	jsl.L CallCalculationSystem                    ;01B09D|225A9700|00975A;
 	pld                                  ;01B0A1|2B      |      ;
 	inc a;01B0A2|1A      |      ;
 	dec a;01B0A3|3A      |      ;
@@ -6182,7 +6182,7 @@ Trigger_CheckSpecial:
 Trigger_ValidateType:
 	lda.W $1935                          ;01B0B8|AD3519  |001935;
 	jsr.W Field_CheckEntityCollision                    ;01B0BB|20DD90  |0190DD;
-	jsl.L CODE_009776                    ;01B0BE|22769700|009776;
+	jsl.L ExecuteSpecialBitProcessing                    ;01B0BE|22769700|009776;
 	beq Trigger_ReturnValid                      ;01B0C2|F002    |01B0C6;
 ;      |        |      ;
 Trigger_ReturnInvalid:
@@ -6480,7 +6480,7 @@ DMA_SetupChannel:
 	jsr.W (DATA8_01c3a6,x)               ;01B28A|FCA6C3  |01C3A6;
 ;      |        |      ;
 DMA_ConfigureMode:
-	jsl.L CODE_0096A0                    ;01B28D|22A09600|0096A0;
+	jsl.L CallExternalThreadManager                    ;01B28D|22A09600|0096A0;
 	jsr.W Field_CameraUpdate                    ;01B291|20838B  |018B83;
 	stz.W $19b0                          ;01B294|9CB019  |0019B0;
 	ply                                  ;01B297|7A      |      ;
@@ -6603,7 +6603,7 @@ DMA_Complete:
 	sec                                  ;01B36F|38      |      ;
 	sbc.W #$0800                         ;01B370|E90008  |      ;
 	sta.W $0020                          ;01B373|8D2000  |010020;
-	jsl.L CODE_009BA4                    ;01B376|22A49B00|009BA4;
+	jsl.L Sub_009BA4                    ;01B376|22A49B00|009BA4;
 	rts                                  ;01B37A|60      |      ;
 ;      |        |      ;
 	sep #$20                             ;01B37B|E220    |      ;
@@ -8321,14 +8321,14 @@ UNREACH_01C2C5:
 	db $19,$60,$e2,$20,$c2,$10,$ae,$95,$19,$9e,$00,$0c,$60,$20,$b8,$ca;01C2EF|        |00E260;
 	db $60,$a9,$10,$00,$20,$b0,$8c,$60   ;01C2FF|        |      ;
 	lda.W #$00f5                         ;01C307|A9F500  |      ;
-	jsl.L CODE_009760                    ;01C30A|22609700|009760;
+	jsl.L Sub_009760                    ;01C30A|22609700|009760;
 	sep #$20                             ;01C30E|E220    |      ;
 	rep #$10                             ;01C310|C210    |      ;
 	jsr.W Battle_CheckVictory                    ;01C312|2050C4  |01C450;
 	rts                                  ;01C315|60      |      ;
 ;      |        |      ;
 	lda.W #$00f5                         ;01C316|A9F500  |      ;
-	jsl.L CODE_00976B                    ;01C319|226B9700|00976B;
+	jsl.L PlaySoundEffectBank                    ;01C319|226B9700|00976B;
 	sep #$20                             ;01C31D|E220    |      ;
 	rep #$10                             ;01C31F|C210    |      ;
 	lda.W $19b4                          ;01C321|ADB419  |0119B4;
@@ -8881,7 +8881,7 @@ Menu_MoveCursorDown:
 	phd                                  ;01C736|0B      |      ;
 	pea.W $0f48                          ;01C737|F4480F  |060F48;
 	pld                                  ;01C73A|2B      |      ;
-	jsl.L CODE_00974E                    ;01C73B|224E9700|00974E;
+	jsl.L CallExternalValidationRoutine                    ;01C73B|224E9700|00974E;
 	pld                                  ;01C73F|2B      |      ;
 	bra Menu_MoveCursorUp                      ;01C740|80EE    |01C730;
 ;      |        |      ;
@@ -8891,7 +8891,7 @@ Menu_MoveCursorLeft:
 	phd                                  ;01C745|0B      |      ;
 	pea.W $0f68                          ;01C746|F4680F  |060F68;
 	pld                                  ;01C749|2B      |      ;
-	jsl.L CODE_00974E                    ;01C74A|224E9700|00974E;
+	jsl.L CallExternalValidationRoutine                    ;01C74A|224E9700|00974E;
 	pld                                  ;01C74E|2B      |      ;
 	bra Menu_MoveCursorUp                      ;01C74F|80DF    |01C730;
 ;      |        |      ;
@@ -8909,7 +8909,7 @@ Menu_ConfirmSelection:
 	phd                                  ;01C761|0B      |      ;
 	pea.W $0f48                          ;01C762|F4480F  |010F48;
 	pld                                  ;01C765|2B      |      ;
-	jsl.L CODE_00975A                    ;01C766|225A9700|00975A;
+	jsl.L CallCalculationSystem                    ;01C766|225A9700|00975A;
 	pld                                  ;01C76A|2B      |      ;
 	inc a;01C76B|1A      |      ;
 	dec a;01C76C|3A      |      ;
@@ -8944,7 +8944,7 @@ Menu_UpdateDisplay:
 	phd                                  ;01C7A5|0B      |      ;
 	pea.W $0f68                          ;01C7A6|F4680F  |010F68;
 	pld                                  ;01C7A9|2B      |      ;
-	jsl.L CODE_00975A                    ;01C7AA|225A9700|00975A;
+	jsl.L CallCalculationSystem                    ;01C7AA|225A9700|00975A;
 	pld                                  ;01C7AE|2B      |      ;
 	inc a;01C7AF|1A      |      ;
 	dec a;01C7B0|3A      |      ;
@@ -9062,7 +9062,7 @@ Field_CheckFlagLoop:
 	lda.L DATA8_06bf15,x                 ;01C852|BF15BF06|06BF15;
 	cmp.B #$ff                           ;01C856|C9FF    |      ;
 	beq Field_ReturnFlagCheck                      ;01C858|F029    |01C883;
-	jsl.L CODE_009776                    ;01C85A|22769700|009776;
+	jsl.L ExecuteSpecialBitProcessing                    ;01C85A|22769700|009776;
 	beq Field_NextFlagEntry                      ;01C85E|F01E    |01C87E;
 	lda.L DATA8_06bf16,x                 ;01C860|BF16BF06|06BF16;
 	sta.W $19ee                          ;01C864|8DEE19  |0119EE;
@@ -9130,7 +9130,7 @@ Field_ProcessDMALoop:
 	lda.L DATA8_06bf15,x                 ;01C8C4|BF15BF06|06BF15;
 	cmp.B #$ff                           ;01C8C8|C9FF    |      ;
 	beq Field_ReturnDMAQueue                      ;01C8CA|F027    |01C8F3;
-	jsl.L CODE_009776                    ;01C8CC|22769700|009776;
+	jsl.L ExecuteSpecialBitProcessing                    ;01C8CC|22769700|009776;
 	beq Field_NextDMAEntry                      ;01C8D0|F01C    |01C8EE;
 	lda.L DATA8_06bf16,x                 ;01C8D2|BF16BF06|06BF16;
 	sta.W $19ee                          ;01C8D6|8DEE19  |0119EE;
@@ -10830,7 +10830,7 @@ Field_DelayLoop:
 ;      |        |      ;
 DATA8_01d6cb:
 	db $d1,$d6,$d0,$82,$d9,$82           ;01D6CB|        |      ;
-	jsl.L CODE_0096A0                    ;01D6D1|22A09600|0096A0;
+	jsl.L CallExternalThreadManager                    ;01D6D1|22A09600|0096A0;
 	rts                                  ;01D6D5|60      |      ;
 ;      |        |      ;
 	sep #$20                             ;01D6D6|E220    |      ;
@@ -11189,7 +11189,7 @@ Field_ScrollRight:
 	adc.B #$36                           ;01D9E6|6936    |      ;
 	ldx.W $19ea                          ;01D9E8|AEEA19  |0119EA;
 	jsr.W Field_UpdateCollisionSprite                    ;01D9EB|20CFCA  |01CACF;
-	jsl.L CODE_0B8121                    ;01D9EE|2221810B|0B8121;
+	jsl.L ExecuteLongGraphicsCall                    ;01D9EE|2221810B|0B8121;
 	lda.B #$00                           ;01D9F2|A900    |      ;
 	xba                                  ;01D9F4|EB      |      ;
 	lda.W $19e2                          ;01D9F5|ADE219  |0119E2;
@@ -11443,7 +11443,7 @@ Field_UpdateCameraPosition:
 	jsr.W Field_CameraCalculate                    ;01E03D|20908B  |018B90;
 	lda.B #$27                           ;01E040|A927    |      ;
 	jsr.W Sound_PlayEffect                    ;01E042|20ADBA  |01BAAD;
-	jsl.L CODE_00D080                    ;01E045|2280D000|00D080;
+	jsl.L ExecuteSoundProcessingSystem                    ;01E045|2280D000|00D080;
 	lda.W $1020                          ;01E049|AD2010  |011020;
 	and.B #$40                           ;01E04C|2940    |      ;
 	bne Field_CalculateCameraOffset                      ;01E04E|D00C    |01E05C;
@@ -11473,7 +11473,7 @@ Field_CalculateCameraOffsetContinue:
 	phd                                  ;01E079|0B      |      ;
 	phy                                  ;01E07A|5A      |      ;
 	pld                                  ;01E07B|2B      |      ;
-	jsl.L CODE_00974E                    ;01E07C|224E9700|00974E;
+	jsl.L CallExternalValidationRoutine                    ;01E07C|224E9700|00974E;
 	pld                                  ;01E080|2B      |      ;
 	plp                                  ;01E081|28      |      ;
 	rts                                  ;01E082|60      |      ;
@@ -11519,7 +11519,7 @@ Field_CompleteCameraUpdate:
 	phd                                  ;01E0B2|0B      |      ;
 	phy                                  ;01E0B3|5A      |      ;
 	pld                                  ;01E0B4|2B      |      ;
-	jsl.L CODE_00975A                    ;01E0B5|225A9700|00975A;
+	jsl.L CallCalculationSystem                    ;01E0B5|225A9700|00975A;
 	pld                                  ;01E0B9|2B      |      ;
 	sep #$20                             ;01E0BA|E220    |      ;
 	rep #$10                             ;01E0BC|C210    |      ;
@@ -11549,7 +11549,7 @@ Field_CompleteCameraUpdate:
 	sta.W $19e7                          ;01E0F3|8DE719  |0119E7;
 	lda.W $19e6                          ;01E0F6|ADE619  |0119E6;
 	sta.W $0020                          ;01E0F9|8D2000  |010020;
-	jsl.L CODE_009B59                    ;01E0FC|22599B00|009B59;
+	jsl.L Sub_009B59                    ;01E0FC|22599B00|009B59;
 	plb                                  ;01E100|AB      |      ;
 	lda.W $1a4e                          ;01E101|AD4E1A  |011A4E;
 	sta.W $212c                          ;01E104|8D2C21  |01212C;
@@ -11577,7 +11577,7 @@ Field_UpdateEntityPosition:
 	phb                                  ;01E138|8B      |      ;
 	lda.W $19e6                          ;01E139|ADE619  |0119E6;
 	sta.W $009e                          ;01E13C|8D9E00  |01009E;
-	jsl.L CODE_009B45                    ;01E13F|22459B00|009B45;
+	jsl.L Sub_009B45                    ;01E13F|22459B00|009B45;
 	plb                                  ;01E143|AB      |      ;
 	rts                                  ;01E144|60      |      ;
 ;      |        |      ;
@@ -11697,7 +11697,7 @@ Field_ClampEntityPosition:
 Field_CompleteEntityUpdate:
 	jsr.W Field_CameraScroll                    ;01E210|20768B  |018B76;
 	dec.W $1030                          ;01E213|CE3010  |011030;
-	jsl.L CODE_009B02                    ;01E216|22029B00|009B02;
+	jsl.L ExecuteLongEnvironmentCall                    ;01E216|22029B00|009B02;
 	jsr.W Field_AIDecisionLoop                    ;01E21A|208BE2  |01E28B;
 	jsr.W Field_AIUpdateDirection                    ;01E21D|205BE3  |01E35B;
 	lda.B #$00                           ;01E220|A900    |      ;
@@ -12130,7 +12130,7 @@ Field_WaitForInput:
 Field_CloseDialog:
 	jsr.W Field_CameraScroll                    ;01E52D|20768B  |018B76;
 	dec.W $1030                          ;01E530|CE3010  |011030;
-	jsl.L CODE_009B02                    ;01E533|22029B00|009B02;
+	jsl.L ExecuteLongEnvironmentCall                    ;01E533|22029B00|009B02;
 	lda.W $1926                          ;01E537|AD2619  |011926;
 	sta.W $193f                          ;01E53A|8D3F19  |01193F;
 	lda.B #$02                           ;01E53D|A902    |      ;
@@ -12143,7 +12143,7 @@ Field_CloseDialog:
 	clc                                  ;01E551|18      |      ;
 	adc.B #$0c                           ;01E552|690C    |      ;
 	jsr.W Field_MapSetupEntity                    ;01E554|20B08C  |018CB0;
-	jsl.L CODE_0B8121                    ;01E557|2221810B|0B8121;
+	jsl.L ExecuteLongGraphicsCall                    ;01E557|2221810B|0B8121;
 	lda.B #$00                           ;01E55B|A900    |      ;
 	xba                                  ;01E55D|EB      |      ;
 	lda.W $0e8b                          ;01E55E|AD8B0E  |010E8B;
@@ -12351,7 +12351,7 @@ Field_ProcessEntityScan:
 	sta.B $0c                            ;01E6CC|850C    |001CBA;
 	lda.W DATA8_07eb46,x                 ;01E6CE|BD46EB  |07EB46;
 	beq Field_ValidEntity                      ;01E6D1|F00D    |01E6E0;
-	jsl.L CODE_009776                    ;01E6D3|22769700|009776;
+	jsl.L ExecuteSpecialBitProcessing                    ;01E6D3|22769700|009776;
 	bne Field_ValidEntity                      ;01E6D7|D007    |01E6E0;
 ;      |        |      ;
 Field_NextEntity:
@@ -13833,7 +13833,7 @@ Field_ReadSaveData:
 	pla                                  ;01F1D2|68      |      ;
 	and.B #$07                           ;01F1D3|2907    |      ;
 	beq Field_ValidateSaveData                      ;01F1D5|F00B    |01F1E2;
-	jsl.L CODE_009776                    ;01F1D7|22769700|009776;
+	jsl.L ExecuteSpecialBitProcessing                    ;01F1D7|22769700|009776;
 	beq Field_ValidateSaveData                      ;01F1DB|F005    |01F1E2;
 	tya                                  ;01F1DD|98      |      ;
 	clc                                  ;01F1DE|18      |      ;
@@ -14209,7 +14209,7 @@ DATA8_01f453:
 	sta.W $0507                          ;01F45C|8D0705  |010507;
 	lda.B #$27                           ;01F45F|A927    |      ;
 	sta.W $0505                          ;01F461|8D0505  |010505;
-	jsl.L CODE_00D080                    ;01F464|2280D000|00D080;
+	jsl.L ExecuteSoundProcessingSystem                    ;01F464|2280D000|00D080;
 ;      |        |      ;
 Field_InitializeMapMode:
 	lda.B #$02                           ;01F468|A902    |      ;
@@ -14217,7 +14217,7 @@ Field_InitializeMapMode:
 	jsr.W MapEvent_InitializeSprite                    ;01F46D|20CD94  |0194CD;
 	jsr.W Field_CameraUpdate                    ;01F470|20838B  |018B83;
 	lda.W $0e88                          ;01F473|AD880E  |010E88;
-	jsl.L CODE_0C8013                    ;01F476|2213800C|0C8013;
+	jsl.L ExecuteSequenceProcessing                    ;01F476|2213800C|0C8013;
 	rts                                  ;01F47A|60      |      ;
 ;      |        |      ;
 	inc.W $19f7                          ;01F47B|EEF719  |0119F7;
@@ -14241,7 +14241,7 @@ Field_InitializeMapMode:
 ;      |        |      ;
 Field_CheckSpecialMap:
 	lda.B #$03                           ;01F4A7|A903    |      ;
-	jsl.L CODE_009776                    ;01F4A9|22769700|009776;
+	jsl.L ExecuteSpecialBitProcessing                    ;01F4A9|22769700|009776;
 	bne Field_MapInitLoop                      ;01F4AD|D01C    |01F4CB;
 	lda.B #$02                           ;01F4AF|A902    |      ;
 	sta.W $0e8b                          ;01F4B1|8D8B0E  |010E8B;
@@ -14366,7 +14366,7 @@ Field_UpdateMovementState:
 ;      |        |      ;
 Field_BeginTransition:
 	lda.B #$36                           ;01F6B5|A936    |      ;
-	jsl.L CODE_00976B                    ;01F6B7|226B9700|00976B;
+	jsl.L PlaySoundEffectBank                    ;01F6B7|226B9700|00976B;
 	ldy.W #$0038                         ;01F6BB|A03800  |      ;
 	ldx.W #$0000                         ;01F6BE|A20000  |      ;
 ;      |        |      ;
@@ -14464,7 +14464,7 @@ Field_WaitFrameLoop:
 	lda.B #$80                           ;01F7F4|A980    |      ;
 	trb.W $19b4                          ;01F7F6|1CB419  |0119B4;
 	lda.B #$03                           ;01F7F9|A903    |      ;
-	jsl.L CODE_009760                    ;01F7FB|22609700|009760;
+	jsl.L Sub_009760                    ;01F7FB|22609700|009760;
 	plx                                  ;01F7FF|FA      |      ;
 	stx.W $19f1                          ;01F800|8EF119  |0119F1;
 	pla                                  ;01F803|68      |      ;

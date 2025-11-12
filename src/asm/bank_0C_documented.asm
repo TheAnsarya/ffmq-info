@@ -15,9 +15,9 @@
 ; - HDMA (Horizontal DMA) effects
 ;
 ; Key Routines:
-; - CODE_0C8000: VBLANK wait routine
-; - CODE_0C8013: Character/monster stat display
-; - CODE_0C8080: Screen initialization
+; - CWaitTimingRoutine: VBLANK wait routine
+; - ExecuteSequenceProcessing: Character/monster stat display
+; - CodeScreenInitialization: Screen initialization
 ;
 ; Related Files:
 ; - Bank $0b: Battle graphics routines
@@ -98,7 +98,7 @@ Display_ShowCharStats:
 	stx.b $17	   ;0C805F	; Store to jump pointer
 	lda.b #$03	  ;0C8061	; Bank $03
 	sta.b $19	   ;0C8063	; Store bank to jump pointer
-	jsl.l CODE_009D6B ;0C8065	; Call display routine
+	jsl.l CallDisplayRoutine ;0C8065	; Call display routine
 	rep #$30		;0C8069	; 16-bit mode
 	lda.b $15	   ;0C806B	; Load return value
 	plx ;0C806D	; Restore X
@@ -116,7 +116,7 @@ Display_ShowCharStats:
 
 Display_ProcessStatValue:
 	beq .ZeroStat   ;0C8071	; Branch if zero
-	jsl.l CODE_009776 ;0C8073	; Check stat condition
+	jsl.l ExecuteSpecialBitProcessing ;0C8073	; Check stat condition
 	beq .NormalStat ;0C8077	; Branch if normal
 	lda.b #$02	  ;0C8079	; Stat modified flag
 	bra .ZeroStat   ;0C807B	; Continue
@@ -136,7 +136,7 @@ Display_ProcessStatValue:
 ; ==============================================================================
 
 Display_InitScreen:
-	jsl.l CODE_00825C ;0C8080	; Call initialization helper
+	jsl.l CallInitializationHelper ;0C8080	; Call initialization helper
 	lda.w #$0000	;0C8084	; Clear value
 	sta.l $7e3665   ;0C8087	; Clear WRAM variable
 	lda.w #$2100	;0C808B	; PPU register base address
@@ -205,17 +205,17 @@ Display_InitScreen:
 ; [Continued from documented section ending at $0c80b2]
 
 	sta.b SNES_TM-$2100 ;0C80B2	; Set main screen layers ($212c) = $11 (BG1+Obj)
-	jsr.w CODE_0C8D7B ;0C80B4	; Call graphics setup routine
+	jsr.w CallGraphicsSetupRoutine ;0C80B4	; Call graphics setup routine
 	lda.w $0112	 ;0C80B7	; Load NMI enable flags
 	sta.w $4200	 ;0C80BA	; Set NMI/IRQ/Auto-Joypad ($4200)
 	cli ;0C80BD	; Enable interrupts
 	lda.b #$0f	  ;0C80BE	; Brightness = 15 (full)
 	sta.w $00aa	 ;0C80C0	; Store brightness value
 	stz.w $0110	 ;0C80C3	; Clear screen state flag
-	jsl.l CODE_00C795 ;0C80C6	; Call main game loop handler
-	jsr.w CODE_0C8BAD ;0C80CA	; Graphics state update
-	jsr.w CODE_0C896F ;0C80CD	; Background layer setup
-	jsl.l CODE_0C8000 ;0C80D0	; Wait for VBLANK
+	jsl.l CallMainGameLoopHandler ;0C80C6	; Call main game loop handler
+	jsr.w GraphicsStateUpdate ;0C80CA	; Graphics state update
+	jsr.w BackgroundLayerSetup ;0C80CD	; Background layer setup
+	jsl.l CWaitTimingRoutine ;0C80D0	; Wait for VBLANK
 	lda.b #$01	  ;0C80D4	; BG mode 1
 	sta.b SNES_BGMODE-$2100 ;0C80D6	; Set background mode ($2105)
 	lda.b #$62	  ;0C80D8	; BG1 tilemap config
@@ -226,19 +226,19 @@ Display_InitScreen:
 	sta.b SNES_BG12NBA-$2100 ;0C80E2	; BG1/BG2 char address ($210b)
 	lda.b #$13	  ;0C80E4	; Layer enable mask
 	sta.b SNES_TM-$2100 ;0C80E6	; Set main screen layers ($212c)
-	jsr.w CODE_0C9037 ;0C80E8	; Additional graphics setup
-	jsr.w CODE_0C8103 ;0C80EB	; Call main screen init
+	jsr.w Complex_Graphics_Buffer_Initialization ;0C80E8	; Additional graphics setup
+	jsr.w CallMainScreenInit ;0C80EB	; Call main screen init
 	rep #$30		;0C80EE	; 16-bit A/X/Y
 	lda.w #$0001	;0C80F0	; Screen initialized flag
 	sta.l $7e3665   ;0C80F3	; Set screen ready flag (WRAM)
-	jsl.l CODE_00C7B8 ;0C80F7	; Game state handler
+	jsl.l GameStateHandler ;0C80F7	; Game state handler
 	sei ;0C80FB	; Disable interrupts
 	lda.w #$0008	;0C80FC	; VBLANK processing flag
 	trb.w $00d2	 ;0C80FF	; Reset VBLANK flag
 	rtl ;0C8102	; Return
 
 ; ==============================================================================
-; CODE_0C8103 - Main Screen Initialization Routine
+; CallMainScreenInit - Main Screen Initialization Routine
 ; ==============================================================================
 ; Sets up Mode 7 screen, loads palettes, initializes display registers.
 ; Called during screen transitions and battle entry.
@@ -254,11 +254,11 @@ Display_MainScreenSetup:
 	jsl.l Display_WaitVBlank ;0C8113	; Wait for VBLANK
 	lda.b #$07	  ;0C8117	; Background mode 7
 	sta.b SNES_BGMODE-$2100 ;0C8119	; Set BG mode ($2105)
-	jsr.w CODE_0C87ED ;0C811B	; Mode 7 matrix setup
+	jsr.w ModeMatrixSetup ;0C811B	; Mode 7 matrix setup
 	jsr.w Display_PaletteLoadSetup ;0C811E	; Palette load setup
-	jsr.w CODE_0C88BE ;0C8121	; Additional graphics init
-	jsr.w CODE_0C8872 ;0C8124	; Background scrolling setup
-	jsr.w CODE_0C87E9 ;0C8127	; Finalize graphics state
+	jsr.w AdditionalGraphicsInit ;0C8121	; Additional graphics init
+	jsr.w BackgroundScrollingSetup ;0C8124	; Background scrolling setup
+	jsr.w FinalizeGraphicsState ;0C8127	; Finalize graphics state
 	lda.b #$40	  ;0C812A	; VBLANK flag
 	trb.w $00d6	 ;0C812C	; Clear VBLANK pending
 	jsl.l Display_WaitVBlank ;0C812F	; Wait for VBLANK
@@ -266,12 +266,12 @@ Display_MainScreenSetup:
 	sta.b SNES_BGMODE-$2100 ;0C8135	; Set BG mode ($2105)
 	stz.b SNES_BG1VOFS-$2100 ;0C8137	; BG1 V-scroll = 0 ($210e)
 	stz.b SNES_BG1VOFS-$2100 ;0C8139	; Write high byte
-	jsr.w CODE_0C8767 ;0C813B	; Graphics state finalize
+	jsr.w GraphicsStateFinalize ;0C813B	; Graphics state finalize
 	jsr.w Display_SpriteOAMSetup ;0C813E	; Sprite/OAM setup
 	rts ;0C8141	; Return
 
 ; ==============================================================================
-; CODE_0C8142 - Window Effect Configuration
+; CodeWindowEffectConfiguration - Window Effect Configuration
 ; ==============================================================================
 ; Sets up color window registers for screen effects (fades, transitions).
 ; Configures SNES window masking system.
@@ -284,10 +284,10 @@ Display_WindowEffectSetup:
 	stx.w $0e0a	 ;0C814B	; Additional window data
 	ldx.w #$5500	;0C814E	; Window config value 3
 	stx.w $0e0c	 ;0C8151	; Final window settings
-	jmp.w CODE_0C8910 ;0C8154	; Jump to window apply routine
+	jmp.w JumpWindowApplyRoutine ;0C8154	; Jump to window apply routine
 
 ; ==============================================================================
-; CODE_0C8157 - VRAM Address Calculation Routine
+; CodeVramAddressCalculationRoutine - VRAM Address Calculation Routine
 ; ==============================================================================
 ; Calculates VRAM addresses for tile placement.
 ; Adds offset $0804 to base addresses for proper tile positioning.
@@ -310,7 +310,7 @@ Display_VRAMAddressCalc:
 	sta.w $0ccc	 ;0C817B	; Store calculated address
 	sep #$20		;0C817E	; 8-bit accumulator
 	lda.b #$80	  ;0C8180	; VRAM increment mode (increment on $2119 write)
-	jsl.l CODE_0C8000 ;0C8182	; Wait for VBLANK
+	jsl.l CWaitTimingRoutine ;0C8182	; Wait for VBLANK
 	sta.b SNES_VMAINC-$2100 ;0C8186	; Set VRAM increment ($2115)
 	lda.b #$08	  ;0C8188	; Tile pattern value
 	ldx.w #$6225	;0C818A	; VRAM address $6225
@@ -325,7 +325,7 @@ Display_VRAMAddressCalc:
 	ldx.w #$6239	;0C81A2	; VRAM address $6239
 
 ; ==============================================================================
-; CODE_0C81A5 - VRAM Pattern Fill Routine
+; CodeVramPatternFillRoutine - VRAM Pattern Fill Routine
 ; ==============================================================================
 ; Fills VRAM with sequential tile numbers for background patterns.
 ; Creates animated tile sequences (water, fire, etc.).
@@ -356,7 +356,7 @@ Display_VRAMPatternFill:
 	rts ;0C81C5	; Return
 
 ; ==============================================================================
-; CODE_0C81C6 - Color Math Disable Routine
+; CodeColorMathDisableRoutine - Color Math Disable Routine
 ; ==============================================================================
 ; Disables color addition/subtraction effects.
 ; Resets window and color math registers.
@@ -368,7 +368,7 @@ Display_ColorMathDisable:
 	rts ;0C81CA	; Return
 
 ; ==============================================================================
-; CODE_0C81CB - Color Addition Effect Setup
+; CodeColorAdditionEffectSetup - Color Addition Effect Setup
 ; ==============================================================================
 ; Enables color addition for screen brightness/darkness effects.
 ; Used for battle transitions, lightning, darkness, etc.
@@ -384,7 +384,7 @@ Display_ColorAdditionSetup:
 	rts ;0C81D9	; Return
 
 ; ==============================================================================
-; CODE_0C81DA - Palette DMA Setup Routine
+; CodePaletteDmaSetupRoutine - Palette DMA Setup Routine
 ; ==============================================================================
 ; Prepares palette data for DMA transfer during VBLANK.
 ; Sets up indirect DMA from Bank $0c address $81ef.
@@ -430,7 +430,7 @@ Display_PaletteLoadSetup:
 	rtl ;0C8223	; Return from palette DMA
 
 ; ==============================================================================
-; CODE_0C8224 - Single Palette DMA Transfer (16 bytes)
+; CodeSinglePaletteDmaTransferBytes - Single Palette DMA Transfer (16 bytes)
 ; ==============================================================================
 ; Transfers 16 bytes of palette data to CGRAM via DMA.
 ; Input: A = CGRAM address, Y = source address (Bank $07)
@@ -455,7 +455,7 @@ Display_PaletteDMATransfer:
 	rts ;0C8240	; Return
 
 ; ==============================================================================
-; CODE_0C8241 - OAM/Sprite Initialization Routine
+; CodeOamSpriteInitializationRoutine - OAM/Sprite Initialization Routine
 ; ==============================================================================
 ; Copies sprite configuration data to OAM buffer.
 ; Uses mvn (block move) for fast 9-byte transfer.
@@ -473,7 +473,7 @@ Display_SpriteOAMSetup:
 	ldx.w #$8671	;0C8257	; Effect script address
 
 ; ==============================================================================
-; CODE_0C825A - Visual Effect Script Interpreter
+; CodeVisualEffectScriptInterpreter - Visual Effect Script Interpreter
 ; ==============================================================================
 ; Interprets bytecode commands for screen effects (fades, flashes, transitions).
 ; Commands: 00=wait, 01=fade step, 02=color cycle, 03=palette load, etc.
@@ -498,10 +498,10 @@ Display_EffectScriptInterpreter:
 	phy ;0C8273	; Save loop counter
 	lda.b #$3f	  ;0C8274	; Fixed color = white ($3f)
 	sta.b SNES_COLDATA-$2100 ;0C8276	; Set color addition ($2132)
-	jsr.w CODE_0C85DB ;0C8278	; Wait one frame
+	jsr.w WaitOneFrame ;0C8278	; Wait one frame
 	lda.b #$e0	  ;0C827B	; Fixed color = dark ($e0)
 	sta.b SNES_COLDATA-$2100 ;0C827D	; Set color subtraction
-	jsr.w CODE_0C85DB ;0C827F	; Wait one frame
+	jsr.w WaitOneFrame ;0C827F	; Wait one frame
 	ply ;0C8282	; Restore loop counter
 	dey ;0C8283	; Decrement
 	bne .ColorFlash ;0C8284	; Loop 4 times (4 flashes)
@@ -513,30 +513,30 @@ Display_EffectScriptInterpreter:
 
 	.CycleLoop:
 	pha ;0C828A	; Save counter
-	jsr.w CODE_0C85DB ;0C828B	; Wait one frame
+	jsr.w WaitOneFrame ;0C828B	; Wait one frame
 	pla ;0C828E	; Restore counter
 	dec A		   ;0C828F	; Decrement
 	bne .CycleLoop  ;0C8290	; Loop until counter = 0
 
 ; Single frame delay (command 01)
 	.SingleFrame:
-	jsr.w CODE_0C85DB ;0C8292	; Wait one frame
+	jsr.w WaitOneFrame ;0C8292	; Wait one frame
 	bra Display_EffectScriptInterpreter ;0C8295	; Continue script
 
 ; Wait until condition met (command 00)
 	.WaitCondition:
-	jsr.w CODE_0C85DB ;0C8297	; Wait one frame
+	jsr.w WaitOneFrame ;0C8297	; Wait one frame
 	lda.w $0c82	 ;0C829A	; Load condition flag
 	bne .WaitCondition ;0C829D	; Loop until flag clears
 	rts ;0C829F	; Return from effect script
 
 ; Palette load command (command 03)
 	.PaletteOp:
-	jmp.w CODE_0C8460 ;0C82A0	; Jump to palette loader
+	jmp.w JumpPaletteLoader ;0C82A0	; Jump to palette loader
 
 ; Special effect command (command 05)
 	.SpecialEffect:
-	jmp.w CODE_0C8421 ;0C82A3	; Jump to special effect handler
+	jmp.w JumpSpecialEffectHandler ;0C82A3	; Jump to special effect handler
 
 ; ==============================================================================
 ; Complex Command Handler (Commands $06-$ff)
@@ -552,11 +552,11 @@ Display_EffectScriptInterpreter:
 	pla ;0C82AC	; Restore command byte
 	and.b #$f8	  ;0C82AD	; Extract command (bits 3-7)
 	cmp.b #$40	  ;0C82AF	; Command < $40?
-	bcc CODE_0C8302 ;0C82B1	; Branch to low-range handler
+	bcc BranchLowRangeHandler ;0C82B1	; Branch to low-range handler
 	cmp.b #$80	  ;0C82B3	; Command < $80?
-	bcc CODE_0C82F7 ;0C82B5	; Branch to mid-range handler
+	bcc BranchMidRangeHandler ;0C82B5	; Branch to mid-range handler
 	cmp.b #$c0	  ;0C82B7	; Command < $c0?
-	bcc CODE_0C82CF ;0C82B9	; Branch to high-range handler
+	bcc BranchHighRangeHandler ;0C82B9	; Branch to high-range handler
 	sbc.b #$40	  ;0C82BB	; Normalize command ($c0+ → $80+)
 	sta.w $0161	 ;0C82BD	; Store normalized command
 	rep #$30		;0C82C0	; 16-bit A/X/Y
@@ -564,8 +564,8 @@ Display_EffectScriptInterpreter:
 	asl A		   ;0C82C5	; *2
 	asl A		   ;0C82C6	; *4 (table offset)
 	adc.w #$0cbc	;0C82C7	; Add table base address
-	jsr.w CODE_0C83CB ;0C82CA	; Execute table entry
-	bra CODE_0C825A ;0C82CD	; Continue script
+	jsr.w ExecuteTableEntry ;0C82CA	; Execute table entry
+	bra CodeVisualEffectScriptInterpreter ;0C82CD	; Continue script
 
 ; High-range command handler ($80-$bf) - Triple table dispatch system
 Display_EffectCommandHighRange:	; Process command $80-$bf with triple table lookup
@@ -576,18 +576,18 @@ Display_EffectCommandHighRange:	; Process command $80-$bf with triple table look
 	asl A		   ;0C82D8	; *4
 	pha ;0C82D9	; Save offset
 	adc.w #$0c80	;0C82DA	; Add table base 1
-	jsr.w CODE_0C83CB ;0C82DD	; Execute table entry 1
+	jsr.w ExecuteTableEntry ;0C82DD	; Execute table entry 1
 	rep #$30		;0C82E0	; 16-bit A/X/Y
 	pla ;0C82E2	; Restore offset
 	asl A		   ;0C82E3	; *2 again (*8 total)
 	adc.w #$0c94	;0C82E4	; Add table base 2
-	jsr.w CODE_0C83CB ;0C82E7	; Execute table entry 2
+	jsr.w ExecuteTableEntry ;0C82E7	; Execute table entry 2
 	rep #$30		;0C82EA	; 16-bit A/X/Y
 	tya ;0C82EC	; Load Y (result from previous call)
 	clc ;0C82ED	; Clear carry
 	adc.w #$0004	;0C82EE	; Add 4
-	jsr.w CODE_0C83CB ;0C82F1	; Execute table entry 3
-	jmp.w CODE_0C825A ;0C82F4	; Continue script
+	jsr.w ExecuteTableEntry ;0C82F1	; Execute table entry 3
+	jmp.w CodeVisualEffectScriptInterpreter ;0C82F4	; Continue script
 
 ; Mid-range command handler ($40-$7f)
 Display_EffectCommandMidRange:
@@ -596,12 +596,12 @@ Display_EffectCommandMidRange:
 	lsr A		   ;0C82FA	; /4
 	lsr A		   ;0C82FB	; /8
 	sta.w $0200	 ;0C82FC	; Store effect type
-	jmp.w CODE_0C825A ;0C82FF	; Continue script
+	jmp.w CodeVisualEffectScriptInterpreter ;0C82FF	; Continue script
 
 ; Low-range command handler ($08-$3f)
 Display_EffectCommandLowRange:
 	cmp.b #$08	  ;0C8302	; Command = $08?
-	bne CODE_0C837D ;0C8304	; Branch if not $08
+	bne BranchIfNot ;0C8304	; Branch if not $08
 	lda.w $015f	 ;0C8306	; Load parameter
 	bne Display_EffectTableLookup ;0C8309	; Branch if parameter != 0
 	rep #$30		;0C830B	; 16-bit A/X/Y
@@ -610,7 +610,7 @@ Display_EffectCommandLowRange:
 	lda.w #$0002	;0C8313	; New value
 	tsb.w $0e08	 ;0C8316	; Set bits in window config
 	sep #$20		;0C8319	; 8-bit accumulator
-	jmp.w CODE_0C825A ;0C831B	; Continue script
+	jmp.w CodeVisualEffectScriptInterpreter ;0C831B	; Continue script
 
 ; Parameter-based table lookup
 Display_EffectTableLookup:
@@ -663,14 +663,14 @@ Display_EffectTableLookup:
 	ora.b $01,S	 ;0C8367	; OR with stack value
 	trb.w $0e0a	 ;0C8369	; Clear bits in second window config
 	cmp.w #$0003	;0C836C	; Compare to 3
-	bne CODE_0C8377 ;0C836F	; Branch if not equal
+	bne BranchIfNotEqual ;0C836F	; Branch if not equal
 	lda.w #$c000	;0C8371	; Top bits mask
 	trb.w $0e08	 ;0C8374	; Clear top bits in first window config
 
 	.CleanupAndExit:
 	pla ;0C8377	; Clean up stack
 	sep #$20		;0C8378	; 8-bit accumulator
-	jmp.w CODE_0C825A ;0C837A	; Continue script
+	jmp.w CodeVisualEffectScriptInterpreter ;0C837A	; Continue script
 
 ; ==============================================================================
 ; Complex Screen Effect Setup (Command $08+)
@@ -691,8 +691,8 @@ Display_EffectComplexParamCommand:
 	.EffectLoop:
 	pha ;0C838F	; Save counter
 	jsr.w Display_ColorAdditionSetup ;0C8390	; Enable color addition
-	jsr.w CODE_0C85DB ;0C8393	; Wait one frame
-	jsr.w CODE_0C85DB ;0C8396	; Wait one frame
+	jsr.w WaitOneFrame ;0C8393	; Wait one frame
+	jsr.w WaitOneFrame ;0C8396	; Wait one frame
 
 ; [Additional effect code continues...]
 
@@ -712,12 +712,12 @@ Display_EffectComplexParamCommand:
 
 ; [Continued from Cycle 1 ending at $0c8399]
 
-	jsr.w CODE_0C85DB ;0C8396	; Wait one frame (VBLANK sync)
+	jsr.w WaitOneFrame ;0C8396	; Wait one frame (VBLANK sync)
 	lda.b #$11	  ;0C8399	; Layer enable mask
 	sta.b SNES_TM-$2100 ;0C839B	; Set main screen layers ($212c)
 	jsr.w Display_ColorMathDisable ;0C839D	; Disable color math
-	jsr.w CODE_0C85DB ;0C83A0	; Wait one frame
-	jsr.w CODE_0C85DB ;0C83A3	; Wait one frame
+	jsr.w WaitOneFrame ;0C83A0	; Wait one frame
+	jsr.w WaitOneFrame ;0C83A3	; Wait one frame
 	pla ;0C83A6	; Restore loop counter
 	dec A		   ;0C83A7	; Decrement
 	bne .EffectLoop ;0C83A8	; Loop if not done (16 frames total)
@@ -726,7 +726,7 @@ Display_EffectComplexParamCommand:
 	jmp.w Display_EffectScriptInterpreter ;0C83AE	; Continue effect script
 
 ; ==============================================================================
-; CODE_0C83B1 - Flash Effect Subroutine
+; CodeFlashEffectSubroutine - Flash Effect Subroutine
 ; ==============================================================================
 ; Creates white flash effect (bright → normal → bright sequence).
 ; Used for lightning, magic spells, critical hits.
@@ -738,14 +738,14 @@ Display_FlashEffect:
 	sta.b SNES_TM-$2100 ;0C83B6	; Set layers ($212c)
 	lda.b #$3f	  ;0C83B8	; Fixed color = white ($3f)
 	sta.b SNES_COLDATA-$2100 ;0C83BA	; Set color addition ($2132)
-	jsr.w CODE_0C85DB ;0C83BC	; Wait one frame (flash)
+	jsr.w WaitOneFrame ;0C83BC	; Wait one frame (flash)
 	jsr.w Display_ColorMathDisable ;0C83BF	; Disable color math
-	jsr.w CODE_0C85DB ;0C83C2	; Wait one frame
-	jsr.w CODE_0C85DB ;0C83C5	; Wait one frame
-	jmp.w CODE_0C85DB ;0C83C8	; Wait one frame and return
+	jsr.w WaitOneFrame ;0C83C2	; Wait one frame
+	jsr.w WaitOneFrame ;0C83C5	; Wait one frame
+	jmp.w WaitOneFrame ;0C83C8	; Wait one frame and return
 
 ; ==============================================================================
-; CODE_0C83CB - Table-Based Effect Executor
+; ExecuteTableEntry - Table-Based Effect Executor
 ; ==============================================================================
 ; Executes visual effects from data tables.
 ; Modifies screen position/color values based on command and parameter.
@@ -803,7 +803,7 @@ Effect_HighRangeHandler:
 	rts ;0C8420	; Return
 
 ; ==============================================================================
-; CODE_0C8421 - Screen Scroll Effect
+; JumpSpecialEffectHandler - Screen Scroll Effect
 ; ==============================================================================
 ; Animated scrolling effect for screen transitions.
 ; Scrolls window positions over 32 frames, then holds for 60 frames.
@@ -827,7 +827,7 @@ Display_ScreenScrollEffect:
 	lda.w $0cc0	 ;0C843E	; Load position 6
 	adc.b #$03	  ;0C8441	; Scroll +3 pixels
 	sta.w $0cc0	 ;0C8443	; Update position 6
-	jsr.w CODE_0C85DB ;0C8446	; Wait one frame
+	jsr.w WaitOneFrame ;0C8446	; Wait one frame
 	pla ;0C8449	; Restore counter
 	dec A		   ;0C844A	; Decrement
 	bne .ScrollLoop ;0C844B	; Loop 32 times
@@ -835,7 +835,7 @@ Display_ScreenScrollEffect:
 
 	.HoldLoop:
 	pha ;0C844F	; Save counter
-	jsr.w CODE_0C85DB ;0C8450	; Wait one frame
+	jsr.w WaitOneFrame ;0C8450	; Wait one frame
 	pla ;0C8453	; Restore counter
 	dec A		   ;0C8454	; Decrement
 	bne .HoldLoop   ;0C8455	; Loop 60 times
@@ -844,7 +844,7 @@ Display_ScreenScrollEffect:
 	jmp.w Display_EffectScriptInterpreter ;0C845D	; Continue script
 
 ; ==============================================================================
-; CODE_0C8460 - Complex Palette Fade Sequence
+; JumpPaletteLoader - Complex Palette Fade Sequence
 ; ==============================================================================
 ; Multi-stage palette fading effect using indirect function calls.
 ; Cycles through color transformations with precise timing.
@@ -862,17 +862,17 @@ Display_ComplexPaletteFade:
 	ldy.w #$8520	;0C8476	; Different fade table
 	jsr.w Display_PaletteFadeStage ;0C8479	; Execute fade stage 3
 	ldy.w #$84cc	;0C847C	; Fade table address
-	jsr.w CODE_0C849E ;0C847F	; Execute fade stage 4
+	jsr.w ExecuteFadeStage ;0C847F	; Execute fade stage 4
 	ldy.w #$84f6	;0C8482	; Fade table address
-	jsr.w CODE_0C849E ;0C8485	; Execute fade stage 5
+	jsr.w ExecuteFadeStage ;0C8485	; Execute fade stage 5
 	stz.w $0214	 ;0C8488	; Clear fade state
 	ldy.w #$854a	;0C848B	; Function pointer 2
 	sty.w $0212	 ;0C848E	; Update function address
 	ldy.w #$84cb	;0C8491	; Final fade table
-	jsr.w CODE_0C849E ;0C8494	; Execute final stage
-	jsr.w CODE_0C85DB ;0C8497	; Wait one frame
+	jsr.w ExecuteFadeStage ;0C8494	; Execute final stage
+	jsr.w WaitOneFrame ;0C8497	; Wait one frame
 	plx ;0C849A	; Restore script pointer
-	jmp.w CODE_0C825A ;0C849B	; Continue script
+	jmp.w CodeVisualEffectScriptInterpreter ;0C849B	; Continue script
 
 ; ==============================================================================
 ; Display_FadeStageExecutor - Fade Stage Executor
@@ -992,12 +992,12 @@ Display_FadeFunction4:
 	lda.b $02,S	 ;0C8562	; Load original value
 	sec ;0C8564	; Set carry
 	sbc.b $01,S	 ;0C8565	; Subtract half-fade value
-	jsr.w CODE_0C8575 ;0C8567	; Apply to screen
+	jsr.w ApplyScreen ;0C8567	; Apply to screen
 	pla ;0C856A	; Clean up stack
 	pla ;0C856B	; Clean up stack
 	phy ;0C856C	; Save Y
 	ldy.w #$0000	;0C856D	; Clear Y
-	jsr.w CODE_0C8575 ;0C8570	; Apply secondary effect
+	jsr.w ApplyScreen ;0C8570	; Apply secondary effect
 	ply ;0C8573	; Restore Y
 	rts ;0C8574	; Return
 
@@ -1114,7 +1114,7 @@ Display_WaitVBlankAndUpdate:
 	inc.w $020e	 ;0C864C	; Increment by 2 (word addressing)
 	dec.w $020c	 ;0C864F	; Decrement counter
 	bne .SpriteUpdateLoop ;0C8652	; Loop for all 5 sprites
-	jsr.w CODE_0C8910 ;0C8654	; Update PPU registers
+	jsr.w JumpWindowApplyRoutine ;0C8654	; Update PPU registers
 	plx ;0C8657	; Restore X
 	rts ;0C8658	; Return
 
@@ -1157,7 +1157,7 @@ Display_SpriteOAMDataCopy:
 	ldy.w #$0c80	;0C876C	; Destination address (OAM buffer)
 	lda.w #$006f	;0C876F	; Transfer size = 112 bytes
 	mvn $00,$0c	 ;0C8772	; Block move (Bank $0c → Bank $00)
-	jsr.w CODE_0C8910 ;0C8775	; Update PPU registers
+	jsr.w JumpWindowApplyRoutine ;0C8775	; Update PPU registers
 	rts ;0C8778	; Return
 
 ; OAM sprite configuration data (112 bytes)
@@ -1194,7 +1194,7 @@ Display_Mode7TilemapSetup:
 	ldx.w #$4000	;0C87F3	; VRAM start address
 	ldy.w #$001e	;0C87F6	; Row count = 30
 	lda.w #$00c0	;0C87F9	; Fill pattern = $c0
-	jsl.l CODE_009994 ;0C87FC	; Call tilemap fill routine
+	jsl.l CallTilemapFillRoutine ;0C87FC	; Call tilemap fill routine
 	plb ;0C8800	; Restore data bank
 	sep #$20		;0C8801	; 8-bit accumulator
 	stz.w $4204	 ;0C8803	; Clear multiply/divide register
@@ -1206,7 +1206,7 @@ Display_Mode7TilemapSetup:
 	asl A		   ;0C880D	; *2
 	sta.w $4205	 ;0C880E	; Store to multiply register
 	lda.b #$20	  ;0C8811	; Value = $20
-	jsl.l CODE_009726 ;0C8813	; Call calculation routine
+	jsl.l ExecuteHardwareDivision ;0C8813	; Call calculation routine
 ; [Additional Mode 7 setup continues...]
 
 ; ==============================================================================
@@ -1225,7 +1225,7 @@ Display_Mode7TilemapSetup:
 
 ; [Continued from Cycle 2 ending at $0c8813]
 
-	jsl.l CODE_009726 ;0C8813	; Call hardware multiply routine
+	jsl.l ExecuteHardwareDivision ;0C8813	; Call hardware multiply routine
 	rep #$30		;0C8817	; 16-bit A/X/Y
 	lda.w $4214	 ;0C8819	; Read quotient from hardware divider
 	sta.l $7f0010,X ;0C881C	; Store to Mode 7 calculation buffer
@@ -1302,13 +1302,13 @@ Display_AnimatedVerticalScroll:
 	phk ;0C8877	; Push data bank
 	plb ;0C8878	; Set data bank
 	pha ;0C8879	; Save scroll value
-	jsl.l CODE_0C8000 ;0C887A	; Wait for VBLANK
+	jsl.l CWaitTimingRoutine ;0C887A	; Wait for VBLANK
 	sta.b SNES_BG1VOFS-$2100 ;0C887E	; Set BG1 vertical scroll ($210e)
 	stz.b SNES_BG1VOFS-$2100 ;0C8880	; High byte = 0
 	lda.w DATA8_0C88B0,X ;0C8882	; Load animation tile pattern
 	inx ;0C8885	; Next table entry
 	phx ;0C8886	; Save index
-	jsr.w CODE_0C88EB ;0C8887	; Draw tile pattern (3×3 grid)
+	jsr.w DrawTilePatternGrid ;0C8887	; Draw tile pattern (3×3 grid)
 	plx ;0C888A	; Restore index
 	cpx.w #$000e	;0C888B	; End of 14-entry table?
 	bne .CheckScrollRange ;0C888E	; Branch if not done
@@ -1361,7 +1361,7 @@ Display_Mode7MatrixInit:
 	plb ;0C88BF	; Set data bank
 	clc ;0C88C0	; Clear carry
 	lda.b #$84	  ;0C88C1	; Center Y = $84 (132 decimal)
-	jsl.l CODE_0C8000 ;0C88C3	; Wait for VBLANK
+	jsl.l CWaitTimingRoutine ;0C88C3	; Wait for VBLANK
 	stz.b SNES_VMAINC-$2100 ;0C88C7	; VRAM address increment = 1
 
 ; Set Mode 7 center point (X coordinate)
@@ -1445,7 +1445,7 @@ Display_SetupNMIOAMTransfer:
 	stx.w $0058	 ;0C891C	; Store NMI handler pointer
 	lda.b #$40	  ;0C891F	; Flag bit 6
 	tsb.w $00e2	 ;0C8921	; Set NMI control flag (enable OAM transfer)
-	jsl.l CODE_0C8000 ;0C8924	; Wait for VBLANK
+	jsl.l CWaitTimingRoutine ;0C8924	; Wait for VBLANK
 	rts ;0C8928	; Return
 
 ; ==============================================================================
@@ -1516,8 +1516,8 @@ Display_Mode7RotationSequence:
 	lda.w $0000,Y   ;0C897D	; Load rotation angle
 	beq .PostRotationFade ;0C8980	; Exit if angle = 0 (no rotation)
 	phy ;0C8982	; Save table pointer
-	jsl.l CODE_0C8000 ;0C8983	; Wait for VBLANK
-	jsr.w CODE_0C8A78 ;0C8987	; Update Mode 7 matrix ($4202 multiply)
+	jsl.l CWaitTimingRoutine ;0C8983	; Wait for VBLANK
+	jsr.w UpdateModeMatrixMultiply ;0C8987	; Update Mode 7 matrix ($4202 multiply)
 	ply ;0C898A	; Restore table pointer
 
 ; Calculate vertical scroll based on rotation progress
@@ -1538,9 +1538,9 @@ Display_Mode7RotationSequence:
 	lda.b #$1e	  ;0C899B	; Loop counter = 30 frames
 
 	.FadeLoop:
-	jsl.l CODE_0C8000 ;0C899D	; Wait for VBLANK
+	jsl.l CWaitTimingRoutine ;0C899D	; Wait for VBLANK
 	pha ;0C89A1	; Save counter
-	jsr.w CODE_0C8A76 ;0C89A2	; Update Mode 7 matrix
+	jsr.w UpdateModeMatrix ;0C89A2	; Update Mode 7 matrix
 	pla ;0C89A5	; Restore counter
 	dec A		   ;0C89A6	; Decrement
 	bne .FadeLoop   ;0C89A7	; Loop 30 times
@@ -1552,7 +1552,7 @@ Display_Mode7RotationSequence:
 	.SpritePositionLoop:						; Sprite position update loop
 	ldy.w $0062	 ;0C89AF	; Load position
 	phy ;0C89B2	; Save position
-	jsr.w CODE_0C8A3F ;0C89B3	; Update sprite coordinates
+	jsr.w UpdateSpriteCoordinates ;0C89B3	; Update sprite coordinates
 	ply ;0C89B6	; Restore position
 	sty.w $0062	 ;0C89B7	; Store position
 	inc.w $0062	 ;0C89BA	; Increment X coordinate
@@ -1561,7 +1561,7 @@ Display_Mode7RotationSequence:
 ; Second sprite update (staggered)
 	ldy.w $0062	 ;0C89C0	; Load updated position
 	phy ;0C89C3	; Save position
-	jsr.w CODE_0C8A3F ;0C89C4	; Update sprite coordinates
+	jsr.w UpdateSpriteCoordinates ;0C89C4	; Update sprite coordinates
 	ply ;0C89C7	; Restore position
 	sty.w $0062	 ;0C89C8	; Store position
 	inc.w $0062	 ;0C89CB	; Increment X coordinate
@@ -1575,21 +1575,21 @@ Display_Mode7RotationSequence:
 ; Third sprite update (pattern of 3)
 	ldy.w $0062	 ;0C89D8	; Load position
 	phy ;0C89DB	; Save position
-	jsr.w CODE_0C8A3F ;0C89DC	; Update sprite coordinates
+	jsr.w UpdateSpriteCoordinates ;0C89DC	; Update sprite coordinates
 	ply ;0C89DF	; Restore position
 	sty.w $0062	 ;0C89E0	; Store position
 	inc.w $0062	 ;0C89E3	; Increment X coordinate
 	bra .SpritePositionLoop ;0C89E6	; Continue loop
 
 	.WaitForTableSync:							; Wait for table sync loop
-	jsl.l CODE_0C8000 ;0C89E8	; Wait for VBLANK
-	jsr.w CODE_0C8A76 ;0C89EC	; Update Mode 7 matrix
+	jsl.l CWaitTimingRoutine ;0C89E8	; Wait for VBLANK
+	jsr.w UpdateModeMatrix ;0C89EC	; Update Mode 7 matrix
 	cpx.w #$8b66	;0C89EF	; Table index at $8b66?
 	bne .WaitForTableSync ;0C89F2	; Loop until synced
 
 	.FinalSyncHold:								; Final sync hold loop
-	jsl.l CODE_0C8000 ;0C89F4	; Wait for VBLANK
-	jsr.w CODE_0C8A76 ;0C89F8	; Update Mode 7 matrix
+	jsl.l CWaitTimingRoutine ;0C89F4	; Wait for VBLANK
+	jsr.w UpdateModeMatrix ;0C89F8	; Update Mode 7 matrix
 	cpx.w #$8b66	;0C89FB	; Table index at $8b66?
 	bne .FinalSyncHold ;0C89FE	; Loop until stable
 
@@ -1622,7 +1622,7 @@ Display_Mode7RotationSequence:
 	bne Display_Mode7RotationSequence.SpriteDecrementLoop ;0C8A24	; Loop for all sprites
 
 	jsr.w Display_SetupNMIOAMTransfer ;0C8A26	; Update OAM via NMI
-	jsl.l CODE_0C8000 ;0C8A29	; Wait for VBLANK
+	jsl.l CWaitTimingRoutine ;0C8A29	; Wait for VBLANK
 	plx ;0C8A2D	; Restore buffer pointer
 	ply ;0C8A2E	; Restore sprite count
 	lda.b $01,S	 ;0C8A2F	; Load brightness level from stack
@@ -1668,7 +1668,7 @@ Display_SpritePositionCalculator:
 	sty.w $0058	 ;0C8A6A	; Store handler pointer
 	lda.b #$40	  ;0C8A6D	; Flag bit 6
 	tsb.w $00e2	 ;0C8A6F	; Set NMI enable flag
-	jsl.l CODE_0C8000 ;0C8A72	; Wait for VBLANK
+	jsl.l CWaitTimingRoutine ;0C8A72	; Wait for VBLANK
 
 ; ==============================================================================
 ; Display_HardwareMultiplySetup - Hardware Multiply Initialization
@@ -1698,7 +1698,7 @@ Display_HardwareMultiplySetup:
 	ldx.w #$8b66	;0C8A93	; Wrap to table start
 
 	.WriteMatrixRegisters:						; Write Mode 7 matrix registers
-	jsl.l CODE_0C8000 ;0C8A96	; Wait for VBLANK
+	jsl.l CWaitTimingRoutine ;0C8A96	; Wait for VBLANK
 
 ; Update Mode 7 matrix A register ($211b)
 	lda.w $0062	 ;0C8A9A	; Load matrix A low byte
@@ -1746,13 +1746,13 @@ Display_ReadMultiplyMatrixElement:
 	lda.w $0000,X   ;0C8ACF	; Load low byte only
 
 	.SmallPositive:								; Small positive value path
-	jsl.l CODE_00971E ;0C8AD2	; Setup hardware multiply/divide
+	jsl.l CallMultiplicationRoutine ;0C8AD2	; Setup hardware multiply/divide
 	ldy.w $4216	 ;0C8AD6	; Read division remainder
 	sty.w $4204	 ;0C8AD9	; Store to dividend register
 
 	.CommonMultiply:							; Common multiply path
 	lda.b #$30	  ;0C8ADC	; Multiplier = 48
-	jsl.l CODE_009726 ;0C8ADE	; Perform hardware multiply
+	jsl.l ExecuteHardwareDivision ;0C8ADE	; Perform hardware multiply
 	ldy.w $4214	 ;0C8AE2	; Read product result ($4214)
 	rts ;0C8AE5	; Return with result in Y
 
@@ -1818,7 +1818,7 @@ Display_ReadMultiplyMatrixElement:
 	stx.w $0064	 ;0C8B1D	; Store row counter
 	ldx.w #$0414	;0C8B20	; Data buffer address
 	lda.w $0063	 ;0C8B23	; Load Y position
-	jsr.w CODE_0C8B3C ;0C8B26	; Update vertical sprite positions
+	jsr.w UpdateVerticalSpritePositions ;0C8B26	; Update vertical sprite positions
 
 ; Update horizontal sprite positions
 	ldx.w #$000b	;0C8B29	; Column count = 11
@@ -1826,7 +1826,7 @@ Display_ReadMultiplyMatrixElement:
 	ldy.w #$6000	;0C8B2F	; VRAM address = $6000
 	ldx.w $0400	 ;0C8B32	; Load X coordinate offset
 	lda.w $0062	 ;0C8B35	; Load X position
-	jsr.w CODE_0C8B3C ;0C8B38	; Update horizontal sprite positions
+	jsr.w UpdateVerticalSpritePositions ;0C8B38	; Update horizontal sprite positions
 	rtl ;0C8B3B	; Return from NMI handler
 
 ; ==============================================================================
@@ -1964,7 +1964,7 @@ Display_TitleScreenInit:
 
 	plb ;0C8C12	; Restore data bank
 	clc ;0C8C13	; Clear carry
-	jsl.l CODE_0C8000 ;0C8C14	; Wait for VBLANK
+	jsl.l CWaitTimingRoutine ;0C8C14	; Wait for VBLANK
 	stz.b SNES_VMAINC-$2100 ;0C8C18	; VRAM address increment = 1
 
 ; Set Mode 7 center point
@@ -2053,7 +2053,7 @@ DATA8_0C8CDE:
 ; Tilemap Fill Command Table
 ; ==============================================================================
 ; Format: [repeat_count] [start_tile] [vram_offset]
-; Used by CODE_0C8C37 to efficiently fill VRAM tilemaps.
+; Used by UsedCodeEfficientlyFillVramTilemaps to efficiently fill VRAM tilemaps.
 ; Offset = 0 marks end of table.
 ; ==============================================================================
 
@@ -2086,15 +2086,15 @@ Display_TitleScreenVRAMSetup:
 
 ; Transfer palette group 1
 	lda.b #$00	  ;0C8D8D	; Palette offset = 0
-	jsr.w CODE_0C8F98 ;0C8D8F	; Transfer palette via DMA
+	jsr.w TransferPaletteViaDma ;0C8D8F	; Transfer palette via DMA
 
 ; Transfer palette group 2
 	lda.b #$80	  ;0C8D92	; Palette offset = $80 (128 colors)
-	jsr.w CODE_0C8F98 ;0C8D94	; Transfer palette via DMA
+	jsr.w TransferPaletteViaDma ;0C8D94	; Transfer palette via DMA
 
 ; Transfer palette group 3
 	lda.b #$c0	  ;0C8D97	; Palette offset = $c0 (192 colors)
-	jsr.w CODE_0C8F98 ;0C8D99	; Transfer palette via DMA
+	jsr.w TransferPaletteViaDma ;0C8D99	; Transfer palette via DMA
 
 ; Fill OAM sprite buffer with pattern
 	rep #$30		;0C8D9C	; 16-bit A/X/Y
@@ -2105,7 +2105,7 @@ Display_TitleScreenVRAMSetup:
 	lda.w #$021d	;0C8DAA	; Transfer 542 bytes (fill entire OAM)
 	mvn $00,$00	 ;0C8DAD	; Block move within Bank $00
 
-	jsr.w CODE_0C8948 ;0C8DB0	; Perform OAM DMA transfer
+	jsr.w PerformOamDmaTransfer ;0C8DB0	; Perform OAM DMA transfer
 
 ; Setup tilemap DMA transfer
 	ldx.w #$1809	;0C8DB3	; DMA mode: Word, A→A, increment
@@ -2119,8 +2119,8 @@ Display_TitleScreenVRAMSetup:
 	lda.b #$01	  ;0C8DC6	; Enable DMA channel 0
 	sta.w $420b	 ;0C8DC8	; Start DMA transfer ($420b)
 
-	jsr.w CODE_0C90F9 ;0C8DCB	; Additional VRAM setup routine
-	jsr.w CODE_0C9142 ;0C8DCE	; Secondary graphics initialization
+	jsr.w Battle_Graphics_Upload_Split_Transfer ;0C8DCB	; Additional VRAM setup routine
+	jsr.w Complex_SpriteGraphics_Initialization_System ;0C8DCE	; Secondary graphics initialization
 
 ; Transfer large graphics block to VRAM $4000
 	ldx.w #$1801	;0C8DD1	; DMA mode: Byte, A→A
@@ -2223,7 +2223,7 @@ Display_TilemapCommandProcessor:	; Process tilemap fill commands from table
 
 	.TileFillLoop:
 	phy ;0C8E6F	; Save counter
-	jsr.w CODE_0C8FB4 ;0C8E70	; Write tile pattern (subroutine)
+	jsr.w 4bpp_Planar_To_Linear_Graphics_Decompression ;0C8E70	; Write tile pattern (subroutine)
 	ply ;0C8E73	; Restore counter
 	dey ;0C8E74	; Decrement
 	bne Display_TilemapCommandProcessor.TileFillLoop ;0C8E75	; Loop for repeat count
@@ -2245,7 +2245,7 @@ Display_TilemapCommandProcessor:	; Process tilemap fill commands from table
 	pla ;0C8E8C	; Clean up stack
 	phk ;0C8E8D	; Push data bank
 	plb ;0C8E8E	; Set data bank
-	jsr.w CODE_0C8EA8 ;0C8E8F	; Additional text/logo setup
+	jsr.w AdditionalTextLogoSetup ;0C8E8F	; Additional text/logo setup
 
 ; Fill bottom screen area with pattern $10
 	sep #$20		;0C8E92	; 8-bit accumulator
@@ -2263,8 +2263,8 @@ Display_TilemapCommandProcessor:	; Process tilemap fill commands from table
 	plp ;0C8EA6	; Restore processor status
 	rts ;0C8EA7	; Return
 
-; [Additional text/logo transfer routines continue at CODE_0C8EA8...]
-; [Palette DMA setup continues at CODE_0C8F98...]
+; [Additional text/logo transfer routines continue at AdditionalTextLogoSetup...]
+; [Palette DMA setup continues at TransferPaletteViaDma...]
 
 ; ==============================================================================
 ; End of Bank $0c Cycle 4
@@ -2293,7 +2293,7 @@ Display_TilemapCommandProcessor:	; Process tilemap fill commands from table
 	rts ;0C8FB3|60      |      ; Return
 
 ; ==============================================================================
-; CODE_0C8FB4: 4bpp Planar to Linear Graphics Decompression
+; 4bpp_Planar_To_Linear_Graphics_Decompression: 4bpp Planar to Linear Graphics Decompression
 ; ==============================================================================
 ; Purpose: Convert SNES 4bpp planar graphics format to linear format for processing
 ; Input: X = pointer to source tile data (32 bytes per 8x8 tile in planar format)
@@ -2302,11 +2302,11 @@ Display_TilemapCommandProcessor:	; Process tilemap fill commands from table
 ; Algorithm: Interleave 4 bitplanes by shifting and combining bits
 ; Used by: Graphics loading routines during initialization/transitions
 ; ------------------------------------------------------------------------------
-CODE_0C8FB4:
+4bpp_Planar_To_Linear_Graphics_Decompression:
 	sep #$20		;0C8FB4|E220    |      ; 8-bit accumulator
 	lda.b #$08	  ;0C8FB6|A908    |      ; 8 rows per tile (8x8 pixels)
 
-CODE_0C8FB8:
+Label_0C8FB8:
 ; Process one row of the tile (8 pixels)
 	pha ;0C8FB8|48      |      ; Save row counter
 
@@ -2320,7 +2320,7 @@ CODE_0C8FB8:
 	sty.b $62	   ;0C8FC1|8462    |000062; Store in DP $62-$63
 	ldy.w #$0008	;0C8FC3|A00800  |      ; 8 pixels per row
 
-CODE_0C8FC6:
+Label_0C8FC6:
 ; Deinterleave 4 bitplanes into 4-bit pixel value
 ; Each pixel needs bits from all 4 planes
 ; Shift order: BP3, BP2, BP1, BP0 (MSB to LSB)
@@ -2335,14 +2335,14 @@ CODE_0C8FC6:
 	and.b #$0f	  ;0C8FD2|290F    |      ; Mask to 4 bits (palette index 0-15)
 	sta.l SNES_VMDATAH ;0C8FD4|8F192100|002119; Write to VRAM high byte ($2119)
 	dey ;0C8FD8|88      |      ; Decrement pixel counter
-	bne CODE_0C8FC6 ;0C8FD9|D0EB    |0C8FC6; Loop for all 8 pixels
+	bne Label_0C8FC6 ;0C8FD9|D0EB    |0C8FC6; Loop for all 8 pixels
 
 ; Move to next row
 	inx ;0C8FDB|E8      |      ; X += 2 (next row in planar format)
 	inx ;0C8FDC|E8      |      ; (2 bytes per row per plane pair)
 	pla ;0C8FDD|68      |      ; Restore row counter
 	dec A		   ;0C8FDE|3A      |      ; Decrement row count
-	bne CODE_0C8FB8 ;0C8FDF|D0D7    |0C8FB8; Loop for all 8 rows
+	bne Label_0C8FB8 ;0C8FDF|D0D7    |0C8FB8; Loop for all 8 rows
 
 ; Tile complete, X now points +$10 from start
 	rep #$30		;0C8FE1|C230    |      ; 16-bit mode
@@ -2352,23 +2352,23 @@ CODE_0C8FC6:
 	rts ;0C8FE8|60      |      ; Return
 
 ; ==============================================================================
-; CODE_0C8FE9: RGB555 Color to Tile Pattern Converter (Batch)
+; RGB555_Color_To_Tile_Pattern_Converter_Batch: RGB555 Color to Tile Pattern Converter (Batch)
 ; ==============================================================================
 ; Purpose: Convert multiple RGB555 color values to tile patterns via lookup
 ; Input: X = pointer to RGB555 color data, Y = count
-; Output: Tile patterns written to VRAM via CODE_0C8FF4
+; Output: Tile patterns written to VRAM via RGB555_Color_To_Tile_Pattern_Converter_Single
 ; Used by: Color-based tile generation (e.g., solid color tiles, gradients)
 ; ------------------------------------------------------------------------------
-CODE_0C8FE9:
+RGB555_Color_To_Tile_Pattern_Converter_Batch:
 	lda.w $0000,X   ;0C8FE9|BD0000  |0C0000; Load RGB555 color word
-	jsr.w CODE_0C8FF4 ;0C8FEC|20F48F  |0C8FF4; Convert to tile pattern
+	jsr.w RGB555_Color_To_Tile_Pattern_Converter_Single ;0C8FEC|20F48F  |0C8FF4; Convert to tile pattern
 	inx ;0C8FEF|E8      |      ; Move to next color
 	dey ;0C8FF0|88      |      ; Decrement count
-	bne CODE_0C8FE9 ;0C8FF1|D0F6    |0C8FE9; Loop until all colors processed
+	bne RGB555_Color_To_Tile_Pattern_Converter_Batch ;0C8FF1|D0F6    |0C8FE9; Loop until all colors processed
 	rts ;0C8FF3|60      |      ; Return
 
 ; ==============================================================================
-; CODE_0C8FF4: RGB555 Color to Tile Pattern Converter (Single)
+; RGB555_Color_To_Tile_Pattern_Converter_Single: RGB555 Color to Tile Pattern Converter (Single)
 ; ==============================================================================
 ; Purpose: Convert single RGB555 color to 8x8 tile pattern using lookup table
 ; Input: A = RGB555 color word (%0BBBBBGGGGGRRRRR, 15-bit color)
@@ -2382,7 +2382,7 @@ CODE_0C8FE9:
 ; Lookup Table: DATA8_078031 contains pre-generated tile patterns
 ; VRAM Format: Each tile row writes to $2118 (VMDATAL), auto-increment
 ; ------------------------------------------------------------------------------
-CODE_0C8FF4:
+RGB555_Color_To_Tile_Pattern_Converter_Single:
 	phy ;0C8FF4|5A      |      ; Preserve registers
 	phx ;0C8FF5|DA      |      ;
 	pha ;0C8FF6|48      |      ; Save color value
@@ -2407,7 +2407,7 @@ CODE_0C8FF4:
 
 	ldy.w #$0008	;0C9007|A00800  |      ; 8 rows per tile
 
-CODE_0C900A:
+Label_0C900A:
 ; Lookup tile pattern for each row
 	tax ;0C900A|AA      |      ; Use color index as X
 	lda.l DATA8_078031,X ;0C900B|BF318007|078031; Load pattern byte from Bank $07
@@ -2416,7 +2416,7 @@ CODE_0C900A:
 	txa ;0C9015|8A      |      ; Restore index
 	adc.w #$0040	;0C9016|694000  |      ; +$40 for next row in table
 	dey ;0C9019|88      |      ; Decrement row counter
-	bne CODE_0C900A ;0C901A|D0EE    |0C900A; Loop for 8 rows
+	bne Label_0C900A ;0C901A|D0EE    |0C900A; Loop for 8 rows
 
 ; Write 8 zero bytes (padding for 4bpp high bitplanes)
 	stz.w $2118	 ;0C901C|9C1821  |0C2118; Zero byte 1
@@ -2433,7 +2433,7 @@ CODE_0C900A:
 	rts ;0C9036|60      |      ; Return
 
 ; ==============================================================================
-; CODE_0C9037: Complex Graphics Buffer Initialization
+; Complex_Graphics_Buffer_Initialization: Complex Graphics Buffer Initialization
 ; ==============================================================================
 ; Purpose: Initialize large graphics buffer in Bank $7f with processed tile data
 ; Input: None (uses hardcoded buffer addresses)
@@ -2443,7 +2443,7 @@ CODE_0C900A:
 ; Used by: Major graphics transitions, screen initialization
 ; Technique: Uses mvn block move for efficiency after processing
 ; ------------------------------------------------------------------------------
-CODE_0C9037:
+Complex_Graphics_Buffer_Initialization:
 	php ;0C9037|08      |      ; Save processor status
 	phd ;0C9038|0B      |      ; Save direct page
 	rep #$30		;0C9039|C230    |      ; 16-bit mode
@@ -2464,13 +2464,13 @@ CODE_0C9037:
 	pea.w $007f	 ;0C904F|F47F00  |0C007F; Push $7f00
 	plb ;0C9052|AB      |      ; Pull into DB ($7f)
 
-CODE_0C9053:
+Label_0C9053:
 ; Process 128 tiles
 	pha ;0C9053|48      |      ; Save iteration counter
-	jsr.w CODE_0C9099 ;0C9054|209990  |0C9099; Process one tile (decompression)
+	jsr.w Tile_Processing_Routine_4bpp_Decompression_To_Buffer ;0C9054|209990  |0C9099; Process one tile (decompression)
 	pla ;0C9057|68      |      ; Restore counter
 	dec A		   ;0C9058|3A      |      ; Decrement
-	bne CODE_0C9053 ;0C9059|D0F8    |0C9053; Loop for all 128 tiles
+	bne Label_0C9053 ;0C9059|D0F8    |0C9053; Loop for all 128 tiles
 
 ; Setup DMA transfer for processed buffer
 	plb ;0C905B|AB      |      ; Restore data bank
@@ -2483,7 +2483,7 @@ CODE_0C9053:
 ; Register completion handler
 	lda.b #$40	  ;0C9069|A940    |      ; bit 6 flag
 	tsb.w $00e2	 ;0C906B|0CE200  |0000E2; Test and Set bit at $e2
-	jsl.l CODE_0C8000 ;0C906E|2200800C|0C8000; Call graphics handler
+	jsl.l CWaitTimingRoutine ;0C906E|2200800C|0C8000; Call graphics handler
 
 	pld ;0C9072|2B      |      ; Restore direct page
 	plp ;0C9073|28      |      ; Restore processor status
@@ -2517,20 +2517,20 @@ CODE_0C9053:
 	rtl ;0C9098|6B      |      ; Return (long)
 
 ; ==============================================================================
-; CODE_0C9099: Tile Processing Routine (4bpp Decompression to Buffer)
+; Tile_Processing_Routine_4bpp_Decompression_To_Buffer: Tile Processing Routine (4bpp Decompression to Buffer)
 ; ==============================================================================
 ; Purpose: Process planar tile data to linear format with transparency support
 ; Input: X = source pointer ($7f:2000+offset), $5f-$60 = dest pointer
 ; Output: Processed tile written to buffer, X advanced, $5f incremented
 ; Format: Converts 4bpp planar to linear with transparency flag (bit 4)
-; Algorithm: Same as CODE_0C8FB4 but writes to buffer instead of VRAM
+; Algorithm: Same as 4bpp_Planar_To_Linear_Graphics_Decompression but writes to buffer instead of VRAM
 ; Difference: Sets bit 4 ($10) if pixel is non-zero (transparency marker)
 ; ------------------------------------------------------------------------------
-CODE_0C9099:
+Tile_Processing_Routine_4bpp_Decompression_To_Buffer:
 	sep #$20		;0C9099|E220    |      ; 8-bit accumulator
 	lda.b #$08	  ;0C909B|A908    |      ; 8 rows per tile
 
-CODE_0C909D:
+Label_0C909D:
 	pha ;0C909D|48      |      ; Save row counter
 	ldy.w $0010,X   ;0C909E|BC1000  |7F0010; Load BP2+BP3 word
 	sty.b $64	   ;0C90A1|8464    |000064; Store at $64-$65
@@ -2538,8 +2538,8 @@ CODE_0C909D:
 	sty.b $62	   ;0C90A6|8462    |000062; Store at $62-$63
 	ldy.w #$0008	;0C90A8|A00800  |      ; 8 pixels per row
 
-CODE_0C90AB:
-; Deinterleave bitplanes (same as CODE_0C8FC6)
+Label_0C90AB:
+; Deinterleave bitplanes (same as Label_0C8FC6)
 	asl.b $65	   ;0C90AB|0665    |000065; Shift BP3
 	rol A		   ;0C90AD|2A      |      ; Rotate into A
 	asl.b $64	   ;0C90AE|0664    |000064; Shift BP2
@@ -2551,24 +2551,24 @@ CODE_0C90AB:
 	and.b #$0f	  ;0C90B7|290F    |      ; Mask to 4 bits (color 0-15)
 
 ; Transparency handling
-	beq CODE_0C90BD ;0C90B9|F002    |0C90BD; If zero, skip (transparent)
+	beq Store_0C90BD ;0C90B9|F002    |0C90BD; If zero, skip (transparent)
 	ora.b #$10	  ;0C90BB|0910    |      ; Set bit 4 (non-transparent marker)
 
-CODE_0C90BD:
+Store_0C90BD:
 ; Write to buffer
 	sta.b [$5f]	 ;0C90BD|875F    |00005F; Write to [$5f] (buffer pointer)
 	rep #$30		;0C90BF|C230    |      ; 16-bit mode
 	inc.b $5f	   ;0C90C1|E65F    |00005F; Increment buffer pointer
 	sep #$20		;0C90C3|E220    |      ; 8-bit mode
 	dey ;0C90C5|88      |      ; Decrement pixel counter
-	bne CODE_0C90AB ;0C90C6|D0E3    |0C90AB; Loop for 8 pixels
+	bne Label_0C90AB ;0C90C6|D0E3    |0C90AB; Loop for 8 pixels
 
 ; Next row
 	inx ;0C90C8|E8      |      ; X += 2
 	inx ;0C90C9|E8      |      ;
 	pla ;0C90CA|68      |      ; Restore row counter
 	dec A		   ;0C90CB|3A      |      ; Decrement
-	bne CODE_0C909D ;0C90CC|D0CF    |0C909D; Loop for 8 rows
+	bne Label_0C909D ;0C90CC|D0CF    |0C909D; Loop for 8 rows
 
 ; Tile complete, advance source pointer
 	rep #$30		;0C90CE|C230    |      ; 16-bit mode
@@ -2605,7 +2605,7 @@ CODE_0C90BD:
 	rtl ;0C90F8|6B      |      ; Return long
 
 ; ==============================================================================
-; CODE_0C90F9: Battle Graphics Upload (Split Transfer)
+; Battle_Graphics_Upload_Split_Transfer: Battle Graphics Upload (Split Transfer)
 ; ==============================================================================
 ; Purpose: Upload battle graphics in two phases (low/high bitplanes separate)
 ; Source: $0c:9140-$a140 (battle graphics data, 4KB)
@@ -2613,7 +2613,7 @@ CODE_0C90BD:
 ; Technique: Two DMA passes - first low bitplanes, then high bitplanes
 ; Used by: Battle scene initialization, enemy sprite loading
 ; ------------------------------------------------------------------------------
-CODE_0C90F9:
+Battle_Graphics_Upload_Split_Transfer:
 ; Phase 1: Upload low bitplanes (word mode, no increment)
 	stz.w $2115	 ;0C90F9|9C1521  |0C2115; VRAM increment = 0
 	ldx.w #$6000	;0C90FC|A20060  |      ; VRAM address $6000
@@ -2650,14 +2650,14 @@ CODE_0C90F9:
 	db $ff,$01	 ;0C9140|        |      ; Graphics data marker ($ff = compressed, $01 = type)
 
 ; ==============================================================================
-; CODE_0C9142: Complex Sprite/Graphics Initialization System
+; Complex_SpriteGraphics_Initialization_System: Complex Sprite/Graphics Initialization System
 ; ==============================================================================
 ; Purpose: Initialize complete sprite/graphics system for battle/overworld
 ; Systems: Tile decompression, compositing, VRAM upload, buffer management
 ; Output: Multiple VRAM regions populated, flags set
 ; Used by: Scene transitions, battle start, major state changes
 ; ------------------------------------------------------------------------------
-CODE_0C9142:
+Complex_SpriteGraphics_Initialization_System:
 	php ;0C9142|08      |      ; Save processor status
 	phd ;0C9143|0B      |      ; Save direct page
 	rep #$30		;0C9144|C230    |      ; 16-bit mode
@@ -2665,9 +2665,9 @@ CODE_0C9142:
 	tcd ;0C9149|5B      |      ; DP = $0000
 
 ; Execute initialization sequence
-	jsr.w CODE_0C9318 ;0C914A|201893  |0C9318; Initialize graphics buffers
-	jsr.w CODE_0C92EB ;0C914D|20EB92  |0C92EB; Setup palette system
-	jsr.w CODE_0C9161 ;0C9150|206191  |0C9161; Load sprite graphics
+	jsr.w Graphics_Buffer_Initialization_Multi_Bank_Copy ;0C914A|201893  |0C9318; Initialize graphics buffers
+	jsr.w PaletteColor_Data_Transformation ;0C914D|20EB92  |0C92EB; Setup palette system
+	jsr.w Sprite_Graphics_Loading_Compositing_System ;0C9150|206191  |0C9161; Load sprite graphics
 
 ; Set completion flags
 	lda.w #$0010	;0C9153|A91000  |      ; Flag value $10
@@ -2679,7 +2679,7 @@ CODE_0C9142:
 	rts ;0C9160|60      |      ; Return
 
 ; ==============================================================================
-; CODE_0C9161: Sprite Graphics Loading & Compositing System
+; Sprite_Graphics_Loading_Compositing_System: Sprite Graphics Loading & Compositing System
 ; ==============================================================================
 ; Purpose: Load and composite multiple sprite layers into VRAM
 ; Technique: Clear buffer, composite 8 sprite layers, upload to VRAM
@@ -2687,81 +2687,81 @@ CODE_0C9142:
 ; VRAM Dest: Various addresses for different sprite layers
 ; Used by: Battle sprite setup, character graphics initialization
 ; ------------------------------------------------------------------------------
-CODE_0C9161:
+Sprite_Graphics_Loading_Compositing_System:
 ; Clear graphics buffer ($7f:2000-$3fff, 8KB)
 	ldx.w #$0000	;0C9161|A20000  |      ; Source = $0000 (zeros)
 	ldy.w #$2000	;0C9164|A00020  |      ; Dest = $2000
 	lda.w #$2000	;0C9167|A90020  |      ; Size = $2000 (8KB)
-	jsl.l CODE_009994 ;0C916A|22949900|009994; Clear memory routine
+	jsl.l CallTilemapFillRoutine ;0C916A|22949900|009994; Clear memory routine
 
 ; Composite sprite layers (8 layers)
-	jsr.w CODE_0C91AF ;0C916E|20AF91  |0C91AF; Layer 1: Base sprites
-	jsr.w CODE_0C9197 ;0C9171|209791  |0C9197; Layer 2: Overlay 1
-	jsr.w CODE_0C9247 ;0C9174|204792  |0C9247; Spacing/padding
-	jsr.w CODE_0C91B7 ;0C9177|20B791  |0C91B7; Layer 3: Accessories
-	jsr.w CODE_0C919F ;0C917A|209F91  |0C919F; Layer 4: Overlay 2
-	jsr.w CODE_0C929E ;0C917D|209E92  |0C929E; Unknown processing
-	jsr.w CODE_0C91BF ;0C9180|20BF91  |0C91BF; Layer 5: Effects
-	jsr.w CODE_0C9247 ;0C9183|204792  |0C9247; Spacing/padding
-	jsr.w CODE_0C91C7 ;0C9186|20C791  |0C91C7; Layer 6: Highlights
-	jsr.w CODE_0C91A7 ;0C9189|20A791  |0C91A7; Layer 7: Shadows
-	jsr.w CODE_0C9247 ;0C918C|204792  |0C9247; Spacing/padding
+	jsr.w Load_0C91AF ;0C916E|20AF91  |0C91AF; Layer 1: Base sprites
+	jsr.w Load_0C9197 ;0C9171|209791  |0C9197; Layer 2: Overlay 1
+	jsr.w Buffer_SpacingPadding ;0C9174|204792  |0C9247; Spacing/padding
+	jsr.w Load_0C91B7 ;0C9177|20B791  |0C91B7; Layer 3: Accessories
+	jsr.w Load_0C919F ;0C917A|209F91  |0C919F; Layer 4: Overlay 2
+	jsr.w Bit_RotationTransformation_Processor ;0C917D|209E92  |0C929E; Unknown processing
+	jsr.w Load_0C91BF ;0C9180|20BF91  |0C91BF; Layer 5: Effects
+	jsr.w Buffer_SpacingPadding ;0C9183|204792  |0C9247; Spacing/padding
+	jsr.w Load_0C91C7 ;0C9186|20C791  |0C91C7; Layer 6: Highlights
+	jsr.w Load_0C91A7 ;0C9189|20A791  |0C91A7; Layer 7: Shadows
+	jsr.w Buffer_SpacingPadding ;0C918C|204792  |0C9247; Spacing/padding
 
 ; Final upload
 	ldy.w #$24c0	;0C918F|A0C024  |      ; VRAM address $24c0
 	ldx.w #$9400	;0C9192|A20094  |      ; Source data pointer
-	bra CODE_0C91CD ;0C9195|8036    |0C91CD; Jump to upload routine
+	bra Sprite_Data_Processing_Loop_Bytecode_Interpreter ;0C9195|8036    |0C91CD; Jump to upload routine
 
 ; ==============================================================================
 ; Sprite Layer Loading Routines (Setup VRAM address + source pointer)
 ; ==============================================================================
 ; Each routine sets Y=VRAM destination, X=source data pointer
-; Then branches to CODE_0C91CD for actual processing
+; Then branches to Sprite_Data_Processing_Loop_Bytecode_Interpreter for actual processing
 ; ------------------------------------------------------------------------------
 
-CODE_0C9197:
+Load_0C9197:
 ; Layer 2: VRAM $2080, source $0c:93CA
 	ldy.w #$2080	;0C9197|A08020  |      ; VRAM dest
 	ldx.w #$93ca	;0C919A|A2CA93  |      ; Source pointer
-	bra CODE_0C91CD ;0C919D|802E    |0C91CD; Process
+	bra Sprite_Data_Processing_Loop_Bytecode_Interpreter ;0C919D|802E    |0C91CD; Process
 
-CODE_0C919F:
+Load_0C919F:
 ; Layer 4: VRAM $2480, source $0c:93EB
 	ldy.w #$2480	;0C919F|A08024  |      ; VRAM dest
 	ldx.w #$93eb	;0C91A2|A2EB93  |      ; Source pointer
-	bra CODE_0C91CD ;0C91A5|8026    |0C91CD; Process
+	bra Sprite_Data_Processing_Loop_Bytecode_Interpreter ;0C91A5|8026    |0C91CD; Process
 
-CODE_0C91A7:
+Load_0C91A7:
 ; Layer 7: VRAM $20c0, source $0c:9410
 	ldy.w #$20c0	;0C91A7|A0C020  |      ; VRAM dest
 	ldx.w #$9410	;0C91AA|A21094  |      ; Source pointer
-	bra CODE_0C91CD ;0C91AD|801E    |0C91CD; Process
+	bra Sprite_Data_Processing_Loop_Bytecode_Interpreter ;0C91AD|801E    |0C91CD; Process
 
-CODE_0C91AF:
+Load_0C91AF:
 ; Layer 1: VRAM $2000, source $0c:9346
 	ldy.w #$2000	;0C91AF|A00020  |      ; VRAM dest
 	ldx.w #$9346	;0C91B2|A24693  |      ; Source pointer
-	bra CODE_0C91CD ;0C91B5|8016    |0C91CD; Process
+	bra Sprite_Data_Processing_Loop_Bytecode_Interpreter ;0C91B5|8016    |0C91CD; Process
 
-CODE_0C91B7:
+Load_0C91B7:
 ; Layer 3: VRAM $2b80, source $0c:9392
 	ldy.w #$2b80	;0C91B7|A0802B  |      ; VRAM dest
 	ldx.w #$9392	;0C91BA|A29293  |      ; Source pointer
-	bra CODE_0C91CD ;0C91BD|800E    |0C91CD; Process
+	bra Sprite_Data_Processing_Loop_Bytecode_Interpreter ;0C91BD|800E    |0C91CD; Process
 
-CODE_0C91BF:
+Load_0C91BF:
 ; Layer 5: VRAM $2ba0, source $0c:9392
 	ldy.w #$2ba0	;0C91BF|A0A02B  |      ; VRAM dest
 	ldx.w #$9392	;0C91C2|A29293  |      ; Source pointer
-	bra CODE_0C91CD ;0C91C5|8006    |0C91CD; Process
+	bra Sprite_Data_Processing_Loop_Bytecode_Interpreter ;0C91C5|8006    |0C91CD; Process
 
-CODE_0C91C7:
+Load_0C91C7:
 ; Layer 6: VRAM $2040, source $0c:9396
 	ldy.w #$2040	;0C91C7|A04020  |      ; VRAM dest
 	ldx.w #$9396	;0C91CA|A29693  |      ; Source pointer
 
 ; ==============================================================================
-; CODE_0C91CD: Sprite Data Processing Loop (Bytecode Interpreter)
+; Sprite_Data_Processing_Loop_Bytecode_Interpreter: Sprite Data Processing Loop (Bytecode Interpreter)
 ; ==============================================================================
 ; Purpose: Process sprite command bytecode to composite graphics
 ; Input: X = command pointer, Y = VRAM base address
@@ -2771,7 +2771,7 @@ CODE_0C91C7:
 ;   $ff: End marker
 ; Algorithm: Interpret commands, composite tiles from $7f:0000 to buffer
 ; ------------------------------------------------------------------------------
-CODE_0C91CD:
+Sprite_Data_Processing_Loop_Bytecode_Interpreter:
 	phk ;0C91CD|4B      |      ; Push program bank ($0c)
 	plb ;0C91CE|AB      |      ; Pull to data bank
 
@@ -2779,7 +2779,7 @@ CODE_0C91CD:
 	lda.w $0000,X   ;0C91CF|BD0000  |0C0000; Load command byte
 	and.w #$00ff	;0C91D2|29FF00  |      ; Mask to byte
 	cmp.w #$0080	;0C91D5|C98000  |      ; Check if < $80
-	bcs CODE_0C91E8 ;0C91D8|B00E    |0C91E8; Branch if >= $80 (offset cmd)
+	bcs Label_0C91E8 ;0C91D8|B00E    |0C91E8; Branch if >= $80 (offset cmd)
 
 ; Tile index command ($00-$7f)
 	asl A		   ;0C91DA|0A      |      ; Multiply by 32:
@@ -2789,15 +2789,15 @@ CODE_0C91CD:
 	asl A		   ;0C91DE|0A      |      ; A = tile offset in bytes
 	phx ;0C91DF|DA      |      ; Save command pointer
 	tax ;0C91E0|AA      |      ; X = tile data offset
-	jsr.w CODE_0C91FF ;0C91E1|20FF91  |0C91FF; Composite tile
+	jsr.w Tile_Compositing_With_Transparency_8x8_Tile_3_Plane ;0C91E1|20FF91  |0C91FF; Composite tile
 	plx ;0C91E4|FA      |      ; Restore command pointer
 	inx ;0C91E5|E8      |      ; Next command
-	bra CODE_0C91CD ;0C91E6|80E5    |0C91CD; Loop
+	bra Sprite_Data_Processing_Loop_Bytecode_Interpreter ;0C91E6|80E5    |0C91CD; Loop
 
-CODE_0C91E8:
+Label_0C91E8:
 ; Check for end marker
 	cmp.w #$00ff	;0C91E8|C9FF00  |      ; End of commands?
-	beq CODE_0C91FE ;0C91EB|F011    |0C91FE; Yes, exit
+	beq Sprite_Data_Processing_Loop_Bytecode_Interpreter_Return_0C91FE ;0C91EB|F011    |0C91FE; Yes, exit
 
 ; Offset command ($80-$fe)
 	and.w #$007f	;0C91ED|297F00  |      ; Mask offset value (0-127)
@@ -2811,13 +2811,13 @@ CODE_0C91E8:
 	adc.b $64	   ;0C91F8|6564    |000064; Add offset
 	tay ;0C91FA|A8      |      ; Update Y
 	inx ;0C91FB|E8      |      ; Next command
-	bra CODE_0C91CD ;0C91FC|80CF    |0C91CD; Loop
+	bra Sprite_Data_Processing_Loop_Bytecode_Interpreter ;0C91FC|80CF    |0C91CD; Loop
 
-CODE_0C91FE:
+Sprite_Data_Processing_Loop_Bytecode_Interpreter_Return_0C91FE:
 	rts ;0C91FE|60      |      ; End of command stream
 
 ; ==============================================================================
-; CODE_0C91FF: Tile Compositing with Transparency (8x8 tile, 3-plane)
+; Tile_Compositing_With_Transparency_8x8_Tile_3_Plane: Tile Compositing with Transparency (8x8 tile, 3-plane)
 ; ==============================================================================
 ; Purpose: Composite source tile onto destination with transparency masking
 ; Input: X = source offset ($7f:0000+X), Y = dest offset ($7f:2000+Y)
@@ -2825,7 +2825,7 @@ CODE_0C91FE:
 ; Format: 3 bytes per row (BP0, BP1, BP2), 8 rows = 24 bytes per tile
 ; Technique: (dest & ~(BP0|BP1|BP2)) | src = composite with transparency
 ; ------------------------------------------------------------------------------
-CODE_0C91FF:
+Tile_Compositing_With_Transparency_8x8_Tile_3_Plane:
 	sep #$20		;0C91FF|E220    |      ; 8-bit accumulator
 	lda.b #$08	  ;0C9201|A908    |      ; 8 rows per tile
 	sta.b $62	   ;0C9203|8562    |000062; Save row counter
@@ -2835,7 +2835,7 @@ CODE_0C91FF:
 	plb ;0C9208|AB      |      ; Pull to DB (high byte)
 	plb ;0C9209|AB      |      ; Pull to DB (low byte) = $7f
 
-CODE_0C920A:
+Load_0C920A:
 ; Load source tile row (3 bytes: BP0, BP1, BP2)
 ; Calculate transparency mask: OR all 3 bitplanes
 	lda.w $0000,X   ;0C920A|BD0000  |7F0000; Load BP0
@@ -2867,7 +2867,7 @@ CODE_0C920A:
 	iny ;0C9238|C8      |      ; Y += 2
 	iny ;0C9239|C8      |      ;
 	dec.b $62	   ;0C923A|C662    |000062; Decrement row counter
-	bne CODE_0C920A ;0C923C|D0CC    |0C920A; Loop for 8 rows
+	bne Load_0C920A ;0C923C|D0CC    |0C920A; Loop for 8 rows
 
 ; Tile complete, advance to next tile
 	rep #$30		;0C923E|C230    |      ; 16-bit mode
@@ -2878,14 +2878,14 @@ CODE_0C920A:
 	rts ;0C9246|60      |      ; Return
 
 ; ==============================================================================
-; CODE_0C9247: Buffer Spacing/Padding Routine
+; Buffer_SpacingPadding: Buffer Spacing/Padding Routine
 ; ==============================================================================
 ; Purpose: Add spacing between sprite layers in buffer
 ; Input: None (uses Bank $7f data bank)
 ; Output: Y advanced by $1e * something (spacing calculation)
 ; Used by: Sprite layer compositing to maintain proper offsets
 ; ------------------------------------------------------------------------------
-CODE_0C9247:
+Buffer_SpacingPadding:
 	pea.w $7f00	 ;0C9247|F4007F  |0C7F00; Set data bank = $7f
 	plb ;0C924A|AB      |      ;
 	plb ;0C924B|AB      |      ;
@@ -2898,21 +2898,21 @@ CODE_0C9247:
 ; Systems: Sprite layer transformations, pixel rotations, animation sequences
 ; ==============================================================================
 
-; Spacing calculation (continued from CODE_0C9247)
+; Spacing calculation (continued from Buffer_SpacingPadding)
 	lda.w #$001e	;0C924D|A91E00  |      ; 30 spacing units
 	sta.b $62	   ;0C9250|8562    |000062; Save spacing counter
 	ldx.w #$0000	;0C9252|A20000  |      ; Start at offset 0
 
-CODE_0C9255:
+Label_0C9255:
 ; Double spacing application
-	jsr.w CODE_0C9260 ;0C9255|206092  |0C9260; Apply spacing transform
-	jsr.w CODE_0C9260 ;0C9258|206092  |0C9260; Apply again (2x)
+	jsr.w Pixel_Row_SwappingRotation ;0C9255|206092  |0C9260; Apply spacing transform
+	jsr.w Pixel_Row_SwappingRotation ;0C9258|206092  |0C9260; Apply again (2x)
 	dec.b $62	   ;0C925B|C662    |000062; Decrement spacing counter
-	bne CODE_0C9255 ;0C925D|D0F6    |0C9255; Loop for 30 iterations
+	bne Label_0C9255 ;0C925D|D0F6    |0C9255; Loop for 30 iterations
 	rts ;0C925F|60      |      ; Return
 
 ; ==============================================================================
-; CODE_0C9260: Pixel Row Swapping/Rotation Routine
+; Pixel_Row_SwappingRotation: Pixel Row Swapping/Rotation Routine
 ; ==============================================================================
 ; Purpose: Swap pixel rows within tile for rotation/flip effects
 ; Input: X = buffer offset (Bank $7f)
@@ -2920,7 +2920,7 @@ CODE_0C9255:
 ; Effect: Vertical flip or rotation transformation
 ; Used by: Sprite animation, orientation changes
 ; ------------------------------------------------------------------------------
-CODE_0C9260:
+Pixel_Row_SwappingRotation:
 ; Swap row 0 with row 14 (offset $00 ↔ offset $0e)
 	lda.w $0000,X   ;0C9260|BD0000  |7F0000; Load row 0
 	tay ;0C9263|A8      |      ; Temp in Y
@@ -2960,46 +2960,46 @@ CODE_0C9260:
 	rts ;0C929D|60      |      ; Return
 
 ; ==============================================================================
-; CODE_0C929E: bit Rotation/Transformation Processor
+; Bit_RotationTransformation_Processor: bit Rotation/Transformation Processor
 ; ==============================================================================
 ; Purpose: Apply bit rotation transformation to graphics buffer
 ; Input: Bank $7f graphics buffer
 ; Algorithm: Process 30 rows of 16 bytes, applying bit rotation to each byte
 ; Used by: Sprite effects, rotation animations, graphical transitions
 ; ------------------------------------------------------------------------------
-CODE_0C929E:
+Bit_RotationTransformation_Processor:
 	pea.w $7f00	 ;0C929E|F4007F  |0C7F00; Set data bank = $7f
 	plb ;0C92A1|AB      |      ;
 	plb ;0C92A2|AB      |      ;
 	ldy.w #$001e	;0C92A3|A01E00  |      ; 30 rows to process
 	ldx.w #$0000	;0C92A6|A20000  |      ; Start at offset 0
 
-CODE_0C92A9:
+Label_0C92A9:
 	phy ;0C92A9|5A      |      ; Save row counter
 	ldy.w #$0010	;0C92AA|A01000  |      ; 16 bytes per row
 
-CODE_0C92AD:
+Label_0C92AD:
 ; Process each byte in row
-	jsr.w CODE_0C92C2 ;0C92AD|20C292  |0C92C2; Apply bit rotation
+	jsr.w Bit_Rotation_Algorithm_8_Bit_Left_Rotation ;0C92AD|20C292  |0C92C2; Apply bit rotation
 	dey ;0C92B0|88      |      ; Decrement byte counter
-	bne CODE_0C92AD ;0C92B1|D0FA    |0C92AD; Loop for 16 bytes
+	bne Label_0C92AD ;0C92B1|D0FA    |0C92AD; Loop for 16 bytes
 
 ; Process additional 8 bytes (24 bytes total per row)
 	ldy.w #$0008	;0C92B3|A00800  |      ; 8 more bytes
 
-CODE_0C92B6:
-	jsr.w CODE_0C92C2 ;0C92B6|20C292  |0C92C2; Apply bit rotation
+Label_0C92B6:
+	jsr.w Bit_Rotation_Algorithm_8_Bit_Left_Rotation ;0C92B6|20C292  |0C92C2; Apply bit rotation
 	inx ;0C92B9|E8      |      ; Advance pointer
 	dey ;0C92BA|88      |      ; Decrement counter
-	bne CODE_0C92B6 ;0C92BB|D0F9    |0C92B6; Loop for 8 bytes
+	bne Label_0C92B6 ;0C92BB|D0F9    |0C92B6; Loop for 8 bytes
 
 	ply ;0C92BD|7A      |      ; Restore row counter
 	dey ;0C92BE|88      |      ; Decrement row counter
-	bne CODE_0C92A9 ;0C92BF|D0E8    |0C92A9; Loop for 30 rows
+	bne Label_0C92A9 ;0C92BF|D0E8    |0C92A9; Loop for 30 rows
 	rts ;0C92C1|60      |      ; Return
 
 ; ==============================================================================
-; CODE_0C92C2: bit Rotation Algorithm (8-bit Left Rotation)
+; Bit_Rotation_Algorithm_8_Bit_Left_Rotation: bit Rotation Algorithm (8-bit Left Rotation)
 ; ==============================================================================
 ; Purpose: Rotate bits left in byte with special bit collection
 ; Input: X = pointer to byte in $7f:0000
@@ -3007,7 +3007,7 @@ CODE_0C92B6:
 ; Effect: Performs bit rotation/rearrangement for graphical transformation
 ; Technique: 8 lsr operations extract bits, rol operations rebuild in new order
 ; ------------------------------------------------------------------------------
-CODE_0C92C2:
+Bit_Rotation_Algorithm_8_Bit_Left_Rotation:
 	sep #$20		;0C92C2|E220    |      ; 8-bit accumulator
 	lda.w $0000,X   ;0C92C4|BD0000  |7F0000; Load byte
 
@@ -3036,20 +3036,20 @@ CODE_0C92C2:
 	rts ;0C92EA|60      |      ; Return
 
 ; ==============================================================================
-; CODE_0C92EB: Palette/Color Data Transformation
+; PaletteColor_Data_Transformation: Palette/Color Data Transformation
 ; ==============================================================================
 ; Purpose: Transform palette data in buffer (possibly deinterlacing or reordering)
 ; Input: Bank $7f graphics buffer with palette data
 ; Algorithm: Process 30 blocks, copying/transforming 8 bytes from offset to offset
 ; Used by: Palette setup, color animation, graphical effects
 ; ------------------------------------------------------------------------------
-CODE_0C92EB:
+PaletteColor_Data_Transformation:
 	clc ;0C92EB|18      |      ; Clear carry
 	lda.w #$001e	;0C92EC|A91E00  |      ; 30 iterations
 	sta.b $62	   ;0C92EF|8562    |000062; Save counter
 	lda.w #$0000	;0C92F1|A90000  |      ; Start offset = 0
 
-CODE_0C92F4:
+Label_0C92F4:
 ; Calculate source/dest offsets
 	adc.w #$0018	;0C92F4|691800  |      ; +$18 (24 bytes)
 	tax ;0C92F7|AA      |      ; X = source offset
@@ -3059,7 +3059,7 @@ CODE_0C92F4:
 	lda.w #$0008	;0C92FD|A90800  |      ; 8 bytes to copy
 	sta.b $64	   ;0C9300|8564    |000064; Save byte counter
 
-CODE_0C9302:
+Label_0C9302:
 ; Copy bytes in reverse order
 	dex ;0C9302|CA      |      ; Decrement source
 	dey ;0C9303|88      |      ; Decrement dest twice
@@ -3068,15 +3068,15 @@ CODE_0C9302:
 	and.w #$00ff	;0C9308|29FF00  |      ; Mask to byte
 	sta.w $0000,Y   ;0C930B|990000  |7F0000; Store at dest
 	dec.b $64	   ;0C930E|C664    |000064; Decrement byte counter
-	bne CODE_0C9302 ;0C9310|D0F0    |0C9302; Loop for 8 bytes
+	bne Label_0C9302 ;0C9310|D0F0    |0C9302; Loop for 8 bytes
 
 	pla ;0C9312|68      |      ; Restore accumulator
 	dec.b $62	   ;0C9313|C662    |000062; Decrement iteration counter
-	bne CODE_0C92F4 ;0C9315|D0DD    |0C92F4; Loop for 30 iterations
+	bne Label_0C92F4 ;0C9315|D0DD    |0C92F4; Loop for 30 iterations
 	rts ;0C9317|60      |      ; Return
 
 ; ==============================================================================
-; CODE_0C9318: Graphics Buffer Initialization (Multi-Bank Copy)
+; Graphics_Buffer_Initialization_Multi_Bank_Copy: Graphics Buffer Initialization (Multi-Bank Copy)
 ; ==============================================================================
 ; Purpose: Initialize graphics buffers by copying data from Bank $04
 ; Input: None
@@ -3084,36 +3084,36 @@ CODE_0C9302:
 ; Technique: Uses mvn block move instruction for efficient copying
 ; Used by: Scene initialization, graphics setup
 ; ------------------------------------------------------------------------------
-CODE_0C9318:
+Graphics_Buffer_Initialization_Multi_Bank_Copy:
 	clc ;0C9318|18      |      ; Clear carry
 
 ; Copy block 1: 4 iterations from $04:E220
 	ldx.w #$e220	;0C9319|A220E2  |      ; Source: Bank $04, offset $e220
 	ldy.w #$0000	;0C931C|A00000  |      ; Dest: offset $0000
 	lda.w #$0004	;0C931F|A90400  |      ; 4 iterations
-	jsr.w CODE_0C9334 ;0C9322|203493  |0C9334; Copy routine
+	jsr.w Block_Copy_Loop_MVN_Based ;0C9322|203493  |0C9334; Copy routine
 
 ; Copy block 2: 6 iterations from $04:E490
 	ldx.w #$e490	;0C9325|A290E4  |      ; Source: Bank $04, offset $e490
 	lda.w #$0006	;0C9328|A90600  |      ; 6 iterations
-	jsr.w CODE_0C9334 ;0C932B|203493  |0C9334; Copy routine
+	jsr.w Block_Copy_Loop_MVN_Based ;0C932B|203493  |0C9334; Copy routine
 
 ; Copy block 3: 20 iterations from $04:FCC0
 	ldx.w #$fcc0	;0C932E|A2C0FC  |      ; Source: Bank $04, offset $fcc0
 	lda.w #$0014	;0C9331|A91400  |      ; 20 iterations (fall through)
 
 ; ==============================================================================
-; CODE_0C9334: Block Copy Loop (MVN-based)
+; Block_Copy_Loop_MVN_Based: Block Copy Loop (MVN-based)
 ; ==============================================================================
 ; Purpose: Copy multiple 23-byte blocks using mvn instruction
 ; Input: A = iteration count, X = source offset (Bank $04), Y = dest offset
 ; Algorithm: Loop A times, copying 23 bytes per iteration, advancing dest by 8
 ; Technique: mvn $7f,$04 (copy from Bank $04 to Bank $7f)
 ; ------------------------------------------------------------------------------
-CODE_0C9334:
+Block_Copy_Loop_MVN_Based:
 	sta.b $62	   ;0C9334|8562    |000062; Save iteration counter
 
-CODE_0C9336:
+Load_0C9336:
 	lda.w #$0017	;0C9336|A91700  |      ; 23 bytes to copy ($17 + 1)
 	mvn $7f,$04	 ;0C9339|547F04  |      ; Block move: $04:X → $7f:Y
 ; mvn auto-increments X, Y and decrements A until A=$ffff
@@ -3123,13 +3123,13 @@ CODE_0C9336:
 	adc.w #$0008	;0C933D|690800  |      ; Add 8 (spacing between blocks)
 	tay ;0C9340|A8      |      ; Update Y
 	dec.b $62	   ;0C9341|C662    |000062; Decrement iteration counter
-	bne CODE_0C9336 ;0C9343|D0F1    |0C9336; Loop until done
+	bne Load_0C9336 ;0C9343|D0F1    |0C9336; Loop until done
 	rts ;0C9345|60      |      ; Return
 
 ; ==============================================================================
 ; DATA: Sprite Layer Command Tables
 ; ==============================================================================
-; Format: Bytecode commands for CODE_0C91CD sprite processor
+; Format: Bytecode commands for Sprite_Data_Processing_Loop_Bytecode_Interpreter sprite processor
 ; Commands: $00-$7f = tile index, $80-$fe = offset adjustment, $ff = end
 ; ==============================================================================
 
@@ -3176,7 +3176,7 @@ CODE_0C9336:
 ; Animation control data
 	db $e2		 ;0C9420|        |      ; sep #$20 instruction
 
-CODE_0C9421:
+Label_0C9421:
 ; Graphics initialization sequence
 	sep #$20		;0C9421|E220    |      ; 8-bit accumulator
 	rep #$10		;0C9423|C210    |      ; 16-bit index
@@ -3224,7 +3224,7 @@ CODE_0C9421:
 	db $e8,$c8,$c8,$c8,$c8,$c0,$40,$00,$d0,$dd,$ad,$02,$0c,$c9,$01,$d0 ;0CA2D5|        |      ;
 	db $05,$a9,$ff,$8d,$3e,$0c,$20,$10,$89,$28,$60 ;0CA2E5|        |      ;
 ; Animation completion check and cleanup
-; Returns to $cODE_0C8910 for next sequence
+; Returns to $JumpWindowApplyRoutine for next sequence
 
 ; ==============================================================================
 ; DATA: Animation Sequence Tables
@@ -3255,7 +3255,7 @@ CODE_0C9421:
 ; ==============================================================================
 ; CODE: Animation Sequencer
 ; ==============================================================================
-CODE_0CA37F:
+Load_0CA37F:
 ; Setup animation playback
 	ldx.w #$a3c0	;0CA37F|A2C0A3  |      ; Animation table pointer
 	stx.b $58	   ;0CA382|8658    |000058; Store at $58-$59
@@ -3266,11 +3266,11 @@ CODE_0CA37F:
 	sta.w $00e2	 ;0CA38D|8DE200  |0000E2; Update flags
 
 ; Execute animation sequence (5 times)
-	jsl.l CODE_0C8000 ;0CA390|2200800C|0C8000; Main animation handler
-	jsl.l CODE_0C8000 ;0CA394|2200800C|0C8000; Repeat
-	jsl.l CODE_0C8000 ;0CA398|2200800C|0C8000; Repeat
-	jsl.l CODE_0C8000 ;0CA39C|2200800C|0C8000; Repeat
-	jsl.l CODE_0C8000 ;0CA3A0|2200800C|0C8000; Repeat
+	jsl.l CWaitTimingRoutine ;0CA390|2200800C|0C8000; Main animation handler
+	jsl.l CWaitTimingRoutine ;0CA394|2200800C|0C8000; Repeat
+	jsl.l CWaitTimingRoutine ;0CA398|2200800C|0C8000; Repeat
+	jsl.l CWaitTimingRoutine ;0CA39C|2200800C|0C8000; Repeat
+	jsl.l CWaitTimingRoutine ;0CA3A0|2200800C|0C8000; Repeat
 
 ; Setup palette update
 	lda.b #$01	  ;0CA3A4|A901    |      ; Enable palette writes
@@ -3288,7 +3288,7 @@ CODE_0CA37F:
 	lda.w #$0006	;0CA3BA|A90600  |      ; 6 sprites
 	mvn $00,$0c	 ;0CA3BD|54000C  |      ; Block move
 
-	jmp.w CODE_0C8910 ;0CA3C0|4C1089  |0C8910; Continue to next sequence
+	jmp.w JumpWindowApplyRoutine ;0CA3C0|4C1089  |0C8910; Continue to next sequence
 
 ; ==============================================================================
 ; DATA: Animation Sequence Pointers
@@ -3297,46 +3297,46 @@ CODE_0CA37F:
 	dw $a532, $a540, $a54e, $a55c ;0CA3C4-0CA3CB; 4 animation sequences
 
 ; Individual sequence entry points
-CODE_0CA3C5:
+Load_0CA3C5:
 	ldy.w #$6100	;0CA3C5|A00061  |      ; Sequence 1 offset
 	ldx.w #$a532	;0CA3C8|A232A5  |      ; Pointer
-	jsr.w CODE_0CA458 ;0CA3CB|2058A4  |0CA458; Execute sequence
+	jsr.w ExecuteSequence ;0CA3CB|2058A4  |0CA458; Execute sequence
 	ldx.w #$a3d0	;0CA3CE|A2D0A3  |      ; Next pointer
 	stx.b $58	   ;0CA3D1|8658    |000058; Store
 	rtl ;0CA3D3|6B      |      ; Return long
 
-CODE_0CA3D5:
+Load_0CA3D5:
 	ldy.w #$6200	;0CA3D5|A00062  |      ; Sequence 2 offset
 	ldx.w #$a540	;0CA3D8|A240A5  |      ; Pointer
-	jsr.w CODE_0CA458 ;0CA3DB|2058A4  |0CA458; Execute
+	jsr.w ExecuteSequence ;0CA3DB|2058A4  |0CA458; Execute
 	ldx.w #$a3e0	;0CA3DE|A2E0A3  |      ; Next
 	stx.b $58	   ;0CA3E1|8658    |000058; Store
 	rtl ;0CA3E3|6B      |      ; Return long
 
-CODE_0CA3E5:
+Load_0CA3E5:
 	ldy.w #$6300	;0CA3E5|A00063  |      ; Sequence 3 offset
 	ldx.w #$a54e	;0CA3E8|A24EA5  |      ; Pointer
-	jsr.w CODE_0CA458 ;0CA3EB|2058A4  |0CA458; Execute
+	jsr.w ExecuteSequence ;0CA3EB|2058A4  |0CA458; Execute
 	ldx.w #$a3f0	;0CA3EE|A2F0A3  |      ; Next
 	stx.b $58	   ;0CA3F1|8658    |000058; Store
 	rtl ;0CA3F3|6B      |      ; Return long
 
-CODE_0CA3F5:
+Load_0CA3F5:
 	ldy.w #$6400	;0CA3F5|A00064  |      ; Sequence 4 offset
 	ldx.w #$a55c	;0CA3F8|A25CA5  |      ; Pointer
-	jsr.w CODE_0CA458 ;0CA3FB|2058A4  |0CA458; Execute
+	jsr.w ExecuteSequence ;0CA3FB|2058A4  |0CA458; Execute
 	ldx.w #$a400	;0CA3FE|A200A4  |      ; Next
 	stx.b $58	   ;0CA401|8658    |000058; Store
 	rtl ;0CA403|6B      |      ; Return long
 
 ; ==============================================================================
-; CODE_0CA405: Complex VRAM Graphics Upload Sequence
+; Complex_VRAM_Graphics_Upload_Sequence: Complex VRAM Graphics Upload Sequence
 ; ==============================================================================
 ; Purpose: Upload multiple graphics layers with palette setup
 ; Used by: Battle scene initialization, character sprite loading
 ; Technique: Sequential VRAM uploads with palette interleaving
 ; ------------------------------------------------------------------------------
-CODE_0CA405:
+Complex_VRAM_Graphics_Upload_Sequence:
 	phk ;0CA405|4B      |      ; Save program bank
 	plb ;0CA406|AB      |      ; Pull to data bank
 	ldx.w #$0000	;0CA407|A20000  |      ; Clear counter
@@ -3351,14 +3351,14 @@ CODE_0CA405:
 	stx.w SNES_VMADDL ;0CA415|8E1621  |002116; Set address
 	ldx.w #$b714	;0CA418|A214B7  |      ; Source data $0c:B714
 	ldy.w #$000f	;0CA41B|A00F00  |      ; 15 iterations
-	jsl.l CODE_008DDF ;0CA41E|22DF8D00|008DDF; Upload routine
+	jsl.l UploadRoutine ;0CA41E|22DF8D00|008DDF; Upload routine
 
 ; Upload graphics layer 2
 	ldx.w #$6700	;0CA422|A20067  |      ; VRAM address $6700
 	stx.w SNES_VMADDL ;0CA425|8E1621  |002116; Set address
 	ldx.w #$b87c	;0CA428|A27CB8  |      ; Source data $0c:B87C
 	ldy.w #$000d	;0CA42B|A00D00  |      ; 13 iterations
-	jsl.l CODE_008DDF ;0CA42E|22DF8D00|008DDF; Upload routine
+	jsl.l UploadRoutine ;0CA42E|22DF8D00|008DDF; Upload routine
 
 ; Setup palette for graphics
 	lda.b #$81	  ;0CA432|A981    |      ; Palette index $81
@@ -3368,12 +3368,12 @@ CODE_0CA405:
 	ldx.w #$0000	;0CA437|A20000  |      ; Start index
 	ldy.w #$0006	;0CA43A|A00600  |      ; 6 colors
 
-CODE_0CA43D:
+Load_0CA43D:
 	lda.l DATA_0CB70E,X ;0CA43D|BF0EB70C|0CB70E; Load color word
 	sta.w $2122	 ;0CA441|8D2221  |0C2122; Write to CGDATA ($2122)
 	inx ;0CA444|E8      |      ; Next color
 	dey ;0CA445|88      |      ; Decrement counter
-	bne CODE_0CA43D ;0CA446|D0F6    |0CA43D; Loop for 6 colors
+	bne Load_0CA43D ;0CA446|D0F6    |0CA43D; Loop for 6 colors
 
 ; Setup palette group 2
 	lda.b #$91	  ;0CA448|A991    |      ; Palette index $91
@@ -3383,12 +3383,12 @@ CODE_0CA43D:
 	ldx.w #$0000	;0CA44D|A20000  |      ; Start index
 	ldy.w #$000e	;0CA450|A00E00  |      ; 14 colors
 
-CODE_0CA453:
+Load_0CA453:
 	lda.l DATA_0CB9B4,X ;0CA453|BFB4B90C|0CB9B4; Load color word
 	sta.w $2122	 ;0CA457|8D2221  |0C2122; Write to CGDATA
 	inx ;0CA45A|E8      |      ; Next
 	dey ;0CA45B|88      |      ; Decrement
-	bne CODE_0CA453 ;0CA45C|D0F6    |0CA453; Loop
+	bne Load_0CA453 ;0CA45C|D0F6    |0CA453; Loop
 
 	rtl ;0CA45E|6B      |      ; Return long
 

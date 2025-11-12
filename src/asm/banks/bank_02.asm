@@ -66,7 +66,7 @@ Battle_SetupEnvironment:
 	beq Battle_ProcessTurn                      ;028094|F014    |0280AA;
 ;      |        |      ;
 Battle_MainLoop:
-	jsl.L CODE_00D2A6                    ;028096|22A6D200|00D2A6;
+	jsl.L CallExternalMonitor                    ;028096|22A6D200|00D2A6;
 	lda.W $1020                          ;02809A|AD2010  |021020;
 	and.B #$40                           ;02809D|2940    |      ;
 	beq Battle_ProcessTurn                      ;02809F|F009    |0280AA;
@@ -160,7 +160,7 @@ Battle_ClearStatusFlags:
 ;      |        |      ;
 Battle_Victory:
 	lda.B #$7a                           ;02813F|A97A    |      ;
-	jsl.L CODE_009776                    ;028141|22769700|009776;
+	jsl.L ExecuteSpecialBitProcessing                    ;028141|22769700|009776;
 	bne Battle_VictorySound                      ;028145|D005    |02814C;
 	lda.B #$04                           ;028147|A904    |      ;
 	sta.W $0500                          ;028149|8D0005  |020500;
@@ -265,7 +265,7 @@ Battle_ApplyEscapeBonus:
 	sta.B $a2                            ;0281E3|85A2    |0004A2;
 	lda.B #$65                           ;0281E5|A965    |      ;
 	sta.W $00a8                          ;0281E7|8DA800  |0200A8;
-	jsl.L CODE_009783                    ;0281EA|22839700|009783;
+	jsl.L ExecuteAudioCall                    ;0281EA|22839700|009783;
 	lda.W $00a9                          ;0281EE|ADA900  |0200A9;
 	cmp.B $a2                            ;0281F1|C5A2    |0004A2;
 	bcc Battle_EscapeFailed                      ;0281F3|900F    |028204;
@@ -376,14 +376,14 @@ Battle_SumEnemy3HP:
 	sep #$20                             ;0282A4|E220    |      ;
 	rep #$10                             ;0282A6|C210    |      ;
 	txa                                  ;0282A8|8A      |      ;
-	jsl.L CODE_009726                    ;0282A9|22269700|009726;
+	jsl.L ExecuteHardwareDivision                    ;0282A9|22269700|009726;
 	lda.W $4214                          ;0282AD|AD1442  |024214;
 	sta.B $a2                            ;0282B0|85A2    |0004A2;
 	stz.B $a3                            ;0282B2|64A3    |0004A3;
 	sta.W $4204                          ;0282B4|8D0442  |024204;
 	stz.W $4205                          ;0282B7|9C0542  |024205;
 	lda.B #$05                           ;0282BA|A905    |      ;
-	jsl.L CODE_009726                    ;0282BC|22269700|009726;
+	jsl.L ExecuteHardwareDivision                    ;0282BC|22269700|009726;
 	lda.W $4214                          ;0282C0|AD1442  |024214;
 	sta.W $4202                          ;0282C3|8D0242  |024202;
 	lda.B $b5                            ;0282C6|A5B5    |0004B5;
@@ -393,7 +393,7 @@ Battle_SumEnemy3HP:
 	lda.W $4216                          ;0282CD|AD1642  |024216;
 	inc a;0282D0|1A      |      ;
 	sta.W $00a8                          ;0282D1|8DA800  |0200A8;
-	jsl.L CODE_009783                    ;0282D4|22839700|009783;
+	jsl.L ExecuteAudioCall                    ;0282D4|22839700|009783;
 	lda.W $00a9                          ;0282D8|ADA900  |0200A9;
 	eor.B #$ff                           ;0282DB|49FF    |      ;
 	inc a;0282DD|1A      |      ;
@@ -468,7 +468,7 @@ Battle_CalculateAGI:
 	pha                                  ;028345|48      |      ;
 	lsr a;028346|4A      |      ;
 	sta.W $00a8                          ;028347|8DA800  |0200A8;
-	jsl.L CODE_009783                    ;02834A|22839700|009783;
+	jsl.L ExecuteAudioCall                    ;02834A|22839700|009783;
 	lda.W $00a9                          ;02834E|ADA900  |0200A9;
 	clc                                  ;028351|18      |      ;
 	adc.B $01,s                          ;028352|6301    |000001;
@@ -560,7 +560,7 @@ Battle_CheckCharacterStatus:
 	and.B #$38                           ;0283CE|2938    |      ;
 	beq Battle_ProcessStatusEffects                      ;0283D0|F01A    |0283EC;
 	jsr.W Battle_CheckStatusRecovery                    ;0283D2|20E088  |0288E0;
-	jsl.L CODE_009B02                    ;0283D5|22029B00|009B02;
+	jsl.L ExecuteLongEnvironmentCall                    ;0283D5|22029B00|009B02;
 	phd                                  ;0283D9|0B      |      ;
 	jsr.W Battle_SetEntityContextParty                    ;0283DA|20228F  |028F22;
 	lda.B $21                            ;0283DD|A521    |001021;
@@ -761,7 +761,7 @@ Battle_CheckPoison:
 	jsl.L Battle_ProcessStatusAnimation                    ;028522|2205ED02|02ED05;
 	jsr.W Battle_CheckMute                    ;028526|200086  |028600;
 	jsl.L Battle_RefreshBattleDisplay                    ;028529|2249D102|02D149;
-	jsl.L CODE_009B02                    ;02852D|22029B00|009B02;
+	jsl.L ExecuteLongEnvironmentCall                    ;02852D|22029B00|009B02;
 	rts                                  ;028531|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
@@ -836,7 +836,7 @@ Battle_ProcessSleep:
 	cmp.B #$30                           ;028592|C930    |      ;
 	bne Battle_SleepLoop                      ;028594|D008    |02859E;
 	lda.B $3a                            ;028596|A53A    |00043A;
-	jsl.L CODE_00DBF4                    ;028598|22F4DB00|00DBF4;
+	jsl.L Sub_00DBF4                    ;028598|22F4DB00|00DBF4;
 	bra Battle_WakeProbability                      ;02859C|802B    |0285C9;
 ;      |        |      ;
 ;      |        |      ;
@@ -853,7 +853,7 @@ Battle_SleepLoop:
 	sta.W $4204                          ;0285AF|8D0442  |024204;
 	stz.W $4205                          ;0285B2|9C0542  |024205;
 	lda.B #$04                           ;0285B5|A904    |      ;
-	jsl.L CODE_009726                    ;0285B7|22269700|009726;
+	jsl.L ExecuteHardwareDivision                    ;0285B7|22269700|009726;
 	lda.B #$00                           ;0285BB|A900    |      ;
 	xba                                  ;0285BD|EB      |      ;
 	lda.W $4214                          ;0285BE|AD1442  |024214;
@@ -989,7 +989,7 @@ Battle_FatalCountdown:
 	phd                                  ;028684|0B      |      ;
 	pea.W $0f18                          ;028685|F4180F  |020F18;
 	pld                                  ;028688|2B      |      ;
-	jsl.L CODE_00974E                    ;028689|224E9700|00974E;
+	jsl.L CallExternalValidationRoutine                    ;028689|224E9700|00974E;
 	pld                                  ;02868D|2B      |      ;
 	dec.B $b3                            ;02868E|C6B3    |0004B3;
 ;      |        |      ;
@@ -1015,14 +1015,14 @@ Battle_ProcessRegen:
 	sta.W $0098                          ;0286A9|8D9800  |020098;
 	lda.W #$0004                         ;0286AC|A90400  |      ;
 	sta.W $009c                          ;0286AF|8D9C00  |02009C;
-	jsl.L CODE_0096B3                    ;0286B2|22B39600|0096B3;
+	jsl.L ExecuteCalculation                    ;0286B2|22B39600|0096B3;
 	lda.W $009e                          ;0286B6|AD9E00  |02009E;
 	sta.W $0098                          ;0286B9|8D9800  |020098;
 	lda.W $00a0                          ;0286BC|ADA000  |0200A0;
 	sta.W $009a                          ;0286BF|8D9A00  |02009A;
 	lda.B $16                            ;0286C2|A516    |001216;
 	sta.W $009c                          ;0286C4|8D9C00  |02009C;
-	jsl.L CODE_0096E4                    ;0286C7|22E49600|0096E4;
+	jsl.L ExecuteFinalCalc                    ;0286C7|22E49600|0096E4;
 	sep #$20                             ;0286CB|E220    |      ;
 	rep #$10                             ;0286CD|C210    |      ;
 	lda.W $009e                          ;0286CF|AD9E00  |02009E;
@@ -1129,14 +1129,14 @@ Battle_WaitForInput:
 	sta.W $0098                          ;02877F|8D9800  |020098;
 	lda.B $14                            ;028782|A514    |001014;
 	sta.W $009c                          ;028784|8D9C00  |02009C;
-	jsl.L CODE_0096B3                    ;028787|22B39600|0096B3;
+	jsl.L ExecuteCalculation                    ;028787|22B39600|0096B3;
 	lda.W $009e                          ;02878B|AD9E00  |02009E;
 	sta.W $0098                          ;02878E|8D9800  |020098;
 	lda.W $00a0                          ;028791|ADA000  |0200A0;
 	sta.W $009a                          ;028794|8D9A00  |02009A;
 	pla                                  ;028797|68      |      ;
 	sta.W $009c                          ;028798|8D9C00  |02009C;
-	jsl.L CODE_0096E4                    ;02879B|22E49600|0096E4;
+	jsl.L ExecuteFinalCalc                    ;02879B|22E49600|0096E4;
 	lda.W $009e                          ;02879F|AD9E00  |02009E;
 	sta.B $14                            ;0287A2|8514    |001014;
 	sep #$20                             ;0287A4|E220    |      ;
@@ -1213,13 +1213,13 @@ Battle_ProcessCommand:
 	adc.B #$4b                           ;02882B|694B    |      ;
 	sta.B $40                            ;02882D|8540    |001040;
 	pld                                  ;02882F|2B      |      ;
-	jsl.L CODE_009B02                    ;028830|22029B00|009B02;
+	jsl.L ExecuteLongEnvironmentCall                    ;028830|22029B00|009B02;
 	rts                                  ;028834|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
 Battle_DisplayMessage:
 	stx.W $0017                          ;028835|8E1700  |020017;
-	jsl.L CODE_00D009                    ;028838|2209D000|00D009;
+	jsl.L CallExternalRoutine                    ;028838|2209D000|00D009;
 	rts                                  ;02883C|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
@@ -1291,7 +1291,7 @@ Battle_ScanPartyLoop:
 	ldx.B $16                            ;0288A4|A616    |001096;
 	stx.W $4204                          ;0288A6|8E0442  |024204;
 	lda.B #$14                           ;0288A9|A914    |      ;
-	jsl.L CODE_009726                    ;0288AB|22269700|009726;
+	jsl.L ExecuteHardwareDivision                    ;0288AB|22269700|009726;
 	rep #$30                             ;0288AF|C230    |      ;
 	lda.W $4214                          ;0288B1|AD1442  |024214;
 	cmp.W #$0064                         ;0288B4|C96400  |      ;
@@ -1335,7 +1335,7 @@ Battle_CheckStatusRecovery:
 	beq Battle_CheckMuteRecovery                      ;0288EC|F014    |028902;
 	lda.B #$65                           ;0288EE|A965    |      ;
 	sta.W $00a8                          ;0288F0|8DA800  |0200A8;
-	jsl.L CODE_009783                    ;0288F3|22839700|009783;
+	jsl.L ExecuteAudioCall                    ;0288F3|22839700|009783;
 	lda.W $00a9                          ;0288F7|ADA900  |0200A9;
 	cmp.B #$14                           ;0288FA|C914    |      ;
 	bcs Battle_CheckMuteRecovery                      ;0288FC|B004    |028902;
@@ -1348,7 +1348,7 @@ Battle_CheckMuteRecovery:
 	beq Battle_CheckConfuseRecovery                      ;028906|F014    |02891C;
 	lda.B #$65                           ;028908|A965    |      ;
 	sta.W $00a8                          ;02890A|8DA800  |0200A8;
-	jsl.L CODE_009783                    ;02890D|22839700|009783;
+	jsl.L ExecuteAudioCall                    ;02890D|22839700|009783;
 	lda.W $00a9                          ;028911|ADA900  |0200A9;
 	cmp.B #$1e                           ;028914|C91E    |      ;
 	bcs Battle_CheckConfuseRecovery                      ;028916|B004    |02891C;
@@ -1361,7 +1361,7 @@ Battle_CheckConfuseRecovery:
 	beq Battle_StatusRecoveryComplete                      ;028920|F014    |028936;
 	lda.B #$65                           ;028922|A965    |      ;
 	sta.W $00a8                          ;028924|8DA800  |0200A8;
-	jsl.L CODE_009783                    ;028927|22839700|009783;
+	jsl.L ExecuteAudioCall                    ;028927|22839700|009783;
 	lda.W $00a9                          ;02892B|ADA900  |0200A9;
 	cmp.B #$28                           ;02892E|C928    |      ;
 	bcs Battle_StatusRecoveryComplete                      ;028930|B004    |028936;
@@ -1475,11 +1475,11 @@ Battle_ProcessBossDefeat:
 	lda.B #$81                           ;0289DF|A981    |      ;
 	clc                                  ;0289E1|18      |      ;
 	adc.B $01,s                          ;0289E2|6301    |000001;
-	jsl.L CODE_00976B                    ;0289E4|226B9700|00976B;
+	jsl.L PlaySoundEffectBank                    ;0289E4|226B9700|00976B;
 	lda.B #$95                           ;0289E8|A995    |      ;
 	clc                                  ;0289EA|18      |      ;
 	adc.B $01,s                          ;0289EB|6301    |000001;
-	jsl.L CODE_009760                    ;0289ED|22609700|009760;
+	jsl.L Sub_009760                    ;0289ED|22609700|009760;
 	pla                                  ;0289F1|68      |      ;
 	asl a;0289F2|0A      |      ;
 	tax                                  ;0289F3|AA      |      ;
@@ -1770,7 +1770,7 @@ Battle_InitializeEnemies:
 	rep #$10                             ;028C0C|C210    |      ;
 	lda.B #$65                           ;028C0E|A965    |      ;
 	sta.W $00a8                          ;028C10|8DA800  |0200A8;
-	jsl.L CODE_009783                    ;028C13|22839700|009783;
+	jsl.L ExecuteAudioCall                    ;028C13|22839700|009783;
 	lda.B #$00                           ;028C17|A900    |      ;
 	xba                                  ;028C19|EB      |      ;
 	lda.W $0513                          ;028C1A|AD1305  |020513;
@@ -2286,10 +2286,10 @@ Battle_ProcessEntityEntry:
 	lsr.B $b7                            ;029007|46B7    |0004B7;
 	lda.B #$65                           ;029009|A965    |      ;
 	sta.W $00a8                          ;02900B|8DA800  |0200A8;
-	jsl.L CODE_009783                    ;02900E|22839700|009783;
+	jsl.L ExecuteAudioCall                    ;02900E|22839700|009783;
 	lda.W $00a9                          ;029012|ADA900  |0200A9;
 	sta.B $b9                            ;029015|85B9    |0004B9;
-	jsl.L CODE_009783                    ;029017|22839700|009783;
+	jsl.L ExecuteAudioCall                    ;029017|22839700|009783;
 	lda.W $00a9                          ;02901B|ADA900  |0200A9;
 	sta.B $b8                            ;02901E|85B8    |0004B8;
 	lda.B $b7                            ;029020|A5B7    |0004B7;
@@ -2714,10 +2714,10 @@ Battle_ProcessDamageVariance:
 	lsr.B $b7                            ;029444|46B7    |0004B7;
 	lda.B #$65                           ;029446|A965    |      ;
 	sta.W $00a8                          ;029448|8DA800  |0200A8;
-	jsl.L CODE_009783                    ;02944B|22839700|009783;
+	jsl.L ExecuteAudioCall                    ;02944B|22839700|009783;
 	lda.W $00a9                          ;02944F|ADA900  |0200A9;
 	sta.B $b9                            ;029452|85B9    |0004B9;
-	jsl.L CODE_009783                    ;029454|22839700|009783;
+	jsl.L ExecuteAudioCall                    ;029454|22839700|009783;
 	lda.W $00a9                          ;029458|ADA900  |0200A9;
 	sta.B $b8                            ;02945B|85B8    |0004B8;
 	lda.B $b7                            ;02945D|A5B7    |0004B7;
@@ -2755,10 +2755,10 @@ Battle_CheckCriticalHit:
 	lsr.B $b7                            ;02949B|46B7    |0004B7;
 	lda.B #$65                           ;02949D|A965    |      ;
 	sta.W $00a8                          ;02949F|8DA800  |0200A8;
-	jsl.L CODE_009783                    ;0294A2|22839700|009783;
+	jsl.L ExecuteAudioCall                    ;0294A2|22839700|009783;
 	lda.W $00a9                          ;0294A6|ADA900  |0200A9;
 	sta.B $b9                            ;0294A9|85B9    |0004B9;
-	jsl.L CODE_009783                    ;0294AB|22839700|009783;
+	jsl.L ExecuteAudioCall                    ;0294AB|22839700|009783;
 	lda.W $00a9                          ;0294AF|ADA900  |0200A9;
 	sta.B $b8                            ;0294B2|85B8    |0004B8;
 	lda.B $b7                            ;0294B4|A5B7    |0004B7;
@@ -3081,7 +3081,7 @@ Battle_DisplayHealValue:
 	lda.B $b3                            ;029741|A5B3    |0004B3;
 ;      |        |      ;
 Battle_ProcessRevive:
-	jsl.L CODE_009726                    ;029743|22269700|009726;
+	jsl.L ExecuteHardwareDivision                    ;029743|22269700|009726;
 	ldx.W $4214                          ;029747|AE1442  |024214;
 	stx.B $77                            ;02974A|8677    |000477;
 	rts                                  ;02974C|60      |      ;
@@ -3341,10 +3341,10 @@ Battle_IncreaseMagic:
 Battle_BuffApplied:
 	lda.B #$65                           ;0298EC|A965    |      ;
 	sta.W $00a8                          ;0298EE|8DA800  |0200A8;
-	jsl.L CODE_009783                    ;0298F1|22839700|009783;
+	jsl.L ExecuteAudioCall                    ;0298F1|22839700|009783;
 	lda.W $00a9                          ;0298F5|ADA900  |0200A9;
 	sta.B $b9                            ;0298F8|85B9    |0004B9;
-	jsl.L CODE_009783                    ;0298FA|22839700|009783;
+	jsl.L ExecuteAudioCall                    ;0298FA|22839700|009783;
 	lda.W $00a9                          ;0298FE|ADA900  |0200A9;
 	sta.B $b8                            ;029901|85B8    |0004B8;
 	rts                                  ;029903|60      |      ;
@@ -3355,14 +3355,14 @@ Battle_ProcessDebuffSpell:
 	sta.W $4204                          ;029906|8D0442  |024204;
 	stz.W $4205                          ;029909|9C0542  |024205;
 	lda.B #$03                           ;02990C|A903    |      ;
-	jsl.L CODE_009726                    ;02990E|22269700|009726;
+	jsl.L ExecuteHardwareDivision                    ;02990E|22269700|009726;
 	lda.W $4214                          ;029912|AD1442  |024214;
 	sta.B $b7                            ;029915|85B7    |0004B7;
 	lda.B $28                            ;029917|A528    |000428;
 	sta.W $4204                          ;029919|8D0442  |024204;
 	stz.W $4205                          ;02991C|9C0542  |024205;
 	lda.B #$03                           ;02991F|A903    |      ;
-	jsl.L CODE_009726                    ;029921|22269700|009726;
+	jsl.L ExecuteHardwareDivision                    ;029921|22269700|009726;
 	lda.W $4214                          ;029925|AD1442  |024214;
 	clc                                  ;029928|18      |      ;
 	adc.B $b7                            ;029929|65B7    |0004B7;
@@ -3686,7 +3686,7 @@ Battle_ApplyConfusionStatus:
 	stz.W $009a                          ;029B13|9C9A00  |02009A;
 	lda.W #$000a                         ;029B16|A90A00  |      ;
 	sta.W $009c                          ;029B19|8D9C00  |02009C;
-	jsl.L CODE_0096E4                    ;029B1C|22E49600|0096E4;
+	jsl.L ExecuteFinalCalc                    ;029B1C|22E49600|0096E4;
 	lda.W $009e                          ;029B20|AD9E00  |02009E;
 	rts                                  ;029B23|60      |      ;
 ;      |        |      ;
@@ -4137,7 +4137,7 @@ Battle_InitializeFade:
 	ldx.B $16                            ;029E50|A616    |001216;
 	pld                                  ;029E52|2B      |      ;
 	stx.W $009c                          ;029E53|8E9C00  |02009C;
-	jsl.L CODE_0096B3                    ;029E56|22B39600|0096B3;
+	jsl.L ExecuteCalculation                    ;029E56|22B39600|0096B3;
 ;      |        |      ;
 Battle_UpdateFade:
 	ldx.W $009e                          ;029E5A|AE9E00  |02009E;
@@ -4146,7 +4146,7 @@ Battle_UpdateFade:
 	stx.W $009a                          ;029E63|8E9A00  |02009A;
 	ldx.W #$0064                         ;029E66|A26400  |      ;
 	stx.W $009c                          ;029E69|8E9C00  |02009C;
-	jsl.L CODE_0096E4                    ;029E6C|22E49600|0096E4;
+	jsl.L ExecuteFinalCalc                    ;029E6C|22E49600|0096E4;
 	ldx.W $009e                          ;029E70|AE9E00  |02009E;
 	stx.B $77                            ;029E73|8677    |000477;
 	jsr.W Battle_ClampHealedHP                    ;029E75|202797  |029727;
@@ -4162,7 +4162,7 @@ Battle_ApplyFadeStep:
 	pld                                  ;029E85|2B      |      ;
 	sta.W $009c                          ;029E86|8D9C00  |02009C;
 	stz.W $009d                          ;029E89|9C9D00  |02009D;
-	jsl.L CODE_0096B3                    ;029E8C|22B39600|0096B3;
+	jsl.L ExecuteCalculation                    ;029E8C|22B39600|0096B3;
 	jsr.W Battle_UpdateFade                    ;029E90|205A9E  |029E5A;
 	bra Battle_ShakeComplete                      ;029E93|808C    |029E21;
 ;      |        |      ;
@@ -4278,7 +4278,7 @@ Battle_MusicChangeComplete:
 	beq Battle_PlayVictoryMusic                      ;029F51|F05D    |029FB0;
 	lda.B #$65                           ;029F53|A965    |      ;
 	sta.W $00a8                          ;029F55|8DA800  |0200A8;
-	jsl.L CODE_009783                    ;029F58|22839700|009783;
+	jsl.L ExecuteAudioCall                    ;029F58|22839700|009783;
 	lda.W $00a9                          ;029F5C|ADA900  |0200A9;
 	clc                                  ;029F5F|18      |      ;
 	adc.B #$0a                           ;029F60|690A    |      ;
@@ -4290,14 +4290,14 @@ Battle_MusicChangeComplete:
 	sta.B $a0                            ;029F6F|85A0    |0004A0;
 	lda.B $77                            ;029F71|A577    |000477;
 	sta.W $009c                          ;029F73|8D9C00  |02009C;
-	jsl.L CODE_0096B3                    ;029F76|22B39600|0096B3;
+	jsl.L ExecuteCalculation                    ;029F76|22B39600|0096B3;
 	lda.W $009e                          ;029F7A|AD9E00  |02009E;
 	sta.W $0098                          ;029F7D|8D9800  |020098;
 	lda.W $009f                          ;029F80|AD9F00  |02009F;
 	sta.W $0099                          ;029F83|8D9900  |020099;
 	lda.W #$0064                         ;029F86|A96400  |      ;
 	sta.W $009c                          ;029F89|8D9C00  |02009C;
-	jsl.L CODE_0096E4                    ;029F8C|22E49600|0096E4;
+	jsl.L ExecuteFinalCalc                    ;029F8C|22E49600|0096E4;
 	lda.W $009e                          ;029F90|AD9E00  |02009E;
 	sec                                  ;029F93|38      |      ;
 	sbc.B $a0                            ;029F94|E5A0    |0004A0;
@@ -4578,7 +4578,7 @@ Battle_ProcessElementalResistance:
 	ldy.W #$0012                         ;02A241|A01200  |      ;
 ;      |        |      ;
 Battle_CheckElementResist:
-	jsl.L CODE_0C8000                    ;02A244|2200800C|0C8000;
+	jsl.L CWaitTimingRoutine                    ;02A244|2200800C|0C8000;
 	lda.W DATA8_02a272,x                 ;02A248|BD72A2  |02A272;
 	sta.W SNES_CGADD                          ;02A24B|8D2121  |022121;
 	lda.W DATA8_02a278,y                 ;02A24E|B978A2  |02A278;
@@ -4726,7 +4726,7 @@ UNREACH_02A32E:
 Battle_ApplyPercentDamage:
 	lda.B #$65                           ;02A373|A965    |      ;
 	sta.W $00a8                          ;02A375|8DA800  |0200A8;
-	jsl.L CODE_009783                    ;02A378|22839700|009783;
+	jsl.L ExecuteAudioCall                    ;02A378|22839700|009783;
 	lda.W $00a9                          ;02A37C|ADA900  |0200A9;
 	cmp.B #$32                           ;02A37F|C932    |      ;
 	bcc Battle_PercentDamageComplete                      ;02A381|9001    |02A384;
@@ -4964,7 +4964,7 @@ Battle_ApplyAttackModifier:
 	beq Battle_AttackModifierApplied                      ;02A4EA|F00E    |02A4FA;
 	lda.B #$05                           ;02A4EC|A905    |      ;
 	sta.W $00a8                          ;02A4EE|8DA800  |0200A8;
-	jsl.L CODE_009783                    ;02A4F1|22839700|009783;
+	jsl.L ExecuteAudioCall                    ;02A4F1|22839700|009783;
 	lda.W $00a9                          ;02A4F5|ADA900  |0200A9;
 	bra Battle_ApplyDefenseModifier                      ;02A4F8|8003    |02A4FD;
 ;      |        |      ;
@@ -5027,7 +5027,7 @@ Battle_SpeedModifierApplied:
 ;      |        |      ;
 Battle_ApplyMagicModifier:
 	lda.B #$11                           ;02A550|A911    |      ;
-	jsl.L CODE_00DA65                    ;02A552|2265DA00|00DA65;
+	jsl.L CallSystemValidation                    ;02A552|2265DA00|00DA65;
 	inc a;02A556|1A      |      ;
 	dec a;02A557|3A      |      ;
 	beq Battle_MagicModifierApplied                      ;02A558|F012    |02A56C;
@@ -5127,7 +5127,7 @@ Battle_DecrementBuffTimer:
 ;      |        |      ;
 Battle_CheckBuffExpired:
 	lda.B #$10                           ;02A5FE|A910    |      ;
-	jsl.L CODE_00DA65                    ;02A600|2265DA00|00DA65;
+	jsl.L CallSystemValidation                    ;02A600|2265DA00|00DA65;
 	inc a;02A604|1A      |      ;
 	dec a;02A605|3A      |      ;
 	beq Battle_BuffTimersUpdated                      ;02A606|F018    |02A620;
@@ -5192,7 +5192,7 @@ Battle_BarrierAbsorbDamage:
 	beq Battle_ReduceBarrier                      ;02A66F|F00E    |02A67F;
 	lda.B #$02                           ;02A671|A902    |      ;
 	sta.W $00a8                          ;02A673|8DA800  |0200A8;
-	jsl.L CODE_009783                    ;02A676|22839700|009783;
+	jsl.L ExecuteAudioCall                    ;02A676|22839700|009783;
 	lda.W $00a9                          ;02A67A|ADA900  |0200A9;
 	bne Battle_BarrierBroken                      ;02A67D|D003    |02A682;
 ;      |        |      ;
@@ -5220,7 +5220,7 @@ Battle_BarrierBroken:
 	sta.B $a7                            ;02A69C|85A7    |0004A7;
 	lda.B #$08                           ;02A69E|A908    |      ;
 	sta.W $00a8                          ;02A6A0|8DA800  |0200A8;
-	jsl.L CODE_009783                    ;02A6A3|22839700|009783;
+	jsl.L ExecuteAudioCall                    ;02A6A3|22839700|009783;
 	lda.W $00a9                          ;02A6A7|ADA900  |0200A9;
 	sta.B $a9                            ;02A6AA|85A9    |0004A9;
 ;      |        |      ;
@@ -5235,7 +5235,7 @@ Battle_BarrierComplete:
 	phd                                  ;02A6B6|0B      |      ;
 	pea.W $04a7                          ;02A6B7|F4A704  |0204A7;
 	pld                                  ;02A6BA|2B      |      ;
-	jsl.L CODE_00975A                    ;02A6BB|225A9700|00975A;
+	jsl.L CallCalculationSystem                    ;02A6BB|225A9700|00975A;
 	pld                                  ;02A6BF|2B      |      ;
 	inc a;02A6C0|1A      |      ;
 	dec a;02A6C1|3A      |      ;
@@ -5308,7 +5308,7 @@ Battle_CalculateEvadeChance:
 	phd                                  ;02A72C|0B      |      ;
 	pea.W $0f18                          ;02A72D|F4180F  |020F18;
 	pld                                  ;02A730|2B      |      ;
-	jsl.L CODE_00975A                    ;02A731|225A9700|00975A;
+	jsl.L CallCalculationSystem                    ;02A731|225A9700|00975A;
 	pld                                  ;02A735|2B      |      ;
 	inc a;02A736|1A      |      ;
 	dec a;02A737|3A      |      ;
@@ -5501,7 +5501,7 @@ Battle_DisplayParry:
 Battle_ParryComplete:
 	lda.B #$65                           ;02A86E|A965    |      ;
 	sta.W $00a8                          ;02A870|8DA800  |0200A8;
-	jsl.L CODE_009783                    ;02A873|22839700|009783;
+	jsl.L ExecuteAudioCall                    ;02A873|22839700|009783;
 	lda.W $00a9                          ;02A877|ADA900  |0200A9;
 	cmp.W $10c2                          ;02A87A|CDC210  |0210C2;
 	beq Battle_ProcessStatusResistance                      ;02A87D|F002    |02A881;
@@ -5523,7 +5523,7 @@ UNREACH_02A88F:
 Battle_CalculateStatusResist:
 	lda.B #$65                           ;02A89F|A965    |      ;
 	sta.W $00a8                          ;02A8A1|8DA800  |0200A8;
-	jsl.L CODE_009783                    ;02A8A4|22839700|009783;
+	jsl.L ExecuteAudioCall                    ;02A8A4|22839700|009783;
 	lda.W $00a9                          ;02A8A8|ADA900  |0200A9;
 	sta.B $a0                            ;02A8AB|85A0    |0004A0;
 	ldx.W #$0007                         ;02A8AD|A20700  |      ;
@@ -5596,7 +5596,7 @@ Battle_ProcessImmunity:
 	phd                                  ;02A90E|0B      |      ;
 	pea.W $0f18                          ;02A90F|F4180F  |020F18;
 	pld                                  ;02A912|2B      |      ;
-	jsl.L CODE_00975A                    ;02A913|225A9700|00975A;
+	jsl.L CallCalculationSystem                    ;02A913|225A9700|00975A;
 	pld                                  ;02A917|2B      |      ;
 	inc a;02A918|1A      |      ;
 	dec a;02A919|3A      |      ;
@@ -5663,7 +5663,7 @@ Battle_ImmunityComplete:
 	beq Battle_ProcessWeakness                      ;02A96C|F00E    |02A97C;
 	lda.B #$02                           ;02A96E|A902    |      ;
 	sta.W $00a8                          ;02A970|8DA800  |0200A8;
-	jsl.L CODE_009783                    ;02A973|22839700|009783;
+	jsl.L ExecuteAudioCall                    ;02A973|22839700|009783;
 	lda.W $00a9                          ;02A977|ADA900  |0200A9;
 	beq Battle_CheckWeaknessFlags                      ;02A97A|F003    |02A97F;
 ;      |        |      ;
@@ -5681,7 +5681,7 @@ Battle_CheckWeaknessFlags:
 	beq Battle_WeaknessFound                      ;02A98B|F012    |02A99F;
 	lda.B #$02                           ;02A98D|A902    |      ;
 	sta.W $00a8                          ;02A98F|8DA800  |0200A8;
-	jsl.L CODE_009783                    ;02A992|22839700|009783;
+	jsl.L ExecuteAudioCall                    ;02A992|22839700|009783;
 	lda.W $00a9                          ;02A996|ADA900  |0200A9;
 	beq Battle_WeaknessFound                      ;02A999|F004    |02A99F;
 	lda.B #$80                           ;02A99B|A980    |      ;
@@ -5712,7 +5712,7 @@ Battle_WeaknessComplete:
 Battle_ProcessAbsorb:
 	lda.B #$06                           ;02A9BA|A906    |      ;
 	sta.W $00a8                          ;02A9BC|8DA800  |0200A8;
-	jsl.L CODE_009783                    ;02A9BF|22839700|009783;
+	jsl.L ExecuteAudioCall                    ;02A9BF|22839700|009783;
 	lda.B #$00                           ;02A9C3|A900    |      ;
 	xba                                  ;02A9C5|EB      |      ;
 	lda.W $00a9                          ;02A9C6|ADA900  |0200A9;
@@ -5747,7 +5747,7 @@ Battle_ConvertToHealing:
 Battle_AbsorbEffectComplete:
 	lda.B #$65                           ;02A9EC|A965    |      ;
 	sta.W $00a8                          ;02A9EE|8DA800  |0200A8;
-	jsl.L CODE_009783                    ;02A9F1|22839700|009783;
+	jsl.L ExecuteAudioCall                    ;02A9F1|22839700|009783;
 	lda.W $00a9                          ;02A9F5|ADA900  |0200A9;
 	sta.B $a0                            ;02A9F8|85A0    |0004A0;
 	phd                                  ;02A9FA|0B      |      ;
@@ -5869,7 +5869,7 @@ Battle_ApplyEnhanceBonus:
 	bcs Battle_EnhanceComplete                      ;02AAB0|B021    |02AAD3;
 	lda.B #$65                           ;02AAB2|A965    |      ;
 	sta.W $00a8                          ;02AAB4|8DA800  |0200A8;
-	jsl.L CODE_009783                    ;02AAB7|22839700|009783;
+	jsl.L ExecuteAudioCall                    ;02AAB7|22839700|009783;
 	lda.W $00a9                          ;02AABB|ADA900  |0200A9;
 	cmp.W DATA8_02d083                   ;02AABE|CD83D0  |02D083;
 	bcs Battle_EnhanceComplete                      ;02AAC1|B010    |02AAD3;
@@ -5998,7 +5998,7 @@ DATA8_02acc6:
 	xba                                  ;02ACDB|EB      |      ;
 	lda.L $7ec360,x                      ;02ACDC|BF60C37E|7EC360;
 	pea.W DATA8_02ace8                   ;02ACE0|F4E8AC  |02ACE8;
-	jsl.L CODE_0097BE                    ;02ACE3|22BE9700|0097BE;
+	jsl.L CallSpriteInitializer                    ;02ACE3|22BE9700|0097BE;
 	rts                                  ;02ACE7|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
@@ -6782,7 +6782,7 @@ Battle_DrawHPBar:
 	sep #$20                             ;02D133|E220    |      ;
 	rep #$10                             ;02D135|C210    |      ;
 	stz.W $0ae9                          ;02D137|9CE90A  |020AE9;
-	jsl.L CODE_0096A0                    ;02D13A|22A09600|0096A0;
+	jsl.L CallExternalThreadManager                    ;02D13A|22A09600|0096A0;
 	stz.W $0ae2                          ;02D13E|9CE20A  |020AE2;
 	stz.W $0af3                          ;02D141|9CF30A  |020AF3;
 	stz.W $0af1                          ;02D144|9CF10A  |020AF1;
@@ -6915,7 +6915,7 @@ Battle_GetNextTurn:
 	lda.B #$18                           ;02D24C|A918    |      ;
 	xba                                  ;02D24E|EB      |      ;
 	lda.B #$0c                           ;02D24F|A90C    |      ;
-	jsl.L CODE_0B92D6                    ;02D251|22D6920B|0B92D6;
+	jsl.L Label_0B92D6                    ;02D251|22D6920B|0B92D6;
 	sep #$20                             ;02D255|E220    |      ;
 	rep #$10                             ;02D257|C210    |      ;
 	jsr.W Battle_ApplyShell                    ;02D259|2018DA  |02DA18;
@@ -7623,7 +7623,7 @@ Battle_DoomCountdown:
 	lda.B $20                            ;02D7BB|A520    |000A20;
 	sta.W $4202                          ;02D7BD|8D0242  |024202;
 	lda.B #$05                           ;02D7C0|A905    |      ;
-	jsl.L CODE_00971E                    ;02D7C2|221E9700|00971E;
+	jsl.L CallMultiplicationRoutine                    ;02D7C2|221E9700|00971E;
 	ldx.W $4216                          ;02D7C6|AE1642  |024216;
 	lda.L DATA8_098462,x                 ;02D7C9|BF628409|098462;
 	sta.B $15                            ;02D7CD|8515    |000A15;
@@ -7653,7 +7653,7 @@ Battle_DoomTriggerDeath:
 	rep #$10                             ;02D817|C210    |      ;
 	sta.W $4202                          ;02D819|8D0242  |024202;
 	lda.B #$05                           ;02D81C|A905    |      ;
-	jsl.L CODE_00971E                    ;02D81E|221E9700|00971E;
+	jsl.L CallMultiplicationRoutine                    ;02D81E|221E9700|00971E;
 	ldx.W $4216                          ;02D822|AE1642  |024216;
 	lda.L DATA8_098460,x                 ;02D825|BF608409|098460;
 	sta.B $69                            ;02D829|8569    |000A69;
@@ -7960,10 +7960,10 @@ Battle_ShellReduceMagic:
 	beq Battle_ShellComplete                      ;02DA32|F015    |02DA49;
 	inx                                  ;02DA34|E8      |      ;
 	sta.B SNES_COLDATA-$2100             ;02DA35|8532    |002132;
-	jsl.L CODE_0C8000                    ;02DA37|2200800C|0C8000;
-	jsl.L CODE_0C8000                    ;02DA3B|2200800C|0C8000;
-	jsl.L CODE_0C8000                    ;02DA3F|2200800C|0C8000;
-	jsl.L CODE_0C8000                    ;02DA43|2200800C|0C8000;
+	jsl.L CWaitTimingRoutine                    ;02DA37|2200800C|0C8000;
+	jsl.L CWaitTimingRoutine                    ;02DA3B|2200800C|0C8000;
+	jsl.L CWaitTimingRoutine                    ;02DA3F|2200800C|0C8000;
+	jsl.L CWaitTimingRoutine                    ;02DA43|2200800C|0C8000;
 	bra Battle_ShellReduceMagic                      ;02DA47|80E6    |02DA2F;
 ;      |        |      ;
 ;      |        |      ;
@@ -7979,11 +7979,11 @@ Battle_ProcessProtect:
 	beq Battle_ApplyProtect                      ;02DA57|F019    |02DA72;
 	inx                                  ;02DA59|E8      |      ;
 	sta.B SNES_COLDATA-$2100             ;02DA5A|8532    |002132;
-	jsl.L CODE_0C8000                    ;02DA5C|2200800C|0C8000;
-	jsl.L CODE_0C8000                    ;02DA60|2200800C|0C8000;
-	jsl.L CODE_0C8000                    ;02DA64|2200800C|0C8000;
-	jsl.L CODE_0C8000                    ;02DA68|2200800C|0C8000;
-	jsl.L CODE_0C8000                    ;02DA6C|2200800C|0C8000;
+	jsl.L CWaitTimingRoutine                    ;02DA5C|2200800C|0C8000;
+	jsl.L CWaitTimingRoutine                    ;02DA60|2200800C|0C8000;
+	jsl.L CWaitTimingRoutine                    ;02DA64|2200800C|0C8000;
+	jsl.L CWaitTimingRoutine                    ;02DA68|2200800C|0C8000;
+	jsl.L CWaitTimingRoutine                    ;02DA6C|2200800C|0C8000;
 	bra Battle_ProcessProtect                      ;02DA70|80E2    |02DA54;
 ;      |        |      ;
 ;      |        |      ;
@@ -8278,7 +8278,7 @@ Battle_ProcessSap:
 	pla                                  ;02DCB1|68      |      ;
 	plx                                  ;02DCB2|FA      |      ;
 	sta.L $7ec480,x                      ;02DCB3|9F80C47E|7EC480;
-	jsl.L CODE_0B935F                    ;02DCB7|225F930B|0B935F;
+	jsl.L Battle_Field_Background_Graphics_Loader                    ;02DCB7|225F930B|0B935F;
 	inc.B $f8                            ;02DCBB|E6F8    |000AF8;
 	plb                                  ;02DCBD|AB      |      ;
 	plp                                  ;02DCBE|28      |      ;
@@ -8383,7 +8383,7 @@ Battle_ProcessSlip:
 	lda.W UNREACH_02DF5B,x               ;02DF42|BD5BDF  |02DF5B;
 	sta.W $0aee                          ;02DF45|8DEE0A  |020AEE;
 	pea.W DATA8_02df53                   ;02DF48|F453DF  |02DF53;
-	jsl.L CODE_0097BE                    ;02DF4B|22BE9700|0097BE;
+	jsl.L CallSpriteInitializer                    ;02DF4B|22BE9700|0097BE;
 	plp                                  ;02DF4F|28      |      ;
 	ply                                  ;02DF50|7A      |      ;
 	plx                                  ;02DF51|FA      |      ;
@@ -8467,7 +8467,7 @@ Battle_SlipDamagePercent:
 	lda.W $0a9c                          ;02DFED|AD9C0A  |020A9C;
 	sta.W $4202                          ;02DFF0|8D0242  |024202;
 	lda.B #$03                           ;02DFF3|A903    |      ;
-	jsl.L CODE_00971E                    ;02DFF5|221E9700|00971E;
+	jsl.L CallMultiplicationRoutine                    ;02DFF5|221E9700|00971E;
 	ldx.W $4216                          ;02DFF9|AE1642  |024216;
 	rep #$30                             ;02DFFC|C230    |      ;
 	lda.L UNREACH_0CF715,x               ;02DFFE|BF15F70C|0CF715;
@@ -8522,7 +8522,7 @@ Battle_ApplyAuto:
 	rep #$10                             ;02E05B|C210    |      ;
 	sta.W $4202                          ;02E05D|8D0242  |024202;
 	lda.B #$06                           ;02E060|A906    |      ;
-	jsl.L CODE_00971E                    ;02E062|221E9700|00971E;
+	jsl.L CallMultiplicationRoutine                    ;02E062|221E9700|00971E;
 	ldx.W $4216                          ;02E066|AE1642  |024216;
 	ldy.W #$0004                         ;02E069|A00400  |      ;
 ;      |        |      ;
@@ -8533,7 +8533,7 @@ Battle_AutoSelectAction:
 	inx                                  ;02E074|E8      |      ;
 	sta.W $4202                          ;02E075|8D0242  |024202;
 	lda.B #$18                           ;02E078|A918    |      ;
-	jsl.L CODE_00971E                    ;02E07A|221E9700|00971E;
+	jsl.L CallMultiplicationRoutine                    ;02E07A|221E9700|00971E;
 	rep #$30                             ;02E07E|C230    |      ;
 	lda.W $4216                          ;02E080|AD1642  |024216;
 	clc                                  ;02E083|18      |      ;
@@ -9031,7 +9031,7 @@ Battle_ProcessQuadracast:
 	lda.B $96                            ;02E506|A596    |000A96;
 	sta.W $4202                          ;02E508|8D0242  |024202;
 	lda.B #$06                           ;02E50B|A906    |      ;
-	jsl.L CODE_00971E                    ;02E50D|221E9700|00971E;
+	jsl.L CallMultiplicationRoutine                    ;02E50D|221E9700|00971E;
 	ldx.W $4216                          ;02E511|AE1642  |024216;
 	lda.B $93                            ;02E514|A593    |000A93;
 	xba                                  ;02E516|EB      |      ;
@@ -9186,7 +9186,7 @@ Battle_MPTurboComplete:
 ;      |        |      ;
 Battle_ProcessConcentrate:
 	php                                  ;02E60F|08      |      ;
-	jsl.L CODE_0C8000                    ;02E610|2200800C|0C8000;
+	jsl.L CWaitTimingRoutine                    ;02E610|2200800C|0C8000;
 	lda.B #$ff                           ;02E614|A9FF    |      ;
 	sta.W SNES_WH1                          ;02E616|8D2721  |022127;
 	sta.W SNES_WH3                          ;02E619|8D2921  |022129;
@@ -9219,7 +9219,7 @@ Battle_ProcessConcentrate:
 	lda.B #$80                           ;02E662|A980    |      ;
 	sta.W $0aa1                          ;02E664|8DA10A  |020AA1;
 	lda.B #$02                           ;02E667|A902    |      ;
-	jsl.L CODE_0C8000                    ;02E669|2200800C|0C8000;
+	jsl.L CWaitTimingRoutine                    ;02E669|2200800C|0C8000;
 	tsb.W $0111                          ;02E66D|0C1101  |020111;
 ;      |        |      ;
 Battle_ApplyConcentrate:
@@ -9268,7 +9268,7 @@ Battle_ProcessMagicBarrier:
 	lda.W $0ab0                          ;02E6BF|ADB00A  |020AB0;
 	adc.W DATA8_02e5a0                   ;02E6C2|6DA0E5  |02E5A0;
 	sta.W $0ab0                          ;02E6C5|8DB00A  |020AB0;
-	jsl.L CODE_0C8000                    ;02E6C8|2200800C|0C8000;
+	jsl.L CWaitTimingRoutine                    ;02E6C8|2200800C|0C8000;
 	sep #$20                             ;02E6CC|E220    |      ;
 	lda.B #$80                           ;02E6CE|A980    |      ;
 	trb.W $0110                          ;02E6D0|1C1001  |020110;
@@ -9442,9 +9442,9 @@ Battle_ApplySapMP:
 	dey                                  ;02E804|88      |      ;
 	cpy.B #$ff                           ;02E805|C0FF    |      ;
 	bne Battle_ProcessSapMP                      ;02E807|D0C7    |02E7D0;
-	jsl.L CODE_0096A0                    ;02E809|22A09600|0096A0;
+	jsl.L CallExternalThreadManager                    ;02E809|22A09600|0096A0;
 	inc.B $e8                            ;02E80D|E6E8    |000AE8;
-	jsl.L CODE_0096A0                    ;02E80F|22A09600|0096A0;
+	jsl.L CallExternalThreadManager                    ;02E80F|22A09600|0096A0;
 	stz.B $e7                            ;02E813|64E7    |000AE7;
 ;      |        |      ;
 Battle_SapMPDrain:
@@ -9506,7 +9506,7 @@ Battle_FaithBoostMagic:
 Battle_FaithComplete:
 	dey                                  ;02E85F|88      |      ;
 	bpl Battle_FaithBoostMagic                      ;02E860|10F5    |02E857;
-	jsl.L CODE_0096A0                    ;02E862|22A09600|0096A0;
+	jsl.L CallExternalThreadManager                    ;02E862|22A09600|0096A0;
 	bra Battle_SapMPDrain                      ;02E866|80AD    |02E815;
 ;      |        |      ;
 ;      |        |      ;
@@ -9863,7 +9863,7 @@ Battle_VanishComplete:
 	phd                                  ;02EA8B|0B      |      ;
 	pea.W $0b00                          ;02EA8C|F4000B  |020B00;
 	pld                                  ;02EA8F|2B      |      ;
-	jsl.L CODE_00974E                    ;02EA90|224E9700|00974E;
+	jsl.L CallExternalValidationRoutine                    ;02EA90|224E9700|00974E;
 	pld                                  ;02EA94|2B      |      ;
 	pla                                  ;02EA95|68      |      ;
 	inc a;02EA96|1A      |      ;
@@ -9885,7 +9885,7 @@ Battle_ApplySafeguard:
 	phd                                  ;02EAA3|0B      |      ;
 	pea.W $0b00                          ;02EAA4|F4000B  |020B00;
 	pld                                  ;02EAA7|2B      |      ;
-	jsl.L CODE_00975A                    ;02EAA8|225A9700|00975A;
+	jsl.L CallCalculationSystem                    ;02EAA8|225A9700|00975A;
 	pld                                  ;02EAAC|2B      |      ;
 	inc a;02EAAD|1A      |      ;
 	dec a;02EAAE|3A      |      ;
@@ -10125,7 +10125,7 @@ Battle_MimicCopyLast:
 	adc.B $d0                            ;02EBFC|65D0    |000AD0;
 	sta.W $4202                          ;02EBFE|8D0242  |0B4202;
 	lda.B #$30                           ;02EC01|A930    |      ;
-	jsl.L CODE_00971E                    ;02EC03|221E9700|00971E;
+	jsl.L CallMultiplicationRoutine                    ;02EC03|221E9700|00971E;
 	lda.B $cc                            ;02EC07|A5CC    |000ACC;
 	beq Battle_MimicExecute                      ;02EC09|F007    |02EC12;
 	rep #$20                             ;02EC0B|C220    |      ;
@@ -10177,7 +10177,7 @@ Battle_BlueComplete:
 	lda.W $0acb                          ;02EC51|ADCB0A  |0B0ACB;
 	sta.W $4202                          ;02EC54|8D0242  |0B4202;
 	lda.B #$20                           ;02EC57|A920    |      ;
-	jsl.L CODE_00971E                    ;02EC59|221E9700|00971E;
+	jsl.L CallMultiplicationRoutine                    ;02EC59|221E9700|00971E;
 	rep #$30                             ;02EC5D|C230    |      ;
 	clc                                  ;02EC5F|18      |      ;
 	lda.W #$7800                         ;02EC60|A90078  |      ;
@@ -10298,7 +10298,7 @@ Battle_ProcessStatusAnimation:
 ;      |        |      ;
 Battle_RageComplete:
 	jsr.W Battle_ApplyChain                    ;02ED28|2091EE  |02EE91;
-	jsl.L CODE_0096A0                    ;02ED2B|22A09600|0096A0;
+	jsl.L CallExternalThreadManager                    ;02ED2B|22A09600|0096A0;
 	rep #$20                             ;02ED2F|C220    |      ;
 	sep #$10                             ;02ED31|E210    |      ;
 	ldx.B #$00                           ;02ED33|A200    |      ;
@@ -10339,7 +10339,7 @@ Battle_FuryDamageMultiplier:
 	lda.B #$3c                           ;02ED77|A93C    |      ;
 ;      |        |      ;
 Battle_FuryComplete:
-	jsl.L CODE_0096A0                    ;02ED79|22A09600|0096A0;
+	jsl.L CallExternalThreadManager                    ;02ED79|22A09600|0096A0;
 	dec a;02ED7D|3A      |      ;
 	bne Battle_FuryComplete                      ;02ED7E|D0F9    |02ED79;
 ;      |        |      ;
@@ -10595,7 +10595,7 @@ Battle_ChainComplete:
 Battle_ProcessBurstDamage:
 	txa                                  ;02EF05|8A      |      ;
 	pea.W DATA8_02ef0e                   ;02EF06|F40EEF  |02EF0E;
-	jsl.L CODE_0097BE                    ;02EF09|22BE9700|0097BE;
+	jsl.L CallSpriteInitializer                    ;02EF09|22BE9700|0097BE;
 ;      |        |      ;
 Battle_ApplyBurst:
 	rtl                                  ;02EF0D|6B      |      ;
@@ -10853,7 +10853,7 @@ DATA8_02f11d:
 Battle_FinisherExecute:
 	sep #$30                             ;02F155|E230    |      ;
 	jsr.W Battle_CheckAutoFight                    ;02F157|20C3F5  |02F5C3;
-	jsl.L CODE_0B8E91                    ;02F15A|22918E0B|0B8E91;
+	jsl.L CodeBattleAnimationStateHandler                    ;02F15A|22918E0B|0B8E91;
 	ldx.B #$00                           ;02F15E|A200    |      ;
 	ldy.B #$20                           ;02F160|A020    |      ;
 ;      |        |      ;
@@ -10900,7 +10900,7 @@ Battle_SummonAttack:
 	phx                                  ;02F199|DA      |      ;
 	phy                                  ;02F19A|5A      |      ;
 	pea.W DATA8_02f1a6                   ;02F19B|F4A6F1  |02F1A6;
-	jsl.L CODE_0097BE                    ;02F19E|22BE9700|0097BE;
+	jsl.L CallSpriteInitializer                    ;02F19E|22BE9700|0097BE;
 	ply                                  ;02F1A2|7A      |      ;
 	plx                                  ;02F1A3|FA      |      ;
 	bra Battle_ProcessSummon                      ;02F1A4|80C4    |02F16A;
@@ -10920,7 +10920,7 @@ DATA8_02f1a6:
 	phx                                  ;02F1C3|DA      |      ;
 	php                                  ;02F1C4|08      |      ;
 	pea.W DATA8_02f62c                   ;02F1C5|F42CF6  |02F62C;
-	jsl.L CODE_0097BE                    ;02F1C8|22BE9700|0097BE;
+	jsl.L CallSpriteInitializer                    ;02F1C8|22BE9700|0097BE;
 	plp                                  ;02F1CC|28      |      ;
 	plx                                  ;02F1CD|FA      |      ;
 	lda.B $e8                            ;02F1CE|A5E8    |000AE8;
@@ -11082,7 +11082,7 @@ Battle_ExitBattle:
 	phd                                  ;02F2E6|0B      |      ;
 	pea.W $0b00                          ;02F2E7|F4000B  |020B00;
 	pld                                  ;02F2EA|2B      |      ;
-	jsl.L CODE_009754                    ;02F2EB|22549700|009754;
+	jsl.L CallExternalCleanupRoutine                    ;02F2EB|22549700|009754;
 	pld                                  ;02F2EF|2B      |      ;
 	pla                                  ;02F2F0|68      |      ;
 	inc a;02F2F1|1A      |      ;
@@ -11106,7 +11106,7 @@ DATA8_02f2f7:
 	cmp.B #$05                           ;02F32C|C905    |      ;
 	bpl UNREACH_02F33B                   ;02F32E|100B    |02F33B;
 	pea.W DATA8_02f33d                   ;02F330|F43DF3  |02F33D;
-	jsl.L CODE_0097BE                    ;02F333|22BE9700|0097BE;
+	jsl.L CallSpriteInitializer                    ;02F333|22BE9700|0097BE;
 	plp                                  ;02F337|28      |      ;
 	ply                                  ;02F338|7A      |      ;
 	plx                                  ;02F339|FA      |      ;
@@ -11504,7 +11504,7 @@ Battle_CheckAutoFight:
 	cmp.B #$03                           ;02F5CE|C903    |      ;
 	bpl Battle_AutoFightReturn                      ;02F5D0|1007    |02F5D9;
 	pea.W DATA8_02f5db                   ;02F5D2|F4DBF5  |02F5DB;
-	jsl.L CODE_0097BE                    ;02F5D5|22BE9700|0097BE;
+	jsl.L CallSpriteInitializer                    ;02F5D5|22BE9700|0097BE;
 ;      |        |      ;
 Battle_AutoFightReturn:
 	plp                                  ;02F5D9|28      |      ;
@@ -11601,7 +11601,7 @@ DATA8_02f62c:
 	phd                                  ;02F69B|0B      |      ;
 	pea.W $0b00                          ;02F69C|F4000B  |020B00;
 	pld                                  ;02F69F|2B      |      ;
-	jsl.L CODE_009754                    ;02F6A0|22549700|009754;
+	jsl.L CallExternalCleanupRoutine                    ;02F6A0|22549700|009754;
 	pld                                  ;02F6A4|2B      |      ;
 	pla                                  ;02F6A5|68      |      ;
 	rep #$30                             ;02F6A6|C230    |      ;
@@ -11755,7 +11755,7 @@ DATA8_02f906:
 	db $18,$f9,$62,$f9,$50,$f9           ;02F906|        |      ;
 	lda.L $7ec360,x                      ;02F90C|BF60C37E|7EC360;
 	pea.W DATA8_02f906                   ;02F910|F406F9  |02F906;
-	jsl.L CODE_0097BE                    ;02F913|22BE9700|0097BE;
+	jsl.L CallSpriteInitializer                    ;02F913|22BE9700|0097BE;
 	rts                                  ;02F917|60      |      ;
 ;      |        |      ;
 	lda.B #$01                           ;02F918|A901    |      ;
@@ -11878,7 +11878,7 @@ DATA8_02f9f9:
 	cmp.B #$11                           ;02FA24|C911    |      ;
 	bpl UNREACH_02FA30                   ;02FA26|1008    |02FA30;
 	pea.W DATA8_02f9f9                   ;02FA28|F4F9F9  |02F9F9;
-	jsl.L CODE_0097BE                    ;02FA2B|22BE9700|0097BE;
+	jsl.L CallSpriteInitializer                    ;02FA2B|22BE9700|0097BE;
 ;      |        |      ;
 Battle_CharGfxLoad:
 	rts                                  ;02FA2F|60      |      ;
@@ -12066,7 +12066,7 @@ Battle_CharLoadComplete:
 	lda.L $7ec320,x                      ;02FB55|BF20C37E|7EC320;
 	clc                                  ;02FB59|18      |      ;
 	adc.B #$08                           ;02FB5A|6908    |      ;
-	jsl.L CODE_0B92D6                    ;02FB5C|22D6920B|0B92D6;
+	jsl.L Label_0B92D6                    ;02FB5C|22D6920B|0B92D6;
 	rts                                  ;02FB60|60      |      ;
 ;      |        |      ;
 	db $85,$fb,$b7,$fb,$2b,$fc,$f1,$fb,$2b,$fc,$b7,$fb,$2b,$fc,$f1,$fb;02FB61|        |0000FB;
@@ -12110,7 +12110,7 @@ Battle_CharLoadComplete:
 	php                                  ;02FDAB|08      |      ;
 	lda.L $7ec380,x                      ;02FDAC|BF80C37E|7EC380;
 	pea.W DATA8_02f62c                   ;02FDB0|F42CF6  |02F62C;
-	jsl.L CODE_0097BE                    ;02FDB3|22BE9700|0097BE;
+	jsl.L CallSpriteInitializer                    ;02FDB3|22BE9700|0097BE;
 	plp                                  ;02FDB7|28      |      ;
 	plx                                  ;02FDB8|FA      |      ;
 	jsr.W Battle_ProcessBattlerFlags                    ;02FDB9|2083F4  |02F483;
@@ -12119,7 +12119,7 @@ Battle_CharLoadComplete:
 	phx                                  ;02FDBD|DA      |      ;
 	lda.L $7ec380,x                      ;02FDBE|BF80C37E|7EC380;
 	pea.W DATA8_02f62c                   ;02FDC2|F42CF6  |02F62C;
-	jsl.L CODE_0097BE                    ;02FDC5|22BE9700|0097BE;
+	jsl.L CallSpriteInitializer                    ;02FDC5|22BE9700|0097BE;
 	plx                                  ;02FDC9|FA      |      ;
 	rts                                  ;02FDCA|60      |      ;
 ;      |        |      ;
@@ -12172,7 +12172,7 @@ Battle_DamageRangeCalc:
 	phd                                  ;02FE57|0B      |      ;
 	pea.W $0b00                          ;02FE58|F4000B  |020B00;
 	pld                                  ;02FE5B|2B      |      ;
-	jsl.L CODE_00974E                    ;02FE5C|224E9700|00974E;
+	jsl.L CallExternalValidationRoutine                    ;02FE5C|224E9700|00974E;
 	pld                                  ;02FE60|2B      |      ;
 	pla                                  ;02FE61|68      |      ;
 	sta.L $7ec2c0,x                      ;02FE62|9FC0C27E|7EC2C0;
@@ -12204,7 +12204,7 @@ Battle_FinalDamageCalc:
 	phd                                  ;02FE9D|0B      |      ;
 	pea.W $0b00                          ;02FE9E|F4000B  |020B00;
 	pld                                  ;02FEA1|2B      |      ;
-	jsl.L CODE_009754                    ;02FEA2|22549700|009754;
+	jsl.L CallExternalCleanupRoutine                    ;02FEA2|22549700|009754;
 	pld                                  ;02FEA6|2B      |      ;
 	plp                                  ;02FEA7|28      |      ;
 	ply                                  ;02FEA8|7A      |      ;

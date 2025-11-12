@@ -71,7 +71,7 @@
 	dw $0000        ; COP vector
 	dw $0000        ; BRK vector
 	dw $0000        ; ABORT vector
-	dw CODE_008000  ; NMI vector
+	dw Label_008000  ; NMI vector
 	dw $0000        ; RESET (unused in native mode)
 	dw $0000        ; IRQ vector
 
@@ -83,8 +83,8 @@
 	dw $0000        ; COP vector
 	dw $0000        ; Reserved
 	dw $0000        ; ABORT vector
-	dw CODE_008000  ; NMI vector
-	dw CODE_008000  ; RESET vector (boot entry point!)
+	dw Label_008000  ; NMI vector
+	dw Label_008000  ; RESET vector (boot entry point!)
 	dw $0000        ; IRQ/BRK vector
 
 ;===============================================================================
@@ -106,7 +106,7 @@
 
 	org $008000
 
-CODE_008000:
+Label_008000:
 ; ===========================================================================
 ; Boot Sequence - SNES Initialization
 ; ===========================================================================
@@ -134,8 +134,8 @@ CODE_008000:
 	xce                     ; Exchange carry with emulation flag
 ; → CPU now in native 65816 mode
 
-	jsr.W CODE_008247       ; Initialize hardware registers
-	jsl.L CODE_0D8000       ; Initialize subsystem (Bank $0d)
+	jsr.W InitializeHardwareRegisters       ; Initialize hardware registers
+	jsl.L Primary_APU_Upload_Entry_Point       ; Initialize subsystem (Bank $0d)
 
 ; ===========================================================================
 ; Initialize Save Game State
@@ -147,19 +147,19 @@ CODE_008000:
 	sta.L $7e3667           ; Clear save file state flag 1
 	dec a; A = $ff (-1)
 	sta.L $7e3668           ; Set save file state flag 2 to $ff
-	bra CODE_008023         ; Skip to main initialization
+	bra Label_008023         ; Skip to main initialization
 
-CODE_008016:
+Label_008016:
 ; ===========================================================================
 ; Secondary Boot Path (called from somewhere else)
 ; ===========================================================================
 
-	jsr.W CODE_008247       ; Initialize hardware registers
+	jsr.W InitializeHardwareRegisters       ; Initialize hardware registers
 	lda.B #$f0              ; A = $f0
 	sta.L $000600           ; Store to low RAM (hardware mirror area)
-	jsl.L CODE_0D8004       ; Initialize subsystem variant
+	jsl.L Secondary_APU_Command_Entry_Point       ; Initialize subsystem variant
 
-CODE_008023:
+Label_008023:
 ; ===========================================================================
 ; Stack and Memory Setup
 ; ===========================================================================
@@ -170,7 +170,7 @@ CODE_008023:
 	ldx.W #$1fff            ; X = $1fff
 	txs                     ; Set stack pointer to $1fff (top of RAM bank $00)
 
-	jsr.W CODE_0081F0       ; Initialize more hardware (details TBD)
+	jsr.W InitializeMoreHardwareDetailsTbd       ; Initialize more hardware (details TBD)
 
 ; ===========================================================================
 ; Check Controller State
@@ -180,26 +180,26 @@ CODE_008023:
 
 	lda.W #$0040            ; A = $0040 (bit 6 = some button?)
 	and.W $00da             ; Mask with controller input at $00da
-	bne CODE_00806E         ; If button pressed, skip to alternate path
+	bne Label_00806E         ; If button pressed, skip to alternate path
 
-	jsl.L CODE_0C8080       ; Call routine in bank $0c
-	bra CODE_00804D         ; Continue to main setup
+	jsl.L CodeScreenInitialization       ; Call routine in bank $0c
+	bra Label_00804D         ; Continue to main setup
 
-CODE_00803A:
+Label_00803A:
 ; ===========================================================================
 ; Another Entry Point (possibly soft reset?)
 ; ===========================================================================
 
-	jsr.W CODE_008247       ; Initialize hardware registers
+	jsr.W InitializeHardwareRegisters       ; Initialize hardware registers
 	lda.B #$f0              ; A = $f0
 	sta.L $000600           ; Store to hardware mirror
-	jsl.L CODE_0D8004       ; Initialize subsystem
+	jsl.L Secondary_APU_Command_Entry_Point       ; Initialize subsystem
 
 	rep #$30                ; 16-bit A, X, Y
 	ldx.W #$1fff            ; Reset stack pointer
 	txs
 
-CODE_00804D:
+Label_00804D:
 ; ===========================================================================
 ; DMA Setup for Initial Data Transfer
 ; ===========================================================================
@@ -207,7 +207,7 @@ CODE_00804D:
 ; This is a fast way to initialize multiple registers at once
 ; ===========================================================================
 
-	jsr.W CODE_0081F0       ; Hardware init
+	jsr.W InitializeMoreHardwareDetailsTbd       ; Hardware init
 
 	sep #$20                ; 8-bit A, 16-bit X/Y
 
@@ -227,7 +227,7 @@ CODE_00804D:
 	lda.B #$01              ; Enable DMA channel 0
 	sta.W SNES_MDMAEN       ; $420b: DMA enable register
 
-CODE_00806E:
+Label_00806E:
 ; ===========================================================================
 ; Main Game Initialization Continues
 ; ===========================================================================
@@ -250,33 +250,33 @@ CODE_00806E:
 	sta.W $00aa             ; Store to game variable
 
 ; Call initialization routine twice (why?)
-	jsl.L CODE_0C8000       ; Bank $0c initialization
-	jsl.L CODE_0C8000       ; Called again (loading screens? fade?)
+	jsl.L CWaitTimingRoutine       ; Bank $0c initialization
+	jsl.L CWaitTimingRoutine       ; Called again (loading screens? fade?)
 
 ; Check save file state
 	lda.L $7e3665           ; Load save state flag
-	bne CODE_0080A8         ; If not zero, handle differently
+	bne Label_0080A8         ; If not zero, handle differently
 
 ; Check if save data exists in SRAM
 	lda.L $700000           ; SRAM byte 1
 	ora.L $70038c           ; OR with SRAM byte 2
 	ora.L $700718           ; OR with SRAM byte 3
-	beq CODE_0080AD         ; If all zero, no save exists
+	beq Label_0080AD         ; If all zero, no save exists
 
 ; Save data exists - load it
-	jsl.L CODE_00B950       ; Load save game
-	bra CODE_0080B0         ; Continue
+	jsl.L LoadSaveGame       ; Load save game
+	bra Load_0080B0         ; Continue
 
-CODE_0080A8:
+Label_0080A8:
 ; Handle different save state
-	jsr.W CODE_008166       ; Call routine
-	bra CODE_0080DC         ; Skip to different path
+	jsr.W CallRoutine       ; Call routine
+	bra SkipDifferentPath         ; Skip to different path
 
-CODE_0080AD:
+Label_0080AD:
 ; No save data - start new game
-	jsr.W CODE_008117       ; New game initialization
+	jsr.W NewGameInitialization       ; New game initialization
 
-CODE_0080B0:
+Load_0080B0:
 ; ===========================================================================
 ; Graphics Setup - Screen Initialization
 ; ===========================================================================
@@ -287,7 +287,7 @@ CODE_0080B0:
 	lda.B #$e0              ; Bits 5-7
 	trb.W $0111             ; Test and reset bits
 
-	jsl.L CODE_0C8000       ; Call init routine
+	jsl.L CWaitTimingRoutine       ; Call init routine
 
 ; Set color math to subtract mode
 	lda.B #$e0              ; Color math control
