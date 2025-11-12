@@ -1,0 +1,673 @@
+================================================================================
+Context Samples for Manual Review
+================================================================================
+
+
+================================================================================
+Code 0x10: ITEM_NAME (55 total occurrences)
+================================================================================
+
+Sample 1/10:
+  Dialog: 0x01
+  Position: 41
+  Context:
+    ITEM][CMD:08]"é[ITEM][ITEM][CMD:18][END][CMD:10][CMD:08][TEXTBOX_BELOW][CMD:0C][CMD:0D][
+
+Sample 2/10:
+  Dialog: 0x03
+  Position: 19
+  Context:
+    [CMD:0B]-a[CMD:0F]X[CMD:10][ITEM] [CMD:2D]-a[CMD:11]es
+[CMD:13]X[IT
+
+Sample 3/10:
+  Dialog: 0x0A
+  Position: 8
+  Context:
+    [CMD:14][CMD:10][CMD:0B][END]
+
+Sample 4/10:
+  Dialog: 0x13
+  Position: 2
+  Context:
+    #t[CMD:10][ASTERISK]l[TEXTBOX_BELOW]ingP[END]
+
+Sample 5/10:
+  Dialog: 0x16
+  Position: 81
+  Context:
+    #'#'[CMD:0A]#[CMD:16]#[CMD:22]#[CMD:2E]#[CMD:10][CMD:1D][END][ITEM]es[END]
+[CMD:12]is
+#i
+
+Sample 6/10:
+  Dialog: 0x18
+  Position: 1
+  Context:
+    #[CMD:10][CMD:11]is
+[ITEM]t[WAIT][ASTERISK][CMD:1
+
+Sample 7/10:
+  Dialog: 0x1A
+  Position: 87
+  Context:
+    #'#'[CMD:0A]#[CMD:16]#[CMD:22]#[CMD:2E]#[CMD:10][CMD:1D][END][ITEM]es[END]
+[CMD:12]is
+#i
+
+Sample 8/10:
+  Dialog: 0x22
+  Position: 2
+  Context:
+    #t[CMD:10][ASTERISK]l[TEXTBOX_BELOW]ingP[END]
+
+Sample 9/10:
+  Dialog: 0x23
+  Position: 171
+  Context:
+    #'#'[CMD:0A]#[CMD:16]#[CMD:22]#[CMD:2E]#[CMD:10][CMD:1D][END][ITEM]es[END]
+[CMD:12]is
+#i
+
+Sample 10/10:
+  Dialog: 0x26
+  Position: 26
+  Context:
+    [CMD:14][ITEM][CMD:0E]usta[CMD:10]ll[END]
+
+
+================================================================================
+Code 0x11: SPELL_NAME (27 total occurrences)
+================================================================================
+
+Sample 1/10:
+  Dialog: 0x03
+  Position: 44
+  Context:
+    :0B]-a[CMD:0F]X[CMD:10][ITEM] [CMD:2D]-a[CMD:11]es
+[CMD:13]X[ITEM][CMD:09];#a[CMD:11]es
+
+
+Sample 2/10:
+  Dialog: 0x03
+  Position: 81
+  Context:
+    ]-a[CMD:11]es
+[CMD:13]X[ITEM][CMD:09];#a[CMD:11]es
+[CMD:0A]#a[CMD:09]7#[END]
+
+Sample 3/10:
+  Dialog: 0x12
+  Position: 17
+  Context:
+    [ITEM] [CMD:2D]-a[CMD:11]es
+[CMD:13]X[ITEM][CMD:09];#a[CMD:11]es
+
+
+Sample 4/10:
+  Dialog: 0x12
+  Position: 54
+  Context:
+    ]-a[CMD:11]es
+[CMD:13]X[ITEM][CMD:09];#a[CMD:11]es
+[CMD:0A]#a[CMD:09]7#[END]
+
+Sample 5/10:
+  Dialog: 0x18
+  Position: 9
+  Context:
+    #[CMD:10][CMD:11]is
+[ITEM]t[WAIT][ASTERISK][CMD:12][CMD:2
+
+Sample 6/10:
+  Dialog: 0x21
+  Position: 17
+  Context:
+    [ITEM] [CMD:2D]-a[CMD:11]es
+[CMD:13]X[ITEM][CMD:09];#a[CMD:11]es
+
+
+Sample 7/10:
+  Dialog: 0x21
+  Position: 54
+  Context:
+    ]-a[CMD:11]es
+[CMD:13]X[ITEM][CMD:09];#a[CMD:11]es
+[CMD:0A]#a[CMD:09]7#[END]
+
+Sample 8/10:
+  Dialog: 0x27
+  Position: 44
+  Context:
+    :0B]-a[CMD:0F]X[CMD:10][ITEM] [CMD:2D]-a[CMD:11]es
+[CMD:13]X[ITEM][CMD:09];#a[CMD:11]es
+
+
+Sample 9/10:
+  Dialog: 0x27
+  Position: 81
+  Context:
+    ]-a[CMD:11]es
+[CMD:13]X[ITEM][CMD:09];#a[CMD:11]es
+[CMD:0A]#a[CMD:09]7#[END]
+
+Sample 10/10:
+  Dialog: 0x2A
+  Position: 0
+  Context:
+    [CMD:11][CMD:11][CMD:08][END]
+
+
+================================================================================
+Code 0x12: MONSTER_NAME (19 total occurrences)
+================================================================================
+
+Sample 1/10:
+  Dialog: 0x06
+  Position: 10
+  Context:
+    to[CMD:23][CMD:12][CMD:23]ea[CMD:2B][ITEM][CMD:1D]E[END][N
+
+Sample 2/10:
+  Dialog: 0x0F
+  Position: 0
+  Context:
+    [CMD:12][CMD:0E]#you[END]
+
+Sample 3/10:
+  Dialog: 0x16
+  Position: 116
+  Context:
+    :2E]#[CMD:10][CMD:1D][END][ITEM]es[END]
+[CMD:12]is
+#ing#on#es#ack#monst#ü#8#M#a#o#.#;###
+
+Sample 4/10:
+  Dialog: 0x18
+  Position: 43
+  Context:
+    MD:10][CMD:11]is
+[ITEM]t[WAIT][ASTERISK][CMD:12][CMD:2A][END]
+
+Sample 5/10:
+  Dialog: 0x1A
+  Position: 122
+  Context:
+    :2E]#[CMD:10][CMD:1D][END][ITEM]es[END]
+[CMD:12]is
+#ing#on#es#ack#monst#ü#8#M#a#o#.#;###
+
+Sample 6/10:
+  Dialog: 0x1E
+  Position: 0
+  Context:
+    [CMD:12][CMD:0E]#you[END]
+
+Sample 7/10:
+  Dialog: 0x23
+  Position: 206
+  Context:
+    :2E]#[CMD:10][CMD:1D][END][ITEM]es[END]
+[CMD:12]is
+#ing#on#es#ack#monst#ü#8#M#a#o#.#;###
+
+Sample 8/10:
+  Dialog: 0x33
+  Position: 116
+  Context:
+    e[CMD:20]t[CMD:10]ou[CMD:10]teto[CMD:23][CMD:12][CMD:23]ea[CMD:2B][ITEM][CMD:1D]E[END][N
+
+Sample 9/10:
+  Dialog: 0x36
+  Position: 18
+  Context:
+    [CMD:0B]kz[CMD:2A][CMD:12][CMD:27][CMD:08][CMD:0E]O
+[END]
+
+Sample 10/10:
+  Dialog: 0x37
+  Position: 116
+  Context:
+    :2E]#[CMD:10][CMD:1D][END][ITEM]es[END]
+[CMD:12]is
+#ing#on#es#ack#monst#ü#8#M#a#o#.#;###
+
+
+================================================================================
+Code 0x13: CHARACTER_NAME (17 total occurrences)
+================================================================================
+
+Sample 1/10:
+  Dialog: 0x03
+  Position: 55
+  Context:
+    0F]X[CMD:10][ITEM] [CMD:2D]-a[CMD:11]es
+[CMD:13]X[ITEM][CMD:09];#a[CMD:11]es
+[CMD:0A]#a[
+
+Sample 2/10:
+  Dialog: 0x12
+  Position: 28
+  Context:
+    [ITEM] [CMD:2D]-a[CMD:11]es
+[CMD:13]X[ITEM][CMD:09];#a[CMD:11]es
+[CMD:0A]#a[
+
+Sample 3/10:
+  Dialog: 0x16
+  Position: 234
+  Context:
+    CMD:08]!é.e.ight.5.u.[CMD:20]'o'[CMD:2E][CMD:13]I'mi[CMD:0F]ö[CMD:0E][ITEM][CMD:09][END]
+
+Sample 4/10:
+  Dialog: 0x1A
+  Position: 240
+  Context:
+    CMD:08]!é.e.ight.5.u.[CMD:20]'o'[CMD:2E][CMD:13]I'mi[CMD:0F]ö[CMD:0E][ITEM][CMD:09][END]
+
+Sample 5/10:
+  Dialog: 0x21
+  Position: 28
+  Context:
+    [ITEM] [CMD:2D]-a[CMD:11]es
+[CMD:13]X[ITEM][CMD:09];#a[CMD:11]es
+[CMD:0A]#a[
+
+Sample 6/10:
+  Dialog: 0x23
+  Position: 324
+  Context:
+    CMD:08]!é.e.ight.5.u.[CMD:20]'o'[CMD:2E][CMD:13]I'mi[CMD:0F]ö[CMD:0E][ITEM][CMD:09][END]
+
+Sample 7/10:
+  Dialog: 0x27
+  Position: 55
+  Context:
+    0F]X[CMD:10][ITEM] [CMD:2D]-a[CMD:11]es
+[CMD:13]X[ITEM][CMD:09];#a[CMD:11]es
+[CMD:0A]#a[
+
+Sample 8/10:
+  Dialog: 0x2D
+  Position: 28
+  Context:
+    [ITEM] [CMD:2D]-a[CMD:11]es
+[CMD:13]X[ITEM][CMD:09];#a[CMD:11]es
+[CMD:0A]#a[
+
+Sample 9/10:
+  Dialog: 0x31
+  Position: 21
+  Context:
+    [CMD:2D]-a[CMD:11]es
+[CMD:13]X[ITEM][CMD:09];#a[CMD:11]es
+[CMD:0A]#a[
+
+Sample 10/10:
+  Dialog: 0x37
+  Position: 234
+  Context:
+    CMD:08]!é.e.ight.5.u.[CMD:20]'o'[CMD:2E][CMD:13]I'mi[CMD:0F]ö[CMD:0E][ITEM][CMD:09][END]
+
+
+================================================================================
+Code 0x14: LOCATION_NAME (8 total occurrences)
+================================================================================
+
+Sample 1/8:
+  Dialog: 0x0A
+  Position: 0
+  Context:
+    [CMD:14][CMD:10][CMD:0B][END]
+
+Sample 2/8:
+  Dialog: 0x0D
+  Position: 12
+  Context:
+    f[CMD:0F]es
+[CMD:14]
+[CMD:0B][END]
+
+Sample 3/8:
+  Dialog: 0x1C
+  Position: 12
+  Context:
+    f[CMD:0F]es
+[CMD:14]
+[CMD:0B][END]
+
+Sample 4/8:
+  Dialog: 0x26
+  Position: 0
+  Context:
+    [CMD:14][ITEM][CMD:0E]usta[CMD:10]ll[END]
+
+Sample 5/8:
+  Dialog: 0x3D
+  Position: 16
+  Context:
+    [CMD:18]stGll#GT[CMD:14]t[CMD:26][END][END]ieli~iöjank[CMD:0E]l[
+
+Sample 6/8:
+  Dialog: 0x55
+  Position: 0
+  Context:
+    [CMD:14][CMD:10][CMD:0B][END]
+
+Sample 7/8:
+  Dialog: 0x61
+  Position: 99
+  Context:
+    MD:10][CMD:08][CMD:0E]O [CMD:18]stGll#GT[CMD:14]t[CMD:26][END][END]ieli~iöjank[CMD:0E]l[
+
+Sample 8/8:
+  Dialog: 0x62
+  Position: 0
+  Context:
+    [CMD:14][CMD:10][CMD:0B][END]
+
+
+================================================================================
+Code 0x16: OBJECT_NAME (12 total occurrences)
+================================================================================
+
+Sample 1/10:
+  Dialog: 0x09
+  Position: 146
+  Context:
+    :27]mNm[CMD:28]n;n[CMD:21]omo?ogp:päq4r#[CMD:16]t#IPst#O[END]
+
+Sample 2/10:
+  Dialog: 0x16
+  Position: 54
+  Context:
+    z#z#z[CMD:0A]'[CMD:18]'k'ö'#'#'[CMD:0A]#[CMD:16]#[CMD:22]#[CMD:2E]#[CMD:10][CMD:1D][END]
+
+Sample 3/10:
+  Dialog: 0x16
+  Position: 175
+  Context:
+    es#ack#monst#ü#8#M#a#o#.#;#####[CMD:08].[CMD:16].[CMD:24].[CMD:08]!é.e.ight.5.u.[CMD:20]
+
+Sample 4/10:
+  Dialog: 0x1A
+  Position: 60
+  Context:
+    z#z#z[CMD:0A]'[CMD:18]'k'ö'#'#'[CMD:0A]#[CMD:16]#[CMD:22]#[CMD:2E]#[CMD:10][CMD:1D][END]
+
+Sample 5/10:
+  Dialog: 0x1A
+  Position: 181
+  Context:
+    es#ack#monst#ü#8#M#a#o#.#;#####[CMD:08].[CMD:16].[CMD:24].[CMD:08]!é.e.ight.5.u.[CMD:20]
+
+Sample 6/10:
+  Dialog: 0x23
+  Position: 144
+  Context:
+    z#z#z[CMD:0A]'[CMD:18]'k'ö'#'#'[CMD:0A]#[CMD:16]#[CMD:22]#[CMD:2E]#[CMD:10][CMD:1D][END]
+
+Sample 7/10:
+  Dialog: 0x23
+  Position: 265
+  Context:
+    es#ack#monst#ü#8#M#a#o#.#;#####[CMD:08].[CMD:16].[CMD:24].[CMD:08]!é.e.ight.5.u.[CMD:20]
+
+Sample 8/10:
+  Dialog: 0x32
+  Position: 137
+  Context:
+    D:21]omo?ogp:päq4r[CMD:24][END]
+[CMD:20][CMD:16][ITEM][CMD:08]!éFesq't##edP[ITEM]Feq't[C
+
+Sample 9/10:
+  Dialog: 0x37
+  Position: 54
+  Context:
+    z#z#z[CMD:0A]'[CMD:18]'k'ö'#'#'[CMD:0A]#[CMD:16]#[CMD:22]#[CMD:2E]#[CMD:10][CMD:1D][END]
+
+Sample 10/10:
+  Dialog: 0x37
+  Position: 175
+  Context:
+    es#ack#monst#ü#8#M#a#o#.#;#####[CMD:08].[CMD:16].[CMD:24].[CMD:08]!é.e.ight.5.u.[CMD:20]
+
+
+================================================================================
+Code 0x17: WEAPON_NAME (1 total occurrences)
+================================================================================
+
+Sample 1/1:
+  Dialog: 0x5E
+  Position: 15
+  Context:
+    [NAME][CMD:29]…[CMD:17]#[ITEM]#~oO[ITEM]#[CMD:09]#C[END]
+
+
+================================================================================
+Code 0x18: ARMOR_NAME (20 total occurrences)
+================================================================================
+
+Sample 1/10:
+  Dialog: 0x01
+  Position: 28
+  Context:
+    [ITEM][CMD:08]"é[ITEM][ITEM][CMD:18][END][CMD:10][CMD:08][TEXTBOX_BELOW][CMD
+
+Sample 2/10:
+  Dialog: 0x10
+  Position: 17
+  Context:
+    [ITEM][CMD:0B]the[CMD:18]s[CMD:0C][END]
+
+Sample 3/10:
+  Dialog: 0x16
+  Position: 28
+  Context:
+    zXzlzxz#z#z#z#z#z#z[CMD:0A]'[CMD:18]'k'ö'#'#'[CMD:0A]#[CMD:16]#[CMD:22]#[CMD
+
+Sample 4/10:
+  Dialog: 0x17
+  Position: 9
+  Context:
+    [CMD:0B]t[CMD:18]s[CMD:0C][END]
+
+Sample 5/10:
+  Dialog: 0x1A
+  Position: 34
+  Context:
+    zàz5zJzXzlzxz#z#z#z#z#z#z[CMD:0A]'[CMD:18]'k'ö'#'#'[CMD:0A]#[CMD:16]#[CMD:22]#[CMD
+
+Sample 6/10:
+  Dialog: 0x1F
+  Position: 17
+  Context:
+    [ITEM][CMD:0B]the[CMD:18]s[CMD:0C][END]
+
+Sample 7/10:
+  Dialog: 0x23
+  Position: 10
+  Context:
+    r[CMD:09]s[CMD:18]s[TEXTBOX_BELOW]sustssz[ITEM][CMD:1E]E[E
+
+Sample 8/10:
+  Dialog: 0x23
+  Position: 118
+  Context:
+    z'
+zinzàz5zJzXzlzxz#z#z#z#z#z#z[CMD:0A]'[CMD:18]'k'ö'#'#'[CMD:0A]#[CMD:16]#[CMD:22]#[CMD
+
+Sample 9/10:
+  Dialog: 0x2B
+  Position: 17
+  Context:
+    [ITEM][CMD:0B]the[CMD:18]s[CMD:0C][END]
+
+Sample 10/10:
+  Dialog: 0x37
+  Position: 28
+  Context:
+    zXzlzxz#z#z#z#z#z#z[CMD:0A]'[CMD:18]'k'ö'#'#'[CMD:0A]#[CMD:16]#[CMD:22]#[CMD
+
+
+================================================================================
+Code 0x1C: UNKNOWN_1C (3 total occurrences)
+================================================================================
+
+Sample 1/3:
+  Dialog: 0x30
+  Position: 19
+  Context:
+    o[CMD:08]~#[CMD:23][CMD:1C][CMD:2B];[CMD:2A][CMD:28][CMD:27]youto[C
+
+Sample 2/3:
+  Dialog: 0x34
+  Position: 48
+  Context:
+    [ITEM][CMD:0D][NAME]#o[CMD:08]~#[CMD:23][CMD:1C][CMD:2B];[CMD:2A][CMD:28][CMD:27]youto[C
+
+Sample 3/3:
+  Dialog: 0x42
+  Position: 57
+  Context:
+    [ITEM][CMD:0D][NAME]#o[CMD:08]~#[CMD:23][CMD:1C][CMD:2B];[CMD:2A][CMD:28][CMD:27]youto[C
+
+
+================================================================================
+Code 0x1D: UNKNOWN_1D (25 total occurrences)
+================================================================================
+
+Sample 1/10:
+  Dialog: 0x06
+  Position: 42
+  Context:
+    [CMD:23][CMD:12][CMD:23]ea[CMD:2B][ITEM][CMD:1D]E[END][NAME][CMD:23][WAIT][CMD:2B][CMD:0
+
+Sample 2/10:
+  Dialog: 0x11
+  Position: 55
+  Context:
+    d[WAIT].[ASTERISK]'s[WAIT]an[ITEM][ITEM][CMD:1D]E[END]
+
+Sample 3/10:
+  Dialog: 0x16
+  Position: 89
+  Context:
+    :0A]#[CMD:16]#[CMD:22]#[CMD:2E]#[CMD:10][CMD:1D][END][ITEM]es[END]
+[CMD:12]is
+#ing#on#es
+
+Sample 4/10:
+  Dialog: 0x1A
+  Position: 95
+  Context:
+    :0A]#[CMD:16]#[CMD:22]#[CMD:2E]#[CMD:10][CMD:1D][END][ITEM]es[END]
+[CMD:12]is
+#ing#on#es
+
+Sample 5/10:
+  Dialog: 0x20
+  Position: 55
+  Context:
+    d[WAIT].[ASTERISK]'s[WAIT]an[ITEM][ITEM][CMD:1D]E[END]
+
+Sample 6/10:
+  Dialog: 0x23
+  Position: 179
+  Context:
+    :0A]#[CMD:16]#[CMD:22]#[CMD:2E]#[CMD:10][CMD:1D][END][ITEM]es[END]
+[CMD:12]is
+#ing#on#es
+
+Sample 7/10:
+  Dialog: 0x29
+  Position: 115
+  Context:
+    ~you[CMD:10]on[CMD:08][CMD:0E]Oyou[ITEM][CMD:1D]E[END][NAME]on[TEXTBOX_BELOW]#Hepoisoned
+
+Sample 8/10:
+  Dialog: 0x2C
+  Position: 55
+  Context:
+    d[WAIT].[ASTERISK]'s[WAIT]an[ITEM][ITEM][CMD:1D]E[END]
+
+Sample 9/10:
+  Dialog: 0x2F
+  Position: 109
+  Context:
+    ~you[CMD:10]on[CMD:08][CMD:0E]Oyou[ITEM][CMD:1D]E[END][NAME]on[TEXTBOX_BELOW]#Hepoisoned
+
+Sample 10/10:
+  Dialog: 0x33
+  Position: 148
+  Context:
+    [CMD:23][CMD:12][CMD:23]ea[CMD:2B][ITEM][CMD:1D]E[END][NAME][CMD:23][WAIT][CMD:2B][CMD:0
+
+
+================================================================================
+Code 0x1E: UNKNOWN_1E (10 total occurrences)
+================================================================================
+
+Sample 1/10:
+  Dialog: 0x1B
+  Position: 118
+  Context:
+    ng##L#rü08[CMD:20]p#[CMD:20][CMD:25]àL5.[CMD:1E]L4.[CMD:08]!éagainö[CMD:0B][CMD:20][CMD:
+
+Sample 2/10:
+  Dialog: 0x23
+  Position: 47
+  Context:
+    9]s[CMD:18]s[TEXTBOX_BELOW]sustssz[ITEM][CMD:1E]E[END][NAME]zhazI'llzwaz'
+zinzàz5zJzXzlz
+
+Sample 3/10:
+  Dialog: 0x28
+  Position: 118
+  Context:
+    ng##L#rü08[CMD:20]p#[CMD:20][CMD:25]àL5.[CMD:1E]L4.[CMD:08]!éagainö[CMD:0B][CMD:20][CMD:
+
+Sample 4/10:
+  Dialog: 0x40
+  Position: 98
+  Context:
+    08]!és[WAIT]s[CMD:08]!éyou[CMD:20][ITEM][CMD:1E]E[END][NAME][TEXTBOX_BELOW]äThewater'sdr
+
+Sample 5/10:
+  Dialog: 0x44
+  Position: 117
+  Context:
+    08]!és[WAIT]s[CMD:08]!éyou[CMD:20][ITEM][CMD:1E]E[END][NAME][TEXTBOX_BELOW]äThewater'sdr
+
+Sample 6/10:
+  Dialog: 0x49
+  Position: 118
+  Context:
+    ng##L#rü08[CMD:20]p#[CMD:20][CMD:25]àL5.[CMD:1E]L4.[CMD:08]!éagainö[CMD:0B][CMD:20][CMD:
+
+Sample 7/10:
+  Dialog: 0x51
+  Position: 213
+  Context:
+    CMD:2A][CMD:10],,,thatight[CMD:10][ITEM][CMD:1E]E[END][NAME][CMD:08][CMD:0E]Oight[WAIT]
+
+
+Sample 8/10:
+  Dialog: 0x67
+  Position: 0
+  Context:
+    [CMD:1E][END]
+
+Sample 9/10:
+  Dialog: 0x69
+  Position: 78
+  Context:
+    CMD:2A][CMD:10],,,thatight[CMD:10][ITEM][CMD:1E]E[END][NAME][CMD:08][CMD:0E]Oight[WAIT]
+
+
+Sample 10/10:
+  Dialog: 0x71
+  Position: 118
+  Context:
+    ng##L#rü08[CMD:20]p#[CMD:20][CMD:25]àL5.[CMD:1E]L4.[CMD:08]!éagainö[CMD:0B][CMD:20][CMD:
+

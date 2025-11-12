@@ -4,6 +4,7 @@ Extract ALL FFMQ dialogs with proper dictionary decoding.
 Uses correct pointer table at 0x01B835 and dictionary at 0x01BA35.
 """
 
+import json
 import sys
 from pathlib import Path
 
@@ -132,28 +133,60 @@ class DialogExtractor:
 		decoded = ''.join(self.decode_byte(b) for b in dialog_bytes)
 		return decoded, dialog_bytes
 	
-	def extract_all(self):
+	def extract_all(self, output_json=None):
 		"""Extract all 117 dialogs."""
 		print("\n" + "="*80)
 		print("EXTRACTING ALL DIALOGS")
 		print("="*80)
+		
+		dialogs = []
 		
 		for i in range(117):
 			decoded, raw = self.extract_dialog(i)
 			print(f"\nDialog 0x{i:02X}:")
 			print(decoded)
 			print(f"(Raw: {' '.join(f'{b:02X}' for b in raw[:20])}{'...' if len(raw) > 20 else ''})")
+			
+			# Store for JSON export
+			dialogs.append({
+				'id': i,
+				'hex_id': f'0x{i:02X}',
+				'decoded_text': decoded,
+				'raw_bytes': raw,
+				'byte_count': len(raw),
+			})
+		
+		# Export to JSON if requested
+		if output_json:
+			json_data = {
+				'metadata': {
+					'game': 'Final Fantasy Mystic Quest',
+					'rom': str(self.rom_path.name),
+					'dialog_count': len(dialogs),
+					'pointer_table': '0x01B835',
+					'dictionary_table': '0x01BA35',
+				},
+				'dialogs': dialogs
+			}
+			
+			with open(output_json, 'w', encoding='utf-8') as f:
+				json.dump(json_data, f, indent=2, ensure_ascii=False)
+			
+			print(f"\n\nExported {len(dialogs)} dialogs to {output_json}")
+		
+		return dialogs
 	
-	def run(self, table_path='simple.tbl'):
+	def run(self, table_path='simple.tbl', output_json=None):
 		"""Run extraction."""
 		self.load_rom()
 		self.load_char_table(table_path)
 		self.load_dictionary()
-		self.extract_all()
+		return self.extract_all(output_json)
 
 if __name__ == '__main__':
 	rom_path = sys.argv[1] if len(sys.argv) > 1 else r'roms\Final Fantasy - Mystic Quest (U) (V1.1).sfc'
 	table_path = sys.argv[2] if len(sys.argv) > 2 else 'simple.tbl'
+	output_json = sys.argv[3] if len(sys.argv) > 3 else 'data/extracted_dialogs.json'
 	
 	extractor = DialogExtractor(rom_path)
-	extractor.run(table_path)
+	extractor.run(table_path, output_json)

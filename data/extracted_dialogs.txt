@@ -1,280 +1,655 @@
 Loaded ROM: Final Fantasy - Mystic Quest (U) (V1.1).sfc (524288 bytes)
-Loaded 256 character mappings from simple.tbl
-Extracted 80 raw dictionary entries
-
-Decoding dictionary entries...
+Loaded 176 character mappings
 Decoded 80 dictionary entries
 
 ================================================================================
-FFMQ DIALOG DICTIONARY (0x30-0x7F)
-================================================================================
-0x30: [CMD:08][CMD:0E]O
-       Raw: [3] 08 0E A8
-
-0x31: [CMD:08]"�
-       Raw: [3] 08 E7 83
-
-0x32: [CMD:08]!�
-       Raw: [3] 08 F7 83
-
-0x33: [CMD:08]o�
-       Raw: [3] 08 C2 84
-
-0x34: [CMD:0D]you[END][CMD:0D]to[END][END][END]
-       Raw: [10] 0D 44 00 FF FF 0D 46 00 00 00
-
-0x35: [ITEM][CMD:18][END][CMD:10][CMD:08]
-       Raw: [5] 05 18 00 10 08
-
-0x36: [CMD:08]ha�
-       Raw: [3] 08 57 84
-
-0x37: [CMD:26][END][CMD:20]'t
-       Raw: [4] 26 00 20 7E
-
-0x38: [CMD:26][END][END]ieli~i�jank[CMD:0E]l[CMD:27]mNm[CMD:28]n;n[CMD:21]omo?ogp:p�q4r
-       Raw: [4] 26 00 00 7F
-
-0x39: [CMD:26][END][CMD:10]ieli~i�jank[CMD:0E]l[CMD:27]mNm[CMD:28]n;n[CMD:21]omo?ogp:p�q4r
-       Raw: [4] 26 00 10 7F
-
-0x3A: [CMD:26][END][END]ieli~i�jank[CMD:0E]l[CMD:27]mNm[CMD:28]n;n[CMD:21]omo?ogp:p�q4r[CMD:24][END]{newline}[CMD:20][CMD:16][ITEM][CMD:08]!�
-       Raw: [8] 38 24 00 01 20 16 05 32
-
-0x3B: [CMD:26][END][CMD:10]ieli~i�jank[CMD:0E]l[CMD:27]mNm[CMD:28]n;n[CMD:21]omo?ogp:p�q4r[CMD:24][END]{newline}[CMD:20][TEXTBOX_BELOW][ITEM][CMD:08]!�
-       Raw: [8] 39 24 00 01 20 1A 05 32
-
-0x3C: [CMD:10][CMD:1D][END][ITEM]es[END]{newline}[CMD:12]is{newline}
-       Raw: [10] 10 1D 00 05 60 00 01 12 5F 01
-
-0x3D: Crystal
-       Raw: [7] 9C C5 CC C6 C7 B4 BF
-
-0x3E: RainbowRoad
-       Raw: [10] AB B4 47 B5 58 FF AB C2 B4 B7
-
-0x3F: th
-       Raw: [2] C7 BB
-
-0x40: e
-       Raw: [2] B8 FF
-
-0x41: the
-       Raw: [4] C7 BB B8 FF
-
-0x42: t
-       Raw: [2] C7 FF
-
-0x43: ou
-       Raw: [2] C2 C8
-
-0x44: you
-       Raw: [3] CC C2 C8
-
-0x45: s
-       Raw: [2] C6 FF
-
-0x46: to
-       Raw: [3] C7 C2 FF
-
-0x47: in
-       Raw: [2] BC C1
-
-0x48: ing
-       Raw: [4] BC C1 BA FF
-
-0x49: l
-       Raw: [2] BF FF
-
-0x4A: ll
-       Raw: [3] BF BF FF
-
-0x4B: er
-       Raw: [2] B8 C5
-
-0x4C: d
-       Raw: [2] B7 FF
-
-0x4D: .
-       Raw: [2] D0 FF
-
-0x4E: 's
-       Raw: [3] D1 C6 FF
-
-0x4F: an
-       Raw: [2] B4 C1
-
-0x50: [ITEM][CMD:1D]E[END][NAME]
-       Raw: [5] 05 1D 9E 00 04
-
-0x51: [ITEM][CMD:1E]E[END][NAME]
-       Raw: [5] 05 1E 9E 00 04
-
-0x52: ight
-       Raw: [4] BC BA BB C7
-
-0x53: ,,,
-       Raw: [3] D2 D2 D2
-
-0x54: on
-       Raw: [2] C2 C1
-
-0x55: you
-       Raw: [2] 44 FF
-
-0x56: en
-       Raw: [2] B8 C1
-
-0x57: ha
-       Raw: [2] BB B4
-
-0x58: ow
-       Raw: [2] C2 CA
-
-0x59: y
-       Raw: [2] CC FF
-
-0x5A: of
-       Raw: [3] C2 B9 FF
-
-0x5B: Th
-       Raw: [2] AD BB
-
-0x5C: or
-       Raw: [2] C2 C5
-
-0x5D: I'll
-       Raw: [3] A2 D1 4A
-
-0x5E: ea
-       Raw: [2] B8 B4
-
-0x5F: is
-       Raw: [2] BC 45
-
-0x60: es
-       Raw: [2] B8 C6
-
-0x61: [CMD:08][CMD:08]���
-       Raw: [3] 08 62 81
-
-0x62: [CMD:08]��
-       Raw: [3] 08 8A 87
-
-0x63: wa
-       Raw: [2] CA B4
-
-0x64: again
-       Raw: [4] B4 BA B4 47
-
-0x65: st
-       Raw: [2] C6 C7
-
-0x66: I
-       Raw: [2] A2 FF
-
-0x67: ve
-       Raw: [2] C9 40
-
-0x68: ed
-       Raw: [2] B8 4C
-
-0x69: om
-       Raw: [2] C2 C0
-
-0x6A: er
-       Raw: [2] 4B FF
-
-0x6B: p
-       Raw: [2] C3 FF
-
-0x6C: ack
-       Raw: [3] B4 B6 BE
-
-0x6D: ust
-       Raw: [3] C8 C6 42
-
-0x6E: '[CMD:08]ha�
-       Raw: [2] CE 36
-
-0x6F: '{newline}
-       Raw: [2] CE 01
-
-0x70: that
-       Raw: [3] 3F B4 42
-
-0x71: prophecy
-       Raw: [8] C3 C5 C2 C3 BB B8 B6 CC
-
-0x72: o
-       Raw: [2] C2 FF
-
-0x73: ,{newline}
-       Raw: [2] D2 01
-
-0x74: ,[CMD:08]ha�
-       Raw: [2] D2 36
-
-0x75: I'm
-       Raw: [4] A2 D1 C0 FF
-
-0x76: el
-       Raw: [2] B8 BF
-
-0x77: with
-       Raw: [4] CA BC 3F FF
-
-0x78: a
-       Raw: [2] B4 FF
-
-0x79: Spencer
-       Raw: [5] AC C3 56 B6 4B
-
-0x7A: ma
-       Raw: [2] C0 B4
-
-0x7B: in
-       Raw: [2] 47 FF
-
-0x7C: monst
-       Raw: [3] C0 54 65
-
-0x7D: k
-       Raw: [2] BE FF
-
-0x7E: 't
-       Raw: [2] D1 42
-
-0x7F: ieli~i�jank[CMD:0E]l[CMD:27]mNm[CMD:28]n;n[CMD:21]omo?ogp:p�q4r
-       Raw: [33] BC 76 BC 80 BC 8B BD 4F BE 0E BF 27 C0 A7 C0 28 C1 DE C1 21 C2 C0 C2 EB C2 BA C3 DC C3 8C C4 94 C5
-
-
-Exported dictionary to complex_extracted.tbl
-
-================================================================================
-TESTING KNOWN DIALOGS
+EXTRACTING ALL DIALOGS
 ================================================================================
 
-================================================================================
-DIALOG 0x59 TEST
-================================================================================
-Raw bytes: 4C 70 C1 B4 C0 40 B5 B8 B9 5C B8 CE 1B 32 9F 5C FF CC 5E C5 45 A6 B4 B6 4E B5 B8 56 FF 65 C8 B7 CC 48 78 A9 C5 C2 C3 BB B8 B6 CC D2 FF FF A8 C1 FF BB 5F 63 59 B5 6C FF B9 C5 69 FF B7 C2 48 C6
+Dialog 0x00:
+[TEXTBOX_BELOW]#Hepoisonedme,,,
+Justashed,,,did
+thet,t,,,trees'[CMD:08]haΦ[CMD:2A]thatyou~youthatyou[END]
+(Raw: FF FF 1A 82 A1 40 C3 C2 BC C6 54 68 C0 B8 53 01 A3 6D B4 45...)
 
-Decoded:
-dthatnamebefore'[TEXTBOX_ABOVE][CMD:08]!�ForyearsMac'sbeenstudyingaProphecy,Onhiswaybackfromdoingsomeresearch.thelakedriedupandhisshipendeduponarockledge,[CMD:08]ha�[CMD:2C][CMD:08][CMD:0E]Oyou[TEXTBOX_BELOW][CMD:08]!�Butthat'snoproblem,{newline}Ifwedigfromhere.we'llbeabletoreachtheship,[CMD:08][CMD:0E]OAnyway.here'sakey,{newline}Theshieldishiddeninthe[CRYSTAL]{newline},[CMD:0D]is{newline}[ASTERISK]{newline}[CMD:08]��[TEXTBOX_BELOW][CMD:08]!�Bytheway.[CRYSTAL][CMD:11]'sbeenhavingsomestrongearthquakeslately,[END]
+Dialog 0x01:
+[ITEM][CMD:08]"Θ[ITEM][ITEM][CMD:18][END][CMD:10][CMD:08][TEXTBOX_BELOW][CMD:0C][CMD:0D][END]
+(Raw: 05 31 05 35 1A 0C 0D 00)
 
-================================================================================
-DIALOG 0x00 TEST
-================================================================================
-Raw bytes: 46 41 46 42 46 43 46 FF FF 00
+Dialog 0x02:
+stemProgram
+Itikiti
 
-Decoded:
-tothetottoouto[END]
+SoundProgram
+MinoruAkao
 
-================================================================================
-DIALOG 0x21 TEST
-================================================================================
-Raw bytes: 25 0B 26 FF FF 1A 81 A5 C2 C2 7D C2 C9 6A 3F 4B B8 73 5B B4 C7 4E 41 1F 01 4D 54 B6 40 41 BB 5E C5 42 5A 41 B0 5C BF B7 D2 30 9A C1 FF C2 BF 4C A9 C5 C2 C3 BB B8 B6 59 C6 B4 CC C6 4D D4 5B 40
+MapGraphics
+PICASSOKABE
 
-Decoded:
-[CMD:25][CMD:0B][CMD:26][TEXTBOX_BELOW]�Lookoverthere,{newline}That'sthe[CRYSTAL]{newline}.oncetheheartoftheWorld,[CMD:08][CMD:0E]OAnoldProphecysays.#Thevile4willstealthePower.anddividetheWorldbehind4doors,{newline}AtthattimetheKnightwillappear#{newline}TheProphecyhasnowcometrue,[CMD:08][CMD:0E]O4monstershavelockedthedoorsofthe[CRYSTAL]{newline}andescapedwiththekeys,{newline}They'redrainingthelightfromthe4CrystalsoftheEarth.andtheWorldisinchaos,Thepeopleareindesperateneedofhelp,[CMD:08][CMD:0E]O[ITEM][CMD:18][END][CMD:10][CMD:08].onlyyoucansavetheCrystalsandtheWorld,[CMD:08]ha�[CMD:2A][CMD:08][CMD:0E]OyGentto[CMD:08][CMD:0E]Oon[CMD:10]you[TEXTBOX_BELOW][END]
+MonsterGraphics
+Yuki'HM'Yasuda
+
+Animation
+ToshiyukiMomose
+
+MapCharacters
+M,Shimoji
+
+SoundComposer
+R,Sasai
+Y,Kawakami
+
+SpecialThanksTo#
+T,Fujii
+CarolMoriyama
+KatsA,Tayama
+H,Yukitake
+K,Adachi
+K,Kokubo
+H,Minaba
+K,Beloit
+C,Budd
+K,Kreider
+K,Kirchner
+V,Mayhew
+M,Ridley
+R,Silveira
+H,Suzuki
+N,Williams
+J,Yanagihara
+T,Nomura[END]
+(Raw: 65 B8 C0 FF A9 C5 C2 BA C5 B4 C0 01 A2 C7 BC BE BC C7 BC 01...)
+
+Dialog 0x03:
+[CMD:0B]-a[CMD:0F]X[CMD:10][ITEM] [CMD:2D]-a[CMD:11]es
+[CMD:13]X[ITEM][CMD:09];#a[CMD:11]es
+[CMD:0A]#a[CMD:09]7#[END]
+(Raw: 0B FF DA B4 0F B1 10 05 06 2D DA B4 11 60 01 13 B1 05 09 DE...)
+
+Dialog 0x04:
+[CMD:22][CMD:08]!Θ'[WAIT]P
+#÷[CMD:0B][CMD:20][CMD:22]#I[ASTERISK][END]
+(Raw: 22 32 D1 02 A9 01 85 8B 0B 20 22 8F A2 03 00)
+
+Dialog 0x05:
+T#[CMD:0A]##[CMD:0A]#[CMD:20]P#Y[CMD:0A]#Z[CMD:0A]#a[CMD:0A]#b[CMD:0A]#c[CMD:0A][CMD:28][CMD:2B]Rma#edp[CMD:08]o[CMD:08][CMD:0E]Oing-of[CMD:29][END]
+(Raw: AD F6 0A 8D F4 0A E2 20 A9 FF 8D B2 0A 8D B3 0A 8D B4 0A 8D...)
+
+Dialog 0x06:
+to[CMD:23][CMD:12][CMD:23]ea[CMD:2B][ITEM][CMD:1D]E[END][NAME][CMD:23][WAIT][CMD:2B][CMD:07][CMD:23]z[END]
+(Raw: 46 FF FF 23 12 23 5E 2B 50 23 02 2B 07 23 CD 00)
+
+Dialog 0x07:
+Warpsusfromthe[CRYSTAL][CMD:08]tothe[CRYSTAL][CMD:0C],[CMD:08]haΦ[CMD:2C]Wyou[TEXTBOX_BELOW][END]
+(Raw: B0 B4 C5 C3 45 C8 45 B9 C5 69 FF 41 1F 08 FF 46 41 1F 0C D2...)
+
+Dialog 0x08:
+i
+
+SoundProgram
+MinoruAkao
+
+MapGraphics
+PICASSOKABE
+
+MonsterGraphics
+Yuki'HM'Yasuda
+
+Animation
+ToshiyukiMomose
+
+MapCharacters
+M,Shimoji
+
+SoundComposer
+R,Sasai
+Y,Kawakami
+
+SpecialThanksTo#
+T,Fujii
+CarolMoriyama
+KatsA,Tayama
+H,Yukitake
+K,Adachi
+K,Kokubo
+H,Minaba
+K,Beloit
+C,Budd
+K,Kreider
+K,Kirchner
+V,Mayhew
+M,Ridley
+R,Silveira
+H,Suzuki
+N,Williams
+J,Yanagihara
+T,Nomura[END]
+(Raw: BC 01 01 AC 43 C1 4C A9 C5 C2 BA C5 B4 C0 01 A6 47 5C C8 FF...)
+
+Dialog 0x09:
+#Gedv[CMD:0B]0[WAIT]P[CMD:0A]#[WAIT]tP[CMD:0A]#[ASTERISK]tPagain[CMD:26][END][END]ieli~i÷jank[CMD:0E]l[CMD:27]mNm[CMD:28]n;n[CMD:21]omo?ogp:pΣq4r#[CMD:16]t#IPst#O[END]
+(Raw: 85 A0 68 C9 0B 90 02 A9 0A 8D 02 42 A9 0A 8D 03 42 A9 64 38...)
+
+Dialog 0x0A:
+[CMD:14][CMD:10][CMD:0B][END]
+(Raw: 14 10 0B 00)
+
+Dialog 0x0B:
+[WAIT][CMD:28]es[CMD:08][CMD:0B]#[END]
+(Raw: 02 28 60 08 0B F4 00)
+
+Dialog 0x0C:
+
+
+[WAIT][ASTERISK][ASTERISK][WAIT]
+
+[WAIT][ASTERISK][WAIT][ASTERISK][END]
+(Raw: FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF...)
+
+Dialog 0x0D:
+f[CMD:0F]es
+[CMD:14]
+[CMD:0B][END]
+(Raw: B9 0F 60 01 14 01 0B 00)
+
+Dialog 0x0E:
+ourage.andrespectyourWorld,
+Abrightfutureawaitsyounow,
+Go.andenjoyalltheWorldhastooffer,[TEXTBOX_ABOVE][END]
+(Raw: 43 C5 B4 BA B8 4D 4F 4C C5 60 C3 B8 B6 42 44 C5 FF B0 5C BF...)
+
+Dialog 0x0F:
+[CMD:12][CMD:0E]#you[END]
+(Raw: 12 0E 82 44 00)
+
+Dialog 0x10:
+[ITEM][CMD:0B]the[CMD:18]s[CMD:0C][END]
+(Raw: 05 0B 41 18 C6 0C 00)
+
+Dialog 0x11:
+l[WAIT]er[WAIT]d[WAIT].[ASTERISK]'s[WAIT]an[ITEM][ITEM][CMD:1D]E[END]
+(Raw: BF FF 02 B8 C5 02 B7 FF 02 D0 FF 03 D1 C6 FF 02 B4 C1 05 05...)
+
+Dialog 0x12:
+[ITEM] [CMD:2D]-a[CMD:11]es
+[CMD:13]X[ITEM][CMD:09];#a[CMD:11]es
+[CMD:0A]#a[CMD:09]7#[END]
+(Raw: 05 06 2D DA B4 11 60 01 13 B1 05 09 DE F5 B4 11 60 01 0A F5...)
+
+Dialog 0x13:
+#t[CMD:10][ASTERISK]l[TEXTBOX_BELOW]ingP[END]
+(Raw: F0 42 10 03 49 FF 1A 48 A9 00)
+
+Dialog 0x14:
+a[CMD:0F]is
+[ITEM]6es
+Wad[END]
+(Raw: B4 0F 5F 01 05 96 60 01 B0 B4 B7 00)
+
+Dialog 0x15:
+sillyhumans.Imustshareaterriblesecret'[CMD:08][CMD:0E]OThatProphecy#
+AgesagoIstartedthatrumor'[CMD:08][CMD:0E]OWelcometothepowerofDarkness'[CMD:23]#[ITEM]#'[END]
+(Raw: C6 BC BF BF 59 BB C8 7A C1 C6 4D 66 C0 6D C6 57 C5 40 78 C7...)
+
+Dialog 0x16:
+zXzlzxz#z#z#z#z#z#z[CMD:0A]'[CMD:18]'k'÷'#'#'[CMD:0A]#[CMD:16]#[CMD:22]#[CMD:2E]#[CMD:10][CMD:1D][END][ITEM]es[END]
+[CMD:12]is
+#ing#on#es#ack#monst#ⁿ#8#M#a#o#.#;#####[CMD:08].[CMD:16].[CMD:24].[CMD:08]!Θ.e.ight.5.u.[CMD:20]'o'[CMD:2E][CMD:13]I'mi[CMD:0F]÷[CMD:0E][ITEM][CMD:09][END]
+(Raw: CD B1 CD BF CD CB CD CF CD D3 CD DF CD E8 CD EE CD FC CD 0A...)
+
+Dialog 0x17:
+[CMD:0B]t[CMD:18]s[CMD:0C][END]
+(Raw: 0B 42 18 C6 0C 00)
+
+Dialog 0x18:
+#[CMD:10][CMD:11]is
+[ITEM]t[WAIT][ASTERISK][CMD:12][CMD:2A][END]
+(Raw: E9 10 11 5F 01 05 42 02 03 12 2A 00)
+
+Dialog 0x19:
+d[CMD:08]Ld[ITEM]##[END]
+(Raw: B7 08 A5 B7 05 F4 FB 00)
+
+Dialog 0x1A:
+zαz5zJzXzlzxz#z#z#z#z#z#z[CMD:0A]'[CMD:18]'k'÷'#'#'[CMD:0A]#[CMD:16]#[CMD:22]#[CMD:2E]#[CMD:10][CMD:1D][END][ITEM]es[END]
+[CMD:12]is
+#ing#on#es#ack#monst#ⁿ#8#M#a#o#.#;#####[CMD:08].[CMD:16].[CMD:24].[CMD:08]!Θ.e.ight.5.u.[CMD:20]'o'[CMD:2E][CMD:13]I'mi[CMD:0F]÷[CMD:0E][ITEM][CMD:09][END]
+(Raw: CD 87 CD 95 CD A3 CD B1 CD BF CD CB CD CF CD D3 CD DF CD E8...)
+
+Dialog 0x1B:
+#ight[CMD:2B][CMD:20][CMD:25]αL5.[CMD:0D]you[END][CMD:0D]to[END][END][END]L4.ing##L#rⁿ08[CMD:20]p#[CMD:20][CMD:25]αL5.[CMD:1E]L4.[CMD:08]!Θagain÷[CMD:0B][CMD:20][CMD:22]#L[CMD:20][CMD:29]##[CMD:20][CMD:2B]#÷L÷v[ITEM]0##bd6~Pma[CMD:22]el7[END]
+(Raw: 85 52 2B 20 25 87 A5 95 D0 34 A5 94 D0 48 E6 89 A5 89 C5 8A...)
+
+Dialog 0x1C:
+f[CMD:0F]es
+[CMD:14]
+[CMD:0B][END]
+(Raw: B9 0F 60 01 14 01 0B 00)
+
+Dialog 0x1D:
+ourage.andrespectyourWorld,
+Abrightfutureawaitsyounow,
+Go.andenjoyalltheWorldhastooffer,[TEXTBOX_ABOVE][END]
+(Raw: 43 C5 B4 BA B8 4D 4F 4C C5 60 C3 B8 B6 42 44 C5 FF B0 5C BF...)
+
+Dialog 0x1E:
+[CMD:12][CMD:0E]#you[END]
+(Raw: 12 0E 82 44 00)
+
+Dialog 0x1F:
+[ITEM][CMD:0B]the[CMD:18]s[CMD:0C][END]
+(Raw: 05 0B 41 18 C6 0C 00)
+
+Dialog 0x20:
+l[WAIT]er[WAIT]d[WAIT].[ASTERISK]'s[WAIT]an[ITEM][ITEM][CMD:1D]E[END]
+(Raw: BF FF 02 B8 C5 02 B7 FF 02 D0 FF 03 D1 C6 FF 02 B4 C1 05 05...)
+
+Dialog 0x21:
+[ITEM] [CMD:2D]-a[CMD:11]es
+[CMD:13]X[ITEM][CMD:09];#a[CMD:11]es
+[CMD:0A]#a[CMD:09]7#[END]
+(Raw: 05 06 2D DA B4 11 60 01 13 B1 05 09 DE F5 B4 11 60 01 0A F5...)
+
+Dialog 0x22:
+#t[CMD:10][ASTERISK]l[TEXTBOX_BELOW]ingP[END]
+(Raw: F0 42 10 03 49 FF 1A 48 A9 00)
+
+Dialog 0x23:
+r[CMD:09]s[CMD:18]s[TEXTBOX_BELOW]sustssz[ITEM][CMD:1E]E[END][NAME]zhazI'llzwaz'
+zinzαz5zJzXzlzxz#z#z#z#z#z#z[CMD:0A]'[CMD:18]'k'÷'#'#'[CMD:0A]#[CMD:16]#[CMD:22]#[CMD:2E]#[CMD:10][CMD:1D][END][ITEM]es[END]
+[CMD:12]is
+#ing#on#es#ack#monst#ⁿ#8#M#a#o#.#;#####[CMD:08].[CMD:16].[CMD:24].[CMD:08]!Θ.e.ight.5.u.[CMD:20]'o'[CMD:2E][CMD:13]I'mi[CMD:0F]÷[CMD:0E][ITEM][CMD:09][END]
+(Raw: C5 09 C6 18 C6 1A C6 6D C6 45 CD 51 CD 57 CD 5D CD 63 CD 6F...)
+
+Dialog 0x24:
+you[END]
+(Raw: 44 00)
+
+Dialog 0x25:
+[END]
+(Raw: 00)
+
+Dialog 0x26:
+[CMD:14][ITEM][CMD:0E]usta[CMD:10]ll[END]
+(Raw: 14 05 0E 6D B4 10 4A 00)
+
+Dialog 0x27:
+[CMD:0B]-a[CMD:0F]X[CMD:10][ITEM] [CMD:2D]-a[CMD:11]es
+[CMD:13]X[ITEM][CMD:09];#a[CMD:11]es
+[CMD:0A]#a[CMD:09]7#[END]
+(Raw: 0B FF DA B4 0F B1 10 05 06 2D DA B4 11 60 01 13 B1 05 09 DE...)
+
+Dialog 0x28:
+#ight[CMD:2B][CMD:20][CMD:25]αL5.[CMD:0D]you[END][CMD:0D]to[END][END][END]L4.ing##L#rⁿ08[CMD:20]p#[CMD:20][CMD:25]αL5.[CMD:1E]L4.[CMD:08]!Θagain÷[CMD:0B][CMD:20][CMD:22]#L[CMD:20][CMD:29]##[CMD:20][CMD:2B]#÷L÷v[ITEM]0##bd6~Pma[CMD:22]el7[END]
+(Raw: 85 52 2B 20 25 87 A5 95 D0 34 A5 94 D0 48 E6 89 A5 89 C5 8A...)
+
+Dialog 0x29:
+wahaha'[CMD:08][CMD:0E]OSurprise'[CMD:08]haΦ[CMD:2A][TEXTBOX_ABOVE][CMD:27]~you[CMD:10]on[CMD:08][CMD:0E]Oyou[ITEM][CMD:1D]E[END][NAME]on[TEXTBOX_BELOW]#Hepoisonedme,,,
+Justashed,,,did
+thet,t,,,trees'[CMD:08]haΦ[CMD:2A]thatyou~youthatyou[END]
+(Raw: 63 FF 57 FF 57 CE 30 AC C8 C5 C3 C5 BC C6 B8 CE 36 2A 1B 27...)
+
+Dialog 0x2A:
+[CMD:11][CMD:11][CMD:08][END]
+(Raw: 11 11 08 00)
+
+Dialog 0x2B:
+[ITEM][CMD:0B]the[CMD:18]s[CMD:0C][END]
+(Raw: 05 0B 41 18 C6 0C 00)
+
+Dialog 0x2C:
+l[WAIT]er[WAIT]d[WAIT].[ASTERISK]'s[WAIT]an[ITEM][ITEM][CMD:1D]E[END]
+(Raw: BF FF 02 B8 C5 02 B7 FF 02 D0 FF 03 D1 C6 FF 02 B4 C1 05 05...)
+
+Dialog 0x2D:
+[ITEM] [CMD:2D]-a[CMD:11]es
+[CMD:13]X[ITEM][CMD:09];#a[CMD:11]es
+[CMD:0A]#a[CMD:09]7#[END]
+(Raw: 05 06 2D DA B4 11 60 01 13 B1 05 09 DE F5 B4 11 60 01 0A F5...)
+
+Dialog 0x2E:
+#t[CMD:10][ASTERISK]l[TEXTBOX_BELOW]ingP[END]
+(Raw: F0 42 10 03 49 FF 1A 48 A9 00)
+
+Dialog 0x2F:
+'[CMD:08][CMD:0E]OSurprise'[CMD:08]haΦ[CMD:2A][TEXTBOX_ABOVE][CMD:27]~you[CMD:10]on[CMD:08][CMD:0E]Oyou[ITEM][CMD:1D]E[END][NAME]on[TEXTBOX_BELOW]#Hepoisonedme,,,
+Justashed,,,did
+thet,t,,,trees'[CMD:08]haΦ[CMD:2A]thatyou~youthatyou[END]
+(Raw: CE 30 AC C8 C5 C3 C5 BC C6 B8 CE 36 2A 1B 27 80 44 10 54 30...)
+
+Dialog 0x30:
+o[CMD:08]~#[CMD:23][CMD:1C][CMD:2B];[CMD:2A][CMD:28][CMD:27]youto[CMD:2C]of[END]
+(Raw: C2 08 80 FB 23 1C 2B DE 2A 28 27 44 46 FF FF 2C 5A 00)
+
+Dialog 0x31:
+[CMD:2D]-a[CMD:11]es
+[CMD:13]X[ITEM][CMD:09];#a[CMD:11]es
+[CMD:0A]#a[CMD:09]7#[END]
+(Raw: 2D DA B4 11 60 01 13 B1 05 09 DE F5 B4 11 60 01 0A F5 B4 09...)
+
+Dialog 0x32:
+###Spencer-U[CMD:21][CMD:0B]lesq't[CMD:26][END][END]ieli~i÷jank[CMD:0E]l[CMD:27]mNm[CMD:28]n;n[CMD:21]omo?ogp:pΣq4r[CMD:24][END]
+[CMD:20][CMD:16][ITEM][CMD:08]!ΘFesq't##edP[ITEM]Feq't[CMD:22]Θ7[END]
+(Raw: D4 F8 82 79 FF DA AE 21 0B BF 60 C4 7E 3A 9F 60 C4 7E FA 82...)
+
+Dialog 0x33:
+[CMD:08]haΦ[CMD:08][CMD:08]ⁿαà[CMD:2A][CMD:08][CMD:0E]Ot[CMD:20]on[CMD:10]the[CMD:20]t[CMD:10]ou[CMD:10]teto[CMD:23][CMD:12][CMD:23]ea[CMD:2B][ITEM][CMD:1D]E[END][NAME][CMD:23][WAIT][CMD:2B][CMD:07][CMD:23]z[END]
+(Raw: 36 61 2A 30 42 20 54 10 41 20 42 10 43 10 42 40 46 FF FF 23...)
+
+Dialog 0x34:
+[CMD:2F][ITEM][CMD:0D][NAME]#o[CMD:08]~#[CMD:23][CMD:1C][CMD:2B];[CMD:2A][CMD:28][CMD:27]youto[CMD:2C]of[END]
+(Raw: 2F 05 0D 04 DF C2 08 80 FB 23 1C 2B DE 2A 28 27 44 46 FF FF...)
+
+Dialog 0x35:
+23456789[END]
+(Raw: FF 92 FF 93 FF 94 FF 95 FF 96 FF 97 FF 98 FF 99 00)
+
+Dialog 0x36:
+[CMD:0B]kz[CMD:2A][CMD:12][CMD:27][CMD:08][CMD:0E]O
+[END]
+(Raw: 0B BE CD 2A 12 27 30 01 FF FF 00)
+
+Dialog 0x37:
+zXzlzxz#z#z#z#z#z#z[CMD:0A]'[CMD:18]'k'÷'#'#'[CMD:0A]#[CMD:16]#[CMD:22]#[CMD:2E]#[CMD:10][CMD:1D][END][ITEM]es[END]
+[CMD:12]is
+#ing#on#es#ack#monst#ⁿ#8#M#a#o#.#;#####[CMD:08].[CMD:16].[CMD:24].[CMD:08]!Θ.e.ight.5.u.[CMD:20]'o'[CMD:2E][CMD:13]I'mi[CMD:0F]÷[CMD:0E][ITEM][CMD:09][END]
+(Raw: CD B1 CD BF CD CB CD CF CD D3 CD DF CD E8 CD EE CD FC CD 0A...)
+
+Dialog 0x38:
+getaloadofthisstuff'[CMD:08]haΦ[CMD:2A][CMD:10]t[CMD:10]you[ITEM][CMD:21][ITEM][CMD:21][CMD:10],,,[CMD:10][ITEM][CMD:1D]E[END][NAME]e,,,[TEXTBOX_BELOW]#I'llkeepthis,
+Oh.here'swhatyouwanted,[CMD:0D]is
+[END]
+(Raw: BA B8 42 78 BF C2 B4 4C 5A 3F 5F 65 C8 B9 B9 CE 36 2A 10 42...)
+
+Dialog 0x39:
+[ITEM]l[END]
+(Raw: 05 49 00)
+
+Dialog 0x3A:
+Alas.sillyhumans.Imustshareaterriblesecret'[CMD:08][CMD:0E]OThatProphecy#
+AgesagoIstartedthatrumor'[CMD:08][CMD:0E]OWelcometothepowerofDarkness'[CMD:23]#[ITEM]#'[END]
+(Raw: 9A BF B4 C6 4D C6 BC BF BF 59 BB C8 7A C1 C6 4D 66 C0 6D C6...)
+
+Dialog 0x3B:
+[TEXTBOX_BELOW]#Hepoisonedme,,,
+Justashed,,,did
+thet,t,,,trees'[CMD:08]haΦ[CMD:2A]thatyou~youthatyou[END]
+(Raw: FF FF 1A 82 A1 40 C3 C2 BC C6 54 68 C0 B8 53 01 A3 6D B4 45...)
+
+Dialog 0x3C:
+adofthisstuff'[CMD:08]haΦ[CMD:2A][CMD:10]t[CMD:10]you[ITEM][CMD:21][ITEM][CMD:21][CMD:10],,,[CMD:10][ITEM][CMD:1D]E[END][NAME]e,,,[TEXTBOX_BELOW]#I'llkeepthis,
+Oh.here'swhatyouwanted,[CMD:0D]is
+[END]
+(Raw: B4 4C 5A 3F 5F 65 C8 B9 B9 CE 36 2A 10 42 10 44 05 21 05 21...)
+
+Dialog 0x3D:
+[CMD:18]stGll#GT[CMD:14]t[CMD:26][END][END]ieli~i÷jank[CMD:0E]l[CMD:27]mNm[CMD:28]n;n[CMD:21]omo?ogp:pΣq4r#G#t[CMD:10][ASTERISK]l[TEXTBOX_BELOW]ingP[END]
+(Raw: 18 65 A0 4A 85 A0 AD 14 42 38 E5 A0 F0 42 10 03 49 FF 1A 48...)
+
+Dialog 0x3E:
+[CMD:0D]a[END]
+(Raw: 0D B4 00)
+
+Dialog 0x3F:
+
+C[CMD:2C][CMD:21]C[CMD:2D][CMD:21]C [CMD:21]C[CMD:21][CMD:21]C[CMD:22][CMD:21]C[CMD:22][CMD:21][CMD:28]ma#Redping÷-of[CMD:08]o[CMD:08][CMD:0E]OerRTK##U[CMD:0A]TM##W[CMD:0A]#[CMD:20]o[CMD:10]P[CMD:0F][CMD:0C][CMD:10]
+[CMD:20][CMD:0F]#C [CMD:21][CMD:28]ma#Redp[CMD:08][CMD:22][END]
+(Raw: 01 9C 2C 21 9C 2D 21 9C 06 21 9C 21 21 9C 22 21 9C 22 21 28...)
+
+Dialog 0x40:
+tmustbetheSpringofLife,[CMD:08]haΦ[CMD:2A][CMD:22]the[CMD:08]!Θs[WAIT]s[CMD:08]!Θyou[CMD:20][ITEM][CMD:1E]E[END][NAME][TEXTBOX_BELOW]ΣThewater'sdriedup'[CMD:08][CMD:0E]OIt'shopelessnow,[TEXTBOX_ABOVE][END]
+(Raw: 42 C0 6D B5 40 41 AC C3 C5 48 5A A5 BC B9 B8 D2 36 2A 22 41...)
+
+Dialog 0x41:
+[CMD:11][CMD:2C][END]
+(Raw: 11 2C 00)
+
+Dialog 0x42:
+[CMD:10]y[CMD:2F][ITEM][CMD:0D][NAME]#o[CMD:08]~#[CMD:23][CMD:1C][CMD:2B];[CMD:2A][CMD:28][CMD:27]youto[CMD:2C]of[END]
+(Raw: 10 59 2F 05 0D 04 DF C2 08 80 FB 23 1C 2B DE 2A 28 27 44 46...)
+
+Dialog 0x43:
+#[ITEM][CMD:0B]t[CMD:18]s[CMD:0C][END]
+(Raw: FC 05 0B 42 18 C6 0C 00)
+
+Dialog 0x44:
+[TEXTBOX_BELOW]ΣThatmustbetheSpringofLife,[CMD:08]haΦ[CMD:2A][CMD:22]the[CMD:08]!Θs[WAIT]s[CMD:08]!Θyou[CMD:20][ITEM][CMD:1E]E[END][NAME][TEXTBOX_BELOW]ΣThewater'sdriedup'[CMD:08][CMD:0E]OIt'shopelessnow,[TEXTBOX_ABOVE][END]
+(Raw: 1A 8C 5B B4 42 C0 6D B5 40 41 AC C3 C5 48 5A A5 BC B9 B8 D2...)
+
+Dialog 0x45:
+[CMD:18][CMD:12][CMD:10][CMD:1D][END][ITEM]es[END]
+[CMD:12]is
+[CMD:0C][ITEM]in[CMD:18][CMD:12][CMD:26][END][END]ieli~i÷jank[CMD:0E]l[CMD:27]mNm[CMD:28]n;n[CMD:21]omo?ogp:pΣq4r[CMD:0C][CMD:0C][ASTERISK][CMD:0E][END]
+(Raw: 18 12 3C 0C 05 47 18 12 38 0C 0C 03 0E 00)
+
+Dialog 0x46:
+me,,,
+Justashed,,,did
+thet,t,,,trees'[CMD:08]haΦ[CMD:2A]thatyou~youthatyou[END]
+(Raw: C0 B8 53 01 A3 6D B4 45 BB 40 B7 53 B7 BC B7 01 41 C7 D2 C7...)
+
+Dialog 0x47:
+#Hepoisonedme,,,
+Justashed,,,did
+thet,t,,,trees'[CMD:08]haΦ[CMD:2A]thatyou~youthatyou[END]
+(Raw: 82 A1 40 C3 C2 BC C6 54 68 C0 B8 53 01 A3 6D B4 45 BB 40 B7...)
+
+Dialog 0x48:
+me,,,
+Justashed,,,did
+thet,t,,,trees'[CMD:08]haΦ[CMD:2A]thatyou~youthatyou[END]
+(Raw: C0 B8 53 01 A3 6D B4 45 BB 40 B7 53 B7 BC B7 01 41 C7 D2 C7...)
+
+Dialog 0x49:
+#ight[CMD:2B][CMD:20][CMD:25]αL5.[CMD:0D]you[END][CMD:0D]to[END][END][END]L4.ing##L#rⁿ08[CMD:20]p#[CMD:20][CMD:25]αL5.[CMD:1E]L4.[CMD:08]!Θagain÷[CMD:0B][CMD:20][CMD:22]#L[CMD:20][CMD:29]##[CMD:20][CMD:2B]#÷L÷v[ITEM]0##bd6~Pma[CMD:22]el7[END]
+(Raw: 85 52 2B 20 25 87 A5 95 D0 34 A5 94 D0 48 E6 89 A5 89 C5 8A...)
+
+Dialog 0x4A:
+[CMD:11][TEXTBOX_BELOW][CMD:12]~[END]
+(Raw: 11 1A 12 80 00)
+
+Dialog 0x4B:
+[END]
+(Raw: 00)
+
+Dialog 0x4C:
+[ITEM][CMD:0B]the[CMD:18]s[CMD:0C][END]
+(Raw: 05 0B 41 18 C6 0C 00)
+
+Dialog 0x4D:
+l[WAIT]er[WAIT]d[WAIT].[ASTERISK]'s[WAIT]an[ITEM][ITEM][CMD:1D]E[END]
+(Raw: BF FF 02 B8 C5 02 B7 FF 02 D0 FF 03 D1 C6 FF 02 B4 C1 05 05...)
+
+Dialog 0x4E:
+[ITEM] [CMD:2D]-a[CMD:11]es
+[CMD:13]X[ITEM][CMD:09];#a[CMD:11]es
+[CMD:0A]#a[CMD:09]7#[END]
+(Raw: 05 06 2D DA B4 11 60 01 13 B1 05 09 DE F5 B4 11 60 01 0A F5...)
+
+Dialog 0x4F:
+#t[CMD:10][ASTERISK]l[TEXTBOX_BELOW]ingP[END]
+(Raw: F0 42 10 03 49 FF 1A 48 A9 00)
+
+Dialog 0x50:
+[END]
+(Raw: FF FF FF FF 00)
+
+Dialog 0x51:
+se'
+Say.what'sbecomeof[CMD:1D][NAME]andCaptainMac#[CMD:08]"ΘThey'refine'
+They'vealreadyheadedhome,[CMD:08]!ΘGreat,SometimeI'lldropbyandsay#Hi'#[CMD:08]haΦ[CMD:23][CMD:08]ⁿα[CMD:2A][CMD:10],,,thatight[CMD:10][ITEM][CMD:1E]E[END][NAME][CMD:08][CMD:0E]Oight[WAIT]
+[CMD:10][ITEM][CMD:1D]E[END][NAME][CMD:08][CMD:0E]O,,,[CMD:20][ITEM][CMD:1D]E[END][NAME][END]
+(Raw: C6 B8 6F AC B4 CC 4D CA 57 C7 4E B5 B8 B6 69 40 5A 1D 04 FF...)
+
+Dialog 0x52:
+[CMD:08][CMD:2F]A[END]
+(Raw: 08 2F 9A 00)
+
+Dialog 0x53:
+[CMD:0B]-a[CMD:0F]X[CMD:10][ITEM] [CMD:2D]-a[CMD:11]es
+[CMD:13]X[ITEM][CMD:09];#a[CMD:11]es
+[CMD:0A]#a[CMD:09]7#[END]
+(Raw: 0B FF DA B4 0F B1 10 05 06 2D DA B4 11 60 01 13 B1 05 09 DE...)
+
+Dialog 0x54:
+[CMD:10][ASTERISK]l[TEXTBOX_BELOW]ingP[END]
+(Raw: 10 03 49 FF 1A 48 A9 00)
+
+Dialog 0x55:
+[CMD:14][CMD:10][CMD:0B][END]
+(Raw: 14 10 0B 00)
+
+Dialog 0x56:
+Lx[CMD:29][CMD:08]rz#[CMD:07]Lx[CMD:18]om[CMD:08]#xs'#[ITEM]#."~Y[CMD:28]ma#Redesing[CMD:08]o[CMD:08][CMD:0E]O[CMD:29][END]
+(Raw: A5 CB 29 08 C5 CD F0 07 A5 CB 18 69 08 85 CB C6 CE F0 05 88...)
+
+Dialog 0x57:
+[END]
+(Raw: 00)
+
+Dialog 0x58:
+to[CMD:2B]#[END]
+(Raw: 46 FF FF 2B DF 00)
+
+Dialog 0x59:
+[TEXTBOX_BELOW]#Hepoisonedme,,,
+Justashed,,,did
+thet,t,,,trees'[CMD:08]haΦ[CMD:2A]thatyou~youthatyou[END]
+(Raw: FF FF 1A 82 A1 40 C3 C2 BC C6 54 68 C0 B8 53 01 A3 6D B4 45...)
+
+Dialog 0x5A:
+ruinourWorld,[CMD:08]!ΘAlas.sillyhumans.Imustshareaterriblesecret'[CMD:08][CMD:0E]OThatProphecy#
+AgesagoIstartedthatrumor'[CMD:08][CMD:0E]OWelcometothepowerofDarkness'[CMD:23]#[ITEM]#'[END]
+(Raw: C5 C8 7B 43 C5 FF B0 5C BF B7 D2 32 9A BF B4 C6 4D C6 BC BF...)
+
+Dialog 0x5B:
+[CMD:0C]Z[END]
+(Raw: 0C B3 00)
+
+Dialog 0x5C:
+CACCURACY#[ITEM]#is
+e[CMD:08]qà[ITEM][CMD:18]ack[END]
+(Raw: 9C 9A 9C 9C AE AB 9A 9C B2 D8 05 F4 5F 01 40 08 C4 81 05 18...)
+
+Dialog 0x5D:
+[CMD:12]e[END]
+(Raw: 12 B8 00)
+
+Dialog 0x5E:
+[NAME][CMD:29]à[CMD:17]#[ITEM]#~oO[ITEM]#[CMD:09]#C[END]
+(Raw: 04 29 81 17 82 05 FD 80 C2 A8 05 E2 09 EF 9C 00)
+
+Dialog 0x5F:
+leanedout'[CMD:0D][CMD:08][CMD:08]ⁿαà
+eth[ITEM]#ing[CMD:08][CMD:0E]O[CMD:24][CMD:0D][CMD:12]  [ITEM][CMD:08]haΦ[CMD:08][CMD:08][CMD:08][CMD:08][CMD:08][CMD:08][CMD:0A]sL[ITEM]#[CMD:0F]es
+[CMD:0B][END]
+(Raw: BF 5E C1 68 43 C7 CE 0D 61 01 40 3F 05 F9 48 30 24 0D 12 06...)
+
+Dialog 0x60:
+
+th[ITEM]k[END]
+(Raw: 01 3F 05 7D 00)
+
+Dialog 0x61:
+[TEXTBOX_BELOW]#[NAME]tC[ITEM]tLZ# tT[CMD:10][CMD:10]#GT0[CMD:10][CMD:08][CMD:0E]O [CMD:18]stGll#GT[CMD:14]t[CMD:26][END][END]ieli~i÷jank[CMD:0E]l[CMD:27]mNm[CMD:28]n;n[CMD:21]omo?ogp:pΣq4r#G#t[CMD:10][ASTERISK]l[TEXTBOX_BELOW]ingP[END]
+(Raw: 1A 8D 04 42 9C 05 42 A5 B3 8D 06 42 AD 10 10 85 A0 AD 90 10...)
+
+Dialog 0x62:
+[CMD:14][CMD:10][CMD:0B][END]
+(Raw: 14 10 0B 00)
+
+Dialog 0x63:
+?om[END]
+(Raw: EB 69 00)
+
+Dialog 0x64:
+
+[ITEM]om[CMD:1D][END]
+(Raw: 01 05 69 1D 00)
+
+Dialog 0x65:
+[ITEM] [CMD:2D]-a[CMD:11]es
+[CMD:13]X[ITEM][CMD:09];#a[CMD:11]es
+[CMD:0A]#a[CMD:09]7#[END]
+(Raw: 05 06 2D DA B4 11 60 01 13 B1 05 09 DE F5 B4 11 60 01 0A F5...)
+
+Dialog 0x66:
+αz5zJzXzlzxz#z#z#z#z#z#z[CMD:0A]'[CMD:18]'k'÷'#'#'[CMD:0A]#[CMD:16]#[CMD:22]#[CMD:2E]#[CMD:10][CMD:1D][END][ITEM]es[END]
+[CMD:12]is
+#ing#on#es#ack#monst#ⁿ#8#M#a#o#.#;#####[CMD:08].[CMD:16].[CMD:24].[CMD:08]!Θ.e.ight.5.u.[CMD:20]'o'[CMD:2E][CMD:13]I'mi[CMD:0F]÷[CMD:0E][ITEM][CMD:09][END]
+(Raw: 87 CD 95 CD A3 CD B1 CD BF CD CB CD CF CD D3 CD DF CD E8 CD...)
+
+Dialog 0x67:
+[CMD:1E][END]
+(Raw: 1E 00)
+
+Dialog 0x68:
+[TEXTBOX_BELOW]ingP[END]
+(Raw: 1A 48 A9 00)
+
+Dialog 0x69:
+say#Hi'#[CMD:08]haΦ[CMD:23][CMD:08]ⁿα[CMD:2A][CMD:10],,,thatight[CMD:10][ITEM][CMD:1E]E[END][NAME][CMD:08][CMD:0E]Oight[WAIT]
+[CMD:10][ITEM][CMD:1D]E[END][NAME][CMD:08][CMD:0E]O,,,[CMD:20][ITEM][CMD:1D]E[END][NAME][END]
+(Raw: C6 B4 59 D3 A1 BC CE D4 36 23 62 2A 10 53 70 52 10 51 30 52...)
+
+Dialog 0x6A:
+#Hepoisonedme,,,
+Justashed,,,did
+thet,t,,,trees'[CMD:08]haΦ[CMD:2A]thatyou~youthatyou[END]
+(Raw: 82 A1 40 C3 C2 BC C6 54 68 C0 B8 53 01 A3 6D B4 45 BB 40 B7...)
+
+Dialog 0x6B:
+sedyoumadeitherewithsuchabadwound'
+Offtobedwithyou,[CMD:08]haΦ[CMD:08][CMD:08]ⁿαà[CMD:2A][CMD:08]oΦyou[ITEM][CMD:1D]E[END][NAME]on[CMD:23]tΘyou[CMD:12]ou[CMD:22]you[CMD:20]onZyou[CMD:13]twaououto[CMD:08]!Θyou[CMD:10]on[TEXTBOX_BELOW]es[ITEM][CMD:18][END][CMD:10][CMD:08].youneedtohearMac'snews,
+You'renotgoingtolikeit,,,[CMD:08]haΦ[CMD:2A][CMD:12]outto[ITEM]#[CMD:07][CMD:08]Th#[CMD:2B]'t[CMD:2B]om[CMD:23]p[END]
+(Raw: C6 68 55 7A B7 40 BC 42 BB 4B 40 77 C6 C8 B6 BB FF 78 B5 B4...)
+
+Dialog 0x6C:
+[CMD:21][END]
+(Raw: 21 00)
+
+Dialog 0x6D:
+
+
+[WAIT][ASTERISK][ASTERISK][WAIT]
+
+[WAIT][ASTERISK][WAIT][ASTERISK][END]
+(Raw: FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF...)
+
+Dialog 0x6E:
+[CMD:0B]#-a[ITEM][CMD:09];#a[CMD:0F]0[CMD:10][CMD:0B]-a[CMD:0F]X[CMD:10][ITEM] [CMD:2D]-a[CMD:11]es
+[CMD:13]X[ITEM][CMD:09];#a[CMD:11]es
+[CMD:0A]#a[CMD:09]7#[END]
+(Raw: 0B DD DA B4 05 09 DE F2 B4 0F 90 10 0B FF DA B4 0F B1 10 05...)
+
+Dialog 0x6F:
+[WAIT]
+[CMD:10][ITEM][CMD:1D]E[END][NAME][CMD:08][CMD:0E]O,,,[CMD:20][ITEM][CMD:1D]E[END][NAME][END]
+(Raw: 02 01 10 50 30 53 20 50 00)
+
+Dialog 0x70:
+[CMD:09];#a[CMD:0F]0[CMD:10][CMD:0B]-a[CMD:0F]X[CMD:10][ITEM] [CMD:2D]-a[CMD:11]es
+[CMD:13]X[ITEM][CMD:09];#a[CMD:11]es
+[CMD:0A]#a[CMD:09]7#[END]
+(Raw: 09 DE F2 B4 0F 90 10 0B FF DA B4 0F B1 10 05 06 2D DA B4 11...)
+
+Dialog 0x71:
+#ight[CMD:2B][CMD:20][CMD:25]αL5.[CMD:0D]you[END][CMD:0D]to[END][END][END]L4.ing##L#rⁿ08[CMD:20]p#[CMD:20][CMD:25]αL5.[CMD:1E]L4.[CMD:08]!Θagain÷[CMD:0B][CMD:20][CMD:22]#L[CMD:20][CMD:29]##[CMD:20][CMD:2B]#÷L÷v[ITEM]0##bd6~Pma[CMD:22]el7[END]
+(Raw: 85 52 2B 20 25 87 A5 95 D0 34 A5 94 D0 48 E6 89 A5 89 C5 8A...)
+
+Dialog 0x72:
+yfrozenuntiltheCrystalofWatershinesagain,[TEXTBOX_ABOVE][END]
+(Raw: 59 B9 C5 C2 CD 56 FF C8 C1 C7 BC 49 41 3D FF 5A B0 B4 C7 6A...)
+
+Dialog 0x73:
+Fesp't#[CMD:20]o[CMD:10][CMD:20][CMD:09]#TV[NAME][CMD:29][CMD:20]#[CMD:08]#[END]
+(Raw: 9F 60 C3 7E E2 20 C2 10 20 09 FB AD AF 04 29 20 F0 08 F6 00)
+
+Dialog 0x74:
+me,,,
+Justashed,,,did
+thet,t,,,trees'[CMD:08]haΦ[CMD:2A]thatyou~youthatyou[END]
+(Raw: C0 B8 53 01 A3 6D B4 45 BB 40 B7 53 B7 BC B7 01 41 C7 D2 C7...)
+
+
+Exported 117 dialogs to data/extracted_dialogs.json

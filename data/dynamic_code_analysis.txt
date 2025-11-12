@@ -1,0 +1,586 @@
+================================================================================
+Dynamic Insertion Code Analysis Report
+Final Fantasy Mystic Quest - Control Codes 0x10-0x1E
+================================================================================
+
+## Overview
+
+Total dialogs analyzed: 117
+Codes analyzed: 0x10-0x1E (15 codes)
+
+## Code Frequency Summary
+
+| Code | Name | Count | Dialogs | Coverage |
+|------|------|-------|---------|----------|
+| 0x10 | ITEM_NAME | 55 | 36 | 30.8% |
+| 0x11 | SPELL_NAME | 27 | 15 | 12.8% |
+| 0x12 | MONSTER_NAME | 19 | 16 | 13.7% |
+| 0x13 | CHARACTER_NAME | 17 | 17 | 14.5% |
+| 0x14 | LOCATION_NAME | 8 | 8 | 6.8% |
+| 0x15 | NUMBER_VALUE | 0 | 0 | 0.0% |
+| 0x16 | OBJECT_NAME | 12 | 7 | 6.0% |
+| 0x17 | WEAPON_NAME | 1 | 1 | 0.9% |
+| 0x18 | ARMOR_NAME | 20 | 18 | 15.4% |
+| 0x19 | ACCESSORY_NAME | 0 | 0 | 0.0% |
+| 0x1A | POSITION_Y | 0 | 0 | 0.0% |
+| 0x1B | POSITION_X | 0 | 0 | 0.0% |
+| 0x1C | UNKNOWN_1C | 3 | 3 | 2.6% |
+| 0x1D | UNKNOWN_1D | 25 | 21 | 17.9% |
+| 0x1E | UNKNOWN_1E | 10 | 10 | 8.5% |
+
+## Detailed Code Analysis
+
+--------------------------------------------------------------------------------
+### Code 0x10: ITEM_NAME
+
+**Occurrences**: 55
+**Dialogs**: 36 (0x01, 0x03, 0x0A, 0x13, 0x16, 0x18, 0x1A, 0x22, 0x23, 0x26...)
+
+**Common preceding text**:
+  - "]#[CMD:22]#[CMD:2E]#" (5x)
+  - "#t" (4x)
+  - "[CMD:0B]-a[CMD:0F]X" (3x)
+  - "[CMD:14]" (3x)
+  - "X_ABOVE][CMD:27]~you" (2x)
+
+**Common following text**:
+  - "[ASTERISK]l[TEXTBOX_" (7x)
+  - "[CMD:1D][END][ITEM]e" (6x)
+  - "[ITEM] [CMD:2D]-a[CM" (5x)
+  - "[ITEM][CMD:1D]E[END]" (5x)
+  - "[CMD:0B][END]" (3x)
+
+**Example contexts** (first 5):
+
+1. Dialog 0x01:
+   ```
+   ITEM][CMD:08]"é[ITEM][ITEM][CMD:18][END][CMD:10][CMD:08][TEXTBOX_BELOW][CMD:0C][CMD:0D][
+   ```
+
+2. Dialog 0x03:
+   ```
+   [CMD:0B]-a[CMD:0F]X[CMD:10][ITEM] [CMD:2D]-a[CMD:11]es
+[CMD:13]X[IT
+   ```
+
+3. Dialog 0x0A:
+   ```
+   [CMD:14][CMD:10][CMD:0B][END]
+   ```
+
+4. Dialog 0x13:
+   ```
+   #t[CMD:10][ASTERISK]l[TEXTBOX_BELOW]ingP[END]
+   ```
+
+5. Dialog 0x16:
+   ```
+   #'#'[CMD:0A]#[CMD:16]#[CMD:22]#[CMD:2E]#[CMD:10][CMD:1D][END][ITEM]es[END]
+[CMD:12]is
+#i
+   ```
+
+--------------------------------------------------------------------------------
+### Code 0x11: SPELL_NAME
+
+**Occurrences**: 27
+**Dialogs**: 15 (0x03, 0x12, 0x18, 0x21, 0x27, 0x2A, 0x2D, 0x31, 0x41, 0x4A...)
+
+**Common preceding text**:
+  - "3]X[ITEM][CMD:09];#a" (11x)
+  - "10][ITEM] [CMD:2D]-a" (5x)
+  - "[ITEM] [CMD:2D]-a" (5x)
+  - "#[CMD:10]" (1x)
+  - "[CMD:11]" (1x)
+
+**Common following text**:
+  - "es
+[CMD:13]X[ITEM][C" (11x)
+  - "es
+[CMD:0A]#a[CMD:09" (11x)
+  - "is
+[ITEM]t[WAIT][AST" (1x)
+  - "[CMD:11][CMD:08][END" (1x)
+  - "[CMD:08][END]" (1x)
+
+**Example contexts** (first 5):
+
+1. Dialog 0x03:
+   ```
+   :0B]-a[CMD:0F]X[CMD:10][ITEM] [CMD:2D]-a[CMD:11]es
+[CMD:13]X[ITEM][CMD:09];#a[CMD:11]es
+
+   ```
+
+2. Dialog 0x03:
+   ```
+   ]-a[CMD:11]es
+[CMD:13]X[ITEM][CMD:09];#a[CMD:11]es
+[CMD:0A]#a[CMD:09]7#[END]
+   ```
+
+3. Dialog 0x12:
+   ```
+   [ITEM] [CMD:2D]-a[CMD:11]es
+[CMD:13]X[ITEM][CMD:09];#a[CMD:11]es
+
+   ```
+
+4. Dialog 0x12:
+   ```
+   ]-a[CMD:11]es
+[CMD:13]X[ITEM][CMD:09];#a[CMD:11]es
+[CMD:0A]#a[CMD:09]7#[END]
+   ```
+
+5. Dialog 0x18:
+   ```
+   #[CMD:10][CMD:11]is
+[ITEM]t[WAIT][ASTERISK][CMD:12][CMD:2
+   ```
+
+--------------------------------------------------------------------------------
+### Code 0x12: MONSTER_NAME
+
+**Occurrences**: 19
+**Dialogs**: 16 (0x06, 0x0F, 0x16, 0x18, 0x1A, 0x1E, 0x23, 0x33, 0x36, 0x37...)
+
+**Common preceding text**:
+  - "][END][ITEM]es[END]" (6x)
+  - "to[CMD:23]" (1x)
+  - "EM]t[WAIT][ASTERISK]" (1x)
+  - "[CMD:10]teto[CMD:23]" (1x)
+  - "[CMD:0B]kz[CMD:2A]" (1x)
+
+**Common following text**:
+  - "is
+#ing#on#es#ack#mo" (5x)
+  - "[CMD:23]ea[CMD:2B][I" (2x)
+  - "[CMD:0E]#you[END]" (2x)
+  - "[CMD:2A][END]" (1x)
+  - "[CMD:27][CMD:08][CMD" (1x)
+
+**Example contexts** (first 5):
+
+1. Dialog 0x06:
+   ```
+   to[CMD:23][CMD:12][CMD:23]ea[CMD:2B][ITEM][CMD:1D]E[END][N
+   ```
+
+2. Dialog 0x0F:
+   ```
+   [CMD:12][CMD:0E]#you[END]
+   ```
+
+3. Dialog 0x16:
+   ```
+   :2E]#[CMD:10][CMD:1D][END][ITEM]es[END]
+[CMD:12]is
+#ing#on#es#ack#monst#ü#8#M#a#o#.#;###
+   ```
+
+4. Dialog 0x18:
+   ```
+   MD:10][CMD:11]is
+[ITEM]t[WAIT][ASTERISK][CMD:12][CMD:2A][END]
+   ```
+
+5. Dialog 0x1A:
+   ```
+   :2E]#[CMD:10][CMD:1D][END][ITEM]es[END]
+[CMD:12]is
+#ing#on#es#ack#monst#ü#8#M#a#o#.#;###
+   ```
+
+--------------------------------------------------------------------------------
+### Code 0x13: CHARACTER_NAME
+
+**Occurrences**: 17
+**Dialogs**: 17 (0x03, 0x12, 0x16, 0x1A, 0x21, 0x23, 0x27, 0x2D, 0x31, 0x37...)
+
+**Common preceding text**:
+  - "CMD:2D]-a[CMD:11]es" (11x)
+  - ".[CMD:20]'o'[CMD:2E]" (5x)
+  - "22]you[CMD:20]onZyou" (1x)
+
+**Common following text**:
+  - "X[ITEM][CMD:09];#a[C" (11x)
+  - "I'mi[CMD:0F]ö[CMD:0E" (5x)
+  - "twaououto[CMD:08]!éy" (1x)
+
+**Example contexts** (first 5):
+
+1. Dialog 0x03:
+   ```
+   0F]X[CMD:10][ITEM] [CMD:2D]-a[CMD:11]es
+[CMD:13]X[ITEM][CMD:09];#a[CMD:11]es
+[CMD:0A]#a[
+   ```
+
+2. Dialog 0x12:
+   ```
+   [ITEM] [CMD:2D]-a[CMD:11]es
+[CMD:13]X[ITEM][CMD:09];#a[CMD:11]es
+[CMD:0A]#a[
+   ```
+
+3. Dialog 0x16:
+   ```
+   CMD:08]!é.e.ight.5.u.[CMD:20]'o'[CMD:2E][CMD:13]I'mi[CMD:0F]ö[CMD:0E][ITEM][CMD:09][END]
+   ```
+
+4. Dialog 0x1A:
+   ```
+   CMD:08]!é.e.ight.5.u.[CMD:20]'o'[CMD:2E][CMD:13]I'mi[CMD:0F]ö[CMD:0E][ITEM][CMD:09][END]
+   ```
+
+5. Dialog 0x21:
+   ```
+   [ITEM] [CMD:2D]-a[CMD:11]es
+[CMD:13]X[ITEM][CMD:09];#a[CMD:11]es
+[CMD:0A]#a[
+   ```
+
+--------------------------------------------------------------------------------
+### Code 0x14: LOCATION_NAME
+
+**Occurrences**: 8
+**Dialogs**: 8 (0x0A, 0x0D, 0x1C, 0x26, 0x3D, 0x55, 0x61, 0x62...)
+
+**Common preceding text**:
+  - "f[CMD:0F]es" (2x)
+  - "[CMD:18]stGll#GT" (1x)
+  - "E]O [CMD:18]stGll#GT" (1x)
+
+**Common following text**:
+  - "[CMD:10][CMD:0B][END" (3x)
+  - "[CMD:0B][END]" (2x)
+  - "t[CMD:26][END][END]i" (2x)
+  - "[ITEM][CMD:0E]usta[C" (1x)
+
+**Example contexts** (first 5):
+
+1. Dialog 0x0A:
+   ```
+   [CMD:14][CMD:10][CMD:0B][END]
+   ```
+
+2. Dialog 0x0D:
+   ```
+   f[CMD:0F]es
+[CMD:14]
+[CMD:0B][END]
+   ```
+
+3. Dialog 0x1C:
+   ```
+   f[CMD:0F]es
+[CMD:14]
+[CMD:0B][END]
+   ```
+
+4. Dialog 0x26:
+   ```
+   [CMD:14][ITEM][CMD:0E]usta[CMD:10]ll[END]
+   ```
+
+5. Dialog 0x3D:
+   ```
+   [CMD:18]stGll#GT[CMD:14]t[CMD:26][END][END]ieli~iöjank[CMD:0E]l[
+   ```
+
+--------------------------------------------------------------------------------
+### Code 0x16: OBJECT_NAME
+
+**Occurrences**: 12
+**Dialogs**: 7 (0x09, 0x16, 0x1A, 0x23, 0x32, 0x37, 0x66...)
+
+**Common preceding text**:
+  - "8]'k'ö'#'#'[CMD:0A]#" (5x)
+  - "#o#.#;#####[CMD:08]." (5x)
+  - "MD:21]omo?ogp:päq4r#" (1x)
+  - "MD:24][END]
+[CMD:20]" (1x)
+
+**Common following text**:
+  - "#[CMD:22]#[CMD:2E]#[" (5x)
+  - ".[CMD:24].[CMD:08]!é" (5x)
+  - "t#IPst#O[END]" (1x)
+  - "[ITEM][CMD:08]!éFesq" (1x)
+
+**Example contexts** (first 5):
+
+1. Dialog 0x09:
+   ```
+   :27]mNm[CMD:28]n;n[CMD:21]omo?ogp:päq4r#[CMD:16]t#IPst#O[END]
+   ```
+
+2. Dialog 0x16:
+   ```
+   z#z#z[CMD:0A]'[CMD:18]'k'ö'#'#'[CMD:0A]#[CMD:16]#[CMD:22]#[CMD:2E]#[CMD:10][CMD:1D][END]
+   ```
+
+3. Dialog 0x16:
+   ```
+   es#ack#monst#ü#8#M#a#o#.#;#####[CMD:08].[CMD:16].[CMD:24].[CMD:08]!é.e.ight.5.u.[CMD:20]
+   ```
+
+4. Dialog 0x1A:
+   ```
+   z#z#z[CMD:0A]'[CMD:18]'k'ö'#'#'[CMD:0A]#[CMD:16]#[CMD:22]#[CMD:2E]#[CMD:10][CMD:1D][END]
+   ```
+
+5. Dialog 0x1A:
+   ```
+   es#ack#monst#ü#8#M#a#o#.#;#####[CMD:08].[CMD:16].[CMD:24].[CMD:08]!é.e.ight.5.u.[CMD:20]
+   ```
+
+--------------------------------------------------------------------------------
+### Code 0x17: WEAPON_NAME
+
+**Occurrences**: 1
+**Dialogs**: 1 (0x5E...)
+
+**Common preceding text**:
+  - "[NAME][CMD:29]…" (1x)
+
+**Common following text**:
+  - "#[ITEM]#~oO[ITEM]#[C" (1x)
+
+**Example contexts** (first 5):
+
+1. Dialog 0x5E:
+   ```
+   [NAME][CMD:29]…[CMD:17]#[ITEM]#~oO[ITEM]#[CMD:09]#C[END]
+   ```
+
+--------------------------------------------------------------------------------
+### Code 0x18: ARMOR_NAME
+
+**Occurrences**: 20
+**Dialogs**: 18 (0x01, 0x10, 0x16, 0x17, 0x1A, 0x1F, 0x23, 0x2B, 0x37, 0x3D...)
+
+**Common preceding text**:
+  - "z#z#z#z#z#z[CMD:0A]'" (5x)
+  - "[ITEM][CMD:0B]the" (4x)
+  - "MD:08]"é[ITEM][ITEM]" (1x)
+  - "[CMD:0B]t" (1x)
+  - "r[CMD:09]s" (1x)
+
+**Common following text**:
+  - "s[CMD:0C][END]" (6x)
+  - "'k'ö'#'#'[CMD:0A]#[C" (5x)
+  - "[END][CMD:10][CMD:08" (2x)
+  - "stGll#GT[CMD:14]t[CM" (2x)
+  - "s[TEXTBOX_BELOW]sust" (1x)
+
+**Example contexts** (first 5):
+
+1. Dialog 0x01:
+   ```
+   [ITEM][CMD:08]"é[ITEM][ITEM][CMD:18][END][CMD:10][CMD:08][TEXTBOX_BELOW][CMD
+   ```
+
+2. Dialog 0x10:
+   ```
+   [ITEM][CMD:0B]the[CMD:18]s[CMD:0C][END]
+   ```
+
+3. Dialog 0x16:
+   ```
+   zXzlzxz#z#z#z#z#z#z[CMD:0A]'[CMD:18]'k'ö'#'#'[CMD:0A]#[CMD:16]#[CMD:22]#[CMD
+   ```
+
+4. Dialog 0x17:
+   ```
+   [CMD:0B]t[CMD:18]s[CMD:0C][END]
+   ```
+
+5. Dialog 0x1A:
+   ```
+   zàz5zJzXzlzxz#z#z#z#z#z#z[CMD:0A]'[CMD:18]'k'ö'#'#'[CMD:0A]#[CMD:16]#[CMD:22]#[CMD
+   ```
+
+--------------------------------------------------------------------------------
+### Code 0x1C: UNKNOWN_1C
+
+**Occurrences**: 3
+**Dialogs**: 3 (0x30, 0x34, 0x42...)
+
+**Common preceding text**:
+  - "#o[CMD:08]~#[CMD:23]" (2x)
+  - "o[CMD:08]~#[CMD:23]" (1x)
+
+**Common following text**:
+  - "[CMD:2B];[CMD:2A][CM" (3x)
+
+**Example contexts** (first 5):
+
+1. Dialog 0x30:
+   ```
+   o[CMD:08]~#[CMD:23][CMD:1C][CMD:2B];[CMD:2A][CMD:28][CMD:27]youto[C
+   ```
+
+2. Dialog 0x34:
+   ```
+   [ITEM][CMD:0D][NAME]#o[CMD:08]~#[CMD:23][CMD:1C][CMD:2B];[CMD:2A][CMD:28][CMD:27]youto[C
+   ```
+
+3. Dialog 0x42:
+   ```
+   [ITEM][CMD:0D][NAME]#o[CMD:08]~#[CMD:23][CMD:1C][CMD:2B];[CMD:2A][CMD:28][CMD:27]youto[C
+   ```
+
+--------------------------------------------------------------------------------
+### Code 0x1D: UNKNOWN_1D
+
+**Occurrences**: 25
+**Dialogs**: 21 (0x06, 0x11, 0x16, 0x1A, 0x20, 0x23, 0x29, 0x2C, 0x2F, 0x33...)
+
+**Common preceding text**:
+  - "2]#[CMD:2E]#[CMD:10]" (5x)
+  - "[WAIT]an[ITEM][ITEM]" (4x)
+  - "WAIT]
+[CMD:10][ITEM]" (3x)
+  - "E]O,,,[CMD:20][ITEM]" (3x)
+  - ":23]ea[CMD:2B][ITEM]" (2x)
+
+**Common following text**:
+  - "[END][ITEM]es[END]
+[" (6x)
+  - "E[END]" (4x)
+  - "E[END][NAME][CMD:08]" (3x)
+  - "E[END][NAME][END]" (3x)
+  - "E[END][NAME][CMD:23]" (2x)
+
+**Example contexts** (first 5):
+
+1. Dialog 0x06:
+   ```
+   [CMD:23][CMD:12][CMD:23]ea[CMD:2B][ITEM][CMD:1D]E[END][NAME][CMD:23][WAIT][CMD:2B][CMD:0
+   ```
+
+2. Dialog 0x11:
+   ```
+   d[WAIT].[ASTERISK]'s[WAIT]an[ITEM][ITEM][CMD:1D]E[END]
+   ```
+
+3. Dialog 0x16:
+   ```
+   :0A]#[CMD:16]#[CMD:22]#[CMD:2E]#[CMD:10][CMD:1D][END][ITEM]es[END]
+[CMD:12]is
+#ing#on#es
+   ```
+
+4. Dialog 0x1A:
+   ```
+   :0A]#[CMD:16]#[CMD:22]#[CMD:2E]#[CMD:10][CMD:1D][END][ITEM]es[END]
+[CMD:12]is
+#ing#on#es
+   ```
+
+5. Dialog 0x20:
+   ```
+   d[WAIT].[ASTERISK]'s[WAIT]an[ITEM][ITEM][CMD:1D]E[END]
+   ```
+
+--------------------------------------------------------------------------------
+### Code 0x1E: UNKNOWN_1E
+
+**Occurrences**: 10
+**Dialogs**: 10 (0x1B, 0x23, 0x28, 0x40, 0x44, 0x49, 0x51, 0x67, 0x69, 0x71...)
+
+**Common preceding text**:
+  - "[CMD:20][CMD:25]àL5." (4x)
+  - "]!éyou[CMD:20][ITEM]" (2x)
+  - "atight[CMD:10][ITEM]" (2x)
+  - "_BELOW]sustssz[ITEM]" (1x)
+
+**Common following text**:
+  - "L4.[CMD:08]!éagainö[" (4x)
+  - "E[END][NAME][TEXTBOX" (2x)
+  - "E[END][NAME][CMD:08]" (2x)
+  - "E[END][NAME]zhazI'll" (1x)
+  - "[END]" (1x)
+
+**Example contexts** (first 5):
+
+1. Dialog 0x1B:
+   ```
+   ng##L#rü08[CMD:20]p#[CMD:20][CMD:25]àL5.[CMD:1E]L4.[CMD:08]!éagainö[CMD:0B][CMD:20][CMD:
+   ```
+
+2. Dialog 0x23:
+   ```
+   9]s[CMD:18]s[TEXTBOX_BELOW]sustssz[ITEM][CMD:1E]E[END][NAME]zhazI'llzwaz'
+zinzàz5zJzXzlz
+   ```
+
+3. Dialog 0x28:
+   ```
+   ng##L#rü08[CMD:20]p#[CMD:20][CMD:25]àL5.[CMD:1E]L4.[CMD:08]!éagainö[CMD:0B][CMD:20][CMD:
+   ```
+
+4. Dialog 0x40:
+   ```
+   08]!és[WAIT]s[CMD:08]!éyou[CMD:20][ITEM][CMD:1E]E[END][NAME][TEXTBOX_BELOW]äThewater'sdr
+   ```
+
+5. Dialog 0x44:
+   ```
+   08]!és[WAIT]s[CMD:08]!éyou[CMD:20][ITEM][CMD:1E]E[END][NAME][TEXTBOX_BELOW]äThewater'sdr
+   ```
+
+--------------------------------------------------------------------------------
+## Dictionary Entry Analysis
+
+### Dictionary Entry 0x50
+
+**Raw bytes**: 05 1D 9E 00 04
+**Decoded**: [ITEM][CMD:1D]E[END][NAME]
+**Pattern**: Insert item name → 0x1D operation → letter E → END → character name
+**Used in dialogs**: 10 (0x06, 0x29, 0x2F, 0x33, 0x38, 0x3C, 0x51, 0x69, 0x6B, 0x6F...)
+
+### Dictionary Entry 0x51
+
+**Raw bytes**: 05 1E 9E 00 04
+**Decoded**: [ITEM][CMD:1E]E[END][NAME]
+**Pattern**: Insert item name → 0x1E operation → letter E → END → character name
+**Used in dialogs**: 5 (0x23, 0x40, 0x44, 0x51, 0x69...)
+
+--------------------------------------------------------------------------------
+## Hypotheses and Conclusions
+
+### Code 0x1D vs 0x1E
+
+Both codes appear in similar dictionary patterns:
+- 0x1D: Used in dictionary 0x50
+- 0x1E: Used in dictionary 0x51
+- Pattern: [ITEM][CMD:XX]E[END][NAME]
+
+**Hypothesis**: These codes control item name display formatting.
+The difference between 0x1D and 0x1E may be:
+- Different text positioning (left vs right aligned)
+- Different capitalization (lowercase 'e' vs uppercase 'E')
+- Different grammatical context (possessive vs nominative)
+
+### Codes 0x10-0x19
+
+Pattern analysis suggests these insert dynamic content:
+- 0x10: Item names (high frequency)
+- 0x11: Spell names (moderate frequency)
+- 0x12: Monster names (moderate frequency)
+- 0x13: Character names (moderate frequency)
+- 0x14: Location names (low frequency)
+- 0x18: Armor names (moderate frequency)
+
+### Next Steps
+
+1. Create ROM test patches to validate hypotheses
+2. Disassemble dialog rendering code at 009DC1-009DD2
+3. Trace jump table for codes 0x10-0x1E
+4. Document confirmed behaviors
+
+================================================================================
+End of Report
+================================================================================
