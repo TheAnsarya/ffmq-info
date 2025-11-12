@@ -1,0 +1,60 @@
+# Sample Dialog Script for FFMQ Dialog Compiler
+# ============================================
+# This is a sample script demonstrating the dialog compiler syntax.
+#
+# Syntax Rules:
+# - [DIALOG N] starts a new dialog with ID N
+# - @TEXTBOX_POSITION sets the textbox position
+# - [CONTROL_CODE] inserts control codes
+# - Regular text is compiled to character codes
+# - Newlines in the script create [NEWLINE] codes
+
+[DIALOG 0]
+@TEXTBOX_BOTTOM
+Welcome to the world of
+Final Fantasy Mystic Quest!
+[WAIT]
+[END]
+
+[DIALOG 1]
+@TEXTBOX_TOP
+What is your name?
+[WAIT]
+[NAME]
+[NEWLINE]
+Nice to meet you!
+[END]
+
+[DIALOG 2]
+@TEXTBOX_MIDDLE
+You received the
+[ITEM] Steel Sword!
+[END]
+
+[DIALOG 3]
+@TEXTBOX_BOTTOM
+This demonstrates the
+dialog compiler system.
+[NEWLINE]
+[NEWLINE]
+It converts human-readable
+text into ROM format!
+[END]
+
+[DIALOG 4]
+@TEXTBOX_TOP
+Control codes:
+[NEWLINE]
+[DELAY] - Add delay
+[WAIT] - Wait for button
+[CLEAR] - Clear textbox
+[END]
+
+[DIALOG 5]
+@TEXTBOX_BOTTOM
+Advanced features:
+[NEWLINE]
+[CMD:08] - Subroutine call
+[CMD:0E] - Memory write
+[CMD:10] - Equipment name
+[END]
