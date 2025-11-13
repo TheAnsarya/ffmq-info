@@ -782,3 +782,26 @@ create a github project for making an `FFMQ Editor UI` where the project and all
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+how to make a AI programming agent have full context understanding of our entire c# project so prompts/queries are fully project-context aware?
+
