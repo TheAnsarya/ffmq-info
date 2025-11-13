@@ -285,7 +285,8 @@
 !map_param_1        = $0e8c     ; Map/movement parameter 1
 !map_param_2        = $0e8d     ; Map/movement parameter 2 (encounter status, pathfinding mode)
 !tilemap_index      = $0e89     ; Tilemap indexing variable (alias for !player_map_x)
-!tilemap_counter    = $0e91     ; Tilemap operation counter
+!tilemap_counter    = $0e91     ; Tilemap operation counter / Current battle map ID in battle context
+!battle_map_id      = $0e91     ; Current battle map/area ID - alias for !tilemap_counter
 
 !tilemap_wram_source_start_2    = $0900     ; Tilemap source start 2 (legacy label)
 !ram_0900                       = $0900     ; Legacy label

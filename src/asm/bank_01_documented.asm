@@ -405,7 +405,7 @@ Battle_MainLoop:
 	jsr.w Battle_InitEnemyAI ; Initialize enemy AI
 
 ; Load enemy stats
-	lda.w $0e91	 ; Get enemy type
+	lda.w !battle_map_id	 ; Get battle map / enemy context
 	sta.w !battle_current_enemy	 ; Store current enemy
 
 	ldx.w $0e89	 ; Get enemy stats pointer
@@ -4961,7 +4961,7 @@ BattleDMA_AlternateEntry:
 BattleMem_ManagementEngine:
 	lda.b #$00	  ;01B4D6|A900    |      ;
 	xba ;01B4D8|EB      |      ;
-	lda.w $0e91	 ;01B4D9|AD910E  |010E91;
+	lda.w !battle_map_id	 ;01B4D9|AD910E  |010E91;
 	tax ;01B4DC|AA      |      ;
 	lda.l DATA8_06be77,x ;01B4DD|BF77BE06|06BE77;
 	bmi .Complete   ;01B4E1|301C    |01B4E3;
@@ -5046,7 +5046,7 @@ BattleEffect_AdvancedProcessor:
 	lda.b #$00	  ;01B545|A900    |      ;
 	sta.w $19f6	 ;01B547|8DF619  |0119F6;
 	xba ;01B54A|EB      |      ;
-	lda.w $0e91	 ;01B54B|AD910E  |010E91;
+	lda.w !battle_map_id	 ;01B54B|AD910E  |010E91;
 	tax ;01B54E|AA      |      ;
 	lda.l DATA8_06be77,x ;01B54F|BF77BE06|06BE77;
 	bmi .Exit	   ;01B553|303A    |01B58F;
@@ -5222,7 +5222,7 @@ BattlePattern_ComplexManager:
 	php ;01B73D|08      |      ;
 	sep #$20		;01B73E|E220    |      ;
 	rep #$10		;01B740|C210    |      ;
-	lda.w $0e91	 ;01B742|AD910E  |010E91;
+	lda.w !battle_map_id	 ;01B742|AD910E  |010E91;
 	beq .Exit	   ;01B745|F00B    |01B752;
 	lda.b #$55	  ;01B747|A955    |      ;
 	sta.w $0e04	 ;01B749|8D040E  |010E04;
@@ -5717,7 +5717,7 @@ BattleAnimation_LoopController:
 	stx.w $1933	 ;01D0D1|8E3319  |011933;
 	sep #$20		;01D0D4|E220    |      ;
 	rep #$10		;01D0D6|C210    |      ;
-	lda.w $0e91	 ;01D0D8|AD910E  |010E91;
+	lda.w !battle_map_id	 ;01D0D8|AD910E  |010E91;
 	cmp.b #$6b	  ;01D0DB|C96B    |      ;
 	bne D006 ;01D0DD|D006    |01D0E5;
 	db $a2,$04,$00,$8e,$31,$19 ;01D0DF|        |      ;
@@ -6855,7 +6855,7 @@ character_battle_processing_system:
 	jsr.w InitializeGraphicsSubsystem ; Initialize character subsystem
 	jsr.w LoadCharacterGraphicsData ; Load character graphics data
 	ldx.w #$0000	; Initialize character index
-	lda.w $0e91	 ; Load current battle map
+	lda.w !battle_map_id	 ; Load current battle map ID
 	cmp.b #$16	  ; Compare with specific map
 	beq .FailedCheck_SuccessCheck ; Branch if matching
 	ldx.w #$0001	; Set alternate character index
@@ -7380,7 +7380,7 @@ battle_state_memory_coordination_system:
 	lda.b #$01	  ; Set battle bank
 	pha ; Push bank to stack
 	plb ; Pull bank from stack
-	lda.w $0e91	 ; Load current battle map
+	lda.w !battle_map_id	 ; Load current battle map ID
 	beq battle_world_map_processing ; Branch if world map
 ; Battle map processing
 	stz.w $194b	 ; Clear battle state flag
@@ -8457,7 +8457,7 @@ Advanced_Battle_Action_Lookup:
 	lda.b #$05	  ; Set battle action data bank
 	pha ; Push bank for switching
 	plb ; Load battle action bank
-	lda.w $0e91	 ; Load battle action environment
+	lda.w !battle_map_id	 ; Load battle map ID / action environment
 	asl a; Shift for action indexing
 	rep #$20		; Set 16-bit mode for action lookup
 	and.w #$00ff	; Mask for action index range
