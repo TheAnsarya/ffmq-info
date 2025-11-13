@@ -707,8 +707,8 @@ make sure to add todo lists and GH issues for all new work! and be sure to refer
 research the unknown sram values and add to editor and document them and also make a UI editor for sram files.
 git commit and push; research any unknown values and generic labels in the disassembly and document findings and fix labels and coment and names in code;
 git commit and push; Week 1: Apply new variable labels globally across all .asm files; research any unknown values and generic labels in the disassembly and document findings and fix labels and coment and names in code;
-turn of all ci/cd and github actions and workflows and turn that shit off, we don't need it right now (maybe later), comment it out
-
+turn off all ci/cd and github actions and workflows and turn that shit off, we don't need it right now (maybe later), comment it out; and then 4,3,2,1
+git commit and push; make sure to add todo lists and GH issues for all new work; update the session/chat logs; make sure to format everything! we use TABS not spaces; implement the changes to make it awesome for as long as you can and use up all the tokens for each session, do not waste my money - use the entire token space; do more per session/prompt; make it as awesome and complete as possible; git commit and push; GOAL:  continue to research, document, and name RAM values and use them in the code; 
 
 
 
