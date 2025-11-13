@@ -711,7 +711,7 @@ DataColors839e:
 ;		copy two sections from WRAM to VRAM through DMA (channel 0)
 ;		each section can have 4 copys
 ; parameters:
-;		@var_1a4c => if $01 then call second copy routine    TODO: verify
+;		!copy_routine_selector ($1a4c) => if $01 then call second copy routine    TODO: verify
 ;		ram $19fa - $1a12 => parameters for first copy
 ;		ram $1a13 - $1a2b => parameters for second copy
 CopyTilemapFromWRAMToVRAM:
@@ -1379,13 +1379,13 @@ Routine01f849:
 
 ; ROUTINE:  ($01f977)
 ; parameters:
-;		@var_192d
+;		!tilemap_x_offset ($192d)
 ; XY => 16bit
 Routine01f977:
 	php					; save processor status
 	%setAto8bit()
 	ldx #$0000			; clear X
-	ldy $192d			; Y => @var_192d
+	ldy $192d			; Y => !tilemap_x_offset
 	jsr $f99f
 	plp					; restore processor status
 	rts				; exit routine
@@ -1401,22 +1401,22 @@ Routine01f977:
 ; ROUTINE:  ($01f985)
 ;
 ; parameters:
-;		@var_0e89 =>
-;		@var_19b4 =>
-;		@var_19d7 =>
-;		@var_1a52 =>
+;		!player_map_x ($0e89)
+;		!graphics_mode_flags ($19b4)
+;		!graphics_index ($19d7)
+;		!graphics_param ($1a52)
 ; A => 8bit, XY => 16bit
 ; TODO: name this routine!!!!!!
 Routine01f985:
 
 ; get offset into JumpTableTilemapCopySetup[]
-	lda $19d7			; load @var_19d7
+	lda $19d7			; load !graphics_index
 	asl a
 	%setAto16bit()
 	and #$0006
-	tax					; x => (lower 2 bits of @var_19d7) * 2
+	tax					; x => (lower 2 bits of !graphics_index) * 2
 
-	lda $0e89			; load @var_0e89
+	lda $0e89			; load !player_map_x
 	%setAto8bit()
 	clc
 	adc $88c4,x
@@ -1440,7 +1440,7 @@ Routine01f985_Entry:
 	01f9a5 sty !ram_1a2d
 
 	ldy #$0000
-	sty $1a2f			; clear @var_1a2f
+	sty $1a2f			; clear !dma_offset
 
 	lda !ram_19b4
 	asl a
@@ -1448,10 +1448,10 @@ Routine01f985_Entry:
 	asl a
 	asl a
 	and #$80
-	sta !ram_1a33			; !ram_1a33 => (bit 3 of @var_19b4 = 1) ? $80 : $00
+	sta !ram_1a33			; !ram_1a33 => (bit 3 of !graphics_mode_flags = 1) ? $80 : $00
 
 	lda $1a52
-	sta !ram_1a34			; !ram_1a34 => @var_1a52
+	sta !ram_1a34			; !ram_1a34 => !graphics_param
 
 	phx					; save X
 	jsr (JumpTableTilemapCopySetup,x)
@@ -1926,7 +1926,7 @@ TilemapCopySetupVertical_2:
 ;		A =>
 ;		Y =>
 ;		!ram_1924 =>
-;		@var_1a2f =>
+;		!dma_offset ($1a2f) =>
 ;		!ram_1a34 =>
 ;		$7f8000[] =>
 ;		$7fcef4[] =>
@@ -1936,7 +1936,7 @@ TilemapCopySetupVertical_2:
 ; A => 8bit, XY => 16bit
 ; TODO: name this routine!!!!!!!!!!
 Routine01fc8e:
-	sta $1a3a			; @var_1a3a => A
+	sta $1a3a			; !temp_accumulator => A
 
 ; multiply Y.high * !ram_1924
 	%setAto16bit()
@@ -1953,13 +1953,13 @@ Routine01fc8e:
 	clc
 	adc $4216			; A => A + multiplication result
 	clc
-	adc $1a2f			; A => A + @var_1a2f
+	adc $1a2f			; A => A + !dma_offset
 	tax					; X => A
 
 	lda #$0000
 	%setAto8bit()
 	lda $7f8000,x		; A => $7f8000[X]
-	eor $1a3a			; A => A xor @var_1a3a
+	eor $1a3a			; A => A xor !temp_accumulator
 	bpl .Skip
 	lda #$80			; if result < 0, use $80
 
@@ -1971,21 +1971,21 @@ Routine01fc8e:
 	asl a				; A => A * 4
 	tax					; X => A
 	lda $7fcef4,x
-	sta $1a35			; @var_1a35 => $7fcef4[x]
+	sta $1a35			; !tile_data_temp_1 => $7fcef4[x]
 	lda $7fcef6,x
-	sta $1a37			; @var_1a35[2] => $7fcef4[x+2]
+	sta $1a37			; !tile_data_temp_2 => $7fcef4[x+2]
 	%setAto8bit()
 
 	tyx					; X => Y
 	lda $7fd0f4,x
-	sta $1a39			; @var_1a39 => $7fcef4[x]
-	sta $1a3c			; @var_1a3c => $7fcef4[x]
+	sta $1a39			; !tile_lookup_value => $7fcef4[x]
+	sta $1a3c			; !tile_data_copy => $7fcef4[x]
 	bpl .Skip2
 
 	and #$70			; bits 4-6
 	lsr a
 	lsr a				; A => A / 4
-	sta $1a3b			; @var_1a3b => A
+	sta $1a3b			; !tile_calc_result => A
 
 	.Skip2
 	%setXYto8bit()
@@ -1994,9 +1994,9 @@ Routine01fc8e:
 	txy					; loop counter
 	.Loop {
 	lda $1a35,y
-	sta $1a3d,x			; @var_1a35[Y]
+	sta $1a3d,x			; !tile_data_array[Y]
 	phx					; save X
-	tax					; X => @var_1a35[Y]
+	tax					; X => !tile_data_array[Y]
 
 ; move bit 1 to bit 6 and clear other bits TODO: WRONG
 	lsr $1a3c			; A => A / 2
@@ -2005,21 +2005,21 @@ Routine01fc8e:
 	and #$40			; bit 6
 	xba					; save for later
 
-	lda $1a39			; load @var_1a39
+	lda $1a39			; load !tile_lookup_value
 	bmi .Skip3			; skip if negative
 
 	lda $7ff274,x
 	asl a
 	asl a
-	sta $1a3b			; @var_1a3b => $7ff274[X] * 4
+	sta $1a3b			; !tile_calc_result => $7ff274[X] * 4
 
 	.Skip3
 	xba					; swap in saved byte
 	plx					; restore X
 
 	ora !ram_1a34		; OR in !ram_1a34
-	ora $1a3b			; OR in @var_1a3b
-	sta $1a3e,x			; @var_1a3d[][X+1] => A
+	ora $1a3b			; OR in !tile_calc_result
+	sta $1a3e,x			; !tile_data_array[X+1] => A
 
 	inx
 	inx					; loop offset += 2
@@ -2091,12 +2091,12 @@ DataCalculateTilemapVramDestination_Offset:
 
 
 ; ROUTINE:  ($01fd50)
-;		Y.high => (Y.high < 0) ? (Y.high + @var_1925) : (Y.high - @var_1925)
+;		Y.high => (Y.high < 0) ? (Y.high + !ram_1925) : (Y.high - !ram_1925)
 ;		Y.low => (Y.low < 0) ? (Y.low + !ram_1924) : (Y.low - !ram_1924)
 ; parameters:
 ;		Y =>
 ;		!ram_1924 =>
-;		@var_1925 =>
+;		!ram_1925 =>
 ; returns:
 ;		Y =>
 ; TODO: Name this routine!!!!!!!!!
@@ -2151,17 +2151,17 @@ Routine01fd50:
 ; ROUTINE: Copy tile data to WRAM ($01fd7b)
 ;		Copies two sets of tiles into WRAM
 ;			1. destination => $7f:d274-‭$7f:f273‬ in $400 byte chunks
-;				when @var_control is negative, the chunk is all $00
-;				else, copy tiles from source address offset => $05:8c80 + ($0300 * @var_control)
+;				when map_chunk_control is negative, the chunk is all $00
+;				else, copy tiles from source address offset => $05:8c80 + ($0300 * map_chunk_control)
 ;			2. destination => $7f:f274-$7f:f373 in $20 byte chunks
-;				source address offset => $05:f280 + (@var_control * $10)
+;				source address offset => $05:f280 + (map_chunk_control * $10)
 ;				bottom 3 bits of each source nibble (low then high) becomes output byte
 ;					so $42 => $02 $04
 ;					and $ca => $02 $04
 ;				TODO: are these tiles?
 ;		(for certain maps, like first map "Level Forest") TODO: what all calls this?
 ; parameters:
-;		ram $191a-1921 => values for @var_control
+;		ram $191a-1921 => values for !map_chunk_control
 ; A is 8bit
 ; TODO: better label?
 CopyTileDataToWRAM:
@@ -2292,23 +2292,23 @@ CopyTileDataToWRAM:
 ; ROUTINE:  ($01ffc1)
 ;
 ; parameters:
-;		@var_0e89
-;		@var_0e8a
+;		!player_map_x ($0e89)
+;		!player_map_y ($0e8a)
 ; A => 8bit, XY => 16bit
 ; TODO: Name this routine!!!!!!!!!
 
 Routine01ffc1:
 ;
-	lda $0e89			; load @var_0e89
+	lda $0e89			; load !player_map_x
 	sec
 	sbc #$08
-	sta $192d			; @var_192d => @var_0e89 - $8
+	sta $192d			; !tilemap_x_offset => !player_map_x - $8
 
 ;
-	lda $0e8a			; load @var_0e8a
+	lda $0e8a			; load !player_map_y
 	sec
 	sbc #$06
-	sta $192e			; @var_192e => @var_0e8a - $6
+	sta $192e			; !tilemap_y_offset => !player_map_y - $6
 
 ;
 	ldx #$000f
@@ -2321,7 +2321,7 @@ Routine01ffc1:
 	phx					; save counter
 	01ffe0 jsr $f977
 	jsr CopyTilemapFromWRAMToVRAM
-	inc $192e			; increment @var_192e
+	inc $192e			; increment !tilemap_y_offset
 
 	plx					; restore counter
 	stx !ram_19bf			; !ram_19bf => counter
@@ -2492,21 +2492,21 @@ Data07f7c3:
 ; TODO: rename!!!!!!!!
 Routine0b8149:
 ; setup variables
-	stz $19f6			; @var_19f6 => $00
+	stz $19f6			; !map_param_zero => $00
 	lda #$80
 	sta !ram_19a5			; @var_19a5 => $80
 	lda #$01
-	sta $1a45			; @var_1a45 => $01
-	ldx $19f1			; load @var_19f1
-	stx $0e89			; @var_0e89 => @var_19f1
-	lda $19f0			; load @var_19f0
-	sta $0e91			; @var_0e91 => @var_19f0
-	bne .IsZero			; if @var_19f0 is $0000
+	sta $1a45			; !graphics_init_flag => $01
+	ldx $19f1			; load !map_param_2
+	stx $0e89			; !player_map_x => !map_param_2
+	lda $19f0			; load !map_param_1
+	sta $0e91			; !tilemap_counter => !map_param_1
+	bne .IsZero			; if !map_param_1 is $0000
 
 	lda #$f2
-	jsl TRBWithBitMaskTo0ea8		; set @var_0ec6 =>
+	jsl TRBWithBitMaskTo0ea8		; set DMA control flags
 
-	stz $1a5b			; @var_1a5b => $00
+	stz $1a5b			; !temp_zero_flag => $00
 
 	lda $0e88			; load @var_0e88
 	%setAto16bit()
@@ -2515,13 +2515,13 @@ Routine0b8149:
 	asl a
 	tax
 	lda Data07f7c3,x
-	sta $0e89			; @var_0e89 =>
+	sta $0e89			; !player_map_x =>
 	%setAto8bit()
 	lda #$f3
 	jsl ANDBitMaskAnd0ea8ToA
 	bne .IsZero
 	lda #$02
-	sta $0e8b			; @var_0e89 => $02
+	sta $0e8b			; !player_map_x (wrong offset comment) => $02
 
 ; clear $0ec8-$0ee7 and $0f28-$0f47
 	ldx #$0000
