@@ -1911,7 +1911,7 @@ BattleChar_DataLoadCoordinator:
 	sta.b $25,x	 ;01A0F5|9525    |001A87;
 	sep #$20		;01A0F7|E220    |      ;
 	lda.b $1e,x	 ;01A0F9|B51E    |001A80;
-	eor.w $19b4	 ;01A0FB|4DB419  |0119B4;
+	eor.w !battle_animation_timer	 ;01A0FB|4DB419  |0119B4;
 	bit.b #$08	  ;01A0FE|8908    |      ;
 	beq F003 ;01A100|F003    |01A105;
 	jmp.w Sub_01A186 ;01A102|4C86A1  |01A186;
@@ -2101,14 +2101,14 @@ BattleChar_AttributeController:
 	sep #$20		;01A228|E220    |      ;
 	rep #$10		;01A22A|C210    |      ;
 	ldx.w #$ffff	;01A22C|A2FFFF  |      ;
-	stx.w $19de	 ;01A22F|8EDE19  |0119DE;
-	stx.w $19e0	 ;01A232|8EE019  |0119E0;
-	lda.w $1914	 ;01A235|AD1419  |011914;
+	stx.w !battle_ptr_1_lo	 ;01A22F|8EDE19  |0119DE;
+	stx.w !battle_ptr_2_lo	 ;01A232|8EE019  |0119E0;
+	lda.w !battle_param_1	 ;01A235|AD1419  |011914;
 	bit.b #$20	  ;01A238|8920    |      ;
 	beq F02b ;01A23A|F02B    |01A267;
 	lda.b #$00	  ;01A23C|A900    |      ;
 	xba ;01A23E|EB      |      ;
-	lda.w $1913	 ;01A23F|AD1319  |011913;
+	lda.w !battle_loop_counter	 ;01A23F|AD1319  |011913;
 	and.b #$0f	  ;01A242|290F    |      ;
 	asl a;01A244|0A      |      ;
 	tax ;01A245|AA      |      ;
@@ -2118,14 +2118,14 @@ BattleChar_AttributeController:
 	tax ;01A24C|AA      |      ;
 	rep #$30		;01A24D|C230    |      ;
 	lda.l DATA8_0cd686,x ;01A24F|BF86D60C|0CD686;
-	sta.w $19de	 ;01A253|8DDE19  |0119DE;
+	sta.w !battle_ptr_1_lo	 ;01A253|8DDE19  |0119DE;
 	plx ;01A256|FA      |      ;
 	lda.l UNREACH_0CD667,x ;01A257|BF67D60C|0CD667;
 	and.w #$000f	;01A25B|290F00  |      ;
 	asl a;01A25E|0A      |      ;
 	tax ;01A25F|AA      |      ;
 	lda.l DATA8_0cd727,x ;01A260|BF27D70C|0CD727;
-	sta.w $19e0	 ;01A264|8DE019  |0119E0;
+	sta.w !battle_ptr_2_lo	 ;01A264|8DE019  |0119E0;
 
 ; ==============================================================================
 ; Sound Channel Buffer Initialization
@@ -2167,7 +2167,7 @@ BattleAudio_ProcessPrimaryChannel_1:
 	phd ;01A2A8|0B      |      ;
 	sep #$20		;01A2A9|E220    |      ;
 	rep #$10		;01A2AB|C210    |      ;
-	lda.w $19df	 ;01A2AD|ADDF19  |0119DF;
+	lda.w !battle_ptr_1_hi	 ;01A2AD|ADDF19  |0119DF;
 	cmp.b #$ff	  ;01A2B0|C9FF    |      ;
 	beq .Exit_PrimaryChannel ;01A2B2|F015    |01A2C9;
 	pea.w $1cd7	 ;01A2B4|F4D71C  |011CD7;
@@ -2176,7 +2176,7 @@ BattleAudio_ProcessPrimaryChannel_1:
 	sty.b $06	   ;01A2BB|8406    |001CDD;
 	ldx.w #$0000	;01A2BD|A20000  |      ;
 	stx.b $00	   ;01A2C0|8600    |001CD7;
-	ldx.w $19de	 ;01A2C2|AEDE19  |0119DE;
+	ldx.w !battle_ptr_1_lo	 ;01A2C2|AEDE19  |0119DE;
 	stx.b $02	   ;01A2C5|8602    |001CD9;
 	bpl .ProcessLoop_Primary ;01A2C7|1004    |01A2CD;
 
@@ -2274,7 +2274,7 @@ BattleAudio_ProcessSecondaryChannel_1:
 	phd ;01A34D|0B      |      ;
 	sep #$20		;01A34E|E220    |      ;
 	rep #$10		;01A350|C210    |      ;
-	lda.w $19e1	 ;01A352|ADE119  |0119E1;
+	lda.w !battle_ptr_2_hi	 ;01A352|ADE119  |0119E1;
 	cmp.b #$ff	  ;01A355|C9FF    |      ;
 	beq .Exit_SecondaryChannel ;01A357|F015    |01A36E;
 	pea.w $1cd7	 ;01A359|F4D71C  |011CD7;
@@ -2283,7 +2283,7 @@ BattleAudio_ProcessSecondaryChannel_1:
 	sty.b $06	   ;01A360|8406    |001CDD;
 	ldx.w #$0000	;01A362|A20000  |      ;
 	stx.b $00	   ;01A365|8600    |001CD7;
-	ldx.w $19e0	 ;01A367|AEE019  |0119E0;
+	ldx.w !battle_ptr_2_lo	 ;01A367|AEE019  |0119E0;
 	stx.b $02	   ;01A36A|8602    |001CD9;
 	bpl .ProcessLoop_Secondary ;01A36C|1004    |01A372;
 
@@ -2379,7 +2379,7 @@ BattleAnimation_MainController_1:
 	php ;01A3F0|08      |      ;
 	phb ;01A3F1|8B      |      ;
 	rep #$30		;01A3F2|C230    |      ;
-	lda.w $19b9	 ;01A3F4|ADB919  |0119B9;
+	lda.w !source_pointer	 ;01A3F4|ADB919  |0119B9;
 	bmi .Exit_MainController ;01A3F7|3008    |01A401;
 	sep #$20		;01A3F9|E220    |      ;
 	jsr.w Sub_01A423 ;01A3FB|2023A4  |01A423;
@@ -2399,7 +2399,7 @@ BattleAnimation_ExtendedHandler_1:
 	php ;01A404|08      |      ;
 	phb ;01A405|8B      |      ;
 	rep #$30		;01A406|C230    |      ;
-	lda.w $19b9	 ;01A408|ADB919  |0119B9;
+	lda.w !source_pointer	 ;01A408|ADB919  |0119B9;
 	bmi .Exit_ExtendedHandler ;01A40B|3013    |01A420;
 	sep #$20		;01A40D|E220    |      ;
 	jsr.w Sub_01A423 ;01A40F|2023A4  |01A423;
@@ -2422,7 +2422,7 @@ BattleAnimation_ExtendedHandler_1:
 BattleGraphics_PreparationSystem_1:
 	rep #$30		;01A423|C230    |      ;
 	phd ;01A425|0B      |      ;
-	pea.w $192b	 ;01A426|F42B19  |01192B;
+	pea.w !battle_direct_page	 ;01A426|F42B19  |01192B;
 	pld ;01A429|2B      |      ;
 	phb ;01A42A|8B      |      ;
 	lda.w #$0000	;01A42B|A90000  |      ;
@@ -2442,7 +2442,7 @@ BattleGraphics_PreparationSystem_1:
 	ldx.w #$c488	;01A44D|A288C4  |      ;
 	stx.b $00	   ;01A450|8600    |00192B;
 	ldy.w #$0006	;01A452|A00600  |      ;
-	ldx.w $19b9	 ;01A455|AEB919  |0119B9;
+	ldx.w !source_pointer	 ;01A455|AEB919  |0119B9;
 	rep #$30		;01A458|C230    |      ;
 
 ; ==============================================================================
@@ -2565,7 +2565,7 @@ BattleGraphics_ScrollManager_1:
 	lda.b $0a	   ;01A4F9|A50A    |001935;
 	rep #$30		;01A4FB|C230    |      ;
 	clc ;01A4FD|18      |      ;
-	adc.w $19b9	 ;01A4FE|6DB919  |0119B9;
+	adc.w !source_pointer	 ;01A4FE|6DB919  |0119B9;
 	tax ;01A501|AA      |      ;
 	sep #$20		;01A502|E220    |      ;
 	rep #$10		;01A504|C210    |      ;
@@ -2588,7 +2588,7 @@ BattleSprite_OAMBuilder_1:
 	inc.b $0b	   ;01A518|E60B    |001936;
 	rep #$30		;01A51A|C230    |      ;
 	clc ;01A51C|18      |      ;
-	adc.w $19b9	 ;01A51D|6DB919  |0119B9;
+	adc.w !source_pointer	 ;01A51D|6DB919  |0119B9;
 	tax ;01A520|AA      |      ;
 	sep #$20		;01A521|E220    |      ;
 	rep #$10		;01A523|C210    |      ;
@@ -2625,7 +2625,7 @@ BattleSprite_PositionCalculator_1:
 	rep #$30		;01A550|C230    |      ;
 	lda.w #$000b	;01A552|A90B00  |      ;
 	clc ;01A555|18      |      ;
-	adc.w $19b9	 ;01A556|6DB919  |0119B9;
+	adc.w !source_pointer	 ;01A556|6DB919  |0119B9;
 	tax ;01A559|AA      |      ;
 	sep #$20		;01A55A|E220    |      ;
 	rep #$10		;01A55C|C210    |      ;
@@ -2692,7 +2692,7 @@ BattleBackground_PatternLoader_1:
 BattleBackground_ColorManager_1:
 	php ;01A5AA|08      |      ;
 	phd ;01A5AB|0B      |      ;
-	pea.w $192b	 ;01A5AC|F42B19  |00192B;
+	pea.w !battle_direct_page	 ;01A5AC|F42B19  |00192B;
 	pld ;01A5AF|2B      |      ;
 	ldx.w #$be20	;01A5B0|A220BE  |      ;
 	stx.b $02	   ;01A5B3|8602    |00192D;
@@ -2773,14 +2773,14 @@ BattleSprite_GraphicsProcessor_1:
 	pea.w $1a72	 ;01A697|F4721A  |001A72;
 	pld ;01A69A|2B      |      ;
 	ldx.w #$0000	;01A69B|A20000  |      ;
-	stx.w $1939	 ;01A69E|8E3919  |001939;
+	stx.w !battle_data_index_2	 ;01A69E|8E3919  |001939;
 	jsr.w Sub_01AF56 ;01A6A1|2056AF  |01AF56;
 	sep #$20		;01A6A4|E220    |      ;
 	rep #$10		;01A6A6|C210    |      ;
 	lda.b #$ff	  ;01A6A8|A9FF    |      ;
-	sta.w $193b	 ;01A6AA|8D3B19  |00193B;
+	sta.w !battle_data_index_3	 ;01A6AA|8D3B19  |00193B;
 	lda.b #$08	  ;01A6AD|A908    |      ;
-	sta.w $1935	 ;01A6AF|8D3519  |001935;
+	sta.w !battle_data_index_1	 ;01A6AF|8D3519  |001935;
 
 ; ==============================================================================
 ; Sprite Data Processing Loop
@@ -2790,32 +2790,32 @@ BattleSprite_GraphicsProcessor_1:
 BattleSprite_TransformEngine_1:
 	sep #$20		;01A6B2|E220    |      ;
 	rep #$10		;01A6B4|C210    |      ;
-	inc.w $193b	 ;01A6B6|EE3B19  |00193B;
-	lda.w $1935	 ;01A6B9|AD3519  |001935;
+	inc.w !battle_data_index_3	 ;01A6B6|EE3B19  |00193B;
+	lda.w !battle_data_index_1	 ;01A6B9|AD3519  |001935;
 	jsr.w Sub_0190DD ;01A6BC|20DD90  |0190DD;
 	cmp.b #$ff	  ;01A6BF|C9FF    |      ;
 	beq F02d ;01A6C1|F02D    |01A6F0;
 	jsr.w Sub_01A6F2 ;01A6C3|20F2A6  |01A6F2;
 	bcs B019 ;01A6C6|B019    |01A6E1;
 	rep #$30		;01A6C8|C230    |      ;
-	ldx.w $1939	 ;01A6CA|AE3919  |001939;
+	ldx.w !battle_data_index_2	 ;01A6CA|AE3919  |001939;
 	lda.b $01,x	 ;01A6CD|B501    |001A73;
 	sta.b $03,x	 ;01A6CF|9503    |001A75;
 	sta.b $05,x	 ;01A6D1|9505    |001A77;
 	sta.b $07,x	 ;01A6D3|9507    |001A79;
-	lda.w $1939	 ;01A6D5|AD3919  |001939;
+	lda.w !battle_data_index_2	 ;01A6D5|AD3919  |001939;
 	clc ;01A6D8|18      |      ;
 	adc.w #$001a	;01A6D9|691A00  |      ;
-	sta.w $1939	 ;01A6DC|8D3919  |001939;
+	sta.w !battle_data_index_2	 ;01A6DC|8D3919  |001939;
 	bra D1 ;01A6DF|80D1    |01A6B2;
 
 BattleSprite_ScaleProcessor_1:
 	sep #$20		;01A6E1|E220    |      ;
 	rep #$10		;01A6E3|C210    |      ;
-	lda.w $1935	 ;01A6E5|AD3519  |001935;
+	lda.w !battle_data_index_1	 ;01A6E5|AD3519  |001935;
 	clc ;01A6E8|18      |      ;
 	adc.b #$07	  ;01A6E9|6907    |      ;
-	sta.w $1935	 ;01A6EB|8D3519  |001935;
+	sta.w !battle_data_index_1	 ;01A6EB|8D3519  |001935;
 	bra D1 ;01A6EE|80C2    |01A6B2;
 
 BattleSprite_RotationHandler_1:
