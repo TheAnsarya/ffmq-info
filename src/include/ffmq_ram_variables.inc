@@ -305,15 +305,62 @@
 !ram_1925           = $1925     ; Conditional offset (used in add/subtract operations)
 !ram_195f           = $195f     ; Legacy graphics variable
 
-; Battle/Field State Flag
+; ----------------------------------------------------------------------------
+; Battle System Variables ($1900-$199f)
+; ----------------------------------------------------------------------------
+!battle_actor0_x        = $1900     ; Battle actor 0 X position
+!battle_actor0_y        = $1902     ; Battle actor 0 Y position
+!battle_actor1_x        = $1904     ; Battle actor 1 X position
+!battle_actor1_y        = $1906     ; Battle actor 1 Y position
+
+!battle_loop_counter    = $1913     ; Battle system loop counter
+!battle_param_1         = $1914     ; Battle parameter/calculation temp 1
+
+!battle_direct_page     = $192b     ; Battle system direct page base ($192b)
+!battle_offset          = $192d     ; Battle data offset/destination offset
+!battle_counter         = $1933     ; Battle loop/operation counter
+!battle_data_index_1    = $1935     ; Battle data index/pointer 1
+!battle_data_index_2    = $1939     ; Battle data index/pointer 2
+!battle_data_index_3    = $193b     ; Battle data index/pointer 3
+!battle_data_temp_1     = $193d     ; Battle temporary data 1
+!battle_data_temp_2     = $193e     ; Battle temporary data 2
+!battle_data_index_4    = $193f     ; Battle data index/pointer 4
+!battle_temp_data       = $1948     ; Battle temporary storage
+
+!battle_phase           = $192a     ; Battle phase/state counter
+!battle_atb_gauge       = $1993     ; Active Time Battle gauge value
 !battle_state_flag      = $19a5     ; Battle/field state flag: $00=field input, $80=battle active, $ff=inactive/disabled
+!battle_turn_counter    = $19ac     ; Battle turn counter
+!battle_status_timer    = $19af     ; Battle status effect timer
+!battle_flags           = $19b0     ; Battle system flags
+
+!battle_animation_timer = $19b4     ; Battle animation timer / Graphics mode flags
+!battle_state_flags     = $19d7     ; Battle state control flags / Graphics data index
+
+!battle_target_select   = $195f     ; Battle target selection index
+
+!battle_ptr_1_lo        = $19de     ; Battle pointer 1 (low byte)
+!battle_ptr_1_hi        = $19df     ; Battle pointer 1 (high byte)
+!battle_ptr_2_lo        = $19e0     ; Battle pointer 2 (low byte)
+!battle_ptr_2_hi        = $19e1     ; Battle pointer 2 (high byte)
+
+!battle_actor_index     = $19ee     ; Current battle actor index
+!battle_current_enemy   = $19f0     ; Current enemy ID/index
+!battle_stats_addr      = $19f1     ; Enemy stats address pointer
+!battle_turn_count      = $19f7     ; Battle turn counter (incremented)
+!battle_turn_phase      = $19f8     ; Battle turn phase state
+
+; Aliased battle/graphics variables (dual purpose)
 !ram_19a5               = $19a5     ; Legacy alias for !battle_state_flag
+!graphics_mode_flags    = $19b4     ; Graphics mode flags (also battle animation timer)
+!ram_19b4               = $19b4     ; Legacy alias
+!graphics_index         = $19d7     ; Graphics data index (also battle state flags)
+
+; Battle/Field State Flag
 
 ; ----------------------------------------------------------------------------
 ; Graphics Mode and Parameters ($19b4-$19f6)
 ; ----------------------------------------------------------------------------
-!graphics_mode_flags    = $19b4     ; Graphics mode flags (bit 3 determines priority $80/$00)
-!ram_19b4               = $19b4     ; Legacy alias - if bit 3 = 1 then !ram_1a33 => $80 else $00
 !data_source_offset     = $19b5     ; Calculated data source offset from ROM tables
 !calculated_source_offset = $19b7   ; Final calculated offset ($1911 * $0a)
 !source_pointer         = $19b9     ; Source data pointer ($ffff or calculated from $1912 * 2)

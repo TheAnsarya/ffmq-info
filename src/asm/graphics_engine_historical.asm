@@ -2502,7 +2502,7 @@ Routine0b8149:
 ; setup variables
 	stz $19f6			; !map_param_zero => $00
 	lda #$80
-	sta !ram_19a5			; @var_19a5 => $80
+	sta !battle_state_flag		; Set battle state flag to active ($80)
 	lda #$01
 	sta $1a45			; !graphics_init_flag => $01
 	ldx $19f1			; load !map_param_2

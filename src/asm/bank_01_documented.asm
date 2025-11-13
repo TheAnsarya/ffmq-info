@@ -81,22 +81,22 @@ Battle_Initialize:
 
 ; Initialize battle state flags
 	lda.b #$ff	  ; Inactive/disabled marker
-	sta.w $19a5	 ; Set battle state flag to inactive
+	sta.w !battle_state_flag	 ; Set battle state flag to inactive
 
 	stz.w $1a46	 ; Clear battle phase counter
 	stz.w $1a45	 ; Clear animation frame
-	stz.w $19ac	 ; Clear turn counter
-	stz.w $19af	 ; Clear status effect timer
+	stz.w !battle_turn_counter	 ; Clear turn counter
+	stz.w !battle_status_timer	 ; Clear status effect timer
 
 ; Set initial combat parameters
 	lda.b #$02	  ; Battle mode = 2
-	sta.w $19d7	 ; Battle state flags
+	sta.w !battle_state_flags	 ; Battle state flags
 
 	lda.b #$40	  ; Default animation speed
-	sta.w $19b4	 ; Animation timer
+	sta.w !battle_animation_timer	 ; Animation timer
 
 	lda.b #$10	  ; Initial turn gauge value
-	sta.w $1993	 ; Active time battle gauge
+	sta.w !battle_atb_gauge	 ; Active time battle gauge
 
 ; Initialize subsystems
 	jsr.w Battle_InitBuffers ; Initialize battle buffers
@@ -105,15 +105,15 @@ Battle_Initialize:
 
 ; Set up actor positions
 	rep #$30		; 16-bit A,X,Y
-	stz.w $19ee	 ; Clear actor index
+	stz.w !battle_actor_index	 ; Clear actor index
 
 	lda.w #$00f8	; Y position = 248
-	sta.w $1902	 ; Actor 0 Y position
-	sta.w $1906	 ; Actor 1 Y position
+	sta.w !battle_actor0_y	 ; Actor 0 Y position
+	sta.w !battle_actor1_y	 ; Actor 1 Y position
 
 	lda.w #$0008	; X position = 8
-	sta.w $1900	 ; Actor 0 X position
-	sta.w $1904	 ; Actor 1 X position
+	sta.w !battle_actor0_x	 ; Actor 0 X position
+	sta.w !battle_actor1_x	 ; Actor 1 X position
 
 ; Initialize enemy data
 	jsl.l LoadEnemyStatsBankB ; Load enemy stats from Bank $0b
@@ -246,7 +246,7 @@ Battle_LoadGraphics:
 	rep #$10		; 16-bit X,Y
 	phd ; Save direct page
 
-	pea.w $192b	 ; Set direct page to $192b
+	pea.w !battle_direct_page	 ; Set direct page to $192b
 	pld ; Pull to D register
 
 ; Load graphics set 1
@@ -331,12 +331,12 @@ Battle_DecompressTile:
 	phb ; Save data bank again
 
 ; Calculate source address
-	lda.w $192b	 ; Get base offset from direct page
+	lda.w !battle_direct_page	 ; Get base offset from direct page
 
 	adc.w #$ca20	; Add base address ($04ca20)
 	tax ; X = source address
 
-	ldy.w $192d	 ; Y = destination offset
+	ldy.w !battle_offset	 ; Y = destination offset
 	lda.w #$000f	; 16 bytes to copy
 	mvn $7f,$04	 ; Copy from Bank $04 to $7f
 
@@ -357,7 +357,7 @@ SEC_Label:
 
 	xba ; Swap accumulator bytes
 	lda.b #$08	  ; 8 bytes to process
-	sta.w $1933	 ; Store counter
+	sta.w !battle_counter	 ; Store counter
 
 Battle_DecompressTile_Loop:
 ; Decompression loop (ExpandSecondHalfWithZeros)
@@ -373,7 +373,7 @@ Battle_DecompressTile_Loop:
 	sta.w $0000,y   ; Write zero (expansion)
 	iny ; Next destination
 
-	dec.w $1933	 ; Decrement counter
+	dec.w !battle_counter	 ; Decrement counter
 	bne Battle_DecompressTile_Loop ; Continue loop
 
 	plp ; Restore processor status
@@ -395,21 +395,21 @@ Battle_MainLoop:
 
 ; Initialize battle state
 	ldx.w #$ffff	; Invalid value
-	stx.w $195f	 ; Clear target selection
+	stx.w !battle_target_select	 ; Clear target selection
 
 	ldx.w #$8000	; Battle active flag
 	stx.w $1a48	 ; Set battle in progress
 
-	stz.w $192a	 ; Clear battle phase
+	stz.w !battle_phase	 ; Clear battle phase
 
 	jsr.w Battle_InitEnemyAI ; Initialize enemy AI
 
 ; Load enemy stats
 	lda.w $0e91	 ; Get enemy type
-	sta.w $19f0	 ; Store current enemy
+	sta.w !battle_current_enemy	 ; Store current enemy
 
 	ldx.w $0e89	 ; Get enemy stats pointer
-	stx.w $19f1	 ; Store stats address
+	stx.w !battle_stats_addr	 ; Store stats address
 
 ; Set battle ready flag
 	lda.b #$80	  ; Battle ready bit
@@ -418,7 +418,7 @@ Battle_MainLoop:
 	jsr.w UpdateBattleDisplay ; Update battle display
 
 ; Check for specific enemy (ID $15)
-	lda.w $0e88	 ; Get enemy ID
+	lda.w !context_param	 ; Get enemy ID
 	cmp.b #$15	  ; Compare to $15
 	bne Battle_MainTurnLoop ; If not, skip special handling
 
@@ -426,21 +426,21 @@ Battle_MainLoop:
 
 Battle_MainTurnLoop:
 ; Battle turn loop
-	inc.w $19f7	 ; Increment turn counter
-	stz.w $19f8	 ; Clear turn phase
+	inc.w !battle_turn_count	 ; Increment turn counter
+	stz.w !battle_turn_phase	 ; Clear turn phase
 
 	jsr.w ProcessBattleAi ; Process battle AI
 	jsr.w Label_0182F2 ; Execute battle command
 
 ; Check for special battle mode
-	lda.w $19b0	 ; Get battle flags
+	lda.w !battle_flags	 ; Get battle flags
 	beq Battle_WaitTurnComplete ; If clear, skip
 
 	jsl.l SpecialBattleProcessing ; Special battle processing
 
 Battle_WaitTurnComplete:
 ; Wait for turn completion
-	lda.w $19f8	 ; Get turn phase
+	lda.w !battle_turn_phase	 ; Get turn phase
 	bne Battle_MainTurnLoop ; If not zero, continue turn
 
 	jsr.w UpdateActorStates ; Update actor states
@@ -448,7 +448,7 @@ Battle_WaitTurnComplete:
 
 Battle_WaitVBlank:
 ; Wait for VBlank
-	lda.w $19f7	 ; Get VBlank flag
+	lda.w !battle_turn_count	 ; Get VBlank flag
 	bne Battle_WaitVBlank ; Wait until zero
 
 	bra Battle_MainTurnLoop ; Next turn
@@ -1169,14 +1169,14 @@ BattleSound_InitializeSoundEffects:
 	sep #$20		;01A228|E220    |      ;
 	rep #$10		;01A22A|C210    |      ;
 	ldx.w #$ffff	;01A22C|A2FFFF  |      ;
-	stx.w $19de	 ;01A22F|8EDE19  |0119DE;
-	stx.w $19e0	 ;01A232|8EE019  |0119E0;
-	lda.w $1914	 ;01A235|AD1419  |011914;
+	stx.w !battle_ptr_1_lo	 ;01A22F|8EDE19  |0119DE;
+	stx.w !battle_ptr_2_lo	 ;01A232|8EE019  |0119E0;
+	lda.w !battle_param_1	 ;01A235|AD1419  |011914;
 	bit.b #$20	  ;01A238|8920    |      ;
 	beq .ClearBuffers ;01A23A|F02B    |01A267;
 	lda.b #$00	  ;01A23C|A900    |      ;
 	xba ;01A23E|EB      |      ;
-	lda.w $1913	 ;01A23F|AD1319  |011913;
+	lda.w !battle_loop_counter	 ;01A23F|AD1319  |011913;
 	and.b #$0f	  ;01A242|290F    |      ;
 	asl a;01A244|0A      |      ;
 	tax ;01A245|AA      |      ;
@@ -1186,14 +1186,14 @@ BattleSound_InitializeSoundEffects:
 	tax ;01A24C|AA      |      ;
 	rep #$30		;01A24D|C230    |      ;
 	lda.l DATA8_0cd686,x ;01A24F|BF86D60C|0CD686;
-	sta.w $19de	 ;01A253|8DDE19  |0119DE;
+	sta.w !battle_ptr_1_lo	 ;01A253|8DDE19  |0119DE;
 	plx ;01A256|FA      |      ;
 	lda.l UNREACH_0CD667,x ;01A257|BF67D60C|0CD667;
 	and.w #$000f	;01A25B|290F00  |      ;
 	asl a;01A25E|0A      |      ;
 	tax ;01A25F|AA      |      ;
 	lda.l DATA8_0cd727,x ;01A260|BF27D70C|0CD727;
-	sta.w $19e0	 ;01A264|8DE019  |0119E0;
+	sta.w !battle_ptr_2_lo	 ;01A264|8DE019  |0119E0;
 
 ; ==============================================================================
 ; Sound Channel Buffer Initialization
@@ -1235,7 +1235,7 @@ BattleAudio_ProcessPrimaryChannel:
 	phd ;01A2A8|0B      |      ;
 	sep #$20		;01A2A9|E220    |      ;
 	rep #$10		;01A2AB|C210    |      ;
-	lda.w $19df	 ;01A2AD|ADDF19  |0119DF;
+	lda.w !battle_ptr_1_hi	 ;01A2AD|ADDF19  |0119DF;
 	cmp.b #$ff	  ;01A2B0|C9FF    |      ;
 	beq .Exit_PrimaryChannel ;01A2B2|F015    |01A2C9;
 	pea.w $1cd7	 ;01A2B4|F4D71C  |011CD7;
@@ -1244,7 +1244,7 @@ BattleAudio_ProcessPrimaryChannel:
 	sty.b $06	   ;01A2BB|8406    |001CDD;
 	ldx.w #$0000	;01A2BD|A20000  |      ;
 	stx.b $00	   ;01A2C0|8600    |001CD7;
-	ldx.w $19de	 ;01A2C2|AEDE19  |0119DE;
+	ldx.w !battle_ptr_1_lo	 ;01A2C2|AEDE19  |0119DE;
 	stx.b $02	   ;01A2C5|8602    |001CD9;
 	bpl .ProcessLoop_Primary ;01A2C7|1004    |01A2CD;
 
@@ -1490,7 +1490,7 @@ BattleAnimation_ExtendedHandler:
 BattleGraphics_PreparationSystem:
 	rep #$30		;01A423|C230    |      ;
 	phd ;01A425|0B      |      ;
-	pea.w $192b	 ;01A426|F42B19  |01192B;
+	pea.w !battle_direct_page	 ;01A426|F42B19  |01192B;
 	pld ;01A429|2B      |      ;
 	phb ;01A42A|8B      |      ;
 	lda.w #$0000	;01A42B|A90000  |      ;
@@ -1510,7 +1510,7 @@ BattleGraphics_PreparationSystem:
 	ldx.w #$c488	;01A44D|A288C4  |      ;
 	stx.b $00	   ;01A450|8600    |00192B;
 	ldy.w #$0006	;01A452|A00600  |      ;
-	ldx.w $19b9	 ;01A455|AEB919  |0119B9;
+	ldx.w !source_pointer	 ;01A455|AEB919  |0119B9;
 	rep #$30		;01A458|C230    |      ;
 
 ; ==============================================================================
@@ -1841,14 +1841,14 @@ BattleSprite_GraphicsProcessor:
 	pea.w $1a72	 ;01A697|F4721A  |001A72;
 	pld ;01A69A|2B      |      ;
 	ldx.w #$0000	;01A69B|A20000  |      ;
-	stx.w $1939	 ;01A69E|8E3919  |001939;
+	stx.w !battle_data_index_2	 ;01A69E|8E3919  |001939;
 	jsr.w Sub_01AF56 ;01A6A1|2056AF  |01AF56;
 	sep #$20		;01A6A4|E220    |      ;
 	rep #$10		;01A6A6|C210    |      ;
 	lda.b #$ff	  ;01A6A8|A9FF    |      ;
-	sta.w $193b	 ;01A6AA|8D3B19  |00193B;
+	sta.w !battle_data_index_3	 ;01A6AA|8D3B19  |00193B;
 	lda.b #$08	  ;01A6AD|A908    |      ;
-	sta.w $1935	 ;01A6AF|8D3519  |001935;
+	sta.w !battle_data_index_1	 ;01A6AF|8D3519  |001935;
 
 ; ==============================================================================
 ; Sprite Data Processing Loop
@@ -1858,32 +1858,32 @@ BattleSprite_GraphicsProcessor:
 BattleSprite_TransformEngine:
 	sep #$20		;01A6B2|E220    |      ;
 	rep #$10		;01A6B4|C210    |      ;
-	inc.w $193b	 ;01A6B6|EE3B19  |00193B;
-	lda.w $1935	 ;01A6B9|AD3519  |001935;
+	inc.w !battle_data_index_3	 ;01A6B6|EE3B19  |00193B;
+	lda.w !battle_data_index_1	 ;01A6B9|AD3519  |001935;
 	jsr.w Sub_0190DD ;01A6BC|20DD90  |0190DD;
 	cmp.b #$ff	  ;01A6BF|C9FF    |      ;
 	beq F02d ;01A6C1|F02D    |01A6F0;
 	jsr.w Sub_01A6F2 ;01A6C3|20F2A6  |01A6F2;
 	bcs B019 ;01A6C6|B019    |01A6E1;
 	rep #$30		;01A6C8|C230    |      ;
-	ldx.w $1939	 ;01A6CA|AE3919  |001939;
+	ldx.w !battle_data_index_2	 ;01A6CA|AE3919  |001939;
 	lda.b $01,x	 ;01A6CD|B501    |001A73;
 	sta.b $03,x	 ;01A6CF|9503    |001A75;
 	sta.b $05,x	 ;01A6D1|9505    |001A77;
 	sta.b $07,x	 ;01A6D3|9507    |001A79;
-	lda.w $1939	 ;01A6D5|AD3919  |001939;
+	lda.w !battle_data_index_2	 ;01A6D5|AD3919  |001939;
 	clc ;01A6D8|18      |      ;
 	adc.w #$001a	;01A6D9|691A00  |      ;
-	sta.w $1939	 ;01A6DC|8D3919  |001939;
+	sta.w !battle_data_index_2	 ;01A6DC|8D3919  |001939;
 	bra D1 ;01A6DF|80D1    |01A6B2;
 
 BattleSprite_ScaleProcessor:
 	sep #$20		;01A6E1|E220    |      ;
 	rep #$10		;01A6E3|C210    |      ;
-	lda.w $1935	 ;01A6E5|AD3519  |001935;
+	lda.w !battle_data_index_1	 ;01A6E5|AD3519  |001935;
 	clc ;01A6E8|18      |      ;
 	adc.b #$07	  ;01A6E9|6907    |      ;
-	sta.w $1935	 ;01A6EB|8D3519  |001935;
+	sta.w !battle_data_index_1	 ;01A6EB|8D3519  |001935;
 	bra D1 ;01A6EE|80C2    |01A6B2;
 
 BattleSprite_RotationHandler:
