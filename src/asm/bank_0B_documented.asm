@@ -573,7 +573,7 @@ BattleInit_SetupEncounter:
 
 ; Clear sprite data buffers
 	lda.b #$02	  ; Battle type = 2 (?)
-	sta.w $0e8b	 ; Store to battle type
+	sta.w !battle_type	 ; Store to battle type
 	ldx.w #$0000	; X = buffer index
 	lda.b #$20	  ; Counter = 32 bytes
 
