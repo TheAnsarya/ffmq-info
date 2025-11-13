@@ -82,11 +82,11 @@ class ParameterDatabase:
 	total_commands: int
 	total_parameters: int
 	commands: Dict[str, CommandParameterInfo]
-	
+
 	def get_command(self, command: str) -> Optional[CommandParameterInfo]:
 		"""Get parameter info for command"""
 		return self.commands.get(command)
-	
+
 	def lookup_value(self, value: str) -> List[ParameterValue]:
 		"""Find all uses of a specific value"""
 		results = []
@@ -100,7 +100,7 @@ class ParameterDatabase:
 
 class ParameterValueExtractor:
 	"""Extract and analyze parameter values from scripts"""
-	
+
 	# Known command parameter counts and descriptions
 	COMMAND_DEFINITIONS = {
 		'END': (0, "End of script/dialog", "END"),
@@ -134,50 +134,50 @@ class ParameterValueExtractor:
 		'HEAL_PARTY': (0, "Fully heal all party members", "HEAL_PARTY"),
 		'RETURN': (0, "Return from subroutine", "RETURN"),
 	}
-	
+
 	def __init__(self, verbose: bool = False):
 		self.verbose = verbose
 		self.dialogs: Dict[str, List[str]] = {}
 		self.parameter_values: List[ParameterValue] = []
 		self.command_stats: Dict[str, CommandParameterInfo] = {}
-	
+
 	def parse_script_file(self, script_path: Path) -> None:
 		"""Parse script file into dialog dictionary"""
 		if self.verbose:
 			print(f"Parsing {script_path}...")
-		
+
 		with open(script_path, 'r', encoding='utf-8') as f:
 			content = f.read()
-		
+
 		# Split by dialog markers
 		dialog_pattern = r'^DIALOG\s+(\S+):(.*?)(?=^DIALOG\s+|\Z)'
 		matches = re.finditer(dialog_pattern, content, re.MULTILINE | re.DOTALL)
-		
+
 		for match in matches:
 			dialog_id = match.group(1)
 			dialog_content = match.group(2).strip()
 			lines = [line.strip() for line in dialog_content.split('\n') if line.strip()]
 			self.dialogs[dialog_id] = lines
-	
+
 	def extract_parameters(self) -> None:
 		"""Extract all parameter values from dialogs"""
 		if self.verbose:
 			print(f"\nExtracting parameters from {len(self.dialogs)} dialogs...")
-		
+
 		for dialog_id, lines in self.dialogs.items():
 			for line_num, line in enumerate(lines, 1):
 				# Skip text lines
 				if line.startswith('"'):
 					continue
-				
+
 				# Parse command and parameters
 				parts = line.split()
 				if not parts:
 					continue
-				
+
 				command = parts[0]
 				params = parts[1:]
-				
+
 				# Extract each parameter
 				for pos, param in enumerate(params):
 					# Get context (surrounding lines)
@@ -186,7 +186,7 @@ class ParameterValueExtractor:
 						if i != line_num - 1:
 							context_lines.append(lines[i])
 					context = '\n'.join(context_lines)
-					
+
 					param_value = ParameterValue(
 						value=param,
 						command=command,
@@ -196,29 +196,29 @@ class ParameterValueExtractor:
 						context=context
 					)
 					self.parameter_values.append(param_value)
-		
+
 		if self.verbose:
 			print(f"  Extracted {len(self.parameter_values)} parameter values")
-	
+
 	def build_statistics(self) -> None:
 		"""Build statistical analysis of parameters"""
 		if self.verbose:
 			print("\nBuilding parameter statistics...")
-		
+
 		# Group by command and position
 		command_params: Dict[str, Dict[int, List[ParameterValue]]] = defaultdict(lambda: defaultdict(list))
-		
+
 		for pv in self.parameter_values:
 			command_params[pv.command][pv.position].append(pv)
-		
+
 		# Build stats for each command
 		for command, positions in command_params.items():
 			param_stats_list = []
-			
+
 			for position in sorted(positions.keys()):
 				values = positions[position]
 				value_freq = Counter(v.value for v in values)
-				
+
 				# Try to parse as integers for range analysis
 				int_values = []
 				for v in values:
@@ -226,16 +226,16 @@ class ParameterValueExtractor:
 						int_values.append(int(v.value, 0))  # Support hex with 0x prefix
 					except ValueError:
 						pass
-				
+
 				min_val = min(int_values) if int_values else None
 				max_val = max(int_values) if int_values else None
-				
+
 				# Get common values (top 10)
 				common = value_freq.most_common(10)
-				
+
 				# Get example uses
 				examples = values[:5]  # First 5 examples
-				
+
 				param_stat = ParameterStats(
 					command=command,
 					position=position,
@@ -248,13 +248,13 @@ class ParameterValueExtractor:
 					examples=examples
 				)
 				param_stats_list.append(param_stat)
-			
+
 			# Get command definition
 			param_count, description, syntax = self.COMMAND_DEFINITIONS.get(
 				command,
 				(len(param_stats_list), "Unknown command", f"{command} <params>")
 			)
-			
+
 			cmd_info = CommandParameterInfo(
 				command=command,
 				total_uses=sum(s.total_occurrences for s in param_stats_list),
@@ -264,29 +264,29 @@ class ParameterValueExtractor:
 				syntax=syntax
 			)
 			self.command_stats[command] = cmd_info
-		
+
 		if self.verbose:
 			print(f"  Analyzed {len(self.command_stats)} commands")
-	
+
 	def build_database(self, script_paths: List[Path]) -> ParameterDatabase:
 		"""Build complete parameter database"""
 		# Parse all scripts
 		for path in script_paths:
 			self.parse_script_file(path)
-		
+
 		# Extract and analyze
 		self.extract_parameters()
 		self.build_statistics()
-		
+
 		db = ParameterDatabase(
 			script_files=[str(p) for p in script_paths],
 			total_commands=sum(info.total_uses for info in self.command_stats.values()),
 			total_parameters=len(self.parameter_values),
 			commands=self.command_stats
 		)
-		
+
 		return db
-	
+
 	def export_json(self, db: ParameterDatabase, output_path: Path) -> None:
 		"""Export database to JSON"""
 		data = {
@@ -295,7 +295,7 @@ class ParameterValueExtractor:
 			'total_parameters': db.total_parameters,
 			'commands': {}
 		}
-		
+
 		for cmd, info in db.commands.items():
 			cmd_data = {
 				'total_uses': info.total_uses,
@@ -304,7 +304,7 @@ class ParameterValueExtractor:
 				'syntax': info.syntax,
 				'parameters': []
 			}
-			
+
 			for param in info.parameters:
 				param_data = {
 					'position': param.position,
@@ -316,31 +316,31 @@ class ParameterValueExtractor:
 					'value_frequencies': param.value_frequencies
 				}
 				cmd_data['parameters'].append(param_data)
-			
+
 			data['commands'][cmd] = cmd_data
-		
+
 		with open(output_path, 'w', encoding='utf-8') as f:
 			json.dump(data, f, indent=2)
-		
+
 		if self.verbose:
 			print(f"\nExported to JSON: {output_path}")
-	
+
 	def export_csv(self, db: ParameterDatabase, output_path: Path) -> None:
 		"""Export database to CSV"""
 		with open(output_path, 'w', newline='', encoding='utf-8') as f:
 			writer = csv.writer(f)
 			writer.writerow([
-				'Command', 'Position', 'Total Uses', 'Unique Values', 
+				'Command', 'Position', 'Total Uses', 'Unique Values',
 				'Min', 'Max', 'Most Common', 'Frequency'
 			])
-			
+
 			for cmd, info in sorted(db.commands.items()):
 				for param in info.parameters:
 					if param.common_values:
 						most_common_val, most_common_freq = param.common_values[0]
 					else:
 						most_common_val, most_common_freq = '', 0
-					
+
 					writer.writerow([
 						cmd,
 						param.position,
@@ -351,15 +351,15 @@ class ParameterValueExtractor:
 						most_common_val,
 						most_common_freq
 					])
-		
+
 		if self.verbose:
 			print(f"\nExported to CSV: {output_path}")
-	
+
 	def export_sqlite(self, db: ParameterDatabase, output_path: Path) -> None:
 		"""Export database to SQLite"""
 		conn = sqlite3.connect(output_path)
 		cursor = conn.cursor()
-		
+
 		# Create tables
 		cursor.execute('''
 			CREATE TABLE IF NOT EXISTS commands (
@@ -370,7 +370,7 @@ class ParameterValueExtractor:
 				syntax TEXT
 			)
 		''')
-		
+
 		cursor.execute('''
 			CREATE TABLE IF NOT EXISTS parameters (
 				id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -383,7 +383,7 @@ class ParameterValueExtractor:
 				FOREIGN KEY (command) REFERENCES commands(command)
 			)
 		''')
-		
+
 		cursor.execute('''
 			CREATE TABLE IF NOT EXISTS parameter_values (
 				id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -396,40 +396,40 @@ class ParameterValueExtractor:
 				FOREIGN KEY (command) REFERENCES commands(command)
 			)
 		''')
-		
+
 		# Insert commands
 		for cmd, info in db.commands.items():
 			cursor.execute('''
 				INSERT INTO commands (command, total_uses, parameter_count, description, syntax)
 				VALUES (?, ?, ?, ?, ?)
 			''', (cmd, info.total_uses, info.parameter_count, info.description, info.syntax))
-			
+
 			# Insert parameter stats
 			for param in info.parameters:
 				cursor.execute('''
 					INSERT INTO parameters (command, position, total_occurrences, unique_values, min_value, max_value)
 					VALUES (?, ?, ?, ?, ?, ?)
-				''', (cmd, param.position, param.total_occurrences, param.unique_values, 
+				''', (cmd, param.position, param.total_occurrences, param.unique_values,
 				      param.min_value, param.max_value))
-				
+
 				# Insert value frequencies
 				for value, freq in param.value_frequencies.items():
 					# Get example dialog_id and line_number
 					example = next((ex for ex in param.examples if ex.value == value), None)
 					dialog_id = example.dialog_id if example else ''
 					line_num = example.line_number if example else 0
-					
+
 					cursor.execute('''
 						INSERT INTO parameter_values (command, position, value, frequency, dialog_id, line_number)
 						VALUES (?, ?, ?, ?, ?, ?)
 					''', (cmd, param.position, value, freq, dialog_id, line_num))
-		
+
 		conn.commit()
 		conn.close()
-		
+
 		if self.verbose:
 			print(f"\nExported to SQLite: {output_path}")
-	
+
 	def generate_report(self, db: ParameterDatabase) -> str:
 		"""Generate parameter reference documentation"""
 		lines = [
@@ -444,7 +444,7 @@ class ParameterValueExtractor:
 			"## Command Reference",
 			""
 		]
-		
+
 		for cmd, info in sorted(db.commands.items()):
 			lines.extend([
 				f"### {cmd}",
@@ -453,25 +453,25 @@ class ParameterValueExtractor:
 				f"**Uses**: {info.total_uses:,}",
 				""
 			])
-			
+
 			if info.parameters:
 				lines.append("**Parameters**:")
 				lines.append("")
-				
+
 				for param in info.parameters:
 					lines.append(f"**Parameter {param.position}**:")
 					lines.append(f"- Occurrences: {param.total_occurrences:,}")
 					lines.append(f"- Unique values: {param.unique_values}")
-					
+
 					if param.min_value is not None and param.max_value is not None:
 						lines.append(f"- Range: {param.min_value} to {param.max_value}")
-					
+
 					if param.common_values:
 						lines.append("- Common values:")
 						for value, freq in param.common_values[:5]:
 							percent = (freq / param.total_occurrences) * 100
 							lines.append(f"  - `{value}`: {freq} times ({percent:.1f}%)")
-					
+
 					# Show example usage
 					if param.examples:
 						lines.append("- Example usage:")
@@ -479,49 +479,49 @@ class ParameterValueExtractor:
 						lines.append(f"  ```")
 						lines.append(f"  {example.command} {example.value}  ; {example.dialog_id} line {example.line_number}")
 						lines.append(f"  ```")
-					
+
 					lines.append("")
-			
+
 			lines.append("---")
 			lines.append("")
-		
+
 		return '\n'.join(lines)
-	
+
 	def interactive_lookup(self, db: ParameterDatabase) -> None:
 		"""Interactive parameter lookup"""
 		print("\n=== Parameter Database Lookup ===")
 		print("Commands: list, lookup <command>, value <value>, quit")
-		
+
 		while True:
 			try:
 				query = input("\n> ").strip()
-				
+
 				if not query:
 					continue
-				
+
 				parts = query.split(None, 1)
 				cmd = parts[0].lower()
-				
+
 				if cmd == 'quit' or cmd == 'exit':
 					break
-				
+
 				elif cmd == 'list':
 					print(f"\nAvailable commands ({len(db.commands)}):")
 					for command in sorted(db.commands.keys()):
 						info = db.commands[command]
 						print(f"  {command:20s} - {info.description}")
-				
+
 				elif cmd == 'lookup' and len(parts) == 2:
 					command = parts[1].upper()
 					info = db.get_command(command)
-					
+
 					if info:
 						print(f"\n{command}")
 						print(f"Description: {info.description}")
 						print(f"Syntax: {info.syntax}")
 						print(f"Uses: {info.total_uses:,}")
 						print(f"\nParameters ({info.parameter_count}):")
-						
+
 						for param in info.parameters:
 							print(f"\n  Position {param.position}:")
 							print(f"    Occurrences: {param.total_occurrences:,}")
@@ -531,24 +531,24 @@ class ParameterValueExtractor:
 							print(f"    Common values: {', '.join(str(v) for v, _ in param.common_values[:5])}")
 					else:
 						print(f"Command '{command}' not found")
-				
+
 				elif cmd == 'value' and len(parts) == 2:
 					value = parts[1]
 					results = db.lookup_value(value)
-					
+
 					if results:
 						print(f"\nFound {len(results)} uses of value '{value}':")
 						for pv in results[:20]:
 							print(f"  {pv.command} param{pv.position} in {pv.dialog_id} line {pv.line_number}")
 					else:
 						print(f"Value '{value}' not found")
-				
+
 				else:
 					print("Unknown command. Try: list, lookup <command>, value <value>, quit")
-			
+
 			except (EOFError, KeyboardInterrupt):
 				break
-		
+
 		print("\nGoodbye!")
 
 
@@ -562,31 +562,31 @@ def main():
 	parser.add_argument('--lookup', type=str, help='Look up specific command')
 	parser.add_argument('--interactive', action='store_true', help='Interactive lookup mode')
 	parser.add_argument('--verbose', action='store_true', help='Verbose output')
-	
+
 	args = parser.parse_args()
-	
+
 	extractor = ParameterValueExtractor(verbose=args.verbose)
-	
+
 	# Build database
 	db = extractor.build_database(args.script)
-	
+
 	# Export to requested formats
 	if args.export_json:
 		extractor.export_json(db, args.export_json)
-	
+
 	if args.export_csv:
 		extractor.export_csv(db, args.export_csv)
-	
+
 	if args.export_sqlite:
 		extractor.export_sqlite(db, args.export_sqlite)
-	
+
 	if args.report:
 		report = extractor.generate_report(db)
 		with open(args.report, 'w', encoding='utf-8') as f:
 			f.write(report)
 		if args.verbose:
 			print(f"\nReport saved to {args.report}")
-	
+
 	# Lookup specific command
 	if args.lookup:
 		info = db.get_command(args.lookup.upper())
@@ -599,24 +599,24 @@ def main():
 				print(f"  Position {param.position}: {param.unique_values} unique values ({param.total_occurrences} uses)")
 		else:
 			print(f"Command '{args.lookup}' not found")
-	
+
 	# Interactive mode
 	if args.interactive:
 		extractor.interactive_lookup(db)
-	
+
 	# Print summary
 	if not args.interactive:
 		print(f"\n✓ Parameter database built")
 		print(f"  Commands: {len(db.commands)}")
 		print(f"  Total parameters: {db.total_parameters:,}")
 		print(f"  Total command uses: {db.total_commands:,}")
-		
+
 		# Top commands by usage
 		top_commands = sorted(db.commands.items(), key=lambda x: x[1].total_uses, reverse=True)[:10]
 		print(f"\nTop 10 Commands:")
 		for cmd, info in top_commands:
 			print(f"  {cmd:20s} {info.total_uses:>6,} uses")
-	
+
 	return 0
 
 

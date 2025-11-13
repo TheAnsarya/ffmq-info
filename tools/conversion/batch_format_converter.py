@@ -66,7 +66,7 @@ class ScriptCollection:
 	"""Collection of dialogs with metadata"""
 	dialogs: List[Dialog]
 	metadata: Dict[str, Any] = field(default_factory=dict)
-	
+
 	def to_dict(self) -> dict:
 		"""Convert to dictionary"""
 		return {
@@ -85,7 +85,7 @@ class ScriptCollection:
 
 class FormatConverter:
 	"""Convert between different script formats"""
-	
+
 	# Event command definitions for assembly generation
 	COMMAND_OPCODES = {
 		'END': 0x00,
@@ -99,14 +99,14 @@ class FormatConverter:
 		'MEMORY_READ': 0x21,
 		'RETURN': 0xFF
 	}
-	
+
 	def __init__(self, verbose: bool = False):
 		self.verbose = verbose
-	
+
 	def detect_format(self, file_path: Path) -> ScriptFormat:
 		"""Auto-detect file format from extension and content"""
 		suffix = file_path.suffix.lower()
-		
+
 		format_map = {
 			'.asm': ScriptFormat.ASSEMBLY,
 			'.txt': ScriptFormat.SCRIPT,
@@ -117,33 +117,33 @@ class FormatConverter:
 			'.yaml': ScriptFormat.YAML,
 			'.yml': ScriptFormat.YAML
 		}
-		
+
 		return format_map.get(suffix, ScriptFormat.SCRIPT)
-	
+
 	def read_script_format(self, file_path: Path) -> ScriptCollection:
 		"""Read human-readable script format (.txt)"""
 		dialogs = []
-		
+
 		with open(file_path, 'r', encoding='utf-8') as f:
 			content = f.read()
-		
+
 		# Split by dialog markers
 		dialog_pattern = r'^DIALOG\s+(\S+):(.*?)(?=^DIALOG\s+|\Z)'
 		matches = re.finditer(dialog_pattern, content, re.MULTILINE | re.DOTALL)
-		
+
 		for match in matches:
 			dialog_id = match.group(1)
 			dialog_content = match.group(2).strip()
-			
+
 			# Separate comments from lines
 			lines = []
 			comments = []
-			
+
 			for line in dialog_content.split('\n'):
 				line = line.rstrip()
 				if not line:
 					continue
-				
+
 				# Extract inline comments
 				if ';' in line:
 					code, comment = line.split(';', 1)
@@ -153,21 +153,21 @@ class FormatConverter:
 						comments.append(comment.strip())
 				else:
 					lines.append(line)
-			
+
 			dialog = Dialog(
 				dialog_id=dialog_id,
 				lines=lines,
 				comments=comments
 			)
 			dialogs.append(dialog)
-		
+
 		return ScriptCollection(dialogs=dialogs)
-	
+
 	def read_json_format(self, file_path: Path) -> ScriptCollection:
 		"""Read JSON format"""
 		with open(file_path, 'r', encoding='utf-8') as f:
 			data = json.load(f)
-		
+
 		dialogs = []
 		for dialog_data in data.get('dialogs', []):
 			dialog = Dialog(
@@ -177,73 +177,73 @@ class FormatConverter:
 				comments=dialog_data.get('comments', [])
 			)
 			dialogs.append(dialog)
-		
+
 		return ScriptCollection(
 			dialogs=dialogs,
 			metadata=data.get('metadata', {})
 		)
-	
+
 	def read_csv_format(self, file_path: Path) -> ScriptCollection:
 		"""Read CSV format"""
 		dialogs_dict: Dict[str, List[str]] = {}
-		
+
 		with open(file_path, 'r', newline='', encoding='utf-8') as f:
 			reader = csv.reader(f)
 			header = next(reader, None)
-			
+
 			for row in reader:
 				if len(row) < 2:
 					continue
-				
+
 				dialog_id = row[0]
 				line_text = row[1]
-				
+
 				if dialog_id not in dialogs_dict:
 					dialogs_dict[dialog_id] = []
 				dialogs_dict[dialog_id].append(line_text)
-		
+
 		dialogs = [
 			Dialog(dialog_id=did, lines=lines)
 			for did, lines in dialogs_dict.items()
 		]
-		
+
 		return ScriptCollection(dialogs=dialogs)
-	
+
 	def read_xml_format(self, file_path: Path) -> ScriptCollection:
 		"""Read XML format"""
 		tree = ET.parse(file_path)
 		root = tree.getroot()
-		
+
 		dialogs = []
-		
+
 		for dialog_elem in root.findall('dialog'):
 			dialog_id = dialog_elem.get('id', '')
 			lines = []
 			comments = []
-			
+
 			for line_elem in dialog_elem.findall('line'):
 				lines.append(line_elem.text or '')
-			
+
 			for comment_elem in dialog_elem.findall('comment'):
 				comments.append(comment_elem.text or '')
-			
+
 			dialog = Dialog(
 				dialog_id=dialog_id,
 				lines=lines,
 				comments=comments
 			)
 			dialogs.append(dialog)
-		
+
 		return ScriptCollection(dialogs=dialogs)
-	
+
 	def read_file(self, file_path: Path, format: Optional[ScriptFormat] = None) -> ScriptCollection:
 		"""Read file in detected or specified format"""
 		if format is None:
 			format = self.detect_format(file_path)
-		
+
 		if self.verbose:
 			print(f"Reading {file_path} as {format.value}...")
-		
+
 		if format == ScriptFormat.SCRIPT:
 			return self.read_script_format(file_path)
 		elif format == ScriptFormat.JSON:
@@ -254,54 +254,54 @@ class FormatConverter:
 			return self.read_xml_format(file_path)
 		else:
 			raise ValueError(f"Reading {format.value} format not yet implemented")
-	
+
 	def write_script_format(self, collection: ScriptCollection, output_path: Path) -> None:
 		"""Write human-readable script format (.txt)"""
 		lines = []
-		
+
 		# Write metadata as comments
 		if collection.metadata:
 			lines.append("; Metadata:")
 			for key, value in collection.metadata.items():
 				lines.append(f"; {key}: {value}")
 			lines.append("")
-		
+
 		# Write dialogs
 		for dialog in collection.dialogs:
 			lines.append(f"DIALOG {dialog.dialog_id}:")
-			
+
 			# Write dialog comments
 			for comment in dialog.comments:
 				lines.append(f"; {comment}")
-			
+
 			# Write lines
 			for line in dialog.lines:
 				lines.append(line)
-			
+
 			lines.append("")
-		
+
 		with open(output_path, 'w', encoding='utf-8') as f:
 			f.write('\n'.join(lines))
-		
+
 		if self.verbose:
 			print(f"Wrote {len(collection.dialogs)} dialogs to {output_path}")
-	
+
 	def write_json_format(self, collection: ScriptCollection, output_path: Path) -> None:
 		"""Write JSON format"""
 		data = collection.to_dict()
-		
+
 		with open(output_path, 'w', encoding='utf-8') as f:
 			json.dump(data, f, indent=2, ensure_ascii=False)
-		
+
 		if self.verbose:
 			print(f"Wrote {len(collection.dialogs)} dialogs to {output_path}")
-	
+
 	def write_csv_format(self, collection: ScriptCollection, output_path: Path) -> None:
 		"""Write CSV format"""
 		with open(output_path, 'w', newline='', encoding='utf-8') as f:
 			writer = csv.writer(f)
 			writer.writerow(['Dialog ID', 'Line Number', 'Content', 'Type'])
-			
+
 			for dialog in collection.dialogs:
 				for line_num, line in enumerate(dialog.lines, 1):
 					# Determine line type
@@ -309,83 +309,83 @@ class FormatConverter:
 						line_type = 'text'
 					else:
 						line_type = 'command'
-					
+
 					writer.writerow([dialog.dialog_id, line_num, line, line_type])
-		
+
 		if self.verbose:
 			print(f"Wrote {len(collection.dialogs)} dialogs to {output_path}")
-	
+
 	def write_xml_format(self, collection: ScriptCollection, output_path: Path) -> None:
 		"""Write XML format"""
 		root = ET.Element('script_collection')
-		
+
 		# Metadata
 		if collection.metadata:
 			meta_elem = ET.SubElement(root, 'metadata')
 			for key, value in collection.metadata.items():
 				item = ET.SubElement(meta_elem, 'item', name=key)
 				item.text = str(value)
-		
+
 		# Dialogs
 		for dialog in collection.dialogs:
 			dialog_elem = ET.SubElement(root, 'dialog', id=dialog.dialog_id)
-			
+
 			# Comments
 			for comment in dialog.comments:
 				comment_elem = ET.SubElement(dialog_elem, 'comment')
 				comment_elem.text = comment
-			
+
 			# Lines
 			for line in dialog.lines:
 				line_elem = ET.SubElement(dialog_elem, 'line')
 				line_elem.text = line
-		
+
 		# Pretty print
 		xml_str = ET.tostring(root, encoding='utf-8')
 		dom = minidom.parseString(xml_str)
 		pretty_xml = dom.toprettyxml(indent='  ', encoding='utf-8')
-		
+
 		with open(output_path, 'wb') as f:
 			f.write(pretty_xml)
-		
+
 		if self.verbose:
 			print(f"Wrote {len(collection.dialogs)} dialogs to {output_path}")
-	
+
 	def write_yaml_format(self, collection: ScriptCollection, output_path: Path) -> None:
 		"""Write YAML format"""
 		lines = []
-		
+
 		# Metadata
 		if collection.metadata:
 			lines.append("metadata:")
 			for key, value in collection.metadata.items():
 				lines.append(f"  {key}: {value}")
 			lines.append("")
-		
+
 		# Dialogs
 		lines.append("dialogs:")
 		for dialog in collection.dialogs:
 			lines.append(f"  - id: {dialog.dialog_id}")
-			
+
 			if dialog.comments:
 				lines.append("    comments:")
 				for comment in dialog.comments:
 					lines.append(f"      - {comment}")
-			
+
 			lines.append("    lines:")
 			for line in dialog.lines:
 				# Escape special YAML characters
 				escaped = line.replace('"', '\\"').replace(':', '\\:')
 				lines.append(f'      - "{escaped}"')
-			
+
 			lines.append("")
-		
+
 		with open(output_path, 'w', encoding='utf-8') as f:
 			f.write('\n'.join(lines))
-		
+
 		if self.verbose:
 			print(f"Wrote {len(collection.dialogs)} dialogs to {output_path}")
-	
+
 	def write_assembly_format(self, collection: ScriptCollection, output_path: Path) -> None:
 		"""Write 65816 assembly format"""
 		lines = [
@@ -395,30 +395,30 @@ class FormatConverter:
 			".org $C00000  ; Adjust as needed",
 			""
 		]
-		
+
 		for dialog in collection.dialogs:
 			lines.append(f"; Dialog: {dialog.dialog_id}")
 			lines.append(f"{dialog.dialog_id}:")
-			
+
 			for line in dialog.lines:
 				# Convert commands to assembly
 				if line.startswith('"'):
 					# Text data
 					text = line.strip('"')
 					lines.append(f'  .db "{text}", $00  ; Text string')
-				
+
 				elif line in self.COMMAND_OPCODES:
 					# Simple command (no parameters)
 					opcode = self.COMMAND_OPCODES[line]
 					lines.append(f'  .db ${opcode:02X}  ; {line}')
-				
+
 				else:
 					# Command with parameters
 					parts = line.split()
 					if parts[0] in self.COMMAND_OPCODES:
 						opcode = self.COMMAND_OPCODES[parts[0]]
 						lines.append(f'  .db ${opcode:02X}  ; {parts[0]}')
-						
+
 						# Parameters
 						for param in parts[1:]:
 							try:
@@ -431,24 +431,24 @@ class FormatConverter:
 					else:
 						# Unknown command, add as comment
 						lines.append(f'  ; Unknown: {line}')
-			
+
 			lines.append("")
-		
+
 		with open(output_path, 'w', encoding='utf-8') as f:
 			f.write('\n'.join(lines))
-		
+
 		if self.verbose:
 			print(f"Wrote {len(collection.dialogs)} dialogs to {output_path}")
-	
-	def write_file(self, collection: ScriptCollection, output_path: Path, 
+
+	def write_file(self, collection: ScriptCollection, output_path: Path,
 	               format: Optional[ScriptFormat] = None) -> None:
 		"""Write file in specified or detected format"""
 		if format is None:
 			format = self.detect_format(output_path)
-		
+
 		if self.verbose:
 			print(f"Writing to {output_path} as {format.value}...")
-		
+
 		if format == ScriptFormat.SCRIPT:
 			self.write_script_format(collection, output_path)
 		elif format == ScriptFormat.JSON:
@@ -463,36 +463,36 @@ class FormatConverter:
 			self.write_assembly_format(collection, output_path)
 		else:
 			raise ValueError(f"Writing {format.value} format not yet implemented")
-	
+
 	def convert(self, input_path: Path, output_path: Path,
 	            input_format: Optional[ScriptFormat] = None,
 	            output_format: Optional[ScriptFormat] = None) -> None:
 		"""Convert file from one format to another"""
 		# Read input
 		collection = self.read_file(input_path, input_format)
-		
+
 		# Write output
 		self.write_file(collection, output_path, output_format)
-		
+
 		if self.verbose:
 			print(f"✓ Converted {input_path} → {output_path}")
-	
+
 	def batch_convert(self, input_paths: List[Path], output_dir: Path,
 	                  output_format: ScriptFormat) -> int:
 		"""Convert multiple files to target format"""
 		output_dir.mkdir(parents=True, exist_ok=True)
 		converted_count = 0
-		
+
 		for input_path in input_paths:
 			# Generate output filename
 			output_path = output_dir / f"{input_path.stem}.{output_format.value}"
-			
+
 			try:
 				self.convert(input_path, output_path, output_format=output_format)
 				converted_count += 1
 			except Exception as e:
 				print(f"Error converting {input_path}: {e}")
-		
+
 		return converted_count
 
 
@@ -501,16 +501,16 @@ def main():
 	parser.add_argument('--input', type=Path, nargs='+', required=True, help='Input file(s)')
 	parser.add_argument('--output', type=Path, help='Output file (single file mode)')
 	parser.add_argument('--output-dir', type=Path, help='Output directory (batch mode)')
-	parser.add_argument('--format', choices=[f.value for f in ScriptFormat], 
+	parser.add_argument('--format', choices=[f.value for f in ScriptFormat],
 	                    help='Output format')
 	parser.add_argument('--input-format', choices=[f.value for f in ScriptFormat],
 	                    help='Force input format (auto-detect if not specified)')
 	parser.add_argument('--verbose', action='store_true', help='Verbose output')
-	
+
 	args = parser.parse_args()
-	
+
 	converter = FormatConverter(verbose=args.verbose)
-	
+
 	# Determine output format
 	if args.format:
 		output_format = ScriptFormat(args.format)
@@ -518,10 +518,10 @@ def main():
 		output_format = converter.detect_format(args.output)
 	else:
 		output_format = ScriptFormat.JSON  # Default
-	
+
 	# Determine input format if specified
 	input_format = ScriptFormat(args.input_format) if args.input_format else None
-	
+
 	# Single file or batch mode?
 	if len(args.input) == 1 and args.output:
 		# Single file conversion
@@ -532,7 +532,7 @@ def main():
 			output_format=output_format
 		)
 		print(f"\n✓ Conversion complete: {args.output}")
-	
+
 	elif args.output_dir:
 		# Batch conversion
 		count = converter.batch_convert(
@@ -541,11 +541,11 @@ def main():
 			output_format
 		)
 		print(f"\n✓ Converted {count}/{len(args.input)} files to {args.output_dir}")
-	
+
 	else:
 		print("Error: Specify either --output (single file) or --output-dir (batch mode)")
 		return 1
-	
+
 	return 0
 
 

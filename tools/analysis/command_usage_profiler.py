@@ -76,7 +76,7 @@ class CommandUsageProfiler:
 	"""
 	Command usage profiler for FFMQ event scripts.
 	"""
-	
+
 	# All 48 event commands
 	COMMANDS = {
 		'END': 0x00, 'NEWLINE': 0x01, 'WAIT': 0x02, 'ASTERISK': 0x03,
@@ -94,7 +94,7 @@ class CommandUsageProfiler:
 		'EXTERNAL_CALL_2': 0x29, 'UNK_2A': 0x2A, 'EXTERNAL_CALL_3': 0x2B,
 		'UNK_2C': 0x2C, 'SET_STATE_WORD_2': 0x2D, 'UNK_2E': 0x2E, 'UNK_2F': 0x2F,
 	}
-	
+
 	def __init__(self):
 		"""Initialize profiler."""
 		self.command_profiles: Dict[str, CommandProfile] = {}
@@ -102,39 +102,39 @@ class CommandUsageProfiler:
 		self.co_occurrences: List[CoOccurrence] = []
 		self.memory_hotspots: Counter = Counter()
 		self.subroutine_targets: Counter = Counter()
-		
+
 		# Initialize command profiles
 		for name, opcode in self.COMMANDS.items():
 			self.command_profiles[name] = CommandProfile(opcode=opcode, name=name)
-	
+
 	def parse_script_file(self, script_file: str) -> None:
 		"""
 		Parse script file and build profiles.
-		
+
 		Args:
 			script_file: Path to script file
 		"""
 		print(f"\n📊 Profiling script: {script_file}")
-		
+
 		current_dialog_id: Optional[int] = None
 		current_profile: Optional[ScriptProfile] = None
 		previous_command: Optional[str] = None
-		
+
 		with open(script_file, 'r', encoding='utf-8') as f:
 			for line in f:
 				line = line.strip()
-				
+
 				# Skip comments and empty lines
 				if line.startswith(';') or not line:
 					continue
-				
+
 				# Dialog start
 				if line.startswith('[DIALOG'):
 					# Save previous dialog
 					if current_profile:
 						current_profile.unique_commands = len(set(current_profile.commands_used))
 						current_profile.complexity_score = self.calculate_complexity(current_profile)
-					
+
 					# Parse dialog ID
 					match = re.match(r'\[DIALOG\s+(\d+)\]', line)
 					if match:
@@ -143,36 +143,36 @@ class CommandUsageProfiler:
 						self.script_profiles[current_dialog_id] = current_profile
 						previous_command = None
 					continue
-				
+
 				if current_profile is None:
 					continue
-				
+
 				# Command
 				if line.startswith('['):
 					match = re.match(r'\[([A-Z_0-9]+)(?::(.+))?\]', line)
 					if not match:
 						continue
-					
+
 					cmd_name = match.group(1)
 					params_str = match.group(2) if match.group(2) else ""
-					
+
 					if cmd_name not in self.COMMANDS:
 						continue
-					
+
 					# Update command profile
 					cmd_profile = self.command_profiles[cmd_name]
 					cmd_profile.usage_count += 1
 					cmd_profile.dialogs_used_in.add(current_dialog_id)
-					
+
 					# Parse parameters
 					params = [p.strip() for p in params_str.split(':')] if params_str else []
 					cmd_profile.total_parameters += len(params)
-					
+
 					# Track parameter distributions
 					for i, param in enumerate(params):
 						if i not in cmd_profile.parameter_distributions:
 							cmd_profile.parameter_distributions[i] = Counter()
-						
+
 						# Parse value
 						try:
 							if param.startswith('0x') or param.startswith('0X'):
@@ -181,21 +181,21 @@ class CommandUsageProfiler:
 								value = int(param[1:], 16)
 							else:
 								value = int(param)
-							
+
 							cmd_profile.parameter_distributions[i][value] += 1
 						except ValueError:
 							pass
-					
+
 					# Update script profile
 					current_profile.command_count += 1
 					current_profile.commands_used.append(cmd_name)
-					
+
 					# Track co-occurrences
 					if previous_command:
 						self.track_co_occurrence(previous_command, cmd_name)
-					
+
 					previous_command = cmd_name
-					
+
 					# Special tracking
 					if cmd_name == 'CALL_SUBROUTINE' and len(params) >= 1:
 						# Track subroutine targets
@@ -206,11 +206,11 @@ class CommandUsageProfiler:
 								target = int(params[0][1:], 16)
 							else:
 								target = int(params[0])
-							
+
 							self.subroutine_targets[target] += 1
 						except ValueError:
 							pass
-					
+
 					elif cmd_name == 'MEMORY_WRITE' and len(params) >= 1:
 						# Track memory addresses
 						try:
@@ -220,25 +220,25 @@ class CommandUsageProfiler:
 								addr = int(params[0][1:], 16)
 							else:
 								addr = int(params[0])
-							
+
 							self.memory_hotspots[addr] += 1
 						except ValueError:
 							pass
-				
+
 				else:
 					# Text line
 					current_profile.text_bytes += len(line)
-		
+
 		# Save last dialog
 		if current_profile:
 			current_profile.unique_commands = len(set(current_profile.commands_used))
 			current_profile.complexity_score = self.calculate_complexity(current_profile)
-		
+
 		# Calculate average parameters per use
 		for cmd_profile in self.command_profiles.values():
 			if cmd_profile.usage_count > 0:
 				cmd_profile.avg_parameters_per_use = cmd_profile.total_parameters / cmd_profile.usage_count
-	
+
 	def track_co_occurrence(self, cmd1: str, cmd2: str) -> None:
 		"""Track command co-occurrence."""
 		# Find existing or create new
@@ -246,39 +246,39 @@ class CommandUsageProfiler:
 			if co.command1 == cmd1 and co.command2 == cmd2:
 				co.count += 1
 				return
-		
+
 		self.co_occurrences.append(CoOccurrence(command1=cmd1, command2=cmd2, count=1))
-	
+
 	def calculate_complexity(self, profile: ScriptProfile) -> float:
 		"""
 		Calculate script complexity score.
-		
+
 		Args:
 			profile: Script profile
-		
+
 		Returns:
 			Complexity score (higher = more complex)
 		"""
 		score = 0.0
-		
+
 		# Base complexity from command count
 		score += profile.command_count * 1.0
-		
+
 		# Bonus for unique commands (more diverse = more complex)
 		score += profile.unique_commands * 2.0
-		
+
 		# Penalty for simple patterns (NEWLINE, WAIT, END only)
 		simple_cmds = ['NEWLINE', 'WAIT', 'END']
 		if all(cmd in simple_cmds for cmd in profile.commands_used):
 			score *= 0.5
-		
+
 		# Bonus for control flow commands
 		control_cmds = ['CALL_SUBROUTINE', 'MEMORY_WRITE']
 		control_count = sum(1 for cmd in profile.commands_used if cmd in control_cmds)
 		score += control_count * 5.0
-		
+
 		return score
-	
+
 	def identify_subroutines(self) -> None:
 		"""Identify scripts that are called as subroutines."""
 		# Mark scripts as subroutines if they're called by others
@@ -288,55 +288,55 @@ class CommandUsageProfiler:
 				# Placeholder logic - in real implementation, use ROM offset mapping
 				if call_count > 0:
 					profile.is_subroutine = True
-	
+
 	def generate_report(self, report_file: str) -> None:
 		"""Generate profiling report."""
 		report_path = Path(report_file)
-		
+
 		lines = []
 		lines.append("# Command Usage Profile Report")
 		lines.append("=" * 80)
 		lines.append("")
-		
+
 		# Summary
 		total_scripts = len(self.script_profiles)
 		total_commands = sum(p.command_count for p in self.script_profiles.values())
-		
+
 		lines.append("## Summary")
 		lines.append("")
 		lines.append(f"- **Total Scripts**: {total_scripts}")
 		lines.append(f"- **Total Commands**: {total_commands}")
 		lines.append(f"- **Avg Commands per Script**: {total_commands / total_scripts if total_scripts > 0 else 0:.1f}")
 		lines.append("")
-		
+
 		# Command frequency
 		lines.append("## Command Frequency")
 		lines.append("")
 		lines.append("| Command | Usage Count | Dialogs | Avg Params |")
 		lines.append("|---------|------------:|--------:|-----------:|")
-		
+
 		sorted_commands = sorted(
 			self.command_profiles.values(),
 			key=lambda c: c.usage_count,
 			reverse=True
 		)
-		
+
 		for cmd in sorted_commands:
 			if cmd.usage_count > 0:
 				lines.append(f"| {cmd.name} | {cmd.usage_count} | {len(cmd.dialogs_used_in)} | {cmd.avg_parameters_per_use:.1f} |")
-		
+
 		lines.append("")
-		
+
 		# Most complex scripts
 		lines.append("## Most Complex Scripts")
 		lines.append("")
-		
+
 		sorted_scripts = sorted(
 			self.script_profiles.values(),
 			key=lambda s: s.complexity_score,
 			reverse=True
 		)
-		
+
 		for profile in sorted_scripts[:10]:
 			lines.append(f"### Dialog {profile.dialog_id}")
 			lines.append(f"- Complexity: {profile.complexity_score:.1f}")
@@ -345,67 +345,67 @@ class CommandUsageProfiler:
 			if profile.is_subroutine:
 				lines.append(f"- **Subroutine** (called by {len(profile.called_by)} scripts)")
 			lines.append("")
-		
+
 		# Command co-occurrences
 		lines.append("## Common Command Patterns")
 		lines.append("")
-		
+
 		sorted_co = sorted(self.co_occurrences, key=lambda c: c.count, reverse=True)
-		
+
 		for co in sorted_co[:20]:
 			lines.append(f"- **{co.command1}** → **{co.command2}**: {co.count} times")
-		
+
 		lines.append("")
-		
+
 		# Memory hotspots
 		if self.memory_hotspots:
 			lines.append("## Memory Hotspots")
 			lines.append("")
 			lines.append("Most frequently written memory addresses:")
 			lines.append("")
-			
+
 			for addr, count in self.memory_hotspots.most_common(10):
 				lines.append(f"- **0x{addr:04X}**: {count} writes")
-			
+
 			lines.append("")
-		
+
 		# Subroutine targets
 		if self.subroutine_targets:
 			lines.append("## Subroutine Call Hotspots")
 			lines.append("")
 			lines.append("Most frequently called subroutines:")
 			lines.append("")
-			
+
 			for offset, count in self.subroutine_targets.most_common(10):
 				lines.append(f"- **0x{offset:04X}**: {count} calls")
-			
+
 			lines.append("")
-		
+
 		# Optimization suggestions
 		lines.append("## Optimization Suggestions")
 		lines.append("")
-		
+
 		# Find repeated command sequences
 		lines.append("### Potential Subroutine Candidates")
 		lines.append("")
 		lines.append("Commands that appear frequently could be moved to subroutines:")
 		lines.append("")
-		
+
 		for cmd in sorted_commands[:5]:
 			if cmd.usage_count > 10:
 				lines.append(f"- **{cmd.name}**: Used {cmd.usage_count} times across {len(cmd.dialogs_used_in)} dialogs")
-		
+
 		lines.append("")
-		
+
 		with open(report_path, 'w', encoding='utf-8') as f:
 			f.write('\n'.join(lines))
-		
+
 		print(f"\n📊 Report saved: {report_path}")
-	
+
 	def export_json(self, json_file: str) -> None:
 		"""Export profiling data to JSON."""
 		json_path = Path(json_file)
-		
+
 		data = {
 			'summary': {
 				'total_scripts': len(self.script_profiles),
@@ -441,17 +441,17 @@ class CommandUsageProfiler:
 				for co in self.co_occurrences
 			],
 		}
-		
+
 		with open(json_path, 'w', encoding='utf-8') as f:
 			json.dump(data, f, indent='\t')
-		
+
 		print(f"📄 JSON data saved: {json_path}")
 
 
 def main():
 	"""Main entry point."""
 	import argparse
-	
+
 	parser = argparse.ArgumentParser(
 		description="Profile FFMQ event command usage patterns",
 		formatter_class=argparse.RawDescriptionHelpFormatter,
@@ -471,46 +471,46 @@ Documentation:
 	See ROM_HACKING_TOOLCHAIN_GUIDE.md for details.
 		"""
 	)
-	
+
 	parser.add_argument(
 		'--script',
 		nargs='+',
 		required=True,
 		help='Path to script file(s)'
 	)
-	
+
 	parser.add_argument(
 		'--report',
 		default='usage_profile_report.md',
 		help='Path for profiling report'
 	)
-	
+
 	parser.add_argument(
 		'--json',
 		default='usage_profile.json',
 		help='Path for JSON export'
 	)
-	
+
 	args = parser.parse_args()
-	
+
 	print("=" * 80)
 	print("COMMAND USAGE PROFILER")
 	print("=" * 80)
-	
+
 	# Initialize profiler
 	profiler = CommandUsageProfiler()
-	
+
 	# Profile each script
 	for script_path in args.script:
 		profiler.parse_script_file(script_path)
-	
+
 	# Identify subroutines
 	profiler.identify_subroutines()
-	
+
 	# Generate outputs
 	profiler.generate_report(args.report)
 	profiler.export_json(args.json)
-	
+
 	print("\n" + "=" * 80)
 	print("PROFILING COMPLETE")
 	print("=" * 80)
