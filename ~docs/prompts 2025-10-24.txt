@@ -690,7 +690,7 @@ git commit and push; update the session/chat logs; make sure to format everythin
 git commit and push; update the session/chat logs; make sure to format everything! we use TABS not spaces; implement the changes to make it awesome for as long as you can and use up all the tokens for each session, do not waste my money - use the entire token space; do more per session/prompt; make it as awesome and complete as possible; git commit and push; GOAL: enemy gui editor, item gui editor, etc., using the new insight and scripts; then whatever else
 
 --------------------------------
-This some old response, so check to see which lines are already done and which ones need to be implemented; if any are still outstanding, then make guthub issues (locally and as actual guithub issues); then do the work! ; Add manual steps to the current documentation for manual steps and add issues so I know what to do tomorrow. ;;;
+a bunch of these editors seem like nonsense; This some old response, so check to see which lines are already done and which ones need to be implemented; if any are still outstanding, then make guthub issues (locally and as actual guithub issues); then do the work! ; Add manual steps to the current documentation for manual steps and add issues so I know what to do tomorrow. ;;;
 Option A: Extract sprite metadata (which tiles use which palettes) and render accordingly
 Option B: Create a palette-aware extractor that uses tilemap/OAM data
  Next Steps (Optional Enhancements)
@@ -702,10 +702,31 @@ Add animation frames (multiple poses per character)
 Implement sprite re-insertion (PNG → ROM for modding)
 ----------------------------
 
-git commit and push; update the session/chat logs; make sure to format everything! we use TABS not spaces; implement the changes to make it awesome for as long as you can and use up all the tokens for each session, do not waste my money - use the entire token space; do more per session/prompt; make it as awesome and complete as possible; git commit and push; GOAL: comprehensive SRAM save file editor with documentation of the tools and the schema with label names etc.; then whatever else
+git commit and push; update the session/chat logs; make sure to format everything! we use TABS not spaces; implement the changes to make it awesome for as long as you can and use up all the tokens for each session, do not waste my money - use the entire token space; do more per session/prompt; make it as awesome and complete as possible; git commit and push; GOAL: fix those lint warnings and comprehensive SRAM save file editor with documentation of the tools and the schema with label names etc.; then whatever else
+make sure to add todo lists and GH issues for all new work! and be sure to reference `https://datacrystal.tcrf.net/wiki/Final_Fantasy:_Mystic_Quest/SRAM_map` for a basic data structure
+research the unknown sram values and add to editor and document them and also make a UI editor for sram files.
+git commit and push; research any unknown values and generic labels in the disassembly and document findings and fix labels and coment and names in code;
+git commit and push; Week 1: Apply new variable labels globally across all .asm files; research any unknown values and generic labels in the disassembly and document findings and fix labels and coment and names in code;
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+a bunch of these editors seem like nonsense; 
 
 
 
