@@ -1,4 +1,4 @@
-﻿
+
 
 
 ;--------------------------------------------------------------------
@@ -2177,7 +2177,7 @@ CopyTileDataToWRAM:
 ; copy $8 blocks of $400 bytes: either copy $20 tiles or clear bytes
 	ldx #$0000			; loop counter
 	.Loop {
-	lda $191a,x			; variable: @var_control, get value from $191a+x (lowram) TODO: trace this ram value
+	lda $191a,x			; variable: map_chunk_control, get value from $191a+x (lowram) TODO: trace this ram value
 	bpl .CopyTiles		; if positive => copy tiles, else => clear $400 bytes
 
 ; clear $400 bytes of wram
@@ -2192,17 +2192,17 @@ CopyTileDataToWRAM:
 
 	.CopyTiles
 ; determine source address offset
-	xba					; save @var_control
+	xba					; save map_chunk_control
 	stz $211b
 	lda #$03
 	sta $211b			; set [M7A] = $0300
-	xba					; swap @var_control back in
-	sta $211c			; set [M7B] = @var_control
+	xba					; swap map_chunk_control back in
+	sta $211c			; set [M7B] = map_chunk_control
 
 	%setAto16bit()
 	lda #$8c80			; source address base (label DataTiles)
 	clc
-	adc $2134			; source address offset => $8c80 + ($0300 * @var_control)
+	adc $2134			; source address offset => $8c80 + ($0300 * map_chunk_control)
 	tay					; set source address offset
 	%setAto8bit()
 
@@ -2230,15 +2230,15 @@ CopyTileDataToWRAM:
 ; write $8 * $20 = $100 bytes
 	ldx #$0000			; loop counter
 	.LoopC {
-	lda $191a,x			; variable: @var_control, get value from $191a+x (lowram) TODO: trace this ram value
+	lda $191a,x			; variable: map_chunk_control, get value from $191a+x (lowram) TODO: trace this ram value
 	phx					; save loop counter
 
 ; determine source address offset
 	sta $211b
-	stz $211b			; set [M7A] = $00(@var_control)
+	stz $211b			; set [M7A] = $00(map_chunk_control)
 	lda #$10
 	sta $211c			; set [M7B] = $10
-	ldy $2134			; source address offset => @var_control * $10
+	ldy $2134			; source address offset => map_chunk_control * $10
 
 ; read $10 bytes, write $20 bytes
 ; split upper and lower nibbles into individual bytes
@@ -2494,7 +2494,7 @@ Routine0b8149:
 ; setup variables
 	stz $19f6			; !map_param_zero => $00
 	lda #$80
-	sta !ram_19a5			; @var_19a5 => $80
+	sta !ram_19a5			; (legacy) => $80
 	lda #$01
 	sta $1a45			; !graphics_init_flag => $01
 	ldx $19f1			; load !map_param_2
@@ -2527,8 +2527,8 @@ Routine0b8149:
 	ldx #$0000
 	lda #$20			; loop counter
 	.Loop {
-	stz $0ec8,x			; @var_0ec8[x] => $00
-	stz $0f28,x			; @var_0f28[x] => $00
+	stz $0ec8,x			; !dma_channel_array[x] => $00
+	stz $0f28,x			; !vram_transfer_array[x] => $00
 	inx					; increment destination offset
 	dec					; decrement counter
 	bne .Loop
@@ -2537,7 +2537,7 @@ Routine0b8149:
 ; clear $0ee8-$0f17
 	lda #$30			; loop counter
 	.LoopB {
-	stz $0ec8,x			; @var_0ec8[x] => $00
+	stz $0ec8,x			; !dma_channel_array[x] => $00
 	inx					; increment destination offset
 	dec					; decrement counter
 	bne .LoopB
@@ -2546,21 +2546,21 @@ Routine0b8149:
 	.IsZero
 
 ;
-	lda $0e91			; load @var_0e91
+	lda $0e91			; load !tilemap_counter
 	%setAto16bit()
 	and #$00ff			; ignore upper byte
 	asl a
-	tax					; source offset => @var_0e91 * 2
+	tax					; source offset => !tilemap_counter * 2
 	lda Data07af3b,x
-	tax					; source offset => Data07af3b[@var_0e91 * 2]
+	tax					; source offset => Data07af3b[!tilemap_counter * 2]
 	%setAto8bit()
-	stx $19b5			; @var_19b5 => source offset
+	stx $19b5			; !data_source_offset => source offset
 
 ;
 	ldy #$0000			; loop counter
 	.LoopC {
 	lda Data07b013,x	;
-	sta $1910,y			; @var_1910[y] => Data07b013[x]
+	sta $1910,y			; !graphics_table_data[y] => Data07b013[x]
 	inx					; increment source offset
 	iny					; increment counter
 	cpy #$0007			; loop until counter = $7
@@ -2568,55 +2568,55 @@ Routine0b8149:
 	}
 
 ; determine source address offset
-; @var_1911 is source address index
+; !source_address_index is source address index
 	lda #$0a
 	sta $211b
 	stz $211b			; set [M7A] => $000a
 	lda $1911
-	sta $211c			; set [M7B] => @var_1911
+	sta $211c			; set [M7B] => !source_address_index
 	ldx $2134
-	stx $19b7			; source address offset => @var_1911 * $0a
+	stx $19b7			; source address offset => !source_address_index * $0a
 
-; copy $a bytes into @var_1918[]
+; copy $a bytes into !tileset_copy_buffer[]
 	ldy #$0000			; loop counter
 	.LoopD {
 	lda.l DataTilesets,x
-	sta $1918,y			; @var_1918[y] => DataTilesets[x]
+	sta $1918,y			; !tileset_copy_buffer[y] => DataTilesets[x]
 	inx					; increment source offset
 	iny					; increment counter
 	cpy #$000a			; loop until counter = $a
 	bne .LoopD
 	}
 
-	ldx #$ffff			; default @var_19b9 value is $ffff
+	ldx #$ffff			; default !source_pointer value is $ffff
 	lda $1912
 	cmp #$ff
-	beq .Skip			; skip ahead if @var_1912 is $ff
+	beq .Skip			; skip ahead if !source_offset_index is $ff
 
 	%setAto16bit()
 	and #$00ff			; ignore upper byte
 	asl a				; A => A * 2
-	tax					; source address offset => @var_1912 * 2
+	tax					; source address offset => !source_offset_index * 2
 	lda.l Data0b8892,x
 	tax
 	%setAto8bit()
 
 	.Skip
-	stx $19b9			; @var_19b9 => X
+	stx $19b9			; !source_pointer => X
 
-	lda $1916			; load @var_1916
+	lda $1916			; load !graphics_param_2
 	and #$e0			; bits 5-7
 	lsr a
 	lsr a				; A => A / 8
 	lsr a
-	sta $1a55			; @var_1a55 => A
+	sta $1a55			; !packed_graphics_flags => A
 
-	lda $1915			; load @var_1915
+	lda $1915			; load !graphics_param_1
 	and #$e0			; bits 5-7
 	ora $1a55			; combine with other 3 bits
 	lsr a
 	lsr a				; A => A / 4
-	sta $1a55			; @var_1a55 => byte made of: two 0 bits, top three bits of @var_1915, top three bits of @var_1916
+	sta $1a55			; !packed_graphics_flags => byte made of: two 0 bits, top three bits of !graphics_param_1, top three bits of !graphics_param_2
 
 	rtl					; exit routine
 
