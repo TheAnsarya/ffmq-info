@@ -1318,9 +1318,10 @@ Clear32bytesOfWRAM:
 ; ROUTINE:  ($01f849)
 ; parameters:
 ;		ram $19f7 =>
-; TODO: name this routine!!!
+; Increments battle phase counter and sets up VRAM tilemap copy operation
+; Loads tilemap data from $f891 table and writes to VRAM addresses
 
-Routine01f849:
+IncrementBattlePhaseAndSetupTilemapCopy:
 	%setAto8bit()
 	01f84b inc $19f7
 	01f84e jsr $82cf
@@ -1406,8 +1407,9 @@ Routine01f977:
 ;		!graphics_index ($19d7)
 ;		!graphics_param ($1a52)
 ; A => 8bit, XY => 16bit
-; TODO: name this routine!!!!!!
-Routine01f985:
+; Loads tilemap copy setup based on graphics index and player position
+; Calculates Y offset from lookup table indexed by lower 2 bits of !graphics_index
+LoadTilemapCopySetup:
 
 ; get offset into JumpTableTilemapCopySetup[]
 	lda $19d7			; load !graphics_index
@@ -1433,8 +1435,7 @@ Routine01f985:
 ;		X => offset into JumpTableTilemapCopySetup[] and JumpTableTilemapCopySetup_2[]
 ;		Y =>
 ;
-
-Routine01f985_Entry:
+LoadTilemapCopySetup_Entry:
 	01f99f jsr $fd50
 	01f9a2 sty !ram_1a31
 	01f9a5 sty !ram_1a2d
@@ -1535,8 +1536,10 @@ JumpTableTilemapCopySetup_2:
 ;		!ram_1a31 =>
 ;		!ram_1a33 =>
 ; A => 8bit, XY => 16bit
-; TODO: name this routine!!!
-TilemapCopySetup:
+; Copies tilemap data values from !ram_1a3d buffer to WRAM tilemap source ($0800 base)
+; Horizontal layout: writes data in horizontal stripe pattern
+; Uses !ram_1a31 counter with wraparound based on !ram_1924
+CopyTilemapDataHorizontal:
 	ldy #$0000			; loop counter
 	.Loop {
 	phy					; save Y
@@ -1634,8 +1637,10 @@ TilemapCopySetup:
 ; parameters:
 ;
 ; A => 8bit, XY => 16bit
-; TODO: name this routine!!!
-TilemapCopySetupVertical:
+; Copies tilemap data values from !ram_1a3d buffer to WRAM tilemap source ($0800 base)
+; Vertical layout: writes data in vertical stripe pattern
+; Uses !ram_1a32 counter with wraparound based on !ram_1925
+CopyTilemapDataVertical:
 	ldy #$0000			; loop counter
 	.Loop {
 	phy					; save Y
@@ -1729,8 +1734,9 @@ TilemapCopySetupVertical:
 ; parameters:
 ;
 ; A => 8bit, XY => 16bit
-; TODO: name this routine!!!
-TilemapCopySetup_2:
+; Copies tilemap data to secondary WRAM tilemap buffer ($0900 base)
+; Horizontal layout variant
+CopyTilemapDataHorizontal_Alt:
 	ldy #$0000			; loop counter
 	.Loop {
 	phy					; save Y
@@ -1829,8 +1835,9 @@ TilemapCopySetup_2:
 ;		!ram_1a33
 ;		!ram_1925
 ; A => 8bit, XY => 16bit
-; TODO: name this routine!!!
-TilemapCopySetupVertical_2:
+; Copies tilemap data to secondary WRAM tilemap buffer ($0900 base)
+; Vertical layout variant
+CopyTilemapDataVertical_Alt:
 	ldy #$0000			; loop counter
 	.Loop {
 	phy					; save Y
@@ -1934,8 +1941,10 @@ TilemapCopySetupVertical_2:
 ; returns:
 ;		ram $1a3d[] => 8 bytes
 ; A => 8bit, XY => 16bit
-; TODO: name this routine!!!!!!!!!!
-Routine01fc8e:
+; Calculates tilemap tile value from Y coordinate and ROM data lookup
+; Performs multiplication, table lookup at $7f8000, and XOR with accumulator
+; Returns result in A (7-bit) and Y, with address offset in X
+CalculateTilemapTileValue:
 	sta $1a3a			; !temp_accumulator => A
 
 ; multiply Y.high * !ram_1924
@@ -2099,8 +2108,9 @@ DataCalculateTilemapVramDestination_Offset:
 ;		!ram_1925 =>
 ; returns:
 ;		Y =>
-; TODO: Name this routine!!!!!!!!!
-Routine01fd50:
+; Wraps Y coordinate within tilemap boundaries using !ram_1924 and !ram_1925
+; Handles both positive and negative overflow by adding/subtracting boundary values
+WrapTilemapCoordinate:
 
 	%setAto16bit()
 	tya					; A => Y
@@ -2295,9 +2305,11 @@ CopyTileDataToWRAM:
 ;		!player_map_x ($0e89)
 ;		!player_map_y ($0e8a)
 ; A => 8bit, XY => 16bit
-; TODO: Name this routine!!!!!!!!!
-
-Routine01ffc1:
+; Calculates tilemap viewport offsets and performs full screen tilemap copy
+; Sets !tilemap_x_offset = !player_map_x - 8
+; Sets !tilemap_y_offset = !player_map_y - 6
+; Copies 13 rows of tilemap data from WRAM to VRAM
+CalculateViewportAndCopyFullTilemap:
 ;
 	lda $0e89			; load !player_map_x
 	sec
