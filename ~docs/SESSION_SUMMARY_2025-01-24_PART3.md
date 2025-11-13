@@ -481,23 +481,44 @@ Expected: 50-100 instances across files
 ## Statistics
 
 ### Label Creation
-- **New Labels This Session:** 30+
-- **Label Categories:** 8 (actors, control, state, turn, combat, data, pointers, enemy)
-- **Address Range Covered:** $1900-$19f8 (battle system)
-- **Multi-purpose Variables:** 2 (with aliases)
+- **New Labels This Session:** 35+ (battle system + map/player variables)
+- **Label Categories:** 9 (actors, control, state, turn, combat, data, pointers, enemy, map/player)
+- **Address Ranges Covered:** 
+  - $0e88-$0e91 (map/player/context variables)
+  - $1900-$19f8 (battle system)
+- **Multi-purpose Variables:** 4 (with aliases)
+  - $0e8b: player_facing / battle_type
+  - $0e8d: map_param_2 (encounter/pathfinding)
+  - $0e91: tilemap_counter / battle_map_id
+  - $19b4: battle_animation_timer / graphics_mode_flags
+  - $19d7: battle_state_flags / graphics_index
 
 ### Code Impact
-- **Files Modified:** 3
-- **Total Replacements:** 70+ instances
-- **Functions Updated:** 20+ unique (40+ including duplicates)
-- **Lines Changed:** ~150 insertions/deletions
-- **Commits:** 3 (all pushed)
+- **Files Modified:** 4 (ffmq_ram_variables.inc, bank_01_documented.asm, bank_0B_documented.asm, SESSION_SUMMARY)
+- **Total Replacements:** 90+ instances
+- **Functions Updated:** 25+ unique (50+ including duplicates)
+- **Lines Changed:** ~200 insertions/deletions
+- **Commits:** 6 (all pushed)
 
 ### Progress Metrics
-- **Bank_01 Battle Variables:** ~40% labeled (70 of ~170 estimated instances)
+- **Bank_01 Battle Variables:** ~50% labeled (90 of ~180 estimated instances)
+- **Map/Player Variables ($0e8x):** 100% complete ($0e88-$0e8d all labeled)
 - **Battle Label Set:** 100% complete (comprehensive namespace created)
 - **@var_ References:** 100% eliminated (all cleaned up)
-- **Token Usage:** 7% of 1M budget (93% remaining)
+- **Token Usage:** 7.2% of 1M budget (92.8% remaining)
+
+### Variables Labeled This Session
+**Map/Player System ($0e88-$0e91):**
+- !context_param ($0e88) - already existed, applied more
+- !player_facing ($0e8b) - NEW, 10+ instances
+- !battle_type ($0e8b) - NEW alias, 5+ instances  
+- !map_param_1 ($0e8c) - NEW, documented
+- !map_param_2 ($0e8d) - NEW, 3+ instances
+- !battle_map_id ($0e91) - NEW alias, 8+ instances
+
+**Battle System ($1900-$19ff):**
+- 30+ battle labels (from previous summary)
+- All applied across 70+ instances
 
 ---
 
