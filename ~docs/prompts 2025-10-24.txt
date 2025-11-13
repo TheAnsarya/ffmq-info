@@ -702,6 +702,7 @@ Add animation frames (multiple poses per character)
 Implement sprite re-insertion (PNG → ROM for modding)
 ----------------------------
 
+git commit and push; update the session/chat logs; make sure to format everything! we use TABS not spaces; implement the changes to make it awesome for as long as you can and use up all the tokens for each session, do not waste my money - use the entire token space; do more per session/prompt; make it as awesome and complete as possible; git commit and push; GOAL: comprehensive SRAM save file editor with documentation of the tools and the schema with label names etc.; then whatever else
 
 
 
