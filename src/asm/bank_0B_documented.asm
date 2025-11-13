@@ -530,7 +530,7 @@ Battle_GfxAddressHigh:
 ;
 ; Key Variables:
 ;   $19f6 = Battle phase counter (cleared to 0)
-;   $19a5 = Battle flags (set to $80)
+;   $19a5 = Battle state flag (set to $80 = battle active)
 ;   $1a45 = Animation enable flag (set to $01)
 ;   $0e89/$0e91 = Enemy formation pointers
 ;
@@ -546,7 +546,7 @@ Battle_GfxAddressHigh:
 BattleInit_SetupEncounter:
 	stz.w $19f6	 ; Clear battle phase counter
 	lda.b #$80	  ; Battle active flag
-	sta.w $19a5	 ; Store to battle flags
+	sta.w $19a5	 ; Set battle state flag to active ($80)
 	lda.b #$01	  ; Animation enable
 	sta.w $1a45	 ; Store to animation flag
 	ldx.w $19f1	 ; Load enemy formation ID (16-bit)

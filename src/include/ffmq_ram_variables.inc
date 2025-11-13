@@ -304,7 +304,10 @@
 !ram_1924           = $1924     ; Legacy graphics variable
 !ram_1925           = $1925     ; Conditional offset (used in add/subtract operations)
 !ram_195f           = $195f     ; Legacy graphics variable
-!ram_19a5           = $19a5     ; Legacy graphics variable
+
+; Battle/Field State Flag
+!battle_state_flag      = $19a5     ; Battle/field state flag: $00=field input, $80=battle active, $ff=inactive/disabled
+!ram_19a5               = $19a5     ; Legacy alias for !battle_state_flag
 
 ; ----------------------------------------------------------------------------
 ; Graphics Mode and Parameters ($19b4-$19f6)

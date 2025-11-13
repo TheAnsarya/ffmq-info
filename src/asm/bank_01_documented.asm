@@ -80,8 +80,8 @@ Battle_Initialize:
 	rep #$10		; 16-bit X,Y
 
 ; Initialize battle state flags
-	lda.b #$ff	  ; Invalid enemy marker
-	sta.w $19a5	 ; Current enemy ID
+	lda.b #$ff	  ; Inactive/disabled marker
+	sta.w $19a5	 ; Set battle state flag to inactive
 
 	stz.w $1a46	 ; Clear battle phase counter
 	stz.w $1a45	 ; Clear animation frame
