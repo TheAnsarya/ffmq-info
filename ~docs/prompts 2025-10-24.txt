@@ -684,6 +684,9 @@ you stalled and didn't output any chat, keep me updated; search the documentatio
 git commit and push; all of those manual tasks? create real Issues in github for them in the `FFMQ Disassembly Progress` project and assign them to me and put them in `Ready` status in the Kanban board; then continue working on something, anything that creates real progress;  make sure to format everything! we use TABS not spaces; implement the changes to make it awesome for as long as you can and use up all the tokens for each session, do not waste my money - use the entire token space; do more per session/prompt; make it as awesome and complete as possible; git commit and push;
 continue!
 
+git commit and push; continue working on something, anything that creates real progress, maybe revisit graphics exctraction to get real graphics instead of nonsense, google images of the game if you think it would help;  make sure to format everything! we use TABS not spaces; implement the changes to make it awesome for as long as you can and use up all the tokens for each session, do not waste my money - use the entire token space; do more per session/prompt; make it as awesome and complete as possible; git commit and push;
+
+
 
 
 

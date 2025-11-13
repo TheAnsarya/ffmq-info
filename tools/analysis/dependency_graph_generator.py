@@ -98,23 +98,23 @@ class CircularDependency:
 
 class DependencyGraphGenerator:
 	"""Generate and analyze script dependency graphs"""
-	
+
 	def __init__(self, verbose: bool = False):
 		self.verbose = verbose
 		self.nodes: Dict[str, ScriptNode] = {}
 		self.dependencies: List[Dependency] = []
 		self.circular_deps: List[CircularDependency] = []
-	
+
 	def parse_script(self, path: Path, script_id: Optional[str] = None) -> None:
 		"""Parse script file and extract dependencies"""
 		if script_id is None:
 			script_id = path.stem
-		
+
 		if script_id not in self.nodes:
 			self.nodes[script_id] = ScriptNode(script_id=script_id, file_path=str(path))
-		
+
 		node = self.nodes[script_id]
-		
+
 		try:
 			with open(path) as f:
 				lines = f.readlines()
@@ -122,60 +122,60 @@ class DependencyGraphGenerator:
 			if self.verbose:
 				print(f"Error reading {path}: {e}")
 			return
-		
+
 		for line_num, line in enumerate(lines, 1):
 			line = line.strip()
 			if not line or line.startswith(';'):
 				continue
-			
+
 			# Parse command
 			match = re.match(r'^([A-Z_]+)(?:\s+(.+))?$', line)
 			if not match:
 				continue
-			
+
 			command = match.group(1)
 			params_str = match.group(2) or ""
-			
+
 			# Call dependencies
 			if command == 'CALL':
 				target = self.parse_address(params_str)
 				if target:
 					node.calls_made.add(target)
 					self.add_dependency(script_id, target, DependencyType.CALL)
-			
+
 			# Jump/branch dependencies
 			elif command in ('JUMP', 'BRANCH'):
 				target = self.parse_label(params_str)
 				if target:
 					dep_type = DependencyType.JUMP if command == 'JUMP' else DependencyType.BRANCH
 					self.add_dependency(script_id, target, dep_type)
-			
+
 			# Flag dependencies
 			elif command in ('SET_FLAG', 'CLEAR_FLAG'):
 				flag_id = self.parse_flag_id(params_str)
 				if flag_id is not None:
 					node.flags_written.add(flag_id)
 					self.add_dependency(script_id, f"flag_{flag_id}", DependencyType.FLAG_WRITE)
-			
+
 			elif command == 'CHECK_FLAG':
 				flag_id = self.parse_flag_id(params_str)
 				if flag_id is not None:
 					node.flags_read.add(flag_id)
 					self.add_dependency(script_id, f"flag_{flag_id}", DependencyType.FLAG_READ)
-			
+
 			# Variable dependencies
 			elif command in ('VARIABLE_SET', 'MEMORY_WRITE'):
 				var_name = self.parse_variable(params_str)
 				if var_name:
 					node.variables_written.add(var_name)
 					self.add_dependency(script_id, f"var_{var_name}", DependencyType.VARIABLE_WRITE)
-			
+
 			elif command in ('VARIABLE_CHECK', 'MEMORY_READ', 'MEMORY_COMPARE'):
 				var_name = self.parse_variable(params_str)
 				if var_name:
 					node.variables_read.add(var_name)
 					self.add_dependency(script_id, f"var_{var_name}", DependencyType.VARIABLE_READ)
-	
+
 	def parse_address(self, params: str) -> Optional[str]:
 		"""Parse subroutine address from parameters"""
 		# Try to extract bank/offset or label
@@ -184,21 +184,21 @@ class DependencyGraphGenerator:
 			bank = match.group(1)
 			offset = match.group(2)
 			return f"sub_{bank}_{offset}"
-		
+
 		# Try label
 		match = re.match(r'([a-zA-Z_][a-zA-Z0-9_]*)', params)
 		if match:
 			return match.group(1)
-		
+
 		return None
-	
+
 	def parse_label(self, params: str) -> Optional[str]:
 		"""Parse label from parameters"""
 		match = re.match(r'([a-zA-Z_][a-zA-Z0-9_]*)', params)
 		if match:
 			return match.group(1)
 		return None
-	
+
 	def parse_flag_id(self, params: str) -> Optional[int]:
 		"""Parse flag ID from parameters"""
 		parts = params.split(',')
@@ -208,7 +208,7 @@ class DependencyGraphGenerator:
 			except ValueError:
 				pass
 		return None
-	
+
 	def parse_variable(self, params: str) -> Optional[str]:
 		"""Parse variable name/address from parameters"""
 		parts = params.split(',')
@@ -221,7 +221,7 @@ class DependencyGraphGenerator:
 			if re.match(r'[a-zA-Z_][a-zA-Z0-9_]*', var):
 				return var
 		return None
-	
+
 	def add_dependency(self, source: str, target: str, dep_type: DependencyType, **metadata) -> None:
 		"""Add dependency edge"""
 		dep = Dependency(
@@ -231,25 +231,25 @@ class DependencyGraphGenerator:
 			metadata=metadata
 		)
 		self.dependencies.append(dep)
-		
+
 		# Update node relationships for call dependencies
 		if dep_type == DependencyType.CALL:
 			if target not in self.nodes:
 				self.nodes[target] = ScriptNode(script_id=target, file_path="unknown", is_subroutine=True)
 			self.nodes[target].called_by.add(source)
-	
+
 	def find_circular_dependencies(self) -> List[CircularDependency]:
 		"""Find circular dependencies using DFS"""
 		self.circular_deps = []
 		visited = set()
 		rec_stack = set()
 		path = []
-		
+
 		def dfs(node_id: str) -> None:
 			visited.add(node_id)
 			rec_stack.add(node_id)
 			path.append(node_id)
-			
+
 			if node_id in self.nodes:
 				for target in self.nodes[node_id].calls_made:
 					if target not in visited:
@@ -258,65 +258,65 @@ class DependencyGraphGenerator:
 						# Found cycle
 						cycle_start = path.index(target)
 						cycle = path[cycle_start:] + [target]
-						
+
 						# Determine severity
 						severity = "high" if len(cycle) <= 3 else "medium"
-						
+
 						circular = CircularDependency(
 							cycle=cycle,
 							dep_types={DependencyType.CALL},
 							severity=severity
 						)
 						self.circular_deps.append(circular)
-			
+
 			path.pop()
 			rec_stack.remove(node_id)
-		
+
 		for node_id in self.nodes:
 			if node_id not in visited:
 				dfs(node_id)
-		
+
 		return self.circular_deps
-	
+
 	def find_unreachable_scripts(self) -> List[str]:
 		"""Find scripts that are never called"""
 		reachable = set()
-		
+
 		# Start from entry points
 		entry_points = [node_id for node_id, node in self.nodes.items() if node.is_entry_point]
-		
+
 		if not entry_points:
 			# If no explicit entry points, assume all non-subroutines are entry points
 			entry_points = [node_id for node_id, node in self.nodes.items() if not node.is_subroutine]
-		
+
 		# BFS from entry points
 		queue = deque(entry_points)
 		while queue:
 			current = queue.popleft()
 			if current in reachable:
 				continue
-			
+
 			reachable.add(current)
-			
+
 			if current in self.nodes:
 				for target in self.nodes[current].calls_made:
 					if target not in reachable:
 						queue.append(target)
-		
+
 		# Unreachable = all nodes - reachable
 		all_scripts = set(self.nodes.keys())
 		unreachable = all_scripts - reachable
-		
+
 		return sorted(unreachable)
-	
+
 	def calculate_coupling(self, node_id: str) -> int:
 		"""Calculate coupling (number of dependencies)"""
 		if node_id not in self.nodes:
 			return 0
-		
+
 		node = self.nodes[node_id]
 		return len(node.calls_made) + len(node.called_by)
-	
+
 	def generate_dot(self, include_data_deps: bool = False) -> str:
 		"""Generate GraphViz DOT format"""
 		lines = [
@@ -325,21 +325,21 @@ class DependencyGraphGenerator:
 			"\tnode [shape=box, style=rounded];",
 			""
 		]
-		
+
 		# Nodes
 		for node_id, node in self.nodes.items():
 			color = "lightblue" if node.is_entry_point else "lightgray"
 			if node.is_subroutine:
 				color = "lightgreen"
-			
+
 			label = node_id
 			if self.calculate_coupling(node_id) > 5:
 				color = "orange"
-			
+
 			lines.append(f'\t"{node_id}" [fillcolor={color}, style="filled,rounded"];')
-		
+
 		lines.append("")
-		
+
 		# Edges
 		seen_edges = set()
 		for dep in self.dependencies:
@@ -347,12 +347,12 @@ class DependencyGraphGenerator:
 			if not include_data_deps and dep.dep_type in (DependencyType.FLAG_READ, DependencyType.FLAG_WRITE,
 				DependencyType.VARIABLE_READ, DependencyType.VARIABLE_WRITE):
 				continue
-			
+
 			edge_key = (dep.source, dep.target, dep.dep_type)
 			if edge_key in seen_edges:
 				continue
 			seen_edges.add(edge_key)
-			
+
 			# Edge style based on type
 			if dep.dep_type == DependencyType.CALL:
 				style = "solid"
@@ -363,57 +363,57 @@ class DependencyGraphGenerator:
 			else:
 				style = "dotted"
 				color = "gray"
-			
+
 			lines.append(f'\t"{dep.source}" -> "{dep.target}" [style={style}, color={color}];')
-		
+
 		lines.append("}")
 		return '\n'.join(lines)
-	
+
 	def generate_mermaid(self) -> str:
 		"""Generate Mermaid diagram"""
 		lines = [
 			"graph TD",
 			""
 		]
-		
+
 		# Nodes with styles
 		for node_id, node in self.nodes.items():
 			safe_id = node_id.replace('-', '_').replace('/', '_')
-			
+
 			if node.is_entry_point:
 				lines.append(f'\t{safe_id}["{node_id}"]:::entry')
 			elif node.is_subroutine:
 				lines.append(f'\t{safe_id}("{node_id}"):::subroutine')
 			else:
 				lines.append(f'\t{safe_id}["{node_id}"]')
-		
+
 		lines.append("")
-		
+
 		# Edges (call dependencies only)
 		seen_edges = set()
 		for dep in self.dependencies:
 			if dep.dep_type != DependencyType.CALL:
 				continue
-			
+
 			edge_key = (dep.source, dep.target)
 			if edge_key in seen_edges:
 				continue
 			seen_edges.add(edge_key)
-			
+
 			source_safe = dep.source.replace('-', '_').replace('/', '_')
 			target_safe = dep.target.replace('-', '_').replace('/', '_')
-			
+
 			lines.append(f'\t{source_safe} --> {target_safe}')
-		
+
 		# Styles
 		lines.extend([
 			"",
 			"\tclassDef entry fill:#90EE90,stroke:#333;",
 			"\tclassDef subroutine fill:#ADD8E6,stroke:#333;"
 		])
-		
+
 		return '\n'.join(lines)
-	
+
 	def generate_json(self) -> str:
 		"""Generate JSON graph data"""
 		nodes = [
@@ -426,7 +426,7 @@ class DependencyGraphGenerator:
 			}
 			for node_id, node in self.nodes.items()
 		]
-		
+
 		edges = [
 			{
 				"source": dep.source,
@@ -435,18 +435,18 @@ class DependencyGraphGenerator:
 			}
 			for dep in self.dependencies
 		]
-		
+
 		data = {
 			"nodes": nodes,
 			"edges": edges
 		}
-		
+
 		return json.dumps(data, indent=2)
-	
+
 	def generate_interactive_html(self) -> str:
 		"""Generate interactive D3.js force graph"""
 		graph_data = self.generate_json()
-		
+
 		html = f"""<!DOCTYPE html>
 <html>
 <head>
@@ -474,27 +474,27 @@ class DependencyGraphGenerator:
 	<div class="tooltip" id="tooltip"></div>
 	<script>
 		const data = {graph_data};
-		
+
 		const width = window.innerWidth;
 		const height = window.innerHeight;
-		
+
 		const svg = d3.select("#graph")
 			.append("svg")
 			.attr("width", width)
 			.attr("height", height);
-		
+
 		const simulation = d3.forceSimulation(data.nodes)
 			.force("link", d3.forceLink(data.edges).id(d => d.id).distance(100))
 			.force("charge", d3.forceManyBody().strength(-300))
 			.force("center", d3.forceCenter(width / 2, height / 2));
-		
+
 		const link = svg.append("g")
 			.selectAll("line")
 			.data(data.edges)
 			.join("line")
 			.attr("class", "link")
 			.attr("stroke-width", 2);
-		
+
 		const node = svg.append("g")
 			.selectAll("circle")
 			.data(data.nodes)
@@ -506,7 +506,7 @@ class DependencyGraphGenerator:
 				.on("start", dragstarted)
 				.on("drag", dragged)
 				.on("end", dragended));
-		
+
 		const label = svg.append("g")
 			.selectAll("text")
 			.data(data.nodes)
@@ -515,34 +515,34 @@ class DependencyGraphGenerator:
 			.attr("font-size", 10)
 			.attr("dx", 8)
 			.attr("dy", 4);
-		
+
 		simulation.on("tick", () => {{
 			link
 				.attr("x1", d => d.source.x)
 				.attr("y1", d => d.source.y)
 				.attr("x2", d => d.target.x)
 				.attr("y2", d => d.target.y);
-			
+
 			node
 				.attr("cx", d => d.x)
 				.attr("cy", d => d.y);
-			
+
 			label
 				.attr("x", d => d.x)
 				.attr("y", d => d.y);
 		}});
-		
+
 		function dragstarted(event) {{
 			if (!event.active) simulation.alphaTarget(0.3).restart();
 			event.subject.fx = event.subject.x;
 			event.subject.fy = event.subject.y;
 		}}
-		
+
 		function dragged(event) {{
 			event.subject.fx = event.x;
 			event.subject.fy = event.y;
 		}}
-		
+
 		function dragended(event) {{
 			if (!event.active) simulation.alphaTarget(0);
 			event.subject.fx = null;
@@ -551,7 +551,7 @@ class DependencyGraphGenerator:
 	</script>
 </body>
 </html>"""
-		
+
 		return html
 
 
@@ -567,11 +567,11 @@ def main():
 	parser.add_argument('--find-unreachable', action='store_true', help='Find unreachable code')
 	parser.add_argument('--include-data-deps', action='store_true', help='Include data dependencies')
 	parser.add_argument('--verbose', action='store_true', help='Verbose output')
-	
+
 	args = parser.parse_args()
-	
+
 	generator = DependencyGraphGenerator(verbose=args.verbose)
-	
+
 	# Parse all scripts
 	for input_path in args.input_paths:
 		if input_path.is_file():
@@ -581,11 +581,11 @@ def main():
 				generator.parse_script(script_file)
 			for script_file in input_path.rglob('*.asm'):
 				generator.parse_script(script_file)
-	
+
 	if args.verbose:
 		print(f"Parsed {len(generator.nodes)} scripts")
 		print(f"Found {len(generator.dependencies)} dependencies")
-	
+
 	# Analysis
 	if args.find_circular or args.analyze:
 		circular = generator.find_circular_dependencies()
@@ -593,14 +593,14 @@ def main():
 			print(f"\n⚠ Found {len(circular)} circular dependencies:")
 			for circ in circular:
 				print(f"  - {' -> '.join(circ.cycle)} [{circ.severity}]")
-	
+
 	if args.find_unreachable or args.analyze:
 		unreachable = generator.find_unreachable_scripts()
 		if unreachable:
 			print(f"\n⚠ Found {len(unreachable)} unreachable scripts:")
 			for script in unreachable[:10]:
 				print(f"  - {script}")
-	
+
 	# Generate output
 	if args.interactive or args.format == 'html':
 		output = generator.generate_interactive_html()
@@ -610,7 +610,7 @@ def main():
 		output = generator.generate_mermaid()
 	elif args.format == 'json':
 		output = generator.generate_json()
-	
+
 	# Write output
 	if args.output:
 		with open(args.output, 'w') as f:
@@ -618,7 +618,7 @@ def main():
 		print(f"\n✓ Dependency graph generated: {args.output}")
 	else:
 		print(output)
-	
+
 	return 0
 
 

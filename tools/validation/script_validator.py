@@ -88,7 +88,7 @@ class ValidationResult:
 
 class ScriptValidator:
 	"""Validate event scripts for correctness and best practices"""
-	
+
 	# Command definitions with parameter specs
 	COMMAND_SPECS = {
 		'END': {'params': 0, 'types': []},
@@ -139,7 +139,7 @@ class ScriptValidator:
 		'MEMORY_READ': {'params': 1, 'types': ['address']},
 		'MEMORY_COMPARE': {'params': 2, 'types': ['address', 'byte']},
 	}
-	
+
 	def __init__(self, strict: bool = False, verbose: bool = False):
 		self.strict = strict
 		self.verbose = verbose
@@ -147,11 +147,11 @@ class ScriptValidator:
 		self.labels_used: Set[str] = set()
 		self.flags_written: Set[int] = set()
 		self.flags_read: Set[int] = set()
-	
+
 	def validate_file(self, path: Path) -> ValidationResult:
 		"""Validate single script file"""
 		result = ValidationResult(file_path=str(path), is_valid=True)
-		
+
 		try:
 			with open(path) as f:
 				lines = f.readlines()
@@ -165,22 +165,22 @@ class ScriptValidator:
 			))
 			result.error_count = 1
 			return result
-		
+
 		# Reset tracking
 		self.labels_defined.clear()
 		self.labels_used.clear()
 		self.flags_written.clear()
 		self.flags_read.clear()
-		
+
 		# Pass 1: Syntax and basic validation
 		for line_num, line in enumerate(lines, 1):
 			original_line = line.rstrip()
 			line = line.strip()
-			
+
 			# Skip blank and comment lines
 			if not line or line.startswith(';'):
 				continue
-			
+
 			# Check for trailing whitespace
 			if original_line != original_line.rstrip():
 				if self.strict:
@@ -192,7 +192,7 @@ class ScriptValidator:
 						suggestion="Remove trailing whitespace"
 					))
 					result.warning_count += 1
-			
+
 			# Label definition
 			if line.endswith(':'):
 				label_name = line[:-1]
@@ -218,7 +218,7 @@ class ScriptValidator:
 						result.is_valid = False
 					self.labels_defined.add(label_name)
 				continue
-			
+
 			# Text line
 			if line.startswith('"'):
 				if not line.endswith('"'):
@@ -232,7 +232,7 @@ class ScriptValidator:
 					result.error_count += 1
 					result.is_valid = False
 				continue
-			
+
 			# Command line
 			match = re.match(r'^([A-Z_]+)(?:\s+(.+))?$', line)
 			if not match:
@@ -246,10 +246,10 @@ class ScriptValidator:
 				result.error_count += 1
 				result.is_valid = False
 				continue
-			
+
 			command = match.group(1)
 			params_str = match.group(2) or ""
-			
+
 			# Validate command exists
 			if command not in self.COMMAND_SPECS:
 				result.issues.append(ValidationIssue(
@@ -264,9 +264,9 @@ class ScriptValidator:
 				else:
 					result.warning_count += 1
 				continue
-			
+
 			spec = self.COMMAND_SPECS[command]
-			
+
 			# Validate parameter count
 			params = [p.strip() for p in params_str.split(',')] if params_str else []
 			if len(params) != spec['params']:
@@ -280,22 +280,22 @@ class ScriptValidator:
 				result.error_count += 1
 				result.is_valid = False
 				continue
-			
+
 			# Validate parameter types
 			for i, (param, expected_type) in enumerate(zip(params, spec['types'])):
 				issues = self.validate_parameter(param, expected_type, line_num, command)
 				result.issues.extend(issues)
 				result.error_count += sum(1 for issue in issues if issue.severity == Severity.ERROR)
 				result.warning_count += sum(1 for issue in issues if issue.severity == Severity.WARNING)
-				
+
 				if any(issue.severity == Severity.ERROR for issue in issues):
 					result.is_valid = False
-			
+
 			# Track label usage
 			if command in ('JUMP', 'BRANCH'):
 				if params:
 					self.labels_used.add(params[0])
-			
+
 			# Track flag usage
 			if command in ('SET_FLAG', 'CLEAR_FLAG'):
 				try:
@@ -309,7 +309,7 @@ class ScriptValidator:
 					self.flags_read.add(flag_id)
 				except (ValueError, IndexError):
 					pass
-		
+
 		# Pass 2: Semantic validation
 		# Check for undefined labels
 		undefined_labels = self.labels_used - self.labels_defined
@@ -322,7 +322,7 @@ class ScriptValidator:
 			))
 			result.error_count += 1
 			result.is_valid = False
-		
+
 		# Check for unused labels
 		unused_labels = self.labels_defined - self.labels_used
 		for label in unused_labels:
@@ -335,7 +335,7 @@ class ScriptValidator:
 					suggestion="Remove unused label or add reference"
 				))
 				result.warning_count += 1
-		
+
 		# Check for flags read before write
 		uninitialized_flags = self.flags_read - self.flags_written
 		for flag_id in uninitialized_flags:
@@ -346,7 +346,7 @@ class ScriptValidator:
 				line_number=0
 			))
 			result.warning_count += 1
-		
+
 		# Check for missing END
 		last_command = None
 		for line in reversed(lines):
@@ -356,7 +356,7 @@ class ScriptValidator:
 				if match:
 					last_command = match.group(1)
 					break
-		
+
 		if last_command != 'END' and last_command != 'RETURN':
 			result.issues.append(ValidationIssue(
 				severity=Severity.WARNING,
@@ -366,13 +366,13 @@ class ScriptValidator:
 				suggestion="Add END or RETURN at end of script"
 			))
 			result.warning_count += 1
-		
+
 		return result
-	
+
 	def validate_parameter(self, param: str, expected_type: str, line_num: int, command: str) -> List[ValidationIssue]:
 		"""Validate parameter type and value"""
 		issues = []
-		
+
 		if expected_type == 'byte':
 			try:
 				value = int(param, 0)
@@ -390,7 +390,7 @@ class ScriptValidator:
 					message=f"Invalid byte value: {param}",
 					line_number=line_num
 				))
-		
+
 		elif expected_type == 'word':
 			try:
 				value = int(param, 0)
@@ -408,7 +408,7 @@ class ScriptValidator:
 					message=f"Invalid word value: {param}",
 					line_number=line_num
 				))
-		
+
 		elif expected_type == 'label':
 			if not re.match(r'^[a-zA-Z_][a-zA-Z0-9_]*$', param):
 				issues.append(ValidationIssue(
@@ -417,7 +417,7 @@ class ScriptValidator:
 					message=f"Invalid label: {param}",
 					line_number=line_num
 				))
-		
+
 		elif expected_type == 'address':
 			# Bank/offset format or hex address
 			if not (re.match(r'^0x[0-9A-Fa-f]{2}/[0-9A-Fa-f]{4}$', param) or
@@ -430,9 +430,9 @@ class ScriptValidator:
 					line_number=line_num,
 					suggestion="Use 0xBB/OOOO or 0xADDRESS format"
 				))
-		
+
 		return issues
-	
+
 	def generate_report(self, results: List[ValidationResult], format: str = 'text') -> str:
 		"""Generate validation report"""
 		if format == 'json':
@@ -441,16 +441,16 @@ class ScriptValidator:
 			return self.generate_markdown_report(results)
 		else:
 			return self.generate_text_report(results)
-	
+
 	def generate_text_report(self, results: List[ValidationResult]) -> str:
 		"""Generate text validation report"""
 		lines = []
-		
+
 		total_errors = sum(r.error_count for r in results)
 		total_warnings = sum(r.warning_count for r in results)
 		total_files = len(results)
 		valid_files = sum(1 for r in results if r.is_valid)
-		
+
 		lines.append("=" * 60)
 		lines.append("VALIDATION REPORT")
 		lines.append("=" * 60)
@@ -460,22 +460,22 @@ class ScriptValidator:
 		lines.append(f"Total errors: {total_errors}")
 		lines.append(f"Total warnings: {total_warnings}")
 		lines.append("")
-		
+
 		for result in results:
 			if not result.issues:
 				continue
-			
+
 			lines.append(f"\n{result.file_path}")
 			lines.append("-" * 60)
-			
+
 			for issue in sorted(result.issues, key=lambda i: (i.line_number, i.severity.value)):
 				severity_str = issue.severity.value.upper()
 				lines.append(f"  [{severity_str}] Line {issue.line_number}: {issue.message}")
 				if issue.suggestion:
 					lines.append(f"    Suggestion: {issue.suggestion}")
-		
+
 		return '\n'.join(lines)
-	
+
 	def generate_markdown_report(self, results: List[ValidationResult]) -> str:
 		"""Generate Markdown validation report"""
 		lines = [
@@ -484,32 +484,32 @@ class ScriptValidator:
 			"## Summary",
 			""
 		]
-		
+
 		total_errors = sum(r.error_count for r in results)
 		total_warnings = sum(r.warning_count for r in results)
 		total_files = len(results)
 		valid_files = sum(1 for r in results if r.is_valid)
-		
+
 		lines.append(f"- **Files Validated:** {total_files}")
 		lines.append(f"- **Valid:** {valid_files} ✓")
 		lines.append(f"- **Invalid:** {total_files - valid_files} ✗")
 		lines.append(f"- **Total Errors:** {total_errors}")
 		lines.append(f"- **Total Warnings:** {total_warnings}")
 		lines.append("")
-		
+
 		lines.append("## Files")
 		lines.append("")
-		
+
 		for result in results:
 			status = "✓" if result.is_valid else "✗"
 			lines.append(f"### {Path(result.file_path).name} {status}")
 			lines.append("")
-			
+
 			if result.issues:
 				lines.append(f"- Errors: {result.error_count}")
 				lines.append(f"- Warnings: {result.warning_count}")
 				lines.append("")
-				
+
 				lines.append("#### Issues")
 				lines.append("")
 				for issue in sorted(result.issues, key=lambda i: (i.line_number, i.severity.value)):
@@ -522,9 +522,9 @@ class ScriptValidator:
 			else:
 				lines.append("No issues found.")
 				lines.append("")
-		
+
 		return '\n'.join(lines)
-	
+
 	def generate_json_report(self, results: List[ValidationResult]) -> str:
 		"""Generate JSON validation report"""
 		data = {
@@ -555,7 +555,7 @@ class ScriptValidator:
 				for r in results
 			]
 		}
-		
+
 		return json.dumps(data, indent=2)
 
 
@@ -570,11 +570,11 @@ def main():
 	parser.add_argument('--ci', action='store_true', help='CI mode (exit code based on validation)')
 	parser.add_argument('--exit-on-error', action='store_true', help='Exit on first error')
 	parser.add_argument('--verbose', action='store_true', help='Verbose output')
-	
+
 	args = parser.parse_args()
-	
+
 	validator = ScriptValidator(strict=args.strict, verbose=args.verbose)
-	
+
 	# Collect files
 	script_files = []
 	for input_path in args.input_paths:
@@ -583,26 +583,26 @@ def main():
 		elif input_path.is_dir():
 			script_files.extend(input_path.rglob('*.txt'))
 			script_files.extend(input_path.rglob('*.asm'))
-	
+
 	if args.verbose:
 		print(f"Validating {len(script_files)} files...")
-	
+
 	# Validate all files
 	results = []
 	for script_file in script_files:
 		result = validator.validate_file(script_file)
 		results.append(result)
-		
+
 		if args.exit_on_error and not result.is_valid:
 			print(f"✗ Validation failed: {script_file}")
 			for issue in result.issues:
 				if issue.severity == Severity.ERROR:
 					print(f"  Line {issue.line_number}: {issue.message}")
 			return 1
-	
+
 	# Generate report
 	report = validator.generate_report(results, format=args.format)
-	
+
 	# Write output
 	if args.output or args.report:
 		output_path = args.output or args.report
@@ -611,21 +611,21 @@ def main():
 		print(f"\n✓ Validation report saved: {output_path}")
 	else:
 		print(report)
-	
+
 	# Summary
 	total_errors = sum(r.error_count for r in results)
 	total_warnings = sum(r.warning_count for r in results)
 	valid_files = sum(1 for r in results if r.is_valid)
-	
+
 	print(f"\n=== Summary ===")
 	print(f"Valid: {valid_files}/{len(results)}")
 	print(f"Errors: {total_errors}")
 	print(f"Warnings: {total_warnings}")
-	
+
 	# CI mode exit code
 	if args.ci:
 		return 1 if total_errors > 0 else 0
-	
+
 	return 0
 
 

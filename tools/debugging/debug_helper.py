@@ -104,7 +104,7 @@ class TraceEntry:
 
 class DebugHelper:
 	"""Interactive debugger for event scripts"""
-	
+
 	# Command opcodes
 	OPCODES = {
 		0x00: 'END',
@@ -123,7 +123,7 @@ class DebugHelper:
 		0x2B: 'VARIABLE_ADD',
 		0x2C: 'VARIABLE_CHECK',
 	}
-	
+
 	def __init__(self, script_data: bytes, verbose: bool = False):
 		self.script_data = script_data
 		self.verbose = verbose
@@ -139,31 +139,31 @@ class DebugHelper:
 		self.running = True
 		self.step_mode = False
 		self.trace_mode = False
-	
+
 	def fetch_instruction(self) -> Tuple[str, List[Any]]:
 		"""Fetch next instruction"""
 		if self.state.program_counter >= len(self.script_data):
 			return ('END', [])
-		
+
 		opcode = self.script_data[self.state.program_counter]
 		command = self.OPCODES.get(opcode, f'UNKNOWN_{opcode:02X}')
-		
+
 		params = []
 		pc = self.state.program_counter + 1
-		
+
 		# Parse parameters based on command
 		if command in ('SET_FLAG', 'CLEAR_FLAG', 'CHECK_FLAG'):
 			if pc + 1 < len(self.script_data):
 				flag_id = struct.unpack_from('<H', self.script_data, pc)[0]
 				params.append(flag_id)
 				pc += 2
-		
+
 		elif command == 'DELAY':
 			if pc < len(self.script_data):
 				frames = self.script_data[pc]
 				params.append(frames)
 				pc += 1
-		
+
 		elif command in ('CALL', 'JUMP', 'BRANCH'):
 			if pc + 2 < len(self.script_data):
 				# Address (bank/offset)
@@ -171,7 +171,7 @@ class DebugHelper:
 				offset = struct.unpack_from('<H', self.script_data, pc + 1)[0]
 				params.append(f"0x{bank:02X}/{offset:04X}")
 				pc += 3
-		
+
 		elif command in ('VARIABLE_SET', 'VARIABLE_ADD', 'VARIABLE_CHECK'):
 			if pc + 3 < len(self.script_data):
 				addr = struct.unpack_from('<H', self.script_data, pc)[0]
@@ -179,7 +179,7 @@ class DebugHelper:
 				params.append(addr)
 				params.append(value)
 				pc += 4
-		
+
 		elif command == 'MEMORY_WRITE':
 			if pc + 2 < len(self.script_data):
 				addr = struct.unpack_from('<H', self.script_data, pc)[0]
@@ -187,48 +187,48 @@ class DebugHelper:
 				params.append(addr)
 				params.append(value)
 				pc += 3
-		
+
 		return (command, params)
-	
+
 	def execute_instruction(self, command: str, params: List[Any]) -> None:
 		"""Execute instruction and update state"""
 		state_changes = {}
-		
+
 		if command == 'SET_FLAG' and params:
 			flag_id = params[0]
 			self.state.flags[flag_id] = True
 			state_changes['flag'] = (flag_id, True)
-		
+
 		elif command == 'CLEAR_FLAG' and params:
 			flag_id = params[0]
 			self.state.flags[flag_id] = False
 			state_changes['flag'] = (flag_id, False)
-		
+
 		elif command == 'VARIABLE_SET' and len(params) >= 2:
 			addr, value = params[0], params[1]
 			self.state.variables[addr] = value
 			state_changes['variable'] = (addr, value)
-		
+
 		elif command == 'VARIABLE_ADD' and len(params) >= 2:
 			addr, value = params[0], params[1]
 			current = self.state.variables.get(addr, 0)
 			self.state.variables[addr] = current + value
 			state_changes['variable'] = (addr, current + value)
-		
+
 		elif command == 'CALL' and params:
 			# Push return address
 			self.state.call_stack.append(self.state.program_counter)
 			state_changes['call'] = params[0]
-		
+
 		elif command == 'RETURN':
 			if self.state.call_stack:
 				return_addr = self.state.call_stack.pop()
 				self.state.program_counter = return_addr
 				state_changes['return'] = return_addr
-		
+
 		elif command == 'END':
 			self.running = False
-		
+
 		# Record trace
 		if self.trace_mode:
 			entry = TraceEntry(
@@ -239,7 +239,7 @@ class DebugHelper:
 				state_changes=state_changes
 			)
 			self.trace.append(entry)
-		
+
 		# Check watchpoints
 		for watch in self.watchpoints:
 			if watch.flag_id is not None:
@@ -247,56 +247,56 @@ class DebugHelper:
 				if current_value != watch.last_value:
 					print(f"Watch: {watch.name} changed to {current_value}")
 					watch.last_value = current_value
-			
+
 			elif watch.address is not None:
 				current_value = self.state.variables.get(watch.address, 0)
 				if current_value != watch.last_value:
 					print(f"Watch: {watch.name} changed to {current_value}")
 					watch.last_value = current_value
-	
+
 	def check_breakpoints(self, command: str) -> bool:
 		"""Check if breakpoint hit"""
 		for bp in self.breakpoints:
 			if not bp.enabled:
 				continue
-			
+
 			hit = False
-			
+
 			if bp.bp_type == BreakpointType.COMMAND:
 				hit = (command == bp.condition)
 			elif bp.bp_type == BreakpointType.LINE:
 				hit = (self.state.line_number == bp.condition)
 			elif bp.bp_type == BreakpointType.ADDRESS:
 				hit = (self.state.program_counter == bp.condition)
-			
+
 			if hit:
 				bp.hit_count += 1
 				return True
-		
+
 		return False
-	
+
 	def run(self, interactive: bool = False) -> None:
 		"""Run debugger"""
 		self.step_mode = interactive
-		
+
 		while self.running and self.state.program_counter < len(self.script_data):
 			# Fetch instruction
 			command, params = self.fetch_instruction()
 			self.state.current_command = command
 			self.state.parameters = params
-			
+
 			# Check breakpoints
 			if self.check_breakpoints(command):
 				print(f"\nBreakpoint hit at line {self.state.line_number}")
 				self.step_mode = True
-			
+
 			# Interactive mode
 			if self.step_mode:
 				self.show_current_state()
-				
+
 				while True:
 					user_input = input("\n(debug) ").strip().lower()
-					
+
 					if user_input in ('s', 'step', ''):
 						break
 					elif user_input in ('c', 'continue'):
@@ -328,10 +328,10 @@ class DebugHelper:
 						self.show_help()
 					else:
 						print(f"Unknown command: {user_input}")
-			
+
 			# Execute instruction
 			self.execute_instruction(command, params)
-			
+
 			# Advance PC
 			if command != 'RETURN':  # RETURN sets PC
 				# Calculate instruction size
@@ -346,11 +346,11 @@ class DebugHelper:
 					inst_size += 4
 				elif command == 'MEMORY_WRITE':
 					inst_size += 3
-				
+
 				self.state.program_counter += inst_size
-			
+
 			self.state.line_number += 1
-	
+
 	def show_current_state(self) -> None:
 		"""Display current execution state"""
 		print(f"\nLine {self.state.line_number}: {self.state.current_command}", end='')
@@ -359,13 +359,13 @@ class DebugHelper:
 		print()
 		print(f"PC: 0x{self.state.program_counter:06X}")
 		print(f"Stack depth: {len(self.state.call_stack)}")
-	
+
 	def show_backtrace(self) -> None:
 		"""Show call stack"""
 		print("\nCall stack:")
 		for i, addr in enumerate(reversed(self.state.call_stack)):
 			print(f"  #{i}: 0x{addr:06X}")
-	
+
 	def print_value(self, expr: str) -> None:
 		"""Print value of expression"""
 		if expr.startswith('flag_'):
@@ -375,7 +375,7 @@ class DebugHelper:
 				print(f"{expr} = {value}")
 			except ValueError:
 				print(f"Invalid flag: {expr}")
-		
+
 		elif expr.startswith('var_'):
 			try:
 				addr = int(expr[4:], 0)
@@ -383,7 +383,7 @@ class DebugHelper:
 				print(f"{expr} = {value}")
 			except ValueError:
 				print(f"Invalid variable: {expr}")
-		
+
 		elif expr.startswith('0x'):
 			try:
 				addr = int(expr, 16)
@@ -391,7 +391,7 @@ class DebugHelper:
 				print(f"[{expr}] = {value}")
 			except ValueError:
 				print(f"Invalid address: {expr}")
-	
+
 	def add_breakpoint(self, condition: str) -> None:
 		"""Add breakpoint"""
 		if condition.startswith('line:'):
@@ -404,7 +404,7 @@ class DebugHelper:
 			bp = Breakpoint(BreakpointType.COMMAND, condition.upper())
 			self.breakpoints.append(bp)
 			print(f"Breakpoint set on command {condition.upper()}")
-	
+
 	def add_watch(self, expr: str) -> None:
 		"""Add watchpoint"""
 		if expr.startswith('flag_'):
@@ -417,7 +417,7 @@ class DebugHelper:
 			watch = WatchPoint(name=expr, address=addr)
 			self.watchpoints.append(watch)
 			print(f"Watching {expr}")
-	
+
 	def show_help(self) -> None:
 		"""Show help"""
 		print("""
@@ -432,7 +432,7 @@ Debug Commands:
   h, help          - Show this help
   q, quit          - Quit debugger
 """)
-	
+
 	def export_trace(self, output_path: Path) -> None:
 		"""Export execution trace"""
 		data = {
@@ -448,7 +448,7 @@ Debug Commands:
 				for entry in self.trace
 			]
 		}
-		
+
 		with open(output_path, 'w') as f:
 			json.dump(data, f, indent=2)
 
@@ -462,45 +462,45 @@ def main():
 	parser.add_argument('--watch', action='append', help='Add watchpoint')
 	parser.add_argument('--break', dest='breakpoint', action='append', help='Add breakpoint')
 	parser.add_argument('--verbose', action='store_true', help='Verbose output')
-	
+
 	args = parser.parse_args()
-	
+
 	# Load script
 	with open(args.script, 'rb') as f:
 		script_data = f.read()
-	
+
 	# Create debugger
 	debugger = DebugHelper(script_data, verbose=args.verbose)
-	
+
 	# Enable trace mode
 	if args.trace:
 		debugger.trace_mode = True
-	
+
 	# Add watchpoints
 	if args.watch:
 		for watch in args.watch:
 			debugger.add_watch(watch)
-	
+
 	# Add breakpoints
 	if args.breakpoint:
 		for bp in args.breakpoint:
 			debugger.add_breakpoint(bp)
-	
+
 	# Run debugger
 	print(f"Debugging {args.script}")
 	print(f"Script size: {len(script_data)} bytes")
-	
+
 	if args.interactive:
 		print("\nInteractive mode - type 'h' for help")
-	
+
 	debugger.run(interactive=args.interactive)
-	
+
 	# Export trace
 	if args.output and debugger.trace:
 		debugger.export_trace(args.output)
 		print(f"\n✓ Trace exported to {args.output}")
 		print(f"  Total steps: {len(debugger.trace)}")
-	
+
 	return 0
 
 

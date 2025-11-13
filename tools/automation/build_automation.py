@@ -114,19 +114,19 @@ class BuildResult:
 
 class BuildAutomation:
 	"""Automated build system"""
-	
+
 	def __init__(self, config: BuildConfig, verbose: bool = False, dry_run: bool = False):
 		self.config = config
 		self.verbose = verbose
 		self.dry_run = dry_run
 		self.file_hashes: Dict[Path, str] = {}
 		self.build_cache: Dict[str, Dict] = {}
-	
+
 	def load_cache(self) -> None:
 		"""Load build cache"""
 		if not self.config.cache_dir:
 			return
-		
+
 		cache_file = self.config.cache_dir / 'build_cache.json'
 		if cache_file.exists():
 			try:
@@ -137,15 +137,15 @@ class BuildAutomation:
 			except Exception as e:
 				if self.verbose:
 					print(f"Failed to load cache: {e}")
-	
+
 	def save_cache(self) -> None:
 		"""Save build cache"""
 		if not self.config.cache_dir:
 			return
-		
+
 		self.config.cache_dir.mkdir(parents=True, exist_ok=True)
 		cache_file = self.config.cache_dir / 'build_cache.json'
-		
+
 		try:
 			with open(cache_file, 'w') as f:
 				json.dump(self.build_cache, f, indent=2, default=str)
@@ -154,12 +154,12 @@ class BuildAutomation:
 		except Exception as e:
 			if self.verbose:
 				print(f"Failed to save cache: {e}")
-	
+
 	def calculate_file_hash(self, path: Path) -> str:
 		"""Calculate SHA-256 hash of file"""
 		if path in self.file_hashes:
 			return self.file_hashes[path]
-		
+
 		try:
 			with open(path, 'rb') as f:
 				file_hash = hashlib.sha256(f.read()).hexdigest()
@@ -167,76 +167,76 @@ class BuildAutomation:
 			return file_hash
 		except Exception:
 			return ""
-	
+
 	def needs_rebuild(self, task: BuildTask) -> bool:
 		"""Check if task needs to be rebuilt"""
 		if not self.config.incremental:
 			return True
-		
+
 		task_key = task.name
-		
+
 		# Check if task in cache
 		if task_key not in self.build_cache:
 			return True
-		
+
 		cached = self.build_cache[task_key]
-		
+
 		# Check if outputs exist
 		for output in task.outputs:
 			if not output.exists():
 				return True
-		
+
 		# Check if inputs changed
 		for input_file in task.inputs:
 			if not input_file.exists():
 				return True
-			
+
 			current_hash = self.calculate_file_hash(input_file)
 			cached_hash = cached.get('inputs', {}).get(str(input_file))
-			
+
 			if current_hash != cached_hash:
 				return True
-		
+
 		return False
-	
+
 	def update_cache(self, task: BuildTask) -> None:
 		"""Update build cache for task"""
 		task_key = task.name
-		
+
 		self.build_cache[task_key] = {
 			'inputs': {str(f): self.calculate_file_hash(f) for f in task.inputs},
 			'outputs': {str(f): self.calculate_file_hash(f) for f in task.outputs},
 			'timestamp': datetime.now().isoformat()
 		}
-	
+
 	def execute_task(self, task: BuildTask) -> bool:
 		"""Execute single build task"""
 		if self.verbose:
 			print(f"\n[{task.stage.value.upper()}] {task.name}")
-		
+
 		# Check if rebuild needed
 		if not self.needs_rebuild(task):
 			if self.verbose:
 				print(f"  Skipped (up to date)")
 			task.status = BuildStatus.SKIPPED
 			return True
-		
+
 		if self.dry_run:
 			print(f"  Would execute: {' '.join(str(c) for c in task.command)}")
 			task.status = BuildStatus.SUCCESS
 			return True
-		
+
 		# Execute command
 		start_time = time.time()
-		
+
 		try:
 			env = dict(task.env_vars) if task.env_vars else None
 			working_dir = task.working_dir or Path.cwd()
-			
+
 			if self.verbose:
 				print(f"  Command: {' '.join(str(c) for c in task.command)}")
 				print(f"  Working dir: {working_dir}")
-			
+
 			result = subprocess.run(
 				task.command,
 				cwd=working_dir,
@@ -244,9 +244,9 @@ class BuildAutomation:
 				capture_output=True,
 				text=True
 			)
-			
+
 			task.duration = time.time() - start_time
-			
+
 			if result.returncode != 0:
 				task.status = BuildStatus.FAILED
 				task.error_message = result.stderr
@@ -254,16 +254,16 @@ class BuildAutomation:
 					print(f"  ✗ Failed ({task.duration:.2f}s)")
 					print(f"  Error: {result.stderr}")
 				return False
-			
+
 			# Update cache
 			self.update_cache(task)
-			
+
 			task.status = BuildStatus.SUCCESS
 			if self.verbose:
 				print(f"  ✓ Success ({task.duration:.2f}s)")
-			
+
 			return True
-		
+
 		except Exception as e:
 			task.duration = time.time() - start_time
 			task.status = BuildStatus.FAILED
@@ -272,20 +272,20 @@ class BuildAutomation:
 				print(f"  ✗ Failed ({task.duration:.2f}s)")
 				print(f"  Error: {e}")
 			return False
-	
+
 	def build(self, stages: Optional[List[BuildStage]] = None) -> BuildResult:
 		"""Execute build pipeline"""
 		start_time = time.time()
-		
+
 		# Load cache
 		self.load_cache()
-		
+
 		# Filter tasks by stage
 		if stages:
 			tasks = [t for t in self.config.tasks if t.stage in stages]
 		else:
 			tasks = self.config.tasks
-		
+
 		if self.verbose:
 			print(f"\n{'='*60}")
 			print(f"Building {self.config.project_name} v{self.config.version}")
@@ -293,27 +293,27 @@ class BuildAutomation:
 			print(f"Total tasks: {len(tasks)}")
 			if stages:
 				print(f"Stages: {', '.join(s.value for s in stages)}")
-		
+
 		# Execute tasks
 		succeeded = 0
 		failed = 0
 		skipped = 0
-		
+
 		for task in tasks:
 			success = self.execute_task(task)
-			
+
 			if task.status == BuildStatus.SUCCESS:
 				succeeded += 1
 			elif task.status == BuildStatus.FAILED:
 				failed += 1
 			elif task.status == BuildStatus.SKIPPED:
 				skipped += 1
-		
+
 		# Save cache
 		self.save_cache()
-		
+
 		total_duration = time.time() - start_time
-		
+
 		result = BuildResult(
 			success=(failed == 0),
 			total_tasks=len(tasks),
@@ -323,7 +323,7 @@ class BuildAutomation:
 			total_duration=total_duration,
 			task_results=tasks
 		)
-		
+
 		# Print summary
 		if self.verbose:
 			print(f"\n{'='*60}")
@@ -332,14 +332,14 @@ class BuildAutomation:
 			print(f"Status: {'SUCCESS' if result.success else 'FAILED'}")
 			print(f"Duration: {total_duration:.2f}s")
 			print(f"Tasks: {succeeded} succeeded, {failed} failed, {skipped} skipped")
-		
+
 		return result
-	
+
 	def clean(self) -> None:
 		"""Clean build artifacts"""
 		if self.verbose:
 			print("Cleaning build artifacts...")
-		
+
 		# Remove output directory
 		if self.config.output_dir.exists():
 			if self.dry_run:
@@ -348,7 +348,7 @@ class BuildAutomation:
 				shutil.rmtree(self.config.output_dir)
 				if self.verbose:
 					print(f"Removed {self.config.output_dir}")
-		
+
 		# Remove cache
 		if self.config.cache_dir and self.config.cache_dir.exists():
 			if self.dry_run:
@@ -357,16 +357,16 @@ class BuildAutomation:
 				shutil.rmtree(self.config.cache_dir)
 				if self.verbose:
 					print(f"Removed {self.config.cache_dir}")
-		
+
 		if self.verbose:
 			print("✓ Clean complete")
-	
+
 	@staticmethod
 	def load_config(config_path: Path) -> BuildConfig:
 		"""Load build configuration from file"""
 		with open(config_path) as f:
 			data = json.load(f)
-		
+
 		# Parse configuration
 		tasks = []
 		for task_data in data.get('tasks', []):
@@ -381,7 +381,7 @@ class BuildAutomation:
 				env_vars=task_data.get('env_vars', {})
 			)
 			tasks.append(task)
-		
+
 		config = BuildConfig(
 			project_name=data['project_name'],
 			version=data['version'],
@@ -395,7 +395,7 @@ class BuildAutomation:
 			incremental=data.get('incremental', True),
 			cache_dir=Path(data['cache_dir']) if 'cache_dir' in data else None
 		)
-		
+
 		return config
 
 
@@ -410,28 +410,28 @@ def main():
 	parser.add_argument('--jobs', type=int, default=1, help='Number of parallel jobs')
 	parser.add_argument('--dry-run', action='store_true', help='Dry run (show what would be done)')
 	parser.add_argument('--verbose', action='store_true', help='Verbose output')
-	
+
 	args = parser.parse_args()
-	
+
 	# Load configuration
 	config = BuildAutomation.load_config(args.config)
-	
+
 	# Override config with command-line args
 	if args.rebuild:
 		config.incremental = False
 	if args.parallel:
 		config.parallel = True
 		config.max_jobs = args.jobs
-	
+
 	# Create build system
 	build_system = BuildAutomation(config, verbose=args.verbose, dry_run=args.dry_run)
-	
+
 	# Clean if requested
 	if args.clean:
 		build_system.clean()
 		if not args.stage:
 			return 0
-	
+
 	# Determine stages to run
 	stages = None
 	if args.stage:
@@ -441,10 +441,10 @@ def main():
 			print(f"Error: Invalid stage '{args.stage}'")
 			print(f"Valid stages: {', '.join(s.value for s in BuildStage)}")
 			return 1
-	
+
 	# Execute build
 	result = build_system.build(stages=stages)
-	
+
 	# Exit with appropriate code
 	return 0 if result.success else 1
 
