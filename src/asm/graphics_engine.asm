@@ -2508,7 +2508,7 @@ Routine0b8149:
 
 	stz $1a5b			; !temp_zero_flag => $00
 
-	lda $0e88			; load @var_0e88
+	lda !context_param			; load graphics context parameter
 	%setAto16bit()
 	and #$00ff			; ignore upper byte
 

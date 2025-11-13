@@ -274,6 +274,9 @@
 !wram_data_ptr      = $06bf     ; WRAM data pointer/offset
 !rom_function_ptr   = $0b83     ; ROM function pointer base
 
+; Context/Multi-Purpose Variables
+!context_param      = $0e88     ; Multi-purpose context parameter (equipment param, enemy ID, formation type, graphics context)
+
 ; Map/Player Position Variables
 !player_map_x       = $0e89     ; Player X coordinate on current map / Tilemap index
 !player_map_y       = $0e8a     ; Player Y coordinate on current map
