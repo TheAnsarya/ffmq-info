@@ -979,7 +979,7 @@ BattleSprite_CalculatePositionWithClipping:
 	sta.b $25,x	 ;01A0F5|9525    |001A87;
 	sep #$20		;01A0F7|E220    |      ;
 	lda.b $1e,x	 ;01A0F9|B51E    |001A80;
-	eor.w $19b4	 ;01A0FB|4DB419  |0119B4;
+	eor.w !battle_animation_timer	 ;01A0FB|4DB419  |0119B4;
 	bit.b #$08	  ;01A0FE|8908    |      ;
 	beq .VisibleCheck ;01A100|F003    |01A105;
 	jmp.w BattleSprite_HideOffScreen ;01A102|4C86A1  |01A186;
@@ -1342,7 +1342,7 @@ BattleAudio_ProcessSecondaryChannel:
 	phd ;01A34D|0B      |      ;
 	sep #$20		;01A34E|E220    |      ;
 	rep #$10		;01A350|C210    |      ;
-	lda.w $19e1	 ;01A352|ADE119  |0119E1;
+	lda.w !battle_ptr_2_hi	 ;01A352|ADE119  |0119E1;
 	cmp.b #$ff	  ;01A355|C9FF    |      ;
 	beq .Exit_SecondaryChannel ;01A357|F015    |01A36E;
 	pea.w $1cd7	 ;01A359|F4D71C  |011CD7;
@@ -1351,7 +1351,7 @@ BattleAudio_ProcessSecondaryChannel:
 	sty.b $06	   ;01A360|8406    |001CDD;
 	ldx.w #$0000	;01A362|A20000  |      ;
 	stx.b $00	   ;01A365|8600    |001CD7;
-	ldx.w $19e0	 ;01A367|AEE019  |0119E0;
+	ldx.w !battle_ptr_2_lo	 ;01A367|AEE019  |0119E0;
 	stx.b $02	   ;01A36A|8602    |001CD9;
 	bpl .ProcessLoop_Secondary ;01A36C|1004    |01A372;
 
@@ -1447,7 +1447,7 @@ BattleAnimation_MainController:
 	php ;01A3F0|08      |      ;
 	phb ;01A3F1|8B      |      ;
 	rep #$30		;01A3F2|C230    |      ;
-	lda.w $19b9	 ;01A3F4|ADB919  |0119B9;
+	lda.w !source_pointer	 ;01A3F4|ADB919  |0119B9;
 	bmi .Exit_MainController ;01A3F7|3008    |01A401;
 	sep #$20		;01A3F9|E220    |      ;
 	jsr.w Sub_01A423 ;01A3FB|2023A4  |01A423;
@@ -1467,7 +1467,7 @@ BattleAnimation_ExtendedHandler:
 	php ;01A404|08      |      ;
 	phb ;01A405|8B      |      ;
 	rep #$30		;01A406|C230    |      ;
-	lda.w $19b9	 ;01A408|ADB919  |0119B9;
+	lda.w !source_pointer	 ;01A408|ADB919  |0119B9;
 	bmi .Exit_ExtendedHandler ;01A40B|3013    |01A420;
 	sep #$20		;01A40D|E220    |      ;
 	jsr.w Sub_01A423 ;01A40F|2023A4  |01A423;
@@ -1633,7 +1633,7 @@ BattleGraphics_ScrollManager:
 	lda.b $0a	   ;01A4F9|A50A    |001935;
 	rep #$30		;01A4FB|C230    |      ;
 	clc ;01A4FD|18      |      ;
-	adc.w $19b9	 ;01A4FE|6DB919  |0119B9;
+	adc.w !source_pointer	 ;01A4FE|6DB919  |0119B9;
 	tax ;01A501|AA      |      ;
 	sep #$20		;01A502|E220    |      ;
 	rep #$10		;01A504|C210    |      ;
@@ -1656,7 +1656,7 @@ BattleSprite_OAMBuilder:
 	inc.b $0b	   ;01A518|E60B    |001936;
 	rep #$30		;01A51A|C230    |      ;
 	clc ;01A51C|18      |      ;
-	adc.w $19b9	 ;01A51D|6DB919  |0119B9;
+	adc.w !source_pointer	 ;01A51D|6DB919  |0119B9;
 	tax ;01A520|AA      |      ;
 	sep #$20		;01A521|E220    |      ;
 	rep #$10		;01A523|C210    |      ;
@@ -1693,7 +1693,7 @@ BattleSprite_PositionCalculator:
 	rep #$30		;01A550|C230    |      ;
 	lda.w #$000b	;01A552|A90B00  |      ;
 	clc ;01A555|18      |      ;
-	adc.w $19b9	 ;01A556|6DB919  |0119B9;
+	adc.w !source_pointer	 ;01A556|6DB919  |0119B9;
 	tax ;01A559|AA      |      ;
 	sep #$20		;01A55A|E220    |      ;
 	rep #$10		;01A55C|C210    |      ;
@@ -1760,7 +1760,7 @@ BattleBackground_PatternLoader:
 BattleBackground_ColorManager:
 	php ;01A5AA|08      |      ;
 	phd ;01A5AB|0B      |      ;
-	pea.w $192b	 ;01A5AC|F42B19  |00192B;
+	pea.w !battle_direct_page	 ;01A5AC|F42B19  |00192B;
 	pld ;01A5AF|2B      |      ;
 	ldx.w #$be20	;01A5B0|A220BE  |      ;
 	stx.b $02	   ;01A5B3|8602    |00192D;
