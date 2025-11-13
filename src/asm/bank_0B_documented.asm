@@ -29,11 +29,11 @@
 ; Graphics Setup Routine
 ; ==============================================================================
 ; Sets up graphics pointers based on battle encounter type.
-; Input: $0e8b = Battle type index
+; Input: !battle_type = Battle type index
 ; ==============================================================================
 
 BattleGfx_SetupByType:
-	lda.w $0e8b	 ;0B8000	; Load battle type
+	lda.w !battle_type	 ;0B8000	; Load battle type
 	beq BattleGfx_Type0 ;0B8003	; Branch if type 0
 	dec a;0B8005	; Decrement type
 	beq BattleGfx_Type1 ;0B8006	; Branch if type 1
@@ -192,7 +192,7 @@ BattleSprite_AnimationExit:
 ; CodeGraphicsSetupBasedBattleType: Battle Graphics Setup Dispatcher
 ; -----------------------------------------------------------------------------
 ; Purpose: Initialize graphics pointers based on battle encounter type
-; Input: $0e8b = Battle type index (0-3)
+; Input: !battle_type = Battle type index (0-3)
 ; Output: $0505/$0506/$0507 = Graphics pointer (bank/address)
 ;
 ; Battle Types:
@@ -211,7 +211,7 @@ BattleSprite_AnimationExit:
 ;   - Pointer format: 24-bit address (bank:address)
 
 BattleGfx_SetupByType_1:
-	lda.w $0e8b	 ; Load battle type index
+	lda.w !battle_type	 ; Load battle type index
 	beq BattleGfx_Type0 ; Type 0: Branch to first handler
 	dec a; Decrement for type comparison
 	beq BattleGfx_Type1 ; Type 1: Branch to second handler
@@ -472,7 +472,7 @@ BattleSprite_SearchNext:	; Continue search
 ; -----------------------------------------------------------------------------
 ; Purpose: Load graphics pointers based on battle type and battle phase
 ; Inputs:
-;   $0e8b = Battle type (0-3)
+;   !battle_type = Battle type (0-3)
 ;   $193f = Battle phase index
 ; Outputs:
 ;   $0505/$0506/$0507 = Final graphics pointer
@@ -488,7 +488,7 @@ BattleSprite_SearchNext:	; Continue search
 BattleGfx_LoadByTypeAndPhase:
 	lda.b #$00	  ; Clear A high byte
 	xba ; Swap A/B (prepare for 16-bit index)
-	lda.w $0e8b	 ; Load battle type
+	lda.w !battle_type	 ; Load battle type
 	tax ; Transfer to X for table lookup
 	lda.l DATA8_0b8140,x ; Load graphics address low byte from table
 	sta.w $0507	 ; Store to pointer low byte
@@ -829,7 +829,7 @@ DATA8_0b82a0:
 ; Process:
 ;   1. Clear lower nibble of $19b4 (reset battle phase flags)
 ;   2. Check bit 3 of $19cb (battle type flag)
-;   3. If set and $0e8d != 0: Set special flag (incomplete code at $0b82df)
+;   3. If set and !map_param_2 != 0: Set special flag (incomplete code at $0b82df)
 ;   4. Extract bits 0-2 from $19cb, combine with $19d3 sign bit
 ;   5. Merge into $19b4 lower nibble
 ;   6. Choose configuration table offset: $0000 or $000a based on flags
@@ -851,7 +851,7 @@ BattleState_ConfigureFlags:
 	lda.w $19cb	 ; Load battle mode register
 	and.b #$08	  ; Check bit 3 (special battle type?)
 	beq BattleState_ProcessFlags ; Skip if not set
-	lda.w $0e8d	 ; Load battle condition register
+	lda.w !map_param_2	 ; Load battle condition register
 	beq BattleState_ProcessFlags ; Skip if zero
 
 ; Incomplete special case code (appears to set flag but never branches)

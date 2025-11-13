@@ -280,6 +280,10 @@
 ; Map/Player Position Variables
 !player_map_x       = $0e89     ; Player X coordinate on current map / Tilemap index
 !player_map_y       = $0e8a     ; Player Y coordinate on current map
+!player_facing      = $0e8b     ; Player facing direction (0=up, 1=right, 2=down, 3=left) | Battle type index in battle mode
+!battle_type        = $0e8b     ; Battle type index (0-3) - alias for !player_facing when in battle context
+!map_param_1        = $0e8c     ; Map/movement parameter 1
+!map_param_2        = $0e8d     ; Map/movement parameter 2 (encounter status, pathfinding mode)
 !tilemap_index      = $0e89     ; Tilemap indexing variable (alias for !player_map_x)
 !tilemap_counter    = $0e91     ; Tilemap operation counter
 

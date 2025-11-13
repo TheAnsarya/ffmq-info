@@ -7133,14 +7133,14 @@ environment_complete:
 ; Complex environment graphics with battle coordination and DMA management
 ; Implements sophisticated environment-battle integration with memory operations
 environment_graphics_integration:
-	lda.w $0e8b	 ; Load environment map data
+	lda.w !player_facing	 ; Load player facing direction / environment map data
 	clc ; Clear carry for addition
 	adc.b #$0c	  ; Add environment offset
 	jsr.w ExecuteGraphicsProcessing ; Execute graphics processing
 	jsl.l ExecuteLongGraphicsCall ; Execute long graphics call
 	lda.b #$00	  ; Clear accumulator
 	xba ; Exchange bytes
-	lda.w $0e8b	 ; Load environment data
+	lda.w !player_facing	 ; Load facing direction
 	asl a; Shift for indexing
 	tax ; Transfer to index
 	jsr.w (DATA8_01e584,x) ; Call environment function
@@ -7385,7 +7385,7 @@ battle_state_memory_coordination_system:
 ; Battle map processing
 	stz.w $194b	 ; Clear battle state flag
 	stz.w $194c	 ; Clear battle counter
-	lda.w $0e8d	 ; Load encounter status
+	lda.w !map_param_2	 ; Load encounter status / map parameter 2
 	bne battle_state_processing ; Branch if encounter active
 	lda.w $19cc	 ; Load battle trigger data
 	bmi battle_state_processing ; Branch if negative
@@ -7587,7 +7587,7 @@ collision_validation_complete:
 ; Sophisticated environment processing with location validation and state management
 ; Manages complex environment interactions with battle coordination and memory management
 battle_environment_location_processing:
-	lda.w $0e8b	 ; Load environment data
+	lda.w !player_facing	 ; Load player facing direction / environment data
 	sta.w $19d7	 ; Store environment state
 	jsr.w .BattleDefeat_MemoryCleanup ; Execute environment processing
 	jsr.w .BattleEscape_FailureHandling ; Execute location validation
@@ -7689,7 +7689,7 @@ multi_path_battle_processing_engine:
 	lda.w $19af	 ; Load pathfinding state
 	bne battle_animation_graphics_state_control ; Branch if active pathfinding
 	inc.w $19af	 ; Increment pathfinding counter
-	lda.w $0e8d	 ; Load pathfinding mode
+	lda.w !map_param_2	 ; Load pathfinding mode / map parameter 2
 	bne battle_animation_processing ; Branch if pathfinding active
 	lda.w $19cb	 ; Load pathfinding configuration
 	and.b #$70	  ; Mask pathfinding type
@@ -7746,7 +7746,7 @@ UNREACH_01EF3B:
 	lda.b #$10	  ; Set advanced positioning mode
 	sta.w $1993	 ; Store positioning control
 	stz.w $1929	 ; Clear secondary state register
-	lda.w $0e8b	 ; Load battle environment context
+	lda.w !player_facing	 ; Load player facing direction / battle environment context
 	sta.w $19d7	 ; Store environment reference
 	jsr.w .BattleDefeat_MemoryCleanup ; Execute coordinate preprocessing
 	jsr.w .BattleDefeat_AudioStop ; Execute coordinate finalization
@@ -7991,7 +7991,7 @@ Primary_Validation_Mode:
 ; Advanced validation processing with environment coordination
 	lda.b #$00	  ; Clear validation register
 	xba ; Exchange accumulator bytes
-	lda.w $0e8b	 ; Load environment validation context
+	lda.w !player_facing	 ; Load player facing / environment validation context
 	asl a; Shift for validation indexing
 	tax ; Transfer to index register
 	phx ; Preserve validation index
@@ -8574,7 +8574,7 @@ Advanced_Sound_Processing:
 ; Complex battle sequence management with multi-state coordination
 	.BattleCursor_UpdatePosition:
 	lda.b #$02	  ; Set battle sequence mode
-	sta.w $0e8b	 ; Store battle sequence context
+	sta.w !battle_type	 ; Store battle type index / sequence context
 	jsr.w ExecuteSequenceInitialization ; Execute sequence initialization
 	jsr.w FinalizeBattleState ; Execute sequence coordination
 	lda.w $0e88	 ; Load sequence environment
@@ -8608,7 +8608,7 @@ Enhancement_Special_Processing:
 	jsl.l ExecuteSpecialBitProcessing ; Execute special enhancement
 	bne Enhancement_Processing_Complete ; Branch if special complete
 	lda.b #$02	  ; Set special completion mode
-	sta.w $0e8b	 ; Store special completion context
+	sta.w !battle_type	 ; Store battle type / special completion context
 	jsr.w ExecuteSequenceInitialization ; Execute completion processing
 	ldx.w #$270b	; Set special enhancement reference
 	stx.w $19ee	 ; Store enhancement reference
