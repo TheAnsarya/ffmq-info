@@ -1157,6 +1157,264 @@ Mark tasks complete as you finish them:
 
 ---
 
+## Priority 6: Sprite Graphics Verification
+
+### Context
+Sprite extraction tools have been created but sprites need manual verification against in-game graphics to ensure accuracy.
+
+**Tools**: `tools/extraction/assemble_sprites.py`, `extract_all_enemies.py`, `extract_sprites.py`  
+**Documentation**: `docs/graphics/SPRITE_EXTRACTION_OUTSTANDING_WORK.md`  
+**GitHub Issues**: #84-#89  
+**Emulator Required**: bsnes-plus or Mesen-S (with VRAM viewer)
+
+---
+
+### Task 6.1: Verify Character Sprites
+
+**Extracted Sprites**: `data/extracted/sprites/characters/`
+
+**Procedure**:
+1. Load FFMQ ROM in emulator
+2. Start new game and enter field
+3. Compare character walking sprites with extracted PNGs
+4. Check all 4 directions (up, down, left, right)
+5. Verify palette correctness
+
+**Expected Results**:
+- Benjamin sprite matches extracted PNG
+- Kaeli sprite matches extracted PNG
+- Phoebe sprite matches extracted PNG
+- Reuben sprite matches extracted PNG
+
+**Documentation**:
+Record findings in `docs/graphics/SPRITE_VERIFICATION_LOG.md`:
+```markdown
+## Character Sprite Verification
+
+### Benjamin
+- ✅/❌ Walking sprite accurate
+- ✅/❌ Palette correct
+- Notes: [any discrepancies]
+
+### Kaeli
+[same format]
+```
+
+**Related Issue**: #89
+
+---
+
+### Task 6.2: Verify Enemy Sprites
+
+**Extracted Sprites**: `data/extracted/sprites/enemies/`
+
+**Procedure**:
+1. Run `python tools/extraction/extract_all_enemies.py` if not done
+2. Load FFMQ in emulator
+3. Battle each enemy type
+4. Screenshot enemies during battle
+5. Compare with extracted enemy PNGs
+6. Verify palette assignments
+
+**Expected Results**:
+- All 83 enemy sprites extracted
+- Sprites match in-game appearance
+- Shared sprites (recolors) documented
+- Palette indices correct
+
+**Documentation**:
+Add to `docs/graphics/SPRITE_VERIFICATION_LOG.md`:
+```markdown
+## Enemy Sprite Verification
+
+Total Enemies: 83
+
+### Verified Enemies:
+- [x] Brownie (ID 0) - Palette correct
+- [ ] [Enemy Name] (ID X) - [Status]
+
+### Issues Found:
+- [List any palette/layout problems]
+```
+
+**Related Issue**: #87, #89
+
+---
+
+### Task 6.3: Identify Animation Frames
+
+**Purpose**: Document animation frame sequences for each character/enemy
+
+**Tools**: Emulator VRAM viewer (Mesen-S: Debug → VRAM Viewer)
+
+**Procedure**:
+1. Open FFMQ in Mesen-S
+2. Open Debug → VRAM Viewer
+3. Walk character in each direction
+4. Note tile indices for each frame of walk cycle
+5. Document frame sequence and timing
+
+**For Each Character**:
+- **Walk Down**: [tile indices] - [frame count]
+- **Walk Up**: [tile indices] - [frame count]
+- **Walk Left**: [tile indices] - [frame count]
+- **Walk Right**: [tile indices] - [frame count]
+- **Idle**: [tile indices]
+- **Attack**: [tile indices] - [frame count]
+
+**Documentation**:
+Create `docs/graphics/ANIMATION_FRAMES_REFERENCE.md`:
+```markdown
+# Animation Frame Reference
+
+## Benjamin
+
+### Walk Cycle (Down)
+- Frame 0: Tiles [0, 1, 16, 17] - Duration: 8 frames
+- Frame 1: Tiles [2, 3, 18, 19] - Duration: 8 frames
+- Frame 2: Tiles [4, 5, 20, 21] - Duration: 8 frames
+- Loop: true
+
+[Continue for all animations]
+```
+
+**Related Issue**: #86, #89
+
+---
+
+### Task 6.4: Locate OAM Data in ROM
+
+**Purpose**: Find static OAM metadata in ROM banks for automatic sprite layout detection
+
+**Tools**: 
+- Disassembly files (`src/asm/bank_*.asm`)
+- Hex editor
+- Emulator debugger
+
+**Procedure**:
+1. Search disassembly for OAM-related code
+2. Look for patterns like:
+   ```asm
+   ; OAM table writes
+   sta.w $0200,y    ; OAM X position
+   lda.b #$xx       ; Tile number
+   sta.w $0202,y    ; Store tile to OAM
+   ```
+3. Find references to static OAM data tables
+4. Document ROM offsets
+
+**Expected Findings**:
+- Static OAM table offsets in ROM
+- Metasprite definition tables
+- Sprite layout data structures
+
+**Documentation**:
+Create `docs/graphics/OAM_LOCATIONS.md`:
+```markdown
+# OAM Data Locations in ROM
+
+## Static OAM Tables
+
+### Character Sprites
+- **Offset**: 0x0XXXXX
+- **Format**: [describe format]
+- **Size**: [bytes]
+
+### Enemy Sprites
+- **Offset**: 0x0XXXXX
+- **Format**: [describe format]
+
+[Continue for all sprite types]
+```
+
+**Related Issue**: #84, #89
+
+---
+
+### Task 6.5: Extract NPC Sprites
+
+**Existing Tool**: `tools/data-extraction/extract_overworld.py` has NPC definitions
+
+**Procedure**:
+1. Review NPC sprite definitions in `extract_overworld.py`
+2. Run extractor or manually extract NPCs
+3. Load game and visit all towns/locations
+4. Screenshot all NPCs
+5. Compare with extracted sprites
+
+**NPCs to Extract**:
+- Old man
+- Woman
+- Guard
+- Merchant
+- Various town NPCs
+- Quest-related NPCs
+
+**Documentation**:
+Add to `docs/graphics/SPRITE_VERIFICATION_LOG.md`:
+```markdown
+## NPC Sprite Verification
+
+### Town NPCs:
+- [ ] Old Man - [Location] - [Status]
+- [ ] Woman - [Location] - [Status]
+- [ ] Guard - [Location] - [Status]
+
+[Continue for all NPCs]
+```
+
+**Related Issue**: #87, #89
+
+---
+
+### Task 6.6: Document UI Element Extraction Status
+
+**Current Status**: Font and menu borders defined, other UI elements pending
+
+**Procedure**:
+1. Review `tools/extraction/extract_sprites.py` UI_SPRITES definitions
+2. Open game menus and screenshot
+3. Compare with extracted UI elements
+4. List missing UI elements
+
+**UI Elements Checklist**:
+- [x] Font tiles (extracted)
+- [x] Menu borders (extracted)
+- [ ] Weapon icons
+- [ ] Item icons
+- [ ] Spell icons
+- [ ] Status indicators
+- [ ] Battle UI elements
+- [ ] World map markers
+- [ ] Cursor graphics
+
+**Documentation**:
+Add to `docs/graphics/SPRITE_EXTRACTION_OUTSTANDING_WORK.md` or create new file.
+
+**Related Issue**: #87
+
+---
+
+## Summary: Manual Sprite Tasks
+
+**Critical Tasks** (do first):
+1. Task 6.1: Verify character sprites (30 min)
+2. Task 6.2: Verify enemy sprites (1-2 hours)
+3. Task 6.4: Locate OAM data in ROM (2-4 hours)
+
+**Important Tasks** (do soon):
+4. Task 6.3: Identify animation frames (4-6 hours)
+5. Task 6.5: Extract NPC sprites (2-3 hours)
+
+**Lower Priority**:
+6. Task 6.6: Document UI elements (1 hour)
+
+**Total Estimated Time**: 10-18 hours of manual work
+
+**Sprite Task Progress**: 0/6 tasks complete (0%)
+
+---
+
 *Last Updated: 2025-11-12*  
-*Total Tasks: 24 core tasks + 5 optional*  
-*Estimated Time: 8-13 hours*
+*Total Tasks: 30 core tasks (24 original + 6 sprite) + 5 optional*  
+*Estimated Time: 18-31 hours*
