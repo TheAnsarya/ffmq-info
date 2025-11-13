@@ -1,22 +1,19 @@
 {
   "name": "enemy_62_pazuzu",
-  "enemy_id": 62,
-  "enemy_name": "Pazuzu",
   "category": "enemy",
   "format": "4BPP",
   "rom_offset": "0x0537C8",
-  "palette_offset": "0x0483E0",
   "dimensions": {
     "width_tiles": 8,
     "height_tiles": 8,
     "width_pixels": 64,
     "height_pixels": 64
   },
+  "palette_index": 7,
   "num_tiles": 64,
-  "shares_graphics": true,
-  "shared_with": [
-    62,
-    72
-  ],
-  "notes": "Pazuzu (ID 62) - Palette from Bank 09"
+  "animation": {
+    "num_frames": 1,
+    "frame_offsets": []
+  },
+  "notes": "Pazuzu (ID 62)"
 }

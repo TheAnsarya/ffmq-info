@@ -1,22 +1,19 @@
 {
   "name": "enemy_32_centaur",
-  "enemy_id": 32,
-  "enemy_name": "Centaur",
   "category": "enemy",
   "format": "4BPP",
   "rom_offset": "0x04B72D",
-  "palette_offset": "0x048200",
   "dimensions": {
     "width_tiles": 8,
     "height_tiles": 8,
     "width_pixels": 64,
     "height_pixels": 64
   },
+  "palette_index": 5,
   "num_tiles": 64,
-  "shares_graphics": true,
-  "shared_with": [
-    32,
-    33
-  ],
-  "notes": "Centaur (ID 32) - Palette from Bank 09"
+  "animation": {
+    "num_frames": 1,
+    "frame_offsets": []
+  },
+  "notes": "Centaur (ID 32)"
 }

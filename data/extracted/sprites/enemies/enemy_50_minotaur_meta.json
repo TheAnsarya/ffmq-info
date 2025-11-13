@@ -1,22 +1,19 @@
 {
   "name": "enemy_50_minotaur",
-  "enemy_id": 50,
-  "enemy_name": "Minotaur",
   "category": "enemy",
   "format": "4BPP",
   "rom_offset": "0x04DE45",
-  "palette_offset": "0x048320",
   "dimensions": {
     "width_tiles": 6,
     "height_tiles": 6,
     "width_pixels": 48,
     "height_pixels": 48
   },
+  "palette_index": 6,
   "num_tiles": 36,
-  "shares_graphics": true,
-  "shared_with": [
-    50,
-    51
-  ],
-  "notes": "Minotaur (ID 50) - Palette from Bank 09"
+  "animation": {
+    "num_frames": 1,
+    "frame_offsets": []
+  },
+  "notes": "Minotaur (ID 50)"
 }

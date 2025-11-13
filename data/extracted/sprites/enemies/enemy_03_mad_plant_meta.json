@@ -1,23 +1,19 @@
 {
   "name": "enemy_03_mad_plant",
-  "enemy_id": 3,
-  "enemy_name": "Mad Plant",
   "category": "enemy",
   "format": "4BPP",
   "rom_offset": "0x0488AD",
-  "palette_offset": "0x048030",
   "dimensions": {
     "width_tiles": 6,
     "height_tiles": 6,
     "width_pixels": 48,
     "height_pixels": 48
   },
+  "palette_index": 4,
   "num_tiles": 36,
-  "shares_graphics": true,
-  "shared_with": [
-    3,
-    4,
-    5
-  ],
-  "notes": "Mad Plant (ID 3) - Palette from Bank 09"
+  "animation": {
+    "num_frames": 1,
+    "frame_offsets": []
+  },
+  "notes": "Mad Plant (ID 3)"
 }

@@ -1,22 +1,19 @@
 {
   "name": "enemy_57_doom_eye",
-  "enemy_id": 57,
-  "enemy_name": "Doom Eye",
   "category": "enemy",
   "format": "4BPP",
   "rom_offset": "0x04F1DD",
-  "palette_offset": "0x048390",
   "dimensions": {
     "width_tiles": 8,
     "height_tiles": 8,
     "width_pixels": 64,
     "height_pixels": 64
   },
+  "palette_index": 6,
   "num_tiles": 64,
-  "shares_graphics": true,
-  "shared_with": [
-    57,
-    67
-  ],
-  "notes": "Doom Eye (ID 57) - Palette from Bank 09"
+  "animation": {
+    "num_frames": 1,
+    "frame_offsets": []
+  },
+  "notes": "Doom Eye (ID 57)"
 }

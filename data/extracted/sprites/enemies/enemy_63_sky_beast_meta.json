@@ -1,22 +1,19 @@
 {
   "name": "enemy_63_sky_beast",
-  "enemy_id": 63,
-  "enemy_name": "Sky Beast",
   "category": "enemy",
   "format": "4BPP",
   "rom_offset": "0x052B08",
-  "palette_offset": "0x0483F0",
   "dimensions": {
     "width_tiles": 8,
     "height_tiles": 8,
     "width_pixels": 64,
     "height_pixels": 64
   },
+  "palette_index": 7,
   "num_tiles": 64,
-  "shares_graphics": true,
-  "shared_with": [
-    63,
-    73
-  ],
-  "notes": "Sky Beast (ID 63) - Palette from Bank 09"
+  "animation": {
+    "num_frames": 1,
+    "frame_offsets": []
+  },
+  "notes": "Sky Beast (ID 63)"
 }

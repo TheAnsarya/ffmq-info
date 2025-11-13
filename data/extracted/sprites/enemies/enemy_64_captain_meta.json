@@ -1,22 +1,19 @@
 {
   "name": "enemy_64_captain",
-  "enemy_id": 64,
-  "enemy_name": "Captain",
   "category": "enemy",
   "format": "4BPP",
   "rom_offset": "0x054338",
-  "palette_offset": "0x048400",
   "dimensions": {
     "width_tiles": 8,
     "height_tiles": 8,
     "width_pixels": 64,
     "height_pixels": 64
   },
+  "palette_index": 7,
   "num_tiles": 64,
-  "shares_graphics": true,
-  "shared_with": [
-    64,
-    74
-  ],
-  "notes": "Captain (ID 64) - Palette from Bank 09"
+  "animation": {
+    "num_frames": 1,
+    "frame_offsets": []
+  },
+  "notes": "Captain (ID 64)"
 }

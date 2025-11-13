@@ -1,22 +1,19 @@
 {
   "name": "enemy_58_succubus",
-  "enemy_id": 58,
-  "enemy_name": "Succubus",
   "category": "enemy",
   "format": "4BPP",
   "rom_offset": "0x050618",
-  "palette_offset": "0x0483A0",
   "dimensions": {
     "width_tiles": 8,
     "height_tiles": 8,
     "width_pixels": 64,
     "height_pixels": 64
   },
+  "palette_index": 6,
   "num_tiles": 64,
-  "shares_graphics": true,
-  "shared_with": [
-    58,
-    68
-  ],
-  "notes": "Succubus (ID 58) - Palette from Bank 09"
+  "animation": {
+    "num_frames": 1,
+    "frame_offsets": []
+  },
+  "notes": "Succubus (ID 58)"
 }

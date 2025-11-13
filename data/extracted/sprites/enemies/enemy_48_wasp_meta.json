@@ -1,22 +1,19 @@
 {
   "name": "enemy_48_wasp",
-  "enemy_id": 48,
-  "enemy_name": "Wasp",
   "category": "enemy",
   "format": "4BPP",
   "rom_offset": "0x04D88D",
-  "palette_offset": "0x048300",
   "dimensions": {
     "width_tiles": 8,
     "height_tiles": 8,
     "width_pixels": 64,
     "height_pixels": 64
   },
+  "palette_index": 6,
   "num_tiles": 64,
-  "shares_graphics": true,
-  "shared_with": [
-    48,
-    49
-  ],
-  "notes": "Wasp (ID 48) - Palette from Bank 09"
+  "animation": {
+    "num_frames": 1,
+    "frame_offsets": []
+  },
+  "notes": "Wasp (ID 48)"
 }

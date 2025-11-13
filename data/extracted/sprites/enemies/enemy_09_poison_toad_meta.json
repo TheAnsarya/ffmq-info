@@ -1,23 +1,19 @@
 {
   "name": "enemy_09_poison_toad",
-  "enemy_id": 9,
-  "enemy_name": "Poison Toad",
   "category": "enemy",
   "format": "4BPP",
   "rom_offset": "0x049135",
-  "palette_offset": "0x048090",
   "dimensions": {
     "width_tiles": 6,
     "height_tiles": 6,
     "width_pixels": 48,
     "height_pixels": 48
   },
+  "palette_index": 4,
   "num_tiles": 36,
-  "shares_graphics": true,
-  "shared_with": [
-    9,
-    10,
-    11
-  ],
-  "notes": "Poison Toad (ID 9) - Palette from Bank 09"
+  "animation": {
+    "num_frames": 1,
+    "frame_offsets": []
+  },
+  "notes": "Poison Toad (ID 9)"
 }

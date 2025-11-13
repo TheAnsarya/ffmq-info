@@ -1,23 +1,19 @@
 {
   "name": "enemy_15_sand_worm",
-  "enemy_id": 15,
-  "enemy_name": "Sand Worm",
   "category": "enemy",
   "format": "4BPP",
   "rom_offset": "0x049945",
-  "palette_offset": "0x0480F0",
   "dimensions": {
     "width_tiles": 8,
     "height_tiles": 8,
     "width_pixels": 64,
     "height_pixels": 64
   },
+  "palette_index": 4,
   "num_tiles": 64,
-  "shares_graphics": true,
-  "shared_with": [
-    15,
-    16,
-    17
-  ],
-  "notes": "Sand Worm (ID 15) - Palette from Bank 09"
+  "animation": {
+    "num_frames": 1,
+    "frame_offsets": []
+  },
+  "notes": "Sand Worm (ID 15)"
 }

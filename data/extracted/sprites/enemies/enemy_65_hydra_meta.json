@@ -1,22 +1,19 @@
 {
   "name": "enemy_65_hydra",
-  "enemy_id": 65,
-  "enemy_name": "Hydra",
   "category": "enemy",
   "format": "4BPP",
   "rom_offset": "0x055430",
-  "palette_offset": "0x048410",
   "dimensions": {
     "width_tiles": 8,
     "height_tiles": 8,
     "width_pixels": 64,
     "height_pixels": 64
   },
+  "palette_index": 7,
   "num_tiles": 64,
-  "shares_graphics": true,
-  "shared_with": [
-    65,
-    75
-  ],
-  "notes": "Hydra (ID 65) - Palette from Bank 09"
+  "animation": {
+    "num_frames": 1,
+    "frame_offsets": []
+  },
+  "notes": "Hydra (ID 65)"
 }

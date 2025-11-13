@@ -1,22 +1,19 @@
 {
   "name": "enemy_42_mage",
-  "enemy_id": 42,
-  "enemy_name": "Mage",
   "category": "enemy",
   "format": "4BPP",
   "rom_offset": "0x04CBE5",
-  "palette_offset": "0x0482A0",
   "dimensions": {
     "width_tiles": 4,
     "height_tiles": 4,
     "width_pixels": 32,
     "height_pixels": 32
   },
+  "palette_index": 6,
   "num_tiles": 16,
-  "shares_graphics": true,
-  "shared_with": [
-    42,
-    43
-  ],
-  "notes": "Mage (ID 42) - Palette from Bank 09"
+  "animation": {
+    "num_frames": 1,
+    "frame_offsets": []
+  },
+  "notes": "Mage (ID 42)"
 }
