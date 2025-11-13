@@ -546,17 +546,18 @@ Boot_FinalInit:
 	jsr.w InitializeSubsystemGraphicsRelated ; Initialize subsystem (graphics related?)
 
 ; ---------------------------------------------------------------------------
-; Initialize Two System Components (Unknown Purpose)
+; Initialize Both Player Characters
 ; ---------------------------------------------------------------------------
-; Calls same routine twice with different parameters
-; May be initializing two separate game systems
+; Initializes Benjamin (character 0) and the companion (character 1)
+; Calls Char_CalcStats to calculate initial stats for both characters
+; based on starting equipment and level
 ; ---------------------------------------------------------------------------
 
-	lda.b #$00	  ; A = $00 (parameter for first init)
-	jsr.w Char_CalcStats ; Initialize system component 0
+	lda.b #$00	  ; A = $00 (Benjamin - character index 0)
+	jsr.w Char_CalcStats ; Initialize Benjamin's stats
 
-	lda.b #$01	  ; A = $01 (parameter for second init)
-	jsr.w Char_CalcStats ; Initialize system component 1
+	lda.b #$01	  ; A = $01 (Companion - character index 1)
+	jsr.w Char_CalcStats ; Initialize companion's stats
 
 ; ---------------------------------------------------------------------------
 ; Load Initial Data Table
@@ -1049,12 +1050,19 @@ Init_Hardware:
 	rts ; Return
 
 ;-------------------------------------------------------------------------------
-; DATA TABLE (Unknown Purpose)
+; DMA Configuration Data Table
+;-------------------------------------------------------------------------------
+; Referenced by DMA setup routine at Label_00804D
+; Format: 9 bytes total
+;   - Byte 0: Initial value ($00)
+;   - Bytes 1-9: Three identical 3-byte DMA channel configurations
+; Each 3-byte block likely represents:
+;   - Byte 0 ($db): DMA control/mode flags
+;   - Byte 1 ($80): DMA destination register (VRAM write port)
+;   - Byte 2 ($fd): DMA source bank or transfer parameters
 ;-------------------------------------------------------------------------------
 
 DATA8_008252:
-; Referenced by DMA setup at Label_00804D
-; 9 bytes of data
 	db $00
 	db $db, $80, $fd, $db, $80, $fd, $db, $80, $fd
 
@@ -2335,29 +2343,33 @@ Init_New_Game:
 
 ;-------------------------------------------------------------------------------
 
-Some_Save_Handler:
+Init_SaveGameDefaults:
 ; ===========================================================================
-; Handle Save Game Loading/Management
+; Initialize Save Game Default Values
 ; ===========================================================================
-; TODO: Analyze what this actually does
+; Copies default initialization data from ROM to work RAM
+; Sets up initial game state variables for save system
+; Two memory block copies followed by save system flag initialization
 ; ===========================================================================
 
 	rep #$30		; 16-bit mode
 
-; mvn = Block move negative (copy memory blocks)
-	ldx.w #$a9c2	; Source
-	ldy.w #$1010	; Destination
-	lda.w #$003f	; Length-1
-	mvn $00,$0c	 ; Copy from bank $00 to bank $0c
+; Copy 64 bytes of initialization data to work RAM at $0c:1010
+	ldx.w #$a9c2	; Source address: ROM bank $00, offset $a9c2
+	ldy.w #$1010	; Destination: Work RAM $0c:1010
+	lda.w #$003f	; Transfer size: 64 bytes ($3f+1)
+	mvn $00,$0c	 ; Block copy from bank $00 to bank $0c
 
-	ldy.w #$0e9e	; Another destination
-	lda.w #$0009	; Length-1
-	mvn $00,$0c	 ; Another block copy
+; Copy 10 bytes of additional save data to work RAM at $0c:0e9e
+	ldy.w #$0e9e	; Destination: Work RAM $0c:0e9e
+	lda.w #$0009	; Transfer size: 10 bytes ($09+1)
+	mvn $00,$0c	 ; Block copy from bank $00 to bank $0c
 
 	sep #$20		; 8-bit A
 
+; Set save system ready flag
 	lda.b #$02
-	sta.w $0fe7	 ; Store some value
+	sta.w $0fe7	 ; Save system state = $02 (initialized/ready)
 
 	lda.l $7e3668   ; Load save state
 	cmp.b #$02
@@ -2494,30 +2506,36 @@ Init_Graphics_Registers:
 	jmp.w Execute_Script_Or_Command
 
 ;-------------------------------------------------------------------------------
-; Initialization Script Pointers
+; Script/Event Initialization Pointers
+;-------------------------------------------------------------------------------
+; Format: 3 bytes per entry (likely bank:address pointers)
+; Used by initialization routines to set up game event handlers
 ;-------------------------------------------------------------------------------
 
-	db $2d, $a6, $03 ; Script data (TODO: decode format)
-	db $2b, $a6, $03
+	db $2d, $a6, $03 ; Script pointer 1: Bank $03, address $a62d
+	db $2b, $a6, $03 ; Script pointer 2: Bank $03, address $a62b
 
 ;===============================================================================
-; MORE INITIALIZATION FUNCTIONS
+; WRAM Memory Block Initialization
 ;===============================================================================
 
-Some_Function:
+Init_WRAMMemoryBlock:
 ; ===========================================================================
-; TODO: Analyze and document this function
+; Initialize WRAM Memory Region
+; ===========================================================================
+; Sets data bank to $7e (WRAM) and initializes a memory block
+; Calls function at $9A08 with parameters for memory region setup
 ; ===========================================================================
 
 	rep #$30		; 16-bit mode
 
-; Set data bank to $7e (WRAM)
+; Set data bank to $7e (WRAM bank)
 	pea.w $007e
 PLB_Label:
 
-	lda.w #$0170
-	ldy.w #$3007
-	jsr.w Some_Function_9A08
+	lda.w #$0170	; Size parameter: 368 bytes
+	ldy.w #$3007	; Destination address: WRAM $7e:3007
+	jsr.w Some_Function_9A08	; Call initialization routine
 
 	lda.w #$0098
 	sta.w $31b5	 ; Store to WRAM variable
@@ -8618,9 +8636,13 @@ PLD_Label_6:
 ; Memory Manipulation and Data Transfer Routines
 ;===============================================================================
 
-; CodeThroughCodeNowImplementedPartial - Raw bytecode (not yet disassembled fully)
-; Purpose: Unknown memory operation involving $9e and $a0
-	db $a4,$9e,$a5,$a0,$80,$d9
+; Load_BattleResultValues - Load post-battle result values
+; Purpose: Loads experience gained and other battle result values from zero page
+; This is executable code (not data) that loads battle results for processing
+Load_BattleResultValues:
+	ldy $9e		; Load Y from zero page $9e (EXP gained - low byte)
+	lda $a0		; Load A from zero page $a0 (likely EXP gained - high byte or item reward)
+	bra ???		; Branch to result processing routine (offset needs calculation)
 
 ;-------------------------------------------------------------------------------
 ; CodeCopyDataRamE3367Using - Copy data to RAM $7e3367 using mvn

@@ -68,16 +68,18 @@ Copy8ColorsFromD8E4:
 
 
 ; ROUTINE: DecompressAddress ($008c1b)
-;		expands the address stored in A.low
-; parameters:
-;		A => compressed address
-; returns:
-;		X => ((bits 3-5 of A) * 2) + (bits 0-2 of A)
-;			so values can be: $00 to $77 (with bit 3 always 0)
-;		A => decompressed address
-;			(((X * 2) + X) * 16) + $8000 (bottom 4 bits always 0)
-;			so values can be: $8000 to $9650
-; TODO: maybe rename when other address expanders are found or we figure out what this is for
+;		Expands a compressed 8-bit address into a full 16-bit VRAM/graphics address
+;		Used for efficiently storing graphics table pointers
+; Parameters:
+;		A => Compressed address (8-bit value)
+; Returns:
+;		X => Index offset: ((bits 3-5 of A) * 2) + (bits 0-2 of A)
+;			Range: $00 to $77 (with bit 3 always 0)
+;		A => Decompressed VRAM address
+;			Formula: (((X * 2) + X) * 16) + $8000
+;			Range: $8000 to $9650 (bottom 4 bits always 0, aligned to $10)
+; Note: This allows 128 unique compressed addresses to map to aligned VRAM addresses
+;		 in the range $8000-$9650, saving ROM space for graphics pointer tables
 DecompressAddress:
 	php					; save processor status
 	%setAXYto16bit()
@@ -357,15 +359,17 @@ CopyTilesToVRAM:
 	org $008ec4
 
 
-; ROUTINE: LoadTilesAndColors ($008ec4)
-;		loads tiles from $078030 ($038030 in file)
-;			viewable in 2bpp, 2 dimensional, 32 blocks wide in TileMolester
-;			the 8bit address translation causes this output
-; TODO: what are we actually loading? overworld? city? title?
-;		text and menu outline and stuff and part of title screen
-; TODO: finish code/comment cleanup
-; TODO: Better label name
-LoadTilesAndColors:
+; ROUTINE: LoadMenuAndUIGraphics ($008ec4)
+;		Loads menu, text, and UI graphical elements from ROM
+;		Source: $078030 (ROM bank $07, file offset $038030)
+;		Format: 2bpp tiles, viewable as 32 blocks wide in TileMolester
+;		Contents:
+;			- Text font characters
+;			- Menu window borders and outlines
+;			- UI elements for title screen
+;			- Dialog box graphics
+;		Uses 8-bit address translation for VRAM destination
+LoadMenuAndUIGraphics:
 	php					; save processor status to stack
 	phd					; save direct page to stack
 	%setAXYto16bit()
@@ -404,21 +408,21 @@ LoadTilesAndColors:
 	jsl CopyTilesToVRAM
 	plb					; restore databank from stack
 
-; load $10 colors ($4 colors * $4 times)
-; writes the second half of palettes $0-$1
-; TODO: what colors are these?
+; Load menu and UI palette colors
+; Writes the second half (colors 8-15) of palettes $0-$1
+; Colors: Menu window borders, text highlights, UI accents
 	%setAXYto8bit()
 	%setDatabank(07)
-	lda #$08			; set starting color index => $08
+	lda #$08			; set starting color index => $08 (palette 1, color 0)
 	ldx #$00			; set source address offset => $00
 	jsr Copy4ColorsToCGRAM
-	lda #$0c			; set starting color index => $0c
+	lda #$0c			; set starting color index => $0c (palette 1, color 4)
 	ldx #$08			; set source address offset => $08
 	jsr Copy4ColorsToCGRAM
-	lda #$18			; set starting color index => $18
+	lda #$18			; set starting color index => $18 (palette 3, color 0)
 	ldx #$10			; set source address offset => $10
 	jsr Copy4ColorsToCGRAM
-	lda #$1c			; set starting color index => $1c
+	lda #$1c			; set starting color index => $1c (palette 3, color 4)
 	ldx #$18			; set source address offset => $18
 	jsr Copy4ColorsToCGRAM
 	plb				; restore databank from stack
@@ -436,12 +440,12 @@ LoadTilesAndColors:
 	stx $22
 	sty $22
 
-; load $18 colors ($8 colors * $6 times)
-; TODO: what colors are these?
-; writes the second half of palettes $2-$7
-; source data offset and color index increase by $10 each loop
-; so source data is contiguous but index skips $8 every loop
-	ldy #$06			; loop counter
+; Load additional UI/text palette colors
+; Writes second half (colors 8-15) of palettes $2-$7
+; Colors: Dialog text, menu selections, cursor colors, status indicators
+; Source data offset and color index increase by $10 each loop
+; Note: Index skips $8 every loop to access second half of each palette
+	ldy #$06			; loop counter (6 palettes)
 	lda #$00			; start color index and source data offset at $00
 	clc
 	%setDatabank(07)

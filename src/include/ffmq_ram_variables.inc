@@ -273,7 +273,11 @@
 ; Medium Priority Graphics Variables (Issue #29)
 !wram_data_ptr      = $06bf     ; WRAM data pointer/offset
 !rom_function_ptr   = $0b83     ; ROM function pointer base
-!tilemap_index      = $0e89     ; Tilemap indexing variable
+
+; Map/Player Position Variables
+!player_map_x       = $0e89     ; Player X coordinate on current map / Tilemap index
+!player_map_y       = $0e8a     ; Player Y coordinate on current map
+!tilemap_index      = $0e89     ; Tilemap indexing variable (alias for !player_map_x)
 !tilemap_counter    = $0e91     ; Tilemap operation counter
 
 !tilemap_wram_source_start_2    = $0900     ; Tilemap source start 2 (legacy label)
@@ -282,23 +286,76 @@
 !ram_1031                       = $1031     ; Legacy label
 !ram_1031_long                  = $001031   ; Legacy label (long address)
 
+; ============================================================================
+; Graphics System Variables ($1900-$1aff)
+; ============================================================================
+
+; ----------------------------------------------------------------------------
+; Map Chunk and Tilemap Control ($191a-$192e)
+; ----------------------------------------------------------------------------
+!map_chunk_control      = $191a     ; Map chunk load control array[8] (negative=$00 fill, else ROM offset)
+!tilemap_x_offset       = $192d     ; Tilemap rendering X offset (player_map_x - 8)
+!tilemap_y_offset       = $192e     ; Tilemap rendering Y offset (player_map_y - 6)
+
 ; Graphics-related legacy labels
 !ram_1924           = $1924     ; Legacy graphics variable
-!ram_1925           = $1925     ; Legacy graphics variable
+!ram_1925           = $1925     ; Conditional offset (used in add/subtract operations)
 !ram_195f           = $195f     ; Legacy graphics variable
 !ram_19a5           = $19a5     ; Legacy graphics variable
 
-!ram_19b4           = $19b4     ; if bit 3 = 1 then !ram_1a33 => $80 else $00
-!ram_19bd           = $19bd     ; bottom 4 bits inversed are a DMA transfer size variable
-!ram_19bf           = $19bf     ; Legacy graphics variable
+; ----------------------------------------------------------------------------
+; Graphics Mode and Parameters ($19b4-$19f6)
+; ----------------------------------------------------------------------------
+!graphics_mode_flags    = $19b4     ; Graphics mode flags (bit 3 determines priority $80/$00)
+!ram_19b4               = $19b4     ; Legacy alias - if bit 3 = 1 then !ram_1a33 => $80 else $00
+!data_source_offset     = $19b5     ; Calculated data source offset from ROM tables
+!calculated_source_offset = $19b7   ; Final calculated offset ($1911 * $0a)
+!source_pointer         = $19b9     ; Source data pointer ($ffff or calculated from $1912 * 2)
+!ram_19bd               = $19bd     ; bottom 4 bits inversed are a DMA transfer size variable
+!ram_19bf               = $19bf     ; Legacy graphics variable
+!graphics_index         = $19d7     ; Graphics data index (lower 2 bits * 2)
 
 ; Medium Priority Graphics Control (Issue #29)
 !graphics_temp_1    = $19ee     ; Graphics temporary variable 1
-!dma_offset         = $1a2f     ; DMA transfer offset
-!bg_control         = $1a3b     ; Background control flags
-!graphics_flags     = $1a3d     ; Graphics system flags
-!sprite_control     = $1a45     ; Sprite control variable
-!layer_flags        = $1a55     ; Layer enable/disable flags
+!map_param_1        = $19f0     ; Map initialization parameter 1
+!map_param_2        = $19f1     ; Map initialization parameter 2
+!map_param_zero     = $19f6     ; Temporary zero flag (cleared to $00)
+
+; ----------------------------------------------------------------------------
+; Tileset Data Loading ($1910-$191f)
+; ----------------------------------------------------------------------------
+!graphics_table_data    = $1910     ; Data loaded from ROM table $07b013
+!source_address_index   = $1911     ; Source address index (multiplied by $0a for offset calc)
+!source_offset_index    = $1912     ; Source offset index ($ff = skip, else calculate)
+!graphics_param_1       = $1915     ; Graphics parameter (top 3 bits used in packing)
+!graphics_param_2       = $1916     ; Graphics parameter (top 3 bits used in packing)
+!tileset_copy_buffer    = $1918     ; Tileset data copy buffer[10 bytes]
+
+; ----------------------------------------------------------------------------
+; Tile Data Processing ($1a2f-$1a5b)
+; ----------------------------------------------------------------------------
+!dma_offset         = $1a2f     ; DMA transfer offset / cleared temp variable
+!bg_control         = $1a3b     ; Background control flags / Tile calculation result
+!graphics_flags     = $1a3d     ; Graphics system flags / Tile data working array[8]
+!sprite_control     = $1a45     ; Sprite control variable / Graphics init flag
+!layer_flags        = $1a55     ; Layer enable/disable flags / Packed graphics flags
+!temp_zero_flag     = $1a5b     ; Temporary variable (cleared to $00)
+
+; New documented names for tile processing
+!temp_graphics_calc     = $1a2f     ; Cleared to $00, used in calculations (alias for !dma_offset)
+!graphics_priority_flag = $1a33     ; Conditional value: (bit 3 of $19b4) ? $80 : $00
+!graphics_param_store   = $1a34     ; Stores $1a52 value
+!tile_data_temp_1       = $1a35     ; Data from $7fcef4[x]
+!tile_data_temp_2       = $1a37     ; Data from $7fcef4[x+2]
+!tile_lookup_value      = $1a39     ; Tile data lookup value
+!temp_accumulator       = $1a3a     ; Temporary accumulator storage
+!tile_calc_result       = $1a3b     ; Calculated tile value (alias for !bg_control)
+!tile_data_copy         = $1a3c     ; Tile data copy
+!tile_data_array        = $1a3d     ; Array of tile/graphics data (alias for !graphics_flags)
+!graphics_init_flag     = $1a45     ; Initialization complete flag (alias for !sprite_control)
+!copy_routine_selector  = $1a4c     ; If $01, call second copy routine
+!graphics_param         = $1a52     ; Graphics parameter value
+!packed_graphics_flags  = $1a55     ; Packed byte: 2 zero bits + top 3 bits of $1915 + top 3 bits of $1916
 
 ; Tilemap VRAM control structures
 !tilemap_vram_control               = $19fa     ; VMAIN flags (known: $80, $81)
@@ -358,6 +415,15 @@
 !general_work_2     = $7ea000   ; General working memory block 2 (4096 bytes)
 !general_work_3     = $7eb000   ; General working memory block 3 (4096 bytes)
 !decompression_buffer = $7ec000 ; Data decompression working buffer (4096 bytes)
+
+; ----------------------------------------------------------------------------
+; Battle System Extended ($7e0800-$7e0bff)
+; ----------------------------------------------------------------------------
+
+; DMA Control Variables
+!dma_control_flags      = $0ec6     ; DMA operation control flags (modified by TRB)
+!dma_channel_array      = $0ec8     ; DMA channel status array (cleared to $00)
+!vram_transfer_array    = $0f28     ; VRAM transfer queue array (cleared to $00)
 
 ; ============================================================================
 ; Battle System Extended ($7e0800-$7e0bff)
