@@ -340,6 +340,24 @@
 !battle_flags           = $19b0     ; Battle system flags
 
 !battle_animation_timer = $19b4     ; Battle animation timer / Graphics mode flags
+
+; ----------------------------------------------------------------------------
+; Movement and Direction State ($19c5-$19d6)
+; ----------------------------------------------------------------------------
+!battle_position_x      = $19c5     ; Battle entity X coordinate (from $7fcef4)
+!battle_position_y      = $19c7     ; Battle entity Y coordinate (from $7fcef6)
+!battle_entity_state    = $19c9     ; Battle entity state/flags (from $7fd0f4)
+!battle_state_backup    = $19ca     ; Backup of entity state ($19c9)
+!movement_state         = $19cb     ; Movement state/configuration backup
+!battle_trigger_data    = $19cc     ; Battle trigger/configuration data
+!movement_config        = $19cf     ; Movement/coordinate configuration register
+!movement_flags         = $19d0     ; Movement attribute flags
+!coordinate_register    = $19d1     ; Primary coordination/collision state register
+!tertiary_attributes    = $19d2     ; Tertiary-specific attributes
+!current_direction      = $19d3     ; Current direction state
+!target_direction       = $19d5     ; Target direction state
+!collision_data         = $19d6     ; Collision/tertiary state data
+
 !battle_state_flags     = $19d7     ; Battle state control flags / Graphics data index
 
 !battle_target_select   = $195f     ; Battle target selection index

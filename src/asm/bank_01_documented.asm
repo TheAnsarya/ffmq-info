@@ -1,4 +1,4 @@
-﻿; ===========================================================================
+; ===========================================================================
 ; Final Fantasy Mystic Quest - Bank $01 - Battle System
 ; ===========================================================================
 ; Size: 15,480 lines of disassembly
@@ -5108,7 +5108,7 @@ BattleState_MachineController:
 	lda.b #$01	  ;01B600|A901    |      ;
 	sta.w $194b	 ;01B602|8D4B19  |01194B;
 	stz.w $1951	 ;01B605|9C5119  |011951;
-	inc.w $19d3	 ;01B608|EED319  |0119D3;
+	inc.w !current_direction	 ;01B608|EED319  |0119D3;
 	ldx.w $0e89	 ;01B60B|AE890E  |010E89;
 	stx.w $192d	 ;01B60E|8E2D19  |01192D;
 	jsr.w Sub_01880C ;01B611|200C88  |01880C;
@@ -5120,7 +5120,7 @@ BattleState_MachineController:
 	and.b #$7f	  ;01B620|297F    |      ;
 	tax ;01B622|AA      |      ;
 	lda.l $7fd0f4,x ;01B623|BFF4D07F|7FD0F4;
-	sta.w $19c9	 ;01B627|8DC919  |0119C9;
+	sta.w !battle_entity_state	 ;01B627|8DC919  |0119C9;
 	php ;01B62A|08      |      ;
 	rep #$30		;01B62B|C230    |      ;
 	txa ;01B62D|8A      |      ;
@@ -5128,9 +5128,9 @@ BattleState_MachineController:
 	asl a;01B62F|0A      |      ;
 	tax ;01B630|AA      |      ;
 	lda.l $7fcef4,x ;01B631|BFF4CE7F|7FCEF4;
-	sta.w $19c5	 ;01B635|8DC519  |0119C5;
+	sta.w !battle_position_x	 ;01B635|8DC519  |0119C5;
 	lda.l $7fcef6,x ;01B638|BFF6CE7F|7FCEF6;
-	sta.w $19c7	 ;01B63C|8DC719  |0119C7;
+	sta.w !battle_position_y	 ;01B63C|8DC719  |0119C7;
 	jsr.w Sub_0196D3 ;01B63F|20D396  |0196D3;
 	jsr.w Sub_019058 ;01B642|205890  |019058;
 	lda.w $19bd	 ;01B645|ADBD19  |0119BD;
@@ -5568,10 +5568,10 @@ BattleSystem_StateController:
 ; ==============================================================================
 
 BattleScene_TransitionManager:
-	lda.w $19cb	 ;01B96D|ADCB19  |0119CB;
+	lda.w !movement_state	 ;01B96D|ADCB19  |0119CB;
 	and.w #$fff8	;01B970|29F8FF  |      ;
 	ora.w #$0001	;01B973|090100  |      ;
-	sta.w $19cb	 ;01B976|8DCB19  |0119CB;
+	sta.w !movement_state	 ;01B976|8DCB19  |0119CB;
 	sep #$20		;01B979|E220    |      ;
 	rep #$10		;01B97B|C210    |      ;
 	lda.w $19b4	 ;01B97D|ADB419  |0119B4;
@@ -6623,18 +6623,18 @@ DATA8_01d6cb:
 	lda.l $7f8000,x ;01D704|BF00807F|7F8000;
 	inc a;01D708|1A      |      ;
 	sta.l $7f8000,x ;01D709|9F00807F|7F8000;
-	sta.w $19d6	 ;01D70D|8DD619  |0119D6;
+	sta.w !collision_data	 ;01D70D|8DD619  |0119D6;
 	lda.b #$01	  ;01D710|A901    |      ;
 	sta.w $194b	 ;01D712|8D4B19  |01194B;
 	stz.w $1951	 ;01D715|9C5119  |011951;
-	lda.w $19c9	 ;01D718|ADC919  |0119C9;
-	sta.w $19ca	 ;01D71B|8DCA19  |0119CA;
+	lda.w !battle_entity_state	 ;01D718|ADC919  |0119C9;
+	sta.w !battle_state_backup	 ;01D71B|8DCA19  |0119CA;
 	lda.b #$00	  ;01D71E|A900    |      ;
 	xba ;01D720|EB      |      ;
-	lda.w $19d6	 ;01D721|ADD619  |0119D6;
+	lda.w !collision_data	 ;01D721|ADD619  |0119D6;
 	tax ;01D724|AA      |      ;
 	lda.l $7fd0f4,x ;01D725|BFF4D07F|7FD0F4;
-	sta.w $19c9	 ;01D729|8DC919  |0119C9;
+	sta.w !battle_entity_state	 ;01D729|8DC919  |0119C9;
 	php ;01D72C|08      |      ;
 	rep #$30		;01D72D|C230    |      ;
 	txa ;01D72F|8A      |      ;
@@ -6642,9 +6642,9 @@ DATA8_01d6cb:
 	asl a;01D731|0A      |      ;
 	tax ;01D732|AA      |      ;
 	lda.l $7fcef4,x ;01D733|BFF4CE7F|7FCEF4;
-	sta.w $19c5	 ;01D737|8DC519  |0119C5;
+	sta.w !battle_position_x	 ;01D737|8DC519  |0119C5;
 	lda.l $7fcef6,x ;01D73A|BFF6CE7F|7FCEF6;
-	sta.w $19c7	 ;01D73E|8DC719  |0119C7;
+	sta.w !battle_position_y	 ;01D73E|8DC719  |0119C7;
 	plp ;01D741|28      |      ;
 	jsr.w Sub_0196D3 ;01D742|20D396  |0196D3;
 	jsr.w Sub_019058 ;01D745|205890  |019058;
@@ -7387,10 +7387,10 @@ battle_state_memory_coordination_system:
 	stz.w $194c	 ; Clear battle counter
 	lda.w !map_param_2	 ; Load encounter status / map parameter 2
 	bne battle_state_processing ; Branch if encounter active
-	lda.w $19cc	 ; Load battle trigger data
+	lda.w !battle_trigger_data	 ; Load battle trigger data
 	bmi battle_state_processing ; Branch if negative
 	xba ; Exchange bytes
-	lda.w $19cb	 ; Load battle configuration
+	lda.w !movement_state	 ; Load battle configuration
 	asl a; Shift for processing
 	xba ; Exchange bytes back
 	rol a; Rotate with carry
@@ -7474,17 +7474,17 @@ animation_setup:
 ; Sophisticated battle movement system with direction processing and coordinate management
 ; Implements complex movement calculations with multi-directional support and state coordination
 battle_direction_movement_processing_engine:
-	lda.w $19d3	 ; Load current direction state
+	lda.w !current_direction	 ; Load current direction state
 	sta.w $193b	 ; Store to movement buffer
-	lda.w $19d5	 ; Load target direction state
-	sta.w $19d3	 ; Store as current direction
-	ldx.w $19cf	 ; Load movement configuration
-	stx.w $19cb	 ; Store movement state
-	lda.w $19d0	 ; Load movement flags
+	lda.w !target_direction	 ; Load target direction state
+	sta.w !current_direction	 ; Store as current direction
+	ldx.w !movement_config	 ; Load movement configuration
+	stx.w !movement_state	 ; Store movement state
+	lda.w !movement_flags	 ; Load movement flags
 	ldy.w $19f1	 ; Load movement index
 	jsr.w .BattleMenu_SelectionConfirm ; Execute movement processing
 	lda.w $193b	 ; Load movement buffer
-	eor.w $19d5	 ; XOR with target direction
+	eor.w !target_direction	 ; XOR with target direction
 	bmi battle_direction_reverse ; Branch if direction reversed
 	lda.b #$02	  ; Set forward movement code
 	rts ; Return from movement processing
@@ -7527,10 +7527,10 @@ character_interaction_special:
 	lda.w $1a80,x   ; Load character configuration
 	and.b #$07	  ; Mask configuration bits
 	sta.w $192b	 ; Store configuration parameter
-	lda.w $19cf	 ; Load character state
+	lda.w !movement_config	 ; Load character state
 	and.b #$f8	  ; Clear lower bits
 	ora.w $192b	 ; OR with configuration
-	sta.w $19cf	 ; Store updated character state
+	sta.w !movement_config	 ; Store updated character state
 	jmp.w JumpCharacterProcessor ; Jump to character processor
 character_interaction_advanced:
 	lda.b #$20	  ; Set advanced processing mode
@@ -7551,12 +7551,12 @@ battle_collision_movement_validation:
 	lda.w $19b4	 ; Load battle movement state
 	and.b #$07	  ; Mask movement direction
 	beq battle_state_standard ; Branch if no movement
-	eor.w $19d1	 ; XOR with collision state
+	eor.w !coordinate_register	 ; XOR with collision state
 	and.b #$07	  ; Mask collision bits
 	bne battle_state_standard ; Branch if collision detected
 	jsr.w .BattleEscape_FailureHandling ; Execute collision validation
 	bcs battle_state_standard ; Branch if collision confirmed
-	lda.w $19d6	 ; Load collision data
+	lda.w !collision_data	 ; Load collision data
 	lsr a; Shift collision flags
 	lsr a; Shift again
 	lsr a; Shift again
@@ -7573,11 +7573,11 @@ battle_collision_movement_validation:
 	bcc collision_validation_complete ; Branch if validation complete
 	inc.w $1926	 ; Increment validation state
 collision_validation_complete:
-	lda.w $19d5	 ; Load target movement state
-	sta.w $19d3	 ; Store as current state
-	ldx.w $19cf	 ; Load movement configuration
-	stx.w $19cb	 ; Store movement backup
-	lda.w $19d0	 ; Load movement flags
+	lda.w !target_direction	 ; Load target movement state
+	sta.w !current_direction	 ; Store as current state
+	ldx.w !movement_config	 ; Load movement configuration
+	stx.w !movement_state	 ; Store movement backup
+	lda.w !movement_flags	 ; Load movement flags
 	ldy.w $19f1	 ; Load movement index
 	jsr.w .BattleMenu_SelectionConfirm ; Execute movement coordination
 	lda.b #$0c	  ; Set movement completion code
@@ -7633,7 +7633,7 @@ environment_location_error:
 ; Implements sophisticated trigger algorithms with multi-event support and memory management
 battle_trigger_event_processing_system:
 	jsr.w ExecuteTriggerValidation ; Execute trigger validation
-	lda.w $19d0	 ; Load trigger state
+	lda.w !movement_flags	 ; Load trigger state
 	bpl trigger_processing_standard ; Branch if standard trigger
 	bit.b #$20	  ; Test trigger type bit
 	beq trigger_processing_standard ; Branch if standard type
@@ -7691,7 +7691,7 @@ multi_path_battle_processing_engine:
 	inc.w $19af	 ; Increment pathfinding counter
 	lda.w !map_param_2	 ; Load pathfinding mode / map parameter 2
 	bne battle_animation_processing ; Branch if pathfinding active
-	lda.w $19cb	 ; Load pathfinding configuration
+	lda.w !movement_state	 ; Load pathfinding configuration
 	and.b #$70	  ; Mask pathfinding type
 	cmp.b #$30	  ; Compare with pathfinding mode
 	beq battle_animation_processing ; Branch if pathfinding mode
@@ -7710,15 +7710,15 @@ pathfinding_standard_setup:
 	sta.w $1933	 ; Store pathfinding direction
 	ldx.w $0e89	 ; Load pathfinding coordinates
 	stx.w $193b	 ; Store pathfinding X coordinate
-	ldx.w $19cb	 ; Load pathfinding state
+	ldx.w !movement_state	 ; Load pathfinding state
 	stx.w $193d	 ; Store pathfinding Y coordinate
-	lda.w $19d3	 ; Load pathfinding direction state
+	lda.w !current_direction	 ; Load pathfinding direction state
 	sta.w $193f	 ; Store pathfinding direction backup
 	ldx.w $19f1	 ; Load pathfinding index
 	stx.w $1943	 ; Store pathfinding index backup
-	ldx.w $19cf	 ; Load pathfinding configuration
+	ldx.w !movement_config	 ; Load pathfinding configuration
 	stx.w $1945	 ; Store pathfinding configuration backup
-	lda.w $19d5	 ; Load pathfinding target state
+	lda.w !target_direction	 ; Load pathfinding target state
 	sta.w $1947	 ; Store pathfinding target backup
 ; Pathfinding processing complete
 	rts ; Return from pathfinding processing
@@ -7757,10 +7757,10 @@ Advanced_Coordinate_Analysis:
 	lda.w $19b4	 ; Load primary coordinate register
 	and.b #$07	  ; Extract lower coordinate bits
 	sta.w $193b	 ; Store X-axis coordinate component
-	lda.w $19cf	 ; Load secondary coordinate register
+	lda.w !movement_config	 ; Load secondary coordinate register
 	and.b #$07	  ; Extract coordinate fragment
 	sta.w $193c	 ; Store Y-axis coordinate component
-	lda.w $19d1	 ; Load tertiary coordinate register
+	lda.w !coordinate_register	 ; Load tertiary coordinate register
 	and.b #$07	  ; Extract Z-axis coordinate fragment
 	sta.w $193d	 ; Store depth coordinate component
 
@@ -7816,22 +7816,22 @@ Secondary_Attribute_Coordination:
 	lda.w $1a80,x   ; Load secondary attribute extension
 	and.b #$07	  ; Extract coordination bits
 	sta.w $193d	 ; Store coordinated attribute
-	lda.w $19d1	 ; Load primary coordination register
+	lda.w !coordinate_register	 ; Load primary coordination register
 	and.b #$f8	  ; Preserve upper coordination bits
 	ora.w $193d	 ; Merge with secondary attributes
-	sta.w $19d1	 ; Store unified coordination state
+	sta.w !coordinate_register	 ; Store unified coordination state
 	stz.w $1940	 ; Clear secondary processing counter
 
 Secondary_Processing_Complete:
 ; Advanced battle state differential analysis
-	lda.w $19d3	 ; Load primary battle state
-	eor.w $19d5	 ; Compare with secondary state
+	lda.w !current_direction	 ; Load primary battle state
+	eor.w !target_direction	 ; Compare with secondary state
 	bmi Advanced_State_Mismatch ; Branch if state conflict detected
 
 ; Advanced Battle State Validation Engine
 ; Complex state validation with multiple validation layers
 Battle_State_Validation:
-	lda.w $19cf	 ; Load coordinate state
+	lda.w !movement_config	 ; Load coordinate state
 	and.b #$70	  ; Extract state classification bits
 	cmp.b #$30	  ; Check for advanced state mode
 	beq Advanced_State_Mismatch ; Branch if advanced mode conflict
@@ -7839,7 +7839,7 @@ Battle_State_Validation:
 	beq Advanced_State_Mismatch ; Branch if intermediate conflict
 
 ; State-Specific Attribute Validation
-	lda.w $19d0	 ; Load state-specific attributes
+	lda.w !movement_flags	 ; Load state-specific attributes
 	bmi Negative_State_Processing ; Branch for negative state handling
 	bit.b #$04	  ; Test state-specific flag
 	bne Advanced_State_Mismatch ; Branch if flag conflict
@@ -7855,14 +7855,14 @@ Advanced_State_Mismatch:
 
 Continue_State_Validation:
 ; Parallel state validation for tertiary battle state
-	lda.w $19d3	 ; Reload primary battle state
-	eor.w $19d6	 ; Compare with tertiary state
+	lda.w !current_direction	 ; Reload primary battle state
+	eor.w !collision_data	 ; Compare with tertiary state
 	bmi Tertiary_State_Error ; Branch if tertiary conflict
 
 ; Tertiary Battle State Processing Engine
 ; Advanced tertiary state management with complex validation
 Tertiary_State_Processing:
-	lda.w $19d1	 ; Load tertiary coordinate state
+	lda.w !coordinate_register	 ; Load tertiary coordinate state
 	and.b #$70	  ; Extract tertiary classification
 	cmp.b #$30	  ; Check tertiary advanced mode
 	beq Tertiary_State_Error ; Branch if advanced tertiary conflict
@@ -7870,7 +7870,7 @@ Tertiary_State_Processing:
 	beq Tertiary_State_Error ; Branch if intermediate tertiary conflict
 
 ; Tertiary-Specific Attribute Validation
-	lda.w $19d2	 ; Load tertiary-specific attributes
+	lda.w !tertiary_attributes	 ; Load tertiary-specific attributes
 	bmi Tertiary_Negative_Processing ; Branch for negative tertiary state
 	bit.b #$04	  ; Test tertiary-specific flag
 	bne Tertiary_State_Error ; Branch if tertiary flag conflict
@@ -7962,12 +7962,12 @@ Battle_Processing_Decision:
 	dec a; Decrement for decision analysis
 	bne Secondary_Battle_Processing ; Branch if secondary processing needed
 	ldy.w $19f1	 ; Load primary battle context
-	lda.w $19d0	 ; Load primary battle state
+	lda.w !movement_flags	 ; Load primary battle state
 	bra Execute_Battle_Processing ; Branch to execution
 
 Secondary_Battle_Processing:
 	ldy.w $19f3	 ; Load secondary battle context
-	lda.w $19d2	 ; Load secondary battle state
+	lda.w !tertiary_attributes	 ; Load secondary battle state
 
 Execute_Battle_Processing:
 	jsr.w .BattleMenu_SelectionConfirm ; Execute advanced battle processing
@@ -8208,8 +8208,8 @@ Battle_Bit_Found:
 ; Multi-layered coordinate processing with validation and error handling
 	.BattleDefeat_MemoryCleanup:
 	jsr.w .BattleDefeat_ScreenClear ; Execute primary coordinate processing
-	sta.w $19d5	 ; Store primary coordinate result
-	stx.w $19cf	 ; Store coordinate transformation index
+	sta.w !target_direction	 ; Store primary coordinate result
+	stx.w !movement_config	 ; Store coordinate transformation index
 	sty.w $19f1	 ; Store coordinate validation reference
 	rts ; Return coordinate processing complete
 
@@ -8218,8 +8218,8 @@ Battle_Bit_Found:
 	.BattleDefeat_AudioStop:
 	ldy.w $19f1	 ; Load primary coordinate reference
 	jsr.w .BattleDefeat_Exit ; Execute secondary coordinate processing
-	sta.w $19d6	 ; Store secondary coordinate result
-	stx.w $19d1	 ; Store secondary transformation index
+	sta.w !collision_data	 ; Store secondary coordinate result
+	stx.w !coordinate_register	 ; Store secondary transformation index
 	sty.w $19f3	 ; Store secondary validation reference
 	rts ; Return secondary processing complete
 
@@ -9700,3 +9700,4 @@ Bank_01_Termination_Marker:
 ; CONFIDENCE LEVEL: MAXIMUM - Ready for continued aggressive import campaign
 
 ; Bank $01 Campaign Complete - Initiating Bank $02 Import Sequence
+
