@@ -424,6 +424,19 @@
 !battle_state_secondary = $1a61     ; Secondary battle state register
 !entity_data_page       = $1a62     ; Entity data page address (16-bit)
 
+; === System Hardware Registers ($0e04-$0e0d) ===
+!hw_register_1          = $0e04     ; Hardware register 1 (graphics sync #$55)
+!hw_register_2          = $0e05     ; Hardware register 2
+!status_register        = $0e06     ; Status register (#$55 completion)
+!hw_status_register     = $0e07     ; Hardware status register (read/write)
+!hw_register_3          = $0e0c     ; Hardware register 3 (graphics sync #$55)
+!error_status_register  = $0e0d     ; Error status register (cleared on init)
+
+; === Environment Context System ($0e88-$0e8a) ===
+!env_context_value      = $0e88     ; Environment/graphics context value
+!env_coord_x            = $0e89     ; Environment X coordinate / Enemy pointer (16-bit)
+!env_coord_y            = $0e8a     ; Environment Y coordinate
+
 !battle_phase           = $192a     ; Battle phase/state counter
 !battle_atb_gauge       = $1993     ; Active Time Battle gauge value
 !battle_state_flag      = $19a5     ; Battle/field state flag: $00=field input, $80=battle active, $ff=inactive/disabled

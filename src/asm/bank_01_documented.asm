@@ -408,7 +408,7 @@ Battle_MainLoop:
 	lda.w !battle_map_id	 ; Get battle map / enemy context
 	sta.w !battle_current_enemy	 ; Store current enemy
 
-	ldx.w $0e89	 ; Get enemy stats pointer
+	ldx.w !env_coord_x	 ; Get enemy stats pointer
 	stx.w !battle_stats_addr	 ; Store stats address
 
 ; Set battle ready flag
@@ -4191,7 +4191,7 @@ BattleState_RegisterControl:
 	sep #$20		;01AF80|E220    |      ;
 	rep #$10		;01AF82|C210    |      ;
 	lda.w !battle_gfx_index	 ;01AF84|ADEE19  |0119EE;
-	sta.w $0e88	 ;01AF87|8D880E  |010E88;
+	sta.w !env_context_value	 ;01AF87|8D880E  |010E88;
 	plp ;01AF8A|28      |      ;
 	rts ;01AF8B|60      |      ;
 
@@ -5109,7 +5109,7 @@ BattleState_MachineController:
 	sta.w !battle_state_flag	 ;01B602|8D4B19  |01194B;
 	stz.w !battle_init_flag	 ;01B605|9C5119  |011951;
 	inc.w !current_direction	 ;01B608|EED319  |0119D3;
-	ldx.w $0e89	 ;01B60B|AE890E  |010E89;
+	ldx.w !env_coord_x	 ;01B60B|AE890E  |010E89;
 	stx.w !battle_offset	 ;01B60E|8E2D19  |01192D;
 	jsr.w Sub_01880C ;01B611|200C88  |01880C;
 	lda.b #$00	  ;01B614|A900    |      ;
@@ -5195,7 +5195,7 @@ BattleAudio_SoundEffectCoordinator:
 	sta.w $0c51	 ;01B716|8D510C  |010C51;
 	sta.w $0c55	 ;01B719|8D550C  |010C55;
 	lda.b #$50	  ;01B71C|A950    |      ;
-	sta.w $0e05	 ;01B71E|8D050E  |010E05;
+	sta.w !hw_register_2	 ;01B71E|8D050E  |010E05;
 	jsr.w Label_0182D0 ;01B721|20D082  |0182D0;
 	lda.b #$2c	  ;01B724|A92C    |      ;
 	jsr.w Sub_01D6A9 ;01B726|20A9D6  |01D6A9;
@@ -5225,8 +5225,8 @@ BattlePattern_ComplexManager:
 	lda.w !battle_map_id	 ;01B742|AD910E  |010E91;
 	beq .Exit	   ;01B745|F00B    |01B752;
 	lda.b #$55	  ;01B747|A955    |      ;
-	sta.w $0e04	 ;01B749|8D040E  |010E04;
-	sta.w $0e0c	 ;01B74C|8D0C0E  |010E0C;
+	sta.w !hw_register_1	 ;01B749|8D040E  |010E04;
+	sta.w !hw_register_3	 ;01B74C|8D0C0E  |010E0C;
 	jsr.w Label_0182D0 ;01B74F|20D082  |0182D0;
 
 	.Exit:
@@ -6831,7 +6831,7 @@ dma_coordinate_processing_system:
 ; Implements complex memory allocation and deallocation for battle scenes
 battle_graphics_memory_management:
 	jsr.w InitializeGraphicsMemory ; Initialize graphics memory
-	stz.w $0e0d	 ; Clear error status register
+	stz.w !error_status_register	 ; Clear error status register
 	jsr.w Label_0182D0 ; Execute memory allocation
 	jsr.w SetupGraphicsBuffers ; Setup graphics buffers
 	jsr.w ConfigureDmaChannels ; Configure DMA channels
@@ -7032,7 +7032,7 @@ animation_loop:
 	dey ; Decrement counter
 	bne animation_loop ; Continue if not zero
 	lda.b #$55	  ; Load completion status
-	sta.w $0e06	 ; Store status register
+	sta.w !status_register	 ; Store status register
 	rts ; Return from animation engine
 
 ; Advanced Coordinate Transformation Engine
@@ -7165,13 +7165,13 @@ environment_animation_control_system:
 	stx.w !battle_data_index_3	 ; Store animation state
 ; Animation processing loop
 animation_processing_loop:
-	stz.w $0e0d	 ; Clear error status
+	stz.w !error_status_register	 ; Clear error status
 	lda.w !battle_data_index_4	 ; Load animation mode
 	asl a; Shift for processing
 	asl a; Shift again
 	sta.w !battle_data_temp_1	 ; Store animation parameter
 	lda.b #$55	  ; Load animation constant
-	sta.w $0e07	 ; Store to hardware register
+	sta.w !hw_status_register	 ; Store to hardware register
 ; Animation step processing
 animation_step_processing:
 	jsr.w ExecuteAlternateStep ; Execute animation step
@@ -7183,9 +7183,9 @@ animation_continue_alternate:
 	jsr.w ExecuteAlternateStep ; Execute alternate step
 animation_continue:
 	jsr.w Label_0182D9 ; Process memory operations
-	lda.w $0e07	 ; Load hardware status
+	lda.w !hw_status_register	 ; Load hardware status
 	eor.b #$04	  ; Toggle status bit
-	sta.w $0e07	 ; Store updated status
+	sta.w !hw_status_register	 ; Store updated status
 	lda.w !battle_data_temp_1	 ; Load animation parameter
 	dec a; Decrement counter
 	sta.w !battle_data_temp_1	 ; Store updated counter
@@ -7708,7 +7708,7 @@ pathfinding_standard_setup:
 	lda.w !battle_coord_state	 ; Load battle pathfinding data
 	and.b #$07	  ; Mask pathfinding direction
 	sta.w !battle_counter	 ; Store pathfinding direction
-	ldx.w $0e89	 ; Load pathfinding coordinates
+	ldx.w !env_coord_x	 ; Load pathfinding coordinates
 	stx.w !battle_data_index_3	 ; Store pathfinding X coordinate
 	ldx.w !movement_state	 ; Load pathfinding state
 	stx.w !battle_data_temp_1	 ; Store pathfinding Y coordinate
@@ -7974,7 +7974,7 @@ Execute_Battle_Processing:
 
 Battle_Processing_Complete:
 ; Final battle validation and preparation for next cycle
-	ldy.w $0e89	 ; Load environment context
+	ldy.w !env_coord_x	 ; Load environment context
 	jsr.w .BattleMenu_InputLoop ; Execute environment validation
 	bcs Battle_Validation_Error ; Branch if validation failed
 
@@ -8015,7 +8015,7 @@ Battle_Validation_Error:
 ; Advanced Environment Validation System
 ; Sophisticated environment processing with multi-layer validation
 Environment_Validation_System:
-	ldy.w $0e89	 ; Load environment context
+	ldy.w !env_coord_x	 ; Load environment context
 	jsr.w .BattleMenu_InputLoop ; Execute environment validation
 	bcs Environment_Validation_Error ; Branch if environment validation failed
 
@@ -8032,7 +8032,7 @@ Advanced_Battle_Mode_Processing:
 
 ; Battle Mode Validation and State Management
 Battle_Mode_Validation:
-	ldy.w $0e89	 ; Load battle mode context
+	ldy.w !env_coord_x	 ; Load battle mode context
 	jsr.w .BattleMenu_InputLoop ; Execute mode validation
 	bcs Environment_Validation_Error ; Branch if mode validation failed
 
@@ -8075,7 +8075,7 @@ Advanced_Graphics_Loading:
 	bne Graphics_Loading_Error ; Branch if loading conflict
 	lda.w DATA8_01f42d,x ; Load graphics data reference
 	tay ; Transfer to index register
-	lda.w $0e88	 ; Load graphics context
+	lda.w !env_context_value	 ; Load graphics context
 	dec a; Decrement for zero-based indexing
 	and.b #$7f	  ; Mask for valid graphics range
 	asl a; Shift for double-byte indexing
@@ -8126,7 +8126,7 @@ Special_Graphics_Active:
 ; Process special graphics with advanced context management
 	lda.b #$00	  ; Clear special graphics register
 	xba ; Exchange accumulator bytes
-	lda.w $0e88	 ; Load special graphics context
+	lda.w !env_context_value	 ; Load special graphics context
 	dec a; Decrement for processing
 	cmp.b #$14	  ; Check for special graphics range
 	bcc Special_Graphics_Continue ; Branch if in special range
@@ -8226,7 +8226,7 @@ Battle_Bit_Found:
 ; Primary Coordinate Transformation Engine
 ; Sophisticated coordinate transformation with environment context
 	.BattleDefeat_ScreenClear:
-	ldy.w $0e89	 ; Load environment coordinate context
+	ldy.w !env_coord_x	 ; Load environment coordinate context
 
 ; Advanced Coordinate Calculation Engine
 ; Complex mathematical coordinate processing with multiple validation layers
@@ -8577,7 +8577,7 @@ Advanced_Sound_Processing:
 	sta.w !battle_type	 ; Store battle type index / sequence context
 	jsr.w ExecuteSequenceInitialization ; Execute sequence initialization
 	jsr.w FinalizeBattleState ; Execute sequence coordination
-	lda.w $0e88	 ; Load sequence environment
+	lda.w !env_context_value	 ; Load sequence environment
 	jsl.l ExecuteSequenceProcessing ; Execute sequence processing
 	rts ; Return sequence processing complete
 
@@ -8593,7 +8593,7 @@ Advanced_Battle_Enhancement:
 	sta.w $1928	 ; Store enhancement flag
 	jsr.w ExecuteEnhancementProcessing ; Execute enhancement processing
 	lda.w !gfx_validated_data	 ; Load enhancement result
-	sta.w $0e88	 ; Store enhancement context
+	sta.w !env_context_value	 ; Store enhancement context
 	cmp.b #$0c	  ; Check enhancement threshold
 	bcc Enhancement_Processing_Complete ; Branch if threshold not met
 	cmp.b #$12	  ; Check enhancement upper limit
@@ -8795,7 +8795,7 @@ Advanced_Graphics_Enhancement:
 	rep #$20		; Set 16-bit accumulator mode
 	and.w #$0006	; Mask for coordinate range
 	tax ; Transfer to coordinate index
-	lda.w $0e89	 ; Load environment coordinate context
+	lda.w !env_coord_x	 ; Load environment coordinate context
 	sep #$20		; Set 8-bit accumulator mode
 	clc ; Clear carry for coordinate addition
 	adc.w DATA8_0188c5,x ; Add X-coordinate offset
@@ -9580,11 +9580,11 @@ Graphics_Completion_Validation_Loop:
 ; Advanced System Coordination and Finalization Engine
 ; Final comprehensive system coordination with complete integration
 BattleGraphics_FinalCoordination:
-	lda.w $0e89	 ; Load environment coordination context
+	lda.w !env_coord_x	 ; Load environment coordination context
 	sec ; Set carry for coordinate adjustment
 	sbc.b #$08	  ; Subtract coordinate offset for precision
 	sta.w !battle_offset	 ; Store adjusted X coordinate reference
-	lda.w $0e8a	 ; Load environment Y coordination context
+	lda.w !env_coord_y	 ; Load environment Y coordination context
 	sec ; Set carry for Y coordinate adjustment
 	sbc.b #$06	  ; Subtract Y coordinate offset for precision
 	sta.w !tilemap_y_offset	 ; Store adjusted Y coordinate reference
@@ -9700,6 +9700,7 @@ Bank_01_Termination_Marker:
 ; CONFIDENCE LEVEL: MAXIMUM - Ready for continued aggressive import campaign
 
 ; Bank $01 Campaign Complete - Initiating Bank $02 Import Sequence
+
 
 
 
