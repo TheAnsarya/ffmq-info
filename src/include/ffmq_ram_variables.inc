@@ -336,7 +336,45 @@
 !battle_data_temp_1     = $193d     ; Battle temporary data 1
 !battle_data_temp_2     = $193e     ; Battle temporary data 2
 !battle_data_index_4    = $193f     ; Battle data index/pointer 4
+!battle_array_elem_1    = $1940     ; Battle array element temp 1
+!battle_array_elem_2    = $1941     ; Battle array element temp 2 / Formation index
+!battle_array_elem_3    = $1942     ; Battle array element temp 3
+!battle_array_elem_4    = $1943     ; Battle array element temp 4 / Loop counter
+!battle_array_elem_5    = $1944     ; Battle array element temp 5
+!battle_array_elem_6    = $1945     ; Battle array element temp 6 / Pathfinding config
+!battle_array_elem_7    = $1946     ; Battle array element temp 7
+!battle_array_elem_8    = $1947     ; Battle array element temp 8 / Pathfinding target
 !battle_temp_data       = $1948     ; Battle temporary storage
+!battle_array_elem_9    = $1949     ; Battle array element temp 9
+!battle_array_elem_10   = $194a     ; Battle array element temp 10
+!battle_state_flag      = $194b     ; Battle state/type flag
+!battle_anim_counter    = $194c     ; Battle animation/frame counter
+!battle_array_elem_11   = $194d     ; Battle array element temp 11
+!battle_init_flag       = $1951     ; Battle initialization/state flag
+
+; === Sprite Animation & Movement System ($1973-$1981) ===
+!sprite_loop_counter    = $1973     ; Sprite processing loop counter (0-$16)
+!sprite_data_offset     = $1975     ; Sprite data offset (increments by $1a per sprite)
+!anim_table_ptr         = $1977     ; Animation table pointer (16-bit: $1977=lo, $1978=hi)
+!anim_table_ptr_hi      = $1978     ; Animation table pointer high byte
+!sprite_frame_value     = $1979     ; Sprite frame/type value / General temp
+!sprite_direction       = $197d     ; Sprite direction/animation index (0-3)
+!anim_frame_index       = $197e     ; Animation frame index / Comparison temp
+!sprite_move_speed      = $197f     ; Sprite movement speed/increment value
+!sprite_anim_y_base     = $1980     ; Vertical animation frame / Y movement base
+!sprite_temp_value      = $1981     ; Temporary storage for sprite data
+
+; === Graphics & Battle System State ($1993-$199d) ===
+!graphics_state_param   = $1993     ; Graphics state parameter (#$10 standard)
+!env_coordinates        = $199d     ; Environment coordinates (16-bit)
+
+; === Battle Graphics & Formation System ($19eb-$19f8) ===
+!formation_valid_flag   = $19eb     ; Formation validation/position flag
+!battle_gfx_index       = $19ee     ; Battle graphics index (masked/combined)
+!battle_gfx_attrib      = $19ef     ; Battle graphics attribute flags
+!special_op_mode        = $19f6     ; Special operation mode
+!anim_loop_counter      = $19f7     ; Animation loop counter
+!scene_transition_ctr   = $19f8     ; Scene transition counter
 
 !battle_phase           = $192a     ; Battle phase/state counter
 !battle_atb_gauge       = $1993     ; Active Time Battle gauge value
