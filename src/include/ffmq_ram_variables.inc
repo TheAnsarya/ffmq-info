@@ -376,6 +376,16 @@
 !anim_loop_counter      = $19f7     ; Animation loop counter
 !scene_transition_ctr   = $19f8     ; Scene transition counter
 
+; === Animation & Graphics Control ($19af-$19bf) ===
+!anim_state_counter     = $19af     ; Animation state/counter (cleared/incremented)
+!graphics_status        = $19b0     ; Graphics status/completion counter
+!battle_coord_state     = $19b4     ; Battle/coordinate state register (flags)
+!gfx_config_register    = $19bd     ; Graphics configuration register (wraps at $1f)
+!gfx_config_alt         = $19bf     ; Alternative graphics configuration (wraps at $0f)
+
+; === Environment & Coordinate System ($19d7) ===
+!env_state_param        = $19d7     ; Environment/coordinate state parameter
+
 !battle_phase           = $192a     ; Battle phase/state counter
 !battle_atb_gauge       = $1993     ; Active Time Battle gauge value
 !battle_state_flag      = $19a5     ; Battle/field state flag: $00=field input, $80=battle active, $ff=inactive/disabled

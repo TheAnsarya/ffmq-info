@@ -5133,16 +5133,16 @@ BattleState_MachineController:
 	sta.w !battle_position_y	 ;01B63C|8DC719  |0119C7;
 	jsr.w Sub_0196D3 ;01B63F|20D396  |0196D3;
 	jsr.w Sub_019058 ;01B642|205890  |019058;
-	lda.w $19bd	 ;01B645|ADBD19  |0119BD;
+	lda.w !gfx_config_register	 ;01B645|ADBD19  |0119BD;
 	clc ;01B648|18      |      ;
 	adc.w #$0008	;01B649|690800  |      ;
 	and.w #$001f	;01B64C|291F00  |      ;
-	sta.w $19bd	 ;01B64F|8DBD19  |0119BD;
-	lda.w $19bf	 ;01B652|ADBF19  |0119BF;
+	sta.w !gfx_config_register	 ;01B64F|8DBD19  |0119BD;
+	lda.w !gfx_config_alt	 ;01B652|ADBF19  |0119BF;
 	clc ;01B655|18      |      ;
 	adc.w #$0004	;01B656|690400  |      ;
 	and.w #$000f	;01B659|290F00  |      ;
-	sta.w $19bf	 ;01B65C|8DBF19  |0119BF;
+	sta.w !gfx_config_alt	 ;01B65C|8DBF19  |0119BF;
 	jsr.w Sub_0188CD ;01B65F|20CD88  |0188CD;
 	plp ;01B662|28      |      ;
 	ldx.w $192b	 ;01B663|AE2B19  |01192B;
@@ -5574,14 +5574,14 @@ BattleScene_TransitionManager:
 	sta.w !movement_state	 ;01B976|8DCB19  |0119CB;
 	sep #$20		;01B979|E220    |      ;
 	rep #$10		;01B97B|C210    |      ;
-	lda.w $19b4	 ;01B97D|ADB419  |0119B4;
+	lda.w !battle_coord_state	 ;01B97D|ADB419  |0119B4;
 	and.b #$f8	  ;01B980|29F8    |      ;
 	ora.b #$01	  ;01B982|0901    |      ;
-	sta.w $19b4	 ;01B984|8DB419  |0119B4;
+	sta.w !battle_coord_state	 ;01B984|8DB419  |0119B4;
 	lda.b #$01	  ;01B987|A901    |      ;
 	sta.w $1928	 ;01B989|8D2819  |011928;
 	lda.b #$02	  ;01B98C|A902    |      ;
-	sta.w $19d7	 ;01B98E|8DD719  |0119D7;
+	sta.w !env_state_param	 ;01B98E|8DD719  |0119D7;
 	jsr.w Sub_01CECA ;01B991|20CACE  |01CECA;
 	jsr.w Sub_01935D ;01B994|205D93  |01935D;
 	lda.w !battle_data_index_1	 ;01B997|AD3519  |011935;
@@ -5600,16 +5600,16 @@ BattleScene_TransitionManager:
 	jsr.w Sub_01880C ;01B9BB|200C88  |01880C;
 	stx.w !battle_data_temp_1	 ;01B9BE|8E3D19  |01193D;
 	jsr.w Sub_019058 ;01B9C1|205890  |019058;
-	lda.w $19bd	 ;01B9C4|ADBD19  |0119BD;
+	lda.w !gfx_config_register	 ;01B9C4|ADBD19  |0119BD;
 	clc ;01B9C7|18      |      ;
 	adc.b #$07	  ;01B9C8|6907    |      ;
 	and.b #$1f	  ;01B9CA|291F    |      ;
-	sta.w $19bd	 ;01B9CC|8DBD19  |0119BD;
-	lda.w $19bf	 ;01B9CF|ADBF19  |0119BF;
+	sta.w !gfx_config_register	 ;01B9CC|8DBD19  |0119BD;
+	lda.w !gfx_config_alt	 ;01B9CF|ADBF19  |0119BF;
 	clc ;01B9D2|18      |      ;
 	adc.b #$05	  ;01B9D3|6905    |      ;
 	and.b #$0f	  ;01B9D5|290F    |      ;
-	sta.w $19bf	 ;01B9D7|8DBF19  |0119BF;
+	sta.w !gfx_config_alt	 ;01B9D7|8DBF19  |0119BF;
 	jsr.w Sub_0188CD ;01B9DA|20CD88  |0188CD;
 	ldx.w $192b	 ;01B9DD|AE2B19  |01192B;
 	stx.w !battle_data_index_4	 ;01B9E0|8E3F19  |01193F;
@@ -6651,32 +6651,32 @@ DATA8_01d6cb:
 	lda.w $19e2	 ;01D748|ADE219  |0119E2;
 	bne .ElementalCheck_ApplyElemental ;01D74B|D020    |01D76D;
 	ldx.w #$0000	;01D74D|A20000  |      ;
-	lda.w $19bd	 ;01D750|ADBD19  |0119BD;
+	lda.w !gfx_config_register	 ;01D750|ADBD19  |0119BD;
 	inc a;01D753|1A      |      ;
 	clc ;01D754|18      |      ;
 	adc.l DATA8_0196cb,x ;01D755|7FCB9601|0196CB;
 	and.b #$1f	  ;01D759|291F    |      ;
-	sta.w $19bd	 ;01D75B|8DBD19  |0119BD;
-	lda.w $19bf	 ;01D75E|ADBF19  |0119BF;
+	sta.w !gfx_config_register	 ;01D75B|8DBD19  |0119BD;
+	lda.w !gfx_config_alt	 ;01D75E|ADBF19  |0119BF;
 	clc ;01D761|18      |      ;
 	adc.l DATA8_0196cc,x ;01D762|7FCC9601|0196CC;
 	and.b #$0f	  ;01D766|290F    |      ;
-	sta.w $19bf	 ;01D768|8DBF19  |0119BF;
+	sta.w !gfx_config_alt	 ;01D768|8DBF19  |0119BF;
 	bra .WeaknessMultiplier_ApplyElemental ;01D76B|801E    |01D78B;
 
 	.ElementalCheck_ApplyElemental:
 	ldx.w #$0000	;01D76D|A20000  |      ;
-	lda.w $19bd	 ;01D770|ADBD19  |0119BD;
+	lda.w !gfx_config_register	 ;01D770|ADBD19  |0119BD;
 	clc ;01D773|18      |      ;
 	adc.l DATA8_0196cb,x ;01D774|7FCB9601|0196CB;
 	and.b #$1f	  ;01D778|291F    |      ;
-	sta.w $19bd	 ;01D77A|8DBD19  |0119BD;
-	lda.w $19bf	 ;01D77D|ADBF19  |0119BF;
+	sta.w !gfx_config_register	 ;01D77A|8DBD19  |0119BD;
+	lda.w !gfx_config_alt	 ;01D77D|ADBF19  |0119BF;
 	dec a;01D780|3A      |      ;
 	clc ;01D781|18      |      ;
 	adc.l DATA8_0196cc,x ;01D782|7FCC9601|0196CC;
 	and.b #$0f	  ;01D786|290F    |      ;
-	sta.w $19bf	 ;01D788|8DBF19  |0119BF;
+	sta.w !gfx_config_alt	 ;01D788|8DBF19  |0119BF;
 
 	.WeaknessMultiplier_ApplyElemental:
 	jsr.w Sub_0188CD ;01D78B|20CD88  |0188CD;
@@ -7150,7 +7150,7 @@ environment_graphics_integration:
 	lda.b #$10	  ; Load graphics constant
 	sta.w !graphics_state_param	 ; Store graphics parameter
 	jsr.w ExecuteGraphicsProcessing2 ; Execute graphics processing
-	lda.w $19b0	 ; Load graphics status
+	lda.w !graphics_status	 ; Load graphics status
 	beq environment_graphics_complete ; Branch if complete
 	jsl.l SpecialBattleProcessing ; Execute long graphics call
 environment_graphics_complete:
@@ -7421,7 +7421,7 @@ world_map_complete:
 ; Sophisticated animation control with graphics state management and memory coordination
 ; Implements complex animation processing with multi-frame coordination and DMA integration
 animation_graphics_state_control:
-	stz.w $19af	 ; Clear animation state
+	stz.w !anim_state_counter	 ; Clear animation state
 	lda.w !battle_state_flag	 ; Load battle state
 	beq animation_standard_processing ; Branch if standard mode
 	bit.b #$08	  ; Test animation mode bit
@@ -7462,7 +7462,7 @@ animation_setup:
 	lda.b #$10	  ; Set graphics value
 	sta.w !graphics_state_param	 ; Store graphics state
 	lda.w DATA8_01f400,x ; Load animation data
-	sta.w $19d7	 ; Store animation parameter
+	sta.w !env_state_param	 ; Store animation parameter
 	lda.w Battle_AnimationModeTable,x ; Load animation mode
 	sta.w $1928	 ; Store animation mode
 	jmp.w JumpAnimationProcessor2 ; Jump to animation processor
@@ -7490,8 +7490,8 @@ battle_direction_movement_processing_engine:
 	rts ; Return from movement processing
 battle_direction_reverse:
 	lda.b #$08	  ; Load direction toggle bit
-	eor.w $19b4	 ; XOR with battle state
-	sta.w $19b4	 ; Store updated battle state
+	eor.w !battle_coord_state	 ; XOR with battle state
+	sta.w !battle_coord_state	 ; Store updated battle state
 	lda.b #$03	  ; Set reverse movement code
 	rts ; Return from movement processing
 
@@ -7548,7 +7548,7 @@ character_interaction_advanced:
 ; Complex collision detection with movement validation and coordinate processing
 ; Implements sophisticated collision algorithms with multi-layer validation and state management
 battle_collision_movement_validation:
-	lda.w $19b4	 ; Load battle movement state
+	lda.w !battle_coord_state	 ; Load battle movement state
 	and.b #$07	  ; Mask movement direction
 	beq battle_state_standard ; Branch if no movement
 	eor.w !coordinate_register	 ; XOR with collision state
@@ -7561,7 +7561,7 @@ battle_collision_movement_validation:
 	lsr a; Shift again
 	lsr a; Shift again
 	lsr a; Shift for final position
-	eor.w $19b4	 ; XOR with battle state
+	eor.w !battle_coord_state	 ; XOR with battle state
 	and.b #$08	  ; Mask collision type bit
 	bne battle_state_standard ; Branch if collision type mismatch
 	lda.b #$01	  ; Set movement validation mode
@@ -7588,7 +7588,7 @@ collision_validation_complete:
 ; Manages complex environment interactions with battle coordination and memory management
 battle_environment_location_processing:
 	lda.w !player_facing	 ; Load player facing direction / environment data
-	sta.w $19d7	 ; Store environment state
+	sta.w !env_state_param	 ; Store environment state
 	jsr.w .BattleDefeat_MemoryCleanup ; Execute environment processing
 	jsr.w .BattleEscape_FailureHandling ; Execute location validation
 	bcc environment_processing_standard ; Branch if standard processing
@@ -7641,7 +7641,7 @@ battle_trigger_event_processing_system:
 	sta.w !battle_gfx_index	 ; Store trigger parameter
 	lda.b #$0f	  ; Set trigger mode
 	sta.w !battle_gfx_attrib	 ; Store trigger configuration
-	inc.w $19b0	 ; Increment trigger counter
+	inc.w !graphics_status	 ; Increment trigger counter
 trigger_processing_standard:
 	stz.w $1929	 ; Clear trigger timer
 	lda.b #$10	  ; Set standard trigger value
@@ -7666,7 +7666,7 @@ battle_flow_standard:
 ; Complex animation control with graphics state management and coordination
 ; Implements sophisticated animation processing with multi-frame coordination and memory management
 battle_animation_graphics_state_control:
-	inc.w $19af	 ; Increment animation counter
+	inc.w !anim_state_counter	 ; Increment animation counter
 battle_animation_processing:
 	lda.w !battle_state_flag	 ; Load animation state
 	cmp.b #$0b	  ; Compare with animation mode
@@ -7686,9 +7686,9 @@ battle_animation_state_setup:
 ; Sophisticated multi-path processing with pathfinding and coordinate management
 ; Implements complex pathfinding algorithms with multi-destination support and state coordination
 multi_path_battle_processing_engine:
-	lda.w $19af	 ; Load pathfinding state
+	lda.w !anim_state_counter	 ; Load pathfinding state
 	bne battle_animation_graphics_state_control ; Branch if active pathfinding
-	inc.w $19af	 ; Increment pathfinding counter
+	inc.w !anim_state_counter	 ; Increment pathfinding counter
 	lda.w !map_param_2	 ; Load pathfinding mode / map parameter 2
 	bne battle_animation_processing ; Branch if pathfinding active
 	lda.w !movement_state	 ; Load pathfinding configuration
@@ -7705,7 +7705,7 @@ pathfinding_standard_setup:
 	sta.w !graphics_state_param	 ; Store pathfinding state
 	ldy.w #$ff01	; Load pathfinding configuration
 	sty.w $1926	 ; Store pathfinding parameters
-	lda.w $19b4	 ; Load battle pathfinding data
+	lda.w !battle_coord_state	 ; Load battle pathfinding data
 	and.b #$07	  ; Mask pathfinding direction
 	sta.w !battle_counter	 ; Store pathfinding direction
 	ldx.w $0e89	 ; Load pathfinding coordinates
@@ -7747,14 +7747,14 @@ UNREACH_01EF3B:
 	sta.w !graphics_state_param	 ; Store positioning control
 	stz.w $1929	 ; Clear secondary state register
 	lda.w !player_facing	 ; Load player facing direction / battle environment context
-	sta.w $19d7	 ; Store environment reference
+	sta.w !env_state_param	 ; Store environment reference
 	jsr.w .BattleDefeat_MemoryCleanup ; Execute coordinate preprocessing
 	jsr.w .BattleDefeat_AudioStop ; Execute coordinate finalization
 
 ; Advanced Coordinate bit Analysis Engine
 ; Sophisticated bit field extraction and analysis for battle positioning
 Advanced_Coordinate_Analysis:
-	lda.w $19b4	 ; Load primary coordinate register
+	lda.w !battle_coord_state	 ; Load primary coordinate register
 	and.b #$07	  ; Extract lower coordinate bits
 	sta.w !battle_data_index_3	 ; Store X-axis coordinate component
 	lda.w !movement_config	 ; Load secondary coordinate register
@@ -8006,7 +8006,7 @@ Primary_Validation_Mode:
 
 Battle_State_Success:
 	lda.b #$03	  ; Set success state
-	tsb.w $19b4	 ; Set success flags
+	tsb.w !battle_coord_state	 ; Set success flags
 
 Battle_Validation_Error:
 	lda.b #$06	  ; Set error state
@@ -8060,7 +8060,7 @@ Secondary_Battle_Attributes:
 Advanced_Battle_Initialization:
 	lda.w $1a5b	 ; Load initialization state
 	bne Battle_Initialization_Complete ; Branch if already initialized
-	inc.w $19b0	 ; Increment initialization counter
+	inc.w !graphics_status	 ; Increment initialization counter
 	ldx.w #$7000	; Set advanced initialization mode
 	stx.w !battle_gfx_index	 ; Store initialization reference
 
@@ -8099,7 +8099,7 @@ Graphics_Data_Validation:
 	sta.w $1a5a	 ; Store validated graphics data
 	inx ; Increment to next data
 	stx.w $1a5d	 ; Store graphics data pointer
-	inc.w $19b0	 ; Increment graphics loading counter
+	inc.w !graphics_status	 ; Increment graphics loading counter
 	ldx.w #$7001	; Set graphics completion mode
 	stx.w !battle_gfx_index	 ; Store completion reference
 	lda.b #$00	  ; Clear graphics loading state
@@ -8132,7 +8132,7 @@ Special_Graphics_Active:
 	bcc Special_Graphics_Continue ; Branch if in special range
 
 ; Advanced Special Graphics Initialization
-	inc.w $19b0	 ; Increment special graphics counter
+	inc.w !graphics_status	 ; Increment special graphics counter
 	rep #$20		; Set 16-bit mode
 	asl a; Shift for special indexing
 	tax ; Transfer to special index
@@ -8167,7 +8167,7 @@ Special_Graphics_Continue:
 
 Special_Graphics_Direct:
 	sty.w $0a9c	 ; Store special graphics result
-	inc.w $19b0	 ; Increment special completion counter
+	inc.w !graphics_status	 ; Increment special completion counter
 	rep #$10		; Set 16-bit index mode
 	ldx.w #$7003	; Set special completion mode
 	stx.w !battle_gfx_index	 ; Store completion mode
@@ -8233,7 +8233,7 @@ Battle_Bit_Found:
 	.BattleDefeat_Exit:
 	lda.b #$00	  ; Clear coordinate calculation register
 	xba ; Exchange for calculation preparation
-	lda.w $19d7	 ; Load coordinate base reference
+	lda.w !env_state_param	 ; Load coordinate base reference
 	asl a; Shift for double-byte indexing
 	tax ; Transfer to coordinate index
 	rep #$20		; Set 16-bit accumulator mode
@@ -8333,7 +8333,7 @@ Alternative_Coordinate_Complete:
 	pea.w $1a62	 ; Push entity data page address
 	pld ; Load entity data page
 	sty.b $00	   ; Store entity reference
-	lda.w $19b4	 ; Load entity validation register
+	lda.w !battle_coord_state	 ; Load entity validation register
 	and.b #$07	  ; Extract entity validation bits
 	sta.b $02	   ; Store validation reference
 	ldx.w #$0000	; Initialize entity search index
@@ -8440,7 +8440,7 @@ Specialized_Entity_Found:
 	beq Battle_Action_Complete ; Branch if standard action mode
 	bit.b #$60	  ; Test battle action type flags
 	bne Battle_Action_Complete ; Branch if action type conflict
-	inc.w $19b0	 ; Increment battle action counter
+	inc.w !graphics_status	 ; Increment battle action counter
 	stz.w !battle_gfx_index	 ; Clear battle action reference
 	and.b #$1f	  ; Extract battle action code
 	sta.w !battle_gfx_attrib	 ; Store battle action code
@@ -8790,7 +8790,7 @@ Advanced_Graphics_Enhancement:
 ; Advanced Coordinate Calculation Engine
 ; Complex coordinate calculation with environment context
 	.BattleWindow_FillBackground:
-	lda.w $19d7	 ; Load coordinate base reference
+	lda.w !env_state_param	 ; Load coordinate base reference
 	asl a; Shift for coordinate indexing
 	rep #$20		; Set 16-bit accumulator mode
 	and.w #$0006	; Mask for coordinate range
@@ -8813,7 +8813,7 @@ Advanced_Graphics_Enhancement:
 	sty.w $1a2d	 ; Store coordinate backup
 	ldy.w #$0000	; Clear coordinate offset
 	sty.w $1a2f	 ; Store coordinate offset reference
-	lda.w $19b4	 ; Load coordinate control register
+	lda.w !battle_coord_state	 ; Load coordinate control register
 	asl a; Shift for coordinate analysis
 	asl a; Continue shift for precise control
 	asl a; Continue shift for coordinate masking
@@ -8900,7 +8900,7 @@ Sprite_Coordinate_Valid:
 	lda.b #$80	  ; Set sprite processing completion flag
 	sta.w $19fa	 ; Store sprite completion flag
 	rep #$20		; Set 16-bit accumulator mode
-	lda.w $19bd	 ; Load sprite configuration register
+	lda.w !gfx_config_register	 ; Load sprite configuration register
 	eor.w #$ffff	; Invert sprite configuration
 	and.w #$000f	; Mask sprite configuration bits
 	inc a; Increment for configuration calculation
@@ -8985,7 +8985,7 @@ Alternative_Y_Valid:
 ; Specialized buffer management for alternative sprite rendering
 Alternative_Sprite_Buffer_Management:
 	rep #$20		; Set 16-bit accumulator mode
-	lda.w $19bf	 ; Load alternative sprite configuration
+	lda.w !gfx_config_alt	 ; Load alternative sprite configuration
 	eor.w #$ffff	; Invert alternative configuration
 	and.w #$000f	; Mask alternative configuration bits
 	inc a; Increment for alternative calculation
@@ -9068,7 +9068,7 @@ Memory_Graphics_Coordinate_Valid:
 ; Sophisticated buffer management with dynamic memory allocation
 Advanced_Memory_Graphics_Buffer_Management:
 	rep #$20		; Set 16-bit accumulator mode
-	lda.w $19bd	 ; Load memory graphics configuration
+	lda.w !gfx_config_register	 ; Load memory graphics configuration
 	eor.w #$ffff	; Invert memory graphics configuration
 	and.w #$000f	; Mask memory graphics configuration bits
 	inc a; Increment for configuration calculation
@@ -9150,7 +9150,7 @@ Alternative_Memory_Y_Valid:
 ; Specialized buffer management for alternative memory rendering
 Alternative_Memory_Buffer_Management:
 	rep #$20		; Set 16-bit accumulator mode
-	lda.w $19bf	 ; Load alternative memory configuration
+	lda.w !gfx_config_alt	 ; Load alternative memory configuration
 	eor.w #$ffff	; Invert alternative memory configuration
 	and.w #$000f	; Mask alternative memory config bits
 	inc a; Increment for alternative calculation
@@ -9277,11 +9277,11 @@ Coordinate_Attribute_Special:
 	.BattleDialogue_AdvanceText:
 	sep #$20		; Set 8-bit accumulator mode
 	ldx.w #$0000	; Initialize buffer finalization index
-	lda.w $19bf	 ; Load graphics buffer configuration
+	lda.w !gfx_config_alt	 ; Load graphics buffer configuration
 	sta.w $4202	 ; Store configuration for multiplication
 	lda.b #$40	  ; Set buffer multiplication factor
 	sta.w $4203	 ; Store multiplication factor
-	lda.w $19bd	 ; Load graphics buffer control
+	lda.w !gfx_config_register	 ; Load graphics buffer control
 	bit.b #$10	  ; Test buffer control flag
 	beq Buffer_Control_Standard ; Branch if standard buffer mode
 	inx ; Increment for advanced buffer mode
@@ -9589,9 +9589,9 @@ BattleGraphics_FinalCoordination:
 	sbc.b #$06	  ; Subtract Y coordinate offset for precision
 	sta.w !tilemap_y_offset	 ; Store adjusted Y coordinate reference
 	ldx.w #$000f	; Set system coordination parameter primary
-	stx.w $19bf	 ; Store coordination parameter primary
+	stx.w !gfx_config_alt	 ; Store coordination parameter primary
 	ldx.w #$0000	; Clear system coordination parameter secondary
-	stx.w $19bd	 ; Store coordination parameter secondary
+	stx.w !gfx_config_register	 ; Store coordination parameter secondary
 
 ; Final System Coordination Loop
 ; Advanced system-wide coordination with comprehensive processing
@@ -9601,12 +9601,12 @@ Final_System_Coordination_Loop:
 	jsr.w Label_0183BF ; Execute system integration coordination
 	inc.w !tilemap_y_offset	 ; Increment coordinate processing sequence
 	plx ; Restore system coordination index
-	stx.w $19bf	 ; Update coordination parameters
+	stx.w !gfx_config_alt	 ; Update coordination parameters
 	inx ; Increment system coordination index
 	cpx.w #$000d	; Check final coordination limit
 	bne Final_System_Coordination_Loop ; Continue final system coordination
 	ldx.w #$0000	; Reset system coordination parameters
-	stx.w $19bf	 ; Clear coordination parameters
+	stx.w !gfx_config_alt	 ; Clear coordination parameters
 	rts ; Return final system coordination complete
 
 ; Bank $01 System Termination and Cleanup
@@ -9700,6 +9700,7 @@ Bank_01_Termination_Marker:
 ; CONFIDENCE LEVEL: MAXIMUM - Ready for continued aggressive import campaign
 
 ; Bank $01 Campaign Complete - Initiating Bank $02 Import Sequence
+
 
 
 
