@@ -711,6 +711,7 @@ turn off all ci/cd and github actions and workflows and turn that shit off, we d
 git commit and push; make sure to add todo lists and GH issues for all new work; update the session/chat logs; make sure to format everything! we use TABS not spaces; implement the changes to make it awesome for as long as you can and use up all the tokens for each session, do not waste my money - use the entire token space; do more per session/prompt; make it as awesome and complete as possible; git commit and push; GOAL:  continue to research, document, and name RAM values and use them in the code; 
 continue to research, document, and name RAM values and use them in the code; 
 git commit and push; continue to research, document, and name RAM values and use them in the code by analyzing the code - what ram values are being accessed? what function/routine is accessing them?; implement the changes to make it awesome for as long as you can and use up all the tokens for each session, do not waste my money - use the entire token space;
+git commit and push; update the session/chat logs; make sure to format everything! we use TABS not spaces; make sure the RAM labels we found are applied throughout the code base; continue to research, document, and name RAM values and use them in the code by analyzing the code - what ram values are being accessed? what function/routine is accessing them?; implement the changes to make it awesome for as long as you can and use up all the tokens for each session, do not waste my money - use the entire token space;
 
 
 

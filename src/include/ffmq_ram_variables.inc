@@ -386,6 +386,44 @@
 ; === Environment & Coordinate System ($19d7) ===
 !env_state_param        = $19d7     ; Environment/coordinate state parameter
 
+; === Graphics Buffer System ($1a13-$1a34) ===
+!gfx_buffer_mode        = $1a13     ; Graphics buffer mode control
+!gfx_buffer_addr_1      = $1a14     ; Primary graphics buffer address (16-bit)
+!gfx_buffer_addr_2      = $1a16     ; Secondary graphics buffer address (16-bit)
+!buffer_ref_1           = $1a1c     ; Primary buffer reference (16-bit)
+!buffer_ref_1_backup    = $1a1e     ; Primary buffer backup (16-bit)
+!buffer_size_ref        = $1a24     ; Buffer size reference (16-bit)
+!buffer_size_backup     = $1a26     ; Buffer size backup (16-bit)
+!buffer_offset_ref      = $1a28     ; Buffer offset reference (16-bit)
+!buffer_offset_backup   = $1a2a     ; Buffer offset backup (16-bit)
+!coord_x_base           = $1a2d     ; Coordinate X base reference (16-bit: $1a2d/$1a2e)
+!coord_y_base           = $1a2e     ; Coordinate Y base reference
+!coord_offset_ref       = $1a2f     ; Coordinate offset reference (16-bit)
+!coord_x_result         = $1a31     ; Coordinate X result (16-bit: $1a31/$1a32)
+!coord_y_result         = $1a32     ; Coordinate Y result
+!coord_flag             = $1a33     ; Coordinate processing flag
+!coord_modifier         = $1a34     ; Coordinate modifier value
+
+; === Graphics Processing & Context ($1a4a-$1a5d) ===
+!coord_context          = $1a4a     ; Coordinate processing context (16-bit)
+!gfx_mode_control       = $1a4c     ; Graphics mode control register
+!gfx_completion_mode    = $1a4e     ; Graphics completion mode
+!gfx_completion_flags   = $1a4f     ; Graphics completion flags
+!buffer_state           = $1a51     ; Buffer state/streaming control
+!coord_modify_data      = $1a52     ; Coordinate modification data
+!coord_finalize_data    = $1a53     ; Coordinate finalization data
+!hardware_flags         = $1a54     ; Hardware configuration flags
+!coord_adjust_x         = $1a56     ; Coordinate X adjustment (16-bit: $1a56/$1a57)
+!coord_adjust_y         = $1a57     ; Coordinate Y adjustment
+!gfx_validated_data     = $1a5a     ; Validated graphics data
+!world_map_flag         = $1a5b     ; World map / Battle attribute state
+!gfx_data_pointer       = $1a5d     ; Graphics data pointer (16-bit)
+
+; === Battle State Registers ($1a60-$1a62) ===
+!battle_state_primary   = $1a60     ; Primary battle state register (16-bit)
+!battle_state_secondary = $1a61     ; Secondary battle state register
+!entity_data_page       = $1a62     ; Entity data page address (16-bit)
+
 !battle_phase           = $192a     ; Battle phase/state counter
 !battle_atb_gauge       = $1993     ; Active Time Battle gauge value
 !battle_state_flag      = $19a5     ; Battle/field state flag: $00=field input, $80=battle active, $ff=inactive/disabled
