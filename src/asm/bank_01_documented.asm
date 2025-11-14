@@ -2832,7 +2832,7 @@ BattleSprite_RotationHandler_1:
 ; ==============================================================================
 
 BattleEffect_LightningProcessor:
-	stz.w $1948	 ;01A6F2|9C4819  |001948;
+	stz.w !battle_temp_data	 ;01A6F2|9C4819  |001948;
 	jsr.w Sub_01B078 ;01A6F5|2078B0  |01B078;
 	bcc Sub_01A6FC ;01A6F8|9002    |01A6FC;
 	sec ;01A6FA|38      |      ;
@@ -2846,22 +2846,22 @@ BattleEffect_LightningProcessor:
 BattleEffect_ExplosionHandler:
 	sep #$20		;01A6FC|E220    |      ;
 	rep #$10		;01A6FE|C210    |      ;
-	ldx.w $1939	 ;01A700|AE3919  |001939;
+	ldx.w !battle_data_index_2	 ;01A700|AE3919  |001939;
 	stz.b $00,x	 ;01A703|7400    |001A72;
-	lda.w $193b	 ;01A705|AD3B19  |00193B;
+	lda.w !battle_data_index_3	 ;01A705|AD3B19  |00193B;
 	sta.b $19,x	 ;01A708|9519    |001A8B;
-	inc.w $1935	 ;01A70A|EE3519  |001935;
-	lda.w $1935	 ;01A70D|AD3519  |001935;
+	inc.w !battle_data_index_1	 ;01A70A|EE3519  |001935;
+	lda.w !battle_data_index_1	 ;01A70D|AD3519  |001935;
 	jsr.w Sub_0190DD ;01A710|20DD90  |0190DD;
 	sta.b $0f,x	 ;01A713|950F    |001A81;
-	inc.w $1935	 ;01A715|EE3519  |001935;
-	lda.w $1935	 ;01A718|AD3519  |001935;
+	inc.w !battle_data_index_1	 ;01A715|EE3519  |001935;
+	lda.w !battle_data_index_1	 ;01A718|AD3519  |001935;
 	jsr.w Sub_0190DD ;01A71B|20DD90  |0190DD;
-	sta.w $193f	 ;01A71E|8D3F19  |00193F;
+	sta.w !battle_data_index_4	 ;01A71E|8D3F19  |00193F;
 	and.b #$3f	  ;01A721|293F    |      ;
 	sta.b $0c,x	 ;01A723|950C    |001A7E;
-	inc.w $1935	 ;01A725|EE3519  |001935;
-	lda.w $1935	 ;01A728|AD3519  |001935;
+	inc.w !battle_data_index_1	 ;01A725|EE3519  |001935;
+	lda.w !battle_data_index_1	 ;01A728|AD3519  |001935;
 	jsr.w Sub_0190DD ;01A72B|20DD90  |0190DD;
 	sta.w $192b	 ;01A72E|8D2B19  |00192B;
 	and.b #$3f	  ;01A731|293F    |      ;
@@ -2871,7 +2871,7 @@ BattleEffect_ExplosionHandler:
 	lsr a;01A73A|4A      |      ;
 	lsr a;01A73B|4A      |      ;
 	pha ;01A73C|48      |      ;
-	lda.w $1948	 ;01A73D|AD4819  |001948;
+	lda.w !battle_temp_data	 ;01A73D|AD4819  |001948;
 	beq F008 ;01A740|F008    |01A74A;
 	pla ;01A742|68      |      ;
 	clc ;01A743|18      |      ;
@@ -2884,8 +2884,8 @@ BattleEffect_TransitionHandler:
 
 BattleEffect_StatusIconManager:
 	sta.b $0e,x	 ;01A74B|950E    |001A80;
-	inc.w $1935	 ;01A74D|EE3519  |001935;
-	lda.w $1935	 ;01A750|AD3519  |001935;
+	inc.w !battle_data_index_1	 ;01A74D|EE3519  |001935;
+	lda.w !battle_data_index_1	 ;01A750|AD3519  |001935;
 	jsr.w Sub_0190DD ;01A753|20DD90  |0190DD;
 	sta.w $192b	 ;01A756|8D2B19  |00192B;
 	and.b #$e0	  ;01A759|29E0    |      ;
@@ -2902,7 +2902,7 @@ BattleEffect_StatusIconManager:
 	lda.w $192b	 ;01A76A|AD2B19  |00192B;
 	and.b #$1f	  ;01A76D|291F    |      ;
 	sta.w $192b	 ;01A76F|8D2B19  |00192B;
-	lda.w $193f	 ;01A772|AD3F19  |00193F;
+	lda.w !battle_data_index_4	 ;01A772|AD3F19  |00193F;
 	and.b #$c0	  ;01A775|29C0    |      ;
 	lsr a;01A777|4A      |      ;
 	ora.w $192b	 ;01A778|0D2B19  |00192B;
@@ -2912,9 +2912,9 @@ BattleEffect_StatusIconManager:
 	lda.l DATA8_0b87e4,x ;01A77E|BFE4870B|0B87E4;
 	sta.w $192b	 ;01A782|8D2B19  |00192B;
 	lda.l DATA8_0b87e5,x ;01A785|BFE5870B|0B87E5;
-	sta.w $192c	 ;01A789|8D2C19  |00192C;
+	sta.w !battle_temp_hi	 ;01A789|8D2C19  |00192C;
 	plx ;01A78C|FA      |      ;
-	lda.w $192c	 ;01A78D|AD2C19  |00192C;
+	lda.w !battle_temp_hi	 ;01A78D|AD2C19  |00192C;
 	sta.b $18,x	 ;01A790|9518    |001A8A;
 	lda.w $192b	 ;01A792|AD2B19  |00192B;
 	and.b #$c0	  ;01A795|29C0    |      ;
@@ -2923,8 +2923,8 @@ BattleEffect_StatusIconManager:
 	lda.w $192b	 ;01A79B|AD2B19  |00192B;
 	and.b #$3f	  ;01A79E|293F    |      ;
 	sta.b $10,x	 ;01A7A0|9510    |001A82;
-	inc.w $1935	 ;01A7A2|EE3519  |001935;
-	lda.w $1935	 ;01A7A5|AD3519  |001935;
+	inc.w !battle_data_index_1	 ;01A7A2|EE3519  |001935;
+	lda.w !battle_data_index_1	 ;01A7A5|AD3519  |001935;
 	jsr.w Sub_0190DD ;01A7A8|20DD90  |0190DD;
 	sta.w $192b	 ;01A7AB|8D2B19  |00192B;
 	and.b #$f8	  ;01A7AE|29F8    |      ;
@@ -2937,10 +2937,10 @@ BattleEffect_StatusIconManager:
 	and.b #$07	  ;01A7BA|2907    |      ;
 	ora.b $0e,x	 ;01A7BC|150E    |001A80;
 	sta.b $0e,x	 ;01A7BE|950E    |001A80;
-	inc.w $1935	 ;01A7C0|EE3519  |001935;
-	lda.w $1935	 ;01A7C3|AD3519  |001935;
+	inc.w !battle_data_index_1	 ;01A7C0|EE3519  |001935;
+	lda.w !battle_data_index_1	 ;01A7C3|AD3519  |001935;
 	jsr.w Sub_0190DD ;01A7C6|20DD90  |0190DD;
-	inc.w $1935	 ;01A7C9|EE3519  |001935;
+	inc.w !battle_data_index_1	 ;01A7C9|EE3519  |001935;
 	sta.w $192b	 ;01A7CC|8D2B19  |00192B;
 	and.b #$80	  ;01A7CF|2980    |      ;
 	lsr a;01A7D1|4A      |      ;
@@ -2960,7 +2960,7 @@ BattleEffect_StatusIconManager:
 	phx ;01A7E9|DA      |      ;
 	phy ;01A7EA|5A      |      ;
 	txy ;01A7EB|9B      |      ;
-	lda.w $193b	 ;01A7EC|AD3B19  |00193B;
+	lda.w !battle_data_index_3	 ;01A7EC|AD3B19  |00193B;
 	jsr.w Sub_01E1D3 ;01A7EF|20D3E1  |01E1D3;
 	phy ;01A7F2|5A      |      ;
 	txy ;01A7F3|9B      |      ;
@@ -2987,7 +2987,7 @@ BattleEffect_TrailRenderer:
 	php ;01A808|08      |      ;
 	sep #$20		;01A809|E220    |      ;
 	rep #$10		;01A80B|C210    |      ;
-	stz.w $1948	 ;01A80D|9C4819  |011948;
+	stz.w !battle_temp_data	 ;01A80D|9C4819  |011948;
 	php ;01A810|08      |      ;
 	pea.w !battle_status_array	 ;01A811|F4721A  |011A72;
 	pld ;01A814|2B      |      ;
@@ -3000,10 +3000,10 @@ BattleEffect_TrailRenderer:
 	asl a;01A821|0A      |      ;
 	asl a;01A822|0A      |      ;
 	tay ;01A823|A8      |      ;
-	sty.w $193b	 ;01A824|8C3B19  |01193B;
+	sty.w !battle_data_index_3	 ;01A824|8C3B19  |01193B;
 	jsr.w Sub_01AA3B ;01A827|203BAA  |01AA3B;
 	plp ;01A82A|28      |      ;
-	ldx.w $1939	 ;01A82B|AE3919  |011939;
+	ldx.w !battle_data_index_2	 ;01A82B|AE3919  |011939;
 	lda.b #$02	  ;01A82E|A902    |      ;
 	sta.w !battle_status_array,x   ;01A830|9D721A  |011A72;
 	plp ;01A833|28      |      ;
@@ -3210,7 +3210,7 @@ BattleChar_VerifyData:
 	php ;01A947|08      |      ;
 	sep #$20		;01A948|E220    |      ;
 	rep #$10		;01A94A|C210    |      ;
-	lda.w $1948	 ;01A94C|AD4819  |001948;
+	lda.w !battle_temp_data	 ;01A94C|AD4819  |001948;
 	bne .AlternateValidation ;01A94F|D006    |01A957;
 	jsr.w Sub_019168 ;01A951|206891  |019168;
 	jmp.w .Complete ;01A954|4C5AA9  |01A95A;
@@ -3290,7 +3290,7 @@ BattleChar_ClearGraphicsData:
 	php ;01A988|08      |      ;
 	sep #$20		;01A989|E220    |      ;
 	rep #$10		;01A98B|C210    |      ;
-	ldx.w $1939	 ;01A98D|AE3919  |001939;
+	ldx.w !battle_data_index_2	 ;01A98D|AE3919  |001939;
 	lda.b #$00	  ;01A990|A900    |      ;
 	sta.b $00,x	 ;01A992|7400    |001A72;
 	sta.b $01,x	 ;01A994|7401    |001A73;
@@ -3330,23 +3330,23 @@ BattleChar_InitializeState:
 	php ;01A9C8|08      |      ;
 	sep #$20		;01A9C9|E220    |      ;
 	rep #$10		;01A9CB|C210    |      ;
-	lda.w $1935	 ;01A9CD|AD3519  |001935;
+	lda.w !battle_data_index_1	 ;01A9CD|AD3519  |001935;
 	jsr.w Sub_0190DD ;01A9D0|20DD90  |0190DD;
-	ldx.w $1939	 ;01A9D3|AE3919  |001939;
+	ldx.w !battle_data_index_2	 ;01A9D3|AE3919  |001939;
 	sta.b $00,x	 ;01A9D6|7400    |001A72;
-	inc.w $1935	 ;01A9D8|EE3519  |001935;
-	lda.w $1935	 ;01A9DB|AD3519  |001935;
+	inc.w !battle_data_index_1	 ;01A9D8|EE3519  |001935;
+	lda.w !battle_data_index_1	 ;01A9DB|AD3519  |001935;
 	jsr.w Sub_0190DD ;01A9DE|20DD90  |0190DD;
 	sta.b $01,x	 ;01A9E1|7401    |001A73;
-	inc.w $1935	 ;01A9E3|EE3519  |001935;
-	lda.w $1935	 ;01A9E6|AD3519  |001935;
+	inc.w !battle_data_index_1	 ;01A9E3|EE3519  |001935;
+	lda.w !battle_data_index_1	 ;01A9E6|AD3519  |001935;
 	jsr.w Sub_0190DD ;01A9E9|20DD90  |0190DD;
 	sta.b $02,x	 ;01A9EC|7402    |001A74;
-	inc.w $1935	 ;01A9EE|EE3519  |001935;
-	lda.w $1935	 ;01A9F1|AD3519  |001935;
+	inc.w !battle_data_index_1	 ;01A9EE|EE3519  |001935;
+	lda.w !battle_data_index_1	 ;01A9F1|AD3519  |001935;
 	jsr.w Sub_0190DD ;01A9F4|20DD90  |0190DD;
 	sta.b $03,x	 ;01A9F7|7403    |001A75;
-	inc.w $1935	 ;01A9F9|EE3519  |001935;
+	inc.w !battle_data_index_1	 ;01A9F9|EE3519  |001935;
 	plp ;01A9FC|28      |      ;
 	rts ;01A9FD|60      |      ;
 
@@ -3359,27 +3359,27 @@ BattleChar_SetupAnimationData:
 	php ;01A9FE|08      |      ;
 	sep #$20		;01A9FF|E220    |      ;
 	rep #$10		;01AA01|C210    |      ;
-	lda.w $1935	 ;01AA03|AD3519  |001935;
+	lda.w !battle_data_index_1	 ;01AA03|AD3519  |001935;
 	jsr.w Sub_0190DD ;01AA06|20DD90  |0190DD;
-	ldx.w $1939	 ;01AA09|AE3919  |001939;
+	ldx.w !battle_data_index_2	 ;01AA09|AE3919  |001939;
 	sta.b $04,x	 ;01AA0C|7404    |001A76;
-	inc.w $1935	 ;01AA0E|EE3519  |001935;
-	lda.w $1935	 ;01AA11|AD3519  |001935;
+	inc.w !battle_data_index_1	 ;01AA0E|EE3519  |001935;
+	lda.w !battle_data_index_1	 ;01AA11|AD3519  |001935;
 	jsr.w Sub_0190DD ;01AA14|20DD90  |0190DD;
 	sta.b $05,x	 ;01AA17|7405    |001A77;
-	inc.w $1935	 ;01AA19|EE3519  |001935;
-	lda.w $1935	 ;01AA1C|AD3519  |001935;
+	inc.w !battle_data_index_1	 ;01AA19|EE3519  |001935;
+	lda.w !battle_data_index_1	 ;01AA1C|AD3519  |001935;
 	jsr.w Sub_0190DD ;01AA1F|20DD90  |0190DD;
 	sta.b $06,x	 ;01AA22|7406    |001A78;
-	inc.w $1935	 ;01AA24|EE3519  |001935;
-	lda.w $1935	 ;01AA27|AD3519  |001935;
+	inc.w !battle_data_index_1	 ;01AA24|EE3519  |001935;
+	lda.w !battle_data_index_1	 ;01AA27|AD3519  |001935;
 	jsr.w Sub_0190DD ;01AA2A|20DD90  |0190DD;
 	sta.b $07,x	 ;01AA2D|7407    |001A79;
-	inc.w $1935	 ;01AA2F|EE3519  |001935;
-	lda.w $1935	 ;01AA32|AD3519  |001935;
+	inc.w !battle_data_index_1	 ;01AA2F|EE3519  |001935;
+	lda.w !battle_data_index_1	 ;01AA32|AD3519  |001935;
 	jsr.w Sub_0190DD ;01AA35|20DD90  |0190DD;
 	sta.b $08,x	 ;01AA38|7408    |001A7A;
-	inc.w $1935	 ;01AA3A|EE3519  |001935;
+	inc.w !battle_data_index_1	 ;01AA3A|EE3519  |001935;
 	plp ;01AA3D|28      |      ;
 	rts ;01AA3E|60      |      ;
 
@@ -3392,8 +3392,8 @@ BattleChar_InitializeDefaults:
 	php ;01AA3B|08      |      ;
 	sep #$20		;01AA3C|E220    |      ;
 	rep #$10		;01AA3E|C210    |      ;
-	ldx.w $1939	 ;01AA40|AE3919  |001939;
-	lda.w $193b	 ;01AA43|AD3B19  |00193B;
+	ldx.w !battle_data_index_2	 ;01AA40|AE3919  |001939;
+	lda.w !battle_data_index_3	 ;01AA43|AD3B19  |00193B;
 	sta.b $19,x	 ;01AA46|9519    |001A8B;
 	lda.b #$02	  ;01AA48|A902    |      ;
 	sta.b $00,x	 ;01AA4A|7400    |001A72;
@@ -3436,11 +3436,11 @@ BattleSprite_TransformCoordinates:
 	rep #$10		;01AA83|C210    |      ;
 	lda.b #$00	  ;01AA85|A900    |      ;
 	xba ;01AA87|EB      |      ;
-	lda.w $1935	 ;01AA88|AD3519  |001935;
+	lda.w !battle_data_index_1	 ;01AA88|AD3519  |001935;
 	jsr.w Sub_0190DD ;01AA8B|20DD90  |0190DD;
 	tay ;01AA8E|A8      |      ;
-	inc.w $1935	 ;01AA8F|EE3519  |001935;
-	lda.w $1935	 ;01AA92|AD3519  |001935;
+	inc.w !battle_data_index_1	 ;01AA8F|EE3519  |001935;
+	lda.w !battle_data_index_1	 ;01AA92|AD3519  |001935;
 	jsr.w Sub_0190DD ;01AA95|20DD90  |0190DD;
 	xba ;01AA98|EB      |      ;
 	rep #$30		;01AA99|C230    |      ;
@@ -3448,15 +3448,15 @@ BattleSprite_TransformCoordinates:
 	and.w #$00ff	;01AA9C|29FF00  |      ;
 	ora.w #$7f00	;01AA9F|097F00  |      ;
 	sta.w $192b	 ;01AAA2|8D2B19  |00192B;
-	inc.w $1935	 ;01AAA5|EE3519  |001935;
-	lda.w $1935	 ;01AAA8|AD3519  |001935;
+	inc.w !battle_data_index_1	 ;01AAA5|EE3519  |001935;
+	lda.w !battle_data_index_1	 ;01AAA8|AD3519  |001935;
 	jsr.w Sub_0190DD ;01AAAB|20DD90  |0190DD;
 	and.w #$00ff	;01AAAE|29FF00  |      ;
 	asl a;01AAB1|0A      |      ;
 	tay ;01AAB2|A8      |      ;
 	lda.w $192b	 ;01AAB3|AD2B19  |00192B;
 	sta.w $0000,y   ;01AAB6|990000  |7F0000;
-	inc.w $1935	 ;01AAB9|EE3519  |001935;
+	inc.w !battle_data_index_1	 ;01AAB9|EE3519  |001935;
 	plp ;01AABC|28      |      ;
 	rts ;01AABD|60      |      ;
 
@@ -3469,71 +3469,71 @@ BattleChar_LoadExtendedStats:
 	php ;01AABE|08      |      ;
 	sep #$20		;01AABF|E220    |      ;
 	rep #$10		;01AAC1|C210    |      ;
-	lda.w $1935	 ;01AAC3|AD3519  |001935;
+	lda.w !battle_data_index_1	 ;01AAC3|AD3519  |001935;
 	jsr.w Sub_0190DD ;01AAC6|20DD90  |0190DD;
-	ldx.w $1939	 ;01AAC9|AE3919  |001939;
+	ldx.w !battle_data_index_2	 ;01AAC9|AE3919  |001939;
 	sta.b $09,x	 ;01AACC|7409    |001A7B;
-	inc.w $1935	 ;01AACE|EE3519  |001935;
-	lda.w $1935	 ;01AAD1|AD3519  |001935;
+	inc.w !battle_data_index_1	 ;01AACE|EE3519  |001935;
+	lda.w !battle_data_index_1	 ;01AAD1|AD3519  |001935;
 	jsr.w Sub_0190DD ;01AAD4|20DD90  |0190DD;
 	sta.b $0a,x	 ;01AAD7|740A    |001A7C;
-	inc.w $1935	 ;01AAD9|EE3519  |001935;
-	lda.w $1935	 ;01AADC|AD3519  |001935;
+	inc.w !battle_data_index_1	 ;01AAD9|EE3519  |001935;
+	lda.w !battle_data_index_1	 ;01AADC|AD3519  |001935;
 	jsr.w Sub_0190DD ;01AADF|20DD90  |0190DD;
 	sta.b $0b,x	 ;01AAE2|740B    |001A7D;
-	inc.w $1935	 ;01AAE4|EE3519  |001935;
-	lda.w $1935	 ;01AAE7|AD3519  |001935;
+	inc.w !battle_data_index_1	 ;01AAE4|EE3519  |001935;
+	lda.w !battle_data_index_1	 ;01AAE7|AD3519  |001935;
 	jsr.w Sub_0190DD ;01AAEA|20DD90  |0190DD;
 	sta.b $0c,x	 ;01AAED|740C    |001A7E;
-	inc.w $1935	 ;01AAEF|EE3519  |001935;
-	lda.w $1935	 ;01AAF2|AD3519  |001935;
+	inc.w !battle_data_index_1	 ;01AAEF|EE3519  |001935;
+	lda.w !battle_data_index_1	 ;01AAF2|AD3519  |001935;
 	jsr.w Sub_0190DD ;01AAF5|20DD90  |0190DD;
 	sta.b $0d,x	 ;01AAF8|740D    |001A7F;
-	inc.w $1935	 ;01AAFA|EE3519  |001935;
-	lda.w $1935	 ;01AAFD|AD3519  |001935;
+	inc.w !battle_data_index_1	 ;01AAFA|EE3519  |001935;
+	lda.w !battle_data_index_1	 ;01AAFD|AD3519  |001935;
 	jsr.w Sub_0190DD ;01AB00|20DD90  |0190DD;
 	sta.b $0e,x	 ;01AB03|740E    |001A80;
-	inc.w $1935	 ;01AB05|EE3519  |001935;
-	lda.w $1935	 ;01AB08|AD3519  |001935;
+	inc.w !battle_data_index_1	 ;01AB05|EE3519  |001935;
+	lda.w !battle_data_index_1	 ;01AB08|AD3519  |001935;
 	jsr.w Sub_0190DD ;01AB0B|20DD90  |0190DD;
 	sta.b $0f,x	 ;01AB0E|740F    |001A81;
-	inc.w $1935	 ;01AB10|EE3519  |001935;
-	lda.w $1935	 ;01AB13|AD3519  |001935;
+	inc.w !battle_data_index_1	 ;01AB10|EE3519  |001935;
+	lda.w !battle_data_index_1	 ;01AB13|AD3519  |001935;
 	jsr.w Sub_0190DD ;01AB16|20DD90  |0190DD;
 	sta.b $10,x	 ;01AB19|7410    |001A82;
-	inc.w $1935	 ;01AB1B|EE3519  |001935;
-	lda.w $1935	 ;01AB1E|AD3519  |001935;
+	inc.w !battle_data_index_1	 ;01AB1B|EE3519  |001935;
+	lda.w !battle_data_index_1	 ;01AB1E|AD3519  |001935;
 	jsr.w Sub_0190DD ;01AB21|20DD90  |0190DD;
 	sta.b $11,x	 ;01AB24|7411    |001A83;
-	inc.w $1935	 ;01AB26|EE3519  |001935;
-	lda.w $1935	 ;01AB29|AD3519  |001935;
+	inc.w !battle_data_index_1	 ;01AB26|EE3519  |001935;
+	lda.w !battle_data_index_1	 ;01AB29|AD3519  |001935;
 	jsr.w Sub_0190DD ;01AB2C|20DD90  |0190DD;
 	sta.b $12,x	 ;01AB2F|7412    |001A84;
-	inc.w $1935	 ;01AB31|EE3519  |001935;
-	lda.w $1935	 ;01AB34|AD3519  |001935;
+	inc.w !battle_data_index_1	 ;01AB31|EE3519  |001935;
+	lda.w !battle_data_index_1	 ;01AB34|AD3519  |001935;
 	jsr.w Sub_0190DD ;01AB37|20DD90  |0190DD;
 	sta.b $13,x	 ;01AB3A|7413    |001A85;
-	inc.w $1935	 ;01AB3C|EE3519  |001935;
-	lda.w $1935	 ;01AB3F|AD3519  |001935;
+	inc.w !battle_data_index_1	 ;01AB3C|EE3519  |001935;
+	lda.w !battle_data_index_1	 ;01AB3F|AD3519  |001935;
 	jsr.w Sub_0190DD ;01AB42|20DD90  |0190DD;
 	sta.b $14,x	 ;01AB45|7414    |001A86;
-	inc.w $1935	 ;01AB47|EE3519  |001935;
-	lda.w $1935	 ;01AB4A|AD3519  |001935;
+	inc.w !battle_data_index_1	 ;01AB47|EE3519  |001935;
+	lda.w !battle_data_index_1	 ;01AB4A|AD3519  |001935;
 	jsr.w Sub_0190DD ;01AB4D|20DD90  |0190DD;
 	sta.b $15,x	 ;01AB50|7415    |001A87;
-	inc.w $1935	 ;01AB52|EE3519  |001935;
-	lda.w $1935	 ;01AB55|AD3519  |001935;
+	inc.w !battle_data_index_1	 ;01AB52|EE3519  |001935;
+	lda.w !battle_data_index_1	 ;01AB55|AD3519  |001935;
 	jsr.w Sub_0190DD ;01AB58|20DD90  |0190DD;
 	sta.b $16,x	 ;01AB5B|7416    |001A88;
-	inc.w $1935	 ;01AB5D|EE3519  |001935;
-	lda.w $1935	 ;01AB60|AD3519  |001935;
+	inc.w !battle_data_index_1	 ;01AB5D|EE3519  |001935;
+	lda.w !battle_data_index_1	 ;01AB60|AD3519  |001935;
 	jsr.w Sub_0190DD ;01AB63|20DD90  |0190DD;
 	sta.b $17,x	 ;01AB66|7417    |001A89;
-	inc.w $1935	 ;01AB68|EE3519  |001935;
-	lda.w $1935	 ;01AB6B|AD3519  |001935;
+	inc.w !battle_data_index_1	 ;01AB68|EE3519  |001935;
+	lda.w !battle_data_index_1	 ;01AB6B|AD3519  |001935;
 	jsr.w Sub_0190DD ;01AB6E|20DD90  |0190DD;
 	sta.b $18,x	 ;01AB71|7418    |001A8A;
-	inc.w $1935	 ;01AB73|EE3519  |001935;
+	inc.w !battle_data_index_1	 ;01AB73|EE3519  |001935;
 	plp ;01AB76|28      |      ;
 	rts ;01AB77|60      |      ;
 
@@ -3546,14 +3546,14 @@ BattleSystem_CoordinateDataLoad:
 	php ;01AB78|08      |      ;
 	sep #$20		;01AB79|E220    |      ;
 	rep #$10		;01AB7B|C210    |      ;
-	ldy.w $193b	 ;01AB7D|AC3B19  |00193B;
+	ldy.w !battle_data_index_3	 ;01AB7D|AC3B19  |00193B;
 	lda.w $f0f0,y   ;01AB80|B9F0F0  |00F0F0;
 	beq .NoSpecialMode ;01AB83|F004    |01AB89;
-	sta.w $1948	 ;01AB85|8D4819  |001948;
+	sta.w !battle_temp_data	 ;01AB85|8D4819  |001948;
 	bra .ProcessCharacter ;01AB88|8002    |01AB8C;
 
 	.NoSpecialMode:
-	stz.w $1948	 ;01AB89|9C4819  |001948;
+	stz.w !battle_temp_data	 ;01AB89|9C4819  |001948;
 
 	.ProcessCharacter:
 	jsr.w Sub_01A6FC ;01AB8C|20FCA6  |01A6FC;
@@ -3567,7 +3567,7 @@ BattleSystem_CoordinateDataLoad:
 	jsr.w BattleChar_SetupAnimationData ;01AB99|20FEA9  |01A9FE;
 	jsr.w BattleChar_LoadExtendedStats ;01AB9C|20BEAA  |01AABE;
 	jsr.w BattleSprite_TransformCoordinates ;01AB9F|2080AA  |01AA80;
-	ldx.w $1939	 ;01ABA2|AE3919  |001939;
+	ldx.w !battle_data_index_2	 ;01ABA2|AE3919  |001939;
 	lda.b #$01	  ;01ABA5|A901    |      ;
 	sta.b $00,x	 ;01ABA7|7400    |001A72;
 	plp ;01ABA9|28      |      ;
@@ -3586,7 +3586,7 @@ BattleMenu_ClearStructure:
 	php ;01ABAB|08      |      ;
 	sep #$20		;01ABAC|E220    |      ;
 	rep #$10		;01ABAE|C210    |      ;
-	ldx.w $1939	 ;01ABB0|AE3919  |001939;
+	ldx.w !battle_data_index_2	 ;01ABB0|AE3919  |001939;
 	lda.b #$00	  ;01ABB3|A900    |      ;
 	sta.b $00,x	 ;01ABB5|7400    |001A72;
 	sta.b $01,x	 ;01ABB7|7401    |001A73;
@@ -3835,7 +3835,7 @@ BattleScene_Setup:
 	dec.w $192b	 ;01AD3B|CE2B19  |01192B;
 	bne .SceneInitLoop ;01AD3E|D0D4    |01AD14;
 	ldx.w #$001f	;01AD40|A21F00  |      ;
-	stx.w $1935	 ;01AD43|8E3519  |011935;
+	stx.w !battle_data_index_1	 ;01AD43|8E3519  |011935;
 
 ; ==============================================================================
 ; Advanced Data Processing Loop
@@ -3850,9 +3850,9 @@ BattleData_ProcessCalculations:
 	lda.l $7fc508,x ;01AD4C|BF08C57F|7FC508;
 	sta.w $192b	 ;01AD50|8D2B19  |01192B;
 	lda.l DATA8_07db14,x ;01AD53|BF14DB07|07DB14;
-	sta.w $192d	 ;01AD57|8D2D19  |01192D;
+	sta.w !battle_offset	 ;01AD57|8D2D19  |01192D;
 	jsr.w Sub_01D23C ;01AD5A|203CD2  |01D23C;
-	lda.w $192f	 ;01AD5D|AD2F19  |01192F;
+	lda.w !battle_color_accum	 ;01AD5D|AD2F19  |01192F;
 	sta.l $7fc508,x ;01AD60|9F08C57F|7FC508;
 	inx ;01AD64|E8      |      ;
 	inx ;01AD65|E8      |      ;
@@ -3861,7 +3861,7 @@ BattleData_ProcessCalculations:
 	jsr.w Battle_UpdateState ;01AD69|2078AD  |01AD78;
 	lda.w #$0004	;01AD6C|A90400  |      ;
 	jsr.w .ProcessEffect_CastSpell ;01AD6F|20BDD6  |01D6BD;
-	dec.w $1935	 ;01AD72|CE3519  |011935;
+	dec.w !battle_data_index_1	 ;01AD72|CE3519  |011935;
 	bne BattleData_ProcessCalculations ;01AD75|D0CF    |01AD46;
 	rts ;01AD77|60      |      ;
 
@@ -3997,14 +3997,14 @@ BattleVictory_HandleSequence:
 
 BattleScene_TransitionA:
 	ldx.w #$0004	;01AE49|A20400  |      ;
-	stx.w $1935	 ;01AE4C|8E3519  |011935;
+	stx.w !battle_data_index_1	 ;01AE4C|8E3519  |011935;
 	lda.w #$0005	;01AE4F|A90500  |      ;
 	sta.w $1937	 ;01AE52|8D3719  |011937;
 	jmp.w Sub_01CCE8 ;01AE55|4CE8CC  |01CCE8;
 
 BattleScene_TransitionB:
 	ldx.w #$0602	;01AE58|A20206  |      ;
-	stx.w $1935	 ;01AE5B|8E3519  |011935;
+	stx.w !battle_data_index_1	 ;01AE5B|8E3519  |011935;
 	lda.w #$0003	;01AE5E|A90300  |      ;
 	sta.w $1937	 ;01AE61|8D3719  |011937;
 	jmp.w Sub_01CCE8 ;01AE64|4CE8CC  |01CCE8;
@@ -4042,11 +4042,11 @@ BattleHUD_UpdateStatusDisplay:
 ; ==============================================================================
 
 BattleHUD_DrawCharacterName:
-	ldx.w $1935	 ;01AEA0|AE3519  |001935;
+	ldx.w !battle_data_index_1	 ;01AEA0|AE3519  |001935;
 	lda.w $1938	 ;01AEA3|AD3819  |001938;
 	sta.w !battle_status_array,x   ;01AEA6|9D721A  |001A72;
-	ldx.w $1939	 ;01AEA9|AE3919  |001939;
-	lda.w $193c	 ;01AEAC|AD3C19  |00193C;
+	ldx.w !battle_data_index_2	 ;01AEA9|AE3919  |001939;
+	lda.w !battle_array_data_2	 ;01AEAC|AD3C19  |00193C;
 	sta.w !battle_status_array,x   ;01AEAF|9D721A  |001A72;
 	rts ;01AEB2|60      |      ;
 
@@ -4057,10 +4057,10 @@ BattleHUD_DrawCharacterName:
 
 BattleAnim_HandleSequence:
 	phy ;01AEB3|5A      |      ;
-	ldx.w $1935	 ;01AEB4|AE3519  |001935;
+	ldx.w !battle_data_index_1	 ;01AEB4|AE3519  |001935;
 	lda.b #$10	  ;01AEB7|A910    |      ;
 	sta.w !battle_status_array,x   ;01AEB9|9D721A  |001A72;
-	sta.w $193d	 ;01AEBC|8D3D19  |00193D;
+	sta.w !battle_data_temp_1	 ;01AEBC|8D3D19  |00193D;
 	lda.w $1a80,x   ;01AEBF|BD801A  |001A80;
 	and.b #$cf	  ;01AEC2|29CF    |      ;
 	sta.w $1a80,x   ;01AEC4|9D801A  |001A80;
@@ -4072,14 +4072,14 @@ BattleAnim_HandleSequence:
 	ora.w $1a80,x   ;01AECE|1D801A  |001A80;
 	sta.w $1a80,x   ;01AED1|9D801A  |001A80;
 	jsr.w JumpUnitProcessor ;01AED4|2082CC  |01CC82;
-	ldx.w $1939	 ;01AED7|AE3919  |001939;
+	ldx.w !battle_data_index_2	 ;01AED7|AE3919  |001939;
 	lda.w $192b	 ;01AEDA|AD2B19  |01192B;
 	ora.b #$90	  ;01AEDD|0990    |      ;
 	sta.w !battle_status_array,x   ;01AEDF|9D721A  |001A72;
-	sta.w $193e	 ;01AEE2|8D3E19  |00193E;
+	sta.w !battle_data_temp_2	 ;01AEE2|8D3E19  |00193E;
 	jsr.w JumpUnitProcessor ;01AEE5|2082CC  |01CC82;
 	ply ;01AEE8|7A      |      ;
-	ldx.w $1935	 ;01AEE9|AE3519  |001935;
+	ldx.w !battle_data_index_1	 ;01AEE9|AE3519  |001935;
 	jsr.w BattleAnim_ComplexLoop ;01AEEC|20F0AE  |01AEF0;
 	rts ;01AEEF|60      |      ;
 
@@ -4105,12 +4105,12 @@ BattleHUD_RefreshAllBars:
 	dey ;01AF04|88      |      ;
 	beq F01e ;01AF05|F01E    |01AF25;
 	phy ;01AF07|5A      |      ;
-	ldx.w $1935	 ;01AF08|AE3519  |001935;
-	lda.w $193d	 ;01AF0B|AD3D19  |00193D;
+	ldx.w !battle_data_index_1	 ;01AF08|AE3519  |001935;
+	lda.w !battle_data_temp_1	 ;01AF0B|AD3D19  |00193D;
 	sta.w !battle_status_array,x   ;01AF0E|9D721A  |001A72;
 	jsr.w JumpUnitProcessor ;01AF11|2082CC  |01CC82;
-	ldx.w $1939	 ;01AF14|AE3919  |001939;
-	lda.w $193e	 ;01AF17|AD3E19  |00193E;
+	ldx.w !battle_data_index_2	 ;01AF14|AE3919  |001939;
+	lda.w !battle_data_temp_2	 ;01AF17|AD3E19  |00193E;
 	sta.w !battle_status_array,x   ;01AF1A|9D721A  |001A72;
 	jsr.w JumpUnitProcessor ;01AF1D|2082CC  |01CC82;
 	inc.w $19f7	 ;01AF20|EEF719  |0119F7;
@@ -4228,7 +4228,7 @@ BattleChar_ValidateAndSetup:
 	lda.w $19ee	 ;01AFB3|ADEE19  |0119EE;
 	jsr.w GetBattleGraphicsIndex ;01AFB6|20EBB1  |01B1EB;
 	bcc D2 ;01AFB9|904D    |01B008;
-	sta.w $192d	 ;01AFBB|8D2D19  |01192D;
+	sta.w !battle_offset	 ;01AFBB|8D2D19  |01192D;
 	lda.w $1a80,x   ;01AFBE|BD801A  |001A80;
 	and.b #$cf	  ;01AFC1|29CF    |      ;
 	ora.b #$10	  ;01AFC3|0910    |      ;
@@ -4245,7 +4245,7 @@ BattleChar_ValidateAndSetup:
 	tay ;01AFDB|A8      |      ;
 	plx ;01AFDC|FA      |      ;
 	jsr.w Sub_01AE8A ;01AFDD|208AAE  |01AE8A;
-	lda.w $192d	 ;01AFE0|AD2D19  |01192D;
+	lda.w !battle_offset	 ;01AFE0|AD2D19  |01192D;
 	and.w #$00ff	;01AFE3|29FF00  |      ;
 	asl a;01AFE6|0A      |      ;
 	asl a;01AFE7|0A      |      ;
@@ -4299,7 +4299,7 @@ BattleCommand_ProcessHub:
 	lda.w $19ee	 ;01B022|ADEE19  |0119EE;
 	jsr.w GetBattleGraphicsIndex ;01B025|20EBB1  |01B1EB;
 	bcc .Exit	   ;01B028|9057    |01B081;
-	sta.w $192d	 ;01B02A|8D2D19  |01192D;
+	sta.w !battle_offset	 ;01B02A|8D2D19  |01192D;
 	lda.w $1a80,x   ;01B02D|BD801A  |001A80;
 	and.b #$cf	  ;01B030|29CF    |      ;
 	ora.b #$20	  ;01B032|0920    |      ;
@@ -4316,7 +4316,7 @@ BattleCommand_ProcessHub:
 	tay ;01B04A|A8      |      ;
 	plx ;01B04B|FA      |      ;
 	jsr.w Sub_01AE8A ;01B04C|208AAE  |01AE8A;
-	lda.w $192d	 ;01B04F|AD2D19  |01192D;
+	lda.w !battle_offset	 ;01B04F|AD2D19  |01192D;
 	and.w #$00ff	;01B052|29FF00  |      ;
 	asl a;01B055|0A      |      ;
 	asl a;01B056|0A      |      ;
@@ -4359,7 +4359,7 @@ BattleChar_RestoreSystem:
 	lda.w $19ee	 ;01B099|ADEE19  |0119EE;
 	jsr.w GetBattleGraphicsIndex ;01B09C|20EBB1  |01B1EB;
 	bcc .Complete   ;01B09F|9063    |01B104;
-	sta.w $192d	 ;01B0A1|8D2D19  |01192D;
+	sta.w !battle_offset	 ;01B0A1|8D2D19  |01192D;
 	lda.w $1a80,x   ;01B0A4|BD801A  |001A80;
 	and.b #$cf	  ;01B0A7|29CF    |      ;
 	ora.b #$30	  ;01B0A9|0930    |      ;
@@ -4376,7 +4376,7 @@ BattleChar_RestoreSystem:
 	tay ;01B0C1|A8      |      ;
 	plx ;01B0C2|FA      |      ;
 	jsr.w Sub_01AE8A ;01B0C3|208AAE  |01AE8A;
-	lda.w $192d	 ;01B0C6|AD2D19  |01192D;
+	lda.w !battle_offset	 ;01B0C6|AD2D19  |01192D;
 	and.w #$00ff	;01B0C9|29FF00  |      ;
 	asl a;01B0CC|0A      |      ;
 	asl a;01B0CD|0A      |      ;
@@ -4418,11 +4418,11 @@ BattleGraphics_CoordinateManager:
 	asl a;01B10C|0A      |      ;
 	tax ;01B10D|AA      |      ;
 	lda.w $1a73,x   ;01B10E|BD731A  |001A73;
-	sta.w $193a	 ;01B111|8D3A19  |00193A;
+	sta.w !battle_array_data_1	 ;01B111|8D3A19  |00193A;
 	lda.w $1a75,x   ;01B114|BD751A  |001A75;
-	sta.w $193c	 ;01B117|8D3C19  |00193C;
+	sta.w !battle_array_data_2	 ;01B117|8D3C19  |00193C;
 	lda.w $1a77,x   ;01B11A|BD771A  |001A77;
-	sta.w $193e	 ;01B11D|8D3E19  |00193E;
+	sta.w !battle_data_temp_2	 ;01B11D|8D3E19  |00193E;
 	lda.w $1a79,x   ;01B120|BD791A  |001A79;
 	sta.w $1940	 ;01B123|8D4019  |001940;
 	lda.w $1a7b,x   ;01B126|BD7B1A  |001A7B;
@@ -4432,7 +4432,7 @@ BattleGraphics_CoordinateManager:
 	lda.w $1a7f,x   ;01B132|BD7F1A  |001A7F;
 	sta.w $1946	 ;01B135|8D4619  |001946;
 	lda.w $1a81,x   ;01B138|BD811A  |001A81;
-	sta.w $1948	 ;01B13B|8D4819  |001948;
+	sta.w !battle_temp_data	 ;01B13B|8D4819  |001948;
 	rts ;01B13E|60      |      ;
 
 ; ==============================================================================
@@ -4444,7 +4444,7 @@ BattleChar_LoadAndManage:
 	sep #$20		;01B13F|E220    |      ;
 	rep #$10		;01B141|C210    |      ;
 	lda.b #$00	  ;01B143|A900    |      ;
-	sta.w $193f	 ;01B145|8D3F19  |00193F;
+	sta.w !battle_data_index_4	 ;01B145|8D3F19  |00193F;
 	lda.b #$c0	  ;01B148|A9C0    |      ;
 	sta.w $1941	 ;01B14A|8D4119  |001941;
 	lda.b #$00	  ;01B14D|A900    |      ;
@@ -4456,11 +4456,11 @@ BattleChar_LoadAndManage:
 	sta.w $1949	 ;01B15C|8D4919  |001949;
 	sta.w $194b	 ;01B15F|8D4B19  |00194B;
 	sta.w $194d	 ;01B162|8D4D19  |00194D;
-	stz.w $1935	 ;01B165|9C3519  |001935;
+	stz.w !battle_data_index_1	 ;01B165|9C3519  |001935;
 	stz.w $1937	 ;01B168|9C3719  |001937;
-	stz.w $1939	 ;01B16B|9C3919  |001939;
-	stz.w $193b	 ;01B16E|9C3B19  |00193B;
-	stz.w $193d	 ;01B171|9C3D19  |00193D;
+	stz.w !battle_data_index_2	 ;01B16B|9C3919  |001939;
+	stz.w !battle_data_index_3	 ;01B16E|9C3B19  |00193B;
+	stz.w !battle_data_temp_1	 ;01B171|9C3D19  |00193D;
 
 	.LoadLoop:
 	lda.w $192a	 ;01B174|AD2A19  |01192A;
@@ -4469,10 +4469,10 @@ BattleChar_LoadAndManage:
 	jsr.w BattleGraphics_CoordinateManager ;01B17B|2005B1  |01B105;
 	jsr.w BattleData_TransferCoordination ;01B17E|208EB1  |01B18E;
 	inc.w $192a	 ;01B181|EE2A19  |01192A;
-	lda.w $1935	 ;01B184|AD3519  |001935;
+	lda.w !battle_data_index_1	 ;01B184|AD3519  |001935;
 	clc ;01B187|18      |      ;
 	adc.b #$08	  ;01B188|6908    |      ;
-	sta.w $1935	 ;01B18A|8D3519  |001935;
+	sta.w !battle_data_index_1	 ;01B18A|8D3519  |001935;
 	bra .LoadLoop   ;01B18D|80E5    |01B174;
 
 ; ==============================================================================
@@ -4481,18 +4481,18 @@ BattleChar_LoadAndManage:
 ; ==============================================================================
 
 BattleData_TransferCoordination:
-	ldx.w $1935	 ;01B18E|AE3519  |001935;
-	lda.w $193a	 ;01B191|AD3A19  |00193A;
+	ldx.w !battle_data_index_1	 ;01B18E|AE3519  |001935;
+	lda.w !battle_array_data_1	 ;01B191|AD3A19  |00193A;
 	sta.w !battle_status_array,x   ;01B194|9D721A  |001A72;
-	lda.w $193b	 ;01B197|AD3B19  |00193B;
+	lda.w !battle_data_index_3	 ;01B197|AD3B19  |00193B;
 	sta.w $1a73,x   ;01B19A|9D731A  |001A73;
-	lda.w $193c	 ;01B19D|AD3C19  |00193C;
+	lda.w !battle_array_data_2	 ;01B19D|AD3C19  |00193C;
 	sta.w $1a74,x   ;01B1A0|9D741A  |001A74;
-	lda.w $193d	 ;01B1A3|AD3D19  |00193D;
+	lda.w !battle_data_temp_1	 ;01B1A3|AD3D19  |00193D;
 	sta.w $1a75,x   ;01B1A6|9D751A  |001A75;
-	lda.w $193e	 ;01B1A9|AD3E19  |00193E;
+	lda.w !battle_data_temp_2	 ;01B1A9|AD3E19  |00193E;
 	sta.w $1a76,x   ;01B1AC|9D761A  |001A76;
-	lda.w $193f	 ;01B1AF|AD3F19  |00193F;
+	lda.w !battle_data_index_4	 ;01B1AF|AD3F19  |00193F;
 	sta.w $1a77,x   ;01B1B2|9D771A  |001A77;
 	lda.w $1940	 ;01B1B5|AD4019  |001940;
 	sta.w $1a78,x   ;01B1B8|9D781A  |001A78;
@@ -5110,7 +5110,7 @@ BattleState_MachineController:
 	stz.w $1951	 ;01B605|9C5119  |011951;
 	inc.w !current_direction	 ;01B608|EED319  |0119D3;
 	ldx.w $0e89	 ;01B60B|AE890E  |010E89;
-	stx.w $192d	 ;01B60E|8E2D19  |01192D;
+	stx.w !battle_offset	 ;01B60E|8E2D19  |01192D;
 	jsr.w Sub_01880C ;01B611|200C88  |01880C;
 	lda.b #$00	  ;01B614|A900    |      ;
 	xba ;01B616|EB      |      ;
@@ -5182,14 +5182,14 @@ BattleAudio_SoundEffectCoordinator:
 	lda.b #$68	  ;01B6F9|A968    |      ;
 	sta.w $0c52	 ;01B6FB|8D520C  |010C52;
 	sta.w $0c56	 ;01B6FE|8D560C  |010C56;
-	lda.w $192d	 ;01B701|AD2D19  |01192D;
+	lda.w !battle_offset	 ;01B701|AD2D19  |01192D;
 	sec ;01B704|38      |      ;
 	sbc.b #$08	  ;01B705|E908    |      ;
 	sta.w $0c50	 ;01B707|8D500C  |010C50;
 	clc ;01B70A|18      |      ;
 	adc.b #$18	  ;01B70B|6918    |      ;
 	sta.w $0c54	 ;01B70D|8D540C  |010C54;
-	lda.w $192e	 ;01B710|AD2E19  |01192E;
+	lda.w !tilemap_y_offset	 ;01B710|AD2E19  |01192E;
 	clc ;01B713|18      |      ;
 	adc.b #$08	  ;01B714|6908    |      ;
 	sta.w $0c51	 ;01B716|8D510C  |010C51;
@@ -5584,21 +5584,21 @@ BattleScene_TransitionManager:
 	sta.w $19d7	 ;01B98E|8DD719  |0119D7;
 	jsr.w Sub_01CECA ;01B991|20CACE  |01CECA;
 	jsr.w Sub_01935D ;01B994|205D93  |01935D;
-	lda.w $1935	 ;01B997|AD3519  |011935;
+	lda.w !battle_data_index_1	 ;01B997|AD3519  |011935;
 	jsr.w GetBattleGraphicsIndex ;01B99A|20EBB1  |01B1EB;
-	sta.w $1939	 ;01B99D|8D3919  |011939;
-	stx.w $193b	 ;01B9A0|8E3B19  |01193B;
+	sta.w !battle_data_index_2	 ;01B99D|8D3919  |011939;
+	stx.w !battle_data_index_3	 ;01B9A0|8E3B19  |01193B;
 	lda.w !battle_status_array,x   ;01B9A3|BD721A  |011A72;
-	sta.w $193a	 ;01B9A6|8D3A19  |01193A;
+	sta.w !battle_array_data_1	 ;01B9A6|8D3A19  |01193A;
 	lda.b #$04	  ;01B9A9|A904    |      ;
 	sta.w !battle_status_array,x   ;01B9AB|9D721A  |011A72;
 	lda.w $1a7d,x   ;01B9AE|BD7D1A  |011A7D;
 	dec a;01B9B1|3A      |      ;
-	sta.w $192d	 ;01B9B2|8D2D19  |01192D;
+	sta.w !battle_offset	 ;01B9B2|8D2D19  |01192D;
 	lda.w $1a7e,x   ;01B9B5|BD7E1A  |011A7E;
-	sta.w $192e	 ;01B9B8|8D2E19  |01192E;
+	sta.w !tilemap_y_offset	 ;01B9B8|8D2E19  |01192E;
 	jsr.w Sub_01880C ;01B9BB|200C88  |01880C;
-	stx.w $193d	 ;01B9BE|8E3D19  |01193D;
+	stx.w !battle_data_temp_1	 ;01B9BE|8E3D19  |01193D;
 	jsr.w Sub_019058 ;01B9C1|205890  |019058;
 	lda.w $19bd	 ;01B9C4|ADBD19  |0119BD;
 	clc ;01B9C7|18      |      ;
@@ -5612,7 +5612,7 @@ BattleScene_TransitionManager:
 	sta.w $19bf	 ;01B9D7|8DBF19  |0119BF;
 	jsr.w Sub_0188CD ;01B9DA|20CD88  |0188CD;
 	ldx.w $192b	 ;01B9DD|AE2B19  |01192B;
-	stx.w $193f	 ;01B9E0|8E3F19  |01193F;
+	stx.w !battle_data_index_4	 ;01B9E0|8E3F19  |01193F;
 	rts ;01B9E3|60      |      ;
 ; ==============================================================================
 ; Bank  - FFMQ Main Battle Systems (Cycle 6, Part 1)
@@ -5710,11 +5710,11 @@ BattleAnimation_LoopController:
 	ldy.w #$0010	;01D0BC|A01000  |      ;
 	stz.w $192b	 ;01D0BF|9C2B19  |01192B;
 	ldx.w #$6b00	;01D0C2|A2006B  |      ;
-	stx.w $192d	 ;01D0C5|8E2D19  |01192D;
-	sty.w $192f	 ;01D0C8|8C2F19  |01192F;
-	stz.w $1931	 ;01D0CB|9C3119  |011931;
+	stx.w !battle_offset	 ;01D0C5|8E2D19  |01192D;
+	sty.w !battle_color_accum	 ;01D0C8|8C2F19  |01192F;
+	stz.w !battle_delta_accum	 ;01D0CB|9C3119  |011931;
 	ldx.w $1900	 ;01D0CE|AE0019  |011900;
-	stx.w $1933	 ;01D0D1|8E3319  |011933;
+	stx.w !battle_counter	 ;01D0D1|8E3319  |011933;
 	sep #$20		;01D0D4|E220    |      ;
 	rep #$10		;01D0D6|C210    |      ;
 	lda.w !battle_map_id	 ;01D0D8|AD910E  |010E91;
@@ -5730,12 +5730,12 @@ BattleAnimation_LoopController:
 	rep #$30		;01D0E9|C230    |      ;
 	lda.w $1900	 ;01D0EB|AD0019  |011900;
 	clc ;01D0EE|18      |      ;
-	adc.w $1931	 ;01D0EF|6D3119  |011931;
+	adc.w !battle_delta_accum	 ;01D0EF|6D3119  |011931;
 	sta.w $1900	 ;01D0F2|8D0019  |011900;
-	lda.w $1931	 ;01D0F5|AD3119  |011931;
+	lda.w !battle_delta_accum	 ;01D0F5|AD3119  |011931;
 	eor.w #$ffff	;01D0F8|49FFFF  |      ;
 	inc a;01D0FB|1A      |      ;
-	sta.w $1931	 ;01D0FC|8D3119  |011931;
+	sta.w !battle_delta_accum	 ;01D0FC|8D3119  |011931;
 	plp ;01D0FF|28      |      ;
 	lda.b #$03	  ;01D100|A903    |      ;
 	sta.w !battle_phase_counter	 ;01D102|8D461A  |011A46;
@@ -5748,7 +5748,7 @@ BattleAnimation_LoopController:
 	dey ;01D113|88      |      ;
 	bne .AnimationUpdateLoop ;01D114|D0D2    |01D0E8;
 	rep #$30		;01D116|C230    |      ;
-	lda.w $1933	 ;01D118|AD3319  |011933;
+	lda.w !battle_counter	 ;01D118|AD3319  |011933;
 	sta.w $1900	 ;01D11B|8D0019  |011900;
 	plp ;01D11E|28      |      ;
 	rts ;01D11F|60      |      ;
@@ -5762,7 +5762,7 @@ BattleChar_SpriteDiscovery:
 	lda.b #$00	  ;01D120|A900    |      ;
 	jsr.w GetBattleGraphicsIndex ;01D122|20EBB1  |01B1EB;
 	bcc .Exit	   ;01D125|9026    |01D14D;
-	stx.w $1935	 ;01D127|8E3519  |011935;
+	stx.w !battle_data_index_1	 ;01D127|8E3519  |011935;
 	sta.w $1937	 ;01D12A|8D3719  |011937;
 	lda.w !battle_status_array,x   ;01D12D|BD721A  |011A72;
 	sta.w $1938	 ;01D130|8D3819  |011938;
@@ -5770,8 +5770,8 @@ BattleChar_SpriteDiscovery:
 	lda.b #$01	  ;01D136|A901    |      ;
 	jsr.w GetBattleGraphicsIndex ;01D138|20EBB1  |01B1EB;
 	bcc .Exit	   ;01D13B|9010    |01D14D;
-	stx.w $1939	 ;01D13D|8E3919  |011939;
-	sta.w $193b	 ;01D140|8D3B19  |01193B;
+	stx.w !battle_data_index_2	 ;01D13D|8E3919  |011939;
+	sta.w !battle_data_index_3	 ;01D140|8D3B19  |01193B;
 	lda.w !battle_status_array,x   ;01D143|BD721A  |011A72;
 	sta.w $1938	 ;01D146|8D3819  |011938;
 	jsr.w Sub_01D14E ;01D149|204ED1  |01D14E;
@@ -5796,7 +5796,7 @@ BattleColor_ManagementSystem:
 	php ;01D159|08      |      ;
 	rep #$30		;01D15A|C230    |      ;
 	lda.w $192b	 ;01D15C|AD2B19  |01192B;
-	sta.w $192f	 ;01D15F|8D2F19  |01192F;
+	sta.w !battle_color_accum	 ;01D15F|8D2F19  |01192F;
 	cmp.w #$7fff	;01D162|C9FF7F  |      ;
 	beq .Exit	   ;01D165|F009    |01D170;
 	jsr.w Sub_01D1E1 ;01D167|20E1D1  |01D1E1;
@@ -5834,7 +5834,7 @@ BattleColor_RedComponent:
 	and.w #$001f	;01D1ED|291F00  |      ;
 
 	.MaxValue:
-	sta.w $192f	 ;01D1F0|8D2F19  |01192F;
+	sta.w !battle_color_accum	 ;01D1F0|8D2F19  |01192F;
 	rts ;01D1F3|60      |      ;
 
 ; ==============================================================================
@@ -5852,8 +5852,8 @@ BattleColor_GreenComponent:
 	and.w #$03e0	;01D203|29E003  |      ;
 
 	.MaxValue:
-	ora.w $192f	 ;01D206|0D2F19  |01192F;
-	sta.w $192f	 ;01D209|8D2F19  |01192F;
+	ora.w !battle_color_accum	 ;01D206|0D2F19  |01192F;
+	sta.w !battle_color_accum	 ;01D209|8D2F19  |01192F;
 	rts ;01D20C|60      |      ;
 
 ; ==============================================================================
@@ -5871,8 +5871,8 @@ BattleColor_BlueComponent:
 	and.w #$7c00	;01D21C|29007C  |      ;
 
 	.MaxValue:
-	ora.w $192f	 ;01D21F|0D2F19  |01192F;
-	sta.w $192f	 ;01D222|8D2F19  |01192F;
+	ora.w !battle_color_accum	 ;01D21F|0D2F19  |01192F;
+	sta.w !battle_color_accum	 ;01D222|8D2F19  |01192F;
 	rts ;01D225|60      |      ;
 
 ; ==============================================================================
@@ -5884,7 +5884,7 @@ BattleColor_FadeController:
 	php ;01D226|08      |      ;
 	rep #$30		;01D227|C230    |      ;
 	lda.w $192b	 ;01D229|AD2B19  |01192B;
-	sta.w $192f	 ;01D22C|8D2F19  |01192F;
+	sta.w !battle_color_accum	 ;01D22C|8D2F19  |01192F;
 	beq .Exit	   ;01D22F|F009    |01D23A;
 	jsr.w BattleColor_FadeRedComponent ;01D231|20ACD2  |01D2AC;
 	jsr.w BattleColor_FadeGreenComponent ;01D234|20B9D2  |01D2B9;
@@ -5903,56 +5903,56 @@ BattleColor_InterpolationEngine:
 	php ;01D23C|08      |      ;
 	rep #$30		;01D23D|C230    |      ;
 	lda.w $192b	 ;01D23F|AD2B19  |01192B;
-	sta.w $192f	 ;01D242|8D2F19  |01192F;
-	cmp.w $192d	 ;01D245|CD2D19  |01192D;
+	sta.w !battle_color_accum	 ;01D242|8D2F19  |01192F;
+	cmp.w !battle_offset	 ;01D245|CD2D19  |01192D;
 	beq .Exit	   ;01D248|F060    |01D2AA;
-	lda.w $192d	 ;01D24A|AD2D19  |01192D;
+	lda.w !battle_offset	 ;01D24A|AD2D19  |01192D;
 	and.w #$001f	;01D24D|291F00  |      ;
-	sta.w $1931	 ;01D250|8D3119  |011931;
+	sta.w !battle_delta_accum	 ;01D250|8D3119  |011931;
 	lda.w $192b	 ;01D253|AD2B19  |01192B;
 	and.w #$001f	;01D256|291F00  |      ;
-	cmp.w $1931	 ;01D259|CD3119  |011931;
+	cmp.w !battle_delta_accum	 ;01D259|CD3119  |011931;
 	beq .CheckGreen ;01D25C|F002    |01D260;
 	bcs .FadeRed	;01D25E|B005    |01D265;
 
 	.CheckGreen:
-	sta.w $192f	 ;01D260|8D2F19  |01192F;
+	sta.w !battle_color_accum	 ;01D260|8D2F19  |01192F;
 	bra .ProcessGreen ;01D263|8003    |01D268;
 
 	.FadeRed:
 	jsr.w BattleColor_FadeRedComponent ;01D265|20ACD2  |01D2AC;
 
 	.ProcessGreen:
-	lda.w $192d	 ;01D268|AD2D19  |01192D;
+	lda.w !battle_offset	 ;01D268|AD2D19  |01192D;
 	and.w #$03e0	;01D26B|29E003  |      ;
-	sta.w $1931	 ;01D26E|8D3119  |011931;
+	sta.w !battle_delta_accum	 ;01D26E|8D3119  |011931;
 	lda.w $192b	 ;01D271|AD2B19  |01192B;
 	and.w #$03e0	;01D274|29E003  |      ;
-	cmp.w $1931	 ;01D277|CD3119  |011931;
+	cmp.w !battle_delta_accum	 ;01D277|CD3119  |011931;
 	beq .MergeGreen ;01D27A|F002    |01D27E;
 	bcs .FadeGreen  ;01D27C|B008    |01D286;
 
 	.MergeGreen:
-	ora.w $192f	 ;01D27E|0D2F19  |01192F;
-	sta.w $192f	 ;01D281|8D2F19  |01192F;
+	ora.w !battle_color_accum	 ;01D27E|0D2F19  |01192F;
+	sta.w !battle_color_accum	 ;01D281|8D2F19  |01192F;
 	bra .ProcessBlue ;01D284|8003    |01D289;
 
 	.FadeGreen:
 	jsr.w BattleColor_FadeGreenComponent ;01D286|20B9D2  |01D2B9;
 
 	.ProcessBlue:
-	lda.w $192d	 ;01D289|AD2D19  |01192D;
+	lda.w !battle_offset	 ;01D289|AD2D19  |01192D;
 	and.w #$7c00	;01D28C|29007C  |      ;
-	sta.w $1931	 ;01D28F|8D3119  |011931;
+	sta.w !battle_delta_accum	 ;01D28F|8D3119  |011931;
 	lda.w $192b	 ;01D292|AD2B19  |01192B;
 	and.w #$7c00	;01D295|29007C  |      ;
-	cmp.w $1931	 ;01D298|CD3119  |011931;
+	cmp.w !battle_delta_accum	 ;01D298|CD3119  |011931;
 	beq .MergeBlue  ;01D29B|F002    |01D29F;
 	bcs .FadeBlue   ;01D29D|B008    |01D2A7;
 
 	.MergeBlue:
-	ora.w $192f	 ;01D29F|0D2F19  |01192F;
-	sta.w $192f	 ;01D2A2|8D2F19  |01192F;
+	ora.w !battle_color_accum	 ;01D29F|0D2F19  |01192F;
+	sta.w !battle_color_accum	 ;01D2A2|8D2F19  |01192F;
 	bra .Exit	   ;01D2A5|8003    |01D2AA;
 
 	.FadeBlue:
@@ -5974,7 +5974,7 @@ BattleColor_FadeRedComponent:
 	dec a;01D2B4|3A      |      ;
 
 	.MinValue:
-	sta.w $192f	 ;01D2B5|8D2F19  |01192F;
+	sta.w !battle_color_accum	 ;01D2B5|8D2F19  |01192F;
 	rts ;01D2B8|60      |      ;
 
 ; ==============================================================================
@@ -5990,8 +5990,8 @@ BattleColor_FadeGreenComponent:
 	sbc.w #$0020	;01D2C2|E92000  |      ;
 
 	.MinValue:
-	ora.w $192f	 ;01D2C5|0D2F19  |01192F;
-	sta.w $192f	 ;01D2C8|8D2F19  |01192F;
+	ora.w !battle_color_accum	 ;01D2C5|0D2F19  |01192F;
+	sta.w !battle_color_accum	 ;01D2C8|8D2F19  |01192F;
 	rts ;01D2CB|60      |      ;
 
 ; ==============================================================================
@@ -6007,8 +6007,8 @@ BattleColor_FadeBlueComponent:
 	sbc.w #$0400	;01D2D5|E90004  |      ;
 
 	.MinValue:
-	ora.w $192f	 ;01D2D8|0D2F19  |01192F;
-	sta.w $192f	 ;01D2DB|8D2F19  |01192F;
+	ora.w !battle_color_accum	 ;01D2D8|0D2F19  |01192F;
+	sta.w !battle_color_accum	 ;01D2DB|8D2F19  |01192F;
 	rts ;01D2DE|60      |      ;
 
 ; ==============================================================================
@@ -6044,7 +6044,7 @@ BattlePalette_BufferManager:
 	lda.b #$f1	  ;01D305|A9F1    |      ;
 	sta.w $050a	 ;01D307|8D0A05  |01050A;
 	lda.b #$0a	  ;01D30A|A90A    |      ;
-	sta.w $1935	 ;01D30C|8D3519  |011935;
+	sta.w !battle_data_index_1	 ;01D30C|8D3519  |011935;
 
 ; ==============================================================================
 ; BattlePalette_AnimationLoop - Advanced Palette Animation Loop
@@ -6061,7 +6061,7 @@ BattlePalette_AnimationLoop:
 	lda.l $7fc588,x ;01D318|BF88C57F|7FC588;
 	sta.w $192b	 ;01D31C|8D2B19  |01192B;
 	jsr.w BattleColor_FadeController ;01D31F|2026D2  |01D226;
-	lda.w $192f	 ;01D322|AD2F19  |01192F;
+	lda.w !battle_color_accum	 ;01D322|AD2F19  |01192F;
 	sta.l $7fc588,x ;01D325|9F88C57F|7FC588;
 	inx ;01D329|E8      |      ;
 	inx ;01D32A|E8      |      ;
@@ -6073,7 +6073,7 @@ BattlePalette_AnimationLoop:
 	jsr.w Sub_018DF3 ;01D334|20F38D  |018DF3;
 	lda.b #$10	  ;01D337|A910    |      ;
 	jsr.w Sub_01D6A9 ;01D339|20A9D6  |01D6A9;
-	dec.w $1935	 ;01D33C|CE3519  |011935;
+	dec.w !battle_data_index_1	 ;01D33C|CE3519  |011935;
 	bne BattlePalette_AnimationLoop ;01D33F|D0CE    |01D30F;
 	jsr.w Sub_01D346 ;01D341|2046D3  |01D346;
 	plp ;01D344|28      |      ;
@@ -6106,11 +6106,11 @@ BattleGraphics_DMATransferSystem:
 	stx.w $192b	 ;01D360|8E2B19  |01192B;
 	stx.w $19e8	 ;01D363|8EE819  |0119E8;
 	lda.b #$7f	  ;01D366|A97F    |      ;
-	sta.w $192d	 ;01D368|8D2D19  |01192D;
+	sta.w !battle_offset	 ;01D368|8D2D19  |01192D;
 	ldx.w #$0000	;01D36B|A20000  |      ;
-	stx.w $192e	 ;01D36E|8E2E19  |01192E;
+	stx.w !tilemap_y_offset	 ;01D36E|8E2E19  |01192E;
 	ldx.w #$0100	;01D371|A20001  |      ;
-	stx.w $1930	 ;01D374|8E3019  |011930;
+	stx.w !graphics_buffer_size	 ;01D374|8E3019  |011930;
 
 	.UpdateLoop:
 	jsr.w Sub_018DF3 ;01D377|20F38D  |018DF3;
@@ -6127,13 +6127,13 @@ BattleGraphics_DMATransferSystem:
 
 BattleGraphics_ProcessCoordinator:
 	ldx.w $192b	 ;01D386|AE2B19  |01192B;
-	stx.w $1935	 ;01D389|8E3519  |011935;
-	lda.w $192d	 ;01D38C|AD2D19  |01192D;
+	stx.w !battle_data_index_1	 ;01D389|8E3519  |011935;
+	lda.w !battle_offset	 ;01D38C|AD2D19  |01192D;
 	sta.w $1937	 ;01D38F|8D3719  |011937;
 	ldx.w #$2000	;01D392|A20020  |      ;
 	stx.w $1938	 ;01D395|8E3819  |011938;
-	ldx.w $1930	 ;01D398|AE3019  |011930;
-	stx.w $193a	 ;01D39B|8E3A19  |01193A;
+	ldx.w !graphics_buffer_size	 ;01D398|AE3019  |011930;
+	stx.w !battle_array_data_1	 ;01D39B|8E3A19  |01193A;
 	lda.b #$04	  ;01D39E|A904    |      ;
 	sta.w !battle_phase_counter	 ;01D3A0|8D461A  |011A46;
 	jmp.w Sub_018DF3 ;01D3A3|4CF38D  |018DF3;
@@ -6150,11 +6150,11 @@ BattleGraphics_BufferManager:
 
 	.SetupTransfer:
 	lda.b #$7f	  ;01D3AF|A97F    |      ;
-	sta.w $192d	 ;01D3B1|8D2D19  |01192D;
+	sta.w !battle_offset	 ;01D3B1|8D2D19  |01192D;
 	ldx.w #$0100	;01D3B4|A20001  |      ;
-	stx.w $192e	 ;01D3B7|8E2E19  |01192E;
+	stx.w !tilemap_y_offset	 ;01D3B7|8E2E19  |01192E;
 	ldx.w #$0080	;01D3BA|A28000  |      ;
-	stx.w $1930	 ;01D3BD|8E3019  |011930;
+	stx.w !graphics_buffer_size	 ;01D3BD|8E3019  |011930;
 	bra BattleGraphics_DMATransferSystem.UpdateLoop ;01D3C0|80B5    |01D377;
 
 BattleGraphics_BufferManager2:
@@ -6176,7 +6176,7 @@ BattleGraphics_StreamingSystem:
 	lda.b #$14	  ;01D3D8|A914    |      ;
 	jsr.w .ProcessEffect_CastSpell ;01D3DA|20BDD6  |01D6BD;
 	ldx.w #$0000	;01D3DD|A20000  |      ;
-	stx.w $1933	 ;01D3E0|8E3319  |011933;
+	stx.w !battle_counter	 ;01D3E0|8E3319  |011933;
 	ldx.w #$0010	;01D3E3|A21000  |      ;
 	stx.w $1943	 ;01D3E6|8E4319  |011943;
 	lda.b #$7f	  ;01D3E9|A97F    |      ;
@@ -6191,15 +6191,15 @@ BattleGraphics_MultiLayerLoop:
 	ldx.w #$0000	;01D3EE|A20000  |      ;
 	stx.w $192b	 ;01D3F1|8E2B19  |01192B;
 	ldx.w #$2000	;01D3F4|A20020  |      ;
-	stx.w $192d	 ;01D3F7|8E2D19  |01192D;
+	stx.w !battle_offset	 ;01D3F7|8E2D19  |01192D;
 	ldx.w #$0008	;01D3FA|A20800  |      ;
 	jsr.w BattleGraphics_CopyEngine ;01D3FD|2062D4  |01D462;
 	ldx.w $19e8	 ;01D400|AEE819  |0119E8;
-	stx.w $1935	 ;01D403|8E3519  |011935;
-	ldx.w $192d	 ;01D406|AE2D19  |01192D;
+	stx.w !battle_data_index_1	 ;01D403|8E3519  |011935;
+	ldx.w !battle_offset	 ;01D406|AE2D19  |01192D;
 	stx.w $1938	 ;01D409|8E3819  |011938;
 	ldx.w #$0100	;01D40C|A20001  |      ;
-	stx.w $193a	 ;01D40F|8E3A19  |01193A;
+	stx.w !battle_array_data_1	 ;01D40F|8E3A19  |01193A;
 	jsr.w Sub_018DF3 ;01D412|20F38D  |018DF3;
 	lda.b #$04	  ;01D415|A904    |      ;
 	sta.w !battle_phase_counter	 ;01D417|8D461A  |011A46;
@@ -6207,24 +6207,24 @@ BattleGraphics_MultiLayerLoop:
 	ldx.w #$0100	;01D41D|A20001  |      ;
 	stx.w $192b	 ;01D420|8E2B19  |01192B;
 	ldx.w #$2100	;01D423|A20021  |      ;
-	stx.w $192d	 ;01D426|8E2D19  |01192D;
+	stx.w !battle_offset	 ;01D426|8E2D19  |01192D;
 	ldx.w #$0004	;01D429|A20400  |      ;
 	jsr.w BattleGraphics_CopyEngine ;01D42C|2062D4  |01D462;
 	jsr.w Sub_018DF3 ;01D42F|20F38D  |018DF3;
 	ldx.w $19ea	 ;01D432|AEEA19  |0119EA;
-	stx.w $1935	 ;01D435|8E3519  |011935;
-	ldx.w $192d	 ;01D438|AE2D19  |01192D;
+	stx.w !battle_data_index_1	 ;01D435|8E3519  |011935;
+	ldx.w !battle_offset	 ;01D438|AE2D19  |01192D;
 	stx.w $1938	 ;01D43B|8E3819  |011938;
 	ldx.w #$0080	;01D43E|A28000  |      ;
-	stx.w $193a	 ;01D441|8E3A19  |01193A;
+	stx.w !battle_array_data_1	 ;01D441|8E3A19  |01193A;
 	lda.b #$04	  ;01D444|A904    |      ;
 	sta.w !battle_phase_counter	 ;01D446|8D461A  |011A46;
 	jsr.w Label_0182D0 ;01D449|20D082  |0182D0;
-	lda.w $1933	 ;01D44C|AD3319  |011933;
+	lda.w !battle_counter	 ;01D44C|AD3319  |011933;
 	clc ;01D44F|18      |      ;
 	adc.b #$12	  ;01D450|6912    |      ;
 	and.b #$1e	  ;01D452|291E    |      ;
-	sta.w $1933	 ;01D454|8D3319  |011933;
+	sta.w !battle_counter	 ;01D454|8D3319  |011933;
 	lda.b #$10	  ;01D457|A910    |      ;
 	jsr.w Sub_01D6A9 ;01D459|20A9D6  |01D6A9;
 	dec.w $1943	 ;01D45C|CE4319  |011943;
@@ -6282,7 +6282,7 @@ BattleChar_AnimationProcessor:
 	php ;01D49B|08      |      ;
 	jsr.w GetBattleGraphicsIndex ;01D49C|20EBB1  |01B1EB;
 	stx.w $192b	 ;01D49F|8E2B19  |01192B;
-	sta.w $192d	 ;01D4A2|8D2D19  |01192D;
+	sta.w !battle_offset	 ;01D4A2|8D2D19  |01192D;
 	rep #$30		;01D4A5|C230    |      ;
 	ldy.w #$000c	;01D4A7|A00C00  |      ;
 
@@ -6339,7 +6339,7 @@ BattleChar_AnimationProcessor:
 	sep #$20		;01D510|E220    |      ;
 	rep #$10		;01D512|C210    |      ;
 	lda.b #$10	  ;01D514|A910    |      ;
-	sta.w $1935	 ;01D516|8D3519  |011935;
+	sta.w !battle_data_index_1	 ;01D516|8D3519  |011935;
 
 ; ==============================================================================
 ; BattlePalette_AnimationController - Advanced Palette Animation Control System
@@ -6356,7 +6356,7 @@ BattlePalette_AnimationController:
 	lda.l $7fc588,x ;01D522|BF88C57F|7FC588;
 	sta.w $192b	 ;01D526|8D2B19  |01192B;
 	jsr.w BattleColor_ManagementSystem ;01D529|2059D1  |01D159;
-	lda.w $192f	 ;01D52C|AD2F19  |01192F;
+	lda.w !battle_color_accum	 ;01D52C|AD2F19  |01192F;
 	sta.l $7fc588,x ;01D52F|9F88C57F|7FC588;
 	inx ;01D533|E8      |      ;
 	inx ;01D534|E8      |      ;
@@ -6368,7 +6368,7 @@ BattlePalette_AnimationController:
 	jsr.w Sub_018DF3 ;01D53E|20F38D  |018DF3;
 	lda.b #$10	  ;01D541|A910    |      ;
 	jsr.w .Exit_CastSpell ;01D543|20C4D6  |01D6C4;
-	dec.w $1935	 ;01D546|CE3519  |011935;
+	dec.w !battle_data_index_1	 ;01D546|CE3519  |011935;
 	bne BattlePalette_AnimationController ;01D549|D0CE    |01D519;
 	lda.b #$70	  ;01D54B|A970    |      ;
 	sta.w $050b	 ;01D54D|8D0B05  |01050B;
@@ -6379,7 +6379,7 @@ BattlePalette_AnimationController:
 	jsr.w Sub_01D603 ;01D55A|2003D6  |01D603;
 	jsr.w Sub_018DF3 ;01D55D|20F38D  |018DF3;
 	lda.b #$0e	  ;01D560|A90E    |      ;
-	sta.w $1935	 ;01D562|8D3519  |011935;
+	sta.w !battle_data_index_1	 ;01D562|8D3519  |011935;
 
 ; ==============================================================================
 ; BattleColor_BlendingProcessor - Advanced Color Blending Processing System
@@ -6396,9 +6396,9 @@ BattleColor_BlendingProcessor:
 	lda.l $7fc588,x ;01D56E|BF88C57F|7FC588;
 	sta.w $192b	 ;01D572|8D2B19  |01192B;
 	lda.l $7fc608,x ;01D575|BF08C67F|7FC608;
-	sta.w $192d	 ;01D579|8D2D19  |01192D;
+	sta.w !battle_offset	 ;01D579|8D2D19  |01192D;
 	jsr.w BattleColor_InterpolationEngine ;01D57C|203CD2  |01D23C;
-	lda.w $192f	 ;01D57F|AD2F19  |01192F;
+	lda.w !battle_color_accum	 ;01D57F|AD2F19  |01192F;
 	sta.l $7fc588,x ;01D582|9F88C57F|7FC588;
 	inx ;01D586|E8      |      ;
 	inx ;01D587|E8      |      ;
@@ -6410,7 +6410,7 @@ BattleColor_BlendingProcessor:
 	sta.w !battle_phase_counter	 ;01D591|8D461A  |011A46;
 	lda.b #$10	  ;01D594|A910    |      ;
 	jsr.w .Exit_CastSpell ;01D596|20C4D6  |01D6C4;
-	dec.w $1935	 ;01D599|CE3519  |011935;
+	dec.w !battle_data_index_1	 ;01D599|CE3519  |011935;
 	bne D0c7 ;01D59C|D0C7    |01D565;
 	lda.b #$28	  ;01D59E|A928    |      ;
 	jsr.w .Exit_CastSpell ;01D5A0|20C4D6  |01D6C4;
@@ -6436,11 +6436,11 @@ BattleColor_BlendingProcessor:
 	sta.w $4300	 ;01D5C3|8D0043  |014300;
 	lda.b #$39	  ;01D5C6|A939    |      ;
 	sta.w $4301	 ;01D5C8|8D0143  |014301;
-	lda.w $192d	 ;01D5CB|AD2D19  |01192D;
+	lda.w !battle_offset	 ;01D5CB|AD2D19  |01192D;
 	sta.w $4304	 ;01D5CE|8D0443  |014304;
-	ldx.w $192e	 ;01D5D1|AE2E19  |01192E;
+	ldx.w !tilemap_y_offset	 ;01D5D1|AE2E19  |01192E;
 	stx.w $4302	 ;01D5D4|8E0243  |014302;
-	ldx.w $1930	 ;01D5D7|AE3019  |011930;
+	ldx.w !graphics_buffer_size	 ;01D5D7|AE3019  |011930;
 	stx.w $4305	 ;01D5DA|8E0543  |014305;
 	lda.b #$01	  ;01D5DD|A901    |      ;
 	sta.w $420b	 ;01D5DF|8D0B42  |01420B;
@@ -6459,14 +6459,14 @@ BattleGraphics_BufferStreamingCoordinator:	; Coordinate buffer streaming with VR
 	sep #$20		;01D5E7	; 8-bit accumulator
 	rep #$10		;01D5E9	; 16-bit X/Y
 	lda.w $1a51	 ;01D5EB	; Load buffer state
-	sta.w $192c	 ;01D5EE	; Save to temp
+	sta.w !battle_temp_hi	 ;01D5EE	; Save to temp
 	stz.w $1a51	 ;01D5F1	; Clear buffer state
 	lda.w $192b	 ;01D5F4	; Load stream counter
 	bne .ProcessStream ;01D5F7	; Branch if active
 	jmp BattleGraphics_BufferStreamingCoordinator.Finalize ;01D5F9	; Skip to finalize
 	.ProcessStream:
 	rep #$30		;01D5FC	; 16-bit A/X/Y
-	lda.w $192d	 ;01D5FE	; Load graphics address
+	lda.w !battle_offset	 ;01D5FE	; Load graphics address
 	sta.w $1b	   ;01D601	; Save for later
 
 ; ==============================================================================
@@ -6482,7 +6482,7 @@ BattleGraphics_DataProcessor:
 	sep #$20		;01D607|E220    |      ;
 	rep #$10		;01D609|C210    |      ;
 	lda.w $1a51	 ;01D60B|AD511A  |011A51;
-	sta.w $192c	 ;01D60E|8D2C19  |01192C;
+	sta.w !battle_temp_hi	 ;01D60E|8D2C19  |01192C;
 	stz.w $1a51	 ;01D611|9C511A  |011A51;
 	lda.w $192b	 ;01D614|AD2B19  |01192B;
 	beq F068 ;01D617|F068    |01D681;
@@ -6528,7 +6528,7 @@ BattleMagic_ApplyElemental:
 	dec.w $192b	 ;01D675|CE2B19  |01192B;
 	bne D0f8 ;01D678|D0F8    |01D672;
 	phb ;01D67A|8B      |      ;
-	lda.w $192c	 ;01D67B|AD2C19  |01192C;
+	lda.w !battle_temp_hi	 ;01D67B|AD2C19  |01192C;
 	sta.w $1a51	 ;01D67E|8D511A  |011A51;
 
 BattleMagic_AnimationTrigger:
@@ -6615,10 +6615,10 @@ DATA8_01d6cb:
 	stx.w $19ea	 ;01D6EE|8EEA19  |0119EA;
 	sta.w $19e7	 ;01D6F1|8DE719  |0119E7;
 	lda.w $1a7d,x   ;01D6F4|BD7D1A  |011A7D;
-	sta.w $192d	 ;01D6F7|8D2D19  |01192D;
+	sta.w !battle_offset	 ;01D6F7|8D2D19  |01192D;
 	lda.w $1a7e,x   ;01D6FA|BD7E1A  |011A7E;
 	dec a;01D6FD|3A      |      ;
-	sta.w $192e	 ;01D6FE|8D2E19  |01192E;
+	sta.w !tilemap_y_offset	 ;01D6FE|8D2E19  |01192E;
 	jsr.w Sub_01880C ;01D701|200C88  |01880C;
 	lda.l $7f8000,x ;01D704|BF00807F|7F8000;
 	inc a;01D708|1A      |      ;
@@ -6736,9 +6736,9 @@ DATA8_01d6cb:
 	phx ;01D7E6|DA      |      ;
 	ldx.w $19ea	 ;01D7E7|AEEA19  |0119EA;
 	lda.w $1a85,x   ;01D7EA|BD851A  |011A85;
-	sta.w $192d	 ;01D7ED|8D2D19  |01192D;
+	sta.w !battle_offset	 ;01D7ED|8D2D19  |01192D;
 	lda.w $1a87,x   ;01D7F0|BD871A  |011A87;
-	sta.w $192e	 ;01D7F3|8D2E19  |01192E;
+	sta.w !tilemap_y_offset	 ;01D7F3|8D2E19  |01192E;
 	plx ;01D7F6|FA      |      ;
 	jsr.w Sub_019681 ;01D7F7|208196  |019681;
 	bra .MPLoop_MPConsumption ;01D7FA|80D5    |01D7D1;
@@ -6773,7 +6773,7 @@ DATA8_01d6cb:
 battle_state_coordination_system:
 	lda.w $19e7	 ; Load battle state parameter
 	sta.w $192b	 ; Store to battle coordination register
-	stz.w $192c	 ; Clear secondary coordination flag
+	stz.w !battle_temp_hi	 ; Clear secondary coordination flag
 	jsr.w ExecuteAdvancedBattleEngineState ; Execute advanced battle engine state
 	rts ; Return from coordination
 
@@ -6804,14 +6804,14 @@ dma_coordinate_processing_system:
 	lda.w $1a85,x   ; Get X coordinate data
 	clc ; Clear carry for addition
 	adc.w DATA8_01e283 ; Add coordinate offset
-	sta.w $1935	 ; Store processed X coordinate
+	sta.w !battle_data_index_1	 ; Store processed X coordinate
 	lda.w $1a87,x   ; Get Y coordinate data
 	clc ; Clear carry for addition
 	adc.w DATA8_01e284 ; Add coordinate offset
 	sta.w $1936	 ; Store processed Y coordinate
 	php ; Save processor flags
 	rep #$30		; Set 16-bit mode
-	lda.w $1935	 ; Load X coordinate
+	lda.w !battle_data_index_1	 ; Load X coordinate
 	sta.w $0cd0	 ; Set DMA destination X
 	clc ; Clear carry
 	adc.w #$0008	; Add sprite width offset
@@ -6819,7 +6819,7 @@ dma_coordinate_processing_system:
 	clc ; Clear carry
 	adc.w #$0800	; Add VRAM page offset
 	sta.w $0cdc	 ; Set DMA destination high
-	lda.w $1935	 ; Reload X coordinate
+	lda.w !battle_data_index_1	 ; Reload X coordinate
 	clc ; Clear carry
 	adc.w #$0800	; Add VRAM offset
 	sta.w $0cd8	 ; Set DMA source high
@@ -6874,9 +6874,9 @@ character_battle_processing_system:
 ; Implements sophisticated animation state control with graphics coordination
 battle_animation_control_system:
 	ldx.w #$ff06	; Load animation parameter
-	stx.w $1935	 ; Store animation coordinate
+	stx.w !battle_data_index_1	 ; Store animation coordinate
 	lda.b #$01	  ; Set animation mode
-	sta.w $1939	 ; Store animation state
+	sta.w !battle_data_index_2	 ; Store animation state
 	jsr.w ExecuteAnimationSetup ; Execute animation setup
 	ldx.w $19ea	 ; Load character index
 	lda.w $1a85,x   ; Get character X position
@@ -6897,7 +6897,7 @@ multi_character_battle_engine:
 	lda.w $19e7	 ; Load current battle state
 	sta.w $192b	 ; Store to battle register
 	lda.b #$01	  ; Set battle mode flag
-	sta.w $192c	 ; Store battle mode
+	sta.w !battle_temp_hi	 ; Store battle mode
 	jsr.w ExecuteAdvancedBattleEngineState ; Execute battle engine
 	jsr.w FinalizeBattleState ; Finalize battle state
 	rts ; Return from multi-character engine
@@ -6910,16 +6910,16 @@ battle_formation_processing:
 	rep #$10		; Set 16-bit index registers
 	lda.b #$06	  ; Load formation parameter 1
 	jsr.w GetBattleGraphicsIndex ; Get formation data
-	stx.w $1935	 ; Store formation index X
+	stx.w !battle_data_index_1	 ; Store formation index X
 	sta.w $1937	 ; Store formation parameter A
 	lda.b #$07	  ; Load formation parameter 2
 	jsr.w GetBattleGraphicsIndex ; Get formation data
-	stx.w $1939	 ; Store formation index X
-	sta.w $193b	 ; Store formation parameter A
+	stx.w !battle_data_index_2	 ; Store formation index X
+	sta.w !battle_data_index_3	 ; Store formation parameter A
 	lda.b #$08	  ; Load formation parameter 3
 	jsr.w GetBattleGraphicsIndex ; Get formation data
-	stx.w $193d	 ; Store formation index X
-	sta.w $193f	 ; Store formation parameter A
+	stx.w !battle_data_temp_1	 ; Store formation index X
+	sta.w !battle_data_index_4	 ; Store formation parameter A
 	lda.b #$09	  ; Load formation parameter 4
 	jsr.w GetBattleGraphicsIndex ; Get formation data
 	stx.w $1941	 ; Store formation index X
@@ -6938,7 +6938,7 @@ battle_loop_control_system:
 	.RandomFactor_SuccessCheck:
 	jsr.w ExecuteBattleStep ; Execute battle step
 	jsr.w Label_0182D0 ; Process memory operations
-	ldx.w $1935	 ; Load formation index
+	ldx.w !battle_data_index_1	 ; Load formation index
 	lda.w !battle_status_array,x   ; Get formation status
 	bne .RandomFactor_SuccessCheck ; Continue if not ready
 	ply ; Restore loop counter
@@ -6955,11 +6955,11 @@ battle_loop_control_system:
 formation_state_management:
 	lda.b #$02	  ; Set formation mode
 	sta.w $192b	 ; Store to coordination register
-	ldx.w $1935	 ; Load formation 1 index
+	ldx.w !battle_data_index_1	 ; Load formation 1 index
 	jsr.w ProcessFormation ; Process formation 1
-	ldx.w $1939	 ; Load formation 2 index
+	ldx.w !battle_data_index_2	 ; Load formation 2 index
 	jsr.w ProcessFormation ; Process formation 2
-	ldx.w $193d	 ; Load formation 3 index
+	ldx.w !battle_data_temp_1	 ; Load formation 3 index
 	jsr.w ProcessFormation ; Process formation 3
 	ldx.w $1941	 ; Load formation 4 index
 ; Fall through to formation processing
@@ -7118,11 +7118,11 @@ environment_active:
 	dec.w $1030	 ; Decrement environment counter
 	jsl.l ExecuteLongEnvironmentCall ; Execute long environment call
 	lda.w $1926	 ; Load environment mode
-	sta.w $193f	 ; Store mode backup
+	sta.w !battle_data_index_4	 ; Store mode backup
 	lda.b #$02	  ; Set environment processing mode
 	sta.w $1926	 ; Store processing mode
 	ldx.w $199d	 ; Load environment coordinates
-	stx.w $1935	 ; Store coordinate backup
+	stx.w !battle_data_index_1	 ; Store coordinate backup
 	jsr.w ExecuteGraphicsMemorySetup ; Execute memory setup
 	jsr.w InitializeGraphicsMemory ; Configure DMA channels
 	rts ; Return from environment processing
@@ -7162,22 +7162,22 @@ environment_graphics_complete:
 ; Implements complex animation state machine with DMA and graphics integration
 environment_animation_control_system:
 	ldx.w #$fc00	; Load animation parameter
-	stx.w $193b	 ; Store animation state
+	stx.w !battle_data_index_3	 ; Store animation state
 ; Animation processing loop
 animation_processing_loop:
 	stz.w $0e0d	 ; Clear error status
-	lda.w $193f	 ; Load animation mode
+	lda.w !battle_data_index_4	 ; Load animation mode
 	asl a; Shift for processing
 	asl a; Shift again
-	sta.w $193d	 ; Store animation parameter
+	sta.w !battle_data_temp_1	 ; Store animation parameter
 	lda.b #$55	  ; Load animation constant
 	sta.w $0e07	 ; Store to hardware register
 ; Animation step processing
 animation_step_processing:
 	jsr.w ExecuteAlternateStep ; Execute animation step
-	ldx.w $1939	 ; Load animation index
+	ldx.w !battle_data_index_2	 ; Load animation index
 	jsr.w ProcessAnimationData ; Process animation data
-	stx.w $1939	 ; Store updated index
+	stx.w !battle_data_index_2	 ; Store updated index
 	bra animation_continue ; Branch to continue
 animation_continue_alternate:
 	jsr.w ExecuteAlternateStep ; Execute alternate step
@@ -7186,9 +7186,9 @@ animation_continue:
 	lda.w $0e07	 ; Load hardware status
 	eor.b #$04	  ; Toggle status bit
 	sta.w $0e07	 ; Store updated status
-	lda.w $193d	 ; Load animation parameter
+	lda.w !battle_data_temp_1	 ; Load animation parameter
 	dec a; Decrement counter
-	sta.w $193d	 ; Store updated counter
+	sta.w !battle_data_temp_1	 ; Store updated counter
 	bit.b #$01	  ; Test bit 0
 	bne animation_step_processing ; Branch if set
 	cmp.b #$00	  ; Compare with zero
@@ -7200,28 +7200,28 @@ animation_continue:
 ; Manages sophisticated environment state with DMA and graphics coordination
 environment_parameter_management:
 	ldx.w #$0004	; Load parameter set 1
-	stx.w $193b	 ; Store parameter state
+	stx.w !battle_data_index_3	 ; Store parameter state
 	bra animation_processing_loop ; Branch to processing
 ; Alternate parameter processing
 	ldx.w #$00fc	; Load parameter set 2
-	stx.w $193b	 ; Store parameter state
+	stx.w !battle_data_index_3	 ; Store parameter state
 	bra animation_processing_loop ; Branch to processing
 
 ; Advanced Dynamic Coordinate Processing Engine
 ; Sophisticated coordinate processing with dynamic transformation and DMA
 ; Implements complex coordinate calculations with memory management
 dynamic_coordinate_processing_engine:
-	lda.w $193b	 ; Load coordinate delta X
+	lda.w !battle_data_index_3	 ; Load coordinate delta X
 	clc ; Clear carry for addition
-	adc.w $1935	 ; Add to current X coordinate
-	sta.w $1935	 ; Store updated X coordinate
-	lda.w $193c	 ; Load coordinate delta Y
+	adc.w !battle_data_index_1	 ; Add to current X coordinate
+	sta.w !battle_data_index_1	 ; Store updated X coordinate
+	lda.w !battle_array_data_2	 ; Load coordinate delta Y
 	clc ; Clear carry for addition
 	adc.w $1936	 ; Add to current Y coordinate
 	sta.w $1936	 ; Store updated Y coordinate
 	php ; Save processor flags
 	rep #$30		; Set 16-bit mode
-	lda.w $1935	 ; Load X coordinate
+	lda.w !battle_data_index_1	 ; Load X coordinate
 	sta.w $0cd0	 ; Set DMA destination X
 	clc ; Clear carry
 	adc.w #$0008	; Add sprite width offset
@@ -7229,7 +7229,7 @@ dynamic_coordinate_processing_engine:
 	clc ; Clear carry
 	adc.w #$0800	; Add VRAM page offset
 	sta.w $0cdc	 ; Set DMA destination high
-	lda.w $1935	 ; Reload X coordinate
+	lda.w !battle_data_index_1	 ; Reload X coordinate
 	clc ; Clear carry
 	adc.w #$0800	; Add VRAM offset
 	sta.w $0cd8	 ; Set DMA source high
@@ -7475,7 +7475,7 @@ animation_setup:
 ; Implements complex movement calculations with multi-directional support and state coordination
 battle_direction_movement_processing_engine:
 	lda.w !current_direction	 ; Load current direction state
-	sta.w $193b	 ; Store to movement buffer
+	sta.w !battle_data_index_3	 ; Store to movement buffer
 	lda.w !target_direction	 ; Load target direction state
 	sta.w !current_direction	 ; Store as current direction
 	ldx.w !movement_config	 ; Load movement configuration
@@ -7483,7 +7483,7 @@ battle_direction_movement_processing_engine:
 	lda.w !movement_flags	 ; Load movement flags
 	ldy.w $19f1	 ; Load movement index
 	jsr.w .BattleMenu_SelectionConfirm ; Execute movement processing
-	lda.w $193b	 ; Load movement buffer
+	lda.w !battle_data_index_3	 ; Load movement buffer
 	eor.w !target_direction	 ; XOR with target direction
 	bmi battle_direction_reverse ; Branch if direction reversed
 	lda.b #$02	  ; Set forward movement code
@@ -7707,13 +7707,13 @@ pathfinding_standard_setup:
 	sty.w $1926	 ; Store pathfinding parameters
 	lda.w $19b4	 ; Load battle pathfinding data
 	and.b #$07	  ; Mask pathfinding direction
-	sta.w $1933	 ; Store pathfinding direction
+	sta.w !battle_counter	 ; Store pathfinding direction
 	ldx.w $0e89	 ; Load pathfinding coordinates
-	stx.w $193b	 ; Store pathfinding X coordinate
+	stx.w !battle_data_index_3	 ; Store pathfinding X coordinate
 	ldx.w !movement_state	 ; Load pathfinding state
-	stx.w $193d	 ; Store pathfinding Y coordinate
+	stx.w !battle_data_temp_1	 ; Store pathfinding Y coordinate
 	lda.w !current_direction	 ; Load pathfinding direction state
-	sta.w $193f	 ; Store pathfinding direction backup
+	sta.w !battle_data_index_4	 ; Store pathfinding direction backup
 	ldx.w $19f1	 ; Load pathfinding index
 	stx.w $1943	 ; Store pathfinding index backup
 	ldx.w !movement_config	 ; Load pathfinding configuration
@@ -7756,19 +7756,19 @@ UNREACH_01EF3B:
 Advanced_Coordinate_Analysis:
 	lda.w $19b4	 ; Load primary coordinate register
 	and.b #$07	  ; Extract lower coordinate bits
-	sta.w $193b	 ; Store X-axis coordinate component
+	sta.w !battle_data_index_3	 ; Store X-axis coordinate component
 	lda.w !movement_config	 ; Load secondary coordinate register
 	and.b #$07	  ; Extract coordinate fragment
-	sta.w $193c	 ; Store Y-axis coordinate component
+	sta.w !battle_array_data_2	 ; Store Y-axis coordinate component
 	lda.w !coordinate_register	 ; Load tertiary coordinate register
 	and.b #$07	  ; Extract Z-axis coordinate fragment
-	sta.w $193d	 ; Store depth coordinate component
+	sta.w !battle_data_temp_1	 ; Store depth coordinate component
 
 ; Multi-Dimensional Battle Entity Processing System
 ; Advanced entity tracking with coordinate validation and error checking
 Multi_Entity_Coordinate_Processing:
 	ldx.w #$0000	; Initialize entity index
-	stx.w $193f	 ; Clear entity processing flags
+	stx.w !battle_data_index_4	 ; Clear entity processing flags
 	ldy.w $19f1	 ; Load primary entity reference
 	jsr.w .BattleEscape_FailureHandling ; Execute entity coordinate validation
 	bcc Entity_Processing_Complete ; Branch if validation successful
@@ -7783,7 +7783,7 @@ Entity_Attribute_Analysis:
 	db $a9,$07,$60 ; Advanced attribute completion code
 
 Continue_Attribute_Processing:
-	inc.w $193f	 ; Increment processing counter
+	inc.w !battle_data_index_4	 ; Increment processing counter
 	lda.w $1a7f,x   ; Reload entity attributes
 	bit.b #$08	  ; Test advanced attribute flag
 	beq Entity_Processing_Complete ; Branch if basic attributes only
@@ -7815,10 +7815,10 @@ Secondary_Entity_Processing:
 Secondary_Attribute_Coordination:
 	lda.w $1a80,x   ; Load secondary attribute extension
 	and.b #$07	  ; Extract coordination bits
-	sta.w $193d	 ; Store coordinated attribute
+	sta.w !battle_data_temp_1	 ; Store coordinated attribute
 	lda.w !coordinate_register	 ; Load primary coordination register
 	and.b #$f8	  ; Preserve upper coordination bits
-	ora.w $193d	 ; Merge with secondary attributes
+	ora.w !battle_data_temp_1	 ; Merge with secondary attributes
 	sta.w !coordinate_register	 ; Store unified coordination state
 	stz.w $1940	 ; Clear secondary processing counter
 
@@ -7883,23 +7883,23 @@ Tertiary_Negative_Processing:
 
 Tertiary_State_Error:
 	lda.b #$07	  ; Set tertiary error code
-	sta.w $193d	 ; Store tertiary error state
+	sta.w !battle_data_temp_1	 ; Store tertiary error state
 
 ; Advanced Multi-State Coordination Engine
 ; Sophisticated coordination between multiple battle states
 Multi_State_Coordination:
 	ldx.w #$0000	; Initialize coordination index
 	txy ; Transfer to Y register
-	lda.w $193c	 ; Load secondary coordination state
+	lda.w !battle_array_data_2	 ; Load secondary coordination state
 	beq Primary_Coordination_Mode ; Branch if primary mode only
 	cmp.b #$07	  ; Check for advanced coordination mode
 	bcs Complex_Coordination_Error ; Branch if coordination overflow
 
 ; Primary-Secondary Coordination Analysis
 Primary_Secondary_Coordination:
-	lda.w $193b	 ; Load primary coordination reference
+	lda.w !battle_data_index_3	 ; Load primary coordination reference
 	beq Primary_Coordination_Mode ; Branch if primary mode active
-	cmp.w $193c	 ; Compare primary with secondary
+	cmp.w !battle_array_data_2	 ; Compare primary with secondary
 	beq Primary_Coordination_Mode ; Branch if coordination match
 	bcc Complex_Coordination_Error ; Branch if coordination underflow
 
@@ -7907,9 +7907,9 @@ Primary_Secondary_Coordination:
 	lda.w $1940	 ; Load coordination state machine
 	bne Complex_Coordination_Error ; Branch if state machine conflict
 	dey ; Decrement coordination counter
-	lda.w $193d	 ; Load tertiary coordination
+	lda.w !battle_data_temp_1	 ; Load tertiary coordination
 	beq Coordination_Complete ; Branch if tertiary coordination complete
-	cmp.w $193b	 ; Compare tertiary with primary
+	cmp.w !battle_data_index_3	 ; Compare tertiary with primary
 	beq Coordination_Complete ; Branch if coordination synchronized
 	iny ; Increment coordination counter
 	bra Complex_Coordination_Error ; Branch to error handling
@@ -7918,28 +7918,28 @@ Primary_Coordination_Mode:
 ; Advanced primary-only coordination processing
 	lda.w $1940	 ; Load primary coordination state
 	bne Secondary_Coordination_Fallback ; Branch if secondary fallback needed
-	lda.w $193d	 ; Load primary coordination reference
+	lda.w !battle_data_temp_1	 ; Load primary coordination reference
 	beq Coordination_Complete ; Branch if coordination complete
 	cmp.b #$07	  ; Check for coordination overflow
 	bcs Secondary_Coordination_Fallback ; Branch if overflow detected
 
 ; Primary Coordination Validation
-	lda.w $193b	 ; Load primary validation reference
+	lda.w !battle_data_index_3	 ; Load primary validation reference
 	beq Tertiary_Coordination_Check ; Branch if tertiary check needed
-	cmp.w $193d	 ; Compare primary with reference
+	cmp.w !battle_data_temp_1	 ; Compare primary with reference
 	beq Coordination_Complete ; Branch if validation successful
 
 Secondary_Coordination_Fallback:
 ; Handle coordination fallback scenarios
-	lda.w $193f	 ; Load fallback state
+	lda.w !battle_data_index_4	 ; Load fallback state
 	bne Complex_Coordination_Error ; Branch if fallback conflict
 	bra Coordination_Success ; Branch to success handler
 
 Tertiary_Coordination_Check:
 ; Advanced tertiary coordination validation
-	lda.w $193c	 ; Load tertiary coordination state
+	lda.w !battle_array_data_2	 ; Load tertiary coordination state
 	beq Coordination_Complete ; Branch if tertiary complete
-	cmp.w $193d	 ; Compare with coordination reference
+	cmp.w !battle_data_temp_1	 ; Compare with coordination reference
 	bne Secondary_Coordination_Fallback ; Branch if tertiary mismatch
 
 Coordination_Complete:
@@ -8782,7 +8782,7 @@ Advanced_Graphics_Enhancement:
 	php ; Preserve processor status
 	sep #$20		; Set 8-bit accumulator mode
 	ldx.w #$0000	; Initialize coordinate processing index
-	ldy.w $192d	 ; Load coordinate reference
+	ldy.w !battle_offset	 ; Load coordinate reference
 	jsr.w .BattleWindow_SetAttributes ; Execute coordinate processing
 	plp ; Restore processor status
 	rts ; Return coordinate processing complete
@@ -9583,11 +9583,11 @@ BattleGraphics_FinalCoordination:
 	lda.w $0e89	 ; Load environment coordination context
 	sec ; Set carry for coordinate adjustment
 	sbc.b #$08	  ; Subtract coordinate offset for precision
-	sta.w $192d	 ; Store adjusted X coordinate reference
+	sta.w !battle_offset	 ; Store adjusted X coordinate reference
 	lda.w $0e8a	 ; Load environment Y coordination context
 	sec ; Set carry for Y coordinate adjustment
 	sbc.b #$06	  ; Subtract Y coordinate offset for precision
-	sta.w $192e	 ; Store adjusted Y coordinate reference
+	sta.w !tilemap_y_offset	 ; Store adjusted Y coordinate reference
 	ldx.w #$000f	; Set system coordination parameter primary
 	stx.w $19bf	 ; Store coordination parameter primary
 	ldx.w #$0000	; Clear system coordination parameter secondary
@@ -9599,7 +9599,7 @@ Final_System_Coordination_Loop:
 	phx ; Preserve system coordination index
 	jsr.w .BattleWindow_DrawBorder ; Execute advanced coordinate processing
 	jsr.w Label_0183BF ; Execute system integration coordination
-	inc.w $192e	 ; Increment coordinate processing sequence
+	inc.w !tilemap_y_offset	 ; Increment coordinate processing sequence
 	plx ; Restore system coordination index
 	stx.w $19bf	 ; Update coordination parameters
 	inx ; Increment system coordination index
@@ -9700,4 +9700,8 @@ Bank_01_Termination_Marker:
 ; CONFIDENCE LEVEL: MAXIMUM - Ready for continued aggressive import campaign
 
 ; Bank $01 Campaign Complete - Initiating Bank $02 Import Sequence
+
+
+
+
 

@@ -322,11 +322,17 @@
 !battle_param_1         = $1914     ; Battle parameter/calculation temp 1
 
 !battle_direct_page     = $192b     ; Battle system direct page base ($192b)
+!battle_temp_hi         = $192c     ; Battle temporary storage (high byte pair with $192b)
 !battle_offset          = $192d     ; Battle data offset/destination offset
+!battle_color_accum     = $192f     ; Color component accumulator / General temp data
+!graphics_buffer_size   = $1930     ; Graphics buffer size/offset parameter
+!battle_delta_accum     = $1931     ; Battle delta accumulator (for calculations)
 !battle_counter         = $1933     ; Battle loop/operation counter
 !battle_data_index_1    = $1935     ; Battle data index/pointer 1
 !battle_data_index_2    = $1939     ; Battle data index/pointer 2
+!battle_array_data_1    = $193a     ; Battle array data element 1
 !battle_data_index_3    = $193b     ; Battle data index/pointer 3
+!battle_array_data_2    = $193c     ; Battle array data element 2 / Y coordinate
 !battle_data_temp_1     = $193d     ; Battle temporary data 1
 !battle_data_temp_2     = $193e     ; Battle temporary data 2
 !battle_data_index_4    = $193f     ; Battle data index/pointer 4
