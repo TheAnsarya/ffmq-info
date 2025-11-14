@@ -83,8 +83,8 @@ Battle_Initialize:
 	lda.b #$ff	  ; Inactive/disabled marker
 	sta.w !battle_state_flag	 ; Set battle state flag to inactive
 
-	stz.w $1a46	 ; Clear battle phase counter
-	stz.w $1a45	 ; Clear animation frame
+	stz.w !battle_phase_counter	 ; Clear battle phase counter
+	stz.w !battle_animation_frame	 ; Clear animation frame
 	stz.w !battle_turn_counter	 ; Clear turn counter
 	stz.w !battle_status_timer	 ; Clear status effect timer
 
@@ -122,7 +122,7 @@ Battle_Initialize:
 	rep #$10		; 16-bit X,Y
 
 ; Clear WRAM battle buffer ($019400-$01a400)
-	stz.w $1a46	 ; Reset phase counter
+	stz.w !battle_phase_counter	 ; Reset phase counter
 
 	ldx.w #$9400	; WRAM battle buffer
 	stx.w SNES_WMADDL ; Set WRAM address low/mid
@@ -143,10 +143,10 @@ Battle_Initialize_ClearLoop:
 	phb ; Save data bank
 
 	lda.w #$ffff	; Fill pattern
-	sta.w $1a72	 ; First word of status array
+	sta.w !battle_status_array	 ; First word of status array
 
-	ldx.w #$1a72	; Source address
-	ldy.w #$1a73	; Destination address
+	ldx.w #!battle_status_array	; Source address
+	ldy.w #!battle_status_array+1	; Destination address
 	lda.w #$023b	; 571 bytes to copy
 	mvn $00,$00	 ; Block fill (source bank, dest bank)
 
@@ -398,7 +398,7 @@ Battle_MainLoop:
 	stx.w !battle_target_select	 ; Clear target selection
 
 	ldx.w #$8000	; Battle active flag
-	stx.w $1a48	 ; Set battle in progress
+	stx.w !battle_active_flag	 ; Set battle in progress
 
 	stz.w !battle_phase	 ; Clear battle phase
 
@@ -1838,7 +1838,7 @@ BattleSprite_GraphicsProcessor:
 	sep #$20		;01A692|E220    |      ;
 	rep #$10		;01A694|C210    |      ;
 	phd ;01A696|0B      |      ;
-	pea.w $1a72	 ;01A697|F4721A  |001A72;
+	pea.w !battle_status_array	 ;01A697|F4721A  |001A72;
 	pld ;01A69A|2B      |      ;
 	ldx.w #$0000	;01A69B|A20000  |      ;
 	stx.w !battle_data_index_2	 ;01A69E|8E3919  |001939;
@@ -2770,7 +2770,7 @@ BattleSprite_GraphicsProcessor_1:
 	sep #$20		;01A692|E220    |      ;
 	rep #$10		;01A694|C210    |      ;
 	phd ;01A696|0B      |      ;
-	pea.w $1a72	 ;01A697|F4721A  |001A72;
+	pea.w !battle_status_array	 ;01A697|F4721A  |001A72;
 	pld ;01A69A|2B      |      ;
 	ldx.w #$0000	;01A69B|A20000  |      ;
 	stx.w !battle_data_index_2	 ;01A69E|8E3919  |001939;
@@ -2989,7 +2989,7 @@ BattleEffect_TrailRenderer:
 	rep #$10		;01A80B|C210    |      ;
 	stz.w $1948	 ;01A80D|9C4819  |011948;
 	php ;01A810|08      |      ;
-	pea.w $1a72	 ;01A811|F4721A  |011A72;
+	pea.w !battle_status_array	 ;01A811|F4721A  |011A72;
 	pld ;01A814|2B      |      ;
 	phy ;01A815|5A      |      ;
 	jsr.w Sub_01A6FC ;01A816|20FCA6  |01A6FC;
@@ -3005,7 +3005,7 @@ BattleEffect_TrailRenderer:
 	plp ;01A82A|28      |      ;
 	ldx.w $1939	 ;01A82B|AE3919  |011939;
 	lda.b #$02	  ;01A82E|A902    |      ;
-	sta.w $1a72,x   ;01A830|9D721A  |011A72;
+	sta.w !battle_status_array,x   ;01A830|9D721A  |011A72;
 	plp ;01A833|28      |      ;
 	rts ;01A834|60      |      ;
 
@@ -3876,7 +3876,7 @@ Battle_UpdateState:
 	rep #$10		;01AD7B|C210    |      ;
 	jsr.w Sub_018DF3 ;01AD7D|20F38D  |018DF3;
 	lda.b #$01	  ;01AD80|A901    |      ;
-	sta.w $1a46	 ;01AD82|8D461A  |011A46;
+	sta.w !battle_phase_counter	 ;01AD82|8D461A  |011A46;
 	jsr.w Sub_018DF3 ;01AD85|20F38D  |018DF3;
 	plp ;01AD88|28      |      ;
 	rts ;01AD89|60      |      ;
@@ -4044,10 +4044,10 @@ BattleHUD_UpdateStatusDisplay:
 BattleHUD_DrawCharacterName:
 	ldx.w $1935	 ;01AEA0|AE3519  |001935;
 	lda.w $1938	 ;01AEA3|AD3819  |001938;
-	sta.w $1a72,x   ;01AEA6|9D721A  |001A72;
+	sta.w !battle_status_array,x   ;01AEA6|9D721A  |001A72;
 	ldx.w $1939	 ;01AEA9|AE3919  |001939;
 	lda.w $193c	 ;01AEAC|AD3C19  |00193C;
-	sta.w $1a72,x   ;01AEAF|9D721A  |001A72;
+	sta.w !battle_status_array,x   ;01AEAF|9D721A  |001A72;
 	rts ;01AEB2|60      |      ;
 
 ; ==============================================================================
@@ -4059,7 +4059,7 @@ BattleAnim_HandleSequence:
 	phy ;01AEB3|5A      |      ;
 	ldx.w $1935	 ;01AEB4|AE3519  |001935;
 	lda.b #$10	  ;01AEB7|A910    |      ;
-	sta.w $1a72,x   ;01AEB9|9D721A  |001A72;
+	sta.w !battle_status_array,x   ;01AEB9|9D721A  |001A72;
 	sta.w $193d	 ;01AEBC|8D3D19  |00193D;
 	lda.w $1a80,x   ;01AEBF|BD801A  |001A80;
 	and.b #$cf	  ;01AEC2|29CF    |      ;
@@ -4075,7 +4075,7 @@ BattleAnim_HandleSequence:
 	ldx.w $1939	 ;01AED7|AE3919  |001939;
 	lda.w $192b	 ;01AEDA|AD2B19  |01192B;
 	ora.b #$90	  ;01AEDD|0990    |      ;
-	sta.w $1a72,x   ;01AEDF|9D721A  |001A72;
+	sta.w !battle_status_array,x   ;01AEDF|9D721A  |001A72;
 	sta.w $193e	 ;01AEE2|8D3E19  |00193E;
 	jsr.w JumpUnitProcessor ;01AEE5|2082CC  |01CC82;
 	ply ;01AEE8|7A      |      ;
@@ -4099,7 +4099,7 @@ BattleHUD_RefreshAllBars:
 	jsr.w Label_0182D0 ;01AEF9|20D082  |0182D0;
 	plp ;01AEFC|28      |      ;
 	plx ;01AEFD|FA      |      ;
-	lda.w $1a72,x   ;01AEFE|BD721A  |001A72;
+	lda.w !battle_status_array,x   ;01AEFE|BD721A  |001A72;
 	bne D0f1 ;01AF01|D0F1    |01AEF4;
 	ply ;01AF03|7A      |      ;
 	dey ;01AF04|88      |      ;
@@ -4107,11 +4107,11 @@ BattleHUD_RefreshAllBars:
 	phy ;01AF07|5A      |      ;
 	ldx.w $1935	 ;01AF08|AE3519  |001935;
 	lda.w $193d	 ;01AF0B|AD3D19  |00193D;
-	sta.w $1a72,x   ;01AF0E|9D721A  |001A72;
+	sta.w !battle_status_array,x   ;01AF0E|9D721A  |001A72;
 	jsr.w JumpUnitProcessor ;01AF11|2082CC  |01CC82;
 	ldx.w $1939	 ;01AF14|AE3919  |001939;
 	lda.w $193e	 ;01AF17|AD3E19  |00193E;
-	sta.w $1a72,x   ;01AF1A|9D721A  |001A72;
+	sta.w !battle_status_array,x   ;01AF1A|9D721A  |001A72;
 	jsr.w JumpUnitProcessor ;01AF1D|2082CC  |01CC82;
 	inc.w $19f7	 ;01AF20|EEF719  |0119F7;
 	bra D0f1 ;01AF23|80CF    |01AEF4;
@@ -4483,7 +4483,7 @@ BattleChar_LoadAndManage:
 BattleData_TransferCoordination:
 	ldx.w $1935	 ;01B18E|AE3519  |001935;
 	lda.w $193a	 ;01B191|AD3A19  |00193A;
-	sta.w $1a72,x   ;01B194|9D721A  |001A72;
+	sta.w !battle_status_array,x   ;01B194|9D721A  |001A72;
 	lda.w $193b	 ;01B197|AD3B19  |00193B;
 	sta.w $1a73,x   ;01B19A|9D731A  |001A73;
 	lda.w $193c	 ;01B19D|AD3C19  |00193C;
@@ -4510,7 +4510,7 @@ BattleMem_InitializeLoops:
 
 	.FillLoop:
 	lda.w #$00ff	;01B1C5|A9FF00  |      ;
-	sta.w $1a72,x   ;01B1C8|9D721A  |001A72;
+	sta.w !battle_status_array,x   ;01B1C8|9D721A  |001A72;
 	inx ;01B1CB|E8      |      ;
 	inx ;01B1CC|E8      |      ;
 	cpx.w #$0020	;01B1CD|E02000  |      ;
@@ -5268,7 +5268,7 @@ BattleSprite_ProcessingEngine:
 	phd ;01B773|0B      |      ;
 	sep #$20		;01B774|E220    |      ;
 	rep #$10		;01B776|C210    |      ;
-	pea.w $1a72	 ;01B778|F4721A  |011A72;
+	pea.w !battle_status_array	 ;01B778|F4721A  |011A72;
 	pld ;01B77B|2B      |      ;
 	ldx.w #$0000	;01B77C|A20000  |      ;
 	stx.w $1975	 ;01B77F|8E7519  |011975;
@@ -5521,7 +5521,7 @@ BattleSystem_StateController:
 	phd ;01B908|0B      |      ;
 	sep #$20		;01B909|E220    |      ;
 	rep #$10		;01B90B|C210    |      ;
-	pea.w $1a72	 ;01B90D|F4721A  |011A72;
+	pea.w !battle_status_array	 ;01B90D|F4721A  |011A72;
 	pld ;01B910|2B      |      ;
 	lda.b $0e,x	 ;01B911|B50E    |001A80;
 	and.b #$c0	  ;01B913|29C0    |      ;
@@ -5588,10 +5588,10 @@ BattleScene_TransitionManager:
 	jsr.w GetBattleGraphicsIndex ;01B99A|20EBB1  |01B1EB;
 	sta.w $1939	 ;01B99D|8D3919  |011939;
 	stx.w $193b	 ;01B9A0|8E3B19  |01193B;
-	lda.w $1a72,x   ;01B9A3|BD721A  |011A72;
+	lda.w !battle_status_array,x   ;01B9A3|BD721A  |011A72;
 	sta.w $193a	 ;01B9A6|8D3A19  |01193A;
 	lda.b #$04	  ;01B9A9|A904    |      ;
-	sta.w $1a72,x   ;01B9AB|9D721A  |011A72;
+	sta.w !battle_status_array,x   ;01B9AB|9D721A  |011A72;
 	lda.w $1a7d,x   ;01B9AE|BD7D1A  |011A7D;
 	dec a;01B9B1|3A      |      ;
 	sta.w $192d	 ;01B9B2|8D2D19  |01192D;
@@ -5738,7 +5738,7 @@ BattleAnimation_LoopController:
 	sta.w $1931	 ;01D0FC|8D3119  |011931;
 	plp ;01D0FF|28      |      ;
 	lda.b #$03	  ;01D100|A903    |      ;
-	sta.w $1a46	 ;01D102|8D461A  |011A46;
+	sta.w !battle_phase_counter	 ;01D102|8D461A  |011A46;
 	jsr.w Sub_018DF3 ;01D105|20F38D  |018DF3;
 	lda.w $192b	 ;01D108|AD2B19  |01192B;
 	clc ;01D10B|18      |      ;
@@ -5764,7 +5764,7 @@ BattleChar_SpriteDiscovery:
 	bcc .Exit	   ;01D125|9026    |01D14D;
 	stx.w $1935	 ;01D127|8E3519  |011935;
 	sta.w $1937	 ;01D12A|8D3719  |011937;
-	lda.w $1a72,x   ;01D12D|BD721A  |011A72;
+	lda.w !battle_status_array,x   ;01D12D|BD721A  |011A72;
 	sta.w $1938	 ;01D130|8D3819  |011938;
 	jsr.w Sub_01D14E ;01D133|204ED1  |01D14E;
 	lda.b #$01	  ;01D136|A901    |      ;
@@ -5772,7 +5772,7 @@ BattleChar_SpriteDiscovery:
 	bcc .Exit	   ;01D13B|9010    |01D14D;
 	stx.w $1939	 ;01D13D|8E3919  |011939;
 	sta.w $193b	 ;01D140|8D3B19  |01193B;
-	lda.w $1a72,x   ;01D143|BD721A  |011A72;
+	lda.w !battle_status_array,x   ;01D143|BD721A  |011A72;
 	sta.w $1938	 ;01D146|8D3819  |011938;
 	jsr.w Sub_01D14E ;01D149|204ED1  |01D14E;
 	sec ;01D14C|38      |      ;
@@ -6069,7 +6069,7 @@ BattlePalette_AnimationLoop:
 	bne .ProcessLoop ;01D32C|D0EA    |01D318;
 	plp ;01D32E|28      |      ;
 	lda.b #$05	  ;01D32F|A905    |      ;
-	sta.w $1a46	 ;01D331|8D461A  |011A46;
+	sta.w !battle_phase_counter	 ;01D331|8D461A  |011A46;
 	jsr.w Sub_018DF3 ;01D334|20F38D  |018DF3;
 	lda.b #$10	  ;01D337|A910    |      ;
 	jsr.w Sub_01D6A9 ;01D339|20A9D6  |01D6A9;
@@ -6115,7 +6115,7 @@ BattleGraphics_DMATransferSystem:
 	.UpdateLoop:
 	jsr.w Sub_018DF3 ;01D377|20F38D  |018DF3;
 	lda.b #$07	  ;01D37A|A907    |      ;
-	sta.w $1a46	 ;01D37C|8D461A  |011A46;
+	sta.w !battle_phase_counter	 ;01D37C|8D461A  |011A46;
 	jsr.w Sub_018DF3 ;01D37F|20F38D  |018DF3;
 	jsr.w BattleGraphics_ProcessCoordinator ;01D382|2086D3  |01D386;
 	rts ;01D385|60      |      ;
@@ -6135,7 +6135,7 @@ BattleGraphics_ProcessCoordinator:
 	ldx.w $1930	 ;01D398|AE3019  |011930;
 	stx.w $193a	 ;01D39B|8E3A19  |01193A;
 	lda.b #$04	  ;01D39E|A904    |      ;
-	sta.w $1a46	 ;01D3A0|8D461A  |011A46;
+	sta.w !battle_phase_counter	 ;01D3A0|8D461A  |011A46;
 	jmp.w Sub_018DF3 ;01D3A3|4CF38D  |018DF3;
 
 ; ==============================================================================
@@ -6202,7 +6202,7 @@ BattleGraphics_MultiLayerLoop:
 	stx.w $193a	 ;01D40F|8E3A19  |01193A;
 	jsr.w Sub_018DF3 ;01D412|20F38D  |018DF3;
 	lda.b #$04	  ;01D415|A904    |      ;
-	sta.w $1a46	 ;01D417|8D461A  |011A46;
+	sta.w !battle_phase_counter	 ;01D417|8D461A  |011A46;
 	jsr.w Label_0182D0 ;01D41A|20D082  |0182D0;
 	ldx.w #$0100	;01D41D|A20001  |      ;
 	stx.w $192b	 ;01D420|8E2B19  |01192B;
@@ -6218,7 +6218,7 @@ BattleGraphics_MultiLayerLoop:
 	ldx.w #$0080	;01D43E|A28000  |      ;
 	stx.w $193a	 ;01D441|8E3A19  |01193A;
 	lda.b #$04	  ;01D444|A904    |      ;
-	sta.w $1a46	 ;01D446|8D461A  |011A46;
+	sta.w !battle_phase_counter	 ;01D446|8D461A  |011A46;
 	jsr.w Label_0182D0 ;01D449|20D082  |0182D0;
 	lda.w $1933	 ;01D44C|AD3319  |011933;
 	clc ;01D44F|18      |      ;
@@ -6320,7 +6320,7 @@ BattleChar_AnimationProcessor:
 	sep #$20		;01D4EC|E220    |      ;
 	rep #$10		;01D4EE|C210    |      ;
 	lda.b #$03	  ;01D4F0|A903    |      ;
-	sta.w $1a72,x   ;01D4F2|9D721A  |011A72;
+	sta.w !battle_status_array,x   ;01D4F2|9D721A  |011A72;
 	plp ;01D4F5|28      |      ;
 	rep #$30		;01D4F6|C230    |      ;
 	ldy.w #$000c	;01D4F8|A00C00  |      ;
@@ -6364,7 +6364,7 @@ BattlePalette_AnimationController:
 	bne .ColorLoop  ;01D536|D0EA    |01D522;
 	plp ;01D538|28      |      ;
 	lda.b #$05	  ;01D539|A905    |      ;
-	sta.w $1a46	 ;01D53B|8D461A  |011A46;
+	sta.w !battle_phase_counter	 ;01D53B|8D461A  |011A46;
 	jsr.w Sub_018DF3 ;01D53E|20F38D  |018DF3;
 	lda.b #$10	  ;01D541|A910    |      ;
 	jsr.w .Exit_CastSpell ;01D543|20C4D6  |01D6C4;
@@ -6407,7 +6407,7 @@ BattleColor_BlendingProcessor:
 	plp ;01D58B|28      |      ;
 	jsr.w Sub_018DF3 ;01D58C|20F38D  |018DF3;
 	lda.b #$05	  ;01D58F|A905    |      ;
-	sta.w $1a46	 ;01D591|8D461A  |011A46;
+	sta.w !battle_phase_counter	 ;01D591|8D461A  |011A46;
 	lda.b #$10	  ;01D594|A910    |      ;
 	jsr.w .Exit_CastSpell ;01D596|20C4D6  |01D6C4;
 	dec.w $1935	 ;01D599|CE3519  |011935;
@@ -6518,7 +6518,7 @@ BattleMagic_CalculatePower:
 	rep #$10		;01D660|C210    |      ;
 	jsr.w Sub_018DF3 ;01D662|20F38D  |018DF3;
 	lda.b #$06	  ;01D665|A906    |      ;
-	sta.w $1a46	 ;01D667|8D461A  |011A46;
+	sta.w !battle_phase_counter	 ;01D667|8D461A  |011A46;
 	jsr.w Sub_018DF3 ;01D66A|20F38D  |018DF3;
 	lda.w $192b	 ;01D66D|AD2B19  |01192B;
 	bmi Sub_01D6A5 ;01D670|3033    |01D6A5;
@@ -6545,7 +6545,7 @@ BattleMagic_AnimationTrigger:
 	sep #$20		;01D69C|E220    |      ;
 	rep #$10		;01D69E|C210    |      ;
 	lda.b #$06	  ;01D6A0|A906    |      ;
-	sta.w $1a46	 ;01D6A2|8D461A  |011A46;
+	sta.w !battle_phase_counter	 ;01D6A2|8D461A  |011A46;
 
 BattleMagic_MPConsumption:
 	plp ;01D6A5|28      |      ;
@@ -6939,7 +6939,7 @@ battle_loop_control_system:
 	jsr.w ExecuteBattleStep ; Execute battle step
 	jsr.w Label_0182D0 ; Process memory operations
 	ldx.w $1935	 ; Load formation index
-	lda.w $1a72,x   ; Get formation status
+	lda.w !battle_status_array,x   ; Get formation status
 	bne .RandomFactor_SuccessCheck ; Continue if not ready
 	ply ; Restore loop counter
 	dey ; Decrement counter
@@ -6969,7 +6969,7 @@ formation_state_management:
 ; Implements unit-specific processing with battle integration
 formation_unit_processing:
 	lda.b #$92	  ; Load formation unit constant
-	sta.w $1a72,x   ; Store unit status
+	sta.w !battle_status_array,x   ; Store unit status
 	jmp.w JumpUnitProcessor ; Jump to unit processor
 ; Return via jump target
 
@@ -8724,7 +8724,7 @@ Graphics_Buffer_Init_Loop:
 ; Sophisticated buffer processing with coordinate transformation
 	.BattleText_NextCharacter:
 	lda.b #$08	  ; Set graphics processing iteration count
-	sta.w $1a46	 ; Store iteration control
+	sta.w !battle_phase_counter	 ; Store iteration control
 	jsr.w Label_0182D0 ; Execute graphics coordination
 	ldx.w #$0004	; Set graphics processing steps
 	inc.w $1904	 ; Increment graphics sequence counter

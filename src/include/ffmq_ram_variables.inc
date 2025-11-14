@@ -428,6 +428,14 @@
 
 !ram_1a2d           = $1a2d     ; Legacy label
 !ram_1a31           = $1a31     ; Legacy label
+
+; ----------------------------------------------------------------------------
+; Battle State and Status Arrays ($1a45-$1cad)
+; ----------------------------------------------------------------------------
+!battle_animation_frame = $1a45     ; Battle animation frame counter / Graphics init flag
+!battle_phase_counter   = $1a46     ; Battle phase counter / Step counter
+!battle_active_flag     = $1a48     ; Battle in progress flag ($8000 = active)
+!battle_status_array    = $1a72     ; Battle status/data array base [571 bytes: $1a72-$1cad]
 !ram_1a32           = $1a32     ; Legacy label
 !ram_1a33           = $1a33     ; Legacy label
 !ram_1a34           = $1a34     ; Legacy label
