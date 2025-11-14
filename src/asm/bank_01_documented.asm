@@ -4274,12 +4274,12 @@ BattleChar_ValidateAndSetup:
 BattleStatus_ManageEffects:
 	sep #$20		;01B009|E220    |      ;
 	rep #$10		;01B00B|C210    |      ;
-	lda.w $1916	 ;01B00D|AD1619  |001916;
+	lda.w !battle_gfx_config	 ;01B00D|AD1619  |001916;
 	and.b #$e0	  ;01B010|29E0    |      ;
-	sta.w $1916	 ;01B012|8D1619  |001916;
+	sta.w !battle_gfx_config	 ;01B012|8D1619  |001916;
 	lda.w !battle_gfx_index	 ;01B015|ADEE19  |0119EE;
 	and.b #$1f	  ;01B018|291F    |      ;
-	sta.w $1916	 ;01B01A|8D1619  |001916;
+	sta.w !battle_gfx_config	 ;01B01A|8D1619  |001916;
 	rts ;01B01D|60      |      ;
 
 
@@ -6416,7 +6416,7 @@ BattleColor_BlendingProcessor:
 	jsr.w .Exit_CastSpell ;01D5A0|20C4D6  |01D6C4;
 	ldx.w #$0f08	;01D5A3|A2080F  |      ;
 	stx.w $0501	 ;01D5A6|8E0105  |010501;
-	lda.w $1916	 ;01D5A9|AD1619  |011916;
+	lda.w !battle_gfx_config	 ;01D5A9|AD1619  |011916;
 	and.b #$1f	  ;01D5AC|291F    |      ;
 	sta.w $0500	 ;01D5AE|8D0005  |010500;
 	plp ;01D5B1|28      |      ;
@@ -7107,7 +7107,7 @@ extended_graphics_processing:
 ; Sophisticated battle environment management with graphics and DMA coordination
 ; Implements complex environment state control with memory management
 battle_environment_processing:
-	lda.w $1030	 ; Load environment counter
+	lda.w !env_counter	 ; Load environment counter
 	bne environment_active ; Branch if environment active
 ; Environment inactive processing
 	ldx.w #$272c	; Load inactive command
@@ -7115,7 +7115,7 @@ battle_environment_processing:
 	jmp.w environment_complete ; Jump to completion
 environment_active:
 	jsr.w InitializeGraphicsSubsystem ; Initialize environment
-	dec.w $1030	 ; Decrement environment counter
+	dec.w !env_counter	 ; Decrement environment counter
 	jsl.l ExecuteLongEnvironmentCall ; Execute long environment call
 	lda.w $1926	 ; Load environment mode
 	sta.w !battle_data_index_4	 ; Store mode backup
@@ -7603,7 +7603,7 @@ battle_environment_location_processing:
 	rep #$10		; Set 16-bit index mode
 	jmp.w (DATA8_01f40f,x) ; Jump to location function
 environment_location_check:
-	lda.w $1031	 ; Load location identifier
+	lda.w !location_identifier	 ; Load location identifier
 	cmp.b #$26	  ; Compare with location range start
 	bcc environment_location_alternate ; Branch if below range
 	cmp.b #$29	  ; Compare with location range end
@@ -7613,7 +7613,7 @@ environment_location_alternate:
 	cmp.b #$06	  ; Compare with alternate type
 	bne environment_location_error ; Branch if type mismatch
 environment_processing_standard:
-	lda.w $1031	 ; Load location identifier
+	lda.w !location_identifier	 ; Load location identifier
 	sec ; Set carry for subtraction
 	sbc.b #$20	  ; Subtract base location offset
 	cmp.b #$0c	  ; Compare with location range
@@ -9700,6 +9700,8 @@ Bank_01_Termination_Marker:
 ; CONFIDENCE LEVEL: MAXIMUM - Ready for continued aggressive import campaign
 
 ; Bank $01 Campaign Complete - Initiating Bank $02 Import Sequence
+
+
 
 
 

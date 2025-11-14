@@ -437,6 +437,13 @@
 !env_coord_x            = $0e89     ; Environment X coordinate / Enemy pointer (16-bit)
 !env_coord_y            = $0e8a     ; Environment Y coordinate
 
+; === Environment State System ($1030-$1031) ===
+!env_counter            = $1030     ; Environment counter (decremented)
+!location_identifier    = $1031     ; Location identifier (range #$20-$2c)
+
+; === Battle Graphics Index System ($1916) ===
+!battle_gfx_config      = $1916     ; Battle graphics configuration (masked #$e0/#$1f)
+
 !battle_phase           = $192a     ; Battle phase/state counter
 !battle_atb_gauge       = $1993     ; Active Time Battle gauge value
 !battle_state_flag      = $19a5     ; Battle/field state flag: $00=field input, $80=battle active, $ff=inactive/disabled
