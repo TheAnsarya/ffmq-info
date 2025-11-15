@@ -352,100 +352,163 @@ Menu_InitializeQueues:
 	rtl                                  ;008333|6B      |      ;
 ;      |        |      ;
 	db $fc,$a6,$03                       ;008334|        |      ;
+
+;===============================================================================
+; VBlank_Handler
+;-------------------------------------------------------------------------------
+; Main VBlank interrupt handler - executes during vertical blanking interval
+; Critical for SNES timing: only 1.1ms window to update VRAM/CGRAM/OAM safely
+;
+; PRIORITY ROUTING LOGIC:
+;   1. Custom handler jump (system_flags_9 bit 6)
+;   2. Palette DMA (system_flags_2 bit 1)
+;   3. VRAM bulk transfer (system_flags_7 bit 6)
+;   4. Field mode setup (system_flags_4 bit 7)
+;   5. Mode-specific: Battle/Standard/Field
+;   6. Final: General DMA + OAM sprite updates
+;
+; PERFORMANCE NOTES:
+;   - Sets direct page to $4300 (DMA registers) for faster access
+;   - Disables HDMA first to prevent conflicts
+;   - All transfers must complete before VBlank ends (~1310 cycles @ 2.68MHz)
+;   - System flags control which transfers execute this frame
+;
+; MEMORY SAFETY:
+;   - Only modifies VRAM/CGRAM/OAM during VBlank (SNES hardware requirement)
+;   - Direct Page = $4300 for DMA register access optimization
+;   - Returns with flags cleared to prevent duplicate transfers
+;===============================================================================
 VBlank_Handler:
-	rep #$30                             ;008337|C230    |      ;
-	lda.W #$4300                         ;008339|A90043  |      ;
-	tcd                                  ;00833C|5B      |      ;
-	sep #$20                             ;00833D|E220    |      ;
-	stz.w !HDMAEN                          ;00833F|9C0C42  |02420C;
-	lda.B #$40                           ;008342|A940    |      ;
+	rep #$30                             ;008337|C230    |      ; 16-bit A/X/Y
+	lda.W #$4300                         ;008339|A90043  |      ; Set DP to DMA registers
+	tcd                                  ;00833C|5B      |      ; for faster access below
+	sep #$20                             ;00833D|E220    |      ; 8-bit A
+	stz.w !HDMAEN                          ;00833F|9C0C42  |02420C; Disable HDMA (prevents conflicts)
+	
+	; PRIORITY 1: Check for custom handler override
+	lda.B #$40                           ;008342|A940    |      ; Test system_flags_9 bit 6
 	and.w !system_flags_9                          ;008344|2DE200  |0200E2;
-	bne VBlank_JumpHandler               ;008347|D034    |00837D;
-	lda.B #$02                           ;008349|A902    |      ;
+	bne VBlank_JumpHandler               ;008347|D034    |00837D; Jump to custom handler if set
+	
+	; PRIORITY 2: Palette DMA requested?
+	lda.B #$02                           ;008349|A902    |      ; Test system_flags_2 bit 1
 	and.w !system_flags_2                          ;00834B|2DD400  |0200D4;
-	bne VBlank_PaletteTransfer           ;00834E|D02A    |00837A;
-	lda.B #$40                           ;008350|A940    |      ;
+	bne VBlank_PaletteTransfer           ;00834E|D02A    |00837A; Yes - handle palette update
+	
+	; PRIORITY 3: VRAM bulk transfer requested?
+	lda.B #$40                           ;008350|A940    |      ; Test system_flags_7 bit 6
 	and.w !system_flags_7                          ;008352|2DDD00  |0200DD;
-	bne VBlank_VRAMTransfer              ;008355|D02E    |008385;
-	lda.B #$80                           ;008357|A980    |      ;
+	bne VBlank_VRAMTransfer              ;008355|D02E    |008385; Yes - handle VRAM DMA
+	
+	; PRIORITY 4: Field mode setup requested?
+	lda.B #$80                           ;008357|A980    |      ; Test system_flags_4 bit 7
 	and.w !system_flags_4                          ;008359|2DD800  |0200D8;
-	beq VBlank_CheckModeFlags            ;00835C|F008    |008366;
-	lda.B #$80                           ;00835E|A980    |      ;
-	trb.w !system_flags_4                          ;008360|1CD800  |0000D8;
-	jmp.W VBlank_FieldMode               ;008363|4CB785  |0085B7;
+	beq VBlank_CheckModeFlags            ;00835C|F008    |008366; No - check mode flags
+	lda.B #$80                           ;00835E|A980    |      ; Clear flag
+	trb.w !system_flags_4                          ;008360|1CD800  |0000D8; (TRB = Test and Reset Bits)
+	jmp.W VBlank_FieldMode               ;008363|4CB785  |0085B7; Initialize field mode graphics
 ;      |        |      ;
 ;      |        |      ;
 VBlank_CheckModeFlags:
-	lda.B #$c0                           ;008366|A9C0    |      ;
+	; Determine which game mode handler to execute
+	lda.B #$c0                           ;008366|A9C0    |      ; Test flags_1 bits 6-7
 	and.w !system_flags_1                          ;008368|2DD200  |0200D2;
-	bne VBlank_FinalTransfers            ;00836B|D03B    |0083A8;
-	lda.B #$10                           ;00836D|A910    |      ;
+	bne VBlank_FinalTransfers            ;00836B|D03B    |0083A8; Skip to final if set
+	lda.B #$10                           ;00836D|A910    |      ; Test flags_1 bit 4 (battle mode?)
 	and.w !system_flags_1                          ;00836F|2DD200  |0200D2;
-	bne VBlank_BattleMode                ;008372|D003    |008377;
-	jmp.W VBlank_StandardMode            ;008374|4C2884  |008428;
+	bne VBlank_BattleMode                ;008372|D003    |008377; Yes - battle mode handler
+	jmp.W VBlank_StandardMode            ;008374|4C2884  |008428; No - standard/menu mode
 ;      |        |      ;
 ;      |        |      ;
 VBlank_BattleMode:
-	jmp.W VBlank_BattleTransfer          ;008377|4C3D86  |00863D;
+	jmp.W VBlank_BattleTransfer          ;008377|4C3D86  |00863D; Handle battle-specific transfers
 ;      |        |      ;
 ;      |        |      ;
 VBlank_PaletteTransfer:
-	jmp.W VBlank_PaletteDMA              ;00837A|4CE883  |0083E8;
+	jmp.W VBlank_PaletteDMA              ;00837A|4CE883  |0083E8; Execute palette DMA
 ;      |        |      ;
 ;      |        |      ;
 VBlank_JumpHandler:
-	lda.B #$40                           ;00837D|A940    |      ;
-	trb.w !system_flags_9                          ;00837F|1CE200  |0000E2;
-	jml.W [$0058]                        ;008382|DC5800  |000058;
+	; Custom handler override - used for special effects/transitions
+	lda.B #$40                           ;00837D|A940    |      ; Clear override flag
+	trb.w !system_flags_9                          ;00837F|1CE200  |0000E2; before jumping
+	jml.W [$0058]                        ;008382|DC5800  |000058; Jump via pointer at $0058
 ;      |        |      ;
 ;      |        |      ;
+;===============================================================================
+; VBlank_VRAMTransfer
+;-------------------------------------------------------------------------------
+; Performs bulk VRAM transfer via DMA channel 5
+; Used for large graphics updates that must happen in one VBlank
+;
+; INPUT:  !vram_src_addr ($01F6) - Source address in RAM
+;         !vram_transfer_size ($01F4) - Transfer size in bytes
+;         !vram_dest_addr ($01F8) - Destination VRAM address
+; OUTPUT: VRAM updated via DMA
+; TIMING: ~10 cycles setup + DMA time (8 cycles per byte transferred)
+;===============================================================================
 VBlank_VRAMTransfer:
-	ldx.W #$1801                         ;008385|A20118  |      ;
-	stx.B !SNES_DMA5PARAM-$4300           ;008388|8650    |004350;
-	ldx.w !vram_src_addr                          ;00838A|AEF601  |0001F6;
-	stx.B !SNES_DMA5ADDRL-$4300           ;00838D|8652    |004352;
-	lda.B #$7f                           ;00838F|A97F    |      ;
-	sta.B !SNES_DMA5ADDRH-$4300           ;008391|8554    |004354;
-	ldx.w !vram_transfer_size                          ;008393|AEF401  |0001F4;
-	stx.B !SNES_DMA5CNTL-$4300            ;008396|8655    |004355;
-	ldx.w !vram_dest_addr                          ;008398|AEF801  |0001F8;
-	stx.W !SNES_VMADDL                    ;00839B|8E1621  |002116;
-	lda.B #$84                           ;00839E|A984    |      ;
-	sta.W !SNES_VMAINC                    ;0083A0|8D1521  |002115;
-	lda.B #$20                           ;0083A3|A920    |      ;
-	sta.W !SNES_MDMAEN                    ;0083A5|8D0B42  |00420B;
+	ldx.W #$1801                         ;008385|A20118  |      ; DMA mode: word, A->B, incr
+	stx.B !SNES_DMA5PARAM-$4300           ;008388|8650    |004350; Channel 5 parameters
+	ldx.w !vram_src_addr                          ;00838A|AEF601  |0001F6; Load source address
+	stx.B !SNES_DMA5ADDRL-$4300           ;00838D|8652    |004352; to DMA5 source low/mid
+	lda.B #$7f                           ;00838F|A97F    |      ; Source bank = $7F
+	sta.B !SNES_DMA5ADDRH-$4300           ;008391|8554    |004354; (work RAM)
+	ldx.w !vram_transfer_size                          ;008393|AEF401  |0001F4; Load transfer size
+	stx.B !SNES_DMA5CNTL-$4300            ;008396|8655    |004355; to DMA5 count register
+	ldx.w !vram_dest_addr                          ;008398|AEF801  |0001F8; Load VRAM destination
+	stx.W !SNES_VMADDL                    ;00839B|8E1621  |002116; Set VRAM address
+	lda.B #$84                           ;00839E|A984    |      ; VRAM incr after high byte write
+	sta.W !SNES_VMAINC                    ;0083A0|8D1521  |002115; +4 per write (word mode)
+	lda.B #$20                           ;0083A3|A920    |      ; Enable DMA channel 5
+	sta.W !SNES_MDMAEN                    ;0083A5|8D0B42  |00420B; Start transfer (blocks until done)
 ;      |        |      ;
+;===============================================================================
+; VBlank_FinalTransfers
+;-------------------------------------------------------------------------------
+; Handles standard per-frame DMA transfers:
+;   - General graphics/tilemap DMA (flags_1 bit 7)
+;   - OAM sprite data transfer (flags_1 bit 5)
+;
+; Always executed after mode-specific handlers
+; Clears transfer flags after completion to prevent duplicate transfers
+;===============================================================================
 VBlank_FinalTransfers:
-	lda.B #$80                           ;0083A8|A980    |      ;
+	; Check for general DMA transfer request
+	lda.B #$80                           ;0083A8|A980    |      ; Test flags_1 bit 7
 	and.w !system_flags_1                          ;0083AA|2DD200  |0200D2;
-	beq VBlank_CheckOAMFlag              ;0083AD|F024    |0083D3;
-	lda.B #$80                           ;0083AF|A980    |      ;
-	sta.W !SNES_VMAINC                    ;0083B1|8D1521  |002115;
-	ldx.W #$1801                         ;0083B4|A20118  |      ;
-	stx.B !SNES_DMA5PARAM-$4300           ;0083B7|8650    |004350;
-	ldx.w !dma_src_addr                          ;0083B9|AEED01  |0001ED;
-	stx.B !SNES_DMA5ADDRL-$4300           ;0083BC|8652    |004352;
-	lda.w !dma_src_bank                          ;0083BE|ADEF01  |0001EF;
+	beq VBlank_CheckOAMFlag              ;0083AD|F024    |0083D3; Skip if not set
+	
+	; Configure general VRAM DMA transfer
+	lda.B #$80                           ;0083AF|A980    |      ; VRAM increment mode
+	sta.W !SNES_VMAINC                    ;0083B1|8D1521  |002115; +128 per write
+	ldx.W #$1801                         ;0083B4|A20118  |      ; DMA mode setup
+	stx.B !SNES_DMA5PARAM-$4300           ;0083B7|8650    |004350; Channel 5 params
+	ldx.w !dma_src_addr                          ;0083B9|AEED01  |0001ED; Load source address
+	stx.B !SNES_DMA5ADDRL-$4300           ;0083BC|8652    |004352; (RAM location)
+	lda.w !dma_src_bank                          ;0083BE|ADEF01  |0001EF; Load source bank
 	sta.B !SNES_DMA5ADDRH-$4300           ;0083C1|8554    |004354;
-	ldx.w !dma_size_param                          ;0083C3|AEEB01  |0001EB;
+	ldx.w !dma_size_param                          ;0083C3|AEEB01  |0001EB; Load transfer size
 	stx.B !SNES_DMA5CNTL-$4300            ;0083C6|8655    |004355;
-	ldx.W $0048                          ;0083C8|AE4800  |000048;
-	stx.W !SNES_VMADDL                    ;0083CB|8E1621  |002116;
-	lda.B #$20                           ;0083CE|A920    |      ;
-	sta.W !SNES_MDMAEN                    ;0083D0|8D0B42  |00420B;
+	ldx.W $0048                          ;0083C8|AE4800  |000048; Load dest VRAM address
+	stx.W !SNES_VMADDL                    ;0083CB|8E1621  |002116; Set VRAM pointer
+	lda.B #$20                           ;0083CE|A920    |      ; Enable channel 5
+	sta.W !SNES_MDMAEN                    ;0083D0|8D0B42  |00420B; Execute DMA
 ;      |        |      ;
 VBlank_CheckOAMFlag:
-	lda.B #$20                           ;0083D3|A920    |      ;
+	; Check for OAM sprite transfer request
+	lda.B #$20                           ;0083D3|A920    |      ; Test flags_1 bit 5
 	and.w !system_flags_1                          ;0083D5|2DD200  |0200D2;
-	beq VBlank_CleanupReturn             ;0083D8|F003    |0083DD;
-	jsr.W VBlank_OAMTransfer             ;0083DA|204385  |008543;
+	beq VBlank_CleanupReturn             ;0083D8|F003    |0083DD; Skip if not requested
+	jsr.W VBlank_OAMTransfer             ;0083DA|204385  |008543; Transfer OAM sprite data
 ;      |        |      ;
 VBlank_CleanupReturn:
-	lda.B #$40                           ;0083DD|A940    |      ;
-	trb.w !system_flags_7                          ;0083DF|1CDD00  |0200DD;
-	lda.B #$a0                           ;0083E2|A9A0    |      ;
-	trb.w !system_flags_1                          ;0083E4|1CD200  |0200D2;
-	rtl                                  ;0083E7|6B      |      ;
+	; Clear transfer flags to prevent re-execution next frame
+	lda.B #$40                           ;0083DD|A940    |      ; Clear flags_7 bit 6
+	trb.w !system_flags_7                          ;0083DF|1CDD00  |0200DD; (VRAM transfer done)
+	lda.B #$a0                           ;0083E2|A9A0    |      ; Clear flags_1 bits 5,7
+	trb.w !system_flags_1                          ;0083E4|1CD200  |0200D2; (OAM + general DMA done)
+	rtl                                  ;0083E7|6B      |      ; Return from VBlank interrupt
 ;      |        |      ;
 ;      |        |      ;
 VBlank_PaletteDMA:
