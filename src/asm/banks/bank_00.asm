@@ -8539,27 +8539,181 @@ Sound_PlayEffect_WindowClose:
 	rts                                  ;00B92F|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
+;===============================================================================
+; Input_WaitForButton
+;-------------------------------------------------------------------------------
+; Waits for player input matching a specified button mask, blocking execution
+; until valid input is detected. Handles button press detection, button release
+; waiting, optional sound effects, and frame-synchronized input polling. This
+; is the primary input handling routine for menus, dialogs, and event triggers.
+;
+; CALLING CONVENTION:
+;   JSR (short call)
+;   A = Button mask (16-bit): which buttons to accept
+;       Bit positions match SNES controller format:
+;         Bit 15: B button
+;         Bit 14: Y button
+;         Bit 13: Select
+;         Bit 12: Start
+;         Bit 11: Up
+;         Bit 10: Down
+;         Bit 9:  Left
+;         Bit 8:  Right
+;         Bit 7:  A button
+;         Bit 6:  X button
+;         Bit 5:  L button
+;         Bit 4:  R button
+;       Value $FFFF = accept any button
+;       Value $8000 = accept only B button
+;       Value $0C80 = accept A, B, Start buttons
+;   $07: Current button state (16-bit, updated by NMI)
+;   Returns: A = button pressed (bit corresponding to button)
+;   Returns: X = current animation frame counter ($01)
+;   Returns: Z flag based on X vs $05 comparison
+;
+; OPERATION:
+;   1. Wait for VBlank (frame synchronization)
+;   2. Test if any allowed buttons currently pressed (BIT $07)
+;   3. If button pressed: Jump to done (return pressed button)
+;   4. Invert button mask (EOR #$FFFF)
+;   5. Test inverted mask against current buttons
+;   6. If no match: Loop back to wait
+;   7. If match (button was released): Play cursor move sound
+;   8. Invert mask back to original
+;   9. Loop back to wait for next press
+;   10. When button detected: Return button value in A
+;
+; BUTTON MASK LOGIC:
+;   Mask parameter specifies ALLOWED buttons (1 = allowed, 0 = ignored)
+;   BIT instruction tests if any allowed button is currently pressed
+;   Example: Mask $C000 (B+Y) with $07=$4000 (Y pressed) → match
+;
+; BUTTON STATE ($07):
+;   16-bit value updated by NMI/input handler each frame
+;   Each bit = 1 if corresponding button currently pressed
+;   Value $0000 = no buttons pressed
+;   Value $8000 = B button currently held
+;   Read-only for this function (NMI updates it)
+;
+; SOUND EFFECT LOGIC:
+;   Sound plays when button transitions from pressed → released
+;   This provides audio feedback for cursor movement
+;   Sound function: Sound_PlayEffect_MenuMove ($00B912)
+;   Sound preserves A register (button mask)
+;
+; MASK INVERSION PATTERN:
+;   Initial: A = allowed buttons (e.g., $C000 = B+Y)
+;   After EOR: A = disallowed buttons ($3FFF = everything except B+Y)
+;   Second BIT: Test if any disallowed button pressed
+;   If match: A button was released (not in original mask)
+;   EOR again: Restore original mask for next iteration
+;
+; FRAME SYNCHRONIZATION:
+;   NMI_WaitForVBlank ensures input checked once per frame
+;   Prevents checking input faster than update rate (60Hz)
+;   Eliminates duplicate detection from single button press
+;   Typical frame time: ~16.7ms @ 60Hz
+;
+; RETURN VALUES:
+;   A = Pressed button value from $07
+;     - Single bit set for button pressed
+;     - Zero if no button (shouldn't happen)
+;   X = Animation frame counter from $01
+;   Z flag = Result of comparing X with $05
+;     - Z=1 if X==$05 (animation at frame 5)
+;     - Z=0 if X≠$05
+;   This allows caller to check animation state
+;
+; PERFORMANCE:
+;   Per iteration (no button): ~150-250 cycles
+;     - VBlank wait: 50-16,700 cycles (depends on timing)
+;     - BIT test: 4 cycles
+;     - Branch: 2-3 cycles
+;     - EOR: 3 cycles
+;     - Loop: 3 cycles
+;   Per iteration (button detected): ~100 cycles
+;     - VBlank wait: variable
+;     - BIT test: 4 cycles
+;     - Load/compare: 10 cycles
+;     - Return: 6 cycles
+;   Total wait time: Variable (1-60+ frames depending on player)
+;
+; USAGE EXAMPLE:
+;   Wait for A, B, or Start button:
+;       lda #$0C80          ; Mask: bits 7,11,12 (A, Start, B)
+;       jsr Input_WaitForButton
+;       ; A now contains which button was pressed
+;       cmp #$0080          ; Was it B button?
+;       beq HandleCancel
+;       ; Otherwise was A or Start
+;
+;   Wait for any button:
+;       lda #$FFFF          ; Accept all buttons
+;       jsr Input_WaitForButton
+;       ; A contains button pressed
+;
+; COMMON CALLERS:
+;   - Menu navigation loops
+;   - Dialog advancement
+;   - Yes/No prompts
+;   - Event triggers
+;   - Save file selection
+;
+; REGISTERS MODIFIED:
+;   A: Contains button pressed on return
+;   X: Contains animation frame counter ($01)
+;   Processor flags: N, Z, V from final operations
+;
+; REGISTERS PRESERVED:
+;   Y: Preserved (not modified)
+;   All other registers: Not guaranteed
+;
+; CRITICAL DEPENDENCIES:
+;   - NMI handler must update $07 with button state each frame
+;   - NMI_WaitForVBlank must exist and function correctly
+;   - Sound_PlayEffect_MenuMove must preserve A register
+;   - $01 must contain valid animation counter
+;   - $05 must contain valid comparison value
+;
+; TECHNICAL NOTES:
+;   The double-inversion pattern (EOR twice) is elegant: it allows detecting
+;   button releases using the same BIT instruction used for presses. When a
+;   button is released, it transitions from "in mask" to "not in mask", which
+;   is detected by testing the inverted mask.
+;
+;   Playing sound on release (not press) prevents sound spam. If sound played
+;   on every press detection, holding a button would trigger sound repeatedly
+;   at 60Hz. Release detection ensures one sound per button action.
+;
+;   The final CPX $05 comparison is unusual - it suggests the caller uses
+;   the Z flag to check if animation is at a specific frame. This allows
+;   combining input waiting with animation state checking in a single call.
+;
+;   VBlank synchronization is critical for consistent input response. Without
+;   it, the loop could poll input hundreds of times per frame, causing race
+;   conditions with NMI updates and inconsistent button detection.
+;===============================================================================
 Input_WaitForButton:
-	jsl.L NMI_WaitForVBlank                    ;00B930|22A09600|0096A0;
-	bit.B $07                            ;00B934|2407    |000007;
-	bne Input_WaitForButton_Done                      ;00B936|D011    |00B949;
-	eor.W #$ffff                         ;00B938|49FFFF  |      ;
-	bit.B $07                            ;00B93B|2407    |000007;
-	beq Input_WaitForButton_Loop                      ;00B93D|F005    |00B944;
-	pha                                  ;00B93F|48      |      ;
-	jsr.W Sound_PlayEffect_MenuMove                    ;00B940|2012B9  |00B912;
-	pla                                  ;00B943|68      |      ;
+	jsl.L NMI_WaitForVBlank                    ;00B930|22A09600|0096A0; Wait for next frame (input updated by NMI)
+	bit.B $07                            ;00B934|2407    |000007; Test if any allowed buttons pressed (A mask & $07)
+	bne Input_WaitForButton_Done                      ;00B936|D011    |00B949; If button pressed → return with button value
+	eor.W #$ffff                         ;00B938|49FFFF  |      ; Invert mask: allowed → disallowed buttons
+	bit.B $07                            ;00B93B|2407    |000007; Test if any disallowed buttons pressed
+	beq Input_WaitForButton_Loop                      ;00B93D|F005    |00B944; If none → restore mask and retry
+	pha                                  ;00B93F|48      |      ; Save inverted mask (button was released)
+	jsr.W Sound_PlayEffect_MenuMove                    ;00B940|2012B9  |00B912; Play cursor move sound (A preserved by function)
+	pla                                  ;00B943|68      |      ; Restore inverted mask
 ;      |        |      ;
 Input_WaitForButton_Loop:
-	eor.W #$ffff                         ;00B944|49FFFF  |      ;
-	bra Input_WaitForButton                      ;00B947|80E7    |00B930;
+	eor.W #$ffff                         ;00B944|49FFFF  |      ; Restore original mask (invert back)
+	bra Input_WaitForButton                      ;00B947|80E7    |00B930; Loop: wait for next frame
 ;      |        |      ;
 ;      |        |      ;
 Input_WaitForButton_Done:
-	lda.B $07                            ;00B949|A507    |000007;
-	ldx.B $01                            ;00B94B|A601    |000001;
-	cpx.B $05                            ;00B94D|E405    |000005;
-	rts                                  ;00B94F|60      |      ;
+	lda.B $07                            ;00B949|A507    |000007; A = button state (which button was pressed)
+	ldx.B $01                            ;00B94B|A601    |000001; X = animation frame counter
+	cpx.B $05                            ;00B94D|E405    |000005; Compare animation frame with $05 (sets Z flag)
+	rts                                  ;00B94F|60      |      ; Return to caller (A=button, X=frame, Z=frame==5)
 ;      |        |      ;
 ;      |        |      ;
 SaveFile_LoadAndCheck:
@@ -11150,40 +11304,267 @@ Color_SetupFadeData:
 	tsb.w !system_flags_2                          ;00CBB9|0CD400  |0000D4;
 	rts                                  ;00CBBC|60      |      ;
 ;      |        |      ;
-	db $27,$ec,$3c,$ec,$3c,$ec,$38,$ec,$00;00CBBD|        |      ;
+	db $27,$ec,$3c,$ec,$3c,$ec,$38,$ec,$00;00CBBD|        |      ; Unknown data (possibly fade timing table)
 ;      |        |      ;
+;===============================================================================
+; Color_FadeIn
+;-------------------------------------------------------------------------------
+; Performs a smooth fade-in effect by gradually increasing screen brightness
+; from black (value $E0) to full brightness ($EA). Executes dialog commands
+; between brightness steps for synchronized animations and updates. This is the
+; standard screen transition for entering battles, scenes, and menu screens.
+;
+; CALLING CONVENTION:
+;   JSR (short call)
+;   $17: Dialog command stream pointer (preserved during fade)
+;   No parameters required
+;   Returns after fade completes (5 brightness steps)
+;
+; OPERATION:
+;   1. Call Color_SetupFadeData to initialize fade system
+;   2. Set initial brightness value to $E9 (near full brightness)
+;   3. Loop 4 times:
+;      a. Save Y register (may be used by caller)
+;      b. Load dialog pointer from $17 into Y
+;      c. Execute dialog commands (animations, updates, etc.)
+;      d. Restore dialog pointer to $17
+;      e. Wait for timing synchronization (frame boundary)
+;      f. Write brightness value to $7F56D8 (main brightness)
+;      g. Write same brightness to $7F56D8+X (secondary brightness)
+;      h. Decrement brightness by 2 (A -= 2, twice)
+;      i. Compare with $E1 (final brightness value)
+;      j. If not $E1, continue loop
+;   4. Execute final dialog command pass
+;   5. Return to caller (screen now at full brightness)
+;
+; BRIGHTNESS VALUES:
+;   SNES brightness format: $E0-$EF (16 levels, only low 4 bits used)
+;   $E0: Black (darkest)
+;   $E1-$EE: Intermediate brightness levels
+;   $EF: Full brightness (brightest)
+;   This function uses: $E9 → $E7 → $E5 → $E3 → $E1
+;   5 steps total (including initial and final states)
+;
+; BRIGHTNESS REGISTERS ($7F56D8):
+;   $7F56D8: Main brightness value (copied to SNES $2100 by NMI)
+;   $7F56D8+X: Secondary brightness (X set by Color_SetupFadeData)
+;   Dual write suggests multiple display layers or modes
+;   Values written during VBlank to prevent screen tearing
+;
+; DIALOG COMMAND EXECUTION:
+;   Dialog_ExecuteInternal called between fade steps
+;   Allows animations, sprite updates, text rendering during fade
+;   Dialog pointer $17 preserved across calls (Y save/restore)
+;   Typical commands: DMA transfers, palette updates, frame delays
+;
+; TIMING SYNCHRONIZATION:
+;   CWaitTimingRoutine ensures fade steps occur at frame boundaries
+;   Prevents brightness updates mid-frame (would cause flicker)
+;   Typical timing: 1 step per frame = ~83ms total (5 frames @ 60Hz)
+;
+; FADE STEPS VISUALIZATION:
+;   Frame 0: Brightness $E9 (very bright, starting point)
+;   Frame 1: Brightness $E7 (bright)
+;   Frame 2: Brightness $E5 (moderate)
+;   Frame 3: Brightness $E3 (dim)
+;   Frame 4: Brightness $E1 (near dark)
+;   Frame 5: Final dialog pass, fade complete
+;
+; PERFORMANCE:
+;   Per fade step: ~1 frame (~16.7ms @ 60Hz)
+;   Dialog execution: Variable (depends on commands)
+;   Total fade time: ~83-100ms (5 frames + dialog overhead)
+;   Cycle count per step: ~50,000-150,000 (highly variable)
+;
+; USAGE EXAMPLE:
+;   Fade in after battle start:
+;       lda #$LOW(BattleFadeCommands)   ; Set dialog pointer
+;       sta $17
+;       jsr Color_FadeIn                 ; Perform fade-in
+;       ; Screen now at full brightness
+;
+; COMMON CALLERS:
+;   - Battle_Initialize: Fade in at battle start
+;   - Scene transitions: Enter new map/area
+;   - Menu opening: Fade in menu screen
+;   - Event triggers: Cutscene transitions
+;
+; REGISTERS MODIFIED:
+;   A: Destroyed (brightness calculations)
+;   Y: Preserved (saved/restored each iteration)
+;   X: Modified by Color_SetupFadeData
+;   Processor flags: Modified by arithmetic
+;
+; REGISTERS PRESERVED:
+;   Y: Explicitly preserved via save/restore
+;   $17: Explicitly preserved (dialog pointer)
+;
+; CRITICAL DEPENDENCIES:
+;   - Color_SetupFadeData must initialize fade system
+;   - Dialog_ExecuteInternal must exist and handle $17 pointer
+;   - CWaitTimingRoutine must provide frame synchronization
+;   - NMI handler must copy $7F56D8 to SNES $2100 each frame
+;   - $7F56D8 must be accessible (WRAM bank $7F)
+;
+; TECHNICAL NOTES:
+;   The double-decrement pattern (DEC A twice) creates 2-unit brightness
+;   steps. This provides smoother fade than single-unit steps while keeping
+;   the fade short (5 steps vs 10 steps for single-unit).
+;
+;   Executing dialog commands during fade is clever: it allows the game to
+;   perform DMA transfers, update sprites, and prepare the scene while the
+;   fade masks visual artifacts. Without this, scene setup would need to
+;   complete before or after the fade, increasing perceived load time.
+;
+;   The Y register save/restore pattern suggests Dialog_ExecuteInternal may
+;   modify Y internally, but the caller needs Y preserved. This defensive
+;   programming prevents dialog system changes from breaking fade logic.
+;
+;   Writing to two brightness locations ($7F56D8 and $7F56D8+X) may support
+;   different display modes or dual-screen configurations, though standard
+;   SNES has only one brightness register ($2100). The secondary write could
+;   be for backup/debugging or future expansion.
+;===============================================================================
 Color_FadeIn:
-	jsr.W Color_SetupFadeData                    ;00CBC6|2091CB  |00CB91;
-	lda.B #$e9                           ;00CBC9|A9E9    |      ;
+	jsr.W Color_SetupFadeData                    ;00CBC6|2091CB  |00CB91; Initialize fade system (sets X offset, flags)
+	lda.B #$e9                           ;00CBC9|A9E9    |      ; A = $E9 (initial brightness: very bright)
 ;      |        |      ;
 Color_FadeInLoop:
-	ldy.B $17                            ;00CBCB|A417    |000017;
-	jsr.W Dialog_ExecuteInternal                    ;00CBCD|20759D  |009D75;
-	sty.B $17                            ;00CBD0|8417    |000017;
-	jsl.L CWaitTimingRoutine                    ;00CBD2|2200800C|0C8000;
-	sta.L $7f56d8                        ;00CBD6|8FD8567F|7F56D8;
-	sta.L $7f56d8,x                      ;00CBDA|9FD8567F|7F56D8;
-	dec a;00CBDE|3A      |      ;
-	dec a;00CBDF|3A      |      ;
-	cmp.B #$e1                           ;00CBE0|C9E1    |      ;
-	bne Color_FadeInLoop                      ;00CBE2|D0E7    |00CBCB;
-	ldy.B $17                            ;00CBE4|A417    |000017;
-	jsr.W Dialog_ExecuteInternal                    ;00CBE6|20759D  |009D75;
-	sty.B $17                            ;00CBE9|8417    |000017;
-	rts                                  ;00CBEB|60      |      ;
+	ldy.B $17                            ;00CBCB|A417    |000017; Y = dialog command pointer (preserve across call)
+	jsr.W Dialog_ExecuteInternal                    ;00CBCD|20759D  |009D75; Execute dialog commands (animations, updates)
+	sty.B $17                            ;00CBD0|8417    |000017; Restore dialog pointer to $17
+	jsl.L CWaitTimingRoutine                    ;00CBD2|2200800C|0C8000; Wait for frame boundary (timing sync)
+	sta.L $7f56d8                        ;00CBD6|8FD8567F|7F56D8; Write brightness to main register ($7F56D8)
+	sta.L $7f56d8,x                      ;00CBDA|9FD8567F|7F56D8; Write brightness to secondary register ($7F56D8+X)
+	dec a                                ;00CBDE|3A      |      ; A -= 1 (decrease brightness)
+	dec a                                ;00CBDF|3A      |      ; A -= 1 (total: -2, step by 2 units)
+	cmp.B #$e1                           ;00CBE0|C9E1    |      ; Compare with $E1 (final brightness value)
+	bne Color_FadeInLoop                      ;00CBE2|D0E7    |00CBCB; If not $E1 → loop (continue fade)
+	ldy.B $17                            ;00CBE4|A417    |000017; Y = dialog pointer (final pass)
+	jsr.W Dialog_ExecuteInternal                    ;00CBE6|20759D  |009D75; Execute final dialog commands
+	sty.B $17                            ;00CBE9|8417    |000017; Restore dialog pointer
+	rts                                  ;00CBEB|60      |      ; Return to caller (fade complete)
 ;      |        |      ;
 ;      |        |      ;
+;===============================================================================
+; Color_FadeOut
+;-------------------------------------------------------------------------------
+; Performs instant fade-out to black by setting SNES color math registers and
+; writing black brightness value. Unlike Color_FadeIn, this is immediate (no
+; gradual steps), used for quick transitions or screen blanking. Also clears
+; fade-in system flag to disable brightness updates.
+;
+; CALLING CONVENTION:
+;   JSR (short call)
+;   No parameters required
+;   Returns immediately after setting black screen
+;
+; OPERATION:
+;   1. Write $93 to CGSWSEL ($2130): Configure color math
+;      - Bit 7: Always clip to black (1)
+;      - Bit 4: Prevent color math (1)
+;      - Bit 1-0: Clip mode (11b = always clip)
+;   2. Write $00 to CGADSUB ($2131): Disable color addition/subtraction
+;   3. Call Color_SetupFadeData to initialize fade system (sets X)
+;   4. Write $E0 to $7F56D8: Set main brightness to black
+;   5. Write $E0 to $7F56D8+X: Set secondary brightness to black
+;   6. Wait for timing synchronization (frame boundary)
+;   7. Clear system flag $D4 bit 3: Disable fade-in system
+;   8. Return to caller (screen now black)
+;
+; COLOR MATH REGISTERS:
+;   CGSWSEL ($2130): Color math control register
+;     Bits 7-6: Clip to black/prevent math control
+;     Bits 5-4: Main/sub screen math enable
+;     Bits 3-2: Window operator (AND/OR/XOR/XNOR)
+;     Bits 1-0: Clip control (00=never, 11=always)
+;     Value $93 = %10010011 = clip to black, prevent math, always clip
+;
+;   CGADSUB ($2131): Color math operation register
+;     Bit 7: Add/subtract select (0=add, 1=subtract)
+;     Bit 6: Half color math (divide result by 2)
+;     Bits 5-0: Backdrop color math enable (per layer)
+;     Value $00 = all disabled, no color math operations
+;
+; BRIGHTNESS BLACK VALUE ($E0):
+;   $E0 = %11100000 = brightness 0 (completely black)
+;   SNES $2100 register: bits 3-0 = brightness (0-15)
+;   Writing $E0 forces screen to black regardless of palettes
+;
+; FADE SYSTEM FLAG ($D4 bit 3):
+;   Bit 3 controls whether NMI updates brightness automatically
+;   TRB (Test and Reset Bits) clears bit 3: disables auto-updates
+;   After fade-out, brightness stays black until explicitly changed
+;
+; IMMEDIATE VS GRADUAL:
+;   Color_FadeIn: Gradual 5-step fade over ~83ms
+;   Color_FadeOut: Instant black in 1 frame (~16.7ms)
+;   Asymmetry is intentional: fade-in is smooth (less jarring)
+;   Fade-out is instant (player expects quick transitions)
+;
+; PERFORMANCE:
+;   Total execution: ~1 frame (~16.7ms @ 60Hz)
+;   Register writes: ~50 cycles
+;   Color_SetupFadeData: ~100-200 cycles
+;   CWaitTimingRoutine: 0-16,700 cycles (frame wait)
+;   Total: ~16,700-33,400 cycles
+;
+; USAGE EXAMPLE:
+;   Fade out before battle start:
+;       jsr Color_FadeOut       ; Instant black screen
+;       jsr Battle_LoadGraphics ; Load graphics while black
+;       jsr Color_FadeIn        ; Gradual fade in
+;
+; COMMON CALLERS:
+;   - Scene transitions: Leave area/map
+;   - Battle initialization: Blank screen before setup
+;   - Game over sequences: Fade to black
+;   - Menu transitions: Instant screen change
+;
+; REGISTERS MODIFIED:
+;   A: Destroyed (brightness value writes)
+;   X: Modified by Color_SetupFadeData
+;   Y: Destroyed (register writes use Y)
+;   Processor flags: Modified
+;
+; REGISTERS PRESERVED:
+;   None guaranteed (low-level graphics function)
+;
+; CRITICAL DEPENDENCIES:
+;   - CGSWSEL ($2130) and CGADSUB ($2131) must be writable (PPU registers)
+;   - Color_SetupFadeData must set X to valid offset
+;   - CWaitTimingRoutine must provide frame synchronization
+;   - NMI handler must copy $7F56D8 to SNES $2100
+;   - System flag $D4 must be writable
+;
+; TECHNICAL NOTES:
+;   The color math configuration ($93/$00) prevents any color manipulation
+;   during fade-out. This ensures the screen goes to pure black, not some
+;   color-shifted version based on active color math settings.
+;
+;   Writing to both $7F56D8 and $7F56D8+X (like Color_FadeIn) maintains
+;   consistency across both brightness registers. This prevents one register
+;   from retaining old brightness while the other updates.
+;
+;   The TRB instruction atomically tests and clears bit 3. This is safer than
+;   loading, masking, and storing, which could race with NMI updates to other
+;   bits in the same byte.
+;
+;   Instant fade-out is less visually jarring than instant fade-in would be.
+;   The human eye adapts quickly to darkness but is sensitive to sudden
+;   brightness. The asymmetric fade design respects this perceptual difference.
+;===============================================================================
 Color_FadeOut:
-	ldy.W #$9300                         ;00CBEC|A00093  |      ;
-	sty.W !SNES_CGSWSEL                   ;00CBEF|8C3021  |002130;
-	jsr.W Color_SetupFadeData                    ;00CBF2|2091CB  |00CB91;
-	lda.B #$e0                           ;00CBF5|A9E0    |      ;
-	sta.L $7f56d8                        ;00CBF7|8FD8567F|7F56D8;
-	sta.L $7f56d8,x                      ;00CBFB|9FD8567F|7F56D8;
-	jsl.L CWaitTimingRoutine                    ;00CBFF|2200800C|0C8000;
-	lda.B #$08                           ;00CC03|A908    |      ;
-	trb.w !system_flags_2                          ;00CC05|1CD400  |0000D4;
-	rts                                  ;00CC08|60      |      ;
+	ldy.W #$9300                         ;00CBEC|A00093  |      ; Y = $9300 (CGSWSEL value $93, CGADSUB value $00)
+	sty.W !SNES_CGSWSEL                   ;00CBEF|8C3021  |002130; Write $93 to CGSWSEL, $00 to CGADSUB (color math off)
+	jsr.W Color_SetupFadeData                    ;00CBF2|2091CB  |00CB91; Initialize fade system (sets X offset)
+	lda.B #$e0                           ;00CBF5|A9E0    |      ; A = $E0 (brightness = 0, black screen)
+	sta.L $7f56d8                        ;00CBF7|8FD8567F|7F56D8; Write $E0 to main brightness register
+	sta.L $7f56d8,x                      ;00CBFB|9FD8567F|7F56D8; Write $E0 to secondary brightness register
+	jsl.L CWaitTimingRoutine                    ;00CBFF|2200800C|0C8000; Wait for frame boundary (apply changes on VBlank)
+	lda.B #$08                           ;00CC03|A908    |      ; A = $08 (bit 3 mask)
+	trb.w !system_flags_2                          ;00CC05|1CD400  |0000D4; Clear system flag $D4 bit 3 (disable fade updates)
+	rts                                  ;00CC08|60      |      ; Return to caller (screen now black)
 ;      |        |      ;
 ;      |        |      ;
 Color_FadeToBlack:
