@@ -411,7 +411,7 @@ Boot_EnableNMI:
 
 	sep #$20		; 8-bit accumulator
 
-	lda.w $0112	 ; A = [$0112] (NMI enable flags)
+	lda.w !interrupt_config	 ; A = [$0112] (NMI enable flags)
 	sta.w SNES_NMITIMEN ; $4200 = Enable NMI/IRQ/Auto-joypad
 ; Copies configuration from RAM variable
 
@@ -488,7 +488,7 @@ Boot_FadeIn:
 ; Clear some display state flag
 
 	lda.b #$e0	  ; A = $e0 (bits 5-7: %11100000)
-	trb.w $0111	 ; Test and Reset bits 5-7 of $0111
+	trb.w !system_interrupt_flags	 ; Test and Reset bits 5-7 of $0111
 ; Clear multiple configuration flags
 
 	jsl.l AddressC8000OriginalCode ; Bank $0c: Wait for VBLANK
@@ -698,7 +698,7 @@ Init_NewGameState:
 	rep #$30		; 16-bit A, X, Y
 
 	lda.w #$ffff	; A = $ffff
-	sta.w $010e	 ; [$010e] = $ffff (state marker)
+	sta.w !save_slot_index	 ; [$010e] = $ffff (state marker)
 
 	jsl.l InitializePaletteSystem ; Initialize subsystem
 	jsr.w InitializeSubsystem ; Initialize subsystem
@@ -1140,10 +1140,10 @@ Init_VBlankDMA:
 ; ---------------------------------------------------------------------------
 
 	lda.w #$0040	; A = $0040 (64 bytes)
-	sta.w $01f0	 ; [$01f0] = $0040 (first OAM DMA size)
+	sta.w !oam_dma_size1	 ; [$01f0] = $0040 (first OAM DMA size)
 
 	lda.w #$0004	; A = $0004 (4 bytes)
-	sta.w $01f2	 ; [$01f2] = $0004 (second OAM DMA size)
+	sta.w !oam_dma_size2	 ; [$01f2] = $0004 (second OAM DMA size)
 
 ; ---------------------------------------------------------------------------
 ; Copy Data from ROM to RAM (Bank $7e)
@@ -1170,7 +1170,7 @@ Init_VBlankDMA:
 ; ---------------------------------------------------------------------------
 
 	lda.w #$0010	; A = $0010 (bit 4)
-	tsb.w $0111	 ; Test and Set bit 4 in $0111
+	tsb.w !system_interrupt_flags	 ; Test and Set bit 4 in $0111
 
 ; ---------------------------------------------------------------------------
 ; Initialize Graphics System (3 calls)
@@ -1415,16 +1415,16 @@ NMI_GraphicsUpload:
 ; $01 = Low byte of destination register
 	stx.b SNES_DMA5PARAM-$4300 ; $4350-$4351 = DMA5 parameters
 
-	ldx.w $01f6	 ; X = source address (from variable)
+	ldx.w !vram_src_addr	 ; X = source address (from variable)
 	stx.b SNES_DMA5ADDRL-$4300 ; $4352-$4353 = Source address low/mid
 
 	lda.b #$7f	  ; A = $7f
 	sta.b SNES_DMA5ADDRH-$4300 ; $4354 = Source bank $7f
 
-	ldx.w $01f4	 ; X = transfer size (from variable)
+	ldx.w !vram_transfer_size	 ; X = transfer size (from variable)
 	stx.b SNES_DMA5CNTL-$4300 ; $4355-$4356 = Transfer size
 
-	ldx.w $01f8	 ; X = VRAM destination address
+	ldx.w !vram_dest_addr	 ; X = VRAM destination address
 	stx.w SNES_VMADDL ; $2116-$2117 = VRAM address
 
 	lda.b #$84	  ; A = $84
@@ -1459,13 +1459,13 @@ NMI_ProcessDMAFlags:
 	ldx.w #$1801	; X = $1801 (DMA parameters)
 	stx.b SNES_DMA5PARAM-$4300 ; $4350-$4351 = DMA5 config
 
-	ldx.w $01ed	 ; X = source address
+	ldx.w !dma_src_addr	 ; X = source address
 	stx.b SNES_DMA5ADDRL-$4300 ; $4352-$4353 = Source address low/mid
 
-	lda.w $01ef	 ; A = source bank
+	lda.w !dma_src_bank	 ; A = source bank
 	sta.b SNES_DMA5ADDRH-$4300 ; $4354 = Source bank
 
-	ldx.w $01eb	 ; X = transfer size
+	ldx.w !dma_size_param	 ; X = transfer size
 	stx.b SNES_DMA5CNTL-$4300 ; $4355-$4356 = Size
 
 	ldx.w $0048	 ; X = VRAM address
@@ -1945,7 +1945,7 @@ DMA_UpdateOAM:
 	lda.b #$00	  ; A = $00
 	sta.b SNES_DMA5ADDRH-$4300 ; $4354 = Source bank $00
 
-	ldx.w $01f0	 ; X = [$01f0] (transfer size - main table)
+	ldx.w !oam_dma_size1	 ; X = [$01f0] (transfer size - main table)
 	stx.b SNES_DMA5CNTL-$4300 ; $4355-$4356 = Size (typically $0200 = 512 bytes)
 
 	ldx.w #$0000	; X = $0000
@@ -1962,7 +1962,7 @@ DMA_UpdateOAM:
 	ldx.w #$0e00	; X = $0e00 (source address for high table)
 	stx.b SNES_DMA5ADDRL-$4300 ; $4352-$4353 = Source: $000e00
 
-	ldx.w $01f2	 ; X = [$01f2] (transfer size - high table)
+	ldx.w !oam_dma_size2	 ; X = [$01f2] (transfer size - high table)
 	stx.b SNES_DMA5CNTL-$4300 ; $4355-$4356 = Size (typically $0020 = 32 bytes)
 
 	ldx.w #$0100	; X = $0100
@@ -2014,7 +2014,7 @@ DMA_BattleGraphics:
 ; Clear some state flag
 
 	lda.b #$e0	  ; A = $e0 (bits 5-7)
-	trb.w $0111	 ; Test and Reset bits 5-7 of $0111
+	trb.w !system_interrupt_flags	 ; Test and Reset bits 5-7 of $0111
 ; Clear multiple state flags
 
 	jsl.l AddressC8000OriginalCode ; Bank $0c: Wait for VBLANK
@@ -2125,7 +2125,7 @@ Skip_Normal_Init:
 ; Used for graphics updates, timing, etc.
 ; ---------------------------------------------------------------------------
 
-	lda.w $0112	 ; Load NMI enable flags
+	lda.w !interrupt_config	 ; Load NMI enable flags
 	sta.w !SNES_NMITIMEN ; $4200: Enable NMI and/or IRQ
 	cli ; Clear interrupt disable flag
 ; Interrupts now active!
@@ -2202,7 +2202,7 @@ Continue_To_Game:
 	trb.w !system_flags_8	 ; Test and reset bit 7 in game flag
 
 	lda.b #$e0	  ; Bits 5-7
-	trb.w $0111	 ; Test and reset bits 5-7
+	trb.w !system_interrupt_flags	 ; Test and reset bits 5-7
 
 	jsl.l BankOC_Init ; Another initialization call
 
@@ -2332,7 +2332,7 @@ Init_New_Game:
 
 	rep #$30		; 16-bit mode
 	lda.w #$ffff
-	sta.w $010e	 ; Initialize some variable to -1
+	sta.w !save_slot_index	 ; Initialize some variable to -1
 
 	jsl.l Some_Init_Function_1
 	jsr.w Some_Init_Function_2
@@ -2808,17 +2808,17 @@ DMA_FieldModeTransfer:
 	trb.w !system_flags_8	 ; Test and Reset bit 6 of $00de
 ; Clear "single character update" flag
 
-	lda.w $010d	 ; A = [$010d] (character position data)
+	lda.w !anim_frame_timer	 ; A = [$010d] (character position data)
 	and.w #$ff00	; A = A & $ff00 (mask high byte)
 	clc ; Clear carry
 	adc.w #$6180	; A = A + $6180 (calculate VRAM address)
 	sta.w $2116	 ; $2116-$2117 = VRAM address
 
-	lda.w $010e	 ; A = [$010e] (character index)
+	lda.w !save_slot_index	 ; A = [$010e] (character index)
 	asl a; A = A × 2 (convert to word offset)
 	tax ; X = character table offset
 
-	lda.w $0107,x   ; A = [$0107 + X] (character data pointer)
+	lda.w !char1_data_ptr,x   ; A = [$0107 + X] (character data pointer)
 	tax ; X = character data pointer
 
 	pha ; Save character data pointer
@@ -2832,7 +2832,7 @@ DMA_FieldModeTransfer:
 ; ---------------------------------------------------------------------------
 
 	clc ; Clear carry
-	lda.w $010e	 ; A = [$010e] (character index)
+	lda.w !save_slot_index	 ; A = [$010e] (character index)
 	adc.w #$000d	; A = A + $000d (palette offset)
 	asl a; A = A × 2
 	asl a; A = A × 4
@@ -2873,7 +2873,7 @@ DMA_UpdateAllCharacters:
 ; Transfer Character 1 Graphics
 ; ---------------------------------------------------------------------------
 
-	ldx.w $0107	 ; X = [$0107] (character 1 data pointer)
+	ldx.w !char1_data_ptr	 ; X = [$0107] (character 1 data pointer)
 	jsr.w DMA_CharacterGraphics ; Transfer character 1 graphics
 
 ; ---------------------------------------------------------------------------
@@ -2883,7 +2883,7 @@ DMA_UpdateAllCharacters:
 	lda.w #$6280	; A = $6280 (VRAM address for char 2)
 	sta.w $2116	 ; Set VRAM address
 
-	ldx.w $0109	 ; X = [$0109] (character 2 data pointer)
+	ldx.w !char2_data_ptr	 ; X = [$0109] (character 2 data pointer)
 	jsr.w DMA_CharacterGraphics ; Transfer character 2 graphics
 
 ; ---------------------------------------------------------------------------
@@ -2893,7 +2893,7 @@ DMA_UpdateAllCharacters:
 	lda.w #$6380	; A = $6380 (VRAM address for char 3)
 	sta.w $2116	 ; Set VRAM address
 
-	ldx.w $010b	 ; X = [$010b] (character 3 data pointer)
+	ldx.w !char3_data_ptr	 ; X = [$010b] (character 3 data pointer)
 	jsr.w DMA_CharacterGraphics ; Transfer character 3 graphics
 
 	plb ; Restore Data Bank
@@ -2910,7 +2910,7 @@ DMA_UpdateAllCharacters:
 ; Transfer Character 1 Palette
 ; ---------------------------------------------------------------------------
 
-	ldy.w $0107	 ; Y = [$0107] (character 1 data pointer)
+	ldy.w !char1_data_ptr	 ; Y = [$0107] (character 1 data pointer)
 	ldx.w #$00d0	; X = $00d0 (CGRAM address = palette $d)
 	jsr.w DMA_CharacterPalette ; Transfer character palette
 
@@ -2918,7 +2918,7 @@ DMA_UpdateAllCharacters:
 ; Transfer Character 2 Palette
 ; ---------------------------------------------------------------------------
 
-	ldy.w $0109	 ; Y = [$0109] (character 2 data pointer)
+	ldy.w !char2_data_ptr	 ; Y = [$0109] (character 2 data pointer)
 	ldx.w #$00e0	; X = $00e0 (CGRAM address = palette $e)
 	jsr.w TransferCharacterPalette ; Transfer character palette
 
@@ -2926,7 +2926,7 @@ DMA_UpdateAllCharacters:
 ; Transfer Character 3 Palette
 ; ---------------------------------------------------------------------------
 
-	ldy.w $010b	 ; Y = [$010b] (character 3 data pointer)
+	ldy.w !char3_data_ptr	 ; Y = [$010b] (character 3 data pointer)
 	ldx.w #$00f0	; X = $00f0 (CGRAM address = palette $f)
 	jsr.w TransferCharacterPalette ; Transfer character palette
 
@@ -3249,12 +3249,12 @@ GameLoop_TimeBasedEvents:
 ; Decrement Timer and Check for Event Trigger
 ; ---------------------------------------------------------------------------
 
-	dec.w $010d	 ; Decrement timer
+	dec.w !anim_frame_timer	 ; Decrement timer
 	bpl GameLoop_TimeBasedEvents_Exit ; If still positive → Exit (not time yet)
 
 ; Timer expired - reset and process status effects
 	lda.b #$0c	  ; A = $0c (12 frames)
-	sta.w $010d	 ; Reset timer to 12 frames
+	sta.w !anim_frame_timer	 ; Reset timer to 12 frames
 
 ; ---------------------------------------------------------------------------
 ; Check Character 1 Status ($700027)
@@ -5708,7 +5708,7 @@ Graphics_PrepareTransition:
 	sep #$30		; 8-bit A/X/Y
 	lda.b #$40	  ; bit 6 mask
 	tsb.w !system_flags_3	 ; Set graphics busy flag in $00d6
-	lda.w $0112	 ; Load NMI/IRQ configuration
+	lda.w !interrupt_config	 ; Load NMI/IRQ configuration
 	sta.w SNES_NMITIMEN ; Store to NMITIMEN ($4200)
 	cli ; Enable interrupts
 	jsl.l FinalSetupRoutine ; Call sprite processing routine
@@ -6744,7 +6744,7 @@ PHY_Label:
 	+	lda.b $40
 	sta.w $01ee
 	lda.b $44
-	sta.w $01ed
+	sta.w !dma_src_addr
 
 	sbc.b $3f
 	lsr a
@@ -6753,7 +6753,7 @@ PHY_Label:
 
 	lda.b $46
 	sbc.b $44
-	sta.w $01eb
+	sta.w !dma_size_param
 	lda.w #$00e0
 	tsb.w !system_flags_1
 	lda.w #$ffff
@@ -6992,7 +6992,7 @@ Graphics_ClearFlag:
 	lda.w #$0004	; bit 2 mask
 	trb.w !system_flags_4	 ; Clear bit 2
 	lda.w #$00c8	; Bits 6-7 + bit 3 mask
-	trb.w $0111	 ; Clear those bits in $0111
+	trb.w !system_interrupt_flags	 ; Clear those bits in $0111
 
 Graphics_ClearFlagDone:
 	rts ; Return
@@ -11575,14 +11575,14 @@ Sprite_SetupCharacter_StoreYOffset:
 	lda.b #$40	  ; bit 6 mask
 	and.w $00e0	 ; Test bit 6 of $e0
 	beq Sprite_SetupCharacter_Done ; If clear, done
-	lda.w $01bf	 ; Load character 1 position
+	lda.w !menu_char1_pos	 ; Load character 1 position
 	bra Sprite_SetupCharacter_CheckPos ; Check position
 
 Sprite_SetupCharacter_CheckAlt:
 	lda.b #$80	  ; bit 7 mask
 	and.w $00e0	 ; Test bit 7 of $e0
 	beq Sprite_SetupCharacter_Done ; If clear, done
-	lda.w $0181	 ; Load character 2 position
+	lda.w !menu_char2_pos	 ; Load character 2 position
 
 Sprite_SetupCharacter_CheckPos:
 	cmp.b $62	   ; Compare with Y offset
@@ -11671,33 +11671,33 @@ Script_SavePointerExecute:
 Shop_SubtractGold:
 	sec ; Set carry for subtraction
 	lda.w $0e84	 ; Load gold low word
-	sbc.w $0164	 ; Subtract amount low
+	sbc.w !menu_amount_lo	 ; Subtract amount low
 	sta.w $0e84	 ; Store result low
 	sep #$20		; 8-bit accumulator
 	lda.w $0e86	 ; Load gold high byte
-	sbc.w $0166	 ; Subtract amount high (with borrow)
+	sbc.w !menu_amount_hi	 ; Subtract amount high (with borrow)
 	sta.w $0e86	 ; Store result high
-	lda.w $015f	 ; Load character index
+	lda.w !menu_selection	 ; Load character index
 	cmp.b #$dd	  ; Check if $dd (special)
 	beq Shop_SubtractGold_Alternate ; If yes, alternate storage
 	jsl.l ExternalDataRoutine ; Call external routine
 	clc ; Clear carry
-	adc.w $0162	 ; Add offset
+	adc.w !menu_cursor_pos	 ; Add offset
 	sta.w $0e9f,x   ; Store at indexed location
-	lda.w $015f	 ; Load character index
+	lda.w !menu_selection	 ; Load character index
 	sta.w $0e9e,x   ; Store character ID
 	bra Shop_SubtractGold_Done ; Restore and return
 
 Shop_SubtractGold_Alternate:
 	clc ; Clear carry
 	lda.w !env_counter	 ; Load alternate storage
-	adc.w $0162	 ; Add offset
+	adc.w !menu_cursor_pos	 ; Add offset
 	sta.w !env_counter	 ; Store result
 	bra Shop_SubtractGold_Done ; Restore and return
 
 Menu_ClearCursor:
 	sep #$20		; 8-bit accumulator
-	stz.w $0162	 ; Clear offset
+	stz.w !menu_cursor_pos	 ; Clear offset
 
 Shop_SubtractGold_Done:
 	plx ; Restore X (script pointer high)
@@ -11738,13 +11738,13 @@ Menu_InputHandler:
 	bit.w #$0200	; Test Select (bit 9)
 	beq Menu_InputHandler ; If not pressed, loop
 	sep #$20		; 8-bit accumulator
-	dec.w $0162	 ; Decrement cursor position
+	dec.w !menu_cursor_pos	 ; Decrement cursor position
 	bpl Menu_UpdateDisplay ; If >= 0, update menu
 	lda.b $95	   ; Load wrapping flags
 	and.b #$02	  ; Test bit 1 (wrap down)
 	beq Menu_InputHandler_SelectNoWrap ;00B721|F048    |00B76B
-	lda.w $0163	 ; Load max position
-	sta.w $0162	 ; Wrap to max
+	lda.w !menu_max_pos	 ; Load max position
+	sta.w !menu_cursor_pos	 ; Wrap to max
 	bra Menu_UpdateDisplay ; Update menu
 
 ;-------------------------------------------------------------------------------
@@ -11757,23 +11757,23 @@ Menu_InputHandler:
 ; Technical: Originally labeled UNREACH_00B76B
 ;-------------------------------------------------------------------------------
 Menu_InputHandler_SelectNoWrap:
-	inc.w $0162                          ;00B76B|EE6201  |000162
+	inc.w !menu_cursor_pos                          ;00B76B|EE6201  |000162
 	bra Menu_InputHandler                ;00B76E|80BE    |00B72E
 
 Menu_InputHandler_Down:
 	sep #$20		; 8-bit accumulator
-	inc.w $0162	 ; Increment cursor position
-	lda.w $0163	 ; Load max position
-	cmp.w $0162	 ; Compare with current
+	inc.w !menu_cursor_pos	 ; Increment cursor position
+	lda.w !menu_max_pos	 ; Load max position
+	cmp.w !menu_cursor_pos	 ; Compare with current
 	bcs Menu_UpdateDisplay ; If max >= current, update
 	lda.b $95	   ; Load wrapping flags
 	and.b #$01	  ; Test bit 0 (wrap up)
 	beq Menu_InputHandler_NoWrapUp ; If no wrap, decrement back
-	stz.w $0162	 ; Wrap to 0
+	stz.w !menu_cursor_pos	 ; Wrap to 0
 	bra Menu_UpdateDisplay ; Update menu
 
 Menu_InputHandler_NoWrapUp:
-	dec.w $0162	 ; Decrement back
+	dec.w !menu_cursor_pos	 ; Decrement back
 	bra Menu_InputHandler ; Read input again
 
 Menu_UpdateDisplay:
@@ -11796,7 +11796,7 @@ Menu_UpdateDisplay:
 Menu_InputHandler_YButton_JumpUp:
 	sep #$20                             ;00B797|E220    |      ; 8-bit accumulator
 	sec ;00B799|38      |      ; Set carry for subtraction
-	lda.w $0162                          ;00B79A|AD6201  |000162; Load cursor position
+	lda.w !menu_cursor_pos                          ;00B79A|AD6201  |000162; Load cursor position
 	beq Menu_InputHandler_YButton_Wrap   ;00B79D|F008    |00B7A7; If zero, handle wrap
 	sbc.b #$0a                           ;00B79F|E90A    |      ; Subtract 10
 	bcs Menu_InputHandler_YButton_Store  ;00B7A1|B00D    |00B7B0; If >= 0, store
@@ -11807,9 +11807,9 @@ Menu_InputHandler_YButton_Wrap:
 	lda.b $95                            ;00B7A7|A595    |000095; Load wrap flags
 	and.b #$04                           ;00B7A9|2904    |      ; Test bit 2 (wrap down)
 	beq Menu_InputHandler                ;00B7AB|F081    |00B72E; If no wrap, read input
-	lda.w $0163                          ;00B7AD|AD6301  |000163; Load max position
+	lda.w !menu_max_pos                          ;00B7AD|AD6301  |000163; Load max position
 Menu_InputHandler_YButton_Store:
-	sta.w $0162                          ;00B7B0|8D6201  |000162; Store new cursor position
+	sta.w !menu_cursor_pos                          ;00B7B0|8D6201  |000162; Store new cursor position
 	bra Menu_UpdateDisplay               ;00B7B3|80D8    |00B78D; Update display
 Menu_InputHandler_YButton_Check:
 ; Continue to X button handler
@@ -11827,22 +11827,22 @@ Menu_InputHandler_YButton_Check:
 ;-------------------------------------------------------------------------------
 Menu_InputHandler_XButton_JumpDown:
 	sep #$20                             ;00B7B5|E220    |      ; 8-bit accumulator
-	lda.w $0162                          ;00B7B7|AD6201  |000162; Load cursor position
-	cmp.w $0163                          ;00B7BA|CD6301  |000163; Compare to max
+	lda.w !menu_cursor_pos                          ;00B7B7|AD6201  |000162; Load cursor position
+	cmp.w !menu_max_pos                          ;00B7BA|CD6301  |000163; Compare to max
 	beq Menu_InputHandler_XButton_Wrap   ;00B7BD|F013    |00B7D2; If at max, handle wrap
 	clc ;00B7BF|18      |      ; Clear carry
 	adc.b #$0a                           ;00B7C0|690A    |      ; Add 10
-	sta.w $0162                          ;00B7C2|8D6201  |000162; Store cursor position
-	lda.w $0163                          ;00B7C5|AD6301  |000163; Load max position
-	cmp.w $0162                          ;00B7C8|CD6201  |000162; Compare to cursor
+	sta.w !menu_cursor_pos                          ;00B7C2|8D6201  |000162; Store cursor position
+	lda.w !menu_max_pos                          ;00B7C5|AD6301  |000163; Load max position
+	cmp.w !menu_cursor_pos                          ;00B7C8|CD6201  |000162; Compare to cursor
 	bcs Menu_UpdateDisplay               ;00B7CB|B0C0    |00B78D; If max >= cursor, update
-	sta.w $0162                          ;00B7CD|8D6201  |000162; Clamp to max
+	sta.w !menu_cursor_pos                          ;00B7CD|8D6201  |000162; Clamp to max
 	bra Menu_UpdateDisplay               ;00B7D0|80BB    |00B78D; Update display
 Menu_InputHandler_XButton_Wrap:
 	lda.b $95                            ;00B7D2|A595    |000095; Load wrap flags
 	and.b #$08                           ;00B7D4|2908    |      ; Test bit 3 (wrap up)
 	beq Menu_InputHandler                ;00B7D6|F0BD    |00B72E; If no wrap, read input
-	stz.w $0162                          ;00B7D8|9C6201  |000162; Wrap to 0
+	stz.w !menu_cursor_pos                          ;00B7D8|9C6201  |000162; Wrap to 0
 	bra Menu_UpdateDisplay               ;00B7DB|80B0    |00B78D; Update display
 
 ;-------------------------------------------------------------------------------
@@ -11885,22 +11885,22 @@ IRQ_JitterFix_Loop:
 	lda.w SNES_SLHV ; Sample H/V counter
 	lda.w SNES_STAT78 ; Read PPU status
 	lda.w SNES_OPVCT ; Read vertical counter
-	sta.w $0118	 ; Store V counter
+	sta.w !irq_handler_addr	 ; Store V counter
 	lda.b #$40	  ; bit 6 mask
 	and.w !system_flags_5	 ; Test bit 6 of $da
 	bne IRQ_JitterFix_Skip ; If set, skip jitter calc
-	lda.w $0118	 ; Load V counter
+	lda.w !irq_handler_addr	 ; Load V counter
 	asl a; × 2
-	adc.w $0118	 ; × 3
+	adc.w !irq_handler_addr	 ; × 3
 	adc.b #$9a	  ; Add offset
 	pha ; Push result
 	plp ; Pull to processor status (jitter)
 
 IRQ_JitterFix_Skip:
-	lsr.w $0118	 ; V counter >> 1
+	lsr.w !irq_handler_addr	 ; V counter >> 1
 	bcs IRQ_JitterFix_Loop ; If carry, resample (unstable)
 	ldx.w #$b86c	; Second-stage IRQ handler
-	stx.w $0118	 ; Store handler address
+	stx.w !irq_handler_addr	 ; Store handler address
 	lda.b #$11	  ; Enable V-IRQ + NMI
 	sta.w SNES_NMITIMEN ; Set interrupt mode
 	cli ; Enable interrupts
@@ -11936,8 +11936,8 @@ IRQ_ScreenOn:
 	lda.b #$07	  ; V-IRQ timer low
 	sta.w SNES_VTIMEL ; Set V timer
 	ldx.w #$b898	; Next IRQ handler (IRQ_JitterFix2)
-	stx.w $0118	 ; Store handler address
-	lda.w $0112	 ; Load interrupt mode
+	stx.w !irq_handler_addr	 ; Store handler address
+	lda.w !interrupt_config	 ; Load interrupt mode
 	sta.w SNES_NMITIMEN ; Set interrupt mode
 	lda.b #$40	  ; bit 6
 	tsb.w !system_flags_4	 ; Set bit 6 of $d8
@@ -11969,22 +11969,22 @@ IRQ_JitterFix2_Loop:
 	lda.w SNES_SLHV ; Sample H/V counter
 	lda.w SNES_STAT78 ; Read PPU status
 	lda.w SNES_OPVCT ; Read vertical counter
-	sta.w $0118	 ; Store V counter
+	sta.w !irq_handler_addr	 ; Store V counter
 	lda.b #$40	  ; bit 6 mask
 	and.w !system_flags_5	 ; Test bit 6 of $da
 	bne IRQ_JitterFix2_Skip ; If set, skip jitter calc
-	lda.w $0118	 ; Load V counter
+	lda.w !irq_handler_addr	 ; Load V counter
 	asl a; × 2
-	adc.w $0118	 ; × 3
+	adc.w !irq_handler_addr	 ; × 3
 	adc.b #$0f	  ; Add offset (different from B82A)
 	pha ; Push result
 	plp ; Pull to processor status
 
 IRQ_JitterFix2_Skip:
-	lsr.w $0118	 ; V counter >> 1
+	lsr.w !irq_handler_addr	 ; V counter >> 1
 	bcc IRQ_JitterFix2_Loop ; If no carry, resample (unstable)
 	ldx.w #$b8da	; Second-stage IRQ handler
-	stx.w $0118	 ; Store handler address
+	stx.w !irq_handler_addr	 ; Store handler address
 	lda.b #$11	  ; Enable V-IRQ + NMI
 	sta.w SNES_NMITIMEN ; Set interrupt mode
 	cli ; Enable interrupts
@@ -12020,8 +12020,8 @@ IRQ_ScreenOn2:
 	lda.b #$d8	  ; V-IRQ timer low
 	sta.w $4209	 ; Set V timer (direct address)
 	ldx.w #$b82a	; First-stage IRQ handler
-	stx.w $0118	 ; Store handler address
-	lda.w $0112	 ; Load interrupt mode
+	stx.w !irq_handler_addr	 ; Store handler address
+	lda.w !interrupt_config	 ; Load interrupt mode
 	sta.w $4200	 ; Set interrupt mode (direct)
 	lda.b #$20	  ; bit 5
 	tsb.w !system_flags_4	 ; Set bit 5 of $d8
@@ -12159,7 +12159,7 @@ Game_Initialize:
 	ldx.w #$ba17	; Menu data pointer
 	jsr.w CodeLikelyLoadsProcessesThisData ; Update menu
 	tsc ; Transfer stack to A
-	sta.w $0105	 ; Save stack pointer
+	sta.w !saved_stack_ptr	 ; Save stack pointer
 	lda.w #$0080	; bit 7
 	tsb.w !system_flags_8	 ; Set bit 7 of $de
 	pei.b ($01)	 ; Save $01
@@ -12189,14 +12189,14 @@ Game_Initialize_Loop:
 	rep #$30		; 16-bit A/X/Y
 	and.w #$00ff	; Mask to 8 bits
 	dec a; Decrement (0-based index)
-	sta.w $010e	 ; Store save slot index
+	sta.w !save_slot_index	 ; Store save slot index
 	bmi Game_StartNew ; If negative (new game), branch
 	jsr.w GetSaveSlotAddress ; Get save slot address
 	tax ; X = save address
 	lda.l $700000,x ; Load save data validity flag
 	beq Game_HandleEmptySlot ; If empty, branch
 	jsr.w Sprite_SetMode2D ; Set sprite mode $2d
-	lda.w $010e	 ; Load save slot index
+	lda.w !save_slot_index	 ; Load save slot index
 	jmp.w InitializeGraphicsComponent ; Load game
 
 ;-------------------------------------------------------------------------------
@@ -12273,7 +12273,7 @@ TitleScreen_Init:
 	ldx.w #$bae7	; Data pointer
 	jsr.w CodeLikelyLoadsProcessesThisData ; Update menu
 	lda.b #$10	  ; bit 4 mask
-	trb.w $0111	 ; Clear bit 4 of $0111
+	trb.w !system_interrupt_flags	 ; Clear bit 4 of $0111
 	jsl.l AddressC8000OriginalCode ; External init call
 	stz.w SNES_BG3VOFS ; Clear BG3 V-scroll low
 	stz.w SNES_BG3VOFS ; Clear BG3 V-scroll high
@@ -12290,7 +12290,7 @@ TitleScreen_Init_ScrollLoop:
 	cmp.b #$d0	  ; Check if reached $d0
 	bne TitleScreen_Init_ScrollLoop ; Loop until done
 	lda.b #$10	  ; bit 4 mask
-	tsb.w $0111	 ; Set bit 4 of $0111
+	tsb.w !system_interrupt_flags	 ; Set bit 4 of $0111
 	rep #$30		; 16-bit A/X/Y
 	stz.w $00cc	 ; Clear character count
 	lda.w #$060d	; Load $060d
@@ -12298,7 +12298,7 @@ TitleScreen_Init_ScrollLoop:
 	lda.w #$0000	; Load 0
 	sta.b $05	   ; Clear $05
 	sta.b $01	   ; Clear $01
-	sta.w $015f	 ; Clear $015f
+	sta.w !menu_selection	 ; Clear $015f
 	bra CharName_UpdateDisplay ; Jump to menu display
 
 ;-------------------------------------------------------------------------------
@@ -12388,7 +12388,7 @@ CharName_InputLoop_Confirm:
 	jmp.w Sprite_SetMode2D ; Set sprite mode $2d and return
 
 CharName_InputLoop_Process:
-	stx.w $015f	 ; Store selected option
+	stx.w !menu_selection	 ; Store selected option
 	jsr.w Anim_SetMode10 ; Set animation mode $10
 
 CharName_UpdateDisplay:
@@ -12553,9 +12553,9 @@ System_Init:
 	jsr.w CodeExternalRoutine ; External routine
 	jsr.w InitializeGraphicsDisplaySystem ; Clear memory routine
 	lda.w #$0200	; Load $0200
-	sta.w $01f0	 ; Store in $01f0
+	sta.w !oam_dma_size1	 ; Store in $01f0
 	lda.w #$0020	; Load $0020
-	sta.w $01f2	 ; Store in $01f2
+	sta.w !oam_dma_size2	 ; Store in $01f2
 	lda.w #$0701	; Load $0701
 	sta.b $03	   ; Store in $03
 	stz.b $05	   ; Clear $05
@@ -12669,17 +12669,17 @@ Screen_TransitionReset_Continue:
 	tsb.w !system_flags_1	 ; Set bit 5 of $d2
 	jsl.l InitializePaletteSystem ; External routine
 	lda.w #$00a0	; Load $a0
-	sta.w $01f0	 ; Store in $01f0
+	sta.w !oam_dma_size1	 ; Store in $01f0
 	lda.w #$000a	; Load $0a
-	sta.w $01f2	 ; Store in $01f2
+	sta.w !oam_dma_size2	 ; Store in $01f2
 	tsc ; Transfer stack to A
-	sta.w $0105	 ; Save stack pointer
+	sta.w !saved_stack_ptr	 ; Save stack pointer
 	jsr.w Menu_Handler ; Menu handler
 	lda.w #$00ff	; Load $ff
 	sep #$30		; 8-bit A/X/Y
 	sta.w $0104	 ; Store in $0104
 	rep #$30		; 16-bit A/X/Y
-	lda.w $0105	 ; Load stack pointer
+	lda.w !saved_stack_ptr	 ; Load stack pointer
 	tcs ; Restore stack
 	jsl.l FinalSetupRoutine ; External routine
 	jsr.w Memory_ClearBlock ; Clear memory
@@ -12687,9 +12687,9 @@ Screen_TransitionReset_Continue:
 	jsr.w CodeLikelyLoadsProcessesThisData ; Update menu
 	jsl.l AddressC8000OriginalCode ; External init
 	lda.w #$0040	; Load $40
-	sta.w $01f0	 ; Store in $01f0
+	sta.w !oam_dma_size1	 ; Store in $01f0
 	lda.w #$0004	; Load $04
-	sta.w $01f2	 ; Store in $01f2
+	sta.w !oam_dma_size2	 ; Store in $01f2
 	pla ; Restore state marker
 	sta.w $0e00	 ; Store back
 	jsr.w ExternalRoutine2 ; External routine
@@ -12855,7 +12855,7 @@ LOOSE_OP_00BDE5:
 	sta.b $8e	   ; Store in $8e
 
 Menu_Handler_Process:
-	stx.w $015f	 ; Store input state
+	stx.w !menu_selection	 ; Store input state
 	jsr.w Anim_SetMode10 ; Set animation mode $10
 	bra Menu_Handler_Update ; Continue
 
@@ -13035,7 +13035,7 @@ Menu_OptionSelection:
 	cmp.w #$000c	; Check if option $0c
 	beq Menu_OptionSelection_Cancel ; If yes, treat as cancel
 	lda.b $01	   ; Load full option
-	sta.w $015f	 ; Store selection
+	sta.w !menu_selection	 ; Store selection
 	lda.w #$ffff	; Load $ffff
 	sta.b $01	   ; Store in $01
 	stz.b $8e	   ; Clear $8e
@@ -13083,7 +13083,7 @@ UNREACH_00BED5:
 	db $48,$22,$00,$80,$0c
 
 Menu_OptionSelection_UpdateDisplay:
-	stx.w $015f	 ; Store input state
+	stx.w !menu_selection	 ; Store input state
 	jsr.w Anim_SetMode10 ; Set animation mode $10
 	ldx.w #$be80	; Data pointer
 	jsr.w CodeLikelyLoadsProcessesThisData ; Update menu
@@ -13148,7 +13148,7 @@ SystemData_Config10:
 	db $00		 ; Padding
 
 Menu_MultiOption_Process:
-	stx.w $015f	 ; Store input state
+	stx.w !menu_selection	 ; Store input state
 	jsr.w Anim_SetMode10 ; Set animation mode $10
 	bra Menu_MultiOption_Loop ; Loop
 
@@ -13864,7 +13864,7 @@ Menu_SaveDelete_Confirm:
 	dec a; Back to 0-based
 	rep #$30		; 16-bit A/X/Y
 	and.w #$00ff	; Mask to 8 bits
-	sta.w $010e	 ; Store slot index
+	sta.w !save_slot_index	 ; Store slot index
 	jsr.w GetSaveSlotAddress2 ; Get save slot address
 	lda.w #$0040	; bit 6 mask
 	tsb.w !system_flags_8	 ; Set bit 6 of $de
@@ -14094,7 +14094,7 @@ WRAM_BattleMenu_Init:
 	mvn $00,$00	 ; Block move within Bank $00
 	sep #$20		; 8-bit accumulator
 	lda.b #$c0	  ; Bits 6-7
-	tsb.w $0111	 ; Set bits in $0111
+	tsb.w !system_interrupt_flags	 ; Set bits in $0111
 	rep #$30		; 16-bit A/X/Y
 
 
@@ -14420,7 +14420,7 @@ WRAM_SetupSprites_Done:
 Screen_DisableDMA:
 	sep #$20		;00C78D|E220    |      ;
 	lda.b #$c0	  ;00C78F|A9C0    |      ;
-	trb.w $0111	 ;00C791|1C1101  |000111;
+	trb.w !system_interrupt_flags	 ;00C791|1C1101  |000111;
 	rts ;00C794|60      |      ;
 
 Screen_WaitForUpdate:
@@ -14476,7 +14476,7 @@ Menu_Init_Battle:
 	jmp.w CodeLikelyLoadsProcessesThisData ;00C7ED|4CC49B  |009BC4;
 
 Menu_Init_Status:
-	lda.w $010d	 ;00C7F0|AD0D01  |00010D;
+	lda.w !anim_frame_timer	 ;00C7F0|AD0D01  |00010D;
 	bpl Menu_Init_Status_Continue ;00C7F3|1003    |00C7F8;
 	lda.w #$0000	;00C7F5|A90000  |      ;
 
@@ -14551,7 +14551,7 @@ Menu_Init_SetBit7:
 	bra Menu_Init_UpdateMenu ;00C883|8018    |00C89D;
 
 Menu_Init_LoadCharacter:
-	lda.w $010d	 ;00C885|AD0D01  |00010D;
+	lda.w !anim_frame_timer	 ;00C885|AD0D01  |00010D;
 	bpl Menu_Init_LoadCharacter_Continue ;00C888|1003    |00C88D;
 	lda.w #$0000	;00C88A|A90000  |      ;
 
@@ -14626,7 +14626,7 @@ SystemData_Config32:
 
 ; Save slot address calculation
 Save_GetSlotAddress:
-	lda.w $015f	 ;00C928|AD5F01  |00015F;
+	lda.w !menu_selection	 ;00C928|AD5F01  |00015F;
 
 Save_GetSlotAddress_Main:
 	and.w #$00ff	;00C92B|29FF00  |      ;
@@ -14986,7 +14986,7 @@ GameState_DataCopy:
 	lda.w #$0080	;00CBA1|A98000  |      ;
 	tsb.w !system_flags_5	 ;00CBA4|0CDA00  |0000DA;
 	lda.w #$0020	;00CBA7|A92000  |      ;
-	tsb.w $0111	 ;00CBAA|0C1101  |000111;
+	tsb.w !system_interrupt_flags	 ;00CBAA|0C1101  |000111;
 	lda.b $02	   ;00CBAD|A502    |000002;
 	and.w #$00ff	;00CBAF|29FF00  |      ;
 	inc a;00CBB2|1A      |      ;
@@ -15059,7 +15059,7 @@ Screen_ColorProcessLoop:
 	lda.b #$08	  ;00CC4B|A908    |      ;
 	trb.w !system_flags_2	 ;00CC4D|1CD400  |0000D4;
 	lda.b #$20	  ;00CC50|A920    |      ;
-	trb.w $0111	 ;00CC52|1C1101  |000111;
+	trb.w !system_interrupt_flags	 ;00CC52|1C1101  |000111;
 	lda.b #$80	  ;00CC55|A980    |      ;
 	trb.w !system_flags_5	 ;00CC57|1CDA00  |0000DA;
 	rts ;00CC5A|60      |      ;

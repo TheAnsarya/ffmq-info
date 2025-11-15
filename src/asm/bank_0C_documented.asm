@@ -81,7 +81,7 @@ Display_ShowCharStats:
 	lda.b $64	   ;0C8028	; Load character index
 	sta.w $00ef	 ;0C802A	; Store to temp variable
 	lda.l DATA8_07EE84,X ;0C802D	; Load stat byte 0
-	sta.w $015f	 ;0C8031	; Store to display buffer
+	sta.w !menu_selection	 ;0C8031	; Store to display buffer
 	lda.l DATA8_07EE85,X ;0C8034	; Load stat byte 1
 	jsr.w Display_ProcessStatValue ;0C8038	; Process stat value
 	sta.w $00b5	 ;0C803B	; Store processed value
@@ -142,7 +142,7 @@ Display_InitScreen:
 	lda.w #$2100	;0C808B	; PPU register base address
 	tcd ;0C808E	; Transfer to direct page
 	sep #$20		;0C808F	; 8-bit accumulator
-	stz.w $0111	 ;0C8091	; Clear NMI flag
+	stz.w !system_interrupt_flags	 ;0C8091	; Clear NMI flag
 	stz.w !system_flags_1	 ;0C8094	; Clear screen mode flag
 	stz.w !system_flags_2	 ;0C8097	; Clear layer enable flag
 	lda.b #$08	  ;0C809A	; Mode 7 enable bit
@@ -206,7 +206,7 @@ Display_InitScreen:
 
 	sta.b SNES_TM-$2100 ;0C80B2	; Set main screen layers ($212c) = $11 (BG1+Obj)
 	jsr.w CallGraphicsSetupRoutine ;0C80B4	; Call graphics setup routine
-	lda.w $0112	 ;0C80B7	; Load NMI enable flags
+	lda.w !interrupt_config	 ;0C80B7	; Load NMI enable flags
 	sta.w $4200	 ;0C80BA	; Set NMI/IRQ/Auto-Joypad ($4200)
 	cli ;0C80BD	; Enable interrupts
 	lda.b #$0f	  ;0C80BE	; Brightness = 15 (full)
@@ -548,7 +548,7 @@ Display_EffectScriptInterpreter:
 	.ComplexOps:
 	pha ;0C82A6	; Save command byte
 	and.b #$07	  ;0C82A7	; Extract parameter (bits 0-2)
-	sta.w $015f	 ;0C82A9	; Store parameter
+	sta.w !menu_selection	 ;0C82A9	; Store parameter
 	pla ;0C82AC	; Restore command byte
 	and.b #$f8	  ;0C82AD	; Extract command (bits 3-7)
 	cmp.b #$40	  ;0C82AF	; Command < $40?
@@ -560,7 +560,7 @@ Display_EffectScriptInterpreter:
 	sbc.b #$40	  ;0C82BB	; Normalize command ($c0+ → $80+)
 	sta.w $0161	 ;0C82BD	; Store normalized command
 	rep #$30		;0C82C0	; 16-bit A/X/Y
-	lda.w $015f	 ;0C82C2	; Load parameter
+	lda.w !menu_selection	 ;0C82C2	; Load parameter
 	asl A		   ;0C82C5	; *2
 	asl A		   ;0C82C6	; *4 (table offset)
 	adc.w #$0cbc	;0C82C7	; Add table base address
@@ -571,7 +571,7 @@ Display_EffectScriptInterpreter:
 Display_EffectCommandHighRange:	; Process command $80-$bf with triple table lookup
 	sta.w $0161	 ;0C82CF	; Store command
 	rep #$30		;0C82D2	; 16-bit A/X/Y
-	lda.w $015f	 ;0C82D4	; Load parameter
+	lda.w !menu_selection	 ;0C82D4	; Load parameter
 	asl A		   ;0C82D7	; *2
 	asl A		   ;0C82D8	; *4
 	pha ;0C82D9	; Save offset
@@ -602,7 +602,7 @@ Display_EffectCommandMidRange:
 Display_EffectCommandLowRange:
 	cmp.b #$08	  ;0C8302	; Command = $08?
 	bne BranchIfNot ;0C8304	; Branch if not $08
-	lda.w $015f	 ;0C8306	; Load parameter
+	lda.w !menu_selection	 ;0C8306	; Load parameter
 	bne Display_EffectTableLookup ;0C8309	; Branch if parameter != 0
 	rep #$30		;0C830B	; 16-bit A/X/Y
 	lda.w #$3c03	;0C830D	; bit mask
@@ -615,7 +615,7 @@ Display_EffectCommandLowRange:
 ; Parameter-based table lookup
 Display_EffectTableLookup:
 	rep #$30		;0C831E	; 16-bit A/X/Y
-	lda.w $015f	 ;0C8320	; Load parameter
+	lda.w !menu_selection	 ;0C8320	; Load parameter
 	asl A		   ;0C8323	; *2
 	asl A		   ;0C8324	; *4
 	pha ;0C8325	; Save offset
@@ -631,7 +631,7 @@ Display_EffectTableLookup:
 	sta.w $0000,Y   ;0C8339	; Store to destination
 	lda.w $0c98	 ;0C833C	; Load second value
 	sta.w $0004,Y   ;0C833F	; Store to destination+4
-	ldy.w $015f	 ;0C8342	; Load parameter
+	ldy.w !menu_selection	 ;0C8342	; Load parameter
 	lda.w #$0003	;0C8345	; bit shift value = 3
 
 ; bit shift loop
@@ -645,7 +645,7 @@ Display_EffectTableLookup:
 	and.w #$aaaa	;0C8351	; Mask pattern ($aaaa)
 	tsb.w $0e08	 ;0C8354	; Set masked bits
 	pla ;0C8357	; Restore shifted value
-	ldy.w $015f	 ;0C8358	; Reload parameter
+	ldy.w !menu_selection	 ;0C8358	; Reload parameter
 	lsr A		   ;0C835B	; Shift right /2
 	lsr A		   ;0C835C	; Shift right /2 (total /4)
 
@@ -1177,7 +1177,7 @@ Display_SpriteOAMDataCopy:
 ; ==============================================================================
 
 Display_ClearNMIFlag:
-	stz.w $0111	 ;0C87E9	; Clear NMI enable flag
+	stz.w !system_interrupt_flags	 ;0C87E9	; Clear NMI enable flag
 	rts ;0C87EC	; Return
 
 ; ==============================================================================
@@ -1273,7 +1273,7 @@ Display_Mode7TilemapSetup:
 	sta.w $4327	 ;0C8862	; DMA2 indirect address bank
 
 	lda.b #$06	  ;0C8865	; Enable channels 1 and 2
-	sta.w $0111	 ;0C8867	; Set HDMA enable flag (NMI handler)
+	sta.w !system_interrupt_flags	 ;0C8867	; Set HDMA enable flag (NMI handler)
 	rts ;0C886A	; Return
 
 ; ==============================================================================

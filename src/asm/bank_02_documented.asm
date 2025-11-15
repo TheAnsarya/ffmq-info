@@ -6222,7 +6222,7 @@ Display_VBlankWait:
 	lda.b #$04	  ;02DB71|A904    |      ; Transfer 4 bytes
 	mvn $00,$02	 ;02DB73|540002  |      ; Block move to DMA registers
 	lda.b #$80	  ;02DB76|A980    |      ; DMA enable flag
-	tsb.w $0111	 ;02DB78|0C1101  |000111; Test and set DMA trigger
+	tsb.w !system_interrupt_flags	 ;02DB78|0C1101  |000111; Test and set DMA trigger
 	phk ;02DB7B|4B      |      ; Push program bank
 	plb ;02DB7C|AB      |      ; Set as data bank
 	stz.b $ea	   ;02DB7D|64EA    |000AEA; Clear DMA complete flag
@@ -6646,7 +6646,7 @@ Graphics_BufferInit:
 	sep #$20		;02DFB3|E220    |      ; 8-bit accumulator
 	rep #$10		;02DFB5|C210    |      ; 16-bit index
 	lda.b #$04	  ;02DFB7|A904    |      ; Set DMA enable flag
-	tsb.w $0111	 ;02DFB9|0C1101  |020111; Test and set DMA control
+	tsb.w !system_interrupt_flags	 ;02DFB9|0C1101  |020111; Test and set DMA control
 	plp ;02DFBC|28      |      ; Restore processor status
 	rts ;02DFBD|60      |      ; Return to caller
 
@@ -7093,7 +7093,7 @@ PPU_InitEngine:
 ; Final System Coordination
 	lda.b #$02	  ;02E667|A902    |      ;  Load coordination flag
 	jsl.l CWaitTimingRoutine ;02E669|2200800C|0C8000;  Call coordination routine
-	tsb.w $0111	 ;02E66D|0C1101  |020111;  Set coordination bit
+	tsb.w !system_interrupt_flags	 ;02E66D|0C1101  |020111;  Set coordination bit
 
 ; ------------------------------------------------------------------------------
 ; Real-Time Processing Loop with Advanced State Management
@@ -7157,7 +7157,7 @@ Label_02E6B4:
 ; System Shutdown and Cleanup
 RealTime_Shutdown:
 	lda.b #$02	  ;02E6D5|A902    |      ;  Load shutdown flag
-	trb.w $0111	 ;02E6D7|1C1101  |020111;  Clear coordination flag
+	trb.w !system_interrupt_flags	 ;02E6D7|1C1101  |020111;  Clear coordination flag
 	stz.w $2123	 ;02E6DA|9C2321  |022123;  Clear BG1/BG2 window
 	stz.w $2124	 ;02E6DD|9C2421  |022124;  Clear BG3/BG4 window
 	stz.w $2125	 ;02E6E0|9C2521  |022125;  Clear OBJ/color window

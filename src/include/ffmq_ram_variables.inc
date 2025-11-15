@@ -115,6 +115,48 @@
 !tilemap2_addr      = $00f5     ; Tilemap 2 source address (invalidated with #$ffff)
 !tile_offset_2      = $00f7     ; Tile offset parameter 2
 
+; ============================================================================
+; Stack Page System Variables ($0100-$01ff)
+; ============================================================================
+; These variables occupy the stack page (page 1 of RAM)
+
+; ----------------------------------------------------------------------------
+; System Interrupts & DMA ($0105-$0118)
+; ----------------------------------------------------------------------------
+!saved_stack_ptr    = $0105     ; Saved stack pointer
+!char_data_ptrs     = $0107     ; Character data pointer array base ($0107, $0109, $010b)
+!char1_data_ptr     = $0107     ; Character 1 data pointer (16-bit)
+!char2_data_ptr     = $0109     ; Character 2 data pointer (16-bit)
+!char3_data_ptr     = $010b     ; Character 3 data pointer (16-bit)
+!anim_frame_timer   = $010d     ; Animation frame timer (12-frame cycle)
+!save_slot_index    = $010e     ; Save slot index / character index / state marker
+!system_interrupt_flags = $0111 ; System interrupt flags (11 uses - tsb/trb)
+!interrupt_config   = $0112     ; NMI/IRQ configuration flags
+!irq_handler_addr   = $0118     ; IRQ handler address / V counter temp (12 uses)
+
+; ----------------------------------------------------------------------------
+; Menu System ($015f-$0181, $01bf)
+; ----------------------------------------------------------------------------
+!menu_selection     = $015f     ; Menu selection / input state (9 uses)
+!menu_cursor_pos    = $0162     ; Menu cursor position (17 uses - heavily used)
+!menu_max_pos       = $0163     ; Menu maximum position
+!menu_amount_lo     = $0164     ; Menu amount value (low byte)
+!menu_amount_hi     = $0166     ; Menu amount value (high byte)
+!menu_char1_pos     = $01bf     ; Character 1 menu position
+!menu_char2_pos     = $0181     ; Character 2 menu position
+
+; ----------------------------------------------------------------------------
+; DMA Transfer Parameters ($01eb-$01f8)
+; ----------------------------------------------------------------------------
+!dma_size_param     = $01eb     ; DMA transfer size parameter
+!dma_src_addr       = $01ed     ; DMA source address (16-bit: $01ed-$01ee)
+!dma_src_bank       = $01ef     ; DMA source bank
+!oam_dma_size1      = $01f0     ; OAM DMA size 1 (main sprite table)
+!oam_dma_size2      = $01f2     ; OAM DMA size 2 (high table)
+!vram_transfer_size = $01f4     ; VRAM transfer size
+!vram_src_addr      = $01f6     ; VRAM transfer source address
+!vram_dest_addr     = $01f8     ; VRAM transfer destination address
+
 ; ----------------------------------------------------------------------------
 ; Player State ($40-$5f)
 ; ----------------------------------------------------------------------------
