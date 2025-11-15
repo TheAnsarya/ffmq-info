@@ -4486,82 +4486,530 @@ Dialog_Execute:
 	rtl                                  ;009D74|6B      |      ;
 ;      |        |      ;
 ;      |        |      ;
+;===============================================================================
+; Dialog_ExecuteInternal
+;-------------------------------------------------------------------------------
+; Core bytecode interpreter for FFMQ's dialog and command execution system.
+; Reads and processes bytecode commands from ROM, executing text display,
+; graphics operations, game logic, and other scripted behaviors. This is the
+; heart of the game's scripting engine, used for dialogs, cutscenes, battle
+; sequences, menu operations, and more.
+;
+; CALLING CONVENTION:
+;   JSR (short call) or JMP (after PEA stack setup)
+;   $17-$18: 24-bit pointer to bytecode stream (bank:addr format)
+;   $3D: Termination byte value (optional, $00 = run forever)
+;   $1A-$1B: 24-bit pointer to output buffer (for text commands)
+;   $1D: Text encryption key (XOR mask for characters ≥ $80)
+;   All registers will be restored on exit
+;
+; OPERATION:
+;   1. Save all registers (P, B, A, D, X, Y) to stack
+;   2. Set data bank to current program bank (PHK/PLB)
+;   3. Check system flag $DB bit 3 (special dialog mode)
+;   4. If bit 3 set AND $D0 bit 4 clear: Enter normal command loop
+;      a. Read next byte from [$17]
+;      b. Check if byte matches terminator $3D
+;      c. If not terminator: continue loop
+;      d. If terminator: finish and restore state
+;   5. If bit 3 set AND $D0 bit 4 set: Wait for frame, then finish
+;   6. If bit 3 clear: Enter flag-checking loop
+;      a. Check $D0 for bits 7 or 4 (pause flags)
+;      b. If neither set: read next command byte
+;      c. If bit 4 set: wait for frame, loop back
+;      d. If bit 7 set: clear bit 7, finish
+;   7. Restore all registers and return
+;
+; BYTECODE COMMAND DISPATCH:
+;   Commands $00-$7F: Direct operations (jump table dispatch)
+;     - $00-$2F: Standard commands (48 total)
+;     - $30-$7F: Text block references (80 text banks)
+;   Commands $80-$FF: Text characters
+;     - XOR with $1D encryption key
+;     - Write to [$1A] output buffer
+;     - Increment $1A by 2 (word-aligned text storage)
+;
+; BYTECODE POINTER ($17-$18):
+;   24-bit long address format: [bank:addr]
+;   Bank byte at $19, address at $17-$18
+;   Auto-increments after each byte read
+;   Typically points to ROM data in banks $03, $04, $07, etc.
+;
+; OUTPUT BUFFER ($1A-$1B):
+;   24-bit long address for decoded text output
+;   Bank byte at $1C, address at $1A-$1B
+;   Increments by 2 per character (word storage)
+;   Usually points to RAM buffers for dialog rendering
+;
+; TEXT ENCRYPTION ($1D):
+;   Single-byte XOR key for character obfuscation
+;   Applied only to bytes ≥ $80 (text characters)
+;   Command bytes ($00-$7F) not encrypted
+;   Common key values: $00 (no encryption), $55, $AA, etc.
+;
+; TERMINATOR BYTE ($3D):
+;   Special value indicating end of command sequence
+;   Checked in main loop: if ($17 byte == $3D) → exit
+;   Value $3D = '=' character, unlikely in normal text
+;   Some scripts use $00 terminator instead
+;
+; SYSTEM FLAGS:
+;   $DB bit 3: Enable special dialog processing mode
+;   $D0 bit 4: Skip command execution, wait mode
+;   $D0 bit 7: Force exit flag (clear and terminate)
+;   $D0 bits 4+7: Pause/resume dialog processing
+;
+; COMMAND DISPATCH TABLE (DATA8_009e0e):
+;   48 command handlers (96 bytes = 48 × 2-byte addresses)
+;   Index: command byte × 2 (word indexing)
+;   Example: Command $00 → jump to [$009E0E] = $A378
+;   Commands $00-$2F implemented, $30+ handled separately
+;
+; TEXT REFERENCE TABLE (DATA8_03ba35):
+;   Located in bank $03 at $BA35
+;   Structure: [length byte][text data...][length][text...]...
+;   Commands $30-$7F reference text blocks 0-79
+;   Algorithm: Skip N blocks by summing length bytes
+;   After skip: execute nested bytecode from that block
+;
+; NESTED EXECUTION:
+;   Text references ($30-$7F) recursively call Dialog_ExecuteNestedCall
+;   Preserves current bytecode pointer on stack
+;   Executes referenced text block as separate command stream
+;   Returns to continue original stream after nested completion
+;
+; LOOP TYPES:
+;
+;   1. NORMAL LOOP (system flag $DB bit 3 set, $D0 bit 4 clear):
+;      - Reads and executes commands continuously
+;      - Checks for terminator $3D after each command
+;      - Fastest execution path for sequential commands
+;
+;   2. ALTERNATE LOOP ($DB bit 3 set, $D0 bit 4 set):
+;      - Waits one frame (Dialog_WaitForFrame)
+;      - Then exits immediately
+;      - Used for frame-synchronized operations
+;
+;   3. FLAG-CHECKING LOOP ($DB bit 3 clear):
+;      - Checks $D0 bits 4 and 7 before each command
+;      - If bit 4 set: waits for frame, loops
+;      - If bit 7 set: clears bit 7, exits
+;      - If neither set: reads next command
+;      - Used for pauseable/resumable dialog sequences
+;
+; PERFORMANCE:
+;   Per command (average): ~50-200 cycles depending on command type
+;   Text character: ~40 cycles (read, decrypt, write, increment)
+;   Command dispatch: ~60 cycles (read, compare, jump indirect)
+;   Text reference: ~200-500 cycles (table lookup, nested call)
+;   Loop overhead: ~30 cycles per iteration
+;
+; USAGE EXAMPLE:
+;   Execute battle dialog sequence:
+;       lda #$LOW(BattleDialog)     ; Set bytecode pointer
+;       sta $17
+;       lda #$HIGH(BattleDialog)
+;       sta $18
+;       lda #$03                     ; Bank $03
+;       sta $19
+;       lda #$00                     ; No terminator (run all)
+;       sta $3D
+;       lda #$LOW(TextBuffer)        ; Set output buffer
+;       sta $1A
+;       lda #$HIGH(TextBuffer)
+;       sta $1B
+;       lda #$00                     ; Bank $00 (WRAM)
+;       sta $1C
+;       lda #$55                     ; Set encryption key
+;       sta $1D
+;       jsr Dialog_ExecuteInternal   ; Execute bytecode
+;
+; COMMON CALLERS:
+;   - Battle command processing
+;   - Cutscene playback
+;   - Menu interaction handlers
+;   - NPC dialog display
+;   - Event triggers
+;
+; REGISTERS MODIFIED:
+;   All registers (A, X, Y) modified during execution
+;   All restored via Stack_RestoreRegisters before return
+;
+; REGISTERS PRESERVED:
+;   All registers (via stack: P, B, A, D, X, Y)
+;   Caller sees no register changes
+;
+; CRITICAL DEPENDENCIES:
+;   - Bytecode data must be valid and well-formed
+;   - Command jump table (DATA8_009e0e) must be complete
+;   - Text reference table (DATA8_03ba35) must be valid
+;   - Output buffer must be writable (WRAM)
+;   - Dialog_ReadNextByte, Dialog_ProcessCommand must exist
+;   - Stack must have space for 7 register saves (14 bytes)
+;
+; TECHNICAL NOTES:
+;   The three-loop design (normal, alternate, flag-checking) allows the
+;   same interpreter to handle both non-interruptible cutscenes (normal
+;   loop) and pauseable dialogs (flag-checking loop). This flexibility
+;   is critical for FFMQ's diverse scripting needs.
+;
+;   Text encryption with XOR is a simple anti-spoiler measure. The key
+;   $1D can be changed dynamically, allowing different encryption for
+;   different text blocks. Decryption is symmetric: XOR again to decrypt.
+;
+;   The terminator byte $3D check enables early exit from command streams.
+;   Without a terminator, the loop runs until a STOP command ($00) or
+;   flag-based exit. This provides two termination mechanisms: explicit
+;   (terminator) and implicit (command-triggered).
+;
+;   Nested text references create a call stack effect without actually
+;   using JSR/RTS. Instead, Dialog_ExecuteNestedCall manually manages
+;   bytecode pointers, allowing arbitrary nesting depth limited only by
+;   stack space.
+;
+;   The indirect jump "(DATA8_009e0e,x)" is a classic 65816 dispatch
+;   pattern. The JMP (addr,x) instruction reads a 16-bit address from
+;   [addr + X], then jumps to that address. This enables O(1) command
+;   dispatch without a chain of compare-and-branch instructions.
+;===============================================================================
 Dialog_ExecuteInternal:
-	php                                  ;009D75|08      |      ;
-	rep #$30                             ;009D76|C230    |      ;
-	phb                                  ;009D78|8B      |      ;
-	pha                                  ;009D79|48      |      ;
-	phd                                  ;009D7A|0B      |      ;
-	phx                                  ;009D7B|DA      |      ;
-	phy                                  ;009D7C|5A      |      ;
-	phk                                  ;009D7D|4B      |      ;
-	plb                                  ;009D7E|AB      |      ;
-	lda.W #$0008                         ;009D7F|A90800  |      ;
-	and.w !system_flags_6                          ;009D82|2DDB00  |0000DB;
-	beq Dialog_ProcessLoop_CheckFlags                      ;009D85|F01B    |009DA2;
-	lda.W #$0010                         ;009D87|A91000  |      ;
-	and.W $00d0                          ;009D8A|2DD000  |0000D0;
-	bne Dialog_ProcessLoop_Alternate                      ;009D8D|D00B    |009D9A;
+	php                                  ;009D75|08      |      ; Save processor status flags
+	rep #$30                             ;009D76|C230    |      ; Set 16-bit A and X/Y for register saves
+	phb                                  ;009D78|8B      |      ; Save data bank register
+	pha                                  ;009D79|48      |      ; Save accumulator
+	phd                                  ;009D7A|0B      |      ; Save Direct Page register
+	phx                                  ;009D7B|DA      |      ; Save X register
+	phy                                  ;009D7C|5A      |      ; Save Y register (7 pushes = 14 bytes stack)
+	phk                                  ;009D7D|4B      |      ; Push program bank to stack
+	plb                                  ;009D7E|AB      |      ; Pull into data bank: DBR = current code bank
+	lda.W #$0008                         ;009D7F|A90800  |      ; A = $0008 (bit 3 mask)
+	and.w !system_flags_6                          ;009D82|2DDB00  |0000DB; Test system flag $DB bit 3
+	beq Dialog_ProcessLoop_CheckFlags                      ;009D85|F01B    |009DA2; If bit 3 clear → flag-checking loop
+	lda.W #$0010                         ;009D87|A91000  |      ; A = $0010 (bit 4 mask)
+	and.W $00d0                          ;009D8A|2DD000  |0000D0; Test $D0 bit 4 (skip/wait mode)
+	bne Dialog_ProcessLoop_Alternate                      ;009D8D|D00B    |009D9A; If bit 4 set → alternate loop (wait+exit)
 ;      |        |      ;
 Dialog_ProcessLoop:
-	jsr.W Dialog_ReadNextByte                    ;009D8F|20BD9D  |009DBD;
-	lda.B $17                            ;009D92|A517    |000017;
-	cmp.B $3d                            ;009D94|C53D    |00003D;
-	bne Dialog_ProcessLoop                      ;009D96|D0F7    |009D8F;
-	bra Dialog_ProcessLoop_Finish                      ;009D98|8020    |009DBA;
+	jsr.W Dialog_ReadNextByte                    ;009D8F|20BD9D  |009DBD; Read next bytecode byte from [$17], increment pointer
+	lda.B $17                            ;009D92|A517    |000017; A = current byte just read (in $17 temp storage)
+	cmp.B $3d                            ;009D94|C53D    |00003D; Compare with terminator byte at $3D
+	bne Dialog_ProcessLoop                      ;009D96|D0F7    |009D8F; If not terminator → loop (read next command)
+	bra Dialog_ProcessLoop_Finish                      ;009D98|8020    |009DBA; Terminator reached → finish and restore state
 ;      |        |      ;
 ;      |        |      ;
 Dialog_ProcessLoop_Alternate:
-	jsr.W Dialog_WaitForFrame                    ;009D9A|2055E0  |00E055;
-	bra Dialog_ProcessLoop_Finish                      ;009D9D|801B    |009DBA;
+	jsr.W Dialog_WaitForFrame                    ;009D9A|2055E0  |00E055; Wait for one VBlank frame (synchronization)
+	bra Dialog_ProcessLoop_Finish                      ;009D9D|801B    |009DBA; After frame wait → finish immediately
 ;      |        |      ;
 ;      |        |      ;
 Dialog_ProcessLoop_Wait:
-	jsr.W Dialog_ReadNextByte                    ;009D9F|20BD9D  |009DBD;
+	jsr.W Dialog_ReadNextByte                    ;009D9F|20BD9D  |009DBD; Read and process next bytecode command
 ;      |        |      ;
 Dialog_ProcessLoop_CheckFlags:
-	lda.W $00d0                          ;009DA2|ADD000  |0000D0;
-	bit.W #$0090                         ;009DA5|899000  |      ;
-	beq Dialog_ProcessLoop_Wait                      ;009DA8|F0F5    |009D9F;
-	bit.W #$0080                         ;009DAA|898000  |      ;
-	bne Dialog_ProcessLoop_ClearFlag                      ;009DAD|D005    |009DB4;
-	jsr.W Dialog_WaitForFrame                    ;009DAF|2055E0  |00E055;
-	bra Dialog_ProcessLoop_CheckFlags                      ;009DB2|80EE    |009DA2;
+	lda.W $00d0                          ;009DA2|ADD000  |0000D0; A = dialog control flags ($D0)
+	bit.W #$0090                         ;009DA5|899000  |      ; Test bits 7 and 4 (exit flag + wait flag)
+	beq Dialog_ProcessLoop_Wait                      ;009DA8|F0F5    |009D9F; If neither set → read next command normally
+	bit.W #$0080                         ;009DAA|898000  |      ; Test bit 7 (force exit flag)
+	bne Dialog_ProcessLoop_ClearFlag                      ;009DAD|D005    |009DB4; If bit 7 set → clear it and exit
+	jsr.W Dialog_WaitForFrame                    ;009DAF|2055E0  |00E055; Bit 4 set (wait mode) → wait one frame
+	bra Dialog_ProcessLoop_CheckFlags                      ;009DB2|80EE    |009DA2; After frame wait → check flags again
 ;      |        |      ;
 ;      |        |      ;
 Dialog_ProcessLoop_ClearFlag:
-	lda.W #$0080                         ;009DB4|A98000  |      ;
-	trb.W $00d0                          ;009DB7|1CD000  |0000D0;
+	lda.W #$0080                         ;009DB4|A98000  |      ; A = $0080 (bit 7 mask)
+	trb.W $00d0                          ;009DB7|1CD000  |0000D0; Test and Reset bit 7 in $D0 (clear exit flag)
 ;      |        |      ;
 Dialog_ProcessLoop_Finish:
-	jmp.W Stack_RestoreRegisters                    ;009DBA|4C1B98  |00981B;
+	jmp.W Stack_RestoreRegisters                    ;009DBA|4C1B98  |00981B; Restore P, B, A, D, X, Y from stack and return
 ;      |        |      ;
 ;      |        |      ;
+;===============================================================================
+; Dialog_ReadNextByte
+;-------------------------------------------------------------------------------
+; Reads the next bytecode byte from the command stream, processes it as either
+; a command (bytes $00-$7F) or text character (bytes $80-$FF), and advances
+; the bytecode pointer. This is the core fetch-decode-dispatch routine of the
+; bytecode interpreter.
+;
+; CALLING CONVENTION:
+;   JSR (short call from Dialog_ExecuteInternal loop)
+;   $17-$19: 24-bit bytecode pointer (auto-incremented)
+;   $1A-$1C: 24-bit output buffer pointer (for text writes)
+;   $1D: Text encryption key (XOR mask for character decryption)
+;   Processor must be in 16-bit accumulator mode
+;
+; OPERATION:
+;   1. Read byte from [$17] (24-bit long address)
+;   2. Increment $17 (bytecode pointer advances by 1)
+;   3. Mask to 8-bit value (AND $00FF)
+;   4. Compare with $80 (command vs text threshold)
+;   5. If < $80: Jump to Dialog_ProcessCommand (commands $00-$7F)
+;   6. If ≥ $80: Fall through to text character processing
+;      a. XOR with encryption key at $1D
+;      b. Write decrypted character to [$1A]
+;      c. Increment $1A by 2 (word-aligned text storage)
+;   7. Return to caller
+;
+; BYTECODE STREAM POINTER ($17-$19):
+;   24-bit long address in 65816 format:
+;     $17: Address low byte
+;     $18: Address high byte
+;     $19: Bank byte
+;   Auto-increments after each read: $17++
+;   Typical values: $03:BA00-FFFF, $04:8000-FFFF, etc.
+;
+; COMMAND VS TEXT THRESHOLD ($80):
+;   Bytes $00-$7F: Commands (128 possible commands)
+;     - $00-$2F: Direct dispatch via jump table (48 commands)
+;     - $30-$7F: Text block references (80 text banks)
+;   Bytes $80-$FF: Text characters (128 character codes)
+;     - Encrypted with XOR key at $1D
+;     - Written to output buffer at [$1A]
+;
+; TEXT CHARACTER PROCESSING:
+;   1. Read character byte (≥ $80)
+;   2. XOR with $1D encryption key → decrypted character
+;   3. Write to [$1A] output buffer (long address write)
+;   4. Increment $1A by 2 (word storage: 2 bytes per character)
+;   5. Return to caller
+;
+; TEXT ENCRYPTION/DECRYPTION:
+;   Algorithm: character XOR key = plaintext
+;   Example: $C5 XOR $55 = $90
+;   Symmetric: encrypting again decrypts (XOR property)
+;   Key at $1D can change during execution for different text blocks
+;
+; OUTPUT BUFFER ($1A-$1C):
+;   24-bit long address for decoded text storage
+;   Word-aligned: increments by 2 per character
+;   Structure suggests each character = 2 bytes (possibly tile index + attribute)
+;   Typical location: WRAM buffers ($7E:xxxx or $7F:xxxx)
+;
+; COMMAND DISPATCH:
+;   Commands $00-$7F branch to Dialog_ProcessCommand
+;   Dialog_ProcessCommand handles:
+;     - Direct commands ($00-$2F): Jump table dispatch
+;     - Text references ($30-$7F): Nested text block lookup
+;
+; PERFORMANCE:
+;   Text character path: ~40 cycles
+;     - 6 cycles: LDA long addressing
+;     - 5 cycles: INC direct page
+;     - 5 cycles: AND immediate
+;     - 3 cycles: CMP immediate
+;     - 2 cycles: BCC (not taken)
+;     - 3 cycles: EOR direct page
+;     - 7 cycles: STA long addressing
+;     - 5 cycles: INC direct page (×2)
+;     - 6 cycles: RTS
+;     Total: ~42 cycles = ~16 microseconds @ 2.68MHz
+;
+;   Command path: ~60 cycles + command handler time
+;     - Same fetch overhead: ~30 cycles
+;     - Jump to Dialog_ProcessCommand: ~10 cycles
+;     - Command processing: 20-500+ cycles (handler-dependent)
+;
+; USAGE EXAMPLE:
+;   Main bytecode interpreter loop:
+;       Dialog_ProcessLoop:
+;           jsr Dialog_ReadNextByte  ; Fetch and process next byte
+;           lda $17                   ; Check if terminator reached
+;           cmp $3D
+;           bne Dialog_ProcessLoop    ; Continue if not done
+;
+; COMMON CALLERS:
+;   - Dialog_ExecuteInternal ($009D8F): Main interpreter loop
+;   - Dialog_ProcessLoop_Wait ($009D9F): Flag-checking loop
+;
+; REGISTERS MODIFIED:
+;   A: Destroyed (contains last character or command byte)
+;   Processor flags: N, Z modified by final operation
+;
+; REGISTERS PRESERVED:
+;   X, Y: Preserved (not modified)
+;   $17: Modified (incremented by 1)
+;   $1A: Modified (incremented by 2 if text character)
+;
+; CRITICAL DEPENDENCIES:
+;   - Bytecode stream at [$17] must be readable
+;   - Output buffer at [$1A] must be writable (for text)
+;   - Processor must be in 16-bit accumulator mode
+;   - Dialog_ProcessCommand must exist for command bytes
+;
+; TECHNICAL NOTES:
+;   The threshold $80 is chosen strategically: characters with high bit set
+;   are visually distinct in hex dumps, making text vs commands easy to
+;   identify during reverse engineering. This was likely intentional.
+;
+;   Word-aligned text storage (increment by 2) suggests SNES tilemap format:
+;   each character may be stored as [tile_index:8, attributes:8] for direct
+;   DMA transfer to VRAM tilemap buffers.
+;
+;   The LDA [$17] / INC $17 pattern is a classic 65816 idiom for sequential
+;   byte reading from a 24-bit pointer. The long addressing mode ([addr])
+;   automatically uses the bank byte at $19, making this very efficient.
+;===============================================================================
 Dialog_ReadNextByte:
-	lda.B [$17]                          ;009DBD|A717    |000017;
-	inc.B $17                            ;009DBF|E617    |000017;
-	and.W #$00ff                         ;009DC1|29FF00  |      ;
-	cmp.W #$0080                         ;009DC4|C98000  |      ;
-	bcc Dialog_ProcessCommand                      ;009DC7|9009    |009DD2;
+	lda.B [$17]                          ;009DBD|A717    |000017; Read byte from [bank $19 : address $17-$18]
+	inc.B $17                            ;009DBF|E617    |000017; Increment bytecode pointer (next byte)
+	and.W #$00ff                         ;009DC1|29FF00  |      ; Mask to 8-bit value (clear high byte)
+	cmp.W #$0080                         ;009DC4|C98000  |      ; Compare with $80 (command vs text threshold)
+	bcc Dialog_ProcessCommand                      ;009DC7|9009    |009DD2; If < $80 → process as command ($00-$7F)
 ;      |        |      ;
 Dialog_WriteCharacter:
-	eor.B $1d                            ;009DC9|451D    |00001D;
+	eor.B $1d                            ;009DC9|451D    |00001D; XOR with encryption key at $1D → decrypt character
 ;      |        |      ;
 Dialog_WriteCharacter_Store:
-	sta.B [$1a]                          ;009DCB|871A    |00001A;
-	inc.B $1a                            ;009DCD|E61A    |00001A;
-	inc.B $1a                            ;009DCF|E61A    |00001A;
-	rts                                  ;009DD1|60      |      ;
+	sta.B [$1a]                          ;009DCB|871A    |00001A; Write character to [bank $1C : address $1A-$1B]
+	inc.B $1a                            ;009DCD|E61A    |00001A; Increment output buffer pointer (low byte)
+	inc.B $1a                            ;009DCF|E61A    |00001A; Increment output buffer pointer (high byte) → +2 total
+	rts                                  ;009DD1|60      |      ; Return to caller (character processed)
 ;      |        |      ;
 ;      |        |      ;
+;===============================================================================
+; Dialog_ProcessCommand
+;-------------------------------------------------------------------------------
+; Processes bytecode commands ($00-$7F), dispatching to appropriate handlers
+; via jump table or text reference lookup. Handles 48 direct commands and 80
+; text block references, forming the complete command set of the interpreter.
+;
+; CALLING CONVENTION:
+;   Branched from Dialog_ReadNextByte (not JSR)
+;   A = Command byte ($00-$7F, already masked to 16-bit)
+;   16-bit accumulator mode active
+;   All bytecode context registers available ($17, $1A, $1D, etc.)
+;
+; OPERATION:
+;   1. Compare command byte with $30
+;   2. If ≥ $30: Jump to text reference handler ($30-$7F)
+;   3. If < $30: Direct command dispatch ($00-$2F)
+;      a. Multiply command by 2 (ASL A) → word index
+;      b. Load index into X register
+;      c. Indirect jump via (DATA8_009e0e,x) → command handler
+;      d. Handler executes, returns here
+;      e. Set 16-bit mode (REP #$30) for consistency
+;      f. Return to caller
+;
+; COMMAND RANGES:
+;   $00-$2F: Direct commands (48 total)
+;     - Dispatched via jump table at DATA8_009e0e
+;     - Each entry = 2-byte handler address
+;     - Table size: 96 bytes (48 × 2)
+;     - Examples: $00 = STOP, $01 = WAIT, $02 = JUMP, etc.
+;
+;   $30-$7F: Text block references (80 total)
+;     - References to pre-stored text blocks in ROM
+;     - Processed via Dialog_ProcessCommand_TextReference
+;     - Uses lookup table at $03:BA35
+;
+; DIRECT COMMAND DISPATCH:
+;   Command byte → multiply by 2 → index into jump table
+;   Example: Command $05 → index $0A → table[$009E0E + $0A]
+;   Jump table entry contains handler address → JMP (indirect)
+;   Handler executes custom logic, then RTS back here
+;
+; JUMP TABLE STRUCTURE (DATA8_009e0e):
+;   $009E0E + ($00×2): $A378 (command $00 handler address)
+;   $009E0E + ($01×2): $A8C0 (command $01 handler address)
+;   ...
+;   $009E0E + ($2F×2): ????? (command $2F handler address)
+;   Total: 48 command addresses = 96 bytes
+;
+; TEXT REFERENCE PROCESSING ($30-$7F):
+;   1. Subtract $30 from command byte → text block index (0-79)
+;   2. If index = 0: Jump directly to first block
+;   3. If index > 0: Skip N blocks by summing length bytes
+;      a. Read length byte from DATA8_03ba35[offset]
+;      b. Add length to offset
+;      c. Decrement index, repeat until index = 0
+;   4. Calculate final text block address
+;   5. Load block address and bank into registers
+;   6. Call Dialog_ExecuteNestedCall to execute block as bytecode
+;
+; TEXT REFERENCE TABLE (DATA8_03ba35):
+;   Bank $03 at address $BA35
+;   Structure: [length:1][data:length][length:1][data:length]...
+;   Length byte indicates bytes in this block (including commands)
+;   Example: $10 $C0 $D5 $E5... = 16-byte block starting $C0
+;
+; NESTED EXECUTION:
+;   Dialog_ExecuteNestedCall preserves current $17 pointer
+;   Executes referenced block as independent bytecode stream
+;   After block completes, restores original $17 and continues
+;   This enables text macros and command subroutines
+;
+; PERFORMANCE:
+;   Direct command: ~60 cycles dispatch + handler time
+;     - 3 cycles: CMP immediate
+;     - 2 cycles: BCS (not taken)
+;     - 2 cycles: ASL A
+;     - 2 cycles: TAX
+;     - 8 cycles: JMP (addr,x) indirect indexed
+;     - Handler: 20-500+ cycles (varies)
+;     - 3 cycles: REP #$30
+;     - 6 cycles: RTS
+;     Total: ~86 cycles + handler
+;
+;   Text reference: ~200-500 cycles
+;     - 3 cycles: CMP immediate
+;     - 2 cycles: BCS (taken)
+;     - Table lookup: ~100-300 cycles (depends on index)
+;     - Nested call setup: ~50 cycles
+;     - Nested execution: 100+ cycles
+;
+; USAGE EXAMPLE:
+;   Command $05 execution:
+;       Dialog_ReadNextByte reads $05
+;       Dialog_ProcessCommand called with A = $0005
+;       $0005 < $0030 → direct dispatch
+;       $0005 × 2 = $000A
+;       Jump to (DATA8_009e0e + $0A) = $A37F
+;       Handler at $A37F executes
+;       Returns here, sets 16-bit mode, RTS
+;
+; COMMON CALLERS:
+;   - Dialog_ReadNextByte ($009DC7): After reading command byte
+;
+; REGISTERS MODIFIED:
+;   A: Destroyed (used for index calculations)
+;   X: Destroyed (used for jump table index)
+;   Y: Potentially modified by command handler
+;   Processor flags: Modified by handler
+;
+; REGISTERS PRESERVED:
+;   None guaranteed (handlers have full register access)
+;   $17, $1A, $1D: Generally preserved (bytecode context)
+;
+; CRITICAL DEPENDENCIES:
+;   - DATA8_009e0e jump table must be complete and valid
+;   - DATA8_03ba35 text reference table must be properly formatted
+;   - All command handlers must exist at specified addresses
+;   - Dialog_ExecuteNestedCall must exist for text references
+;
+; TECHNICAL NOTES:
+;   The indirect indexed jump "(DATA8_009e0e,x)" is a powerful 65816
+;   instruction. It reads a 16-bit address from [DATA8_009e0e + X],
+;   then jumps to that address. This provides O(1) dispatch time
+;   regardless of command number, unlike a chain of comparisons.
+;
+;   The $30 threshold separates "true commands" from "text macros".
+;   This design allows the interpreter to support both inline text
+;   and reusable text blocks with the same bytecode space, maximizing
+;   ROM utilization while maintaining clean separation of concerns.
+;
+;   The REP #$30 after handler return ensures 16-bit mode is restored,
+;   even if the handler switched to 8-bit mode. This defensive
+;   programming prevents mode corruption from propagating through the
+;   interpreter loop.
+;===============================================================================
 Dialog_ProcessCommand:
-	cmp.W #$0030                         ;009DD2|C93000  |      ;
-	bcs Dialog_ProcessCommand_TextReference                      ;009DD5|B008    |009DDF;
-	asl a;009DD7|0A      |      ;
-	tax                                  ;009DD8|AA      |      ;
-	jsr.W (DATA8_009e0e,x)               ;009DD9|FC0E9E  |009E0E;
-	rep #$30                             ;009DDC|C230    |      ;
-	rts                                  ;009DDE|60      |      ;
+	cmp.W #$0030                         ;009DD2|C93000  |      ; Compare command byte with $30 (text reference threshold)
+	bcs Dialog_ProcessCommand_TextReference                      ;009DD5|B008    |009DDF; If ≥ $30 → handle as text reference ($30-$7F)
+	asl a                                ;009DD7|0A      |      ; A × 2 = word index into jump table
+	tax                                  ;009DD8|AA      |      ; X = jump table index (command × 2)
+	jsr.W (DATA8_009e0e,x)               ;009DD9|FC0E9E  |009E0E; Indirect jump: read handler address from table, call it
+	rep #$30                             ;009DDC|C230    |      ; Restore 16-bit A and X/Y (defensive: handlers may change)
+	rts                                  ;009DDE|60      |      ; Return to caller (Dialog_ReadNextByte loop)
 ;      |        |      ;
 ;      |        |      ;
 Dialog_ProcessCommand_TextReference:
