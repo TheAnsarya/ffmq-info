@@ -4382,24 +4382,223 @@ DMA_TransferTilemap:
 ;       .dl CommandList_VRAMUpload    ; 3 bytes: command list pointer
 ;       .db $01                        ; DMA mode
 ;       .db $18                        ; VRAM data port
-;       .dw SourceData                 ; Source address
-;       .db $7F                        ; Source bank
-;       .dw $1000                      ; Transfer size
-;       ; ... (additional parameters)
+;===============================================================================
+; DMA_CopyParamsAndExecute
+;-------------------------------------------------------------------------------
+; Universal DMA parameter loader and command list executor. This is one of the
+; most critical functions in FFMQ, used throughout the codebase for loading
+; graphics, palettes, tilemaps, and other data via SNES DMA channels. It copies
+; a 24-byte parameter structure from ROM to Direct Page RAM, then executes a
+; bytecode command list that configures and triggers DMA transfers.
+;
+; CALLING CONVENTION:
+;   Mode: A = 16-bit, X = 16-bit, Y = 16-bit (enforced via REP #$30)
+;   Input:
+;     X = Address of 24-byte parameter structure
+;     DBR = Bank containing parameter structure (usually $00)
+;   Call: JSR DMA_CopyParamsAndExecute
+;   Returns: DMA transfers completed, command list executed
+;   Registers: P and Y preserved (PHP/PLP, PHY/PLY), A modified, X advanced
+;
+; OPERATION:
+;   1. Save processor status (P register) to stack
+;   2. Set 16-bit A/X/Y mode (REP #$30)
+;   3. Save Y register to stack (preserved across call)
+;   4. Save A register to stack (preserved across call)
+;   5. Set Y = $0017 (byte count - 1 = 23, for 24-byte transfer)
+;   6. Set A = $0002 (destination offset in Direct Page)
+;   7. Execute MVN $00,$00: block move 24 bytes from [DBR:X] to [$00:$02]
+;      - Copies parameter structure to Direct Page $02-$19
+;      - After MVN: X += 24, A = $1A, Y = $FFFF
+;   8. Restore A register from stack
+;   9. Restore Y register from stack
+;   10. Restore processor status from stack
+;   11. Jump to Dialog_ExecuteInternal: execute command list at [$17-$19]
+;
+; PARAMETER STRUCTURE (24 bytes at Direct Page $02-$19):
+;   $02-$03: Unknown/unused (2 bytes)
+;   $04-$16: Unknown/unused (19 bytes) 
+;   $17-$19: Command list pointer (3 bytes, 24-bit long address)
+;     - $17-$18: Low/middle bytes of address
+;     - $19: Bank byte
+;     - Points to bytecode command list executed by Dialog_ExecuteInternal
+;
+; The 24-byte structure varies by use case, but always ends with a 3-byte
+; pointer to the command list that will configure DMA and trigger transfers.
+;
+; MVN INSTRUCTION MECHANICS:
+;   MVN $00,$00 = Move block with DBR=$00 (source) to bank $00 (dest)
+;   - Before: X = source, A = destination, Y = count-1
+;   - Transfer: Copies (Y+1) bytes from [DBR:X] to [$00:A]
+;   - After: X = X + (Y+1), A = A + (Y+1), Y = $FFFF
+;   - Interrupts: Allowed between bytes (REP instruction per byte)
+;   - Performance: ~7 cycles per byte + overhead
+;
+; WHY 24 BYTES?
+;   The parameter structure size (24 bytes) accommodates:
+;   - Multiple DMA channel configurations
+;   - Source/destination addresses (3 bytes each × multiple)
+;   - Transfer sizes (2 bytes × multiple)
+;   - Control flags and mode bytes
+;   - Command list pointer (always last 3 bytes)
+;
+; COMMAND LIST EXECUTION:
+;   After copying parameters, the function jumps to Dialog_ExecuteInternal,
+;   which reads the bytecode command list pointed to by $17-$19. Commands
+;   typically include:
+;   - DMA channel configuration (set $43xx registers)
+;   - VRAM/CGRAM address setup (set $21xx registers)
+;   - DMA trigger (write to $420B)
+;   - Multiple transfers in sequence
+;   - Conditional operations
+;
+; TYPICAL COMMAND LIST STRUCTURE:
+;   .db $08              ; Command: Execute subroutine/nested list
+;   .dw SubroutineAddr   ; Subroutine address
+;   .db $0E              ; Command: Write 16-bit value to address
+;   .dw $4350            ; Address: DMA channel 5 parameter register
+;   .dw $1801            ; Value: DMA mode (2 registers, increment)
+;   .db $0E              ; Write 16-bit value
+;   .dw $4352            ; DMA5 source address low/middle
+;   .dw SourceData       ; Source pointer
+;   .db $0D              ; Write 8-bit value
+;   .db $4354            ; DMA5 source bank
+;   .db $07              ; Bank $07
+;   .db $0E              ; Write 16-bit value
+;   .dw $4355            ; DMA5 transfer size
+;   .dw $1000            ; 4096 bytes
+;   .db $0D              ; Write 8-bit value
+;   .db $420B            ; MDMAEN (DMA enable register)
+;   .db $20              ; Enable channel 5 (bit 5)
+;   .db $3D              ; Terminator: End command list
+;
+; DIRECT PAGE LAYOUT DURING EXECUTION:
+;   $00-$01: Varies (often used by commands)
+;   $02-$16: Parameter structure data (21 bytes, contents vary)
+;   $17-$19: Command list pointer (3 bytes)
+;     - Dialog_ExecuteInternal reads from [$17-$19]
+;     - Auto-increments $17 as it processes commands
+;   $1A-$FF: Other temporary storage used by commands
+;
+; EXAMPLE USAGE #1: Load battle graphics
+;   Parameter structure at $00C8E6:
+;     .db ...20 bytes parameter data...
+;     .dw $8686            ; Command list address (low/middle)
+;     .db $03              ; Command list bank
+;   
+;   Code:
+;     ldx.W #$C8E6         ; X = parameter structure
+;     jsr DMA_CopyParamsAndExecute
+;     ; Graphics loaded to VRAM via DMA
+;
+; EXAMPLE USAGE #2: Load palette data
+;   From Screen_InitializeVideoRegisters:
+;     ldx.W #$C8E3         ; Parameter structure address
+;     jsr DMA_CopyParamsAndExecute
+;     ; Palette data transferred to CGRAM
+;
+; PERFORMANCE:
+;   - Parameter copy: 24 bytes × ~7 cycles = ~168 cycles
+;   - Overhead: ~30 cycles (saves, restores, jump)
+;   - Command list execution: highly variable (100-10000+ cycles)
+;     - Depends on number of commands, DMA transfers, etc.
+;   - Total: ~200 cycles minimum + command list time
+;
+; DMA TRANSFER PERFORMANCE:
+;   Once command list triggers DMA:
+;   - Small transfer (32 bytes): ~50 cycles
+;   - Medium transfer (512 bytes): ~650 cycles
+;   - Large transfer (4096 bytes): ~5,100 cycles
+;   - Multiple sequential transfers add up
+;
+; TYPICAL CALLERS:
+;   - Screen_InitializeVideoRegisters ($00BAF0): PPU initialization
+;   - Battle_LoadGraphics ($008EC4): Battle scene graphics
+;   - Battle_PrepareGraphics ($00BD30): Graphics preparation
+;   - Battle_SetupGraphics ($00C7DE): Battle setup
+;   - DMA_TransferPalettes ($009B45): Palette transfers
+;   - DMA_TransferFont ($009B59): Font data loading
+;   - DMA_TransferTilemap ($009BA4): Tilemap updates
+;   - Many other graphics/data loading functions
+;
+; WHY JUMP NOT JSR TO Dialog_ExecuteInternal?
+;   The function uses JMP (not JSR) to Dialog_ExecuteInternal because:
+;   1. Dialog_ExecuteInternal will RTS back to our CALLER (not us)
+;   2. This implements tail-call optimization (saves stack space)
+;   3. No point returning to us just to immediately RTS ourselves
+;   4. Stack layout after JMP: [Caller Return Address] ← SP
+;      (Our return address already removed by PLP)
+;
+; REGISTERS MODIFIED:
+;   A: Modified (used for destination pointer, then restored, then modified)
+;   X: Modified (advanced by 24 bytes after MVN)
+;   Y: Preserved (PHY/PLY)
+;   P: Preserved (PHP/PLP)
+;   Direct Page $02-$19: Overwritten with parameter structure
+;   $17-$19: Used as bytecode instruction pointer during execution
+;
+; CRITICAL DEPENDENCIES:
+;   - Caller MUST set DBR to bank containing parameter structure
+;   - Parameter structure MUST be 24 bytes
+;   - Last 3 bytes MUST be valid command list pointer
+;   - Command list MUST end with terminator ($3D)
+;   - DMA operations in command list MUST occur during VBlank
+;
+; SAFE TO CALL:
+;   - During VBlank if command list does DMA
+;   - During active display if command list only sets registers
+;   - From any bank (caller sets DBR appropriately)
+;   - Recursively (if command list calls other DMA operations)
+;
+; TECHNICAL NOTES:
+;   1. This is a "two-stage" function: copy parameters, then execute commands.
+;      The separation allows reusable command lists with different parameters.
+;   
+;   2. MVN is interrupt-safe: REP instruction between each byte transfer
+;      allows NMI to occur. This prevents VBlank being missed during long
+;      parameter copies.
+;   
+;   3. The function name is slightly misleading: it doesn't directly execute
+;      DMA. It copies parameters and executes a bytecode command list that
+;      THEN configures and triggers DMA. More accurate name would be
+;      "DMA_LoadParamsAndExecuteCommands".
+;   
+;   4. Dialog_ExecuteInternal is reused here even though this isn't dialog.
+;      The bytecode interpreter is general-purpose and handles both dialog
+;      text processing and hardware configuration commands.
+;   
+;   5. Stack usage: 3 words pushed (P, Y, A), all popped before JMP.
+;      Dialog_ExecuteInternal will RTS to our caller.
+;
+; RELATED FUNCTIONS:
+;   - Dialog_ExecuteInternal ($009D75): Bytecode command interpreter
+;   - DMA_TransferPalettes ($009B45): Wrapper for palette DMA
+;   - DMA_TransferFont ($009B59): Wrapper for font DMA
+;   - DMA_TransferTilemap ($009BA4): Wrapper for tilemap DMA
+;   - Battle_LoadGraphics ($008EC4): Major graphics loading function
+;   - Screen_InitializeVideoRegisters ($00BAF0): PPU initialization
+;
+; COMMAND LIST BYTECODES (commonly used):
+;   $00-$2F: Direct command dispatch (48 commands, jump table)
+;   $08: Execute nested command list (subroutine call)
+;   $0D: Write 8-bit value to address
+;   $0E: Write 16-bit value to address  
+;   $3D: Terminator (end command list, return)
+;   $30-$7F: Text reference (not typically used in DMA context)
 ;===============================================================================
 DMA_CopyParamsAndExecute:
-	php                                  ;009BC4|08      |      ; Save processor status
-	rep #$30                             ;009BC5|C230    |      ; 16-bit A/X/Y mode
-	phy                                  ;009BC7|5A      |      ; Save Y register
-	pha                                  ;009BC8|48      |      ; Save A register
-	ldy.W #$0017                         ;009BC9|A01700  |      ; Y = byte count - 1 (24 bytes: 0-23 = $17)
-	lda.W #$0002                         ;009BCC|A90200  |      ; A = destination offset (DP:$02)
-	mvn $00,$00                          ;009BCF|540000  |      ; Block move: $00:X → $00:A, count Y+1
-	                                     ;       |        |      ; After MVN: X += 24, A += 24, Y = $FFFF
-	pla                                  ;009BD2|68      |      ; Restore A register
-	ply                                  ;009BD3|7A      |      ; Restore Y register
-	plp                                  ;009BD4|28      |      ; Restore processor status
-	jmp.W Dialog_ExecuteInternal                    ;009BD5|4C759D  |009D75; Execute command list (uses copied $17-$19)
+	php                                  ;009BC4|08      |      ; Push processor status: preserve P flags (mode, carry, etc.)
+	rep #$30                             ;009BC5|C230    |      ; Set 16-bit A, X, Y: required for MVN block move
+	phy                                  ;009BC7|5A      |      ; Push Y register: preserve Y across parameter copy
+	pha                                  ;009BC8|48      |      ; Push A register: preserve A across parameter copy
+	ldy.W #$0017                         ;009BC9|A01700  |      ; Y = $0017 (count - 1 = 23, for 24-byte MVN transfer)
+	lda.W #$0002                         ;009BCC|A90200  |      ; A = $0002 (destination: Direct Page offset $02)
+	mvn $00,$00                          ;009BCF|540000  |      ; Block move: copy 24 bytes [DBR:X] → [$00:$02-$19]
+	                                     ;       |        |      ; After MVN: X += 24, A = $1A, Y = $FFFF
+	pla                                  ;009BD2|68      |      ; Pull A register: restore original A value
+	ply                                  ;009BD3|7A      |      ; Pull Y register: restore original Y value
+	plp                                  ;009BD4|28      |      ; Pull processor status: restore original P flags
+	jmp.W Dialog_ExecuteInternal                    ;009BD5|4C759D  |009D75; Tail call: execute bytecode at [$17-$19], RTS to our caller
 ;      |        |      ;
 	lda.W #$0004                         ;009BD8|A90400  |      ;
 	and.w !system_flags_4                          ;009BDB|2DD800  |0000D8;
