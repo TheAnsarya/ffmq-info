@@ -207,7 +207,7 @@ Display_InitScreen:
 	sta.b SNES_TM-$2100 ;0C80B2	; Set main screen layers ($212c) = $11 (BG1+Obj)
 	jsr.w CallGraphicsSetupRoutine ;0C80B4	; Call graphics setup routine
 	lda.w !interrupt_config	 ;0C80B7	; Load NMI enable flags
-	sta.w $4200	 ;0C80BA	; Set NMI/IRQ/Auto-Joypad ($4200)
+	sta.w !NMITIMEN	 ;0C80BA	; Set NMI/IRQ/Auto-Joypad ($4200)
 	cli ;0C80BD	; Enable interrupts
 	lda.b #$0f	  ;0C80BE	; Brightness = 15 (full)
 	sta.w !brightness_value	 ;0C80C0	; Store brightness value
@@ -1197,14 +1197,14 @@ Display_Mode7TilemapSetup:
 	jsl.l CallTilemapFillRoutine ;0C87FC	; Call tilemap fill routine
 	plb ;0C8800	; Restore data bank
 	sep #$20		;0C8801	; 8-bit accumulator
-	stz.w $4204	 ;0C8803	; Clear multiply/divide register
+	stz.w !WRDIVL	 ;0C8803	; Clear multiply/divide register
 	ldx.w #$00ce	;0C8806	; Table offset = $ce
 	ldy.w #$0082	;0C8809	; Y parameter = $82
 
 	.SetupCalculationLoop:					; Loop: Setup calculation
 	tya ;0C880C	; Transfer Y to A
 	asl A		   ;0C880D	; *2
-	sta.w $4205	 ;0C880E	; Store to multiply register
+	sta.w !WRDIVH	 ;0C880E	; Store to multiply register
 	lda.b #$20	  ;0C8811	; Value = $20
 	jsl.l ExecuteHardwareDivision ;0C8813	; Call calculation routine
 ; [Additional Mode 7 setup continues...]
@@ -1227,7 +1227,7 @@ Display_Mode7TilemapSetup:
 
 	jsl.l ExecuteHardwareDivision ;0C8813	; Call hardware multiply routine
 	rep #$30		;0C8817	; 16-bit A/X/Y
-	lda.w $4214	 ;0C8819	; Read quotient from hardware divider
+	lda.w !RDDIVL	 ;0C8819	; Read quotient from hardware divider
 	sta.l $7f0010,X ;0C881C	; Store to Mode 7 calculation buffer
 	sep #$20		;0C8820	; 8-bit accumulator
 	iny ;0C8822	; Next Y value
@@ -1653,7 +1653,7 @@ Display_SpritePositionCalculator:
 	and.w #$00ff	;0C8A45	; Mask to 8-bit
 	eor.w #$ffff	;0C8A48	; Invert bits (two's complement prep)
 	adc.w #$040f	;0C8A4B	; Add screen offset ($0410 - 1)
-	sta.w $0400	 ;0C8A4E	; Store screen X coordinate
+	sta.w !JOY_DOWN	 ;0C8A4E	; Store screen X coordinate
 
 	lda.w $0063	 ;0C8A51	; Load Y position
 	and.w #$00ff	;0C8A54	; Mask to 8-bit
@@ -1681,7 +1681,7 @@ Display_HardwareMultiplySetup:
 	lda.b #$30	  ;0C8A76	; Multiplicand = 48
 
 	.SetMultiplicand:
-	sta.w $4202	 ;0C8A78	; Set multiplicand register ($4202)
+	sta.w !WRMPYA	 ;0C8A78	; Set multiplicand register ($4202)
 	sta.w $0064	 ;0C8A7B	; Store to variable
 	jsr.w Display_ReadMultiplyMatrixElement ;0C8A7E	; Read Mode 7 matrix element
 	sty.w $0062	 ;0C8A81	; Store matrix A value
@@ -1747,19 +1747,19 @@ Display_ReadMultiplyMatrixElement:
 
 	.SmallPositive:								; Small positive value path
 	jsl.l CallMultiplicationRoutine ;0C8AD2	; Setup hardware multiply/divide
-	ldy.w $4216	 ;0C8AD6	; Read division remainder
-	sty.w $4204	 ;0C8AD9	; Store to dividend register
+	ldy.w !RDMPYL	 ;0C8AD6	; Read division remainder
+	sty.w !WRDIVL	 ;0C8AD9	; Store to dividend register
 
 	.CommonMultiply:							; Common multiply path
 	lda.b #$30	  ;0C8ADC	; Multiplier = 48
 	jsl.l ExecuteHardwareDivision ;0C8ADE	; Perform hardware multiply
-	ldy.w $4214	 ;0C8AE2	; Read product result ($4214)
+	ldy.w !RDDIVL	 ;0C8AE2	; Read product result ($4214)
 	rts ;0C8AE5	; Return with result in Y
 
 	.LargePositive:								; Large positive value path
-	stz.w $4204	 ;0C8AE6	; Clear dividend high byte
+	stz.w !WRDIVL	 ;0C8AE6	; Clear dividend high byte
 	lda.w $0064	 ;0C8AE9	; Load multiplier value
-	sta.w $4205	 ;0C8AEC	; Set divisor register
+	sta.w !WRDIVH	 ;0C8AEC	; Set divisor register
 	bra .CommonMultiply ;0C8AEF	; Continue to multiply
 
 	.NegativeValue:								; Negative value path (sign extend)
@@ -1824,7 +1824,7 @@ Display_ReadMultiplyMatrixElement:
 	ldx.w #$000b	;0C8B29	; Column count = 11
 	stx.w $0064	 ;0C8B2C	; Store column counter
 	ldy.w #$6000	;0C8B2F	; VRAM address = $6000
-	ldx.w $0400	 ;0C8B32	; Load X coordinate offset
+	ldx.w !JOY_DOWN	 ;0C8B32	; Load X coordinate offset
 	lda.w $0062	 ;0C8B35	; Load X position
 	jsr.w UpdateVerticalSpritePositions ;0C8B38	; Update horizontal sprite positions
 	rtl ;0C8B3B	; Return from NMI handler
@@ -2117,7 +2117,7 @@ Display_TitleScreenVRAMSetup:
 	ldx.w #$0000	;0C8DC1	; Transfer size = 64KB (full auto)
 	stx.b SNES_DMA0CNTL-$4300 ;0C8DC4	; Set DMA0 count ($4305)
 	lda.b #$01	  ;0C8DC6	; Enable DMA channel 0
-	sta.w $420b	 ;0C8DC8	; Start DMA transfer ($420b)
+	sta.w !MDMAEN	 ;0C8DC8	; Start DMA transfer ($420b)
 
 	jsr.w Battle_Graphics_Upload_Split_Transfer ;0C8DCB	; Additional VRAM setup routine
 	jsr.w Complex_SpriteGraphics_Initialization_System ;0C8DCE	; Secondary graphics initialization
@@ -2126,7 +2126,7 @@ Display_TitleScreenVRAMSetup:
 	ldx.w #$1801	;0C8DD1	; DMA mode: Byte, A→A
 	stx.b SNES_DMA0PARAM-$4300 ;0C8DD4	; Set DMA0 parameters
 	ldx.w #$4000	;0C8DD6	; VRAM address = $4000
-	stx.w $2116	 ;0C8DD9	; Set VRAM address ($2116)
+	stx.w !VMADDL	 ;0C8DD9	; Set VRAM address ($2116)
 	ldx.w #$2000	;0C8DDC	; Source address = $7f2000
 	stx.b SNES_DMA0ADDRL-$4300 ;0C8DDF	; Set DMA0 source
 	lda.b #$7f	  ;0C8DE1	; Source bank = $7f
@@ -2134,7 +2134,7 @@ Display_TitleScreenVRAMSetup:
 	ldx.w #$1000	;0C8DE5	; Transfer size = 4096 bytes
 	stx.b SNES_DMA0CNTL-$4300 ;0C8DE8	; Set DMA0 count
 	lda.b #$01	  ;0C8DEA	; Enable DMA channel 0
-	sta.w $420b	 ;0C8DEC	; Start DMA transfer
+	sta.w !MDMAEN	 ;0C8DEC	; Start DMA transfer
 
 ; Process graphics command table
 	lda.b #$0c	  ;0C8DEF	; Source bank = $0c
@@ -2145,7 +2145,7 @@ Display_TitleScreenVRAMSetup:
 Display_GraphicsCommandProcessor:	; Graphics command DMA transfer loop (processes tile data commands)
 	.CommandLoop:
 	rep #$30		;0C8DF9	; 16-bit A/X/Y
-	sty.w $2116	 ;0C8DFB	; Set VRAM address ($2116)
+	sty.w !VMADDL	 ;0C8DFB	; Set VRAM address ($2116)
 
 ; Calculate DMA transfer size (entry byte 0 × 32)
 	lda.w $0000,X   ;0C8DFE	; Load entry byte 0
@@ -2182,7 +2182,7 @@ Display_GraphicsCommandProcessor:	; Graphics command DMA transfer loop (processe
 
 	sep #$20		;0C8E2A	; 8-bit accumulator
 	lda.b #$01	  ;0C8E2C	; Enable DMA channel 0
-	sta.w $420b	 ;0C8E2E	; Start DMA transfer ($420b)
+	sta.w !MDMAEN	 ;0C8E2E	; Start DMA transfer ($420b)
 
 ; Check for next command (entry byte 2 != 0)
 	lda.w $0002,X   ;0C8E31	; Load entry byte 2
@@ -2250,12 +2250,12 @@ Display_TilemapCommandProcessor:	; Process tilemap fill commands from table
 ; Fill bottom screen area with pattern $10
 	sep #$20		;0C8E92	; 8-bit accumulator
 	ldx.w #$3fc0	;0C8E94	; VRAM address = $3fc0
-	stx.w $2116	 ;0C8E97	; Set VRAM address
+	stx.w !VMADDL	 ;0C8E97	; Set VRAM address
 	ldx.w #$0040	;0C8E9A	; Fill count = 64 tiles
 	lda.b #$10	  ;0C8E9D	; Fill pattern = tile $10
 
 	.BottomFillLoop:
-	sta.w $2119	 ;0C8E9F	; Write to VRAM data ($2119)
+	sta.w !VMDATAH	 ;0C8E9F	; Write to VRAM data ($2119)
 	dex ;0C8EA2	; Decrement counter
 	bne Display_TilemapCommandProcessor.BottomFillLoop ;0C8EA3	; Loop for all tiles
 
@@ -2412,21 +2412,21 @@ Label_0C900A:
 	tax ;0C900A|AA      |      ; Use color index as X
 	lda.l DATA8_078031,X ;0C900B|BF318007|078031; Load pattern byte from Bank $07
 	and.w #$00ff	;0C900F|29FF00  |      ; Mask to byte
-	sta.w $2118	 ;0C9012|8D1821  |0C2118; Write to VRAM low byte ($2118)
+	sta.w !VMDATAL	 ;0C9012|8D1821  |0C2118; Write to VRAM low byte ($2118)
 	txa ;0C9015|8A      |      ; Restore index
 	adc.w #$0040	;0C9016|694000  |      ; +$40 for next row in table
 	dey ;0C9019|88      |      ; Decrement row counter
 	bne Label_0C900A ;0C901A|D0EE    |0C900A; Loop for 8 rows
 
 ; Write 8 zero bytes (padding for 4bpp high bitplanes)
-	stz.w $2118	 ;0C901C|9C1821  |0C2118; Zero byte 1
-	stz.w $2118	 ;0C901F|9C1821  |0C2118; Zero byte 2
-	stz.w $2118	 ;0C9022|9C1821  |0C2118; Zero byte 3
-	stz.w $2118	 ;0C9025|9C1821  |0C2118; Zero byte 4
-	stz.w $2118	 ;0C9028|9C1821  |0C2118; Zero byte 5
-	stz.w $2118	 ;0C902B|9C1821  |0C2118; Zero byte 6
-	stz.w $2118	 ;0C902E|9C1821  |0C2118; Zero byte 7
-	stz.w $2118	 ;0C9031|9C1821  |0C2118; Zero byte 8
+	stz.w !VMDATAL	 ;0C901C|9C1821  |0C2118; Zero byte 1
+	stz.w !VMDATAL	 ;0C901F|9C1821  |0C2118; Zero byte 2
+	stz.w !VMDATAL	 ;0C9022|9C1821  |0C2118; Zero byte 3
+	stz.w !VMDATAL	 ;0C9025|9C1821  |0C2118; Zero byte 4
+	stz.w !VMDATAL	 ;0C9028|9C1821  |0C2118; Zero byte 5
+	stz.w !VMDATAL	 ;0C902B|9C1821  |0C2118; Zero byte 6
+	stz.w !VMDATAL	 ;0C902E|9C1821  |0C2118; Zero byte 7
+	stz.w !VMDATAL	 ;0C9031|9C1821  |0C2118; Zero byte 8
 
 	plx ;0C9034|FA      |      ; Restore registers
 	ply ;0C9035|7A      |      ;
@@ -2615,33 +2615,33 @@ Store_0C90BD:
 ; ------------------------------------------------------------------------------
 Battle_Graphics_Upload_Split_Transfer:
 ; Phase 1: Upload low bitplanes (word mode, no increment)
-	stz.w $2115	 ;0C90F9|9C1521  |0C2115; VRAM increment = 0
+	stz.w !VMAIN	 ;0C90F9|9C1521  |0C2115; VRAM increment = 0
 	ldx.w #$6000	;0C90FC|A20060  |      ; VRAM address $6000
-	stx.w $2116	 ;0C90FF|8E1621  |0C2116; Set VRAM address
+	stx.w !VMADDL	 ;0C90FF|8E1621  |0C2116; Set VRAM address
 	ldx.w #$1808	;0C9102|A20818  |      ; DMA mode: word, dest $2118-$2119
-	stx.w $4300	 ;0C9105|8E0043  |0C4300; DMA0 params
+	stx.w !DMA0_DMAP	 ;0C9105|8E0043  |0C4300; DMA0 params
 	ldx.w #$9140	;0C9108|A24091  |      ; Source: $0c:9140 (low bitplanes)
-	stx.w $4302	 ;0C910B|8E0243  |0C4302; Source address
+	stx.w !DMA0_A1T0L	 ;0C910B|8E0243  |0C4302; Source address
 	lda.b #$0c	  ;0C910E|A90C    |      ; Bank $0c
-	sta.w $4304	 ;0C9110|8D0443  |0C4304; Source bank
+	sta.w !DMA0_A1B0	 ;0C9110|8D0443  |0C4304; Source bank
 	ldx.w #$1000	;0C9113|A20010  |      ; $1000 bytes (4KB)
-	stx.w $4305	 ;0C9116|8E0543  |0C4305; Byte count
+	stx.w !DMA0_DAS0L	 ;0C9116|8E0543  |0C4305; Byte count
 	lda.b #$01	  ;0C9119|A901    |      ; Channel 0 enable
-	sta.w $420b	 ;0C911B|8D0B42  |0C420B; Trigger DMA
+	sta.w !MDMAEN	 ;0C911B|8D0B42  |0C420B; Trigger DMA
 
 ; Phase 2: Upload high bitplanes (word mode, increment +1)
 	lda.b #$80	  ;0C911E|A980    |      ; VRAM increment = 1 (word)
-	sta.w $2115	 ;0C9120|8D1521  |0C2115; Set increment mode
+	sta.w !VMAIN	 ;0C9120|8D1521  |0C2115; Set increment mode
 	ldx.w #$6000	;0C9123|A20060  |      ; VRAM address $6000 (same base)
-	stx.w $2116	 ;0C9126|8E1621  |0C2116; Set VRAM address
+	stx.w !VMADDL	 ;0C9126|8E1621  |0C2116; Set VRAM address
 	lda.b #$19	  ;0C9129|A919    |      ; DMA mode: $19 = word, auto-inc
-	sta.w $4301	 ;0C912B|8D0143  |0C4301; DMA0 dest register
+	sta.w !DMA0_BBAD	 ;0C912B|8D0143  |0C4301; DMA0 dest register
 	ldx.w #$9141	;0C912E|A24191  |      ; Source: $0c:9141 (+1 for high BP)
-	stx.w $4302	 ;0C9131|8E0243  |0C4302; Source address
+	stx.w !DMA0_A1T0L	 ;0C9131|8E0243  |0C4302; Source address
 	ldx.w #$1000	;0C9134|A20010  |      ; $1000 bytes (4KB)
-	stx.w $4305	 ;0C9137|8E0543  |0C4305; Byte count
+	stx.w !DMA0_DAS0L	 ;0C9137|8E0543  |0C4305; Byte count
 	lda.b #$01	  ;0C913A|A901    |      ; Channel 0 enable
-	sta.w $420b	 ;0C913C|8D0B42  |0C420B; Trigger DMA
+	sta.w !MDMAEN	 ;0C913C|8D0B42  |0C420B; Trigger DMA
 	rts ;0C913F|60      |      ; Return
 
 ; ==============================================================================
@@ -3274,7 +3274,7 @@ Load_0CA37F:
 
 ; Setup palette update
 	lda.b #$01	  ;0CA3A4|A901    |      ; Enable palette writes
-	sta.w $2105	 ;0CA3A6|8D0521  |002105; BG mode register ($2105)
+	sta.w !BGMODE	 ;0CA3A6|8D0521  |002105; BG mode register ($2105)
 
 ; DMA transfer for palette data
 	rep #$30		;0CA3A9|C230    |      ; 16-bit mode
@@ -3362,7 +3362,7 @@ Complex_VRAM_Graphics_Upload_Sequence:
 
 ; Setup palette for graphics
 	lda.b #$81	  ;0CA432|A981    |      ; Palette index $81
-	sta.w $2121	 ;0CA434|8D2121  |0C2121; CGADD ($2121)
+	sta.w !CGADD	 ;0CA434|8D2121  |0C2121; CGADD ($2121)
 
 ; Write 6 color entries
 	ldx.w #$0000	;0CA437|A20000  |      ; Start index
@@ -3370,14 +3370,14 @@ Complex_VRAM_Graphics_Upload_Sequence:
 
 Load_0CA43D:
 	lda.l DATA_0CB70E,X ;0CA43D|BF0EB70C|0CB70E; Load color word
-	sta.w $2122	 ;0CA441|8D2221  |0C2122; Write to CGDATA ($2122)
+	sta.w !CGDATA	 ;0CA441|8D2221  |0C2122; Write to CGDATA ($2122)
 	inx ;0CA444|E8      |      ; Next color
 	dey ;0CA445|88      |      ; Decrement counter
 	bne Load_0CA43D ;0CA446|D0F6    |0CA43D; Loop for 6 colors
 
 ; Setup palette group 2
 	lda.b #$91	  ;0CA448|A991    |      ; Palette index $91
-	sta.w $2121	 ;0CA44A|8D2121  |0C2121; CGADD
+	sta.w !CGADD	 ;0CA44A|8D2121  |0C2121; CGADD
 
 ; Write 14 color entries
 	ldx.w #$0000	;0CA44D|A20000  |      ; Start index
@@ -3385,7 +3385,7 @@ Load_0CA43D:
 
 Load_0CA453:
 	lda.l DATA_0CB9B4,X ;0CA453|BFB4B90C|0CB9B4; Load color word
-	sta.w $2122	 ;0CA457|8D2221  |0C2122; Write to CGDATA
+	sta.w !CGDATA	 ;0CA457|8D2221  |0C2122; Write to CGDATA
 	inx ;0CA45A|E8      |      ; Next
 	dey ;0CA45B|88      |      ; Decrement
 	bne Load_0CA453 ;0CA45C|D0F6    |0CA453; Loop

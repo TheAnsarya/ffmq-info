@@ -100,7 +100,7 @@ InitWorldMapDisplay:
 	sta.B SNES_TM-$2100                  ;0C80B2|852C    |00212C;
 	jsr.W ConfigureHDMAChannels                    ;0C80B4|207B8D  |0C8D7B;
 	lda.w !interrupt_config                          ;0C80B7|AD1201  |0C0112;
-	sta.W $4200                          ;0C80BA|8D0042  |0C4200;
+	sta.w !NMITIMEN                          ;0C80BA|8D0042  |0C4200;
 	cli                                  ;0C80BD|58      |      ;
 	lda.B #$0f                           ;0C80BE|A90F    |      ;
 	sta.w !brightness_value                          ;0C80C0|8DAA00  |0C00AA;
@@ -888,18 +888,18 @@ SetupMode7Registers:
 	jsl.L CallTilemapFillRoutine                    ;0C87FC|22949900|009994;
 	plb                                  ;0C8800|AB      |      ;
 	sep #$20                             ;0C8801|E220    |      ;
-	stz.W $4204                          ;0C8803|9C0442  |0C4204;
+	stz.w !WRDIVL                          ;0C8803|9C0442  |0C4204;
 	ldx.W #$00ce                         ;0C8806|A2CE00  |      ;
 	ldy.W #$0082                         ;0C8809|A08200  |      ;
 ;      |        |      ;
 Mode7_CalculateMatrix:
 	tya                                  ;0C880C|98      |      ;
 	asl a;0C880D|0A      |      ;
-	sta.W $4205                          ;0C880E|8D0542  |0C4205;
+	sta.w !WRDIVH                          ;0C880E|8D0542  |0C4205;
 	lda.B #$20                           ;0C8811|A920    |      ;
 	jsl.L ExecuteHardwareDivision                    ;0C8813|22269700|009726;
 	rep #$30                             ;0C8817|C230    |      ;
-	lda.W $4214                          ;0C8819|AD1442  |0C4214;
+	lda.w !RDDIVL                          ;0C8819|AD1442  |0C4214;
 	sta.L $7f0010,x                      ;0C881C|9F10007F|7F0010;
 	sep #$20                             ;0C8820|E220    |      ;
 	iny                                  ;0C8822|C8      |      ;
@@ -1212,7 +1212,7 @@ Graphics_LiteralCommand:
 	and.W #$00ff                         ;0C8A45|29FF00  |      ;
 	eor.W #$ffff                         ;0C8A48|49FFFF  |      ;
 	adc.W #$040f                         ;0C8A4B|690F04  |      ;
-	sta.W $0400                          ;0C8A4E|8D0004  |0C0400;
+	sta.w !JOY_DOWN                          ;0C8A4E|8D0004  |0C0400;
 	lda.W $0063                          ;0C8A51|AD6300  |0C0063;
 	and.W #$00ff                         ;0C8A54|29FF00  |      ;
 	eor.W #$ffff                         ;0C8A57|49FFFF  |      ;
@@ -1231,7 +1231,7 @@ Graphics_NextCommand:
 	lda.B #$30                           ;0C8A76|A930    |      ;
 ;      |        |      ;
 Graphics_ContinueDecompress:
-	sta.W $4202                          ;0C8A78|8D0242  |0C4202;
+	sta.w !WRMPYA                          ;0C8A78|8D0242  |0C4202;
 	sta.W $0064                          ;0C8A7B|8D6400  |0C0064;
 	jsr.W VRAM_WriteData                    ;0C8A7E|20C88A  |0C8AC8;
 	sty.W $0062                          ;0C8A81|8C6200  |0C0062;
@@ -1279,20 +1279,20 @@ VRAM_WriteData:
 ;      |        |      ;
 VRAM_SetupWrite:
 	jsl.L CallMultiplicationRoutine                    ;0C8AD2|221E9700|00971E;
-	ldy.W $4216                          ;0C8AD6|AC1642  |0C4216;
-	sty.W $4204                          ;0C8AD9|8C0442  |0C4204;
+	ldy.w !RDMPYL                          ;0C8AD6|AC1642  |0C4216;
+	sty.w !WRDIVL                          ;0C8AD9|8C0442  |0C4204;
 ;      |        |      ;
 VRAM_IncrementPointer:
 	lda.B #$30                           ;0C8ADC|A930    |      ;
 	jsl.L ExecuteHardwareDivision                    ;0C8ADE|22269700|009726;
-	ldy.W $4214                          ;0C8AE2|AC1442  |0C4214;
+	ldy.w !RDDIVL                          ;0C8AE2|AC1442  |0C4214;
 	rts                                  ;0C8AE5|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
 VRAM_PrepareNextWrite:
-	stz.W $4204                          ;0C8AE6|9C0442  |0C4204;
+	stz.w !WRDIVL                          ;0C8AE6|9C0442  |0C4204;
 	lda.W $0064                          ;0C8AE9|AD6400  |0C0064;
-	sta.W $4205                          ;0C8AEC|8D0542  |0C4205;
+	sta.w !WRDIVH                          ;0C8AEC|8D0542  |0C4205;
 	bra VRAM_IncrementPointer                      ;0C8AEF|80EB    |0C8ADC;
 ;      |        |      ;
 ;      |        |      ;
@@ -1331,7 +1331,7 @@ VRAM_CompleteWrite:
 	ldx.W #$000b                         ;0C8B29|A20B00  |      ;
 	stx.W $0064                          ;0C8B2C|8E6400  |000064;
 	ldy.W #$6000                         ;0C8B2F|A00060  |      ;
-	ldx.W $0400                          ;0C8B32|AE0004  |000400;
+	ldx.w !JOY_DOWN                          ;0C8B32|AE0004  |000400;
 	lda.W $0062                          ;0C8B35|AD6200  |000062;
 	jsr.W UploadGraphicsBlock                    ;0C8B38|203C8B  |0C8B3C;
 	rtl                                  ;0C8B3B|6B      |      ;
@@ -1530,7 +1530,7 @@ ConfigureHDMAChannels:
 	ldx.W #$0000                         ;0C8DC1|A20000  |      ;
 	stx.B SNES_DMA0CNTL-$4300            ;0C8DC4|8605    |004305;
 	lda.B #$01                           ;0C8DC6|A901    |      ;
-	sta.W $420b                          ;0C8DC8|8D0B42  |0C420B;
+	sta.w !MDMAEN                          ;0C8DC8|8D0B42  |0C420B;
 	jsr.W UpdateMode7Matrix                    ;0C8DCB|20F990  |0C90F9;
 	jsr.W Mode7Matrix_Calculate                    ;0C8DCE|204291  |0C9142;
 	ldx.W #$1801                         ;0C8DD1|A20118  |      ;
@@ -1544,7 +1544,7 @@ ConfigureHDMAChannels:
 	ldx.W #$1000                         ;0C8DE5|A20010  |      ;
 	stx.B SNES_DMA0CNTL-$4300            ;0C8DE8|8605    |004305;
 	lda.B #$01                           ;0C8DEA|A901    |      ;
-	sta.W $420b                          ;0C8DEC|8D0B42  |0C420B;
+	sta.w !MDMAEN                          ;0C8DEC|8D0B42  |0C420B;
 	lda.B #$0c                           ;0C8DEF|A90C    |      ;
 	sta.B SNES_DMA0ADDRH-$4300           ;0C8DF1|8504    |004304;
 	ldy.W #$5100                         ;0C8DF3|A00051  |      ;
@@ -1582,7 +1582,7 @@ HDMA_SetupRegisters:
 	pla                                  ;0C8E29|68      |      ;
 	sep #$20                             ;0C8E2A|E220    |      ;
 	lda.B #$01                           ;0C8E2C|A901    |      ;
-	sta.W $420b                          ;0C8E2E|8D0B42  |0C420B;
+	sta.w !MDMAEN                          ;0C8E2E|8D0B42  |0C420B;
 	lda.W $0002,x                        ;0C8E31|BD0200  |0C0002;
 	php                                  ;0C8E34|08      |      ;
 	inx                                  ;0C8E35|E8      |      ;
@@ -1909,27 +1909,27 @@ UpdateMode7Matrix:
 	ldx.W #$6000                         ;0C90FC|A20060  |      ;
 	stx.W SNES_VMADDL                          ;0C90FF|8E1621  |0C2116;
 	ldx.W #$1808                         ;0C9102|A20818  |      ;
-	stx.W $4300                          ;0C9105|8E0043  |0C4300;
+	stx.w !DMA0_DMAP                          ;0C9105|8E0043  |0C4300;
 	ldx.W #$9140                         ;0C9108|A24091  |      ;
-	stx.W $4302                          ;0C910B|8E0243  |0C4302;
+	stx.w !DMA0_A1T0L                          ;0C910B|8E0243  |0C4302;
 	lda.B #$0c                           ;0C910E|A90C    |      ;
-	sta.W $4304                          ;0C9110|8D0443  |0C4304;
+	sta.w !DMA0_A1B0                          ;0C9110|8D0443  |0C4304;
 	ldx.W #$1000                         ;0C9113|A20010  |      ;
-	stx.W $4305                          ;0C9116|8E0543  |0C4305;
+	stx.w !DMA0_DAS0L                          ;0C9116|8E0543  |0C4305;
 	lda.B #$01                           ;0C9119|A901    |      ;
-	sta.W $420b                          ;0C911B|8D0B42  |0C420B;
+	sta.w !MDMAEN                          ;0C911B|8D0B42  |0C420B;
 	lda.B #$80                           ;0C911E|A980    |      ;
 	sta.W SNES_VMAINC                          ;0C9120|8D1521  |0C2115;
 	ldx.W #$6000                         ;0C9123|A20060  |      ;
 	stx.W SNES_VMADDL                          ;0C9126|8E1621  |0C2116;
 	lda.B #$19                           ;0C9129|A919    |      ;
-	sta.W $4301                          ;0C912B|8D0143  |0C4301;
+	sta.w !DMA0_BBAD                          ;0C912B|8D0143  |0C4301;
 	ldx.W #$9141                         ;0C912E|A24191  |      ;
-	stx.W $4302                          ;0C9131|8E0243  |0C4302;
+	stx.w !DMA0_A1T0L                          ;0C9131|8E0243  |0C4302;
 	ldx.W #$1000                         ;0C9134|A20010  |      ;
-	stx.W $4305                          ;0C9137|8E0543  |0C4305;
+	stx.w !DMA0_DAS0L                          ;0C9137|8E0543  |0C4305;
 	lda.B #$01                           ;0C913A|A901    |      ;
-	sta.W $420b                          ;0C913C|8D0B42  |0C420B;
+	sta.w !MDMAEN                          ;0C913C|8D0B42  |0C420B;
 	rts                                  ;0C913F|60      |      ;
 ;      |        |      ;
 	db $ff,$01                           ;0C9140|        |      ;

@@ -614,11 +614,11 @@ BattleInit_CopyEnemyStats:	; Copy enemy data loop (7 bytes)
 
 ; Calculate enemy HP multiplier (?)
 	lda.b #$0a	  ; Multiplier = 10
-	sta.w $211b	 ; Store to hardware multiply register
-	stz.w $211b	 ; Clear upper byte (10 × 256 = 2560?)
+	sta.w !M7A	 ; Store to hardware multiply register
+	stz.w !M7A	 ; Clear upper byte (10 × 256 = 2560?)
 	lda.w !source_address_index	 ; Load enemy base stat
-	sta.w $211c	 ; Store to multiply operand
-	ldx.w $2134	 ; Load multiply result (16-bit)
+	sta.w !M7B	 ; Store to multiply operand
+	ldx.w !MPYL	 ; Load multiply result (16-bit)
 	stx.w !calculated_source_offset	 ; Store calculated value
 
 	ldy.w #$0000	; Y = destination index
@@ -931,14 +931,14 @@ BattleMap_GetTileData:
 	tya ; Transfer Y to A (coordinate data)
 	sep #$20		; Set A to 8-bit
 	xba ; Get high byte
-	sta.w $4202	 ; Store to multiply register A
+	sta.w !WRMPYA	 ; Store to multiply register A
 	lda.w !battle_coord_x_boundary	 ; Load map row stride
-	sta.w $4203	 ; Store to multiply register B
+	sta.w !WRMPYB	 ; Store to multiply register B
 	xba ; Swap back
 	rep #$20		; Set A to 16-bit
 	and.w #$003f	; Mask to 6 bits (column offset)
 	clc ; Clear carry
-	adc.w $4216	 ; Add multiply result (row offset)
+	adc.w !RDMPYL	 ; Add multiply result (row offset)
 	tax ; Transfer to X (save index)
 	tay ; Transfer to Y (save index again)
 
@@ -991,17 +991,17 @@ EnemyGfx_DecompressLoop:	; Decompression loop (3 blocks)
 
 ; Calculate block size from table
 	lda.w DATA8_0b83ac,x ; Load size low byte
-	sta.w $211b	 ; Store to hardware multiply low
+	sta.w !M7A	 ; Store to hardware multiply low
 	lda.w DATA8_0b83ad,x ; Load size high byte
-	sta.w $211b	 ; Store to hardware multiply high
+	sta.w !M7A	 ; Store to hardware multiply high
 	xba ; Swap back (flags to A)
-	sta.w $211c	 ; Store flags as multiplier
+	sta.w !M7B	 ; Store flags as multiplier
 
 ; Calculate source address
 	rep #$20		; Set A to 16-bit
 	lda.w DATA8_0b83b2,x ; Load base address from table
 	clc ; Clear carry
-	adc.w $2134	 ; Add multiply result (offset)
+	adc.w !MPYL	 ; Add multiply result (offset)
 	pha ; Save calculated source address
 	lda.w DATA8_0b83ac,x ; Load block size again
 	dec a; Decrement for mvn (size-1)
@@ -1054,13 +1054,13 @@ EnemyGfx_CopySpriteData:
 	beq EnemyGfx_Special19 ; Branch to special case
 
 ; Standard enemy graphics transfer
-	sta.w $4202	 ; Store ID to multiply register A
+	sta.w !WRMPYA	 ; Store ID to multiply register A
 	lda.b #$80	  ; 128 bytes per sprite
-	sta.w $4203	 ; Store to multiply register B
+	sta.w !WRMPYB	 ; Store to multiply register B
 	rep #$20		; Set A to 16-bit
 	lda.w #$8000	; Base address in source bank
 	clc ; Clear carry
-	adc.w $4216	 ; Add multiply result (offset)
+	adc.w !RDMPYL	 ; Add multiply result (offset)
 	tax ; Transfer to X (source address)
 	ldy.w #$c588	; Y = destination in WRAM
 	lda.w #$007f	; Transfer size = 128 bytes (127+1)
@@ -1136,19 +1136,19 @@ BattleBG_CopyTileData:
 
 BattlePPU_ConfigureRegisters:
 	lda.b #$41	  ; BG1 map = $4100, size 32×32 tiles
-	sta.w $2107	 ; Write to BG1 tilemap register
+	sta.w !BG1SC	 ; Write to BG1 tilemap register
 
 	lda.w $1a4d	 ; Load BG2 tilemap config
-	sta.w $2108	 ; Write to BG2 tilemap register
+	sta.w !BG2SC	 ; Write to BG2 tilemap register
 
 	lda.w !gfx_completion_mode	 ; Load main screen layers
-	sta.w $212c	 ; Write to main screen designation
+	sta.w !TM	 ; Write to main screen designation
 
 	lda.w !gfx_completion_flags	 ; Load subscreen layers (for blending)
-	sta.w $212d	 ; Write to subscreen designation
+	sta.w !TS	 ; Write to subscreen designation
 
 	lda.w $1a50	 ; Load color math control
-	sta.w $2130	 ; Write to color math register
+	sta.w !CGWSEL	 ; Write to color math register
 
 ; Special handling for battle mode $70
 	ldy.w !buffer_state	 ; Load color math mode config
@@ -1164,7 +1164,7 @@ BattlePPU_ConfigureRegisters:
 
 BattlePPU_WriteColorMath:
 	tya ; Transfer final config to A
-	sta.w $2131	 ; Write to color math mode register
+	sta.w !CGADSUB	 ; Write to color math mode register
 	rtl ; Return
 
 ; -----------------------------------------------------------------------------
@@ -1270,16 +1270,16 @@ BattleEnemy_SetupTileData:
 	sep #$20		; Set A to 8-bit
 	lda.w !graphics_table_data	 ; Load enemy type flags
 	and.b #$3f	  ; Mask bits 0-5 (enemy base type)
-	sta.w $4202	 ; Store to multiply register A
+	sta.w !WRMPYA	 ; Store to multiply register A
 	lda.b #$03	  ; Multiply by 3
-	sta.w $4203	 ; Store to multiply register B
+	sta.w !WRMPYB	 ; Store to multiply register B
 
 ; Setup DMA parameters
 	ldx.w #$7f80	; DMA dest bank:address high
 	stx.w $0904	 ; Store to DMA dest pointer
 	stz.w $0903	 ; Clear DMA dest pointer low byte
 
-	ldx.w $4216	 ; Load multiply result (enemy_type × 3)
+	ldx.w !RDMPYL	 ; Load multiply result (enemy_type × 3)
 	rep #$20		; Set A to 16-bit
 	lda.l DATA8_0b8735,x ; Load source address from table
 	sta.w !tilemap_wram_source_start_2	 ; Store to DMA source pointer
@@ -1603,11 +1603,11 @@ BattleGfx_DecompressToWRAM:
 
 	ldx.b $00	   ; Load source address
 	ldy.b $03	   ; Load WRAM dest address
-	sty.w $2181	 ; Write WRAM address low/mid to $2181
+	sty.w !WMADDL	 ; Write WRAM address low/mid to $2181
 	lda.b $05	   ; Load WRAM dest bank
 
 ; Relocate direct page to PPU registers for fast access
-	pea.w $2100	 ; Direct page = $2100 (PPU registers)
+	pea.w !INIDISP	 ; Direct page = $2100 (PPU registers)
 	pld ; Pull to DP
 	sta.b SNES_WMADDH-$2100 ; Write WRAM address high ($2183)
 

@@ -7,7 +7,7 @@ Battle_Initialize:
 	phd                                  ;028001|0B      |      ;
 	php                                  ;028002|08      |      ;
 	rep #$30                             ;028003|C230    |      ;
-	pea.W $0400                          ;028005|F40004  |000400;
+	pea.w !JOY_DOWN                          ;028005|F40004  |000400;
 	pld                                  ;028008|2B      |      ;
 	stz.B $00                            ;028009|6400    |000400;
 	ldx.W #$0400                         ;02800B|A20004  |      ;
@@ -223,10 +223,10 @@ Battle_CheckEscape:
 	inc a;02819C|1A      |      ;
 	inc a;02819D|1A      |      ;
 	inc a;02819E|1A      |      ;
-	sta.W $4204                          ;02819F|8D0442  |024204;
-	stz.W $4205                          ;0281A2|9C0542  |024205;
+	sta.w !WRDIVL                          ;02819F|8D0442  |024204;
+	stz.w !WRDIVH                          ;0281A2|9C0542  |024205;
 	lda.B $b3                            ;0281A5|A5B3    |0004B3;
-	sta.W $4206                          ;0281A7|8D0642  |024206;
+	sta.w !WRDIVB                          ;0281A7|8D0642  |024206;
 	lda.W $1010                          ;0281AA|AD1010  |021010;
 	sta.B $a0                            ;0281AD|85A0    |0004A0;
 	lda.w !char2_companion_id                          ;0281AF|AD9010  |021090;
@@ -237,7 +237,7 @@ Battle_CheckEscape:
 	sta.B $a0                            ;0281B8|85A0    |0004A0;
 ;      |        |      ;
 Battle_CalculateEscapeRate:
-	lda.W $4214                          ;0281BA|AD1442  |024214;
+	lda.w !RDDIVL                          ;0281BA|AD1442  |024214;
 	sec                                  ;0281BD|38      |      ;
 	sbc.B $a0                            ;0281BE|E5A0    |0004A0;
 	beq Battle_EscapeFailed                      ;0281C0|F042    |028204;
@@ -256,12 +256,12 @@ Battle_ProcessEscapeCalc:
 	lda.B #$0a                           ;0281D3|A90A    |      ;
 ;      |        |      ;
 Battle_ApplyEscapeBonus:
-	sta.W $4202                          ;0281D5|8D0242  |024202;
+	sta.w !WRMPYA                          ;0281D5|8D0242  |024202;
 	lda.B #$0a                           ;0281D8|A90A    |      ;
-	sta.W $4203                          ;0281DA|8D0342  |024203;
+	sta.w !WRMPYB                          ;0281DA|8D0342  |024203;
 	lda.B #$64                           ;0281DD|A964    |      ;
 	sec                                  ;0281DF|38      |      ;
-	sbc.W $4216                          ;0281E0|ED1642  |024216;
+	sbc.w !RDMPYL                          ;0281E0|ED1642  |024216;
 	sta.B $a2                            ;0281E3|85A2    |0004A2;
 	lda.B #$65                           ;0281E5|A965    |      ;
 	sta.W $00a8                          ;0281E7|8DA800  |0200A8;
@@ -372,25 +372,25 @@ Battle_SumEnemy2HP:
 ;      |        |      ;
 Battle_SumEnemy3HP:
 	lda.B $a2                            ;02829F|A5A2    |0004A2;
-	sta.W $4204                          ;0282A1|8D0442  |024204;
+	sta.w !WRDIVL                          ;0282A1|8D0442  |024204;
 	sep #$20                             ;0282A4|E220    |      ;
 	rep #$10                             ;0282A6|C210    |      ;
 	txa                                  ;0282A8|8A      |      ;
 	jsl.L ExecuteHardwareDivision                    ;0282A9|22269700|009726;
-	lda.W $4214                          ;0282AD|AD1442  |024214;
+	lda.w !RDDIVL                          ;0282AD|AD1442  |024214;
 	sta.B $a2                            ;0282B0|85A2    |0004A2;
 	stz.B $a3                            ;0282B2|64A3    |0004A3;
-	sta.W $4204                          ;0282B4|8D0442  |024204;
-	stz.W $4205                          ;0282B7|9C0542  |024205;
+	sta.w !WRDIVL                          ;0282B4|8D0442  |024204;
+	stz.w !WRDIVH                          ;0282B7|9C0542  |024205;
 	lda.B #$05                           ;0282BA|A905    |      ;
 	jsl.L ExecuteHardwareDivision                    ;0282BC|22269700|009726;
-	lda.W $4214                          ;0282C0|AD1442  |024214;
-	sta.W $4202                          ;0282C3|8D0242  |024202;
+	lda.w !RDDIVL                          ;0282C0|AD1442  |024214;
+	sta.w !WRMPYA                          ;0282C3|8D0242  |024202;
 	lda.B $b5                            ;0282C6|A5B5    |0004B5;
-	sta.W $4203                          ;0282C8|8D0342  |024203;
+	sta.w !WRMPYB                          ;0282C8|8D0342  |024203;
 	php                                  ;0282CB|08      |      ;
 	plp                                  ;0282CC|28      |      ;
-	lda.W $4216                          ;0282CD|AD1642  |024216;
+	lda.w !RDMPYL                          ;0282CD|AD1642  |024216;
 	inc a;0282D0|1A      |      ;
 	sta.W $00a8                          ;0282D1|8DA800  |0200A8;
 	jsl.L ExecuteAudioCall                    ;0282D4|22839700|009783;
@@ -413,7 +413,7 @@ UNREACH_0282EE:
 Battle_InitializeSlots:
 	sep #$20                             ;0282F9|E220    |      ;
 	rep #$10                             ;0282FB|C210    |      ;
-	pea.W $0400                          ;0282FD|F40004  |020400;
+	pea.w !JOY_DOWN                          ;0282FD|F40004  |020400;
 	pld                                  ;028300|2B      |      ;
 	stz.B $8a                            ;028301|648A    |00048A;
 	stz.B $87                            ;028303|6487    |000487;
@@ -481,7 +481,7 @@ Battle_CalculateAGI:
 	inc.B $a0                            ;028361|E6A0    |0004A0;
 	dec.B $a2                            ;028363|C6A2    |0004A2;
 	bne Battle_ProcessSlotLoop                      ;028365|D0C6    |02832D;
-	pea.W $0400                          ;028367|F40004  |020400;
+	pea.w !JOY_DOWN                          ;028367|F40004  |020400;
 	pld                                  ;02836A|2B      |      ;
 	sep #$30                             ;02836B|E230    |      ;
 ;      |        |      ;
@@ -583,7 +583,7 @@ Battle_ProcessStatusEffects:
 	lda.B $21                            ;0283F0|A521    |001021;
 	sta.W $0411                          ;0283F2|8D1104  |020411;
 	lda.B $10                            ;0283F5|A510    |001010;
-	sta.W $0400                          ;0283F7|8D0004  |020400;
+	sta.w !JOY_DOWN                          ;0283F7|8D0004  |020400;
 	lda.B $2e                            ;0283FA|A52E    |00102E;
 	sta.W $0416                          ;0283FC|8D1604  |020416;
 	lda.B $2f                            ;0283FF|A52F    |00102F;
@@ -850,13 +850,13 @@ Battle_SleepLoop:
 	lda.B $3a                            ;0285AA|A53A    |00043A;
 	sec                                  ;0285AC|38      |      ;
 	sbc.B #$14                           ;0285AD|E914    |      ;
-	sta.W $4204                          ;0285AF|8D0442  |024204;
-	stz.W $4205                          ;0285B2|9C0542  |024205;
+	sta.w !WRDIVL                          ;0285AF|8D0442  |024204;
+	stz.w !WRDIVH                          ;0285B2|9C0542  |024205;
 	lda.B #$04                           ;0285B5|A904    |      ;
 	jsl.L ExecuteHardwareDivision                    ;0285B7|22269700|009726;
 	lda.B #$00                           ;0285BB|A900    |      ;
 	xba                                  ;0285BD|EB      |      ;
-	lda.W $4214                          ;0285BE|AD1442  |024214;
+	lda.w !RDDIVL                          ;0285BE|AD1442  |024214;
 	tax                                  ;0285C1|AA      |      ;
 	phd                                  ;0285C2|0B      |      ;
 	jsr.W Battle_SetEntityContextParty                    ;0285C3|20228F  |028F22;
@@ -1289,11 +1289,11 @@ Battle_ScanPartyLoop:
 	ora.B $03,s                          ;0288A0|0303    |000003;
 	sta.B $03,s                          ;0288A2|8303    |000003;
 	ldx.B $16                            ;0288A4|A616    |001096;
-	stx.W $4204                          ;0288A6|8E0442  |024204;
+	stx.w !WRDIVL                          ;0288A6|8E0442  |024204;
 	lda.B #$14                           ;0288A9|A914    |      ;
 	jsl.L ExecuteHardwareDivision                    ;0288AB|22269700|009726;
 	rep #$30                             ;0288AF|C230    |      ;
-	lda.W $4214                          ;0288B1|AD1442  |024214;
+	lda.w !RDDIVL                          ;0288B1|AD1442  |024214;
 	cmp.W #$0064                         ;0288B4|C96400  |      ;
 	bcc Battle_AllDead                      ;0288B7|9003    |0288BC;
 	lda.W #$0063                         ;0288B9|A96300  |      ;
@@ -1409,24 +1409,24 @@ UNREACH_028965:
 	db $c9,$4a,$b0,$04,$a9,$06,$80,$02,$a9,$0a;028965|        |      ;
 ;      |        |      ;
 Battle_MultiplyRewardByLevel:
-	sta.W $4202                          ;02896F|8D0242  |024202;
+	sta.w !WRMPYA                          ;02896F|8D0242  |024202;
 	pla                                  ;028972|68      |      ;
-	sta.W $4203                          ;028973|8D0342  |024203;
+	sta.w !WRMPYB                          ;028973|8D0342  |024203;
 	pha                                  ;028976|48      |      ;
 	pla                                  ;028977|68      |      ;
 	rep #$30                             ;028978|C230    |      ;
-	lda.W $4216                          ;02897A|AD1642  |024216;
+	lda.w !RDMPYL                          ;02897A|AD1642  |024216;
 	clc                                  ;02897D|18      |      ;
 	adc.W $04a2                          ;02897E|6DA204  |0204A2;
 	sta.W $04a2                          ;028981|8DA204  |0204A2;
 	sep #$20                             ;028984|E220    |      ;
 	rep #$10                             ;028986|C210    |      ;
 	pla                                  ;028988|68      |      ;
-	sta.W $4203                          ;028989|8D0342  |024203;
+	sta.w !WRMPYB                          ;028989|8D0342  |024203;
 	pha                                  ;02898C|48      |      ;
 	pla                                  ;02898D|68      |      ;
 	rep #$30                             ;02898E|C230    |      ;
-	lda.W $4216                          ;028990|AD1642  |024216;
+	lda.w !RDMPYL                          ;028990|AD1642  |024216;
 	clc                                  ;028993|18      |      ;
 	adc.W $04a0                          ;028994|6DA004  |0204A0;
 	sta.W $04a0                          ;028997|8DA004  |0204A0;
@@ -1572,7 +1572,7 @@ Battle_GetNumberDigit:
 	phd                                  ;028AE2|0B      |      ;
 	phk                                  ;028AE3|4B      |      ;
 	plb                                  ;028AE4|AB      |      ;
-	pea.W $0400                          ;028AE5|F40004  |020400;
+	pea.w !JOY_DOWN                          ;028AE5|F40004  |020400;
 	pld                                  ;028AE8|2B      |      ;
 	sep #$20                             ;028AE9|E220    |      ;
 	rep #$10                             ;028AEB|C210    |      ;
@@ -1604,7 +1604,7 @@ DATA8_028b0a:
 	db $10                               ;028B0E|        |028B04;
 ;      |        |      ;
 Battle_SetupTargeting:
-	pea.W $0400                          ;028B0F|F40004  |020400;
+	pea.w !JOY_DOWN                          ;028B0F|F40004  |020400;
 	pld                                  ;028B12|2B      |      ;
 	sep #$20                             ;028B13|E220    |      ;
 	rep #$10                             ;028B15|C210    |      ;
@@ -1617,18 +1617,18 @@ Battle_SetupTargeting:
 	lsr a;028B1F|4A      |      ;
 	tax                                  ;028B20|AA      |      ;
 	lda.W DATA8_028bfc,x                 ;028B21|BDFC8B  |028BFC;
-	sta.W $4202                          ;028B24|8D0242  |024202;
+	sta.w !WRMPYA                          ;028B24|8D0242  |024202;
 	lda.B $3a                            ;028B27|A53A    |00043A;
 	sec                                  ;028B29|38      |      ;
 	sbc.W DATA8_028c01,x                 ;028B2A|FD018C  |028C01;
-	sta.W $4203                          ;028B2D|8D0342  |024203;
+	sta.w !WRMPYB                          ;028B2D|8D0342  |024203;
 	rep #$30                             ;028B30|C230    |      ;
 	txa                                  ;028B32|8A      |      ;
 	asl a;028B33|0A      |      ;
 	tax                                  ;028B34|AA      |      ;
 	lda.W DATA8_028bf2,x                 ;028B35|BDF28B  |028BF2;
 	clc                                  ;028B38|18      |      ;
-	adc.W $4216                          ;028B39|6D1642  |024216;
+	adc.w !RDMPYL                          ;028B39|6D1642  |024216;
 	tax                                  ;028B3C|AA      |      ;
 	sep #$20                             ;028B3D|E220    |      ;
 	rep #$10                             ;028B3F|C210    |      ;
@@ -1764,7 +1764,7 @@ DATA8_028c01:
 	db $20,$40,$14,$10,$2f               ;028C01|        |      ;
 ;      |        |      ;
 Battle_InitializeEnemies:
-	pea.W $0400                          ;028C06|F40004  |020400;
+	pea.w !JOY_DOWN                          ;028C06|F40004  |020400;
 	pld                                  ;028C09|2B      |      ;
 	sep #$20                             ;028C0A|E220    |      ;
 	rep #$10                             ;028C0C|C210    |      ;
@@ -1960,13 +1960,13 @@ Battle_SetEnemyAttributes:
 	sep #$20                             ;028D87|E220    |      ;
 	rep #$10                             ;028D89|C210    |      ;
 	pla                                  ;028D8B|68      |      ;
-	sta.W $4202                          ;028D8C|8D0242  |024202;
+	sta.w !WRMPYA                          ;028D8C|8D0242  |024202;
 	lda.B #$03                           ;028D8F|A903    |      ;
-	sta.W $4203                          ;028D91|8D0342  |024203;
+	sta.w !WRMPYB                          ;028D91|8D0342  |024203;
 	rep #$30                             ;028D94|C230    |      ;
 	lda.W #$c17c                         ;028D96|A97CC1  |      ;
 	clc                                  ;028D99|18      |      ;
-	adc.W $4216                          ;028D9A|6D1642  |024216;
+	adc.w !RDMPYL                          ;028D9A|6D1642  |024216;
 	tax                                  ;028D9D|AA      |      ;
 	sep #$20                             ;028D9E|E220    |      ;
 	rep #$10                             ;028DA0|C210    |      ;
@@ -1987,13 +1987,13 @@ Battle_SetEnemyAttributes:
 	rep #$10                             ;028DBE|C210    |      ;
 	pla                                  ;028DC0|68      |      ;
 	pha                                  ;028DC1|48      |      ;
-	sta.W $4202                          ;028DC2|8D0242  |024202;
+	sta.w !WRMPYA                          ;028DC2|8D0242  |024202;
 	lda.B #$0e                           ;028DC5|A90E    |      ;
-	sta.W $4203                          ;028DC7|8D0342  |024203;
+	sta.w !WRMPYB                          ;028DC7|8D0342  |024203;
 	rep #$30                             ;028DCA|C230    |      ;
 	lda.W #$c275                         ;028DCC|A975C2  |      ;
 	clc                                  ;028DCF|18      |      ;
-	adc.W $4216                          ;028DD0|6D1642  |024216;
+	adc.w !RDMPYL                          ;028DD0|6D1642  |024216;
 	tax                                  ;028DD3|AA      |      ;
 	lda.W $0000,x                        ;028DD4|BD0000  |020000;
 	ldy.W #$0014                         ;028DD7|A01400  |      ;
@@ -2079,13 +2079,13 @@ Battle_AIDecisionTree:
 	iny                                  ;028E64|C8      |      ;
 	sta.B ($92),y                        ;028E65|9192    |000492;
 	pla                                  ;028E67|68      |      ;
-	sta.W $4202                          ;028E68|8D0242  |024202;
+	sta.w !WRMPYA                          ;028E68|8D0242  |024202;
 	lda.B #$09                           ;028E6B|A909    |      ;
-	sta.W $4203                          ;028E6D|8D0342  |024203;
+	sta.w !WRMPYB                          ;028E6D|8D0342  |024203;
 	rep #$30                             ;028E70|C230    |      ;
 	lda.W #$c6ff                         ;028E72|A9FFC6  |      ;
 	clc                                  ;028E75|18      |      ;
-	adc.W $4216                          ;028E76|6D1642  |024216;
+	adc.w !RDMPYL                          ;028E76|6D1642  |024216;
 	tax                                  ;028E79|AA      |      ;
 	phx                                  ;028E7A|DA      |      ;
 	lda.W $0000,x                        ;028E7B|BD0000  |020000;
@@ -2473,13 +2473,13 @@ Battle_CommandItem:
 	jsr.W Battle_CalculateHitChance                    ;02917E|20E1A0  |02A0E1;
 	jsr.W Battle_DeathResistCheck                    ;029181|209D99  |02999D;
 	lda.B #$1e                           ;029184|A91E    |      ;
-	sta.W $4202                          ;029186|8D0242  |024202;
+	sta.w !WRMPYA                          ;029186|8D0242  |024202;
 	lda.B $dd                            ;029189|A5DD    |0004DD;
 	and.B #$0f                           ;02918B|290F    |      ;
-	sta.W $4203                          ;02918D|8D0342  |024203;
+	sta.w !WRMPYB                          ;02918D|8D0342  |024203;
 	pha                                  ;029190|48      |      ;
 	pla                                  ;029191|68      |      ;
-	ldx.W $4216                          ;029192|AE1642  |024216;
+	ldx.w !RDMPYL                          ;029192|AE1642  |024216;
 	stx.B $77                            ;029195|8677    |000477;
 	jsr.W Battle_ProcessPetrifySpell                    ;029197|20DA99  |0299DA;
 	jsr.W Battle_ClampHealedHP                    ;02919A|202797  |029727;
@@ -3061,9 +3061,9 @@ Battle_ApplyHealing:
 ;      |        |      ;
 Battle_ClampHealedHP:
 	ldx.B $77                            ;029727|A677    |000477;
-	stx.W $4204                          ;029729|8E0442  |024204;
+	stx.w !WRDIVL                          ;029729|8E0442  |024204;
 	ldx.B $78                            ;02972C|A678    |000478;
-	stx.W $4205                          ;02972E|8E0542  |024205;
+	stx.w !WRDIVH                          ;02972E|8E0542  |024205;
 	lda.B $39                            ;029731|A539    |000439;
 	cmp.B #$80                           ;029733|C980    |      ;
 	beq Battle_HealingComplete                      ;029735|F005    |02973C;
@@ -3082,7 +3082,7 @@ Battle_DisplayHealValue:
 ;      |        |      ;
 Battle_ProcessRevive:
 	jsl.L ExecuteHardwareDivision                    ;029743|22269700|009726;
-	ldx.W $4214                          ;029747|AE1442  |024214;
+	ldx.w !RDDIVL                          ;029747|AE1442  |024214;
 	stx.B $77                            ;02974A|8677    |000477;
 	rts                                  ;02974C|60      |      ;
 ;      |        |      ;
@@ -3352,18 +3352,18 @@ Battle_BuffApplied:
 ;      |        |      ;
 Battle_ProcessDebuffSpell:
 	adc.B $e1                            ;029904|65E1    |0004E1;
-	sta.W $4204                          ;029906|8D0442  |024204;
-	stz.W $4205                          ;029909|9C0542  |024205;
+	sta.w !WRDIVL                          ;029906|8D0442  |024204;
+	stz.w !WRDIVH                          ;029909|9C0542  |024205;
 	lda.B #$03                           ;02990C|A903    |      ;
 	jsl.L ExecuteHardwareDivision                    ;02990E|22269700|009726;
-	lda.W $4214                          ;029912|AD1442  |024214;
+	lda.w !RDDIVL                          ;029912|AD1442  |024214;
 	sta.B $b7                            ;029915|85B7    |0004B7;
 	lda.B $28                            ;029917|A528    |000428;
-	sta.W $4204                          ;029919|8D0442  |024204;
-	stz.W $4205                          ;02991C|9C0542  |024205;
+	sta.w !WRDIVL                          ;029919|8D0442  |024204;
+	stz.w !WRDIVH                          ;02991C|9C0542  |024205;
 	lda.B #$03                           ;02991F|A903    |      ;
 	jsl.L ExecuteHardwareDivision                    ;029921|22269700|009726;
-	lda.W $4214                          ;029925|AD1442  |024214;
+	lda.w !RDDIVL                          ;029925|AD1442  |024214;
 	clc                                  ;029928|18      |      ;
 	adc.B $b7                            ;029929|65B7    |0004B7;
 	sta.B $b7                            ;02992B|85B7    |0004B7;
@@ -3562,12 +3562,12 @@ Battle_ApplyPoisonStatus:
 ;      |        |      ;
 Battle_PoisonApplied:
 	lda.B $dd                            ;029A69|A5DD    |0004DD;
-	sta.W $4202                          ;029A6B|8D0242  |024202;
+	sta.w !WRMPYA                          ;029A6B|8D0242  |024202;
 	lda.B #$12                           ;029A6E|A912    |      ;
-	sta.W $4203                          ;029A70|8D0342  |024203;
+	sta.w !WRMPYB                          ;029A70|8D0342  |024203;
 	pha                                  ;029A73|48      |      ;
 	pla                                  ;029A74|68      |      ;
-	ldx.W $4216                          ;029A75|AE1642  |024216;
+	ldx.w !RDMPYL                          ;029A75|AE1642  |024216;
 	stx.B $77                            ;029A78|8677    |000477;
 	rts                                  ;029A7A|60      |      ;
 ;      |        |      ;
@@ -4195,15 +4195,15 @@ Battle_FadeComplete:
 	lsr a;029EBF|4A      |      ;
 	lsr a;029EC0|4A      |      ;
 	and.B #$03                           ;029EC1|2903    |      ;
-	sta.W $4202                          ;029EC3|8D0242  |024202;
+	sta.w !WRMPYA                          ;029EC3|8D0242  |024202;
 	lda.B #$19                           ;029EC6|A919    |      ;
-	sta.W $4203                          ;029EC8|8D0342  |024203;
+	sta.w !WRMPYB                          ;029EC8|8D0342  |024203;
 	plx                                  ;029ECB|FA      |      ;
 	phd                                  ;029ECC|0B      |      ;
 	jsr.W Battle_SetEntityContextEnemy                    ;029ECD|202F8F  |028F2F;
 	lda.B $26,x                          ;029ED0|B526    |001026;
 	sec                                  ;029ED2|38      |      ;
-	sbc.W $4216                          ;029ED3|ED1642  |024216;
+	sbc.w !RDMPYL                          ;029ED3|ED1642  |024216;
 	bcs Battle_ProcessSound                      ;029ED6|B002    |029EDA;
 	lda.B #$00                           ;029ED8|A900    |      ;
 ;      |        |      ;
@@ -4564,7 +4564,7 @@ Battle_ProcessElementalResistance:
 	php                                  ;02A22B|08      |      ;
 	sep #$20                             ;02A22C|E220    |      ;
 	rep #$10                             ;02A22E|C210    |      ;
-	pea.W $0400                          ;02A230|F40004  |020400;
+	pea.w !JOY_DOWN                          ;02A230|F40004  |020400;
 	pld                                  ;02A233|2B      |      ;
 	lda.B #$00                           ;02A234|A900    |      ;
 	xba                                  ;02A236|EB      |      ;
@@ -4614,7 +4614,7 @@ DATA8_02a279:
 	db $21,$00,$00                       ;02A289|        |      ;
 ;      |        |      ;
 Battle_ProcessDOTDamage:
-	pea.W $0400                          ;02A28C|F40004  |020400;
+	pea.w !JOY_DOWN                          ;02A28C|F40004  |020400;
 	pld                                  ;02A28F|2B      |      ;
 	sep #$20                             ;02A290|E220    |      ;
 	rep #$10                             ;02A292|C210    |      ;
@@ -7454,7 +7454,7 @@ Battle_ProcessCharm:
 	phd                                  ;02D6B4|0B      |      ;
 	sep #$20                             ;02D6B5|E220    |      ;
 	rep #$10                             ;02D6B7|C210    |      ;
-	pea.W $2100                          ;02D6B9|F40021  |022100;
+	pea.w !INIDISP                          ;02D6B9|F40021  |022100;
 	pld                                  ;02D6BC|2B      |      ;
 	lda.B #$00                           ;02D6BD|A900    |      ;
 	sta.B SNES_WMADDH-$2100              ;02D6BF|8583    |002183;
@@ -7621,10 +7621,10 @@ Battle_DoomCountdown:
 	sep #$20                             ;02D7B7|E220    |      ;
 	rep #$10                             ;02D7B9|C210    |      ;
 	lda.B $20                            ;02D7BB|A520    |000A20;
-	sta.W $4202                          ;02D7BD|8D0242  |024202;
+	sta.w !WRMPYA                          ;02D7BD|8D0242  |024202;
 	lda.B #$05                           ;02D7C0|A905    |      ;
 	jsl.L CallMultiplicationRoutine                    ;02D7C2|221E9700|00971E;
-	ldx.W $4216                          ;02D7C6|AE1642  |024216;
+	ldx.w !RDMPYL                          ;02D7C6|AE1642  |024216;
 	lda.L DATA8_098462,x                 ;02D7C9|BF628409|098462;
 	sta.B $15                            ;02D7CD|8515    |000A15;
 	plp                                  ;02D7CF|28      |      ;
@@ -7651,10 +7651,10 @@ Battle_DoomTriggerDeath:
 	sta.B $20                            ;02D813|8520    |000A20;
 	sep #$20                             ;02D815|E220    |      ;
 	rep #$10                             ;02D817|C210    |      ;
-	sta.W $4202                          ;02D819|8D0242  |024202;
+	sta.w !WRMPYA                          ;02D819|8D0242  |024202;
 	lda.B #$05                           ;02D81C|A905    |      ;
 	jsl.L CallMultiplicationRoutine                    ;02D81E|221E9700|00971E;
-	ldx.W $4216                          ;02D822|AE1642  |024216;
+	ldx.w !RDMPYL                          ;02D822|AE1642  |024216;
 	lda.L DATA8_098460,x                 ;02D825|BF608409|098460;
 	sta.B $69                            ;02D829|8569    |000A69;
 	lda.L DATA8_098461,x                 ;02D82B|BF618409|098461;
@@ -7801,21 +7801,21 @@ Battle_ZombieReverseHealing:
 	sbc.W DATA8_02d96c,x                 ;02D931|FD6CD9  |02D96C;
 	sep #$20                             ;02D934|E220    |      ;
 	rep #$10                             ;02D936|C210    |      ;
-	sta.W $4202                          ;02D938|8D0242  |024202;
+	sta.w !WRMPYA                          ;02D938|8D0242  |024202;
 	rep #$30                             ;02D93B|C230    |      ;
 	lda.W DATA8_02d972,x                 ;02D93D|BD72D9  |02D972;
 	sta.W $0a79                          ;02D940|8D790A  |020A79;
 	sep #$20                             ;02D943|E220    |      ;
 	rep #$10                             ;02D945|C210    |      ;
-	sta.W $4203                          ;02D947|8D0342  |024203;
+	sta.w !WRMPYB                          ;02D947|8D0342  |024203;
 	nop                                  ;02D94A|EA      |      ;
 	nop                                  ;02D94B|EA      |      ;
 	nop                                  ;02D94C|EA      |      ;
 	nop                                  ;02D94D|EA      |      ;
-	lda.W $4216                          ;02D94E|AD1642  |024216;
-	sta.W $4202                          ;02D951|8D0242  |024202;
+	lda.w !RDMPYL                          ;02D94E|AD1642  |024216;
+	sta.w !WRMPYA                          ;02D951|8D0242  |024202;
 	lda.W DATA8_02d974,x                 ;02D954|BD74D9  |02D974;
-	sta.W $4203                          ;02D957|8D0342  |024203;
+	sta.w !WRMPYB                          ;02D957|8D0342  |024203;
 	nop                                  ;02D95A|EA      |      ;
 	nop                                  ;02D95B|EA      |      ;
 	nop                                  ;02D95C|EA      |      ;
@@ -7823,7 +7823,7 @@ Battle_ZombieReverseHealing:
 	rep #$30                             ;02D95E|C230    |      ;
 	lda.W DATA8_02d970,x                 ;02D960|BD70D9  |02D970;
 	clc                                  ;02D963|18      |      ;
-	adc.W $4216                          ;02D964|6D1642  |024216;
+	adc.w !RDMPYL                          ;02D964|6D1642  |024216;
 	sta.B $6b                            ;02D967|856B    |000A6B;
 	plb                                  ;02D969|AB      |      ;
 	plp                                  ;02D96A|28      |      ;
@@ -7914,14 +7914,14 @@ Battle_FloatImmuneGround:
 ;      |        |      ;
 Battle_FloatComplete:
 	xba                                  ;02D9EF|EB      |      ;
-	sta.W $4202                          ;02D9F0|8D0242  |0A4202;
+	sta.w !WRMPYA                          ;02D9F0|8D0242  |0A4202;
 	lda.B #$18                           ;02D9F3|A918    |      ;
-	sta.W $4203                          ;02D9F5|8D0342  |0A4203;
+	sta.w !WRMPYB                          ;02D9F5|8D0342  |0A4203;
 	rep #$30                             ;02D9F8|C230    |      ;
 	ply                                  ;02D9FA|7A      |      ;
 	lda.W $0000,y                        ;02D9FB|B90000  |0A0000;
 	clc                                  ;02D9FE|18      |      ;
-	adc.W $4216                          ;02D9FF|6D1642  |0A4216;
+	adc.w !RDMPYL                          ;02D9FF|6D1642  |0A4216;
 	sta.W $0002,y                        ;02DA02|990200  |0A0002;
 	iny                                  ;02DA05|C8      |      ;
 	iny                                  ;02DA06|C8      |      ;
@@ -7944,7 +7944,7 @@ Battle_ProcessShell:
 ;      |        |      ;
 Battle_ApplyShell:
 	phd                                  ;02DA18|0B      |      ;
-	pea.W $2100                          ;02DA19|F40021  |022100;
+	pea.w !INIDISP                          ;02DA19|F40021  |022100;
 	pld                                  ;02DA1C|2B      |      ;
 	stz.W $0a7e                          ;02DA1D|9C7E0A  |020A7E;
 	lda.B #$1d                           ;02DA20|A91D    |      ;
@@ -8044,7 +8044,7 @@ Battle_ProcessRegen:
 	lda.B $e6                            ;02DADE|A5E6    |000AE6;
 	bne Battle_ProcessRegen                      ;02DAE0|D0FC    |02DADE;
 	phd                                  ;02DAE2|0B      |      ;
-	pea.W $2100                          ;02DAE3|F40021  |022100;
+	pea.w !INIDISP                          ;02DAE3|F40021  |022100;
 	pld                                  ;02DAE6|2B      |      ;
 	lda.B #$42                           ;02DAE7|A942    |      ;
 	sta.B SNES_BG1SC-$2100               ;02DAE9|8507    |002107;
@@ -8465,10 +8465,10 @@ Battle_SlipDamagePercent:
 	sep #$20                             ;02DFE9|E220    |      ;
 	rep #$10                             ;02DFEB|C210    |      ;
 	lda.W $0a9c                          ;02DFED|AD9C0A  |020A9C;
-	sta.W $4202                          ;02DFF0|8D0242  |024202;
+	sta.w !WRMPYA                          ;02DFF0|8D0242  |024202;
 	lda.B #$03                           ;02DFF3|A903    |      ;
 	jsl.L CallMultiplicationRoutine                    ;02DFF5|221E9700|00971E;
-	ldx.W $4216                          ;02DFF9|AE1642  |024216;
+	ldx.w !RDMPYL                          ;02DFF9|AE1642  |024216;
 	rep #$30                             ;02DFFC|C230    |      ;
 	lda.L UNREACH_0CF715,x               ;02DFFE|BF15F70C|0CF715;
 	and.W #$00ff                         ;02E002|29FF00  |      ;
@@ -8520,10 +8520,10 @@ Battle_ApplyAuto:
 	php                                  ;02E058|08      |      ;
 	sep #$20                             ;02E059|E220    |      ;
 	rep #$10                             ;02E05B|C210    |      ;
-	sta.W $4202                          ;02E05D|8D0242  |024202;
+	sta.w !WRMPYA                          ;02E05D|8D0242  |024202;
 	lda.B #$06                           ;02E060|A906    |      ;
 	jsl.L CallMultiplicationRoutine                    ;02E062|221E9700|00971E;
-	ldx.W $4216                          ;02E066|AE1642  |024216;
+	ldx.w !RDMPYL                          ;02E066|AE1642  |024216;
 	ldy.W #$0004                         ;02E069|A00400  |      ;
 ;      |        |      ;
 Battle_AutoSelectAction:
@@ -8531,11 +8531,11 @@ Battle_AutoSelectAction:
 	rep #$10                             ;02E06E|C210    |      ;
 	lda.L DATA8_0cef85,x                 ;02E070|BF85EF0C|0CEF85;
 	inx                                  ;02E074|E8      |      ;
-	sta.W $4202                          ;02E075|8D0242  |024202;
+	sta.w !WRMPYA                          ;02E075|8D0242  |024202;
 	lda.B #$18                           ;02E078|A918    |      ;
 	jsl.L CallMultiplicationRoutine                    ;02E07A|221E9700|00971E;
 	rep #$30                             ;02E07E|C230    |      ;
-	lda.W $4216                          ;02E080|AD1642  |024216;
+	lda.w !RDMPYL                          ;02E080|AD1642  |024216;
 	clc                                  ;02E083|18      |      ;
 	adc.W #$d785                         ;02E084|6985D7  |      ;
 	sta.W $0a8b                          ;02E087|8D8B0A  |020A8B;
@@ -8696,7 +8696,7 @@ Battle_ReflectMagicComplete:
 	php                                  ;02E1C7|08      |      ;
 	sep #$20                             ;02E1C8|E220    |      ;
 	rep #$10                             ;02E1CA|C210    |      ;
-	pea.W $2100                          ;02E1CC|F40021  |022100;
+	pea.w !INIDISP                          ;02E1CC|F40021  |022100;
 	pld                                  ;02E1CF|2B      |      ;
 	phb                                  ;02E1D0|8B      |      ;
 	lda.W $0a8a                          ;02E1D1|AD8A0A  |020A8A;
@@ -8874,7 +8874,7 @@ Battle_ApplyNullMagic:
 ;      |        |      ;
 Battle_NullMagicNegate:
 	phx                                  ;02E3E4|DA      |      ;
-	pea.W $2100                          ;02E3E5|F40021  |062100;
+	pea.w !INIDISP                          ;02E3E5|F40021  |062100;
 	pld                                  ;02E3E8|2B      |      ;
 	lda.B #$00                           ;02E3E9|A900    |      ;
 	xba                                  ;02E3EB|EB      |      ;
@@ -8913,7 +8913,7 @@ Battle_ProcessDoublecast:
 ;      |        |      ;
 Battle_ApplyDoublecast:
 	phx                                  ;02E454|DA      |      ;
-	pea.W $2100                          ;02E455|F40021  |062100;
+	pea.w !INIDISP                          ;02E455|F40021  |062100;
 	pld                                  ;02E458|2B      |      ;
 	ldx.W #$0010                         ;02E459|A21000  |      ;
 ;      |        |      ;
@@ -9029,10 +9029,10 @@ Battle_ProcessQuadracast:
 	sep #$20                             ;02E502|E220    |      ;
 	rep #$10                             ;02E504|C210    |      ;
 	lda.B $96                            ;02E506|A596    |000A96;
-	sta.W $4202                          ;02E508|8D0242  |024202;
+	sta.w !WRMPYA                          ;02E508|8D0242  |024202;
 	lda.B #$06                           ;02E50B|A906    |      ;
 	jsl.L CallMultiplicationRoutine                    ;02E50D|221E9700|00971E;
-	ldx.W $4216                          ;02E511|AE1642  |024216;
+	ldx.w !RDMPYL                          ;02E511|AE1642  |024216;
 	lda.B $93                            ;02E514|A593    |000A93;
 	xba                                  ;02E516|EB      |      ;
 	lda.L DATA8_0cef89,x                 ;02E517|BF89EF0C|0CEF89;
@@ -9190,12 +9190,12 @@ Battle_ProcessConcentrate:
 	lda.B #$ff                           ;02E614|A9FF    |      ;
 	sta.W SNES_WH1                          ;02E616|8D2721  |022127;
 	sta.W SNES_WH3                          ;02E619|8D2921  |022129;
-	stz.W $2126                          ;02E61C|9C2621  |022126;
-	stz.W $2128                          ;02E61F|9C2821  |022128;
-	stz.W $212e                          ;02E622|9C2E21  |02212E;
-	stz.W $212f                          ;02E625|9C2F21  |02212F;
-	stz.W $212a                          ;02E628|9C2A21  |02212A;
-	stz.W $212b                          ;02E62B|9C2B21  |02212B;
+	stz.w !WH0                          ;02E61C|9C2621  |022126;
+	stz.w !WH2                          ;02E61F|9C2821  |022128;
+	stz.w !TMW                          ;02E622|9C2E21  |02212E;
+	stz.w !TSW                          ;02E625|9C2F21  |02212F;
+	stz.w !WBGLOG                          ;02E628|9C2A21  |02212A;
+	stz.w !WOBJLOG                          ;02E62B|9C2B21  |02212B;
 	lda.B #$22                           ;02E62E|A922    |      ;
 	sta.W SNES_W12SEL                          ;02E630|8D2321  |022123;
 	sta.W SNES_W34SEL                          ;02E633|8D2421  |022124;
@@ -10123,7 +10123,7 @@ Battle_MimicCopyLast:
 	lda.B $cf                            ;02EBF9|A5CF    |000ACF;
 	clc                                  ;02EBFB|18      |      ;
 	adc.B $d0                            ;02EBFC|65D0    |000AD0;
-	sta.W $4202                          ;02EBFE|8D0242  |0B4202;
+	sta.w !WRMPYA                          ;02EBFE|8D0242  |0B4202;
 	lda.B #$30                           ;02EC01|A930    |      ;
 	jsl.L CallMultiplicationRoutine                    ;02EC03|221E9700|00971E;
 	lda.B $cc                            ;02EC07|A5CC    |000ACC;
@@ -10139,7 +10139,7 @@ Battle_MimicExecute:
 ;      |        |      ;
 Battle_MimicComplete:
 	clc                                  ;02EC17|18      |      ;
-	adc.W $4216                          ;02EC18|6D1642  |0B4216;
+	adc.w !RDMPYL                          ;02EC18|6D1642  |0B4216;
 	sta.B $8b                            ;02EC1B|858B    |000A8B;
 	lda.B $cb                            ;02EC1D|A5CB    |000ACB;
 	and.W #$00ff                         ;02EC1F|29FF00  |      ;
@@ -10171,17 +10171,17 @@ Battle_BlueComplete:
 	phd                                  ;02EC46|0B      |      ;
 	sep #$20                             ;02EC47|E220    |      ;
 	rep #$10                             ;02EC49|C210    |      ;
-	pea.W $2100                          ;02EC4B|F40021  |0B2100;
+	pea.w !INIDISP                          ;02EC4B|F40021  |0B2100;
 	pld                                  ;02EC4E|2B      |      ;
 	stz.B SNES_WMADDH-$2100              ;02EC4F|6483    |002183;
 	lda.W $0acb                          ;02EC51|ADCB0A  |0B0ACB;
-	sta.W $4202                          ;02EC54|8D0242  |0B4202;
+	sta.w !WRMPYA                          ;02EC54|8D0242  |0B4202;
 	lda.B #$20                           ;02EC57|A920    |      ;
 	jsl.L CallMultiplicationRoutine                    ;02EC59|221E9700|00971E;
 	rep #$30                             ;02EC5D|C230    |      ;
 	clc                                  ;02EC5F|18      |      ;
 	lda.W #$7800                         ;02EC60|A90078  |      ;
-	adc.W $4216                          ;02EC63|6D1642  |0B4216;
+	adc.w !RDMPYL                          ;02EC63|6D1642  |0B4216;
 	ldx.W #$0008                         ;02EC66|A20800  |      ;
 ;      |        |      ;
 Battle_MorphTransform:
@@ -10628,15 +10628,15 @@ Battle_BurstCalculate:
 	lda.W DATA8_02ef63,x                 ;02EF3A|BD63EF  |02EF63;
 	sta.W SNES_VMADDL                          ;02EF3D|8D1621  |022116;
 	lda.W DATA8_02ef71,x                 ;02EF40|BD71EF  |02EF71;
-	sta.W $4302                          ;02EF43|8D0243  |024302;
+	sta.w !DMA0_A1T0L                          ;02EF43|8D0243  |024302;
 	lda.W DATA8_02ef7f,x                 ;02EF46|BD7FEF  |02EF7F;
-	sta.W $4305                          ;02EF49|8D0543  |024305;
+	sta.w !DMA0_DAS0L                          ;02EF49|8D0543  |024305;
 	sep #$20                             ;02EF4C|E220    |      ;
 	rep #$10                             ;02EF4E|C210    |      ;
 	lda.B #$80                           ;02EF50|A980    |      ;
 	sta.W SNES_VMAINC                          ;02EF52|8D1521  |022115;
 	lda.B #$01                           ;02EF55|A901    |      ;
-	sta.W $420b                          ;02EF57|8D0B42  |02420B;
+	sta.w !MDMAEN                          ;02EF57|8D0B42  |02420B;
 	plp                                  ;02EF5A|28      |      ;
 	ply                                  ;02EF5B|7A      |      ;
 	plx                                  ;02EF5C|FA      |      ;
@@ -10680,14 +10680,14 @@ Battle_ProcessOverkill:
 	lda.W DATA8_02efe4,x                 ;02EFB1|BDE4EF  |02EFE4;
 	sta.W SNES_VMADDL                          ;02EFB4|8D1621  |022116;
 	lda.W DATA8_02eff2,x                 ;02EFB7|BDF2EF  |02EFF2;
-	sta.W $4302                          ;02EFBA|8D0243  |024302;
+	sta.w !DMA0_A1T0L                          ;02EFBA|8D0243  |024302;
 	lda.W DATA8_02f000,x                 ;02EFBD|BD00F0  |02F000;
-	sta.W $4305                          ;02EFC0|8D0543  |024305;
+	sta.w !DMA0_DAS0L                          ;02EFC0|8D0543  |024305;
 	sep #$20                             ;02EFC3|E220    |      ;
 	lda.B #$80                           ;02EFC5|A980    |      ;
 	sta.W SNES_VMAINC                          ;02EFC7|8D1521  |022115;
 	lda.B #$01                           ;02EFCA|A901    |      ;
-	sta.W $420b                          ;02EFCC|8D0B42  |02420B;
+	sta.w !MDMAEN                          ;02EFCC|8D0B42  |02420B;
 	rep #$20                             ;02EFCF|C220    |      ;
 	txa                                  ;02EFD1|8A      |      ;
 	cmp.W #$0002                         ;02EFD2|C90200  |      ;
@@ -10798,7 +10798,7 @@ Battle_ApplyFinisher:
 	sep #$20                             ;02F0D6|E220    |      ;
 	rep #$10                             ;02F0D8|C210    |      ;
 	lda.B #$01                           ;02F0DA|A901    |      ;
-	sta.W $420b                          ;02F0DC|8D0B42  |02420B;
+	sta.w !MDMAEN                          ;02F0DC|8D0B42  |02420B;
 	lda.B #$80                           ;02F0DF|A980    |      ;
 	sta.W SNES_OAMADDH                          ;02F0E1|8D0321  |022103;
 	lda.B $e9                            ;02F0E4|A5E9    |000AE9;
@@ -10822,8 +10822,8 @@ Battle_ApplyFinisher:
 	sta.W SNES_BG2HOFS                          ;02F105|8D0F21  |02210F;
 	stz.W SNES_BG2HOFS                          ;02F108|9C0F21  |02210F;
 	lda.B $f3                            ;02F10B|A5F3    |000AF3;
-	sta.W $2110                          ;02F10D|8D1021  |022110;
-	stz.W $2110                          ;02F110|9C1021  |022110;
+	sta.w !BG2VOFS                          ;02F10D|8D1021  |022110;
+	stz.w !BG2VOFS                          ;02F110|9C1021  |022110;
 	ldx.B $f0                            ;02F113|A6F0    |000AF0;
 	lda.W DATA8_02f11d,x                 ;02F115|BD1DF1  |02F11D;
 	sta.W SNES_OBJSEL                          ;02F118|8D0121  |022101;
@@ -11626,14 +11626,14 @@ Battle_BattlerInitComplete:
 	lda.B #$a2                           ;02F6C3|A9A2    |      ;
 	sta.W SNES_CGADSUB                          ;02F6C5|8D3121  |022131;
 	lda.B #$e6                           ;02F6C8|A9E6    |      ;
-	sta.W $2132                          ;02F6CA|8D3221  |022132;
+	sta.w !COLDATA                          ;02F6CA|8D3221  |022132;
 	lda.B #$00                           ;02F6CD|A900    |      ;
 	sta.L $7ec380,x                      ;02F6CF|9F80C37E|7EC380;
 	rts                                  ;02F6D3|60      |      ;
 ;      |        |      ;
 	stz.W SNES_CGADSUB                          ;02F6D4|9C3121  |022131;
 	lda.B #$e0                           ;02F6D7|A9E0    |      ;
-	sta.W $2132                          ;02F6D9|8D3221  |022132;
+	sta.w !COLDATA                          ;02F6D9|8D3221  |022132;
 	lda.B #$00                           ;02F6DC|A900    |      ;
 	sta.L $7ec380,x                      ;02F6DE|9F80C37E|7EC380;
 	rts                                  ;02F6E2|60      |      ;
@@ -11641,7 +11641,7 @@ Battle_BattlerInitComplete:
 	lda.B #$22                           ;02F6E3|A922    |      ;
 	sta.W SNES_CGADSUB                          ;02F6E5|8D3121  |022131;
 	lda.B #$ed                           ;02F6E8|A9ED    |      ;
-	sta.W $2132                          ;02F6EA|8D3221  |022132;
+	sta.w !COLDATA                          ;02F6EA|8D3221  |022132;
 	lda.B #$00                           ;02F6ED|A900    |      ;
 	sta.L $7ec380,x                      ;02F6EF|9F80C37E|7EC380;
 	rts                                  ;02F6F3|60      |      ;
@@ -11656,7 +11656,7 @@ Battle_BattlerInitComplete:
 ;      |        |      ;
 	lda.B #$01                           ;02F708|A901    |      ;
 	sta.W SNES_TS                          ;02F70A|8D2D21  |02212D;
-	stz.W $2132                          ;02F70D|9C3221  |022132;
+	stz.w !COLDATA                          ;02F70D|9C3221  |022132;
 	lda.B #$02                           ;02F710|A902    |      ;
 	sta.W SNES_CGSWSEL                          ;02F712|8D3021  |022130;
 	lda.B #$50                           ;02F715|A950    |      ;
@@ -11669,7 +11669,7 @@ Battle_BattlerInitComplete:
 	stz.W SNES_CGSWSEL                          ;02F724|9C3021  |022130;
 	stz.W SNES_CGADSUB                          ;02F727|9C3121  |022131;
 	lda.B #$e0                           ;02F72A|A9E0    |      ;
-	sta.W $2132                          ;02F72C|8D3221  |022132;
+	sta.w !COLDATA                          ;02F72C|8D3221  |022132;
 	lda.B #$00                           ;02F72F|A900    |      ;
 	sta.L $7ec380,x                      ;02F731|9F80C37E|7EC380;
 	rts                                  ;02F735|60      |      ;
@@ -11785,7 +11785,7 @@ DATA8_02f906:
 	sta.L $7ec240,x                      ;02F955|9F40C27E|7EC240;
 	stz.W SNES_CGADSUB                          ;02F959|9C3121  |022131;
 	lda.B #$e0                           ;02F95C|A9E0    |      ;
-	sta.W $2132                          ;02F95E|8D3221  |022132;
+	sta.w !COLDATA                          ;02F95E|8D3221  |022132;
 	rts                                  ;02F961|60      |      ;
 ;      |        |      ;
 	phx                                  ;02F962|DA      |      ;
@@ -11802,7 +11802,7 @@ DATA8_02f906:
 Battle_LoadEnemyGraphics:
 	plx                                  ;02F976|FA      |      ;
 	lda.L $7ec460,x                      ;02F977|BF60C47E|7EC460;
-	sta.W $2132                          ;02F97B|8D3221  |022132;
+	sta.w !COLDATA                          ;02F97B|8D3221  |022132;
 	lda.L $7ec460,x                      ;02F97E|BF60C47E|7EC460;
 	clc                                  ;02F982|18      |      ;
 	adc.L $7ec480,x                      ;02F983|7F80C47E|7EC480;

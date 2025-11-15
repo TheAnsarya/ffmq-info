@@ -14,7 +14,7 @@ Bank02_Init:
 	phd ; Preserve direct page register for context
 	php ; Preserve processor status for state management
 	rep #$30		; Set 16-bit accumulator and index registers
-	pea.w $0400	 ; Push direct page address for bank coordination
+	pea.w !JOY_DOWN	 ; Push direct page address for bank coordination
 	pld ; Load direct page for advanced addressing
 	stz.b $00	   ; Clear direct page base for initialization
 
@@ -1226,7 +1226,7 @@ entity_audio_lookup:
 ; Manage entity state transitions with validation
 
 comprehensive_entity_processing:
-	pea.w $0400	 ;028B0F|F40004  |020400; Set direct page
+	pea.w !JOY_DOWN	 ;028B0F|F40004  |020400; Set direct page
 	pld ;028B12|2B      |      ; Load direct page
 	sep #$20		;028B13|E220    |      ; Set 8-bit accumulator
 	rep #$10		;028B15|C210    |      ; Set 16-bit index
@@ -1250,11 +1250,11 @@ multi_level_parameter_calc:
 	lsr a;028B1F|4A      |      ; Shift parameter level 4
 	tax ;028B20|AA      |      ; Transfer to index
 	lda.w DATA8_028bfc,x ;028B21|BDFC8B  |028BFC; Load calculation factor
-	sta.w $4202	 ;028B24|8D0242  |024202; Store in multiplier
+	sta.w !WRMPYA	 ;028B24|8D0242  |024202; Store in multiplier
 	lda.b $3a	   ;028B27|A53A    |00043A; Load entity base value
 	sec ;028B29|38      |      ; Set carry for subtraction
 	sbc.w DATA8_028c01,x ;028B2A|FD018C  |028C01; Subtract offset table value
-	sta.w $4203	 ;028B2D|8D0342  |024203; Store in multiplicand
+	sta.w !WRMPYB	 ;028B2D|8D0342  |024203; Store in multiplicand
 
 ;--------------------------------------------------------------------
 ; Advanced Data Table Processing System
@@ -1272,7 +1272,7 @@ advanced_data_table_processing:
 	tax ;028B34|AA      |      ; Transfer back to index
 	lda.w DATA8_028bf2,x ;028B35|BDF28B  |028BF2; Load table base address
 	clc ;028B38|18      |      ; Clear carry for addition
-	adc.w $4216	 ;028B39|6D1642  |024216; Add multiplication result
+	adc.w !RDMPYL	 ;028B39|6D1642  |024216; Add multiplication result
 	tax ;028B3C|AA      |      ; Transfer to index register
 	sep #$20		;028B3D|E220    |      ; Set 8-bit accumulator
 	rep #$10		;028B3F|C210    |      ; Set 16-bit index
@@ -1583,7 +1583,7 @@ base_offset_table:
 ; Critical for maintaining audio-visual synchronization
 
 advanced_audio_processing:
-	pea.w $0400	 ;028C06|F40004  |020400; Set direct page
+	pea.w !JOY_DOWN	 ;028C06|F40004  |020400; Set direct page
 	pld ;028C09|2B      |      ; Load direct page
 	sep #$20		;028C0A|E220    |      ; Set 8-bit accumulator
 	rep #$10		;028C0C|C210    |      ; Set 16-bit index
@@ -2306,9 +2306,9 @@ Graphics_ProcessComplete:
 ;Implements division using hardware division registers for speed
 Entity_UpdateCalculations:
 	ldx.b $77	   ; Load dividend low
-	stx.w $4204	 ; Store in hardware division register
+	stx.w !WRDIVL	 ; Store in hardware division register
 	ldx.b $78	   ; Load dividend high
-	stx.w $4205	 ; Store in hardware division register high
+	stx.w !WRDIVH	 ; Store in hardware division register high
 	lda.b $39	   ; Load division mode
 	cmp.b #$80	  ; Check for mode $80
 	beq Math_DivMode80 ; Branch to mode $80 handler
@@ -2328,7 +2328,7 @@ Math_DivMode81:
 ;Division result processing
 Math_DivExecute:
 	jsl.l ExecuteHardwareDivision ; Execute hardware division
-	ldx.w $4214	 ; Load division result
+	ldx.w !RDDIVL	 ; Load division result
 	stx.b $77	   ; Store division result
 	rts ; Return from division
 
@@ -3117,7 +3117,7 @@ DATA8_02a279:
 ; Primary game loop controller management system
 ;----------------------------------------------------------------------------
 Controller_GameLoop:
-	pea.w $0400	 ;02A28C|F40004  |020400; Set direct page to $0400
+	pea.w !JOY_DOWN	 ;02A28C|F40004  |020400; Set direct page to $0400
 	pld ;02A28F|2B      |      ;
 	sep #$20		;02A290|E220    |      ; 8-bit accumulator
 	rep #$10		;02A292|C210    |      ; 16-bit index
@@ -5287,7 +5287,7 @@ Graphics_SetupEngine:
 	lda.b #$00	  ;02D5C3|A900    |      ; Clear register
 	xba ;02D5C5|EB      |      ; Exchange bytes
 	lda.b #$7e	  ;02D5C6|A97E    |      ; Bank $7e
-	sta.w $2183	 ;02D5C8|8D8321  |022183; Set WRAM bank
+	sta.w !WMADDH	 ;02D5C8|8D8321  |022183; Set WRAM bank
 	lda.b $83	   ;02D5CB|A583    |000A83; Load state index
 	asl a;02D5CD|0A      |      ; Multiply by 2
 	tax ;02D5CE|AA      |      ; Transfer to X
@@ -5305,18 +5305,18 @@ Graphics_SetupEngine:
 
 ; Graphics Tile Writing Loop
 Graphics_TileWriteLoop:
-	sty.w $2181	 ;02D5E7|8C8121  |022181; Set WRAM address
+	sty.w !WMADDL	 ;02D5E7|8C8121  |022181; Set WRAM address
 	iny ;02D5EA|C8      |      ; Increment address
 	lda.b $74	   ;02D5EB|A574    |000A74; Load tile data
 	sep #$20		;02D5ED|E220    |      ; 8-bit accumulator
 	rep #$10		;02D5EF|C210    |      ; 16-bit index
-	sta.w $2180	 ;02D5F1|8D8021  |022180; Write tile low byte
+	sta.w !WMDATA	 ;02D5F1|8D8021  |022180; Write tile low byte
 	xba ;02D5F4|EB      |      ; Exchange bytes
 	ora.b #$20	  ;02D5F5|0920    |      ; Set tile attributes
-	ora.w $2180	 ;02D5F7|0D8021  |022180; OR with existing data
-	sty.w $2181	 ;02D5FA|8C8121  |022181; Set WRAM address
+	ora.w !WMDATA	 ;02D5F7|0D8021  |022180; OR with existing data
+	sty.w !WMADDL	 ;02D5FA|8C8121  |022181; Set WRAM address
 	iny ;02D5FD|C8      |      ; Increment address
-	sta.w $2180	 ;02D5FE|8D8021  |022180; Write tile high byte
+	sta.w !WMDATA	 ;02D5FE|8D8021  |022180; Write tile high byte
 	dex ;02D601|CA      |      ; Decrement width
 	beq Graphics_SetupDone ;02D602|F020    |02D624; Exit if done
 	dec.b $7f	   ;02D604|C67F    |000A7F; Decrement height
@@ -5327,7 +5327,7 @@ Graphics_TileWriteLoop:
 	lda.b $72	   ;02D60A|A572    |000A72; Load base Y
 	clc ;02D60C|18      |      ; Clear carry
 	adc.w #$0040	;02D60D|694000  |      ; Add row offset (64)
-	sta.w $2181	 ;02D610|8D8121  |022181; Set WRAM address
+	sta.w !WMADDL	 ;02D610|8D8121  |022181; Set WRAM address
 	sta.b $72	   ;02D613|8572    |000A72; Store new Y
 	tay ;02D615|A8      |      ; Transfer to Y
 	sep #$20		;02D616|E220    |      ; 8-bit accumulator
@@ -5359,18 +5359,18 @@ Memory_TileUpdate:
 	ldy.b $72	   ;02D632|A472    |000A72; Load Y position
 	iny ;02D634|C8      |      ; Increment Y
 	lda.b #$7e	  ;02D635|A97E    |      ; Bank $7e
-	sta.w $2183	 ;02D637|8D8321  |022183; Set WRAM bank
+	sta.w !WMADDH	 ;02D637|8D8321  |022183; Set WRAM bank
 	lda.b $83	   ;02D63A|A583    |000A83; Load state index
 	asl a;02D63C|0A      |      ; Multiply by 2
 	asl.b $6e	   ;02D63D|066E    |000A6E; Shift graphics data
 	adc.b #$00	  ;02D63F|6900    |      ; Add carry
 	asl a;02D641|0A      |      ; Multiply by 2
 	asl a;02D642|0A      |      ; Multiply by 4
-	sty.w $2181	 ;02D643|8C8121  |022181; Set WRAM address
-	ora.w $2180	 ;02D646|0D8021  |022180; OR with existing data
+	sty.w !WMADDL	 ;02D643|8C8121  |022181; Set WRAM address
+	ora.w !WMDATA	 ;02D646|0D8021  |022180; OR with existing data
 	ora.b #$20	  ;02D649|0920    |      ; Set tile attributes
-	sty.w $2181	 ;02D64B|8C8121  |022181; Set WRAM address
-	sta.w $2180	 ;02D64E|8D8021  |022180; Write updated data
+	sty.w !WMADDL	 ;02D64B|8C8121  |022181; Set WRAM address
+	sta.w !WMDATA	 ;02D64E|8D8021  |022180; Write updated data
 	lda.b #$00	  ;02D651|A900    |      ; Clear register
 	xba ;02D653|EB      |      ; Exchange bytes
 	dec.b $80	   ;02D654|C680    |000A80; Decrement counter
@@ -5417,9 +5417,9 @@ Graphics_SetPixel:
 	sep #$20		;02D672|E220    |      ; 8-bit accumulator
 	rep #$10		;02D674|C210    |      ; 16-bit index
 	lda.b #$7e	  ;02D676|A97E    |      ; Bank $7e
-	sta.w $2183	 ;02D678|8D8321  |022183; Set WRAM bank
+	sta.w !WMADDH	 ;02D678|8D8321  |022183; Set WRAM bank
 	ldx.b $70	   ;02D67B|A670    |000A70; Load memory offset
-	stx.w $2181	 ;02D67D|8E8121  |022181; Set WRAM address
+	stx.w !WMADDL	 ;02D67D|8E8121  |022181; Set WRAM address
 	lda.b $15	   ;02D680|A515    |000A15; Load graphics bank
 	pha ;02D682|48      |      ; Save bank
 	plb ;02D683|AB      |      ; Set as data bank
@@ -5432,7 +5432,7 @@ Graphics_TransferLoop1:
 	lda.b ($69)	 ;02D689|B269    |000A69; Load graphics byte
 	sep #$20		;02D68B|E220    |      ; 8-bit accumulator
 	rep #$10		;02D68D|C210    |      ; 16-bit index
-	sta.w $2180	 ;02D68F|8D8021  |092180; Write to WRAM
+	sta.w !WMDATA	 ;02D68F|8D8021  |092180; Write to WRAM
 	rep #$30		;02D692|C230    |      ; 16-bit mode
 	inc.b $69	   ;02D694|E669    |000A69; Next graphics byte
 	dey ;02D696|88      |      ; Decrement counter
@@ -5445,8 +5445,8 @@ Graphics_TransferLoop2:
 	lda.b ($69)	 ;02D69C|B269    |000A69; Load graphics byte
 	sep #$20		;02D69E|E220    |      ; 8-bit accumulator
 	rep #$10		;02D6A0|C210    |      ; 16-bit index
-	sta.w $2180	 ;02D6A2|8D8021  |092180; Write to WRAM
-	stz.w $2180	 ;02D6A5|9C8021  |092180; Write zero byte
+	sta.w !WMDATA	 ;02D6A2|8D8021  |092180; Write to WRAM
+	stz.w !WMDATA	 ;02D6A5|9C8021  |092180; Write zero byte
 	rep #$30		;02D6A8|C230    |      ; 16-bit mode
 	inc.b $69	   ;02D6AA|E669    |000A69; Next graphics byte
 	dey ;02D6AC|88      |      ; Decrement counter
@@ -5463,7 +5463,7 @@ Graphics_AltPixel:
 	phd ;02D6B4|0B      |      ; Save direct page
 	sep #$20		;02D6B5|E220    |      ; 8-bit accumulator
 	rep #$10		;02D6B7|C210    |      ; 16-bit index
-	pea.w $2100	 ;02D6B9|F40021  |022100; Set direct page to $2100
+	pea.w !INIDISP	 ;02D6B9|F40021  |022100; Set direct page to $2100
 	pld ;02D6BC|2B      |      ; Load new direct page
 	lda.b #$00	  ;02D6BD|A900    |      ; Clear value
 	sta.b SNES_WMADDH-$2100 ;02D6BF|8583    |002183; Set WRAM bank to 0
@@ -5645,10 +5645,10 @@ State_DataProcess:
 	sep #$20		;02D7B7|E220    |      ; 8-bit accumulator
 	rep #$10		;02D7B9|C210    |      ; 16-bit index
 	lda.b $20	   ;02D7BB|A520    |000A20; Load state parameter
-	sta.w $4202	 ;02D7BD|8D0242  |024202; Set multiplicand
+	sta.w !WRMPYA	 ;02D7BD|8D0242  |024202; Set multiplicand
 	lda.b #$05	  ;02D7C0|A905    |      ; Set multiplier
 	jsl.l CallMultiplicationRoutine ;02D7C2|221E9700|00971E; Call multiplication routine
-	ldx.w $4216	 ;02D7C6|AE1642  |024216; Load multiplication result
+	ldx.w !RDMPYL	 ;02D7C6|AE1642  |024216; Load multiplication result
 	lda.l DATA8_098462,x ;02D7C9|BF628409|098462; Load bank data
 	sta.b $15	   ;02D7CD|8515    |000A15; Store bank value
 	plp ;02D7CF|28      |      ; Restore processor status
@@ -5678,10 +5678,10 @@ Entity_GraphicsCoordinator:
 	sta.b $20	   ;02D813|8520    |000A20; Store for processing
 	sep #$20		;02D815|E220    |      ; 8-bit accumulator
 	rep #$10		;02D817|C210    |      ; 16-bit index
-	sta.w $4202	 ;02D819|8D0242  |024202; Set multiplicand
+	sta.w !WRMPYA	 ;02D819|8D0242  |024202; Set multiplicand
 	lda.b #$05	  ;02D81C|A905    |      ; Set multiplier (5)
 	jsl.l CallMultiplicationRoutine ;02D81E|221E9700|00971E; Call multiplication routine
-	ldx.w $4216	 ;02D822|AE1642  |024216; Load result address
+	ldx.w !RDMPYL	 ;02D822|AE1642  |024216; Load result address
 
 ; Multi-Bank Data Retrieval
 	lda.l DATA8_098460,x ;02D825|BF608409|098460; Load graphics bank 1
@@ -5861,23 +5861,23 @@ Graphics_CalcProcess:
 	sbc.w DATA8_02d96c,x ;02D931|FD6CD9  |02D96C; Subtract base value
 	sep #$20		;02D934|E220    |      ; 8-bit accumulator
 	rep #$10		;02D936|C210    |      ; 16-bit index
-	sta.w $4202	 ;02D938|8D0242  |024202; Set multiplicand
+	sta.w !WRMPYA	 ;02D938|8D0242  |024202; Set multiplicand
 	rep #$30		;02D93B|C230    |      ; 16-bit mode
 	lda.w DATA8_02d972,x ;02D93D|BD72D9  |02D972; Load multiplier data
 	sta.w $0a79	 ;02D940|8D790A  |020A79; Store multiplier
 	sep #$20		;02D943|E220    |      ; 8-bit accumulator
 	rep #$10		;02D945|C210    |      ; 16-bit index
-	sta.w $4203	 ;02D947|8D0342  |024203; Set multiplier
+	sta.w !WRMPYB	 ;02D947|8D0342  |024203; Set multiplier
 	nop ;02D94A|EA      |      ; Wait for multiplication
 	nop ;02D94B|EA      |      ; Wait for multiplication
 	nop ;02D94C|EA      |      ; Wait for multiplication
 	nop ;02D94D|EA      |      ; Wait for multiplication
 
 ; Second Stage Graphics Calculation
-	lda.w $4216	 ;02D94E|AD1642  |024216; Load multiplication result
-	sta.w $4202	 ;02D951|8D0242  |024202; Set new multiplicand
+	lda.w !RDMPYL	 ;02D94E|AD1642  |024216; Load multiplication result
+	sta.w !WRMPYA	 ;02D951|8D0242  |024202; Set new multiplicand
 	lda.w DATA8_02d974,x ;02D954|BD74D9  |02D974; Load second multiplier
-	sta.w $4203	 ;02D957|8D0342  |024203; Set second multiplier
+	sta.w !WRMPYB	 ;02D957|8D0342  |024203; Set second multiplier
 	nop ;02D95A|EA      |      ; Wait for multiplication
 	nop ;02D95B|EA      |      ; Wait for multiplication
 	nop ;02D95C|EA      |      ; Wait for multiplication
@@ -5885,7 +5885,7 @@ Graphics_CalcProcess:
 	rep #$30		;02D95E|C230    |      ; 16-bit mode
 	lda.w DATA8_02d970,x ;02D960|BD70D9  |02D970; Load base offset
 	clc ;02D963|18      |      ; Clear carry
-	adc.w $4216	 ;02D964|6D1642  |024216; Add calculation result
+	adc.w !RDMPYL	 ;02D964|6D1642  |024216; Add calculation result
 	sta.b $6b	   ;02D967|856B    |000A6B; Store final result
 	plb ;02D969|AB      |      ; Restore data bank
 	plp ;02D96A|28      |      ; Restore processor status
@@ -5983,14 +5983,14 @@ Data_BitLoop:
 ; Final Calculation Processing
 Data_FinalCalc:
 	xba ;02D9EF|EB      |      ; Exchange bytes
-	sta.w $4202	 ;02D9F0|8D0242  |0A4202; Set multiplicand
+	sta.w !WRMPYA	 ;02D9F0|8D0242  |0A4202; Set multiplicand
 	lda.b #$18	  ;02D9F3|A918    |      ; Set multiplier (24)
-	sta.w $4203	 ;02D9F5|8D0342  |0A4203; Set multiplier
+	sta.w !WRMPYB	 ;02D9F5|8D0342  |0A4203; Set multiplier
 	rep #$30		;02D9F8|C230    |      ; 16-bit mode
 	ply ;02D9FA|7A      |      ; Restore Y position
 	lda.w $0000,y   ;02D9FB|B90000  |0A0000; Load base value
 	clc ;02D9FE|18      |      ; Clear carry
-	adc.w $4216	 ;02D9FF|6D1642  |0A4216; Add multiplication result
+	adc.w !RDMPYL	 ;02D9FF|6D1642  |0A4216; Add multiplication result
 	sta.w $0002,y   ;02DA02|990200  |0A0002; Store final result
 	iny ;02DA05|C8      |      ; Next Y position
 	iny ;02DA06|C8      |      ; Next Y position (word)
@@ -6013,7 +6013,7 @@ Data_CoordExit:
 ; Complex display processing with sophisticated color effects and timing
 Display_ColorManager:
 	phd ;02DA18|0B      |      ; Save direct page
-	pea.w $2100	 ;02DA19|F40021  |022100; Set direct page to $2100
+	pea.w !INIDISP	 ;02DA19|F40021  |022100; Set direct page to $2100
 	pld ;02DA1C|2B      |      ; Load new direct page
 	stz.w $0a7e	 ;02DA1D|9C7E0A  |020A7E; Clear display flag
 	lda.b #$1d	  ;02DA20|A91D    |      ; Main screen enable
@@ -6140,7 +6140,7 @@ Display_VBlankWait:
 ; Advanced Graphics Configuration Engine
 ; Complex screen mode and graphics setup
 	phd ;02DAE2|0B      |      ; Save direct page
-	pea.w $2100	 ;02DAE3|F40021  |022100; Set direct page to PPU
+	pea.w !INIDISP	 ;02DAE3|F40021  |022100; Set direct page to PPU
 	pld ;02DAE6|2B      |      ; Load PPU direct page
 	lda.b #$42	  ;02DAE7|A942    |      ; BG1 screen configuration
 	sta.b SNES_BG1SC-$2100 ;02DAE9|8507    |002107; Set BG1 screen
@@ -6679,10 +6679,10 @@ Graphics_DataProcessor_2:
 	sep #$20		;02DFE9|E220    |      ; 8-bit accumulator
 	rep #$10		;02DFEB|C210    |      ; 16-bit index
 	lda.w $0a9c	 ;02DFED|AD9C0A  |020A9C; Load graphics mode
-	sta.w $4202	 ;02DFF0|8D0242  |024202; Set multiplicand
+	sta.w !WRMPYA	 ;02DFF0|8D0242  |024202; Set multiplicand
 	lda.b #$03	  ;02DFF3|A903    |      ; Set multiplier (3)
 	jsl.l CallMultiplicationRoutine ;02DFF5|221E9700|00971E; Call multiplication routine
-	ldx.w $4216	 ;02DFF9|AE1642  |024216; Load result index
+	ldx.w !RDMPYL	 ;02DFF9|AE1642  |024216; Load result index
 	rep #$30		;02DFFC|C230    |      ; 16-bit mode
 	lda.l UNREACH_0CF715,x ;02DFFE|BF15F70C|0CF715; Load graphics parameter 1
 	and.w #$00ff	;02E002|29FF00  |      ; Mask to 8-bit
@@ -6742,10 +6742,10 @@ Graphics_CalcEngine:
 	php ;02E058|08      |      ; Save processor status
 	sep #$20		;02E059|E220    |      ; 8-bit accumulator
 	rep #$10		;02E05B|C210    |      ; 16-bit index
-	sta.w $4202	 ;02E05D|8D0242  |024202; Set multiplicand
+	sta.w !WRMPYA	 ;02E05D|8D0242  |024202; Set multiplicand
 	lda.b #$06	  ;02E060|A906    |      ; Set multiplier (6)
 	jsl.l CallMultiplicationRoutine ;02E062|221E9700|00971E; Call multiplication routine
-	ldx.w $4216	 ;02E066|AE1642  |024216; Load multiplication result
+	ldx.w !RDMPYL	 ;02E066|AE1642  |024216; Load multiplication result
 	ldy.w #$0004	;02E069|A00400  |      ; Process 4 data segments
 
 ; Graphics Data Segment Processing Loop
@@ -6754,11 +6754,11 @@ Graphics_SegmentLoop:
 	rep #$10		;02E06E|C210    |      ; 16-bit index
 	lda.l DATA8_0cef85,x ;02E070|BF85EF0C|0CEF85; Load graphics data segment
 	inx ;02E074|E8      |      ; Next data byte
-	sta.w $4202	 ;02E075|8D0242  |024202; Set new multiplicand
+	sta.w !WRMPYA	 ;02E075|8D0242  |024202; Set new multiplicand
 	lda.b #$18	  ;02E078|A918    |      ; Set multiplier (24)
 	jsl.l CallMultiplicationRoutine ;02E07A|221E9700|00971E; Call multiplication routine
 	rep #$30		;02E07E|C230    |      ; 16-bit mode
-	lda.w $4216	 ;02E080|AD1642  |024216; Load calculation result
+	lda.w !RDMPYL	 ;02E080|AD1642  |024216; Load calculation result
 	clc ;02E083|18      |      ; Clear carry
 	adc.w #$d785	;02E084|6985D7  |      ; Add graphics base offset
 	sta.w $0a8b	 ;02E087|8D8B0A  |020A8B; Store graphics address
@@ -6873,10 +6873,10 @@ Graphics_MultiProcessor:
 	sep #$20		;02E502|E220    |      ;  8-bit accumulator mode
 	rep #$10		;02E504|C210    |      ;  16-bit index registers
 	lda.b $96	   ;02E506|A596    |000A96;  Load graphics multiplier
-	sta.w $4202	 ;02E508|8D0242  |024202;  Store to hardware multiplier
+	sta.w !WRMPYA	 ;02E508|8D0242  |024202;  Store to hardware multiplier
 	lda.b #$06	  ;02E50B|A906    |      ;  Load multiplication factor
 	jsl.l CallMultiplicationRoutine ;02E50D|221E9700|00971E;  Call multiplication routine
-	ldx.w $4216	 ;02E511|AE1642  |024216;  Load multiplication result
+	ldx.w !RDMPYL	 ;02E511|AE1642  |024216;  Load multiplication result
 	lda.b $93	   ;02E514|A593    |000A93;  Load graphics bank identifier
 	xba ;02E516|EB      |      ;  Exchange accumulator bytes
 	lda.l DATA8_0cef89,x ;02E517|BF89EF0C|0CEF89;  Load graphics data from table
@@ -7026,12 +7026,12 @@ System_Coordinator:
 	jsr.w CallSystemInitialization ;02E5C5|200FE6  |02E60F;  Call system initialization
 	lda.b #$80	  ;02E5C8|A980    |      ;  Load system enable flag
 	tsb.w !battle_ready_flag	 ;02E5CA|0C1001  |020110;  Set system enable bit
-	stz.w $212c	 ;02E5CD|9C2C21  |02212C;  Clear main screen designation
-	stz.w $212d	 ;02E5D0|9C2D21  |02212D;  Clear sub screen designation
-	stz.w $2106	 ;02E5D3|9C0621  |022106;  Clear mosaic register
-	stz.w $2121	 ;02E5D6|9C2121  |022121;  Clear CGRAM address
-	stz.w $2122	 ;02E5D9|9C2221  |022122;  Clear CGRAM data
-	stz.w $2122	 ;02E5DC|9C2221  |022122;  Clear CGRAM data again
+	stz.w !TM	 ;02E5CD|9C2C21  |02212C;  Clear main screen designation
+	stz.w !TS	 ;02E5D0|9C2D21  |02212D;  Clear sub screen designation
+	stz.w !MOSAIC	 ;02E5D3|9C0621  |022106;  Clear mosaic register
+	stz.w !CGADD	 ;02E5D6|9C2121  |022121;  Clear CGRAM address
+	stz.w !CGDATA	 ;02E5D9|9C2221  |022122;  Clear CGRAM data
+	stz.w !CGDATA	 ;02E5DC|9C2221  |022122;  Clear CGRAM data again
 	plp ;02E5DF|28      |      ;  Restore processor status
 	ply ;02E5E0|7A      |      ;  Restore Y register
 	plx ;02E5E1|FA      |      ;  Restore X register
@@ -7055,20 +7055,20 @@ PPU_InitEngine:
 	php ;02E60F|08      |      ;  Preserve processor status
 	jsl.l CWaitTimingRoutine ;02E610|2200800C|0C8000;  Call external system routine
 	lda.b #$ff	  ;02E614|A9FF    |      ;  Load window mask value
-	sta.w $2127	 ;02E616|8D2721  |022127;  Set window 1 mask
-	sta.w $2129	 ;02E619|8D2921  |022129;  Set window 2 mask
-	stz.w $2126	 ;02E61C|9C2621  |022126;  Clear window 1 position
-	stz.w $2128	 ;02E61F|9C2821  |022128;  Clear window 2 position
-	stz.w $212e	 ;02E622|9C2E21  |02212E;  Clear window mask main
-	stz.w $212f	 ;02E625|9C2F21  |02212F;  Clear window mask sub
-	stz.w $212a	 ;02E628|9C2A21  |02212A;  Clear window mask BG1/BG2
-	stz.w $212b	 ;02E62B|9C2B21  |02212B;  Clear window mask BG3/BG4
+	sta.w !WH1	 ;02E616|8D2721  |022127;  Set window 1 mask
+	sta.w !WH3	 ;02E619|8D2921  |022129;  Set window 2 mask
+	stz.w !WH0	 ;02E61C|9C2621  |022126;  Clear window 1 position
+	stz.w !WH2	 ;02E61F|9C2821  |022128;  Clear window 2 position
+	stz.w !TMW	 ;02E622|9C2E21  |02212E;  Clear window mask main
+	stz.w !TSW	 ;02E625|9C2F21  |02212F;  Clear window mask sub
+	stz.w !WBGLOG	 ;02E628|9C2A21  |02212A;  Clear window mask BG1/BG2
+	stz.w !WOBJLOG	 ;02E62B|9C2B21  |02212B;  Clear window mask BG3/BG4
 	lda.b #$22	  ;02E62E|A922    |      ;  Load color addition value
-	sta.w $2123	 ;02E630|8D2321  |022123;  Set BG1/BG2 window mask
-	sta.w $2124	 ;02E633|8D2421  |022124;  Set BG3/BG4 window mask
-	sta.w $2125	 ;02E636|8D2521  |022125;  Set OBJ/color window mask
+	sta.w !W12SEL	 ;02E630|8D2321  |022123;  Set BG1/BG2 window mask
+	sta.w !W34SEL	 ;02E633|8D2421  |022124;  Set BG3/BG4 window mask
+	sta.w !WOBJSEL	 ;02E636|8D2521  |022125;  Set OBJ/color window mask
 	lda.b #$40	  ;02E639|A940    |      ;  Load color math value
-	sta.w $2130	 ;02E63B|8D3021  |022130;  Set color addition mode
+	sta.w !CGWSEL	 ;02E63B|8D3021  |022130;  Set color addition mode
 
 ; Advanced DMA Configuration for Graphics Processing
 	ldx.w #$e6e8	;02E63E|A2E8E6  |      ;  Load DMA source address
@@ -7137,7 +7137,7 @@ RealTime_StoreCalc:
 	asl a;02E6AC|0A      |      ;  Shift left (multiply by 2)
 	and.b #$f0	  ;02E6AD|29F0    |      ;  Mask upper nibble
 	ora.b #$07	  ;02E6AF|0907    |      ;  Set lower bits
-	sta.w $2106	 ;02E6B1|8D0621  |022106;  Set mosaic register
+	sta.w !MOSAIC	 ;02E6B1|8D0621  |022106;  Set mosaic register
 
 ; System Timing and Coordination Update
 Label_02E6B4:
@@ -7158,10 +7158,10 @@ Label_02E6B4:
 RealTime_Shutdown:
 	lda.b #$02	  ;02E6D5|A902    |      ;  Load shutdown flag
 	trb.w !system_interrupt_flags	 ;02E6D7|1C1101  |020111;  Clear coordination flag
-	stz.w $2123	 ;02E6DA|9C2321  |022123;  Clear BG1/BG2 window
-	stz.w $2124	 ;02E6DD|9C2421  |022124;  Clear BG3/BG4 window
-	stz.w $2125	 ;02E6E0|9C2521  |022125;  Clear OBJ/color window
-	stz.w $2130	 ;02E6E3|9C3021  |022130;  Clear color math mode
+	stz.w !W12SEL	 ;02E6DA|9C2321  |022123;  Clear BG1/BG2 window
+	stz.w !W34SEL	 ;02E6DD|9C2421  |022124;  Clear BG3/BG4 window
+	stz.w !WOBJSEL	 ;02E6E0|9C2521  |022125;  Clear OBJ/color window
+	stz.w !CGWSEL	 ;02E6E3|9C3021  |022130;  Clear color math mode
 	plp ;02E6E6|28      |      ;  Restore processor status
 	rts ;02E6E7|60      |      ;  Return from processing
 
@@ -7192,7 +7192,7 @@ Label_02E6ED:
 
 ; PPU Configuration for Memory Operations
 	lda.b #$43	  ;02E707|A943    |      ;  Load VRAM configuration
-	sta.w $2101	 ;02E709|8D0121  |022101;  Set OAM base size
+	sta.w !OBSEL	 ;02E709|8D0121  |022101;  Set OAM base size
 	lda.b #$ff	  ;02E70C|A9FF    |      ;  Load fill value
 	sta.w $0ab7	 ;02E70E|8DB70A  |020AB7;  Store fill pattern
 
@@ -8525,17 +8525,17 @@ Label_02EF31:
 ; DMA Transfer Configuration Setup
 	rep #$30		;02EF38|C230    |      ;  16-bit registers and indexes
 	lda.w DATA8_02ef63,x ;02EF3A|BD63EF  |02EF63;  Load VRAM destination from table
-	sta.w $2116	 ;02EF3D|8D1621  |022116;  Set VRAM address register
+	sta.w !VMADDL	 ;02EF3D|8D1621  |022116;  Set VRAM address register
 	lda.w DATA8_02ef71,x ;02EF40|BD71EF  |02EF71;  Load DMA source address from table
-	sta.w $4302	 ;02EF43|8D0243  |024302;  Set DMA source address register
+	sta.w !DMA0_A1T0L	 ;02EF43|8D0243  |024302;  Set DMA source address register
 	lda.w DATA8_02ef7f,x ;02EF46|BD7FEF  |02EF7F;  Load DMA transfer size from table
-	sta.w $4305	 ;02EF49|8D0543  |024305;  Set DMA transfer size register
+	sta.w !DMA0_DAS0L	 ;02EF49|8D0543  |024305;  Set DMA transfer size register
 	sep #$20		;02EF4C|E220    |      ;  8-bit accumulator mode
 	rep #$10		;02EF4E|C210    |      ;  16-bit index registers
 	lda.b #$80	  ;02EF50|A980    |      ;  Load VRAM increment mode
-	sta.w $2115	 ;02EF52|8D1521  |022115;  Set VRAM increment register
+	sta.w !VMAIN	 ;02EF52|8D1521  |022115;  Set VRAM increment register
 	lda.b #$01	  ;02EF55|A901    |      ;  Load DMA trigger flag
-	sta.w $420b	 ;02EF57|8D0B42  |02420B;  Trigger DMA transfer
+	sta.w !MDMAEN	 ;02EF57|8D0B42  |02420B;  Trigger DMA transfer
 	plp ;02EF5A|28      |      ;  Restore processor status
 	ply ;02EF5B|7A      |      ;  Restore Y register
 	plx ;02EF5C|FA      |      ;  Restore X register
@@ -8588,16 +8588,16 @@ Label_02EFA8:
 ; Secondary DMA Transfer Configuration
 	rep #$30		;02EFAF|C230    |      ;  16-bit registers and indexes
 	lda.w DATA8_02efe4,x ;02EFB1|BDE4EF  |02EFE4;  Load secondary VRAM destination
-	sta.w $2116	 ;02EFB4|8D1621  |022116;  Set secondary VRAM address
+	sta.w !VMADDL	 ;02EFB4|8D1621  |022116;  Set secondary VRAM address
 	lda.w DATA8_02eff2,x ;02EFB7|BDF2EF  |02EFF2;  Load secondary DMA source
-	sta.w $4302	 ;02EFBA|8D0243  |024302;  Set secondary DMA source address
+	sta.w !DMA0_A1T0L	 ;02EFBA|8D0243  |024302;  Set secondary DMA source address
 	lda.w DATA8_02f000,x ;02EFBD|BD00F0  |02F000;  Load secondary DMA transfer size
-	sta.w $4305	 ;02EFC0|8D0543  |024305;  Set secondary DMA size
+	sta.w !DMA0_DAS0L	 ;02EFC0|8D0543  |024305;  Set secondary DMA size
 	sep #$20		;02EFC3|E220    |      ;  8-bit accumulator mode
 	lda.b #$80	  ;02EFC5|A980    |      ;  Load secondary VRAM increment mode
-	sta.w $2115	 ;02EFC7|8D1521  |022115;  Set secondary VRAM increment
+	sta.w !VMAIN	 ;02EFC7|8D1521  |022115;  Set secondary VRAM increment
 	lda.b #$01	  ;02EFCA|A901    |      ;  Load secondary DMA trigger flag
-	sta.w $420b	 ;02EFCC|8D0B42  |02420B;  Trigger secondary DMA transfer
+	sta.w !MDMAEN	 ;02EFCC|8D0B42  |02420B;  Trigger secondary DMA transfer
 
 ; Secondary DMA Validation and Completion
 	rep #$20		;02EFCF|C220    |      ;  16-bit accumulator mode
@@ -8817,18 +8817,18 @@ Return_02F6C2:
 ; Color Mode Configuration A - High Intensity
 Load_02F6C3:
 	lda.b #$a2	  ;02F6C3|A9A2    |      ;  Load high intensity color mode
-	sta.w $2131	 ;02F6C5|8D3121  |022131;  Set color addition select register
+	sta.w !CGADSUB	 ;02F6C5|8D3121  |022131;  Set color addition select register
 	lda.b #$e6	  ;02F6C8|A9E6    |      ;  Load intensity value
-	sta.w $2132	 ;02F6CA|8D3221  |022132;  Set color data register
+	sta.w !COLDATA	 ;02F6CA|8D3221  |022132;  Set color data register
 	lda.b #$00	  ;02F6CD|A900    |      ;  Clear entity processing state
 	sta.l $7ec380,x ;02F6CF|9F80C37E|7EC380;  Store entity state
 	rts ;02F6D3|60      |      ;  Return from color mode A
 
 ; Color Mode Configuration B - Standard
 Store_02F6D4:
-	stz.w $2131	 ;02F6D4|9C3121  |022131;  Clear color addition select
+	stz.w !CGADSUB	 ;02F6D4|9C3121  |022131;  Clear color addition select
 	lda.b #$e0	  ;02F6D7|A9E0    |      ;  Load standard intensity value
-	sta.w $2132	 ;02F6D9|8D3221  |022132;  Set standard color data
+	sta.w !COLDATA	 ;02F6D9|8D3221  |022132;  Set standard color data
 	lda.b #$00	  ;02F6DC|A900    |      ;  Clear entity processing state
 	sta.l $7ec380,x ;02F6DE|9F80C37E|7EC380;  Store entity state
 	rts ;02F6E2|60      |      ;  Return from color mode B
@@ -8836,9 +8836,9 @@ Store_02F6D4:
 ; Color Mode Configuration C - Enhanced
 Load_02F6E3:
 	lda.b #$22	  ;02F6E3|A922    |      ;  Load enhanced color mode
-	sta.w $2131	 ;02F6E5|8D3121  |022131;  Set enhanced color addition
+	sta.w !CGADSUB	 ;02F6E5|8D3121  |022131;  Set enhanced color addition
 	lda.b #$ed	  ;02F6E8|A9ED    |      ;  Load enhanced intensity value
-	sta.w $2132	 ;02F6EA|8D3221  |022132;  Set enhanced color data
+	sta.w !COLDATA	 ;02F6EA|8D3221  |022132;  Set enhanced color data
 	lda.b #$00	  ;02F6ED|A900    |      ;  Clear entity processing state
 	sta.l $7ec380,x ;02F6EF|9F80C37E|7EC380;  Store entity state
 	rts ;02F6F3|60      |      ;  Return from color mode C
@@ -8859,23 +8859,23 @@ Label_02F6F4:
 ; Advanced Window Processing and Mode Management
 Load_02F708:
 	lda.b #$01	  ;02F708|A901    |      ;  Load window enable flag
-	sta.w $212d	 ;02F70A|8D2D21  |02212D;  Enable window 1
-	stz.w $2132	 ;02F70D|9C3221  |022132;  Clear color data register
+	sta.w !TS	 ;02F70A|8D2D21  |02212D;  Enable window 1
+	stz.w !COLDATA	 ;02F70D|9C3221  |022132;  Clear color data register
 	lda.b #$02	  ;02F710|A902    |      ;  Load window mode
-	sta.w $2130	 ;02F712|8D3021  |022130;  Set color window control
+	sta.w !CGWSEL	 ;02F712|8D3021  |022130;  Set color window control
 	lda.b #$50	  ;02F715|A950    |      ;  Load window color configuration
-	sta.w $2131	 ;02F717|8D3121  |022131;  Set window color addition
+	sta.w !CGADSUB	 ;02F717|8D3121  |022131;  Set window color addition
 	lda.b #$00	  ;02F71A|A900    |      ;  Clear entity processing state
 	sta.l $7ec380,x ;02F71C|9F80C37E|7EC380;  Store entity state
 	rts ;02F720|60      |      ;  Return from window processing
 
 ; Window Processing Reset and Cleanup
 Store_02F721:
-	stz.w $212d	 ;02F721|9C2D21  |02212D;  Disable window 1
-	stz.w $2130	 ;02F724|9C3021  |022130;  Clear window control
-	stz.w $2131	 ;02F727|9C3121  |022131;  Clear color addition
+	stz.w !TS	 ;02F721|9C2D21  |02212D;  Disable window 1
+	stz.w !CGWSEL	 ;02F724|9C3021  |022130;  Clear window control
+	stz.w !CGADSUB	 ;02F727|9C3121  |022131;  Clear color addition
 	lda.b #$e0	  ;02F72A|A9E0    |      ;  Load default color value
-	sta.w $2132	 ;02F72C|8D3221  |022132;  Set default color data
+	sta.w !COLDATA	 ;02F72C|8D3221  |022132;  Set default color data
 	lda.b #$00	  ;02F72F|A900    |      ;  Clear entity processing state
 	sta.l $7ec380,x ;02F731|9F80C37E|7EC380;  Store entity state
 	rts ;02F735|60      |      ;  Return from window reset

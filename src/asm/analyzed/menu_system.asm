@@ -174,7 +174,7 @@ MenuSystemInit:
 
 ; Enable interrupts
 	lda.w !interrupt_config                     ; Get saved interrupt flags
-	sta.W $4200                     ; $4200 = Enable NMI/IRQ
+	sta.w !NMITIMEN                     ; $4200 = Enable NMI/IRQ
 	cli                             ; Clear interrupt disable
 
 ; Set brightness

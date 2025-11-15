@@ -111,7 +111,7 @@ DMA_TransferTileData:
 
 ; Setup VRAM increment
 	lda.B #$80                      ; Standard increment
-	sta.W $2115                     ; VRAM increment register
+	sta.w !VMAIN                     ; VRAM increment register
 
 ; Configure DMA channel 5 for tile data
 	ldx.W #$2200                    ; Different DMA mode for tiles

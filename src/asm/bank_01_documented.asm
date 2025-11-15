@@ -6428,22 +6428,22 @@ BattleColor_BlendingProcessor:
 ; ==============================================================================
 
 	lda.b #$80	  ;01D5B3|A980    |      ;
-	sta.w $2115	 ;01D5B5|8D1521  |012115;
+	sta.w !VMAIN	 ;01D5B5|8D1521  |012115;
 	ldx.w !battle_temp_work	 ;01D5B8|AE2B19  |01192B;
-	stx.w $2116	 ;01D5BB|8E1621  |012116;
-	lda.w $213a	 ;01D5BE|AD3A21  |01213A;
+	stx.w !VMADDL	 ;01D5BB|8E1621  |012116;
+	lda.w !VMDATAHREAD	 ;01D5BE|AD3A21  |01213A;
 	lda.b #$81	  ;01D5C1|A981    |      ;
-	sta.w $4300	 ;01D5C3|8D0043  |014300;
+	sta.w !DMA0_DMAP	 ;01D5C3|8D0043  |014300;
 	lda.b #$39	  ;01D5C6|A939    |      ;
-	sta.w $4301	 ;01D5C8|8D0143  |014301;
+	sta.w !DMA0_BBAD	 ;01D5C8|8D0143  |014301;
 	lda.w !battle_offset	 ;01D5CB|AD2D19  |01192D;
-	sta.w $4304	 ;01D5CE|8D0443  |014304;
+	sta.w !DMA0_A1B0	 ;01D5CE|8D0443  |014304;
 	ldx.w !tilemap_y_offset	 ;01D5D1|AE2E19  |01192E;
-	stx.w $4302	 ;01D5D4|8E0243  |014302;
+	stx.w !DMA0_A1T0L	 ;01D5D4|8E0243  |014302;
 	ldx.w !graphics_buffer_size	 ;01D5D7|AE3019  |011930;
-	stx.w $4305	 ;01D5DA|8E0543  |014305;
+	stx.w !DMA0_DAS0L	 ;01D5DA|8E0543  |014305;
 	lda.b #$01	  ;01D5DD|A901    |      ;
-	sta.w $420b	 ;01D5DF|8D0B42  |01420B;
+	sta.w !MDMAEN	 ;01D5DF|8D0B42  |01420B;
 	rts ;01D5E2|60      |      ;
 
 ; ==============================================================================
@@ -7287,9 +7287,9 @@ graphics_data_processing_engine:
 	lda.b #$04	  ; Set graphics bank
 	pha ; Push bank to stack
 	plb ; Pull bank from stack
-	stz.w $2181	 ; Clear WRAM address port
+	stz.w !WMADDL	 ; Clear WRAM address port
 	ldx.w #$7f42	; Load graphics data address
-	stx.w $2182	 ; Set WRAM address high
+	stx.w !WMADDM	 ; Set WRAM address high
 	ldy.w #$f720	; Load graphics data source
 	ldx.w #$0010	; Set data processing count
 graphics_data_loop:
@@ -7335,7 +7335,7 @@ palette_processing_loop:
 color_conversion_processing_engine:
 	phd ; Save direct page register
 	phx ; Save X register
-	pea.w $2100	 ; Push hardware register page
+	pea.w !INIDISP	 ; Push hardware register page
 	pld ; Pull to direct page
 	rep #$20		; Set 16-bit accumulator mode
 	tya ; Transfer Y to accumulator
@@ -8271,14 +8271,14 @@ Positive_X_Coordinate:
 Finalize_Coordinate_Processing:
 	tay ; Transfer Y-coordinate result
 	xba ; Exchange for X-coordinate access
-	sta.w $4202	 ; Store X-coordinate for multiplication
+	sta.w !WRMPYA	 ; Store X-coordinate for multiplication
 	lda.w !battle_coord_x_boundary	 ; Load X-boundary for multiplication
-	sta.w $4203	 ; Store multiplier
+	sta.w !WRMPYB	 ; Store multiplier
 	xba ; Exchange for coordinate finalization
 	rep #$20		; Set 16-bit mode for final calculation
 	and.w #$003f	; Mask coordinate for final range
 	clc ; Clear carry for final addition
-	adc.w $4216	 ; Add multiplication result
+	adc.w !RDMPYL	 ; Add multiplication result
 	tax ; Transfer final coordinate index
 	sep #$20		; Set 8-bit mode
 	lda.l $7f8000,x ; Load coordinate map data
@@ -8363,12 +8363,12 @@ Entity_Search_Loop:
 
 Entity_Search_Continue:
 	lda.b #$1a	  ; Set entity search increment
-	sta.w $211b	 ; Store search multiplier low
-	stz.w $211b	 ; Clear search multiplier high
+	sta.w !M7A	 ; Store search multiplier low
+	stz.w !M7A	 ; Clear search multiplier high
 	xba ; Exchange for index processing
 	inc a; Increment entity index
-	sta.w $211c	 ; Store entity index multiplier
-	ldx.w $2134	 ; Load multiplication result
+	sta.w !M7B	 ; Store entity index multiplier
+	ldx.w !MPYL	 ; Load multiplication result
 	cmp.b #$16	  ; Check for entity search limit
 	bne Entity_Search_Loop ; Continue search if limit not reached
 	pld ; Restore direct page register
@@ -8411,12 +8411,12 @@ Specialized_Entity_Search_Loop:
 
 Specialized_Search_Continue:
 	lda.b #$1a	  ; Set specialized search increment
-	sta.w $211b	 ; Store specialized multiplier low
-	stz.w $211b	 ; Clear specialized multiplier high
+	sta.w !M7A	 ; Store specialized multiplier low
+	stz.w !M7A	 ; Clear specialized multiplier high
 	xba ; Exchange for specialized index processing
 	inc a; Increment specialized entity index
-	sta.w $211c	 ; Store specialized index multiplier
-	ldx.w $2134	 ; Load specialized multiplication result
+	sta.w !M7B	 ; Store specialized index multiplier
+	ldx.w !MPYL	 ; Load specialized multiplication result
 	cmp.b #$16	  ; Check for specialized search limit
 	bne Specialized_Entity_Search_Loop ; Continue specialized search
 	pld ; Restore direct page register
@@ -9195,14 +9195,14 @@ Alternative_Memory_Buffer_Management:
 	tya ; Transfer Y coordinate to accumulator
 	sep #$20		; Set 8-bit accumulator mode
 	xba ; Exchange accumulator bytes
-	sta.w $4202	 ; Store coordinate for multiplication
+	sta.w !WRMPYA	 ; Store coordinate for multiplication
 	lda.w !battle_coord_x_boundary	 ; Load coordinate boundary
-	sta.w $4203	 ; Store multiplier
+	sta.w !WRMPYB	 ; Store multiplier
 	xba ; Exchange accumulator bytes
 	rep #$20		; Set 16-bit accumulator mode
 	and.w #$003f	; Mask coordinate for range
 	clc ; Clear carry for coordinate calculation
-	adc.w $4216	 ; Add multiplication result
+	adc.w !RDMPYL	 ; Add multiplication result
 	clc ; Clear carry for offset addition
 	adc.w !coord_offset_ref	 ; Add coordinate offset
 	tax ; Transfer coordinate result to X
@@ -9278,9 +9278,9 @@ Coordinate_Attribute_Special:
 	sep #$20		; Set 8-bit accumulator mode
 	ldx.w #$0000	; Initialize buffer finalization index
 	lda.w !gfx_config_alt	 ; Load graphics buffer configuration
-	sta.w $4202	 ; Store configuration for multiplication
+	sta.w !WRMPYA	 ; Store configuration for multiplication
 	lda.b #$40	  ; Set buffer multiplication factor
-	sta.w $4203	 ; Store multiplication factor
+	sta.w !WRMPYB	 ; Store multiplication factor
 	lda.w !gfx_config_register	 ; Load graphics buffer control
 	bit.b #$10	  ; Test buffer control flag
 	beq Buffer_Control_Standard ; Branch if standard buffer mode
@@ -9294,7 +9294,7 @@ Buffer_Control_Standard:
 	clc ; Clear carry for address calculation
 	adc.w DATA8_01fd4d,x ; Add buffer base address
 	clc ; Clear carry for final calculation
-	adc.w $4216	 ; Add multiplication result
+	adc.w !RDMPYL	 ; Add multiplication result
 	rts ; Return buffer finalization complete
 
 ; Buffer Address Table
@@ -9344,9 +9344,9 @@ Coordinate_Validation_Complete:
 	pha ; Push bank for switching
 	plb ; Load graphics processing bank
 	ldx.w #$d274	; Set graphics DMA destination
-	stx.w $2181	 ; Store DMA destination low
+	stx.w !WMADDL	 ; Store DMA destination low
 	lda.b #$7f	  ; Set graphics DMA destination bank
-	sta.w $2183	 ; Store DMA destination bank
+	sta.w !WMADDH	 ; Store DMA destination bank
 	ldx.w #$0000	; Initialize graphics processing index
 
 ; Bank-Switched Graphics Processing Loop
@@ -9364,15 +9364,15 @@ Graphics_Data_Inner_Loop:
 
 Bank_Graphics_Data_Processing:
 	xba ; Exchange graphics data bytes
-	stz.w $211b	 ; Clear multiplication register low
+	stz.w !M7A	 ; Clear multiplication register low
 	lda.b #$03	  ; Set graphics multiplication factor
-	sta.w $211b	 ; Store multiplication factor
+	sta.w !M7A	 ; Store multiplication factor
 	xba ; Exchange graphics data bytes back
-	sta.w $211c	 ; Store graphics data for multiplication
+	sta.w !M7B	 ; Store graphics data for multiplication
 	rep #$20		; Set 16-bit accumulator mode
 	lda.w #$8c80	; Set graphics processing base
 	clc ; Clear carry for address calculation
-	adc.w $2134	 ; Add multiplication result
+	adc.w !MPYL	 ; Add multiplication result
 	tay ; Transfer graphics address to Y
 	sep #$20		; Set 8-bit accumulator mode
 	phx ; Preserve graphics processing index
@@ -9397,32 +9397,32 @@ Advanced_Graphics_Palette_Processing:
 	pha ; Push palette bank for switching
 	plb ; Load palette processing bank
 	ldx.w #$f274	; Set palette DMA destination
-	stx.w $2181	 ; Store palette DMA destination
+	stx.w !WMADDL	 ; Store palette DMA destination
 	ldx.w #$0000	; Initialize palette processing index
 
 ; Palette Processing Loop
 Palette_Processing_Loop:
 	lda.w !map_chunk_control,x   ; Load palette processing data
 	phx ; Preserve palette processing index
-	sta.w $211b	 ; Store palette data for multiplication
-	stz.w $211b	 ; Clear multiplication register high
+	sta.w !M7A	 ; Store palette data for multiplication
+	stz.w !M7A	 ; Clear multiplication register high
 	lda.b #$10	  ; Set palette multiplication factor
-	sta.w $211c	 ; Store palette multiplication factor
-	ldy.w $2134	 ; Load palette multiplication result
+	sta.w !M7B	 ; Store palette multiplication factor
+	ldy.w !MPYL	 ; Load palette multiplication result
 	ldx.w #$0010	; Set palette transfer count
 
 ; Palette Transfer Loop
 Palette_Transfer_Loop:
 	lda.w DATA8_05f280,y ; Load palette color data
 	and.b #$07	  ; Extract color component low
-	sta.w $2180	 ; Store color component low
+	sta.w !WMDATA	 ; Store color component low
 	lda.w DATA8_05f280,y ; Reload palette color data
 	and.b #$70	  ; Extract color component high
 	lsr a; Shift color component
 	lsr a; Continue shift for color processing
 	lsr a; Continue shift for precise color
 	lsr a; Complete shift for color component
-	sta.w $2180	 ; Store color component high
+	sta.w !WMDATA	 ; Store color component high
 	iny ; Increment palette data index
 	dex ; Decrement palette transfer count
 	bne Palette_Transfer_Loop ; Continue palette transfer
@@ -9440,9 +9440,9 @@ Palette_Transfer_Loop:
 	lda.b #$04	  ; Set DMA transfer bank
 	pha ; Push DMA bank for switching
 	plb ; Load DMA transfer bank
-	stz.w $2181	 ; Clear DMA address low
+	stz.w !WMADDL	 ; Clear DMA address low
 	ldx.w #$7f40	; Set DMA source address
-	stx.w $2182	 ; Store DMA source address
+	stx.w !WMADDM	 ; Store DMA source address
 	ldy.w #$9a20	; Set DMA transfer start address
 
 ; DMA Transfer Primary Loop

@@ -1230,7 +1230,7 @@ Init_VBlankDMA:
 ; Set Direct Page to PPU Registers ($2100)
 ; ---------------------------------------------------------------------------
 ; Clever technique: Set D=$2100 so direct page accesses hit PPU registers
-; This makes `STA.b $15` equivalent to `STA.w $2115` (VMAINC)
+; This makes `STA.b $15` equivalent to `STA.w !VMAIN` (VMAINC)
 ; Saves bytes and cycles in tight VBLANK code
 ; ---------------------------------------------------------------------------
 
@@ -1302,11 +1302,11 @@ NMI_Handler:
 
 	lda.w #$4300	; A = $4300 (DMA register base)
 	tcd ; D = $4300 (Direct Page → DMA registers)
-; Now `LDA.b $00` = `LDA.w $4300` etc.
+; Now `LDA.b $00` = `LDA.w !DMA0_DMAP` etc.
 
 	sep #$20		; 8-bit accumulator
 
-	stz.w $420c	 ; $420c (HDMAEN) = $00
+	stz.w !HDMAEN	 ; $420c (HDMAEN) = $00
 ; Disable HDMA during processing
 
 ; ---------------------------------------------------------------------------
@@ -1531,7 +1531,7 @@ DMA_TransferTilemap:
 ; Clear "tilemap DMA pending" flag
 
 	lda.b #$80	  ; A = $80 (increment after $2119 write)
-	sta.w $2115	 ; $2115 (VMAINC) = $80
+	sta.w !VMAIN	 ; $2115 (VMAINC) = $80
 ; VRAM address increments by 1 word after high byte write
 
 ; ---------------------------------------------------------------------------
@@ -1622,7 +1622,7 @@ NMI_LargeTransfer:
 ; Clear "large transfer pending" flag
 
 	lda.b #$80	  ; A = $80 (increment mode)
-	sta.w $2115	 ; $2115 (VMAINC) = $80
+	sta.w !VMAIN	 ; $2115 (VMAINC) = $80
 
 ; ---------------------------------------------------------------------------
 ; Check Battle Graphics Mode ($00d8 bit 1)
@@ -1652,10 +1652,10 @@ NMI_LargeTransfer:
 	stx.b SNES_DMA5CNTL-$4300 ; $4355-$4356 = Transfer size
 
 	ldx.w #$3bad	; X = $3bad (VRAM destination)
-	stx.w $2116	 ; $2116-$2117 = VRAM address
+	stx.w !VMADDL	 ; $2116-$2117 = VRAM address
 
 	lda.b #$20	  ; A = $20 (DMA channel 5)
-	sta.w $420b	 ; $420b = Execute DMA
+	sta.w !MDMAEN	 ; $420b = Execute DMA
 
 ; ---------------------------------------------------------------------------
 ; Additional Battle Graphics Data Transfer
@@ -1666,13 +1666,13 @@ NMI_LargeTransfer:
 	rep #$30		; 16-bit A, X, Y
 
 	ldx.w #$4bed	; X = $4bed (VRAM address)
-	stx.w $2116	 ; Set VRAM address
+	stx.w !VMADDL	 ; Set VRAM address
 
 	lda.l $7f17da   ; A = [$7f17da] (16-bit data)
-	sta.w $2118	 ; $2118-$2119 = Write to VRAM data
+	sta.w !VMDATAL	 ; $2118-$2119 = Write to VRAM data
 
 	lda.l $7f17dc   ; A = [$7f17dc] (16-bit data)
-	sta.w $2118	 ; Write second word to VRAM
+	sta.w !VMDATAL	 ; Write second word to VRAM
 
 	sep #$20		; 8-bit accumulator
 
@@ -1723,13 +1723,13 @@ NMI_AlternateTransfer:
 	rep #$30		; 16-bit A, X, Y
 
 	ldx.w #$5e8d	; X = $5e8d (VRAM address)
-	stx.w $2116	 ; Set VRAM address
+	stx.w !VMADDL	 ; Set VRAM address
 
 	lda.l $7e2d1a   ; A = [$7e2d1a] (data from WRAM)
-	sta.w $2118	 ; Write to VRAM
+	sta.w !VMDATAL	 ; Write to VRAM
 
 	lda.l $7e2d1c   ; A = [$7e2d1c]
-	sta.w $2118	 ; Write second word
+	sta.w !VMDATAL	 ; Write second word
 
 ; ---------------------------------------------------------------------------
 ; Prepare for Tilemap Transfer
@@ -1837,7 +1837,7 @@ DMA_TransferPalette:
 ;   3. Execute 16-byte DMA transfer
 ; ===========================================================================
 
-	sta.w $2121	 ; $2121 (CGADD) = Palette start address
+	sta.w !CGADD	 ; $2121 (CGADD) = Palette start address
 ; Sets where in CGRAM to write
 
 	ldy.w #$0010	; Y = $0010 (16 bytes = 8 colors)
@@ -1855,7 +1855,7 @@ DMA_TransferPalette:
 	sep #$20		; 8-bit accumulator
 
 	lda.b #$20	  ; A = $20 (DMA channel 5)
-	sta.w $420b	 ; $420b = Execute palette DMA
+	sta.w !MDMAEN	 ; $420b = Execute palette DMA
 
 	rts ; Return
 
@@ -2702,7 +2702,7 @@ DMA_SpecialVRAMHandler:
 	plb ; B = $04 (Data Bank = $04)
 
 	ldx.w #$60c0	; X = $60c0 (VRAM address)
-	stx.w $2116	 ; Set VRAM address
+	stx.w !VMADDL	 ; Set VRAM address
 
 	ldx.w #$ff00	; X = $ff00
 	stx.w !state_marker	 ; [$00f0] = $ff00 (state marker)
@@ -2812,7 +2812,7 @@ DMA_FieldModeTransfer:
 	and.w #$ff00	; A = A & $ff00 (mask high byte)
 	clc ; Clear carry
 	adc.w #$6180	; A = A + $6180 (calculate VRAM address)
-	sta.w $2116	 ; $2116-$2117 = VRAM address
+	sta.w !VMADDL	 ; $2116-$2117 = VRAM address
 
 	lda.w !save_slot_index	 ; A = [$010e] (character index)
 	asl a; A = A × 2 (convert to word offset)
@@ -2859,7 +2859,7 @@ DMA_UpdateAllCharacters:
 ; ---------------------------------------------------------------------------
 
 	lda.w #$6100	; A = $6100 (VRAM address)
-	sta.w $2116	 ; Set VRAM address
+	sta.w !VMADDL	 ; Set VRAM address
 
 	ldx.w #$9a20	; X = $9a20 (source in bank $04)
 	ldy.w #$0004	; Y = $0004 (DMA parameters)
@@ -2881,7 +2881,7 @@ DMA_UpdateAllCharacters:
 ; ---------------------------------------------------------------------------
 
 	lda.w #$6280	; A = $6280 (VRAM address for char 2)
-	sta.w $2116	 ; Set VRAM address
+	sta.w !VMADDL	 ; Set VRAM address
 
 	ldx.w !char2_data_ptr	 ; X = [$0109] (character 2 data pointer)
 	jsr.w DMA_CharacterGraphics ; Transfer character 2 graphics
@@ -2891,7 +2891,7 @@ DMA_UpdateAllCharacters:
 ; ---------------------------------------------------------------------------
 
 	lda.w #$6380	; A = $6380 (VRAM address for char 3)
-	sta.w $2116	 ; Set VRAM address
+	sta.w !VMADDL	 ; Set VRAM address
 
 	ldx.w !char3_data_ptr	 ; X = [$010b] (character 3 data pointer)
 	jsr.w DMA_CharacterGraphics ; Transfer character 3 graphics
@@ -4742,7 +4742,7 @@ VRAM_Write8TilesPattern:
 
 	php ; Save processor status
 	phd ; Save Direct Page
-	pea.w $2100	 ; Push $2100
+	pea.w !INIDISP	 ; Push $2100
 	pld ; Direct Page = $2100
 	sep #$20		; 8-bit A
 	lda.b #$88	  ; A = $88 (VRAM increment +32 after high)
@@ -5263,7 +5263,7 @@ Status_RenderIcon:
 	pea.w $007e	 ; Push bank $7e
 	plb ; Data bank = $7e
 	phy ; Save Y offset
-	pea.w $0400	 ; Push $0400
+	pea.w !JOY_DOWN	 ; Push $0400
 	pld ; Direct Page = $0400
 
 	sta.b $3a	   ; Save icon ID to $043a
@@ -6262,8 +6262,8 @@ Memory_Copy64Bytes:
 	sta.w $0024,y
 	lda.w $0022,x   ; Copy word at +$22
 	sta.w $0022,y
-	lda.w $0020,x   ; Copy word at +$20
-	sta.w $0020,y
+	lda.w !JOY_L,x   ; Copy word at +$20
+	sta.w !JOY_L,y
 
 Memory_Copy32Bytes:
 	lda.w $001e,x   ; Copy word at +$1e
@@ -6383,7 +6383,7 @@ Memory_Fill64:
 	sta.w $0022,y   ; Fill word at +$22
 
 Memory_Fill32:
-	sta.w $0020,y   ; Fill word at +$20
+	sta.w !JOY_L,y   ; Fill word at +$20
 	sta.w $001e,y   ; Fill word at +$1e
 	sta.w $001c,y   ; Fill word at +$1c
 	sta.w $001a,y   ; Fill word at +$1a
@@ -9351,7 +9351,7 @@ Window_FillLoop:
 	dec a
 	sta.w $0022,y
 	dec a
-	sta.w $0020,y
+	sta.w !JOY_L,y
 	dec a
 	sta.w $001e,y
 	dec a
@@ -12018,11 +12018,11 @@ IRQ_ScreenOn2:
 	jsr.w CallsLabelCodeScreenSetupRoutines ; Screen setup routine 2
 	sep #$20		; 8-bit accumulator
 	lda.b #$d8	  ; V-IRQ timer low
-	sta.w $4209	 ; Set V timer (direct address)
+	sta.w !VTIMEL	 ; Set V timer (direct address)
 	ldx.w #$b82a	; First-stage IRQ handler
 	stx.w !irq_handler_addr	 ; Store handler address
 	lda.w !interrupt_config	 ; Load interrupt mode
-	sta.w $4200	 ; Set interrupt mode (direct)
+	sta.w !NMITIMEN	 ; Set interrupt mode (direct)
 	lda.b #$20	  ; bit 5
 	tsb.w !system_flags_4	 ; Set bit 5 of $d8
 	ply ; Restore Y
@@ -12419,7 +12419,7 @@ System_Init:
 	tcd ; Set direct page to $2100
 	stz.b SNES_CGSWSEL-$2100 ; Clear color/window select
 	lda.w #$0017	; Enable BG1+BG2+BG3+OBJ
-	sta.w $212c	 ; Set main screen designation
+	sta.w !TM	 ; Set main screen designation
 	lda.w #$5555	; Init marker
 	sta.w $0e00	 ; Store marker
 	sep #$20		; 8-bit accumulator
@@ -14462,7 +14462,7 @@ Screen_FadeOut_Done:
 	lda.b #$80	  ;00C7CF|A980    |      ;
 	tsb.w !system_flags_3	 ;00C7D1|0CD600  |0100D6;
 	lda.b #$80	  ;00C7D4|A980    |      ;
-	sta.w $2100	 ;00C7D6|8D0021  |012100;
+	sta.w !INIDISP	 ;00C7D6|8D0021  |012100;
 	sta.w !battle_ready_flag	 ;00C7D9|8D1001  |010110;
 	plp ;00C7DC|28      |      ;
 	rtl ;00C7DD|6B      |      ;

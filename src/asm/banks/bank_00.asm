@@ -357,7 +357,7 @@ VBlank_Handler:
 	lda.W #$4300                         ;008339|A90043  |      ;
 	tcd                                  ;00833C|5B      |      ;
 	sep #$20                             ;00833D|E220    |      ;
-	stz.W $420c                          ;00833F|9C0C42  |02420C;
+	stz.w !HDMAEN                          ;00833F|9C0C42  |02420C;
 	lda.B #$40                           ;008342|A940    |      ;
 	and.w !system_flags_9                          ;008344|2DE200  |0200E2;
 	bne VBlank_JumpHandler               ;008347|D034    |00837D;
@@ -452,7 +452,7 @@ VBlank_PaletteDMA:
 	lda.B #$02                           ;0083E8|A902    |      ;
 	trb.w !system_flags_2                          ;0083EA|1CD400  |0200D4;
 	lda.B #$80                           ;0083ED|A980    |      ;
-	sta.W $2115                          ;0083EF|8D1521  |022115;
+	sta.w !VMAIN                          ;0083EF|8D1521  |022115;
 	ldx.W #$2200                         ;0083F2|A20022  |      ;
 	stx.B SNES_DMA5PARAM-$4300           ;0083F5|8650    |004350;
 	lda.B #$07                           ;0083F7|A907    |      ;
@@ -487,7 +487,7 @@ VBlank_StandardMode:
 	lda.B #$80                           ;00842F|A980    |      ;
 	trb.w !system_flags_2                          ;008431|1CD400  |0200D4;
 	lda.B #$80                           ;008434|A980    |      ;
-	sta.W $2115                          ;008436|8D1521  |022115;
+	sta.w !VMAIN                          ;008436|8D1521  |022115;
 	lda.B #$02                           ;008439|A902    |      ;
 	and.w !system_flags_4                          ;00843B|2DD800  |0200D8;
 	beq VBlank_StandardLowPrio           ;00843E|F039    |008479;
@@ -500,16 +500,16 @@ VBlank_StandardMode:
 	ldx.W #$0062                         ;00844E|A26200  |      ;
 	stx.B SNES_DMA5CNTL-$4300            ;008451|8655    |004355;
 	ldx.W #$3bad                         ;008453|A2AD3B  |      ;
-	stx.W $2116                          ;008456|8E1621  |022116;
+	stx.w !VMADDL                          ;008456|8E1621  |022116;
 	lda.B #$20                           ;008459|A920    |      ;
-	sta.W $420b                          ;00845B|8D0B42  |02420B;
+	sta.w !MDMAEN                          ;00845B|8D0B42  |02420B;
 	rep #$30                             ;00845E|C230    |      ;
 	ldx.W #$4bed                         ;008460|A2ED4B  |      ;
-	stx.W $2116                          ;008463|8E1621  |022116;
+	stx.w !VMADDL                          ;008463|8E1621  |022116;
 	lda.L $7f17da                        ;008466|AFDA177F|7F17DA;
-	sta.W $2118                          ;00846A|8D1821  |022118;
+	sta.w !VMDATAL                          ;00846A|8D1821  |022118;
 	lda.L $7f17dc                        ;00846D|AFDC177F|7F17DC;
-	sta.W $2118                          ;008471|8D1821  |022118;
+	sta.w !VMDATAL                          ;008471|8D1821  |022118;
 	sep #$20                             ;008474|E220    |      ;
 ;      |        |      ;
 VBlank_StandardEnd:
@@ -529,11 +529,11 @@ VBlank_StandardLowPrio:
 	jsr.W Sub_008504                    ;00848F|200485  |008504;
 	rep #$30                             ;008492|C230    |      ;
 	ldx.W #$5e8d                         ;008494|A28D5E  |      ;
-	stx.W $2116                          ;008497|8E1621  |022116;
+	stx.w !VMADDL                          ;008497|8E1621  |022116;
 	lda.L $7e2d1a                        ;00849A|AF1A2D7E|7E2D1A;
-	sta.W $2118                          ;00849E|8D1821  |022118;
+	sta.w !VMDATAL                          ;00849E|8D1821  |022118;
 	lda.L $7e2d1c                        ;0084A1|AF1C2D7E|7E2D1C;
-	sta.W $2118                          ;0084A5|8D1821  |022118;
+	sta.w !VMDATAL                          ;0084A5|8D1821  |022118;
 	ldx.W #$ff00                         ;0084A8|A200FF  |      ;
 	stx.w !state_marker                          ;0084AB|8EF000  |0200F0;
 	ldx.w !tilemap1_addr                          ;0084AE|AEF200  |0200F2;
@@ -576,7 +576,7 @@ Init_CheckWeaponType:
 ;      |        |      ;
 ;      |        |      ;
 VBlank_PaletteHelper:
-	sta.W $2121                          ;008504|8D2121  |022121;
+	sta.w !CGADD                          ;008504|8D2121  |022121;
 	ldy.W #$0010                         ;008507|A01000  |      ;
 	sty.B SNES_DMA5CNTL-$4300            ;00850A|8455    |004355;
 	rep #$30                             ;00850C|C230    |      ;
@@ -587,7 +587,7 @@ VBlank_PaletteHelper:
 	sta.B SNES_DMA5ADDRL-$4300           ;008516|8552    |004352;
 	sep #$20                             ;008518|E220    |      ;
 	lda.B #$20                           ;00851A|A920    |      ;
-	sta.W $420b                          ;00851C|8D0B42  |02420B;
+	sta.w !MDMAEN                          ;00851C|8D0B42  |02420B;
 	rts                                  ;00851F|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
@@ -740,7 +740,7 @@ VBlank_BattleTransfer:
 	pea.W $0004                          ;00864E|F40400  |000004;
 	plb                                  ;008651|AB      |      ;
 	ldx.W #$60c0                         ;008652|A2C060  |      ;
-	stx.W $2116                          ;008655|8E1621  |042116;
+	stx.w !VMADDL                          ;008655|8E1621  |042116;
 	ldx.W #$ff00                         ;008658|A200FF  |      ;
 	stx.w !state_marker                          ;00865B|8EF000  |0400F0;
 	ldx.W #$99c0                         ;00865E|A2C099  |      ;
@@ -792,7 +792,7 @@ VBlank_BattleAlt:
 	and.W #$ff00                         ;0086CA|2900FF  |      ;
 	clc                                  ;0086CD|18      |      ;
 	adc.W #$6180                         ;0086CE|698061  |      ;
-	sta.W $2116                          ;0086D1|8D1621  |042116;
+	sta.w !VMADDL                          ;0086D1|8D1621  |042116;
 	lda.w !save_slot_index                          ;0086D4|AD0E01  |04010E;
 	asl a;0086D7|0A      |      ;
 	tax                                  ;0086D8|AA      |      ;
@@ -816,7 +816,7 @@ VBlank_BattleAlt:
 ;      |        |      ;
 Battle_PaletteLoadAlt:
 	lda.W #$6100                         ;0086F3|A90061  |      ;
-	sta.W $2116                          ;0086F6|8D1621  |042116;
+	sta.w !VMADDL                          ;0086F6|8D1621  |042116;
 	ldx.W #$9a20                         ;0086F9|A2209A  |      ;
 	ldy.W #$0004                         ;0086FC|A00400  |      ;
 	jsl.L VRAM_ByteCopy                    ;0086FF|22DF8D00|008DDF;
@@ -826,11 +826,11 @@ Battle_PaletteLoadAlt:
 	ldx.w !char_data_ptrs                          ;00870D|AE0701  |040107;
 	jsr.W Battle_DoubleVRAMCopy          ;008710|205187  |008751;
 	lda.W #$6280                         ;008713|A98062  |      ;
-	sta.W $2116                          ;008716|8D1621  |042116;
+	sta.w !VMADDL                          ;008716|8D1621  |042116;
 	ldx.w !char2_data_ptr                          ;008719|AE0901  |040109;
 	jsr.W Battle_DoubleVRAMCopy          ;00871C|205187  |008751;
 	lda.W #$6380                         ;00871F|A98063  |      ;
-	sta.W $2116                          ;008722|8D1621  |042116;
+	sta.w !VMADDL                          ;008722|8D1621  |042116;
 	ldx.w !char3_data_ptr                          ;008725|AE0B01  |04010B;
 	jsr.W Battle_DoubleVRAMCopy          ;008728|205187  |008751;
 	plb                                  ;00872B|AB      |      ;
@@ -1876,7 +1876,7 @@ VRAM_CopyLoop:
 Graphics_CopyTileWithBlanks:
 	php                                  ;008E54|08      |      ;
 	phd                                  ;008E55|0B      |      ;
-	pea.W $2100                          ;008E56|F40021  |072100;
+	pea.w !INIDISP                          ;008E56|F40021  |072100;
 	pld                                  ;008E59|2B      |      ;
 	sep #$20                             ;008E5A|E220    |      ;
 	lda.B #$88                           ;008E5C|A988    |      ;
@@ -2223,7 +2223,7 @@ Menu_DisplayItemCount:
 	pea.W $007e                          ;009115|F47E00  |00007E;
 	plb                                  ;009118|AB      |      ;
 	phy                                  ;009119|5A      |      ;
-	pea.W $0400                          ;00911A|F40004  |7E0400;
+	pea.w !JOY_DOWN                          ;00911A|F40004  |7E0400;
 	pld                                  ;00911D|2B      |      ;
 	sta.B $3a                            ;00911E|853A    |00043A;
 	jsl.L Sub_028AE0                    ;009120|22E08A02|028AE0;
@@ -3016,8 +3016,8 @@ Memory_Copy64Bytes:
 	sta.W $0024,y                        ;0098E2|992400  |7E0024;
 	lda.W $0022,x                        ;0098E5|BD2200  |7E0022;
 	sta.W $0022,y                        ;0098E8|992200  |7E0022;
-	lda.W $0020,x                        ;0098EB|BD2000  |7E0020;
-	sta.W $0020,y                        ;0098EE|992000  |7E0020;
+	lda.w !JOY_L,x                        ;0098EB|BD2000  |7E0020;
+	sta.w !JOY_L,y                        ;0098EE|992000  |7E0020;
 ;      |        |      ;
 Memory_Copy32Bytes:
 	lda.W $001e,x                        ;0098F1|BD1E00  |7E001E;
@@ -3138,7 +3138,7 @@ Memory_Fill_64Bytes:
 	sta.W $0022,y                        ;0099E7|992200  |7F0022;
 ;      |        |      ;
 Memory_Fill_32Bytes:
-	sta.W $0020,y                        ;0099EA|992000  |7F0020;
+	sta.w !JOY_L,y                        ;0099EA|992000  |7F0020;
 	sta.W $001e,y                        ;0099ED|991E00  |7F001E;
 	sta.W $001c,y                        ;0099F0|991C00  |7F001C;
 	sta.W $001a,y                        ;0099F3|991A00  |7F001A;
@@ -5245,7 +5245,7 @@ TextBox_FillBackground_Loop:
 	dec a;00AC4E|3A      |      ;
 	sta.W $0022,y                        ;00AC4F|992200  |7E0022;
 	dec a;00AC52|3A      |      ;
-	sta.W $0020,y                        ;00AC53|992000  |7E0020;
+	sta.w !JOY_L,y                        ;00AC53|992000  |7E0020;
 	dec a;00AC56|3A      |      ;
 	sta.W $001e,y                        ;00AC57|991E00  |7E001E;
 	dec a;00AC5A|3A      |      ;
@@ -7014,11 +7014,11 @@ VBlank_CheckPolling_Second:
 	jsr.W Sub_008B88                    ;00B8EA|20888B  |008B88;
 	sep #$20                             ;00B8ED|E220    |      ;
 	lda.B #$d8                           ;00B8EF|A9D8    |      ;
-	sta.W $4209                          ;00B8F1|8D0942  |024209;
+	sta.w !VTIMEL                          ;00B8F1|8D0942  |024209;
 	ldx.W #$b82a                         ;00B8F4|A22AB8  |      ;
 	stx.w !irq_handler_addr                          ;00B8F7|8E1801  |020118;
 	lda.w !interrupt_config                          ;00B8FA|AD1201  |020112;
-	sta.W $4200                          ;00B8FD|8D0042  |024200;
+	sta.w !NMITIMEN                          ;00B8FD|8D0042  |024200;
 	lda.B #$20                           ;00B900|A920    |      ;
 	tsb.w !system_flags_4                          ;00B902|0CD800  |0200D8;
 	ply                                  ;00B905|7A      |      ;
@@ -7257,7 +7257,7 @@ Screen_InitializeVideoRegisters:
 	tcd                                  ;00BAF3|5B      |      ;
 	stz.B SNES_CGSWSEL-$2100             ;00BAF4|6430    |002130;
 	lda.W #$0017                         ;00BAF6|A91700  |      ;
-	sta.W $212c                          ;00BAF9|8D2C21  |01212C;
+	sta.w !TM                          ;00BAF9|8D2C21  |01212C;
 	lda.W #$5555                         ;00BAFC|A95555  |      ;
 	sta.W $0e00                          ;00BAFF|8D000E  |010E00;
 	sep #$20                             ;00BB02|E220    |      ;
@@ -8929,7 +8929,7 @@ Fade_CheckAltMode:
 	lda.B #$80                           ;00C7CF|A980    |      ;
 	tsb.w !system_flags_3                          ;00C7D1|0CD600  |0100D6;
 	lda.B #$80                           ;00C7D4|A980    |      ;
-	sta.W $2100                          ;00C7D6|8D0021  |012100;
+	sta.w !INIDISP                          ;00C7D6|8D0021  |012100;
 	sta.w !battle_ready_flag                          ;00C7D9|8D1001  |010110;
 	plp                                  ;00C7DC|28      |      ;
 	rtl                                  ;00C7DD|6B      |      ;
@@ -11819,7 +11819,7 @@ Item_ItemUsable:
 	lda.W $0022,x                        ;00DCFF|BD2200  |7F0022;
 	eor.W #$00ff                         ;00DD02|49FF00  |      ;
 	sta.W $2022,x                        ;00DD05|9D2220  |7F2022;
-	lda.W $0020,x                        ;00DD08|BD2000  |7F0020;
+	lda.w !JOY_L,x                        ;00DD08|BD2000  |7F0020;
 	eor.W #$00ff                         ;00DD0B|49FF00  |      ;
 	sta.W $2020,x                        ;00DD0E|9D2020  |7F2020;
 	lda.W $001e,x                        ;00DD11|BD1E00  |7F001E;
@@ -11869,7 +11869,7 @@ Item_ItemUsable:
 	sta.W $2002,x                        ;00DD95|9D0220  |7F2002;
 	lda.W $0000,x                        ;00DD98|BD0000  |7F0000;
 	eor.W #$00ff                         ;00DD9B|49FF00  |      ;
-	sta.W $2000,x                        ;00DD9E|9D0020  |7F2000;
+	sta.w !JOY_SELECT,x                        ;00DD9E|9D0020  |7F2000;
 	txa                                  ;00DDA1|8A      |      ;
 	adc.B $56                            ;00DDA2|6556    |0000B4;
 	tax                                  ;00DDA4|AA      |      ;
@@ -12737,8 +12737,8 @@ Graphics_UpdateDisplay:
 	lda.W #$1000                         ;00E5E0|A90010  |      ;
 	sta.w !vram_transfer_size                          ;00E5E3|8DF401  |0001F4;
 	pea.W $0000                          ;00E5E6|F40000  |000000;
-	pea.W $4000                          ;00E5E9|F40040  |004000;
-	pea.W $2000                          ;00E5EC|F40020  |002000;
+	pea.w !JOY_Y                          ;00E5E9|F40040  |004000;
+	pea.w !JOY_SELECT                          ;00E5EC|F40020  |002000;
 	pea.W $0009                          ;00E5EF|F40900  |000009;
 	bra Graphics_CallCopy                      ;00E5F2|8049    |00E63D;
 ;      |        |      ;
@@ -12749,8 +12749,8 @@ Graphics_SetupMode2:
 	lda.W #$0600                         ;00E5FA|A90006  |      ;
 	sta.w !vram_transfer_size                          ;00E5FD|8DF401  |0001F4;
 	pea.W $0000                          ;00E600|F40000  |000000;
-	pea.W $4000                          ;00E603|F40040  |004000;
-	pea.W $2000                          ;00E606|F40020  |002000;
+	pea.w !JOY_Y                          ;00E603|F40040  |004000;
+	pea.w !JOY_SELECT                          ;00E606|F40020  |002000;
 	pea.W $0003                          ;00E609|F40300  |000003;
 	bra Graphics_CallCopy                      ;00E60C|802F    |00E63D;
 ;      |        |      ;
@@ -12761,8 +12761,8 @@ Graphics_SetupMode0:
 	lda.W #$0900                         ;00E614|A90009  |      ;
 	sta.w !vram_transfer_size                          ;00E617|8DF401  |0001F4;
 	pea.W $0000                          ;00E61A|F40000  |000000;
-	pea.W $4000                          ;00E61D|F40040  |004000;
-	pea.W $2000                          ;00E620|F40020  |002000;
+	pea.w !JOY_Y                          ;00E61D|F40040  |004000;
+	pea.w !JOY_SELECT                          ;00E620|F40020  |002000;
 	bra Graphics_PushParams                      ;00E623|8015    |00E63A;
 ;      |        |      ;
 ;      |        |      ;
@@ -12805,8 +12805,8 @@ Graphics_CallCopy:
 	lda.W #$0200                         ;00E66E|A90002  |      ;
 	sta.w !vram_transfer_size                          ;00E671|8DF401  |0001F4;
 	pea.W $0000                          ;00E674|F40000  |000000;
-	pea.W $4000                          ;00E677|F40040  |004000;
-	pea.W $2000                          ;00E67A|F40020  |002000;
+	pea.w !JOY_Y                          ;00E677|F40040  |004000;
+	pea.w !JOY_SELECT                          ;00E67A|F40020  |002000;
 	pea.W $0002                          ;00E67D|F40200  |000002;
 	pea.W $0004                          ;00E680|F40400  |000004;
 	jsr.W Graphics_CopyTileData                    ;00E683|2093DF  |00DF93;
@@ -13365,9 +13365,9 @@ Graphics_ClearTileLine:
 	lda.W $001e,x                        ;00ED27|BD1E00  |7F001E;
 	and.W #$7777                         ;00ED2A|297777  |      ;
 	sta.W $001e,x                        ;00ED2D|9D1E00  |7F001E;
-	lda.W $0020,x                        ;00ED30|BD2000  |7F0020;
+	lda.w !JOY_L,x                        ;00ED30|BD2000  |7F0020;
 	and.W #$7777                         ;00ED33|297777  |      ;
-	sta.W $0020,x                        ;00ED36|9D2000  |7F0020;
+	sta.w !JOY_L,x                        ;00ED36|9D2000  |7F0020;
 	lda.W $0022,x                        ;00ED39|BD2200  |7F0022;
 	and.W #$7777                         ;00ED3C|297777  |      ;
 	sta.W $0022,x                        ;00ED3F|9D2200  |7F0022;
@@ -13447,9 +13447,9 @@ Graphics_FillPattern_Layer:
 	lda.W $001e,x                        ;00EE12|BD1E00  |7F001E;
 	and.W #$bbbb                         ;00EE15|29BBBB  |      ;
 	sta.W $001e,x                        ;00EE18|9D1E00  |7F001E;
-	lda.W $0020,x                        ;00EE1B|BD2000  |7F0020;
+	lda.w !JOY_L,x                        ;00EE1B|BD2000  |7F0020;
 	and.W #$bbbb                         ;00EE1E|29BBBB  |      ;
-	sta.W $0020,x                        ;00EE21|9D2000  |7F0020;
+	sta.w !JOY_L,x                        ;00EE21|9D2000  |7F0020;
 	lda.W $0022,x                        ;00EE24|BD2200  |7F0022;
 	and.W #$bbbb                         ;00EE27|29BBBB  |      ;
 	sta.W $0022,x                        ;00EE2A|9D2200  |7F0022;
@@ -13529,9 +13529,9 @@ Graphics_FillPattern_Process:
 	lda.W $001e,x                        ;00EEFD|BD1E00  |7F001E;
 	and.W #$dddd                         ;00EF00|29DDDD  |      ;
 	sta.W $001e,x                        ;00EF03|9D1E00  |7F001E;
-	lda.W $0020,x                        ;00EF06|BD2000  |7F0020;
+	lda.w !JOY_L,x                        ;00EF06|BD2000  |7F0020;
 	and.W #$dddd                         ;00EF09|29DDDD  |      ;
-	sta.W $0020,x                        ;00EF0C|9D2000  |7F0020;
+	sta.w !JOY_L,x                        ;00EF0C|9D2000  |7F0020;
 	lda.W $0022,x                        ;00EF0F|BD2200  |7F0022;
 	and.W #$dddd                         ;00EF12|29DDDD  |      ;
 	sta.W $0022,x                        ;00EF15|9D2200  |7F0022;
@@ -13611,9 +13611,9 @@ Graphics_FillTiles_Loop:
 	lda.W $001e,x                        ;00EFE8|BD1E00  |7F001E;
 	and.W #$eeee                         ;00EFEB|29EEEE  |      ;
 	sta.W $001e,x                        ;00EFEE|9D1E00  |7F001E;
-	lda.W $0020,x                        ;00EFF1|BD2000  |7F0020;
+	lda.w !JOY_L,x                        ;00EFF1|BD2000  |7F0020;
 	and.W #$eeee                         ;00EFF4|29EEEE  |      ;
-	sta.W $0020,x                        ;00EFF7|9D2000  |7F0020;
+	sta.w !JOY_L,x                        ;00EFF7|9D2000  |7F0020;
 	lda.W $0022,x                        ;00EFFA|BD2200  |7F0022;
 	and.W #$eeee                         ;00EFFD|29EEEE  |      ;
 	sta.W $0022,x                        ;00F000|9D2200  |7F0022;
