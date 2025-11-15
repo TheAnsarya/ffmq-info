@@ -1166,7 +1166,7 @@ Graphics_DecompressLoop:
 	bne Graphics_DecompressLoop                      ;0C89FE|D0F4    |0C89F4;
 	jsr.W TransferOAMToVRAM                    ;0C8A00|201089  |0C8910;
 	lda.B #$30                           ;0C8A03|A930    |      ;
-	sta.W $0505                          ;0C8A05|8D0505  |0C0505;
+	sta.w !audio_coord_register                          ;0C8A05|8D0505  |0C0505;
 	ldx.W #$2100                         ;0C8A08|A20021  |      ;
 	stx.B SNES_CGSWSEL-$2100             ;0C8A0B|8630    |002130;
 	lda.B #$ff                           ;0C8A0D|A9FF    |      ;

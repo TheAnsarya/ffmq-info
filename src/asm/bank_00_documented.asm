@@ -1106,10 +1106,10 @@ Init_VBlankDMA:
 	sep #$20		; 8-bit accumulator
 
 	sta.w $0500	 ; [$0500] = $ff
-	sta.w $0505	 ; [$0505] = $ff
+	sta.w !audio_coord_register	 ; [$0505] = $ff
 
 	lda.b #$00	  ; A = $00
-	sta.w $050a	 ; [$050a] = $00
+	sta.w !audio_hw_register_1	 ; [$050a] = $00
 
 ; ---------------------------------------------------------------------------
 ; Clear Graphics State Flags ($7e3659-$7e3663)
@@ -1216,7 +1216,7 @@ Init_VBlankDMA:
 
 	lda.l DATA8_07800a ; A = [ROM $07800a]
 	and.w #$739c	; A = A & $739c (mask specific bits)
-	sta.w $0e9c	 ; [$0e9c] = masked value
+	sta.w !menu_color	 ; [$0e9c] = masked value
 
 ; ---------------------------------------------------------------------------
 ; Initialize Additional Systems
@@ -4897,7 +4897,7 @@ Graphics_InitFieldMenuMode:
 	plb ; Restore data bank
 
 ; Load special color values
-	ldx.w $0e9c	 ; X = color value (low byte)
+	ldx.w !menu_color	 ; X = color value (low byte)
 	ldy.w $0e9d	 ; Y = color value (high byte)
 	lda.b #$0d	  ; A = $0d (CGRAM address)
 	sta.b !SNES_CGADD-$2100 ; Set CGRAM address
@@ -12041,7 +12041,7 @@ Sprite_SetMode2D:
 	php ; Save processor status
 	sep #$20		; 8-bit accumulator
 	lda.b #$2d	  ; Mode $2d
-	sta.w $0505	 ; Store in sprite mode
+	sta.w !audio_coord_register	 ; Store in sprite mode
 	plp ; Restore processor status
 
 
@@ -12057,7 +12057,7 @@ Sprite_SetMode2C:
 	php ; Save processor status
 	sep #$20		; 8-bit accumulator
 	lda.b #$2c	  ; Mode $2c
-	sta.w $0505	 ; Store in sprite mode
+	sta.w !audio_coord_register	 ; Store in sprite mode
 	plp ; Restore processor status
 
 
@@ -12073,7 +12073,7 @@ Anim_SetMode10:
 	php ; Save processor status
 	sep #$20		; 8-bit accumulator
 	lda.b #$10	  ; Mode $10
-	sta.w $050a	 ; Store in animation mode
+	sta.w !audio_hw_register_1	 ; Store in animation mode
 	plp ; Restore processor status
 
 
@@ -12089,7 +12089,7 @@ Anim_SetMode11:
 	php ; Save processor status
 	sep #$20		; 8-bit accumulator
 	lda.b #$11	  ; Mode $11
-	sta.w $050a	 ; Store in animation mode
+	sta.w !audio_hw_register_1	 ; Store in animation mode
 	plp ; Restore processor status
 
 
@@ -12527,13 +12527,13 @@ System_Init:
 	plb ; Restore data bank
 	lda.b #$31	  ; CGRAM address $31
 	sta.b SNES_CGADD-$2100 ; Set CGRAM address
-	lda.w $0e9c	 ; Load color low
+	lda.w !menu_color	 ; Load color low
 	sta.b SNES_CGDATA-$2100 ; Write to CGRAM
 	lda.w $0e9d	 ; Load color high
 	sta.b SNES_CGDATA-$2100 ; Write to CGRAM
 	lda.b #$71	  ; CGRAM address $71
 	sta.b SNES_CGADD-$2100 ; Set CGRAM address
-	lda.w $0e9c	 ; Load color low
+	lda.w !menu_color	 ; Load color low
 	sta.b SNES_CGDATA-$2100 ; Write to CGRAM
 	lda.w $0e9d	 ; Load color high
 	sta.b SNES_CGDATA-$2100 ; Write to CGRAM
@@ -13247,7 +13247,7 @@ Menu_Item_Discard_Execute:
 Menu_Item_Discard_UpdateDisplay:
 	sep #$20		; 8-bit accumulator
 	lda.w $04df	 ; Load character ID
-	sta.w $0505	 ; Store in $0505
+	sta.w !audio_coord_register	 ; Store in $0505
 	rep #$30		; 16-bit A/X/Y
 	jsr.w ExternalRoutine3 ; External routine
 	ldx.w #$c035	; Menu data
@@ -13372,7 +13372,7 @@ Menu_Spell_ProcessInput:
 ; Technical: Originally labeled UNREACH_00C064
 ;-------------------------------------------------------------------------------
 Menu_Spell_Slot0Handler:
-	lda.w $0e91                          ;00C064|AD910E  |010E91; Load spell ID
+	lda.w !tilemap_counter                          ;00C064|AD910E  |010E91; Load spell ID
 	and.w #$007f                         ;00C067|297F00  |      ; Mask to 7 bits
 	cmp.w #$0007                         ;00C06A|C90700  |      ; Check if >= 7
 	bcc Menu_Spell_ProcessInput          ;00C06D|90D5    |00C044; If < 7, loop
@@ -13384,7 +13384,7 @@ Menu_Spell_Slot0Handler:
 	sta.w $043a                          ;00C07B|8D3A04  |01043A; Store effect
 	jsl.l BankRoutine                    ;00C07E|22E08A02|028AE0; Call effect handler
 	lda.w $04df                          ;00C082|ADDF04  |0104DF; Load character ID
-	sta.w $0505                          ;00C085|8D0505  |010505; Store for update
+	sta.w !audio_coord_register                          ;00C085|8D0505  |010505; Store for update
 	lda.b #$14                           ;00C088|A914    |      ; Load menu ID
 	jmp.w JumpMenuHandler                    ;00C08A|4CF4BC  |00BCF4; Jump to menu handler
 
@@ -13462,7 +13462,7 @@ Menu_Spell_DecrementMP_Main:
 Menu_Spell_DecrementMP_Do:
 	dec.w !char1_current_mp,x   ; Decrement MP
 	lda.w $04df	 ; Load character ID
-	sta.w $0505	 ; Store in $0505
+	sta.w !audio_coord_register	 ; Store in $0505
 	rep #$30		; 16-bit A/X/Y
 	ldx.w #$c035	; Menu data
 	jsr.w CodeLikelyLoadsProcessesThisData ; Update menu
@@ -13670,7 +13670,7 @@ Menu_BattleSettings_UpdateSetting:
 
 Menu_BattleSettings_Blue:
 	rep #$30		; 16-bit A/X/Y
-	lda.w $0e9c	 ; Load color data
+	lda.w !menu_color	 ; Load color data
 	lsr a; Extract blue component
 	lsr a
 	sep #$20		; 8-bit accumulator
@@ -13680,7 +13680,7 @@ Menu_BattleSettings_Blue:
 	bra Menu_BattleSettings_StoreColor ; Store result
 
 Menu_BattleSettings_Green:
-	lda.w $0e9c	 ; Load color data (green)
+	lda.w !menu_color	 ; Load color data (green)
 
 Menu_BattleSettings_StoreColor:
 	and.b #$1f	  ; Mask to 5 bits
@@ -13794,7 +13794,7 @@ Menu_BattleSettings_SetRed_Store:
 Menu_BattleSettings_SetGreen:
 	rep #$30		; 16-bit A/X/Y
 	lda.w #$03e0	; Mask for green component
-	trb.w $0e9c	 ; Clear green bits
+	trb.w !menu_color	 ; Clear green bits
 	lda.b $00	   ; Load new value
 	and.w #$ff00	; Get high byte
 	lsr a; Shift right
@@ -13803,12 +13803,12 @@ Menu_BattleSettings_SetGreen:
 	lda.w #$03e0	; Max value
 
 Menu_BattleSettings_SetGreen_Store:
-	tsb.w $0e9c	 ; Set green bits
+	tsb.w !menu_color	 ; Set green bits
 	bra Menu_BattleSettings_Commit ; Update display
 
 Menu_BattleSettings_SetBlue:
 	lda.b #$1f	  ; Mask for blue component
-	trb.w $0e9c	 ; Clear blue bits
+	trb.w !menu_color	 ; Clear blue bits
 	lda.b $01	   ; Load new value
 	asl a; Shift left 2 times
 	asl a
@@ -13817,7 +13817,7 @@ Menu_BattleSettings_SetBlue:
 	lda.b #$1f	  ; Max value
 
 Menu_BattleSettings_SetBlue_Store:
-	tsb.w $0e9c	 ; Set blue bits
+	tsb.w !menu_color	 ; Set blue bits
 	bra Menu_BattleSettings_Commit ; Update display
 
 SystemData_Config14:

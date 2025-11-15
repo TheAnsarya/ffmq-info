@@ -189,7 +189,7 @@ SaveData_IncrementCharacter:
 	lda.W DATA8_0081d5,x                 ;0081A0|BDD581  |0081D5;
 	sta.W $0e88                          ;0081A3|8D880E  |000E88;
 	ldy.W DATA8_0081d6,x                 ;0081A6|BCD681  |0081D6;
-	sty.W $0e89                          ;0081A9|8C890E  |000E89;
+	sty.w !player_map_x                          ;0081A9|8C890E  |000E89;
 	lda.W DATA8_0081d8,x                 ;0081AC|BDD881  |0081D8;
 	sta.W $0e92                          ;0081AF|8D920E  |000E92;
 	ldy.W DATA8_0081db,x                 ;0081B2|BCDB81  |0081DB;
@@ -288,9 +288,9 @@ Menu_InitializeQueues:
 	lda.W #$00ff                         ;008274|A9FF00  |      ;
 	sep #$20                             ;008277|E220    |      ;
 	sta.W $0500                          ;008279|8D0005  |000500;
-	sta.W $0505                          ;00827C|8D0505  |000505;
+	sta.w !audio_coord_register                          ;00827C|8D0505  |000505;
 	lda.B #$00                           ;00827F|A900    |      ;
-	sta.W $050a                          ;008281|8D0A05  |00050A;
+	sta.w !audio_hw_register_1                          ;008281|8D0A05  |00050A;
 	sta.L $7e3659                        ;008284|8F59367E|7E3659;
 	sta.L $7e365e                        ;008288|8F5E367E|7E365E;
 	sta.L $7e3663                        ;00828C|8F63367E|7E3663;
@@ -334,7 +334,7 @@ Menu_InitializeQueues:
 	sta.W $10a0                          ;008302|8DA010  |0010A0;
 	lda.L DATA8_07800a                   ;008305|AF0A8007|07800A;
 	and.W #$739c                         ;008309|299C73  |      ;
-	sta.W $0e9c                          ;00830C|8D9C0E  |000E9C;
+	sta.w !menu_color                          ;00830C|8D9C0E  |000E9C;
 	jsr.W Battle_LoadGraphics                    ;00830F|20C48E  |008EC4;
 	jsr.W Sub_008C3D                    ;008312|203D8C  |008C3D;
 	jsr.W Sub_008D29                    ;008315|20298D  |008D29;
@@ -1071,7 +1071,7 @@ Graphics_HandlePaletteFlags:
 	sep #$30                             ;008913|E230    |      ;
 	lda.B #$10                           ;008915|A910    |      ;
 	trb.w !system_flags_2                          ;008917|1CD400  |0000D4;
-	ldx.W $0e9c                          ;00891A|AE9C0E  |000E9C;
+	ldx.w !menu_color                          ;00891A|AE9C0E  |000E9C;
 	ldy.W $0e9d                          ;00891D|AC9D0E  |000E9D;
 	lda.B #$0d                           ;008920|A90D    |      ;
 	jsr.W Sub_008956                    ;008922|205689  |008956;
@@ -1980,7 +1980,7 @@ Battle_LoadGraphics:
 	ldx.B #$18                           ;008F30|A218    |      ;
 	jsr.W Palette_Write8Colors                    ;008F32|20B48F  |008FB4;
 	plb                                  ;008F35|AB      |      ;
-	ldx.W $0e9c                          ;008F36|AE9C0E  |000E9C;
+	ldx.w !menu_color                          ;008F36|AE9C0E  |000E9C;
 	ldy.W $0e9d                          ;008F39|AC9D0E  |000E9D;
 	lda.B #$0d                           ;008F3C|A90D    |      ;
 	sta.B SNES_CGADD-$2100               ;008F3E|8521    |002121;
@@ -7030,7 +7030,7 @@ Sound_PlayEffect_MenuSelect:
 	php                                  ;00B908|08      |      ;
 	sep #$20                             ;00B909|E220    |      ;
 	lda.B #$2d                           ;00B90B|A92D    |      ;
-	sta.W $0505                          ;00B90D|8D0505  |000505;
+	sta.w !audio_coord_register                          ;00B90D|8D0505  |000505;
 	plp                                  ;00B910|28      |      ;
 	rts                                  ;00B911|60      |      ;
 ;      |        |      ;
@@ -7039,7 +7039,7 @@ Sound_PlayEffect_MenuMove:
 	php                                  ;00B912|08      |      ;
 	sep #$20                             ;00B913|E220    |      ;
 	lda.B #$2c                           ;00B915|A92C    |      ;
-	sta.W $0505                          ;00B917|8D0505  |000505;
+	sta.w !audio_coord_register                          ;00B917|8D0505  |000505;
 	plp                                  ;00B91A|28      |      ;
 	rts                                  ;00B91B|60      |      ;
 ;      |        |      ;
@@ -7048,7 +7048,7 @@ Sound_PlayEffect_WindowOpen:
 	php                                  ;00B91C|08      |      ;
 	sep #$20                             ;00B91D|E220    |      ;
 	lda.B #$10                           ;00B91F|A910    |      ;
-	sta.W $050a                          ;00B921|8D0A05  |00050A;
+	sta.w !audio_hw_register_1                          ;00B921|8D0A05  |00050A;
 	plp                                  ;00B924|28      |      ;
 	rts                                  ;00B925|60      |      ;
 ;      |        |      ;
@@ -7057,7 +7057,7 @@ Sound_PlayEffect_WindowClose:
 	php                                  ;00B926|08      |      ;
 	sep #$20                             ;00B927|E220    |      ;
 	lda.B #$11                           ;00B929|A911    |      ;
-	sta.W $050a                          ;00B92B|8D0A05  |00050A;
+	sta.w !audio_hw_register_1                          ;00B92B|8D0A05  |00050A;
 	plp                                  ;00B92E|28      |      ;
 	rts                                  ;00B92F|60      |      ;
 ;      |        |      ;
@@ -7365,13 +7365,13 @@ Screen_InitializeVideoRegisters:
 	plb                                  ;00BBF2|AB      |      ;
 	lda.B #$31                           ;00BBF3|A931    |      ;
 	sta.B SNES_CGADD-$2100               ;00BBF5|8521    |002121;
-	lda.W $0e9c                          ;00BBF7|AD9C0E  |000E9C;
+	lda.w !menu_color                          ;00BBF7|AD9C0E  |000E9C;
 	sta.B SNES_CGDATA-$2100              ;00BBFA|8522    |002122;
 	lda.W $0e9d                          ;00BBFC|AD9D0E  |000E9D;
 	sta.B SNES_CGDATA-$2100              ;00BBFF|8522    |002122;
 	lda.B #$71                           ;00BC01|A971    |      ;
 	sta.B SNES_CGADD-$2100               ;00BC03|8521    |002121;
-	lda.W $0e9c                          ;00BC05|AD9C0E  |000E9C;
+	lda.w !menu_color                          ;00BC05|AD9C0E  |000E9C;
 	sta.B SNES_CGDATA-$2100              ;00BC08|8522    |002122;
 	lda.W $0e9d                          ;00BC0A|AD9D0E  |000E9D;
 	sta.B SNES_CGDATA-$2100              ;00BC0D|8522    |002122;
@@ -7852,7 +7852,7 @@ Sprite_UpdatePosition:
 Sprite_WriteOAM:
 	sep #$20                             ;00BFC0|E220    |      ;
 	lda.W $04df                          ;00BFC2|ADDF04  |0004DF;
-	sta.W $0505                          ;00BFC5|8D0505  |000505;
+	sta.w !audio_coord_register                          ;00BFC5|8D0505  |000505;
 	rep #$30                             ;00BFC8|C230    |      ;
 	jsr.W Item_InitializePartySlots                    ;00BFCA|20A5DA  |00DAA5;
 	ldx.W #$c035                         ;00BFCD|A235C0  |      ;
@@ -8011,7 +8011,7 @@ Menu_DecrementItem:
 Menu_UpdateItemDisplay:
 	dec.W $1018,x                        ;00C10B|DE1810  |001018;
 	lda.W $04df                          ;00C10E|ADDF04  |0004DF;
-	sta.W $0505                          ;00C111|8D0505  |000505;
+	sta.w !audio_coord_register                          ;00C111|8D0505  |000505;
 	rep #$30                             ;00C114|C230    |      ;
 	ldx.W #$c035                         ;00C116|A235C0  |      ;
 	jsr.W DMA_CopyParamsAndExecute                    ;00C119|20C49B  |009BC4;
@@ -8184,7 +8184,7 @@ ColorSelect_ApplyChange:
 ;      |        |      ;
 ColorSelect_Green:
 	rep #$30                             ;00C242|C230    |      ;
-	lda.W $0e9c                          ;00C244|AD9C0E  |000E9C;
+	lda.w !menu_color                          ;00C244|AD9C0E  |000E9C;
 	lsr a;00C247|4A      |      ;
 	lsr a;00C248|4A      |      ;
 	sep #$20                             ;00C249|E220    |      ;
@@ -8195,7 +8195,7 @@ ColorSelect_Green:
 ;      |        |      ;
 ;      |        |      ;
 ColorSelect_Red:
-	lda.W $0e9c                          ;00C250|AD9C0E  |000E9C;
+	lda.w !menu_color                          ;00C250|AD9C0E  |000E9C;
 ;      |        |      ;
 ColorSelect_ExtractChannel:
 	and.B #$1f                           ;00C253|291F    |      ;
@@ -8318,7 +8318,7 @@ ColorSelect_StoreBrightness:
 ColorSelect_ProcessGreen:
 	rep #$30                             ;00C30A|C230    |      ;
 	lda.W #$03e0                         ;00C30C|A9E003  |      ;
-	trb.W $0e9c                          ;00C30F|1C9C0E  |000E9C;
+	trb.w !menu_color                          ;00C30F|1C9C0E  |000E9C;
 	lda.B $00                            ;00C312|A500    |000000;
 	and.W #$ff00                         ;00C314|2900FF  |      ;
 	lsr a;00C317|4A      |      ;
@@ -8327,13 +8327,13 @@ ColorSelect_ProcessGreen:
 	lda.W #$03e0                         ;00C31D|A9E003  |      ;
 ;      |        |      ;
 ColorSelect_StoreGreen:
-	tsb.W $0e9c                          ;00C320|0C9C0E  |000E9C;
+	tsb.w !menu_color                          ;00C320|0C9C0E  |000E9C;
 	bra ColorSelect_PlaySound                      ;00C323|80C6    |00C2EB;
 ;      |        |      ;
 ;      |        |      ;
 ColorSelect_ProcessBlue:
 	lda.B #$1f                           ;00C325|A91F    |      ;
-	trb.W $0e9c                          ;00C327|1C9C0E  |000E9C;
+	trb.w !menu_color                          ;00C327|1C9C0E  |000E9C;
 	lda.B $01                            ;00C32A|A501    |000001;
 	asl a;00C32C|0A      |      ;
 	asl a;00C32D|0A      |      ;
@@ -8342,7 +8342,7 @@ ColorSelect_ProcessBlue:
 	lda.B #$1f                           ;00C332|A91F    |      ;
 ;      |        |      ;
 ColorSelect_StoreBlue:
-	tsb.W $0e9c                          ;00C334|0C9C0E  |000E9C;
+	tsb.w !menu_color                          ;00C334|0C9C0E  |000E9C;
 	bra ColorSelect_PlaySound                      ;00C337|80B2    |00C2EB;
 ;      |        |      ;
 ;      |        |      ;
@@ -9661,7 +9661,7 @@ Graphics_RestorePalettes:
 	sep #$20                             ;00CD7C|E220    |      ;
 	lda.B #$31                           ;00CD7E|A931    |      ;
 	sta.W SNES_CGADD                     ;00CD80|8D2121  |002121;
-	lda.W $0e9c                          ;00CD83|AD9C0E  |000E9C;
+	lda.w !menu_color                          ;00CD83|AD9C0E  |000E9C;
 	sta.W SNES_CGDATA                    ;00CD86|8D2221  |002122;
 	lda.W $0e9d                          ;00CD89|AD9D0E  |000E9D;
 	sta.W SNES_CGDATA                    ;00CD8C|8D2221  |002122;
@@ -10263,13 +10263,13 @@ BattleEnd_ReturnValue:
 	jsl.L CWaitTimingRoutine                    ;00D25F|2200800C|0C8000;
 	lda.B #$0d                           ;00D263|A90D    |      ;
 	sta.W SNES_CGADD                     ;00D265|8D2121  |002121;
-	lda.W $0e9c                          ;00D268|AD9C0E  |000E9C;
+	lda.w !menu_color                          ;00D268|AD9C0E  |000E9C;
 	sta.W SNES_CGDATA                    ;00D26B|8D2221  |002122;
 	lda.W $0e9d                          ;00D26E|AD9D0E  |000E9D;
 	sta.W SNES_CGDATA                    ;00D271|8D2221  |002122;
 	lda.B #$1d                           ;00D274|A91D    |      ;
 	sta.W SNES_CGADD                     ;00D276|8D2121  |002121;
-	lda.W $0e9c                          ;00D279|AD9C0E  |000E9C;
+	lda.w !menu_color                          ;00D279|AD9C0E  |000E9C;
 	sta.W SNES_CGDATA                    ;00D27C|8D2221  |002122;
 	lda.W $0e9d                          ;00D27F|AD9D0E  |000E9D;
 	sta.W SNES_CGDATA                    ;00D282|8D2221  |002122;

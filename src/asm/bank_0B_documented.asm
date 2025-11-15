@@ -552,7 +552,7 @@ BattleInit_SetupEncounter:
 	ldx.w !battle_array_elem_4	 ; Load enemy formation ID (16-bit)
 	stx.w !env_coord_x	 ; Store to formation pointer
 	lda.w !battle_current_enemy	 ; Load enemy formation bank
-	sta.w $0e91	 ; Store to formation bank pointer
+	sta.w !tilemap_counter	 ; Store to formation bank pointer
 	bne BattleInit_LoadEnemyData ; Branch if not zero (custom formation)
 
 ; Standard formation loading
@@ -593,7 +593,7 @@ BattleInit_ClearBuffer2:	; Clear second buffer section
 	bne BattleInit_ClearBuffer2 ; Loop until 48 bytes cleared
 
 BattleInit_LoadEnemyData:	; Enemy data loading
-	lda.w $0e91	 ; Load formation bank
+	lda.w !tilemap_counter	 ; Load formation bank
 	rep #$20		; Set A to 16-bit mode
 	and.w #$00ff	; Mask to 8-bit value
 	asl a; Multiply by 2 (word table)

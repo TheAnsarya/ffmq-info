@@ -1117,7 +1117,7 @@ Battle_ProcessManualInput:
 Battle_WaitForInput:
 	sta.B $10                            ;028767|8510    |001010;
 	lda.B #$2a                           ;028769|A92A    |      ;
-	sta.W $0505                          ;02876B|8D0505  |020505;
+	sta.w !audio_coord_register                          ;02876B|8D0505  |020505;
 	ldx.W #$d2d4                         ;02876E|A2D4D2  |      ;
 	jsr.W Battle_DisplayMessage                    ;028771|203588  |028835;
 	rep #$30                             ;028774|C230    |      ;
@@ -3013,7 +3013,7 @@ Battle_AnimateDamage:
 ;      |        |      ;
 	jsr.W Battle_CureParalysis                    ;0296B4|20B897  |0297B8;
 	lda.B #$14                           ;0296B7|A914    |      ;
-	sta.W $0505                          ;0296B9|8D0505  |020505;
+	sta.w !audio_coord_register                          ;0296B9|8D0505  |020505;
 	phd                                  ;0296BC|0B      |      ;
 	jsr.W Battle_SetEntityContextEnemy                    ;0296BD|202F8F  |028F2F;
 	lda.B $21                            ;0296C0|A521    |001021;
@@ -4404,7 +4404,7 @@ Battle_CalculateHitChance:
 ;      |        |      ;
 Battle_RollHitDice:
 	lda.B $df                            ;02A0E8|A5DF    |0004DF;
-	sta.W $0505                          ;02A0EA|8D0505  |020505;
+	sta.w !audio_coord_register                          ;02A0EA|8D0505  |020505;
 	lda.B $8d                            ;02A0ED|A58D    |00048D;
 	cmp.B #$02                           ;02A0EF|C902    |      ;
 	bcs Battle_ProcessMissAnimation                      ;02A0F1|B030    |02A123;
@@ -6059,7 +6059,7 @@ Battle_UpdateStatusIcons:
 ;      |        |      ;
 Battle_DrawStatusIcon:
 	lda.B #$06                           ;02AD77|A906    |      ;
-	sta.W $0505                          ;02AD79|8D0505  |020505;
+	sta.w !audio_coord_register                          ;02AD79|8D0505  |020505;
 	stz.W $0af0                          ;02AD7C|9CF00A  |020AF0;
 	jsr.W Battle_FinalDamageCalc                    ;02AD7F|2083FE  |02FE83;
 	lda.B #$01                           ;02AD82|A901    |      ;
@@ -6114,7 +6114,7 @@ Battle_ProcessHPBar:
 ;      |        |      ;
 Battle_UpdateHPBar:
 	lda.B #$0a                           ;02ADEE|A90A    |      ;
-	sta.W $0505                          ;02ADF0|8D0505  |020505;
+	sta.w !audio_coord_register                          ;02ADF0|8D0505  |020505;
 	rts                                  ;02ADF3|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
@@ -7270,7 +7270,7 @@ Battle_ProcessWaitTime:
 ;      |        |      ;
 Battle_CalculateWait:
 	lda.B #$3f                           ;02D422|A93F    |      ;
-	sta.W $0505                          ;02D424|8D0505  |020505;
+	sta.w !audio_coord_register                          ;02D424|8D0505  |020505;
 	lda.B #$7e                           ;02D427|A97E    |      ;
 	sta.B $87                            ;02D429|8587    |000A87;
 	ldy.W #$0000                         ;02D42B|A00000  |      ;
@@ -8239,7 +8239,7 @@ Battle_ProtectReducePhysical:
 	lda.B #$0f                           ;02DACB|A90F    |      ;
 	sta.W $050d                          ;02DACD|8D0D05  |02050D;
 	lda.B #$03                           ;02DAD0|A903    |      ;
-	sta.W $050a                          ;02DAD2|8D0A05  |02050A;
+	sta.w !audio_hw_register_1                          ;02DAD2|8D0A05  |02050A;
 ;      |        |      ;
 Battle_ProtectComplete:
 	stz.B $e3                            ;02DAD5|64E3    |000AE3;

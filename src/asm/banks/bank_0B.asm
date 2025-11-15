@@ -3,7 +3,7 @@
 ;      |        |      ;
 ;      |        |      ;
 BattleEvent_EventDispatcher:
-	lda.W $0e8b                          ;0B8000|AD8B0E  |010E8B;
+	lda.w !player_facing                          ;0B8000|AD8B0E  |010E8B;
 	beq Event_Type0                      ;0B8003|F012    |0B8017;
 	dec a;0B8005|3A      |      ;
 	beq Event_Type1                      ;0B8006|F01B    |0B8023;
@@ -40,7 +40,7 @@ Event_Type2:
 ;      |        |      ;
 Event_SetupCommon:
 	lda.B #$0a                           ;0B8039|A90A    |      ;
-	sta.W $0505                          ;0B803B|8D0505  |010505;
+	sta.w !audio_coord_register                          ;0B803B|8D0505  |010505;
 	rtl                                  ;0B803E|6B      |      ;
 ;      |        |      ;
 	php                                  ;0B803F|08      |      ;
@@ -177,7 +177,7 @@ FindBattler_Next:
 BattleEvent_LoadFont:
 	lda.B #$00                           ;0B8121|A900    |      ;
 	xba                                  ;0B8123|EB      |      ;
-	lda.W $0e8b                          ;0B8124|AD8B0E  |010E8B;
+	lda.w !player_facing                          ;0B8124|AD8B0E  |010E8B;
 	tax                                  ;0B8127|AA      |      ;
 	lda.L DATA8_0b8140,x                 ;0B8128|BF40810B|0B8140;
 	sta.W $0507                          ;0B812C|8D0705  |010507;
@@ -186,7 +186,7 @@ BattleEvent_LoadFont:
 	lda.L UNREACH_0B8144,x               ;0B8133|BF44810B|0B8144;
 	sta.W $0506                          ;0B8137|8D0605  |010506;
 	lda.B #$07                           ;0B813A|A907    |      ;
-	sta.W $0505                          ;0B813C|8D0505  |010505;
+	sta.w !audio_coord_register                          ;0B813C|8D0505  |010505;
 	rtl                                  ;0B813F|6B      |      ;
 ;      |        |      ;
 ;      |        |      ;
@@ -206,9 +206,9 @@ InitBattleGraphics:
 	lda.B #$01                           ;0B8151|A901    |      ;
 	sta.w !sprite_control                          ;0B8153|8D451A  |011A45;
 	ldx.w !battle_array_elem_4                          ;0B8156|AEF119  |0119F1;
-	stx.W $0e89                          ;0B8159|8E890E  |010E89;
+	stx.w !player_map_x                          ;0B8159|8E890E  |010E89;
 	lda.w !battle_current_enemy                          ;0B815C|ADF019  |0119F0;
-	sta.W $0e91                          ;0B815F|8D910E  |010E91;
+	sta.w !tilemap_counter                          ;0B815F|8D910E  |010E91;
 	bne LoadEnemyTileData                      ;0B8162|D041    |0B81A5;
 	lda.B #$f2                           ;0B8164|A9F2    |      ;
 	jsl.L PlaySoundEffectBank                    ;0B8166|226B9700|00976B;
@@ -219,13 +219,13 @@ InitBattleGraphics:
 	asl a;0B8175|0A      |      ;
 	tax                                  ;0B8176|AA      |      ;
 	lda.L UNREACH_07F7C3,x               ;0B8177|BFC3F707|07F7C3;
-	sta.W $0e89                          ;0B817B|8D890E  |010E89;
+	sta.w !player_map_x                          ;0B817B|8D890E  |010E89;
 	sep #$20                             ;0B817E|E220    |      ;
 	lda.B #$f3                           ;0B8180|A9F3    |      ;
 	jsl.L ExecuteSpecialBitProcessing                    ;0B8182|22769700|009776;
 	bne LoadEnemyTileData                      ;0B8186|D01D    |0B81A5;
 	lda.B #$02                           ;0B8188|A902    |      ;
-	sta.W $0e8b                          ;0B818A|8D8B0E  |010E8B;
+	sta.w !player_facing                          ;0B818A|8D8B0E  |010E8B;
 	ldx.W #$0000                         ;0B818D|A20000  |      ;
 	lda.B #$20                           ;0B8190|A920    |      ;
 ;      |        |      ;
@@ -244,7 +244,7 @@ ClearGraphicsLoop2:
 	bne ClearGraphicsLoop2                      ;0B81A3|D0F9    |0B819E;
 ;      |        |      ;
 LoadEnemyTileData:
-	lda.W $0e91                          ;0B81A5|AD910E  |010E91;
+	lda.w !tilemap_counter                          ;0B81A5|AD910E  |010E91;
 	rep #$20                             ;0B81A8|C220    |      ;
 	and.W #$00ff                         ;0B81AA|29FF00  |      ;
 	asl a;0B81AD|0A      |      ;
@@ -384,7 +384,7 @@ DATA8_0b82a0:
 	db $00                               ;0B82A9|        |      ;
 ;      |        |      ;
 LoadMapTile:
-	ldy.W $0e89                          ;0B82AA|AC890E  |010E89;
+	ldy.w !player_map_x                          ;0B82AA|AC890E  |010E89;
 	jsr.W CalculateTileAddress                    ;0B82AD|203883  |0B8338;
 	sta.w !current_direction                          ;0B82B0|8DD319  |0119D3;
 	stx.w !movement_state                          ;0B82B3|8ECB19  |0119CB;
@@ -736,7 +736,7 @@ ProcessAnimation_Return:
 	lda.B #$08                           ;0B85BF|A908    |      ;
 	sta.W SNES_M7A                          ;0B85C1|8D1B21  |01211B;
 	stz.W SNES_M7A                          ;0B85C4|9C1B21  |01211B;
-	lda.W $0e89                          ;0B85C7|AD890E  |010E89;
+	lda.w !player_map_x                          ;0B85C7|AD890E  |010E89;
 	sec                                  ;0B85CA|38      |      ;
 	sbc.B #$08                           ;0B85CB|E908    |      ;
 	sta.W SNES_M7B                          ;0B85CD|8D1C21  |01211C;
