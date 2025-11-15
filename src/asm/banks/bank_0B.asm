@@ -202,12 +202,12 @@ UNREACH_0B8144:
 InitBattleGraphics:
 	stz.W $19f6                          ;0B8149|9CF619  |0119F6;
 	lda.B #$80                           ;0B814C|A980    |      ;
-	sta.W $19a5                          ;0B814E|8DA519  |0119A5;
+	sta.w !battle_state_flag                          ;0B814E|8DA519  |0119A5;
 	lda.B #$01                           ;0B8151|A901    |      ;
 	sta.W $1a45                          ;0B8153|8D451A  |011A45;
 	ldx.w !battle_array_elem_4                          ;0B8156|AEF119  |0119F1;
 	stx.W $0e89                          ;0B8159|8E890E  |010E89;
-	lda.W $19f0                          ;0B815C|ADF019  |0119F0;
+	lda.w !battle_current_enemy                          ;0B815C|ADF019  |0119F0;
 	sta.W $0e91                          ;0B815F|8D910E  |010E91;
 	bne LoadEnemyTileData                      ;0B8162|D041    |0B81A5;
 	lda.B #$f2                           ;0B8164|A9F2    |      ;
@@ -386,7 +386,7 @@ DATA8_0b82a0:
 LoadMapTile:
 	ldy.W $0e89                          ;0B82AA|AC890E  |010E89;
 	jsr.W CalculateTileAddress                    ;0B82AD|203883  |0B8338;
-	sta.W $19d3                          ;0B82B0|8DD319  |0119D3;
+	sta.w !current_direction                          ;0B82B0|8DD319  |0119D3;
 	stx.w !movement_state                          ;0B82B3|8ECB19  |0119CB;
 	lda.W $19cc                          ;0B82B6|ADCC19  |0119CC;
 	bpl ProcessMapTile                      ;0B82B9|1010    |0B82CB;
@@ -414,7 +414,7 @@ ProcessTile_CheckDuplicate:
 	lda.w !movement_state                          ;0B82E3|ADCB19  |0119CB;
 	and.B #$07                           ;0B82E6|2907    |      ;
 	xba                                  ;0B82E8|EB      |      ;
-	lda.W $19d3                          ;0B82E9|ADD319  |0119D3;
+	lda.w !current_direction                          ;0B82E9|ADD319  |0119D3;
 	bpl ProcessTile_SetDirection                      ;0B82EC|1004    |0B82F2;
 	xba                                  ;0B82EE|EB      |      ;
 	ora.B #$08                           ;0B82EF|0908    |      ;

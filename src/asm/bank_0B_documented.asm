@@ -546,12 +546,12 @@ Battle_GfxAddressHigh:
 BattleInit_SetupEncounter:
 	stz.w $19f6	 ; Clear battle phase counter
 	lda.b #$80	  ; Battle active flag
-	sta.w $19a5	 ; Set battle state flag to active ($80)
+	sta.w !battle_state_flag	 ; Set battle state flag to active ($80)
 	lda.b #$01	  ; Animation enable
 	sta.w $1a45	 ; Store to animation flag
 	ldx.w !battle_array_elem_4	 ; Load enemy formation ID (16-bit)
 	stx.w !env_coord_x	 ; Store to formation pointer
-	lda.w $19f0	 ; Load enemy formation bank
+	lda.w !battle_current_enemy	 ; Load enemy formation bank
 	sta.w $0e91	 ; Store to formation bank pointer
 	bne BattleInit_LoadEnemyData ; Branch if not zero (custom formation)
 
@@ -861,7 +861,7 @@ BattleState_ProcessFlags:
 	lda.w !ram_19cb	 ; Load battle mode register
 	and.b #$07	  ; Mask bits 0-2 (phase bits)
 	xba ; Swap to high byte
-	lda.w $19d3	 ; Load battle subtype
+	lda.w !current_direction	 ; Load battle subtype
 	bpl BattleState_MergeFlags ; Branch if positive
 
 ; Negative subtype: Set bit 3 in phase value

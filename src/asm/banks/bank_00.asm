@@ -10090,7 +10090,7 @@ BattleEnd_ProcessRewards:
 ;      |        |      ;
 BattleEnd_InitializeDisplay:
 	lda.B #$ff                           ;00D0AA|A9FF    |      ;
-	sta.W $19a5                          ;00D0AC|8DA519  |0019A5;
+	sta.w !battle_state_flag                          ;00D0AC|8DA519  |0019A5;
 	lda.B #$10                           ;00D0AF|A910    |      ;
 	trb.W $00d6                          ;00D0B1|1CD600  |0000D6;
 	lda.L $7e365e                        ;00D0B4|AF5E367E|7E365E;
