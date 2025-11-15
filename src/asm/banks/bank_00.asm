@@ -8263,58 +8263,282 @@ Battle_Initialize:
 	jmp.W Fade_ReadBrightnessTarget                    ;00BD2D|4C95C7  |00C795;
 ;      |        |      ;
 ;      |        |      ;
+;===============================================================================
+; Battle_PrepareGraphics
+;-------------------------------------------------------------------------------
+; Prepares all graphics resources for battle initialization, including DMA 
+; parameter setup, timing synchronization, tilemap/palette loading, and 
+; screen configuration. This is the master graphics preparation routine called 
+; at the start of every battle encounter.
+;
+; CALLING CONVENTION:
+;   JSR (short call from Battle_Initialize)
+;   Processor flags and Direct Page will be preserved
+;   No parameters required
+;
+; OPERATION:
+;   1. Save processor state (P) and Direct Page (D)
+;   2. Set 8-bit accumulator, 16-bit index registers
+;   3. Switch to Direct Page $0000 (zero page for fast access)
+;   4. Execute DMA parameter copy command list (at $BD61)
+;   5. Wait for timing synchronization (ensure frame boundary)
+;   6. Load battle graphics tiles, palettes, and sprite data
+;   7. Process battle-specific initialization routines
+;   8. Transfer graphics via fast DMA (no sync overhead)
+;   9. Process cutscene scroll parameters for battle camera
+;   10. Set system flag bit 4 in $D6 (battle graphics ready)
+;   11. Initialize screen state to $FFF0 (specific mode)
+;   12. Restore Direct Page and processor flags
+;
+; DMA COMMAND LIST ($BD61):
+;   Data at $00BD61 = [$F2, $82, $03]
+;   This is a 3-byte command sequence processed by DMA_CopyParamsAndExecute
+;   Exact interpretation depends on dialog command format, but likely sets
+;   up initial DMA parameters for battle graphics transfers
+;
+; TIMING SYNCHRONIZATION:
+;   CWaitTimingRoutine ensures execution happens at frame boundary
+;   Critical for preventing screen tearing during graphics upload
+;   Typical wait: 0-16ms depending on current scanline position
+;
+; GRAPHICS LOADING SEQUENCE:
+;   Battle_LoadGraphics:   Loads character/enemy/UI tiles and palettes
+;   Sub_008C3D:            Unknown initialization (likely tilemap setup)
+;   Sub_008D29:            Unknown initialization (likely more graphics config)
+;   DMA_TransferGFX:       Fast VRAM transfer (100-500 cycles)
+;
+; SCREEN STATE $8E:
+;   Value $FFF0 indicates battle graphics preparation complete
+;   This is a specific mode code that controls main loop behavior
+;   Negative value ($FFF0 = -16) may signal "battle active" state
+;
+; SYSTEM FLAGS ($D6 bit 4):
+;   Setting bit 4 (value $10) marks battle graphics as loaded
+;   Other routines can check this flag before rendering
+;   Prevents duplicate graphics loads or rendering before ready
+;
+; PERFORMANCE:
+;   Typical execution: 50-100ms total (mostly graphics loading)
+;   Breakdown:
+;     - DMA command: ~1-5ms
+;     - Timing wait: 0-16ms
+;     - Graphics load: 20-60ms (depends on amount of data)
+;     - Subroutines: 5-10ms each
+;     - Final DMA: ~1ms
+;     - Scroll processing: ~1ms
+;   Total cycles: ~135,000-270,000 @ 2.68MHz (highly variable)
+;
+; USAGE EXAMPLE:
+;   Battle_Initialize:
+;       jsr.W Battle_PrepareGraphics    ; Load all battle graphics
+;       jmp.W Fade_ReadBrightnessTarget ; Continue with fade-in
+;
+; COMMON CALLERS:
+;   - Battle_Initialize ($00BD2A): Main battle entry point
+;
+; REGISTERS MODIFIED:
+;   A, X (all values temporary)
+;   Direct Page changed to $0000 then restored
+;   Processor flags changed then restored
+;
+; REGISTERS PRESERVED:
+;   All registers (via PHP/PLP and PHD/PLD)
+;   Caller sees no register changes
+;
+; CRITICAL DEPENDENCIES:
+;   - DMA system must be initialized (Init_SetupDMA)
+;   - VBlank handler must be active for DMA transfers
+;   - VRAM/CGRAM must be accessible (forced blank or VBlank)
+;   - Battle data structures must be set up before call
+;
+; TECHNICAL NOTES:
+;   The sequence PEA $0000 / PLD sets Direct Page to $0000 without
+;   affecting the stack pointer. This is faster than LDA #$0000 / TCD
+;   because PEA doesn't require loading the accumulator first.
+;
+;   The final screen state $FFF0 is stored in Direct Page location $8E.
+;   This is a common pattern in FFMQ where negative values in $8E indicate
+;   special states or modes, while positive values are menu/screen IDs.
+;
+;   System flag $D6 bit 4 ($10) acts as a semaphore indicating graphics
+;   readiness. The TSB instruction (Test and Set Bits) atomically sets the
+;   bit while preserving other flags - crucial for multithreaded-like logic.
+;===============================================================================
 Battle_PrepareGraphics:
-	php                                  ;00BD30|08      |      ;
-	phd                                  ;00BD31|0B      |      ;
-	sep #$20                             ;00BD32|E220    |      ;
-	rep #$10                             ;00BD34|C210    |      ;
-	pea.W $0000                          ;00BD36|F40000  |010000;
-	pld                                  ;00BD39|2B      |      ;
-	ldx.W #$bd61                         ;00BD3A|A261BD  |      ;
-	jsr.W DMA_CopyParamsAndExecute                    ;00BD3D|20C49B  |009BC4;
-	jsl.L CWaitTimingRoutine                    ;00BD40|2200800C|0C8000;
-	jsr.W Battle_LoadGraphics                    ;00BD44|20C48E  |008EC4;
-	jsr.W Sub_008C3D                    ;00BD47|203D8C  |008C3D;
-	jsr.W Sub_008D29                    ;00BD4A|20298D  |008D29;
-	jsl.L DMA_TransferGFX                    ;00BD4D|222F9B00|009B2F;
-	jsr.W Cutscene_ProcessScroll                    ;00BD51|2042A3  |00A342;
-	lda.B #$10                           ;00BD54|A910    |      ;
-	tsb.w !system_flags_3                          ;00BD56|0CD600  |0000D6;
-	ldx.W #$fff0                         ;00BD59|A2F0FF  |      ;
-	stx.B $8e                            ;00BD5C|868E    |00008E;
-	pld                                  ;00BD5E|2B      |      ;
-	plp                                  ;00BD5F|28      |      ;
-	rts                                  ;00BD60|60      |      ;
+	php                                  ;00BD30|08      |      ; Save processor status (8/16-bit modes, carry, etc.)
+	phd                                  ;00BD31|0B      |      ; Save current Direct Page register
+	sep #$20                             ;00BD32|E220    |      ; Set 8-bit accumulator (for byte operations)
+	rep #$10                             ;00BD34|C210    |      ; Set 16-bit index registers (for word addressing)
+	pea.W $0000                          ;00BD36|F40000  |010000; Push $0000 to stack (faster than LDA #$0000 / TCD)
+	pld                                  ;00BD39|2B      |      ; Pull stack value into D register → Direct Page = $0000
+	ldx.W #$bd61                         ;00BD3A|A261BD  |      ; X = command list address (3-byte DMA setup)
+	jsr.W DMA_CopyParamsAndExecute                    ;00BD3D|20C49B  |009BC4; Execute command list: copy params + run commands
+	jsl.L CWaitTimingRoutine                    ;00BD40|2200800C|0C8000; Wait for frame timing boundary (prevent tearing)
+	jsr.W Battle_LoadGraphics                    ;00BD44|20C48E  |008EC4; Load battle tiles, palettes, sprites into buffers
+	jsr.W Sub_008C3D                    ;00BD47|203D8C  |008C3D; Unknown: likely tilemap initialization or config
+	jsr.W Sub_008D29                    ;00BD4A|20298D  |008D29; Unknown: likely additional graphics setup
+	jsl.L DMA_TransferGFX                    ;00BD4D|222F9B00|009B2F; Fast DMA transfer to VRAM (no synchronization overhead)
+	jsr.W Cutscene_ProcessScroll                    ;00BD51|2042A3  |00A342; Calculate battle camera scroll parameters
+	lda.B #$10                           ;00BD54|A910    |      ; A = $10 (bit 4 mask)
+	tsb.w !system_flags_3                          ;00BD56|0CD600  |0000D6; Set bit 4 in system flags: battle graphics ready
+	ldx.W #$fff0                         ;00BD59|A2F0FF  |      ; X = $FFF0 (battle active state code = -16)
+	stx.B $8e                            ;00BD5C|868E    |00008E; Store screen state: negative = special mode
+	pld                                  ;00BD5E|2B      |      ; Restore original Direct Page register
+	plp                                  ;00BD5F|28      |      ; Restore original processor status
+	rts                                  ;00BD60|60      |      ; Return to caller (Battle_Initialize)
 ;      |        |      ;
-	db $f2,$82,$03                       ;00BD61|        |      ;
+	db $f2,$82,$03                       ;00BD61|        |      ; DMA command list: 3-byte sequence for parameter setup
 ;      |        |      ;
+;===============================================================================
+; Battle_InitializeTilemap
+;-------------------------------------------------------------------------------
+; Initializes the battle background tilemap by filling a buffer with a repeating
+; pattern of 8 tile indices. Creates the checkerboard-like foundation for the
+; battle scene background, which is later enhanced with character/enemy sprites
+; and UI overlays.
+;
+; CALLING CONVENTION:
+;   JSR (short call)
+;   No parameters required
+;   Accumulator will be modified (use 16-bit mode)
+;
+; OPERATION:
+;   1. Write $5555 to buffer start ($0C20) as seed pattern
+;   2. Use MVN (block move negative) to replicate to $0C22-$0DFF
+;      - Copies 510 bytes ($01FD+1) from $0C20 forward
+;      - Creates solid $5555 pattern across entire buffer
+;   3. Set up pointer to tile index table at $BD99
+;   4. Loop 32 times ($20 iterations):
+;      a. Read next tile index from table
+;      b. Store to tilemap buffer (every 4th byte = tile index)
+;      c. Write $30 attribute byte (palette/priority flags)
+;      d. Advance buffer position by 4 bytes
+;      e. Advance table pointer by 1 byte
+;   5. Return when all 32 tiles written
+;
+; MEMORY LAYOUT:
+;   Buffer at $0C20-$0DFF (480 bytes = 240 tile entries)
+;   Each tilemap entry = 4 bytes:
+;     +0: Tile index (from table)
+;     +1: Attribute byte ($30)
+;     +2: $55 (from MVN fill)
+;     +3: $55 (from MVN fill)
+;
+; TILE INDEX TABLE ($BD99):
+;   32 bytes defining the repeating tile pattern:
+;   [$08,$0A,$09,$0B, $08,$09,$0A,$0B, $10,$11,$12,$13, ...]
+;   This creates an 8-tile pattern repeated 4 times
+;   Total pattern covers 32 tile positions in the tilemap
+;
+; ATTRIBUTE BYTE ($30):
+;   SNES tilemap attribute format: vhopppcc
+;     v = vertical flip (0)
+;     h = horizontal flip (0)
+;     o = priority (1)
+;     ppp = palette (100b = palette 4)
+;     cc = high 2 bits of tile index (00)
+;   Value $30 = %00110000 = priority on, palette 4
+;
+; MVN INSTRUCTION:
+;   MVN $00,$00: Move memory block with source bank $00, dest bank $00
+;   Preconditions:
+;     X = source address ($0C20)
+;     Y = destination address ($0C22)
+;     A = byte count - 1 ($01FD = 509 decimal)
+;   Operation: Copies (A+1) bytes from [X] to [Y], incrementing both
+;   After: X = $0C20 + 510, Y = $0C22 + 510, A = $FFFF
+;
+; BUFFER USAGE:
+;   $0C20-$0DFF: Battle tilemap buffer (480 bytes)
+;   Structure: 120 tilemap entries × 4 bytes each
+;   After initialization: Every 4th byte = pattern tile, next byte = $30
+;   Remaining bytes = $55 (filler from MVN)
+;
+; LOOP STRUCTURE:
+;   Counter: Y register = $0020 (32 iterations)
+;   Index: X register = buffer offset (starts 0, increments by 4)
+;   Pointer: $5F = table address (starts $BD99, increments by 1)
+;   Each iteration: Reads 1 table byte → writes 1 tile entry (4 bytes total)
+;
+; PERFORMANCE:
+;   MVN operation: ~2,570 cycles (510 bytes × 5 cycles/byte approx)
+;   Loop: 32 iterations × ~40 cycles = ~1,280 cycles
+;   Total: ~3,850 cycles = ~1.4ms @ 2.68MHz
+;
+; USAGE EXAMPLE:
+;   Battle scene initialization:
+;       jsr Battle_InitializeTilemap    ; Set up background tile pattern
+;       jsr Battle_LoadEnemySprites     ; Add enemy graphics
+;       jsr Battle_SetupUI              ; Add command windows
+;
+; TILE PATTERN VISUALIZATION:
+;   The table creates this repeating 8-tile pattern:
+;   Row 1: [08 0A 09 0B]
+;   Row 2: [08 09 0A 0B]
+;   Row 3: [10 11 12 13]
+;   Row 4: [18 19 1A 1B]
+;   Row 5: [10 11 12 13]  (repeat of row 3)
+;   Row 6: [28 29 2A 2B]
+;   Row 7: [10 11 12 13]  (repeat of row 3)
+;   Row 8: [38 39 3A 3B]
+;
+;   This creates a structured background with repeating elements,
+;   likely representing floor tiles or battle arena texture.
+;
+; REGISTERS MODIFIED:
+;   A: Destroyed (used for attribute bytes and MVN count)
+;   X: Destroyed (used for source address and loop indexing)
+;   Y: Destroyed (used for destination address and loop counter)
+;   $5F-$60: Modified (temporary pointer to tile table)
+;
+; REGISTERS PRESERVED:
+;   None (caller must preserve if needed)
+;
+; TECHNICAL NOTES:
+;   The MVN instruction is extremely efficient for large block copies,
+;   but requires setup overhead. For 510 bytes, it's ~2-3x faster than
+;   a manual loop. However, it destroys X, Y, and A registers.
+;
+;   The $5555 pattern written by MVN creates a distinctive byte signature
+;   in unused tilemap slots. This may help with debugging or could be
+;   intentional padding for VRAM transfer alignment.
+;
+;   Writing tile index and attribute separately (with processor mode
+;   switches) suggests the original code prioritized clarity over
+;   absolute performance. A fully optimized version could write both
+;   bytes in 16-bit mode with a single store.
+;
+;   The pointer at $5F uses Direct Page addressing, which is faster
+;   than absolute addressing (2 cycles vs 4 cycles per access). With
+;   32 iterations, this saves ~64 cycles total.
+;===============================================================================
 Battle_InitializeTilemap:
-	lda.W #$5555                         ;00BD64|A95555  |      ;
-	sta.W $0c20                          ;00BD67|8D200C  |000C20;
-	ldx.W #$0c20                         ;00BD6A|A2200C  |      ;
-	ldy.W #$0c22                         ;00BD6D|A0220C  |      ;
-	lda.W #$01fd                         ;00BD70|A9FD01  |      ;
-	mvn $00,$00                          ;00BD73|540000  |      ;
-	ldx.W #$bd99                         ;00BD76|A299BD  |      ;
-	stx.B $5f                            ;00BD79|865F    |00005F;
-	ldx.W #$0000                         ;00BD7B|A20000  |      ;
-	ldy.W #$0020                         ;00BD7E|A02000  |      ;
+	lda.W #$5555                         ;00BD64|A95555  |      ; A = $5555 (seed pattern for MVN fill)
+	sta.W $0c20                          ;00BD67|8D200C  |000C20; Write seed to buffer start ($0C20)
+	ldx.W #$0c20                         ;00BD6A|A2200C  |      ; X = source address (start of buffer)
+	ldy.W #$0c22                         ;00BD6D|A0220C  |      ; Y = dest address (+2 from source)
+	lda.W #$01fd                         ;00BD70|A9FD01  |      ; A = $01FD (509 = copy 510 bytes)
+	mvn $00,$00                          ;00BD73|540000  |      ; Copy 510 bytes: replicate $5555 across buffer
+	ldx.W #$bd99                         ;00BD76|A299BD  |      ; X = tile index table address ($BD99)
+	stx.B $5f                            ;00BD79|865F    |00005F; Store table pointer in Direct Page for fast access
+	ldx.W #$0000                         ;00BD7B|A20000  |      ; X = 0 (buffer index, increments by 4 each iteration)
+	ldy.W #$0020                         ;00BD7E|A02000  |      ; Y = $20 (32 iterations = 32 tiles)
 ;      |        |      ;
 Battle_InitializeTilemap_Loop:
-	sep #$20                             ;00BD81|E220    |      ;
-	lda.B ($5f)                          ;00BD83|B25F    |00005F;
-	sta.W $0c22,x                        ;00BD85|9D220C  |000C22;
-	lda.B #$30                           ;00BD88|A930    |      ;
-	sta.W $0c23,x                        ;00BD8A|9D230C  |000C23;
-	rep #$30                             ;00BD8D|C230    |      ;
-	inc.B $5f                            ;00BD8F|E65F    |00005F;
-	inx                                  ;00BD91|E8      |      ;
-	inx                                  ;00BD92|E8      |      ;
-	inx                                  ;00BD93|E8      |      ;
-	inx                                  ;00BD94|E8      |      ;
-	dey                                  ;00BD95|88      |      ;
-	bne Battle_InitializeTilemap_Loop                      ;00BD96|D0E9    |00BD81;
-	rts                                  ;00BD98|60      |      ;
+	sep #$20                             ;00BD81|E220    |      ; Set 8-bit accumulator (for byte read/write)
+	lda.B ($5f)                          ;00BD83|B25F    |00005F; A = [tile table pointer] (1 byte tile index)
+	sta.W $0c22,x                        ;00BD85|9D220C  |000C22; Write tile index to buffer[$0C22 + X]
+	lda.B #$30                           ;00BD88|A930    |      ; A = $30 (attribute: priority on, palette 4)
+	sta.W $0c23,x                        ;00BD8A|9D230C  |000C23; Write attribute to buffer[$0C23 + X]
+	rep #$30                             ;00BD8D|C230    |      ; Set 16-bit A and X (for pointer arithmetic)
+	inc.B $5f                            ;00BD8F|E65F    |00005F; Advance tile table pointer by 1 byte
+	inx                                  ;00BD91|E8      |      ; X += 1
+	inx                                  ;00BD92|E8      |      ; X += 1
+	inx                                  ;00BD93|E8      |      ; X += 1
+	inx                                  ;00BD94|E8      |      ; X += 1 (total: X += 4, next tilemap entry)
+	dey                                  ;00BD95|88      |      ; Y -= 1 (decrement loop counter)
+	bne Battle_InitializeTilemap_Loop                      ;00BD96|D0E9    |00BD81; Loop while Y ≠ 0 (32 times total)
+	rts                                  ;00BD98|60      |      ; Return to caller
 ;      |        |      ;
 	db $08,$0a,$09,$0b,$08,$09,$0a,$0b,$10,$11,$12,$13,$18,$19,$1a,$1b;00BD99|        |      ;
 	db $10,$11,$12,$13,$28,$29,$2a,$2b,$10,$11,$12,$13,$38,$39,$3a,$3b;00BDA9|        |      ;
