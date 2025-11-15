@@ -59,7 +59,7 @@ Event_SetupCommon:
 	and.B #$cf                           ;0B8057|29CF    |      ;
 	ora.B #$10                           ;0B8059|0910    |      ;
 	sta.w !battle_unit_flags,x                        ;0B805B|9D801A  |0B1A80;
-	lda.W $1a82,x                        ;0B805E|BD821A  |0B1A82;
+	lda.w !battle_unit_flags_ext,x                        ;0B805E|BD821A  |0B1A82;
 	rep #$30                             ;0B8061|C230    |      ;
 	and.W #$00ff                         ;0B8063|29FF00  |      ;
 	asl a;0B8066|0A      |      ;
@@ -112,7 +112,7 @@ BattleEvent_Return:
 	lda.w !battle_unit_flags,x                        ;0B80B9|BD801A  |001A80;
 	and.B #$cf                           ;0B80BC|29CF    |      ;
 	sta.w !battle_unit_flags,x                        ;0B80BE|9D801A  |001A80;
-	lda.W $1a82,x                        ;0B80C1|BD821A  |001A82;
+	lda.w !battle_unit_flags_ext,x                        ;0B80C1|BD821A  |001A82;
 	rep #$30                             ;0B80C4|C230    |      ;
 	and.W #$00ff                         ;0B80C6|29FF00  |      ;
 	asl a;0B80C9|0A      |      ;
@@ -204,7 +204,7 @@ InitBattleGraphics:
 	lda.B #$80                           ;0B814C|A980    |      ;
 	sta.w !battle_state_flag                          ;0B814E|8DA519  |0119A5;
 	lda.B #$01                           ;0B8151|A901    |      ;
-	sta.W $1a45                          ;0B8153|8D451A  |011A45;
+	sta.w !sprite_control                          ;0B8153|8D451A  |011A45;
 	ldx.w !battle_array_elem_4                          ;0B8156|AEF119  |0119F1;
 	stx.W $0e89                          ;0B8159|8E890E  |010E89;
 	lda.w !battle_current_enemy                          ;0B815C|ADF019  |0119F0;
@@ -212,7 +212,7 @@ InitBattleGraphics:
 	bne LoadEnemyTileData                      ;0B8162|D041    |0B81A5;
 	lda.B #$f2                           ;0B8164|A9F2    |      ;
 	jsl.L PlaySoundEffectBank                    ;0B8166|226B9700|00976B;
-	stz.W $1a5b                          ;0B816A|9C5B1A  |011A5B;
+	stz.w !world_map_flag                          ;0B816A|9C5B1A  |011A5B;
 	lda.W $0e88                          ;0B816D|AD880E  |010E88;
 	rep #$20                             ;0B8170|C220    |      ;
 	and.W #$00ff                         ;0B8172|29FF00  |      ;
@@ -291,19 +291,19 @@ LoadSampleLoop:
 	sep #$20                             ;0B8205|E220    |      ;
 ;      |        |      ;
 LoadEnemyRemap:
-	stx.W $19b9                          ;0B8207|8EB919  |0119B9;
-	lda.W $1916                          ;0B820A|AD1619  |011916;
+	stx.w !source_pointer                          ;0B8207|8EB919  |0119B9;
+	lda.w !battle_gfx_config                          ;0B820A|AD1619  |011916;
 	and.B #$e0                           ;0B820D|29E0    |      ;
 	lsr a;0B820F|4A      |      ;
 	lsr a;0B8210|4A      |      ;
 	lsr a;0B8211|4A      |      ;
-	sta.W $1a55                          ;0B8212|8D551A  |011A55;
+	sta.w !layer_flags                          ;0B8212|8D551A  |011A55;
 	lda.W $1915                          ;0B8215|AD1519  |011915;
 	and.B #$e0                           ;0B8218|29E0    |      ;
-	ora.W $1a55                          ;0B821A|0D551A  |011A55;
+	ora.w !layer_flags                          ;0B821A|0D551A  |011A55;
 	lsr a;0B821D|4A      |      ;
 	lsr a;0B821E|4A      |      ;
-	sta.W $1a55                          ;0B821F|8D551A  |011A55;
+	sta.w !layer_flags                          ;0B821F|8D551A  |011A55;
 	rtl                                  ;0B8222|6B      |      ;
 ;      |        |      ;
 ;      |        |      ;
@@ -323,14 +323,14 @@ InitMapLoop:
 	inx                                  ;0B8237|E8      |      ;
 	cpx.W #$000b                         ;0B8238|E00B00  |      ;
 	bne InitMapLoop                      ;0B823B|D0F4    |0B8231;
-	lda.W $1a55                          ;0B823D|AD551A  |0B1A55;
+	lda.w !layer_flags                          ;0B823D|AD551A  |0B1A55;
 	beq InitMap_Return                      ;0B8240|F052    |0B8294;
 	dec a;0B8242|3A      |      ;
 	asl a;0B8243|0A      |      ;
 	asl a;0B8244|0A      |      ;
 	tax                                  ;0B8245|AA      |      ;
 	lda.W DATA8_0b8450,x                 ;0B8246|BD5084  |0B8450;
-	sta.W $1a55                          ;0B8249|8D551A  |0B1A55;
+	sta.w !layer_flags                          ;0B8249|8D551A  |0B1A55;
 	lda.W DATA8_0b8451,x                 ;0B824C|BD5184  |0B8451;
 	sta.W $1a56                          ;0B824F|8D561A  |0B1A56;
 	lda.W DATA8_0b8452,x                 ;0B8252|BD5284  |0B8452;
@@ -338,7 +338,7 @@ InitMapLoop:
 	lda.W DATA8_0b844f,x                 ;0B8258|BD4F84  |0B844F;
 	pha                                  ;0B825B|48      |      ;
 	and.B #$07                           ;0B825C|2907    |      ;
-	sta.W $1a4c                          ;0B825E|8D4C1A  |0B1A4C;
+	sta.w !gfx_mode_control                          ;0B825E|8D4C1A  |0B1A4C;
 	pla                                  ;0B8261|68      |      ;
 	and.B #$70                           ;0B8262|2970    |      ;
 	lsr a;0B8264|4A      |      ;
@@ -347,7 +347,7 @@ InitMapLoop:
 	lda.W DATA8_0b84df,x                 ;0B8267|BDDF84  |0B84DF;
 	sta.W $1a50                          ;0B826A|8D501A  |0B1A50;
 	lda.W DATA8_0b84e0,x                 ;0B826D|BDE084  |0B84E0;
-	sta.W $1a51                          ;0B8270|8D511A  |0B1A51;
+	sta.w !buffer_state                          ;0B8270|8D511A  |0B1A51;
 	lda.W DATA8_0b84e2,x                 ;0B8273|BDE284  |0B84E2;
 	sta.W $1a4f                          ;0B8276|8D4F1A  |0B1A4F;
 	lda.W DATA8_0b84e1,x                 ;0B8279|BDE184  |0B84E1;
@@ -597,7 +597,7 @@ SetupBattleDisplay:
 	sta.W SNES_TS                          ;0B8431|8D2D21  |01212D;
 	lda.W $1a50                          ;0B8434|AD501A  |011A50;
 	sta.W SNES_CGSWSEL                          ;0B8437|8D3021  |012130;
-	ldy.W $1a51                          ;0B843A|AC511A  |011A51;
+	ldy.w !buffer_state                          ;0B843A|AC511A  |011A51;
 	lda.w !movement_state                          ;0B843D|ADCB19  |0119CB;
 	and.B #$70                           ;0B8440|2970    |      ;
 	cmp.B #$70                           ;0B8442|C970    |      ;
@@ -693,7 +693,7 @@ UNREACH_0B8540:
 ProcessAnimationFrame:
 	lda.B #$00                           ;0B8560|A900    |      ;
 	xba                                  ;0B8562|EB      |      ;
-	lda.W $1a4c                          ;0B8563|AD4C1A  |011A4C;
+	lda.w !gfx_mode_control                          ;0B8563|AD4C1A  |011A4C;
 	asl a;0B8566|0A      |      ;
 	tax                                  ;0B8567|AA      |      ;
 	jsr.W (DATA8_0b856c,x)               ;0B8568|FC6C85  |0B856C;
@@ -703,7 +703,7 @@ ProcessAnimationFrame:
 DATA8_0b856c:
 	db $33,$86,$7a,$85,$bf,$85,$33,$86,$34,$86,$2e,$86;0B856C|        |      ;
 	db $bf,$85                           ;0B8578|        |55AD85;
-	lda.W $1a55                          ;0B857A|AD551A  |011A55;
+	lda.w !layer_flags                          ;0B857A|AD551A  |011A55;
 	bpl ProcessAnimation_Return                      ;0B857D|103F    |0B85BE;
 	ldx.W #$1000                         ;0B857F|A20010  |      ;
 	stx.W $1a4a                          ;0B8582|8E4A1A  |011A4A;
@@ -743,7 +743,7 @@ ProcessAnimation_Return:
 	rep #$20                             ;0B85D0|C220    |      ;
 	lda.W $2134                          ;0B85D2|AD3421  |012134;
 	and.W #$01f8                         ;0B85D5|29F801  |      ;
-	sta.W $1904                          ;0B85D8|8D0419  |011904;
+	sta.w !battle_actor1_x                          ;0B85D8|8D0419  |011904;
 	sep #$20                             ;0B85DB|E220    |      ;
 	lda.B #$08                           ;0B85DD|A908    |      ;
 	sta.W SNES_M7A                          ;0B85DF|8D1B21  |01211B;
@@ -757,9 +757,9 @@ ProcessAnimation_Return:
 	clc                                  ;0B85F3|18      |      ;
 	adc.W $1a56                          ;0B85F4|6D561A  |011A56;
 	and.W #$01f8                         ;0B85F7|29F801  |      ;
-	sta.W $1906                          ;0B85FA|8D0619  |011906;
+	sta.w !battle_actor1_y                          ;0B85FA|8D0619  |011906;
 	sep #$20                             ;0B85FD|E220    |      ;
-	lda.W $1a55                          ;0B85FF|AD551A  |011A55;
+	lda.w !layer_flags                          ;0B85FF|AD551A  |011A55;
 	and.B #$3f                           ;0B8602|293F    |      ;
 	sta.W $4202                          ;0B8604|8D0242  |014202;
 	lda.B #$03                           ;0B8607|A903    |      ;

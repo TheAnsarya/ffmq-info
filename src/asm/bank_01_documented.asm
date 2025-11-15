@@ -9537,7 +9537,7 @@ Execute_Graphics_Completion:
 	sta.w $1a2c	 ; Store graphics completion mode
 	lda.w !coord_finalize_data	 ; Load graphics completion reference
 	sta.w !coord_modifier	 ; Store graphics completion context
-	lda.w $1a55	 ; Load graphics completion validation
+	lda.w !layer_flags	 ; Load graphics completion validation
 	jsr.w ExecuteGraphicsCompletionValidation ; Execute graphics completion validation
 	ldy.w #$0000	; Initialize graphics completion index
 	rep #$20		; Set 16-bit accumulator mode

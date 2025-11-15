@@ -100,7 +100,7 @@ BattleSprite_AnimationHandler:
 	and.b #$cf	  ;0B8057	; Mask off animation bits
 	ora.b #$10	  ;0B8059	; Set animation active flag
 	sta.w !battle_unit_flags,x   ;0B805B	; Store updated flags
-	lda.w $1a82,x   ;0B805E	; Load animation ID
+	lda.w !battle_unit_flags_ext,x   ;0B805E	; Load animation ID
 	rep #$30		;0B8061	; 16-bit mode
 	and.w #$00ff	;0B8063	; Mask to byte
 	asl a;0B8066	; Multiply by 2
@@ -303,7 +303,7 @@ BattleGfx_CommonSetup_1:	; Common bank setup
 	sta.w !battle_unit_flags,x   ; Store updated attributes
 
 ; Load animation frame data
-	lda.w $1a82,x   ; Load animation frame index
+	lda.w !battle_unit_flags_ext,x   ; Load animation frame index
 	rep #$30		; Set A/X/Y to 16-bit mode
 	and.w #$00ff	; Mask to 8-bit value
 	asl a; Multiply by 2 (word table)
@@ -374,7 +374,7 @@ BattleSprite_AnimationExit_1:	; Exit routine
 	sta.w !battle_unit_flags,x   ; Store cleared attributes
 
 ; Load animation frame (no offset added this time)
-	lda.w $1a82,x   ; Load animation frame index
+	lda.w !battle_unit_flags_ext,x   ; Load animation frame index
 	rep #$30		; Set A/X/Y to 16-bit mode
 	and.w #$00ff	; Mask to 8-bit value
 	asl a; Multiply by 2 (word table)
@@ -548,7 +548,7 @@ BattleInit_SetupEncounter:
 	lda.b #$80	  ; Battle active flag
 	sta.w !battle_state_flag	 ; Set battle state flag to active ($80)
 	lda.b #$01	  ; Animation enable
-	sta.w $1a45	 ; Store to animation flag
+	sta.w !sprite_control	 ; Store to animation flag
 	ldx.w !battle_array_elem_4	 ; Load enemy formation ID (16-bit)
 	stx.w !env_coord_x	 ; Store to formation pointer
 	lda.w !battle_current_enemy	 ; Load enemy formation bank
@@ -558,7 +558,7 @@ BattleInit_SetupEncounter:
 ; Standard formation loading
 	lda.b #$f2	  ; Sound effect ID ($f2 = battle start fanfare)
 	jsl.l PlaySoundEffectBank ; Play sound effect (Bank $00)
-	stz.w $1a5b	 ; Clear sprite animation index
+	stz.w !world_map_flag	 ; Clear sprite animation index
 	lda.w !env_context_value	 ; Load formation type
 	rep #$20		; Set A to 16-bit mode
 	and.w #$00ff	; Mask to 8-bit value
@@ -645,21 +645,21 @@ BattleInit_CopyEnemyExtendedData:	; Copy extended enemy data (10 bytes)
 	sep #$20		; Set A to 8-bit mode
 
 BattleInit_SetupEnemyPalette:
-	stx.w $19b9	 ; Store enemy graphics pointer
+	stx.w !source_pointer	 ; Store enemy graphics pointer
 
 ; Extract palette bits from enemy attributes
-	lda.w $1916	 ; Load enemy attribute byte 1
+	lda.w !battle_gfx_config	 ; Load enemy attribute byte 1
 	and.b #$e0	  ; Mask bits 5-7 (palette high bits)
 	lsr a; Shift right 3 times (move to low bits)
 	lsr a
 	lsr a
-	sta.w $1a55	 ; Store palette high bits
+	sta.w !layer_flags	 ; Store palette high bits
 	lda.w $1915	 ; Load enemy attribute byte 2
 	and.b #$e0	  ; Mask bits 5-7 (palette low bits)
-	ora.w $1a55	 ; Combine with high bits
+	ora.w !layer_flags	 ; Combine with high bits
 	lsr a; Shift right 2 more times
 	lsr a; Final palette value = bits combined >> 2
-	sta.w $1a55	 ; Store final palette index
+	sta.w !layer_flags	 ; Store final palette index
 	rtl ; Return to caller
 
 ; -----------------------------------------------------------------------------
@@ -702,7 +702,7 @@ BattleGfx_CopyDefaults:	; Copy default values loop
 	cpx.w #$000b	; Copied 11 bytes?
 	bne BattleGfx_CopyDefaults ; Loop until complete
 
-	lda.w $1a55	 ; Load background type index
+	lda.w !layer_flags	 ; Load background type index
 	beq BattleGfx_LayerExit ; Exit if 0 (no special background)
 
 ; Special background setup (complex multi-table lookup)
@@ -713,7 +713,7 @@ BattleGfx_CopyDefaults:	; Copy default values loop
 
 ; Load 3 bytes from primary table
 	lda.w DATA8_0b8450,x ; Load byte 0
-	sta.w $1a55	 ; Store background param 0
+	sta.w !layer_flags	 ; Store background param 0
 	lda.w DATA8_0b8451,x ; Load byte 1
 	sta.w $1a56	 ; Store background param 1
 	lda.w DATA8_0b8452,x ; Load byte 2
@@ -723,7 +723,7 @@ BattleGfx_CopyDefaults:	; Copy default values loop
 	lda.w DATA8_0b844f,x ; Load attribute byte
 	pha ; Save it
 	and.b #$07	  ; Mask bits 0-2
-	sta.w $1a4c	 ; Store layer type (0-7)
+	sta.w !gfx_mode_control	 ; Store layer type (0-7)
 	pla ; Restore attribute
 	and.b #$70	  ; Mask bits 4-6 (palette bits)
 	lsr a; Shift right twice (divide by 4)
@@ -734,7 +734,7 @@ BattleGfx_CopyDefaults:	; Copy default values loop
 	lda.w DATA8_0b84df,x ; Load config byte 0
 	sta.w $1a50	 ; Store layer config 0
 	lda.w DATA8_0b84e0,x ; Load config byte 1
-	sta.w $1a51	 ; Store layer config 1
+	sta.w !buffer_state	 ; Store layer config 1
 	lda.w DATA8_0b84e2,x ; Load config byte 2
 	sta.w $1a4f	 ; Store layer priority
 
@@ -1151,7 +1151,7 @@ BattlePPU_ConfigureRegisters:
 	sta.w $2130	 ; Write to color math register
 
 ; Special handling for battle mode $70
-	ldy.w $1a51	 ; Load color math mode config
+	ldy.w !buffer_state	 ; Load color math mode config
 	lda.w !ram_19cb	 ; Load battle mode flags
 	and.b #$70	  ; Check bits 4-6
 	cmp.b #$70	  ; All three bits set?
@@ -1314,7 +1314,7 @@ Battle_TileStride:
 BattleLayer_TypeDispatcher:
 	lda.b #$00	  ; Clear A high byte
 	xba ; Prepare for 16-bit index
-	lda.w $1a4c	 ; Load layer type
+	lda.w !gfx_mode_control	 ; Load layer type
 	asl a; Multiply by 2 (word table)
 	tax ; Transfer to X
 	jsr.w (DATA8_0b856c,x) ; Indirect jump to handler
@@ -1336,7 +1336,7 @@ DATA8_0b856c:
 ; Purpose: Configure static background graphics
 ; Special handling for negative $1a55 (special background flag)
 
-	lda.w $1a55	 ; Load background ID
+	lda.w !layer_flags	 ; Load background ID
 	bpl SkipSpecialSetupIfPositive ; Skip special setup if positive
 
 ; Special background setup
