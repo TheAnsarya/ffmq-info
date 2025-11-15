@@ -374,6 +374,25 @@
 !battle_scene_mode      = $1937     ; Battle scene/transition mode parameter
 !battle_character_param = $1938     ; Battle character/unit parameter (stats pointer etc.)
 
+; === Battle Graphics & Indexing ($1900, $1919, $1926, $1928, $192a) ===
+!battle_actor0_base_x   = $1900     ; Battle actor 0 base X position (modified during rendering)
+!battle_gfx_temp        = $1919     ; Battle graphics temporary storage
+!battle_gfx_flags       = $1926     ; Battle graphics flags/state (decremented in loops)
+!battle_render_temp     = $1928     ; Battle rendering temporary value
+!battle_phase           = $192a     ; Battle phase/state counter (incremented)
+
+; === Battle Unit Extended Data ($1a7e, $1a81, $1a85, $1a87) ===
+!battle_unit_data       = $1a7e     ; Battle unit extended data (indexed by X)
+!battle_unit_state      = $1a81     ; Battle unit state flags (indexed by X)
+!battle_unit_coord_lo   = $1a85     ; Battle unit coordinate low byte (indexed by X)
+!battle_unit_coord_hi   = $1a87     ; Battle unit coordinate high byte (indexed by X)
+
+; === Battle Graphics Pointers ($19e2, $19e7, $19e8, $19ea) ===
+!battle_gfx_pointer     = $19e2     ; Battle graphics pointer/index (cleared/set in loops)
+!battle_state_param     = $19e7     ; Battle state parameter (stored/loaded frequently)
+!battle_index_x         = $19e8     ; Battle graphics index X register backup
+!battle_index_temp      = $19ea     ; Battle graphics index temporary storage
+
 ; === Battle Graphics & Formation System ($19eb-$19f8) ===
 !formation_valid_flag   = $19eb     ; Formation validation/position flag
 !battle_gfx_index       = $19ee     ; Battle graphics index (masked/combined)
@@ -446,6 +465,31 @@
 ; === Environment State System ($1030-$1031) ===
 !env_counter            = $1030     ; Environment counter (decremented)
 !location_identifier    = $1031     ; Location identifier (range #$20-$2c)
+
+; === Character Direct Page Pointers ($1000, $1080, $1032-$1033) ===
+!char1_data_page        = $1000     ; Character 1 direct page base pointer
+!char2_data_page        = $1080     ; Character 2 direct page base pointer
+!char_x_pos             = $1032     ; Character X position (field/menu context)
+!char_y_pos             = $1033     ; Character Y position (field/menu context)
+
+; === Character Stats in Direct Page ($1014-$1021, $1094-$10a1) ===
+; Accessed via character base pointers ($1000 or $1080)
+!char1_current_hp       = $1014     ; Character 1 current HP (16-bit)
+!char1_max_hp           = $1016     ; Character 1 maximum HP (16-bit)
+!char1_current_mp       = $1018     ; Character 1 current MP
+!char1_status           = $1021     ; Character 1 status flags
+!char1_spell_equipped   = $1038     ; Character 1 spell equipped flags
+!char1_cursor_pos       = $10b1     ; Character 1 cursor position (menu)
+
+!char2_current_hp       = $1094     ; Character 2 current HP (16-bit)
+!char2_max_hp           = $1096     ; Character 2 maximum HP (16-bit)
+!char2_current_mp       = $1098     ; Character 2 current MP
+!char2_companion_id     = $1090     ; Character 2 companion ID/type
+!char2_status           = $10a1     ; Character 2 status flags
+!char2_active_flag      = $10a0     ; Character 2 active/display flag
+
+; === Character Name Buffer ($1100) ===
+!char_name_buffer       = $1100     ; Character name text buffer (indexed access)
 
 ; === Battle Graphics Index System ($1916) ===
 !battle_gfx_config      = $1916     ; Battle graphics configuration (masked #$e0/#$1f)

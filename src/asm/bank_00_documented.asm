@@ -1206,9 +1206,9 @@ Init_VBlankDMA:
 ; ---------------------------------------------------------------------------
 
 	lda.w #$00ff	; A = $00ff
-	sta.w $1090	 ; [$1090] = $00ff (character state?)
-	sta.w $10a1	 ; [$10a1] = $00ff
-	sta.w $10a0	 ; [$10a0] = $00ff (active character?)
+	sta.w !char2_companion_id	 ; [$1090] = $00ff (character state?)
+	sta.w !char2_status	 ; [$10a1] = $00ff
+	sta.w !char2_active_flag	 ; [$10a0] = $00ff (active character?)
 
 ; ---------------------------------------------------------------------------
 ; Load Configuration from ROM
@@ -1782,7 +1782,7 @@ NMI_AlternateTransfer:
 ; Different Y positions use different graphics data
 ; ---------------------------------------------------------------------------
 
-	lda.w $1031	 ; A = [$1031] (Y position)
+	lda.w !location_identifier	 ; A = [$1031] (Y position)
 
 	ldx.w #$c708	; X = $c708 (default source 1)
 	cmp.b #$26	  ; Compare Y with $26
@@ -3557,13 +3557,13 @@ Input_ButtonA_ToggleStatus:
 	bne Input_ButtonA_Exit ; If blocked → Exit
 
 ; Check if in valid screen position
-	lda.w $1090	 ; A = [$1090] (screen mode/position)
+	lda.w !char2_companion_id	 ; A = [$1090] (screen mode/position)
 	bmi Input_ButtonA_Alternate ; If negative → Call alternate handler
 
 ; Toggle character status display
-	lda.w $10a0	 ; A = [$10a0] (character display flags)
+	lda.w !char2_active_flag	 ; A = [$10a0] (character display flags)
 	eor.b #$80	  ; Toggle bit 7
-	sta.w $10a0	 ; Save new flag state
+	sta.w !char2_active_flag	 ; Save new flag state
 
 	lda.b #$40	  ; A = $40 (bit 6)
 	tsb.w $00d4	 ; Set bit 6 of $00d4 (update needed)
@@ -3593,11 +3593,11 @@ Menu_CheckCharPosition:
 ;   Otherwise → Call B908
 ; ===========================================================================
 
-	lda.w $1032	 ; A = [$1032] (X position)
+	lda.w !char_x_pos	 ; A = [$1032] (X position)
 	cmp.b #$80	  ; Compare with $80
 	bne Menu_CheckCharPosition_Normal ; If not $80 → Jump to B908
 
-	lda.w $1033	 ; A = [$1033] (Y position)
+	lda.w !char_y_pos	 ; A = [$1033] (Y position)
 	bne Menu_CheckCharPosition_Normal ; If not $00 → Jump to B908
 
 	jmp.w AlternateCharacterUpdateRoutine ; Special position → Call B912
@@ -3626,7 +3626,7 @@ Menu_NavCharUp:
 ; Calculate Current Character Index
 ; ---------------------------------------------------------------------------
 
-	lda.w $1031	 ; A = [$1031] (Y position)
+	lda.w !location_identifier	 ; A = [$1031] (Y position)
 	sec ; Set carry for subtraction
 	sbc.b #$20	  ; A = Y - $20 (base offset)
 
@@ -3685,7 +3685,7 @@ Menu_NavCharDown:
 
 	jsr.w Menu_CheckCharPosition ; Validate character position
 
-	lda.w $1031	 ; A = [$1031] (Y position)
+	lda.w !location_identifier	 ; A = [$1031] (Y position)
 	sec ; Set carry
 	sbc.b #$20	  ; A = Y - $20 (base offset)
 
@@ -4119,7 +4119,7 @@ Tilemap_RefreshLayer0:
 	php ; Save processor status
 	sep #$30		; 8-bit A, X, Y
 
-	ldx.w $1031	 ; X = character Y position
+	ldx.w !location_identifier	 ; X = character Y position
 	cpx.b #$ff	  ; Check if invalid position
 	beq UNREACH_008C81 ; If $ff → Exit (invalid)
 
@@ -4204,7 +4204,7 @@ Tilemap_RefreshLayer0_Field:
 
 	rep #$10		; 16-bit X, Y
 
-	lda.w $1031	 ; A = character Y position
+	lda.w !location_identifier	 ; A = character Y position
 	jsr.w Tilemap_CalcRowAddress ; Calculate tilemap address
 	stx.w $00f2	 ; [$00f2] = tilemap address
 
@@ -4389,7 +4389,7 @@ Tilemap_RefreshLayer1:
 ; Battle Mode Layer Update
 ; ---------------------------------------------------------------------------
 
-	ldx.w $10b1	 ; X = [$10b1] (cursor position)
+	ldx.w !char1_cursor_pos	 ; X = [$10b1] (cursor position)
 	cpx.b #$ff	  ; Check if invalid
 	beq Tilemap_RefreshLayer1_Exit ; If $ff → Exit
 
@@ -4435,7 +4435,7 @@ Tilemap_RefreshLayer1_Field:
 ; Field Mode Layer Update
 ; ===========================================================================
 
-	ldx.w $10b1	 ; X = cursor position
+	ldx.w !char1_cursor_pos	 ; X = cursor position
 	lda.l DATA8_049800,x ; A = base tile
 	asl a; A × 2
 	asl a; A × 4
@@ -4443,7 +4443,7 @@ Tilemap_RefreshLayer1_Field:
 
 	rep #$10		; 16-bit X, Y
 
-	lda.w $10b1	 ; A = cursor position
+	lda.w !char1_cursor_pos	 ; A = cursor position
 	jsr.w Tilemap_CalcRowAddress ; Calculate tilemap address
 	stx.w $00f5	 ; Save address
 
@@ -4510,12 +4510,12 @@ Party_ValidateCharPos:
 ;   $1031 = Updated position after validation
 ; ===========================================================================
 
-	lda.w $1031	 ; Get current character position
+	lda.w !location_identifier	 ; Get current character position
 	pha ; Save it
 	lda.w #$0003	; A = 3 (check 3 party slots)
 	jsr.w Party_CheckAvailability ; Validate party member
 	pla ; Restore original position
-	sta.w $1031	 ; Store back to $1031
+	sta.w !location_identifier	 ; Store back to $1031
 	sty.b $9e	   ; Save validated position to $9e
 	rts ; Return
 
@@ -4556,9 +4556,9 @@ Party_CheckAvailability:
 	adc.b #$04	  ; A = 4 - count (bit shift count)
 	tax ; X = shift count
 
-	lda.w $1032	 ; Get status flags (high byte)
+	lda.w !char_x_pos	 ; Get status flags (high byte)
 	xba ; Swap to low byte
-	lda.w $1033	 ; Get status flags (low byte)
+	lda.w !char_y_pos	 ; Get status flags (low byte)
 	rep #$20		; 16-bit A
 	sep #$10		; 8-bit X, Y
 	lsr a; Shift right (first bit)
@@ -4581,7 +4581,7 @@ Party_CheckAvailability_ShiftLoop:
 	ldy.b #$ff	  ; No valid members → $ff
 
 Party_CheckAvailability_Found:
-	sty.w $1031	 ; Store validated position
+	sty.w !location_identifier	 ; Store validated position
 	plp ; Restore processor status
 	rts ; Return
 
@@ -5061,7 +5061,7 @@ Status_InitDisplay:
 	phk ; Push program bank
 	plb ; Data bank = program bank
 	sep #$30		; 8-bit mode
-	pea.w $1000	 ; Push $1000
+	pea.w !char1_data_page	 ; Push $1000
 	pld ; Direct Page = $1000 (party data)
 
 ; Process party status bits (high nibble of $1032)
@@ -5132,7 +5132,7 @@ Skip_Status_Group4:
 	jsr.w Status_RenderCharacter ; Render character status
 
 ; Switch to second character slot data
-	pea.w $1080	 ; Push $1080
+	pea.w !char2_data_page	 ; Push $1080
 	pld ; Direct Page = $1080
 	ldy.b #$50	  ; Y = $50 (display offset)
 	jsr.w Status_RenderCharacter ; Render character status
@@ -5439,12 +5439,12 @@ Char_CalcStats:
 	pea.w $007e	 ; Push $7e to stack
 	plb ; Data Bank = $7e
 	clc ; Clear carry
-	pea.w $1000	 ; Default to character 1 DP ($1000)
+	pea.w !char1_data_page	 ; Default to character 1 DP ($1000)
 	pld ; Direct Page = $1000
 	ldx.b #$00	  ; X = $00 (buffer offset)
 	bit.b #$01	  ; Test bit 0 of $89
 	beq Setup_Done  ; If 0, use first character's DP
-	pea.w $1080	 ; Character 2 DP ($1080)
+	pea.w !char2_data_page	 ; Character 2 DP ($1080)
 	pld ; Direct Page = $1080
 	ldx.b #$50	  ; X = $50 (character 2 buffer offset)
 
@@ -7806,7 +7806,7 @@ Cmd_CopyDisplayState:
 	jsr.w PrepareState ; Prepare state
 	sep #$20		; 8-bit A
 	ldx.w $101b	 ; Load source X
-	stx.w $1018	 ; Copy to destination X
+	stx.w !char1_current_mp	 ; Copy to destination X
 	lda.w $101d	 ; Load source bank
 	sta.w $101a	 ; Copy to destination bank
 	ldx.w $109b	 ; Load source X (second set)
@@ -7821,8 +7821,8 @@ Cmd_CopyDisplayState:
 
 Cmd_CopyAndClearFlags:
 	jsr.w Cmd_CopyDisplayState ; Copy display state
-	stz.w $1021	 ; Clear flag
-	stz.w $10a1	 ; Clear flag
+	stz.w !char1_status	 ; Clear flag
+	stz.w !char2_status	 ; Clear flag
 	rts ; Return
 
 ; ---------------------------------------------------------------------------
@@ -7830,10 +7830,10 @@ Cmd_CopyAndClearFlags:
 ; ---------------------------------------------------------------------------
 
 Cmd_PrepareDisplayState:
-	ldx.w $1016	 ; Load source
-	stx.w $1014	 ; Copy to destination
-	ldx.w $1096	 ; Load source (second set)
-	stx.w $1094	 ; Copy to destination
+	ldx.w !char1_max_hp	 ; Load source
+	stx.w !char1_current_hp	 ; Copy to destination
+	ldx.w !char2_max_hp	 ; Load source (second set)
+	stx.w !char2_current_hp	 ; Copy to destination
 	lda.w #$0003	; Bits 0-1 mask
 	trb.w $102f	 ; Clear bits
 	trb.w $10af	 ; Clear bits
@@ -7847,7 +7847,7 @@ Cmd_PrepareDisplayState:
 
 Cmd_CharacterDMATransfer:
 	lda.w #$0080	; bit 7 mask
-	and.w $10a0	 ; Test character flag
+	and.w !char2_active_flag	 ; Test character flag
 	php ; Save result
 
 ; Read character slot index
@@ -7878,7 +7878,7 @@ Cmd_CharacterDMATransfer:
 	plp ; Restore flags
 	bne SkipIfFlagWasSet ; Skip if flag was set
 	lda.w #$0080	; bit 7 mask
-	trb.w $10a0	 ; Clear character flag
+	trb.w !char2_active_flag	 ; Clear character flag
 
 Cmd_CharDMATransfer_Done:
 	rts ; Return
@@ -11288,7 +11288,7 @@ Text_CalcCentering:
 	stz.b $a0	   ; Clear high byte
 
 Text_CalcCentering_Loop1:
-	lda.w $1100,x   ; Load character from buffer
+	lda.w !char_name_buffer,x   ; Load character from buffer
 	inx ; Next character
 	cmp.b #$80	  ; Check if >= $80
 	bcc Text_CalcCentering_Loop2 ; If < $80, found end of first section
@@ -11302,7 +11302,7 @@ Text_CalcCentering_Loop2:
 	beq Text_CalcCentering_Calc ; If done, exit
 
 Text_CalcCentering_Loop2_Inner:
-	lda.w $1100,x   ; Load character
+	lda.w !char_name_buffer,x   ; Load character
 	inx ; Next character
 	cmp.b #$80	  ; Check if >= $80
 	bcc Text_CalcCentering_Calc ; If < $80, still in second section
@@ -11690,9 +11690,9 @@ Shop_SubtractGold:
 
 Shop_SubtractGold_Alternate:
 	clc ; Clear carry
-	lda.w $1030	 ; Load alternate storage
+	lda.w !env_counter	 ; Load alternate storage
 	adc.w $0162	 ; Add offset
-	sta.w $1030	 ; Store result
+	sta.w !env_counter	 ; Store result
 	bra Shop_SubtractGold_Done ; Restore and return
 
 Menu_ClearCursor:
@@ -12936,7 +12936,7 @@ Menu_PartySelection:
 	stz.b $8e	   ; Clear position low
 	stz.b $8f	   ; Clear position high
 	ldx.w #$0102	; Two options (two characters)
-	lda.w $1090	 ; Check companion status
+	lda.w !char2_companion_id	 ; Check companion status
 	bpl Menu_PartySelection_Init ; Branch if companion present
 	ldx.w #$0101	; One option (solo)
 
@@ -12947,7 +12947,7 @@ Menu_PartySelection_Init:
 	lda.l $7e3664   ; Load last selection
 	beq Menu_PartySelection_Start ; Branch if zero
 	bmi Menu_PartySelection_BattleCheck ; Branch if negative
-	lda.w $1090	 ; Check companion status again
+	lda.w !char2_companion_id	 ; Check companion status again
 	bmi Menu_PartySelection_Start ; Branch if no companion
 	inc.b $01	   ; Select second option
 	bra Menu_PartySelection_Start ; Continue
@@ -13275,7 +13275,7 @@ Menu_Item_Discard_Armor_Execute:
 	dec.w $0e9f,x   ; Decrement quantity
 	tax ; X = item offset
 	sep #$20		; 8-bit accumulator
-	stz.w $1021,x   ; Clear equipped flag
+	stz.w !char1_status,x   ; Clear equipped flag
 	rep #$30		; 16-bit A/X/Y
 	bra Menu_Item_Discard_UpdateDisplay ; Update display
 
@@ -13288,16 +13288,16 @@ Menu_Item_Discard_Consumable:
 Menu_Item_Discard_Consumable_Execute:
 	dec.w $0e9f,x   ; Decrement quantity
 	tax ; X = item offset
-	lda.w $1016,x   ; Load max HP
+	lda.w !char1_max_hp,x   ; Load max HP
 	lsr a; ÷ 4 (HP recovery amount)
 	lsr a
-	adc.w $1014,x   ; Add current HP
-	cmp.w $1016,x   ; Check if exceeds max
+	adc.w !char1_current_hp,x   ; Add current HP
+	cmp.w !char1_max_hp,x   ; Check if exceeds max
 	bcc Menu_Item_StoreHP ; If not, store
-	lda.w $1016,x   ; Use max HP
+	lda.w !char1_max_hp,x   ; Use max HP
 
 Menu_Item_StoreHP:
-	sta.w $1014,x   ; Store new HP
+	sta.w !char1_current_hp,x   ; Store new HP
 	bra Menu_Item_Discard_UpdateDisplay ; Update display
 
 ;-------------------------------------------------------------------------------
@@ -13378,7 +13378,7 @@ Menu_Spell_Slot0Handler:
 	bcc Menu_Spell_ProcessInput          ;00C06D|90D5    |00C044; If < 7, loop
 	jsr.w ConfirmSpellUse                    ;00C06F|20B1C1  |00C1B1; Confirm spell use
 	beq Menu_Spell_ProcessInput          ;00C072|F0D3    |00C047; If cancelled, loop
-	dec.w $1018,x                        ;00C074|DE1810  |011018; Decrement MP
+	dec.w !char1_current_mp,x                        ;00C074|DE1810  |011018; Decrement MP
 	sep #$20                             ;00C077|E220    |      ; 8-bit accumulator
 	lda.b #$14                           ;00C079|A914    |      ; Load spell effect ID
 	sta.w $043a                          ;00C07B|8D3A04  |01043A; Store effect
@@ -13410,7 +13410,7 @@ Menu_Spell_Cancel:
 	beq Menu_Spell_ValidateSlot ; If character 0, branch
 	cmp.w #$0003	; Check if character 3
 	bne Menu_Spell_ErrorSound ; If not, error
-	lda.w $1090	 ; Load companion data
+	lda.w !char2_companion_id	 ; Load companion data
 	and.w #$00ff	; Mask to 8 bits
 	cmp.w #$00ff	; Check if no companion
 	beq Menu_Spell_ErrorSound ; If none, error
@@ -13418,7 +13418,7 @@ Menu_Spell_Cancel:
 
 Menu_Spell_ValidateSlot:
 	tax ; X = character offset
-	lda.w $1021,x   ; Load status flags
+	lda.w !char1_status,x   ; Load status flags
 	and.w #$00f9	; Mask out certain flags
 	bne Menu_Spell_ErrorSound ; If flagged, error
 	lda.w #$0007	; Load 7 (max spell slot -1)
@@ -13426,9 +13426,9 @@ Menu_Spell_ValidateSlot:
 	sbc.b $02	   ; Subtract selection
 	and.w #$00ff	; Mask to 8 bits
 	jsr.w GetBitMask ; Get bit mask
-	and.w $1038,x   ; Test spell equipped
+	and.w !char1_spell_equipped,x   ; Test spell equipped
 	beq Menu_Spell_InvalidSpellJump ; If not equipped, error
-	lda.w $1018,x   ; Load current MP
+	lda.w !char1_current_mp,x   ; Load current MP
 	and.w #$00ff	; Mask to 8 bits
 	beq Menu_Spell_InvalidSpellJump ; If no MP, error
 	lda.b $02	   ; Load spell slot
@@ -13442,15 +13442,15 @@ Menu_Spell_ValidateSlot:
 	cmp.w #$0001	; Check result
 	beq Menu_Spell_DecrementMP_Char0 ; If 1, branch
 	tax ; X = character offset
-	lda.w $1016	 ; Load max HP
-	sta.w $1014	 ; Restore to full HP
+	lda.w !char1_max_hp	 ; Load max HP
+	sta.w !char1_current_hp	 ; Restore to full HP
 	txa ; A = character offset
 
 Menu_Spell_DecrementMP_Char0:
 	cmp.w #$0000	; Check if character 0
 	beq Menu_Spell_DecrementMP_Main ; If yes, skip
-	lda.w $1096	 ; Load companion max HP
-	sta.w $1094	 ; Restore companion HP
+	lda.w !char2_max_hp	 ; Load companion max HP
+	sta.w !char2_current_hp	 ; Restore companion HP
 
 Menu_Spell_DecrementMP_Main:
 	sep #$20		; 8-bit accumulator
@@ -13460,7 +13460,7 @@ Menu_Spell_DecrementMP_Main:
 	ldx.w #$0080	; Companion offset
 
 Menu_Spell_DecrementMP_Do:
-	dec.w $1018,x   ; Decrement MP
+	dec.w !char1_current_mp,x   ; Decrement MP
 	lda.w $04df	 ; Load character ID
 	sta.w $0505	 ; Store in $0505
 	rep #$30		; 16-bit A/X/Y
@@ -13474,12 +13474,12 @@ Menu_Spell_UseCure:
 	sep #$20		; 8-bit accumulator
 	cmp.b #$01	  ; Check result
 	beq Menu_Spell_CureCompanion ; If 1, branch
-	stz.w $1021	 ; Clear status (char 0)
+	stz.w !char1_status	 ; Clear status (char 0)
 
 Menu_Spell_CureCompanion:
 	cmp.b #$00	  ; Check if character 0
 	beq Menu_Spell_FinishCure ; If yes, skip
-	stz.w $10a1	 ; Clear companion status
+	stz.w !char2_status	 ; Clear companion status
 
 Menu_Spell_FinishCure:
 	rep #$30		; 16-bit A/X/Y
@@ -13505,29 +13505,29 @@ Menu_Spell_UseHeal:
 	lda.b $01,s	 ; Load character from stack
 	cmp.w #$0001	; Check if character 1
 	beq IfYesSkipHpCalc ; If yes, skip HP calc
-	lda.w $1016	 ; Load max HP
+	lda.w !char1_max_hp	 ; Load max HP
 	jsr.w Menu_Spell_CalcPercent ; Calculate percentage
-	adc.w $1014	 ; Add current HP
-	cmp.w $1016	 ; Check if exceeds max
+	adc.w !char1_current_hp	 ; Add current HP
+	cmp.w !char1_max_hp	 ; Check if exceeds max
 	bcc Menu_Spell_StoreHP_Main ; If not, store
-	lda.w $1016	 ; Use max HP
+	lda.w !char1_max_hp	 ; Use max HP
 
 Menu_Spell_StoreHP_Main:
-	sta.w $1014	 ; Store new HP
+	sta.w !char1_current_hp	 ; Store new HP
 
 Menu_Spell_HealCompanion:
 	sty.b $98	   ; Restore recovery amount
 	lda.b $01,s	 ; Load character from stack
 	beq Menu_Spell_HealComplete ; If character 0, skip
-	lda.w $1096	 ; Load companion max HP
+	lda.w !char2_max_hp	 ; Load companion max HP
 	jsr.w Menu_Spell_CalcPercent ; Calculate percentage
-	adc.w $1094	 ; Add companion current HP
-	cmp.w $1096	 ; Check if exceeds max
+	adc.w !char2_current_hp	 ; Add companion current HP
+	cmp.w !char2_max_hp	 ; Check if exceeds max
 	bcc Menu_Spell_StoreHP_Comp ; If not, store
-	lda.w $1096	 ; Use max HP
+	lda.w !char2_max_hp	 ; Use max HP
 
 Menu_Spell_StoreHP_Comp:
-	sta.w $1094	 ; Store companion HP
+	sta.w !char2_current_hp	 ; Store companion HP
 
 Menu_Spell_HealComplete:
 	pla ; Restore character offset
@@ -13638,7 +13638,7 @@ Menu_BattleSettings_InputLoop:
 ;-------------------------------------------------------------------------------
 Menu_BattleSettings_YButton:
 	sep #$20                             ;00C20E|E220    |      ; 8-bit accumulator
-	lda.w $1090                          ;00C210|AD9010  |011090; Load companion status
+	lda.w !char2_companion_id                          ;00C210|AD9010  |011090; Load companion status
 	bmi Menu_BattleSettings_InputLoop    ;00C213|30D6    |00C1EB; If negative, loop
 	jmp.w JumpSubmenu                    ;00C215|4CD9C2  |00C2D9; Jump to submenu
 
@@ -13699,7 +13699,7 @@ Menu_BattleSettings_Cursor:
 	bra Menu_BattleSettings_UpdateDisplay ; Continue
 
 Menu_BattleSettings_Mode:
-	lda.w $1090	 ; Load battle mode setting
+	lda.w !char2_companion_id	 ; Load battle mode setting
 	bpl Menu_BattleSettings_Mode_Active ; If active mode, branch
 	lda.b $06	   ; Load current selection
 	eor.b #$02	  ; Toggle bit 1
@@ -13709,7 +13709,7 @@ Menu_BattleSettings_Mode:
 
 Menu_BattleSettings_Mode_Active:
 	lda.b #$80	  ; Load $80
-	and.w $10a0	 ; Test companion flag
+	and.w !char2_active_flag	 ; Test companion flag
 	beq Menu_BattleSettings_Mode_Store ; If not set, use 0
 	lda.b #$ff	  ; Load $ff
 
@@ -13759,9 +13759,9 @@ Menu_BattleSettings_ToggleSetting:
 	bra Menu_BattleSettings_Commit ; Update display
 
 Menu_BattleSettings_ToggleMode:
-	lda.w $10a0	 ; Load companion flag
+	lda.w !char2_active_flag	 ; Load companion flag
 	eor.b #$80	  ; Toggle bit 7
-	sta.w $10a0	 ; Store back
+	sta.w !char2_active_flag	 ; Store back
 	bra Menu_BattleSettings_Commit ; Update display
 
 Menu_BattleSettings_ToggleSpeed:
