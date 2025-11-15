@@ -7805,14 +7805,14 @@ Cmd_WaitVBlank:
 Cmd_CopyDisplayState:
 	jsr.w PrepareState ; Prepare state
 	sep #$20		; 8-bit A
-	ldx.w $101b	 ; Load source X
+	ldx.w !char1_temp_data_2	 ; Load source X
 	stx.w !char1_current_mp	 ; Copy to destination X
-	lda.w $101d	 ; Load source bank
-	sta.w $101a	 ; Copy to destination bank
-	ldx.w $109b	 ; Load source X (second set)
-	stx.w $1098	 ; Copy to destination X
-	lda.w $109d	 ; Load source bank (second set)
-	sta.w $109a	 ; Copy to destination bank
+	lda.w !char1_temp_bank	 ; Load source bank
+	sta.w !char1_temp_data_1	 ; Copy to destination bank
+	ldx.w !char2_temp_data_2	 ; Load source X (second set)
+	stx.w !char2_temp_data_1	 ; Copy to destination X
+	lda.w !char2_temp_data_3	 ; Load source bank (second set)
+	sta.w !char2_temp_bank	 ; Copy to destination bank
 	rts ; Return
 
 ; ---------------------------------------------------------------------------
@@ -7835,8 +7835,8 @@ Cmd_PrepareDisplayState:
 	ldx.w !char2_max_hp	 ; Load source (second set)
 	stx.w !char2_current_hp	 ; Copy to destination
 	lda.w #$0003	; Bits 0-1 mask
-	trb.w $102f	 ; Clear bits
-	trb.w $10af	 ; Clear bits
+	trb.w !char1_state_flags	 ; Clear bits
+	trb.w !char2_state_flags	 ; Clear bits
 	rts ; Return
 
 ; ---------------------------------------------------------------------------
@@ -13492,7 +13492,7 @@ Menu_Spell_UseHeal:
 	jsr.w ConfirmSpellUse ; Confirm spell use
 	beq IfCancelledLoop ; If cancelled, loop
 	pha ; Save character offset
-	lda.w $1025,x   ; Load spell power
+	lda.w !char1_spell_power,x   ; Load spell power
 	and.w #$00ff	; Mask to 8 bits
 	sta.b $64	   ; Store in $64
 	asl a; × 2

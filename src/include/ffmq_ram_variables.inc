@@ -590,8 +590,13 @@
 !char1_max_hp           = $1016     ; Character 1 maximum HP (16-bit)
 !char1_current_mp       = $1018     ; Character 1 current MP
 !char1_status           = $1021     ; Character 1 status flags
+!char1_spell_power      = $1025     ; Character 1 spell power (white or black magic stat)
+!char1_state_flags      = $102f     ; Character 1 state flags (bits 0-1 used)
 !char1_spell_equipped   = $1038     ; Character 1 spell equipped flags
 !char1_cursor_pos       = $10b1     ; Character 1 cursor position (menu)
+!char1_temp_data_1      = $101a     ; Character 1 temporary data 1
+!char1_temp_data_2      = $101b     ; Character 1 temporary data 2
+!char1_temp_bank        = $101d     ; Character 1 temporary bank value
 
 !char2_current_hp       = $1094     ; Character 2 current HP (16-bit)
 !char2_max_hp           = $1096     ; Character 2 maximum HP (16-bit)
@@ -599,6 +604,11 @@
 !char2_companion_id     = $1090     ; Character 2 companion ID/type
 !char2_status           = $10a1     ; Character 2 status flags
 !char2_active_flag      = $10a0     ; Character 2 active/display flag
+!char2_temp_data_1      = $1098     ; Character 2 temporary data 1 (X coordinate temp)
+!char2_temp_bank        = $109a     ; Character 2 temporary bank value
+!char2_temp_data_2      = $109b     ; Character 2 temporary data 2 (X coordinate temp)
+!char2_temp_data_3      = $109d     ; Character 2 temporary data 3 (bank temp)
+!char2_state_flags      = $10af     ; Character 2 state flags (bits 0-1 used)
 
 ; === Character Name Buffer ($1100) ===
 !char_name_buffer       = $1100     ; Character name text buffer (indexed access)
