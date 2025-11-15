@@ -35,7 +35,7 @@ LoadScriptParameter:
 	lda.B $64                            ;0C8028|A564    |000064;
 	sta.W $00ef                          ;0C802A|8DEF00  |0100EF;
 	lda.L DATA8_07ee84,x                 ;0C802D|BF84EE07|07EE84;
-	sta.W $015f                          ;0C8031|8D5F01  |01015F;
+	sta.w !menu_selection                          ;0C8031|8D5F01  |01015F;
 	lda.L DATA8_07ee85,x                 ;0C8034|BF85EE07|07EE85;
 	jsr.W CheckScriptExecution                    ;0C8038|207180  |0C8071;
 	sta.W $00b5                          ;0C803B|8DB500  |0100B5;
@@ -99,11 +99,11 @@ InitWorldMapDisplay:
 	lda.B #$11                           ;0C80B0|A911    |      ;
 	sta.B SNES_TM-$2100                  ;0C80B2|852C    |00212C;
 	jsr.W ConfigureHDMAChannels                    ;0C80B4|207B8D  |0C8D7B;
-	lda.W $0112                          ;0C80B7|AD1201  |0C0112;
+	lda.w !interrupt_config                          ;0C80B7|AD1201  |0C0112;
 	sta.W $4200                          ;0C80BA|8D0042  |0C4200;
 	cli                                  ;0C80BD|58      |      ;
 	lda.B #$0f                           ;0C80BE|A90F    |      ;
-	sta.W $00aa                          ;0C80C0|8DAA00  |0C00AA;
+	sta.w !brightness_value                          ;0C80C0|8DAA00  |0C00AA;
 	stz.w !battle_ready_flag                          ;0C80C3|9C1001  |0C0110;
 	jsl.L CallMainGameLoopHandler                    ;0C80C6|2295C700|00C795;
 	jsr.W InitializeWorldData                    ;0C80CA|20AD8B  |0C8BAD;
@@ -137,7 +137,7 @@ SetupWorldMapGraphics:
 	ldx.W #$90d7                         ;0C8108|A2D790  |      ;
 	stx.W $0058                          ;0C810B|8E5800  |000058;
 	lda.B #$40                           ;0C810E|A940    |      ;
-	tsb.W $00e2                          ;0C8110|0CE200  |0000E2;
+	tsb.w !system_flags_9                          ;0C8110|0CE200  |0000E2;
 	jsl.L WaitForVBlank                    ;0C8113|2200800C|0C8000;
 	lda.B #$07                           ;0C8117|A907    |      ;
 	sta.B SNES_BGMODE-$2100              ;0C8119|8505    |002105;
@@ -164,7 +164,7 @@ ConfigureWorldTiles:
 	ldx.W #$5555                         ;0C8148|A25555  |      ;
 	stx.W $0e0a                          ;0C814B|8E0A0E  |0C0E0A;
 	ldx.W #$5500                         ;0C814E|A20055  |      ;
-	stx.W $0e0c                          ;0C8151|8E0C0E  |0C0E0C;
+	stx.w !hw_register_3                          ;0C8151|8E0C0E  |0C0E0C;
 	jmp.W TransferOAMToVRAM                    ;0C8154|4C1089  |0C8910;
 ;      |        |      ;
 ;      |        |      ;
@@ -245,7 +245,7 @@ LoadWorldPalettes:
 	ldx.W #$81ef                         ;0C81DF|A2EF81  |      ;
 	stx.W $0058                          ;0C81E2|8E5800  |0C0058;
 	lda.B #$40                           ;0C81E5|A940    |      ;
-	tsb.W $00e2                          ;0C81E7|0CE200  |0C00E2;
+	tsb.w !system_flags_9                          ;0C81E7|0CE200  |0C00E2;
 	jsl.L WaitForVBlank                    ;0C81EA|2200800C|0C8000;
 	rts                                  ;0C81EE|60      |      ;
 ;      |        |      ;
@@ -361,7 +361,7 @@ Animation_SpecialZoom:
 Animation_ProcessOpcode:
 	pha                                  ;0C82A6|48      |      ;
 	and.B #$07                           ;0C82A7|2907    |      ;
-	sta.W $015f                          ;0C82A9|8D5F01  |0C015F;
+	sta.w !menu_selection                          ;0C82A9|8D5F01  |0C015F;
 	pla                                  ;0C82AC|68      |      ;
 	and.B #$f8                           ;0C82AD|29F8    |      ;
 	cmp.B #$40                           ;0C82AF|C940    |      ;
@@ -373,7 +373,7 @@ Animation_ProcessOpcode:
 	sbc.B #$40                           ;0C82BB|E940    |      ;
 	sta.W $0161                          ;0C82BD|8D6101  |0C0161;
 	rep #$30                             ;0C82C0|C230    |      ;
-	lda.W $015f                          ;0C82C2|AD5F01  |0C015F;
+	lda.w !menu_selection                          ;0C82C2|AD5F01  |0C015F;
 	asl a;0C82C5|0A      |      ;
 	asl a;0C82C6|0A      |      ;
 	adc.W #$0cbc                         ;0C82C7|69BC0C  |      ;
@@ -384,7 +384,7 @@ Animation_ProcessOpcode:
 ProcessOpcode_Type8:
 	sta.W $0161                          ;0C82CF|8D6101  |0C0161;
 	rep #$30                             ;0C82D2|C230    |      ;
-	lda.W $015f                          ;0C82D4|AD5F01  |0C015F;
+	lda.w !menu_selection                          ;0C82D4|AD5F01  |0C015F;
 	asl a;0C82D7|0A      |      ;
 	asl a;0C82D8|0A      |      ;
 	pha                                  ;0C82D9|48      |      ;
@@ -415,7 +415,7 @@ ProcessOpcode_Type4:
 ProcessOpcode_ConfigureMode7:
 	cmp.B #$08                           ;0C8302|C908    |      ;
 	bne Animation_FlashEffect                      ;0C8304|D077    |0C837D;
-	lda.W $015f                          ;0C8306|AD5F01  |0C015F;
+	lda.w !menu_selection                          ;0C8306|AD5F01  |0C015F;
 	bne ConfigureMode7_Setup                      ;0C8309|D013    |0C831E;
 	rep #$30                             ;0C830B|C230    |      ;
 	lda.W #$3c03                         ;0C830D|A9033C  |      ;
@@ -428,7 +428,7 @@ ProcessOpcode_ConfigureMode7:
 ;      |        |      ;
 ConfigureMode7_Setup:
 	rep #$30                             ;0C831E|C230    |      ;
-	lda.W $015f                          ;0C8320|AD5F01  |0C015F;
+	lda.w !menu_selection                          ;0C8320|AD5F01  |0C015F;
 	asl a;0C8323|0A      |      ;
 	asl a;0C8324|0A      |      ;
 	pha                                  ;0C8325|48      |      ;
@@ -444,7 +444,7 @@ ConfigureMode7_Setup:
 	sta.W $0000,y                        ;0C8339|990000  |0C0000;
 	lda.W $0c98                          ;0C833C|AD980C  |0C0C98;
 	sta.W $0004,y                        ;0C833F|990400  |0C0004;
-	ldy.W $015f                          ;0C8342|AC5F01  |0C015F;
+	ldy.w !menu_selection                          ;0C8342|AC5F01  |0C015F;
 	lda.W #$0003                         ;0C8345|A90300  |      ;
 ;      |        |      ;
 Mode7_CalculateMask:
@@ -457,7 +457,7 @@ Mode7_CalculateMask:
 	and.W #$aaaa                         ;0C8351|29AAAA  |      ;
 	tsb.W $0e08                          ;0C8354|0C080E  |0C0E08;
 	pla                                  ;0C8357|68      |      ;
-	ldy.W $015f                          ;0C8358|AC5F01  |0C015F;
+	ldy.w !menu_selection                          ;0C8358|AC5F01  |0C015F;
 	lsr a;0C835B|4A      |      ;
 	lsr a;0C835C|4A      |      ;
 ;      |        |      ;
@@ -592,7 +592,7 @@ ZoomOut_FinalFrames:
 	pla                                  ;0C8453|68      |      ;
 	dec a;0C8454|3A      |      ;
 	bne ZoomOut_FinalFrames                      ;0C8455|D0F8    |0C844F;
-	stz.W $0e0d                          ;0C8457|9C0D0E  |0C0E0D;
+	stz.w !error_status_register                          ;0C8457|9C0D0E  |0C0E0D;
 	stz.W $0e0e                          ;0C845A|9C0E0E  |0C0E0E;
 	jmp.W ProcessAnimationScript                    ;0C845D|4C5A82  |0C825A;
 ;      |        |      ;
@@ -1046,7 +1046,7 @@ TransferOAMToVRAM:
 	ldx.W #$8929                         ;0C8919|A22989  |      ;
 	stx.W $0058                          ;0C891C|8E5800  |0C0058;
 	lda.B #$40                           ;0C891F|A940    |      ;
-	tsb.W $00e2                          ;0C8921|0CE200  |0C00E2;
+	tsb.w !system_flags_9                          ;0C8921|0CE200  |0C00E2;
 	jsl.L WaitForVBlank                    ;0C8924|2200800C|0C8000;
 	rts                                  ;0C8928|60      |      ;
 ;      |        |      ;
@@ -1224,7 +1224,7 @@ Graphics_LiteralCommand:
 	ldy.W #$8b0c                         ;0C8A67|A00C8B  |      ;
 	sty.W $0058                          ;0C8A6A|8C5800  |0C0058;
 	lda.B #$40                           ;0C8A6D|A940    |      ;
-	tsb.W $00e2                          ;0C8A6F|0CE200  |0C00E2;
+	tsb.w !system_flags_9                          ;0C8A6F|0CE200  |0C00E2;
 	jsl.L WaitForVBlank                    ;0C8A72|2200800C|0C8000;
 ;      |        |      ;
 Graphics_NextCommand:
@@ -1378,7 +1378,7 @@ Graphics_UploadLoop:
 ;      |        |      ;
 InitializeWorldData:
 	lda.B #$18                           ;0C8BAD|A918    |      ;
-	sta.W $0500                          ;0C8BAF|8D0005  |0C0500;
+	sta.w !audio_gfx_index                          ;0C8BAF|8D0005  |0C0500;
 	rep #$30                             ;0C8BB2|C230    |      ;
 	ldx.W #$8ce2                         ;0C8BB4|A2E28C  |      ;
 	ldy.W #$0d00                         ;0C8BB7|A0000D  |      ;
@@ -1715,7 +1715,7 @@ WorldInput_CheckButtons:
 ;      |        |      ;
 WorldInput_ProcessDPad:
 	pha                                  ;0C8FB8|48      |      ;
-	ldy.W $0010,x                        ;0C8FB9|BC1000  |7F0010;
+	ldy.w !ram_1031_long,x                        ;0C8FB9|BC1000  |7F0010;
 	sty.B $64                            ;0C8FBC|8464    |000064;
 	ldy.W $0000,x                        ;0C8FBE|BC0000  |7F0000;
 	sty.B $62                            ;0C8FC1|8462    |000062;
@@ -1821,7 +1821,7 @@ Camera_CalculateOffset:
 	ldx.W #$9075                         ;0C9063|A27590  |      ;
 	stx.W $0058                          ;0C9066|8E5800  |000058;
 	lda.B #$40                           ;0C9069|A940    |      ;
-	tsb.W $00e2                          ;0C906B|0CE200  |0000E2;
+	tsb.w !system_flags_9                          ;0C906B|0CE200  |0000E2;
 	jsl.L WaitForVBlank                    ;0C906E|2200800C|0C8000;
 	pld                                  ;0C9072|2B      |      ;
 	plp                                  ;0C9073|28      |      ;
@@ -1850,7 +1850,7 @@ Camera_UpdateScrolling:
 ;      |        |      ;
 Camera_AdjustHorizontal:
 	pha                                  ;0C909D|48      |      ;
-	ldy.W $0010,x                        ;0C909E|BC1000  |7F0010;
+	ldy.w !ram_1031_long,x                        ;0C909E|BC1000  |7F0010;
 	sty.B $64                            ;0C90A1|8464    |000064;
 	ldy.W $0000,x                        ;0C90A3|BC0000  |7F0000;
 	sty.B $62                            ;0C90A6|8462    |000062;
@@ -2064,7 +2064,7 @@ DrawTileToMap:
 DrawTile_ProcessPixels:
 	lda.W $0000,x                        ;0C920A|BD0000  |7F0000;
 	ora.W $0001,x                        ;0C920D|1D0100  |7F0001;
-	ora.W $0010,x                        ;0C9210|1D1000  |7F0010;
+	ora.w !ram_1031_long,x                        ;0C9210|1D1000  |7F0010;
 	eor.B #$ff                           ;0C9213|49FF    |      ;
 	sta.B $64                            ;0C9215|8564    |000064;
 	and.W $0000,y                        ;0C9217|390000  |7F0000;
@@ -2075,9 +2075,9 @@ DrawTile_ProcessPixels:
 	ora.W $0001,x                        ;0C9225|1D0100  |7F0001;
 	sta.W $0001,y                        ;0C9228|990100  |7F0001;
 	lda.B $64                            ;0C922B|A564    |000064;
-	and.W $0010,y                        ;0C922D|391000  |7F0010;
-	ora.W $0010,x                        ;0C9230|1D1000  |7F0010;
-	sta.W $0010,y                        ;0C9233|991000  |7F0010;
+	and.w !ram_1031_long,y                        ;0C922D|391000  |7F0010;
+	ora.w !ram_1031_long,x                        ;0C9230|1D1000  |7F0010;
+	sta.w !ram_1031_long,y                        ;0C9233|991000  |7F0010;
 	inx                                  ;0C9236|E8      |      ;
 	inx                                  ;0C9237|E8      |      ;
 	iny                                  ;0C9238|C8      |      ;

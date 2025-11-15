@@ -544,7 +544,7 @@ Battle_GfxAddressHigh:
 ;   7. Clear battle sprite buffers ($0ec8-$0f88 range)
 
 BattleInit_SetupEncounter:
-	stz.w $19f6	 ; Clear battle phase counter
+	stz.w !special_op_mode	 ; Clear battle phase counter
 	lda.b #$80	  ; Battle active flag
 	sta.w !battle_state_flag	 ; Set battle state flag to active ($80)
 	lda.b #$01	  ; Animation enable
@@ -578,8 +578,8 @@ BattleInit_SetupEncounter:
 	lda.b #$20	  ; Counter = 32 bytes
 
 BattleInit_ClearBuffer1:	; Clear first buffer section
-	stz.w $0ec8,x   ; Clear byte at $0ec8+X
-	stz.w $0f28,x   ; Clear byte at $0f28+X
+	stz.w !dma_channel_array,x   ; Clear byte at $0ec8+X
+	stz.w !vram_transfer_array,x   ; Clear byte at $0f28+X
 	inx ; Increment index
 	dec a; Decrement counter
 	bne BattleInit_ClearBuffer1 ; Loop until 32 bytes cleared
@@ -587,7 +587,7 @@ BattleInit_ClearBuffer1:	; Clear first buffer section
 	lda.b #$30	  ; Counter = 48 bytes
 
 BattleInit_ClearBuffer2:	; Clear second buffer section
-	stz.w $0ec8,x   ; Clear byte at $0ec8+X
+	stz.w !dma_channel_array,x   ; Clear byte at $0ec8+X
 	inx ; Increment index
 	dec a; Decrement counter
 	bne BattleInit_ClearBuffer2 ; Loop until 48 bytes cleared
@@ -601,12 +601,12 @@ BattleInit_LoadEnemyData:	; Enemy data loading
 	lda.l DATA8_07af3b,x ; Load enemy data table pointer (Bank $07)
 	tax ; Transfer to X (source pointer)
 	sep #$20		; Set A to 8-bit mode
-	stx.w $19b5	 ; Store enemy data pointer
+	stx.w !data_source_offset	 ; Store enemy data pointer
 	ldy.w #$0000	; Y = destination index
 
 BattleInit_CopyEnemyStats:	; Copy enemy data loop (7 bytes)
 	lda.l DATA8_07b013,x ; Load enemy stat byte from Bank $07
-	sta.w $1910,y   ; Store to battle RAM at $1910+Y
+	sta.w !graphics_table_data,y   ; Store to battle RAM at $1910+Y
 	inx ; Increment source
 	iny ; Increment destination
 	cpy.w #$0007	; Copied 7 bytes?
@@ -616,16 +616,16 @@ BattleInit_CopyEnemyStats:	; Copy enemy data loop (7 bytes)
 	lda.b #$0a	  ; Multiplier = 10
 	sta.w $211b	 ; Store to hardware multiply register
 	stz.w $211b	 ; Clear upper byte (10 × 256 = 2560?)
-	lda.w $1911	 ; Load enemy base stat
+	lda.w !source_address_index	 ; Load enemy base stat
 	sta.w $211c	 ; Store to multiply operand
 	ldx.w $2134	 ; Load multiply result (16-bit)
-	stx.w $19b7	 ; Store calculated value
+	stx.w !calculated_source_offset	 ; Store calculated value
 
 	ldy.w #$0000	; Y = destination index
 
 BattleInit_CopyEnemyExtendedData:	; Copy extended enemy data (10 bytes)
 	lda.l DATA8_0b8cd9,x ; Load data from Bank $0b table
-	sta.w $1918,y   ; Store to battle RAM at $1918+Y
+	sta.w !tileset_copy_buffer,y   ; Store to battle RAM at $1918+Y
 	inx ; Increment source
 	iny ; Increment destination
 	cpy.w #$000a	; Copied 10 bytes?
@@ -633,7 +633,7 @@ BattleInit_CopyEnemyExtendedData:	; Copy extended enemy data (10 bytes)
 
 ; Enemy graphics pointer setup
 	ldx.w #$ffff	; Default = no graphics ($ffff)
-	lda.w $1912	 ; Load enemy graphics ID
+	lda.w !source_offset_index	 ; Load enemy graphics ID
 	cmp.b #$ff	  ; Check if no graphics
 	beq BattleInit_SetupEnemyPalette ; Skip graphics load if $ff
 	rep #$20		; Set A to 16-bit mode
@@ -654,7 +654,7 @@ BattleInit_SetupEnemyPalette:
 	lsr a
 	lsr a
 	sta.w !layer_flags	 ; Store palette high bits
-	lda.w $1915	 ; Load enemy attribute byte 2
+	lda.w !graphics_param_1	 ; Load enemy attribute byte 2
 	and.b #$e0	  ; Mask bits 5-7 (palette low bits)
 	ora.w !layer_flags	 ; Combine with high bits
 	lsr a; Shift right 2 more times
@@ -697,7 +697,7 @@ BattleGfx_InitLayerData:
 
 BattleGfx_CopyDefaults:	; Copy default values loop
 	lda.w DATA8_0b8296,x ; Load default byte
-	sta.w $1a4a,x   ; Store to layer data buffer
+	sta.w !coord_context,x   ; Store to layer data buffer
 	inx ; Increment index
 	cpx.w #$000b	; Copied 11 bytes?
 	bne BattleGfx_CopyDefaults ; Loop until complete
@@ -715,9 +715,9 @@ BattleGfx_CopyDefaults:	; Copy default values loop
 	lda.w DATA8_0b8450,x ; Load byte 0
 	sta.w !layer_flags	 ; Store background param 0
 	lda.w DATA8_0b8451,x ; Load byte 1
-	sta.w $1a56	 ; Store background param 1
+	sta.w !coord_adjust_x	 ; Store background param 1
 	lda.w DATA8_0b8452,x ; Load byte 2
-	sta.w $1a57	 ; Store background param 2
+	sta.w !coord_adjust_y	 ; Store background param 2
 
 ; Process attribute byte (bits 0-2 and bits 4-6)
 	lda.w DATA8_0b844f,x ; Load attribute byte
@@ -736,20 +736,20 @@ BattleGfx_CopyDefaults:	; Copy default values loop
 	lda.w DATA8_0b84e0,x ; Load config byte 1
 	sta.w !buffer_state	 ; Store layer config 1
 	lda.w DATA8_0b84e2,x ; Load config byte 2
-	sta.w $1a4f	 ; Store layer priority
+	sta.w !gfx_completion_flags	 ; Store layer priority
 
 ; Load scroll/position data (3 bytes from third table)
 	lda.w DATA8_0b84e1,x ; Load scroll index
 	tax ; Transfer to X for third lookup
 	lda.w DATA8_0b829e,x ; Load scroll value 0
-	sta.w $1a52	 ; Store layer scroll X
+	sta.w !coord_modify_data	 ; Store layer scroll X
 	lda.w DATA8_0b829f,x ; Load scroll value 1
-	sta.w $1a53	 ; Store layer scroll Y
+	sta.w !coord_finalize_data	 ; Store layer scroll Y
 	lda.w DATA8_0b82a0,x ; Load scroll value 2
 	sta.w !ram_1a54	 ; Store layer scroll speed
 
 	lda.b #$17	  ; Layer count/flags = $17
-	sta.w $1a4e	 ; Store to layer control
+	sta.w !gfx_completion_mode	 ; Store to layer control
 
 BattleGfx_LayerExit:
 	plb ; Restore data bank
@@ -895,7 +895,7 @@ BattleState_CopyLoop:	; Copy loop
 
 ; Set PPU background map pointer
 	ldx.w #$0e06	; Default BG map = $0e06
-	lda.w $1910	 ; Load enemy attribute flags
+	lda.w !graphics_table_data	 ; Load enemy attribute flags
 	bpl BattleState_SetMapPtr ; Use default if positive
 	ldx.w #$0e0e	; Alternate BG map = $0e0e (for special enemies)
 
@@ -981,7 +981,7 @@ EnemyGfx_Decompress:
 	plb ; Set data bank = $0b
 	ldx.w #$0000	; X = table index
 	ldy.w #$cef4	; Y = dest address (WRAM)
-	lda.w $1918	 ; Load enemy graphics flags
+	lda.w !tileset_copy_buffer	 ; Load enemy graphics flags
 	and.b #$0f	  ; Mask to lower nibble
 
 EnemyGfx_DecompressLoop:	; Decompression loop (3 blocks)
@@ -1049,7 +1049,7 @@ DATA8_0b83b2:
 ;   Source: Bank$05:$8000 + offset → Dest: $7f:$c588
 
 EnemyGfx_CopySpriteData:
-	lda.w $1919	 ; Load enemy sprite ID
+	lda.w !battle_gfx_temp	 ; Load enemy sprite ID
 	cmp.b #$19	  ; Check if special enemy (ID $19)
 	beq EnemyGfx_Special19 ; Branch to special case
 
@@ -1141,10 +1141,10 @@ BattlePPU_ConfigureRegisters:
 	lda.w $1a4d	 ; Load BG2 tilemap config
 	sta.w $2108	 ; Write to BG2 tilemap register
 
-	lda.w $1a4e	 ; Load main screen layers
+	lda.w !gfx_completion_mode	 ; Load main screen layers
 	sta.w $212c	 ; Write to main screen designation
 
-	lda.w $1a4f	 ; Load subscreen layers (for blending)
+	lda.w !gfx_completion_flags	 ; Load subscreen layers (for blending)
 	sta.w $212d	 ; Write to subscreen designation
 
 	lda.w $1a50	 ; Load color math control
@@ -1258,7 +1258,7 @@ DATA8_0b84e2:
 
 BattleEnemy_SetupTileData:
 	rep #$20		; Set A to 16-bit
-	lda.w $1918	 ; Load enemy graphics flags
+	lda.w !tileset_copy_buffer	 ; Load enemy graphics flags
 	and.w #$00f0	; Mask bits 4-7 (graphics mode)
 	lsr a; Shift right 3 times (divide by 8)
 	lsr a; Now value is 0-15 (index × 2)
@@ -1268,7 +1268,7 @@ BattleEnemy_SetupTileData:
 	sta.w !battle_coord_x_boundary	 ; Store to tile stride variable
 
 	sep #$20		; Set A to 8-bit
-	lda.w $1910	 ; Load enemy type flags
+	lda.w !graphics_table_data	 ; Load enemy type flags
 	and.b #$3f	  ; Mask bits 0-5 (enemy base type)
 	sta.w $4202	 ; Store to multiply register A
 	lda.b #$03	  ; Multiply by 3
@@ -1282,7 +1282,7 @@ BattleEnemy_SetupTileData:
 	ldx.w $4216	 ; Load multiply result (enemy_type × 3)
 	rep #$20		; Set A to 16-bit
 	lda.l DATA8_0b8735,x ; Load source address from table
-	sta.w $0900	 ; Store to DMA source pointer
+	sta.w !tilemap_wram_source_start_2	 ; Store to DMA source pointer
 	sep #$20		; Set A to 8-bit
 	lda.l DATA8_0b8737,x ; Load source bank from table
 	sta.w $0902	 ; Store to DMA source bank
@@ -1341,7 +1341,7 @@ DATA8_0b856c:
 
 ; Special background setup
 	ldx.w #$1000	; Special flag value
-	stx.w $1a4a	 ; Store to background config
+	stx.w !coord_context	 ; Store to background config
 
 ; Load music/sound based on available data
 	ldx.w #$f6d1	; Music pointer 1
@@ -1363,7 +1363,7 @@ DATA8_0b856c:
 
 BattleGfx_SetupDMATransfer:
 ; Setup DMA for graphics transfer
-	stx.w $0900	 ; Store music/graphics source
+	stx.w !tilemap_wram_source_start_2	 ; Store music/graphics source
 	lda.b #$07	  ; Source bank 7
 	sta.w $0902	 ; Store to DMA source bank
 	ldx.w #$7f90	; Dest = WRAM $7f:90xx
@@ -1474,7 +1474,7 @@ BattleGfx_DecompressLoad:
 	php ; Save processor status
 	phd ; Save direct page register
 	phb ; Save data bank
-	pea.w $0900	 ; Set direct page = $0900 (DMA params)
+	pea.w !tilemap_wram_source_start_2	 ; Set direct page = $0900 (DMA params)
 	pld ; Pull to direct page register
 	rep #$30		; Set A/X/Y to 16-bit
 
@@ -1594,7 +1594,7 @@ BattleGfx_DecompressToWRAM:
 	phd ; Save direct page
 	sep #$20		; Set A to 8-bit
 	rep #$10		; Set X/Y to 16-bit
-	pea.w $0900	 ; Set direct page = $0900
+	pea.w !tilemap_wram_source_start_2	 ; Set direct page = $0900
 	pld ; Pull to DP
 
 	lda.b $02	   ; Load source bank
@@ -2119,7 +2119,7 @@ BattleAnim_StateHandler:
 	sta.l $7ec360,x ; Store updated frame
 
 ; Check for special animation mode
-	lda.w $1021	 ; Load battle mode flags
+	lda.w !char1_status	 ; Load battle mode flags
 	bit.b #$40	  ; Check bit 6 (special mode?)
 	bne BattleAnim_SkipTransfer ; Skip transfer if set
 
@@ -2233,7 +2233,7 @@ BattleAnim_UpdateSecondary:	; Secondary animation counter update
 	inc a; Increment frame
 	sta.l $7ec360,x ; Store updated frame
 
-	lda.w $10a1	 ; Load battle mode flags
+	lda.w !char2_status	 ; Load battle mode flags
 	jsr.w BattleAnim_BitScanRoutine ; Call bit scan routine (find first set bit)
 	cmp.b $f5	   ; Compare with cached value (DP)
 	beq BattleAnim_SecondaryUnchanged ; Skip if unchanged
@@ -3175,7 +3175,7 @@ Battle_Field_Background_Graphics_Loader:
 	rep #$30		;0B9366 16-bit A/X/Y mode
 
 ; Get battlefield type and lookup source address
-	lda.w $10a0	 ;0B9368 Get battle configuration word
+	lda.w !char2_active_flag	 ;0B9368 Get battle configuration word
 	and.w #$000f	;0B936B Isolate low 4 bits (battlefield ID)
 	asl a;0B936E × 2 (word table)
 	tay ;0B936F Y = table offset

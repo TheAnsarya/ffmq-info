@@ -34,17 +34,17 @@ DMA_TransferToVRAM_Ch5:
 	stx.B SNES_DMA5PARAM-$4300      ; $4350 = DMA5 control
 
 ; Source address from RAM parameters
-	ldx.W $01f6                     ; Load source address (low/mid bytes)
+	ldx.w !vram_src_addr                     ; Load source address (low/mid bytes)
 	stx.B SNES_DMA5ADDRL-$4300      ; $4352-$4353 = source address
 	lda.B #$7f                      ; Source bank = $7f (work RAM)
 	sta.B SNES_DMA5ADDRH-$4300      ; $4354 = source bank
 
 ; Transfer size
-	ldx.W $01f4                     ; Load transfer size
+	ldx.w !vram_transfer_size                     ; Load transfer size
 	stx.B SNES_DMA5CNTL-$4300       ; $4355-$4356 = transfer count
 
 ; Destination VRAM address
-	ldx.W $01f8                     ; Load VRAM destination
+	ldx.w !vram_dest_addr                     ; Load VRAM destination
 	stx.W SNES_VMADDL               ; $2116-$2117 = VRAM address
 
 ; Configure VRAM increment mode
@@ -77,13 +77,13 @@ DMA_TransferPalette:
 	stx.B SNES_DMA5PARAM-$4300      ; DMA5 control
 
 ; Source address from parameters
-	ldx.W $01ed                     ; Palette data source (low/mid)
+	ldx.w !dma_src_addr                     ; Palette data source (low/mid)
 	stx.B SNES_DMA5ADDRL-$4300      ; Set source address
-	lda.W $01ef                     ; Source bank
+	lda.w !dma_src_bank                     ; Source bank
 	sta.B SNES_DMA5ADDRH-$4300      ; Set source bank
 
 ; Transfer size
-	ldx.W $01eb                     ; Palette data size
+	ldx.w !dma_size_param                     ; Palette data size
 	stx.B SNES_DMA5CNTL-$4300       ; Set transfer count
 
 ; Destination address

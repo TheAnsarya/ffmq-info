@@ -20,7 +20,7 @@ Battle_Initialize:
 	lda.W #$000a                         ;028020|A90A00  |      ;
 	mvn $00,$00                          ;028023|540000  |      ;
 	lda.W #$ffff                         ;028026|A9FFFF  |      ;
-	sta.W $1100                          ;028029|8D0011  |001100;
+	sta.w !char_name_buffer                          ;028029|8D0011  |001100;
 	ldx.W #$1100                         ;02802C|A20011  |      ;
 	ldy.W #$1102                         ;02802F|A00211  |      ;
 	lda.W #$027d                         ;028032|A97D02  |      ;
@@ -163,7 +163,7 @@ Battle_Victory:
 	jsl.L ExecuteSpecialBitProcessing                    ;028141|22769700|009776;
 	bne Battle_VictorySound                      ;028145|D005    |02814C;
 	lda.B #$04                           ;028147|A904    |      ;
-	sta.W $0500                          ;028149|8D0005  |020500;
+	sta.w !audio_gfx_index                          ;028149|8D0005  |020500;
 ;      |        |      ;
 Battle_VictorySound:
 	ldx.W #$d4f1                         ;02814C|A2F1D4  |      ;
@@ -229,7 +229,7 @@ Battle_CheckEscape:
 	sta.W $4206                          ;0281A7|8D0642  |024206;
 	lda.W $1010                          ;0281AA|AD1010  |021010;
 	sta.B $a0                            ;0281AD|85A0    |0004A0;
-	lda.W $1090                          ;0281AF|AD9010  |021090;
+	lda.w !char2_companion_id                          ;0281AF|AD9010  |021090;
 	bmi Battle_CalculateEscapeRate                      ;0281B2|3006    |0281BA;
 	clc                                  ;0281B4|18      |      ;
 	adc.B $a0                            ;0281B5|65A0    |0004A0;
@@ -313,7 +313,7 @@ Battle_CheckGameOver:
 Battle_CalculatePartyHP:
 	stz.B $a0                            ;028233|64A0    |0004A0;
 	ldx.W #$0000                         ;028235|A20000  |      ;
-	lda.W $1021                          ;028238|AD2110  |021021;
+	lda.w !char1_status                          ;028238|AD2110  |021021;
 	and.B #$f0                           ;02823B|29F0    |      ;
 	bne Battle_AddCharacterHP                      ;02823D|D006    |028245;
 	lda.W $1024                          ;02823F|AD2410  |021024;
@@ -321,7 +321,7 @@ Battle_CalculatePartyHP:
 	sta.B $a0                            ;028243|85A0    |0004A0;
 ;      |        |      ;
 Battle_AddCharacterHP:
-	lda.W $10a1                          ;028245|ADA110  |0210A1;
+	lda.w !char2_status                          ;028245|ADA110  |0210A1;
 	and.B #$f0                           ;028248|29F0    |      ;
 	bne Battle_AverageHP                      ;02824A|D009    |028255;
 	lda.B $a0                            ;02824C|A5A0    |0004A0;
@@ -690,7 +690,7 @@ Battle_CheckConfusion:
 	stz.B $8d                            ;0284C1|648D    |00048D;
 	lda.B #$01                           ;0284C3|A901    |      ;
 	sta.B $8e                            ;0284C5|858E    |00048E;
-	lda.W $1021                          ;0284C7|AD2110  |021021;
+	lda.w !char1_status                          ;0284C7|AD2110  |021021;
 	and.B #$c0                           ;0284CA|29C0    |      ;
 	beq Battle_ProcessConfusion                      ;0284CC|F004    |0284D2;
 	inc.B $8d                            ;0284CE|E68D    |00048D;
@@ -698,7 +698,7 @@ Battle_CheckConfusion:
 ;      |        |      ;
 ;      |        |      ;
 Battle_ProcessConfusion:
-	lda.W $10a1                          ;0284D2|ADA110  |0210A1;
+	lda.w !char2_status                          ;0284D2|ADA110  |0210A1;
 	and.B #$c0                           ;0284D5|29C0    |      ;
 	beq Battle_NextTargetSlot                      ;0284D7|F030    |028509;
 	stz.B $8e                            ;0284D9|648E    |00048E;
@@ -1079,7 +1079,7 @@ Battle_ProcessInput:
 	and.W $1221                          ;02872F|2D2112  |021221;
 	and.B #$80                           ;028732|2980    |      ;
 	sta.B $95                            ;028734|8595    |000495;
-	lda.W $1021                          ;028736|AD2110  |021021;
+	lda.w !char1_status                          ;028736|AD2110  |021021;
 	and.B #$c0                           ;028739|29C0    |      ;
 	bne Battle_CheckAuto                      ;02873B|D003    |028740;
 ;      |        |      ;
@@ -1089,10 +1089,10 @@ Battle_CheckAutoCommand:
 ;      |        |      ;
 ;      |        |      ;
 Battle_CheckAuto:
-	lda.W $1090                          ;028740|AD9010  |021090;
+	lda.w !char2_companion_id                          ;028740|AD9010  |021090;
 	cmp.B #$ff                           ;028743|C9FF    |      ;
 	beq Battle_SetAutoCommand                      ;028745|F007    |02874E;
-	lda.W $10a1                          ;028747|ADA110  |0210A1;
+	lda.w !char2_status                          ;028747|ADA110  |0210A1;
 	and.B #$c0                           ;02874A|29C0    |      ;
 	beq Battle_CheckAutoCommand                      ;02874C|F0EF    |02873D;
 ;      |        |      ;
@@ -1218,7 +1218,7 @@ Battle_ProcessCommand:
 ;      |        |      ;
 ;      |        |      ;
 Battle_DisplayMessage:
-	stx.W $0017                          ;028835|8E1700  |020017;
+	stx.w !general_address                          ;028835|8E1700  |020017;
 	jsl.L CallExternalRoutine                    ;028838|2209D000|00D009;
 	rts                                  ;02883C|60      |      ;
 ;      |        |      ;
@@ -3088,10 +3088,10 @@ Battle_ProcessRevive:
 ;      |        |      ;
 ;      |        |      ;
 Battle_ReviveTarget:
-	lda.W $1021                          ;02974D|AD2110  |021021;
+	lda.w !char1_status                          ;02974D|AD2110  |021021;
 	and.B #$c0                           ;029750|29C0    |      ;
 	bne Battle_SetReviveHP                      ;029752|D00A    |02975E;
-	lda.W $10a1                          ;029754|ADA110  |0210A1;
+	lda.w !char2_status                          ;029754|ADA110  |0210A1;
 	and.B #$c0                           ;029757|29C0    |      ;
 	bne Battle_SetReviveHP                      ;029759|D003    |02975E;
 	lda.B #$02                           ;02975B|A902    |      ;
@@ -4422,14 +4422,14 @@ Battle_RollHitDice:
 ;      |        |      ;
 ;      |        |      ;
 Battle_CompareHitRoll:
-	lda.W $1021                          ;02A109|AD2110  |021021;
+	lda.w !char1_status                          ;02A109|AD2110  |021021;
 	and.B #$c0                           ;02A10C|29C0    |      ;
 	bne Battle_HitSuccess                      ;02A10E|D005    |02A115;
 	lda.B $e3                            ;02A110|A5E3    |0004E3;
 	sta.W $0ab2                          ;02A112|8DB20A  |020AB2;
 ;      |        |      ;
 Battle_HitSuccess:
-	lda.W $10a1                          ;02A115|ADA110  |0210A1;
+	lda.w !char2_status                          ;02A115|ADA110  |0210A1;
 	and.B #$c0                           ;02A118|29C0    |      ;
 	bne Battle_HitFailed                      ;02A11A|D005    |02A121;
 	lda.B $e3                            ;02A11C|A5E3    |0004E3;
@@ -4984,7 +4984,7 @@ Battle_DefenseModifierApplied:
 	lda.W $10b8                          ;02A505|ADB810  |0210B8;
 	and.B #$10                           ;02A508|2910    |      ;
 	beq UNREACH_02A511                   ;02A50A|F005    |02A511;
-	lda.W $1098                          ;02A50C|AD9810  |021098;
+	lda.w !char2_current_mp                          ;02A50C|AD9810  |021098;
 	bne Battle_ApplySpeedModifier                      ;02A50F|D005    |02A516;
 ;      |        |      ;
 UNREACH_02A511:
@@ -5330,7 +5330,7 @@ Battle_EvadeSuccess:
 	sta.B $a7                            ;02A74A|85A7    |0004A7;
 	stz.B $38                            ;02A74C|6438    |000438;
 	stz.W $10d0                          ;02A74E|9CD010  |0210D0;
-	lda.W $10b1                          ;02A751|ADB110  |0210B1;
+	lda.w !char1_cursor_pos                          ;02A751|ADB110  |0210B1;
 	sta.B $3a                            ;02A754|853A    |00043A;
 	sta.W $10d2                          ;02A756|8DD210  |0210D2;
 	jsr.W Battle_SetupTargeting                    ;02A759|200F8B  |028B0F;
@@ -5368,7 +5368,7 @@ Battle_EvadeComplete:
 Battle_ProcessBlock:
 	lda.B #$00                           ;02A78A|A900    |      ;
 	xba                                  ;02A78C|EB      |      ;
-	lda.W $10a0                          ;02A78D|ADA010  |0210A0;
+	lda.w !char2_active_flag                          ;02A78D|ADA010  |0210A0;
 	and.B #$0f                           ;02A790|290F    |      ;
 	dec a;02A792|3A      |      ;
 	tax                                  ;02A793|AA      |      ;
@@ -5404,7 +5404,7 @@ Battle_BlockSuccess:
 	sta.B $a2                            ;02A7B8|85A2    |0004A2;
 	lda.B #$00                           ;02A7BA|A900    |      ;
 	xba                                  ;02A7BC|EB      |      ;
-	lda.W $10a0                          ;02A7BD|ADA010  |0210A0;
+	lda.w !char2_active_flag                          ;02A7BD|ADA010  |0210A0;
 	and.B #$0f                           ;02A7C0|290F    |      ;
 	dec a;02A7C2|3A      |      ;
 	pha                                  ;02A7C3|48      |      ;
@@ -5424,7 +5424,7 @@ Battle_BlockFailed:
 	sta.W $10d2                          ;02A7D7|8DD210  |0210D2;
 	cmp.B #$1c                           ;02A7DA|C91C    |      ;
 	bne Battle_DisplayBlock                      ;02A7DC|D007    |02A7E5;
-	lda.W $109a                          ;02A7DE|AD9A10  |02109A;
+	lda.w !char2_temp_bank                          ;02A7DE|AD9A10  |02109A;
 	beq Battle_DisplayParry                      ;02A7E1|F07B    |02A85E;
 	bra Battle_ProcessParry                      ;02A7E3|8010    |02A7F5;
 ;      |        |      ;
@@ -8233,7 +8233,7 @@ Battle_ProtectReducePhysical:
 	inc a;02DABE|1A      |      ;
 	and.B #$03                           ;02DABF|2903    |      ;
 	beq Battle_ProtectComplete                      ;02DAC1|F012    |02DAD5;
-	sta.W $050b                          ;02DAC3|8D0B05  |02050B;
+	sta.w !audio_hw_register_2                          ;02DAC3|8D0B05  |02050B;
 	lda.B #$08                           ;02DAC6|A908    |      ;
 	sta.W $050c                          ;02DAC8|8D0C05  |02050C;
 	lda.B #$0f                           ;02DACB|A90F    |      ;
@@ -8275,7 +8275,7 @@ Battle_ProcessRegen:
 	lda.W #$01be                         ;02DB18|A9BE01  |      ;
 	mvn $02,$02                          ;02DB1B|540202  |      ;
 	lda.W #$5555                         ;02DB1E|A95555  |      ;
-	sta.W $0e04                          ;02DB21|8D040E  |020E04;
+	sta.w !hw_register_1                          ;02DB21|8D040E  |020E04;
 	ldx.W #$0e04                         ;02DB24|A2040E  |      ;
 	ldy.W #$0e05                         ;02DB27|A0050E  |      ;
 	lda.W #$001a                         ;02DB2A|A91A00  |      ;
@@ -8337,7 +8337,7 @@ Battle_RegenRestoreHP:
 	bpl Battle_RegenRestoreHP                      ;02DB96|10FB    |02DB93;
 	ldy.W #$0a25                         ;02DB98|A0250A  |      ;
 	ldx.W #$dcc4                         ;02DB9B|A2C4DC  |      ;
-	lda.W $1090                          ;02DB9E|AD9010  |021090;
+	lda.w !char2_companion_id                          ;02DB9E|AD9010  |021090;
 	cmp.B #$ff                           ;02DBA1|C9FF    |      ;
 	bne Battle_RegenComplete                      ;02DBA3|D003    |02DBA8;
 	ldx.W #$dccc                         ;02DBA5|A2CCDC  |      ;
@@ -8440,7 +8440,7 @@ Battle_ProcessSap:
 	asl a;02DC66|0A      |      ;
 	phx                                  ;02DC67|DA      |      ;
 	tax                                  ;02DC68|AA      |      ;
-	lda.W $10a0                          ;02DC69|ADA010  |0210A0;
+	lda.w !char2_active_flag                          ;02DC69|ADA010  |0210A0;
 	and.B #$0f                           ;02DC6C|290F    |      ;
 	tay                                  ;02DC6E|A8      |      ;
 	lda.W UNREACH_02DCD4,y               ;02DC6F|B9D4DC  |02DCD4;
@@ -9149,10 +9149,10 @@ Battle_ProcessTriplecast:
 ;      |        |      ;
 Battle_ApplyTriplecast:
 	lda.W $0000,y                        ;02E479|B90000  |7E0000;
-	ora.W $0010,y                        ;02E47C|191000  |7E0010;
+	ora.w !ram_1031_long,y                        ;02E47C|191000  |7E0010;
 	iny                                  ;02E47F|C8      |      ;
 	ora.W $0000,y                        ;02E480|190000  |7E0000;
-	sta.W $0010,y                        ;02E483|991000  |7E0010;
+	sta.w !ram_1031_long,y                        ;02E483|991000  |7E0010;
 	iny                                  ;02E486|C8      |      ;
 	dex                                  ;02E487|CA      |      ;
 	bne Battle_ApplyTriplecast                      ;02E488|D0EF    |02E479;

@@ -61,11 +61,11 @@ Main_NormalStart:
 	lda.W #$0000                         ;008074|A90000  |      ;
 	tcd                                  ;008077|5B      |      ;
 	sep #$20                             ;008078|E220    |      ;
-	lda.W $0112                          ;00807A|AD1201  |000112;
+	lda.w !interrupt_config                          ;00807A|AD1201  |000112;
 	sta.W SNES_NMITIMEN                  ;00807D|8D0042  |004200;
 	cli                                  ;008080|58      |      ;
 	lda.B #$0f                           ;008081|A90F    |      ;
-	sta.W $00aa                          ;008083|8DAA00  |0000AA;
+	sta.w !brightness_value                          ;008083|8DAA00  |0000AA;
 	jsl.L CWaitTimingRoutine                    ;008086|2200800C|0C8000;
 	jsl.L CWaitTimingRoutine                    ;00808A|2200800C|0C8000;
 	lda.L $7e3665                        ;00808E|AF65367E|7E3665;
@@ -88,7 +88,7 @@ Init_NewGame:
 ;      |        |      ;
 Init_GraphicsSetup:
 	lda.B #$80                           ;0080B0|A980    |      ;
-	trb.W $00de                          ;0080B2|1CDE00  |0000DE;
+	trb.w !system_flags_8                          ;0080B2|1CDE00  |0000DE;
 	lda.B #$e0                           ;0080B5|A9E0    |      ;
 	trb.w !system_interrupt_flags                          ;0080B7|1C1101  |000111;
 	jsl.L CWaitTimingRoutine                    ;0080BA|2200800C|0C8000;
@@ -117,11 +117,11 @@ Init_MenuSetup:
 	trb.w !system_flags_3                          ;0080F6|1CD600  |0000D6;
 	stz.w !battle_ready_flag                          ;0080F9|9C1001  |000110;
 	lda.B #$01                           ;0080FC|A901    |      ;
-	tsb.W $00e2                          ;0080FE|0CE200  |0000E2;
+	tsb.w !system_flags_9                          ;0080FE|0CE200  |0000E2;
 	lda.B #$10                           ;008101|A910    |      ;
 	tsb.w !system_flags_3                          ;008103|0CD600  |0000D6;
 	ldx.W #$fff0                         ;008106|A2F0FF  |      ;
-	stx.W $008e                          ;008109|8E8E00  |00008E;
+	stx.w !game_state_value                          ;008109|8E8E00  |00008E;
 	jsl.L DMA_TransferGFX                    ;00810C|222F9B00|009B2F;
 	jsr.W Sub_008230                    ;008110|203082  |008230;
 	jml.L Label_018272                    ;008113|5C728201|018272;
@@ -150,7 +150,7 @@ Init_TitleScreen:
 	sta.W SNES_MDMAEN                    ;00814D|8D0B42  |00420B;
 	rep #$30                             ;008150|C230    |      ;
 	lda.W #$ffff                         ;008152|A9FFFF  |      ;
-	sta.W $010e                          ;008155|8D0E01  |00010E;
+	sta.w !save_slot_index                          ;008155|8D0E01  |00010E;
 	jsl.L Fade_ReadBrightnessTarget                    ;008158|2295C700|00C795;
 	jsr.W Screen_InitializeTitle                    ;00815C|201ABA  |00BA1A;
 	jsl.L Fade_SetBrightness                    ;00815F|22B8C700|00C7B8;
@@ -187,7 +187,7 @@ SaveData_IncrementCharacter:
 	sep #$20                             ;00819C|E220    |      ;
 	stz.B $19                            ;00819E|6419    |000019;
 	lda.W DATA8_0081d5,x                 ;0081A0|BDD581  |0081D5;
-	sta.W $0e88                          ;0081A3|8D880E  |000E88;
+	sta.w !context_param                          ;0081A3|8D880E  |000E88;
 	ldy.W DATA8_0081d6,x                 ;0081A6|BCD681  |0081D6;
 	sty.w !player_map_x                          ;0081A9|8C890E  |000E89;
 	lda.W DATA8_0081d8,x                 ;0081AC|BDD881  |0081D8;
@@ -233,7 +233,7 @@ Init_SNES:
 	ldy.W #$0002                         ;0081F9|A00200  |      ;
 	lda.W #$05fd                         ;0081FC|A9FD05  |      ;
 	mvn $00,$00                          ;0081FF|540000  |      ;
-	stz.W $0800                          ;008202|9C0008  |000800;
+	stz.w !tilemap_wram_source_start                          ;008202|9C0008  |000800;
 	ldx.W #$0800                         ;008205|A20008  |      ;
 	ldy.W #$0802                         ;008208|A00208  |      ;
 	lda.W #$17f8                         ;00820B|A9F817  |      ;
@@ -281,13 +281,13 @@ Menu_InitializeQueues:
 	tcd                                  ;008261|5B      |      ;
 	ldx.W #$ff08                         ;008262|A208FF  |      ;
 	stx.W $0503                          ;008265|8E0305  |000503;
-	stx.W $0501                          ;008268|8E0105  |000501;
+	stx.w !audio_sound_params                          ;008268|8E0105  |000501;
 	ldx.W #$880f                         ;00826B|A20F88  |      ;
 	stx.W $0508                          ;00826E|8E0805  |000508;
-	stx.W $0506                          ;008271|8E0605  |000506;
+	stx.w !audio_control_register                          ;008271|8E0605  |000506;
 	lda.W #$00ff                         ;008274|A9FF00  |      ;
 	sep #$20                             ;008277|E220    |      ;
-	sta.W $0500                          ;008279|8D0005  |000500;
+	sta.w !audio_gfx_index                          ;008279|8D0005  |000500;
 	sta.w !audio_coord_register                          ;00827C|8D0505  |000505;
 	lda.B #$00                           ;00827F|A900    |      ;
 	sta.w !audio_hw_register_1                          ;008281|8D0A05  |00050A;
@@ -302,9 +302,9 @@ Menu_InitializeQueues:
 	ldx.W #$8334                         ;0082A2|A23483  |      ;
 	jsr.W DMA_CopyParamsAndExecute                    ;0082A5|20C49B  |009BC4;
 	lda.W #$0040                         ;0082A8|A94000  |      ;
-	sta.W $01f0                          ;0082AB|8DF001  |0001F0;
+	sta.w !oam_dma_size1                          ;0082AB|8DF001  |0001F0;
 	lda.W #$0004                         ;0082AE|A90400  |      ;
-	sta.W $01f2                          ;0082B1|8DF201  |0001F2;
+	sta.w !oam_dma_size2                          ;0082B1|8DF201  |0001F2;
 	ldx.W #$b81b                         ;0082B4|A21BB8  |      ;
 	ldy.W #$3000                         ;0082B7|A00030  |      ;
 	lda.W #$0006                         ;0082BA|A90600  |      ;
@@ -329,9 +329,9 @@ Menu_InitializeQueues:
 	lda.W #$004f                         ;0082F3|A94F00  |      ;
 	mvn $00,$0c                          ;0082F6|54000C  |      ;
 	lda.W #$00ff                         ;0082F9|A9FF00  |      ;
-	sta.W $1090                          ;0082FC|8D9010  |001090;
-	sta.W $10a1                          ;0082FF|8DA110  |0010A1;
-	sta.W $10a0                          ;008302|8DA010  |0010A0;
+	sta.w !char2_companion_id                          ;0082FC|8D9010  |001090;
+	sta.w !char2_status                          ;0082FF|8DA110  |0010A1;
+	sta.w !char2_active_flag                          ;008302|8DA010  |0010A0;
 	lda.L DATA8_07800a                   ;008305|AF0A8007|07800A;
 	and.W #$739c                         ;008309|299C73  |      ;
 	sta.w !menu_color                          ;00830C|8D9C0E  |000E9C;
@@ -359,13 +359,13 @@ VBlank_Handler:
 	sep #$20                             ;00833D|E220    |      ;
 	stz.W $420c                          ;00833F|9C0C42  |02420C;
 	lda.B #$40                           ;008342|A940    |      ;
-	and.W $00e2                          ;008344|2DE200  |0200E2;
+	and.w !system_flags_9                          ;008344|2DE200  |0200E2;
 	bne VBlank_JumpHandler               ;008347|D034    |00837D;
 	lda.B #$02                           ;008349|A902    |      ;
 	and.w !system_flags_2                          ;00834B|2DD400  |0200D4;
 	bne VBlank_PaletteTransfer           ;00834E|D02A    |00837A;
 	lda.B #$40                           ;008350|A940    |      ;
-	and.W $00dd                          ;008352|2DDD00  |0200DD;
+	and.w !system_flags_7                          ;008352|2DDD00  |0200DD;
 	bne VBlank_VRAMTransfer              ;008355|D02E    |008385;
 	lda.B #$80                           ;008357|A980    |      ;
 	and.w !system_flags_4                          ;008359|2DD800  |0200D8;
@@ -395,20 +395,20 @@ VBlank_PaletteTransfer:
 ;      |        |      ;
 VBlank_JumpHandler:
 	lda.B #$40                           ;00837D|A940    |      ;
-	trb.W $00e2                          ;00837F|1CE200  |0000E2;
+	trb.w !system_flags_9                          ;00837F|1CE200  |0000E2;
 	jml.W [$0058]                        ;008382|DC5800  |000058;
 ;      |        |      ;
 ;      |        |      ;
 VBlank_VRAMTransfer:
 	ldx.W #$1801                         ;008385|A20118  |      ;
 	stx.B SNES_DMA5PARAM-$4300           ;008388|8650    |004350;
-	ldx.W $01f6                          ;00838A|AEF601  |0001F6;
+	ldx.w !vram_src_addr                          ;00838A|AEF601  |0001F6;
 	stx.B SNES_DMA5ADDRL-$4300           ;00838D|8652    |004352;
 	lda.B #$7f                           ;00838F|A97F    |      ;
 	sta.B SNES_DMA5ADDRH-$4300           ;008391|8554    |004354;
-	ldx.W $01f4                          ;008393|AEF401  |0001F4;
+	ldx.w !vram_transfer_size                          ;008393|AEF401  |0001F4;
 	stx.B SNES_DMA5CNTL-$4300            ;008396|8655    |004355;
-	ldx.W $01f8                          ;008398|AEF801  |0001F8;
+	ldx.w !vram_dest_addr                          ;008398|AEF801  |0001F8;
 	stx.W SNES_VMADDL                    ;00839B|8E1621  |002116;
 	lda.B #$84                           ;00839E|A984    |      ;
 	sta.W SNES_VMAINC                    ;0083A0|8D1521  |002115;
@@ -423,11 +423,11 @@ VBlank_FinalTransfers:
 	sta.W SNES_VMAINC                    ;0083B1|8D1521  |002115;
 	ldx.W #$1801                         ;0083B4|A20118  |      ;
 	stx.B SNES_DMA5PARAM-$4300           ;0083B7|8650    |004350;
-	ldx.W $01ed                          ;0083B9|AEED01  |0001ED;
+	ldx.w !dma_src_addr                          ;0083B9|AEED01  |0001ED;
 	stx.B SNES_DMA5ADDRL-$4300           ;0083BC|8652    |004352;
-	lda.W $01ef                          ;0083BE|ADEF01  |0001EF;
+	lda.w !dma_src_bank                          ;0083BE|ADEF01  |0001EF;
 	sta.B SNES_DMA5ADDRH-$4300           ;0083C1|8554    |004354;
-	ldx.W $01eb                          ;0083C3|AEEB01  |0001EB;
+	ldx.w !dma_size_param                          ;0083C3|AEEB01  |0001EB;
 	stx.B SNES_DMA5CNTL-$4300            ;0083C6|8655    |004355;
 	ldx.W $0048                          ;0083C8|AE4800  |000048;
 	stx.W SNES_VMADDL                    ;0083CB|8E1621  |002116;
@@ -442,7 +442,7 @@ VBlank_CheckOAMFlag:
 ;      |        |      ;
 VBlank_CleanupReturn:
 	lda.B #$40                           ;0083DD|A940    |      ;
-	trb.W $00dd                          ;0083DF|1CDD00  |0200DD;
+	trb.w !system_flags_7                          ;0083DF|1CDD00  |0200DD;
 	lda.B #$a0                           ;0083E2|A9A0    |      ;
 	trb.w !system_flags_1                          ;0083E4|1CD200  |0200D2;
 	rtl                                  ;0083E7|6B      |      ;
@@ -522,10 +522,10 @@ VBlank_StandardLowPrio:
 	lda.B #$07                           ;00847E|A907    |      ;
 	sta.B SNES_DMA5ADDRH-$4300           ;008480|8554    |004354;
 	lda.B #$88                           ;008482|A988    |      ;
-	ldx.W $00f4                          ;008484|AEF400  |0200F4;
+	ldx.w !tile_offset_1                          ;008484|AEF400  |0200F4;
 	jsr.W Sub_008504                    ;008487|200485  |008504;
 	lda.B #$98                           ;00848A|A998    |      ;
-	ldx.W $00f7                          ;00848C|AEF700  |0200F7;
+	ldx.w !tile_offset_2                          ;00848C|AEF700  |0200F7;
 	jsr.W Sub_008504                    ;00848F|200485  |008504;
 	rep #$30                             ;008492|C230    |      ;
 	ldx.W #$5e8d                         ;008494|A28D5E  |      ;
@@ -536,10 +536,10 @@ VBlank_StandardLowPrio:
 	sta.W $2118                          ;0084A5|8D1821  |022118;
 	ldx.W #$ff00                         ;0084A8|A200FF  |      ;
 	stx.w !state_marker                          ;0084AB|8EF000  |0200F0;
-	ldx.W $00f2                          ;0084AE|AEF200  |0200F2;
+	ldx.w !tilemap1_addr                          ;0084AE|AEF200  |0200F2;
 	lda.W #$6000                         ;0084B1|A90060  |      ;
 	jsr.W Sub_008520                    ;0084B4|202085  |008520;
-	ldx.W $00f5                          ;0084B7|AEF500  |0000F5;
+	ldx.w !tilemap2_addr                          ;0084B7|AEF500  |0000F5;
 	lda.W #$6040                         ;0084BA|A94060  |      ;
 	jsr.W Sub_008520                    ;0084BD|202085  |008520;
 	sep #$20                             ;0084C0|E220    |      ;
@@ -552,7 +552,7 @@ VBlank_StandardLowPrio:
 	stx.B SNES_DMA5CNTL-$4300            ;0084D1|8655    |004355;
 	lda.B #$7f                           ;0084D3|A97F    |      ;
 	sta.B SNES_DMA5ADDRH-$4300           ;0084D5|8554    |004354;
-	lda.W $1031                          ;0084D7|AD3110  |001031;
+	lda.w !ram_1031                          ;0084D7|AD3110  |001031;
 	ldx.W #$c708                         ;0084DA|A208C7  |      ;
 	cmp.B #$26                           ;0084DD|C926    |      ;
 	bcc Init_LoadTileData                      ;0084DF|900A    |0084EB;
@@ -570,8 +570,8 @@ Init_LoadTileData:
 ;      |        |      ;
 Init_CheckWeaponType:
 	ldx.W #$ffff                         ;0084F8|A2FFFF  |      ;
-	stx.W $00f2                          ;0084FB|8EF200  |0000F2;
-	stx.W $00f5                          ;0084FE|8EF500  |0000F5;
+	stx.w !tilemap1_addr                          ;0084FB|8EF200  |0000F2;
+	stx.w !tilemap2_addr                          ;0084FE|8EF500  |0000F5;
 	jmp.W VBlank_FinalTransfers          ;008501|4CA883  |0083A8;
 ;      |        |      ;
 ;      |        |      ;
@@ -619,7 +619,7 @@ VBlank_OAMTransfer:
 	stx.B SNES_DMA5ADDRL-$4300           ;00854B|8652    |004352;
 	lda.B #$00                           ;00854D|A900    |      ;
 	sta.B SNES_DMA5ADDRH-$4300           ;00854F|8554    |004354;
-	ldx.W $01f0                          ;008551|AEF001  |0001F0;
+	ldx.w !oam_dma_size1                          ;008551|AEF001  |0001F0;
 	stx.B SNES_DMA5CNTL-$4300            ;008554|8655    |004355;
 	ldx.W #$0000                         ;008556|A20000  |      ;
 	stx.W SNES_OAMADDL                   ;008559|8E0221  |002102;
@@ -627,7 +627,7 @@ VBlank_OAMTransfer:
 	sta.W SNES_MDMAEN                    ;00855E|8D0B42  |00420B;
 	ldx.W #$0e00                         ;008561|A2000E  |      ;
 	stx.B SNES_DMA5ADDRL-$4300           ;008564|8652    |004352;
-	ldx.W $01f2                          ;008566|AEF201  |0001F2;
+	ldx.w !oam_dma_size2                          ;008566|AEF201  |0001F2;
 	stx.B SNES_DMA5CNTL-$4300            ;008569|8655    |004355;
 	ldx.W #$0100                         ;00856B|A20001  |      ;
 	stx.W SNES_OAMADDL                   ;00856E|8E0221  |002102;
@@ -784,26 +784,26 @@ VBlank_BattleAlt:
 	pea.W $0004                          ;0086B5|F40400  |000004;
 	plb                                  ;0086B8|AB      |      ;
 	lda.W #$0040                         ;0086B9|A94000  |      ;
-	and.W $00de                          ;0086BC|2DDE00  |0400DE;
+	and.w !system_flags_8                          ;0086BC|2DDE00  |0400DE;
 	beq Battle_PaletteLoadAlt            ;0086BF|F032    |0086F3;
 	lda.W #$0040                         ;0086C1|A94000  |      ;
-	trb.W $00de                          ;0086C4|1CDE00  |0400DE;
-	lda.W $010d                          ;0086C7|AD0D01  |04010D;
+	trb.w !system_flags_8                          ;0086C4|1CDE00  |0400DE;
+	lda.w !anim_frame_timer                          ;0086C7|AD0D01  |04010D;
 	and.W #$ff00                         ;0086CA|2900FF  |      ;
 	clc                                  ;0086CD|18      |      ;
 	adc.W #$6180                         ;0086CE|698061  |      ;
 	sta.W $2116                          ;0086D1|8D1621  |042116;
-	lda.W $010e                          ;0086D4|AD0E01  |04010E;
+	lda.w !save_slot_index                          ;0086D4|AD0E01  |04010E;
 	asl a;0086D7|0A      |      ;
 	tax                                  ;0086D8|AA      |      ;
-	lda.W $0107,x                        ;0086D9|BD0701  |040107;
+	lda.w !char_data_ptrs,x                        ;0086D9|BD0701  |040107;
 	tax                                  ;0086DC|AA      |      ;
 	pha                                  ;0086DD|48      |      ;
 	jsr.W Battle_DoubleVRAMCopy          ;0086DE|205187  |008751;
 	ply                                  ;0086E1|7A      |      ;
 	plb                                  ;0086E2|AB      |      ;
 	clc                                  ;0086E3|18      |      ;
-	lda.W $010e                          ;0086E4|AD0E01  |00010E;
+	lda.w !save_slot_index                          ;0086E4|AD0E01  |00010E;
 	adc.W #$000d                         ;0086E7|690D00  |      ;
 	asl a;0086EA|0A      |      ;
 	asl a;0086EB|0A      |      ;
@@ -823,27 +823,27 @@ Battle_PaletteLoadAlt:
 	ldx.W #$cd20                         ;008703|A220CD  |      ;
 	ldy.W #$0004                         ;008706|A00400  |      ;
 	jsl.L VRAM_ByteCopy                    ;008709|22DF8D00|008DDF;
-	ldx.W $0107                          ;00870D|AE0701  |040107;
+	ldx.w !char_data_ptrs                          ;00870D|AE0701  |040107;
 	jsr.W Battle_DoubleVRAMCopy          ;008710|205187  |008751;
 	lda.W #$6280                         ;008713|A98062  |      ;
 	sta.W $2116                          ;008716|8D1621  |042116;
-	ldx.W $0109                          ;008719|AE0901  |040109;
+	ldx.w !char2_data_ptr                          ;008719|AE0901  |040109;
 	jsr.W Battle_DoubleVRAMCopy          ;00871C|205187  |008751;
 	lda.W #$6380                         ;00871F|A98063  |      ;
 	sta.W $2116                          ;008722|8D1621  |042116;
-	ldx.W $010b                          ;008725|AE0B01  |04010B;
+	ldx.w !char3_data_ptr                          ;008725|AE0B01  |04010B;
 	jsr.W Battle_DoubleVRAMCopy          ;008728|205187  |008751;
 	plb                                  ;00872B|AB      |      ;
 	lda.W #$d824                         ;00872C|A924D8  |      ;
 	ldx.W #$00c0                         ;00872F|A2C000  |      ;
 	jsr.W Battle_PaletteHelper           ;008732|206F87  |00876F;
-	ldy.W $0107                          ;008735|AC0701  |000107;
+	ldy.w !char_data_ptrs                          ;008735|AC0701  |000107;
 	ldx.W #$00d0                         ;008738|A2D000  |      ;
 	jsr.W Battle_PaletteCopy             ;00873B|206C87  |00876C;
-	ldy.W $0109                          ;00873E|AC0901  |000109;
+	ldy.w !char2_data_ptr                          ;00873E|AC0901  |000109;
 	ldx.W #$00e0                         ;008741|A2E000  |      ;
 	jsr.W Battle_PaletteCopy             ;008744|206C87  |00876C;
-	ldy.W $010b                          ;008747|AC0B01  |00010B;
+	ldy.w !char3_data_ptr                          ;008747|AC0B01  |00010B;
 	ldx.W #$00f0                         ;00874A|A2F000  |      ;
 	jsr.W Battle_PaletteCopy             ;00874D|206C87  |00876C;
 	rtl                                  ;008750|6B      |      ;
@@ -889,7 +889,7 @@ Battle_PaletteHelper:
 	ldy.W #$54f6                         ;008797|A0F654  |      ;
 	rep #$30                             ;00879A|C230    |      ;
 	lda.W #$0080                         ;00879C|A98000  |      ;
-	and.W $0ec6                          ;00879F|2DC60E  |000EC6;
+	and.w !dma_control_flags                          ;00879F|2DC60E  |000EC6;
 	bne Graphics_WindowCopyAlt           ;0087A2|D01B    |0087BF;
 	lda.W #$0024                         ;0087A4|A92400  |      ;
 	sta.L $7f54f4                        ;0087A7|8FF4547F|7F54F4;
@@ -919,7 +919,7 @@ Graphics_HDMASetup:
 	beq Graphics_PaletteEnd              ;0087D5|F063    |00883A;
 	lda.B #$40                           ;0087D7|A940    |      ;
 	trb.w !system_flags_2                          ;0087D9|1CD400  |0000D4;
-	lda.W $1090                          ;0087DC|AD9010  |001090;
+	lda.w !char2_companion_id                          ;0087DC|AD9010  |001090;
 	bmi Graphics_PaletteEnd              ;0087DF|3059    |00883A;
 	pea.W SNES_INIDISP                   ;0087E1|F40021  |002100;
 	pld                                  ;0087E4|2B      |      ;
@@ -934,7 +934,7 @@ Graphics_WriteVRAM:
 	stx.B SNES_VMADDL-$2100              ;0087F4|8616    |002116;
 	ldx.W #$0000                         ;0087F6|A20000  |      ;
 	lda.B #$80                           ;0087F9|A980    |      ;
-	and.W $10a0                          ;0087FB|2DA010  |0010A0;
+	and.w !char2_active_flag                          ;0087FB|2DA010  |0010A0;
 	beq Graphics_LoadData                ;0087FE|F003    |008803;
 	ldx.W #$0003                         ;008800|A20300  |      ;
 ;      |        |      ;
@@ -1072,7 +1072,7 @@ Graphics_HandlePaletteFlags:
 	lda.B #$10                           ;008915|A910    |      ;
 	trb.w !system_flags_2                          ;008917|1CD400  |0000D4;
 	ldx.w !menu_color                          ;00891A|AE9C0E  |000E9C;
-	ldy.W $0e9d                          ;00891D|AC9D0E  |000E9D;
+	ldy.w !menu_color_hi                          ;00891D|AC9D0E  |000E9D;
 	lda.B #$0d                           ;008920|A90D    |      ;
 	jsr.W Sub_008956                    ;008922|205689  |008956;
 	lda.B #$1d                           ;008925|A91D    |      ;
@@ -1088,7 +1088,7 @@ Graphics_CheckWindowFlag:
 	and.W $0eac                          ;008939|2DAC0E  |000EAC;
 	bne Graphics_WriteHDMAEnable         ;00893C|D00F    |00894D;
 	lda.W #$0001                         ;00893E|A90100  |      ;
-	and.W $00e2                          ;008941|2DE200  |0000E2;
+	and.w !system_flags_9                          ;008941|2DE200  |0000E2;
 	beq Graphics_WriteHDMAEnable         ;008944|F007    |00894D;
 	lda.W #$0169                         ;008946|A96901  |      ;
 	sta.L $7e3015                        ;008949|8F15307E|7E3015;
@@ -1144,7 +1144,7 @@ Frame_StandardUpdate:
 	and.w !system_flags_5                          ;00899F|2DDA00  |0200DA;
 	bne Frame_CheckInputMask             ;0089A2|D008    |0089AC;
 	lda.W #$0004                         ;0089A4|A90400  |      ;
-	and.W $00e2                          ;0089A7|2DE200  |0200E2;
+	and.w !system_flags_9                          ;0089A7|2DE200  |0200E2;
 	bne Frame_ProcessInput               ;0089AA|D011    |0089BD;
 ;      |        |      ;
 Frame_CheckInputMask:
@@ -1167,15 +1167,15 @@ Frame_ProcessInput:
 Frame_UpdateCharSprites:
 	phd                                  ;0089C6|0B      |      ;
 	lda.W #$0080                         ;0089C7|A98000  |      ;
-	and.W $00de                          ;0089CA|2DDE00  |0200DE;
+	and.w !system_flags_8                          ;0089CA|2DDE00  |0200DE;
 	beq Frame_SpriteReturn               ;0089CD|F057    |008A26;
 	lda.W #$0c00                         ;0089CF|A9000C  |      ;
 	tcd                                  ;0089D2|5B      |      ;
 	sep #$30                             ;0089D3|E230    |      ;
-	dec.W $010d                          ;0089D5|CE0D01  |02010D;
+	dec.w !anim_frame_timer                          ;0089D5|CE0D01  |02010D;
 	bpl Frame_SpriteReturn               ;0089D8|104C    |008A26;
 	lda.B #$0c                           ;0089DA|A90C    |      ;
-	sta.W $010d                          ;0089DC|8D0D01  |02010D;
+	sta.w !anim_frame_timer                          ;0089DC|8D0D01  |02010D;
 	lda.L $700027                        ;0089DF|AF270070|700027;
 	bne Char_CheckSecond                 ;0089E3|D005    |0089EA;
 	ldx.B #$40                           ;0089E5|A240    |      ;
@@ -1299,11 +1299,11 @@ Cursor_UpdateComplete:
 ;      |        |      ;
 	jsr.W Input_CheckCancel              ;008A9D|20578B  |008B57;
 	bne Input_ToggleReturn               ;008AA0|D01A    |008ABC;
-	lda.W $1090                          ;008AA2|AD9010  |021090;
+	lda.w !char2_companion_id                          ;008AA2|AD9010  |021090;
 	bmi Input_ToggleAlt                  ;008AA5|3012    |008AB9;
-	lda.W $10a0                          ;008AA7|ADA010  |0210A0;
+	lda.w !char2_active_flag                          ;008AA7|ADA010  |0210A0;
 	eor.B #$80                           ;008AAA|4980    |      ;
-	sta.W $10a0                          ;008AAC|8DA010  |0210A0;
+	sta.w !char2_active_flag                          ;008AAC|8DA010  |0210A0;
 	lda.B #$40                           ;008AAF|A940    |      ;
 	tsb.w !system_flags_2                          ;008AB1|0CD400  |0200D4;
 	jsr.W Sound_PlayEffect_MenuSelect                    ;008AB4|2008B9  |00B908;
@@ -1318,10 +1318,10 @@ Input_ToggleReturn:
 ;      |        |      ;
 ;      |        |      ;
 Menu_CheckDisplayMode:
-	lda.W $1032                          ;008ABD|AD3210  |021032;
+	lda.w !char_x_pos                          ;008ABD|AD3210  |021032;
 	cmp.B #$80                           ;008AC0|C980    |      ;
 	bne Menu_StandardDisplay             ;008AC2|D008    |008ACC;
-	lda.W $1033                          ;008AC4|AD3310  |021033;
+	lda.w !char_y_pos                          ;008AC4|AD3310  |021033;
 	bne Menu_StandardDisplay             ;008AC7|D003    |008ACC;
 	jmp.W Sound_PlayEffect_MenuMove                    ;008AC9|4C12B9  |00B912;
 ;      |        |      ;
@@ -1332,7 +1332,7 @@ Menu_StandardDisplay:
 	jsr.W Input_CheckCancel              ;008ACF|20578B  |008B57;
 	bne Menu_CycleDone                   ;008AD2|D023    |008AF7;
 	jsr.W Menu_CheckDisplayMode          ;008AD4|20BD8A  |008ABD;
-	lda.W $1031                          ;008AD7|AD3110  |021031;
+	lda.w !ram_1031                          ;008AD7|AD3110  |021031;
 	sec                                  ;008ADA|38      |      ;
 	sbc.B #$20                           ;008ADB|E920    |      ;
 	ldx.B #$ff                           ;008ADD|A2FF    |      ;
@@ -1360,7 +1360,7 @@ Menu_CycleDone:
 	jsr.W Input_CheckCancel              ;008AF8|20578B  |008B57;
 	bne Menu_CycleDown_Done              ;008AFB|D023    |008B20;
 	jsr.W Menu_CheckDisplayMode          ;008AFD|20BD8A  |008ABD;
-	lda.W $1031                          ;008B00|AD3110  |021031;
+	lda.w !ram_1031                          ;008B00|AD3110  |021031;
 	sec                                  ;008B03|38      |      ;
 	sbc.B #$20                           ;008B04|E920    |      ;
 	ldx.B #$ff                           ;008B06|A2FF    |      ;
@@ -1569,7 +1569,7 @@ Cursor_CalcPosition:
 Cursor_UpdateSprite:
 	php                                  ;008C3D|08      |      ;
 	sep #$30                             ;008C3E|E230    |      ;
-	ldx.W $1031                          ;008C40|AE3110  |001031;
+	ldx.w !ram_1031                          ;008C40|AE3110  |001031;
 	cpx.B #$ff                           ;008C43|E0FF    |      ;
 	beq UNREACH_008C81                   ;008C45|F03A    |008C81;
 	lda.B #$02                           ;008C47|A902    |      ;
@@ -1608,11 +1608,11 @@ Cursor_UpdateSprite_Field:
 	lda.L DATA8_049800,x                 ;008C83|BF009804|049800;
 	asl a;008C87|0A      |      ;
 	asl a;008C88|0A      |      ;
-	sta.W $00f4                          ;008C89|8DF400  |0000F4;
+	sta.w !tile_offset_1                          ;008C89|8DF400  |0000F4;
 	rep #$10                             ;008C8C|C210    |      ;
-	lda.W $1031                          ;008C8E|AD3110  |001031;
+	lda.w !ram_1031                          ;008C8E|AD3110  |001031;
 	jsr.W Cursor_CalcTileIndex           ;008C91|208A8D  |008D8A;
-	stx.W $00f2                          ;008C94|8EF200  |0000F2;
+	stx.w !tilemap1_addr                          ;008C94|8EF200  |0000F2;
 	ldx.W #$2d1a                         ;008C97|A21A2D  |      ;
 	lda.B #$7e                           ;008C9A|A97E    |      ;
 ;      |        |      ;
@@ -1699,7 +1699,7 @@ Menu2_UpdateCursor:
 	lda.B #$02                           ;008D2C|A902    |      ;
 	and.w !system_flags_4                          ;008D2E|2DD800  |0000D8;
 	beq Menu2_UpdateCursor_Field         ;008D31|F039    |008D6C;
-	ldx.W $10b1                          ;008D33|AEB110  |0010B1;
+	ldx.w !char1_cursor_pos                          ;008D33|AEB110  |0010B1;
 	cpx.B #$ff                           ;008D36|E0FF    |      ;
 	beq Menu2_UpdateCursor_Return        ;008D38|F030    |008D6A;
 	lda.L DATA8_049800,x                 ;008D3A|BF009804|049800;
@@ -1731,15 +1731,15 @@ Menu2_UpdateCursor_Return:
 ;      |        |      ;
 ;      |        |      ;
 Menu2_UpdateCursor_Field:
-	ldx.W $10b1                          ;008D6C|AEB110  |0010B1;
+	ldx.w !char1_cursor_pos                          ;008D6C|AEB110  |0010B1;
 	lda.L DATA8_049800,x                 ;008D6F|BF009804|049800;
 	asl a;008D73|0A      |      ;
 	asl a;008D74|0A      |      ;
-	sta.W $00f7                          ;008D75|8DF700  |0000F7;
+	sta.w !tile_offset_2                          ;008D75|8DF700  |0000F7;
 	rep #$10                             ;008D78|C210    |      ;
-	lda.W $10b1                          ;008D7A|ADB110  |0010B1;
+	lda.w !char1_cursor_pos                          ;008D7A|ADB110  |0010B1;
 	jsr.W Cursor_CalcTileIndex           ;008D7D|208A8D  |008D8A;
-	stx.W $00f5                          ;008D80|8EF500  |0000F5;
+	stx.w !tilemap2_addr                          ;008D80|8EF500  |0000F5;
 	lda.B #$80                           ;008D83|A980    |      ;
 	tsb.w !system_flags_2                          ;008D85|0CD400  |0000D4;
 	plp                                  ;008D88|28      |      ;
@@ -1756,12 +1756,12 @@ Cursor_CalcTileIndex:
 ;      |        |      ;
 UNREACH_008D93:
 	db $a2,$ff,$ff,$60                   ;008D93|        |      ;
-	lda.W $1031                          ;008D97|AD3110  |001031;
+	lda.w !ram_1031                          ;008D97|AD3110  |001031;
 	pha                                  ;008D9A|48      |      ;
 	lda.W #$0003                         ;008D9B|A90300  |      ;
 	jsr.W Menu_ValidateItem              ;008D9E|20A88D  |008DA8;
 	pla                                  ;008DA1|68      |      ;
-	sta.W $1031                          ;008DA2|8D3110  |001031;
+	sta.w !ram_1031                          ;008DA2|8D3110  |001031;
 	sty.B $9e                            ;008DA5|849E    |00009E;
 	rts                                  ;008DA7|60      |      ;
 ;      |        |      ;
@@ -1780,9 +1780,9 @@ Menu_ValidateItem:
 	sec                                  ;008DB7|38      |      ;
 	adc.B #$04                           ;008DB8|6904    |      ;
 	tax                                  ;008DBA|AA      |      ;
-	lda.W $1032                          ;008DBB|AD3210  |021032;
+	lda.w !char_x_pos                          ;008DBB|AD3210  |021032;
 	xba                                  ;008DBE|EB      |      ;
-	lda.W $1033                          ;008DBF|AD3310  |021033;
+	lda.w !char_y_pos                          ;008DBF|AD3310  |021033;
 	rep #$20                             ;008DC2|C220    |      ;
 	sep #$10                             ;008DC4|E210    |      ;
 	lsr a;008DC6|4A      |      ;
@@ -1804,7 +1804,7 @@ Menu_ValidateItem_Loop:
 	ldy.B #$ff                           ;008DD8|A0FF    |      ;
 ;      |        |      ;
 Menu_ValidateItem_Invalid:
-	sty.W $1031                          ;008DDA|8C3110  |021031;
+	sty.w !ram_1031                          ;008DDA|8C3110  |021031;
 	plp                                  ;008DDD|28      |      ;
 	rts                                  ;008DDE|60      |      ;
 ;      |        |      ;
@@ -1837,7 +1837,7 @@ VRAM_CopyLoop:
 	sta.B SNES_VMDATAL-$2100             ;008E0F|8518    |002118;
 	lda.w !state_marker                          ;008E11|ADF000  |0400F0;
 	sep #$20                             ;008E14|E220    |      ;
-	lda.W $0010,x                        ;008E16|BD1000  |040010;
+	lda.w !ram_1031_long,x                        ;008E16|BD1000  |040010;
 	tay                                  ;008E19|A8      |      ;
 	sty.B SNES_VMDATAL-$2100             ;008E1A|8418    |002118;
 	lda.W $0011,x                        ;008E1C|BD1100  |040011;
@@ -1858,7 +1858,7 @@ VRAM_CopyLoop:
 	lda.W $0016,x                        ;008E3A|BD1600  |040016;
 	tay                                  ;008E3D|A8      |      ;
 	sty.B SNES_VMDATAL-$2100             ;008E3E|8418    |002118;
-	lda.W $0017,x                        ;008E40|BD1700  |040017;
+	lda.w !general_address,x                        ;008E40|BD1700  |040017;
 	tay                                  ;008E43|A8      |      ;
 	sty.B SNES_VMDATAL-$2100             ;008E44|8418    |002118;
 	rep #$30                             ;008E46|C230    |      ;
@@ -1981,7 +1981,7 @@ Battle_LoadGraphics:
 	jsr.W Palette_Write8Colors                    ;008F32|20B48F  |008FB4;
 	plb                                  ;008F35|AB      |      ;
 	ldx.w !menu_color                          ;008F36|AE9C0E  |000E9C;
-	ldy.W $0e9d                          ;008F39|AC9D0E  |000E9D;
+	ldy.w !menu_color_hi                          ;008F39|AC9D0E  |000E9D;
 	lda.B #$0d                           ;008F3C|A90D    |      ;
 	sta.B SNES_CGADD-$2100               ;008F3E|8521    |002121;
 	stx.B SNES_CGDATA-$2100              ;008F40|8622    |002122;
@@ -2080,7 +2080,7 @@ Menu_InitializeItemCounts:
 	phk                                  ;00902B|4B      |      ;
 	plb                                  ;00902C|AB      |      ;
 	sep #$30                             ;00902D|E230    |      ;
-	pea.W $1000                          ;00902F|F40010  |001000;
+	pea.w !char1_data_page                          ;00902F|F40010  |001000;
 	pld                                  ;009032|2B      |      ;
 	lda.B $32                            ;009033|A532    |001032;
 	and.B #$e0                           ;009035|29E0    |      ;
@@ -2134,7 +2134,7 @@ Menu_CountAccessories:
 Menu_CountSpells:
 	ldy.B #$00                           ;009092|A000    |      ;
 	jsr.W Menu_UpdateItemDisplay                    ;009094|20A390  |0090A3;
-	pea.W $1080                          ;009097|F48010  |001080;
+	pea.w !char2_data_page                          ;009097|F48010  |001080;
 	pld                                  ;00909A|2B      |      ;
 	ldy.B #$50                           ;00909B|A050    |      ;
 	jsr.W Menu_UpdateItemDisplay                    ;00909D|20A390  |0090A3;
@@ -2339,12 +2339,12 @@ Stats_UpdateDisplay:
 	pea.W $007e                          ;0091D8|F47E00  |00007E;
 	plb                                  ;0091DB|AB      |      ;
 	clc                                  ;0091DC|18      |      ;
-	pea.W $1000                          ;0091DD|F40010  |7E1000;
+	pea.w !char1_data_page                          ;0091DD|F40010  |7E1000;
 	pld                                  ;0091E0|2B      |      ;
 	ldx.B #$00                           ;0091E1|A200    |      ;
 	bit.B #$01                           ;0091E3|8901    |      ;
 	beq Stats_UpdateDigits                      ;0091E5|F006    |0091ED;
-	pea.W $1080                          ;0091E7|F48010  |7E1080;
+	pea.w !char2_data_page                          ;0091E7|F48010  |7E1080;
 	pld                                  ;0091EA|2B      |      ;
 	ldx.B #$50                           ;0091EB|A250    |      ;
 ;      |        |      ;
@@ -2427,11 +2427,11 @@ Sound_ExecuteCommands:
 	rep #$10                             ;009273|C210    |      ;
 	lda.B #$20                           ;009275|A920    |      ;
 	tsb.W $00d9                          ;009277|0CD900  |0200D9;
-	pea.W $0500                          ;00927A|F40005  |020500;
+	pea.w !audio_gfx_index                          ;00927A|F40005  |020500;
 	pld                                  ;00927D|2B      |      ;
 	cli                                  ;00927E|58      |      ;
 	lda.B #$04                           ;00927F|A904    |      ;
-	and.W $00e2                          ;009281|2DE200  |0200E2;
+	and.w !system_flags_9                          ;009281|2DE200  |0200E2;
 	bne Sound_ProcessCommand2                      ;009284|D01D    |0092A3;
 	lda.B $00                            ;009286|A500    |000500;
 	bmi Sound_ProcessCommand2                      ;009288|3019    |0092A3;
@@ -2473,7 +2473,7 @@ Sound_ProcessCommand3:
 ;      |        |      ;
 Sound_CheckBit:
 	lda.B #$04                           ;0092D2|A904    |      ;
-	and.W $00e2                          ;0092D4|2DE200  |0200E2;
+	and.w !system_flags_9                          ;0092D4|2DE200  |0200E2;
 	bne Sound_EnableInterrupts                      ;0092D7|D010    |0092E9;
 ;      |        |      ;
 Sound_ExecuteCall:
@@ -2505,7 +2505,7 @@ NMI_EnableAndProcess:
 	sep #$30                             ;0092FC|E230    |      ;
 	lda.B #$40                           ;0092FE|A940    |      ;
 	tsb.w !system_flags_3                          ;009300|0CD600  |0000D6;
-	lda.W $0112                          ;009303|AD1201  |000112;
+	lda.w !interrupt_config                          ;009303|AD1201  |000112;
 	sta.W SNES_NMITIMEN                  ;009306|8D0042  |004200;
 	cli                                  ;009309|58      |      ;
 	jsl.L Fade_SetBrightness                    ;00930A|22B8C700|00C7B8;
@@ -2531,7 +2531,7 @@ Timer_Initialize:
 	lda.B #$02                           ;00932D|A902    |      ;
 	trb.w !system_flags_6                          ;00932F|1CDB00  |0000DB;
 	lda.B #$80                           ;009332|A980    |      ;
-	trb.W $00e2                          ;009334|1CE200  |0000E2;
+	trb.w !system_flags_9                          ;009334|1CE200  |0000E2;
 	lda.B #$04                           ;009337|A904    |      ;
 	tsb.w !system_flags_6                          ;009339|0CDB00  |0000DB;
 	rep #$30                             ;00933C|C230    |      ;
@@ -2565,7 +2565,7 @@ Timer_ProcessFrame:
 ;      |        |      ;
 Timer_UpdateCounter:
 	lda.W #$0080                         ;009362|A98000  |      ;
-	and.W $00e2                          ;009365|2DE200  |0200E2;
+	and.w !system_flags_9                          ;009365|2DE200  |0200E2;
 	bne UNREACH_0093C9                   ;009368|D05F    |0093C9;
 	jsr.W Input_CheckAnyPressed                    ;00936A|20FB95  |0095FB;
 	bne UNREACH_0093C9                   ;00936D|D05A    |0093C9;
@@ -2640,11 +2640,11 @@ UNREACH_0093CC:
 	db $a9,$80,$00,$85,$90,$60,$a9,$00,$04,$a6,$13,$10,$f6,$80,$f1;0095EC|        |      ;
 ;      |        |      ;
 Input_CheckAnyPressed:
-	lda.W $102f                          ;0095FB|AD2F10  |02102F;
-	ora.W $10af                          ;0095FE|0DAF10  |0210AF;
+	lda.w !char1_state_flags                          ;0095FB|AD2F10  |02102F;
+	ora.w !char2_state_flags                          ;0095FE|0DAF10  |0210AF;
 	and.W #$0003                         ;009601|290300  |      ;
-	ora.W $1021                          ;009604|0D2110  |021021;
-	ora.W $10a1                          ;009607|0DA110  |0210A1;
+	ora.w !char1_status                          ;009604|0D2110  |021021;
+	ora.w !char2_status                          ;009607|0DA110  |0210A1;
 	and.W #$00ff                         ;00960A|29FF00  |      ;
 	rts                                  ;00960D|60      |      ;
 ;      |        |      ;
@@ -3034,8 +3034,8 @@ Memory_Copy32Bytes:
 	sta.W $0014,y                        ;009912|991400  |7E0014;
 	lda.W $0012,x                        ;009915|BD1200  |7E0012;
 	sta.W $0012,y                        ;009918|991200  |7E0012;
-	lda.W $0010,x                        ;00991B|BD1000  |7E0010;
-	sta.W $0010,y                        ;00991E|991000  |7E0010;
+	lda.w !ram_1031_long,x                        ;00991B|BD1000  |7E0010;
+	sta.w !ram_1031_long,y                        ;00991E|991000  |7E0010;
 	lda.W $000e,x                        ;009921|BD0E00  |7E000E;
 	sta.W $000e,y                        ;009924|990E00  |7E000E;
 	lda.W $000c,x                        ;009927|BD0C00  |7E000C;
@@ -3148,7 +3148,7 @@ Memory_Fill_32Bytes:
 	sta.W $0012,y                        ;0099FF|991200  |7F0012;
 ;      |        |      ;
 Memory_Fill_16Bytes:
-	sta.W $0010,y                        ;009A02|991000  |7F0010;
+	sta.w !ram_1031_long,y                        ;009A02|991000  |7F0010;
 ;      |        |      ;
 Memory_Fill_14Bytes:
 	sta.W $000e,y                        ;009A05|990E00  |7F000E;
@@ -3987,36 +3987,36 @@ Dialog_LoadPointerFromTable:
 Party_CopyPositionData:
 	jsr.W Party_UpdatePositionData                    ;00A1F8|2020A2  |00A220;
 	sep #$20                             ;00A1FB|E220    |      ;
-	ldx.W $101b                          ;00A1FD|AE1B10  |00101B;
-	stx.W $1018                          ;00A200|8E1810  |001018;
-	lda.W $101d                          ;00A203|AD1D10  |00101D;
-	sta.W $101a                          ;00A206|8D1A10  |00101A;
-	ldx.W $109b                          ;00A209|AE9B10  |00109B;
-	stx.W $1098                          ;00A20C|8E9810  |001098;
-	lda.W $109d                          ;00A20F|AD9D10  |00109D;
-	sta.W $109a                          ;00A212|8D9A10  |00109A;
+	ldx.w !char1_temp_data_2                          ;00A1FD|AE1B10  |00101B;
+	stx.w !char1_current_mp                          ;00A200|8E1810  |001018;
+	lda.w !char1_temp_bank                          ;00A203|AD1D10  |00101D;
+	sta.w !char1_temp_data_1                          ;00A206|8D1A10  |00101A;
+	ldx.w !char2_temp_data_2                          ;00A209|AE9B10  |00109B;
+	stx.w !char2_current_mp                          ;00A20C|8E9810  |001098;
+	lda.w !char2_temp_data_3                          ;00A20F|AD9D10  |00109D;
+	sta.w !char2_temp_bank                          ;00A212|8D9A10  |00109A;
 	rts                                  ;00A215|60      |      ;
 ;      |        |      ;
 	jsr.W Party_CopyPositionData                    ;00A216|20F8A1  |00A1F8;
-	stz.W $1021                          ;00A219|9C2110  |001021;
-	stz.W $10a1                          ;00A21C|9CA110  |0010A1;
+	stz.w !char1_status                          ;00A219|9C2110  |001021;
+	stz.w !char2_status                          ;00A21C|9CA110  |0010A1;
 	rts                                  ;00A21F|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
 Party_UpdatePositionData:
-	ldx.W $1016                          ;00A220|AE1610  |001016;
-	stx.W $1014                          ;00A223|8E1410  |001014;
-	ldx.W $1096                          ;00A226|AE9610  |001096;
-	stx.W $1094                          ;00A229|8E9410  |001094;
+	ldx.w !char1_max_hp                          ;00A220|AE1610  |001016;
+	stx.w !char1_current_hp                          ;00A223|8E1410  |001014;
+	ldx.w !char2_max_hp                          ;00A226|AE9610  |001096;
+	stx.w !char2_current_hp                          ;00A229|8E9410  |001094;
 	lda.W #$0003                         ;00A22C|A90300  |      ;
-	trb.W $102f                          ;00A22F|1C2F10  |00102F;
-	trb.W $10af                          ;00A232|1CAF10  |0010AF;
+	trb.w !char1_state_flags                          ;00A22F|1C2F10  |00102F;
+	trb.w !char2_state_flags                          ;00A232|1CAF10  |0010AF;
 	rts                                  ;00A235|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
 Party_LoadCharacterData:
 	lda.W #$0080                         ;00A236|A98000  |      ;
-	and.W $10a0                          ;00A239|2DA010  |0010A0;
+	and.w !char2_active_flag                          ;00A239|2DA010  |0010A0;
 	php                                  ;00A23C|08      |      ;
 	lda.B [$17]                          ;00A23D|A717    |000017;
 	inc.B $17                            ;00A23F|E617    |000017;
@@ -4040,7 +4040,7 @@ Party_LoadCharacterData:
 	plp                                  ;00A26A|28      |      ;
 	bne Party_LoadCharacterData_Return                      ;00A26B|D006    |00A273;
 	lda.W #$0080                         ;00A26D|A98000  |      ;
-	trb.W $10a0                          ;00A270|1CA010  |0010A0;
+	trb.w !char2_active_flag                          ;00A270|1CA010  |0010A0;
 ;      |        |      ;
 Party_LoadCharacterData_Return:
 	rts                                  ;00A273|60      |      ;
@@ -4167,7 +4167,7 @@ Cutscene_ProcessScroll:
 	lda.B $40                            ;00A34E|A540    |000040;
 	sta.W $01ee                          ;00A350|8DEE01  |0001EE;
 	lda.B $44                            ;00A353|A544    |000044;
-	sta.W $01ed                          ;00A355|8DED01  |0001ED;
+	sta.w !dma_src_addr                          ;00A355|8DED01  |0001ED;
 	sec                                  ;00A358|38      |      ;
 	sbc.B $3f                            ;00A359|E53F    |00003F;
 	lsr a;00A35B|4A      |      ;
@@ -4176,7 +4176,7 @@ Cutscene_ProcessScroll:
 	sec                                  ;00A360|38      |      ;
 	lda.B $46                            ;00A361|A546    |000046;
 	sbc.B $44                            ;00A363|E544    |000044;
-	sta.W $01eb                          ;00A365|8DEB01  |0001EB;
+	sta.w !dma_size_param                          ;00A365|8DEB01  |0001EB;
 	lda.W #$00e0                         ;00A368|A9E000  |      ;
 	tsb.w !system_flags_1                          ;00A36B|0CD200  |0000D2;
 	lda.W #$ffff                         ;00A36E|A9FFFF  |      ;
@@ -5261,7 +5261,7 @@ TextBox_FillBackground_Loop:
 	dec a;00AC6E|3A      |      ;
 	sta.W $0012,y                        ;00AC6F|991200  |7E0012;
 	dec a;00AC72|3A      |      ;
-	sta.W $0010,y                        ;00AC73|991000  |7E0010;
+	sta.w !ram_1031_long,y                        ;00AC73|991000  |7E0010;
 	dec a;00AC76|3A      |      ;
 	sta.W $000e,y                        ;00AC77|990E00  |7E000E;
 	dec a;00AC7A|3A      |      ;
@@ -6509,7 +6509,7 @@ UNREACH_00B4BB:
 	stz.B $a0                            ;00B50B|64A0    |0000A0;
 ;      |        |      ;
 Text_CountHighBytes_Loop:
-	lda.W $1100,x                        ;00B50D|BD0011  |001100;
+	lda.w !char_name_buffer,x                        ;00B50D|BD0011  |001100;
 	inx                                  ;00B510|E8      |      ;
 	cmp.B #$80                           ;00B511|C980    |      ;
 	bcc Text_CountHighBytes_SecondPass                      ;00B513|9007    |00B51C;
@@ -6523,7 +6523,7 @@ Text_CountHighBytes_SecondPass:
 	beq Text_SelectMaxCount                      ;00B51D|F00D    |00B52C;
 ;      |        |      ;
 Text_CountHighBytes_InnerLoop:
-	lda.W $1100,x                        ;00B51F|BD0011  |001100;
+	lda.w !char_name_buffer,x                        ;00B51F|BD0011  |001100;
 	inx                                  ;00B522|E8      |      ;
 	cmp.B #$80                           ;00B523|C980    |      ;
 	bcc Text_SelectMaxCount                      ;00B525|9005    |00B52C;
@@ -6730,7 +6730,7 @@ Dialog_CalculateBottom:
 	lda.B #$40                           ;00B682|A940    |      ;
 	and.W $00e0                          ;00B684|2DE000  |0000E0;
 	beq Dialog_Complete                      ;00B687|F028    |00B6B1;
-	lda.W $01bf                          ;00B689|ADBF01  |0001BF;
+	lda.w !menu_char1_pos                          ;00B689|ADBF01  |0001BF;
 	bra Dialog_CompareCursorPosition                      ;00B68C|800A    |00B698;
 ;      |        |      ;
 ;      |        |      ;
@@ -6738,7 +6738,7 @@ Dialog_CheckCursorMode:
 	lda.B #$80                           ;00B68E|A980    |      ;
 	and.W $00e0                          ;00B690|2DE000  |0000E0;
 	beq Dialog_Complete                      ;00B693|F01C    |00B6B1;
-	lda.W $0181                          ;00B695|AD8101  |000181;
+	lda.w !menu_char2_pos                          ;00B695|AD8101  |000181;
 ;      |        |      ;
 Dialog_CompareCursorPosition:
 	cmp.B $62                            ;00B698|C562    |000062;
@@ -6798,35 +6798,35 @@ Sprite_Load_SpecialBlank:
 Item_SubtractGold:
 	sec                                  ;00B6E7|38      |      ;
 	lda.W $0e84                          ;00B6E8|AD840E  |000E84;
-	sbc.W $0164                          ;00B6EB|ED6401  |000164;
+	sbc.w !menu_amount_lo                          ;00B6EB|ED6401  |000164;
 	sta.W $0e84                          ;00B6EE|8D840E  |000E84;
 	sep #$20                             ;00B6F1|E220    |      ;
 	lda.W $0e86                          ;00B6F3|AD860E  |000E86;
-	sbc.W $0166                          ;00B6F6|ED6601  |000166;
+	sbc.w !menu_amount_hi                          ;00B6F6|ED6601  |000166;
 	sta.W $0e86                          ;00B6F9|8D860E  |000E86;
-	lda.W $015f                          ;00B6FC|AD5F01  |00015F;
+	lda.w !menu_selection                          ;00B6FC|AD5F01  |00015F;
 	cmp.B #$dd                           ;00B6FF|C9DD    |      ;
 	beq Item_UpdateGPCounter                      ;00B701|F013    |00B716;
 	jsl.L Item_GetCharacterStats                    ;00B703|2265DA00|00DA65;
 	clc                                  ;00B707|18      |      ;
-	adc.W $0162                          ;00B708|6D6201  |000162;
+	adc.w !menu_cursor_pos                          ;00B708|6D6201  |000162;
 	sta.W $0e9f,x                        ;00B70B|9D9F0E  |000E9F;
-	lda.W $015f                          ;00B70E|AD5F01  |00015F;
+	lda.w !menu_selection                          ;00B70E|AD5F01  |00015F;
 	sta.W $0e9e,x                        ;00B711|9D9E0E  |000E9E;
 	bra Text_WrapCheck_Return                      ;00B714|8011    |00B727;
 ;      |        |      ;
 ;      |        |      ;
 Item_UpdateGPCounter:
 	clc                                  ;00B716|18      |      ;
-	lda.W $1030                          ;00B717|AD3010  |001030;
-	adc.W $0162                          ;00B71A|6D6201  |000162;
-	sta.W $1030                          ;00B71D|8D3010  |001030;
+	lda.w !env_counter                          ;00B717|AD3010  |001030;
+	adc.w !menu_cursor_pos                          ;00B71A|6D6201  |000162;
+	sta.w !env_counter                          ;00B71D|8D3010  |001030;
 	bra Text_WrapCheck_Return                      ;00B720|8005    |00B727;
 ;      |        |      ;
 ;      |        |      ;
 Dialog_RestorePointer:
 	sep #$20                             ;00B722|E220    |      ;
-	stz.W $0162                          ;00B724|9C6201  |000162;
+	stz.w !menu_cursor_pos                          ;00B724|9C6201  |000162;
 ;      |        |      ;
 Text_WrapCheck_Return:
 	plx                                  ;00B727|FA      |      ;
@@ -6854,13 +6854,13 @@ Input_WaitLoop:
 	bit.W #$0200                         ;00B751|890002  |      ;
 	beq Input_WaitLoop                      ;00B754|F0D8    |00B72E;
 	sep #$20                             ;00B756|E220    |      ;
-	dec.W $0162                          ;00B758|CE6201  |000162;
+	dec.w !menu_cursor_pos                          ;00B758|CE6201  |000162;
 	bpl Input_RefreshDisplay                      ;00B75B|1030    |00B78D;
 	lda.B $95                            ;00B75D|A595    |000095;
 	and.B #$02                           ;00B75F|2902    |      ;
 	beq UNREACH_00B76B                   ;00B761|F008    |00B76B;
-	lda.W $0163                          ;00B763|AD6301  |000163;
-	sta.W $0162                          ;00B766|8D6201  |000162;
+	lda.w !menu_max_pos                          ;00B763|AD6301  |000163;
+	sta.w !menu_cursor_pos                          ;00B766|8D6201  |000162;
 	bra Input_RefreshDisplay                      ;00B769|8022    |00B78D;
 ;      |        |      ;
 ;      |        |      ;
@@ -6869,19 +6869,19 @@ UNREACH_00B76B:
 ;      |        |      ;
 Input_HandleRight:
 	sep #$20                             ;00B770|E220    |      ;
-	inc.W $0162                          ;00B772|EE6201  |000162;
-	lda.W $0163                          ;00B775|AD6301  |000163;
-	cmp.W $0162                          ;00B778|CD6201  |000162;
+	inc.w !menu_cursor_pos                          ;00B772|EE6201  |000162;
+	lda.w !menu_max_pos                          ;00B775|AD6301  |000163;
+	cmp.w !menu_cursor_pos                          ;00B778|CD6201  |000162;
 	bcs Input_RefreshDisplay                      ;00B77B|B010    |00B78D;
 	lda.B $95                            ;00B77D|A595    |000095;
 	and.B #$01                           ;00B77F|2901    |      ;
 	beq Input_HandleRight_Wrap                      ;00B781|F005    |00B788;
-	stz.W $0162                          ;00B783|9C6201  |000162;
+	stz.w !menu_cursor_pos                          ;00B783|9C6201  |000162;
 	bra Input_RefreshDisplay                      ;00B786|8005    |00B78D;
 ;      |        |      ;
 ;      |        |      ;
 Input_HandleRight_Wrap:
-	dec.W $0162                          ;00B788|CE6201  |000162;
+	dec.w !menu_cursor_pos                          ;00B788|CE6201  |000162;
 	bra Input_WaitLoop                      ;00B78B|80A1    |00B72E;
 ;      |        |      ;
 ;      |        |      ;
@@ -6918,22 +6918,22 @@ VBlank_WaitForScanline_First:
 	lda.W SNES_SLHV                      ;00B836|AD3721  |002137;
 	lda.W SNES_STAT78                    ;00B839|AD3F21  |00213F;
 	lda.W SNES_OPVCT                     ;00B83C|AD3D21  |00213D;
-	sta.W $0118                          ;00B83F|8D1801  |000118;
+	sta.w !irq_handler_addr                          ;00B83F|8D1801  |000118;
 	lda.B #$40                           ;00B842|A940    |      ;
 	and.w !system_flags_5                          ;00B844|2DDA00  |0000DA;
 	bne VBlank_CheckPolling_First                      ;00B847|D00B    |00B854;
-	lda.W $0118                          ;00B849|AD1801  |000118;
+	lda.w !irq_handler_addr                          ;00B849|AD1801  |000118;
 	asl a;00B84C|0A      |      ;
-	adc.W $0118                          ;00B84D|6D1801  |000118;
+	adc.w !irq_handler_addr                          ;00B84D|6D1801  |000118;
 	adc.B #$9a                           ;00B850|699A    |      ;
 	pha                                  ;00B852|48      |      ;
 	plp                                  ;00B853|28      |      ;
 ;      |        |      ;
 VBlank_CheckPolling_First:
-	lsr.W $0118                          ;00B854|4E1801  |000118;
+	lsr.w !irq_handler_addr                          ;00B854|4E1801  |000118;
 	bcs VBlank_WaitForScanline_First                      ;00B857|B0DD    |00B836;
 	ldx.W #$b86c                         ;00B859|A26CB8  |      ;
-	stx.W $0118                          ;00B85C|8E1801  |000118;
+	stx.w !irq_handler_addr                          ;00B85C|8E1801  |000118;
 	lda.B #$11                           ;00B85F|A911    |      ;
 	sta.W SNES_NMITIMEN                  ;00B861|8D0042  |004200;
 	cli                                  ;00B864|58      |      ;
@@ -6956,8 +6956,8 @@ VBlank_CheckPolling_First:
 	lda.B #$07                           ;00B87F|A907    |      ;
 	sta.W SNES_VTIMEL                    ;00B881|8D0942  |004209;
 	ldx.W #$b898                         ;00B884|A298B8  |      ;
-	stx.W $0118                          ;00B887|8E1801  |000118;
-	lda.W $0112                          ;00B88A|AD1201  |000112;
+	stx.w !irq_handler_addr                          ;00B887|8E1801  |000118;
+	lda.w !interrupt_config                          ;00B88A|AD1201  |000112;
 	sta.W SNES_NMITIMEN                  ;00B88D|8D0042  |004200;
 	lda.B #$40                           ;00B890|A940    |      ;
 	tsb.w !system_flags_4                          ;00B892|0CD800  |0000D8;
@@ -6978,22 +6978,22 @@ VBlank_WaitForScanline_Second:
 	lda.W SNES_SLHV                      ;00B8A4|AD3721  |002137;
 	lda.W SNES_STAT78                    ;00B8A7|AD3F21  |00213F;
 	lda.W SNES_OPVCT                     ;00B8AA|AD3D21  |00213D;
-	sta.W $0118                          ;00B8AD|8D1801  |000118;
+	sta.w !irq_handler_addr                          ;00B8AD|8D1801  |000118;
 	lda.B #$40                           ;00B8B0|A940    |      ;
 	and.w !system_flags_5                          ;00B8B2|2DDA00  |0000DA;
 	bne VBlank_CheckPolling_Second                      ;00B8B5|D00B    |00B8C2;
-	lda.W $0118                          ;00B8B7|AD1801  |000118;
+	lda.w !irq_handler_addr                          ;00B8B7|AD1801  |000118;
 	asl a;00B8BA|0A      |      ;
-	adc.W $0118                          ;00B8BB|6D1801  |000118;
+	adc.w !irq_handler_addr                          ;00B8BB|6D1801  |000118;
 	adc.B #$0f                           ;00B8BE|690F    |      ;
 	pha                                  ;00B8C0|48      |      ;
 	plp                                  ;00B8C1|28      |      ;
 ;      |        |      ;
 VBlank_CheckPolling_Second:
-	lsr.W $0118                          ;00B8C2|4E1801  |000118;
+	lsr.w !irq_handler_addr                          ;00B8C2|4E1801  |000118;
 	bcc VBlank_WaitForScanline_Second                      ;00B8C5|90DD    |00B8A4;
 	ldx.W #$b8da                         ;00B8C7|A2DAB8  |      ;
-	stx.W $0118                          ;00B8CA|8E1801  |000118;
+	stx.w !irq_handler_addr                          ;00B8CA|8E1801  |000118;
 	lda.B #$11                           ;00B8CD|A911    |      ;
 	sta.W SNES_NMITIMEN                  ;00B8CF|8D0042  |004200;
 	cli                                  ;00B8D2|58      |      ;
@@ -7016,8 +7016,8 @@ VBlank_CheckPolling_Second:
 	lda.B #$d8                           ;00B8EF|A9D8    |      ;
 	sta.W $4209                          ;00B8F1|8D0942  |024209;
 	ldx.W #$b82a                         ;00B8F4|A22AB8  |      ;
-	stx.W $0118                          ;00B8F7|8E1801  |020118;
-	lda.W $0112                          ;00B8FA|AD1201  |020112;
+	stx.w !irq_handler_addr                          ;00B8F7|8E1801  |020118;
+	lda.w !interrupt_config                          ;00B8FA|AD1201  |020112;
 	sta.W $4200                          ;00B8FD|8D0042  |024200;
 	lda.B #$20                           ;00B900|A920    |      ;
 	tsb.w !system_flags_4                          ;00B902|0CD800  |0200D8;
@@ -7102,9 +7102,9 @@ SaveFile_LoadAndCheck:
 	ldx.W #$ba17                         ;00B96E|A217BA  |      ;
 	jsr.W DMA_CopyParamsAndExecute                    ;00B971|20C49B  |009BC4;
 	tsc                                  ;00B974|3B      |      ;
-	sta.W $0105                          ;00B975|8D0501  |000105;
+	sta.w !saved_stack_ptr                          ;00B975|8D0501  |000105;
 	lda.W #$0080                         ;00B978|A98000  |      ;
-	tsb.W $00de                          ;00B97B|0CDE00  |0000DE;
+	tsb.w !system_flags_8                          ;00B97B|0CDE00  |0000DE;
 	pei.B ($01)                          ;00B97E|D401    |000001;
 	pei.B ($03)                          ;00B980|D403    |000003;
 	lda.W #$0401                         ;00B982|A90104  |      ;
@@ -7132,14 +7132,14 @@ SaveFile_CheckInput:
 	rep #$30                             ;00B9B7|C230    |      ;
 	and.W #$00ff                         ;00B9B9|29FF00  |      ;
 	dec a;00B9BC|3A      |      ;
-	sta.W $010e                          ;00B9BD|8D0E01  |00010E;
+	sta.w !save_slot_index                          ;00B9BD|8D0E01  |00010E;
 	bmi UNREACH_00B9D5                   ;00B9C0|3013    |00B9D5;
 	jsr.W SaveFile_CalculateOffset                    ;00B9C2|202BC9  |00C92B;
 	tax                                  ;00B9C5|AA      |      ;
 	lda.L $700000,x                      ;00B9C6|BF000070|700000;
 	beq UNREACH_00B9DB                   ;00B9CA|F00F    |00B9DB;
 	jsr.W Sound_PlayEffect_MenuSelect                    ;00B9CC|2008B9  |00B908;
-	lda.W $010e                          ;00B9CF|AD0E01  |00010E;
+	lda.w !save_slot_index                          ;00B9CF|AD0E01  |00010E;
 	jmp.W SaveFile_SaveOperation                    ;00B9D2|4C63CA  |00CA63;
 ;      |        |      ;
 ;      |        |      ;
@@ -7189,7 +7189,7 @@ Screen_ScrollBG3_Loop:
 	lda.W #$0000                         ;00BA61|A90000  |      ;
 	sta.B $05                            ;00BA64|8505    |000005;
 	sta.B $01                            ;00BA66|8501    |000001;
-	sta.W $015f                          ;00BA68|8D5F01  |00015F;
+	sta.w !menu_selection                          ;00BA68|8D5F01  |00015F;
 	bra SaveFile_RefreshDisplay                      ;00BA6B|8072    |00BADF;
 ;      |        |      ;
 ;      |        |      ;
@@ -7225,7 +7225,7 @@ SaveFile_HandleInput:
 	rep #$10                             ;00BAAB|C210    |      ;
 	inc.W $00cc                          ;00BAAD|EECC00  |0000CC;
 	lda.L DATA8_03a37c,x                 ;00BAB0|BF7CA303|03A37C;
-	sta.W $1000,y                        ;00BAB4|990010  |001000;
+	sta.w !char1_data_page,y                        ;00BAB4|990010  |001000;
 	jsr.W Sound_PlayEffect_WindowClose                    ;00BAB7|2026B9  |00B926;
 	ldx.W #$baed                         ;00BABA|A2EDBA  |      ;
 	jsr.W DMA_CopyParamsAndExecute                    ;00BABD|20C49B  |009BC4;
@@ -7242,7 +7242,7 @@ SaveFile_ValidateSelection:
 ;      |        |      ;
 ;      |        |      ;
 SaveFile_StoreSelection:
-	stx.W $015f                          ;00BAD9|8E5F01  |00015F;
+	stx.w !menu_selection                          ;00BAD9|8E5F01  |00015F;
 	jsr.W Sound_PlayEffect_WindowOpen                    ;00BADC|201CB9  |00B91C;
 ;      |        |      ;
 SaveFile_RefreshDisplay:
@@ -7367,13 +7367,13 @@ Screen_InitializeVideoRegisters:
 	sta.B SNES_CGADD-$2100               ;00BBF5|8521    |002121;
 	lda.w !menu_color                          ;00BBF7|AD9C0E  |000E9C;
 	sta.B SNES_CGDATA-$2100              ;00BBFA|8522    |002122;
-	lda.W $0e9d                          ;00BBFC|AD9D0E  |000E9D;
+	lda.w !menu_color_hi                          ;00BBFC|AD9D0E  |000E9D;
 	sta.B SNES_CGDATA-$2100              ;00BBFF|8522    |002122;
 	lda.B #$71                           ;00BC01|A971    |      ;
 	sta.B SNES_CGADD-$2100               ;00BC03|8521    |002121;
 	lda.w !menu_color                          ;00BC05|AD9C0E  |000E9C;
 	sta.B SNES_CGDATA-$2100              ;00BC08|8522    |002122;
-	lda.W $0e9d                          ;00BC0A|AD9D0E  |000E9D;
+	lda.w !menu_color_hi                          ;00BC0A|AD9D0E  |000E9D;
 	sta.B SNES_CGDATA-$2100              ;00BC0D|8522    |002122;
 	stz.B SNES_BG1HOFS-$2100             ;00BC0F|640D    |00210D;
 	stz.B SNES_BG1HOFS-$2100             ;00BC11|640D    |00210D;
@@ -7391,9 +7391,9 @@ Screen_InitializeVideoRegisters:
 	jsr.W Battle_InitializeGraphics                    ;00BC2B|20DBC4  |00C4DB;
 	jsr.W Battle_InitializeTilemap                    ;00BC2E|2064BD  |00BD64;
 	lda.W #$0200                         ;00BC31|A90002  |      ;
-	sta.W $01f0                          ;00BC34|8DF001  |0001F0;
+	sta.w !oam_dma_size1                          ;00BC34|8DF001  |0001F0;
 	lda.W #$0020                         ;00BC37|A92000  |      ;
-	sta.W $01f2                          ;00BC3A|8DF201  |0001F2;
+	sta.w !oam_dma_size2                          ;00BC3A|8DF201  |0001F2;
 	lda.W #$0701                         ;00BC3D|A90107  |      ;
 	sta.B $03                            ;00BC40|8503    |000003;
 	stz.B $05                            ;00BC42|6405    |000005;
@@ -7454,7 +7454,7 @@ Scene_Initialize:
 	trb.w !system_flags_3                          ;00BCAD|1CD600  |0100D6;
 	lda.W $0e00                          ;00BCB0|AD000E  |010E00;
 	pha                                  ;00BCB3|48      |      ;
-	stz.W $008e                          ;00BCB4|9C8E00  |01008E;
+	stz.w !game_state_value                          ;00BCB4|9C8E00  |01008E;
 	jsl.L Fade_SetBrightness                    ;00BCB7|22B8C700|00C7B8;
 	jsr.W Screen_InitializeVideoRegisters                    ;00BCBB|20F0BA  |00BAF0;
 	lda.W #$0001                         ;00BCBE|A90100  |      ;
@@ -7474,17 +7474,17 @@ Scene_InitializeGFX:
 	tsb.w !system_flags_1                          ;00BCD7|0CD200  |0000D2;
 	jsl.L Fade_ReadBrightnessTarget                    ;00BCDA|2295C700|00C795;
 	lda.W #$00a0                         ;00BCDE|A9A000  |      ;
-	sta.W $01f0                          ;00BCE1|8DF001  |0001F0;
+	sta.w !oam_dma_size1                          ;00BCE1|8DF001  |0001F0;
 	lda.W #$000a                         ;00BCE4|A90A00  |      ;
-	sta.W $01f2                          ;00BCE7|8DF201  |0001F2;
+	sta.w !oam_dma_size2                          ;00BCE7|8DF201  |0001F2;
 	tsc                                  ;00BCEA|3B      |      ;
-	sta.W $0105                          ;00BCEB|8D0501  |000105;
+	sta.w !saved_stack_ptr                          ;00BCEB|8D0501  |000105;
 	jsr.W Scene_MainLoop                    ;00BCEE|20B9BD  |00BDB9;
 	lda.W #$00ff                         ;00BCF1|A9FF00  |      ;
 	sep #$30                             ;00BCF4|E230    |      ;
 	sta.W $0104                          ;00BCF6|8D0401  |000104;
 	rep #$30                             ;00BCF9|C230    |      ;
-	lda.W $0105                          ;00BCFB|AD0501  |000105;
+	lda.w !saved_stack_ptr                          ;00BCFB|AD0501  |000105;
 	tcs                                  ;00BCFE|1B      |      ;
 	jsl.L Fade_SetBrightness                    ;00BCFF|22B8C700|00C7B8;
 	jsr.W Battle_InitializeTilemap                    ;00BD03|2064BD  |00BD64;
@@ -7492,9 +7492,9 @@ Scene_InitializeGFX:
 	jsr.W DMA_CopyParamsAndExecute                    ;00BD09|20C49B  |009BC4;
 	jsl.L CWaitTimingRoutine                    ;00BD0C|2200800C|0C8000;
 	lda.W #$0040                         ;00BD10|A94000  |      ;
-	sta.W $01f0                          ;00BD13|8DF001  |0001F0;
+	sta.w !oam_dma_size1                          ;00BD13|8DF001  |0001F0;
 	lda.W #$0004                         ;00BD16|A90400  |      ;
-	sta.W $01f2                          ;00BD19|8DF201  |0001F2;
+	sta.w !oam_dma_size2                          ;00BD19|8DF201  |0001F2;
 	pla                                  ;00BD1C|68      |      ;
 	sta.W $0e00                          ;00BD1D|8D000E  |000E00;
 	jsr.W Graphics_ClearFlag                    ;00BD20|208DC7  |00C78D;
@@ -7613,11 +7613,11 @@ Scene_ProcessFrame_AltMode:
 	lda.W #$0001                         ;00BDFD|A90100  |      ;
 	trb.w !system_flags_4                          ;00BE00|1CD800  |0000D8;
 	lda.W #$0080                         ;00BE03|A98000  |      ;
-	tsb.W $00de                          ;00BE06|0CDE00  |0000DE;
+	tsb.w !system_flags_8                          ;00BE06|0CDE00  |0000DE;
 	pei.B ($01)                          ;00BE09|D401    |000001;
 	pei.B ($05)                          ;00BE0B|D405    |000005;
 	pei.B ($03)                          ;00BE0D|D403    |000003;
-	lda.W $010d                          ;00BE0F|AD0D01  |00010D;
+	lda.w !anim_frame_timer                          ;00BE0F|AD0D01  |00010D;
 	bpl Scene_Update                      ;00BE12|1003    |00BE17;
 	lda.W #$0000                         ;00BE14|A90000  |      ;
 ;      |        |      ;
@@ -7690,7 +7690,7 @@ Input_ProcessButtons:
 	stz.B $8e                            ;00BE9A|648E    |00008E;
 	stz.B $8f                            ;00BE9C|648F    |00008F;
 	ldx.W #$0102                         ;00BE9E|A20201  |      ;
-	lda.W $1090                          ;00BEA1|AD9010  |001090;
+	lda.w !char2_companion_id                          ;00BEA1|AD9010  |001090;
 	bpl Input_CheckDirection                      ;00BEA4|1003    |00BEA9;
 	ldx.W #$0101                         ;00BEA6|A20101  |      ;
 ;      |        |      ;
@@ -7701,7 +7701,7 @@ Input_CheckDirection:
 	lda.L $7e3664                        ;00BEAF|AF64367E|7E3664;
 	beq Input_HandleUp                      ;00BEB3|F014    |00BEC9;
 	bmi UNREACH_00BEC0                   ;00BEB5|3009    |00BEC0;
-	lda.W $1090                          ;00BEB7|AD9010  |001090;
+	lda.w !char2_companion_id                          ;00BEB7|AD9010  |001090;
 	bmi Input_HandleUp                      ;00BEBA|300D    |00BEC9;
 	inc.B $01                            ;00BEBC|E601    |000001;
 	bra Input_HandleUp                      ;00BEBE|8009    |00BEC9;
@@ -7873,7 +7873,7 @@ Sprite_ApplyOffset:
 	dec.W $0e9f,x                        ;00BFE2|DE9F0E  |000E9F;
 	tax                                  ;00BFE5|AA      |      ;
 	sep #$20                             ;00BFE6|E220    |      ;
-	stz.W $1021,x                        ;00BFE8|9E2110  |001021;
+	stz.w !char1_status,x                        ;00BFE8|9E2110  |001021;
 	rep #$30                             ;00BFEB|C230    |      ;
 	bra Sprite_WriteOAM                      ;00BFED|80D1    |00BFC0;
 ;      |        |      ;
@@ -7887,16 +7887,16 @@ Sprite_StoreToOAM:
 Sprite_Complete:
 	dec.W $0e9f,x                        ;00BFF9|DE9F0E  |000E9F;
 	tax                                  ;00BFFC|AA      |      ;
-	lda.W $1016,x                        ;00BFFD|BD1610  |001016;
+	lda.w !char1_max_hp,x                        ;00BFFD|BD1610  |001016;
 	lsr a;00C000|4A      |      ;
 	lsr a;00C001|4A      |      ;
-	adc.W $1014,x                        ;00C002|7D1410  |001014;
-	cmp.W $1016,x                        ;00C005|DD1610  |001016;
+	adc.w !char1_current_hp,x                        ;00C002|7D1410  |001014;
+	cmp.w !char1_max_hp,x                        ;00C005|DD1610  |001016;
 	bcc Sprite_SetPosition                      ;00C008|9003    |00C00D;
-	lda.W $1016,x                        ;00C00A|BD1610  |001016;
+	lda.w !char1_max_hp,x                        ;00C00A|BD1610  |001016;
 ;      |        |      ;
 Sprite_SetPosition:
-	sta.W $1014,x                        ;00C00D|9D1410  |001014;
+	sta.w !char1_current_hp,x                        ;00C00D|9D1410  |001014;
 	bra Sprite_WriteOAM                      ;00C010|80AE    |00BFC0;
 ;      |        |      ;
 ;      |        |      ;
@@ -7959,7 +7959,7 @@ Menu_ValidateItem:
 	beq Menu_CheckItemValid                      ;00C09D|F013    |00C0B2;
 	cmp.W #$0003                         ;00C09F|C90300  |      ;
 	bne UNREACH_00C044                   ;00C0A2|D0A0    |00C044;
-	lda.W $1090                          ;00C0A4|AD9010  |001090;
+	lda.w !char2_companion_id                          ;00C0A4|AD9010  |001090;
 	and.W #$00ff                         ;00C0A7|29FF00  |      ;
 	cmp.W #$00ff                         ;00C0AA|C9FF00  |      ;
 	beq UNREACH_00C044                   ;00C0AD|F095    |00C044;
@@ -7967,7 +7967,7 @@ Menu_ValidateItem:
 ;      |        |      ;
 Menu_CheckItemValid:
 	tax                                  ;00C0B2|AA      |      ;
-	lda.W $1021,x                        ;00C0B3|BD2110  |001021;
+	lda.w !char1_status,x                        ;00C0B3|BD2110  |001021;
 	and.W #$00f9                         ;00C0B6|29F900  |      ;
 	bne UNREACH_00C044                   ;00C0B9|D089    |00C044;
 	lda.W #$0007                         ;00C0BB|A90700  |      ;
@@ -7975,9 +7975,9 @@ Menu_CheckItemValid:
 	sbc.B $02                            ;00C0BF|E502    |000002;
 	and.W #$00ff                         ;00C0C1|29FF00  |      ;
 	jsr.W Bitfield_GetBitmask                    ;00C0C4|20F297  |0097F2;
-	and.W $1038,x                        ;00C0C7|3D3810  |001038;
+	and.w !char1_spell_equipped,x                        ;00C0C7|3D3810  |001038;
 	beq UNREACH_00C095                   ;00C0CA|F0C9    |00C095;
-	lda.W $1018,x                        ;00C0CC|BD1810  |001018;
+	lda.w !char1_current_mp,x                        ;00C0CC|BD1810  |001018;
 	and.W #$00ff                         ;00C0CF|29FF00  |      ;
 	beq UNREACH_00C095                   ;00C0D2|F0C1    |00C095;
 	lda.B $02                            ;00C0D4|A502    |000002;
@@ -7991,15 +7991,15 @@ Menu_CheckItemValid:
 	cmp.W #$0001                         ;00C0E7|C90100  |      ;
 	beq Menu_UpdateItemCount                      ;00C0EA|F008    |00C0F4;
 	tax                                  ;00C0EC|AA      |      ;
-	lda.W $1016                          ;00C0ED|AD1610  |001016;
-	sta.W $1014                          ;00C0F0|8D1410  |001014;
+	lda.w !char1_max_hp                          ;00C0ED|AD1610  |001016;
+	sta.w !char1_current_hp                          ;00C0F0|8D1410  |001014;
 	txa                                  ;00C0F3|8A      |      ;
 ;      |        |      ;
 Menu_UpdateItemCount:
 	cmp.W #$0000                         ;00C0F4|C90000  |      ;
 	beq Menu_DecrementItem                      ;00C0F7|F006    |00C0FF;
-	lda.W $1096                          ;00C0F9|AD9610  |001096;
-	sta.W $1094                          ;00C0FC|8D9410  |001094;
+	lda.w !char2_max_hp                          ;00C0F9|AD9610  |001096;
+	sta.w !char2_current_hp                          ;00C0FC|8D9410  |001094;
 ;      |        |      ;
 Menu_DecrementItem:
 	sep #$20                             ;00C0FF|E220    |      ;
@@ -8009,7 +8009,7 @@ Menu_DecrementItem:
 	ldx.W #$0080                         ;00C108|A28000  |      ;
 ;      |        |      ;
 Menu_UpdateItemDisplay:
-	dec.W $1018,x                        ;00C10B|DE1810  |001018;
+	dec.w !char1_current_mp,x                        ;00C10B|DE1810  |001018;
 	lda.W $04df                          ;00C10E|ADDF04  |0004DF;
 	sta.w !audio_coord_register                          ;00C111|8D0505  |000505;
 	rep #$30                             ;00C114|C230    |      ;
@@ -8024,12 +8024,12 @@ Menu_ProcessEquipment:
 	sep #$20                             ;00C124|E220    |      ;
 	cmp.B #$01                           ;00C126|C901    |      ;
 	beq Menu_ClearEquipmentFlag                      ;00C128|F003    |00C12D;
-	stz.W $1021                          ;00C12A|9C2110  |001021;
+	stz.w !char1_status                          ;00C12A|9C2110  |001021;
 ;      |        |      ;
 Menu_ClearEquipmentFlag:
 	cmp.B #$00                           ;00C12D|C900    |      ;
 	beq Menu_ProcessEquipment_Done                      ;00C12F|F003    |00C134;
-	stz.W $10a1                          ;00C131|9CA110  |0010A1;
+	stz.w !char2_status                          ;00C131|9CA110  |0010A1;
 ;      |        |      ;
 Menu_ProcessEquipment_Done:
 	rep #$30                             ;00C134|C230    |      ;
@@ -8044,7 +8044,7 @@ Menu_ProcessUsableItem:
 	jsr.W Menu_ConfirmItemUse                    ;00C13B|20B1C1  |00C1B1;
 	beq Menu_Return                      ;00C13E|F0F8    |00C138;
 	pha                                  ;00C140|48      |      ;
-	lda.W $1025,x                        ;00C141|BD2510  |001025;
+	lda.w !char1_spell_power,x                        ;00C141|BD2510  |001025;
 	and.W #$00ff                         ;00C144|29FF00  |      ;
 	sta.B $64                            ;00C147|8564    |000064;
 	asl a;00C149|0A      |      ;
@@ -8057,29 +8057,29 @@ Menu_ProcessUsableItem:
 	lda.B $01,s                          ;00C154|A301    |000001;
 	cmp.W #$0001                         ;00C156|C90100  |      ;
 	beq Menu_ProcessItemPercent                      ;00C159|F014    |00C16F;
-	lda.W $1016                          ;00C15B|AD1610  |001016;
+	lda.w !char1_max_hp                          ;00C15B|AD1610  |001016;
 	jsr.W Math_CalculatePercent                    ;00C15E|208DC1  |00C18D;
-	adc.W $1014                          ;00C161|6D1410  |001014;
-	cmp.W $1016                          ;00C164|CD1610  |001016;
+	adc.w !char1_current_hp                          ;00C161|6D1410  |001014;
+	cmp.w !char1_max_hp                          ;00C164|CD1610  |001016;
 	bcc Menu_UpdateItemPercent                      ;00C167|9003    |00C16C;
-	lda.W $1016                          ;00C169|AD1610  |001016;
+	lda.w !char1_max_hp                          ;00C169|AD1610  |001016;
 ;      |        |      ;
 Menu_UpdateItemPercent:
-	sta.W $1014                          ;00C16C|8D1410  |001014;
+	sta.w !char1_current_hp                          ;00C16C|8D1410  |001014;
 ;      |        |      ;
 Menu_ProcessItemPercent:
 	sty.B $98                            ;00C16F|8498    |000098;
 	lda.B $01,s                          ;00C171|A301    |000001;
 	beq Menu_CompleteItemUpdate                      ;00C173|F014    |00C189;
-	lda.W $1096                          ;00C175|AD9610  |001096;
+	lda.w !char2_max_hp                          ;00C175|AD9610  |001096;
 	jsr.W Math_CalculatePercent                    ;00C178|208DC1  |00C18D;
-	adc.W $1094                          ;00C17B|6D9410  |001094;
-	cmp.W $1096                          ;00C17E|CD9610  |001096;
+	adc.w !char2_current_hp                          ;00C17B|6D9410  |001094;
+	cmp.w !char2_max_hp                          ;00C17E|CD9610  |001096;
 	bcc Menu_StoreItemPercent                      ;00C181|9003    |00C186;
-	lda.W $1096                          ;00C183|AD9610  |001096;
+	lda.w !char2_max_hp                          ;00C183|AD9610  |001096;
 ;      |        |      ;
 Menu_StoreItemPercent:
-	sta.W $1094                          ;00C186|8D9410  |001094;
+	sta.w !char2_current_hp                          ;00C186|8D9410  |001094;
 ;      |        |      ;
 Menu_CompleteItemUpdate:
 	pla                                  ;00C189|68      |      ;
@@ -8176,7 +8176,7 @@ ColorSelect_ApplyChange:
 	beq ColorSelect_Red                      ;00C235|F019    |00C250;
 	cmp.B #$05                           ;00C237|C905    |      ;
 	bcc ColorSelect_Green                      ;00C239|9007    |00C242;
-	lda.W $0e9d                          ;00C23B|AD9D0E  |000E9D;
+	lda.w !menu_color_hi                          ;00C23B|AD9D0E  |000E9D;
 	lsr a;00C23E|4A      |      ;
 	lsr a;00C23F|4A      |      ;
 	bra ColorSelect_ExtractChannel                      ;00C240|8011    |00C253;
@@ -8216,7 +8216,7 @@ ColorSelect_Blue:
 ;      |        |      ;
 ;      |        |      ;
 ColorSelect_CheckBattleMode:
-	lda.W $1090                          ;00C26D|AD9010  |001090;
+	lda.w !char2_companion_id                          ;00C26D|AD9010  |001090;
 	bpl ColorSelect_ProcessBattleColor                      ;00C270|100A    |00C27C;
 	lda.B $06                            ;00C272|A506    |000006;
 	eor.B #$02                           ;00C274|4902    |      ;
@@ -8227,7 +8227,7 @@ ColorSelect_CheckBattleMode:
 ;      |        |      ;
 ColorSelect_ProcessBattleColor:
 	lda.B #$80                           ;00C27C|A980    |      ;
-	and.W $10a0                          ;00C27E|2DA010  |0010A0;
+	and.w !char2_active_flag                          ;00C27E|2DA010  |0010A0;
 	beq ColorSelect_ProcessBattleColor_Value                      ;00C281|F002    |00C285;
 	lda.B #$ff                           ;00C283|A9FF    |      ;
 ;      |        |      ;
@@ -8240,7 +8240,7 @@ ColorSelect_ProcessBattleColor_Value:
 ;      |        |      ;
 ColorSelect_ProcessField:
 	lda.B #$80                           ;00C28E|A980    |      ;
-	and.W $0ec6                          ;00C290|2DC60E  |000EC6;
+	and.w !dma_control_flags                          ;00C290|2DC60E  |000EC6;
 	beq ColorSelect_StoreSelection                      ;00C293|F002    |00C297;
 	db $a9,$01                           ;00C295|        |      ;
 ;      |        |      ;
@@ -8280,16 +8280,16 @@ ColorSelect_ToggleSetting:
 ;      |        |      ;
 ;      |        |      ;
 ColorSelect_ToggleBattleMode:
-	lda.W $10a0                          ;00C2D9|ADA010  |0010A0;
+	lda.w !char2_active_flag                          ;00C2D9|ADA010  |0010A0;
 	eor.B #$80                           ;00C2DC|4980    |      ;
-	sta.W $10a0                          ;00C2DE|8DA010  |0010A0;
+	sta.w !char2_active_flag                          ;00C2DE|8DA010  |0010A0;
 	bra ColorSelect_PlaySound                      ;00C2E1|8008    |00C2EB;
 ;      |        |      ;
 ;      |        |      ;
 ColorSelect_ToggleFieldMode:
-	lda.W $0ec6                          ;00C2E3|ADC60E  |000EC6;
+	lda.w !dma_control_flags                          ;00C2E3|ADC60E  |000EC6;
 	eor.B #$80                           ;00C2E6|4980    |      ;
-	sta.W $0ec6                          ;00C2E8|8DC60E  |000EC6;
+	sta.w !dma_control_flags                          ;00C2E8|8DC60E  |000EC6;
 ;      |        |      ;
 ColorSelect_PlaySound:
 	jsr.W Sound_PlayEffect_MenuSelect                    ;00C2EB|2008B9  |00B908;
@@ -8301,7 +8301,7 @@ ColorSelect_ProcessBrightness:
 	bcc ColorSelect_ProcessBlue                      ;00C2F2|9031    |00C325;
 	beq ColorSelect_ProcessGreen                      ;00C2F4|F014    |00C30A;
 	lda.B #$7c                           ;00C2F6|A97C    |      ;
-	trb.W $0e9d                          ;00C2F8|1C9D0E  |000E9D;
+	trb.w !menu_color_hi                          ;00C2F8|1C9D0E  |000E9D;
 	lda.B $01                            ;00C2FB|A501    |000001;
 	asl a;00C2FD|0A      |      ;
 	asl a;00C2FE|0A      |      ;
@@ -8311,7 +8311,7 @@ ColorSelect_ProcessBrightness:
 	lda.B #$7c                           ;00C303|A97C    |      ;
 ;      |        |      ;
 ColorSelect_StoreBrightness:
-	tsb.W $0e9d                          ;00C305|0C9D0E  |000E9D;
+	tsb.w !menu_color_hi                          ;00C305|0C9D0E  |000E9D;
 	bra ColorSelect_PlaySound                      ;00C308|80E1    |00C2EB;
 ;      |        |      ;
 ;      |        |      ;
@@ -8383,10 +8383,10 @@ FileSelect_Confirm:
 	dec a;00C376|3A      |      ;
 	rep #$30                             ;00C377|C230    |      ;
 	and.W #$00ff                         ;00C379|29FF00  |      ;
-	sta.W $010e                          ;00C37C|8D0E01  |00010E;
+	sta.w !save_slot_index                          ;00C37C|8D0E01  |00010E;
 	jsr.W SaveFile_PrepareOperation                    ;00C37F|20D3C9  |00C9D3;
 	lda.W #$0040                         ;00C382|A94000  |      ;
-	tsb.W $00de                          ;00C385|0CDE00  |0000DE;
+	tsb.w !system_flags_8                          ;00C385|0CDE00  |0000DE;
 	jsr.W Character_LoadPortraits                    ;00C388|203FCF  |00CF3F;
 	ldx.W #$c3d8                         ;00C38B|A2D8C3  |      ;
 	jsr.W DMA_CopyParamsAndExecute                    ;00C38E|20C49B  |009BC4;
@@ -8730,7 +8730,7 @@ Graphics_ProcessPaletteEntry:
 	sec                                  ;00C62F|38      |      ;
 ;      |        |      ;
 Graphics_StorePaletteValue:
-	sta.W $0010,x                        ;00C630|9D1000  |7E0010;
+	sta.w !ram_1031_long,x                        ;00C630|9D1000  |7E0010;
 	sta.W $0012,x                        ;00C633|9D1200  |7E0012;
 	sta.W $0014,x                        ;00C636|9D1400  |7E0014;
 	sta.W $0016,x                        ;00C639|9D1600  |7E0016;
@@ -8892,10 +8892,10 @@ Fade_ReadBrightnessTarget:
 	sep #$20                             ;00C796|E220    |      ;
 	lda.B #$80                           ;00C798|A980    |      ;
 	trb.w !system_flags_3                          ;00C79A|1CD600  |0000D6;
-	lda.W $00aa                          ;00C79D|ADAA00  |0000AA;
+	lda.w !brightness_value                          ;00C79D|ADAA00  |0000AA;
 	and.B #$f0                           ;00C7A0|29F0    |      ;
 	sta.w !battle_ready_flag                          ;00C7A2|8D1001  |000110;
-	lda.W $00aa                          ;00C7A5|ADAA00  |0000AA;
+	lda.w !brightness_value                          ;00C7A5|ADAA00  |0000AA;
 ;      |        |      ;
 Fade_IncrementLoop:
 	cmp.w !battle_ready_flag                          ;00C7A8|CD1001  |000110;
@@ -8914,7 +8914,7 @@ Fade_SetBrightness:
 	php                                  ;00C7B8|08      |      ;
 	sep #$20                             ;00C7B9|E220    |      ;
 	lda.w !battle_ready_flag                          ;00C7BB|AD1001  |010110;
-	sta.W $00aa                          ;00C7BE|8DAA00  |0100AA;
+	sta.w !brightness_value                          ;00C7BE|8DAA00  |0100AA;
 ;      |        |      ;
 Fade_Complete:
 	bit.B #$0f                           ;00C7C1|890F    |      ;
@@ -8945,7 +8945,7 @@ Battle_SetupGraphics:
 ;      |        |      ;
 ;      |        |      ;
 Battle_CheckAltMode:
-	lda.W $010d                          ;00C7F0|AD0D01  |00010D;
+	lda.w !anim_frame_timer                          ;00C7F0|AD0D01  |00010D;
 	bpl Battle_ClearBuffer                      ;00C7F3|1003    |00C7F8;
 	lda.W #$0000                         ;00C7F5|A90000  |      ;
 ;      |        |      ;
@@ -9012,7 +9012,7 @@ Battle_LoadPalettes:
 	ldx.W #$c91c                         ;00C880|A21CC9  |      ;
 	bra Battle_ExecuteDMA                      ;00C883|8018    |00C89D;
 ;      |        |      ;
-	lda.W $010d                          ;00C885|AD0D01  |00010D;
+	lda.w !anim_frame_timer                          ;00C885|AD0D01  |00010D;
 	bpl Battle_CheckSaveMode                      ;00C888|1003    |00C88D;
 	lda.W #$0000                         ;00C88A|A90000  |      ;
 ;      |        |      ;
@@ -9074,7 +9074,7 @@ Battle_LoadGraphicsLoop:
 	db $03,$4b,$93,$03,$57,$93,$03,$60,$93,$03,$a9,$93,$03,$ae,$93,$03;00C903|        |      ;
 	db $f7,$93,$03,$fc,$93,$03,$74,$94,$03,$79,$94,$03,$dd,$94,$03,$e2;00C913|        |      ;
 	db $94,$03,$ea,$97,$03               ;00C923|        |      ;
-	lda.W $015f                          ;00C928|AD5F01  |00015F;
+	lda.w !menu_selection                          ;00C928|AD5F01  |00015F;
 ;      |        |      ;
 SaveFile_CalculateOffset:
 	and.W #$00ff                         ;00C92B|29FF00  |      ;
@@ -9358,11 +9358,11 @@ Color_InitializeFade:
 	trb.w !system_flags_5                          ;00CAEE|1CDA00  |0000DA;
 	jsr.W Color_FadeToBlack                    ;00CAF1|2009CC  |00CC09;
 	ldx.W #$5555                         ;00CAF4|A25555  |      ;
-	stx.W $0e04                          ;00CAF7|8E040E  |000E04;
-	stx.W $0e06                          ;00CAFA|8E060E  |000E06;
+	stx.w !hw_register_1                          ;00CAF7|8E040E  |000E04;
+	stx.w !status_register                          ;00CAFA|8E060E  |000E06;
 	stx.W $0e08                          ;00CAFD|8E080E  |000E08;
 	lda.B #$80                           ;00CB00|A980    |      ;
-	trb.W $00de                          ;00CB02|1CDE00  |0000DE;
+	trb.w !system_flags_8                          ;00CB02|1CDE00  |0000DE;
 	bra Color_SetupDisplay                      ;00CB05|8072    |00CB79;
 ;      |        |      ;
 ;      |        |      ;
@@ -9382,7 +9382,7 @@ Color_CopyPalette:
 	mvn $00,$00                          ;00CB1F|540000  |      ;
 	sep #$20                             ;00CB22|E220    |      ;
 	lda.B #$80                           ;00CB24|A980    |      ;
-	tsb.W $00de                          ;00CB26|0CDE00  |0000DE;
+	tsb.w !system_flags_8                          ;00CB26|0CDE00  |0000DE;
 	jsr.W Graphics_RestorePalettes                    ;00CB29|2060CD  |00CD60;
 	jsr.W Color_FadeIn                    ;00CB2C|20C6CB  |00CBC6;
 	jsl.L CWaitTimingRoutine                    ;00CB2F|2200800C|0C8000;
@@ -9663,7 +9663,7 @@ Graphics_RestorePalettes:
 	sta.W SNES_CGADD                     ;00CD80|8D2121  |002121;
 	lda.w !menu_color                          ;00CD83|AD9C0E  |000E9C;
 	sta.W SNES_CGDATA                    ;00CD86|8D2221  |002122;
-	lda.W $0e9d                          ;00CD89|AD9D0E  |000E9D;
+	lda.w !menu_color_hi                          ;00CD89|AD9D0E  |000E9D;
 	sta.W SNES_CGDATA                    ;00CD8C|8D2221  |002122;
 	lda.B #$20                           ;00CD8F|A920    |      ;
 	tsb.w !system_flags_1                          ;00CD91|0CD200  |0000D2;
@@ -9948,13 +9948,13 @@ Character_LoadPortrait:
 	asl a;00CF7E|0A      |      ;
 	tax                                  ;00CF7F|AA      |      ;
 	tya                                  ;00CF80|98      |      ;
-	sta.W $0107,x                        ;00CF81|9D0701  |000107;
+	sta.w !char_data_ptrs,x                        ;00CF81|9D0701  |000107;
 	rts                                  ;00CF84|60      |      ;
 ;      |        |      ;
 	db $a0,$9b,$80,$d9,$74,$d8,$20,$9d,$20,$dc,$64,$d8,$a0,$9e,$00,$de;00CF85|        |      ;
 	db $54,$d8,$20,$a0,$60,$e1,$44,$d8   ;00CF95|        |      ;
 	sep #$20                             ;00CF9D|E220    |      ;
-	dec.W $015f                          ;00CF9F|CE5F01  |00015F;
+	dec.w !menu_selection                          ;00CF9F|CE5F01  |00015F;
 	bpl Scroll_DecrementTimer1                      ;00CFA2|1003    |00CFA7;
 	db $ee,$5f,$01                       ;00CFA4|        |00015F;
 ;      |        |      ;
@@ -9974,23 +9974,23 @@ Scroll_ProcessColor:
 	and.W #$1f00                         ;00CFBC|29001F  |      ;
 	asl a;00CFBF|0A      |      ;
 	asl a;00CFC0|0A      |      ;
-	sta.W $0162                          ;00CFC1|8D6201  |000162;
-	lda.W $015f                          ;00CFC4|AD5F01  |00015F;
+	sta.w !menu_cursor_pos                          ;00CFC1|8D6201  |000162;
+	lda.w !menu_selection                          ;00CFC4|AD5F01  |00015F;
 	and.W #$1f00                         ;00CFC7|29001F  |      ;
 	lsr a;00CFCA|4A      |      ;
 	lsr a;00CFCB|4A      |      ;
 	lsr a;00CFCC|4A      |      ;
-	tsb.W $0162                          ;00CFCD|0C6201  |000162;
+	tsb.w !menu_cursor_pos                          ;00CFCD|0C6201  |000162;
 	lda.W $0161                          ;00CFD0|AD6101  |000161;
 	and.W #$001f                         ;00CFD3|291F00  |      ;
-	tsb.W $0162                          ;00CFD6|0C6201  |000162;
+	tsb.w !menu_cursor_pos                          ;00CFD6|0C6201  |000162;
 	sep #$20                             ;00CFD9|E220    |      ;
 	jsl.L CWaitTimingRoutine                    ;00CFDB|2200800C|0C8000;
 	lda.B #$31                           ;00CFDF|A931    |      ;
 	sta.W SNES_CGADD                     ;00CFE1|8D2121  |002121;
-	lda.W $0162                          ;00CFE4|AD6201  |000162;
+	lda.w !menu_cursor_pos                          ;00CFE4|AD6201  |000162;
 	sta.W SNES_CGDATA                    ;00CFE7|8D2221  |002122;
-	lda.W $0163                          ;00CFEA|AD6301  |000163;
+	lda.w !menu_max_pos                          ;00CFEA|AD6301  |000163;
 	sta.W SNES_CGDATA                    ;00CFED|8D2221  |002122;
 	rts                                  ;00CFF0|60      |      ;
 ;      |        |      ;
@@ -9999,7 +9999,7 @@ Input_CheckMenuSound:
 	php                                  ;00CFF1|08      |      ;
 	rep #$30                             ;00CFF2|C230    |      ;
 	pha                                  ;00CFF4|48      |      ;
-	lda.W $008e                          ;00CFF5|AD8E00  |00008E;
+	lda.w !game_state_value                          ;00CFF5|AD8E00  |00008E;
 	and.W #$4030                         ;00CFF8|293040  |      ;
 	eor.W #$ffff                         ;00CFFB|49FFFF  |      ;
 	and.W $0015                          ;00CFFE|2D1500  |000015;
@@ -10084,9 +10084,9 @@ BattleEnd_ProcessRewards:
 	lda.W #$000f                         ;00D09A|A90F00  |      ;
 	mvn $00,$00                          ;00D09D|540000  |      ;
 	sep #$20                             ;00D0A0|E220    |      ;
-	lda.W $1090                          ;00D0A2|AD9010  |001090;
+	lda.w !char2_companion_id                          ;00D0A2|AD9010  |001090;
 	bpl BattleEnd_InitializeDisplay                      ;00D0A5|1003    |00D0AA;
-	sta.W $10a1                          ;00D0A7|8DA110  |0010A1;
+	sta.w !char2_status                          ;00D0A7|8DA110  |0010A1;
 ;      |        |      ;
 BattleEnd_InitializeDisplay:
 	lda.B #$ff                           ;00D0AA|A9FF    |      ;
@@ -10111,32 +10111,32 @@ BattleEnd_InitializeDisplay:
 BattleEnd_MainLoop:
 	ldx.W #$d1a5                         ;00D0DA|A2A5D1  |      ;
 	jsr.W DMA_CopyParamsAndExecute                    ;00D0DD|20C49B  |009BC4;
-	lda.W $1090                          ;00D0E0|AD9010  |001090;
+	lda.w !char2_companion_id                          ;00D0E0|AD9010  |001090;
 	ora.W #$ff00                         ;00D0E3|0900FF  |      ;
 	tax                                  ;00D0E6|AA      |      ;
 	lda.W #$00c0                         ;00D0E7|A9C000  |      ;
 	inx                                  ;00D0EA|E8      |      ;
 	beq BattleEnd_CheckExit                      ;00D0EB|F008    |00D0F5;
-	and.W $10a1                          ;00D0ED|2DA110  |0010A1;
+	and.w !char2_status                          ;00D0ED|2DA110  |0010A1;
 	beq BattleEnd_CheckInput                      ;00D0F0|F008    |00D0FA;
 	lda.W #$00c0                         ;00D0F2|A9C000  |      ;
 ;      |        |      ;
 BattleEnd_CheckExit:
-	and.W $1021                          ;00D0F5|2D2110  |001021;
+	and.w !char1_status                          ;00D0F5|2D2110  |001021;
 	bne BattleEnd_UpdateDisplay                      ;00D0F8|D042    |00D13C;
 ;      |        |      ;
 BattleEnd_CheckInput:
 	lda.W #$00f8                         ;00D0FA|A9F800  |      ;
-	trb.W $1021                          ;00D0FD|1C2110  |001021;
-	trb.W $10a1                          ;00D100|1CA110  |0010A1;
-	lda.W $1014                          ;00D103|AD1410  |001014;
+	trb.w !char1_status                          ;00D0FD|1C2110  |001021;
+	trb.w !char2_status                          ;00D100|1CA110  |0010A1;
+	lda.w !char1_current_hp                          ;00D103|AD1410  |001014;
 	bne BattleEnd_UpdateCounters                      ;00D106|D003    |00D10B;
-	inc.W $1014                          ;00D108|EE1410  |001014;
+	inc.w !char1_current_hp                          ;00D108|EE1410  |001014;
 ;      |        |      ;
 BattleEnd_UpdateCounters:
-	lda.W $1094                          ;00D10B|AD9410  |001094;
+	lda.w !char2_current_hp                          ;00D10B|AD9410  |001094;
 	bne BattleEnd_FadeOut                      ;00D10E|D003    |00D113;
-	inc.W $1094                          ;00D110|EE9410  |001094;
+	inc.w !char2_current_hp                          ;00D110|EE9410  |001094;
 ;      |        |      ;
 BattleEnd_FadeOut:
 	jsl.L Fade_SetBrightness                    ;00D113|22B8C700|00C7B8;
@@ -10189,7 +10189,7 @@ BattleEnd_ReturnValue:
 	pld                                  ;00D1AB|2B      |      ;
 	sep #$20                             ;00D1AC|E220    |      ;
 	rep #$10                             ;00D1AE|C210    |      ;
-	ldx.W $0017                          ;00D1B0|AE1700  |000017;
+	ldx.w !general_address                          ;00D1B0|AE1700  |000017;
 	phx                                  ;00D1B3|DA      |      ;
 	jsl.L CWaitTimingRoutine                    ;00D1B4|2200800C|0C8000;
 	lda.B #$80                           ;00D1B8|A980    |      ;
@@ -10236,7 +10236,7 @@ BattleEnd_ReturnValue:
 	jsl.L VRAM_ByteCopy                    ;00D210|22DF8D00|008DDF;
 	plb                                  ;00D214|AB      |      ;
 	plx                                  ;00D215|FA      |      ;
-	stx.W $0017                          ;00D216|8E1700  |000017;
+	stx.w !general_address                          ;00D216|8E1700  |000017;
 	rtl                                  ;00D219|6B      |      ;
 ;      |        |      ;
 	sep #$30                             ;00D21A|E230    |      ;
@@ -10265,13 +10265,13 @@ BattleEnd_ReturnValue:
 	sta.W SNES_CGADD                     ;00D265|8D2121  |002121;
 	lda.w !menu_color                          ;00D268|AD9C0E  |000E9C;
 	sta.W SNES_CGDATA                    ;00D26B|8D2221  |002122;
-	lda.W $0e9d                          ;00D26E|AD9D0E  |000E9D;
+	lda.w !menu_color_hi                          ;00D26E|AD9D0E  |000E9D;
 	sta.W SNES_CGDATA                    ;00D271|8D2221  |002122;
 	lda.B #$1d                           ;00D274|A91D    |      ;
 	sta.W SNES_CGADD                     ;00D276|8D2121  |002121;
 	lda.w !menu_color                          ;00D279|AD9C0E  |000E9C;
 	sta.W SNES_CGDATA                    ;00D27C|8D2221  |002122;
-	lda.W $0e9d                          ;00D27F|AD9D0E  |000E9D;
+	lda.w !menu_color_hi                          ;00D27F|AD9D0E  |000E9D;
 	sta.W SNES_CGDATA                    ;00D282|8D2221  |002122;
 	lda.B #$40                           ;00D285|A940    |      ;
 	trb.w !system_interrupt_flags                          ;00D287|1C1101  |000111;
@@ -10397,7 +10397,7 @@ Character_Cancel:
 ;      |        |      ;
 Character_InputLoop:
 	stz.B $14                            ;00D350|6414    |000014;
-	lda.W $1021                          ;00D352|AD2110  |001021;
+	lda.w !char1_status                          ;00D352|AD2110  |001021;
 	and.B #$f8                           ;00D355|29F8    |      ;
 	bne Character_CheckPlayerInput                      ;00D357|D009    |00D362;
 	jsr.W Character_LoadCharacterData                    ;00D359|2024D4  |00D424;
@@ -10407,20 +10407,20 @@ Character_InputLoop:
 ;      |        |      ;
 Character_CheckPlayerInput:
 	inc.B $14                            ;00D362|E614    |000014;
-	lda.W $1090                          ;00D364|AD9010  |001090;
+	lda.w !char2_companion_id                          ;00D364|AD9010  |001090;
 	inc a;00D367|1A      |      ;
 	beq Character_ReturnToMenu                      ;00D368|F0CB    |00D335;
-	lda.W $10a1                          ;00D36A|ADA110  |0010A1;
+	lda.w !char2_status                          ;00D36A|ADA110  |0010A1;
 	and.B #$f8                           ;00D36D|29F8    |      ;
 	bne Character_ReturnToMenu                      ;00D36F|D0C4    |00D335;
-	lda.W $10a0                          ;00D371|ADA010  |0010A0;
+	lda.w !char2_active_flag                          ;00D371|ADA010  |0010A0;
 	and.B #$80                           ;00D374|2980    |      ;
 	bne Character_ReturnToMenu                      ;00D376|D0BD    |00D335;
 	jsr.W Character_LoadCharacterData                    ;00D378|2024D4  |00D424;
 	lda.B $16                            ;00D37B|A516    |000016;
 	and.B #$80                           ;00D37D|2980    |      ;
 	beq Character_ReturnToMenu                      ;00D37F|F0B4    |00D335;
-	lda.W $1021                          ;00D381|AD2110  |001021;
+	lda.w !char1_status                          ;00D381|AD2110  |001021;
 	and.B #$f8                           ;00D384|29F8    |      ;
 	bne Character_ReturnToMenu                      ;00D386|D0AD    |00D335;
 	lda.W $1050                          ;00D388|AD5010  |001050;
@@ -10434,7 +10434,7 @@ Character_CheckPlayerInput:
 Character_UpdateFlags:
 	lda.B #$30                           ;00D397|A930    |      ;
 	trb.W $1020                          ;00D399|1C2010  |001020;
-	trb.W $10a0                          ;00D39C|1CA010  |0010A0;
+	trb.w !char2_active_flag                          ;00D39C|1CA010  |0010A0;
 	lda.W $1050                          ;00D39F|AD5010  |001050;
 	dec a;00D3A2|3A      |      ;
 	bne Character_UpdateP1Flags                      ;00D3A3|D005    |00D3AA;
@@ -10452,9 +10452,9 @@ Character_UpdateP2Flags:
 	cmp.B #$11                           ;00D3B8|C911    |      ;
 	bne Character_CheckP1                      ;00D3BA|D00A    |00D3C6;
 	lda.B #$30                           ;00D3BC|A930    |      ;
-	trb.W $10a0                          ;00D3BE|1CA010  |0010A0;
+	trb.w !char2_active_flag                          ;00D3BE|1CA010  |0010A0;
 	lda.B #$20                           ;00D3C1|A920    |      ;
-	tsb.W $10a0                          ;00D3C3|0CA010  |0010A0;
+	tsb.w !char2_active_flag                          ;00D3C3|0CA010  |0010A0;
 ;      |        |      ;
 Character_CheckP1:
 	lda.W $10d0                          ;00D3C6|ADD010  |0010D0;
@@ -10653,7 +10653,7 @@ Character_UpdateCharacterSlot:
 ;      |        |      ;
 ;      |        |      ;
 Character_LoadCharacter:
-	lda.W $1031,x                        ;00D513|BD3110  |001031;
+	lda.w !ram_1031,x                        ;00D513|BD3110  |001031;
 	cmp.B #$ff                           ;00D516|C9FF    |      ;
 	beq Character_SetUnavailable                   ;00D518|F018    |00D532;
 	sta.W $043a                          ;00D51A|8D3A04  |00043A;
@@ -10666,7 +10666,7 @@ Character_LoadCharacter:
 	bcc Character_LoadComplete                      ;00D527|900E    |00D537;
 	cmp.B #$2c                           ;00D529|C92C    |      ;
 	beq Character_LoadComplete                      ;00D52B|F00A    |00D537;
-	lda.W $1030,x                        ;00D52D|BD3010  |001030;
+	lda.w !env_counter,x                        ;00D52D|BD3010  |001030;
 	bne Character_LoadComplete                      ;00D530|D005    |00D537;
 ;      |        |      ;
 Character_SetUnavailable:
@@ -10982,7 +10982,7 @@ Equipment_InitializeDialog:
 	beq Equipment_DefaultState                      ;00D767|F050    |00D7B9;
 	lda.W $1010,y                        ;00D769|B91010  |001010;
 	bmi Equipment_DefaultState                      ;00D76C|304B    |00D7B9;
-	lda.W $1021,y                        ;00D76E|B92110  |001021;
+	lda.w !char1_status,y                        ;00D76E|B92110  |001021;
 	bit.B #$c0                           ;00D771|89C0    |      ;
 	bne Equipment_DefaultState                      ;00D773|D044    |00D7B9;
 	rep #$30                             ;00D775|C230    |      ;
@@ -11300,7 +11300,7 @@ Item_DefaultAlly1:
 ;      |        |      ;
 ;      |        |      ;
 Item_ToggleSelection:
-	lda.W $1090                          ;00D977|AD9010  |001090;
+	lda.w !char2_companion_id                          ;00D977|AD9010  |001090;
 	inc a;00D97A|1A      |      ;
 	beq Item_ReturnNoChange                      ;00D97B|F0CF    |00D94C;
 	lda.B $01                            ;00D97D|A501    |000001;
@@ -11400,7 +11400,7 @@ Item_DefaultAlly1_Alt:
 	db $ad,$2d,$0a,$80,$a7               ;00DA02|        |000A2D;
 ;      |        |      ;
 Item_ToggleNext:
-	lda.W $1090                          ;00DA07|AD9010  |001090;
+	lda.w !char2_companion_id                          ;00DA07|AD9010  |001090;
 	inc a;00DA0A|1A      |      ;
 	beq Item_ReturnNext                      ;00DA0B|F0CF    |00D9DC;
 	lda.B $01                            ;00DA0D|A501    |000001;
@@ -11473,7 +11473,7 @@ Item_ReturnStats:
 ;      |        |      ;
 Item_CheckBenjaminOrKaeli:
 	bne Item_GetKaeliStats                      ;00DA95|D007    |00DA9E;
-	lda.W $1030                          ;00DA97|AD3010  |001030;
+	lda.w !env_counter                          ;00DA97|AD3010  |001030;
 	ldx.B #$92                           ;00DA9A|A292    |      ;
 	bra Item_ReturnWithStats                      ;00DA9C|8005    |00DAA3;
 ;      |        |      ;
@@ -11515,7 +11515,7 @@ Item_InitComplete:
 	rts                                  ;00DACB|60      |      ;
 ;      |        |      ;
 	sep #$20                             ;00DACC|E220    |      ;
-	dec.W $0166                          ;00DACE|CE6601  |000166;
+	dec.w !menu_amount_hi                          ;00DACE|CE6601  |000166;
 	lda.B $9e                            ;00DAD1|A59E    |00009E;
 	cmp.B #$10                           ;00DAD3|C910    |      ;
 	bcc Item_IncrementDone                      ;00DAD5|902A    |00DB01;
@@ -11531,9 +11531,9 @@ Item_InitComplete:
 ;      |        |      ;
 ;      |        |      ;
 Item_IncrementBenjamin:
-	lda.W $1030                          ;00DAEC|AD3010  |001030;
+	lda.w !env_counter                          ;00DAEC|AD3010  |001030;
 	jsr.W Item_CheckMaxHP                    ;00DAEF|2005DB  |00DB05;
-	sta.W $1030                          ;00DAF2|8D3010  |001030;
+	sta.w !env_counter                          ;00DAF2|8D3010  |001030;
 	bra Item_IncrementDone                      ;00DAF5|800A    |00DB01;
 ;      |        |      ;
 ;      |        |      ;
@@ -11543,14 +11543,14 @@ Item_IncrementPartyMember:
 	sta.W $0e9f,x                        ;00DAFE|9D9F0E  |000E9F;
 ;      |        |      ;
 Item_IncrementDone:
-	inc.W $0166                          ;00DB01|EE6601  |000166;
+	inc.w !menu_amount_hi                          ;00DB01|EE6601  |000166;
 	rts                                  ;00DB04|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
 Item_CheckMaxHP:
 	cmp.B #$63                           ;00DB05|C963    |      ;
 	bcc Item_AddHP                      ;00DB07|900B    |00DB14;
-	stz.W $0166                          ;00DB09|9C6601  |000166;
+	stz.w !menu_amount_hi                          ;00DB09|9C6601  |000166;
 	lda.B #$80                           ;00DB0C|A980    |      ;
 	trb.W $0165                          ;00DB0E|1C6501  |000165;
 	lda.B #$63                           ;00DB11|A963    |      ;
@@ -11558,13 +11558,13 @@ Item_CheckMaxHP:
 ;      |        |      ;
 ;      |        |      ;
 Item_AddHP:
-	adc.W $0166                          ;00DB14|6D6601  |000166;
+	adc.w !menu_amount_hi                          ;00DB14|6D6601  |000166;
 	cmp.B #$64                           ;00DB17|C964    |      ;
 	bcc Item_HPUpdateComplete                      ;00DB19|900C    |00DB27;
 	sbc.B #$63                           ;00DB1B|E963    |      ;
 	eor.B #$ff                           ;00DB1D|49FF    |      ;
-	adc.W $0166                          ;00DB1F|6D6601  |000166;
-	sta.W $0166                          ;00DB22|8D6601  |000166;
+	adc.w !menu_amount_hi                          ;00DB1F|6D6601  |000166;
+	sta.w !menu_amount_hi                          ;00DB22|8D6601  |000166;
 	lda.B #$63                           ;00DB25|A963    |      ;
 ;      |        |      ;
 Item_HPUpdateComplete:
@@ -11599,10 +11599,10 @@ Item_AddItem:
 	cmp.B #$dd                           ;00DB52|C9DD    |      ;
 	bcc Item_AddWeapon                      ;00DB54|9068    |00DBBE;
 	bne Item_AddKaeliHP                      ;00DB56|D00C    |00DB64;
-	lda.W $1030                          ;00DB58|AD3010  |001030;
+	lda.w !env_counter                          ;00DB58|AD3010  |001030;
 	cmp.B #$63                           ;00DB5B|C963    |      ;
 	bcs Item_AddComplete                      ;00DB5D|B077    |00DBD6;
-	inc.W $1030                          ;00DB5F|EE3010  |001030;
+	inc.w !env_counter                          ;00DB5F|EE3010  |001030;
 	bra Item_AddComplete                      ;00DB62|8072    |00DBD6;
 ;      |        |      ;
 ;      |        |      ;
@@ -11637,7 +11637,7 @@ Item_AddKeyItem:
 Item_AddMagicItem:
 	sbc.B #$13                           ;00DB8E|E913    |      ;
 	phd                                  ;00DB90|0B      |      ;
-	pea.W $1038                          ;00DB91|F43810  |001038;
+	pea.w !char1_spell_equipped                          ;00DB91|F43810  |001038;
 	pld                                  ;00DB94|2B      |      ;
 	jsl.L Bitfield_SetBits                    ;00DB95|224E9700|00974E;
 	pld                                  ;00DB99|2B      |      ;
@@ -11653,12 +11653,12 @@ Item_ProcessConsumable:
 	sec                                  ;00DBA1|38      |      ;
 	sbc.B #$20                           ;00DBA2|E920    |      ;
 	phd                                  ;00DBA4|0B      |      ;
-	pea.W $1032                          ;00DBA5|F43210  |001032;
+	pea.w !char_x_pos                          ;00DBA5|F43210  |001032;
 	pld                                  ;00DBA8|2B      |      ;
 	jsl.L Bitfield_SetBits                    ;00DBA9|224E9700|00974E;
 	pld                                  ;00DBAD|2B      |      ;
 	pla                                  ;00DBAE|68      |      ;
-	sta.W $1031                          ;00DBAF|8D3110  |001031;
+	sta.w !ram_1031                          ;00DBAF|8D3110  |001031;
 	ldy.B #$00                           ;00DBB2|A000    |      ;
 	jsr.W Menu_DisplayItemCount                    ;00DBB4|201191  |009111;
 	lda.B #$04                           ;00DBB7|A904    |      ;
@@ -11695,7 +11695,7 @@ Item_AddElixir:
 	lda.B #$04                           ;00DBE2|A904    |      ;
 	tsb.W $10b3                          ;00DBE4|0CB310  |0010B3;
 	lda.B #$2d                           ;00DBE7|A92D    |      ;
-	sta.W $10b1                          ;00DBE9|8DB110  |0010B1;
+	sta.w !char1_cursor_pos                          ;00DBE9|8DB110  |0010B1;
 	ldy.B #$50                           ;00DBEC|A050    |      ;
 	jsr.W Menu_DisplayItemCount                    ;00DBEE|201191  |009111;
 	pla                                  ;00DBF1|68      |      ;
@@ -11745,10 +11745,10 @@ Item_RemoveWeapon:
 ;      |        |      ;
 Item_RemoveKeyItem:
 	tax                                  ;00DC29|AA      |      ;
-	lda.W $1018,x                        ;00DC2A|BD1810  |001018;
+	lda.w !char1_current_mp,x                        ;00DC2A|BD1810  |001018;
 	cmp.B #$63                           ;00DC2D|C963    |      ;
 	bcs Item_CheckElixir                      ;00DC2F|B003    |00DC34;
-	inc.W $1018,x                        ;00DC31|FE1810  |001018;
+	inc.w !char1_current_mp,x                        ;00DC31|FE1810  |001018;
 ;      |        |      ;
 Item_CheckElixir:
 	rep #$30                             ;00DC34|C230    |      ;
@@ -11774,9 +11774,9 @@ Item_CanUseItem:
 ;      |        |      ;
 Item_CheckUsable:
 	tax                                  ;00DC4D|AA      |      ;
-	lda.W $1018,x                        ;00DC4E|BD1810  |001018;
+	lda.w !char1_current_mp,x                        ;00DC4E|BD1810  |001018;
 	beq Item_CheckPartyMember                      ;00DC51|F005    |00DC58;
-	dec.W $1018,x                        ;00DC53|DE1810  |001018;
+	dec.w !char1_current_mp,x                        ;00DC53|DE1810  |001018;
 	lda.B #$ff                           ;00DC56|A9FF    |      ;
 ;      |        |      ;
 Item_CheckPartyMember:
@@ -11843,7 +11843,7 @@ Item_ItemUsable:
 	lda.W $0012,x                        ;00DD47|BD1200  |7F0012;
 	eor.W #$00ff                         ;00DD4A|49FF00  |      ;
 	sta.W $2012,x                        ;00DD4D|9D1220  |7F2012;
-	lda.W $0010,x                        ;00DD50|BD1000  |7F0010;
+	lda.w !ram_1031_long,x                        ;00DD50|BD1000  |7F0010;
 	eor.W #$00ff                         ;00DD53|49FF00  |      ;
 	sta.W $2010,x                        ;00DD56|9D1020  |7F2010;
 	lda.W $000e,x                        ;00DD59|BD0E00  |7F000E;
@@ -12234,7 +12234,7 @@ Graphics_UpdateOffset:
 Graphics_QueueSprite:
 	tay                                  ;00E03F|A8      |      ;
 	lda.W #$0080                         ;00E040|A98000  |      ;
-	and.W $00dd                          ;00E043|2DDD00  |0000DD;
+	and.w !system_flags_7                          ;00E043|2DDD00  |0000DD;
 	bne Graphics_ReturnSpriteID                      ;00E046|D00B    |00E053;
 	tya                                  ;00E048|98      |      ;
 	ldx.W $00ca                          ;00E049|AECA00  |0000CA;
@@ -12347,7 +12347,7 @@ Dialog_ScrollInput:
 Dialog_MainLoop:
 	jsl.L NMI_WaitForVBlank                    ;00E0F8|22A09600|0096A0;
 	lda.W #$0020                         ;00E0FC|A92000  |      ;
-	and.W $00dd                          ;00E0FF|2DDD00  |0000DD;
+	and.w !system_flags_7                          ;00E0FF|2DDD00  |0000DD;
 	bne Dialog_UpdateBuffer                      ;00E102|D015    |00E119;
 	lda.W #$0020                         ;00E104|A92000  |      ;
 	and.W $00d0                          ;00E107|2DD000  |0000D0;
@@ -12381,7 +12381,7 @@ Dialog_ProcessSpriteCommand:
 	tcd                                  ;00E129|5B      |      ;
 	pei.B ($58)                          ;00E12A|D458    |0000B6;
 	lda.W #$0080                         ;00E12C|A98000  |      ;
-	and.W $00dd                          ;00E12F|2DDD00  |0000DD;
+	and.w !system_flags_7                          ;00E12F|2DDD00  |0000DD;
 	bne Dialog_AdjustPosition                      ;00E132|D043    |00E177;
 	lda.B $03,s                          ;00E134|A303    |000003;
 	cmp.W #$00ff                         ;00E136|C9FF00  |      ;
@@ -12449,7 +12449,7 @@ Dialog_ExecuteQueue:
 	tcd                                  ;00E1A7|5B      |      ;
 	sep #$20                             ;00E1A8|E220    |      ;
 	lda.B #$80                           ;00E1AA|A980    |      ;
-	tsb.W $00dd                          ;00E1AC|0CDD00  |0000DD;
+	tsb.w !system_flags_7                          ;00E1AC|0CDD00  |0000DD;
 	lda.B #$7e                           ;00E1AF|A97E    |      ;
 	xba                                  ;00E1B1|EB      |      ;
 	lda.W $00ca                          ;00E1B2|ADCA00  |0000CA;
@@ -12460,7 +12460,7 @@ Dialog_ExecuteQueue:
 ;      |        |      ;
 Dialog_ClearQueue:
 	lda.W #$0080                         ;00E1BF|A98000  |      ;
-	trb.W $00dd                          ;00E1C2|1CDD00  |0000DD;
+	trb.w !system_flags_7                          ;00E1C2|1CDD00  |0000DD;
 	lda.W #$005e                         ;00E1C5|A95E00  |      ;
 	tcd                                  ;00E1C8|5B      |      ;
 	rts                                  ;00E1C9|60      |      ;
@@ -12733,9 +12733,9 @@ Graphics_UpdateDisplay:
 	bcc Graphics_SetupMode1                      ;00E5D6|904D    |00E625;
 	beq Graphics_SetupMode2                      ;00E5D8|F01A    |00E5F4;
 	lda.W #$4000                         ;00E5DA|A90040  |      ;
-	sta.W $01f6                          ;00E5DD|8DF601  |0001F6;
+	sta.w !vram_src_addr                          ;00E5DD|8DF601  |0001F6;
 	lda.W #$1000                         ;00E5E0|A90010  |      ;
-	sta.W $01f4                          ;00E5E3|8DF401  |0001F4;
+	sta.w !vram_transfer_size                          ;00E5E3|8DF401  |0001F4;
 	pea.W $0000                          ;00E5E6|F40000  |000000;
 	pea.W $4000                          ;00E5E9|F40040  |004000;
 	pea.W $2000                          ;00E5EC|F40020  |002000;
@@ -12745,9 +12745,9 @@ Graphics_UpdateDisplay:
 ;      |        |      ;
 Graphics_SetupMode2:
 	lda.W #$4000                         ;00E5F4|A90040  |      ;
-	sta.W $01f6                          ;00E5F7|8DF601  |0001F6;
+	sta.w !vram_src_addr                          ;00E5F7|8DF601  |0001F6;
 	lda.W #$0600                         ;00E5FA|A90006  |      ;
-	sta.W $01f4                          ;00E5FD|8DF401  |0001F4;
+	sta.w !vram_transfer_size                          ;00E5FD|8DF401  |0001F4;
 	pea.W $0000                          ;00E600|F40000  |000000;
 	pea.W $4000                          ;00E603|F40040  |004000;
 	pea.W $2000                          ;00E606|F40020  |002000;
@@ -12757,9 +12757,9 @@ Graphics_SetupMode2:
 ;      |        |      ;
 Graphics_SetupMode0:
 	lda.W #$4000                         ;00E60E|A90040  |      ;
-	sta.W $01f6                          ;00E611|8DF601  |0001F6;
+	sta.w !vram_src_addr                          ;00E611|8DF601  |0001F6;
 	lda.W #$0900                         ;00E614|A90009  |      ;
-	sta.W $01f4                          ;00E617|8DF401  |0001F4;
+	sta.w !vram_transfer_size                          ;00E617|8DF401  |0001F4;
 	pea.W $0000                          ;00E61A|F40000  |000000;
 	pea.W $4000                          ;00E61D|F40040  |004000;
 	pea.W $2000                          ;00E620|F40020  |002000;
@@ -12768,10 +12768,10 @@ Graphics_SetupMode0:
 ;      |        |      ;
 Graphics_SetupMode1:
 	lda.W #$4700                         ;00E625|A90047  |      ;
-	sta.W $01f6                          ;00E628|8DF601  |0001F6;
+	sta.w !vram_src_addr                          ;00E628|8DF601  |0001F6;
 	lda.W #$0900                         ;00E62B|A90009  |      ;
-	sta.W $01f4                          ;00E62E|8DF401  |0001F4;
-	pea.W $0010                          ;00E631|F41000  |000010;
+	sta.w !vram_transfer_size                          ;00E62E|8DF401  |0001F4;
+	pea.w !ram_1031_long                          ;00E631|F41000  |000010;
 	pea.W $4610                          ;00E634|F41046  |004610;
 	pea.W $2680                          ;00E637|F48026  |002680;
 ;      |        |      ;
@@ -12786,24 +12786,24 @@ Graphics_CallCopy:
 	adc.W #$000a                         ;00E645|690A00  |      ;
 	tcs                                  ;00E648|1B      |      ;
 	sec                                  ;00E649|38      |      ;
-	lda.W $01f6                          ;00E64A|ADF601  |0001F6;
+	lda.w !vram_src_addr                          ;00E64A|ADF601  |0001F6;
 	sbc.W #$4000                         ;00E64D|E90040  |      ;
 	lsr a;00E650|4A      |      ;
 	adc.W #$3800                         ;00E651|690038  |      ;
-	sta.W $01f8                          ;00E654|8DF801  |0001F8;
+	sta.w !vram_dest_addr                          ;00E654|8DF801  |0001F8;
 	lda.W #$0040                         ;00E657|A94000  |      ;
-	tsb.W $00dd                          ;00E65A|0CDD00  |0000DD;
+	tsb.w !system_flags_7                          ;00E65A|0CDD00  |0000DD;
 	plp                                  ;00E65D|28      |      ;
 	rts                                  ;00E65E|60      |      ;
 ;      |        |      ;
 	php                                  ;00E65F|08      |      ;
 	rep #$30                             ;00E660|C230    |      ;
 	lda.W #$4000                         ;00E662|A90040  |      ;
-	sta.W $01f6                          ;00E665|8DF601  |0001F6;
+	sta.w !vram_src_addr                          ;00E665|8DF601  |0001F6;
 	lda.W #$3000                         ;00E668|A90030  |      ;
-	sta.W $01f8                          ;00E66B|8DF801  |0001F8;
+	sta.w !vram_dest_addr                          ;00E66B|8DF801  |0001F8;
 	lda.W #$0200                         ;00E66E|A90002  |      ;
-	sta.W $01f4                          ;00E671|8DF401  |0001F4;
+	sta.w !vram_transfer_size                          ;00E671|8DF401  |0001F4;
 	pea.W $0000                          ;00E674|F40000  |000000;
 	pea.W $4000                          ;00E677|F40040  |004000;
 	pea.W $2000                          ;00E67A|F40020  |002000;
@@ -12815,7 +12815,7 @@ Graphics_CallCopy:
 	adc.W #$000a                         ;00E688|690A00  |      ;
 	tcs                                  ;00E68B|1B      |      ;
 	lda.W #$0040                         ;00E68C|A94000  |      ;
-	tsb.W $00dd                          ;00E68F|0CDD00  |0000DD;
+	tsb.w !system_flags_7                          ;00E68F|0CDD00  |0000DD;
 	plp                                  ;00E692|28      |      ;
 	rts                                  ;00E693|60      |      ;
 ;      |        |      ;
@@ -13341,9 +13341,9 @@ Graphics_ClearTileLine:
 	lda.W $000e,x                        ;00ECDF|BD0E00  |7F000E;
 	and.W #$7777                         ;00ECE2|297777  |      ;
 	sta.W $000e,x                        ;00ECE5|9D0E00  |7F000E;
-	lda.W $0010,x                        ;00ECE8|BD1000  |7F0010;
+	lda.w !ram_1031_long,x                        ;00ECE8|BD1000  |7F0010;
 	and.W #$7777                         ;00ECEB|297777  |      ;
-	sta.W $0010,x                        ;00ECEE|9D1000  |7F0010;
+	sta.w !ram_1031_long,x                        ;00ECEE|9D1000  |7F0010;
 	lda.W $0012,x                        ;00ECF1|BD1200  |7F0012;
 	and.W #$7777                         ;00ECF4|297777  |      ;
 	sta.W $0012,x                        ;00ECF7|9D1200  |7F0012;
@@ -13423,9 +13423,9 @@ Graphics_FillPattern_Layer:
 	lda.W $000e,x                        ;00EDCA|BD0E00  |7F000E;
 	and.W #$bbbb                         ;00EDCD|29BBBB  |      ;
 	sta.W $000e,x                        ;00EDD0|9D0E00  |7F000E;
-	lda.W $0010,x                        ;00EDD3|BD1000  |7F0010;
+	lda.w !ram_1031_long,x                        ;00EDD3|BD1000  |7F0010;
 	and.W #$bbbb                         ;00EDD6|29BBBB  |      ;
-	sta.W $0010,x                        ;00EDD9|9D1000  |7F0010;
+	sta.w !ram_1031_long,x                        ;00EDD9|9D1000  |7F0010;
 	lda.W $0012,x                        ;00EDDC|BD1200  |7F0012;
 	and.W #$bbbb                         ;00EDDF|29BBBB  |      ;
 	sta.W $0012,x                        ;00EDE2|9D1200  |7F0012;
@@ -13505,9 +13505,9 @@ Graphics_FillPattern_Process:
 	lda.W $000e,x                        ;00EEB5|BD0E00  |7F000E;
 	and.W #$dddd                         ;00EEB8|29DDDD  |      ;
 	sta.W $000e,x                        ;00EEBB|9D0E00  |7F000E;
-	lda.W $0010,x                        ;00EEBE|BD1000  |7F0010;
+	lda.w !ram_1031_long,x                        ;00EEBE|BD1000  |7F0010;
 	and.W #$dddd                         ;00EEC1|29DDDD  |      ;
-	sta.W $0010,x                        ;00EEC4|9D1000  |7F0010;
+	sta.w !ram_1031_long,x                        ;00EEC4|9D1000  |7F0010;
 	lda.W $0012,x                        ;00EEC7|BD1200  |7F0012;
 	and.W #$dddd                         ;00EECA|29DDDD  |      ;
 	sta.W $0012,x                        ;00EECD|9D1200  |7F0012;
@@ -13587,9 +13587,9 @@ Graphics_FillTiles_Loop:
 	lda.W $000e,x                        ;00EFA0|BD0E00  |7F000E;
 	and.W #$eeee                         ;00EFA3|29EEEE  |      ;
 	sta.W $000e,x                        ;00EFA6|9D0E00  |7F000E;
-	lda.W $0010,x                        ;00EFA9|BD1000  |7F0010;
+	lda.w !ram_1031_long,x                        ;00EFA9|BD1000  |7F0010;
 	and.W #$eeee                         ;00EFAC|29EEEE  |      ;
-	sta.W $0010,x                        ;00EFAF|9D1000  |7F0010;
+	sta.w !ram_1031_long,x                        ;00EFAF|9D1000  |7F0010;
 	lda.W $0012,x                        ;00EFB2|BD1200  |7F0012;
 	and.W #$eeee                         ;00EFB5|29EEEE  |      ;
 	sta.W $0012,x                        ;00EFB8|9D1200  |7F0012;
@@ -13680,13 +13680,13 @@ Graphics_FillTiles_Store:
 	adc.W #$000a                         ;00F092|690A00  |      ;
 	tcs                                  ;00F095|1B      |      ;
 	lda.W #$4e00                         ;00F096|A9004E  |      ;
-	sta.W $01f6                          ;00F099|8DF601  |0001F6;
+	sta.w !vram_src_addr                          ;00F099|8DF601  |0001F6;
 	lda.W #$3f00                         ;00F09C|A9003F  |      ;
-	sta.W $01f8                          ;00F09F|8DF801  |0001F8;
+	sta.w !vram_dest_addr                          ;00F09F|8DF801  |0001F8;
 	lda.W #$0200                         ;00F0A2|A90002  |      ;
-	sta.W $01f4                          ;00F0A5|8DF401  |0001F4;
+	sta.w !vram_transfer_size                          ;00F0A5|8DF401  |0001F4;
 	lda.W #$0040                         ;00F0A8|A94000  |      ;
-	tsb.W $00dd                          ;00F0AB|0CDD00  |0000DD;
+	tsb.w !system_flags_7                          ;00F0AB|0CDD00  |0000DD;
 	jsl.L CWaitTimingRoutine                    ;00F0AE|2200800C|0C8000;
 	rts                                  ;00F0B2|60      |      ;
 ;      |        |      ;

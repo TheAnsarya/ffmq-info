@@ -79,13 +79,13 @@ SkipDMAFill:	; Original: Label_00806E
 	sep #$20                        ; 8-bit accumulator
 
 ; Enable interrupts
-	lda.W $0112                     ; Load saved interrupt flags
+	lda.w !interrupt_config                     ; Load saved interrupt flags
 	sta.W SNES_NMITIMEN             ; Enable NMI/IRQ
 	cli                             ; Clear interrupt disable flag
 
 ; Initialize game brightness
 	lda.B #$0f                      ; Full brightness
-	sta.W $00aa                     ; Store brightness value
+	sta.w !brightness_value                     ; Store brightness value
 
 ; Main initialization sequence
 	jsl.L WaitForVBlank             ; Wait for vertical blank ($0c8000)
@@ -115,7 +115,7 @@ StartNewGame:	; Original: Label_0080AD
 EnterMainLoop:	; Original: Load_0080B0
 ; Clear various flags
 	lda.B #$80
-	trb.W $00de                     ; Clear bit 7 of flags
+	trb.w !system_flags_8                     ; Clear bit 7 of flags
 	lda.B #$e0
 	trb.w !system_interrupt_flags                     ; Clear bits 5-7
 

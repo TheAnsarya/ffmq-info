@@ -39,7 +39,7 @@ Secondary_Memory_Block_Processing:
 ; Sophisticated memory pattern setup with comprehensive initialization
 Advanced_Memory_Pattern_Initialization:
 	lda.w #$ffff	; Set advanced memory pattern
-	sta.w $1100	 ; Store pattern to memory base
+	sta.w !char_name_buffer	 ; Store pattern to memory base
 	ldx.w #$1100	; Set pattern source address
 	ldy.w #$1102	; Set pattern destination address
 	lda.w #$027d	; Set pattern block size
@@ -734,7 +734,7 @@ standard_entity_calc:
 	stz.b $8d	   ;0284C1|648D    |00048D; Clear calc index 1
 	lda.b #$01	  ;0284C3|A901    |      ; Set calc mode
 	sta.b $8e	   ;0284C5|858E    |00048E; Store calc index 2
-	lda.w $1021	 ;0284C7|AD2110  |021021; Load entity status
+	lda.w !char1_status	 ;0284C7|AD2110  |021021; Load entity status
 	and.b #$c0	  ;0284CA|29C0    |      ; Mask status bits
 	beq entity_status_check ;0284CC|F004    |0284D2; Check secondary status
 	inc.b $8d	   ;0284CE|E68D    |00048D; Increment calc index
@@ -750,7 +750,7 @@ standard_entity_calc:
 ; Coordinate with calculation systems
 
 entity_status_check:
-	lda.w $10a1	 ;0284D2|ADA110  |0210A1; Load secondary status
+	lda.w !char2_status	 ;0284D2|ADA110  |0210A1; Load secondary status
 	and.b #$c0	  ;0284D5|29C0    |      ; Mask status bits
 	beq calc_execution ;0284D7|F030    |028509; Execute if clear
 	stz.b $8e	   ;0284D9|648E    |00048E; Clear calc index 2
@@ -1172,7 +1172,7 @@ final_entity_processing:
 ; Ensure proper data flow
 
 external_data_interface:
-	stx.w $0017	 ;028835|8E1700  |020017; Store data pointer
+	stx.w !general_address	 ;028835|8E1700  |020017; Store data pointer
 	jsl.l CallExternalRoutine ;028838|2209D000|00D009; Call external routine
 	rts ;02883C|60      |      ; Return to caller
 
@@ -2335,10 +2335,10 @@ Math_DivExecute:
 ;Division parameter calculation
 ;Calculates division parameters based on system state
 Math_DivGetParam:
-	lda.w $1021	 ; Load system state 1
+	lda.w !char1_status	 ; Load system state 1
 	and.b #$c0	  ; Test state flags
 	bne Math_DivParam1 ; Branch if flags set
-	lda.w $10a1	 ; Load system state 2
+	lda.w !char2_status	 ; Load system state 2
 	and.b #$c0	  ; Test state flags
 	bne Math_DivParam1 ; Branch if flags set
 	lda.b #$02	  ; Load default parameter
@@ -3250,7 +3250,7 @@ Idle_StateHandler:
 	lda.b #$65                           ;02A332|A965    |
 	sta.w $00a8                          ;02A334|8DA800  |0000A8
 	jsl.l ExecuteAudioCall                    ;02A337|22839700|009783
-	lda.w $10a0                          ;02A33B|ADA010  |0110A0
+	lda.w !char2_active_flag                          ;02A33B|ADA010  |0110A0
 	and.b #$0f                           ;02A33E|290F    |
 	dec ;02A340|3A      |
 	tax ;02A341|AA      |
@@ -3258,7 +3258,7 @@ Idle_StateHandler:
 	cmp.w $00a9                          ;02A345|CDA900  |0000A9
 	bcc +                                ;02A348|9001    |02A34B
 	rts ;02A34A|60      |
-+	lda.w $102f                          ;02A34B|AD2F10  |01102F
++	lda.w !char1_state_flags                          ;02A34B|AD2F10  |01102F
 	and.b #$02                           ;02A34E|2902    |
 	beq +                                ;02A350|F00B    |02A35D
 	lda.b #$11                           ;02A352|A911    |
@@ -3266,7 +3266,7 @@ Idle_StateHandler:
 	lda.b #$30                           ;02A357|A930    |
 	tsb.w $1020                          ;02A359|0C2010  |011020
 	rts ;02A35C|60      |
-+	lda.w $102f                          ;02A35D|AD2F10  |01102F
++	lda.w !char1_state_flags                          ;02A35D|AD2F10  |01102F
 	and.b #$02                           ;02A360|2902    |
 	bne +                                ;02A362|D001    |02A365
 	rts ;02A364|60      |
@@ -3878,7 +3878,7 @@ Controller_ProcessActive:
 	sta.b $a7	   ;02A74A|85A7    |0004A7; Store controller status
 	stz.b $38	   ;02A74C|6438    |000438; Clear system flag
 	stz.w $10d0	 ;02A74E|9CD010  |0210D0; Clear command register
-	lda.w $10b1	 ;02A751|ADB110  |0210B1; Read system parameter
+	lda.w !char1_cursor_pos	 ;02A751|ADB110  |0210B1; Read system parameter
 	sta.b $3a	   ;02A754|853A    |00043A; Store parameter
 	sta.w $10d2	 ;02A756|8DD210  |0210D2; Store in command type
 	jsr.w ExecuteAdvancedCalc ;02A759|200F8B  |028B0F; Process system state
@@ -6171,7 +6171,7 @@ Display_VBlankWait:
 
 ; Special Pattern Buffer Setup
 	lda.w #$5555	;02DB1E|A95555  |      ; Special pattern value
-	sta.w $0e04	 ;02DB21|8D040E  |020E04; Store in special buffer
+	sta.w !hw_register_1	 ;02DB21|8D040E  |020E04; Store in special buffer
 	ldx.w #$0e04	;02DB24|A2040E  |      ; Source address
 	ldy.w #$0e05	;02DB27|A0050E  |      ; Destination address
 	lda.w #$001a	;02DB2A|A91A00  |      ; Transfer count (27 bytes)
@@ -6250,7 +6250,7 @@ State_RegClearLoop:
 ; State Data Transfer and Configuration Engine
 	ldy.w #$0a25	;02DB98|A0250A  |      ; Destination address
 	ldx.w #$dcc4	;02DB9B|A2C4DC  |      ; Default source address
-	lda.w $1090	 ;02DB9E|AD9010  |021090; Load configuration flag
+	lda.w !char2_companion_id	 ;02DB9E|AD9010  |021090; Load configuration flag
 	cmp.b #$ff	  ;02DBA1|C9FF    |      ; Check for special mode
 	bne State_BlockTransfer ;02DBA3|D003    |02DBA8; Branch if normal mode
 	ldx.w #$dccc	;02DBA5|A2CCDC  |      ; Alternate source address
@@ -6384,7 +6384,7 @@ Object_ManagementEngine:
 	tax ;02DC68|AA      |      ; Transfer to index
 
 ; Special Tile Selection Engine
-	lda.w $10a0	 ;02DC69|ADA010  |0210A0; Load special flags
+	lda.w !char2_active_flag	 ;02DC69|ADA010  |0210A0; Load special flags
 	and.b #$0f	  ;02DC6C|290F    |      ; Mask lower bits
 	tay ;02DC6E|A8      |      ; Transfer to index
 	lda.w Tile_MappingTable,y ;02DC6F|B9D4DC  |02DCD4; Load tile from table
@@ -8155,7 +8155,7 @@ Load_02EC84:
 ; Synchronization Complete Handler
 Load_02EC98:
 	lda.b #$ff	  ;02EC98|A9FF    |      ;  Load synchronization complete flag
-	sta.w $0010,x   ;02EC9A|9D1000  |7E0010;  Store synchronization marker
+	sta.w !ram_1031_long,x   ;02EC9A|9D1000  |7E0010;  Store synchronization marker
 	inx ;02EC9D|E8      |      ;  Increment coordination pointer
 	dey ;02EC9E|88      |      ;  Decrement synchronization counter
 	bne Load_02EC84 ;02EC9F|D0E3    |02EC84;  Continue synchronization if more

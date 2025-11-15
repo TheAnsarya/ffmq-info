@@ -283,7 +283,7 @@ Display_WindowEffectSetup:
 	ldx.w #$5555	;0C8148	; Window config value 2
 	stx.w $0e0a	 ;0C814B	; Additional window data
 	ldx.w #$5500	;0C814E	; Window config value 3
-	stx.w $0e0c	 ;0C8151	; Final window settings
+	stx.w !hw_register_3	 ;0C8151	; Final window settings
 	jmp.w JumpWindowApplyRoutine ;0C8154	; Jump to window apply routine
 
 ; ==============================================================================
@@ -839,7 +839,7 @@ Display_ScreenScrollEffect:
 	pla ;0C8453	; Restore counter
 	dec A		   ;0C8454	; Decrement
 	bne .HoldLoop   ;0C8455	; Loop 60 times
-	stz.w $0e0d	 ;0C8457	; Clear window state 1
+	stz.w !error_status_register	 ;0C8457	; Clear window state 1
 	stz.w $0e0e	 ;0C845A	; Clear window state 2
 	jmp.w Display_EffectScriptInterpreter ;0C845D	; Continue script
 
@@ -2314,7 +2314,7 @@ Label_0C8FB8:
 ; $0000,X = BP0 (low 2 bytes)
 ; $0010,X = BP2 (high 2 bytes)
 ; Each pair represents one row across the tile
-	ldy.w $0010,X   ;0C8FB9|BC1000  |7F0010; Load bitplane 2+3 word
+	ldy.w !ram_1031_long,X   ;0C8FB9|BC1000  |7F0010; Load bitplane 2+3 word
 	sty.b $64	   ;0C8FBC|8464    |000064; Store in DP $64-$65
 	ldy.w $0000,X   ;0C8FBE|BC0000  |7F0000; Load bitplane 0+1 word
 	sty.b $62	   ;0C8FC1|8462    |000062; Store in DP $62-$63
@@ -2532,7 +2532,7 @@ Tile_Processing_Routine_4bpp_Decompression_To_Buffer:
 
 Label_0C909D:
 	pha ;0C909D|48      |      ; Save row counter
-	ldy.w $0010,X   ;0C909E|BC1000  |7F0010; Load BP2+BP3 word
+	ldy.w !ram_1031_long,X   ;0C909E|BC1000  |7F0010; Load BP2+BP3 word
 	sty.b $64	   ;0C90A1|8464    |000064; Store at $64-$65
 	ldy.w $0000,X   ;0C90A3|BC0000  |7F0000; Load BP0+BP1 word
 	sty.b $62	   ;0C90A6|8462    |000062; Store at $62-$63
@@ -2840,7 +2840,7 @@ Load_0C920A:
 ; Calculate transparency mask: OR all 3 bitplanes
 	lda.w $0000,X   ;0C920A|BD0000  |7F0000; Load BP0
 	ora.w $0001,X   ;0C920D|1D0100  |7F0001; OR BP1
-	ora.w $0010,X   ;0C9210|1D1000  |7F0010; OR BP2
+	ora.w !ram_1031_long,X   ;0C9210|1D1000  |7F0010; OR BP2
 	eor.b #$ff	  ;0C9213|49FF    |      ; Invert = transparency mask
 	sta.b $64	   ;0C9215|8564    |000064; Save mask
 
@@ -2857,9 +2857,9 @@ Load_0C920A:
 
 ; Composite BP2: (dest & mask) | src
 	lda.b $64	   ;0C922B|A564    |000064; Load mask
-	and.w $0010,Y   ;0C922D|391000  |7F0010; Mask dest BP2
-	ora.w $0010,X   ;0C9230|1D1000  |7F0010; OR source BP2
-	sta.w $0010,Y   ;0C9233|991000  |7F0010; Write result
+	and.w !ram_1031_long,Y   ;0C922D|391000  |7F0010; Mask dest BP2
+	ora.w !ram_1031_long,X   ;0C9230|1D1000  |7F0010; OR source BP2
+	sta.w !ram_1031_long,Y   ;0C9233|991000  |7F0010; Write result
 
 ; Next row (stride +2 for X, +2 for Y within 8x8)
 	inx ;0C9236|E8      |      ; X += 2

@@ -69,7 +69,7 @@ DisplayEquipmentInfo:
 
 ; Load equipment stats from data table
 	lda.L DATA8_07ee84,x            ; Equipment ID
-	sta.W $015f                     ; Store equipment ID
+	sta.w !menu_selection                     ; Store equipment ID
 
 ; Process stat bonuses (ATK/DEF/etc)
 	lda.L DATA8_07ee85,x            ; Stat bonus 1
@@ -173,13 +173,13 @@ MenuSystemInit:
 	jsr.W LoadMenuGraphics               ; Load menu graphics
 
 ; Enable interrupts
-	lda.W $0112                     ; Get saved interrupt flags
+	lda.w !interrupt_config                     ; Get saved interrupt flags
 	sta.W $4200                     ; $4200 = Enable NMI/IRQ
 	cli                             ; Clear interrupt disable
 
 ; Set brightness
 	lda.B #$0f                      ; Full brightness
-	sta.W $00aa                     ; Store brightness value
+	sta.w !brightness_value                     ; Store brightness value
 
 ; Clear menu state
 	stz.w !battle_ready_flag                     ; Clear menu state
@@ -240,7 +240,7 @@ LoadMenuContent:
 
 ; Request callback execution
 	lda.B #$40                      ; Bit 6 = callback pending
-	tsb.W $00e2                     ; Set callback flag
+	tsb.w !system_flags_9                     ; Set callback flag
 
 	jsl.L WaitForVBlank             ; Wait for update
 

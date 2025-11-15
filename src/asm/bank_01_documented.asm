@@ -2965,7 +2965,7 @@ BattleEffect_StatusIconManager:
 	phy ;01A7F2|5A      |      ;
 	txy ;01A7F3|9B      |      ;
 	plx ;01A7F4|FA      |      ;
-	lda.w $0f28,y   ;01A7F5|B9280F  |000F28;
+	lda.w !vram_transfer_array,y   ;01A7F5|B9280F  |000F28;
 	beq F00a ;01A7F8|F00A    |01A804;
 	lda.w $0f2a,y   ;01A7FA|B92A0F  |000F2A;
 	sta.b $0b,x	 ;01A7FD|950B    |001A7D;
@@ -8701,7 +8701,7 @@ DATA8_01f892:
 
 ; Graphics Buffer Initialization Loop
 Graphics_Buffer_Init_Loop:
-	sta.w $0900,x   ; Store buffer initialization pattern
+	sta.w !tilemap_wram_source_start_2,x   ; Store buffer initialization pattern
 	inx ; Increment buffer index
 	inx ; Increment for double-byte data
 	cpx.w #$0080	; Check buffer initialization limit
@@ -8874,7 +8874,7 @@ Sprite_Processing_Loop:
 	ply ; Restore sprite index
 	rep #$20		; Set 16-bit accumulator mode
 	lda.w !battle_sprite_comp1	 ; Load sprite data component 1
-	sta.w $0800,y   ; Store sprite data to buffer 1
+	sta.w !tilemap_wram_source_start,y   ; Store sprite data to buffer 1
 	lda.w !battle_sprite_comp2	 ; Load sprite data component 2
 	sta.w $0802,y   ; Store sprite data to buffer 2
 	lda.w !battle_sprite_comp3	 ; Load sprite data component 3
@@ -8955,7 +8955,7 @@ Alternative_Sprite_Loop:
 	ply ; Restore alternative sprite index
 	rep #$20		; Set 16-bit accumulator mode
 	lda.w !battle_sprite_comp1	 ; Load alternative sprite component 1
-	sta.w $0800,y   ; Store to alternative buffer 1
+	sta.w !tilemap_wram_source_start,y   ; Store to alternative buffer 1
 	lda.w !battle_sprite_comp2	 ; Load alternative sprite component 2
 	sta.w $0880,y   ; Store to alternative buffer 2
 	lda.w !battle_sprite_comp3	 ; Load alternative sprite component 3
@@ -9038,7 +9038,7 @@ Memory_Graphics_Processing_Loop:
 	ply ; Restore memory graphics index
 	rep #$20		; Set 16-bit accumulator mode
 	lda.w !battle_sprite_comp1	 ; Load memory graphics component 1
-	sta.w $0900,y   ; Store to memory graphics buffer 1
+	sta.w !tilemap_wram_source_start_2,y   ; Store to memory graphics buffer 1
 	lda.w !battle_sprite_comp2	 ; Load memory graphics component 2
 	sta.w $0902,y   ; Store to memory graphics buffer 2
 	lda.w !battle_sprite_comp3	 ; Load memory graphics component 3
@@ -9120,7 +9120,7 @@ Alternative_Memory_Graphics_Loop:
 	ply ; Restore alternative memory index
 	rep #$20		; Set 16-bit accumulator mode
 	lda.w !battle_sprite_comp1	 ; Load alternative memory component 1
-	sta.w $0900,y   ; Store to alternative memory buffer 1
+	sta.w !tilemap_wram_source_start_2,y   ; Store to alternative memory buffer 1
 	lda.w !battle_sprite_comp2	 ; Load alternative memory component 2
 	sta.w $0980,y   ; Store to alternative memory buffer 2
 	lda.w !battle_sprite_comp3	 ; Load alternative memory component 3
@@ -9190,7 +9190,7 @@ Alternative_Memory_Buffer_Management:
 ; Advanced Coordinate Transformation Engine
 ; Sophisticated coordinate transformation with mathematical precision
 	.BattleDialogue_WaitForInput:
-	sta.w $1a3a	 ; Store coordinate transformation flags
+	sta.w !temp_accumulator	 ; Store coordinate transformation flags
 	rep #$20		; Set 16-bit accumulator mode
 	tya ; Transfer Y coordinate to accumulator
 	sep #$20		; Set 8-bit accumulator mode
@@ -9209,7 +9209,7 @@ Alternative_Memory_Buffer_Management:
 	lda.w #$0000	; Clear accumulator for data loading
 	sep #$20		; Set 8-bit accumulator mode
 	lda.l $7f8000,x ; Load coordinate map data
-	eor.w $1a3a	 ; Apply coordinate transformation flags
+	eor.w !temp_accumulator	 ; Apply coordinate transformation flags
 	bpl Coordinate_Transform_Positive ; Branch if coordinate positive
 	lda.b #$80	  ; Set coordinate negative flag
 
@@ -9221,19 +9221,19 @@ Coordinate_Transform_Positive:
 	asl a; Continue shift for precise addressing
 	tax ; Transfer coordinate address to X
 	lda.l $7fcef4,x ; Load coordinate transformation data 1
-	sta.w $1a35	 ; Store transformation component 1
+	sta.w !tile_data_temp_1	 ; Store transformation component 1
 	lda.l $7fcef6,x ; Load coordinate transformation data 2
-	sta.w $1a37	 ; Store transformation component 2
+	sta.w !tile_data_temp_2	 ; Store transformation component 2
 	sep #$20		; Set 8-bit accumulator mode
 	tyx ; Transfer coordinate to X register
 	lda.l $7fd0f4,x ; Load coordinate attribute data
-	sta.w $1a39	 ; Store coordinate attributes
-	sta.w $1a3c	 ; Store coordinate attribute backup
+	sta.w !tile_lookup_value	 ; Store coordinate attributes
+	sta.w !tile_data_copy	 ; Store coordinate attribute backup
 	bpl Coordinate_Attribute_Positive ; Branch if attribute positive
 	and.b #$70	  ; Extract attribute flags
 	lsr a; Shift attribute flags
 	lsr a; Continue shift for attribute processing
-	sta.w $1a3b	 ; Store processed attribute flags
+	sta.w !bg_control	 ; Store processed attribute flags
 
 Coordinate_Attribute_Positive:
 	sep #$10		; Set 8-bit index registers
@@ -9242,27 +9242,27 @@ Coordinate_Attribute_Positive:
 
 ; Coordinate Attribute Processing Loop
 Coordinate_Attribute_Processing_Loop:
-	lda.w $1a35,y   ; Load coordinate attribute component
+	lda.w !tile_data_temp_1,y   ; Load coordinate attribute component
 	sta.w !battle_sprite_comp1,x   ; Store processed attribute component
 	phx ; Preserve attribute index
 	tax ; Transfer attribute to X
-	lsr.w $1a3c	 ; Shift coordinate attribute control
+	lsr.w !tile_data_copy	 ; Shift coordinate attribute control
 	ror a; Rotate attribute data
 	ror a; Continue rotation for precise control
 	and.b #$40	  ; Extract attribute control flag
 	xba ; Exchange attribute bytes
-	lda.w $1a39	 ; Load coordinate attribute reference
+	lda.w !tile_lookup_value	 ; Load coordinate attribute reference
 	bmi Coordinate_Attribute_Special ; Branch if special attribute mode
 	lda.l $7ff274,x ; Load standard attribute data
 	asl a; Shift standard attribute
 	asl a; Continue shift for standard processing
-	sta.w $1a3b	 ; Store processed standard attribute
+	sta.w !bg_control	 ; Store processed standard attribute
 
 Coordinate_Attribute_Special:
 	xba ; Exchange attribute bytes
 	plx ; Restore attribute index
 	ora.w !coord_modifier	 ; Combine with attribute base
-	ora.w $1a3b	 ; Combine with processed attributes
+	ora.w !bg_control	 ; Combine with processed attributes
 	sta.w $1a3e,x   ; Store final attribute result
 	inx ; Increment attribute index
 	inx ; Continue increment for double-byte data
@@ -9351,7 +9351,7 @@ Coordinate_Validation_Complete:
 
 ; Bank-Switched Graphics Processing Loop
 Bank_Graphics_Processing_Loop:
-	lda.w $191a,x   ; Load graphics processing data
+	lda.w !map_chunk_control,x   ; Load graphics processing data
 	bpl Bank_Graphics_Data_Processing ; Branch if graphics data positive
 	ldy.w #$0020	; Set graphics processing count
 
@@ -9402,7 +9402,7 @@ Advanced_Graphics_Palette_Processing:
 
 ; Palette Processing Loop
 Palette_Processing_Loop:
-	lda.w $191a,x   ; Load palette processing data
+	lda.w !map_chunk_control,x   ; Load palette processing data
 	phx ; Preserve palette processing index
 	sta.w $211b	 ; Store palette data for multiplication
 	stz.w $211b	 ; Clear multiplication register high
@@ -9462,7 +9462,7 @@ DMA_Transfer_Secondary_Loop:
 ; Sophisticated pattern processing with bank coordination
 Advanced_DMA_Pattern_Processing:
 	ldx.w #$0000	; Initialize pattern processing index
-	lda.w $1910	 ; Load pattern processing control
+	lda.w !graphics_table_data	 ; Load pattern processing control
 	bpl DMA_Pattern_Standard ; Branch if standard pattern mode
 	ldx.w #$000c	; Set advanced pattern mode offset
 
@@ -9545,7 +9545,7 @@ Execute_Graphics_Completion:
 ; Graphics Completion Processing Loop
 Graphics_Completion_Loop:
 	lda.w !battle_sprite_comp1	 ; Load graphics completion component 1
-	sta.w $0900,y   ; Store completion component 1
+	sta.w !tilemap_wram_source_start_2,y   ; Store completion component 1
 	lda.w !battle_sprite_comp2	 ; Load graphics completion component 2
 	sta.w $0902,y   ; Store completion component 2
 	lda.w !battle_sprite_comp3	 ; Load graphics completion component 3

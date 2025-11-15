@@ -943,7 +943,7 @@ Clear_WorkRAM:
 ; Skips $0600-$07ff (512 bytes preserved)
 ; ---------------------------------------------------------------------------
 
-	stz.w $0800	 ; [$0800] = $00 (write zero to start of region)
+	stz.w !tilemap_wram_source_start	 ; [$0800] = $00 (write zero to start of region)
 
 	ldx.w #$0800	; X = $0800 (source address)
 	ldy.w #$0802	; Y = $0802 (dest address)
@@ -1096,16 +1096,16 @@ Init_VBlankDMA:
 
 	ldx.w #$ff08	; X = $ff08 (init value)
 	stx.w $0503	 ; [$0503-$0504] = $ff08
-	stx.w $0501	 ; [$0501-$0502] = $ff08
+	stx.w !audio_sound_params	 ; [$0501-$0502] = $ff08
 
 	ldx.w #$880f	; X = $880f (init value)
 	stx.w $0508	 ; [$0508-$0509] = $880f
-	stx.w $0506	 ; [$0506-$0507] = $880f
+	stx.w !audio_control_register	 ; [$0506-$0507] = $880f
 
 	lda.w #$00ff	; A = $00ff
 	sep #$20		; 8-bit accumulator
 
-	sta.w $0500	 ; [$0500] = $ff
+	sta.w !audio_gfx_index	 ; [$0500] = $ff
 	sta.w !audio_coord_register	 ; [$0505] = $ff
 
 	lda.b #$00	  ; A = $00
@@ -2475,7 +2475,7 @@ Init_Graphics_Registers:
 ; Clear More RAM ($0800-$1ff8 = 6,136 bytes)
 ; ---------------------------------------------------------------------------
 
-	stz.w $0800	 ; Clear byte at $0800
+	stz.w !tilemap_wram_source_start	 ; Clear byte at $0800
 
 	ldx.w #$0800	; Source = $0800
 	ldy.w #$0802	; Dest = $0802
@@ -4680,7 +4680,7 @@ VRAM_DirectWriteLarge_InnerLoop:
 	tay ; Y = data byte
 	sty.b !SNES_VMDATAL-$2100 ; Write to VRAM data (low)
 
-	lda.w $0010,x   ; Get 17th byte
+	lda.w !ram_1031_long,x   ; Get 17th byte
 	tay ; Y = data byte
 	sty.b !SNES_VMDATAL-$2100 ; Write to VRAM data (low)
 	lda.w $0011,x   ; Get 18th byte
@@ -4701,7 +4701,7 @@ VRAM_DirectWriteLarge_InnerLoop:
 	lda.w $0016,x   ; Get 23rd byte
 	tay ; Y = data byte
 	sty.b !SNES_VMDATAL-$2100 ; Write to VRAM data (low)
-	lda.w $0017,x   ; Get 24th byte
+	lda.w !general_address,x   ; Get 24th byte
 	tay ; Y = data byte
 	sty.b !SNES_VMDATAL-$2100 ; Write to VRAM data (low)
 
@@ -4898,7 +4898,7 @@ Graphics_InitFieldMenuMode:
 
 ; Load special color values
 	ldx.w !menu_color	 ; X = color value (low byte)
-	ldy.w $0e9d	 ; Y = color value (high byte)
+	ldy.w !menu_color_hi	 ; Y = color value (high byte)
 	lda.b #$0d	  ; A = $0d (CGRAM address)
 	sta.b !SNES_CGADD-$2100 ; Set CGRAM address
 	stx.b !SNES_CGDATA-$2100 ; Write color (low)
@@ -5593,7 +5593,7 @@ Animation_UpdateSystem:
 	rep #$10		; 16-bit X/Y
 	lda.b #$20	  ; bit 5 mask
 	tsb.w $00d9	 ; Set animation processing flag
-	pea.w $0500	 ; Push $0500 to stack
+	pea.w !audio_gfx_index	 ; Push $0500 to stack
 	pld ; Direct Page = $0500 (animation queue)
 	cli ; Enable interrupts
 
@@ -6280,8 +6280,8 @@ Memory_Copy32Bytes:
 	sta.w $0014,y
 	lda.w $0012,x   ; Copy word at +$12
 	sta.w $0012,y
-	lda.w $0010,x   ; Copy word at +$10
-	sta.w $0010,y
+	lda.w !ram_1031_long,x   ; Copy word at +$10
+	sta.w !ram_1031_long,y
 	lda.w $000e,x   ; Copy word at +$0e
 	sta.w $000e,y
 	lda.w $000c,x   ; Copy word at +$0c
@@ -6393,7 +6393,7 @@ Memory_Fill32:
 	sta.w $0012,y   ; Fill word at +$12
 
 Memory_Fill16:
-	sta.w $0010,y   ; Fill word at +$10
+	sta.w !ram_1031_long,y   ; Fill word at +$10
 
 Memory_Fill14Bytes:
 	sta.w $000e,y   ; Fill word at +$0e
@@ -9367,7 +9367,7 @@ Window_FillLoop:
 	dec a
 	sta.w $0012,y
 	dec a
-	sta.w $0010,y
+	sta.w !ram_1031_long,y
 	dec a
 	sta.w $000e,y
 	dec a
@@ -12357,7 +12357,7 @@ CharName_InputLoop:
 	rep #$10		; 16-bit X/Y
 	inc.w $00cc	 ; Increment character count
 	lda.l DATA8_03a37c,x ; Load character from table
-	sta.w $1000,y   ; Store in name buffer
+	sta.w !char1_data_page,y   ; Store in name buffer
 	jsr.w Anim_SetMode11 ; Set animation mode $11
 	ldx.w #$baed	; Menu data
 	jsr.w CodeLikelyLoadsProcessesThisData ; Update menu
@@ -12529,13 +12529,13 @@ System_Init:
 	sta.b SNES_CGADD-$2100 ; Set CGRAM address
 	lda.w !menu_color	 ; Load color low
 	sta.b SNES_CGDATA-$2100 ; Write to CGRAM
-	lda.w $0e9d	 ; Load color high
+	lda.w !menu_color_hi	 ; Load color high
 	sta.b SNES_CGDATA-$2100 ; Write to CGRAM
 	lda.b #$71	  ; CGRAM address $71
 	sta.b SNES_CGADD-$2100 ; Set CGRAM address
 	lda.w !menu_color	 ; Load color low
 	sta.b SNES_CGDATA-$2100 ; Write to CGRAM
-	lda.w $0e9d	 ; Load color high
+	lda.w !menu_color_hi	 ; Load color high
 	sta.b SNES_CGDATA-$2100 ; Write to CGRAM
 	stz.b SNES_BG1HOFS-$2100 ; Clear BG1 H-scroll
 	stz.b SNES_BG1HOFS-$2100 ; (write twice)
@@ -13663,7 +13663,7 @@ Menu_BattleSettings_UpdateSetting:
 	beq Menu_BattleSettings_Green ; If = 3, handle green color
 	cmp.b #$05	  ; Check if < 5
 	bcc Menu_BattleSettings_Blue ; If yes, handle blue color
-	lda.w $0e9d	 ; Load color data high byte
+	lda.w !menu_color_hi	 ; Load color data high byte
 	lsr a; Extract red component
 	lsr a
 	bra Menu_BattleSettings_StoreColor ; Store result
@@ -13721,7 +13721,7 @@ Menu_BattleSettings_Mode_Store:
 
 Menu_BattleSettings_Speed:
 	lda.b #$80	  ; Load $80
-	and.w $0ec6	 ; Test battle speed flag
+	and.w !dma_control_flags	 ; Test battle speed flag
 	beq Menu_BattleSettings_Speed_Store ; If not set, use 0
 	db $a9,$01	 ; lda #$01
 
@@ -13765,9 +13765,9 @@ Menu_BattleSettings_ToggleMode:
 	bra Menu_BattleSettings_Commit ; Update display
 
 Menu_BattleSettings_ToggleSpeed:
-	lda.w $0ec6	 ; Load battle speed
+	lda.w !dma_control_flags	 ; Load battle speed
 	eor.b #$80	  ; Toggle bit 7
-	sta.w $0ec6	 ; Store back
+	sta.w !dma_control_flags	 ; Store back
 
 Menu_BattleSettings_Commit:
 	jsr.w Sprite_SetMode2D ; Set sprite mode $2d
@@ -13778,7 +13778,7 @@ Menu_BattleSettings_SetColor:
 	bcc Menu_BattleSettings_SetBlue ; If < 4, handle blue
 	beq Menu_BattleSettings_SetGreen ; If = 4, handle green
 	lda.b #$7c	  ; Mask for red component
-	trb.w $0e9d	 ; Clear red bits
+	trb.w !menu_color_hi	 ; Clear red bits
 	lda.b $01	   ; Load new value
 	asl a; Shift left 4 times
 	asl a
@@ -13788,7 +13788,7 @@ Menu_BattleSettings_SetColor:
 	lda.b #$7c	  ; Max value
 
 Menu_BattleSettings_SetRed_Store:
-	tsb.w $0e9d	 ; Set red bits
+	tsb.w !menu_color_hi	 ; Set red bits
 	bra Menu_BattleSettings_Commit ; Update display
 
 Menu_BattleSettings_SetGreen:
@@ -14238,7 +14238,7 @@ Screen_FillWords_Alt:
 	sec ; Set carry
 
 Screen_FillWords_Loop:
-	sta.w $0010,x   ; Store at X+$10
+	sta.w !ram_1031_long,x   ; Store at X+$10
 	sta.w $0012,x   ; Store at X+$12
 	sta.w $0014,x   ; Store at X+$14
 	sta.w $0016,x   ; Store at X+$16
@@ -14908,8 +14908,8 @@ GameState_Flag1Set:
 	trb.w !system_flags_5	 ;00CAEE|1CDA00  |0000DA;
 	jsr.w Screen_ColorProcessor ;00CAF1|2009CC  |00CC09;
 	ldx.w #$5555	;00CAF4|A25555  |      ;
-	stx.w $0e04	 ;00CAF7|8E040E  |000E04;
-	stx.w $0e06	 ;00CAFA|8E060E  |000E06;
+	stx.w !hw_register_1	 ;00CAF7|8E040E  |000E04;
+	stx.w !status_register	 ;00CAFA|8E060E  |000E06;
 	stx.w $0e08	 ;00CAFD|8E080E  |000E08;
 	lda.b #$80	  ;00CB00|A980    |      ;
 	trb.w !system_flags_8	 ;00CB02|1CDE00  |0000DE;

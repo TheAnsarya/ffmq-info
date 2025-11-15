@@ -241,13 +241,13 @@ Label_00806E:
 	sep #$20                ; 8-bit A
 
 ; Enable interrupts (NMI/IRQ)
-	lda.W $0112             ; Load interrupt enable flags
+	lda.w !interrupt_config             ; Load interrupt enable flags
 	sta.W SNES_NMITIMEN     ; $4200: Enable NMI/IRQ
 	cli                     ; Clear interrupt disable flag
 
 ; Set screen brightness
 	lda.B #$0f              ; Full brightness
-	sta.W $00aa             ; Store to game variable
+	sta.w !brightness_value             ; Store to game variable
 
 ; Call initialization routine twice (why?)
 	jsl.L CWaitTimingRoutine       ; Bank $0c initialization
@@ -282,7 +282,7 @@ Load_0080B0:
 ; ===========================================================================
 
 	lda.B #$80              ; Bit 7
-	trb.W $00de             ; Test and reset bit in game flag
+	trb.w !system_flags_8             ; Test and reset bit in game flag
 
 	lda.B #$e0              ; Bits 5-7
 	trb.w !system_interrupt_flags             ; Test and reset bits
