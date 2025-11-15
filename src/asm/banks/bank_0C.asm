@@ -297,7 +297,7 @@ InitWorldMapSprites:
 	mvn $0c,$0c                          ;0C824C|540C0C  |      ;
 	sep #$20                             ;0C824F|E220    |      ;
 	stz.W $0160                          ;0C8251|9C6001  |0C0160;
-	stz.W $0201                          ;0C8254|9C0102  |0C0201;
+	stz.w !vfx_oam_control                          ;0C8254|9C0102  |0C0201;
 	ldx.W #$8671                         ;0C8257|A27186  |      ;
 ;      |        |      ;
 ProcessAnimationScript:
@@ -408,7 +408,7 @@ ProcessOpcode_Type4:
 	lsr a;0C82F9|4A      |      ;
 	lsr a;0C82FA|4A      |      ;
 	lsr a;0C82FB|4A      |      ;
-	sta.W $0200                          ;0C82FC|8D0002  |0C0200;
+	sta.w !vfx_effect_type                          ;0C82FC|8D0002  |0C0200;
 	jmp.W ProcessAnimationScript                    ;0C82FF|4C5A82  |0C825A;
 ;      |        |      ;
 ;      |        |      ;
@@ -537,7 +537,7 @@ ApplyScreenOffset:
 ;      |        |      ;
 ScreenOffset_AdjustY:
 	lda.W $0001,x                        ;0C83DD|BD0100  |0C0001;
-	sbc.W $0200                          ;0C83E0|ED0002  |0C0200;
+	sbc.w !vfx_effect_type                          ;0C83E0|ED0002  |0C0200;
 	sta.W $0001,x                        ;0C83E3|9D0100  |0C0001;
 	bra ScreenOffset_CheckRange                      ;0C83E6|8013    |0C83FB;
 ;      |        |      ;
@@ -600,7 +600,7 @@ ZoomOut_FinalFrames:
 Animation_ComplexRotation:
 	phx                                  ;0C8460|DA      |      ;
 	ldy.W #$8575                         ;0C8461|A07585  |      ;
-	sty.W $0212                          ;0C8464|8C1202  |0C0212;
+	sty.w !vfx_function_ptr                          ;0C8464|8C1202  |0C0212;
 	ldx.W #$0000                         ;0C8467|A20000  |      ;
 	ldy.W #$84cb                         ;0C846A|A0CB84  |      ;
 	jsr.W ComplexRotation_Execute                    ;0C846D|209E84  |0C849E;
@@ -612,9 +612,9 @@ Animation_ComplexRotation:
 	jsr.W ComplexRotation_Execute                    ;0C847F|209E84  |0C849E;
 	ldy.W #$84f6                         ;0C8482|A0F684  |      ;
 	jsr.W ComplexRotation_Execute                    ;0C8485|209E84  |0C849E;
-	stz.W $0214                          ;0C8488|9C1402  |0C0214;
+	stz.w !vfx_fade_state                          ;0C8488|9C1402  |0C0214;
 	ldy.W #$854a                         ;0C848B|A04A85  |      ;
-	sty.W $0212                          ;0C848E|8C1202  |0C0212;
+	sty.w !vfx_function_ptr                          ;0C848E|8C1202  |0C0212;
 	ldy.W #$84cb                         ;0C8491|A0CB84  |      ;
 	jsr.W ComplexRotation_Execute                    ;0C8494|209E84  |0C849E;
 	jsr.W AnimateWorldSprites                    ;0C8497|20DB85  |0C85DB;
@@ -623,7 +623,7 @@ Animation_ComplexRotation:
 ;      |        |      ;
 ;      |        |      ;
 ComplexRotation_Execute:
-	sty.W $0210                          ;0C849E|8C1002  |0C0210;
+	sty.w !vfx_table_ptr                          ;0C849E|8C1002  |0C0210;
 	ldy.W #$85b3                         ;0C84A1|A0B385  |      ;
 ;      |        |      ;
 Rotation_ProcessStep:
@@ -707,7 +707,7 @@ Rotation_QuarterStep:
 ;      |        |      ;
 	lda.W $0c81                          ;0C854A|AD810C  |0C0C81;
 	pha                                  ;0C854D|48      |      ;
-	lda.W $0214                          ;0C854E|AD1402  |0C0214;
+	lda.w !vfx_fade_state                          ;0C854E|AD1402  |0C0214;
 	bcs Rotation_AdjustOffset                      ;0C8551|B006    |0C8559;
 	sec                                  ;0C8553|38      |      ;
 	sbc.W $0000,y                        ;0C8554|F90000  |0C0000;
@@ -719,7 +719,7 @@ Rotation_AdjustOffset:
 	adc.W $0000,y                        ;0C855A|790000  |0C0000;
 ;      |        |      ;
 Rotation_StoreOffset:
-	sta.W $0214                          ;0C855D|8D1402  |0C0214;
+	sta.w !vfx_fade_state                          ;0C855D|8D1402  |0C0214;
 	lsr a;0C8560|4A      |      ;
 	pha                                  ;0C8561|48      |      ;
 	lda.B $02,s                          ;0C8562|A302    |000002;
@@ -783,23 +783,23 @@ AnimateWorldSprites:
 	sta.W $0cce                          ;0C85F1|8DCE0C  |0C0CCE;
 	rep #$30                             ;0C85F4|C230    |      ;
 	lda.W #$0005                         ;0C85F6|A90500  |      ;
-	sta.W $020c                          ;0C85F9|8D0C02  |0C020C;
-	stz.W $020e                          ;0C85FC|9C0E02  |0C020E;
+	sta.w !vfx_sprite_counter                          ;0C85F9|8D0C02  |0C020C;
+	stz.w !vfx_sprite_index                          ;0C85FC|9C0E02  |0C020E;
 ;      |        |      ;
 AnimateSprites_Loop:
-	lda.W $020e                          ;0C85FF|AD0E02  |0C020E;
+	lda.w !vfx_sprite_index                          ;0C85FF|AD0E02  |0C020E;
 	asl a;0C8602|0A      |      ;
 	adc.W #$0c80                         ;0C8603|69800C  |      ;
 	tay                                  ;0C8606|A8      |      ;
-	ldx.W $020e                          ;0C8607|AE0E02  |0C020E;
-	lda.W $0202,x                        ;0C860A|BD0202  |0C0202;
+	ldx.w !vfx_sprite_index                          ;0C8607|AE0E02  |0C020E;
+	lda.w !vfx_anim_frames,x                        ;0C860A|BD0202  |0C0202;
 	inc a;0C860D|1A      |      ;
 	cmp.W #$000e                         ;0C860E|C90E00  |      ;
 	bne Sprite_UpdateTile                      ;0C8611|D003    |0C8616;
 	lda.W #$0000                         ;0C8613|A90000  |      ;
 ;      |        |      ;
 Sprite_UpdateTile:
-	sta.W $0202,x                        ;0C8616|9D0202  |0C0202;
+	sta.w !vfx_anim_frames,x                        ;0C8616|9D0202  |0C0202;
 	tax                                  ;0C8619|AA      |      ;
 	sep #$20                             ;0C861A|E220    |      ;
 	lda.W DATA8_0c8659,x                 ;0C861C|BD5986  |0C8659;
@@ -807,7 +807,7 @@ Sprite_UpdateTile:
 	cmp.B #$44                           ;0C8622|C944    |      ;
 	php                                  ;0C8624|08      |      ;
 	rep #$30                             ;0C8625|C230    |      ;
-	lda.W $020e                          ;0C8627|AD0E02  |0C020E;
+	lda.w !vfx_sprite_index                          ;0C8627|AD0E02  |0C020E;
 	asl a;0C862A|0A      |      ;
 	asl a;0C862B|0A      |      ;
 	adc.W #$0c94                         ;0C862C|69940C  |      ;
@@ -828,9 +828,9 @@ Sprite_SetFrame44:
 ;      |        |      ;
 Sprite_UpdatePalette:
 	rep #$30                             ;0C8647|C230    |      ;
-	inc.W $020e                          ;0C8649|EE0E02  |0C020E;
-	inc.W $020e                          ;0C864C|EE0E02  |0C020E;
-	dec.W $020c                          ;0C864F|CE0C02  |0C020C;
+	inc.w !vfx_sprite_index                          ;0C8649|EE0E02  |0C020E;
+	inc.w !vfx_sprite_index                          ;0C864C|EE0E02  |0C020E;
+	dec.w !vfx_sprite_counter                          ;0C864F|CE0C02  |0C020C;
 	bne AnimateSprites_Loop                      ;0C8652|D0AB    |0C85FF;
 	jsr.W TransferOAMToVRAM                    ;0C8654|201089  |0C8910;
 	plx                                  ;0C8657|FA      |      ;

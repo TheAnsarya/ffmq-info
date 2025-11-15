@@ -158,6 +158,19 @@
 !vram_dest_addr     = $01f8     ; VRAM transfer destination address
 
 ; ----------------------------------------------------------------------------
+; Visual Effects System ($0200-$0214)
+; ----------------------------------------------------------------------------
+; Used by bank_0C visual effect routines for OAM/sprite/fade effects
+!vfx_effect_type    = $0200     ; Visual effect type / adjustment value (5 uses)
+!vfx_oam_control    = $0201     ; OAM control byte (2 uses)
+!vfx_anim_frames    = $0202     ; Sprite animation frame array (indexed, 4 uses)
+!vfx_sprite_counter = $020c     ; Sprite loop counter (4 uses)
+!vfx_sprite_index   = $020e     ; Sprite index (word addressing, 12 uses)
+!vfx_table_ptr      = $0210     ; Effect table pointer (indirect JSR, 2 uses)
+!vfx_function_ptr   = $0212     ; Effect function pointer (indirect JSR, 4 uses)
+!vfx_fade_state     = $0214     ; Fade direction/state flag (6 uses)
+
+; ----------------------------------------------------------------------------
 ; Player State ($40-$5f)
 ; ----------------------------------------------------------------------------
 !player_x_pos       = $40       ; Player X position (2 bytes: $40-$41)

@@ -469,7 +469,7 @@ Display_SpriteOAMSetup:
 	mvn $0c,$0c	 ;0C824C	; Block move within bank $0c
 	sep #$20		;0C824F	; 8-bit accumulator
 	stz.w $0160	 ;0C8251	; Clear sprite state flag
-	stz.w $0201	 ;0C8254	; Clear OAM control byte
+	stz.w !vfx_oam_control	 ;0C8254	; Clear OAM control byte
 	ldx.w #$8671	;0C8257	; Effect script address
 
 ; ==============================================================================
@@ -595,7 +595,7 @@ Display_EffectCommandMidRange:
 	lsr A		   ;0C82F9	; /2
 	lsr A		   ;0C82FA	; /4
 	lsr A		   ;0C82FB	; /8
-	sta.w $0200	 ;0C82FC	; Store effect type
+	sta.w !vfx_effect_type	 ;0C82FC	; Store effect type
 	jmp.w CodeVisualEffectScriptInterpreter ;0C82FF	; Continue script
 
 ; Low-range command handler ($08-$3f)
@@ -765,7 +765,7 @@ Display_TableEffectExecutor:
 
 	.ProcessEffect:
 	lda.w $0001,X   ;0C83DD	; Load table value
-	sbc.w $0200	 ;0C83E0	; Subtract adjustment
+	sbc.w !vfx_effect_type	 ;0C83E0	; Subtract adjustment
 	sta.w $0001,X   ;0C83E3	; Store result
 	bra .ContinueEffect ;0C83E6	; Continue
 
@@ -783,7 +783,7 @@ Effect_HighRangeHandler:
 	cpy.w #$00a9                         ;0C83ED|C0A900  |
 	bcs +                                ;0C83F0|B009    |0C83FB
 	lda.w $0001,X                        ;0C83F2|BD0100  |
-	adc.w $0200                          ;0C83F5|6D0002  |
+	adc.w !vfx_effect_type                          ;0C83F5|6D0002  |
 	sta.w $0001,X                        ;0C83F8|9D0100  |
 +   ; Fall through to continue effect
 
@@ -853,7 +853,7 @@ Display_ScreenScrollEffect:
 Display_ComplexPaletteFade:
 	phx ;0C8460	; Save script pointer
 	ldy.w #$8575	;0C8461	; Function pointer 1
-	sty.w $0212	 ;0C8464	; Store function address
+	sty.w !vfx_function_ptr	 ;0C8464	; Store function address
 	ldx.w #$0000	;0C8467	; Clear X (parameter)
 	ldy.w #$84cb	;0C846A	; Fade table address
 	jsr.w Display_PaletteFadeStage ;0C846D	; Execute fade stage 1
@@ -865,9 +865,9 @@ Display_ComplexPaletteFade:
 	jsr.w ExecuteFadeStage ;0C847F	; Execute fade stage 4
 	ldy.w #$84f6	;0C8482	; Fade table address
 	jsr.w ExecuteFadeStage ;0C8485	; Execute fade stage 5
-	stz.w $0214	 ;0C8488	; Clear fade state
+	stz.w !vfx_fade_state	 ;0C8488	; Clear fade state
 	ldy.w #$854a	;0C848B	; Function pointer 2
-	sty.w $0212	 ;0C848E	; Update function address
+	sty.w !vfx_function_ptr	 ;0C848E	; Update function address
 	ldy.w #$84cb	;0C8491	; Final fade table
 	jsr.w ExecuteFadeStage ;0C8494	; Execute final stage
 	jsr.w WaitOneFrame ;0C8497	; Wait one frame
@@ -883,7 +883,7 @@ Display_ComplexPaletteFade:
 ; ==============================================================================
 
 Display_FadeStageExecutor:
-	sty.w $0210	 ;0C849E	; Store table address
+	sty.w !vfx_table_ptr	 ;0C849E	; Store table address
 	ldy.w #$85b3	;0C84A1	; Fade curve start
 
 	.FadeCurveLoop:									; Loop through fade curve
@@ -975,7 +975,7 @@ Display_FadeFunction3:
 Display_FadeFunction4:
 	lda.w $0c81	 ;0C854A	; Load base value
 	pha ;0C854D	; Save to stack
-	lda.w $0214	 ;0C854E	; Load fade direction flag
+	lda.w !vfx_fade_state	 ;0C854E	; Load fade direction flag
 	bcs .AddCurve   ;0C8551	; Branch if carry set
 	sec ;0C8553	; Set carry
 	sbc.w $0000,Y   ;0C8554	; Subtract curve value
@@ -986,7 +986,7 @@ Display_FadeFunction4:
 	adc.w $0000,Y   ;0C855A	; Add curve value
 
 	.ApplyFade:
-	sta.w $0214	 ;0C855D	; Store new fade value
+	sta.w !vfx_fade_state	 ;0C855D	; Store new fade value
 	lsr A		   ;0C8560	; Divide by 2
 	pha ;0C8561	; Save to stack
 	lda.b $02,S	 ;0C8562	; Load original value
@@ -1066,23 +1066,23 @@ Display_WaitVBlankAndUpdate:
 	sta.w $0cce	 ;0C85F1	; Update sprite tile 4
 	rep #$30		;0C85F4	; 16-bit A/X/Y
 	lda.w #$0005	;0C85F6	; Loop counter = 5 sprites
-	sta.w $020c	 ;0C85F9	; Store counter
-	stz.w $020e	 ;0C85FC	; Clear sprite index
+	sta.w !vfx_sprite_counter	 ;0C85F9	; Store counter
+	stz.w !vfx_sprite_index	 ;0C85FC	; Clear sprite index
 
 	.SpriteUpdateLoop:							; Loop: Update each sprite
-	lda.w $020e	 ;0C85FF	; Load sprite index
+	lda.w !vfx_sprite_index	 ;0C85FF	; Load sprite index
 	asl A		   ;0C8602	; *2 (word offset)
 	adc.w #$0c80	;0C8603	; Add base address
 	tay ;0C8606	; Use as pointer
-	ldx.w $020e	 ;0C8607	; Load sprite index
-	lda.w $0202,X   ;0C860A	; Load animation frame
+	ldx.w !vfx_sprite_index	 ;0C8607	; Load sprite index
+	lda.w !vfx_anim_frames,X   ;0C860A	; Load animation frame
 	inc A		   ;0C860D	; Next frame
 	cmp.w #$000e	;0C860E	; Frame >= 14?
 	bne .StoreFrame ;0C8611	; Branch if not
 	lda.w #$0000	;0C8613	; Wrap to frame 0
 
 	.StoreFrame:
-	sta.w $0202,X   ;0C8616	; Store new frame number
+	sta.w !vfx_anim_frames,X   ;0C8616	; Store new frame number
 	tax ;0C8619	; Use frame as index
 	sep #$20		;0C861A	; 8-bit accumulator
 	lda.w DATA8_0C8659,X ;0C861C	; Load tile number from table
@@ -1090,7 +1090,7 @@ Display_WaitVBlankAndUpdate:
 	cmp.b #$44	  ;0C8622	; Tile = $44?
 	php ;0C8624	; Save comparison result
 	rep #$30		;0C8625	; 16-bit A/X/Y
-	lda.w $020e	 ;0C8627	; Load sprite index
+	lda.w !vfx_sprite_index	 ;0C8627	; Load sprite index
 	asl A		   ;0C862A	; *2
 	asl A		   ;0C862B	; *4 (dword offset)
 	adc.w #$0c94	;0C862C	; Add base address
@@ -1110,9 +1110,9 @@ Display_WaitVBlankAndUpdate:
 
 	.ContinueSpriteLoop:
 	rep #$30		;0C8647	; 16-bit A/X/Y
-	inc.w $020e	 ;0C8649	; Next sprite
-	inc.w $020e	 ;0C864C	; Increment by 2 (word addressing)
-	dec.w $020c	 ;0C864F	; Decrement counter
+	inc.w !vfx_sprite_index	 ;0C8649	; Next sprite
+	inc.w !vfx_sprite_index	 ;0C864C	; Increment by 2 (word addressing)
+	dec.w !vfx_sprite_counter	 ;0C864F	; Decrement counter
 	bne .SpriteUpdateLoop ;0C8652	; Loop for all 5 sprites
 	jsr.w JumpWindowApplyRoutine ;0C8654	; Update PPU registers
 	plx ;0C8657	; Restore X
