@@ -396,7 +396,7 @@ BattleSprite_AnimationExit_1:	; Exit routine
 
 BattleSprite_InitAnimationState:
 	lda.w $009e	 ; Load frame counter
-	sta.w $192c	 ; Store to animation counter
+	sta.w !battle_temp_hi	 ; Store to animation counter
 	lda.b #$02	  ; Sprite index = 2
 	sta.w !battle_temp_work	 ; Store sprite index
 	jsl.l CallsCodeAnimationFrameCalculatorBank ; Call animation frame calculator (Bank $01)
@@ -932,7 +932,7 @@ BattleMap_GetTileData:
 	sep #$20		; Set A to 8-bit
 	xba ; Get high byte
 	sta.w $4202	 ; Store to multiply register A
-	lda.w $1924	 ; Load map row stride
+	lda.w !battle_coord_x_boundary	 ; Load map row stride
 	sta.w $4203	 ; Store to multiply register B
 	xba ; Swap back
 	rep #$20		; Set A to 16-bit
@@ -1265,7 +1265,7 @@ BattleEnemy_SetupTileData:
 	lsr a
 	tax ; Transfer to X for lookup
 	lda.l Battle_TileStride,x ; Load tile stride (16-bit value)
-	sta.w $1924	 ; Store to tile stride variable
+	sta.w !battle_coord_x_boundary	 ; Store to tile stride variable
 
 	sep #$20		; Set A to 8-bit
 	lda.w $1910	 ; Load enemy type flags

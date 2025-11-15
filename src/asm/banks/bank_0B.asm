@@ -128,7 +128,7 @@ BattleEvent_Return:
 ;      |        |      ;
 BattleEvent_InitSearch:
 	lda.W $009e                          ;0B80D9|AD9E00  |00009E;
-	sta.W $192c                          ;0B80DC|8D2C19  |00192C;
+	sta.w !battle_temp_hi                          ;0B80DC|8D2C19  |00192C;
 	lda.B #$02                           ;0B80DF|A902    |      ;
 	sta.w !battle_temp_work                          ;0B80E1|8D2B19  |00192B;
 	jsl.L CallsCodeAnimationFrameCalculatorBank                    ;0B80E4|22D18B01|018BD1;
@@ -460,7 +460,7 @@ CalculateTileAddress:
 	sep #$20                             ;0B833B|E220    |      ;
 	xba                                  ;0B833D|EB      |      ;
 	sta.W $4202                          ;0B833E|8D0242  |014202;
-	lda.W $1924                          ;0B8341|AD2419  |011924;
+	lda.w !battle_coord_x_boundary                          ;0B8341|AD2419  |011924;
 	sta.W $4203                          ;0B8344|8D0342  |014203;
 	xba                                  ;0B8347|EB      |      ;
 	rep #$20                             ;0B8348|C220    |      ;
@@ -661,7 +661,7 @@ LoadEnemySpriteTiles:
 	lsr a;0B8505|4A      |      ;
 	tax                                  ;0B8506|AA      |      ;
 	lda.L UNREACH_0B8540,x               ;0B8507|BF40850B|0B8540;
-	sta.W $1924                          ;0B850B|8D2419  |011924;
+	sta.w !battle_coord_x_boundary                          ;0B850B|8D2419  |011924;
 	sep #$20                             ;0B850E|E220    |      ;
 	lda.W $1910                          ;0B8510|AD1019  |011910;
 	and.B #$3f                           ;0B8513|293F    |      ;
