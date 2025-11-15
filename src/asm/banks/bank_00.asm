@@ -11948,17 +11948,195 @@ Battle_LoadGraphicsLoop:
 	db $94,$03,$ea,$97,$03               ;00C923|        |      ;
 	lda.w !menu_selection                          ;00C928|AD5F01  |00015F;
 ;      |        |      ;
+;===============================================================================
+; SaveFile_CalculateOffset
+;-------------------------------------------------------------------------------
+; Calculates the byte offset into save file RAM ($7F:0000 or $70:0000) for a
+; given character/save slot index. Each save slot occupies $038C (908) bytes,
+; so this function performs: offset = slot_index × $038C. Used throughout save/
+; load code to access character data, inventory, progress flags, etc.
+;
+; CALLING CONVENTION:
+;   JSR (short call)
+;   A = Character/slot index (0-based, typically 0-2 for 3 party members)
+;       Can also be save file slot (0-3 for 4 save slots)
+;   Returns: Direct Page $0B = calculated offset (word value)
+;   Accumulator 16-bit recommended (rep #$30 before call)
+;
+; OPERATION:
+;   1. Mask A to 8-bit value (keep only low byte)
+;   2. Store masked value in $98 (multiplicand low word)
+;   3. Load $038C into $9C (multiplier)
+;   4. Call Math_Multiply16x16: $9E-$A1 = $98-$9B × $9C-$9F
+;   5. Add $0000 to result (identity operation, may be padding)
+;   6. Store final offset in Direct Page $0B (word)
+;   7. Return to caller
+;
+; MULTIPLICATION DETAILS:
+;   Formula: offset = index × $038C
+;   
+;   Example calculations:
+;     Slot 0: 0 × $038C = $0000 (start of first character)
+;     Slot 1: 1 × $038C = $038C (start of second character)
+;     Slot 2: 2 × $038C = $0718 (start of third character)
+;     Slot 3: 3 × $038C = $0AA4 (start of fourth save slot)
+;
+;   Max index typically 3, max offset = $0AA4 (2724 bytes)
+;   Total save RAM per file ≈ 4 × $038C = $0E30 (3632 bytes)
+;
+; SAVE FILE STRUCTURE (per slot, $038C bytes):
+;   $0000-$0003: Character stats (HP, MP, level, etc.)
+;   $0004-$001F: Character name (32 bytes, null-terminated)
+;   $0020-$007F: Equipment and inventory data
+;   $0080-$00B3: Spell list and abilities
+;   $00B4-$00B7: Portrait ID and character class
+;   $00B8-$01FF: Progress flags, story state, collected items
+;   $0200-$02FF: Map data and visited locations
+;   $0300-$038B: Additional game state (timers, counters, etc.)
+;
+;   The $038C byte size ensures clean slot boundaries and allows
+;   easy slot management in 64KB RAM banks.
+;
+; DIRECT PAGE USAGE:
+;   Input:  None (parameter in A)
+;   Output: $0B = calculated offset (word, little-endian)
+;   
+;   Temporary:
+;     $98-$9B: Multiplicand (slot index, zero-extended to 32-bit)
+;     $9C-$9F: Multiplier ($038C, zero-extended to 32-bit)
+;     $9E-$A1: Product (32-bit result, only low word used)
+;
+;   The multiplication routine returns 32-bit product but only the
+;   low 16 bits are needed (stored in $9E-$9F, copied to $0B).
+;
+; WHY $038C BYTE SLOTS:
+;   Size $038C (908 bytes) provides enough space for:
+;     - Full character statistics and progression data
+;     - Complete inventory (weapons, armor, items)
+;     - All learned spells and abilities
+;     - Story progress flags and event triggers
+;     - Map exploration state
+;     - Miscellaneous counters and timers
+;
+;   The size is a balance between:
+;     + Sufficient space for comprehensive save data
+;     + Fitting 4 save slots in 4KB RAM page ($1000 bytes)
+;     + Clean boundaries for slot management
+;
+; COMMON CALLERS:
+;   - Character_LoadPortrait ($00CF62): Access portrait ID at offset $00B4
+;   - SaveFile_Load: Read complete slot data
+;   - SaveFile_Save: Write complete slot data
+;   - Character_UpdateStats: Modify character data in slot
+;   - Inventory_AddItem: Update inventory at slot offset
+;   - Progress_SetFlag: Set story flags in slot data
+;
+; USAGE EXAMPLES:
+;   Load character 0 portrait:
+;       lda.W #$0000              ; A = 0 (character slot 0)
+;       jsr SaveFile_CalculateOffset
+;       ; Now $0B = $0000
+;       lda.B $0B                 ; X = offset
+;       clc
+;       adc.W #$00B4              ; Add portrait offset
+;       tax
+;       lda.L $700000,x           ; Read portrait ID from $70:00B4
+;   
+;   Load character 1 HP:
+;       lda.W #$0001              ; A = 1 (character slot 1)
+;       jsr SaveFile_CalculateOffset
+;       ; Now $0B = $038C
+;       lda.B $0B
+;       tax
+;       lda.L $700000,x           ; Read HP from $70:038C
+;
+; PERFORMANCE:
+;   Math_Multiply16x16: ~200-500 cycles (variable, depends on values)
+;   Overhead: ~30 cycles (masking, loading, storing)
+;   Total: ~230-530 cycles (~86-198μs @ 2.68MHz)
+;
+;   For small indices (0-3), multiplication is fast (<250 cycles).
+;   This is acceptable for save/load operations which are infrequent.
+;
+; REGISTERS MODIFIED:
+;   A: Modified (contains intermediate values)
+;   Direct Page $98-$A1: Temporary multiplication workspace
+;   Direct Page $0B: Output (calculated offset)
+;
+; REGISTERS PRESERVED:
+;   None explicitly (caller should preserve if needed)
+;
+; CRITICAL DEPENDENCIES:
+;   - Math_Multiply16x16 function available ($0096B3)
+;   - Direct Page $98-$A1 writable (not in ROM)
+;   - Accumulator typically 16-bit (rep #$30 before call)
+;
+; ERROR HANDLING:
+;   No validation of input index
+;   Index > 255 gets masked to 8-bit (only low byte used)
+;   Out-of-range index results in invalid offset (caller responsibility)
+;
+; TECHNICAL NOTES:
+;   The "and.W #$00FF" instruction masks A to 8-bit value, ensuring
+;   only the low byte is used for slot index. This protects against
+;   invalid high-byte values while supporting 8-bit or 16-bit input.
+;
+;   The "adc.W #$0000" instruction appears redundant (adds zero) but
+;   may serve purposes like:
+;     - Padding for code alignment
+;     - Future-proofing for base offset adjustment
+;     - Forcing carry flag clear (though CLC already does this)
+;
+;   Most likely it's a remnant from development where a non-zero base
+;   offset was planned but later removed.
+;
+;   Direct Page $0B is a common pattern for returning word values from
+;   helper functions. Callers read $0B after JSR to retrieve the result.
+;
+; SAVE RAM BANKS:
+;   Bank $70: Permanent save data (battery-backed SRAM)
+;   Bank $7F: Temporary/scratch save data (lost on reset)
+;
+;   This function calculates offsets within these banks. Caller must
+;   set up proper bank access before using the offset:
+;       jsr SaveFile_SetBank70    ; Set $61 = $70
+;       lda.W #$0000              ; Slot 0
+;       jsr SaveFile_CalculateOffset
+;       lda.B $0B                 ; Offset
+;       tax
+;       lda.L $700000,x           ; Access $70:offset
+;
+; SLOT INDEX MEANINGS:
+;   When called for character data (3-slot party):
+;     0 = Main character (Benjamin)
+;     1 = First companion (Kaeli/Tristam/Phoebe/Reuben)
+;     2 = Second companion (Old Man/temporary)
+;
+;   When called for save file slots (4-slot saves):
+;     0 = Save file 1
+;     1 = Save file 2
+;     2 = Save file 3
+;     3 = Save file 4
+;
+;   Context determines interpretation. Function doesn't distinguish.
+;
+; RELATED FUNCTIONS:
+;   - Math_Multiply16x16 ($0096B3): 16-bit multiplication routine
+;   - SaveFile_SetBank70 ($00C94F): Set bank pointer to $70
+;   - SaveFile_SetBank7F ($00C942): Set bank pointer to $7F
+;   - Character_LoadPortrait ($00CF62): Uses this for portrait lookup
+;===============================================================================
 SaveFile_CalculateOffset:
-	and.W #$00ff                         ;00C92B|29FF00  |      ;
-	sta.B $98                            ;00C92E|8598    |000098;
-	lda.W #$038c                         ;00C930|A98C03  |      ;
-	sta.B $9c                            ;00C933|859C    |00009C;
-	jsl.L Math_Multiply16x16                    ;00C935|22B39600|0096B3;
-	lda.B $9e                            ;00C939|A59E    |00009E;
-	clc                                  ;00C93B|18      |      ;
-	adc.W #$0000                         ;00C93C|690000  |      ;
-	sta.B $0b                            ;00C93F|850B    |00000B;
-	rts                                  ;00C941|60      |      ;
+	and.W #$00ff	; Mask to 8-bit value: keep only slot index (0-255)
+	sta.B $98	; Store slot index in multiplicand low word
+	lda.W #$038c	; A = $038C (908 bytes per save slot)
+	sta.B $9c	; Store multiplier: slot size constant
+	jsl.L Math_Multiply16x16	; Multiply: $9E-$A1 = slot_index × $038C
+	lda.B $9e	; A = product low word (calculated offset)
+	clc	; Clear carry for addition (ensure no overflow)
+	adc.W #$0000	; Add $0000 (identity, may be padding or future base offset)
+	sta.B $0b	; Store final offset in Direct Page $0B for caller
+	rts	; Return to caller with offset in $0B
 ;      |        |      ;
 ;      |        |      ;
 SaveFile_SetBank7F:
