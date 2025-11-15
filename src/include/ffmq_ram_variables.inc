@@ -460,6 +460,51 @@
 !battle_index_x         = $19e8     ; Battle graphics index X register backup
 !battle_index_temp      = $19ea     ; Battle graphics index temporary storage
 
+; === Battle Array Elements & Entity Management ($19f1-$1a01) ===
+!battle_array_elem_4    = $19f1     ; Battle array element 4 / primary entity reference (10 uses)
+!battle_array_elem_6    = $19f3     ; Battle array element 6 / secondary entity reference
+!battle_entity_state    = $19f9     ; Battle entity primary state / completion flag (8 uses)
+!battle_sprite_flag     = $19fa     ; Battle sprite completion flag
+!battle_sprite_result   = $19fb     ; Battle sprite buffer result
+!battle_sprite_next     = $19fd     ; Battle sprite buffer next
+!battle_sprite_flags    = $19ff     ; Battle sprite buffer flags
+!battle_sprite_final    = $1a01     ; Battle sprite buffer final
+
+; === Battle Sprite Buffer Addresses ($1a03-$1a11) ===
+!battle_sprite_buf_addr1 = $1a03    ; Battle sprite buffer address primary
+!battle_sprite_buf_addr2 = $1a05    ; Battle sprite buffer extended primary
+!battle_sprite_buf_addr3 = $1a07    ; Battle sprite buffer address secondary
+!battle_sprite_buf_addr4 = $1a09    ; Battle sprite buffer extended secondary
+!battle_sprite_config1  = $1a0b     ; Battle sprite configuration primary (6 uses)
+!battle_sprite_config2  = $1a0d     ; Battle sprite configuration secondary
+!battle_sprite_remain   = $1a0f     ; Battle sprite buffer remaining
+!battle_sprite_backup   = $1a11     ; Battle sprite buffer backup
+
+; === Battle Coordinate System ($1902-$1936) ===
+!battle_gfx_register2   = $1902     ; Battle secondary graphics register
+!battle_gfx_backup      = $1904     ; Battle graphics backup register / sequence counter
+!battle_gfx_backup2     = $1906     ; Battle secondary backup register / counter
+!battle_gfx_value       = $1913     ; Battle graphics value register
+!battle_coord_x_boundary = $1924    ; Battle X-coordinate boundary (13 uses)
+!battle_coord_y_boundary = $1925    ; Battle Y-coordinate boundary (11 uses)
+!battle_coord_result    = $1927     ; Battle coordination result
+!battle_anim_timer      = $1929     ; Battle animation timer / state register (8 uses)
+!battle_coord_y_processed = $1936   ; Battle Y coordinate processed
+
+; === Battle Entity Data ($19e6, $19ec-$19ed) ===
+!battle_entity_data_ref = $19e6     ; Battle entity data reference / character parameter
+!battle_entity_confirm  = $19ec     ; Battle entity confirmation / character mode
+!battle_entity_backup   = $19ed     ; Battle entity character backup
+
+; === Battle Sprite Data Components ($1a3d-$1a43) ===
+!battle_sprite_comp1    = $1a3d     ; Battle sprite data component 1 (6 uses)
+!battle_sprite_comp2    = $1a3f     ; Battle sprite data component 2
+!battle_sprite_comp3    = $1a41     ; Battle sprite data component 3
+!battle_sprite_comp4    = $1a43     ; Battle sprite data component 4
+
+; === Battle Data Pointers ($1cd7) ===
+!battle_data_pointer    = $1cd7     ; Battle data pointer (used in pea.w instructions)
+
 ; === Battle Graphics & Formation System ($19eb-$19f8) ===
 !formation_valid_flag   = $19eb     ; Formation validation/position flag
 !battle_gfx_index       = $19ee     ; Battle graphics index (masked/combined)

@@ -1238,7 +1238,7 @@ BattleAudio_ProcessPrimaryChannel:
 	lda.w !battle_ptr_1_hi	 ;01A2AD|ADDF19  |0119DF;
 	cmp.b #$ff	  ;01A2B0|C9FF    |      ;
 	beq .Exit_PrimaryChannel ;01A2B2|F015    |01A2C9;
-	pea.w $1cd7	 ;01A2B4|F4D71C  |011CD7;
+	pea.w !battle_data_pointer	 ;01A2B4|F4D71C  |011CD7;
 	pld ;01A2B7|2B      |      ;
 	ldy.w #$0007	;01A2B8|A00700  |      ;
 	sty.b $06	   ;01A2BB|8406    |001CDD;
@@ -1345,7 +1345,7 @@ BattleAudio_ProcessSecondaryChannel:
 	lda.w !battle_ptr_2_hi	 ;01A352|ADE119  |0119E1;
 	cmp.b #$ff	  ;01A355|C9FF    |      ;
 	beq .Exit_SecondaryChannel ;01A357|F015    |01A36E;
-	pea.w $1cd7	 ;01A359|F4D71C  |011CD7;
+	pea.w !battle_data_pointer	 ;01A359|F4D71C  |011CD7;
 	pld ;01A35C|2B      |      ;
 	ldy.w #$0007	;01A35D|A00700  |      ;
 	sty.b $06	   ;01A360|8406    |001CDD;
@@ -2170,7 +2170,7 @@ BattleAudio_ProcessPrimaryChannel_1:
 	lda.w !battle_ptr_1_hi	 ;01A2AD|ADDF19  |0119DF;
 	cmp.b #$ff	  ;01A2B0|C9FF    |      ;
 	beq .Exit_PrimaryChannel ;01A2B2|F015    |01A2C9;
-	pea.w $1cd7	 ;01A2B4|F4D71C  |011CD7;
+	pea.w !battle_data_pointer	 ;01A2B4|F4D71C  |011CD7;
 	pld ;01A2B7|2B      |      ;
 	ldy.w #$0007	;01A2B8|A00700  |      ;
 	sty.b $06	   ;01A2BB|8406    |001CDD;
@@ -2277,7 +2277,7 @@ BattleAudio_ProcessSecondaryChannel_1:
 	lda.w !battle_ptr_2_hi	 ;01A352|ADE119  |0119E1;
 	cmp.b #$ff	  ;01A355|C9FF    |      ;
 	beq .Exit_SecondaryChannel ;01A357|F015    |01A36E;
-	pea.w $1cd7	 ;01A359|F4D71C  |011CD7;
+	pea.w !battle_data_pointer	 ;01A359|F4D71C  |011CD7;
 	pld ;01A35C|2B      |      ;
 	ldy.w #$0007	;01A35D|A00700  |      ;
 	sty.b $06	   ;01A360|8406    |001CDD;
@@ -5019,10 +5019,10 @@ BattleAI_FinalizeChoice:
 	asl a;01B52D|0A      |      ;
 	asl a;01B52E|0A      |      ;
 	sta.w !battle_gfx_index	 ;01B52F|8DEE19  |0119EE;
-	lda.w $1913	 ;01B532|AD1319  |011913;
+	lda.w !battle_gfx_value	 ;01B532|AD1319  |011913;
 	and.b #$0f	  ;01B535|290F    |      ;
 	ora.w !battle_gfx_index	 ;01B537|0DEE19  |0119EE;
-	sta.w $1913	 ;01B53A|8D1319  |011913;
+	sta.w !battle_gfx_value	 ;01B53A|8D1319  |011913;
 	bra F2 ;01B53D|80DB    |01B51A;
 
 ;-------------------------------------------------------------------------------
@@ -6808,7 +6808,7 @@ dma_coordinate_processing_system:
 	lda.w !battle_unit_coord_hi,x   ; Get Y coordinate data
 	clc ; Clear carry for addition
 	adc.w DATA8_01e284 ; Add coordinate offset
-	sta.w $1936	 ; Store processed Y coordinate
+	sta.w !battle_coord_y_processed	 ; Store processed Y coordinate
 	php ; Save processor flags
 	rep #$30		; Set 16-bit mode
 	lda.w !battle_data_index_1	 ; Load X coordinate
@@ -7217,8 +7217,8 @@ dynamic_coordinate_processing_engine:
 	sta.w !battle_data_index_1	 ; Store updated X coordinate
 	lda.w !battle_array_data_2	 ; Load coordinate delta Y
 	clc ; Clear carry for addition
-	adc.w $1936	 ; Add to current Y coordinate
-	sta.w $1936	 ; Store updated Y coordinate
+	adc.w !battle_coord_y_processed	 ; Add to current Y coordinate
+	sta.w !battle_coord_y_processed	 ; Store updated Y coordinate
 	php ; Save processor flags
 	rep #$30		; Set 16-bit mode
 	lda.w !battle_data_index_1	 ; Load X coordinate
@@ -7430,7 +7430,7 @@ animation_graphics_state_control:
 	bne animation_type_processing ; Branch if type set
 	bra animation_complete ; Branch to completion
 animation_standard_processing:
-	lda.w $1929	 ; Load animation timer
+	lda.w !battle_anim_timer	 ; Load animation timer
 	bne animation_timer_processing ; Branch if timer active
 	lda.w !graphics_state_param	 ; Load graphics state
 	cmp.b #$10	  ; Compare with standard value
@@ -7438,7 +7438,7 @@ animation_standard_processing:
 animation_timer_processing:
 	lda.b #$10	  ; Set standard graphics value
 	sta.w !graphics_state_param	 ; Store graphics state
-	stz.w $1929	 ; Clear animation timer
+	stz.w !battle_anim_timer	 ; Clear animation timer
 	lda.b #$04	  ; Return animation code
 	rts ; Return from animation
 animation_complete:
@@ -7447,7 +7447,7 @@ animation_complete:
 animation_type_processing:
 	inc.w !battle_anim_counter	 ; Increment animation counter
 	lda.b #$83	  ; Set animation mode
-	sta.w $1929	 ; Store animation timer
+	sta.w !battle_anim_timer	 ; Store animation timer
 	ldx.w #$0006	; Set animation parameter
 	bra animation_setup ; Branch to setup
 animation_special_processing:
@@ -7456,9 +7456,9 @@ animation_special_processing:
 	sep #$10		; Set 8-bit index mode
 	rep #$10		; Set 16-bit index mode
 	lda.b #$80	  ; Set special animation mode
-	sta.w $1929	 ; Store animation timer
+	sta.w !battle_anim_timer	 ; Store animation timer
 animation_setup:
-	stz.w $19f9	 ; Clear animation flag
+	stz.w !battle_entity_state	 ; Clear animation flag
 	lda.b #$10	  ; Set graphics value
 	sta.w !graphics_state_param	 ; Store graphics state
 	lda.w DATA8_01f400,x ; Load animation data
@@ -7481,7 +7481,7 @@ battle_direction_movement_processing_engine:
 	ldx.w !movement_config	 ; Load movement configuration
 	stx.w !movement_state	 ; Store movement state
 	lda.w !movement_flags	 ; Load movement flags
-	ldy.w $19f1	 ; Load movement index
+	ldy.w !battle_array_elem_4	 ; Load movement index
 	jsr.w .BattleMenu_SelectionConfirm ; Execute movement processing
 	lda.w !battle_data_index_3	 ; Load movement buffer
 	eor.w !target_direction	 ; XOR with target direction
@@ -7537,10 +7537,10 @@ character_interaction_advanced:
 	sta.w !graphics_state_param	 ; Store graphics state
 	ldx.w !battle_index_x	 ; Load character index
 	stx.w !battle_index_temp	 ; Store character backup
-	lda.w $19e6	 ; Load character parameter
+	lda.w !battle_entity_data_ref	 ; Load character parameter
 	sta.w !battle_state_param	 ; Store character state
-	lda.w $19ec	 ; Load character mode
-	sta.w $19ed	 ; Store character backup
+	lda.w !battle_entity_confirm	 ; Load character mode
+	sta.w !battle_entity_backup	 ; Store character backup
 	jsr.w .BattleDefeat_AudioStop ; Execute character processing
 	rts ; Return from interaction
 
@@ -7566,7 +7566,7 @@ battle_collision_movement_validation:
 	bne battle_state_standard ; Branch if collision type mismatch
 	lda.b #$01	  ; Set movement validation mode
 	sta.w !battle_gfx_flags	 ; Store validation state
-	ldy.w $19f1	 ; Load movement index
+	ldy.w !battle_array_elem_4	 ; Load movement index
 	ldx.w #$0000	; Clear collision index
 	jsr.w .BattleEscape_SuccessCheck ; Execute movement validation
 	jsr.w .BattleMenu_InputLoop ; Execute collision processing
@@ -7578,7 +7578,7 @@ collision_validation_complete:
 	ldx.w !movement_config	 ; Load movement configuration
 	stx.w !movement_state	 ; Store movement backup
 	lda.w !movement_flags	 ; Load movement flags
-	ldy.w $19f1	 ; Load movement index
+	ldy.w !battle_array_elem_4	 ; Load movement index
 	jsr.w .BattleMenu_SelectionConfirm ; Execute movement coordination
 	lda.b #$0c	  ; Set movement completion code
 	rts ; Return from collision validation
@@ -7643,7 +7643,7 @@ battle_trigger_event_processing_system:
 	sta.w !battle_gfx_attrib	 ; Store trigger configuration
 	inc.w !graphics_status	 ; Increment trigger counter
 trigger_processing_standard:
-	stz.w $1929	 ; Clear trigger timer
+	stz.w !battle_anim_timer	 ; Clear trigger timer
 	lda.b #$10	  ; Set standard trigger value
 	sta.w !graphics_state_param	 ; Store trigger state
 	lda.b #$0a	  ; Set trigger return code
@@ -7700,7 +7700,7 @@ multi_path_battle_processing_engine:
 	bit.b #$08	  ; Test pathfinding mode bit
 	bne pathfinding_standard_setup ; Branch if standard mode
 pathfinding_standard_setup:
-	stz.w $1929	 ; Clear pathfinding timer
+	stz.w !battle_anim_timer	 ; Clear pathfinding timer
 	lda.b #$10	  ; Set standard pathfinding value
 	sta.w !graphics_state_param	 ; Store pathfinding state
 	ldy.w #$ff01	; Load pathfinding configuration
@@ -7714,7 +7714,7 @@ pathfinding_standard_setup:
 	stx.w !battle_data_temp_1	 ; Store pathfinding Y coordinate
 	lda.w !current_direction	 ; Load pathfinding direction state
 	sta.w !battle_data_index_4	 ; Store pathfinding direction backup
-	ldx.w $19f1	 ; Load pathfinding index
+	ldx.w !battle_array_elem_4	 ; Load pathfinding index
 	stx.w !battle_array_elem_4	 ; Store pathfinding index backup
 	ldx.w !movement_config	 ; Load pathfinding configuration
 	stx.w !battle_array_elem_6	 ; Store pathfinding configuration backup
@@ -7741,11 +7741,11 @@ UNREACH_01EF3B:
 ; Sophisticated state initialization with multi-register coordination
 	.BattleVictory_SequenceComplete:
 	lda.b #$01	  ; Initialize primary state register
-	sta.w $19f9	 ; Set battle entity primary state
+	sta.w !battle_entity_state	 ; Set battle entity primary state
 	sta.w !battle_render_temp	 ; Set battle coordination flag
 	lda.b #$10	  ; Set advanced positioning mode
 	sta.w !graphics_state_param	 ; Store positioning control
-	stz.w $1929	 ; Clear secondary state register
+	stz.w !battle_anim_timer	 ; Clear secondary state register
 	lda.w !player_facing	 ; Load player facing direction / battle environment context
 	sta.w !env_state_param	 ; Store environment reference
 	jsr.w .BattleDefeat_MemoryCleanup ; Execute coordinate preprocessing
@@ -7769,7 +7769,7 @@ Advanced_Coordinate_Analysis:
 Multi_Entity_Coordinate_Processing:
 	ldx.w #$0000	; Initialize entity index
 	stx.w !battle_data_index_4	 ; Clear entity processing flags
-	ldy.w $19f1	 ; Load primary entity reference
+	ldy.w !battle_array_elem_4	 ; Load primary entity reference
 	jsr.w .BattleEscape_FailureHandling ; Execute entity coordinate validation
 	bcc Entity_Processing_Complete ; Branch if validation successful
 
@@ -7797,7 +7797,7 @@ Advanced_Attribute_Engine:
 
 Entity_Processing_Complete:
 ; Advanced secondary entity coordinate processing
-	ldy.w $19f3	 ; Load secondary entity reference
+	ldy.w !battle_array_elem_6	 ; Load secondary entity reference
 	jsr.w .BattleEscape_FailureHandling ; Execute coordinate validation
 	bcc Secondary_Processing_Complete
 
@@ -7951,7 +7951,7 @@ Coordination_Success:
 Complex_Coordination_Error:
 ; Store coordination results and prepare for battle processing
 	tya ; Transfer coordination state
-	sta.w $1927	 ; Store coordination result
+	sta.w !battle_coord_result	 ; Store coordination result
 	txa ; Transfer success state
 	sta.w !battle_gfx_flags	 ; Store success result
 	beq Battle_Processing_Complete ; Branch if no further processing needed
@@ -7961,12 +7961,12 @@ Complex_Coordination_Error:
 Battle_Processing_Decision:
 	dec a; Decrement for decision analysis
 	bne Secondary_Battle_Processing ; Branch if secondary processing needed
-	ldy.w $19f1	 ; Load primary battle context
+	ldy.w !battle_array_elem_4	 ; Load primary battle context
 	lda.w !movement_flags	 ; Load primary battle state
 	bra Execute_Battle_Processing ; Branch to execution
 
 Secondary_Battle_Processing:
-	ldy.w $19f3	 ; Load secondary battle context
+	ldy.w !battle_array_elem_6	 ; Load secondary battle context
 	lda.w !tertiary_attributes	 ; Load secondary battle state
 
 Execute_Battle_Processing:
@@ -7982,10 +7982,10 @@ Battle_Processing_Complete:
 Advanced_Battle_Validation:
 	lda.w !battle_gfx_flags	 ; Load battle validation state
 	beq Battle_State_Success ; Branch if validation successful
-	ldy.w $19f1	 ; Load primary validation context
+	ldy.w !battle_array_elem_4	 ; Load primary validation context
 	dec a; Decrement for validation analysis
 	beq Primary_Validation_Mode ; Branch if primary validation
-	ldy.w $19f3	 ; Load secondary validation context
+	ldy.w !battle_array_elem_6	 ; Load secondary validation context
 
 Primary_Validation_Mode:
 ; Advanced validation processing with environment coordination
@@ -8000,7 +8000,7 @@ Primary_Validation_Mode:
 	bcs Battle_Validation_Error ; Branch if validation failed
 
 ; Final validation confirmation
-	ldy.w $19f1	 ; Load final validation context
+	ldy.w !battle_array_elem_4	 ; Load final validation context
 	jsr.w .BattleMenu_InputLoop ; Execute final validation
 	bcs Battle_Validation_Error ; Branch if final validation failed
 
@@ -8210,17 +8210,17 @@ Battle_Bit_Found:
 	jsr.w .BattleDefeat_ScreenClear ; Execute primary coordinate processing
 	sta.w !target_direction	 ; Store primary coordinate result
 	stx.w !movement_config	 ; Store coordinate transformation index
-	sty.w $19f1	 ; Store coordinate validation reference
+	sty.w !battle_array_elem_4	 ; Store coordinate validation reference
 	rts ; Return coordinate processing complete
 
 ; Secondary Coordinate Processing Engine
 ; Advanced secondary coordinate management with state synchronization
 	.BattleDefeat_AudioStop:
-	ldy.w $19f1	 ; Load primary coordinate reference
+	ldy.w !battle_array_elem_4	 ; Load primary coordinate reference
 	jsr.w .BattleDefeat_Exit ; Execute secondary coordinate processing
 	sta.w !collision_data	 ; Store secondary coordinate result
 	stx.w !coordinate_register	 ; Store secondary transformation index
-	sty.w $19f3	 ; Store secondary validation reference
+	sty.w !battle_array_elem_6	 ; Store secondary validation reference
 	rts ; Return secondary processing complete
 
 ; Primary Coordinate Transformation Engine
@@ -8246,33 +8246,33 @@ Battle_Bit_Found:
 	adc.w DATA8_0190d6,x ; Add Y-coordinate offset
 	bpl Positive_Y_Coordinate ; Branch if Y-coordinate positive
 	clc ; Clear carry for boundary handling
-	adc.w $1925	 ; Add Y-boundary correction
+	adc.w !battle_coord_y_boundary	 ; Add Y-boundary correction
 	bra Process_X_Coordinate ; Branch to X-coordinate processing
 
 Positive_Y_Coordinate:
-	cmp.w $1925	 ; Compare with Y-boundary
+	cmp.w !battle_coord_y_boundary	 ; Compare with Y-boundary
 	bcc Process_X_Coordinate ; Branch if within Y-boundary
 	sec ; Set carry for boundary correction
-	sbc.w $1925	 ; Subtract Y-boundary
+	sbc.w !battle_coord_y_boundary	 ; Subtract Y-boundary
 
 Process_X_Coordinate:
 	xba ; Exchange for X-coordinate processing
 	bpl Positive_X_Coordinate ; Branch if X-coordinate positive
 	clc ; Clear carry for X-boundary handling
-	adc.w $1924	 ; Add X-boundary correction
+	adc.w !battle_coord_x_boundary	 ; Add X-boundary correction
 	bra Finalize_Coordinate_Processing
 
 Positive_X_Coordinate:
-	cmp.w $1924	 ; Compare with X-boundary
+	cmp.w !battle_coord_x_boundary	 ; Compare with X-boundary
 	bcc Finalize_Coordinate_Processing ; Branch if within X-boundary
 	sec ; Set carry for X-boundary correction
-	sbc.w $1924	 ; Subtract X-boundary
+	sbc.w !battle_coord_x_boundary	 ; Subtract X-boundary
 
 Finalize_Coordinate_Processing:
 	tay ; Transfer Y-coordinate result
 	xba ; Exchange for X-coordinate access
 	sta.w $4202	 ; Store X-coordinate for multiplication
-	lda.w $1924	 ; Load X-boundary for multiplication
+	lda.w !battle_coord_x_boundary	 ; Load X-boundary for multiplication
 	sta.w $4203	 ; Store multiplier
 	xba ; Exchange for coordinate finalization
 	rep #$20		; Set 16-bit mode for final calculation
@@ -8308,7 +8308,7 @@ Finalize_Coordinate_Processing:
 	db $18,$6d,$25,$19,$80,$09 ; Alternative Y-boundary correction
 
 Alternative_Positive_Y:
-	cmp.w $1925	 ; Compare with alternative Y-boundary
+	cmp.w !battle_coord_y_boundary	 ; Compare with alternative Y-boundary
 	bcc Alternative_Process_X ; Branch if within alternative Y-boundary
 	db $38,$ed,$25,$19 ; Alternative Y-boundary subtraction
 
@@ -8318,7 +8318,7 @@ Alternative_Process_X:
 	db $18,$6d,$24,$19,$80,$09 ; Alternative X-boundary correction
 
 Alternative_Positive_X:
-	cmp.w $1924	 ; Compare with alternative X-boundary
+	cmp.w !battle_coord_x_boundary	 ; Compare with alternative X-boundary
 	bcc Alternative_Coordinate_Complete ; Branch if within X-boundary
 	db $38,$ed,$24,$19 ; Alternative X-boundary subtraction
 
@@ -8377,10 +8377,10 @@ Entity_Search_Continue:
 
 Entity_Found:
 	lda.b $1f,x	 ; Load found entity data
-	sta.w $19e6	 ; Store entity data reference
+	sta.w !battle_entity_data_ref	 ; Store entity data reference
 	stx.w !battle_index_x	 ; Store entity index
 	xba ; Exchange for entity confirmation
-	sta.w $19ec	 ; Store entity confirmation
+	sta.w !battle_entity_confirm	 ; Store entity confirmation
 	pld ; Restore direct page register
 	sec ; Set carry for search success
 	rts ; Return search success
@@ -8425,10 +8425,10 @@ Specialized_Search_Continue:
 
 Specialized_Entity_Found:
 	lda.b $1f,x	 ; Load specialized entity data
-	sta.w $19e6	 ; Store specialized entity reference
+	sta.w !battle_entity_data_ref	 ; Store specialized entity reference
 	stx.w !battle_index_x	 ; Store specialized entity index
 	xba ; Exchange for specialized confirmation
-	sta.w $19ec	 ; Store specialized confirmation
+	sta.w !battle_entity_confirm	 ; Store specialized confirmation
 	pld ; Restore direct page register
 	sec ; Set carry for specialized success
 	rts ; Return specialized search success
@@ -8588,7 +8588,7 @@ Advanced_Battle_Enhancement:
 	jsr.w ProcessMemoryWithStateUpdate ; Execute enhancement coordination
 	lda.b #$10	  ; Set enhancement mode
 	sta.w !graphics_state_param	 ; Store enhancement control
-	stz.w $1929	 ; Clear enhancement state
+	stz.w !battle_anim_timer	 ; Clear enhancement state
 	lda.b #$01	  ; Set enhancement active flag
 	sta.w !battle_render_temp	 ; Store enhancement flag
 	jsr.w ExecuteEnhancementProcessing ; Execute enhancement processing
@@ -8655,9 +8655,9 @@ Advanced_Graphics_Initialization:
 	inc.w !anim_loop_counter	 ; Increment graphics processing counter
 	jsr.w ProcessMemoryWithStateUpdate ; Execute graphics coordination
 	ldx.w !battle_actor0_base_x	 ; Load primary graphics register
-	stx.w $1904	 ; Store graphics backup register
-	ldx.w $1902	 ; Load secondary graphics register
-	stx.w $1906	 ; Store secondary backup register
+	stx.w !battle_gfx_backup	 ; Store graphics backup register
+	ldx.w !battle_gfx_register2	 ; Load secondary graphics register
+	stx.w !battle_gfx_backup2	 ; Store secondary backup register
 	lda.b #$07	  ; Set advanced graphics mode
 	sta.w !gfx_mode_control	 ; Store graphics mode control
 	jsr.w .BattleText_PrintLoop ; Execute graphics buffer initialization
@@ -8727,16 +8727,16 @@ Graphics_Buffer_Init_Loop:
 	sta.w !battle_phase_counter	 ; Store iteration control
 	jsr.w ProcessMemoryWithStateUpdate ; Execute graphics coordination
 	ldx.w #$0004	; Set graphics processing steps
-	inc.w $1904	 ; Increment graphics sequence counter
+	inc.w !battle_gfx_backup	 ; Increment graphics sequence counter
 
 ; Graphics Processing Inner Loop
 Graphics_Processing_Inner_Loop:
 	phx ; Preserve processing step counter
 	rep #$20		; Set 16-bit accumulator mode
-	dec.w $1906	 ; Decrement secondary graphics counter
-	dec.w $1906	 ; Continue decrement for precise timing
-	dec.w $1906	 ; Continue decrement for precise timing
-	dec.w $1906	 ; Complete decrement sequence
+	dec.w !battle_gfx_backup2	 ; Decrement secondary graphics counter
+	dec.w !battle_gfx_backup2	 ; Continue decrement for precise timing
+	dec.w !battle_gfx_backup2	 ; Continue decrement for precise timing
+	dec.w !battle_gfx_backup2	 ; Complete decrement sequence
 	sep #$20		; Set 8-bit accumulator mode
 	ldx.w #$270b	; Set graphics operation reference
 	stx.w !battle_gfx_index	 ; Store graphics operation mode
@@ -8750,13 +8750,13 @@ Fine_Graphics_Processing_Loop:
 	rep #$20		; Set 16-bit accumulator mode
 	dec.w !battle_actor0_base_x	 ; Decrement primary graphics register
 	dec.w !battle_actor0_base_x	 ; Continue decrement for precise control
-	dec.w $1904	 ; Decrement graphics sequence counter
-	dec.w $1904	 ; Continue decrement for sequence control
+	dec.w !battle_gfx_backup	 ; Decrement graphics sequence counter
+	dec.w !battle_gfx_backup	 ; Continue decrement for sequence control
 	jsr.w ProcessMemoryWithStateUpdate ; Execute graphics coordination
 	inc.w !battle_actor0_base_x	 ; Increment primary graphics register
 	inc.w !battle_actor0_base_x	 ; Continue increment for restoration
-	inc.w $1904	 ; Increment graphics sequence counter
-	inc.w $1904	 ; Continue increment for sequence restoration
+	inc.w !battle_gfx_backup	 ; Increment graphics sequence counter
+	inc.w !battle_gfx_backup	 ; Continue increment for sequence restoration
 	jsr.w ProcessMemoryWithStateUpdate ; Execute graphics coordination
 	sep #$20		; Set 8-bit accumulator mode
 	plx ; Restore fine processing counter
@@ -8873,13 +8873,13 @@ Sprite_Processing_Loop:
 	jsr.w .BattleDialogue_WaitForInput ; Execute sprite coordinate transformation
 	ply ; Restore sprite index
 	rep #$20		; Set 16-bit accumulator mode
-	lda.w $1a3d	 ; Load sprite data component 1
+	lda.w !battle_sprite_comp1	 ; Load sprite data component 1
 	sta.w $0800,y   ; Store sprite data to buffer 1
-	lda.w $1a3f	 ; Load sprite data component 2
+	lda.w !battle_sprite_comp2	 ; Load sprite data component 2
 	sta.w $0802,y   ; Store sprite data to buffer 2
-	lda.w $1a41	 ; Load sprite data component 3
+	lda.w !battle_sprite_comp3	 ; Load sprite data component 3
 	sta.w $0880,y   ; Store sprite data to buffer 3
-	lda.w $1a43	 ; Load sprite data component 4
+	lda.w !battle_sprite_comp4	 ; Load sprite data component 4
 	sta.w $0882,y   ; Store sprite data to buffer 4
 	sep #$20		; Set 8-bit accumulator mode
 	iny ; Increment sprite buffer index
@@ -8888,17 +8888,17 @@ Sprite_Processing_Loop:
 	iny ; Complete increment for sprite alignment
 	lda.w !coord_x_result	 ; Load sprite coordinate reference
 	inc a; Increment sprite coordinate
-	cmp.w $1924	 ; Compare with coordinate boundary
+	cmp.w !battle_coord_x_boundary	 ; Compare with coordinate boundary
 	bcc Sprite_Coordinate_Valid ; Branch if coordinate within boundary
 	sec ; Set carry for boundary correction
-	sbc.w $1924	 ; Subtract boundary for wrap-around
+	sbc.w !battle_coord_x_boundary	 ; Subtract boundary for wrap-around
 
 Sprite_Coordinate_Valid:
 	sta.w !coord_x_result	 ; Store updated sprite coordinate
 	cpy.w #$0044	; Check sprite processing limit
 	bne Sprite_Processing_Loop ; Continue sprite processing
 	lda.b #$80	  ; Set sprite processing completion flag
-	sta.w $19fa	 ; Store sprite completion flag
+	sta.w !battle_sprite_flag	 ; Store sprite completion flag
 	rep #$20		; Set 16-bit accumulator mode
 	lda.w !gfx_config_register	 ; Load sprite configuration register
 	eor.w #$ffff	; Invert sprite configuration
@@ -8906,38 +8906,38 @@ Sprite_Coordinate_Valid:
 	inc a; Increment for configuration calculation
 	asl a; Shift for configuration indexing
 	asl a; Continue shift for precise indexing
-	sta.w $1a0b	 ; Store sprite configuration primary
-	sta.w $1a0d	 ; Store sprite configuration secondary
+	sta.w !battle_sprite_config1	 ; Store sprite configuration primary
+	sta.w !battle_sprite_config2	 ; Store sprite configuration secondary
 
 ; Advanced Sprite Buffer Management
 ; Sophisticated buffer management with dynamic allocation
 Advanced_Sprite_Buffer_Management:
 	lda.w #$0044	; Set sprite buffer size
 	sec ; Set carry for size calculation
-	sbc.w $1a0b	 ; Subtract configuration size
-	sta.w $1a0f	 ; Store sprite buffer remaining
-	sta.w $1a11	 ; Store sprite buffer backup
+	sbc.w !battle_sprite_config1	 ; Subtract configuration size
+	sta.w !battle_sprite_remain	 ; Store sprite buffer remaining
+	sta.w !battle_sprite_backup	 ; Store sprite buffer backup
 	lda.w #$0800	; Set sprite buffer base address
-	sta.w $1a03	 ; Store sprite buffer address primary
+	sta.w !battle_sprite_buf_addr1	 ; Store sprite buffer address primary
 	clc ; Clear carry for address calculation
-	adc.w $1a0b	 ; Add configuration offset
-	sta.w $1a07	 ; Store sprite buffer address secondary
+	adc.w !battle_sprite_config1	 ; Add configuration offset
+	sta.w !battle_sprite_buf_addr3	 ; Store sprite buffer address secondary
 	lda.w #$0880	; Set sprite buffer extended address
-	sta.w $1a05	 ; Store sprite buffer extended primary
+	sta.w !battle_sprite_buf_addr2	 ; Store sprite buffer extended primary
 	clc ; Clear carry for extended calculation
-	adc.w $1a0d	 ; Add configuration extended offset
-	sta.w $1a09	 ; Store sprite buffer extended secondary
+	adc.w !battle_sprite_config2	 ; Add configuration extended offset
+	sta.w !battle_sprite_buf_addr4	 ; Store sprite buffer extended secondary
 	jsr.w .BattleDialogue_AdvanceText ; Execute sprite buffer finalization
-	sta.w $19fb	 ; Store sprite buffer result
+	sta.w !battle_sprite_result	 ; Store sprite buffer result
 	clc ; Clear carry for result calculation
 	adc.w #$0020	; Add sprite buffer increment
-	sta.w $19fd	 ; Store sprite buffer next
+	sta.w !battle_sprite_next	 ; Store sprite buffer next
 	eor.w #$0400	; Toggle sprite buffer bank
 	and.w #$47c0	; Mask sprite buffer flags
-	sta.w $19ff	 ; Store sprite buffer flags
+	sta.w !battle_sprite_flags	 ; Store sprite buffer flags
 	clc ; Clear carry for final calculation
 	adc.w #$0020	; Add sprite buffer final increment
-	sta.w $1a01	 ; Store sprite buffer final
+	sta.w !battle_sprite_final	 ; Store sprite buffer final
 	sep #$20		; Set 8-bit accumulator mode
 	rts ; Return sprite processing complete
 
@@ -8954,13 +8954,13 @@ Alternative_Sprite_Loop:
 	jsr.w .BattleDialogue_WaitForInput ; Execute alternative sprite transformation
 	ply ; Restore alternative sprite index
 	rep #$20		; Set 16-bit accumulator mode
-	lda.w $1a3d	 ; Load alternative sprite component 1
+	lda.w !battle_sprite_comp1	 ; Load alternative sprite component 1
 	sta.w $0800,y   ; Store to alternative buffer 1
-	lda.w $1a3f	 ; Load alternative sprite component 2
+	lda.w !battle_sprite_comp2	 ; Load alternative sprite component 2
 	sta.w $0880,y   ; Store to alternative buffer 2
-	lda.w $1a41	 ; Load alternative sprite component 3
+	lda.w !battle_sprite_comp3	 ; Load alternative sprite component 3
 	sta.w $0802,y   ; Store to alternative buffer 3
-	lda.w $1a43	 ; Load alternative sprite component 4
+	lda.w !battle_sprite_comp4	 ; Load alternative sprite component 4
 	sta.w $0882,y   ; Store to alternative buffer 4
 	sep #$20		; Set 8-bit accumulator mode
 	iny ; Increment alternative sprite index
@@ -8969,17 +8969,17 @@ Alternative_Sprite_Loop:
 	iny ; Complete increment for alternative sprite
 	lda.w !coord_y_result	 ; Load alternative sprite Y coordinate
 	inc a; Increment alternative Y coordinate
-	cmp.w $1925	 ; Compare with Y boundary
+	cmp.w !battle_coord_y_boundary	 ; Compare with Y boundary
 	bcc Alternative_Y_Valid ; Branch if Y coordinate valid
 	sec ; Set carry for Y boundary correction
-	sbc.w $1925	 ; Subtract Y boundary for wrap
+	sbc.w !battle_coord_y_boundary	 ; Subtract Y boundary for wrap
 
 Alternative_Y_Valid:
 	sta.w !coord_y_result	 ; Store updated alternative Y coordinate
 	cpy.w #$0040	; Check alternative sprite limit
 	bne Alternative_Sprite_Loop ; Continue alternative sprite processing
 	lda.b #$81	  ; Set alternative sprite completion flag
-	sta.w $19fa	 ; Store alternative completion flag
+	sta.w !battle_sprite_flag	 ; Store alternative completion flag
 
 ; Alternative Sprite Buffer Management
 ; Specialized buffer management for alternative sprite rendering
@@ -8991,32 +8991,32 @@ Alternative_Sprite_Buffer_Management:
 	inc a; Increment for alternative calculation
 	asl a; Shift for alternative indexing
 	asl a; Continue shift for alternative precision
-	sta.w $1a0b	 ; Store alternative configuration primary
-	sta.w $1a0d	 ; Store alternative configuration secondary
+	sta.w !battle_sprite_config1	 ; Store alternative configuration primary
+	sta.w !battle_sprite_config2	 ; Store alternative configuration secondary
 	lda.w #$0040	; Set alternative buffer size
 	sec ; Set carry for alternative size calculation
-	sbc.w $1a0b	 ; Subtract alternative configuration size
-	sta.w $1a0f	 ; Store alternative buffer remaining
-	sta.w $1a11	 ; Store alternative buffer backup
+	sbc.w !battle_sprite_config1	 ; Subtract alternative configuration size
+	sta.w !battle_sprite_remain	 ; Store alternative buffer remaining
+	sta.w !battle_sprite_backup	 ; Store alternative buffer backup
 	lda.w #$0800	; Set alternative buffer base
-	sta.w $1a03	 ; Store alternative buffer primary
+	sta.w !battle_sprite_buf_addr1	 ; Store alternative buffer primary
 	clc ; Clear carry for alternative address calc
-	adc.w $1a0b	 ; Add alternative configuration offset
-	sta.w $1a07	 ; Store alternative buffer secondary
+	adc.w !battle_sprite_config1	 ; Add alternative configuration offset
+	sta.w !battle_sprite_buf_addr3	 ; Store alternative buffer secondary
 	lda.w #$0880	; Set alternative buffer extended
-	sta.w $1a05	 ; Store alternative buffer extended primary
+	sta.w !battle_sprite_buf_addr2	 ; Store alternative buffer extended primary
 	clc ; Clear carry for alternative extended calc
-	adc.w $1a0d	 ; Add alternative extended offset
-	sta.w $1a09	 ; Store alternative buffer extended secondary
+	adc.w !battle_sprite_config2	 ; Add alternative extended offset
+	sta.w !battle_sprite_buf_addr4	 ; Store alternative buffer extended secondary
 	jsr.w .BattleDialogue_AdvanceText ; Execute alternative buffer finalization
-	sta.w $19fb	 ; Store alternative buffer result
+	sta.w !battle_sprite_result	 ; Store alternative buffer result
 	inc a; Increment alternative result
-	sta.w $19fd	 ; Store alternative buffer next
+	sta.w !battle_sprite_next	 ; Store alternative buffer next
 	dec a; Decrement for alternative flag calculation
 	and.w #$441e	; Mask alternative buffer flags
-	sta.w $19ff	 ; Store alternative buffer flags
+	sta.w !battle_sprite_flags	 ; Store alternative buffer flags
 	inc a; Increment alternative final
-	sta.w $1a01	 ; Store alternative buffer final
+	sta.w !battle_sprite_final	 ; Store alternative buffer final
 	sep #$20		; Set 8-bit accumulator mode
 	rts ; Return alternative sprite processing complete
 ; =============================================================================
@@ -9037,13 +9037,13 @@ Memory_Graphics_Processing_Loop:
 	jsr.w .BattleDialogue_WaitForInput ; Execute memory graphics transformation
 	ply ; Restore memory graphics index
 	rep #$20		; Set 16-bit accumulator mode
-	lda.w $1a3d	 ; Load memory graphics component 1
+	lda.w !battle_sprite_comp1	 ; Load memory graphics component 1
 	sta.w $0900,y   ; Store to memory graphics buffer 1
-	lda.w $1a3f	 ; Load memory graphics component 2
+	lda.w !battle_sprite_comp2	 ; Load memory graphics component 2
 	sta.w $0902,y   ; Store to memory graphics buffer 2
-	lda.w $1a41	 ; Load memory graphics component 3
+	lda.w !battle_sprite_comp3	 ; Load memory graphics component 3
 	sta.w $0980,y   ; Store to memory graphics buffer 3
-	lda.w $1a43	 ; Load memory graphics component 4
+	lda.w !battle_sprite_comp4	 ; Load memory graphics component 4
 	sta.w $0982,y   ; Store to memory graphics buffer 4
 	sep #$20		; Set 8-bit accumulator mode
 	iny ; Increment memory graphics index
@@ -9052,10 +9052,10 @@ Memory_Graphics_Processing_Loop:
 	iny ; Complete increment for memory graphics
 	lda.w !coord_x_result	 ; Load memory graphics coordinate reference
 	inc a; Increment memory graphics coordinate
-	cmp.w $1924	 ; Compare with coordinate boundary
+	cmp.w !battle_coord_x_boundary	 ; Compare with coordinate boundary
 	bcc Memory_Graphics_Coordinate_Valid ; Branch if coordinate valid
 	sec ; Set carry for boundary correction
-	sbc.w $1924	 ; Subtract boundary for coordinate wrap
+	sbc.w !battle_coord_x_boundary	 ; Subtract boundary for coordinate wrap
 
 Memory_Graphics_Coordinate_Valid:
 	sta.w !coord_x_result	 ; Store updated memory graphics coordinate
@@ -9119,13 +9119,13 @@ Alternative_Memory_Graphics_Loop:
 	jsr.w .BattleDialogue_WaitForInput ; Execute alternative memory transformation
 	ply ; Restore alternative memory index
 	rep #$20		; Set 16-bit accumulator mode
-	lda.w $1a3d	 ; Load alternative memory component 1
+	lda.w !battle_sprite_comp1	 ; Load alternative memory component 1
 	sta.w $0900,y   ; Store to alternative memory buffer 1
-	lda.w $1a3f	 ; Load alternative memory component 2
+	lda.w !battle_sprite_comp2	 ; Load alternative memory component 2
 	sta.w $0980,y   ; Store to alternative memory buffer 2
-	lda.w $1a41	 ; Load alternative memory component 3
+	lda.w !battle_sprite_comp3	 ; Load alternative memory component 3
 	sta.w $0902,y   ; Store to alternative memory buffer 3
-	lda.w $1a43	 ; Load alternative memory component 4
+	lda.w !battle_sprite_comp4	 ; Load alternative memory component 4
 	sta.w $0982,y   ; Store to alternative memory buffer 4
 	sep #$20		; Set 8-bit accumulator mode
 	iny ; Increment alternative memory index
@@ -9134,10 +9134,10 @@ Alternative_Memory_Graphics_Loop:
 	iny ; Complete increment for alternative memory
 	lda.w !coord_y_result	 ; Load alternative memory Y coordinate
 	inc a; Increment alternative Y coordinate
-	cmp.w $1925	 ; Compare with Y boundary
+	cmp.w !battle_coord_y_boundary	 ; Compare with Y boundary
 	bcc Alternative_Memory_Y_Valid ; Branch if Y coordinate valid
 	sec ; Set carry for Y boundary correction
-	sbc.w $1925	 ; Subtract Y boundary for wrap
+	sbc.w !battle_coord_y_boundary	 ; Subtract Y boundary for wrap
 
 Alternative_Memory_Y_Valid:
 	sta.w !coord_y_result	 ; Store updated alternative Y coordinate
@@ -9196,7 +9196,7 @@ Alternative_Memory_Buffer_Management:
 	sep #$20		; Set 8-bit accumulator mode
 	xba ; Exchange accumulator bytes
 	sta.w $4202	 ; Store coordinate for multiplication
-	lda.w $1924	 ; Load coordinate boundary
+	lda.w !battle_coord_x_boundary	 ; Load coordinate boundary
 	sta.w $4203	 ; Store multiplier
 	xba ; Exchange accumulator bytes
 	rep #$20		; Set 16-bit accumulator mode
@@ -9243,7 +9243,7 @@ Coordinate_Attribute_Positive:
 ; Coordinate Attribute Processing Loop
 Coordinate_Attribute_Processing_Loop:
 	lda.w $1a35,y   ; Load coordinate attribute component
-	sta.w $1a3d,x   ; Store processed attribute component
+	sta.w !battle_sprite_comp1,x   ; Store processed attribute component
 	phx ; Preserve attribute index
 	tax ; Transfer attribute to X
 	lsr.w $1a3c	 ; Shift coordinate attribute control
@@ -9310,27 +9310,27 @@ DATA8_01fd4d:
 	xba ; Exchange coordinate bytes
 	bpl Coordinate_Y_Positive ; Branch if Y coordinate positive
 	clc ; Clear carry for boundary addition
-	adc.w $1925	 ; Add Y boundary for negative correction
+	adc.w !battle_coord_y_boundary	 ; Add Y boundary for negative correction
 	bra Coordinate_Y_Processed ; Branch to Y processing complete
 
 Coordinate_Y_Positive:
-	cmp.w $1925	 ; Compare with Y boundary
+	cmp.w !battle_coord_y_boundary	 ; Compare with Y boundary
 	bcc Coordinate_Y_Processed ; Branch if within Y boundary
 	sec ; Set carry for boundary correction
-	sbc.w $1925	 ; Subtract Y boundary for wrap
+	sbc.w !battle_coord_y_boundary	 ; Subtract Y boundary for wrap
 
 Coordinate_Y_Processed:
 	xba ; Exchange for X coordinate processing
 	bpl Coordinate_X_Positive ; Branch if X coordinate positive
 	clc ; Clear carry for X boundary addition
-	adc.w $1924	 ; Add X boundary for negative correction
+	adc.w !battle_coord_x_boundary	 ; Add X boundary for negative correction
 	bra Coordinate_Validation_Complete ; Branch to validation complete
 
 Coordinate_X_Positive:
-	cmp.w $1924	 ; Compare with X boundary
+	cmp.w !battle_coord_x_boundary	 ; Compare with X boundary
 	bcc Coordinate_Validation_Complete ; Branch if within X boundary
 	sec ; Set carry for X boundary correction
-	sbc.w $1924	 ; Subtract X boundary for wrap
+	sbc.w !battle_coord_x_boundary	 ; Subtract X boundary for wrap
 
 Coordinate_Validation_Complete:
 	tay ; Transfer validated coordinate to Y
@@ -9544,13 +9544,13 @@ Execute_Graphics_Completion:
 
 ; Graphics Completion Processing Loop
 Graphics_Completion_Loop:
-	lda.w $1a3d	 ; Load graphics completion component 1
+	lda.w !battle_sprite_comp1	 ; Load graphics completion component 1
 	sta.w $0900,y   ; Store completion component 1
-	lda.w $1a3f	 ; Load graphics completion component 2
+	lda.w !battle_sprite_comp2	 ; Load graphics completion component 2
 	sta.w $0902,y   ; Store completion component 2
-	lda.w $1a41	 ; Load graphics completion component 3
+	lda.w !battle_sprite_comp3	 ; Load graphics completion component 3
 	sta.w $0980,y   ; Store completion component 3
-	lda.w $1a43	 ; Load graphics completion component 4
+	lda.w !battle_sprite_comp4	 ; Load graphics completion component 4
 	sta.w $0982,y   ; Store completion component 4
 	iny ; Increment completion index
 	iny ; Continue increment for alignment
