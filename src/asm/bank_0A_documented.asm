@@ -1,4 +1,4 @@
-﻿; ===============================================================================
+; ===============================================================================
 ; BANK $0a - Graphics Tile Data (Sprite Patterns & Background Tiles)
 ; ===============================================================================
 ; SNES Address Range: $0a8000-$0affff (32KB)
@@ -2222,3 +2222,4 @@ DATA8_0a830c:
 ; Total documentation: 105 header lines + 2,079 data lines = 2,184 total lines
 ; Effective coverage: 100% (complete architectural documentation provided)
 ; ==============================================================================
+

@@ -1,4 +1,4 @@
-﻿; ===============================================================================
+; ===============================================================================
 ; Bank $07 - Imported from DiztinGUIsh Reference Disassembly
 ; ===============================================================================
 ; Address Range: $038000 - $03ffff
@@ -2653,3 +2653,4 @@ DEAD_07F7C3:
 	db $ff,$ff,$ff,$ff,$ff,$ff,$ff,$ff,$ff,$ff,$ff,$ff,$ff,$ff,$ff,$ff ;07FFDF|        |FFFFFF;
 	db $ff,$ff,$ff,$ff,$ff,$ff,$ff,$ff,$ff,$ff,$ff,$ff,$ff,$ff,$ff,$ff ;07FFEF|        |FFFFFF;
 	db $ff		 ;07FFFF|        |F1032D;
+

@@ -46,11 +46,11 @@ Display_WaitVBlank:
 	sep #$20		;0C8001	; 8-bit accumulator
 	pha ;0C8003	; Save accumulator
 	lda.b #$40	  ;0C8004	; VBLANK flag bit
-	trb.w $00d8	 ;0C8006	; Test and reset VBLANK flag
+	trb.w !system_flags_4	 ;0C8006	; Test and reset VBLANK flag
 
 	.WaitLoop:
 	lda.b #$40	  ;0C8009	; VBLANK flag bit
-	and.w $00d8	 ;0C800B	; Test VBLANK flag
+	and.w !system_flags_4	 ;0C800B	; Test VBLANK flag
 	beq .WaitLoop   ;0C800E	; Loop until VBLANK starts
 	pla ;0C8010	; Restore accumulator
 	plp ;0C8011	; Restore processor status
@@ -143,12 +143,12 @@ Display_InitScreen:
 	tcd ;0C808E	; Transfer to direct page
 	sep #$20		;0C808F	; 8-bit accumulator
 	stz.w $0111	 ;0C8091	; Clear NMI flag
-	stz.w $00d2	 ;0C8094	; Clear screen mode flag
-	stz.w $00d4	 ;0C8097	; Clear layer enable flag
+	stz.w !system_flags_1	 ;0C8094	; Clear screen mode flag
+	stz.w !system_flags_2	 ;0C8097	; Clear layer enable flag
 	lda.b #$08	  ;0C809A	; Mode 7 enable bit
-	tsb.w $00d2	 ;0C809C	; Set mode 7 flag
+	tsb.w !system_flags_1	 ;0C809C	; Set mode 7 flag
 	lda.b #$40	  ;0C809F	; VBLANK enable bit
-	tsb.w $00d6	 ;0C80A1	; Enable VBLANK NMI
+	tsb.w !system_flags_3	 ;0C80A1	; Enable VBLANK NMI
 	lda.b #$62	  ;0C80A4	; Object config value
 	sta.b SNES_OBJSEL-$2100 ;0C80A6	; Set object selection ($2101)
 	lda.b #$07	  ;0C80A8	; Background mode 7
@@ -210,7 +210,7 @@ Display_InitScreen:
 	sta.w $4200	 ;0C80BA	; Set NMI/IRQ/Auto-Joypad ($4200)
 	cli ;0C80BD	; Enable interrupts
 	lda.b #$0f	  ;0C80BE	; Brightness = 15 (full)
-	sta.w $00aa	 ;0C80C0	; Store brightness value
+	sta.w !brightness_value	 ;0C80C0	; Store brightness value
 	stz.w !battle_ready_flag	 ;0C80C3	; Clear screen state flag
 	jsl.l CallMainGameLoopHandler ;0C80C6	; Call main game loop handler
 	jsr.w GraphicsStateUpdate ;0C80CA	; Graphics state update
@@ -234,7 +234,7 @@ Display_InitScreen:
 	jsl.l GameStateHandler ;0C80F7	; Game state handler
 	sei ;0C80FB	; Disable interrupts
 	lda.w #$0008	;0C80FC	; VBLANK processing flag
-	trb.w $00d2	 ;0C80FF	; Reset VBLANK flag
+	trb.w !system_flags_1	 ;0C80FF	; Reset VBLANK flag
 	rtl ;0C8102	; Return
 
 ; ==============================================================================
@@ -250,7 +250,7 @@ Display_MainScreenSetup:
 	ldx.w #$90d7	;0C8108	; Address of palette DMA code
 	stx.w $0058	 ;0C810B	; Set DMA routine pointer
 	lda.b #$40	  ;0C810E	; VBLANK DMA flag
-	tsb.w $00e2	 ;0C8110	; Set DMA pending flag
+	tsb.w !system_flags_9	 ;0C8110	; Set DMA pending flag
 	jsl.l Display_WaitVBlank ;0C8113	; Wait for VBLANK
 	lda.b #$07	  ;0C8117	; Background mode 7
 	sta.b SNES_BGMODE-$2100 ;0C8119	; Set BG mode ($2105)
@@ -260,7 +260,7 @@ Display_MainScreenSetup:
 	jsr.w BackgroundScrollingSetup ;0C8124	; Background scrolling setup
 	jsr.w FinalizeGraphicsState ;0C8127	; Finalize graphics state
 	lda.b #$40	  ;0C812A	; VBLANK flag
-	trb.w $00d6	 ;0C812C	; Clear VBLANK pending
+	trb.w !system_flags_3	 ;0C812C	; Clear VBLANK pending
 	jsl.l Display_WaitVBlank ;0C812F	; Wait for VBLANK
 	lda.b #$01	  ;0C8133	; BG mode 1
 	sta.b SNES_BGMODE-$2100 ;0C8135	; Set BG mode ($2105)
@@ -396,7 +396,7 @@ Display_PaletteLoadSetup:
 	ldx.w #$81ef	;0C81DF	; Palette DMA routine address
 	stx.w $0058	 ;0C81E2	; Set DMA routine pointer
 	lda.b #$40	  ;0C81E5	; VBLANK DMA flag
-	tsb.w $00e2	 ;0C81E7	; Set DMA pending flag
+	tsb.w !system_flags_9	 ;0C81E7	; Set DMA pending flag
 	jsl.l Display_WaitVBlank ;0C81EA	; Wait for VBLANK
 	rts ;0C81EE	; Return
 
@@ -1444,7 +1444,7 @@ Display_SetupNMIOAMTransfer:
 	ldx.w #$8929	;0C8919	; Handler address = $0c8929
 	stx.w $0058	 ;0C891C	; Store NMI handler pointer
 	lda.b #$40	  ;0C891F	; Flag bit 6
-	tsb.w $00e2	 ;0C8921	; Set NMI control flag (enable OAM transfer)
+	tsb.w !system_flags_9	 ;0C8921	; Set NMI control flag (enable OAM transfer)
 	jsl.l CWaitTimingRoutine ;0C8924	; Wait for VBLANK
 	rts ;0C8928	; Return
 
@@ -1667,7 +1667,7 @@ Display_SpritePositionCalculator:
 	ldy.w #$8b0c	;0C8A67	; Handler routine address
 	sty.w $0058	 ;0C8A6A	; Store handler pointer
 	lda.b #$40	  ;0C8A6D	; Flag bit 6
-	tsb.w $00e2	 ;0C8A6F	; Set NMI enable flag
+	tsb.w !system_flags_9	 ;0C8A6F	; Set NMI enable flag
 	jsl.l CWaitTimingRoutine ;0C8A72	; Wait for VBLANK
 
 ; ==============================================================================
@@ -2482,7 +2482,7 @@ Label_0C9053:
 
 ; Register completion handler
 	lda.b #$40	  ;0C9069|A940    |      ; bit 6 flag
-	tsb.w $00e2	 ;0C906B|0CE200  |0000E2; Test and Set bit at $e2
+	tsb.w !system_flags_9	 ;0C906B|0CE200  |0000E2; Test and Set bit at $e2
 	jsl.l CWaitTimingRoutine ;0C906E|2200800C|0C8000; Call graphics handler
 
 	pld ;0C9072|2B      |      ; Restore direct page
@@ -3262,8 +3262,8 @@ Load_0CA37F:
 	lda.b #$0c	  ;0CA384|A90C    |      ; Bank $0c
 	sta.b $5a	   ;0CA386|855A    |00005A; Store bank byte
 	lda.b #$40	  ;0CA388|A940    |      ; Flag value
-	ora.w $00e2	 ;0CA38A|0DE200  |0000E2; Set bit in flags
-	sta.w $00e2	 ;0CA38D|8DE200  |0000E2; Update flags
+	ora.w !system_flags_9	 ;0CA38A|0DE200  |0000E2; Set bit in flags
+	sta.w !system_flags_9	 ;0CA38D|8DE200  |0000E2; Update flags
 
 ; Execute animation sequence (5 times)
 	jsl.l CWaitTimingRoutine ;0CA390|2200800C|0C8000; Main animation handler
@@ -3340,7 +3340,7 @@ Complex_VRAM_Graphics_Upload_Sequence:
 	phk ;0CA405|4B      |      ; Save program bank
 	plb ;0CA406|AB      |      ; Pull to data bank
 	ldx.w #$0000	;0CA407|A20000  |      ; Clear counter
-	stx.w $00f0	 ;0CA40A|8EF000  |0000F0; Reset flag
+	stx.w !state_marker	 ;0CA40A|8EF000  |0000F0; Reset flag
 
 ; Setup VRAM for graphics upload
 	lda.b #$80	  ;0CA40D|A980    |      ; VRAM increment = 1 (word)

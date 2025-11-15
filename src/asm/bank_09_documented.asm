@@ -1,4 +1,4 @@
-﻿; ==============================================================================
+; ==============================================================================
 ; BANK $09 - Graphics Data (Sprite/Tile Patterns)
 ; ==============================================================================
 ; SNES Address Range: $098000-$09ffff (32 KB)
@@ -2184,3 +2184,4 @@ DATA8_098464_1:
 	db $ff,$ff,$ff,$ff,$ff,$ff,$ff,$ff,$ff,$ff,$ff,$ff,$ff,$ff,$ff,$ff ;09FFD5|        |FFFFFF;
 	db $ff,$ff,$ff,$ff,$ff,$ff,$ff,$ff,$ff,$ff,$ff,$ff,$ff,$ff,$ff,$ff ;09FFE5|        |FFFFFF;
 	db $ff,$ff,$ff,$ff,$ff,$ff,$ff,$ff,$ff,$ff,$ff ;09FFF5|        |FFFFFF;
+

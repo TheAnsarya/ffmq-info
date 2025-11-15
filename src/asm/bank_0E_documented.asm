@@ -1,4 +1,4 @@
-﻿; ==============================================================================
+; ==============================================================================
 ; Bank $0e - Extended APU/Sound Data (Continuation of Bank $0d)
 ; ==============================================================================
 ; Bank $0e Size: 2,051 source lines (estimated ~32KB of $0e8000-$0effff range)
@@ -3359,3 +3359,4 @@
 ; Total identified separator values: 40+ unique bytes
 ; Organized into 9+ functional tiers
 ; Most sophisticated data organization in FFMQ ROM
+

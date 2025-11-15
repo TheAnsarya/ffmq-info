@@ -340,7 +340,7 @@ Boot_SetupStack:
 ; ---------------------------------------------------------------------------
 
 	lda.w #$0040	; A = $0040 (bit 6 mask)
-	and.w $00da	 ; Test bit 6 of $00da
+	and.w !system_flags_5	 ; Test bit 6 of $00da
 	bne Boot_EnableNMI ; If bit 6 set → Skip display init, jump ahead
 
 	jsl.l AddressC8080OriginalCode ; Bank $0c: Full display/PPU initialization
@@ -419,7 +419,7 @@ Boot_EnableNMI:
 ; Enable IRQ interrupts (NMI already configured)
 
 	lda.b #$0f	  ; A = $0f
-	sta.w $00aa	 ; [$00aa] = $0f (some game state variable)
+	sta.w !brightness_value	 ; [$00aa] = $0f (some game state variable)
 
 	jsl.l AddressC8000OriginalCode ; Bank $0c: Wait for VBLANK
 	jsl.l AddressC8000OriginalCode ; Bank $0c: Wait for VBLANK again
@@ -484,7 +484,7 @@ Boot_FadeIn:
 ; ===========================================================================
 
 	lda.b #$80	  ; A = $80 (bit 7)
-	trb.w $00de	 ; Test and Reset bit 7 of $00de
+	trb.w !system_flags_8	 ; Test and Reset bit 7 of $00de
 ; Clear some display state flag
 
 	lda.b #$e0	  ; A = $e0 (bits 5-7: %11100000)
@@ -577,21 +577,21 @@ Boot_FinalInit:
 ; ---------------------------------------------------------------------------
 
 	lda.b #$04	  ; A = $04 (bit 2)
-	tsb.w $00d4	 ; Test and Set bit 2 in $00d4
+	tsb.w !system_flags_2	 ; Test and Set bit 2 in $00d4
 ; Enable some display/update feature
 
 	lda.b #$80	  ; A = $80 (bit 7)
-	trb.w $00d6	 ; Test and Reset bit 7 in $00d6
+	trb.w !system_flags_3	 ; Test and Reset bit 7 in $00d6
 ; Disable some feature
 
 	stz.w !battle_ready_flag	 ; [$0110] = $00 (clear game state variable)
 
 	lda.b #$01	  ; A = $01 (bit 0)
-	tsb.w $00e2	 ; Test and Set bit 0 in $00e2
+	tsb.w !system_flags_9	 ; Test and Set bit 0 in $00e2
 ; Enable some system feature
 
 	lda.b #$10	  ; A = $10 (bit 4)
-	tsb.w $00d6	 ; Test and Set bit 4 in $00d6
+	tsb.w !system_flags_3	 ; Test and Set bit 4 in $00d6
 ; Enable another feature
 
 ; ---------------------------------------------------------------------------
@@ -601,7 +601,7 @@ Boot_FinalInit:
 ; ---------------------------------------------------------------------------
 
 	ldx.w #$fff0	; X = $fff0 (-16 in signed 16-bit)
-	stx.w $008e	 ; [$008e] = $fff0 (initial game state)
+	stx.w !game_state_value	 ; [$008e] = $fff0 (initial game state)
 
 ; ---------------------------------------------------------------------------
 ; Final Setup Routines
@@ -1237,7 +1237,7 @@ Init_VBlankDMA:
 	lda.w #$2100	; A = $2100 (PPU register base)
 	tcd ; D = $2100 (Direct Page → PPU registers)
 
-	stz.w $00f0	 ; [$00f0] = $0000 (clear state)
+	stz.w !state_marker	 ; [$00f0] = $0000 (clear state)
 
 ; ---------------------------------------------------------------------------
 ; Upload Graphics to VRAM
@@ -1314,7 +1314,7 @@ NMI_Handler:
 ; ---------------------------------------------------------------------------
 
 	lda.b #$40	  ; A = $40 (bit 6 mask)
-	and.w $00e2	 ; Test bit 6 of $00e2
+	and.w !system_flags_9	 ; Test bit 6 of $00e2
 	bne NMI_SpecialHandler ; If set → Jump to special handler
 
 ; ---------------------------------------------------------------------------
@@ -1322,7 +1322,7 @@ NMI_Handler:
 ; ---------------------------------------------------------------------------
 
 	lda.b #$02	  ; A = $02 (bit 1 mask)
-	and.w $00d4	 ; Test bit 1 of $00d4
+	and.w !system_flags_2	 ; Test bit 1 of $00d4
 	bne NMI_TilemapDMA ; If set → Tilemap DMA needed
 
 ; ---------------------------------------------------------------------------
@@ -1330,7 +1330,7 @@ NMI_Handler:
 ; ---------------------------------------------------------------------------
 
 	lda.b #$40	  ; A = $40 (bit 6 mask)
-	and.w $00dd	 ; Test bit 6 of $00dd
+	and.w !system_flags_7	 ; Test bit 6 of $00dd
 	bne NMI_GraphicsUpload ; If set → Graphics upload needed
 
 ; ---------------------------------------------------------------------------
@@ -1338,11 +1338,11 @@ NMI_Handler:
 ; ---------------------------------------------------------------------------
 
 	lda.b #$80	  ; A = $80 (bit 7 mask)
-	and.w $00d8	 ; Test bit 7 of $00d8
+	and.w !system_flags_4	 ; Test bit 7 of $00d8
 	beq NMI_CheckMoreFlags ; If clear → Skip battle graphics
 
 	lda.b #$80	  ; A = $80
-	trb.w $00d8	 ; Test and Reset bit 7 of $00d8
+	trb.w !system_flags_4	 ; Test and Reset bit 7 of $00d8
 ; Clear the flag (one-shot operation)
 
 	jmp.w ExecuteBattleGraphicsUpdate ; Execute battle graphics update
@@ -1357,11 +1357,11 @@ NMI_CheckMoreFlags:
 ; ===========================================================================
 
 	lda.b #$c0	  ; A = $c0 (bits 6-7 mask)
-	and.w $00d2	 ; Test bits 6-7 of $00d2
+	and.w !system_flags_1	 ; Test bits 6-7 of $00d2
 	bne AddressA8OriginalCode ; If any set → Execute DMA operations
 
 	lda.b #$10	  ; A = $10 (bit 4 mask)
-	and.w $00d2	 ; Test bit 4 of $00d2
+	and.w !system_flags_1	 ; Test bit 4 of $00d2
 	bne NMI_SpecialDMA ; If set → Special operation
 
 	jmp.w ContinueAdditionalHandlers ; → Continue to additional handlers
@@ -1388,7 +1388,7 @@ NMI_SpecialHandler:
 ; ===========================================================================
 
 	lda.b #$40	  ; A = $40
-	trb.w $00e2	 ; Test and Reset bit 6 of $00e2
+	trb.w !system_flags_9	 ; Test and Reset bit 6 of $00e2
 ; Clear flag before jumping
 
 	jml.w [$0058]   ; Jump Long to address stored at [$0058]
@@ -1446,7 +1446,7 @@ NMI_ProcessDMAFlags:
 ; ===========================================================================
 
 	lda.b #$80	  ; A = $80 (bit 7 mask)
-	and.w $00d2	 ; Test bit 7 of $00d2
+	and.w !system_flags_1	 ; Test bit 7 of $00d2
 	beq NMI_CheckOAMFlag ; If clear → Skip this DMA
 
 ; ---------------------------------------------------------------------------
@@ -1484,7 +1484,7 @@ NMI_CheckOAMFlag:
 ; ===========================================================================
 
 	lda.b #$20	  ; A = $20 (bit 5 mask)
-	and.w $00d2	 ; Test bit 5 of $00d2
+	and.w !system_flags_1	 ; Test bit 5 of $00d2
 	beq NMI_Cleanup ; If clear → Skip OAM update
 
 	jsr.w DMA_UpdateOAM ; Execute OAM DMA transfer
@@ -1499,11 +1499,11 @@ NMI_Cleanup:
 ; ===========================================================================
 
 	lda.b #$40	  ; A = $40 (bit 6)
-	trb.w $00dd	 ; Test and Reset bit 6 of $00dd
+	trb.w !system_flags_7	 ; Test and Reset bit 6 of $00dd
 ; Clear graphics upload flag
 
 	lda.b #$a0	  ; A = $a0 (bits 5 and 7)
-	trb.w $00d2	 ; Test and Reset bits 5,7 of $00d2
+	trb.w !system_flags_1	 ; Test and Reset bits 5,7 of $00d2
 ; Clear OAM and VRAM DMA flags
 
 	rtl ; Return from Long call (NMI complete)
@@ -1527,7 +1527,7 @@ DMA_TransferTilemap:
 ; ===========================================================================
 
 	lda.b #$02	  ; A = $02 (bit 1)
-	trb.w $00d4	 ; Test and Reset bit 1 of $00d4
+	trb.w !system_flags_2	 ; Test and Reset bit 1 of $00d4
 ; Clear "tilemap DMA pending" flag
 
 	lda.b #$80	  ; A = $80 (increment after $2119 write)
@@ -1557,7 +1557,7 @@ DMA_TransferTilemap:
 	rep #$30		; 16-bit A, X, Y
 
 	ldx.w #$ff00	; X = $ff00
-	stx.w $00f0	 ; [$00f0] = $ff00 (state marker)
+	stx.w !state_marker	 ; [$00f0] = $ff00 (state marker)
 
 ; ---------------------------------------------------------------------------
 ; Check Transfer Mode ($0062)
@@ -1614,11 +1614,11 @@ NMI_LargeTransfer:
 ; ===========================================================================
 
 	lda.b #$80	  ; A = $80 (bit 7 mask)
-	and.w $00d4	 ; Test bit 7 of $00d4
+	and.w !system_flags_2	 ; Test bit 7 of $00d4
 	beq NMI_ReturnToHandler ; If clear → Skip, jump to handler return
 
 	lda.b #$80	  ; A = $80
-	trb.w $00d4	 ; Test and Reset bit 7 of $00d4
+	trb.w !system_flags_2	 ; Test and Reset bit 7 of $00d4
 ; Clear "large transfer pending" flag
 
 	lda.b #$80	  ; A = $80 (increment mode)
@@ -1629,7 +1629,7 @@ NMI_LargeTransfer:
 ; ---------------------------------------------------------------------------
 
 	lda.b #$02	  ; A = $02 (bit 1 mask)
-	and.w $00d8	 ; Test bit 1 of $00d8
+	and.w !system_flags_4	 ; Test bit 1 of $00d8
 	beq NMI_AlternateTransfer ; If clear → Use alternate path
 
 ; ---------------------------------------------------------------------------
@@ -1709,11 +1709,11 @@ NMI_AlternateTransfer:
 ; ---------------------------------------------------------------------------
 
 	lda.b #$88	  ; A = $88 (palette address)
-	ldx.w $00f4	 ; X = [$00f4] (source offset 1)
+	ldx.w !tile_offset_1	 ; X = [$00f4] (source offset 1)
 	jsr.w TransferPaletteSet ; Transfer palette set 1
 
 	lda.b #$98	  ; A = $98 (palette address)
-	ldx.w $00f7	 ; X = [$00f7] (source offset 2)
+	ldx.w !tile_offset_2	 ; X = [$00f7] (source offset 2)
 	jsr.w TransferPaletteSet ; Transfer palette set 2
 
 ; ---------------------------------------------------------------------------
@@ -1736,17 +1736,17 @@ NMI_AlternateTransfer:
 ; ---------------------------------------------------------------------------
 
 	ldx.w #$ff00	; X = $ff00
-	stx.w $00f0	 ; [$00f0] = $ff00 (marker)
+	stx.w !state_marker	 ; [$00f0] = $ff00 (marker)
 
 ; ---------------------------------------------------------------------------
 ; Transfer Two Tilemap Regions
 ; ---------------------------------------------------------------------------
 
-	ldx.w $00f2	 ; X = [$00f2] (tilemap 1 source)
+	ldx.w !tilemap1_addr	 ; X = [$00f2] (tilemap 1 source)
 	lda.w #$6000	; A = $6000 (VRAM address 1)
 	jsr.w TransferTilemapRegion ; Transfer tilemap region 1
 
-	ldx.w $00f5	 ; X = [$00f5] (tilemap 2 source)
+	ldx.w !tilemap2_addr	 ; X = [$00f5] (tilemap 2 source)
 	lda.w #$6040	; A = $6040 (VRAM address 2)
 	jsr.w TransferTilemapRegion ; Transfer tilemap region 2
 
@@ -1757,7 +1757,7 @@ NMI_AlternateTransfer:
 ; ---------------------------------------------------------------------------
 
 	lda.b #$10	  ; A = $10 (bit 4 mask)
-	and.w $00da	 ; Test bit 4 of $00da
+	and.w !system_flags_5	 ; Test bit 4 of $00da
 	bne IfSetSkipMenuGraphicsTransfer ; If set → Skip menu graphics transfer
 
 ; ---------------------------------------------------------------------------
@@ -1812,8 +1812,8 @@ NMI_ClearTransferMarkers:
 ; ===========================================================================
 
 	ldx.w #$ffff	; X = $ffff
-	stx.w $00f2	 ; [$00f2] = $ffff (invalidate tilemap 1)
-	stx.w $00f5	 ; [$00f5] = $ffff (invalidate tilemap 2)
+	stx.w !tilemap1_addr	 ; [$00f2] = $ffff (invalidate tilemap 1)
+	stx.w !tilemap2_addr	 ; [$00f5] = $ffff (invalidate tilemap 2)
 
 	jmp.w NMI_ProcessDMAFlags ; → Return to NMI handler
 
@@ -2010,7 +2010,7 @@ DMA_BattleGraphics:
 ; ===========================================================================
 
 	lda.b #$80	  ; A = $80 (bit 7)
-	trb.w $00de	 ; Test and Reset bit 7 of $00de
+	trb.w !system_flags_8	 ; Test and Reset bit 7 of $00de
 ; Clear some state flag
 
 	lda.b #$e0	  ; A = $e0 (bits 5-7)
@@ -2036,7 +2036,7 @@ DMA_BattleGraphics:
 ; ---------------------------------------------------------------------------
 
 	lda.w #$0040	; A = $0040 (bit 6 = some button?)
-	and.w $00da	 ; Mask with controller input
+	and.w !system_flags_5	 ; Mask with controller input
 	bne Skip_Normal_Init ; If button held, skip to alternate path
 
 ; Normal initialization path
@@ -2135,7 +2135,7 @@ Skip_Normal_Init:
 ; ---------------------------------------------------------------------------
 
 	lda.b #$0f	  ; Full brightness (0-15 scale)
-	sta.w $00aa	 ; Store to brightness variable
+	sta.w !brightness_value	 ; Store to brightness variable
 
 ; Call initialization twice (fade in/out? Double buffer?)
 	jsl.l BankOC_Init
@@ -2199,7 +2199,7 @@ Continue_To_Game:
 ; ===========================================================================
 
 	lda.b #$80	  ; bit 7
-	trb.w $00de	 ; Test and reset bit 7 in game flag
+	trb.w !system_flags_8	 ; Test and reset bit 7 in game flag
 
 	lda.b #$e0	  ; Bits 5-7
 	trb.w $0111	 ; Test and reset bits 5-7
@@ -2254,21 +2254,21 @@ Enter_Main_Loop:
 	jsr.w Execute_Script_Or_Command
 
 	lda.b #$04
-	tsb.w $00d4	 ; Test and set bit 2 in game flag
+	tsb.w !system_flags_2	 ; Test and set bit 2 in game flag
 
 	lda.b #$80
-	trb.w $00d6	 ; Test and reset bit 7 in flag
+	trb.w !system_flags_3	 ; Test and reset bit 7 in flag
 
 	stz.w !battle_ready_flag	 ; Clear some variable
 
 	lda.b #$01
-	tsb.w $00e2	 ; Test and set bit 0
+	tsb.w !system_flags_9	 ; Test and set bit 0
 
 	lda.b #$10
-	tsb.w $00d6	 ; Test and set bit 4
+	tsb.w !system_flags_3	 ; Test and set bit 4
 
 	ldx.w #$fff0	; Some value
-	stx.w $008e	 ; Store to variable
+	stx.w !game_state_value	 ; Store to variable
 
 	jsl.l Some_System_Call
 	jsr.w Some_Function
@@ -2587,7 +2587,7 @@ DMA_FieldGraphicsUpdate:
 
 ; Check if battle mode graphics needed
 	lda.b #$10	  ; Check bit 4 of display flags
-	and.w $00da	 ; Test against display status
+	and.w !system_flags_5	 ; Test against display status
 	beq +		   ; If clear, continue to field graphics
 	jmp GraphicsUpdateFieldModeContinuedCode ; Otherwise do battle graphics transfer
 	+
@@ -2628,7 +2628,7 @@ DMA_FieldGraphicsUpdate:
 
 ; Check if tilemap update needed
 	lda.b #$80	  ; Check bit 7
-	and.w $00d6	 ; Test display flags
+	and.w !system_flags_3	 ; Test display flags
 	beq DMA_FieldGraphicsUpdate_OAM ; If clear, skip tilemap transfer
 
 ; Transfer tilemap data
@@ -2651,10 +2651,10 @@ DMA_FieldGraphicsUpdate_OAM:
 
 ; Check if additional display update needed
 	lda.b #$20	  ; Check bit 5
-	and.w $00d6	 ; Test display flags
+	and.w !system_flags_3	 ; Test display flags
 	beq DMA_FieldGraphicsUpdate_Exit ; If clear, exit
 	lda.b #$78	  ; Set multiple flags (bits 3,4,5,6)
-	tsb.w $00d4	 ; Set bits in status register
+	tsb.w !system_flags_2	 ; Set bits in status register
 
 DMA_FieldGraphicsUpdate_Exit:
 	rtl ; Return
@@ -2678,7 +2678,7 @@ DMA_SpecialVRAMHandler:
 ; ===========================================================================
 
 	lda.b #$10	  ; A = $10 (bit 4 mask)
-	trb.w $00d2	 ; Test and Reset bit 4 of $00d2
+	trb.w !system_flags_1	 ; Test and Reset bit 4 of $00d2
 ; Clear "special transfer pending" flag
 
 	lda.b #$80	  ; A = $80 (increment mode)
@@ -2689,7 +2689,7 @@ DMA_SpecialVRAMHandler:
 ; ---------------------------------------------------------------------------
 
 	lda.b #$10	  ; A = $10 (bit 4 mask)
-	and.w $00da	 ; Test bit 4 of $00da
+	and.w !system_flags_5	 ; Test bit 4 of $00da
 	beq DMA_FieldModeTransfer ; If clear → Use normal field mode graphics
 
 ; ---------------------------------------------------------------------------
@@ -2705,7 +2705,7 @@ DMA_SpecialVRAMHandler:
 	stx.w $2116	 ; Set VRAM address
 
 	ldx.w #$ff00	; X = $ff00
-	stx.w $00f0	 ; [$00f0] = $ff00 (state marker)
+	stx.w !state_marker	 ; [$00f0] = $ff00 (state marker)
 
 	ldx.w #$99c0	; X = $99c0 (source in bank $04)
 	ldy.w #$0004	; Y = $0004 (DMA parameters)
@@ -2782,7 +2782,7 @@ DMA_FieldModeTransfer:
 
 	rep #$30		; 16-bit A, X, Y
 
-	stz.w $00f0	 ; [$00f0] = $0000 (clear state marker)
+	stz.w !state_marker	 ; [$00f0] = $0000 (clear state marker)
 
 	pea.w $0004	 ; Push $0004
 	plb ; B = $04 (Data Bank = $04)
@@ -2795,7 +2795,7 @@ DMA_FieldModeTransfer:
 ; ---------------------------------------------------------------------------
 
 	lda.w #$0040	; A = $0040 (bit 6 mask)
-	and.w $00de	 ; Test bit 6 of $00de
+	and.w !system_flags_8	 ; Test bit 6 of $00de
 	beq DMA_UpdateAllCharacters ; If clear → Update all characters
 
 ; ---------------------------------------------------------------------------
@@ -2805,7 +2805,7 @@ DMA_FieldModeTransfer:
 ; ---------------------------------------------------------------------------
 
 	lda.w #$0040	; A = $0040
-	trb.w $00de	 ; Test and Reset bit 6 of $00de
+	trb.w !system_flags_8	 ; Test and Reset bit 6 of $00de
 ; Clear "single character update" flag
 
 	lda.w $010d	 ; A = [$010d] (character position data)
@@ -3095,7 +3095,7 @@ GameLoop_ProcessEvents:
 ; ---------------------------------------------------------------------------
 
 	lda.w #$0004	; A = $0004 (bit 2 mask)
-	and.w $00d4	 ; Test bit 2 of $00d4
+	and.w !system_flags_2	 ; Test bit 2 of $00d4
 	beq GameLoop_NormalUpdate ; If clear → Normal frame processing
 
 ; ---------------------------------------------------------------------------
@@ -3106,7 +3106,7 @@ GameLoop_ProcessEvents:
 ; ---------------------------------------------------------------------------
 
 	lda.w #$0004	; A = $0004
-	trb.w $00d4	 ; Test and Reset bit 2 of $00d4
+	trb.w !system_flags_2	 ; Test and Reset bit 2 of $00d4
 ; Clear "full refresh needed" flag
 
 ; Refresh Background Layer 0
@@ -3138,7 +3138,7 @@ GameLoop_NormalUpdate:
 ; ---------------------------------------------------------------------------
 
 	lda.w #$0010	; A = $0010 (bit 4 mask)
-	and.w $00da	 ; Test bit 4 of $00da (menu mode flag)
+	and.w !system_flags_5	 ; Test bit 4 of $00da (menu mode flag)
 	bne GameLoop_ProcessInput ; If set → Process controller input
 
 ; ---------------------------------------------------------------------------
@@ -3146,7 +3146,7 @@ GameLoop_NormalUpdate:
 ; ---------------------------------------------------------------------------
 
 	lda.w #$0004	; A = $0004 (bit 2 mask)
-	and.w $00e2	 ; Test bit 2 of $00e2
+	and.w !system_flags_9	 ; Test bit 2 of $00e2
 	bne GameLoop_UpdateState ; If set → Skip input (cutscene/auto mode)
 
 ;-------------------------------------------------------------------------------
@@ -3232,7 +3232,7 @@ GameLoop_TimeBasedEvents:
 ; ---------------------------------------------------------------------------
 
 	lda.w #$0080	; A = $0080 (bit 7 mask)
-	and.w $00de	 ; Test bit 7 of $00de
+	and.w !system_flags_8	 ; Test bit 7 of $00de
 	beq GameLoop_TimeBasedEvents_Exit ; If clear → Skip time-based processing
 
 ; ---------------------------------------------------------------------------
@@ -3339,7 +3339,7 @@ GameLoop_SetSpriteFlag:
 ; ---------------------------------------------------------------------------
 
 	lda.b #$20	  ; A = $20 (bit 5)
-	tsb.w $00d2	 ; Set bit 5 of $00d2 (sprite update needed)
+	tsb.w !system_flags_1	 ; Set bit 5 of $00d2 (sprite update needed)
 
 ;-------------------------------------------------------------------------------
 
@@ -3566,7 +3566,7 @@ Input_ButtonA_ToggleStatus:
 	sta.w !char2_active_flag	 ; Save new flag state
 
 	lda.b #$40	  ; A = $40 (bit 6)
-	tsb.w $00d4	 ; Set bit 6 of $00d4 (update needed)
+	tsb.w !system_flags_2	 ; Set bit 6 of $00d4 (update needed)
 
 	jsr.w NormalPositionCallB908 ; Update character display
 	bra Input_ButtonA_Exit ; → Exit
@@ -3805,7 +3805,7 @@ Input_CheckAllowed:
 ; ===========================================================================
 
 	lda.b #$10	  ; A = $10 (bit 4 mask)
-	and.w $00d6	 ; Test bit 4 of $00d6
+	and.w !system_flags_3	 ; Test bit 4 of $00d6
 	beq Input_CheckAllowed_Exit ; If clear → Input allowed, exit
 
 ; Input blocked - mask controller state
@@ -3857,7 +3857,7 @@ Input_ReadController:
 ; ---------------------------------------------------------------------------
 
 	lda.w #$0040	; A = $0040 (bit 6 mask)
-	and.w $00d6	 ; Test bit 6 of $00d6
+	and.w !system_flags_3	 ; Test bit 6 of $00d6
 	bne Input_ReadController_Exit ; If set → Controller disabled, exit
 
 ; ---------------------------------------------------------------------------
@@ -3872,7 +3872,7 @@ Input_ReadController:
 ; ---------------------------------------------------------------------------
 
 	lda.w #$0008	; A = $0008 (bit 3 mask)
-	and.w $00d2	 ; Test bit 3 of $00d2
+	and.w !system_flags_1	 ; Test bit 3 of $00d2
 	bne Input_SpecialMode ; If set → Special input mode
 
 ; ---------------------------------------------------------------------------
@@ -3880,7 +3880,7 @@ Input_ReadController:
 ; ---------------------------------------------------------------------------
 
 	lda.w #$0004	; A = $0004 (bit 2 mask)
-	and.w $00db	 ; Test bit 2 of $00db
+	and.w !system_flags_6	 ; Test bit 2 of $00db
 	bne Input_AlternateFilter ; If set → Use alternate filtering
 
 ; ---------------------------------------------------------------------------
@@ -4128,7 +4128,7 @@ Tilemap_RefreshLayer0:
 ; ---------------------------------------------------------------------------
 
 	lda.b #$02	  ; A = $02 (bit 1 mask)
-	and.w $00d8	 ; Test bit 1 of $00d8
+	and.w !system_flags_4	 ; Test bit 1 of $00d8
 	beq Tilemap_RefreshLayer0_Field ; If clear → Field mode
 
 ; ---------------------------------------------------------------------------
@@ -4200,13 +4200,13 @@ Tilemap_RefreshLayer0_Field:
 	lda.l DATA8_049800,x ; A = [$049800+X] (base tile)
 	asl a; A = A × 2
 	asl a; A = A × 4 (tile offset)
-	sta.w $00f4	 ; [$00f4] = tile offset
+	sta.w !tile_offset_1	 ; [$00f4] = tile offset
 
 	rep #$10		; 16-bit X, Y
 
 	lda.w !location_identifier	 ; A = character Y position
 	jsr.w Tilemap_CalcRowAddress ; Calculate tilemap address
-	stx.w $00f2	 ; [$00f2] = tilemap address
+	stx.w !tilemap1_addr	 ; [$00f2] = tilemap address
 
 	ldx.w #$2d1a	; X = $2d1a (WRAM source address)
 	lda.b #$7e	  ; A = $7e (bank $7e)
@@ -4230,7 +4230,7 @@ Tilemap_TransferData:
 	pha ; Save bank number
 
 	lda.b #$04	  ; A = $04 (bit 2 mask)
-	and.w $00da	 ; Test bit 2 of $00da
+	and.w !system_flags_5	 ; Test bit 2 of $00da
 	beq Tilemap_SetupDMA ; If clear → Normal cursor
 
 ; Check blink timer
@@ -4240,7 +4240,7 @@ Tilemap_TransferData:
 
 ; Apply alternate palette during blink
 	lda.b #$10	  ; A = $10 (bit 4 mask)
-	and.w $00da	 ; Test bit 4 of $00da
+	and.w !system_flags_5	 ; Test bit 4 of $00da
 	bne Tilemap_BlinkSpecial ; If set → Special blink mode
 
 ; Normal blink mode (incomplete in disassembly)
@@ -4357,7 +4357,7 @@ Tilemap_FinalizeUpdate:
 	plb ; Pull to data bank (B = $00)
 
 	lda.b #$80	  ; A = $80 (bit 7)
-	tsb.w $00d4	 ; Set bit 7 of $00d4 (large VRAM update flag)
+	tsb.w !system_flags_2	 ; Set bit 7 of $00d4 (large VRAM update flag)
 
 	plp ; Restore processor status
 	rts ; Return
@@ -4382,7 +4382,7 @@ Tilemap_RefreshLayer1:
 ; ---------------------------------------------------------------------------
 
 	lda.b #$02	  ; A = $02 (bit 1 mask)
-	and.w $00d8	 ; Test bit 1 of $00d8
+	and.w !system_flags_4	 ; Test bit 1 of $00d8
 	beq IfClearFieldMode ; If clear → Field mode
 
 ; ---------------------------------------------------------------------------
@@ -4422,7 +4422,7 @@ Tilemap_RefreshLayer1:
 	sta.l $7f07ba   ; Tile 4 position
 
 	lda.w #$0080	; A = $0080 (bit 7)
-	tsb.w $00d4	 ; Set large update flag
+	tsb.w !system_flags_2	 ; Set large update flag
 
 Tilemap_RefreshLayer1_Exit:
 	plp ; Restore status
@@ -4439,16 +4439,16 @@ Tilemap_RefreshLayer1_Field:
 	lda.l DATA8_049800,x ; A = base tile
 	asl a; A × 2
 	asl a; A × 4
-	sta.w $00f7	 ; Save tile offset
+	sta.w !tile_offset_2	 ; Save tile offset
 
 	rep #$10		; 16-bit X, Y
 
 	lda.w !char1_cursor_pos	 ; A = cursor position
 	jsr.w Tilemap_CalcRowAddress ; Calculate tilemap address
-	stx.w $00f5	 ; Save address
+	stx.w !tilemap2_addr	 ; Save address
 
 	lda.b #$80	  ; A = $80
-	tsb.w $00d4	 ; Set update flag
+	tsb.w !system_flags_2	 ; Set update flag
 
 	plp ; Restore status
 	rts ; Return
@@ -4753,35 +4753,35 @@ VRAM_Write8TilesPattern:
 VRAM_Write8TilesPattern_Loop:
 	lda.w $0000,x   ; Get word 0
 	sta.b !SNES_VMDATAL-$2100 ; Write to VRAM
-	lda.w $00f0	 ; Get pattern word
+	lda.w !state_marker	 ; Get pattern word
 	sta.b !SNES_VMDATAL-$2100 ; Write pattern
 	lda.w $0002,x   ; Get word 1
 	sta.b !SNES_VMDATAL-$2100 ; Write to VRAM
-	lda.w $00f0	 ; Get pattern word
+	lda.w !state_marker	 ; Get pattern word
 	sta.b !SNES_VMDATAL-$2100 ; Write pattern
 	lda.w $0004,x   ; Get word 2
 	sta.b !SNES_VMDATAL-$2100 ; Write to VRAM
-	lda.w $00f0	 ; Get pattern word
+	lda.w !state_marker	 ; Get pattern word
 	sta.b !SNES_VMDATAL-$2100 ; Write pattern
 	lda.w $0006,x   ; Get word 3
 	sta.b !SNES_VMDATAL-$2100 ; Write to VRAM
-	lda.w $00f0	 ; Get pattern word
+	lda.w !state_marker	 ; Get pattern word
 	sta.b !SNES_VMDATAL-$2100 ; Write pattern
 	lda.w $0008,x   ; Get word 4
 	sta.b !SNES_VMDATAL-$2100 ; Write to VRAM
-	lda.w $00f0	 ; Get pattern word
+	lda.w !state_marker	 ; Get pattern word
 	sta.b !SNES_VMDATAL-$2100 ; Write pattern
 	lda.w $000a,x   ; Get word 5
 	sta.b !SNES_VMDATAL-$2100 ; Write to VRAM
-	lda.w $00f0	 ; Get pattern word
+	lda.w !state_marker	 ; Get pattern word
 	sta.b !SNES_VMDATAL-$2100 ; Write pattern
 	lda.w $000c,x   ; Get word 6
 	sta.b !SNES_VMDATAL-$2100 ; Write to VRAM
-	lda.w $00f0	 ; Get pattern word
+	lda.w !state_marker	 ; Get pattern word
 	sta.b !SNES_VMDATAL-$2100 ; Write pattern
 	lda.w $000e,x   ; Get word 7
 	sta.b !SNES_VMDATAL-$2100 ; Write to VRAM
-	lda.w $00f0	 ; Get pattern word
+	lda.w !state_marker	 ; Get pattern word
 	sta.b !SNES_VMDATAL-$2100 ; Write pattern
 
 	txa ; A = X (source pointer)
@@ -4864,7 +4864,7 @@ Graphics_InitFieldMenuMode:
 ; Setup for additional tile transfer
 	rep #$30		; 16-bit mode
 	lda.w #$ff00	; A = $ff00 (pattern for interleaving)
-	sta.w $00f0	 ; Store pattern word
+	sta.w !state_marker	 ; Store pattern word
 	ldx.w #$2000	; X = $2000 (VRAM address)
 	stx.b !SNES_VMADDL-$2100 ; Set VRAM address
 
@@ -5599,7 +5599,7 @@ Animation_UpdateSystem:
 
 ; Process animation slot 1 ($00)
 	lda.b #$04	  ; bit 2 mask
-	and.w $00e2	 ; Check animation gate flag
+	and.w !system_flags_9	 ; Check animation gate flag
 	bne Check_Slot2 ; If set, skip slot 1
 	lda.b $00	   ; A = animation type (slot 1)
 	bmi Check_Slot2 ; If $ff (empty), skip
@@ -5643,7 +5643,7 @@ Check_Slot3:
 
 Check_Gate:
 	lda.b #$04	  ; bit 2 mask
-	and.w $00e2	 ; Check animation gate flag
+	and.w !system_flags_9	 ; Check animation gate flag
 	bne Animation_Done ; If set, skip slot 3
 
 Execute_Slot3:
@@ -5707,15 +5707,15 @@ Graphics_SetupBattleMode:
 Graphics_PrepareTransition:
 	sep #$30		; 8-bit A/X/Y
 	lda.b #$40	  ; bit 6 mask
-	tsb.w $00d6	 ; Set graphics busy flag in $00d6
+	tsb.w !system_flags_3	 ; Set graphics busy flag in $00d6
 	lda.w $0112	 ; Load NMI/IRQ configuration
 	sta.w SNES_NMITIMEN ; Store to NMITIMEN ($4200)
 	cli ; Enable interrupts
 	jsl.l FinalSetupRoutine ; Call sprite processing routine
 	lda.b #$08	  ; bit 3 mask
-	trb.w $00d2	 ; Clear graphics ready flag
+	trb.w !system_flags_1	 ; Clear graphics ready flag
 	lda.b #$04	  ; bit 2 mask
-	trb.w $00db	 ; Clear animation gate
+	trb.w !system_flags_6	 ; Clear animation gate
 	rts ; Return
 
 ; ===========================================================================
@@ -5745,11 +5745,11 @@ Display_EnableEffects:
 	lda.b #$0c	  ; Value $0c
 	sta.w $0055	 ; Store to display config
 	lda.b #$02	  ; bit 1 mask
-	trb.w $00db	 ; Clear display update gate
+	trb.w !system_flags_6	 ; Clear display update gate
 	lda.b #$80	  ; bit 7 mask
-	trb.w $00e2	 ; Clear graphics effect flag
+	trb.w !system_flags_9	 ; Clear graphics effect flag
 	lda.b #$04	  ; bit 2 mask
-	tsb.w $00db	 ; Set animation gate
+	tsb.w !system_flags_6	 ; Set animation gate
 	rep #$30		; 16-bit A/X/Y
 	pla ; Restore A
 	plb ; Restore data bank
@@ -5772,7 +5772,7 @@ Display_EnableEffects:
 
 Display_CheckFrameUpdate:
 	lda.w #$0004	; bit 2 mask
-	and.w $00db	 ; Check animation gate
+	and.w !system_flags_6	 ; Check animation gate
 	beq Skip_Frame_Check ; If clear, skip
 	lda.w $0e97	 ; Load frame counter
 	and.w #$000f	; Mask to lower nibble
@@ -6755,7 +6755,7 @@ PHY_Label:
 	sbc.b $44
 	sta.w $01eb
 	lda.w #$00e0
-	tsb.w $00d2
+	tsb.w !system_flags_1
 	lda.w #$ffff
 	sta.b $44
 	stz.b $46
@@ -6776,10 +6776,10 @@ TAX_Label:
 
 Graphics_CallSystem:
 	lda.w #$0080
-	tsb.w $00d8
+	tsb.w !system_flags_4
 	jsl.l AddressC8000OriginalCode
 	lda.w #$0008
-	trb.w $00d4
+	trb.w !system_flags_2
 
 
 Graphics_CheckDisplayReady:
@@ -6987,10 +6987,10 @@ Graphics_ProcessData:
 
 Graphics_ClearFlag:
 	lda.w #$0004	; bit 2 mask
-	and.w $00d8	 ; Test if set
+	and.w !system_flags_4	 ; Test if set
 	beq Graphics_ClearFlagDone ; Skip if not set
 	lda.w #$0004	; bit 2 mask
-	trb.w $00d8	 ; Clear bit 2
+	trb.w !system_flags_4	 ; Clear bit 2
 	lda.w #$00c8	; Bits 6-7 + bit 3 mask
 	trb.w $0111	 ; Clear those bits in $0111
 
@@ -7138,7 +7138,7 @@ Palette_UseDefault:
 	sta.l $7f501d   ; Store to buffer +$1d
 
 	lda.b #$04	  ; bit 2 mask
-	tsb.w $00d8	 ; Set bit 2 in flags
+	tsb.w !system_flags_4	 ; Set bit 2 in flags
 	rep #$30		; 16-bit A/X/Y
 	rts ; Return
 
@@ -7269,7 +7269,7 @@ Graphics_ProcessStream:
 
 ; Check if special processing mode
 	lda.w #$0008	; bit 3 mask
-	and.w $00db	 ; Test flag
+	and.w !system_flags_6	 ; Test flag
 	beq Graphics_ProcessStream_Normal ; Normal processing
 
 ; Special mode with synchronization
@@ -8401,15 +8401,15 @@ Graphics_BankSwitch:
 	sta.b $19	   ; Set new bank
 	stx.b $17	   ; Set new pointer
 	lda.b #$08	  ; Load flag bit $08
-	and.w $00db	 ; Test current flag state
+	and.w !system_flags_6	 ; Test current flag state
 	php ; Save flag state
 	lda.b #$08	  ; Load flag bit $08
-	trb.w $00db	 ; Clear flag
+	trb.w !system_flags_6	 ; Clear flag
 	jsr.w ProcessGraphicsData ; Execute in new context (external)
 	plp ; Restore flag state
 	beq IfFlagWasClearSkipRestore ; If flag was clear, skip restore
 	lda.b #$08	  ; Load flag bit
-	tsb.w $00db	 ; Restore flag to set state
+	tsb.w !system_flags_6	 ; Restore flag to set state
 
 Graphics_RestoreContext:
 	xba ; Get old bank from B
@@ -8572,15 +8572,15 @@ Graphics_ExecSubroutine:
 	lda.b $62	   ; Load subroutine address
 	sta.b $17	   ; Set as pointer
 	lda.w #$0008	; Load flag $08
-	and.w $00db	 ; Test current state
+	and.w !system_flags_6	 ; Test current state
 	php ; Save flag state
 	lda.w #$0008	; Load flag $08
-	tsb.w $00db	 ; Set flag
+	tsb.w !system_flags_6	 ; Set flag
 	jsr.w ProcessGraphicsData ; Execute subroutine (external)
 	plp ; Restore flag state
 	bne IfFlagWasSetKeepIt ; If flag was set, keep it
 	lda.w #$0008	; Load flag $08
-	trb.w $00db	 ; Clear flag
+	trb.w !system_flags_6	 ; Clear flag
 
 Graphics_RestoreState:
 	pla ; Restore $3d
@@ -11185,7 +11185,7 @@ Tilemap_UpdateMax_Done:
 ;-------------------------------------------------------------------------------
 System_CheckModeJump:
 	lda.w #$0020	; bit 5 mask
-	and.w $00da	 ; Test bit 5 of $da
+	and.w !system_flags_5	 ; Test bit 5 of $da
 	beq System_AlternateModeJump ; If clear, jump to alternate
 	jmp.w CodePointerManipulationCoordinateCalculations ; Jump to routine A
 
@@ -11385,7 +11385,7 @@ Sprite_SetupCharacter:
 	sep #$20		; 8-bit accumulator
 	rep #$10		; 16-bit X/Y
 	lda.b #$10	  ; bit 4 mask
-	and.w $00da	 ; Test bit 4 of $da
+	and.w !system_flags_5	 ; Test bit 4 of $da
 	beq Sprite_SetupCharacter_Normal ; If clear, normal mode
 	lda.b #$04	  ; Mode 4 (battle mode)
 	sta.b $24	   ; Store sprite mode
@@ -11634,7 +11634,7 @@ Sprite_DisplayCharacter:
 Sprite_DisplayCharacter_Do:
 	sta.b $64	   ; Store position offset
 	lda.b #$02	  ; bit 1 mask
-	tsb.w $00d4	 ; Set bit 1 of $d4
+	tsb.w !system_flags_2	 ; Set bit 1 of $d4
 	jsl.l AddressC8000OriginalCode ; Call external sprite display
 
 
@@ -11887,7 +11887,7 @@ IRQ_JitterFix_Loop:
 	lda.w SNES_OPVCT ; Read vertical counter
 	sta.w $0118	 ; Store V counter
 	lda.b #$40	  ; bit 6 mask
-	and.w $00da	 ; Test bit 6 of $da
+	and.w !system_flags_5	 ; Test bit 6 of $da
 	bne IRQ_JitterFix_Skip ; If set, skip jitter calc
 	lda.w $0118	 ; Load V counter
 	asl a; × 2
@@ -11940,7 +11940,7 @@ IRQ_ScreenOn:
 	lda.w $0112	 ; Load interrupt mode
 	sta.w SNES_NMITIMEN ; Set interrupt mode
 	lda.b #$40	  ; bit 6
-	tsb.w $00d8	 ; Set bit 6 of $d8
+	tsb.w !system_flags_4	 ; Set bit 6 of $d8
 	ply ; Restore Y
 	pld ; Restore direct page
 	rti ; Return from interrupt
@@ -11971,7 +11971,7 @@ IRQ_JitterFix2_Loop:
 	lda.w SNES_OPVCT ; Read vertical counter
 	sta.w $0118	 ; Store V counter
 	lda.b #$40	  ; bit 6 mask
-	and.w $00da	 ; Test bit 6 of $da
+	and.w !system_flags_5	 ; Test bit 6 of $da
 	bne IRQ_JitterFix2_Skip ; If set, skip jitter calc
 	lda.w $0118	 ; Load V counter
 	asl a; × 2
@@ -12024,7 +12024,7 @@ IRQ_ScreenOn2:
 	lda.w $0112	 ; Load interrupt mode
 	sta.w $4200	 ; Set interrupt mode (direct)
 	lda.b #$20	  ; bit 5
-	tsb.w $00d8	 ; Set bit 5 of $d8
+	tsb.w !system_flags_4	 ; Set bit 5 of $d8
 	ply ; Restore Y
 	pld ; Restore direct page
 	rti ; Return from interrupt
@@ -12149,7 +12149,7 @@ Game_Initialize:
 	rep #$30		; 16-bit A/X/Y
 	pea.w $5555	 ; Push $5555 (init marker?)
 	lda.w #$0080	; bit 7
-	tsb.w $00d6	 ; Set bit 7 of $d6
+	tsb.w !system_flags_3	 ; Set bit 7 of $d6
 	jsl.l AddressC8000OriginalCode ; Call Bank $0c init
 	jsr.w System_Init ; Initialization routine
 	stz.b $01	   ; Clear $01
@@ -12161,7 +12161,7 @@ Game_Initialize:
 	tsc ; Transfer stack to A
 	sta.w $0105	 ; Save stack pointer
 	lda.w #$0080	; bit 7
-	tsb.w $00de	 ; Set bit 7 of $de
+	tsb.w !system_flags_8	 ; Set bit 7 of $de
 	pei.b ($01)	 ; Save $01
 	pei.b ($03)	 ; Save $03
 	lda.w #$0401	; Load $0401
@@ -12432,7 +12432,7 @@ System_Init:
 	lda.b #$80	  ; VRAM increment after high byte
 	sta.b SNES_VMAINC-$2100 ; Set VRAM increment mode
 	rep #$30		; 16-bit A/X/Y
-	stz.w $00f0	 ; Clear $f0
+	stz.w !state_marker	 ; Clear $f0
 	ldx.w #$0000	; VRAM address $0000
 	stx.b SNES_VMADDL-$2100 ; Set VRAM address
 	pea.w $0007	 ; Bank $07
@@ -12620,7 +12620,7 @@ Screen_SetUpdateFlag:
 	php ; Save processor status
 	sep #$30		; 8-bit A/X/Y
 	lda.b #$01	  ; bit 0 mask
-	tsb.w $00d8	 ; Set bit 0 of $d8
+	tsb.w !system_flags_4	 ; Set bit 0 of $d8
 	plp ; Restore processor status
 
 ;-------------------------------------------------------------------------------
@@ -12647,14 +12647,14 @@ Screen_TransitionReset:
 	phd ; Save direct page
 	rep #$30		; 16-bit A/X/Y
 	lda.w #$0010	; bit 4 mask
-	trb.w $00d6	 ; Clear bit 4 of $d6
+	trb.w !system_flags_3	 ; Clear bit 4 of $d6
 	lda.w $0e00	 ; Load state marker
 	pha ; Save on stack
-	stz.w $008e	 ; Clear $8e
+	stz.w !game_state_value	 ; Clear $8e
 	jsl.l FinalSetupRoutine ; External routine
 	jsr.w System_Init ; Initialize system
 	lda.w #$0001	; bit 0 mask
-	and.w $00d8	 ; Test bit 0 of $d8
+	and.w !system_flags_4	 ; Test bit 0 of $d8
 	bne Screen_TransitionReset_Alt ; If set, alternate path
 	jsr.w CodeCodeConditionalScreenSetup ; Screen setup routine 1
 	bra Screen_TransitionReset_Continue ; Continue
@@ -12666,7 +12666,7 @@ Screen_TransitionReset_Continue:
 	ldx.w #$be80	; Data pointer
 	jsr.w CodeLikelyLoadsProcessesThisData ; Update menu
 	lda.w #$0020	; bit 5 mask
-	tsb.w $00d2	 ; Set bit 5 of $d2
+	tsb.w !system_flags_1	 ; Set bit 5 of $d2
 	jsl.l InitializePaletteSystem ; External routine
 	lda.w #$00a0	; Load $a0
 	sta.w $01f0	 ; Store in $01f0
@@ -12738,7 +12738,7 @@ Screen_UpdateFull:
 	jsl.l FinalSystemInitialization ; External routine
 	jsr.w ImportedSegmentCodeCode ; External routine
 	lda.b #$10	  ; bit 4 mask
-	tsb.w $00d6	 ; Set bit 4 of $d6
+	tsb.w !system_flags_3	 ; Set bit 4 of $d6
 	ldx.w #$fff0	; Load $fff0
 	stx.b $8e	   ; Store in $8e
 	pld ; Restore direct page
@@ -12811,7 +12811,7 @@ Menu_Handler:
 	phk ; Push program bank
 	plb ; Set data bank
 	lda.w #$0001	; bit 0 mask
-	and.w $00d8	 ; Test bit 0 of $d8
+	and.w !system_flags_4	 ; Test bit 0 of $d8
 	bne Menu_Handler_AltMode ; If set, alternate mode
 	lda.w #$fff0	; Load $fff0
 	sta.b $8e	   ; Store in $8e
@@ -12864,7 +12864,7 @@ Menu_Handler_AltMode:
 	jsr.w Input_PollWithToggle ; Poll input
 	bne Menu_Handler_Update ; If button pressed, process
 	lda.b #$01	  ; bit 0 mask
-	trb.w $00d8	 ; Clear bit 0 of $d8
+	trb.w !system_flags_4	 ; Clear bit 0 of $d8
 	bit.w #$0080	; Test B button
 	bne Menu_Handler_AltCancel ; If pressed, cancel
 	bit.w #$8000	; Test A button
@@ -12883,7 +12883,7 @@ Menu_Handler_AltCancel:
 
 Menu_Handler_Cancel:
 	lda.b #$01	  ; bit 0 mask
-	trb.w $00d8	 ; Clear bit 0 of $d8
+	trb.w !system_flags_4	 ; Clear bit 0 of $d8
 
 
 Menu_Handler_Update:
@@ -12927,7 +12927,7 @@ Menu_PartySelection:
 	rep #$10		; 16-bit index
 	sta.w $04e0	 ; Store menu parameter
 	lda.b #$04	  ; Menu active flag
-	tsb.w $00da	 ; Set bit 2 in flags
+	tsb.w !system_flags_5	 ; Set bit 2 in flags
 	pei.b ($8e)	 ; Save position
 	pei.b ($01)	 ; Save option
 	pei.b ($03)	 ; Save menu type
@@ -13165,7 +13165,7 @@ Menu_MultiOption_Process:
 ;-------------------------------------------------------------------------------
 Menu_Item_CleanupReturn:
 	lda.b #$04	  ; bit 2 mask
-	trb.w $00da	 ; Clear bit 2 of $da
+	trb.w !system_flags_5	 ; Clear bit 2 of $da
 	ldx.w #$bf48	; Menu data
 	jsr.w CodeLikelyLoadsProcessesThisData ; Update menu
 	plx ; Restore X
@@ -13595,7 +13595,7 @@ SystemData_Config13:
 ;-------------------------------------------------------------------------------
 Menu_BattleSettings:
 	lda.w #$0020	; bit 5 mask
-	tsb.w $00d6	 ; Set bit 5 of $d6
+	tsb.w !system_flags_3	 ; Set bit 5 of $d6
 	lda.w #$0602	; Menu mode $0602
 	sta.b $03	   ; Store in $03
 	lda.w #$bff0	; Load $bff0
@@ -13625,7 +13625,7 @@ Menu_BattleSettings_InputLoop:
 	jsr.w Anim_SetMode10 ; Set animation mode $10
 	stz.b $8e	   ; Clear $8e
 	lda.w #$0020	; bit 5 mask
-	trb.w $00d6	 ; Clear bit 5 of $d6
+	trb.w !system_flags_3	 ; Clear bit 5 of $d6
 
 
 ;-------------------------------------------------------------------------------
@@ -13867,7 +13867,7 @@ Menu_SaveDelete_Confirm:
 	sta.w $010e	 ; Store slot index
 	jsr.w GetSaveSlotAddress2 ; Get save slot address
 	lda.w #$0040	; bit 6 mask
-	tsb.w $00de	 ; Set bit 6 of $de
+	tsb.w !system_flags_8	 ; Set bit 6 of $de
 	jsr.w MainRoutine ; Clear save data
 	ldx.w #$c3d8	; Menu data
 	jsr.w CodeLikelyLoadsProcessesThisData ; Update menu
@@ -13897,10 +13897,10 @@ Menu_SaveDelete_UpdateDisplay:
 	lda.b #$e0	  ; Load $e0
 	sta.l $7f56da,x ; Store to WRAM indexed
 	lda.b #$08	  ; bit 3 mask
-	tsb.w $00d4	 ; Set bit 3
+	tsb.w !system_flags_2	 ; Set bit 3
 	jsl.l AddressC8000OriginalCode ; Call external routine
 	lda.b #$08	  ; bit 3 mask
-	trb.w $00d4	 ; Clear bit 3
+	trb.w !system_flags_2	 ; Clear bit 3
 	rep #$30		; 16-bit A/X/Y
 	jmp.w Menu_SaveDelete_InputLoop ; Jump back to loop
 
@@ -14427,11 +14427,11 @@ Screen_WaitForUpdate:
 	php ;00C795|08      |      ;
 	sep #$20		;00C796|E220    |      ;
 	lda.b #$80	  ;00C798|A980    |      ;
-	trb.w $00d6	 ;00C79A|1CD600  |0000D6;
-	lda.w $00aa	 ;00C79D|ADAA00  |0000AA;
+	trb.w !system_flags_3	 ;00C79A|1CD600  |0000D6;
+	lda.w !brightness_value	 ;00C79D|ADAA00  |0000AA;
 	and.b #$f0	  ;00C7A0|29F0    |      ;
 	sta.w !battle_ready_flag	 ;00C7A2|8D1001  |000110;
-	lda.w $00aa	 ;00C7A5|ADAA00  |0000AA;
+	lda.w !brightness_value	 ;00C7A5|ADAA00  |0000AA;
 
 Screen_WaitForUpdate_Loop:
 	cmp.w !battle_ready_flag	 ;00C7A8|CD1001  |000110;
@@ -14448,7 +14448,7 @@ Screen_FadeOut:
 	php ;00C7B8|08      |      ;
 	sep #$20		;00C7B9|E220    |      ;
 	lda.w !battle_ready_flag	 ;00C7BB|AD1001  |010110;
-	sta.w $00aa	 ;00C7BE|8DAA00  |0100AA;
+	sta.w !brightness_value	 ;00C7BE|8DAA00  |0100AA;
 
 Screen_FadeOut_Loop:
 	bit.b #$0f	  ;00C7C1|890F    |      ;
@@ -14460,7 +14460,7 @@ Screen_FadeOut_Loop:
 
 Screen_FadeOut_Done:
 	lda.b #$80	  ;00C7CF|A980    |      ;
-	tsb.w $00d6	 ;00C7D1|0CD600  |0100D6;
+	tsb.w !system_flags_3	 ;00C7D1|0CD600  |0100D6;
 	lda.b #$80	  ;00C7D4|A980    |      ;
 	sta.w $2100	 ;00C7D6|8D0021  |012100;
 	sta.w !battle_ready_flag	 ;00C7D9|8D1001  |010110;
@@ -14496,7 +14496,7 @@ Menu_Init_Status_Continue:
 	lda.w #$0005	;00C816|A90500  |      ;
 	mvn $00,$00	 ;00C819|540000  |      ;
 	lda.w #$0020	;00C81C|A92000  |      ;
-	tsb.w $00d2	 ;00C81F|0CD200  |0000D2;
+	tsb.w !system_flags_1	 ;00C81F|0CD200  |0000D2;
 	jsr.w Screen_Setup1 ;00C822|2007C6  |00C607;
 	ldx.w #$51c5	;00C825|A2C551  |      ;
 	ldy.w #$5015	;00C828|A01550  |      ;
@@ -14517,12 +14517,12 @@ Menu_Init_Status_Continue:
 ; Menu initialization and game state management
 Menu_Init_SetBit6:
 	lda.w #$0040	;00C84C|A94000  |      ;
-	tsb.w $00db	 ;00C84F|0CDB00  |0000DB;
+	tsb.w !system_flags_6	 ;00C84F|0CDB00  |0000DB;
 	bra Menu_Init_Common ;00C852|8006    |00C85A;
 
 Menu_Init_SetBit0:
 	lda.w #$0001	;00C854|A90100  |      ;
-	tsb.w $00da	 ;00C857|0CDA00  |0000DA;
+	tsb.w !system_flags_5	 ;00C857|0CDA00  |0000DA;
 
 Menu_Init_Common:
 	jsr.w Screen_Setup3 ;00C85A|2023C6  |00C623;
@@ -14546,7 +14546,7 @@ Menu_Init_ClearBit7:
 
 Menu_Init_SetBit7:
 	lda.w #$0080	;00C87A|A98000  |      ;
-	tsb.w $00db	 ;00C87D|0CDB00  |0000DB;
+	tsb.w !system_flags_6	 ;00C87D|0CDB00  |0000DB;
 	ldx.w #$c91c	;00C880|A21CC9  |      ;
 	bra Menu_Init_UpdateMenu ;00C883|8018    |00C89D;
 
@@ -14560,7 +14560,7 @@ Menu_Init_LoadCharacter_Continue:
 	sta.b $01	   ;00C890|8501    |000001;
 	sta.b $05	   ;00C892|8505    |000005;
 	lda.w #$0002	;00C894|A90200  |      ;
-	tsb.w $00da	 ;00C897|0CDA00  |0000DA;
+	tsb.w !system_flags_5	 ;00C897|0CDA00  |0000DA;
 	ldx.w #$c922	;00C89A|A222C9  |      ;
 
 Menu_Init_UpdateMenu:
@@ -14888,36 +14888,36 @@ GameState_CheckFlags:
 	tcd ;00CAC4|5B      |      ;
 	sep #$20		;00CAC5|E220    |      ;
 	lda.b #$01	  ;00CAC7|A901    |      ;
-	and.w $00da	 ;00CAC9|2DDA00  |0000DA;
+	and.w !system_flags_5	 ;00CAC9|2DDA00  |0000DA;
 	bne GameState_Flag1Set ;00CACC|D01E    |00CAEC;
 	lda.b #$40	  ;00CACE|A940    |      ;
-	and.w $00db	 ;00CAD0|2DDB00  |0000DB;
+	and.w !system_flags_6	 ;00CAD0|2DDB00  |0000DB;
 	bne GameState_Flag40Set ;00CAD3|D032    |00CB07;
 	ldx.w #$9300	;00CAD5|A20093  |      ;
 	stx.w SNES_CGSWSEL ;00CAD8|8E3021  |002130;
 	lda.b #$02	  ;00CADB|A902    |      ;
-	and.w $00da	 ;00CADD|2DDA00  |0000DA;
+	and.w !system_flags_5	 ;00CADD|2DDA00  |0000DA;
 	bne GameState_FlagCheck2 ;00CAE0|D02F    |00CB11;
 	lda.b #$80	  ;00CAE2|A980    |      ;
-	and.w $00db	 ;00CAE4|2DDB00  |0000DB;
+	and.w !system_flags_6	 ;00CAE4|2DDB00  |0000DB;
 	bne GameState_Flag80Set ;00CAE7|D065    |00CB4E;
 	jmp.w GameState_FlagsComplete ;00CAE9|4C76CB  |00CB76;
 
 GameState_Flag1Set:
 	lda.b #$01	  ;00CAEC|A901    |      ;
-	trb.w $00da	 ;00CAEE|1CDA00  |0000DA;
+	trb.w !system_flags_5	 ;00CAEE|1CDA00  |0000DA;
 	jsr.w Screen_ColorProcessor ;00CAF1|2009CC  |00CC09;
 	ldx.w #$5555	;00CAF4|A25555  |      ;
 	stx.w $0e04	 ;00CAF7|8E040E  |000E04;
 	stx.w $0e06	 ;00CAFA|8E060E  |000E06;
 	stx.w $0e08	 ;00CAFD|8E080E  |000E08;
 	lda.b #$80	  ;00CB00|A980    |      ;
-	trb.w $00de	 ;00CB02|1CDE00  |0000DE;
+	trb.w !system_flags_8	 ;00CB02|1CDE00  |0000DE;
 	bra GameState_RestoreAndExit ;00CB05|8072    |00CB79;
 
 GameState_Flag40Set:
 	lda.b #$40	  ;00CB07|A940    |      ;
-	trb.w $00db	 ;00CB09|1CDB00  |0000DB;
+	trb.w !system_flags_6	 ;00CB09|1CDB00  |0000DB;
 	jsr.w Sub_00CCBD ;00CB0C|20BDCC  |00CCBD;
 	bra GameState_RestoreAndExit ;00CB0F|8068    |00CB79;
 ; ==============================================================================
@@ -14933,7 +14933,7 @@ GameState_FlagCheck2:
 	mvn $00,$00	 ;00CB1F|540000  |      ;
 	sep #$20		;00CB22|E220    |      ;
 	lda.b #$80	  ;00CB24|A980    |      ;
-	tsb.w $00de	 ;00CB26|0CDE00  |0000DE;
+	tsb.w !system_flags_8	 ;00CB26|0CDE00  |0000DE;
 	jsr.w Sub_00CD60 ;00CB29|2060CD  |00CD60;
 	jsr.w Sub_00CBC6 ;00CB2C|20C6CB  |00CBC6;
 	jsl.l AddressC8000OriginalCode ;00CB2F|2200800C|0C8000;
@@ -14942,9 +14942,9 @@ GameState_FlagCheck2:
 	sta.l $7f56d8,x ;00CB39|9FD8567F|7F56D8;
 	jsl.l AddressC8000OriginalCode ;00CB3D|2200800C|0C8000;
 	lda.b #$02	  ;00CB41|A902    |      ;
-	trb.w $00da	 ;00CB43|1CDA00  |0000DA;
+	trb.w !system_flags_5	 ;00CB43|1CDA00  |0000DA;
 	lda.b #$08	  ;00CB46|A908    |      ;
-	trb.w $00d4	 ;00CB48|1CD400  |0000D4;
+	trb.w !system_flags_2	 ;00CB48|1CD400  |0000D4;
 	jmp.w Sub_00981B ;00CB4B|4C1B98  |00981B;
 
 GameState_Flag80Set:
@@ -14957,9 +14957,9 @@ GameState_Flag80Set:
 	sta.l $7f56de   ;00CB61|8FDE567F|7F56DE;
 	jsl.l AddressC8000OriginalCode ;00CB65|2200800C|0C8000;
 	lda.b #$80	  ;00CB69|A980    |      ;
-	trb.w $00db	 ;00CB6B|1CDB00  |0000DB;
+	trb.w !system_flags_6	 ;00CB6B|1CDB00  |0000DB;
 	lda.b #$08	  ;00CB6E|A908    |      ;
-	trb.w $00d4	 ;00CB70|1CD400  |0000D4;
+	trb.w !system_flags_2	 ;00CB70|1CD400  |0000D4;
 	jmp.w Sub_00981B ;00CB73|4C1B98  |00981B;
 
 GameState_FlagsComplete:
@@ -14984,7 +14984,7 @@ GameState_DataCopy:
 	mvn $7f,$00	 ;00CB9D|547F00  |      ;
 	plb ;00CBA0|AB      |      ;
 	lda.w #$0080	;00CBA1|A98000  |      ;
-	tsb.w $00da	 ;00CBA4|0CDA00  |0000DA;
+	tsb.w !system_flags_5	 ;00CBA4|0CDA00  |0000DA;
 	lda.w #$0020	;00CBA7|A92000  |      ;
 	tsb.w $0111	 ;00CBAA|0C1101  |000111;
 	lda.b $02	   ;00CBAD|A502    |000002;
@@ -14994,7 +14994,7 @@ GameState_DataCopy:
 	tax ;00CBB4|AA      |      ;
 	sep #$20		;00CBB5|E220    |      ;
 	lda.b #$08	  ;00CBB7|A908    |      ;
-	tsb.w $00d4	 ;00CBB9|0CD400  |0000D4;
+	tsb.w !system_flags_2	 ;00CBB9|0CD400  |0000D4;
 	rts ;00CBBC|60      |      ;
 
 SystemData_Config33:
@@ -15029,12 +15029,12 @@ Screen_BrightnessMax:
 	sta.l $7f56d8,x ;00CBFB|9FD8567F|7F56D8;
 	jsl.l AddressC8000OriginalCode ;00CBFF|2200800C|0C8000;
 	lda.b #$08	  ;00CC03|A908    |      ;
-	trb.w $00d4	 ;00CC05|1CD400  |0000D4;
+	trb.w !system_flags_2	 ;00CC05|1CD400  |0000D4;
 	rts ;00CC08|60      |      ;
 
 Screen_ColorProcessor:
 	lda.b #$08	  ;00CC09|A908    |      ;
-	tsb.w $00d4	 ;00CC0B|0CD400  |0000D4;
+	tsb.w !system_flags_2	 ;00CC0B|0CD400  |0000D4;
 	ldx.w #$0007	;00CC0E|A20700  |      ;
 
 Screen_ColorProcessLoop:
@@ -15057,11 +15057,11 @@ Screen_ColorProcessLoop:
 	dex ;00CC48|CA      |      ;
 	bne D0c6 ;00CC49|D0C6    |00CC11;
 	lda.b #$08	  ;00CC4B|A908    |      ;
-	trb.w $00d4	 ;00CC4D|1CD400  |0000D4;
+	trb.w !system_flags_2	 ;00CC4D|1CD400  |0000D4;
 	lda.b #$20	  ;00CC50|A920    |      ;
 	trb.w $0111	 ;00CC52|1C1101  |000111;
 	lda.b #$80	  ;00CC55|A980    |      ;
-	trb.w $00da	 ;00CC57|1CDA00  |0000DA;
+	trb.w !system_flags_5	 ;00CC57|1CDA00  |0000DA;
 	rts ;00CC5A|60      |      ;
 
 Screen_ColorAdjust:

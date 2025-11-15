@@ -91,6 +91,31 @@
 !window_2_right     = $37       ; Window 2 right boundary position
 
 ; ----------------------------------------------------------------------------
+; System State Flags ($00d2-$00e2, $008e, $00aa, $00f0)
+; ----------------------------------------------------------------------------
+; These flags control various system states, updated via tsb/trb bitwise operations
+!system_flags_1     = $00d2     ; System flags byte 1 (sprite update, menu state)
+!system_flags_2     = $00d4     ; System flags byte 2 (VRAM update flags, game state)
+!system_flags_3     = $00d6     ; System flags byte 3 (display flags, rendering state)
+!system_flags_4     = $00d8     ; System flags byte 4 (character/menu state)
+!system_flags_5     = $00da     ; System flags byte 5 (controller/menu mode, heavily tested)
+!system_flags_6     = $00db     ; System flags byte 6 (game state flags)
+!system_flags_7     = $00dd     ; System flags byte 7 (system state)
+!system_flags_8     = $00de     ; System flags byte 8 (game mode flags)
+!system_flags_9     = $00e2     ; System flags byte 9 (state control)
+!game_state_value   = $008e     ; Game state value (16-bit, often #$fff0)
+!brightness_value   = $00aa     ; Screen brightness value (#$0f = full)
+!state_marker       = $00f0     ; State marker (#$ff00 or #$0000)
+
+; ----------------------------------------------------------------------------
+; Graphics Transfer Addresses ($00f2, $00f4, $00f5, $00f7)
+; ----------------------------------------------------------------------------
+!tilemap1_addr      = $00f2     ; Tilemap 1 source address (invalidated with #$ffff)
+!tile_offset_1      = $00f4     ; Tile offset parameter 1
+!tilemap2_addr      = $00f5     ; Tilemap 2 source address (invalidated with #$ffff)
+!tile_offset_2      = $00f7     ; Tile offset parameter 2
+
+; ----------------------------------------------------------------------------
 ; Player State ($40-$5f)
 ; ----------------------------------------------------------------------------
 !player_x_pos       = $40       ; Player X position (2 bytes: $40-$41)
