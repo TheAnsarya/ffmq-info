@@ -7,11 +7,11 @@ WaitForVBlank:
 	sep #$20                             ;0C8001|E220    |      ;
 	pha                                  ;0C8003|48      |      ;
 	lda.B #$40                           ;0C8004|A940    |      ;
-	trb.W $00d8                          ;0C8006|1CD800  |0000D8;
+	trb.w !system_flags_4                          ;0C8006|1CD800  |0000D8;
 ;      |        |      ;
 VBlankWaitLoop:
 	lda.B #$40                           ;0C8009|A940    |      ;
-	and.W $00d8                          ;0C800B|2DD800  |0000D8;
+	and.w !system_flags_4                          ;0C800B|2DD800  |0000D8;
 	beq VBlankWaitLoop                      ;0C800E|F0F9    |0C8009;
 	pla                                  ;0C8010|68      |      ;
 	plp                                  ;0C8011|28      |      ;
@@ -83,13 +83,13 @@ InitWorldMapDisplay:
 	lda.W #$2100                         ;0C808B|A90021  |      ;
 	tcd                                  ;0C808E|5B      |      ;
 	sep #$20                             ;0C808F|E220    |      ;
-	stz.W $0111                          ;0C8091|9C1101  |000111;
-	stz.W $00d2                          ;0C8094|9CD200  |0000D2;
-	stz.W $00d4                          ;0C8097|9CD400  |0000D4;
+	stz.w !system_interrupt_flags                          ;0C8091|9C1101  |000111;
+	stz.w !system_flags_1                          ;0C8094|9CD200  |0000D2;
+	stz.w !system_flags_2                          ;0C8097|9CD400  |0000D4;
 	lda.B #$08                           ;0C809A|A908    |      ;
-	tsb.W $00d2                          ;0C809C|0CD200  |0000D2;
+	tsb.w !system_flags_1                          ;0C809C|0CD200  |0000D2;
 	lda.B #$40                           ;0C809F|A940    |      ;
-	tsb.W $00d6                          ;0C80A1|0CD600  |0000D6;
+	tsb.w !system_flags_3                          ;0C80A1|0CD600  |0000D6;
 	lda.B #$62                           ;0C80A4|A962    |      ;
 	sta.B SNES_OBJSEL-$2100              ;0C80A6|8501    |002101;
 	lda.B #$07                           ;0C80A8|A907    |      ;
@@ -104,7 +104,7 @@ InitWorldMapDisplay:
 	cli                                  ;0C80BD|58      |      ;
 	lda.B #$0f                           ;0C80BE|A90F    |      ;
 	sta.W $00aa                          ;0C80C0|8DAA00  |0C00AA;
-	stz.W $0110                          ;0C80C3|9C1001  |0C0110;
+	stz.w !battle_ready_flag                          ;0C80C3|9C1001  |0C0110;
 	jsl.L CallMainGameLoopHandler                    ;0C80C6|2295C700|00C795;
 	jsr.W InitializeWorldData                    ;0C80CA|20AD8B  |0C8BAD;
 	jsr.W ClearVRAMRegion                    ;0C80CD|206F89  |0C896F;
@@ -127,7 +127,7 @@ InitWorldMapDisplay:
 	jsl.L GameStateHandler                    ;0C80F7|22B8C700|00C7B8;
 	sei                                  ;0C80FB|78      |      ;
 	lda.W #$0008                         ;0C80FC|A90800  |      ;
-	trb.W $00d2                          ;0C80FF|1CD200  |0C00D2;
+	trb.w !system_flags_1                          ;0C80FF|1CD200  |0C00D2;
 	rtl                                  ;0C8102|6B      |      ;
 ;      |        |      ;
 ;      |        |      ;
@@ -147,7 +147,7 @@ SetupWorldMapGraphics:
 	jsr.W Mode7_ConfigureTilemap                    ;0C8124|207288  |0C8872;
 	jsr.W ClearDisplayFlags                    ;0C8127|20E987  |0C87E9;
 	lda.B #$40                           ;0C812A|A940    |      ;
-	trb.W $00d6                          ;0C812C|1CD600  |0C00D6;
+	trb.w !system_flags_3                          ;0C812C|1CD600  |0C00D6;
 	jsl.L WaitForVBlank                    ;0C812F|2200800C|0C8000;
 	lda.B #$01                           ;0C8133|A901    |      ;
 	sta.B SNES_BGMODE-$2100              ;0C8135|8505    |002105;
@@ -874,7 +874,7 @@ InitializeOAMData:
 	db $80,$6f,$c8,$00,$90,$6f,$ca,$00,$a0,$6f,$cc,$00,$b0,$6f,$ce,$00;0C87D9|        |      ;
 ;      |        |      ;
 ClearDisplayFlags:
-	stz.W $0111                          ;0C87E9|9C1101  |0C0111;
+	stz.w !system_interrupt_flags                          ;0C87E9|9C1101  |0C0111;
 	rts                                  ;0C87EC|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
@@ -931,7 +931,7 @@ Mode7_CalculateMatrix:
 	sta.W $4317                          ;0C885F|8D1743  |0C4317;
 	sta.W $4327                          ;0C8862|8D2743  |0C4327;
 	lda.B #$06                           ;0C8865|A906    |      ;
-	sta.W $0111                          ;0C8867|8D1101  |0C0111;
+	sta.w !system_interrupt_flags                          ;0C8867|8D1101  |0C0111;
 	rts                                  ;0C886A|60      |      ;
 ;      |        |      ;
 	db $ff,$10,$00,$d1,$0e,$01,$00       ;0C886B|        |      ;

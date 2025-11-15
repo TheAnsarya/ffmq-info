@@ -65,7 +65,7 @@ DMA_TransferToVRAM_Ch5:
 DMA_TransferPalette:
 ; Check if palette DMA is requested
 	lda.B #$80                      ; Check bit 7
-	and.W $00d2                     ; Test flag byte
+	and.w !system_flags_1                     ; Test flag byte
 	beq .noPaletteDMA               ; Skip if not set
 
 ; Setup for palette transfer
@@ -107,7 +107,7 @@ DMA_TransferPalette:
 DMA_TransferTileData:
 ; Clear tile transfer flag
 	lda.B #$02                      ; Bit 1
-	trb.W $00d4                     ; Clear in flag byte
+	trb.w !system_flags_2                     ; Clear in flag byte
 
 ; Setup VRAM increment
 	lda.B #$80                      ; Standard increment
@@ -129,7 +129,7 @@ DMA_TransferTileData:
 ; Prepare for transfer
 	rep #$30                        ; 16-bit mode
 	ldx.W #$ff00                    ; Clear mask
-	stx.W $00f0                     ; Store mask
+	stx.w !state_marker                     ; Store mask
 
 ; Check transfer mode
 	ldx.W $0062                     ; Check transfer type

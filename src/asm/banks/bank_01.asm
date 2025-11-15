@@ -238,7 +238,7 @@ Field_MainLoop:
 	ldx.W $0e89                          ;018290|AE890E  |010E89;
 	stx.w !battle_array_elem_4                          ;018293|8EF119  |0119F1;
 	lda.B #$80                           ;018296|A980    |      ;
-	sta.W $0110                          ;018298|8D1001  |010110;
+	sta.w !battle_ready_flag                          ;018298|8D1001  |010110;
 	jsr.W Field_LoadMap                    ;01829B|204D91  |01914D;
 	lda.W $0e88                          ;01829E|AD880E  |000E88;
 	cmp.B #$15                           ;0182A1|C915    |      ;
@@ -603,7 +603,7 @@ Field_ProcessSprite:
 ;      |        |      ;
 DATA8_018557:
 	db $dc,$86,$5f,$85,$7b,$85,$db,$85   ;018557|        |      ;
-	lda.W $0110                          ;01855F|AD1001  |010110;
+	lda.w !battle_ready_flag                          ;01855F|AD1001  |010110;
 	bpl Field_UpdateSpritePosition                      ;018562|1004    |018568;
 	stz.w !sprite_control                          ;018564|9C451A  |011A45;
 	rts                                  ;018567|60      |      ;
@@ -658,7 +658,7 @@ Field_CalculateSpriteOffset:
 	rts                                  ;0185DA|60      |      ;
 ;      |        |      ;
 	lda.B #$0f                           ;0185DB|A90F    |      ;
-	sta.W $0110                          ;0185DD|8D1001  |010110;
+	sta.w !battle_ready_flag                          ;0185DD|8D1001  |010110;
 	lda.W $080e                          ;0185E0|AD0E08  |01080E;
 	bit.B #$80                           ;0185E3|8980    |      ;
 	bne Field_CheckSpriteFlags                      ;0185E5|D06B    |018652;
@@ -715,13 +715,13 @@ Field_SpriteDataLoop:
 	stx.W $4312                          ;018646|8E1243  |014312;
 	stz.W $4314                          ;018649|9C1443  |014314;
 	lda.B #$02                           ;01864C|A902    |      ;
-	tsb.W $0111                          ;01864E|0C1101  |010111;
+	tsb.w !system_interrupt_flags                          ;01864E|0C1101  |010111;
 	rts                                  ;018651|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
 Field_CheckSpriteFlags:
 	lda.B #$02                           ;018652|A902    |      ;
-	trb.W $0111                          ;018654|1C1101  |010111;
+	trb.w !system_interrupt_flags                          ;018654|1C1101  |010111;
 	stz.W $2123                          ;018657|9C2321  |012123;
 	stz.W $2124                          ;01865A|9C2421  |012124;
 	stz.W $2125                          ;01865D|9C2521  |012125;
@@ -729,7 +729,7 @@ Field_CheckSpriteFlags:
 	sta.W $2130                          ;018663|8D3021  |012130;
 	stz.w !sprite_control                          ;018666|9C451A  |011A45;
 	lda.W $0811                          ;018669|AD1108  |010811;
-	sta.W $0110                          ;01866C|8D1001  |010110;
+	sta.w !battle_ready_flag                          ;01866C|8D1001  |010110;
 	stz.W $2106                          ;01866F|9C0621  |012106;
 	rts                                  ;018672|60      |      ;
 ;      |        |      ;
@@ -2082,11 +2082,11 @@ Field_MapLoadStart:
 ;      |        |      ;
 Field_MapDataLoad:
 	jsl.L CWaitTimingRoutine                    ;0191E2|2200800C|0C8000;
-	lda.W $0110                          ;0191E6|AD1001  |010110;
+	lda.w !battle_ready_flag                          ;0191E6|AD1001  |010110;
 	bpl Field_MapDataLoad                      ;0191E9|10F7    |0191E2;
-	lda.W $0111                          ;0191EB|AD1101  |010111;
+	lda.w !system_interrupt_flags                          ;0191EB|AD1101  |010111;
 	pha                                  ;0191EE|48      |      ;
-	stz.W $0111                          ;0191EF|9C1101  |010111;
+	stz.w !system_interrupt_flags                          ;0191EF|9C1101  |010111;
 	stz.W $420c                          ;0191F2|9C0C42  |01420C;
 	jsl.L CodePpuRegisterConfigurationBattleGraphics                    ;0191F5|221D840B|0B841D;
 	jsr.W Field_LoadMapTiles                    ;0191F9|203684  |018436;
@@ -2112,7 +2112,7 @@ Field_MapDataLoad:
 ;      |        |      ;
 MapEvent_InitComplete:
 	pla                                  ;019234|68      |      ;
-	sta.W $0111                          ;019235|8D1101  |010111;
+	sta.w !system_interrupt_flags                          ;019235|8D1101  |010111;
 	stz.w !battle_phase_counter                          ;019238|9C461A  |011A46;
 	stz.w !battle_turn_counter                          ;01923B|9CAC19  |0119AC;
 	lda.W $0e91                          ;01923E|AD910E  |010E91;
@@ -2211,11 +2211,11 @@ MapEvent_SetupNewMap:
 ;      |        |      ;
 MapEvent_WaitForVBlank:
 	jsl.L CWaitTimingRoutine                    ;019317|2200800C|0C8000;
-	lda.W $0110                          ;01931B|AD1001  |010110;
+	lda.w !battle_ready_flag                          ;01931B|AD1001  |010110;
 	bpl MapEvent_WaitForVBlank                      ;01931E|10F7    |019317;
-	lda.W $0111                          ;019320|AD1101  |010111;
+	lda.w !system_interrupt_flags                          ;019320|AD1101  |010111;
 	pha                                  ;019323|48      |      ;
-	stz.W $0111                          ;019324|9C1101  |010111;
+	stz.w !system_interrupt_flags                          ;019324|9C1101  |010111;
 	stz.W $420c                          ;019327|9C0C42  |01420C;
 	jsl.L CodePpuRegisterConfigurationBattleGraphics                    ;01932A|221D840B|0B841D;
 	jsr.W Field_LoadMapTiles                    ;01932E|203684  |018436;
@@ -2227,7 +2227,7 @@ MapEvent_WaitForVBlank:
 	jsr.W Field_UpdateWorldSprites                    ;019340|206CFE  |01FE6C;
 	jsr.W Field_UpdateSpriteFlags                    ;019343|207386  |018673;
 	pla                                  ;019346|68      |      ;
-	sta.W $0111                          ;019347|8D1101  |010111;
+	sta.w !system_interrupt_flags                          ;019347|8D1101  |010111;
 	jsl.L Sub_00BD2A                    ;01934A|222ABD00|00BD2A;
 	jsr.W Field_EntityCollisionLoop                    ;01934E|202B91  |01912B;
 	inc.w !anim_loop_counter                          ;019351|EEF719  |0019F7;
@@ -6784,7 +6784,7 @@ HDMA_Configure:
 ;      |        |      ;
 HDMA_SetupTable:
 	jsr.W Field_UpdateAndWait                    ;01B529|20D982  |0182D9;
-	dec.W $0110                          ;01B52C|CE1001  |010110;
+	dec.w !battle_ready_flag                          ;01B52C|CE1001  |010110;
 	bne HDMA_SetupTable                      ;01B52F|D0F8    |01B529;
 	rts                                  ;01B531|60      |      ;
 ;      |        |      ;
@@ -6793,10 +6793,10 @@ HDMA_SetupTable:
 ;      |        |      ;
 HDMA_Enable:
 	jsr.W Field_UpdateAndWait                    ;01B536|20D982  |0182D9;
-	lda.W $0110                          ;01B539|AD1001  |010110;
+	lda.w !battle_ready_flag                          ;01B539|AD1001  |010110;
 	cmp.B #$0f                           ;01B53C|C90F    |      ;
 	beq HDMA_Disable                      ;01B53E|F005    |01B545;
-	inc.W $0110                          ;01B540|EE1001  |010110;
+	inc.w !battle_ready_flag                          ;01B540|EE1001  |010110;
 	bra HDMA_Enable                      ;01B543|80F1    |01B536;
 ;      |        |      ;
 ;      |        |      ;

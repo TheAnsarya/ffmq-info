@@ -8226,7 +8226,7 @@ Battle_ProtectReducePhysical:
 	sta.B $7e                            ;02DAAF|857E    |000A7E;
 	stz.W $0af0                          ;02DAB1|9CF00A  |020AF0;
 	lda.B #$0f                           ;02DAB4|A90F    |      ;
-	sta.W $0110                          ;02DAB6|8D1001  |020110;
+	sta.w !battle_ready_flag                          ;02DAB6|8D1001  |020110;
 	lda.W $04af                          ;02DAB9|ADAF04  |0204AF;
 	lsr a;02DABC|4A      |      ;
 	lsr a;02DABD|4A      |      ;
@@ -8316,7 +8316,7 @@ Battle_ProcessRegen:
 	lda.B #$04                           ;02DB71|A904    |      ;
 	mvn $00,$02                          ;02DB73|540002  |      ;
 	lda.B #$80                           ;02DB76|A980    |      ;
-	tsb.W $0111                          ;02DB78|0C1101  |000111;
+	tsb.w !system_interrupt_flags                          ;02DB78|0C1101  |000111;
 	phk                                  ;02DB7B|4B      |      ;
 	plb                                  ;02DB7C|AB      |      ;
 	stz.B $ea                            ;02DB7D|64EA    |000AEA;
@@ -8644,7 +8644,7 @@ UNREACH_02DF5B:
 	sep #$20                             ;02DFB3|E220    |      ;
 	rep #$10                             ;02DFB5|C210    |      ;
 	lda.B #$04                           ;02DFB7|A904    |      ;
-	tsb.W $0111                          ;02DFB9|0C1101  |020111;
+	tsb.w !system_interrupt_flags                          ;02DFB9|0C1101  |020111;
 	plp                                  ;02DFBC|28      |      ;
 	rts                                  ;02DFBD|60      |      ;
 ;      |        |      ;
@@ -9373,7 +9373,7 @@ Battle_MPTurboComplete:
 	rep #$10                             ;02E5C3|C210    |      ;
 	jsr.W Battle_ProcessConcentrate                    ;02E5C5|200FE6  |02E60F;
 	lda.B #$80                           ;02E5C8|A980    |      ;
-	tsb.W $0110                          ;02E5CA|0C1001  |020110;
+	tsb.w !battle_ready_flag                          ;02E5CA|0C1001  |020110;
 	stz.W SNES_TM                          ;02E5CD|9C2C21  |02212C;
 	stz.W SNES_TS                          ;02E5D0|9C2D21  |02212D;
 	stz.W SNES_MOSAIC                          ;02E5D3|9C0621  |022106;
@@ -9427,7 +9427,7 @@ Battle_ProcessConcentrate:
 	sta.W $0aa1                          ;02E664|8DA10A  |020AA1;
 	lda.B #$02                           ;02E667|A902    |      ;
 	jsl.L CWaitTimingRoutine                    ;02E669|2200800C|0C8000;
-	tsb.W $0111                          ;02E66D|0C1101  |020111;
+	tsb.w !system_interrupt_flags                          ;02E66D|0C1101  |020111;
 ;      |        |      ;
 Battle_ApplyConcentrate:
 	sep #$20                             ;02E670|E220    |      ;
@@ -9478,13 +9478,13 @@ Battle_ProcessMagicBarrier:
 	jsl.L CWaitTimingRoutine                    ;02E6C8|2200800C|0C8000;
 	sep #$20                             ;02E6CC|E220    |      ;
 	lda.B #$80                           ;02E6CE|A980    |      ;
-	trb.W $0110                          ;02E6D0|1C1001  |020110;
+	trb.w !battle_ready_flag                          ;02E6D0|1C1001  |020110;
 	bra Battle_ApplyConcentrate                      ;02E6D3|809B    |02E670;
 ;      |        |      ;
 ;      |        |      ;
 Battle_ApplyMagicBarrier:
 	lda.B #$02                           ;02E6D5|A902    |      ;
-	trb.W $0111                          ;02E6D7|1C1101  |020111;
+	trb.w !system_interrupt_flags                          ;02E6D7|1C1101  |020111;
 	stz.W SNES_W12SEL                          ;02E6DA|9C2321  |022123;
 	stz.W SNES_W34SEL                          ;02E6DD|9C2421  |022124;
 	stz.W SNES_WOBJSEL                          ;02E6E0|9C2521  |022125;

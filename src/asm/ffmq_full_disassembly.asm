@@ -179,7 +179,7 @@ Label_008023:
 ; ===========================================================================
 
 	lda.W #$0040            ; A = $0040 (bit 6 = some button?)
-	and.W $00da             ; Mask with controller input at $00da
+	and.w !system_flags_5             ; Mask with controller input at $00da
 	bne Label_00806E         ; If button pressed, skip to alternate path
 
 	jsl.L CodeScreenInitialization       ; Call routine in bank $0c
@@ -285,7 +285,7 @@ Load_0080B0:
 	trb.W $00de             ; Test and reset bit in game flag
 
 	lda.B #$e0              ; Bits 5-7
-	trb.W $0111             ; Test and reset bits
+	trb.w !system_interrupt_flags             ; Test and reset bits
 
 	jsl.L CWaitTimingRoutine       ; Call init routine
 

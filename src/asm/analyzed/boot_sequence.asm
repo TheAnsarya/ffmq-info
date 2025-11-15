@@ -38,7 +38,7 @@ ContinueBootSequence:	; Original: Label_008023
 
 ; Check for specific hardware flag
 	lda.W #$0040                    ; Bit 6 flag
-	and.W $00da                     ; Check flag in zero page
+	and.w !system_flags_5                     ; Check flag in zero page
 	bne SkipDMAFill                 ; If set, skip DMA fill
 
 ; Perform DMA fill operation
@@ -117,7 +117,7 @@ EnterMainLoop:	; Original: Load_0080B0
 	lda.B #$80
 	trb.W $00de                     ; Clear bit 7 of flags
 	lda.B #$e0
-	trb.W $0111                     ; Clear bits 5-7
+	trb.w !system_interrupt_flags                     ; Clear bits 5-7
 
 	jsl.L WaitForVBlank
 

@@ -22,12 +22,12 @@ WaitForVBlank:
 
 ; Clear VBlank flag
 	lda.B #$40                      ; Bit 6 = VBlank flag
-	trb.W $00d8                     ; Clear bit in flag byte
+	trb.w !system_flags_4                     ; Clear bit in flag byte
 
 	.waitLoop:
 ; Poll VBlank flag
 	lda.B #$40                      ; Check bit 6
-	and.W $00d8                     ; Test flag byte
+	and.w !system_flags_4                     ; Test flag byte
 	beq .waitLoop                   ; Loop until VBlank occurs
 
 ; VBlank has occurred
@@ -146,15 +146,15 @@ MenuSystemInit:
 	sep #$20                        ; 8-bit mode
 
 ; Clear menu flags
-	stz.W $0111                     ; Clear general flags
-	stz.W $00d2                     ; Clear DMA flags
-	stz.W $00d4                     ; Clear transfer flags
+	stz.w !system_interrupt_flags                     ; Clear general flags
+	stz.w !system_flags_1                     ; Clear DMA flags
+	stz.w !system_flags_2                     ; Clear transfer flags
 
 ; Set initial flags
 	lda.B #$08                      ; Bit 3
-	tsb.W $00d2                     ; Set in DMA flags
+	tsb.w !system_flags_1                     ; Set in DMA flags
 	lda.B #$40                      ; Bit 6
-	tsb.W $00d6                     ; Set in display flags
+	tsb.w !system_flags_3                     ; Set in display flags
 
 ; Configure PPU for menu mode
 	lda.B #$62                      ; Object base = $6000, size = 16x16
@@ -182,7 +182,7 @@ MenuSystemInit:
 	sta.W $00aa                     ; Store brightness value
 
 ; Clear menu state
-	stz.W $0110                     ; Clear menu state
+	stz.w !battle_ready_flag                     ; Clear menu state
 
 ; Initialize subsystems
 	jsl.L InitializePaletteSystem               ; Initialize palette system
@@ -221,7 +221,7 @@ MenuSystemInit:
 ; Disable interrupts temporarily
 	sei                             ; Set interrupt disable
 	lda.W #$0008                    ; Bit 3
-	trb.W $00d2                     ; Clear in DMA flags
+	trb.w !system_flags_1                     ; Clear in DMA flags
 
 	rtl                             ; Return
 
@@ -257,7 +257,7 @@ LoadMenuContent:
 
 ; Clear display flag
 	lda.B #$40                      ; Bit 6
-	trb.W $00d6                     ; Clear display pending
+	trb.w !system_flags_3                     ; Clear display pending
 
 	jsl.L WaitForVBlank             ; Final sync
 
