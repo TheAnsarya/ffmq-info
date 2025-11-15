@@ -10906,54 +10906,328 @@ Graphics_ClearFlag:
 	lda.B #$c0                           ;00C78F|A9C0    |      ;
 	trb.w !system_interrupt_flags                          ;00C791|1C1101  |000111;
 	rts                                  ;00C794|60      |      ;
-;      |        |      ;
-;      |        |      ;
+;===============================================================================
+; Fade_ReadBrightnessTarget
+;-------------------------------------------------------------------------------
+; Smoothly fades screen brightness from current value up to target value.
+; This function implements a gradual brightening effect by incrementing the
+; brightness level one step at a time with frame-synchronized delays between
+; each step. Used for fade-in transitions where the screen needs to smoothly
+; brighten from a darker state to the target brightness level stored in $00AA.
+;
+; CALLING CONVENTION:
+;   Mode: A = 8-bit or 16-bit (function handles both), X/Y = any, DBR = $00
+;   Call: JSL Fade_ReadBrightnessTarget
+;   Returns: Brightness faded to target value in $00AA
+;   Registers: P flags preserved (PHP/PLP), A/X/Y modified internally
+;
+; OPERATION:
+;   1. Save current processor status (P register) to stack
+;   2. Set 8-bit accumulator mode for byte operations
+;   3. Clear system flag $D6 bit 7 (TRB: test and reset bit atomically)
+;   4. Read target brightness value from $00AA
+;   5. Mask to high nibble only ($F0): $Ex becomes $E0, etc.
+;   6. Store masked value to $0110 (battle_ready_flag, temporary use)
+;   7. Read current brightness value from $00AA again
+;   8. Loop: Compare current brightness with target (masked value)
+;   9. If equal: brightness reached target, exit loop
+;   10. If not equal: increment target counter at $0110
+;   11. Call CWaitTimingRoutine: synchronize to VBlank (one frame delay)
+;   12. Repeat loop until current brightness equals target
+;   13. Restore processor status from stack
+;   14. Return to caller (RTL: long return)
+;
+; BRIGHTNESS REGISTER FORMAT:
+;   SNES INIDISP ($2100) brightness format: %Fbbb_bbbb
+;     F = Force blank bit (bit 7): 1 = screen forced blank, 0 = normal
+;     b = Brightness level (bits 0-3): $0 = black, $F = full brightness
+;   
+;   This function works with $Ex values:
+;     $E0 = Force blank OFF, brightness 0 (black screen)
+;     $E1 = Force blank OFF, brightness 1
+;     $E2 = Force blank OFF, brightness 2
+;     ...
+;     $EF = Force blank OFF, brightness 15 (maximum)
+;
+; TARGET VALUE MASKING:
+;   The function masks the target brightness to the high nibble ($F0):
+;   - If $00AA = $E5, masked value = $E0 (target = brightness 0)
+;   - If $00AA = $E9, masked value = $E0 (target = brightness 0)
+;   - If $00AA = $EF, masked value = $E0 (target = brightness 0)
+;   
+;   This creates a "round down to 0" effect for the low nibble.
+;   The increment loop then counts UP from $E0 to the actual value in $00AA.
+;
+; INCREMENT LOOP MECHANICS:
+;   The loop increments $0110 from masked value (e.g., $E0) toward actual
+;   brightness value (e.g., $E5):
+;   
+;   Iteration 1: $0110 = $E0, $00AA = $E5, not equal → INC → $E1
+;   Iteration 2: $0110 = $E1, $00AA = $E5, not equal → INC → $E2
+;   Iteration 3: $0110 = $E2, $00AA = $E5, not equal → INC → $E3
+;   Iteration 4: $0110 = $E3, $00AA = $E5, not equal → INC → $E4
+;   Iteration 5: $0110 = $E4, $00AA = $E5, not equal → INC → $E5
+;   Iteration 6: $0110 = $E5, $00AA = $E5, EQUAL → Exit
+;   
+;   Each iteration takes ~1 frame (16.7ms @ 60Hz), so 5 steps = ~83ms total.
+;
+; SYSTEM FLAG $D6 BIT 7:
+;   The TRB instruction clears bit 7 of $00D6 atomically:
+;   - Test: Z flag set if bit 7 was 0 before operation
+;   - Reset: Bit 7 cleared to 0 regardless of previous value
+;   - Atomic: No race condition possible (single instruction)
+;   
+;   Bit 7 of $D6 likely indicates "brightness change in progress" or similar.
+;   Clearing it signals that the brightness system is active and transitioning.
+;
+; TEMPORARY REGISTER USAGE:
+;   $0110 (battle_ready_flag): Repurposed as brightness increment counter
+;   - Not actually related to battle ready state in this function
+;   - Used as temporary storage for the incrementing brightness value
+;   - Common pattern in FFMQ: registers have multiple context-dependent uses
+;
+; PERFORMANCE:
+;   - Fixed overhead: ~20 cycles (PHP, SEP, TRB, LDA×2, AND, STA)
+;   - Per-iteration: ~40 cycles (CMP, BEQ, INC, JSL setup, BRA) + frame delay
+;   - Frame delay: ~89,342 cycles @ 2.68MHz (16.7ms @ 60Hz)
+;   - Total: 20 + (N × 89,382) cycles, where N = brightness difference
+;   - Example: $E0 → $E5 = 5 iterations ≈ 446,930 cycles ≈ 166ms
+;
+; COMMON USAGE:
+;   Used after Color_FadeOut when screen needs to brighten back up:
+;   
+;   Color_FadeOut:              ; Instant fade to black ($E0)
+;       lda.B #$E0
+;       sta.w !brightness_value
+;       ; ... other operations ...
+;   
+;   ; Later, fade back in:
+;   Fade_ReadBrightnessTarget:  ; Gradual fade from $E0 to target
+;       ; Brightness stored in $00AA (e.g., $E5)
+;       ; This function fades: $E0 → $E1 → $E2 → $E3 → $E4 → $E5
+;
+; RELATED FUNCTIONS:
+;   - Color_FadeIn ($00CBC6): 5-step fade with dialog execution between steps
+;   - Color_FadeOut ($00CBEC): Instant fade to black
+;   - Fade_SetBrightness ($00C7B8): Sets brightness and fades DOWN to $80
+;   - CWaitTimingRoutine ($0C8000): VBlank synchronization and frame delay
+;
+; REGISTERS MODIFIED:
+;   A: Modified (used for brightness values and comparisons)
+;   X: Preserved (not used)
+;   Y: Preserved (not used)
+;   P: Preserved (PHP at start, PLP at end)
+;   $0110: Modified (used as temporary increment counter)
+;   $D6 bit 7: Cleared (TRB instruction)
+;
+; SAFE TO CALL:
+;   - From any bank (long call via JSL)
+;   - With any processor mode (function handles mode switching)
+;   - During NMI if brightness change needed
+;   - Multiple times (idempotent if target already reached)
+;
+; TECHNICAL NOTES:
+;   1. Asymmetric fade design: This function fades UP gradually, while
+;      Fade_SetBrightness fades DOWN gradually. Both provide smooth transitions
+;      but in opposite directions.
+;   
+;   2. Frame synchronization: Each brightness step occurs on a VBlank boundary
+;      via CWaitTimingRoutine, ensuring glitch-free transitions.
+;   
+;   3. Variable duration: Fade duration depends on brightness difference:
+;      1 step = ~17ms, 5 steps = ~83ms, 15 steps (max) = ~250ms
+;   
+;   4. Register reuse: $0110 (battle_ready_flag) has no battle-related meaning
+;      in this context; it's simply a convenient scratch register.
+;   
+;   5. Masking rationale: The $F0 mask ensures the loop always starts from a
+;      brightness value with low nibble = 0, creating predictable iteration counts.
+;===============================================================================
 Fade_ReadBrightnessTarget:
-	php                                  ;00C795|08      |      ;
-	sep #$20                             ;00C796|E220    |      ;
-	lda.B #$80                           ;00C798|A980    |      ;
-	trb.w !system_flags_3                          ;00C79A|1CD600  |0000D6;
-	lda.w !brightness_value                          ;00C79D|ADAA00  |0000AA;
-	and.B #$f0                           ;00C7A0|29F0    |      ;
-	sta.w !battle_ready_flag                          ;00C7A2|8D1001  |000110;
-	lda.w !brightness_value                          ;00C7A5|ADAA00  |0000AA;
+	php                                  ;00C795|08      |      ; Push processor status: preserve P flags (mode, carry, etc.)
+	sep #$20                             ;00C796|E220    |      ; Set 8-bit accumulator: brightness is byte value
+	lda.B #$80                           ;00C798|A980    |      ; A = $80 (bit 7 mask for system flag)
+	trb.w !system_flags_3                          ;00C79A|1CD600  |0000D6; Test and reset bit 7 of $D6: clear "brightness changing" flag
+	lda.w !brightness_value                          ;00C79D|ADAA00  |0000AA; Load target brightness from $00AA (e.g., $E5)
+	and.B #$f0                           ;00C7A0|29F0    |      ; Mask to high nibble: $E5 becomes $E0 (clear low 4 bits)
+	sta.w !battle_ready_flag                          ;00C7A2|8D1001  |000110; Store masked value to $0110 (temporary counter)
+	lda.w !brightness_value                          ;00C7A5|ADAA00  |0000AA; Load target brightness again (compare value)
 ;      |        |      ;
 Fade_IncrementLoop:
-	cmp.w !battle_ready_flag                          ;00C7A8|CD1001  |000110;
-	beq Fade_DecrementBrightness                      ;00C7AB|F009    |00C7B6;
-	inc.w !battle_ready_flag                          ;00C7AD|EE1001  |000110;
-	jsl.L CWaitTimingRoutine                    ;00C7B0|2200800C|0C8000;
-	bra Fade_IncrementLoop                      ;00C7B4|80F2    |00C7A8;
+	cmp.w !battle_ready_flag                          ;00C7A8|CD1001  |000110; Compare A (target $E5) with counter (current $E0+)
+	beq Fade_DecrementBrightness                      ;00C7AB|F009    |00C7B6; If equal: reached target, exit loop
+	inc.w !battle_ready_flag                          ;00C7AD|EE1001  |000110; Increment counter: $E0 → $E1 → $E2 ... → target
+	jsl.L CWaitTimingRoutine                    ;00C7B0|2200800C|0C8000; Wait for VBlank: one frame delay (~16.7ms)
+	bra Fade_IncrementLoop                      ;00C7B4|80F2    |00C7A8; Loop: check if target reached, continue incrementing
 ;      |        |      ;
 ;      |        |      ;
 Fade_DecrementBrightness:
-	plp                                  ;00C7B6|28      |      ;
-	rtl                                  ;00C7B7|6B      |      ;
-;      |        |      ;
-;      |        |      ;
+	plp                                  ;00C7B6|28      |      ; Pull processor status: restore P flags
+	rtl                                  ;00C7B7|6B      |      ; Return to caller (long return)
+;===============================================================================
+; Fade_SetBrightness
+;-------------------------------------------------------------------------------
+; Sets brightness to specified value and then fades DOWN to complete darkness.
+; This function implements a gradual darkening effect by decrementing the
+; brightness level one step at a time with frame-synchronized delays between
+; each step. Opposite of Fade_ReadBrightnessTarget which fades UP. Used for
+; fade-out transitions where the screen needs to smoothly darken from current
+; brightness to complete black ($80 = force blank).
+;
+; CALLING CONVENTION:
+;   Mode: A = 8-bit or 16-bit (function handles both), X/Y = any, DBR = $00
+;   Input: $0110 (battle_ready_flag) = starting brightness value (e.g., $EF)
+;   Call: JSL Fade_SetBrightness
+;   Returns: Screen completely black ($80 in INIDISP), system flag $D6 bit 7 set
+;   Registers: P flags preserved (PHP/PLP), A/X/Y modified internally
+;
+; OPERATION:
+;   1. Save current processor status (P register) to stack
+;   2. Set 8-bit accumulator mode for byte operations
+;   3. Load starting brightness from $0110 (e.g., $EF)
+;   4. Store to $00AA (brightness_value): set current brightness
+;   5. Loop: Test low nibble (bits 0-3) with BIT #$0F
+;   6. If low nibble = 0: brightness is $E0, skip decrement loop
+;   7. If low nibble ≠ 0: decrement A (e.g., $EF → $EE → $ED ...)
+;   8. Store decremented value back to $0110 (temporary counter)
+;   9. Call CWaitTimingRoutine: one frame delay (~16.7ms)
+;   10. Loop back to step 5 until low nibble becomes 0
+;   11. Set system flag $D6 bit 7 (TSB: test and set bit atomically)
+;   12. Set A = $80 (force blank bit set, brightness 0)
+;   13. Write $80 to INIDISP ($2100): screen completely black
+;   14. Store $80 to $0110 (final state marker)
+;   15. Restore processor status from stack
+;   16. Return to caller (RTL: long return)
+;
+; BRIGHTNESS FADE SEQUENCE:
+;   If $0110 = $EF on entry, the fade proceeds as follows:
+;   
+;   Iteration 1: A = $EF, BIT #$0F → Z=0 (low nibble = F) → DEC → $EE
+;   Iteration 2: A = $EE, BIT #$0F → Z=0 (low nibble = E) → DEC → $ED
+;   Iteration 3: A = $ED, BIT #$0F → Z=0 (low nibble = D) → DEC → $EC
+;   ...
+;   Iteration 14: A = $E1, BIT #$0F → Z=0 (low nibble = 1) → DEC → $E0
+;   Iteration 15: A = $E0, BIT #$0F → Z=1 (low nibble = 0) → Exit loop
+;   
+;   Then: A = $80 → INIDISP = $80 (force blank, screen black)
+;
+; BIT INSTRUCTION MECHANICS:
+;   BIT #$0F performs: A AND #$0F, set Z flag if result is zero
+;   - Does NOT modify A (unlike AND which stores result)
+;   - Only sets Z flag based on masked bits
+;   - If A = $E5: A AND $0F = $05, Z=0 (low nibble ≠ 0)
+;   - If A = $E0: A AND $0F = $00, Z=1 (low nibble = 0)
+;   
+;   Used here to detect when brightness reaches $EX format with low nibble 0.
+;
+; FORCE BLANK ($80) vs NORMAL ($Ex):
+;   - $80 = %1000_0000 = Force blank ON, brightness 0
+;     - Bit 7 = 1: Screen forced blank (no display output)
+;     - Bits 0-3 = 0: Brightness level 0 (irrelevant when blanked)
+;   - $E0 = %1110_0000 = Force blank OFF, brightness 0
+;     - Bit 7 = 0: Normal display mode
+;     - Bits 0-3 = 0: Brightness 0 (black but display active)
+;   
+;   Final $80 value ensures complete screen blackout, not just brightness 0.
+;
+; SYSTEM FLAG $D6 BIT 7:
+;   The TSB instruction sets bit 7 of $00D6 atomically:
+;   - Test: Z flag set if bit 7 was 0 before operation
+;   - Set: Bit 7 set to 1 regardless of previous value
+;   - Atomic: No race condition possible (single instruction)
+;   
+;   Setting bit 7 likely indicates "fade to black complete" or "blanking active".
+;   Opposite of Fade_ReadBrightnessTarget which clears this bit (TRB).
+;
+; PERFORMANCE:
+;   - Fixed overhead: ~30 cycles (PHP, SEP, LDA, STA, BIT, TSB, PLP)
+;   - Per-iteration: ~35 cycles (BIT, BEQ, DEC, STA, JSL setup, BRA) + frame
+;   - Frame delay: ~89,342 cycles @ 2.68MHz (16.7ms @ 60Hz)
+;   - Total: 30 + (N × 89,377) cycles, where N = low nibble value
+;   - Example: $EF → $E0 = 15 iterations ≈ 1,340,685 cycles ≈ 500ms
+;   - Maximum: $EF → $80 = 15 iterations + overhead ≈ 500ms total
+;
+; USAGE EXAMPLE:
+;   Fade from maximum brightness to complete black:
+;   
+;   lda.B #$EF                  ; Start at maximum brightness
+;   sta.w !battle_ready_flag    ; Store in $0110
+;   jsl Fade_SetBrightness      ; Fade: $EF → $EE → ... → $E0 → $80
+;   ; Returns with screen completely black, $D6 bit 7 set
+;
+; COMMON CALLING PATTERNS:
+;   Used in battle transitions and scene changes:
+;   
+;   ; End of battle
+;   lda.w !brightness_value     ; Get current brightness
+;   sta.w !battle_ready_flag    ; Store as starting point
+;   jsl Fade_SetBrightness      ; Fade to black gradually
+;   ; Screen now black, safe to reload graphics
+;
+; RELATED FUNCTIONS:
+;   - Fade_ReadBrightnessTarget ($00C795): Fades UP from dark to bright
+;   - Color_FadeOut ($00CBEC): Instant fade to black (no gradual transition)
+;   - Color_FadeIn ($00CBC6): 5-step fade with dialog execution
+;   - CWaitTimingRoutine ($0C8000): VBlank synchronization
+;
+; REGISTERS MODIFIED:
+;   A: Modified (brightness values)
+;   X: Preserved (not used)
+;   Y: Preserved (not used)
+;   P: Preserved (PHP/PLP)
+;   $00AA: Modified (set to starting brightness)
+;   $0110: Modified (decremented each iteration, final value $80)
+;   $D6 bit 7: Set (TSB instruction)
+;   INIDISP ($2100): Set to $80 (force blank)
+;
+; SAFE TO CALL:
+;   - From any bank (long call via JSL)
+;   - With any processor mode (handles mode switching)
+;   - During VBlank or active display (synchronized)
+;   - Multiple times (idempotent if already at $80)
+;
+; TECHNICAL NOTES:
+;   1. Complementary design: This function (fade DOWN) complements
+;      Fade_ReadBrightnessTarget (fade UP), providing bidirectional smooth
+;      brightness transitions.
+;   
+;   2. Two-stage fade: First fades from $EX to $E0 (gradual), then instantly
+;      jumps to $80 (force blank). The $E0 → $80 transition is instant because
+;      there's no visible difference (both are completely black).
+;   
+;   3. Label naming: "Fade_DecrementBrightness" and "Fade_Complete" labels are
+;      in logical sequence but could be confusing. "Fade_Complete" is actually
+;      the decrement LOOP, while "Fade_CheckAltMode" is the completion handler.
+;   
+;   4. Frame synchronization: Each brightness step waits for VBlank via
+;      CWaitTimingRoutine, ensuring smooth visual transitions without tearing.
+;   
+;   5. Final state: Function leaves system in "force blank" state ($80) with
+;      flag $D6 bit 7 set, signaling to other code that screen is blanked.
+;===============================================================================
 Fade_SetBrightness:
-	php                                  ;00C7B8|08      |      ;
-	sep #$20                             ;00C7B9|E220    |      ;
-	lda.w !battle_ready_flag                          ;00C7BB|AD1001  |010110;
-	sta.w !brightness_value                          ;00C7BE|8DAA00  |0100AA;
+	php                                  ;00C7B8|08      |      ; Push processor status: preserve P flags
+	sep #$20                             ;00C7B9|E220    |      ; Set 8-bit accumulator: brightness is byte value
+	lda.w !battle_ready_flag                          ;00C7BB|AD1001  |010110; Load starting brightness from $0110 (e.g., $EF)
+	sta.w !brightness_value                          ;00C7BE|8DAA00  |0100AA; Store to $00AA: set current brightness value
 ;      |        |      ;
 Fade_Complete:
-	bit.B #$0f                           ;00C7C1|890F    |      ;
-	beq Fade_CheckAltMode                      ;00C7C3|F00A    |00C7CF;
-	dec a;00C7C5|3A      |      ;
-	sta.w !battle_ready_flag                          ;00C7C6|8D1001  |010110;
-	jsl.L CWaitTimingRoutine                    ;00C7C9|2200800C|0C8000;
-	bra Fade_Complete                      ;00C7CD|80F2    |00C7C1;
+	bit.B #$0f                           ;00C7C1|890F    |      ; Test low nibble (bits 0-3): Z=1 if all zero
+	beq Fade_CheckAltMode                      ;00C7C3|F00A    |00C7CF; If low nibble = 0: reached $E0, skip to force blank
+	dec a;00C7C5|3A      |      ; Decrement A: $EF → $EE → $ED ... → $E0
+	sta.w !battle_ready_flag                          ;00C7C6|8D1001  |010110; Store decremented value to $0110 (update counter)
+	jsl.L CWaitTimingRoutine                    ;00C7C9|2200800C|0C8000; Wait for VBlank: one frame delay (~16.7ms)
+	bra Fade_Complete                      ;00C7CD|80F2    |00C7C1; Loop: continue decrementing until $E0
 ;      |        |      ;
 ;      |        |      ;
 Fade_CheckAltMode:
-	lda.B #$80                           ;00C7CF|A980    |      ;
-	tsb.w !system_flags_3                          ;00C7D1|0CD600  |0100D6;
-	lda.B #$80                           ;00C7D4|A980    |      ;
-	sta.w !INIDISP                          ;00C7D6|8D0021  |012100;
-	sta.w !battle_ready_flag                          ;00C7D9|8D1001  |010110;
-	plp                                  ;00C7DC|28      |      ;
-	rtl                                  ;00C7DD|6B      |      ;
+	lda.B #$80                           ;00C7CF|A980    |      ; A = $80 (bit 7 mask for system flag)
+	tsb.w !system_flags_3                          ;00C7D1|0CD600  |0100D6; Test and set bit 7 of $D6: mark "fade complete" flag
+	lda.B #$80                           ;00C7D4|A980    |      ; A = $80 (force blank bit set, brightness 0)
+	sta.w !INIDISP                          ;00C7D6|8D0021  |012100; Write to INIDISP ($2100): force blank, screen black
+	sta.w !battle_ready_flag                          ;00C7D9|8D1001  |010110; Store $80 to $0110: final state marker
+	plp                                  ;00C7DC|28      |      ; Pull processor status: restore P flags
+	rtl                                  ;00C7DD|6B      |      ; Return to caller (long return)
 ;      |        |      ;
 ;      |        |      ;
 Battle_SetupGraphics:
