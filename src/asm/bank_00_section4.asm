@@ -371,35 +371,35 @@ VRAM_TransferTile:
 
 ; Word 1
 	lda.W				   $0000,x   ; Load source word
-	sta.B				   SNES_VMDATAL-$2100 ; Write to VRAM data (via direct page)
+	sta.B !SNES_VMDATAL-$2100 ; Write to VRAM data (via direct page)
 
 ; Word 2
 	lda.W				   $0002,x
-	sta.B				   SNES_VMDATAL-$2100
+	sta.B !SNES_VMDATAL-$2100
 
 ; Word 3
 	lda.W				   $0004,x
-	sta.B				   SNES_VMDATAL-$2100
+	sta.B !SNES_VMDATAL-$2100
 
 ; Word 4
 	lda.W				   $0006,x
-	sta.B				   SNES_VMDATAL-$2100
+	sta.B !SNES_VMDATAL-$2100
 
 ; Word 5
 	lda.W				   $0008,x
-	sta.B				   SNES_VMDATAL-$2100
+	sta.B !SNES_VMDATAL-$2100
 
 ; Word 6
 	lda.W				   $000a,x
-	sta.B				   SNES_VMDATAL-$2100
+	sta.B !SNES_VMDATAL-$2100
 
 ; Word 7
 	lda.W				   $000c,x
-	sta.B				   SNES_VMDATAL-$2100
+	sta.B !SNES_VMDATAL-$2100
 
 ; Word 8
 	lda.W				   $000e,x
-	sta.B				   SNES_VMDATAL-$2100
+	sta.B !SNES_VMDATAL-$2100
 
 ; Handle extra bytes (likely for 3bpp bitplane)
 	lda.W				   $00f0	 ; Get extra data flag
@@ -408,35 +408,35 @@ VRAM_TransferTile:
 ; Write 8 extra bytes
 	lda.W				   $0010,x
 TAY_Label:
-	sty.B				   SNES_VMDATAL-$2100
+	sty.B !SNES_VMDATAL-$2100
 
 	lda.W				   $0011,x
 TAY_Label:
-	sty.B				   SNES_VMDATAL-$2100
+	sty.B !SNES_VMDATAL-$2100
 
 	lda.W				   $0012,x
 TAY_Label:
-	sty.B				   SNES_VMDATAL-$2100
+	sty.B !SNES_VMDATAL-$2100
 
 	lda.W				   $0013,x
 TAY_Label:
-	sty.B				   SNES_VMDATAL-$2100
+	sty.B !SNES_VMDATAL-$2100
 
 	lda.W				   $0014,x
 TAY_Label:
-	sty.B				   SNES_VMDATAL-$2100
+	sty.B !SNES_VMDATAL-$2100
 
 	lda.W				   $0015,x
 TAY_Label:
-	sty.B				   SNES_VMDATAL-$2100
+	sty.B !SNES_VMDATAL-$2100
 
 	lda.W				   $0016,x
 TAY_Label:
-	sty.B				   SNES_VMDATAL-$2100
+	sty.B !SNES_VMDATAL-$2100
 
 	lda.W				   $0017,x
 TAY_Label:
-	sty.B				   SNES_VMDATAL-$2100
+	sty.B !SNES_VMDATAL-$2100
 
 	rep					 #$30		; Back to 16-bit
 
@@ -470,7 +470,7 @@ VRAM_InterleavedWrite:
 
 	sep					 #$20		; 8-bit A
 	lda.B				   #$88	  ; VRAM increment after high byte write, column mode
-	sta.B				   SNES_VMAINC-$2100 ; Set VRAM increment mode
+	sta.B !SNES_VMAINC-$2100 ; Set VRAM increment mode
 
 	rep					 #$30		; 16-bit A,X,Y
 	clc							   ; Clear carry
@@ -480,44 +480,44 @@ VRAM_InterleavedWriteLoop:
 ; This creates striped patterns in VRAM
 
 	lda.W				   $0000,x
-	sta.B				   SNES_VMDATAL-$2100
+	sta.B !SNES_VMDATAL-$2100
 	lda.W				   $00f0	 ; Load filler value ($ff00)
-	sta.B				   SNES_VMDATAL-$2100
+	sta.B !SNES_VMDATAL-$2100
 
 	lda.W				   $0002,x
-	sta.B				   SNES_VMDATAL-$2100
+	sta.B !SNES_VMDATAL-$2100
 	lda.W				   $00f0
-	sta.B				   SNES_VMDATAL-$2100
+	sta.B !SNES_VMDATAL-$2100
 
 	lda.W				   $0004,x
-	sta.B				   SNES_VMDATAL-$2100
+	sta.B !SNES_VMDATAL-$2100
 	lda.W				   $00f0
-	sta.B				   SNES_VMDATAL-$2100
+	sta.B !SNES_VMDATAL-$2100
 
 	lda.W				   $0006,x
-	sta.B				   SNES_VMDATAL-$2100
+	sta.B !SNES_VMDATAL-$2100
 	lda.W				   $00f0
-	sta.B				   SNES_VMDATAL-$2100
+	sta.B !SNES_VMDATAL-$2100
 
 	lda.W				   $0008,x
-	sta.B				   SNES_VMDATAL-$2100
+	sta.B !SNES_VMDATAL-$2100
 	lda.W				   $00f0
-	sta.B				   SNES_VMDATAL-$2100
+	sta.B !SNES_VMDATAL-$2100
 
 	lda.W				   $000a,x
-	sta.B				   SNES_VMDATAL-$2100
+	sta.B !SNES_VMDATAL-$2100
 	lda.W				   $00f0
-	sta.B				   SNES_VMDATAL-$2100
+	sta.B !SNES_VMDATAL-$2100
 
 	lda.W				   $000c,x
-	sta.B				   SNES_VMDATAL-$2100
+	sta.B !SNES_VMDATAL-$2100
 	lda.W				   $00f0
-	sta.B				   SNES_VMDATAL-$2100
+	sta.B !SNES_VMDATAL-$2100
 
 	lda.W				   $000e,x
-	sta.B				   SNES_VMDATAL-$2100
+	sta.B !SNES_VMDATAL-$2100
 	lda.W				   $00f0
-	sta.B				   SNES_VMDATAL-$2100
+	sta.B !SNES_VMDATAL-$2100
 
 ; Advance source pointer
 TXA_Label:
@@ -529,7 +529,7 @@ TAX_Label:
 
 	sep					 #$20		; 8-bit A
 	lda.B				   #$80	  ; Reset to normal increment mode
-	sta.B				   SNES_VMAINC-$2100
+	sta.B !SNES_VMAINC-$2100
 
 	pld							   ; Restore direct page
 	plp							   ; Restore processor status

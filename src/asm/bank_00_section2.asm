@@ -9,33 +9,33 @@
 Graphics_TransferBattleMode:
 ; Setup VRAM address for character data
 	ldx.W				   #$4400	; VRAM address $4400
-	stx.W				   SNES_VMADDL ; Set VRAM write address
+	stx.W !SNES_VMADDL ; Set VRAM write address
 
 ; Configure DMA for 2-byte sequential write (VMDATAL/VMDATAH)
 	ldx.W				   #$1801	; DMA mode: word write, increment source
-	stx.B				   SNES_DMA5PARAM-$4300 ; Set DMA5 parameters
+	stx.B !SNES_DMA5PARAM-$4300 ; Set DMA5 parameters
 
 ; Transfer character graphics from $7f0480
 	ldx.W				   #$0480	; Source: $7f0480
-	stx.B				   SNES_DMA5ADDRL-$4300 ; Set source address (low/mid)
+	stx.B !SNES_DMA5ADDRL-$4300 ; Set source address (low/mid)
 	lda.B				   #$7f	  ; Bank $7f (WRAM)
-	sta.B				   SNES_DMA5ADDRH-$4300 ; Set source bank
+	sta.B !SNES_DMA5ADDRH-$4300 ; Set source bank
 	ldx.W				   #$0280	; Transfer size: $0280 bytes (640 bytes)
-	stx.B				   SNES_DMA5CNTL-$4300 ; Set transfer size
+	stx.B !SNES_DMA5CNTL-$4300 ; Set transfer size
 	lda.B				   #$20	  ; Trigger DMA channel 5
-	sta.W				   SNES_MDMAEN ; Execute transfer
+	sta.W !SNES_MDMAEN ; Execute transfer
 
 ; Transfer tilemap data to VRAM $5820
 	ldx.W				   #$5820	; VRAM address $5820
-	stx.W				   SNES_VMADDL ; Set VRAM write address
+	stx.W !SNES_VMADDL ; Set VRAM write address
 	ldx.W				   #$2040	; Source: $7e2040
-	stx.B				   SNES_DMA5ADDRL-$4300 ; Set source address
+	stx.B !SNES_DMA5ADDRL-$4300 ; Set source address
 	lda.B				   #$7e	  ; Bank $7e (WRAM)
-	sta.B				   SNES_DMA5ADDRH-$4300 ; Set source bank
+	sta.B !SNES_DMA5ADDRH-$4300 ; Set source bank
 	ldx.W				   #$0b00	; Transfer size: $0b00 bytes (2816 bytes)
-	stx.B				   SNES_DMA5CNTL-$4300 ; Set transfer size
+	stx.B !SNES_DMA5CNTL-$4300 ; Set transfer size
 	lda.B				   #$20	  ; Trigger DMA channel 5
-	sta.W				   SNES_MDMAEN ; Execute transfer
+	sta.W !SNES_MDMAEN ; Execute transfer
 
 ; Set flag indicating graphics updated
 	lda.B				   #$40	  ; Bit 6 flag
@@ -54,7 +54,7 @@ Graphics_TransferBattleMode:
 Graphics_UpdateFieldMode:
 ; Setup VRAM for vertical increment mode
 	lda.B				   #$80	  ; Increment after writing to $2119
-	sta.W				   SNES_VMAINC ; Set VRAM increment mode
+	sta.W !SNES_VMAINC ; Set VRAM increment mode
 
 ; Check if battle mode graphics needed
 	lda.B				   #$10	  ; Check bit 4 of display flags
@@ -63,38 +63,38 @@ Graphics_UpdateFieldMode:
 
 ; Field mode graphics update
 	ldx.W				   $0042	 ; Get current VRAM address from variable
-	stx.W				   SNES_VMADDL ; Set VRAM write address
+	stx.W !SNES_VMADDL ; Set VRAM write address
 
 ; Setup DMA for character tile transfer
 	ldx.W				   #$1801	; DMA mode: word write, increment
-	stx.B				   SNES_DMA5PARAM-$4300 ; Set DMA5 parameters
+	stx.B !SNES_DMA5PARAM-$4300 ; Set DMA5 parameters
 	ldx.W				   #$0040	; Source: $7f0040
-	stx.B				   SNES_DMA5ADDRL-$4300 ; Set source address
+	stx.B !SNES_DMA5ADDRL-$4300 ; Set source address
 	lda.B				   #$7f	  ; Bank $7f (WRAM)
-	sta.B				   SNES_DMA5ADDRH-$4300 ; Set source bank
+	sta.B !SNES_DMA5ADDRH-$4300 ; Set source bank
 	ldx.W				   #$07c0	; Transfer size: $07c0 bytes (1984 bytes)
-	stx.B				   SNES_DMA5CNTL-$4300 ; Set transfer size
+	stx.B !SNES_DMA5CNTL-$4300 ; Set transfer size
 	lda.B				   #$20	  ; Trigger DMA channel 5
-	sta.W				   SNES_MDMAEN ; Execute transfer
+	sta.W !SNES_MDMAEN ; Execute transfer
 
 	rep					 #$30		; 16-bit A, X, Y
 	clc							   ; Clear carry for addition
 	lda.W				   $0042	 ; Get VRAM address
 	adc.W				   #$1000	; Add $1000 for next section
-	sta.W				   SNES_VMADDL ; Set new VRAM address
+	sta.W !SNES_VMADDL ; Set new VRAM address
 	sep					 #$20		; 8-bit A
 
 ; Transfer second section of tiles
 	ldx.W				   #$1801	; DMA mode: word write
-	stx.B				   SNES_DMA5PARAM-$4300 ; Set DMA5 parameters
+	stx.B !SNES_DMA5PARAM-$4300 ; Set DMA5 parameters
 	ldx.W				   #$1040	; Source: $7f1040
-	stx.B				   SNES_DMA5ADDRL-$4300 ; Set source address
+	stx.B !SNES_DMA5ADDRL-$4300 ; Set source address
 	lda.B				   #$7f	  ; Bank $7f (WRAM)
-	sta.B				   SNES_DMA5ADDRH-$4300 ; Set source bank
+	sta.B !SNES_DMA5ADDRH-$4300 ; Set source bank
 	ldx.W				   #$07c0	; Transfer size: $07c0 bytes
-	stx.B				   SNES_DMA5CNTL-$4300 ; Set transfer size
+	stx.B !SNES_DMA5CNTL-$4300 ; Set transfer size
 	lda.B				   #$20	  ; Trigger DMA channel 5
-	sta.W				   SNES_MDMAEN ; Execute transfer
+	sta.W !SNES_MDMAEN ; Execute transfer
 
 ; Check if tilemap update needed
 	lda.B				   #$80	  ; Check bit 7
@@ -103,17 +103,17 @@ Graphics_UpdateFieldMode:
 
 ; Transfer tilemap data
 	ldx.W				   #$5820	; VRAM address $5820
-	stx.W				   SNES_VMADDL ; Set VRAM write address
+	stx.W !SNES_VMADDL ; Set VRAM write address
 	ldx.W				   #$1801	; DMA mode: word write
-	stx.B				   SNES_DMA5PARAM-$4300 ; Set DMA5 parameters
+	stx.B !SNES_DMA5PARAM-$4300 ; Set DMA5 parameters
 	ldx.W				   #$2040	; Source: $7e2040
-	stx.B				   SNES_DMA5ADDRL-$4300 ; Set source address
+	stx.B !SNES_DMA5ADDRL-$4300 ; Set source address
 	lda.B				   #$7e	  ; Bank $7e (WRAM)
-	sta.B				   SNES_DMA5ADDRH-$4300 ; Set source bank
+	sta.B !SNES_DMA5ADDRH-$4300 ; Set source bank
 	ldx.W				   #$0fc0	; Transfer size: $0fc0 bytes (4032 bytes)
-	stx.B				   SNES_DMA5CNTL-$4300 ; Set transfer size
+	stx.B !SNES_DMA5CNTL-$4300 ; Set transfer size
 	lda.B				   #$20	  ; Trigger DMA channel 5
-	sta.W				   SNES_MDMAEN ; Execute transfer
+	sta.W !SNES_MDMAEN ; Execute transfer
 	rtl							   ; Return
 
 Graphics_TransferFieldTilemap_Skip:
@@ -343,7 +343,7 @@ Skip_Window_Update:
 
 ; Apply HDMA channel enable settings
 	lda.W				   $0111	 ; Get HDMA channel mask
-	sta.W				   SNES_HDMAEN ; Write to HDMA enable register
+	sta.W !SNES_HDMAEN ; Write to HDMA enable register
 
 	rtl							   ; Return from VBlank handler
 

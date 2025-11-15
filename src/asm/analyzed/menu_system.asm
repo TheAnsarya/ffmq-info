@@ -158,16 +158,16 @@ MenuSystemInit:
 
 ; Configure PPU for menu mode
 	lda.B #$62                      ; Object base = $6000, size = 16x16
-	sta.B SNES_OBJSEL-$2100         ; $2101 = OBJ select
+	sta.B !SNES_OBJSEL-$2100         ; $2101 = OBJ select
 
 	lda.B #$07                      ; Mode 7
-	sta.B SNES_BGMODE-$2100         ; $2105 = BG mode
+	sta.B !SNES_BGMODE-$2100         ; $2105 = BG mode
 
 	lda.B #$80                      ; Mode 7 settings
-	sta.B SNES_M7SEL-$2100          ; $211a = Mode 7 select
+	sta.B !SNES_M7SEL-$2100          ; $211a = Mode 7 select
 
 	lda.B #$11                      ; Enable BG1 and OBJ
-	sta.B SNES_TM-$2100             ; $212c = Main screen layers
+	sta.B !SNES_TM-$2100             ; $212c = Main screen layers
 
 ; Additional menu setup
 	jsr.W LoadMenuGraphics               ; Load menu graphics
@@ -192,20 +192,20 @@ MenuSystemInit:
 
 ; Switch to standard BG mode
 	lda.B #$01                      ; Mode 1
-	sta.B SNES_BGMODE-$2100         ; $2105 = BG mode
+	sta.B !SNES_BGMODE-$2100         ; $2105 = BG mode
 
 ; Configure tilemap addresses
 	lda.B #$62                      ; BG1 tilemap at $6200
-	sta.B SNES_BG1SC-$2100          ; $2107 = BG1 screen base
+	sta.B !SNES_BG1SC-$2100          ; $2107 = BG1 screen base
 
 	lda.B #$69                      ; BG2 tilemap at $6900
-	sta.B SNES_BG2SC-$2100          ; $2108 = BG2 screen base
+	sta.B !SNES_BG2SC-$2100          ; $2108 = BG2 screen base
 
 	lda.B #$44                      ; BG1/BG2 CHR at $4000
-	sta.B SNES_BG12NBA-$2100        ; $210b = BG1/2 character base
+	sta.B !SNES_BG12NBA-$2100        ; $210b = BG1/2 character base
 
 	lda.B #$13                      ; Enable BG1, BG2, OBJ
-	sta.B SNES_TM-$2100             ; $212c = Main screen layers
+	sta.B !SNES_TM-$2100             ; $212c = Main screen layers
 
 ; Render initial menu
 	jsr.W Complex_Graphics_Buffer_Initialization               ; Draw menu frame
@@ -246,7 +246,7 @@ LoadMenuContent:
 
 ; Setup display mode 7
 	lda.B #$07                      ; Mode 7
-	sta.B SNES_BGMODE-$2100         ; Set mode
+	sta.B !SNES_BGMODE-$2100         ; Set mode
 
 ; Load menu elements
 	jsr.W LoadCharacterPortraits               ; Load character portraits
@@ -263,11 +263,11 @@ LoadMenuContent:
 
 ; Return to mode 1
 	lda.B #$01                      ; Mode 1
-	sta.B SNES_BGMODE-$2100         ; Set mode
+	sta.B !SNES_BGMODE-$2100         ; Set mode
 
 ; Reset BG1 scroll
-	stz.B SNES_BG1VOFS-$2100        ; Vertical scroll = 0
-	stz.B SNES_BG1VOFS-$2100        ; (write twice for 16-bit)
+	stz.B !SNES_BG1VOFS-$2100        ; Vertical scroll = 0
+	stz.B !SNES_BG1VOFS-$2100        ; (write twice for 16-bit)
 
 ; Update menu elements
 	jsr.W RenderMenuText               ; Render menu text

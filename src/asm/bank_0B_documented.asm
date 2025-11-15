@@ -1609,7 +1609,7 @@ BattleGfx_DecompressToWRAM:
 ; Relocate direct page to PPU registers for fast access
 	pea.w !INIDISP	 ; Direct page = $2100 (PPU registers)
 	pld ; Pull to DP
-	sta.b SNES_WMADDH-$2100 ; Write WRAM address high ($2183)
+	sta.b !SNES_WMADDH-$2100 ; Write WRAM address high ($2183)
 
 	ldy.w $0000,x   ; Load data size from source
 	inx ; Skip size bytes
@@ -1636,14 +1636,14 @@ INY_Label_1:
 	and.b #$7f	  ; Mask to repeat count (bits 0-6)
 
 BattleGfx_WRAMRepeatFill:	; Repeat fill loop
-	sta.b SNES_WMDATA-$2100 ; Write byte to WRAM ($2180)
+	sta.b !SNES_WMDATA-$2100 ; Write byte to WRAM ($2180)
 	dey ; Decrement repeat counter
 	bne BattleGfx_WRAMRepeatFill ; Loop until done
 	ply ; Restore remaining bytes count
 	bra BattleGfx_WRAMContinue ; Continue
 
 BattleGfx_WRAMDirectCopy:	; Direct copy mode
-	sta.b SNES_WMDATA-$2100 ; Write byte directly to WRAM
+	sta.b !SNES_WMDATA-$2100 ; Write byte directly to WRAM
 
 BattleGfx_WRAMContinue:
 	inx ; Increment source

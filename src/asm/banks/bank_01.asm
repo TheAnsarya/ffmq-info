@@ -63,13 +63,13 @@
 	rep #$10                             ;018145|C210    |      ;
 	stz.w !battle_phase_counter                          ;018147|9C461A  |001A46;
 	ldx.W #$9400                         ;01814A|A20094  |      ;
-	stx.W SNES_WMADDL                    ;01814D|8E8121  |002181;
+	stx.W !SNES_WMADDL                    ;01814D|8E8121  |002181;
 	lda.B #$01                           ;018150|A901    |      ;
-	sta.W SNES_WMADDH                    ;018152|8D8321  |002183;
+	sta.W !SNES_WMADDH                    ;018152|8D8321  |002183;
 	ldy.W #$1000                         ;018155|A00010  |      ;
 ;      |        |      ;
 Field_ClearWRAM:
-	stz.W SNES_WMDATA                    ;018158|9C8021  |002180;
+	stz.W !SNES_WMDATA                    ;018158|9C8021  |002180;
 	dey                                  ;01815B|88      |      ;
 	bne Field_ClearWRAM                      ;01815C|D0FA    |018158;
 	rep #$30                             ;01815E|C230    |      ;
@@ -118,16 +118,16 @@ Field_ClearVRAM:
 	sep #$20                             ;0181BB|E220    |      ;
 	rep #$10                             ;0181BD|C210    |      ;
 	lda.B #$80                           ;0181BF|A980    |      ;
-	sta.W SNES_VMAINC                    ;0181C1|8D1521  |002115;
-	stz.W SNES_VMADDL                    ;0181C4|9C1621  |002116;
+	sta.W !SNES_VMAINC                    ;0181C1|8D1521  |002115;
+	stz.W !SNES_VMADDL                    ;0181C4|9C1621  |002116;
 	lda.B #$40                           ;0181C7|A940    |      ;
-	sta.W SNES_VMADDH                    ;0181C9|8D1721  |002117;
+	sta.W !SNES_VMADDH                    ;0181C9|8D1721  |002117;
 	rep #$30                             ;0181CC|C230    |      ;
 	ldx.W #$1000                         ;0181CE|A20010  |      ;
 	lda.W #$01ff                         ;0181D1|A9FF01  |      ;
 ;      |        |      ;
 Field_ClearVRAMLoop:
-	sta.W SNES_VMDATAL                   ;0181D4|8D1821  |002118;
+	sta.W !SNES_VMDATAL                   ;0181D4|8D1821  |002118;
 	dex                                  ;0181D7|CA      |      ;
 	bne Field_ClearVRAMLoop                      ;0181D8|D0FA    |0181D4;
 	plp                                  ;0181DA|28      |      ;
@@ -2172,7 +2172,7 @@ MapEvent_LoadNewMap:
 	dex                                  ;0192B3|CA      |      ;
 	stx.w !battle_target_select                          ;0192B4|8E5F19  |00195F;
 	lda.B #$03                           ;0192B7|A903    |      ;
-	sta.W SNES_OBJSEL                    ;0192B9|8D0121  |002101;
+	sta.W !SNES_OBJSEL                    ;0192B9|8D0121  |002101;
 	lda.B #$01                           ;0192BC|A901    |      ;
 	pha                                  ;0192BE|48      |      ;
 	plb                                  ;0192BF|AB      |      ;
@@ -5950,13 +5950,13 @@ Collision_CheckSolid:
 	lda.w !sprite_move_speed                          ;01AF21|AD7F19  |00197F;
 	tax                                  ;01AF24|AA      |      ;
 	lda.w !sprite_anim_y_base                          ;01AF25|AD8019  |001980;
-	sta.W SNES_WRMPYA                    ;01AF28|8D0242  |004202;
+	sta.W !SNES_WRMPYA                    ;01AF28|8D0242  |004202;
 	lda.w !battle_coord_x_boundary                          ;01AF2B|AD2419  |001924;
-	sta.W SNES_WRMPYB                    ;01AF2E|8D0342  |004203;
+	sta.W !SNES_WRMPYB                    ;01AF2E|8D0342  |004203;
 	rep #$30                             ;01AF31|C230    |      ;
 	txa                                  ;01AF33|8A      |      ;
 	clc                                  ;01AF34|18      |      ;
-	adc.W SNES_RDMPYL                    ;01AF35|6D1642  |004216;
+	adc.W !SNES_RDMPYL                    ;01AF35|6D1642  |004216;
 	tax                                  ;01AF38|AA      |      ;
 	rts                                  ;01AF39|60      |      ;
 ;      |        |      ;
@@ -12476,12 +12476,12 @@ Field_LoadMapTile:
 	beq Field_LoadCharacterTiles                      ;01E792|F034    |01E7C8;
 	pha                                  ;01E794|48      |      ;
 	and.B #$3f                           ;01E795|293F    |      ;
-	sta.B SNES_M7A-$2100                 ;01E797|851B    |00211B;
-	stz.B SNES_M7A-$2100                 ;01E799|641B    |00211B;
+	sta.B !SNES_M7A-$2100                 ;01E797|851B    |00211B;
+	stz.B !SNES_M7A-$2100                 ;01E799|641B    |00211B;
 	lda.B #$18                           ;01E79B|A918    |      ;
-	sta.B SNES_M7B-$2100                 ;01E79D|851C    |00211C;
+	sta.B !SNES_M7B-$2100                 ;01E79D|851C    |00211C;
 	rep #$20                             ;01E79F|C220    |      ;
-	lda.B SNES_MPYL-$2100                ;01E7A1|A534    |002134;
+	lda.B !SNES_MPYL-$2100                ;01E7A1|A534    |002134;
 	clc                                  ;01E7A3|18      |      ;
 	adc.W #$f5a0                         ;01E7A4|69A0F5  |      ;
 	tay                                  ;01E7A7|A8      |      ;
@@ -12518,7 +12518,7 @@ Field_LoadCharacterTiles:
 	plb                                  ;01E7CB|AB      |      ;
 	ldy.W #$ddc4                         ;01E7CC|A0C4DD  |      ;
 	ldx.W #$1a00                         ;01E7CF|A2001A  |      ;
-	stx.B SNES_WMADDL-$2100              ;01E7D2|8681    |002181;
+	stx.B !SNES_WMADDL-$2100              ;01E7D2|8681    |002181;
 	ldx.W #$0088                         ;01E7D4|A28800  |      ;
 ;      |        |      ;
 Field_LoadTileLoop1:
@@ -12526,7 +12526,7 @@ Field_LoadTileLoop1:
 	dex                                  ;01E7DA|CA      |      ;
 	bne Field_LoadTileLoop1                      ;01E7DB|D0FA    |01E7D7;
 	ldx.W #$2c00                         ;01E7DD|A2002C  |      ;
-	stx.B SNES_WMADDL-$2100              ;01E7E0|8681    |002181;
+	stx.B !SNES_WMADDL-$2100              ;01E7E0|8681    |002181;
 	ldx.W #$0008                         ;01E7E2|A20800  |      ;
 ;      |        |      ;
 Field_LoadTileLoop2:
@@ -12618,12 +12618,12 @@ Field_DecodeLoop1:
 	iny                                  ;01E866|C8      |      ;
 	tax                                  ;01E867|AA      |      ;
 	lda.L DATA8_02e236,x                 ;01E868|BF36E202|02E236;
-	sta.B SNES_WMDATA-$2100              ;01E86C|8580    |002180;
+	sta.B !SNES_WMDATA-$2100              ;01E86C|8580    |002180;
 	lda.W $0000,y                        ;01E86E|B90000  |040000;
 	dey                                  ;01E871|88      |      ;
 	tax                                  ;01E872|AA      |      ;
 	lda.L DATA8_02e236,x                 ;01E873|BF36E202|02E236;
-	sta.B SNES_WMDATA-$2100              ;01E877|8580    |002180;
+	sta.B !SNES_WMDATA-$2100              ;01E877|8580    |002180;
 	dey                                  ;01E879|88      |      ;
 	dey                                  ;01E87A|88      |      ;
 	plx                                  ;01E87B|FA      |      ;
@@ -12638,8 +12638,8 @@ Field_DecodeLoop2:
 	dey                                  ;01E887|88      |      ;
 	tax                                  ;01E888|AA      |      ;
 	lda.L DATA8_02e236,x                 ;01E889|BF36E202|02E236;
-	sta.B SNES_WMDATA-$2100              ;01E88D|8580    |002180;
-	stz.B SNES_WMDATA-$2100              ;01E88F|6480    |002180;
+	sta.B !SNES_WMDATA-$2100              ;01E88D|8580    |002180;
+	stz.B !SNES_WMDATA-$2100              ;01E88F|6480    |002180;
 	plx                                  ;01E891|FA      |      ;
 	dex                                  ;01E892|CA      |      ;
 	bne Field_DecodeLoop2                      ;01E893|D0EE    |01E883;
@@ -12664,7 +12664,7 @@ Field_DecodeFullTile:
 	iny                                  ;01E8A9|C8      |      ;
 	tax                                  ;01E8AA|AA      |      ;
 	lda.L DATA8_02e236,x                 ;01E8AB|BF36E202|02E236;
-	sta.B SNES_WMDATA-$2100              ;01E8AF|8580    |002180;
+	sta.B !SNES_WMDATA-$2100              ;01E8AF|8580    |002180;
 	plx                                  ;01E8B1|FA      |      ;
 	dex                                  ;01E8B2|CA      |      ;
 	bne Field_DecodeFullTile                      ;01E8B3|D0F0    |01E8A5;
@@ -12676,8 +12676,8 @@ Field_DecodeHalfTile:
 	iny                                  ;01E8BC|C8      |      ;
 	tax                                  ;01E8BD|AA      |      ;
 	lda.L DATA8_02e236,x                 ;01E8BE|BF36E202|02E236;
-	sta.B SNES_WMDATA-$2100              ;01E8C2|8580    |002180;
-	stz.B SNES_WMDATA-$2100              ;01E8C4|6480    |002180;
+	sta.B !SNES_WMDATA-$2100              ;01E8C2|8580    |002180;
+	stz.B !SNES_WMDATA-$2100              ;01E8C4|6480    |002180;
 	plx                                  ;01E8C6|FA      |      ;
 	dex                                  ;01E8C7|CA      |      ;
 	bne Field_DecodeHalfTile                      ;01E8C8|D0EE    |01E8B8;
@@ -12707,10 +12707,10 @@ Field_DecodeTileData3:
 Field_DecodeVerticalFlip:
 	lda.W $0000,y                        ;01E8E9|B90000  |040000;
 	iny                                  ;01E8EC|C8      |      ;
-	sta.B SNES_WMDATA-$2100              ;01E8ED|8580    |002180;
+	sta.B !SNES_WMDATA-$2100              ;01E8ED|8580    |002180;
 	lda.W $0000,y                        ;01E8EF|B90000  |040000;
 	dey                                  ;01E8F2|88      |      ;
-	sta.B SNES_WMDATA-$2100              ;01E8F3|8580    |002180;
+	sta.B !SNES_WMDATA-$2100              ;01E8F3|8580    |002180;
 	dey                                  ;01E8F5|88      |      ;
 	dey                                  ;01E8F6|88      |      ;
 	dex                                  ;01E8F7|CA      |      ;
@@ -12721,8 +12721,8 @@ Field_DecodeVerticalFlip:
 Field_DecodeVerticalLoop:
 	lda.W $0000,y                        ;01E8FE|B90000  |040000;
 	dey                                  ;01E901|88      |      ;
-	sta.B SNES_WMDATA-$2100              ;01E902|8580    |002180;
-	stz.B SNES_WMDATA-$2100              ;01E904|6480    |002180;
+	sta.B !SNES_WMDATA-$2100              ;01E902|8580    |002180;
+	stz.B !SNES_WMDATA-$2100              ;01E904|6480    |002180;
 	dex                                  ;01E906|CA      |      ;
 	bne Field_DecodeVerticalLoop                      ;01E907|D0F5    |01E8FE;
 	ply                                  ;01E909|7A      |      ;
@@ -12741,7 +12741,7 @@ Field_DecodeTileData4:
 Field_DecodeNormalTile:
 	lda.W $0000,y                        ;01E916|B90000  |040000;
 	iny                                  ;01E919|C8      |      ;
-	sta.B SNES_WMDATA-$2100              ;01E91A|8580    |002180;
+	sta.B !SNES_WMDATA-$2100              ;01E91A|8580    |002180;
 	dex                                  ;01E91C|CA      |      ;
 	bne Field_DecodeNormalTile                      ;01E91D|D0F7    |01E916;
 	ldx.W #$0008                         ;01E91F|A20800  |      ;
@@ -12749,8 +12749,8 @@ Field_DecodeNormalTile:
 Field_DecodeNormalLoop:
 	lda.W $0000,y                        ;01E922|B90000  |040000;
 	iny                                  ;01E925|C8      |      ;
-	sta.B SNES_WMDATA-$2100              ;01E926|8580    |002180;
-	stz.B SNES_WMDATA-$2100              ;01E928|6480    |002180;
+	sta.B !SNES_WMDATA-$2100              ;01E926|8580    |002180;
+	stz.B !SNES_WMDATA-$2100              ;01E928|6480    |002180;
 	dex                                  ;01E92A|CA      |      ;
 	bne Field_DecodeNormalLoop                      ;01E92B|D0F5    |01E922;
 	plx                                  ;01E92D|FA      |      ;
@@ -12783,10 +12783,10 @@ Field_ClearTileData:
 	ldx.W #$0008                         ;01E94D|A20800  |      ;
 ;      |        |      ;
 Field_ClearTileLoop:
-	stz.B SNES_WMDATA-$2100              ;01E950|6480    |002180;
-	stz.B SNES_WMDATA-$2100              ;01E952|6480    |002180;
-	stz.B SNES_WMDATA-$2100              ;01E954|6480    |002180;
-	stz.B SNES_WMDATA-$2100              ;01E956|6480    |002180;
+	stz.B !SNES_WMDATA-$2100              ;01E950|6480    |002180;
+	stz.B !SNES_WMDATA-$2100              ;01E952|6480    |002180;
+	stz.B !SNES_WMDATA-$2100              ;01E954|6480    |002180;
+	stz.B !SNES_WMDATA-$2100              ;01E956|6480    |002180;
 	dex                                  ;01E958|CA      |      ;
 	bne Field_ClearTileLoop                      ;01E959|D0F5    |01E950;
 	plx                                  ;01E95B|FA      |      ;

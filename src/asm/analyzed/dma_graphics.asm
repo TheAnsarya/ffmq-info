@@ -16,9 +16,9 @@
 ; ============================================================================
 InitializeHardware:
 	sep #$30                        ; 8-bit A, X, Y
-	stz.W SNES_NMITIMEN             ; Disable NMI and IRQ ($4200 = $00)
+	stz.W !SNES_NMITIMEN             ; Disable NMI and IRQ ($4200 = $00)
 	lda.B #$80                      ; Force blank bit
-	sta.W SNES_INIDISP              ; Force screen blank ($2100 = $80)
+	sta.W !SNES_INIDISP              ; Force screen blank ($2100 = $80)
 	rts
 
 ; ============================================================================
@@ -31,29 +31,29 @@ InitializeHardware:
 DMA_TransferToVRAM_Ch5:
 ; Setup DMA channel 5 parameters
 	ldx.W #$1801                    ; DMA params: $18 = VRAM write, $01 = increment mode
-	stx.B SNES_DMA5PARAM-$4300      ; $4350 = DMA5 control
+	stx.B !SNES_DMA5PARAM-$4300      ; $4350 = DMA5 control
 
 ; Source address from RAM parameters
 	ldx.w !vram_src_addr                     ; Load source address (low/mid bytes)
-	stx.B SNES_DMA5ADDRL-$4300      ; $4352-$4353 = source address
+	stx.B !SNES_DMA5ADDRL-$4300      ; $4352-$4353 = source address
 	lda.B #$7f                      ; Source bank = $7f (work RAM)
-	sta.B SNES_DMA5ADDRH-$4300      ; $4354 = source bank
+	sta.B !SNES_DMA5ADDRH-$4300      ; $4354 = source bank
 
 ; Transfer size
 	ldx.w !vram_transfer_size                     ; Load transfer size
-	stx.B SNES_DMA5CNTL-$4300       ; $4355-$4356 = transfer count
+	stx.B !SNES_DMA5CNTL-$4300       ; $4355-$4356 = transfer count
 
 ; Destination VRAM address
 	ldx.w !vram_dest_addr                     ; Load VRAM destination
-	stx.W SNES_VMADDL               ; $2116-$2117 = VRAM address
+	stx.W !SNES_VMADDL               ; $2116-$2117 = VRAM address
 
 ; Configure VRAM increment mode
 	lda.B #$84                      ; Increment after $2119 write, by 128
-	sta.W SNES_VMAINC               ; $2115 = VRAM increment mode
+	sta.W !SNES_VMAINC               ; $2115 = VRAM increment mode
 
 ; Execute DMA transfer
 	lda.B #$20                      ; Enable DMA channel 5 (bit 5)
-	sta.W SNES_MDMAEN               ; $420b = start DMA
+	sta.W !SNES_MDMAEN               ; $420b = start DMA
 	rts
 
 ; ============================================================================
@@ -70,29 +70,29 @@ DMA_TransferPalette:
 
 ; Setup for palette transfer
 	lda.B #$80                      ; Standard increment
-	sta.W SNES_VMAINC               ; $2115 = increment mode
+	sta.W !SNES_VMAINC               ; $2115 = increment mode
 
 ; Configure DMA channel 5
 	ldx.W #$1801                    ; VRAM write mode
-	stx.B SNES_DMA5PARAM-$4300      ; DMA5 control
+	stx.B !SNES_DMA5PARAM-$4300      ; DMA5 control
 
 ; Source address from parameters
 	ldx.w !dma_src_addr                     ; Palette data source (low/mid)
-	stx.B SNES_DMA5ADDRL-$4300      ; Set source address
+	stx.B !SNES_DMA5ADDRL-$4300      ; Set source address
 	lda.w !dma_src_bank                     ; Source bank
-	sta.B SNES_DMA5ADDRH-$4300      ; Set source bank
+	sta.B !SNES_DMA5ADDRH-$4300      ; Set source bank
 
 ; Transfer size
 	ldx.w !dma_size_param                     ; Palette data size
-	stx.B SNES_DMA5CNTL-$4300       ; Set transfer count
+	stx.B !SNES_DMA5CNTL-$4300       ; Set transfer count
 
 ; Destination address
 	ldx.W $0048                     ; VRAM destination from RAM
-	stx.W SNES_VMADDL               ; Set VRAM address
+	stx.W !SNES_VMADDL               ; Set VRAM address
 
 ; Execute transfer
 	lda.B #$20                      ; Enable channel 5
-	sta.W SNES_MDMAEN               ; Start DMA
+	sta.W !SNES_MDMAEN               ; Start DMA
 
 	.noPaletteDMA:
 ; Additional processing...
@@ -115,11 +115,11 @@ DMA_TransferTileData:
 
 ; Configure DMA channel 5 for tile data
 	ldx.W #$2200                    ; Different DMA mode for tiles
-	stx.B SNES_DMA5PARAM-$4300      ; DMA5 control
+	stx.B !SNES_DMA5PARAM-$4300      ; DMA5 control
 
 ; Source bank for tile data
 	lda.B #$07                      ; Bank $07 (ROM data)
-	sta.B SNES_DMA5ADDRH-$4300      ; Source bank
+	sta.B !SNES_DMA5ADDRH-$4300      ; Source bank
 
 ; Tile-specific transfer setup
 	lda.B #$a8                      ; Tile mode parameter
@@ -145,7 +145,7 @@ DMA_TransferTileData:
 ; Special mode 1 transfer
 	phk
 	plb                             ; Set data bank to current program bank
-	sta.W SNES_VMADDL               ; Set VRAM address
+	sta.W !SNES_VMADDL               ; Set VRAM address
 	ldx.W #$f0c1                    ; Special transfer data
 	ldy.W #$0004                    ; Size parameter
 	jmp.W ExecuteSpecialTransfer               ; Execute special transfer

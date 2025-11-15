@@ -61,15 +61,15 @@ SetupComplete:	; Original: Label_00804D
 
 ; Setup DMA to clear screen
 	ldx.W #$1809                    ; DMA parameters: A->B, auto-increment
-	stx.W SNES_DMA0PARAM            ; DMA channel 0 control
+	stx.W !SNES_DMA0PARAM            ; DMA channel 0 control
 	ldx.W #$8252                    ; Source address low/mid
-	stx.W SNES_DMA0ADDRL            ; DMA source address
+	stx.W !SNES_DMA0ADDRL            ; DMA source address
 	lda.B #$00                      ; Source bank
-	sta.W SNES_DMA0ADDRH            ; DMA source bank
+	sta.W !SNES_DMA0ADDRH            ; DMA source bank
 	ldx.W #$0000                    ; Transfer size = 64KB
-	stx.W SNES_DMA0CNTL             ; DMA transfer size
+	stx.W !SNES_DMA0CNTL             ; DMA transfer size
 	lda.B #$01                      ; Enable channel 0
-	sta.W SNES_MDMAEN               ; Start DMA transfer
+	sta.W !SNES_MDMAEN               ; Start DMA transfer
 
 SkipDMAFill:	; Original: Label_00806E
 	jsl.L $00011f                   ; Call unknown routine (BIOS?)
@@ -80,7 +80,7 @@ SkipDMAFill:	; Original: Label_00806E
 
 ; Enable interrupts
 	lda.w !interrupt_config                     ; Load saved interrupt flags
-	sta.W SNES_NMITIMEN             ; Enable NMI/IRQ
+	sta.W !SNES_NMITIMEN             ; Enable NMI/IRQ
 	cli                             ; Clear interrupt disable flag
 
 ; Initialize game brightness
@@ -123,13 +123,13 @@ EnterMainLoop:	; Original: Load_0080B0
 
 ; Setup color math
 	lda.B #$e0                      ; Color math: all layers
-	sta.W SNES_COLDATA              ; Set color data
+	sta.W !SNES_COLDATA              ; Set color data
 	ldx.W #$0000
-	stx.W SNES_CGSWSEL              ; Clear color window
+	stx.W !SNES_CGSWSEL              ; Clear color window
 
 ; Reset scroll positions
-	stz.W SNES_BG1VOFS              ; BG1 vertical scroll = 0
-	stz.W SNES_BG1VOFS              ; Write twice for 16-bit
+	stz.W !SNES_BG1VOFS              ; BG1 vertical scroll = 0
+	stz.W !SNES_BG1VOFS              ; Write twice for 16-bit
 
 MainGameLoop:	; Original: OriginalCode
 ; Main game loop continues...

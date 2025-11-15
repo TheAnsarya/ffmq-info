@@ -374,20 +374,20 @@ Boot_SetupDMA:
 	ldx.w #$1809	; X = $1809
 ; $18 = DMA mode (2 registers, increment write)
 ; $09 = Target register (high byte)
-	stx.w SNES_DMA0PARAM ; $4300 = DMA0 parameters
+	stx.w !SNES_DMA0PARAM ; $4300 = DMA0 parameters
 
 	ldx.w #$8252	; X = $8252 (source address low/mid)
-	stx.w SNES_DMA0ADDRL ; $4302-$4303 = Source address $xx8252
+	stx.w !SNES_DMA0ADDRL ; $4302-$4303 = Source address $xx8252
 
 	lda.b #$00	  ; A = $00
-	sta.w SNES_DMA0ADDRH ; $4304 = Source bank $00 → $008252
+	sta.w !SNES_DMA0ADDRH ; $4304 = Source bank $00 → $008252
 
 	ldx.w #$0000	; X = $0000 (transfer size = 0 bytes!)
-	stx.w SNES_DMA0CNTL ; $4305-$4306 = Transfer 0 bytes
+	stx.w !SNES_DMA0CNTL ; $4305-$4306 = Transfer 0 bytes
 ; This DMA won't transfer anything!
 
 	lda.b #$01	  ; A = $01 (enable channel 0)
-	sta.w SNES_MDMAEN ; $420b = Execute DMA channel 0
+	sta.w !SNES_MDMAEN ; $420b = Execute DMA channel 0
 ; (Executes but transfers 0 bytes)
 
 ;-------------------------------------------------------------------------------
@@ -412,7 +412,7 @@ Boot_EnableNMI:
 	sep #$20		; 8-bit accumulator
 
 	lda.w !interrupt_config	 ; A = [$0112] (NMI enable flags)
-	sta.w SNES_NMITIMEN ; $4200 = Enable NMI/IRQ/Auto-joypad
+	sta.w !SNES_NMITIMEN ; $4200 = Enable NMI/IRQ/Auto-joypad
 ; Copies configuration from RAM variable
 
 	cli ; Clear Interrupt disable flag
@@ -506,10 +506,10 @@ Boot_FadeIn:
 ; bit 7 = 1: Subtract color
 ; bit 6 = 1: Half color math
 ; bit 5 = 1: Enable color math
-	sta.w SNES_COLDATA ; $2132 = Color math configuration
+	sta.w !SNES_COLDATA ; $2132 = Color math configuration
 
 	ldx.w #$0000	; X = $0000
-	stx.w SNES_CGSWSEL ; $2130 = Color/math window settings = 0
+	stx.w !SNES_CGSWSEL ; $2130 = Color/math window settings = 0
 ; Disable all color window masking
 
 ; ---------------------------------------------------------------------------
@@ -519,10 +519,10 @@ Boot_FadeIn:
 ; Writing $00 twice sets scroll position to 0
 ; ---------------------------------------------------------------------------
 
-	stz.w SNES_BG1VOFS ; $210e = BG1 vertical scroll = 0 (low byte)
-	stz.w SNES_BG1VOFS ; $210e = BG1 vertical scroll = 0 (high byte)
-	stz.w SNES_BG2VOFS ; $2110 = BG2 vertical scroll = 0 (low byte)
-	stz.w SNES_BG2VOFS ; $2110 = BG2 vertical scroll = 0 (high byte)
+	stz.w !SNES_BG1VOFS ; $210e = BG1 vertical scroll = 0 (low byte)
+	stz.w !SNES_BG1VOFS ; $210e = BG1 vertical scroll = 0 (high byte)
+	stz.w !SNES_BG2VOFS ; $2110 = BG2 vertical scroll = 0 (low byte)
+	stz.w !SNES_BG2VOFS ; $2110 = BG2 vertical scroll = 0 (high byte)
 
 	jsr.w AdditionalGraphicsFadeSetup ; Additional graphics/fade setup
 	jsl.l AddressC8000OriginalCode ; Bank $0c: Wait for VBLANK again
@@ -642,7 +642,7 @@ Init_NewGameState:
 	lda.b #$14	  ; A = $14 (%00010100)
 ; bit 4 = Enable BG3
 ; bit 2 = Enable BG1
-	sta.w SNES_TM   ; $212c = Main screen designation
+	sta.w !SNES_TM   ; $212c = Main screen designation
 ; Display BG1 and BG3 on main screen
 
 	rep #$30		; 16-bit A, X, Y
@@ -670,25 +670,25 @@ Init_NewGameState:
 ; ---------------------------------------------------------------------------
 
 	ldx.w #$0000	; X = $0000
-	stx.w SNES_OAMADDL ; $2102-$2103 = OAM address = $0000
+	stx.w !SNES_OAMADDL ; $2102-$2103 = OAM address = $0000
 ; Start writing at first sprite
 
 	ldx.w #$0400	; X = $0400
 ; $04 = DMA mode: 2 registers, write once
 ; $00 = Target register low byte
-	stx.w SNES_DMA5PARAM ; $4350 = DMA5 parameters
+	stx.w !SNES_DMA5PARAM ; $4350 = DMA5 parameters
 
 	ldx.w #$0c00	; X = $0c00
-	stx.w SNES_DMA5ADDRL ; $4352-$4353 = Source address $xx0C00
+	stx.w !SNES_DMA5ADDRL ; $4352-$4353 = Source address $xx0C00
 
 	lda.b #$00	  ; A = $00
-	sta.w SNES_DMA5ADDRH ; $4354 = Source bank = $00 → $000c00
+	sta.w !SNES_DMA5ADDRH ; $4354 = Source bank = $00 → $000c00
 
 	ldx.w #$0220	; X = $0220 (544 bytes)
-	stx.w SNES_DMA5CNTL ; $4355-$4356 = Transfer size = 544 bytes
+	stx.w !SNES_DMA5CNTL ; $4355-$4356 = Transfer size = 544 bytes
 
 	lda.b #$20	  ; A = $20 (bit 5 = DMA channel 5)
-	sta.w SNES_MDMAEN ; $420b = Execute DMA channel 5
+	sta.w !SNES_MDMAEN ; $420b = Execute DMA channel 5
 ; Copies OAM data to PPU
 
 ; ---------------------------------------------------------------------------
@@ -1039,11 +1039,11 @@ Init_Hardware:
 
 	sep #$30		; 8-bit A, X, Y (and set flags)
 
-	stz.w SNES_NMITIMEN ; $4200 = $00
+	stz.w !SNES_NMITIMEN ; $4200 = $00
 ; Disable NMI, IRQ, and auto-joypad read
 
 	lda.b #$80	  ; A = $80 (bit 7 = force blank)
-	sta.w SNES_INIDISP ; $2100 = $80
+	sta.w !SNES_INIDISP ; $2100 = $80
 ; Force blank: screen output disabled
 ; Brightness = 0
 
@@ -1244,7 +1244,7 @@ Init_VBlankDMA:
 ; ---------------------------------------------------------------------------
 
 	ldx.w #$6080	; X = $6080 (VRAM address)
-	stx.b SNES_VMADDL-$2100 ; $2116-$2117 = VRAM address $6080
+	stx.b !SNES_VMADDL-$2100 ; $2116-$2117 = VRAM address $6080
 ; (using direct page offset)
 
 	pea.w $0004	 ; Push $0004
@@ -1413,27 +1413,27 @@ NMI_GraphicsUpload:
 	ldx.w #$1801	; X = $1801
 ; $18 = DMA mode (2 registers, increment)
 ; $01 = Low byte of destination register
-	stx.b SNES_DMA5PARAM-$4300 ; $4350-$4351 = DMA5 parameters
+	stx.b !SNES_DMA5PARAM-$4300 ; $4350-$4351 = DMA5 parameters
 
 	ldx.w !vram_src_addr	 ; X = source address (from variable)
-	stx.b SNES_DMA5ADDRL-$4300 ; $4352-$4353 = Source address low/mid
+	stx.b !SNES_DMA5ADDRL-$4300 ; $4352-$4353 = Source address low/mid
 
 	lda.b #$7f	  ; A = $7f
-	sta.b SNES_DMA5ADDRH-$4300 ; $4354 = Source bank $7f
+	sta.b !SNES_DMA5ADDRH-$4300 ; $4354 = Source bank $7f
 
 	ldx.w !vram_transfer_size	 ; X = transfer size (from variable)
-	stx.b SNES_DMA5CNTL-$4300 ; $4355-$4356 = Transfer size
+	stx.b !SNES_DMA5CNTL-$4300 ; $4355-$4356 = Transfer size
 
 	ldx.w !vram_dest_addr	 ; X = VRAM destination address
-	stx.w SNES_VMADDL ; $2116-$2117 = VRAM address
+	stx.w !SNES_VMADDL ; $2116-$2117 = VRAM address
 
 	lda.b #$84	  ; A = $84
 ; bit 7 = increment after writing $2119
 ; Bits 0-3 = increment by 128 words
-	sta.w SNES_VMAINC ; $2115 = VRAM address increment mode
+	sta.w !SNES_VMAINC ; $2115 = VRAM address increment mode
 
 	lda.b #$20	  ; A = $20 (bit 5 = DMA channel 5)
-	sta.w SNES_MDMAEN ; $420b = Execute DMA channel 5
+	sta.w !SNES_MDMAEN ; $420b = Execute DMA channel 5
 ; Transfer starts immediately!
 
 ;-------------------------------------------------------------------------------
@@ -1454,25 +1454,25 @@ NMI_ProcessDMAFlags:
 ; ---------------------------------------------------------------------------
 
 	lda.b #$80	  ; A = $80 (increment after $2119 write)
-	sta.w SNES_VMAINC ; $2115 = VRAM increment mode
+	sta.w !SNES_VMAINC ; $2115 = VRAM increment mode
 
 	ldx.w #$1801	; X = $1801 (DMA parameters)
-	stx.b SNES_DMA5PARAM-$4300 ; $4350-$4351 = DMA5 config
+	stx.b !SNES_DMA5PARAM-$4300 ; $4350-$4351 = DMA5 config
 
 	ldx.w !dma_src_addr	 ; X = source address
-	stx.b SNES_DMA5ADDRL-$4300 ; $4352-$4353 = Source address low/mid
+	stx.b !SNES_DMA5ADDRL-$4300 ; $4352-$4353 = Source address low/mid
 
 	lda.w !dma_src_bank	 ; A = source bank
-	sta.b SNES_DMA5ADDRH-$4300 ; $4354 = Source bank
+	sta.b !SNES_DMA5ADDRH-$4300 ; $4354 = Source bank
 
 	ldx.w !dma_size_param	 ; X = transfer size
-	stx.b SNES_DMA5CNTL-$4300 ; $4355-$4356 = Size
+	stx.b !SNES_DMA5CNTL-$4300 ; $4355-$4356 = Size
 
 	ldx.w $0048	 ; X = VRAM address
-	stx.w SNES_VMADDL ; $2116-$2117 = VRAM address
+	stx.w !SNES_VMADDL ; $2116-$2117 = VRAM address
 
 	lda.b #$20	  ; A = $20 (DMA channel 5)
-	sta.w SNES_MDMAEN ; $420b = Execute DMA
+	sta.w !SNES_MDMAEN ; $420b = Execute DMA
 
 ;-------------------------------------------------------------------------------
 
@@ -1541,10 +1541,10 @@ DMA_TransferTilemap:
 	ldx.w #$2200	; X = $2200
 ; $22 = DMA mode (fixed source, increment dest)
 ; $00 = Target register low byte
-	stx.b SNES_DMA5PARAM-$4300 ; $4350 = DMA5 parameters
+	stx.b !SNES_DMA5PARAM-$4300 ; $4350 = DMA5 parameters
 
 	lda.b #$07	  ; A = $07
-	sta.b SNES_DMA5ADDRH-$4300 ; $4354 = Source bank $07
+	sta.b !SNES_DMA5ADDRH-$4300 ; $4354 = Source bank $07
 
 	lda.b #$a8	  ; A = $a8 (CGADD - palette address register)
 	ldx.w $0064	 ; X = [$0064] (palette index/parameters)
@@ -1590,7 +1590,7 @@ DMA_SpecialGraphics:
 	plb ; Pull to Data Bank (B register)
 ; B = $00 (set data bank to current program bank)
 
-	sta.w SNES_VMADDL ; $2116-$2117 = VRAM address $6080
+	sta.w !SNES_VMADDL ; $2116-$2117 = VRAM address $6080
 
 	ldx.w #$f0c1	; X = $f0c1 (source address in bank $04)
 	ldy.w #$0004	; Y = $0004 (DMA parameters)
@@ -1639,17 +1639,17 @@ NMI_LargeTransfer:
 ; ---------------------------------------------------------------------------
 
 	ldx.w #$1801	; X = $1801 (DMA parameters)
-	stx.b SNES_DMA5PARAM-$4300 ; $4350 = DMA5 config
+	stx.b !SNES_DMA5PARAM-$4300 ; $4350 = DMA5 config
 
 	ldx.w #$075a	; X = $075a (source address offset)
-	stx.b SNES_DMA5ADDRL-$4300 ; $4352-$4353 = Source address low/mid
+	stx.b !SNES_DMA5ADDRL-$4300 ; $4352-$4353 = Source address low/mid
 
 	lda.b #$7f	  ; A = $7f
-	sta.b SNES_DMA5ADDRH-$4300 ; $4354 = Source bank $7f
+	sta.b !SNES_DMA5ADDRH-$4300 ; $4354 = Source bank $7f
 ; Full source: $7f075a
 
 	ldx.w #$0062	; X = $0062 (98 bytes)
-	stx.b SNES_DMA5CNTL-$4300 ; $4355-$4356 = Transfer size
+	stx.b !SNES_DMA5CNTL-$4300 ; $4355-$4356 = Transfer size
 
 	ldx.w #$3bad	; X = $3bad (VRAM destination)
 	stx.w !VMADDL	 ; $2116-$2117 = VRAM address
@@ -1699,10 +1699,10 @@ NMI_AlternateTransfer:
 ; ---------------------------------------------------------------------------
 
 	ldx.w #$2200	; X = $2200 (DMA parameters)
-	stx.b SNES_DMA5PARAM-$4300 ; $4350 = DMA5 config
+	stx.b !SNES_DMA5PARAM-$4300 ; $4350 = DMA5 config
 
 	lda.b #$07	  ; A = $07
-	sta.b SNES_DMA5ADDRH-$4300 ; $4354 = Source bank $07
+	sta.b !SNES_DMA5ADDRH-$4300 ; $4354 = Source bank $07
 
 ; ---------------------------------------------------------------------------
 ; Transfer Two Palette Sets
@@ -1767,13 +1767,13 @@ NMI_AlternateTransfer:
 ; ---------------------------------------------------------------------------
 
 	ldx.w #$1801	; X = $1801 (DMA parameters)
-	stx.b SNES_DMA5PARAM-$4300 ; $4350 = DMA5 config
+	stx.b !SNES_DMA5PARAM-$4300 ; $4350 = DMA5 config
 
 	ldx.w #$0380	; X = $0380 (896 bytes)
-	stx.b SNES_DMA5CNTL-$4300 ; $4355-$4356 = Transfer size
+	stx.b !SNES_DMA5CNTL-$4300 ; $4355-$4356 = Transfer size
 
 	lda.b #$7f	  ; A = $7f
-	sta.b SNES_DMA5ADDRH-$4300 ; $4354 = Source bank $7f
+	sta.b !SNES_DMA5ADDRH-$4300 ; $4354 = Source bank $7f
 
 ; ---------------------------------------------------------------------------
 ; Select Source Address Based on Menu Position
@@ -1796,13 +1796,13 @@ NMI_AlternateTransfer:
 ; Y >= $29 → Use source 3
 
 DMA_ExecuteTilemapTransfer:
-	stx.b SNES_DMA5ADDRL-$4300 ; $4352-$4353 = Selected source address
+	stx.b !SNES_DMA5ADDRL-$4300 ; $4352-$4353 = Selected source address
 
 	ldx.w #$6700	; X = $6700 (VRAM destination)
-	stx.w SNES_VMADDL ; $2116-$2117 = VRAM address
+	stx.w !SNES_VMADDL ; $2116-$2117 = VRAM address
 
 	lda.b #$20	  ; A = $20 (DMA channel 5)
-	sta.w SNES_MDMAEN ; $420b = Execute DMA
+	sta.w !SNES_MDMAEN ; $420b = Execute DMA
 
 ;-------------------------------------------------------------------------------
 
@@ -1841,7 +1841,7 @@ DMA_TransferPalette:
 ; Sets where in CGRAM to write
 
 	ldy.w #$0010	; Y = $0010 (16 bytes = 8 colors)
-	sty.b SNES_DMA5CNTL-$4300 ; $4355-$4356 = Transfer 16 bytes
+	sty.b !SNES_DMA5CNTL-$4300 ; $4355-$4356 = Transfer 16 bytes
 
 	rep #$30		; 16-bit A, X, Y
 
@@ -1850,7 +1850,7 @@ DMA_TransferPalette:
 	clc ; Clear carry
 	adc.w #$d8e4	; A = A + $d8e4 (add base address)
 ; Final source in bank $07: $07(D8E4+offset)
-	sta.b SNES_DMA5ADDRL-$4300 ; $4352-$4353 = Calculated source address
+	sta.b !SNES_DMA5ADDRL-$4300 ; $4352-$4353 = Calculated source address
 
 	sep #$20		; 8-bit accumulator
 
@@ -1882,7 +1882,7 @@ DMA_StandardTilemap:
 	cpx.w #$ffff	; Check if X = $ffff
 	beq DMA_StandardTilemap_Skip ; If yes → Skip transfer (no data)
 
-	sta.w SNES_VMADDL ; $2116-$2117 = VRAM destination address
+	sta.w !SNES_VMADDL ; $2116-$2117 = VRAM destination address
 
 	pea.w $0004	 ; Push $0004
 	plb ; B = $04 (Data Bank = $04)
@@ -1937,40 +1937,40 @@ DMA_UpdateOAM:
 	ldx.w #$0400	; X = $0400
 ; $04 = DMA mode (write 2 registers once)
 ; $00 = Target register low byte ($2104 = OAMDATA)
-	stx.b SNES_DMA5PARAM-$4300 ; $4350 = DMA5 config
+	stx.b !SNES_DMA5PARAM-$4300 ; $4350 = DMA5 config
 
 	ldx.w #$0c00	; X = $0c00 (source address)
-	stx.b SNES_DMA5ADDRL-$4300 ; $4352-$4353 = Source in bank $00: $000c00
+	stx.b !SNES_DMA5ADDRL-$4300 ; $4352-$4353 = Source in bank $00: $000c00
 
 	lda.b #$00	  ; A = $00
-	sta.b SNES_DMA5ADDRH-$4300 ; $4354 = Source bank $00
+	sta.b !SNES_DMA5ADDRH-$4300 ; $4354 = Source bank $00
 
 	ldx.w !oam_dma_size1	 ; X = [$01f0] (transfer size - main table)
-	stx.b SNES_DMA5CNTL-$4300 ; $4355-$4356 = Size (typically $0200 = 512 bytes)
+	stx.b !SNES_DMA5CNTL-$4300 ; $4355-$4356 = Size (typically $0200 = 512 bytes)
 
 	ldx.w #$0000	; X = $0000
-	stx.w SNES_OAMADDL ; $2102-$2103 = OAM address = 0
+	stx.w !SNES_OAMADDL ; $2102-$2103 = OAM address = 0
 ; Start writing at first sprite
 
 	lda.b #$20	  ; A = $20 (DMA channel 5)
-	sta.w SNES_MDMAEN ; $420b = Execute DMA (main table)
+	sta.w !SNES_MDMAEN ; $420b = Execute DMA (main table)
 
 ; ---------------------------------------------------------------------------
 ; Configure DMA for High OAM Table
 ; ---------------------------------------------------------------------------
 
 	ldx.w #$0e00	; X = $0e00 (source address for high table)
-	stx.b SNES_DMA5ADDRL-$4300 ; $4352-$4353 = Source: $000e00
+	stx.b !SNES_DMA5ADDRL-$4300 ; $4352-$4353 = Source: $000e00
 
 	ldx.w !oam_dma_size2	 ; X = [$01f2] (transfer size - high table)
-	stx.b SNES_DMA5CNTL-$4300 ; $4355-$4356 = Size (typically $0020 = 32 bytes)
+	stx.b !SNES_DMA5CNTL-$4300 ; $4355-$4356 = Size (typically $0020 = 32 bytes)
 
 	ldx.w #$0100	; X = $0100
-	stx.w SNES_OAMADDL ; $2102-$2103 = OAM address = $100
+	stx.w !SNES_OAMADDL ; $2102-$2103 = OAM address = $100
 ; This is where high table starts
 
 	lda.b #$20	  ; A = $20 (DMA channel 5)
-	sta.w SNES_MDMAEN ; $420b = Execute DMA (high table)
+	sta.w !SNES_MDMAEN ; $420b = Execute DMA (high table)
 
 	rts ; Return
 
@@ -1991,22 +1991,22 @@ DMA_BattleGraphics:
 ; ---------------------------------------------------------------------------
 
 	ldx.w #$4400	; X = $4400 (VRAM destination)
-	stx.w SNES_VMADDL ; $2116-$2117 = VRAM address
+	stx.w !SNES_VMADDL ; $2116-$2117 = VRAM address
 
 	ldx.w #$1801	; X = $1801 (DMA parameters)
-	stx.b SNES_DMA5PARAM-$4300 ; $4350 = DMA5 config
+	stx.b !SNES_DMA5PARAM-$4300 ; $4350 = DMA5 config
 
 	ldx.w #$0480	; X = $0480 (source address offset)
-	stx.b SNES_DMA5ADDRL-$4300 ; $4352-$4353 = Source in bank $7f: $7f0480
+	stx.b !SNES_DMA5ADDRL-$4300 ; $4352-$4353 = Source in bank $7f: $7f0480
 
 	lda.b #$7f	  ; A = $7f
-	sta.b SNES_DMA5ADDRH-$4300 ; $4354 = Source bank
+	sta.b !SNES_DMA5ADDRH-$4300 ; $4354 = Source bank
 
 	ldx.w #$0280	; X = $0280 (640 bytes)
-	stx.b SNES_DMA5CNTL-$4300 ; $4355-$4356 = Transfer size
+	stx.b !SNES_DMA5CNTL-$4300 ; $4355-$4356 = Transfer size
 
 	lda.b #$20	  ; A = $20 (DMA channel 5)
-	sta.w SNES_MDMAEN ; $420b = Execute DMA
+	sta.w !SNES_MDMAEN ; $420b = Execute DMA
 ; ===========================================================================
 
 	lda.b #$80	  ; A = $80 (bit 7)
@@ -2583,7 +2583,7 @@ DMA_Init_Data:
 DMA_FieldGraphicsUpdate:
 ; Setup VRAM for vertical increment mode
 	lda.b #$80	  ; Increment after writing to $2119
-	sta.w SNES_VMAINC ; Set VRAM increment mode
+	sta.w !SNES_VMAINC ; Set VRAM increment mode
 
 ; Check if battle mode graphics needed
 	lda.b #$10	  ; Check bit 4 of display flags
@@ -2593,38 +2593,38 @@ DMA_FieldGraphicsUpdate:
 	+
 ; Field mode graphics update
 	ldx.w $0042	 ; Get current VRAM address from variable
-	stx.w SNES_VMADDL ; Set VRAM write address
+	stx.w !SNES_VMADDL ; Set VRAM write address
 
 ; Setup DMA for character tile transfer
 	ldx.w #$1801	; DMA mode: word write, increment
-	stx.b SNES_DMA5PARAM-$4300 ; Set DMA5 parameters
+	stx.b !SNES_DMA5PARAM-$4300 ; Set DMA5 parameters
 	ldx.w #$0040	; Source: $7f0040
-	stx.b SNES_DMA5ADDRL-$4300 ; Set source address
+	stx.b !SNES_DMA5ADDRL-$4300 ; Set source address
 	lda.b #$7f	  ; Bank $7f (WRAM)
-	sta.b SNES_DMA5ADDRH-$4300 ; Set source bank
+	sta.b !SNES_DMA5ADDRH-$4300 ; Set source bank
 	ldx.w #$07c0	; Transfer size: $07c0 bytes (1984 bytes)
-	stx.b SNES_DMA5CNTL-$4300 ; Set transfer size
+	stx.b !SNES_DMA5CNTL-$4300 ; Set transfer size
 	lda.b #$20	  ; Trigger DMA channel 5
-	sta.w SNES_MDMAEN ; Execute transfer
+	sta.w !SNES_MDMAEN ; Execute transfer
 
 	rep #$30		; 16-bit A, X, Y
 	clc ; Clear carry for addition
 	lda.w $0042	 ; Get VRAM address
 	adc.w #$1000	; Add $1000 for next section
-	sta.w SNES_VMADDL ; Set new VRAM address
+	sta.w !SNES_VMADDL ; Set new VRAM address
 	sep #$20		; 8-bit A
 
 ; Transfer second section of tiles
 	ldx.w #$1801	; DMA mode: word write
-	stx.b SNES_DMA5PARAM-$4300 ; Set DMA5 parameters
+	stx.b !SNES_DMA5PARAM-$4300 ; Set DMA5 parameters
 	ldx.w #$1040	; Source: $7f1040
-	stx.b SNES_DMA5ADDRL-$4300 ; Set source address
+	stx.b !SNES_DMA5ADDRL-$4300 ; Set source address
 	lda.b #$7f	  ; Bank $7f (WRAM)
-	sta.b SNES_DMA5ADDRH-$4300 ; Set source bank
+	sta.b !SNES_DMA5ADDRH-$4300 ; Set source bank
 	ldx.w #$07c0	; Transfer size: $07c0 bytes
-	stx.b SNES_DMA5CNTL-$4300 ; Set transfer size
+	stx.b !SNES_DMA5CNTL-$4300 ; Set transfer size
 	lda.b #$20	  ; Trigger DMA channel 5
-	sta.w SNES_MDMAEN ; Execute transfer
+	sta.w !SNES_MDMAEN ; Execute transfer
 
 ; Check if tilemap update needed
 	lda.b #$80	  ; Check bit 7
@@ -2633,17 +2633,17 @@ DMA_FieldGraphicsUpdate:
 
 ; Transfer tilemap data
 	ldx.w #$5820	; VRAM address $5820
-	stx.w SNES_VMADDL ; Set VRAM write address
+	stx.w !SNES_VMADDL ; Set VRAM write address
 	ldx.w #$1801	; DMA mode: word write
-	stx.b SNES_DMA5PARAM-$4300 ; Set DMA5 parameters
+	stx.b !SNES_DMA5PARAM-$4300 ; Set DMA5 parameters
 	ldx.w #$2040	; Source: $7e2040
-	stx.b SNES_DMA5ADDRL-$4300 ; Set source address
+	stx.b !SNES_DMA5ADDRL-$4300 ; Set source address
 	lda.b #$7e	  ; Bank $7e (WRAM)
-	sta.b SNES_DMA5ADDRH-$4300 ; Set source bank
+	sta.b !SNES_DMA5ADDRH-$4300 ; Set source bank
 	ldx.w #$0fc0	; Transfer size: $0fc0 bytes (4032 bytes)
-	stx.b SNES_DMA5CNTL-$4300 ; Set transfer size
+	stx.b !SNES_DMA5CNTL-$4300 ; Set transfer size
 	lda.b #$20	  ; Trigger DMA channel 5
-	sta.w SNES_MDMAEN ; Execute transfer
+	sta.w !SNES_MDMAEN ; Execute transfer
 	rtl ; Return
 
 DMA_FieldGraphicsUpdate_OAM:
@@ -2682,7 +2682,7 @@ DMA_SpecialVRAMHandler:
 ; Clear "special transfer pending" flag
 
 	lda.b #$80	  ; A = $80 (increment mode)
-	sta.w SNES_VMAINC ; $2115 = Increment after $2119 write
+	sta.w !SNES_VMAINC ; $2115 = Increment after $2119 write
 
 ; ---------------------------------------------------------------------------
 ; Check Battle Mode Graphics Flag
@@ -2718,22 +2718,22 @@ DMA_SpecialVRAMHandler:
 ; ---------------------------------------------------------------------------
 
 	lda.b #$a8	  ; A = $a8 (palette start address)
-	sta.w SNES_CGADD ; $2121 = CGRAM address = $a8
+	sta.w !SNES_CGADD ; $2121 = CGRAM address = $a8
 
 	ldx.w #$2200	; X = $2200 (DMA parameters)
-	stx.b SNES_DMA5PARAM-$4300 ; $4350 = DMA5 config
+	stx.b !SNES_DMA5PARAM-$4300 ; $4350 = DMA5 config
 
 	ldx.w #$d814	; X = $d814 (source offset)
-	stx.b SNES_DMA5ADDRL-$4300 ; $4352-$4353 = Source: $07d814
+	stx.b !SNES_DMA5ADDRL-$4300 ; $4352-$4353 = Source: $07d814
 
 	lda.b #$07	  ; A = $07
-	sta.b SNES_DMA5ADDRH-$4300 ; $4354 = Source bank $07
+	sta.b !SNES_DMA5ADDRH-$4300 ; $4354 = Source bank $07
 
 	ldx.w #$0010	; X = $0010 (16 bytes = 8 colors)
-	stx.b SNES_DMA5CNTL-$4300 ; $4355-$4356 = Transfer size
+	stx.b !SNES_DMA5CNTL-$4300 ; $4355-$4356 = Transfer size
 
 	lda.b #$20	  ; A = $20 (DMA channel 5)
-	sta.w SNES_MDMAEN ; $420b = Execute palette DMA
+	sta.w !SNES_MDMAEN ; $420b = Execute palette DMA
 
 ; ---------------------------------------------------------------------------
 ; Clear Specific Palette Entries
@@ -2743,14 +2743,14 @@ DMA_SpecialVRAMHandler:
 ; ---------------------------------------------------------------------------
 
 	lda.b #$0d	  ; A = $0d (palette entry 13)
-	sta.w SNES_CGADD ; Set CGRAM address
-	stz.w SNES_CGDATA ; $2122 = $00 (color low byte = black)
-	stz.w SNES_CGDATA ; $2122 = $00 (color high byte)
+	sta.w !SNES_CGADD ; Set CGRAM address
+	stz.w !SNES_CGDATA ; $2122 = $00 (color low byte = black)
+	stz.w !SNES_CGDATA ; $2122 = $00 (color high byte)
 
 	lda.b #$1d	  ; A = $1d (palette entry 29)
-	sta.w SNES_CGADD ; Set CGRAM address
-	stz.w SNES_CGDATA ; $2122 = $00 (black)
-	stz.w SNES_CGDATA ; $2122 = $00
+	sta.w !SNES_CGADD ; Set CGRAM address
+	stz.w !SNES_CGDATA ; $2122 = $00 (black)
+	stz.w !SNES_CGDATA ; $2122 = $00
 
 	rtl ; Return
 
@@ -2769,16 +2769,16 @@ DMA_FieldModeTransfer:
 ; ---------------------------------------------------------------------------
 
 	ldx.w #$2200	; X = $2200 (DMA parameters)
-	stx.b SNES_DMA5PARAM-$4300 ; $4350 = DMA5 config
+	stx.b !SNES_DMA5PARAM-$4300 ; $4350 = DMA5 config
 
 	ldx.w #$d824	; X = $d824 (source offset)
-	stx.b SNES_DMA5ADDRL-$4300 ; $4352-$4353 = Source: $07d824
+	stx.b !SNES_DMA5ADDRL-$4300 ; $4352-$4353 = Source: $07d824
 
 	lda.b #$07	  ; A = $07
-	sta.b SNES_DMA5ADDRH-$4300 ; $4354 = Source bank $07
+	sta.b !SNES_DMA5ADDRH-$4300 ; $4354 = Source bank $07
 
 	ldx.w #$0010	; X = $0010 (16 bytes)
-	stx.b SNES_DMA5CNTL-$4300 ; $4355-$4356 = Transfer size
+	stx.b !SNES_DMA5CNTL-$4300 ; $4355-$4356 = Transfer size
 
 	rep #$30		; 16-bit A, X, Y
 
@@ -3009,18 +3009,18 @@ DMA_PaletteToCGRAM:
 ;   16 bytes = 8 colors per transfer
 ; ===========================================================================
 
-	sta.b SNES_DMA5ADDRL-$4300 ; $4352-$4353 = Source address
+	sta.b !SNES_DMA5ADDRL-$4300 ; $4352-$4353 = Source address
 
 	txa ; A = X (CGRAM address)
 	sep #$20		; 8-bit accumulator
 
-	sta.w SNES_CGADD ; $2121 = CGRAM address
+	sta.w !SNES_CGADD ; $2121 = CGRAM address
 
 	ldx.w #$0010	; X = $0010 (16 bytes)
-	stx.b SNES_DMA5CNTL-$4300 ; $4355-$4356 = Transfer size
+	stx.b !SNES_DMA5CNTL-$4300 ; $4355-$4356 = Transfer size
 
 	lda.b #$20	  ; A = $20 (DMA channel 5)
-	sta.w SNES_MDMAEN ; $420b = Execute palette DMA
+	sta.w !SNES_MDMAEN ; $420b = Execute palette DMA
 
 	rep #$30		; 16-bit A, X, Y
 
@@ -3887,7 +3887,7 @@ Input_ReadController:
 ; Normal Controller Read
 ; ---------------------------------------------------------------------------
 
-	lda.w SNES_CNTRL1L ; A = [$4218] (Controller 1 input)
+	lda.w !SNES_CNTRL1L ; A = [$4218] (Controller 1 input)
 ; Reads 16-bit joypad state
 	bra Input_ProcessButtons ; → Process input
 
@@ -3901,7 +3901,7 @@ Input_SpecialMode:
 ; Only allows button presses (A, B, X, Y, L, R, Start, Select).
 ; ===========================================================================
 
-	lda.w SNES_CNTRL1L ; A = controller state
+	lda.w !SNES_CNTRL1L ; A = controller state
 	and.w #$fff0	; A = A & $fff0 (clear bits 0-3, D-pad)
 	beq Input_ProcessButtons ; If zero → No buttons pressed
 
@@ -3926,7 +3926,7 @@ Input_AlternateFilter:
 ;-------------------------------------------------------------------------------
 
 Input_AlternateNormal:
-	lda.w SNES_CNTRL1L ; A = controller state
+	lda.w !SNES_CNTRL1L ; A = controller state
 	and.w #$fff0	; Mask D-pad
 	beq Input_ProcessButtons ; If zero → No buttons
 
@@ -5709,7 +5709,7 @@ Graphics_PrepareTransition:
 	lda.b #$40	  ; bit 6 mask
 	tsb.w !system_flags_3	 ; Set graphics busy flag in $00d6
 	lda.w !interrupt_config	 ; Load NMI/IRQ configuration
-	sta.w SNES_NMITIMEN ; Store to NMITIMEN ($4200)
+	sta.w !SNES_NMITIMEN ; Store to NMITIMEN ($4200)
 	cli ; Enable interrupts
 	jsl.l FinalSetupRoutine ; Call sprite processing routine
 	lda.b #$08	  ; bit 3 mask
@@ -5910,7 +5910,7 @@ Skip_Division:
 Hardware_WriteMultiplierB:
 	php ; Save processor status
 	sep #$20		; 8-bit A
-	sta.w SNES_WRMPYB ; Write to multiplier B register
+	sta.w !SNES_WRMPYB ; Write to multiplier B register
 	plp ; Restore processor status
 	rtl ; Return long
 
@@ -5929,7 +5929,7 @@ Hardware_WriteMultiplierB:
 Hardware_Divide:
 	php ; Save processor status
 	sep #$20		; 8-bit A
-	sta.w SNES_WRDIVB ; Write divisor to hardware
+	sta.w !SNES_WRDIVB ; Write divisor to hardware
 	xba ; Swap A bytes (delay)
 	xba ; Swap back (delay)
 	plp ; Restore processor status
@@ -6093,12 +6093,12 @@ Random_Generate:
 	sep #$20		; 8-bit A
 	xba ; Get high byte
 	sta.b $4b	   ; Store to $a9 (DP $005e + $4b)
-	sta.w SNES_WRDIVL ; Write to divider (low byte)
-	stz.w SNES_WRDIVH ; Clear divider (high byte)
+	sta.w !SNES_WRDIVL ; Write to divider (low byte)
+	stz.w !SNES_WRDIVH ; Clear divider (high byte)
 	lda.b $4a	   ; Load modulo value from $a8
 	beq Random_Done ; If zero, skip modulo
 	jsl.l Hardware_Divide ; Perform division
-	lda.w SNES_RDMPYL ; Read remainder (result of modulo)
+	lda.w !SNES_RDMPYL ; Read remainder (result of modulo)
 	sta.b $4b	   ; Store to $a9
 
 Random_Done:
@@ -7030,22 +7030,22 @@ Palette_InitColorProcessing:
 	sep #$20		; 8-bit A
 
 	lda.b #$7f	  ; Bank $7f
-	sta.w SNES_DMA3ADDRH ; DMA3 source bank
-	sta.w SNES_DMA6ADDRH ; DMA6 source bank
-	sta.w SNES_DMA7ADDRH ; DMA7 source bank
+	sta.w !SNES_DMA3ADDRH ; DMA3 source bank
+	sta.w !SNES_DMA6ADDRH ; DMA6 source bank
+	sta.w !SNES_DMA7ADDRH ; DMA7 source bank
 
 	ldx.w #$2100	; SNES register base
-	stx.w SNES_DMA3PARAM ; DMA3 parameter
+	stx.w !SNES_DMA3PARAM ; DMA3 parameter
 	ldx.w #$2202	; Different register
-	stx.w SNES_DMA6PARAM ; DMA6 parameter
-	stx.w SNES_DMA7PARAM ; DMA7 parameter
+	stx.w !SNES_DMA6PARAM ; DMA6 parameter
+	stx.w !SNES_DMA7PARAM ; DMA7 parameter
 
 	ldx.w #$5007	; Source address
-	stx.w SNES_DMA3ADDRL ; DMA3 source low
+	stx.w !SNES_DMA3ADDRL ; DMA3 source low
 	ldx.w #$5010	; Source address
-	stx.w SNES_DMA6ADDRL ; DMA6 source low
+	stx.w !SNES_DMA6ADDRL ; DMA6 source low
 	ldx.w #$501d	; Source address
-	stx.w SNES_DMA7ADDRL ; DMA7 source low
+	stx.w !SNES_DMA7ADDRL ; DMA7 source low
 
 	rep #$30		; 16-bit A/X/Y
 	rts ; Return
@@ -7858,7 +7858,7 @@ Cmd_CharacterDMATransfer:
 	sta.w $0e92	 ; Store character slot
 
 ; Calculate offset: slot * $50
-	sta.w SNES_WRMPYA ; Multiplicand = slot
+	sta.w !SNES_WRMPYA ; Multiplicand = slot
 	lda.b #$50	  ; Multiplier = $50 (80 bytes)
 	jsl.l PerformMultiply ; Perform multiply
 	rep #$30		; 16-bit A/X/Y
@@ -7866,7 +7866,7 @@ Cmd_CharacterDMATransfer:
 ; Setup DMA transfer
 	clc ; Clear carry
 	lda.w #$d0b0	; Base address $0cd0b0
-	adc.w SNES_RDMPYL ; Add offset (result)
+	adc.w !SNES_RDMPYL ; Add offset (result)
 	tax ; X = source address
 	ldy.w #$1080	; Y = destination $7e1080
 	lda.w #$0050	; Transfer $50 bytes
@@ -11879,12 +11879,12 @@ IRQ_JitterFix:
 	sep #$20		; 8-bit accumulator
 	phk ; Push program bank
 	plb ; Set data bank = program bank
-	stz.w SNES_NMITIMEN ; Disable NMI/IRQ
+	stz.w !SNES_NMITIMEN ; Disable NMI/IRQ
 
 IRQ_JitterFix_Loop:
-	lda.w SNES_SLHV ; Sample H/V counter
-	lda.w SNES_STAT78 ; Read PPU status
-	lda.w SNES_OPVCT ; Read vertical counter
+	lda.w !SNES_SLHV ; Sample H/V counter
+	lda.w !SNES_STAT78 ; Read PPU status
+	lda.w !SNES_OPVCT ; Read vertical counter
 	sta.w !irq_handler_addr	 ; Store V counter
 	lda.b #$40	  ; bit 6 mask
 	and.w !system_flags_5	 ; Test bit 6 of $da
@@ -11902,7 +11902,7 @@ IRQ_JitterFix_Skip:
 	ldx.w #$b86c	; Second-stage IRQ handler
 	stx.w !irq_handler_addr	 ; Store handler address
 	lda.b #$11	  ; Enable V-IRQ + NMI
-	sta.w SNES_NMITIMEN ; Set interrupt mode
+	sta.w !SNES_NMITIMEN ; Set interrupt mode
 	cli ; Enable interrupts
 	wai ; Wait for interrupt
 	rep #$30		; 16-bit A/X/Y
@@ -11925,20 +11925,20 @@ IRQ_JitterFix_Skip:
 ;-------------------------------------------------------------------------------
 IRQ_ScreenOn:
 	lda.b #$80	  ; Screen off brightness
-	sta.w SNES_INIDISP ; Disable screen
+	sta.w !SNES_INIDISP ; Disable screen
 	lda.b #$01	  ; NMI only mode
-	sta.w SNES_NMITIMEN ; Set interrupt mode
+	sta.w !SNES_NMITIMEN ; Set interrupt mode
 	rep #$30		; 16-bit A/X/Y
 	phd ; Save direct page
 	phy ; Save Y
 	jsr.w ScreenSetupRoutine ; Screen setup
 	sep #$20		; 8-bit accumulator
 	lda.b #$07	  ; V-IRQ timer low
-	sta.w SNES_VTIMEL ; Set V timer
+	sta.w !SNES_VTIMEL ; Set V timer
 	ldx.w #$b898	; Next IRQ handler (IRQ_JitterFix2)
 	stx.w !irq_handler_addr	 ; Store handler address
 	lda.w !interrupt_config	 ; Load interrupt mode
-	sta.w SNES_NMITIMEN ; Set interrupt mode
+	sta.w !SNES_NMITIMEN ; Set interrupt mode
 	lda.b #$40	  ; bit 6
 	tsb.w !system_flags_4	 ; Set bit 6 of $d8
 	ply ; Restore Y
@@ -11963,12 +11963,12 @@ IRQ_JitterFix2:
 	sep #$20		; 8-bit accumulator
 	phk ; Push program bank
 	plb ; Set data bank = program bank
-	stz.w SNES_NMITIMEN ; Disable NMI/IRQ
+	stz.w !SNES_NMITIMEN ; Disable NMI/IRQ
 
 IRQ_JitterFix2_Loop:
-	lda.w SNES_SLHV ; Sample H/V counter
-	lda.w SNES_STAT78 ; Read PPU status
-	lda.w SNES_OPVCT ; Read vertical counter
+	lda.w !SNES_SLHV ; Sample H/V counter
+	lda.w !SNES_STAT78 ; Read PPU status
+	lda.w !SNES_OPVCT ; Read vertical counter
 	sta.w !irq_handler_addr	 ; Store V counter
 	lda.b #$40	  ; bit 6 mask
 	and.w !system_flags_5	 ; Test bit 6 of $da
@@ -11986,7 +11986,7 @@ IRQ_JitterFix2_Skip:
 	ldx.w #$b8da	; Second-stage IRQ handler
 	stx.w !irq_handler_addr	 ; Store handler address
 	lda.b #$11	  ; Enable V-IRQ + NMI
-	sta.w SNES_NMITIMEN ; Set interrupt mode
+	sta.w !SNES_NMITIMEN ; Set interrupt mode
 	cli ; Enable interrupts
 	wai ; Wait for interrupt
 	rep #$30		; 16-bit A/X/Y
@@ -12009,9 +12009,9 @@ IRQ_JitterFix2_Skip:
 ;-------------------------------------------------------------------------------
 IRQ_ScreenOn2:
 	lda.w !battle_ready_flag	 ; Load brightness value
-	sta.w SNES_INIDISP ; Set screen brightness
+	sta.w !SNES_INIDISP ; Set screen brightness
 	lda.b #$01	  ; NMI only mode
-	sta.w SNES_NMITIMEN ; Set interrupt mode
+	sta.w !SNES_NMITIMEN ; Set interrupt mode
 	phd ; Save direct page
 	jsr.w Label_008BA0 ; Screen setup routine 1
 	phy ; Save Y
@@ -12275,16 +12275,16 @@ TitleScreen_Init:
 	lda.b #$10	  ; bit 4 mask
 	trb.w !system_interrupt_flags	 ; Clear bit 4 of $0111
 	jsl.l AddressC8000OriginalCode ; External init call
-	stz.w SNES_BG3VOFS ; Clear BG3 V-scroll low
-	stz.w SNES_BG3VOFS ; Clear BG3 V-scroll high
+	stz.w !SNES_BG3VOFS ; Clear BG3 V-scroll low
+	stz.w !SNES_BG3VOFS ; Clear BG3 V-scroll high
 	lda.b #$17	  ; Enable BG1+BG2+BG3+sprites
-	sta.w SNES_TM   ; Set main screen designation
+	sta.w !SNES_TM   ; Set main screen designation
 	lda.b #$00	  ; Start at Y=0
 
 TitleScreen_Init_ScrollLoop:
 	jsl.l AddressC8000OriginalCode ; External call
-	sta.w SNES_BG3VOFS ; Set BG3 V-scroll low
-	stz.w SNES_BG3VOFS ; Clear BG3 V-scroll high
+	sta.w !SNES_BG3VOFS ; Set BG3 V-scroll low
+	stz.w !SNES_BG3VOFS ; Clear BG3 V-scroll high
 	clc ; Clear carry
 	adc.b #$08	  ; Add 8 (scroll speed)
 	cmp.b #$d0	  ; Check if reached $d0
@@ -12347,12 +12347,12 @@ CharName_InputLoop:
 	cpy.b #$08	  ; Check if 8 chars entered
 	beq CharName_ErrorSound ; If full, error sound
 	lda.b $06	   ; Load selected character (row)
-	sta.w SNES_WRMPYA ; Set multiplicand
+	sta.w !SNES_WRMPYA ; Set multiplicand
 	lda.b #$1a	  ; Load 26 (chars per row)
 	jsl.l PerformMultiply ; Multiply
 	lda.b $05	   ; Load column
 	asl a; × 2
-	adc.w SNES_RDMPYL ; Add multiplication result
+	adc.w !SNES_RDMPYL ; Add multiplication result
 	tax ; X = character index
 	rep #$10		; 16-bit X/Y
 	inc.w $00cc	 ; Increment character count
@@ -12417,7 +12417,7 @@ MenuConfig_CharName2:
 System_Init:
 	lda.w #$2100	; PPU register base
 	tcd ; Set direct page to $2100
-	stz.b SNES_CGSWSEL-$2100 ; Clear color/window select
+	stz.b !SNES_CGSWSEL-$2100 ; Clear color/window select
 	lda.w #$0017	; Enable BG1+BG2+BG3+OBJ
 	sta.w !TM	 ; Set main screen designation
 	lda.w #$5555	; Init marker
@@ -12426,15 +12426,15 @@ System_Init:
 	lda.b #$00	  ; Load 0
 	sta.l $7e3664   ; Clear flag
 	lda.b #$3b	  ; BG1 tilemap = $3b00
-	sta.b SNES_BG1SC-$2100 ; Set BG1 screen base
+	sta.b !SNES_BG1SC-$2100 ; Set BG1 screen base
 	lda.b #$4b	  ; BG2 tilemap = $4b00
-	sta.b SNES_BG2SC-$2100 ; Set BG2 screen base
+	sta.b !SNES_BG2SC-$2100 ; Set BG2 screen base
 	lda.b #$80	  ; VRAM increment after high byte
-	sta.b SNES_VMAINC-$2100 ; Set VRAM increment mode
+	sta.b !SNES_VMAINC-$2100 ; Set VRAM increment mode
 	rep #$30		; 16-bit A/X/Y
 	stz.w !state_marker	 ; Clear $f0
 	ldx.w #$0000	; VRAM address $0000
-	stx.b SNES_VMADDL-$2100 ; Set VRAM address
+	stx.b !SNES_VMADDL-$2100 ; Set VRAM address
 	pea.w $0007	 ; Bank $07
 	plb ; Set data bank to $07
 	ldx.w #$8030	; Source address
@@ -12442,7 +12442,7 @@ System_Init:
 	jsl.l DmaTransferVram ; DMA transfer to VRAM
 	plb ; Restore data bank
 	ldx.w #$1000	; VRAM address $1000
-	stx.b SNES_VMADDL-$2100 ; Set VRAM address
+	stx.b !SNES_VMADDL-$2100 ; Set VRAM address
 	pea.w $0004	 ; Bank $04
 	plb ; Set data bank to $04
 	ldx.w #$9840	; Source address
@@ -12450,7 +12450,7 @@ System_Init:
 	jsl.l ExecuteSpecialTransfer ; DMA transfer
 	plb ; Restore data bank
 	ldx.w #$6080	; VRAM address $6080
-	stx.b SNES_VMADDL-$2100 ; Set VRAM address
+	stx.b !SNES_VMADDL-$2100 ; Set VRAM address
 	pea.w $0004	 ; Bank $04
 	plb ; Set data bank
 	ldx.w #$99c0	; Source address
@@ -12489,62 +12489,62 @@ System_Init:
 	jsr.w LoadColorData ; Load color data
 	plb ; Restore data bank
 	lda.b #$80	  ; CGRAM address $80
-	sta.b SNES_CGADD-$2100 ; Set CGRAM address
+	sta.b !SNES_CGADD-$2100 ; Set CGRAM address
 	pea.w $0007	 ; Bank $07
 	plb ; Set data bank
 	lda.w DATA8_07d814 ; Load color data
-	sta.b SNES_CGDATA-$2100 ; Write to CGRAM
+	sta.b !SNES_CGDATA-$2100 ; Write to CGRAM
 	lda.w DATA8_07d815 ; Load color data
-	sta.b SNES_CGDATA-$2100 ; Write to CGRAM
+	sta.b !SNES_CGDATA-$2100 ; Write to CGRAM
 	lda.w DATA8_07d816 ; Load color data
-	sta.b SNES_CGDATA-$2100 ; Write to CGRAM
+	sta.b !SNES_CGDATA-$2100 ; Write to CGRAM
 	lda.w DATA8_07d817 ; Load color data
-	sta.b SNES_CGDATA-$2100 ; Write to CGRAM
+	sta.b !SNES_CGDATA-$2100 ; Write to CGRAM
 	lda.w DATA8_07d818 ; Load color data
-	sta.b SNES_CGDATA-$2100 ; Write to CGRAM
+	sta.b !SNES_CGDATA-$2100 ; Write to CGRAM
 	lda.w DATA8_07d819 ; Load color data
-	sta.b SNES_CGDATA-$2100 ; Write to CGRAM
+	sta.b !SNES_CGDATA-$2100 ; Write to CGRAM
 	lda.w DATA8_07d81a ; Load color data
-	sta.b SNES_CGDATA-$2100 ; Write to CGRAM
+	sta.b !SNES_CGDATA-$2100 ; Write to CGRAM
 	lda.w DATA8_07d81b ; Load color data
-	sta.b SNES_CGDATA-$2100 ; Write to CGRAM
+	sta.b !SNES_CGDATA-$2100 ; Write to CGRAM
 	lda.w DATA8_07d81c ; Load color data
-	sta.b SNES_CGDATA-$2100 ; Write to CGRAM
+	sta.b !SNES_CGDATA-$2100 ; Write to CGRAM
 	lda.w DATA8_07d81d ; Load color data
-	sta.b SNES_CGDATA-$2100 ; Write to CGRAM
+	sta.b !SNES_CGDATA-$2100 ; Write to CGRAM
 	lda.w DATA8_07d81e ; Load color data
-	sta.b SNES_CGDATA-$2100 ; Write to CGRAM
+	sta.b !SNES_CGDATA-$2100 ; Write to CGRAM
 	lda.w DATA8_07d81f ; Load color data
-	sta.b SNES_CGDATA-$2100 ; Write to CGRAM
+	sta.b !SNES_CGDATA-$2100 ; Write to CGRAM
 	lda.w DATA8_07d820 ; Load color data
-	sta.b SNES_CGDATA-$2100 ; Write to CGRAM
+	sta.b !SNES_CGDATA-$2100 ; Write to CGRAM
 	lda.w DATA8_07d821 ; Load color data
-	sta.b SNES_CGDATA-$2100 ; Write to CGRAM
+	sta.b !SNES_CGDATA-$2100 ; Write to CGRAM
 	lda.w DATA8_07d822 ; Load color data
-	sta.b SNES_CGDATA-$2100 ; Write to CGRAM
+	sta.b !SNES_CGDATA-$2100 ; Write to CGRAM
 	lda.w DATA8_07d823 ; Load color data
-	sta.b SNES_CGDATA-$2100 ; Write to CGRAM
+	sta.b !SNES_CGDATA-$2100 ; Write to CGRAM
 	plb ; Restore data bank
 	lda.b #$31	  ; CGRAM address $31
-	sta.b SNES_CGADD-$2100 ; Set CGRAM address
+	sta.b !SNES_CGADD-$2100 ; Set CGRAM address
 	lda.w !menu_color	 ; Load color low
-	sta.b SNES_CGDATA-$2100 ; Write to CGRAM
+	sta.b !SNES_CGDATA-$2100 ; Write to CGRAM
 	lda.w !menu_color_hi	 ; Load color high
-	sta.b SNES_CGDATA-$2100 ; Write to CGRAM
+	sta.b !SNES_CGDATA-$2100 ; Write to CGRAM
 	lda.b #$71	  ; CGRAM address $71
-	sta.b SNES_CGADD-$2100 ; Set CGRAM address
+	sta.b !SNES_CGADD-$2100 ; Set CGRAM address
 	lda.w !menu_color	 ; Load color low
-	sta.b SNES_CGDATA-$2100 ; Write to CGRAM
+	sta.b !SNES_CGDATA-$2100 ; Write to CGRAM
 	lda.w !menu_color_hi	 ; Load color high
-	sta.b SNES_CGDATA-$2100 ; Write to CGRAM
-	stz.b SNES_BG1HOFS-$2100 ; Clear BG1 H-scroll
-	stz.b SNES_BG1HOFS-$2100 ; (write twice)
-	stz.b SNES_BG1VOFS-$2100 ; Clear BG1 V-scroll
-	stz.b SNES_BG1VOFS-$2100 ; (write twice)
-	stz.b SNES_BG2HOFS-$2100 ; Clear BG2 H-scroll
-	stz.b SNES_BG2HOFS-$2100 ; (write twice)
-	stz.b SNES_BG2VOFS-$2100 ; Clear BG2 V-scroll
-	stz.b SNES_BG2VOFS-$2100 ; (write twice)
+	sta.b !SNES_CGDATA-$2100 ; Write to CGRAM
+	stz.b !SNES_BG1HOFS-$2100 ; Clear BG1 H-scroll
+	stz.b !SNES_BG1HOFS-$2100 ; (write twice)
+	stz.b !SNES_BG1VOFS-$2100 ; Clear BG1 V-scroll
+	stz.b !SNES_BG1VOFS-$2100 ; (write twice)
+	stz.b !SNES_BG2HOFS-$2100 ; Clear BG2 H-scroll
+	stz.b !SNES_BG2HOFS-$2100 ; (write twice)
+	stz.b !SNES_BG2VOFS-$2100 ; Clear BG2 V-scroll
+	stz.b !SNES_BG2VOFS-$2100 ; (write twice)
 	rep #$30		; 16-bit A/X/Y
 	lda.w #$0000	; Direct page = $0000
 	tcd ; Restore direct page
@@ -12573,39 +12573,39 @@ System_Init:
 ; Uses: DATA8_07D7F4 onwards (color data)
 ;-------------------------------------------------------------------------------
 Palette_LoadColors:
-	sta.b SNES_CGADD-$2100 ; Set CGRAM address
+	sta.b !SNES_CGADD-$2100 ; Set CGRAM address
 	lda.w DATA8_07d7f4,x ; Load color byte
-	sta.b SNES_CGDATA-$2100 ; Write to CGRAM
+	sta.b !SNES_CGDATA-$2100 ; Write to CGRAM
 	lda.w DATA8_07d7f5,x ; (repeat for 32 bytes = 16 colors)
-	sta.b SNES_CGDATA-$2100
+	sta.b !SNES_CGDATA-$2100
 	lda.w DATA8_07d7f6,x
-	sta.b SNES_CGDATA-$2100
+	sta.b !SNES_CGDATA-$2100
 	lda.w DATA8_07d7f7,x
-	sta.b SNES_CGDATA-$2100
+	sta.b !SNES_CGDATA-$2100
 	lda.w DATA8_07d7f8,x
-	sta.b SNES_CGDATA-$2100
+	sta.b !SNES_CGDATA-$2100
 	lda.w DATA8_07d7f9,x
-	sta.b SNES_CGDATA-$2100
+	sta.b !SNES_CGDATA-$2100
 	lda.w DATA8_07d7fa,x
-	sta.b SNES_CGDATA-$2100
+	sta.b !SNES_CGDATA-$2100
 	lda.w DATA8_07d7fb,x
-	sta.b SNES_CGDATA-$2100
+	sta.b !SNES_CGDATA-$2100
 	lda.w DATA8_07d7fc,x
-	sta.b SNES_CGDATA-$2100
+	sta.b !SNES_CGDATA-$2100
 	lda.w DATA8_07d7fd,x
-	sta.b SNES_CGDATA-$2100
+	sta.b !SNES_CGDATA-$2100
 	lda.w DATA8_07d7fe,x
-	sta.b SNES_CGDATA-$2100
+	sta.b !SNES_CGDATA-$2100
 	lda.w DATA8_07d7ff,x
-	sta.b SNES_CGDATA-$2100
+	sta.b !SNES_CGDATA-$2100
 	lda.w DATA8_07d800,x
-	sta.b SNES_CGDATA-$2100
+	sta.b !SNES_CGDATA-$2100
 	lda.w DATA8_07d801,x
-	sta.b SNES_CGDATA-$2100
+	sta.b !SNES_CGDATA-$2100
 	lda.w DATA8_07d802,x
-	sta.b SNES_CGDATA-$2100
+	sta.b !SNES_CGDATA-$2100
 	lda.w DATA8_07d803,x
-	sta.b SNES_CGDATA-$2100
+	sta.b !SNES_CGDATA-$2100
 
 
 ;-------------------------------------------------------------------------------
@@ -14894,7 +14894,7 @@ GameState_CheckFlags:
 	and.w !system_flags_6	 ;00CAD0|2DDB00  |0000DB;
 	bne GameState_Flag40Set ;00CAD3|D032    |00CB07;
 	ldx.w #$9300	;00CAD5|A20093  |      ;
-	stx.w SNES_CGSWSEL ;00CAD8|8E3021  |002130;
+	stx.w !SNES_CGSWSEL ;00CAD8|8E3021  |002130;
 	lda.b #$02	  ;00CADB|A902    |      ;
 	and.w !system_flags_5	 ;00CADD|2DDA00  |0000DA;
 	bne GameState_FlagCheck2 ;00CAE0|D02F    |00CB11;
@@ -14970,9 +14970,9 @@ GameState_RestoreAndExit:
 	jsr.w Sub_00CD42 ;00CB7C|2042CD  |00CD42;
 	jsl.l AddressC8000OriginalCode ;00CB7F|2200800C|0C8000;
 	lda.b #$e0	  ;00CB83|A9E0    |      ;
-	sta.w SNES_COLDATA ;00CB85|8D3221  |002132;
+	sta.w !SNES_COLDATA ;00CB85|8D3221  |002132;
 	ldx.w #$0000	;00CB88|A20000  |      ;
-	stx.w SNES_CGSWSEL ;00CB8B|8E3021  |002130;
+	stx.w !SNES_CGSWSEL ;00CB8B|8E3021  |002130;
 	jmp.w Sub_00981B ;00CB8E|4C1B98  |00981B;
 
 GameState_DataCopy:
@@ -15022,7 +15022,7 @@ Screen_FadeLoop:
 
 Screen_BrightnessMax:
 	ldy.w #$9300	;00CBEC|A00093  |      ;
-	sty.w SNES_CGSWSEL ;00CBEF|8C3021  |002130;
+	sty.w !SNES_CGSWSEL ;00CBEF|8C3021  |002130;
 	jsr.w GameState_DataCopy ;00CBF2|2091CB  |00CB91;
 	lda.b #$e0	  ;00CBF5|A9E0    |      ;
 	sta.l $7f56d8   ;00CBF7|8FD8567F|7F56D8;

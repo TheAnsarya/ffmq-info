@@ -167,7 +167,7 @@ Menu_TransitionSetup:
 
 ; Configure NMI for menu
 	lda.W				   $0112	 ; Get NMI configuration
-	sta.W				   SNES_NMITIMEN ; Write to NMI register ($4200)
+	sta.W !SNES_NMITIMEN ; Write to NMI register ($4200)
 
 	cli							   ; Enable interrupts
 
@@ -459,7 +459,7 @@ Math_HardwareMultiply:
 	php							   ; Save processor status
 	sep					 #$20		; 8-bit A
 
-	sta.W				   SNES_WRMPYB ; Write to hardware multiplier ($4203)
+	sta.W !SNES_WRMPYB ; Write to hardware multiplier ($4203)
 
 	plp							   ; Restore processor status
 	rtl							   ; Return (result available after 8 cycles)
@@ -476,7 +476,7 @@ Math_HardwareDivide:
 	php							   ; Save processor status
 	sep					 #$20		; 8-bit A
 
-	sta.W				   SNES_WRDIVB ; Write to hardware divider ($4206)
+	sta.W !SNES_WRDIVB ; Write to hardware divider ($4206)
 
 	xba							   ; Delay (swap and swap back)
 	xba							   ; 16 cycles for division

@@ -213,19 +213,19 @@ Label_00804D:
 
 ; Configure DMA Channel 0
 	ldx.W #$1809            ; DMA parameters
-	stx.W SNES_DMA0PARAM    ; $4300: DMA control + target register
+	stx.W !SNES_DMA0PARAM    ; $4300: DMA control + target register
 
 	ldx.W #$8252            ; Source address (low/mid bytes)
-	stx.W SNES_DMA0ADDRL    ; $4302-4303: Source address low/mid
+	stx.W !SNES_DMA0ADDRL    ; $4302-4303: Source address low/mid
 
 	lda.B #$00              ; Source bank = $00
-	sta.W SNES_DMA0ADDRH    ; $4304: Source address bank
+	sta.W !SNES_DMA0ADDRH    ; $4304: Source address bank
 
 	ldx.W #$0000            ; Transfer size = $0000 (means $10000 = 64KB!)
-	stx.W SNES_DMA0CNTL     ; $4305-4306: Transfer size
+	stx.W !SNES_DMA0CNTL     ; $4305-4306: Transfer size
 
 	lda.B #$01              ; Enable DMA channel 0
-	sta.W SNES_MDMAEN       ; $420b: DMA enable register
+	sta.W !SNES_MDMAEN       ; $420b: DMA enable register
 
 Label_00806E:
 ; ===========================================================================
@@ -242,7 +242,7 @@ Label_00806E:
 
 ; Enable interrupts (NMI/IRQ)
 	lda.w !interrupt_config             ; Load interrupt enable flags
-	sta.W SNES_NMITIMEN     ; $4200: Enable NMI/IRQ
+	sta.W !SNES_NMITIMEN     ; $4200: Enable NMI/IRQ
 	cli                     ; Clear interrupt disable flag
 
 ; Set screen brightness
@@ -291,15 +291,15 @@ Load_0080B0:
 
 ; Set color math to subtract mode
 	lda.B #$e0              ; Color math control
-	sta.W SNES_COLDATA      ; $2132: Color math settings
+	sta.W !SNES_COLDATA      ; $2132: Color math settings
 
 ; Reset windowing and color effects
 	ldx.W #$0000
-	stx.W SNES_CGSWSEL      ; $2130: Window mask + color math enable
+	stx.W !SNES_CGSWSEL      ; $2130: Window mask + color math enable
 
 ; Reset BG1 vertical scroll
-	stz.W SNES_BG1VOFS      ; $210e: BG1 V-scroll low byte
-	stz.W SNES_BG1VOFS      ; $210e: BG1 V-scroll high byte
+	stz.W !SNES_BG1VOFS      ; $210e: BG1 V-scroll low byte
+	stz.W !SNES_BG1VOFS      ; $210e: BG1 V-scroll high byte
 
 ; ===========================================================================
 ; TODO: Continue disassembling and commenting the rest of bank_00.asm

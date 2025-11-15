@@ -125,16 +125,16 @@ Battle_Initialize:
 	stz.w !battle_phase_counter	 ; Reset phase counter
 
 	ldx.w #$9400	; WRAM battle buffer
-	stx.w SNES_WMADDL ; Set WRAM address low/mid
+	stx.w !SNES_WMADDL ; Set WRAM address low/mid
 
 	lda.b #$01	  ; Bank $01 (this bank)
-	sta.w SNES_WMADDH ; Set WRAM address high
+	sta.w !SNES_WMADDH ; Set WRAM address high
 
 	ldy.w #$1000	; 4096 bytes to clear
 
 Battle_Initialize_ClearLoop:
 ; Clear loop
-	stz.w SNES_WMDATA ; Write zero to WRAM
+	stz.w !SNES_WMDATA ; Write zero to WRAM
 	dey ; Decrement counter
 	bne Battle_Initialize_ClearLoop ; Continue until done
 
@@ -214,12 +214,12 @@ Battle_ClearVRAM:
 
 ; Set VRAM parameters
 	lda.b #$80	  ; Increment after writing to $2119
-	sta.w SNES_VMAINC ; VRAM increment mode
+	sta.w !SNES_VMAINC ; VRAM increment mode
 
-	stz.w SNES_VMADDL ; VRAM address low = $00
+	stz.w !SNES_VMADDL ; VRAM address low = $00
 
 	lda.b #$40	  ; VRAM address high = $40
-	sta.w SNES_VMADDH ; VRAM address = $4000
+	sta.w !SNES_VMADDH ; VRAM address = $4000
 
 	rep #$30		; 16-bit A,X,Y
 	ldx.w #$1000	; 4096 words to write
@@ -227,7 +227,7 @@ Battle_ClearVRAM:
 
 Battle_ClearVRAM_Loop:
 ; Write loop
-	sta.w SNES_VMDATAL ; Write tile to VRAM
+	sta.w !SNES_VMDATAL ; Write tile to VRAM
 	dex ; Decrement counter
 	bne Battle_ClearVRAM_Loop ; Continue until done
 
@@ -7262,14 +7262,14 @@ vram_management_transfer_system:
 	plb ; Pull bank from stack
 	ldy.w #$ddc4	; Load VRAM destination address
 	ldx.w #$1a00	; Load VRAM source address
-	stx.b SNES_WMADDL-$2100 ; Set WRAM address low
+	stx.b !SNES_WMADDL-$2100 ; Set WRAM address low
 	ldx.w #$0088	; Set transfer count
 vram_transfer_loop_1:
 	jsr.w ExecuteComplexMemoryTransfer ; Execute transfer operation
 	dex ; Decrement counter
 	bne vram_transfer_loop_1 ; Continue if not zero
 	ldx.w #$2c00	; Load secondary VRAM address
-	stx.b SNES_WMADDL-$2100 ; Set WRAM address low
+	stx.b !SNES_WMADDL-$2100 ; Set WRAM address low
 	ldx.w #$0008	; Set secondary transfer count
 vram_transfer_loop_2:
 	jsr.w ExecuteComplexMemoryTransfer ; Execute transfer operation
@@ -7355,12 +7355,12 @@ color_component_loop:
 	iny ; Increment source pointer
 	tax ; Transfer to index
 	lda.l DATA8_02e236,x ; Load converted color value
-	sta.b SNES_WMDATA-$2100 ; Store to hardware register
+	sta.b !SNES_WMDATA-$2100 ; Store to hardware register
 	lda.w $0000,y   ; Load next component
 	dey ; Decrement for processing
 	tax ; Transfer to index
 	lda.l DATA8_02e236,x ; Load converted color value
-	sta.b SNES_WMDATA-$2100 ; Store to hardware register
+	sta.b !SNES_WMDATA-$2100 ; Store to hardware register
 	dey ; Decrement source pointer
 	dey ; Decrement again
 	plx ; Restore component counter

@@ -96,7 +96,7 @@ SPC_InitMain:
 	phx ;0D803F	; Push to stack
 	pld ;0D8040	; Pull to direct page
 	ldx.w #$bbaa	;0D8041	; SPC700 ready signature
-	cpx.w SNES_APUIO0 ;0D8044	; Check APU port 0/1
+	cpx.w !SNES_APUIO0 ;0D8044	; Check APU port 0/1
 	beq SPC_WaitReady ;0D8047	; Branch if ready
 	ldy.b $f8	   ;0D8049	; Check communication flag
 	beq SPC_WaitReady ;0D804B	; Branch if not communicating
@@ -112,23 +112,23 @@ SPC_InitMain:
 
 SPC_WaitReady:
 ; Wait for SPC700 to be ready
-	cpx.w SNES_APUIO0 ;0D8077	; Check for ready signature
+	cpx.w !SNES_APUIO0 ;0D8077	; Check for ready signature
 	bne SPC_WaitReady ;0D807A	; Loop until ready
 
 ; Begin sound driver upload
 	ldx.w #$0000	;0D807C	; Start at offset 0
 	lda.l DATA8_0d8014 ;0D807F	; Load target address low
-	sta.w SNES_APUIO2 ;0D8083	; Send to APU port 2
+	sta.w !SNES_APUIO2 ;0D8083	; Send to APU port 2
 	lda.l DATA8_0d8015 ;0D8086	; Load target address high
-	sta.w SNES_APUIO3 ;0D808A	; Send to APU port 3
+	sta.w !SNES_APUIO3 ;0D808A	; Send to APU port 3
 	lda.b #$01	  ;0D808D	; Upload start command
-	sta.w SNES_APUIO1 ;0D808F	; Send to APU port 1
+	sta.w !SNES_APUIO1 ;0D808F	; Send to APU port 1
 	lda.b #$cc	  ;0D8092	; Handshake value
-	sta.w SNES_APUIO0 ;0D8094	; Send to APU port 0
+	sta.w !SNES_APUIO0 ;0D8094	; Send to APU port 0
 
 SPC_WaitAck:
 ; Wait for SPC700 acknowledgment
-	cmp.w SNES_APUIO0 ;0D8097	; Check port 0
+	cmp.w !SNES_APUIO0 ;0D8097	; Check port 0
 	bne SPC_WaitAck ;0D809A	; Loop until acknowledged
 
 ; ==============================================================================
@@ -161,13 +161,13 @@ SPC_TransferBlock:
 SPC_TransferLoop:
 ; Transfer data bytes with handshake
 	lda.b [$14],y   ;0D80C1	; Load data byte
-	sta.w SNES_APUIO1 ;0D80C3	; Send to APU port 1
+	sta.w !SNES_APUIO1 ;0D80C3	; Send to APU port 1
 	xba ;0D80C6	; Swap to counter byte
-	sta.w SNES_APUIO0 ;0D80C7	; Send to APU port 0
+	sta.w !SNES_APUIO0 ;0D80C7	; Send to APU port 0
 
 SPC_WaitTransfer:
 ; Wait for acknowledgment
-	cmp.w SNES_APUIO0 ;0D80CA	; Check port 0
+	cmp.w !SNES_APUIO0 ;0D80CA	; Check port 0
 	bne SPC_WaitTransfer ;0D80CD	; Loop until acknowledged
 	iny ;0D80CF	; Next byte
 	xba ;0D80D0	; Swap back
@@ -181,18 +181,18 @@ SPC_WaitTransfer:
 
 ; Sound driver upload complete
 	lda.b #$00	  ;0D80DD	; Zero value
-	sta.w SNES_APUIO1 ;0D80DF	; Clear port 1
+	sta.w !SNES_APUIO1 ;0D80DF	; Clear port 1
 	lda.l DATA8_0d8014 ;0D80E2	; Load start address low
-	sta.w SNES_APUIO2 ;0D80E6	; Send to port 2
+	sta.w !SNES_APUIO2 ;0D80E6	; Send to port 2
 	lda.l DATA8_0d8015 ;0D80E9	; Load start address high
-	sta.w SNES_APUIO3 ;0D80ED	; Send to port 3
+	sta.w !SNES_APUIO3 ;0D80ED	; Send to port 3
 	lda.b #$00	  ;0D80F0	; Start execution command
 	xba ;0D80F2	; Swap
 
 SPC_StartDriver:
 ; Final handshake to start driver
-	sta.w SNES_APUIO0 ;0D80F3	; Send to port 0
-	cmp.w SNES_APUIO0 ;0D80F6	; Wait for ack
+	sta.w !SNES_APUIO0 ;0D80F3	; Send to port 0
+	cmp.w !SNES_APUIO0 ;0D80F6	; Wait for ack
 	bne SPC_StartDriver ;0D80F9	; Loop until acknowledged
 
 	ply ;0D80FB	; Restore Y
@@ -354,7 +354,7 @@ SPC_InitMain_1:
 ; This confirms SPC700 is ready to receive data
 ; ------------------------------------------------------------------------------
 	ldx.w #$bbaa	;0D8041|A2AABB  |      ; IPL ready signature
-	cpx.w SNES_APUIO0 ;0D8044|EC4021  |002140; Check APUIO0/1 for $aabb
+	cpx.w !SNES_APUIO0 ;0D8044|EC4021  |002140; Check APUIO0/1 for $aabb
 	beq SPC_WaitReady ;0D8047|F02E    |0D8077; If IPL ready, start upload
 
 ; ------------------------------------------------------------------------------
@@ -390,7 +390,7 @@ SPC_InitMain_1:
 ;   6. Transfer data bytes with incrementing handshake
 ; ------------------------------------------------------------------------------
 SPC_WaitReady_1:
-	cpx.w SNES_APUIO0 ;0D8077|EC4021  |002140; Wait for SPC700 ready
+	cpx.w !SNES_APUIO0 ;0D8077|EC4021  |002140; Wait for SPC700 ready
 	bne SPC_WaitReady ;0D807A|D0FB    |0D8077; Loop until $bbaa confirmed
 
 ; ------------------------------------------------------------------------------
@@ -398,20 +398,20 @@ SPC_WaitReady_1:
 ; ------------------------------------------------------------------------------
 	ldx.w #$0000	;0D807C|A20000  |      ; Module index = 0
 	lda.l DATA8_0d8014 ;0D807F|AF14800D|0D8014; Load module address low
-	sta.w SNES_APUIO2 ;0D8083|8D4221  |002142; Send to APUIO2 (SPC700 RAM addr low)
+	sta.w !SNES_APUIO2 ;0D8083|8D4221  |002142; Send to APUIO2 (SPC700 RAM addr low)
 	lda.l DATA8_0d8015 ;0D8086|AF15800D|0D8015; Load module address high
-	sta.w SNES_APUIO3 ;0D808A|8D4321  |002143; Send to APUIO3 (SPC700 RAM addr high)
+	sta.w !SNES_APUIO3 ;0D808A|8D4321  |002143; Send to APUIO3 (SPC700 RAM addr high)
 	lda.b #$01	  ;0D808D|A901    |      ; Command $01 = upload data
-	sta.w SNES_APUIO1 ;0D808F|8D4121  |002141; Send command to APUIO1
+	sta.w !SNES_APUIO1 ;0D808F|8D4121  |002141; Send command to APUIO1
 	lda.b #$cc	  ;0D8092|A9CC    |      ; Initial handshake byte
-	sta.w SNES_APUIO0 ;0D8094|8D4021  |002140; Send to APUIO0 (triggers SPC700)
+	sta.w !SNES_APUIO0 ;0D8094|8D4021  |002140; Send to APUIO0 (triggers SPC700)
 
 ; ------------------------------------------------------------------------------
 ; Wait for SPC700 to acknowledge handshake
 ; SPC700 IPL will echo handshake byte back to APUIO0 when ready
 ; ------------------------------------------------------------------------------
 SPC_WaitAck_1:
-	cmp.w SNES_APUIO0 ;0D8097|CD4021  |002140; Wait for echo
+	cmp.w !SNES_APUIO0 ;0D8097|CD4021  |002140; Wait for echo
 	bne SPC_WaitAck ;0D809A|D0FB    |0D8097; Loop until handshake confirmed
 
 ; ==============================================================================
@@ -459,15 +459,15 @@ SPC_TransferBlock_1:
 ; ------------------------------------------------------------------------------
 SPC_TransferLoop_1:
 	lda.b [$14],y   ;0D80C1|B714    |000614; Read data byte from module
-	sta.w SNES_APUIO1 ;0D80C3|8D4121  |002141; Send to APUIO1 (data port)
+	sta.w !SNES_APUIO1 ;0D80C3|8D4121  |002141; Send to APUIO1 (data port)
 	xba ;0D80C6|EB      |      ; Get handshake byte from B
-	sta.w SNES_APUIO0 ;0D80C7|8D4021  |002140; Send to APUIO0 (triggers transfer)
+	sta.w !SNES_APUIO0 ;0D80C7|8D4021  |002140; Send to APUIO0 (triggers transfer)
 
 ; ------------------------------------------------------------------------------
 ; Wait for SPC700 to echo handshake (confirms byte received)
 ; ------------------------------------------------------------------------------
 SPC_WaitTransfer_1:
-	cmp.w SNES_APUIO0 ;0D80CA|CD4021  |002140; Wait for echo
+	cmp.w !SNES_APUIO0 ;0D80CA|CD4021  |002140; Wait for echo
 	bne SPC_WaitTransfer ;0D80CD|D0FB    |0D80CA; Loop until confirmed
 
 ; ------------------------------------------------------------------------------
@@ -500,18 +500,18 @@ Label_0D80DD:
 ; ------------------------------------------------------------------------------
 	xba ;0D80E4|EB      |      ; Get handshake
 	lda.l DATA8_0d8014,x ;0D80E5|BF14800D|0D8014; Next module address low
-	sta.w SNES_APUIO2 ;0D80E9|8D4221  |002142; Send to APUIO2
+	sta.w !SNES_APUIO2 ;0D80E9|8D4221  |002142; Send to APUIO2
 	lda.l DATA8_0d8015,x ;0D80EC|BF15800D|0D8015; Next module address high
-	sta.w SNES_APUIO3 ;0D80F0|8D4321  |002143; Send to APUIO3
+	sta.w !SNES_APUIO3 ;0D80F0|8D4321  |002143; Send to APUIO3
 	xba ;0D80F3|EB      |      ; Restore handshake
-	sta.w SNES_APUIO1 ;0D80F4|8D4121  |002141; Send to APUIO1
-	sta.w SNES_APUIO0 ;0D80F7|8D4021  |002140; Trigger transfer
+	sta.w !SNES_APUIO1 ;0D80F4|8D4121  |002141; Send to APUIO1
+	sta.w !SNES_APUIO0 ;0D80F7|8D4021  |002140; Trigger transfer
 
 ; ------------------------------------------------------------------------------
 ; Wait for acknowledgment, then continue
 ; ------------------------------------------------------------------------------
 Label_0D80FA:
-	cmp.w SNES_APUIO0 ;0D80FA|CD4021  |002140; Wait for echo
+	cmp.w !SNES_APUIO0 ;0D80FA|CD4021  |002140; Wait for echo
 	bne Label_0D80FA ;0D80FD|D0FB    |0D80FA; Loop until confirmed
 	bra SPC_TransferBlock ;0D80FF|809B    |0D809C; Transfer next module
 
@@ -523,25 +523,25 @@ Label_0D80FA:
 ; ==============================================================================
 Start_SPC700_Driver_Execution:
 	ldy.w #$0200	;0D8101|A00002  |      ; Execution address = $0200
-	sty.w SNES_APUIO2 ;0D8104|8C4221  |002142; Send address to APUIO2/3
+	sty.w !SNES_APUIO2 ;0D8104|8C4221  |002142; Send address to APUIO2/3
 	xba ;0D8107|EB      |      ; Get handshake
 	lda.b #$00	  ;0D8108|A900    |      ; Command $00 = execute
-	sta.w SNES_APUIO1 ;0D810A|8D4121  |002141; Send command
+	sta.w !SNES_APUIO1 ;0D810A|8D4121  |002141; Send command
 	xba ;0D810D|EB      |      ; Restore handshake
-	sta.w SNES_APUIO0 ;0D810E|8D4021  |002140; Trigger execution
+	sta.w !SNES_APUIO0 ;0D810E|8D4021  |002140; Trigger execution
 
 ; ------------------------------------------------------------------------------
 ; Wait for confirmation that driver started
 ; ------------------------------------------------------------------------------
 Label_0D8111:
-	cmp.w SNES_APUIO0 ;0D8111|CD4021  |002140; Wait for echo
+	cmp.w !SNES_APUIO0 ;0D8111|CD4021  |002140; Wait for echo
 	bne Label_0D8111 ;0D8114|D0FB    |0D8111; Loop until confirmed
 
 ; ------------------------------------------------------------------------------
 ; Clear work RAM used during upload
 ; ------------------------------------------------------------------------------
 	xba ;0D8116|EB      |      ; Get handshake to A
-	sta.w SNES_APUIO0 ;0D8117|8D4021  |002140; Send final handshake
+	sta.w !SNES_APUIO0 ;0D8117|8D4021  |002140; Send final handshake
 	ldx.w #$0100	;0D811A|A20001  |      ; Clear 256 bytes
 Store_0D811D:
 	sta.w $05ff,x   ;0D811D|9DFF05  |0005FF; Clear work RAM
@@ -700,22 +700,22 @@ MusicSFX_Load:
 	stx.b $06	   ;0D818E|8606    |000606; Store for comparison
 	txa ;0D8190|8A      |      ; A = parameter low byte
 	and.b #$0f	  ;0D8191|290F    |      ; Mask low nibble
-	sta.w SNES_APUIO1 ;0D8193|8D4121  |002141; Send to APUIO1
+	sta.w !SNES_APUIO1 ;0D8193|8D4121  |002141; Send to APUIO1
 
 ; ------------------------------------------------------------------------------
 ; Handshake protocol for parameter update
 ; ------------------------------------------------------------------------------
 	lda.b #$84	  ;0D8196|A984    |      ; Handshake $84
 Label_0D8198:
-	cmp.w SNES_APUIO0 ;0D8198|CD4021  |002140; Wait for different value
+	cmp.w !SNES_APUIO0 ;0D8198|CD4021  |002140; Wait for different value
 	beq Label_0D8198 ;0D819B|F0FB    |0D8198; Loop until SPC700 not $84
-	sta.w SNES_APUIO0 ;0D819D|8D4021  |002140; Send handshake
+	sta.w !SNES_APUIO0 ;0D819D|8D4021  |002140; Send handshake
 
 Label_0D81A0:
-	cmp.w SNES_APUIO0 ;0D81A0|CD4021  |002140; Wait for echo
+	cmp.w !SNES_APUIO0 ;0D81A0|CD4021  |002140; Wait for echo
 	bne Label_0D81A0 ;0D81A3|D0FB    |0D81A0; Loop until confirmed
 	lda.b #$00	  ;0D81A5|A900    |      ; Clear APUIO0
-	sta.w SNES_APUIO0 ;0D81A7|8D4021  |002140; (prepare for next)
+	sta.w !SNES_APUIO0 ;0D81A7|8D4021  |002140; (prepare for next)
 
 ; ------------------------------------------------------------------------------
 ; Send high nibble of parameter
@@ -726,19 +726,19 @@ Label_0D81A0:
 	lsr a;0D81AE|4A      |      ; (extract high nibble)
 	lsr a;0D81AF|4A      |      ;
 	lsr a;0D81B0|4A      |      ;
-	sta.w SNES_APUIO1 ;0D81B1|8D4121  |002141; Send to APUIO1
+	sta.w !SNES_APUIO1 ;0D81B1|8D4121  |002141; Send to APUIO1
 	lda.b #$81	  ;0D81B4|A981    |      ; Handshake $81
 
 Label_0D81B6:
-	cmp.w SNES_APUIO0 ;0D81B6|CD4021  |002140; Wait for different
+	cmp.w !SNES_APUIO0 ;0D81B6|CD4021  |002140; Wait for different
 	beq Label_0D81B6 ;0D81B9|F0FB    |0D81B6; Loop
-	sta.w SNES_APUIO0 ;0D81BB|8D4021  |002140; Send handshake
+	sta.w !SNES_APUIO0 ;0D81BB|8D4021  |002140; Send handshake
 
 Label_0D81BE:
-	cmp.w SNES_APUIO0 ;0D81BE|CD4021  |002140; Wait for echo
+	cmp.w !SNES_APUIO0 ;0D81BE|CD4021  |002140; Wait for echo
 	bne Label_0D81BE ;0D81C1|D0FB    |0D81BE; Loop
 	xba ;0D81C3|EB      |      ; Restore command
-	sta.w SNES_APUIO0 ;0D81C4|8D4021  |002140; Send to APUIO0
+	sta.w !SNES_APUIO0 ;0D81C4|8D4021  |002140; Send to APUIO0
 
 ; ------------------------------------------------------------------------------
 ; Send combined low nibbles
@@ -751,19 +751,19 @@ Label_0D81BE:
 	lda.b $03	   ;0D81CE|A503    |000603; Get byte 3
 	and.b #$0f	  ;0D81D0|290F    |      ; Keep low nibble
 	ora.b $02	   ;0D81D2|0502    |000602; Combine nibbles
-	sta.w SNES_APUIO1 ;0D81D4|8D4121  |002141; Send to APUIO1
+	sta.w !SNES_APUIO1 ;0D81D4|8D4121  |002141; Send to APUIO1
 	lda.b #$81	  ;0D81D7|A981    |      ; Handshake $81
 
 Label_0D81D9:
-	cmp.w SNES_APUIO0 ;0D81D9|CD4021  |002140; Wait for different
+	cmp.w !SNES_APUIO0 ;0D81D9|CD4021  |002140; Wait for different
 	beq Label_0D81D9 ;0D81DC|F0FB    |0D81D9; Loop
-	sta.w SNES_APUIO0 ;0D81DE|8D4021  |002140; Send handshake
+	sta.w !SNES_APUIO0 ;0D81DE|8D4021  |002140; Send handshake
 
 Label_0D81E1:
-	cmp.w SNES_APUIO0 ;0D81E1|CD4021  |002140; Wait for echo
+	cmp.w !SNES_APUIO0 ;0D81E1|CD4021  |002140; Wait for echo
 	bne Label_0D81E1 ;0D81E4|D0FB    |0D81E1; Loop
 	xba ;0D81E6|EB      |      ; Restore command
-	sta.w SNES_APUIO0 ;0D81E7|8D4021  |002140; Send final handshake
+	sta.w !SNES_APUIO0 ;0D81E7|8D4021  |002140; Send final handshake
 	jmp.w Exit ;0D81EA|4C7881  |0D8178; Exit
 
 ; ==============================================================================
@@ -785,17 +785,17 @@ Load_New_TrackSFX:
 ; ------------------------------------------------------------------------------
 Load_0D81FA:
 	lda.b $01	   ;0D81FA|A501    |000601; Load new track number
-	sta.w SNES_APUIO1 ;0D81FC|8D4121  |002141; Send to APUIO1
+	sta.w !SNES_APUIO1 ;0D81FC|8D4121  |002141; Send to APUIO1
 	sta.b $05	   ;0D81FF|8505    |000605; Update current track
-	sta.w SNES_WRMPYA ;0D8201|8D0242  |004202; Multiply A (track number)
+	sta.w !SNES_WRMPYA ;0D8201|8D0242  |004202; Multiply A (track number)
 	lda.b #$03	  ;0D8204|A903    |      ; By 3 (entry size)
-	sta.w SNES_WRMPYB ;0D8206|8D0342  |004203; WRMPYB triggers multiply
+	sta.w !SNES_WRMPYB ;0D8206|8D0342  |004203; WRMPYB triggers multiply
 
 ; ------------------------------------------------------------------------------
 ; Send track address to SPC700
 ; ------------------------------------------------------------------------------
 	ldx.b $02	   ;0D8209|A602    |000602; Load track address
-	stx.w SNES_APUIO2 ;0D820B|8E4221  |002142; Send to APUIO2/3
+	stx.w !SNES_APUIO2 ;0D820B|8E4221  |002142; Send to APUIO2/3
 	stx.b $06	   ;0D820E|8606    |000606; Store for later
 	xba ;0D8210|EB      |      ; Swap accumulators
 
@@ -803,12 +803,12 @@ Load_0D81FA:
 ; Handshake for address transfer
 ; ------------------------------------------------------------------------------
 Label_0D8211:
-	cmp.w SNES_APUIO0 ;0D8211|CD4021  |002140; Wait for different
+	cmp.w !SNES_APUIO0 ;0D8211|CD4021  |002140; Wait for different
 	beq Label_0D8211 ;0D8214|F0FB    |0D8211; Loop
-	sta.w SNES_APUIO0 ;0D8216|8D4021  |002140; Send handshake
+	sta.w !SNES_APUIO0 ;0D8216|8D4021  |002140; Send handshake
 
 Label_0D8219:
-	cmp.w SNES_APUIO0 ;0D8219|CD4021  |002140; Wait for echo
+	cmp.w !SNES_APUIO0 ;0D8219|CD4021  |002140; Wait for echo
 	bne Label_0D8219 ;0D821C|D0FB    |0D8219; Loop
 
 ; ------------------------------------------------------------------------------
@@ -816,20 +816,20 @@ Label_0D8219:
 ; Command $02 = load track data to $1c00 in SPC700 RAM
 ; ------------------------------------------------------------------------------
 	lda.b #$02	  ;0D821E|A902    |      ; Command $02
-	sta.w SNES_APUIO1 ;0D8220|8D4121  |002141; Send command
+	sta.w !SNES_APUIO1 ;0D8220|8D4121  |002141; Send command
 	ldx.w #$1c00	;0D8223|A2001C  |      ; SPC700 destination = $1c00
-	stx.w SNES_APUIO2 ;0D8226|8E4221  |002142; Send address
-	sta.w SNES_APUIO0 ;0D8229|8D4021  |002140; Trigger command
+	stx.w !SNES_APUIO2 ;0D8226|8E4221  |002142; Send address
+	sta.w !SNES_APUIO0 ;0D8229|8D4021  |002140; Trigger command
 
 Label_0D822C:
-	cmp.w SNES_APUIO0 ;0D822C|CD4021  |002140; Wait for echo
+	cmp.w !SNES_APUIO0 ;0D822C|CD4021  |002140; Wait for echo
 	bne Label_0D822C ;0D822F|D0FB    |0D822C; Loop
 
 ; ------------------------------------------------------------------------------
 ; Look up track data address in table
 ; Uses hardware multiply result (track# × 3) as table index
 ; ------------------------------------------------------------------------------
-	ldx.w SNES_RDMPYL ;0D8231|AE1642  |004216; Get multiply result
+	ldx.w !SNES_RDMPYL ;0D8231|AE1642  |004216; Get multiply result
 	lda.l Sound_DataPtrLow,x ;0D8234|BFAEBD0D|0DBDAE; Load data ptr low
 	sta.b $14	   ;0D8238|8514    |000614; Store to DP
 	lda.l Sound_DataPtrMid,x ;0D823A|BFAFBD0D|0DBDAF; Load data ptr mid
@@ -878,24 +878,24 @@ Label_0D8265:
 ; ==============================================================================
 Data_Block_Transfer_Loop:
 	lda.b [$14],y   ;0D826B|B714    |000614; Read data byte 1
-	sta.w SNES_APUIO2 ;0D826D|8D4221  |002142; Send to APUIO2
+	sta.w !SNES_APUIO2 ;0D826D|8D4221  |002142; Send to APUIO2
 	iny ;0D8270|C8      |      ; Next byte
 	bne Load_0D8278 ;0D8271|D005    |0D8278; If no page wrap
 	db $e6,$16,$a0,$00,$80 ;0D8273|        |000016; Increment bank, reset Y
 
 Load_0D8278:
 	lda.b [$14],y   ;0D8278|B714    |000614; Read data byte 2
-	sta.w SNES_APUIO3 ;0D827A|8D4321  |002143; Send to APUIO3
+	sta.w !SNES_APUIO3 ;0D827A|8D4321  |002143; Send to APUIO3
 	iny ;0D827D|C8      |      ; Next byte
 	bne Label_0D8285 ;0D827E|D005    |0D8285; If no page wrap
 	db $e6,$16,$a0,$00,$80 ;0D8280|        |000016; Increment bank, reset Y
 
 Label_0D8285:
 	xba ;0D8285|EB      |      ; Get handshake from B
-	sta.w SNES_APUIO0 ;0D8286|8D4021  |002140; Send to trigger transfer
+	sta.w !SNES_APUIO0 ;0D8286|8D4021  |002140; Send to trigger transfer
 
 Label_0D8289:
-	cmp.w SNES_APUIO0 ;0D8289|CD4021  |002140; Wait for SPC700 echo
+	cmp.w !SNES_APUIO0 ;0D8289|CD4021  |002140; Wait for SPC700 echo
 	bne Label_0D8289 ;0D828C|D0FB    |0D8289; Loop until confirmed
 	inc a;0D828E|1A      |      ; Increment handshake
 	bne Label_0D8292 ;0D828F|D001    |0D8292; If not $00
@@ -918,7 +918,7 @@ Label_0D8292:
 ; Set up multiplication for later calculations
 ; ------------------------------------------------------------------------------
 	lda.b #$20	  ;0D8297|A920    |      ; Multiply by $20
-	sta.w SNES_WRMPYB ;0D8299|8D0342  |004203; Set multiplier
+	sta.w !SNES_WRMPYB ;0D8299|8D0342  |004203; Set multiplier
 	rep #$20		;0D829C|C220    |      ; 16-bit accumulator
 
 ; ------------------------------------------------------------------------------
@@ -938,7 +938,7 @@ Store_0D82A1:
 ; Calculate pattern table base address
 ; Uses hardware multiply result (track# × $20) as offset
 ; ------------------------------------------------------------------------------
-	lda.w SNES_RDMPYL ;0D82AC|AD1642  |004216; Get multiply result
+	lda.w !SNES_RDMPYL ;0D82AC|AD1642  |004216; Get multiply result
 	tax ;0D82AF|AA      |      ; X = pattern table offset
 	clc ;0D82B0|18      |      ; Clear carry
 	adc.w #$0020	;0D82B1|692000  |      ; Add $20 (next entry)
@@ -1016,7 +1016,7 @@ Sound_Effect_Processing:
 	stz.b $17	   ;0D82F1|6417    |000617; Clear size accumulator low
 	sep #$20		;0D82F3|E220    |      ; 8-bit accumulator
 	lda.b #$03	  ;0D82F5|A903    |      ; Multiply by 3
-	sta.w SNES_WRMPYA ;0D82F7|8D0242  |004202; Set multiplicand
+	sta.w !SNES_WRMPYA ;0D82F7|8D0242  |004202; Set multiplicand
 	ldx.w #$0000	;0D82FA|A20000  |      ; Start at first entry
 
 ; ------------------------------------------------------------------------------
@@ -1026,7 +1026,7 @@ Load_0D82FD:
 	lda.b $c8,x	 ;0D82FD|B5C8    |0006C8; Load buffer 2 entry
 	beq Channel_Allocation_And_Memory_Management ;0D82FF|F03F    |0D8340; If zero, end of list
 	dec a;0D8301|3A      |      ; Convert to 0-based index
-	sta.w SNES_WRMPYB ;0D8302|8D0342  |004203; Multiply (entry × 3)
+	sta.w !SNES_WRMPYB ;0D8302|8D0342  |004203; Multiply (entry × 3)
 	nop ;0D8305|EA      |      ; Wait for multiply (8 cycles)
 	nop ;0D8306|EA      |      ;
 	phx ;0D8307|DA      |      ; Save buffer index
@@ -1034,7 +1034,7 @@ Load_0D82FD:
 ; ------------------------------------------------------------------------------
 ; Look up sound effect data pointer using multiply result
 ; ------------------------------------------------------------------------------
-	ldx.w SNES_RDMPYL ;0D8308|AE1642  |004216; Get multiply result (index × 3)
+	ldx.w !SNES_RDMPYL ;0D8308|AE1642  |004216; Get multiply result (index × 3)
 	lda.l DATA8_0dbdff,x ;0D830B|BFFFBD0D|0DBDFF; Load data pointer low
 	sta.b $14	   ;0D830F|8514    |000614; Store to DP
 	lda.l DATA8_0dbe00,x ;0D8311|BF00BE0D|0DBE00; Load data pointer mid
@@ -1157,7 +1157,7 @@ Store_0D837B:
 Channel_Reallocation_Pattern_Swap:
 	sep #$20		;0D8387|E220    |      ; 8-bit accumulator
 	lda.b #$07	  ;0D8389|A907    |      ; APU command $07
-	sta.w SNES_APUIO1 ;0D838B|8D4121  |002141; Send swap command
+	sta.w !SNES_APUIO1 ;0D838B|8D4121  |002141; Send swap command
 	stz.b $10	   ;0D838E|6410    |000610; Clear handshake counter
 	ldy.w #$0000	;0D8390|A00000  |      ; Y = channel index
 	rep #$20		;0D8393|C220    |      ; 16-bit accumulator
@@ -1201,13 +1201,13 @@ Perform_Pattern_Swap:
 	stz.b $88,x	 ;0D83B3|7488    |000688; Clear old pattern
 	sta.w $0628,y   ;0D83B5|992806  |000628; Assign new channel
 	lda.b $48,x	 ;0D83B8|B548    |000648; Get old RAM address
-	sta.w SNES_APUIO2 ;0D83BA|8D4221  |002142; Send to SPC700
+	sta.w !SNES_APUIO2 ;0D83BA|8D4221  |002142; Send to SPC700
 	sep #$20		;0D83BD|E220    |      ; 8-bit accumulator
 	lda.b $10	   ;0D83BF|A510    |000610; Get handshake
-	sta.w SNES_APUIO0 ;0D83C1|8D4021  |002140; Send to SPC700
+	sta.w !SNES_APUIO0 ;0D83C1|8D4021  |002140; Send to SPC700
 
 Label_0D83C4:
-	cmp.w SNES_APUIO0 ;0D83C4|CD4021  |002140; Wait for echo
+	cmp.w !SNES_APUIO0 ;0D83C4|CD4021  |002140; Wait for echo
 	bne Label_0D83C4 ;0D83C7|D0FB    |0D83C4; Loop
 	inc.b $10	   ;0D83C9|E610    |000610; Increment handshake
 	rep #$20		;0D83CB|C220    |      ; 16-bit accumulator
@@ -1216,13 +1216,13 @@ Label_0D83C4:
 ; Send additional swap parameters
 ; ------------------------------------------------------------------------------
 	lda.w $0648,y   ;0D83CD|B94806  |000648; Get new data address
-	sta.w SNES_APUIO2 ;0D83D0|8D4221  |002142; Send to SPC700
+	sta.w !SNES_APUIO2 ;0D83D0|8D4221  |002142; Send to SPC700
 	sep #$20		;0D83D3|E220    |      ; 8-bit accumulator
 	lda.b $10	   ;0D83D5|A510    |000610; Get handshake
-	sta.w SNES_APUIO0 ;0D83D7|8D4021  |002140; Send to SPC700
+	sta.w !SNES_APUIO0 ;0D83D7|8D4021  |002140; Send to SPC700
 
 Label_0D83DA:
-	cmp.w SNES_APUIO0 ;0D83DA|CD4021  |002140; Wait for echo
+	cmp.w !SNES_APUIO0 ;0D83DA|CD4021  |002140; Wait for echo
 	bne Label_0D83DA ;0D83DD|D0FB    |0D83DA; Loop
 	inc.b $10	   ;0D83DF|E610    |000610; Increment handshake
 	rep #$20		;0D83E1|C220    |      ; 16-bit accumulator
@@ -1231,17 +1231,17 @@ Label_0D83DA:
 ; Transfer pattern size data
 ; ------------------------------------------------------------------------------
 	lda.b $68,x	 ;0D83E3|B568    |000668; Get pattern size
-	sta.w SNES_APUIO2 ;0D83E5|8D4221  |002142; Send to SPC700
+	sta.w !SNES_APUIO2 ;0D83E5|8D4221  |002142; Send to SPC700
 	sta.w $0668,y   ;0D83E8|996806  |000668; Store in new slot
 	clc ;0D83EB|18      |      ; Clear carry
 	adc.w $0648,y   ;0D83EC|794806  |000648; Add base address
 	sta.w $064a,y   ;0D83EF|994A06  |00064A; Store end address
 	sep #$20		;0D83F2|E220    |      ; 8-bit accumulator
 	lda.b $10	   ;0D83F4|A510    |000610; Get handshake
-	sta.w SNES_APUIO0 ;0D83F6|8D4021  |002140; Send to SPC700
+	sta.w !SNES_APUIO0 ;0D83F6|8D4021  |002140; Send to SPC700
 
 Label_0D83F9:
-	cmp.w SNES_APUIO0 ;0D83F9|CD4021  |002140; Wait for echo
+	cmp.w !SNES_APUIO0 ;0D83F9|CD4021  |002140; Wait for echo
 	bne Label_0D83F9 ;0D83FC|D0FB    |0D83F9; Loop
 	inc.b $10	   ;0D83FE|E610    |000610; Increment handshake
 	rep #$20		;0D8400|C220    |      ; 16-bit accumulator
@@ -1270,8 +1270,8 @@ Store_0D8405:
 Sound_Effect_Upload:
 	sep #$20		;0D840E|E220    |      ; 8-bit accumulator
 	lda.b #$03	  ;0D8410|A903    |      ; Multiply by 3
-	sta.w SNES_WRMPYA ;0D8412|8D0242  |004202; Set multiplier
-	sta.w SNES_APUIO1 ;0D8415|8D4121  |002141; Send command $03
+	sta.w !SNES_WRMPYA ;0D8412|8D0242  |004202; Set multiplier
+	sta.w !SNES_APUIO1 ;0D8415|8D4121  |002141; Send command $03
 	ldx.w #$0000	;0D8418|A20000  |      ; Start at channel 0
 
 ; ------------------------------------------------------------------------------
@@ -1290,14 +1290,14 @@ Load_0D841B:
 Store_0D8423:
 	stx.b $24	   ;0D8423|8624    |000624; Store channel index
 	lda.b $48,x	 ;0D8425|B548    |000648; Get RAM address low
-	sta.w SNES_APUIO2 ;0D8427|8D4221  |002142; Send to SPC700
+	sta.w !SNES_APUIO2 ;0D8427|8D4221  |002142; Send to SPC700
 	lda.b $49,x	 ;0D842A|B549    |000649; Get RAM address high
-	sta.w SNES_APUIO3 ;0D842C|8D4321  |002143; Send to SPC700
+	sta.w !SNES_APUIO3 ;0D842C|8D4321  |002143; Send to SPC700
 	lda.b #$00	  ;0D842F|A900    |      ; Initial handshake
-	sta.w SNES_APUIO0 ;0D8431|8D4021  |002140; Send to trigger
+	sta.w !SNES_APUIO0 ;0D8431|8D4021  |002140; Send to trigger
 
 Label_0D8434:
-	cmp.w SNES_APUIO0 ;0D8434|CD4021  |002140; Wait for echo
+	cmp.w !SNES_APUIO0 ;0D8434|CD4021  |002140; Wait for echo
 	bne Label_0D8434 ;0D8437|D0FB    |0D8434; Loop
 	inc a;0D8439|1A      |      ; Handshake = $01
 	sta.b $10	   ;0D843A|8510    |000610; Store handshake
@@ -1322,7 +1322,7 @@ Load_0D8448:
 	ldy.b $24	   ;0D8448|A424    |000624; Get channel index
 	sta.w $0628,y   ;0D844A|992806  |000628; Assign to channel
 	dec a;0D844D|3A      |      ; Convert to 0-based
-	sta.w SNES_WRMPYB ;0D844E|8D0342  |004203; Multiply (SFX# × 3)
+	sta.w !SNES_WRMPYB ;0D844E|8D0342  |004203; Multiply (SFX# × 3)
 	nop ;0D8451|EA      |      ; Wait for multiply
 	nop ;0D8452|EA      |      ;
 	phx ;0D8453|DA      |      ; Save buffer index
@@ -1330,7 +1330,7 @@ Load_0D8448:
 ; ------------------------------------------------------------------------------
 ; Look up SFX data pointer in table
 ; ------------------------------------------------------------------------------
-	ldx.w SNES_RDMPYL ;0D8454|AE1642  |004216; Get table index
+	ldx.w !SNES_RDMPYL ;0D8454|AE1642  |004216; Get table index
 	lda.l DATA8_0dbdff,x ;0D8457|BFFFBD0D|0DBDFF; Load pointer low
 	sta.b $14	   ;0D845B|8514    |000614; Store to DP
 	lda.l DATA8_0dbe00,x ;0D845D|BF00BE0D|0DBE00; Load pointer mid
@@ -1387,7 +1387,7 @@ Label_0D8487:
 ; ==============================================================================
 SFX_Byte_Transfer_Loop:
 	lda.b [$14],y   ;0D849B|B714    |000614; Read byte 1
-	sta.w SNES_APUIO1 ;0D849D|8D4121  |002141; Send to APUIO1
+	sta.w !SNES_APUIO1 ;0D849D|8D4121  |002141; Send to APUIO1
 	iny ;0D84A0|C8      |      ; Next byte
 	bne Load_0D84A8 ;0D84A1|D005    |0D84A8; If no wrap
 	inc.b $16	   ;0D84A3|E616    |000616; Increment bank
@@ -1395,7 +1395,7 @@ SFX_Byte_Transfer_Loop:
 
 Load_0D84A8:
 	lda.b [$14],y   ;0D84A8|B714    |000614; Read byte 2
-	sta.w SNES_APUIO2 ;0D84AA|8D4221  |002142; Send to APUIO2
+	sta.w !SNES_APUIO2 ;0D84AA|8D4221  |002142; Send to APUIO2
 	iny ;0D84AD|C8      |      ; Next byte
 	bne Load_0D84B5 ;0D84AE|D005    |0D84B5; If no wrap
 	inc.b $16	   ;0D84B0|E616    |000616; Increment bank
@@ -1403,7 +1403,7 @@ Load_0D84A8:
 
 Load_0D84B5:
 	lda.b [$14],y   ;0D84B5|B714    |000614; Read byte 3
-	sta.w SNES_APUIO3 ;0D84B7|8D4321  |002143; Send to APUIO3
+	sta.w !SNES_APUIO3 ;0D84B7|8D4321  |002143; Send to APUIO3
 	iny ;0D84BA|C8      |      ; Next byte
 	bne Load_0D84C2 ;0D84BB|D005    |0D84C2; If no wrap
 	db $e6,$16,$a0,$00,$80 ;0D84BD|        |000016; Increment bank
@@ -1413,10 +1413,10 @@ Load_0D84B5:
 ; ------------------------------------------------------------------------------
 Load_0D84C2:
 	lda.b $10	   ;0D84C2|A510    |000610; Get handshake
-	sta.w SNES_APUIO0 ;0D84C4|8D4021  |002140; Send to trigger
+	sta.w !SNES_APUIO0 ;0D84C4|8D4021  |002140; Send to trigger
 
 Label_0D84C7:
-	cmp.w SNES_APUIO0 ;0D84C7|CD4021  |002140; Wait for echo
+	cmp.w !SNES_APUIO0 ;0D84C7|CD4021  |002140; Wait for echo
 	bne Label_0D84C7 ;0D84CA|D0FB    |0D84C7; Loop
 	inc.b $10	   ;0D84CC|E610    |000610; Increment handshake
 	bne Label_0D84D2 ;0D84CE|D002    |0D84D2; If not $00

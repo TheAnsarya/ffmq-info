@@ -42,7 +42,7 @@ SPC_UploadDriver:
 	phx                                  ;0D803F|DA      |      ;
 	pld                                  ;0D8040|2B      |      ;
 	ldx.W #$bbaa                         ;0D8041|A2AABB  |      ;
-	cpx.W SNES_APUIO0                    ;0D8044|EC4021  |002140;
+	cpx.W !SNES_APUIO0                    ;0D8044|EC4021  |002140;
 	beq SPC_WaitReady                      ;0D8047|F02E    |0D8077;
 	ldy.B $f8                            ;0D8049|A4F8    |0006F8;
 	beq SPC_WaitReady                      ;0D804B|F02A    |0D8077;
@@ -55,20 +55,20 @@ SPC_UploadDriver:
 	db $ca,$d0,$fa,$84,$48,$a9,$ff,$85,$05,$a9,$f0,$85,$00,$4c,$5c,$81;0D8067|        |      ;
 ;      |        |      ;
 SPC_WaitReady:
-	cpx.W SNES_APUIO0                    ;0D8077|EC4021  |002140;
+	cpx.W !SNES_APUIO0                    ;0D8077|EC4021  |002140;
 	bne SPC_WaitReady                      ;0D807A|D0FB    |0D8077;
 	ldx.W #$0000                         ;0D807C|A20000  |      ;
 	lda.L DATA8_0d8014                   ;0D807F|AF14800D|0D8014;
-	sta.W SNES_APUIO2                    ;0D8083|8D4221  |002142;
+	sta.W !SNES_APUIO2                    ;0D8083|8D4221  |002142;
 	lda.L DATA8_0d8015                   ;0D8086|AF15800D|0D8015;
-	sta.W SNES_APUIO3                    ;0D808A|8D4321  |002143;
+	sta.W !SNES_APUIO3                    ;0D808A|8D4321  |002143;
 	lda.B #$01                           ;0D808D|A901    |      ;
-	sta.W SNES_APUIO1                    ;0D808F|8D4121  |002141;
+	sta.W !SNES_APUIO1                    ;0D808F|8D4121  |002141;
 	lda.B #$cc                           ;0D8092|A9CC    |      ;
-	sta.W SNES_APUIO0                    ;0D8094|8D4021  |002140;
+	sta.W !SNES_APUIO0                    ;0D8094|8D4021  |002140;
 ;      |        |      ;
 SPC_WaitHandshake:
-	cmp.W SNES_APUIO0                    ;0D8097|CD4021  |002140;
+	cmp.W !SNES_APUIO0                    ;0D8097|CD4021  |002140;
 	bne SPC_WaitHandshake                      ;0D809A|D0FB    |0D8097;
 ;      |        |      ;
 SPC_UploadBlock:
@@ -93,12 +93,12 @@ SPC_UploadBlock:
 ;      |        |      ;
 SPC_SendDataByte:
 	lda.B [$14],y                        ;0D80C1|B714    |000614;
-	sta.W SNES_APUIO1                    ;0D80C3|8D4121  |002141;
+	sta.W !SNES_APUIO1                    ;0D80C3|8D4121  |002141;
 	xba                                  ;0D80C6|EB      |      ;
-	sta.W SNES_APUIO0                    ;0D80C7|8D4021  |002140;
+	sta.W !SNES_APUIO0                    ;0D80C7|8D4021  |002140;
 ;      |        |      ;
 SPC_WaitAck:
-	cmp.W SNES_APUIO0                    ;0D80CA|CD4021  |002140;
+	cmp.W !SNES_APUIO0                    ;0D80CA|CD4021  |002140;
 	bne SPC_WaitAck                      ;0D80CD|D0FB    |0D80CA;
 	inc a;0D80CF|1A      |      ;
 	xba                                  ;0D80D0|EB      |      ;
@@ -119,33 +119,33 @@ SPC_NextBlock:
 	beq SPC_StartDriver                      ;0D80E2|F01D    |0D8101;
 	xba                                  ;0D80E4|EB      |      ;
 	lda.L DATA8_0d8014,x                 ;0D80E5|BF14800D|0D8014;
-	sta.W SNES_APUIO2                    ;0D80E9|8D4221  |002142;
+	sta.W !SNES_APUIO2                    ;0D80E9|8D4221  |002142;
 	lda.L DATA8_0d8015,x                 ;0D80EC|BF15800D|0D8015;
-	sta.W SNES_APUIO3                    ;0D80F0|8D4321  |002143;
+	sta.W !SNES_APUIO3                    ;0D80F0|8D4321  |002143;
 	xba                                  ;0D80F3|EB      |      ;
-	sta.W SNES_APUIO1                    ;0D80F4|8D4121  |002141;
-	sta.W SNES_APUIO0                    ;0D80F7|8D4021  |002140;
+	sta.W !SNES_APUIO1                    ;0D80F4|8D4121  |002141;
+	sta.W !SNES_APUIO0                    ;0D80F7|8D4021  |002140;
 ;      |        |      ;
 SPC_WaitBlockAck:
-	cmp.W SNES_APUIO0                    ;0D80FA|CD4021  |002140;
+	cmp.W !SNES_APUIO0                    ;0D80FA|CD4021  |002140;
 	bne SPC_WaitBlockAck                      ;0D80FD|D0FB    |0D80FA;
 	bra SPC_UploadBlock                      ;0D80FF|809B    |0D809C;
 ;      |        |      ;
 ;      |        |      ;
 SPC_StartDriver:
 	ldy.W #$0200                         ;0D8101|A00002  |      ;
-	sty.W SNES_APUIO2                    ;0D8104|8C4221  |002142;
+	sty.W !SNES_APUIO2                    ;0D8104|8C4221  |002142;
 	xba                                  ;0D8107|EB      |      ;
 	lda.B #$00                           ;0D8108|A900    |      ;
-	sta.W SNES_APUIO1                    ;0D810A|8D4121  |002141;
+	sta.W !SNES_APUIO1                    ;0D810A|8D4121  |002141;
 	xba                                  ;0D810D|EB      |      ;
-	sta.W SNES_APUIO0                    ;0D810E|8D4021  |002140;
+	sta.W !SNES_APUIO0                    ;0D810E|8D4021  |002140;
 ;      |        |      ;
 SPC_WaitDriverStart:
-	cmp.W SNES_APUIO0                    ;0D8111|CD4021  |002140;
+	cmp.W !SNES_APUIO0                    ;0D8111|CD4021  |002140;
 	bne SPC_WaitDriverStart                      ;0D8114|D0FB    |0D8111;
 	xba                                  ;0D8116|EB      |      ;
-	sta.W SNES_APUIO0                    ;0D8117|8D4021  |002140;
+	sta.W !SNES_APUIO0                    ;0D8117|8D4021  |002140;
 	ldx.W #$0100                         ;0D811A|A20001  |      ;
 ;      |        |      ;
 SPC_ClearMemory:
@@ -230,38 +230,38 @@ SPC_CheckChannel:
 	stx.B $06                            ;0D818E|8606    |000606;
 	txa                                  ;0D8190|8A      |      ;
 	and.B #$0f                           ;0D8191|290F    |      ;
-	sta.W SNES_APUIO1                    ;0D8193|8D4121  |002141;
+	sta.W !SNES_APUIO1                    ;0D8193|8D4121  |002141;
 	lda.B #$84                           ;0D8196|A984    |      ;
 ;      |        |      ;
 SPC_WaitChannel1:
-	cmp.W SNES_APUIO0                    ;0D8198|CD4021  |002140;
+	cmp.W !SNES_APUIO0                    ;0D8198|CD4021  |002140;
 	beq SPC_WaitChannel1                      ;0D819B|F0FB    |0D8198;
-	sta.W SNES_APUIO0                    ;0D819D|8D4021  |002140;
+	sta.W !SNES_APUIO0                    ;0D819D|8D4021  |002140;
 ;      |        |      ;
 SPC_WaitChannel2:
-	cmp.W SNES_APUIO0                    ;0D81A0|CD4021  |002140;
+	cmp.W !SNES_APUIO0                    ;0D81A0|CD4021  |002140;
 	bne SPC_WaitChannel2                      ;0D81A3|D0FB    |0D81A0;
 	lda.B #$00                           ;0D81A5|A900    |      ;
-	sta.W SNES_APUIO0                    ;0D81A7|8D4021  |002140;
+	sta.W !SNES_APUIO0                    ;0D81A7|8D4021  |002140;
 	xba                                  ;0D81AA|EB      |      ;
 	lda.B $03                            ;0D81AB|A503    |000603;
 	lsr a;0D81AD|4A      |      ;
 	lsr a;0D81AE|4A      |      ;
 	lsr a;0D81AF|4A      |      ;
 	lsr a;0D81B0|4A      |      ;
-	sta.W SNES_APUIO1                    ;0D81B1|8D4121  |002141;
+	sta.W !SNES_APUIO1                    ;0D81B1|8D4121  |002141;
 	lda.B #$81                           ;0D81B4|A981    |      ;
 ;      |        |      ;
 SPC_WaitChannel3:
-	cmp.W SNES_APUIO0                    ;0D81B6|CD4021  |002140;
+	cmp.W !SNES_APUIO0                    ;0D81B6|CD4021  |002140;
 	beq SPC_WaitChannel3                      ;0D81B9|F0FB    |0D81B6;
-	sta.W SNES_APUIO0                    ;0D81BB|8D4021  |002140;
+	sta.W !SNES_APUIO0                    ;0D81BB|8D4021  |002140;
 ;      |        |      ;
 SPC_WaitChannel4:
-	cmp.W SNES_APUIO0                    ;0D81BE|CD4021  |002140;
+	cmp.W !SNES_APUIO0                    ;0D81BE|CD4021  |002140;
 	bne SPC_WaitChannel4                      ;0D81C1|D0FB    |0D81BE;
 	xba                                  ;0D81C3|EB      |      ;
-	sta.W SNES_APUIO0                    ;0D81C4|8D4021  |002140;
+	sta.W !SNES_APUIO0                    ;0D81C4|8D4021  |002140;
 	xba                                  ;0D81C7|EB      |      ;
 	lda.B $02                            ;0D81C8|A502    |000602;
 	and.B #$f0                           ;0D81CA|29F0    |      ;
@@ -269,19 +269,19 @@ SPC_WaitChannel4:
 	lda.B $03                            ;0D81CE|A503    |000603;
 	and.B #$0f                           ;0D81D0|290F    |      ;
 	ora.B $02                            ;0D81D2|0502    |000602;
-	sta.W SNES_APUIO1                    ;0D81D4|8D4121  |002141;
+	sta.W !SNES_APUIO1                    ;0D81D4|8D4121  |002141;
 	lda.B #$81                           ;0D81D7|A981    |      ;
 ;      |        |      ;
 SPC_WaitChannel5:
-	cmp.W SNES_APUIO0                    ;0D81D9|CD4021  |002140;
+	cmp.W !SNES_APUIO0                    ;0D81D9|CD4021  |002140;
 	beq SPC_WaitChannel5                      ;0D81DC|F0FB    |0D81D9;
-	sta.W SNES_APUIO0                    ;0D81DE|8D4021  |002140;
+	sta.W !SNES_APUIO0                    ;0D81DE|8D4021  |002140;
 ;      |        |      ;
 SPC_WaitChannel6:
-	cmp.W SNES_APUIO0                    ;0D81E1|CD4021  |002140;
+	cmp.W !SNES_APUIO0                    ;0D81E1|CD4021  |002140;
 	bne SPC_WaitChannel6                      ;0D81E4|D0FB    |0D81E1;
 	xba                                  ;0D81E6|EB      |      ;
-	sta.W SNES_APUIO0                    ;0D81E7|8D4021  |002140;
+	sta.W !SNES_APUIO0                    ;0D81E7|8D4021  |002140;
 	jmp.W SPC_Return                    ;0D81EA|4C7881  |0D8178;
 ;      |        |      ;
 ;      |        |      ;
@@ -295,34 +295,34 @@ SPC_PrepareUpload:
 ;      |        |      ;
 SPC_StoreChannel:
 	lda.B $01                            ;0D81FA|A501    |000601;
-	sta.W SNES_APUIO1                    ;0D81FC|8D4121  |002141;
+	sta.W !SNES_APUIO1                    ;0D81FC|8D4121  |002141;
 	sta.B $05                            ;0D81FF|8505    |000605;
-	sta.W SNES_WRMPYA                    ;0D8201|8D0242  |004202;
+	sta.W !SNES_WRMPYA                    ;0D8201|8D0242  |004202;
 	lda.B #$03                           ;0D8204|A903    |      ;
-	sta.W SNES_WRMPYB                    ;0D8206|8D0342  |004203;
+	sta.W !SNES_WRMPYB                    ;0D8206|8D0342  |004203;
 	ldx.B $02                            ;0D8209|A602    |000602;
-	stx.W SNES_APUIO2                    ;0D820B|8E4221  |002142;
+	stx.W !SNES_APUIO2                    ;0D820B|8E4221  |002142;
 	stx.B $06                            ;0D820E|8606    |000606;
 	xba                                  ;0D8210|EB      |      ;
 ;      |        |      ;
 SPC_WaitUpload1:
-	cmp.W SNES_APUIO0                    ;0D8211|CD4021  |002140;
+	cmp.W !SNES_APUIO0                    ;0D8211|CD4021  |002140;
 	beq SPC_WaitUpload1                      ;0D8214|F0FB    |0D8211;
-	sta.W SNES_APUIO0                    ;0D8216|8D4021  |002140;
+	sta.W !SNES_APUIO0                    ;0D8216|8D4021  |002140;
 ;      |        |      ;
 SPC_WaitUpload2:
-	cmp.W SNES_APUIO0                    ;0D8219|CD4021  |002140;
+	cmp.W !SNES_APUIO0                    ;0D8219|CD4021  |002140;
 	bne SPC_WaitUpload2                      ;0D821C|D0FB    |0D8219;
 	lda.B #$02                           ;0D821E|A902    |      ;
-	sta.W SNES_APUIO1                    ;0D8220|8D4121  |002141;
+	sta.W !SNES_APUIO1                    ;0D8220|8D4121  |002141;
 	ldx.W #$1c00                         ;0D8223|A2001C  |      ;
-	stx.W SNES_APUIO2                    ;0D8226|8E4221  |002142;
-	sta.W SNES_APUIO0                    ;0D8229|8D4021  |002140;
+	stx.W !SNES_APUIO2                    ;0D8226|8E4221  |002142;
+	sta.W !SNES_APUIO0                    ;0D8229|8D4021  |002140;
 ;      |        |      ;
 SPC_LoadMusicData:
-	cmp.W SNES_APUIO0                    ;0D822C|CD4021  |002140;
+	cmp.W !SNES_APUIO0                    ;0D822C|CD4021  |002140;
 	bne SPC_LoadMusicData                      ;0D822F|D0FB    |0D822C;
-	ldx.W SNES_RDMPYL                    ;0D8231|AE1642  |004216;
+	ldx.W !SNES_RDMPYL                    ;0D8231|AE1642  |004216;
 	lda.L UNREACH_0DBDAE,x               ;0D8234|BFAEBD0D|0DBDAE;
 	sta.B $14                            ;0D8238|8514    |000614;
 	lda.L UNREACH_0DBDAF,x               ;0D823A|BFAFBD0D|0DBDAF;
@@ -355,24 +355,24 @@ SPC_ReadMusicData:
 ;      |        |      ;
 SPC_SendMusicBlock:
 	lda.B [$14],y                        ;0D826B|B714    |000614;
-	sta.W SNES_APUIO2                    ;0D826D|8D4221  |002142;
+	sta.W !SNES_APUIO2                    ;0D826D|8D4221  |002142;
 	iny                                  ;0D8270|C8      |      ;
 	bne SPC_SendBlockByte2                      ;0D8271|D005    |0D8278;
 	db $e6,$16,$a0,$00,$80               ;0D8273|        |000016;
 ;      |        |      ;
 SPC_SendBlockByte2:
 	lda.B [$14],y                        ;0D8278|B714    |000614;
-	sta.W SNES_APUIO3                    ;0D827A|8D4321  |002143;
+	sta.W !SNES_APUIO3                    ;0D827A|8D4321  |002143;
 	iny                                  ;0D827D|C8      |      ;
 	bne SPC_SendBlockByte3                      ;0D827E|D005    |0D8285;
 	db $e6,$16,$a0,$00,$80               ;0D8280|        |000016;
 ;      |        |      ;
 SPC_SendBlockByte3:
 	xba                                  ;0D8285|EB      |      ;
-	sta.W SNES_APUIO0                    ;0D8286|8D4021  |002140;
+	sta.W !SNES_APUIO0                    ;0D8286|8D4021  |002140;
 ;      |        |      ;
 SPC_WaitBlockSend:
-	cmp.W SNES_APUIO0                    ;0D8289|CD4021  |002140;
+	cmp.W !SNES_APUIO0                    ;0D8289|CD4021  |002140;
 	bne SPC_WaitBlockSend                      ;0D828C|D0FB    |0D8289;
 	inc a;0D828E|1A      |      ;
 	bne SPC_NextMusicByte                      ;0D828F|D001    |0D8292;
@@ -384,7 +384,7 @@ SPC_NextMusicByte:
 	dex                                  ;0D8294|CA      |      ;
 	bpl SPC_SendMusicBlock                      ;0D8295|10D4    |0D826B;
 	lda.B #$20                           ;0D8297|A920    |      ;
-	sta.W SNES_WRMPYB                    ;0D8299|8D0342  |004203;
+	sta.W !SNES_WRMPYB                    ;0D8299|8D0342  |004203;
 	rep #$20                             ;0D829C|C220    |      ;
 	ldx.W #$0000                         ;0D829E|A20000  |      ;
 ;      |        |      ;
@@ -395,7 +395,7 @@ SPC_ClearChannelData:
 	inx                                  ;0D82A6|E8      |      ;
 	cpx.W #$0020                         ;0D82A7|E02000  |      ;
 	bne SPC_ClearChannelData                      ;0D82AA|D0F5    |0D82A1;
-	lda.W SNES_RDMPYL                    ;0D82AC|AD1642  |004216;
+	lda.W !SNES_RDMPYL                    ;0D82AC|AD1642  |004216;
 	tax                                  ;0D82AF|AA      |      ;
 	clc                                  ;0D82B0|18      |      ;
 	adc.W #$0020                         ;0D82B1|692000  |      ;
@@ -442,18 +442,18 @@ SPC_UploadSamples:
 	stz.B $17                            ;0D82F1|6417    |000617;
 	sep #$20                             ;0D82F3|E220    |      ;
 	lda.B #$03                           ;0D82F5|A903    |      ;
-	sta.W SNES_WRMPYA                    ;0D82F7|8D0242  |004202;
+	sta.W !SNES_WRMPYA                    ;0D82F7|8D0242  |004202;
 	ldx.W #$0000                         ;0D82FA|A20000  |      ;
 ;      |        |      ;
 SPC_ProcessSample:
 	lda.B $c8,x                          ;0D82FD|B5C8    |0006C8;
 	beq SPC_FindFreeSlot                      ;0D82FF|F03F    |0D8340;
 	dec a;0D8301|3A      |      ;
-	sta.W SNES_WRMPYB                    ;0D8302|8D0342  |004203;
+	sta.W !SNES_WRMPYB                    ;0D8302|8D0342  |004203;
 	nop                                  ;0D8305|EA      |      ;
 	nop                                  ;0D8306|EA      |      ;
 	phx                                  ;0D8307|DA      |      ;
-	ldx.W SNES_RDMPYL                    ;0D8308|AE1642  |004216;
+	ldx.W !SNES_RDMPYL                    ;0D8308|AE1642  |004216;
 	lda.L DATA8_0dbdff,x                 ;0D830B|BFFFBD0D|0DBDFF;
 	sta.B $14                            ;0D830F|8514    |000614;
 	lda.L DATA8_0dbe00,x                 ;0D8311|BF00BE0D|0DBE00;
@@ -542,7 +542,7 @@ SPC_ClearSlotLoop:
 SPC_RemapSamples:
 	sep #$20                             ;0D8387|E220    |      ;
 	lda.B #$07                           ;0D8389|A907    |      ;
-	sta.W SNES_APUIO1                    ;0D838B|8D4121  |002141;
+	sta.W !SNES_APUIO1                    ;0D838B|8D4121  |002141;
 	stz.B $10                            ;0D838E|6410    |000610;
 	ldy.W #$0000                         ;0D8390|A00000  |      ;
 	rep #$20                             ;0D8393|C220    |      ;
@@ -580,39 +580,39 @@ SPC_RemapEntry:
 	stz.B $88,x                          ;0D83B3|7488    |000688;
 	sta.W $0628,y                        ;0D83B5|992806  |000628;
 	lda.B $48,x                          ;0D83B8|B548    |000648;
-	sta.W SNES_APUIO2                    ;0D83BA|8D4221  |002142;
+	sta.W !SNES_APUIO2                    ;0D83BA|8D4221  |002142;
 	sep #$20                             ;0D83BD|E220    |      ;
 	lda.B $10                            ;0D83BF|A510    |000610;
-	sta.W SNES_APUIO0                    ;0D83C1|8D4021  |002140;
+	sta.W !SNES_APUIO0                    ;0D83C1|8D4021  |002140;
 ;      |        |      ;
 SPC_WaitRemap1:
-	cmp.W SNES_APUIO0                    ;0D83C4|CD4021  |002140;
+	cmp.W !SNES_APUIO0                    ;0D83C4|CD4021  |002140;
 	bne SPC_WaitRemap1                      ;0D83C7|D0FB    |0D83C4;
 	inc.B $10                            ;0D83C9|E610    |000610;
 	rep #$20                             ;0D83CB|C220    |      ;
 	lda.W $0648,y                        ;0D83CD|B94806  |000648;
-	sta.W SNES_APUIO2                    ;0D83D0|8D4221  |002142;
+	sta.W !SNES_APUIO2                    ;0D83D0|8D4221  |002142;
 	sep #$20                             ;0D83D3|E220    |      ;
 	lda.B $10                            ;0D83D5|A510    |000610;
-	sta.W SNES_APUIO0                    ;0D83D7|8D4021  |002140;
+	sta.W !SNES_APUIO0                    ;0D83D7|8D4021  |002140;
 ;      |        |      ;
 SPC_WaitRemap2:
-	cmp.W SNES_APUIO0                    ;0D83DA|CD4021  |002140;
+	cmp.W !SNES_APUIO0                    ;0D83DA|CD4021  |002140;
 	bne SPC_WaitRemap2                      ;0D83DD|D0FB    |0D83DA;
 	inc.B $10                            ;0D83DF|E610    |000610;
 	rep #$20                             ;0D83E1|C220    |      ;
 	lda.B $68,x                          ;0D83E3|B568    |000668;
-	sta.W SNES_APUIO2                    ;0D83E5|8D4221  |002142;
+	sta.W !SNES_APUIO2                    ;0D83E5|8D4221  |002142;
 	sta.W $0668,y                        ;0D83E8|996806  |000668;
 	clc                                  ;0D83EB|18      |      ;
 	adc.W $0648,y                        ;0D83EC|794806  |000648;
 	sta.W $064a,y                        ;0D83EF|994A06  |00064A;
 	sep #$20                             ;0D83F2|E220    |      ;
 	lda.B $10                            ;0D83F4|A510    |000610;
-	sta.W SNES_APUIO0                    ;0D83F6|8D4021  |002140;
+	sta.W !SNES_APUIO0                    ;0D83F6|8D4021  |002140;
 ;      |        |      ;
 SPC_WaitRemap3:
-	cmp.W SNES_APUIO0                    ;0D83F9|CD4021  |002140;
+	cmp.W !SNES_APUIO0                    ;0D83F9|CD4021  |002140;
 	bne SPC_WaitRemap3                      ;0D83FC|D0FB    |0D83F9;
 	inc.B $10                            ;0D83FE|E610    |000610;
 	rep #$20                             ;0D8400|C220    |      ;
@@ -632,8 +632,8 @@ SPC_ClearLoop:
 SPC_UploadSampleData:
 	sep #$20                             ;0D840E|E220    |      ;
 	lda.B #$03                           ;0D8410|A903    |      ;
-	sta.W SNES_WRMPYA                    ;0D8412|8D0242  |004202;
-	sta.W SNES_APUIO1                    ;0D8415|8D4121  |002141;
+	sta.W !SNES_WRMPYA                    ;0D8412|8D0242  |004202;
+	sta.W !SNES_APUIO1                    ;0D8415|8D4121  |002141;
 	ldx.W #$0000                         ;0D8418|A20000  |      ;
 ;      |        |      ;
 SPC_FindFirstSlot:
@@ -647,14 +647,14 @@ SPC_FindFirstSlot:
 SPC_SetupUpload:
 	stx.B $24                            ;0D8423|8624    |000624;
 	lda.B $48,x                          ;0D8425|B548    |000648;
-	sta.W SNES_APUIO2                    ;0D8427|8D4221  |002142;
+	sta.W !SNES_APUIO2                    ;0D8427|8D4221  |002142;
 	lda.B $49,x                          ;0D842A|B549    |000649;
-	sta.W SNES_APUIO3                    ;0D842C|8D4321  |002143;
+	sta.W !SNES_APUIO3                    ;0D842C|8D4321  |002143;
 	lda.B #$00                           ;0D842F|A900    |      ;
-	sta.W SNES_APUIO0                    ;0D8431|8D4021  |002140;
+	sta.W !SNES_APUIO0                    ;0D8431|8D4021  |002140;
 ;      |        |      ;
 SPC_WaitUploadReady:
-	cmp.W SNES_APUIO0                    ;0D8434|CD4021  |002140;
+	cmp.W !SNES_APUIO0                    ;0D8434|CD4021  |002140;
 	bne SPC_WaitUploadReady                      ;0D8437|D0FB    |0D8434;
 	inc a;0D8439|1A      |      ;
 	sta.B $10                            ;0D843A|8510    |000610;
@@ -671,11 +671,11 @@ SPC_LoadSampleHeader:
 	ldy.B $24                            ;0D8448|A424    |000624;
 	sta.W $0628,y                        ;0D844A|992806  |000628;
 	dec a;0D844D|3A      |      ;
-	sta.W SNES_WRMPYB                    ;0D844E|8D0342  |004203;
+	sta.W !SNES_WRMPYB                    ;0D844E|8D0342  |004203;
 	nop                                  ;0D8451|EA      |      ;
 	nop                                  ;0D8452|EA      |      ;
 	phx                                  ;0D8453|DA      |      ;
-	ldx.W SNES_RDMPYL                    ;0D8454|AE1642  |004216;
+	ldx.W !SNES_RDMPYL                    ;0D8454|AE1642  |004216;
 	lda.L DATA8_0dbdff,x                 ;0D8457|BFFFBD0D|0DBDFF;
 	sta.B $14                            ;0D845B|8514    |000614;
 	lda.L DATA8_0dbe00,x                 ;0D845D|BF00BE0D|0DBE00;
@@ -715,7 +715,7 @@ SPC_StoreSampleSize:
 ;      |        |      ;
 SPC_SendSampleData:
 	lda.B [$14],y                        ;0D849B|B714    |000614;
-	sta.W SNES_APUIO1                    ;0D849D|8D4121  |002141;
+	sta.W !SNES_APUIO1                    ;0D849D|8D4121  |002141;
 	iny                                  ;0D84A0|C8      |      ;
 	bne SPC_SendSampleByte2                      ;0D84A1|D005    |0D84A8;
 	inc.B $16                            ;0D84A3|E616    |000616;
@@ -723,7 +723,7 @@ SPC_SendSampleData:
 ;      |        |      ;
 SPC_SendSampleByte2:
 	lda.B [$14],y                        ;0D84A8|B714    |000614;
-	sta.W SNES_APUIO2                    ;0D84AA|8D4221  |002142;
+	sta.W !SNES_APUIO2                    ;0D84AA|8D4221  |002142;
 	iny                                  ;0D84AD|C8      |      ;
 	bne SPC_SendSampleByte3                      ;0D84AE|D005    |0D84B5;
 	inc.B $16                            ;0D84B0|E616    |000616;
@@ -731,17 +731,17 @@ SPC_SendSampleByte2:
 ;      |        |      ;
 SPC_SendSampleByte3:
 	lda.B [$14],y                        ;0D84B5|B714    |000614;
-	sta.W SNES_APUIO3                    ;0D84B7|8D4321  |002143;
+	sta.W !SNES_APUIO3                    ;0D84B7|8D4321  |002143;
 	iny                                  ;0D84BA|C8      |      ;
 	bne SPC_SendSampleByte4                      ;0D84BB|D005    |0D84C2;
 	db $e6,$16,$a0,$00,$80               ;0D84BD|        |000016;
 ;      |        |      ;
 SPC_SendSampleByte4:
 	lda.B $10                            ;0D84C2|A510    |000610;
-	sta.W SNES_APUIO0                    ;0D84C4|8D4021  |002140;
+	sta.W !SNES_APUIO0                    ;0D84C4|8D4021  |002140;
 ;      |        |      ;
 SPC_WaitSampleByte:
-	cmp.W SNES_APUIO0                    ;0D84C7|CD4021  |002140;
+	cmp.W !SNES_APUIO0                    ;0D84C7|CD4021  |002140;
 	bne SPC_WaitSampleByte                      ;0D84CA|D0FB    |0D84C7;
 	inc.B $10                            ;0D84CC|E610    |000610;
 	bne SPC_NextSampleByte                      ;0D84CE|D002    |0D84D2;
@@ -816,12 +816,12 @@ SPC_LookupSample:
 SPC_SendChannelData:
 	sep #$20                             ;0D853B|E220    |      ;
 	lda.B #$02                           ;0D853D|A902    |      ;
-	sta.W SNES_APUIO1                    ;0D853F|8D4121  |002141;
+	sta.W !SNES_APUIO1                    ;0D853F|8D4121  |002141;
 	ldx.W #$0700                         ;0D8542|A20007  |      ;
 	phx                                  ;0D8545|DA      |      ;
 	pld                                  ;0D8546|2B      |      ;
 	ldx.W #$1a40                         ;0D8547|A2401A  |      ;
-	stx.W SNES_APUIO2                    ;0D854A|8E4221  |002142;
+	stx.W !SNES_APUIO2                    ;0D854A|8E4221  |002142;
 	lda.B #$00                           ;0D854D|A900    |      ;
 	ldx.W #$fffe                         ;0D854F|A2FEFF  |      ;
 	bra SPC_SendChannel1                      ;0D8552|8005    |0D8559;
@@ -829,13 +829,13 @@ SPC_SendChannelData:
 ;      |        |      ;
 SPC_SendChannelLoop1:
 	ldy.B $00,x                          ;0D8554|B400    |000700;
-	sty.W SNES_APUIO2                    ;0D8556|8C4221  |002142;
+	sty.W !SNES_APUIO2                    ;0D8556|8C4221  |002142;
 ;      |        |      ;
 SPC_SendChannel1:
-	sta.W SNES_APUIO0                    ;0D8559|8D4021  |002140;
+	sta.W !SNES_APUIO0                    ;0D8559|8D4021  |002140;
 ;      |        |      ;
 SPC_WaitChannel1Send:
-	cmp.W SNES_APUIO0                    ;0D855C|CD4021  |002140;
+	cmp.W !SNES_APUIO0                    ;0D855C|CD4021  |002140;
 	bne SPC_WaitChannel1Send                      ;0D855F|D0FB    |0D855C;
 	inc a;0D8561|1A      |      ;
 	inx                                  ;0D8562|E8      |      ;
@@ -843,7 +843,7 @@ SPC_WaitChannel1Send:
 	cpx.W #$0040                         ;0D8564|E04000  |      ;
 	bne SPC_SendChannelLoop1                      ;0D8567|D0EB    |0D8554;
 	ldx.W #$1b80                         ;0D8569|A2801B  |      ;
-	stx.W SNES_APUIO2                    ;0D856C|8E4221  |002142;
+	stx.W !SNES_APUIO2                    ;0D856C|8E4221  |002142;
 	lda.B #$00                           ;0D856F|A900    |      ;
 	ldx.W #$fffe                         ;0D8571|A2FEFF  |      ;
 	bra SPC_SendChannel2                      ;0D8574|8005    |0D857B;
@@ -851,13 +851,13 @@ SPC_WaitChannel1Send:
 ;      |        |      ;
 SPC_SendChannelLoop2:
 	ldy.B $40,x                          ;0D8576|B440    |000740;
-	sty.W SNES_APUIO2                    ;0D8578|8C4221  |002142;
+	sty.W !SNES_APUIO2                    ;0D8578|8C4221  |002142;
 ;      |        |      ;
 SPC_SendChannel2:
-	sta.W SNES_APUIO0                    ;0D857B|8D4021  |002140;
+	sta.W !SNES_APUIO0                    ;0D857B|8D4021  |002140;
 ;      |        |      ;
 SPC_WaitChannel2Send:
-	cmp.W SNES_APUIO0                    ;0D857E|CD4021  |002140;
+	cmp.W !SNES_APUIO0                    ;0D857E|CD4021  |002140;
 	bne SPC_WaitChannel2Send                      ;0D8581|D0FB    |0D857E;
 	inc a;0D8583|1A      |      ;
 	inx                                  ;0D8584|E8      |      ;
@@ -865,7 +865,7 @@ SPC_WaitChannel2Send:
 	cpx.W #$0080                         ;0D8586|E08000  |      ;
 	bne SPC_SendChannelLoop2                      ;0D8589|D0EB    |0D8576;
 	ldx.W #$1ac0                         ;0D858B|A2C01A  |      ;
-	stx.W SNES_APUIO2                    ;0D858E|8E4221  |002142;
+	stx.W !SNES_APUIO2                    ;0D858E|8E4221  |002142;
 	lda.B #$00                           ;0D8591|A900    |      ;
 	ldx.W #$fffe                         ;0D8593|A2FEFF  |      ;
 	bra SPC_SendChannel3                      ;0D8596|8005    |0D859D;
@@ -873,13 +873,13 @@ SPC_WaitChannel2Send:
 ;      |        |      ;
 SPC_SendChannelLoop3:
 	ldy.B $c0,x                          ;0D8598|B4C0    |0007C0;
-	sty.W SNES_APUIO2                    ;0D859A|8C4221  |002142;
+	sty.W !SNES_APUIO2                    ;0D859A|8C4221  |002142;
 ;      |        |      ;
 SPC_SendChannel3:
-	sta.W SNES_APUIO0                    ;0D859D|8D4021  |002140;
+	sta.W !SNES_APUIO0                    ;0D859D|8D4021  |002140;
 ;      |        |      ;
 SPC_WaitChannel3Send:
-	cmp.W SNES_APUIO0                    ;0D85A0|CD4021  |002140;
+	cmp.W !SNES_APUIO0                    ;0D85A0|CD4021  |002140;
 	bne SPC_WaitChannel3Send                      ;0D85A3|D0FB    |0D85A0;
 	inc a;0D85A5|1A      |      ;
 	inx                                  ;0D85A6|E8      |      ;
@@ -888,8 +888,8 @@ SPC_WaitChannel3Send:
 	bne SPC_SendChannelLoop3                      ;0D85AB|D0EB    |0D8598;
 	sep #$20                             ;0D85AD|E220    |      ;
 	lda.B #$00                           ;0D85AF|A900    |      ;
-	sta.W SNES_APUIO1                    ;0D85B1|8D4121  |002141;
-	sta.W SNES_APUIO0                    ;0D85B4|8D4021  |002140;
+	sta.W !SNES_APUIO1                    ;0D85B1|8D4121  |002141;
+	sta.W !SNES_APUIO0                    ;0D85B4|8D4021  |002140;
 	jmp.W SPC_Return                    ;0D85B7|4C7881  |0D8178;
 ;      |        |      ;
 ;      |        |      ;
@@ -897,17 +897,17 @@ SPC_PlaySound:
 	sep #$20                             ;0D85BA|E220    |      ;
 	xba                                  ;0D85BC|EB      |      ;
 	lda.B $03                            ;0D85BD|A503    |000603;
-	sta.W SNES_APUIO3                    ;0D85BF|8D4321  |002143;
+	sta.W !SNES_APUIO3                    ;0D85BF|8D4321  |002143;
 	lda.B $02                            ;0D85C2|A502    |000602;
-	sta.W SNES_APUIO2                    ;0D85C4|8D4221  |002142;
+	sta.W !SNES_APUIO2                    ;0D85C4|8D4221  |002142;
 	lda.B $01                            ;0D85C7|A501    |000601;
-	sta.W SNES_APUIO1                    ;0D85C9|8D4121  |002141;
+	sta.W !SNES_APUIO1                    ;0D85C9|8D4121  |002141;
 	xba                                  ;0D85CC|EB      |      ;
 ;      |        |      ;
 SPC_WaitSoundReady:
-	cmp.W SNES_APUIO0                    ;0D85CD|CD4021  |002140;
+	cmp.W !SNES_APUIO0                    ;0D85CD|CD4021  |002140;
 	beq SPC_WaitSoundReady                      ;0D85D0|F0FB    |0D85CD;
-	sta.W SNES_APUIO0                    ;0D85D2|8D4021  |002140;
+	sta.W !SNES_APUIO0                    ;0D85D2|8D4021  |002140;
 	cmp.B #$f0                           ;0D85D5|C9F0    |      ;
 	bcc SPC_WaitSoundComplete                      ;0D85D7|9014    |0D85ED;
 	cmp.B #$f2                           ;0D85D9|C9F2    |      ;
@@ -925,10 +925,10 @@ SPC_SavePrevious:
 	xba                                  ;0D85EC|EB      |      ;
 ;      |        |      ;
 SPC_WaitSoundComplete:
-	cmp.W SNES_APUIO0                    ;0D85ED|CD4021  |002140;
+	cmp.W !SNES_APUIO0                    ;0D85ED|CD4021  |002140;
 	bne SPC_WaitSoundComplete                      ;0D85F0|D0FB    |0D85ED;
 	lda.B #$00                           ;0D85F2|A900    |      ;
-	sta.W SNES_APUIO0                    ;0D85F4|8D4021  |002140;
+	sta.W !SNES_APUIO0                    ;0D85F4|8D4021  |002140;
 	jmp.W SPC_Return                    ;0D85F7|4C7881  |0D8178;
 ;      |        |      ;
 ;      |        |      ;

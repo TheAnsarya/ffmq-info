@@ -263,10 +263,10 @@ LoadEnemyLoop:
 	cpy.W #$0007                         ;0B81C5|C00700  |      ;
 	bne LoadEnemyLoop                      ;0B81C8|D0F2    |0B81BC;
 	lda.B #$0a                           ;0B81CA|A90A    |      ;
-	sta.W SNES_M7A                          ;0B81CC|8D1B21  |01211B;
-	stz.W SNES_M7A                          ;0B81CF|9C1B21  |01211B;
+	sta.W !SNES_M7A                          ;0B81CC|8D1B21  |01211B;
+	stz.W !SNES_M7A                          ;0B81CF|9C1B21  |01211B;
 	lda.w !source_address_index                          ;0B81D2|AD1119  |011911;
-	sta.W SNES_M7B                          ;0B81D5|8D1C21  |01211C;
+	sta.W !SNES_M7B                          ;0B81D5|8D1C21  |01211C;
 	ldx.w !MPYL                          ;0B81D8|AE3421  |012134;
 	stx.w !calculated_source_offset                          ;0B81DB|8EB719  |0119B7;
 	ldy.W #$0000                         ;0B81DE|A00000  |      ;
@@ -497,11 +497,11 @@ TransferLoop:
 	pha                                  ;0B8379|48      |      ;
 	xba                                  ;0B837A|EB      |      ;
 	lda.W DATA8_0b83ac,x                 ;0B837B|BDAC83  |0B83AC;
-	sta.W SNES_M7A                          ;0B837E|8D1B21  |0B211B;
+	sta.W !SNES_M7A                          ;0B837E|8D1B21  |0B211B;
 	lda.W DATA8_0b83ad,x                 ;0B8381|BDAD83  |0B83AD;
-	sta.W SNES_M7A                          ;0B8384|8D1B21  |0B211B;
+	sta.W !SNES_M7A                          ;0B8384|8D1B21  |0B211B;
 	xba                                  ;0B8387|EB      |      ;
-	sta.W SNES_M7B                          ;0B8388|8D1C21  |0B211C;
+	sta.W !SNES_M7B                          ;0B8388|8D1C21  |0B211C;
 	rep #$20                             ;0B838B|C220    |      ;
 	lda.W DATA8_0b83b2,x                 ;0B838D|BDB283  |0B83B2;
 	clc                                  ;0B8390|18      |      ;
@@ -588,15 +588,15 @@ LoadDecorativeTiles:
 ;      |        |      ;
 SetupBattleDisplay:
 	lda.B #$41                           ;0B841D|A941    |      ;
-	sta.W SNES_BG1SC                          ;0B841F|8D0721  |012107;
+	sta.W !SNES_BG1SC                          ;0B841F|8D0721  |012107;
 	lda.W $1a4d                          ;0B8422|AD4D1A  |011A4D;
-	sta.W SNES_BG2SC                          ;0B8425|8D0821  |012108;
+	sta.W !SNES_BG2SC                          ;0B8425|8D0821  |012108;
 	lda.w !gfx_completion_mode                          ;0B8428|AD4E1A  |011A4E;
-	sta.W SNES_TM                          ;0B842B|8D2C21  |01212C;
+	sta.W !SNES_TM                          ;0B842B|8D2C21  |01212C;
 	lda.w !gfx_completion_flags                          ;0B842E|AD4F1A  |011A4F;
-	sta.W SNES_TS                          ;0B8431|8D2D21  |01212D;
+	sta.W !SNES_TS                          ;0B8431|8D2D21  |01212D;
 	lda.W $1a50                          ;0B8434|AD501A  |011A50;
-	sta.W SNES_CGSWSEL                          ;0B8437|8D3021  |012130;
+	sta.W !SNES_CGSWSEL                          ;0B8437|8D3021  |012130;
 	ldy.w !buffer_state                          ;0B843A|AC511A  |011A51;
 	lda.w !movement_state                          ;0B843D|ADCB19  |0119CB;
 	and.B #$70                           ;0B8440|2970    |      ;
@@ -608,7 +608,7 @@ SetupBattleDisplay:
 ;      |        |      ;
 ApplyColorMath:
 	tya                                  ;0B844A|98      |      ;
-	sta.W SNES_CGADSUB                          ;0B844B|8D3121  |012131;
+	sta.W !SNES_CGADSUB                          ;0B844B|8D3121  |012131;
 	rtl                                  ;0B844E|6B      |      ;
 ;      |        |      ;
 ;      |        |      ;
@@ -734,24 +734,24 @@ ProcessAnimation_Return:
 	rts                                  ;0B85BE|60      |      ;
 ;      |        |      ;
 	lda.B #$08                           ;0B85BF|A908    |      ;
-	sta.W SNES_M7A                          ;0B85C1|8D1B21  |01211B;
-	stz.W SNES_M7A                          ;0B85C4|9C1B21  |01211B;
+	sta.W !SNES_M7A                          ;0B85C1|8D1B21  |01211B;
+	stz.W !SNES_M7A                          ;0B85C4|9C1B21  |01211B;
 	lda.w !player_map_x                          ;0B85C7|AD890E  |010E89;
 	sec                                  ;0B85CA|38      |      ;
 	sbc.B #$08                           ;0B85CB|E908    |      ;
-	sta.W SNES_M7B                          ;0B85CD|8D1C21  |01211C;
+	sta.W !SNES_M7B                          ;0B85CD|8D1C21  |01211C;
 	rep #$20                             ;0B85D0|C220    |      ;
 	lda.w !MPYL                          ;0B85D2|AD3421  |012134;
 	and.W #$01f8                         ;0B85D5|29F801  |      ;
 	sta.w !battle_actor1_x                          ;0B85D8|8D0419  |011904;
 	sep #$20                             ;0B85DB|E220    |      ;
 	lda.B #$08                           ;0B85DD|A908    |      ;
-	sta.W SNES_M7A                          ;0B85DF|8D1B21  |01211B;
-	stz.W SNES_M7A                          ;0B85E2|9C1B21  |01211B;
+	sta.W !SNES_M7A                          ;0B85DF|8D1B21  |01211B;
+	stz.W !SNES_M7A                          ;0B85E2|9C1B21  |01211B;
 	lda.w !player_map_y                          ;0B85E5|AD8A0E  |010E8A;
 	sec                                  ;0B85E8|38      |      ;
 	sbc.B #$06                           ;0B85E9|E906    |      ;
-	sta.W SNES_M7B                          ;0B85EB|8D1C21  |01211C;
+	sta.W !SNES_M7B                          ;0B85EB|8D1C21  |01211C;
 	rep #$20                             ;0B85EE|C220    |      ;
 	lda.w !MPYL                          ;0B85F0|AD3421  |012134;
 	clc                                  ;0B85F3|18      |      ;
@@ -894,11 +894,11 @@ UploadCompressedData:
 	plb                                  ;0B86F8|AB      |      ;
 	ldx.B $00                            ;0B86F9|A600    |000900;
 	ldy.B $03                            ;0B86FB|A403    |000903;
-	sty.W SNES_WMADDL                          ;0B86FD|8C8121  |072181;
+	sty.W !SNES_WMADDL                          ;0B86FD|8C8121  |072181;
 	lda.B $05                            ;0B8700|A505    |000905;
 	pea.w !INIDISP                          ;0B8702|F40021  |072100;
 	pld                                  ;0B8705|2B      |      ;
-	sta.B SNES_WMADDH-$2100              ;0B8706|8583    |002183;
+	sta.B !SNES_WMADDH-$2100              ;0B8706|8583    |002183;
 	ldy.W $0000,x                        ;0B8708|BC0000  |070000;
 	inx                                  ;0B870B|E8      |      ;
 	inx                                  ;0B870C|E8      |      ;
@@ -921,7 +921,7 @@ UploadLoop:
 	and.B #$7f                           ;0B8721|297F    |      ;
 ;      |        |      ;
 UploadRLEByte:
-	sta.B SNES_WMDATA-$2100              ;0B8723|8580    |002180;
+	sta.B !SNES_WMDATA-$2100              ;0B8723|8580    |002180;
 	dey                                  ;0B8725|88      |      ;
 	bne UploadRLEByte                      ;0B8726|D0FB    |0B8723;
 	ply                                  ;0B8728|7A      |      ;
@@ -929,7 +929,7 @@ UploadRLEByte:
 ;      |        |      ;
 ;      |        |      ;
 UploadNormalByte:
-	sta.B SNES_WMDATA-$2100              ;0B872B|8580    |002180;
+	sta.B !SNES_WMDATA-$2100              ;0B872B|8580    |002180;
 ;      |        |      ;
 UploadNext:
 	inx                                  ;0B872D|E8      |      ;

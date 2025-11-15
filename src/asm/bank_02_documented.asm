@@ -5466,14 +5466,14 @@ Graphics_AltPixel:
 	pea.w !INIDISP	 ;02D6B9|F40021  |022100; Set direct page to $2100
 	pld ;02D6BC|2B      |      ; Load new direct page
 	lda.b #$00	  ;02D6BD|A900    |      ; Clear value
-	sta.b SNES_WMADDH-$2100 ;02D6BF|8583    |002183; Set WRAM bank to 0
+	sta.b !SNES_WMADDH-$2100 ;02D6BF|8583    |002183; Set WRAM bank to 0
 	ldx.w $0a70	 ;02D6C1|AE700A  |020A70; Load memory address
-	stx.b SNES_WMADDL-$2100 ;02D6C4|8681    |002181; Set WRAM address
+	stx.b !SNES_WMADDL-$2100 ;02D6C4|8681    |002181; Set WRAM address
 	lda.b #$20	  ;02D6C6|A920    |      ; Clear 32 bytes
 
 ; Memory Clear Loop
 Memory_ClearLoop:
-	stz.b SNES_WMDATA-$2100 ;02D6C8|6480    |002180; Write zero to WRAM
+	stz.b !SNES_WMDATA-$2100 ;02D6C8|6480    |002180; Write zero to WRAM
 	dec a;02D6CA|3A      |      ; Decrement counter
 	bne Memory_ClearLoop ;02D6CB|D0FB    |02D6C8; Continue clear loop
 	pld ;02D6CD|2B      |      ; Restore direct page
@@ -6017,19 +6017,19 @@ Display_ColorManager:
 	pld ;02DA1C|2B      |      ; Load new direct page
 	stz.w $0a7e	 ;02DA1D|9C7E0A  |020A7E; Clear display flag
 	lda.b #$1d	  ;02DA20|A91D    |      ; Main screen enable
-	sta.b SNES_TM-$2100 ;02DA22|852C    |00212C; Set main screen
-	stz.b SNES_TS-$2100 ;02DA24|642D    |00212D; Clear sub screen
-	stz.b SNES_CGSWSEL-$2100 ;02DA26|6430    |002130; Clear color window
+	sta.b !SNES_TM-$2100 ;02DA22|852C    |00212C; Set main screen
+	stz.b !SNES_TS-$2100 ;02DA24|642D    |00212D; Clear sub screen
+	stz.b !SNES_CGSWSEL-$2100 ;02DA26|6430    |002130; Clear color window
 	ldx.w #$0000	;02DA28|A20000  |      ; Initialize index
 	lda.b #$a1	  ;02DA2B|A9A1    |      ; Color math settings
-	sta.b SNES_CGADSUB-$2100 ;02DA2D|8531    |002131; Set color math
+	sta.b !SNES_CGADSUB-$2100 ;02DA2D|8531    |002131; Set color math
 
 ; Color Effect Processing Loop 1
 Display_ColorLoop1:
 	lda.w DATA8_02da7d,x ;02DA2F|BD7DDA  |02DA7D; Load color data
 	beq Display_ColorPhase2 ;02DA32|F015    |02DA49; Exit if zero
 	inx ;02DA34|E8      |      ; Next color
-	sta.b SNES_COLDATA-$2100 ;02DA35|8532    |002132; Set color data
+	sta.b !SNES_COLDATA-$2100 ;02DA35|8532    |002132; Set color data
 	jsl.l CWaitTimingRoutine ;02DA37|2200800C|0C8000; Wait timing routine
 	jsl.l CWaitTimingRoutine ;02DA3B|2200800C|0C8000; Wait timing routine
 	jsl.l CWaitTimingRoutine ;02DA3F|2200800C|0C8000; Wait timing routine
@@ -6039,9 +6039,9 @@ Display_ColorLoop1:
 ; Color Effect Processing Phase 2
 Display_ColorPhase2:
 	lda.b #$1f	  ;02DA49|A91F    |      ; Full screen enable
-	sta.b SNES_TM-$2100 ;02DA4B|852C    |00212C; Set main screen
+	sta.b !SNES_TM-$2100 ;02DA4B|852C    |00212C; Set main screen
 	lda.b #$22	  ;02DA4D|A922    |      ; Alternate color math
-	sta.b SNES_CGADSUB-$2100 ;02DA4F|8531    |002131; Set color math
+	sta.b !SNES_CGADSUB-$2100 ;02DA4F|8531    |002131; Set color math
 	ldx.w #$0000	;02DA51|A20000  |      ; Reset index
 
 ; Color Effect Processing Loop 2
@@ -6049,7 +6049,7 @@ Display_ColorLoop2:
 	lda.w DATA8_02da7d,x ;02DA54|BD7DDA  |02DA7D; Load color data
 	beq Display_ProcessDone ;02DA57|F019    |02DA72; Exit if zero
 	inx ;02DA59|E8      |      ; Next color
-	sta.b SNES_COLDATA-$2100 ;02DA5A|8532    |002132; Set color data
+	sta.b !SNES_COLDATA-$2100 ;02DA5A|8532    |002132; Set color data
 	jsl.l CWaitTimingRoutine ;02DA5C|2200800C|0C8000; Wait timing routine
 	jsl.l CWaitTimingRoutine ;02DA60|2200800C|0C8000; Wait timing routine
 	jsl.l CWaitTimingRoutine ;02DA64|2200800C|0C8000; Wait timing routine
@@ -6060,9 +6060,9 @@ Display_ColorLoop2:
 ; Display Processing Completion
 Display_ProcessDone:
 	stz.w $0a84	 ;02DA72|9C840A  |020A84; Clear processing flag
-	stz.b SNES_CGSWSEL-$2100 ;02DA75|6430    |002130; Clear color window
-	stz.b SNES_CGADSUB-$2100 ;02DA77|6431    |002131; Clear color math
-	stz.b SNES_COLDATA-$2100 ;02DA79|6432    |002132; Clear color data
+	stz.b !SNES_CGSWSEL-$2100 ;02DA75|6430    |002130; Clear color window
+	stz.b !SNES_CGADSUB-$2100 ;02DA77|6431    |002131; Clear color math
+	stz.b !SNES_COLDATA-$2100 ;02DA79|6432    |002132; Clear color data
 	pld ;02DA7B|2B      |      ; Restore direct page
 	rts ;02DA7C|60      |      ; Return
 
@@ -6143,14 +6143,14 @@ Display_VBlankWait:
 	pea.w !INIDISP	 ;02DAE3|F40021  |022100; Set direct page to PPU
 	pld ;02DAE6|2B      |      ; Load PPU direct page
 	lda.b #$42	  ;02DAE7|A942    |      ; BG1 screen configuration
-	sta.b SNES_BG1SC-$2100 ;02DAE9|8507    |002107; Set BG1 screen
+	sta.b !SNES_BG1SC-$2100 ;02DAE9|8507    |002107; Set BG1 screen
 	lda.b #$4a	  ;02DAEB|A94A    |      ; BG2 screen configuration
-	sta.b SNES_BG2SC-$2100 ;02DAED|8508    |002108; Set BG2 screen
+	sta.b !SNES_BG2SC-$2100 ;02DAED|8508    |002108; Set BG2 screen
 	rep #$30		;02DAEF|C230    |      ; 16-bit mode
-	stz.b SNES_BG1HOFS-$2100 ;02DAF1|640D    |00210D; Clear BG1 H scroll
-	stz.b SNES_BG1HOFS-$2100 ;02DAF3|640D    |00210D; Clear BG1 H scroll (high)
-	stz.b SNES_BG2HOFS-$2100 ;02DAF5|640F    |00210F; Clear BG2 H scroll
-	stz.b SNES_BG2HOFS-$2100 ;02DAF7|640F    |00210F; Clear BG2 H scroll (high)
+	stz.b !SNES_BG1HOFS-$2100 ;02DAF1|640D    |00210D; Clear BG1 H scroll
+	stz.b !SNES_BG1HOFS-$2100 ;02DAF3|640D    |00210D; Clear BG1 H scroll (high)
+	stz.b !SNES_BG2HOFS-$2100 ;02DAF5|640F    |00210F; Clear BG2 H scroll
+	stz.b !SNES_BG2HOFS-$2100 ;02DAF7|640F    |00210F; Clear BG2 H scroll (high)
 
 ; Memory Buffer Initialization Engine
 ; Advanced memory buffer setup with multi-bank coordination
