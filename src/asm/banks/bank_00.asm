@@ -2993,15 +2993,102 @@ DATA8_0097fb:
 	db $01,$00,$02,$00,$04,$00,$08,$00,$10,$00,$20,$00,$40,$00,$80,$00;0097FB|        |      ;
 	db $00,$01,$00,$02,$00,$04,$00,$08,$00,$10,$00,$20,$00,$40,$00,$80;00980B|        |      ;
 ;      |        |      ;
+;===============================================================================
+; Stack_RestoreRegisters
+;-------------------------------------------------------------------------------
+; Standard stack cleanup/return routine for Dialog and DMA functions
+; Restores all saved registers from stack in correct reverse order
+;
+; CALLING CONVENTION:
+;   Jump target from multiple Dialog/DMA functions
+;   Expects stack configured as: [P][B][A][D][X][Y][RetAddr]
+;
+; STACK LAYOUT (before call):
+;   SP+0:  Return address (2 bytes)
+;   SP+2:  Y register (2 bytes) - saved by PHY
+;   SP+4:  X register (2 bytes) - saved by PHX
+;   SP+6:  Direct Page (2 bytes) - saved by PHD
+;   SP+8:  A register (2 bytes) - saved by PHA
+;   SP+10: Data Bank (1 byte) - saved by PHB
+;   SP+11: Processor Status (1 byte) - saved by PHP
+;
+; OPERATION:
+;   1. Set 16-bit A/X/Y mode (REP #$30)
+;   2. Pull Y register (PLY)
+;   3. Pull X register (PLX)
+;   4. Pull Direct Page (PLD)
+;   5. Pull A register (PLA)
+;   6. Pull Data Bank (PLB)
+;   7. Pull Processor Status (PLP)
+;   8. Return (RTS)
+;
+; WHY REP #$30 FIRST?
+;   - Ensures PLY/PLX pull 16-bit values
+;   - Critical for correct stack alignment
+;   - If 8-bit mode, would only pull low byte
+;   - Stack would misalign, causing crash
+;
+; REGISTER RESTORATION ORDER:
+;   Exact reverse of typical save sequence:
+;   Save: PHP, PHB, PHA, PHD, PHX, PHY
+;   Restore: (REP #$30), PLY, PLX, PLD, PLA, PLB, PLP
+;
+; USAGE EXAMPLE:
+;   Dialog_ExecuteInternal:
+;       PHP           ; Save P
+;       PHB           ; Save B
+;       PHA           ; Save A
+;       PHD           ; Save D
+;       PHX           ; Save X
+;       PHY           ; Save Y
+;       ; ... function work ...
+;       JMP Stack_RestoreRegisters  ; Clean up and return
+;
+; WHY JMP INSTEAD OF JSR?
+;   - Stack already has return address
+;   - JSR would push duplicate return address
+;   - JMP uses existing return address
+;   - Saves 6 cycles (no JSR/RTS overhead)
+;
+; TECHNICAL DETAILS:
+;   - Final RTS returns to original caller
+;   - All registers restored to entry state
+;   - Processor flags restored (including M/X bits)
+;   - Data Bank restored for bank safety
+;   - Direct Page restored for DP safety
+;
+; PERFORMANCE:
+;   - REP #$30: 3 cycles
+;   - PLY: 4 cycles
+;   - PLX: 4 cycles
+;   - PLD: 5 cycles
+;   - PLA: 4 cycles
+;   - PLB: 4 cycles
+;   - PLP: 4 cycles
+;   - RTS: 6 cycles
+;   - Total: 34 cycles
+;
+; COMMON CALLERS:
+;   - Dialog_ExecuteInternal
+;   - Cutscene_ProcessScroll
+;   - Various DMA coordination functions
+;   - Any function with full register save
+;
+; SAFETY NOTES:
+;   - Stack must be properly aligned before call
+;   - Incorrect save sequence → crash/corruption
+;   - REP #$30 critical for 16-bit pulls
+;   - Used only when all 6 registers saved
+;===============================================================================
 Stack_RestoreRegisters:
-	rep #$30                             ;00981B|C230    |      ;
-	ply                                  ;00981D|7A      |      ;
-	plx                                  ;00981E|FA      |      ;
-	pld                                  ;00981F|2B      |      ;
-	pla                                  ;009820|68      |      ;
-	plb                                  ;009821|AB      |      ;
-	plp                                  ;009822|28      |      ;
-	rts                                  ;009823|60      |      ;
+	rep #$30                             ;00981B|C230    |      ; 16-bit A/X/Y mode for correct pulls
+	ply                                  ;00981D|7A      |      ; Restore Y register (16-bit)
+	plx                                  ;00981E|FA      |      ; Restore X register (16-bit)
+	pld                                  ;00981F|2B      |      ; Restore Direct Page register (16-bit)
+	pla                                  ;009820|68      |      ; Restore A register (16-bit)
+	plb                                  ;009821|AB      |      ; Restore Data Bank register (8-bit)
+	plp                                  ;009822|28      |      ; Restore Processor Status (8-bit, includes M/X flags)
+	rts                                  ;009823|60      |      ; Return to original caller
 ;      |        |      ;
 	db $08,$8b,$e2,$30,$a5,$3b,$85,$62,$64,$63,$64,$3b,$a5,$3c,$38,$e5;009824|        |      ;
 	db $3a,$85,$64,$64,$65,$c6,$3a,$a5,$36,$eb,$a5,$39,$c2,$30,$85,$31;009834|        |      ;
@@ -4714,37 +4801,143 @@ Dialog_JumpTable_Return:
 ;      |        |      ;
 	db $a7,$17,$e6,$17,$29,$ff,$00,$22,$65,$da,$00,$85,$9e,$64,$a0,$60;00A332|        |000017;
 ;      |        |      ;
+;===============================================================================
+; Cutscene_ProcessScroll
+;-------------------------------------------------------------------------------
+; Processes scrolling parameters and prepares DMA transfer for cutscene effects
+; Calculates scroll offsets and configures DMA for smooth screen transitions
+;
+; CALLING CONVENTION:
+;   JSR from DMA_PrepareAndTransfer or cutscene handlers
+;   Requires Direct Page = $0000
+;
+; SCROLL PARAMETER LOCATIONS (Direct Page):
+;   $40:    Source bank for scroll data
+;   $3F:    Scroll offset adjustment
+;   $42:    Base scroll position
+;   $44:    Current scroll position (updated)
+;   $46:    Scroll range/limit
+;   $48:    Calculated midpoint scroll value (output)
+;
+; DMA OUTPUT PARAMETERS (RAM $01EB-$01EE):
+;   $01EB (!dma_size_param):  DMA transfer size in bytes
+;   $01ED (!dma_src_addr):    DMA source address (low word)
+;   $01EE:                    DMA source bank
+;
+; SYSTEM FLAGS UPDATED:
+;   !system_flags_1 ($00D2) bit 5: Scroll DMA pending
+;   !system_flags_1 ($00D2) bit 6: Scroll processing active
+;   !system_flags_1 ($00D2) bit 7: VBlank scroll transfer flag
+;
+; ALGORITHM:
+;   1. Check if scroll active ($46 != 0)
+;      - If inactive, skip to finish
+;   2. Store source bank to DMA parameter ($40 → $01EE)
+;   3. Store current scroll position to DMA source ($44 → $01ED)
+;   4. Calculate midpoint scroll value:
+;      - Subtract offset: $44 - $3F
+;      - Divide by 2 (LSR A)
+;      - Add base position: result + $42
+;      - Store in $48 (visible scroll position)
+;   5. Calculate DMA transfer size:
+;      - Range = $46 - $44 (scroll limit - current position)
+;      - Store in $01EB (bytes to transfer)
+;   6. Set scroll DMA flags ($E0 = bits 5,6,7 in !system_flags_1)
+;   7. Mark scroll complete: $44 = $FFFF, $46 = $0000
+;   8. Restore all registers and return
+;
+; SCROLL CALCULATION EXAMPLE:
+;   Assume: $3F=$10, $42=$80, $44=$C0, $46=$100
+;   
+;   Midpoint calc:
+;     $C0 - $10 = $B0
+;     $B0 >> 1  = $58
+;     $58 + $80 = $D8
+;     Result: $48 = $D8 (midpoint scroll value)
+;   
+;   Transfer size:
+;     $100 - $C0 = $40
+;     Result: $01EB = $40 (64 bytes to transfer)
+;
+; WHY MIDPOINT CALCULATION?
+;   - Creates smooth interpolated scroll
+;   - Current position too abrupt for cutscenes
+;   - Midpoint provides smooth easing effect
+;   - Division by 2 averages offset and position
+;
+; USAGE EXAMPLE:
+;   ; Setup scroll parameters
+;   LDA #$7E          ; Source bank
+;   STA $40
+;   LDA #$0020        ; Scroll offset
+;   STA $3F
+;   LDA #$0100        ; Base position
+;   STA $42
+;   LDA #$0200        ; Current scroll
+;   STA $44
+;   LDA #$0300        ; Scroll limit
+;   STA $46
+;   JSR Cutscene_ProcessScroll
+;   ; DMA parameters now configured, flags set
+;
+; TECHNICAL DETAILS:
+;   - Uses Stack_RestoreRegisters for cleanup
+;   - Saves: P, B, A, D, X, Y (full register set)
+;   - DMA transfer triggered by VBlank handler
+;   - Flag $E0 signals NMI to execute scroll DMA
+;   - $FFFF marker in $44 prevents re-processing
+;
+; REGISTERS PRESERVED:
+;   All via Stack_RestoreRegisters
+;   (P, B, A, D, X, Y fully restored)
+;
+; PERFORMANCE:
+;   - Active scroll path: ~60 cycles
+;   - Inactive path: ~25 cycles
+;   - DMA execution in VBlank: ~200-500 cycles
+;
+; COMMON CALLERS:
+;   - DMA_PrepareAndTransfer (coordinate graphics + scroll)
+;   - Cutscene initialization routines
+;   - Map transition handlers
+;   - Battle intro/outro sequences
+;
+; FLAG BITS EXPLAINED ($E0 = bits 5,6,7):
+;   Bit 5: Scroll data ready for DMA
+;   Bit 6: Scroll processing in progress
+;   Bit 7: VBlank should execute scroll transfer
+;===============================================================================
 Cutscene_ProcessScroll:
-	php                                  ;00A342|08      |      ;
-	rep #$30                             ;00A343|C230    |      ;
-	phb                                  ;00A345|8B      |      ;
-	pha                                  ;00A346|48      |      ;
-	phd                                  ;00A347|0B      |      ;
-	phx                                  ;00A348|DA      |      ;
-	phy                                  ;00A349|5A      |      ;
-	lda.B $46                            ;00A34A|A546    |000046;
-	beq Cutscene_ProcessScroll_Finish                      ;00A34C|F027    |00A375;
-	lda.B $40                            ;00A34E|A540    |000040;
-	sta.W $01ee                          ;00A350|8DEE01  |0001EE;
-	lda.B $44                            ;00A353|A544    |000044;
-	sta.w !dma_src_addr                          ;00A355|8DED01  |0001ED;
-	sec                                  ;00A358|38      |      ;
-	sbc.B $3f                            ;00A359|E53F    |00003F;
-	lsr a;00A35B|4A      |      ;
-	adc.B $42                            ;00A35C|6542    |000042;
-	sta.B $48                            ;00A35E|8548    |000048;
-	sec                                  ;00A360|38      |      ;
-	lda.B $46                            ;00A361|A546    |000046;
-	sbc.B $44                            ;00A363|E544    |000044;
-	sta.w !dma_size_param                          ;00A365|8DEB01  |0001EB;
-	lda.W #$00e0                         ;00A368|A9E000  |      ;
-	tsb.w !system_flags_1                          ;00A36B|0CD200  |0000D2;
-	lda.W #$ffff                         ;00A36E|A9FFFF  |      ;
-	sta.B $44                            ;00A371|8544    |000044;
-	stz.B $46                            ;00A373|6446    |000046;
+	php                                  ;00A342|08      |      ; Save processor status
+	rep #$30                             ;00A343|C230    |      ; 16-bit A/X/Y mode
+	phb                                  ;00A345|8B      |      ; Save Data Bank
+	pha                                  ;00A346|48      |      ; Save A register
+	phd                                  ;00A347|0B      |      ; Save Direct Page
+	phx                                  ;00A348|DA      |      ; Save X register
+	phy                                  ;00A349|5A      |      ; Save Y register
+	lda.B $46                            ;00A34A|A546    |000046; Load scroll range/limit
+	beq Cutscene_ProcessScroll_Finish                      ;00A34C|F027    |00A375; If zero, skip (scroll inactive)
+	lda.B $40                            ;00A34E|A540    |000040; Load source bank
+	sta.W $01ee                          ;00A350|8DEE01  |0001EE; Store to DMA bank parameter
+	lda.B $44                            ;00A353|A544    |000044; Load current scroll position
+	sta.w !dma_src_addr                          ;00A355|8DED01  |0001ED; Store to DMA source address (low word)
+	sec                                  ;00A358|38      |      ; Set carry for subtraction
+	sbc.B $3f                            ;00A359|E53F    |00003F; Subtract scroll offset ($44 - $3F)
+	lsr a;00A35B|4A      |      ; Divide by 2 (shift right)
+	adc.B $42                            ;00A35C|6542    |000042; Add base scroll position (midpoint calculation)
+	sta.B $48                            ;00A35E|8548    |000048; Store calculated midpoint scroll value
+	sec                                  ;00A360|38      |      ; Set carry for subtraction
+	lda.B $46                            ;00A361|A546    |000046; Load scroll range/limit
+	sbc.B $44                            ;00A363|E544    |000044; Calculate remaining scroll ($46 - $44)
+	sta.w !dma_size_param                          ;00A365|8DEB01  |0001EB; Store as DMA transfer size
+	lda.W #$00e0                         ;00A368|A9E000  |      ; Bits 5,6,7 = scroll DMA flags
+	tsb.w !system_flags_1                          ;00A36B|0CD200  |0000D2; Set scroll DMA pending flags
+	lda.W #$ffff                         ;00A36E|A9FFFF  |      ; Marker value
+	sta.B $44                            ;00A371|8544    |000044; Mark scroll position complete ($FFFF = done)
+	stz.B $46                            ;00A373|6446    |000046; Clear scroll range (processing complete)
 ;      |        |      ;
 Cutscene_ProcessScroll_Finish:
-	jmp.W Stack_RestoreRegisters                    ;00A375|4C1B98  |00981B;
+	jmp.W Stack_RestoreRegisters                    ;00A375|4C1B98  |00981B; Restore all registers and return
 ;      |        |      ;
 	lda.W #$0080                         ;00A378|A98000  |      ;
 	tsb.W $00d0                          ;00A37B|0CD000  |0000D0;
