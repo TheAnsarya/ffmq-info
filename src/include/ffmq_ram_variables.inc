@@ -368,6 +368,12 @@
 !graphics_state_param   = $1993     ; Graphics state parameter (#$10 standard)
 !env_coordinates        = $199d     ; Environment coordinates (16-bit)
 
+; === Battle State & Mode Registers ($0110, $192b, $1937-$1938) ===
+!battle_ready_flag      = $0110     ; Battle ready flag (#$80 = ready, cleared between battles)
+!battle_temp_work       = $192b     ; Battle temporary work value (multi-purpose calculation register)
+!battle_scene_mode      = $1937     ; Battle scene/transition mode parameter
+!battle_character_param = $1938     ; Battle character/unit parameter (stats pointer etc.)
+
 ; === Battle Graphics & Formation System ($19eb-$19f8) ===
 !formation_valid_flag   = $19eb     ; Formation validation/position flag
 !battle_gfx_index       = $19ee     ; Battle graphics index (masked/combined)
@@ -472,6 +478,14 @@
 !movement_state         = $19cb     ; Movement state/configuration backup
 !battle_trigger_data    = $19cc     ; Battle trigger/configuration data
 !movement_config        = $19cf     ; Movement/coordinate configuration register
+
+; === Sprite/Battle Unit Status Array ($1a71-$1a82) ===
+; Array of status/state values for battle units/sprites
+; Often indexed by X register (unit index * 2)
+!battle_unit_base       = $1a71     ; Battle unit status array base (zero-initialized)
+!battle_status_array    = $1a72     ; Battle unit status array ($1a72-$1a7f, 14 entries)
+!battle_unit_flags      = $1a80     ; Battle unit flags array (indexed access)
+!battle_unit_flags_ext  = $1a82     ; Extended battle unit flags
 !movement_flags         = $19d0     ; Movement attribute flags
 !coordinate_register    = $19d1     ; Primary coordination/collision state register
 !tertiary_attributes    = $19d2     ; Tertiary-specific attributes

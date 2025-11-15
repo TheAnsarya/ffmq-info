@@ -1,4 +1,4 @@
-﻿; =============================================================================
+; =============================================================================
 ; FFMQ Bank $02 - Cycle 1: Advanced System Initialization and Memory Management
 ; Lines 1-500: Sophisticated initialization with multi-bank coordination
 ; =============================================================================
@@ -445,7 +445,7 @@ special_condition_handler:
 	jsl.l ExecuteSpecialBitProcessing ;028141|22769700|009776; Execute audio call
 	bne audio_processed ;028145|D005    |02814C; Branch if processed
 	lda.b #$04	  ;028147|A904    |      ; Set audio state
-	sta.w $0500	 ;028149|8D0005  |020500; Store audio state
+	sta.w !audio_gfx_index	 ;028149|8D0005  |020500; Store audio state
 
 audio_processed:
 	ldx.w #$d4f1	;02814C|A2F1D4  |      ; Load data pointer
@@ -946,7 +946,7 @@ entity_lifecycle_management:
 entity_valid_range:
 	sta.b $10	   ;028767|8510    |001010; Store validated entity
 	lda.b #$2a	  ;028769|A92A    |      ; Set entity marker
-	sta.w $0505	 ;02876B|8D0505  |020505; Store in system area
+	sta.w !audio_coord_register	 ;02876B|8D0505  |020505; Store in system area
 	ldx.w #$d2d4	;02876E|A2D4D2  |      ; Load data pointer
 	jsr.w ProcessData ;028771|203588  |028835; Process entity data
 
@@ -2249,7 +2249,7 @@ Controller_DataSwap:
 ;Initializes graphics processing and sets up coordinate systems
 	jsr.w InitializeGraphicsBaseSystem ; Initialize graphics base system
 	lda.b #$14	  ; Set graphics processing mode
-	sta.w $0505	 ; Store graphics mode
+	sta.w !audio_coord_register	 ; Store graphics mode
 	phd ; Push direct page for context switch
 	jsr.w SwitchInputProcessingContext ; Switch to graphics context
 	lda.b $21	   ; Load graphics state flags
@@ -3018,7 +3018,7 @@ System_ComplexProcessing:
 	lda.b #$ff                           ;029DD9|A9FF    |
 	sta.w $0a02,X                        ;029DDB|9D020A  |000A02
 	lda.b #$00                           ;029DDE|A900    |
-	sta.w $0505                          ;029DE0|8D0505  |000505
+	sta.w !audio_coord_register                          ;029DE0|8D0505  |000505
 	ldx.w #$0000                         ;029DE3|A20000  |
 	stx.b $77                            ;029DE6|8677    |000077
 	rts ;029DE8|60      |
@@ -4246,7 +4246,7 @@ Math_ZeroValue:
 ; Final Mathematical Result Processing
 Math_FinalResult:
 	lda.b #$0a	  ;02AA73|A90A    |      ; Set result value
-	sta.w $0505	 ;02AA75|8D0505  |020505; Store in system register
+	sta.w !audio_coord_register	 ;02AA75|8D0505  |020505; Store in system register
 	rts ;02AA78|60      |      ; Return
 
 ;----------------------------------------------------------------------------
@@ -4370,7 +4370,7 @@ Graphics_SetChannelMode:
 	lda.b #$02	  ;02AB57|A902    |      ; Set channel mode
 	sta.l $7ec360,x ;02AB59|9F60C37E|7EC360; Store channel mode
 	lda.b #$19	  ;02AB5D|A919    |      ; Set channel parameter
-	sta.w $0505	 ;02AB5F|8D0505  |020505; Store in system register
+	sta.w !audio_coord_register	 ;02AB5F|8D0505  |020505; Store in system register
 	rts ;02AB62|60      |      ; Return
 
 ;----------------------------------------------------------------------------
@@ -4511,7 +4511,7 @@ Graphics_PatternZero:
 ; Graphics System Reset Trigger
 Graphics_SystemReset:
 	lda.b #$0a	  ;02AC4D|A90A    |      ; Set system reset command
-	sta.w $0505	 ;02AC4F|8D0505  |020505; Store reset command
+	sta.w !audio_coord_register	 ;02AC4F|8D0505  |020505; Store reset command
 	rts ;02AC52|60      |      ; Return
 
 ;----------------------------------------------------------------------------
@@ -4640,7 +4640,7 @@ Color_ModeProcessor:
 	lda.b #$02	  ;02AD33|A902    |      ; Set color mode
 	sta.l $7ec360,x ;02AD35|9F60C37E|7EC360; Store color mode
 	lda.b #$19	  ;02AD39|A919    |      ; Set color parameter
-	sta.w $0505	 ;02AD3B|8D0505  |020505; Store in system register
+	sta.w !audio_coord_register	 ;02AD3B|8D0505  |020505; Store in system register
 	rts ;02AD3E|60      |      ; Return
 
 ;----------------------------------------------------------------------------
@@ -5017,7 +5017,7 @@ Graphics_EntityProcessor:
 ; Standard Graphics Processing Mode
 Graphics_StandardMode:
 	lda.b #$3f	  ;02D422|A93F    |      ; Graphics parameter
-	sta.w $0505	 ;02D424|8D0505  |020505; Store parameter
+	sta.w !audio_coord_register	 ;02D424|8D0505  |020505; Store parameter
 	lda.b #$7e	  ;02D427|A97E    |      ; Bank $7e
 	sta.b $87	   ;02D429|8587    |000A87; Store bank
 	ldy.w #$0000	;02D42B|A00000  |      ; Initialize Y
@@ -6106,7 +6106,7 @@ Display_StateInit:
 	sta.b $7e	   ;02DAAF|857E    |000A7E; Store processing flag
 	stz.w $0af0	 ;02DAB1|9CF00A  |020AF0; Clear frame counter
 	lda.b #$0f	  ;02DAB4|A90F    |      ; Set sprite limit
-	sta.w $0110	 ;02DAB6|8D1001  |020110; Store sprite count
+	sta.w !battle_ready_flag	 ;02DAB6|8D1001  |020110; Store sprite count
 	lda.w $04af	 ;02DAB9|ADAF04  |0204AF; Load world state
 	lsr a;02DABC|4A      |      ; Shift right
 	lsr a;02DABD|4A      |      ; Shift right again
@@ -6116,13 +6116,13 @@ Display_StateInit:
 
 ; Special State Configuration
 ; Configure special world state parameters
-	sta.w $050b	 ;02DAC3|8D0B05  |02050B; Store world parameter 1
+	sta.w !audio_hw_register_2	 ;02DAC3|8D0B05  |02050B; Store world parameter 1
 	lda.b #$08	  ;02DAC6|A908    |      ; Set parameter 2
 	sta.w $050c	 ;02DAC8|8D0C05  |02050C; Store parameter 2
 	lda.b #$0f	  ;02DACB|A90F    |      ; Set parameter 3
 	sta.w $050d	 ;02DACD|8D0D05  |02050D; Store parameter 3
 	lda.b #$03	  ;02DAD0|A903    |      ; Set parameter 4
-	sta.w $050a	 ;02DAD2|8D0A05  |02050A; Store parameter 4
+	sta.w !audio_hw_register_1	 ;02DAD2|8D0A05  |02050A; Store parameter 4
 
 ; System State Coordination
 Display_SystemCoord:
@@ -7025,7 +7025,7 @@ System_Coordinator:
 	rep #$10		;02E5C3|C210    |      ;  16-bit index registers
 	jsr.w CallSystemInitialization ;02E5C5|200FE6  |02E60F;  Call system initialization
 	lda.b #$80	  ;02E5C8|A980    |      ;  Load system enable flag
-	tsb.w $0110	 ;02E5CA|0C1001  |020110;  Set system enable bit
+	tsb.w !battle_ready_flag	 ;02E5CA|0C1001  |020110;  Set system enable bit
 	stz.w $212c	 ;02E5CD|9C2C21  |02212C;  Clear main screen designation
 	stz.w $212d	 ;02E5D0|9C2D21  |02212D;  Clear sub screen designation
 	stz.w $2106	 ;02E5D3|9C0621  |022106;  Clear mosaic register
@@ -7151,7 +7151,7 @@ Label_02E6B4:
 	jsl.l CWaitTimingRoutine ;02E6C8|2200800C|0C8000;  Call external coordination
 	sep #$20		;02E6CC|E220    |      ;  8-bit accumulator mode
 	lda.b #$80	  ;02E6CE|A980    |      ;  Load system flag
-	trb.w $0110	 ;02E6D0|1C1001  |020110;  Clear system flag
+	trb.w !battle_ready_flag	 ;02E6D0|1C1001  |020110;  Clear system flag
 	bra RealTime_ProcessLoop ;02E6D3|809B    |02E670;  Continue processing loop
 
 ; System Shutdown and Cleanup
@@ -9277,3 +9277,4 @@ DATA8_02fece:
 ; Technical Mastery: Complete entity animation, sprite processing, memory management
 ; Quality Standard: Professional-grade comprehensive system documentation maintained
 ;====================================================================
+

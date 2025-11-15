@@ -584,7 +584,7 @@ Boot_FinalInit:
 	trb.w $00d6	 ; Test and Reset bit 7 in $00d6
 ; Disable some feature
 
-	stz.w $0110	 ; [$0110] = $00 (clear game state variable)
+	stz.w !battle_ready_flag	 ; [$0110] = $00 (clear game state variable)
 
 	lda.b #$01	  ; A = $01 (bit 0)
 	tsb.w $00e2	 ; Test and Set bit 0 in $00e2
@@ -2259,7 +2259,7 @@ Enter_Main_Loop:
 	lda.b #$80
 	trb.w $00d6	 ; Test and reset bit 7 in flag
 
-	stz.w $0110	 ; Clear some variable
+	stz.w !battle_ready_flag	 ; Clear some variable
 
 	lda.b #$01
 	tsb.w $00e2	 ; Test and set bit 0
@@ -12008,7 +12008,7 @@ IRQ_JitterFix2_Skip:
 ; Notes: Uses different screen setup sequence than InterruptVectorUpdatedCode
 ;-------------------------------------------------------------------------------
 IRQ_ScreenOn2:
-	lda.w $0110	 ; Load brightness value
+	lda.w !battle_ready_flag	 ; Load brightness value
 	sta.w SNES_INIDISP ; Set screen brightness
 	lda.b #$01	  ; NMI only mode
 	sta.w SNES_NMITIMEN ; Set interrupt mode
@@ -14430,13 +14430,13 @@ Screen_WaitForUpdate:
 	trb.w $00d6	 ;00C79A|1CD600  |0000D6;
 	lda.w $00aa	 ;00C79D|ADAA00  |0000AA;
 	and.b #$f0	  ;00C7A0|29F0    |      ;
-	sta.w $0110	 ;00C7A2|8D1001  |000110;
+	sta.w !battle_ready_flag	 ;00C7A2|8D1001  |000110;
 	lda.w $00aa	 ;00C7A5|ADAA00  |0000AA;
 
 Screen_WaitForUpdate_Loop:
-	cmp.w $0110	 ;00C7A8|CD1001  |000110;
+	cmp.w !battle_ready_flag	 ;00C7A8|CD1001  |000110;
 	beq Screen_WaitForUpdate_Done ;00C7AB|F009    |00C7B6;
-	inc.w $0110	 ;00C7AD|EE1001  |000110;
+	inc.w !battle_ready_flag	 ;00C7AD|EE1001  |000110;
 	jsl.l AddressC8000OriginalCode ;00C7B0|2200800C|0C8000;
 	bra Screen_WaitForUpdate_Loop ;00C7B4|80F2    |00C7A8;
 
@@ -14447,14 +14447,14 @@ Screen_WaitForUpdate_Done:
 Screen_FadeOut:
 	php ;00C7B8|08      |      ;
 	sep #$20		;00C7B9|E220    |      ;
-	lda.w $0110	 ;00C7BB|AD1001  |010110;
+	lda.w !battle_ready_flag	 ;00C7BB|AD1001  |010110;
 	sta.w $00aa	 ;00C7BE|8DAA00  |0100AA;
 
 Screen_FadeOut_Loop:
 	bit.b #$0f	  ;00C7C1|890F    |      ;
 	beq Screen_FadeOut_Done ;00C7C3|F00A    |00C7CF;
 	dec a;00C7C5|3A      |      ;
-	sta.w $0110	 ;00C7C6|8D1001  |010110;
+	sta.w !battle_ready_flag	 ;00C7C6|8D1001  |010110;
 	jsl.l AddressC8000OriginalCode ;00C7C9|2200800C|0C8000;
 	bra Screen_FadeOut_Loop ;00C7CD|80F2    |00C7C1;
 
@@ -14463,7 +14463,7 @@ Screen_FadeOut_Done:
 	tsb.w $00d6	 ;00C7D1|0CD600  |0100D6;
 	lda.b #$80	  ;00C7D4|A980    |      ;
 	sta.w $2100	 ;00C7D6|8D0021  |012100;
-	sta.w $0110	 ;00C7D9|8D1001  |010110;
+	sta.w !battle_ready_flag	 ;00C7D9|8D1001  |010110;
 	plp ;00C7DC|28      |      ;
 	rtl ;00C7DD|6B      |      ;
 

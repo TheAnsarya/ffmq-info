@@ -1,4 +1,4 @@
-﻿; ==============================================================================
+; ==============================================================================
 ; Bank $0b - Battle Graphics and Animation Routines
 ; ==============================================================================
 ; This bank contains executable code for battle graphics management,
@@ -42,38 +42,38 @@ BattleGfx_SetupByType:
 
 ; Type 3: Setup pointers
 	lda.b #$4a	  ;0B800B	; Graphics pointer low
-	sta.w $0507	 ;0B800D	; Store to pointer
+	sta.w !audio_effect_control	 ;0B800D	; Store to pointer
 	lda.b #$1b	  ;0B8010	; Graphics pointer high
-	sta.w $0506	 ;0B8012	; Store to pointer
+	sta.w !audio_control_register	 ;0B8012	; Store to pointer
 	bra BattleGfx_CommonSetup ;0B8015	; Jump to common setup
 
 BattleGfx_Type0:
 ; Type 0: Default graphics
 	lda.b #$a1	  ;0B8017	; Graphics pointer low
-	sta.w $0507	 ;0B8019	; Store to pointer
+	sta.w !audio_effect_control	 ;0B8019	; Store to pointer
 	lda.b #$1f	  ;0B801C	; Graphics pointer high
-	sta.w $0506	 ;0B801E	; Store to pointer
+	sta.w !audio_control_register	 ;0B801E	; Store to pointer
 	bra BattleGfx_CommonSetup ;0B8021	; Jump to common setup
 
 BattleGfx_Type1:
 ; Type 1: Alternate graphics
 	lda.b #$b6	  ;0B8023	; Graphics pointer low
-	sta.w $0507	 ;0B8025	; Store to pointer
+	sta.w !audio_effect_control	 ;0B8025	; Store to pointer
 	lda.b #$1b	  ;0B8028	; Graphics pointer high
-	sta.w $0506	 ;0B802A	; Store to pointer
+	sta.w !audio_control_register	 ;0B802A	; Store to pointer
 	bra BattleGfx_CommonSetup ;0B802D	; Jump to common setup
 
 BattleGfx_Type2:
 ; Type 2: Special graphics
 	lda.b #$5f	  ;0B802F	; Graphics pointer low
-	sta.w $0507	 ;0B8031	; Store to pointer
+	sta.w !audio_effect_control	 ;0B8031	; Store to pointer
 	lda.b #$1f	  ;0B8034	; Graphics pointer high
-	sta.w $0506	 ;0B8036	; Store to pointer
+	sta.w !audio_control_register	 ;0B8036	; Store to pointer
 
 BattleGfx_CommonSetup:
 ; Common graphics setup
 	lda.b #$0a	  ;0B8039	; Bank $0a (graphics bank)
-	sta.w $0505	 ;0B803B	; Store bank number
+	sta.w !audio_coord_register	 ;0B803B	; Store bank number
 	rtl ;0B803E	; Return
 
 ; ==============================================================================
@@ -93,13 +93,13 @@ BattleSprite_AnimationHandler:
 	phk ;0B8047	; Push program bank
 	plb ;0B8048	; Pull to data bank
 	jsr.w CallAnimationUpdate ;0B8049	; Call animation update
-	ldx.w $192b	 ;0B804C	; Load sprite index
+	ldx.w !battle_temp_work	 ;0B804C	; Load sprite index
 	cpx.w #$ffff	;0B804F	; Check for invalid
 	beq BranchIfInvalid ;0B8052	; Branch if invalid
-	lda.w $1a80,x   ;0B8054	; Load sprite flags
+	lda.w !battle_unit_flags,x   ;0B8054	; Load sprite flags
 	and.b #$cf	  ;0B8057	; Mask off animation bits
 	ora.b #$10	  ;0B8059	; Set animation active flag
-	sta.w $1a80,x   ;0B805B	; Store updated flags
+	sta.w !battle_unit_flags,x   ;0B805B	; Store updated flags
 	lda.w $1a82,x   ;0B805E	; Load animation ID
 	rep #$30		;0B8061	; 16-bit mode
 	and.w #$00ff	;0B8063	; Mask to byte
@@ -193,7 +193,7 @@ BattleSprite_AnimationExit:
 ; -----------------------------------------------------------------------------
 ; Purpose: Initialize graphics pointers based on battle encounter type
 ; Input: !battle_type = Battle type index (0-3)
-; Output: $0505/$0506/$0507 = Graphics pointer (bank/address)
+; Output: !audio_coord_register/!audio_control_register/!audio_effect_control = Graphics pointer (bank/address)
 ;
 ; Battle Types:
 ;   Type 0 → Pointers: Bank $0a, Addr $1fa1
@@ -220,35 +220,35 @@ BattleGfx_SetupByType_1:
 
 ; Type 3 handler
 	lda.b #$4a	  ; Graphics address low byte
-	sta.w $0507	 ; Store to pointer low
+	sta.w !audio_effect_control	 ; Store to pointer low
 	lda.b #$1b	  ; Graphics address high byte
-	sta.w $0506	 ; Store to pointer high
+	sta.w !audio_control_register	 ; Store to pointer high
 	bra BattleGfx_CommonSetup ; Jump to common bank setup
 
 BattleGfx_Type0_1:	; Type 0 handler
 	lda.b #$a1	  ; Graphics address low byte
-	sta.w $0507	 ; Store to pointer low
+	sta.w !audio_effect_control	 ; Store to pointer low
 	lda.b #$1f	  ; Graphics address high byte
-	sta.w $0506	 ; Store to pointer high
+	sta.w !audio_control_register	 ; Store to pointer high
 	bra BattleGfx_CommonSetup ; Jump to common bank setup
 
 BattleGfx_Type1_1:	; Type 1 handler
 	lda.b #$b6	  ; Graphics address low byte
-	sta.w $0507	 ; Store to pointer low
+	sta.w !audio_effect_control	 ; Store to pointer low
 	lda.b #$1b	  ; Graphics address high byte
-	sta.w $0506	 ; Store to pointer high
+	sta.w !audio_control_register	 ; Store to pointer high
 	bra BattleGfx_CommonSetup ; Jump to common bank setup
 
 BattleGfx_Type2_1:	; Type 2 handler
 	lda.b #$5f	  ; Graphics address low byte
-	sta.w $0507	 ; Store to pointer low
+	sta.w !audio_effect_control	 ; Store to pointer low
 	lda.b #$1f	  ; Graphics address high byte
-	sta.w $0506	 ; Store to pointer high
+	sta.w !audio_control_register	 ; Store to pointer high
 ; Fall through to BattleGfx_CommonSetup
 
 BattleGfx_CommonSetup_1:	; Common bank setup
 	lda.b #$0a	  ; Bank $0a (graphics data bank)
-	sta.w $0505	 ; Store to pointer bank byte
+	sta.w !audio_coord_register	 ; Store to pointer bank byte
 	rtl ; Return to caller (long return)
 
 ; -----------------------------------------------------------------------------
@@ -292,15 +292,15 @@ BattleGfx_CommonSetup_1:	; Common bank setup
 	phk ; Push program bank (Bank $0b)
 	plb ; Pull to data bank (set DB = $0b)
 	jsr.w CallAnimationUpdate ; Call animation state setup
-	ldx.w $192b	 ; Load sprite index
+	ldx.w !battle_temp_work	 ; Load sprite index
 	cpx.w #$ffff	; Check if valid sprite ($ffff = none)
 	beq BranchIfInvalid ; Exit if no sprite to update
 
 ; Update sprite attributes
-	lda.w $1a80,x   ; Load sprite attribute byte
+	lda.w !battle_unit_flags,x   ; Load sprite attribute byte
 	and.b #$cf	  ; Clear bits 4-5 (palette bits)
 	ora.b #$10	  ; Set bit 4 (palette 1?)
-	sta.w $1a80,x   ; Store updated attributes
+	sta.w !battle_unit_flags,x   ; Store updated attributes
 
 ; Load animation frame data
 	lda.w $1a82,x   ; Load animation frame index
@@ -364,14 +364,14 @@ BattleSprite_AnimationExit_1:	; Exit routine
 	sep #$20		; Set A to 8-bit mode
 	rep #$10		; Set X/Y to 16-bit mode
 	jsr.w CallAnimationUpdate ; Call animation state setup
-	ldx.w $192b	 ; Load sprite index
+	ldx.w !battle_temp_work	 ; Load sprite index
 	cpx.w #$ffff	; Check if valid sprite
 	beq BranchIfInvalid ; Exit if no sprite
 
 ; Clear sprite attributes (no priority bit set)
-	lda.w $1a80,x   ; Load sprite attribute byte
+	lda.w !battle_unit_flags,x   ; Load sprite attribute byte
 	and.b #$cf	  ; Clear bits 4-5 (remove palette/priority)
-	sta.w $1a80,x   ; Store cleared attributes
+	sta.w !battle_unit_flags,x   ; Store cleared attributes
 
 ; Load animation frame (no offset added this time)
 	lda.w $1a82,x   ; Load animation frame index
@@ -398,7 +398,7 @@ BattleSprite_InitAnimationState:
 	lda.w $009e	 ; Load frame counter
 	sta.w $192c	 ; Store to animation counter
 	lda.b #$02	  ; Sprite index = 2
-	sta.w $192b	 ; Store sprite index
+	sta.w !battle_temp_work	 ; Store sprite index
 	jsl.l CallsCodeAnimationFrameCalculatorBank ; Call animation frame calculator (Bank $01)
 	rts ; Return to caller (short return)
 
@@ -475,14 +475,14 @@ BattleSprite_SearchNext:	; Continue search
 ;   !battle_type = Battle type (0-3)
 ;   $193f = Battle phase index
 ; Outputs:
-;   $0505/$0506/$0507 = Final graphics pointer
+;   !audio_coord_register/!audio_control_register/!audio_effect_control = Final graphics pointer
 ;
 ; Uses two lookup tables:
 ;   DATA8_0B8140: Battle type → graphics address low byte
 ;   Battle_GfxAddressHigh: Battle phase → graphics address high byte
 ;
 ; Combines both lookups to create complete 24-bit pointer:
-;   Bank $07 always (stored in $0505)
+;   Bank $07 always (stored in !audio_coord_register)
 ;   Address from table combination
 
 BattleGfx_LoadByTypeAndPhase:
@@ -491,13 +491,13 @@ BattleGfx_LoadByTypeAndPhase:
 	lda.w !battle_type	 ; Load battle type
 	tax ; Transfer to X for table lookup
 	lda.l DATA8_0b8140,x ; Load graphics address low byte from table
-	sta.w $0507	 ; Store to pointer low byte
+	sta.w !audio_effect_control	 ; Store to pointer low byte
 	lda.w $193f	 ; Load battle phase index
 	tax ; Transfer to X for second lookup
 	lda.l Battle_GfxAddressHigh,x ; Load graphics address high byte from table
-	sta.w $0506	 ; Store to pointer high byte
+	sta.w !audio_control_register	 ; Store to pointer high byte
 	lda.b #$07	  ; Bank $07 (graphics/sound bank)
-	sta.w $0505	 ; Store to pointer bank byte
+	sta.w !audio_coord_register	 ; Store to pointer bank byte
 	rtl ; Return to caller
 
 ; Data Tables for Graphics Pointers
@@ -532,7 +532,7 @@ Battle_GfxAddressHigh:
 ;   $19f6 = Battle phase counter (cleared to 0)
 ;   $19a5 = Battle state flag (set to $80 = battle active)
 ;   $1a45 = Animation enable flag (set to $01)
-;   $0e89/$0e91 = Enemy formation pointers
+;   !env_coord_x/$0e91 = Enemy formation pointers
 ;
 ; Process:
 ;   1. Clear battle phase counter
@@ -550,7 +550,7 @@ BattleInit_SetupEncounter:
 	lda.b #$01	  ; Animation enable
 	sta.w $1a45	 ; Store to animation flag
 	ldx.w $19f1	 ; Load enemy formation ID (16-bit)
-	stx.w $0e89	 ; Store to formation pointer
+	stx.w !env_coord_x	 ; Store to formation pointer
 	lda.w $19f0	 ; Load enemy formation bank
 	sta.w $0e91	 ; Store to formation bank pointer
 	bne BattleInit_LoadEnemyData ; Branch if not zero (custom formation)
@@ -559,13 +559,13 @@ BattleInit_SetupEncounter:
 	lda.b #$f2	  ; Sound effect ID ($f2 = battle start fanfare)
 	jsl.l PlaySoundEffectBank ; Play sound effect (Bank $00)
 	stz.w $1a5b	 ; Clear sprite animation index
-	lda.w $0e88	 ; Load formation type
+	lda.w !env_context_value	 ; Load formation type
 	rep #$20		; Set A to 16-bit mode
 	and.w #$00ff	; Mask to 8-bit value
 	asl a; Multiply by 2 (word table)
 	tax ; Transfer to X for lookup
 	lda.l UNREACH_07F7C3,x ; Load formation data pointer (Bank $07)
-	sta.w $0e89	 ; Store to formation pointer
+	sta.w !env_coord_x	 ; Store to formation pointer
 	sep #$20		; Set A to 8-bit mode
 	lda.b #$f3	  ; Sound effect ID ($f3 = battle music start)
 	jsl.l ExecuteSpecialBitProcessing ; Play sound effect (Bank $00)
@@ -799,7 +799,7 @@ DATA8_0b82a0:
 ; - Bank $00: Sound effects (PlaySoundEffectBank, ExecuteSpecialBitProcessing), frame data (DATA8_00FDCA)
 ; - Bank $01: Sprite rendering (CallAnimationLoader), OAM tables (DATA8_01A63A)
 ; - Bank $07: Enemy data (DATA8_07AF3B, DATA8_07B013, UNREACH_07F7C3)
-; - Bank $0a: Graphics tile data (referenced by pointers at $0505-$0507)
+; - Bank $0a: Graphics tile data (referenced by pointers at !audio_coord_register-!audio_effect_control)
 ; - Bank $0b: Enemy graphics pointers (DATA8_0B8892), layer config (multiple tables)
 ;
 ; Hardware Registers Used:
@@ -3744,3 +3744,4 @@ DATA8_0bf091:
 ; ==============================================================================
 ; END OF BANK $0b - 100% DOCUMENTATION COMPLETE!
 ; ==============================================================================
+

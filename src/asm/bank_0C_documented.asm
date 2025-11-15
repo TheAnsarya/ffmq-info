@@ -211,7 +211,7 @@ Display_InitScreen:
 	cli ;0C80BD	; Enable interrupts
 	lda.b #$0f	  ;0C80BE	; Brightness = 15 (full)
 	sta.w $00aa	 ;0C80C0	; Store brightness value
-	stz.w $0110	 ;0C80C3	; Clear screen state flag
+	stz.w !battle_ready_flag	 ;0C80C3	; Clear screen state flag
 	jsl.l CallMainGameLoopHandler ;0C80C6	; Call main game loop handler
 	jsr.w GraphicsStateUpdate ;0C80CA	; Graphics state update
 	jsr.w BackgroundLayerSetup ;0C80CD	; Background layer setup
@@ -1596,7 +1596,7 @@ Display_Mode7RotationSequence:
 ; Setup final color effects
 	jsr.w Display_SetupNMIOAMTransfer ;0C8A00	; Enable NMI OAM transfer
 	lda.b #$30	  ;0C8A03	; Flag value = $30
-	sta.w $0505	 ;0C8A05	; Store effect state
+	sta.w !audio_coord_register	 ;0C8A05	; Store effect state
 	ldx.w #$2100	;0C8A08	; Color math mode
 	stx.b SNES_CGSWSEL-$2100 ;0C8A0B	; Set color window ($2130)
 	lda.b #$ff	  ;0C8A0D	; Maximum brightness
@@ -1899,7 +1899,7 @@ DATA8_0C8B93:	; Animation speed table (30 bytes)
 
 Display_TitleScreenInit:
 	lda.b #$18	  ;0C8BAD	; Effect timer = 24 frames
-	sta.w $0500	 ;0C8BAF	; Store effect state
+	sta.w !audio_gfx_index	 ;0C8BAF	; Store effect state
 	rep #$30		;0C8BB2	; 16-bit A/X/Y
 
 ; Transfer title screen configuration data
@@ -4288,3 +4288,4 @@ Graphics_ParamTable3:
 ; Documented Lines: 4,226 lines (100% COMPLETE)
 ; Documentation Quality: Comprehensive inline comments for all routines
 ; ==============================================================================
+
