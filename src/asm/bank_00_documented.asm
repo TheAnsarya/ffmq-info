@@ -819,10 +819,10 @@ Load_SaveSlotData:
 	stz.b $19	   ; [$19] = $00 (clear direct page variable)
 
 	lda.w DATA8_0081d5,x ; A = table[X+0] (byte 0)
-	sta.w $0e88	 ; Store to $0e88
+	sta.w !env_context_value	 ; Store to !env_context_value
 
 	ldy.w DATA8_0081d6,x ; Y = table[X+1,X+2] (bytes 1-2, 16-bit)
-	sty.w $0e89	 ; Store to $0e89-$0e8a
+	sty.w !env_coord_x	 ; Store to !env_coord_x-!env_coord_y
 
 	lda.w DATA8_0081d8,x ; A = table[X+3] (byte 3)
 	sta.w $0e92	 ; Store to $0e92
@@ -2392,10 +2392,10 @@ Init_SaveGameDefaults:
 
 ; Load data from table based on save state
 	lda.w Save_State_Table,x
-	sta.w $0e88
+	sta.w !env_context_value
 
 	ldy.w Save_State_Table+1,x
-	sty.w $0e89
+	sty.w !env_coord_x
 
 	lda.w Save_State_Table+3,x
 	sta.w $0e92
@@ -10808,7 +10808,7 @@ Script_Execute_Handler:
 Script_Execute_External:
 	pei.b ($17)	 ; Save current script pointer
 	pei.b ($18)	 ; (both bytes)
-	sta.w $19ee	 ; Store script address
+	sta.w !battle_gfx_index	 ; Store script address
 	jsl.l BankScriptInitializationRoutine ; Initialize and run script
 	pla ; Restore script pointer
 	sta.b $18
@@ -15090,3 +15090,5 @@ ExternalRoutine_00CF62:
 ; ==============================================================================
 ; END OF BANK $00 - 100% COMPLETE
 ; ==============================================================================
+
+

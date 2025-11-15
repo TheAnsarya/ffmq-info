@@ -444,6 +444,15 @@
 ; === Battle Graphics Index System ($1916) ===
 !battle_gfx_config      = $1916     ; Battle graphics configuration (masked #$e0/#$1f)
 
+; === Audio/Sound System Registers ($0500-$050b) ===
+!audio_gfx_index        = $0500     ; Audio/graphics index (masked battle_gfx value)
+!audio_sound_params     = $0501     ; Sound parameters (16-bit: $0501/$0502, often #$0f08)
+!audio_coord_register   = $0505     ; Audio coordination register (#$27)
+!audio_control_register = $0506     ; Audio/sound control register (16-bit: $0506/$0507)
+!audio_effect_control   = $0507     ; Sound effect control register (#$88)
+!audio_hw_register_1    = $050a     ; Hardware audio register 1 (#$f5)
+!audio_hw_register_2    = $050b     ; Hardware audio register 2 (#$03)
+
 !battle_phase           = $192a     ; Battle phase/state counter
 !battle_atb_gauge       = $1993     ; Active Time Battle gauge value
 !battle_state_flag      = $19a5     ; Battle/field state flag: $00=field input, $80=battle active, $ff=inactive/disabled

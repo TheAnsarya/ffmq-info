@@ -430,7 +430,7 @@ Battle_MainTurnLoop:
 	stz.w !battle_turn_phase	 ; Clear turn phase
 
 	jsr.w ProcessBattleAi ; Process battle AI
-	jsr.w Label_0182F2 ; Execute battle command
+	jsr.w ExecuteBattleCommand ; Execute battle command
 
 ; Check for special battle mode
 	lda.w !battle_flags	 ; Get battle flags
@@ -463,8 +463,8 @@ Battle_InitializationSystem:
 	php ;018222|08      |      ;
 	phk ;018223|4B      |      ;
 	plb ;018224|AB      |      ;
-	sep #		   ;018225|E220    |      ;
-	rep #		   ;018227|C210    |      ;
+	sep #$20   ;018225|E220    |      ;
+	rep #$10   ;018227|C210    |      ;
 	sta.w ;018229|8D9A0A  |010A9A;
 	asl a;01822C|0A      |      ;
 	asl a;01822D|0A      |      ;
@@ -493,13 +493,13 @@ DATA8_018242:
 	db ,,,,,,,,,,,,,,, ;018301|        |      ;
 	db ,,,,,,,,,,,,,,, ;018311|        |      ;
 ;      |        |      ;
-Label_018321:
+InitializeBattleDisplay:
 	php ;018321|08      |      ;
 	phb ;018322|8B      |      ;
 	phk ;018323|4B      |      ;
 	plb ;018324|AB      |      ;
-	sep #		   ;018325|E220    |      ;
-	rep #		   ;018327|C210    |      ;
+	sep #$20		   ;018325|E220    |      ;
+	rep #$10		   ;018327|C210    |      ;
 	lda.w ;018329|AD890A  |010A89;
 	sta.w ;01832C|8D3319  |011933;
 	lda.w ;01832F|AD8A0A  |010A8A;
@@ -525,12 +525,12 @@ Label_018321:
 	plp ;018353|28      |      ;
 	plb ;018354|AB      |      ;
 	rts ;018355|60      |      ;
-Label_018272:
-	sep #		   ;018272|E220    |      ;
-	rep #		   ;018274|C210    |      ;
+InitializeBattleSystem:
+	sep #$20		   ;018272|E220    |      ;
+	rep #$10		   ;018274|C210    |      ;
 	phk ;018276|4B      |      ;
 	plb ;018277|AB      |      ;
-	ldx.w #		 ;018278|A2FFFF  |      ;
+	ldx.w #$ffff		 ;018278|A2FFFF  |      ;
 	stx.w ;01827B|8E5F19  |01195F;
 	ldx.w #		 ;01827E|A20080  |      ;
 	stx.w ;018281|8E481A  |011A48;
@@ -548,18 +548,18 @@ Label_018272:
 	bne Label_0182A9 ;0182A3|D004    |0182A9;
 	jsl.l SpecialEnemyInitialization ;0182A5|22609A00|009A60;
 ;      |        |      ;
-Label_0182A9:
+ProcessBattleAiLoop:
 	inc.w ;0182A9|EEF719  |0119F7;
 	stz.w ;0182AC|9CF819  |0119F8;
 	jsr.w ProcessBattleAi ;0182AF|20B3E9  |01E9B3;
-	jsr.w Label_0182F2 ;0182B2|20F282  |0182F2;
+	jsr.w ExecuteBattleCommand ;0182B2|20F282  |0182F2;
 	lda.w ;0182B5|ADB019  |0119B0;
 	beq Load_0182BE ;0182B8|F004    |0182BE;
 	jsl.l SpecialBattleProcessing ;0182BA|224CB201|01B24C;
 ;      |        |      ;
 Load_0182BE:
 	lda.w ;0182BE|ADF819  |0119F8;
-	bne Label_0182A9 ;0182C1|D0E6    |0182A9;
+	bne ProcessBattleAiLoop ;0182C1|D0E6    |0182A9;
 	jsr.w UpdateActorStates ;0182C3|205DAB  |01AB5D;
 	jsr.w ProcessStatusEffects ;0182C6|2081A0  |01A081;
 ;      |        |      ;
@@ -569,24 +569,24 @@ Load_0182C9:
 	bra Label_0182A9 ;0182CE|80D9    |0182A9;
 ;      |        |      ;
 ;      |        |      ;
-Label_0182D0:
+ProcessMemoryWithStateUpdate:
 	php ;0182D0|08      |      ;
 	phx ;0182D1|DA      |      ;
 	phy ;0182D2|5A      |      ;
-	sep #		   ;0182D3|E220    |      ;
-	rep #		   ;0182D5|C210    |      ;
-	bra Label_0182E3 ;0182D7|800A    |0182E3;
+	sep #$20		   ;0182D3|E220    |      ;
+	rep #$10		   ;0182D5|C210    |      ;
+	bra WaitForStatusUpdate ;0182D7|800A    |0182E3;
 ;      |        |      ;
 ;      |        |      ;
-Label_0182D9:
+ProcessMemoryAndUpdateActors:
 	php ;0182D9|08      |      ;
 	phx ;0182DA|DA      |      ;
 	phy ;0182DB|5A      |      ;
-	sep #		   ;0182DC|E220    |      ;
-	rep #		   ;0182DE|C210    |      ;
+	sep #$20		   ;0182DC|E220    |      ;
+	rep #$10		   ;0182DE|C210    |      ;
 	jsr.w UpdateActorStates ;0182E0|205DAB  |01AB5D;
 ;      |        |      ;
-Label_0182E3:
+WaitForStatusUpdate:
 	jsr.w ProcessStatusEffects ;0182E3|2081A0  |01A081;
 ;      |        |      ;
 Load_0182E6:
@@ -599,12 +599,12 @@ Load_0182E6:
 	rts ;0182F1|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
-Label_0182F2:
-	rep #		   ;0182F2|C220    |      ;
-	and.w #		 ;0182F4|29FF00  |      ;
+ExecuteBattleCommand:
+	rep #$20		   ;0182F2|C220    |      ;
+	and.w #$00ff		 ;0182F4|29FF00  |      ;
 	asl a;0182F7|0A      |      ;
 	tax ;0182F8|AA      |      ;
-	sep #		   ;0182F9|E220    |      ;
+	sep #$20   ;0182F9|E220    |      ;
 	jmp.w (DATA8_0182fe,x) ;0182FB|7CFE82  |0182FE;
 ;      |        |      ;
 ;      |        |      ;
@@ -612,14 +612,14 @@ DATA8_0182fe:
 	db ,,,,,,,,,,,,,,, ;0182FE|        |      ;
 	db ,,,,,,,,,,,,,,, ;01830E|        |      ;
 	db ,		   ;01831E|        |      ;
-	sep #		   ;018320|E220    |      ;
-	rep #		   ;018322|C210    |      ;
+	sep #$20   ;018320|E220    |      ;
+	rep #$10   ;018322|C210    |      ;
 	phb ;018324|8B      |      ;
 	lda.w ;018325|ADA519  |0019A5;
-	bne Label_01832D ;018328|D003    |01832D;
+	bne BattleRtlExit ;018328|D003    |01832D;
 	jsr.w Sub_018A2D ;01832A|202D8A  |018A2D;
 ;      |        |      ;
-Label_01832D:
+BattleRtlExit:
 	plb ;01832D|AB      |      ;
 	rtl ;01832E|6B      |      ;
 ;      |        |      ;
@@ -633,13 +633,13 @@ DATA8_018330:
 	phb ;018338|8B      |      ;
 	phk ;018339|4B      |      ;
 	plb ;01833A|AB      |      ;
-	sep #		   ;01833B|E220    |      ;
-	rep #		   ;01833D|C210    |      ;
+	sep #$20   ;01833B|E220    |      ;
+	rep #$10   ;01833D|C210    |      ;
 	lda.w ;01833F|ADA519  |0119A5;
-	bmi Label_018358 ;018342|3014    |018358;
+	bmi ProcessBattleGraphicsRtl ;018342|3014    |018358;
 	jsr.w Sub_018E07 ;018344|20078E  |018E07;
 	jsr.w Sub_01973A ;018347|203A97  |01973A;
-	lda.b #		 ;01834A|A900    |      ;
+	lda.b #$00		 ;01834A|A900    |      ;
 	xba ;01834C|EB      |      ;
 	lda.w ;01834D|AD461A  |011A46;
 	asl a;018350|0A      |      ;
@@ -647,7 +647,7 @@ DATA8_018330:
 	jsr.w (DATA8_01835b,x) ;018352|FC5B83  |01835B;
 	stz.w ;018355|9C461A  |011A46;
 ;      |        |      ;
-Label_018358:
+ProcessBattleGraphicsRtl:
 	plb ;018358|AB      |      ;
 	plp ;018359|28      |      ;
 	rtl ;01835A|6B      |      ;
@@ -694,7 +694,7 @@ DATA8_0183a2:
 	db ,,,,,,,,,,,,,,, ;0183A2|        |      ;
 	db ,,,,,,,,,,,, ;0183B2|        |      ;
 ;      |        |      ;
-Label_0183BF:
+ExecuteSystemIntegration:
 	jsr.w Load_0183CC ;0183BF|20CC83  |0183CC;
 	lda.w ;0183C2|AD4C1A  |011A4C;
 	dec a;0183C5|3A      |      ;
@@ -783,7 +783,7 @@ Load_01845E:
 	ldx.w #		 ;01845E|A288C5  |      ;
 	lda.b #		 ;018461|A900    |      ;
 ;      |        |      ;
-Label_018463:
+CopyGraphicsDataLoop:
 	pha ;018463|48      |      ;
 	sta.w ;018464|8D2121  |012121;
 	ldy.w #		 ;018467|A00022  |      ;
@@ -795,17 +795,17 @@ Label_018463:
 	sty.w ;018478|8C0543  |014305;
 	lda.b #		 ;01847B|A901    |      ;
 	sta.w ;01847D|8D0B42  |01420B;
-	rep #		   ;018480|C220    |      ;
+	rep #$20   ;018480|C220    |      ;
 	txa ;018482|8A      |      ;
 	clc ;018483|18      |      ;
 	adc.w #		 ;018484|691000  |      ;
 	tax ;018487|AA      |      ;
-	sep #		   ;018488|E220    |      ;
+	sep #$20   ;018488|E220    |      ;
 	pla ;01848A|68      |      ;
 	clc ;01848B|18      |      ;
 	adc.b #		 ;01848C|6910    |      ;
 	cmp.b #		 ;01848E|C980    |      ;
-	bne Label_018463 ;018490|D0D1    |018463;
+	bne CopyGraphicsDataLoop ;018490|D0D1    |018463;
 	rts ;018492|60      |      ;
 ;      |        |      ;
 Load_018493:
@@ -877,11 +877,11 @@ Load_0184E1:
 	plb ;01852B|AB      |      ;
 	rep #		   ;01852C|C230    |      ;
 	inc.w ;01852E|EEA619  |0119A6;
-	sep #		   ;018531|E220    |      ;
+	sep #$20   ;018531|E220    |      ;
 	stz.w ;018533|9CF719  |0119F7;
 	lda.w ;018536|ADA519  |0119A5;
 	inc a;018539|1A      |      ;
-	beq Label_018554 ;01853A|F018    |018554;
+	beq CleanBattleExit ;01853A|F018    |018554;
 	bmi Load_018547 ;01853C|3009    |018547;
 	jsr.w Sub_018673 ;01853E|207386  |018673;
 	ldx.w ;018541|AE481A  |011A48;
@@ -896,7 +896,7 @@ Load_018547:
 	tax ;018550|AA      |      ;
 	jsr.w (DATA8_018557,x) ;018551|FC5785  |018557;
 ;      |        |      ;
-Label_018554:
+CleanBattleExit:
 	plb ;018554|AB      |      ;
 	plp ;018555|28      |      ;
 	rtl ;018556|6B      |      ;
@@ -3762,9 +3762,9 @@ Battle_SetupSpecialOperation:
 	rep #$10		;01ACDD|C210    |      ;
 	lda.b #$03	  ;01ACDF|A903    |      ;
 	sta.w !special_op_mode	 ;01ACE1|8DF619  |0119F6;
-	sta.w $050b	 ;01ACE4|8D0B05  |01050B;
+	sta.w !audio_hw_register_2	 ;01ACE4|8D0B05  |01050B;
 	lda.b #$f5	  ;01ACE7|A9F5    |      ;
-	sta.w $050a	 ;01ACE9|8D0A05  |01050A;
+	sta.w !audio_hw_register_1	 ;01ACE9|8D0A05  |01050A;
 	rts ;01ACEC|60      |      ;
 
 ; ==============================================================================
@@ -3891,9 +3891,9 @@ BattleHUD_UpdateHealthBar:
 	sep #$20		;01AD8B|E220    |      ;
 	rep #$10		;01AD8D|C210    |      ;
 	lda.b #$80	  ;01AD8F|A980    |      ;
-	sta.w $050b	 ;01AD91|8D0B05  |01050B;
+	sta.w !audio_hw_register_2	 ;01AD91|8D0B05  |01050B;
 	lda.b #$81	  ;01AD94|A981    |      ;
-	sta.w $050a	 ;01AD96|8D0A05  |01050A;
+	sta.w !audio_hw_register_1	 ;01AD96|8D0A05  |01050A;
 	lda.b #$14	  ;01AD99|A914    |      ;
 	jsr.w .ProcessEffect_CastSpell ;01AD9B|20BDD6  |01D6BD;
 	plp ;01AD9E|28      |      ;
@@ -4096,7 +4096,7 @@ BattleHUD_RefreshAllBars:
 	phx ;01AEF4|DA      |      ;
 	php ;01AEF5|08      |      ;
 	jsr.w ExecuteBattleStep ;01AEF6|20EDCA  |01CAED;
-	jsr.w Label_0182D0 ;01AEF9|20D082  |0182D0;
+	jsr.w ProcessMemoryWithStateUpdate ;01AEF9|20D082  |0182D0;
 	plp ;01AEFC|28      |      ;
 	plx ;01AEFD|FA      |      ;
 	lda.w !battle_status_array,x   ;01AEFE|BD721A  |001A72;
@@ -4148,13 +4148,13 @@ BattleInput_ProcessCommands:
 
 BattleSound_IntegrateEffects:
 	lda.w #$0f08	;01AF47|A9080F  |      ;
-	sta.w $0501	 ;01AF4A|8D0105  |010501;
+	sta.w !audio_sound_params	 ;01AF4A|8D0105  |010501;
 	php ;01AF4D|08      |      ;
 	sep #$20		;01AF4E|E220    |      ;
 	rep #$10		;01AF50|C210    |      ;
 	lda.w !battle_gfx_index	 ;01AF52|ADEE19  |0119EE;
 	and.b #$1f	  ;01AF55|291F    |      ;
-	sta.w $0500	 ;01AF57|8D0005  |010500;
+	sta.w !audio_gfx_index	 ;01AF57|8D0005  |010500;
 	plp ;01AF5A|28      |      ;
 	rts ;01AF5B|60      |      ;
 
@@ -4173,8 +4173,8 @@ BattleAudio_ManageChannels:
 	sep #$20		;01AF64|E220    |      ;
 	rep #$10		;01AF66|C210    |      ;
 	ldx.w #$880f	;01AF68|A20F88  |      ;
-	stx.w $0506	 ;01AF6B|8E0605  |010506;
-	sta.w $0505	 ;01AF6E|8D0505  |010505;
+	stx.w !audio_control_register	 ;01AF6B|8E0605  |010506;
+	sta.w !audio_coord_register	 ;01AF6E|8D0505  |010505;
 	plp ;01AF71|28      |      ;
 	plx ;01AF72|FA      |      ;
 	rts ;01AF73|60      |      ;
@@ -5147,7 +5147,7 @@ BattleState_MachineController:
 	plp ;01B662|28      |      ;
 	ldx.w $192b	 ;01B663|AE2B19  |01192B;
 	stx.w !battle_target_select	 ;01B666|8E5F19  |01195F;
-	jsr.w Label_0182D0 ;01B669|20D082  |0182D0;
+	jsr.w ProcessMemoryWithStateUpdate ;01B669|20D082  |0182D0;
 	plp ;01B66C|28      |      ;
 	rts ;01B66D|60      |      ;
 
@@ -5196,14 +5196,14 @@ BattleAudio_SoundEffectCoordinator:
 	sta.w $0c55	 ;01B719|8D550C  |010C55;
 	lda.b #$50	  ;01B71C|A950    |      ;
 	sta.w !hw_register_2	 ;01B71E|8D050E  |010E05;
-	jsr.w Label_0182D0 ;01B721|20D082  |0182D0;
+	jsr.w ProcessMemoryWithStateUpdate ;01B721|20D082  |0182D0;
 	lda.b #$2c	  ;01B724|A92C    |      ;
 	jsr.w Sub_01D6A9 ;01B726|20A9D6  |01D6A9;
 	lda.w $0c51	 ;01B729|AD510C  |010C51;
 	dec a;01B72C|3A      |      ;
 	sta.w $0c51	 ;01B72D|8D510C  |010C51;
 	sta.w $0c55	 ;01B730|8D550C  |010C55;
-	jsr.w Label_0182D0 ;01B733|20D082  |0182D0;
+	jsr.w ProcessMemoryWithStateUpdate ;01B733|20D082  |0182D0;
 	lda.b #$2c	  ;01B736|A92C    |      ;
 	jsr.w Sub_01D6A9 ;01B738|20A9D6  |01D6A9;
 	plp ;01B73B|28      |      ;
@@ -5227,7 +5227,7 @@ BattlePattern_ComplexManager:
 	lda.b #$55	  ;01B747|A955    |      ;
 	sta.w !hw_register_1	 ;01B749|8D040E  |010E04;
 	sta.w !hw_register_3	 ;01B74C|8D0C0E  |010E0C;
-	jsr.w Label_0182D0 ;01B74F|20D082  |0182D0;
+	jsr.w ProcessMemoryWithStateUpdate ;01B74F|20D082  |0182D0;
 
 	.Exit:
 	plp ;01B752|28      |      ;
@@ -6042,7 +6042,7 @@ BattlePalette_BufferManager:
 	sep #$20		;01D301|E220    |      ;
 	rep #$10		;01D303|C210    |      ;
 	lda.b #$f1	  ;01D305|A9F1    |      ;
-	sta.w $050a	 ;01D307|8D0A05  |01050A;
+	sta.w !audio_hw_register_1	 ;01D307|8D0A05  |01050A;
 	lda.b #$0a	  ;01D30A|A90A    |      ;
 	sta.w !battle_data_index_1	 ;01D30C|8D3519  |011935;
 
@@ -6170,9 +6170,9 @@ BattleGraphics_BufferManager2:
 
 BattleGraphics_StreamingSystem:
 	ldx.w #$0f08	;01D3CD|A2080F  |      ;
-	stx.w $0501	 ;01D3D0|8E0105  |010501;
+	stx.w !audio_sound_params	 ;01D3D0|8E0105  |010501;
 	lda.b #$1a	  ;01D3D3|A91A    |      ;
-	sta.w $0500	 ;01D3D5|8D0005  |010500;
+	sta.w !audio_gfx_index	 ;01D3D5|8D0005  |010500;
 	lda.b #$14	  ;01D3D8|A914    |      ;
 	jsr.w .ProcessEffect_CastSpell ;01D3DA|20BDD6  |01D6BD;
 	ldx.w #$0000	;01D3DD|A20000  |      ;
@@ -6203,7 +6203,7 @@ BattleGraphics_MultiLayerLoop:
 	jsr.w Sub_018DF3 ;01D412|20F38D  |018DF3;
 	lda.b #$04	  ;01D415|A904    |      ;
 	sta.w !battle_phase_counter	 ;01D417|8D461A  |011A46;
-	jsr.w Label_0182D0 ;01D41A|20D082  |0182D0;
+	jsr.w ProcessMemoryWithStateUpdate ;01D41A|20D082  |0182D0;
 	ldx.w #$0100	;01D41D|A20001  |      ;
 	stx.w $192b	 ;01D420|8E2B19  |01192B;
 	ldx.w #$2100	;01D423|A20021  |      ;
@@ -6219,7 +6219,7 @@ BattleGraphics_MultiLayerLoop:
 	stx.w !battle_array_data_1	 ;01D441|8E3A19  |01193A;
 	lda.b #$04	  ;01D444|A904    |      ;
 	sta.w !battle_phase_counter	 ;01D446|8D461A  |011A46;
-	jsr.w Label_0182D0 ;01D449|20D082  |0182D0;
+	jsr.w ProcessMemoryWithStateUpdate ;01D449|20D082  |0182D0;
 	lda.w !battle_counter	 ;01D44C|AD3319  |011933;
 	clc ;01D44F|18      |      ;
 	adc.b #$12	  ;01D450|6912    |      ;
@@ -6371,9 +6371,9 @@ BattlePalette_AnimationController:
 	dec.w !battle_data_index_1	 ;01D546|CE3519  |011935;
 	bne BattlePalette_AnimationController ;01D549|D0CE    |01D519;
 	lda.b #$70	  ;01D54B|A970    |      ;
-	sta.w $050b	 ;01D54D|8D0B05  |01050B;
+	sta.w !audio_hw_register_2	 ;01D54D|8D0B05  |01050B;
 	lda.b #$81	  ;01D550|A981    |      ;
-	sta.w $050a	 ;01D552|8D0A05  |01050A;
+	sta.w !audio_hw_register_1	 ;01D552|8D0A05  |01050A;
 	lda.b #$0a	  ;01D555|A90A    |      ;
 	sta.w $192b	 ;01D557|8D2B19  |01192B;
 	jsr.w Sub_01D603 ;01D55A|2003D6  |01D603;
@@ -6415,10 +6415,10 @@ BattleColor_BlendingProcessor:
 	lda.b #$28	  ;01D59E|A928    |      ;
 	jsr.w .Exit_CastSpell ;01D5A0|20C4D6  |01D6C4;
 	ldx.w #$0f08	;01D5A3|A2080F  |      ;
-	stx.w $0501	 ;01D5A6|8E0105  |010501;
+	stx.w !audio_sound_params	 ;01D5A6|8E0105  |010501;
 	lda.w !battle_gfx_config	 ;01D5A9|AD1619  |011916;
 	and.b #$1f	  ;01D5AC|291F    |      ;
-	sta.w $0500	 ;01D5AE|8D0005  |010500;
+	sta.w !audio_gfx_index	 ;01D5AE|8D0005  |010500;
 	plp ;01D5B1|28      |      ;
 	rts ;01D5B2|60      |      ;
 
@@ -6524,7 +6524,7 @@ BattleMagic_CalculatePower:
 	bmi Sub_01D6A5 ;01D670|3033    |01D6A5;
 
 BattleMagic_ApplyElemental:
-	jsr.w Label_0182D9 ;01D672|20D982  |0182D9;
+	jsr.w ProcessMemoryAndUpdateActors ;01D672|20D982  |0182D9;
 	dec.w $192b	 ;01D675|CE2B19  |01192B;
 	bne D0f8 ;01D678|D0F8    |01D672;
 	phb ;01D67A|8B      |      ;
@@ -6688,9 +6688,9 @@ DATA8_01d6cb:
 	sep #$20		;01D79D|E220    |      ;
 	rep #$10		;01D79F|C210    |      ;
 	ldx.w #$a11f	;01D7A1|A21FA1  |      ;
-	stx.w $0506	 ;01D7A4|8E0605  |010506;
+	stx.w !audio_control_register	 ;01D7A4|8E0605  |010506;
 	lda.b #$0a	  ;01D7A7|A90A    |      ;
-	sta.w $0505	 ;01D7A9|8D0505  |010505;
+	sta.w !audio_coord_register	 ;01D7A9|8D0505  |010505;
 	lda.b #$14	  ;01D7AC|A914    |      ;
 	sta.w $1926	 ;01D7AE|8D2619  |011926;
 
@@ -6752,7 +6752,7 @@ DATA8_01d6cb:
 
 	.DeductMP_MPConsumption:
 	stx.w !battle_array_elem_11	 ;01D809|8E4D19  |01194D;
-	jsr.w Label_0182D0 ;01D80C|20D082  |0182D0;
+	jsr.w ProcessMemoryWithStateUpdate ;01D80C|20D082  |0182D0;
 	lda.w $1926	 ;01D80F|AD2619  |011926;
 	cmp.b #$0b	  ;01D812|C90B    |      ;
 	bne .SuccessLoop_SuccessCheck ;01D814|D005    |01D81B;
@@ -6832,7 +6832,7 @@ dma_coordinate_processing_system:
 battle_graphics_memory_management:
 	jsr.w InitializeGraphicsMemory ; Initialize graphics memory
 	stz.w !error_status_register	 ; Clear error status register
-	jsr.w Label_0182D0 ; Execute memory allocation
+	jsr.w ProcessMemoryWithStateUpdate ; Execute memory allocation
 	jsr.w SetupGraphicsBuffers ; Setup graphics buffers
 	jsr.w ConfigureDmaChannels ; Configure DMA channels
 	jsr.w InitializeGraphicsState ; Initialize graphics state
@@ -6893,7 +6893,7 @@ battle_animation_control_system:
 ; Implements complex character interaction and battle flow coordination
 multi_character_battle_engine:
 	lda.b #$f2	  ; Load battle status constant
-	sta.w $050a	 ; Store to hardware register
+	sta.w !audio_hw_register_1	 ; Store to hardware register
 	lda.w $19e7	 ; Load current battle state
 	sta.w $192b	 ; Store to battle register
 	lda.b #$01	  ; Set battle mode flag
@@ -6937,7 +6937,7 @@ battle_loop_control_system:
 	phy ; Save loop counter
 	.RandomFactor_SuccessCheck:
 	jsr.w ExecuteBattleStep ; Execute battle step
-	jsr.w Label_0182D0 ; Process memory operations
+	jsr.w ProcessMemoryWithStateUpdate ; Process memory operations
 	ldx.w !battle_data_index_1	 ; Load formation index
 	lda.w !battle_status_array,x   ; Get formation status
 	bne .RandomFactor_SuccessCheck ; Continue if not ready
@@ -7022,12 +7022,12 @@ graphics_buffer_animation_engine:
 	inc a; Increment for next buffer
 	sta.w $0c6e	 ; Set graphics buffer 4
 	plp ; Restore processor flags
-	jsr.w Label_0182D9 ; Execute memory processing
+	jsr.w ProcessMemoryAndUpdateActors ; Execute memory processing
 	ldy.w #$0006	; Set animation loop counter
 animation_loop:
 	phy ; Save loop counter
 	jsr.w ExecuteAnimationStep ; Execute animation step
-	jsr.w Label_0182D9 ; Process memory operations
+	jsr.w ProcessMemoryAndUpdateActors ; Process memory operations
 	ply ; Restore loop counter
 	dey ; Decrement counter
 	bne animation_loop ; Continue if not zero
@@ -7081,7 +7081,7 @@ timing_delay_long:
 	ldy.w #$0006	; Set long delay counter
 timing_delay_common:
 	phy ; Save delay counter
-	jsr.w Label_0182D9 ; Execute delay processing
+	jsr.w ProcessMemoryAndUpdateActors ; Execute delay processing
 	ply ; Restore delay counter
 	dey ; Decrement counter
 	bne timing_delay_common ; Continue if not zero
@@ -7182,7 +7182,7 @@ animation_step_processing:
 animation_continue_alternate:
 	jsr.w ExecuteAlternateStep ; Execute alternate step
 animation_continue:
-	jsr.w Label_0182D9 ; Process memory operations
+	jsr.w ProcessMemoryAndUpdateActors ; Process memory operations
 	lda.w !hw_status_register	 ; Load hardware status
 	eor.b #$04	  ; Toggle status bit
 	sta.w !hw_status_register	 ; Store updated status
@@ -8563,11 +8563,11 @@ DATA8_01f453:
 ; Sophisticated audio management with battle coordination
 Advanced_Sound_Processing:
 	lda.b #$0f	  ; Set advanced sound mode
-	sta.w $0506	 ; Store sound control register
+	sta.w !audio_control_register	 ; Store sound control register
 	lda.b #$88	  ; Set sound effect parameters
-	sta.w $0507	 ; Store sound effect control
+	sta.w !audio_effect_control	 ; Store sound effect control
 	lda.b #$27	  ; Set audio coordination mode
-	sta.w $0505	 ; Store audio coordination
+	sta.w !audio_coord_register	 ; Store audio coordination
 	jsl.l ExecuteSoundProcessingSystem ; Execute sound processing system
 
 ; Advanced Battle Sequence Processing
@@ -8585,7 +8585,7 @@ Advanced_Sound_Processing:
 ; Sophisticated battle enhancement with progression tracking
 Advanced_Battle_Enhancement:
 	inc.w !anim_loop_counter	 ; Increment battle enhancement counter
-	jsr.w Label_0182D0 ; Execute enhancement coordination
+	jsr.w ProcessMemoryWithStateUpdate ; Execute enhancement coordination
 	lda.b #$10	  ; Set enhancement mode
 	sta.w !graphics_state_param	 ; Store enhancement control
 	stz.w $1929	 ; Clear enhancement state
@@ -8653,7 +8653,7 @@ DATA8_01f846:
 Advanced_Graphics_Initialization:
 	sep #$20		; Set 8-bit accumulator mode
 	inc.w !anim_loop_counter	 ; Increment graphics processing counter
-	jsr.w Label_0182D0 ; Execute graphics coordination
+	jsr.w ProcessMemoryWithStateUpdate ; Execute graphics coordination
 	ldx.w $1900	 ; Load primary graphics register
 	stx.w $1904	 ; Store graphics backup register
 	ldx.w $1902	 ; Load secondary graphics register
@@ -8725,7 +8725,7 @@ Graphics_Buffer_Init_Loop:
 	.BattleText_NextCharacter:
 	lda.b #$08	  ; Set graphics processing iteration count
 	sta.w !battle_phase_counter	 ; Store iteration control
-	jsr.w Label_0182D0 ; Execute graphics coordination
+	jsr.w ProcessMemoryWithStateUpdate ; Execute graphics coordination
 	ldx.w #$0004	; Set graphics processing steps
 	inc.w $1904	 ; Increment graphics sequence counter
 
@@ -8741,7 +8741,7 @@ Graphics_Processing_Inner_Loop:
 	ldx.w #$270b	; Set graphics operation reference
 	stx.w !battle_gfx_index	 ; Store graphics operation mode
 	jsl.l SpecialBattleProcessing ; Execute graphics operation
-	jsr.w Label_0182D0 ; Execute graphics coordination
+	jsr.w ProcessMemoryWithStateUpdate ; Execute graphics coordination
 	ldx.w #$0008	; Set fine graphics processing steps
 
 ; Fine Graphics Processing Loop
@@ -8752,12 +8752,12 @@ Fine_Graphics_Processing_Loop:
 	dec.w $1900	 ; Continue decrement for precise control
 	dec.w $1904	 ; Decrement graphics sequence counter
 	dec.w $1904	 ; Continue decrement for sequence control
-	jsr.w Label_0182D0 ; Execute graphics coordination
+	jsr.w ProcessMemoryWithStateUpdate ; Execute graphics coordination
 	inc.w $1900	 ; Increment primary graphics register
 	inc.w $1900	 ; Continue increment for restoration
 	inc.w $1904	 ; Increment graphics sequence counter
 	inc.w $1904	 ; Continue increment for sequence restoration
-	jsr.w Label_0182D0 ; Execute graphics coordination
+	jsr.w ProcessMemoryWithStateUpdate ; Execute graphics coordination
 	sep #$20		; Set 8-bit accumulator mode
 	plx ; Restore fine processing counter
 	dex ; Decrement fine processing steps
@@ -9598,7 +9598,7 @@ BattleGraphics_FinalCoordination:
 Final_System_Coordination_Loop:
 	phx ; Preserve system coordination index
 	jsr.w .BattleWindow_DrawBorder ; Execute advanced coordinate processing
-	jsr.w Label_0183BF ; Execute system integration coordination
+	jsr.w ExecuteSystemIntegration ; Execute system integration coordination
 	inc.w !tilemap_y_offset	 ; Increment coordinate processing sequence
 	plx ; Restore system coordination index
 	stx.w !gfx_config_alt	 ; Update coordination parameters
@@ -9700,6 +9700,11 @@ Bank_01_Termination_Marker:
 ; CONFIDENCE LEVEL: MAXIMUM - Ready for continued aggressive import campaign
 
 ; Bank $01 Campaign Complete - Initiating Bank $02 Import Sequence
+
+
+
+
+
 
 
 
