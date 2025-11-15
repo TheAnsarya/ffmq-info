@@ -52,13 +52,13 @@ Event_SetupCommon:
 	phk                                  ;0B8047|4B      |      ;
 	plb                                  ;0B8048|AB      |      ;
 	jsr.W BattleEvent_InitSearch                    ;0B8049|20D980  |0B80D9;
-	ldx.W $192b                          ;0B804C|AE2B19  |0B192B;
+	ldx.w !battle_temp_work                          ;0B804C|AE2B19  |0B192B;
 	cpx.W #$ffff                         ;0B804F|E0FFFF  |      ;
 	beq BattleEvent_Return                      ;0B8052|F04D    |0B80A1;
-	lda.W $1a80,x                        ;0B8054|BD801A  |0B1A80;
+	lda.w !battle_unit_flags,x                        ;0B8054|BD801A  |0B1A80;
 	and.B #$cf                           ;0B8057|29CF    |      ;
 	ora.B #$10                           ;0B8059|0910    |      ;
-	sta.W $1a80,x                        ;0B805B|9D801A  |0B1A80;
+	sta.w !battle_unit_flags,x                        ;0B805B|9D801A  |0B1A80;
 	lda.W $1a82,x                        ;0B805E|BD821A  |0B1A82;
 	rep #$30                             ;0B8061|C230    |      ;
 	and.W #$00ff                         ;0B8063|29FF00  |      ;
@@ -74,7 +74,7 @@ Event_SetupCommon:
 ;      |        |      ;
 BattleEvent_UpdateOAM:
 	rep #$30                             ;0B8077|C230    |      ;
-	lda.W $192d                          ;0B8079|AD2D19  |00192D;
+	lda.w !tilemap_x_offset                          ;0B8079|AD2D19  |00192D;
 	and.W #$00ff                         ;0B807C|29FF00  |      ;
 	asl a;0B807F|0A      |      ;
 	asl a;0B8080|0A      |      ;
@@ -106,12 +106,12 @@ BattleEvent_Return:
 	sep #$20                             ;0B80AA|E220    |      ;
 	rep #$10                             ;0B80AC|C210    |      ;
 	jsr.W BattleEvent_InitSearch                    ;0B80AE|20D980  |0B80D9;
-	ldx.W $192b                          ;0B80B1|AE2B19  |00192B;
+	ldx.w !battle_temp_work                          ;0B80B1|AE2B19  |00192B;
 	cpx.W #$ffff                         ;0B80B4|E0FFFF  |      ;
 	beq BattleEvent_Return                      ;0B80B7|F0E8    |0B80A1;
-	lda.W $1a80,x                        ;0B80B9|BD801A  |001A80;
+	lda.w !battle_unit_flags,x                        ;0B80B9|BD801A  |001A80;
 	and.B #$cf                           ;0B80BC|29CF    |      ;
-	sta.W $1a80,x                        ;0B80BE|9D801A  |001A80;
+	sta.w !battle_unit_flags,x                        ;0B80BE|9D801A  |001A80;
 	lda.W $1a82,x                        ;0B80C1|BD821A  |001A82;
 	rep #$30                             ;0B80C4|C230    |      ;
 	and.W #$00ff                         ;0B80C6|29FF00  |      ;
@@ -130,7 +130,7 @@ BattleEvent_InitSearch:
 	lda.W $009e                          ;0B80D9|AD9E00  |00009E;
 	sta.W $192c                          ;0B80DC|8D2C19  |00192C;
 	lda.B #$02                           ;0B80DF|A902    |      ;
-	sta.W $192b                          ;0B80E1|8D2B19  |00192B;
+	sta.w !battle_temp_work                          ;0B80E1|8D2B19  |00192B;
 	jsl.L CallsCodeAnimationFrameCalculatorBank                    ;0B80E4|22D18B01|018BD1;
 	rts                                  ;0B80E8|60      |      ;
 ;      |        |      ;
@@ -139,7 +139,7 @@ BattleEvent_InitSearch:
 	pha                                  ;0B80EB|48      |      ;
 	php                                  ;0B80EC|08      |      ;
 	phd                                  ;0B80ED|0B      |      ;
-	pea.W $1a72                          ;0B80EE|F4721A  |001A72;
+	pea.w !battle_status_array                          ;0B80EE|F4721A  |001A72;
 	pld                                  ;0B80F1|2B      |      ;
 	sep #$20                             ;0B80F2|E220    |      ;
 	rep #$10                             ;0B80F4|C210    |      ;
@@ -181,7 +181,7 @@ BattleEvent_LoadFont:
 	tax                                  ;0B8127|AA      |      ;
 	lda.L DATA8_0b8140,x                 ;0B8128|BF40810B|0B8140;
 	sta.W $0507                          ;0B812C|8D0705  |010507;
-	lda.W $193f                          ;0B812F|AD3F19  |01193F;
+	lda.w !battle_data_index_4                          ;0B812F|AD3F19  |01193F;
 	tax                                  ;0B8132|AA      |      ;
 	lda.L UNREACH_0B8144,x               ;0B8133|BF44810B|0B8144;
 	sta.W $0506                          ;0B8137|8D0605  |010506;
@@ -205,7 +205,7 @@ InitBattleGraphics:
 	sta.W $19a5                          ;0B814E|8DA519  |0119A5;
 	lda.B #$01                           ;0B8151|A901    |      ;
 	sta.W $1a45                          ;0B8153|8D451A  |011A45;
-	ldx.W $19f1                          ;0B8156|AEF119  |0119F1;
+	ldx.w !battle_array_elem_4                          ;0B8156|AEF119  |0119F1;
 	stx.W $0e89                          ;0B8159|8E890E  |010E89;
 	lda.W $19f0                          ;0B815C|ADF019  |0119F0;
 	sta.W $0e91                          ;0B815F|8D910E  |010E91;
@@ -357,7 +357,7 @@ InitMapLoop:
 	lda.W DATA8_0b829f,x                 ;0B8283|BD9F82  |0B829F;
 	sta.W $1a53                          ;0B8286|8D531A  |0B1A53;
 	lda.W DATA8_0b82a0,x                 ;0B8289|BDA082  |0B82A0;
-	sta.W $1a54                          ;0B828C|8D541A  |0B1A54;
+	sta.w !hardware_flags                          ;0B828C|8D541A  |0B1A54;
 	lda.B #$17                           ;0B828F|A917    |      ;
 	sta.W $1a4e                          ;0B8291|8D4E1A  |0B1A4E;
 ;      |        |      ;
@@ -387,7 +387,7 @@ LoadMapTile:
 	ldy.W $0e89                          ;0B82AA|AC890E  |010E89;
 	jsr.W CalculateTileAddress                    ;0B82AD|203883  |0B8338;
 	sta.W $19d3                          ;0B82B0|8DD319  |0119D3;
-	stx.W $19cb                          ;0B82B3|8ECB19  |0119CB;
+	stx.w !movement_state                          ;0B82B3|8ECB19  |0119CB;
 	lda.W $19cc                          ;0B82B6|ADCC19  |0119CC;
 	bpl ProcessMapTile                      ;0B82B9|1010    |0B82CB;
 	and.B #$40                           ;0B82BB|2940    |      ;
@@ -400,10 +400,10 @@ LoadMapTile:
 ;      |        |      ;
 ;      |        |      ;
 ProcessMapTile:
-	lda.W $19b4                          ;0B82CB|ADB419  |0119B4;
+	lda.w !battle_coord_state                          ;0B82CB|ADB419  |0119B4;
 	and.B #$f0                           ;0B82CE|29F0    |      ;
-	sta.W $19b4                          ;0B82D0|8DB419  |0119B4;
-	lda.W $19cb                          ;0B82D3|ADCB19  |0119CB;
+	sta.w !battle_coord_state                          ;0B82D0|8DB419  |0119B4;
+	lda.w !movement_state                          ;0B82D3|ADCB19  |0119CB;
 	and.B #$08                           ;0B82D6|2908    |      ;
 	beq ProcessTile_CheckDuplicate                      ;0B82D8|F009    |0B82E3;
 	lda.W $0e8d                          ;0B82DA|AD8D0E  |010E8D;
@@ -411,7 +411,7 @@ ProcessMapTile:
 	db $a9,$01,$80,$05                   ;0B82DF|        |      ;
 ;      |        |      ;
 ProcessTile_CheckDuplicate:
-	lda.W $19cb                          ;0B82E3|ADCB19  |0119CB;
+	lda.w !movement_state                          ;0B82E3|ADCB19  |0119CB;
 	and.B #$07                           ;0B82E6|2907    |      ;
 	xba                                  ;0B82E8|EB      |      ;
 	lda.W $19d3                          ;0B82E9|ADD319  |0119D3;
@@ -422,8 +422,8 @@ ProcessTile_CheckDuplicate:
 ;      |        |      ;
 ProcessTile_SetDirection:
 	xba                                  ;0B82F2|EB      |      ;
-	ora.W $19b4                          ;0B82F3|0DB419  |0119B4;
-	sta.W $19b4                          ;0B82F6|8DB419  |0119B4;
+	ora.w !battle_coord_state                          ;0B82F3|0DB419  |0119B4;
+	sta.w !battle_coord_state                          ;0B82F6|8DB419  |0119B4;
 	ldx.W #$0000                         ;0B82F9|A20000  |      ;
 	and.B #$07                           ;0B82FC|2907    |      ;
 	dec a;0B82FE|3A      |      ;
@@ -435,7 +435,7 @@ ProcessTile_SetTable:
 ;      |        |      ;
 LoadTableLoop:
 	lda.L DATA8_0b8324,x                 ;0B8307|BF24830B|0B8324;
-	sta.W $1993,y                        ;0B830B|999319  |011993;
+	sta.w !graphics_state_param,y                        ;0B830B|999319  |011993;
 	inx                                  ;0B830E|E8      |      ;
 	iny                                  ;0B830F|C8      |      ;
 	cpy.W #$000a                         ;0B8310|C00A00  |      ;
@@ -598,7 +598,7 @@ SetupBattleDisplay:
 	lda.W $1a50                          ;0B8434|AD501A  |011A50;
 	sta.W SNES_CGSWSEL                          ;0B8437|8D3021  |012130;
 	ldy.W $1a51                          ;0B843A|AC511A  |011A51;
-	lda.W $19cb                          ;0B843D|ADCB19  |0119CB;
+	lda.w !movement_state                          ;0B843D|ADCB19  |0119CB;
 	and.B #$70                           ;0B8440|2970    |      ;
 	cmp.B #$70                           ;0B8442|C970    |      ;
 	bne ApplyColorMath                      ;0B8444|D004    |0B844A;

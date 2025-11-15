@@ -121,7 +121,7 @@ BattleSprite_AnimationHandler:
 
 BattleSprite_UpdateOAM:
 	rep #$30		;0B8077	; 16-bit mode
-	lda.w $192d	 ;0B8079	; Load OAM table index
+	lda.w !tilemap_x_offset	 ;0B8079	; Load OAM table index
 	and.w #$00ff	;0B807C	; Mask to byte
 	asl a;0B807F	; Multiply by 4
 	asl a;0B8080	; (4 bytes per OAM entry)
@@ -318,7 +318,7 @@ BattleGfx_CommonSetup_1:	; Common bank setup
 
 BattleSprite_UpdateOAM_1:	; OAM Data Update Routine
 	rep #$30		; Set A/X/Y to 16-bit mode
-	lda.w $192d	 ; Load OAM slot index
+	lda.w !tilemap_x_offset	 ; Load OAM slot index
 	and.w #$00ff	; Mask to 8-bit value
 	asl a; Multiply by 4 (ASL twice for ×4)
 	asl a; Each OAM entry is 4 words
@@ -430,7 +430,7 @@ BattleSprite_InitAnimationState:
 	pha ; Save accumulator
 	php ; Save processor status
 	phd ; Save direct page register
-	pea.w $1a72	 ; Push sprite table base address
+	pea.w !ram_1a72	 ; Push sprite table base address
 	pld ; Pull to direct page (DP = $1a72)
 	sep #$20		; Set A to 8-bit mode
 	rep #$10		; Set X/Y to 16-bit mode
@@ -492,7 +492,7 @@ BattleGfx_LoadByTypeAndPhase:
 	tax ; Transfer to X for table lookup
 	lda.l DATA8_0b8140,x ; Load graphics address low byte from table
 	sta.w !audio_effect_control	 ; Store to pointer low byte
-	lda.w $193f	 ; Load battle phase index
+	lda.w !ram_193f	 ; Load battle phase index
 	tax ; Transfer to X for second lookup
 	lda.l Battle_GfxAddressHigh,x ; Load graphics address high byte from table
 	sta.w !audio_control_register	 ; Store to pointer high byte
@@ -549,7 +549,7 @@ BattleInit_SetupEncounter:
 	sta.w $19a5	 ; Set battle state flag to active ($80)
 	lda.b #$01	  ; Animation enable
 	sta.w $1a45	 ; Store to animation flag
-	ldx.w $19f1	 ; Load enemy formation ID (16-bit)
+	ldx.w !battle_array_elem_4	 ; Load enemy formation ID (16-bit)
 	stx.w !env_coord_x	 ; Store to formation pointer
 	lda.w $19f0	 ; Load enemy formation bank
 	sta.w $0e91	 ; Store to formation bank pointer
@@ -746,7 +746,7 @@ BattleGfx_CopyDefaults:	; Copy default values loop
 	lda.w DATA8_0b829f,x ; Load scroll value 1
 	sta.w $1a53	 ; Store layer scroll Y
 	lda.w DATA8_0b82a0,x ; Load scroll value 2
-	sta.w $1a54	 ; Store layer scroll speed
+	sta.w !ram_1a54	 ; Store layer scroll speed
 
 	lda.b #$17	  ; Layer count/flags = $17
 	sta.w $1a4e	 ; Store to layer control
@@ -844,11 +844,11 @@ DATA8_0b82a0:
 ;   bit 4-7: Cleared at entry
 
 BattleState_ConfigureFlags:
-	lda.w $19b4	 ; Load current battle state
+	lda.w !ram_19b4	 ; Load current battle state
 	and.b #$f0	  ; Clear lower nibble (bits 0-3)
-	sta.w $19b4	 ; Store cleared flags
+	sta.w !ram_19b4	 ; Store cleared flags
 
-	lda.w $19cb	 ; Load battle mode register
+	lda.w !ram_19cb	 ; Load battle mode register
 	and.b #$08	  ; Check bit 3 (special battle type?)
 	beq BattleState_ProcessFlags ; Skip if not set
 	lda.w !map_param_2	 ; Load battle condition register
@@ -858,7 +858,7 @@ BattleState_ConfigureFlags:
 	db $a9,$01,$80,$05 ; lda #$01 / bra +5 (dead code?)
 
 BattleState_ProcessFlags:
-	lda.w $19cb	 ; Load battle mode register
+	lda.w !ram_19cb	 ; Load battle mode register
 	and.b #$07	  ; Mask bits 0-2 (phase bits)
 	xba ; Swap to high byte
 	lda.w $19d3	 ; Load battle subtype
@@ -871,8 +871,8 @@ BattleState_ProcessFlags:
 
 BattleState_MergeFlags:
 	xba ; Swap back to low byte
-	ora.w $19b4	 ; Merge with cleared state flags
-	sta.w $19b4	 ; Store final battle state
+	ora.w !ram_19b4	 ; Merge with cleared state flags
+	sta.w !ram_19b4	 ; Store final battle state
 
 ; Choose configuration table offset
 	ldx.w #$0000	; Default offset = 0
@@ -887,7 +887,7 @@ BattleState_CopyConfig:
 
 BattleState_CopyLoop:	; Copy loop
 	lda.l DATA8_0b8324,x ; Load config byte from table
-	sta.w $1993,y   ; Store to battle config RAM
+	sta.w !graphics_state_param,y   ; Store to battle config RAM
 	inx ; Increment source
 	iny ; Increment destination
 	cpy.w #$000a	; Copied 10 bytes?
@@ -1152,7 +1152,7 @@ BattlePPU_ConfigureRegisters:
 
 ; Special handling for battle mode $70
 	ldy.w $1a51	 ; Load color math mode config
-	lda.w $19cb	 ; Load battle mode flags
+	lda.w !ram_19cb	 ; Load battle mode flags
 	and.b #$70	  ; Check bits 4-6
 	cmp.b #$70	  ; All three bits set?
 	bne BattlePPU_WriteColorMath ; Skip if not

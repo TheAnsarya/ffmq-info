@@ -6291,7 +6291,7 @@ Dialog_ExecuteOrRoute:
 Dialog_ExecuteGame:
 	pei.B ($17)                          ;00B367|D417    |000017;
 	pei.B ($18)                          ;00B369|D418    |000018;
-	sta.W $19ee                          ;00B36B|8DEE19  |0019EE;
+	sta.w !battle_gfx_index                          ;00B36B|8DEE19  |0019EE;
 	jsl.L SpecialBattleProcessing                    ;00B36E|224CB201|01B24C;
 	pla                                  ;00B372|68      |      ;
 	sta.B $18                            ;00B373|8518    |000018;
