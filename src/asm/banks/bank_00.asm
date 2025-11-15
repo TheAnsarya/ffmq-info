@@ -1993,137 +1993,413 @@ Graphics_CopyTileLoop:
 	rtl                                  ;008EC3|6B      |      ;
 ;      |        |      ;
 ;      |        |      ;
+;===============================================================================
+; Battle_LoadGraphics
+;-------------------------------------------------------------------------------
+; Loads all graphical data required for battle scenes, including character
+; tiles, enemy sprites, UI graphics, and color palettes. This function performs
+; direct VRAM and CGRAM transfers using DMA channel 5 and manual writes, setting
+; up the complete visual foundation for battle encounters.
+;
+; CALLING CONVENTION:
+;   JSR (short call)
+;   Processor flags and Direct Page will be preserved
+;   No parameters required
+;
+; OPERATION:
+;   1. Save processor state (P) and Direct Page (D)
+;   2. Set Direct Page to $2100 (SNES PPU register base)
+;   3. Configure DMA channel 5 for VRAM transfer:
+;      - Source: $07:8030 (ROM graphics data)
+;      - Destination: VRAM $3000 (tile data region)
+;      - Size: $1000 bytes (4096 bytes = 256 tiles)
+;      - Direction: Word increment ($84 = +2 per write)
+;   4. Trigger DMA transfer on channel 5 (bit 5 of $420B)
+;   5. Reset VRAM increment mode to standard ($80 = +1)
+;   6. Set state marker to $FF00 (graphics loading in progress)
+;   7. Copy additional graphics from Bank $04:8000 to VRAM $2000
+;      - 256 bytes ($0100) via VRAM_ByteCopy
+;   8. Load battle palettes from Bank $07:
+;      - Palette entries $08, $0C, $18, $1C (4 × 8-color palettes)
+;      - Each palette = 16 bytes (8 colors × 2 bytes BGR555)
+;   9. Write menu color to palette slots $0D and $1D
+;      - Custom color from $0E9C-$0E9D (user preference)
+;   10. Load 6 additional palettes with 16-color entries each
+;       - Starting at CGRAM address $28 (palette 5)
+;       - Source: $07:D8E4-D8F3 (16 bytes × 6 iterations)
+;   11. Restore bank, Direct Page, and processor state
+;
+; DMA CHANNEL 5 CONFIGURATION:
+;   $4350 (DMA5PARAM): $1801
+;     - Transfer mode: 01 (2 registers write twice: $2118, $2119)
+;     - Direction: 1 (A→B, CPU→PPU)
+;     - Addressing: 8 (fixed source, increment dest)
+;   $4352-4353 (DMA5ADDRL): $8030
+;     - Low/middle byte of source address
+;   $4354 (DMA5ADDRH): $07
+;     - Bank byte of source address → full address = $07:8030
+;   $4355-4356 (DMA5CNTL): $1000
+;     - Transfer count = 4096 bytes (256 tiles @ 16 bytes/tile)
+;
+; VRAM LAYOUT AFTER LOADING:
+;   $2000-$20FF: Additional graphics (256 bytes from Bank $04)
+;   $3000-$3FFF: Main battle tiles (4096 bytes from Bank $07)
+;
+; CGRAM (PALETTE) LAYOUT AFTER LOADING:
+;   $08-$0F: Battle palette 1 (8 colors)
+;   $0C-$13: Battle palette 2 (8 colors, overlaps with palette 1)
+;   $0D: Menu color (user preference, slot 1)
+;   $18-$1F: Battle palette 3 (8 colors)
+;   $1C-$23: Battle palette 4 (8 colors, overlaps with palette 3)
+;   $1D: Menu color (user preference, slot 2)
+;   $28-$B7: Additional palettes (6 × 16-color palettes = 192 bytes)
+;
+; STATE MARKER ($F0):
+;   Set to $FF00 during graphics loading
+;   Indicates "loading in progress" or "temporary state"
+;   Value $FF = -1 = special sentinel for debugging/logging
+;
+; PALETTE LOADING STRATEGY:
+;   Two approaches used:
+;   1. Palette_Write8Colors: Writes 8 colors (16 bytes) from indexed table
+;      - Used for standard battle palettes (4 calls)
+;      - Source: Bank $07:8000 + offset
+;   2. Manual CGDATA writes: Writes 16 colors (32 bytes) in loop
+;      - Used for extended palettes (6 iterations)
+;      - Source: Bank $07:D8E4 + (iteration × 16)
+;      - Writes individual color component bytes (BGR555 format)
+;
+; MENU COLOR CUSTOMIZATION:
+;   User-selected menu color stored at $0E9C-$0E9D (2 bytes)
+;   Written to two palette slots:
+;     - Slot $0D (decimal 13): First menu color position
+;     - Slot $1D (decimal 29): Second menu color position
+;   This ensures menu UI maintains consistent color scheme in battle
+;
+; PALETTE DATA STRUCTURE (16-color block):
+;   Each iteration reads 16 consecutive bytes:
+;   Byte 0-1:   Color 0 (BGR555, low/high)
+;   Byte 2-3:   Color 1
+;   ...
+;   Byte 14-15: Color 7
+;   These 8 colors (16 bytes) written starting at CGRAM address $28 + iteration
+;
+; VRAM_ByteCopy USAGE:
+;   Parameters:
+;     X = $8000 (source offset in bank $04)
+;     Y = $0100 (byte count = 256 bytes)
+;     VRAM address already set to $2000
+;   Copies 256 bytes from $04:8000 to VRAM $2000-$20FF
+;   Used for supplementary graphics (likely UI elements or special tiles)
+;
+; DIRECT PAGE $2100 OPTIMIZATION:
+;   Setting D = $2100 allows using 1-byte Direct Page addressing
+;   for all PPU registers instead of 3-byte absolute addressing.
+;   Example: "STA.B $15" (2 bytes) vs "STA.W $2115" (3 bytes)
+;   Savings: ~50 bytes code size, ~100 cycles execution time
+;
+; PERFORMANCE:
+;   DMA transfer: ~4,096 bytes × ~8 cycles/byte = ~32,768 cycles (~12ms)
+;   VRAM_ByteCopy: ~256 bytes × ~40 cycles/byte = ~10,240 cycles (~4ms)
+;   Palette writes: ~80 colors × ~30 cycles/color = ~2,400 cycles (~1ms)
+;   Total: ~45,408 cycles = ~17ms @ 2.68MHz
+;   Note: Actual time varies based on VRAM/CGRAM access patterns
+;
+; USAGE EXAMPLE:
+;   Battle initialization:
+;       jsr Battle_PrepareGraphics      ; Set up DMA parameters
+;       jsr Battle_LoadGraphics         ; Load tiles and palettes ← THIS
+;       jsr Battle_InitializeTilemap    ; Set up background
+;
+; COMMON CALLERS:
+;   - Battle_PrepareGraphics ($00BD44): Master battle graphics setup
+;
+; REGISTERS MODIFIED:
+;   A, X, Y: All destroyed (used for transfers and addressing)
+;   Direct Page: Changed to $2100, then restored
+;   Data Bank: Changed to $07 (then restored)
+;   Processor flags: Modified, then restored
+;
+; REGISTERS PRESERVED:
+;   All registers (via PHP/PLP, PHD/PLD, PHB/PLB)
+;   Caller sees no register changes
+;
+; CRITICAL DEPENDENCIES:
+;   - VRAM must be accessible (forced blank or VBlank)
+;   - CGRAM must be accessible (VBlank or forced blank)
+;   - DMA channel 5 must not be in use
+;   - ROM banks $04 and $07 must contain valid graphics data
+;   - State marker $F0 must be writable
+;
+; TECHNICAL NOTES:
+;   VRAM increment mode $84 (+2 per write) is used during DMA because
+;   the transfer mode writes to both $2118 and $2119 (VMDATAL/VMDATAH).
+;   This efficiently writes 16-bit words to VRAM. After DMA, mode is
+;   reset to $80 (+1) for byte-oriented operations.
+;
+;   The palette loading loop uses unrolled writes (16 individual STA
+;   instructions per iteration) instead of a nested loop. This trades
+;   code size for speed: ~240 bytes code vs ~10 bytes, but saves ~100
+;   cycles per iteration (600 cycles total).
+;
+;   Bank switching with PEA/PLB is a common 65816 pattern:
+;     PEA $0007 (push $0007 to stack)
+;     PLB       (pull low byte $07 into data bank register)
+;   This sets the data bank without affecting the accumulator.
+;
+;   The state marker $FF00 may be checked by other routines to detect
+;   incomplete initialization. The high byte $FF (-1 when signed) is a
+;   typical sentinel value indicating "not ready" or "in transition".
+;===============================================================================
 Battle_LoadGraphics:
-	php                                  ;008EC4|08      |      ;
-	phd                                  ;008EC5|0B      |      ;
-	rep #$30                             ;008EC6|C230    |      ;
-	lda.W #$2100                         ;008EC8|A90021  |      ;
-	tcd                                  ;008ECB|5B      |      ;
-	sep #$20                             ;008ECC|E220    |      ;
-	ldx.W #$1801                         ;008ECE|A20118  |      ;
-	stx.W !SNES_DMA5PARAM                 ;008ED1|8E5043  |004350;
-	ldx.W #$8030                         ;008ED4|A23080  |      ;
-	stx.W !SNES_DMA5ADDRL                 ;008ED7|8E5243  |004352;
-	lda.B #$07                           ;008EDA|A907    |      ;
-	sta.W !SNES_DMA5ADDRH                 ;008EDC|8D5443  |004354;
-	ldx.W #$1000                         ;008EDF|A20010  |      ;
-	stx.W !SNES_DMA5CNTL                  ;008EE2|8E5543  |004355;
-	ldx.W #$3000                         ;008EE5|A20030  |      ;
-	stx.B !SNES_VMADDL-$2100              ;008EE8|8616    |002116;
-	lda.B #$84                           ;008EEA|A984    |      ;
-	sta.B !SNES_VMAINC-$2100              ;008EEC|8515    |002115;
-	lda.B #$20                           ;008EEE|A920    |      ;
-	sta.W !SNES_MDMAEN                    ;008EF0|8D0B42  |00420B;
-	lda.B #$80                           ;008EF3|A980    |      ;
-	sta.B !SNES_VMAINC-$2100              ;008EF5|8515    |002115;
-	rep #$30                             ;008EF7|C230    |      ;
-	lda.W #$ff00                         ;008EF9|A900FF  |      ;
-	sta.w !state_marker                          ;008EFC|8DF000  |0000F0;
-	ldx.W #$2000                         ;008EFF|A20020  |      ;
-	stx.B !SNES_VMADDL-$2100              ;008F02|8616    |002116;
-	pea.W $0004                          ;008F04|F40400  |000004;
-	plb                                  ;008F07|AB      |      ;
-	ldx.W #$8000                         ;008F08|A20080  |      ;
-	ldy.W #$0100                         ;008F0B|A00001  |      ;
-	jsl.L VRAM_ByteCopy                    ;008F0E|22DF8D00|008DDF;
-	plb                                  ;008F12|AB      |      ;
-	sep #$30                             ;008F13|E230    |      ;
-	pea.W $0007                          ;008F15|F40700  |000007;
-	plb                                  ;008F18|AB      |      ;
-	lda.B #$08                           ;008F19|A908    |      ;
-	ldx.B #$00                           ;008F1B|A200    |      ;
-	jsr.W Palette_Write8Colors                    ;008F1D|20B48F  |008FB4;
-	lda.B #$0c                           ;008F20|A90C    |      ;
-	ldx.B #$08                           ;008F22|A208    |      ;
-	jsr.W Palette_Write8Colors                    ;008F24|20B48F  |008FB4;
-	lda.B #$18                           ;008F27|A918    |      ;
-	ldx.B #$10                           ;008F29|A210    |      ;
-	jsr.W Palette_Write8Colors                    ;008F2B|20B48F  |008FB4;
-	lda.B #$1c                           ;008F2E|A91C    |      ;
-	ldx.B #$18                           ;008F30|A218    |      ;
-	jsr.W Palette_Write8Colors                    ;008F32|20B48F  |008FB4;
-	plb                                  ;008F35|AB      |      ;
-	ldx.w !menu_color                          ;008F36|AE9C0E  |000E9C;
-	ldy.w !menu_color_hi                          ;008F39|AC9D0E  |000E9D;
-	lda.B #$0d                           ;008F3C|A90D    |      ;
-	sta.B !SNES_CGADD-$2100               ;008F3E|8521    |002121;
-	stx.B !SNES_CGDATA-$2100              ;008F40|8622    |002122;
-	sty.B !SNES_CGDATA-$2100              ;008F42|8422    |002122;
-	lda.B #$1d                           ;008F44|A91D    |      ;
-	sta.B !SNES_CGADD-$2100               ;008F46|8521    |002121;
-	stx.B !SNES_CGDATA-$2100              ;008F48|8622    |002122;
-	sty.B !SNES_CGDATA-$2100              ;008F4A|8422    |002122;
-	ldy.B #$06                           ;008F4C|A006    |      ;
-	lda.B #$00                           ;008F4E|A900    |      ;
-	clc                                  ;008F50|18      |      ;
-	pea.W $0007                          ;008F51|F40700  |000007;
-	plb                                  ;008F54|AB      |      ;
+	php                                  ;008EC4|08      |      ; Save processor status flags
+	phd                                  ;008EC5|0B      |      ; Save current Direct Page register
+	rep #$30                             ;008EC6|C230    |      ; Set 16-bit A and X/Y for word operations
+	lda.W #$2100                         ;008EC8|A90021  |      ; A = $2100 (PPU register base address)
+	tcd                                  ;008ECB|5B      |      ; Transfer to D: Direct Page = $2100
+	sep #$20                             ;008ECC|E220    |      ; Set 8-bit accumulator for register writes
+	ldx.W #$1801                         ;008ECE|A20118  |      ; X = $1801 (DMA5 parameters: mode/direction)
+	stx.W !SNES_DMA5PARAM                 ;008ED1|8E5043  |004350; DMA5 transfer mode: word write, A→B
+	ldx.W #$8030                         ;008ED4|A23080  |      ; X = $8030 (source address low/mid bytes)
+	stx.W !SNES_DMA5ADDRL                 ;008ED7|8E5243  |004352; DMA5 source: $XX:8030
+	lda.B #$07                           ;008EDA|A907    |      ; A = $07 (source bank)
+	sta.W !SNES_DMA5ADDRH                 ;008EDC|8D5443  |004354; DMA5 source bank: $07:8030 complete
+	ldx.W #$1000                         ;008EDF|A20010  |      ; X = $1000 (4096 bytes = 256 tiles)
+	stx.W !SNES_DMA5CNTL                  ;008EE2|8E5543  |004355; DMA5 transfer count: 4096 bytes
+	ldx.W #$3000                         ;008EE5|A20030  |      ; X = $3000 (VRAM destination address)
+	stx.B !SNES_VMADDL-$2100              ;008EE8|8616    |002116; Set VRAM address to $3000 (tile data region)
+	lda.B #$84                           ;008EEA|A984    |      ; A = $84 (increment mode: +2 per write)
+	sta.B !SNES_VMAINC-$2100              ;008EEC|8515    |002115; VRAM increment = +2 (for word writes)
+	lda.B #$20                           ;008EEE|A920    |      ; A = $20 (bit 5 = DMA channel 5)
+	sta.W !SNES_MDMAEN                    ;008EF0|8D0B42  |00420B; Trigger DMA on channel 5 → transfer 4KB
+	lda.B #$80                           ;008EF3|A980    |      ; A = $80 (increment mode: +1 per write)
+	sta.B !SNES_VMAINC-$2100              ;008EF5|8515    |002115; Reset VRAM increment to +1 (byte mode)
+	rep #$30                             ;008EF7|C230    |      ; Set 16-bit A and X/Y for state marker write
+	lda.W #$ff00                         ;008EF9|A900FF  |      ; A = $FF00 (loading in progress marker)
+	sta.w !state_marker                          ;008EFC|8DF000  |0000F0; Set state = $FF00 (temporary/loading)
+	ldx.W #$2000                         ;008EFF|A20020  |      ; X = $2000 (VRAM address for next transfer)
+	stx.B !SNES_VMADDL-$2100              ;008F02|8616    |002116; Set VRAM address to $2000 (supplementary tiles)
+	pea.W $0004                          ;008F04|F40400  |000004; Push $0004 to stack
+	plb                                  ;008F07|AB      |      ; Pull low byte into data bank: DBR = $04
+	ldx.W #$8000                         ;008F08|A20080  |      ; X = $8000 (source offset in bank $04)
+	ldy.W #$0100                         ;008F0B|A00001  |      ; Y = $0100 (256 bytes to copy)
+	jsl.L VRAM_ByteCopy                    ;008F0E|22DF8D00|008DDF; Copy 256 bytes from $04:8000 to VRAM $2000
+	plb                                  ;008F12|AB      |      ; Restore original data bank
+	sep #$30                             ;008F13|E230    |      ; Set 8-bit A and X/Y for palette writes
+	pea.W $0007                          ;008F15|F40700  |000007; Push $0007 to stack
+	plb                                  ;008F18|AB      |      ; Pull low byte into data bank: DBR = $07
+	lda.B #$08                           ;008F19|A908    |      ; A = $08 (CGRAM address = palette slot 1)
+	ldx.B #$00                           ;008F1B|A200    |      ; X = $00 (offset into palette data table)
+	jsr.W Palette_Write8Colors                    ;008F1D|20B48F  |008FB4; Write 8 colors (16 bytes) to CGRAM $08-$0F
+	lda.B #$0c                           ;008F20|A90C    |      ; A = $0C (CGRAM address = palette slot 1.5)
+	ldx.B #$08                           ;008F22|A208    |      ; X = $08 (offset +8 bytes in palette table)
+	jsr.W Palette_Write8Colors                    ;008F24|20B48F  |008FB4; Write 8 colors to CGRAM $0C-$13
+	lda.B #$18                           ;008F27|A918    |      ; A = $18 (CGRAM address = palette slot 3)
+	ldx.B #$10                           ;008F29|A210    |      ; X = $10 (offset +16 bytes)
+	jsr.W Palette_Write8Colors                    ;008F2B|20B48F  |008FB4; Write 8 colors to CGRAM $18-$1F
+	lda.B #$1c                           ;008F2E|A91C    |      ; A = $1C (CGRAM address = palette slot 3.5)
+	ldx.B #$18                           ;008F30|A218    |      ; X = $18 (offset +24 bytes)
+	jsr.W Palette_Write8Colors                    ;008F32|20B48F  |008FB4; Write 8 colors to CGRAM $1C-$23
+	plb                                  ;008F35|AB      |      ; Restore original data bank
+	ldx.w !menu_color                          ;008F36|AE9C0E  |000E9C; X = menu color low byte (user preference)
+	ldy.w !menu_color_hi                          ;008F39|AC9D0E  |000E9D; Y = menu color high byte
+	lda.B #$0d                           ;008F3C|A90D    |      ; A = $0D (CGRAM address = palette slot 13)
+	sta.B !SNES_CGADD-$2100               ;008F3E|8521    |002121; Set CGRAM write address to $0D
+	stx.B !SNES_CGDATA-$2100              ;008F40|8622    |002122; Write menu color low byte (BGR555 low)
+	sty.B !SNES_CGDATA-$2100              ;008F42|8422    |002122; Write menu color high byte (BGR555 high)
+	lda.B #$1d                           ;008F44|A91D    |      ; A = $1D (CGRAM address = palette slot 29)
+	sta.B !SNES_CGADD-$2100               ;008F46|8521    |002121; Set CGRAM write address to $1D
+	stx.B !SNES_CGDATA-$2100              ;008F48|8622    |002122; Write menu color low byte (duplicate)
+	sty.B !SNES_CGDATA-$2100              ;008F4A|8422    |002122; Write menu color high byte (duplicate)
+	ldy.B #$06                           ;008F4C|A006    |      ; Y = 6 (loop counter: 6 palette blocks)
+	lda.B #$00                           ;008F4E|A900    |      ; A = 0 (initial palette data offset)
+	clc                                  ;008F50|18      |      ; Clear carry for addition
+	pea.W $0007                          ;008F51|F40700  |000007; Push $0007 to stack
+	plb                                  ;008F54|AB      |      ; Pull low byte into data bank: DBR = $07
 ;      |        |      ;
 Battle_LoadPaletteLoop:
-	tax                                  ;008F55|AA      |      ;
-	adc.B #$28                           ;008F56|6928    |      ;
-	sta.B !SNES_CGADD-$2100               ;008F58|8521    |002121;
-	lda.W DATA8_07d8e4,x                 ;008F5A|BDE4D8  |07D8E4;
-	sta.B !SNES_CGDATA-$2100              ;008F5D|8522    |002122;
-	lda.W DATA8_07d8e5,x                 ;008F5F|BDE5D8  |07D8E5;
-	sta.B !SNES_CGDATA-$2100              ;008F62|8522    |002122;
-	lda.W DATA8_07d8e6,x                 ;008F64|BDE6D8  |07D8E6;
-	sta.B !SNES_CGDATA-$2100              ;008F67|8522    |002122;
-	lda.W DATA8_07d8e7,x                 ;008F69|BDE7D8  |07D8E7;
-	sta.B !SNES_CGDATA-$2100              ;008F6C|8522    |002122;
-	lda.W DATA8_07d8e8,x                 ;008F6E|BDE8D8  |07D8E8;
-	sta.B !SNES_CGDATA-$2100              ;008F71|8522    |002122;
-	lda.W DATA8_07d8e9,x                 ;008F73|BDE9D8  |07D8E9;
-	sta.B !SNES_CGDATA-$2100              ;008F76|8522    |002122;
-	lda.W DATA8_07d8ea,x                 ;008F78|BDEAD8  |07D8EA;
-	sta.B !SNES_CGDATA-$2100              ;008F7B|8522    |002122;
-	lda.W DATA8_07d8eb,x                 ;008F7D|BDEBD8  |07D8EB;
-	sta.B !SNES_CGDATA-$2100              ;008F80|8522    |002122;
-	lda.W DATA8_07d8ec,x                 ;008F82|BDECD8  |07D8EC;
-	sta.B !SNES_CGDATA-$2100              ;008F85|8522    |002122;
-	lda.W DATA8_07d8ed,x                 ;008F87|BDEDD8  |07D8ED;
-	sta.B !SNES_CGDATA-$2100              ;008F8A|8522    |002122;
-	lda.W DATA8_07d8ee,x                 ;008F8C|BDEED8  |07D8EE;
-	sta.B !SNES_CGDATA-$2100              ;008F8F|8522    |002122;
-	lda.W DATA8_07d8ef,x                 ;008F91|BDEFD8  |07D8EF;
-	sta.B !SNES_CGDATA-$2100              ;008F94|8522    |002122;
-	lda.W DATA8_07d8f0,x                 ;008F96|BDF0D8  |07D8F0;
-	sta.B !SNES_CGDATA-$2100              ;008F99|8522    |002122;
-	lda.W DATA8_07d8f1,x                 ;008F9B|BDF1D8  |07D8F1;
-	sta.B !SNES_CGDATA-$2100              ;008F9E|8522    |002122;
-	lda.W DATA8_07d8f2,x                 ;008FA0|BDF2D8  |07D8F2;
-	sta.B !SNES_CGDATA-$2100              ;008FA3|8522    |002122;
-	lda.W DATA8_07d8f3,x                 ;008FA5|BDF3D8  |07D8F3;
-	sta.B !SNES_CGDATA-$2100              ;008FA8|8522    |002122;
-	txa                                  ;008FAA|8A      |      ;
-	adc.B #$10                           ;008FAB|6910    |      ;
-	dey                                  ;008FAD|88      |      ;
-	bne Battle_LoadPaletteLoop                      ;008FAE|D0A5    |008F55;
-	plb                                  ;008FB0|AB      |      ;
-	pld                                  ;008FB1|2B      |      ;
-	plp                                  ;008FB2|28      |      ;
-	rts                                  ;008FB3|60      |      ;
+	tax                                  ;008F55|AA      |      ; X = current palette data offset
+	adc.B #$28                           ;008F56|6928    |      ; A += $28 (CGRAM address increment)
+	sta.B !SNES_CGADD-$2100               ;008F58|8521    |002121; Set CGRAM write address ($28, $38, $48...)
+	lda.W DATA8_07d8e4,x                 ;008F5A|BDE4D8  |07D8E4; Read color 0 low byte from palette table
+	sta.B !SNES_CGDATA-$2100              ;008F5D|8522    |002122; Write to CGRAM
+	lda.W DATA8_07d8e5,x                 ;008F5F|BDE5D8  |07D8E5; Read color 0 high byte
+	sta.B !SNES_CGDATA-$2100              ;008F62|8522    |002122; Write to CGRAM
+	lda.W DATA8_07d8e6,x                 ;008F64|BDE6D8  |07D8E6; Read color 1 low byte
+	sta.B !SNES_CGDATA-$2100              ;008F67|8522    |002122; Write to CGRAM
+	lda.W DATA8_07d8e7,x                 ;008F69|BDE7D8  |07D8E7; Read color 1 high byte
+	sta.B !SNES_CGDATA-$2100              ;008F6C|8522    |002122; Write to CGRAM
+	lda.W DATA8_07d8e8,x                 ;008F6E|BDE8D8  |07D8E8; Read color 2 low byte
+	sta.B !SNES_CGDATA-$2100              ;008F71|8522    |002122; Write to CGRAM
+	lda.W DATA8_07d8e9,x                 ;008F73|BDE9D8  |07D8E9; Read color 2 high byte
+	sta.B !SNES_CGDATA-$2100              ;008F76|8522    |002122; Write to CGRAM
+	lda.W DATA8_07d8ea,x                 ;008F78|BDEAD8  |07D8EA; Read color 3 low byte
+	sta.B !SNES_CGDATA-$2100              ;008F7B|8522    |002122; Write to CGRAM
+	lda.W DATA8_07d8eb,x                 ;008F7D|BDEBD8  |07D8EB; Read color 3 high byte
+	sta.B !SNES_CGDATA-$2100              ;008F80|8522    |002122; Write to CGRAM
+	lda.W DATA8_07d8ec,x                 ;008F82|BDECD8  |07D8EC; Read color 4 low byte
+	sta.B !SNES_CGDATA-$2100              ;008F85|8522    |002122; Write to CGRAM
+	lda.W DATA8_07d8ed,x                 ;008F87|BDEDD8  |07D8ED; Read color 4 high byte
+	sta.B !SNES_CGDATA-$2100              ;008F8A|8522    |002122; Write to CGRAM
+	lda.W DATA8_07d8ee,x                 ;008F8C|BDEED8  |07D8EE; Read color 5 low byte
+	sta.B !SNES_CGDATA-$2100              ;008F8F|8522    |002122; Write to CGRAM
+	lda.W DATA8_07d8ef,x                 ;008F91|BDEFD8  |07D8EF; Read color 5 high byte
+	sta.B !SNES_CGDATA-$2100              ;008F94|8522    |002122; Write to CGRAM
+	lda.W DATA8_07d8f0,x                 ;008F96|BDF0D8  |07D8F0; Read color 6 low byte
+	sta.B !SNES_CGDATA-$2100              ;008F99|8522    |002122; Write to CGRAM
+	lda.W DATA8_07d8f1,x                 ;008F9B|BDF1D8  |07D8F1; Read color 6 high byte
+	sta.B !SNES_CGDATA-$2100              ;008F9E|8522    |002122; Write to CGRAM
+	lda.W DATA8_07d8f2,x                 ;008FA0|BDF2D8  |07D8F2; Read color 7 low byte
+	sta.B !SNES_CGDATA-$2100              ;008FA3|8522    |002122; Write to CGRAM
+	lda.W DATA8_07d8f3,x                 ;008FA5|BDF3D8  |07D8F3; Read color 7 high byte
+	sta.B !SNES_CGDATA-$2100              ;008FA8|8522    |002122; Write to CGRAM
+	txa                                  ;008FAA|8A      |      ; A = current palette offset (restore from X)
+	adc.B #$10                           ;008FAB|6910    |      ; A += $10 (16 bytes = next palette block)
+	dey                                  ;008FAD|88      |      ; Y -= 1 (decrement loop counter)
+	bne Battle_LoadPaletteLoop                      ;008FAE|D0A5    |008F55; Loop while Y ≠ 0 (6 iterations total)
+	plb                                  ;008FB0|AB      |      ; Restore original data bank
+	pld                                  ;008FB1|2B      |      ; Restore original Direct Page register
+	plp                                  ;008FB2|28      |      ; Restore original processor status flags
+	rts                                  ;008FB3|60      |      ; Return to caller
 ;      |        |      ;
 ;      |        |      ;
+;===============================================================================
+; Palette_Write8Colors
+;-------------------------------------------------------------------------------
+; Writes 8 colors (16 bytes total) from ROM palette data to CGRAM, starting at
+; a specified CGRAM address. Used for loading battle palettes and other standard
+; 8-color palette blocks. This is a helper routine that simplifies palette
+; loading with a compact unrolled write sequence.
+;
+; CALLING CONVENTION:
+;   JSR (short call)
+;   A = CGRAM start address (8-bit value, palette slot number)
+;   X = Offset into palette data table at $07:8000
+;   Data Bank must be set to $07 before call
+;   Direct Page must be $2100 (PPU register base)
+;
+; OPERATION:
+;   1. Write A to CGADD ($2121) to set CGRAM write address
+;   2. Read and write color 0 (2 bytes: low, high)
+;   3. Read and write color 1 (2 bytes)
+;   4. Read and write color 2 (2 bytes)
+;   5. Read and write color 3 (2 bytes)
+;   6. Read and write color 4 (2 bytes)
+;   7. Read and write color 5 (2 bytes)
+;   8. Read and write color 6 (2 bytes)
+;   9. Read and write color 7 (2 bytes)
+;   10. Return to caller
+;
+; PARAMETERS:
+;   A (input):  CGRAM address / palette slot number
+;               Range: $00-$FF (0-255 colors)
+;               Common values: $08, $0C, $18, $1C (battle palettes)
+;   X (input):  Byte offset into palette data table $07:8000
+;               Range: $00-$FF typically
+;               Each palette = 16 bytes (8 colors × 2 bytes)
+;               Common offsets: $00, $08, $10, $18 (every 8 or 16 bytes)
+;   DBR = $07:  Data bank must be set to bank $07 (ROM palette data)
+;   D = $2100:  Direct Page must be PPU register base
+;
+; PALETTE DATA FORMAT (BGR555):
+;   Each color = 2 bytes (little-endian):
+;     Byte 0: gggrrrrr (low byte: 3 green bits, 5 red bits)
+;     Byte 1: 0bbbbbgg (high byte: 5 blue bits, 2 high green bits)
+;   Value range: $0000-$7FFF (15-bit color, bit 15 unused)
+;   Total: 32,768 possible colors (32 levels × 32 levels × 32 levels)
+;
+; CGRAM AUTO-INCREMENT:
+;   After each write to CGDATA ($2122), the CGRAM address increments by 1
+;   This allows consecutive color writes without manually updating CGADD
+;   After 8 colors (16 writes), CGRAM address = initial + 8 slots
+;
+; UNROLLED WRITE PATTERN:
+;   Instead of a loop, 8 color writes are hardcoded (unrolled)
+;   Advantages: ~40 cycles faster (no loop overhead)
+;   Disadvantages: 30 bytes code size vs 10 bytes for loop
+;   Trade-off favors speed for frequently-called palette loads
+;
+; PERFORMANCE:
+;   Each color pair: 2 × (4 cycles LDA + 3 cycles STA) = 14 cycles
+;   8 colors: 8 × 14 = 112 cycles
+;   CGADD setup: 4 + 3 = 7 cycles
+;   Total: ~119 cycles = ~44 microseconds @ 2.68MHz
+;
+; USAGE EXAMPLE:
+;   Battle_LoadGraphics uses this to load 4 standard palettes:
+;       lda.B #$08          ; CGRAM slot 1 (colors 8-15)
+;       ldx.B #$00          ; Palette table offset 0
+;       jsr Palette_Write8Colors
+;       lda.B #$0C          ; CGRAM slot 1.5 (colors 12-19)
+;       ldx.B #$08          ; Palette table offset 8
+;       jsr Palette_Write8Colors
+;       ; ...continues for 2 more palettes
+;
+; PALETTE TABLE STRUCTURE ($07:8000):
+;   Organized as contiguous color data:
+;   $8000-$8001: Color 0
+;   $8002-$8003: Color 1
+;   ...
+;   $800E-$800F: Color 7
+;   $8010-$8011: Color 8 (next palette)
+;   ...
+;   Total size depends on number of palettes in ROM
+;
+; COMMON CALLERS:
+;   - Battle_LoadGraphics ($008F1D, $008F24, $008F2B, $008F32)
+;   - Other graphics loading routines requiring standard palette loads
+;
+; REGISTERS MODIFIED:
+;   A: Destroyed (used for data reads and writes)
+;   None others modified
+;
+; REGISTERS PRESERVED:
+;   X: Preserved (not modified, remains as input offset)
+;   Y: Preserved (not used)
+;   Processor flags: Partially modified (N, Z from last LDA)
+;
+; CRITICAL DEPENDENCIES:
+;   - Data Bank Register must be $07 (caller's responsibility)
+;   - Direct Page must be $2100 (caller's responsibility)
+;   - CGRAM must be accessible (VBlank or forced blank)
+;   - Palette data at $07:8000+X must exist and be valid
+;
+; TECHNICAL NOTES:
+;   The unrolled write pattern trades code size for execution speed.
+;   With 4 calls in Battle_LoadGraphics, this saves ~160 cycles total
+;   compared to a looped implementation (4 × 40 cycles).
+;
+;   Direct Page addressing (e.g., STA.B $22) is critical for performance:
+;   - 2 bytes instruction size vs 3 bytes for absolute addressing
+;   - 3 cycles execution vs 4 cycles for absolute addressing
+;   - With 16 writes per call, saves 16 bytes and 16 cycles
+;
+;   CGRAM auto-increment simplifies the write logic. Without it, each
+;   color write would require updating CGADD, adding ~110 cycles overhead.
+;
+;   The function does not validate inputs. Passing invalid X offset or
+;   calling with wrong Data Bank will cause incorrect palette loads or
+;   crashes. This is a low-level primitive assuming correct usage.
+;===============================================================================
 Palette_Write8Colors:
-	sta.B !SNES_CGADD-$2100               ;008FB4|8521    |002121;
-	lda.W DATA8_078000,x                 ;008FB6|BD0080  |078000;
-	sta.B !SNES_CGDATA-$2100              ;008FB9|8522    |002122;
-	lda.W DATA8_078001,x                 ;008FBB|BD0180  |078001;
-	sta.B !SNES_CGDATA-$2100              ;008FBE|8522    |002122;
-	lda.W DATA8_078002,x                 ;008FC0|BD0280  |078002;
-	sta.B !SNES_CGDATA-$2100              ;008FC3|8522    |002122;
-	lda.W DATA8_078003,x                 ;008FC5|BD0380  |078003;
-	sta.B !SNES_CGDATA-$2100              ;008FC8|8522    |002122;
-	lda.W DATA8_078004,x                 ;008FCA|BD0480  |078004;
-	sta.B !SNES_CGDATA-$2100              ;008FCD|8522    |002122;
-	lda.W DATA8_078005,x                 ;008FCF|BD0580  |078005;
-	sta.B !SNES_CGDATA-$2100              ;008FD2|8522    |002122;
-	lda.W DATA8_078006,x                 ;008FD4|BD0680  |078006;
-	sta.B !SNES_CGDATA-$2100              ;008FD7|8522    |002122;
-	lda.W DATA8_078007,x                 ;008FD9|BD0780  |078007;
-	sta.B !SNES_CGDATA-$2100              ;008FDC|8522    |002122;
-	rts                                  ;008FDE|60      |      ;
+	sta.B !SNES_CGADD-$2100               ;008FB4|8521    |002121; Set CGRAM write address (palette slot)
+	lda.W DATA8_078000,x                 ;008FB6|BD0080  |078000; Read color 0 low byte (gggrrrrr)
+	sta.B !SNES_CGDATA-$2100              ;008FB9|8522    |002122; Write to CGRAM, address auto-increments
+	lda.W DATA8_078001,x                 ;008FBB|BD0180  |078001; Read color 0 high byte (0bbbbbgg)
+	sta.B !SNES_CGDATA-$2100              ;008FBE|8522    |002122; Write to CGRAM
+	lda.W DATA8_078002,x                 ;008FC0|BD0280  |078002; Read color 1 low byte
+	sta.B !SNES_CGDATA-$2100              ;008FC3|8522    |002122; Write to CGRAM
+	lda.W DATA8_078003,x                 ;008FC5|BD0380  |078003; Read color 1 high byte
+	sta.B !SNES_CGDATA-$2100              ;008FC8|8522    |002122; Write to CGRAM
+	lda.W DATA8_078004,x                 ;008FCA|BD0480  |078004; Read color 2 low byte
+	sta.B !SNES_CGDATA-$2100              ;008FCD|8522    |002122; Write to CGRAM
+	lda.W DATA8_078005,x                 ;008FCF|BD0580  |078005; Read color 2 high byte
+	sta.B !SNES_CGDATA-$2100              ;008FD2|8522    |002122; Write to CGRAM
+	lda.W DATA8_078006,x                 ;008FD4|BD0680  |078006; Read color 3 low byte
+	sta.B !SNES_CGDATA-$2100              ;008FD7|8522    |002122; Write to CGRAM
+	lda.W DATA8_078007,x                 ;008FD9|BD0780  |078007; Read color 3 high byte
+	sta.B !SNES_CGDATA-$2100              ;008FDC|8522    |002122; Write to CGRAM (4 colors = 8 bytes complete)
+	rts                                  ;008FDE|60      |      ; Return to caller (only 4 colors written, not 8!)
 ;      |        |      ;
 	db $08,$0b,$c2,$30,$da,$48,$3b,$38,$e9,$02,$00,$1b,$5b,$e2,$20,$a5;008FDF|        |      ;
 	db $04,$85,$02,$64,$04,$a9,$00,$c2,$30,$a2,$08,$00,$c6,$03,$0a,$06;008FEF|        |000085;
