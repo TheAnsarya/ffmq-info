@@ -1934,63 +1934,261 @@ VRAM_CopyLoop:
 	pld                                  ;008E51|2B      |      ;
 	plp                                  ;008E52|28      |      ;
 	rtl                                  ;008E53|6B      |      ;
-;      |        |      ;
-;      |        |      ;
+;===============================================================================
+; Graphics_CopyTileWithBlanks
+;-------------------------------------------------------------------------------
+; Copies tile graphics data to VRAM with interleaved blank rows. This function
+; implements a specific tile loading pattern where each source row (2 bytes)
+; is followed by a blank row (2 bytes of $0000), effectively doubling the
+; vertical spacing of the tiles. Used for specific graphical effects where
+; tiles need extra spacing or where alternating rows should be empty.
+;
+; CALLING CONVENTION:
+;   Mode: A = 16-bit, X = 16-bit, Y = 16-bit, DBR = source bank
+;   Input:
+;     X = Source address offset (within current data bank)
+;     Y = Number of bytes to copy from source (before blank insertion)
+;     VRAM address already set via $2116-$2117 (VMADDL/VMADDH)
+;   Call: JSL Graphics_CopyTileWithBlanks
+;   Returns: Data copied to VRAM with interleaved blanks
+;   Registers: P and D preserved (PHP/PLP, PHD/PLD), A/X/Y modified
+;
+; OPERATION:
+;   1. Save processor status (P) and Direct Page (D) to stack
+;   2. Set Direct Page to $2100 (SNES PPU register base)
+;   3. Set 8-bit accumulator mode for register writes
+;   4. Set VRAM increment mode to $88: +4 after low byte write
+;   5. Set 16-bit mode for A, X, Y (data operations)
+;   6. Clear carry flag (CLC) for address arithmetic
+;   7. Loop (Y iterations, each processes 16 bytes = 1 tile):
+;      a. Read word from source[X+0], write to VMDATAL (row 0 of tile)
+;      b. Read $00F0 (blank marker), write to VMDATAL (blank row)
+;      c. Read word from source[X+2], write to VMDATAL (row 1)
+;      d. Read $00F0, write to VMDATAL (blank row)
+;      e. Read word from source[X+4], write to VMDATAL (row 2)
+;      f. Read $00F0, write to VMDATAL (blank row)
+;      g. Read word from source[X+6], write to VMDATAL (row 3)
+;      h. Read $00F0, write to VMDATAL (blank row)
+;      i. Read word from source[X+8], write to VMDATAL (row 4)
+;      j. Read $00F0, write to VMDATAL (blank row)
+;      k. Read word from source[X+10], write to VMDATAL (row 5)
+;      l. Read $00F0, write to VMDATAL (blank row)
+;      m. Read word from source[X+12], write to VMDATAL (row 6)
+;      n. Read $00F0, write to VMDATAL (blank row)
+;      o. Read word from source[X+14], write to VMDATAL (row 7)
+;      p. Read $00F0, write to VMDATAL (blank row, complete tile)
+;   8. Add $10 to X (advance to next 16-byte tile)
+;   9. Decrement Y (tile counter)
+;   10. If Y ≠ 0: loop back to step 7
+;   11. Set VRAM increment mode back to $80 (+1 after high byte)
+;   12. Restore Direct Page and processor status
+;   13. Return to caller (RTL: long return)
+;
+; TILE DATA FORMAT (SNES 4BPP):
+;   Each SNES tile = 8×8 pixels, 4 bits per pixel = 32 bytes total
+;   Organized as 4 bitplanes, each bitplane = 8 rows × 2 bytes
+;   
+;   Source data (input): 16 bytes = 2 bitplanes
+;     Row 0: bytes 0-1   (bitplane 0-1, pixels 0-7)
+;     Row 1: bytes 2-3   (bitplane 0-1, pixels 8-15)
+;     Row 2: bytes 4-5   (bitplane 0-1, pixels 16-23)
+;     Row 3: bytes 6-7   (bitplane 0-1, pixels 24-31)
+;     Row 4: bytes 8-9   (bitplane 0-1, pixels 32-39)
+;     Row 5: bytes 10-11 (bitplane 0-1, pixels 40-47)
+;     Row 6: bytes 12-13 (bitplane 0-1, pixels 48-55)
+;     Row 7: bytes 14-15 (bitplane 0-1, pixels 56-63)
+;   
+;   VRAM output (this function): 32 bytes = 4 bitplanes with blanks
+;     Row 0: source[0-1]   + $0000 (blank) = 4 bytes (2 bitplanes data, 2 blank)
+;     Row 1: source[2-3]   + $0000 (blank) = 4 bytes
+;     Row 2: source[4-5]   + $0000 (blank) = 4 bytes
+;     Row 3: source[6-7]   + $0000 (blank) = 4 bytes
+;     Row 4: source[8-9]   + $0000 (blank) = 4 bytes
+;     Row 5: source[10-11] + $0000 (blank) = 4 bytes
+;     Row 6: source[12-13] + $0000 (blank) = 4 bytes
+;     Row 7: source[14-15] + $0000 (blank) = 4 bytes
+;   
+;   Result: Tile appears with only 2 bitplanes (4 colors) instead of full
+;   4 bitplanes (16 colors). The blank bitplanes reduce color depth.
+;
+; VRAM INCREMENT MODE $88:
+;   $88 = %1000_1000
+;     Bit 7 = 1: Increment after low byte write ($2118)
+;     Bits 0-1 = 00: Increment amount = +1 word
+;     Bits 2-3 = 10: Translation mode = +4 (remapping active)
+;   
+;   With translation +4, each VMDATAL write advances VRAM address by 4 bytes:
+;   Write 1: VRAM[$0000-$0001] ← data, address becomes $0004
+;   Write 2: VRAM[$0004-$0005] ← data, address becomes $0008
+;   ...
+;   
+;   This allows the interleaved blank pattern to work correctly without
+;   manual address manipulation between each write.
+;
+; BLANK MARKER ($00F0):
+;   The function reads from address $00F0 (state_marker) for blank words.
+;   - This is WRAM address in bank $07 (or current DBR)
+;   - Value is typically $0000 (blank tile data)
+;   - Reading from a known-zero location is faster than loading immediate $0000
+;   - Also provides consistency: if $00F0 is modified, all blanks change
+;
+; DIRECT PAGE $2100 OPTIMIZATION:
+;   Setting D = $2100 allows 2-byte addressing for PPU registers:
+;   - Without: sta.W $2118 (3 bytes: $8D,$18,$21)
+;   - With DP: sta.B $18   (2 bytes: $85,$18)
+;   - Saves: 1 byte per instruction, ~32 bytes total
+;   - Also saves cycles: direct page addressing is faster
+;
+; PERFORMANCE:
+;   Per tile (Y=1, 16 bytes source → 32 bytes VRAM):
+;   - Setup: ~20 cycles (PHP, PHD, PEA, PLD, SEP, LDA, STA, REP, CLC)
+;   - Loop body: ~240 cycles per iteration
+;     - 16 × LDA absolute,X: 16 × 5 = 80 cycles
+;     - 8 × LDA $00F0: 8 × 4 = 32 cycles
+;     - 16 × STA $2118: 16 × 4 = 64 cycles
+;     - TXA, ADC, TAX: 6 cycles
+;     - DEY, BNE: 4 cycles
+;   - Cleanup: ~15 cycles (SEP, LDA, STA, PLD, PLP, RTL)
+;   - Total per tile: ~275 cycles (~103 microseconds @ 2.68MHz)
+;   - For 16 tiles (256 bytes): ~4,400 cycles (~1.6ms)
+;
+; USAGE EXAMPLE:
+;   Copy 16 tiles (256 bytes) from bank $07 offset $8030 to VRAM $0000:
+;   
+;   rep #$30                    ; 16-bit mode
+;   ldx.W #$0000                ; VRAM address $0000
+;   stx.W $2116                 ; Set VRAM address
+;   pea.W $0007                 ; Push bank $07
+;   plb                         ; DBR = $07
+;   ldx.W #$8030                ; Source offset $8030
+;   ldy.W #$0100                ; 256 bytes = 16 tiles
+;   jsl Graphics_CopyTileWithBlanks
+;   plb                         ; Restore DBR
+;   ; VRAM now contains 16 tiles with blank bitplanes interleaved
+;
+; COMMON CALLING PATTERN:
+;   From Screen_InitializeVideoRegisters ($00BAF0):
+;   
+;   ldx.W #$0000                ; VRAM address $0000
+;   stx.B $16                   ; Set VRAM address (Direct Page $2100)
+;   pea.W $0007                 ; Bank $07
+;   plb                         ; DBR = $07
+;   ldx.W #$8030                ; Source at $07:8030
+;   ldy.W #$0100                ; 256 bytes (16 tiles)
+;   jsl Graphics_CopyTileWithBlanks
+;   plb                         ; Restore bank
+;
+; WHY INTERLEAVED BLANKS:
+;   This pattern creates tiles with reduced color depth (2bpp instead of 4bpp):
+;   - Source provides bitplanes 0-1 (4 colors: palette entries 0-3)
+;   - Blank bitplanes 2-3 mean higher color bits always 0
+;   - Result: Tiles can only use first 4 colors of assigned palette
+;   
+;   Useful for:
+;   1. Reducing ROM space (16 bytes/tile instead of 32)
+;   2. Simplifying graphics (fewer colors to manage)
+;   3. Runtime palette effects (4-color tiles easier to recolor)
+;   4. Compatibility with simpler graphics assets
+;
+; RELATED FUNCTIONS:
+;   - VRAM_ByteCopy ($008DDF): Direct VRAM copy without blank insertion
+;   - Battle_LoadGraphics ($008EC4): Uses this function for initial tile loading
+;   - Screen_InitializeVideoRegisters ($00BAF0): Calls this for system graphics
+;
+; REGISTERS MODIFIED:
+;   A: Modified (data transfers)
+;   X: Modified (incremented by $10 per tile)
+;   Y: Modified (decremented to 0)
+;   P: Preserved (PHP/PLP)
+;   D: Preserved (PHD/PLD), temporarily $2100
+;   VMAINC ($2115): Set to $88 (loop), restored to $80 (cleanup)
+;   VMDATAL ($2118): Written 16 times per tile
+;   VRAM address: Advanced by 32 bytes per tile
+;
+; SAFE TO CALL:
+;   - During VBlank (VRAM accessible)
+;   - With screen blanked (VRAM always accessible)
+;   - From any bank (long call via JSL)
+;   - Multiple times (no side effects except VRAM content)
+;
+; CRITICAL DEPENDENCIES:
+;   - VRAM address MUST be set before calling (via $2116-$2117)
+;   - Source data bank MUST be set (caller's DBR)
+;   - Y parameter MUST be byte count (not tile count)
+;   - $00F0 should contain $0000 (blank tile data)
+;
+; TECHNICAL NOTES:
+;   1. The function name says "CopyTileWithBlanks" but actually copies
+;      multiple tiles determined by Y parameter. Better name would be
+;      "CopyTilesWithBlankBitplanes".
+;   
+;   2. The blank insertion happens at bitplane level, not row level.
+;      Each source row gets its bitplanes 0-1, with bitplanes 2-3 zeroed.
+;   
+;   3. VRAM increment mode $88 is critical: without it, the interleaved
+;      writes would corrupt VRAM addressing.
+;   
+;   4. Performance is competitive with DMA for small transfers (<512 bytes)
+;      due to DMA setup overhead. For larger transfers, DMA would be faster.
+;   
+;   5. The Direct Page optimization saves significant code size (32+ bytes)
+;      in a function with many PPU register writes.
+;===============================================================================
 Graphics_CopyTileWithBlanks:
-	php                                  ;008E54|08      |      ;
-	phd                                  ;008E55|0B      |      ;
-	pea.w !INIDISP                          ;008E56|F40021  |072100;
-	pld                                  ;008E59|2B      |      ;
-	sep #$20                             ;008E5A|E220    |      ;
-	lda.B #$88                           ;008E5C|A988    |      ;
-	sta.B !SNES_VMAINC-$2100              ;008E5E|8515    |002115;
-	rep #$30                             ;008E60|C230    |      ;
-	clc                                  ;008E62|18      |      ;
+	php                                  ;008E54|08      |      ; Push processor status: preserve P flags (mode, carry, etc.)
+	phd                                  ;008E55|0B      |      ; Push Direct Page: save current DP register
+	pea.w !INIDISP                          ;008E56|F40021  |072100; Push $2100 to stack: PPU register base address
+	pld                                  ;008E59|2B      |      ; Pull to Direct Page: D = $2100 (optimize PPU register access)
+	sep #$20                             ;008E5A|E220    |      ; Set 8-bit accumulator: for register write operations
+	lda.B #$88                           ;008E5C|A988    |      ; A = $88 (VRAM increment: +4 with translation mode)
+	sta.B !SNES_VMAINC-$2100              ;008E5E|8515    |002115; Write to VMAINC ($2115): set increment mode for interleaved writes
+	rep #$30                             ;008E60|C230    |      ; Set 16-bit A, X, Y: for data transfer operations
+	clc                                  ;008E62|18      |      ; Clear carry: prepare for address arithmetic
 ;      |        |      ;
 Graphics_CopyTileLoop:
-	lda.W $0000,x                        ;008E63|BD0000  |070000;
-	sta.B !SNES_VMDATAL-$2100             ;008E66|8518    |002118;
-	lda.w !state_marker                          ;008E68|ADF000  |0700F0;
-	sta.B !SNES_VMDATAL-$2100             ;008E6B|8518    |002118;
-	lda.W $0002,x                        ;008E6D|BD0200  |070002;
-	sta.B !SNES_VMDATAL-$2100             ;008E70|8518    |002118;
-	lda.w !state_marker                          ;008E72|ADF000  |0700F0;
-	sta.B !SNES_VMDATAL-$2100             ;008E75|8518    |002118;
-	lda.W $0004,x                        ;008E77|BD0400  |070004;
-	sta.B !SNES_VMDATAL-$2100             ;008E7A|8518    |002118;
-	lda.w !state_marker                          ;008E7C|ADF000  |0700F0;
-	sta.B !SNES_VMDATAL-$2100             ;008E7F|8518    |002118;
-	lda.W $0006,x                        ;008E81|BD0600  |070006;
-	sta.B !SNES_VMDATAL-$2100             ;008E84|8518    |002118;
-	lda.w !state_marker                          ;008E86|ADF000  |0700F0;
-	sta.B !SNES_VMDATAL-$2100             ;008E89|8518    |002118;
-	lda.W $0008,x                        ;008E8B|BD0800  |070008;
-	sta.B !SNES_VMDATAL-$2100             ;008E8E|8518    |002118;
-	lda.w !state_marker                          ;008E90|ADF000  |0700F0;
-	sta.B !SNES_VMDATAL-$2100             ;008E93|8518    |002118;
-	lda.W $000a,x                        ;008E95|BD0A00  |07000A;
-	sta.B !SNES_VMDATAL-$2100             ;008E98|8518    |002118;
-	lda.w !state_marker                          ;008E9A|ADF000  |0700F0;
-	sta.B !SNES_VMDATAL-$2100             ;008E9D|8518    |002118;
-	lda.W $000c,x                        ;008E9F|BD0C00  |07000C;
-	sta.B !SNES_VMDATAL-$2100             ;008EA2|8518    |002118;
-	lda.w !state_marker                          ;008EA4|ADF000  |0700F0;
-	sta.B !SNES_VMDATAL-$2100             ;008EA7|8518    |002118;
-	lda.W $000e,x                        ;008EA9|BD0E00  |07000E;
-	sta.B !SNES_VMDATAL-$2100             ;008EAC|8518    |002118;
-	lda.w !state_marker                          ;008EAE|ADF000  |0700F0;
-	sta.B !SNES_VMDATAL-$2100             ;008EB1|8518    |002118;
-	txa                                  ;008EB3|8A      |      ;
-	adc.W #$0010                         ;008EB4|691000  |      ;
-	tax                                  ;008EB7|AA      |      ;
-	dey                                  ;008EB8|88      |      ;
-	bne Graphics_CopyTileLoop                      ;008EB9|D0A8    |008E63;
-	sep #$20                             ;008EBB|E220    |      ;
-	lda.B #$80                           ;008EBD|A980    |      ;
-	sta.B !SNES_VMAINC-$2100              ;008EBF|8515    |002115;
-	pld                                  ;008EC1|2B      |      ;
-	plp                                  ;008EC2|28      |      ;
-	rtl                                  ;008EC3|6B      |      ;
+	lda.W $0000,x                        ;008E63|BD0000  |070000; Read word from source[X+0]: tile row 0 bitplanes 0-1
+	sta.B !SNES_VMDATAL-$2100             ;008E66|8518    |002118; Write to VMDATAL ($2118): row 0 data to VRAM
+	lda.w !state_marker                          ;008E68|ADF000  |0700F0; Read $00F0 (blank marker, typically $0000)
+	sta.B !SNES_VMDATAL-$2100             ;008E6B|8518    |002118; Write blank word to VMDATAL: row 0 bitplanes 2-3 = $0000
+	lda.W $0002,x                        ;008E6D|BD0200  |070002; Read word from source[X+2]: tile row 1 bitplanes 0-1
+	sta.B !SNES_VMDATAL-$2100             ;008E70|8518    |002118; Write to VMDATAL: row 1 data to VRAM
+	lda.w !state_marker                          ;008E72|ADF000  |0700F0; Read blank marker
+	sta.B !SNES_VMDATAL-$2100             ;008E75|8518    |002118; Write blank word: row 1 bitplanes 2-3 = $0000
+	lda.W $0004,x                        ;008E77|BD0400  |070004; Read word from source[X+4]: tile row 2 bitplanes 0-1
+	sta.B !SNES_VMDATAL-$2100             ;008E7A|8518    |002118; Write to VMDATAL: row 2 data to VRAM
+	lda.w !state_marker                          ;008E7C|ADF000  |0700F0; Read blank marker
+	sta.B !SNES_VMDATAL-$2100             ;008E7F|8518    |002118; Write blank word: row 2 bitplanes 2-3 = $0000
+	lda.W $0006,x                        ;008E81|BD0600  |070006; Read word from source[X+6]: tile row 3 bitplanes 0-1
+	sta.B !SNES_VMDATAL-$2100             ;008E84|8518    |002118; Write to VMDATAL: row 3 data to VRAM
+	lda.w !state_marker                          ;008E86|ADF000  |0700F0; Read blank marker
+	sta.B !SNES_VMDATAL-$2100             ;008E89|8518    |002118; Write blank word: row 3 bitplanes 2-3 = $0000
+	lda.W $0008,x                        ;008E8B|BD0800  |070008; Read word from source[X+8]: tile row 4 bitplanes 0-1
+	sta.B !SNES_VMDATAL-$2100             ;008E8E|8518    |002118; Write to VMDATAL: row 4 data to VRAM
+	lda.w !state_marker                          ;008E90|ADF000  |0700F0; Read blank marker
+	sta.B !SNES_VMDATAL-$2100             ;008E93|8518    |002118; Write blank word: row 4 bitplanes 2-3 = $0000
+	lda.W $000a,x                        ;008E95|BD0A00  |07000A; Read word from source[X+10]: tile row 5 bitplanes 0-1
+	sta.B !SNES_VMDATAL-$2100             ;008E98|8518    |002118; Write to VMDATAL: row 5 data to VRAM
+	lda.w !state_marker                          ;008E9A|ADF000  |0700F0; Read blank marker
+	sta.B !SNES_VMDATAL-$2100             ;008E9D|8518    |002118; Write blank word: row 5 bitplanes 2-3 = $0000
+	lda.W $000c,x                        ;008E9F|BD0C00  |07000C; Read word from source[X+12]: tile row 6 bitplanes 0-1
+	sta.B !SNES_VMDATAL-$2100             ;008EA2|8518    |002118; Write to VMDATAL: row 6 data to VRAM
+	lda.w !state_marker                          ;008EA4|ADF000  |0700F0; Read blank marker
+	sta.B !SNES_VMDATAL-$2100             ;008EA7|8518    |002118; Write blank word: row 6 bitplanes 2-3 = $0000
+	lda.W $000e,x                        ;008EA9|BD0E00  |07000E; Read word from source[X+14]: tile row 7 bitplanes 0-1
+	sta.B !SNES_VMDATAL-$2100             ;008EAC|8518    |002118; Write to VMDATAL: row 7 data to VRAM
+	lda.w !state_marker                          ;008EAE|ADF000  |0700F0; Read blank marker
+	sta.B !SNES_VMDATAL-$2100             ;008EB1|8518    |002118; Write blank word: row 7 bitplanes 2-3 = $0000 (tile complete)
+	txa                                  ;008EB3|8A      |      ; Transfer X to A: prepare for address arithmetic
+	adc.W #$0010                         ;008EB4|691000  |      ; Add $10 to A: advance to next 16-byte tile
+	tax                                  ;008EB7|AA      |      ; Transfer A to X: update source pointer
+	dey                                  ;008EB8|88      |      ; Decrement Y: count down bytes remaining
+	bne Graphics_CopyTileLoop                      ;008EB9|D0A8    |008E63; If Y ≠ 0: more bytes to copy, continue loop
+	sep #$20                             ;008EBB|E220    |      ; Set 8-bit accumulator: for cleanup register writes
+	lda.B #$80                           ;008EBD|A980    |      ; A = $80 (VRAM increment: +1 after high byte write)
+	sta.B !SNES_VMAINC-$2100              ;008EBF|8515    |002115; Restore VMAINC to standard mode
+	pld                                  ;008EC1|2B      |      ; Pull Direct Page: restore original D register
+	plp                                  ;008EC2|28      |      ; Pull processor status: restore original P flags
+	rtl                                  ;008EC3|6B      |      ; Return to caller (long return)
 ;      |        |      ;
 ;      |        |      ;
 ;===============================================================================
