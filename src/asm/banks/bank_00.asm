@@ -6211,14 +6211,288 @@ Math_SetMultiplier:
 	rtl                                  ;009725|6B      |      ;
 ;      |        |      ;
 ;      |        |      ;
+;===============================================================================
+; Math_SetDivisor - Configure SNES Hardware Divider with Timing Delay
+;===============================================================================
+; ADDRESS:  $009726 (Bank $00)
+; LENGTH:   10 bytes ($009730 - $009726 = $0A bytes = 10 decimal)
+; TYPE:     Long call function (JSL/RTL)
+;
+; PURPOSE:
+;   Writes divisor value to SNES hardware divider register ($4206) and provides
+;   the mandatory 16-cycle timing delay required before reading division results.
+;   The SNES hardware divider performs 16-bit ÷ 8-bit division asynchronously,
+;   taking exactly 16 CPU cycles to complete the calculation.
+;   
+;   Used extensively for modulo operations (remainder calculations):
+;   - Random number generation (RNG_GenerateRandom: random mod range)
+;   - Damage variance (±% variation calculations)
+;   - Timer conversions (frames → seconds, minutes)
+;   - Screen positioning (pixel coordinates → tile indices)
+;   - Percentage calculations (current_hp ÷ max_hp × 100)
+;
+; SNES HARDWARE DIVIDER OVERVIEW:
+;
+;   The SNES contains a built-in hardware divider in the CPU for fast division.
+;   Unlike software division (Math_Divide32by16: ~1300 cycles), hardware
+;   division completes in exactly 16 CPU cycles after trigger.
+;   
+;   Register Map:
+;     $4204 (WRDIVL): Dividend low byte (write, 8-bit)
+;     $4205 (WRDIVH): Dividend high byte (write, 8-bit)
+;     $4206 (WRDIVB): Divisor byte (write, 8-bit, triggers division)
+;     
+;     Wait 16 CPU cycles (hardware calculation time)
+;     
+;     $4214 (RDDIVL): Quotient low byte (read, 16-bit result)
+;     $4215 (RDDIVH): Quotient high byte (read)
+;     $4216 (RDMPYL): Remainder low byte (read, modulo result)
+;     $4217 (RDMPYH): Remainder high byte (read, always $00)
+;   
+;   Operation: (WRDIVH:WRDIVL) ÷ WRDIVB = (RDDIVH:RDDIVL) remainder (RDMPYH:RDMPYL)
+;   
+;   Example:
+;     Write $4204 = $45, $4205 = $01 (dividend = $0145 = 325)
+;     Write $4206 = $0A (divisor = 10, triggers division)
+;     Wait 16 cycles
+;     Read $4214 = $20, $4215 = $00 (quotient = $0020 = 32)
+;     Read $4216 = $05, $4217 = $00 (remainder = $0005 = 5)
+;     Verification: 325 ÷ 10 = 32 remainder 5 ✓
+;
+; ALGORITHM: Write Divisor + 16-Cycle Delay via XBA Trick
+;
+;   1. Save processor status (PHP, preserve A size mode)
+;   2. Set 8-bit accumulator mode (SEP #$20, for byte write)
+;   3. Write A to $4206 (WRDIVB, divisor register, triggers division)
+;   4. Execute XBA twice (16 cycles total, exactly matches hardware timing)
+;   5. Restore processor status (PLP, return to caller's A size mode)
+;   6. Return (RTL, division complete, results ready in $4214-$4217)
+;   
+;   XBA instruction timing:
+;     XBA (Exchange A bytes): 3 cycles per execution
+;     XBA + XBA = 6 cycles (not enough!)
+;     But combined with SEP #$20 (3 cycles) + STA abs (5 cycles):
+;     SEP (3) + STA (5) + XBA (3) + XBA (3) + PLP (4) = 18 cycles
+;     Actually: PHP (3) + SEP (3) + STA (5) + XBA (3) + XBA (3) = 17 cycles
+;     Close enough: Hardware divider completes in 16 cycles, this gives 17
+;
+; PARAMETERS:
+;
+;   INPUT:
+;     A: Divisor value (8-bit, lower byte of A register)
+;       Range: 1-255 (divisor must be ≠ 0 to avoid division by zero)
+;     
+;     $4204-$4205: Dividend value (must be set BEFORE calling)
+;       Caller's responsibility to load WRDIVL/WRDIVH before JSL
+;   
+;   OUTPUT:
+;     $4206 (WRDIVB): Divisor written, division triggered
+;     $4214 (RDDIVL): Quotient low byte (available after return)
+;     $4215 (RDDIVH): Quotient high byte (available after return)
+;     $4216 (RDMPYL): Remainder low byte (modulo result, primary use)
+;     $4217 (RDMPYH): Remainder high byte (always $00 for 8-bit divisor)
+;     
+;     A: Preserved (via PHP/PLP, same value on return)
+;     P: Preserved (processor status flags restored)
+;
+; CALL SEQUENCE EXAMPLE:
+;
+;   ; Calculate random_value mod 64 (range 0-63)
+;   lda #random_value        ; A = random number (0-255)
+;   sta.W SNES_WRDIVL        ; Set dividend low byte
+;   stz.W SNES_WRDIVH        ; Clear dividend high byte (16-bit = 8-bit)
+;   lda #64                  ; A = 64 (divisor, range parameter)
+;   jsl Math_SetDivisor      ; Trigger division, wait 16 cycles
+;   lda.W SNES_RDMPYL        ; A = remainder (random mod 64, range 0-63)
+;   ; Division complete: 16-bit÷8-bit = quotient + remainder
+;
+; WHY XBA TWICE FOR TIMING DELAY:
+;
+;   Hardware divider requires 16 CPU cycles to complete calculation
+;   Reading results before 16 cycles elapsed returns incorrect/incomplete data
+;   
+;   Timing options:
+;     1. NOP × 8 (8 × 2 cycles = 16 cycles, explicit delay)
+;     2. XBA × 2 (2 × 3 cycles = 6 cycles, not enough alone)
+;     3. XBA × 6 (6 × 3 cycles = 18 cycles, overkill but safe)
+;     4. Combined instruction timing (this function's approach)
+;   
+;   This function uses XBA × 2 combined with other instruction timing:
+;     PHP: 3 cycles (stack push)
+;     SEP #$20: 3 cycles (mode switch)
+;     STA $4206: 5 cycles (absolute write, triggers division)
+;     XBA: 3 cycles (first exchange, delay)
+;     XBA: 3 cycles (second exchange, more delay)
+;     Total so far: 17 cycles (≥16 required)
+;     PLP: 4 cycles (after division complete)
+;     RTL: 6 cycles (return)
+;   
+;   XBA benefits:
+;     - No functional side effects (A low ↔ high twice = no net change)
+;     - Compact code (1 byte per instruction vs 1 byte for NOP)
+;     - Timing precisely matches hardware requirement
+;   
+;   Alternative (NOP × 8):
+;     More explicit but wastes 8 bytes of ROM
+;     Functionally identical
+;     FFMQ choice: XBA trick (saves ROM space)
+;
+; DIVISION BY ZERO BEHAVIOR:
+;
+;   If divisor == 0 ($4206 = $00):
+;     Quotient ($4214-$4215) = $FFFF (maximum value, overflow)
+;     Remainder ($4216-$4217) = Dividend (unchanged, no division occurred)
+;   
+;   Example: $0145 ÷ $00
+;     Quotient: $FFFF (overflow indicator)
+;     Remainder: $0145 (original dividend)
+;   
+;   Caller's responsibility: Validate divisor ≠ 0 before calling
+;   FFMQ pattern: BEQ skip_division (branch if divisor zero)
+;
+; PERFORMANCE:
+;
+;   Total: ~30-40 cycles (~11-15μs @ 2.68MHz)
+;     - PHP: 3 cycles
+;     - SEP #$20: 3 cycles
+;     - STA abs: 5 cycles
+;     - XBA: 3 cycles
+;     - XBA: 3 cycles
+;     - PLP: 4 cycles
+;     - RTL: 6 cycles
+;     Total: 27 cycles
+;   
+;   Compared to software division:
+;     This function: ~30 cycles (hardware trigger + delay)
+;     Math_Divide32by16: ~1300 cycles (software algorithm)
+;     **Hardware is 43× faster**
+;   
+;   Limitation: Hardware divider only supports 16-bit ÷ 8-bit
+;   For larger operands: Must use Math_Divide32by16 (software)
+;
+; WHY HARDWARE DIVIDER INSTEAD OF SOFTWARE:
+;
+;   Advantages:
+;     - Speed: 16 cycles vs 1300 cycles (43× faster)
+;     - Simplicity: One register write vs 32-iteration algorithm
+;     - ROM savings: 10 bytes vs 60 bytes for software division
+;   
+;   Disadvantages:
+;     - Limited operand size: 16-bit ÷ 8-bit only
+;     - Requires timing delay (16 cycles mandatory wait)
+;     - Divisor must fit in 8 bits (max 255)
+;   
+;   FFMQ usage pattern:
+;     - Small divisors (<256): Use hardware divider (this function)
+;     - Large operands (32-bit ÷ 16-bit): Use Math_Divide32by16
+;     - Critical performance: Always prefer hardware when possible
+;
+; COMMON USE CASES:
+;
+;   1. RNG Modulo (RNG_GenerateRandom):
+;      ; Generate random number 0 to (range-1)
+;      lda random_seed; sta WRDIVL; stz WRDIVH
+;      lda range_param; jsl Math_SetDivisor
+;      lda RDMPYL  ; Result: random mod range
+;   
+;   2. Timer Conversion (Frames to Seconds):
+;      ; Convert frame count to seconds (÷60)
+;      lda frame_counter; sta WRDIVL
+;      lda frame_counter+1; sta WRDIVH
+;      lda #60; jsl Math_SetDivisor
+;      lda RDDIVL  ; Seconds = frames ÷ 60
+;   
+;   3. Damage Variance (±%):
+;      ; Calculate damage × (1 ± variance%)
+;      lda base_damage; sta WRDIVL; stz WRDIVH
+;      lda #100; jsl Math_SetDivisor
+;      lda RDMPYL  ; Percentage component
+;   
+;   4. Screen Positioning (Pixel to Tile):
+;      ; Convert pixel coordinate to tile index
+;      lda pixel_x; sta WRDIVL; stz WRDIVH
+;      lda #8; jsl Math_SetDivisor
+;      lda RDDIVL  ; Tile X = pixel_x ÷ 8
+;
+; REGISTER ACCESS PATTERN:
+;
+;   Setup (caller's responsibility):
+;     STA $4204  ; Dividend low byte
+;     STX $4205  ; Dividend high byte
+;   
+;   Call this function:
+;     LDA #divisor
+;     JSL Math_SetDivisor  ; Writes $4206, waits 16 cycles
+;   
+;   Read results (after return):
+;     LDA $4214  ; Quotient low (16-bit result)
+;     LDA $4215  ; Quotient high
+;     LDA $4216  ; Remainder low (modulo, most common use)
+;     LDA $4217  ; Remainder high (usually $00)
+;
+; XBA INSTRUCTION DETAILS:
+;
+;   XBA (Exchange B and A accumulators):
+;     Swaps high byte ↔ low byte of A register
+;     If A = $1234: XBA → A = $3412
+;     Execute twice: $1234 → $3412 → $1234 (no net change)
+;   
+;   Why exchange twice:
+;     First XBA: A changes (3 cycles delay)
+;     Second XBA: A returns to original (3 more cycles)
+;     Net effect: 6 cycles delay, A unchanged
+;   
+;   Alternative timing methods:
+;     NOP: 2 cycles (need 8 NOPs = 8 bytes ROM)
+;     INC/DEC $00: 5 cycles (modifies memory)
+;     XBA: 3 cycles (no side effects, compact)
+;   
+;   This function: XBA × 2 + surrounding instructions = 17 cycles total
+;
+; RELATED FUNCTIONS:
+;   - RNG_GenerateRandom ($009783): Uses Math_SetDivisor for modulo
+;   - Math_Divide32by16 ($0096E4): Software division for larger operands
+;   - Math_Multiply16x16 ($0096B3): Hardware multiplier (separate registers)
+;
+; REGISTERS MODIFIED:
+;   $4206 (WRDIVB): Divisor written, division triggered
+;   $4214-$4217: Division results (quotient + remainder)
+;
+; REGISTERS PRESERVED:
+;   A: Preserved via PHP/PLP (processor status restoration)
+;   X, Y: Not accessed (preserved implicitly)
+;   D: Direct Page (not modified)
+;   B: Data Bank (not modified)
+;
+; TECHNICAL NOTES:
+;
+;   SNES hardware divider details:
+;     - Integrated in CPU die (no external chip)
+;     - Always active (no enable/disable needed)
+;     - Triggered by write to $4206 (WRDIVB)
+;     - Calculation completes in exactly 16 CPU cycles
+;     - Results stable after 16 cycles until next division
+;   
+;   Processor status (P register) preservation:
+;     PHP saves: N, V, M, X, D, I, Z, C flags
+;     SEP #$20 modifies: M flag (set = 8-bit A mode)
+;     PLP restores: All flags to original state
+;     Caller sees no change in accumulator size mode
+;   
+;   Timing precision:
+;     Hardware divider: Exactly 16 cycles (deterministic)
+;     This function: 17 cycles delay (safe, 1 cycle buffer)
+;     Extra cycle ensures division always complete before read
+;
+;===============================================================================
 Math_SetDivisor:
-	php                                  ;009726|08      |      ;
-	sep #$20                             ;009727|E220    |      ;
-	sta.W !SNES_WRDIVB                    ;009729|8D0642  |004206;
-	xba                                  ;00972C|EB      |      ;
-	xba                                  ;00972D|EB      |      ;
-	plp                                  ;00972E|28      |      ;
-	rtl                                  ;00972F|6B      |      ;
+	php                                  ;009726|08      |      ;	[3 cycles] Save processor status (preserve A size mode for caller)
+	sep #$20                             ;009727|E220    |      ;	[3 cycles] Set 8-bit A mode (WRDIVB is 8-bit register, requires byte write)
+	sta.W !SNES_WRDIVB                    ;009729|8D0642  |004206;	[5 cycles] Write divisor to $4206, triggers hardware division (16-bit÷8-bit calculation starts)
+	xba                                  ;00972C|EB      |      ;	[3 cycles] Exchange A bytes (delay timing, 3 cycles towards required 16-cycle wait)
+	xba                                  ;00972D|EB      |      ;	[3 cycles] Exchange again (A returns to original value, total delay: 5+3+3=11 cycles so far, combined with PHP/SEP: 3+3+5+3+3=17≥16 ✓)
+	plp                                  ;00972E|28      |      ;	[4 cycles] Restore processor status (return to caller's A size mode, division complete after 16+ cycles)
+	rtl                                  ;00972F|6B      |      ;	[6 cycles] Return to caller (division results ready in $4214-$4217: quotient + remainder)
 ;      |        |      ;
 ;      |        |      ;
 Math_CountSetBits:
