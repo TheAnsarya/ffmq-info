@@ -16194,11 +16194,11 @@ ColorSelect_StoreSelection:
 ColorSelect_UpdateDisplay:
 	sty.B $03                            ;00C29D|8403    |000003;
 	sta.B $01                            ;00C29F|8501    |000001;
-	lda.W DATA8_00c339,x                 ;00C2A1|BD39C3  |00C339;
+	lda.W ColorSelect_PaletteData1,x     ;00C2A1|BD39C3  |00C339; Load palette byte 1
 	sta.L $7f56d7                        ;00C2A4|8FD7567F|7F56D7;
-	lda.W DATA8_00c33a,x                 ;00C2A8|BD3AC3  |00C33A;
+	lda.W ColorSelect_PaletteData2,x     ;00C2A8|BD3AC3  |00C33A; Load palette byte 2
 	sta.L $7f56d9                        ;00C2AB|8FD9567F|7F56D9;
-	lda.W DATA8_00c33b,x                 ;00C2AF|BD3BC3  |00C33B;
+	lda.W ColorSelect_PaletteData3,x     ;00C2AF|BD3BC3  |00C33B; Load palette byte 3
 	sta.L $7f56db                        ;00C2B2|8FDB567F|7F56DB;
 ;      |        |      ;
 ColorSelect_RefreshColors:
@@ -16288,14 +16288,15 @@ ColorSelect_StoreBlue:
 	tsb.w !menu_color                          ;00C334|0C9C0E  |000E9C;
 	bra ColorSelect_PlaySound                      ;00C337|80B2    |00C2EB;
 ;      |        |      ;
-;      |        |      ;
-DATA8_00c339:
+; Color selection palette data tables
+; Indexed by X, loaded into $7F56D7/D9/DB palette buffers
+ColorSelect_PaletteData1:
 	db $1f                               ;00C339|        |      ;
 ;      |        |      ;
-DATA8_00c33a:
+ColorSelect_PaletteData2:
 	db $20                               ;00C33A|        |      ;
 ;      |        |      ;
-DATA8_00c33b:
+ColorSelect_PaletteData3:
 	db $78,$3f,$20,$58,$5f,$20,$38,$7f,$38,$00,$94,$92,$03;00C33B|        |      ;
 	lda.W #$0301                         ;00C348|A90103  |      ;
 	sta.B $03                            ;00C34B|8503    |000003;
