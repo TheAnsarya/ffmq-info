@@ -2018,7 +2018,7 @@ DATA8_05f72d:
 	db $1d,$1b,$28,$82                   ;05F918|        |      ;
 	db $30,$52,$17,$a7                   ;05F91C|        |05F970;
 ;      |        |      ;
-UNREACH_05F920:
+Overworld_DeadCode_SpriteOffsetTable:
 	db $00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00;05F920|        |      ;
 	db $00,$00,$09,$00,$1b,$00,$30,$00,$42,$00;05F92E|        |      ;
 	db $4e,$00                           ;05F938|        |004E00;
@@ -2050,7 +2050,7 @@ UNREACH_05F920:
 DATA8_05f9f8:
 	db $18,$13                           ;05F9F8|        |      ;
 ;      |        |      ;
-UNREACH_05F9FA:
+Overworld_DeadCode_NPCData:
 	db $00                               ;05F9FA|        |      ;
 	db $1b,$27,$01                       ;05F9FB|        |      ;
 	db $13,$2b,$01                       ;05F9FE|        |00002B;

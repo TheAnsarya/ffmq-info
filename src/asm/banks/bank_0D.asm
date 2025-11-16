@@ -205,7 +205,7 @@ SPC_DirectCommand:
 	jmp.W SPC_PlaySound                    ;0D8172|4CBA85  |0D85BA;
 ;      |        |      ;
 ;      |        |      ;
-UNREACH_0D8175:
+SPC_DeadCode_JumpAddr:
 	db $4c,$0e,$86                       ;0D8175|        |0D860E;
 ;      |        |      ;
 SPC_Return:
@@ -1862,13 +1862,13 @@ DATA8_0d9d78:
 	db $ff,$ff,$ff,$ff,$ff,$ff,$ff,$ff,$ff,$ff,$ff,$ff,$ff,$ff,$ff,$ff;0DBD98|        |      ;
 	db $ff,$ff,$ff,$ff,$ff,$ff           ;0DBDA8|        |      ;
 ;      |        |      ;
-UNREACH_0DBDAE:
+Music_DeadCode_TrackPointer1:
 	db $0d                               ;0DBDAE|        |000E85;
 ;      |        |      ;
-UNREACH_0DBDAF:
+Music_DeadCode_TrackPointer2:
 	db $85                               ;0DBDAF|        |00000E;
 ;      |        |      ;
-UNREACH_0DBDB0:
+Music_DeadCode_TrackTable:
 	db $0e                               ;0DBDB0|        |008573;
 	db $73,$85,$0e,$69,$8b,$0e           ;0DBDB1|        |      ;
 	db $21,$93,$0e                       ;0DBDB7|        |000093;
@@ -1906,7 +1906,7 @@ DATA8_0dbe7d:
 	db $ff,$84,$cf,$68,$8f,$b8,$a7,$c0,$ff,$d4,$9f,$a4,$bf,$ac,$af,$11;0DBE8D|        |      ;
 	db $ff,$b2,$ff,$e0                   ;0DBE9D|        |      ;
 ;      |        |      ;
-UNREACH_0DBEA1:
+Music_DeadCode_InstrumentMap:
 	db $00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00;0DBEA1|        |      ;
 	db $00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00;0DBEB1|        |      ;
 	db $02,$00,$0b,$00,$07,$00,$0d,$00,$11,$00,$10,$00,$0a,$00,$0e,$00;0DBEC1|        |      ;

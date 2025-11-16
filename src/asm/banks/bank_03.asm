@@ -1632,6 +1632,8 @@ UNREACH_03D5E5:
 	db $36,$eb,$54,$eb                   ;03D67D|        |      ;
 	db $63,$eb                           ;03D681|        |0000EB;
 	db $63,$eb                           ;03D683|        |      ;
+;      |        |      ;
+Tileset_DeadCode_PointerTable:
 	db $78,$ec,$f7,$ec,$07,$ed,$2b,$ed,$2b,$ed,$77,$ed,$b2,$ed,$e8,$ed;03D685|        |      ;
 	db $eb,$ed,$08,$ee,$19,$ee,$31,$ee,$cb,$ee,$30,$f3,$36,$f3,$59,$f3;03D695|        |      ;
 	db $31,$f4,$31,$f4,$44,$f4,$7f,$f4,$a5,$f4,$bc,$f4,$e1,$f4,$e4,$f4;03D6A5|        |0000F4;

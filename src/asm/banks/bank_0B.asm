@@ -195,7 +195,7 @@ DATA8_0b8140:
 	db $88                               ;0B8142|        |      ;
 	db $85                               ;0B8143|        |      ;
 ;      |        |      ;
-UNREACH_0B8144:
+Battle_DeadCode_OpacityTable:
 	db $0f                               ;0B8144|        |6F4F2F;
 	db $2f,$4f,$6f,$8f                   ;0B8145|        |      ;
 ;      |        |      ;
@@ -682,7 +682,7 @@ LoadEnemySpriteTiles:
 	rtl                                  ;0B853F|6B      |      ;
 ;      |        |      ;
 ;      |        |      ;
-UNREACH_0B8540:
+Animation_DeadCode_CoordPairTable:
 	db $10,$10,$20,$10,$30,$10,$40,$10,$10,$20;0B8540|        |0B8552;
 	db $20,$20,$30,$20,$40,$20           ;0B854A|        |      ;
 	db $10,$30,$20,$30,$30,$30           ;0B8550|        |0B8582;
@@ -1748,7 +1748,7 @@ UpdateBattleSprites:
 	rtl                                  ;0B9384|6B      |      ;
 ;      |        |      ;
 ;      |        |      ;
-UNREACH_0B9385:
+Animation_DeadCode_VRAMOffsetTable:
 	db $24,$d8                           ;0B9385|        |0000D8;
 	db $74,$d8,$64,$d8,$54,$d8,$44,$d8,$74,$d8,$64,$d8;0B9387|        |      ;
 	db $54,$d8,$44,$d8,$8b,$0b,$08,$4b,$ab,$f4,$00,$0b,$2b,$e2,$20,$c2;0B9393|        |      ;
@@ -3157,7 +3157,7 @@ UNREACH_0B9385:
 	db $fc,$14,$ec,$04,$fc,$0c,$fc,$08,$f8,$88,$f8,$90,$f0,$e0,$e0,$ec;0BEB35|        |0BEC14;
 	db $ec,$ec,$d4,$d8,$58,$70,$e0       ;0BEB45|        |00D4EC;
 ;      |        |      ;
-UNREACH_0BEB4C:
+Animation_DeadCode_FrameSequence:
 	db $8b,$00,$ff                       ;0BEB4C|        |      ;
 	db $8c,$00,$9f,$08,$19,$2a,$19,$2b,$19,$2c,$19,$2d,$19,$2a,$19,$2b;0BEB4F|        |      ;
 	db $19,$2c,$19,$2d,$19,$2e,$ff,$8d   ;0BEB5F|        |      ;
