@@ -22519,10 +22519,12 @@ Graphics_FillTiles_Store:
 	db $18,$fb,$20,$47,$82,$a9,$01,$8f,$67,$36,$7e,$3a,$8f,$65,$36,$7e;00F121|        |      ;
 	db $8f,$66,$36,$7e,$22,$00,$80,$0d,$4c,$23,$80;00F131|        |7E3666;
 ;      |        |      ;
-DATA8_00f13c:
+; Sprite tile and attribute data tables
+; Used by Field_ProcessEntities for entity rendering
+Sprite_TileIndexTable:
 	db $0c                               ;00F13C|        |      ;
 ;      |        |      ;
-DATA8_00f13d:
+Sprite_AttributeTable:
 	db $00,$0d,$00,$0f,$40,$0e,$40,$0c,$00,$0d,$00,$0e,$00,$0f,$00,$05;00F13D|        |      ;
 	db $40,$04,$40,$07,$40,$06,$40,$09,$40,$08,$40,$0b,$40,$0a,$40,$00;00F14D|        |      ;
 	db $00,$01,$00,$02,$00,$03,$00,$00,$00,$01,$00,$03,$40,$02,$40,$04;00F15D|        |      ;
@@ -22544,16 +22546,18 @@ DATA8_00f13d:
 	db $38,$00,$39,$00,$3a,$00,$3b,$00,$34,$00,$35,$00,$36,$00,$37,$00;00F234|        |      ;
 	db $54,$00,$55,$00,$56,$00,$57,$00   ;00F244|        |      ;
 ;      |        |      ;
-DATA8_00f24c:
+; Character animation frame data tables
+; 3-byte entries: [tile_offset, Y_offset, X_offset]
+Anim_DirectionOffsetTable:
 	db $00,$00,$60,$00,$c0,$00,$20,$01   ;00F24C|        |      ;
 ;      |        |      ;
-DATA8_00f254:
+Anim_TileOffsetTable:
 	db $00                               ;00F254|        |      ;
 ;      |        |      ;
-DATA8_00f255:
+Anim_YOffsetTable:
 	db $00                               ;00F255|        |      ;
 ;      |        |      ;
-DATA8_00f256:
+Anim_XOffsetTable:
 	db $fd,$00,$00,$fa,$00,$00,$f7,$08,$00,$f4,$08,$00,$f1,$08,$00,$ee;00F256|        |      ;
 	db $08,$00,$ec,$08,$00,$ea,$08,$00,$e8,$08,$00,$e6,$08,$00,$e5,$08;00F266|        |      ;
 	db $00,$e4,$08,$00,$e3,$08,$00,$e2,$08,$00,$e1,$08,$00,$e0,$08,$00;00F276|        |      ;

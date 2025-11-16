@@ -1533,9 +1533,9 @@ Field_ProcessEntities:
 	pha                                  ;018D39|48      |      ;
 	lda.w !graphics_state_param                          ;018D3A|AD9319  |011993;
 	clc                                  ;018D3D|18      |      ;
-	adc.L DATA8_00f13c,x                 ;018D3E|7F3CF100|00F13C;
+	adc.L Sprite_TileIndexTable,x        ;018D3E|7F3CF100|00F13C; Load sprite tile index
 	sta.W $0c02,y                        ;018D42|99020C  |010C02;
-	lda.L DATA8_00f13d,x                 ;018D45|BF3DF100|00F13D;
+	lda.L Sprite_AttributeTable,x        ;018D45|BF3DF100|00F13D; Load sprite attributes
 	ora.W $19b2                          ;018D49|0DB219  |0119B2;
 	ora.W $198b                          ;018D4C|0D8B19  |01198B;
 	sta.W $0c03,y                        ;018D4F|99030C  |010C03;
@@ -1568,9 +1568,9 @@ Field_EntityUpdate:
 	pha                                  ;018D7C|48      |      ;
 	lda.w !graphics_state_param                          ;018D7D|AD9319  |011993;
 	clc                                  ;018D80|18      |      ;
-	adc.L DATA8_00f13c,x                 ;018D81|7F3CF100|00F13C;
+	adc.L Sprite_TileIndexTable,x        ;018D81|7F3CF100|00F13C; Load sprite tile index
 	sta.W $0c02,y                        ;018D85|99020C  |010C02;
-	lda.L DATA8_00f13d,x                 ;018D88|BF3DF100|00F13D;
+	lda.L Sprite_AttributeTable,x        ;018D88|BF3DF100|00F13D; Load sprite attributes
 	bit.B #$01                           ;018D8C|8901    |      ;
 	beq Field_EntityCheck                      ;018D8E|F006    |018D96;
 	dec a;018D90|3A      |      ;
@@ -3498,7 +3498,7 @@ Char_ClampVelocity:
 	and.W #$0003                         ;019D60|290300  |      ;
 	asl a;019D63|0A      |      ;
 	tax                                  ;019D64|AA      |      ;
-	lda.L DATA8_00f24c,x                 ;019D65|BF4CF200|00F24C;
+	lda.L Anim_DirectionOffsetTable,x    ;019D65|BF4CF200|00F24C; Load animation offset by direction
 	sta.W $194f                          ;019D69|8D4F19  |01194F;
 	ldx.W #$0000                         ;019D6C|A20000  |      ;
 	stx.w !battle_init_flag                          ;019D6F|8E5119  |011951;
@@ -3547,11 +3547,11 @@ Char_AnimationLoop:
 	lda.B #$00                           ;019DC9|A900    |      ;
 	xba                                  ;019DCB|EB      |      ;
 	ldx.W $194f                          ;019DCC|AE4F19  |01194F;
-	lda.L DATA8_00f255,x                 ;019DCF|BF55F200|00F255;
+	lda.L Anim_YOffsetTable,x            ;019DCF|BF55F200|00F255; Load Y offset
 	sta.W $199a                          ;019DD3|8D9A19  |01199A;
-	lda.L DATA8_00f256,x                 ;019DD6|BF56F200|00F256;
+	lda.L Anim_XOffsetTable,x            ;019DD6|BF56F200|00F256; Load X offset
 	sta.W $1999                          ;019DDA|8D9919  |011999;
-	lda.L DATA8_00f254,x                 ;019DDD|BF54F200|00F254;
+	lda.L Anim_TileOffsetTable,x         ;019DDD|BF54F200|00F254; Load tile offset
 	inx                                  ;019DE1|E8      |      ;
 	inx                                  ;019DE2|E8      |      ;
 	inx                                  ;019DE3|E8      |      ;
@@ -5878,7 +5878,7 @@ Collision_FlagEnd:
 ;      |        |      ;
 Collision_ProcessTile:
 	rep #$30                             ;01AEB0|C230    |      ;
-	lda.W DATA8_00f13c,y                 ;01AEB2|B93CF1  |00F13C;
+	lda.W Sprite_TileIndexTable,y        ;01AEB2|B93CF1  |00F13C; Load tile index
 	iny                                  ;01AEB5|C8      |      ;
 	and.W #$00ff                         ;01AEB6|29FF00  |      ;
 	clc                                  ;01AEB9|18      |      ;
@@ -5891,7 +5891,7 @@ Collision_ProcessTile:
 	sta.B $02,x                          ;01AEC7|9502    |001A74;
 	xba                                  ;01AEC9|EB      |      ;
 	ora.B $02,x                          ;01AECA|1502    |001A74;
-	ora.W DATA8_00f13c,y                 ;01AECC|193CF1  |00F13C;
+	ora.W Sprite_TileIndexTable,y        ;01AECC|193CF1  |00F13C; OR with next tile index
 	iny                                  ;01AECF|C8      |      ;
 	sta.B $02,x                          ;01AED0|9502    |001A74;
 	inx                                  ;01AED2|E8      |      ;
