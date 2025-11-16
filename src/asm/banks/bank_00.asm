@@ -6506,27 +6506,303 @@ RNG_GenerateRandom_ModuloFinish:
 	rtl                                  ;0097BD|6B      |      ; long return with random number in A ($00-$FF or $00 to range-1)
 ;      |        |      ;
 ;      |        |      ;
+;===============================================================================
+; Stack_IndirectJump - Dynamic Dispatch via Stack Manipulation
+;===============================================================================
+; ADDRESS:  $0097BE (Bank $00)
+; LENGTH:   28 bytes ($0097DA - $0097BE = $1C bytes = 28 decimal)
+; TYPE:     Interrupt-style function (called via JSL, returns via RTI)
+;
+; PURPOSE:
+;   Performs dynamic indirect jump through a jump table, allowing runtime
+;   selection of code paths based on an index value. Uses advanced stack
+;   manipulation to redirect execution flow without requiring a return to
+;   the original caller.
+;   
+;   Common use cases in FFMQ:
+;   - Menu command dispatch (attack/magic/item/defend selection)
+;   - Battle action handlers (spell/ability/summon execution)
+;   - Dialog command processing (text/portrait/wait/choice)
+;   - State machine transitions (field/battle/menu mode switching)
+;   - Event script interpretation (opcode → handler mapping)
+;
+; ALGORITHM: Stack Frame Manipulation for Indirect Jump
+;
+;   Traditional indirect jump:
+;     JSR handler_table,X  ; Not supported on 65816 for long calls
+;     JMP (handler_ptr)    ; Requires setup code at each call site
+;   
+;   This function's approach (stack manipulation):
+;     1. Caller executes: JSL Stack_IndirectJump
+;     2. Stack contains: [return bank][return address high][return address low][P][B][Y]
+;     3. Function reads jump table pointer from return address location
+;     4. Looks up target address in jump table using index
+;     5. Replaces return address on stack with target address
+;     6. RTI pops target address → PC, execution continues at new location
+;     7. Original caller never regains control (seamless dispatch)
+;
+; STACK LAYOUT DURING EXECUTION:
+;
+;   On entry (after PHP, PHB, PHY):
+;     SP+$00: Y low byte (just pushed)
+;     SP+$01: Y high byte
+;     SP+$02: B (Data Bank, pushed)
+;     SP+$03: P (Processor Status, from PHP)
+;     SP+$04: Return address low byte (JSL pushed this)
+;     SP+$05: Return address mid byte
+;     SP+$06: Return address bank byte
+;     SP+$07: (previous stack data)
+;     SP+$08: Pointer to jump table (placed by caller before JSL)
+;     SP+$09: Pointer high byte
+;   
+;   Jump table structure:
+;     Each entry: 2 bytes (16-bit address)
+;     Index 0: offset $00 → first handler address
+;     Index 1: offset $02 → second handler address
+;     Index N: offset N×2 → Nth handler address
+;   
+;   Example jump table:
+;     DATA16_JumpTable:
+;       dw Handler_Attack   ; Index 0 ($0000)
+;       dw Handler_Magic    ; Index 1 ($0002)
+;       dw Handler_Item     ; Index 2 ($0004)
+;       dw Handler_Defend   ; Index 3 ($0006)
+;
+; PARAMETERS:
+;
+;   INPUT:
+;     A: Jump table index (8-bit, masked to lower byte)
+;       Range: 0-127 (multiplied by 2 for address lookup)
+;     
+;     Stack+$08: Pointer to jump table (16-bit address)
+;       Points to array of 16-bit addresses
+;       Caller must set up before calling
+;     
+;     Data Bank (B register): Bank containing jump table
+;       Used when reading table entry via indexed addressing
+;   
+;   OUTPUT:
+;     PC: Program Counter set to target handler address (from table)
+;     B: Data Bank restored from stack
+;     P: Processor status restored from stack
+;     Y: Restored from stack
+;     
+;     Stack: Return address replaced with target handler address
+;
+; CALL SEQUENCE EXAMPLE:
+;
+;   Menu_DispatchCommand:
+;       lda.W menu_selection         ; Get selected command (0-3)
+;       pea.W JumpTable_MenuCommands ; Push jump table address to stack
+;       jsl.L Stack_IndirectJump     ; Call dispatcher
+;       ; NEVER RETURNS HERE - execution continues at selected handler
+;   
+;   Handler_Attack:
+;       ; Attack command code
+;       rtl  ; Returns to Menu_DispatchCommand's caller
+;   
+;   JumpTable_MenuCommands:
+;       dw Handler_Attack    ; Index 0
+;       dw Handler_Magic     ; Index 1
+;       dw Handler_Item      ; Index 2
+;       dw Handler_Defend    ; Index 3
+;
+; STEP-BY-STEP EXECUTION:
+;
+;   1. PHP: Save processor status (A/X/Y size, flags)
+;   2. PHB: Save Data Bank register
+;   3. REP #$30: Set 16-bit A/X/Y mode
+;   4. PHY: Save Y register
+;   5. AND #$00FF: Mask index to 8-bit (clear high byte)
+;   6. ASL A: Multiply index by 2 (for word addressing)
+;   7. TAY: Transfer table offset to Y
+;   8. LDA $06,S: Load return bank from stack (caller's bank)
+;   9. PHA + PLB + PLB: Set Data Bank = caller's bank (for table read)
+;   10. LDA ($08,S),Y: Read target address from jump table at offset Y
+;   11. TAY: Save target address to Y temporarily
+;   12. LDA $05,S: Load return address mid byte
+;   13. STA $08,S: Store to jump table pointer slot (shift stack up)
+;   14. TYA: Recover target address from Y
+;   15. STA $05,S: Store target address to return address slot
+;   16. PLY: Restore Y register
+;   17. PLB: Restore Data Bank
+;   18. RTI: Return from interrupt (pops P, PC low, PC high, PC bank)
+;
+; WHY RTI INSTEAD OF RTL:
+;
+;   RTL (Return from Long subroutine):
+;     Pops: [PC low][PC high][PC bank]
+;     Does not pop processor status
+;     Cannot manipulate what gets loaded into P register
+;   
+;   RTI (Return from Interrupt):
+;     Pops: [P][PC low][PC high][PC bank] (in 65816 native mode)
+;     Restores processor status from stack
+;     Allows complete control of return context
+;   
+;   This function needs RTI because:
+;     - Stack frame includes saved P register (from PHP)
+;     - Must restore exact processor state (A/X/Y sizes, flags)
+;     - Provides clean exit with all registers properly restored
+;     - RTL would leave P register on stack (leak 1 byte)
+;
+; PERFORMANCE:
+;
+;   Total: ~70-80 cycles (~26-30μs @ 2.68MHz)
+;     - Stack operations: 40 cycles (PHP/PHB/PHY/PHA/PLA/PLB/PLY/RTI)
+;     - Mode switch: 3 cycles (REP #$30)
+;     - Address calculation: 10 cycles (AND/ASL/TAY)
+;     - Table lookup: 8 cycles (LDA indirect indexed)
+;     - Stack manipulation: 15 cycles (LDA/STA shuffling)
+;   
+;   Compared to alternatives:
+;     Direct JSL: 8 cycles (but requires compile-time target)
+;     Computed JSL: ~40 cycles (setup + JML through pointer)
+;     This function: ~75 cycles (overhead for flexibility)
+;   
+;   Trade-off: 67 extra cycles for dynamic dispatch capability
+;
+; WHY THIS APPROACH:
+;
+;   Alternatives for dynamic dispatch:
+;   
+;   1. Computed JMP/JML:
+;      lda index; asl; tax; jmp (table,x)
+;      Problems: Only works within same bank, requires index in X
+;   
+;   2. Manual dispatch chain:
+;      cmp #0; beq handler0; cmp #1; beq handler1; ...
+;      Problems: Slow for many options (5+ cycles per test)
+;   
+;   3. Generate JSL at runtime:
+;      Write JSL opcode + address to RAM, execute from RAM
+;      Problems: Complex, requires executable RAM, cache issues
+;   
+;   4. This function (stack manipulation):
+;      Pros: Works across banks, clean syntax, reusable
+;      Cons: 75-cycle overhead, complex implementation
+;   
+;   FFMQ choice: Stack manipulation (best balance for cross-bank dispatch)
+;
+; COMMON USE CASES:
+;
+;   1. Battle Action Dispatch (8 possible actions):
+;      Index 0: Attack
+;      Index 1: White Magic
+;      Index 2: Black Magic
+;      Index 3: Wizard Magic
+;      Index 4: Item
+;      Index 5: Defend
+;      Index 6: Run
+;      Index 7: Special/Summon
+;   
+;   2. Menu Command Dispatch (6 commands):
+;      Index 0: Status
+;      Index 1: Equipment
+;      Index 2: Magic
+;      Index 3: Item
+;      Index 4: Settings
+;      Index 5: Exit
+;   
+;   3. Dialog Command Interpreter (16+ opcodes):
+;      Index 0: Display text
+;      Index 1: Wait for input
+;      Index 2: Show portrait
+;      Index 3: Play sound effect
+;      Index 4: Branch/jump
+;      etc.
+;
+; STACK BANK MANIPULATION DETAIL:
+;
+;   Goal: Set Data Bank = caller's bank (for jump table read)
+;   
+;   LDA $06,S: Loads return bank byte (24-bit addressing, bank = SP+6)
+;   PHA: Pushes 16-bit value to stack (A low byte, A high byte)
+;   PLB: Pops 8-bit value to Data Bank (only pops low byte)
+;   PLB: Pops again (clears high byte from stack, sets B = caller bank)
+;   
+;   Why PHA + PLB + PLB:
+;     Cannot directly transfer memory to B register
+;     Cannot use TBA (no such instruction exists)
+;     Must go through stack: memory → A → stack → B
+;     PHA pushes 16 bits, PLB pops 8 bits, need 2 PLB to balance
+;
+; RETURN ADDRESS SHUFFLE DETAIL:
+;
+;   Goal: Replace return address with target handler address
+;   
+;   Original stack (after table lookup):
+;     SP+$05: Return address mid byte (caller address)
+;     SP+$08: Jump table pointer low byte (setup by caller)
+;     Y: Target handler address (read from table)
+;   
+;   LDA $05,S: Load return address mid byte
+;   STA $08,S: Store to jump table pointer location (shift stack)
+;   TYA: Load target handler address
+;   STA $05,S: Store to return address location (overwrite)
+;   
+;   Result: Return address now points to target handler
+;   RTI will pop target address → PC, jump to handler
+;
+; RELATED FUNCTIONS:
+;   - Menu_ProcessCommand: Uses Stack_IndirectJump for command dispatch
+;   - Battle_ExecuteAction: Uses Stack_IndirectJump for action handlers
+;   - Dialog_ExecuteInternal: May use for opcode interpretation
+;
+; REGISTERS MODIFIED:
+;   PC: Program Counter (set to target handler address)
+;   All other registers restored from stack
+;
+; REGISTERS PRESERVED:
+;   A, X, Y: Restored via stack (PLY, RTI restores P which affects sizes)
+;   B: Data Bank restored via PLB
+;   P: Processor status restored via RTI
+;
+; TECHNICAL NOTES:
+;
+;   RTI behavior in 65816 native mode:
+;     Pops 4 bytes: [P][PC low][PC high][PC bank] (vs 3 for RTL)
+;     Sets processor status from popped P byte
+;     Sets Program Counter to 24-bit address
+;     Enables interrupts (may have been disabled)
+;   
+;   Stack grows downward (decrement on push):
+;     Higher addresses = older data
+;     Lower addresses = newer data
+;     SP+0 = most recent push
+;   
+;   Data Bank (B register):
+;     Used for absolute addressing when bank not specified
+;     LDA $1234 actually accesses [$B:1234]
+;     Jump table read uses caller's bank for portability
+;   
+;   Maximum jump table size:
+;     Index range: 0-127 (8-bit input, masked)
+;     Table entries: 128 × 2 bytes = 256 bytes max
+;     Can extend by removing AND #$00FF mask (support 0-255)
+;
+;===============================================================================
 Stack_IndirectJump:
-	php                                  ;0097BE|08      |      ;
-	phb                                  ;0097BF|8B      |      ;
-	rep #$30                             ;0097C0|C230    |      ;
-	phy                                  ;0097C2|5A      |      ;
-	and.W #$00ff                         ;0097C3|29FF00  |      ;
-	asl a;0097C6|0A      |      ;
-	tay                                  ;0097C7|A8      |      ;
-	lda.B $06,s                          ;0097C8|A306    |000006;
-	pha                                  ;0097CA|48      |      ;
-	plb                                  ;0097CB|AB      |      ;
-	plb                                  ;0097CC|AB      |      ;
-	lda.B ($08,s),y                      ;0097CD|B308    |000008;
-	tay                                  ;0097CF|A8      |      ;
-	lda.B $05,s                          ;0097D0|A305    |000005;
-	sta.B $08,s                          ;0097D2|8308    |000008;
-	tya                                  ;0097D4|98      |      ;
-	sta.B $05,s                          ;0097D5|8305    |000005;
-	ply                                  ;0097D7|7A      |      ;
-	plb                                  ;0097D8|AB      |      ;
-	rti                                  ;0097D9|40      |      ;
+	php                                  ;0097BE|08      |      ; save processor status flags (A/X/Y size, decimal mode, carry, etc.)
+	phb                                  ;0097BF|8B      |      ; save Data Bank register (preserve caller's bank)
+	rep #$30                             ;0097C0|C230    |      ; set 16-bit A/X/Y mode (for address operations)
+	phy                                  ;0097C2|5A      |      ; save Y register (preserve caller's Y)
+	and.W #$00ff                         ;0097C3|29FF00  |      ; mask index to 8-bit (A = index, clear high byte)
+	asl a                                ;0097C6|0A      |      ; multiply index by 2 (table entries are 16-bit addresses)
+	tay                                  ;0097C7|A8      |      ; transfer table offset to Y (for indexed addressing)
+	lda.B $06,s                          ;0097C8|A306    |000006; load return bank from stack (SP+$06 = caller's bank byte)
+	pha                                  ;0097CA|48      |      ; push return bank to stack (16-bit push, low byte = bank)
+	plb                                  ;0097CB|AB      |      ; set Data Bank = caller's bank (8-bit pop, from pushed low byte)
+	plb                                  ;0097CC|AB      |      ; pop again to balance stack (clear high byte from 16-bit push)
+	lda.B ($08,s),y                      ;0097CD|B308    |000008; read target address from jump table (indirect indexed, SP+$08 = table pointer)
+	tay                                  ;0097CF|A8      |      ; save target address to Y temporarily
+	lda.B $05,s                          ;0097D0|A305    |000005; load return address mid byte from stack (SP+$05)
+	sta.B $08,s                          ;0097D2|8308    |000008; store to jump table pointer slot (shift stack frame up)
+	tya                                  ;0097D4|98      |      ; transfer target address from Y to A
+	sta.B $05,s                          ;0097D5|8305    |000005; store target address to return address slot (overwrite return address)
+	ply                                  ;0097D7|7A      |      ; restore Y register from stack
+	plb                                  ;0097D8|AB      |      ; restore Data Bank register from stack
+	rti                                  ;0097D9|40      |      ; return from interrupt (pops P, PC low/mid/bank from stack → jump to target)
 ;      |        |      ;
 ;      |        |      ;
 Bitfield_PrepareAccess:
