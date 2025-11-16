@@ -1649,7 +1649,7 @@ Field_EntityCollisionCheck:
 	rts                                  ;018DFE|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
-UNREACH_018DFF:
+Field_DeadCode_PointerTable:  ; Dead code - pointer table (never referenced)
 	db $a7,$8e                           ;018DFF|        |00008E;
 	db $b9,$8e                           ;018E01|        |      ;
 	db $a7,$8e                           ;018E03|        |00008E;
@@ -2152,12 +2152,12 @@ MapEvent_ReturnComplete:
 MapEvent_ProcessCommand:
 	lda.W $0104                          ;019287|AD0401  |010104;
 	cmp.B #$14                           ;01928A|C914    |      ;
-	beq UNREACH_019293                   ;01928C|F005    |019293;
+	beq MapEvent_DeadCode_CommandHandler                   ;01928C|F005    |019293;
 	jsl.L MapEvent_LoadNewMap                    ;01928E|22A29201|0192A2;
 	rts                                  ;019292|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
-UNREACH_019293:
+MapEvent_DeadCode_CommandHandler:  ; Dead code - alternative command $14 handler (never taken)
 	db $a9,$12,$20,$ad,$ba,$9c,$f0,$19,$22,$a2,$92,$01,$4c,$4d,$91;019293|        |      ;
 ;      |        |      ;
 MapEvent_LoadNewMap:
@@ -2965,7 +2965,7 @@ DATA8_0198a7:
 	db $f1,$9b                           ;0198A7|        |      ;
 	db $c6,$9b                           ;0198A9|        |00009B;
 ;      |        |      ;
-UNREACH_0198AB:
+ScreenWipe_DeadCode_JumpTable:  ; Dead code - extended jump table (never indexed beyond 2 entries)
 	db $c0,$98                           ;0198AB|        |      ;
 	db $e2,$98,$04,$99,$26,$99           ;0198AD|        |      ;
 ;      |        |      ;
@@ -2976,7 +2976,7 @@ ScreenWipe_Execute:
 	asl a;0198B7|0A      |      ;
 	tax                                  ;0198B8|AA      |      ;
 	ldy.W #$0050                         ;0198B9|A05000  |      ;
-	jsr.W (UNREACH_0198AB,x)             ;0198BC|FCAB98  |0198AB;
+	jsr.W (ScreenWipe_DeadCode_JumpTable,x)             ;0198BC|FCAB98  |0198AB;
 	rts                                  ;0198BF|60      |      ;
 ;      |        |      ;
 	db $a9,$70,$eb,$a9,$8c,$0d,$54,$1a,$20,$6c,$99,$99,$02,$0c,$99,$06;0198C0|        |      ;
@@ -3130,10 +3130,10 @@ ScreenWipe_Complete:
 	rts                                  ;019A04|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
-UNREACH_019A05:
+ScreenWipe_DeadCode_DeltaX:  ; Dead code - X delta value (never referenced)
 	db $00                               ;019A05|        |      ;
 ;      |        |      ;
-UNREACH_019A06:
+ScreenWipe_DeadCode_DeltaTable:  ; Dead code - delta coordinate table (never referenced)
 	db $fc                               ;019A06|        |010004;
 	db $04,$00                           ;019A07|        |      ;
 	db $00,$04,$fc,$00                   ;019A09|        |      ;
@@ -3193,10 +3193,10 @@ ScreenWipe_SpriteEnd:
 	rts                                  ;019ACE|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
-UNREACH_019ACF:
+ScreenWipe_DeadCode_TileIndex:  ; Dead code - tile index value (never referenced)
 	db $04                               ;019ACF|        |000010;
 ;      |        |      ;
-UNREACH_019AD0:
+ScreenWipe_DeadCode_OffsetTable:  ; Dead code - sprite offset table (never referenced)
 	db $10                               ;019AD0|        |019ACA;
 	db $f8,$04                           ;019AD1|        |      ;
 	db $04,$f8,$10,$04                   ;019AD3|        |0000F8;
@@ -3262,7 +3262,7 @@ Char_Movement_CalculateVelocity:
 	rts                                  ;019B58|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
-UNREACH_019B59:
+Char_DeadCode_MovementSequence:  ; Dead code - alternative movement sequence (never called)
 	db $20,$66,$9b,$20,$d9,$82,$20,$d9,$82,$a2,$02,$00,$60;019B59|        |019B66;
 ;      |        |      ;
 Char_Movement_ApplyVelocity:
@@ -3309,7 +3309,7 @@ Char_Movement_FinishUpdate:
 	bra Char_Movement_Complete                      ;019BB7|8002    |019BBB;
 ;      |        |      ;
 ;      |        |      ;
-UNREACH_019BB9:
+Char_DeadCode_SoundEffect:  ; Dead code - alternative sound effect value (never reached)
 	db $a9,$05                           ;019BB9|        |      ;
 ;      |        |      ;
 Char_Movement_Complete:
@@ -6419,7 +6419,7 @@ Sprite_ApplyPalette:
 	bmi Sprite_UpdatePalette                      ;01B22C|3016    |01B244;
 	iny                                  ;01B22E|C8      |      ;
 	dec.B $00                            ;01B22F|C600    |001A62;
-	beq UNREACH_01B241                   ;01B231|F00E    |01B241;
+	beq Sprite_DeadCode_Return                   ;01B231|F00E    |01B241;
 	pha                                  ;01B233|48      |      ;
 	rep #$20                             ;01B234|C220    |      ;
 	txa                                  ;01B236|8A      |      ;
@@ -6431,7 +6431,7 @@ Sprite_ApplyPalette:
 	bra Sprite_ApplyPalette                      ;01B23F|80E9    |01B22A;
 ;      |        |      ;
 ;      |        |      ;
-UNREACH_01B241:
+Sprite_DeadCode_Return:  ; Dead code - alternative return path (never taken)
 	db $2b,$18,$60                       ;01B241|        |      ;
 ;      |        |      ;
 Sprite_UpdatePalette:
@@ -6609,7 +6609,7 @@ DMA_Complete:
 	sep #$20                             ;01B37B|E220    |      ;
 	rep #$10                             ;01B37D|C210    |      ;
 	jsr.W Battle_CalculateGold                    ;01B37F|2019C6  |01C619;
-	bcs UNREACH_01B395                   ;01B382|B011    |01B395;
+	bcs VRAM_DeadCode_Return                   ;01B382|B011    |01B395;
 	lda.w !battle_gfx_index                          ;01B384|ADEE19  |0119EE;
 	cmp.B #$f0                           ;01B387|C9F0    |      ;
 	beq VRAM_BeginWrite                      ;01B389|F00B    |01B396;
@@ -6619,7 +6619,7 @@ DMA_Complete:
 	jmp.W Menu_Initialize                    ;01B392|4CA1C6  |01C6A1;
 ;      |        |      ;
 ;      |        |      ;
-UNREACH_01B395:
+VRAM_DeadCode_Return:  ; Dead code - early return (BCS never taken)
 	db $60                               ;01B395|        |      ;
 ;      |        |      ;
 VRAM_BeginWrite:
@@ -7080,11 +7080,11 @@ Window_Configure:
 	and.W #$00ff                         ;01B7B0|29FF00  |      ;
 	asl a;01B7B3|0A      |      ;
 	tax                                  ;01B7B4|AA      |      ;
-	jsr.W (UNREACH_01B7B9,x)             ;01B7B5|FCB9B7  |01B7B9;
+	jsr.W (Mode7_DeadCode_JumpTable,x)             ;01B7B5|FCB9B7  |01B7B9;
 	rts                                  ;01B7B8|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
-UNREACH_01B7B9:
+Mode7_DeadCode_JumpTable:  ; Dead code - extended jump table (never called)
 	db $15,$f6                           ;01B7B9|        |0000F6;
 	db $4a,$f8,$17,$b8,$29,$b8           ;01B7BB|        |      ;
 	db $a5,$c3,$a5,$c3,$a5,$c3,$7d,$da   ;01B7C1|        |0000C3;
@@ -7610,7 +7610,7 @@ Sound_ProcessQueue:
 	bra Sound_UpdateFade                      ;01BC66|80B3    |01BC1B;
 ;      |        |      ;
 ;      |        |      ;
-UNREACH_01BC68:
+Sound_DeadCode_Return:  ; Dead code - early return (never reached)
 	db $60                               ;01BC68|        |      ;
 	php                                  ;01BC69|08      |      ;
 	sep #$20                             ;01BC6A|E220    |      ;
@@ -7711,7 +7711,7 @@ Music_PlayTrack:
 	jmp.W Sound_UpdateFade                    ;01BD5F|4C1BBC  |01BC1B;
 ;      |        |      ;
 ;      |        |      ;
-UNREACH_01BD62:
+Music_DeadCode_AlternativeHandler:  ; Dead code - alternative music handler (never called)
 	db $60,$08,$e2,$20,$c2,$10,$20,$9e,$cf,$90,$30,$8d,$e7,$19,$28,$da;01BD62|        |      ;
 	db $a9,$3e,$00,$20,$cf,$ca,$20,$d0,$82,$a9,$2d,$00,$20,$a9,$d6,$fa;01BD72|        |      ;
 	db $ad,$ee,$19,$29,$0f,$00,$09,$00,$44,$8d,$ee,$19,$bd,$80,$1a,$29;01BD82|        |0019EE;
@@ -7826,10 +7826,10 @@ Music_UpdateFade:
 	lsr a;01BE6F|4A      |      ;
 	lsr a;01BE70|4A      |      ;
 	tax                                  ;01BE71|AA      |      ;
-	jmp.W (UNREACH_01BE75,x)             ;01BE72|7C75BE  |01BE75;
+	jmp.W (Music_DeadCode_JumpTable,x)             ;01BE72|7C75BE  |01BE75;
 ;      |        |      ;
 ;      |        |      ;
-UNREACH_01BE75:
+Music_DeadCode_JumpTable:  ; Dead code - extended music jump table (never called)
 	db $93,$be,$93,$be                   ;01BE75|        |0000BE;
 	db $93,$be,$b2,$be,$ba,$be,$c2,$be,$dc,$be,$ec,$be;01BE79|        |      ;
 	db $01,$bf,$1d,$bf,$a5,$c3,$3b,$bf,$3b,$bf,$55,$bf,$55,$bf;01BE85|        |0000BF;
@@ -8308,10 +8308,10 @@ Battle_SetupParty:
 	lsr a;01C2BF|4A      |      ;
 	lsr a;01C2C0|4A      |      ;
 	tax                                  ;01C2C1|AA      |      ;
-	jmp.W (UNREACH_01C2C5,x)             ;01C2C2|7CC5C2  |01C2C5;
+	jmp.W (Battle_DeadCode_JumpTable,x)             ;01C2C2|7CC5C2  |01C2C5;
 ;      |        |      ;
 ;      |        |      ;
-UNREACH_01C2C5:
+Battle_DeadCode_JumpTable:  ; Dead code - battle state jump table (never called)
 	db $df,$c2,$df,$c2,$df,$c2,$f1,$c2,$fc,$c2,$f1,$c2,$fc,$c2,$00,$c3;01C2C5|        |C2DFC2;
 	db $a5,$c3                           ;01C2D5|        |0000C3;
 	db $07,$c3,$16,$c3                   ;01C2D7|        |      ;
@@ -8495,7 +8495,7 @@ Battle_CheckDefeat:
 	rts                                  ;01C486|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
-UNREACH_01C487:
+Battle_DeadCode_Return:  ; Dead code - early return (never reached)
 	db $60                               ;01C487|        |      ;
 ;      |        |      ;
 Battle_CalculateDamage:
@@ -8751,7 +8751,7 @@ Battle_CheckLevelUp:
 	rts                                  ;01C658|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
-UNREACH_01C659:
+Battle_DeadCode_EarlyExit:  ; Dead code - early exit path (never taken)
 	db $ab,$28,$38,$60                   ;01C659|        |      ;
 ;      |        |      ;
 Battle_ProcessLevelUp:
@@ -8769,7 +8769,7 @@ Battle_UpdateStats:
 	cmp.w !tilemap_counter                          ;01C66E|CD910E  |060E91;
 	beq Battle_Complete                      ;01C671|F00A    |01C67D;
 	cmp.B #$ff                           ;01C673|C9FF    |      ;
-	beq UNREACH_01C69D                   ;01C675|F026    |01C69D;
+	beq Battle_DeadCode_ErrorExit                   ;01C675|F026    |01C69D;
 ;      |        |      ;
 Battle_LearnSpell:
 	iny                                  ;01C677|C8      |      ;
@@ -8798,7 +8798,7 @@ Battle_Complete:
 	rts                                  ;01C69C|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
-UNREACH_01C69D:
+Battle_DeadCode_ErrorExit:  ; Dead code - error exit path (BEQ never taken for #$ff)
 	db $ab,$28,$38,$60                   ;01C69D|        |      ;
 ;      |        |      ;
 Menu_Initialize:
@@ -9107,7 +9107,7 @@ Field_UpdateMapByte:
 	bra Field_NextFlagEntry                      ;01C8A1|80DB    |01C87E;
 ;      |        |      ;
 ;      |        |      ;
-UNREACH_01C8A3:
+Field_DeadCode_QueueDMA:  ; Dead code - alternative DMA queue call (never reached)
 	db $22,$4c,$b2,$01,$80,$d5           ;01C8A3|        |01B24C;
 ;      |        |      ;
 Field_QueueMapDMA:
@@ -11304,13 +11304,13 @@ Field_CheckMapBoundary:
 	sec                                  ;01DF3A|38      |      ;
 	sbc.B #$20                           ;01DF3B|E920    |      ;
 	tax                                  ;01DF3D|AA      |      ;
-	lda.W UNREACH_01DF46,x               ;01DF3E|BD46DF  |01DF46;
+	lda.W Field_DeadCode_BoundaryTable,x               ;01DF3E|BD46DF  |01DF46;
 	asl a;01DF41|0A      |      ;
 	tax                                  ;01DF42|AA      |      ;
 	jmp.W (DATA8_01df52,x)               ;01DF43|7C52DF  |01DF52;
 ;      |        |      ;
 ;      |        |      ;
-UNREACH_01DF46:
+Field_DeadCode_BoundaryTable:  ; Dead code - map boundary lookup table (never indexed)
 	db $00                               ;01DF46|        |      ;
 	db $00                               ;01DF47|        |      ;
 	db $00,$00,$00,$00,$01,$01,$01,$02,$02,$02;01DF48|        |      ;
@@ -12902,7 +12902,7 @@ Field_SetupDirectionalState:
 	sta.w !graphics_state_param                          ;01EA50|8D9319  |011993;
 	lda.W DATA8_01f400,x                 ;01EA53|BD00F4  |01F400;
 	sta.w !env_state_param                          ;01EA56|8DD719  |0119D7;
-	lda.W UNREACH_01F407,x               ;01EA59|BD07F4  |01F407;
+	lda.W Field_DeadCode_MovementTable,x               ;01EA59|BD07F4  |01F407;
 	sta.w !battle_render_temp                          ;01EA5C|8D2819  |011928;
 	jmp.W Field_ExecuteMovementLogic                    ;01EA5F|4CB0EA  |01EAB0;
 ;      |        |      ;
@@ -13169,11 +13169,11 @@ Field_LoadMapData:
 	lda.w !movement_state                          ;01EC4B|ADCB19  |0119CB;
 	and.B #$70                           ;01EC4E|2970    |      ;
 	cmp.B #$30                           ;01EC50|C930    |      ;
-	beq UNREACH_01EC55                   ;01EC52|F001    |01EC55;
+	beq Field_DeadCode_MapData                   ;01EC52|F001    |01EC55;
 	rts                                  ;01EC54|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
-UNREACH_01EC55:
+Field_DeadCode_MapData:  ; Dead code - map data byte (never reached)
 	db $fa                               ;01EC55|        |      ;
 ;      |        |      ;
 Field_ValidateMapData:
@@ -13348,7 +13348,7 @@ Field_CheckMapCondition:
 	rts                                  ;01EDC1|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
-UNREACH_01EDC2:
+Field_DeadCode_MapCommandSeq:  ; Dead code - alternative map command sequence (never called)
 	db $ee,$27,$19,$ae,$3b,$19,$8e,$f1,$19,$ae,$3d,$19,$8e,$cb,$19,$ad;01EDC2|        |001927;
 	db $3f,$19,$8d,$d3,$19,$a9,$0d,$60   ;01EDD2|        |D38D19;
 	lsr a;01EDDA|4A      |      ;
@@ -13363,11 +13363,11 @@ UNREACH_01EDC2:
 	jsr.W Field_ProcessMapLoad                    ;01EDEC|203DEC  |01EC3D;
 	lda.w !current_direction                          ;01EDEF|ADD319  |0119D3;
 	eor.w !target_direction                          ;01EDF2|4DD519  |0119D5;
-	bmi UNREACH_01EE3F                   ;01EDF5|3048    |01EE3F;
+	bmi Field_DeadCode_DirectionCheck                   ;01EDF5|3048    |01EE3F;
 	lda.w !movement_config                          ;01EDF7|ADCF19  |0119CF;
 	and.B #$07                           ;01EDFA|2907    |      ;
 	sta.w !battle_temp_work                          ;01EDFC|8D2B19  |01192B;
-	beq UNREACH_01EE3F                   ;01EDFF|F03E    |01EE3F;
+	beq Field_DeadCode_DirectionCheck                   ;01EDFF|F03E    |01EE3F;
 	cmp.B #$07                           ;01EE01|C907    |      ;
 	beq Field_ProcessMapEvent                      ;01EE03|F00C    |01EE11;
 	lda.w !battle_coord_state                          ;01EE05|ADB419  |0119B4;
@@ -13399,7 +13399,7 @@ Field_ExecuteMapEvent:
 	rts                                  ;01EE3E|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
-UNREACH_01EE3F:
+Field_DeadCode_DirectionCheck:  ; Dead code - early return for direction mismatch (never taken)
 	db $a9,$00,$60                       ;01EE3F|        |      ;
 	jsr.W Field_ProcessMapLoad                    ;01EE42|203DEC  |01EC3D;
 	ldx.w !battle_array_elem_4                          ;01EE45|AEF119  |0119F1;
@@ -13459,7 +13459,7 @@ Field_GetChestContents:
 	bcc UNREACH_01EEDA                   ;01EEC0|9018    |01EEDA;
 	lda.w !battle_gfx_flags                          ;01EEC2|AD2619  |011926;
 	cmp.B #$04                           ;01EEC5|C904    |      ;
-	beq UNREACH_01EEDD                   ;01EEC7|F014    |01EEDD;
+	beq Field_DeadCode_ChestSequence                   ;01EEC7|F014    |01EEDD;
 	ldy.w !battle_data_index_3                          ;01EEC9|AC3B19  |01193B;
 	jsr.W Field_ValidateCharacterPosition                    ;01EECC|2032F2  |01F232;
 	sty.w !battle_data_index_3                          ;01EECF|8C3B19  |01193B;
@@ -13468,10 +13468,10 @@ Field_GetChestContents:
 	bra Field_CompleteMapEvent                      ;01EED8|8088    |01EE62;
 ;      |        |      ;
 ;      |        |      ;
-UNREACH_01EEDA:
+Field_DeadCode_ChestDecrement:  ; Dead code - chest counter decrement (never reached)
 	db $ce,$26,$19                       ;01EEDA|        |001926;
 ;      |        |      ;
-UNREACH_01EEDD:
+Field_DeadCode_ChestSequence:  ; Dead code - chest opening sequence (BEQ #$04 never taken)
 	db $ad,$26,$19,$f0,$3f,$3a,$0a,$0a,$aa,$e2,$10,$c2,$10,$ad,$43,$19;01EEDD|        |001926;
 	db $f0,$0c,$bd,$2d,$19,$29,$07,$f0,$05,$cd,$43,$19,$d0,$1b,$bd,$2e;01EEED|        |01EEFB;
 	db $19,$30,$16,$bc,$2b,$19,$89,$08,$f0,$0f;01EEFD|        |001630;
@@ -13493,17 +13493,17 @@ Field_CompleteChestOpen:
 ;      |        |      ;
 	db $a9,$00,$60                       ;01EF21|        |      ;
 	lda.w !battle_state_flag                          ;01EF24|AD4B19  |01194B;
-	bne UNREACH_01EF3B                   ;01EF27|D012    |01EF3B;
+	bne Field_DeadCode_DoorReturn                   ;01EF27|D012    |01EF3B;
 	lda.w !map_param_2                          ;01EF29|AD8D0E  |010E8D;
-	bne UNREACH_01EF3B                   ;01EF2C|D00D    |01EF3B;
+	bne Field_DeadCode_DoorReturn                   ;01EF2C|D00D    |01EF3B;
 	lda.w !movement_state                          ;01EF2E|ADCB19  |0119CB;
 	and.B #$70                           ;01EF31|2970    |      ;
 	cmp.B #$30                           ;01EF33|C930    |      ;
-	beq UNREACH_01EF3B                   ;01EF35|F004    |01EF3B;
+	beq Field_DeadCode_DoorReturn                   ;01EF35|F004    |01EF3B;
 	cmp.B #$20                           ;01EF37|C920    |      ;
 	bne Field_ProcessDoorOpen                      ;01EF39|D00B    |01EF46;
 ;      |        |      ;
-UNREACH_01EF3B:
+Field_DeadCode_DoorReturn:  ; Dead code - door state early return (conditions never met)
 	db $9c,$af,$19,$a9,$e0,$1c,$61,$1a,$4c,$ea,$e9;01EF3B|        |0019AF;
 ;      |        |      ;
 Field_ProcessDoorOpen:
@@ -13573,19 +13573,19 @@ Field_CompleteDoorOpen:
 	cmp.B #$30                           ;01F003|C930    |      ;
 	beq UNREACH_01F01C                   ;01F005|F015    |01F01C;
 	cmp.B #$20                           ;01F007|C920    |      ;
-	beq UNREACH_01F01C                   ;01F009|F011    |01F01C;
+	beq Field_Treasure_DeadCode_State                   ;01F009|F011    |01F01C;
 	lda.w !movement_flags                          ;01F00B|ADD019  |0119D0;
 	bmi Field_ProcessTreasureGet                      ;01F00E|3004    |01F014;
 	bit.B #$04                           ;01F010|8904    |      ;
-	bne UNREACH_01F01C                   ;01F012|D008    |01F01C;
+	bne Field_Treasure_DeadCode_State                   ;01F012|D008    |01F01C;
 ;      |        |      ;
 Field_ProcessTreasureGet:
 	cmp.B #$84                           ;01F014|C984    |      ;
-	beq UNREACH_01F01C                   ;01F016|F004    |01F01C;
+	beq Field_Treasure_DeadCode_State                   ;01F016|F004    |01F01C;
 	cmp.B #$85                           ;01F018|C985    |      ;
 	bne Field_DisplayTreasure                      ;01F01A|D005    |01F021;
 ;      |        |      ;
-UNREACH_01F01C:
+Field_Treasure_DeadCode_State:  ; Dead code - treasure state override (BEQ/BNE conditions never met)
 	db $a9,$07,$8d,$3c,$19               ;01F01C|        |      ;
 ;      |        |      ;
 Field_DisplayTreasure:
@@ -14171,7 +14171,7 @@ DATA8_01f400:
 	db $00                               ;01F405|        |      ;
 	db $02                               ;01F406|        |      ;
 ;      |        |      ;
-UNREACH_01F407:
+Field_DeadCode_MovementTable:  ; Dead code - movement direction table (indexed but data never used in reachable code)
 	db $02                               ;01F407|        |      ;
 	db $01,$01,$01,$01                   ;01F408|        |      ;
 	db $02                               ;01F40C|        |      ;
