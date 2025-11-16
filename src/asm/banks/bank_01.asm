@@ -302,10 +302,10 @@ Field_DispatchMode:
 	asl a;0182F7|0A      |      ;
 	tax                                  ;0182F8|AA      |      ;
 	sep #$20                             ;0182F9|E220    |      ;
-	jmp.W (DATA8_0182fe,x)               ;0182FB|7CFE82  |0182FE;
+	jmp.W (Field_ModeDispatchTable,x)               ;0182FB|7CFE82  |0182FE;
 ;      |        |      ;
 ;      |        |      ;
-DATA8_0182fe:
+Field_ModeDispatchTable:
 	db $f1,$82,$4d,$91,$5d,$93,$c7,$93,$cd,$94,$79,$92,$f3,$9c,$31,$e0;0182FE|        |      ;
 	db $c1,$e0,$38,$e1,$79,$97,$ed,$94,$45,$e1,$71,$98,$02,$e2,$20,$e5;01830E|        |      ;
 	db $69,$92                           ;01831E|        |      ;
@@ -321,10 +321,10 @@ Field_ModeReturn:
 	rtl                                  ;01832E|6B      |      ;
 ;      |        |      ;
 ;      |        |      ;
-DATA8_01832f:
+Field_WindowCoordY:
 	db $78                               ;01832F|        |      ;
 ;      |        |      ;
-DATA8_018330:
+Field_WindowCoordinates:
 	db $57,$80,$57,$78,$5f,$80,$5f       ;018330|        |      ;
 	php                                  ;018337|08      |      ;
 	phb                                  ;018338|8B      |      ;
@@ -341,7 +341,7 @@ DATA8_018330:
 	lda.w !battle_phase_counter                          ;01834D|AD461A  |011A46;
 	asl a;018350|0A      |      ;
 	tax                                  ;018351|AA      |      ;
-	jsr.W (DATA8_01835b,x)               ;018352|FC5B83  |01835B;
+	jsr.W (Field_UpdatePhaseTable,x)               ;018352|FC5B83  |01835B;
 	stz.w !battle_phase_counter                          ;018355|9C461A  |011A46;
 ;      |        |      ;
 Field_UpdateEnd:
@@ -350,7 +350,7 @@ Field_UpdateEnd:
 	rtl                                  ;01835A|6B      |      ;
 ;      |        |      ;
 ;      |        |      ;
-DATA8_01835b:
+Field_UpdatePhaseTable:
 	db $cb,$83,$6d,$83,$bf,$83,$c2,$cc,$31,$cf,$5e,$84,$22,$85,$b3,$d5;01835B|        |      ;
 	db $01,$84                           ;01836B|        |      ;
 ;      |        |      ;
@@ -360,15 +360,15 @@ Field_LoadPalettes:
 	xba                                  ;018371|EB      |      ;
 ;      |        |      ;
 Field_PaletteLoop:
-	lda.W DATA8_01839f,x                 ;018372|BD9F83  |01839F;
+	lda.W Field_PaletteStartIndices,x                 ;018372|BD9F83  |01839F;
 	sta.w !CGADD                          ;018375|8D2121  |012121;
 	ldy.W #$2200                         ;018378|A00022  |      ;
 	sty.w !DMA0_DMAP                          ;01837B|8C0043  |014300;
-	ldy.W DATA8_0183a0,x                 ;01837E|BCA083  |0183A0;
+	ldy.W Field_PaletteSourceAddrs,x                 ;01837E|BCA083  |0183A0;
 	sty.w !DMA0_A1T0L                          ;018381|8C0243  |014302;
 	lda.B #$7f                           ;018384|A97F    |      ;
 	sta.w !DMA0_A1B0                          ;018386|8D0443  |014304;
-	lda.W DATA8_0183a2,x                 ;018389|BDA283  |0183A2;
+	lda.W Field_PaletteSizes,x                 ;018389|BDA283  |0183A2;
 	tay                                  ;01838C|A8      |      ;
 	sty.w !DMA0_DAS0L                          ;01838D|8C0543  |014305;
 	lda.B #$01                           ;018390|A901    |      ;
@@ -382,13 +382,13 @@ Field_PaletteLoop:
 	rts                                  ;01839E|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
-DATA8_01839f:
+Field_PaletteStartIndices:
 	db $80                               ;01839F|        |      ;
 ;      |        |      ;
-DATA8_0183a0:
+Field_PaletteSourceAddrs:
 	db $88,$c4                           ;0183A0|        |      ;
 ;      |        |      ;
-DATA8_0183a2:
+Field_PaletteSizes:
 	db $10,$90,$a8,$c4,$10,$a0,$c8,$c4,$10,$b0,$e8,$c4,$20,$c0,$08,$c5;0183A2|        |      ;
 	db $10,$d0,$28,$c5,$10,$e0,$48,$c5,$10,$f0,$68,$c5,$10;0183B2|        |      ;
 ;      |        |      ;
@@ -593,7 +593,7 @@ Field_CheckSpriteType:
 	and.B #$03                           ;01854D|2903    |      ;
 	asl a;01854F|0A      |      ;
 	tax                                  ;018550|AA      |      ;
-	jsr.W (DATA8_018557,x)               ;018551|FC5785  |018557;
+	jsr.W (Sprite_ProcessorTable,x)               ;018551|FC5785  |018557;
 ;      |        |      ;
 Field_ProcessSprite:
 	plb                                  ;018554|AB      |      ;
@@ -601,7 +601,7 @@ Field_ProcessSprite:
 	rtl                                  ;018556|6B      |      ;
 ;      |        |      ;
 ;      |        |      ;
-DATA8_018557:
+Sprite_ProcessorTable:
 	db $dc,$86,$5f,$85,$7b,$85,$db,$85   ;018557|        |      ;
 	lda.w !battle_ready_flag                          ;01855F|AD1001  |010110;
 	bpl Field_UpdateSpritePosition                      ;018562|1004    |018568;
@@ -763,7 +763,7 @@ Field_UpdateSpriteFlags:
 	lda.w !gfx_mode_control                          ;0186A5|AD4C1A  |011A4C;
 	asl a;0186A8|0A      |      ;
 	tax                                  ;0186A9|AA      |      ;
-	jsr.W (DATA8_0186b6,x)               ;0186AA|FCB686  |0186B6;
+	jsr.W (Graphics_ModeHandlerTable,x)               ;0186AA|FCB686  |0186B6;
 	ldx.W #$0000                         ;0186AD|A20000  |      ;
 	stx.B $08                            ;0186B0|8608    |001908;
 	stx.B $0a                            ;0186B2|860A    |00190A;
@@ -771,7 +771,7 @@ Field_UpdateSpriteFlags:
 	rts                                  ;0186B5|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
-DATA8_0186b6:
+Graphics_ModeHandlerTable:
 	db $b5,$86,$c8,$86,$dd,$86,$c8,$86,$36,$87,$dd,$86;0186B6|        |      ;
 	db $36,$87                           ;0186C2|        |000087;
 	db $7a,$87                           ;0186C4|        |      ;
@@ -906,11 +906,11 @@ Field_ProcessMovement:
 	lda.w !env_state_param                          ;0187E9|ADD719  |0119D7;
 	asl a;0187EC|0A      |      ;
 	tax                                  ;0187ED|AA      |      ;
-	lda.L DATA8_0190d5,x                 ;0187EE|BFD59001|0190D5;
+	lda.L Direction_InitialValue,x                 ;0187EE|BFD59001|0190D5;
 	clc                                  ;0187F2|18      |      ;
 	adc.w !tilemap_x_offset                          ;0187F3|6D2D19  |01192D;
 	sta.w !tilemap_x_offset                          ;0187F6|8D2D19  |01192D;
-	lda.L DATA8_0190d6,x                 ;0187F9|BFD69001|0190D6;
+	lda.L Direction_ValueTable,x                 ;0187F9|BFD69001|0190D6;
 	clc                                  ;0187FD|18      |      ;
 	adc.w !tilemap_y_offset                          ;0187FE|6D2E19  |01192E;
 	sta.w !tilemap_y_offset                          ;018801|8D2E19  |01192E;
@@ -986,10 +986,10 @@ Field_MovementComplete:
 	db $42,$ad,$2d,$19,$c2,$30,$29,$ff,$00,$18,$6d,$16,$42,$8d,$bb,$19;0188B3|        |      ;
 	db $28,$60                           ;0188C3|        |      ;
 ;      |        |      ;
-DATA8_0188c5:
+Movement_OffsetConstant:
 	db $f8                               ;0188C5|        |      ;
 ;      |        |      ;
-DATA8_0188c6:
+Movement_OffsetValues:
 	db $fa,$09,$fb,$f8,$06,$f7,$fb       ;0188C6|        |      ;
 ;      |        |      ;
 Field_MovementCheck:
@@ -1045,7 +1045,7 @@ Field_MovementEnd:
 	db $e8,$88,$d0,$ef,$c2,$30,$a0,$10,$00,$a2,$00,$00,$bd,$31,$19,$8d;0189FB|        |      ;
 	db $18,$21,$e8,$e8,$88,$d0,$f5,$28,$7a,$60;018A0B|        |      ;
 ;      |        |      ;
-DATA8_018a15:
+Field_UnusedDataBytes:
 	db $cc,$cc,$cc,$cc,$ff,$f0,$cc,$00,$cc,$cc,$cc,$3f,$00,$00,$00,$00;018A15|        |      ;
 	db $00,$00,$00,$00,$00,$00,$00,$00   ;018A25|        |      ;
 ;      |        |      ;
@@ -1435,7 +1435,7 @@ Field_MapSetupLoop:
 	xba                                  ;018C90|EB      |      ;
 	lda.w !env_state_param                          ;018C91|ADD719  |0119D7;
 	tax                                  ;018C94|AA      |      ;
-	lda.W DATA8_018cac,x                 ;018C95|BDAC8C  |018CAC;
+	lda.W Movement_DirectionMultipliers,x                 ;018C95|BDAC8C  |018CAC;
 	sta.w !M7B                          ;018C98|8D1C21  |01211C;
 	rep #$20                             ;018C9B|C220    |      ;
 	txa                                  ;018C9D|8A      |      ;
@@ -1449,7 +1449,7 @@ Field_MapSetupLoop:
 	rts                                  ;018CAB|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
-DATA8_018cac:
+Movement_DirectionMultipliers:
 	db $ff,$01,$01,$ff                   ;018CAC|        |      ;
 ;      |        |      ;
 Field_MapSetupEntity:
@@ -1483,11 +1483,11 @@ Field_LoadEntityData:
 	ldx.W #$0000                         ;018CE3|A20000  |      ;
 ;      |        |      ;
 Field_EntityDataLoop:
-	lda.W DATA8_018dd9,x                 ;018CE6|BDD98D  |018DD9;
+	lda.W Entity_SpriteDirectionByte,x                 ;018CE6|BDD98D  |018DD9;
 	sta.W $1994                          ;018CE9|8D9419  |011994;
-	ldy.W DATA8_018dda,x                 ;018CEC|BCDA8D  |018DDA;
+	ldy.W Entity_FirstSpriteOffset,x                 ;018CEC|BCDA8D  |018DDA;
 	sty.W $1995                          ;018CEF|8C9519  |011995;
-	ldy.W DATA8_018ddc,x                 ;018CF2|BCDC8D  |018DDC;
+	ldy.W Entity_SecondSpriteOffset,x                 ;018CF2|BCDC8D  |018DDC;
 	sty.W $1997                          ;018CF5|8C9719  |011997;
 ;      |        |      ;
 Field_EntityDataCopy:
@@ -1510,11 +1510,11 @@ Field_EntityDataEnd:
 	rep #$10                             ;018D0C|C210    |      ;
 	lda.w !hardware_flags                          ;018D0E|AD541A  |011A54;
 	sec                                  ;018D11|38      |      ;
-	sbc.W DATA8_018de3,x                 ;018D12|FDE38D  |018DE3;
+	sbc.W Entity_PaletteOffset1,x                 ;018D12|FDE38D  |018DE3;
 	sta.W $198b                          ;018D15|8D8B19  |01198B;
 	lda.w !hardware_flags                          ;018D18|AD541A  |011A54;
 	sec                                  ;018D1B|38      |      ;
-	sbc.W DATA8_018de4,x                 ;018D1C|FDE48D  |018DE4;
+	sbc.W Entity_PaletteOffset2,x                 ;018D1C|FDE48D  |018DE4;
 	sta.W $198c                          ;018D1F|8D8C19  |01198C;
 	rep #$20                             ;018D22|C220    |      ;
 	lda.W $198f                          ;018D24|AD8F19  |01198F;
@@ -1620,19 +1620,19 @@ Field_EntityProcess:
 	rts                                  ;018DD8|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
-DATA8_018dd9:
+Entity_SpriteDirectionByte:
 	db $40                               ;018DD9|        |      ;
 ;      |        |      ;
-DATA8_018dda:
+Entity_FirstSpriteOffset:
 	db $04,$02                           ;018DDA|        |      ;
 ;      |        |      ;
-DATA8_018ddc:
+Entity_SecondSpriteOffset:
 	db $0c,$02,$c0,$0c,$02,$04,$02       ;018DDC|        |      ;
 ;      |        |      ;
-DATA8_018de3:
+Entity_PaletteOffset1:
 	db $00                               ;018DE3|        |      ;
 ;      |        |      ;
-DATA8_018de4:
+Entity_PaletteOffset2:
 	db $00,$00,$10,$10,$00,$10,$10       ;018DE4|        |      ;
 	db $00,$00,$00,$00,$00,$00           ;018DEB|        |      ;
 	db $00,$00                           ;018DF1|        |      ;
@@ -1946,12 +1946,12 @@ Field_TileCollisionCheck:
 	asl a;019089|0A      |      ;
 	tax                                  ;01908A|AA      |      ;
 	rep #$30                             ;01908B|C230    |      ;
-	lda.L DATA8_0190ad,x                 ;01908D|BFAD9001|0190AD;
+	lda.L Collision_TileXOffsets,x                 ;01908D|BFAD9001|0190AD;
 	clc                                  ;019091|18      |      ;
 	adc.w !gfx_config_register                          ;019092|6DBD19  |0119BD;
 	and.W #$001f                         ;019095|291F00  |      ;
 	sta.w !gfx_config_register                          ;019098|8DBD19  |0119BD;
-	lda.L DATA8_0190af,x                 ;01909B|BFAF9001|0190AF;
+	lda.L Collision_TileYOffsets,x                 ;01909B|BFAF9001|0190AF;
 	clc                                  ;01909F|18      |      ;
 	adc.w !gfx_config_alt                          ;0190A0|6DBF19  |0119BF;
 	and.W #$000f                         ;0190A3|290F00  |      ;
@@ -1962,10 +1962,10 @@ Field_TileCollisionCheck:
 	rts                                  ;0190AC|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
-DATA8_0190ad:
+Collision_TileXOffsets:
 	db $00,$00                           ;0190AD|        |      ;
 ;      |        |      ;
-DATA8_0190af:
+Collision_TileYOffsets:
 	db $ff,$ff,$11,$00,$00,$00,$00,$00,$0b,$00,$ff,$ff,$00,$00;0190AF|        |      ;
 ;      |        |      ;
 Field_TileCollisionResult:
@@ -1983,10 +1983,10 @@ Field_TileCollisionResult:
 	rts                                  ;0190D4|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
-DATA8_0190d5:
+Direction_InitialValue:
 	db $00                               ;0190D5|        |      ;
 ;      |        |      ;
-DATA8_0190d6:
+Direction_ValueTable:
 	db $ff,$01,$00,$00,$01,$ff,$00       ;0190D6|        |      ;
 ;      |        |      ;
 Field_CheckEntityCollision:
@@ -5572,7 +5572,7 @@ Camera_WriteRegisters:
 	and.W #$00ff                         ;01AC97|29FF00  |      ;
 	phx                                  ;01AC9A|DA      |      ;
 	tax                                  ;01AC9B|AA      |      ;
-	lda.L DATA8_0190d5,x                 ;01AC9C|BFD59001|0190D5;
+	lda.L Direction_InitialValue,x                 ;01AC9C|BFD59001|0190D5;
 	sta.w !anim_table_ptr                          ;01ACA0|8D7719  |011977;
 	plx                                  ;01ACA3|FA      |      ;
 	sep #$20                             ;01ACA4|E220    |      ;
@@ -5931,11 +5931,11 @@ Collision_TileResult:
 	lda.w !sprite_temp_value                          ;01AEFE|AD8119  |011981;
 	asl a;01AF01|0A      |      ;
 	tax                                  ;01AF02|AA      |      ;
-	lda.L DATA8_0190d5,x                 ;01AF03|BFD59001|0190D5;
+	lda.L Direction_InitialValue,x                 ;01AF03|BFD59001|0190D5;
 	clc                                  ;01AF07|18      |      ;
 	adc.w !sprite_move_speed                          ;01AF08|6D7F19  |01197F;
 	sta.w !sprite_move_speed                          ;01AF0B|8D7F19  |01197F;
-	lda.L DATA8_0190d6,x                 ;01AF0E|BFD69001|0190D6;
+	lda.L Direction_ValueTable,x                 ;01AF0E|BFD69001|0190D6;
 	clc                                  ;01AF12|18      |      ;
 	adc.w !sprite_anim_y_base                          ;01AF13|6D8019  |011980;
 	sta.w !sprite_anim_y_base                          ;01AF16|8D8019  |011980;
@@ -9480,7 +9480,7 @@ Field_StoreEntityData:
 	and.W #$00ff                         ;01CC07|29FF00  |      ;
 	phx                                  ;01CC0A|DA      |      ;
 	tax                                  ;01CC0B|AA      |      ;
-	lda.L DATA8_0190d5,x                 ;01CC0C|BFD59001|0190D5;
+	lda.L Direction_InitialValue,x                 ;01CC0C|BFD59001|0190D5;
 	sta.w !anim_table_ptr                          ;01CC10|8D7719  |011977;
 	plx                                  ;01CC13|FA      |      ;
 	sep #$20                             ;01CC14|E220    |      ;
@@ -9823,11 +9823,11 @@ Field_MapChangeLoop:
 	lda.w !env_state_param                          ;01CECD|ADD719  |0119D7;
 	asl a;01CED0|0A      |      ;
 	tax                                  ;01CED1|AA      |      ;
-	lda.W DATA8_0190d5,x                 ;01CED2|BDD590  |0190D5;
+	lda.W Direction_InitialValue,x                 ;01CED2|BDD590  |0190D5;
 	clc                                  ;01CED5|18      |      ;
 	adc.w !player_map_x                          ;01CED6|6D890E  |010E89;
 	sta.w !battle_array_elem_4                          ;01CED9|8DF119  |0119F1;
-	lda.W DATA8_0190d6,x                 ;01CEDC|BDD690  |0190D6;
+	lda.W Direction_ValueTable,x                 ;01CEDC|BDD690  |0190D6;
 	clc                                  ;01CEDF|18      |      ;
 	adc.w !player_map_y                          ;01CEE0|6D8A0E  |010E8A;
 	sta.W $19f2                          ;01CEE3|8DF219  |0119F2;
@@ -11627,11 +11627,11 @@ Field_EntityMovementContinue:
 	phy                                  ;01E19C|5A      |      ;
 	lda.W $1a7d,y                        ;01E19D|B97D1A  |011A7D;
 	clc                                  ;01E1A0|18      |      ;
-	adc.L DATA8_0190d5,x                 ;01E1A1|7FD59001|0190D5;
+	adc.L Direction_InitialValue,x                 ;01E1A1|7FD59001|0190D5;
 	sta.W $1a7d,y                        ;01E1A5|997D1A  |011A7D;
 	lda.w !battle_unit_data,y                        ;01E1A8|B97E1A  |011A7E;
 	clc                                  ;01E1AB|18      |      ;
-	adc.L DATA8_0190d6,x                 ;01E1AC|7FD69001|0190D6;
+	adc.L Direction_ValueTable,x                 ;01E1AC|7FD69001|0190D6;
 	sta.w !battle_unit_data,y                        ;01E1B0|997E1A  |011A7E;
 	lda.W $1a8b,y                        ;01E1B3|B98B1A  |011A8B;
 	pha                                  ;01E1B6|48      |      ;
@@ -13906,10 +13906,10 @@ Field_ValidateCharacterPosition:
 	tya                                  ;01F23C|98      |      ;
 	sep #$20                             ;01F23D|E220    |      ;
 	clc                                  ;01F23F|18      |      ;
-	adc.W DATA8_0190d5,x                 ;01F240|7DD590  |0190D5;
+	adc.W Direction_InitialValue,x                 ;01F240|7DD590  |0190D5;
 	xba                                  ;01F243|EB      |      ;
 	clc                                  ;01F244|18      |      ;
-	adc.W DATA8_0190d6,x                 ;01F245|7DD690  |0190D6;
+	adc.W Direction_ValueTable,x                 ;01F245|7DD690  |0190D6;
 	bpl Field_WrapCoordinateX                      ;01F248|1006    |01F250;
 	clc                                  ;01F24A|18      |      ;
 	adc.w !battle_coord_y_boundary                          ;01F24B|6D2519  |011925;
@@ -13967,10 +13967,10 @@ Field_CalculateWrappedPosition:
 	tya                                  ;01F29A|98      |      ;
 	sep #$20                             ;01F29B|E220    |      ;
 	clc                                  ;01F29D|18      |      ;
-	adc.W DATA8_0190d5,x                 ;01F29E|7DD590  |0190D5;
+	adc.W Direction_InitialValue,x                 ;01F29E|7DD590  |0190D5;
 	xba                                  ;01F2A1|EB      |      ;
 	clc                                  ;01F2A2|18      |      ;
-	adc.W DATA8_0190d6,x                 ;01F2A3|7DD690  |0190D6;
+	adc.W Direction_ValueTable,x                 ;01F2A3|7DD690  |0190D6;
 	bpl Field_CheckXBoundary                      ;01F2A6|1006    |01F2AE;
 	db $18,$6d,$25,$19,$80,$09           ;01F2A8|        |      ;
 ;      |        |      ;
@@ -14643,10 +14643,10 @@ Field_CalculateWorldCoords:
 	lda.w !player_map_x                          ;01F990|AD890E  |010E89;
 	sep #$20                             ;01F993|E220    |      ;
 	clc                                  ;01F995|18      |      ;
-	adc.W DATA8_0188c5,x                 ;01F996|7DC588  |0188C5;
+	adc.W Movement_OffsetConstant,x                 ;01F996|7DC588  |0188C5;
 	xba                                  ;01F999|EB      |      ;
 	clc                                  ;01F99A|18      |      ;
-	adc.W DATA8_0188c6,x                 ;01F99B|7DC688  |0188C6;
+	adc.W Movement_OffsetValues,x                 ;01F99B|7DC688  |0188C6;
 	xba                                  ;01F99E|EB      |      ;
 	tay                                  ;01F99F|A8      |      ;
 ;      |        |      ;
