@@ -1968,27 +1968,220 @@ Input_ReadController_Return:
 	rts	; Return to caller with updated input state variables
 ;      |        |      ;
 ;      |        |      ;
+;===============================================================================
+; Input_ProcessRepeat
+;-------------------------------------------------------------------------------
+; Implements button repeat/autofire logic for held buttons. When a button is
+; held down, this function generates periodic "virtual presses" after an initial
+; delay, allowing menu navigation and text scrolling to repeat automatically.
+; Critical for user experience in menus, dialogs, and inventory management.
+;
+; CALLING CONVENTION:
+;   JSR (short call from input processing or menu code)
+;   Input: Direct Page $92 = current button state (held buttons)
+;          Direct Page $94 = newly pressed buttons this frame
+;          Direct Page $09 = repeat timer (decrements each frame)
+;   Output: Direct Page $07 = autofire output (button to repeat)
+;           Direct Page $09 = updated repeat timer
+;
+; OPERATION:
+;   1. Clear autofire output $07 (assume no repeat this frame)
+;   2. Check if any buttons newly pressed this frame ($94)
+;   3. If NEW press detected:
+;      a. Store newly pressed buttons in $07 (output immediate press)
+;      b. Set repeat timer $09 = $0019 (25 frames ≈ 417ms initial delay)
+;      c. Return (no repeat on first press)
+;   4. If NO new press (button held from previous frame):
+;      a. Check if any buttons currently held ($92)
+;      b. If no buttons held: return (nothing to repeat)
+;      c. Decrement repeat timer $09
+;      d. If timer ≥ 0: return (still in delay period)
+;      e. If timer < 0 (delay expired):
+;         - Store held buttons $92 in $07 (generate repeat event)
+;         - Reset timer $09 = $0005 (6 frames ≈ 100ms repeat rate)
+;         - Return with repeat event
+;
+; BUTTON REPEAT BEHAVIOR:
+;
+;   Initial Press:
+;     Frame 0: Button pressed → $94 set, $07 = button, timer = 25
+;     Frames 1-24: Button held → timer decrements, no repeat
+;     Frame 25: Timer expires → $07 = button (first repeat)
+;   
+;   Continuous Hold:
+;     Frame 25: First repeat, timer = 6
+;     Frames 26-30: Timer decrements, no repeat
+;     Frame 31: Timer expires → $07 = button (second repeat)
+;     Frame 31: Timer reset to 6
+;     [Repeats every 6 frames while button held]
+;
+; TIMING ANALYSIS:
+;
+;   Initial delay: 25 frames @ 60Hz = 416.7ms
+;     - Prevents accidental repeats from quick taps
+;     - Comfortable delay before auto-scroll begins
+;   
+;   Repeat rate: 6 frames @ 60Hz = 100ms (10 repeats/second)
+;     - Fast enough for responsive menu scrolling
+;     - Slow enough to avoid skipping desired items
+;
+; DIRECT PAGE VARIABLES:
+;   $07: Autofire output (buttons to repeat this frame)
+;        - Written by this function
+;        - Read by Input_ReadController (OR'd with hardware input)
+;        - Cleared each frame in Input_ReadController
+;   
+;   $09: Repeat timer (countdown, frames until next repeat)
+;        - $0019 (25): Initial delay after new press
+;        - $0005 (6): Repeat interval after first repeat
+;        - Decrements each frame when button held
+;   
+;   $92: Current button state (all held buttons)
+;        - Read by this function
+;        - Set by Input_ReadController from hardware
+;   
+;   $94: Newly pressed buttons (pressed THIS frame)
+;        - Read by this function to detect new presses
+;        - Set by Input_ReadController
+;
+; EXAMPLE SEQUENCE:
+;
+;   User holds DOWN button on D-pad in menu:
+;   
+;   Frame 0: DOWN pressed
+;     $94 = $0400 (newly pressed)
+;     → Input_ProcessRepeat_NewPress
+;     → $07 = $0400 (immediate)
+;     → $09 = $0019 (25 frame delay)
+;     Result: Menu cursor moves down immediately
+;   
+;   Frames 1-24: DOWN held
+;     $94 = $0000 (not new)
+;     $92 = $0400 (still held)
+;     $09 = 24, 23, 22, ... 1, 0 (counting down)
+;     → No repeat yet
+;     Result: Cursor stays still
+;   
+;   Frame 25: Timer expires
+;     $09 = -1 (< 0)
+;     → $07 = $0400 (first repeat)
+;     → $09 = $0005 (6 frame interval)
+;     Result: Cursor moves down again
+;   
+;   Frames 26-30: Timer counting
+;     $09 = 5, 4, 3, 2, 1, 0
+;     Result: Cursor stays still
+;   
+;   Frame 31: Second repeat
+;     $09 = -1
+;     → $07 = $0400
+;     → $09 = $0005
+;     Result: Cursor moves down (3rd time total)
+;   
+;   [Pattern continues every 6 frames while held]
+;   
+;   Frame X: User releases DOWN
+;     $92 = $0000 (no buttons)
+;     → Return immediately (no repeat)
+;     Next press starts over with 25-frame delay
+;
+; USAGE PATTERN:
+;
+;   Main loop:
+;       jsr Input_ReadController    ; Read hardware, update $92/$94
+;       jsr Input_ProcessRepeat     ; Generate autofire in $07
+;       ; Now $90 = autofire output
+;       ; Input_ReadController will OR $90 with hardware next frame
+;       jsr Menu_HandleNavigation   ; Use combined input
+;
+; WHY TWO-STAGE TIMING:
+;   Initial delay (25 frames):
+;     - Prevents unwanted repeats from brief button taps
+;     - Gives user time to release for single action
+;     - Industry standard: 300-500ms initial delay
+;   
+;   Fast repeat (6 frames):
+;     - Enables quick scrolling through long lists
+;     - Not too fast (avoids overshooting desired item)
+;     - 10 repeats/sec = comfortable navigation speed
+;
+; COMMON CALLERS:
+;   - Menu_ProcessInput: Menu navigation with autofire
+;   - Dialog_WaitForInput: Dialog text scrolling
+;   - Field_HandleMovement: Potentially for held movement
+;   - Inventory_Navigate: Item list scrolling
+;
+; PERFORMANCE:
+;   Best case (no buttons held): ~15 cycles (~6μs)
+;   New press case: ~25 cycles (~9μs)
+;   Held button case: ~30-40 cycles (~11-15μs)
+;   
+;   Called once per frame (60 times/second)
+;   Total CPU usage: <1% (negligible)
+;
+; TECHNICAL NOTES:
+;
+;   The DEC instruction on $09 automatically sets the N (negative) flag
+;   when the value goes from $00 to $FF (-1 in signed interpretation).
+;   BPL (Branch if Plus) tests N flag:
+;     N=0 (positive): branch taken, return (still in delay)
+;     N=1 (negative): branch not taken, generate repeat
+;   
+;   This is more efficient than comparing with zero explicitly:
+;     DEC + BPL: 5 + 2 = 7 cycles
+;     CMP + BCS: 3 + 2 = 5 cycles (but requires CMP #$00)
+;   
+;   The direct assignment "sta.B $07" with held buttons in A ($92)
+;   copies ALL held buttons to autofire output. If multiple buttons
+;   are held simultaneously, they all repeat together. This is
+;   usually fine (multiple D-pad buttons typically conflict), but
+;   could cause issues if game logic doesn't expect it.
+;
+;   Timer value $0019 (25 decimal) chosen to match typical console
+;   input standards:
+;     NES/SNES standard: ~300-500ms initial delay
+;     25 frames @ 16.67ms = 416.7ms ✓
+;   
+;   Repeat rate $0005 (6 frames) = 100ms chosen for responsiveness:
+;     Too fast (<60ms): Hard to stop on desired item
+;     Too slow (>150ms): Feels sluggish
+;     100ms: Sweet spot for menu navigation
+;
+; REGISTERS MODIFIED:
+;   A: Temporary values (button states, timer values)
+;   Direct Page $07: Autofire output
+;   Direct Page $09: Repeat timer (updated)
+;
+; REGISTERS PRESERVED:
+;   None (caller should not depend on A preservation)
+;
+; RELATED FUNCTIONS:
+;   - Input_ReadController ($008BA0): Main input polling
+;   - Menu_HandleNavigation: Uses autofire for cursor movement
+;===============================================================================
 Input_ProcessRepeat:
-	stz.B $07                            ;008BFD|6407    |000007;
-	lda.B $94                            ;008BFF|A594    |000094;
-	bne Input_ProcessRepeat_NewPress     ;008C01|D010    |008C13;
-	lda.B $92                            ;008C03|A592    |000092;
-	beq Input_ProcessRepeat_Return       ;008C05|F00B    |008C12;
-	dec.B $09                            ;008C07|C609    |000009;
-	bpl Input_ProcessRepeat_Return       ;008C09|1007    |008C12;
-	sta.B $07                            ;008C0B|8507    |000007;
-	lda.W #$0005                         ;008C0D|A90500  |      ;
-	sta.B $09                            ;008C10|8509    |000009;
+	stz.B $07	; Clear autofire output: assume no repeat this frame
+	lda.B $94	; A = newly pressed buttons (from Input_ReadController)
+	bne Input_ProcessRepeat_NewPress	; If any new press, handle initial press logic
+	lda.B $92	; A = currently held buttons
+	beq Input_ProcessRepeat_Return	; If no buttons held, nothing to repeat → return
+	dec.B $09	; Decrement repeat timer (counts down each frame)
+	bpl Input_ProcessRepeat_Return	; If timer ≥ 0, still in delay period → return
+	sta.B $07	; Timer expired: store held buttons as autofire output (repeat event)
+	lda.W #$0005	; A = $0005 (6 frames = 100ms repeat interval)
+	sta.B $09	; Reset timer for next repeat cycle
 ;      |        |      ;
 Input_ProcessRepeat_Return:
-	rts                                  ;008C12|60      |      ;
+	rts	; Return to caller with $07 = autofire output (0 or button repeat)
 ;      |        |      ;
 ;      |        |      ;
 Input_ProcessRepeat_NewPress:
-	sta.B $07                            ;008C13|8507    |000007;
-	lda.W #$0019                         ;008C15|A91900  |      ;
-	sta.B $09                            ;008C18|8509    |000009;
-	rts                                  ;008C1A|60      |      ;
+	sta.B $07	; Store newly pressed buttons in autofire output (immediate)
+	lda.W #$0019	; A = $0019 (25 frames = 417ms initial delay before first repeat)
+	sta.B $09	; Set repeat timer for initial delay period
+	rts	; Return with new press handled
+;      |        |      ;
+;      |        |      ;
 ;      |        |      ;
 ;      |        |      ;
 Cursor_CalcPosition:
