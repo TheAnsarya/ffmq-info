@@ -2045,52 +2045,293 @@ Char_UpdateAllTiles:
 ;      |        |      ;
 	inc.B $01                            ;008A61|E601    |000001;
 ;      |        |      ;
+;===============================================================================
+; Cursor_CheckBounds - Validate and Clamp Cursor Position Within Menu Bounds
+;===============================================================================
+; ADDRESS:  $008A63 (Bank $00)
+; LENGTH:   58 bytes ($008A9D - $008A63 = $3A bytes = 58 decimal)
+; TYPE:     Subroutine (RTS return, part of cursor movement validation system)
+;
+; PURPOSE:
+;   Validates cursor position against menu boundaries and handles wrapping
+;   or clamping behavior based on menu configuration flags. Ensures cursor
+;   stays within valid menu grid coordinates (vertical and horizontal limits).
+;   
+;   Supports three boundary behaviors per axis:
+;   1. Wrap: Cursor wraps from max to 0 (and vice versa)
+;   2. Clamp: Cursor stops at boundary (stays at max-1 or 0)
+;   3. Stop: Movement blocked when reaching boundary
+;   
+;   Used by menu systems for item selection, equipment screens, battle
+;   action menus, and any interface with grid-based cursor navigation.
+;
+; ALGORITHM: Two-Pass Boundary Check (Vertical then Horizontal)
+;
+;   Pass 1 - Vertical Bounds Check:
+;     1. Load cursor Y position ($01)
+;     2. Check if negative (< 0): branch to wrap check
+;     3. Compare with vertical limit ($03)
+;     4. If within bounds: continue to horizontal check
+;     5. If out of bounds: check wrap flag (bit 0 of $95)
+;        - Wrap enabled: wrap to 0
+;        - Wrap disabled: check clamp flag (bit 1)
+;          - Clamp enabled: set to max-1
+;          - Clamp disabled: set to 0
+;   
+;   Pass 2 - Horizontal Bounds Check:
+;     1. Load cursor X position ($02)
+;     2. Check if negative (< 0): branch to wrap check
+;     3. Compare with horizontal limit ($04)
+;     4. If within bounds: return (cursor valid)
+;     5. If out of bounds: check wrap flag (bit 2 of $95)
+;        - Wrap enabled: wrap to 0
+;        - Wrap disabled: check clamp flag (bit 3)
+;          - Clamp enabled: set to max-1
+;          - Clamp disabled: set to 0
+;
+; PARAMETERS:
+;
+;   INPUT:
+;     $01: Cursor Y position (signed 8-bit, row index)
+;       Range: -1 to 255 (negative = out of bounds top)
+;     
+;     $02: Cursor X position (signed 8-bit, column index)
+;       Range: -1 to 255 (negative = out of bounds left)
+;     
+;     $03: Vertical boundary limit (max Y + 1)
+;       Example: 5 rows → limit = 5 (valid Y: 0-4)
+;     
+;     $04: Horizontal boundary limit (max X + 1)
+;       Example: 8 columns → limit = 8 (valid X: 0-7)
+;     
+;     $95: Menu behavior flags (bit flags for wrap/clamp control)
+;       Bit 0: Vertical wrap enable (1 = wrap, 0 = check clamp)
+;       Bit 1: Vertical clamp enable (1 = clamp to max-1, 0 = wrap to 0)
+;       Bit 2: Horizontal wrap enable (1 = wrap, 0 = check clamp)
+;       Bit 3: Horizontal clamp enable (1 = clamp to max-1, 0 = wrap to 0)
+;       Bits 4-7: Other menu flags (not used by this function)
+;   
+;   OUTPUT:
+;     $01: Validated/corrected cursor Y position (0 to limit-1)
+;     $02: Validated/corrected cursor X position (0 to limit-1)
+;     
+;     Both values guaranteed to be within bounds after return
+;
+; CALL SEQUENCE EXAMPLE:
+;
+;   ; Menu with 5 rows, 3 columns, vertical wrap, horizontal clamp
+;   lda #5; sta $03          ; Vertical limit (rows 0-4)
+;   lda #3; sta $04          ; Horizontal limit (cols 0-2)
+;   lda #%00000001; sta $95  ; Bit 0 set = vertical wrap
+;   
+;   ; Player presses down at row 4
+;   lda $01; inc a; sta $01  ; Y = 5 (out of bounds)
+;   jsr Cursor_CheckBounds
+;   ; Result: $01 = 0 (wrapped to top)
+;   
+;   ; Player presses right at column 2
+;   lda $02; inc a; sta $02  ; X = 3 (out of bounds)
+;   jsr Cursor_CheckBounds
+;   ; Result: $02 = 2 (clamped to max, bit 1 not set = default 0)
+;
+; VERTICAL BOUNDARY BEHAVIOR ($01 vs $03):
+;
+;   Behavior matrix (based on $95 bits 0-1):
+;     
+;     Case 1: Y < 0 (moved up past top)
+;       Bit 1=0, Bit 0=X: Set Y = 0 (wrap to top)
+;       Bit 1=1, Bit 0=X: Set Y = limit-1 (clamp to bottom)
+;     
+;     Case 2: Y >= limit (moved down past bottom)
+;       Bit 0=1: (not reached, wrap check in separate path)
+;       Bit 0=0, Bit 1=0: Set Y = 0 (wrap to top)
+;       Bit 0=0, Bit 1=1: Set Y = limit-1 (clamp to bottom)
+;   
+;   Common configurations:
+;     $95 & $03 = %00: No wrap, reset to 0 (simple wrap)
+;     $95 & $03 = %01: Wrap enabled (continuous scrolling)
+;     $95 & $03 = %10: Clamp enabled (stop at edges)
+;     $95 & $03 = %11: Clamp enabled (wrap bit ignored)
+;
+; HORIZONTAL BOUNDARY BEHAVIOR ($02 vs $04):
+;
+;   Identical logic to vertical, using bits 2-3 instead of bits 0-1.
+;   
+;   Behavior matrix (based on $95 bits 2-3):
+;     
+;     Case 1: X < 0 (moved left past edge)
+;       Bit 3=0, Bit 2=X: Set X = 0 (wrap to left)
+;       Bit 3=1, Bit 2=X: Set X = limit-1 (clamp to right)
+;     
+;     Case 2: X >= limit (moved right past edge)
+;       Bit 2=1: (not reached, wrap check in separate path)
+;       Bit 2=0, Bit 3=0: Set X = 0 (wrap to left)
+;       Bit 2=0, Bit 3=1: Set X = limit-1 (clamp to right)
+;
+; WHY CHECK NEGATIVE VALUES (BMI):
+;
+;   Cursor position is signed 8-bit:
+;     0-127: Valid positive coordinates
+;     128-255: Interpreted as -128 to -1 (negative flag set)
+;   
+;   When cursor moves up/left past 0:
+;     0 - 1 = $FF = -1 (negative, triggers BMI branch)
+;   
+;   BMI (Branch if Minus) checks processor N flag:
+;     N=1 if bit 7 set (value >= 128 = negative in signed)
+;     Allows detection of underflow without explicit comparison
+;
+; PERFORMANCE:
+;
+;   Best case (cursor within bounds): ~20 cycles
+;     - LDA $01: 3 cycles
+;     - BMI: 2 cycles (not taken)
+;     - CMP $03: 3 cycles
+;     - BCC: 3 cycles (taken to horizontal check)
+;     - LDA $02: 3 cycles
+;     - BMI: 2 cycles (not taken)
+;     - CMP $04: 3 cycles
+;     - BCC: 3 cycles (taken to return)
+;     - RTS: 6 cycles
+;     Total: ~28 cycles
+;   
+;   Worst case (both axes out of bounds, clamp): ~60 cycles
+;     Includes wrap/clamp decision branches and corrections
+;
+; COMMON USE CASES:
+;
+;   1. Item Menu (8×4 grid, wrap both axes):
+;      lda #8; sta $03; lda #4; sta $04
+;      lda #%00000101; sta $95  ; Bits 0,2 = wrap enabled
+;      jsr Cursor_CheckBounds
+;   
+;   2. Battle Actions (4×1 vertical list, no wrap):
+;      lda #4; sta $03; lda #1; sta $04
+;      stz $95  ; No wrap, clamp to bounds
+;      jsr Cursor_CheckBounds
+;   
+;   3. Equipment Screen (5×2 grid, vertical wrap, horizontal clamp):
+;      lda #5; sta $03; lda #2; sta $04
+;      lda #%00001001; sta $95  ; Bit 0=wrap vertical, bit 3=clamp horizontal
+;      jsr Cursor_CheckBounds
+;
+; SUBROUTINE BREAKDOWN:
+;
+;   Cursor_CheckBounds ($008A63):
+;     Entry point, checks vertical bounds first
+;   
+;   Cursor_ClampVertical ($008A71):
+;     Clamps Y to limit-1 (bottom edge)
+;   
+;   Cursor_CheckWrap1 ($008A78):
+;     Handles vertical wrap vs clamp decision
+;   
+;   Cursor_CheckHorizontal ($008A80):
+;     Checks horizontal bounds (X position)
+;   
+;   Cursor_ClampHorizontal ($008A8E):
+;     Clamps X to limit-1 (right edge)
+;   
+;   Cursor_CheckWrap2 ($008A94):
+;     Handles horizontal wrap vs clamp decision
+;   
+;   Cursor_UpdateComplete ($008A9C):
+;     Return point (cursor validated and corrected)
+;
+; WHY TWO-PASS ALGORITHM (VERTICAL THEN HORIZONTAL):
+;
+;   Design rationale:
+;   - Sequential validation ensures both axes checked
+;   - Vertical checked first (common menu layout priority)
+;   - Independent flag bits allow different behavior per axis
+;   - Single RTS at end (code reuse, smaller ROM footprint)
+;   
+;   Alternative (combined check):
+;     More complex branching logic required
+;     Would duplicate RTS instructions
+;     Current approach: simpler, more maintainable
+;
+; RELATED FUNCTIONS:
+;   - Cursor_CalcPosition ($008A0D): Converts grid coordinates to screen position
+;   - Input_ProcessRepeat ($0095C7): Auto-repeat for cursor movement
+;   - Menu_UpdateCursor ($008xxx): Updates cursor sprite based on position
+;
+; REGISTERS MODIFIED:
+;   A: Used for comparisons and corrections (not preserved)
+;   $01: Cursor Y position (corrected to valid range)
+;   $02: Cursor X position (corrected to valid range)
+;
+; REGISTERS PRESERVED:
+;   X, Y: Not accessed (preserved implicitly)
+;   $03, $04: Boundary limits (read-only, not modified)
+;   $95: Menu flags (read-only, not modified)
+;
+; TECHNICAL NOTES:
+;
+;   Signed comparison behavior:
+;     BMI checks N flag (bit 7 of accumulator)
+;     Values 0-127: N=0 (positive)
+;     Values 128-255: N=1 (negative in signed interpretation)
+;     CMP sets flags based on unsigned subtraction
+;     BCC (Branch if Carry Clear) for "less than" check
+;   
+;   Flag bit layout ($95):
+;     Bits 0-3: Boundary behavior (this function)
+;     Bits 4-7: Other menu state (different subsystems)
+;     Bitwise AND isolates specific behavior flags
+;   
+;   Decrement trick (DEC A):
+;     For limit=5, valid range is 0-4
+;     Clamp sets position to limit-1 (5-1=4, max valid)
+;     Prevents off-by-one errors in grid indexing
+;
+;===============================================================================
 Cursor_CheckBounds:
-	lda.B $01                            ;008A63|A501    |000001;
-	bmi Cursor_CheckWrap1                ;008A65|3011    |008A78;
-	cmp.B $03                            ;008A67|C503    |000003;
-	bcc Cursor_CheckHorizontal           ;008A69|9015    |008A80;
-	lda.B $95                            ;008A6B|A595    |000095;
-	and.B #$01                           ;008A6D|2901    |      ;
-	bne Cursor_CheckWrap1                ;008A6F|D007    |008A78;
+	lda.B $01                            ;008A63|A501    |000001;	[3 cycles] Load cursor Y position (row index, check if within vertical bounds)
+	bmi Cursor_CheckWrap1                ;008A65|3011    |008A78;	[2/3 cycles] Branch if negative (Y < 0, moved up past top edge, handle underflow)
+	cmp.B $03                            ;008A67|C503    |000003;	[3 cycles] Compare Y with vertical limit (is Y >= max_rows?)
+	bcc Cursor_CheckHorizontal           ;008A69|9015    |008A80;	[3/2 cycles] Branch if Y < limit (within bounds, skip to horizontal check)
+	lda.B $95                            ;008A6B|A595    |000095;	[3 cycles] Load menu behavior flags (check wrap/clamp configuration for vertical axis)
+	and.B #$01                           ;008A6D|2901    |      ;	[2 cycles] Isolate bit 0 (vertical wrap enable flag)
+	bne Cursor_CheckWrap1                ;008A6F|D007    |008A78;	[2/3 cycles] Branch if wrap enabled (use wrap logic instead of clamping)
 ;      |        |      ;
 Cursor_ClampVertical:
-	lda.B $03                            ;008A71|A503    |000003;
-	dec a;008A73|3A      |      ;
-	sta.B $01                            ;008A74|8501    |000001;
-	bra Cursor_CheckHorizontal           ;008A76|8008    |008A80;
+	lda.B $03                            ;008A71|A503    |000003;	[3 cycles] Load vertical limit (max_rows, prepare to clamp to bottom edge)
+	dec a                                ;008A73|3A      |      ;	[2 cycles] Decrement to max valid index (limit-1, e.g., 5 rows → index 4)
+	sta.B $01                            ;008A74|8501    |000001;	[3 cycles] Store clamped Y position (cursor set to bottom row)
+	bra Cursor_CheckHorizontal           ;008A76|8008    |008A80;	[3 cycles] Skip to horizontal bounds check (vertical correction complete)
 ;      |        |      ;
 ;      |        |      ;
 Cursor_CheckWrap1:
-	lda.B $95                            ;008A78|A595    |000095;
-	and.B #$02                           ;008A7A|2902    |      ;
-	bne Cursor_ClampVertical             ;008A7C|D0F3    |008A71;
-	stz.B $01                            ;008A7E|6401    |000001;
+	lda.B $95                            ;008A78|A595    |000095;	[3 cycles] Load menu behavior flags again (check clamp flag for vertical axis)
+	and.B #$02                           ;008A7A|2902    |      ;	[2 cycles] Isolate bit 1 (vertical clamp enable flag)
+	bne Cursor_ClampVertical             ;008A7C|D0F3    |008A71;	[2/3 cycles] Branch if clamp enabled (set Y to limit-1, bottom edge)
+	stz.B $01                            ;008A7E|6401    |000001;	[3 cycles] Clear Y position (wrap to top row, Y = 0, default wrap behavior)
 ;      |        |      ;
 Cursor_CheckHorizontal:
-	lda.B $02                            ;008A80|A502    |000002;
-	bmi Cursor_CheckWrap2                ;008A82|3010    |008A94;
-	cmp.B $04                            ;008A84|C504    |000004;
-	bcc Cursor_UpdateComplete            ;008A86|9014    |008A9C;
-	lda.B $95                            ;008A88|A595    |000095;
-	and.B #$04                           ;008A8A|2904    |      ;
-	bne Cursor_CheckWrap2                ;008A8C|D006    |008A94;
+	lda.B $02                            ;008A80|A502    |000002;	[3 cycles] Load cursor X position (column index, check if within horizontal bounds)
+	bmi Cursor_CheckWrap2                ;008A82|3010    |008A94;	[2/3 cycles] Branch if negative (X < 0, moved left past edge, handle underflow)
+	cmp.B $04                            ;008A84|C504    |000004;	[3 cycles] Compare X with horizontal limit (is X >= max_cols?)
+	bcc Cursor_UpdateComplete            ;008A86|9014    |008A9C;	[3/2 cycles] Branch if X < limit (within bounds, validation complete, return)
+	lda.B $95                            ;008A88|A595    |000095;	[3 cycles] Load menu behavior flags (check wrap/clamp configuration for horizontal axis)
+	and.B #$04                           ;008A8A|2904    |      ;	[2 cycles] Isolate bit 2 (horizontal wrap enable flag)
+	bne Cursor_CheckWrap2                ;008A8C|D006    |008A94;	[2/3 cycles] Branch if wrap enabled (use wrap logic instead of clamping)
 ;      |        |      ;
 Cursor_ClampHorizontal:
-	lda.B $04                            ;008A8E|A504    |000004;
-	dec a;008A90|3A      |      ;
-	sta.B $02                            ;008A91|8502    |000002;
-	rts                                  ;008A93|60      |      ;
+	lda.B $04                            ;008A8E|A504    |000004;	[3 cycles] Load horizontal limit (max_cols, prepare to clamp to right edge)
+	dec a                                ;008A90|3A      |      ;	[2 cycles] Decrement to max valid index (limit-1, e.g., 8 cols → index 7)
+	sta.B $02                            ;008A91|8502    |000002;	[3 cycles] Store clamped X position (cursor set to rightmost column)
+	rts                                  ;008A93|60      |      ;	[6 cycles] Return to caller (both axes validated and corrected)
 ;      |        |      ;
 ;      |        |      ;
 Cursor_CheckWrap2:
-	lda.B $95                            ;008A94|A595    |000095;
-	and.B #$08                           ;008A96|2908    |      ;
-	bne Cursor_ClampHorizontal           ;008A98|D0F4    |008A8E;
-	stz.B $02                            ;008A9A|6402    |000002;
+	lda.B $95                            ;008A94|A595    |000095;	[3 cycles] Load menu behavior flags again (check clamp flag for horizontal axis)
+	and.B #$08                           ;008A96|2908    |      ;	[2 cycles] Isolate bit 3 (horizontal clamp enable flag)
+	bne Cursor_ClampHorizontal           ;008A98|D0F4    |008A8E;	[2/3 cycles] Branch if clamp enabled (set X to limit-1, right edge)
+	stz.B $02                            ;008A9A|6402    |000002;	[3 cycles] Clear X position (wrap to left column, X = 0, default wrap behavior)
 ;      |        |      ;
 Cursor_UpdateComplete:
-	rts                                  ;008A9C|60      |      ;
+	rts                                  ;008A9C|60      |      ;	[6 cycles] Return to caller (cursor position validated, within bounds)
 ;      |        |      ;
 	jsr.W Input_CheckCancel              ;008A9D|20578B  |008B57;
 	bne Input_ToggleReturn               ;008AA0|D01A    |008ABC;
