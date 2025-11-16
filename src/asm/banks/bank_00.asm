@@ -1734,22 +1734,22 @@ Graphics_WriteVRAM:
 	ldx.W #$0003                         ;008800|A20300  |      ;
 ;      |        |      ;
 Graphics_LoadData:
-	lda.W DATA8_008960,x                 ;008803|BD6089  |008960;
-	sta.B !SNES_VMDATAL-$2100             ;008806|8518    |002118;
-	lda.W DATA8_008961,x                 ;008808|BD6189  |008961;
-	sta.B !SNES_VMDATAL-$2100             ;00880B|8518    |002118;
-	lda.W DATA8_008962,x                 ;00880D|BD6289  |008962;
-	sta.B !SNES_VMDATAL-$2100             ;008810|8518    |002118;
+	lda.W Graphics_PaletteIndices_Primary,x  ;008803|BD6089  |008960;	Load palette index 1
+	sta.B !SNES_VMDATAL-$2100             ;008806|8518    |002118;	→ VMDATAL ($2118)
+	lda.W Graphics_PaletteIndices_Primary2,x ;008808|BD6189  |008961;	Load palette index 2
+	sta.B !SNES_VMDATAL-$2100             ;00880B|8518    |002118;	→ VMDATAL ($2118)
+	lda.W Graphics_PaletteIndices_Primary3,x ;00880D|BD6289  |008962;	Load palette index 3
+	sta.B !SNES_VMDATAL-$2100             ;008810|8518    |002118;	→ VMDATAL ($2118)
 	lda.B #$02                           ;008812|A902    |      ;
 	and.w !system_flags_4                          ;008814|2DD800  |0000D8;
 	beq Graphics_PaletteEnd              ;008817|F021    |00883A;
-	lda.W DATA8_008960,x                 ;008819|BD6089  |008960;
+	lda.W Graphics_PaletteIndices_Primary,x  ;008819|BD6089  |008960;	Mirror to WRAM buffer ($7E26F6)
 	sta.L $7e26f6                        ;00881C|8FF6267E|7E26F6;
 	sta.L $7f16f6                        ;008820|8FF6167F|7F16F6;
-	lda.W DATA8_008961,x                 ;008824|BD6189  |008961;
+	lda.W Graphics_PaletteIndices_Primary2,x ;008824|BD6189  |008961;	Mirror to WRAM buffer ($7E26F8)
 	sta.L $7e26f8                        ;008827|8FF8267E|7E26F8;
 	sta.L $7f16f8                        ;00882B|8FF8167F|7F16F8;
-	lda.W DATA8_008962,x                 ;00882F|BD6289  |008962;
+	lda.W Graphics_PaletteIndices_Primary3,x ;00882F|BD6289  |008962;	Mirror to WRAM buffer ($7E26FA)
 	sta.L $7e26fa                        ;008832|8FFA267E|7E26FA;
 	sta.L $7f16fa                        ;008836|8FFA167F|7F16FA;
 ;      |        |      ;
@@ -1902,14 +1902,14 @@ Graphics_WritePaletteSlot:
 	rts                                  ;00895F|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
-DATA8_008960:
-	db $3c                               ;008960|        |      ;
+Graphics_PaletteIndices_Primary:
+	db $3c                               ;008960|        |      ;	Palette index 1 (primary character)
 ;      |        |      ;
-DATA8_008961:
-	db $3d                               ;008961|        |      ;
+Graphics_PaletteIndices_Primary2:
+	db $3d                               ;008961|        |      ;	Palette index 2 (primary character)
 ;      |        |      ;
-DATA8_008962:
-	db $3e,$45,$3a,$3b                   ;008962|        |      ;
+Graphics_PaletteIndices_Primary3:
+	db $3e,$45,$3a,$3b                   ;008962|        |      ;	Palette indices 3 + secondary character set
 	rep #$30                             ;008966|C230    |      ;
 	lda.W #$0000                         ;008968|A90000  |      ;
 	tcd                                  ;00896B|5B      |      ;
