@@ -9073,7 +9073,7 @@ Memory_FillLong:
 ; ALGORITHM:
 ;   1. For counts ≥ 64 bytes: Fill in 64-byte chunks (unrolled)
 ;   2. For remainder < 64 bytes: Jump to specific unrolled routine
-;   3. Uses jump table for exact byte counts (DATA8_009a1e)
+;   3. Uses jump table for exact byte counts (Memory_Fill_JumpTable)
 ;
 ; PERFORMANCE OPTIMIZATION:
 ;   - Unrolled loops eliminate branch overhead
@@ -9083,7 +9083,7 @@ Memory_FillLong:
 ;
 ; UNROLLED FILL SIZES:
 ;   64, 32, 16, 14, 12, 8, 6, 4, 2 bytes
-;   Exact matches via jump table at DATA8_009a1e
+;   Exact matches via jump table at Memory_Fill_JumpTable
 ;
 ; USAGE EXAMPLES:
 ;   ; Fill 256 bytes at $7F:0000 with $0000
@@ -9111,7 +9111,7 @@ Memory_FillLong:
 ; JUMP TABLE CALCULATION:
 ;   - Remainder = count & $003F (last 6 bits)
 ;   - Each entry = 2 bytes (word address)
-;   - Table base = DATA8_009a1e
+;   - Table base = Memory_Fill_JumpTable
 ;   - Jump = table[remainder*2]
 ;
 ; MEMORY ACCESS PATTERN (64-byte chunk):
@@ -9170,7 +9170,7 @@ Memory_Fill_64ByteLoop:
 Memory_Fill_TableJump:
 	tax                                  ;0099B8|AA      |      ; X = remainder (0-63)
 	pla                                  ;0099B9|68      |      ; Pull fill value into A
-	jmp.W (DATA8_009a1e,x)               ;0099BA|7C1E9A  |009A1E; Jump to exact unrolled routine for remainder
+	jmp.W (Memory_Fill_JumpTable,x)      ;0099BA|7C1E9A  |009A1E; Jump to exact unrolled routine for remainder
 ;      |        |      ;
 ;      |        |      ;
 ;-------------------------------------------------------------------------------
@@ -9242,14 +9242,14 @@ Memory_Fill_8Bytes:
 ;      |        |      ;
 ;      |        |      ;
 ;-------------------------------------------------------------------------------
-; DATA8_009a1e - Jump table for Memory_Fill remainder handling
+; Memory_Fill_JumpTable - Jump table for Memory_Fill remainder handling
 ; Maps byte count (0-63) to unrolled fill routine address
 ; Each entry is a 16-bit address pointer
 ; Table covers all possible remainders when count % 64
 ; Even byte counts point to exact routines
 ; Odd byte counts point to next higher even routine (word addressing)
 ;-------------------------------------------------------------------------------
-DATA8_009a1e:
+Memory_Fill_JumpTable:
 	db $1d,$9a,$1a,$9a,$17,$9a,$14,$9a,$11,$9a;009A1E|        |      ;
 	db $0e,$9a                           ;009A28|        |000B9A;
 	db $0b,$9a,$08,$9a,$05,$9a,$02,$9a,$ff,$99,$fc,$99,$f9,$99,$f6,$99;009A2A|        |      ;
@@ -10301,7 +10301,7 @@ Dialog_Execute:
 ;   $D0 bit 7: Force exit flag (clear and terminate)
 ;   $D0 bits 4+7: Pause/resume dialog processing
 ;
-; COMMAND DISPATCH TABLE (DATA8_009e0e):
+; COMMAND DISPATCH TABLE (Dialog_CommandDispatchTable):
 ;   48 command handlers (96 bytes = 48 × 2-byte addresses)
 ;   Index: command byte × 2 (word indexing)
 ;   Example: Command $00 → jump to [$009E0E] = $A378
@@ -10749,7 +10749,7 @@ Dialog_ProcessCommand:
 	bcs Dialog_ProcessCommand_TextReference                      ;009DD5|B008    |009DDF; If ≥ $30 → handle as text reference ($30-$7F)
 	asl a                                ;009DD7|0A      |      ; A × 2 = word index into jump table
 	tax                                  ;009DD8|AA      |      ; X = jump table index (command × 2)
-	jsr.W (DATA8_009e0e,x)               ;009DD9|FC0E9E  |009E0E; Indirect jump: read handler address from table, call it
+	jsr.W (Dialog_CommandDispatchTable,x) ;009DD9|FC0E9E  |009E0E; Indirect jump: read handler address from table, call it
 	rep #$30                             ;009DDC|C230    |      ; Restore 16-bit A and X/Y (defensive: handlers may change)
 	rts                                  ;009DDE|60      |      ; Return to caller (Dialog_ReadNextByte loop)
 ;      |        |      ;
@@ -10785,7 +10785,7 @@ Dialog_ProcessCommand_TextReference_Jump:
 	jmp.W Dialog_ExecuteNestedCall                    ;009E0B|4CF9A7  |00A7F9;
 ;      |        |      ;
 ;      |        |      ;
-DATA8_009e0e:
+Dialog_CommandDispatchTable:
 	db $78,$a3,$c0,$a8,$bd,$a8,$9c,$a3,$54,$b3,$7f,$a3,$b0,$b4;009E0E|        |      ;
 	db $08,$a7                           ;009E1C|        |      ;
 	db $55,$a7,$3f,$a8,$19,$a5,$f5,$a3,$58,$a9,$6c,$a9,$7d,$a9,$d6,$af;009E1E|        |      ;
@@ -10795,8 +10795,8 @@ DATA8_009e0e:
 	db $f4,$b2,$50,$a1,$a2,$ae,$1d,$a1,$7d,$a0,$89,$a0,$9d,$a0,$a9,$a0;009E50|        |      ;
 	db $b5,$ae,$79,$b3,$c7,$ae,$55,$b3,$74,$a0,$63,$a5,$6e,$a0;009E60|        |      ;
 ;      |        |      ;
-DATA8_009e6e:
-	db $42,$a3,$ab,$a3,$1e,$a5           ;009E6E|        |      ;
+Dialog_SubCommandDispatchTable:
+	db $42,$a3,$ab,$a3,$1e,$a5           ;009E6E|        |      ; Jump table for sub-commands (extended dialog commands)
 	db $2e,$a5                           ;009E74|        |00D5A5;
 	db $d5,$a3,$de,$a3,$e5,$a3,$ec,$a3   ;009E76|        |      ;
 	db $00,$00                           ;009E7E|        |      ;
@@ -11409,12 +11409,12 @@ Cutscene_ProcessScroll_Finish:
 	tsb.W $00d0                          ;00A37B|0CD000  |0000D0;
 	rts                                  ;00A37E|60      |      ;
 ;      |        |      ;
-	lda.B [$17]                          ;00A37F|A717    |000017;
-	inc.B $17                            ;00A381|E617    |000017;
-	and.W #$00ff                         ;00A383|29FF00  |      ;
-	asl a;00A386|0A      |      ;
-	tax                                  ;00A387|AA      |      ;
-	jmp.W (DATA8_009e6e,x)               ;00A388|7C6E9E  |009E6E;
+	lda.B [$17]                          ;00A37F|A717    |000017;	Read sub-command byte
+	inc.B $17                            ;00A381|E617    |000017;	Advance text pointer
+	and.W #$00ff                         ;00A383|29FF00  |      ;	Mask to byte value
+	asl a;00A386|0A      |      ;	× 2 (word index)
+	tax                                  ;00A387|AA      |      ;	X = sub-command index
+	jmp.W (Dialog_SubCommandDispatchTable,x) ;00A388|7C6E9E  |009E6E;	Jump to sub-command handler
 ;      |        |      ;
 	lda.W #$0080                         ;00A38B|A98000  |      ;
 	tsb.w !system_flags_4                          ;00A38E|0CD800  |0000D8;
@@ -12645,7 +12645,7 @@ TextBox_DrawPattern_WithXOR:
 	sta.B $64                            ;00AD87|8564    |000064;
 ;      |        |      ;
 TextBox_DrawPattern_WithXOR_Loop:
-	jsr.W (DATA8_009a1e,x)               ;00AD89|FC1E9A  |009A1E;
+	jsr.W (Memory_Fill_JumpTable,x)      ;00AD89|FC1E9A  |009A1E;
 	tya                                  ;00AD8C|98      |      ;
 	adc.W #$0040                         ;00AD8D|694000  |      ;
 	tay                                  ;00AD90|A8      |      ;
@@ -12694,7 +12694,7 @@ Menu_InitializeSlots_Loop:
 	lda.B $64                            ;00ADDB|A564    |000064;
 	and.W #$fff8                         ;00ADDD|29F8FF  |      ;
 	adc.W #$0008                         ;00ADE0|690800  |      ;
-	jsr.W (DATA8_009a1e,x)               ;00ADE3|FC1E9A  |009A1E;
+	jsr.W (Memory_Fill_JumpTable,x)      ;00ADE3|FC1E9A  |009A1E;
 	sbc.W #$0007                         ;00ADE6|E90700  |      ;
 	tax                                  ;00ADE9|AA      |      ;
 	lda.B $64                            ;00ADEA|A564    |000064;
@@ -12732,7 +12732,7 @@ Menu_ClearSlots_Loop:
 	asl a;00AE1E|0A      |      ;
 	tax                                  ;00AE1F|AA      |      ;
 	lda.B $64                            ;00AE20|A564    |000064;
-	jsr.W (DATA8_009a1e,x)               ;00AE22|FC1E9A  |009A1E;
+	jsr.W (Memory_Fill_JumpTable,x)      ;00AE22|FC1E9A  |009A1E;
 	plb                                  ;00AE25|AB      |      ;
 	rts                                  ;00AE26|60      |      ;
 ;      |        |      ;
