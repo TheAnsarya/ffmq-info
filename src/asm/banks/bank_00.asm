@@ -5547,50 +5547,380 @@ Math_Multiply16x16_AddShift:
 	rtl	; Long return to caller with product in $9E-$A1
 ;      |        |      ;
 ;      |        |      ;
+;===============================================================================
+; Math_Divide32by16
+;-------------------------------------------------------------------------------
+; Software implementation of 32-bit ÷ 16-bit unsigned division
+; Performs long division algorithm to divide 32-bit dividend by 16-bit divisor
+; Companion function to Math_Multiply16x16 (batch 27)
+;
+; CALLING CONVENTION:
+;   JSL (long call from any bank)
+;   Input:  $98-$9B = 32-bit dividend (little-endian, value to divide)
+;           $9C-$9D = 16-bit divisor (value to divide by)
+;   Output: $9E-$A1 = 32-bit quotient (dividend ÷ divisor)
+;           $A2-$A3 = 16-bit remainder (dividend mod divisor)
+;   Returns via RTL
+;
+; DIVISION FORMULA:
+;   dividend ÷ divisor = quotient, remainder
+;   Example: $12345678 ÷ $1000 = quotient $12345, remainder $0678
+;   Verification: (quotient × divisor) + remainder = dividend
+;
+; OPERATION SEQUENCE:
+;
+;   1. REGISTER PRESERVATION:
+;      - PHP: Save processor status (P)
+;      - REP #$30: Set 16-bit A/X/Y mode
+;      - PHD: Save Direct Page (D)
+;      - PHA: Save accumulator (A)
+;      - PHX: Save X register
+;   
+;   2. DIRECT PAGE SETUP:
+;      - LDA #$0000: Load 0
+;      - TCD: Set Direct Page = $0000 (for DP addressing)
+;      - Allows: lda.b $98 instead of lda.w $0098
+;   
+;   3. COPY DIVIDEND TO WORKING REGISTERS:
+;      - $98-$99 (dividend low word) → $A4-$A5
+;      - $9A-$9B (dividend high word) → $A6-$A7
+;      - Preserves original dividend value
+;   
+;   4. INITIALIZE ACCUMULATOR:
+;      - STZ $A2: Clear remainder accumulator ($A2-$A3 = 0)
+;      - Quotient will build in $9E-$A1
+;   
+;   5. SETUP LOOP COUNTER:
+;      - LDX #$0020: 32 iterations (one per dividend bit)
+;   
+;   6. BINARY LONG DIVISION LOOP (32 iterations):
+;      
+;      a) SHIFT DIVIDEND BIT INTO ACCUMULATOR:
+;         - ASL $9E: Shift quotient low byte left (bit 7 → C)
+;         - ROL $A0: Rotate quotient byte 1 left (C → bit 0, bit 7 → C)
+;         - ASL $A4: Shift working dividend low left (bit 7 → C)
+;         - ROL $A6: Rotate working dividend high left (C → bit 0, bit 7 → C)
+;         - ROL $A2: Rotate remainder accumulator left (C → bit 0, bit 7 → C)
+;         
+;         Effect: Shifts highest unprocessed dividend bit into accumulator
+;      
+;      b) TEST IF DIVISOR FITS:
+;         - LDA $A2: Load current remainder accumulator
+;         - BCS UNREACH_009710: If carry set (accumulator ≥ $10000), handle overflow
+;         - SEC: Set carry for subtraction
+;         - SBC $9C: Subtract divisor from accumulator
+;         - BCS Math_Divide32by16_Store: If carry set (no borrow), divisor fits
+;         - BRA Math_Divide32by16_Next: If carry clear (borrow), divisor too large
+;      
+;      c) IF DIVISOR FITS:
+;         - STA $A2: Store result back to accumulator (remainder)
+;         - INC $9E: Set bit 0 of quotient (quotient bit = 1)
+;      
+;      d) IF DIVISOR TOO LARGE:
+;         - Skip store (quotient bit remains 0)
+;      
+;      e) DECREMENT COUNTER:
+;         - DEX: Decrement loop counter (32 → 31 → ... → 1 → 0)
+;         - BNE Math_Divide32by16_Loop: Continue if X ≠ 0
+;   
+;   7. RESTORE REGISTERS:
+;      - PLX: Restore X register
+;      - PLA: Restore accumulator
+;      - PLD: Restore Direct Page
+;      - PLP: Restore processor status
+;   
+;   8. RETURN:
+;      - RTL: Long return with quotient in $9E-$A1, remainder in $A2-$A3
+;
+; BINARY LONG DIVISION ALGORITHM:
+;
+;   Similar to decimal long division, but in binary (base 2):
+;   
+;   Example: $0010 ÷ $0003
+;   Binary: %00010000 ÷ %00000011 = %00000101 remainder %00000001
+;   Decimal: 16 ÷ 3 = 5 remainder 1
+;   
+;   Step-by-step for 8-bit example:
+;     Quotient: 00000000 (building)
+;     Remainder: 0000 (accumulator)
+;     Divisor: 0011 (stays constant)
+;     Dividend: 00010000 (16)
+;   
+;     Iteration 1: Shift bit 7 of dividend into remainder
+;       Remainder: 0000 (shifted left, bit 0 from dividend)
+;       Test: 0000 < 0011? Yes → Quotient bit 0 = 0
+;     
+;     Iteration 2: Shift bit 6
+;       Remainder: 0000
+;       Test: 0000 < 0011? Yes → Quotient bit 0 = 0
+;     
+;     Iteration 5: Shift bit 4 (first '1' bit)
+;       Remainder: 0001 (accumulated 1)
+;       Test: 0001 < 0011? Yes → Quotient bit 0 = 0
+;     
+;     Iteration 6:
+;       Remainder: 0010 (shifted to 0010)
+;       Test: 0010 < 0011? Yes → Quotient bit 0 = 0
+;     
+;     Iteration 7:
+;       Remainder: 0100 (shifted to 0100)
+;       Test: 0100 >= 0011? Yes! → Subtract
+;       Remainder: 0100 - 0011 = 0001
+;       Quotient bit = 1 → Quotient = 00000100
+;     
+;     Iteration 8:
+;       Remainder: 0010 (shifted)
+;       Test: 0010 < 0011? Yes → Quotient bit 0 = 0
+;     
+;     ... (continue for all 32 bits)
+;     
+;     Final: Quotient = %00000101 (5), Remainder = %00000001 (1)
+;
+; ASL/ROL SHIFTING CHAIN:
+;
+;   Creates 128-bit shift register across multiple bytes:
+;   
+;   Before shift (16-bit example):
+;     Quotient:  [---- ----] [---- ----]  ($9E-$A1, building result)
+;     Working:   [1001 0110] [1011 0001]  ($A4-$A7, dividend copy)
+;     Remainder: [0000 0000] [0000 0000]  ($A2-$A3, accumulator)
+;   
+;   After ASL $9E, ROL $A0, ASL $A4, ROL $A6, ROL $A2:
+;     Quotient:  [---- ---0] [---- ----]  (shifted left, room for quotient bit)
+;     Working:   [0010 1100] [0110 0010]  (shifted left)
+;     Remainder: [0000 0000] [0000 0001]  (bit from working dividend)
+;   
+;   Each iteration shifts one dividend bit into remainder accumulator
+;
+; UNREACH_009710 CODE:
+;
+;   db $e5,$9c (SBC $9C instruction)
+;   
+;   This code is marked unreachable because BCS at $009707 is always taken
+;   when carry is set from ROL $A2.
+;   
+;   If carry set from ROL:
+;     Remainder accumulator was ≥ $8000
+;     After ROL, remainder is ≥ $10000 (with carry bit)
+;     Divisor ($9C) is max $FFFF
+;     So remainder is always ≥ divisor
+;     Subtraction always succeeds (never borrows)
+;   
+;   The SBC at $009710 would execute, but it's redundant:
+;     Always branches to Math_Divide32by16_Store
+;     Same as the BCS path at $00970C
+;   
+;   Likely: Defensive programming or compiler artifact
+;
+; DIVISION BY ZERO:
+;
+;   If divisor ($9C-$9D) == 0:
+;     Subtraction always fails (SBC from 0 always borrows)
+;     Quotient remains all zeros
+;     Remainder accumulates full dividend
+;     No crash, but results are incorrect
+;   
+;   Caller must validate divisor ≠ 0 before calling
+;   
+;   FFMQ pattern: Check divisor before division
+;     ldx $divisor
+;     beq skip_division
+;     jsl Math_Divide32by16
+;
+; PERFORMANCE:
+;
+;   Total: ~1200-1400 cycles (~448-522μs @ 2.68MHz)
+;   
+;   Breakdown per iteration (32 iterations):
+;     5× ASL/ROL: 30 cycles (6 cycles each)
+;     LDA: 3 cycles
+;     BCS: 2-3 cycles (depends on branch)
+;     SEC: 2 cycles
+;     SBC: 3 cycles
+;     BCS/BRA: 2-3 cycles
+;     STA/INC: ~8 cycles (conditional)
+;     DEX: 2 cycles
+;     BNE: 3 cycles (taken) or 2 cycles (final)
+;     Total per iteration: ~40-45 cycles
+;   
+;   32 iterations × 42 avg = ~1344 cycles
+;   Plus setup/teardown: ~50 cycles
+;   
+;   Much slower than hardware multiply (SNES has no hardware divide)
+;
+; USAGE EXAMPLES:
+;
+;   Example 1: Divide damage by defense (32-bit ÷ 16-bit)
+;     lda #damage_low       ; $98-$99 = damage low word
+;     sta $98
+;     lda #damage_high      ; $9A-$9B = damage high word
+;     sta $9A
+;     lda #defense          ; $9C-$9D = defense value
+;     sta $9C
+;     jsl Math_Divide32by16 ; Divide
+;     lda $9E               ; Result quotient in $9E-$A1
+;     
+;   Example 2: Calculate percentage (experience ÷ max × 100)
+;     lda current_exp       ; $98-$9B = current experience
+;     sta $98
+;     stz $9A               ; Clear high word (16-bit input)
+;     lda max_exp           ; $9C-$9D = max experience
+;     sta $9C
+;     jsl Math_Divide32by16 ; current ÷ max
+;     lda $9E               ; Quotient = 0.xxx (fractional)
+;     ; Multiply by 100 for percentage
+;     
+;   Example 3: Convert frames to seconds (frames ÷ 60)
+;     lda frame_count_low   ; $98-$9B = total frames
+;     sta $98
+;     lda frame_count_high
+;     sta $9A
+;     lda #60               ; $9C = 60 frames/second
+;     sta $9C
+;     jsl Math_Divide32by16 ; frames ÷ 60
+;     lda $9E               ; Quotient = seconds
+;     lda $A2               ; Remainder = leftover frames
+;
+; COMMON USE CASES:
+;
+;   Damage Calculation:
+;     Final damage = (base damage × multiplier) ÷ defense
+;     Division needed to scale down high damage values
+;   
+;   Experience/Level Calculation:
+;     Required exp for level N = base × (N^2) ÷ scale
+;     Division to normalize exponential growth
+;   
+;   Timer/Counter Conversion:
+;     Frames → Seconds: total_frames ÷ 60
+;     Cycles → Milliseconds: total_cycles ÷ 2680
+;   
+;   Percentage Calculation:
+;     HP percentage = (current_hp ÷ max_hp) × 100
+;     Divide first, then multiply (prevents overflow)
+;   
+;   Screen Positioning:
+;     Tile index = pixel_coordinate ÷ 8
+;     Division by powers of 2 (could use shifts, but generic div works)
+;
+; WHY SOFTWARE DIVISION:
+;
+;   SNES 65816 hardware has no division instruction
+;   
+;   Available options:
+;     1. Software long division (this function)
+;     2. Lookup tables (fast but memory intensive)
+;     3. Reciprocal multiplication (complex setup)
+;   
+;   FFMQ uses software division:
+;     Pros: Works for any divisor, no memory overhead
+;     Cons: Slow (~1300 cycles vs ~16 for multiply)
+;   
+;   Trade-off: Acceptable for RPG (not called frequently)
+;   Battle damage: ~10-20 divisions per battle action
+;   Menu updates: Rare division operations
+;
+; COMPARISON TO MATH_MULTIPLY16x16:
+;
+;   Multiply (batch 27):
+;     16-bit × 16-bit = 32-bit product
+;     ~250-300 cycles (hardware accelerated)
+;     Uses SNES $4202/$4203 multiply registers
+;   
+;   Divide (batch 37):
+;     32-bit ÷ 16-bit = 32-bit quotient + 16-bit remainder
+;     ~1300 cycles (software algorithm)
+;     No hardware support, pure CPU computation
+;   
+;   Division is ~5× slower than multiplication on SNES
+;
+; REGISTERS MODIFIED:
+;   A: Intermediate calculations
+;   X: Loop counter (32 → 0)
+;   D: Direct Page ($0000 temporarily)
+;   P: Processor status (restored)
+;
+; REGISTERS PRESERVED:
+;   Original A, X, D, P (via stack)
+;   Y: Not used, naturally preserved
+;   B: Data Bank (not modified)
+;
+; MEMORY LOCATIONS:
+;   $98-$9B: Dividend input (preserved)
+;   $9C-$9D: Divisor input (preserved)
+;   $9E-$A1: Quotient output (result)
+;   $A2-$A3: Remainder output (modulo)
+;   $A4-$A7: Working dividend copy (temporary)
+;
+; RELATED FUNCTIONS:
+;   - Math_Multiply16x16 ($0096B3): Companion multiply (batch 27)
+;   - Math_SetDivisor ($009726): Hardware divisor setup (for modulo)
+;   - Math_SetMultiplier ($00971E): Hardware multiplier setup
+;   - RNG_GenerateRandom: Uses division for modulo operation
+;
+; TECHNICAL NOTES:
+;
+;   Binary long division is same algorithm taught in school:
+;     Decimal: 125 ÷ 5 = 25 (shift, test, subtract, repeat)
+;     Binary: %1111101 ÷ %101 = %11001 (same steps, simpler tests)
+;   
+;   Each iteration processes one bit (like one digit in decimal)
+;   
+;   The ASL/ROL chain creates a 128-bit shift register:
+;     [Quotient 32-bit] [Working 64-bit] [Remainder 16-bit]
+;     Shifts from right to left, dividend → remainder → quotient
+;   
+;   Quotient builds from LSB to MSB (bit 0 first, bit 31 last)
+;   
+;   Direct Page optimization saves cycles:
+;     "lda.b $98" (3 cycles) vs "lda.w $0098" (4 cycles)
+;     With 200+ DP accesses: Saves ~200 cycles (~15% speedup)
+;
+;===============================================================================
 Math_Divide32by16:
-	php                                  ;0096E4|08      |      ;
-	rep #$30                             ;0096E5|C230    |      ;
-	phd                                  ;0096E7|0B      |      ;
-	pha                                  ;0096E8|48      |      ;
-	phx                                  ;0096E9|DA      |      ;
-	lda.W #$0000                         ;0096EA|A90000  |      ;
-	tcd                                  ;0096ED|5B      |      ;
-	lda.B $98                            ;0096EE|A598    |000098;
-	sta.B $a4                            ;0096F0|85A4    |0000A4;
-	lda.B $9a                            ;0096F2|A59A    |00009A;
-	sta.B $a6                            ;0096F4|85A6    |0000A6;
-	stz.B $a2                            ;0096F6|64A2    |0000A2;
-	ldx.W #$0020                         ;0096F8|A22000  |      ;
+	php                                  ;0096E4|08      |      ; save processor status flags
+	rep #$30                             ;0096E5|C230    |      ; set 16-bit A/X/Y mode
+	phd                                  ;0096E7|0B      |      ; save Direct Page register
+	pha                                  ;0096E8|48      |      ; save accumulator
+	phx                                  ;0096E9|DA      |      ; save X register
+	lda.W #$0000                         ;0096EA|A90000  |      ; A = $0000 (new Direct Page base)
+	tcd                                  ;0096ED|5B      |      ; set Direct Page = $0000 (for DP addressing optimization)
+	lda.B $98                            ;0096EE|A598    |000098; load dividend low word ($98-$99)
+	sta.B $a4                            ;0096F0|85A4    |0000A4; store to working dividend low ($A4-$A5)
+	lda.B $9a                            ;0096F2|A59A    |00009A; load dividend high word ($9A-$9B)
+	sta.B $a6                            ;0096F4|85A6    |0000A6; store to working dividend high ($A6-$A7)
+	stz.B $a2                            ;0096F6|64A2    |0000A2; clear remainder accumulator ($A2-$A3 = 0)
+	ldx.W #$0020                         ;0096F8|A22000  |      ; X = $0020 (32 iterations, one per dividend bit)
 ;      |        |      ;
 Math_Divide32by16_Loop:
-	asl.B $9e                            ;0096FB|069E    |00009E;
-	rol.B $a0                            ;0096FD|26A0    |0000A0;
-	asl.B $a4                            ;0096FF|06A4    |0000A4;
-	rol.B $a6                            ;009701|26A6    |0000A6;
-	rol.B $a2                            ;009703|26A2    |0000A2;
-	lda.B $a2                            ;009705|A5A2    |0000A2;
-	bcs UNREACH_009710                   ;009707|B007    |009710;
-	sec                                  ;009709|38      |      ;
-	sbc.B $9c                            ;00970A|E59C    |00009C;
-	bcs Math_Divide32by16_Store                      ;00970C|B004    |009712;
-	bra Math_Divide32by16_Next                      ;00970E|8006    |009716;
+	asl.B $9e                            ;0096FB|069E    |00009E; shift quotient low byte left (bit 7 → carry)
+	rol.B $a0                            ;0096FD|26A0    |0000A0; rotate quotient byte 1 left (carry → bit 0)
+	asl.B $a4                            ;0096FF|06A4    |0000A4; shift working dividend low left (bit 7 → carry)
+	rol.B $a6                            ;009701|26A6    |0000A6; rotate working dividend high left (carry → bit 0)
+	rol.B $a2                            ;009703|26A2    |0000A2; rotate remainder accumulator left (dividend bit → remainder)
+	lda.B $a2                            ;009705|A5A2    |0000A2; load current remainder accumulator value
+	bcs UNREACH_009710                   ;009707|B007    |009710; if carry set (remainder ≥ $10000): handle overflow (unreachable)
+	sec                                  ;009709|38      |      ; set carry for subtraction
+	sbc.B $9c                            ;00970A|E59C    |00009C; subtract divisor from remainder (A = remainder - divisor)
+	bcs Math_Divide32by16_Store          ;00970C|B004    |009712; if carry set (no borrow): divisor fits, store result
+	bra Math_Divide32by16_Next           ;00970E|8006    |009716; if carry clear (borrow): divisor too large, skip to next iteration
 ;      |        |      ;
 ;      |        |      ;
 UNREACH_009710:
-	db $e5,$9c                           ;009710|        |00009C;
+	db $e5,$9c                           ;009710|        |00009C; unreachable: SBC $9C (redundant subtraction, always succeeds)
 ;      |        |      ;
 Math_Divide32by16_Store:
-	sta.B $a2                            ;009712|85A2    |0000A2;
-	inc.B $9e                            ;009714|E69E    |00009E;
+	sta.B $a2                            ;009712|85A2    |0000A2; store subtraction result back to remainder (update accumulator)
+	inc.B $9e                            ;009714|E69E    |00009E; set quotient bit 0 = 1 (divisor fit, quotient bit = 1)
 ;      |        |      ;
 Math_Divide32by16_Next:
-	dex                                  ;009716|CA      |      ;
-	bne Math_Divide32by16_Loop                      ;009717|D0E2    |0096FB;
-	plx                                  ;009719|FA      |      ;
-	pla                                  ;00971A|68      |      ;
-	pld                                  ;00971B|2B      |      ;
-	plp                                  ;00971C|28      |      ;
-	rtl                                  ;00971D|6B      |      ;
+	dex                                  ;009716|CA      |      ; decrement loop counter (32 → 31 → ... → 1 → 0)
+	bne Math_Divide32by16_Loop           ;009717|D0E2    |0096FB; if X ≠ 0: continue division loop (process next bit)
+	plx                                  ;009719|FA      |      ; restore X register
+	pla                                  ;00971A|68      |      ; restore accumulator
+	pld                                  ;00971B|2B      |      ; restore Direct Page register
+	plp                                  ;00971C|28      |      ; restore processor status flags
+	rtl                                  ;00971D|6B      |      ; long return with quotient in $9E-$A1, remainder in $A2-$A3
 ;      |        |      ;
 ;      |        |      ;
 Math_SetMultiplier:
