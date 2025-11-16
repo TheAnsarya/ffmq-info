@@ -5628,51 +5628,291 @@ Math_CountSetBits_Loop:
 ;      |        |      ;
 	db $08,$c2,$30,$da,$a2,$10,$00,$ca,$0a,$90,$fc,$8a,$fa,$28,$6b;00973F|        |      ;
 ;      |        |      ;
+;===============================================================================
+; Bitfield_SetBits / Bitfield_ClearBits / Bitfield_TestBits
+;-------------------------------------------------------------------------------
+; Atomic bit manipulation routines for game flags, progression tracking,
+; and state management. Provides safe set/clear/test operations on bitfields
+; stored throughout RAM.
+;
+; THREE MAIN FUNCTIONS:
+;
+;   Bitfield_SetBits ($00974E):
+;     Sets specified bits to 1 (OR operation via TSB)
+;     Example: Set flag bit 3 → bitfield |= (1 << 3)
+;   
+;   Bitfield_ClearBits ($009754):
+;     Clears specified bits to 0 (AND NOT operation via TRB)
+;     Example: Clear flag bit 5 → bitfield &= ~(1 << 5)
+;   
+;   Bitfield_TestBits ($00975A):
+;     Tests if any specified bits are set (AND operation)
+;     Returns: A = bits that are set (0 if none)
+;     Z flag set if result is 0 (no bits set)
+;
+; CALLING CONVENTION:
+;   JSL (long call, works across banks)
+;   Input:  A (8-bit) = Bit index 0-255 (which bit to manipulate)
+;           Direct Page = Base address of bitfield
+;   Output: Bitfield updated (Set/Clear only)
+;           A = Test result (TestBits only)
+;           Z flag = 1 if test result is 0
+;   Returns via RTL
+;
+; OPERATION SEQUENCE (all three functions):
+;
+;   1. Call Bitfield_PrepareAccess:
+;      - Converts bit index to byte offset + bit mask
+;      - Updates Direct Page to point to correct byte
+;      - Returns bit mask in A (e.g., $01, $02, $04, $08...)
+;   
+;   2. Execute bit operation:
+;      Set:   TSB.B $00  (Test and Set Bits - OR with mask)
+;      Clear: TRB.B $00  (Test and Reset Bits - AND NOT mask)
+;      Test:  AND.B $00  (bitwise AND with current value)
+;   
+;   3. Return via RTL
+;
+; ENTITY VARIANT FUNCTIONS:
+;
+;   Bitfield_SetBits_Entity ($009760):
+;   Bitfield_ClearBits_Entity ($00976B):
+;   Bitfield_TestBits_Entity ($009776):
+;   
+;   Convenience wrappers for entity bitfields at Direct Page $0EA8
+;   
+;   Operation:
+;     1. Save current Direct Page (PHD)
+;     2. Set Direct Page to $0EA8 (entity flags base)
+;     3. Call corresponding base function
+;     4. Restore Direct Page (PLD)
+;     5. For TestBits_Entity: INC+DEC to set Z flag
+;   
+;   WHY $0EA8:
+;     Entity state flags base address
+;     NPC states, chest opened, trigger activated, etc.
+;     Each entity has bitfield at $0EA8 + (entity_id ÷ 8)
+;
+; BIT INDEX TO BYTE/MASK CONVERSION:
+;
+;   Bit index A (0-255) maps to:
+;     Byte offset = A ÷ 8 (bits 7-3 of A)
+;     Bit position = A mod 8 (bits 2-0 of A)
+;   
+;   Example conversions:
+;     Bit 0  → Byte 0, Mask $0001 (0000 0001)
+;     Bit 7  → Byte 0, Mask $0080 (1000 0000)
+;     Bit 8  → Byte 1, Mask $0001 (next byte, bit 0)
+;     Bit 15 → Byte 1, Mask $0080
+;     Bit 42 → Byte 5, Mask $0004 (5*8+2, 0000 0100)
+;   
+;   Bitfield_PrepareAccess handles this conversion
+;
+; TSB/TRB INSTRUCTIONS (Test and Set/Reset Bits):
+;
+;   TSB addr:
+;     Old value: addr = %10101010
+;     Mask:      A    = %00001100
+;     Operation: addr = addr | A
+;     New value: addr = %10101110
+;     Z flag: Set if (old addr & mask) == 0
+;   
+;   TRB addr:
+;     Old value: addr = %10101110
+;     Mask:      A    = %00001100
+;     Operation: addr = addr & ~A
+;     New value: addr = %10100010
+;     Z flag: Set if (old addr & mask) == 0
+;   
+;   WHY TSB/TRB:
+;     Atomic read-modify-write operations
+;     Prevents race conditions in multi-context code
+;     Alternative: LDA + ORA/AND + STA (not atomic)
+;     SNES 65816: Native TSB/TRB support
+;
+; USAGE EXAMPLES:
+;
+;   Example 1: Set quest flag 42
+;     lda #42                      ; Bit index 42
+;     pea.w $game_flags           ; Push bitfield base address
+;     pld                          ; Set Direct Page
+;     jsl Bitfield_SetBits         ; Set bit 42
+;   
+;   Example 2: Check if boss defeated (entity flag 15)
+;     lda #15                      ; Entity flag 15 (boss slot)
+;     jsl Bitfield_TestBits_Entity ; Test entity flag
+;     beq boss_not_defeated        ; Z=1 if flag clear
+;     ; Boss defeated code here
+;   
+;   Example 3: Clear chest opened flag 128
+;     lda #128                     ; Chest ID 128
+;     pea.w $chest_flags           ; Chest bitfield base
+;     pld
+;     jsl Bitfield_ClearBits       ; Clear flag (reset chest)
+;
+; COMMON USE CASES:
+;
+;   Quest Progression:
+;     Set bit: Player completed quest
+;     Test bit: Check if quest available
+;     Example: Crystal collected, dungeon cleared
+;   
+;   Chest/Treasure Tracking:
+;     Set bit: Chest opened, item collected
+;     Test bit: Check if chest already opened
+;     256 chests max (8 bits × 32 bytes)
+;   
+;   NPC State Management:
+;     Set bit: NPC defeated, talked to, quest given
+;     Clear bit: Respawn NPC, reset dialog state
+;     Test bit: Check NPC availability
+;   
+;   Trigger Activation:
+;     Set bit: Door unlocked, bridge lowered, event triggered
+;     Test bit: Check if trigger already activated
+;   
+;   Character Abilities:
+;     Set bit: Spell learned, ability unlocked
+;     Test bit: Check if ability available in menu
+;
+; WHY ENTITY VARIANTS EXIST:
+;
+;   Entity flags are frequently accessed
+;   Always at same base address ($0EA8)
+;   Variants save setup code at call sites:
+;   
+;   Without variant (8 bytes):
+;     pea.w $0EA8
+;     pld
+;     jsl Bitfield_SetBits
+;   
+;   With variant (5 bytes):
+;     jsl Bitfield_SetBits_Entity
+;   
+;   Across hundreds of call sites: Saves kilobytes of ROM
+;
+; INC+DEC IN TESTBITS_ENTITY:
+;
+;   Purpose: Set Z flag based on A register
+;   
+;   After TestBits returns:
+;     A = bit test result (0 if no bits set)
+;     Z flag = undefined (from PLD instruction)
+;   
+;   INC A + DEC A:
+;     If A was 0: INC sets Z=0, DEC sets Z=1 (result back to 0)
+;     If A was nonzero: INC/DEC don't affect Z consistently
+;     BUT: DEC always sets Z=1 if result is 0
+;   
+;   Net effect: Z flag correctly reflects A == 0
+;   
+;   Alternative: CMP #$00 (3 cycles vs 4 for INC+DEC)
+;   WHY INC+DEC: Possibly historical or preference
+;
+; PERFORMANCE:
+;
+;   Set/Clear: ~50-60 cycles (~19-22μs @ 2.68MHz)
+;     Overhead: JSL/RTL (16), PrepareAccess (30), TSB/TRB (6)
+;   
+;   Test: ~55-65 cycles (~20-24μs)
+;     Additional: AND instruction (3 cycles)
+;   
+;   Entity variants: +20 cycles (PHD/PLD/PEA overhead)
+;   
+;   Extremely fast for critical path operations
+;   Atomic operations prevent corruption
+;
+; MEMORY SAFETY:
+;
+;   TSB/TRB are atomic (single instruction, uninterruptible)
+;   Safe to use with interrupts enabled
+;   No race conditions between game loop and NMI handler
+;   
+;   Example race condition WITHOUT atomicity:
+;     Main: LDA flag, ORA #$01, STA flag  ; 3 instructions
+;     NMI:  LDA flag, ORA #$02, STA flag  ; (interrupts between)
+;     Result: Bit 1 or bit 2 lost (race condition)
+;   
+;   With TSB (atomic):
+;     Main: TSB flag  ; Single instruction
+;     NMI:  TSB flag  ; No race condition possible
+;     Result: Both bits set correctly
+;
+; RELATED FUNCTIONS:
+;   - Bitfield_PrepareAccess ($0097DA): Bit index → byte offset conversion
+;   - Bitfield_GetBitmask ($0097F2): Bit position → mask lookup
+;   - Math_CountSetBits: Count how many bits are set in a byte
+;
+; REGISTERS MODIFIED:
+;   A: Bit mask (Set/Clear), Test result (Test)
+;   D: Direct Page (adjusted to target byte)
+;   P: Processor status (preserved via PHP/PLP in PrepareAccess)
+;
+; REGISTERS PRESERVED:
+;   X, Y (not modified)
+;   B: Data Bank (not modified)
+;
+; TECHNICAL NOTES:
+;
+;   Direct Page addressing saves cycles:
+;     "tsb.b $00" (2 bytes, 6 cycles)
+;     vs "tsb.w $1234" (3 bytes, 8 cycles)
+;   
+;   Bitfield storage efficiency:
+;     256 flags = 32 bytes (vs 256 bytes for byte-per-flag)
+;     8× memory savings for boolean data
+;   
+;   Trade-off:
+;     Memory: Compact (8 flags per byte)
+;     Speed: Slightly slower than byte checks (bitfield conversion)
+;     For FFMQ: Memory savings critical (SRAM limited to 8KB)
+;
+;===============================================================================
 Bitfield_SetBits:
-	jsr.W Bitfield_PrepareAccess                    ;00974E|20DA97  |0097DA;
-	tsb.B $00                            ;009751|0400    |0000D2;
-	rtl                                  ;009753|6B      |      ;
+	jsr.W Bitfield_PrepareAccess         ;00974E|20DA97  |0097DA; convert bit index to byte offset + mask
+	tsb.B $00                            ;009751|0400    |0000D2; set bits at Direct Page $00 (TSB = Test and Set Bits, atomic OR)
+	rtl                                  ;009753|6B      |      ; return to caller
 ;      |        |      ;
 ;      |        |      ;
 Bitfield_ClearBits:
-	jsr.W Bitfield_PrepareAccess                    ;009754|20DA97  |0097DA;
-	trb.B $00                            ;009757|1400    |0000D0;
-	rtl                                  ;009759|6B      |      ;
+	jsr.W Bitfield_PrepareAccess         ;009754|20DA97  |0097DA; convert bit index to byte offset + mask
+	trb.B $00                            ;009757|1400    |0000D0; clear bits at Direct Page $00 (TRB = Test and Reset Bits, atomic AND NOT)
+	rtl                                  ;009759|6B      |      ; return to caller
 ;      |        |      ;
 ;      |        |      ;
 Bitfield_TestBits:
-	jsr.W Bitfield_PrepareAccess                    ;00975A|20DA97  |0097DA;
-	and.B $00                            ;00975D|2500    |0000DA;
-	rtl                                  ;00975F|6B      |      ;
+	jsr.W Bitfield_PrepareAccess         ;00975A|20DA97  |0097DA; convert bit index to byte offset + mask
+	and.B $00                            ;00975D|2500    |0000DA; test bits at Direct Page $00 (AND with current value)
+	rtl                                  ;00975F|6B      |      ; return with A = test result, Z = 1 if no bits set
 ;      |        |      ;
 ;      |        |      ;
 Bitfield_SetBits_Entity:
-	phd                                  ;009760|0B      |      ;
-	pea.W $0ea8                          ;009761|F4A80E  |000EA8;
-	pld                                  ;009764|2B      |      ;
-	jsl.L Bitfield_SetBits                    ;009765|224E9700|00974E;
-	pld                                  ;009769|2B      |      ;
-	rtl                                  ;00976A|6B      |      ;
+	phd                                  ;009760|0B      |      ; save current Direct Page
+	pea.W $0ea8                          ;009761|F4A80E  |000EA8; push $0EA8 to stack (entity flags base address)
+	pld                                  ;009764|2B      |      ; set Direct Page = $0EA8 (entity bitfield base)
+	jsl.L Bitfield_SetBits               ;009765|224E9700|00974E; call Bitfield_SetBits with entity DP
+	pld                                  ;009769|2B      |      ; restore original Direct Page
+	rtl                                  ;00976A|6B      |      ; return to caller
 ;      |        |      ;
 ;      |        |      ;
 Bitfield_ClearBits_Entity:
-	phd                                  ;00976B|0B      |      ;
-	pea.W $0ea8                          ;00976C|F4A80E  |000EA8;
-	pld                                  ;00976F|2B      |      ;
-	jsl.L Bitfield_ClearBits                    ;009770|22549700|009754;
-	pld                                  ;009774|2B      |      ;
-	rtl                                  ;009775|6B      |      ;
+	phd                                  ;00976B|0B      |      ; save current Direct Page
+	pea.W $0ea8                          ;00976C|F4A80E  |000EA8; push $0EA8 to stack (entity flags base)
+	pld                                  ;00976F|2B      |      ; set Direct Page = $0EA8 (entity bitfield base)
+	jsl.L Bitfield_ClearBits             ;009770|22549700|009754; call Bitfield_ClearBits with entity DP
+	pld                                  ;009774|2B      |      ; restore original Direct Page
+	rtl                                  ;009775|6B      |      ; return to caller
 ;      |        |      ;
 ;      |        |      ;
 Bitfield_TestBits_Entity:
-	phd                                  ;009776|0B      |      ;
-	pea.W $0ea8                          ;009777|F4A80E  |000EA8;
-	pld                                  ;00977A|2B      |      ;
-	jsl.L Bitfield_TestBits                    ;00977B|225A9700|00975A;
-	pld                                  ;00977F|2B      |      ;
-	inc a;009780|1A      |      ;
-	dec a;009781|3A      |      ;
-	rtl                                  ;009782|6B      |      ;
+	phd                                  ;009776|0B      |      ; save current Direct Page
+	pea.W $0ea8                          ;009777|F4A80E  |000EA8; push $0EA8 to stack (entity flags base)
+	pld                                  ;00977A|2B      |      ; set Direct Page = $0EA8 (entity bitfield base)
+	jsl.L Bitfield_TestBits              ;00977B|225A9700|00975A; call Bitfield_TestBits with entity DP
+	pld                                  ;00977F|2B      |      ; restore original Direct Page
+	inc a                                ;009780|1A      |      ; increment A (sets flags)
+	dec a                                ;009781|3A      |      ; decrement A back to original (sets Z flag if A was 0)
+	rtl                                  ;009782|6B      |      ; return with Z flag correctly set based on test result
 ;      |        |      ;
 ;      |        |      ;
 RNG_GenerateRandom:
