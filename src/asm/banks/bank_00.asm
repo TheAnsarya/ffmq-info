@@ -11192,34 +11192,34 @@ Dialog_WaitFrames:
 	ldx.W #$0000                         ;00A2B8|A20000  |      ;
 ;      |        |      ;
 Dialog_LoadCharacterPointer:
-	lda.W DATA8_00a2dd,x                 ;00A2BB|BDDDA2  |00A2DD;
-	cmp.B #$ff                           ;00A2BE|C9FF    |      ;
-	beq UNREACH_00A2D4                   ;00A2C0|F012    |00A2D4;
-	cmp.B $01,s                          ;00A2C2|C301    |000001;
-	beq Dialog_LoadCharacterPointer_Found                      ;00A2C4|F005    |00A2CB;
-	inx                                  ;00A2C6|E8      |      ;
+	lda.W Dialog_CharacterTable_IDs,x    ;00A2BB|BDDDA2  |00A2DD;	Load character ID from table
+	cmp.B #$ff                           ;00A2BE|C9FF    |      ;	Check for terminator ($FF)
+	beq UNREACH_00A2D4                   ;00A2C0|F012    |00A2D4;	If $FF: end of table (error)
+	cmp.B $01,s                          ;00A2C2|C301    |000001;	Compare with target character ID (on stack)
+	beq Dialog_LoadCharacterPointer_Found ;00A2C4|F005    |00A2CB;	If match: found character entry
+	inx                                  ;00A2C6|E8      |      ;	X += 3 (skip to next entry: 1 ID byte + 2 pointer bytes)
 	inx                                  ;00A2C7|E8      |      ;
 	inx                                  ;00A2C8|E8      |      ;
-	bra Dialog_LoadCharacterPointer                      ;00A2C9|80F0    |00A2BB;
+	bra Dialog_LoadCharacterPointer                      ;00A2C9|80F0    |00A2BB;	Continue search
 ;      |        |      ;
 ;      |        |      ;
 Dialog_LoadCharacterPointer_Found:
-	rep #$30                             ;00A2CB|C230    |      ;
-	lda.W DATA8_00a2de,x                 ;00A2CD|BDDEA2  |00A2DE;
-	sta.B $9e                            ;00A2D0|859E    |00009E;
-	plx                                  ;00A2D2|FA      |      ;
-	rts                                  ;00A2D3|60      |      ;
+	rep #$30                             ;00A2CB|C230    |      ;	A 16-bit, X/Y 16-bit
+	lda.W Dialog_CharacterTable_Pointers,x ;00A2CD|BDDEA2  |00A2DE;	Load 16-bit pointer for character
+	sta.B $9e                            ;00A2D0|859E    |00009E;	Store pointer to $9E-$9F
+	plx                                  ;00A2D2|FA      |      ;	Restore X register
+	rts                                  ;00A2D3|60      |      ;	Return with character pointer in $9E
 ;      |        |      ;
 ;      |        |      ;
 UNREACH_00A2D4:
 	db $a2,$ff,$ff,$86,$9e,$86,$a0,$fa,$60;00A2D4|        |      ;
 ;      |        |      ;
-DATA8_00a2dd:
-	db $10                               ;00A2DD|        |      ;
+Dialog_CharacterTable_IDs:
+	db $10                               ;00A2DD|        |      ; Character ID table (parallel with pointer table)
 ;      |        |      ;
-DATA8_00a2de:
-	db $19,$00,$12,$32,$00,$dd,$0a,$00   ;00A2DE|        |      ;
-	db $ff                               ;00A2E6|        |E617A7;
+Dialog_CharacterTable_Pointers:
+	db $19,$00,$12,$32,$00,$dd,$0a,$00   ;00A2DE|        |      ; 16-bit pointer table (character data addresses)
+	db $ff                               ;00A2E6|        |E617A7; $FF = terminator
 	lda.B [$17]                          ;00A2E7|A717    |000017;
 	inc.B $17                            ;00A2E9|E617    |000017;
 	and.W #$00ff                         ;00A2EB|29FF00  |      ;
@@ -15569,11 +15569,11 @@ Scene_Update:
 	sta.B $01                            ;00BE1A|8501    |000001;
 	sta.B $05                            ;00BE1C|8505    |000005;
 	pea.W Scene_Exit                    ;00BE1E|F4E4BD  |00BDE4;
-	lda.W DATA8_00be7b                   ;00BE21|AD7BBE  |00BE7B;
-	pha                                  ;00BE24|48      |      ;
-	lda.W DATA8_00be79                   ;00BE25|AD79BE  |00BE79;
-	pha                                  ;00BE28|48      |      ;
-	rts                                  ;00BE29|60      |      ;
+	lda.W Scene_DefaultParameter2        ;00BE21|AD7BBE  |00BE7B;	Load default parameter 2 address
+	pha                                  ;00BE24|48      |      ;	Push to stack
+	lda.W Scene_DefaultParameter1        ;00BE25|AD79BE  |00BE79;	Load default parameter 1 address
+	pha                                  ;00BE28|48      |      ;	Push to stack
+	rts                                  ;00BE29|60      |      ;	Return (indirect call via stack)
 ;      |        |      ;
 ;      |        |      ;
 Scene_HandleCancel:
@@ -15592,29 +15592,29 @@ Scene_HandleCancel:
 	stz.B $01                            ;00BE41|6401    |000001;
 	stz.B $05                            ;00BE43|6405    |000005;
 	pea.W Scene_Exit                    ;00BE45|F4E4BD  |00BDE4;
-	lda.W DATA8_00be57,x                 ;00BE48|BD57BE  |00BE57;
-	pha                                  ;00BE4B|48      |      ;
-	lda.W DATA8_00be55,x                 ;00BE4C|BD55BE  |00BE55;
-	pha                                  ;00BE4F|48      |      ;
-	jmp.W (DATA8_00be53,x)               ;00BE50|7C53BE  |00BE53;
+	lda.W Scene_Parameter2Table,x        ;00BE48|BD57BE  |00BE57;	Load parameter 2 address from table
+	pha                                  ;00BE4B|48      |      ;	Push to stack
+	lda.W Scene_Parameter1Table,x        ;00BE4C|BD55BE  |00BE55;	Load parameter 1 address from table
+	pha                                  ;00BE4F|48      |      ;	Push to stack
+	jmp.W (Scene_HandlerJumpTable,x)     ;00BE50|7C53BE  |00BE53;	Indirect jump to scene handler
 ;      |        |      ;
 ;      |        |      ;
-DATA8_00be53:
-	db $bc,$c8                           ;00BE53|        |      ;
+Scene_HandlerJumpTable:
+	db $bc,$c8                           ;00BE53|        |      ; Jump table for scene handlers (indexed dispatch)
 ;      |        |      ;
-DATA8_00be55:
-	db $4a,$bf                           ;00BE55|        |      ;
+Scene_Parameter1Table:
+	db $4a,$bf                           ;00BE55|        |      ; Parameter 1 addresses for scene handlers
 ;      |        |      ;
-DATA8_00be57:
-	db $b6,$c8,$c6,$c8,$37,$c0,$c0,$c8,$65,$c8,$da,$c3,$59,$c8,$6a,$c8;00BE57|        |      ;
+Scene_Parameter2Table:
+	db $b6,$c8,$c6,$c8,$37,$c0,$c0,$c8,$65,$c8,$da,$c3,$59,$c8,$6a,$c8;00BE57|        |      ; Parameter 2 addresses for scene handlers
 	db $46,$c4,$59,$c8,$6f,$c8,$a1,$c4,$59,$c8,$7a,$c8,$d8,$c1,$4b,$c8;00BE67|        |      ;
 	db $85,$c8                           ;00BE77|        |      ;
 ;      |        |      ;
-DATA8_00be79:
-	db $47,$c3                           ;00BE79|        |      ;
+Scene_DefaultParameter1:
+	db $47,$c3                           ;00BE79|        |      ; Default parameter 1 address
 ;      |        |      ;
-DATA8_00be7b:
-	db $53,$c8                           ;00BE7B|        |      ;
+Scene_DefaultParameter2:
+	db $53,$c8                           ;00BE7B|        |      ; Default parameter 2 address
 	db $6e,$ad,$03                       ;00BE7D|        |0003AD;
 	db $74,$ad,$03                       ;00BE80|        |      ;
 ;      |        |      ;
