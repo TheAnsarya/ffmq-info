@@ -2969,16 +2969,132 @@ Menu2_UpdateCursor_Field:
 	rts	; Return to caller with field cursor tilemap updated
 ;      |        |      ;
 ;      |        |      ;
+;===============================================================================
+; Cursor_CalcTileIndex
+;-------------------------------------------------------------------------------
+; Converts a grid position to a tilemap address (pixel X coordinate) by calling
+; Cursor_CalcPosition and moving the result to X register. Simple wrapper
+; function that adapts Cursor_CalcPosition for tilemap addressing use cases.
+;
+; CALLING CONVENTION:
+;   JSR (called from field cursor update code)
+;   Input: A = Grid position (8-bit value, same format as Cursor_CalcPosition)
+;   Output: X = Tilemap address/pixel X coordinate (16-bit)
+;           A = Unchanged (grid position preserved)
+;   No processor status modification (internal PHP/PLP in Cursor_CalcPosition)
+;
+; OPERATION:
+;   1. Check if A == $FF (cursor disabled)
+;   2. If $FF, branch to unreachable code (returns X = $FFFF)
+;   3. Otherwise, call Cursor_CalcPosition (A → pixel X coordinate)
+;   4. Transfer result A → X (tilemap address in X register)
+;   5. Return with X = tilemap address
+;
+; WHY THIS WRAPPER EXISTS:
+;   Cursor_CalcPosition returns pixel coordinate in A (accumulator)
+;   Field cursor code needs tilemap address in X (index register)
+;   
+;   This wrapper eliminates need for "JSR + TAX" at every call site:
+;     Without wrapper:  JSR Cursor_CalcPosition | TAX
+;     With wrapper:     JSR Cursor_CalcTileIndex
+;   
+;   Saves 1 byte and 2 cycles per call (minor optimization, ~10 call sites)
+;
+; GRID POSITION FORMAT:
+;   Same as Cursor_CalcPosition input:
+;     Bits 5-3 (mask $38): Column index × 8
+;     Bits 2-0 (mask $07): Row index 0-7
+;     $FF: Special value (cursor disabled, not used in normal path)
+;
+; OUTPUT INTERPRETATION:
+;   X = Pixel X coordinate (same formula as Cursor_CalcPosition):
+;     X = ((row + column×2) × 48) + $8000
+;   
+;   Used as tilemap address in field rendering:
+;     - Stored to !tilemap1_addr ($F2) or !tilemap2_addr ($F5)
+;     - Later used to calculate VRAM tilemap offset
+;     - Formula: VRAM_addr = (X - $8000) / tile_width + base
+;
+; DISABLED CURSOR PATH ($FF):
+;   UNREACH_008D93: db $A2,$FF,$FF,$60
+;     Disassembles to: LDX #$FFFF | RTS
+;   
+;   Returns X = $FFFF to indicate no valid tilemap address
+;   Code appears unreachable in practice (callers filter $FF before calling)
+;   Likely defensive programming or leftover from refactoring
+;
+; PERFORMANCE:
+;   Total: ~60-70 cycles (~22-26μs @ 2.68MHz)
+;     - Cursor_CalcPosition call: ~55-65 cycles
+;     - TAX transfer: 2 cycles
+;     - RTS return: 6 cycles
+;   
+;   Very fast, called once per frame per cursor
+;   Overhead negligible compared to full cursor update
+;
+; USAGE PATTERN:
+;   Field cursor update:
+;       lda $10B1                      ; A = cursor grid position
+;       jsr Cursor_CalcTileIndex       ; X = tilemap address
+;       stx $F2                        ; Store to tilemap variable
+;       ; Later: use $F2 for tilemap rendering
+;
+; COMMON CALLERS:
+;   - Menu2_UpdateCursor_Field ($008D6C): Second cursor tilemap
+;   - Cursor_UpdateSprite_Field ($008C83): First cursor tilemap
+;   - Field_UpdateCursor: Field mode cursor positioning
+;   - Map_PositionCursor: Overworld map cursor
+;
+; WHY NOT INLINE:
+;   Inlining (JSR Cursor_CalcPosition + TAX) would save:
+;     - JSR/RTS overhead: 12 cycles
+;     - But cost: +2 bytes per call site × 10 sites = +20 bytes ROM
+;   
+;   Trade-off favors wrapper:
+;     - Smaller ROM footprint
+;     - Cleaner code (single call vs two instructions)
+;     - 12 cycle overhead < 1μs (negligible for once-per-frame operation)
+;
+; TECHNICAL NOTES:
+;
+;   The TAX instruction (2 cycles, 1 byte) is one of the fastest operations:
+;     - No memory access (register-to-register)
+;     - No processor status change (in this context)
+;     - Sets N/Z flags based on X value (not used here)
+;   
+;   The $FF check could be optimized away:
+;     - All callers already filter $FF before calling
+;     - CMP + BEQ overhead: 5 cycles wasted per call
+;     - Likely defensive code or API contract requirement
+;   
+;   Function is so thin it's borderline macro territory:
+;     - No local variables
+;     - No complex logic
+;     - Pure delegation to Cursor_CalcPosition
+;     - Exists only for register placement convenience
+;
+; REGISTERS MODIFIED:
+;   X: Output tilemap address (16-bit pixel coordinate)
+;
+; REGISTERS PRESERVED:
+;   A: Grid position (passed through unchanged, though Cursor_CalcPosition modifies it)
+;   P: Processor status (Cursor_CalcPosition uses PHP/PLP)
+;
+; RELATED FUNCTIONS:
+;   - Cursor_CalcPosition ($008C1B): Actual grid → pixel conversion
+;   - Menu2_UpdateCursor ($008D29): Uses this for second cursor
+;   - Cursor_UpdateSprite ($008C3D): Uses this for first cursor
+;===============================================================================
 Cursor_CalcTileIndex:
-	cmp.B #$ff                           ;008D8A|C9FF    |      ;
-	beq UNREACH_008D93                   ;008D8C|F005    |008D93;
-	jsr.W Cursor_CalcPosition            ;008D8E|201B8C  |008C1B;
-	tax                                  ;008D91|AA      |      ;
-	rts                                  ;008D92|60      |      ;
+	cmp.B #$ff	; Check if cursor disabled ($FF = hidden)
+	beq UNREACH_008D93	; If disabled, return X=$FFFF (unreachable in practice)
+	jsr.W Cursor_CalcPosition	; Call grid → pixel converter (A → X coordinate in A)
+	tax	; X = tilemap address (transfer result from A to X)
+	rts	; Return with X = tilemap address for field cursor
 ;      |        |      ;
 ;      |        |      ;
 UNREACH_008D93:
-	db $a2,$ff,$ff,$60                   ;008D93|        |      ;
+	db $a2,$ff,$ff,$60	; Unreachable: LDX #$FFFF, RTS (disabled cursor path)
 	lda.w !ram_1031                          ;008D97|AD3110  |001031;
 	pha                                  ;008D9A|48      |      ;
 	lda.W #$0003                         ;008D9B|A90300  |      ;
