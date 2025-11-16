@@ -1193,7 +1193,7 @@ Field_InputEnd:
 	asl a;018B16|0A      |      ;
 	phx                                  ;018B17|DA      |      ;
 	tax                                  ;018B18|AA      |      ;
-	lda.L DATA8_00fdca,x                 ;018B19|BFCAFD00|00FDCA;
+	lda.L Camera_DirectionOffsetTable,x            ;018B19|BFCAFD00|00FDCA;  ; Get camera offset for direction (5 entries)
 	sta.w !tilemap_x_offset                          ;018B1D|8D2D19  |01192D;
 	plx                                  ;018B20|FA      |      ;
 	lda.w !battle_temp_hi                          ;018B21|AD2C19  |01192C;
@@ -2476,9 +2476,9 @@ Dialog_Setup:
 	asl a;019523|0A      |      ;
 	tax                                  ;019524|AA      |      ;
 	rep #$30                             ;019525|C230    |      ;
-	lda.L DATA8_00f3ec,x                 ;019527|BFECF300|00F3EC;
+	lda.L Dialog_DirectionOffsetTable,x            ;019527|BFECF300|00F3EC;  ; Get dialog frame offset for facing direction
 	sta.W $194f                          ;01952B|8D4F19  |01194F;
-	lda.L DATA8_00f5e2,x                 ;01952E|BFE2F500|00F5E2;
+	lda.L Dialog_SecondaryOffsetTable,x            ;01952E|BFE2F500|00F5E2;  ; Get secondary offset for direction
 	sta.w !battle_array_elem_11                          ;019532|8D4D19  |01194D;
 	jsr.W Dialog_BeginDisplay                    ;019535|20D895  |0195D8;
 	plp                                  ;019538|28      |      ;
@@ -2581,7 +2581,7 @@ Dialog_ProcessDelay:
 	lda.B #$00                           ;0195FB|A900    |      ;
 	xba                                  ;0195FD|EB      |      ;
 	ldx.W $194f                          ;0195FE|AE4F19  |01194F;
-	lda.L DATA8_00f3f4,x                 ;019601|BFF4F300|00F3F4;
+	lda.L Dialog_CommandSequence,x                 ;019601|BFF4F300|00F3F4;  ; Read animation command (high bit = delay)
 	bpl Dialog_ProcessNext                      ;019605|100B    |019612;
 	and.B #$7f                           ;019607|297F    |      ;
 	sta.w !battle_init_flag                          ;019609|8D5119  |011951;
@@ -2626,7 +2626,7 @@ Dialog_ProcessCommand:
 	ldx.w !battle_array_elem_11                          ;01964C|AE4D19  |01194D;
 ;      |        |      ;
 Dialog_CommandLoop:
-	lda.L DATA8_00f5f2,x                 ;01964F|BFF2F500|00F5F2;
+	lda.L Dialog_SpriteSequence,x                  ;01964F|BFF2F500|00F5F2;  ; Read sprite command byte
 	inx                                  ;019653|E8      |      ;
 	cmp.B #$ff                           ;019654|C9FF    |      ;
 	beq Dialog_CommandEnd                      ;019656|F024    |01967C;
@@ -2642,7 +2642,7 @@ Dialog_CommandLoop:
 ;      |        |      ;
 ;      |        |      ;
 Dialog_ExtendedCommand:
-	lda.L DATA8_00f5f2,x                 ;01966F|BFF2F500|00F5F2;
+	lda.L Dialog_SpriteSequence,x                  ;01966F|BFF2F500|00F5F2;  ; Read extended command parameter
 	inx                                  ;019673|E8      |      ;
 	sta.w !battle_array_elem_9                          ;019674|8D4919  |011949;
 	jsr.W Char_DashComplete                    ;019677|20DD9E  |019EDD;
@@ -2669,20 +2669,20 @@ Dialog_SetupSprite:
 	tay                                  ;019696|A8      |      ;
 	sep #$20                             ;019697|E220    |      ;
 	rep #$10                             ;019699|C210    |      ;
-	lda.L DATA8_00f5f2,x                 ;01969B|BFF2F500|00F5F2;
+	lda.L Dialog_SpriteSequence,x                  ;01969B|BFF2F500|00F5F2;  ; Read tile number
 	inx                                  ;01969F|E8      |      ;
 	sta.W $0002,y                        ;0196A0|990200  |010002;
-	lda.L DATA8_00f5f2,x                 ;0196A3|BFF2F500|00F5F2;
+	lda.L Dialog_SpriteSequence,x                  ;0196A3|BFF2F500|00F5F2;  ; Read attributes
 	inx                                  ;0196A7|E8      |      ;
 	ora.w !battle_array_elem_10                          ;0196A8|0D4A19  |01194A;
 	ora.w !hardware_flags                          ;0196AB|0D541A  |011A54;
 	sta.W $0003,y                        ;0196AE|990300  |010003;
-	lda.L DATA8_00f5f2,x                 ;0196B1|BFF2F500|00F5F2;
+	lda.L Dialog_SpriteSequence,x                  ;0196B1|BFF2F500|00F5F2;  ; Read X position
 	inx                                  ;0196B5|E8      |      ;
 	clc                                  ;0196B6|18      |      ;
 	adc.w !tilemap_x_offset                          ;0196B7|6D2D19  |01192D;
 	sta.W $0000,y                        ;0196BA|990000  |010000;
-	lda.L DATA8_00f5f2,x                 ;0196BD|BFF2F500|00F5F2;
+	lda.L Dialog_SpriteSequence,x                  ;0196BD|BFF2F500|00F5F2;  ; Read Y position
 	inx                                  ;0196C1|E8      |      ;
 	clc                                  ;0196C2|18      |      ;
 	adc.w !tilemap_y_offset                          ;0196C3|6D2E19  |01192E;
@@ -2818,9 +2818,9 @@ ScreenEffect_Initialize:
 	asl a;01979E|0A      |      ;
 	tax                                  ;01979F|AA      |      ;
 	rep #$30                             ;0197A0|C230    |      ;
-	lda.L DATA8_00f3d4,x                 ;0197A2|BFD4F300|00F3D4;
+	lda.L ScreenEffect_DirectionOffsetTable,x      ;0197A2|BFD4F300|00F3D4;  ; Get screen effect offset for facing direction
 	sta.B $24                            ;0197A6|8524    |00194F;
-	lda.L DATA8_00f53a,x                 ;0197A8|BF3AF500|00F53A;
+	lda.L ScreenEffect_SecondaryOffsetTable,x      ;0197A8|BF3AF500|00F53A;  ; Get secondary offset for direction
 	sta.B $22                            ;0197AC|8522    |00194D;
 	stz.B $26                            ;0197AE|6426    |001951;
 	sep #$20                             ;0197B0|E220    |      ;
@@ -2841,7 +2841,7 @@ ScreenEffect_ProcessDelay:
 	lda.B #$00                           ;0197C5|A900    |      ;
 	xba                                  ;0197C7|EB      |      ;
 	ldx.B $24                            ;0197C8|A624    |00194F;
-	lda.L DATA8_00f3dc,x                 ;0197CA|BFDCF300|00F3DC;
+	lda.L ScreenEffect_CommandSequence,x           ;0197CA|BFDCF300|00F3DC;  ; Read animation command (high bit = delay)
 	bpl ScreenEffect_ProcessNext                      ;0197CE|1009    |0197D9;
 	and.B #$7f                           ;0197D0|297F    |      ;
 	sta.B $26                            ;0197D2|8526    |001951;
@@ -2877,7 +2877,7 @@ ScreenEffect_ProcessCommand:
 	ldx.B $22                            ;0197FF|A622    |00194D;
 ;      |        |      ;
 ScreenEffect_CommandLoop:
-	lda.L DATA8_00f542,x                 ;019801|BF42F500|00F542;
+	lda.L ScreenEffect_SpriteSequence,x            ;019801|BF42F500|00F542;  ; Read sprite command byte
 	inx                                  ;019805|E8      |      ;
 	cmp.B #$ff                           ;019806|C9FF    |      ;
 	beq ScreenEffect_CommandEnd                      ;019808|F01B    |019825;
@@ -2891,7 +2891,7 @@ ScreenEffect_CommandLoop:
 ;      |        |      ;
 ;      |        |      ;
 ScreenEffect_ExtendedCommand:
-	lda.L DATA8_00f542,x                 ;019819|BF42F500|00F542;
+	lda.L ScreenEffect_SpriteSequence,x            ;019819|BF42F500|00F542;  ; Read extended command parameter
 	inx                                  ;01981D|E8      |      ;
 	sta.B $1e                            ;01981E|851E    |001949;
 	jsr.W Char_DashComplete                    ;019820|20DD9E  |019EDD;
@@ -2918,20 +2918,20 @@ ScreenEffect_SetupSprite:
 	tay                                  ;01983C|A8      |      ;
 	sep #$20                             ;01983D|E220    |      ;
 	rep #$10                             ;01983F|C210    |      ;
-	lda.L DATA8_00f542,x                 ;019841|BF42F500|00F542;
+	lda.L ScreenEffect_SpriteSequence,x            ;019841|BF42F500|00F542;  ; Read tile number
 	inx                                  ;019845|E8      |      ;
 	sta.W $0002,y                        ;019846|990200  |010002;
-	lda.L DATA8_00f542,x                 ;019849|BF42F500|00F542;
+	lda.L ScreenEffect_SpriteSequence,x            ;019849|BF42F500|00F542;  ; Read attributes
 	inx                                  ;01984D|E8      |      ;
 	ora.w !battle_array_elem_10                          ;01984E|0D4A19  |01194A;
 	ora.w !hardware_flags                          ;019851|0D541A  |011A54;
 	sta.W $0003,y                        ;019854|990300  |010003;
-	lda.L DATA8_00f542,x                 ;019857|BF42F500|00F542;
+	lda.L ScreenEffect_SpriteSequence,x            ;019857|BF42F500|00F542;  ; Read X position
 	inx                                  ;01985B|E8      |      ;
 	clc                                  ;01985C|18      |      ;
 	adc.w !env_coordinates                          ;01985D|6D9D19  |01199D;
 	sta.W $0000,y                        ;019860|990000  |010000;
-	lda.L DATA8_00f542,x                 ;019863|BF42F500|00F542;
+	lda.L ScreenEffect_SpriteSequence,x            ;019863|BF42F500|00F542;  ; Read Y position
 	inx                                  ;019867|E8      |      ;
 	clc                                  ;019868|18      |      ;
 	adc.W $199e                          ;019869|6D9E19  |01199E;
@@ -3479,7 +3479,7 @@ Char_ApplySpeed:
 ;      |        |      ;
 Char_UpdateVelocity:
 	rep #$30                             ;019D2F|C230    |      ;
-	lda.L DATA8_00f410,x                 ;019D31|BF10F400|00F410;
+	lda.L Char_VelocityTable,x                     ;019D31|BF10F400|00F410;  ; Get velocity from table indexed by movement state
 	sta.w !battle_array_elem_11                          ;019D35|8D4D19  |01194D;
 	sep #$20                             ;019D38|E220    |      ;
 	rep #$10                             ;019D3A|C210    |      ;
@@ -3654,7 +3654,7 @@ Char_JumpUpdate:
 	ldx.w !battle_array_elem_11                          ;019E99|AE4D19  |01194D;
 ;      |        |      ;
 Char_JumpLanding:
-	lda.L DATA8_00f420,x                 ;019E9C|BF20F400|00F420;
+	lda.L Char_JumpAnimSequence,x                  ;019E9C|BF20F400|00F420;  ; Read jump animation command ($FF=end, $80=extended)
 	inx                                  ;019EA0|E8      |      ;
 	cmp.B #$ff                           ;019EA1|C9FF    |      ;
 	beq Char_DashUpdate                      ;019EA3|F033    |019ED8;
@@ -3674,7 +3674,7 @@ Char_JumpLanding:
 ;      |        |      ;
 ;      |        |      ;
 Char_ProcessDash:
-	lda.L DATA8_00f420,x                 ;019EC2|BF20F400|00F420;
+	lda.L Char_JumpAnimSequence,x                  ;019EC2|BF20F400|00F420;  ; Read dash command parameter
 	inx                                  ;019EC6|E8      |      ;
 	sta.w !battle_array_elem_9                          ;019EC7|8D4919  |011949;
 	lda.W $1994                          ;019ECA|AD9419  |011994;
@@ -5158,7 +5158,7 @@ Entity_UpdateAnimFrame:
 	sta.w !battle_data_temp_1                          ;01A99E|8D3D19  |00193D;
 	asl a;01A9A1|0A      |      ;
 	tax                                  ;01A9A2|AA      |      ;
-	lda.L DATA8_00fdca,x                 ;01A9A3|BFCAFD00|00FDCA;
+	lda.L Camera_DirectionOffsetTable,x            ;01A9A3|BFCAFD00|00FDCA;  ; Get camera offset for direction
 	sta.w !battle_data_index_3                          ;01A9A7|8D3B19  |00193B;
 	plx                                  ;01A9AA|FA      |      ;
 	lda.B $0e,x                          ;01A9AB|B50E    |001A80;

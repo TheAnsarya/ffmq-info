@@ -65,7 +65,7 @@ Event_SetupCommon:
 	asl a;0B8066|0A      |      ;
 	phx                                  ;0B8067|DA      |      ;
 	tax                                  ;0B8068|AA      |      ;
-	lda.L DATA8_00fdca,x                 ;0B8069|BFCAFD00|00FDCA;
+	lda.L Camera_DirectionOffsetTable,x            ;0B8069|BFCAFD00|00FDCA;  ; Get camera offset for direction
 	clc                                  ;0B806D|18      |      ;
 	adc.W #$0008                         ;0B806E|690800  |      ;
 	tay                                  ;0B8071|A8      |      ;
@@ -119,7 +119,7 @@ BattleEvent_Return:
 	phx                                  ;0B80CA|DA      |      ;
 	tax                                  ;0B80CB|AA      |      ;
 	clc                                  ;0B80CC|18      |      ;
-	lda.L DATA8_00fdca,x                 ;0B80CD|BFCAFD00|00FDCA;
+	lda.L Camera_DirectionOffsetTable,x            ;0B80CD|BFCAFD00|00FDCA;  ; Get camera offset for direction
 	tay                                  ;0B80D1|A8      |      ;
 	plx                                  ;0B80D2|FA      |      ;
 	jsl.L CallAnimationLoader                    ;0B80D3|2286AE01|01AE86;

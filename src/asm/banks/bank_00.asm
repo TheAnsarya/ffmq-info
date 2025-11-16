@@ -22583,23 +22583,23 @@ Anim_XOffsetTable:
 	db $0b,$00,$ef,$0b,$00,$f0,$0b,$00,$f2,$0b,$00,$f4,$0b,$00,$f6,$0b;00F3B6|        |      ;
 	db $00,$f8,$0b,$00,$fa,$06,$00,$fc,$06,$00,$fe,$06,$00,$00;00F3C6|        |      ;
 ;      |        |      ;
-DATA8_00f3d4:
+ScreenEffect_DirectionOffsetTable:  ; 4 × 16-bit offsets indexed by player_facing × 2
 	db $00,$00,$04,$00,$08,$00,$0c,$00   ;00F3D4|        |      ;
 ;      |        |      ;
-DATA8_00f3dc:
+ScreenEffect_CommandSequence:  ; Animation command bytes (high bit = delay flag)
 	db $00,$82,$0c,$8a,$02,$82,$0d,$8a,$04,$82,$0e,$8a,$06,$82,$0f,$8a;00F3DC|        |      ;
 ;      |        |      ;
-DATA8_00f3ec:
+Dialog_DirectionOffsetTable:  ; 4 × 16-bit offsets indexed by player_facing × 2
 	db $00,$00,$07,$00,$0e,$00,$15,$00   ;00F3EC|        |      ;
 ;      |        |      ;
-DATA8_00f3f4:
+Dialog_CommandSequence:  ; Animation command bytes (high bit = delay flag)
 	db $0d,$82,$0c,$86,$0f,$86,$06,$0e,$82,$0d,$86,$0c,$86,$00,$0f,$82;00F3F4|        |      ;
 	db $0e,$86,$0d,$86,$02,$0c,$82,$0f,$86,$0e,$86,$04;00F404|        |      ;
 ;      |        |      ;
-DATA8_00f410:
+Char_VelocityTable:  ; Character velocity values indexed by movement state
 	db $00,$00,$38,$00,$00,$00,$6b,$00,$9e,$00,$cc,$00,$9e,$00,$f3,$00;00F410|        |      ;
 ;      |        |      ;
-DATA8_00f420:
+Char_JumpAnimSequence:  ; Jump animation command sequence ($FF=end, $80=extended)
 	db $ff,$04,$3c,$20,$00,$08,$05,$3c,$60,$08,$08,$ff,$ff,$ff,$ff,$ff;00F420|        |      ;
 	db $ff,$ff,$ff,$ff,$ff,$ff,$ff,$ff,$ff,$ff,$ff,$ff,$ff,$ff,$ff,$ff;00F430|        |      ;
 	db $ff,$ff,$ff,$ff,$ff,$04,$3d,$60,$fb,$08,$05,$3d,$20,$0d,$08,$ff;00F440|        |      ;
@@ -22619,10 +22619,10 @@ DATA8_00f420:
 	db $ff,$ff,$ff,$ff,$ff,$ff,$ff,$ff,$ff,$ff,$ff,$ff,$ff,$ff,$ff,$ff;00F51E|        |FFFFFF;
 	db $04,$3d,$20,$0d,$08,$ff,$ff,$ff,$ff,$80,$04,$ff;00F52E|        |00003D;
 ;      |        |      ;
-DATA8_00f53a:
+ScreenEffect_SecondaryOffsetTable:  ; Paired with DirectionOffsetTable (4 × 16-bit)
 	db $00,$00,$28,$00,$50,$00,$78,$00   ;00F53A|        |      ;
 ;      |        |      ;
-DATA8_00f542:
+ScreenEffect_SpriteSequence:  ; Screen effect sprite command sequence
 	db $14,$71,$a0,$05,$f8,$ff,$ff,$ff,$ff,$14,$71,$a0,$05,$f0,$15,$70;00F542|        |      ;
 	db $a0,$05,$f8,$ff,$ff,$ff,$ff,$ff,$ff,$ff,$ff,$14,$71,$a0,$05,$f8;00F552|        |      ;
 	db $80,$15,$ff,$ff,$ff,$80,$14,$ff,$14,$72,$60,$0c,$04,$ff,$ff,$ff;00F562|        |      ;
@@ -22634,13 +22634,13 @@ DATA8_00f542:
 	db $ff,$14,$72,$20,$f0,$04,$15,$73,$20,$f8,$04,$ff,$ff,$ff,$ff,$ff;00F5C2|        |      ;
 	db $ff,$ff,$ff,$14,$72,$20,$f8,$04,$80,$15,$ff,$ff,$ff,$80,$14,$ff;00F5D2|        |      ;
 ;      |        |      ;
-DATA8_00f5e2:
+Dialog_SecondaryOffsetTable:  ; Paired with DirectionOffsetTable (4 × 16-bit)
 	db $00,$00,$81,$00,$02,$01,$83,$01   ;00F5E2|        |      ;
 ;      |        |      ;
-DATA8_00f5ea:
+Dialog_AnimIndexTable:  ; Dialog animation index offsets (4 × 16-bit)
 	db $04,$02,$a1,$02,$3e,$03,$db,$03   ;00F5EA|        |      ;
 ;      |        |      ;
-DATA8_00f5f2:
+Dialog_SpriteSequence:  ; Dialog sprite command sequence
 	db $14,$76,$60,$18,$00,$15,$77,$60,$10,$00,$16,$76,$e0,$18,$08,$17;00F5F2|        |      ;
 	db $77,$e0,$10,$08,$ff,$ff,$ff,$ff,$14,$7c,$60,$18,$f0,$15,$7d,$60;00F602|        |      ;
 	db $10,$f0,$16,$7e,$60,$18,$f8,$17,$7f,$60,$10,$f8,$ff,$ff,$ff,$ff;00F612|        |      ;
@@ -22771,7 +22771,7 @@ DATA8_00f5f2:
 	db $28,$00,$29,$00,$2a,$00,$2b,$00,$2c,$00,$2d,$00,$2e,$00,$2f,$00;00FDB2|        |      ;
 	db $2d,$40,$2c,$40,$2f,$40,$2e,$40   ;00FDC2|        |      ;
 ;      |        |      ;
-DATA8_00fdca:
+Camera_DirectionOffsetTable:  ; Camera scroll offsets indexed by direction (5 × 16-bit)
 	db $00,$00,$2e,$09,$00,$00,$90,$00   ;00FDCA|        |      ;
 	db $00,$00                           ;00FDD2|        |      ;
 	db $6e,$09,$7e,$09,$8e,$09,$9e,$09   ;00FDD4|        |      ;
