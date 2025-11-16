@@ -11211,7 +11211,7 @@ Dialog_LoadCharacterPointer_Found:
 	rts                                  ;00A2D3|60      |      ;	Return with character pointer in $9E
 ;      |        |      ;
 ;      |        |      ;
-UNREACH_00A2D4:
+Dialog_DeadCode_CharacterLookup:  ; Dead code after RTS (alternative character lookup logic)
 	db $a2,$ff,$ff,$86,$9e,$86,$a0,$fa,$60;00A2D4|        |      ;
 ;      |        |      ;
 Dialog_CharacterTable_IDs:
@@ -11235,7 +11235,7 @@ Dialog_CharacterTable_Pointers:
 	rts                                  ;00A2FE|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
-UNREACH_00A2FF:
+Dialog_DeadCode_TableIncrement:  ; Dead code after RTS (alternative table increment)
 	db $1a,$0a,$65,$17,$85,$17,$60       ;00A2FF|        |      ;
 	lda.B [$17]                          ;00A306|A717    |000017;
 	inc.B $17                            ;00A308|E617    |000017;
@@ -12297,7 +12297,7 @@ Dialog_RepeatCharacter_Loop:
 ;      |        |      ;
 	db $60                               ;00AAF6|        |      ;
 ;      |        |      ;
-UNREACH_00AAF7:
+Text_DeadCode_JumpTable:  ; Dead code after JMP (text processing jump table)
 	db $f6,$aa                           ;00AAF7|        |0000AA;
 	db $07,$ab,$20,$ab,$88,$ab,$ce,$ab,$e5,$ab,$9f,$ab,$ba,$ab;00AAF9|        |      ;
 	lda.B $2b                            ;00AB07|A52B    |00002B;
@@ -13693,11 +13693,11 @@ Display_ClampMax_Return:
 ;      |        |      ;
 	lda.W #$0020                         ;00B4B0|A92000  |      ;
 	and.w !system_flags_5                          ;00B4B3|2DDA00  |0000DA;
-	beq UNREACH_00B4BB                   ;00B4B6|F003    |00B4BB;
+	beq Display_DeadCode_JumpTarget                   ;00B4B6|F003    |00B4BB;
 	jmp.W Text_CalculateDisplayPosition                    ;00B4B8|4CC0A8  |00A8C0;
 ;      |        |      ;
 ;      |        |      ;
-UNREACH_00B4BB:
+Display_DeadCode_JumpTarget:  ; Dead code - alternative display calculation (never taken)
 	db $a9,$ff,$00,$4c,$c9,$9d           ;00B4BB|        |      ;
 	lda.W #$1c00                         ;00B4C1|A9001C  |      ;
 	trb.B $1d                            ;00B4C4|141D    |00001D;
@@ -13817,14 +13817,14 @@ Dialog_CheckPortraitMode:
 	cmp.B #$4e                           ;00B5B0|C94E    |      ;
 	beq Dialog_AdjustPortraitOffset                      ;00B5B2|F015    |00B5C9;
 	cmp.B #$6b                           ;00B5B4|C96B    |      ;
-	beq UNREACH_00B5C2                   ;00B5B6|F00A    |00B5C2;
+	beq Dialog_DeadCode_PortraitClamp                   ;00B5B6|F00A    |00B5C2;
 	cmp.B #$77                           ;00B5B8|C977    |      ;
 	bcc Dialog_IncrementPosition                      ;00B5BA|9023    |00B5DF;
 	cmp.B #$7b                           ;00B5BC|C97B    |      ;
 	bcs Dialog_IncrementPosition                      ;00B5BE|B01F    |00B5DF;
 	db $80,$07                           ;00B5C0|        |00B5C9;
 ;      |        |      ;
-UNREACH_00B5C2:
+Dialog_DeadCode_PortraitClamp:  ; Dead code - portrait offset adjustment (never reached)
 	db $18,$a5,$23,$69,$04,$85,$23       ;00B5C2|        |      ;
 ;      |        |      ;
 Dialog_AdjustPortraitOffset:
@@ -13867,12 +13867,12 @@ Dialog_StoreDelay:
 	sta.B $24                            ;00B5F5|8524    |000024;
 	lda.B $23                            ;00B5F7|A523    |000023;
 	cmp.B #$08                           ;00B5F9|C908    |      ;
-	bcc UNREACH_00B607                   ;00B5FB|900A    |00B607;
+	bcc Dialog_DeadCode_MinBound                   ;00B5FB|900A    |00B607;
 	cmp.B #$a9                           ;00B5FD|C9A9    |      ;
 	bcc Dialog_CalculateBottomBound                      ;00B5FF|900A    |00B60B;
 	db $a9,$a8,$85,$23,$80,$04           ;00B601|        |      ;
 ;      |        |      ;
-UNREACH_00B607:
+Dialog_DeadCode_MinBound:  ; Dead code - minimum Y position clamp (never reached)
 	db $a9,$08,$85,$23                   ;00B607|        |      ;
 ;      |        |      ;
 Dialog_CalculateBottomBound:
@@ -14077,13 +14077,13 @@ Input_WaitLoop:
 	bpl Input_RefreshDisplay                      ;00B75B|1030    |00B78D;
 	lda.B $95                            ;00B75D|A595    |000095;
 	and.B #$02                           ;00B75F|2902    |      ;
-	beq UNREACH_00B76B                   ;00B761|F008    |00B76B;
+	beq Input_DeadCode_DownWrap                   ;00B761|F008    |00B76B;
 	lda.w !menu_max_pos                          ;00B763|AD6301  |000163;
 	sta.w !menu_cursor_pos                          ;00B766|8D6201  |000162;
 	bra Input_RefreshDisplay                      ;00B769|8022    |00B78D;
 ;      |        |      ;
 ;      |        |      ;
-UNREACH_00B76B:
+Input_DeadCode_DownWrap:  ; Dead code - cursor wrap (wrap disabled in $95)
 	db $ee,$62,$01,$80,$be               ;00B76B|        |000162;
 ;      |        |      ;
 Input_HandleRight:
@@ -14111,11 +14111,11 @@ Input_RefreshDisplay:
 	bra Input_WaitLoop                      ;00B795|8097    |00B72E;
 ;      |        |      ;
 ;      |        |      ;
-UNREACH_00B797:
+Input_DeadCode_VerticalWrap:  ; Dead code - vertical column wrap logic (alternative input handling)
 	db $e2,$20,$38,$ad,$62,$01,$f0,$08,$e9,$0a,$b0,$0d,$a9,$00,$80,$09;00B797|        |      ;
 	db $a5,$95,$29,$04,$f0,$81,$ad,$63,$01,$8d,$62,$01,$80,$d8;00B7A7|        |000095;
 ;      |        |      ;
-UNREACH_00B7B5:
+Input_DeadCode_ColumnIncrement:  ; Dead code - column increment logic (alternative input handling)
 	db $e2,$20,$ad,$62,$01,$cd,$63,$01,$f0,$13,$18,$69,$0a,$8d,$62,$01;00B7B5|        |      ;
 	db $ad,$63,$01,$cd,$62,$01,$b0,$c0,$8d,$62,$01,$80,$bb,$a5,$95,$29;00B7C5|        |000163;
 	db $08,$f0,$bd,$9c,$62,$01,$80,$b0   ;00B7D5|        |      ;
@@ -14510,19 +14510,19 @@ SaveFile_CheckInput:
 	jsr.W SaveFile_CalculateOffset                    ;00B9C2|202BC9  |00C92B;
 	tax                                  ;00B9C5|AA      |      ;
 	lda.L $700000,x                      ;00B9C6|BF000070|700000;
-	beq UNREACH_00B9DB                   ;00B9CA|F00F    |00B9DB;
+	beq SaveFile_DeadCode_NoData                   ;00B9CA|F00F    |00B9DB;
 	jsr.W Sound_PlayEffect_MenuSelect                    ;00B9CC|2008B9  |00B908;
 	lda.w !save_slot_index                          ;00B9CF|AD0E01  |00010E;
 	jmp.W SaveFile_SaveOperation                    ;00B9D2|4C63CA  |00CA63;
 ;      |        |      ;
 ;      |        |      ;
-UNREACH_00B9D5:
+SaveFile_DeadCode_EraseSlot:  ; Dead code - erase save slot (never reached via BEQ)
 	db $20,$08,$b9,$4c,$1a,$ba           ;00B9D5|        |00B908;
 ;      |        |      ;
-UNREACH_00B9DB:
+SaveFile_DeadCode_NoData:  ; Dead code - empty slot handling (alternative path)
 	db $20,$12,$b9,$80,$c0               ;00B9DB|        |00B912;
 ;      |        |      ;
-UNREACH_00B9E0:
+SaveFile_DeadCode_InitSlot:  ; Dead code - initialize save slot (alternative path)
 	db $86,$05,$20,$1c,$b9,$e2,$30,$a9,$ec,$8f,$d8,$56,$7f,$8f,$da,$56;00B9E0|        |000005;
 	db $7f,$8f,$dc,$56,$7f,$8f,$de,$56,$7f,$a5,$06,$0a,$aa,$a9,$e0,$9f;00B9F0|        |56DC8F;
 	db $d8,$56,$7f,$a9,$08,$0c,$d4,$00,$22,$00,$80,$0c,$a9,$08,$1c,$d4;00BA00|        |      ;
@@ -14566,7 +14566,7 @@ Screen_ScrollBG3_Loop:
 	bra SaveFile_RefreshDisplay                      ;00BA6B|8072    |00BADF;
 ;      |        |      ;
 ;      |        |      ;
-UNREACH_00BA6D:
+SaveFile_DeadCode_SoundEffect:  ; Dead code - sound effect call (never reached)
 	db $20,$12,$b9                       ;00BA6D|        |00B912;
 ;      |        |      ;
 SaveFile_HandleInput:
@@ -14605,7 +14605,7 @@ SaveFile_HandleInput:
 	bra SaveFile_HandleInput                      ;00BAC0|80AE    |00BA70;
 ;      |        |      ;
 ;      |        |      ;
-UNREACH_00BAC2:
+SaveFile_DeadCode_CharacterCheck:  ; Dead code - character ID validation (never reached)
 	db $ac,$cc,$00,$f0,$a6,$88,$8c,$cc,$00,$e2,$20,$a9,$03,$80,$e3;00BAC2|        |0000CC;
 ;      |        |      ;
 SaveFile_ValidateSelection:
@@ -15643,27 +15643,27 @@ Input_CheckDirection:
 	stz.B $02                            ;00BEAD|6402    |000002;
 	lda.L $7e3664                        ;00BEAF|AF64367E|7E3664;
 	beq Input_HandleUp                      ;00BEB3|F014    |00BEC9;
-	bmi UNREACH_00BEC0                   ;00BEB5|3009    |00BEC0;
+	bmi Menu_DeadCode_CompanionCheck                   ;00BEB5|3009    |00BEC0;
 	lda.w !char2_companion_id                          ;00BEB7|AD9010  |001090;
 	bmi Input_HandleUp                      ;00BEBA|300D    |00BEC9;
 	inc.B $01                            ;00BEBC|E601    |000001;
 	bra Input_HandleUp                      ;00BEBE|8009    |00BEC9;
 ;      |        |      ;
 ;      |        |      ;
-UNREACH_00BEC0:
+Menu_DeadCode_CompanionCheck:  ; Dead code - companion validation (BMI never true for AND #$20)
 	db $ad,$e0,$04,$29,$20,$d0,$0d,$80,$07;00BEC0|        |0004E0;
 ;      |        |      ;
 Input_HandleUp:
 	lda.W $04e0                          ;00BEC9|ADE004  |0004E0;
 	and.B #$10                           ;00BECC|2910    |      ;
-	beq UNREACH_00BED4                   ;00BECE|F004    |00BED4;
+	beq Menu_DeadCode_SelectDefault                   ;00BECE|F004    |00BED4;
 ;      |        |      ;
 Input_HandleDown:
 	lda.B $01                            ;00BED0|A501    |000001;
 	bra Input_HandleLeft                      ;00BED2|8002    |00BED6;
 ;      |        |      ;
 ;      |        |      ;
-UNREACH_00BED4:
+Menu_DeadCode_SelectDefault:  ; Dead code - default selection value (never reached)
 	db $a9,$80                           ;00BED4|        |      ;
 ;      |        |      ;
 Input_HandleLeft:
@@ -15803,7 +15803,7 @@ Sprite_WriteOAM:
 	bra Input_RefreshCursor                      ;00BFD3|80A2    |00BF77;
 ;      |        |      ;
 ;      |        |      ;
-UNREACH_00BFD5:
+Menu_DeadCode_ItemSelection:  ; Dead code - alternative item selection jump (never taken)
 	db $4c,$5a,$bf                       ;00BFD5|        |00BF5A;
 ;      |        |      ;
 Sprite_CalculateOAM:
@@ -15865,7 +15865,7 @@ Menu_ProcessItemSelection:
 	bra Menu_RefreshDisplay                      ;00C042|8049    |00C08D;
 ;      |        |      ;
 ;      |        |      ;
-UNREACH_00C044:
+Menu_DeadCode_SoundEffect:  ; Dead code - sound effect call (never reached)
 	db $20,$12,$b9                       ;00C044|        |00B912;
 ;      |        |      ;
 Menu_WaitForInput:
@@ -15882,7 +15882,7 @@ Menu_WaitForInput:
 	jmp.W DMA_CopyParamsAndExecute                    ;00C061|4CC49B  |009BC4;
 ;      |        |      ;
 ;      |        |      ;
-UNREACH_00C064:
+Menu_DeadCode_InventoryCheck:  ; Dead code - inventory item validation (never reached)
 	db $ad,$91,$0e,$29,$7f,$00,$c9,$07,$00,$90,$d5,$20,$b1,$c1,$f0,$d3;00C064|        |000E91;
 	db $de,$18,$10,$e2,$20,$a9,$14,$8d,$3a,$04,$22,$e0,$8a,$02,$ad,$df;00C074|        |001018;
 	db $04,$8d,$05,$05,$a9,$14,$4c,$f4,$bc;00C084|        |00008D;
@@ -15893,7 +15893,7 @@ Menu_RefreshDisplay:
 	bra Menu_WaitForInput                      ;00C093|80B2    |00C047;
 ;      |        |      ;
 ;      |        |      ;
-UNREACH_00C095:
+Menu_DeadCode_ReturnToMain:  ; Dead code - return to main menu (never reached)
 	db $4c,$44,$c0                       ;00C095|        |00C044;
 ;      |        |      ;
 Menu_ValidateItem:
@@ -16094,7 +16094,7 @@ ColorSelect_WaitInput:
 	rts                                  ;00C20D|60      |      ;
 ;      |        |      ;
 ;      |        |      ;
-UNREACH_00C20E:
+ColorSelect_DeadCode_CompanionCheck:  ; Dead code - companion validation (never reached)
 	db $e2,$20,$ad,$90,$10,$30,$d6,$4c,$d9,$c2;00C20E|        |      ;
 ;      |        |      ;
 ColorSelect_ProcessSelection:
@@ -16810,7 +16810,7 @@ Graphics_ReadPaletteEntry:
 	bra Graphics_IncrementPaletteIndex                      ;00C782|8002    |00C786;
 ;      |        |      ;
 ;      |        |      ;
-UNREACH_00C784:
+Graphics_DeadCode_PaletteSkip:  ; Dead code - palette index skip (never reached)
 	db $c8,$c8                           ;00C784|        |      ;
 ;      |        |      ;
 Graphics_IncrementPaletteIndex:
@@ -17572,11 +17572,11 @@ SaveFile_LoadWithValidation:
 	jsr.W SaveFile_SetBank70                    ;00C9BC|204FC9  |00C94F;
 	jsr.W SaveFile_CalculateChecksum                    ;00C9BF|205CC9  |00C95C;
 	cmp.B $12                            ;00C9C2|C512    |000012;
-	bne UNREACH_00C9CB                   ;00C9C4|D005    |00C9CB;
+	bne SaveFile_DeadCode_ChecksumError                   ;00C9C4|D005    |00C9CB;
 	jsr.W SaveFile_ValidateChecksum                    ;00C9C6|207DC9  |00C97D;
 	beq SaveFile_ValidationComplete                      ;00C9C9|F003    |00C9CE;
 ;      |        |      ;
-UNREACH_00C9CB:
+SaveFile_DeadCode_ChecksumError:  ; Dead code - checksum mismatch handling (never reached)
 	db $68,$80,$c7                       ;00C9CB|        |      ;
 ;      |        |      ;
 SaveFile_ValidationComplete:
@@ -19823,14 +19823,14 @@ Equipment_CheckCharacterAlive:
 ;      |        |      ;
 Equipment_CheckNegativeFlag:
 	bit.B #$01                           ;00D7A5|8901    |      ;
-	beq UNREACH_00D7B2                   ;00D7A7|F009    |00D7B2;
+	beq Equipment_DeadCode_DirectionCheck                   ;00D7A7|F009    |00D7B2;
 	lda.W $04e0                          ;00D7A9|ADE004  |0004E0;
 	bit.B #$02                           ;00D7AC|8902    |      ;
 	bne Equipment_NoEquipment                      ;00D7AE|D049    |00D7F9;
 	bra Equipment_DefaultState                      ;00D7B0|8007    |00D7B9;
 ;      |        |      ;
 ;      |        |      ;
-UNREACH_00D7B2:
+Equipment_DeadCode_DirectionCheck:  ; Dead code - D-pad check (never reached)
 	db $ad,$e0,$04,$89,$08,$d0,$13       ;00D7B2|        |0004E0;
 ;      |        |      ;
 Equipment_DefaultState:
@@ -19839,12 +19839,12 @@ Equipment_DefaultState:
 	bne Equipment_CheckUnequip                      ;00D7BE|D011    |00D7D1;
 	lda.W $04e0                          ;00D7C0|ADE004  |0004E0;
 	bit.B #$04                           ;00D7C3|8904    |      ;
-	beq UNREACH_00D7CC                   ;00D7C5|F005    |00D7CC;
+	beq Equipment_DeadCode_PointerHigh                   ;00D7C5|F005    |00D7CC;
 	ldx.W #$0200                         ;00D7C7|A20002  |      ;
 	bra Equipment_UpdatePointer                      ;00D7CA|8030    |00D7FC;
 ;      |        |      ;
 ;      |        |      ;
-UNREACH_00D7CC:
+Equipment_DeadCode_PointerHigh:  ; Dead code - high pointer value (never reached)
 	db $a2,$00,$03,$80,$2b               ;00D7CC|        |      ;
 ;      |        |      ;
 Equipment_CheckUnequip:
@@ -21830,7 +21830,7 @@ Graphics_Line_Shallow:
 	jmp.W Graphics_Pixel_CalcAddr                    ;00E9B3|4C76EA  |00EA76;
 ;      |        |      ;
 ;      |        |      ;
-UNREACH_00E9B6:
+Graphics_DeadCode_LineAlgorithm:  ; Dead code - alternative line drawing algorithm (never reached)
 	db $3b,$38,$e9,$07,$00,$1b,$5b,$20,$c9,$e9,$c2,$30,$3b,$18,$69,$07;00E9B6|        |      ;
 	db $00,$1b,$60,$e2,$20,$ad,$b6,$00,$85,$06,$ad,$b8,$00,$85,$07,$a9;00E9C6|        |      ;
 	db $01,$85,$04,$85,$05,$38,$ad,$ba,$00,$ed,$b6,$00,$b0,$08,$49,$ff;00E9D6|        |000085;
