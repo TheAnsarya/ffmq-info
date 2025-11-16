@@ -5249,20 +5249,300 @@ Input_CheckAnyPressed:
 	rtl                                  ;00969F|6B      |      ;
 ;      |        |      ;
 ;      |        |      ;
+;===============================================================================
+; NMI_WaitForVBlank - Synchronize Execution to VBlank Period
+;===============================================================================
+; ADDRESS:  $0096A0 (Bank $00)
+; LENGTH:   19 bytes ($0096B3 - $0096A0 = $13 bytes = 19 decimal)
+; TYPE:     Long call function (JSL/RTL)
+;
+; PURPOSE:
+;   Blocks execution until the next VBlank (vertical blanking interval) period
+;   begins. This synchronizes game logic with the display refresh cycle,
+;   ensuring graphics updates occur during safe timing windows.
+;   
+;   SNES displays 60 frames per second (NTSC) or 50 fps (PAL)
+;   VBlank duration: ~4.5 scanlines (~1.32ms) per frame
+;   Active display: ~224 scanlines (~16.7ms) per frame
+;   
+;   VBlank is the ONLY safe time for:
+;   - Updating VRAM (video memory, graphics tiles)
+;   - Changing palette colors (CGRAM)
+;   - Modifying OAM (sprite attribute memory)
+;   - Adjusting PPU registers (scrolling, windows, mode)
+;   
+;   Accessing these during active display causes graphical glitches:
+;   - Tearing (partial updates visible on screen)
+;   - Flickering sprites
+;   - Corrupted tiles
+;   - Color artifacts
+;
+; ALGORITHM: Busy-Wait Loop with Flag Polling
+;
+;   1. Clear system_flags_4 bit 5 ($20): Mark VBlank not yet occurred
+;   2. Loop: Poll system_flags_4 bit 5
+;   3. If bit still clear: VBlank hasn't started, continue looping
+;   4. If bit set: VBlank occurred (NMI handler set flag), exit loop
+;   
+;   NMI handler (VBlank_Handler) sets bit 5 every frame at VBlank start
+;   This function waits for next occurrence of that bit being set
+;
+; PARAMETERS:
+;
+;   INPUT:
+;     None (uses global system_flags_4 register)
+;   
+;   OUTPUT:
+;     None (execution synchronized to VBlank timing)
+;     
+;     Timing guarantee: Returns during or immediately after VBlank period
+;     
+;     system_flags_4 bit 5 ($20): Left SET when function returns
+;       (Cleared by this function before wait, set by NMI handler)
+;
+; COMMON USE CASES:
+;
+;   1. Graphics Update Synchronization:
+;      jsl NMI_WaitForVBlank  ; Wait for safe timing
+;      ; Now update VRAM tiles
+;      lda #tile_data; sta.W SNES_VMDATAL
+;   
+;   2. Palette Change (Fade Effects):
+;      jsl NMI_WaitForVBlank  ; Wait for VBlank
+;      ; Update CGRAM colors
+;      lda #palette_addr; sta.W SNES_CGADD
+;      lda #new_color; sta.W SNES_CGDATA
+;   
+;   3. Sprite Movement (OAM Update):
+;      jsl NMI_WaitForVBlank  ; Synchronize
+;      ; Update OAM sprite positions
+;      lda #sprite_x; sta oam_buffer+0
+;      lda #sprite_y; sta oam_buffer+1
+;   
+;   4. Frame Rate Limiting:
+;      Main_Loop:
+;        jsl Game_ProcessLogic  ; Update game state
+;        jsl NMI_WaitForVBlank  ; Lock to 60fps
+;        bra Main_Loop
+;   
+;   5. Prevent Mid-Frame Writes:
+;      ; Ensure previous frame's VBlank complete
+;      jsl NMI_WaitForVBlank
+;      ; Safe to queue DMA for next VBlank
+;      lda #dma_params; sta vram_transfer_size
+;
+; SYSTEM_FLAGS_4 BIT ASSIGNMENTS:
+;
+;   Bit 0 ($01): (unknown)
+;   Bit 1 ($02): (unknown)
+;   Bit 2 ($04): (unknown)
+;   Bit 3 ($08): (unknown)
+;   Bit 4 ($10): (unknown)
+;   Bit 5 ($20): VBlank occurred flag
+;     Set by: NMI handler (VBlank_Handler) at start of VBlank
+;     Cleared by: This function before wait, or manually by caller
+;     Used for: Frame synchronization, VBlank detection
+;   Bit 6 ($40): (unknown)
+;   Bit 7 ($80): (unknown)
+;
+; TIMING BEHAVIOR:
+;
+;   Case 1: Called during active display (mid-frame)
+;     - Waits until VBlank starts (~0-16ms depending on call timing)
+;     - Returns immediately when VBlank flag set
+;   
+;   Case 2: Called during VBlank period
+;     - Flag already set from current VBlank
+;     - TRB clears flag, begins wait for NEXT frame
+;     - Waits ~16.7ms (full frame duration) for next VBlank
+;   
+;   Case 3: Called immediately after VBlank
+;     - Flag still set from previous VBlank
+;     - TRB clears flag, waits for next VBlank
+;     - Waits ~16.7ms for next frame
+;   
+;   IMPORTANT: This function waits for NEXT VBlank occurrence
+;   To wait for current VBlank if mid-frame, flag must already be clear
+;
+; PERFORMANCE:
+;
+;   Setup: ~15-20 cycles (~6-7μs)
+;     - PHP: 3 cycles
+;     - SEP #$20: 3 cycles
+;     - PHA: 3 cycles
+;     - LDA #imm: 2 cycles
+;     - TRB abs: 8 cycles
+;   
+;   Loop iteration: ~10 cycles per check (~3.7μs)
+;     - LDA #imm: 2 cycles
+;     - AND abs: 4 cycles
+;     - BEQ rel: 2 cycles (not taken) or 3 cycles (taken)
+;   
+;   Total wait time: 15 + (iterations × 10) cycles
+;   
+;   Worst case: Called immediately after flag clear
+;     Iterations: ~16,700μs ÷ 3.7μs = ~4,500 iterations
+;     Cycles: 15 + (4,500 × 10) = ~45,015 cycles
+;     Time: ~16.7ms (one full frame)
+;   
+;   Best case: Flag already set when loop starts
+;     Iterations: 1
+;     Cycles: 15 + 10 = 25 cycles
+;     Time: ~9μs
+;   
+;   Average: ~8.35ms (half frame duration)
+;
+; WHY TRB INSTEAD OF AND + STA:
+;
+;   TRB (Test and Reset Bits):
+;     Single instruction: TRB absolute
+;     Atomic operation: Test current value, clear specified bits
+;     Cycles: 8 (vs 12 for LDA+AND+STA)
+;     Safe: No race condition with NMI handler
+;   
+;   Alternative (AND + STA):
+;     LDA system_flags_4  ; 4 cycles
+;     AND #~$20           ; 2 cycles
+;     STA system_flags_4  ; 4 cycles
+;     Total: 10 cycles (slower)
+;     Problem: Race condition if NMI occurs between LDA and STA
+;   
+;   TRB advantages:
+;     - Faster (8 cycles vs 10)
+;     - Atomic (cannot be interrupted mid-operation)
+;     - Cleaner code (1 instruction vs 3)
+;
+; RACE CONDITION PREVENTION:
+;
+;   Scenario: NMI occurs between flag clear and loop check
+;   
+;   Without atomicity:
+;     1. LDA system_flags_4 (read $00, flag clear)
+;     2. ** NMI occurs here, sets flag **
+;     3. AND #~$20 (clear bit 5 in A)
+;     4. STA system_flags_4 (write $00, overwrites NMI's flag set!)
+;     5. Loop checks flag, finds it clear (wrong!)
+;     6. Waits entire additional frame unnecessarily
+;   
+;   With TRB (atomic):
+;     1. TRB system_flags_4, #$20 (clear bit 5 atomically)
+;     2. If NMI occurs after TRB: Flag gets set correctly
+;     3. If NMI occurs during TRB: Hardware ensures correct result
+;     4. Loop checks flag, finds correct state
+;     5. Waits correct amount of time
+;
+; INTERRUPT BEHAVIOR:
+;
+;   NMI (VBlank interrupt) remains enabled during wait
+;   NMI handler executes every frame:
+;     - Sets system_flags_4 bit 5
+;     - Performs DMA transfers
+;     - Updates OAM
+;     - Processes audio commands
+;   
+;   This function's loop continues checking flag between NMI calls
+;   When NMI sets flag, loop exits on next iteration
+;
+; WHY 8-BIT ACCUMULATOR MODE:
+;
+;   SEP #$20: Set 8-bit A mode
+;   
+;   Reasons:
+;     1. system_flags_4 is a byte variable (not word)
+;     2. TRB operates on 8-bit value efficiently
+;     3. AND operates on 8-bit flags
+;     4. Saves cycles vs 16-bit operations
+;   
+;   Alternative (16-bit):
+;     Would load 2 bytes (system_flags_4 + next byte)
+;     Wastes cycles testing/clearing unused high byte
+;     No functional benefit
+;
+; VBLANK PERIOD DETAILS:
+;
+;   NTSC (North America, Japan): 60.0 Hz
+;     Frame duration: 16.67ms
+;     Active display: 224 scanlines × 63.5μs = 14.22ms
+;     VBlank: ~262 - 224 = 38 scanlines × 63.5μs = 2.41ms
+;     Safe VRAM access window: ~1.3ms (first ~20 scanlines of VBlank)
+;   
+;   PAL (Europe): 50.0 Hz
+;     Frame duration: 20.00ms
+;     Active display: 224 scanlines × 64μs = 14.34ms
+;     VBlank: ~312 - 224 = 88 scanlines × 64μs = 5.63ms
+;     Safe VRAM access window: ~3ms
+;   
+;   This function returns during VBlank period
+;   Caller must complete VRAM/OAM updates before VBlank ends
+;
+; COMMON PITFALLS:
+;
+;   1. Calling twice in succession:
+;      jsl NMI_WaitForVBlank  ; Waits for next VBlank
+;      jsl NMI_WaitForVBlank  ; Waits ANOTHER full frame!
+;      Problem: 2× frame delay (33.4ms instead of 16.7ms)
+;   
+;   2. Forgetting to wait before VRAM write:
+;      lda #tile_data; sta SNES_VMDATAL  ; Mid-frame write!
+;      Result: Graphical corruption, tearing
+;   
+;   3. Too much work during VBlank:
+;      jsl NMI_WaitForVBlank
+;      ; 5ms of VRAM updates here
+;      Result: Updates overflow VBlank period, cause glitches
+;   
+;   4. Waiting inside NMI handler:
+;      VBlank_Handler:
+;        jsl NMI_WaitForVBlank  ; DEADLOCK!
+;      Problem: NMI can't set flag while inside NMI handler
+;
+; RELATED FUNCTIONS:
+;   - VBlank_Handler ($008337): NMI interrupt handler, sets VBlank flag
+;   - DMA_CopyParamsAndExecute: Often called after this function
+;   - Frame_ProcessUpdate: Main loop frame processing
+;
+; REGISTERS MODIFIED:
+;   A: (restored via stack)
+;   P: (restored via stack)
+;
+; REGISTERS PRESERVED:
+;   A: Saved via PHA/PLA
+;   X, Y: Not accessed (preserved implicitly)
+;   D: Direct Page (not modified)
+;   B: Data Bank (not modified)
+;
+; TECHNICAL NOTES:
+;
+;   Busy-wait loop (polling):
+;     Alternative: WAI instruction (Wait for Interrupt)
+;     WAI halts CPU until interrupt occurs
+;     FFMQ doesn't use WAI (compatibility, simplicity)
+;   
+;   Flag polling overhead:
+;     ~4,500 iterations @ 10 cycles = 45,000 cycles/frame
+;     ~1.7% of 2.68MHz CPU (45K ÷ 2.68M × 60fps = 1%)
+;     Acceptable for synchronization guarantee
+;   
+;   Alternative approaches:
+;     Event-driven: Use IRQ/NMI to wake sleeping code
+;     Hardware timer: Use SNES hardware timer interrupts
+;     FFMQ choice: Simple polling (easy to understand, reliable)
+;
+;===============================================================================
 NMI_WaitForVBlank:
-	php                                  ;0096A0|08      |      ;
-	sep #$20                             ;0096A1|E220    |      ;
-	pha                                  ;0096A3|48      |      ;
-	lda.B #$20                           ;0096A4|A920    |      ;
-	trb.w !system_flags_4                          ;0096A6|1CD800  |0000D8;
+	php                                  ;0096A0|08      |      ; save processor status flags (preserve A/X/Y size, decimal mode)
+	sep #$20                             ;0096A1|E220    |      ; set 8-bit accumulator mode (for byte flag operations)
+	pha                                  ;0096A3|48      |      ; save accumulator (preserve caller's A value)
+	lda.B #$20                           ;0096A4|A920    |      ; A = $20 (bit 5 mask, VBlank occurred flag)
+	trb.w !system_flags_4                ;0096A6|1CD800  |0000D8; clear VBlank flag (TRB = Test and Reset Bits, atomic operation)
 ;      |        |      ;
 NMI_WaitForVBlank_Loop:
-	lda.B #$20                           ;0096A9|A920    |      ;
-	and.w !system_flags_4                          ;0096AB|2DD800  |0000D8;
-	beq NMI_WaitForVBlank_Loop                      ;0096AE|F0F9    |0096A9;
-	pla                                  ;0096B0|68      |      ;
-	plp                                  ;0096B1|28      |      ;
-	rtl                                  ;0096B2|6B      |      ;
+	lda.B #$20                           ;0096A9|A920    |      ; A = $20 (bit 5 mask, check VBlank flag)
+	and.w !system_flags_4                ;0096AB|2DD800  |0000D8; test if VBlank flag set (A = flags & $20)
+	beq NMI_WaitForVBlank_Loop           ;0096AE|F0F9    |0096A9; if Z=1 (flag clear): loop, wait for NMI to set flag
+	pla                                  ;0096B0|68      |      ; restore accumulator (caller's A value)
+	plp                                  ;0096B1|28      |      ; restore processor status flags (A/X/Y size, etc.)
+	rtl                                  ;0096B2|6B      |      ; long return (VBlank occurred, safe to access VRAM/OAM)
 ;      |        |      ;
 ;      |        |      ;
 ;===============================================================================
